@@ -380,16 +380,23 @@ class FlexicontentModelTag extends FCModelAdmin
 		$jinput->set('view', 'tags');
 		$jinput->set('option', 'com_tags');
 
-		$result = $dispatcher->trigger($this->event_change_state, array('com_tags.tag', (array) $id, $state));
+		$results = FLEXI_J40GE
+			? $app->triggerEvent($this->event_change_state, array('com_tags.tag', (array) $id, $state))
+			: $dispatcher->trigger($this->event_change_state, array('com_tags.tag', (array) $id, $state));
 		
 		// Revert compatibilty steps ... besides the plugins using the change state event, should have updated DB state value anyway
 		$jinput->set('view', $view);
 		$jinput->set('option', $option);
-		
-		if (in_array(false, $result, true) && !$event_failed_notice_added)
+
+		// Abort further actions if any plugin returns a result === false
+		if (is_array($results) && in_array(false, $results, true))
 		{
-			$app->enqueueMessage('At least 1 plugin event handler for onContentChangeState failed', 'warning');
-			$event_failed_notice_added = true;
+			if (!$event_failed_notice_added)
+			{
+				$app->enqueueMessage('At least 1 plugin event handler for onContentChangeState failed', 'warning');
+				$event_failed_notice_added = true;
+			}
+
 			return false;
 		}
 
@@ -397,6 +404,7 @@ class FlexicontentModelTag extends FCModelAdmin
 		{
 			$this->cleanCache(null, -1);
 		}
+
 		return true;
 	}
 

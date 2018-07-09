@@ -30,6 +30,9 @@ use Joomla\String\StringHelper;
  */
 class FlexicontentViewItems extends JViewLegacy
 {
+	var $tooltip_class = FLEXI_J40GE ? 'hasTooltip' : 'hasTooltip';
+	var $btn_sm_class  = FLEXI_J40GE ? 'btn btn-sm btn-outline-primary' : 'btn btn-small';
+
 	function display( $tpl = null )
 	{
 		// ***
@@ -66,7 +69,6 @@ class FlexicontentViewItems extends JViewLegacy
 		// Some flags
 		$useAssocs = flexicontent_db::useAssociations();
 		$print_logging_info = $cparams->get('print_logging_info');
-		$tip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
 		
 		// Get model
 		$model = $this->getModel();
@@ -243,7 +245,7 @@ class FlexicontentViewItems extends JViewLegacy
 		// Add usability notices if these are enabled
 		// ******************************************
 		
-		$conf_link = '<a href="index.php?option=com_config&view=component&component=com_flexicontent&path=" class="btn btn-info btn-small">'.JText::_("FLEXI_CONFIG").'</a>';
+		$conf_link = '<a href="index.php?option=com_config&view=component&component=com_flexicontent&path=" class="' . $this->btn_sm_class . ' btn-info">'.JText::_("FLEXI_CONFIG").'</a>';
 		
 		if ( $cparams->get('show_usability_messages', 1)  && !$unassociated && !$badcatitems)     // Important usability messages
 		{
@@ -325,7 +327,7 @@ class FlexicontentViewItems extends JViewLegacy
 		// include subcats boolean list
 		$subcats_na = $filter_order_type && $filter_cats && ($filter_order=='i.ordering' || $filter_order=='catsordering');
 		$lists['filter_subcats'] = $subcats_na
-			? '<img src="components/com_flexicontent/assets/images/comments.png" style="margin: 4px 0 0 8px;" class="hasTooltip" title="'.JText::_( 'FLEXI_SUBCATEGORIES_NOT_INCLUDED_DURING_CATORDER', true ).' &lt;br/&gt; &lt;br/&gt; '.JText::_('FLEXI_SUBCATEGORIES_NOT_INCLUDED_DURING_CATORDER_DESC', true).'" />'
+			? '<img src="components/com_flexicontent/assets/images/comments.png" style="margin: 4px 0 0 8px;" class="'.$this->tooltip_class.'" title="'.JText::_( 'FLEXI_SUBCATEGORIES_NOT_INCLUDED_DURING_CATORDER', true ).' &lt;br/&gt; &lt;br/&gt; '.JText::_('FLEXI_SUBCATEGORIES_NOT_INCLUDED_DURING_CATORDER_DESC', true).'" />'
 			: '';
 		$lists['filter_subcats'] .= ($subcats_na ? '<div style="display:none">' : '') . '
 			<input type="checkbox" id="filter_subcats" name="filter_subcats" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()" value="1" '.($filter_subcats ? ' checked="checked" ' : '').' />
@@ -356,7 +358,7 @@ class FlexicontentViewItems extends JViewLegacy
 			$_catsinstate[] = JHtml::_('select.option', $i, $v);
 		}
 
-		$catsinstate_attrs = ' class="add-on icon-info '.$tip_class.'" title="'.flexicontent_html::getToolTip(JText::_('FLEXI_LIST_ITEMS_IN_CATS', true), JText::_('FLEXI_LIST_ITEMS_IN_CATS_DESC', true), 0, 1).'" ';
+		$catsinstate_attrs = ' class="add-on icon-info '.$this->tooltip_class.'" title="'.flexicontent_html::getToolTip(JText::_('FLEXI_LIST_ITEMS_IN_CATS', true), JText::_('FLEXI_LIST_ITEMS_IN_CATS_DESC', true), 0, 1).'" ';
 		$lists['filter_catsinstate'] = ($filter_catsinstate || 1 ? '<div '.$catsinstate_attrs.'>&nbsp;'.JText::_('FLEXI_IN_CAT_STATE').'</div>' : '').
 			JHtml::_('select.genericlist', $_catsinstate, 'filter_catsinstate', 'size="1" class="use_select2_lib'.($filter_catsinstate!=1 ? '' : ' fc_skip_highlight').'" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', 'value', 'text', $filter_catsinstate, 'filter_catsinstate' );
 		//$lists['filter_catsinstate'] = JHtml::_('select.radiolist', $_catsinstate, 'filter_catsinstate', 'size="1" class="inputbox" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', 'value', 'text', $filter_catsinstate );
@@ -399,7 +401,7 @@ class FlexicontentViewItems extends JViewLegacy
 		}
 		//$lists['scope'] = JHtml::_('select.radiolist', $_scopes, 'scope', 'size="1" class="inputbox"', 'value', 'text', $scope );
 		$lists['scope'] = '
-			<span class="hasTooltip" style="display:inline-block; padding:0; margin:0;" title="'.JText::_('FLEXI_SEARCH_TEXT_INSIDE').'"><i class="icon-info"></i></span>
+			<span class="'.$this->tooltip_class.'" style="display:inline-block; padding:0; margin:0;" title="'.JText::_('FLEXI_SEARCH_TEXT_INSIDE').'"><i class="icon-info"></i></span>
 			'.JHtml::_('select.genericlist', $_scopes, 'scope', 'size="1" class="use_select2_lib fc_skip_highlight" onchange="jQuery(\'#search\').attr(\'placeholder\', jQuery(this).find(\'option:selected\').text());" ', 'value', 'text', $scope, 'scope' );
 		
 		/*$lists['scope']  = '';
@@ -671,7 +673,6 @@ class FlexicontentViewItems extends JViewLegacy
 		}
 
 		$contrl = "items.";
-		$tip_class = 'hasTooltip';
 		$btn_arr = array();
 
 		foreach($state as $shortname => $statedata)
@@ -682,7 +683,7 @@ class FlexicontentViewItems extends JViewLegacy
 				$statedata['name'], $btn_name, $full_js,
 				$msg_alert = JText::_('FLEXI_NO_ITEMS_SELECTED'), $msg_confirm = JText::_('FLEXI_ARE_YOU_SURE'),
 				$btn_task='', $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false,
-				$statedata['btn_class'] . ' btn-fcaction ' . $tip_class, $statedata['btn_icon'],
+				$statedata['btn_class'] . ' ' . $this->btn_sm_class . ' btn-fcaction ' . $this->tooltip_class, $statedata['btn_icon'],
 				'data-placement="right" title="' . flexicontent_html::encodeHTML(JText::_($statedata['desc']), 2) . '"', $auto_add = 0, $tag_type='button');
 		}
 
@@ -709,7 +710,6 @@ class FlexicontentViewItems extends JViewLegacy
 		$document = JFactory::getDocument();
 		$toolbar = JToolbar::getInstance('toolbar');
 		$loading_msg = flexicontent_html::encodeHTML(JText::_('FLEXI_LOADING') .' ... '. JText::_('FLEXI_PLEASE_WAIT'), 2);
-		$tip_class = ' hasTooltip';
 
 		$hasEdit    = $perms->CanEdit    || $perms->CanEditOwn;
 		$hasPublish = $perms->CanPublish || $perms->CanPublishOwn;
@@ -843,7 +843,7 @@ class FlexicontentViewItems extends JViewLegacy
 			if (count($btn_arr))
 			{
 				$drop_btn = '
-					<button type="button" class="btn btn-small dropdown-toggle" data-toggle="dropdown">
+					<button type="button" class="' . $this->btn_sm_class . ' dropdown-toggle" data-toggle="dropdown">
 						<span title="'.JText::_('FLEXI_CHANGE_STATE').'" class="icon-menu"></span>
 						'.JText::_('FLEXI_CHANGE_STATE').'
 						<span class="caret"></span>
@@ -884,7 +884,7 @@ class FlexicontentViewItems extends JViewLegacy
 		if (count($btn_arr))
 		{
 			$drop_btn = '
-				<button type="button" class="btn btn-small btn-primary dropdown-toggle" data-toggle="dropdown">
+				<button type="button" class="' . $this->btn_sm_class . ' btn-primary dropdown-toggle" data-toggle="dropdown">
 					<span title="'.JText::_('FLEXI_MAINTENANCE').'" class="icon-menu"></span>
 					'.JText::_('FLEXI_MAINTENANCE').'
 					<span class="caret"></span>

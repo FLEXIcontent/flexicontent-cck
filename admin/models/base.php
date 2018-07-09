@@ -537,6 +537,7 @@ abstract class FCModelAdmin extends JModelAdmin
 	function save($data)
 	{
 		// Initialise variables
+		$app        = JFactory::getApplication();
 		$dispatcher = JEventDispatcher::getInstance();
 
 		// Note that 'data' is typically post['jform'] and it is validated by the caller e.g. the controller
@@ -593,8 +594,12 @@ abstract class FCModelAdmin extends JModelAdmin
 		}
 
 		// Trigger the before save event (typically: onContentBeforeSave)
-		$result = $dispatcher->trigger($this->event_before_save, array($this->option . '.' . $this->name, &$record, $isNew, $data));
-		if (in_array(false, $result, true))
+		$results = FLEXI_J40GE
+			? $app->triggerEvent($this->event_before_save, array($this->option . '.' . $this->name, &$record, $isNew, $data))
+			: $dispatcher->trigger($this->event_before_save, array($this->option . '.' . $this->name, &$record, $isNew, $data));
+
+		// Abort record store if any plugin returns a result === false
+		if (is_array($results) && in_array(false, $results, true))
 		{
 			$this->setError($record->getError());
 			return false;
@@ -617,8 +622,17 @@ abstract class FCModelAdmin extends JModelAdmin
 		// Update language Associations
 		$this->saveAssociations($record, $data);
 
-		// Trigger the after save event (typically: onContentBeforeSave)
-		$dispatcher->trigger($this->event_after_save, array($this->option . '.' . $this->name, &$record, $isNew, $data));
+		// Trigger the after save event (typically: onContentAfterSave)
+		$results = FLEXI_J40GE
+			? $app->triggerEvent($this->event_after_save, array($this->option . '.' . $this->name, &$record, $isNew, $data))
+			: $dispatcher->trigger($this->event_after_save, array($this->option . '.' . $this->name, &$record, $isNew, $data));
+
+		// Abort further actions if any plugin returns a result === false
+		/*if (is_array($results) && in_array(false, $results, true))
+		{
+			$this->setError($record->getError());
+			return false;
+		}*/
 
 		// Extra steps after loading record, and before calling JTable::bind()
 		$this->_afterStore($record, $data);
@@ -1006,7 +1020,15 @@ abstract class FCModelAdmin extends JModelAdmin
 		{
 			// Check XML file exists
 			$model_xml_filepath = JPath::clean(JPATH_BASE.DS.'components'.DS . $extension_name . DS.'models'.DS.'forms'.DS . $model_name . '.xml');
-			if (!file_exists($model_xml_filepath))
+			$file_exists = file_exists($model_xml_filepath);
+
+			if (!$file_exists && FLEXI_J40GE)
+			{
+				$model_xml_filepath = JPath::clean(JPATH_BASE.DS.'components'.DS . $extension_name . DS.'forms'.DS . $model_name . '.xml');
+				$file_exists = file_exists($model_xml_filepath);
+			}
+
+			if (!$file_exists)
 			{
 				throw new Exception('Error reading model \'s form XML file : ' . $model_xml_filepath . ' file not found', 500);
 			}
@@ -1133,7 +1155,10 @@ abstract class FCModelAdmin extends JModelAdmin
 				?: $this->contentType->getTypeByAlias($this->typeAlias);
 
 			// Get tabs observer
-			$this->tagsObserver = $this->table->getObserverOfClass('Joomla\CMS\Table\Observer\Tags');
+			if (!FLEXI_J40GE)
+			{
+				$this->tagsObserver = $this->table->getObserverOfClass('Joomla\CMS\Table\Observer\Tags');
+			}
 		}
 	}
 

@@ -1248,7 +1248,6 @@ if ( $typeid && $this->params->get('selecttheme_fe') ) : ?>
 							if ($cssprep && FLEXI_J37GE)
 							{
 								$_value = $form_layout->getValue($fieldname, $groupname, $this->row->parameters->get($fieldname));
-								$field->setValue($_value);
 								$form_layout->setFieldAttribute($fieldname, 'disabled', 'true', $field->group);
 								$field->setup($form_layout->getFieldXml($fieldname, $field->group), $_value, $field->group);
 							}

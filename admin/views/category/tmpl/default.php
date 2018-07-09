@@ -147,7 +147,7 @@ $this->document->addScriptDeclaration($js);
 							<div class="control-group">
 								<div class="control-label">' . $field->label . '</div>
 								<div class="controls">
-									' . $this->getInheritedFieldDisplay($field, $this->iparams) . '
+									' . flexicontent_html::getInheritedFieldDisplay($field, $this->iparams) . '
 								</div>
 							</div>
 							';
@@ -250,7 +250,7 @@ $this->document->addScriptDeclaration($js);
 						<div class="control-group">
 							<div class="control-label">' . $field->label . '</div>
 							<div class="controls">
-								' . $this->getInheritedFieldDisplay($field, $this->iparams) . '
+								' . flexicontent_html::getInheritedFieldDisplay($field, $this->iparams) . '
 							</div>
 						</div>
 						';
@@ -275,7 +275,7 @@ $this->document->addScriptDeclaration($js);
 						<div class="control-group">
 							<div class="control-label">'.$field->label.'</div>
 							<div class="controls">
-								'.$this->getInheritedFieldDisplay($field, $this->iparams).'
+								' . flexicontent_html::getInheritedFieldDisplay($field, $this->iparams) . '
 							</div>
 						</div>
 						';
@@ -308,16 +308,18 @@ $this->document->addScriptDeclaration($js);
 
 						$_value = isset($_p[$_name])  ?  $_p[$_name]  :  null;
 
-						// setValue(), is ok if input property, has not been already created, otherwise we need to re-initialize (which clears input)
-						//$field->setup($field->element, $_value, $field->group);
-
+						/**
+						 * We need to set value manually here because the values are save in the 'attribs' group, but the parameters are really located in the 'templates' group ...
+						 * ...setValue(), is ok if input property, has not been already created, otherwise we need to re-initialize (which clears input)
+						 */
+						//$field->setup($this->form->getFieldXml($field->name, $field->group), $_value, $field->group);
 						$field->setValue($_value);
 
 						echo ($field->getAttribute('type')=='separator' || $field->hidden) ? $field->input : '
 						<div class="control-group">
 							<div class="control-label">'.$field->label.'</div>
 							<div class="controls">
-								'.$this->getInheritedFieldDisplay($field, $this->iparams).'
+								' . flexicontent_html::getInheritedFieldDisplay($field, $this->iparams) . '
 							</div>
 						</div>
 						';
@@ -333,7 +335,7 @@ $this->document->addScriptDeclaration($js);
 							</div>
 							<div class="fcclear"></div>
 
-							<div class="fc-sliders-plain-outer">
+							<div class="fc-sliders-plain-outer fc_preloaded">
 								<?php
 								echo JHtml::_('sliders.start','theme-sliders-'.$this->form->getValue("id"), array('useCookie'=>1,'show'=>1));
 								$groupname = 'attribs';  // Field Group name this is for name of <fields name="..." >
@@ -364,16 +366,14 @@ $this->document->addScriptDeclaration($js);
 											if ($field->getAttribute('not_inherited')) continue;
 											//if ($field->getAttribute('cssprep')) continue;
 
-											$cssprep = $field->getAttribute('cssprep');
-											$_labelclass = $cssprep == 'less' ? 'fc_less_parameter' : '';
-
-											$fieldname = $field->fieldname;
+											$fieldname  = $field->fieldname;
+											$cssprep    = $field->getAttribute('cssprep');
+											$labelclass = $cssprep == 'less' ? 'fc_less_parameter' : '';
 
 											// For J3.7.0+ , we have extra form methods Form::getFieldXml()
 											if ($cssprep && FLEXI_J37GE)
 											{
 												$_value = $form_layout->getValue($fieldname, $groupname, @ $this->iparams[$fieldname]);
-												$field->setValue($_value);
 												$form_layout->setFieldAttribute($fieldname, 'disabled', 'true', $field->group);
 												$field->setup($form_layout->getFieldXml($fieldname, $field->group), $_value, $field->group);
 											}
@@ -383,7 +383,7 @@ $this->document->addScriptDeclaration($js);
 											 : '
 												<div class="control-group" id="'.$field->id.'-container">
 													<div class="control-label">'.
-														str_replace('class="', 'class="'.$_labelclass.' ',
+														str_replace('class="', 'class="'.$labelclass.' ',
 															str_replace('jform_attribs_', 'jform_layouts_'.$tmpl->name.'_',
 																$form_layout->getLabel($fieldname, $groupname)
 															)
@@ -395,7 +395,7 @@ $this->document->addScriptDeclaration($js);
 															:
 															str_replace('jform_attribs_', 'jform_layouts_'.$tmpl->name.'_',
 																str_replace('[attribs]', '[layouts]['.$tmpl->name.']',
-																	$this->getInheritedFieldDisplay($field, $this->iparams)
+																	flexicontent_html::getInheritedFieldDisplay($field, $this->iparams)
 																	//$form_layout->getInput($fieldname, $groupname/*, $value*/)   // Value already set, no need to pass it
 																)
 															)
@@ -429,17 +429,19 @@ $this->document->addScriptDeclaration($js);
 								if ($_name=='clayout' || $_name=='clayout_mobile') continue;
 
 								$_value = isset($_p[$_name])  ?  $_p[$_name]  :  null;
-
-								// setValue(), is ok if input property, has not been already created, otherwise we need to re-initialize (which clears input)
-								//$field->setup($field->element, $_value, $field->group);
-
+								
+								/**
+								 * We need to set value manually here because the values are save in the 'attribs' group, but the parameters are really located in the 'templates' group ...
+								 * ...setValue(), is ok if input property, has not been already created, otherwise we need to re-initialize (which clears input)
+								 */
+								//$field->setup($this->form->getFieldXml($field->name, $field->group), $_value, $field->group);
 								$field->setValue($_value);
 
 								echo ($field->getAttribute('type')=='separator' || $field->hidden) ? $field->input : '
 								<div class="control-group">
 									<div class="control-label">'.$field->label.'</div>
 									<div class="controls">
-										'.$this->getInheritedFieldDisplay($field, $this->iparams).'
+										' . flexicontent_html::getInheritedFieldDisplay($field, $this->iparams) . '
 									</div>
 								</div>
 								';
@@ -468,7 +470,7 @@ $this->document->addScriptDeclaration($js);
 						<div class="control-group">
 							<div class="control-label">'.$field->label.'</div>
 							<div class="controls">
-								'.$this->getInheritedFieldDisplay($field, $this->iparams).'
+								' . flexicontent_html::getInheritedFieldDisplay($field, $this->iparams) . '
 							</div>
 						</div>
 						';
@@ -493,7 +495,7 @@ $this->document->addScriptDeclaration($js);
 						<div class="control-group">
 							<div class="control-label">'.$field->label.'</div>
 							<div class="controls">
-								'.$this->getInheritedFieldDisplay($field, $this->iparams).'
+								' . flexicontent_html::getInheritedFieldDisplay($field, $this->iparams) . '
 							</div>
 						</div>
 						';
@@ -561,7 +563,7 @@ $this->document->addScriptDeclaration($js);
 				<div class="control-group">
 					<div class="control-label">' . $field->label . '</div>
 					<div class="controls">
-						' . $this->getInheritedFieldDisplay($field, $this->iparams) . '
+						' . flexicontent_html::getInheritedFieldDisplay($field, $this->iparams) . '
 					</div>
 				</div>
 				';
@@ -581,7 +583,7 @@ $this->document->addScriptDeclaration($js);
 					<div class="control-group">
 						<div class="control-label">' . $field->label . '</div>
 						<div class="controls">
-							' . $this->getInheritedFieldDisplay($field, $this->iparams) . '
+							' . flexicontent_html::getInheritedFieldDisplay($field, $this->iparams) . '
 						</div>
 					</div>
 					';

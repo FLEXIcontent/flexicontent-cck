@@ -10,6 +10,9 @@
  */
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
+
+use Joomla\CMS\Editor\Editor;
+
 JLoader::register('FCField', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/fcfield/parentfield.php');
 
 class plgFlexicontent_fieldsTextarea extends FCField
@@ -68,7 +71,7 @@ class plgFlexicontent_fieldsTextarea extends FCField
 		// Create the editor object of editor prefered by the user,
 		// this will also add the needed JS to the HTML head
 		$editor_name = $field->parameters->get( 'editor',  $user->getParam('editor', $app->getCfg('editor'))  );
-		$editor  = JFactory::getEditor($editor_name);
+		$editor = FLEXI_J40GE ? Editor::getInstance($editor_name) : JEditor::getInstance($editor_name);
 		$editor_plg_params = array();  // Override parameters of the editor plugin, ignored by most editors !!
 
 
@@ -1048,7 +1051,7 @@ class plgFlexicontent_fieldsTextarea extends FCField
 		// Create the editor object of editor prefered by the user,
 		// this will also add the needed JS to the HTML head
 		$editor_name = $field->parameters->get( 'editor',  $user->getParam('editor', $app->getCfg('editor'))  );
-		$editor  = JFactory::getEditor($editor_name);
+		$editor = FLEXI_J40GE ? Editor::getInstance($editor_name) : JEditor::getInstance($editor_name);
 		$editor_plg_params = array();  // Override parameters of the editor plugin, ignored by most editors !!
 
 
