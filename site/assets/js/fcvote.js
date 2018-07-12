@@ -43,16 +43,8 @@ jQuery(document).ready(function(){
 
 			var rating = jQuery(this).text();
 
-			if (1)
-			{
-				var voteurl = live_site_base +
-					'/index.php?option=com_flexicontent&task=reviews.ajaxvote&user_rating=' + rating + '&cid=' + itemID + '&xid=' + xid;
-			}
-			else
-			{
-				var voteurl = live_site_root +
-				'/index.php?option=com_flexicontent&format=raw&task=ajaxvote&user_rating=' + rating + '&cid=' + itemID + '&xid=' + xid;
-			}
+			var voteurl = live_site_base +
+				'/index.php?option=com_flexicontent&task=reviews.ajaxvote&user_rating=' + rating + '&cid=' + itemID + '&xid=' + xid;
 
 			jQuery.ajax({
 				url: voteurl,

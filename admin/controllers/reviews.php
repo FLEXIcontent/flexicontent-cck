@@ -1297,6 +1297,43 @@ class FlexicontentControllerReviews extends FlexicontentController
 
 
 	/**
+	 * Method to terminate the ajax voting tasking task on error
+	 *
+	 * @access private
+	 * @since 1.0
+	 */
+	protected function _ajaxvote_error($mssg, $xid, $no_ajax = false)
+	{
+		if ($this->input->get('task', '', 'cmd') == __FUNCTION__) die(__FUNCTION__ . ' : direct call not allowed');
+
+		// Handle non ajax call
+		if ($no_ajax)
+		{
+			JFactory::getApplication()->enqueueMessage($mssg, 'notice');
+			return;
+		}
+
+		// Since voting REJECTED, avoid setting BAR percentage and HTML rating text ... someone else may have voted for the item ...
+		else
+		{
+			$result	= new stdClass();
+			$result->percentage = '';
+			$result->htmlrating = '';
+			$mssg = '
+			<div class="fc-mssg fc-warning fc-nobgimage">
+				<button type="button" class="close" data-dismiss="alert">&times;</button>
+				'.$mssg.'
+			</div>';
+
+			$xid !== 'main'
+				? $result->message = $mssg
+				: $result->message_main = $mssg;
+			jexit(json_encode($result));
+		}
+	}
+
+
+	/**
 	 * Method for clearing cache of data depending on records type
 	 *
 	 * return: string
