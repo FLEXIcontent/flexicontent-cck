@@ -463,7 +463,7 @@ class FlexicontentModelField extends FCModelAdmin
 		$field = $this->_record;
 
 		// Override 'types' for core fields, since the core field must be assigned to all types
-		if ($field->iscore)
+		if ($field->iscore && $field->field_type !== 'voting')
 		{
 			$query = $this->_db->getQuery(true)
 				->select('id')
