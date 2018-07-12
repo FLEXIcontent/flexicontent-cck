@@ -20,6 +20,31 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_favourites` (
   KEY `type` (`type`)
 ) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`;
 
+CREATE TABLE IF NOT EXISTS `#__flexicontent_reviews` (
+  `id` int(11) NOT NULL auto_increment,
+  `content_id` int(11) NOT NULL,
+  `type` varchar(255) NOT NULL DEFAULT 'item',
+  `average_rating` int NOT NULL,
+  `custom_ratings` text NOT NULL DEFAULT '',
+  `user_id` int(11) NOT NULL DEFAULT '0',
+  `email` varchar(255) NOT NULL DEFAULT '',
+  `title` varchar(255) NULL,
+  `text` mediumtext NULL,
+  `state` tinyint(3) NOT NULL DEFAULT '0',
+  `approved` tinyint(3) NOT NULL DEFAULT '0',
+  `useful_yes` int(11) NOT NULL DEFAULT '0',
+  `useful_no` int(11) NOT NULL DEFAULT '0',
+  `submit_date` datetime NOT NULL,
+  `update_date` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `checked_out` int(11) unsigned NOT NULL default '0',
+  `checked_out_time` datetime NOT NULL default '0000-00-00 00:00:00',
+  `attribs` mediumtext NULL,
+  PRIMARY KEY  (`id`),
+  KEY (`content_id`, `user_id`, `type`),
+  KEY (`content_id`, `type`),
+  KEY `user_id` (`user_id`)
+) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`;
+
 CREATE TABLE IF NOT EXISTS `#__flexicontent_fields` (
   `id` int(11) unsigned NOT NULL auto_increment,
   `asset_id` int(11) unsigned NOT NULL default '0',

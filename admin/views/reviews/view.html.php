@@ -5,7 +5,7 @@
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
  * @license GNU/GPL v2
- * 
+ *
  * FLEXIcontent is a derivative work of the excellent QuickFAQ component
  * @copyright (C) 2008 Christoph Lukes
  * see www.schlu.net for more information
@@ -32,11 +32,9 @@ class FlexicontentViewReviews extends JViewLegacy
 {
 	function display( $tpl = null )
 	{
-		flexicontent_html::__DEV_check_reviews_table();
-
-		// ***
-		// *** Initialise variables
-		// ***
+		/**
+		 * Initialise variables
+		 */
 
 		$app     = JFactory::getApplication();
 		$jinput  = $app->input;
@@ -47,7 +45,7 @@ class FlexicontentViewReviews extends JViewLegacy
 		$user     = JFactory::getUser();
 		$db       = JFactory::getDbo();
 		$document = JFactory::getDocument();
-		
+
 		// Get model
 		$model = $this->getModel();
 
@@ -56,9 +54,9 @@ class FlexicontentViewReviews extends JViewLegacy
 
 
 
-		// ***
-		// *** Get filters
-		// ***
+		/**
+		 * Get filters
+		 */
 
 		$count_filters = 0;
 
@@ -66,7 +64,7 @@ class FlexicontentViewReviews extends JViewLegacy
 		$filter_state     = $model->getState( 'filter_state' );
 
 		if ($filter_state) $count_filters++;
-		
+
 		// Text search
 		$search = $model->getState('search');
 		$search = StringHelper::trim(StringHelper::strtolower($search));
@@ -76,20 +74,20 @@ class FlexicontentViewReviews extends JViewLegacy
 		$filter_order_Dir = $model->getState('filter_order_Dir');
 
 
-		// ***
-		// *** Important usability messages
-		// ***
+		/**
+		 * Important usability messages
+		 */
 
 		if ( $cparams->get('show_usability_messages', 1) )
 		{
 		}
-		
-		
-		
-		// ***
-		// *** Add css and js to document
-		// ***
-		
+
+
+
+		/**
+		 * Add css and js to document
+		 */
+
 		!JFactory::getLanguage()->isRtl()
 			? $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', FLEXI_VHASH)
 			: $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', FLEXI_VHASH);
@@ -107,13 +105,13 @@ class FlexicontentViewReviews extends JViewLegacy
 
 
 
-		// ***
-		// *** Create Submenu & Toolbar
-		// ***
+		/**
+		 * Create Submenu & Toolbar
+		 */
 
 		// Create Submenu (and also check access to current view)
 		FLEXIUtilities::ManagerSideMenu('CanReviews');
-		
+
 		// Create document/toolbar titles
 		$doc_title = JText::_( 'FLEXI_REVIEWS' );
 		$site_title = $document->getTitle();
@@ -134,24 +132,24 @@ class FlexicontentViewReviews extends JViewLegacy
 		$pagination = $this->get( 'Pagination' );
 
 
-		// ***
-		// *** Create List Filters
-		// ***
+		/**
+		 * Create List Filters
+		 */
 
 		$lists = array();
-		
+
 		// build publication state filter
 		$states 	= array();
 		$states[] = JHtml::_('select.option',  '', '-'/*JText::_( 'FLEXI_SELECT_STATE' )*/ );
 		$states[] = JHtml::_('select.option',  'P', JText::_( 'FLEXI_PUBLISHED' ) );
 		$states[] = JHtml::_('select.option',  'U', JText::_( 'FLEXI_UNPUBLISHED' ) );
 		//$states[] = JHtml::_('select.option',  '-2', JText::_( 'FLEXI_TRASHED' ) );
-		
+
 		$lists['state'] = ($filter_state || 1 ? '<div class="add-on">'.JText::_('FLEXI_STATE').'</div>' : '').
 			JHtml::_('select.genericlist', $states, 'filter_state', 'class="use_select2_lib" size="1" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', 'value', 'text', $filter_state );
 			//JHtml::_('grid.state', $filter_state );
-		
-		
+
+
 		// text search filter
 		$lists['search']= $search;
 
@@ -239,7 +237,7 @@ class FlexicontentViewReviews extends JViewLegacy
 		}
 
 		JToolbarHelper::checkin($contrl.'checkin');
-		
+
 		if ($perms->CanConfig)
 		{
 			JToolbarHelper::divider(); JToolbarHelper::spacer();
@@ -250,7 +248,7 @@ class FlexicontentViewReviews extends JViewLegacy
 			$_height = ($fc_screen_height && $fc_screen_height-128 > 550 ) ? ($fc_screen_height-128 > 1000 ? 1000 : $fc_screen_height-128 ) : 550;
 			JToolbarHelper::preferences('com_flexicontent', $_height, $_width, 'Configuration');
 		}
-		
+
 		if ($js)
 		{
 			$document->addScriptDeclaration('
@@ -260,5 +258,4 @@ class FlexicontentViewReviews extends JViewLegacy
 			');
 		}
 	}
-
 }
