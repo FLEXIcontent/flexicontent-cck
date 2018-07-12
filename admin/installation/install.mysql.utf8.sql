@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_reviews` (
   `content_id` int(11) NOT NULL,
   `type` varchar(255) NOT NULL DEFAULT 'item',
   `average_rating` int NOT NULL,
-  `custom_ratings` text NOT NULL DEFAULT '',
+  `custom_ratings` text NULL,
   `user_id` int(11) NOT NULL DEFAULT '0',
   `email` varchar(255) NOT NULL DEFAULT '',
   `title` varchar(255) NULL,
