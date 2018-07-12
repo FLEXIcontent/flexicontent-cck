@@ -101,10 +101,10 @@ $this->document->addScriptDeclaration($js);
 <form action="index.php?controller=users" method="post" name="adminForm" id="adminForm" class="form-validate form-horizontal" autocomplete="off">
 
 
-<div class="container-fluid" style="padding: 0px; margin-bottom: 24px;">
+<div class="container-fluid row" style="padding: 0px; margin-bottom: 24px;">
 
 
-	<div class="span6 full_width_980" style="margin-bottom: 16px !important;">
+	<div class="span6 col-6 full_width_980" style="margin-bottom: 16px !important;">
 
 		<div class="fcsep_level_h">
 			<?php echo JText::_('FLEXI_USER'); ?>
@@ -355,7 +355,7 @@ $this->document->addScriptDeclaration($js);
 	endforeach;
 ?>
 	
-	<div class="span6 full_width_980" style="margin-bottom: 16px !important;">
+	<div class="span6 col-6 full_width_980" style="margin-bottom: 16px !important;">
 
 		<?php if ($total_fsets==1) : ?>
 		<div class="fcsep_level_h">

@@ -29,8 +29,8 @@ jimport('cms.html.html');      // JHtml
 jimport('cms.html.select');    // JHtmlSelect
 jimport('joomla.form.field');  // JFormField
 
-//jimport('joomla.form.helper'); // JFormHelper
-//JFormHelper::loadFieldClass('...');   // JFormField...
+jimport('joomla.form.helper'); // JFormHelper
+JFormHelper::loadFieldClass('groupedlist');   // JFormFieldGroupedList
 
 /**
 * Renders a multiple select element
@@ -65,9 +65,9 @@ class JFormFieldMultiList extends JFormField
 		$control_name = str_replace($name, '', $element_id);
 
 		$attribs = array(
-	    'id' => $element_id, // HTML id for select field
-	    'list.attr' => array( // additional HTML attributes for select field
-	    ),
+			'id' => $element_id, // HTML id for select field
+			'group.id' => 'id',
+			'list.attr' => array(), // additional HTML attributes for select field
 	    'list.translate'=>false, // true to translate
 	    'option.key'=>'value', // key name for value in data array
 	    'option.text'=>'text', // key name for text in data array

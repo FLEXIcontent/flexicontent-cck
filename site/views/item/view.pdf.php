@@ -31,6 +31,7 @@ class FlexicontentViewItems extends JViewLegacy
 {
 	function display($tpl = null)
 	{
+		$app        = JFactory::getApplication();
 		$user       = JFactory::getUser();
 		$dispatcher = JEventDispatcher::getInstance();
 
@@ -46,11 +47,9 @@ class FlexicontentViewItems extends JViewLegacy
 
 		// process the new plugins
 		JPluginHelper::importPlugin('content', 'image');
-		if (!FLEXI_J16GE) {
-			$dispatcher->trigger('onPrepareContent', array (& $item, & $params, 0));
-		} else {
-			$dispatcher->trigger('onContentPrepare', array ('com_content.article', &$item, &$params, 0));
-		}
+		FLEXI_J40GE
+			? $app->triggerEvent('onContentPrepare', array ('com_content.article', &$item, &$params, 0))
+			: $dispatcher->trigger('onContentPrepare', array ('com_content.article', &$item, &$params, 0));
 
 		$document = JFactory::getDocument();
 

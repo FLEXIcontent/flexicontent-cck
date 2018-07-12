@@ -72,10 +72,10 @@ $this->document->addScriptDeclaration($js);
 		<div class="tabbertab" id="tabset_cat_props_desc_tab" data-icon-class="icon-file-2" >
 			<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_BASIC' ); ?> </h3>
 
-			<div class="container-fluid" style="padding: 0px !important;">
+			<div class="container-fluid row" style="padding: 0px !important;">
 
 				<!--LEFT COLUMN-->
-				<div class="span8 full_width_980 off-white">
+				<div class="span8 col-8 full_width_980 off-white">
 
 					<div class="fcclear"></div>
 					<div class="flexi_params">
@@ -85,7 +85,7 @@ $this->document->addScriptDeclaration($js);
 				</div>
 
 				<!--RIGHT COLUMN-->
-				<div class="span4 full_width_980 off-white">
+				<div class="span4 col-4 full_width_980 off-white">
 
 					<div class="form-vertical">
 
@@ -157,7 +157,7 @@ $this->document->addScriptDeclaration($js);
 
 				</div>
 
-			</div><!--.container-fluid-->
+			</div><!--.container-fluid row-->
 
 		</div><!-- tabbertab FLEXI_BASIC -->
 
@@ -165,9 +165,9 @@ $this->document->addScriptDeclaration($js);
 		<div class="tabbertab" id="tabset_cat_props_metaseo_tab" data-icon-class="icon-bookmark" >
 			<h3 class="tabberheading"> <?php echo JText::_('FLEXI_PUBLISHING') . ', ' . JText::_('FLEXI_META'); ?> </h3>
 
-			<div class="container-fluid" style="padding: 0px !important;">
+			<div class="container-fluid row" style="padding: 0px !important;">
 
-				<div class="span6 full_width_980" style="max-width: 980px;">
+				<div class="span6 col-6 full_width_980" style="max-width: 980px;">
 					<div class="fcsep_level1"><?php echo JText::_('FLEXI_PUBLISHING'); ?></div>
 
 					<?php /* No inheritage needed for these */ ?>
@@ -176,7 +176,7 @@ $this->document->addScriptDeclaration($js);
 				</div>
 
 				<!--RIGHT COLUMN-->
-				<div class="span6 full_width_980" style="max-width: 980px;">
+				<div class="span6 col-6 full_width_980" style="max-width: 980px;">
 					<div class="fcsep_level1"><?php echo JText::_('FLEXI_META_SEO'); ?></div>
 
 					<?php /*echo JLayoutHelper::render('joomla.edit.metadata', $this);*/ ?>

@@ -1372,7 +1372,12 @@ class FlexicontentViewItem extends JViewLegacy
 		$class = 'use_select2_lib';
 		$attribs = 'class="'.$class.'"';
 		$lists['state'] = JHtml::_('select.groupedlist', $state, $fieldname,
-			array('id' => $elementid, 'group.id' => 'id', 'list.attr' => $attribs, 'list.select' => $item->state)
+			array(
+				'id' => $elementid,
+				'group.id' => 'id',
+				'list.attr' => $attribs,
+				'list.select' => $item->state,
+			)
 		);
 
 

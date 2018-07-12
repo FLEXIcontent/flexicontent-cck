@@ -5,7 +5,7 @@
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
  * @license GNU/GPL v2
- * 
+ *
  * FLEXIcontent is a derivative work of the excellent QuickFAQ component
  * @copyright (C) 2008 Christoph Lukes
  * see www.schlu.net for more information
@@ -40,7 +40,7 @@ class FlexicontentModelField extends FCModelAdmin
 	var $record_name = 'field';
 
 	/**
-	 * Record database table 
+	 * Record database table
 	 *
 	 * @var string
 	 */
@@ -367,15 +367,15 @@ class FlexicontentModelField extends FCModelAdmin
 			if ($record->issearch==-1 || $record->issearch==2) unset($data['issearch']);  // Already dirty
 			else if (@ $data['issearch']==0 && $record->issearch==1) $data['issearch']=-1; // Becomes dirty OFF
 			else if (@ $data['issearch']==1 && $record->issearch==0) $data['issearch']=2;  // Becomes dirty ON
-			
+
 			if ($record->isadvsearch==-1 || $record->isadvsearch==2) unset($data['isadvsearch']);  // Already dirty
 			else if (@ $data['isadvsearch']==0 && $record->isadvsearch==1) $data['isadvsearch']=-1; // Becomes dirty OFF
 			else if (@ $data['isadvsearch']==1 && $record->isadvsearch==0) $data['isadvsearch']=2;  // Becomes dirty ON
-			
+
 			if ($record->isadvfilter==-1 || $record->isadvfilter==2) unset($data['isadvfilter']);  // Already dirty
 			else if (@ $data['isadvfilter']==0 && $record->isadvfilter==1) $data['isadvfilter']=-1; // Becomes dirty OFF
 			else if (@ $data['isadvfilter']==1 && $record->isadvfilter==0) $data['isadvfilter']=2;  // Becomes dirty ON
-			
+
 			// FORCE dirty OFF, if field is being unpublished -and- is not already normal OFF
 			if ( isset($data['published']) && $data['published']==0 && $record->published==1 )
 			{
@@ -388,7 +388,13 @@ class FlexicontentModelField extends FCModelAdmin
 		if (!$data['id'] && !empty($data['iscore']))
 		{
 			$this->setError('Field\'s "iscore" property is ON, but creating new fields as CORE is not allowed');
+
 			return false;
+		}
+
+		if (!isset($data['positions']))
+		{
+			$data['positions'] = '';
 		}
 	}
 
@@ -408,6 +414,7 @@ class FlexicontentModelField extends FCModelAdmin
 		$types = ! empty($data['tid'])
 			? $data['tid']
 			: array();
+
 		$this->_assignTypesToField($types);
 	}
 
@@ -432,7 +439,7 @@ class FlexicontentModelField extends FCModelAdmin
 		// Convert field positions to an array
 		if (!is_array($record->positions))
 		{
-			$record->positions = explode("\n", $record->positions);
+			$record->positions = explode('\n', $record->positions);
 		}
 
 		// Load type assigments (an array of type IDs)
@@ -454,51 +461,72 @@ class FlexicontentModelField extends FCModelAdmin
 	private function _assignTypesToField($types)
 	{
 		$field = $this->_record;
-		
-		// Override 'types' for core fields, since the core field must be assigned to all types
-		if ($field->iscore == 1)
-		{
-			$query 	= 'SELECT id'
-				. ' FROM #__flexicontent_types'
-				;
-			$this->_db->setQuery($query);
-			$types = $this->_db->loadColumn();
-		}
-		
-		// Store field to types relations
-		// delete relations which type is not part of the types array anymore
-		$query 	= 'DELETE FROM #__flexicontent_fields_type_relations'
-			. ' WHERE field_id = '.$field->id
-			. (!empty($types) ? ' AND type_id NOT IN (' . implode(', ', $types) . ')' : '')
-			;
-		$this->_db->setQuery($query);
-		$this->_db->execute();
-		
-		// draw an array of the used types
-		$query 	= 'SELECT type_id'
-			. ' FROM #__flexicontent_fields_type_relations'
-			. ' WHERE field_id = '.$field->id
-			;
-		$this->_db->setQuery($query);
-		$used = $this->_db->loadColumn();
-		
-		foreach($types as $type)
-		{
-			// insert only the new records
-			if (!in_array($type, $used)) {
-				//get last position of each field in each type;
-				$query 	= 'SELECT max(ordering) as ordering'
-					. ' FROM #__flexicontent_fields_type_relations'
-					. ' WHERE type_id = ' . $type
-					;
-				$this->_db->setQuery($query);
-				$ordering = $this->_db->loadResult()+1;
 
-				$query 	= 'INSERT INTO #__flexicontent_fields_type_relations (`field_id`, `type_id`, `ordering`)'
-					.' VALUES(' . $field->id . ',' . $type . ', ' . $ordering . ')'
-					;
-				$this->_db->setQuery($query);
-				$this->_db->execute();
+		// Override 'types' for core fields, since the core field must be assigned to all types
+		if ($field->iscore)
+		{
+			$query = $this->_db->getQuery(true)
+				->select('id')
+				->from('#__flexicontent_types');
+
+			$types = $this->_db->setQuery($query)->loadColumn();
+		}
+
+		/**
+		 * Store field to types relations
+		 * Try to avoid unneeded deletion and insertions
+		 */
+
+		// First, delete existing types assignments no longer used by the field
+		$query = $this->_db->getQuery(true)
+			->delete('#__flexicontent_fields_type_relations')
+			->where('field_id = ' . (int) $field->id);
+
+		if (!empty($types))
+		{
+			$query->where('type_id NOT IN (' . implode(', ', $types) . ')');
+		}
+
+		$this->_db->setQuery($query)->execute();
+
+		// Second, find type assignments of the field that did not changed
+		$query = $this->_db->getQuery(true)
+			->select('type_id')
+			->from('#__flexicontent_fields_type_relations')
+			->where('field_id = ' . (int) $field->id);
+
+		$used = $this->_db->setQuery($query)->loadColumn();
+
+		// Third, insert only the new records
+		foreach ($types as $type)
+		{
+			if (!in_array($type, $used))
+			{
+				// Get last position of each field in each type
+				$query = $this->_db->getQuery(true)
+					->select('MAX(ordering) as ordering')
+					->from('#__flexicontent_fields_type_relations')
+					->where('type_id = ' . (int) $type);
+
+				$ordering = $this->_db->setQuery($query)->loadResult();
+
+				// Insert new type assignment using the next available ordering
+				$ordering += 1;
+
+				$query = $this->_db->getQuery(true)
+					->insert('#__flexicontent_fields_type_relations')
+					->columns(array(
+						$this->_db->quoteName('field_id'),
+						$this->_db->quoteName('type_id'),
+						$this->_db->quoteName('ordering')
+					))
+					->values(
+						(int) $field->id . ' , ' .
+						(int) $type . ' , ' .
+						(int) $ordering
+					);
+
+				$this->_db->setQuery($query)->execute();
 			}
 		}
 	}
@@ -506,7 +534,7 @@ class FlexicontentModelField extends FCModelAdmin
 
 	/**
 	 * Method to get types list
-	 * 
+	 *
 	 * @return array
 	 * @since 1.5
 	 */
@@ -518,7 +546,7 @@ class FlexicontentModelField extends FCModelAdmin
 
 	/**
 	 * Method to the Field Type for a given or for current field ID
-	 * 
+	 *
 	 * @return array
 	 * @since 3.2
 	 */
@@ -526,14 +554,16 @@ class FlexicontentModelField extends FCModelAdmin
 	{
 		$pk = $pk ?: (int) $this->_id;
 
-		if ( ! $pk ) return array();
+		if (!$pk)
+		{
+			return array();
+		}
 
-		$query = 'SELECT DISTINCT type_id '
-			. ' FROM #__flexicontent_fields_type_relations '
-			. ' WHERE field_id = ' . $pk
-			;
-		$this->_db->setQuery($query);
+		$query = $this->_db->getQuery(true)
+			->select('DISTINCT type_id')
+			->from('#__flexicontent_fields_type_relations')
+			->where('field_id = ' . (int) $pk);
 
-		return $this->_db->loadColumn();
+		return $this->_db->setQuery($query)->loadColumn();
 	}
 }

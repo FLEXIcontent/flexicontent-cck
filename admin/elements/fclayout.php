@@ -21,7 +21,7 @@ jimport('joomla.filesystem.file');    // JFile
 jimport('cms.html.html');      // JHtml
 
 jimport('joomla.form.helper'); // JFormHelper
-JFormHelper::loadFieldClass('list');   // JFormFieldList
+JFormHelper::loadFieldClass('groupedlist');   // JFormFieldGroupedList
 
 // Load JS tabber lib
 JFactory::getDocument()->addScriptVersion(JUri::root(true).'/components/com_flexicontent/assets/js/tabber-minimized.js', FLEXI_VHASH);

@@ -26,9 +26,9 @@ if ($this->behaviour === 'translate' && !flexicontent_db::useAssociations())
 <div id="flexicontent" class="flexicontent">
 <form action="index.php" method="post"  name="adminForm" id="adminForm" class="form-validate form-horizontal">
 
-	<div class="container-fluid" style="padding: 0px; margin-bottom: 24px; max-width: 1200px;">
+	<div class="container-fluid row" style="padding: 0px; margin-bottom: 24px; max-width: 1200px;">
 
-		<div class="span6 full_width_980" style="margin-bottom: 16px !important;">
+		<div class="span6 col-6 full_width_980" style="margin-bottom: 16px !important;">
 
 			<fieldset>
 			<legend style="text-align: center;"><?php echo JText::_( 'FLEXI_CONTENTS_LIST' ); ?></legend>
@@ -62,7 +62,7 @@ if ($this->behaviour === 'translate' && !flexicontent_db::useAssociations())
 			</fieldset>
 
 	</div>
-	<div class="span6 full_width_980" style="margin-bottom: 16px !important;">
+	<div class="span6 col-6 full_width_980" style="margin-bottom: 16px !important;">
 
 			<fieldset>
 			
