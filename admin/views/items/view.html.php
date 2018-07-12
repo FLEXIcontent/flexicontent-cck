@@ -31,7 +31,8 @@ use Joomla\String\StringHelper;
 class FlexicontentViewItems extends JViewLegacy
 {
 	var $tooltip_class = FLEXI_J40GE ? 'hasTooltip' : 'hasTooltip';
-	var $btn_sm_class  = FLEXI_J40GE ? 'btn btn-sm btn-outline-primary' : 'btn btn-small';
+	var $btn_sm_class  = FLEXI_J40GE ? 'btn btn-sm' : 'btn btn-small';
+	var $btn_iv_class  = FLEXI_J40GE ? 'btn-dark' : 'btn-inverse';
 
 	function display( $tpl = null )
 	{
@@ -319,7 +320,12 @@ class FlexicontentViewItems extends JViewLegacy
 		$attribs = 'class="use_select2_lib" multiple="multiple" size="3" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"';
 		$lists['filter_state'] = ($filter_state || 1 ? '<div class="add-on">'.JText::_('FLEXI_STATE').'</div>' : '').
 			JHtml::_('select.groupedlist', $states, 'filter_state[]',
-				array('id' => 'filter_state', 'group.id' => 'id', 'list.attr' => $attribs, 'list.select' => $filter_state)
+				array(
+					'id' => 'filter_state',
+					'group.id' => 'id',
+					'list.attr' => $attribs,
+					'list.select' => $filter_state,
+				)
 			);
 			//JHtml::_('grid.state', $filter_state );
 
@@ -683,7 +689,7 @@ class FlexicontentViewItems extends JViewLegacy
 				$statedata['name'], $btn_name, $full_js,
 				$msg_alert = JText::_('FLEXI_NO_ITEMS_SELECTED'), $msg_confirm = JText::_('FLEXI_ARE_YOU_SURE'),
 				$btn_task='', $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false,
-				$statedata['btn_class'] . ' ' . $this->btn_sm_class . ' btn-fcaction ' . $this->tooltip_class, $statedata['btn_icon'],
+				$statedata['btn_class'] . ' ' . $this->btn_sm_class . ' btn-fcaction ' . $this->btn_iv_class . ' ' . $this->tooltip_class, $statedata['btn_icon'],
 				'data-placement="right" title="' . flexicontent_html::encodeHTML(JText::_($statedata['desc']), 2) . '"', $auto_add = 0, $tag_type='button');
 		}
 
@@ -842,8 +848,8 @@ class FlexicontentViewItems extends JViewLegacy
 
 			if (count($btn_arr))
 			{
-				$drop_btn = '
-					<button type="button" class="' . $this->btn_sm_class . ' dropdown-toggle" data-toggle="dropdown">
+				$drop_btn = (FLEXI_J40GE ? '&nbsp;&nbsp;&nbsp;' : '') . '
+					<button type="button" class="' . $this->btn_sm_class . ' btn-info dropdown-toggle" data-toggle="dropdown">
 						<span title="'.JText::_('FLEXI_CHANGE_STATE').'" class="icon-menu"></span>
 						'.JText::_('FLEXI_CHANGE_STATE').'
 						<span class="caret"></span>

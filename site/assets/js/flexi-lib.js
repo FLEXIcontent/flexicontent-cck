@@ -202,7 +202,7 @@
 		{
 			iframe = jQuery('<iframe id="'+tagid+'_frame" style="visibility:hidden; width:100%; height:100%; border:0; margin:0; padding:0;" src=""></iframe>');
 			container.append(iframe);
-			iframe.load(function() {
+			iframe.on('load', function() {
 				// Show retrieved contents and hide the loading animation
 				iframe.show().css('visibility', 'visible');
 				loading.hide();

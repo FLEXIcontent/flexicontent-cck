@@ -33,8 +33,8 @@ $this->document->addScriptDeclaration($js);
 <div id="flexicontent" class="flexicontent">
 <form action="index.php" method="post" name="adminForm" id="adminForm" class="form-validate form-horizontal">
 
-	<div class="container-fluid">
-		<div class="span6 full_width_980">
+	<div class="container-fluid row">
+		<div class="span6 col-6 full_width_980">
 
 			<table class="fc-form-tbl" style="margin-bottom:12px;">
 
@@ -87,7 +87,7 @@ $this->document->addScriptDeclaration($js);
 			</table>
 
 		</div>
-		<div class="span6 full_width_980">
+		<div class="span6 col-6 full_width_980">
 
 			<div class="fc-info fc-nobgimage fc-mssg" style="display:block; float:left; clear:both; margin: 32px 0px 32px 0px !important; font-size:12px;">
 				<?php echo str_replace('<br/>', ' ', JText::_('FLEXI_ITEM_PARAM_OVERRIDE_ORDER_DETAILS')); ?>

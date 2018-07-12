@@ -462,8 +462,8 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 				<?php echo JText::_('FLEXI_INSTRUCTIONS_ADD_FIELD_TO_LAYOUT_POSITION');?>
 			</div>
 
-			<div class="container-fluid" style="padding:0px!important;">
-				<div class="span6 full_width_980">
+			<div class="container-fluid row" style="padding:0px!important;">
+				<div class="span6 col-6 full_width_980">
 
 					<fieldset id="available_fields_container">
 						<legend style="margin:0 0 12px 0; font-size:14px; padding-top:6px; padding-bottom:6px; background:gray;" class="fcsep_level1"><?php echo JText::_('FLEXI_AVAILABLE_FIELDS') ?></legend>
@@ -528,7 +528,7 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 
 				</div>
 
-				<div class="span6 full_width_980 padded_wrap_box">
+				<div class="span6 col-6 full_width_980 padded_wrap_box">
 
 					<fieldset id="layout_positions_container">
 						<legend style="margin:0 0 12px 0; font-size:14px; padding-top:6px; padding-bottom:6px; background:gray;" class="fcsep_level1"><?php echo JText::_('FLEXI_AVAILABLE_POS') ?></legend>

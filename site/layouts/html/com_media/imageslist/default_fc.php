@@ -9,6 +9,7 @@
 
 defined('_JEXEC') or die;
 
+$app  = JFactory::getApplication();
 $lang = JFactory::getLanguage();
 $this->viewLayout = basename(__FILE__, '.php');
 
@@ -156,7 +157,9 @@ if (count($this->images) > 0 || count($this->videos) > 0 || count($this->docs) >
 
 		for ($i = 0, $n = count($this->docs); $i < $n; $i++) :
 			$file = & $this->docs[$i];
-			$dispatcher->trigger('onContentBeforeDisplay', array('com_media.file', &$this->_tmp_doc, &$params));
+			FLEXI_J40GE
+				? $app->triggerEvent('onContentBeforeDisplay', array('com_media.file', &$this->_tmp_doc, &$params))
+				: $dispatcher->trigger('onContentBeforeDisplay', array('com_media.file', &$this->_tmp_doc, &$params));
 			?>
 
 			<li class="imgOutline thumbnail height-80 width-80 center">
@@ -173,13 +176,17 @@ if (count($this->images) > 0 || count($this->videos) > 0 || count($this->docs) >
 			</li>
 
 			<?php
-			$dispatcher->trigger('onContentAfterDisplay', array('com_media.file', &$file, &$params));
+			FLEXI_J40GE
+				? $app->triggerEvent('onContentAfterDisplay', array('com_media.file', &$file, &$params))
+				: $dispatcher->trigger('onContentAfterDisplay', array('com_media.file', &$file, &$params));
 
 		endfor;
 
 		for ($i = 0, $n = count($this->videos); $i < $n; $i++) :
 			$file = & $this->videos[$i];
-			$dispatcher->trigger('onContentBeforeDisplay', array('com_media.file', &$file, &$params));
+			FLEXI_J40GE
+				? $app->triggerEvent('onContentBeforeDisplay', array('com_media.file', &$file, &$params))
+				: $dispatcher->trigger('onContentBeforeDisplay', array('com_media.file', &$file, &$params));
 			?>
 
 			<li class="imgOutline thumbnail height-80 width-80 center">
@@ -196,13 +203,17 @@ if (count($this->images) > 0 || count($this->videos) > 0 || count($this->docs) >
 				<span class="video-preview-icon btn icon-search" style="z-index: 2; position: absolute; bottom: 0; right: 0; padding: 4px; box-sizing: content-box; margin: 0;" href="<?php echo COM_MEDIA_BASEURL, '/', $file->name; ?>" title="<?php echo $file->name; ?>"></span>
 			</li>
 			<?php
-			$dispatcher->trigger('onContentAfterDisplay', array('com_media.file', &$file, &$params));
+			FLEXI_J40GE
+				? $app->triggerEvent('onContentAfterDisplay', array('com_media.file', &$file, &$params))
+				: $dispatcher->trigger('onContentAfterDisplay', array('com_media.file', &$file, &$params));
 
 		endfor;
 
 		for ($i = 0, $n = count($this->images); $i < $n; $i++) :
 			$file = & $this->images[$i];
-			$dispatcher->trigger('onContentBeforeDisplay', array('com_media.file', &$file, &$params));
+			FLEXI_J40GE
+				? $app->triggerEvent('onContentBeforeDisplay', array('com_media.file', &$file, &$params))
+				: $dispatcher->trigger('onContentBeforeDisplay', array('com_media.file', &$file, &$params));
 			?>
 
 			<li class="imgOutline thumbnail height-80 width-80 center">
@@ -219,7 +230,9 @@ if (count($this->images) > 0 || count($this->videos) > 0 || count($this->docs) >
 				<span class="img-preview-icon btn icon-search" style="z-index: 2; position: absolute; bottom: 0; right: 0; padding: 4px; box-sizing: content-box; margin: 0;" href="<?php echo COM_MEDIA_BASEURL, '/', $file->name; ?>" title="<?php echo $file->name; ?>"></span>
 			</li>
 			<?php
-			$dispatcher->trigger('onContentAfterDisplay', array('com_media.file', &$file, &$params));
+			FLEXI_J40GE
+				? $app->triggerEvent('onContentAfterDisplay', array('com_media.file', &$file, &$params))
+				: $dispatcher->trigger('onContentAfterDisplay', array('com_media.file', &$file, &$params));
 
 		endfor; ?>
 

@@ -21,8 +21,8 @@ jimport('cms.html.html');      // JHtml
 jimport('cms.html.select');    // JHtmlSelect
 jimport('joomla.form.field');  // JFormField
 
-//jimport('joomla.form.helper'); // JFormHelper
-//JFormHelper::loadFieldClass('...');   // JFormField...
+jimport('joomla.form.helper'); // JFormHelper
+JFormHelper::loadFieldClass('groupedlist');   // JFormFieldGroupedList
 
 
 class JFormFieldMicrodataprops extends JFormField
@@ -41,20 +41,36 @@ class JFormFieldMicrodataprops extends JFormField
 			$jm_types = $jm->getTypes();
 		}
 
-		// Initialize the options array
-		$options = array();
-		$options[] = JHtml::_('select.option','', '-- '.JText::_('FLEXI_DISABLE').' --');
-		
+		// Prepare the grouped list
+		$groups = array();
+		$groups[0]['items'] = array(
+			JHtml::_('select.option','', '-- '.JText::_('FLEXI_DISABLE').' --')
+		);
+
 		foreach($jm_types as $type => $tdata)
 		{
-			$options[] = JHtml::_('select.optgroup', JText::_( $type ) );
-			foreach($tdata['properties'] as $propname => $props) {
+			$options = array();
+			foreach($tdata['properties'] as $propname => $props)
+			{
 				$options[] = JHtml::_('select.option', $propname, $propname);
 			}
-			$options[] = JHtml::_('select.optgroup', '' );
+
+			$grp = (string) $type;
+			$groups[$grp] = array();
+			$groups[$grp]['id'] = null;
+			$groups[$grp]['text'] = JText::_($type);
+			$groups[$grp]['items'] = $options;
 		}
 
 		// Render and return the drop down select
-		return JHtml::_('select.genericlist', $options, $this->name, 'class="use_select2_lib inputbox"', 'value', 'text', $this->value, $this->id);
+		return JHtml::_('select.groupedlist', $groups, $this->name,
+			array(
+				'id' => $this->id,
+				'group.id' => 'id',
+				'list.attr' => array('class'=> 'use_select2_lib inputbox'),
+				'list.select' => $this->value,
+				'option.attr' => 'attr',  // need to set the name we use for options attributes
+			)
+		);
 	}
 }

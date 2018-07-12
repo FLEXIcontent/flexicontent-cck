@@ -313,13 +313,13 @@ if (isset($this->item->item_translations)) foreach ($this->item->item_translatio
 
 <form action="index.php" method="post" name="adminForm" id="adminForm" class="form-validate form-horizontal" enctype="multipart/form-data" >
 	
-	<div class="container-fluid" style="padding:0px!important;">
+	<div class="container-fluid row" style="padding:0px!important;">
 	<?php /*<fieldset class="basicfields_set">
 		<legend>
 			<span class="fc_legend_header_text"><?php echo JText::_( 'FLEXI_BASIC' ); ?></span>
 		</legend>*/ ?>
 		
-		<div class="span6 full_width_980">
+		<div class="span6 col-6 full_width_980">
 			
 			<?php
 				$field = isset($this->fields['title']) ? $this->fields['title'] : false;
@@ -524,7 +524,7 @@ if (isset($this->item->item_translations)) foreach ($this->item->item_translatio
 		</div>
 		
 		
-		<div class="span6 full_width_980">
+		<div class="span6 col-6 full_width_980">
 			
 			<?php
 				$field = isset($this->fields['document_type']) ? $this->fields['document_type'] : false;
