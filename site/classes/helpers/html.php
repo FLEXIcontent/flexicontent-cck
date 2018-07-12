@@ -373,7 +373,7 @@ class flexicontent_html
 		$domain = null;
 		$defaultCanonical = flexicontent_html::getDefaultCanonical($domain);
 		$domain = $domain ? $domain : $uri->toString(array('scheme', 'host', 'port'));
-		
+
 		// Remove trailing slash for home page without subfolder'
 		if ($ucanonical === '/')
 		{
@@ -1254,7 +1254,7 @@ class flexicontent_html
 						jQuery('input.fc_checkboxtoggle').bootstrapToggle();
 					});
 				";
-				
+
 				break;
 
 			case 'touch-punch':
@@ -1628,7 +1628,7 @@ class flexicontent_html
 				$document->addScript($framework_path.'/js/jquery.tmpl.min.js');
 				//$document->addScript($framework_path.'/js/jquery.easing.1.3.js');
 				$document->addScriptVersion(JUri::root(true).'/components/com_flexicontent/assets/js/jquery-easing.js', FLEXI_VHASH);
-				
+
 				$document->addScript($framework_path.'/js/jquery.elastislide.js');
 				//$document->addScript($framework_path.'/js/gallery.js'); // replace with field specific: gallery_tmpl.js
 				break;
@@ -1737,7 +1737,7 @@ class flexicontent_html
 				$site_languages = FLEXIUtilities::getLanguages();
 				$default_lang_code = flexicontent_html::getSiteDefaultLang();
 				$sef_lang_code = isset($site_languages->{$default_lang_code}) ? $site_languages->{$default_lang_code}->sef : '';
-				
+
 				$needed_vars = array('cid', 'cids', 'cc');
 				$FC_URL_VARS = array();
 
@@ -3590,8 +3590,6 @@ class flexicontent_html
 		$db   = JFactory::getDbo();
 		$cparams = JComponentHelper::getParams('com_flexicontent');
 
-		flexicontent_html::__DEV_check_reviews_table();
-
 		// Only label given
 		if (!is_object($xiddata))
 		{
@@ -3933,53 +3931,6 @@ class flexicontent_html
 				'.( $desc ? '<div class="fcvote-desc">'.$desc.'</div>' :'' ).'
 			</div>
 		</div>';
-	}
-
-
-	static function __DEV_check_reviews_table()
-	{
-		static $check_review_table_dev = null;
-		if ($check_review_table_dev !== null) return;
-		$check_review_table_dev = 1;
-
-		$app = JFactory::getApplication();
-		$db  = JFactory::getDbo();
-		$dbprefix = $app->getCfg('dbprefix');
-
-		$query = 'SHOW TABLES LIKE "' . $dbprefix . 'flexicontent_reviews_dev"';
-		$db->setQuery($query);
-		$reviews_tbl_exists = count($db->loadObjectList());
-
-		if ( !$reviews_tbl_exists )
-		{
-			$query = "
-			CREATE TABLE IF NOT EXISTS `#__flexicontent_reviews_dev` (
-				`id` int(11) NOT NULL auto_increment,
-			  `content_id` int(11) NOT NULL,
-			  `type` varchar(255) NOT NULL DEFAULT 'item',
-			  `average_rating` float NOT NULL,
-			  `custom_ratings` text NOT NULL DEFAULT '',
-			  `user_id` int(11) NOT NULL DEFAULT '0',
-			  `email` varchar(255) NOT NULL DEFAULT '',
-			  `title` varchar(255) NOT NULL,
-			  `text` mediumtext NOT NULL,
-			  `state` tinyint(3) NOT NULL DEFAULT '0',
-				`approved` tinyint(3) NOT NULL DEFAULT '0',
-				`useful_yes` int(11) NOT NULL DEFAULT '0',
-				`useful_no` int(11) NOT NULL DEFAULT '0',
-			  `submit_date` datetime NOT NULL,
-			  `update_date` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
-				`checked_out` int(11) unsigned NOT NULL default '0',
-				`checked_out_time` datetime NOT NULL default '0000-00-00 00:00:00',
-			  `attribs` mediumtext NULL,
-				PRIMARY KEY  (`id`),
-			  UNIQUE (`content_id`, `user_id`, `type`),
-			  KEY (`content_id`, `type`),
-			  KEY `user_id` (`user_id`)
-			) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`;";
-		}
-		$db->setQuery($query);
-		$db->execute();
 	}
 
 
@@ -5588,20 +5539,20 @@ class flexicontent_html
 		foreach($pathDestFolder_arr as $i => $pathDestFolder)
 		{
 			$pathSourceFolder = $pathSourceFolder_arr[$i];
-	
+
 			// 1. Check DESTINATION folder
 			if ( !JFolder::exists($pathDestFolder) && !JFolder::create($pathDestFolder) )
 			{
 				echo '<span class="alert alert-warning"> Error, unable to create folder: '. $pathDestFolder.'</span>';
 			}
-	
+
 			// 2. Copy override files
 			$files = glob($pathSourceFolder . '/*.*');
 
 			foreach($files as $sourcepath)
 			{
 				$dest_path = $pathDestFolder . basename($sourcepath);
-				
+
 				$not_exists = !JFile::exists($dest_path);
 				if ($not_exists || filemtime($sourcepath) > filemtime($dest_path))
 				{

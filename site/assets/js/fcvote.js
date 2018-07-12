@@ -1,9 +1,10 @@
 jQuery(document).ready(function(){
 	//var url = location.href;  // entire url including querystring - also: window.location.href;
-	//var live_site = url.substring(0, url.indexOf('/', 14)) + fc_root_uri + '/';
+	//var live_site_root = url.substring(0, url.indexOf('/', 14)) + fc_root_uri;
 	
 	var currentURL = window.location;
-	var live_site = currentURL.protocol + '//' + currentURL.host + fc_root_uri;
+	var live_site_root = currentURL.protocol + '//' + currentURL.host + fc_root_uri;
+	var live_site_base = currentURL.protocol + '//' + currentURL.host + fc_base_uri;
 	var under_vote = false;
 	
 	if (jQuery('.fcvote').length)
@@ -41,7 +42,17 @@ jQuery(document).ready(function(){
 			xid_msg.empty().show().addClass('ajax-loader');
 
 			var rating = jQuery(this).text();
-			var voteurl = live_site + '/index.php?option=com_flexicontent&format=raw&task=ajaxvote&user_rating=' + rating + '&cid=' + itemID + '&xid=' + xid;
+
+			if (1)
+			{
+				var voteurl = live_site_base +
+					'/index.php?option=com_flexicontent&task=reviews.ajaxvote&user_rating=' + rating + '&cid=' + itemID + '&xid=' + xid;
+			}
+			else
+			{
+				var voteurl = live_site_root +
+				'/index.php?option=com_flexicontent&format=raw&task=ajaxvote&user_rating=' + rating + '&cid=' + itemID + '&xid=' + xid;
+			}
 
 			jQuery.ajax({
 				url: voteurl,
@@ -148,17 +159,20 @@ jQuery(document).ready(function(){
 
 		if (1)
 		{
-			var live_site = currentURL.protocol + '//' + currentURL.host + fc_base_uri;
-			var url = live_site + '/index.php?option=com_flexicontent&task=reviews.edit&view=reviews&id=0&tmpl=component&tagid=' + tagid + '&content_id=' + content_id + '&review_type=' + review_type;
-			url = url + '&lang=' + (typeof fc_sef_lang != 'undefined' ? fc_sef_lang : '');
+			var url = live_site_base +
+				'/index.php?option=com_flexicontent&task=reviews.edit&view=reviews&id=0&tmpl=component&tagid=' + tagid +
+				'&content_id=' + content_id + '&review_type=' + review_type +
+				'&lang=' + (typeof fc_sef_lang != 'undefined' ? fc_sef_lang : '');
+
 			fc_showDialog(url, 'fc_modal_popup_container', 0, 800, 800, 0, {title: 'Review this item'});
 		}
 		else
 		{
-			var live_site = currentURL.protocol + '//' + currentURL.host + fc_root_uri;
-			box_loading.empty().addClass('ajax-loader').css('display', 'inline-block');
-			var url = live_site + '/index.php?option=com_flexicontent&format=raw&task=getreviewform&tagid=' + tagid + '&content_id=' + content_id + '&review_type=' + review_type;
+			var url = live_site_root +
+				'/index.php?option=com_flexicontent&format=raw&task=getreviewform&tagid=' + tagid +
+				'&content_id=' + content_id + '&review_type=' + review_type;
 
+			box_loading.empty().addClass('ajax-loader').css('display', 'inline-block');
 
 			jQuery.ajax({
 				url: url,
@@ -198,36 +212,47 @@ jQuery(document).ready(function(){
 			}
 		}
 
-		box_loading.empty().addClass('ajax-loader').css('display', 'inline-block');
-
 		var currentURL = window.location;
-		var live_site = currentURL.protocol + '//' + currentURL.host + fc_root_uri;
-		var url = live_site + "/index.php?option=com_flexicontent&format=raw&task=storereviewform";
 
-		jQuery.ajax({
-			url: url,
-			dataType: "json",
-			data: jQuery(form).serialize(),
-			success: function( data )
-			{
-				box_loading.empty().removeClass('ajax-loader').css('display', 'none');
-				if (typeof(data.html) && data.html)
+		if (1)
+		{
+			var url = live_site_base + '/index.php?option=com_flexicontent&task=reviews.edit&view=reviews&id=0&tmpl=component&tagid='
+				+ tagid + '&content_id=' + content_id + '&review_type=' + review_type
+				+ '&lang=' + (typeof fc_sef_lang != 'undefined' ? fc_sef_lang : '');
+
+			fc_showDialog(url, 'fc_modal_popup_container', 0, 800, 800, 0, {title: 'Review this item'});
+		}
+		else
+		{
+			var url = live_site_root + "/index.php?option=com_flexicontent&format=raw&task=storereviewform";
+
+			box_loading.empty().addClass('ajax-loader').css('display', 'inline-block');
+
+			jQuery.ajax({
+				url: url,
+				dataType: "json",
+				data: jQuery(form).serialize(),
+				success: function( data )
 				{
-					if (typeof(data.error) && data.error)
+					box_loading.empty().removeClass('ajax-loader').css('display', 'none');
+					if (typeof(data.html) && data.html)
 					{
-						box_loading.html(data.html).css('display', 'block');
+						if (typeof(data.error) && data.error)
+						{
+							box_loading.html(data.html).css('display', 'block');
+						}
+						else
+						{
+							box.html(data.html).show();
+						}
 					}
-					else
-					{
-						box.html(data.html).show();
-					}
+				},
+				error: function (xhr, ajaxOptions, thrownError) {
+					box_loading.empty().removeClass('ajax-loader').css('display', 'none');
+					alert('Error status: ' + xhr.status + ' , Error text: ' + thrownError);
 				}
-			},
-			error: function (xhr, ajaxOptions, thrownError) {
-				box_loading.empty().removeClass('ajax-loader').css('display', 'none');
-				alert('Error status: ' + xhr.status + ' , Error text: ' + thrownError);
-			}
-		});
+			});
+		}
 	}
 
 

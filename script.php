@@ -5,7 +5,7 @@
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
  * @license GNU/GPL v2
- * 
+ *
  * FLEXIcontent is a derivative work of the excellent QuickFAQ component
  * @copyright (C) 2008 Christoph Lukes
  * see www.schlu.net for more information
@@ -77,30 +77,30 @@ class com_flexicontentInstallerScript
 			// load english language file for 'com_flexicontent' component then override with current language file
 			JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, 'en-GB', true);
 			JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, true);
-		
+
 			JFactory::getApplication()->enqueueMessage(JText::sprintf('FLEXI_UPGRADE_PHP_VERSION_GE', $PHP_VERSION_NEEDED), 'warning');
 			return false;
 		}
-		
+
 		// Get existing manifest data
 		$existing_manifest = $this->getExistingManifest();
-		
+
 		// Get Joomla version
 		$jversion = new JVersion();
-		
+
 		// File version of new manifest file
 		$this->release = $parent->getManifest()->version;
-		
+
 		// File version of existing manifest file
 		$this->release_existing = $existing_manifest[ 'version' ];
-		
+
 		// Manifest file minimum Joomla version
 		$this->minimum_joomla_release = $parent->getManifest()->attributes()->version;
 
 		// Only execute during install / update not during uninstallation (J4 will run post flight during uninstall too)
 		if ($type=='update' || $type=='install') :
 		?>
-		
+
 		<table style="border-collapse: collapse; background-color: transparent;">
 			<tr>
 				<td valign="top">
@@ -117,8 +117,8 @@ class com_flexicontentInstallerScript
 			</tr>
 
 		</table>
-		
-		<?php		
+
+		<?php
 		echo '
 		<div class="alert alert-info" style="margin:32px 0px 0px 0px;">' .JText::_('Performing prior to installation tasks ... '). '
 		<br/>
@@ -129,7 +129,7 @@ class com_flexicontentInstallerScript
 				' . JText::_('COM_FLEXICONTENT_CURRENT').': <span class="badge badge-success">' . PHP_VERSION . '</span>
 			</li>
 		';
-		
+
 		// Check that current Joomla release is not older than minimum required
 		if ( version_compare($jversion->getShortVersion(), $this->minimum_joomla_release, 'lt') )
 		{
@@ -146,7 +146,7 @@ class com_flexicontentInstallerScript
 					' . JText::_('COM_FLEXICONTENT_CURRENT').': <span class="badge badge-success">' . $jversion->getShortVersion() . '</span>
 				</li>';
 		}
-		
+
 		// Print message about installing / updating / downgrading FLEXIcontent
 		$downgrade_allowed = true;
 		if ($type=='update')
@@ -164,14 +164,14 @@ class com_flexicontentInstallerScript
 				return false;  // Returning false here would abort
 			}
 		}
-		
+
 		echo '
 		</ul>
 		</div>
 		';
-		
+
 		endif; // type == install / update
-		
+
 		// Set a flag about FLEXIcontent being installed (1) or upgraded (0)
 		define('FLEXI_NEW_INSTALL', $type=='install' ? 1 : 0);
 	}
@@ -197,8 +197,8 @@ class com_flexicontentInstallerScript
 		// You can have the backend jump directly to the newly installed component configuration page
 		// $parent->getParent()->setRedirectURL('index.php?option=com_flexicontent');
 	}
-	
-	
+
+
 	/*
 	* $parent is the class calling this method.
 	* update runs after the database scripts are executed.
@@ -232,14 +232,14 @@ class com_flexicontentInstallerScript
 		// You can have the backend jump directly to the newly updated component configuration page
 		// $parent->getParent()->setRedirectURL('index.php?option=com_flexicontent');
 	}
-	
-	
+
+
 	function do_extra( $parent )
 	{
 		// init vars
 		$error = false;
 		$extensions = array();
-		
+
 		// clear a cache
 		$cache = JFactory::getCache();
 		$cache->clean( '_system' );  // This might be necessary as installing-uninstalling in same session may result in wrong extension ids, etc
@@ -248,7 +248,7 @@ class com_flexicontentInstallerScript
 		$cache->clean( 'com_flexicontent_cats' );
 		$cache->clean( 'com_flexicontent_items' );
 		$cache->clean( 'com_flexicontent_filters' );
-		
+
 		// reseting post installation session variables
 		$session  = JFactory::getSession();
 		$session->set('flexicontent.postinstall', false);
@@ -256,9 +256,9 @@ class com_flexicontentInstallerScript
 		$session->set('flexicontent.allplgpublish', false);
 		$session->set('unbounded_noext', false, 'flexicontent');
 		$session->set('unbounded_badcat', false, 'flexicontent');
-		
+
 		$db = JFactory::getDbo();
-		
+
 		// Parse XML file to identify additional extensions,
 		// This code part (for installing additional extensions) originates from Zoo J1.5 Component:
 		// @author    YOOtheme http://www.yootheme.com
@@ -292,18 +292,18 @@ class com_flexicontentInstallerScript
 		foreach ($extensions as $i => $extension)
 		{
 			$jinstaller = & $extensions[$i]['installer'];    // new JInstaller();
-			
+
 			// J1.6+ installer requires that we explicit set override/upgrade options
 			$jinstaller->setOverwrite(true);
 			$jinstaller->setUpgrade(true);
-			
+
 			if ($jinstaller->install($extensions[$i]['folder']))
 			{
 				$extensions[$i]['status'] = true;
 				$ext_manifest = $jinstaller->getManifest();
 				$ext_manifest_name = $ext_manifest->name;
 				//if ($ext_manifest_name!=$extensions[$i]['name'])  echo $ext_manifest_name." - ".$extensions[$i]['name'] . "<br/>";
-				
+
 				// Force existing plugins/modules to use name found in each extension's manifest.xml file
 				if (1) //if ( in_array($extensions[$i]['ext_folder'], array('flexicontent_fields', 'flexicontent', 'search', 'content', 'system')) || $extensions[$i]['type']=='module' )
 				{
@@ -423,8 +423,8 @@ class com_flexicontentInstallerScript
 		// All OK, or acceptable errors
 		return true;
 	}
-	
-	
+
+
 	/*
 	* $parent is the class calling this method.
 	* $type is the type of change (install, update or discover_install, not uninstall).
@@ -453,7 +453,7 @@ class com_flexicontentInstallerScript
 			$params['my_param2'] = '4';
 			$params['my_param3'] = 'Star';
 		}
-		
+
 		$this->setParams( $params );*/
 
 		/*JFactory::getApplication()->enqueueMessage('
@@ -492,7 +492,7 @@ class com_flexicontentInstallerScript
 				</tr>
 			</tfoot>
 			<tbody>
-			
+
 		<?php
 		// Fix for categories with wrong extension
 		$query = 'UPDATE #__categories SET extension = "com_content", published = 0 WHERE  extension = "com_flexicontent"';
@@ -509,75 +509,76 @@ class com_flexicontentInstallerScript
 		);
 
 		// Get DB table information
-		
+
 		$query = 'SHOW TABLES LIKE "' . $dbprefix . 'flexicontent_fields_item_relations"';
 		$db->setQuery($query);
 		$fi_rels_tbl_exists = (boolean) count($db->loadObjectList());
-		
+
 		$query = 'SHOW TABLES LIKE "' . $dbprefix . 'flexicontent_items_versions"';
 		$db->setQuery($query);
 		$fi_vers_tbl_exists = (boolean) count($db->loadObjectList());
-		
+
 		$query = 'SHOW TABLES LIKE "' . $dbprefix . 'flexicontent_favourites"';
 		$db->setQuery($query);
 		$favs_tbl_exists = (boolean) count($db->loadObjectList());
-		
+
 		$query = 'SHOW TABLES LIKE "' . $dbprefix . 'flexicontent_files"';
 		$db->setQuery($query);
 		$files_tbl_exists = (boolean) count($db->loadObjectList());
-		
+
 		$query = 'SHOW TABLES LIKE "' . $dbprefix . 'flexicontent_fields"';
 		$db->setQuery($query);
 		$fields_tbl_exists = (boolean) count($db->loadObjectList());
-		
+
 		$query = 'SHOW TABLES LIKE "' . $dbprefix . 'flexicontent_types"';
 		$db->setQuery($query);
 		$types_tbl_exists = (boolean) count($db->loadObjectList());
-		
+
 		$query = 'SHOW TABLES LIKE "' . $dbprefix . 'flexicontent_tags"';
 		$db->setQuery($query);
 		$tags_tbl_exists = (boolean) count($db->loadObjectList());
-		
+
 		$query = 'SHOW TABLES LIKE "' . $dbprefix . 'flexicontent_items_ext"';
 		$db->setQuery($query);
 		$iext_tbl_exists = (boolean) count($db->loadObjectList());
-		
+
 		$query = 'SHOW TABLES LIKE "' . $dbprefix . 'flexicontent_advsearch_index"';
 		$db->setQuery($query);
 		$advsearch_index_tbl_exists = (boolean) count($db->loadObjectList());
-		
+
 		$query = 'SHOW TABLES LIKE "' . $dbprefix . 'flexicontent_authors_ext"';
 		$db->setQuery($query);
 		$authors_ext_tbl_exists = (boolean) count($db->loadObjectList());
-		
-		$query = 'SHOW TABLES LIKE "' . $dbprefix . 'flexicontent_reviews"';
+
+		// BETA table
+		$query = 'SHOW TABLES LIKE "' . $dbprefix . 'flexicontent_reviews_dev"';
 		$db->setQuery($query);
 		$reviews_beta_tbl_exists = (boolean) count($db->loadObjectList());
-		
-		//$query = 'SHOW TABLES LIKE "' . $dbprefix . 'flexicontent_reviews_dev"';   // TODO WHEN FEATURE IS COMPLETE SWITCH WITH THE ABOVE !!
-		//$db->setQuery($query);
-		//$reviews_tbl_exists = (boolean) count($db->loadObjectList());
-		
+
+		$query = 'SHOW TABLES LIKE "' . $dbprefix . 'flexicontent_reviews"';
+		$db->setQuery($query);
+		$reviews_tbl_exists = (boolean) count($db->loadObjectList());
+
 		$query = 'SHOW TABLES LIKE "' . $dbprefix . 'flexicontent_templates"';
 		$db->setQuery($query);
 		$templates_tbl_exists = (boolean) count($db->loadObjectList());
-		
+
 		$query = 'SHOW TABLES LIKE "' . $dbprefix . 'flexicontent_layouts_conf"';
 		$db->setQuery($query);
 		$layouts_conf_tbl_exists = (boolean) count($db->loadObjectList());
-		
+
 		$query = 'SHOW TABLES LIKE "' . $dbprefix . 'flexicontent_items_tmp"';
 		$db->setQuery($query);
 		$content_cache_tbl_exists = (boolean) count($db->loadObjectList());
-		
+
 		$query = 'SHOW TABLES LIKE "' . $dbprefix . 'flexicontent_download_history"';
 		$db->setQuery($query);
 		$dl_history_tbl_exists = (boolean) count($db->loadObjectList());
-		
+
 		$query = 'SHOW TABLES LIKE "' . $dbprefix . 'flexicontent_download_coupons"';
 		$db->setQuery($query);
 		$dl_coupons_tbl_exists = (boolean) count($db->loadObjectList());
-		
+
 		// Data Types of columns
 		$tbl_names_arr = array('flexicontent_files', 'flexicontent_fields', 'flexicontent_types');
 		foreach ($tbl_names_arr as $tbl_name)
@@ -588,8 +589,8 @@ class com_flexicontentInstallerScript
 			$tbl_datatypes[$tbl_name] = $db->loadAssocList('COLUMN_NAME');
 		}
 		?>
-		
-		
+
+
 		<?php
 		// Delete orphan plugin entries
 		?>
@@ -599,7 +600,7 @@ class com_flexicontentInstallerScript
 					<?php
 					$queries = array();
 					$queries[] ="DELETE FROM `#__extensions` WHERE folder='flexicontent_fields' AND element IN ('flexisystem', 'flexiadvroute', 'flexisearch', 'flexiadvsearch', 'flexinotify')";
-					
+
 					if ( !empty($queries) ) {
 						foreach ($queries as $query) {
 							$db->setQuery($query);
@@ -619,7 +620,7 @@ class com_flexicontentInstallerScript
 					?>
 					</td>
 				</tr>
-		
+
 		<?php
 		// Enable FLEXIcontent system plugins
 		?>
@@ -629,7 +630,7 @@ class com_flexicontentInstallerScript
 					<?php
 					$queries = array();
 					$queries[] = "UPDATE #__extensions SET enabled=1 WHERE type='plugin' AND (element=".$db->Quote('flexisystem')." OR element=".$db->Quote('flexiadvroute').") AND folder=".$db->Quote('system');
-					
+
 					if ( !empty($queries) ) {
 						foreach ($queries as $query) {
 							$db->setQuery($query);
@@ -649,7 +650,7 @@ class com_flexicontentInstallerScript
 					?>
 					</td>
 				</tr>
-		
+
 		<?php
 		// Update DB table flexicontent_fields: Convert deprecated fields types to 'text' field type
 		?>
@@ -672,10 +673,10 @@ class com_flexicontentInstallerScript
 							$msg[$n++] = '<span class="badge badge-error">SQL Error</span> '. $e->getMessage() . '<br/>';
 							continue;
 						}
-						
+
 						$count_rows = $db->getAffectedRows();
 						$msg[$n] = '<span class="label label-'.($count_rows ? 'warning' : 'info').'">'.$count_rows.'</span><span class="label">'.$old_type.'</span> &nbsp; ';
-						
+
 						$query = 'SELECT *, extension_id AS id '
 							.' FROM #__extensions'
 							.' WHERE type="plugin"'
@@ -683,7 +684,7 @@ class com_flexicontentInstallerScript
 							.'  AND folder='.$db->Quote( 'flexicontent_fields' );
 						$db->setQuery($query);
 						$ext = $db->loadAssoc();
-						
+
 						if ($ext && $ext['id'] > 0) {
 							$installer = new JInstaller();
 							if ( $installer->uninstall($ext['type'], $ext['id'], (int)$ext['client_id']) )
@@ -697,7 +698,7 @@ class com_flexicontentInstallerScript
 					</td>
 					<td> <?php echo implode("\n", $msg); ?> </td>
 				</tr>
-				
+
 		<?php
 		// Upgrade DB tables: ADD new columns
 		?>
@@ -718,7 +719,7 @@ class com_flexicontentInstallerScript
 					if ($content_cache_tbl_exists)    $tbls[] = "#__flexicontent_items_tmp";
 					if ($advsearch_index_tbl_exists)  $tbls[] = "#__flexicontent_advsearch_index";
 					foreach ($tbls as $tbl) $tbl_fields[$tbl] = $db->getTableColumns($tbl);
-					
+
 					$queries = array();
 					if ( $iext_tbl_exists ) {
 						$_query = "ALTER TABLE `#__flexicontent_items_ext`";
@@ -731,14 +732,14 @@ class com_flexicontentInstallerScript
 						if (!array_key_exists('lang_parent_id', $tbl_fields['#__flexicontent_items_ext'])) $_querycols[] = " ADD `lang_parent_id` INT(11) UNSIGNED NOT NULL DEFAULT '0' AFTER `type_id`";
 						if (!empty($_querycols)) $queries[] = $_query . implode(",", $_querycols);
 					}
-					
+
 					if ($fi_rels_tbl_exists && !array_key_exists('suborder', $tbl_fields['#__flexicontent_fields_item_relations'])) {
 						$queries[] = "ALTER TABLE `#__flexicontent_fields_item_relations` ADD `suborder` INT(11) NOT NULL DEFAULT '1' AFTER `valueorder`";
 					}
 					if ($fi_vers_tbl_exists && !array_key_exists('suborder', $tbl_fields['#__flexicontent_items_versions'])) {
 						$queries[] = "ALTER TABLE `#__flexicontent_items_versions` ADD `suborder` INT(11) NOT NULL DEFAULT '1' AFTER `valueorder`";
 					}
-					
+
 					if ($fi_rels_tbl_exists && !array_key_exists('value_integer', $tbl_fields['#__flexicontent_fields_item_relations'])) {
 						$queries[] = "ALTER TABLE `#__flexicontent_fields_item_relations` ADD `value_integer` BIGINT(20) NULL AFTER `value`";
 					}
@@ -748,7 +749,7 @@ class com_flexicontentInstallerScript
 					if ($fi_rels_tbl_exists && !array_key_exists('value_datetime', $tbl_fields['#__flexicontent_fields_item_relations'])) {
 						$queries[] = "ALTER TABLE `#__flexicontent_fields_item_relations` ADD `value_datetime` DATETIME NULL AFTER `value_decimal`";
 					}
-					
+
 					/*if ($fi_rels_tbl_exists && !array_key_exists('qindex01', $tbl_fields['#__flexicontent_fields_item_relations'])) {
 						$queries[] = "ALTER TABLE `#__flexicontent_fields_item_relations` ADD `qindex01` MEDIUMTEXT NULL DEFAULT NULL AFTER `value_datetime`";
 					}
@@ -758,7 +759,7 @@ class com_flexicontentInstallerScript
 					if ($fi_rels_tbl_exists && !array_key_exists('qindex03', $tbl_fields['#__flexicontent_fields_item_relations'])) {
 						$queries[] = "ALTER TABLE `#__flexicontent_fields_item_relations` ADD `qindex03` MEDIUMTEXT NULL DEFAULT NULL AFTER `qindex02`";
 					}
-					
+
 					if ($fi_vers_tbl_exists && !array_key_exists('qindex01', $tbl_fields['#__flexicontent_items_versions'])) {
 						$queries[] = "ALTER TABLE `#__flexicontent_items_versions` ADD `qindex01` MEDIUMTEXT NULL DEFAULT NULL AFTER `value`";
 					}
@@ -768,12 +769,12 @@ class com_flexicontentInstallerScript
 					if ($fi_vers_tbl_exists && !array_key_exists('qindex03', $tbl_fields['#__flexicontent_items_versions'])) {
 						$queries[] = "ALTER TABLE `#__flexicontent_items_versions` ADD `qindex03` MEDIUMTEXT NULL DEFAULT NULL AFTER `qindex02`";
 					}*/
-					
+
 					// Favourites TABLE
 					if ( $favs_tbl_exists && !array_key_exists('type', $tbl_fields['#__flexicontent_favourites'])) {
 						$queries[] = "ALTER TABLE `#__flexicontent_favourites` ADD `type` INT(11) NOT NULL DEFAULT '0' AFTER `notify`";
 					}
-					
+
 					// Files TABLE
 					$tbl_name = 'flexicontent_files';
 					if ( $files_tbl_exists && !array_key_exists('filename_original', $tbl_fields['#__'.$tbl_name])) {
@@ -797,7 +798,7 @@ class com_flexicontentInstallerScript
 					if ( isset($tbl_datatypes[$tbl_name]) && strtolower($tbl_datatypes[$tbl_name]['attribs']['DATA_TYPE']) != 'mediumtext' ) {
 						$queries[] = "ALTER TABLE `#__".$tbl_name."` CHANGE `attribs` `attribs` MEDIUMTEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL";
 					}
-					
+
 					// Fields TABLE
 					$tbl_name = 'flexicontent_fields';
 					if ( $fields_tbl_exists && !array_key_exists('untranslatable', $tbl_fields['#__'.$tbl_name])) {
@@ -821,7 +822,7 @@ class com_flexicontentInstallerScript
 					if ( isset($tbl_datatypes[$tbl_name]) && strtolower($tbl_datatypes[$tbl_name]['attribs']['DATA_TYPE']) != 'mediumtext' ) {
 						$queries[] = "ALTER TABLE `#__".$tbl_name."` CHANGE `attribs` `attribs` MEDIUMTEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL";
 					}
-					
+
 					// Types TABLE
 					$tbl_name = 'flexicontent_types';
 					if ( $types_tbl_exists && !array_key_exists('asset_id', $tbl_fields['#__'.$tbl_name]) ) {
@@ -842,18 +843,12 @@ class com_flexicontentInstallerScript
 					if ( $tags_tbl_exists && !array_key_exists('jtag_id', $tbl_fields['#__'.$tbl_name]) ) {
 						$queries[] = "ALTER TABLE `#__".$tbl_name."` ADD `jtag_id` INT(10) UNSIGNED NULL AFTER `checked_out_time`";
 					}
-					
-					// Types TABLE
-					$tbl_name = 'flexicontent_tags';
-					if ( $tags_tbl_exists && !array_key_exists('jtag_id', $tbl_fields['#__'.$tbl_name]) ) {
-						$queries[] = "ALTER TABLE `#__".$tbl_name."` ADD `jtag_id` INT(10) UNSIGNED NULL AFTER `checked_out_time`";
-					}
-					
+
 					// Templates TABLE
 					if ( $templates_tbl_exists && !array_key_exists('cfgname', $tbl_fields['#__flexicontent_templates'])) {
 						$queries[] = "ALTER TABLE `#__flexicontent_templates` ADD `cfgname` varchar(50) NOT NULL default '' AFTER `template`";
 					}
-					
+
 					$upgrade_count = 0;
 					if ( !empty($queries) ) {
 						foreach ($queries as $query) {
@@ -873,7 +868,7 @@ class com_flexicontentInstallerScript
 					?>
 					</td>
 				</tr>
-		
+
 		<?php
 		// Create/Upgrade ADVANCED index DB table: ADD column and indexes
 		// Because Adding indexes can be heavy to the SQL server (if not done asychronously ??) we truncate table OR drop it and recreate it
@@ -882,14 +877,14 @@ class com_flexicontentInstallerScript
 					<td class="key" style="font-size:11px;">Create/Upgrade advanced search index table: </td>
 					<td>
 					<?php
-					
+
 			    $queries = array();
 					if ( $advsearch_index_tbl_exists ) {
 				    $db->setQuery("SHOW INDEX FROM #__flexicontent_advsearch_index");
 				    $_indexes = $db->loadObjectList();
 				    foreach ($_indexes as $tbl_index) $tbl_indexes['#__flexicontent_advsearch_index'][$tbl_index->Key_name] = true;
 				  }
-				  
+
 					if ( !$advsearch_index_tbl_exists || !array_key_exists('sid', $tbl_fields['#__flexicontent_advsearch_index']) ) {
 						if ( $advsearch_index_tbl_exists) $queries[] = "DROP TABLE `#__flexicontent_advsearch_index`";
 						$queries[] = "CREATE TABLE `#__flexicontent_advsearch_index` (
@@ -904,7 +899,7 @@ class com_flexicontentInstallerScript
 							KEY `value_id` (`value_id`)
 							) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`";
 					}
-					
+
 					/*
 					$_add_indexes = array();
 					if ( $advsearch_index_tbl_exists && !array_key_exists('field_id', $tbl_indexes['#__flexicontent_advsearch_index'])) {
@@ -919,14 +914,14 @@ class com_flexicontentInstallerScript
 					if ( $advsearch_index_tbl_exists && !array_key_exists('value_id', $tbl_indexes['#__flexicontent_advsearch_index'])) {
 						$_add_indexes[] = " ADD KEY ( `value_id` ) ";
 					}
-					
+
 					if (count($_add_indexes)) {
 						$db->setQuery('TRUNCATE TABLE #__flexicontent_advsearch_index');
 						$db->execute();   // Truncate table of search index to avoid long-delay on indexing
 						$queries[] = "ALTER TABLE `#__flexicontent_advsearch_index` ". implode(",", $_add_indexes);
 					}
 					*/
-					
+
 					$upgrade_count = 0;
 					if ( !empty($queries) ) {
 						foreach ($queries as $query) {
@@ -955,7 +950,7 @@ class com_flexicontentInstallerScript
 					<td class="key" style="font-size:11px;">Create/Upgrade authors configuration DB table: </td>
 					<td>
 					<?php
-					
+
 			    $queries = array();
 					if ( !$authors_ext_tbl_exists ) {
 						$queries[] = "
@@ -966,7 +961,7 @@ class com_flexicontentInstallerScript
 						  PRIMARY KEY  (`user_id`)
 						) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`";
 					}
-					
+
 					$upgrade_count = 0;
 					if ( !empty($queries) ) {
 						foreach ($queries as $query) {
@@ -986,7 +981,7 @@ class com_flexicontentInstallerScript
 					?>
 					</td>
 				</tr>
-				
+
 		<?php
 		// Create flexicontent_reviews table if it does not exist
 		?>
@@ -994,46 +989,50 @@ class com_flexicontentInstallerScript
 					<td class="key" style="font-size:11px;">Create/Upgrade reviews DB table: </td>
 					<td>
 					<?php
-					
+
 			    $queries = array();
-					if ( $reviews_beta_tbl_exists ) {
-						$queries[] = "DROP TABLE `#__flexicontent_reviews`";
+					if ($reviews_beta_tbl_exists)
+					{
+						$queries[] = "DROP TABLE `#__flexicontent_reviews_dev`";
 					}
-					// TODO add this in installation SQL file when feature is finished
-					/*if ( !$reviews_tbl_exists ) {
+
+					if (!$reviews_tbl_exists)
+					{
 						$queries[] = "
-						CREATE TABLE IF NOT EXISTS `#__flexicontent_reviews_dev` (
+						CREATE TABLE IF NOT EXISTS `#__flexicontent_reviews` (
 							`id` int(11) NOT NULL auto_increment,
-						  `content_id` int(11) NOT NULL,
-						  `type` varchar(255) NOT NULL DEFAULT 'item',
-						  `average_rating` float NOT NULL,
-						  `custom_ratings` text NOT NULL,
-						  `user_id` int(11) NOT NULL DEFAULT '0',
-						  `email` varchar(255) NOT NULL DEFAULT '',
-						  `title` varchar(255) NOT NULL,
-						  `text` mediumtext NOT NULL,
-						  `state` tinyint(3) NOT NULL DEFAULT '0',
+							`content_id` int(11) NOT NULL,
+							`type` varchar(255) NOT NULL DEFAULT 'item',
+							`average_rating` int NOT NULL,
+							`custom_ratings` text NOT NULL DEFAULT '',
+							`user_id` int(11) NOT NULL DEFAULT '0',
+							`email` varchar(255) NOT NULL DEFAULT '',
+							`title` varchar(255) NULL,
+							`text` mediumtext NULL,
+							`state` tinyint(3) NOT NULL DEFAULT '0',
 							`approved` tinyint(3) NOT NULL DEFAULT '0',
 							`useful_yes` int(11) NOT NULL DEFAULT '0',
 							`useful_no` int(11) NOT NULL DEFAULT '0',
-						  `submit_date` datetime NOT NULL,
-						  `update_date` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+							`submit_date` datetime NOT NULL,
+							`update_date` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
 							`checked_out` int(11) unsigned NOT NULL default '0',
 							`checked_out_time` datetime NOT NULL default '0000-00-00 00:00:00',
-						  `attribs` mediumtext NULL,
+							`attribs` mediumtext NULL,
 							PRIMARY KEY  (`id`),
-						  KEY (`content_id`, `user_id`, `type`),
-						  KEY (`content_id`, `type`),
-						  KEY `user_id` (`user_id`)
+							KEY (`content_id`, `user_id`, `type`),
+							KEY (`content_id`, `type`),
+							KEY `user_id` (`user_id`)
 						) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`;";
-					}*/
-					
+					}
+
 					$upgrade_count = 0;
-					if ( !empty($queries) ) {
-						foreach ($queries as $query) {
-							$db->setQuery($query);
+
+					if (!empty($queries))
+					{
+						foreach ($queries as $query)
+						{
 							try {
-								$db->execute();
+								$db->setQuery($query)->execute();
 								$upgrade_count++;
 							}
 							catch (Exception $e) {
@@ -1043,11 +1042,15 @@ class com_flexicontentInstallerScript
 						}
 						echo '<span class="badge badge-success">table(s) created / upgraded: '.$upgrade_count.'</span>';
 					}
-					else echo '<span class="badge badge-info">nothing to do</span>';
+
+					else
+					{
+						echo '<span class="badge badge-info">nothing to do</span>';
+					}
 					?>
 					</td>
 				</tr>
-				
+
 		<?php
 		// Create content_cache table if it does not exist
 		?>
@@ -1055,7 +1058,7 @@ class com_flexicontentInstallerScript
 					<td class="key" style="font-size:11px;">Create/Upgrade content cache DB table: </td>
 					<td>
 					<?php
-					
+
 			    $queries = array();
 					if ( !$content_cache_tbl_exists ) {
 						$queries[] = "
@@ -1090,7 +1093,7 @@ class com_flexicontentInstallerScript
 						if (!array_key_exists('lang_parent_id', $tbl_fields['#__flexicontent_items_tmp'])) $_querycols[] = " ADD `lang_parent_id` INT(11) UNSIGNED NOT NULL DEFAULT '0' AFTER `type_id`";
 						if (!empty($_querycols)) $queries[] = "ALTER TABLE `#__flexicontent_items_tmp` " . implode(",", $_querycols);
 					}
-					
+
 					$upgrade_count = 0;
 					if ( !empty($queries) ) {
 						foreach ($queries as $query) {
@@ -1110,7 +1113,7 @@ class com_flexicontentInstallerScript
 					?>
 					</td>
 				</tr>
-				
+
 		<?php
 		// Create/Upgrade DB tables for downloads enhancements
 		?>
@@ -1118,9 +1121,9 @@ class com_flexicontentInstallerScript
 					<td class="key" style="font-size:11px;">Create/Upgrade DB tables for downloads enhancements: </td>
 					<td>
 					<?php
-					
+
 			    $queries = array();
-					
+
 					if ( !$dl_history_tbl_exists ) {
 						$queries[] = "
 						CREATE TABLE `#__flexicontent_download_history` (
@@ -1134,7 +1137,7 @@ class com_flexicontentInstallerScript
 							KEY `file_id` (`file_id`)
 						) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`";
 					}
-					
+
 					if ( !$dl_coupons_tbl_exists ) {
 						$queries[] = "
 						CREATE TABLE `#__flexicontent_download_coupons` (
@@ -1151,7 +1154,7 @@ class com_flexicontentInstallerScript
 							KEY `token` (`token`)
 						) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`";
 					}
-					
+
 					$upgrade_count = 0;
 					if ( !empty($queries) ) {
 						foreach ($queries as $query) {
@@ -1171,7 +1174,7 @@ class com_flexicontentInstallerScript
 					?>
 					</td>
 				</tr>
-				
+
 		<?php
 		// Create layouts_conf table if it does not exist
 		?>
@@ -1179,7 +1182,7 @@ class com_flexicontentInstallerScript
 					<td class="key" style="font-size:11px;">Create/Upgrade layouts configuration DB table: </td>
 					<td>
 					<?php
-					
+
 			    $queries = array();
 					if ( !$layouts_conf_tbl_exists ) {
 						$queries[] = "
@@ -1191,7 +1194,7 @@ class com_flexicontentInstallerScript
 						  PRIMARY KEY  (`template`,`cfgname`,`layout`)
 						) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`";
 					}
-					
+
 					$upgrade_count = 0;
 					if ( !empty($queries) ) {
 						foreach ($queries as $query) {
@@ -1211,7 +1214,7 @@ class com_flexicontentInstallerScript
 					?>
 					</td>
 				</tr>
-				
+
 		<?php
 		// Create fields table if it does not exist
 		?>
@@ -1219,12 +1222,12 @@ class com_flexicontentInstallerScript
 					<td class="key" style="font-size:11px;">Create/Upgrade fields DB table: </td>
 					<td>
 					<?php
-					
+
 			    $queries = array();
 					if ( !$fields_tbl_exists ) {
 						$queries[] = "ALTER TABLE #__flexicontent_fields MODIFY description TEXT NOT NULL";
 					}
-					
+
 					if ( !empty($queries) ) {
 						foreach ($queries as $query) {
 							$db->setQuery($query);
@@ -1244,7 +1247,7 @@ class com_flexicontentInstallerScript
 					?>
 					</td>
 				</tr>
-				
+
 		<?php
 		// Decide if search re-indexing is needed
 		?>
@@ -1254,7 +1257,7 @@ class com_flexicontentInstallerScript
 					<?php
 					// Check if there is need to update the search-index
 			    $version_needs_search_reindex = version_compare($this->release_existing, '3.0.10', '<');
-			    
+
 			    $queries = array();
 					if ( $fields_tbl_exists && $version_needs_search_reindex ) {
 						$db->setQuery('SELECT COUNT(*) FROM #__flexicontent_items_ext LIMIT 1');
@@ -1268,7 +1271,7 @@ class com_flexicontentInstallerScript
 							$queries[] = 'UPDATE #__flexicontent_fields'. $set_clause	." WHERE published=1";
 						}
 					}
-					
+
 					if ( !empty($queries) ) {
 						foreach ($queries as $query) {
 							$db->setQuery($query);
@@ -1288,7 +1291,7 @@ class com_flexicontentInstallerScript
 					?>
 					</td>
 				</tr>
-				
+
 			</tbody>
 		</table>
 		<?php
@@ -1302,7 +1305,7 @@ class com_flexicontentInstallerScript
   		</span>
 			<?php echo JText::_('COM_FLEXICONTENT_PLEASE_COMPLETE_POST_INSTALL_TASKS_AT_DASHBOARD'); ?>
   	</div>
-		
+
 		<?php
 		/* This code maybe used in the future to automate post-installation tasks
 			<tr>
@@ -1312,7 +1315,7 @@ class com_flexicontentInstallerScript
 				<td valign="top" width="100%" style="font-weight: bold; color: red; font-size: 14px;">
 					<a href="index.php?option=com_flexicontent&task=finishinstall&action=newinstall" style="font-weight: bold; color: red; font-size: 14px;">
 		    		<?php // echo JText::_('New install'); ?>
-					</a>&nbsp;&nbsp;|&nbsp;&nbsp; 
+					</a>&nbsp;&nbsp;|&nbsp;&nbsp;
 					<a href="index.php?option=com_flexicontent&task=finishinstall&action=update" style="font-weight: bold; color: red; font-size: 14px;">
 		    		<?php // echo JText::_('Update an existing install'); ?>
 					</a>
@@ -1332,21 +1335,21 @@ class com_flexicontentInstallerScript
 		ini_set('display_errors',1);
 
 		$app = JFactory::getApplication();
-		
+
 		// Extra CSS needed for J3.x+
 		echo '<link type="text/css" href="components/com_flexicontent/assets/css/j3x.css?'.FLEXI_VHASH.'" rel="stylesheet">';
-		
+
 		// Installed component manifest file version
 		$this->release = $parent->getManifest()->version;
 		echo '<div class="alert alert-info" style="margin:32px 0px 8px 0px;">' .'Uninstalling FLEXIcontent '.$this->release. '</div>';
-		
+
 		// init vars
 		$error = false;
 		$extensions = array();
 		$db = JFactory::getDbo();
 		$dbprefix = $app->getCfg('dbprefix');
 		$dbname   = $app->getCfg('db');
-		
+
 		// Uninstall additional flexicontent modules/plugins found in Joomla DB,
 		// This code part (for uninstalling additional extensions) originates from Zoo J1.5 Component:
 		// Original uninstall.php file
@@ -1357,7 +1360,7 @@ class com_flexicontentInstallerScript
 		$manifest = isset($parent) ? $parent->getParent()->manifest : $this->manifest;
 		$additional = $manifest->xpath('additional');
 		$additional = count($additional) ? reset($additional) : NULL;
-		
+
 		if ( is_object($additional) && count( $additional->children() ) )
 		{
 			$exts = $additional->children();
@@ -1377,7 +1380,7 @@ class com_flexicontentInstallerScript
 							// query extension id and client id
 							$db->setQuery($query);
 							$res = $db->loadObject();
-		
+
 							$res_id = (int)( @$res->extension_id );
 							$extensions[] = array(
 								'name' => strip_tags( $ext->asXml() ),
@@ -1397,7 +1400,7 @@ class com_flexicontentInstallerScript
 						// query extension id and client id
 						$db->setQuery($query);
 						$res = $db->loadObject();
-						
+
 						$res_id = (int)( @$res->extension_id );
 						$extensions[] = array(
 							'name' => $ext->asXml(),
@@ -1410,16 +1413,16 @@ class com_flexicontentInstallerScript
 				}
 			}
 		}
-		
+
 		// uninstall additional extensions
 		for ($i = 0; $i < count($extensions); $i++) {
 			$extension =& $extensions[$i];
-			
+
 			if ($extension['id'] > 0 && $extension['installer']->uninstall($extension['type'], $extension['id'], $extension['client_id'])) {
 				$extension['status'] = true;
 			}
 		}
-		
+
 		?>
 		<div class="alert alert-warning" style="margin:24px 0px 2px 0px; width: 300px;"><?php echo JText::_('COM_FLEXICONTENT_ADDITIONAL_EXTENSIONS'); ?></div>
 		<table class="adminlist">
@@ -1478,7 +1481,7 @@ class com_flexicontentInstallerScript
 					<td>
 						<?php
 						$queries = array();
-						
+
 						$query = 'SHOW TABLES LIKE "' . JFactory::getApplication()->getCfg('dbprefix') . 'jcomments"';
 						$db->setQuery($query);
 						$jcomments_tbl_exists = (boolean) count($db->loadObjectList());
@@ -1486,7 +1489,7 @@ class com_flexicontentInstallerScript
 							$queries['jcomments'] = 'UPDATE #__jcomments AS j SET j.object_group="com_content" WHERE j.object_group="com_flexicontent" ';
 							$queries['jcomments_objects'] = 'UPDATE #__jcomments_objects AS j SET j.object_group="com_content" WHERE j.object_group="com_flexicontent" ';
 						}
-						
+
 						if ( !empty($queries) ) {
 							$count_rows = 0;
 							foreach ($queries as $tbl => $query) {
@@ -1526,16 +1529,16 @@ class com_flexicontentInstallerScript
 								.' WHERE c.parent_id=1 AND c.extension="com_content"';
 							$db->setQuery($query);
 							$asset_ids = $db->loadColumn();
-							
+
 							$result = 2;
-							foreach ($asset_ids as $asset_id) 
+							foreach ($asset_ids as $asset_id)
 							{
 								//echo $asset_id." parent to -> " .$asset->id ."<br/>";
 								$cc_asset->load($asset_id);
 								$cc_asset->parent_id = $asset->id;
 								$cc_asset->lft = $asset->rgt;
 								$cc_asset->setLocation($asset->id, 'last-child');
-								
+
 								// Save the category asset (create or update it)
 								if (!$cc_asset->check() || !$cc_asset->store(false)) {
 									echo $cc_asset->getError();
@@ -1546,7 +1549,7 @@ class com_flexicontentInstallerScript
 								}
 							}
 						}
-						
+
 						$status_class = $result==2 ? 'badge badge-success' : 'badge badge-error';
 						?>
 						<span class="<?php echo $status_class; ?>"><?php
@@ -1577,7 +1580,7 @@ class com_flexicontentInstallerScript
 							";
 						$db->setQuery($query);
 						$tbl_names = $db->loadColumn();
-						
+
 						$count_removed = 0;
 						if (count($tbl_names)) {
 							foreach($tbl_names as $tbl_name) {
@@ -1650,11 +1653,11 @@ class com_flexicontentInstallerScript
 	{
 		static $paramsArr = null;
 		if ($paramsArr !== null) return $paramsArr;
-		
+
 		$db = JFactory::getDbo();
 		$db->setQuery( 'SELECT manifest_cache FROM #__extensions WHERE element = '. $db->quote($name) .' AND type= '. $db->quote($type) );
 		$manifest_cache =  $db->loadResult();
-		
+
 		$paramsArr = json_decode($manifest_cache, true );
 		return $paramsArr;
 	}
@@ -1713,7 +1716,7 @@ class com_flexicontentInstallerScript
 
 		// Re-encode parameters
 		$attribs = json_encode($_attribs);
-		
+
 		// Store field parameter back to the DB
 		$query = 'UPDATE #__' . $dbtbl_name . ''
 			.' SET ' . $dbcol_name . '=' . $db->Quote($attribs)

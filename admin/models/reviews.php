@@ -31,7 +31,7 @@ use Joomla\String\StringHelper;
  */
 class FlexicontentModelReviews extends JModelList
 {
-	var $records_dbtbl = 'flexicontent_reviews_dev';
+	var $records_dbtbl = 'flexicontent_reviews';
 
 	/**
 	 * Record rows
