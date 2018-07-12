@@ -364,7 +364,7 @@ class FlexicontentViewField extends JViewLegacy
 		$types = $this->get('Typeslist');
 		$typesselected = $this->get('FieldType');
 		$attribs  = 'class="use_select2_lib" multiple="multiple" size="6"';
-		$attribs .= $row->iscore ? ' disabled="disabled"' : '';
+		$attribs .= $row->iscore && $row->field_type !== 'voting' ? ' disabled="disabled"' : '';
 		$types_fieldname = 'jform[tid][]';
 		$lists['tid'] = flexicontent_html::buildtypesselect($types, $types_fieldname, $typesselected, false, $attribs);
 
