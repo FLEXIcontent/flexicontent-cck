@@ -1560,6 +1560,9 @@ class com_flexicontentInstallerScript
 						?></span>
 					</td>
 				</tr>
+
+
+
 		<?php
 		// Drop search tables
 		?>
@@ -1594,6 +1597,47 @@ class com_flexicontentInstallerScript
 						?>
 					</td>
 				</tr>
+
+
+		<?php
+		// Remove template overrides, TODO make this more robust ...
+		?>
+				<tr class="row0">
+					<td class="key" style="font-size:11px;">Remove template overrides</td>
+					<td>
+						<?php
+						$admin_tmpl = JFactory::getApplication()->getTemplate();
+						$site_tmpl  = JFactory::getApplication('site')->getTemplate();
+
+						$tmpl_override_files = array(
+							JPATH_ADMINISTRATOR . '/templates/' . $admin_tmpl . '/html/com_media/images/default_fc.php',
+							JPATH_ADMINISTRATOR . '/templates/' . $admin_tmpl . '/html/com_media/imageslist/default_fc.php',
+							JPATH_SITE . '/templates/' . $site_tmpl . '/html/com_media/images/default_fc.php',
+							JPATH_SITE . '/templates/' . $site_tmpl . '/html/com_media/imageslist/default_fc.php',
+						);
+
+						$count_removed = 0;
+
+						if (!empty($tmpl_override_files))
+						{
+							foreach($tmpl_override_files as $file)
+							{
+								if (JFile::exists($file))
+								{
+									if (!JFile::delete($file))
+									{
+										echo 'Cannot delete legacy file: ' . $file . '<br />';
+									}
+									else $count_removed++;
+								}
+							}
+							echo '<span class="badge badge-success">template override(s) removed: ' . $count_removed . '</span>';
+						}
+						else echo '<span class="badge badge-info">nothing to do</span>';
+						?>
+					</td>
+				</tr>
+
 			</tbody>
 		</table>
 			<?php
