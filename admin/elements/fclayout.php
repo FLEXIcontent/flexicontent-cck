@@ -18,7 +18,10 @@ require_once(JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'f
 
 jimport('joomla.filesystem.folder');  // JFolder
 jimport('joomla.filesystem.file');    // JFile
+
 jimport('cms.html.html');      // JHtml
+jimport('cms.html.select');    // JHtmlSelect
+jimport('joomla.form.field');  // JFormField
 
 jimport('joomla.form.helper'); // JFormHelper
 JFormHelper::loadFieldClass('groupedlist');   // JFormFieldGroupedList
@@ -35,7 +38,7 @@ JFactory::getDocument()->addScriptDeclaration(' document.write(\'<style type="te
  * @subpackage  Form
  * @since       1.5
  */
-class JFormFieldFclayout extends JFormFieldList
+class JFormFieldFclayout extends JFormFieldGroupedList
 {
 	/**
 	 * The form field type.

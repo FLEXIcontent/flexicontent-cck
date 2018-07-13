@@ -25,7 +25,7 @@ jimport('joomla.form.helper'); // JFormHelper
 JFormHelper::loadFieldClass('groupedlist');   // JFormFieldGroupedList
 
 
-class JFormFieldMicrodataprops extends JFormField
+class JFormFieldMicrodataprops extends JFormFieldGroupedList
 {
 	protected $type = 'microdataprops';
 	
