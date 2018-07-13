@@ -36,7 +36,7 @@ JFormHelper::loadFieldClass('groupedlist');   // JFormFieldGroupedList
 * Renders a multiple select element
 *
 */
-class JFormFieldMultiList extends JFormField
+class JFormFieldMultiList extends JFormFieldGroupedList
 {
 	protected $_options;
 	protected $_inherited;

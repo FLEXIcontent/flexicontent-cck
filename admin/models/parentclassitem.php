@@ -3488,7 +3488,7 @@ class ParentClassItem extends FCModelAdmin
 		}
 
 		// Retrieve Layout's parameters, also deciding the layout
-		if ($app->isAdmin() || $this->isForm)
+		if ($app->isAdmin() || !empty($this->isForm))
 		{
 			$ilayout = $itemParams->get('ilayout', $typeParams->get('ilayout', 'default'));
 			$this->setItemLayout($ilayout);
