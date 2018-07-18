@@ -165,7 +165,7 @@ class FCPagination extends JPagination
 	 */
 	public function getLimitBox()
 	{
-		if ( !JFactory::getApplication()->isAdmin() )
+		if (!JFactory::getApplication()->isAdmin())
 		{
 			return parent::getLimitBox();
 		}
@@ -191,7 +191,7 @@ class FCPagination extends JPagination
 			'select.genericlist',
 			$limits,
 			$this->prefix . 'limit',
-			'class="inputbox input-mini" size="1" onchange="Joomla.submitform();"',
+			'class="' . (FLEXI_J40GE ? 'form-control' : '') . ' fc_skip_highlight" size="1" onchange="Joomla.submitform();"',
 			'value',
 			'text',
 			$selected

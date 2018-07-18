@@ -147,8 +147,9 @@ div.statetoggler {
 	padding: 4px 4px;
 	display: inline-block;
 	width: auto;
-	line-height: 14px;
-	height: 14px;
+	line-height: 18px;
+	height: 18px;
+	box-sizing: content-box;
 
 	.icon-publish:before,
 	.icon-checkmark-2:before {
@@ -238,6 +239,7 @@ div.statetoggler {
 				min-width: auto;
 
 				background: none repeat scroll 0 0 transparent;
+				color: black;
 				outline: none;
 				text-decoration: none;
 				white-space: nowrap;
@@ -392,9 +394,12 @@ div.statetoggler {
  * Various Containers
  ********************/
 
-body .fc-iblock {
-	display: inline-block !important;  /* FORCED (this is the purpose of the class) */
+body .fc-iblock
+#flexicontent .fc-iblock,
+.flexicontent .fc-iblock {
+	display: inline-block;
 }
+
 body .fc-nowrap-box,
 #flexicontent .nowrap_box,
 .flexicontent .nowrap_box {
@@ -402,11 +407,21 @@ body .fc-nowrap-box,
 	vertical-align: top;
 	display: inline-block;
 	float: none;
+
+	.label {
+		vertical-align: top;
+	}
+	
+	/* avoid issue of box inside box */
+	.fc-nowrap-box,
+	.nowrap_box {
+		vertical-align: middle;
+		.label {
+			vertical-align: middle;
+		}
+	}
 }
-#flexicontent .nowrap_box .label,
-.flexicontent .nowrap_box .label {
-	vertical-align: top;
-}
+
 #flexicontent .filterbuttons_head .nowrap_box .label,
 .flexicontent .filterbuttons_head .nowrap_box .label {
 	vertical-align: middle;
@@ -633,7 +648,7 @@ body .btn-group.fc-group > .statetoggler.btn.btn-small {
 	color: black;
 	font-size: 120%;
 }
-.fc-preview-btn .icon-screen {
+.fc-preview-btn:not(.active):not(:hover) .icon-screen {
 	color: darkcyan;
 }
 

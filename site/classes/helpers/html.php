@@ -2314,17 +2314,17 @@ class flexicontent_html
 		if ( $show_icons==1 ) {
 			$caption = '';
 			$button_classes .= '';
-			$tooltip_place = 'bottom';
+			$tooltip_placement = 'bottom';
 		} else {
 			$caption = $text;
 			if ( !$params->get('btn_grp_dropdown', 0) ) $button_classes .= self::$use_bootstrap ? ' btn btn-small' : ' fc_button fcsimple fcsmall';
-			$tooltip_place = !$params->get('btn_grp_dropdown', 0) ? 'bottom' : 'left';
+			$tooltip_placement = !$params->get('btn_grp_dropdown', 0) ? 'bottom' : 'left';
 		}
 		$button_classes .= ' hasTooltip';
 		$tooltip_title = flexicontent_html::getToolTip($text, $overlib, 0);
 
 		// $link as set above
-		$output	= ' <a href="'.$link.'" class="'.$button_classes.'" data-placement="'.$tooltip_place.'" title="'.$tooltip_title.'" onclick="'.$onclick.'" >'.$image.$caption.'</a>';
+		$output	= ' <a href="'.$link.'" class="'.$button_classes.'" data-placement="' . $tooltip_placement . '" title="'.$tooltip_title.'" onclick="'.$onclick.'" >'.$image.$caption.'</a>';
 		$output	= JText::_( 'FLEXI_ICON_SEP' ) .$output. JText::_( 'FLEXI_ICON_SEP' );
 
 		return $output;
@@ -2376,11 +2376,11 @@ class flexicontent_html
 		if ( $show_icons==1 ) {
 			$caption = '';
 			$button_classes .= '';
-			$tooltip_place = 'bottom';
+			$tooltip_placement = 'bottom';
 		} else {
 			$caption = $text;
 			if ( !$params->get('btn_grp_dropdown', 0) ) $button_classes .= self::$use_bootstrap ? ' btn btn-small' : ' fc_button fcsimple fcsmall';
-			$tooltip_place = !$params->get('btn_grp_dropdown', 0) ? 'bottom' : 'left';
+			$tooltip_placement = !$params->get('btn_grp_dropdown', 0) ? 'bottom' : 'left';
 		}
 		$button_classes .= ' hasTooltip';
 		$tooltip_title = flexicontent_html::getToolTip($text, $overlib, 0);
@@ -2392,7 +2392,7 @@ class flexicontent_html
 		$targetLink = "_self";
 		$confirm_text = JText::_('FLEXI_ARE_YOU_SURE_PERMANENT_DELETE', true);
 
-		$output	= ' <a href="'.$link.'" class="'.$button_classes.'" data-placement="'.$tooltip_place.'" onclick="return confirm(\''.$confirm_text.'\')" target="'.$targetLink.'" title="'.$tooltip_title.'">'.$image.$caption.'</a>';
+		$output	= ' <a href="'.$link.'" class="'.$button_classes.'" data-placement="' . $tooltip_placement . '" onclick="return confirm(\''.$confirm_text.'\')" target="'.$targetLink.'" title="'.$tooltip_title.'">'.$image.$caption.'</a>';
 		$output	= JText::_( 'FLEXI_ICON_SEP' ) .$output. JText::_( 'FLEXI_ICON_SEP' );
 
 		return $output;
@@ -2458,17 +2458,17 @@ class flexicontent_html
 		if ( $show_icons==1 ) {
 			$caption = '';
 			$button_classes .= '';
-			$tooltip_place = 'bottom';
+			$tooltip_placement = 'bottom';
 		} else {
 			$caption = $text;
 			if ( !$params->get('btn_grp_dropdown', 0) ) $button_classes .= self::$use_bootstrap ? ' btn btn-small' : ' fc_button fcsimple fcsmall';
-			$tooltip_place = !$params->get('btn_grp_dropdown', 0) ? 'bottom' : 'left';
+			$tooltip_placement = !$params->get('btn_grp_dropdown', 0) ? 'bottom' : 'left';
 		}
 		$button_classes .= ' hasTooltip';
 		$tooltip_title = flexicontent_html::getToolTip($text, $overlib, 0);
 
 		// $link as set above
-		$output	= ' <a href="'.$link.'" class="'.$button_classes.'" data-placement="'.$tooltip_place.'" title="'.$tooltip_title.'" onclick="'.$onclick.'" >'.$image.$caption.'</a>';
+		$output	= ' <a href="'.$link.'" class="'.$button_classes.'" data-placement="' . $tooltip_placement . '" title="'.$tooltip_title.'" onclick="'.$onclick.'" >'.$image.$caption.'</a>';
 		$output	= JText::_( 'FLEXI_ICON_SEP' ) .$output. JText::_( 'FLEXI_ICON_SEP' );
 
 		return $output;
@@ -2516,17 +2516,17 @@ class flexicontent_html
 		if ( $show_icons==1 ) {
 			$caption = '';
 			$button_classes .= '';
-			$tooltip_place = 'bottom';
+			$tooltip_placement = 'bottom';
 		} else {
 			$caption = $text;
 			if ( !$params->get('btn_grp_dropdown', 0) ) $button_classes .= self::$use_bootstrap ? ' btn btn-small' : ' fc_button fcsimple fcsmall';
-			$tooltip_place = !$params->get('btn_grp_dropdown', 0) ? 'bottom' : 'left';
+			$tooltip_placement = !$params->get('btn_grp_dropdown', 0) ? 'bottom' : 'left';
 		}
 		$button_classes .= ' hasTooltip';
 		$tooltip_title = flexicontent_html::getToolTip($text, $overlib, 0);
 
 		// $link as set above
-		$output	= ' <a href="'.$link.'" class="'.$button_classes.'" data-placement="'.$tooltip_place.'" title="'.$tooltip_title.'" onclick="'.$onclick.'" rel="nofollow">'.$image.$caption.'</a>';
+		$output	= ' <a href="'.$link.'" class="'.$button_classes.'" data-placement="' . $tooltip_placement . '" title="'.$tooltip_title.'" onclick="'.$onclick.'" rel="nofollow">'.$image.$caption.'</a>';
 		$output	= JText::_( 'FLEXI_ICON_SEP' ) .$output. JText::_( 'FLEXI_ICON_SEP' );
 
 		return $output;
@@ -2605,17 +2605,17 @@ class flexicontent_html
 		if ( $show_icons==1 ) {
 			$caption = '';
 			$button_classes .= '';
-			$tooltip_place = 'bottom';
+			$tooltip_placement = 'bottom';
 		} else {
 			$caption = $text;
 			if ( !$params->get('btn_grp_dropdown', 0) ) $button_classes .= self::$use_bootstrap ? ' btn btn-small' : ' fc_button fcsimple fcsmall';
-			$tooltip_place = !$params->get('btn_grp_dropdown', 0) ? 'bottom' : 'left';
+			$tooltip_placement = !$params->get('btn_grp_dropdown', 0) ? 'bottom' : 'left';
 		}
 		$button_classes .= ' hasTooltip';
 		$tooltip_title = flexicontent_html::getToolTip($text, $overlib, 0);
 
 		// emailed link was set above
-		$output	= ' <a href="'.$mail_to_url.'" class="'.$button_classes.'" data-placement="'.$tooltip_place.'" title="'.$tooltip_title.'" onclick="'.$onclick.'" rel="nofollow">'.$image.$caption.'</a>';
+		$output	= ' <a href="'.$mail_to_url.'" class="'.$button_classes.'" data-placement="' . $tooltip_placement . '" title="'.$tooltip_title.'" onclick="'.$onclick.'" rel="nofollow">'.$image.$caption.'</a>';
 		$output	= JText::_( 'FLEXI_ICON_SEP' ) .$output. JText::_( 'FLEXI_ICON_SEP' );
 
 		return $output;
@@ -2658,17 +2658,17 @@ class flexicontent_html
 		if ( $show_icons==1 ) {
 			$caption = '';
 			$button_classes .= '';
-			$tooltip_place = 'bottom';
+			$tooltip_placement = 'bottom';
 		} else {
 			$caption = $text;
 			if ( !$params->get('btn_grp_dropdown', 0) ) $button_classes .= self::$use_bootstrap ? ' btn btn-small' : ' fc_button fcsimple fcsmall';
-			$tooltip_place = !$params->get('btn_grp_dropdown', 0) ? 'bottom' : 'left';
+			$tooltip_placement = !$params->get('btn_grp_dropdown', 0) ? 'bottom' : 'left';
 		}
 		$button_classes .= ' hasTooltip';
 		$tooltip_title = flexicontent_html::getToolTip($text, $overlib, 0);
 
 		$link 	= JRoute::_('index.php?view='.FLEXI_ITEMVIEW.'&cid='.$item->categoryslug.'&id='.$item->slug.'&format=pdf');
-		$output	= ' <a href="'.$link.'" class="'.$button_classes.'" data-placement="'.$tooltip_place.'" title="'.$tooltip_title.'">'.$image.$caption.'</a>';
+		$output	= ' <a href="'.$link.'" class="'.$button_classes.'" data-placement="' . $tooltip_placement . '" title="'.$tooltip_title.'">'.$image.$caption.'</a>';
 		$output	= JText::_( 'FLEXI_ICON_SEP' ) .$output. JText::_( 'FLEXI_ICON_SEP' );
 
 		return $output;
@@ -2682,7 +2682,7 @@ class flexicontent_html
 	 * @param array $params
 	 * @since 1.0
 	 */
-	static function statebutton( $item, $params=null, $addToggler=true, $tooltip_place = null, $class=null, $ops = array('controller'=>'items', 'state_propname'=>'state') )
+	static function statebutton( $item, $params=null, $addToggler=true, $tooltip_placement=null, $class=null, $ops = array('controller'=>'items', 'state_propname'=>'state') )
 	{
 		// Some static variables
 		static $user;
@@ -2875,12 +2875,14 @@ class flexicontent_html
 			if ($has_archive)      $state_ids[] = 2;
 			if ($item->canDelete)  $state_ids[] = -2;
 
-			if ($tooltip_place === 'top') $tooltip_place = '';
-			else if ( $tooltip_place ) ;
-			else if ( !$params || !$params->get('show_icons', 2) )
-				$tooltip_place = 'bottom';
+			if ($tooltip_placement === 'top')
+				$tooltip_placement = '';
+			elseif ($tooltip_placement)
+				;
+			elseif (!$params || !$params->get('show_icons', 2))
+				$tooltip_placement = 'bottom';
 			else
-				$tooltip_place = !$params->get('btn_grp_dropdown', 0) ? 'bottom' : 'left';
+				$tooltip_placement = !$params->get('btn_grp_dropdown', 0) ? 'bottom' : 'left';
 
 			//$allowed_states = array();
 			//$allowed_states[] = '<div>'.$jtext['action'].'</div>');
@@ -2894,7 +2896,7 @@ class flexicontent_html
 			}
 			$tooltip_title = flexicontent_html::getToolTip($state_text ? $state_text : JText::_( 'FLEXI_PUBLISH_INFORMATION' ), ' &nbsp; '.implode("\n<br/> &nbsp; \n", $publish_info).'<br/>'.$jtext['change_state'], 0);
 			$output = '
-			<div class="statetoggler '.$button_classes.' '.$tooltip_class.'" '.($tooltip_place ? ' data-placement="'.$tooltip_place.'"' : '').' title="'.$tooltip_title.'" onclick="fc_statehandler_singleton.toggleSelector(this)">
+			<div class="statetoggler '.$button_classes.' '.$tooltip_class.'" ' . ($tooltip_placement ? ' data-placement="' . $tooltip_placement . '"' : '') . ' title="'.$tooltip_title.'" onclick="fc_statehandler_singleton.toggleSelector(this)">
 				<div class="statetoggler_inner">
 					<div id="row'.$item->id.'" class="stateopener ntxt">
 						'.$stateicon.'
@@ -2985,17 +2987,17 @@ class flexicontent_html
 		if ( $show_icons==1 ) {
 			$caption = '';
 			$button_classes .= '';
-			$tooltip_place = 'bottom';
+			$tooltip_placement = 'bottom';
 		} else {
 			$caption = $text;
 			if ( !$params->get('btn_grp_dropdown', 0) ) $button_classes .= self::$use_bootstrap ? ' btn btn-small' : ' fc_button fcsimple fcsmall';
-			$tooltip_place = !$params->get('btn_grp_dropdown', 0) ? 'bottom' : 'left';
+			$tooltip_placement = !$params->get('btn_grp_dropdown', 0) ? 'bottom' : 'left';
 		}
 		$button_classes .= ' hasTooltip';
 		$tooltip_title = flexicontent_html::getToolTip($text, $overlib, 0);
 
 		$link = 'index.php?option=com_flexicontent&task=approval&cid='.$item->id;
-		$output	= ' <a href="'.$link.'" class="'.$button_classes.'" data-placement="'.$tooltip_place.'" title="'.$tooltip_title.'">'.$image.$caption.'</a>';
+		$output	= ' <a href="'.$link.'" class="'.$button_classes.'" data-placement="' . $tooltip_placement . '" title="'.$tooltip_title.'">'.$image.$caption.'</a>';
 		$output	= JText::_( 'FLEXI_ICON_SEP' ) .$output. JText::_( 'FLEXI_ICON_SEP' );
 
 		return $output;
@@ -3048,11 +3050,11 @@ class flexicontent_html
 		if ( $show_icons==1 ) {
 			$caption = '';
 			$button_classes .= '';
-			$tooltip_place = 'bottom';
+			$tooltip_placement = 'bottom';
 		} else {
 			$caption = $text;
 			if ( !$params->get('btn_grp_dropdown', 0) ) $button_classes .= self::$use_bootstrap ? ' btn btn-small' : ' fc_button fcsimple fcsmall';
-			$tooltip_place = !$params->get('btn_grp_dropdown', 0) ? 'bottom' : 'left';
+			$tooltip_placement = !$params->get('btn_grp_dropdown', 0) ? 'bottom' : 'left';
 		}
 		$button_classes .= ' hasTooltip';
 		$tooltip_title = flexicontent_html::getToolTip($text, $overlib, 0);
@@ -3067,7 +3069,7 @@ class flexicontent_html
 			$link = JUri::base(true).'/administrator/index.php?option=com_flexicontent&task=items.edit&cid[]='.$item->id;
 			$targetLink = "_blank";
 		}
-		$output	= ' <a href="'.$link.'" class="'.$button_classes.'" data-placement="'.$tooltip_place.'" target="'.$targetLink.'" title="'.$tooltip_title.'">'.$image.$caption.'</a>';
+		$output	= ' <a href="'.$link.'" class="'.$button_classes.'" data-placement="' . $tooltip_placement . '" target="'.$targetLink.'" title="'.$tooltip_title.'">'.$image.$caption.'</a>';
 		$output	= JText::_( 'FLEXI_ICON_SEP' ) .$output. JText::_( 'FLEXI_ICON_SEP' );
 
 		return $output;
@@ -3234,18 +3236,18 @@ class flexicontent_html
 		if ( $show_icons==1 && !$auto_relations ) {
 			$caption = '';
 			$button_classes .= '';
-			$tooltip_place = 'bottom';
+			$tooltip_placement = 'bottom';
 		} else {
 			$caption = $btn_title;
 			if ( !$params->get('btn_grp_dropdown', 0) ) $button_classes .=
 				(self::$use_bootstrap ? ' btn btn-small' : ' fc_button fcsimple fcsmall')
 				.($auto_relations ? ' btn-success' : '');
-			$tooltip_place = !$params->get('btn_grp_dropdown', 0) ? 'bottom' : 'left';
+			$tooltip_placement = !$params->get('btn_grp_dropdown', 0) ? 'bottom' : 'left';
 		}
 		$button_classes .= ' hasTooltip';
 		$tooltip_title = flexicontent_html::getToolTip($btn_title, $btn_desc, 0);
 
-		$output	= ' <a href="'.$link.'" class="'.$button_classes.'" data-placement="'.$tooltip_place.'" title="'.$tooltip_title.'">'.$image.$caption.'</a>';
+		$output	= ' <a href="'.$link.'" class="'.$button_classes.'" data-placement="' . $tooltip_placement . '" title="'.$tooltip_title.'">'.$image.$caption.'</a>';
 		if (!$auto_relations)
 		{
 			$output	= JText::_( 'FLEXI_ICON_SEP' ) .$output. JText::_( 'FLEXI_ICON_SEP' );
@@ -4941,6 +4943,17 @@ class flexicontent_html
 	}
 
 
+	// * Create a spacer inside Joomla Toolbar
+	static function spacer($width = 32)
+	{
+		static $i = 0;
+
+		$btn_name = 'fc_toolbar_spacer_' . ($i++);
+		$toolbar = JToolbar::getInstance('toolbar');
+		$toolbar->appendButton('Custom', '<span style="width: ' . (int) $width. 'px; height: 1px; display: inline-block;"></span>', $btn_name);
+	}
+
+
 	// * Create a custom button inside Joomla Toolbar
 	static function addToolBarButton(
 		$text='Button Text', $btn_name='btnname', $full_js='', $err_msg='', $confirm_msg='', $task='btntask', $extra_js='',
@@ -4949,6 +4962,7 @@ class flexicontent_html
 		$toolbar = JToolbar::getInstance('toolbar');
 		$text  = JText::_($text);
 		$class = $btn_icon ? $btn_icon : 'icon-32-'.$btn_name;
+		$btn_sm_class = FLEXI_J40GE ? 'btn btn-sm' : 'btn btn-small';
 
 		if ( !$full_js )
 		{
@@ -4976,7 +4990,11 @@ class flexicontent_html
 		$full_js = "javascript: $full_js";
 
 		$button_html	= '
-		<'.$tag_type.' '.($tag_type=='a' ? 'href="javascript:;"' : '').' onclick="'.htmlspecialchars($full_js, ENT_QUOTES, 'UTF-8').'" class="toolbar btn btn-small '.$btn_class.'" '.$attrs.'>
+		<'.$tag_type.' '.($tag_type=='a' ? 'href="javascript:;"' : '').'
+			onclick="'.htmlspecialchars($full_js, ENT_QUOTES, 'UTF-8').'"
+			class="toolbar ' . $btn_sm_class . ' ' . $btn_class . '"
+			' . $attrs . '
+		>
 			<span class="'.$class.'" title="'.htmlspecialchars($text, ENT_QUOTES, 'UTF-8').'"></span>
 			'.$text.'
 		</'.$tag_type.'>';
@@ -4990,35 +5008,58 @@ class flexicontent_html
 
 
 	// * Create a drop down button menu inside Joomla Toolbar
-	static function addToolBarDropMenu($btn_arr, $btn_group_name, $drop_btn = null)
+	static function addToolBarDropMenu($btn_arr, $btn_group_name, $drop_btn = null, $ops = array())
 	{
 		$toolbar = JToolbar::getInstance('toolbar');
 
-		if (!count($btn_arr))
+		if (count($btn_arr) < 2)
 		{
+			if (count($btn_arr) === 1)
+			{
+				$toolbar->appendButton(
+					'Custom',
+					$button_html = end($btn_arr),
+					$btn_name = key($btn_arr)
+				);
+			}
+
 			return;
 		}
-		if (count($btn_arr) == 1)
+
+		if (!empty($ops['drop_class_full']))
 		{
-			$button_html = end($btn_arr);
-			$btn_name = key($btn_arr);
-			$toolbar->appendButton('Custom', $button_html, $btn_name);
-			return;
+			$drop_btn_class = $ops['drop_class_full'];
+		}
+		else
+		{
+			$drop_btn_class =
+				(FLEXI_J40GE
+					? 'btn btn-sm toolbar dropdown-toggle dropdown-toggle-split'
+					: 'btn btn-small toolbar dropdown-toggle'
+				) .
+				(!empty($ops['drop_class_extra'])
+					? ' ' . $ops['drop_class_extra']
+					: ''
+				);
 		}
 
 		$buttons_html = '
-		<div class="buttons btn-group">
-			'.array_shift($btn_arr).'
-		  '.($drop_btn ?: '
-		  <button type="button" class="btn btn-small dropdown-toggle" data-toggle="dropdown">
-		    <span class="caret"></span>
-		  </button>').'
-			<ul class="dropdown-menu" role="menu">
-				<li>' . implode("</li>\n<li>", $btn_arr) . '</li>
-			</ul>
-		</div>';
+			<div class="buttons btn-group">
+				'.array_shift($btn_arr).'
+			  '.($drop_btn ?: '
+			  <button type="button" class="' . $drop_btn_class . '" data-toggle="dropdown">
+			    <span class="caret"></span>
+			  </button>').'
+				<ul class="dropdown-menu dropdown-menu-right" x-placement="bottom-end" role="menu">
+					<li>' . implode("</li>\n<li>", $btn_arr) . '</li>
+				</ul>
+			</div>';
 
-		$toolbar->appendButton('Custom', $buttons_html, $btn_group_name);
+		$toolbar->appendButton(
+			'Custom',
+			$buttons_html,
+			$btn_group_name
+		);
 	}
 
 

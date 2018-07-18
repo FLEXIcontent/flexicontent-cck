@@ -788,8 +788,9 @@ div.statetoggler {
 	padding: 4px 4px;
 	display: inline-block;
 	width: auto;
-	line-height: 14px;
-	height: 14px;
+	line-height: 18px;
+	height: 18px;
+	box-sizing: content-box;
 }
 div.statetoggler .icon-publish:before,
 div.statetoggler .icon-checkmark-2:before {
@@ -868,6 +869,7 @@ div.statetoggler > div.statetoggler_inner > .options > span {
 	min-height: 24px;
 	min-width: auto;
 	background: none repeat scroll 0 0 transparent;
+	color: black;
 	outline: none;
 	text-decoration: none;
 	white-space: nowrap;
@@ -982,8 +984,10 @@ div.statetoggler > div.statetoggler_inner > .options > span > img {
 	display: block;
 	padding: 2px;
 }
-body .fc-iblock {
-	display: inline-block !important;
+body .fc-iblock
+#flexicontent .fc-iblock,
+.flexicontent .fc-iblock {
+	display: inline-block;
 }
 body .fc-nowrap-box,
 #flexicontent .nowrap_box,
@@ -993,9 +997,26 @@ body .fc-nowrap-box,
 	display: inline-block;
 	float: none;
 }
+body .fc-nowrap-box .label,
 #flexicontent .nowrap_box .label,
 .flexicontent .nowrap_box .label {
 	vertical-align: top;
+}
+body .fc-nowrap-box .fc-nowrap-box,
+body .fc-nowrap-box .nowrap_box,
+#flexicontent .nowrap_box .fc-nowrap-box,
+#flexicontent .nowrap_box .nowrap_box,
+.flexicontent .nowrap_box .fc-nowrap-box,
+.flexicontent .nowrap_box .nowrap_box {
+	vertical-align: middle;
+}
+body .fc-nowrap-box .fc-nowrap-box .label,
+body .fc-nowrap-box .nowrap_box .label,
+#flexicontent .nowrap_box .fc-nowrap-box .label,
+#flexicontent .nowrap_box .nowrap_box .label,
+.flexicontent .nowrap_box .fc-nowrap-box .label,
+.flexicontent .nowrap_box .nowrap_box .label {
+	vertical-align: middle;
 }
 #flexicontent .filterbuttons_head .nowrap_box .label,
 .flexicontent .filterbuttons_head .nowrap_box .label {
@@ -1221,7 +1242,7 @@ body .btn-group.fc-group > .statetoggler.btn.btn-small {
 	color: black;
 	font-size: 120%;
 }
-.fc-preview-btn .icon-screen {
+.fc-preview-btn:not(.active):not(:hover) .icon-screen {
 	color: darkcyan;
 }
 #flexicontent .fc-box,
@@ -1606,7 +1627,7 @@ table.adminlist thead tr {
 	border-bottom: 1px solid #aaa !important;
 }
 table.adminlist thead th {
-	background: none repeat scroll 0 0 #fff !important;
+	background: transparent !important;
 	border: none;
 	border-width: 0px !important;
 	color: #555;
@@ -1721,9 +1742,10 @@ table.adminlist td.order {
 	width: auto;
 }
 table.adminlist .pagination {
-	display: inline-block;
-	margin: 4px auto 2px;
-	padding: 0;
+	display: flex;
+	box-sizing: border-box;
+	margin-left: auto;
+	margin-right: auto;
 }
 .novalue {
 	color: gray;
@@ -1940,8 +1962,16 @@ div fieldset.panelform {
 	user-select: none;
 	outline-width: 0;
 }
+#flexicontent .btn[class^="btn-outline-"],
+#flexicontent .btn[class*=" btn-outline-"] {
+	border-width: 1px;
+	border-radius: 4px;
+}
+#flexicontent .btn.btn-sm {
+	padding: 4px 4px 3px 5px;
+}
 @media (min-width: 1020px) {
-	.btn.spaced-btn,
+	.com_flexicontent .btn.spaced-btn,
 	#toolbar-preview_btns_group {
 		margin-left: 32px;
 	}
@@ -2134,10 +2164,12 @@ form div.container_fcfield > select {
 #flexicontent div fieldset.panelform .input-prepend > button {
 	margin-left: 0px;
 }
+#flexicontent div .btn-group > .btn:not(:last-child),
 #flexicontent div .input-append > .btn:not(:last-child) {
 	border-top-right-radius: 0px;
 	border-bottom-right-radius: 0px;
 }
+#flexicontent div .btn-group > .btn:not(:first-child),
 #flexicontent div .input-prepend > .btn:not(:first-child) {
 	border-top-left-radius: 0px;
 	border-bottom-left-radius: 0px;
@@ -2842,12 +2874,18 @@ div.current ul.config-option-list li fieldset {
 	margin: 0;
 	padding: 0;
 }
+.subhead #toolbar.btn-toolbar > *,
+.subhead #toolbar.btn-toolbar > *:first-of-type {
+	margin-left: .75rem;
+}
+.subhead #toolbar.btn-toolbar > *:first-child {
+	margin-left: 0;
+}
 #toolbar .buttons.btn-group .toolbar {
 	text-align: left;
 }
 #toolbar .buttons.btn-group .toolbar > [class^="icon-"],
 #toolbar .buttons.btn-group .toolbar > [class*=" icon-"] {
-	float: left;
 	text-align: center;
 }
 #toolbar .buttons.btn-group > ul.dropdown-menu {
@@ -2855,22 +2893,22 @@ div.current ul.config-option-list li fieldset {
 	border: unset;
 	box-shadow: unset;
 	padding: 0;
+	min-width: 100% !important;
+	width: auto !important;
+	top: 100% !important;
+	left: auto !important;
+	transform: unset !important;
 }
-#toolbar .buttons.btn-group > ul.dropdown-menu > li > .toolbar {
-	float: left;
-	min-width: 260px;
-	margin-top: 0px;
+#toolbar .buttons.btn-group > ul.dropdown-menu > li,
+#toolbar .buttons.btn-group > ul.dropdown-menu > li .toolbar {
+	display: block;
 	width: 100%;
-}
-#toolbar .buttons.btn-group > ul.dropdown-menu > li > .toolbar:hover {
-	background: #e0e0e0;
-	color: black;
+	box-sizing: border-box;
 }
 #toolbar .buttons.btn-group > .toolbar {
 	margin: 0;
 }
-#toolbar .buttons.btn-group > .toolbar + .dropdown-toggle {
-	margin: 0 8px 0 0;
+#toolbar .buttons.btn-group > .toolbar + .dropdown-toggle:not(.dropdown-toggle-split) {
 	padding-top: 1px;
 }
 #toolbar .buttons.btn-group > .dropdown-toggle:first-child .caret {

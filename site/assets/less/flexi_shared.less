@@ -454,7 +454,7 @@ table.adminlist {
 
 	/* HEAD cell */
 	thead th {
-		background: none repeat scroll 0 0 #fff !important; /* forced, combines with table, row, cell borders */
+		background: transparent !important; /* forced, combines with table, row, cell borders */
 		border: none;
 		border-width: 0px !important; /* forced, avoid border of cell overlapping over the border of the row */
 		color: #555;
@@ -589,9 +589,10 @@ table.adminlist {
 
 	/* IF PAGINATION is inside the table the force center alignment */
 	.pagination {
-		display: inline-block;
-		margin: 4px auto 2px;
-		padding: 0;
+		display: flex;
+		box-sizing: border-box;
+		margin-left: auto;
+		margin-right: auto;
 	}
 }
 
@@ -859,8 +860,18 @@ div fieldset.panelform {
 	user-select: none;
 	outline-width: 0;
 }
+#flexicontent {
+	.btn[class^="btn-outline-"],
+	.btn[class*=" btn-outline-"] {
+		border-width: 1px;
+		border-radius: 4px;
+	}
+	.btn.btn-sm {
+		padding: 4px 4px 3px 5px;
+	}
+}
 @media (min-width: 1020px) {
-	.btn.spaced-btn,
+	.com_flexicontent .btn.spaced-btn,
 	#toolbar-preview_btns_group {
 		margin-left: 32px;
 	}
@@ -1067,10 +1078,12 @@ form div.container_fcfield > select {
 #flexicontent div fieldset.panelform .input-prepend > button {
 	margin-left: 0px;
 }
+#flexicontent div .btn-group > .btn:not(:last-child),
 #flexicontent div .input-append > .btn:not(:last-child) {
 	border-top-right-radius: 0px;
 	border-bottom-right-radius: 0px;
 }
+#flexicontent div .btn-group > .btn:not(:first-child),
 #flexicontent div .input-prepend > .btn:not(:first-child) {
 	border-top-left-radius: 0px;
 	border-bottom-left-radius: 0px;
@@ -1917,13 +1930,20 @@ div.current ul.config-option-list li fieldset {
  * e.g. Drop down menu of buttons
  */
  
+.subhead #toolbar.btn-toolbar > *,
+.subhead #toolbar.btn-toolbar > *:first-of-type {
+	margin-left: .75rem;
+}
+.subhead #toolbar.btn-toolbar > *:first-child {
+	margin-left: 0;
+}
+
 #toolbar .buttons.btn-group {
 	.toolbar {
 		text-align: left;
 
-	> [class^="icon-"],
-	> [class*=" icon-"] {
-			float: left;
+		> [class^="icon-"],
+		> [class*=" icon-"] {
 			text-align: center;
 		}
 	}
@@ -1933,16 +1953,21 @@ div.current ul.config-option-list li fieldset {
 		border: unset;
 		box-shadow: unset;
 		padding: 0;
+		min-width: 100% !important;
+		width: auto !important;
+		top: 100% !important;
+		left: auto !important;
+		transform: unset !important;
 
-		> li > .toolbar {
-			float: left;
-			min-width: 260px;
-			margin-top: 0px;
+		> li,
+		> li .toolbar {
+			display: block;
 			width: 100%;
+			box-sizing: border-box;
 		}
-		> li > .toolbar:hover {
-			background: #e0e0e0;
-			color: black;
+		> li .toolbar:hover {
+			/*background: #e0e0e0;
+			color: black;*/
 		}
 	}
 	
@@ -1950,8 +1975,7 @@ div.current ul.config-option-list li fieldset {
 		margin: 0;
 	}
 
-	> .toolbar + .dropdown-toggle {
-		margin: 0 8px 0 0;
+	> .toolbar + .dropdown-toggle:not(.dropdown-toggle-split) {
 		padding-top: 1px;
 	}
 	> .dropdown-toggle:first-child .caret {

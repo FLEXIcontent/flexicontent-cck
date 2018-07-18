@@ -35,8 +35,8 @@ $box_class_subtitle1 = $this->params->get('box_class_subtitle1', 'flexi group li
 $box_class_subtitle2 = $this->params->get('box_class_subtitle2', 'flexi group lineinfo subtitle2');
 $box_class_subtitle3 = $this->params->get('box_class_subtitle3', 'flexi group lineinfo subtitle3');
 
-$box_class_image  = $this->params->get('box_class_image', 'flexi group image span4');
-$box_class_top    = $this->params->get('box_class_top', 'flexi group infoblock span8');
+$box_class_image  = $this->params->get('box_class_image', 'flexi group image');
+$box_class_top    = $this->params->get('box_class_top', 'flexi group infoblock');
 $box_class_descr  = $this->params->get('box_class_descr', 'flexi group description');
 $box_class_bottom = $this->params->get('box_class_bottom', 'flexi group infoblock');
 
@@ -296,6 +296,30 @@ $microdata_itemtype_code = 'itemscope itemtype="http://schema.org/'.$microdata_i
 		<!-- BOF image/top row -->
 		<aside class="flexi topblock group">  <!-- NOTE: image block is inside top block ... -->
 
+			<?php
+				$has_output_image = false;
+				$has_output_top   = false;
+
+				if (isset($item->positions['image']))
+				{
+					foreach ($item->positions['image'] as $field)
+					{
+						$has_output_image = $has_output_image || strlen($field->display);
+					}
+				}
+
+				if (isset($item->positions['top']))
+				{
+					foreach ($item->positions['top'] as $field)
+					{
+						$has_output_top = $has_output_top || strlen($field->display);
+					}
+				}
+				
+				$box_class_image .= (!$has_output_top ? ' span12' : ' span4');
+				$box_class_top   .= (!$has_output_image ? ' span12' : ' span8');
+			?>
+			
 			<?php if (isset($item->positions['image'])) : ?>
 				<!-- BOF image block -->
 				<?php foreach ($item->positions['image'] as $field) : ?>

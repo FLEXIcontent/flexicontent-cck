@@ -199,8 +199,8 @@
 			<field name="box_class_subtitle_tab12" type="text" size="3" hint="flexi lineinfo" default="" label="Tab 12" description="FLEXI_TAB_CLASS_DESC" />
 
 			<field name="custom_class_grp_content_containers" type="separator" cssprep="1" default="Main Content" description="" level="level3" />
-			<field name="box_class_image" type="text" size="3" hint="flexi group image span4" default="" label="FLEXI_IMAGE" description="FLEXI_IMAGE_CLASS_DESC" />
-			<field name="box_class_top" type="text" size="3" hint="flexi group infoblock span8" default="" label="FLEXI_TOP" description="FLEXI_TOP_CLASS_DESC" />
+			<field name="box_class_image" type="text" size="3" hint="flexi group image" default="" label="FLEXI_IMAGE" description="FLEXI_IMAGE_CLASS_DESC" />
+			<field name="box_class_top" type="text" size="3" hint="flexi group infoblock" default="" label="FLEXI_TOP" description="FLEXI_TOP_CLASS_DESC" />
 			<field name="box_class_descr" type="text" size="3" hint="flexi group description" default="" label="FLEXI_DESCRIPTION" description="FLEXI_DESCRIPTION_CLASS_DESC" />
 
 			<field name="custom_class_grp_bottom_tabs" type="separator" cssprep="1" default="Bottom Tabset" description="" level="level3" />
