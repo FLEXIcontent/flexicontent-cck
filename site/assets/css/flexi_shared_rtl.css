@@ -348,7 +348,7 @@ table.adminlist thead tr {
 	border-bottom: 1px solid #aaa !important;
 }
 table.adminlist thead th {
-	background: none repeat scroll 0 0 #fff !important;
+	background: transparent !important;
 	border: none;
 	border-width: 0px !important;
 	color: #555;
@@ -463,9 +463,10 @@ table.adminlist td.order {
 	width: auto;
 }
 table.adminlist .pagination {
-	display: inline-block;
-	margin: 4px auto 2px;
-	padding: 0;
+	display: flex;
+	box-sizing: border-box;
+	margin-left: auto;
+	margin-right: auto;
 }
 .novalue {
 	color: gray;
@@ -682,8 +683,16 @@ div fieldset.panelform {
 	user-select: none;
 	outline-width: 0;
 }
+#flexicontent .btn[class^="btn-outline-"],
+#flexicontent .btn[class*=" btn-outline-"] {
+	border-width: 1px;
+	border-radius: 4px;
+}
+#flexicontent .btn.btn-sm {
+	padding: 4px 4px 3px 5px;
+}
 @media (min-width: 1020px) {
-	.btn.spaced-btn,
+	.com_flexicontent .btn.spaced-btn,
 	#toolbar-preview_btns_group {
 		margin-right: 32px;
 	}
@@ -876,10 +885,12 @@ form div.container_fcfield > select {
 #flexicontent div fieldset.panelform .input-prepend > button {
 	margin-right: 0px;
 }
+#flexicontent div .btn-group > .btn:not(:last-child),
 #flexicontent div .input-append > .btn:not(:last-child) {
 	border-top-left-radius: 0px;
 	border-bottom-left-radius: 0px;
 }
+#flexicontent div .btn-group > .btn:not(:first-child),
 #flexicontent div .input-prepend > .btn:not(:first-child) {
 	border-top-right-radius: 0px;
 	border-bottom-right-radius: 0px;
@@ -1584,12 +1595,18 @@ div.current ul.config-option-list li fieldset {
 	margin: 0;
 	padding: 0;
 }
+.subhead #toolbar.btn-toolbar > *,
+.subhead #toolbar.btn-toolbar > *:first-of-type {
+	margin-left: .75rem;
+}
+.subhead #toolbar.btn-toolbar > *:first-child {
+	margin-left: 0;
+}
 #toolbar .buttons.btn-group .toolbar {
 	text-align: right;
 }
 #toolbar .buttons.btn-group .toolbar > [class^="icon-"],
 #toolbar .buttons.btn-group .toolbar > [class*=" icon-"] {
-	float: right;
 	text-align: center;
 }
 #toolbar .buttons.btn-group > ul.dropdown-menu {
@@ -1597,22 +1614,22 @@ div.current ul.config-option-list li fieldset {
 	border: unset;
 	box-shadow: unset;
 	padding: 0;
+	min-width: 100% !important;
+	width: auto !important;
+	top: 100% !important;
+	left: auto !important;
+	transform: unset !important;
 }
-#toolbar .buttons.btn-group > ul.dropdown-menu > li > .toolbar {
-	float: right;
-	min-width: 260px;
-	margin-top: 0px;
+#toolbar .buttons.btn-group > ul.dropdown-menu > li,
+#toolbar .buttons.btn-group > ul.dropdown-menu > li .toolbar {
+	display: block;
 	width: 100%;
-}
-#toolbar .buttons.btn-group > ul.dropdown-menu > li > .toolbar:hover {
-	background: #e0e0e0;
-	color: black;
+	box-sizing: border-box;
 }
 #toolbar .buttons.btn-group > .toolbar {
 	margin: 0;
 }
-#toolbar .buttons.btn-group > .toolbar + .dropdown-toggle {
-	margin: 0 0 0 8px;
+#toolbar .buttons.btn-group > .toolbar + .dropdown-toggle:not(.dropdown-toggle-split) {
 	padding-top: 1px;
 }
 #toolbar .buttons.btn-group > .dropdown-toggle:first-child .caret {

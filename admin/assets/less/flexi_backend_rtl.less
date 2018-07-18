@@ -218,7 +218,10 @@ td.col_created .input-append,
 td.col_revised .input-append {
 	margin: 0px;
 }
-td.col_title,
+td.col_title {
+	text-align: right;
+	min-width: 120px;
+}
 td.col_template {
 	text-align: right;
 }
@@ -267,24 +270,33 @@ div.adminthumbs.fcmanthumbs {
 // *** Filters header  (Text search / Buttons / Pagination)
 // ***
 
-.flexicontent #fc-filters-header #search {
-	margin: 0px !important;
-	padding: 4px !important;
-	vertical-align: top !important;
-}
-.flexicontent #fc-filters-header #limit {
-	padding: 3px 6px !important;
-}
-.flexicontent #fc-filters-header .fc-filter {
-	vertical-align: top !important;
-	border: 0px !important;
-	padding: 0px !important;
-	margin: 2px 32px 6px 0px;
-}
-.flexicontent #fc-filters-header .fc-filter .label {
-	font-size: 11px;
-	padding: 4px 4px;
-	margin: 0px 4px;
+.flexicontent #fc-filters-header {
+
+	#search {
+		margin: 0px !important;
+		padding: 4px !important;
+		vertical-align: top !important;
+	}
+	#limit {
+		padding: 3px 6px !important;
+	}
+
+	.fc-filter {
+		vertical-align: baseline !important;
+		border: 0px !important;
+		padding: 0px !important;
+		margin: 2px 0 6px 24px;
+
+		.label {
+			font-size: 11px;
+			padding: 4px 4px;
+			margin: 0px 4px;
+		}
+		.input-append {
+			margin: 0px;
+		}
+	}
+
 }
 
 

@@ -42,17 +42,12 @@ $useAssocs = flexicontent_db::useAssociations();
  * COMMON classes and COMMON repeated texts
  */
 
-$tip_class = ' hasTooltip';
-$btn_class = 'btn';  //'fc_button fcsimple';
+$btn_class = 'btn';
+$ico_class = 'fc-man-icon-s';
 
-$ico_class   = 'fc-man-icon-s';
-$btn_s_class = 'btn btn-small';
-
-$edit_item_title = JText::_('FLEXI_EDIT_ITEM', true);
 $edit_cat_title  = JText::_('FLEXI_EDIT_CATEGORY', true);
-$edit_layout     = htmlspecialchars(JText::_('FLEXI_EDIT_LAYOUT_N_GLOBAL_PARAMETERS', true), ENT_QUOTES, 'UTF-8');
 $rem_filt_txt    = JText::_('FLEXI_REMOVE_FILTER', true);
-$rem_filt_tip    = ' class="'.$tip_class.' filterdel" title="'.flexicontent_html::getToolTip('FLEXI_ACTIVE_FILTER', 'FLEXI_CLICK_TO_REMOVE_THIS_FILTER', 1, 1).'" ';
+$rem_filt_tip    = ' class="' . $this->tooltip_class . ' filterdel" title="'.flexicontent_html::getToolTip('FLEXI_ACTIVE_FILTER', 'FLEXI_CLICK_TO_REMOVE_THIS_FILTER', 1, 1).'" ';
 $_NEVER_         = JText::_('FLEXI_NEVER');
 $_NULL_DATE_     = $this->db->getNullDate();
 
@@ -65,7 +60,7 @@ $_NULL_DATE_     = $this->db->getNullDate();
 flexicontent_html::jscode_to_showhide_table(
 	'mainChooseColBox',
 	'adminListTableFCitems',
-	$start_html = '<span class="label">' . JText::_('FLEXI_COLUMNS', true) . '<\/span> &nbsp; ',
+	$start_html = '<span class="badge ' . (FLEXI_J40GE ? 'badge-dark' : 'badge-inverse') . '">' . JText::_('FLEXI_COLUMNS', true) . '<\/span> &nbsp; ',
 	$end_html = '<div class="icon-arrow-up-2 btn" title="' . JText::_('FLEXI_HIDE') . '" style="cursor: pointer;" onclick="fc_toggle_box_via_btn(\\\'mainChooseColBox\\\', document.getElementById(\\\'fc_mainChooseColBox_btn\\\'), \\\'btn-primary\\\');"><\/div>'
 );
 $tools_cookies['fc-filters-box-disp'] = JFactory::getApplication()->input->cookie->get('fc-filters-box-disp', 0, 'int');
@@ -77,18 +72,6 @@ $tools_cookies['fc-filters-box-disp'] = JFactory::getApplication()->input->cooki
  */
 
 $image_flag_path = "../media/mod_languages/images/";
-
-$attribs_preview    = ' class="fc-preview-btn ntxt '.$btn_s_class.' '.$tip_class.'" title="'.flexicontent_html::getToolTip( 'FLEXI_PREVIEW', 'FLEXI_DISPLAY_ENTRY_IN_FRONTEND_DESC', 1, 1).'" ';
-$attribs_editlayout = ' class="fc-edit-layout-btn ntxt '.$btn_s_class.' '.$tip_class.'" title="'.flexicontent_html::getToolTip( 'FLEXI_EDIT_LAYOUT_N_GLOBAL_PARAMETERS', null, 1, 1).'" ';
-
-$image_preview = 0
-	? JHtml::image( 'components/com_flexicontent/assets/images/'.'monitor_go.png', JText::_('FLEXI_PREVIEW'), ' class="'.$ico_class.'"')
-	: '<span class="icon-screen"></span>';
-
-$image_editlayout = 0
-	? JHtml::image('components/com_flexicontent/assets/images/'.'layout_edit.png', htmlspecialchars(JText::_('FLEXI_EDIT_LAYOUT_N_GLOBAL_PARAMETERS'), ENT_QUOTES, 'UTF-8'), ' class="'.$ico_class.'"')
-	: '<span class="icon-edit"></span>';
-
 $featimg = JHtml::image ( 'administrator/components/com_flexicontent/assets/images/star.png', JText::_( 'FLEXI_FEATURED' ), ' style="text-align:left" class="'.$ico_class.'" title="'.JText::_( 'FLEXI_FEATURED' ).'"' );
 
 
@@ -110,14 +93,14 @@ $ordering_draggable = $cparams->get('draggable_reordering', 1);
 
 if ($this->reOrderingActive)
 {
-	$image_ordering_tip = '<img src="components/com_flexicontent/assets/images/comments.png" class="'.$ico_class.' '.$tip_class.'" alt="Reordering" title="'.flexicontent_html::getToolTip('FLEXI_REORDERING', 'FLEXI_REORDERING_ENABLED_DESC', 1, 1).'" /> ';
-	//$image_ordering_tip = '<span class="icon-info '.$tip_class.'" title="'.flexicontent_html::getToolTip('FLEXI_REORDERING', 'FLEXI_REORDERING_ENABLED_DESC', 1, 1).'"></span>';
+	$image_ordering_tip = '<img src="components/com_flexicontent/assets/images/comments.png" class="' . $ico_class . ' ' . $this->tooltip_class . '" alt="Reordering" title="'.flexicontent_html::getToolTip('FLEXI_REORDERING', 'FLEXI_REORDERING_ENABLED_DESC', 1, 1).'" /> ';
+	//$image_ordering_tip = '<span class="icon-info ' . $this->tooltip_class . '" title="' . flexicontent_html::getToolTip('FLEXI_REORDERING', 'FLEXI_REORDERING_ENABLED_DESC', 1, 1).'"></span>';
 	$drag_handle_box = '<div class="fc_drag_handle%s" title="'.JText::_('FLEXI_ORDER_SAVE_WHEN_DONE', true).'"></div>';
 }
 else
 {
-	$image_ordering_tip = '<img src="components/com_flexicontent/assets/images/comments.png" class="'.$ico_class.' '.$tip_class.'" alt="Reordering" title="'.flexicontent_html::getToolTip('FLEXI_REORDERING', 'FLEXI_REORDERING_DISABLED_DESC', 1, 1).'" /> ';
-	//$image_ordering_tip = '<span class="icon-info '.$tip_class.'" title="'.flexicontent_html::getToolTip('FLEXI_REORDERING', 'FLEXI_REORDERING_DISABLED_DESC', 1, 1).'"></span>';
+	$image_ordering_tip = '<img src="components/com_flexicontent/assets/images/comments.png" class="' . $ico_class . ' ' . $this->tooltip_class . '" alt="Reordering" title="'.flexicontent_html::getToolTip('FLEXI_REORDERING', 'FLEXI_REORDERING_DISABLED_DESC', 1, 1).'" /> ';
+	//$image_ordering_tip = '<span class="icon-info ' . $this->tooltip_class . '" title="' . flexicontent_html::getToolTip('FLEXI_REORDERING', 'FLEXI_REORDERING_DISABLED_DESC', 1, 1) . '"></span>';
 	$drag_handle_box = '<div class="fc_drag_handle%s" title="'.JText::_('FLEXI_ORDER_COLUMN_FIRST', true).'" ></div>';
 	$image_saveorder    = '';
 }
@@ -129,7 +112,7 @@ $drag_handle_html['downonly'] = sprintf($drag_handle_box, ' fc_drag_handle_downo
 $drag_handle_html['none']     = sprintf($drag_handle_box, '_none');
 
 $_img_title = JText::_('MAIN category shown in bold', true);
-$categories_tip  = '<img src="components/com_flexicontent/assets/images/information.png" class="'.$ico_class.' '.$tip_class.'" alt="'.$_img_title.'" title="'.flexicontent_html::getToolTip(null, $_img_title, 0, 1).'" />';
+$categories_tip  = '<img src="components/com_flexicontent/assets/images/information.png" class="'.$ico_class . ' ' . $this->tooltip_class . '" alt="'.$_img_title.'" title="'.flexicontent_html::getToolTip(null, $_img_title, 0, 1).'" />';
 
 if ( !$this->filter_order_type )
 {
@@ -145,7 +128,7 @@ else
 	$ord_catid = 'rel_catid';
 	$ord_col = 'catsordering';
 }
-$ordering_type_attrs = ' data-placement="bottom" class="add-on fc-lbl-inverted fc-lbl-padded icon-info '.$tip_class.'" title="'.flexicontent_html::getToolTip($_img_title, $_img_title_desc, 0, 1).'" ';
+$ordering_type_attrs = ' data-placement="bottom" class="add-on fc-lbl-inverted fc-lbl-padded icon-info ' . $this->tooltip_class . '" title="'.flexicontent_html::getToolTip($_img_title, $_img_title_desc, 0, 1).'" ';
 
 $ord_grp = 1;
 
@@ -172,7 +155,7 @@ $tz_offset = $tz->getOffset(new JDate()) / 3600;
 $tz_info =  $tz_offset > 0 ? ' UTC +' . $tz_offset : ' UTC ' . $tz_offset;
 $tz_info .= ' ('.$user_zone.')';
 $date_note_msg   = JText::sprintf( FLEXI_J16GE ? 'FLEXI_DATES_IN_USER_TIMEZONE_NOTE' : 'FLEXI_DATES_IN_SITE_TIMEZONE_NOTE', ' ', $tz_info );
-$date_note_attrs = ' class="input-append input-prepend fc-xpended '.$tip_class.'" title="'.flexicontent_html::getToolTip(null, $date_note_msg, 0, 1).'" ';
+$date_note_attrs = ' class="' . $this->ina_grp_class . ' fc-xpended ' . $this->tooltip_class . '" title="'.flexicontent_html::getToolTip(null, $date_note_msg, 0, 1).'" ';
 //$date_zone_tip   = JHtml::image ( 'administrator/components/com_flexicontent/assets/images/comments.png', JText::_( 'FLEXI_NOTES' ), $date_note_attrs );
 
 
@@ -452,22 +435,25 @@ jQuery(document).ready(function(){
 	<form action="index.php?option=<?php echo $this->option; ?>&amp;view=<?php echo $this->view; ?>" method="post" name="adminForm" id="adminForm" style="<?php echo ($this->unassociated && !count($this->rows) ? 'display: none;' : ''); ?>">
 
 	<div id="fc-filters-header">
-		<span class="fc-filter nowrap_box" style="margin: 1px;">
+		<div class="fc-filter nowrap_box" style="margin-left: 2px; margin-right: 2px;">
 			<?php echo $this->lists['scope']; ?>
-		</span>
-		<span class="btn-group input-append fc-filter filter-search">
-			<input type="text" name="search" id="search" placeholder="<?php echo JText::_( 'FLEXI_SEARCH' ); ?>" value="<?php echo htmlspecialchars($this->lists['search'], ENT_QUOTES, 'UTF-8'); ?>" class="inputbox" />
-			<button title="" data-original-title="<?php echo JText::_('FLEXI_SEARCH'); ?>" class="<?php echo $btn_class.' '.$tip_class; ?>" onclick="document.adminForm.limitstart.value=0; Joomla.submitform();"><?php echo FLEXI_J30GE ? '<i class="icon-search"></i>' : JText::_('FLEXI_GO'); ?></button>
-			<button title="" data-original-title="<?php echo JText::_('FLEXI_RESET_FILTERS'); ?>" class="<?php echo $btn_class.' '.$tip_class; ?>" onclick="document.adminForm.limitstart.value=0; delAllFilters(); Joomla.submitform();"><?php echo FLEXI_J30GE ? '<i class="icon-remove"></i>' : JText::_('FLEXI_CLEAR'); ?></button>
-		</span>
+		</div>
 
-		<?php $_class = FLEXI_J30GE ? ' btn' : ' fc_button fcsimple fcsmall'; ?>
-		<span class="fc-filter nowrap_box" style="margin: 1px;">
+		<div class="fc-filter filter-search nowrap_box">
+			<div class="btn-group <?php echo $this->ina_grp_class; ?>">
+				<input type="text" name="search" id="search" placeholder="<?php echo JText::_( 'FLEXI_SEARCH' ); ?>" value="<?php echo htmlspecialchars($this->lists['search'], ENT_QUOTES, 'UTF-8'); ?>" class="inputbox" />
+				<button title="" data-original-title="<?php echo JText::_('FLEXI_SEARCH'); ?>" class="<?php echo $btn_class . (FLEXI_J40GE ? ' btn-outline-dark ' : ' ') . $this->tooltip_class; ?>" onclick="document.adminForm.limitstart.value=0; Joomla.submitform();"><?php echo FLEXI_J30GE ? '<i class="icon-search"></i>' : JText::_('FLEXI_GO'); ?></button>
+				<button title="" data-original-title="<?php echo JText::_('FLEXI_RESET_FILTERS'); ?>" class="<?php echo $btn_class . (FLEXI_J40GE ? ' btn-outline-dark ' : ' ') . $this->tooltip_class; ?>" onclick="document.adminForm.limitstart.value=0; delAllFilters(); Joomla.submitform();"><?php echo FLEXI_J30GE ? '<i class="icon-remove"></i>' : JText::_('FLEXI_CLEAR'); ?></button>
+			</div>
+		</div>
+
+		<?php $_class = FLEXI_J40GE ? 'btn btn-outline-info' : 'btn'; ?>
+		<div class="fc-filter nowrap_box">
 			<span class="hasTooltip" title="<?php echo JText::_('FLEXI_IMAN_ABOUT_ADDING_MORE_COLUMNS_AND_FILTERS'); ?>" style="display: inline-block; margin-top: 3px;" >
 				<i class="icon-cog" style="font-size: 14px; margin-top: 2px;"></i>
 			</span>
-			<span class="btn-group fc-filter">
-				<span id="fc_filters_box_btn" class="<?php echo $_class.($this->count_filters ? ' btn-primary' : ''); ?>" onclick="fc_toggle_box_via_btn('fc-filters-box', this, 'btn-primary', false, undefined, 1);">
+			<div class="btn-group">
+				<span id="fc_filters_box_btn" class="<?php echo ($this->count_filters ? 'btn btn-primary' :  $_class); ?>" onclick="fc_toggle_box_via_btn('fc-filters-box', this, 'btn-primary', false, undefined, 1);">
 					<?php echo JText::_( 'FLEXI_FILTERS' ) . ($this->count_filters  ? ' <sup>'.$this->count_filters.'</sup>' : ''); ?> &nbsp;
 				</span>
 				<span id="fc_mainChooseColBox_btn" class="<?php echo $_class; ?>" onclick="fc_toggle_box_via_btn('mainChooseColBox', this, 'btn-primary');">
@@ -476,17 +462,17 @@ jQuery(document).ready(function(){
 				<span id="fc-toggle-cats_btn" class="<?php echo $_class; ?> hasTooltip" title="<?php echo JText::_('FLEXI_SECONDARY_CATEGORIES'); ?>" onclick="jQuery(this).data('box_showing', !jQuery(this).data('box_showing')); jQuery(this).data('box_showing') ? jQuery('.fc_assignments_box.fc_cats').show(400) : jQuery('.fc_assignments_box.fc_cats').hide(400);" ><span class="icon-tree-2"></span></span>
 				<span id="fc-toggle-tags_btn" class="<?php echo $_class; ?> hasTooltip" title="<?php echo JText::_('FLEXI_TAGS'); ?>" onclick="jQuery(this).data('box_showing', !jQuery(this).data('box_showing')); jQuery(this).data('box_showing') ? jQuery('.fc_assignments_box.fc_tags').show(400) : jQuery('.fc_assignments_box.fc_tags').hide(400);" ><span class="icon-tags"></span></span>
 				<span id="fc-mini-help_btn" class="<?php echo $_class; ?>" onclick="fc_toggle_box_via_btn('fc-mini-help', this, 'btn-primary');" ><span class="icon-help"></span></span>
-			</span>
+			</div>
 			<input type="hidden" id="fc-filters-box-disp" name="fc-filters-box-disp" value="<?php echo $tools_cookies['fc-filters-box-disp']; ?>" />
-		</span>
+		</div>
 
-		<span class="fc-filter nowrap_box">
-			<span class="limit nowrap_box">
+		<div class="fc-filter nowrap_box">
+			<div class="limit nowrap_box">
 				<?php
 				$pagination_footer = $this->pagination->getListFooter();
 				if (strpos($pagination_footer, '"limit"') === false) echo $this->pagination->getLimitBox();
 				?>
-			</span>
+			</div>
 
 			<span class="fc_item_total_data nowrap_box fc-mssg-inline fc-info fc-nobgimage">
 				<?php echo @$this->resultsCounter ? $this->resultsCounter : $this->pagination->getResultsCounter(); // custom Results Counter ?>
@@ -497,7 +483,7 @@ jQuery(document).ready(function(){
 				<?php echo $getPagesCounter; ?>
 			</span>
 			<?php endif; ?>
-		</span>
+		</div>
 	</div>
 
 
@@ -602,7 +588,7 @@ jQuery(document).ready(function(){
 		<div id="fc-filters-slide-btn" class="icon-arrow-up-2 btn" title="<?php echo JText::_('FLEXI_HIDE'); ?>" style="cursor: pointer;" onclick="fc_toggle_box_via_btn('fc-filters-box', document.getElementById('fc_filters_box_btn'), 'btn-primary');"></div>
 	</div>
 
-	<div id="mainChooseColBox" class="well well-small" style="display:none;"></div>
+	<div id="mainChooseColBox" class="well well-small group-fcset" style="display:none;"></div>
 
 	<?php echo @$this->minihelp; ?>
 	<div class="fcclear"></div>
@@ -867,7 +853,6 @@ jQuery(document).ready(function(){
 
 
 			$row_ilayout =  $row->config->get('ilayout') ?  $row->config->get('ilayout') : $row->tconfig->get('ilayout');
-			$layout_url = 'index.php?option=com_flexicontent&amp;view=template&amp;type=items&amp;tmpl=component&amp;ismodal=1&amp;folder='. $row_ilayout;
 
 			// Set a row language, even if empty to avoid errors
 			$lang_default = '*';
@@ -946,23 +931,9 @@ jQuery(document).ready(function(){
 			<td class="col_state" style="padding-right: 8px;">
 				<div class="btn-group fc-group fc-items">
 					<?php
-					$site_languages = FLEXIUtilities::getLanguages();
-					$sef_lang = $row->language != '*' && isset($site_languages->{$row->language}) ? $site_languages->{$row->language}->sef : '';
-					$record_url =
-						// Route the record URL to an appropriate menu item
-						FlexicontentHelperRoute::getItemRoute($row->id.':'.$row->alias, $row->categoryslug, 0, $row)
-
-						// Force language to be switched to the language of the record, thus showing the record (and not its associated translation of current FE language)
-						. ($sef_lang ? '&lang=' . $sef_lang : '');
-
-					// Build a frontend SEF url
-					$record_url = flexicontent_html::getSefUrl($record_url);
-
-					$previewlink = $record_url;
-
-					echo flexicontent_html::statebutton( $row, null, $addToggler = ($this->pagination->limit <= $this->inline_ss_max), 'top', 'btn btn-small' );
+					echo JHtml::_('fcitems.statebutton', $row, $i);
 					echo JHtml::_('fcitems.featured', $row->featured, $i, $row->canEditState);
-					echo '<a '.$attribs_preview.' href="'.$previewlink.'" target="_blank">'.$image_preview.'</a>';
+					echo JHtml::_('fcitems.preview', $row, '_blank', $i);
 					?>
 				</div>
 			</td>
@@ -978,17 +949,11 @@ jQuery(document).ready(function(){
 				// Display item scheduled / expired icons if item is in published state
 				echo JHtml::_('fcitems.scheduled_expired', $row, $user, $i);
 
-				// Display title with no edit link ... if row is not-editable for any reason (no ACL or checked-out by other user)
-				if (!$row->canEdit)
-				{
-					echo htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8');
-				}
-
-				// Display title with edit link ... (row editable and not checked out)
-				else
-				{
-					echo '<a href="'.$edit_link.'" title="'.$edit_item_title.'">'.htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8').'</a>';
-				}
+				/**
+				 * Display title with edit link ... (row editable and not checked out)
+				 * Display title with no edit link ... if row is not-editable for any reason (no ACL or checked-out by other user)
+				 */
+				echo JHtml::_('fcitems.edit_link', $row, $i, $row->canEdit);
 				?>
 			</td>
 
@@ -1036,7 +1001,7 @@ jQuery(document).ready(function(){
 						);
 
 						echo '
-						<a class="fc_assoc_translation label label-association ' . $tip_class . ($assoc_modified < $row_modified ? ' fc_assoc_later_mod' : '').'" target="_blank" href="'.$_link.'" title="'.$_title.'" >
+						<a class="fc_assoc_translation label label-association ' . $this->tooltip_class . ($assoc_modified < $row_modified ? ' fc_assoc_later_mod' : '').'" target="_blank" href="'.$_link.'" title="'.$_title.'" >
 							'.($assoc_item->lang=='*' ? JText::_("FLEXI_ALL") : strtoupper($assoc_item->shortcode)).'
 						</a>';
 					}
@@ -1051,11 +1016,7 @@ jQuery(document).ready(function(){
 			</td>
 
 			<td class="col_edit_layout">
-				<?php if ($this->permissions->CanTemplates && $row_ilayout) : ?>
-				<a <?php echo $attribs_editlayout; ?> href="<?php echo $layout_url; ?>" onclick="var url = jQuery(this).attr('href'); fc_showDialog(url, 'fc_modal_popup_container', 0, 0, 0, 0, {title:'<?php echo $edit_layout; ?>'}); return false;" >
-					<?php echo $image_editlayout;?>
-				</a>
-				<?php endif; ?>
+				<?php echo JHtml::_('fcitems.edit_layout', $row, '__modal__', $i, $this->permissions->CanTemplates, $row_ilayout); ?>
 			</td>
 			<td class="col_template">
 				<?php echo $row_ilayout.($row->config->get('ilayout') ? '' : '<sup>[1]</sup>') ?>
@@ -1073,7 +1034,7 @@ jQuery(document).ready(function(){
 
 			<td class="col_access">
 				<?php echo $row->canEdit && $this->permissions->CanAccLvl
-					? flexicontent_html::userlevel('access['.$row->id.']', $row->access, 'onchange="return listItemTask(\'cb'.$i.'\',\'items.access\')"')
+					? flexicontent_html::userlevel('access['.$row->id.']', $row->access, 'class="use_select2_lib" onchange="return listItemTask(\'cb'.$i.'\',\'items.access\')"')
 					: $row->access_level; ?>
 			</td>
 

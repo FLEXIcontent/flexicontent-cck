@@ -41,10 +41,11 @@ ul.tabbernav > li.tabberactive a {
 }
 ul.tabbernav > li.tabberactive a:hover {
 	color: #000;
-	background: white;
+	background-color: #fff;
 	border-bottom: 1px solid white;
 }
 .tabberlive .tabbertab {
+	background: #fff;
 	padding: 5px;
 	border: 1px solid #aaa;
 	border-top: 0;
