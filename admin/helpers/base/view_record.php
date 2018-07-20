@@ -39,4 +39,5 @@ class FlexicontentViewBaseRecord extends JViewLegacy
 	var $ina_grp_class = FLEXI_J40GE ? 'input-group' : 'input-append';
 	var $inp_grp_class = FLEXI_J40GE ? 'input-group' : 'input-prepend';
 	var $select_class  = FLEXI_J40GE ? 'use_select2_lib' : 'use_select2_lib';
+	//var $txt_grp_class = FLEXI_J40GE ? 'input-group-text' : 'add-on';
 }

@@ -199,6 +199,23 @@ div.adminthumbs.fcmanthumbs {
 .flexicontent #fc-filters-box {
 	padding-right: 0px;
 }
+.flexicontent #fc-filters-box.fcman-abs,
+.flexicontent #mainChooseColBox.fcman-abs {
+	position: absolute;
+	box-shadow: 2px 2px 6px black;
+	background: #fff;
+	z-index: 100;
+	right: 0;
+	top: 100%;
+}
+.flexicontent #mainChooseColBox > #mainChooseColBox_cols {
+	display: inline-block;
+}
+.flexicontent #mainChooseColBox > #mainChooseColBox_cols > * {
+	display: inline-block;
+	float: right;
+	clear: both;
+}
 #flexicontent input.fcitem_order_no {
 	text-align: center;
 }
@@ -210,19 +227,29 @@ div.adminthumbs.fcmanthumbs {
 .flexicontent #fc-filters-header #limit {
 	padding: 3px 6px !important;
 }
-.flexicontent #fc-filters-header .fc-filter {
+.flexicontent #fc-filters-header .fc-filter-head-box {
 	vertical-align: baseline !important;
 	border: 0px !important;
 	padding: 0px !important;
 	margin: 2px 0 6px 24px;
+	width: unset;
 }
-.flexicontent #fc-filters-header .fc-filter .label {
+.flexicontent #fc-filters-header .fc-filter-head-box .label {
 	font-size: 11px;
 	padding: 4px 4px;
 	margin: 0px 4px;
 }
-.flexicontent #fc-filters-header .fc-filter .input-append {
+.flexicontent #fc-filters-header .fc-filter-head-box .input-group-append,
+.flexicontent #fc-filters-header .fc-filter-head-box .input-group-prepend,
+.flexicontent #fc-filters-header .fc-filter-head-box .input-append,
+.flexicontent #fc-filters-header .fc-filter-head-box .input-prepend {
 	margin: 0px;
+}
+.flexicontent #fc-filters-header .fc-filter-head-box .input-group-append > *,
+.flexicontent #fc-filters-header .fc-filter-head-box .input-group-prepend > *,
+.flexicontent #fc-filters-header .fc-filter-head-box .input-append > *,
+.flexicontent #fc-filters-header .fc-filter-head-box .input-prepend > * {
+	display: inline-block;
 }
 .flexicontent #fc-filters-box #fc-filters-slide-btn {
 	width: 100%;
@@ -234,6 +261,10 @@ div.adminthumbs.fcmanthumbs {
 	float: none;
 	clear: both;
 }
+.flexicontent #fc-filters-box [class^="icon-arrow-"] {
+	vertical-align: middle;
+	font-size: 18px;
+}
 .flexicontent #fc-filters-box .fc-filter {
 	border: 0px solid;
 	margin: 4px 2px 4px 2px;
@@ -242,31 +273,63 @@ div.adminthumbs.fcmanthumbs {
 	min-width: 310px;
 	min-height: 30px;
 	float: none;
+	display: block;
 }
 .flexicontent #fc-filters-box .fc-filter.fc-filter-double {
 	min-width: 628px;
 }
-.flexicontent #fc-filters-box .fc-filter #s2id_date.select2-container.use_select2_lib.fc_skip_highlight .select2-choice {
+.flexicontent #fc-filters-box .fc-filter.fc-filter-double .select2-container .select2-choice {
+	width: 482px !important;
+}
+.flexicontent #fc-filters-box .fc-filter.fc-filter-double .select2-container-multi {
+	width: 490px !important;
+}
+.flexicontent #fc-filters-box .fc-filter .fc-xpended-row .input-group-text:first-child,
+.flexicontent #fc-filters-box .fc-filter .fc-xpended-row .add-on:first-child {
+	min-width: 128px;
+	max-width: 128px;
+	white-space: normal;
+	word-wrap: break-word;
+	text-align: right;
+	display: inline-block;
+}
+.flexicontent #fc-filters-box .fc-filter .fc-xpended-row .add-on,
+.flexicontent #fc-filters-box .fc-filter .fc-xpended .add-on {
+	color: black;
+}
+.flexicontent #fc-filters-box .fc-filter #s2id_date.select2-container.use_select2_lib .select2-choice {
 	width: 90px !important;
 	min-width: 90px !important;
+}
+.flexicontent #fc-filters-box .fc-filter #s2id_date.select2-container.use_select2_lib .select2-choice .select2-arrow {
+	border-radius: 0px !important;
 }
 .flexicontent #fc-filters-box .fc-filter #startdate_img,
 .flexicontent #fc-filters-box .fc-filter #enddate_img {
 	padding-right: 2px !important;
 	padding-left: 2px !important;
 }
+.flexicontent #fc-filters-box .fc-filter #startdate_btn,
+.flexicontent #fc-filters-box .fc-filter #enddate_btn {
+	font-size: 14px !important;
+	height: 28px !important;
+	padding: 2px 4px !important;
+	box-sizing: border-box;
+}
+.flexicontent #fc-filters-box .fc-filter #startdate_btn {
+	border-radius: 0;
+}
 .flexicontent #fc-filters-box .fc-filter #startdate,
 .flexicontent #fc-filters-box .fc-filter #enddate {
 	font-size: 11px !important;
-	min-width: 57px;
-	max-width: 57px;
+	min-width: 76px;
+	max-width: 76px;
+	height: 16px !important;
+	padding: 13px 8px !important;
+	box-sizing: border-box;
 }
-.flexicontent #fc-filters-box .fc-filter .fc-xpended-row .add-on:first-child {
-	min-width: 120px;
-	max-width: 120px;
-	white-space: normal;
-	word-wrap: break-word;
-	text-align: left;
+.admin.com_flexicontent .select2-drop .select2-results {
+	max-height: 400px !important;
 }
 .flexicontent #fc-filters-box .fc-filter > * {
 	vertical-align: middle !important;
@@ -276,8 +339,8 @@ div.adminthumbs.fcmanthumbs {
 .flexicontent #fc-filters-box .fc-filter > *:not(.fc-xpended):not(.fc-xpended-row) {
 	margin: 0 6px 0 2px !important;
 }
-.flexicontent #fc-filters-box .fc-filter [class^="fc-xpended"] > div.select2-container .select2-choice > .select2-chosen,
-.flexicontent #fc-filters-box .fc-filter [class*="fc-xpended"] > div.select2-container .select2-choice > .select2-chosen {
+.flexicontent #fc-filters-box .fc-filter [class^="fc-xpended"] div.select2-container .select2-choice > .select2-chosen,
+.flexicontent #fc-filters-box .fc-filter [class*="fc-xpended"] div.select2-container .select2-choice > .select2-chosen {
 	white-space: nowrap !important;
 }
 .flexicontent #fc-filters-box .fc-filter .label {
@@ -285,30 +348,17 @@ div.adminthumbs.fcmanthumbs {
 	padding: 4px 4px;
 	margin: 0px 4px;
 }
-.admin.com_flexicontent .select2-drop .select2-results {
-	max-height: 400px !important;
-}
-.flexicontent #fc-filters-box .fc-filter.fc-filter-double .select2-container .select2-choice {
-	width: 482px !important;
-}
-.flexicontent #fc-filters-box .fc-filter.fc-filter-double .select2-container-multi {
-	width: 490px !important;
-}
 .flexicontent #fc-filters-box .fc-filter *:not(.input-append):not(.input-prepend) > input[type="text"] {
 	padding: 2px 2px 3px !important;
 	margin: 0px !important;
-}
-.flexicontent #fc-filters-box .fc-filter .input-append,
-.flexicontent #fc-filters-box .fc-filter .input-prepend {
-	margin: 0px;
 }
 .flexicontent #fc-filters-box .fc-filter .field-calendar > div > button {
 	width: 25px;
 	padding-left: 0;
 	padding-right: 4px;
 }
-.flexicontent #fc-filters-box .fc-filter .input-prepend > .add-on + input,
-.flexicontent #fc-filters-box .fc-filter .input-append > .add-on + input {
+.flexicontent #fc-filters-box .fc-filter .input-group-prepend > .input-group-text + input,
+.flexicontent #fc-filters-box .fc-filter .input-prepend > .add-on + input {
 	width: 160px !important;
 }
 .flexicontent #fc-filters-box .fc-filter .input-prepend > input,
@@ -349,10 +399,6 @@ div.adminthumbs.fcmanthumbs {
 	padding: 2px 6px 2px 26px !important;
 	background: transparent url(../images/select2.png) no-repeat scroll -32px -22px !important;
 	width: 100% !important;
-}
-.flexicontent #fc-filters-box [class^="icon-arrow-"] {
-	vertical-align: middle;
-	font-size: 18px;
 }
 .flexicontent .fc_drag_handle_none,
 .flexicontent .fc_drag_handle {
@@ -886,6 +932,10 @@ img.btn.btn-small.fc-man-icon-s {
 .flexicontent .fcmanlist th :not(.btn-group) > [class^="icon-"],
 .flexicontent .fcmanlist th :not(.btn-group) > [class*="icon-"] {
 	font-size: 14px;
+}
+.flexicontent .fcmanlist .col_template,
+.flexicontent .fcmanlist .col_alias {
+	font-family: verdana;
 }
 .flexicontent .fcmanlist :not(.btn-group) > .btn.btn-small {
 	padding: 2px 2px 1px 3px;

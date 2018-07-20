@@ -517,22 +517,26 @@ class FlexicontentModelItems extends JModelLegacy
 	function getCustomFilts()
 	{
 		$app     = JFactory::getApplication();
+		$user    = JFactory::getUser();
 		$jinput  = $app->input;
 		$option  = $jinput->get('option', '', 'cmd');
 		$view    = $jinput->get('view', '', 'cmd');
 		$fcform  = $jinput->get('fcform', 0, 'int');
 		
-		$user= JFactory::getUser();
-		
 		$p = $option.'.'.$view.'.';
 		
 		// Check if custom filters were already calculated
-		if ( $this->_custom_filters !== null) return $this->_custom_filters;
+		if ($this->_custom_filters !== null)
+		{
+			return $this->_custom_filters;
+		}
+
 		$this->_custom_filters = array();
 		
 		// Get the extra fields from COMPONENT OR per type if TYPE FILTER is active
 		$types = $this->getTypesFromFilter();
-		if ( count($types)==1 ) 
+
+		if (count($types) === 1) 
 		{
 			$type = reset($types);
 			$im_custom_filters = $type->params->get("items_manager_custom_filters");
@@ -547,7 +551,12 @@ class FlexicontentModelItems extends JModelLegacy
 		}
 		
 		$im_custom_filters = trim($im_custom_filters);
-		if (!$im_custom_filters) return array();
+
+		if (!$im_custom_filters)
+		{
+			return array();
+		}
+
 		$im_custom_filters = preg_split("/[\s]*,[\s]*/", $im_custom_filters);
 		ArrayHelper::toInteger($im_custom_filters, null);
 		
@@ -589,6 +598,7 @@ class FlexicontentModelItems extends JModelLegacy
 		
 		$this->_custom_filters = & $custom_filters;
 		$this->renderFiltersHTML();
+
 		return $this->_custom_filters;
 	}
 	
@@ -613,7 +623,8 @@ class FlexicontentModelItems extends JModelLegacy
 		
 		foreach($this->_custom_filters as $filter)
 		{
-			if ( !isset($allowed_field_types[$filter->field_type]) ) {
+			if (!isset($allowed_field_types[$filter->field_type]))
+			{
 				JFactory::getApplication()->enqueueMessage('Filter: '. $field->name .' is of type '. $field->field_type .' , allowed types for backend custom filters are: '. implode(', ', array_keys($allowed_field_types)), 'warning');
 				$filter->html = '';
 				continue;
@@ -623,27 +634,40 @@ class FlexicontentModelItems extends JModelLegacy
 			$extra_props = ($filter->field_type == 'radioimage' || $filter->field_type == 'checkboximage') ? array('image', 'valgrp', 'state') : array();
 			$elements = FlexicontentFields::indexedField_getElements($filter, $item=null, $extra_props, $item_pros, $create_filter=true);
 			
-			$filter->parameters->set( 'faceted_filter', 0 );
-			$filter->parameters->set( 'display_filter_as', 0 );
-			$filter->parameters->set( 'display_label_filter', -1 );
-			$filter->parameters->set( 'label_filter_css', 'add-on' );
+			$filter->isfilter = 1;
+
+			$filter->parameters->set('faceted_filter', 0);
+			$filter->parameters->set('display_filter_as', 0);
+			$filter->parameters->set('display_label_filter', 0);
+			$filter->parameters->set('label_filter_css', '');
+			//$filter->parameters->set('display_label_filter', -1);
+			//$filter->parameters->set('label_filter_css', 'add-on');
 			$filter->parameters->set( 'filter_extra_attribs', ' onchange="document.adminForm.limitstart.value=0; Joomla.submitform()" ' );
 			
 			// Check for error during getting indexed field elements
-			if ( !$elements ) {
+			if (!$elements)
+			{
 				$filter->html = '';
-				$sql_mode = $filter->parameters->get( 'sql_mode', 0 );  // must retrieve variable here, and not before retrieving elements !
+
+				// Must retrieve variable here, and not before retrieving elements !
+				$sql_mode = $filter->parameters->get( 'sql_mode', 0 );
+
 				if ($sql_mode && $item_pros > 0)
+				{
 					$filter->html = sprintf( JText::_('FLEXI_FIELD_ITEM_SPECIFIC_AS_FILTERABLE'), $filter->label );
-				else if ($sql_mode)
-					$filter->html = JText::_('FLEXI_FIELD_INVALID_QUERY');
+				}
 				else
-					$filter->html = JText::_('FLEXI_FIELD_INVALID_ELEMENTS');
+				{
+					$filter->html = $sql_mode
+						? JText::_('FLEXI_FIELD_INVALID_QUERY')
+						: JText::_('FLEXI_FIELD_INVALID_ELEMENTS');
+				}
 				continue;
 			}
 			
 			FlexicontentFields::createFilter($filter, $filter->value, $formName, $elements);
 		}
+
 		// Restore view
 		$jinput->set('view', $view);
 	}
@@ -1237,40 +1261,37 @@ class FlexicontentModelItems extends JModelLegacy
 		$perms   = FlexicontentHelperPerm::getPerm();
 
 
-		// ***
-		// *** FLAGs to decide which items to list
-		// ***
+		/**
+		 * FLAGs to decide which items to list
+		 */
 
 		$allitems	= $perms->DisplayAllItems;
 		$viewable_items = $this->cparams->get('iman_viewable_items', 1);
 		$editable_items = $this->cparams->get('iman_editable_items', 0);
 
 
-		// ***
-		// *** SPECIAL item listing CASES, item ids are already calculated and provided,
-		// *** in such a case WHERE clause limits to the given item ids
-		// ***
+		/**
+		 * SPECIAL item listing CASES, item ids are already calculated and provided,
+		 * in such a case WHERE clause limits to the given item ids
+		 */
 
 		// CASE 1: listing items using a file
 		$filter_fileid = $this->getState( 'filter_fileid' );
+
 		if ($filter_fileid)
 		{
 			$fileid_to_itemids = $session->get('fileid_to_itemids', array(),'flexicontent');
 			$itemids =  $fileid_to_itemids[$filter_fileid];
-			if ( empty($itemids) )
-			{
-				return ' WHERE 0 ';
-			}
-			else
-			{
-				return ' WHERE i.id IN ('. implode(',', $itemids) .') ';
-			}
+
+			return empty($itemids)
+				? ' WHERE 0 '
+				: ' WHERE i.id IN ('. implode(',', $itemids) .') ';
 		}
 
 
-		// ***
-		// *** Get item list filters
-		// ***
+		/**
+		 * Get item list filters
+		 */
 
 		// various filters (mostly multi-value)
 		$filter_tag 		= $this->getState( 'filter_tag' );
@@ -1303,9 +1324,9 @@ class FlexicontentModelItems extends JModelLegacy
 		$enddate   = StringHelper::trim( StringHelper::strtolower( $enddate ) );
 
 
-		// ***
-		// *** Start building the AND parts of where clause
-		// ***
+		/**
+		 * Start building the AND parts of where clause
+		 */
 
 		$where = array();
 
@@ -1314,11 +1335,12 @@ class FlexicontentModelItems extends JModelLegacy
 		//$where[] = ' cat.extension = ' . $this->_db->Quote(FLEXI_CAT_EXTENSION);
 
 
-		// ***
-		// *** IF items viewable: default is enabled
-		// ***
+		/**
+		 * IF items viewable: default is enabled
+		 */
 
 		$joinaccess = '';
+
 		if (!$allitems && $viewable_items)
 		{
 			$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
@@ -1327,41 +1349,51 @@ class FlexicontentModelItems extends JModelLegacy
 			$where[] = ' c.access IN (0,'.$aid_list.')';
 			$where[] = ' i.access IN (0,'.$aid_list.')';
 		}
+
 		$extra_joins .= $joinaccess;
 
 
-		// ***
-		// *** IF items in an editable (main) category: default is disabled
-		// ***
+		/**
+		 * IF items in an editable (main) category: default is disabled
+		 */
 
 		$allowedcats = false;
 		$allowedcats_own = false;
+
 		if (!$allitems && $editable_items)
 		{
 			$allowedcats = FlexicontentHelperPerm::getAllowedCats( $user, $actions_allowed=array('core.edit'), $require_all=true, $check_published = false, false, $find_first = false);
 			$allowedcats_own = FlexicontentHelperPerm::getAllowedCats( $user, $actions_allowed=array('core.edit.own'), $require_all=true, $check_published = false, false, $find_first = false);
-			if ($allowedcats || $allowedcats_own) {
+
+			if ($allowedcats || $allowedcats_own)
+			{
 				$_edit_where = '( ';
 				
 				if ($allowedcats)
+				{
 					$_edit_where .= '( i.catid IN (' . implode( ', ', $allowedcats ) . ') )';
+				}
 					
 				if ($allowedcats && $allowedcats_own)
+				{
 					$_edit_where .= ' OR ';
+				}
 					
 				if ($allowedcats_own)
+				{
 					$_edit_where .= '( i.catid IN (' . implode( ', ', $allowedcats_own ) . ') AND i.created_by='.$user->id.')';
+				}
 					
 				$where[] = $_edit_where .' )';
 			}
 		}
 
 
-		// ***
-		// *** Limit using the category filter
-		// ***
-		
-		if ( $filter_cats )
+		/**
+		 * Limit using the category filter
+		 */
+
+		if ($filter_cats)
 		{
 			// CURRENTLY in main or secondary category.  -TODO-  maybe add limiting by main category, if ... needed
 			
@@ -1369,31 +1401,36 @@ class FlexicontentModelItems extends JModelLegacy
 				? 'i.catid'
 				: 'rel.catid';
 
-			if ( $filter_subcats )
+			if ($filter_subcats)
 			{
 				global $globalcats;
 				
-				$_sub_cids = array();
 				if ($filter_catsinstate == 99)
 				{
 					$_sub_cids = $globalcats[$filter_cats]->descendantsarray;
 				}
 				else
 				{
+					$_sub_cids = array();
+
 					foreach( $globalcats[$filter_cats]->descendantsarray as $_dcatid)
 					{
 						if ($globalcats[$_dcatid]->published==$filter_catsinstate) $_sub_cids[] = $_dcatid;
 					}
 				}
-				if ( empty ($_sub_cids) ) $where[] = ' FALSE  ';
-				else $where[] = '('.$cat_type.' IN (' . implode( ', ', $_sub_cids ) . ')' .' OR '. 'c.id IN (' . implode( ', ', $_sub_cids ) . '))';
-				
+
+				$where[] = empty($_sub_cids)
+					? ' FALSE '
+					: '(' .
+						$cat_type . ' IN (' . implode(', ', $_sub_cids) . ')' .
+						' OR ' .
+						'c.id IN (' . implode(', ', $_sub_cids) . ')' .
+						')';
 			}
 			else
 			{
 				$where[] = $cat_type.' = ' . $filter_cats;
 			}
-
 		}
 
 		else
@@ -1411,20 +1448,21 @@ class FlexicontentModelItems extends JModelLegacy
 		}
 
 
-		// ***
-		// *** Limit using the featured filter
-		// ***
+		/**
+		 * Limit using the featured filter
+		 */
+
 		if (strlen($filter_featured))
 		{
 			$where[] = 'i.featured = ' . $filter_featured;
 		}
 
 
-		// ***
-		// *** Limit using state or group of states (e.g. published states)
-		// ***
+		/**
+		 * Limit using state or group of states (e.g. published states)
+		 */
 
-		if ( empty($filter_state) )
+		if (empty($filter_state))
 		{
 			$where[] = 'i.state <> -2';
 			$where[] = 'i.state <> 2';
@@ -1440,29 +1478,31 @@ class FlexicontentModelItems extends JModelLegacy
 			$states = array();
 
 			// No limitations, and clear any other flags in the array
-			if ( isset($FS['ALL']) )
+			if (isset($FS['ALL']))
 			{
 				$filter_state = array('ALL');
 				$FS = array('ALL'=>0);
 				$filter_state = $this->setState('filter_state', $filter_state);
 			}
-			else if ( isset($FS['ORPHAN']) )
+			elseif (isset($FS['ORPHAN']))
 			{
 				$where[] = 'i.state NOT IN(2,-2,1,0,-3,-4,-5)';
 			}
 			else
 			{
-				if ( isset($FS['ALL_P']) )  array_push($states, 1,-5);
-				if ( isset($FS['ALL_U']) )  array_push($states, 0,-3,-4);
-				if ( isset($FS['P']) )      array_push($states, 1);
-				if ( isset($FS['U']) )      array_push($states, 0);
-				if ( isset($FS['PE']) )     array_push($states, -3);
-				if ( isset($FS['OQ']) )     array_push($states, -4);
-				if ( isset($FS['IP']) )     array_push($states, -5);
-				if ( isset($FS['RV']) )     array_push($states, 1,-5);
-				if ( isset($FS['A']) )      array_push($states, 2);
-				if ( isset($FS['T']) )      array_push($states, -2);
+				isset($FS['ALL_P']) ? array_push($states, 1,-5) : null;
+				isset($FS['ALL_U']) ? array_push($states, 0,-3,-4) : null;
+				isset($FS['P']) ? array_push($states, 1) : null;
+				isset($FS['U']) ? array_push($states, 0) : null;
+				isset($FS['PE']) ? array_push($states, -3) : null;
+				isset($FS['OQ']) ? array_push($states, -4) : null;
+				isset($FS['IP']) ? array_push($states, -5) : null;
+				isset($FS['RV']) ? array_push($states, 1,-5) : null;
+				isset($FS['A']) ? array_push($states, 2) : null;
+				isset($FS['T']) ? array_push($states, -2) : null;
+
 				$states = array_unique($states, SORT_REGULAR);
+
 				if (!empty($states))
 				{
 					$where[] = 'i.state IN ('.implode(',', $states).')';
@@ -1471,94 +1511,110 @@ class FlexicontentModelItems extends JModelLegacy
 		}
 
 
-		// ***
-		// *** Limit using simpler filtering, (item) type, author, (item) id, language, access
-		// ***
+		/**
+		 * Limit using simpler filtering, (item) type, author, (item) id, language, access
+		 */
 
-		if ( !empty($filter_tag) )
+		if (!empty($filter_tag))
 		{
 			ArrayHelper::toInteger($filter_tag, null);
 			$where[] = 'tg.tid IN (' . implode( ',', $filter_tag) .')';
 		}
 
-		if ( !empty($filter_type) )
+		if (!empty($filter_type))
 		{
 			ArrayHelper::toInteger($filter_type, null);
 			$where[] = ($tmp_only ? 'i.' : 'ie.') . 'type_id IN (' . implode( ',', $filter_type) .')';
 		}
 
-		if ( !empty($filter_author) )
+		if (!empty($filter_author))
 		{
 			ArrayHelper::toInteger($filter_author, null);
 			$where[] = 'i.created_by IN (' . implode( ',', $filter_author) .')';
 		}
 
-		if ( $filter_id )
+		if ($filter_id)
 		{
 			$where[] = 'i.id = ' . $filter_id;
 		}
 
-		if ( !empty($filter_lang) )
+		if (!empty($filter_lang))
 		{
-			if ( !is_array($filter_lang) )
+			if (!is_array($filter_lang))
+			{
 				$filter_langs[] = $this->_db->Quote($filter_lang);
-			else foreach($filter_lang as $val)
-				$filter_langs[] = $this->_db->Quote($val);
-			
+			}
+			else
+			{
+				foreach($filter_lang as $val)
+				{
+					$filter_langs[] = $this->_db->Quote($val);
+				}
+			}
+
 			$where[] = 'i.language IN (' . implode( ',', $filter_langs) .')';
 		}
 
-		if ( !empty($filter_access) )
+		if (!empty($filter_access))
 		{
 			ArrayHelper::toInteger($filter_access, null);
 			$where[] = 'i.access IN (' . implode( ',', $filter_access) .')';
 		}
 
 
-		// ***
-		// *** CUSTON filters
-		// ***
+		/**
+		 * CUSTON filters
+		 */
 
 		$customFilts = $this->getCustomFilts();
 		$_filts_vals_clause =  array();
+
 		foreach($customFilts as $filter)
 		{
-			if (!count($filter->value)) continue;
+			if (!count($filter->value))
+			{
+				continue;
+			}
+
 			$_filts_vals_clause[] = ' (fi.field_id='.$filter->id.' AND fi.value='.$this->_db->Quote($filter->value[0]).')';
 		}
-		if ( count($_filts_vals_clause) )
+
+		if (count($_filts_vals_clause))
 		{
 			$where[] = ' (' . implode(' OR ', $_filts_vals_clause).' )';
 		}
 
 
-		// ***
-		// *** TEXT search filtering	
-		// ***
+		/**
+		 * TEXT search filtering	
+		 */
 
 		$search_prefix = JComponentHelper::getParams( 'com_flexicontent' )->get('add_search_prefix') ? 'vvv' : '';   // SEARCH WORD Prefix
 		
 		if ($search)
 		{
-			$escaped_search = $this->_db->escape( $search, true );
+			$escaped_search = $this->_db->escape($search, true);
 			
-			if ($scope == 1) {
-				$where[] = ' LOWER(i.title) LIKE '.$this->_db->Quote( '%'.$escaped_search.'%', false );
-			}
-			
-			if ($scope == 2) {
-				$where[] = '(LOWER(i.introtext) LIKE '.$this->_db->Quote( '%'.$escaped_search.'%', false ) . ' OR LOWER(i.fulltext)  LIKE '.$this->_db->Quote( '%'.$escaped_search.'%', false ) . ') ';
-			}
-			
-			if ($scope == 4) {
-				$where[] = ' MATCH (ie.search_index) AGAINST ('.$this->_db->Quote( $search_prefix.$escaped_search.'*', false ).' IN BOOLEAN MODE)';
+			switch($scope)
+			{
+				case 1:
+					$where[] = ' LOWER(i.title) LIKE '.$this->_db->Quote( '%'.$escaped_search.'%', false );
+					break;
+
+				case 2:
+					$where[] = '(LOWER(i.introtext) LIKE '.$this->_db->Quote( '%'.$escaped_search.'%', false ) . ' OR LOWER(i.fulltext)  LIKE '.$this->_db->Quote( '%'.$escaped_search.'%', false ) . ') ';
+					break;
+
+				case 4:
+					$where[] = ' MATCH (ie.search_index) AGAINST ('.$this->_db->Quote( $search_prefix.$escaped_search.'*', false ).' IN BOOLEAN MODE)';
+					break;
 			}
 		}
 
 
-		// ***
-		// *** Date range filtering (creation and/or modification)
-		// ***
+		/**
+		 * Date range filtering (creation and/or modification)
+		 */
 
 		$nullDate = $this->_db->getNullDate();
 		
@@ -1566,38 +1622,43 @@ class FlexicontentModelItems extends JModelLegacy
 		{
 			$_where = array();
 
-			if ($date == 1)
+			switch($date)
 			{
-				if ($startdate) $_where[] = ' i.created >= ' . $this->_db->Quote($startdate);
-				if ($enddate)   $_where[] = ' i.created <= ' . $this->_db->Quote($enddate);
-				$where[] = '( ' . implode(' AND ', $_where) . ' )';
-			}
-			else if ($date == 2)
-			{
-				if ($startdate)  $_where[] = '( i.modified >= ' . $this->_db->Quote($startdate) . ' OR ( i.modified = ' . $this->_db->Quote($nullDate) . ' AND i.created >= ' . $this->_db->Quote($startdate) . '))';
-				if ($enddate)    $_where[] = '( i.modified <= ' . $this->_db->Quote($enddate)   . ' OR ( i.modified = ' . $this->_db->Quote($nullDate) . ' AND i.created <= ' . $this->_db->Quote($enddate) . '))';
-				$where[] = '( ' . implode(' AND ', $_where) . ' )';
-			}
-			else if ($date == 3)
-			{
-				if ($startdate) $_where[] = '( i.publish_up >= ' . $this->_db->Quote($startdate) . ' OR ( i.publish_up = ' . $this->_db->Quote($nullDate) . ' AND i.created >= ' . $this->_db->Quote($startdate) . '))';
-				if ($enddate)   $_where[] = '( i.publish_up <= ' . $this->_db->Quote($enddate) . ' OR ( i.publish_up = ' . $this->_db->Quote($nullDate) . ' AND i.created >= ' . $this->_db->Quote($startdate) . '))';
-				$where[] = '( ' . implode(' AND ', $_where) . ' )';
-			}
-			else if ($date == 4)
-			{
-				if ($startdate) $_where[] = ' i.publish_down >= ' . $this->_db->Quote($startdate);
-				if ($enddate)   $_where[] = ' i.publish_down <= ' . $this->_db->Quote($enddate);
-				$where[] = '( ' . implode(' AND ', $_where) . ' )';
+				case 1:
+					if ($startdate) $_where[] = ' i.created >= ' . $this->_db->Quote($startdate);
+					if ($enddate)   $_where[] = ' i.created <= ' . $this->_db->Quote($enddate);
+					$where[] = '( ' . implode(' AND ', $_where) . ' )';
+					break;
+
+				case 2:
+					if ($startdate)  $_where[] = '( i.modified >= ' . $this->_db->Quote($startdate) . ' OR ( i.modified = ' . $this->_db->Quote($nullDate) . ' AND i.created >= ' . $this->_db->Quote($startdate) . '))';
+					if ($enddate)    $_where[] = '( i.modified <= ' . $this->_db->Quote($enddate)   . ' OR ( i.modified = ' . $this->_db->Quote($nullDate) . ' AND i.created <= ' . $this->_db->Quote($enddate) . '))';
+					$where[] = '( ' . implode(' AND ', $_where) . ' )';
+					break;
+
+				case 3:
+					if ($startdate) $_where[] = '( i.publish_up >= ' . $this->_db->Quote($startdate) . ' OR ( i.publish_up = ' . $this->_db->Quote($nullDate) . ' AND i.created >= ' . $this->_db->Quote($startdate) . '))';
+					if ($enddate)   $_where[] = '( i.publish_up <= ' . $this->_db->Quote($enddate) . ' OR ( i.publish_up = ' . $this->_db->Quote($nullDate) . ' AND i.created >= ' . $this->_db->Quote($startdate) . '))';
+					$where[] = '( ' . implode(' AND ', $_where) . ' )';
+					break;
+
+				case 4:
+					if ($startdate) $_where[] = ' i.publish_down >= ' . $this->_db->Quote($startdate);
+					if ($enddate)   $_where[] = ' i.publish_down <= ' . $this->_db->Quote($enddate);
+					$where[] = '( ' . implode(' AND ', $_where) . ' )';
+					break;
 			}
 		}
 
 
-		// ***
-		// *** Finally create the AND clause of the WHERE clause
-		// ***
+		/**
+		 * Finally create the AND clause of the WHERE clause
+		 */
 
-		$where = ( count( $where ) ? ' WHERE ' . implode( ' AND ', $where ) : '' );
+		$where = count($where)
+			? ' WHERE ' . implode(' AND ', $where)
+			: '';
+
 		return $where;
 	}
 
