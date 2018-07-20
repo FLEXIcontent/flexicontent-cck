@@ -5,7 +5,7 @@
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
  * @license GNU/GPL v2
- * 
+ *
  * FLEXIcontent is a derivative work of the excellent QuickFAQ component
  * @copyright (C) 2008 Christoph Lukes
  * see www.schlu.net for more information
@@ -45,89 +45,94 @@ class JFormFieldFields extends JFormField
 	* @var      string
 	*/
 	protected	$type = 'Fields';
-	
-	
+
+
 	function getInput()
 	{
 		static $non_orderable;
 		static $js_css_added = null;
-		if ( $js_css_added===null )
+
+		if ($js_css_added === null)
 		{
 			flexicontent_html::loadJQuery();
 			flexicontent_html::loadFramework('flexi-lib-form');
 			$js_css_added = true;
 		}
-		
+
 		$app  = JFactory::getApplication();
 		$doc	= JFactory::getDocument();
 		$db		= JFactory::getDbo();
 		$cparams = JComponentHelper::getParams('com_flexicontent');
-		
+
 		$node = & $this->element;
 		$attributes = get_object_vars($node->attributes());
 		$attributes = $attributes['@attributes'];
-		
-		
-		// *******************************************************************
-		// Option labels and option values (for the created SELECT form field)
-		// *******************************************************************
-		
+
+
+		/**
+		 * Option labels and option values (for the created SELECT form field)
+		 */
+
 		$fieldnameastext = (boolean) @ $attributes['fieldnameastext'];
 		$groupables = (boolean) @ $attributes['groupables'];
 		
+		// NOTE: ELSE should always be 'id', otherwise we break compatiblity with all previous FC versions !
 		$ovalue = ((boolean) @ $attributes['fieldnameasvalue']) ?
 			'name' :
-			'id' ;  // ELSE should always be THIS , otherwise we break compatiblity with all previous FC versions
-		
-		
-		// ******************************
-		// Field selection limiting FLAGs
-		// ******************************
-		
+			'id' ;
+
+
+		/**
+		 * Field selection limiting FLAGs
+		 */
+
 		$and = '';
-		
-		if ((boolean) @ $attributes['isnotcore'])
+
+		if ((boolean) $this->element['isnotcore'])
 		{
 			$and .= ' AND iscore = 0';
 		}
-		
-		$issearch = @ $attributes['issearch'];
+
+		$issearch = $this->element['issearch'];
 		if ( strlen($issearch) )
 		{
 			$and .= ' AND issearch='. (int)$issearch;
 		}
-		
-		$isadvsearch = @ $attributes['isadvsearch'];
+
+		$isadvsearch = $this->element['isadvsearch'];
+
 		if ( strlen($isadvsearch) )
 		{
 			$and .= ' AND isadvsearch='. (int)$isadvsearch;
 		}
-		
-		$isadvfilter = @ $attributes['isadvfilter'];
-		if ( strlen($isadvfilter) )
+
+		$isadvfilter = $this->element['isadvfilter'];
+
+		if (strlen($isadvfilter))
 		{
 			$and .= ' AND isadvfilter='. (int)$isadvfilter;
 		}
-		
+
 		// For 'Filters' type not set means value 1 otherwise means any ('*')
-		$isfilter = strlen(@$attributes['isfilter']) ?
-			(int) $attributes['isfilter'] :
-			($this->type=='Filters' ? 1 : '*');
-		if ( $isfilter!='*' )
+		$isfilter = $this->element['isfilter']
+			? (int) $attributes['isfilter']
+			: ($this->type === 'Filters' ? 1 : '*');
+
+		if ($isfilter !== '*')
 		{
 			$and .= ' AND isfilter='. (int)$isfilter;
 		}
-		
+
 		// For 'Filters' type not set means true otherwise false
 		$issortable = strlen(@$attributes['issortable']) ?
 			(boolean) $attributes['issortable'] :
 			($this->type=='Filters' ? true : false);
-		
-		
-		// ********************************
-		// INCLUDE/EXCLUDE some field types
-		// ********************************
-		
+
+
+		/**
+		 * INCLUDE/EXCLUDE some field types
+		 */
+
 		$field_type = (string) @ $attributes['field_type'];
 		if ( $field_type )
 		{
@@ -135,7 +140,7 @@ class JFormFieldFields extends JFormField
 			foreach($field_type as $i => $ft) $field_type_quoted[$i] = $db->Quote($ft);
 			$and .= ' AND field_type IN ('. implode(',', $field_type_quoted).')';
 		}
-		
+
 		$exclude_field_type = (string) @ $attributes['exclude_field_type'];
 		if ( $exclude_field_type )
 		{
@@ -143,42 +148,51 @@ class JFormFieldFields extends JFormField
 			foreach($exclude_field_type as $i => $ft) $exclude_field_type_quoted[$i] = $db->Quote($ft);
 			$and .= ' AND field_type NOT IN ('. implode(',', $exclude_field_type_quoted).')';
 		}
-		
+
 		// Limit to current type
-		$type_id_variable =  @$attributes['type_id_variable'];
-		$tid = 0;
-		if($type_id_variable)
+		$type_id_variable = $this->element['type_id_variable'];
+
+		if ($type_id_variable)
 		{
 			$tid = $app->input->get($type_id_variable);
-			$tid = is_array($tid) ? 
-				(int) reset($tid) :
-				(int) $tid ;
-			if ($tid) $and .= ' AND ftr.type_id=' . $tid;
+			$tid = is_array($tid)
+				? (int) reset($tid)
+				: (int) $tid ;
 		}
-		
+		else
+		{
+			$tid = 0;
+		}
+
+		if ($tid)
+		{
+			$and .= ' AND ftr.type_id = ' . (int) $tid;
+		}
+
 		// Orderable
-		$orderable = (int) @ $attributes['orderable'];
-		if ( $orderable && empty($non_orderable) )
+		$orderable = (int) $this->element['orderable'];
+
+		if ($orderable && empty($non_orderable))
 		{
 			$non_orderable1 = 'account_via_submit,authoritems,toolbar,image,groupmarker,fcpagenav,minigallery,weblink,email,fcloadmodule';
 			$non_orderable2 = trim($cparams->get('non_orderable_types', ''));
-			
+
 			$non_orderable = $non_orderable1.($non_orderable2 ? ','.$non_orderable2 : '');
 			$non_orderable = array_unique(preg_split("/[\s]*,[\s]*/", $non_orderable));
-			
+
 			$non_orderable = array_flip( $non_orderable);
 			unset($non_orderable['file']);  // always include 'file' fields in the orderable types
 			$non_orderable = array_flip( $non_orderable);
-			
+
 			foreach($non_orderable as $i => $ft) $non_orderable_quoted[$i] = $db->Quote($ft);
 			$and .= " AND field_type NOT IN (". implode(",", $non_orderable_quoted).")";
 		}
-		
-		
-		// **************************
-		// Retrieve field data for DB
-		// **************************
-		
+
+
+		/**
+		 * Retrieve field data for DB
+		 */
+
 		static $fields_q;
 		$query = 'SELECT f.'.$ovalue.' AS value, f.label, f.id, f.name'
 			.($groupables ? ', f.attribs' : '')
@@ -188,7 +202,7 @@ class JFormFieldFields extends JFormField
 			.$and
 			.' ORDER BY label ASC, id ASC'
 		;
-		
+
 		if ( !isset($fields_q[$query]) )
 		{
 			$db->setQuery($query);
@@ -196,8 +210,8 @@ class JFormFieldFields extends JFormField
 			$fields_q[$query] = $fields;
 		}
 		else $fields = $fields_q[$query];
-		
-		
+
+
 		// Get only fields that are configured to be in a fieldgroup (we will need to render parameters for this)
 		if ($groupables)
 		{
@@ -212,8 +226,8 @@ class JFormFieldFields extends JFormField
 			}
 			$fields = $_fields;
 		}
-		
-		
+
+
 		// Handle fields having the same label
 		$_keys = array_keys($fields);
 		$_total = count($fields);
@@ -226,12 +240,12 @@ class JFormFieldFields extends JFormField
 				$_dupls[ $key ] = $_dupls[ $_keys[$i+1] ] = 1;
 			}
 		}
-		
-		
-		// ***********************************
-		// Values, form field name and id, etc
-		// ***********************************
-		
+
+
+		/**
+		 * Values, form field name and id, etc
+		 */
+
 		$values = $this->value;
 		if ( empty($values) ) {
 			$values = array();
@@ -240,8 +254,8 @@ class JFormFieldFields extends JFormField
 			$values = preg_split("/[\s]*[\|,][\s]*/", $values);
 		}
 		//print_r($values);
-		
-		
+
+
 		$v2f = array();
 		$options = array();
 		foreach($fields as $field)
@@ -253,12 +267,12 @@ class JFormFieldFields extends JFormField
 			$field->option_text = & $option->text;
 			$v2f[$field->value] = $field;
 		}
-		
-		
-		// *******************************************
-		// HTML Tag parameters parameters, and styling
-		// *******************************************
-		
+
+
+		/**
+		 * HTML Tag parameters parameters, and styling
+		 */
+
 		if ($issortable)
 		{
 			$element_id = $this->id.'_selector';
@@ -271,58 +285,59 @@ class JFormFieldFields extends JFormField
 			$fieldname  = $this->name;
 			$element_id = $this->id;
 		}
-		
+
 		$classes = (string) @ $attributes['class'];
-		
+
 		$attribs = ' style="float:left;" ';
-		
+
 		if ( @$attributes['multiple']=='multiple' || @$attributes['multiple']=='true' )
 		{
 			$attribs .= ' multiple="multiple" ';
 			$attribs .= (@$attributes['size']) ? ' size="'.$attributes['size'].'" ' : ' size="6" ';
 		}
-		
-		else {
-			
+
+		else
+		{
 			if ((boolean) @ $attributes['display_useglobal'] && !$issortable)
 			{
 				array_unshift($options, JHtml::_('select.option', '' , '- '.JText::_('FLEXI_USE_GLOBAL').' -'));
 				array_unshift($options, JHtml::_('select.option', '0', '- '.JText::_('FLEXI_NOT_SET').' -'));   // Compatibility with older FC versions
 			}
-			
+
 			else
 			{
 				$custom_prompt = (string) @ $attributes['custom_prompt'];
 				$custom_prompt = JText::_($custom_prompt ? $custom_prompt : 'FLEXI_PLEASE_SELECT');
 				$custom_value = isset($attributes['custom_value']) ? (string) @ $attributes['custom_value'] : ($issortable ? '' : '0');
-				
+
 				array_unshift($options, JHtml::_('select.option', $custom_value, '- '.$custom_prompt.' -'));
 			}
 		}
-		
+
 		$sorter_html = $tip_text = '';
 		if ($onchange = @$attributes['onchange'])
 		{
 			$control_name = str_replace($attributes['name'], '', $this->id);
 			$onchange = str_replace('{control_name}', $control_name, $onchange);
 		}
-		
-		else if ($appendtofield = @$attributes['appendtofield'])
+
+		elseif ($appendtofield = @$attributes['appendtofield'])
 		{
 			$appendtofield = 'jform_attribs_'.$appendtofield;
 			$onchange = 'fcfield_add2list(\''.$appendtofield.'\', this);';
 		}
-		
+
 		if ($issortable)
 		{
 			$sortable_id = 'sortable-'.$element_id_sorter;
-			
+
 			$onchange .= ' return fcfield_add_sortable_element(this);';
 			$classes .= ' records_container fcfields_sorter';
 			$sorter_html  = '
 			<div class="fcclear"></div>
 			<div class="'.$classes.'">
 				<ul id="'.$sortable_id.'" class="fcrecords fcfields_list">';
+
 			foreach($values as $val)
 			{
 				if( !isset($v2f[$val]) ) continue;
@@ -337,10 +352,10 @@ class JFormFieldFields extends JFormField
 				<input type="text" id="'.$element_id_sorter.'" name="'.$fieldname_sorter.'" value="'.implode(',', $values).'" class="fc_hidden_value" />
 			</div>
 			<div class="fcclear"></div>';
-			
+
 			$js = "";
 			if ($js) JFactory::getDocument()->addScriptDeclaration($js);
-			
+
 			$attribs .= ' class="use_select2_lib" ';
 			flexicontent_html::loadFramework('select2');
 		}
@@ -348,12 +363,12 @@ class JFormFieldFields extends JFormField
 		{
 			$attribs .= ' class="'.$classes.'" ';
 		}
-		
+
 		if ($onchange)
 		{
 			$attribs .= ' onchange="'.$onchange.'"';
 		}
-		
+
 		if ($inline_tip = @$attributes['inline_tip'])
 		{
 			$tip_img = @$attributes['tip_img'];
@@ -366,23 +381,22 @@ class JFormFieldFields extends JFormField
 			$previewimage = $preview_img ? JHtml::image ( 'administrator/components/com_flexicontent/assets/images/'.$preview_img, JText::_( 'FLEXI_NOTES' ), ' style="vertical-align:middle; max-height:24px; padding:0px; margin:0 0 0 12px;" ' ) : '';
 			$tip_text = '<span class="'.$tip_class.'" style="float:left;" title="'.flexicontent_html::getToolTip(null, $inline_tip, 1, 1).'">'.$hintmage.$previewimage.'</span>';
 		}
-		
-		
-		// ***********************
-		// Create the field's HTML
-		// ***********************
-		
+
+
+		/**
+		 * Create the field's HTML
+		 */
+
 		return ($issortable ? '
 		<div class="container_fcfield-inner">
 			' : '').
-			
+
 			JHtml::_('select.genericlist', $options, $fieldname, $attribs, 'value', 'text', ($issortable ? array() : $values), $element_id).'
 			'.$tip_text.'
 			'.$sorter_html
-		
+
 		.($issortable ? '
 		</div>
 		' : '');
 	}
 }
-?>

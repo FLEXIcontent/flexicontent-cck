@@ -3730,7 +3730,7 @@ class FlexicontentFields
 			'isSearchView' => $isSearchView,
 		);
 
-		$layouts_path = null;
+		$layouts_path = JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'layouts';
 
 		$filter->html = '';
 
@@ -3745,13 +3745,13 @@ class FlexicontentFields
 		{
 			switch ($display_filter_as)
 			{
-				case 0: case 2: case 6:  // 0: Select (single value selectable), 2: Dual select (value range), 6: Multi Select (multiple values selectable)
-
+				// 0: Select (single value selectable), 2: Dual select (value range), 6: Multi Select (multiple values selectable)
+				case 0: case 2: case 6:
 					echo JLayoutHelper::render('items_list_filters.select_selectmul', $displayData, $layouts_path);
 					break;
 
-				case 1: case 3: case 7: case 8: // (TODO: autocomplete) ... 1: Text input, 3: Dual text input (value range), both of these can be JS date calendars, 7: Slider, 8: Slider range
-
+				// (TODO: autocomplete) ... 1: Text input, 3: Dual text input (value range), both of these can be JS date calendars, 7: Slider, 8: Slider range
+				case 1: case 3: case 7: case 8:
 					echo JLayoutHelper::render('items_list_filters.txtsearch_date_slider', $displayData, $layouts_path);
 					break;
 
