@@ -58,7 +58,15 @@ class plgSystemFlexisystem extends JPlugin
 		$this->cparams = JComponentHelper::getParams($this->extension);
 
 		// Temporary workaround until code is updated
-		if (FLEXI_J40GE) JFactory::getDbo()->setQuery("SET sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''))")->execute();
+		if (FLEXI_J40GE)
+		{
+			//JFactory::getDbo()->setQuery("SET sql_mode=''")->execute();
+
+			JFactory::getDbo()->setQuery(
+				"SET sql_mode=(SELECT REPLACE(REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''),'STRICT_TRANS_TABLES',''))"
+			)->execute();
+
+		}
 	}
 	
 	

@@ -260,7 +260,24 @@ div.adminthumbs.fcmanthumbs {
 .flexicontent #fc-filters-box {
 	padding-right: 0px;
 }
-
+//.flexicontent #fc-mini-help,
+.flexicontent #fc-filters-box.fcman-abs,
+.flexicontent #mainChooseColBox.fcman-abs {
+	position: absolute;
+	box-shadow: 2px 2px 6px black;
+	background: #fff;
+	z-index: 100;
+	right: 0;
+	top: 100%;
+}
+.flexicontent #mainChooseColBox > #mainChooseColBox_cols {
+	display: inline-block;
+}
+.flexicontent #mainChooseColBox > #mainChooseColBox_cols > * {
+	display: inline-block;
+	float: right;
+	clear: both;
+}
 #flexicontent input.fcitem_order_no {
 	text-align: center;
 }
@@ -281,22 +298,30 @@ div.adminthumbs.fcmanthumbs {
 		padding: 3px 6px !important;
 	}
 
-	.fc-filter {
+	.fc-filter-head-box {
 		vertical-align: baseline !important;
 		border: 0px !important;
 		padding: 0px !important;
 		margin: 2px 0 6px 24px;
+		width: unset;
 
 		.label {
 			font-size: 11px;
 			padding: 4px 4px;
 			margin: 0px 4px;
 		}
-		.input-append {
-			margin: 0px;
+
+		.input-group-append,
+		.input-group-prepend,
+		.input-append,
+		.input-prepend {
+			margin: 0px;  /* do not set font-size !*/
+
+			> * {
+				display: inline-block;
+			}
 		}
 	}
-
 }
 
 
@@ -305,121 +330,150 @@ div.adminthumbs.fcmanthumbs {
 // *** Filters box
 // ***
 
-/* Filters close button */
-.flexicontent #fc-filters-box #fc-filters-slide-btn {
-	width: 100%;
-	display: inline-block;
-	box-sizing: border-box;
-	margin: 8px 0 0 0;
-	height: 24px;
-	padding: 4px;
-	float: none;
-	clear: both;
+.flexicontent #fc-filters-box {
+
+	/* Filters close button */
+	#fc-filters-slide-btn {
+		width: 100%;
+		display: inline-block;
+		box-sizing: border-box;
+		margin: 8px 0 0 0;
+		height: 24px;
+		padding: 4px;
+		float: none;
+		clear: both;
+	}
+
+	/* Icons customization */
+	[class^="icon-arrow-"] {
+		vertical-align: middle;
+		font-size: 18px;
+	}
+
+
+	/* Filter container */
+	.fc-filter {
+		border: 0px solid;
+		margin: 4px 2px 4px 2px;
+		padding: 0px;
+		vertical-align: top;
+		min-width: 310px;
+		min-height: 30px;
+		float: none;
+		display: block;
+
+		/* Filter container (double size) */
+		&.fc-filter-double {
+			min-width: 628px;
+
+			.select2-container .select2-choice {
+				width: 482px !important;
+			}
+			.select2-container-multi {
+				width: 490px !important;
+			}
+		}
+
+		/* Filter labels */
+		.fc-xpended-row .input-group-text:first-child,
+		.fc-xpended-row .add-on:first-child {
+			min-width: 128px;
+			max-width: 128px;
+			white-space: normal;    /* allow wrap */
+			word-wrap: break-word;  /* allow wrap */
+			text-align: right;
+			display: inline-block;
+		}
+		.fc-xpended-row .add-on,
+		.fc-xpended .add-on {
+			color: black;  /* because we place inside a ... btn ... */
+		}
+
+
+		// ***
+		// *** Specific Filter cases
+		// ***
+
+		#s2id_date.select2-container.use_select2_lib .select2-choice {
+			width: 90px !important;
+			min-width: 90px !important;
+		}
+		#s2id_date.select2-container.use_select2_lib .select2-choice .select2-arrow {
+			border-radius: 0px !important;
+		}
+		#startdate_img,
+		#enddate_img {
+			padding-right: 2px !important;
+			padding-left: 2px !important;
+		}
+		#startdate_btn,
+		#enddate_btn {
+			font-size: 14px !important;
+			height: 28px !important;
+			padding: 2px 4px !important;
+			box-sizing: border-box;
+		}
+		#startdate_btn {
+			border-radius: 0;
+		}
+		#startdate,
+		#enddate {
+			font-size: 11px !important;
+			min-width: 76px;
+			max-width: 76px;
+			height: 16px !important;
+			padding: 13px 8px !important;
+			box-sizing: border-box;
+		}
+	}
 }
-
-/* Filter container */
-.flexicontent #fc-filters-box .fc-filter {
-	border: 0px solid;
-	margin: 4px 2px 4px 2px;
-	padding: 0px;
-	vertical-align: top;
-	min-width: 310px;
-	min-height: 30px;
-	float: none;
-}
-.flexicontent #fc-filters-box .fc-filter.fc-filter-double {
-	min-width: 628px;
-}
-
-
-
-// ***
-// *** Specific Filter cases
-// ***
-
-.flexicontent #fc-filters-box .fc-filter {
-	#s2id_date.select2-container.use_select2_lib.fc_skip_highlight .select2-choice {
-		width: 90px !important;
-		min-width: 90px !important;
-	}
-	#startdate_img,
-	#enddate_img {
-		padding-right: 2px !important;
-		padding-left: 2px !important;
-	}
-	#startdate,
-	#enddate {
-		font-size: 11px !important;
-		min-width: 57px;
-		max-width: 57px;
-	}
-	.fc-xpended-row .add-on:first-child {
-		min-width: 120px;
-		max-width: 120px;
-		white-space: normal;    /* allow wrap */
-		word-wrap: break-word;  /* allow wrap */
-		text-align: left;
-	}
-	.fc-xpended .add-on:first-child {
-	}
-}
-
 
 
 // ***
 // *** Filters
 // ***
  
-/* First level childs */
-.flexicontent #fc-filters-box .fc-filter > * {
-	vertical-align: middle !important;
-	float: right;
-	margin: 0 !important;
-}
-.flexicontent #fc-filters-box .fc-filter > *:not(.fc-xpended):not(.fc-xpended-row) {
-	margin: 0 6px 0 2px !important;
-}
-.flexicontent #fc-filters-box .fc-filter [class^="fc-xpended"] > div.select2-container .select2-choice > .select2-chosen,
-.flexicontent #fc-filters-box .fc-filter [class*="fc-xpended"] > div.select2-container .select2-choice > .select2-chosen {
-	white-space: nowrap !important;
-}
-.flexicontent #fc-filters-box .fc-filter .label {
-	font-size: 11px;
-	padding: 4px 4px;
-	margin: 0px 4px;
-}
-
-
 /* Increase max height of select2 drop downs */
 .admin.com_flexicontent .select2-drop .select2-results {
 	max-height: 400px !important;
 }
 
 
-.flexicontent #fc-filters-box .fc-filter.fc-filter-double  {
-	.select2-container .select2-choice {
-		width: 482px !important;
-	}
-	.select2-container-multi {
-		width: 490px !important;
-	}
-}
+
 .flexicontent #fc-filters-box .fc-filter {
+	/* First level childs */
+	> * {
+		vertical-align: middle !important;
+		float: right;
+		margin: 0 !important;
+	}
+	> *:not(.fc-xpended):not(.fc-xpended-row) {
+		margin: 0 6px 0 2px !important;
+	}
+
+	[class^="fc-xpended"] div.select2-container .select2-choice > .select2-chosen,
+	[class*="fc-xpended"] div.select2-container .select2-choice > .select2-chosen {
+		white-space: nowrap !important;
+	}
+
+	.label {
+		font-size: 11px;
+		padding: 4px 4px;
+		margin: 0px 4px;
+	}
+
 	*:not(.input-append):not(.input-prepend) > input[type="text"] {
 		padding: 2px 2px 3px !important;
 		margin: 0px !important;
 	}
-	.input-append,
-	.input-prepend {
-		margin: 0px;  /* do not set font-size !*/
-	}
+
 	.field-calendar > div > button {
 		width: 25px;
 		padding-left: 0;
 		padding-right: 4px;
 	}
-	.input-prepend > .add-on + input,
-	.input-append > .add-on + input {
+	.input-group-prepend > .input-group-text + input,
+	.input-prepend > .add-on + input {
 		width: 160px !important;
 	}
 	.input-prepend > input,
@@ -470,14 +524,6 @@ div.adminthumbs.fcmanthumbs {
 			}
 		}
 	}
-}
-
-
-/* some icons customization */
-
-.flexicontent #fc-filters-box [class^="icon-arrow-"] {
-	vertical-align: middle;
-	font-size: 18px;
 }
 
 
@@ -1147,6 +1193,9 @@ img.btn.btn-small.fc-man-icon-s {
 	th :not(.btn-group) > [class^="icon-"],
 	th :not(.btn-group) > [class*="icon-"] {
 		font-size: 14px;
+	}
+	.col_template, .col_alias {
+		font-family: verdana;
 	}
 
 	// Some defaults for buttons inside backend lists

@@ -39,4 +39,42 @@ class FlexicontentViewBaseRecords extends JViewLegacy
 	var $ina_grp_class = FLEXI_J40GE ? 'input-group' : 'input-append';
 	var $inp_grp_class = FLEXI_J40GE ? 'input-group' : 'input-prepend';
 	var $select_class  = FLEXI_J40GE ? 'use_select2_lib' : 'use_select2_lib';
+	//var $txt_grp_class = FLEXI_J40GE ? 'input-group-text' : 'add-on';
+	
+	public function getFilterDisplay($filter)
+	{
+		$label_extra_class = isset($filter['label_extra_class']) ? $filter['label_extra_class'] : '';
+		$label_extra_attrs = isset($filter['label_extra_attrs']) ? ArrayHelper::toString($filter['label_extra_attrs']) : '';
+
+		if (!FLEXI_J40GE)
+		{
+			$label = $filter['label']
+				? '<div class="add-on ' . $label_extra_class .'" ' . $label_extra_attrs .'>' . $filter['label'] . '</div>'
+				: '';
+			return '
+				<div class="fc-filter nowrap_box">
+					<div class="input-prepend input-append fc-xpended-row">
+						' . $label . '
+						' . $filter['html'] . '
+					</div>
+				</div>
+			';
+		}
+		else
+		{
+			$label = $filter['label']
+				? '<div class="input-group-text ' . $label_extra_class .'" ' . $label_extra_attrs .'>' . $filter['label'] . '</div>'
+				: '';
+			return '
+				<div class="fc-filter nowrap_box">
+					<div class="input-group fc-xpended-row">
+						<div class="input-group-prepend">
+						' . $label . '
+							' . $filter['html'] . '
+						</div>
+					</div>
+				</div>
+			';
+		}
+	}
 }

@@ -294,4 +294,33 @@ abstract class JHtmlFcitems
 			'</a>';
 		}
 	}
+
+
+	/**
+	 * Method to create a checkbox for a grid row.
+	 *
+	 * @param   integer  $rowNum      The row index
+	 * @param   integer  $recId       The record id
+	 * @param   boolean  $checkedOut  True if item is checked out
+	 * @param   string   $name        The name of the form element
+	 * @param   string   $stub        The name of stub identifier
+	 * @param   string   $title       The name of the item
+	 *
+	 * @return  mixed    String of html with a checkbox if item is not checked out, null if checked out.
+	 *
+	 * @since   3.3
+	 */
+	public static function grid_id($rowNum, $recId, $checkedOut = false, $name = 'cid', $stub = 'cb', $title = '')
+	{
+		if ($checkedOut)
+		{
+			return '';
+		}
+
+		return '
+			<div class="group-fcset">
+				<input type="checkbox" id="' . $stub . $rowNum . '" name="' . $name . '[]" value="' . $recId . '" onclick="Joomla.isChecked(this.checked);">
+				<label for="' . $stub . $rowNum . '"><span class="sr-only">' . JText::_('JSELECT') . ' ' . htmlspecialchars($title, ENT_COMPAT, 'UTF-8') . '</span></label>
+			</div>';
+	}
 }
