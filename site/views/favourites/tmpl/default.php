@@ -69,7 +69,7 @@ if ($menu) $page_classes .= ' menuitem'.$menu->id;
 
 <!-- BOF buttons -->
 <?php
-if (JRequest::getCmd('print')) {
+if (JFactory::getApplication()->input->getInt('print', 0)) {
 	if ($this->params->get('print_behaviour', 'auto') == 'auto') : ?>
 		<script type="text/javascript">jQuery(document).ready(function(){ window.print(); });</script>
 	<?php	elseif ($this->params->get('print_behaviour') == 'button') : ?>

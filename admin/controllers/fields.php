@@ -813,10 +813,19 @@ class FlexicontentControllerFields extends FlexicontentController
 
 		$user  = JFactory::getUser();
 		$model = $this->getModel('fields');
-
-		$cid = $this->input->get('cid', array(0), 'array');
-		$field_id = (int) $cid[0];
 		$task  = $this->input->get('task', '', 'cmd');
+
+		$cid   = $this->input->get('cid', array(), 'array');
+		ArrayHelper::toInteger($cid);
+
+		// *** Check at least one item was selected
+		if (!count($cid))
+		{
+			$app->enqueueMessage(JText::_('FLEXI_NO_ITEMS_SELECTED'), 'error');
+			$app->redirect($this->returnURL);
+		}
+
+		$field_id = reset($cid);
 
 		// Calculate access
 		$asset = 'com_flexicontent.field.' . $field_id;
@@ -831,7 +840,7 @@ class FlexicontentControllerFields extends FlexicontentController
 			return;
 		}
 
-		$accesses	= $this->input->getArray('access', array(0));
+		$accesses	= $this->input->get('access', array(), 'array');
 		$access = $accesses[$field_id];
 
 		if (!$model->saveaccess($field_id, $access))

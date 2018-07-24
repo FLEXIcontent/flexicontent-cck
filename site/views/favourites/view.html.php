@@ -5,7 +5,7 @@
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
  * @license GNU/GPL v2
- * 
+ *
  * FLEXIcontent is a derivative work of the excellent QuickFAQ component
  * @copyright (C) 2008 Christoph Lukes
  * see www.schlu.net for more information
@@ -39,43 +39,44 @@ class FlexicontentViewFavourites extends JViewLegacy
 	{
 		//initialize variables
 		$app      = JFactory::getApplication();
-		$jinput   = JFactory::getApplication()->input;
+		$jinput   = $app->input;
 
-		$view   = $jinput->get('view', '', 'cmd');
+		$option   = $jinput->getCmd('option', '');
+		$view     = $jinput->getCmd('view', '');
 
 		$document = JFactory::getDocument();
 		$menus    = $app->getMenu();
 		$menu     = $menus->getActive();
 		$uri      = JUri::getInstance();
-		
+
 		// Get view's Model
 		$model  = $this->getModel();
-		
+
 		// Get parameters via model
 		$params  = $model->getParams();
-		
+
 
 
 		// ***
 		// *** Get data from the model
 		// ***
-		
+
 		$items   = $this->get('Data');
 		$total   = $this->get('Total');
-		
-		
+
+
 		// ***
 		// *** Bind Fields to items and RENDER their display HTML, but check for document type, due to Joomla issue with system
 		// *** plugins creating JDocument in early events forcing it to be wrong type, when format as url suffix is enabled
 		// ***
-		
+
 		$items 	= FlexicontentFields::getFields($items, $view, $params);
-		
-		
+
+
 		// ************************************************************************
 		// Calculate CSS classes needed to add special styling markups to the items
 		// ************************************************************************
-		
+
 		flexicontent_html::calculateItemMarkups($items, $params);
 
 
@@ -96,8 +97,8 @@ class FlexicontentViewFavourites extends JViewLegacy
 		{
 			$document->addStyleSheetVersion($this->baseurl.'/templates/'.$app->getTemplate().'/css/flexicontent.css', FLEXI_VHASH);
 		}
-		
-		
+
+
 		// **********************************************************
 		// Calculate a (browser window) page title and a page heading
 		// **********************************************************
@@ -137,7 +138,7 @@ class FlexicontentViewFavourites extends JViewLegacy
 
 			// Calculate default page heading (=called page title in J1.5), which in turn will be document title below !! ...
 			// meta_params->get('page_title') is meant for <title> but let's use as ... default page heading
-			$default_heading = JText::_( 'FLEXI_YOUR_FAVOURED_ITEMS' );
+			$default_heading = JText::_('FLEXI_YOUR_FAVOURED_ITEMS');
 
 			// Decide to show page heading (=J1.5 page title), this is always yes
 			$show_default_heading = 1;
@@ -155,16 +156,16 @@ class FlexicontentViewFavourites extends JViewLegacy
 			$params->set('show_page_heading', 0);
 			$params->set('show_page_title',   0);
 		}
-		
-		
-		
+
+
+
 		// ************************************************************
 		// Create the document title, by from page title and other data
 		// ************************************************************
-		
+
 		// Use the page heading as document title, (already calculated above via 'appropriate' logic ...)
 		$doc_title = $params->get( 'page_title' );
-		
+
 		// Check and prepend or append site name to page title
 		if ( $doc_title != $app->getCfg('sitename') ) {
 			if ($app->getCfg('sitename_pagetitles', 0) == 1) {
@@ -174,19 +175,19 @@ class FlexicontentViewFavourites extends JViewLegacy
 				$doc_title = JText::sprintf('JPAGETITLE', $doc_title, $app->getCfg('sitename'));
 			}
 		}
-		
+
 		// Finally, set document title
 		$document->setTitle($doc_title);
-		
-		
+
+
 		// ************************
 		// Set document's META tags
 		// ************************
-		
+
 		// Workaround for Joomla not setting the default value for 'robots', so component must do it
 		$app_params = $app->getParams();
 		if (($_mp=$app_params->get('robots')))    $document->setMetadata('robots', $_mp);
-		
+
 		// Overwrite with menu META data if menu matched
 		if ($menu_matches) {
 			if (($_mp=$menu->params->get('menu-meta_description')))  $document->setDescription( $_mp );
@@ -194,27 +195,27 @@ class FlexicontentViewFavourites extends JViewLegacy
 			if (($_mp=$menu->params->get('robots')))                 $document->setMetadata('robots', $_mp);
 			if (($_mp=$menu->params->get('secure')))                 $document->setMetadata('secure', $_mp);
 		}
-		
+
 		// Disable features, that are not supported by the view
 		$params->set('use_filters',0);
 		$params->set('show_alpha',0);
 		$params->set('clayout_switcher',0);
-		
+
 		$lists = array();
-		
+
 		//ordering
 		$lists['filter_order']     = $jinput->get('filter_order', 'i.title', 'cmd');
 		$lists['filter_order_Dir'] = $jinput->get('filter_order_Dir', 'ASC', 'cmd');
 		$lists['filter']           = $jinput->get('filter', '', 'string');
-		
-		
-		
+
+
+
 		// ***
 		// *** Create the pagination object
 		// ***
-		
+
 		$pageNav = $this->get('pagination');
-		
+
 		$_revert = array('%21'=>'!', '%2A'=>'*', '%27'=>"'", '%28'=>'(', '%29'=>')');
 		foreach($_GET as $i => $v)
 		{
@@ -242,22 +243,32 @@ class FlexicontentViewFavourites extends JViewLegacy
 			// Make sure all URL variables are added to the pagination URLs
 			else
 			{
-				$pageNav->setAdditionalUrlParam($i, $v);
+				if (is_array($v))
+				{
+					foreach($v as $ii => &$vv)
+					{
+						$pageNav->setAdditionalUrlParam($i.'['.$ii.']', $vv);
+					}
+				}
+				else
+				{
+					$pageNav->setAdditionalUrlParam($i, $v);
+				}
 			}
 		}
-		
+
 		$_sh404sef = defined('SH404SEF_IS_RUNNING') && JFactory::getConfig()->get('sef');
 		if ($_sh404sef) $pageNav->setAdditionalUrlParam('limit', $model->getState('limit'));
-		
+
 		// Create links, etc
 		$link = JRoute::_(FlexicontentHelperRoute::getFavsRoute(0, $menu_matches ? $menu->id : 0));
-		
+
 		//$print_link = JRoute::_('index.php?view=favourites&pop=1&tmpl=component');
 		$curr_url   = str_replace('&', '&amp;', $_SERVER['REQUEST_URI']);
 		$print_link = $curr_url .(strstr($curr_url, '?') ? '&amp;'  : '?').'pop=1&amp;tmpl=component&amp;print=1';
-		
+
 		$pageclass_sfx = htmlspecialchars($params->get('pageclass_sfx'));
-		
+
 		$this->action = $link;  // $uri->toString()
 		$this->print_link = $print_link;
 		$this->items = $items;
@@ -265,12 +276,12 @@ class FlexicontentViewFavourites extends JViewLegacy
 		$this->params = $params;
 		$this->pageNav = $pageNav;
 		$this->pageclass_sfx = $pageclass_sfx;
-		
+
 		$print_logging_info = $params->get('print_logging_info');
 		if ( $print_logging_info ) { global $fc_run_times; $start_microtime = microtime(true); }
-		
+
 		parent::display($tpl);
-		
+
 		if ( $print_logging_info ) @$fc_run_times['template_render'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 	}
 }

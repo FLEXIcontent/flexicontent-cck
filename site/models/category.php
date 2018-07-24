@@ -1182,7 +1182,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 
 		// Text search relevance [title] or [title, search index]
 		$filter_word_relevance_order = (int) $this->_params->get('filter_word_relevance_order', 1);
-		
+
 		if ($phrase === null)
 		{
 			$default_searchphrase = $this->_params->get('default_searchphrase', 'all');
@@ -1371,7 +1371,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		if ($filters) foreach ($filters as $filter)
 		{
 			// Get filter values, setting into appropriate session variables
-			$filt_vals = $app->input->get('filter_' . $filter->id, '', 'array');
+			$filt_vals = $app->input->getString('filter_' . $filter->id);
 
 			// Skip filters without value
 			if (is_array($filt_vals))
@@ -1391,7 +1391,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 			}
 			else
 			{
-				$is_empty = !is_array($filt_vals) && !strlen(trim($filt_vals));
+				$is_empty = !strlen(trim($filt_vals));
 			}
 
 			if (!$filter->parameters->get('allow_filtering_empty', 0) && $is_empty)

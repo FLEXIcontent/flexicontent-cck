@@ -134,11 +134,10 @@ class FlexicontentControllerCategories extends JControllerAdmin
 
 		$cid = $this->input->get('cid', array(), 'array');
 		ArrayHelper::toInteger($cid);
-		$msg = '';
 
-		if (!is_array($cid) || count($cid) < 1)
+		// *** Check at least one item was selected
+		if (!count($cid))
 		{
-			// No category selected
 			$warnings_arr = array(
 				1 => 'FLEXI_SELECT_ITEM_PUBLISH',
 				0 => 'FLEXI_SELECT_ITEM_UNPUBLISH',
@@ -254,11 +253,10 @@ class FlexicontentControllerCategories extends JControllerAdmin
 
 		$cid = $this->input->get('cid', array(), 'array');
 		ArrayHelper::toInteger($cid);
-		$msg = '';
 
-		if (!is_array($cid) || count($cid) < 1)
+		// *** Check at least one item was selected
+		if (!count($cid))
 		{
-			// No category selected
 			$app->setHeader('status', '500', true);
 			$this->setRedirect('index.php?option=com_flexicontent&view=categories', JText::_('FLEXI_SELECT_ITEM_DELETE'), 'warning');
 
@@ -329,19 +327,20 @@ class FlexicontentControllerCategories extends JControllerAdmin
 
 		$cid = $this->input->get('cid', array(), 'array');
 		ArrayHelper::toInteger($cid);
-		$id = (int) $cid[0];
 
-		if (!is_array($cid) || count($cid) < 1)
+		// *** Check at least one item was selected
+		if (!count($cid))
 		{
-			// No category selected
 			$app->setHeader('status', '500', true);
 			$this->setRedirect('index.php?option=com_flexicontent&view=categories', JText::_('FLEXI_NO_ITEMS_SELECTED'), 'warning');
 
 			return;
 		}
 
+		$id = reset($cid);
+
 		// Get new category access
-		$accesses = $this->input->get('access', array(0), 'array');
+		$accesses = $this->input->get('access', array(), 'array');
 		ArrayHelper::toInteger($accesses);
 		$access = $accesses[$id];
 

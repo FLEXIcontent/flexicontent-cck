@@ -51,74 +51,88 @@ $joomla_image_path = $joomla_image_path ? $joomla_image_path.DS : '';
 $joomla_image_url  = $joomla_image_url  ? $joomla_image_url.'/' : '';
 
 // Get the directory menu parameters 
-$cols = JRequest::getVar('columns_count',false);
-if(!$cols) $cols = $this->params->get('columns_count',1);
+$cols = $app->input->getInt('columns_count', 0);
+$cols = $cols ?: (int) $this->params->get('columns_count', 1);
 
 // If 0 blocks for col, divide equally between columns
-$items_per_column = round(count($this->categories)/$cols);
+$items_per_column = round(count($this->categories) / $cols);
 
-$c1 = $this->params->get('column1',false);
-if(!$c1) $c1 = $items_per_column;
-$c2 = $this->params->get('column2',false);
-if(!$c2) $c2 = $items_per_column;
-$c3 = $this->params->get('column3',false);
-if(!$c3) $c3 = $items_per_column;
+$c1 = (int) $this->params->get('column1', 0);
+$c2 = (int) $this->params->get('column2', 0);
+$c3 = (int) $this->params->get('column3', 0);
+
+$c1 = $c1 ?: $items_per_column;
+$c2 = $c2 ?: $items_per_column;
+$c3 = $c3 ?: $items_per_column;
+
 $i = 0;
 
 $condition1	= $condition2	= $condition3	= $style = '';
 switch ($cols) 
 {
-	case 1 :
-	$condition1	= '';
-	$condition2	= '';
-	$condition3	= '';
-	$style		= ' style="width:100%;"';
-	break;
+	case 1:
+		$condition1	= '';
+		$condition2	= '';
+		$condition3	= '';
+		$style		= ' style="width:100%;"';
+		break;
 
-	case 2 :
-	$condition1	= $c1;
-	$condition2	= '';
-	$condition3	= '';
-	$style		= ' style="width:49%;"';
-	break;
+	case 2:
+		$condition1	= $c1;
+		$condition2	= '';
+		$condition3	= '';
+		$style		= ' style="width:49%;"';
+		break;
 
-	case 3 :
-	$condition1	= $c1;
-	$condition2	= ($c1+$c2);
-	$condition3	= '';
-	$style		= ' style="width:32%;"';
-	break;
+	case 3:
+		$condition1	= $c1;
+		$condition2	= ($c1+$c2);
+		$condition3	= '';
+		$style		= ' style="width:32%;"';
+		break;
 
-	case 4 :
-	$condition1	= $c1;
-	$condition2	= ($c1+$c2);
-	$condition3	= ($c1+$c2+$c3);
-	$style		= ' style="width:24%;"';
-	break;
+	case 4:
+		$condition1	= $c1;
+		$condition2	= ($c1+$c2);
+		$condition3	= ($c1+$c2+$c3);
+		$style		= ' style="width:24%;"';
+		break;
 }
 ?>
 
 <div class="fccatcolumn "<?php echo $style; ?>>
 <?php foreach ($this->categories as $cat) : ?>
 
-  <?php
-	if (FLEXI_J16GE && !is_object($cat->params) ) $cat->params = new JRegistry($cat->params);
-  if ($this->params->get('hide_empty_cats')) {
-    $subcats_are_empty = 1;
-    if (!$cat->assigneditems) foreach($cat->subcats as $subcat) {
-      if ($subcat->assignedcats || $subcat->assignedsubitems) {
-        $subcats_are_empty = 0;
-        break;
-      }
-    } else {
-      $subcats_are_empty = 0;
-    }
-    if ($subcats_are_empty) continue;
-  }
-  ?>
+	<?php
+	if (!is_object($cat->params))
+	{
+		$cat->params = new JRegistry($cat->params);
+	}
+
+	if ($this->params->get('hide_empty_cats'))
+	{
+		$subcats_are_empty = 1;
+		if (!$cat->assigneditems)
+		{
+			foreach($cat->subcats as $subcat)
+			{
+	      if ($subcat->assignedcats || $subcat->assignedsubitems)
+				{
+					$subcats_are_empty = 0;
+					break;
+				}
+			}
+		}
+		else
+		{
+			$subcats_are_empty = 0;
+		}
+		if ($subcats_are_empty) continue;
+	}
+	?>
 
 <div class="floattext">
-    
+
 	<h2 class="fccat_title_box cat<?php echo $cat->id; ?>">
 		<?php echo $cat_link_title ? '<a class="fccat_title" href="'.JRoute::_( FlexicontentHelperRoute::getCategoryRoute($cat->slug) ).'">' : '<span class="fccat_title">'; ?>
 			
@@ -197,11 +211,18 @@ switch ($cols)
 		
 		<?php foreach ($cat->subcats as $subcat) : ?>
 			<?php
-			if (FLEXI_J16GE && !is_object($subcat->params) ) $subcat->params = new JRegistry($subcat->params);
-			$oddeven = $oddeven=='even' ? 'odd' : 'even';
+			if (!is_object($subcat->params))
+			{
+				$subcat->params = new JRegistry($subcat->params);
+			}
+
+			$oddeven = $oddeven === 'even'
+				? 'odd'
+				: 'even';
 			
-			if ($hide_empty_subcats) {
-				if (!$subcat->assignedcats && !$subcat->assignedsubitems) continue;
+			if ($hide_empty_subcats && !$subcat->assignedcats && !$subcat->assignedsubitems)
+			{
+				continue;
 			}
 			?>
 		

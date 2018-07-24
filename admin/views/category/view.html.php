@@ -436,11 +436,6 @@ class FlexicontentViewCategory extends JViewLegacy
 				.$js.
 			'});');
 		}
-		
-		
-		// Get editor instance
-		$editor_name = $user->getParam('editor', $app->getCfg('editor'));
-		$editor  = JFactory::getEditor($editor_name);
 
 
 		// ***
@@ -452,7 +447,6 @@ class FlexicontentViewCategory extends JViewLegacy
 		$this->row      = $row;
 		$this->form     = $form;
 		$this->perms    = $perms;
-		$this->editor   = $editor;
 		$this->tmpls    = $tmpls;
 		$this->cparams  = $cparams;
 		$this->iparams  = $iparams;

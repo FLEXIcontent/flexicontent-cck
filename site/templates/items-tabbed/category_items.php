@@ -354,7 +354,7 @@ foreach ($items as $i => $item) :
 	<?php endif; ?>
 	
 	
-	<?php if ($this->params->get('show_comments_incat') && !JRequest::getVar('print')) : /* PARAMETER MISSING */?>
+	<?php if ($this->params->get('show_comments_incat') && !JFactory::getApplication()->input->getInt('print', 0)) : /* PARAMETER MISSING */?>
 		<!-- BOF comments -->
 		<section class="comments group">
 		<?php

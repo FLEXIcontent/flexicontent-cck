@@ -16,10 +16,10 @@ if ($show_alpha == 1) {
 } else {  // $show_alpha == 2
 	// Custom setting
 	$alphacharacters = $this->params->get('alphacharacters', "[default]=a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,y,z!!0,1,2,3,4,5,6,7,8,9");
-	
+
 	// Get a 2 character language tag
 	$lang = flexicontent_html::getUserCurrentLang();
-	
+
 	// a. Try to get for current language
 	$result = preg_match("/(\[$lang\])=([^[]+)/i", $alphacharacters, $matches);
 	if ($result) {
@@ -34,7 +34,7 @@ if ($show_alpha == 1) {
 			$custom_lang_alpha_index = JTEXT::_("FLEXI_ALPHA_INDEX_CHARACTERS");
 		}
 	}
-	
+
 	$groups = explode("!!", $custom_lang_alpha_index);
 	$groupcssclasses = explode("!!", $this->params->get('alphagrpcssclasses'));
 	$alphaaliases = explode("!!", $this->params->get('alphaaliases'));
@@ -59,7 +59,7 @@ for($i=count($groupcssclasses); $i<count($groups); $i++) {
 	$groupcssclasses[$i] = 'letters';
 }
 
-$selected_letter = JRequest::getVar('letter', '');
+$selected_letter = JFactory::getApplication()->input->getVar('letter', '');
 ?>
 
 <div id="fc_alpha">
@@ -80,7 +80,7 @@ $selected_letter = JRequest::getVar('letter', '');
 			// a. Skip on empty $letter (2 commas ,,)
 			$letter = trim($letter);
 			if ($letter==='') continue;
-			
+
 			// b. Check for ALIASes
 			$letter_label = $letter;
 			if ($letter==='#' ) {
@@ -89,14 +89,14 @@ $selected_letter = JRequest::getVar('letter', '');
 			if (isset($alphaalias_arr[$letter])) {
 				$letter = $alphaalias_arr[$letter];
 			}
-			
+
 			// c. Try to get range of characters
 			$range = explode("-", $letter);
-			
-			// d. Check if character exists 
+
+			// d. Check if character exists
 			$has_item = false;
 			if(count($range)==1) {
-				
+
 				// Check if any character out of the all subgroup characters exists
 				// Meaning (There is at least on item title starting with one of the group letters)
 				$c = 0;
@@ -113,28 +113,28 @@ $selected_letter = JRequest::getVar('letter', '');
 					echo "Error in Alpha Index<br>incorrect letter range: ".$letter."<br>";
 					continue;
 				}
-				
+
 				// Get range characters
 				$startletter = $range[0];  $endletter = $range[1];
-				
+
 				// ERROR CHECK: Range START and END are single character strings
 				if (StringHelper::strlen($startletter) != 1 || StringHelper::strlen($endletter) != 1) {
 					echo "Error in Alpha Index<br>letter range: ".$letter." start and end must be one character<br>";
 					continue;
 				}
-				
+
 				// Get ord of characters and their rangle length
 				$startord=FLEXIUtilities::uniord($startletter);
 				$endord=FLEXIUtilities::uniord($endletter);
 				$range_length = $endord - $startord;
-				
+
 				// ERROR CHECK: Character range has at least one character
 				if ($range_length > 200 || $range_length < 1) {
-					// A sanity check that the range is something logical and that 
+					// A sanity check that the range is something logical and that
 					echo "Error in Alpha Index<br>letter range: ".$letter.", is incorrect or contains more that 200 characters<br>";
 					continue;
 				}
-				
+
 				// Check if any character out of the range characters exists
 				// Meaning (There is at least on item title starting with one of the range characters)
 				for($uord=$startord; $uord<=$endord; $uord++) :
@@ -145,7 +145,7 @@ $selected_letter = JRequest::getVar('letter', '');
 					}
 				endfor;
 			}
-			
+
 			if ($alphacharsep) $aiclass = "fc_alpha_index_sep";
 			else $aiclass = "fc_alpha_index";
 			$currentclass = '';
@@ -165,9 +165,9 @@ $selected_letter = JRequest::getVar('letter', '');
 		endforeach;
 	?>
 	</div>
-	
+
 	<div class='fcclear'></div><?php /* needed by ie6-ie7 */ ?>
-	
+
 	<?php
 	}?>
 </div>
