@@ -2251,7 +2251,7 @@ class flexicontent_html
 	 */
 	static function feedbutton($view, &$params, $slug = null, $itemslug = null, $reserved=null, $item = null)
 	{
-		if ( !$params->get('show_feed_icon', 1) || JFactory::getApplication()->input->get('print', 0, 'INT') ) return;
+		if ( !$params->get('show_feed_icon', 1) || JFactory::getApplication()->input->getInt('print', 0) ) return;
 
 		$uri    = JUri::getInstance();
 		$base  	= $uri->toString( array('scheme', 'host', 'port'));
@@ -2339,7 +2339,7 @@ class flexicontent_html
 	 */
 	static function deletebutton( $item, &$params)
 	{
-		if ( !$params->get('show_deletebutton', 0) || JFactory::getApplication()->input->get('print', 0, 'INT') ) return;
+		if ( !$params->get('show_deletebutton', 0) || JFactory::getApplication()->input->getInt('print', 0) ) return;
 
 		$user	= JFactory::getUser();
 
@@ -2407,7 +2407,7 @@ class flexicontent_html
 	 */
 	static function csvbutton($view, &$params, $slug = null, $itemslug = null, $reserved=null, $item = null)
 	{
-		if ( !$params->get('show_csvbutton', 0) || JFactory::getApplication()->input->get('print', 0, 'INT') ) return;
+		if ( !$params->get('show_csvbutton', 0) || JFactory::getApplication()->input->getInt('print', 0) ) return;
 
 		$uri    = JUri::getInstance();
 		$base  	= $uri->toString( array('scheme', 'host', 'port'));
@@ -2484,7 +2484,7 @@ class flexicontent_html
 	 */
 	static function printbutton( $print_link, &$params )
 	{
-		if ( !$params->get('show_print_icon') || JFactory::getApplication()->input->get('print', 0, 'INT') ) return;
+		if ( !$params->get('show_print_icon') || JFactory::getApplication()->input->getInt('print', 0) ) return;
 
 		$status = 'status=no,toolbar=no,scrollbars=yes,titlebar=no,menubar=no,resizable=yes,left=50,width=\'+(screen.width-100)+\',top=20,height=\'+(screen.height-160)+\',directories=no,location=no';
 		$onclick = ' window.open(this.href,\'win2\',\''.$status.'\'); return false; ';
@@ -2545,7 +2545,7 @@ class flexicontent_html
 		static $initialize = null;
 		static $uri, $base;
 
-		if ( !$params->get('show_email_icon') || JFactory::getApplication()->input->get('print', 0, 'INT') ) return;
+		if ( !$params->get('show_email_icon') || JFactory::getApplication()->input->getInt('print', 0) ) return;
 
 		if ($initialize === null) {
 			if (file_exists ( JPATH_SITE.DS.'components'.DS.'com_mailto'.DS.'helpers'.DS.'mailto.php' )) {
@@ -2631,7 +2631,7 @@ class flexicontent_html
 	 */
 	static function pdfbutton( $item, &$params)
 	{
-		if ( FLEXI_J16GE || !$params->get('show_pdf_icon') || JFactory::getApplication()->input->get('print', 0, 'INT') ) return;
+		if ( FLEXI_J16GE || !$params->get('show_pdf_icon') || JFactory::getApplication()->input->getInt('print', 0) ) return;
 
 		$show_icons = $params->get('show_icons', 2);
 		$use_font   = $params->get('use_font_icons', 1);
@@ -2700,7 +2700,7 @@ class flexicontent_html
 			$user = JFactory::getUser();
 			$nullDate = JFactory::getDbo()->getNullDate();
 			$isAdmin  = JFactory::getApplication()->isAdmin();
-			$isPrint  = JFactory::getApplication()->input->get('print', 0, 'INT');
+			$isPrint  = JFactory::getApplication()->input->getInt('print', 0);
 			$img_path = JUri::root(true) . '/components/com_flexicontent/assets/images/';
 			$use_font_icons = $isAdmin || ($params && $params->get('use_font_icons', 1));
 
@@ -2941,7 +2941,7 @@ class flexicontent_html
 	 */
 	static function approvalbutton( $item, &$params)
 	{
-		if ( JFactory::getApplication()->input->get('print', 0, 'INT') ) return;
+		if ( JFactory::getApplication()->input->getInt('print', 0) ) return;
 
 		static $user = null, $requestApproval = null;
 		if ($user === null) {
@@ -3013,7 +3013,7 @@ class flexicontent_html
 	 */
 	static function editbutton( $item, &$params)
 	{
-		if ( !$params->get('show_editbutton', 1) || JFactory::getApplication()->input->get('print', 0, 'INT') ) return;
+		if ( !$params->get('show_editbutton', 1) || JFactory::getApplication()->input->getInt('print', 0) ) return;
 
 		$user	= JFactory::getUser();
 
@@ -3084,7 +3084,7 @@ class flexicontent_html
 	 */
 	static function addbutton(&$params, &$submit_cat = null, $menu_itemid = 0, $btn_text = '', $auto_relations = false, $ignore_unauthorized = null)
 	{
-		if ( !$params->get('show_addbutton', 1) || JFactory::getApplication()->input->get('print', 0, 'INT') ) return;
+		if ( !$params->get('show_addbutton', 1) || JFactory::getApplication()->input->getInt('print', 0) ) return;
 
 		$app = JFactory::getApplication();
 		$user	= JFactory::getUser();
@@ -5628,7 +5628,7 @@ class flexicontent_html
 	public static function getInheritedFieldDisplay($field, $params, $_v = null)
 	{
 		$_v = $params ? $params->get($field->fieldname) : $_v;
-		
+
 		if ($_v === '' || $_v === null)
 		{
 			return $field->input;

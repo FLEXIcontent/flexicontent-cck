@@ -11,7 +11,7 @@ class flexicontent_db
 {
 	/**
 	 * Method to set value for custom field 's common data types (INTEGER, DECIMAL(65,15), DATETIME)
-	 * 
+	 *
 	 * @return string
 	 * @since 1.5
 	 */
@@ -25,17 +25,17 @@ class flexicontent_db
 		$db->execute();
 	}
 
-	
+
 	/**
 	 * Method to verify a record has valid JSON data for the given column
-	 * 
+	 *
 	 * @return string
 	 * @since 3.1
 	 */
 	static function check_fix_JSON_column($colname, $tblname, $idname, $id, & $attribs=null)
 	{
 		$db = JFactory::getDbo();
-		
+
 		// This extra may seem redudant, but it is to avoid clearing valid data, due to coding or other errors
 		$db->setQuery('SELECT '.$colname.' FROM #__'.$tblname.' WHERE '.$idname.' = ' . $db->Quote($id));
 		$attribs = $db->loadResult();
@@ -59,35 +59,35 @@ class flexicontent_db
 		return $json_data;
 	}
 
-	
+
 	/**
 	 * Method to get the (language filtered) name of all access levels
-	 * 
+	 *
 	 * @return string
 	 * @since 1.5
 	 */
 	static function getAccessNames($accessid=null)
 	{
 		static $access_names = array();
-		
+
 		if ( $accessid!==null && isset($access_names[$accessid]) ) return $access_names[$accessid];
-		
+
 		$db = JFactory::getDbo();
 		$db->setQuery('SELECT id, title FROM #__viewlevels');
 		$_arr = $db->loadObjectList();
 		$access_names = array(0=>'Public');  // zero does not exist in J2.5+ but we set it for compatibility
 		foreach ($_arr as $o) $access_names[$o->id] = JText::_($o->title);
-		
+
 		if ( $accessid )
 			return isset($access_names[$accessid]) ? $access_names[$accessid] : 'not found access id: '.$accessid;
 		else
 			return $access_names;
 	}
-	
-	
+
+
 	/**
 	 * Method to get the type parameters of an item
-	 * 
+	 *
 	 * @return string
 	 * @since 1.5
 	 */
@@ -105,7 +105,7 @@ class flexicontent_db
 		{
 			return $typeparams[$typeid];
 		}
-		
+
 		$db = JFactory::getDbo();
 		$query	= 'SELECT t.id, t.attribs'
 			. ' FROM #__flexicontent_types AS t'
@@ -125,7 +125,7 @@ class flexicontent_db
 			{
 				return false;
 			}
-			
+
 			$typeid = $data->id;
 			$typeparams[$typeid] = $data->attribs;
 
@@ -156,7 +156,7 @@ class flexicontent_db
 			return $typeparams;
 		}
 	}
-	
+
 	/**
 	 * Method to get the nr of favourites of anitem
 	 *
@@ -167,18 +167,18 @@ class flexicontent_db
 	static function getFavourites($type, $item_id)
 	{
 		$db = JFactory::getDbo();
-		
+
 		$query = '
 			SELECT COUNT(id) AS favs
 			FROM #__flexicontent_favourites
 			WHERE itemid = '.(int)$item_id.'
 				AND type = '.(int)$type;
 		$db->setQuery($query);
-		
+
 		return $db->loadResult();
 	}
-	
-	
+
+
 	/**
 	 * Method to get the nr of favourites of an user
 	 *
@@ -188,7 +188,7 @@ class flexicontent_db
 	static function getFavoured($type, $item_id, $user_id)
 	{
 		$db = JFactory::getDbo();
-		
+
 		$query = '
 			SELECT COUNT(id) AS fav
 			FROM #__flexicontent_favourites
@@ -196,11 +196,11 @@ class flexicontent_db
 				AND userid = '.(int)$user_id.'
 				AND type = '.(int)$type;
 		$db->setQuery($query);
-		
+
 		return $db->loadResult();
 	}
-	
-	
+
+
 	/**
 	 * Method to remove a favourite
 	 *
@@ -211,18 +211,18 @@ class flexicontent_db
 	static function removefav($type, $item_id, $user_id)
 	{
 		$db = JFactory::getDbo();
-		
+
 		$query = '
 			DELETE FROM #__flexicontent_favourites
 			WHERE itemid = '.(int)$item_id.'
 				AND userid = '.(int)$user_id.'
 				AND type = '.(int)$type;
 		$db->setQuery($query);
-		
+
 		return $db->execute();
 	}
-	
-	
+
+
 	/**
 	 * Method to add a favourite
 	 *
@@ -233,16 +233,16 @@ class flexicontent_db
 	static function addfav($type, $item_id, $user_id)
 	{
 		$db = JFactory::getDbo();
-		
+
 		$obj = new stdClass();
 		$obj->itemid = (int)$item_id;
 		$obj->userid = (int)$user_id;
 		$obj->type   = (int)$type;
-		
+
 		return $db->insertObject('#__flexicontent_favourites', $obj);
 	}
-	
-	
+
+
 	/*
 	 * Retrieve author/user configuration
 	 *
@@ -268,8 +268,8 @@ class flexicontent_db
 
 		return $userConfig[$user_id];
 	}
-	
-	
+
+
 	/*
 	 * Find stopwords and too small words
 	 *
@@ -282,7 +282,7 @@ class flexicontent_db
 		$app    = JFactory::getApplication();
 		$option = $app->input->get('option', '', 'cmd');
 		$min_word_len = $app->getUserState( $option.'.min_word_len', 0 );
-		
+
 		$_word_clause = $isprefix ? '+%s*' : '+%s';
 		$query = 'SELECT '.$col
 			.' FROM #__'.$tbl
@@ -315,7 +315,7 @@ class flexicontent_db
 
 		return $_words;
 	}
-	
+
 	/**
 	 * Helper method to execute an SQL file containing multiple queries
 	 *
@@ -326,19 +326,19 @@ class flexicontent_db
 	{
 		$queries = file_get_contents( $sql_file );
 		$queries = preg_split("/;+(?=([^'|^\\\']*['|\\\'][^'|^\\\']*['|\\\'])*[^'|^\\\']*[^'|^\\\']$)/", $queries);
-		
+
 		$db = JFactory::getDbo();
 		foreach ($queries as $query) {
 			$query = trim($query);
 			if (!$query) continue;
-			
+
 			$db->setQuery($query);
 			$result = $db->execute();
 			if ($db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');
 		}
 	}
-	
-	
+
+
 	/**
 	 * Helper method to execute a query directly, bypassing Joomla DB Layer
 	 *
@@ -355,7 +355,7 @@ class flexicontent_db
 
 		$query = $db->replacePrefix($query);  //echo "<pre>"; print_r($query); echo "\n\n";
 		$db_connection = $db->getConnection();
-		
+
 		if ($dbtype === 'pdomysql' && is_a($db_connection, 'mysqli'))
 		{
 			$dbtype = 'mysqli';
@@ -488,17 +488,17 @@ class flexicontent_db
 		$order_fallback = 'rdate';  // Use as default or when an invalid ordering is requested
 		$orderbycustomfield   = (int) $params->get('orderbycustomfield'.$sfx, 1);    // Backwards compatibility, defaults to enabled *
 		$orderbycustomfieldid = (int) $params->get('orderbycustomfieldid'.$sfx, 0);  // * but this needs to be set in order for field ordering to be used
-		
+
 		// 1. If a FORCED -ORDER- is not given, then use ordering parameters from configuration. NOTE: custom field ordering takes priority
 		if (!$order)
 		{
 			$order = ($orderbycustomfield && $orderbycustomfieldid)  ?  'field'  :  $params->get($config_param.$sfx, $order_fallback);
 		}
-		
+
 		// 2. If allowing user ordering override, then get ordering from HTTP request variable
 		$request_order = $app->input->get($request_var.$sfx, '', 'string');
 		$order = $params->get('orderby_override') && $request_order ? $request_order : $order;
-		
+
 		// 3. Check various cases of invalid order, print warning, and reset ordering to default
 		if ($order=='field' && !$orderbycustomfieldid )
 		{
@@ -511,20 +511,20 @@ class flexicontent_db
 			if (!file_exists(JPATH_SITE.DS.'components'.DS.'com_jcomments'.DS.'jcomments.php')) {
 				echo "jcomments not installed, you need jcomments to use 'Most commented' ordering OR display comments information.<br/>\n";
 				$order = $order_fallback;
-			} 
+			}
 		}
-		
+
 		$order_col_1st = $default_order_col_1st;
 		$order_dir_1st = $default_order_dir_1st;
 		flexicontent_db::_getOrderByClause($params, $order, $i_as, $rel_as, $order_col_1st, $order_dir_1st, $sfx);
 		$order_arr[1] = $order;
 		$orderby = ' ORDER BY '.$order_col_1st.' '.$order_dir_1st;
-		
-		
+
+
 		// ***
 		// *** 2nd level ordering, (currently only supported when no SFX given)
 		// ***
-		
+
 		if ($sfx!='' || !$support_2nd_lvl)
 		{
 			$orderby .= $order_col_1st != $i_as.'.title'  ?  ', '.$i_as.'.title'  :  '';
@@ -532,23 +532,23 @@ class flexicontent_db
 			$order = $order_arr;
 			return $orderby;
 		}
-		
+
 		$order = '';  // Clear this, thus force retrieval from parameters (below)
 		$sfx='_2nd';  // Set suffix of second level ordering
 		$order_fallback = 'alpha';  // Use as default or when an invalid ordering is requested
 		$orderbycustomfield   = (int) $params->get('orderbycustomfield'.$sfx, 1);    // Backwards compatibility, defaults to enabled *
 		$orderbycustomfieldid = (int) $params->get('orderbycustomfieldid'.$sfx, 0);  // * but this needs to be set in order for field ordering to be used
-		
+
 		// 1. If a FORCED -ORDER- is not given, then use ordering parameters from configuration. NOTE: custom field ordering takes priority
 		if (!$order)
 		{
 			$order = ($orderbycustomfield && $orderbycustomfieldid)  ?  'field'  :  $params->get($config_param.$sfx, $order_fallback);
 		}
-		
+
 		// 2. If allowing user ordering override, then get ordering from HTTP request variable
 		$request_order = $app->input->get($request_var.$sfx, '', 'string');
 		$order = $request_var && $request_order ? $request_order : $order;
-		
+
 		// 3. Check various cases of invalid order, print warning, and reset ordering to default
 		if ($order=='field' && !$orderbycustomfieldid )
 		{
@@ -562,9 +562,9 @@ class flexicontent_db
 			{
 				echo "jcomments not installed, you need jcomments to use 'Most commented' ordering OR display comments information.<br/>\n";
 				$order = $order_fallback;
-			} 
+			}
 		}
-		
+
 		$order_col_2nd = '';
 		$order_dir_2nd = '';
 		if ($order!='default')
@@ -573,14 +573,14 @@ class flexicontent_db
 			$order_arr[2] = $order;
 			$orderby .= ', '.$order_col_2nd.' '.$order_dir_2nd;
 		}
-		
+
 		// Order by title after default ordering
 		$orderby .= ($order_col_1st != $i_as.'.title' && $order_col_2nd != $i_as.'.title')  ?  ', '.$i_as.'.title'  :  '';
 		$order = $order_arr;
 		return $orderby;
 	}
-	
-	
+
+
 	// Create order clause sub-parts
 	static function _getOrderByClause(&$params, &$order='', $i_as='i', $rel_as='rel', &$order_col='', &$order_dir='', $sfx='')
 	{
@@ -863,7 +863,7 @@ class flexicontent_db
 		foreach($cid as $pk)
 		{
 			if (!$pk) continue;
-			
+
 			// Get an instance of the row to checkin.
 			$table = JTable::getInstance($tbl, '');
 			if (!$table->load($pk))
@@ -874,13 +874,13 @@ class flexicontent_db
 
 			// Record check-in is allowed if either (a) current user has Global Checkin privilege OR (b) record checked out by current user
 			if (!$table->checked_out) continue;
-			
+
 			if ( !$canCheckinRecords && $table->checked_out != $user->id )
 			{
 				$diff_user[] = $pk;  //$controller->setError(JText::_( 'FLEXI_RECORD_CHECKED_OUT_DIFF_USER'));  //return; // false;
 				continue;
 			}
-			
+
 			// Attempt to check the row in.
 			if ( !$table->checkin($pk) )
 			{
@@ -889,15 +889,15 @@ class flexicontent_db
 			}
 			$checked_in++;
 		}
-		
+
 		$msg = JText::sprintf('FLEXI_RECORD_CHECKED_IN_SUCCESSFULLY', $checked_in);
 		if (count($diff_user))  $msg .= '<br/><br/>IDs: '.implode(', ', $diff_user).' -- '.JText::_( 'FLEXI_RECORD_CHECKED_OUT_DIFF_USER');
 		if (count($other_err))  $msg .= '<br/><br/>'.implode('<br/> ', $other_err);
-		
+
 		$controller->setRedirect( $redirect_url, $msg, ($other_err ? 'error' : 'message') );
 	}
-	
-	
+
+
 	/**
 	 * Return field types grouped or not
 	 *
@@ -918,15 +918,15 @@ class flexicontent_db
 			.($usage ? ' GROUP BY plg.element' : '')
 			.' ORDER BY title ASC'
 			;
-		
+
 		$db->setQuery($query);
 		$field_types = $db->loadObjectList('field_type');
-		
+
 		foreach($field_types as $field_type) {
 			$field_type->friendly = preg_replace("/FLEXIcontent[ \t]*-[ \t]*/i", "", $field_type->title);
 		}
 		if (!$group) return $field_types;
-		
+
 		$grps = array(
 			JText::_('FLEXI_SELECTION_FIELDS')          => array('radio', 'radioimage', 'checkbox', 'checkboximage', 'select', 'selectmultiple'),
 			JText::_('FLEXI_SINGLE_PROP_FIELDS')        => array('date', 'text', 'textarea', 'textselect'),
@@ -949,52 +949,70 @@ class flexicontent_db
 		}
 		// Remaining fields
 		$field_types_grp['3rd-Party / Other Fields'] = $field_types;
-		
+
 		return $field_types_grp;
 	}
-	
-	
+
+
 	/**
 	 * Method to get data/parameters of thie given or all types
 	 *
 	 * @access public
 	 * @return object
 	 */
-	static function getTypeData($contenttypes_list=false)
+	static function getTypeData($contenttypes_list = false)
 	{
 		static $cached = null;
-		if ( isset($cached[$contenttypes_list]) ) return $cached[$contenttypes_list];
-		
+
+		if (is_array($contenttypes_list))
+		{
+			ArrayHelper::toInteger($contenttypes_list);
+			$contenttypes_list = implode(',', $contenttypes_list);
+		}
+
+		if (isset($cached[$contenttypes_list]))
+		{
+			return $cached[$contenttypes_list];
+		}
+
 		// Retrieve item's Content Type parameters
 		$db = JFactory::getDbo();
-		$query = 'SELECT * '
-				. ' FROM #__flexicontent_types AS t'
-				. ($contenttypes_list ? ' WHERE id IN('.$contenttypes_list.')' : '')
-				;
-		$db->setQuery($query);
-		$types = $db->loadObjectList('id');
-		foreach ($types as $type) $type->params = new JRegistry($type->attribs);
-		
+		$query = $db->getQuery(true)
+			->select('*')
+			->from('#__flexicontent_types AS t');
+
+		if ($contenttypes_list)
+		{
+			$query->where('id IN (' . $contenttypes_list . ')');
+		}
+
+		$types = $db->setQuery($query)->loadObjectList('id');
+
+		foreach ($types as $type)
+		{
+			$type->params = new JRegistry($type->attribs);
+		}
+
 		$cached[$contenttypes_list] = $types;
 		return $types;
 	}
-	
-	
+
+
 	static function getOriginalContentItemids($_items, $ids=null)
 	{
 		if (empty($ids) && empty($_items)) return array();
-		
+
 		if (is_array($_items))
 			$items = & $_items;
 		else
 			$items = array( & $_items );
-		
+
 		if (empty($ids))
 		{
 			$ids = array();
 			foreach($items as $item) $ids[] = $item->id;
 		}
-		
+
 		// Get associated translations
 		$db = JFactory::getDbo();
 		$query = 'SELECT a.id as id, k.id as original_id'
@@ -1004,7 +1022,7 @@ class flexicontent_db
 			. ' WHERE a.id IN ('. implode(',', $ids) .') AND a.context = "com_content.item"';
 		$db->setQuery($query);
 		$assoc_keys = $db->loadObjectList('id');
-		
+
 		if (!empty($items))
 		{
 			foreach($items as $item) $item->lang_parent_id = isset($assoc_keys[$item->id]) ? $assoc_keys[$item->id]->original_id : $item->id;
@@ -1012,8 +1030,8 @@ class flexicontent_db
 		else
 			return $assoc_keys;
 	}
-	
-		
+
+
 	static function getLangAssocs($ids)
 	{
 		$db = JFactory::getDbo();
@@ -1024,14 +1042,14 @@ class flexicontent_db
 			. ' WHERE a.id IN ('. implode(',', $ids) .') AND a.context = "com_content.item"';
 		$db->setQuery($query);
 		$associations = $db->loadObjectList();
-		
+
 		$translations = array();
 		foreach ($associations as $assoc)
 		{
 			$assoc->shortcode = strpos($assoc->language,'-')  ?  substr($assoc->language, 0, strpos($assoc->language,'-'))  :  $assoc->language;
 			$translations[$assoc->item_id][$assoc->id] = $assoc;
 		}
-		
+
 		return $translations;
 	}
 
@@ -1048,34 +1066,33 @@ class flexicontent_db
 		// ***
 		// *** Prepare / check associations array
 		// ***
-		
+
 		// Unset empty associations from associations array, to avoid save them in the associations table
 		$associations = isset($data['associations']) ? $data['associations'] : array();
 		foreach ($associations as $tag => $id)
 		{
 			if (empty($id)) unset($associations[$tag]);
 		}
-		
+
 		// Raise notice that associations should be empty if language of current item is '*' (ALL)
 		$all_language = $item->language == '*';
 		if ($all_language && !empty($associations))
 		{
 			JError::raiseNotice(403, JText::_('FLEXI_ERROR_ALL_LANGUAGE_ASSOCIATED'));
 		}
-		
+
 		// Make sure that current item id, is the association id of the language of the current item
 		$associations[$item->language] = $item->id;
 
 		// Make sure associations ids are integers
 		ArrayHelper::toInteger($associations);
-		
+
 		$db = JFactory::getDbo();
 		$query = $db->getQuery(true)
 			->select($db->quoteName('key'))
 			->from('#__associations')
 			->where($db->quoteName('context') . ' = ' . $db->quote($context))
 			->where($db->quoteName('id') . ' = ' . (int) $item->id);
-		$db->setQuery($query)->execute();
 		$key = $db->setQuery($query)->loadResult();
 
 
@@ -1098,23 +1115,23 @@ class flexicontent_db
 
 		// Only add language associations if item language is not '*' (ALL)
 		if ($all_language || count($associations)<=1) return true;
-		
+
 		$key = md5(json_encode($associations));
 		$query->clear()
 			->insert('#__associations');
-		
+
 		foreach ($associations as $id)
 		{
 			$query->values($id . ',' . $db->quote($context) . ',' . $db->quote($key));
 		}
-		
+
 		$db->setQuery($query);
 		$db->execute();
 
 		return true;
 	}
-	
-	
+
+
 	/**
 	 * Method to determine if J3.1+ associations should be used
 	 *
@@ -1135,7 +1152,7 @@ class flexicontent_db
 		$component = 'com_flexicontent';
 		$cname = str_replace('com_', '', $component);
 		$j3x_assocs = true;
-		
+
 		if (!$assoc || !$component || !$cname || !$j3x_assocs)
 		{
 			$assoc = false;
@@ -1147,7 +1164,7 @@ class flexicontent_db
 
 			$assoc = class_exists($hname) && !empty($hname::$category_association);
 		}
-		
+
 		return $assoc;
 	}
 

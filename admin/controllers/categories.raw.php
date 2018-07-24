@@ -85,9 +85,9 @@ class FlexicontentControllerCategories extends JControllerAdmin
 		// Check for request forgeries
 		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 
+		$task   = $this->input->getCmd('task');
 		$copyid	= $this->input->getInt('copycid', 0);
-		$destid	= $this->input->getArray('destcid', array());
-		$task = $this->input->getCmd('task');
+		$destid	= $this->input->get('destcid', array(), 'array');
 
 		ArrayHelper::toInteger($destid);
 

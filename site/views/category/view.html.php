@@ -5,7 +5,7 @@
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
  * @license GNU/GPL v2
- * 
+ *
  * FLEXIcontent is a derivative work of the excellent QuickFAQ component
  * @copyright (C) 2008 Christoph Lukes
  * see www.schlu.net for more information
@@ -42,7 +42,7 @@ class FlexicontentViewCategory extends JViewLegacy
 		// Get Non-routing Categories, and Category Tree
 		global $globalnoroute, $globalcats;
 		if (!is_array($globalnoroute)) $globalnoroute = array();
-		
+
 		//initialize variables
 		$dispatcher = JEventDispatcher::getInstance();
 		$app      = JFactory::getApplication();
@@ -54,30 +54,30 @@ class FlexicontentViewCategory extends JViewLegacy
 		$print    = $jinput->get('print', '', 'cmd');
 
 		$document = JFactory::getDocument();
-		
+
 		// Check for Joomla issue with system plugins creating JDocument in early events forcing it to be wrong type, when format as url suffix is enabled
 		if ($format && $document->getType() != strtolower($format))
 		{
 			echo '<div class="alert">WARNING: &nbsp; Document format should be: <b>'.$format.'</b> but current document is: <b>'. $document->getType().'</b> <br/>Some system plugin may have forced current document type</div>';
 		}
-		
+
 		$menus    = $app->getMenu();
 		$menu     = $menus->getActive();
 		$uri      = JUri::getInstance();
 		$user     = JFactory::getUser();
 		$aid      = JAccess::getAuthorisedViewLevels($user->id);
-		
+
 		// Get view's Model
 		$model  = $this->getModel();
-		
+
 		// Allow clayout from HTTP request, this will be checked during loading category parameters
 		$model->setCatLayout('__request__');
 		// Indicate to model to merge menu parameters if menu matches
 		$model->mergeMenuParams = true;
-		
+
 		// Get the category, loading category data and doing parameters merging
 		$category = $model->getCategory();
-		
+
 		// Get Tag data if current layout is 'tags'
 		$tag = $model->getTag();
 
@@ -124,7 +124,7 @@ class FlexicontentViewCategory extends JViewLegacy
 		// ***
 		// *** Get data from the model
 		// ***
-		
+
 		$categories = $this->get('Childs'); // this will also count sub-category items is if  'show_itemcount'  is enabled
 		$peercats   = $this->get('Peers');  // this will also count sub-category items is if  'show_subcatcount_peercat'  is enabled
 		$items   = $this->get('Data');
@@ -132,7 +132,7 @@ class FlexicontentViewCategory extends JViewLegacy
 		$filters = !$print ? $this->get('Filters') : array();
 		$comments= !$print && $params->get('show_comments_count', 0)  ?  $this->get('CommentsInfo')  :  null;
 		$alpha   = !$print && $params->get('show_alpha', 1)  ?  $this->get('Alphaindex')  :  array();  // This is somewhat expensive so calculate it only if required
-		
+
 		// Request variables, WARNING, must be loaded after retrieving items, because limitstart may have been modified
 		$limitstart = $jinput->get('limitstart', 0, 'int');
 
@@ -140,14 +140,14 @@ class FlexicontentViewCategory extends JViewLegacy
 		// ***
 		// *** CATEGORY LAYOUT handling
 		// ***
-		
+
 		// Get category 's layout as this may have been altered by model's decideLayout()
 		$clayout = $params->get('clayout');
-		
+
 		// Get cached template data, re-parsing XML/LESS files, also loading any template language files of a specific template
 		$themes = flexicontent_tmpl::getTemplates(  array($clayout) );
-		
-		
+
+
 		/**
 		 * Get URL variables
 		 */
@@ -176,7 +176,7 @@ class FlexicontentViewCategory extends JViewLegacy
 		JHtml::_('behavior.framework', true);
 		flexicontent_html::loadFramework('jQuery');
 		flexicontent_html::loadFramework('flexi_tmpl_common');
-		
+
 		// Add css files to the document <head> section (also load CSS joomla template override)
 		if (!$params->get('disablecss', ''))
 		{
@@ -185,21 +185,21 @@ class FlexicontentViewCategory extends JViewLegacy
 		if (file_exists(JPATH_SITE.DS.'templates'.DS.$app->getTemplate().DS.'css'.DS.'flexicontent.css')) {
 			$document->addStyleSheetVersion($this->baseurl.'/templates/'.$app->getTemplate().'/css/flexicontent.css', FLEXI_VHASH);
 		}
-		
-		
+
+
 		// ********************************************************************************************
 		// Create pathway, if automatic pathways is enabled, then path will be cleared before populated
 		// ********************************************************************************************
-		
+
 		// Get category titles needed by pathway, this will allow Falang to translate them
 		$catshelper = new flexicontent_cats($category->id);
 		$parents    = $catshelper->getParentlist($all_cols=false);
 		$rootcat = (int) $params->get('rootcat');
 		if ($rootcat) $root_parents = $globalcats[$rootcat]->ancestorsarray;
-		
+
 		// Get current pathway
 		$pathway = $app->getPathWay();
-		
+
 		// Clear pathway, if automatic pathways are enabled
 		if ( $params->get('automatic_pathways', 0) )
 		{
@@ -211,42 +211,42 @@ class FlexicontentViewCategory extends JViewLegacy
 		{
 			$item_depth = $params->get('item_depth', 0);
 		}
-		
+
 		// Respect menu item depth, defined in menu item
 		$p = $item_depth;
 		while ( $p < count($parents) )
 		{
 			// Do not add the directory root category or its parents (this when coming from a directory view)
 			if ( !empty($root_parents) && in_array($parents[$p]->id, $root_parents) )  { $p++; continue; }
-			
+
 			// Do not add to pathway unroutable categories
 			if ( in_array($parents[$p]->id, $globalnoroute) )  { $p++; continue; }
-			
+
 			// Add current parent category
 			$pathway->addItem( $this->escape($parents[$p]->title), JRoute::_( FlexicontentHelperRoute::getCategoryRoute($parents[$p]->slug) ) );
 			$p++;
 		}
 		//echo "<pre>"; print_r($pathway); echo "</pre>";
-		
-		
+
+
 		// *******************************************************************************************************************
 		// Bind Fields to items and RENDER their display HTML, but check for document type, due to Joomla issue with system
 		// plugins creating JDocument in early events forcing it to be wrong type, when format as url suffix is enabled
 		// *******************************************************************************************************************
-		
+
 		if ($format != 'feed')
 		{
 			$items 	= FlexicontentFields::getFields($items, 'category', $params, $aid);
 		}
-		
-		
+
+
 		// ************************************************************************
 		// Calculate CSS classes needed to add special styling markups to the items
 		// ************************************************************************
-		
+
 		flexicontent_html::calculateItemMarkups($items, $params);
-		
-		
+
+
 		// **********************************************************
 		// Calculate a (browser window) page title and a page heading
 		// **********************************************************
@@ -337,7 +337,7 @@ class FlexicontentViewCategory extends JViewLegacy
 		/**
 		 * Create the document title, by from page title and other data
 		 */
-		
+
 		// Use the page heading as document title, (already calculated above via 'appropriate' logic ...)
 		// or the overriden custom <title> ... set via parameter
 		$doc_title = empty($meta_params)
@@ -356,15 +356,15 @@ class FlexicontentViewCategory extends JViewLegacy
 				$doc_title = JText::sprintf('JPAGETITLE', $doc_title, $app->getCfg('sitename'));
 			}
 		}
-		
+
 		// Finally, set document title
 		$document->setTitle($doc_title);
-		
-		
+
+
 		/**
 		 * Set document's META tags
 		 */
-		
+
 		// Workaround for Joomla not setting the default value for 'robots', so component must do it
 		$app_params = $app->getParams();
 		if (($_mp=$app_params->get('robots')))
@@ -411,7 +411,7 @@ class FlexicontentViewCategory extends JViewLegacy
 				$document->setMetaData('author', $meta_params->get('author'));
 			}
 		}
-		
+
 		// Overwrite with menu META data if menu matched
 		if ($menu_matches)
 		{
@@ -420,10 +420,10 @@ class FlexicontentViewCategory extends JViewLegacy
 			if (($_mp=$menu->params->get('robots')))                 $document->setMetadata('robots', $_mp);
 			if (($_mp=$menu->params->get('secure')))                 $document->setMetadata('secure', $_mp);
 		}
-		
-		
+
+
 		/**
-		 * Create category link, but also consider current 'layout', and use the 
+		 * Create category link, but also consider current 'layout', and use the
 		 * layout specific variables so that filtering form will work properly
 		 */
 
@@ -434,7 +434,7 @@ class FlexicontentViewCategory extends JViewLegacy
 		// ***
 		// *** Add canonical link (if needed and different than current URL), also preventing Joomla default (SEF plugin)
 		// ***
-		
+
 		$add_canonical = (int) $params->get('add_canonical', 0);
 		if ($add_canonical)
 		{
@@ -556,26 +556,28 @@ class FlexicontentViewCategory extends JViewLegacy
 			$_id = $jinput->get('id');
 			$jinput->set('id', $category->id);   // compatibility for plugin that will try to use this variable
 
-			$results = $dispatcher->trigger('onContentPrepare', array ('com_content.category', &$category, &$params, 0));
+			$results = FLEXI_J40GE
+				? $app->triggerEvent('onContentPrepare', array ('com_content.category', &$category, &$params, 0))
+				: $dispatcher->trigger('onContentPrepare', array ('com_content.category', &$category, &$params, 0));
 
 			$jinput->set('layout', $layout);  // Restore LAYOUT variable should some plugin have modified it
-			$jinput->set('id', $_id);   // Restore previous value of this variable 
+			$jinput->set('id', $_id);   // Restore previous value of this variable
 
 			$category->description 	= $category->text;
 		}
 
 		// Maybe here not to import all plugins but just those for description field or add a parameter for this
-		// Anyway these events are usually not very time consuming as is the the event onPrepareContent(J1.5)/onContentPrepare(J1.6+) 
+		// Anyway these events are usually not very time consuming as is the the event onPrepareContent(J1.5)/onContentPrepare(J1.6+)
 		JPluginHelper::importPlugin('content');
-		
+
 		$noroute_cats = array_flip($globalnoroute);
-		
+
 		$type_attribs = flexicontent_db::getTypeAttribs($force=true, $typeid=0);
 		$type_params = array();
 		foreach ($items as $item)
 		{
 			$item->event 	= new stdClass();
-			
+
 			if ( !isset($type_params[$item->type_id]) )
 			{
 				$type_params[$item->type_id] = new JRegistry($type_attribs[$item->type_id]);
@@ -612,7 +614,7 @@ class FlexicontentViewCategory extends JViewLegacy
 			}
 
 			// 2. CATEGORY SLUG: ITEM's MAIN category   (already SET, ... no assignment needed)
-			// -- Since we cannot use current category (above), we will use item's MAIN category 
+			// -- Since we cannot use current category (above), we will use item's MAIN category
 			// -- ALSO routing (creating links) to this category is allowed
 			elseif ( !isset($noroute_cats[$item->catid]) )
 			{
@@ -632,10 +634,10 @@ class FlexicontentViewCategory extends JViewLegacy
 					}
 				}
 			}
-			
+
 			// Just put item's text (description field) inside property 'text' in case the events modify the given text,
 			$item->text = isset($item->fields['text']->display) ? $item->fields['text']->display : '';
-			
+
 			// Do some compatibility steps, Set option to 'com_content' (view is already called 'category')
 			// but set a flag 'isflexicontent' to indicate triggering from inside FLEXIcontent ... code
 			$jinput->set('option', 'com_content');
@@ -643,22 +645,28 @@ class FlexicontentViewCategory extends JViewLegacy
 
 			// These events return text that could be displayed at appropriate positions by our templates
 			$item->event = new stdClass();
-			
-			$results = $dispatcher->trigger('onContentAfterTitle', array('com_content.category', &$item, &$params, 0));
+
+			$results = FLEXI_J40GE
+				? $app->triggerEvent('onContentAfterTitle', array('com_content.category', &$item, &$params, 0))
+				: $dispatcher->trigger('onContentAfterTitle', array('com_content.category', &$item, &$params, 0));
 			$item->event->afterDisplayTitle = trim(implode("\n", $results));
-	
-			$results = $dispatcher->trigger('onContentBeforeDisplay', array('com_content.category', &$item, &$params, 0));
+
+			$results = FLEXI_J40GE
+				? $app->triggerEvent('onContentBeforeDisplay', array('com_content.category', &$item, &$params, 0))
+				: $dispatcher->trigger('onContentBeforeDisplay', array('com_content.category', &$item, &$params, 0));
 			$item->event->beforeDisplayContent = trim(implode("\n", $results));
-	
-			$results = $dispatcher->trigger('onContentAfterDisplay', array('com_content.category', &$item, &$params, 0));
+
+			$results = FLEXI_J40GE
+				? $app->triggerEvent('onContentAfterDisplay', array('com_content.category', &$item, &$params, 0))
+				: $dispatcher->trigger('onContentAfterDisplay', array('com_content.category', &$item, &$params, 0));
 			$item->event->afterDisplayContent = trim(implode("\n", $results));
-							
+
 			// Set the option back to 'com_flexicontent'
 			$jinput->set('option', 'com_flexicontent');
-			
+
 			// Put text back into the description field, THESE events SHOULD NOT modify the item text, but some plugins may do it anyway... , so we assign text back for compatibility
 			$item->fields['text']->display = & $item->text;
-			
+
 		}
 
 
@@ -734,9 +742,9 @@ class FlexicontentViewCategory extends JViewLegacy
 		{
 			$default_image = '';
 		}
-		
-		
-		// Create category image/description/etc data 
+
+
+		// Create category image/description/etc data
 		$cat = $category;
 		$image = '';
 
@@ -772,7 +780,7 @@ class FlexicontentViewCategory extends JViewLegacy
 				}
 
 				$cat->image_src = @$src;  // Also add image category URL for developers
-				
+
 				if ($image)
 				{
 					$image = '<img class="fccat_image" src="'.$image.'" alt="'.$this->escape($cat->title).'" title="'.$this->escape($cat->title).'"/>';
@@ -830,9 +838,9 @@ class FlexicontentViewCategory extends JViewLegacy
 		{
 			$default_image = '';
 		}
-		
-		
-		// Create sub-category image/description/etc data 
+
+
+		// Create sub-category image/description/etc data
 		foreach ($categories as $cat)
 		{
 			$image = '';
@@ -863,10 +871,10 @@ class FlexicontentViewCategory extends JViewLegacy
 					$ext = strtolower(pathinfo($src, PATHINFO_EXTENSION));
 					$f = in_array( $ext, array('png', 'ico', 'gif', 'jpg', 'jpeg') ) ? '&amp;f='.$ext : '';
 					$conf	= $w . $h . $aoe . $q . $ar . $zc . $f;
-					
+
 					$base_url = (!preg_match("#^http|^https|^ftp|^/#i", $src)) ?  $this->baseurl.'/' : '';
 					$src = $base_url.$src;
-					
+
 					$image = $phpThumbURL.$src.$conf;
 				}
 
@@ -912,7 +920,7 @@ class FlexicontentViewCategory extends JViewLegacy
 			$ar 	= '&amp;ar=x';
 			$zc		= $cat_image_method ? '&amp;zc=' . $cat_image_method : '';
 		}
-		
+
 		if ($cat_default_image)
 		{
 			$src = $this->baseurl ."/". $joomla_image_url . $cat_default_image;
@@ -928,8 +936,8 @@ class FlexicontentViewCategory extends JViewLegacy
 		{
 			$default_image = '';
 		}
-		
-		// Create peer-category image/description/etc data 
+
+		// Create peer-category image/description/etc data
 		foreach ($peercats as $cat)
 		{
 			$image = '';
@@ -939,19 +947,19 @@ class FlexicontentViewCategory extends JViewLegacy
 				{
 					$cat->params = new JRegistry($cat->params);
 				}
-				
+
 				$cat->image = $cat->params->get('image');
 				$cat->introtext = & $cat->description;
 				$cat->fulltext = "";
-				
+
 				if ( $cat_image_source && $cat->image && JFile::exists( JPATH_SITE .DS. $joomla_image_path . $cat->image ) )
 				{
 					$src = $this->baseurl ."/". $joomla_image_url . $cat->image;
-					
+
 					$ext = strtolower(pathinfo($src, PATHINFO_EXTENSION));
 					$f = in_array( $ext, array('png', 'ico', 'gif', 'jpg', 'jpeg') ) ? '&amp;f='.$ext : '';
 					$conf	= $w . $h . $aoe . $q . $ar . $zc . $f;
-					
+
 					$image = $phpThumbURL.$src.$conf;
 				}
 
@@ -960,15 +968,15 @@ class FlexicontentViewCategory extends JViewLegacy
 					$ext = strtolower(pathinfo($src, PATHINFO_EXTENSION));
 					$f = in_array( $ext, array('png', 'ico', 'gif', 'jpg', 'jpeg') ) ? '&amp;f='.$ext : '';
 					$conf	= $w . $h . $aoe . $q . $ar . $zc . $f;
-					
+
 					$base_url = (!preg_match("#^http|^https|^ftp|^/#i", $src)) ?  $this->baseurl.'/' : '';
 					$src = $base_url.$src;
-					
+
 					$image = $phpThumbURL.$src.$conf;
 				}
 
 				$cat->image_src = @$src;  // Also add image category URL for developers
-				
+
 				if ($image)
 				{
 					$image = '<img class="fccat_image" src="'.$image.'" alt="'.$this->escape($cat->title).'" title="'.$this->escape($cat->title).'"/>';
@@ -990,36 +998,36 @@ class FlexicontentViewCategory extends JViewLegacy
 
 		// remove previous alpha index filter
 		//$uri->delVar('letter');
-		
+
 		// remove filter variables (includes search box and sort order)
 		preg_match_all('/filter[^=]*/', $uri->toString(), $matches);
 		foreach($matches[0] as $match)
 		{
 			//$uri->delVar($match);
 		}
-		
+
 		// Build Lists
 		$lists = array();
-		
+
 		//ordering
 		$lists['filter_order']     = $jinput->get('filter_order', 'i.title', 'cmd');
 		$lists['filter_order_Dir'] = $jinput->get('filter_order_Dir', 'ASC', 'cmd');
 		$lists['filter']           = $jinput->get('filter', '', 'string');
-		
+
 		// Add html to filter objects
 		$form_name = 'adminForm';
 		if ($filters)
 		{
 			FlexicontentFields::renderFilters( $params, $filters, $form_name );
 		}
-		
-		
+
+
 		// ***
 		// *** Create the pagination object
 		// ***
-		
+
 		$pageNav = $this->get('pagination');
-		
+
 		$_revert = array('%21'=>'!', '%2A'=>'*', '%27'=>"'", '%28'=>'(', '%29'=>')');
 		foreach($jinput->get->get->getArray() as $i => $v)
 		{
@@ -1047,23 +1055,33 @@ class FlexicontentViewCategory extends JViewLegacy
 			// Make sure all URL variables are added to the pagination URLs
 			else
 			{
-				$pageNav->setAdditionalUrlParam($i, $v);
+				if (is_array($v))
+				{
+					foreach($v as $ii => &$vv)
+					{
+						$pageNav->setAdditionalUrlParam($i.'['.$ii.']', $vv);
+					}
+				}
+				else
+				{
+					$pageNav->setAdditionalUrlParam($i, $v);
+				}
 			}
 		}
 		$resultsCounter = $pageNav->getResultsCounter();  // for overriding model's result counter
-		
+
 		$_sh404sef = defined('SH404SEF_IS_RUNNING') && JFactory::getConfig()->get('sef');
 		if ($_sh404sef) $pageNav->setAdditionalUrlParam('limit', $model->getState('limit'));
-		
-		
+
+
 		// **********************************************************************
 		// Print link ... must include layout and current filtering url vars, etc
 		// **********************************************************************
-		
+
 		$curr_url   = str_replace('&', '&amp;', $_SERVER['REQUEST_URI']);
 		$print_link = $curr_url .(strstr($curr_url, '?') ? '&amp;'  : '?').'pop=1&amp;tmpl=component&amp;print=1';
 		$pageclass_sfx = htmlspecialchars($params->get('pageclass_sfx'));
-		
+
 		$this->layout_vars = $layout_vars;
 		$this->action = $category_link;
 		$this->print_link = $print_link;
@@ -1077,23 +1095,23 @@ class FlexicontentViewCategory extends JViewLegacy
 		$this->params = $params;
 		$this->pageNav = $pageNav;
 		$this->pageclass_sfx = $pageclass_sfx;
-		
+
 		$this->pagination = $pageNav;  // compatibility Alias for old templates
 		$this->resultsCounter = $resultsCounter;  // for overriding model's result counter
 		$this->limitstart = $limitstart; // compatibility shortcut
-		
+
 		$this->filters = $filters;
 		$this->comments = $comments;
 		$this->alpha = $alpha;
 		$this->tmpl = $tmpl;
-		
-		
+
+
 		// NOTE: Moved decision of layout into the model, function decideLayout() layout variable should never be empty
 		// It will consider things like: template exists, is allowed, client is mobile, current frontend user override, etc
-		
+
 		// !!! The following method of loading layouts, is Joomla legacy view loading of layouts
 		// TODO: EXAMINE IF NEEDED to re-use these layouts, and use JLayout ??
-		
+
 		// Despite layout variable not being empty, there may be missing some sub-layout files,
 		// e.g. category_somefilename.php for this reason we will use a fallback layout that surely has these files
 		$fallback_layout = $params->get('category_fallback_layout', 'blog');  // parameter does not exist yet
@@ -1102,7 +1120,7 @@ class FlexicontentViewCategory extends JViewLegacy
 			$this->addTemplatePath(JPATH_COMPONENT.DS.'templates'.DS.$fallback_layout);
 			$this->addTemplatePath(JPATH_SITE.DS.'templates'.DS.$app->getTemplate().DS.'html'.DS.'com_flexicontent'.DS.'templates'.DS.$fallback_layout);
 		}
-		
+
 		$this->addTemplatePath(JPATH_COMPONENT.DS.'templates'.DS.$clayout);
 		$this->addTemplatePath(JPATH_SITE.DS.'templates'.DS.$app->getTemplate().DS.'html'.DS.'com_flexicontent'.DS.'templates'.DS.$clayout);
 
@@ -1119,9 +1137,9 @@ class FlexicontentViewCategory extends JViewLegacy
 
 		$print_logging_info = $params->get('print_logging_info');
 		if ( $print_logging_info ) { global $fc_run_times; $start_microtime = microtime(true); }
-		
+
 		parent::display($tpl);
-		
+
 		if ( $print_logging_info ) @$fc_run_times['template_render'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 	}
 }

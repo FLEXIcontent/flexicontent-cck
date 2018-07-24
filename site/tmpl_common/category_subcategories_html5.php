@@ -2,7 +2,7 @@
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
 $i = 0;
-$layout = JRequest::getCmd('layout', '');
+$layout = JFactory::getApplication()->input->getCmd('layout', '');
 
 // Sub-category prefix/suffix/separator parameters
 $pretext = $this->params->get( 'subcat_pretext', '' ); $posttext = $this->params->get( 'subcat_posttext', '' );

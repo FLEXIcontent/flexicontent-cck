@@ -670,7 +670,17 @@ class FlexicontentControllerTypes extends FlexicontentController
 
 		$model = $this->getModel('types');
 		$task  = $this->getTask();
-		$cid   = $this->input->get('cid', array(0), 'array');
+
+		$cid   = $this->input->get('cid', array(), 'array');
+		ArrayHelper::toInteger($cid);
+
+		// *** Check at least one item was selected
+		if (!count($cid))
+		{
+			$app->enqueueMessage(JText::_('FLEXI_NO_ITEMS_SELECTED'), 'error');
+			$app->redirect($this->returnURL);
+		}
+
 		$id    = (int) $cid[0];
 
 		// Calculate access
@@ -686,7 +696,7 @@ class FlexicontentControllerTypes extends FlexicontentController
 			return;
 		}
 
-		$accesses = $this->input->get('access', array(0), 'array');
+		$accesses = $this->input->get('access', array(), 'array');
 		$access = $accesses[$id];
 
 		if (!$model->saveaccess($id, $access))

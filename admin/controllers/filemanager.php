@@ -1514,10 +1514,18 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		$app   = JFactory::getApplication();
 		$user  = JFactory::getUser();
 		$model = $this->getModel('filemanager');
-		$cid = $this->input->get('cid', array(0), 'array');
-		ArrayHelper::toInteger($cid, array(0));
 
-		$file_id = (int) $cid[0];
+		$cid   = $this->input->get('cid', array(), 'array');
+		ArrayHelper::toInteger($cid);
+
+		// *** Check at least one item was selected
+		if (!count($cid))
+		{
+			$app->enqueueMessage(JText::_('FLEXI_NO_ITEMS_SELECTED'), 'error');
+			$app->redirect($this->returnURL);
+		}
+
+		$file_id = reset($cid);
 		$row = JTable::getInstance('flexicontent_files', '');
 		$row->load($file_id);
 
@@ -1534,7 +1542,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 			return;
 		}
 
-		$accesses = $this->input->get('access', array(0), 'array');
+		$accesses = $this->input->get('access', array(), 'array');
 		ArrayHelper::toInteger($accesses);
 		$access = $accesses[$file_id];
 

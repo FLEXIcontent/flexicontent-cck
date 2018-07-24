@@ -36,7 +36,11 @@ class FCDispatcher extends JEventDispatcher
 	 */
 	function __construct( $debug=false )
 	{
-		parent::__construct();
+		if (!FLEXI_J40GE)
+		{
+			parent::__construct();
+		}
+
 		$this->debug = $debug;
 		
 		if ( !$this->prepContentFuncs ) {

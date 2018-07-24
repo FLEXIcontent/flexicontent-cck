@@ -1,6 +1,6 @@
 <?php
 defined( '_JEXEC' ) or die( 'Restricted access' );
-if ( JFactory::getApplication()->input->get('print', 0, 'int') ) return;
+if ( JFactory::getApplication()->input->getInt('print', 0) ) return;
 
 ob_start();
 

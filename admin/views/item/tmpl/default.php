@@ -1545,7 +1545,7 @@ if ( count($FC_jfields_html) ) : ?>
 					//echo JHtml::_('sliders.panel', $slider_title, $slider_id);
 					echo JHtml::_('bootstrap.addSlide', $slider_set_id, $slider_title, $slider_id);
 
-					if (!$item_layout || $tmpl->name != $item_layout)
+					if (!$item_layout || $tmpl->name !== $item_layout)
 					{
 						echo JHtml::_('bootstrap.endSlide');
 						continue;
@@ -1610,7 +1610,6 @@ if ( count($FC_jfields_html) ) : ?>
 							';
 
 						endforeach; ?>
-
 						
 						</fieldset>
 						
@@ -1621,10 +1620,10 @@ if ( count($FC_jfields_html) ) : ?>
 				
 				<?php echo JHtml::_('bootstrap.endAccordion'); //echo JHtml::_('sliders.end'); ?>
 
-			</div><!-- class="fc-sliders-plain-outer" -->
-		</div><!-- tabbertab FLEXI_LAYOUT_PARAMETERS -->
-		
-	</div> <!-- end tab -->
+			</div><!-- END class="fc-sliders-plain-outer" -->
+		</div> <!-- END class="fc_tabset_inner" -->
+
+	</div><!-- END tabbertab FLEXI_LAYOUT_PARAMETERS -->
 
 
 

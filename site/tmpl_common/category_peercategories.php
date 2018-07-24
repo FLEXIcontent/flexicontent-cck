@@ -2,13 +2,13 @@
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
 $i = 0;
-$layout = JRequest::getCmd('layout', '');
+$layout = JFactory::getApplication()->input->getCmd('layout', '');
 
 // Sub-category prefix/suffix/separator parameters
 $pretext = $this->params->get( 'peercat_pretext', '' ); $posttext = $this->params->get( 'peercat_posttext', '' );
 $opentag = $this->params->get( 'peercat_opentag', '' ); $closetag = $this->params->get( 'peercat_closetag', '' );
 
-$separatorf = $this->params->get( 'peercat_separatorf' ); 
+$separatorf = $this->params->get( 'peercat_separatorf' );
 $separators_arr = array( 0 => '&nbsp;', 1 => '<br />', 2 => '&nbsp;|&nbsp;', 3 => ',&nbsp;', 4 => $closetag.$opentag, 5 => '' );
 $separatorf = isset($separators_arr[$separatorf]) ? $separators_arr[$separatorf] : '&nbsp;';
 
@@ -35,15 +35,15 @@ $peercats_html = array();
 foreach ($this->peercats as $sub) {
 	if (!$show_empty_cats && $show_itemcount && $sub->assigneditems==0) continue;
 	$subsubcount = count($sub->subcats);
-	
+
 	// a. Optional sub-category image
 	$peercats_html[$i] = "<span class='floattext peercat ".$peercat_cont_class."'>\n";
 	if ($show_description_image_peercat && $sub->image) {
 		$peercats_html[$i] .= "  <span class='catimg'>".$sub->image."</span>\n";
 	}
-	
+
 	$peercats_html[$i] .= "  <span class='catinfo ".$peercat_info_class."'>\n";
-	
+
 	// b. Category title with link and optional item counts
 	$cat_link = ($layout=='myitems' || $layout=='author') ? $this->action .(strstr($this->action, '?') ? '&amp;'  : '?'). 'cid='.$sub->slug :
 		JRoute::_( FlexicontentHelperRoute::getCategoryRoute($sub->slug) );
@@ -52,14 +52,14 @@ foreach ($this->peercats as $sub) {
 	if ($show_subcatcount) $infocount_str .= ($show_itemcount ? ' / ' : '').count($sub->subcats) . $peercatcount_label;
 	if (strlen($infocount_str)) $infocount_str = ' (' . $infocount_str . ')';
 	$peercats_html[$i] .= "    <a class='catlink' href='".$cat_link."'>".$this->escape($sub->title)."</a>".$infocount_str."</span>\n";
-	
+
 	// c. Optional sub-category description stripped of HTML and cut to given length
 	if ($show_description_peercat && $sub->description) {
 		$peercats_html[$i] .= "  <span class='catdescription'>". flexicontent_html::striptagsandcut( $sub->description, $description_cut_text_peercat )."</span>";
 	}
-	
+
 	$peercats_html[$i] .= "</span>\n";
-	
+
 	// d. Add prefix, suffix to the HTML of current sub-category
 	$peercats_html[$i] = $pretext.$peercats_html[$i].$posttext;
 	$i++;

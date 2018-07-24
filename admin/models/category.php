@@ -21,6 +21,7 @@ defined('_JEXEC') or die('Restricted access');
 
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
+use Joomla\Component\Categories\Administrator\Helper\CategoriesHelper;
 
 jimport('legacy.model.admin');
 require_once('base.php');
@@ -196,10 +197,18 @@ class FlexicontentModelCategory extends FCModelAdmin
 	 *
 	 * @since   3.2.0
 	 */
-	public function getTable($type = 'Category', $prefix = 'CategoriesTable', $config = array())
+	public function getTable($type = 'Category', $prefix = null, $config = array())
 	{
-		JTable::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_categories'.DS.'tables');
-		return JTable::getInstance($type, $prefix, $config);
+		$prefix = $prefix !== null
+			? $prefix
+			: (FLEXI_J40GE ? 'Joomla\\CMS\\Table\\' : 'CategoriesTable');
+
+		if (!FLEXI_J40GE)
+		{
+			JTable::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_categories'.DS.'tables');
+		}
+
+		return parent::getTable($type, $prefix, $config);
 	}
 
 
@@ -539,7 +548,9 @@ class FlexicontentModelCategory extends FCModelAdmin
 			{
 				if ($item->id != null)
 				{
-					$item->associations = CategoriesHelper::getAssociations($item->id, $item->extension);
+					$item->associations = FLEXI_J40GE
+						? CategoriesHelper::getAssociations($item->id, $item->extension)
+						: \CategoriesHelper::getAssociations($item->id, $item->extension);
 					ArrayHelper::toInteger($item->associations);
 				}
 				else

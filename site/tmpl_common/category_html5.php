@@ -11,7 +11,7 @@ if ($menu) $page_classes .= ' menuitem'.$menu->id;
 <div id="flexicontent" class="flexicontent <?php echo $page_classes; ?>" >
 
 <!-- BOF buttons -->
-<?php if (JRequest::getCmd('print')) : ?>
+<?php if (JFactory::getApplication()->input->getInt('print', 0)) : ?>
 
 	<?php if ($this->params->get('print_behaviour', 'auto') == 'auto') : ?>
 		<script type="text/javascript">jQuery(document).ready(function(){ window.print(); });</script>

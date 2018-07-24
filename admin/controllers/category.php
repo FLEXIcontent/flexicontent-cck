@@ -75,7 +75,7 @@ class FlexicontentControllerCategory extends JControllerForm
 			$this->input->post->set('cid', $cid);
 		}
 
-		parent::edit();
+		parent::edit($key, $urlVar);
 	}
 
 

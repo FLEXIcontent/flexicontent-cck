@@ -18,8 +18,9 @@
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-jimport('legacy.controller.legacy');
 use Joomla\String\StringHelper;
+
+jimport('legacy.controller.legacy');
 
 /**
  * FLEXIcontent Component Controller

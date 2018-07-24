@@ -222,17 +222,30 @@ $this->document->addScriptDeclaration($js);
 
 			<div class="fc-sliders-plain-outer fc_preloaded">
 				<?php
-				echo JHtml::_('sliders.start','theme-sliders-'.$this->form->getValue("id"), array('useCookie'=>1));
+				$slider_set_id = 'theme-sliders-' . $this->form->getValue('id');
+				//echo JHtml::_('sliders.start', $slider_set_id, array('useCookie'=>1));
+				echo JHtml::_('bootstrap.startAccordion', $slider_set_id, array(/*'active' => ''*/));
+
 				$groupname = 'attribs';  // Field Group name this is for name of <fields name="..." >
 				$item_layout = $this->row->attribs->get('ilayout');
 
 				foreach ($this->tmpls as $tmpl) :
 
 					$form_layout = $tmpl->params;
-					$label = '<span class="btn"><i class="icon-edit"></i>'.JText::_( 'FLEXI_PARAMETERS_THEMES_SPECIFIC' ) . ' : ' . $tmpl->name.'</span>';
-					echo JHtml::_('sliders.panel', $label, $tmpl->name.'-'.$groupname.'-options');
+					$slider_title = '
+						<span class="btn"><i class="icon-edit"></i>
+							' . JText::_('FLEXI_PARAMETERS_THEMES_SPECIFIC') . ' : ' . $tmpl->name . '
+						</span>';
+					$slider_id = $tmpl->name . '-' . $groupname . '-options';
 
-					if ($tmpl->name !== $item_layout) continue;
+					//echo JHtml::_('sliders.panel', $slider_title, $slider_id);
+					echo JHtml::_('bootstrap.addSlide', $slider_set_id, $slider_title, $slider_id);
+
+					if ($tmpl->name !== $item_layout)
+					{
+						echo JHtml::_('bootstrap.endSlide');
+						continue;
+					}
 
 					// Display only current layout and only get global layout parameters for it
 					$layoutParams = flexicontent_tmpl::getLayoutparams('items', $tmpl->name, '');
@@ -262,7 +275,7 @@ $this->document->addScriptDeclaration($js);
 							// For J3.7.0+ , we have extra form methods Form::getFieldXml()
 							if ($cssprep && FLEXI_J37GE)
 							{
-								$_value = $form_layout->getValue($fieldname, $groupname, @ $layoutParams[$fieldname]);
+								$_value = $form_layout->getValue($fieldname, $groupname, $layoutParams->get($fieldname));
 								$form_layout->setFieldAttribute($fieldname, 'disabled', 'true', $field->group);
 								$field->setup($form_layout->getFieldXml($fieldname, $field->group), $_value, $field->group);
 							}
@@ -273,8 +286,10 @@ $this->document->addScriptDeclaration($js);
 								<div class="control-group" id="'.$field->id.'-container">
 									<div class="control-label">'.
 										str_replace('class="', 'class="'.$labelclass.' ',
-											str_replace('jform_attribs_', 'jform_layouts_'.$tmpl->name.'_',
-												$form_layout->getLabel($fieldname, $groupname)
+											str_replace(' for="', ' data-for="',
+												str_replace('jform_attribs_', 'jform_layouts_'.$tmpl->name.'_',
+													$form_layout->getLabel($fieldname, $groupname)
+												)
 											)
 										) . '
 									</div>
@@ -299,12 +314,17 @@ $this->document->addScriptDeclaration($js);
 						</fieldset>
 
 					<?php endforeach; //fieldSets ?>
+					<?php echo JHtml::_('bootstrap.endSlide'); ?>
+
 				<?php endforeach; //tmpls ?>
 
-				<?php echo JHtml::_('sliders.end'); ?>
-			</div>
-		</div>
-	</div>
+				<?php echo JHtml::_('bootstrap.endAccordion'); //echo JHtml::_('sliders.end'); ?>
+
+			</div><!-- END class="fc-sliders-plain-outer" -->
+		</div> <!-- END class="fc_tabset_inner" -->
+
+	</div><!-- END tabbertab FLEXI_LAYOUT -->
+
 
 
 	<!-- Permissions tab -->
