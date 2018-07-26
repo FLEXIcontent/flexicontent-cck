@@ -657,7 +657,7 @@ class plgSearchFlexiadvsearch extends JPlugin
 		foreach($filters as $field)
 		{
 			// Get value of current filter, and SKIP it if value is EMPTY
-			$filtervalue = $app->input->getString('filter_'.$field->id, '');
+			$filtervalue = $app->input->get('filter_'.$field->id, '', 'array');
 			$empty_filtervalue_array  = is_array($filtervalue)  && !strlen(trim(implode('',$filtervalue)));
 			$empty_filtervalue_string = !is_array($filtervalue) && !strlen(trim($filtervalue));
 			if ($empty_filtervalue_array || $empty_filtervalue_string) continue;

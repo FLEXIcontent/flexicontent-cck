@@ -903,7 +903,7 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		foreach ($filters as $filter)
 		{
 			$filter->parameters->set('display_label_filter_s', 0);
-			$filter->value = $jinput->getString('filter_' . $filter->id);
+			$filter->value = $jinput->get('filter_' . $filter->id, '', 'array');
 
 			if (
 				(!is_array($filter->value) && strlen($filter->value)) ||
