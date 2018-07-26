@@ -663,6 +663,7 @@ class plgFlexicontent_fieldsText extends FCField
 		$inputmask	= $field->parameters->get( 'inputmask', false ) ;
 
 		// Server side validation
+		$required   = (int) $field->parameters->get( 'required', 0 ) ;
 		$validation = $field->parameters->get( 'validation', 'HTML' ) ;
 		$maxlength  = (int) $field->parameters->get( 'maxlength', 0 ) ;
 
@@ -678,7 +679,7 @@ class plgFlexicontent_fieldsText extends FCField
 		$new = 0;
 		foreach ($post as $n => $v)
 		{
-			$v = $post[$n];
+			$v = trim($post[$n]);
 
 			// Unmasking is done via JS code, but try to redo it, to avoid value loss if unmasking was not done
 			if ($inputmask === 'decimal')
@@ -701,7 +702,9 @@ class plgFlexicontent_fieldsText extends FCField
 			// *** Validate data, skipping values that are empty after validation
 			// ***
 
-			$post[$n] = flexicontent_html::dataFilter($v, $maxlength, $validation, 0);
+			$post[$n] = $required || strlen($v)
+				? flexicontent_html::dataFilter($v, $maxlength, $validation, 0)
+				: '';
 
 			// Skip empty value, but if in group increment the value position
 			if (!strlen($post[$n]))
