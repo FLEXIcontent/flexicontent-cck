@@ -219,7 +219,7 @@ if ( $use_search || $use_filters ) : /* BOF search and filters block */
 				$even_odd_class = !$filters_in_tabs ? (($n++)%2 ? ' fc_even': ' fc_odd') : '';
 
 				// Highlight active filter
-				$filt_vals = $app->input->getString('filter_' . $filt->id);
+				$filt_vals = $app->input->get('filter_' . $filt->id, '', 'array');
 
 				// Skip filters without value
 				if (is_array($filt_vals))

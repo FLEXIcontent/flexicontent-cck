@@ -1371,7 +1371,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		if ($filters) foreach ($filters as $filter)
 		{
 			// Get filter values, setting into appropriate session variables
-			$filt_vals = $app->input->getString('filter_' . $filter->id);
+			$filt_vals = $app->input->get('filter_' . $filter->id, '', 'array');
 
 			// Skip filters without value
 			if (is_array($filt_vals))
