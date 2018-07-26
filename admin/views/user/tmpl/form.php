@@ -100,9 +100,7 @@ $this->document->addScriptDeclaration($js);
 <div id="flexicontent">
 <form action="index.php?controller=users" method="post" name="adminForm" id="adminForm" class="form-validate form-horizontal" autocomplete="off">
 
-
-<div class="container-fluid row" style="padding: 0px; margin-bottom: 24px;">
-
+<div class="container-fluid row" style="padding: 0px !important; margin: 0px! important;">
 
 	<div class="span6 col-6 full_width_980" style="margin-bottom: 16px !important;">
 
@@ -398,6 +396,7 @@ $this->document->addScriptDeclaration($js);
 		</div><!-- fctabber -->
 			
 	</div>
+
 </div>
 
 

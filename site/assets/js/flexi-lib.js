@@ -45,14 +45,20 @@
 		var _msg = '';
 
 		var input_files = input.files;
-		if (input_files && input_files[0]) {
+
+		if (input_files && input_files[0])
+		{
 			var imageType = /image.*/;
-			if (!input_files[0].type.match(imageType)) {
+
+			if (!input_files[0].type.match(imageType))
+			{
 		  	if (nonimg_mssg=='-1') _msg = '';
 		  	else if (nonimg_mssg=='-2') _msg = input.value;
 		  	else if (nonimg_mssg=='0' || nonimg_mssg=='') _msg = (nonimg_mssg!='' ? nonimg_mssg : input.value+' <br/> '+Joomla.JText._('FLEXI_NOT_AN_IMAGE_FILE'));
 		  	jQuery('#'+img_id).hide();
-		  } else {
+		  }
+			else
+			{
 		  	if (nonimg_mssg=='-2' || nonimg_mssg=='0') _msg = input.value;
 		  	else _msg = '';
 				var reader = new FileReader();
@@ -884,7 +890,7 @@
 	//******************************************
 	
 	// *** Hide a column of a table
-	function toggle_column(container_div_id, data_tbl_id, col_no, firstrun)
+	function fc_tbl_toggle_column(container_div_id, data_tbl_id, col_no, firstrun)
 	{
 		// 1. Get column-status array for the table with id: data_tbl_id
 		var show_col = eval('show_col_'+data_tbl_id);
@@ -1066,26 +1072,29 @@
 			column_toggle_lbl.remove();
 	
 			// 6. Show / Hide current column
-			if ( ( !firstload && !js_isset(show_col[col]) ) || ( jQuery(thcells[col]).hasClass('initiallyHidden') && !js_isset(show_col[col]) ) ) {
+			if ( ( !firstload && !js_isset(show_col[col]) ) || ( jQuery(thcells[col]).hasClass('initiallyHidden') && !js_isset(show_col[col]) ) )
+			{
 				var checked_str = '';
 				var fontcolor_str = 'black';//var fontcolor_str = '#aaaaaa';
-				// *** It has value of 0 or not set, set it to 1 for toggle_column() function to hide it
+
+				// *** It has value of 0 or not set, set it to 1 for fc_tbl_toggle_column() function to hide it
 				show_col[col] = 1;
-				// *** Call toggle_column()
-				toggle_column('', data_tbl_id, col, 1);
-			} else {
+				fc_tbl_toggle_column('', data_tbl_id, col, 1);
+			}
+			else
+			{
 				var checked_str = 'checked="checked"';
 				var fontcolor_str = 'black'; //var fontcolor_str = 'black';
-				// *** It has value of 1 or not set, set it to 0 for toggle_column() function to show it
+
+				// *** It has value of 1 or not set, set it to 0 for fc_tbl_toggle_column() function to show it
 				show_col[col] = 0;
-				// *** Call toggle_column()
-				toggle_column('', data_tbl_id, col, 1);
+				fc_tbl_toggle_column('', data_tbl_id, col, 1);
 			}
 	
 			// 7. Create column checkbox and append it to str
 			var ffieldid   = 'columnchoose_' + data_tbl_id + '_' + col;
 			var ffieldname = 'columnchoose_' + data_tbl_id + '[' + col + ']';
-			str = str + '<input align="right" id="' + ffieldid + '" name="' + ffieldname + '" type="checkbox" data-colno="' + col + '" ' + checked_str + ' onclick="toggle_column(\''+container_div_id+'\', \''+data_tbl_id+'\', '+col+', 0);">'
+			str = str + '<input align="right" id="' + ffieldid + '" name="' + ffieldname + '" type="checkbox" data-colno="' + col + '" ' + checked_str + ' onclick="fc_tbl_toggle_column(\''+container_div_id+'\', \''+data_tbl_id+'\', '+col+', 0);">'
 			+ '<label id="' + ffieldid + '_label" style="color:'+fontcolor_str+';" for="' + ffieldid + '">' + col_display_name + '</label>';
 		}
 	
@@ -1298,7 +1307,9 @@
 				box.show() :
 				box.slideDown(400) ;
 			jQuery(btn).addClass(btnClass).data('fc_noeffect', null).removeClass('fc_noeffect');
-		} else {
+		}
+		else
+		{
 			if (el) fclib_setCookie(el.get(0).name, 0, 0);
 			jQuery(btn).data('fc_noeffect') || jQuery(btn).hasClass('fc_noeffect') ?
 				box.hide() :
@@ -1610,10 +1621,14 @@
 				var nVals = new Array();
 				var i = 0;
 				var found = 0;
-				if (vals && vals.length) vals.each(function(v) {
-					if (v != e.val) nVals[i++] = v;
-					else found = 1;
-				});
+				if (vals && vals.length)
+				{
+					for (var n = 0; n < vals.length; ++n)
+					{
+						if (vals[n] != e.val) nVals[i++] = vals[n];
+						else found = 1;
+					}
+				}
 
 				if (!found) nVals[i++] = e.val;
 				sel_EL.data('set_selected_values', nVals);
