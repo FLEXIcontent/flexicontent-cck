@@ -367,7 +367,7 @@ jQuery(document).ready(function() {
 		}
 	}
 
-	if (typeof Calendar !== "undefined" && typeof Calendar.prototype.callCloseHandler === 'function')
+	else if (typeof Calendar !== "undefined" && typeof Calendar.prototype.callCloseHandler === 'function')
 	{
 		var oldFunc = Calendar.prototype.callCloseHandler;
 		Calendar.prototype.callCloseHandler = function()
@@ -499,9 +499,10 @@ jQuery(document).ready(function() {
 				Joomla.JText._('FLEXI_APPLYING_FILTERING') +
 				'<div class="fc_blocker_bar"><div></div></div>' +
 			'</div>' +
-		'</div>');
+		'</div>'
+	);
 
-		fc_recalculateWindow();
+	fc_recalculateWindow();
 });
 
 

@@ -26,7 +26,7 @@ if ($this->behaviour === 'translate' && !flexicontent_db::useAssociations())
 <div id="flexicontent" class="flexicontent">
 <form action="index.php" method="post"  name="adminForm" id="adminForm" class="form-validate form-horizontal">
 
-	<div class="container-fluid row" style="padding: 0px; margin-bottom: 24px; max-width: 1200px;">
+	<div class="container-fluid row" style="padding: 0px !important; margin: 0px !important; max-width: 1200px;">
 
 		<div class="span6 col-6 full_width_980" style="margin-bottom: 16px !important;">
 
@@ -61,8 +61,9 @@ if ($this->behaviour === 'translate' && !flexicontent_db::useAssociations())
 				</table>
 			</fieldset>
 
-	</div>
-	<div class="span6 col-6 full_width_980" style="margin-bottom: 16px !important;">
+		</div>
+
+		<div class="span6 col-6 full_width_980" style="margin-bottom: 16px !important;">
 
 			<fieldset>
 			

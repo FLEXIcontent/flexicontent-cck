@@ -36,10 +36,8 @@ $isAdmin = $app->isAdmin();
  * COMMON classes and COMMON repeated texts
  */
 
-$tip_class = ' hasTooltip';
-$btn_class = 'btn';  //'fc_button fcsimple';
-
-$ico_class   = 'fc-man-icon-s';
+$btn_class = 'btn';
+$ico_class = 'fc-man-icon-s';
 $btn_s_class = 'btn btn-small';
 
 $edit_entry  = JText::_('FLEXI_EDIT_CATEGORY', true);
@@ -66,17 +64,7 @@ $tools_cookies['fc-filters-box-disp'] = JFactory::getApplication()->input->cooki
  */
 
 $fcfilter_attrs_row = ' class="input-prepend fc-xpended-row" ';
-$attribs_preview    = ' class="fc-preview-btn ntxt '.$btn_s_class.' '.$tip_class.'" title="'.flexicontent_html::getToolTip( 'FLEXI_PREVIEW', 'FLEXI_DISPLAY_ENTRY_IN_FRONTEND_DESC', 1, 1).'" ';
-$attribs_rsslist    = ' class="fc-rss-list-btn ntxt '.$btn_s_class.' '.$tip_class.'" title="'.flexicontent_html::getToolTip( 'FLEXI_FEED_RSS', 'FLEXI_DISPLAY_RSS_IN_FRONTEND_DESC', 1, 1).'" ';
-$attribs_editlayout = ' class="fc-edit-layout-btn ntxt '.$btn_s_class.' '.$tip_class.'" title="'.flexicontent_html::getToolTip( 'FLEXI_EDIT_LAYOUT_N_GLOBAL_PARAMETERS', null, 1, 1).'" ';
-
-$image_preview = 0
-	? JHtml::image( 'components/com_flexicontent/assets/images/'.'monitor_go.png', JText::_('FLEXI_PREVIEW'), ' class="'.$ico_class.'"')
-	: '<span class="icon-screen"></span>';
-
-$image_rsslist = 0
-	? JHtml::image( FLEXI_ICONPATH.'livemarks.png', JText::_('FLEXI_FEED'), ' class="'.$ico_class.'"')
-	: '<span class="icon-feed"></span>';
+$attribs_editlayout = ' class="fc-edit-layout-btn ntxt '.$btn_s_class.' ' . $this->tooltip_class . '" title="'.flexicontent_html::getToolTip( 'FLEXI_EDIT_LAYOUT_N_GLOBAL_PARAMETERS', null, 1, 1).'" ';
 
 $image_editlayout = 0 ?
 	JHtml::image('components/com_flexicontent/assets/images/'.'layout_edit.png', htmlspecialchars(JText::_('FLEXI_EDIT_LAYOUT_N_GLOBAL_PARAMETERS'), ENT_QUOTES, 'UTF-8'), ' class="'.$ico_class.'"') :
@@ -120,16 +108,31 @@ function delFilter(name)
 	var myForm = jQuery('#adminForm');
 	var filter = jQuery('#'+name);
 	if (filter.attr('type')=='checkbox')
+	{
 		filter.checked = '';
+	}
 	else
+	{
 		filter.val('');
+		// Case that input has Calendar JS attached
+		if (filter.attr('data-alt-value'))
+		{
+			filter.attr('data-alt-value', '');
+		}
+	}
 }
 
-function delAllFilters() {
-	delFilter('search'); delFilter('filter_state'); delFilter('filter_cats');
-	delFilter('filter_level'); delFilter('filter_access'); delFilter('filter_language');
+function delAllFilters()
+{
+	delFilter('search');
+	delFilter('filter_state');
+	delFilter('filter_cats');
+	delFilter('filter_level');
+	delFilter('filter_access');
+	delFilter('filter_language');
 	delFilter('filter_id');
-	delFilter('filter_order'); delFilter('filter_order_Dir');
+	delFilter('filter_order');
+	delFilter('filter_order_Dir');
 }
 
 </script>
@@ -142,7 +145,6 @@ function delAllFilters() {
 
 
 <div class="<?php echo FLEXI_J40GE ? 'row' : 'row-fluid'; ?>">
-
 
 <?php if (!empty( $this->sidebar)) : ?>
 
@@ -161,8 +163,8 @@ function delAllFilters() {
 	<div id="fc-filters-header">
 		<div class="btn-group input-append fc-filter filter-search">
 			<input type="text" name="search" id="search" placeholder="<?php echo JText::_( 'FLEXI_SEARCH' ); ?>" value="<?php echo htmlspecialchars($this->lists['search'], ENT_QUOTES, 'UTF-8'); ?>" class="inputbox" />
-			<button title="" data-original-title="<?php echo JText::_('FLEXI_SEARCH'); ?>" class="<?php echo $btn_class.' '.$tip_class; ?>" onclick="document.adminForm.limitstart.value=0; Joomla.submitform();"><?php echo FLEXI_J30GE ? '<i class="icon-search"></i>' : JText::_('FLEXI_GO'); ?></button>
-			<button title="" data-original-title="<?php echo JText::_('FLEXI_RESET_FILTERS'); ?>" class="<?php echo $btn_class.' '.$tip_class; ?>" onclick="document.adminForm.limitstart.value=0; delAllFilters(); Joomla.submitform();"><?php echo FLEXI_J30GE ? '<i class="icon-remove"></i>' : JText::_('FLEXI_CLEAR'); ?></button>
+			<button title="" data-original-title="<?php echo JText::_('FLEXI_SEARCH'); ?>" class="<?php echo $btn_class . (FLEXI_J40GE ? ' btn-outline-dark ' : ' ') . $this->tooltip_class; ?>" onclick="document.adminForm.limitstart.value=0; Joomla.submitform();"><?php echo FLEXI_J30GE ? '<i class="icon-search"></i>' : JText::_('FLEXI_GO'); ?></button>
+			<button title="" data-original-title="<?php echo JText::_('FLEXI_RESET_FILTERS'); ?>" class="<?php echo $btn_class . (FLEXI_J40GE ? ' btn-outline-dark ' : ' ') . $this->tooltip_class; ?>" onclick="document.adminForm.limitstart.value=0; delAllFilters(); Joomla.submitform();"><?php echo FLEXI_J30GE ? '<i class="icon-remove"></i>' : JText::_('FLEXI_CLEAR'); ?></button>
 		</div>
 
 		<?php $_class = FLEXI_J30GE ? ' btn' : ' fc_button fcsimple fcsmall'; ?>
@@ -263,19 +265,19 @@ function delAllFilters() {
 			<!--th class="hideOnDemandClass"><?php echo JHtml::_('grid.sort', 'FLEXI_ITEMS_ASSIGNED', 'nrassigned', $this->lists['order_Dir'], $this->lists['order'] ); ?></th-->
 			<th class="hideOnDemandClass center hidden-phone hidden-tablet">
 				<span class="column_toggle_lbl" style="display:none;"><small class="badge"><?php echo $state_names['ALL_P']; ?></small></span>
-				<?php echo '<span class="'.$tip_class.' icon-'.$state_icons['ALL_P'].'" title="'.$state_names['ALL_P'].' '.JText::_ ('FLEXI_ITEMS').'" data-placement="top" style="font-size: 16px;"></span>'; ?>
+				<?php echo '<span class="' . $this->tooltip_class . ' icon-'.$state_icons['ALL_P'].'" title="'.$state_names['ALL_P'].' '.JText::_ ('FLEXI_ITEMS').'" data-placement="top" style="font-size: 16px;"></span>'; ?>
 			</th>
 			<th class="hideOnDemandClass center hidden-phone hidden-tablet">
 				<span class="column_toggle_lbl" style="display:none;"><small class="badge"><?php echo $state_names['ALL_U']; ?></small></span>
-				<?php echo '<span class="'.$tip_class.' icon-'.$state_icons['ALL_U'].'" title="'.$state_names['ALL_U'].' '.JText::_ ('FLEXI_ITEMS').'" data-placement="top" style="font-size: 16px;"></span>'; ?>
+				<?php echo '<span class="' . $this->tooltip_class . ' icon-'.$state_icons['ALL_U'].'" title="'.$state_names['ALL_U'].' '.JText::_ ('FLEXI_ITEMS').'" data-placement="top" style="font-size: 16px;"></span>'; ?>
 			</th>
 			<th class="hideOnDemandClass center hidden-phone hidden-tablet">
 				<span class="column_toggle_lbl" style="display:none;"><small class="badge"><?php echo $state_names['A']; ?></small></span>
-				<?php echo '<span class="'.$tip_class.' icon-'.$state_icons['A'].'" title="'.$state_names['A'].' '.JText::_ ('FLEXI_ITEMS').'" data-placement="top" style="font-size: 16px;"></span>'; ?>
+				<?php echo '<span class="' . $this->tooltip_class . ' icon-'.$state_icons['A'].'" title="'.$state_names['A'].' '.JText::_ ('FLEXI_ITEMS').'" data-placement="top" style="font-size: 16px;"></span>'; ?>
 			</th>
 			<th class="hideOnDemandClass center hidden-phone hidden-tablet">
 				<span class="column_toggle_lbl" style="display:none;"><small class="badge"><?php echo $state_names['T']; ?></small></span>
-				<?php echo '<span class="'.$tip_class.' icon-'.$state_icons['T'].'" title="'.$state_names['T'].' '.JText::_ ('FLEXI_ITEMS').'" data-placement="top" style="font-size: 16px;"></span>'; ?>
+				<?php echo '<span class="' . $this->tooltip_class . ' icon-'.$state_icons['T'].'" title="'.$state_names['T'].' '.JText::_ ('FLEXI_ITEMS').'" data-placement="top" style="font-size: 16px;"></span>'; ?>
 			</th>
 			<th class="hideOnDemandClass hidden-phone"><?php echo JHtml::_('grid.sort', 'FLEXI_ACCESS', 'a.access', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<!--th class="hideOnDemandClass">
@@ -453,8 +455,8 @@ function delAllFilters() {
 					//echo JHtml::_('fccats.published', $row->published, $i, $canChange);
 
 					echo flexicontent_html::statebutton( $row, null, $addToggler = ($this->pagination->limit <= $this->inline_ss_max), 'top', 'btn btn-small', array('controller'=>'categories', 'state_propname'=>'published') );
-					echo '<a '.$attribs_rsslist.' href="'.$rsslink.'" target="_blank">'.$image_rsslist.'</a>';
-					echo '<a '.$attribs_preview.' href="'.$previewlink.'" target="_blank">'.$image_preview.'</a>';
+					echo JHtml::_('fccats.rss_link', $row, '_blank', $i);
+					echo JHtml::_('fccats.preview', $row, '_blank', $i);
 					?>
 				</div>
 			</td>
@@ -482,7 +484,7 @@ function delAllFilters() {
 						}
 						$_tip_title = htmlspecialchars($_tip_title, ENT_QUOTES, 'UTF-8');
 						?>
-						<a class="btn btn-micro <?php echo $tip_class; ?>" title="<?php echo $_tip_title; ?>" href="javascript:;" onclick="var ccb=document.getElementById('cb<?php echo $i;?>'); ccb.checked=1; ccb.form.task.value='<?php echo $task_str; ?>'; ccb.form.submit();">
+						<a class="btn btn-micro <?php echo $this->tooltip_class; ?>" title="<?php echo $_tip_title; ?>" href="javascript:;" onclick="var ccb=document.getElementById('cb<?php echo $i;?>'); ccb.checked=1; ccb.form.task.value='<?php echo $task_str; ?>'; ccb.form.submit();">
 							<span class="icon-checkedout"></span>
 						</a>
 						<?php
@@ -508,7 +510,7 @@ function delAllFilters() {
 				?>
 
 				<?php	if (!empty($row->note)) : /* Display J1.6+ category note in a tooltip */ ?>
-					<span class="<?php echo $tip_class; ?>" title="<?php echo flexicontent_html::getToolTip( JText::_ ('FLEXI_NOTES'), $row->note, 0, 1); ?>">
+					<span class="<?php echo $this->tooltip_class; ?>" title="<?php echo flexicontent_html::getToolTip( JText::_ ('FLEXI_NOTES'), $row->note, 0, 1); ?>">
 						<?php echo $infoimage; ?>
 					</span>
 				<?php endif; ?>
@@ -593,11 +595,13 @@ function delAllFilters() {
 				<?php echo $row->language_title ? $this->escape($row->language_title) : JText::_('JUNDEFINED'); ?>
 			<?php endif;?>
 			</td>
+
 			<td class="center hidden-phone">
 				<span title="<?php echo sprintf('%d-%d', $row->lft, $row->rgt);?>">
 				<?php echo $row->id; ?>
 				</span>
 			</td>
+
 		</tr>
 		<?php
 			$i++;
@@ -618,7 +622,7 @@ function delAllFilters() {
 	<div class="fcclear"></div>
 	<input type="hidden" name="original_order_values" value="<?php echo implode(',', $originalOrders); ?>" />
 
-	<!-- Common management fields -->
+	<!-- Common management form fields -->
 	<input type="hidden" name="boxchecked" value="0" />
 	<input type="hidden" name="option" value="com_flexicontent" />
 	<!---input type="hidden" name="controller" value="categories" /-->

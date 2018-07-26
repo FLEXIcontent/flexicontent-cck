@@ -260,7 +260,7 @@ div.adminthumbs.fcmanthumbs {
 .flexicontent #fc-filters-box {
 	padding-right: 0px;
 }
-//.flexicontent #fc-mini-help,
+.flexicontent #fc-mini-help,
 .flexicontent #fc-filters-box.fcman-abs,
 .flexicontent #mainChooseColBox.fcman-abs {
 	position: absolute;
@@ -269,7 +269,10 @@ div.adminthumbs.fcmanthumbs {
 	z-index: 100;
 	right: 0;
 	top: 100%;
+	text-align: right;
+	padding: 6px;
 }
+
 .flexicontent #mainChooseColBox > #mainChooseColBox_cols {
 	display: inline-block;
 }
@@ -299,9 +302,9 @@ div.adminthumbs.fcmanthumbs {
 	}
 
 	.fc-filter-head-box {
-		vertical-align: baseline !important;
-		border: 0px !important;
-		padding: 0px !important;
+		vertical-align: middle;
+		border: 0px;
+		padding: 0px;
 		margin: 2px 0 6px 24px;
 		width: unset;
 
@@ -424,6 +427,30 @@ div.adminthumbs.fcmanthumbs {
 			height: 16px !important;
 			padding: 13px 8px !important;
 			box-sizing: border-box;
+		}
+	}
+}
+
+// *** Search Scope
+#s2id_scope.select2-container.use_select2_lib {
+	margin: 0;
+	display: inherit;
+
+	.select2-choice {
+		width: 10px !important;
+		margin: 0 !important;
+		border-top-left-radius: 0;
+		border-bottom-left-radius: 0;
+
+		.select2-chosen {
+			white-space: nowrap !important;
+		}
+
+		.select2-arrow {
+			border-radius: 0px;
+			> * {
+				background-position-y: 0.5em;
+			}
 		}
 	}
 }

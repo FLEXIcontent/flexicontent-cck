@@ -861,6 +861,14 @@ div fieldset.panelform {
 	outline-width: 0;
 }
 #flexicontent {
+	.input-group > input {
+		border-width: 1px;
+		border-style: solid;
+	}
+	.input-group > input:first-child,
+	.input-group > input:last-child {
+		border-radius: 4px;
+	}
 	.btn[class^="btn-outline-"],
 	.btn[class*=" btn-outline-"] {
 		border-width: 1px;
@@ -1078,15 +1086,19 @@ form div.container_fcfield > select {
 #flexicontent div fieldset.panelform .input-prepend > button {
 	margin-right: 0px;
 }
-#flexicontent div .btn-group > .btn:not(:last-child),
-#flexicontent div .input-append > .btn:not(:last-child) {
+#flexicontent div .btn-group > *:not(:last-child),
+#flexicontent div .input-append > *:not(:last-child) {
 	border-top-left-radius: 0px;
 	border-bottom-left-radius: 0px;
+	vertical-align: middle;
 }
-#flexicontent div .btn-group > .btn:not(:first-child),
-#flexicontent div .input-prepend > .btn:not(:first-child) {
+#flexicontent div .btn-group > *:not(:first-of-type),
+#flexicontent div .input-prepend > *:not(:first-child),
+#flexicontent div .btn-group > *:not(:first-child):not(label),
+#flexicontent div .input-prepend > *:not(:first-child):not(label) {
 	border-top-right-radius: 0px;
 	border-bottom-right-radius: 0px;
+	vertical-align: middle;
 }
 
 #flexicontent div fieldset.panelform :not(.container_fcfield) fieldset.radio,
@@ -1806,6 +1818,17 @@ table.fc-form-tbl td.key > .fc-prop-lbl {
 	font-style: italic !important;
 }
 
+/* Avoid page jumping effect until this is rendered via JS */
+select.use_select2_lib {
+	height: 1em !important;
+	width: 1.4em !important;
+	margin: 0 !important;
+	padding: 0 !important;
+	box-sizing: border-box !important;
+	border: 1px !important;
+	display: inline-block;
+}
+
 
 
 /**********************************
@@ -2073,6 +2096,11 @@ html[dir="rtl"] .select2-container .select2-choice {
 	white-space: normal !important; /* for chrome! */
 	width: auto !important;
 	min-width: 24px !important;
+}
+
+/* height fix for template CSS */
+.select2-container-multi .select2-choices > li {
+	box-sizing: content-box;
 }
 
 /* search box container */

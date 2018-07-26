@@ -8,6 +8,7 @@
  */
 
 defined('_JEXEC') or die;
+
 JHtml::_('bootstrap.tooltip');
 
 
@@ -22,6 +23,8 @@ abstract class JHtmlFcitems
 	static $btn_sm_class   = FLEXI_J40GE ? 'btn btn-sm' : 'btn btn-small';
 	static $btn_iv_class   = FLEXI_J40GE ? 'btn-dark' : 'btn-inverse';
 	static $btn_mbar_class = FLEXI_J40GE ? 'btn-outline-info' : '';
+	static $ctrl_s = 'item';
+	static $ctrl   = 'items';
 
 	/**
 	 * Create the feature/unfeature links
@@ -72,7 +75,7 @@ abstract class JHtmlFcitems
 	 */
 	public static function checkedout($row, $user, $i)
 	{
-		//return JHtml::_('jgrid.checkedout', $i, $row->editor, $row->checked_out_time, 'items.', $row->canCheckin);
+		//return JHtml::_('jgrid.checkedout', $i, $row->editor, $row->checked_out_time, static::$ctrl . '.', $row->canCheckin);
 
 		if (!$row->checked_out) return '';
 		if (!$row->canCheckin)
@@ -86,7 +89,7 @@ abstract class JHtmlFcitems
 
 		return 
 		($row->checked_out != $user->id ? '<input id="cb'.$i.'" type="checkbox" value="'.$row->id.'" name="cid[]" style="display:none!important;">' : '') . '
-		<a class="btn btn-micro btn-outline-secondary ntxt ' . static::$tooltip_class . '" title="'.JHtml::tooltipText($_tip_title).'" href="javascript:;" onclick="var ccb=document.getElementById(\'cb'.$i.'\'); ccb.checked=1; ccb.form.task.value=\'items.checkin\'; ccb.form.submit();">
+		<a class="btn btn-micro btn-outline-secondary ntxt ' . static::$tooltip_class . '" title="'.JHtml::tooltipText($_tip_title).'" href="javascript:;" onclick="var ccb=document.getElementById(\'cb'.$i.'\'); ccb.checked=1; ccb.form.task.value=\'' . static::$ctrl . '.checkin\'; ccb.form.submit();">
 			<span class="icon-checkedout"></span>
 		</a>
 		';
@@ -157,7 +160,7 @@ abstract class JHtmlFcitems
 
 
 	/**
-	 * Create the statetoggler button for items view
+	 * Create the statetoggler button
 	 *
 	 * @param   object   $row        The row
 	 * @param   int      $i          Row number
@@ -169,11 +172,15 @@ abstract class JHtmlFcitems
 		static $params = null;
 		static $addToggler = true;
 		static $tooltip_placement = 'top';
+		static $ops = null;
 
-		static $ops = array(
-			'controller'=>'items',
-			'state_propname'=>'state',
-		);
+		if ($ops === null)
+		{
+			$ops = array(
+				'controller' => static::$ctrl,
+				'state_propname'=>'state',
+			);
+		}
 
 		return flexicontent_html::statebutton($row, $params, $addToggler, $tooltip_placement, static::$btn_sm_class . ' ' . static::$btn_mbar_class, $ops);
 	}
@@ -200,12 +207,12 @@ abstract class JHtmlFcitems
 		}
 
 		// Build a frontend SEF url
-		$preview_link = flexicontent_html::getSefUrl($record_url);
+		$link = flexicontent_html::getSefUrl($record_url);
 
 		$attribs = ''
 			. ' class="fc-preview-btn ntxt ' .  static::$btn_mbar_class . ' ' . static::$btn_sm_class . ' ' . static::$tooltip_class . '"'
 			. ' title="' . flexicontent_html::getToolTip('FLEXI_PREVIEW', 'FLEXI_DISPLAY_ENTRY_IN_FRONTEND_DESC', 1, 1) . '"'
-			. ' href="' . $preview_link .'"'
+			. ' href="' . $link .'"'
 			. '	target="' . $target . '"';
 
 		return '

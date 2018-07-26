@@ -279,7 +279,7 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 		}
 		
 		$this->minihelp = '
-			<div id="fc-mini-help" class="fc-mssg fc-info" style="display:none;">
+			<div id="fc-mini-help" class="fc-mssg fc-info" style="display:none; min-width: 600px;">
 				'.JText::sprintf('FLEXI_ABOUT_CUSTOM_FIELD_COLUMNS_COMPONENT_AND_PER_TYPE', $conf_link).'<br/><br/>
 				<sup>[1]</sup> ' . JText::_('FLEXI_TMPL_NOT_SET_USING_TYPE_DEFAULT') . '<br />
 				'.( $useAssocs ? '
@@ -525,32 +525,32 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 		
 		//search filter
 		$scopes = array();
-		$scopes[1] = JText::_( 'FLEXI_TITLE' );
-		$scopes[2] = JText::_( 'FLEXI_DESCRIPTION' );
-		$scopes[4] = JText::_( 'FLEXI_FIELDS_IN_BASIC_SEARCH_INDEX' );
+		$scopes[1] = JText::_('FLEXI_TITLE');
+		$scopes[2] = JText::_('FLEXI_DESCRIPTION');
+		$scopes[4] = JText::_('FLEXI_FIELDS_IN_BASIC_SEARCH_INDEX');
 		$_scopes = array();
+		$this->scope_title = $scopes[$scope];
 
 		foreach ($scopes as $i => $v)
 		{
 			$_scopes[] = JHtml::_('select.option', $i, $v);
 		}
 		//$lists['scope'] = JHtml::_('select.radiolist', $_scopes, 'scope', 'size="1" class="inputbox"', 'value', 'text', $scope );
-		$lists['scope'] = '
-			<span class="' . $this->tooltip_class . '" title="'.JText::_('FLEXI_SEARCH_TEXT_INSIDE').'"><i class="icon-info-2"></i></span>
-			' . JHtml::_('select.genericlist',
-				$_scopes,
-				'scope',
-				array(
-					'size' => '1',
-					'class' => $this->select_class . ' fc_skip_highlight',
-					'onchange' => 'jQuery(\'#search\').attr(\'placeholder\', jQuery(this).find(\'option:selected\').text());',
-				),
-				'value',
-				'text',
-				$scope,
-				'scope'
-			);
-		
+		$lists['scope_tip'] = '<span class="' . $this->tooltip_class . '" title="'.JText::_('FLEXI_SEARCH_TEXT_INSIDE').'" style="display: inline-block;"><i class="icon-info-2"></i></span>';
+		$lists['scope'] = JHtml::_('select.genericlist',
+			$_scopes,
+			'scope',
+			array(
+				'size' => '1',
+				'class' => $this->select_class . ' fc_skip_highlight',
+				'onchange' => 'jQuery(\'#search\').attr(\'placeholder\', jQuery(this).find(\'option:selected\').text());',
+			),
+			'value',
+			'text',
+			$scope,
+			'scope'
+		);
+
 		/*$lists['scope']  = '';
 		foreach ($scopes as $i => $v)
 		{
@@ -734,12 +734,11 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 		{
 			$lists['filter_fileid'] = '';
 		}
-		
-		//assign data to template
+
+		// Assign data to template
 		$this->count_filters = $count_filters;
-		//$this->filter_stategrp = $filter_stategrp;
 		$this->filter_catsinstate = $filter_catsinstate;
-		$this->db = $db;
+
 		$this->lists = $lists;
 		$this->rows = $rows;
 		$this->itemCats = $itemCats;

@@ -86,8 +86,9 @@ class FlexicontentControllerCategory extends JControllerForm
 		if ($this->input->get('fc_doajax_submit'))
 		{
 			JFactory::getApplication()->enqueueMessage(JText::_('FLEXI_ITEM_SAVED'), 'message');
-			echo flexicontent_html::get_system_messages_html();
-			exit();  // Ajax submit, do not rerender the view
+
+			// Ajax submit, do not rerender the view
+			jexit(flexicontent_html::get_system_messages_html());
 		}
 	}
 
@@ -118,8 +119,12 @@ class FlexicontentControllerCategory extends JControllerForm
 		}
 
 		$usercats = FlexicontentHelperPerm::getAllowedCats(
-			$user, $actions_allowed = array('core.create'),
-			$require_all = true, $check_published = true, $specific_catids = false, $find_first = true
+			$user,
+			$actions_allowed = array('core.create'),
+			$require_all = true,
+			$check_published = true,
+			$specific_catids = false,
+			$find_first = true
 		);
 
 		return count($usercats) > 0;

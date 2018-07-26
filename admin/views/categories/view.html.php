@@ -18,17 +18,19 @@
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-jimport('legacy.view.legacy');
 use Joomla\String\StringHelper;
+use Joomla\Utilities\ArrayHelper;
+
+JLoader::register('FlexicontentViewBaseRecords', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/base/view_records.php');
 
 /**
- * View class for the FLEXIcontent categories screen
+ * HTML View class for the FLEXIcontent categories screen
  *
  * @package Joomla
  * @subpackage FLEXIcontent
  * @since 1.0
  */
-class FlexicontentViewCategories extends JViewLegacy
+class FlexicontentViewCategories extends FlexicontentViewBaseRecords
 {
 	function display( $tpl = null )
 	{

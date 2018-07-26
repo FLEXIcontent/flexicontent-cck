@@ -72,7 +72,7 @@ $this->document->addScriptDeclaration($js);
 		<div class="tabbertab" id="tabset_cat_props_desc_tab" data-icon-class="icon-file-2" >
 			<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_BASIC' ); ?> </h3>
 
-			<div class="container-fluid row" style="padding: 0px !important;">
+			<div class="container-fluid row" style="padding: 0px !important; margin: 0px !important">
 
 				<!--LEFT COLUMN-->
 				<div class="span8 col-8 full_width_980 off-white">
@@ -165,7 +165,7 @@ $this->document->addScriptDeclaration($js);
 		<div class="tabbertab" id="tabset_cat_props_metaseo_tab" data-icon-class="icon-bookmark" >
 			<h3 class="tabberheading"> <?php echo JText::_('FLEXI_PUBLISHING') . ', ' . JText::_('FLEXI_META'); ?> </h3>
 
-			<div class="container-fluid row" style="padding: 0px !important;">
+			<div class="container-fluid row" style="padding: 0px !important; margin: 0px !important">
 
 				<div class="span6 col-6 full_width_980" style="max-width: 980px;">
 					<div class="fcsep_level1"><?php echo JText::_('FLEXI_PUBLISHING'); ?></div>
