@@ -684,12 +684,12 @@ class plgFlexicontent_fieldsText extends FCField
 			// Unmasking is done via JS code, but try to redo it, to avoid value loss if unmasking was not done
 			if ($inputmask === 'decimal')
 			{
-				$v = str_replace('.', '', $v);
-				$v = str_replace(',', '.', $v);
+				$v = str_replace(',', '', $v);
 			}
 			elseif ($inputmask === 'decimal_comma')
 			{
-				$v = str_replace(',', '', $v);
+				$v = str_replace('.', '', $v);
+				$v = str_replace(',', '.', $v);
 			}
 			elseif ($inputmask === 'currency' || $inputmask === 'currency_euro')
 			{
