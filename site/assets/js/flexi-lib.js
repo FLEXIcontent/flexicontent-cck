@@ -1062,13 +1062,15 @@
 	
 		// 3. Iterate through the 'th' cells and create column hiders for those having the class 'hideOnDemandClass'
 		var str = (typeof start_text != "undefined") ? start_text : '';
-		for (var col=0; col<thcells.length;col++) {
+
+		for (var col = 0; col < thcells.length; col++)
+		{
 			// 4. Skip if not having 'hideOnDemandClass' class
 			if (!jQuery(thcells[col]).hasClass('hideOnDemandClass')) continue;
 	
 			// 5. Get column name
 			var column_toggle_lbl = jQuery(thcells[col]).find('.column_toggle_lbl');
-			var col_display_name = column_toggle_lbl.length ? column_toggle_lbl.html(): jQuery(thcells[col]).text();
+			var col_display_name = column_toggle_lbl.length ? column_toggle_lbl.html() : jQuery(thcells[col]).text();
 			column_toggle_lbl.remove();
 	
 			// 6. Show / Hide current column

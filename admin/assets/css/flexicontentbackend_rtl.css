@@ -3369,41 +3369,55 @@ div.adminthumbs.fcmanthumbs {
 #flexicontent input.fcitem_order_no {
 	text-align: center;
 }
-.flexicontent #fc-filters-header #search {
+.flexicontent #fc-managers-header #search {
 	margin: 0px !important;
 	padding: 4px !important;
 	vertical-align: top !important;
+	min-width: 200px;
+	border: 1px solid #aaa;
 }
-.flexicontent #fc-filters-header #limit {
+.flexicontent #fc-managers-header #search::placeholder {
+	color: #ccc;
+	opacity: 1;
+}
+.flexicontent #fc-managers-header #search:-ms-input-placeholder {
+	color: #ccc;
+}
+.flexicontent #fc-managers-header #search::-ms-input-placeholder {
+	color: #ccc;
+}
+.flexicontent #fc-managers-header #limit {
 	padding: 3px 6px !important;
 }
-.flexicontent #fc-filters-header .fc-filter-head-box {
+.flexicontent #fc-managers-header .fc-filter-head-box {
 	vertical-align: middle;
 	border: 0px;
 	padding: 0px;
 	margin: 2px 0 6px 24px;
 	width: unset;
+	position: relative;
 }
-.flexicontent #fc-filters-header .fc-filter-head-box .label {
+.flexicontent #fc-managers-header .fc-filter-head-box .label {
 	font-size: 11px;
 	padding: 4px 4px;
 	margin: 0px 4px;
 }
-.flexicontent #fc-filters-header .fc-filter-head-box .input-group-append,
-.flexicontent #fc-filters-header .fc-filter-head-box .input-group-prepend,
-.flexicontent #fc-filters-header .fc-filter-head-box .input-append,
-.flexicontent #fc-filters-header .fc-filter-head-box .input-prepend {
+.flexicontent #fc-managers-header .fc-filter-head-box .input-group-append,
+.flexicontent #fc-managers-header .fc-filter-head-box .input-group-prepend,
+.flexicontent #fc-managers-header .fc-filter-head-box .input-append,
+.flexicontent #fc-managers-header .fc-filter-head-box .input-prepend {
 	margin: 0px;
 }
-.flexicontent #fc-filters-header .fc-filter-head-box .input-group-append > *,
-.flexicontent #fc-filters-header .fc-filter-head-box .input-group-prepend > *,
-.flexicontent #fc-filters-header .fc-filter-head-box .input-append > *,
-.flexicontent #fc-filters-header .fc-filter-head-box .input-prepend > * {
+.flexicontent #fc-managers-header .fc-filter-head-box .input-group-append > *,
+.flexicontent #fc-managers-header .fc-filter-head-box .input-group-prepend > *,
+.flexicontent #fc-managers-header .fc-filter-head-box .input-append > *,
+.flexicontent #fc-managers-header .fc-filter-head-box .input-prepend > * {
 	display: inline-block;
 }
-.flexicontent #fc-filters-box #fc-filters-slide-btn {
+.flexicontent #fc-managers-header #fc-columns-slide-btn,
+.flexicontent #fc-managers-header #fc-filters-slide-btn {
 	width: 100%;
-	display: inline-block;
+	display: block;
 	box-sizing: border-box;
 	margin: 8px 0 0 0;
 	height: 24px;
@@ -3477,6 +3491,7 @@ div.adminthumbs.fcmanthumbs {
 	height: 16px !important;
 	padding: 13px 8px !important;
 	box-sizing: border-box;
+	border-radius: 0;
 }
 #s2id_scope.select2-container.use_select2_lib {
 	margin: 0;

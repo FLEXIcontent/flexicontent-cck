@@ -347,7 +347,6 @@ class FlexicontentViewCategories extends FlexicontentViewBaseRecords
 
 		// Create pagination object
 		$pagination = $this->get( 'Pagination' );
-		$inline_ss_max = 50000;
 		$drag_reorder_max = 150;
 
 
@@ -364,43 +363,121 @@ class FlexicontentViewCategories extends FlexicontentViewBaseRecords
 
 		// build category filter (it's subtree will be displayed)
 		$categories = $globalcats;
-		$lists['cats'] = ($filter_cats || 1 ? '<div class="add-on">'.JText::_('FLEXI_CATEGORY').'</div>' : '').
-			flexicontent_cats::buildcatselect($categories, 'filter_cats', $filter_cats, '-', 'class="use_select2_lib" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', $check_published=true, $check_perms=false);
-		
+		$lists['filter_cats'] = $this->getFilterDisplay(array(
+			'label' => JText::_('FLEXI_CATEGORY'),
+			'html' => flexicontent_cats::buildcatselect(
+				$categories,
+				'filter_cats',
+				$filter_cats,
+				'-',
+				array(
+					'class' => 'use_select2_lib',
+					'onchange' => 'document.adminForm.limitstart.value=0; Joomla.submitform();',
+				),
+				$check_published = true,
+				$check_perms = false
+			)
+		));
+
 		// build depth level filter
 		$options	= array();
 		$options[]	= JHtml::_('select.option', '', '-'/*JText::_('FLEXI_SELECT_MAX_DEPTH')*/);
-		for($i=1; $i<=10; $i++) $options[]	= JHtml::_('select.option', $i, $i);
-		$fieldname =  $elementid = 'filter_level';
-		$attribs = 'class="use_select2_lib" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"';
-		$lists['level']	= ($filter_level || 1 ? '<div class="add-on">'.JText::_('FLEXI_MAX_DEPTH').'</div>' : '').
-			JHtml::_('select.genericlist', $options, $fieldname, $attribs, 'value', 'text', $filter_level, $elementid, $translate=true );
-		
+
+		for ($i = 1; $i <= 10; $i++)
+		{
+			$options[]	= JHtml::_('select.option', $i, $i);
+		}
+
+		$fieldname = 'filter_level';
+		$elementid = 'filter_level';
+
+		$lists['filter_level'] = $this->getFilterDisplay(array(
+			'label' => JText::_('FLEXI_MAX_DEPTH'),
+			'html' => JHtml::_('select.genericlist',
+				$options,
+				$fieldname,
+				array(
+					'class' => 'use_select2_lib',
+					'onchange' => 'document.adminForm.limitstart.value=0; Joomla.submitform();',
+				),
+				'value',
+				'text',
+				$filter_level,
+				$elementid,
+				$translate = true
+			)
+		));
+
 		// build publication state filter
 		$options = JHtml::_('jgrid.publishedOptions');
 		array_unshift($options, JHtml::_('select.option', '', '-'/*JText::_('JOPTION_SELECT_PUBLISHED')*/) );
-		$fieldname =  $elementid = 'filter_state';
-		$attribs = 'class="use_select2_lib" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"';
-		$lists['state'] = ($filter_state || 1 ? '<div class="add-on">'.JText::_('FLEXI_STATE').'</div>' : '').
-			JHtml::_('select.genericlist', $options, $fieldname, $attribs, 'value', 'text', $filter_state, $elementid, $translate=true );
+
+		$fieldname = 'filter_state';
+		$elementid = 'filter_state';
+
+		$lists['filter_state'] = $this->getFilterDisplay(array(
+			'label' => JText::_('FLEXI_STATE'),
+			'html' => JHtml::_('select.genericlist',
+				$options,
+				$fieldname,
+				array(
+					'class' => 'use_select2_lib',
+					'onchange' => 'document.adminForm.limitstart.value=0; Joomla.submitform();',
+				),
+				'value',
+				'text',
+				$filter_state,
+				$elementid,
+				$translate = true
+			)
+		));
 		
 		// build access level filter
 		$options = JHtml::_('access.assetgroups');
 		array_unshift($options, JHtml::_('select.option', '', '-'/*JText::_('JOPTION_SELECT_ACCESS')*/) );
-		$fieldname =  $elementid = 'filter_access';
-		$attribs = 'class="use_select2_lib" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"';
-		$lists['access'] = ($filter_access || 1 ? '<div class="add-on">'.JText::_('FLEXI_ACCESS').'</div>' : '').
-			JHtml::_('select.genericlist', $options, $fieldname, $attribs, 'value', 'text', $filter_access, $elementid, $translate=true );
-		
+
+		$fieldname = 'filter_access';
+		$elementid = 'filter_access';
+
+		$lists['filter_access'] = $this->getFilterDisplay(array(
+			'label' => JText::_('FLEXI_ACCESS'),
+			'html' => JHtml::_('select.genericlist',
+				$options,
+				$fieldname,
+				array(
+					'class' => 'use_select2_lib',
+					'onchange' => 'document.adminForm.limitstart.value=0; Joomla.submitform();',
+				),
+				'value',
+				'text',
+				$filter_access,
+				$elementid,
+				$translate = true
+			)
+		));
+
 		// build language filter
-		$lists['language'] = ($filter_language || 1 ? '<div class="add-on">'.JText::_('FLEXI_LANGUAGE').'</div>' : '').
-			flexicontent_html::buildlanguageslist('filter_language', 'class="use_select2_lib" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', $filter_language, '-'/*2*/);
-		
+		$lists['filter_language'] = $this->getFilterDisplay(array(
+			'label' => JText::_('FLEXI_LANGUAGE'),
+			'html' => flexicontent_html::buildlanguageslist(
+				'filter_language',
+				array(
+					'class' => 'use_select2_lib',
+					'onchange' => 'document.adminForm.limitstart.value=0; Joomla.submitform();',
+				),
+				$filter_language,
+				'-'
+			)
+		));
+
+		// build id list filter
+		$lists['filter_id'] = $this->getFilterDisplay(array(
+			'label' => JText::_('FLEXI_ID'),
+			'html' => '<input type="text" name="filter_id" id="filter_id" size="6" value="' . $filter_id . '" class="inputbox" style="width:auto;" />',
+		));
+
 		// text search filter
 		$lists['search']= $search;
-
-		// search id
-		$lists['filter_id'] = $filter_id;
 		
 		// table ordering
 		$lists['order_Dir'] = $filter_order_Dir;
@@ -409,7 +486,6 @@ class FlexicontentViewCategories extends FlexicontentViewBaseRecords
 		$orderingx = ($lists['order'] == $order_property && strtolower($lists['order_Dir']) == 'asc') ? $order_property : '';
 
 		//assign data to template
-		$this->CanTemplates = $perms->CanTemplates;
 		$this->count_filters = $count_filters;
 
 		$this->lists = $lists;
@@ -420,7 +496,6 @@ class FlexicontentViewCategories extends FlexicontentViewBaseRecords
 		$this->orderingx = $orderingx;
 		$this->user = $user;
 
-		$this->inline_ss_max = $inline_ss_max;
 		$this->option = $option;
 		$this->view = $view;
 

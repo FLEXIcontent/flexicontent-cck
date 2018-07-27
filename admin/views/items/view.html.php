@@ -750,7 +750,7 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 		$this->cid = $cid;
 		$this->pagination = $pagination;
 		$this->reOrderingActive = $reOrderingActive;
-		$this->permissions = FlexicontentHelperPerm::getPerm();
+		$this->perms = FlexicontentHelperPerm::getPerm();
 		$this->unassociated = $unassociated;
 		$this->badcatitems = $badcatitems;
 		
