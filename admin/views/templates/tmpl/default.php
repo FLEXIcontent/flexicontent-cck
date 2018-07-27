@@ -123,7 +123,7 @@ $list_total_cols = 8;
 	<table id="adminListTableFCtemplates" class="adminlist table fcmanlist" style="width: 100% !important;">
 	
 	<thead>
-		<tr class="header">
+		<tr>
 			<th><?php echo JText::_( 'FLEXI_NUM' ); ?></th>
 			<th class="left">
 				<input type="checkbox" name="checkall-toggle" id="checkall-toggle" value="" title="<?php echo JText::_('JGLOBAL_CHECK_ALL'); ?>" onclick="Joomla.checkAll(this)" />

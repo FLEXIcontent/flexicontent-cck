@@ -23,8 +23,7 @@ abstract class JHtmlFccats
 	static $btn_sm_class   = FLEXI_J40GE ? 'btn btn-sm' : 'btn btn-small';
 	static $btn_iv_class   = FLEXI_J40GE ? 'btn-dark' : 'btn-inverse';
 	static $btn_mbar_class = FLEXI_J40GE ? 'btn-outline-info' : '';
-	static $ctrl_s = 'category';
-	static $ctrl   = 'categories';
+	static $ctrl = 'categories';
 
 	/**
 	 * Create the publish/unpublish links
@@ -78,7 +77,11 @@ abstract class JHtmlFccats
 	{
 		//return JHtml::_('jgrid.checkedout', $i, $row->editor, $row->checked_out_time, static::$ctrl . '.', $row->canCheckin);
 
-		if (!$row->checked_out) return '';
+		if (!$row->checked_out)
+		{
+			return '';
+		}
+
 		if (!$row->canCheckin)
 		{
 			return '<span class="icon-lock ' . static::$tooltip_class . '" title="'.JHtml::tooltipText('FLEXI_RECORD_CHECKED_OUT_DIFF_USER').'"></span> ';
@@ -116,7 +119,7 @@ abstract class JHtmlFccats
 		{
 			$ops = array(
 				'controller' => static::$ctrl,
-				'state_propname'=>'state',
+				'state_propname' => 'published',
 			);
 		}
 
@@ -222,7 +225,8 @@ abstract class JHtmlFccats
 			return '';
 		}
 
-		$layout_url = 'index.php?option=com_flexicontent&amp;view=template&amp;type=category&amp;tmpl=component&amp;ismodal=' . ($target === '__modal__' ? '1' : '0') . '&amp;folder=' . $layout;
+		$layout_type = 'category';
+		$layout_url  = 'index.php?option=com_flexicontent&amp;view=template&amp;type=' . $layout_type . '&amp;tmpl=component&amp;ismodal=' . ($target === '__modal__' ? '1' : '0') . '&amp;folder=' . $layout;
 
 		if ($target === '__modal__')
 		{

@@ -545,7 +545,7 @@ if ($js)
 
 		<?php if (!$this->folder_mode) : ?>
 
-			<div id="fc-filters-header">
+			<div id="fc-managers-header">
 				<span class="fc-filter nowrap_box" style="margin: 1px;">
 					<?php echo $this->lists['scope']; ?>
 				</span>
@@ -648,7 +648,7 @@ if ($js)
 					</div>
 				</div>
 
-				<div id="fc-filters-slide-btn" class="icon-arrow-up-2 btn" title="<?php echo JText::_('FLEXI_HIDE'); ?>" style="cursor: pointer;" onclick="fc_toggle_box_via_btn('fc-filters-box', document.getElementById('fc_filters_box_btn'), 'btn-primary');"></div>
+				<div id="fc-filters-slide-btn" class="icon-arrow-up-2 btn btn-outline-secondary" title="<?php echo JText::_('FLEXI_HIDE'); ?>" style="cursor: pointer;" onclick="fc_toggle_box_via_btn('fc-filters-box', document.getElementById('fc_filters_box_btn'), 'btn-primary');"></div>
 			</div>
 
 		<?php else: ?>
@@ -697,7 +697,7 @@ if ($js)
 
 			<table id="adminListTableFCfiles<?php echo $this->layout.$this->fieldid; ?>" class="adminlist table fcmanlist fman_list_element">
 			<thead>
-    		<tr class="header">
+    		<tr>
 					<th class="center hidden-phone"><?php echo JText::_( 'FLEXI_NUM' ); ?></th>
 
 					<th>&nbsp;</th>

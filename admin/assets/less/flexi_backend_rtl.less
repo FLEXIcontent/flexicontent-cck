@@ -290,12 +290,25 @@ div.adminthumbs.fcmanthumbs {
 // *** Filters header  (Text search / Buttons / Pagination)
 // ***
 
-.flexicontent #fc-filters-header {
+.flexicontent #fc-managers-header {
 
 	#search {
 		margin: 0px !important;
 		padding: 4px !important;
 		vertical-align: top !important;
+		min-width: 200px;
+		border: 1px solid #aaa;
+
+		&::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
+			color: #ccc;
+			opacity: 1; /* Firefox */
+		}
+		&:-ms-input-placeholder { /* Internet Explorer 10-11 */
+			color: #ccc;
+		}
+		&::-ms-input-placeholder { /* Microsoft Edge */
+			color: #ccc;
+		}
 	}
 	#limit {
 		padding: 3px 6px !important;
@@ -307,6 +320,7 @@ div.adminthumbs.fcmanthumbs {
 		padding: 0px;
 		margin: 2px 0 6px 24px;
 		width: unset;
+		position: relative;
 
 		.label {
 			font-size: 11px;
@@ -325,20 +339,12 @@ div.adminthumbs.fcmanthumbs {
 			}
 		}
 	}
-}
 
-
-
-// ***
-// *** Filters box
-// ***
-
-.flexicontent #fc-filters-box {
-
-	/* Filters close button */
+	/* Manager Sliders close button (Filters, columns, other ?) */
+	#fc-columns-slide-btn,
 	#fc-filters-slide-btn {
 		width: 100%;
-		display: inline-block;
+		display: block;
 		box-sizing: border-box;
 		margin: 8px 0 0 0;
 		height: 24px;
@@ -346,6 +352,14 @@ div.adminthumbs.fcmanthumbs {
 		float: none;
 		clear: both;
 	}
+}
+
+
+// ***
+// *** Filters box
+// ***
+
+.flexicontent #fc-filters-box {
 
 	/* Icons customization */
 	[class^="icon-arrow-"] {
@@ -427,6 +441,7 @@ div.adminthumbs.fcmanthumbs {
 			height: 16px !important;
 			padding: 13px 8px !important;
 			box-sizing: border-box;
+			border-radius: 0;
 		}
 	}
 }

@@ -52,7 +52,7 @@ function delAllFilters() {
 
 <form action="index.php?option=com_flexicontent&amp;view=qfcategoryelement&amp;tmpl=component" method="post" name="adminForm" id="adminForm">
 
-	<div id="fc-filters-header">
+	<div id="fc-managers-header">
 		<span class="fc-filter nowrap_box">
 			<span class="filter-search btn-group">
 				<input type="text" name="search" id="search" placeholder="<?php echo JText::_( 'FLEXI_SEARCH' ); ?>" value="<?php echo htmlspecialchars($this->lists['search'], ENT_QUOTES, 'UTF-8'); ?>" class="inputbox" />
