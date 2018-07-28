@@ -248,23 +248,30 @@ $microdata_itemtype_code = 'itemscope itemtype="http://schema.org/'.$microdata_i
 	</header>
 	<?php endif; ?>
 
-	<?php if (($this->params->get('show_vote', 1)) || ($this->params->get('show_favs', 1)))  : ?>
+	<?php
+		$show_vote = $this->params->get('show_vote', 1) && FlexicontentFields::getFieldDisplay($item, 'voting', $values=null, $method='display');
+		$show_favs = $this->params->get('show_favs', 1) && FlexicontentFields::getFieldDisplay($item, 'favourites', $values=null, $method='display');
+	?>
+	
+	<?php if ($show_vote || $show_favs) : ?>
 	<!-- BOF item rating, favourites -->
+
 	<aside class="itemactions group">
-		<?php if ($this->params->get('show_vote', 1)) : ?>
-		<div class="voting">
-		<?php FlexicontentFields::getFieldDisplay($item, 'voting', $values=null, $method='display'); ?>
-		<?php echo $this->fields['voting']->display; ?>
-		</div>
+
+		<?php if ($show_vote) : ?>
+			<div class="voting">
+				<?php echo $this->fields['voting']->display; ?>
+			</div>
 		<?php endif; ?>
 
-		<?php if ($this->params->get('show_favs', 1)) : ?>
-		<div class="favourites">
-			<?php FlexicontentFields::getFieldDisplay($item, 'favourites', $values=null, $method='display'); ?>
-			<?php echo $this->fields['favourites']->display; ?>
-		</div>
+		<?php if ($show_favs) : ?>
+			<div class="favourites">
+				<?php echo $this->fields['favourites']->display; ?>
+			</div>
 		<?php endif; ?>
+
 	</aside>
+
 	<!-- EOF item rating, favourites -->
 	<?php endif; ?>
 
