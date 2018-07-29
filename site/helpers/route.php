@@ -38,24 +38,24 @@ class FlexicontentHelperRoute
 	/**
 	 * function to retrieve component menuitems only once;
 	 */
-	static function _setMenuitems($language = '*')
+	protected static function _setMenuitems($language = '*')
 	{
 		// Return already retrieved data
 		if ( isset(self::$menuitems[$language]) ) return self::$menuitems[$language];
-		
+
 		// Get component
 		$component = JComponentHelper::getComponent('com_flexicontent');
-		
-		
+
+
 		// Get menu items pointing to the Flexicontent component
 		// NOTE:
 		//  -- In J1.5 the static method JSite::getMenu() will give an error (in backend), and also an error in J3.2+
 		//     while JFactory::getApplication('site')->getMenu() will not return the frontend menus
 		$menus = JFactory::getApplication()->getMenu('site', array());   // this will work in J1.5 backend too !!!
-		
+
 		$attribs = array('component_id');
 		$values  = array($component->id);
-		
+
 		// Limit to given language and ... to language ALL ('*')
 		if ($language != '*')
 		{
@@ -76,11 +76,11 @@ class FlexicontentHelperRoute
 		{
 			// We do not need to check and skip menu items of non-allowed access level, since
 			// filtering by access levels of current user, is already done by JMenuSite::getItems()
-			
+
 			// Index by menu id
 			self::$menuitems[$language][$menuitem->id] = $menuitem;
 		}
-		
+
 		return self::$menuitems[$language];
 	}
 
@@ -88,7 +88,7 @@ class FlexicontentHelperRoute
 	/**
 	 * function to discover if a active menu item id is of flexicontent component
 	 */
-	static function _getActiveFlexiMenuitem()
+	protected static function _getActiveFlexiMenuitem()
 	{
 		static $active = null;
 
@@ -107,40 +107,40 @@ class FlexicontentHelperRoute
 	/**
 	 * function to discover a default item id only once
 	 */
-	static function _setDefaultMenuitemId()
+	protected static function _setDefaultMenuitemId()
 	{
 		// Cache the result on multiple calls
 		static $_component_default_menuitem_id = null;
 		if ( $_component_default_menuitem_id!==null ) return $_component_default_menuitem_id;
-		
+
 		// Default item not found (yet) ... set it to false to indicate that we tried
 		$_component_default_menuitem_id = false;
 		$current_language = JFactory::getLanguage()->getTag();  // Current language tag
-		
+
 		// NOTE: In J1.5 the static method JSite::getMenu() will give an error, while JFactory::getApplication('site')->getMenu() will not return the frontend menus
 		$menus = JFactory::getApplication()->getMenu('site', array());   // this will work in J1.5 backend too !!!
-		
+
 		// Get preference for default menu item
 		$params = JComponentHelper::getParams('com_flexicontent');
 		$default_menuitem_preference = $params->get('default_menuitem_preference', 0);
-		
+
 		switch ($default_menuitem_preference)
 		{
 		case 1:
 			// Try to use ACTIVE (current) menu item if pointing to Flexicontent, (if so configure in global options)
 			$menu = $menus->getActive();
-			
+
 			// Check that (a) it exists and is active (b) points to com_flexicontent
 			if ($menu && isset($menu->query['option']) && $menu->query['option'] === 'com_flexicontent' )
 			{
 				// Check language, checking access is not needed as it was done already above, by the JMenu::getItem()
 				$item_matches = $current_language == '*' || in_array($menu->language, array('*', $current_language)) || !JLanguageMultilang::isEnabled();
-				
+
 				// If item matched then set it as default and return it
 				if ($item_matches)  return  $_component_default_menuitem_id = $menu->id;
 			}
 			// DO NOT BREAK HERE !! FALLBACK to 2
-		
+
 		case 2:
 			// Try to use (user defined) component's default menu item, (if so configure in global options)
 			$menuitem_id = $params->get('default_menu_itemid', false);
@@ -158,7 +158,7 @@ class FlexicontentHelperRoute
 	/**
 	 * function to discover a default item id only once
 	 */
-	static function _setLayoutDefaultMenuitemIds()
+	protected static function _setLayoutDefaultMenuitemIds()
 	{
 		// Cache the result on multiple calls
 		static $_layouts_default_menuitem_id = null;
@@ -198,60 +198,72 @@ class FlexicontentHelperRoute
 	 */
 	protected static function _buildLanguageLookup()
 	{
-		if( self::$lang_lookup !== null ) return;
-		
-		// Create map of: item language code to SEF URL language code
-		// We don't use helper function so that we also get non-published ones
+		if (self::$lang_lookup !== null)
+		{
+			return;
+		}
+
 		$db = JFactory::getDbo();
+
+		/**
+		 * Create map of: item language code to SEF URL language code
+		 * We don't use helper function so that we also get non-published ones
+		 */
 		$query = $db->getQuery(true)
 			->select('a.sef AS sef')
 			->select('a.lang_code AS lang_code')
 			->from('#__languages AS a');
 
-		$db->setQuery($query);
-		$langs = $db->loadObjectList();
+		$langs = $db->setQuery($query)->loadObjectList();
+
 		foreach ($langs as $lang)
 		{
 			self::$lang_lookup[$lang->lang_code] = $lang->sef;
 		}
-		
+
 		// Get configuration whether to remove SEF language code from URL
 		$plugin = JPluginHelper::getPlugin('system', 'languagefilter');
-		if (!empty($plugin)) {
+
+		if (!empty($plugin))
+		{
 			$pluginParams = new JRegistry($plugin->params);
 			self::$add_url_lang = ! $pluginParams->get('remove_default_prefix', 0);
-		} else {
+		}
+		else
+		{
 			self::$add_url_lang = 1;
 		}
-		
+
 		// No need to do more work since we will not add language code to the URLs
 		if ( !self::$add_url_lang ) return;
-		
+
 		// Get user's access levels
 		$user	= JFactory::getUser();
 		$levels = JAccess::getAuthorisedViewLevels($user->id);
-		
-		// Get home page menu items according to language, and 
+
+		// Get home page menu items according to language, and
 		$menus = JFactory::getApplication()->getMenu('site', array());
-		
+
 		// Get content languages and filter them to include only inteface languages
 		$content_langs = JLanguageHelper::getLanguages();
 		$interface_langs = array();
-		
+
 		foreach ($content_langs as $i => &$language)
 		{
-			// Do not display language without frontend UI
-			if (!JLanguage::exists($language->lang_code))
+			if (
+				// Do not display language without frontend UI
+				!JLanguage::exists($language->lang_code) ||
+
+				// Do not display language without specific home menu
+				!$menus->getDefault($language->lang_code) ||
+
+				// Do not display language without authorized access level
+				(isset($language->access) && $language->access && !in_array($language->access, $levels))
+			)
+			{
 				continue;
-			
-			// Do not display language without specific home menu
-			elseif (!$menus->getDefault($language->lang_code))
-				continue;
-			
-			// Do not display language without authorized access level
-			elseif (isset($language->access) && $language->access && !in_array($language->access, $levels))
-				continue;
-			
+			}
+
 			self::$interface_langs[$language->lang_code] = $language;
 		}
 		// DEBUG print the filtered languages
@@ -263,20 +275,28 @@ class FlexicontentHelperRoute
 	/**
 	 * Get type parameters
 	 */
-	static function _getTypeParams()
+	protected static function _getTypeParams()
 	{
 		static $types = null;
-		if ($types !== null) return $types;
-		
+
+		if ($types !== null)
+		{
+			return $types;
+		}
+
 		// Retrieve item's Content Type parameters
 		$db = JFactory::getDbo();
-		$query = 'SELECT t.attribs, t.id '
-				. ' FROM #__flexicontent_types AS t'
-				;
-		$db->setQuery($query);
-		$types = $db->loadObjectList('id');
-		foreach ($types as $type) $type->params = new JRegistry($type->attribs);
-		
+		$query = $db->getQuery(true)
+			->select('t.attribs, t.id')
+			->from('#__flexicontent_types AS t');
+
+		$types = $db->setQuery($query)->loadObjectList('id');
+
+		foreach ($types as $type)
+		{
+			$type->params = new JRegistry($type->attribs);
+		}
+
 		return $types;
 	}
 
@@ -285,18 +305,18 @@ class FlexicontentHelperRoute
 	/**
 	 * Load an item
 	 */
-	static function _loadItem($_id, $doQuery = true)
+	protected static function _loadItem($_id, $doQuery = true)
 	{
 		global $fc_list_items;
 		static $items = array();
-		
+
 		//echo "FlexicontentHelperRoute::_loadItem(".$_id .")<br/>";
 		//echo "<pre>"; debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS); echo "</pre>";
-		
+
 		if ( isset($fc_list_items[$_id]) )  return $fc_list_items[$_id];
 		if ( isset($items[$_id]) )  return $fc_list_items[$_id];
 		if (!$doQuery) return false;
-		
+
 		// Finally last fallback, make a DB query to load the item
 		//echo "FlexicontentHelperRoute::_loadItem(".$_id .") doing query<br/>";
 		$db = JFactory::getDbo();
@@ -305,9 +325,8 @@ class FlexicontentHelperRoute
 			->from('#__content AS i')
 			->join('LEFT', '#__flexicontent_items_ext AS ie ON ie.item_id = i.id')
 			->where('i.id='.$_id);
-		$db->setQuery( $query );
-		$items[$_id] = $db->loadObject();
-		
+		$items[$_id] = $db->setQuery($query)->loadObject();
+
 		return $items[$_id];
 	}
 
@@ -319,15 +338,15 @@ class FlexicontentHelperRoute
 	static function getItemRoute($id, $catid = 0, $_Itemid = 0, $item = null)
 	{
 		$Itemid = $_Itemid == -1  ?  0  :  $_Itemid;  // -1 indicates to return the found menu Itemid instead of the produced link
-		
+
 		static $component_default_menuitem_id = null;  // Calculate later only if needed
-		
+
 		static $current_language = null;
 		if ($current_language === null)
 		{
 			$current_language = JFactory::getLanguage()->getTag();  // Current language tag
 		}
-		
+
 		static $use_language = null;
 		if ($use_language === null)
 		{
@@ -337,7 +356,7 @@ class FlexicontentHelperRoute
 				self::_buildLanguageLookup();
 			}
 		}
-		
+
 		global $globalcats;
 		$_catid = (int) $catid;
 		$_id = (int) $id;
@@ -346,19 +365,19 @@ class FlexicontentHelperRoute
 		// ***
 		// *** Get data of the FLEXIcontent item (only if not already given)
 		// *** including data like: type id, language, but do not do 1 SQL query
-		// *** per item, to get the type id and language  ...  
+		// *** per item, to get the type id and language  ...
 		// *** for language we will use current language, for type_id, we ignore
 		// ***
 
 		// Compatibility with calls not passing item data, check for item data in global object, avoiding an extra SQL call
 		if ( !$item ) $item = FlexicontentHelperRoute::_loadItem($_id, $doQuery = false);
-		
+
 		// Get language
 		$language = (!$item || @!$item->language) ? $current_language : $item->language;
-		
+
 		// Get type ID
 		$type_id = ($item && isset($item->type_id))? $item->type_id : 0;
-		
+
 		// Get type data
 		static $types = null;
 		if ($type_id && $types === null) {
@@ -399,27 +418,27 @@ class FlexicontentHelperRoute
 		// ***
 
 		$needles = array();
-		
+
 		// Priority 1: Item view menu items of given item ID
 		$needles[FLEXI_ITEMVIEW] = array($_id);
-		
+
 		// Priority 2: Type's default before categories (if so configured): ... giving an object means no-lookup and just use it
 		if ($type && $type_menu_itemid_usage==1 && $type->typeMenuItem)  $needles['type_before'] = $type->typeMenuItem;
-		
+
 		// Priority 3: Category view menu items of given category IDs ... item's category and its parent categories in ascending order
 		$needles['category'] = $parents_ids;
-		
+
 		// Priority 4: Directory view menu items ... pointing to same category IDs as above
 		$needles['flexicontent'] = $needles['category'];
-		
+
 		// Priority 5: Type's default after categories (if so configured): ... giving an object means no-lookup and just use it
 		if ($type && $type_menu_itemid_usage==2 && $type->typeMenuItem)  $needles['type_after'] = $type->typeMenuItem;
-		
+
 		// Do not add component's default menu item to allow trying "ALL" language items ? before component default ?
-		
+
 		// Other data to pass to _findItem()
 		$data = array();
-		$data['item'] = $item;   
+		$data['item'] = $item;
 
 
 		// ***
@@ -495,16 +514,16 @@ class FlexicontentHelperRoute
 	static function getCategoryRoute($catid, $_Itemid = 0, $urlvars = array(), $category = null)
 	{
 		$Itemid = $_Itemid == -1  ?  0  :  $_Itemid;  // -1 indicates to return the found menu Itemid instead of the produced link
-		
+
 		// Calculate later only if needed
 		static $component_default_menuitem_id = null;
 		static $layout_default_menuitem_ids = null;
-		
+
 		static $current_language = null;
 		if ($current_language === null) {
 			$current_language = JFactory::getLanguage()->getTag();  // Current language tag
 		}
-		
+
 		static $use_language = null;
 		if ($use_language === null)
 		{
@@ -513,41 +532,41 @@ class FlexicontentHelperRoute
 				self::_buildLanguageLookup();
 			}
 		}
-		
+
 		global $globalcats;
 		$_catid = (int) $catid;
-		
-		
+
+
 		// **************************************
 		// Get data of the FLEXIcontent category
 		// data like: language, and ancestors ids
 		// **************************************
-		
+
 		// Get language
 		$language = $category && !empty($category->language) ? $category->language : null;
 		if (!$language) {
 			$language = isset($globalcats[$_catid]->language) ? $globalcats[$_catid]->language : $current_language;
 		}
-		
+
 		// Get item's parent categores to be used in search a menu item of type category view
 		$parents_ids = array();
 		if ( $_catid && isset($globalcats[$_catid]->ancestorsarray) ) {
 			$parents_ids = array_reverse($globalcats[$_catid]->ancestorsarray);
 		}
-		
-		
+
+
 		// **********************************************************
 		// Create the needles for table lookup in descending priority
 		// **********************************************************
-		
+
 		$needles = array();
-		
+
 		// Category view menu items of given category ID ... and then parent categories in ascending order
 		$needles['category'] = $parents_ids;
-		
+
 		// Directory view menu items starting at given category ID ... and then parent categories in ascending order
 		$needles['flexicontent'] = $parents_ids;
-		
+
 		// If layout is set, then add cid: 0 (indexes: LayoutID_0), -1 (indexes: 0_0) as last needles
 		$layout = !empty($urlvars['layout']) ? $urlvars['layout'] : false;
 		if ($layout) {
@@ -568,10 +587,10 @@ class FlexicontentHelperRoute
 		{
 			$link .= '&cid='.$catid;
 		}
-		
+
 		// Other data to pass to _findCategory()
 		$data = array();
-		
+
 		// Append given variables, but exclude 'cid' if already added ('catslug')
 		foreach ($urlvars as $varname => $varval)
 		{
@@ -586,8 +605,8 @@ class FlexicontentHelperRoute
 		}
 
 		$data['urlvars'] = $urlvars;
-		
-		
+
+
 		// use SEF language code as so configured
 		$data['language'] = '*';  // Default to ALL
 		if ($use_language && $language && $language != "*")
@@ -600,13 +619,13 @@ class FlexicontentHelperRoute
 				$data['language'] = $language;
 			}
 		}
-		
-		
+
+
 		// USE the itemid provided, if we were given one it means it is "appropriate and relevant"
 		if ($Itemid) {
 			$link .= '&Itemid='.$Itemid;
 		}
-		
+
 		// Try to find the most appropriate/relevant menu item, using the priority set via needles array
 		else if ($menuitem = FlexicontentHelperRoute::_findCategory($needles, $data)) {
 			$Itemid = $menuitem->id;
@@ -618,28 +637,28 @@ class FlexicontentHelperRoute
 				$link = str_replace('cid=', 'rootcat=', $link);
 			}
 		}
-		
+
 		// Try to use component's default menu item, this is according to COMPONENT CONFIGURATION and includes ACTIVE menu item if appropriate
 		// but try layout specific first
 		else {
 			$layout = !empty($urlvars['layout']) ? $urlvars['layout'] : false;
-			
+
 			if ($layout && $layout_default_menuitem_ids === null)
 				$layout_default_menuitem_ids = FlexicontentHelperRoute::_setLayoutDefaultMenuitemIds();
-			
+
 			if ( $layout && !empty($layout_default_menuitem_ids[$layout]) ) {
 				$Itemid = $layout_default_menuitem_ids[$layout];
 			}
 			else {
 				if ($component_default_menuitem_id === null)
 					$component_default_menuitem_id = FlexicontentHelperRoute::_setDefaultMenuitemId();
-				
+
 				$Itemid = (int) $component_default_menuitem_id;  // if false (aka not set) then it will be typecasted to ZERO
 			}
-			
+
 			if ($Itemid) $link .= '&Itemid='.$Itemid;
 		}
-		
+
 		// Return menu Itemid or the produced link
 		return $_Itemid == -1 ? $Itemid : $link;
 	}
@@ -652,9 +671,9 @@ class FlexicontentHelperRoute
 	static function getSearchRoute($reserved=0, $_Itemid = 0)
 	{
 		$Itemid = $_Itemid == -1  ?  0  :  $_Itemid;  // -1 indicates to return the found menu Itemid instead of the produced link
-		
+
 		static $component_default_menuitem_id = null;  // Calculate later only if needed
-		
+
 		// Get default menu item for 'search' view
 		static $_search_default_menuitem_id = null;
 		if ($_search_default_menuitem_id === null)
@@ -662,34 +681,34 @@ class FlexicontentHelperRoute
 			$params = JComponentHelper::getParams('com_flexicontent');
 			$_search_default_menuitem_id = $params->get('search_view_default_menu_itemid', false);
 		}
-		
-		
+
+
 		// ***************
 		// Create the link
 		// ***************
-		
+
 		$link = 'index.php?option=com_flexicontent&view=search';
-		
+
 		// USE the itemid provided, if we were given one it means it is "appropriate and relevant"
 		if ($Itemid) {
 			$link .= '&Itemid='.$Itemid;
 		}
-		
+
 		// Fallback to default menu item for the view
 		else if ($_search_default_menuitem_id) {
 			$Itemid = $_search_default_menuitem_id;
 			$link .= '&Itemid='.$Itemid;
 		}
-		
+
 		// Try to use component's default menu item, this is according to COMPONENT CONFIGURATION and includes ACTIVE menu item if appropriate
 		else {
 			if ($component_default_menuitem_id === null)
 				$component_default_menuitem_id = FlexicontentHelperRoute::_setDefaultMenuitemId();
-			
+
 			$Itemid = (int) $component_default_menuitem_id;  // if false (aka not set) then it will be typecasted to ZERO
 			if ($Itemid) $link .= '&Itemid='.$Itemid;
 		}
-		
+
 		// Return menu Itemid or the produced link
 		return $_Itemid == -1 ? $Itemid : $link;
 	}
@@ -702,9 +721,9 @@ class FlexicontentHelperRoute
 	static function getFavsRoute($reserved=0, $_Itemid = 0)
 	{
 		$Itemid = $_Itemid == -1  ?  0  :  $_Itemid;  // -1 indicates to return the found menu Itemid instead of the produced link
-		
+
 		static $component_default_menuitem_id = null;  // Calculate later only if needed
-		
+
 		// Get default menu item for 'favourites' view
 		static $_favs_default_menuitem_id = null;
 		if ($_favs_default_menuitem_id === null)
@@ -712,34 +731,34 @@ class FlexicontentHelperRoute
 			$params = JComponentHelper::getParams('com_flexicontent');
 			$_favs_default_menuitem_id = $params->get('favs_view_default_menu_itemid', false);
 		}
-		
-		
+
+
 		// ***************
 		// Create the link
 		// ***************
-		
+
 		$link = 'index.php?option=com_flexicontent&view=favourites';
-		
+
 		// USE the itemid provided, if we were given one it means it is "appropriate and relevant"
 		if ($Itemid) {
 			$link .= '&Itemid='.$Itemid;
 		}
-		
+
 		// Fallback to default menu item for the view
 		else if ($_favs_default_menuitem_id) {
 			$Itemid = $_favs_default_menuitem_id;
 			$link .= '&Itemid='.$Itemid;
 		}
-		
+
 		// Try to use component's default menu item, this is according to COMPONENT CONFIGURATION and includes ACTIVE menu item if appropriate
 		else {
 			if ($component_default_menuitem_id === null)
 				$component_default_menuitem_id = FlexicontentHelperRoute::_setDefaultMenuitemId();
-			
+
 			$Itemid = (int) $component_default_menuitem_id;  // if false (aka not set) then it will be typecasted to ZERO
 			if ($Itemid) $link .= '&Itemid='.$Itemid;
 		}
-		
+
 		// Return menu Itemid or the produced link
 		return $_Itemid == -1 ? $Itemid : $link;
 	}
@@ -752,14 +771,14 @@ class FlexicontentHelperRoute
 	static function getTagRoute($id, $_Itemid = 0)
 	{
 		$Itemid = $_Itemid == -1  ?  0  :  $_Itemid;  // -1 indicates to return the found menu Itemid instead of the produced link
-		
+
 		static $component_default_menuitem_id = null;  // Calculate later only if needed
-		
+
 		static $current_language = null;
 		if ($current_language === null) {
 			$current_language = JFactory::getLanguage()->getTag();  // Current language tag
 		}
-		
+
 		static $use_language = null;
 		if ($use_language === null)
 		{
@@ -769,7 +788,7 @@ class FlexicontentHelperRoute
 				self::_buildLanguageLookup();
 			}
 		}
-		
+
 		// Get default menu item for 'tags' view
 		static $_tags_default_menuitem_id = null;
 		if ($_tags_default_menuitem_id === null)
@@ -777,13 +796,13 @@ class FlexicontentHelperRoute
 			$params = JComponentHelper::getParams('com_flexicontent');
 			$_tags_default_menuitem_id = $params->get('tags_view_default_menu_itemid', false);
 		}
-		
-		
+
+
 		// ***
 		// *** Get data of given TAG
 		// *** data like: language
 		// ***
-		
+
 		// Get language, IN FUTURE tags will have language because we will use J3+ tags
 		$language = '*';
 
@@ -792,7 +811,7 @@ class FlexicontentHelperRoute
 		// *** Create the needles for table lookup in descending priority
 		// ***
 		$needles = array();
-		
+
 		$needles['tags'] = array( (int) $id );
 
 
@@ -801,10 +820,10 @@ class FlexicontentHelperRoute
 		// ***
 
 		$link = 'index.php?option=com_flexicontent&view=tags&id='.$id;
-		
+
 		// Other data to pass to _findTag()
 		$data = array();
-		
+
 		// use SEF language code as so configured
 		$data['language'] = '*';  // Default to ALL
 		if ($use_language && $language && $language != "*")
@@ -823,59 +842,59 @@ class FlexicontentHelperRoute
 		if ($Itemid) {
 			$link .= '&Itemid='.$Itemid;
 		}
-		
+
 		// Try to find the most appropriate/relevant menu item, using the priority set via needles array
 		else if ($menuitem = FlexicontentHelperRoute::_findTag($needles, $data)) {
 			$Itemid = $menuitem->id;
 			$link .= '&Itemid='.$Itemid;
 		}
-		
+
 		// Fallback to default menu item for the view
 		else if ($_tags_default_menuitem_id) {
 			$Itemid = $_tags_default_menuitem_id;
 			$link .= '&Itemid='.$Itemid;
 		}
-		
+
 		// Try to use component's default menu item, this is according to COMPONENT CONFIGURATION and includes ACTIVE menu item if appropriate
 		else {
 			if ($component_default_menuitem_id === null)
 				$component_default_menuitem_id = FlexicontentHelperRoute::_setDefaultMenuitemId();
-			
+
 			$Itemid = (int) $component_default_menuitem_id;  // if false (aka not set) then it will be typecasted to ZERO
 			if ($Itemid) $link .= '&Itemid='.$Itemid;
 		}
-		
+
 		// Return menu Itemid or the produced link
 		return $_Itemid == -1 ? $Itemid : $link;
 	}
-	
-	
-	static function _findItem($needles, &$data)
+
+
+	protected static function _findItem($needles, &$data)
 	{
 		if ( !$needles ) return false;
-		
+
 		// Get language, item ,current (matched) category menu item
 		$language = $data['language'];
 		$item = $data['item'];
-		
+
 		// Set language menu items if not already done
-		if ( !isset(self::$menuitems[$language]) )
+		if (!isset(self::$menuitems[$language]))
 		{
 			FlexicontentHelperRoute::_setMenuitems($language);
 		}
 		$component_menuitems = & self::$menuitems[$language];
-		
-		
-		// ***
-		// *** Done ONCE per language: Iterate through menu items pointing to FLEXIcontent component, to create a reverse lookup
-		// *** table for the given language, not if given language is missing the an '*' menu item will be allowed in its place
-		// ***
-		if ( !isset(self::$lookup[$language]) )
+
+
+		/**
+		 * Done ONCE per language: Iterate through menu items pointing to FLEXIcontent component, to create a reverse lookup
+		 * table for the given language, not if given language is missing the an '*' menu item will be allowed in its place
+		 */
+		if (!isset(self::$lookup[$language]))
 		{
 			FlexicontentHelperRoute::populateLookupTable($language);
 		}
-		
-		
+
+
 		// Get current menu item, we will prefer current menu if it points to given category,
 		// thus maintaining current menu item if multiple menu items to same category exist !!
 		static $active = null;
@@ -884,27 +903,27 @@ class FlexicontentHelperRoute
 		{
 			$active = FlexicontentHelperRoute::_getActiveFlexiMenuitem();
 		}
-		
-		
+
+
 		// Now find menu item for given needles
 		$matched_menu = false;
-		
+
 		//JFactory::getApplication()->enqueueMessage("Finding Item: ".$item->id ."<br/>Language:".$language." <br/> ". print_r(self::$lookup[$language]['item'], true)."<br/>".print_r($needles,true),'message');
 		foreach ($needles as $view => $ids)
 		{
 			if ( is_object($ids) && ($ids->language=='*' || $ids->language==$language) ) return $ids;  // done, this an already appropriate menu item object
-			
+
 			// Lookup if then given ids for the given view exists for the given language
 			if ( !isset(self::$lookup[$language][$view]) ) continue;
-			
+
 			foreach($ids as $id)
 			{
 				if ( !isset(self::$lookup[$language][$view][(int)$id]) ) continue;  // not found
-				
+
 				//JFactory::getApplication()->enqueueMessage("MATCHED $language $view $id : ". self::$lookup[$language][$view][(int)$id],'message');
 				$menuid = self::$lookup[$language][$view][(int)$id];
 				$menuitem = $component_menuitems[$menuid];
-				
+
 				// menu item matched, break out
 				$matched_menu = $menuitem;
 				break;
@@ -922,12 +941,12 @@ class FlexicontentHelperRoute
 		) {
 			$matched_menu = $active;
 		}
-		
+
 		return $matched_menu;
 	}
 
 
-	static function _findCategory($needles, &$data)
+	protected static function _findCategory($needles, &$data)
 	{
 		if ( !$needles ) return false;
 
@@ -938,11 +957,11 @@ class FlexicontentHelperRoute
 			'author'=>'authorid',
 			'mcats'=>'cids',
 		);
-		
+
 		// Get language, url variables
 		$language = $data['language'];
 		$urlvars  = $data['urlvars'];
-		
+
 		// Get per layout id variable to use it for hashing (indexing the lookup array)
 		$layout = !empty($urlvars['layout']) ? $urlvars['layout'] : false;
 		if ($layout)
@@ -950,67 +969,94 @@ class FlexicontentHelperRoute
 			$i_name = @ $layout_idvars[$layout];
 			$i_val = $i_name && !empty($urlvars[$i_name])  ?  ((int)$urlvars[$i_name]).'_'  :  '0_';
 		}
-		
+
 		// Set language menu items if not already done
-		if ( !isset(self::$menuitems[$language]) )
+		if (!isset(self::$menuitems[$language]))
 		{
 			FlexicontentHelperRoute::_setMenuitems($language);
 		}
 		$component_menuitems = & self::$menuitems[$language];
 
 
-		// ***
-		// *** Done ONCE per language: Iterate through menu items pointing to FLEXIcontent component, to create a reverse lookup
-		// *** table for the given language, not if given language is missing the an '*' menu item will be allowed in its place
-		// ***
-		if ( !isset(self::$lookup[$language]) )
+		/**
+		 * Done ONCE per language: Iterate through menu items pointing to FLEXIcontent component, to create a reverse lookup
+		 * table for the given language, not if given language is missing the an '*' menu item will be allowed in its place
+		 */
+		if (!isset(self::$lookup[$language]))
 		{
 			FlexicontentHelperRoute::populateLookupTable($language);
 		}
-		
-		
-		// Get current menu item, we will prefer current menu if it points to given category,
-		// thus maintaining current menu item if multiple menu items to same category exist !!
+
+
+		/**
+		 * Get current menu item, we will prefer current menu if it points to given category,
+		 * thus maintaining current menu item if multiple menu items to same category exist !!
+		 */
 		static $active = null;
 
 		if ($active === null)
 		{
 			$active = FlexicontentHelperRoute::_getActiveFlexiMenuitem();
 		}
-		
-		
+
+
 		// Now find menu item for given needles
 		$matched_menu = false;
-		
+
 		foreach ($needles as $view => $ids)
 		{
-			if ( is_object($ids) && ($ids->language=='*' || $ids->language==$language) ) return $ids;  // done, this an already appropriate menu item object
-			if ( $view=='_language' ) continue;
-			
-			$i_view = $view . ($layout ? '_'.$layout : '');
-			
+			// Check if this an already appropriate menu item object
+			if (is_object($ids) && ($ids->language === '*' || $ids->language == $language))
+			{
+				return $ids;
+			}
+
+			if ($view === '_language')
+			{
+				continue;
+			}
+
+			$i_view = $view . ($layout ? '_' . $layout : '');
+
 			// Lookup if then given ids for the given view exists for the given language
-			if ( !isset(self::$lookup[$language][$i_view]) ) continue;
-			
+			if (!isset(self::$lookup[$language][$i_view]))
+			{
+				continue;
+			}
+
 			foreach($ids as $id)
 			{
-				$i_id = (int)$id;
-				if ($layout) $i_id = $i_id==-1 ? '0_0' : $i_val . $i_id;
+				$i_id = (int) $id;
+
+				if ($layout)
+				{
+					$i_id = $i_id === -1
+						? '0_0'
+						: $i_val . $i_id;
+				}
 				//echo "i_id: ". $i_id ."<br/>";
-				
-				if ( !isset(self::$lookup[$language][$i_view][$i_id]) ) continue;  // not found
+
+				// Check if not found and continue
+				if (!isset(self::$lookup[$language][$i_view][$i_id]))
+				{
+					continue;
+				}
 				//echo "$language $i_view $i_id : ". self::$lookup[$language][$i_view][$i_id] ."<br/>";
-				
+
 				$menuid = self::$lookup[$language][$i_view][$i_id];
 				$menuitem = $component_menuitems[$menuid];
-				
+
 				// menu item matched, break out
 				$matched_menu = $menuitem;
 				break;
 			}
-			if ($matched_menu) break;
+
+			if ($matched_menu)
+			{
+				break;
+			}
 		}
-		
+
 		// Prefer current category menu item if also appropriate
 		if ($matched_menu && $active && @ $matched_menu->query['view'] == 'category' &&
 			@ $matched_menu->query['view'] == @ $active->query['view'] &&
@@ -1023,35 +1069,36 @@ class FlexicontentHelperRoute
 		) {
 			$matched_menu = $active;
 		}
-		
+
 		return $matched_menu;
 	}
-	
-		
-	static function _findTag($needles, &$data)
+
+
+	protected static function _findTag($needles, &$data)
 	{
 		if ( !$needles ) return false;
-		
+
 		// Get language, item, current (matched) category menu item
 		$language = $data['language'];
-		
+
 		// Set language menu items if not already done
-		if ( !isset(self::$menuitems[$language]) )
+		if (!isset(self::$menuitems[$language]))
 		{
 			FlexicontentHelperRoute::_setMenuitems($language);
 		}
 		$component_menuitems = & self::$menuitems[$language];
-		
-		
-		// *****************************************************************************************************************
-		// Done ONCE per language: Iterate through menu items pointing to FLEXIcontent component, to create a reverse lookup
-		// table for the given language, not if given language is missing the an '*' menu item will be allowed in its place
-		// *****************************************************************************************************************
-		if ( !isset(self::$lookup[$language]) ) {
+
+
+		/**
+		 * Done ONCE per language: Iterate through menu items pointing to FLEXIcontent component, to create a reverse lookup
+		 * table for the given language, not if given language is missing the an '*' menu item will be allowed in its place
+		 */
+		if (!isset(self::$lookup[$language]))
+		{
 			FlexicontentHelperRoute::populateLookupTable($language);
 		}
-		
-		
+
+
 		// Get current menu item, we will prefer current menu if it points to given category,
 		// thus maintaining current menu item if multiple menu items to same category exist !!
 		static $active = null;
@@ -1060,55 +1107,63 @@ class FlexicontentHelperRoute
 		{
 			$active = FlexicontentHelperRoute::_getActiveFlexiMenuitem();
 		}
-		
-		
+
+
 		// Now find menu item for given needles
 		$matched_menu = false;
-		
+
 		foreach ($needles as $view => $ids)
 		{
-			if ( is_object($ids) && ($ids->language=='*' || $ids->language==$language) ) return $ids;  // done, this an already appropriate menu item object
-			
+			// This an already appropriate menu item object
+			if (is_object($ids) && ($ids->language === '*' || $ids->language == $language))
+			{
+				return $ids;
+			}
+
 			// Lookup if then given ids for the given view exists for the given language
 			if ( !isset(self::$lookup[$language][$view]) ) continue;
-			
+
 			foreach($ids as $id)
 			{
-				if ( !isset(self::$lookup[$language][$view][(int)$id]) ) continue;  // not found
-				
+				// Check if not found
+				if (!isset(self::$lookup[$language][$view][(int) $id]))
+				{
+					continue;
+				}
+
 				//echo "$language $view $id : ". self::$lookup[$language][$view][(int)$id] ."<br/>";
-				$menuid = self::$lookup[$language][$view][(int)$id];
+				$menuid   = self::$lookup[$language][$view][(int) $id];
 				$menuitem = $component_menuitems[$menuid];
-				
+
 				// menu item matched, break out
 				$matched_menu = $menuitem;
 				break;
 			}
 			if ($matched_menu) break;
 		}
-		
+
 		// Prefer current tags menu item if also appropriate
 		if ($matched_menu && $active && @ $matched_menu->query['view'] == 'tags' &&
 			@ $matched_menu->query['view'] == @ $active->query['view'] &&
 			@ $matched_menu->query['id'] == @ $active->query['id'] &&
-			($active->language == $language || $active->language == '*')
+			($active->language == $language || $active->language === '*')
 		) {
 			$matched_menu = $active;
 		}
-		
+
 		return $matched_menu;
 	}
-	
-	
+
+
 	static function populateLookupTable($language)
 	{
 		// Set language menu items if not already done
-		if ( !isset(self::$menuitems[$language]) )
+		if (!isset(self::$menuitems[$language]))
 		{
 			FlexicontentHelperRoute::_setMenuitems($language);
 		}
 		$component_menuitems = & self::$menuitems[$language];
-		
+
 		// Every VIEW may have a different variable for the lookup table in which we will add the menu items
 		static $view_varnames = array(FLEXI_ITEMVIEW=>'id', 'category'=>'cid', 'tags'=>'id', 'flexicontent'=>'rootcatid');
 
@@ -1117,38 +1172,38 @@ class FlexicontentHelperRoute
 			'author'=>'authorid',
 			'mcats'=>'cids',
 		);
-		
+
 		self::$lookup[$language] = array();
 		$user = JFactory::getUser();
-		
+
 		foreach($component_menuitems as $menuitem)
 		{
 			if ( !isset($menuitem->query) || !isset($menuitem->query['view']) ) continue;  // view not set
 			if ( $menuitem->language != $language && $menuitem->language!='*') continue;   // wrong menu item language, neither item's language, nor '*' = ALL
-			
+
 			$view   = $menuitem->query['view'];
 			$layout = $view=='category' && !empty($menuitem->query['layout']) ? $menuitem->query['layout'] : false;
-			
+
 			// Create lookup table for view if it does not exist already
 			$i_view = $view . ($layout && $view=='category' ? '_'.$layout : '');
 			if (!isset(self::$lookup[$language][$i_view]))  self::$lookup[$language][$i_view] = array();
-			
+
 			// Check if view 's variable (used in lookup table) exists in the menu item
 			if ( !isset($view_varnames[$view]) ) continue;
 			$i_name = $view_varnames[$view];
-			
+
 			if ( empty($menuitem->query[$i_name]) && ! $layout ) continue;
 			$i_val  = !empty($menuitem->query[$i_name]) ? (int)$menuitem->query[$i_name] : 0;
-			
+
 			if ( $layout )
 			{
 				$i_name = @ $layout_idvars[$layout];
 				$i_val  = ((int)($i_name ? @ $menuitem->query[$i_name] : '0')) . '_' . $i_val;
 			}
-			
+
 			// Only a specific language menu item can override an existing lookup entry
 			if ( isset(self::$lookup[$language][$i_view][$i_val]) && $menuitem->language == '*' ) continue;
-			
+
 			// Finally set new lookup entry or override existing lookup entry with language specific menu item
 			self::$lookup[$language][$i_view][$i_val] = (int) $menuitem->id;
 		}
@@ -1162,7 +1217,7 @@ class FlexicontentHelperRoute
 		$current_language = JFactory::getLanguage()->getTag();  // Current language tag
 
 		$menus = JFactory::getApplication()->getMenu('site', array());   // this will work in J1.5 backend too !!!
-		$menu = $menus->getItem($menuitem_id);  // Try to load the menu item		
+		$menu = $menus->getItem($menuitem_id);  // Try to load the menu item
 
 		// Check that (a) it exists and is active (b) points to com_flexicontent
 		if ($menu && isset($menu->query['option']) && $menu->query['option'] === 'com_flexicontent')
