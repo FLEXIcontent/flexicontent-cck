@@ -307,11 +307,20 @@ function FLEXIcontentBuildRoute(&$query)
 				$mauthorid = isset($menu->query['authorid']) ? (int) $menu->query['authorid'] : null;
 				$authorid  = isset($query['authorid']) ? (int) $query['authorid'] : null;
 
+				if ($remove_ids)
+				{
+					$authoralias = $authorid !== null ? substr($query['authorid'], strlen($authorid . '-')) : null;
+				}
+				else
+				{
+					$authorslug = $authorid !== null ? $query['authorid'] : null;
+				}
+
 				if ($mview === $view && $mlayout === $layout)
 				{
 					if ($mauthorid !== $authorid)
 					{
-						$segments[] = $query['authorid'];
+						$segments[] = $remove_ids ? $authoralias : $authorslug;
 
 						if ($cid && $mcid !== $cid)
 						{
@@ -336,7 +345,7 @@ function FLEXIcontentBuildRoute(&$query)
 				else
 				{
 					$segments[] = 'authored';
-					$segments[] = $authorid;
+					$segments[] = $remove_ids ? $authoralias : $authorslug;
 
 					if ($cid && $mcid !== $cid)
 					{
@@ -650,7 +659,7 @@ function FLEXIcontentParseRoute($segments)
 	{
 		$vars['view'] = 'category';
 		$vars['layout'] = 'author';
-		$vars['authorid'] = $segments[1];
+		$vars['authorid'] = _fc_route_addRecordIdPrefix($segments, 1, '#__users', '', 'username');
 		$vars['cid'] = _fc_route_addRecordIdPrefix($segments, 2, '#__categories');  // optional
 
 		return $vars;
@@ -733,7 +742,7 @@ function FLEXIcontentParseRoute($segments)
 			case 'author':
 				$vars['view']     = 'category';
 				$vars['layout']   = 'author';
-				$vars['authorid'] = $segments[0];
+				$vars['authorid'] = _fc_route_addRecordIdPrefix($segments, 0, '#__users', '', 'username');
 				$vars['cid']      = _fc_route_addRecordIdPrefix($segments, 1, '#__categories');  // optional
 
 				return $vars;
@@ -902,7 +911,7 @@ function FLEXIcontentParseRoute($segments)
 /**
  * Get the ID of a record when given the record 'alias and table name
  */
-function _fc_route_getRecordIdByAlias($alias, $tbl, $language = null)
+function _fc_route_getRecordIdByAlias($alias, $tbl, $language = null, $col = 'alias')
 {
 	if ($language === null)
 	{
@@ -913,7 +922,7 @@ function _fc_route_getRecordIdByAlias($alias, $tbl, $language = null)
 	$query = $db->getQuery(true)
 		->select('i.id')
 		->from($db->QuoteName($tbl) . ' AS i')
-		->where('i.alias = ' . $db->Quote($alias));
+		->where('i.' . $db->QuoteName($col) . ' = ' . $db->Quote($alias));
 
 	if ($language)
 	{
@@ -929,7 +938,7 @@ function _fc_route_getRecordIdByAlias($alias, $tbl, $language = null)
 /**
  * Prepend record ID to a SEF URL segement if it is not already present
  */
-function _fc_route_addRecordIdPrefix($segments, $i, $tbl, $language = null)
+function _fc_route_addRecordIdPrefix($segments, $i, $tbl, $language = null, $col = 'alias')
 {
 	if (!isset($segments[$i]))
 	{
@@ -947,7 +956,7 @@ function _fc_route_addRecordIdPrefix($segments, $i, $tbl, $language = null)
 	}
 
 	$segments[$i] = str_replace(':', '-', $segments[$i]);
-	$segments[$i] = _fc_route_getRecordIdByAlias($segments[$i], $tbl, $language) . '-' . $segments[$i];
+	$segments[$i] = _fc_route_getRecordIdByAlias($segments[$i], $tbl, $language, $col) . '-' . $segments[$i];
 
 	return $segments[$i];
 }

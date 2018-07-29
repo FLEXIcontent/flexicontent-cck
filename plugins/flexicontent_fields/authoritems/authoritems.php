@@ -47,8 +47,30 @@ class plgFlexicontent_fieldsAuthoritems extends FCField
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 		static $author_links = array();
 
-		if ( !isset($author_links[$item->created_by]) ) {
-			$author_links[$item->created_by] = JRoute::_( FlexicontentHelperRoute::getCategoryRoute(0, 0, array('layout'=>'author', 'authorid'=>$item->created_by)) );
+		if (!isset($author_links[$item->created_by]))
+		{
+			try
+			{
+				$author = JFactory::getUser($item->created_by);
+				$created_by_username = JFilterOutput::stringURLUnicodeSlug($author->username);
+				
+				$authorslug = $created_by_username !== $author->username
+					? $item->created_by
+					: $item->created_by . ':' . $created_by_username;
+			}
+
+			catch (Exception $e) {
+				$authorslug = $item->created_by;
+			}
+
+			$author_links[$item->created_by] = JRoute::_(FlexicontentHelperRoute::getCategoryRoute(
+				0,
+				0,
+				array(
+					'layout' => 'author',
+					'authorid' => $authorslug
+				)
+			));
 		}
 
 		$field->{$prop} = '<a href="'.$author_links[$item->created_by].'" itemprop="author">'.JText::_('FLEXI_FIELD_AI_MORE_ITEMS_BY_THIS_AUTHOR').'</a>';
