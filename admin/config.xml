@@ -73,8 +73,14 @@
 			<field name="unauthorized_page" type="text" size="50" default="" label="FLEXI_UNAUTHORIZED_URL" description="FLEXI_UNAUTHORIZED_URL_DESC" class="input-xxlarge" />
 
 		<field name="" type="separator" default="FLEXI_SEO_SEF_URLS" label="" level="level0" />
-			
+
 			<field name="" type="separator" default="FLEXI_URL_SEGMENTS_CREATION" label="" level="level3" />
+
+			<field name="sef_ids" type="radio" default="0" label="JGLOBAL_SEF_NOIDS_LABEL" description="JGLOBAL_SEF_NOIDS_DESC" class="btn-group group-fcmethod" filter="integer" >
+				<option value="0">JNO</option>
+				<option value="1">JYES</option>
+			</field>
+
 			<field name="add_item_sef_segment" type="fcradio" default="1" label="FLEXI_SHORTER_ITEM_OR_CATEGORY_SEF_URLS" description="FLEXI_SHORTER_ITEM_OR_CATEGORY_SEF_URLS_DESC" class="group-fcset fc-cleared">
 				<option value="0">FLEXI_SKIP_ITEM_SEGMENT_IN_ITEM_URLS</option>
 				<option value="1">FLEXI_SKIP_CAT_SEGMENT_IN_CAT_URLS</option>
