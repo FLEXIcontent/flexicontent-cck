@@ -1120,24 +1120,29 @@ class plgSystemFlexisystem extends JPlugin
 	 */
 	public function onBeforeCompileHead()
 	{
-		if (!JFactory::getApplication()->isAdmin()) return;
+		if (!JFactory::getApplication()->isAdmin() || !JFactory::getUser()->id)
+		{
+			return;
+		}
 
 		require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'permission.php');
 		$perms = FlexicontentHelperPerm::getPerm();
+		JHtml::_('jquery.framework');
+
 		JFactory::getDocument()->addScriptDeclaration("
 			jQuery(document).ready(function(){
-				".(!$perms->CanReviews ? 'jQuery(\'#menu-com-flexicontent a[href="index.php?option=com_flexicontent&view=reviews"]\').parent().remove();' : '')."
-				".(!$perms->CanCats    ? 'jQuery(\'#menu-com-flexicontent a[href="index.php?option=com_flexicontent&view=categories"]\').parent().remove();' : '')."
-				".(!$perms->CanTypes   ? 'jQuery(\'#menu-com-flexicontent a[href="index.php?option=com_flexicontent&view=types"]\').parent().remove();' : '')."
-				".(!$perms->CanFields  ? 'jQuery(\'#menu-com-flexicontent a[href="index.php?option=com_flexicontent&view=fields"]\').parent().remove();' : '')."
-				".(!$perms->CanTags    ? 'jQuery(\'#menu-com-flexicontent a[href="index.php?option=com_flexicontent&view=tags"]\').parent().remove();' : '')."
-				".(!$perms->CanTemplates ? 'jQuery(\'#menu-com-flexicontent a[href="index.php?option=com_flexicontent&view=templates"]\').parent().remove();' : '')."
-				".(!$perms->CanAuthors ? 'jQuery(\'#menu-com-flexicontent a[href="index.php?option=com_flexicontent&view=users"]\').parent().remove();' : '')."
-				".(!$perms->CanGroups  ? 'jQuery(\'#menu-com-flexicontent a[href="index.php?option=com_flexicontent&view=groups"]\').parent().remove();' : '')."
-				".(!$perms->CanFiles   ? 'jQuery(\'#menu-com-flexicontent a[href="index.php?option=com_flexicontent&view=filemanager"]\').parent().remove();' : '')."
-				".(!$perms->CanImport  ? 'jQuery(\'#menu-com-flexicontent a[href="index.php?option=com_flexicontent&view=import"]\').parent().remove();' : '')."
-				".(!$perms->CanStats   ? 'jQuery(\'#menu-com-flexicontent a[href="index.php?option=com_flexicontent&view=stats"]\').parent().remove();' : '')."
-				".(!$perms->CanConfig  ? 'jQuery(\'#menu-com-flexicontent a[href="index.php?option=com_config&view=component&component=com_flexicontent"]\').parent().remove();' : '')."
+				".(!$perms->CanReviews ? 'jQuery(\'#menu a[href="index.php?option=com_flexicontent&view=reviews"]\').parent().remove();' : '')."
+				".(!$perms->CanCats    ? 'jQuery(\'#menu a[href="index.php?option=com_flexicontent&view=categories"]\').parent().remove();' : '')."
+				".(!$perms->CanTypes   ? 'jQuery(\'#menu a[href="index.php?option=com_flexicontent&view=types"]\').parent().remove();' : '')."
+				".(!$perms->CanFields  ? 'jQuery(\'#menu a[href="index.php?option=com_flexicontent&view=fields"]\').parent().remove();' : '')."
+				".(!$perms->CanTags    ? 'jQuery(\'#menu a[href="index.php?option=com_flexicontent&view=tags"]\').parent().remove();' : '')."
+				".(!$perms->CanTemplates ? 'jQuery(\'#menu a[href="index.php?option=com_flexicontent&view=templates"]\').parent().remove();' : '')."
+				".(!$perms->CanAuthors ? 'jQuery(\'#menu a[href="index.php?option=com_flexicontent&view=users"]\').parent().remove();' : '')."
+				".(!$perms->CanGroups  ? 'jQuery(\'#menu a[href="index.php?option=com_flexicontent&view=groups"]\').parent().remove();' : '')."
+				".(!$perms->CanFiles   ? 'jQuery(\'#menu a[href="index.php?option=com_flexicontent&view=filemanager"]\').parent().remove();' : '')."
+				".(!$perms->CanImport  ? 'jQuery(\'#menu a[href="index.php?option=com_flexicontent&view=import"]\').parent().remove();' : '')."
+				".(!$perms->CanStats   ? 'jQuery(\'#menu a[href="index.php?option=com_flexicontent&view=stats"]\').parent().remove();' : '')."
+				".(!$perms->CanConfig  ? 'jQuery(\'#menu a[href="index.php?option=com_config&view=component&component=com_flexicontent"]\').parent().remove();' : '')."
 			});
 		");
 	}
