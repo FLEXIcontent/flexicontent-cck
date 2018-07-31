@@ -1066,7 +1066,9 @@ class flexicontent_html
 		$document = JFactory::getDocument();
 		$flexiparams = JComponentHelper::getParams('com_flexicontent');
 		$lib_path = '/components/com_flexicontent/librairies';
-		$add_remote_forced = $add_remote === 2 || FLEXI_J40GE;
+
+		$add_remote_forced_jquery = $add_remote === 2;
+		$add_remote_forced_jquery_ui = $add_remote === 2 || FLEXI_J40GE;
 
 		if (!$params)
 		{
@@ -1075,6 +1077,10 @@ class flexicontent_html
 
 		// Set jQuery to load in views that use it
 		$JQUERY_VER = FLEXI_J40GE ? '3.3.1' : $params->get('jquery_ver', $flexiparams->get('jquery_ver', '1.8.3'));
+		$JQUERY_VER_URL_ATTRS = FLEXI_J40GE ? array(
+			'integrity' => 'sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=',
+			'crossorigin' => 'anonymous',
+		) : null;
 		$JQUERY_UI_VER = FLEXI_J40GE ? '1.12.1' : $params->get('jquery_ui_ver', $flexiparams->get('jquery_ui_ver', '1.9.2'));
 		$JQUERY_UI_THEME = $params->get('jquery_ui_theme', $flexiparams->get('jquery_ui_theme', 'ui-lightness'));   // FLEXI_JQUERY_UI_CSS_STYLE:  'ui-lightness', 'smoothness'
 		JText::script("FLEXI_FORM_IS_BEING_SUBMITTED", true);
@@ -1085,10 +1091,10 @@ class flexicontent_html
 
 		if ( $add_jquery && !$jquery_added && !JPluginHelper::isEnabled('system', 'jquerysupport') )
 		{
-			if ($add_remote_forced)
+			if ($add_remote_forced_jquery)
 			{
 				JHtml::_('jquery.framework');   // add and "override" it
-				$document->addScript('//code.jquery.com/'.$JQUERY_VER.'/jquery.min.js');
+				$document->addScript('//code.jquery.com/jquery-'.$JQUERY_VER.'.min.js', null, $JQUERY_VER_URL_ATTRS);
 			}
 			else
 			{
@@ -1113,7 +1119,7 @@ class flexicontent_html
 		if ($add_jquery_ui && !$jquery_ui_added)
 		{
 			// Load all components of jQuery-UI
-			if ($add_remote_forced)
+			if ($add_remote_forced_jquery_ui)
 			{
 				JHtml::_('jquery.ui', array());   // add and "override" it
 				$document->addScript('//code.jquery.com/ui/'.$JQUERY_UI_VER.'/jquery-ui.min.js');
@@ -1141,7 +1147,7 @@ class flexicontent_html
 		if ( $add_jquery_ui_css && !$jquery_ui_css_added )
 		{
 			// FLEXI_JQUERY_UI_CSS_STYLE:  'ui-lightness', 'smoothness'
-			$add_remote_forced
+			$add_remote_forced_jquery_ui
 				? $document->addStyleSheet('//code.jquery.com/ui/'.$JQUERY_UI_VER.'/themes/'.$JQUERY_UI_THEME.'/jquery-ui.css')
 				: $document->addStyleSheet(JUri::root(true).$lib_path.'/jquery/css/'.$JQUERY_UI_THEME.'/jquery-ui-'.$JQUERY_UI_VER.'.css');
 
