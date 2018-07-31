@@ -162,7 +162,7 @@ class flexicontent_upload
 		
 		$format = strtolower(flexicontent_upload::getExt($file['name']));
 
-		$allowed_exts = preg_split("/[\s]*,[\s]*/", strtolower($params->get('upload_extensions', 'bmp,csv,doc,docx,gif,ico,jpg,jpeg,odg,odp,ods,odt,pdf,png,ppt,pptx,swf,txt,xcf,xls,xlsx,zip,ics')));
+		$allowed_exts = preg_split("/[\s]*,[\s]*/", strtolower($params->get('upload_extensions', 'bmp,csv,doc,docx,gif,ico,jpg,jpeg,odg,odp,ods,odt,pdf,png,ppt,pptx,txt,xcf,xls,xlsx,zip,ics')));
 		$allowed_exts = array_flip($allowed_exts);
 
 		$ignored_exts = preg_split("/[\s]*,[\s]*/", strtolower($params->get('ignore_extensions')));

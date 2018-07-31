@@ -153,7 +153,7 @@
 			<param name="trigger_onprepare_content_cat" default="1" />
 			<param name="filter_types" default="createdby,modifiedby,type,state,tags,checkbox,checkboximage,radio,radioimage,select,selectmultiple" />
 
-			<param name="upload_extensions" default="bmp,csv,doc,docx,gif,ico,jpg,jpeg,odg,odp,ods,odt,pdf,png,ppt,pptx,swf,txt,xcf,xls,xlsx,zip,ics" />
+			<param name="upload_extensions" default="bmp,csv,doc,docx,gif,ico,jpg,jpeg,odg,odp,ods,odt,pdf,png,ppt,pptx,txt,xcf,xls,xlsx,zip,ics" />
 			<param name="upload_maxsize" default="10000000" />
 			<param name="file_path" default="components/com_flexicontent/uploads" />
 			<param name="media_path" default="components/com_flexicontent/medias" />
@@ -161,7 +161,7 @@
 			<param name="check_mime" default="1" />
 			<param name="image_extensions" default="bmp,gif,jpg,png" />
 			<param name="ignore_extensions" default="" />	
-			<param name="upload_mime" default="image/jpeg,image/gif,image/png,image/bmp,application/x-shockwave-flash,application/msword,application/excel,application/pdf,application/powerpoint,text/plain,application/x-zip" />
+			<param name="upload_mime" default="image/jpeg,image/gif,image/png,image/bmp,application/msword,application/excel,application/pdf,application/powerpoint,text/plain,application/x-zip" />
 			<param name="upload_mime_illegal" default="text/html" />
 			<param name="advcache" default="1" />
 			<param name="advcache_time" default="3600" />

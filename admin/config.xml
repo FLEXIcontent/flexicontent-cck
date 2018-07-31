@@ -1710,7 +1710,7 @@
 
 			<field name="" type="separator" default="FLEXI_LIMITS" icon_class="icon-lock" level="tab_open" box_type="1" remove_boxes="2" />
 			<field name="upload_maxsize" type="text" size="50" default="10000000" label="FLEXI_MAXIMUM_SIZE_LABEL" description="FLEXI_MAXIMUM_SIZE_DESC" />
-			<field name="upload_extensions" type="textarea" rows="2" default="bmp,csv,doc,docx,gif,ico,jpg,jpeg,odg,odp,ods,odt,pdf,png,ppt,pptx,swf,txt,xcf,xls,xlsx,zip,ics" label="FLEXI_ALLOWED_EXTENSIONS" description="FLEXI_ALLOWED_EXTENSIONS_DESC" class="input-xxlarge" />
+			<field name="upload_extensions" type="textarea" rows="2" default="bmp,csv,doc,docx,gif,ico,jpg,jpeg,odg,odp,ods,odt,pdf,png,ppt,pptx,txt,xcf,xls,xlsx,zip,ics" label="FLEXI_ALLOWED_EXTENSIONS" description="FLEXI_ALLOWED_EXTENSIONS_DESC" class="input-xxlarge" />
 
 			<field name="" type="separator" default="FLEXI_AUTO_RESIZE_ORIGINAL_IMAGES" description="" level="level3" />
 			<field name="" type="separator" default="FLEXI_AUTO_RESIZE_ORIGINAL_IMAGES_INFO" description="" level="level3" class="alert alert-info fcpadded"/>
@@ -1740,7 +1740,7 @@
 			
 			<field name="" type="separator" default="FLEXI_MIME_TYPES" label="" level="level3" />
 			<field name="upload_mime_illegal" type="text" size="50" default="text/html" label="FLEXI_ILLEGAL_MIME_TYPES" description="FLEXI_ILLEGAL_MIME_TYPES_DESC" class="input-xxlarge" />
-			<field name="upload_mime" type="textarea" rows="2" default="image/jpeg,image/gif,image/png,image/bmp,application/x-shockwave-flash,application/msword,application/excel,application/pdf,application/powerpoint,text/plain,application/x-zip" label="FLEXI_LEGAL_MIME_TYPES_LABEL" description="FLEXI_LEGAL_MIME_TYPES_DESC" class="input-xxlarge" />
+			<field name="upload_mime" type="textarea" rows="2" default="image/jpeg,image/gif,image/png,image/bmp,application/msword,application/excel,application/pdf,application/powerpoint,text/plain,application/x-zip" label="FLEXI_LEGAL_MIME_TYPES_LABEL" description="FLEXI_LEGAL_MIME_TYPES_DESC" class="input-xxlarge" />
 
 		<field name="" type="separator" default="FLEXI_FILES_CONF" level="tabset_close" box_type="1" remove_boxes="2" />
 	</fieldset>
