@@ -945,18 +945,24 @@ function _fc_route_addRecordIdPrefix($segments, $i, $tbl, $language = null, $col
 		return null;
 	}
 
-	$params = JComponentHelper::getParams('com_flexicontent');
-
-	$remove_ids = (int) $params->get('sef_ids', 0);
-	$record_id  = (int) $segments[$i];
-
-	if (!$remove_ids || $record_id)
+	if (!JComponentHelper::getParams('com_flexicontent')->get('sef_ids', 0))
 	{
 		return $segments[$i];
 	}
 
-	$segments[$i] = str_replace(':', '-', $segments[$i]);
-	$segments[$i] = _fc_route_getRecordIdByAlias($segments[$i], $tbl, $language, $col) . '-' . $segments[$i];
+	// Get record ID from record's alias
+	$record_id_from_alias = _fc_route_getRecordIdByAlias(
+		str_replace(':', '-', $segments[$i]),
+		$tbl,
+		$language,
+		$col
+	);
+
+	// Only prepend record ID if it was found, otherwise prepend nothing allowing legacy SEF URLs that contain IDs to work
+	if ($record_id_from_alias)
+	{
+		$segments[$i] = $record_id_from_alias . '-' . $segments[$i];
+	}
 
 	return $segments[$i];
 }
