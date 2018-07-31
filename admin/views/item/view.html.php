@@ -1095,6 +1095,8 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		$tparams = $model->getTypeparams();
 		$tparams = new JRegistry($tparams);
 
+		$typesselected = $model->getItemType();
+
 		$cid = $model->getId();
 		$isnew = ! $cid;
 		$ctrl = 'items';
