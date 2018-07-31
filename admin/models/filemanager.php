@@ -462,7 +462,7 @@ class FlexicontentModelFilemanager extends JModelLegacy
 		$option = $jinput->get('option', '', 'cmd');
 		$cparams = JComponentHelper::getParams('com_flexicontent');
 
-		$exts = $exts ?: $cparams->get('upload_extensions', 'bmp,csv,doc,docx,gif,ico,jpg,jpeg,odg,odp,ods,odt,pdf,png,ppt,pptx,swf,txt,xcf,xls,xlsx,zip,ics');
+		$exts = $exts ?: $cparams->get('upload_extensions', 'bmp,csv,doc,docx,gif,ico,jpg,jpeg,odg,odp,ods,odt,pdf,png,ppt,pptx,txt,xcf,xls,xlsx,zip,ics');
 		$imageexts = array('jpg','gif','png','bmp','jpeg');  // Common image extensions
 		$options = array();
 		$gallery_folder = $this->getFieldFolderPath($itemid, $fieldid, $options);
