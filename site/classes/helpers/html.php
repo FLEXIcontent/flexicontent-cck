@@ -1585,19 +1585,9 @@ class flexicontent_html
 				// Load jQuery mouse wheel as this JS can make use of it
 				flexicontent_html::loadFramework('mousewheel');
 
-				// Add mousewheel plugin (this is optional)
-				//$document->addScript($framework_path.'/lib/jquery.mousewheel-3.0.6.pack.js');
-
 				// Add fancyBox CSS / JS
-				$document->addStyleSheet($framework_path.'/source/jquery.fancybox.css');
-				$document->addScript($framework_path.'/source/jquery.fancybox.pack.js');
-
-				// Optionally add helpers - button, thumbnail and/or media
-				$document->addStyleSheet($framework_path.'/source/helpers/jquery.fancybox-buttons.css');
-				$document->addScript($framework_path.'/source/helpers/jquery.fancybox-buttons.js');
-				$document->addScript($framework_path.'/source/helpers/jquery.fancybox-media.js');
-				$document->addStyleSheet($framework_path.'/source/helpers/jquery.fancybox-thumbs.css');
-				$document->addScript($framework_path.'/source/helpers/jquery.fancybox-thumbs.js');
+				$document->addStyleSheet($framework_path.'/dist/jquery.fancybox.min.css');
+				$document->addScript($framework_path.'/dist/jquery.fancybox.min.js');
 
 				// Attach fancybox to all elements having a specific CSS class
 				$js .= "
