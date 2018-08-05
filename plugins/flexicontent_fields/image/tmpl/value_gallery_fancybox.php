@@ -20,12 +20,28 @@ foreach ($values as $n => $value)
 	if ($result === _FC_BREAK_) break;
 
 	$title_attr = $desc ? '<span class=\'badge\'>'.$title.'</span> '.$desc : $title;
-	$group_str = $group_name ? 'data-fancybox-group="'.$group_name.'"' : '';
+	$group_str = $group_name ? 'data-fancybox="'.$group_name.'"' : '';
+
+	if (!empty($usemediaurl) && !empty($value['mediaurl']))
+	{
+		$attribs = 'href="' . $value['mediaurl'] . '"  ';
+
+		if (strpos($value['mediaurl'], 'youtube') === false && strpos($value['mediaurl'], 'vimeo') === false)
+		{
+			$attribs .= ' data-type="iframe"';
+		}
+	}
+	else
+	{
+		$attribs = 'href="' . JUri::root(true).'/'.$srcl . '" ';
+	}
+
 	$field->{$prop}[] = $pretext.
-		'<a style="'.$style.'" href="'.JUri::root(true).'/'.$srcl.'"  class="fc_image_thumb fancybox" '.$group_str.' title="'.$title_attr.'">
+		'<a style="' . $style . '" ' . $attribs . '" class="fc_image_thumb" ' . $group_str . ' title="'  .$title_attr . '">
 			'.$img_legend.'
 		</a>'
-		.$inline_info.$posttext;
+		. $inline_info
+		. $posttext;
 }
 
 

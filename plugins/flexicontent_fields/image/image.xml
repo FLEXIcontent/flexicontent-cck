@@ -89,7 +89,21 @@
 				<option value="200">200</option>
 				<option value="250">250</option>
 			</field>
-			
+						
+			<field name="" type="separator" default="FLEXI_FIELD_LINKTO_URL" description="" level="level2" />
+			<field name="" type="separator" default="FLEXI_FIELD_LINKTO_URL_DESC" depend_class="" level="level3" class="alert alert-info fcpadded" />
+			<field name="linkto_url" type="multilist" subtype="radio" default="0" label="FLEXI_ENABLE_PROPERTY" description="" toggle_related="1" class="btn-group group-fcmethod">
+				<option value="0" show_list="img-link-nourl-mode" hide_list="img-link-url-mode">FLEXI_NO</option>
+				<option value="1" show_list="img-link-url-mode" hide_list="img-link-nourl-mode">FLEXI_YES</option>
+			</field>
+			<field name="url_target" type="groupedlist" default="_self" label="FLEXI_FIELD_URL_TARGET" description="FLEXI_FIELD_URL_TARGET_DESC" depend_class="img-link-url-mode" >
+				<option value="_self">FLEXI_FIELD_LINK_SAME_FRM_WIN_TAB</option>
+				<option value="_blank">FLEXI_FIELD_LINK_NEW_WIN_TAB</option>
+				<group label="FLEXI_FIELD_LINK_MODAL_POPUP_WIN">
+					<option value="multibox">FLEXI_FIELD_IMAGE_MULTIBOX_BUILTIN</option>
+					<option value="fancybox">FLEXI_FIELD_IMAGE_FANCYBOX_BUILTIN</option>
+				</group>
+			</field>
 
 			<field name="" type="separator" default="FLEXI_FIELD_IMAGE_SOURCE_MODE" description="FLEXI_FIELD_IMAGE_SOURCE_MODE_DESC" icon_class="icon-wrench" level="tab_open" box_type="1" />
 
@@ -153,23 +167,21 @@
 				<option value="1">FLEXI_CROP</option>
 			</field>
 
-			
+			<field name="" type="separator" default="FLEXI_FIELD_MEDIA_URL" description="..." icon_class="icon-video" level="tab_open" box_type="1" />
+			<field name="use_mediaurl" type="multilist" subtype="radio" default="0" label="FLEXI_ENABLE_PROPERTY" description="FLEXI_ENABLE_PROPERTY_DESC" toggle_related="1" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="img-mediaurl-mode">FLEXI_NO</option>
+				<option value="1" show_list="img-mediaurl-mode" hide_list="">Video URLs (Youtube, Vimeo)</option>
+				<option value="2" show_list="img-mediaurl-mode" hide_list="">Any URL</option>
+			</field>
+			<field name="default_mediaurl" type="text" default="" label="FLEXI_PROPERTY_DEFAULT" description="FLEXI_PROPERTY_DEFAULT_DESC" depend_class="img-mediaurl-mode" />
+			<field name="mediaurl_usage" type="list" default="0" label="FLEXI_OPTIONAL_PROPERTIES_DEFAULT_USAGE" description="FLEXI_OPTIONAL_PROPERTIES_DEFAULT_USAGE_DESC" depend_class="img-mediaurl-mode" >
+				<option value="0">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_NEW</option>
+				<option value="1">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_ALL</option>
+				<option value="2">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_AND_ON_EMPTY</option>
+			</field>
+
 			<field name="" type="separator" default="FLEXI_OPTIONAL_PROPERTIES" description="FLEXI_OPTIONAL_PROPERTIES_DESC" icon_class="icon-checkmark-circle" level="tab_open" box_type="1" />
 			<field name="" type="separator" default="FLEXI_IMG_JOOMLA_MODE_SETTINGS_NOT_USED_NOTES" level="level3" depend_class="img-joomla-mode" class="alert alert-warning fcpadded" />
-			
-			<field name="" type="separator" default="FLEXI_FIELD_LINKTO_URL" description="FLEXI_FIELD_LINKTO_URL_DESC" level="level3" />
-			<field name="linkto_url" type="multilist" subtype="radio" default="0" label="FLEXI_ENABLE_PROPERTY" description="FLEXI_ENABLE_PROPERTY_DESC" toggle_related="1" class="btn-group btn-group-yesno">
-				<option value="0" show_list="img-link-nourl-mode" hide_list="img-link-url-mode">FLEXI_NO</option>
-				<option value="1" show_list="img-link-url-mode" hide_list="img-link-nourl-mode">FLEXI_YES</option>
-			</field>
-			<field name="url_target" type="groupedlist" default="_self" label="FLEXI_FIELD_URL_TARGET" description="FLEXI_FIELD_URL_TARGET_DESC" depend_class="img-link-url-mode" >
-				<option value="_self">FLEXI_FIELD_LINK_SAME_FRM_WIN_TAB</option>
-				<option value="_blank">FLEXI_FIELD_LINK_NEW_WIN_TAB</option>
-				<group label="FLEXI_FIELD_LINK_MODAL_POPUP_WIN">
-					<option value="multibox">FLEXI_FIELD_IMAGE_MULTIBOX_BUILTIN</option>
-					<option value="fancybox">FLEXI_FIELD_IMAGE_FANCYBOX_BUILTIN</option>
-				</group>
-			</field>
 			
 			<field name="" type="separator" default="FLEXI_ALTERN_TEXT" level="level3" />
 			<field name="use_alt" type="multilist" subtype="radio" default="0" label="FLEXI_ENABLE_PROPERTY" description="FLEXI_ENABLE_PROPERTY_DESC" toggle_related="1" class="btn-group btn-group-yesno">
