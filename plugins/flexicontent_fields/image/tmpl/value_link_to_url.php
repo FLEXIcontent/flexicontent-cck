@@ -30,7 +30,7 @@ foreach ($values as $n => $value)
 	}
 
 	// CASE: Link to URL that opens inside a popup via multibox
-	else if ($url_target=='multibox')
+	elseif ($url_target === 'multibox')
 	{
 		$field->{$prop}[] = $pretext.'
 		<script>document.write(\'<a style="'.$style.'" href="'.$urllink.'" id="mb'.$uniqueid.'" class="fc_image_thumb mb field_' . $field->id . '" rel="width:\'+(jQuery(window).width()-150)+\',height:\'+(jQuery(window).height()-150)+\'">\')</script>
@@ -41,11 +41,11 @@ foreach ($values as $n => $value)
 	}
 
 	// CASE: Link to URL that opens inside a popup via fancybox
-	else if ($url_target=='fancybox')
+	elseif ($url_target === 'fancybox')
 	{
 		$field->{$prop}[] = $pretext.'
-		<span class="fc_image_thumb" style="'.$style.'; cursor: pointer;" '.
-			'onclick="jQuery.fancybox.open([{ type: \'iframe\', href: \''.$urllink.'\', topRatio: 0.9, leftRatio: 0.9, title: \''.($desc ? $title.': '.$desc : $title).'\' }], { padding : 0});"
+		<span class="fc_image_thumb" style="'.$style.'; cursor: pointer;"
+			onclick="jQuery.fancybox.open([{ type: \'iframe\', src: \''.$urllink.'\', topRatio: 0.9, leftRatio: 0.9, title: \''.($desc ? $title.': '.$desc : $title).'\' }], { padding : 0});"
 		>
 			'.$img_legend.'
 		</span>
