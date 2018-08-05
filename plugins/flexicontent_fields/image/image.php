@@ -116,30 +116,35 @@ class plgFlexicontent_fieldsImage extends FCField
 		$thumb_size_default = $field->parameters->get('thumb_size_default', 120);
 		$preview_thumb_w = $preview_thumb_h = 600;
 
-		// optional properies configuration
-		$linkto_url  = $field->parameters->get('linkto_url', 0 );
-		$alt_usage   = $field->parameters->get( 'alt_usage', 0 ) ;
-		$title_usage = $field->parameters->get( 'title_usage', 0 ) ;
-		$desc_usage  = $field->parameters->get( 'desc_usage', 0 ) ;
-		$cust1_usage = $field->parameters->get( 'cust1_usage', 0 );
-		$cust2_usage = $field->parameters->get( 'cust2_usage', 0 );
+		// Optional properies configuration
+		$linkto_url = (int) $field->parameters->get('linkto_url', 0);
 
-		$default_alt    = ($item->version == 0 || $alt_usage > 0) ? $field->parameters->get( 'default_alt', '' ) : '';
-		$default_title  = ($item->version == 0 || $title_usage > 0) ? JText::_($field->parameters->get( 'default_title', '' )) : '';
-		$default_desc   = ($item->version == 0 || $desc_usage > 0) ? $field->parameters->get( 'default_desc', '' ) : '';
-		$default_cust1  = ($item->version == 0 || $cust1_usage > 0) ? $field->parameters->get( 'default_cust1', '' ) : '';
-		$default_cust2  = ($item->version == 0 || $cust2_usage > 0) ? $field->parameters->get( 'default_cust2', '' ) : '';
+		$usemediaurl = (int) $field->parameters->get('use_mediaurl', 0);
+		$usealt      = (int) $field->parameters->get('use_alt', 0);
+		$usetitle    = (int) $field->parameters->get('use_title', 0);
+		$usedesc     = (int) $field->parameters->get('use_desc', 1);
+		$usecust1    = (int) $field->parameters->get('use_cust1', 0);
+		$usecust2    = (int) $field->parameters->get('use_cust2', 0);
 
-		$usealt    = $field->parameters->get( 'use_alt', 1 ) ;
-		$usetitle  = $field->parameters->get( 'use_title', 1 ) ;
-		$usedesc   = $field->parameters->get( 'use_desc', 1 ) ;
-		$usecust1  = $field->parameters->get( 'use_cust1', 0 ) ;
-		$usecust2  = $field->parameters->get( 'use_cust2', 0 ) ;
+		$mediaurl_usage = (int) $field->parameters->get('mediaurl_usage', 0);
+		$alt_usage      = (int) $field->parameters->get('alt_usage', 0);
+		$title_usage    = (int) $field->parameters->get('title_usage', 0);
+		$desc_usage     = (int) $field->parameters->get('desc_usage', 0);
+		$cust1_usage    = (int) $field->parameters->get('cust1_usage', 0);
+		$cust2_usage    = (int) $field->parameters->get('cust2_usage', 0);
+
+		$default_mediaurl = ($item->version == 0 || $mediaurl_usage > 0) ? $field->parameters->get( 'default_mediaurl', '' ) : '';
+		$default_alt      = ($item->version == 0 || $alt_usage > 0) ? $field->parameters->get( 'default_alt', '' ) : '';
+		$default_title    = ($item->version == 0 || $title_usage > 0) ? JText::_($field->parameters->get( 'default_title', '' )) : '';
+		$default_desc     = ($item->version == 0 || $desc_usage > 0) ? $field->parameters->get( 'default_desc', '' ) : '';
+		$default_cust1    = ($item->version == 0 || $cust1_usage > 0) ? $field->parameters->get( 'default_cust1', '' ) : '';
+		$default_cust2    = ($item->version == 0 || $cust2_usage > 0) ? $field->parameters->get( 'default_cust2', '' ) : '';
+
 
 		// *** Calculate some configuration flags
 
 		// Display properties box
-		$none_props = !$linkto_url && !$usealt && !$usetitle && !$usedesc && !$usecust1 && !$usecust2;
+		$none_props = !$linkto_url && !$usemediaurl && !$usealt && !$usetitle && !$usedesc && !$usecust1 && !$usecust2;
 
 		// Inline uploaders flags
 		$use_inline_uploaders = $image_source >= 0;
@@ -393,9 +398,15 @@ class plgFlexicontent_fieldsImage extends FCField
 				";
 
 			if ($linkto_url) $js .= "
-				newField.find('input.imglink').val('');
-				newField.find('input.imglink').attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][urllink]');
-				newField.find('input.imglink').attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_urllink');
+				newField.find('input.imgurllink').val('');
+				newField.find('input.imgurllink').attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][urllink]');
+				newField.find('input.imgurllink').attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_urllink');
+				";
+
+			if ($usemediaurl) $js .= "
+				newField.find('input.imgmediaurl').val(".json_encode($default_mediaurl).");
+				newField.find('input.imgmediaurl').attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][mediaurl]');
+				newField.find('input.imgmediaurl').attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_mediaurl');
 				";
 
 			if ($usealt) $js .= "
@@ -913,7 +924,12 @@ class plgFlexicontent_fieldsImage extends FCField
 			if ($linkto_url) $urllink =
 				'<tr>
 					<!--td class="key"><label class="fc-prop-lbl">'.JText::_( 'FLEXI_FIELD_LINKTO_URL' ).'</label></td-->
-					<td><input class="imglink" size="40" name="'.$fieldname_n.'[urllink]" value="'.(isset($value['urllink']) ? $value['urllink'] : '').'" type="text" placeholder="'.htmlspecialchars(JText::_( 'FLEXI_FIELD_LINKTO_URL' ), ENT_COMPAT, 'UTF-8').'"/></td>
+					<td><input class="imgurllink" size="40" name="'.$fieldname_n.'[urllink]" value="'.(isset($value['urllink']) ? $value['urllink'] : '').'" type="text" placeholder="'.htmlspecialchars(JText::_( 'FLEXI_FIELD_LINKTO_URL' ), ENT_COMPAT, 'UTF-8').'"/></td>
+				</tr>';
+			if ($usemediaurl) $mediaurl =
+				'<tr>
+					<!--td class="key"><label class="fc-prop-lbl">'.JText::_( 'FLEXI_FIELD_MEDIA_URL' ).'</label></td-->
+					<td><input class="imgmediaurl" size="40" name="'.$fieldname_n.'[mediaurl]" value="'.(isset($value['mediaurl']) ? $value['mediaurl'] : $default_mediaurl).'" type="text" placeholder="'.htmlspecialchars(JText::_( 'FLEXI_FIELD_MEDIA_URL' ) . ($usemediaurl === 1 ? ' (youtube, vimeo)' : ''), ENT_COMPAT, 'UTF-8').'"/></td>
 				</tr>';
 			if ($usealt) $alt =
 				'<tr>
@@ -1034,16 +1050,17 @@ class plgFlexicontent_fieldsImage extends FCField
 			').'
 			'
 
-			.(($linkto_url || $usealt || $usetitle || $usedesc || $usecust1 || $usecust2) ?
+			.(($linkto_url || $usemediaurl || $usealt || $usetitle || $usedesc || $usecust1 || $usecust2) ?
 			'
 			<div class="fcimg_value_props">
 				<table class="fc-form-tbl fcinner fccompact">
-					'.@ $urllink.'
-					'.@ $alt.'
-					'.@ $title.'
-					'.@ $desc.'
-					'.@ $cust1.'
-					'.@ $cust2.'
+					' . @ $urllink . '
+					' . @ $mediaurl . '
+					' . @ $alt . '
+					' . @ $title . '
+					' . @ $desc . '
+					' . @ $cust1 . '
+					' . @ $cust2 . '
 				</table>
 			</div>'
 			: '');
@@ -1179,25 +1196,29 @@ class plgFlexicontent_fieldsImage extends FCField
 		$multiple_image_usages = $image_source == 0 && $all_media && $unique_thumb_method == 0;
 		$extra_prefix = $multiple_image_usages  ?  'fld' . $field->id . '_'  :  '';
 
-		$usealt      = $field->parameters->get( 'use_alt', 1 ) ;
-		$alt_usage   = $field->parameters->get( 'alt_usage', 0 ) ;
-		$default_alt = ($alt_usage == 2)  ?  $field->parameters->get( 'default_alt', '' ) : '';
+		$usemediaurl      = (int) $field->parameters->get('use_mediaurl', 0);
+		$mediaurl_usage   = (int) $field->parameters->get('mediaurl_usage', 0);
+		$default_mediaurl = ($mediaurl_usage == 2) ? $field->parameters->get('default_mediaurl', '') : '';
 
-		$usetitle      = $field->parameters->get( 'use_title', 1 ) ;
-		$title_usage   = $field->parameters->get( 'title_usage', 0 ) ;
-		$default_title = ($title_usage == 2)  ?  JText::_($field->parameters->get( 'default_title', '' )) : '';
+		$usealt        = (int) $field->parameters->get('use_alt', 0);
+		$alt_usage     = (int) $field->parameters->get('alt_usage', 0);
+		$default_alt   = ($alt_usage == 2) ? $field->parameters->get('default_alt', '') : '';
 
-		$usedesc       = $field->parameters->get( 'use_desc', 1 ) ;
-		$desc_usage    = $field->parameters->get( 'desc_usage', 0 ) ;
-		$default_desc  = ($desc_usage == 2)  ?  $field->parameters->get( 'default_desc', '' ) : '';
+		$usetitle      = (int) $field->parameters->get('use_title', 0);
+		$title_usage   = (int) $field->parameters->get('title_usage', 0);
+		$default_title = ($title_usage == 2) ? JText::_($field->parameters->get('default_title', '')) : '';
 
-		$usecust1      = $field->parameters->get( 'use_cust1', 0 ) ;
-		$cust1_usage   = $field->parameters->get( 'cust1_usage', 0 ) ;
-		$default_cust1 = ($cust1_usage == 2)  ?  JText::_($field->parameters->get( 'default_cust1', '' )) : '';
+		$usedesc       = (int) $field->parameters->get('use_desc', 1);
+		$desc_usage    = (int) $field->parameters->get('desc_usage', 0);
+		$default_desc  = ($desc_usage == 2) ? $field->parameters->get('default_desc', '') : '';
 
-		$usecust2      = $field->parameters->get( 'use_cust2', 0 ) ;
-		$cust2_usage   = $field->parameters->get( 'cust2_usage', 0 ) ;
-		$default_cust2 = ($cust2_usage == 2)  ?  JText::_($field->parameters->get( 'default_cust2', '' )) : '';
+		$usecust1      = (int) $field->parameters->get('use_cust1', 0);
+		$cust1_usage   = (int) $field->parameters->get('cust1_usage', 0);
+		$default_cust1 = ($cust1_usage == 2) ? JText::_($field->parameters->get('default_cust1', '')) : '';
+
+		$usecust2      = (int) $field->parameters->get('use_cust2', 0);
+		$cust2_usage   = (int) $field->parameters->get('cust2_usage', 0);
+		$default_cust2 = ($cust2_usage == 2) ? JText::_($field->parameters->get('default_cust2', '')) : '';
 
 		// Separators / enclosing characters
 		$remove_space = $field->parameters->get( 'remove_space', 0 ) ;
@@ -1358,8 +1379,9 @@ class plgFlexicontent_fieldsImage extends FCField
 		if ( !count($values) )
 		{
 			// Create default image to be used if  (a) no image assigned  OR  (b) images assigned have been deleted
-			$default_image = $field->parameters->get( 'default_image', '');
-			if ( $default_image )
+			$default_image = $field->parameters->get('default_image', '');
+
+			if ($default_image)
 			{
 				$image_DF = array();
 				// field attributes (default value specific)
@@ -1407,9 +1429,9 @@ class plgFlexicontent_fieldsImage extends FCField
 
 		if ($prop=='display' && ($view=='item' || $view=='category'))
 		{
-			$_method = $view=='item' ?
-				$field->parameters->get( 'default_method_item', 'display' ) :
-				$field->parameters->get( 'default_method_cat', 'display_single_total') ;
+			$_method = $view === 'item'
+				? $field->parameters->get('default_method_item', 'display')
+				: $field->parameters->get('default_method_cat', 'display_single_total');
 		}
 		else
 		{
@@ -1535,15 +1557,15 @@ class plgFlexicontent_fieldsImage extends FCField
 		// *** Title/Description in inline thumbnails
 		// ***
 
-		$showtitle = $field->parameters->get( 'showtitle', 0 ) ;
-		$showdesc  = $field->parameters->get( 'showdesc', 0 ) ;
+		$showtitle = $field->parameters->get('showtitle', 0);
+		$showdesc  = $field->parameters->get('showdesc', 0);
 
 
 		// ***
 		// *** Link to URL configuration
 		// ***
 
-		$linkto_url	= $field->parameters->get('linkto_url',0);
+		$linkto_url	= (int) $field->parameters->get('linkto_url', 0);
 
 		if ($linkto_url)
 		{
@@ -1569,6 +1591,12 @@ class plgFlexicontent_fieldsImage extends FCField
 			{
 				$usepopup = 0;
 			}
+		}
+
+		// Force Fancybox if using Media embeeding, this is until we add support for more galleries ...
+		elseif ($usemediaurl)
+		{
+			$popuptype = 4;
 		}
 
 
@@ -1793,6 +1821,17 @@ class plgFlexicontent_fieldsImage extends FCField
 		}
 
 
+		// Optional properies configuration
+		$linkto_url = (int) $field->parameters->get('linkto_url', 0);
+
+		$usemediaurl  = (int) $field->parameters->get('use_mediaurl', 0);
+		$usealt       = (int) $field->parameters->get('use_alt', 0);
+		$usetitle     = (int) $field->parameters->get('use_title', 0);
+		$usedesc      = (int) $field->parameters->get('use_desc', 1);
+		$usecust1     = (int) $field->parameters->get('use_cust1', 0);
+		$usecust2     = (int) $field->parameters->get('use_cust2', 0);
+
+
 		// ***
 		// *** Special steps for image field in Folder-mode(s)
 		// ***
@@ -1989,7 +2028,7 @@ class plgFlexicontent_fieldsImage extends FCField
 			}
 
 
-			// Defaut values for unset required properties of values
+			// Default values for unset required properties of values
 			$v['originalname'] = isset($v['originalname']) ? $v['originalname'] : '';
 			$v['existingname'] = isset($v['existingname']) ? $v['existingname'] : '';
 
@@ -2010,9 +2049,34 @@ class plgFlexicontent_fieldsImage extends FCField
 			}
 
 			// Add image entry to a new array skipping empty image entries
-			if ($v!==false)
+			if ($v !== false)
 			{
-				if ($v) $new_filenames[$v['originalname']] = 1;
+				if ($v)
+				{
+					$new_filenames[$v['originalname']] = 1;
+
+					// Validate other value properties
+					$v['urllink'] = $linkto_url ? flexicontent_html::dataFilter($v['urllink'], 4000, 'URL', 0) : null;
+					$v['mediaurl'] = $usemediaurl ? flexicontent_html::dataFilter($v['mediaurl'], 4000, 'URL', 0) : null;
+					if ($usemediaurl === 1 && strpos($v['mediaurl'], 'youtube') === false && strpos($v['mediaurl'], 'vimeo') === false)
+					{
+						$v['mediaurl'] = '';
+					}
+					$v['alt'] = $usealt ? flexicontent_html::dataFilter($v['alt'], 400, 'STRING', 0) : null;
+					$v['title'] = $usetitle ? flexicontent_html::dataFilter($v['title'], 400, 'STRING', 0) : null;
+					$v['desc'] = $usedesc ? flexicontent_html::dataFilter($v['desc'], 4000, 'STRING', 0) : null;
+					$v['cust1'] = $usecust1 ? flexicontent_html::dataFilter($v['cust1'], 4000, 'STRING', 0) : null;
+					$v['cust2'] = $usecust2 ? flexicontent_html::dataFilter($v['cust2'], 4000, 'STRING', 0) : null;
+
+					foreach($v as $propname => $propval)
+					{
+						if ($propval === null)
+						{
+							unset($v[$propname]);
+						}
+					}
+				}
+
 				$newpost[$new] = $v;
 				$new++;
 			}
@@ -2517,7 +2581,7 @@ class plgFlexicontent_fieldsImage extends FCField
 		}
 
 		$output_filename = $dest_path . $prefix . $filename ;
-		
+
 		// Catch case of bad permission for thumbnail files but good permission for containing folder ...
 		if (file_exists($output_filename))
 		{
