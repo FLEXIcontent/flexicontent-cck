@@ -123,15 +123,18 @@ class plgFlexicontent_fieldsAccount_via_submit extends FCField
 		if ($css) $document->addStyleDeclaration($css);
 
 
-		// *****************************************
-		// Create field's HTML display for item form
-		// *****************************************
+		/**
+		 * Create field's HTML display for item form
+		 */
 
 		$field->html = array();
 
 		$user = JFactory::getUser();
-		if ($item->id) {
-			if ($field->parameters->get( 'display_item_owner', 0 ) ) {
+
+		if ($item->id)
+		{
+			if ($field->parameters->get('display_item_owner', 0))
+			{
 				$owner = JFactory::getUser($item->created_by);
 			  $field->html[] = '
 			  <div class="'.$input_grp_class.' fc-xpended">
@@ -144,8 +147,11 @@ class plgFlexicontent_fieldsAccount_via_submit extends FCField
 				 ';
 				//<span class="fc_acc_via_mail_owner_uid">: '.$owner->id.'</span>';
 			}
-		} else if ($user->id) {
-			if ($field->parameters->get( 'display_when_logged', 0 ) ) {
+		}
+		elseif ($user->id)
+		{
+			if ($field->parameters->get('display_when_logged', 0))
+			{
 			  $field->html[] = '
 			  <div class="'.$input_grp_class.' fc-xpended">
 				  <span class="' . $add_on_class . ' fc_acc_via_mail_logged_as">'.JText::_( 'FLEXI_ACCOUNT_V_SUBMIT_LOGGED_AS' ).'</span>
@@ -157,52 +163,53 @@ class plgFlexicontent_fieldsAccount_via_submit extends FCField
 				';
 				//<span class="fc_acc_via_mail_owner_uid">: '.$user->id.'</span>';
 			}
-		} else {
+		}
+		else
+		{
 			$n = 0;
 			$fieldname_n = $fieldname.'['.$n.']';
 			$elementid_n = $elementid.'_'.$n;
 
 			$value['addr'] = !empty($value['addr']) ? $value['addr'] : '';
-			$value['addr'] = htmlspecialchars(
-				(FLEXI_J30GE ? JStringPunycode::emailToUTF8($value['addr']) : $value['addr']),
-				ENT_COMPAT, 'UTF-8'
-			);
 			$addr = '
 				<div class="fcfield_avs_box-addr nowrap_box">
 					<label class="label">'.JText::_( 'FLEXI_ACCOUNT_V_SUBMIT_ADDR' ).'</label>
-					<input class="avs_addr fcfield_textval'.$classes.'" name="'.$fieldname_n.'[addr]" id="'.$elementid_n.'" type="text" value="'.$value['addr'].'" '.$attribs.' />
+					<input class="avs_addr fcfield_textval'.$classes.'" name="'.$fieldname_n.'[addr]" id="'.$elementid_n.'" type="text" value="'.htmlspecialchars(JStringPunycode::emailToUTF8($value['addr']), ENT_COMPAT, 'UTF-8').'" '.$attribs.' />
 				</div>';
 
 			$full = '';
-			if ($usefull) {
+
+			if ($usefull)
+			{
 				$value['full'] = !empty($value['full']) ? $value['full'] : '';
-				$value['full'] = isset($value['full']) ? htmlspecialchars($value['full'], ENT_COMPAT, 'UTF-8') : '';
 				$full = '
 				<div class="fcfield_avs_box-full nowrap_box">
 					<label class="label">'.JText::_( 'FLEXI_ACCOUNT_V_SUBMIT_FULLNAME' ).'</label>
-					<input class="avs_full fcfield_textval" name="'.$fieldname_n.'[full]" type="text" size="'.$size.'" value="'.$value['full'].'" />
+					<input class="avs_full fcfield_textval" name="'.$fieldname_n.'[full]" type="text" size="'.$size.'" value="'.htmlspecialchars($value['full'], ENT_COMPAT, 'UTF-8').'" />
 				</div>';
 			}
 
 			$first = '';
-			if ($usefirst) {
+
+			if ($usefirst)
+			{
 				$value['first'] = !empty($value['first']) ? $value['first'] : '';
-				$value['first'] = isset($value['first']) ? htmlspecialchars($value['first'], ENT_COMPAT, 'UTF-8') : '';
 				$first = '
 				<div class="fcfield_avs_box-first nowrap_box">
 					<label class="label">'.JText::_( 'FLEXI_ACCOUNT_V_SUBMIT_FIRSTNAME' ).'</label>
-					<input class="avs_first fcfield_textval" name="'.$fieldname_n.'[first]" type="text" size="'.$size.'" value="'.$value['first'].'" />
+					<input class="avs_first fcfield_textval" name="'.$fieldname_n.'[first]" type="text" size="'.$size.'" value="'.htmlspecialchars($value['first'], ENT_COMPAT, 'UTF-8').'" />
 				</div>';
 			}
 
 			$last = '';
-			if ($uselast) {
+
+			if ($uselast)
+			{
 				$value['last'] = !empty($value['last']) ? $value['last'] : '';
-				$value['last'] = isset($value['last']) ? htmlspecialchars($value['last'], ENT_COMPAT, 'UTF-8') : '';
 				$last = '
 				<div class="fcfield_avs_box-last nowrap_box">
 					<label class="label">'.JText::_( 'FLEXI_ACCOUNT_V_SUBMIT_LASTNAME' ).'</label>
-					<input class="avs_last fcfield_textval" name="'.$fieldname_n.'[last]" type="text" size="'.$size.'" value="'.$value['last'].'" />
+					<input class="avs_last fcfield_textval" name="'.$fieldname_n.'[last]" type="text" size="'.$size.'" value="'.htmlspecialchars($value['last'], ENT_COMPAT, 'UTF-8').'" />
 				</div>';
 			}
 
@@ -214,8 +221,14 @@ class plgFlexicontent_fieldsAccount_via_submit extends FCField
 				';
 		}
 
-		if ( !count($field->html) && $field->formhidden!=4 ) $field->html[] = '';
-		$field->html = !count($field->html) ? null : '<div class="fcfieldval_container valuebox fcfieldval_container_'.$field->id.'">' . $field->html[0] .'</div>';
+		if (!count($field->html) && $field->formhidden != 4)
+		{
+			$field->html[] = '';
+		}
+
+		$field->html = !count($field->html)
+			? null
+			: '<div class="fcfieldval_container valuebox fcfieldval_container_'.$field->id.'">' . $field->html[0] .'</div>';
 	}
 
 

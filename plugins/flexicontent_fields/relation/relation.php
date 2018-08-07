@@ -400,7 +400,7 @@ class plgFlexicontent_fieldsRelation extends FCField
 					$itemtitle = $statestr.$itemtitle." ";
 				}
 				$itemid = $itemdata->id;
-				$items_options_select[$n] .= '<option selected="selected" value="'.$related_items_sets[$n][$itemid]->value.'" >'.$itemtitle.'</option>'."\n";
+				$items_options_select[$n] .= '<option selected="selected" value="'.htmlspecialchars($related_items_sets[$n][$itemid]->value, ENT_COMPAT, 'UTF-8').'" >'.$itemtitle.'</option>'."\n";
 			}
 		}
 

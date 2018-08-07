@@ -1280,28 +1280,30 @@ class plgFlexicontent_fieldsFile extends FCField
 	{
 		// Find which file data are already cached, and if no new file ids to query, then return cached only data
 		static $cached_data = array();
+
 		$return_data = array();
 		$new_ids = array();
 		$file_ids = (array) $fid;
+
 		foreach ($file_ids as $file_id)
 		{
-			$f = (int)$file_id;
-			if ( !isset($cached_data[$f]) && $f)
+			$f = (int) $file_id;
+			if (!isset($cached_data[$f]) && $f)
+			{
 				$new_ids[] = $f;
+			}
 		}
 
 		// Get file data not retrieved already
-		if ( count($new_ids) )
+		if (count($new_ids))
 		{
 			// Only query files that are not already cached
 			$db = JFactory::getDbo();
 			$query = 'SELECT * '. $extra_select //filename, filename_original, altname, description, ext, id'
-					. ' FROM #__flexicontent_files'
-					. ' WHERE id IN ('. implode(',', $new_ids) . ')'
-					. ($published ? '  AND published = 1' : '')
-					;
-			$db->setQuery($query);
-			$new_data = $db->loadObjectList('id');
+				. ' FROM #__flexicontent_files'
+				. ' WHERE id IN ('. implode(',', $new_ids) . ')'
+				. ($published ? '  AND published = 1' : '');
+			$new_data = $db->setQuery($query)->loadObjectList('id');
 
 			if ($new_data) foreach($new_data as $file_id => $file_data)
 			{
@@ -1312,14 +1314,14 @@ class plgFlexicontent_fieldsFile extends FCField
 		// Finally get file data in correct order
 		foreach($file_ids as $file_id)
 		{
-			$f = (int)$file_id;
-			if ( isset($cached_data[$f]) && $f)
+			$f = (int) $file_id;
+			if (isset($cached_data[$f]) && $f)
 			{
 				$return_data[$file_id] = $cached_data[$f];
 			}
 		}
 
-		return !is_array($fid) ? @$return_data[(int)$fid] : $return_data;
+		return !is_array($fid) ? @ $return_data[(int) $fid] : $return_data;
 	}
 
 

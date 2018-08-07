@@ -770,8 +770,14 @@ class plgFlexicontent_fieldsImage extends FCField
 			$fieldname_n = $fieldname.'['.$n.']';
 			$elementid_n = $elementid.'_'.$n;
 
+			/**
+			 * Make sure 'originalname' if set, but do not set 'existingname' as we use isset later ...
+			 * 'existingname' should be present only via form reloading
+			 */
 			$value['originalname'] = isset($value['originalname']) ? trim($value['originalname']) : '';
-			$image_subpath = !empty($value['existingname']) ? $value['existingname'] : $value['originalname'];  // existingname should be present only via form reloading
+			$image_subpath = !empty($value['existingname'])
+				? $value['existingname']
+				: $value['originalname'];
 
 			// Check and rebuild thumbnails if needed, existing name mean newly selected image e.g. after form reload
 			$rebuild_res = !$image_subpath
@@ -822,7 +828,7 @@ class plgFlexicontent_fieldsImage extends FCField
 			if ( $image_source >= 0 )
 			{
 				$existingname = '
-					<input type="hidden" class="existingname fcfield_textval" id="'.$elementid_n.'_existingname" name="'.$fieldname_n.'[existingname]" value="'.(!empty($value['existingname']) ? $value['existingname'] : '').'" />
+					<input type="hidden" class="existingname fcfield_textval" id="'.$elementid_n.'_existingname" name="'.$fieldname_n.'[existingname]" value="'.htmlspecialchars(!empty($value['existingname']) ? $value['existingname'] : '', ENT_COMPAT, 'UTF-8').'" />
 				';
 
 				$select_existing = '';
@@ -913,7 +919,7 @@ class plgFlexicontent_fieldsImage extends FCField
 			// originalname form field
 			if ( $image_subpath )
 			{
-				$originalname = '<input name="'.$fieldname_n.'[originalname]" id="'.$elementid_n.'_originalname" type="hidden" class="originalname" value="'.$value['originalname'].'" />';
+				$originalname = '<input name="'.$fieldname_n.'[originalname]" id="'.$elementid_n.'_originalname" type="hidden" class="originalname" value="'.htmlspecialchars($value['originalname'], ENT_COMPAT, 'UTF-8').'" />';
 				$originalname .= '<input name="'.$elementid_n.'_hasvalue" id="'.$elementid_n.'" type="text" class="fc_hidden_value hasvalue '.($use_ingroup ? $required_class : '').'" value="1" />';
 			} else {
 				$originalname = '<input name="'.$fieldname_n.'[originalname]" id="'.$elementid_n.'_originalname" type="hidden" class="originalname" value="" />';
@@ -924,22 +930,22 @@ class plgFlexicontent_fieldsImage extends FCField
 			if ($linkto_url) $urllink =
 				'<tr>
 					<!--td class="key"><label class="fc-prop-lbl">'.JText::_( 'FLEXI_FIELD_LINKTO_URL' ).'</label></td-->
-					<td><input class="imgurllink" size="40" name="'.$fieldname_n.'[urllink]" value="'.(isset($value['urllink']) ? $value['urllink'] : '').'" type="text" placeholder="'.htmlspecialchars(JText::_( 'FLEXI_FIELD_LINKTO_URL' ), ENT_COMPAT, 'UTF-8').'"/></td>
+					<td><input class="imgurllink" size="40" name="'.$fieldname_n.'[urllink]" value="'.htmlspecialchars(isset($value['urllink']) ? $value['urllink'] : '', ENT_COMPAT, 'UTF-8').'" type="text" placeholder="'.htmlspecialchars(JText::_( 'FLEXI_FIELD_LINKTO_URL' ), ENT_COMPAT, 'UTF-8').'"/></td>
 				</tr>';
 			if ($usemediaurl) $mediaurl =
 				'<tr>
 					<!--td class="key"><label class="fc-prop-lbl">'.JText::_( 'FLEXI_FIELD_MEDIA_URL' ).'</label></td-->
-					<td><input class="imgmediaurl" size="40" name="'.$fieldname_n.'[mediaurl]" value="'.(isset($value['mediaurl']) ? $value['mediaurl'] : $default_mediaurl).'" type="text" placeholder="'.htmlspecialchars(JText::_( 'FLEXI_FIELD_MEDIA_URL' ) . ($usemediaurl === 1 ? ' (youtube, vimeo)' : ''), ENT_COMPAT, 'UTF-8').'"/></td>
+					<td><input class="imgmediaurl" size="40" name="'.$fieldname_n.'[mediaurl]" value="'.htmlspecialchars(isset($value['mediaurl']) ? $value['mediaurl'] : $default_mediaurl, ENT_COMPAT, 'UTF-8').'" type="text" placeholder="'.htmlspecialchars(JText::_( 'FLEXI_FIELD_MEDIA_URL' ) . ($usemediaurl === 1 ? ' (youtube, vimeo)' : ''), ENT_COMPAT, 'UTF-8').'"/></td>
 				</tr>';
 			if ($usealt) $alt =
 				'<tr>
 					<!--td class="key"><label class="fc-prop-lbl">'.JText::_( 'FLEXI_FIELD_ALT' ).'</label></td-->
-					<td><input class="imgalt" size="40" name="'.$fieldname_n.'[alt]" value="'.(isset($value['alt']) ? $value['alt'] : $default_alt).'" type="text" placeholder="'.htmlspecialchars(JText::_( 'FLEXI_FIELD_ALT' ), ENT_COMPAT, 'UTF-8').'"/></td>
+					<td><input class="imgalt" size="40" name="'.$fieldname_n.'[alt]" value="'.htmlspecialchars(isset($value['alt']) ? $value['alt'] : $default_alt, ENT_COMPAT, 'UTF-8').'" type="text" placeholder="'.htmlspecialchars(JText::_( 'FLEXI_FIELD_ALT' ), ENT_COMPAT, 'UTF-8').'"/></td>
 				</tr>';
 			if ($usetitle) $title =
 				'<tr>
 					<!--td class="key"><label class="fc-prop-lbl">'.JText::_( 'FLEXI_FIELD_TITLE' ).' <br/>('.JText::_('FLEXI_FIELD_TOOLTIP').')</label></td-->
-					<td><input class="imgtitle" size="40" name="'.$fieldname_n.'[title]" value="'.(isset($value['title']) ? $value['title'] : $default_title).'" type="text" placeholder="'.htmlspecialchars(JText::_( 'FLEXI_FIELD_TITLE' ), ENT_COMPAT, 'UTF-8').'"/></td>
+					<td><input class="imgtitle" size="40" name="'.$fieldname_n.'[title]" value="'.htmlspecialchars(isset($value['title']) ? $value['title'] : $default_title, ENT_COMPAT, 'UTF-8').'" type="text" placeholder="'.htmlspecialchars(JText::_( 'FLEXI_FIELD_TITLE' ), ENT_COMPAT, 'UTF-8').'"/></td>
 				</tr>';
 			if ($usedesc) $desc =
 				'<tr>
@@ -949,12 +955,12 @@ class plgFlexicontent_fieldsImage extends FCField
 			if ($usecust1) $cust1 =
 				'<tr>
 					<!--td class="key"><label class="fc-prop-lbl">'.JText::_( 'FLEXI_FIELD_IMG_CUST1' ).'</label></td-->
-					<td><input class="imgcust1" size="40" name="'.$fieldname_n.'[cust1]" value="'.(isset($value['cust1']) ? $value['cust1'] : $default_cust1).'" type="text" placeholder="'.htmlspecialchars(JText::_( 'FLEXI_FIELD_IMG_CUST1' ), ENT_COMPAT, 'UTF-8').'"/></td>
+					<td><input class="imgcust1" size="40" name="'.$fieldname_n.'[cust1]" value="'.htmlspecialchars(isset($value['cust1']) ? $value['cust1'] : $default_cust1, ENT_COMPAT, 'UTF-8').'" type="text" placeholder="'.htmlspecialchars(JText::_( 'FLEXI_FIELD_IMG_CUST1' ), ENT_COMPAT, 'UTF-8').'"/></td>
 				</tr>';
 			if ($usecust2) $cust2 =
 				'<tr>
 					<!--td class="key"><label class="fc-prop-lbl">'.JText::_( 'FLEXI_FIELD_IMG_CUST2' ).'</label></td-->
-					<td><input class="imgcust2" size="40" name="'.$fieldname_n.'[cust2]" value="'.(isset($value['cust2']) ? $value['cust2'] : $default_cust2).'" type="text" placeholder="'.htmlspecialchars(JText::_( 'FLEXI_FIELD_IMG_CUST2' ), ENT_COMPAT, 'UTF-8').'"/></td>
+					<td><input class="imgcust2" size="40" name="'.$fieldname_n.'[cust2]" value="'.htmlspecialchars(isset($value['cust2']) ? $value['cust2'] : $default_cust2, ENT_COMPAT, 'UTF-8').'" type="text" placeholder="'.htmlspecialchars(JText::_( 'FLEXI_FIELD_IMG_CUST2' ), ENT_COMPAT, 'UTF-8').'"/></td>
 				</tr>';
 
 			// DB-mode needs a 'pick_existing_n'

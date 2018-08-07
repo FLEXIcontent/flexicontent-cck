@@ -29,17 +29,17 @@
 
 		// NOTE: HTML tag id of this form element needs to match the -for- attribute of label HTML tag of this FLEXIcontent field, so that label will be marked invalid when needed
 		$value['link'] = !empty($value['link']) ? $value['link'] : $default_link;
-		$value['link'] = htmlspecialchars( JStringPunycode::urlToUTF8($value['link']), ENT_COMPAT, 'UTF-8' );
 		$has_value_class = $value['link'] ? ' fc-has-value' : '';
 
 		$link = '
 			<div class="' . $box_classes . '">
 				<label class="' . $lbl_classes . $has_value_class . ' fc-lbl urllink-lbl" for="'.$elementid_n.'_link">'.JText::_( 'FLEXI_FIELD_URL' ).'</label>
-				<input ' . $ff_events . ' class="urllink ' . $input_classes . ' ' . $link_classes . '" name="'.$fieldname_n.'[link]" id="'.$elementid_n.'_link" type="text" value="'.$value['link'].'" ' . $link_attribs . '/>
+				<input ' . $ff_events . ' class="urllink ' . $input_classes . ' ' . $link_classes . '" name="'.$fieldname_n.'[link]" id="'.$elementid_n.'_link" type="text" value="'.htmlspecialchars(JStringPunycode::urlToUTF8($value['link']), ENT_COMPAT, 'UTF-8').'" ' . $link_attribs . '/>
 			</div>';
 
 		$autoprefix = '';
-		if ($allow_relative_addrs==2)
+
+		if ($allow_relative_addrs == 2)
 		{
 			$_tip_title  = flexicontent_html::getToolTip(null, 'FLEXI_FIELD_WEBLINK_IS_RELATIVE_DESC', 1, 1);
 			$is_absolute = (boolean) parse_url($value['link'], PHP_URL_SCHEME); // preg_match("#^http|^https|^ftp#i", $value['link']);
@@ -59,39 +59,39 @@
 		}
 
 		$title = '';
+
 		if ($usetitle)
 		{
 			$value['title'] = !empty($value['title']) ? $value['title'] : $default_title;
-			$value['title'] = htmlspecialchars($value['title'], ENT_COMPAT, 'UTF-8');
 			$has_value_class = $value['title'] ? ' fc-has-value' : '';
 
 			$title = '
 			<div class="' . $box_classes . '">
 				<label class="' . $lbl_classes . $has_value_class . ' fc-lbl urltitle-lbl" for="'.$elementid_n.'_title">'.JText::_( 'FLEXI_FIELD_WEBLINK_URLTITLE' ).'</label>
-				<input ' . $ff_events . ' class="urltitle ' . $input_classes . '" name="'.$fieldname_n.'[title]" id="'.$elementid_n.'_title" type="text" size="'.$size.'" value="'.$value['title'].'" />
+				<input ' . $ff_events . ' class="urltitle ' . $input_classes . '" name="'.$fieldname_n.'[title]" id="'.$elementid_n.'_title" type="text" size="'.$size.'" value="'.htmlspecialchars($value['title'], ENT_COMPAT, 'UTF-8').'" />
 			</div>';
 		}
 
 		$linktext = '';
+
 		if ($usetext)
 		{
 			$value['linktext'] = !empty($value['linktext']) ? $value['linktext'] : $default_text;
-			$value['linktext'] = htmlspecialchars($value['linktext'], ENT_COMPAT, 'UTF-8');
 			$has_value_class = $value['linktext'] ? ' fc-has-value' : '';
 
 			$linktext = '
 			<div class="' . $box_classes . '">
 				<label class="' . $lbl_classes . $has_value_class . ' fc-lbl urllinktext-lbl" for="'.$elementid_n.'_linktext">'.JText::_( 'FLEXI_FIELD_WEBLINK_URLLINK_TEXT' ).'</label>
-				<input ' . $ff_events . ' class="urllinktext ' . $input_classes . '" name="'.$fieldname_n.'[linktext]" id="'.$elementid_n.'_linktext" type="text" size="'.$size.'" value="'.$value['linktext'].'" />
+				<input ' . $ff_events . ' class="urllinktext ' . $input_classes . '" name="'.$fieldname_n.'[linktext]" id="'.$elementid_n.'_linktext" type="text" size="'.$size.'" value="'.htmlspecialchars($value['linktext'], ENT_COMPAT, 'UTF-8').'" />
 			</div>';
 		}
 
 		$class = '';
+
 		if ($useclass)
 		{
 			// Do not load the default from viewing configuration !, this will allow re-configuring default in viewing configuration at any time
 			$value['class'] = !empty($value['class']) ? $value['class'] : '';  //$default_class;
-			$value['class'] = htmlspecialchars($value['class'], ENT_COMPAT, 'UTF-8');
 			$has_value_class = $value['class'] ? ' fc-has-value' : '';
 
 			if ($useclass==1)
@@ -99,7 +99,7 @@
 				$class = '
 					<div class="' . $box_classes . '">
 						<label class="' . $lbl_classes . $has_value_class . ' fc-lbl urlclass-lbl" for="'.$elementid_n.'_class">'.JText::_( 'FLEXI_FIELD_WEBLINK_URLCLASS' ).'</label>
-						<input ' . $ff_events . ' class="urlclass ' . $input_classes . '" name="'.$fieldname_n.'[class]" id="'.$elementid_n.'_class" type="text" size="'.$size.'" value="'.$value['class'].'" />
+						<input ' . $ff_events . ' class="urlclass ' . $input_classes . '" name="'.$fieldname_n.'[class]" id="'.$elementid_n.'_class" type="text" size="'.$size.'" value="'.htmlspecialchars($value['class'], ENT_COMPAT, 'UTF-8').'" />
 					</div>';
 			}
 			else if ($useclass==2)
@@ -114,25 +114,25 @@
 		}
 
 		$id = '';
+
 		if ($useid)
 		{
 			$value['id'] = !empty($value['id']) ? $value['id'] : $default_id;
-			$value['id'] = htmlspecialchars($value['id'], ENT_COMPAT, 'UTF-8');
 			$has_value_class = $value['id'] ? ' fc-has-value' : '';
 
 			$id = '
 			<div class="' . $box_classes . '">
 				<label class="' . $lbl_classes . $has_value_class . ' fc-lbl urlid-lbl" for="'.$elementid_n.'_id">'.JText::_( 'FLEXI_FIELD_WEBLINK_URLID' ).'</label>
-				<input ' . $ff_events . ' class="urlid ' . $input_classes . '" name="'.$fieldname_n.'[id]" id="'.$elementid_n.'_id" type="text" size="'.$size.'" value="'.$value['id'].'" />
+				<input ' . $ff_events . ' class="urlid ' . $input_classes . '" name="'.$fieldname_n.'[id]" id="'.$elementid_n.'_id" type="text" size="'.$size.'" value="'.htmlspecialchars($value['id'], ENT_COMPAT, 'UTF-8').'" />
 			</div>';
 		}
 
 		$target = '';
+
 		if ($usetarget)
 		{
 			// Do not load the default from viewing configuration !, this will allow re-configuring default in viewing configuration at any time
 			$value['target'] = !empty($value['target']) ? $value['target'] : '';  //$default_target;
-			$value['target'] = htmlspecialchars($value['target'], ENT_COMPAT, 'UTF-8');
 			$has_value_class = $value['target'] ? ' fc-has-value' : '';
 
 			$target_attribs = ' class="urltarget use_select2_lib" ';
@@ -152,14 +152,16 @@
 		}
 
 		$hits = '';
-		if ($usehits) {
-			$hits = (int) @ $value['hits'];
+
+		if ($usehits)
+		{
+			$value['hits'] = !empty($value['hits']) ? (int) $value['hits'] : 0;
 			$has_value_class = ' fc-has-value';
 
 			$hits = '
 				<div class="' . $input_grp_class . ' fc-xpended-row">
 					<label class="' . $add_on_class . ' fc-lbl urlhits-lbl" for="'.$elementid_n.'_hits">'.JText::_( 'FLEXI_FIELD_WEBLINK_POPULARITY' ).'</label>
-					<input class="urlhits fc_hidden_value ' . $has_value_class . '" name="'.$fieldname_n.'[hits]" id="'.$elementid_n.'_hits" type="text" value="'.$hits.'" />
+					<input class="urlhits fc_hidden_value ' . $has_value_class . '" name="'.$fieldname_n.'[hits]" id="'.$elementid_n.'_hits" type="text" value="'.htmlspecialchars($value['hits'], ENT_COMPAT, 'UTF-8').'" />
 					<span class="' . $add_on_class . ' hitcount">'.$hits.' '.JText::_( 'FLEXI_FIELD_HITS' ).'</span>
 				</div>
 				';

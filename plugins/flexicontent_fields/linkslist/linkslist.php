@@ -128,7 +128,7 @@ class plgFlexicontent_fieldsLinkslist extends FCField
 				$checked  = in_array($li_title, $field->value) ? ' checked="checked"' : null;
 				$options[] = ''
 					.$pretext
-					.'<input type="checkbox" class="'.$required.'" name="'.$fieldname.'" value="'.$li_title.'" id="'.$elementid.'_'.$n.'"'.$checked.' />'
+					.'<input type="checkbox" class="'.$required.'" name="'.$fieldname.'" value="'.htmlspecialchars($li_title, ENT_COMPAT, 'UTF-8').'" id="'.$elementid.'_'.$n.'"'.$checked.' />'
 					.'<label for="'.$elementid.'_'.$n.'">'.$li_title.'</label>'
 					.$posttext
 					;
@@ -270,7 +270,7 @@ class plgFlexicontent_fieldsLinkslist extends FCField
 		if ( !in_array($filter->field_type, static::$field_types) ) return;
 
 		$size = (int)$filter->parameters->get( 'size', 30 );
-		$filter->html	='<input name="filter_'.$filter->id.'" class="fc_field_filter" type="text" size="'.$size.'" value="'.$value.'" />';
+		$filter->html	='<input name="filter_'.$filter->id.'" class="fc_field_filter" type="text" size="'.$size.'" value="'.htmlspecialchars($value, ENT_COMPAT, 'UTF-8').'" />';
 	}*/
 
 
