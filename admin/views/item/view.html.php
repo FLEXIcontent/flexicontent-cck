@@ -1,4 +1,4 @@
-<?php
+11<?php
 /**
  * @version 1.5 stable $Id$
  * @package Joomla
@@ -1185,8 +1185,8 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		 * Add a preview button(s)
 		 */
 		
-		//$_sh404sef = JPluginHelper::isEnabled('system', 'sh404sef') && $config->get('sef');
-		$_sh404sef = defined('SH404SEF_IS_RUNNING') && $config->get('sef');
+		//$_sh404sef = JPluginHelper::isEnabled('system', 'sh404sef') && JFactory::getConfig()->get('sef');
+		$_sh404sef = defined('SH404SEF_IS_RUNNING') && JFactory::getConfig()->get('sef');
 		if ( $cid )
 		{
 			// Create the non-SEF URL
