@@ -290,7 +290,7 @@ abstract class JHtmlFcitems
 		}
 
 		// Display title with no edit link ... if row is not-editable for any reason (no ACL or checked-out by other user)
-		if (!$canEdit)
+		if (!$canEdit || ($row->checked_out && (int) $row->checked_out !== (int) JFactory::getUser()->id))
 		{
 			return htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8');
 		}
