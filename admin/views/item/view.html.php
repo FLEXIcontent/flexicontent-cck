@@ -1,4 +1,4 @@
-11<?php
+<?php
 /**
  * @version 1.5 stable $Id$
  * @package Joomla
