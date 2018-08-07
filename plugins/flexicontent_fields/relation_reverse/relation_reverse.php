@@ -107,7 +107,7 @@ class plgFlexicontent_fieldsRelation_reverse extends FCField
 					return;
 				}
 
-				$field->html = '<input id="'.$elementid.'" name="'.$fieldname.'[]" type="hidden" value="'.$rel_item->id.'" />';
+				$field->html = '<input id="'.$elementid.'" name="'.$fieldname.'[]" type="hidden" value="'.(int) $rel_item->id.'" />';
 				$field->html .= '<div class="alert alert-success">'.JText::_($auto_relate_submit_mssg).' '.$rel_item->title.'</div>';
 				return;
 			}

@@ -172,7 +172,7 @@ class plgFlexicontent_fieldsAddressint extends FCField
 		foreach($ac_type_allowed_list as $ac_type)
 		{
 			$lbl = $list_ac_types[$ac_type];
-			$ac_type_options .= '<option value="'.$ac_type.'"  '.($ac_type == $ac_types_default ? 'selected="selected"' : '').'>'.JText::_($lbl)."</option>\n";
+			$ac_type_options .= '<option value="'.htmlspecialchars($ac_type, ENT_COMPAT, 'UTF-8').'"  '.($ac_type == $ac_types_default ? 'selected="selected"' : '').'>'.JText::_($lbl)."</option>\n";
 		}
 		//echo $ac_type_options; exit;
 

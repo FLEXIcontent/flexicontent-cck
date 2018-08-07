@@ -4,7 +4,8 @@ $PRV_TYPE='0';
 $image_placeholder = 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=';
 
 $n = 0;
-foreach($field->value as $file_id)
+
+foreach ($field->value as $file_id)
 {
 	$file_data = $files_data[$file_id];
 	$fieldname_n = $fieldname.'['.$n.']';
@@ -37,7 +38,7 @@ foreach($field->value as $file_id)
 			<div style="display:inline-block;">
 				<span class="fc_filedata_storage_name" style="display:none;">'.$file_data->filename.'</span>
 				<div class="fc_filedata_txt_nowrap nowrap_hidden">'.$file_data->filename.'<br/>'.$file_data->altname.'</div>
-				<input class="fc_filedata_txt inlinefile-data-txt '. $info_txt_classes . $required_class .'" readonly="readonly" name="'.$fieldname_n.'[file-data-txt]" id="'.$elementid_n.'_file-data-txt" '.$info_txt_tooltip.' value="'.$filename_original.'" />
+				<input class="fc_filedata_txt inlinefile-data-txt '. $info_txt_classes . $required_class .'" readonly="readonly" name="'.$fieldname_n.'[file-data-txt]" id="'.$elementid_n.'_file-data-txt" '.$info_txt_tooltip.' value="'.htmlspecialchars($filename_original, ENT_COMPAT, 'UTF-8').'" />
 				'.(!$iform_title ? '<br/>
 				<div class="'.$input_grp_class.' fc-xpended-row">
 					<label class="' . $add_on_class . ' fc-lbl fc_filedata_title-lbl">'.JText::_( 'FLEXI_FILE_DISPLAY_TITLE' ).'</label>
@@ -61,7 +62,7 @@ foreach($field->value as $file_id)
 				<label class="' . $add_on_class . ' fc-lbl inlinefile-data-lbl '.$tooltip_class.'" title="'.flexicontent_html::getToolTip('FLEXI_FIELD_'.$FT.'_ABOUT_SELECTED_FILE', 'FLEXI_FIELD_'.$FT.'_ABOUT_SELECTED_FILE_DESC', 1, 1).'" id="'.$elementid_n.'_file-data-lbl" for="'.$elementid_n.'_file-data-txt">
 					' . JText::_('FLEXI_FIELD_'.$FT.'_SELECT_FILE') . '
 				</label>
-				<input type="hidden" id="'.$elementid_n.'_file-id" name="'.$fieldname_n.'[file-id]" value="'.$file_id.'" class="fc_fileid" />'.'
+				<input type="hidden" id="'.$elementid_n.'_file-id" name="'.$fieldname_n.'[file-id]" value="'.htmlspecialchars($file_id, ENT_COMPAT, 'UTF-8').'" class="fc_fileid" />'.'
 				'.(! $field->parameters->get('use_myfiles', '1') ? '
 				<span class="btn fc_fileupload_box">
 					<span>'.JText::_('FLEXI_FIELD_'.$FT.'_UPLOAD_NEW').'</span>

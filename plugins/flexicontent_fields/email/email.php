@@ -117,7 +117,8 @@ class plgFlexicontent_fieldsEmail extends FCField
 
 
 		// Initialise property with default value
-		if ( !$field->value ) {
+		if (!$field->value)
+		{
 			$field->value = array();
 			$field->value[0]['addr'] = $default_addr;
 			$field->value[0]['text'] = $default_title;

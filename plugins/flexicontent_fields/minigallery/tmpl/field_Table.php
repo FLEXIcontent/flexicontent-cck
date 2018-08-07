@@ -4,7 +4,8 @@ $PRV_TYPE='0';
 $image_placeholder = 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=';
 
 $n = 0;
-foreach($field->value as $file_id)
+
+foreach ($field->value as $file_id)
 {
 	$file_data = $files_data[$file_id];
 	$fieldname_n = $fieldname.'['.$n.']';
@@ -37,7 +38,7 @@ foreach($field->value as $file_id)
 	<div style="display:inline-block;">
 		<span class="fc_filedata_storage_name" style="display:none;">'.$file_data->filename.'</span>
 		<div class="fc_filedata_txt_nowrap nowrap_hidden">'.$file_data->filename.'<br/>'.$file_data->altname.'</div>
-		<input class="fc_filedata_txt inlinefile-data-txt '. $info_txt_classes . $required_class .'" readonly="readonly" name="'.$fieldname_n.'[file-data-txt]" id="'.$elementid_n.'_file-data-txt" '.$info_txt_tooltip.' value="'.$filename_original.'" />
+		<input class="fc_filedata_txt inlinefile-data-txt '. $info_txt_classes . $required_class .'" readonly="readonly" name="'.$fieldname_n.'[file-data-txt]" id="'.$elementid_n.'_file-data-txt" '.$info_txt_tooltip.' value="'.htmlspecialchars($filename_original, ENT_COMPAT, 'UTF-8').'" />
 		'.(!$iform_title ? '<br/><div class="'.$input_grp_class.'"><span class="' . $add_on_class . ' fc-lbl fc_filedata_title-lbl">'.JText::_( 'FLEXI_FILE_DISPLAY_TITLE' ).'</span><span class="' . $add_on_class . ' fc_filedata_title">'. ($file_data->altname && $filename_original!=$file_data->altname ? $file_data->altname : '-').'</span></div>' : '').'
 		<br/>
 		'.($form_file_preview ? '<img id="'.$elementid_n.'_img_preview" src="'.$preview_src.'" class="fc_preview_thumb" style="'.$preview_css.'" alt="Preview image placeholder"/>' : '').'
@@ -51,7 +52,7 @@ foreach($field->value as $file_id)
 		<td class="inlinefile-data-cell" '.($fields_box_placing==1 && $cols2_exist ? 'colspan="2"' : '').'>
 			<span class="inlinefile-data">
 				'.($fields_box_placing==1 ? '<span style="visibility:hidden; z-index:-1; position:absolute;">'.$_select_file_lbl.'</span>' : '').'
-				<input type="hidden" id="'.$elementid_n.'_file-id" name="'.$fieldname_n.'[file-id]" value="'.$file_id.'" class="fc_fileid" />'.'
+				<input type="hidden" id="'.$elementid_n.'_file-id" name="'.$fieldname_n.'[file-id]" value="'.htmlspecialchars($file_id, ENT_COMPAT, 'UTF-8').'" class="fc_fileid" />'.'
 				<span class="'./*$input_grp_class.*/'">
 					'.(! $field->parameters->get('use_myfiles', '1') ? '
 					<span class="btn fc_fileupload_box">

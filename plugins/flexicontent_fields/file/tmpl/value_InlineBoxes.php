@@ -296,19 +296,19 @@ foreach($values as $file_id)
 		{
 			// NO ACCESS: add file info via form field elements, in case the URL target needs to use them
 			$file_data_fields = "";
-			if ( !$authorized && $noaccess_addvars)
+			if (!$authorized && $noaccess_addvars)
 			{
 				$file_data_fields =
-					'<input type="hidden" name="fc_field_id" value="'.$field->id.'"/>'."\n".
-					'<input type="hidden" name="fc_item_id" value="'.$item->id.'"/>'."\n".
-					'<input type="hidden" name="fc_file_id" value="'.$file_id.'"/>'."\n";
+					'<input type="hidden" name="fc_field_id" value="'.(int) $field->id.'"/>'."\n".
+					'<input type="hidden" name="fc_item_id" value="'.(int) $item->id.'"/>'."\n".
+					'<input type="hidden" name="fc_file_id" value="'.(int) $file_id.'"/>'."\n";
 			}
 
 			// The download button in a mini form ...
 			$actions_arr[] = ''
 				.'<form id="form-download-'.$field->id.'-'.($n+1).'" method="post" action="'.$dl_link.'" style="display:inline-block;" ' . ($non_file_url ? 'target="_blank"' : '') . '>'
 				.$file_data_fields
-				.'<input type="submit" name="download-'.$field->id.'[]" class="'.$file_classes.' btn-success fcfile_downloadFile" title="'.$downloadsinfo.'" value="'.$downloadstext.'"/>'
+				.'<input type="submit" name="download-'.$field->id.'[]" class="'.$file_classes.' btn-success fcfile_downloadFile" title="'.htmlspecialchars($downloadsinfo, ENT_COMPAT, 'UTF-8').'" value="'.htmlspecialchars($downloadstext, ENT_COMPAT, 'UTF-8').'"/>'
 				.'</form>'."\n";
 		}
 
@@ -336,7 +336,7 @@ foreach($values as $file_id)
 				. ' data-contentid="'. $item->id .'"'
 				. ' data-fileid="'. $file_data->id .'"';
 			$actions_arr[] =
-				'<input type="button" '. $attribs .' value="'.$addtocarttext.'" />';
+				'<input type="button" '. $attribs .' value="'.htmlspecialchars($addtocarttext, ENT_COMPAT, 'UTF-8').'" />';
 		}
 
 
@@ -353,8 +353,8 @@ foreach($values as $file_id)
 				.'&task=call_extfunc&exttype=plugins&extfolder=flexicontent_fields&extname=file&extfunc=share_file_form'
 				.'&file_id='.$file_id.'&content_id='.$item->id.'&field_id='.$field->id;
 			$actions_arr[] =
-				'<input type="button" class="'.$file_classes.' fcfile_shareFile" title="'.$shareinfo.'" data-href="'.$send_form_url.'" value="'.$sharetext.'" '.
-					' onclick="var url = jQuery(this).attr(\'data-href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 800, 800, 0, {title:\''.$sharetext.'\'}); return false;" '.
+				'<input type="button" class="'.$file_classes.' fcfile_shareFile" title="'.$shareinfo.'" data-href="'.$send_form_url.'" value="'.htmlspecialchars($sharetext, ENT_COMPAT, 'UTF-8').'" '.
+					' onclick="var url = jQuery(this).attr(\'data-href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 800, 800, 0, {title:\''.htmlspecialchars($sharetext, ENT_COMPAT, 'UTF-8').'\'}); return false;" '.
 				'/>';
 		}
 	}

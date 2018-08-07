@@ -76,7 +76,7 @@ class plgFlexicontent_fieldsFcloadmodule extends FCField
 			$field->html[] = '
 				<tr>
 					<td class="key"><label for="'.$elementid.'_'.$n.'" class="fc-prop-lbl">' . $param_label . '</label></td>
-					<td><input id="'.$elementid.'_'.$n.'" name="'.$fieldname.'[0]['.$param_name.']" class="input-xlarge" type="text" size="40" value="'.$param_value.'" /></td>
+					<td><input id="'.$elementid.'_'.$n.'" name="'.$fieldname.'[0]['.$param_name.']" class="input-xlarge" type="text" size="40" value="'.htmlspecialchars($param_value, ENT_COMPAT, 'UTF-8').'" /></td>
 				</tr>'
 				;
 			$n++;
