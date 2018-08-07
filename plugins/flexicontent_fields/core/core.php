@@ -605,8 +605,9 @@ class plgFlexicontent_fieldsCore extends FCField
 
 				$filter_ffname = 'filter_'.$filter->id;
 				$filter_ffid   = $formName.'_'.$filter->id.'_val';
+				$title_value   = (isset($value[0]) ? $value[0] : '');
 
-				$filter->html	.= '<input id="'.$filter_ffid.'" name="'.$filter_ffname.'" '.$attribs_str.' type="text" size="20" value="'.$value.'" />';
+				$filter->html	.= '<input id="'.$filter_ffid.'" name="'.$filter_ffname.'" '.$attribs_str.' type="text" size="20" value="'.htmlspecialchars($title_value, ENT_COMPAT, 'UTF-8' ).'" />';
 			break;
 
 			case 'createdby':     // Authors
