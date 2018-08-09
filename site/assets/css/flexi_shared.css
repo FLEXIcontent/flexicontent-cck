@@ -30,6 +30,16 @@ body > #system-message-container {
 body > #system-message-container .alert {
 	margin: 0;
 }
+.com_flexicontent .ui-autocomplete-loading {
+	background: #eee url('../images/ajax-loader.gif') no-repeat 96% center;
+}
+.com_flexicontent .ui-autocomplete,
+.com_flexicontent .ui-autocomplete-list {
+	max-height: 400px;
+	overflow-y: auto;
+	overflow-x: hidden;
+	z-index: 1000 !important;
+}
 .flexicontent .calendar {
 	vertical-align: middle;
 }
