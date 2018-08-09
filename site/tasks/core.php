@@ -24,8 +24,10 @@ class FlexicontentTasksCore
 		require_once JPATH_BASE . '/includes/defines.php';
 		require_once JPATH_BASE . '/includes/framework.php';
 
+		$is_admin = preg_match('/\/administrator\//', $_SERVER['HTTP_REFERER']);
+
 		// Instantiate the application.
-		$app = JFactory::getApplication('site');
+		$app = JFactory::getApplication($is_admin ? 'administrator' : 'site');
 		$app->initialise();
 
 		// Call the task
@@ -74,28 +76,42 @@ class FlexicontentTasksCore
 		$cids = $jinput->get('cids', '', 'string');
 		
 		// CASE 1: Single category view, zero or string means ignore and use 'cids'
-		if ( $cid )
+		if ($cid)
 		{
 			$_cids = array($cid);
 		}
 		
 		// CASE 2: Multi category view
-		else if ( !empty($cids) )
+		elseif (!empty($cids))
 		{
-			if ( !is_array($cids) )
+			if (!is_array($cids))
 			{
 				$_cids = preg_replace( '/[^0-9,]/i', '', (string) $cids );
 				$_cids = explode(',', $_cids);
-			} else $_cids = $cids;
+			}
+			else
+			{
+				$_cids = $cids;
+			}
 		}
 
 		// No category id was given
-		else $_cids = array();
+		else
+		{
+			$_cids = array();
+		}
 
 
 		// Make sure given data are integers ...
 		$cids = array();
-		if ($_cids) foreach ($_cids as $i => $_id)  if ((int)$_id) $cids[] = (int)$_id;
+
+		foreach ($_cids as $i => $_id)
+		{
+			if ((int) $_id)
+			{
+				$cids[] = (int) $_id;
+			}
+		}
 
 		// Sub - cats
 		if ($usesubs)
@@ -381,8 +397,12 @@ class FlexicontentTasksCore
 	 * @return object
 	 * @since 1.0
 	 */
-	private function _getTags($mask="", $limit=100)
+	private function _getTags($mask="", $limit=500)
 	{
+		$app     = JFactory::getApplication();
+		$jinput  = $app->input;
+		if ($jinput->get('task', '', 'cmd') == __FUNCTION__) die(__FUNCTION__ . ' : direct call not allowed');
+
 		$db = JFactory::getDbo();
 
 		$escaped_mask = $db->escape($mask, true);
@@ -409,6 +429,10 @@ class FlexicontentTasksCore
 	 */
 	private function _loadLanguage()
 	{
+		$app     = JFactory::getApplication();
+		$jinput  = $app->input;
+		if ($jinput->get('task', '', 'cmd') == __FUNCTION__) die(__FUNCTION__ . ' : direct call not allowed');
+
 		// Load english language file for 'com_flexicontent' component then override with current language file
 		JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, 'en-GB', true);
 		JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, true);

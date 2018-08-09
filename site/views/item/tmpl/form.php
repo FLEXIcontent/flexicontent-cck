@@ -127,7 +127,7 @@ if ( $this->perms['cantags'] && $this->params->get('usetags_fe', 1)==1 )
 			
 			tagInput.keydown(function(event)
 			{
-				if( (event.keyCode==13) )
+				if (event.keyCode == 13)
 				{
 					var el = jQuery(event.target);
 					if (el.val()=='') return false; // No tag to assign / create
@@ -139,7 +139,8 @@ if ( $this->perms['cantags'] && $this->params->get('usetags_fe', 1)==1 )
 					var data_name = el.data('tagname');
 					//window.console.log( 'User input: '+el.val() + ' data-tagid: ' + data_id + ' data-tagname: \"'+ data_name + '\"');
 					
-					if (el.val() == data_name && data_id!='' && data_id!='0') {
+					if (el.val() == data_name && data_id != '' && data_id != '0')
+					{
 						//window.console.log( 'Assigning found tag: (' + data_id + ', \"' + data_name + '\")');
 						addToList(data_id, data_name);
 						el.autocomplete('close');
@@ -154,41 +155,56 @@ if ( $this->perms['cantags'] && $this->params->get('usetags_fe', 1)==1 )
 					return false;
 				}
 			});
-			
-			jQuery.ui.autocomplete( {
-				source: function( request, response ) {
+
+			var fcTagsCache = {};
+
+			jQuery.ui.autocomplete({
+				source: function( request, response )
+				{
 					var el   = jQuery(this.element);
 					var term = request.term;
+
+					if (term in fcTagsCache)
+					{
+						response(fcTagsCache[term]);
+						return;
+					}
+
 					//window.console.log( 'Getting tags for \"' + term + '\" ...');
 					jQuery.ajax({
-						/*
-						url: '".JUri::base(true)."/index.php?option=com_flexicontent&". JSession::getFormToken() ."=1" . ($sef_lang ? '&lang=' . $sef_lang : '') . "',
-						*/
-						url: '".JUri::base(true)."/components/com_flexicontent/tasks/core.php?". JSession::getFormToken() ."=1',
+						url: '".JUri::root(true)."/components/com_flexicontent/tasks/core.php?". JSession::getFormToken() ."=1',
 						dataType: 'json',
 						data: {
-							q: request.term,
+							q: term,
 							task: 'viewtags',
 							format: 'json'
 						},
-						success: function( data ) {
+						success: function(data)
+						{
 							//window.console.log( '... received tags for \"' + term + '\"');
-							response( jQuery.map( data, function( item ) {
-								if (el.val()==item.name)
+							var response_data = jQuery.map(data, function(item)
+							{
+								if (el.val() == item.name)
 								{
 									//window.console.log( 'Found exact TAG match, (' + item.id + ', \"' + item.name + '\")');
 									el.data('tagid',   item.id);
 									el.data('tagname', item.name);
 								}
 								return jQuery('#ultagbox').find('input[value=\"'+item.id+'\"]').length > 0 ? null : { label: item.name, value: item.id };
-							}));
+							});
+
+							fcTagsCache[term] = response_data;
+							response(response_data);
 						}
 					});
 				},
+
 				delay: 200,
-				minLength: 1,
-				focus: function ( event, ui ) {
-					//window.console.log( (ui.item  ?  'current ID: ' + ui.item.value + 'current Label: ' + ui.item.label :  'Nothing selected') );
+				minLength: 0,
+
+				focus: function ( event, ui )
+				{
+					//window.console.log( (ui.item  ?  'current ID: ' + ui.item.value + ' , current Label: ' + ui.item.label :  'Nothing selected') );
 					
 					var el = jQuery(event.target);
 					if (ui.item.value!='' && ui.item.value!='0')
@@ -200,23 +216,34 @@ if ( $this->perms['cantags'] && $this->params->get('usetags_fe', 1)==1 )
 					
 					event.preventDefault();  // Prevent default behaviour of setting 'ui.item.value' into the input
 				},
-				select: function( event, ui ) {
+
+				select: function( event, ui )
+				{
 					//window.console.log( 'Selected: ' + ui.item.label + ', input was \'' + this.value + '\'');
 					
 					var el = jQuery(event.target);
-					if (ui.item.value!='' && ui.item.value!='0') {
+					if (ui.item.value != '' && ui.item.value != '0')
+					{
 						addToList(ui.item.value, ui.item.label);
 						el.val('');  //clear existing value
 					}
 					
 					event.preventDefault();  // Prevent default behaviour of setting 'ui.item.value' into the input and triggering change event
 				},
+
 				//change: function( event, ui ) { window.console.log( 'autocomplete change()' ); },
 				//open: function() { window.console.log( 'autocomplete open()' ); },
 				//close: function() { window.console.log( 'autocomplete close()' ); },
 				//search: function() { window.console.log( 'autocomplete search()' ); }
 			}, tagInput.get(0) );
-			
+
+			// Call search method on focus to allow immediate search
+			tagInput.focus(function () {
+				jQuery(this).autocomplete('search', this.value);
+			});
+
+			// Call autocomplete.search method to load and cache all tags up to a maximum ... e.g. 500
+			tagInput.attr('readonly', 'readonly').autocomplete('search', '').autocomplete('close').removeAttr('readonly');
 		});
 
 
@@ -224,6 +251,7 @@ if ( $this->perms['cantags'] && $this->params->get('usetags_fe', 1)==1 )
 		{
 			// Prefer quick tag selector if it exists
 			var cmtag = jQuery('#quick-tag-'+id);
+
 			if (cmtag.length)
 			{
 				cmtag.attr('checked', 'checked').trigger('change');
@@ -231,7 +259,10 @@ if ( $this->perms['cantags'] && $this->params->get('usetags_fe', 1)==1 )
 			else
 			{
 				var obj = jQuery('#ultagbox');
-				if (obj.find('input[value=\"'+id+'\"]').length > 0) return;
+				if (obj.find('input[value=\"'+id+'\"]').length > 0)
+				{
+					return;
+				}
 				obj.append('<li class=\"tagitem\"><span>'+name+'</span><input type=\"hidden\" name=\"jform[tag][]\" value=\"'+id+'\" /><a href=\"javascript:;\" class=\"deletetag\" onclick=\"javascript:deleteTag(this);\" title=\"' + Joomla.JText._('FLEXI_DELETE_TAG') + '\"></a></li>');
 			}
 		}
