@@ -183,15 +183,16 @@ class plgFlexicontent_fieldsAddressint extends FCField
 		// Field name and HTML TAG id
 		$fieldname = 'custom['.$field->name.']';
 		$elementid = 'custom_'.$field->name;
+		$field_name_js = str_replace('-', '_', $field->name);
 
 
 		// JS data of current field
 		$js = '
-			fcfield_addrint.allowed_countries["'.$field->name.'"] = new Array('.(count($ac_country_allowed_list) ? '"' . implode('", "', $ac_country_allowed_list) . '"' : '').');
-			fcfield_addrint.single_country["'.$field->name.'"] = "'.$single_country.'";
+			fcfield_addrint.allowed_countries["'.$field_name_js.'"] = new Array('.(count($ac_country_allowed_list) ? '"' . implode('", "', $ac_country_allowed_list) . '"' : '').');
+			fcfield_addrint.single_country["'.$field_name_js.'"] = "'.$single_country.'";
 
-			fcfield_addrint.map_zoom["'.$field->name.'"] = '.$map_zoom.';
-			fcfield_addrint.map_type["'.$field->name.'"] = "'.strtoupper($map_type).'";
+			fcfield_addrint.map_zoom["'.$field_name_js.'"] = '.$map_zoom.';
+			fcfield_addrint.map_type["'.$field_name_js.'"] = "'.strtoupper($map_type).'";
 		';
 		$css = "";
 
@@ -421,7 +422,7 @@ class plgFlexicontent_fieldsAddressint extends FCField
 				newField.find('.hasPopover').popover({html: true, container: newField, trigger : 'hover focus'});
 
 				// Initialize gmaps search autocomplete
-				fcfield_addrint.initAutoComplete('".$elementid."_'+uniqueRowNum".$field->id.", '".$field->name."');
+				fcfield_addrint.initAutoComplete('".$elementid."_'+uniqueRowNum".$field->id.", '".$field_name_js."');
 
 				rowCount".$field->id."++;       // incremented / decremented
 				uniqueRowNum".$field->id."++;   // incremented only
