@@ -13,6 +13,7 @@
 	<files>
 		<filename plugin="sharedmedia">sharedmedia.php</filename>
 		<filename>index.html</filename>
+		<folder>js</folder>
 	</files>
 
 	<config>
