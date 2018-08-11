@@ -4,6 +4,7 @@
 	fcfield_sharemedia.fc_elemID_tmp = null;
 	fcfield_sharemedia.debugToConsole = [];
 	fcfield_sharemedia.use_native_apis = [];
+	fcfield_sharemedia.youtube_key = [];
 
 
 	fcfield_sharemedia.youtubeDurationToSeconds = function(duration)
@@ -102,7 +103,7 @@
 			fcfield_sharemedia.debugToConsole[config_name] ? window.console.log("Media ID: "+mediaID) : "";
 			switch(apiType)
 			{
-				case "youtube"    : ajax_url = "https://www.googleapis.com/youtube/v3/videos?id="+mediaID+"&key='.$youtube_key.'&part=snippet,contentDetails,statistics,status";/*&callback=fcfield_sharemedia.youtubeCallback";*/  break;
+				case "youtube"    : ajax_url = "https://www.googleapis.com/youtube/v3/videos?id="+mediaID+"&key="+fcfield_sharemedia.youtube_key[config_name]+"&part=snippet,contentDetails,statistics,status";/*&callback=fcfield_sharemedia.youtubeCallback";*/  break;
 				case "vimeo"      : ajax_url = "//vimeo.com/api/v2/video/"+mediaID+".json";/*?callback=fcfield_sharemedia.vimeoCallback";*/  break;
 				case "dailymotion": ajax_url = "https://api.dailymotion.com/video/"+mediaID+"?fields=description,duration,owner.screenname,thumbnail_60_url,title";/*&callback=fcfield_sharemedia.dailymotionCallback";*/  break;
 			}
