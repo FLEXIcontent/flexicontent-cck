@@ -29,12 +29,12 @@ foreach ($values as $n => $value)
 	if ($result === _FC_CONTINUE_) continue;
 	if ($result === _FC_BREAK_) break;
 
-	$title_attr = $desc ? $desc : $title;
+	$title_attr = $desc_encoded ? $desc_encoded : $title_encoded;
 	$img_legend_custom ='
-		<img src="'.JUri::root(true).'/'.$src.'" alt ="'.$alt.'"'.$legend.' class="'.$class.'"
+		<img src="'.JUri::root(true).'/'.$src.'" alt ="'.$alt_encoded.'"'.$legend.' class="'.$class.'"
 			data-medium="' . JUri::root(true).'/'.$srcm . '"
 			data-large="' . JUri::root(true).'/'.$srcl . '"
-			data-description="'.$title_attr.'" itemprop="image"/>
+			data-description="' . $title_attr . '" itemprop="image"/>
 	';
 	$group_str = $group_name ? 'rel="['.$group_name.']"' : '';
 	$field->{$prop}[] = '

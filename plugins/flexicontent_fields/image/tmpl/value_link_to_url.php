@@ -36,8 +36,11 @@ foreach ($values as $n => $value)
 		<script>document.write(\'<a style="'.$style.'" href="'.$urllink.'" id="mb'.$uniqueid.'" class="fc_image_thumb mb field_' . $field->id . '" rel="width:\'+(jQuery(window).width()-150)+\',height:\'+(jQuery(window).height()-150)+\'">\')</script>
 			'.$img_legend.'
 		<script>document.write(\'</a>\')</script>
-		<div class="multiBoxDesc mbox_img_url mb'.$uniqueid.'">'.($desc ? $desc : $title).'</div>
-		'.$inline_info.$posttext;
+		<div class="multiBoxDesc mbox_img_url mb'.$uniqueid.'">
+			' . ($desc ? $desc : $title) . '
+		</div>'
+		. $inline_info
+		. $posttext;
 	}
 
 	// CASE: Link to URL that opens inside a popup via fancybox
@@ -45,7 +48,7 @@ foreach ($values as $n => $value)
 	{
 		$field->{$prop}[] = $pretext.'
 		<span class="fc_image_thumb" style="'.$style.'; cursor: pointer;"
-			onclick="jQuery.fancybox.open([{ type: \'iframe\', src: \''.$urllink.'\', topRatio: 0.9, leftRatio: 0.9, title: \''.($desc ? $title.': '.$desc : $title).'\' }], { padding : 0});"
+			onclick="jQuery.fancybox.open([{ type: \'iframe\', src: \''.$urllink.'\', topRatio: 0.9, leftRatio: 0.9, title: \''.($desc_encoded ? $title_encoded . ': ' . $desc_encoded : $title_encoded).'\' }], { padding : 0});"
 		>
 			'.$img_legend.'
 		</span>
