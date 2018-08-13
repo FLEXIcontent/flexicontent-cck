@@ -97,8 +97,10 @@
 		$legend = '';
 	}
 
-	// Handle single image display, with/without total, TODO: verify all JS handle & ignore display none on the img TAG
-	$style = ($i!=0 && $isSingle) ? 'display:none;' : '';
+	// Handle single image display, with/without total, TODO: verify all JS handle & ignore display none on the img TAG container
+	$style = $i > 0 && $isSingle
+		? 'display:none;'
+		: '';
 
 	// Create a unique id for the link tags, and a class name for image tags
 	$uniqueid = $item->id . '_' . $field->id . '_' . $i;
@@ -272,11 +274,11 @@
 	// Note this is ignore by some galleries that have special containment that does not allow inline info, pretext, posttext
 	else
 	{
-		// Add inline display of title/desc
+		// Add inline display of title/desc, note that if we are hide non-first images (display_single_*), then we will hide this information box too
 		if (($showtitle && $title) || ($showdesc && $desc))
 		{
 			$inline_info = '
-			<div class="fc_img_tooltip_data alert alert-info" style="'.$style.'" >
+			<div class="fc_img_tooltip_data alert alert-info" style="' . $style . '">
 
 			' . ($showtitle && $title ? '<div class="fc_img_tooltip_title" style="line-height:1em; font-weight:bold;">'.$title.'</div>' : '') . '
 			' . ($showdesc && $desc ? '<div class="fc_img_tooltip_desc" style="line-height:1em;">'.$desc.'</div>' : '') . '

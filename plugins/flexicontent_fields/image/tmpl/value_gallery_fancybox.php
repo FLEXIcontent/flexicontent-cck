@@ -21,12 +21,21 @@ foreach ($values as $n => $value)
 
 	$title_attr = htmlspecialchars($desc ? '<b>' . $title . '</b><br> ' . $desc : $title, ENT_COMPAT, 'UTF-8');
 	$group_str = $group_name ? 'data-fancybox="' . $group_name . '"' : '';
+	$legend_icon = '';
 
 	if (!empty($usemediaurl) && !empty($value['mediaurl']))
 	{
 		$attribs = 'href="' . $value['mediaurl'] . '"  ';
+		
+		// Video providers natively supported by this JS gallery
+		if (strpos($value['mediaurl'], 'youtube') !== false || strpos($value['mediaurl'], 'vimeo') !== false)
+		{
+			$style .= 'position: relative; display: inline-block;';
+			$legend_icon = '<div style="font-size: 48px; opacity: 0.8; background: white; position: absolute; right: 50%; bottom: calc(50% - 12px);"><div class="icon-video-2" style="color: font-size: 48px;"></div></div>';
+		}
 
-		if (strpos($value['mediaurl'], 'youtube') === false && strpos($value['mediaurl'], 'vimeo') === false)
+		// Non video URL or a video provider not supported nativley by this JS gallery
+		else
 		{
 			$attribs .= ' data-type="iframe"';
 		}
@@ -37,8 +46,9 @@ foreach ($values as $n => $value)
 	}
 
 	$field->{$prop}[] = $pretext.
-		'<a style="' . $style . '" ' . $attribs . '" class="fc_image_thumb" ' . $group_str . ' title="' . $title_attr . '" data-caption="' . $title_attr . '">
+		'<a style="' . $style . '" ' . $attribs . ' class="fc_image_thumb" ' . $group_str . ' data-title="' . $title_attr . '" data-caption="' . $title_attr . '">
 			' . $img_legend . '
+			' . $legend_icon . '
 		</a>'
 		. $inline_info
 		. $posttext;
