@@ -23,8 +23,14 @@ class plgFlexicontent_fieldsImage extends FCField
 	static $field_types = null; // Automatic, do not remove since needed for proper late static binding, define explicitely when a field can render other field types
 	var $task_callable = null;  // Field's methods allowed to be called via AJAX
 
-	static $value_only_displays = array("display_backend_src"=>0, "display_small_src"=>1, "display_medium_src"=>2, "display_large_src"=>3, "display_original_src"=>4);
-	static $single_displays = array('display_single'=>0, 'display_single_total'=>1, 'display_single_link'=>2, 'display_single_total_link'=>3);
+	static $default_widths  = array('l' => 800,'m' => 400,'s' => 120,'b' => 40);
+	static $default_heights = array('l' => 600,'m' => 300,'s' => 90,'b' => 30);
+
+	static $display_to_thumb_size = array('display_backend_src' => 'b', 'display_small_src' => 's', 'display_medium_src' => 'm', 'display_large_src' => 'l', 'display_original_src' => 'o');
+	static $index_to_thumb_size = array(-1 => 'b', 1 => 's', 2 => 'm', 3 => 'l', 4 => 'o');
+
+	static $value_only_displays = array('display_backend_src' => 0, 'display_small_src' => 1, 'display_medium_src' => 2, 'display_large_src' => 3, 'display_original_src' => 4);
+	static $single_displays = array('display_single' => 0, 'display_single_total' => 1, 'display_single_link' => 2, 'display_single_total_link' => 3);
 	static $js_added = array();
 
 	// ***
@@ -872,12 +878,14 @@ class plgFlexicontent_fieldsImage extends FCField
 						<div class="fcfield-image-mediaurl-box" ' . (empty($value['mediaurl']) ? ' style="display: none;" ' : '') . '>
 							<input class="img_mediaurl" size="40" name="'.$fieldname_n.'[mediaurl]" id="'.$elementid_n.'_mediaurl" value="'.htmlspecialchars(isset($value['mediaurl']) ? $value['mediaurl'] : $default_mediaurl, ENT_COMPAT, 'UTF-8').'" type="text" placeholder="'. $placeholder .'"/>
 							<br>
-							<a href="javascript:;" class="'. $tooltip_class .' btn btn-primary btn-small img_fetch_btn" title="'.JText::_('FLEXI_FETCH').'" onclick="fcfield_image.fetchData(\''.$elementid_n.'\', \''.$field_name_js.'\'); return false;">
-								<i class="icon-loop"></i> ' . JText::_('FLEXI_FETCH') . '
-							</a>
-							<a href="javascript:;" class="'. $tooltip_class .' btn btn-warning btn-small img_clear_btn" id="'.$elementid_n.'_clear_btn" title="'.JText::_('FLEXI_CLEAR').'" onclick="fcfield_image.clearData(\''.$elementid_n.'\', \''.$field_name_js.'\'); return false;" >
-								<i class="icon-cancel"></i> ' . JText::_('FLEXI_CLEAR') . '
-							</a>
+							<div class="' . $input_grp_class . ' fcfield-image-mediaurl-btns">
+								<a href="javascript:;" class="'. $tooltip_class .' btn btn-primary btn-small img_fetch_btn" title="'.JText::_('FLEXI_FETCH').'" onclick="fcfield_image.fetchData(\''.$elementid_n.'\', \''.$field_name_js.'\'); return false;">
+									<i class="icon-loop"></i> ' . JText::_('FLEXI_FETCH') . '
+								</a>
+								<a href="javascript:;" class="'. $tooltip_class .' btn btn-warning btn-small img_clear_btn" id="'.$elementid_n.'_clear_btn" title="'.JText::_('FLEXI_CLEAR').'" onclick="fcfield_image.clearData(\''.$elementid_n.'\', \''.$field_name_js.'\'); return false;" >
+									<i class="icon-cancel"></i> ' . JText::_('FLEXI_CLEAR') . '
+								</a>
+							</div>
 							<div class="fcfield_message_box" id="fcfield_message_box_'.$elementid_n.'"></div>
 						</div>
 					</td>
@@ -2397,7 +2405,7 @@ class plgFlexicontent_fieldsImage extends FCField
 					$db->insertObject('#__flexicontent_files', $obj);
 					$app->enqueueMessage($field->label . ' : ' . JText::_('FLEXI_UPLOAD_COMPLETE'));
 
-					$sizes = array('l','m','s','b');
+					$sizes = array('l', 'm', 's', 'b');
 					foreach ($sizes as $size)
 					{
 						// create the thumbnail
@@ -2451,14 +2459,12 @@ class plgFlexicontent_fieldsImage extends FCField
 
 		// Parameters for phpthumb
 		$ext = strtolower(flexicontent_upload::getExt($filename));
-		$default_widths = array('l'=>800,'m'=>400,'s'=>120,'b'=>40);
-		$default_heights = array('l'=>600,'m'=>300,'s'=>90,'b'=>30);
-		$w			= $field->parameters->get('w_'.$size, $default_widths[$size]);
-		$h			= $field->parameters->get('h_'.$size, $default_heights[$size]);
-		$crop		= $field->parameters->get('method_'.$size);
+		$w			= $field->parameters->get('w_' . $size, self::$default_widths[$size]);
+		$h			= $field->parameters->get('h_' . $size, self::$default_heights[$size]);
+		$crop		= $field->parameters->get('method_' . $size);
 		$quality= $field->parameters->get('quality');
-		$usewm	= $field->parameters->get('use_watermark_'.$size);
-		$wmfile	= JPath::clean(JPATH_SITE . DS . $field->parameters->get('wm_'.$size));
+		$usewm	= $field->parameters->get('use_watermark_' . $size);
+		$wmfile	= JPath::clean(JPATH_SITE . DS . $field->parameters->get('wm_' . $size));
 		$wmop		= $field->parameters->get('wm_opacity');
 		$wmpos	= $field->parameters->get('wm_position');
 
@@ -2713,9 +2719,7 @@ class plgFlexicontent_fieldsImage extends FCField
 		$origsize_h = $filesize[1];
 		$origsize_w = $filesize[0];
 
-		$sizes = array('l','m','s','b');
-		$default_widths = array('l'=>800,'m'=>400,'s'=>120,'b'=>40);
-		$default_heights = array('l'=>600,'m'=>300,'s'=>90,'b'=>30);
+		$sizes = array('l', 'm', 's', 'b');
 
 		// Always create an unprefixed small thumb, it is needed when assigning preview
 		if ($extra_prefix)
@@ -2749,11 +2753,11 @@ class plgFlexicontent_fieldsImage extends FCField
 				continue;
 			}
 
-			$param_w = $field->parameters->get( 'w_'.$size, $default_widths[$size] );
-			$param_h = $field->parameters->get( 'h_'.$size, $default_heights[$size] );
-			$crop = $field->parameters->get('method_'.$size);
-			$usewm = $field->parameters->get('use_watermark_'.$size);
-			$copyorg = $field->parameters->get('copy_original_'.$size, 1);
+			$param_w = $field->parameters->get('w_' . $size, self::$default_widths[$size]);
+			$param_h = $field->parameters->get('h_' . $size, self::$default_heights[$size]);
+			$crop = $field->parameters->get('method_' . $size);
+			$usewm = $field->parameters->get('use_watermark_' . $size);
+			$copyorg = $field->parameters->get('copy_original_' . $size, 1);
 			$copy_original = ($copyorg==2) || ($origsize_w == $param_w && $origsize_h == $param_h && !$usewm && $copyorg==1);
 
 			// Check if size of file is not same as parameters and recreate the thumbnail
