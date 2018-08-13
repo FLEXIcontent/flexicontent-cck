@@ -19,8 +19,8 @@ foreach ($values as $n => $value)
 	if ($result === _FC_CONTINUE_) continue;
 	if ($result === _FC_BREAK_) break;
 
-	$title_attr = $desc ? '<span class=\'badge\'>'.$title.'</span> '.$desc : $title;
-	$group_str = $group_name ? 'data-fancybox="'.$group_name.'"' : '';
+	$title_attr = htmlspecialchars($desc ? '<b>' . $title . '</b><br> ' . $desc : $title, ENT_COMPAT, 'UTF-8');
+	$group_str = $group_name ? 'data-fancybox="' . $group_name . '"' : '';
 
 	if (!empty($usemediaurl) && !empty($value['mediaurl']))
 	{
@@ -37,8 +37,8 @@ foreach ($values as $n => $value)
 	}
 
 	$field->{$prop}[] = $pretext.
-		'<a style="' . $style . '" ' . $attribs . '" class="fc_image_thumb" ' . $group_str . ' title="'  .$title_attr . '">
-			'.$img_legend.'
+		'<a style="' . $style . '" ' . $attribs . '" class="fc_image_thumb" ' . $group_str . ' title="' . $title_attr . '" data-caption="' . $title_attr . '">
+			' . $img_legend . '
 		</a>'
 		. $inline_info
 		. $posttext;

@@ -314,6 +314,7 @@ div.container_fcfield div.toggle_all_values_buttons_box {
 		> .fcfield-enablevalue,
 		> .fcfield-disablevalue,
 		> .fcfield-clearvalue,
+		> .fcfield-medialurlvalue,
 		> .fcfield-selectvalue,
 		> .fcfield-uploadvalue,
 		> .fcfield-button,
@@ -340,6 +341,7 @@ div.container_fcfield div.toggle_all_values_buttons_box {
 		> .fcfield-enablevalue:not(.add-on):not(.input-group-addon):not(.btn),
 		> .fcfield-disablevalue:not(.add-on):not(.input-group-addon):not(.btn),
 		> .fcfield-clearvalue:not(.add-on):not(.input-group-addon):not(.btn),
+		> .fcfield-medialurlvalue:not(.add-on):not(.input-group-addon):not(.btn),
 		> .fcfield-selectvalue:not(.add-on):not(.input-group-addon):not(.btn),
 		> .fcfield-uploadvalue:not(.add-on):not(.input-group-addon):not(.btn),
 		> .fcfield-button:not(.add-on):not(.input-group-addon):not(.btn),
@@ -375,6 +377,7 @@ div.container_fcfield div.toggle_all_values_buttons_box {
 		.fcfield-enablevalue:not(.fcfont-icon):hover,
 		.fcfield-disablevalue:not(.fcfont-icon):hover,
 		.fcfield-clearvalue:not(.fcfont-icon):hover,
+		.fcfield-medialurlvalue:not(.fcfont-icon):hover,
 		.fcfield-selectvalue:not(.fcfont-icon):hover,
 		.fcfield-uploadvalue:not(.fcfont-icon):hover,
 		.fcfield-button:not(.fcfont-icon):hover,
@@ -396,6 +399,7 @@ div.container_fcfield div.toggle_all_values_buttons_box {
 		.fcfield-enablevalue.fcfont-icon:hover,
 		.fcfield-disablevalue.fcfont-icon:hover,
 		.fcfield-clearvalue.fcfont-icon:hover,
+		.fcfield-medialurlvalue.fcfont-icon:hover,
 		.fcfield-selectvalue.fcfont-icon:hover,
 		.fcfield-uploadvalue.fcfont-icon:hover,
 		.fcfield-button.fcfont-icon:hover,
@@ -421,6 +425,7 @@ div.container_fcfield div.toggle_all_values_buttons_box {
 	span.fcfield-enablevalue.fcfont-icon,
 	span.fcfield-disablevalue.fcfont-icon,
 	span.fcfield-clearvalue.fcfont-icon,
+	span.fcfield-medialurlvalue.fcfont-icon,
 	span.fcfield-selectvalue.fcfont-icon,
 	span.fcfield-uploadvalue.fcfont-icon,
 	span.fcfield-button.fcfont-icon,
@@ -601,7 +606,6 @@ div.container_fcfield div.toggle_all_values_buttons_box {
 		color: darkorange;
 	}
 
-
 	/* FIELDs: Clear value button */
 	.fcfield-clearvalue {
 		margin: 0px 0px 2px 0px;
@@ -614,6 +618,17 @@ div.container_fcfield div.toggle_all_values_buttons_box {
 		color: #555;
 	}
 
+	/* FIELDs: MEdia URL value button */
+	.fcfield-medialurlvalue {
+		margin: 0px 0px 2px 0px;
+		background: url(../images/layout.png) 50% 50% no-repeat;
+	}
+	span.fcfield-medialurlvalue.fcfont-icon:before {
+		content: "\e015";
+	}
+	span.fcfield-medialurlvalue:before {
+		color: #555;
+	}
 
 	/* FIELDs: Select value button */
 	.fcfield-selectvalue {

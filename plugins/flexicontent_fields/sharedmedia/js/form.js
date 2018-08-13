@@ -44,13 +44,13 @@
 
 	fcfield_sharemedia.fetchData = function(element_id_n, config_name)
 	{
-		var msg_box = jQuery("#fcfield_sm_mssg_"+element_id_n);
+		var msg_box = jQuery("#fcfield_message_box_"+element_id_n);
 
 		// Clear any existing message
 		msg_box.html("");
 
 		// Clear existing value
-		fcfield_sharemedia.clearData(element_id_n);
+		fcfield_sharemedia.clearData(element_id_n, config_name);
 
 		// if URL field is empty then nothing to do, else continue with creating the fetch URL
 		var url = jQuery("#"+element_id_n+"_url").val();
@@ -172,7 +172,7 @@
 		{
 			if (data.items.length == 0)
 			{
-				jQuery("#fcfield_sm_mssg_" + element_id_n).html("<span class=\"alert alert-warning fc-iblock\">Not found</span>");
+				jQuery("#fcfield_message_box_" + element_id_n).html("<span class=\"alert alert-warning fc-iblock\">Not found</span>");
 				return;
 			}
 			fcfield_sharemedia.toggleMETArows(element_id_n, 1);
@@ -184,12 +184,12 @@
 				description: data.items[0].snippet.description,
 				thumb: data.items[0].snippet.thumbnails.medium.url
 			}, config_name);
-			jQuery("#fcfield_sm_mssg_" + element_id_n).html("");
+			jQuery("#fcfield_message_box_" + element_id_n).html("");
 		}
 		else
 		{
 			var errorText = typeof data === "object" ? data.error.message : data;
-			jQuery("#fcfield_sm_mssg_" + element_id_n).html("<span class=\"alert alert-warning fc-iblock\"><i>" + Joomla.JText._('PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_SERVER_RESPONDED_WITH_ERROR') + "</i><br/><br/>" + errorText + "</span>");
+			jQuery("#fcfield_message_box_" + element_id_n).html("<span class=\"alert alert-warning fc-iblock\"><i>" + Joomla.JText._('PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_SERVER_RESPONDED_WITH_ERROR') + "</i><br/><br/>" + errorText + "</span>");
 		}
 	}
 
@@ -210,12 +210,12 @@
 				description: data[0].description,
 				thumb: data[0].thumbnail_small
 			}, config_name);
-			jQuery("#fcfield_sm_mssg_" + element_id_n).html("");
+			jQuery("#fcfield_message_box_" + element_id_n).html("");
 		}
 		else
 		{
 			var errorText = typeof data === "object" ? data.error_message : data;
-			jQuery("#fcfield_sm_mssg_" + element_id_n).html("<span class=\"alert alert-warning fc-iblock\"><i>" + Joomla.JText._('PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_SERVER_RESPONDED_WITH_ERROR') + "</i><br/><br/>"+errorText+"</span>");
+			jQuery("#fcfield_message_box_" + element_id_n).html("<span class=\"alert alert-warning fc-iblock\"><i>" + Joomla.JText._('PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_SERVER_RESPONDED_WITH_ERROR') + "</i><br/><br/>"+errorText+"</span>");
 		}
 	}
 
@@ -236,12 +236,12 @@
 				description: data.description,
 				thumb: data.thumbnail_60_url
 			}, config_name);
-			jQuery("#fcfield_sm_mssg_" + element_id_n).html("");
+			jQuery("#fcfield_message_box_" + element_id_n).html("");
 		}
 		else
 		{
 			var errorText = typeof data === "object" ? data.error.message : data;
-			jQuery("#fcfield_sm_mssg_" + element_id_n).html("<span class=\"alert alert-warning fc-iblock\"><i>" + Joomla.JText._('PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_SERVER_RESPONDED_WITH_ERROR') + "</i><br/><br/>" + errorText + "</span>");
+			jQuery("#fcfield_message_box_" + element_id_n).html("<span class=\"alert alert-warning fc-iblock\"><i>" + Joomla.JText._('PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_SERVER_RESPONDED_WITH_ERROR') + "</i><br/><br/>" + errorText + "</span>");
 		}
 	}
 
@@ -250,7 +250,7 @@
 	{
 		element_id_n = typeof element_id_n === "undefined" || !element_id_n  ?  fcfield_sharemedia.fc_elemID_tmp : element_id_n;    // *** element_id_n not set if called as callback
 
-		if (typeof data === "object" && typeof data.error == "undefined")
+		if (typeof data === "object" && typeof data.error === "undefined")
 		{
 			if (1)  // TODO Possibly add more checks
 			{
@@ -267,22 +267,22 @@
 						description: data.description,
 						thumb: data.thumbnail_url
 					}, config_name);
-					jQuery("#fcfield_sm_mssg_" + element_id_n).html("");
+					jQuery("#fcfield_message_box_" + element_id_n).html("");
 				}
 				else
 				{
-					jQuery("#fcfield_sm_mssg_" + element_id_n).html("IFRAME SRC parameter not found in response");
+					jQuery("#fcfield_message_box_" + element_id_n).html("IFRAME SRC parameter not found in response");
 				}
 			}
 			else
 			{
-				jQuery("#fcfield_sm_mssg_" + element_id_n).html("<div class=\"alert alert-warning\"><button type=\"button\" class=\"close\" data-dismiss=\"alert\">?</button>'. JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_URL_NOT_MEDIA').'</div>");
+				jQuery("#fcfield_message_box_" + element_id_n).html("<div class=\"alert alert-warning\"><button type=\"button\" class=\"close\" data-dismiss=\"alert\">?</button>'. JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_URL_NOT_MEDIA').'</div>");
 			}
 		}
 		else
 		{
 			var errorText = typeof data === "object" ? data.error_message : data;
-			jQuery("#fcfield_sm_mssg_" + element_id_n).html("<span class=\"alert alert-warning fc-iblock\"><i>" + Joomla.JText._('PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_SERVER_RESPONDED_WITH_ERROR') + "</i><br/><br/>" + errorText + "</span>");
+			jQuery("#fcfield_message_box_" + element_id_n).html("<span class=\"alert alert-warning fc-iblock\"><i>" + Joomla.JText._('PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_SERVER_RESPONDED_WITH_ERROR') + "</i><br/><br/>" + errorText + "</span>");
 		}
 	}
 

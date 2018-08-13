@@ -19,13 +19,14 @@ foreach ($values as $n => $value)
 	if ($result === _FC_CONTINUE_) continue;
 	if ($result === _FC_BREAK_) break;
 
-	$title_attr = $desc ? $title.'::'.$desc : $title;
+	$title_attr = $desc_encoded ? $title_encoded . '::' . $desc_encoded : $title_encoded;
 	$group_str = $group_name ? 'data-mediabox-group="group['.$group_name.'];"' : '';
 	$field->{$prop}[] = $pretext.
-		'<a style="'.$style.'" href="'.JUri::root(true).'/'.$srcl.'"  class="fc_image_thumb jcepopup" '.$group_str.' title['.$title_attr.']">
+		'<a style="'.$style.'" href="'.JUri::root(true).'/'.$srcl.'"  class="fc_image_thumb jcepopup" '.$group_str.' title[' . $title_attr . ']">
 			'.$img_nolegend.'
 		</a>'
-		.$inline_info.$posttext;
+		. $inline_info
+		. $posttext;
 }
 
 

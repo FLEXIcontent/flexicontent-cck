@@ -184,7 +184,7 @@ class plgFlexicontent_fieldsSharedmedia extends FCField
 				newField.find('.sm_preview').attr('id', element_id + '_preview');
 				newField.find('.sm_fetch_btn').attr('onclick', 'fcfield_sharemedia.fetchData(\'' + element_id + '\', \'".$field_name_js."\');');
 				newField.find('.sm_clear_btn').attr('onclick', 'fcfield_sharemedia.clearData(\'' + element_id + '\', \'".$field_name_js."\');');
-				newField.find('.fcfield_sm_mssg').attr('id', 'fcfield_sm_mssg_' + element_id);
+				newField.find('.fcfield_message_box').attr('id', 'fcfield_message_box_' + element_id);
 				";
 
 			// Add new field to DOM
@@ -201,7 +201,7 @@ class plgFlexicontent_fieldsSharedmedia extends FCField
 				// Extra actions after adding element to the DOM
 			$js .= "
 				// Clear any existing message
-				jQuery('#fcfield_sm_mssg_' + element_id).html('');
+				jQuery('#fcfield_message_box_' + element_id).html('');
 
 				// Clear old value (user entered) URL
 				jQuery('#' + element_id + '_url').val('');
@@ -399,7 +399,7 @@ class plgFlexicontent_fieldsSharedmedia extends FCField
 					</td>
 				</tr>
 				<tr>
-					<td colspan="2" style="padding:0"><span class="fcfield_sm_mssg" id="fcfield_sm_mssg_'.$elementid_n.'"></span></td>
+					<td colspan="2" style="padding:0"><span class="fcfield_message_box" id="fcfield_message_box_'.$elementid_n.'"></span></td>
 				</tr>'
 			.($display_api_type_form ? '
 				<tr '.($is_empty ? ' style="display:none;" ' : '').'>

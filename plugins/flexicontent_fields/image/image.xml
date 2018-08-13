@@ -14,6 +14,7 @@
 		<filename plugin="image">image.php</filename>
 		<filename>index.html</filename>
 		<folder>image</folder>
+		<folder>js</folder>
 		<folder>tmpl</folder>
 		<folder>tmpl_common</folder>
 	</files>
