@@ -1514,6 +1514,15 @@ div.empty_image {
 	margin-bottom: 3px;
 	word-wrap: break-word;
 }
+.fcfield-image-mediaurl-box div.fcfield-image-mediaurl-btns {
+	margin: 4px 2px !important;
+	width: 100%;
+}
+.fcfield-image-mediaurl-box div.fcfield-image-mediaurl-btns .img_fetch_btn,
+.fcfield-image-mediaurl-box div.fcfield-image-mediaurl-btns .img_clear_btn {
+	width: 50%;
+	box-sizing: border-box;
+}
 .fcimg_preview_box {
 	display: inline-block;
 	box-sizing: border-box;

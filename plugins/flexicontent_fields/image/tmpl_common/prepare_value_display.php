@@ -196,10 +196,10 @@
 	}
 
 
-	// ***
-	// *** CHECK if we were asked for value only display (e.g. image source)
-	// *** if so we will not be creating the HTML code for Image / Gallery
-	// ***
+	/**
+	 * CHECK if we were asked for value only display (e.g. image source)
+	 * if so we will not be creating the HTML code for Image / Gallery
+	 */
 
 	if (isset(self::$value_only_displays[$prop]))
 	{
@@ -207,41 +207,53 @@
 	}
 
 
-	// ***
-	// *** Create image tags (according to configuration parameters)
-	// *** that will be used for the requested 'display' variable
-	// ***
+	/**
+	 * Create image tags (according to configuration parameters)
+	 * that will be used for the requested 'display' variable
+	 */
+
+	$size = isset(self::$display_to_thumb_size[$prop])
+		? self::$display_to_thumb_size[$prop]
+		: (isset(self::$index_to_thumb_size[$thumb_size]) ? self::$index_to_thumb_size[$thumb_size] : 's');
+
+	$crop = $field->parameters->get('method_'.$size);
+	$w = $field->parameters->get('w_' . $size, self::$default_widths[$size]);
+	$h = $field->parameters->get('h_' . $size, self::$default_heights[$size]);
+	
+	$img_size_attrs = $crop
+		? ' style="width: ' . $w . 'px; height: ' . $h . 'px;" '
+		: ' style="max-width: ' . $w . 'px; max-height: ' . $h . 'px;" ';
 
 	switch ($prop)
 	{
 		case 'display_backend':
-			$img_legend   = '<img src="'.$abs_srcb.'" alt="'.$alt_encoded.'"'.$legend.' class="'.$class.'" itemprop="image" />';
-			$img_nolegend = '<img src="'.$abs_srcb.'" alt="'.$alt_encoded.'" class="'.$class.'" itemprop="image"/>';
+			$img_legend   = '<img src="'.$abs_srcb.'" alt="'.$alt_encoded.'"'.$legend.' class="'.$class.'" itemprop="image" ' . $img_size_attrs . ' />';
+			$img_nolegend = '<img src="'.$abs_srcb.'" alt="'.$alt_encoded.'" class="'.$class.'" itemprop="image" ' . $img_size_attrs . ' />';
 			break;
 
 		case 'display_small':
-			$img_legend   = '<img src="'.$abs_srcs.'" alt="'.$alt_encoded.'"'.$legend.' class="'.$class.'" itemprop="image"/>';
-			$img_nolegend = '<img src="'.$abs_srcs.'" alt="'.$alt_encoded.'" class="'.$class.'" itemprop="image"/>';
+			$img_legend   = '<img src="'.$abs_srcs.'" alt="'.$alt_encoded.'"'.$legend.' class="'.$class.'" itemprop="image" ' . $img_size_attrs . ' />';
+			$img_nolegend = '<img src="'.$abs_srcs.'" alt="'.$alt_encoded.'" class="'.$class.'" itemprop="image" ' . $img_size_attrs . ' />';
 			break;
 
 		case 'display_medium':
-			$img_legend   = '<img src="'.$abs_srcm.'" alt="'.$alt_encoded.'"'.$legend.' class="'.$class.'" itemprop="image"/>';
-			$img_nolegend = '<img src="'.$abs_srcm.'" alt="'.$alt_encoded.'" class="'.$class.'" itemprop="image"/>';
+			$img_legend   = '<img src="'.$abs_srcm.'" alt="'.$alt_encoded.'"'.$legend.' class="'.$class.'" itemprop="image" ' . $img_size_attrs . ' />';
+			$img_nolegend = '<img src="'.$abs_srcm.'" alt="'.$alt_encoded.'" class="'.$class.'" itemprop="image" ' . $img_size_attrs . ' />';
 			break;
 
 		case 'display_large':
-			$img_legend   = '<img src="'.$abs_srcl.'" alt="'.$alt_encoded.'"'.$legend.' class="'.$class.'" itemprop="image"/>';
-			$img_nolegend = '<img src="'.$abs_srcl.'" alt="'.$alt_encoded.'" class="'.$class.'" itemprop="image"/>';
+			$img_legend   = '<img src="'.$abs_srcl.'" alt="'.$alt_encoded.'"'.$legend.' class="'.$class.'" itemprop="image" ' . $img_size_attrs . ' />';
+			$img_nolegend = '<img src="'.$abs_srcl.'" alt="'.$alt_encoded.'" class="'.$class.'" itemprop="image" ' . $img_size_attrs . ' />';
 			break;
 
 		case 'display_original':
-			$img_legend   = '<img src="'.$abs_srco.'" alt="'.$alt_encoded.'"'.$legend.' class="'.$class.'" itemprop="image"/>';
-			$img_nolegend = '<img src="'.$abs_srco.'" alt="'.$alt_encoded.'" class="'.$class.'" itemprop="image"/>';
+			$img_legend   = '<img src="'.$abs_srco.'" alt="'.$alt_encoded.'"'.$legend.' class="'.$class.'" itemprop="image" ' . $img_size_attrs . ' />';
+			$img_nolegend = '<img src="'.$abs_srco.'" alt="'.$alt_encoded.'" class="'.$class.'" itemprop="image" ' . $img_size_attrs . ' />';
 			break;
 
 		case 'display': default:
-			$img_legend   = '<img src="'.$abs_src.'" alt="'.$alt_encoded.'"'.$legend.' class="'.$class.'" itemprop="image"/>';
-			$img_nolegend = '<img src="'.$abs_src.'" alt="'.$alt_encoded.'" class="'.$class.'" itemprop="image"/>';
+			$img_legend   = '<img src="'.$abs_src.'" alt="'.$alt_encoded.'"'.$legend.' class="'.$class.'" itemprop="image" ' . $img_size_attrs . ' />';
+			$img_nolegend = '<img src="'.$abs_src.'" alt="'.$alt_encoded.'" class="'.$class.'" itemprop="image" ' . $img_size_attrs . ' />';
 			break;
 	}
 
