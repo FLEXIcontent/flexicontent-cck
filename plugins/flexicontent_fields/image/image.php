@@ -2694,9 +2694,14 @@ class plgFlexicontent_fieldsImage extends FCField
 		}
 
 
-		// Enforce protection of original image files any Folder-mode
-		$this->protectImagePath($field, $src_path);
-
+		/**
+		 * Enforce protection of original image files for any type of Folder-mode
+		 * But do not try to protect folder of default image
+		 */
+		if (empty($value['default_image']))
+		{
+			$this->protectImagePath($field, $src_path);
+		}
 
 		// Configuration
 		$image_source = (int) $field->parameters->get('image_source', 0);
@@ -2707,7 +2712,7 @@ class plgFlexicontent_fieldsImage extends FCField
 
 		// *** FLAG to indicate if images are shared across fields, has the effect of adding field id to image thumbnails
 		$multiple_image_usages = $image_source == 0 && $all_media && $unique_thumb_method == 0;
-		$multiple_image_usages = $multiple_image_usages || @ $value['default_image'];
+		$multiple_image_usages = $multiple_image_usages || !empty($value['default_image']);
 		$extra_prefix = $multiple_image_usages  ?  'fld' . $field->id . '_'  :  '';
 
 
