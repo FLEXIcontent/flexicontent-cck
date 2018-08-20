@@ -1,22 +1,15 @@
 <?php
 /**
- * @version 1.5 stable $Id: default.php 1904 2014-05-20 12:21:09Z ggppdk $
- * @package Joomla
- * @subpackage FLEXIcontent
- * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
- * @license GNU/GPL v2
- * 
- * FLEXIcontent is a derivative work of the excellent QuickFAQ component
- * @copyright (C) 2008 Christoph Lukes
- * see www.schlu.net for more information
+ * @package         FLEXIcontent
+ * @version         3.3
  *
- * FLEXIcontent is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
+ * @link            http://www.flexicontent.com
+ * @copyright       Copyright © 2018, FLEXIcontent team, All Rights Reserved
+ * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
-defined( '_JEXEC' ) or die( 'Restricted access' );
+defined('_JEXEC') or die('Restricted access');
 
 use Joomla\String\StringHelper;
 
@@ -72,28 +65,28 @@ if ($this->perms['cantags'] || $this->perms['canversion'])
 
 	$this->document->addScriptDeclaration("
 		jQuery(document).ready(function(){
-			
+
 			jQuery('.deletetag').click(function(e){
 				jQuery(this).parent().remove();
 				return false;
 			});
-			
+
 			var tagInput = jQuery('#input-tags');
-			
+
 			tagInput.keydown(function(event)
 			{
 				if (event.keyCode == 13)
 				{
 					var el = jQuery(event.target);
 					if (el.val()=='') return false; // No tag to assign / create
-					
+
 					var selection_isactive = jQuery('.ui-autocomplete .ui-state-focus').length != 0;
 					if (selection_isactive) return false; // Enter pressed, while autocomplete item is focused, autocomplete \'select\' event handler will handle this
-					
+
 					var data_id   = el.data('tagid');
 					var data_name = el.data('tagname');
 					//window.console.log( 'User input: '+el.val() + ' data-tagid: ' + data_id + ' data-tagname: \"'+ data_name + '\"');
-					
+
 					if (el.val() == data_name && data_id != '' && data_id != '0')
 					{
 						//window.console.log( 'Assigning found tag: (' + data_id + ', \"' + data_name + '\")');
@@ -105,7 +98,7 @@ if ($this->perms['cantags'] || $this->perms['canversion'])
 						addtag(0, el.val());
 						el.autocomplete('close');
 					}
-					
+
 					el.val('');  //clear existing value
 					return false;
 				}
@@ -160,7 +153,7 @@ if ($this->perms['cantags'] || $this->perms['canversion'])
 				focus: function ( event, ui )
 				{
 					//window.console.log( (ui.item  ?  'current ID: ' + ui.item.value + ' , current Label: ' + ui.item.label :  'Nothing selected') );
-					
+
 					var el = jQuery(event.target);
 					if (ui.item.value!='' && ui.item.value!='0')
 					{
@@ -168,21 +161,21 @@ if ($this->perms['cantags'] || $this->perms['canversion'])
 					}
 					el.data('tagid',   ui.item.value);
 					el.data('tagname', ui.item.label);
-					
+
 					event.preventDefault();  // Prevent default behaviour of setting 'ui.item.value' into the input
 				},
 
 				select: function( event, ui )
 				{
 					//window.console.log( 'Selected: ' + ui.item.label + ', input was \'' + this.value + '\'');
-					
+
 					var el = jQuery(event.target);
 					if (ui.item.value != '' && ui.item.value != '0')
 					{
 						addToList(ui.item.value, ui.item.label);
 						el.val('');  //clear existing value
 					}
-					
+
 					event.preventDefault();  // Prevent default behaviour of setting 'ui.item.value' into the input and triggering change event
 				},
 
@@ -232,19 +225,19 @@ if ($this->perms['cantags'] || $this->perms['canversion'])
 				alert(\" + Joomla.JText._('FLEXI_ENTER_TAG') + \");
 				return;
 			}
-			
+
 			var tag = new itemscreen();
 			tag.addtag( id, tagname, '".JUri::base(true)."/index.php?option=com_flexicontent&".$tags_task."addtag&format=raw&". JSession::getFormToken() ."=1');
 		}
-		
+
 		function deleteTag(obj)
 		{
 			var parent = obj.parentNode;
 			parent.innerHTML = '';
 			parent.parentNode.removeChild(parent);
 		}
-		
-		
+
+
 		PageClick = function(pageclickednumber) {
 			jQuery.ajax({ url: '".JUri::base(true)."/index.php?option=com_flexicontent&".$task_items."getversionlist&id=".$this->item->id."&active=".$this->item->version."&". JSession::getFormToken() ."=1&format=raw&page='+pageclickednumber, context: jQuery('#version_tbl'), success: function(str){
 				jQuery(this).html(\"\\
@@ -254,7 +247,7 @@ if ($this->perms['cantags'] || $this->perms['canversion'])
 				\");
 				jQuery('#version_tbl').find('.hasTooltip').tooltip({html: true, container: jQuery('#version_tbl')});
 				jQuery('#version_tbl').find('.hasPopover').popover({html: true, container: jQuery('#version_tbl'), trigger : 'hover focus'});
-				
+
 				// Attach click event to version compare links of the newly created page
 				jQuery(this).find('a.modal-versions').each(function(index, value) {
 					jQuery(this).on('click', function() {
@@ -265,14 +258,14 @@ if ($this->perms['cantags'] || $this->perms['canversion'])
 					});
 				});
 			}});
-			
+
 			// Reattach pagination inside the newly created page
 			jQuery('#fc_pager').pager({ pagenumber: pageclickednumber, pagecount: ".$this->pagecount.", buttonClickCallback: PageClick });
 		}
-		
+
 		jQuery(document).ready(function()
 		{
-			// For the initially displayed versions page:  Add onclick event that opens compare in popup 
+			// For the initially displayed versions page:  Add onclick event that opens compare in popup
 			jQuery('a.modal-versions').each(function(index, value) {
 				jQuery(this).on('click', function() {
 					// Load given URL in an popup dialog
@@ -288,7 +281,7 @@ if ($this->perms['cantags'] || $this->perms['canversion'])
 				pagecount: " . $this->pagecount . ",
 				buttonClickCallback: PageClick
 			});
-			
+
 			// Attach textarea autogrow height (while typing)
 			jQuery('#versioncomment').autogrow({
 				minHeight: 32,
@@ -305,18 +298,18 @@ $this->document->addScriptDeclaration
 	jQuery(document).ready(function(){
 		var hits = new itemscreen('hits', {id:".($this->item->id ? $this->item->id : 0).", task:'".$ctrl_items."gethits', sess_token:'" . JSession::getFormToken() . "'});
 		//hits.fetchscreen();
-	
+
 		var votes = new itemscreen('votes', {id:".($this->item->id ? $this->item->id : 0).", task:'".$ctrl_items."getvotes', sess_token:'" . JSession::getFormToken() . "'});
 		//votes.fetchscreen();
 	});
-	
+
 	function reseter(task, id, div)
 	{
 		var res = new itemscreen();
 		task = '".$ctrl_items."' + task;
 		res.reseter(task, id, div, '" . JUri::base(true) . "/index.php?option=com_flexicontent&controller=items&" . JSession::getFormToken() . "=1');
 	}
-	
+
 	function clickRestore(link)
 	{
 		if (confirm('".JText::_( 'FLEXI_CONFIRM_VERSION_RESTORE',true )."'))
@@ -348,16 +341,16 @@ if (isset($this->item->item_translations)) foreach ($this->item->item_translatio
 <div id="flexicontent" class="flexi_edit full_body_box flexicontent" >
 
 <form action="index.php" method="post" name="adminForm" id="adminForm" class="form-validate form-horizontal" enctype="multipart/form-data" >
-	
+
 	<div class="container-fluid row" style="padding: 0px !important; margin: 0px !important;">
 
 	<?php /*<fieldset class="basicfields_set">
 		<legend>
 			<span class="fc_legend_header_text"><?php echo JText::_( 'FLEXI_BASIC' ); ?></span>
 		</legend>*/ ?>
-		
+
 		<div class="span6 col-6 full_width_980">
-			
+
 			<?php
 				$field = isset($this->fields['title']) ? $this->fields['title'] : false;
 
@@ -377,9 +370,9 @@ if (isset($this->item->item_translations)) foreach ($this->item->item_translatio
 			</label>
 			</span>
 			<?php /*echo $this->form->getLabel('title');*/ ?>
-	
+
 			<div class="container_fcfield container_fcfield_id_6 container_fcfield_name_title input-fcmax" id="container_fcfield_6">
-			
+
 			<?php if ( $this->params->get('auto_title', 0) ): ?>
 				<?php echo $this->item->title . ' <div class="fc-nobgimage fc-info fc-mssg-inline hasTooltip" title="' . JText::_('FLEXI_SET_TO_AUTOMATIC_VALUE_ON_SAVE', true) . '"><span class="icon-info"></span> ' . JText::_('FLEXI_AUTO', true) . '</div>' ; ?>
 			<?php	elseif ( isset($this->item->item_translations) ) :?>
@@ -409,14 +402,14 @@ if (isset($this->item->item_translations)) foreach ($this->item->item_translatio
 				</div>
 				<!-- tabber end -->
 				<?php $tabSetCnt = array_pop($tabSetStack); ?>
-	
+
 			<?php else : ?>
 				<?php echo $this->form->getInput('title');?>
 			<?php endif; ?>
-			
+
 			</div>
-			
-			
+
+
 			<div class="fcclear"></div>
 			<?php
 				$field_description = JText::_($this->form->getField('alias')->description);
@@ -456,13 +449,13 @@ if (isset($this->item->item_translations)) foreach ($this->item->item_translatio
 				</div>
 				<!-- tabber end -->
 				<?php $tabSetCnt = array_pop($tabSetStack); ?>
-	
+
 			<?php else : ?>
 				<?php echo $this->form->getInput('alias');?>
 			<?php endif; ?>
 			</div>
 
-			
+
 			<div class="fcclear"></div>
 			<span class="label-fcouter" id="jform_catid-lbl-outer">
 			<label id="jform_catid-lbl" for="jform_catid" data-for="jform_catid" class="<?php echo $tip_class . $lbl_class; ?> pull-left label-fcinner label-toplevel" style="display:inline-block;" title="<?php echo flexicontent_html::getToolTip( 'FLEXI_NOTES', 'FLEXI_SEC_FEAT_CATEGORIES_NOTES', 1, 1);?>">
@@ -477,7 +470,7 @@ if (isset($this->item->item_translations)) foreach ($this->item->item_translatio
 					<?php echo JText::_('FLEXI_NOTES'); ?>
 				</div>
 			</div>
-		
+
 
 			<?php /* tags always available in backend */ ?>
 			<?php
@@ -501,7 +494,7 @@ if (isset($this->item->item_translations)) foreach ($this->item->item_translatio
 				<div class="fcclear"></div>
 				<div id="tags">
 					<input type="text" id="input-tags" name="tagname" class="<?php echo $tip_class; ?>"
-						placeholder="<?php echo JText::_($this->perms['cancreatetags'] ? 'FLEXI_TAG_SEARCH_EXISTING_CREATE_NEW' : 'FLEXI_TAG_SEARCH_EXISTING'); ?>" 
+						placeholder="<?php echo JText::_($this->perms['cancreatetags'] ? 'FLEXI_TAG_SEARCH_EXISTING_CREATE_NEW' : 'FLEXI_TAG_SEARCH_EXISTING'); ?>"
 						title="<?php echo flexicontent_html::getToolTip( 'FLEXI_NOTES', ($this->perms['cancreatetags'] ? 'FLEXI_TAG_CAN_ASSIGN_CREATE' : 'FLEXI_TAG_CAN_ASSIGN_ONLY'), 1, 1);?>"
 					/>
 					<span id='input_new_tag' ></span>
@@ -559,10 +552,10 @@ if (isset($this->item->item_translations)) foreach ($this->item->item_translatio
 			</div>
 
 		</div>
-		
-		
+
+
 		<div class="span6 col-6 full_width_980">
-			
+
 			<?php
 				$field = isset($this->fields['document_type']) ? $this->fields['document_type'] : false;
 
@@ -584,7 +577,7 @@ if (isset($this->item->item_translations)) foreach ($this->item->item_translatio
 			</label>
 			</span>
 			<?php /*echo $this->form->getLabel('type_id');*/ ?>
-		
+
 			<div class="container_fcfield container_fcfield_id_8 container_fcfield_name_type" id="container_fcfield_8">
 				<?php echo $this->lists['type']; ?>
 				<?php //echo $this->form->getInput('type_id'); ?>
@@ -596,8 +589,8 @@ if (isset($this->item->item_translations)) foreach ($this->item->item_translatio
 				</span>
 				<div id="fc-change-warning" class="fc-mssg fc-warning" style="display:none; float:left;"><?php echo JText::_( 'FLEXI_TAKE_CARE_CHANGING_FIELD_TYPE' ); ?></div>
 			</div>
-		
-		
+
+
 			<div class="fcclear"></div>
 			<span class="label-fcouter" id="jform_language-lbl-outer">
 			<label id="jform_language-lbl" for="jform_language" class="<?php echo $lbl_class; ?> pull-left label-fcinner label-toplevel" >
@@ -606,12 +599,12 @@ if (isset($this->item->item_translations)) foreach ($this->item->item_translatio
 			</label>
 			</span>
 			<?php /*echo $this->form->getLabel('language');*/ ?>
-		
+
 			<div class="container_fcfield container_fcfield_name_language">
 				<?php echo $this->lists['languages']; ?>
 			</div>
-		
-		
+
+
 			<?php
 				$field = isset($this->fields['state']) ? $this->fields['state'] : false;
 
@@ -646,10 +639,10 @@ if (isset($this->item->item_translations)) foreach ($this->item->item_translatio
 				echo $this->published;
 				echo '<input type="hidden" name="jform[state]" id="jform_vstate" value="'.$this->item->state.'" />';
 			endif;?>
-		
-		
+
+
 			<?php if ( $this->perms['canpublish'] ) { ?>
-			
+
 				<?php if (!$this->params->get('auto_approve', 1)) : ?>
 					<div class="fcclear"></div>
 					<?php
@@ -667,7 +660,7 @@ if (isset($this->item->item_translations)) foreach ($this->item->item_translatio
 				<?php else : ?>
 					<?php echo '<input type="hidden" name="jform[vstate]" id="jform_vstate" value="2" />'; ?>
 				<?php endif; ?>
-			
+
 			<?php } else if (!$this->params->get('auto_approve', 1)) {
 				// Enable approval if versioning disabled, this make sense,
 				// since if use can edit item THEN item should be updated !!!
@@ -676,8 +669,8 @@ if (isset($this->item->item_translations)) foreach ($this->item->item_translatio
 			} else {
 				echo '<input type="hidden" name="jform[vstate]" id="jform_vstate" value="2" />';
 			} ?>
-			
-			
+
+
 			<?php if ($this->subscribers) : ?>
 				<div class="fcclear"></div>
 				<?php
@@ -694,12 +687,12 @@ if (isset($this->item->item_translations)) foreach ($this->item->item_translatio
 			<?php endif; ?>
 
 		</div>
-		
+
 	<?php /*</fieldset>*/ ?>
 	</div>
 
 
-<?php 
+<?php
 // *****************************************
 // Capture JOOMLA INTRO/FULL IMAGES and URLS
 // *****************************************
@@ -711,7 +704,7 @@ if ( $this->params->get('use_jimages_be', $show_jui) || $this->params->get('use_
 	if ( $this->params->get('use_jimages_be', $show_jui) )  $fields_grps_compatibility[] = 'images';
 	if ( $this->params->get('use_jurls_be', $show_jui) )    $fields_grps_compatibility[] = 'urls';
 	foreach ($fields_grps_compatibility as $name => $fields_grp_name) :
-		
+
 		ob_start(); ?>
 		<table class="fc-form-tbl fcinner fcfullwidth">
 		<?php foreach ($this->form->getGroup($fields_grp_name) as $field) : ?>
@@ -730,7 +723,7 @@ if ( $this->params->get('use_jimages_be', $show_jui) || $this->params->get('use_
 		endforeach; ?>
 		</table>
 		<?php $FC_jfields_html[$fields_grp_name] = ob_get_clean();
-		
+
 	endforeach;
 endif;
 ?>
@@ -773,7 +766,7 @@ $tabCnt[$tabSetCnt] = 0;
 	<!-- Description tab -->
 	<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" data-icon-class="icon-file-2">
 		<h3 class="tabberheading hasTooltip" title="<?php echo $_desc; ?>"> <?php echo $field->label ? $field->label : JText::_( 'FLEXI_DESCRIPTION' ); ?> </h3>
-	
+
 			<?php
 			// Field has tooltip
 			$edithelp = $field->edithelp ? $field->edithelp : 1;
@@ -785,7 +778,7 @@ $tabCnt[$tabSetCnt] = 0;
 			{
 				$label_attrs = 'class="' . $lbl_class . ' pull-left label-fcinner label-toplevel"';
 			}
-			
+
 			// Some fields may force a container width ?
 			$display_label_form = (int) $field->parameters->get('display_label_form', 1);
 			$full_width = $display_label_form === 0 || $display_label_form === 2 || $display_label_form === -1;
@@ -797,7 +790,7 @@ $tabCnt[$tabSetCnt] = 0;
 				: 'width:' . $width . ($width != (int) $width ? 'px !important;' : '');
 			$container_class = 'container_fcfield container_fcfield_id_' . $field->id . ' container_fcfield_name_' . $field->name;
 			?>
-			
+
 			<?php /* description field label will be USED as TAB handle title, with field's description as Tooltip */
 			/*if ($display_label_form > 0): ?>
 				<div class="label-fcouter" id="label_outer_fcfield_<?php echo $field->id; ?>">
@@ -810,10 +803,10 @@ $tabCnt[$tabSetCnt] = 0;
 					<div class="fcclear"></div>
 				<?php endif; ?>
 			<?php endif; */?>
-			
+
 			<div style="<?php echo $container_width; ?>;" class="<?php echo $container_class;?>" id="container_fcfield_<?php echo $field->id;?>">
 				<?php echo ($field->description && $edithelp==3) ? '<div class="alert fc-small fc-iblock">'.$field->description.'</div>' : ''; ?>
-				
+
 			<?php	if (isset($this->item->item_translations) ) :
 				// CASE: CORE 'description' FIELD with multi-tabbed editing of joomfish (J1.5) or falang (J2.5+)
 				array_push($tabSetStack, $tabSetCnt);
@@ -845,14 +838,14 @@ $tabCnt[$tabSetCnt] = 0;
 				</div>
 				<!-- tabber end -->
 				<?php $tabSetCnt = array_pop($tabSetStack); ?>
-				
+
 			<?php elseif ( !is_array($field->html) ) : /* CASE 2: NORMAL FIELD non-tabbed */ ?>
 				<?php echo isset($field->html) ? $field->html : $noplugin; ?>
 			<?php endif; ?>
-			
+
 		</div>
 	</div> <!-- end tab -->
-	
+
 <?php endif; ?>
 
 
@@ -863,7 +856,7 @@ $tabCnt[$tabSetCnt] = 0;
 if ($this->item->type_id) {
 	$_str = JText::_('FLEXI_DETAILS');
 	$_str = StringHelper::strtoupper(StringHelper::substr($_str, 0, 1)) . StringHelper::substr($_str, 1);
-	
+
 	$type_lbl = $this->typesselected->name;
 	$type_lbl = $type_lbl ? JText::_($type_lbl) : JText::_('FLEXI_CONTENT_TYPE');
 	$type_lbl = $type_lbl .' ('. $_str .')';
@@ -872,11 +865,11 @@ if ($this->item->type_id) {
 }
 ?>
 <?php if ($this->fields && $this->item->type_id) : ?>
-	
+
 	<!-- Field manager tab -->
 	<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" data-icon-class="icon-signup">
 		<h3 class="tabberheading"> <?php echo $type_lbl; ?> </h3>
-		
+
 		<?php
 			$this->document->addScriptDeclaration("
 				jQuery(document).ready(function() {
@@ -889,9 +882,9 @@ if ($this->item->type_id) {
 				});
 			");
 		?>
-		
+
 		<div class="fc_tabset_inner">
-			
+
 			<?php
 			$hide_ifempty_fields = array('fcloadmodule', 'fcpagenav', 'toolbar');
 			$row_k = 0;
@@ -901,17 +894,17 @@ if ($this->item->type_id) {
 				if (
 					// SKIP backend hidden fields from this listing
 					($field->iscore && empty($field->html))   ||   $field->parameters->get('backend_hidden')  ||   in_array($field->formhidden, array(2,3))   ||
-					
+
 					// Skip hide-if-empty fields from this listing
 					( empty($field->html) && ($field->formhidden==4 || in_array($field->field_type, $hide_ifempty_fields)) )
 				) continue;
-				
+
 				// Check to SKIP (hide) field e.g. description field ('maintext'), alias field etc
 				if ($this->tparams->get('hide_' . $field->field_type))
 				{
 					continue;
 				}
-				
+
 				$not_in_tabs = "";
 				if ($field->field_type=='groupmarker')
 				{
@@ -966,7 +959,7 @@ if ($this->item->type_id) {
 				{
 					$label_attrs = 'class="' . $lbl_class . ' pull-left label-fcinner label-toplevel"';
 				}
-				
+
 				$row_k = 1 - $row_k;
 
 				// Some fields may force a container width ?
@@ -980,7 +973,7 @@ if ($this->item->type_id) {
 					: 'width:' . $width . ($width != (int) $width ? 'px !important;' : '');
 				$container_class = 'fcfield_row' . $row_k . ' container_fcfield container_fcfield_id_' . $field->id . ' container_fcfield_name_' . $field->name;
 				?>
-				
+
 				<div class="control-group">
 
 					<div class="control-label" id="label_outer_fcfield_<?php echo $field->id; ?>" style="<?php echo $display_label_form < 1 ? 'display:none;' : '' ?>">
@@ -1036,18 +1029,18 @@ if ($this->item->type_id) {
 
 					</div>
 				</div>
-				
+
 			<?php endforeach; ?>
-			
+
 		</div>
 
 	</div> <!-- end tab -->
-	
+
 <?php else : /* NO TYPE SELECTED */ ?>
 
 	<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" >
 		<h3 class="tabberheading"> <?php echo $type_lbl; ?> </h3>
-		
+
 		<div class="fc_tabset_inner">
 			<?php if ($this->item->type_id == 0) : ?>
 				<input name="jform[type_id_not_set]" value="1" type="hidden" />
@@ -1056,9 +1049,9 @@ if ($this->item->type_id) {
 				<div class="fc-mssg-inline fc-info"><?php echo JText::_( 'FLEXI_NO_FIELDS_TO_TYPE' ); ?></div>
 			<?php	endif; ?>
 		</div>
-		
+
 	</div> <!-- end tab -->
-	
+
 <?php	endif; ?>
 
 
@@ -1080,10 +1073,10 @@ if ($this->item->type_id) {
 	<!-- CUSTOM parameters TABs -->
 	<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" data-icon-class="<?php echo $icon_class; ?>">
 		<h3 class="tabberheading"> <?php echo JText::_($label); ?> </h3>
-		
+
 		<div class="fc_tabset_inner">
 			<?php foreach ($this->form->getFieldset($name) as $field) : ?>
-				
+
 				<?php if ($field->hidden): ?>
 					<span style="display:none !important;">
 						<?php echo $field->input; ?>
@@ -1096,29 +1089,29 @@ if ($this->item->type_id) {
 						' : $field->input); ?>
 					</fieldset>
 				<?php endif; ?>
-				
+
 			<?php endforeach; ?>
 		</div>
-		
+
 	</div> <!-- end tab -->
-	
+
 	<?php endforeach; ?>
 
 
 	<!-- Assignment tab -->
 	<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" data-icon-class="icon-tree-2">
 		<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_ASSIGNMENTS' ); ?> </h3>
-		
+
 		<?php $fset_lbl = JText::_('FLEXI_CATEGORIES') .' / '. JText::_('FLEXI_FEATURED');?>
-		
+
 		<div class="fcclear"></div>
 		<fieldset class="basicfields_set" id="fcform_categories_tags_container">
 			<legend>
 				<span class="fc_legend_header_text"><?php echo JText::_( $fset_lbl ); ?></span>
 			</legend>
-			
+
 			<?php if (1) : /* secondary categories always available in backend */ ?>
-				
+
 				<div class="fcclear"></div>
 				<div class="control-group">
 
@@ -1171,14 +1164,14 @@ if ($this->item->type_id) {
 			</div>
 
 		</fieldset>
-		
-		
+
+
 		<div class="fcclear"></div>
 		<fieldset class="basicfields_set" id="fcform_language_container">
 			<legend>
 				<span class="fc_legend_header_text"><?php echo JText::_('FLEXI_LANGUAGE') .' '. JText::_('FLEXI_ASSOCIATIONS'); ?></span>
 			</legend>
-			
+
 			<!-- BOF of language / language associations section -->
 			<?php if ( flexicontent_db::useAssociations() ) : ?>
 
@@ -1192,9 +1185,9 @@ if ($this->item->type_id) {
 
 			<?php endif; ?>
 			<!-- EOF of language / language associations section -->
-			
+
 		</fieldset>
-	
+
 	</div> <!-- end tab -->
 
 
@@ -1202,7 +1195,7 @@ if ($this->item->type_id) {
 	<!-- Publishing tab -->
 	<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" data-icon-class="icon-calendar">
 		<h3 class="tabberheading"> <?php echo JText::_('FLEXI_PUBLISHING'); ?> </h3>
-		
+
 		<div class="fc_tabset_inner">
 			<div class="alert alert-info fc-iblock">
 			<?php
@@ -1250,7 +1243,7 @@ if ($this->item->type_id) {
 			</div>
 
 		</div>
-		
+
 	</div> <!-- end tab -->
 
 
@@ -1258,17 +1251,17 @@ if ($this->item->type_id) {
 	<!-- META/SEO tab -->
 	<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" data-icon-class="icon-bookmark">
 		<h3 class="tabberheading"> <?php echo JText::_('FLEXI_META_SEO'); ?> </h3>
-		
+
 		<?php
 		//echo $this->form->getLabel('metadesc');
 		//echo $this->form->getInput('metadesc');
 		//echo $this->form->getLabel('metakey');
 		//echo $this->form->getInput('metakey');
 		?>
-		
+
 		<span class="fcsep_level1" style=""><?php echo JText::_( 'FLEXI_META' ); ?></span>
 		<div class="fcclear"></div>
-		
+
 		<fieldset class="panelform">
 			<span class="label-fcouter" id="metadesc-lbl-outer">
 				<?php echo str_replace('class="', 'class="' . $lbl_class . ' label-fcinner ', $this->form->getLabel('metadesc')); ?>
@@ -1302,17 +1295,17 @@ if ($this->item->type_id) {
 					</div>
 					<!-- tabber end -->
 					<?php $tabSetCnt = array_pop($tabSetStack); ?>
-					
+
 				<?php else : ?>
 					<?php echo $this->form->getInput('metadesc'); ?>
 				<?php endif; ?>
-				
+
 			</div>
 		</fieldset>
 
 		<fieldset class="panelform">
 			<span class="label-fcouter" id="metakey-lbl-outer"><?php echo str_replace('class="', 'class="' . $lbl_class . ' label-fcinner ', $this->form->getLabel('metakey')); ?></span>
-			
+
 			<div class="container_fcfield">
 				<?php	if ( isset($this->item->item_translations) ) :?>
 					<?php
@@ -1341,14 +1334,14 @@ if ($this->item->type_id) {
 					</div>
 					<!-- tabber end -->
 					<?php $tabSetCnt = array_pop($tabSetStack); ?>
-					
+
 				<?php else : ?>
 					<?php echo $this->form->getInput('metakey'); ?>
 				<?php endif; ?>
-				
+
 				</div>
 		</fieldset>
-		
+
 		<?php foreach($this->form->getGroup('metadata') as $field): ?>
 			<?php if ($field->hidden): ?>
 				<span style="display:none !important;">
@@ -1363,11 +1356,11 @@ if ($this->item->type_id) {
 				</fieldset>
 			<?php endif; ?>
 		<?php endforeach; ?>
-		
-		
+
+
 		<span class="fcsep_level1" style=""><?php echo JText::_( 'FLEXI_SEO' ); ?></span>
 		<div class="fcclear"></div>
-		
+
 		<?php foreach ($this->form->getFieldset('params-seoconf') as $field) : ?>
 			<?php if ($field->hidden): ?>
 				<span style="display:none !important;">
@@ -1382,7 +1375,7 @@ if ($this->item->type_id) {
 				</fieldset>
 			<?php endif; ?>
 		<?php endforeach; ?>
-		
+
 	</div> <!-- end tab -->
 
 
@@ -1410,10 +1403,10 @@ if ($this->item->type_id) {
 	<!-- CUSTOM parameters TABs -->
 	<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" data-icon-class="<?php echo $icon_class; ?>">
 		<h3 class="tabberheading"> <?php echo JText::_($label); ?> </h3>
-		
+
 		<div class="fc_tabset_inner">
 			<?php foreach ($this->form->getFieldset($name) as $field) : ?>
-				
+
 				<?php if ($field->hidden): ?>
 					<span style="display:none !important;">
 						<?php echo $field->input; ?>
@@ -1426,12 +1419,12 @@ if ($this->item->type_id) {
 						' : $field->input); ?>
 					</fieldset>
 				<?php endif; ?>
-				
+
 			<?php endforeach; ?>
 		</div>
-		
+
 	</div> <!-- end tab -->
-	
+
 	<?php endforeach; ?>
 
 
@@ -1439,20 +1432,20 @@ if ($this->item->type_id) {
 	<!-- Display parameters tab -->
 	<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" data-icon-class="icon-eye-open">
 		<h3 class="tabberheading"> <?php echo JText::_('FLEXI_DISPLAYING'); ?> </h3>
-		
+
 		<div class="fc_tabset_inner">
 		<?php
 			$fieldSets = $this->form->getFieldsets('attribs');
 			foreach ($fieldSets as $name => $fieldSet) :
-			
+
 				if (substr($name, 0, 7) != 'params-' || $name == 'params-seoconf') continue;
-				
+
 				$label = !empty($fieldSet->label) ? $fieldSet->label : 'FLEXI_'.$name.'_FIELDSET_LABEL';
 				//echo JHtml::_('sliders.panel', JText::_($label), $name.'-options');
 				//echo "<h2>".$label. "</h2> " . "<h3>".$name. "</h3> ";
 				?>
 				<?php foreach ($this->form->getFieldset($name) as $field) : ?>
-					
+
 					<?php if ($field->hidden): ?>
 						<span style="display:none !important;">
 							<?php echo $field->input; ?>
@@ -1465,17 +1458,17 @@ if ($this->item->type_id) {
 							' : $field->input); ?>
 						</fieldset>
 					<?php endif; ?>
-					
+
 				<?php endforeach; ?>
-				
+
 		<?php endforeach; ?>
 		</div>
-		
+
 	</div> <!-- end tab -->
 
 
 
-<?php 
+<?php
 // *********************
 // JOOMLA IMAGE/URLS TAB
 // *********************
@@ -1498,23 +1491,23 @@ if ( count($FC_jfields_html) ) : ?>
 	<!-- Joomla images/urls tab -->
 	<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" data-icon-class="<?php echo $fseticon; ?>">
 		<h3 class="tabberheading"> <?php echo JText::_($fsetname); ?> </h3>
-		
+
 		<?php foreach ($FC_jfields_html as $fields_grp_name => $_html) : ?>
 		<fieldset class="flexi_params fc_tabset_inner">
 			<div class="alert alert-info" style="width: 50%;"><?php echo JText::_('FLEXI_'.strtoupper($fields_grp_name).'_COMP'); ?></div>
 			<?php echo $_html; ?>
 		</fieldset>
 		<?php endforeach; ?>
-		
+
 	</div>
 <?php endif; ?>
 
 
-	
+
 	<!-- Template tab -->
 	<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" data-icon-class="icon-palette">
 		<h3 class="tabberheading"> <?php echo JText::_('FLEXI_LAYOUT'); ?> </h3>
-		
+
 		<div class="fc_tabset_inner">
 
 			<span class="btn-group input-append" style="margin: 2px 0px 6px;">
@@ -1529,7 +1522,7 @@ if ( count($FC_jfields_html) ) : ?>
 				<b>NOTE:</b> Common method for -displaying- fields is by <b>editing the template layout</b> in template manager and placing the fields into <b>template positions</b>
 			</div>
 			<div class="fcclear"></div>
-			
+
 			<?php
 			foreach ($this->form->getFieldset('themes') as $field):
 
@@ -1560,18 +1553,19 @@ if ( count($FC_jfields_html) ) : ?>
 				<?php echo JText::_( 'FLEXI_RECOMMEND_CONTENT_TYPE_LAYOUT' ); ?>
 			</div>
 			<div class="fcclear"></div>
-			
-			<div class="fc-sliders-plain-outer fc_preloaded">
+
+			<?php $item_layout = $this->item->itemparams->get('ilayout'); ?>
+
+			<div class="fc-sliders-plain-outer <?php echo $item_layout ? 'fc_preloaded' : ''; ?>">
 				<?php
 				$slider_set_id = 'theme-sliders-' . $this->form->getValue('id');
 				//echo JHtml::_('sliders.start', $slider_set_id, array('useCookie'=>1));
 				echo JHtml::_('bootstrap.startAccordion', $slider_set_id, array(/*'active' => ''*/));
 
 				$groupname = 'attribs';  // Field Group name this is for name of <fields name="..." >
-				$item_layout = $this->item->itemparams->get('ilayout');
-				
+
 				foreach ($this->tmpls as $tmpl) :
-					
+
 					$form_layout = $tmpl->params;
 					$slider_title = '
 						<span class="btn"><i class="icon-edit"></i>
@@ -1587,11 +1581,11 @@ if ( count($FC_jfields_html) ) : ?>
 						echo JHtml::_('bootstrap.endSlide');
 						continue;
 					}
-					
+
 					$fieldSets = $form_layout->getFieldsets($groupname);
 					foreach ($fieldSets as $fsname => $fieldSet) : ?>
 						<fieldset class="panelform">
-						
+
 						<?php
 						if (isset($fieldSet->label) && trim($fieldSet->label)) :
 							echo '<div style="margin:0 0 12px 0; font-size: 16px; background-color: #333; float:none;" class="fcsep_level0">'.JText::_($fieldSet->label).'</div>';
@@ -1599,7 +1593,7 @@ if ( count($FC_jfields_html) ) : ?>
 						if (isset($fieldSet->description) && trim($fieldSet->description)) :
 							echo '<div class="fc-mssg fc-info">'.JText::_($fieldSet->description).'</div>';
 						endif;
-						
+
 						foreach ($form_layout->getFieldset($fsname) as $field) :
 
 							if ($field->getAttribute('not_inherited')) continue;
@@ -1647,14 +1641,14 @@ if ( count($FC_jfields_html) ) : ?>
 							';
 
 						endforeach; ?>
-						
+
 						</fieldset>
-						
+
 					<?php endforeach; //fieldSets ?>
 					<?php echo JHtml::_('bootstrap.endSlide'); ?>
 
 				<?php endforeach; //tmpls ?>
-				
+
 				<?php echo JHtml::_('bootstrap.endAccordion'); //echo JHtml::_('sliders.end'); ?>
 
 			</div><!-- END class="fc-sliders-plain-outer" -->
@@ -1667,7 +1661,7 @@ if ( count($FC_jfields_html) ) : ?>
 	<!-- Versioning tab -->
 	<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" data-icon-class="icon-stack" >
 		<h3 class="tabberheading">  <?php echo JText::_('FLEXI_VERSIONS'); ?> </h3>
-		
+
 		<div class="fc_tabset_inner">
 
 		<?php
@@ -1833,11 +1827,11 @@ if ( count($FC_jfields_html) ) : ?>
 			</tr>
 		<?php endif; ?>
 		</table>
-	
-	
-	<?php if ($this->params->get('use_versioning', 1)) : ?>		
+
+
+	<?php if ($this->params->get('use_versioning', 1)) : ?>
 		<?php if ( $this->perms['canversion'] ) : ?>
-		
+
 		<table class="" style="margin: 10px; width: auto; float: left;">
 			<tr>
 				<td>
@@ -1891,26 +1885,26 @@ if ( count($FC_jfields_html) ) : ?>
 				<div id="fc_pager"></div>
 			</td></tr>
 		</table>
-		
+
 		<?php endif; ?>
 	<?php endif; ?>
-	
+
 	</div>
 	</div> <!-- end tab -->
-	
-	
+
+
 	<?php if ( $this->perms['canright'] ) : ?>
 	<!-- Permissions tab -->
 	<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" data-icon-class="icon-power-cord">
 		<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_PERMISSIONS' ); ?> </h3>
-		
+
 		<div class="fc_tabset_inner">
 			<div id="access"><?php echo $this->form->getInput('rules'); ?></div>
 		</div>
-		
+
 	</div> <!-- end tab -->
 	<?php endif; ?>
-	
+
 </div> <!-- end of tab set -->
 
 <?php $tabSetCnt = array_pop($tabSetStack); ?>

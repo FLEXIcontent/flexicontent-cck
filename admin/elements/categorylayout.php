@@ -190,6 +190,8 @@ function clayout_loadPanel(element)
 
 	if (panel.closest('.fc_preloaded').length)
 	{
+		//window.console.log('Found preloaded panel, using it: ' + panel_id);
+
 		panel.closest('.fc_preloaded').removeClass('fc_preloaded');
 	 	setTimeout(function(){
 			if (panel_header_link.hasClass('collapsed') || panel_header.hasClass('pane-toggler'))
@@ -205,6 +207,8 @@ function clayout_loadPanel(element)
 	var _loading_img = '<img src=\"components/com_flexicontent/assets/images/ajax-loader.gif\" style=\"vertical-align: middle;\">';
 	panel_header_link.html('<span><span class=\"btn\"><i class=\"icon-edit\"><\/i>'+(panel.hasClass('fc_layout_loaded') ? '".JText::_( 'FLEXI_REFRESHING' )."' : '".JText::_( 'FLEXI_LOADING' )."')+' ... '+_loading_img+'<\/span><\/span>');
 	panel.parent().removeClass('pane-disabled').show();
+
+	//window.console.log('Server call to load panel : ' + element);
 
 	// Re-enabled an already loaded panel, (avoid re-downloading which will cause modified parameters to be lost)
 	if (panel.hasClass('fc_layout_loaded'))

@@ -153,7 +153,7 @@ class FlexicontentControllerTemplates extends FlexicontentController
 		{
 			case 'item':
 				// Get/Create item model ... note there should not be any relevant HTTP Request variables set ...
-				require_once (JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'models'.DS.'item.php');
+				require_once (JPATH_BASE.DS.'components'.DS.'com_flexicontent'.DS.'models'.DS.'item.php');
 				$item_model = new FlexicontentModelItem();
 				$item = $item_model->getItem($ext_id, $check_view_access=false, $no_cache=true);
 				$ext_params = $item->parameters;
