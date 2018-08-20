@@ -1,19 +1,12 @@
 <?php
 /**
- * @version 1.5 stable $Id: default.php 1079 2012-01-02 00:18:34Z ggppdk $
- * @package Joomla
- * @subpackage FLEXIcontent
- * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
- * @license GNU/GPL v2
+ * @package         FLEXIcontent
+ * @version         3.3
  *
- * FLEXIcontent is a derivative work of the excellent QuickFAQ component
- * @copyright (C) 2008 Christoph Lukes
- * see www.schlu.net for more information
- *
- * FLEXIcontent is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
+ * @link            http://www.flexicontent.com
+ * @copyright       Copyright © 2018, FLEXIcontent team, All Rights Reserved
+ * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
 defined('_JEXEC') or die('Restricted access');
@@ -335,14 +328,15 @@ $this->document->addScriptDeclaration($js);
 							</div>
 							<div class="fcclear"></div>
 
-							<div class="fc-sliders-plain-outer fc_preloaded">
+							<?php $cat_layout = $this->row->params->get('clayout'); ?>
+
+							<div class="fc-sliders-plain-outer <?php echo $cat_layout ? 'fc_preloaded' : ''; ?>">
 								<?php
 								$slider_set_id = 'theme-sliders-' . $this->form->getValue('id');
 								//echo JHtml::_('sliders.start', $slider_set_id, array('useCookie'=>1, 'show'=>1));
 								echo JHtml::_('bootstrap.startAccordion', $slider_set_id, array(/*'active' => ''*/));
 
 								$groupname = 'attribs';  // Field Group name this is for name of <fields name="..." >
-								$cat_layout = @ $this->row->params['clayout'];
 
 								foreach ($this->tmpls as $tmpl) :
 
@@ -446,7 +440,7 @@ $this->document->addScriptDeclaration($js);
 								if ($_name=='clayout' || $_name=='clayout_mobile') continue;
 
 								$_value = isset($_p[$_name])  ?  $_p[$_name]  :  null;
-								
+
 								/**
 								 * We need to set value manually here because the values are save in the 'attribs' group, but the parameters are really located in the 'templates' group ...
 								 * ...setValue(), is ok if input property, has not been already created, otherwise we need to re-initialize (which clears input)

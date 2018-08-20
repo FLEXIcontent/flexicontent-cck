@@ -1,22 +1,17 @@
 <?php
 /**
- * @version 1.5 stable $Id$
- * @package Joomla
- * @subpackage FLEXIcontent
- * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
- * @license GNU/GPL v2
- * 
- * FLEXIcontent is a derivative work of the excellent QuickFAQ component
- * @copyright (C) 2008 Christoph Lukes
- * see www.schlu.net for more information
+ * @package         FLEXIcontent
+ * @version         3.3
  *
- * FLEXIcontent is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
+ * @link            http://www.flexicontent.com
+ * @copyright       Copyright © 2018, FLEXIcontent team, All Rights Reserved
+ * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
+
+use Joomla\String\StringHelper;
 
 $app   = JFactory::getApplication();
 $user  = JFactory::getUser();
@@ -1227,31 +1222,45 @@ if ( $typeid && $this->params->get('selecttheme_fe') ) : ?>
 					';
 				}
 			endforeach; ?>
-			
+
 			<div class="fcclear"></div>
 			<div class="fc-success fc-mssg" style="font-size: 12px; margin: 8px 0 !important;" id="__content_type_default_layout__">
 				<?php echo JText::_( 'FLEXI_USING_LAYOUT_DEFAULTS' ); ?>
 			</div>
 		
 		<?php $captured['layout_selection'] = ob_get_clean(); endif;
-		
-		
-		
+
+
+
 		if ( $this->params->get('selecttheme_fe') >= 2 ) : ob_start(); ?>
 
-			<div class="fc-sliders-plain-outer">
+			<?php $item_layout = $this->row->itemparams->get('ilayout'); ?>
+
+			<div class="fc-sliders-plain-outer <?php echo $item_layout ? 'fc_preloaded' : ''; ?>">
 				<?php
-				echo JHtml::_('sliders.start','theme-sliders-'.$this->form->getValue("id"), array('useCookie'=>1));
+				$slider_set_id = 'theme-sliders-' . $this->form->getValue('id');
+				//echo JHtml::_('sliders.start', $slider_set_id, array('useCookie'=>1));
+				echo JHtml::_('bootstrap.startAccordion', $slider_set_id, array(/*'active' => ''*/));
+
 				$groupname = 'attribs';  // Field Group name this is for name of <fields name="..." >
-				$item_layout = $this->row->itemparams->get('ilayout');
 				
 				foreach ($this->tmpls as $tmpl) :
 					
 					$form_layout = $tmpl->params;
-					$label = '<span class="btn"><i class="icon-edit"></i>'.JText::_( 'FLEXI_PARAMETERS_THEMES_SPECIFIC' ) . ' : ' . $tmpl->name.'</span>';
-					echo JHtml::_('sliders.panel', $label, $tmpl->name.'-'.$groupname.'-options');
-					
-					if (!$item_layout || $tmpl->name != $item_layout) continue;
+					$slider_title = '
+						<span class="btn"><i class="icon-edit"></i>
+							' . JText::_('FLEXI_PARAMETERS_THEMES_SPECIFIC') . ' : ' . $tmpl->name . '
+						</span>';
+					$slider_id = $tmpl->name . '-' . $groupname . '-options';
+
+					//echo JHtml::_('sliders.panel', $slider_title, $slider_id);
+					echo JHtml::_('bootstrap.addSlide', $slider_set_id, $slider_title, $slider_id);
+
+					if (!$item_layout || $tmpl->name !== $item_layout)
+					{
+						echo JHtml::_('bootstrap.endSlide');
+						continue;
+					}
 					
 					$fieldSets = $form_layout->getFieldsets($groupname);
 					foreach ($fieldSets as $fsname => $fieldSet) : ?>
@@ -1270,10 +1279,9 @@ if ( $typeid && $this->params->get('selecttheme_fe') ) : ?>
 							if ($field->getAttribute('not_inherited')) continue;
 							//if ($field->getAttribute('cssprep')) continue;
 
-							$cssprep = $field->getAttribute('cssprep');
-							$_labelclass = $cssprep == 'less' ? 'fc_less_parameter' : '';
-
-							$fieldname = $field->fieldname;
+							$fieldname  = $field->fieldname;
+							$cssprep    = $field->getAttribute('cssprep');
+							$labelclass = $cssprep == 'less' ? 'fc_less_parameter' : '';
 
 							// For J3.7.0+ , we have extra form methods Form::getFieldXml()
 							if ($cssprep && FLEXI_J37GE)
@@ -1288,7 +1296,7 @@ if ( $typeid && $this->params->get('selecttheme_fe') ) : ?>
 							 : '
 								<div class="control-group" id="'.$field->id.'-container">
 									<div class="control-label">'.
-										str_replace('class="', 'class="'.$_labelclass.' ',
+										str_replace('class="', 'class="'.$labelclass.' ',
 											str_replace(' for="', ' data-for="',
 												str_replace('jform_attribs_', 'jform_layouts_'.$tmpl->name.'_',
 													$form_layout->getLabel($fieldname, $groupname)
@@ -1302,7 +1310,7 @@ if ( $typeid && $this->params->get('selecttheme_fe') ) : ?>
 											:
 											str_replace('jform_attribs_', 'jform_layouts_'.$tmpl->name.'_',
 												str_replace('[attribs]', '[layouts]['.$tmpl->name.']',
-													$this->getInheritedFieldDisplay($field, $this->row->parameters)
+													flexicontent_html::getInheritedFieldDisplay($field, $this->row->parameters)
 													//$form_layout->getInput($fieldname, $groupname/*, $value*/)   // Value already set, no need to pass it
 												)
 											)
@@ -1313,14 +1321,16 @@ if ( $typeid && $this->params->get('selecttheme_fe') ) : ?>
 							';
 
 						endforeach; ?>
-
 						
 						</fieldset>
 						
 					<?php endforeach; //fieldSets ?>
+					<?php echo JHtml::_('bootstrap.endSlide'); ?>
+
 				<?php endforeach; //tmpls ?>
 				
-				<?php echo JHtml::_('sliders.end'); ?>
+				<?php echo JHtml::_('bootstrap.endAccordion'); //echo JHtml::_('sliders.end'); ?>
+
 			</div>
 		<?php
 		$captured['layout_params'] = ob_get_clean(); endif; ?>
