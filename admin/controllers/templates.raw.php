@@ -381,13 +381,10 @@ class FlexicontentControllerTemplates extends FlexicontentController
 
 						$_label = str_replace('jform_attribs_', 'jform_layouts_' . $ext_name . '_', $field->label);
 						$_input = str_replace('jform_attribs_', 'jform_layouts_' . $ext_name . '_',
-							str_replace('[attribs]', '[layouts][' . $ext_name . ']', $field->input)
+							str_replace('[attribs]', '[layouts][' . $ext_name . ']',
+								($inh_params ? flexicontent_html::getInheritedFieldDisplay($field, $inh_params) : $field->input)
+							)
 						);
-
-						if ($inh_params)
-						{
-							$_input = flexicontent_html::getInheritedFieldDisplay($field, $inh_params);
-						}
 					}
 					elseif ($ext_view === 'field')
 					{
