@@ -72,36 +72,98 @@ class FlexicontentControllerFlexicontent extends FlexicontentController
 
 		$db = JFactory::getDbo();
 
+		$query = 'SELECT id'
+			. ' FROM #__flexicontent_fields'
+			. ' WHERE id < 15'
+			;
+		$existing = $db->setQuery($query)->loadColumn();
+		$existing = array_flip($existing);
+
 		$query 	= '
 		INSERT INTO `#__flexicontent_fields`
 			(`id`,`field_type`,`name`,`label`,`description`,`isfilter`,`iscore`,`issearch`,`isadvsearch`,`untranslatable`,`formhidden`,`valueseditable`,`edithelp`,`positions`,`published`,`attribs`,`checked_out`,`checked_out_time`,`access`,`ordering`)
-		VALUES
-			(1,"maintext","text","Description","Main description text (introtext/fulltext)",0,1,1,0,0,0,0,1,"description.items.default",1,\'{"display_label":"0","trigger_onprepare_content":"1"}\',0,"0000-00-00 00:00:00",1,2),
-			(2,"created","created","Created","Date this item was created",0,1,1,0,0,0,0,1,"top.items.default\nabove-description-line1-nolabel.category.blog",1,\'{"display_label":"1","date_format":"DATE_FORMAT_LC1","custom_date":"","pretext":"","posttext":""}\',0,"0000-00-00 00:00:00",1,3),
-			(3,"createdby","created_by","Created by","User (owner) who created this item",0,1,1,0,0,0,0,1,"top.items.default\nabove-description-line1-nolabel.category.blog",1,\'{"display_label":"1","pretext":"","posttext":""}\',0,"0000-00-00 00:00:00",1,4),
-			(4,"modified","modified","Last modified","Date this item was last modified",0,1,1,0,0,0,0,1,"top.items.default",1,\'{"display_label":"1","date_format":"DATE_FORMAT_LC1","custom_date":"","pretext":"","posttext":""}\',0,"0000-00-00 00:00:00",1,5),
-			(5,"modifiedby","modified_by","Revised by","User who last modified this item",0,1,1,0,0,0,0,1,"top.items.default",1,\'{"display_label":"1","pretext":"","posttext":""}\',0,"0000-00-00 00:00:00",1,6),
-			(6,"title","title","Title","Item title",0,1,1,0,0,0,0,1,"",1,\'{"display_label":"1"}\',0,"0000-00-00 00:00:00",1,1),
-			(7,"hits","hits","Hits","Number of hits",0,1,1,0,0,0,0,1,"",1,\'{"display_label":"1","pretext":"","posttext":"views"}\',0,"0000-00-00 00:00:00",1,7),
-			(8,"type","document_type","Document type","Document type",0,1,1,0,0,0,0,1,"",1,\'{"display_label":"1","pretext":"","posttext":""}\',0,"0000-00-00 00:00:00",1,8),
-			(9,"version","version","Version","Latest version number",0,1,1,0,0,0,0,1,"",1,\'{"display_label":"1","pretext":"","posttext":""}\',0,"0000-00-00 00:00:00",1,9),
-			(10,"state","state","State","Publication status",0,1,1,0,0,0,0,1,"",1,\'{"display_label":"1"}\',0,"0000-00-00 00:00:00",1,10),
-			(11,"voting","voting","Voting","Voting buttons",0,1,1,0,0,0,0,1,"top.items.default\nabove-description-line2-nolabel.category.blog",1,\'{"display_label":"1","dimension":"16","image":"components/com_flexicontent/assets/images/star-small.png"}\',0,"0000-00-00 00:00:00",1,11),
-			(12,"favourites","favourites","Favourites","Add to favourites button",0,1,1,0,0,0,0,1,"top.items.default\nabove-description-line2-nolabel.category.blog",1,\'{"display_label":"1"}\',0,"0000-00-00 00:00:00",1,12),
-			(13,"categories","categories","Categories","Categories this item is assigned to",0,1,1,0,0,0,0,1,"top.items.default\nunder-description-line1.category.blog",1,\'{"display_label":"1","separatorf":"2"}\',0,"0000-00-00 00:00:00",1,13),
-			(14,"tags","tags","Tags","Tags assigned to this item",0,1,1,0,0,0,0,1,"top.items.default\nunder-description-line2.category.blog",1,\'{"display_label":"1","separatorf":"2"}\',0,"0000-00-00 00:00:00",1,14)
-		';
-		$db->setQuery($query);
+		VALUES';
+
+		$vals = array();
+
+		!isset($existing[1])
+			? $vals[1] = '(1,"maintext","text","Description","Main description text (introtext/fulltext)",0,1,1,0,0,0,0,1,"description.items.default",1,\'{"display_label":"0","trigger_onprepare_content":"1"}\',0,"0000-00-00 00:00:00",1,2)'
+			: null;
+		!isset($existing[2])
+			? $vals[2] = '(2,"created","created","Created","Date this item was created",0,1,1,0,0,0,0,1,"top.items.default\nabove-description-line1-nolabel.category.blog",1,\'{"display_label":"1","date_format":"DATE_FORMAT_LC1","custom_date":"","pretext":"","posttext":""}\',0,"0000-00-00 00:00:00",1,3)'
+			: null;
+		!isset($existing[3])
+			? $vals[3] = '(3,"createdby","created_by","Created by","User (owner) who created this item",0,1,1,0,0,0,0,1,"top.items.default\nabove-description-line1-nolabel.category.blog",1,\'{"display_label":"1","pretext":"","posttext":""}\',0,"0000-00-00 00:00:00",1,4)'
+			: null;
+		!isset($existing[4])
+			? $vals[4] = '(4,"modified","modified","Last modified","Date this item was last modified",0,1,1,0,0,0,0,1,"top.items.default",1,\'{"display_label":"1","date_format":"DATE_FORMAT_LC1","custom_date":"","pretext":"","posttext":""}\',0,"0000-00-00 00:00:00",1,5)'
+			: null;
+		!isset($existing[5])
+			? $vals[5] = '(5,"modifiedby","modified_by","Revised by","User who last modified this item",0,1,1,0,0,0,0,1,"top.items.default",1,\'{"display_label":"1","pretext":"","posttext":""}\',0,"0000-00-00 00:00:00",1,6)'
+			: null;
+		!isset($existing[6])
+			? $vals[6] = '(6,"title","title","Title","Item title",0,1,1,0,0,0,0,1,"",1,\'{"display_label":"1"}\',0,"0000-00-00 00:00:00",1,1)'
+			: null;
+		!isset($existing[7])
+			? $vals[7] = '(7,"hits","hits","Hits","Number of hits",0,1,1,0,0,0,0,1,"",1,\'{"display_label":"1","pretext":"","posttext":"views"}\',0,"0000-00-00 00:00:00",1,7)'
+			: null;
+		!isset($existing[8])
+			? $vals[8] = '(8,"type","document_type","Document type","Document type",0,1,1,0,0,0,0,1,"",1,\'{"display_label":"1","pretext":"","posttext":""}\',0,"0000-00-00 00:00:00",1,8)'
+			: null;
+		!isset($existing[9])
+			? $vals[9] = '(9,"version","version","Version","Latest version number",0,1,1,0,0,0,0,1,"",1,\'{"display_label":"1","pretext":"","posttext":""}\',0,"0000-00-00 00:00:00",1,9)'
+			: null;
+		!isset($existing[10])
+			? $vals[10] = '(10,"state","state","State","Publication status",0,1,1,0,0,0,0,1,"",1,\'{"display_label":"1"}\',0,"0000-00-00 00:00:00",1,10)'
+			: null;
+		!isset($existing[11])
+			? $vals[11] = '(11,"voting","voting","Voting","Voting buttons",0,1,1,0,0,0,0,1,"top.items.default\nabove-description-line2-nolabel.category.blog",1,\'{"display_label":"1","dimension":"16","image":"components/com_flexicontent/assets/images/star-small.png"}\',0,"0000-00-00 00:00:00",1,11)'
+			: null;
+		!isset($existing[12])
+			? $vals[12] = '(12,"favourites","favourites","Favourites","Add to favourites button",0,1,1,0,0,0,0,1,"top.items.default\nabove-description-line2-nolabel.category.blog",1,\'{"display_label":"1"}\',0,"0000-00-00 00:00:00",1,12)'
+			: null;
+		!isset($existing[13])
+			? $vals[13] = '(13,"categories","categories","Categories","Categories this item is assigned to",0,1,1,0,0,0,0,1,"top.items.default\nunder-description-line1.category.blog",1,\'{"display_label":"1","separatorf":"2"}\',0,"0000-00-00 00:00:00",1,13)'
+			: null;
+		!isset($existing[14])
+			? $vals[14] = '(14,"tags","tags","Tags","Tags assigned to this item",0,1,1,0,0,0,0,1,"top.items.default\nunder-description-line2.category.blog",1,\'{"display_label":"1","separatorf":"2"}\',0,"0000-00-00 00:00:00",1,14)'
+			: null;
+
+		$query .= implode(', ', $vals);
 
 		try
 		{
-			$db->execute();
+			$db->setQuery($query)->execute();
 		}
 		catch (Exception $e)
 		{
-			echo '<span class="install-notok"></span>';
-			echo $e->getMessage();
-			jexit();
+			jexit('<span class="install-notok"></span>' . $e->getMessage());
+		}
+
+		$type_ids = $db->setQuery('SELECT id FROM `#__flexicontent_types`')->loadColumn();
+
+		if ($type_ids)
+		{
+			$query = 'REPLACE INTO `#__flexicontent_fields_type_relations` (`field_id`,`type_id`,`ordering`) VALUES';
+			$rels = array();
+
+			foreach ($type_ids as $type_id)
+			{
+				foreach ($vals as $field_id => $i)
+				{
+					$rels[] = '(' . (int) $field_id . ',' . (int) $type_id . ', 0)';
+				}
+			}
+			$query .= implode(', ', $rels);
+
+			try
+			{
+				$db->setQuery($query)->execute();
+			}
+			catch (Exception $e)
+			{
+				jexit('<span class="install-notok"></span>' . $e->getMessage());
+			}
 		}
 
 		echo '<span class="install-ok"></span>';

@@ -324,14 +324,15 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 	 * @access public
 	 * @return	boolean	True on success
 	 */
-	function getExistFields()
+	function getExistCoreFields()
 	{
 		static $return;
 		if ($return !== NULL) return $return;
 		$return = false;
 		
-		$query = 'SELECT COUNT( id )'
+		$query = 'SELECT COUNT(id)'
 			. ' FROM #__flexicontent_fields'
+			. ' WHERE iscore = 1'
 			;
 		$this->_db->setQuery( $query );
 		$count = $this->_db->loadResult();
@@ -352,7 +353,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		if ($return !== NULL) return $return;
 		$return = false;
 		
-		$query = 'SELECT COUNT( extension_id )'
+		$query = 'SELECT COUNT(extension_id)'
 			. ' FROM #__extensions'
 			. ' WHERE `type`= '.$this->_db->Quote('plugin').' AND folder = ' . $this->_db->Quote('flexicontent_fields')
 			;

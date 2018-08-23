@@ -96,7 +96,7 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 			
 			$existtype 			= $model->getExistType();
 			$existmenuitems	= $model->getExistMenuItems();
-			$existfields 		= $model->getExistFields();
+			$existfields 		= $model->getExistCoreFields();
 			
 			$existfplg 			= $model->getExistFieldsPlugins();
 			$existseplg 		= $model->getExistSearchPlugin();
