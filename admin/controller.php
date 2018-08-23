@@ -168,9 +168,9 @@ class FlexicontentController extends JControllerLegacy
 		//printf('<br/>-- [getExistMenuItems: %.2f s] ', $fc_run_times['getExistMenuItems']/1000000);
 	
 		if ( $print_logging_info ) $start_microtime = microtime(true);
-		$existfields 		= $model->getExistFields();
-		if ( $print_logging_info ) @$fc_run_times['getExistFields'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
-		//printf('<br/>-- [getExistFields: %.2f s] ', $fc_run_times['getExistFields']/1000000);
+		$existfields 		= $model->getExistCoreFields();
+		if ( $print_logging_info ) @$fc_run_times['getExistCoreFields'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+		//printf('<br/>-- [getExistCoreFields: %.2f s] ', $fc_run_times['getExistCoreFields']/1000000);
 	
 		if ( $print_logging_info ) $start_microtime = microtime(true);
 		$existfplg 			= $model->getExistFieldsPlugins();
