@@ -1,4 +1,6 @@
 files:
-  - source: '*.ini'
-    translation: >-
-      /%original_path%/%two_letters_code%/%two_letters_code%_%original_file_name%.%file_extension%
+  - source: /**/en-GB/*.ini
+    translation: /**/%locale%/%locale%.%file_name%.ini
+    translation_replace: {
+    "en-GB." : ""
+}
