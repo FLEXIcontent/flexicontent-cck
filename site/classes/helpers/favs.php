@@ -41,15 +41,18 @@ class flexicontent_favs extends flexicontent_state
 	public function toggleIsFavoured($type, $id)
 	{
 		$this->loadState();
+		$records = !empty($this->records->$type) ? $this->records->$type : array();
 
-		if (isset($this->records->$type[$id]))
+		if (isset($records[$id]))
 		{
-			unset($this->records->$type[$id]);
+			unset($records[$id]);
+			$this->records->$type = $records;
 			return -1;
 		}
 		else
 		{
-			$this->records->$type[$id] = 1;
+			$records[$id] = 1;
+			$this->records->$type = $records;
 			return 1;
 		}
 	}
