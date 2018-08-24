@@ -1,0 +1,4 @@
+files:
+  - source: '*.ini'
+    translation: >-
+      /%original_path%/%two_letters_code%/%two_letters_code%_%original_file_name%
