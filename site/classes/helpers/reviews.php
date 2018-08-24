@@ -2,7 +2,7 @@
 defined( '_JEXEC' ) or die( 'Restricted access' );
 require_once('state.php');
 
-class flexicontent_favs extends flexicontent_state
+class flexicontent_revs extends flexicontent_state
 {
 	static $instance = null;   // Needed to for late static binding, definition in parent is not enough, do not remove
 	var $records = null;
@@ -41,15 +41,18 @@ class flexicontent_favs extends flexicontent_state
 	public function toggleIsFavoured($type, $id)
 	{
 		$this->loadState();
+		$records = !empty($this->records->$type) ? $this->records->$type : array();
 
-		if (isset($this->records->$type[$id]))
+		if (isset($records[$id]))
 		{
-			unset($this->records->$type[$id]);
+			unset($records[$id]);
+			$this->records->$type = $records;
 			return -1;
 		}
 		else
 		{
-			$this->records->$type[$id] = 1;
+			$records[$id] = 1;
+			$this->records->$type = $records;
 			return 1;
 		}
 	}
