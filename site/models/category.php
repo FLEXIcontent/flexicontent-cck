@@ -19,8 +19,10 @@
 // no direct access
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-jimport('legacy.model.legacy');
 use Joomla\String\StringHelper;
+use Joomla\Utilities\ArrayHelper;
+
+jimport('legacy.model.legacy');
 
 /**
  * FLEXIcontent Component Model
@@ -220,18 +222,16 @@ class FlexicontentModelCategory extends JModelLegacy {
 				break;
 
 			case 'mcats':
-				$_cids = $jinput->get('cids', '');
-				if ( !is_array($_cids) )
+				$_cids = $jinput->get('cids', array(), 'array');
+
+				if (!is_array($_cids))
 				{
-					$_cids = preg_replace( '/[^0-9,]/i', '', (string) $_cids );
+					$_cids = preg_replace('/[^0-9,]/i', '', (string) $_cids);
 					$_cids = explode(',', $_cids);
 				}
 
-				$this->_ids = array();
-				foreach ($_cids as $i => $_id)
-				{
-					if ((int)$_id) $this->_ids[] = (int)$_id;
-				}
+				ArrayHelper::toInteger($_cids);
+				$this->_ids = $_cids;
 
 				// Clear category id, it is not used by this layout
 				$this->_id = 0;
@@ -1187,7 +1187,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 
 		// Text search relevance [title] or [title, search index]
 		$filter_word_relevance_order = (int) $this->_params->get('filter_word_relevance_order', 1);
-		
+
 		if ($phrase === null)
 		{
 			$default_searchphrase = $this->_params->get('default_searchphrase', 'all');
@@ -1356,16 +1356,17 @@ class FlexicontentModelCategory extends JModelLegacy {
 		if ($locked_filters) foreach($locked_filters as $_filter) $filters[$_filter->id] = $_filter;
 
 		// Override text search auto-complete category ids with those of filter 13
-		$f13_val = $app->input->get('filter_13', null, 'array');
-		if ( isset($filters[13]) && !empty($f13_val) )
+		$_cids = $app->input->get('filter_13', array(), 'array');
+
+		if (isset($filters[13]) && !empty($_cids))
 		{
-			if ( !is_array($f13_val) ) {
-				$f13_val = preg_replace( '/[^0-9,]/i', '', (string) $f13_val );
-				$f13_val = explode(',', $f13_val);
+			if (!is_array($_cids))
+			{
+				$_cids = preg_replace('/[^0-9,]/i', '', (string) $_cids);
+				$_cids = explode(',', $_cids);
 			}
-			// This is not used in DB query, it will be added as value of HTML tag parameter, but anyway filter it as integer to avoid broken HTML
-			$_cids = array();
-			foreach ($f13_val as $i => $_id)  if ((int)$_id) $_cids[] = (int)$_id;
+
+			ArrayHelper::toInteger($_cids);
 
 			$this->_params->set('txt_ac_cid', 'NA');
 			$this->_params->set('txt_ac_cids', $_cids);
@@ -1373,6 +1374,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 
 		// Get SQL clause for filtering via each field
 		$return_sql = 2;
+
 		if ($filters) foreach ($filters as $filter)
 		{
 			// Get filter values, setting into appropriate session variables
@@ -1396,7 +1398,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 			}
 			else
 			{
-				$is_empty = !is_array($filt_vals) && !strlen(trim($filt_vals));
+				$is_empty = !strlen(trim($filt_vals));
 			}
 
 			if (!$filter->parameters->get('allow_filtering_empty', 0) && $is_empty)
@@ -2515,7 +2517,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 				break;
 
 			case 'tags':
-				JArrayHelper::toInteger($values);  // Sanitize filter values as integers
+				ArrayHelper::toInteger($values);  // Sanitize filter values as integers
 				$query  = 'SELECT itemid'
 						. ' FROM #__flexicontent_tags_item_relations'
 						. ' WHERE tid IN ('. implode(",", $values) .')';  // no db quoting needed since these were typecasted to ints

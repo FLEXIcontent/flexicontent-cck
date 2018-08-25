@@ -2,6 +2,7 @@
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
 use Joomla\String\StringHelper;
+use Joomla\Utilities\ArrayHelper;
 use Joomla\CMS\Application\CMSApplication;
 
 class flexicontent_html
@@ -5143,19 +5144,21 @@ class flexicontent_html
 
 		if ($obj && isset($obj->_ids))
 		{
-			$layout_vars['cids'] = !is_array($obj->_ids) ? $obj->_ids : implode(',' , $obj->_ids);
+			$layout_vars['cids'] = !is_array($obj->_ids)
+				? $obj->_ids
+				: implode(',' , $obj->_ids);
 		}
 		else
 		{
-			$mcats_list = $app->input->get('cids', '', 'STRING');
-			if ( !is_array($mcats_list) )
+			$cids = $app->input->get('cids', array(), 'array');
+
+			if (!is_array($cids))
 			{
-				$mcats_list = preg_replace( '/[^0-9,]/i', '', (string) $mcats_list );
-				$mcats_list = explode(',', $mcats_list);
+				$cids = preg_replace( '/[^0-9,]/i', '', (string) $cids );
+				$cids = explode(',', $cids);
 			}
-			// make sure given data are integers ... and skipping zero values
-			$cids = array();
-			foreach ($mcats_list as $i => $_id)  if ((int)$_id) $cids[] = (int) $_id;
+
+			ArrayHelper::toInteger($cids);
 			$layout_vars['cids'] = implode(',' , $cids);
 		}
 
