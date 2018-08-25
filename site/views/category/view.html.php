@@ -1032,40 +1032,28 @@ class FlexicontentViewCategory extends JViewLegacy
 		foreach($jinput->get->get->getArray() as $i => $v)
 		{
 			// URL-encode filter values
-			if (substr($i, 0, 6) === "filter")
+			$is_fcfilter = substr($i, 0, 6) === 'filter';
+
+			if (is_array($v))
 			{
-				if (is_array($v))
+				foreach($v as $ii => $vv)
 				{
-					foreach($v as $ii => &$vv)
+					if ($is_fcfilter)
 					{
 						$vv = str_replace('&', '__amp__', $vv);
 						$vv = strtr(rawurlencode($vv), $_revert);
-						$pageNav->setAdditionalUrlParam($i.'['.$ii.']', $vv);
 					}
-					unset($vv);
+					$pageNav->setAdditionalUrlParam($i.'['.$ii.']', $vv);
 				}
-				else
+			}
+			else
+			{
+				if ($is_fcfilter)
 				{
 					$v = str_replace('&', '__amp__', $v);
 					$v = strtr(rawurlencode($v), $_revert);
-					$pageNav->setAdditionalUrlParam($i, $v);
 				}
-			}
-
-			// Make sure all URL variables are added to the pagination URLs
-			else
-			{
-				if (is_array($v))
-				{
-					foreach($v as $ii => &$vv)
-					{
-						$pageNav->setAdditionalUrlParam($i.'['.$ii.']', $vv);
-					}
-				}
-				else
-				{
-					$pageNav->setAdditionalUrlParam($i, $v);
-				}
+				$pageNav->setAdditionalUrlParam($i, $v);
 			}
 		}
 		$resultsCounter = $pageNav->getResultsCounter();  // for overriding model's result counter
