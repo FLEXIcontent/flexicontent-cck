@@ -1279,7 +1279,18 @@ class plgFlexicontent_fieldsImage extends FCField
 			$values = array();
 
 			// Use 'intro' image in multi-item listings
-			$_image_name = $view!='item' ? 'intro' : 'fulltext';
+			switch ($view)
+			{
+				case 'item':
+					$_image_name = $field->parameters->get('img-if-for-itemlist', '2') === '1' ? 'intro' : 'fulltext';
+					break;
+				case 'category':
+					$_image_name = $field->parameters->get('img-if-for-catlist', '1') === '1' ? 'intro' : 'fulltext';
+					break;
+				case 'module':
+					$_image_name = $field->parameters->get('img-if-for-modlist', '1') === '1' ? 'intro' : 'fulltext';
+					break;
+			}
 
 			if ( $item->images )
 			{
