@@ -54,7 +54,7 @@ if ($cat_default_image)
 	$conf	= $w . $h . $aoe . $q . $ar . $zc . $f;
 	
 	$default_image = $phpThumbURL.$src.$conf;
-	$default_image = '<img src="'.$default_image.'" alt="%s" title="%s" style="align: ' . $cat_image_float . '" />';
+	$default_image = '<img src="'.$default_image.'" alt="%s" title="%s" style="float: ' . $cat_image_float . '" />';
 }
 else
 {
@@ -127,7 +127,7 @@ foreach ($list as $cat) :
 		
 		if ($src)
 		{
-			$image = '<img src="'.$phpThumbURL.$src.$conf.'" alt="'.$cat->title.'" title="'.$cat->title.'" style="align: ' . $cat_image_float . '" />';
+			$image = '<img src="'.$phpThumbURL.$src.$conf.'" alt="'.$cat->title.'" title="'.$cat->title.'" style="float: ' . $cat_image_float . '" />';
 		}
 		elseif ($default_image)
 		{
