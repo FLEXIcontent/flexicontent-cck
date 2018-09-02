@@ -110,7 +110,7 @@
 
 			<field name="image_source" type="multilist" subtype="list" default="1" toggle_related="1" label="FLEXI_FIELD_IMAGE_SRC_MODE" description="FLEXI_FIELD_IMAGE_SRC_MODE_DESC">
 				<option value="-2" show_list="img-joomla-mode" hide_list="img-db-mode,img-fld-mode,img-common-conf,client-resize">Joomla media manager</option>
-				<option value="-1" show_list="img-joomla-mode" hide_list="img-db-mode,img-fld-mode,img-common-conf,client-resize">Joomla article images: (intro + full)</option>
+				<option value="-1" show_list="img-joomla-mode,img-joomla-mode-if" hide_list="img-db-mode,img-fld-mode,img-common-conf,client-resize">Joomla article images: (intro + full)</option>
 				<option value="0"  show_list="img-db-mode,img-common-conf,client-resize"  hide_list="img-fld-mode,img-joomla-mode">FLEXI_FIELD_REUSABLE_DB_MODE</option>
 				<option value="1"  show_list="img-fld-mode,img-common-conf,client-resize" hide_list="img-db-mode,img-joomla-mode">FLEXI_FIELD_ITEM_SPECIFIC_FOLDER_MODE</option>
 			</field>
@@ -120,6 +120,21 @@
 				<option value="2">FLEXI_UPLOADED_FILE_SELECT_ONLY</option>
 			</field>
 			<field name="" type="separator" default="FLEXI_IMG_JOOMLA_MODE_NOTES" level="level3" depend_class="img-joomla-mode" class="alert alert-info fcpadded" />
+
+			<field name="" type="separator" default="FLEXI_FIELD_IMAGE_THUMBNAIL_IN_VIEWS" level="level3" depend_class="img-joomla-mode-if" class="" />
+			<field name="img-if-for-itemlist" type="radio" default="2" label="FLEXI_ITEM" description="" depend_class="img-joomla-mode-if" class="btn-group group-fcinfo">
+				<option value="1">Intro</option>
+				<option value="2">Full</option>
+			</field>
+			<field name="img-if-for-catlist" type="radio" default="1" label="FLEXI_CATEGORY" description="" depend_class="img-joomla-mode-if" class="btn-group group-fcinfo">
+				<option value="1">Intro</option>
+				<option value="fulltext">Full</option>
+			</field>
+			<field name="img-if-for-modlist" type="radio" default="1" label="FLEXI_MODULE" description="" depend_class="img-joomla-mode-if" class="btn-group group-fcinfo">
+				<option value="1">Intro</option>
+				<option value="2">Full</option>
+			</field>
+
 
 			<field name="" type="separator" default="FLEXI_PARAMETERS_BEHAVIOR_FOLDER_MODE" description="FLEXI_PARAMETERS_BEHAVIOR_FOLDER_MODE_DESC" level="level1" depend_class="img-fld-mode" />
 			<field name="of_usage" type="radio" default="0" label="FLEXI_FIELD_IMAGE_ASSOC_ITEMS_SAME_IMAGES" description="FLEXI_FIELD_IMAGE_ASSOC_ITEMS_SAME_IMAGES_DESC" depend_class="img-fld-mode" class="btn-group group-fcinfo">
