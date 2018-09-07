@@ -1107,7 +1107,8 @@ class FlexicontentController extends JControllerLegacy
 		{
 			$this->input->set('browser_cachable', 0);
 			$this->input->set('task', 'add');
-			$this->add();
+			// The 'add' task does not exist, instead it is an alias to 'edit' task
+			$this->edit();
 			return;
 		}
 
@@ -1228,6 +1229,7 @@ class FlexicontentController extends JControllerLegacy
 		//echo "cacheable: ".(int)$cachable." - " . print_r($safeurlparams, true) ."<br/>";
 		parent::display($cachable, $safeurlparams);
 	}
+
 
 	/**
 	 * Add / Edit an item
