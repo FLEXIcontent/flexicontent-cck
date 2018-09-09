@@ -112,11 +112,24 @@ class FlexicontentViewItems extends JViewLegacy
 
 		// Map of CORE to item properties
 		$core_props = array(
+
+			// Core fields (Having field property 'iscore': 1)
 			'title'=>'title',
 			'created_by'=>'author',
 			'modified_by'=>'modifier',
 			'created'=>'created',
-			'modified'=>'modified'
+			'modified'=>'modified',
+			
+			// Core-property fields (Having field type: 'coreprops')
+			'id'=>'id',
+			'access'=>'access',
+			'alias'=>'alias',
+			'lang'=>'language',
+			'language'=>'language',
+			'category'=>'catid',
+			'created_by_alias'=>'created_by_alias',
+			'publish_up'=>'publish_up',
+			'publish_down'=>'publish_down',
 		);
 
 		$total_fields = 0;
@@ -223,6 +236,13 @@ class FlexicontentViewItems extends JViewLegacy
 				{
 					$prop = $core_props[$field_name];
 					$vals = $item->$prop;
+				}
+
+				elseif ($field->field_type === 'coreprops' && $include_in_csv_export === 1)
+				{
+					$props_type = $field->parameters->get('props_type', '');
+					$prop = isset($core_props[$props_type]) ? $core_props[$props_type] : $props_type;
+					$vals = isset($item->$prop) ? $item->$prop : '';
 				}
 
 				// CASE 3: RAW value display !

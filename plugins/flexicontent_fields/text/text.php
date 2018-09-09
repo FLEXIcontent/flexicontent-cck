@@ -590,6 +590,13 @@ class plgFlexicontent_fieldsText extends FCField
 			break;
 		}
 
+		// Cleaner output for CSV export
+		if ($prop === 'csv_export')
+		{
+			$separatorf = ', ';
+			$itemprop = false;
+		}
+
 		// Get layout name
 		$viewlayout = $field->parameters->get('viewlayout', '');
 		$viewlayout = $viewlayout ? 'value_'.$viewlayout : 'value_default';
