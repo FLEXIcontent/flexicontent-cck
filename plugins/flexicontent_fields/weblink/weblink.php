@@ -464,7 +464,7 @@ class plgFlexicontent_fieldsWeblink extends FCField
 
 
 	// Method to create field's HTML display for frontend views
-	function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')
+	public function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 
@@ -681,6 +681,40 @@ class plgFlexicontent_fieldsWeblink extends FCField
 			$separatorf = '&nbsp;';
 			break;
 		}
+
+
+		// CSV export: Create customized output and return
+		if ($prop === 'csv_export')
+		{
+			$separatorf = ' | ';
+			$itemprop = false;
+
+			$csv_export_text = $field->parameters->get('csv_export_text', '{{title}} {{link}}');
+			$field_matches = null;
+
+			$result = preg_match_all("/\{\{([a-zA-Z_0-9-]+)\}\}/", $csv_export_text, $field_matches);
+			$propertyNames = $result ? $field_matches[1] : array();
+
+			$field->{$prop} = array();
+
+			foreach ($values as $value)
+			{
+				$output = $csv_export_text;
+
+				foreach ($propertyNames as $pname)
+				{
+					$output = str_replace('{{' . $pname . '}}', (isset($value[$pname]) ? $value[$pname] : ''), $output);
+				}
+
+				$field->{$prop}[] = $output;
+			}
+
+			// Apply values separator, creating a non-array output regardless of fieldgrouping, as fieldgroup CSV export is not supported
+			$field->{$prop} = implode($separatorf, $field->{$prop});
+
+			return;
+		}
+
 
 		// Get layout name
 		$viewlayout = $field->parameters->get('viewlayout', '');
