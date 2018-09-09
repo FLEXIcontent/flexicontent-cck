@@ -1072,6 +1072,7 @@ class FlexicontentModelItems extends JModelLegacy
 					)
 				. ', cr.rating_count AS rating_count' . $ratings_col
 				. ', CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug'
+				. ', c.title AS maincat_title'
 				. ', GROUP_CONCAT(DISTINCT icats.catid SEPARATOR  ",") AS relcats'
 				. ', GROUP_CONCAT(DISTINCT tg.tid    SEPARATOR  ",") AS taglist'
 				. ', CASE WHEN level.title IS NULL THEN CONCAT_WS(\'\', \'deleted:\', i.access) ELSE level.title END AS access_level'

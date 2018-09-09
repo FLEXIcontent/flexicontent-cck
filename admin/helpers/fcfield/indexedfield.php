@@ -1175,12 +1175,13 @@ class FCIndexedField extends FCField
 			break;
 		}
 
+		// Cleaner output for CSV export
 		if ($prop === 'csv_export')
 		{
 			$separatorf = ', ';
+			$itemprop = false;
 		}
-		
-		
+
 		// Get indexed element values
 		$elements = FlexicontentFields::indexedField_getElements($field, $item, static::$extra_props);
 		if ( !$elements ) {
