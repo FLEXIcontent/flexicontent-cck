@@ -347,6 +347,12 @@ class plgFlexicontent_fieldsCore extends FCField
 
 				case 'maintext': // main text
 
+					if ($prop === 'csv_export')
+					{
+						$field->{$prop} = $item->introtext . chr(13).chr(13) . $item->fulltext;
+						continue;
+					}
+
 					// Special display variables
 					if ($raw_values!==null)
 					{

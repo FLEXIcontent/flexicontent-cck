@@ -1956,6 +1956,9 @@ class flexicontent_html
 			')\b/i',
 		' $1$2', $cleantext);
 
+		// Strip javascript
+		$cleantext = preg_replace('#<script(.*?)>(.*?)</script>#is', '', $cleantext);
+
 		// Strip html tags
 		$cleantext = strip_tags($cleantext);
 
