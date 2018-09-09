@@ -100,9 +100,17 @@ class plgFlexicontent_fieldsCoreprops extends FCField
 			break;
 		}
 
+		// Cleaner output for CSV export
+		if ($prop === 'csv_export')
+		{
+			$separatorf = ', ';
+			$itemprop = false;
+		}
+
 		$props_type = $field->parameters->get('props_type');
 		switch($props_type)
 		{
+			case 'lang':
 			case 'language':
 				if ($all_langs===null)
 				{
@@ -113,13 +121,9 @@ class plgFlexicontent_fieldsCoreprops extends FCField
 				$field->{$prop} = $lang_data && $lang_data->code !== '*' && $lang_data->title_native ? $lang_data->title_native : $lang_data->name;
 				break;
 
-			case 'id':
-			case 'alias':
-				$field->{$prop} = $item->{$props_type};
-				break;
-
 			case 'category':
-				$link_maincat = $field->parameters->get('link_maincat', 1);
+				$link_maincat = $prop === 'csv_export' ? 0 : (int) $field->parameters->get('link_maincat', 1);
+
 				if ($link_maincat)
 				{
 					$maincatid = isset($item->maincatid) ? $item->maincatid : $item->catid;   // maincatid is used by item view
@@ -130,7 +134,7 @@ class plgFlexicontent_fieldsCoreprops extends FCField
 					}
 				}
 
-				$maincat_title =  !empty($item->maincat_title) ? $item->maincat_title : 'catid: '.$item->catid;
+				$maincat_title =  !empty($item->maincat_title) ? $item->maincat_title : $item->categoryslug;
 				$field->{$prop} = $link_maincat
 					? '<a class="fc_coreprop fc_maincat link_' .$field->name. '" href="' . $cat_links[$maincatid] . '">' . $maincat_title . '</a>'
 					: $maincat_title;
@@ -144,9 +148,12 @@ class plgFlexicontent_fieldsCoreprops extends FCField
 				$field->{$prop} = isset($acclvl_names[$item->access])  ?  $acclvl_names[$item->access]  :  'unknown access level id: '.$item->access;
 				break;
 
-			// Indicate NOT IMPLEMENTED by using property name as field DISPLAY ?
+			/**
+			 * Try to use the item property as display, and if not found,
+			 * then indicate NOT IMPLEMENTED by using property name as field DISPLAY
+			 */
 			default:
-				$field->{$prop} = $props_type;
+				$field->{$prop} = isset($item->{$props_type}) ? $item->{$props_type} : $props_type;
 				break;
 		}
 

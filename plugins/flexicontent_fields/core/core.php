@@ -128,11 +128,6 @@ class plgFlexicontent_fieldsCore extends FCField
 		$_closetag = $field->parameters->get( 'closetag', '' );
 		$pretext_cacheable = $posttext_cacheable = $opentag_cacheable = $closetag_cacheable = false;
 
-		if ($prop === 'csv_export')
-		{
-			$separatorf = 3;  // comma
-		}
-
 		switch($separatorf)
 		{
 			case 0:
@@ -162,6 +157,12 @@ class plgFlexicontent_fieldsCore extends FCField
 			default:
 			$separatorf = '&nbsp;';
 			break;
+		}
+
+		if ($prop === 'csv_export')
+		{
+			$separatorf = ', ';
+			$itemprop = false;
 		}
 
 		// Get date format configuration for date-based fields
