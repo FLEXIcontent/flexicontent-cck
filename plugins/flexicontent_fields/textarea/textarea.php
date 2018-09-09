@@ -703,6 +703,26 @@ class plgFlexicontent_fieldsTextarea extends FCField
 			break;
 		}
 
+
+		// CSV export: Create customized output and return
+		if ($prop === 'csv_export')
+		{
+			$separatorf = ' | ';
+			$itemprop = false;
+
+			foreach ($values as $value)
+			{
+				// Smart strip HTML tags without cutting the text
+				$field->{$prop}[] = $value;
+			}
+
+			// Apply values separator, creating a non-array output regardless of fieldgrouping, as fieldgroup CSV export is not supported
+			$field->{$prop} = implode($separatorf, $field->{$prop});
+
+			return;
+		}
+
+
 		// Get layout name
 		$viewlayout = $field->parameters->get('viewlayout', '');
 		$viewlayout = $viewlayout ? 'value_'.$viewlayout : 'value_default';

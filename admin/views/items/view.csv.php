@@ -212,6 +212,7 @@ class FlexicontentViewItems extends JViewLegacy
 			foreach($item0->fields as $field_name => $field)
 			{
 				$include_in_csv_export = (int) $field->parameters->get('include_in_csv_export', 0);
+				$csv_strip_html = (int) $field->parameters->get('csv_strip_html', 0);
 
 				if ( !$include_in_csv_export )
 				{
@@ -229,6 +230,12 @@ class FlexicontentViewItems extends JViewLegacy
 					$vals = isset($item->onDemandFields[$field->name]->csv_export)
 						? $item->onDemandFields[$field->name]->csv_export
 						: '';
+
+					// Smart strip HTML tags without cutting the text
+					if ($csv_strip_html)
+					{
+						$vals = flexicontent_html::striptagsandcut($vals);
+					}
 				}
 
 				// CASE 2: CORE properties (special case), TODO: Implement this as "RENDERED value display" (and make it default output for them ?)

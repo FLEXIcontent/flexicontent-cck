@@ -877,6 +877,8 @@ class FlexicontentFields
 		// *****************************************
 		// Trigger content plugins on the field text
 		// *****************************************
+		
+		$skip_trigger_plgs = $method === 'csv_export' ? true : $skip_trigger_plgs;
 
 		if ( !$skip_trigger_plgs && !isset($_trigger_plgs_ft[$field_name]) )
 		{
