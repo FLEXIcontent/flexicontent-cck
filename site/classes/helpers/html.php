@@ -2012,9 +2012,6 @@ class flexicontent_html
 			'keep_jplugins_code' => false
 		);
 
-		// Strip javascript
-		$cleantext = preg_replace('#<script(.*?)>(.*?)</script>#is', '', $cleantext);
-
 		// Convert html entities to characters so that they will not be removed ... by strip_tags
 		$cleantext = html_entity_decode ($text, ENT_NOQUOTES, 'UTF-8');
 
@@ -2029,6 +2026,9 @@ class flexicontent_html
 			'main|nav|noscript|ol|output|p|pre|section|table|tfoot|ul|video'.
 			')\b/i',
 		' $1$2', $cleantext);
+
+		// Strip javascript
+		$cleantext = preg_replace('#<script(.*?)>(.*?)</script>#is', '', $cleantext);
 
 		// Strip html tags
 		$cleantext = strip_tags($cleantext);
