@@ -163,6 +163,10 @@ class FlexicontentModelCategory extends JModelLegacy {
 		// Set category id and call constrcuctor
 		$cid = JFactory::getApplication()->input->get('cid', 0, 'int');
 
+		// Catch case that 'cid' is an array (bug other bad url)
+		$cid = is_array($cid) ? (int) reset($cid) : $cid;
+		JFactory::getApplication()->input->set('cid', $cid);
+
 		// This will set the category id and clear all member variables
 		$this->setId($cid);
 
