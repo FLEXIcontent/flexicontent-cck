@@ -132,6 +132,10 @@ $is_flexiview = $option=="com_flexicontent" && ($view=="category" || $view=="ite
 $catid_fieldname = 'cid';    // we could use a different name per module but that is an overkill and possible will lead to bugs, e.g. 'cid_mod_'.$module->id;
 $current_cid = $is_flexiview ? $jinput->get($catid_fieldname, 0, 'int') : 0;
 
+// Catch case that 'cid' is an array (legacy bug of 'mcats' menu item ?)
+$current_cid = is_array($current_cid) ? (int) reset($current_cid) : $current_cid;
+JFactory::getApplication()->input->set($catid_fieldname, $current_cid);
+
 // Decide to use specific category ID or use current category ID
 $force_specific_cid = !$display_cat_list && $config_catid;
 $empty_current_cid  = !$current_cid;
