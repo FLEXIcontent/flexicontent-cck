@@ -1,27 +1,21 @@
 <?php
 /**
- * @version 1.5 stable $Id$
- * @plugin 1.1
- * @package Joomla
- * @subpackage FLEXIcontent
- * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
- * @license GNU/GPL v2
- * 
- * FLEXIcontent is a derivative work of the excellent QuickFAQ component
- * @copyright (C) 2008 Christoph Lukes
- * see www.schlu.net for more information
+ * @package         FLEXIcontent
+ * @version         3.3
  *
- * FLEXIcontent is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
+ * @link            http://www.flexicontent.com
+ * @copyright       Copyright © 2018, FLEXIcontent team, All Rights Reserved
+ * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
-defined( '_JEXEC' ) or die( 'Restricted access' );
+defined('_JEXEC') or die('Restricted access');
+
+use Joomla\Utilities\ArrayHelper;
 
 jimport('cms.plugin.plugin');
-if (!defined('DS'))  define('DS',DIRECTORY_SEPARATOR);
 
+if (!defined('DS'))  define('DS',DIRECTORY_SEPARATOR);
 require_once (JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'defineconstants.php');
 
 /**
@@ -32,7 +26,7 @@ class plgSystemFlexisystem extends JPlugin
 	var $extension;  // Component name
 	var $cparams;    // Component parameters
 	var $autoloadLanguage = false;
-	
+
 	/**
 	 * Constructor
 	 */
@@ -58,10 +52,15 @@ class plgSystemFlexisystem extends JPlugin
 		$this->cparams = JComponentHelper::getParams($this->extension);
 
 		// Temporary workaround until code is updated
-		if (FLEXI_J40GE) JFactory::getDbo()->setQuery("SET sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''))")->execute();
+		if (FLEXI_J40GE)
+		{
+			JFactory::getDbo()->setQuery(
+				"SET sql_mode=(SELECT REPLACE(REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''),'STRICT_TRANS_TABLES',''))"
+			)->execute();
+		}
 	}
-	
-	
+
+
 	/**
 	 * Joomla initialized, but component has not been decided yet, this is good place to some actions regardless of component
 	 * OR to make early redirections OR to alter variables used to do routing (deciding the component that will be executed)
@@ -76,11 +75,12 @@ class plgSystemFlexisystem extends JPlugin
 		$app  = JFactory::getApplication();
 		$task = $app->input->get('task', '', 'string');  // NOTE during this event 'task' is (controller.task), thus we use filtering 'string'
 
-		if ( $task === 'articles.featured' || $task === 'articles.unfeatured' )
+		/**
+		 * Call 'flexicontent' items model to update the featured FLAG, thus updating temporary data too
+		 */
+
+		if ($task === 'articles.featured' || $task === 'articles.unfeatured')
 		{
-			//***
-			//*** Call 'flexicontent' items model to update the featured FLAG, thus updating temporary data too
-			//***
 			$this->_loadFcHelpersAndLanguage();
 
 			// Load the FLEXIcontent item
@@ -92,18 +92,23 @@ class plgSystemFlexisystem extends JPlugin
 			$itemmodel->featured($cid, $task === 'articles.featured' ? 1 : 0);
 		}
 
-		elseif ( $task=='config.store' )
+		/**
+		 * Call joomla configuration model to update to sync the permission between com_flexicontent and com_content
+		 */
+
+		elseif ($task === 'config.store')
 		{
 			$comp = $app->input->get('comp', '', 'cmd');
 			$comp = str_replace('com_flexicontent.category.', 'com_content.category.', $comp);
 			$comp = str_replace('com_flexicontent.item.', 'com_content.article.', $comp);
 			$app->input->set('comp', $comp);
 
-			if ( $comp == 'com_content' || $comp == 'com_flexicontent' )
+			if ($comp === 'com_content' || $comp === 'com_flexicontent')
 			{
 				$skip_arr = array('core.admin'=>1, 'core.options'=>1, 'core.manage'=>1);
 				$action = $app->input->get('action');
-				if ( substr($action, 0, 5) == 'core.' && !isset($skip_arr[$action]) )
+
+				if (substr($action, 0, 5) == 'core.' && !isset($skip_arr[$action]))
 				{
 					$comp_other = $comp == 'com_content'  ?  'com_flexicontent'  :  'com_content';
 					$permissions = array(
@@ -113,13 +118,12 @@ class plgSystemFlexisystem extends JPlugin
 						'value'     => $app->input->get('value', '', 'cmd'),
 						'title'     => $app->input->get('title', '', 'string')
 					);
-					
+
 					JLoader::register('ConfigModelApplication', JPATH_ADMINISTRATOR.DS.'components'.DS.'com_config'.DS.'model'.DS.'application.php');
 					JLoader::register('ConfigModelForm', JPATH_SITE.DS.'components'.DS.'com_config'.DS.'model'.DS.'form.php');
 					JLoader::register('ConfigModelCms', JPATH_SITE.DS.'components'.DS.'com_config'.DS.'model'.DS.'cms.php');
-					
-					//require_once( JPATH_ADMINISTRATOR.DS.'components'.DS.'com_config'.DS.'models'.DS.'application.php');					
-					if ( !(substr($permissions['component'], -6) == '.false') )
+
+					if (!(substr($permissions['component'], -6) === '.false'))
 					{
 						// Load Permissions from Session and send to Model
 						$model    = new ConfigModelApplication;
@@ -129,20 +133,20 @@ class plgSystemFlexisystem extends JPlugin
 				}
 			}
 		}
-		
-		
+
+
 		// Fix for return urls with unicode aliases
 		$return   = $app->input->get('return', null);
 		$isfcurl  = $app->input->get('isfcurl', null);
 		$fcreturn = $app->input->get('fcreturn', null);
 		if ($return && ($isfcurl || $fcreturn)) $app->input->set('return', strtr($return, '-_,', '+/='));
-		
+
 		$username = $app->input->get('fcu', null);
 		$password = $app->input->get('fcp', null);
 		$option   = $app->input->get('option', null);
 		$session = JFactory::getSession();
-		
-		
+
+
 		// Clear categories cache if previous page has saved FC component configuration
 		if ( $session->get('clear_cats_cache', 0, 'flexicontent') )
 		{
@@ -163,12 +167,12 @@ class plgSystemFlexisystem extends JPlugin
 
 			//JFactory::getApplication()->enqueueMessage( "Cleaned CACHE groups: <b>com_flexicontent</b>, <b>com_flexicontent_cats</b>", 'message');
 		}
-		
+
 		if (FLEXI_SECTION || FLEXI_CAT_EXTENSION)
 		{
 			global $globalcats;
 			$start_microtime = microtime(true);
-			if (FLEXI_CACHE) 
+			if (FLEXI_CACHE)
 			{
 				// Add the category tree to categories cache
 				$catscache = JFactory::getCache('com_flexicontent_cats');
@@ -181,7 +185,7 @@ class plgSystemFlexisystem extends JPlugin
 			$time_passed = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 			//JFactory::getApplication()->enqueueMessage( "recalculated categories data, execution time: ". sprintf('%.2f s', $time_passed/1000000), 'message');
 		}
-		
+
 		// REMEMBER last value of the fcdebug parameter, and use it to enable statistics display
 		if ( $option==$this->extension && $this->cparams->get('print_logging_info')==1 )
 		{
@@ -193,23 +197,23 @@ class plgSystemFlexisystem extends JPlugin
 			$session->set('fcdebug', ($fcdebug ? 1 : 0), 'flexicontent');
 			$this->cparams->set('print_logging_info', ($fcdebug ? 2 : 0));
 		}
-		
+
 		$print_logging_info = $this->cparams->get('print_logging_info');
 		if ($print_logging_info) { global $fc_run_times; $start_microtime = microtime(true); }
-		
+
 		// (a.1) (Auto) Check-in DB table records according to time limits set
 		$this->checkinRecords();
-		
+
 		// (a.2) (Auto) Change item state, e.g. archive expired items (publish_down date exceeded)
 		$this->handleExpiredItems();
-		
+
 		if ($print_logging_info) $fc_run_times['auto_checkin_auto_state'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
-		
+
 		// (b) Autologin for frontend preview
 		if (!empty($username) && !empty($password) && $this->cparams->get('autoflogin', 0)) {
 			$result = $this->loginUser();
 		}
-		
+
 		// (c) Route PDF format to HTML format for J1.6+
 		$redirect_pdf_format = $this->params->get('redirect_pdf_format', 1);
 		if ($redirect_pdf_format && $app->input->get('format', 'html', 'cmd') == 'pdf')
@@ -220,11 +224,11 @@ class plgSystemFlexisystem extends JPlugin
 				JFactory::getApplication()->enqueueMessage('PDF generation is not supported, the HTML version is displayed instead', 'notice');
 			}
 		}
-		
+
 		return;
 	}
-	
-	
+
+
 	/**
 	 * Joomla initialized, and component has been decided, and component's optional request (URL) variables have been set (e.g. those set via the menu item)
 	 * this is good place to make redirections needing the component's optional request variables, and to calculate data that are globally needed
@@ -237,23 +241,23 @@ class plgSystemFlexisystem extends JPlugin
 		// Detect saving component configuration, e.g. set a flag to indicate cleaning categories cache on next page load
 		// We place this above format check, because maybe, saving will be AJAX based (? format=raw ?)
 		$this->trackSaveConf();
-		
+
 		$format = JFactory::getApplication()->input->get('format', 'html', 'cmd');
 		if ($format != 'html') return;
-		
+
 		$app      = JFactory::getApplication();
 		$session  = JFactory::getSession();
 		$document = JFactory::getDocument();
-		
+
 		$option = $app->input->get('option', '', 'cmd');
 		$view   = $app->input->get('view', '', 'cmd');
 		$controller = $app->input->get('controller', '', 'cmd');
 		$component  = $app->input->get('component', '', 'cmd');
-		
+
 		$layout = $app->input->get('layout', '', 'string');
 		$tmpl   = $app->input->get('tmpl', '', 'string');
 		$task   = $app->input->get('task', '', 'string');  // NOTE during this event 'task' is (controller.task), thus we use filtering 'string'
-		
+
 		$fcdebug = $this->cparams->get('print_logging_info')==2  ?  2  :  $session->get('fcdebug', 0, 'flexicontent');
 		$isAdmin = JFactory::getApplication()->isAdmin();
 
@@ -279,7 +283,7 @@ class plgSystemFlexisystem extends JPlugin
 				JHtml::_('formbehavior.chosen', '#_some_iiidddd_');
 				//$js .= "\n"."jQuery.fn.chosen = function(){};"."\n";  // Suppress chosen function completely, (commented out ... we will allow it)
 			}
-			
+
 			// Add information for PHP 5.3.9+ 'max_input_vars' limit
 			$max_input_vars = ini_get('max_input_vars');
 			if (extension_loaded('suhosin'))
@@ -298,7 +302,7 @@ class plgSystemFlexisystem extends JPlugin
 				});
 			";
 		}
-		
+
 		// Hide Joomla administration menus in FC modals
 		if (
 			$isAdmin && (
@@ -315,21 +319,21 @@ class plgSystemFlexisystem extends JPlugin
 				});
 			";
 		if ($js) $document->addScriptDeclaration($js);
-		
-		
+
+
 		// Detect resolution we will do this regardless of ... using mobile layouts
 		if ($this->cparams->get('use_mobile_layouts') || $app->isAdmin()) $this->detectClientResolution($this->cparams);
-		
+
 		// Exclude pagebreak outputing dialog from redirection
 		if ( $option=='com_content' && ($layout=='pagebreak' || $layout=='modal') ) return;
-		
+
 		// Redirect backend article / category management, and frontend article view
 		$app->isAdmin() ?
 			$this->redirectAdminComContent() :
 			$this->redirectSiteComContent() ;
 	}
-	
-	
+
+
 	/**
 	 * Utility Function:
 	 * Force backend specific redirestions like joomla category management and joomla article management to the
@@ -343,7 +347,7 @@ class plgSystemFlexisystem extends JPlugin
 		$app   = JFactory::getApplication();
 		$user  = JFactory::getUser();
 		$option = $app->input->get('option', '', 'cmd');
-		
+
 		// Skip other components
 		if (empty($option) || ($option !== 'com_content'  && $option !== 'com_categories'))
 		{
@@ -357,14 +361,14 @@ class plgSystemFlexisystem extends JPlugin
 		$_ct = explode('.', $task);
 		$task = $_ct[ count($_ct) - 1];
 		if (count($_ct) > 1) $controller = $_ct[0];
-		
+
 		// Get user groups of current user
 		$usergroups = $user->getAuthorisedGroups();
-		
+
 		// Get user groups excluded from redirection
 		$exclude_cats = $this->params->get('exclude_redirect_cats', array());
 		$exclude_arts = $this->params->get('exclude_redirect_articles', array());
-		
+
 		// Get URLs excluded from redirection
 		$excluded_urls = $this->params->get('excluded_redirect_urls');
 		$excluded_urls = preg_split("/[\s]*%%[\s]*/", $excluded_urls);
@@ -372,7 +376,7 @@ class plgSystemFlexisystem extends JPlugin
 		{
 			unset($excluded_urls[count($excluded_urls)-1]);
 		}
-		
+
 		// Get current URL
 		$uri = JUri::getInstance();
 
@@ -463,11 +467,11 @@ class plgSystemFlexisystem extends JPlugin
 		// Apply redirection
 		if (!empty($redirectURL))
 		{
-			$app->redirect($redirectURL, '');
+			$app->redirect($redirectURL);
 		}
 	}
-	
-	
+
+
 	/**
 	 * Utility Function:
 	 * Force frontend specific redirestions most notably redirecting the joomla ARTICLE VIEW to the FLEXIcontent ITEM VIEW
@@ -565,7 +569,7 @@ class plgSystemFlexisystem extends JPlugin
 
 
 		// ***
-		// *** Allow Joomla article view for non-bound items or for specific content types (also 
+		// *** Allow Joomla article view for non-bound items or for specific content types (also
 		// ***
 
 		if ($in_limits)
@@ -711,10 +715,10 @@ class plgSystemFlexisystem extends JPlugin
 		//establish the hierarchy of the categories
 		$children = array();
 		$parents = array();
-		
+
 		//set depth limit
 		$levellimit = 30;
-		
+
 		foreach ($cats as $child)
 		{
 			$parent = $child->parent_id;
@@ -723,7 +727,7 @@ class plgSystemFlexisystem extends JPlugin
 			array_push($list, $child);
 			$children[$parent] = $list;
 		}
-		
+
 		$parents = array_unique($parents);
 
 		//get list of the items
@@ -741,7 +745,7 @@ class plgSystemFlexisystem extends JPlugin
 			$cat->descendants        = implode(',', $cat->descendantsarray);
 			$cat->language           = isset($cat->language) ? $cat->language : '';
 		}
-		
+
 		return $globalcats;
 	}
 
@@ -754,7 +758,7 @@ class plgSystemFlexisystem extends JPlugin
     * a. looping through all categories  v  in given children array padding all of category v with same padding
     * b. but for every category v that has a children array, it calling itself (recursion) in order to inject the children categories just bellow category v
     *
-    * This function is based on the joomla 1.0 treerecurse 
+    * This function is based on the joomla 1.0 treerecurse
     *
     * @access private
     * @return array
@@ -763,7 +767,7 @@ class plgSystemFlexisystem extends JPlugin
 	{
 		$ROOT_CATEGORY_ID = 1;
 		if (!$ancestors) $ancestors = array();
-		
+
 		if (!empty($children[$parent_id]) && $level <= $maxlevel)
 		{
 			foreach ($children[$parent_id] as $v)
@@ -773,7 +777,7 @@ class plgSystemFlexisystem extends JPlugin
 				if ((!in_array($v->parent_id, $ancestors)) && $v->parent_id != $ROOT_CATEGORY_ID)
 				{
 					$ancestors[] = $v->parent_id;
-				} 
+				}
 
 				// Top level category (a child of ROOT)
 				if ($v->parent_id==1)
@@ -926,22 +930,22 @@ class plgSystemFlexisystem extends JPlugin
 		//echo "<pre>"; print_r($_POST); exit;
 		//echo "<pre>"; print_r($_REQUEST); exit;
 		//echo count($_REQUEST, COUNT_RECURSIVE); exit;
-		
+
 		// Workaround for max_input_vars limitation (PHP 5.3.9+)
 		if ( !empty($_POST['fcdata_serialized']) )
 		{
 			$app     = JFactory::getApplication();
 
 			//parse_str($_POST['fcdata_serialized'], $form_data);  // Combined with "jQuery.serialize()", but cannot be used to overcome 'max_input_vars'
-			
+
 			//$total_vars_e = null;
 			//$form_data_e = $this->parse_json_decode_eval( $_POST['fcdata_serialized'], $total_vars_e );
-			
+
 			$total_vars = null;
 			$form_data = $this->parse_json_decode( $_POST['fcdata_serialized'], $total_vars );
-			
+
 			//echo "<pre>"; print_r( $this->array_diff_recursive($form_data_e, $form_data) );  echo "</pre>"; exit;
-			
+
 			foreach($form_data as $n => $v)
 			{
 				$_POST[$n] = $v;
@@ -949,11 +953,11 @@ class plgSystemFlexisystem extends JPlugin
 				$app->input->post->set($n, $v);
 				$app->input->set($n, $v);
 			}
-			
+
 			/*foreach($_GET as $var => $val) {
 				if ( !isset($_POST[$var]) ) JFactory::getApplication()->enqueueMessage( "GET variable: ".$var . " is not set in the POST ARRAY", 'message');
 			}*/
-			
+
 			if (JDEBUG) JFactory::getApplication()->enqueueMessage(
 				"Form data were serialized, ".
 				'<b class="label">PHP max_input_vars</b> <span class="badge badge-info">'.ini_get('max_input_vars').'</span> '.
@@ -963,9 +967,9 @@ class plgSystemFlexisystem extends JPlugin
 			);
 		}
 	}
-	
-	
-	
+
+
+
 	/**
 	 * Utility Function:
 	 * to allow automatic logins, e.g. previewing during editing
@@ -974,7 +978,7 @@ class plgSystemFlexisystem extends JPlugin
 	 * @access public
 	 * @return void
 	 */
-	function loginUser() 
+	function loginUser()
 	{
 		$app = JFactory::getApplication();
 
@@ -982,7 +986,7 @@ class plgSystemFlexisystem extends JPlugin
 		$password  = $app->input->get('fcp', null);
 
 		jimport('joomla.user.helper');
-		
+
 		$db = JFactory::getDbo();
 		$query 	= 'SELECT id, password'
 				. ' FROM #__users'
@@ -991,7 +995,7 @@ class plgSystemFlexisystem extends JPlugin
 				;
 		$db->setQuery( $query );
 		$result = $db->loadObject();
-		
+
 		if($result)
 		{
 			JPluginHelper::importPlugin('user');
@@ -1003,11 +1007,11 @@ class plgSystemFlexisystem extends JPlugin
 			$loginEvent = FLEXI_J16GE ? 'onUserLogin' : 'onLoginUser';
 			$result = $app->triggerEvent($loginEvent, array((array)$response,$options));
 		}
-		
+
 		return;
 	}
-	
-	
+
+
 	/**
 	 * After component has created its output, this is good place to make global replacements
 	 *
@@ -1061,9 +1065,10 @@ class plgSystemFlexisystem extends JPlugin
 			elseif ($view === 'category')
 			{
 				// Category id
-				if ($cid = $app->input->get('cid', 0, 'int') && !is_array($cid))
+				if ($cid = $app->input->get('cid', 0, 'int'))
 				{
-					$css[] = "catid-".$cid;
+					ArrayHelper::toInteger($cid, array());
+					$css[] = "catid-" . implode('-', $cid);
 				}
 
 				if ($authorid = $app->input->get('authorid', 0, 'int'))  $css[] = "authorid-".$authorid; // Author id
@@ -1093,7 +1098,9 @@ class plgSystemFlexisystem extends JPlugin
 
 			$inline_js_close_btn = !FLEXI_J30GE ? 'onclick="this.parentNode.parentNode.removeChild(this.parentNode);"' : '';
 			$inline_css_close_btn = !FLEXI_J30GE ? 'float:right; display:block; font-size:18px; cursor: pointer;' : '';
+
 			$_replace_ = strpos($html, '<!-- fc_perf -->') ? '<!-- fc_perf -->' : '</body>';
+
 			$html = str_replace($_replace_,
 				'<div id="fc_perf_box" class="fc-mssg fc-info">'.
 					'<a class="close" data-dismiss="alert" '.$inline_js_close_btn.' style="'.$inline_css_close_btn.'" >&#215;</a>'.
@@ -1117,10 +1124,18 @@ class plgSystemFlexisystem extends JPlugin
 	 */
 	public function onBeforeCompileHead()
 	{
-		if (!JFactory::getApplication()->isAdmin()) return;
+		$app = JFactory::getApplication();
+		$format = $app->input->get('format', 'html', 'cmd');
+
+		if (!$app->isAdmin() || !JFactory::getUser()->id || $format !== 'html')
+		{
+			return;
+		}
 
 		require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'permission.php');
 		$perms = FlexicontentHelperPerm::getPerm();
+		JHtml::_('jquery.framework');
+
 		JFactory::getDocument()->addScriptDeclaration("
 			jQuery(document).ready(function(){
 				".(!$perms->CanReviews ? 'jQuery(\'#menu-com-flexicontent a[href="index.php?option=com_flexicontent&view=reviews"]\').parent().remove();' : '')."
@@ -1153,27 +1168,27 @@ class plgSystemFlexisystem extends JPlugin
 			$cachetime = (int) JFactory::getConfig()->get('cachetime', 15);
 			$cachetime = $cachetime > 60 ? 60 : ($cachetime < 15 ? 15 : $cachetime);
 			$cachetime = $cachetime * 60;
-			
+
 			// Try to avoid browser warning message "Page has expired or similar"
 			// This should turning off the 'must-revalidate' directive in the 'Cache-Control' header
-			JResponse::allowCache($browser_cachable ? true : false);
-			JResponse::setHeader('Pragma', $browser_cachable ? '' :'no-cache');
-			
+			$app->allowCache($browser_cachable ? true : false);
+			$app->setHeader('Pragma', $browser_cachable ? '' :'no-cache');
+
 			// CONTROL INTERMEDIARY CACHES (PROXY, ETC)
 			// 1:  public content (unlogged user),   2:  private content (logged user)
 			// BUT WE FORCE 'private' to avoid problems with 3rd party plugins and modules, that do cookie-based per visitor content for guests (unlogged users)
 			$cacheControl  = 'private';  // $browser_cachable == 1 ? 'public' : 'private';
-			
+
 			// SET MAX-AGE, to allow modern browsers to cache the page, despite expires header in the past
 			$cacheControl .= ', max-age=300';
-			JResponse::setHeader('Cache-Control', $cacheControl );
-			
+			$app->setHeader('Cache-Control', $cacheControl );
+
 			// Make sure no legacy proxies any caching !
-			JResponse::setHeader('Expires', 'Fri, 01 Jan 1990 00:00:00 GMT');
+			$app->setHeader('Expires', 'Fri, 01 Jan 1990 00:00:00 GMT');
 		}
 	}
-	
-	
+
+
 	/**
 	 * Utility function to detect client's screen resolution, and set it into the session
 	 *
@@ -1185,14 +1200,14 @@ class plgSystemFlexisystem extends JPlugin
 		$app      = JFactory::getApplication();
 		$session  = JFactory::getSession();
 		$debug_mobile = $this->cparams->get('debug_mobile');
-		
+
 		// Get session variables
 		$fc_screen_resolution  = $session->get('fc_screen_resolution', null, 'flexicontent');
 		if ( $fc_screen_resolution!==null) return;
-		
-		
+
+
 		// Screen resolution is known after second reload or when user revisits our website
-		
+
 		if ( isset($_COOKIE["fc_screen_resolution"]) ) {
 			$fc_screen_resolution = $_COOKIE["fc_screen_resolution"];
 			list($fc_screen_width,$fc_screen_height) = explode("x", $fc_screen_resolution);
@@ -1205,9 +1220,9 @@ class plgSystemFlexisystem extends JPlugin
 			}
 			return;
 		}
-		
+
 		// Calculate "low screen resolution" if needed
-		
+
 		else if ( $session->has('screenSizeCookieTried', 'flexicontent') ) {
 			$session->set('fc_screen_resolution', false, 'flexicontent');
 			$session->set('fc_screen_width', 0, 'flexicontent');
@@ -1216,9 +1231,9 @@ class plgSystemFlexisystem extends JPlugin
 				$app->enqueueMessage( "FC DEBUG_MOBILE: Detecting resolution failed, session variable 'fc_screen_resolution' was set to false", 'message');
 			}
 		}
-		
+
 		// Add JS code to detect Screen Size if not within limits (this will be known to us on next reload)
-		
+
 		else {
 			if ($debug_mobile) {
 				$app->enqueueMessage( "FC DEBUG_MOBILE: Added JS code to detect and set screen resolution cookie", 'message');
@@ -1227,8 +1242,8 @@ class plgSystemFlexisystem extends JPlugin
 			$session->set('screenSizeCookieToBeAdded', 1, 'flexicontent');
 		}
 	}
-	
-	
+
+
 	/**
 	 * Utility function:
 	 * Adds JS code for detecting screen resolution and setting appropriate browser cookie
@@ -1240,39 +1255,39 @@ class plgSystemFlexisystem extends JPlugin
 	{
 		static $screenSizeCookieAdded = false;
 		if ($screenSizeCookieAdded) return;
-		
+
 		$debug_mobile = $this->cparams->get('debug_mobile');
-		
+
 		$document = JFactory::getDocument();
-		$js = ' 
+		$js = '
 			function fc_getScreenWidth()
 			{
 				xWidth = null;
 				if(window.screen != null)
 					xWidth = window.screen.availWidth;
-		 
+
 				if(window.innerWidth != null)
 					xWidth = window.innerWidth;
-		 
+
 				if(document.body != null)
 					xWidth = document.body.clientWidth;
-		 
+
 				return xWidth;
 			}
 			function fc_getScreenHeight() {
 				xHeight = null;
 				if(window.screen != null)
 					xHeight = window.screen.availHeight;
-			 
+
 				if(window.innerHeight != null)
 					xHeight =   window.innerHeight;
-			 
+
 				if(document.body != null)
 					xHeight = document.body.clientHeight;
-			 
+
 				return xHeight;
 			}
-			
+
 			function fc_setCookie(cookieName, cookieValue, nDays) {
 				var today = new Date();
 				var expire = new Date();
@@ -1286,20 +1301,20 @@ class plgSystemFlexisystem extends JPlugin
 				}
 				//alert(cookieName+"="+escape(cookieValue) + ";path=" + path);
 			}
-			
+
 			fc_screen_width  = fc_getScreenWidth();
 			fc_screen_height = fc_getScreenHeight();
 			var fc_screen_resolution = "" + fc_screen_width + "x" + fc_screen_height;
 			fc_setCookie("fc_screen_resolution", fc_screen_resolution, 0);
-			
+
 			' . /*($debug_mobile ? 'alert("Detected screen resolution: " + fc_screen_resolution + " this info will be used on next load");' : '') .*/ '
 			' . /*'window.location="'.$_SERVER["REQUEST_URI"].'"; ' .*/ '
 		';
 		$document->addScriptDeclaration($js);
 		$screenSizeCookieAdded = true;
 	}
-	
-	
+
+
 	/**
 	 * Utility function:
 	 * Checks-IN DB table records when some conditions (e.g. time) are applicable
@@ -1381,7 +1396,7 @@ class plgSystemFlexisystem extends JPlugin
 					$date->setTimezone($tz);
 					$checkout_time_secs = $date->toUnix();
 					//echo $date->toFormat()." <br>";
-					
+
 					$checkout_secs = $current_time_secs - $checkout_time_secs;
 					if ( $checkout_secs >= $max_checkout_secs )
 					{
@@ -1431,7 +1446,7 @@ class plgSystemFlexisystem extends JPlugin
 
 		$db  = JFactory::getDbo();
 		$app = JFactory::getApplication();
-		
+
 		// Get current seconds
 		$date = JFactory::getDate('now');
 		$tz	= new DateTimeZone($app->getCfg('offset'));
@@ -1444,14 +1459,14 @@ class plgSystemFlexisystem extends JPlugin
 
 		$_nowDate = 'UTC_TIMESTAMP()';
 		$nullDate	= $db->getNullDate();
-		
+
 		$query = 'UPDATE #__content SET state = '.$new_state.
 			($clear_publish_down_date ? ', publish_down = '.$db->Quote($nullDate) : '').
 			' WHERE publish_down != '.$db->Quote($nullDate).' AND publish_down <= '.$_nowDate;
 		//echo $query;
 		$db->setQuery($query);
 		$db->execute();
-		
+
 		$query = 'UPDATE #__flexicontent_items_tmp SET state = '.$new_state.
 			($clear_publish_down_date ? ', publish_down = '.$db->Quote($nullDate) : '').
 			' WHERE publish_down != '.$db->Quote($nullDate).' AND publish_down <= '.$_nowDate;
@@ -1459,8 +1474,8 @@ class plgSystemFlexisystem extends JPlugin
 		$db->setQuery($query);
 		$db->execute();
 	}
-	
-	
+
+
 	/* Increment item / category hits counters, according to configuration */
 	function countHit()
 	{
@@ -1527,8 +1542,8 @@ class plgSystemFlexisystem extends JPlugin
 			}
 		}
 	}
-	
-	
+
+
 	/* Decide about incrementing item / category hits counter according to configuration */
 	function count_new_hit($item_id) // If needed to modify params then clone them !! ??
 	{
@@ -1627,8 +1642,8 @@ class plgSystemFlexisystem extends JPlugin
 		// Last visit within time limit, do not count new hit
 		return 0;
 	}
-	
-	
+
+
 	/*
 	 * Function to restore serialized form data with:  JSON.stringify( jform.serializeArray() )
 	 * This is currently UNUSED, because we use an alternative without eval ...
@@ -1636,23 +1651,23 @@ class plgSystemFlexisystem extends JPlugin
 	private function parse_json_decode_eval($string, & $count)
 	{
 		$parsed = array();    // Decompressed data to be returned
-		
+
 		$pairs = json_decode($string, true);
 		$count = count($pairs);
 		//echo "<pre>"; print_r($pairs); exit;
-		
+
 		foreach ($pairs as $pair)
 		{
 			$name = $pair['name'];
 			$value = $pair['value'];
-			
+
 			// Escape name and value strings
 			$name = str_replace('\\', '\\\\', $name);
 			$value = str_replace('\\', '\\\\', $value);
-			
+
 			// Always quote the value even if it is numeric, this is proper as parameters in Joomla are treated as strings
 			$value = '"' . str_replace('"', '\"', $value) . '"';
-			
+
 			// CASE: name is an array,  some'var[index1][inde'x2]=value    -->   ][\'some\\\'var\'][\'index1\'][\'index2\']=\'value\';
 			if (strpos($name, '[') !== false)
 			{
@@ -1665,7 +1680,7 @@ class plgSystemFlexisystem extends JPlugin
 				// Final create the assignment to be evaluated:  $parsed['na']['me'] = 'value';
 				eval('$parsed[\'' . $name . ' = ' . $value . "; \n");
 			}
-			
+
 			// CASE name is not an array, a single variable assignment
 			else {
 				// Add double slashes to index name
@@ -1677,8 +1692,8 @@ class plgSystemFlexisystem extends JPlugin
 		//echo "<pre>"; print_r($parsed);  echo "</pre>"; exit;
 		return $parsed;
 	}
-	
-	
+
+
 	/*
 	 * Function to restore serialized form data with:  JSON.stringify( jform.serializeArray() )
 	 */
@@ -1686,54 +1701,54 @@ class plgSystemFlexisystem extends JPlugin
 	{
 		$name_cnt = array();  // Empty index counters
 		$parsed = array();    // Decompressed data to be returned
-		
+
 		$pairs = json_decode($string, true);
 		$count = count($pairs);
 		//echo "<pre>"; print_r($pairs); echo "</pre>";
-		
+
 		foreach ($pairs as $pair)
 		{
 			$name = $pair['name'];
 			$value = $pair['value'];
-			
+
 			$name_cnt[$name] = isset($name_cnt[$name]) ? $name_cnt[$name] + 1 : 0;
 			$indexes = preg_split('/[\[]+/', $name);
-			
+
 			$point = & $parsed;
 			foreach($indexes as $n => &$index)
 			{
 				$index = trim($index, ']');
 				$index = $index === '' ? (string) $name_cnt[$name] : $index;
-				
+
 				if ($n+1 == count($indexes))
 				{
 					break;
 				}
-				
+
 				if ( !isset($point[$index]) )
 				{
 					$point[$index] = array();
 				}
-				
+
 				$point = & $point[$index];
 			}
-			
+
 			// Assign value and ... !! UNSET ARRAY REFERENCE, BEWARE !!
 			//if ($value=='__SAVED__') $value .= 'test';
 			$point[$index] = $value;
 			unset($index);
 		}
-		
+
 		//echo "<pre>"; print_r($parsed);  echo "</pre>"; exit;
 		return $parsed;
 	}
-	
-	
-	
+
+
+
 	function array_diff_recursive($arr1, $arr2)
 	{
 		$diff = array();
-		
+
 		foreach ($arr1 as $i => $v)
 		{
 			if (array_key_exists($i, $arr2))
@@ -1743,27 +1758,27 @@ class plgSystemFlexisystem extends JPlugin
 					$diff_rec = $this->array_diff_recursive($v, $arr2[$i]);
 					if (count($diff_rec)) $diff[$i] = $diff_rec;
 				}
-				
+
 				else if ($v != $arr2[$i]) {
 					$diff[$i] = $v;
 				}
 			}
-			
+
 			else {
 				$diff[$i] = $v;
 			}
 		}
-		
+
 		return $diff;
 	}
-	
-	
-	
-	
+
+
+
+
 	// ***
 	// *** Utility methods
 	// ***
-	
+
 	// Function by decide type of user, currently unused since we used user access level instead of this function
 	function getUserType()
 	{
@@ -1774,12 +1789,12 @@ class plgSystemFlexisystem extends JPlugin
 		$manager_grp = 6;
 		$admin_grp = 7;
 		$super_admin_grp = 8;
-		
+
 		$user = JFactory::getUser();
 		$coreUserGroups = $user->getAuthorisedGroups();
 		// $coreViewLevels = $user->getAuthorisedViewLevels();
 		$aid = max ($user->getAuthorisedViewLevels());
-		
+
 		$access = '';
 		if ($aid == 1)
 			$access = 'public'; // public
@@ -1795,7 +1810,7 @@ class plgSystemFlexisystem extends JPlugin
 			$access = 'admin'; // is admin user
 		if (in_array($super_admin_grp,$coreUserGroups))
 			$access = 'superadmin'; // is super admin user
-		
+
 		return $access;
 	}
 
@@ -1815,8 +1830,8 @@ class plgSystemFlexisystem extends JPlugin
 		$cache = JCache::getInstance('', $options);
 		return $cache;
 	}
-	
-	
+
+
 	/**
 	 * Event method onExtensionBeforeSave
 	 *
@@ -1831,8 +1846,8 @@ class plgSystemFlexisystem extends JPlugin
 		$app   = JFactory::getApplication();
 		$user  = JFactory::getUser();
 		$option = $app->input->get('component', '', 'cmd');
-		
-		
+
+
 		// ***
 		// *** Handle syncing permissions between com_content and com_flexicontent assets
 		// ***
@@ -1841,7 +1856,7 @@ class plgSystemFlexisystem extends JPlugin
 		{
 			$rules_arr = @ $_POST['jform']['rules'];
 			$option_other = $option == 'com_content'  ?  'com_flexicontent'  :  'com_content';
-			
+
 			// Only save permissions rules, if user is allowed to edit them
 			// and if rules exists (in J3.5+ they are saved via AJAX thus code would normally be triggered only in J3.2 - J3.4)
 			if ( $rules_arr!= null && $user->authorise('core.admin', $option) )
@@ -1856,10 +1871,10 @@ class plgSystemFlexisystem extends JPlugin
 					$asset->title = $option_other;
 					$asset->setLocation($root->id, 'last-child');
 				}
-				
+
 				// Get existing asset rules as an array
 				$asset_rules = json_decode($asset->rules, true);
-				
+
 				// Copy rules, clearing empty ones
 				foreach($rules_arr as $rule_name => $rule_data)
 				{
@@ -1873,7 +1888,7 @@ class plgSystemFlexisystem extends JPlugin
 					}
 					$asset_rules[$rule_name] = $rules_arr[$rule_name];
 				}
-				
+
 				// If com_content configuration was saved then restore cleared *.own rules, and re-save com_content asset
 				if ($option == 'com_content')
 				{
@@ -1891,11 +1906,11 @@ class plgSystemFlexisystem extends JPlugin
 						}
 					}
 				}
-				
+
 				// Save asset rules of the other component
 				$rules = new JAccessRules($asset_rules);
 				$asset->rules = (string) $rules;
-				
+
 				if (!$asset->check() || !$asset->store())
 				{
 					throw new RuntimeException($asset->getError());
@@ -1916,10 +1931,10 @@ class plgSystemFlexisystem extends JPlugin
 			// Check for non-empty layout parameter
 			$layout = $_POST['jform']['params']['layout'];
 			if (empty($layout)) return;
-			
+
 			// Check for currently supported cases, !!! TODO add case of MENUS
 			if (empty($table->module)) return;
-			
+
 			// Check if layout XML parameter file exists
 			$client = JApplicationHelper::getClientInfo($table->client_id);
 			$layoutpath = JPath::clean($client->path . '/modules/' . $table->module . '/tmpl/' . $layout .'.xml');
@@ -1928,7 +1943,7 @@ class plgSystemFlexisystem extends JPlugin
 				$layoutpath = JPath::clean($client->path . '/modules/' . $table->module . '/tmpl/_fallback/_fallback.xml');
 				if (!file_exists($layoutpath)) return;
 			}
-			
+
 			// Attempt to parse the XML file
 			$xml = simplexml_load_file($layoutpath);
 			if (!$xml)
@@ -1936,12 +1951,12 @@ class plgSystemFlexisystem extends JPlugin
 				JFactory::getApplication()->enqueueMessage('Error parsing layout file of "'.$new_ilayout.'". Layout parameters were not saved', 'warning');
 				return;
 			}
-			
+
 			// Create form object loading the , (form name seems not to cause any problem)
 			$jform = new JForm('com_flexicontent.layout', array('control' => 'jform', 'load_data' => false));
 			$tmpl_params = $xml->asXML();
 			$jform->load($tmpl_params);
-			
+
 			// Set cleared layout parameters
 			$fset = 'params';
 			$layout_post = array();
@@ -1958,7 +1973,7 @@ class plgSystemFlexisystem extends JPlugin
 				JFactory::getApplication()->enqueueMessage('Error validating layout posted parameters. Layout parameters were not saved', 'error');
 				return;
 			}
-			
+
 			$params = new JRegistry($table->params);
 			foreach ($jform->getGroup($fset) as $field)
 			{
@@ -1967,7 +1982,7 @@ class plgSystemFlexisystem extends JPlugin
 				$value = isset($layout_post[$fset][$fieldname]) ? $layout_post[$fset][$fieldname] : null;
 				$params->set($fieldname, $value);
 			}
-			
+
 			// Set parameters back to module's DB table object
 			$table->params = $params->toString();
 		}
@@ -2052,9 +2067,10 @@ class plgSystemFlexisystem extends JPlugin
 
 		// Get model and set default type if type not set already (new item or existing item with no type)
 		$model = new FlexicontentModelItem();
+
 		if (empty($data->type_id))
 		{
-			$types = flexicontent_html::getTypesList($type_ids=false, $check_perms = true, $published=true);		
+			$types = flexicontent_html::getTypesList($type_ids=false, $check_perms = true, $published=true);
 			$default_type = isset($types[$default_type_id])
 				? $types[$default_type_id]
 				: reset($types);
@@ -2083,7 +2099,7 @@ class plgSystemFlexisystem extends JPlugin
 		// ***
 		// *** Load CSS files
 		// ***
-		
+
 		!JFactory::getLanguage()->isRtl()
 			? $document->addStyleSheetVersion(JUri::root(true).'/components/com_flexicontent/assets/css/flexi_form.css', FLEXI_VHASH)
 			: $document->addStyleSheetVersion(JUri::root(true).'/components/com_flexicontent/assets/css/flexi_form_rtl.css', FLEXI_VHASH);
@@ -2114,19 +2130,19 @@ class plgSystemFlexisystem extends JPlugin
 		$_params->set('load-ui-dialog', 1);
 		$_params->set('load-ui-menu', $has_J2S ? 0 : 1);
 		$_params->set('load-ui-autocomplete', $has_J2S ? 0 : 1);
-		
+
 		flexicontent_html::loadJQuery( $add_jquery = 1, $add_jquery_ui = 1, $add_jquery_ui_css = 1, $add_remote = 1, $_params);   //flexicontent_html::loadFramework('jQuery');
 		flexicontent_html::loadFramework('select2');
 		flexicontent_html::loadFramework('touch-punch');
 		flexicontent_html::loadFramework('prettyCheckable');
 		flexicontent_html::loadFramework('flexi-lib');
 		flexicontent_html::loadFramework('flexi-lib-form');
-		
+
 		// Add js function to overload the joomla submitform validation
 		JHtml::_('behavior.formvalidation');  // load default validation JS to make sure it is overriden
 		$document->addScriptVersion(JUri::root(true).'/components/com_flexicontent/assets/js/admin.js', FLEXI_VHASH);
 		$document->addScriptVersion(JUri::root(true).'/components/com_flexicontent/assets/js/validate.js', FLEXI_VHASH);
-		
+
 		// Add js function for custom code used by FLEXIcontent item form
 		$document->addScriptVersion(JUri::root(true).'/components/com_flexicontent/assets/js/itemscreen.js', FLEXI_VHASH);
 
@@ -2134,7 +2150,7 @@ class plgSystemFlexisystem extends JPlugin
 		// ***
 		// *** Load field values from session (typically during a form reload after a servers-side form validation failure)
 		// *** NOTE: Because of fieldgroup rendering other fields, this step must be done in seperate loop, placed before FIELD HTML creation
-		// *** 
+		// ***
 
 		$jcustom = $app->getUserState('com_flexicontent.edit.item.custom');
 		foreach ($fields as $field)
@@ -2159,7 +2175,7 @@ class plgSystemFlexisystem extends JPlugin
 		{
 			FlexicontentFields::getFieldFormDisplay($field, $item, $user);
 		}
-		
+
 		global $form_fcitem; // TODO remove this global
 		$form_fcitem = $item;
 
@@ -2216,18 +2232,8 @@ class plgSystemFlexisystem extends JPlugin
 		}
 
 
-		static $init = null;
-		if (!$init)
-		{
-			JTable::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'tables');
-			
-			require_once (JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'defineconstants.php');
-			require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.fields.php');
-			require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.helper.php');
-			require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'permission.php');
-			require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'models'.DS.'item'.'.php');
-		}
-		
+		$this->_loadFcHelpersAndLanguage();
+
 		if (!isset($items[$row->id]))
 		{
 			$model = new FlexicontentModelItem();
@@ -2253,27 +2259,27 @@ class plgSystemFlexisystem extends JPlugin
 		);
 		$allow_jview = $item->parameters->get('allow_jview', 0);
 		$placement = $item->parameters->get('jview_fields_placement', 1);
-		
+
 		if ( $allow_jview != 1 || !$placement || !isset($placements_arr[$placement]) ) return;   //Disabled
 		if ( $placements_arr[$placement] != $eventName ) return;  // Not current event
-		
+
 		$fields_added[$row->id] = true; // Only add once
 		$view = 'com_content.article' ? 'item' : 'category';
 		FlexicontentFields::getFields($item, $view, $_item_params = null, $aid = null, $use_tmpl = false);  // $_item_params == null means only retrieve fields
-		
+
 		// Only Render custom fields
 		$displayed_fields = array();
 		foreach ($item->fields as $field)
 		{
 			if ($field->iscore) continue;
-			
+
 			$displayed_fields[$field->name] = $field;
 			$values = isset($item->fieldvalues[$field->id]) ? $item->fieldvalues[$field->id] : array();
 			FlexicontentFields::renderField($item, $field, $values, $method='display', $view, false, $row);
 		}
-		
+
 		if (!count($displayed_fields)) return null;
-		
+
 		// Render the list of groups
 		$field_html = array();
 		foreach($displayed_fields as $field_name => $field)
@@ -2289,7 +2295,7 @@ class plgSystemFlexisystem extends JPlugin
 				';
 		}
 		$_display = '<div class="fc-custom-fields-box">'.implode('', $field_html).'</div>';
-		
+
 		return $_display;
 	}
 
@@ -2429,9 +2435,9 @@ class plgSystemFlexisystem extends JPlugin
 			return true;
 		}
 
-		//*** 
+		//***
 		//*** Maintain flexicontent-specific article parameters
-		//*** 
+		//***
 
 		JLoader::register('FlexicontentModelItem', JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'models'.DS.'item.php');
 		$model = new FlexicontentModelItem();
@@ -2441,7 +2447,12 @@ class plgSystemFlexisystem extends JPlugin
 		$record->load($item->id);
 
 		$mergeProperties = array('attribs', 'metadata');
-		$mergeOptions = array('params_fset' => 'attribs', 'layout_type' => 'item', 'model_names' => array('com_flexicontent' => 'item', 'com_content' => 'article'));
+		$mergeOptions = array(
+			'params_fset'  => 'attribs',
+			'layout_type'  => 'item',
+			'model_names'  => array('com_flexicontent' => 'item', 'com_content' => 'article'),
+			'cssprep_save' => false,
+		);
 		$model->mergeAttributes($record, $data, $mergeProperties, $mergeOptions);
 
 		$item_data = array();
@@ -2474,18 +2485,12 @@ class plgSystemFlexisystem extends JPlugin
 			return true;
 		}
 
-		//***
-		//*** Call 'flexicontent' items model to update flexicontent item data: fields, version data, temporary data
-		//***
+		/**
+		 * Call 'flexicontent' items model to update flexicontent item data: fields, version data, temporary data
+		 */
 
-		JTable::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'tables');
-		require_once (JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'defineconstants.php');
-		require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.fields.php');
-		require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.helper.php');
-		require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.categories.php');
-		require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'permission.php');
-		JLoader::register('FlexicontentModelItem', JPATH_BASE.DS.'components'.DS.'com_flexicontent'.DS.'models'.DS.'item.php');
-		JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR);
+		$this->_loadFcHelpersAndLanguage();
+
 		$app  = JFactory::getApplication();
 
 		// Needed for new items, since now an item has been created
@@ -2515,9 +2520,10 @@ class plgSystemFlexisystem extends JPlugin
 
 		// Get model and set default type if type not set already (new item or existing item with no type)
 		$model = new FlexicontentModelItem();
+
 		if (empty($data['type_id']))
 		{
-			$types = flexicontent_html::getTypesList($type_ids=false, $check_perms = true, $published=true);		
+			$types = flexicontent_html::getTypesList($type_ids=false, $check_perms = true, $published=true);
 			$default_type = isset($types[$default_type_id])
 				? $types[$default_type_id]
 				: reset($types);
@@ -2529,6 +2535,7 @@ class plgSystemFlexisystem extends JPlugin
 		$tags_tmp = isset($data['tags']) ? $data['tags'] : null;
 		unset($data['tags']);
 
+		// Save FLEXIcontent item, using the provided data
 		$model->store($data);
 
 		// Revert changes to data
@@ -2578,20 +2585,23 @@ class plgSystemFlexisystem extends JPlugin
 
 	private function _loadFcHelpersAndLanguage()
 	{
+		JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR);
 		JTable::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'tables');
+
 		require_once (JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'defineconstants.php');
 		require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.fields.php');
 		require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.helper.php');
 		require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.categories.php');
 		require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'permission.php');
+
 		JLoader::register('FlexicontentModelItem', JPATH_BASE.DS.'components'.DS.'com_flexicontent'.DS.'models'.DS.'item.php');
-		JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR);
 	}
+
 
 	private function _addfavs($type, $item_ids, $user_id)
 	{
 		$db = JFactory::getDbo();
-		
+
 		if (!is_array($item_ids))
 		{
 			$obj = new stdClass();
@@ -2642,5 +2652,5 @@ class plgSystemFlexisystem extends JPlugin
 		 * null is no work done
 		 */
 		return null;
-	}	
+	}
 }
