@@ -196,7 +196,7 @@ foreach ($this->values as $n => $value)
 	// if no url, compatibility with old values
 	if (empty($map_link))
 	{
-		$map_link = "http://maps.google.com/maps?q=";
+		$map_link = "https://maps.google.com/maps?q=";
 		if(!empty($value['addr1']) && !empty($value['city']) && (!empty($value['province']) || !empty($value['state']))  && !empty($value['zip']))
 		{
 			$map_link .= urlencode(($value['addr1'] ? $value['addr1'].',' : '')
