@@ -2149,7 +2149,7 @@ class flexicontent_html
 	 * @return void
 	 * @since 1.0
 	 */
-	static function setitemstate($controller_obj, $type = 'html', $record_type = 'item')
+	static function setitemstate($controller_obj, $type = 'html', $record_name = 'item')
 	{
 		$app = JFactory::getApplication();
 		$jinput = $app->input;
@@ -2157,87 +2157,117 @@ class flexicontent_html
 		$id = $jinput->get('id', 0, 'int');
 		$jinput->set('cid', $id);
 
-		$model = $controller_obj->getModel($record_type);
-		$user = JFactory::getUser();
-		$state = $jinput->get('state', 0, 'int');
+		$model  = $controller_obj->getModel($record_name);
+		$record = $model->getItem($id);
+		$user   = JFactory::getUser();
+		$state  = $jinput->get('state', 0, 'int');
+		$perms  = FlexicontentHelperPerm::getPerm();
+
+		$archive_unsupported = false; //in_array($record_name, array('...', '...');
+		$trash_unsupported   = false; //in_array($record_name, array('...', '...');
 
 		// Determine priveleges of the current user on the given item
-		switch ($record_type)
+		if (!in_array($record_name, array('item', 'category', 'tag', 'review')))
 		{
-			case 'item':
-				$q = 'SELECT id, created_by, catid FROM #__content WHERE id =' . $id;
-				$asset = 'com_content.article.' . $id;
-				break;
-			case 'category':
-				$q = 'SELECT id, created_user_id as created_by, parent_id as catid FROM #__categories WHERE id =' . $id;
-				$asset = 'com_content.category.' . $id;
-				break;
-			case 'tag':
-				$q = 'SELECT id, created_user_id as created_by, parent_id as catid FROM #__tags WHERE id =' . $id;
-				$asset = 'com_tags.tag.' . $id;
-				$canManage = FlexicontentHelperPerm::getPerm()->CanTags ? true : false;
-				$archive_unsupported = false;
-				$trash_unsupported = false;
-				break;
-			default:
-				die('flexicontent_html::statebutton() , unknown type: ' . $record_type);
-				break;
+			die('flexicontent_html::' . __FUNCTION__ . '() , unknown type: ' . $record_name);
 		}
+
+		// Check if locked, (we catch case that property checked_out does not exist using empty()
+		$canCheckin = empty($record->checked_out) || $record->checked_out == $user->id || $user->authorise('core.admin', 'com_checkin');
 
 		// Determine privileges of the current user on the given item
-		if (isset($canManage))
+		$has_edit_state = $model->canEditState($record);
+		$has_delete     = $model->canDelete($record);
+		$has_archive    = $record_name === 'item' ? $has_edit_state && $perms->CanArchives : $has_edit_state;
+
+		// Clear access if record is locked
+		$has_edit_state = $canCheckin && $has_edit_state;
+		$has_delete     = $canCheckin && $has_delete;
+		$has_archive    = $canCheckin && $has_archive;
+
+		// Clear access if state is not supported
+		$has_delete  = $has_delete && empty($trash_unsupported);
+		$has_archive = $has_archive && empty($archive_unsupported);
+
+		// Has access to specific state, and doing the specific state change
+		$has_n_doing_edit_state = $has_edit_state && in_array($state, array(0,1,-3,-4,-5));
+		$has_n_doing_delete     = $has_delete && $state === -2;
+		$has_n_doing_archive    = $has_archive && $state === 2;
+
+		// Check if user can change of the item to the requested state
+		if (!$has_n_doing_edit_state && !$has_n_doing_delete && !$has_n_doing_archive)
 		{
-			$has_edit_state = $canManage;
-			$has_delete = $canManage;
-		}
-		else
-		{
-			// Get owner and other record data
-			$db = JFactory::getDbo();
-			$db->setQuery($q);
-			$record = $db->loadObject();
-
-			$has_edit_state = $user->authorise('core.edit.state', $asset) || ($user->authorise('core.edit.state.own', $asset) && $record->created_by == $user->get('id'));
-			$has_delete     = $user->authorise('core.delete', $asset) || ($user->authorise('core.delete.own', $asset) && $record->created_by == $user->get('id'));
-		}
-		$has_delete = $has_delete && empty($trash_unsupported);
-
-		// ...
-		$perms = FlexicontentHelperPerm::getPerm();
-		$has_archive    = $perms->CanArchives && empty($archive_unsupported);
-
-		$has_edit_state = $has_edit_state && in_array($state, array(0,1,-3,-4,-5));
-		$has_delete     = $has_delete     && $state == -2;
-		$has_archive    = $has_archive    && $state == 2;
-
-		// check if user can edit.state of the item
-		$access_msg = '';
-		if (!$has_edit_state && !$has_delete && !$has_archive)
-		{
-			//echo JText::_( 'FLEXI_NO_ACCESS_CHANGE_STATE' );
-			echo JText::_( 'FLEXI_DENIED' );   // must a few words
-			return;
+			// This must be short text, so not using 'FLEXI_NO_ACCESS_CHANGE_STATE'
+			jexit(JText::_('FLEXI_DENIED'));
 		}
 
 		// Set new item state (model will also handle cache cleaning)
 		if (!$model->setitemstate($id, $state))
 		{
 			$msg = JText::_('FLEXI_ERROR_SETTING_THE_ITEM_STATE') . ' : ' . $model->getError();
-			if ($type == 'json')
+
+			if ($type === 'json')
 			{
 				$app->enqueueMessage($msg, 'warning');
 				$data = array('error'=>flexicontent_html::get_system_messages_html(), 'html'=>'---', 'title'=>JText::_('Aborted'));
-				echo json_encode($data);
+				jexit(json_encode($data));
 			}
-			else	echo $msg;
-			return;
+			else
+			{
+				jexit($msg);
+			}
 		}
 
 		// Output new state icon and terminate
 		$tmpparams = new JRegistry();
 		$tmpparams->set('stateicon_popup', 'basic');
 		$stateicon = flexicontent_html::stateicon($state, $tmpparams, $type);
+
 		jexit($stateicon);
+	}
+
+
+	/**
+	 * Creates a font icon or image icon for the button according to configuration object
+	 *
+	 * @param  object  $params   Configuration parameters, typically of component plus some override
+	 * @param  array   $config   Configuration for creating the icon
+	 * @param  string  $icon     The icon HTML
+	 *
+	 * @since  3.3.0
+	 */
+	static function createFcBtnIcon($params, $config, & $icon)
+	{
+		static $icon_class = null;
+
+		$show_icons = (int) $params->get('show_icons', 2);
+		$use_font   = (int) $params->get('use_font_icons', 1);
+
+		if ($show_icons && $use_font)
+		{
+			if ($icon_class === null)
+			{
+				if (self::$icon_classes === null)
+				{
+					self::load_class_config();
+				}
+
+				$icon_class = !empty(self::$icon_classes[$config->iconname])
+					? self::$icon_classes[$config->iconname]
+					: $config->icondefault;
+
+				if ($show_icons === 2)
+				{
+					$icon_class .= ' fcIconPadRight';
+				}
+			}
+
+			$icon = '<i class="'.$icon_class.'"></i>';
+		}
+		elseif ($show_icons)
+		{
+			$icon = JHtml::image(FLEXI_ICONPATH . $config->iconimage, JText::_($config->icontitle), $attribs = '');
+		}
 	}
 
 
@@ -2287,44 +2317,41 @@ class flexicontent_html
 		$status = 'status=no,toolbar=no,scrollbars=yes,titlebar=no,menubar=no,resizable=yes,left=50,width=\'+(screen.width-100)+\',top=20,height=\'+(screen.height-160)+\',directories=no,location=no';
 		$onclick = ' window.open(this.href,\'win2\',\''.$status.'\'); return false; ';
 
-		// This checks template image directory for image, if none found, default image is returned
-		$show_icons = $params->get('show_icons', 2);
-		$use_font   = $params->get('use_font_icons', 1);
-		if ( $show_icons && $use_font ) {
-			static $icon_class = null;
-			if ($icon_class == null) {
-				if (self::$icon_classes==null) self::load_class_config();
-				$icon_class = empty(self::$icon_classes['feed']) ? 'icon-feed' : self::$icon_classes['feed'];
-				$icon_class .= ($show_icons==2 ? ' fcIconPadRight' : '');
-			}
-			$attribs = '';
-			$image = '<i class="'.$icon_class.'"></i>';
-		} else if ( $show_icons ) {
-			$attribs = '';
-			$image = JHtml::image(FLEXI_ICONPATH.'livemarks.png', JText::_( 'FLEXI_FEED' ), $attribs);
-		} else {
-			$image = '';
-		}
+		// Get font icon or image icon for the button
+		$config = (object) array(
+			'iconname' => 'feed',
+			'icondefault' => 'icon-feed',
+			'iconimage' => 'livemarks.png',
+			'icontitle' => 'FLEXI_FEED',
+		);
+
+		$show_icons = (int) $params->get('show_icons', 2);
+		$image = '';
+		self::createFcBtnIcon($params, $config, $image);
 
 		$overlib = JText::_( 'FLEXI_FEED_TIP' );
 		$text = JText::_( 'FLEXI_FEED' );
 
 		$button_classes = 'fc_feedbutton';
-		if ( $show_icons==1 ) {
+		if ($show_icons === 1)
+		{
 			$caption = '';
 			$button_classes .= '';
 			$tooltip_placement = 'bottom';
-		} else {
+		}
+		else
+		{
 			$caption = $text;
 			if ( !$params->get('btn_grp_dropdown', 0) ) $button_classes .= self::$use_bootstrap ? ' btn btn-small' : ' fc_button fcsimple fcsmall';
 			$tooltip_placement = !$params->get('btn_grp_dropdown', 0) ? 'bottom' : 'left';
 		}
+
 		$button_classes .= ' hasTooltip';
 		$tooltip_title = flexicontent_html::getToolTip($text, $overlib, 0);
 
 		// $link as set above
 		$output	= ' <a href="'.$link.'" class="'.$button_classes.'" data-placement="' . $tooltip_placement . '" title="'.$tooltip_title.'" onclick="'.$onclick.'" >'.$image.$caption.'</a>';
-		$output	= JText::_( 'FLEXI_ICON_SEP' ) .$output. JText::_( 'FLEXI_ICON_SEP' );
+		$output = JText::_('FLEXI_ICON_SEP') . $output . JText::_('FLEXI_ICON_SEP');
 
 		return $output;
 	}
@@ -2336,51 +2363,51 @@ class flexicontent_html
 	 * @param array $params
 	 * @since 1.0
 	 */
-	static function deletebutton( $item, &$params)
+	static function deletebutton($item, &$params)
 	{
 		if ( !$params->get('show_deletebutton', 0) || JFactory::getApplication()->input->getInt('print', 0) ) return;
 
 		$user	= JFactory::getUser();
 
 		// Determine if current user can delete the given item
-		$has_delete = false;
 		$asset = 'com_content.article.' . $item->id;
 		$has_delete = $user->authorise('core.delete', $asset) || ($item->created_by == $user->get('id') && $user->authorise('core.delete.own', $asset));
 
 		// Create the delete button only if user can delete the give item
-		if ( !$has_delete ) return;
-
-		$show_icons = $params->get('show_icons', 2);
-		$use_font   = $params->get('use_font_icons', 1);
-		if ( $show_icons && $use_font ) {
-			static $icon_class = null;
-			if ($icon_class == null) {
-				if (self::$icon_classes==null) self::load_class_config();
-				$icon_class = empty(self::$icon_classes['delete']) ? 'icon-delete' : self::$icon_classes['delete'];
-				$icon_class .= ($show_icons==2 ? ' fcIconPadRight' : '');
-			}
-			$attribs = '';
-			$image = '<i class="'.$icon_class.'"></i>';
-		} else if ( $show_icons ) {
-			$attribs = '';
-			$image = JHtml::image('components/com_flexicontent/assets/images/'.'delete.png', JText::_( 'FLEXI_DELETE' ), $attribs);
-		} else {
-			$image = '';
+		if (!$has_delete)
+		{
+			return;
 		}
+
+		// Get font icon or image icon for the button
+		$config = (object) array(
+			'iconname' => 'delete',
+			'icondefault' => 'icon-delete',
+			'iconimage' => 'delete.png',
+			'icontitle' => 'FLEXI_DELETE',
+		);
+
+		$show_icons = (int) $params->get('show_icons', 2);
+		$image = '';
+		self::createFcBtnIcon($params, $config, $image);
 
 		$overlib 	= JText::_( 'FLEXI_DELETE_TIP' );
 		$text 		= JText::_( 'FLEXI_DELETE' );
 
 		$button_classes = 'fc_deletebutton';
-		if ( $show_icons==1 ) {
+		if ($show_icons === 1)
+		{
 			$caption = '';
 			$button_classes .= '';
 			$tooltip_placement = 'bottom';
-		} else {
+		}
+		else
+		{
 			$caption = $text;
 			if ( !$params->get('btn_grp_dropdown', 0) ) $button_classes .= self::$use_bootstrap ? ' btn btn-small' : ' fc_button fcsimple fcsmall';
 			$tooltip_placement = !$params->get('btn_grp_dropdown', 0) ? 'bottom' : 'left';
 		}
+
 		$button_classes .= ' hasTooltip';
 		$tooltip_title = flexicontent_html::getToolTip($text, $overlib, 0);
 
@@ -2392,7 +2419,7 @@ class flexicontent_html
 		$confirm_text = JText::_('FLEXI_ARE_YOU_SURE_PERMANENT_DELETE', true);
 
 		$output	= ' <a href="'.$link.'" class="'.$button_classes.'" data-placement="' . $tooltip_placement . '" onclick="return confirm(\''.$confirm_text.'\')" target="'.$targetLink.'" title="'.$tooltip_title.'">'.$image.$caption.'</a>';
-		$output	= JText::_( 'FLEXI_ICON_SEP' ) .$output. JText::_( 'FLEXI_ICON_SEP' );
+		$output = JText::_('FLEXI_ICON_SEP') . $output . JText::_('FLEXI_ICON_SEP');
 
 		return $output;
 	}
@@ -2431,44 +2458,41 @@ class flexicontent_html
 		$status = 'status=no,toolbar=no,scrollbars=yes,titlebar=no,menubar=no,resizable=yes,left=50,width=\'+(screen.width-100)+\',top=20,height=\'+(screen.height-160)+\',directories=no,location=no';
 		$onclick = ' window.open(this.href,\'win2\',\''.$status.'\'); return false; ';
 
-		// This checks template image directory for image, if none found, default image is returned
-		$show_icons = $params->get('show_icons', 2);
-		$use_font   = $params->get('use_font_icons', 1);
-		if ( $show_icons && $use_font ) {
-			static $icon_class = null;
-			if ($icon_class == null) {
-				if (self::$icon_classes==null) self::load_class_config();
-				$icon_class = empty(self::$icon_classes['csv']) ? 'icon-download' : self::$icon_classes['csv'];
-				$icon_class .= ($show_icons==2 ? ' fcIconPadRight' : '');
-			}
-			$attribs = '';
-			$image = '<i class="'.$icon_class.'"></i>';
-		} else if ( $show_icons ) {
-			$attribs = '';
-			$image = JHtml::image('components/com_flexicontent/assets/images/'.'csv.png', JText::_( 'FLEXI_CSV_EXPORT' ), $attribs);
-		} else {
-			$image = '';
-		}
+		// Get font icon or image icon for the button
+		$config = (object) array(
+			'iconname' => 'csv',
+			'icondefault' => 'icon-download',
+			'iconimage' => 'csv.png',
+			'icontitle' => 'FLEXI_CSV_EXPORT',
+		);
+
+		$show_icons = (int) $params->get('show_icons', 2);
+		$image = '';
+		self::createFcBtnIcon($params, $config, $image);
 
 		$overlib = JText::_( 'FLEXI_CSV_TIP' );
 		$text = JText::_( 'FLEXI_CSV' );
 
 		$button_classes = 'fc_csvbutton';
-		if ( $show_icons==1 ) {
+		if ($show_icons === 1)
+		{
 			$caption = '';
 			$button_classes .= '';
 			$tooltip_placement = 'bottom';
-		} else {
+		}
+		else
+		{
 			$caption = $text;
 			if ( !$params->get('btn_grp_dropdown', 0) ) $button_classes .= self::$use_bootstrap ? ' btn btn-small' : ' fc_button fcsimple fcsmall';
 			$tooltip_placement = !$params->get('btn_grp_dropdown', 0) ? 'bottom' : 'left';
 		}
+
 		$button_classes .= ' hasTooltip';
 		$tooltip_title = flexicontent_html::getToolTip($text, $overlib, 0);
 
 		// $link as set above
 		$output	= ' <a href="'.$link.'" class="'.$button_classes.'" data-placement="' . $tooltip_placement . '" title="'.$tooltip_title.'" onclick="'.$onclick.'" >'.$image.$caption.'</a>';
-		$output	= JText::_( 'FLEXI_ICON_SEP' ) .$output. JText::_( 'FLEXI_ICON_SEP' );
+		$output = JText::_('FLEXI_ICON_SEP') . $output . JText::_('FLEXI_ICON_SEP');
 
 		return $output;
 	}
@@ -2481,7 +2505,7 @@ class flexicontent_html
 	 * @param array $params
 	 * @since 1.0
 	 */
-	static function printbutton( $print_link, &$params )
+	static function printbutton($print_link, &$params)
 	{
 		if ( !$params->get('show_print_icon') || JFactory::getApplication()->input->getInt('print', 0) ) return;
 
@@ -2489,44 +2513,42 @@ class flexicontent_html
 		$onclick = ' window.open(this.href,\'win2\',\''.$status.'\'); return false; ';
 		$link = JRoute::_($print_link);
 
-		// This checks template image directory for image, if none found, default image is returned
-		$show_icons = $params->get('show_icons', 2);
-		$use_font   = $params->get('use_font_icons', 1);
-		if ( $show_icons && $use_font ) {
-			static $icon_class = null;
-			if ($icon_class == null) {
-				if (self::$icon_classes==null) self::load_class_config();
-				$icon_class = empty(self::$icon_classes['print']) ? 'icon-print' : self::$icon_classes['print'];
-				$icon_class .= ($show_icons==2 ? ' fcIconPadRight' : '');
-			}
-			$attribs = '';
-			$image = '<i class="'.$icon_class.'"></i>';
-		} else if ( $show_icons ) {
-			$attribs = '';
-			$image = JHtml::image(FLEXI_ICONPATH.'printButton.png', JText::_( 'FLEXI_PRINT' ), $attribs);
-		} else {
-			$image = '';
-		}
+		// Get font icon or image icon for the button
+		$config = (object) array(
+			'iconname' => 'print',
+			'icondefault' => 'icon-print',
+			'iconimage' => 'printButton.png',
+			'icontitle' => 'FLEXI_PRINT',
+		);
+
+		$show_icons = (int) $params->get('show_icons', 2);
+		$image = '';
+		self::createFcBtnIcon($params, $config, $image);
 
 		$overlib = JText::_( 'FLEXI_PRINT_TIP' );
 		$text = JText::_( 'FLEXI_PRINT' );
 
 		$button_classes = 'fc_printbutton';
-		if ( $show_icons==1 ) {
+
+		if ($show_icons === 1)
+		{
 			$caption = '';
 			$button_classes .= '';
 			$tooltip_placement = 'bottom';
-		} else {
+		}
+		else
+		{
 			$caption = $text;
 			if ( !$params->get('btn_grp_dropdown', 0) ) $button_classes .= self::$use_bootstrap ? ' btn btn-small' : ' fc_button fcsimple fcsmall';
 			$tooltip_placement = !$params->get('btn_grp_dropdown', 0) ? 'bottom' : 'left';
 		}
+
 		$button_classes .= ' hasTooltip';
 		$tooltip_title = flexicontent_html::getToolTip($text, $overlib, 0);
 
 		// $link as set above
 		$output	= ' <a href="'.$link.'" class="'.$button_classes.'" data-placement="' . $tooltip_placement . '" title="'.$tooltip_title.'" onclick="'.$onclick.'" rel="nofollow">'.$image.$caption.'</a>';
-		$output	= JText::_( 'FLEXI_ICON_SEP' ) .$output. JText::_( 'FLEXI_ICON_SEP' );
+		$output = JText::_('FLEXI_ICON_SEP') . $output . JText::_('FLEXI_ICON_SEP');
 
 		return $output;
 	}
@@ -2578,44 +2600,42 @@ class flexicontent_html
 		$status = 'left=50,width=\'+((screen.width-100) > 800 ? 800 : (screen.width-100))+\',top=20,height=\'+((screen.width-160) > 800 ? 800 : (screen.width-160))+\',menubar=yes,resizable=yes';
 		$onclick = ' window.open(this.href,\'win2\',\''.$status.'\'); return false; ';
 
-		// This checks template image directory for image, if none found, default image is returned
-		$show_icons = $params->get('show_icons', 2);
-		$use_font   = $params->get('use_font_icons', 1);
-		if ( $show_icons && $use_font ) {
-			static $icon_class = null;
-			if ($icon_class == null) {
-				if (self::$icon_classes==null) self::load_class_config();
-				$icon_class = empty(self::$icon_classes['mail']) ? 'icon-envelope' : self::$icon_classes['mail'];
-				$icon_class .= ($show_icons==2 ? ' fcIconPadRight' : '');
-			}
-			$attribs = '';
-			$image = '<i class="'.$icon_class.'"></i>';
-		} else if ( $show_icons ) {
-			$attribs = '';
-			$image = JHtml::image(FLEXI_ICONPATH.'emailButton.png', JText::_( 'FLEXI_EMAIL' ), $attribs);
-		} else {
-			$image = '';
-		}
+		// Get font icon or image icon for the button
+		$config = (object) array(
+			'iconname' => 'mail',
+			'icondefault' => 'icon-envelope',
+			'iconimage' => 'emailButton.png',
+			'icontitle' => 'FLEXI_EMAIL',
+		);
+
+		$show_icons = (int) $params->get('show_icons', 2);
+		$image = '';
+		self::createFcBtnIcon($params, $config, $image);
 
 		$overlib = JText::_( 'FLEXI_EMAIL_TIP' );
 		$text = JText::_( 'FLEXI_EMAIL' );
 
 		$button_classes = 'fc_mailbutton';
-		if ( $show_icons==1 ) {
+
+		if ($show_icons === 1)
+		{
 			$caption = '';
 			$button_classes .= '';
 			$tooltip_placement = 'bottom';
-		} else {
+		}
+		else
+		{
 			$caption = $text;
 			if ( !$params->get('btn_grp_dropdown', 0) ) $button_classes .= self::$use_bootstrap ? ' btn btn-small' : ' fc_button fcsimple fcsmall';
 			$tooltip_placement = !$params->get('btn_grp_dropdown', 0) ? 'bottom' : 'left';
 		}
+
 		$button_classes .= ' hasTooltip';
 		$tooltip_title = flexicontent_html::getToolTip($text, $overlib, 0);
 
 		// emailed link was set above
 		$output	= ' <a href="'.$mail_to_url.'" class="'.$button_classes.'" data-placement="' . $tooltip_placement . '" title="'.$tooltip_title.'" onclick="'.$onclick.'" rel="nofollow">'.$image.$caption.'</a>';
-		$output	= JText::_( 'FLEXI_ICON_SEP' ) .$output. JText::_( 'FLEXI_ICON_SEP' );
+		$output = JText::_('FLEXI_ICON_SEP') . $output . JText::_('FLEXI_ICON_SEP');
 
 		return $output;
 	}
@@ -2628,47 +2648,46 @@ class flexicontent_html
 	 * @param array $params
 	 * @since 1.0
 	 */
-	static function pdfbutton( $item, &$params)
+	static function pdfbutton($item, &$params)
 	{
 		if ( FLEXI_J16GE || !$params->get('show_pdf_icon') || JFactory::getApplication()->input->getInt('print', 0) ) return;
 
-		$show_icons = $params->get('show_icons', 2);
-		$use_font   = $params->get('use_font_icons', 1);
-		if ( $show_icons && $use_font ) {
-			static $icon_class = null;
-			if ($icon_class == null) {
-				if (self::$icon_classes==null) self::load_class_config();
-				$icon_class = empty(self::$icon_classes['pdf']) ? 'icon-book' : self::$icon_classes['pdf'];
-				$icon_class .= ($show_icons==2 ? ' fcIconPadRight' : '');
-			}
-			$attribs = '';
-			$image = '<i class="'.$icon_class.'"></i>';
-		} else if ( $show_icons ) {
-			$attribs = '';
-			$image = JHtml::image(FLEXI_ICONPATH.'pdf_button.png', JText::_( 'FLEXI_CREATE_PDF' ), $attribs);
-		} else {
-			$image = '';
-		}
+		// Get font icon or image icon for the button
+		$config = (object) array(
+			'iconname' => 'pdf',
+			'icondefault' => 'icon-book',
+			'iconimage' => 'pdf_button.png',
+			'icontitle' => 'FLEXI_CREATE_PDF',
+		);
+
+		$show_icons = (int) $params->get('show_icons', 2);
+		$image = null;
+		self::createFcBtnIcon($params, $config, $image);
 
 		$overlib = JText::_( 'FLEXI_CREATE_PDF_TIP' );
 		$text = JText::_( 'FLEXI_CREATE_PDF' );
 
 		$button_classes = 'fc_pdfbutton';
-		if ( $show_icons==1 ) {
+
+		if ($show_icons === 1)
+		{
 			$caption = '';
 			$button_classes .= '';
 			$tooltip_placement = 'bottom';
-		} else {
+		}
+		else
+		{
 			$caption = $text;
 			if ( !$params->get('btn_grp_dropdown', 0) ) $button_classes .= self::$use_bootstrap ? ' btn btn-small' : ' fc_button fcsimple fcsmall';
 			$tooltip_placement = !$params->get('btn_grp_dropdown', 0) ? 'bottom' : 'left';
 		}
+
 		$button_classes .= ' hasTooltip';
 		$tooltip_title = flexicontent_html::getToolTip($text, $overlib, 0);
 
 		$link 	= JRoute::_('index.php?view='.FLEXI_ITEMVIEW.'&cid='.$item->categoryslug.'&id='.$item->slug.'&format=pdf');
 		$output	= ' <a href="'.$link.'" class="'.$button_classes.'" data-placement="' . $tooltip_placement . '" title="'.$tooltip_title.'">'.$image.$caption.'</a>';
-		$output	= JText::_( 'FLEXI_ICON_SEP' ) .$output. JText::_( 'FLEXI_ICON_SEP' );
+		$output = JText::_('FLEXI_ICON_SEP') . $output . JText::_('FLEXI_ICON_SEP');
 
 		return $output;
 	}
@@ -2681,84 +2700,86 @@ class flexicontent_html
 	 * @param array $params
 	 * @since 1.0
 	 */
-	static function statebutton( $item, $params=null, $addToggler=true, $tooltip_placement=null, $class=null, $ops = array('controller'=>'items', 'state_propname'=>'state') )
+	static function statebutton($record, $params = null, $config = null)
 	{
-		// Some static variables
-		static $user;
-		static $nullDate;
-		static $isAdmin;
-		static $isPrint;
-		static $img_path;
-		static $use_font_icons;
-
-		static $has_archive = null;
-		static $has_checkin = null;
-
-		if ($has_archive === null)
-		{
-			$user = JFactory::getUser();
-			$nullDate = JFactory::getDbo()->getNullDate();
-			$isAdmin  = JFactory::getApplication()->isAdmin();
-			$isPrint  = JFactory::getApplication()->input->getInt('print', 0);
-			$img_path = JUri::root(true) . '/components/com_flexicontent/assets/images/';
-			$use_font_icons = $isAdmin || ($params && $params->get('use_font_icons', 1));
-
-			$has_archive = FlexicontentHelperPerm::getPerm()->CanArchives;
-			$has_checkin = $user->authorise('core.admin', 'com_checkin');
-		}
+		$config = $config ?: (object) array(
+			'controller'     => 'items',
+			'record_name'    => 'item',
+			'state_propname' => 'state',
+			'addToggler'     => true,
+			'tipPlacement'   => null,
+			'class'          => null, 
+		);
+	
+		$user    = JFactory::getUser();
+		$isAdmin = JFactory::getApplication()->isAdmin();
+		$isPrint = JFactory::getApplication()->input->getInt('print', 0);
 
 		// Check if state icon should not be shown (note: parameters are usually NULL in backend)
-		if ( !$isAdmin && ($params && !$params->get('show_state_icon', 1) || $isPrint) ) return;
-
-		// Determine edit state, delete privileges of the current user on the given item, NOTE: currently we ignore canCheckin in frontend
-		switch ($ops['controller'])
+		if (!$isAdmin && ($params && !$params->get('show_state_icon', 1) || $isPrint))
 		{
-			case 'items':
-				$asset = 'com_content.article.' . $item->id;
-				$created_by = $item->created_by;
-				$refresh_on_success = 'false';
-				break;
-			case 'categories':
-				$asset = 'com_content.category.' . $item->id;
-				$created_by = $item->created_user_id;
-				$refresh_on_success = 'true';
-				break;
-			case 'tags':
-				$canManage = FlexicontentHelperPerm::getPerm()->CanTags ? true : false;
-				$refresh_on_success = 'false';
-				$archive_unsupported = false;
-				$trash_unsupported = false;
-				break;
-			default:
-				die('flexicontent_html::statebutton() , unknown type: ' . $ops['controller']);
-				break;
+			return;
 		}
 
-		$item->canCheckin   = isset($item->canCheckin)   ? $item->canCheckin   : $has_checkin || $item->checked_out == 0 || $item->checked_out == $user->id;
-		if (isset($canManage))
+		$recordClass = 'FlexicontentModel' . ucfirst($config->record_name);
+		JLoader::register($recordClass, JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'models'.DS.$config->record_name.'.php');
+
+		try
 		{
-			$item->canEditState = isset($item->canEditState) ? $item->canEditState : $canManage;
-			$item->canDelete    = isset($item->canDelete)    ? $item->canDelete    : $canManage;
+			$model = new $recordClass();
 		}
-		else
+		catch (Exception $e)
 		{
-			$item->canEditState = isset($item->canEditState) ? $item->canEditState : (!$isAdmin || $item->canCheckin) && ($user->authorise('core.edit.state', $asset) || ($created_by == $user->get('id') && $user->authorise('core.edit.state.own', $asset)));
-			$item->canDelete    = isset($item->canDelete)    ? $item->canDelete    : (!$isAdmin || $item->canCheckin) && ($user->authorise('core.delete', $asset)     || ($created_by == $user->get('id') && $user->authorise('core.delete.own', $asset)));
+			die('flexicontent_html::' . __FUNCTION__ . '() , unknown type: ' . $record_name);
 		}
 
-		$item->canDelete = $item->canDelete && empty($trash_unsupported);
+		$archive_unsupported = false; //in_array($record_name, array('...', '...');
+		$trash_unsupported   = false; //in_array($record_name, array('...', '...');
+		$refresh_on_success  = in_array($config->record_name, array('category')) ? 'true' : 'false';
+
+
+		/**
+		 * Calculate Edit / Edit state if not already calculated, some record types
+		 * do not have atomic assets, for them we will use 'canManage' permission
+		 */
+
+		$canArchives = $config->record_name == 'item' ? FlexicontentHelperPerm::getPerm()->CanArchives : null;
+
+		$record->canCheckin = isset($record->canCheckin)
+			? $record->canCheckin
+			: empty($record->checked_out) || $record->checked_out == $user->id || $user->authorise('core.admin', 'com_checkin');
+
+		$record->canEditState = isset($record->canEditState) ? $record->canEditState : $model->canEditState($record);
+		$record->canDelete    = isset($record->canDelete) ? $record->canDelete : $model->canDelete($record);
+
+		// Clear access if record is locked
+		$has_edit_state = $record->canCheckin && $record->canEditState;
+		$has_delete     = $record->canCheckin && $record->canDelete;
+		$has_archive    = $record->canCheckin && $record->canEditState && ($canArchives || $canArchives === null);
+
+		// Clear access if state is not supported
+		$has_delete  = $has_delete && empty($trash_unsupported);
 		$has_archive = $has_archive && empty($archive_unsupported);
 
-		// Display state toggler if it can do any of state change
-		$canChangeState = $item->canEditState || $item->canDelete || $has_archive;
+		$canChangeState = $has_edit_state || $has_delete || $has_archive;
+
+		// Some string and flags
+		$nullDate       = JFactory::getDbo()->getNullDate();
+		$img_path       = JUri::root(true) . '/components/com_flexicontent/assets/images/';
+		$use_font_icons = $isAdmin || ($params && $params->get('use_font_icons', 1));
+
+
+		/**
+		 * Display state toggler if it can do any of state change
+		 */
 
 		static $js_and_css_added = false;
 
-		if (!$js_and_css_added && $canChangeState && $addToggler )
+		if (!$js_and_css_added && $canChangeState && $config->addToggler)
 		{
 			// File exists both in frontend & backend (and is different), so we will use 'base' method and not 'root'
 			JText::script('FLEXI_ACTION', true);
-			if ($ops['controller'] === 'items')
+			if ($config->record_name == 'item')
 			{
 				JText::script('FLEXI_SET_STATE_AS_IN_PROGRESS', true);
 				JText::script('FLEXI_SET_STATE_AS_PENDING', true);
@@ -2775,7 +2796,7 @@ class flexicontent_html
 			$doc->addScriptVersion(JUri::root(true).'/components/com_flexicontent/assets/js/stateselector.js', FLEXI_VHASH);
 			$js = '
 				var fc_statehandler_singleton = new fc_statehandler({
-					task: ' . json_encode($isAdmin ? $ops['controller'] . '.setitemstate' : 'setitemstate') . ',
+					task: ' . json_encode($isAdmin ? $config->controller . '.setitemstate' : 'setitemstate') . ',
 					img_path: ' . json_encode($img_path) . ',
 					font_icons: ' . ($use_font_icons ? 'true' : 'false') . ',
 					refresh_on_success: ' . $refresh_on_success . '
@@ -2795,36 +2816,44 @@ class flexicontent_html
 		static $jtext = array();
 		static $icon_params = null;
 
-		if ( !$state_names )
+		if (!$state_names)
 		{
 			$state_names  = array(1=>JText::_('FLEXI_PUBLISHED'), -5=>JText::_('FLEXI_IN_PROGRESS'), 0=>JText::_('FLEXI_UNPUBLISHED'), -3=>JText::_('FLEXI_PENDING'), -4=>JText::_('FLEXI_TO_WRITE'), 2=>JText::_('FLEXI_ARCHIVED'), -2=>JText::_('FLEXI_TRASHED'), 'u'=>JText::_('FLEXI_UNKNOWN'));
 			$state_descrs = array(1=>JText::_('FLEXI_PUBLISH_THIS_ITEM'), -5=>JText::_('FLEXI_SET_STATE_AS_IN_PROGRESS'), 0=>JText::_('FLEXI_UNPUBLISH_THIS_ITEM'), -3=>JText::_('FLEXI_SET_STATE_AS_PENDING'), -4=>JText::_('FLEXI_SET_STATE_AS_TO_WRITE'), 2=>JText::_('FLEXI_ARCHIVE_THIS_ITEM'), -2=>JText::_('FLEXI_TRASH_THIS_ITEM'), 'u'=>'FLEXI_UNKNOWN');
 			$state_imgs   = array(1=>'accept.png', -5=>'publish_g.png', 0=>'publish_x.png', -3=>'publish_r.png', -4=>'publish_y.png', 2=>'archive.png', -2=>'trash.png', 'u'=>'unknown.png');
-			$font_icons   = array(1=>'publish', -5=>'checkmark-2', 0=>'unpublish', -3=>'clock', -4=>'pencil-2', 2=>'archive', -2=>'trash', 'u'=>'question-2');
+			$font_icons   = array(1=>'publish', -5=>'checkmark-2', 0=>'unpublish', -3=>'question', -4=>'pencil-2', 2=>'archive', -2=>'trash', 'u'=>'question-2');
 
 			$tooltip_class = ' hasTooltip';
 			$state_tips = array();
 			$title_header = '';//JText::_( 'FLEXI_ACTION' );
+
 			foreach ($state_names as $state_id => $i)
 			{
 				$state_tips[$state_id] = flexicontent_html::getToolTip($title_header, $state_descrs[$state_id], 0, 1);
 			}
 
 			$button_classes = 'fc_statebutton';
-			if ($class)
-				$button_classes .= ' '.$class;
-			else if ( !$params || !$params->get('btn_grp_dropdown', 0) )
-				$button_classes .= self::$use_bootstrap ? ' btn btn-small' : ' fc_button fcsimple fcsmall';
-			else
-				$button_classes .= ' btn';
 
-			$jtext['icon_sep'] = JText::_( 'FLEXI_ICON_SEP' );
-			$jtext['start_always'] = JText::_( 'FLEXI_START_ALWAYS' );
-			$jtext['start'] = JText::_( 'FLEXI_START' );
-			$jtext['finish_no_expiry'] = JText::_( 'FLEXI_FINISH_NO_EXPIRY' );
-			$jtext['finish'] = JText::_( 'FLEXI_FINISH' );
-			$jtext['change_state'] = JText::_('FLEXI_CLICK_TO_CHANGE_STATE');
-			$jtext['action'] = JText::_('FLEXI_ACTION');
+			if ($config->class)
+			{
+				$button_classes .= ' ' . $config->class;
+			}
+			elseif (!$params || !$params->get('btn_grp_dropdown', 0))
+			{
+				$button_classes .= self::$use_bootstrap ? ' btn btn-small' : ' fc_button fcsimple fcsmall';
+			}
+			else
+			{
+				$button_classes .= ' btn';
+			}
+
+			$jtext['icon_sep']         = JText::_('FLEXI_ICON_SEP');
+			$jtext['start_always']     = JText::_('FLEXI_START_ALWAYS');
+			$jtext['start']            = JText::_('FLEXI_START');
+			$jtext['finish_no_expiry'] = JText::_('FLEXI_FINISH_NO_EXPIRY');
+			$jtext['finish']           = JText::_('FLEXI_FINISH');
+			$jtext['change_state']     = JText::_('FLEXI_CLICK_TO_CHANGE_STATE');
+			$jtext['action']           = JText::_('FLEXI_ACTION');
 
 			$icon_params = new JRegistry();
 			$icon_params->set('stateicon_popup', 'none');
@@ -2832,10 +2861,15 @@ class flexicontent_html
 		}
 
 		// Create state icon
-		$state = $item->{$ops['state_propname']};
-		if ( !isset($state_names[$state]) ) $state = 'u';
-		$state_text ='';
-		$stateicon = flexicontent_html::stateicon($state, $icon_params, 'html', $state_text);
+		$state = $record->{$config->state_propname};
+
+		if (!isset($state_names[$state]))
+		{
+			$state = 'u';
+		}
+
+		$state_text = '';
+		$stateicon = flexicontent_html::stateicon($state, $icon_params, 'html', $state_text, $record, $show_status = 2);
 
 		$tz_string = JFactory::getApplication()->getCfg('offset');
 		$tz = new DateTimeZone( $tz_string );
@@ -2843,45 +2877,61 @@ class flexicontent_html
 
 		// Create publish information
 		$publish_info = array();
-		if (isset($item->publish_up))
+
+		if (isset($record->publish_up))
 		{
-			$publish_up = JFactory::getDate($item->publish_up);
+			$publish_up = JFactory::getDate($record->publish_up);
 			$publish_up->setTimezone($tz);
-			$publish_info[] = $item->publish_up == $nullDate
+			$publish_info[] = $record->publish_up == $nullDate
 				? $jtext['start_always']
 				: $jtext['start'] .": ". JHtml::_('date', $publish_up->toSql(), 'Y-m-d H:i:s');
 		}
-		if (isset($item->publish_down))
+
+		if (isset($record->publish_down))
 		{
-			$publish_down = JFactory::getDate($item->publish_down);
+			$publish_down = JFactory::getDate($record->publish_down);
 			$publish_down->setTimezone($tz);
-			$publish_info[] = $item->publish_down == $nullDate
+			$publish_info[] = $record->publish_down == $nullDate
 				? $jtext['finish_no_expiry']
 				: $jtext['finish'] .": ". JHtml::_('date', $publish_down->toSql(), 'Y-m-d H:i:s');
 		}
 
 
 		// Create the state selector button and return it
-		if ( $canChangeState && $addToggler )
+		if ($canChangeState && $config->addToggler)
 		{
 			// Only add user's permitted states on the current item
-			if ($item->canEditState)
+			if ($has_edit_state)
 			{
-				$state_ids = $ops['controller'] === 'items'
+				$state_ids = $config->record_name == 'item'
 					? array(1, -5, 0, -3, -4)
 					: array(1, 0);
 			}
-			if ($has_archive)      $state_ids[] = 2;
-			if ($item->canDelete)  $state_ids[] = -2;
 
-			if ($tooltip_placement === 'top')
-				$tooltip_placement = '';
-			elseif ($tooltip_placement)
-				;
+			if ($has_archive)
+			
+			{
+				$state_ids[] = 2;
+			}
+
+			if ($has_delete)
+			
+			{
+				$state_ids[] = -2;
+			}
+
+			if ($config->tipPlacement)
+			{
+				$tooltip_placement = $config->tipPlacement !== 'top' ? $config->tipPlacement : '';
+			}
 			elseif (!$params || !$params->get('show_icons', 2))
+			{
 				$tooltip_placement = 'bottom';
+			}
 			else
+			{
 				$tooltip_placement = !$params->get('btn_grp_dropdown', 0) ? 'bottom' : 'left';
+			}
 
 			//$allowed_states = array();
 			//$allowed_states[] = '<div>'.$jtext['action'].'</div>');
@@ -2889,7 +2939,7 @@ class flexicontent_html
 			{
 				$state_data[] = array('i'=>$state_id);
 				/*$allowed_states[] ='
-					<span onclick="fc_statehandler_singleton.setstate(\''.$state_id.'\', \''.$item->id.'\')">
+					<span onclick="fc_statehandler_singleton.setstate(\''.$state_id.'\', \'' . $record->id . '\')">
 						'.($use_font_icons ? '<span class="icon-'.$font_icons[$state_id].'"></span>' : '<img src="'.$img_path.$state_imgs[$state_id].'" alt="s" /> ').$state_tips[$state_id].'
 					</span>';*/
 			}
@@ -2897,15 +2947,16 @@ class flexicontent_html
 			$output = '
 			<div class="statetoggler '.$button_classes.' '.$tooltip_class.'" ' . ($tooltip_placement ? ' data-placement="' . $tooltip_placement . '"' : '') . ' title="'.$tooltip_title.'" onclick="fc_statehandler_singleton.toggleSelector(this)">
 				<div class="statetoggler_inner">
-					<div id="row'.$item->id.'" class="stateopener ntxt">
+					<div id="row' . $record->id . '" class="stateopener ntxt">
 						'.$stateicon.'
 					</div>
-					<div class="options" data-id="'.$item->id.'" data-st="'.htmlspecialchars(json_encode($state_data), ENT_COMPAT, 'UTF-8').'">'/*.implode('', $allowed_states)*/.'</div>
+					<div class="options" data-id="' . $record->id . '" data-st="'.htmlspecialchars(json_encode($state_data), ENT_COMPAT, 'UTF-8').'">'/*.implode('', $allowed_states)*/.'</div>
 				</div>
 			</div>';
 		}
 
-		else if ($isAdmin)  // Backend, possibly with state selector disabled
+		// Backend, possibly with state selector disabled
+		elseif ($isAdmin)
 		{
 			if ($canChangeState)
 			{
@@ -2914,7 +2965,7 @@ class flexicontent_html
 
 			$tooltip_title = flexicontent_html::getToolTip(JText::_( 'FLEXI_PUBLISH_INFORMATION' ), implode("\n<br/>\n", $publish_info), 0);
 			$output = '
-				<div id="row'.$item->id.'" class="statetoggler_disabled '.$class.'">
+				<div id="row' . $record->id . '" class="statetoggler_disabled ' . $config->class . '">
 					<span class="'.$tooltip_class.'" title="'.$tooltip_title.'">
 						'.$stateicon.'
 					</span>
@@ -2938,7 +2989,7 @@ class flexicontent_html
 	 * @param array $params
 	 * @since 1.0
 	 */
-	static function approvalbutton( $item, &$params)
+	static function approvalbutton($item, &$params)
 	{
 		if ( JFactory::getApplication()->input->getInt('print', 0) ) return;
 
@@ -2959,45 +3010,47 @@ class flexicontent_html
 		$has_edit_state = $user->authorise('core.edit.state', $asset) || ($item->created_by == $user->get('id') && $user->authorise('core.edit.state.own', $asset));
 
 		// Create the approval button only if user cannot edit the item (**note check at top of this method)
-		if ( $has_edit_state ) return;
-
-		$show_icons = $params->get('show_icons', 2);
-		$use_font   = $params->get('use_font_icons', 1);
-		if ( $show_icons && $use_font ) {
-			static $icon_class = null;
-			if ($icon_class == null) {
-				if (self::$icon_classes==null) self::load_class_config();
-				$icon_class = empty(self::$icon_classes['approval']) ? 'icon-key' : self::$icon_classes['approval'];
-				$icon_class .= ($show_icons==2 ? ' fcIconPadRight' : '');
-			}
-			$attribs = '';
-			$image = '<i class="'.$icon_class.'"></i>';
-		} else if ( $show_icons ) {
-			$attribs = '';
-			$image = JHtml::image('components/com_flexicontent/assets/images/'.'key_add.png', JText::_( 'FLEXI_APPROVAL_REQUEST' ), $attribs);
-		} else {
-			$image = '';
+		if ($has_edit_state)
+		{
+			return;
 		}
+
+		// Get font icon or image icon for the button
+		$config = (object) array(
+			'iconname' => 'approval',
+			'icondefault' => 'icon-key',
+			'iconimage' => 'key_add.png',
+			'icontitle' => 'FLEXI_APPROVAL_REQUEST',
+		);
+
+		$show_icons = (int) $params->get('show_icons', 2);
+		$image = null;
+		self::createFcBtnIcon($params, $config, $image);
 
 		$overlib 	= JText::_( 'FLEXI_APPROVAL_REQUEST_INFO' );
 		$text 		= JText::_( 'FLEXI_APPROVAL_REQUEST' );
 
 		$button_classes = 'fc_approvalbutton';
-		if ( $show_icons==1 ) {
+
+		if ($show_icons === 1)
+		{
 			$caption = '';
 			$button_classes .= '';
 			$tooltip_placement = 'bottom';
-		} else {
+		}
+		else
+		{
 			$caption = $text;
 			if ( !$params->get('btn_grp_dropdown', 0) ) $button_classes .= self::$use_bootstrap ? ' btn btn-small' : ' fc_button fcsimple fcsmall';
 			$tooltip_placement = !$params->get('btn_grp_dropdown', 0) ? 'bottom' : 'left';
 		}
+
 		$button_classes .= ' hasTooltip';
 		$tooltip_title = flexicontent_html::getToolTip($text, $overlib, 0);
 
 		$link = 'index.php?option=com_flexicontent&task=approval&cid='.$item->id;
 		$output	= ' <a href="'.$link.'" class="'.$button_classes.'" data-placement="' . $tooltip_placement . '" title="'.$tooltip_title.'">'.$image.$caption.'</a>';
-		$output	= JText::_( 'FLEXI_ICON_SEP' ) .$output. JText::_( 'FLEXI_ICON_SEP' );
+		$output = JText::_('FLEXI_ICON_SEP') . $output . JText::_('FLEXI_ICON_SEP');
 
 		return $output;
 	}
@@ -3010,66 +3063,71 @@ class flexicontent_html
 	 * @param array $params
 	 * @since 1.0
 	 */
-	static function editbutton( $item, &$params)
+	static function editbutton($item, &$params)
 	{
 		if ( !$params->get('show_editbutton', 1) || JFactory::getApplication()->input->getInt('print', 0) ) return;
 
 		$user	= JFactory::getUser();
 
 		// Determine if current user can edit the given item
-		$has_edit_state = false;
 		$asset = 'com_content.article.' . $item->id;
 		$has_edit_state = $user->authorise('core.edit', $asset) || ($item->created_by == $user->get('id') && $user->authorise('core.edit.own', $asset));
 
 		// Create the edit button only if user can edit the give item
-		if ( !$has_edit_state ) return;
-
-		$show_icons = $params->get('show_icons', 2);
-		$use_font   = $params->get('use_font_icons', 1);
-		if ( $show_icons && $use_font ) {
-			static $icon_class = null;
-			if ($icon_class == null) {
-				if (self::$icon_classes==null) self::load_class_config();
-				$icon_class = empty(self::$icon_classes['edit']) ? 'icon-pencil' : self::$icon_classes['edit'];
-				$icon_class .= ($show_icons==2 ? ' fcIconPadRight' : '');
-			}
-			$attribs = '';
-			$image = '<i class="'.$icon_class.'"></i>';
-		} else if ( $show_icons ) {
-			$attribs = '';
-			$image = JHtml::image(FLEXI_ICONPATH.'edit.png', JText::_( 'FLEXI_EDIT' ), $attribs);
-		} else {
-			$image = '';
+		if (!$has_edit_state)
+		{
+			return;
 		}
+
+		// Get font icon or image icon for the button
+		$config = (object) array(
+			'iconname' => 'edit',
+			'icondefault' => 'icon-pencil',
+			'iconimage' => 'edit.png',
+			'icontitle' => 'FLEXI_EDIT',
+		);
+
+		$show_icons = (int) $params->get('show_icons', 2);
+		$image = null;
+		self::createFcBtnIcon($params, $config, $image);
 
 		$overlib 	= JText::_( 'FLEXI_EDIT_TIP' );
 		$text 		= JText::_( 'FLEXI_EDIT' );
 
 		$button_classes = 'fc_editbutton';
-		if ( $show_icons==1 ) {
+
+		if ($show_icons === 1)
+		{
 			$caption = '';
 			$button_classes .= '';
 			$tooltip_placement = 'bottom';
-		} else {
+		}
+		else
+		{
 			$caption = $text;
 			if ( !$params->get('btn_grp_dropdown', 0) ) $button_classes .= self::$use_bootstrap ? ' btn btn-small' : ' fc_button fcsimple fcsmall';
 			$tooltip_placement = !$params->get('btn_grp_dropdown', 0) ? 'bottom' : 'left';
 		}
+
 		$button_classes .= ' hasTooltip';
 		$tooltip_title = flexicontent_html::getToolTip($text, $overlib, 0);
 
-		if ( $params->get('show_editbutton', 1) == '1') {
+		if ((int) $params->get('show_editbutton', 1) === 1)
+		{
 			//$Itemid = JFactory::getApplication()->input->get('Itemid', 0, 'int');  // Maintain menu item ? e.g. current category view,
 			$Itemid = 0;
 			$item_url = JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, $Itemid, $item));
 			$link = $item_url . (strpos($item_url, '?') !== false ? '&' : '?') . 'task=edit';
 			$targetLink = "_self";
-		} else if ( $params->get('show_editbutton', 1) == '2' ) {
+		}
+		elseif ((int) $params->get('show_editbutton', 1) === 2)
+		{
 			$link = JUri::base(true).'/administrator/index.php?option=com_flexicontent&task=items.edit&cid[]='.$item->id;
 			$targetLink = "_blank";
 		}
+
 		$output	= ' <a href="'.$link.'" class="'.$button_classes.'" data-placement="' . $tooltip_placement . '" target="'.$targetLink.'" title="'.$tooltip_title.'">'.$image.$caption.'</a>';
-		$output	= JText::_( 'FLEXI_ICON_SEP' ) .$output. JText::_( 'FLEXI_ICON_SEP' );
+		$output = JText::_('FLEXI_ICON_SEP') . $output . JText::_('FLEXI_ICON_SEP');
 
 		return $output;
 	}
@@ -3213,43 +3271,49 @@ class flexicontent_html
 		 * Finally create the submit icon / button
 		 */
 
-		$show_icons = $params->get('show_icons', 2);
-		$use_font   = $params->get('use_font_icons', 1);
-		if ( $show_icons && $use_font && !$auto_relations ) {
-			static $icon_class = null;
-			if ($icon_class == null) {
-				if (self::$icon_classes==null) self::load_class_config();
-				$icon_class = empty(self::$icon_classes['new']) ? 'icon-new' : self::$icon_classes['new'];
-				$icon_class .= ($show_icons==2 ? ' fcIconPadRight' : '');
-			}
-			$attribs = '';
-			$image = '<i class="'.$icon_class.'"></i>';
-		} else if ( $show_icons && !$auto_relations ) {
-			$attribs = '';
-			$image = JHtml::image('components/com_flexicontent/assets/images/'.'plus-button.png', $btn_desc, $attribs);
-		} else {
+
+		// Get font icon or image icon for the button
+		$config = (object) array(
+			'iconname' => 'new',
+			'icondefault' => 'icon-new',
+			'iconimage' => 'plus-button.png',
+			'icontitle' => $btn_desc,
+		);
+
+		$show_icons = (int) $params->get('show_icons', 2);
+		$image = '';
+		self::createFcBtnIcon($params, $config, $image);
+
+		if (!$auto_relations)
+		{
 			$image = '';
 		}
 
 		$button_classes = 'fc_addbutton';
-		if ( $show_icons==1 && !$auto_relations ) {
+
+		if ($show_icons === 1 && !$auto_relations)
+		{
 			$caption = '';
 			$button_classes .= '';
 			$tooltip_placement = 'bottom';
-		} else {
+		}
+		else
+		{
 			$caption = $btn_title;
 			if ( !$params->get('btn_grp_dropdown', 0) ) $button_classes .=
 				(self::$use_bootstrap ? ' btn btn-small' : ' fc_button fcsimple fcsmall')
 				.($auto_relations ? ' btn-success' : '');
 			$tooltip_placement = !$params->get('btn_grp_dropdown', 0) ? 'bottom' : 'left';
 		}
+
 		$button_classes .= ' hasTooltip';
 		$tooltip_title = flexicontent_html::getToolTip($btn_title, $btn_desc, 0);
 
 		$output	= ' <a href="'.$link.'" class="'.$button_classes.'" data-placement="' . $tooltip_placement . '" title="'.$tooltip_title.'">'.$image.$caption.'</a>';
+
 		if (!$auto_relations)
 		{
-			$output	= JText::_( 'FLEXI_ICON_SEP' ) .$output. JText::_( 'FLEXI_ICON_SEP' );
+			$output = JText::_('FLEXI_ICON_SEP') . $output . JText::_('FLEXI_ICON_SEP');
 		}
 
 		return $output;
@@ -3263,7 +3327,7 @@ class flexicontent_html
 	 * @param array $params
 	 * @since 1.0
 	 */
-	static function stateicon($state, $params, $type = 'html', &$state_text=null)
+	static function stateicon($state, $params, $type = 'html', &$state_text=null, $item = null, $show_status = 0)
 	{
 		static $jtext_state = null;
 		static $tooltip_class = ' hasTooltip';
@@ -3280,9 +3344,42 @@ class flexicontent_html
 		if ($state_names === null)
 		{
 			$jtext_state = JText::_( 'FLEXI_STATE' );
-			$state_names = array(1=>JText::_('FLEXI_PUBLISHED'), -5=>JText::_('FLEXI_IN_PROGRESS'), 0=>JText::_('FLEXI_UNPUBLISHED'), -3=>JText::_('FLEXI_PENDING'), -4=>JText::_('FLEXI_TO_WRITE'), 2=>JText::_('FLEXI_ARCHIVED'), -2=>JText::_('FLEXI_TRASHED'), 'u'=>JText::_('FLEXI_UNKNOWN'));
-			$state_imgs  = array(1=>'accept.png', -5=>'publish_g.png', 0=>'publish_x.png', -3=>'publish_r.png', -4=>'publish_y.png', 2=>'archive.png', -2=>'trash.png', 'u'=>'unknown.png');
-			$font_icons  = array(1=>'publish', -5=>'checkmark-2', 0=>'unpublish', -3=>'clock', -4=>'pencil-2', 2=>'archive', -2=>'trash', 'u'=>'question-2');
+			$state_names = array(
+				 1  => JText::_('FLEXI_PUBLISHED'),
+				-5  => JText::_('FLEXI_IN_PROGRESS'),
+				 0  => JText::_('FLEXI_UNPUBLISHED'),
+				-3  => JText::_('FLEXI_PENDING'),
+				-4  => JText::_('FLEXI_TO_WRITE'),
+				 2  => JText::_('FLEXI_ARCHIVED'),
+				-2  => JText::_('FLEXI_TRASHED'),
+				'u' => JText::_('FLEXI_UNKNOWN'),
+				'e' => JText::_('FLEXI_PUBLICATION_EXPIRED'),
+				's' => JText::_('FLEXI_SCHEDULED_FOR_PUBLICATION'),
+			);
+			$state_imgs = array(
+				 1  => 'accept.png',
+				-5  => 'publish_g.png',
+				 0  => 'publish_x.png',
+				-3  => 'publish_r.png',
+				-4  => 'publish_y.png',
+				 2  => 'archive.png',
+				-2  => 'trash.png',
+				'u' => 'unknown.png',
+				'e' => 'clock.png',
+				's' => 'warning.png',
+			);
+			$font_icons = array(
+				 1  => 'publish',
+				-5  => 'checkmark-2',
+				 0  => 'unpublish',
+				-3  => 'question',
+				-4  => 'pencil-2',
+				 2  => 'archive',
+				-2  => 'trash',
+				'u' => 'question-2',
+				'e' => 'expired',
+				's' => 'pending',
+			);
 
 			foreach($state_names as $state_id => $state_name)
 			{
@@ -3298,10 +3395,30 @@ class flexicontent_html
 		}
 
 		// Check for invalid state
-		if ( !isset($state_names[$state]) )
+		if (!isset($state_names[$state]))
 		{
 			$state = 'u';
 		}
+
+		// Check for expired that is published / in progress / archived
+		if ($item && $show_status && !empty($item->publication_expired) && in_array($state, array(1, -5, 2)))
+		{
+			$show_status === 1
+				? $state = 'e'
+				: $is_expired = true;
+		}
+
+		// Check for scheduled that is published / in progress / archived
+		elseif ($item && $show_status && !empty($item->publication_scheduled) && in_array($state, array(1, -5, 2)))
+		{
+			$show_status === 1
+				? $state = 's'
+				: $is_scheduled = true;
+		}
+
+		$scheduled_expired_html = !empty($is_expired)
+			? '<span class="fc_expired"></span>'
+			: (!empty($is_scheduled) ? '<span class="fc_scheduled"></span>' : '');
 
 		$show_icons = (int) $params->get('show_icons', 1);
 		$state_text = $state_names[$state];
@@ -3313,8 +3430,14 @@ class flexicontent_html
 		}
 
 		// Return cached icon if already calculated
-		$popup_type = $type == 'json' ? 'basic' : $params->get('stateicon_popup', 'full');
-		if ( isset($state_icons[$state][$popup_type]) ) return $state_icons[$state][$popup_type];
+		$popup_type = $type === 'json'
+			? 'basic'
+			: $params->get('stateicon_popup', 'full');
+
+		if (isset($state_icons[$state][$popup_type]))
+		{
+			return $scheduled_expired_html . $state_icons[$state][$popup_type];
+		}
 
 		// If using font icons
 		$use_font = $params->get('use_font_icons', 1);
@@ -3329,21 +3452,22 @@ class flexicontent_html
 				break;
 			case 'basic':
 			case 'full': default:
-				$data['class'] = $icon_class. ' ' . ($popup_type != 'basic' ? $tooltip_class : '');
+				$data['class'] = $icon_class . ' ' . ($popup_type != 'basic' ? $tooltip_class : '');
 				$data['title'] = $state_basictips[$state];
 				break;
 		}
 
 		// Special case return uncached JSON encoded data
-		if ($type == 'json')
+		if ($type === 'json')
 		{
 			$data['html'] = ($use_font
-				? '<span class="'.$data['class'].'"></span>'
+				? '<span class="' . $data['class'] . '"></span>'
 				: JHtml::image('components/com_flexicontent/assets/images/'.$state_imgs[$state], $state_names[$state], '')
 			) . ($show_icons === 2
 				? '<span class="fc-mssg-inline fc-info fc-iblock fc-nobgimage">' . $state_names[$state] . '</span>'
 				: ''
 			);
+
 			unset($data['class']);
 			return json_encode($data);
 		}
@@ -3355,14 +3479,14 @@ class flexicontent_html
 			$tag_attribs .= ' ' . $key . '="' . $val . '" ';
 		}
 		$state_icons[$state][$popup_type] = ($use_font
-			? '<span '.$tag_attribs.'></span>'
+			? '<span ' . $tag_attribs . '></span>'
 			: JHtml::image('components/com_flexicontent/assets/images/'.$state_imgs[$state], $state_names[$state], $tag_attribs)
 		) . ($show_icons === 2
 				? '<span class="fc-mssg-inline fc-info fc-iblock fc-nobgimage">' . $state_names[$state] . '</span>'
 				: ''
 		);
 
-		return $state_icons[$state][$popup_type];
+		return $scheduled_expired_html . $state_icons[$state][$popup_type];
 	}
 
 

@@ -848,6 +848,10 @@ class com_flexicontentInstallerScript
 					if ( $templates_tbl_exists && !array_key_exists('cfgname', $tbl_fields['#__flexicontent_templates'])) {
 						$queries[] = "ALTER TABLE `#__flexicontent_templates` ADD `cfgname` varchar(50) NOT NULL default '' AFTER `template`";
 					}
+					if ( $templates_tbl_exists && !array_key_exists('id', $tbl_fields['#__flexicontent_templates'])) {
+						$queries[] = "ALTER TABLE `#__flexicontent_templates` DROP PRIMARY KEY";
+						$queries[] = "ALTER TABLE `#__flexicontent_templates` ADD `id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT KEY FIRST";
+					}
 
 					$upgrade_count = 0;
 					if ( !empty($queries) ) {

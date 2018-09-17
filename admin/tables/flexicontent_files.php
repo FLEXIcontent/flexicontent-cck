@@ -96,7 +96,6 @@ class flexicontent_files extends JTable
 	public function __construct(& $db)
 	{
 		$this->_records_dbtbl  = 'flexicontent_' . $this->_record_name . 's';
-		$this->_records_jtable = 'flexicontent_' . $this->_record_name . 's';
 		$this->_NAME = strtoupper($this->_record_name);
 
 		parent::__construct('#__' . $this->_records_dbtbl, 'id', $db);

@@ -13,7 +13,7 @@ var fc_state_icons = {
 	'1': 'publish',
 	'-5': 'checkmark-2',
 	'0': 'unpublish',
-	'-3': 'clock',
+	'-3': 'question',
 	'-4': 'pencil-2',
 	'2': 'archive',
 	'-2': 'trash',

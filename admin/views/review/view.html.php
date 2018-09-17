@@ -1,27 +1,20 @@
 <?php
 /**
- * @version 1.5 stable $Id: view.html.php 1577 2012-12-02 15:10:44Z ggppdk $
- * @package Joomla
- * @subpackage FLEXIcontent
- * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
- * @license GNU/GPL v2
+ * @package         FLEXIcontent
+ * @version         3.3
  *
- * FLEXIcontent is a derivative work of the excellent QuickFAQ component
- * @copyright (C) 2008 Christoph Lukes
- * see www.schlu.net for more information
- *
- * FLEXIcontent is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
+ * @link            http://www.flexicontent.com
+ * @copyright       Copyright © 2018, FLEXIcontent team, All Rights Reserved
+ * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
-defined( '_JEXEC' ) or die( 'Restricted access' );
+defined('_JEXEC') or die('Restricted access');
 
 jimport('legacy.view.legacy');
 
 /**
- * View class for the FLEXIcontent review screen
+ * HTML View class for the FLEXIcontent review screen
  *
  * @package Joomla
  * @subpackage FLEXIcontent
@@ -29,7 +22,7 @@ jimport('legacy.view.legacy');
  */
 class FlexicontentViewReview extends JViewLegacy
 {
-	function display($tpl = null)
+	public function display($tpl = null)
 	{
 		/**
 		 * Initialise variables
@@ -96,7 +89,6 @@ class FlexicontentViewReview extends JViewLegacy
 		}
 
 
-
 		/**
 		 * Include needed files and add needed js / css files
 		 */
@@ -128,7 +120,6 @@ class FlexicontentViewReview extends JViewLegacy
 		$document->addScriptVersion(JUri::root(true).'/components/com_flexicontent/assets/js/validate.js', FLEXI_VHASH);
 
 
-
 		/**
 		 * Create the toolbar
 		 */
@@ -146,9 +137,8 @@ class FlexicontentViewReview extends JViewLegacy
 
 		// SET toolbar title
 		!$isnew
-			? JToolbarHelper::title( JText::_( 'FLEXI_EDIT_REVIEW' ), 'reviewedit' )   // Editing existing review
-			: JToolbarHelper::title( JText::_( 'FLEXI_NEW_REVIEW' ), 'reviewadd' );    // Creating new review
-
+			? JToolbarHelper::title(JText::_('FLEXI_EDIT_REVIEW'), 'reviewedit')
+			: JToolbarHelper::title(JText::_('FLEXI_NEW_REVIEW'), 'reviewadd');
 
 
 		/**
@@ -159,13 +149,16 @@ class FlexicontentViewReview extends JViewLegacy
 		$btn_arr = array();
 
 		// Add ajax apply only for existing records
-		$btn_name = 'apply_ajax';
-		$btn_task = $ctrl.'.apply_ajax';
+		if (!$isnew)
+		{
+			$btn_name = 'apply_ajax';
+			$btn_task = $ctrl.'.apply_ajax';
 
-		$btn_arr[$btn_name] = flexicontent_html::addToolBarButton(
-			'FLEXI_APPLY', $btn_name, $full_js="Joomla.submitbutton('".$ctrl.".apply_ajax')", $msg_alert='', $msg_confirm='',
-			$btn_task, $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false, $btn_class="".$tip_class, $btn_icon="icon-loop",
-			'data-placement="bottom" title="'.JText::_('FLEXI_FAST_SAVE_INFO', true).'"', $auto_add = 0);
+			$btn_arr[$btn_name] = flexicontent_html::addToolBarButton(
+				'FLEXI_APPLY', $btn_name, $full_js="Joomla.submitbutton('".$ctrl.".apply_ajax')", $msg_alert='', $msg_confirm='',
+				$btn_task, $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false, $btn_class="".$tip_class, $btn_icon="icon-loop",
+				'data-placement="bottom" title="'.JText::_('FLEXI_FAST_SAVE_INFO', true).'"', $auto_add = 0);
+		}
 
 		// Apply & Reload button   ***   (Apply Type, is a special case of new that has not loaded custom fieds yet, due to type not defined on initial form load)
 		if ($isAdmin && !$componentTmpl)
@@ -185,29 +178,25 @@ class FlexicontentViewReview extends JViewLegacy
 		flexicontent_html::addToolBarDropMenu($btn_arr, 'apply_btns_group');
 
 
-
 		/**
 		 * Save buttons
 		 */
 
 		$btn_arr = array();
 
-		if ($isAdmin && !$componentTmpl)
-		{
-			$btn_name = 'save';
-			$btn_task = $ctrl.'.save';
+		$btn_name = 'save';
+		$btn_task = $ctrl.'.save';
 
-			//JToolbarHelper::save($btn_task);  //JToolbarHelper::custom( $btn_task, 'save.png', 'save.png', 'JSAVE', false );
+		//JToolbarHelper::save($btn_task);  //JToolbarHelper::custom( $btn_task, 'save.png', 'save.png', 'JSAVE', false );
 
-			$btn_arr[$btn_name] = flexicontent_html::addToolBarButton(
-				'JSAVE', $btn_name, $full_js="Joomla.submitbutton('".$ctrl.".save')", $msg_alert='', $msg_confirm='',
-				$btn_task, $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false, $btn_class="".$tip_class, $btn_icon="icon-save",
-				'data-placement="bottom" title=""', $auto_add = 0);
-		}
+		$btn_arr[$btn_name] = flexicontent_html::addToolBarButton(
+			'JSAVE', $btn_name, $full_js="Joomla.submitbutton('".$ctrl.".save')", $msg_alert='', $msg_confirm='',
+			$btn_task, $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false, $btn_class="".$tip_class, $btn_icon="icon-save",
+			'data-placement="bottom" title=""', $auto_add = 0);
 
 
 		// Add a save and new button, if user can create new records
-		if ($isAdmin && !$componentTmpl && $cancreate)
+		if (!$componentTmpl && $cancreate)
 		{
 			$btn_name = 'save2new';
 			$btn_task = $ctrl.'.save2new';
@@ -283,8 +272,8 @@ class FlexicontentViewReview extends JViewLegacy
 		//JFilterOutput::objectHTMLSafe( $row, ENT_QUOTES, $exclude_keys = '' );
 
 		// Assign data to template
-		$this->row    = $row;
-		$this->form   = $form;
+		$this->row      = $row;
+		$this->form     = $form;
 
 		parent::display($tpl);
 	}

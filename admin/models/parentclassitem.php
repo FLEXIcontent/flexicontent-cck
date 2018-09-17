@@ -1,37 +1,25 @@
 <?php
 /**
- * @version 1.5 stable $Id: item.php 1244 2012-04-12 05:07:35Z ggppdk $
- * @package Joomla
- * @subpackage FLEXIcontent
- * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
- * @license GNU/GPL v2
+ * @package         FLEXIcontent
+ * @version         3.3
  *
- * FLEXIcontent is a derivative work of the excellent QuickFAQ component
- * @copyright (C) 2008 Christoph Lukes
- * see www.schlu.net for more information
- *
- * FLEXIcontent is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
+ * @link            http://www.flexicontent.com
+ * @copyright       Copyright © 2018, FLEXIcontent team, All Rights Reserved
+ * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
-// no direct access
-defined( '_JEXEC' ) or die( 'Restricted access' );
+defined('_JEXEC') or die('Restricted access');
 
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 use Joomla\CMS\Table\Table;
 
-jimport('legacy.model.admin');
-require_once('base.php');
+require_once('base/base.php');
 
 /**
- * FLEXIcontent Component Item Model
+ * FLEXIcontent Component (Common) Item Model (FrontEnd / BackEnd)
  *
- * @package Joomla
- * @subpackage FLEXIcontent
- * @since		1.0
  */
 class ParentClassItem extends FCModelAdmin
 {
@@ -54,7 +42,14 @@ class ParentClassItem extends FCModelAdmin
 	 *
 	 * @var string
 	 */
-	var $records_jtable = null;
+	var $records_jtable = 'flexicontent_items';
+
+	/**
+	 * Column names
+	 */
+	var $state_col   = 'state';
+	var $name_col    = 'title';
+	var $parent_col  = 'catid';
 
 	/**
 	 * Record primary key
@@ -171,7 +166,9 @@ class ParentClassItem extends FCModelAdmin
 		{
 			$this->record_keys = array('id');
 		}
+
 		$this->debug_tags = false;
+		$this->use_jtable_publishing = true;
 
 		parent::__construct();
 
@@ -205,10 +202,14 @@ class ParentClassItem extends FCModelAdmin
 	/**
 	 * Method to set the identifier
 	 *
-	 * @access	public
-	 * @param	int record identifier
+	 * @param		int	    $id        record identifier
+	 * @param		int	    $currcatid record's current category
+	 * @param		int	    $typeid    record's type
+	 * @param		string  $ilayout   record's item layout
+	 *
+	 * @since	3.3.0
 	 */
-	function setId($id, $currcatid=null, $typeid=null, $ilayout=null)
+	function setId($id, $currcatid = null, $typeid = null, $ilayout = null)
 	{
 		// A cache of categories assigned to every item
 		static $item_cids = array();
@@ -438,8 +439,8 @@ class ParentClassItem extends FCModelAdmin
 	/**
 	 * Method to load record data
 	 *
-	 * @access	protected
 	 * @return	boolean	True on success
+	 *
 	 * @since	1.0
 	 */
 	protected function _loadRecord($pk = null, $no_cache=false, $force_version=0)
@@ -623,7 +624,7 @@ class ParentClassItem extends FCModelAdmin
 					'c.title AS category_title, c.alias AS category_alias, c.lft,c.rgt, '.  // Current category data
 					'mc.title AS maincat_title, mc.alias AS maincat_alias');                // Main category data
 				$query->select('ty.name AS typename, ty.alias as typealias');             // Content Type data, and author data
-				$query->select('u.name AS author');                                       // Author data
+				$query->select('ua.name AS author');                                       // Author data
 
 				// Rating count, Rating & Score
 				$query->select('v.rating_count as rating_count, ROUND( v.rating_sum / v.rating_count ) AS rating, ((v.rating_sum / v.rating_count)*'.(100 / $rating_resolution).') as score');
@@ -640,7 +641,7 @@ class ParentClassItem extends FCModelAdmin
 				$query->from('#__content AS i');
 				$query->join('LEFT', '#__flexicontent_items_ext AS ie ON ie.item_id = i.id');
 				$query->join('LEFT', '#__flexicontent_types AS ty ON (CASE WHEN ie.type_id = 0 THEN ' . (int) $this->_typeid . ' ELSE ie.type_id END) = ty.id');
-				$query->join('LEFT', '#__users AS u on u.id = i.created_by');
+				$query->join('LEFT', '#__users AS ua on ua.id = i.created_by');
 				$query->join('LEFT', '#__content_rating AS v ON i.id = v.content_id');
 				$query->join('LEFT', '#__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id' . $limit_to_cid);
 
@@ -1491,9 +1492,9 @@ class ParentClassItem extends FCModelAdmin
 	/**
 	 * Method to initialise the record data
 	 *
-	 * @access	protected
 	 * @return	boolean	True on success
-	 * @since	1.0
+	 *
+	 * @since	1.5
 	 */
 	protected function _initRecord(&$record = null, $initOnly = false)
 	{
@@ -3704,8 +3705,8 @@ class ParentClassItem extends FCModelAdmin
 	function getAlltags()
 	{
 		$query = 'SELECT * FROM #__flexicontent_tags ORDER BY name';
-		$this->_db->setQuery($query);
-		$tags = $this->_db->loadObjectlist();
+		$tags = $this->_db->setQuery($query)->loadObjectList();
+
 		return $tags;
 	}
 
@@ -3764,16 +3765,29 @@ class ParentClassItem extends FCModelAdmin
 	/**
 	 * Method to fetch tags according to a given mask
 	 *
-	 * @return object
-	 * @since 1.0
+	 * @return  An array of tag data objects
+	 *
+	 * @since 1.5
 	 */
-	function gettags($mask="", $limit=100)
+	function gettags($mask="", $limit = 100)
 	{
-		$escaped_mask = $this->_db->escape( $mask, true );
-		$where = ($mask!="")?" name like ".$this->_db->Quote( '%'.$escaped_mask.'%', false )." AND":"";
-		$query = 'SELECT * FROM #__flexicontent_tags WHERE '.$where.' published = 1 ORDER BY name LIMIT 0,'.((int)$limit);
-		$this->_db->setQuery($query);
-		$tags = $this->_db->loadObjectlist();
+		$query = $this->_db->getQuery(true)
+			->select('*')
+			->from('#__flexicontent_tags')
+			->where('published = 1')
+			->order($this->_db->quoteName('name'))
+			->setLimit((int) $limit, $offset = 0);
+
+		if ($mask)
+		{
+			$escaped_mask = $this->_db->escape($mask, true);
+			$quoted_escaped_mask = $this->_db->Quote('%' . $escaped_mask . '%', false);
+
+			$query->where($this->_db->quoteName('name') . ' LIKE ' . $quoted_escaped_mask);
+		}
+
+		$tags = $this->_db->setQuery($query)->loadObjectList();
+
 		return $tags;
 	}
 
@@ -4320,118 +4334,6 @@ class ParentClassItem extends FCModelAdmin
 
 
 	/**
-	 * Method to change the state of a record
-	 *
-	 * @access	public
-	 * @return	boolean	True on success
-	 * @since	1.0
-	 */
-	function setitemstate($id, $state = 1, $cleanCache = true)
-	{
-		$app  = JFactory::getApplication();
-		$user = JFactory::getUser();
-
-		$jinput     = JFactory::getApplication()->input;
-		$dispatcher = JEventDispatcher::getInstance();
-
-		$option = $jinput->get('option', '', 'cmd');
-		$view = $jinput->get('view', '', 'cmd');
-
-		static $event_failed_notice_added = false;
-
-		if ( $id )
-		{
-			$v = FLEXIUtilities::getCurrentVersions((int)$id);
-
-			$query = 'UPDATE #__content'
-				. ' SET state = ' . (int) $state
-				. ' WHERE id = ' . (int) $id
-			;
-			$this->_db->setQuery( $query );
-			$this->_db->execute();
-
-			$query = 'UPDATE #__flexicontent_items_tmp'
-				. ' SET state = ' . (int) $state
-				. ' WHERE id = ' . (int) $id
-			;
-			$this->_db->setQuery( $query );
-			$this->_db->execute();
-
-			$query = 'UPDATE #__flexicontent_items_versions'
-				. ' SET value = ' . (int) $state
-				. ' WHERE item_id = ' . (int) $id
-				. ' AND valueorder = 1'
-				. ' AND field_id = 10'
-				. ' AND version = ' . (int) $v['version']
-				;
-			$this->_db->setQuery( $query );
-			$this->_db->execute();
-		}
-
-
-		// ***
-		// *** Trigger Event 'onContentChangeState' of Joomla's Content plugins
-		// ***
-		if (empty($this->skipChangeStateEvent))
-		{
-			$jinput->set('isflexicontent', 'yes');
-
-			// Make sure we import flexicontent AND content plugins since we will be triggering their events
-			JPluginHelper::importPlugin('content');
-
-			// PREPARE FOR TRIGGERING content events
-			// We need to fake joomla's states ... when triggering events
-			$fc_state = $state;
-			if ( in_array($fc_state, array(1,-5)) ) $jm_state = 1;           // published states
-			else if ( in_array($fc_state, array(0,-3,-4)) ) $jm_state = 0;   // unpublished states
-			else $jm_state = $fc_state;                                      // trashed & archive states
-
-			$item = new stdClass();
-
-			// Compatibility steps (including Joomla compatible state),
-			// so that 3rd party plugins using the change state event work properly
-			$jinput->set('view', 'article');
-			$jinput->set('option', 'com_content');
-			$item->state = $jm_state;
-
-			// Workaround for buggy extensions using article model but not setting correct include path
-			JModelLegacy::addIncludePath(JPATH_BASE . '/components/com_content/models');
-
-			//Trigger the event
-			$results = FLEXI_J40GE
-				? $app->triggerEvent($this->event_change_state, array('com_content.article', (array) $id, $jm_state))
-				: $dispatcher->trigger($this->event_change_state, array('com_content.article', (array) $id, $jm_state));
-
-			// Revert compatibilty steps ... the $item->state is not used further regardless if it was changed,
-			// besides the plugins using the change state event, should have updated DB state value anyway
-			$jinput->set('view', $view);
-			$jinput->set('option', $option);
-			if ($item->state == $jm_state) $item->state = $fc_state;  // this check is redundant, item->state is not used further ...
-
-			// Abort further actions if any plugin returns a result === false
-			if (is_array($results) && in_array(false, $results, true))
-			{
-				if (!$event_failed_notice_added)
-				{
-					$app->enqueueMessage('At least 1 plugin event handler for onContentChangeState failed', 'warning');
-					$event_failed_notice_added = true;
-				}
-
-				return false;
-			}
-		}
-
-		if ($cleanCache)
-		{
-			$this->cleanCache(null, 0);
-			$this->cleanCache(null, 1);
-		}
-
-		return true;
-	}
-
-
-	/**
 	 * Method to get the versionlist which belongs to the item
 	 *
 	 * @return object
@@ -4439,9 +4341,9 @@ class ParentClassItem extends FCModelAdmin
 	 */
 	function getVersionList($limitstart=0, $versionsperpage=0)
 	{
-		$query 	= 'SELECT v.version_id AS nr, v.created AS date, u.name AS modifier, v.comment AS comment'
+		$query 	= 'SELECT v.version_id AS nr, v.created AS date, ua.name AS modifier, v.comment AS comment'
 				.' FROM #__flexicontent_versions AS v'
-				.' LEFT JOIN #__users AS u ON v.created_by = u.id'
+				.' LEFT JOIN #__users AS ua ON ua.id = v.created_by'
 				.' WHERE item_id = ' . (int)$this->_id
 				.' ORDER BY version_id ASC'
 				. ($versionsperpage?' LIMIT '.$limitstart.','.$versionsperpage:'')
@@ -4461,8 +4363,8 @@ class ParentClassItem extends FCModelAdmin
 	{
 		$query 	= 'SELECT count(*) as num'
 				.' FROM #__flexicontent_versions AS v'
-				.' LEFT JOIN #__users AS u ON v.created_by = u.id'
-				.' WHERE item_id = ' . (int)$this->_id
+				.' LEFT JOIN #__users AS ua ON ua.id = v.created_by'
+				.' WHERE item_id = ' . (int) $this->_id
 				;
 		$this->_db->setQuery($query);
 		return $this->_db->loadResult();
@@ -4574,14 +4476,14 @@ class ParentClassItem extends FCModelAdmin
 			}
 
 			$user_emails_ugrps = array();
-			if ( count( $nConf->{$ugrps[$ntype]} ) )
+
+			if (count($nConf->{$ugrps[$ntype]}))
 			{
 				// emails for user groups
-				$query = "SELECT DISTINCT email FROM #__users as u"
-					." JOIN #__user_usergroup_map ugm ON u.id=ugm.user_id AND ugm.group_id IN (".implode(",",$nConf->{$ugrps[$ntype]}).")";
+				$query = 'SELECT DISTINCT email FROM #__users as u'
+					. ' JOIN #__user_usergroup_map ugm ON u.id = ugm.user_id AND ugm.group_id IN (' . implode(',', $nConf->{$ugrps[$ntype]}) . ')';
 
-				$db->setQuery( $query );
-				$user_emails_ugrps = $db->loadColumn();
+				$user_emails_ugrps = $db->setQuery($query)->loadColumn();
 			}
 
 			// merge them
@@ -5096,61 +4998,69 @@ class ParentClassItem extends FCModelAdmin
 	 */
 	public function featured($pks, $value = 0, $cleanCache = true)
 	{
-		// Sanitize the ids.
+		$db  = $this->_db;
 		$pks = (array) $pks;
 		ArrayHelper::toInteger($pks);
 
-		if (empty($pks))
+		if (count($pks))
 		{
-			$this->setError(JText::_('FLEXI_NO_ITEMS_SELECTED'));
-			return false;
-		}
+			try {
+				/**
+				 * Toggle featured flag in the data tables
+				 */
+				$query = 'UPDATE #__%s SET featured = ' . (int) $value . ' WHERE id IN (' . implode(',', $pks) . ')';
+				$db->setQuery(sprintf($query, $this->records_dbtbl))->execute();
+				$db->setQuery(sprintf($query, 'flexicontent_items_tmp'))->execute();
 
-		$db = $this->_db;
-		try {
-			$query = 'UPDATE #__%s SET featured = ' . (int)$value . ' WHERE id IN ('.implode(',', $pks).')';
-			$db->setQuery(sprintf($query, $this->records_dbtbl))->execute();
-			$db->setQuery(sprintf($query, 'flexicontent_items_tmp'))->execute();
+				/**
+				 * Add / Remove record in the 'content_frontpage' DB table
+				 */
 
-			// Adjust the mapping table, clear the existing features settings
-			if ((int)$value == 0)
-			{
-				$db->setQuery('DELETE FROM #__content_frontpage WHERE content_id IN ('.implode(',', $pks).')')->execute();
-			}
-			else
-			{
-				// first, we find out which of our new featured articles are already featured.
-				$db->setQuery('SELECT f.content_id FROM #__content_frontpage AS f WHERE content_id IN ('.implode(',', $pks).')');
-
-				// we diff the arrays to get a list of the articles that are newly featured
-				$old_featured = $db->loadColumn();
-				$new_featured = array_diff($pks, $old_featured);
-
-				// Featuring.
-				$tuples = array();
-				foreach ($new_featured as $pk) $tuples[] = '('.$pk.', 0)';
-				if (count($tuples))
+				// (a) To clear flag just delete the records
+				if ((int) $value == 0)
 				{
-					$db->setQuery(
-						'INSERT INTO #__content_frontpage '
-						.'('.$db->quoteName('content_id').', '.$db->quoteName('ordering').')'
-						.' VALUES '.implode(',', $tuples)
-					)->execute();
+					$db->setQuery('DELETE FROM #__content_frontpage WHERE content_id IN ('.implode(',', $pks).')')->execute();
+				}
+
+				// (b) To set records we need to add ONLY the new ones
+				else
+				{
+					// First, we find out which of our new featured articles are already featured.
+					$old_featured = $db->setQuery('SELECT f.content_id FROM #__content_frontpage AS f WHERE content_id IN ('.implode(',', $pks).')')->loadColumn();
+					$new_featured = array_diff($pks, $old_featured);
+
+					// Now add only the new records
+					if (count($new_featured))
+					{
+						$tuples = array();
+
+						foreach ($new_featured as $pk)
+						{
+							$tuples[] = '(' . $pk . ', 0)';
+						}
+
+						$db->setQuery(
+							'INSERT INTO #__content_frontpage '
+							. '(' . $db->quoteName('content_id') . ', ' . $db->quoteName('ordering') . ')'
+							. ' VALUES ' . implode(',', $tuples)
+						)->execute();
+					}
 				}
 			}
-		}
-		catch (Exception $e) {
-			$this->setError($e->getMessage());
-			return false;
+			catch (Exception $e) {
+				$this->setError($e->getMessage());
+				return false;
+			}
+
+			$this->getTable('flexicontent_content_frontpage', '')->reorder();
+
+			if ($cleanCache)
+			{
+				$this->cleanCache(null, 0);
+				$this->cleanCache(null, 1);
+			}
 		}
 
-		$this->getTable('flexicontent_content_frontpage', '')->reorder();
-
-		if ($cleanCache)
-		{
-			$this->cleanCache(null, 0);
-			$this->cleanCache(null, 1);
-		}
 		return true;
 	}
 
@@ -5372,35 +5282,80 @@ class ParentClassItem extends FCModelAdmin
 	}
 
 
-	public function cleanCache($group = null, $client_id = 0)
+	/**
+	 * Custom clean the cache
+	 *
+	 * @param   string   $group      Clean cache only in the given group
+	 * @param   integer  $client_id  Site Cache (0) / Admin Cache (1) or both Caches (-1)
+	 *
+	 * @return  void
+	 *
+	 * @since   3.2.0
+	 */
+	protected function cleanCache($group = null, $client_id = 0)
 	{
-		$cache = FLEXIUtilities::getCache($group, $client_id);
 		if ($group)
 		{
-			$cache->clean();
+			parent::cleanCache($group, $client_id);
 		}
+
+		// An empty '$group' will clean '$this->option' which is the Component VIEW Cache, we will do a little more ...
 		else
 		{
-			$cache->clean('com_flexicontent_items');
-			$cache->clean('com_flexicontent_filters');
+			/**
+			 * Note: null should be the same as $this->option ...
+			 * Maybe add option not clean Component's VIEW cache it will be too aggressive ...
+			 */
+			if (1)
+			{
+				parent::cleanCache(null, $client_id);
+				parent::cleanCache('com_content', $client_id);
+			}
+
+			parent::cleanCache('com_flexicontent_items', $client_id);
+			parent::cleanCache('com_flexicontent_filters', $client_id);
 		}
+	}
+
+
+	/**
+	 * Method to change the title & alias.
+	 *
+	 * @param   integer  $parent_id  If applicable, the id of the parent (e.g. assigned category)
+	 * @param   string   $alias      The alias / name.
+	 * @param   string   $title      The title / label.
+	 *
+	 * @return  array    Contains the modified title and alias / name.
+	 *
+	 * @since   1.7
+	 */
+	protected function generateNewTitle($parent_id, $alias, $title)
+	{
+		// Alter the title & alias
+		$table = $this->getTable();
+
+		while ($table->load(array('alias' => $alias)))
+		{
+			$title = StringHelper::increment($title);
+			$alias = StringHelper::increment($alias, 'dash');
+		}
+
+		return array($title, $alias);
 	}
 
 
 	/**
 	 * Method to check if the user can edit the record
 	 *
-	 * @access	public
 	 * @return	boolean	True on success
+	 *
 	 * @since	3.2.0
 	 */
-	function canEdit($record=null)
+	public function canEdit($record = null)
 	{
-		$record = $record ?: $this->_record;
-
-		$user = JFactory::getUser();
+		$record  = $record ?: $this->_record;
+		$user    = JFactory::getUser();
 		$session = JFactory::getSession();
-
 		$isOwner = !empty($record->created_by) && ( $record->created_by == $user->get('id') );
 
 		// Check if item was editable, but was rendered non-editable
@@ -5423,17 +5378,18 @@ class ParentClassItem extends FCModelAdmin
 		$hasTypeEditOwn = !$record->type_id ? true : FlexicontentHelperPerm::checkTypeAccess($record->type_id, 'core.edit.own');
 		if (!$hasTypeEdit && !$hasTypeEditOwn) return false;
 
-		if ( !empty($record->id) )
+		// Existing item, use item specific permissions
+		if (!empty($record->id))
 		{
-			// Existing item, use item specific permissions
 			$asset = $this->typeAlias . '.' . $record->id;
 			$allowed =
 				($hasTypeEdit && $user->authorise('core.edit', $asset)) ||
 				($hasTypeEditOwn && $user->authorise('core.edit.own', $asset) && ($isOwner || $hasCoupon));  // hasCoupon acts as item owner
 		}
+
+		// *** New item *** ... edit should not be used on new item, always return false
 		else
 		{
-			// *** New item *** ... edit should not be used on new item always return false
 			$allowed = false;
 		}
 
@@ -5444,17 +5400,15 @@ class ParentClassItem extends FCModelAdmin
 	/**
 	 * Method to check if the user can edit record 's state
 	 *
-	 * @access	public
 	 * @return	boolean	True on success
+	 *
 	 * @since	3.2.0
 	 */
-	function canEditState($record=null)
+	public function canEditState($record = null)
 	{
-		$record = $record ?: $this->_record;
-
-		$user = JFactory::getUser();
+		$record  = $record ?: $this->_record;
+		$user    = JFactory::getUser();
 		$session = JFactory::getSession();
-
 		$isOwner = !empty($record->created_by) && ( $record->created_by == $user->get('id') );
 
 		$hasCoupon = false;
@@ -5470,7 +5424,7 @@ class ParentClassItem extends FCModelAdmin
 		if (!$hasTypeEditState && !$hasTypeEditStateOwn) return false;
 
 		// Existing item, use item specific permissions
-		if ( !empty($record->id) )
+		if (!empty($record->id))
 		{
 			$asset = $this->typeAlias . '.' . $record->id;
 			$allowed =
@@ -5493,6 +5447,36 @@ class ParentClassItem extends FCModelAdmin
 			$allowed =
 				($hasTypeEditState && $user->authorise('core.edit.state', 'com_flexicontent')) ||
 				($hasTypeEditStateOwn && $user->authorise('core.edit.state.own', 'com_flexicontent'));
+		}
+
+		return $allowed;
+	}
+
+
+	/**
+	 * Method to check if the user can delete the record
+	 *
+	 * @return	boolean	True on success
+	 *
+	 * @since	3.2.0
+	 */
+	public function canDelete($record = null)
+	{
+		$record  = $record ?: $this->_record;
+		$user    = JFactory::getUser();
+		$isOwner = !empty($record->created_by) && ( $record->created_by == $user->get('id') );
+
+		// Existing item, use item specific permissions
+		if (!empty($record->id))
+		{
+			$asset = $this->typeAlias . '.' . $record->id;
+			$allowed = $user->authorise('core.delete', $asset) || ($user->authorise('core.delete.own', $asset) && $isOwner);
+		}
+
+		// Delete should not be used only on existing records, always return false
+		else
+		{
+			$allowed = false;
 		}
 
 		return $allowed;
@@ -5544,41 +5528,18 @@ class ParentClassItem extends FCModelAdmin
 
 
 	/**
-	 * Method to change the title & alias.
-	 *
-	 * @param   integer  $parent_id  If applicable, the id of the parent (e.g. assigned category)
-	 * @param   string   $alias      The alias / name.
-	 * @param   string   $title      The title / label.
-	 *
-	 * @return  array    Contains the modified title and alias / name.
-	 *
-	 * @since   1.7
-	 */
-	protected function generateNewTitle($parent_id, $alias, $title)
-	{
-		// Alter the title & alias
-		$table = $this->getTable();
-
-		while ($table->load(array('alias' => $alias)))
-		{
-			$title = StringHelper::increment($title);
-			$alias = StringHelper::increment($alias, 'dash');
-		}
-
-		return array($title, $alias);
-	}
-
-
-	/**
 	 * Method to do some record / data preprocessing before call JTable::bind()
 	 *
 	 * Note. Typically called inside this MODEL 's store()
 	 *
+	 * @param   object     $record   The record object
+	 * @param   array      $data     The new data array
+	 *
 	 * @since	3.2.0
 	 */
-	// TODO add call of this method, currently unused
 	protected function _prepareBind($record, & $data)
 	{
+		// Call parent class bind preparation
 		parent::_prepareBind($record, $data);
 	}
 
@@ -5587,6 +5548,9 @@ class ParentClassItem extends FCModelAdmin
 	 * Method to do some work after record has been stored
 	 *
 	 * Note. Typically called inside this MODEL 's store()
+	 *
+	 * @param   object     $record   The record object
+	 * @param   array      $data     The new data array
 	 *
 	 * @since	3.2.0
 	 */
@@ -5602,12 +5566,10 @@ class ParentClassItem extends FCModelAdmin
 	 *
 	 * Note. Typically called inside this MODEL 's store()
 	 *
-	 * @access	protected
 	 * @param	object   $record   The record object
 	 *
 	 * @since	3.2.0
 	 */
-	// TODO add call of this method, currently unused
 	protected function _afterLoad($record)
 	{
 		parent::_afterLoad($record);
@@ -5868,7 +5830,8 @@ class ParentClassItem extends FCModelAdmin
 		}
 
 		// Clean the cache
-		$this->cleanCache();
+		$this->cleanCache(null, 0);
+		$this->cleanCache(null, 1);
 	}
 
 

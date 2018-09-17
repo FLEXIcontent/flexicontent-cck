@@ -1,19 +1,12 @@
 <?php
 /**
- * @version 1.5 stable $Id: flexicontent_reviews.php 171 2010-03-20 00:44:02Z emmanuel.danan $
- * @package Joomla
- * @subpackage FLEXIcontent
- * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
- * @license GNU/GPL v2
- * 
- * FLEXIcontent is a derivative work of the excellent QuickFAQ component
- * @copyright (C) 2008 Christoph Lukes
- * see www.schlu.net for more information
+ * @package         FLEXIcontent
+ * @version         3.3
  *
- * FLEXIcontent is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
+ * @link            http://www.flexicontent.com
+ * @copyright       Copyright © 2018, FLEXIcontent team, All Rights Reserved
+ * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
 defined('_JEXEC') or die('Restricted access');
@@ -31,11 +24,13 @@ class flexicontent_reviews extends flexicontent_basetable
 
 	public function __construct(& $db)
 	{
-		$this->_records_dbtbl  = 'flexicontent_' . $this->_record_name . 's' . '_dev';
-		$this->_records_jtable = 'flexicontent_' . $this->_record_name . 's';
+		$this->_records_dbtbl  = 'flexicontent_' . $this->_record_name . 's';
 		$this->_NAME = strtoupper($this->_record_name);
 
 		parent::__construct('#__' . $this->_records_dbtbl, 'id', $db);
+
+		// Set the alias since the column is called state
+		$this->setColumnAlias('published', 'state');
 	}
 
 
@@ -48,7 +43,7 @@ class flexicontent_reviews extends flexicontent_basetable
 			$datenow = JFactory::getDate();
 			$this->submit_date = $datenow->toSql();
 		}
-		
+
 		// If edited by review submitter then also set the update_date
 		if ( $this->id && $this->user_id == JFactory::getUser()->id )
 		{

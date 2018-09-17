@@ -16,7 +16,7 @@
  * GNU General Public License for more details.
  */
 
-defined( '_JEXEC' ) or die( 'Restricted access' );
+defined('_JEXEC') or die('Restricted access');
 
 use Joomla\String\StringHelper;
 
@@ -1530,7 +1530,7 @@ if ($js)
 					<input type="hidden" name="u_item_id" value="<?php echo $this->u_item_id; ?>" />
 					<input type="hidden" name="folder_mode" value="<?php echo $this->folder_mode; ?>" />
 					<?php /* NOTE: return URL should use & and not &amp; for variable seperation as these will be re-encoded on redirect */ ?>
-					<input type="hidden" name="return-url" value="<?php echo base64_encode('index.php?option=com_flexicontent&view=<?php echo $this->view; ?>&field='.$this->fieldid.'&folder_mode='.$this->folder_mode.'&layout='.$this->layout.'&tmpl='.$_tmpl); ?>" />
+					<input type="hidden" name="return" value="<?php echo base64_encode('index.php?option=com_flexicontent&view=<?php echo $this->view; ?>&field='.$this->fieldid.'&folder_mode='.$this->folder_mode.'&layout='.$this->layout.'&tmpl='.$_tmpl); ?>" />
 				</form>
 
 			</fieldset>
@@ -1706,7 +1706,7 @@ if ($js)
 			</fieldset>
 
 			<?php /* NOTE: return URL should use & and not &amp; for variable seperation as these will be re-encoded on redirect */ ?>
-			<input type="hidden" name="return-url" value="<?php echo base64_encode('index.php?option=com_flexicontent&view='.$this->view.'&tmpl='.$_tmpl.'&field='.$this->fieldid.'&layout='.$this->layout); ?>" />
+			<input type="hidden" name="return" value="<?php echo base64_encode('index.php?option=com_flexicontent&view='.$this->view.'&tmpl='.$_tmpl.'&field='.$this->fieldid.'&layout='.$this->layout); ?>" />
 		</form>
 
 	</div>
@@ -1826,7 +1826,7 @@ if ($js)
 				</fieldset>
 			</fieldset>
 			<?php /* NOTE: return URL should use & and not &amp; for variable seperation as these will be re-encoded on redirect */ ?>
-			<input type="hidden" name="return-url" value="<?php echo base64_encode('index.php?option=com_flexicontent&view=filemanager'); ?>" />
+			<input type="hidden" name="return" value="<?php echo base64_encode('index.php?option=com_flexicontent&view=filemanager'); ?>" />
 		</form>
 
 	</div>

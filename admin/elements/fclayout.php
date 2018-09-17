@@ -455,7 +455,7 @@ function fc_getLayout_".$_name."(el, initial)
 
 	jQuery.ajax({
 		type: 'GET',
-		url: 'index.php?option=com_flexicontent&task=templates.getlayoutparams&ext_option=".$option."&ext_view=".$view."&ext_name=".$ext_name."&layout_pfx=".$layout_pfx."&ext_id=".$pk."&directory=".$directory."&layout_name='+layout_name+'&format=raw',
+		url: 'index.php?option=com_flexicontent&task=templates.getlayoutparams&ext_option=".$option."&ext_view=".$view."&ext_name=".$ext_name."&layout_pfx=".$layout_pfx."&ext_id=".$pk."&directory=".$directory."&layout_name='+layout_name+'&format=raw&" . JSession::getFormToken() . "=1',
 		success: function(str) {
 			if (bs_tab_handle.length)
 			{

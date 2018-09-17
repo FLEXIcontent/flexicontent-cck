@@ -1,46 +1,62 @@
 <?php
 /**
- * @version 1.5 stable $Id: tags.php 1889 2014-04-26 03:25:28Z ggppdk $
- * @package Joomla
- * @subpackage FLEXIcontent
- * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
- * @license GNU/GPL v2
- * 
- * FLEXIcontent is a derivative work of the excellent QuickFAQ component
- * @copyright (C) 2008 Christoph Lukes
- * see www.schlu.net for more information
+ * @package         FLEXIcontent
+ * @version         3.3
  *
- * FLEXIcontent is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
+ * @link            http://www.flexicontent.com
+ * @copyright       Copyright © 2018, FLEXIcontent team, All Rights Reserved
+ * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
-// no direct access
 defined('_JEXEC') or die('Restricted access');
 
-jimport('legacy.model.legacy');
 use Joomla\String\StringHelper;
+use Joomla\Utilities\ArrayHelper;
 use Joomla\CMS\Table\Table;
 
+require_once('base/baselist.php');
+
 /**
- * FLEXIcontent Component tags Model
+ * FLEXIcontent Component Tags Model
  *
- * @package Joomla
- * @subpackage FLEXIcontent
- * @since		1.0
  */
-class FlexicontentModelTags extends JModelLegacy
+class FlexicontentModelTags extends FCModelAdminList
 {
+
+	var $records_dbtbl  = 'flexicontent_tags';
+	var $records_jtable = 'flexicontent_tags';
+
 	/**
-	 * Tag data
+	 * Column names and record name
+	 */
+	var $record_name = 'tag';
+	var $state_col   = 'published';
+	var $name_col    = 'name';
+	var $parent_col  = null;
+
+	/**
+	 * (Default) Behaviour Flags
+	 */
+	var $listViaAccess = false;
+	var $copyRelations = false;
+
+	/**
+	 * Search and ordering columns
+	 */
+	var $search_cols       = array('name', 'alias');
+	var $default_order     = 'a.name';
+	var $default_order_dir = 'ASC';
+
+	/**
+	 * Record rows
 	 *
-	 * @var object
+	 * @var array
 	 */
 	var $_data = null;
 
 	/**
-	 * Tag total
+	 * Rows total
 	 *
 	 * @var integer
 	 */
@@ -54,15 +70,14 @@ class FlexicontentModelTags extends JModelLegacy
 	var $_pagination = null;
 
 	/**
-	 * Tag id
+	 * Single record id (used in operations)
 	 *
 	 * @var int
 	 */
 	var $_id = null;
-	
 
 	/**
-	 * Joomla Tags helper object
+	 * Joomla 3.x Tags helper object
 	 *
 	 * @var int
 	 */
@@ -72,420 +87,274 @@ class FlexicontentModelTags extends JModelLegacy
 	/**
 	 * Constructor
 	 *
-	 * @since 1.0
+	 * @since 3.3.0
 	 */
-	function __construct()
+	public function __construct($config = array())
 	{
-		parent::__construct();
-		
+		parent::__construct($config);
+
 		$app    = JFactory::getApplication();
 		$jinput = $app->input;
 		$option = $jinput->get('option', '', 'cmd');
 		$view   = $jinput->get('view', '', 'cmd');
 		$fcform = $jinput->get('fcform', 0, 'int');
-		$p      = $option.'.'.$view.'.';
+		$p      = $option . '.' . $view . '.';
 
-		// Initialize Tags helper object 
-		$tagsHelper = new \JHelperTags;
-		
-		
-		
-		// ****************************************
-		// Ordering: filter_order, filter_order_Dir
-		// ****************************************
-		
-		$default_order     = 't.name';
-		$default_order_dir = 'ASC';
-		
-		$filter_order      = $fcform ? $jinput->get('filter_order',     $default_order,      'cmd')  :  $app->getUserStateFromRequest( $p.'filter_order',     'filter_order',     $default_order,      'cmd' );
-		$filter_order_Dir  = $fcform ? $jinput->get('filter_order_Dir', $default_order_dir, 'word')  :  $app->getUserStateFromRequest( $p.'filter_order_Dir', 'filter_order_Dir', $default_order_dir, 'word' );
-		
-		if (!$filter_order)     $filter_order     = $default_order;
-		if (!$filter_order_Dir) $filter_order_Dir = $default_order_dir;
-		
-		$this->setState('filter_order', $filter_order);
-		$this->setState('filter_order_Dir', $filter_order_Dir);
-		
-		$app->setUserState($p.'filter_order', $filter_order);
-		$app->setUserState($p.'filter_order_Dir', $filter_order_Dir);
-		
-		
-		
-		// **************
-		// view's Filters
-		// **************
-		
+
+		/**
+		 * View's Filters
+		 * Inherited filters : filter_state, search
+		 */
+
 		// Various filters
-		$filter_state    = $fcform ? $jinput->get('filter_state',    '', 'string')  :  $app->getUserStateFromRequest( $p.'filter_state',    'filter_state',    '', 'string' );   // we may check for '*', so string filter
-		$filter_assigned = $fcform ? $jinput->get('filter_assigned', '', 'cmd')     :  $app->getUserStateFromRequest( $p.'filter_assigned', 'filter_assigned', '', 'cmd' );
-		
-		$this->setState('filter_state', $filter_state);
+		$filter_assigned = $fcform ? $jinput->get('filter_assigned', '', 'cmd') : $app->getUserStateFromRequest($p . 'filter_assigned', 'filter_assigned', '', 'cmd');
 		$this->setState('filter_assigned', $filter_assigned);
-		
-		$app->setUserState($p.'filter_state', $filter_state);
-		$app->setUserState($p.'filter_assigned', $filter_assigned);
-		
-		
-		// Text search
-		$search = $fcform ? $jinput->get('search', '', 'string')  :  $app->getUserStateFromRequest( $p.'search',  'search',  '',  'string' );
-		$this->setState('search', $search);
-		$app->setUserState($p.'search', $search);
-		
-		
-		
-		// *****************************
-		// Pagination: limit, limitstart
-		// *****************************
-		
-		$limit      = $fcform ? $jinput->get('limit', $app->getCfg('list_limit'), 'int')  :  $app->getUserStateFromRequest( $p.'limit', 'limit', $app->getCfg('list_limit'), 'int');
-		$limitstart = $fcform ? $jinput->get('limitstart',                     0, 'int')  :  $app->getUserStateFromRequest( $p.'limitstart', 'limitstart', 0, 'int' );
-		
-		// In case limit has been changed, adjust limitstart accordingly
-		$limitstart = ( $limit != 0 ? (floor($limitstart / $limit) * $limit) : 0 );
-		$jinput->set( 'limitstart',	$limitstart );
-		
-		$this->setState('limit', $limit);
-		$this->setState('limitstart', $limitstart);
-		
-		$app->setUserState($p.'limit', $limit);
-		$app->setUserState($p.'limitstart', $limitstart);
-		
-		
-		// For some model function that use single id
-		$array = $jinput->get('cid', array(0), 'array');
-		$this->setId((int)$array[0]);
+		$app->setUserState($p . 'filter_assigned', $filter_assigned);
+
+
+		// Manage view permission
+		$this->canManage = FlexicontentHelperPerm::getPerm()->CanTags;
+
+		// Initialize Tags helper object
+		$this->tagsHelper = new \JHelperTags;
 	}
 
 
 	/**
-	 * Method to set the Tag identifier
+	 * Method to build the query for the records
 	 *
-	 * @access	public
-	 * @param	int Tag identifier
+	 * @return JDatabaseQuery   The DB Query object
+	 *
+	 * @since 3.3.0
 	 */
-	function setId($id)
+	protected function getListQuery()
 	{
-		// Set id and wipe data
-		$this->_id	 = $id;
-		$this->_data = null;
-	}
+		// Create a query with all its clauses: WHERE, HAVING and ORDER BY, etc
+		$query = parent::getListQuery()
+			->select(
+				'CASE WHEN CHAR_LENGTH(a.alias) THEN CONCAT_WS(\':\', a.id, a.alias) ELSE a.id END as slug'
+			)
+		;
 
+		/**
+		 * Get assignments
+		 */
 
-	/**
-	 * Method to count assigned items for the given categories
-	 *
-	 * @access public
-	 * @return	string
-	 * @since	1.6
-	 */
-	function getAssignedItems($tids)
-	{
-		if (empty($tids)) return array();
-		
-		$db = JFactory::getDbo();
-		
-		// Select the required fields from the table.
-		$query  = " SELECT rel.tid, COUNT(rel.itemid) AS nrassigned";
-		$query .= " FROM #__flexicontent_tags_item_relations AS rel";
-		$query .= " WHERE rel.tid IN (".implode(",", $tids).") ";
-		$query .= " GROUP BY rel.tid";
-		
-		$db->setQuery( $query );
-		$assigned = $db->loadObjectList('tid');
-		return $assigned;
-	}
-	
-	
-	/**
-	 * Method to get tags data
-	 *
-	 * @access public
-	 * @return array
-	 */
-	function getData()
-	{
-		// Lets load the tags if it doesn't already exist
-		if (empty($this->_data))
+		$filter_order    = $this->getState('filter_order');
+		$filter_assigned = $this->getState('filter_assigned');
+
+		// Join to get assignments
+		if ($filter_assigned || $filter_order == 'nrassigned')
 		{
-			$query = $this->_buildQuery();
-			$this->_data = $this->_getList($query, $this->getState('limitstart'), $this->getState('limit'));
-			$db = JFactory::getDbo();
-			$db->setQuery("SELECT FOUND_ROWS()");
-			$this->_total = $db->loadResult();
-		}
-		
-		return $this->_data;
-	}
-
-
-	/**
-	 * Method to get the total nr of the tags
-	 *
-	 * @access public
-	 * @return integer
-	 */
-	function getTotal()
-	{
-		// Lets load the tags if it doesn't already exist
-		if (empty($this->_total))
-		{
-			$query = $this->_buildQuery();
-			$this->_total = $this->_getListCount($query);
+			$query->leftJoin('#__flexicontent_tags_item_relations AS rel ON rel.tid = a.id');
 		}
 
-		return $this->_total;
-	}
-
-
-	/**
-	 * Method to get a pagination object for the tags
-	 *
-	 * @access public
-	 * @return integer
-	 */
-	function getPagination()
-	{
-		// Lets load the tags if it doesn't already exist
-		if (empty($this->_pagination))
+		// Select to get assignments
+		if ($filter_order === 'nrassigned')
 		{
-			require_once (JPATH_COMPONENT_SITE.DS.'helpers'.DS.'pagination.php');
-			$this->_pagination = new FCPagination( $this->getTotal(), $this->getState('limitstart'), $this->getState('limit') );
+			$query->select('(SELECT COUNT(rel.tid) FROM #__flexicontent_tags_item_relations AS rel WHERE rel.tid = a.id GROUP BY a.id) AS nrassigned');
 		}
 
-		return $this->_pagination;
-	}
-
-
-	/**
-	 * Method to build the query for the tags
-	 *
-	 * @access private
-	 * @return integer
-	 * @since 1.0
-	 */
-	function _buildQuery()
-	{
-		// Get the WHERE, HAVING and ORDER BY clauses for the query
-		$where		= $this->_buildContentWhere();
-		$orderby	= $this->_buildContentOrderBy();
-		$having		= $this->_buildContentHaving();
-		
-		$filter_order     = $this->getState( 'filter_order' );
-		$filter_assigned	= $this->getState( 'filter_assigned' );
-		
-		$query = 'SELECT SQL_CALC_FOUND_ROWS t.*, u.name AS editor'
-			// because of multi-multi tag-item relations it is faster to calculate this with a single seperate query
-			// if it was single mapping e.g. like it is 'item' TO 'content type' or 'item' TO 'creator' we could use a subquery
-			// the more tags are listed (query LIMIT) the bigger the performance difference ...
-			. ($filter_order=='nrassigned' ? ', (SELECT COUNT(rel.tid) FROM #__flexicontent_tags_item_relations AS rel WHERE rel.tid=t.id GROUP BY t.id) AS nrassigned' : '')
-			. ', CASE WHEN CHAR_LENGTH(t.alias) THEN CONCAT_WS(\':\', t.id, t.alias) ELSE t.id END as slug'
-			. ' FROM #__flexicontent_tags AS t'
-			. ' LEFT JOIN #__users AS u ON u.id = t.checked_out'
-			. ($filter_assigned || $filter_order=='nrassigned' ? ' LEFT JOIN #__flexicontent_tags_item_relations AS rel ON rel.tid=t.id' : '')
-			. $where
-			. ' GROUP BY t.id'
-			. $having
-			. $orderby
-			;
+		/**
+		 * Because of multi-multi tag-item relations it is faster to calculate this with a single seperate query
+		 * if it was single mapping e.g. like it is 'item' TO 'content type' or 'item' TO 'creator' we could use a subquery
+		 * the more tags are listed (query LIMIT) the bigger the performance difference ...
+		 */
+		// ... by using method *::getAssignedItems()
 
 		return $query;
 	}
 
 
 	/**
-	 * Method to build the orderby clause of the query for the tags
+	 * Method to build the where clause of the query for the records
 	 *
-	 * @access private
-	 * @return string
+	 * @param		JDatabaseQuery|bool   $q   DB Query object or bool to indicate returning an array or rendering the clause
+	 *
+	 * @return  JDatabaseQuery|array
+	 *
 	 * @since 1.0
 	 */
-	function _buildContentOrderBy()
+	protected function _buildContentWhere($q = false)
 	{
-		$filter_order     = $this->getState( 'filter_order' );
-		$filter_order_Dir	= $this->getState( 'filter_order_Dir' );
-		
-		$orderby 	= ' ORDER BY '.$filter_order.' '.$filter_order_Dir;
+		// Inherited filters : filter_state, search
+		$where = parent::_buildContentWhere(false);
 
-		return $orderby;
-	}
-
-
-	/**
-	 * Method to build the where clause of the query for the tags
-	 *
-	 * @access private
-	 * @return string
-	 * @since 1.0
-	 */
-	function _buildContentWhere()
-	{
-		$app = JFactory::getApplication();
-		$option = $app->input->get('option', '', 'CMD');
-		
-		$filter_state	= $this->getState( 'filter_state' );
-		
-		// text search
-		$search  = $this->getState( 'search' );
-		$search  = StringHelper::trim( StringHelper::strtolower( $search ) );
-		
-		$where = array();
-
-		if ( empty($filter_state) )
+		if ($q instanceof \JDatabaseQuery)
 		{
-			$where[] = 't.published <> -2';
-			$where[] = 't.published <> 2';
-		}
-		else
-		{
-			if ( $filter_state == 'P' ) {
-				$where[] = 't.published = 1';
-			} else if ($filter_state == 'U' ) {
-				$where[] = 't.published = 0';
-			} else if ($filter_state == 'A' ) {
-				$where[] = 't.published = 2';
-			} else if ($filter_state == 'T' ) {
-				$where[] = 't.published = -2';
-			}
+			return $where ? $q->where($where) : $q;
 		}
 
-		if ($search) {
-			$escaped_search = FLEXI_J16GE ? $this->_db->escape( $search, true ) : $this->_db->getEscaped( $search, true );
-			$where[] = ' LOWER(t.name) LIKE '.$this->_db->Quote( '%'.$escaped_search.'%', false );
-		}
-
-		$where 		= ( count( $where ) ? ' WHERE ' . implode( ' AND ', $where ) : '' );
-
-		return $where;
+		return $q
+			? ' WHERE ' . (count($where) ? implode(' AND ', $where) : ' 1 ')
+			: $where;
 	}
 
 
 	/**
 	 * Method to build the having clause of the query for the files
 	 *
-	 * @access private
-	 * @return string
+	 * @param		JDatabaseQuery|bool   $q   DB Query object or bool to indicate returning an array or rendering the clause
+	 *
+	 * @return  JDatabaseQuery|array
+	 *
 	 * @since 1.0
 	 */
-	function _buildContentHaving()
+	protected function _buildContentHaving($q = false)
 	{
-		$filter_assigned	= $this->getState( 'filter_assigned' );
-		
-		$having = '';
-		
-		if ( $filter_assigned ) {
-			if ( $filter_assigned == 'O' ) {
-				$having = ' HAVING COUNT(rel.tid) = 0';
-			} else if ($filter_assigned == 'A' ) {
-				$having = ' HAVING COUNT(rel.tid) > 0';
-			}
-		}
-		
-		return $having;
-	}
+		$having = parent::_buildContentHaving(false);
 
+		$filter_assigned = $this->getState('filter_assigned');
+		$rel_col         = 'rel.tid';
 
-	/**
-	 * Method to (un)publish a tag
-	 *
-	 * @access	public
-	 * @return	boolean	True on success
-	 * @since	1.0
-	 */
-	function publish($cid = array(), $publish = 1)
-	{
-		$user = JFactory::getUser();
-
-		if (count( $cid ))
+		switch ($filter_assigned)
 		{
-			$cids = implode( ',', $cid );
+			case 'O':
+				$having[] = 'COUNT(' . $rel_col . ') = 0';
+				break;
 
-			$query 	= 'UPDATE #__flexicontent_tags'
-					. ' SET published = ' . (int) $publish
-					. ' WHERE id IN ('. $cids .')'
-					. ' AND ( checked_out = 0 OR ( checked_out = ' . (int) $user->get('id'). ' ) )'
-					;
-			$this->_db->setQuery( $query );
-			$this->_db->execute();
+			case 'A':
+				$having[] = 'COUNT(' . $rel_col . ') > 0';
+				break;
 		}
-		return true;
+
+		if ($q instanceof \JDatabaseQuery)
+		{
+			return $having ? $q->having($having) : $q;
+		}
+
+		return $q
+			? ' HAVING ' . (count($having) ? implode(' AND ', $having) : ' 1 ')
+			: $having;
 	}
 
 
 	/**
-	 * Method to check if given records can not be deleted e.g. due to assignments or due to being a CORE record
+	 * Method to delete related data of records
 	 *
-	 * @access	public
-	 * @return	boolean
-	 * @since	1.5
-	 */
-	function candelete($cid, & $cid_noauth=array(), & $cid_wassocs=array())
-	{
-		$cid_noauth = $cid_wassocs = array();
-
-		// Find ACL disallowed
-		$cid_noauth = FlexicontentHelperPerm::getPerm()->CanTags ? array() : $cid;
-
-		return !count($cid_noauth) && !count($cid_wassocs);
-	}
-
-
-	/**
-	 * Method to check if given records can not be unpublished e.g. due to assignments or due to being a CORE record
+	 * @param		array			$cid          array of record ids to delete their related Data
 	 *
-	 * @access	public
-	 * @return	boolean
-	 * @since	1.5
-	 */
-	function canunpublish($cid, & $cid_noauth=array(), & $cid_wassocs=array())
-	{
-		$cid_noauth = $cid_wassocs = array();
-
-		// Find ACL disallowed
-		$cid_noauth = FlexicontentHelperPerm::getPerm()->CanTags ? array() : $cid;
-
-		return !count($cid_noauth) && !count($cid_wassocs);
-	}
-
-
-	/**
-	 * Method to remove a tag
+	 * @return	void
 	 *
-	 * @access	public
-	 * @return	boolean	True on success
-	 * @since	1.0
+	 * @since		3.3.0
 	 */
-	function delete($cid = array())
+	protected function _deleteRelatedData($cid)
 	{
-		$result = false;
-
 		if (count($cid))
 		{
-			$cids = implode(',', $cid);
-
-			$query = 'DELETE FROM #__flexicontent_tags'
-				. ' WHERE id IN (' . $cids . ')';
-
-			$this->_db->setQuery($query)->execute();
-
-			$query = 'DELETE FROM #__flexicontent_tags_item_relations'
-				. ' WHERE tid IN (' . $cids . ')';
-
+			// Delete also tag - item relations
+			$query = $this->_db->getQuery(true)
+				->delete('#__flexicontent_tags_item_relations')
+				->where('tid IN (' . $cid_list . ')');
 			$this->_db->setQuery($query)->execute();
 		}
-
-		return true;
 	}
+
+
+	/**
+	 * Method to copy records
+	 *
+	 * @param		array			$cid          array of record ids to copy
+	 * @param		array			$copyRelations   flag to indicate copying 'related' data, like 'assignments'
+	 *
+	 * @return	array		Array of old-to new record ids of copied record IDs
+	 *
+	 * @since		1.0
+	 */
+	public function copy($cid, $copyRelations = null)
+	{
+		$copyRelations = copyValues === null ? $this->copyValues : $copyRelations;
+		$ids_map       = array();
+		$name          = $this->name_col;
+
+		foreach ($cid as $id)
+		{
+			$table        = $this->getTable($this->records_jtable, '');
+			$table->load($id);
+			$table->id    = 0;
+			$table->$name = $table->$name . ' [copy]';
+			$table->alias = JFilterOutput::stringURLSafe($table->$name);
+			$table->check();
+			$table->store();
+
+			// Add new record id to the old-to-new IDs map
+			$ids_map[$id] = $table->id;
+		}
+
+		// Also copy related Data, like 'assignments'
+		if ($copyRelations)
+		{
+			$this->_copyRelatedData($ids_map);
+		}
+
+		return $ids_map;
+	}
+
+
+	/**
+	 * Method to copy assignments and other related data of records
+	 *
+	 * @param   array     $ids_map     array of old to new record ids
+	 *
+	 * @return	void
+	 *
+	 * @since		3.3.0
+	 */
+	protected function _copyRelatedData($ids_map)
+	{
+		
+	}
+
+
+	/**
+	 * Method to find which records having assignments blocking a state change
+	 *
+	 * @param		array     $cid      array of record ids to check
+	 * @param		string    $tostate  action related to assignments
+	 *
+	 * @return	array     The records having assignments
+	 */
+	public function filterByAssignments($cid = array(), $tostate = -2)
+	{
+		ArrayHelper::toInteger($cid);
+		$cid_wassocs = array();
+
+		switch ($tostate)
+		{
+			// Trash
+			case -2:
+				$query = 'SELECT DISTINCT tid'
+					. ' FROM #__flexicontent_tags_item_relations'
+					. ' WHERE tid IN (' . implode(',', $cid) . ')'
+				;
+
+				$cid_wassocs = $this->_db->setQuery($query)->loadColumn();
+				break;
+
+			// Unpublish
+			case 0:
+				break;
+		}
+
+		return $cid_wassocs;
+	}
+
+
+	/**
+	 * START OF MODEL SPECIFIC METHODS
+	 */
 
 
 	/**
 	 * Method to import a list of tags
 	 *
-	 * @access	public
 	 * @params	string	the list of tags to import
+	 *
 	 * @return	array	the import logs
+	 *
 	 * @since	1.5
 	 */
-	function importList($tags)
+	public function importList($tags)
 	{
 		if (!$tags)
 		{
@@ -493,25 +362,25 @@ class FlexicontentModelTags extends JModelLegacy
 		}
 
 		// Initialize the logs counters
-		$logs = array();
-		$logs['error'] 		= 0;
-		$logs['success'] 	= 0;
-		
+		$logs            = array();
+		$logs['error']   = 0;
+		$logs['success'] = 0;
+
 		$tags = explode("\n", $tags);
-		
+
 		foreach ($tags as $tag)
 		{
-			$row = $this->getTable('flexicontent_tags', '');
-			$row->name 		= $tag;
+			$row            = $this->getTable($this->records_jtable, '');
+			$row->name      = $tag;
 			$row->published = 1;
 			if (!$row->check())
 			{
-				$logs['error']++;			
+				$logs['error'] ++;
 			}
 			else
 			{
 				$row->store();
-				$logs['success']++;
+				$logs['success'] ++;
 			}
 		}
 
@@ -522,18 +391,18 @@ class FlexicontentModelTags extends JModelLegacy
 	/**
 	 * Method to get ids of all files
 	 *
-	 * @access	public
 	 * @return	boolean	integer array on success
+	 *
 	 * @since	1.0
 	 */
-	function getNotMappedTagIds(&$total=null, $start=0, $limit=5000)
+	public function getNotMappedTagIds(&$total = null, $start = 0, $limit = 5000)
 	{
 		$query = 'SELECT SQL_CALC_FOUND_ROWS ft.id '
 			. ' FROM #__flexicontent_tags AS ft'
 			. ' LEFT JOIN #__tags AS jt ON ft.jtag_id = jt.id'
 			. ' WHERE ft.jtag_id = 0 OR jt.id IS NULL'
 			. ($limit ? ' LIMIT ' . (int) $start . ', ' . (int) $limit : '')
-			;
+		;
 		$tag_ids = $this->_db->setQuery($query)->loadColumn();
 
 		// Get items total
@@ -595,6 +464,7 @@ class FlexicontentModelTags extends JModelLegacy
 				$loaded = true;
 			}
 
+			// (C) Try to load auto-created alias, and (D) Fail if not found
 			else
 			{
 				// Set title then call check() method to auto-create an alias
@@ -611,13 +481,13 @@ class FlexicontentModelTags extends JModelLegacy
 				else
 				{
 					// Prepare tag data
-					$tagTable->id = 0;
-					$tagTable->title = $tagText;
+					$tagTable->id        = 0;
+					$tagTable->title     = $tagText;
 					$tagTable->published = 1;
 
 					// Language ALL, Public access (assumed ... 1)
 					$tagTable->language = '*';
-					$tagTable->access = 1;
+					$tagTable->access   = 1;
 
 					// Make this item a child of the root tag
 					$tagTable->setLocation($tagTable->getRootId(), 'last-child');
@@ -639,7 +509,7 @@ class FlexicontentModelTags extends JModelLegacy
 			if ($loaded)
 			{
 				$newTags[$tagText] = (object) array(
-					'id' => (int) $tagTable->id,
+					'id'    => (int) $tagTable->id,
 					'title' => $tagTable->title,
 					'alias' => $tagTable->alias
 				);
@@ -665,47 +535,75 @@ class FlexicontentModelTags extends JModelLegacy
 	 */
 	public function addTagMapping($ucmId, TableInterface $table, $tags = array())
 	{
-		$db = $table->getDbo();
-		$key = $table->getKeyName();
-		$item = $table->$key;
-		$typeId = $tagsHelper->getTypeId($tagsHelper->typeAlias);
+		$key    = $table->getKeyName();
+		$item   = $table->$key;
+		$typeId = $this->tagsHelper->getTypeId($this->tagsHelper->typeAlias);
 
 		// Insert the new tag maps
 		if (strpos('#', implode(',', $tags)) === false)
 		{
-			$tags = $tagsHelper->createTagsFromField($tags);
+			$tags = $this->tagsHelper->createTagsFromField($tags);
 		}
 
 		// Prevent saving duplicate tags
 		$tags = array_unique($tags);
 
-		$query = $db->getQuery(true);
+		$query = $this->_db->getQuery(true);
 		$query->insert('#__contentitem_tag_map');
 		$query->columns(
 			array(
-				$db->quoteName('type_alias'),
-				$db->quoteName('core_content_id'),
-				$db->quoteName('content_item_id'),
-				$db->quoteName('tag_id'),
-				$db->quoteName('tag_date'),
-				$db->quoteName('type_id'),
+				$this->_db->quoteName('type_alias'),
+				$this->_db->quoteName('core_content_id'),
+				$this->_db->quoteName('content_item_id'),
+				$this->_db->quoteName('tag_id'),
+				$this->_db->quoteName('tag_date'),
+				$this->_db->quoteName('type_id'),
 			)
 		);
 
 		foreach ($tags as $tag)
 		{
 			$query->values(
-				$db->quote($tagsHelper->typeAlias)
+				$this->_db->quote($this->tagsHelper->typeAlias)
 				. ', ' . (int) $ucmId
 				. ', ' . (int) $item
-				. ', ' . $db->quote($tag)
+				. ', ' . $this->_db->quote($tag)
 				. ', ' . $query->currentTimestamp()
 				. ', ' . (int) $typeId
 			);
 		}
 
-		$db->setQuery($query);
-
-		return (boolean) $db->execute();
+		return (boolean) $this->_db->setQuery($query)->execute();
 	}
+
+
+	/**
+	 * Method to count assigned items for the given categories
+	 *
+	 * @return	string
+	 *
+	 * @since	1.6
+	 */
+	public function getAssignedItems($tids)
+	{
+		if (empty($tids))
+		{
+			return array();
+		}
+
+		// Select the required fields from the table.
+		$query = " SELECT rel.tid, COUNT(rel.itemid) AS nrassigned"
+			. " FROM #__flexicontent_tags_item_relations AS rel"
+			. " WHERE rel.tid IN (" . implode(",", $tids) . ") "
+			. " GROUP BY rel.tid";
+
+		$assigned = $this->_db->setQuery($query)->loadObjectList('tid');
+		return $assigned;
+	}
+
+
+	/**
+	 * START OF MODEL LEGACY METHODS
+	 */
+
 }

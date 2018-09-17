@@ -1,23 +1,15 @@
 <?php
 /**
- * @version 1.5 stable $Id: flexicontent_items.php 1832 2014-01-17 00:17:27Z ggppdk $
- * @package Joomla
- * @subpackage FLEXIcontent
- * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
- * @license GNU/GPL v2
- * 
- * FLEXIcontent is a derivative work of the excellent QuickFAQ component
- * @copyright (C) 2008 Christoph Lukes
- * see www.schlu.net for more information
+ * @package         FLEXIcontent
+ * @version         3.3
  *
- * FLEXIcontent is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
+ * @link            http://www.flexicontent.com
+ * @copyright       Copyright © 2018, FLEXIcontent team, All Rights Reserved
+ * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
 defined('_JEXEC') or die('Restricted access');
-
 use Joomla\String\StringHelper;
 use Joomla\CMS\Event\AbstractEvent;
 use Joomla\Database\DatabaseDriver;
@@ -186,13 +178,34 @@ class flexicontent_items extends _flexicontent_items
 	/** @var string */
 	var $search_index		= null;
 
+	// Non-table (private) properties
+	var $_record_name = 'item';
+	var $_title = 'title';
+	var $_alias = 'alias';
+	var $_force_ascii_alias = false;
+	var $_allow_underscore = true;
+
+	var $_jtbls = array(
+		'#__content' => array('Content', 'JTable', 'state'),
+		'#__flexicontent_items_ext' => array('flexicontent_items_ext', '', false),
+		'#__flexicontent_items_tmp' => array('flexicontent_items_tmp', '', 'state'),
+	);
+
 	/**
-	 * Name of the the items ext table
+	 * Name of the data table
 	 *
 	 * @var	string
 	 * @access protected
 	 */
-	var $_tbl_join_ext			= '#__flexicontent_items_ext';
+	var $_tbl = null;
+
+	/**
+	 * Name of the data ext table
+	 *
+	 * @var	string
+	 * @access protected
+	 */
+	var $_tbl_ext			= '#__flexicontent_items_ext';
 	
 	/**
 	 * Name of the foreign key in the link table
@@ -202,14 +215,15 @@ class flexicontent_items extends _flexicontent_items
 	 * @access	protected
 	 */
 	var $_frn_key_ext			= 'item_id';
+	var $_tbl_key_ext			= 'id';
 	
 	/**
-	 * Name of the the items ext table
+	 * Name of the data tmp table
 	 *
 	 * @var	string
 	 * @access protected
 	 */
-	var $_tbl_join_tmp			= '#__flexicontent_items_tmp';
+	var $_tbl_tmp			= '#__flexicontent_items_tmp';
 	
 	/**
 	 * Name of the foreign key in the link table
@@ -219,6 +233,7 @@ class flexicontent_items extends _flexicontent_items
 	 * @access	protected
 	 */
 	var $_frn_key_tmp			= 'id';
+	var $_tbl_key_tmp			= 'id';
 
 
 
@@ -231,7 +246,15 @@ class flexicontent_items extends _flexicontent_items
 	 */
 	public function __construct($db)
 	{
-		parent::__construct('#__content', 'id', $db);
+		//JTable::addIncludePath(JPATH_SITE . '/libraries/src/Table');
+
+		$this->_records_dbtbl  = 'content';
+		$this->_NAME = strtoupper($this->_record_name);
+
+		parent::__construct('#__' . $this->_records_dbtbl, 'id', $db);
+
+		// Set the alias since the column is called state
+		$this->setColumnAlias('published', 'state');
 	}
 
 
@@ -269,8 +292,8 @@ class flexicontent_items extends _flexicontent_items
 		if (!isset($tbl_fields))
 		{
 			$tbls = array(
-				$this->_tbl_join_ext,
-				$this->_tbl_join_tmp
+				$this->_tbl_ext,
+				$this->_tbl_tmp,
 			);
 
 			foreach ($tbls as $tbl)
@@ -311,7 +334,7 @@ class flexicontent_items extends _flexicontent_items
 		foreach ($this->tbl_fields as $tbl => $props_arr)
 		{
 			// Skip this table as it contains copies of the other tables , they do not have their own values
-			if ($tbl === $this->_tbl_join_tmp)
+			if ($tbl === $this->_tbl_tmp)
 			{
 				continue;
 			}
@@ -334,16 +357,13 @@ class flexicontent_items extends _flexicontent_items
 	/**
 	 * Method to load a row from the database by primary key and bind the fields to the Table instance properties.
 	 *
-	 * @param   mixed    $keys   An optional primary key value to load the row by, or an array of fields to match.
-	 *                           If not set the instance property value is used.
+	 * @param   mixed    $keys   An optional primary key value to load the row by, or an array of fields to match. If not set the instance property value is used.
 	 * @param   boolean  $reset  True to reset the default values before loading the new row.
 	 *
 	 * @return  boolean  True if successful. False if row not found.
 	 *
-	 * @since   11.1
-	 * @throws  \InvalidArgumentException
-	 * @throws  \RuntimeException
-	 * @throws  \UnexpectedValueException
+	 * @since   3.3
+	 * @throws  \InvalidArgumentException, \RuntimeException, \UnexpectedValueException
 	 */
 	public function load($keys = null, $reset = true)
 	{
@@ -412,9 +432,9 @@ class flexicontent_items extends _flexicontent_items
 
 		// Initialise the query.
 		$query = $this->_db->getQuery(true)
-			->select('*')
-			->from($this->_tbl)
-			->join('LEFT', $this->_tbl_join_ext . ' ON ' . $this->_tbl_key . ' = ' . $this->_frn_key_ext);
+			->select('e.*, a.*')
+			->from($this->_tbl . ' AS a')
+			->join('LEFT', $this->_tbl_ext . ' AS e ON a.' . $this->_tbl_key_ext . ' = e.' . $this->_frn_key_ext);
 
 		$fields = array_keys($this->getProperties());
 
@@ -468,278 +488,15 @@ class flexicontent_items extends _flexicontent_items
 
 
 	/**
-	 * Overloaded bind function
+	 * Method to perform sanity checks on the Table instance properties to ensure they are safe to store in the database.
 	 *
-	 * @param   array  $array   Named array
-	 * @param   mixed  $ignore  An optional array or space separated list of properties
-	 *                          to ignore while binding.
+	 * Child classes should override this method to make sure the data they are storing in the database is safe and as expected before storage.
 	 *
-	 * @return  mixed  Null if operation was satisfactory, otherwise returns an error string
+	 * @return  boolean  True if the instance is sane and able to be stored in the database.
 	 *
-	 * @see     JTable:bind
-	 * @since   11.1
+	 * @since   3.3
 	 */
-	public function bind($array, $ignore = '')
-	{
-		if (isset($array['images']) && is_array($array['images']))
-		{
-			$registry = new JRegistry;
-			$registry->loadArray($array['images']);
-			$array['images'] = (string)$registry;
-		}
-
-		if (isset($array['urls']) && is_array($array['urls']))
-		{
-			$registry = new JRegistry;
-			$registry->loadArray($array['urls']);
-			$array['urls'] = (string)$registry;
-		}
-		
-		if (isset($array['attribs']) && is_array($array['attribs']))
-		{
-			$registry = new JRegistry;
-			$registry->loadArray($array['attribs']);
-			$array['attribs'] = (string)$registry;
-		}
-
-		if (isset($array['metadata']) && is_array($array['metadata']))
-		{
-			$registry = new JRegistry;
-			$registry->loadArray($array['metadata']);
-			$array['metadata'] = (string)$registry;
-		}
-
-		// Bind the rules.
-		if (isset($array['rules']) && is_array($array['rules']))
-		{
-			$rules = new JAccessRules($array['rules']);
-			$this->setRules($rules);
-		}
-
-		return parent::bind($array, $ignore);
-	}
-
-	/**
-	 * Overloaded store function
-	 *
-	 * @access public
-	 * @return boolean
-	 * @since 1.5
-	 */
-	function store( $updateNulls=false )
-	{
-		$k             = $this->_tbl_key;
-		$frn_key_ext   = $this->_frn_key_ext;
-		$frn_key_tmp   = $this->_frn_key_tmp;
-
-		// Split the object for the two tables #__content and #__flexicontent_items_ext, (#__flexicontent_items_tmp duplicates non-TEXT data of #__content)
-		$record = JTable::getInstance('content');
-		$record->_tbl = $this->_tbl;
-		$record->_tbl_key = $this->_tbl_key;
-
-		$record_ext = JTable::getInstance('flexicontent_items_ext', '');
-		$record_ext->_tbl = $this->_tbl_join_ext;
-		$record_ext->_tbl_key = $this->_frn_key_ext;
-
-		$record_tmp = JTable::getInstance('flexicontent_items_tmp', '');
-		$record_tmp->_tbl = $this->_tbl_join_tmp;
-		$record_tmp->_tbl_key = $this->_frn_key_tmp;
-		
-		foreach ($this->getProperties() as $p => $v)
-		{
-			// If the property is in the join properties array we add it to the items_tmp object (coming either from tbl or tbl_ext or from other joined table)
-			if (isset($this->tbl_fields[$this->_tbl_join_tmp][$p]))
-			{
-				$record_tmp->$p = $v;
-			}
-			
-			// If the property is in the join properties array we add it to the items_ext object
-			if (isset($this->tbl_fields[$this->_tbl_join_ext][$p]))
-			{
-				$record_ext->$p = $v;
-				
-				// Also use main table for article's language column
-				if ($p === 'language')
-				{
-					$record->$p = $v;
-				}
-			
-				// Master item id for (translation groups), (Deprecated, TODO remove)
-				if ($p === 'lang_parent_id')
-				{
-					$record_ext->$p = 0;//$record->id;
-					$record_tmp->$p = 0;//$record->id;
-				}
-			}
-				
-			// Else we add it to the core item properties
-			else
-			{
-				$record->$p = $v;
-			}
-		}
-
-		if ($this->$k)
-		{
-			$ret = $this->_db->updateObject($this->_tbl, $record, $this->_tbl_key, $updateNulls);
-
-			$record_ext->$frn_key_ext = $this->$k;
-			$record_tmp->$frn_key_tmp = $this->$k;
-		}
-		else
-		{
-			$ret = $this->_db->insertObject( $this->_tbl, $record, $this->_tbl_key );
-
-			// Get record ID, either this was given or we will get auto-increment ID of last INSERT operation
-			$this->id = $record->id ?: $this->_db->insertid();
-		}
-
-		if (!$ret)
-		{
-			$this->setError(get_class($this) . '::store failed - ' . $this->_db->getErrorMsg());
-			return false;
-		}
-
-		else
-		{
-			// Check foreign key for DB table items_ext
-			$ext_exists = false;
-			if (!empty($record_ext->$frn_key_ext))
-			{
-				$ext_exists = (boolean) $this->_db->setQuery('SELECT COUNT(*) FROM ' . $this->_tbl_join_ext . ' WHERE ' . $frn_key_ext . '=' . (int) $record_ext->$frn_key_ext)->loadResult();
-			}
-
-			// Check foreign key for DB table items_tmp
-			$tmp_exists = false;
-			if (!empty($record_tmp->$frn_key_tmp))
-			{
-				$tmp_exists = (boolean) $this->_db->setQuery('SELECT COUNT(*) FROM ' . $this->_tbl_join_tmp . ' WHERE ' . $frn_key_tmp . '=' . (int) $record_tmp->$frn_key_tmp)->loadResult();
-			}
-			
-			// Update #__flexicontent_items_ext table
-			if ($ext_exists)
-			{
-				$ret = $this->_db->updateObject( $this->_tbl_join_ext, $record_ext, $this->_frn_key_ext, $updateNulls );
-			}
-
-			// Insert into #__flexicontent_items_ext table
-			else
-			{
-				$record_ext->$frn_key_ext = $this->id;
-				$ret = $this->_db->insertObject( $this->_tbl_join_ext, $record_ext, $this->_frn_key_ext );
-			}
-
-			// Update #__flexicontent_items_tmp table
-			if ($tmp_exists)
-			{
-				$ret = $this->_db->updateObject( $this->_tbl_join_tmp, $record_tmp, $this->_frn_key_tmp, $updateNulls );
-			}
-
-			// Insert into #__flexicontent_items_tmp table
-			else
-			{
-				$record_tmp->$frn_key_tmp = $this->id;
-				$ret = $this->_db->insertObject( $this->_tbl_join_tmp, $record_tmp, $this->_frn_key_tmp );
-			}
-
-			// Check for unique Alias
-			$sub_q = 'SELECT catid FROM #__flexicontent_cats_item_relations WHERE itemid=' . (int) $this->id;
-			$query = 'SELECT COUNT(*) FROM #__flexicontent_items_tmp AS i '
-				. ' JOIN #__flexicontent_items_ext AS e ON i.id = e.item_id '
-				. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON i.id = rel.itemid '
-				. ' WHERE i.alias=' . $this->_db->Quote($this->alias)
-				. '  AND (i.catid=' . (int) $this->id . ' OR rel.catid IN (' . $sub_q . ') )'
-				. '  AND e.language = ' . $this->_db->Quote($record_ext->language)
-				. '  AND i.id <> ' . (int) $this->id
-				//. '  AND e.lang_parent_id <> ' . (int) $record_ext->lang_parent_id
-				;
-
-			$duplicate_aliases = (boolean) $this->_db->setQuery($query)->loadResult();
-
-			if ($duplicate_aliases)
-			{
-				$query 	= 'UPDATE #__content SET alias=' . $this->_db->Quote($this->alias . '_' . $this->id) . ' WHERE id=' . (int) $this->id;
-				$this->_db->setQuery($query)->execute();
-			}
-		}
-
-		// If the table is not set to track assets return true.
-		if (!$this->_trackAssets)
-		{
-			return true;
-		}
-
-		if ($this->_locked)
-		{
-			$this->_unlock();
-		}
-
-		//
-		// Asset Tracking
-		//
-
-		$parentId = $this->_getAssetParentId();
-		$name  = $this->_getAssetName();
-		$title = $this->_getAssetTitle();
-
-		$asset = JTable::getInstance('Asset');
-		$asset->loadByName($name);
-
-		// Check for an error.
-		if ($error = $asset->getError())
-		{
-			$this->setError($error);
-			return false;
-		}
-
-		// Specify how a new or moved node asset is inserted into the tree.
-		if (empty($this->asset_id) || $asset->parent_id != $parentId)
-		{
-			$asset->setLocation($parentId, 'last-child');
-		}
-
-		// Prepare the asset to be stored.
-		$asset->parent_id = $parentId;
-		$asset->name  = $name;
-		$asset->title = $title;
-		
-		if ($this->_rules instanceof JAccessRules)
-		{
-			$asset->rules = (string) $this->_rules;
-		}
-
-		if (!$asset->check() || !$asset->store($updateNulls))
-		{
-			$this->setError($asset->getError());
-			return false;
-		}
-
-		// Update the asset_id field in this table.
-		if (empty($this->asset_id))
-		{
-			$this->asset_id = (int) $asset->id;
-
-			$query = $this->_db->getQuery(true)
-				->update($this->_db->quoteName($this->_tbl))
-				->set('asset_id = '.(int) $this->asset_id)
-				->where($this->_db->quoteName( $k ) . ' = ' . (int) $this->$k);
-
-			$this->_db->setQuery($query)->execute();
-		}
-
-		return true;
-	}
-
-
-	/**
-	 * Overloaded check function
-	 *
-	 * @access public
-	 * @return boolean
-	 * @see JTable::check
-	 * @since 1.5
-	 */
-	function check()
+	public function check()
 	{
 		// check for empty title
 		if (trim($this->title) == '')
@@ -832,4 +589,276 @@ class flexicontent_items extends _flexicontent_items
 
 		return true;
 	}
+
+	/**
+	 * Overloaded bind function
+	 *
+	 * @param   array  $array   Named array
+	 * @param   mixed  $ignore  An optional array or space separated list of properties
+	 *                          to ignore while binding.
+	 *
+	 * @return  mixed  Null if operation was satisfactory, otherwise returns an error string
+	 *
+	 * @see     JTable:bind
+	 * @since   11.1
+	 */
+	public function bind($array, $ignore = '')
+	{
+		if (isset($array['images']) && is_array($array['images']))
+		{
+			$registry = new JRegistry;
+			$registry->loadArray($array['images']);
+			$array['images'] = (string)$registry;
+		}
+
+		if (isset($array['urls']) && is_array($array['urls']))
+		{
+			$registry = new JRegistry;
+			$registry->loadArray($array['urls']);
+			$array['urls'] = (string)$registry;
+		}
+		
+		if (isset($array['attribs']) && is_array($array['attribs']))
+		{
+			$registry = new JRegistry;
+			$registry->loadArray($array['attribs']);
+			$array['attribs'] = (string)$registry;
+		}
+
+		if (isset($array['metadata']) && is_array($array['metadata']))
+		{
+			$registry = new JRegistry;
+			$registry->loadArray($array['metadata']);
+			$array['metadata'] = (string)$registry;
+		}
+
+		// Bind the rules.
+		if (isset($array['rules']) && is_array($array['rules']))
+		{
+			$rules = new JAccessRules($array['rules']);
+			$this->setRules($rules);
+		}
+
+		return parent::bind($array, $ignore);
+	}
+
+
+	/**
+	 * Overloaded store function
+	 *
+	 * @return boolean
+	 *
+	 * @since 1.5
+	 */
+	public function store($updateNulls = false)
+	{
+		$k      = $this->_tbl_key;
+		$fk_ext = $this->_frn_key_ext;
+		$tk_ext = $this->_tbl_key_ext;
+		$fk_tmp = $this->_frn_key_tmp;
+		$tk_tmp = $this->_tbl_key_tmp;
+
+		// Split the data to their actual DB table, (#__flexicontent_items_tmp duplicates non-TEXT data of #__content)
+		$record = JTable::getInstance($this->_jtbls[$this->_tbl][0], $this->_jtbls[$this->_tbl][1]);
+		$record->_tbl = $this->_tbl;
+		$record->_tbl_key = $k;
+
+		$record_ext = JTable::getInstance($this->_jtbls[$this->_tbl_ext][0], $this->_jtbls[$this->_tbl_ext][1]);
+		$record_ext->_tbl = $this->_tbl_ext;
+		$record_ext->_tbl_key = $fk_ext;
+
+		$record_tmp = JTable::getInstance($this->_jtbls[$this->_tbl_tmp][0], $this->_jtbls[$this->_tbl_tmp][1]);
+		$record_tmp->_tbl = $this->_tbl_tmp;
+		$record_tmp->_tbl_key = $fk_tmp;
+
+		foreach ($this->getProperties() as $p => $v)
+		{
+			// If the property is in the join properties array we add it to the items_tmp object (coming either from tbl or tbl_ext or from other joined table)
+			if (isset($this->tbl_fields[$this->_tbl_tmp][$p]))
+			{
+				$record_tmp->$p = $v;
+			}
+			
+			// If the property is in the join properties array we add it to the items_ext object
+			if (isset($this->tbl_fields[$this->_tbl_ext][$p]))
+			{
+				$record_ext->$p = $v;
+				
+				// Also use main table for article's language column
+				if ($p === 'language')
+				{
+					$record->$p = $v;
+				}
+			
+				// Master item id for (translation groups), (Deprecated, TODO remove)
+				if ($p === 'lang_parent_id')
+				{
+					$record_ext->$p = 0;//$record->id;
+					$record_tmp->$p = 0;//$record->id;
+				}
+			}
+				
+			// Add it to the main record properties
+			else
+			{
+				$record->$p = $v;
+			}
+		}
+
+		if ($this->$k)
+		{
+			$ret = $this->_db->updateObject($this->_tbl, $record, $k, $updateNulls);
+		}
+		else
+		{
+			$ret = $this->_db->insertObject($this->_tbl, $record, $k);
+
+			// Get record ID, either this was given or we will get auto-increment ID of last INSERT operation
+			$this->$k = $record->$k;
+		}
+
+		// Set related tables IDs
+		$record_ext->$fk_ext = $this->$tk_ext;
+		$record_tmp->$fk_tmp = $this->$tk_tmp;
+
+		if (!$ret)
+		{
+			$this->setError(get_class($this) . '::store failed - ' . $this->_db->getErrorMsg());
+			return false;
+		}
+
+		else
+		{
+			// Check if record at extended data DB table exists
+			$ext_exists = false;
+
+			if (!empty($record_ext->$fk_ext))
+			{
+				$ext_exists = (boolean) $this->_db->setQuery('SELECT COUNT(*) FROM ' . $this->_tbl_ext . ' WHERE ' . $fk_ext . '=' . (int) $record_ext->$fk_ext)->loadResult();
+			}
+
+			// Check if record at temporary data DB table exists
+			$tmp_exists = false;
+			if (!empty($record_tmp->$fk_tmp))
+			{
+				$tmp_exists = (boolean) $this->_db->setQuery('SELECT COUNT(*) FROM ' . $this->_tbl_tmp . ' WHERE ' . $fk_tmp . '=' . (int) $record_tmp->$fk_tmp)->loadResult();
+			}
+			
+			// Update extended data record
+			if ($ext_exists)
+			{
+				$ret = $this->_db->updateObject($this->_tbl_ext, $record_ext, $fk_ext, $updateNulls);
+			}
+
+			// Insert extended data record
+			else
+			{
+				// Insert without using autoincrement
+				$record_ext->$fk_ext = $this->$tk_ext;
+				$ret = $this->_db->insertObject($this->_tbl_ext, $record_ext, $fk_ext);
+			}
+
+			// Update #__flexicontent_items_tmp table
+			if ($tmp_exists)
+			{
+				$ret = $this->_db->updateObject($this->_tbl_tmp, $record_tmp, $fk_tmp, $updateNulls);
+			}
+
+			// Insert into #__flexicontent_items_tmp table
+			else
+			{
+				// Insert without using autoincrement
+				$record_tmp->$fk_tmp = $this->$tk_tmp;
+				$ret = $this->_db->insertObject($this->_tbl_tmp, $record_tmp, $fk_tmp);
+			}
+
+			// Check for unique Alias
+			$sub_q = 'SELECT catid FROM #__flexicontent_cats_item_relations WHERE itemid=' . (int) $this->id;
+			$query = 'SELECT COUNT(*) FROM #__flexicontent_items_tmp AS i '
+				. ' JOIN #__flexicontent_items_ext AS e ON i.id = e.item_id '
+				. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON i.id = rel.itemid '
+				. ' WHERE i.alias=' . $this->_db->Quote($this->alias)
+				. '  AND (i.catid=' . (int) $this->id . ' OR rel.catid IN (' . $sub_q . ') )'
+				. '  AND e.language = ' . $this->_db->Quote($record_ext->language)
+				. '  AND i.id <> ' . (int) $this->id
+				//. '  AND e.lang_parent_id <> ' . (int) $record_ext->lang_parent_id
+				;
+
+			$duplicate_aliases = (boolean) $this->_db->setQuery($query)->loadResult();
+
+			if ($duplicate_aliases)
+			{
+				$query 	= 'UPDATE #__content SET alias=' . $this->_db->Quote($this->alias . '_' . $this->id) . ' WHERE id=' . (int) $this->id;
+				$this->_db->setQuery($query)->execute();
+			}
+		}
+
+		// If the table is not set to track assets return true.
+		if (!$this->_trackAssets)
+		{
+			return true;
+		}
+
+		if ($this->_locked)
+		{
+			$this->_unlock();
+		}
+
+		//
+		// Asset Tracking
+		//
+
+		$parentId = $this->_getAssetParentId();
+		$name  = $this->_getAssetName();
+		$title = $this->_getAssetTitle();
+
+		$asset = JTable::getInstance('Asset');
+		$asset->loadByName($name);
+
+		// Check for an error.
+		if ($error = $asset->getError())
+		{
+			$this->setError($error);
+			return false;
+		}
+
+		// Specify how a new or moved node asset is inserted into the tree.
+		if (empty($this->asset_id) || $asset->parent_id != $parentId)
+		{
+			$asset->setLocation($parentId, 'last-child');
+		}
+
+		// Prepare the asset to be stored.
+		$asset->parent_id = $parentId;
+		$asset->name  = $name;
+		$asset->title = $title;
+		
+		if ($this->_rules instanceof JAccessRules)
+		{
+			$asset->rules = (string) $this->_rules;
+		}
+
+		if (!$asset->check() || !$asset->store($updateNulls))
+		{
+			$this->setError($asset->getError());
+			return false;
+		}
+
+		// Update the asset_id field in this table.
+		if (empty($this->asset_id))
+		{
+			$this->asset_id = (int) $asset->id;
+
+			$query = $this->_db->getQuery(true)
+				->update($this->_db->quoteName($this->_tbl))
+				->set('asset_id = '.(int) $this->asset_id)
+				->where($this->_db->quoteName( $k ) . ' = ' . (int) $this->$k);
+
+			$this->_db->setQuery($query)->execute();
+		}
+
+		return true;
+	}
+
+
 }

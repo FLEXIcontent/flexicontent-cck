@@ -163,7 +163,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		// Set category id and call constrcuctor
 		$cid = JFactory::getApplication()->input->get('cid', 0, 'int');
 
-		// Catch case that 'cid' is an array (bug other bad url)
+		// Catch case that 'cid' is an array (bug or not so proper url)
 		$cid = is_array($cid) ? (int) reset($cid) : $cid;
 		JFactory::getApplication()->input->set('cid', $cid ?: null);
 
@@ -939,6 +939,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		$_join_clauses = ''
 			. ($this->_layout=='favs' ? ' LEFT JOIN #__flexicontent_favourites AS fav ON fav.itemid = i.id AND type = 0' : '')
 			. ($this->_layout=='tags' ? ' JOIN #__flexicontent_tags_item_relations AS tag ON tag.itemid = i.id' : '')
+			. ($this->_layout=='tags' ? ' JOIN #__flexicontent_tags AS tagtbl ON tagtbl.id = tag.tid AND tagtbl.published = 1' : '')
 			. ' JOIN #__flexicontent_types AS ty ON '. ($counting ? 'i.' : 'ie.') .'type_id = ty.id'
 			. ' JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'
 			. ' JOIN #__categories AS c ON c.id = i.catid'

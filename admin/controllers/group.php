@@ -1,29 +1,53 @@
 <?php
 /**
- * @package     Joomla.Administrator
- * @subpackage  com_flexicontent
+ * @package         FLEXIcontent
+ * @version         3.3
  *
- * @copyright   Copyright (C) 2005 - 2017 Open Source Matters, Inc. All rights reserved.
- * @license     GNU General Public License version 2 or later; see LICENSE.txt
+ * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
+ * @link            http://www.flexicontent.com
+ * @copyright       Copyright © 2018, FLEXIcontent team, All Rights Reserved
+ * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
 defined('_JEXEC') or die;
+
+use Joomla\String\StringHelper;
+use Joomla\Utilities\ArrayHelper;
 
 // Import parent controller
 jimport('legacy.controller.form');
 
 /**
- * User view level controller class.
+ * FLEXIcontent (User) Group Controller
  *
- * @since  1.6
+ * @since 3.3
  */
 class FlexicontentControllerGroup extends JControllerForm
 {
+
 	/**
-	 * @var	    string  The prefix to use with controller messages.
+	 * @var     string  The prefix to use with controller messages.
 	 * @since   1.6
 	 */
-	protected $text_prefix = 'COM_USERS_GROUP';
+	protected $text_prefix;
+
+	/**
+	 * Constructor
+	 *
+	 * @param   array   $config    associative array of configuration settings.
+	 *
+	 * @since 3.3
+	 */
+	public function __construct($config = array())
+	{
+		parent::__construct($config);
+
+		// The prefix to use with controller messages.
+		$this->text_prefix = 'COM_USERS_GROUP';
+
+		// Register task aliases
+	}
+
 
 	/**
 	 * Method to check if you can save a new or existing record.

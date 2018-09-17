@@ -1,13 +1,18 @@
 <?php
 /**
- * @version		$Id$
- * @package		Joomla.Framework
- * @subpackage	Form
- * @copyright	Copyright (C) 2005 - 2010 Open Source Matters, Inc. All rights reserved.
- * @license		GNU General Public License version 2 or later; see LICENSE.txt
+ * @package         FLEXIcontent
+ * @version         3.3
+ *
+ * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
+ * @link            http://www.flexicontent.com
+ * @copyright       Copyright © 2018, FLEXIcontent team, All Rights Reserved
+ * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
-defined('JPATH_BASE') or die;
+defined('_JEXEC') or die('Restricted access');
+
+use Joomla\String\StringHelper;
+use Joomla\Utilities\ArrayHelper;
 
 jimport('cms.html.html');      // JHtml
 jimport('cms.html.select');    // JHtmlSelect
@@ -55,20 +60,20 @@ class JFormFieldFieldordering extends JFormField
 
 		// Initialize JavaScript field attributes.
 		$attr .= $this->element['onchange'] ? ' onchange="'.(string) $this->element['onchange'].'"' : '';
-		
+
 		$db = JFactory::getDbo();
-		
+
 		// Build the query for the ordering list.
 		$query = 'SELECT ordering AS value, label AS text'
 		. ' FROM #__flexicontent_fields'
 		. ' WHERE published >= 0'
 		. ' ORDER BY ordering'
 		;
-		
+
 		$fieldname	= $this->name;
 		$element_id = $this->id;
 		$fieldid = $this->form->getValue('id');
-		
+
 		// Create a read-only list (no name) with a hidden input to store the value.
 		if ( (string) $this->element['readonly'] == 'true' ) {
 			$attr .= ' disabled="disabled" ';
@@ -80,7 +85,7 @@ class JFormFieldFieldordering extends JFormField
 			$ordering = $this->form->getValue('ordering');
 			$html[] = str_replace('jform'.$attributes['name'], $element_id, JHtml::_('list.ordering', $this->name, $query, trim($attr), $ordering, $fieldid ? 0 : 1));
 		}
-		
+
 		return implode($html);
 	}
 }

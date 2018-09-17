@@ -1,11 +1,18 @@
 <?php
 /**
- * @version		$Id: categoryparent.php 18808 2010-09-08 05:44:54Z eddieajau $
- * @copyright	Copyright (C) 2005 - 2010 Open Source Matters, Inc. All rights reserved.
- * @license		GNU General Public License version 2 or later; see LICENSE.txt
+ * @package         FLEXIcontent
+ * @version         3.3
+ *
+ * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
+ * @link            http://www.flexicontent.com
+ * @copyright       Copyright © 2018, FLEXIcontent team, All Rights Reserved
+ * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
-defined('JPATH_BASE') or die;
+defined('_JEXEC') or die('Restricted access');
+
+use Joomla\String\StringHelper;
+use Joomla\Utilities\ArrayHelper;
 
 jimport('cms.html.html');      // JHtml
 jimport('cms.html.select');    // JHtmlSelect
@@ -61,7 +68,7 @@ class JFormFieldCategorytree extends JFormFieldList
 		$options = (array) $this->getOptions();
 
 		// Create a read-only list (no name) with a hidden input to store the value.
-		if ((string) $this->element['readonly'] == 'true') {			
+		if ((string) $this->element['readonly'] == 'true') {
 			$html[] = '<select name="" '.trim($attr).'>';
 			foreach($options as $opt) {
 				$disabled = '';
@@ -78,7 +85,7 @@ class JFormFieldCategorytree extends JFormFieldList
 		}
 		// Create a regular list.
 		else {
-			
+
 			//$html[] = JHtml::_('select.genericlist', $options, $this->name, trim($attr), 'value', 'text', $this->value, $this->id);
 			$html[] = '<select name="'.$this->name.'" '.trim($attr).'>';
 			foreach($options as $opt) {
@@ -95,7 +102,7 @@ class JFormFieldCategorytree extends JFormFieldList
 
 		return implode("\n", $html);
 	}
-	
+
 	/**
 	 * Method to get the field options.
 	 *
@@ -133,7 +140,7 @@ class JFormFieldCategorytree extends JFormFieldList
 			$obj->text = JText::_( 'FLEXI_SELECT_CATEGORY' );
 			$catlist[] 	= $obj;
 		}
-		
+
 		foreach ($globalcats as $item) {
 			if ( !$published || ($published && $item->published) )
 			{

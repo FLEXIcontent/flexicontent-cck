@@ -139,7 +139,7 @@ function delAllFilters() {
 		$n = count($this->rows);
 		foreach ($this->rows as $row)
 		{
-			$published = JHtml::_('jgrid.published', $row->published, $i, 'categories.', $canChange=0 );
+			$published = JHtml::_('jgrid.published', $row->published, $i, 'categories.', $canChange = false);
    	?>
 		<tr class="<?php echo "row$k"; ?>">
 

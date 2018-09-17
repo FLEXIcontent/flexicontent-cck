@@ -1,39 +1,30 @@
 <?php
 /**
- * @version 1.5 stable $Id: tag.php 1577 2012-12-02 15:10:44Z ggppdk $
- * @package Joomla
- * @subpackage FLEXIcontent
- * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
- * @license GNU/GPL v2
- * 
- * FLEXIcontent is a derivative work of the excellent QuickFAQ component
- * @copyright (C) 2008 Christoph Lukes
- * see www.schlu.net for more information
+ * @package         FLEXIcontent
+ * @version         3.3
  *
- * FLEXIcontent is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
+ * @link            http://www.flexicontent.com
+ * @copyright       Copyright © 2018, FLEXIcontent team, All Rights Reserved
+ * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
-// no direct access
 defined('_JEXEC') or die('Restricted access');
 
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 
-jimport('legacy.model.admin');
-require_once('base.php');
+require_once('base/base.php');
+require_once('base/traitnestable.php');
 
 /**
  * FLEXIcontent Component Tag Model
  *
- * @package Joomla
- * @subpackage FLEXIcontent
- * @since		1.0
  */
 class FlexicontentModelTag extends FCModelAdmin
 {
+	//use FCModelTraitNestableRecord;
+
 	/**
 	 * Record name
 	 *
@@ -42,18 +33,25 @@ class FlexicontentModelTag extends FCModelAdmin
 	var $record_name = 'tag';
 
 	/**
-	 * Record database table 
+	 * Record database table
 	 *
 	 * @var string
 	 */
-	var $records_dbtbl = null;
+	var $records_dbtbl = 'flexicontent_tags';
 
 	/**
 	 * Record jtable name
 	 *
 	 * @var string
 	 */
-	var $records_jtable = null;
+	var $records_jtable = 'flexicontent_tags';
+
+	/**
+	 * Column names
+	 */
+	var $state_col   = 'published';
+	var $name_col    = 'name';
+	var $parent_col  = null;//'parent_id';
 
 	/**
 	 * Record primary key
@@ -74,7 +72,7 @@ class FlexicontentModelTag extends FCModelAdmin
 	 *
 	 * @var object
 	 */
-	var $events_context = null;
+	var $events_context = 'com_tags.tag';
 
 	/**
 	 * Flag to indicate adding new records with next available ordering (at the end),
@@ -97,6 +95,7 @@ class FlexicontentModelTag extends FCModelAdmin
 	 * @var string
 	 */
 	var $extension_proxy = null;
+	var $event_recid_col = 'jtag_id';
 
 	/**
 	 * Use language associations
@@ -114,22 +113,27 @@ class FlexicontentModelTag extends FCModelAdmin
 	/**
 	 * Constructor
 	 *
-	 * @since 1.0
+	 * @since 3.3.0
 	 */
-	function __construct()
+	public function __construct($config = array())
 	{
-		parent::__construct();
+		$this->use_jtable_publishing = true;
+
+		parent::__construct($config);
+
+		$this->canManage = FlexicontentHelperPerm::getPerm()->CanTags;
+		$this->canCreate = FlexicontentHelperPerm::getPerm()->CanCreateTags;
 	}
 
 
 	/**
 	 * Legacy method to get the record
 	 *
-	 * @access	public
 	 * @return	object
+	 *
 	 * @since	1.0
 	 */
-	function & getTag($pk = null)
+	public function getTag($pk = null)
 	{
 		return parent::getRecord($pk);
 	}
@@ -138,9 +142,12 @@ class FlexicontentModelTag extends FCModelAdmin
 	/**
 	 * Method to initialise the record data
 	 *
-	 * @access	protected
+	 * @param   object      $record    The record being initialized
+	 * @param   boolean     $initOnly  If true then only a new record will be initialized without running the _afterLoad() method
+	 *
 	 * @return	boolean	True on success
-	 * @since	1.0
+	 *
+	 * @since	1.5
 	 */
 	protected function _initRecord(&$record = null, $initOnly = false)
 	{
@@ -149,7 +156,7 @@ class FlexicontentModelTag extends FCModelAdmin
 		// Set some new record specific properties, note most properties already have proper values
 		// Either the DB default values (set by getTable() method) or the values set by _afterLoad() method
 		$record->id							= 0;
-		$record->name						= null;  //$this->record_name . ($this->_getLastId() + 1);
+		$record->name						= null;
 		$record->alias					= null;
 		$record->published			= 1;
 		$record->checked_out		= 0;
@@ -162,17 +169,36 @@ class FlexicontentModelTag extends FCModelAdmin
 
 
 	/**
-	 * Method to store the record
+	 * Legacy method to store the record, use save() instead
 	 *
 	 * @param   array  $data  The form data.
 	 *
 	 * @return  boolean  True on success.
 	 *
-	 * @since   1.6
+	 * @since   3.2.0
 	 */
-	function store($data)
+	public function store($data)
 	{
 		return parent::store($data);
+	}
+
+
+	/**
+	 * Method to preprocess the form.
+	 *
+	 * @param   JForm   $form   A JForm object.
+	 * @param   mixed   $data   The data expected for the form.
+	 * @param   string  $plugins_group  The name of the plugin group to import and trigger
+	 *
+	 * @return  void
+	 *
+	 * @see     JFormField
+	 * @since   1.6
+	 * @throws  Exception if there is an error in the form event.
+	 */
+	protected function preprocessForm(JForm $form, $data, $plugins_group = null)
+	{
+		parent::preprocessForm($form, $data, $plugins_group);
 	}
 
 
@@ -205,47 +231,50 @@ class FlexicontentModelTag extends FCModelAdmin
 	/**
 	 * Method to check if the user can edit the record
 	 *
-	 * @access	public
 	 * @return	boolean	True on success
+	 *
 	 * @since	3.2.0
 	 */
-	function canEdit($record=null)
+	public function canEdit($record = null)
 	{
-		$record = $record ?: $this->_record;
+		$record  = $record ?: $this->_record;
+		$user    = JFactory::getUser();
 
 		return !$record || !$record->id
-			? FlexicontentHelperPerm::getPerm()->CanCreateTags
-			: FlexicontentHelperPerm::getPerm()->CanTags;
+			? $this->canCreate
+			: $this->canManage;
 	}
 
 
 	/**
 	 * Method to check if the user can edit record 's state
 	 *
-	 * @access	public
 	 * @return	boolean	True on success
+	 *
 	 * @since	3.2.0
 	 */
-	function canEditState($record=null)
+	public function canEditState($record = null)
 	{
-		$record = $record ?: $this->_record;
+		$record  = $record ?: $this->_record;
+		$user    = JFactory::getUser();
 
-		return FlexicontentHelperPerm::getPerm()->CanTags;
+		return $this->canManage;
 	}
 
 
 	/**
 	 * Method to check if the user can delete the record
 	 *
-	 * @access	public
 	 * @return	boolean	True on success
+	 *
 	 * @since	3.2.0
 	 */
-	function canDelete($record=null)
+	public function canDelete($record = null)
 	{
-		$record = $record ?: $this->_record;
+		$record  = $record ?: $this->_record;
+		$user    = JFactory::getUser();
 
-		return FlexicontentHelperPerm::getPerm()->CanTags;
+		return $this->canManage;
 	}
 
 
@@ -254,10 +283,14 @@ class FlexicontentModelTag extends FCModelAdmin
 	 *
 	 * Note. Typically called inside this MODEL 's store()
 	 *
+	 * @param   object     $record   The record object
+	 * @param   array      $data     The new data array
+	 *
 	 * @since	3.2.0
 	 */
 	protected function _prepareBind($record, & $data)
 	{
+		// Call parent class bind preparation
 		parent::_prepareBind($record, $data);
 	}
 
@@ -266,6 +299,9 @@ class FlexicontentModelTag extends FCModelAdmin
 	 * Method to do some work after record has been stored
 	 *
 	 * Note. Typically called inside this MODEL 's store()
+	 *
+	 * @param   object     $record   The record object
+	 * @param   array      $data     The new data array
 	 *
 	 * @since	3.2.0
 	 */
@@ -280,6 +316,8 @@ class FlexicontentModelTag extends FCModelAdmin
 	 *
 	 * Note. Typically called inside this MODEL 's store()
 	 *
+	 * @param	object   $record   The record object
+	 *
 	 * @since	3.2.0
 	 */
 	protected function _afterLoad($record)
@@ -289,170 +327,7 @@ class FlexicontentModelTag extends FCModelAdmin
 
 
 	/**
-	 * Method to change the state of a record
-	 *
-	 * @access	public
-	 * @return	boolean	True on success
-	 * @since	1.0
+	 * START OF MODEL SPECIFIC METHODS
 	 */
-	function setitemstate($id, $state = 1, $cleanCache = true)
-	{
-		$app  = JFactory::getApplication();
-		$user = JFactory::getUser();
 
-		$jinput     = JFactory::getApplication()->input;
-		$dispatcher = JEventDispatcher::getInstance();
-
-		$option = $jinput->get('option', '', 'cmd');
-		$view = $jinput->get('view', '', 'cmd');
-		$format = $jinput->get('format', 'html', 'cmd');
-
-		$jinput->set('isflexicontent', 'yes');
-		static $event_failed_notice_added = false;
-
-		if ( !$id )
-		{
-			return false;
-		}
-
-		if (empty($this->using_native_tags))
-		{
-			$query = 'UPDATE #__flexicontent_tags'
-				. ' SET published = ' . (int) $state
-				. ' WHERE id IN (' . (int) $id . ')'
-			;
-			$this->_db->setQuery( $query );
-			$this->_db->execute();
-			return true;
-		}
-
-		// Add all children to the list
-		$cid = array($id);
-		if ($state!=1) $this->_addTags($id, $cid);
-
-		// Add all parents to the list
-		if ($state==1) $this->_addTags($id, $cid, 'parents');
-
-		ArrayHelper::toInteger($cid, null);
-		$cids = implode( ',', $cid );
-
-		// Get the owner of all tags
-		$query = 'SELECT id, created_user_id'
-			. ' FROM #__tags as c'
-			. ' WHERE id IN (' . $cids . ')'
-			;
-		$this->_db->setQuery( $query );
-		$tags = $this->_db->loadObjectList('id');
-
-		// Check access to change state of tags
-		foreach ($cid as $tagid)
-		{
-			$hasEditState			= $user->authorise('core.edit.state', 'com_tags.tag.' . $tagid);
-			$hasEditStateOwn	= $user->authorise('core.edit.state.own', 'com_tags.tag.' . $tagid) && $tags[$tagid]->created_user_id==$user->get('id');
-			if (!$hasEditState && !$hasEditStateOwn)
-			{
-				$msg = 'You are not authorised to change state of tag with id: '. $tagid
-					.'<br />NOTE: when publishing a tag the parent tags will get published'
-					.'<br />NOTE: when unpublishing a tag the children tags will get unpublished';
-
-				$this->setError($msg);
-				return false;
-			}
-		}
-
-		$query = 'UPDATE #__tags'
-			. ' SET published = ' . (int) $state
-			. ' WHERE id IN (' . $cids . ')'
-		;
-		$this->_db->setQuery( $query );
-		$this->_db->execute();
-		
-		
-		// ****************************************************************
-		// Trigger Event 'onContentChangeState' of Joomla's Content plugins
-		// ****************************************************************
-		// Make sure we import flexicontent AND content plugins since we will be triggering their events
-		JPluginHelper::importPlugin('content');
-		
-		$item = new stdClass();
-		
-		// Compatibility steps, so that 3rd party plugins using the change state event work properly
-		$jinput->set('view', 'tags');
-		$jinput->set('option', 'com_tags');
-
-		$results = FLEXI_J40GE
-			? $app->triggerEvent($this->event_change_state, array('com_tags.tag', (array) $id, $state))
-			: $dispatcher->trigger($this->event_change_state, array('com_tags.tag', (array) $id, $state));
-		
-		// Revert compatibilty steps ... besides the plugins using the change state event, should have updated DB state value anyway
-		$jinput->set('view', $view);
-		$jinput->set('option', $option);
-
-		// Abort further actions if any plugin returns a result === false
-		if (is_array($results) && in_array(false, $results, true))
-		{
-			if (!$event_failed_notice_added)
-			{
-				$app->enqueueMessage('At least 1 plugin event handler for onContentChangeState failed', 'warning');
-				$event_failed_notice_added = true;
-			}
-
-			return false;
-		}
-
-		if ($cleanCache)
-		{
-			$this->cleanCache(null, -1);
-		}
-
-		return true;
-	}
-
-
-	/**
-	 * Method to add children/parents to a specific tag
-	 *
-	 * @param int $id
-	 * @param array $list
-	 * @param string $type
-	 * @return oject
-	 * 
-	 * @since 1.0
-	 */
-	function _addTags($id, &$list, $type = 'children')
-	{
-		// Initialize variables
-		$return = true;
-
-		$get = $type == 'children' ? 'id' : 'parent_id';
-		$source = $type == 'children' ? 'parent_id' : 'id';
-
-		// Get all rows with parent of $id
-		$query = 'SELECT ' . $get
-			. ' FROM #__tags as c'
-			. ' AND ' . $source . ' = ' . (int) $id . ' AND ' . $get . ' <> 1';
-		$this->_db->setQuery( $query );
-		$rows = $this->_db->loadObjectList();
-
-		// Recursively iterate through all children
-		foreach ($rows as $row)
-		{
-			$found = false;
-			foreach ($list as $idx)
-			{
-				if ($idx == $row->$get)
-				{
-					$found = true;
-					break;
-				}
-			}
-			if (!$found)
-			{
-				$list[] = $row->$get;
-			}
-			$return = $this->_addTags($row->$get, $list, $type);
-		}
-
-		return $return;
-	}
 }

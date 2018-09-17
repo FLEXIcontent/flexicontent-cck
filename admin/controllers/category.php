@@ -1,32 +1,26 @@
 <?php
 /**
- * @version 1.5 stable $Id$
- * @package Joomla
- * @subpackage FLEXIcontent
- * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
- * @license GNU/GPL v2
+ * @package         FLEXIcontent
+ * @version         3.3
  *
- * FLEXIcontent is a derivative work of the excellent QuickFAQ component
- * @copyright (C) 2008 Christoph Lukes
- * see www.schlu.net for more information
- *
- * FLEXIcontent is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
+ * @link            http://www.flexicontent.com
+ * @copyright       Copyright © 2018, FLEXIcontent team, All Rights Reserved
+ * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
 defined('_JEXEC') or die;
+
+use Joomla\String\StringHelper;
+use Joomla\Utilities\ArrayHelper;
 
 // Import parent controller
 jimport('legacy.controller.form');
 
 /**
- * The Menu Item Controller
+ * FLEXIcontent Category Controller
  *
- * @package		Joomla.Administrator
- * @subpackage	com_categories
- * @since		1.6
+ * @since 3.3
  */
 class FlexicontentControllerCategory extends JControllerForm
 {
@@ -37,22 +31,23 @@ class FlexicontentControllerCategory extends JControllerForm
 	protected $extension;
 
 	/**
-	 * Constructor.
+	 * Constructor
 	 *
-	 * @param	array An optional associative array of configuration settings.
-	 * @see		JController
-	 * @since	1.6
+	 * @param   array   $config    associative array of configuration settings.
+	 *
+	 * @since 3.3
 	 */
 	public function __construct($config = array())
 	{
 		parent::__construct($config);
 
-		// Guess the JText message prefix. Defaults to the option.
+		// The extension for which the categories apply.
 		if (empty($this->extension))
 		{
 			$this->extension = $this->input->getCmd('extension', 'com_flexicontent');
 		}
 
+		// Register task aliases
 		$this->registerTask('apply',			'save');
 		$this->registerTask('apply_ajax',	'save');
 		$this->registerTask('save2new',		'save');

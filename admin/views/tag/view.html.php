@@ -1,27 +1,20 @@
 <?php
 /**
- * @version 1.5 stable $Id: view.html.php 1577 2012-12-02 15:10:44Z ggppdk $
- * @package Joomla
- * @subpackage FLEXIcontent
- * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
- * @license GNU/GPL v2
- * 
- * FLEXIcontent is a derivative work of the excellent QuickFAQ component
- * @copyright (C) 2008 Christoph Lukes
- * see www.schlu.net for more information
+ * @package         FLEXIcontent
+ * @version         3.3
  *
- * FLEXIcontent is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
+ * @link            http://www.flexicontent.com
+ * @copyright       Copyright © 2018, FLEXIcontent team, All Rights Reserved
+ * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
-defined( '_JEXEC' ) or die( 'Restricted access' );
+defined('_JEXEC') or die('Restricted access');
 
 jimport('legacy.view.legacy');
 
 /**
- * View class for the FLEXIcontent tag screen
+ * HTML View class for the FLEXIcontent tag screen
  *
  * @package Joomla
  * @subpackage FLEXIcontent
@@ -29,11 +22,11 @@ jimport('legacy.view.legacy');
  */
 class FlexicontentViewTag extends JViewLegacy
 {
-	function display($tpl = null)
+	public function display($tpl = null)
 	{
-		// ***
-		// *** Initialise variables
-		// ***
+		/**
+		 * Initialise variables
+		 */
 
 		$app      = JFactory::getApplication();
 		$jinput   = $app->input;
@@ -49,12 +42,36 @@ class FlexicontentViewTag extends JViewLegacy
 		$manager_view = $ctrl = 'tags';
 		$js = '';
 
+		// Load Joomla 'com_tags' language files
+		JFactory::getLanguage()->load('com_tags', JPATH_ADMINISTRATOR, 'en-GB', true);
+		JFactory::getLanguage()->load('com_tags', JPATH_ADMINISTRATOR, null, true);
+
+		$isAdmin = $app->isAdmin();
+		$componentTmpl = $app->input->getCmd('tmpl') === 'component';
 
 
-		// ***
-		// *** Get record data, and check if record is already checked out
-		// ***
-		
+		if (!$isAdmin)
+		{
+			// Note : we use some strings from administrator part, so we will also load administrator language file
+			// TODO: remove this need by moving common language string to different file ?
+
+			// Load english language file for 'com_content' component then override with current language file
+			JFactory::getLanguage()->load('com_content', JPATH_ADMINISTRATOR, 'en-GB', true);
+			JFactory::getLanguage()->load('com_content', JPATH_ADMINISTRATOR, null, true);
+
+			// Load english language file for 'com_flexicontent' component then override with current language file
+			JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, 'en-GB', true);
+			JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, true);
+
+			// Frontend form layout is named 'form' instead of 'default', 'default' in frontend is typically used for viewing would be used for
+			$this->setLayout('form');
+		}
+
+
+		/**
+		 * Get record data, and check if record is already checked out
+		 */
+
 		// Get model and load the record data
 		$model = $this->getModel();
 		$row   = $this->get('Item');
@@ -76,54 +93,67 @@ class FlexicontentViewTag extends JViewLegacy
 		}
 
 
+		/**
+		 * Include needed files and add needed js / css files
+		 */
 
-		// ***
-		// *** Include needed files and add needed js / css files
-		// ***
-		
 		// Add css to document
-		!JFactory::getLanguage()->isRtl()
-			? $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', FLEXI_VHASH)
-			: $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', FLEXI_VHASH);
-		!JFactory::getLanguage()->isRtl()
-			? $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/j3x.css', FLEXI_VHASH)
-			: $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/j3x_rtl.css', FLEXI_VHASH);
-		
+		if ($isAdmin)
+		{
+			!JFactory::getLanguage()->isRtl()
+				? $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', FLEXI_VHASH)
+				: $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', FLEXI_VHASH);
+			!JFactory::getLanguage()->isRtl()
+				? $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/j3x.css', FLEXI_VHASH)
+				: $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/j3x_rtl.css', FLEXI_VHASH);
+		}
+		else
+		{
+			!JFactory::getLanguage()->isRtl()
+				? $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontent.css', FLEXI_VHASH)
+				: $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontent_rtl.css', FLEXI_VHASH);
+		}
+
 		// Add JS frameworks
 		flexicontent_html::loadFramework('select2');
 		flexicontent_html::loadFramework('flexi-lib-form');
-		
+
 		// Add js function to overload the joomla submitform validation
 		JHtml::_('behavior.formvalidation');  // load default validation JS to make sure it is overriden
 		$document->addScriptVersion(JUri::root(true).'/components/com_flexicontent/assets/js/admin.js', FLEXI_VHASH);
 		$document->addScriptVersion(JUri::root(true).'/components/com_flexicontent/assets/js/validate.js', FLEXI_VHASH);
 
 
+		/**
+		 * Create the toolbar
+		 */
 
-		// ***
-		// *** Create the toolbar
-		// ***
 		$toolbar = JToolbar::getInstance('toolbar');
+
+		// Include JToolbarHelper
+		if (!$isAdmin)
+		{
+			require_once JPATH_ADMINISTRATOR . '/includes/toolbar.php';
+		}
 
 		// Creation flag used to decide if adding save and new / save as copy buttons are allowed
 		$cancreate = true;
-		
+
 		// SET toolbar title
 		!$isnew
 			? JToolbarHelper::title( JText::_( 'FLEXI_EDIT_TAG' ), 'tagedit' )
 			: JToolbarHelper::title( JText::_( 'FLEXI_NEW_TAG' ), 'tagadd' );
 
 
-
-		// ***
-		// *** Apply buttons
-		// ***
+		/**
+		 * Apply buttons
+		 */
 
 		// Apply button
 		$btn_arr = array();
 
 		// Add ajax apply only for existing records
-		if ( !$isnew )
+		if (!$isnew)
 		{
 			$btn_name = 'apply_ajax';
 			$btn_task = $ctrl.'.apply_ajax';
@@ -135,31 +165,34 @@ class FlexicontentViewTag extends JViewLegacy
 		}
 
 		// Apply & Reload button   ***   (Apply Type, is a special case of new that has not loaded custom fieds yet, due to type not defined on initial form load)
-		$btn_name = 'apply';
-		$btn_task = $ctrl.'.apply';
-		$btn_title = !$isnew ? 'FLEXI_APPLY_N_RELOAD' : 'FLEXI_ADD';
+		if ($isAdmin && !$componentTmpl)
+		{
+			$btn_name = 'apply';
+			$btn_task = $ctrl.'.apply';
+			$btn_title = !$isnew ? 'FLEXI_APPLY_N_RELOAD' : 'FLEXI_ADD';
 
-		//JToolbarHelper::apply($btn_task, $btn_title, false);
+			//JToolbarHelper::apply($btn_task, $btn_title, false);
 
-		$btn_arr[$btn_name] = flexicontent_html::addToolBarButton(
-			$btn_title, $btn_name, $full_js="Joomla.submitbutton('".$btn_task."')", $msg_alert='', $msg_confirm='',
-			$btn_task, $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false, $btn_class="".$tip_class, $btn_icon="icon-save",
-			'data-placement="right" title=""', $auto_add = 0);
+			$btn_arr[$btn_name] = flexicontent_html::addToolBarButton(
+				$btn_title, $btn_name, $full_js="Joomla.submitbutton('".$btn_task."')", $msg_alert='', $msg_confirm='',
+				$btn_task, $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false, $btn_class="".$tip_class, $btn_icon="icon-save",
+				'data-placement="right" title=""', $auto_add = 0);
+		}
 
 		flexicontent_html::addToolBarDropMenu($btn_arr, 'apply_btns_group');
 
 
+		/**
+		 * Save buttons
+		 */
 
-		// ***
-		// *** Save buttons
-		// ***
 		$btn_arr = array();
 
 		$btn_name = 'save';
 		$btn_task = $ctrl.'.save';
 
 		//JToolbarHelper::save($btn_task);  //JToolbarHelper::custom( $btn_task, 'save.png', 'save.png', 'JSAVE', false );
-		
+
 		$btn_arr[$btn_name] = flexicontent_html::addToolBarButton(
 			'JSAVE', $btn_name, $full_js="Joomla.submitbutton('".$ctrl.".save')", $msg_alert='', $msg_confirm='',
 			$btn_task, $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false, $btn_class="".$tip_class, $btn_icon="icon-save",
@@ -167,7 +200,7 @@ class FlexicontentViewTag extends JViewLegacy
 
 
 		// Add a save and new button, if user can create new records
-		if ($cancreate)
+		if (!$componentTmpl && $cancreate)
 		{
 			$btn_name = 'save2new';
 			$btn_task = $ctrl.'.save2new';
@@ -193,13 +226,17 @@ class FlexicontentViewTag extends JViewLegacy
 					'data-placement="right" title="'.JText::_('FLEXI_SAVE_AS_COPY_INFO', true).'"', $auto_add = 0);
 			}
 		}
+
 		flexicontent_html::addToolBarDropMenu($btn_arr, 'save_btns_group');
 
 
 		// Cancel button
-		$isnew
-			? JToolbarHelper::cancel($ctrl.'.cancel')
-			: JToolbarHelper::cancel($ctrl.'.cancel', 'JTOOLBAR_CLOSE');
+		if ($isAdmin && !$componentTmpl)
+		{
+			$isnew
+				? JToolbarHelper::cancel($ctrl.'.cancel')
+				: JToolbarHelper::cancel($ctrl.'.cancel', 'JTOOLBAR_CLOSE');
+		}
 
 
 		// Preview button
@@ -217,11 +254,58 @@ class FlexicontentViewTag extends JViewLegacy
 			);
 		}
 
+		$jtag_id = $row->jtag_id;
+
+		// Find the respective Joomla Tag Id by using its title, creating a new Joomla tag if it does not exist already, and then mapping it to current FLEXIcontent tag
+		if (!$isnew && !$jtag_id)
+		{
+			$tagsHelper = new \JHelperTags;
+			$jtag_id_arr = $tagsHelper->createTagsFromField(array('#new#' . $row->name));
+			if (!empty($jtag_id_arr))
+			{
+				$jtag_id = reset($jtag_id_arr);
+				$tagTable = JTable::getInstance($_type = 'flexicontent_tags', $_prefix = '', $_config = array());
+				$tagTable->load($row->id);
+				$tagTable->jtag_id = $jtag_id;
+				$tagTable->store();
+			}
+		}
+
+		if ($jtag_id)
+		{
+			JText::script("FLEXI_UPDATING_CONTENTS", true);
+			$document->addScriptDeclaration('
+				function fc_edit_jtag_modal_load( container )
+				{
+					if ( container.find("iframe").get(0).contentWindow.location.href.indexOf("view=tags") != -1 )
+					{
+						container.dialog("close");
+					}
+				}
+				function fc_edit_jtag_modal_close()
+				{
+					window.location.reload(false);
+					document.body.innerHTML = Joomla.JText._("FLEXI_UPDATING_CONTENTS") + \' <img id="page_loading_img" src="components/com_flexicontent/assets/images/ajax-loader.gif">\';
+				}
+			');
+
+			$modal_title = JText::_('FLEXI_EDIT_JTAG', true);
+			$tip_class = ' hasTooltip';
+			JToolbarHelper::divider();
+			flexicontent_html::addToolBarButton(
+				'FLEXI_EDIT_JTAG', $btn_name='edit_jtag',
+				$full_js="var url = jQuery(this).attr('data-href'); var the_dialog = fc_showDialog(url, 'fc_modal_popup_container', 0, 0, 0, fc_edit_jtag_modal_close, {title:'".$modal_title."', loadFunc: fc_edit_jtag_modal_load}); return false;",
+				$msg_alert='', $msg_confirm='',
+				$btn_task='', $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false, $btn_class="spaced-btn btn-info".$tip_class, $btn_icon="icon-pencil",
+				'data-placement="bottom" data-href="index.php?option=com_tags&task=tag.edit&id='.$jtag_id.'" title="Edit all details of joomla tag"'
+			);
+		}
 
 
-		// ***
-		// *** Add inline js to head
-		// ***
+		/**
+		 * Add inline js to head
+		 */
+
 		if ($js)
 		{
 			$document->addScriptDeclaration('jQuery(document).ready(function(){'
@@ -230,8 +314,11 @@ class FlexicontentViewTag extends JViewLegacy
 		}
 
 
-		// Encode (UTF-8 charset) HTML entities form data so that they can be set as form field values
-		// NOTE: we will use JForm to output fields so this is redundant
+		/**
+		 * Encode (UTF-8 charset) HTML entities form data so that they can be set as form field values
+		 * NOTE: we will use JForm to output fields so this is redundant
+		 */
+
 		//JFilterOutput::objectHTMLSafe( $row, ENT_QUOTES, $exclude_keys = '' );
 
 		// Assign data to template

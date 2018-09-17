@@ -1,45 +1,50 @@
 <?php
 /**
- * @version 1.5 stable $Id: qfcategoryelement.php 184 2010-04-04 06:08:30Z emmanuel.danan $
- * @package Joomla
- * @subpackage FLEXIcontent
- * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
- * @license GNU/GPL v2
- * 
- * FLEXIcontent is a derivative work of the excellent QuickFAQ component
- * @copyright (C) 2008 Christoph Lukes
- * see www.schlu.net for more information
+ * @package         FLEXIcontent
+ * @version         3.3
  *
- * FLEXIcontent is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
+ * @link            http://www.flexicontent.com
+ * @copyright       Copyright © 2018, FLEXIcontent team, All Rights Reserved
+ * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
-// no direct access
 defined('_JEXEC') or die('Restricted access');
 
 jimport('legacy.model.list');
 use Joomla\String\StringHelper;
+use Joomla\Utilities\ArrayHelper;
+use Joomla\CMS\Table\Table;
+use Joomla\CMS\Table\User;
 
 /**
  * Flexicontent Component Categoryelement Model
  *
- * @package Joomla
- * @subpackage FLEXIcontent
- * @since		1.0
  */
 class FlexicontentModelQfcategoryelement extends JModelList
 {
+	var $records_dbtbl = 'categories';
+	var $records_jtable = 'flexicontent_categories';
+
+	var $state_col = 'published';
+	var $name_col  = 'title';
+	var $record_name = 'category';
+	var $parent_col = 'parent_id';
+	var $listViaAccess = true;
+
+	var $search_cols = array('title', 'alias', 'note');
+	var $default_order = 'a.lft';
+	var $default_order_dir = 'ASC';
+
 	/**
-	 * rows array
+	 * Record rows
 	 *
 	 * @var array
 	 */
 	var $_data = null;
 
 	/**
-	 * Category total
+	 * Rows total
 	 *
 	 * @var integer
 	 */
@@ -55,54 +60,69 @@ class FlexicontentModelQfcategoryelement extends JModelList
 	/**
 	 * Constructor
 	 *
-	 * @since 1.0
+	 * @since 3.3.0
 	 */
-	function __construct()
+	public function __construct($config = array())
 	{
-		parent::__construct();
-		$app = JFactory::getApplication();
-		$option = JRequest::getVar('option');
-		$view   = JRequest::getVar('view');
+		parent::__construct($config);
 
-		$limit      = $app->getUserStateFromRequest( $option.'.'.$view.'.limit', 'limit', $app->getCfg('list_limit'), 'int');
-		$limitstart = $app->getUserStateFromRequest( $option.'.'.$view.'.limitstart', 'limitstart', 0, 'int' );
+		$app    = JFactory::getApplication();
+		$jinput = $app->input;
+		$option = $jinput->get('option', '', 'cmd');
+		$view   = $jinput->get('view', '', 'cmd');
+		$fcform = $jinput->get('fcform', 0, 'int');
+		$p      = $option . '.' . $view . '.';
+
+
+		/**
+		 * Pagination: limit, limitstart
+		 */
+
+		$limit      = $fcform ? $jinput->get('limit', $app->getCfg('list_limit'), 'int')  :  $app->getUserStateFromRequest( $p.'limit', 'limit', $app->getCfg('list_limit'), 'int');
+		$limitstart = $fcform ? $jinput->get('limitstart',                     0, 'int')  :  $app->getUserStateFromRequest( $p.'limitstart', 'limitstart', 0, 'int' );
 
 		// In case limit has been changed, adjust limitstart accordingly
 		$limitstart = ( $limit != 0 ? (floor($limitstart / $limit) * $limit) : 0 );
+		$jinput->set( 'limitstart',	$limitstart );
 
 		$this->setState('limit', $limit);
 		$this->setState('limitstart', $limitstart);
+
+		$app->setUserState($p.'limit', $limit);
+		$app->setUserState($p.'limitstart', $limitstart);
+
+
 	}
-	
+
 
 	/**
-	 * Method to get the query used to retrieve categories data
+	 * Method to build the query for the records
 	 *
-	 * @access public
-	 * @return	string
-	 * @since	1.6
+	 * @return string
+	 *
+	 * @since 3.3.0
 	 */
-	function getListQuery()
+	protected function getListQuery()
 	{
 		$query = $this->_db->getQuery(true);
 		$query->select(
 				'c.*'
-				.', u.name AS author, CASE WHEN level.title IS NULL THEN CONCAT_WS(\'\', \'deleted:\', c.access) ELSE level.title END AS access_level'
+				.', ua.name AS author, CASE WHEN level.title IS NULL THEN CONCAT_WS(\'\', \'deleted:\', c.access) ELSE level.title END AS access_level'
 				.', c.params as config, l.title AS language_title');
 		$query->from('#__categories AS c');
 		$query->join('LEFT', '#__languages AS l ON l.lang_code = c.language');
-		$query->join('LEFT', '#__viewlevels as level ON level.id=c.access');
-		$query->join('LEFT', '#__users AS u ON u.id = c.created_user_id');
+		$query->join('LEFT', '#__viewlevels as level ON level.id = c.access');
+		$query->join('LEFT', '#__users as ua ON ua.id = c.created_user_id');
 		$this->_buildContentWhere($query);
 		$this->_buildContentOrderBy($query);
-		
-		
+
+
 		//echo nl2br(str_replace('#__','jos_',$query));
 		//echo str_replace('#__', 'jos_', $query->__toString());
 		return $query;
 	}
-	
-	
+
+
 	/**
 	 * Build the order clause
 	 *
@@ -114,18 +134,18 @@ class FlexicontentModelQfcategoryelement extends JModelList
 		$app = JFactory::getApplication();
 		$option = JRequest::getVar('option');
 		$view   = JRequest::getVar('view');
-		
+
 		$filter_order     = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_order',     'filter_order',     'c.lft',      'cmd' );
 		$filter_order_Dir = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_order_Dir', 'filter_order_Dir', '',           'cmd' );
-		
+
 		$orderby = $filter_order.' '.$filter_order_Dir . ($filter_order != 'c.lft' ? ', c.lft' : '');
 		if ($query)
 			$query->order($orderby);
 		else
 			return ' ORDER BY '. $orderby;
 	}
-	
-	
+
+
 	/**
 	 * Build the where clause
 	 *
@@ -138,38 +158,38 @@ class FlexicontentModelQfcategoryelement extends JModelList
 		$user   = JFactory::getUser();
 		$option = JRequest::getVar('option');
 		$view   = JRequest::getVar('view');
-		
+
 		$assocs_id   = JRequest::getInt( 'assocs_id', 0 );
-		
+
 		if ($assocs_id)
 		{
 			$language    = $app->getUserStateFromRequest( $option.'.'.$view.'.language', 'language', '', 'string' );
 			$created_by  = $app->getUserStateFromRequest( $option.'.'.$view.'.created_by', 'created_by', 0, 'int' );
-			
+
 			$assocanytrans = $user->authorise('flexicontent.assocanytrans', 'com_flexicontent');
 			if (!$assocanytrans && !$created_by) {
 				$created_by = $user->id;
 				$app->setUserState( $option.'.'.$view.'.created_by', $created_by );
 			}
 		}
-		
+
 		$filter_state  = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_state', 'filter_state', '', 'cmd' );
 		$filter_cats   = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_cats',  'filter_cats',  0,  'int' );
-		
+
 		$filter_level  = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_level', 'filter_level', 0,  'int' );
 		$filter_lang   = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_lang',  'filter_lang',  '', 'cmd' );
 		$filter_author = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_author','filter_author','', 'cmd' );
 		$filter_access = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_access','filter_access','', 'string' );
-		
+
 		$filter_lang   = $assocs_id && $language   ? $language   : $filter_lang;
 		$filter_author = $assocs_id && $created_by ? $created_by : $filter_author;
-		
+
 		$search = $app->getUserStateFromRequest( $option.'.'.$view.'.search', 'search', '', 'string' );
 		$search = StringHelper::trim( StringHelper::strtolower( $search ) );
 
 		$where = array();
 		$where[] = "c.extension = '".FLEXI_CAT_EXTENSION."' ";
-		
+
 		// Filter by publications state
 		if (is_numeric($filter_state)) {
 			$where[] = 'c.published = ' . (int) $filter_state;
@@ -177,12 +197,12 @@ class FlexicontentModelQfcategoryelement extends JModelList
 		elseif ( $filter_state === '') {
 			$where[] = 'c.published IN (0, 1)';
 		}
-		
+
 		// Filter by access level
 		if ( strlen($filter_access) ) {
 			$where[] = 'c.access = '.(int) $filter_access;
 		}
-		
+
 		// Filter by parent category
 		if ( $filter_cats ) {
 			// Limit category list to those contain in the subtree of the choosen category
@@ -191,29 +211,29 @@ class FlexicontentModelQfcategoryelement extends JModelList
 			// Limit category list to those containing CONTENT (joomla articles)
 			$where[] = ' (c.lft >= ' . $this->_db->Quote(FLEXI_LFT_CATEGORY) . ' AND c.rgt <= ' . $this->_db->Quote(FLEXI_RGT_CATEGORY) . ')';
 		}
-		
+
 		// Filter by depth level
 		if ( $filter_level ) {
 			$where[] = 'c.level <= '.(int) $filter_level;
 		}
-		
+
 		// Filter by language
 		if ( $filter_lang ) {
 			$where[] = 'c.language = '.$this->_db->Quote( $filter_lang );
 		}
-		
+
 		// Filter by author / owner
 		if ( strlen($filter_author) ) {
 			$where[] = 'c.created_user_id = ' . $filter_author;
 		}
-		
-		// Implement View Level Access
-		if (!$user->authorise('core.admin'))
+
+		// Filter via View Level Access, if user is not super-admin
+		if (!JFactory::getUser()->authorise('core.admin') && ($app->isSite() || $this->listViaAccess))
 		{
 			$groups	= implode(',', JAccess::getAuthorisedViewLevels($user->id));
 			$where[] = 'c.access IN ('.$groups.')';
 		}
-		
+
 		// Filter by search word (can be also be  id:NN  OR author:AAAAA)
 		if ( !empty($search) ) {
 			if (stripos($search, 'id:') === 0) {
@@ -221,38 +241,38 @@ class FlexicontentModelQfcategoryelement extends JModelList
 			}
 			elseif (stripos($search, 'author:') === 0) {
 				$search = $this->_db->Quote('%'.$this->_db->escape(substr($search, 7), true).'%');
-				$where[] = '(u.name LIKE '.$search.' OR u.username LIKE '.$search.')';
+				$where[] = '(ua.name LIKE '.$search.' OR ua.username LIKE '.$search.')';
 			}
 			else {
 				$search = $this->_db->Quote('%'.$this->_db->escape($search, true).'%');
 				$where[] = '(c.title LIKE '.$search.' OR c.alias LIKE '.$search.' OR c.note LIKE '.$search.')';
 			}
 		}
-		
+
 		if ($query)
 			foreach($where as $w) $query->where($w);
 		else
 			return count($where) ? ' WHERE '.implode(' AND ', $where) : '';
 	}
-	
-	
+
+
 	// ***********************************
 	// *** MODEL SPECIFIC HELPER FUNCTIONS
 	// ***********************************
-	
+
 	/**
 	 * Method to get author list for filtering
-	 * 
+	 *
 	 * @return array
 	 * @since 1.5
 	 */
 	function getAuthorslist ()
 	{
-		$query = 'SELECT i.created_by AS id, u.name AS name'
+		$query = 'SELECT i.created_by AS id, ua.name AS name'
 				. ' FROM #__content AS i'
-				. ' LEFT JOIN #__users AS u ON u.id = i.created_by'
+				. ' LEFT JOIN #__users as ua ON ua.id = i.created_by'
 				. ' GROUP BY i.created_by'
-				. ' ORDER BY u.name'
+				. ' ORDER BY ua.name'
 				;
 		$this->_db->setQuery($query);
 

@@ -1,45 +1,42 @@
 <?php
 /**
- * @version		$Id: users.php 1847 2014-02-16 06:29:06Z ggppdk $
- * @package		Joomla
- * @subpackage	Users
- * @copyright	Copyright (C) 2005 - 2010 Open Source Matters. All rights reserved.
- * @license		GNU/GPL, see LICENSE.php
- * Joomla! is free software. This version may have been modified pursuant
- * to the GNU General Public License, and as distributed it includes or
- * is derivative of works licensed under the GNU General Public License or
- * other free or open source software licenses.
- * See COPYRIGHT.php for copyright notices and details.
+ * @package         FLEXIcontent
+ * @version         3.3
+ *
+ * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
+ * @link            http://www.flexicontent.com
+ * @copyright       Copyright © 2018, FLEXIcontent team, All Rights Reserved
+ * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
-// No direct access
-defined('_JEXEC') or die('Restricted access');
+defined('_JEXEC') or die;
 
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 
-// Register autoloader for parent controller, in case controller is executed by another component
-JLoader::register('FlexicontentController', JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'controller.php');
+JLoader::register('FlexicontentControllerBaseAdmin', JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'controllers' . DS . 'base' . DS . 'baseadmin.php');
 
 /**
- * Users Component Controller
+ * FLEXIcontent Users Controller
  *
- * @package		Joomla
- * @subpackage	Users
- * @since 1.5
+ * NOTE: -Only- if this controller is needed by frontend URLs, then create a derived controller in frontend 'controllers' folder
+ *
+ * @since 3.3
  */
-class FlexicontentControllerUsers extends FlexicontentController
+class FlexicontentControllerUsers extends FlexicontentControllerBaseAdmin
 {
 	/**
 	 * Constructor
 	 *
-	 * @params	array	Controller configuration array
+	 * @param   array   $config    associative array of configuration settings.
+	 *
+	 * @since 3.3
 	 */
-	function __construct($config = array())
+	public function __construct($config = array())
 	{
 		parent::__construct($config);
 
-		// Register Extra tasks
+		// Register task aliases
 		$this->registerTask('add',          'display');
 		$this->registerTask('edit',         'display');
 		$this->registerTask('apply',        'save');
@@ -57,18 +54,18 @@ class FlexicontentControllerUsers extends FlexicontentController
 		$task = $this->getTask();
 
 		// Force URL variables for add / edit task
-		if ($task == 'add' || $task == 'edit')
+		if ($task === 'add' || $task === 'edit')
 		{
 			$this->input->set('hidemainmenu', 1);
 			$this->input->set('layout', 'form');
 			$this->input->set('view', 'user');
-			$this->input->set('edit', $task == 'edit');
+			$this->input->set('edit', $task === 'edit');
 		}
 
 		$view = $this->input->get('view', 'users', 'cmd');
 
 		// Force 'form' layout if displaying singular view
-		if ($view == 'user')
+		if ($view === 'user')
 		{
 			$this->input->set('layout', 'form');
 		}
@@ -433,12 +430,12 @@ class FlexicontentControllerUsers extends FlexicontentController
 		{
 			$options = array();
 
-			if ($task == 'logout' || $task == 'block')
+			if ($task === 'logout' || $task === 'block')
 			{
 				$options['clientid'][] = 0; // Site
 				$options['clientid'][] = 1; // administrator
 			}
-			elseif ($task == 'flogout')
+			elseif ($task === 'flogout')
 			{
 				$options['clientid'][] = $client;
 			}

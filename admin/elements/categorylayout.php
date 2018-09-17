@@ -230,7 +230,7 @@ function clayout_loadPanel(element)
 	{
 		jQuery.ajax({
 			type: 'GET',
-			url: 'index.php?option=com_flexicontent&task=templates.getlayoutparams&ext_view=".$ext_view."&ext_option=".$ext_option."&ext_name='+element+'&ext_id=".$pk."&layout_name=category&ext_type=templates&directory='+element+'&format=raw',
+			url: 'index.php?option=com_flexicontent&task=templates.getlayoutparams&ext_view=".$ext_view."&ext_option=".$ext_option."&ext_name='+element+'&ext_id=".$pk."&layout_name=category&ext_type=templates&directory='+element+'&format=raw&" . JSession::getFormToken() . "=1',
 			success: function(str)
 			{
 				panel.addClass('fc_layout_loaded').html(str);

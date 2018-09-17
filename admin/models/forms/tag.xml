@@ -11,6 +11,10 @@
 		</field>
 		<field name="checked_out" type="hidden" filter="unset" labelclass="fc-prop-lbl" />
 		<field name="checked_out_time" type="hidden" filter="unset" labelclass="fc-prop-lbl" />	
+
+		<!--field name="parent_id" type="tag" label="COM_TAGS_FIELD_PARENT_LABEL" description="COM_TAGS_FIELD_PARENT_DESC" mode="nested" validate="notequals" field="id" parent="parent">
+			<option value="1">JNONE</option>
+		</field-->
 	</fieldset>
 
 </form>
