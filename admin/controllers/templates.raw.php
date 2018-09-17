@@ -1,58 +1,61 @@
 <?php
 /**
- * @version 1.5 stable $Id: templates.php 1260 2012-04-25 17:43:21Z ggppdk $
- * @package Joomla
- * @subpackage FLEXIcontent
- * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
- * @license GNU/GPL v2
+ * @package         FLEXIcontent
+ * @version         3.3
  *
- * FLEXIcontent is a derivative work of the excellent QuickFAQ component
- * @copyright (C) 2008 Christoph Lukes
- * see www.schlu.net for more information
- *
- * FLEXIcontent is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
+ * @link            http://www.flexicontent.com
+ * @copyright       Copyright © 2018, FLEXIcontent team, All Rights Reserved
+ * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
-defined('_JEXEC') or die('Restricted access');
+defined('_JEXEC') or die;
 
-// Register autoloader for parent controller, in case controller is executed by another component
-JLoader::register('FlexicontentController', JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'controller.php');
+use Joomla\String\StringHelper;
+use Joomla\Utilities\ArrayHelper;
+
+JLoader::register('FlexicontentControllerBaseAdmin', JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'controllers' . DS . 'base' . DS . 'baseadmin.php');
+
+// Manually import models in case used by frontend, then models will not be autoloaded correctly via getModel('name')
+require_once JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'models' . DS . 'template.php';
+require_once JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'models' . DS . 'templates.php';
 
 /**
- * FLEXIcontent Component Templates Controller
+ * FLEXIcontent Templates Controller (RAW)
  *
- * @package Joomla
- * @subpackage FLEXIcontent
- * @since 1.0
+ * NOTE: -Only- if this controller is needed by frontend URLs, then create a derived controller in frontend 'controllers' folder
+ *
+ * @since 3.3
  */
-class FlexicontentControllerTemplates extends FlexicontentController
+class FlexicontentControllerTemplates extends FlexicontentControllerBaseAdmin
 {
 	/**
 	 * Constructor
 	 *
-	 * @since 1.0
+	 * @param   array   $config    associative array of configuration settings.
+	 *
+	 * @since 3.3
 	 */
-	function __construct()
+	public function __construct($config = array())
 	{
-		parent::__construct();
+		parent::__construct($config);
 
-		// Register Extra task
+		// Can manage ACL
+		$this->canManage = FlexicontentHelperPerm::getPerm()->CanTemplates;
 	}
+
 
 	/**
 	 * Logic to duplicate a template
 	 *
-	 * @access public
 	 * @return void
+	 *
 	 * @since 1.5
 	 */
-	function duplicate()
+	public function duplicate()
 	{
 		// Check for request forgeries
-		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
+		JSession::checkToken('request') or die(JText::_('JINVALID_TOKEN'));
 
 		// Check access
 		if (!FlexicontentHelperPerm::getPerm()->CanTemplates)
@@ -82,14 +85,14 @@ class FlexicontentControllerTemplates extends FlexicontentController
 	/**
 	 * Logic to remove a template
 	 *
-	 * @access public
 	 * @return void
+	 *
 	 * @since 1.5
 	 */
-	function remove()
+	public function remove()
 	{
 		// Check for request forgeries
-		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
+		JSession::checkToken('request') or die(JText::_('JINVALID_TOKEN'));
 
 		// Check access
 		if (!FlexicontentHelperPerm::getPerm()->CanTemplates)
@@ -124,10 +127,16 @@ class FlexicontentControllerTemplates extends FlexicontentController
 	 * @return void
 	 * @since 1.5
 	 */
-	function getlayoutparams()
+	public function getlayoutparams()
 	{
+		// Check for request forgeries
+		JSession::checkToken('request') or die(JText::_('JINVALID_TOKEN'));
+
+		// Calculate access
+		$is_authorised = $this->canManage;
+
 		// Check access
-		if (!FlexicontentHelperPerm::getPerm()->CanTemplates)
+		if (!$is_authorised)
 		{
 			jexit(JText::_('FLEXI_ALERTNOTAUTH_TASK'));
 		}
@@ -344,9 +353,9 @@ class FlexicontentControllerTemplates extends FlexicontentController
 			$fieldSets = $form_layout->getFieldsets($groupname);
 
 			foreach ($fieldSets as $fsname => $fieldSet) : ?>
-			
+
 			<div class="fc_layout_box_outer">
-				
+
 				<?php
 				if (isset($fieldSet->label) && trim($fieldSet->label))
 				{
@@ -430,9 +439,9 @@ class FlexicontentControllerTemplates extends FlexicontentController
 					}
 
 				endforeach; ?>
-					
+
 			</div>
-			
+
 			<?php endforeach; // FieldSets
 		}
 		else

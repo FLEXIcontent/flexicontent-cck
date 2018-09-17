@@ -1,51 +1,69 @@
 <?php
 /**
- * @version 1.5 stable $Id: tags.php 171 2010-03-20 00:44:02Z emmanuel.danan $
- * @package Joomla
- * @subpackage FLEXIcontent
- * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
- * @license GNU/GPL v2
+ * @package         FLEXIcontent
+ * @version         3.3
  *
- * FLEXIcontent is a derivative work of the excellent QuickFAQ component
- * @copyright (C) 2008 Christoph Lukes
- * see www.schlu.net for more information
- *
- * FLEXIcontent is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
+ * @link            http://www.flexicontent.com
+ * @copyright       Copyright © 2018, FLEXIcontent team, All Rights Reserved
+ * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
-defined('_JEXEC') or die('Restricted access');
+defined('_JEXEC') or die;
 
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 
-// Register autoloader for parent controller, in case controller is executed by another component
-JLoader::register('FlexicontentController', JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'controller.php');
+JLoader::register('FlexicontentControllerBaseAdmin', JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'controllers' . DS . 'base' . DS . 'baseadmin.php');
+
+// Manually import models in case used by frontend, then models will not be autoloaded correctly via getModel('name')
+require_once JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'models' . DS . 'tag.php';
+require_once JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'models' . DS . 'tags.php';
 
 /**
- * FLEXIcontent Component Tags Controller
+ * FLEXIcontent Tags Controller (RAW)
  *
- * @package Joomla
- * @subpackage FLEXIcontent
- * @since 1.0
+ * NOTE: -Only- if this controller is needed by frontend URLs, then create a derived controller in frontend 'controllers' folder
+ *
+ * @since 3.3
  */
-class FlexicontentControllerTags extends FlexicontentController
+class FlexicontentControllerTags extends FlexicontentControllerBaseAdmin
 {
-	static $record_limit = 5000;
+	var $records_dbtbl = 'flexicontent_tags';
+
+	var $records_jtable = 'flexicontent_tags';
+
+	var $record_name = 'tag';
+
+	var $record_name_pl = 'tags';
+
+	var $_NAME = 'TAG';
+
+	var $record_alias = 'alias';
+
+	var $runMode = 'standalone';
+
+	var $exitHttpHead = null;
+
+	var $exitMessages = array();
+
+	var $exitLogTexts = array();
+
+	var $exitSuccess  = true;
 
 	/**
 	 * Constructor
 	 *
-	 * @since 1.0
+	 * @param   array   $config    associative array of configuration settings.
+	 *
+	 * @since 3.3
 	 */
-	function __construct()
+	public function __construct($config = array())
 	{
-		parent::__construct();
+		parent::__construct($config);
 
-		// Register Extra task
-		$this->registerTask('import', 			'import');
+		// Can manage ACL
+		$this->canManage = FlexicontentHelperPerm::getPerm()->CanTags;
 	}
 
 
@@ -463,18 +481,5 @@ class FlexicontentControllerTags extends FlexicontentController
 		$session->set($indexer . '_total_queries', $_total_queries, 'flexicontent');
 
 		jexit(sprintf('success | ' . $cnt . ' | Server execution time: %.2f secs ', $_total_runtime / 1000000) . ' | Total DB updates: ' . $_total_queries);
-	}
-
-
-	/**
-	 * Logic to change the state of a tag
-	 *
-	 * @access public
-	 * @return void
-	 * @since 3.2
-	 */
-	function setitemstate()
-	{
-		flexicontent_html::setitemstate($this, 'json', $_record_type = 'tag');
 	}
 }

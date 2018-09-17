@@ -16,7 +16,7 @@
  * GNU General Public License for more details.
  */
 
-defined( '_JEXEC' ) or die( 'Restricted access' );
+defined('_JEXEC') or die('Restricted access');
 ?>
 
 <!-- CSS fixes for J2.5.x -->

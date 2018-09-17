@@ -1,34 +1,24 @@
 <?php
 /**
- * @version 1.5 stable $Id: view.html.php 1577 2012-12-02 15:10:44Z ggppdk $
- * @package Joomla
- * @subpackage FLEXIcontent
- * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
- * @license GNU/GPL v2
- * 
- * FLEXIcontent is a derivative work of the excellent QuickFAQ component
- * @copyright (C) 2008 Christoph Lukes
- * see www.schlu.net for more information
+ * @package         FLEXIcontent
+ * @version         3.3
  *
- * FLEXIcontent is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
+ * @link            http://www.flexicontent.com
+ * @copyright       Copyright © 2018, FLEXIcontent team, All Rights Reserved
+ * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
-defined( '_JEXEC' ) or die( 'Restricted access' );
+defined('_JEXEC') or die('Restricted access');
 
 jimport('legacy.view.legacy');
 use Joomla\String\StringHelper;
 
 /**
  * View class for the FLEXIcontent templates screen
- *
- * @package Joomla
- * @subpackage FLEXIcontent
- * @since 1.0
  */
-class FlexicontentViewTemplate extends JViewLegacy {
+class FlexicontentViewTemplate extends JViewLegacy
+{
 
 	function display($tpl = null)
 	{
@@ -38,12 +28,12 @@ class FlexicontentViewTemplate extends JViewLegacy {
 		$db       = JFactory::getDbo();
 		$document = JFactory::getDocument();
 		$user     = JFactory::getUser();
-		
+
 		$use_jquery_sortable = true;
 		$type    = JRequest::getVar('type',  'items', '', 'word');
 		$folder  = JRequest::getVar('folder',  'default', '', 'cmd');
 		$ismodal = JRequest::getVar('ismodal',  'default', '', 'int');
-		
+
 		//Get data from the model
 		$layout  = $this->get( 'Data');
 		if (!$layout)
@@ -51,16 +41,16 @@ class FlexicontentViewTemplate extends JViewLegacy {
 			$app->redirect('index.php?option=com_flexicontent', JText::_( 'Template not found: <b>' ).JRequest::getVar('folder',  'default', '', 'cmd').'</b>');
 		}
 		$conf    = $this->get( 'LayoutConf');
-		
+
 		$fields  = $this->get( 'Fields');
 		$fbypos  = $this->get( 'FieldsByPositions');
 		$used    = $this->get( 'UsedFields');
-		
+
 		$contentTypes = $this->get( 'TypesList' );
 		//$fieldTypes = $this->get( 'FieldTypesList' );
 		$fieldTypes = flexicontent_db::getFieldTypes($_grouped = true, $_usage=false, $_published=false);  // Field types with content type ASSIGNMENT COUNTING
-		
-		
+
+
 		// Create CONTENT TYPE SELECTOR
 		foreach ($fields as $field) {
 			$field->type_ids = !empty($field->reltypes)  ?  explode("," , $field->reltypes)  :  array();
@@ -73,8 +63,8 @@ class FlexicontentViewTemplate extends JViewLegacy {
 		$fieldname = $elementid = 'content_type__au__';
 		$attribs = ' onchange="filterFieldList(\'%s\', \'%s\', \'%s\');" class="use_select2_lib" ';
 		$content_type_select = JHtml::_('select.genericlist', $options, $fieldname, $attribs, 'value', 'text', '', $elementid );
-		
-		
+
+
 		// Create FIELD TYPE SELECTOR
 		//$ALL = StringHelper::strtoupper(JText::_( 'FLEXI_ALL' )) . ' : ';
 		$fftypes = array();
@@ -97,8 +87,8 @@ class FlexicontentViewTemplate extends JViewLegacy {
 		$fieldname = $elementid = 'field_type__au__';
 		$attribs = ' class="use_select2_lib" onchange="filterFieldList(\'%s\', \'%s\', \'%s\');"';
 		$field_type_select = flexicontent_html::buildfieldtypeslist($fftypes, $fieldname, '', ($_grouped ? 1 : 0), $attribs, $elementid);
-		
-		
+
+
 		if (isset($layout->positions)) {
 			$sort = array();
 			$jssort = array();
@@ -122,10 +112,10 @@ class FlexicontentViewTemplate extends JViewLegacy {
 				}
 			}
 			$positions = implode(',', $idsort);
-			
+
 			$jssort = implode("; ", $jssort);
 			$sortable_ids = "#".implode(",#", $sort);
-			
+
 			$js = "
 			jQuery(function() {
 				my = jQuery( \"$sortable_ids\" ).sortable({
@@ -149,7 +139,7 @@ class FlexicontentViewTemplate extends JViewLegacy {
 				jQuery(hidden_id).val(fields.join(','))
 			}
 			";
-			
+
 			$js .= '
 			var fieldListFilters = new Array( "content_type", "field_type" );
 			function filterFieldList (containerID, method, group)
@@ -158,13 +148,13 @@ class FlexicontentViewTemplate extends JViewLegacy {
 				for (i=0; i<fieldListFilters.length; i++)
 				{
 					filter_name = fieldListFilters[i];
-					
+
 					var filter_val = jQuery("#" + filter_name + "_" + group).val();
 					if (filter_val) {
 						needed_classes += "."+filter_name+"_"+filter_val;
 					}
 				}
-				
+
 				if (needed_classes) {
 					(method=="hide") ?
 						jQuery("#"+containerID).find("li").show().filter(":not("+needed_classes+")").hide() :
@@ -175,18 +165,18 @@ class FlexicontentViewTemplate extends JViewLegacy {
 						jQuery("#"+containerID).find("li").css({"color":"black"});
 				}
 			}
-			
+
 			';
-			
+
 			$document->addScriptDeclaration( $js );
 		}
-		
-		
-		
+
+
+
 		// ***
 		// *** Load JS/CSS files
 		// ***
-		
+
 		// Add css to document
 		!JFactory::getLanguage()->isRtl()
 			? $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', FLEXI_VHASH)
@@ -194,7 +184,7 @@ class FlexicontentViewTemplate extends JViewLegacy {
 		!JFactory::getLanguage()->isRtl()
 			? $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/j3x.css', FLEXI_VHASH)
 			: $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/j3x_rtl.css', FLEXI_VHASH);
-		
+
 		// Add JS frameworks
 		flexicontent_html::loadJQuery();
 		flexicontent_html::loadFramework('select2');
@@ -215,19 +205,19 @@ class FlexicontentViewTemplate extends JViewLegacy {
 		// *****************************
 		// Get user's global permissions
 		// *****************************
-		
+
 		$perms = FlexicontentHelperPerm::getPerm();
 
 		if (!$perms->CanTemplates) {
 			$app->redirect('index.php?option=com_flexicontent', JText::_( 'FLEXI_NO_ACCESS' ));
 		}
-		
-		
-		
+
+
+
 		// ************************
 		// Create Submenu & Toolbar
 		// ************************
-		
+
 		// Create Submenu (and also check access to current view)
 		FLEXIUtilities::ManagerSideMenu('CanTemplates');
 
@@ -242,11 +232,11 @@ class FlexicontentViewTemplate extends JViewLegacy {
 			JToolbarHelper::apply('templates.apply_modal');
 			echo $bar->render();
 		}
-		
-		
+
+
 		// Check that less files for all layouts of current template (=folder) exist and are up-to-date
 		$this->check_less_files($folder);
-		
+
 		// Create / load layout parameters if not already done above
 		if (!is_object($layout->params))
 		{
@@ -255,15 +245,15 @@ class FlexicontentViewTemplate extends JViewLegacy {
 			$layout->params = $jform;
 		}
 		// ... values applied at the template form file
-		
+
 		// Load the template again but ... this time allow triggering less compiling if needed
 		flexicontent_tmpl::getTemplates($folder, $skip_less=false);
-		
+
 		// Load language file (this will also load the template and also trigger less compiling)
 		FLEXIUtilities::loadTemplateLanguageFile($folder);
-		
+
 		//print_r($layout);
-		
+
 		//assign data to template
 		//print_r($conf);
 		$this->conf = $conf;
@@ -279,23 +269,23 @@ class FlexicontentViewTemplate extends JViewLegacy {
 		$this->use_jquery_sortable = $use_jquery_sortable;
 		$this->content_type_select = $content_type_select;
 		$this->field_type_select = $field_type_select;
-		
+
 		parent::display($tpl);
 	}
-	
-	
-	
+
+
+
 	/*
 	 * Check that the LESS layout file that stores parameter values exists and is up to date (its modification time after XML file modification)
 	 */
 	function check_xml_to_less($layout = null)
 	{
 		$tmpldir = JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'templates'.DS.$layout->name;
-		
+
 		// ****************************************************************************************************************************
-		// Create / Update the "variable defaults" FILEs (using defaults from XML files): config_auto_item.less / config_auto_item.less 
+		// Create / Update the "variable defaults" FILEs (using defaults from XML files): config_auto_item.less / config_auto_item.less
 		// ****************************************************************************************************************************
-		
+
 		$view = $layout->view;
 		$less_data = "/* This is created automatically, do NOT edit this manually! \nThis is used by _layout_type_ layout to save parameters as less variables. \nNOTE: Make sure that this is imported by 'config.less' \n to make a parameter be a LESS variable, edit parameter in _layout_type_.xml and add cssprep=\"less\" \n created parameters will be like: @FCLL_parameter_name: value; */\n\n";
 		$_less_auto = false;
@@ -304,8 +294,8 @@ class FlexicontentViewTemplate extends JViewLegacy {
 			file_put_contents($_less_auto, str_replace("FCLL_", "FCI_", str_replace("_layout_type_", $view, $less_data)));
 		}
 		if (!$_less_auto) return;
-		
-		$layout_type = $view == 'item' ? 'items' : 'category';
+
+		$layout_type = $view === 'item' ? 'items' : 'category';
 		$model = new FlexicontentModelTemplate();
 		$model->setLayoutType($layout_type);
 		$_layout = $model->getData();
@@ -313,42 +303,42 @@ class FlexicontentViewTemplate extends JViewLegacy {
 		$_attribs = $_conf->attribs;
 		$model->storeLessConf($layout->name, $cfgname='', $layout_type, $_attribs);
 	}
-	
-	/*	
+
+	/*
 	 * Check that less files for all layouts of current template (=folder) exist and are up-to-date
 	 */
 	function check_less_files($folder)
 	{
 		// **************************************************************************************
 		// Get both single item ('items') and multi-item ('category') layouts of current template
-		// 'folder' and apply Template Parameters values into the form fields structures 
+		// 'folder' and apply Template Parameters values into the form fields structures
 		// **************************************************************************************
-		
+
 		$tmpl = flexicontent_tmpl::getTemplates( $folder, $skip_less=true );
-		
+
 		$tmpldir = JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'templates'.DS.$folder;
-		
+
 		// Create less folders if they do not exist already
 		if ( !JFolder::exists( $tmpldir . '/less' ) ) if ( !JFolder::create( $tmpldir . '/less') )  JError::raiseWarning(100, JText::_('Unable to create "/less/" folder'));
-		
+
 		// Abort if directory creation failed
 		if ( ! JFolder::exists( $tmpldir . '/less' ) ) return;
-		
-		
+
+
 		// ***********************************************************************
 		// Create CUSTOM config.less, that is include by item.less / category.less
 		// ************************************************************ ***********
-		
+
 		if ( !JFolder::exists( $tmpldir . '/less/include' ) ) if ( !JFolder::create( $tmpldir . '/less/include') )  JError::raiseWarning(100, JText::_('Unable to create "/less/include" folder'));
 		if ( !JFile::exists($tmpldir . '/less/include/config.less') ) {
 			file_put_contents($tmpldir . '/less/include/config.less', "/* Place your less variables, mixins, etc, here \n1. This is commonly imported by files: item.less and category.less, \n2. If you add extra less file imports, then place files \ninside same folder for automatic compiling to be triggered */\n\n@import 'config_auto_item.less';\n@import 'config_auto_category.less';\n");
 		}
-		
-		
+
+
 		// *************************************************************************
 		// Create files item.less / category.less by COPYING item.css / category.css
 		// *************************************************************************
-		
+
 		$less_files = array('/css/item.css'=>'/less/item.less', '/css/category.css'=>'/less/category.less');
 		foreach($less_files as $css_name => $less_name) {
 			if ( !JFile::exists($tmpldir . $css_name) )  continue;  // Do not try to copy CSS file that does not exist
@@ -362,14 +352,14 @@ class FlexicontentViewTemplate extends JViewLegacy {
 				}
 			}
 		}
-		
-		
+
+
 		// Check that the LESS layout files that stores parameter values exist
 		// and they are up to date (their modification time after XML file modification)
-		
+
 		$_layout = !isset($tmpl->items->$folder)  ?  false  :  $tmpl->items->$folder;
 		$this->check_xml_to_less($_layout);
-		
+
 		$_layout = !isset($tmpl->category->$folder)  ?  false  :  $tmpl->category->$folder;
 		$this->check_xml_to_less($_layout);
 	}

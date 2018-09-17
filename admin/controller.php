@@ -29,11 +29,12 @@ jimport('legacy.controller.legacy');
  * @subpackage FLEXIcontent
  * @since 1.0
  */
-class FlexicontentController extends JControllerLegacy
+class FlexicontentController extends JControllerAdmin
 {
-	function __construct()
+	public function __construct($config = array())
 	{
-		parent::__construct();
+		parent::__construct($config);
+
 		$params = JComponentHelper::getParams('com_flexicontent');
 		$print_logging_info = $params->get('print_logging_info');
 		if ( $print_logging_info )  global $fc_run_times;
@@ -272,11 +273,19 @@ class FlexicontentController extends JControllerLegacy
 
 
 	/**
-	 * Display the view
+	 * Method to display a view.
+	 *
+	 * @param   boolean        $cachable   If true, the view output will be cached
+	 * @param   mixed|boolean  $urlparams  An array of safe URL parameters and their variable types, for valid values see {@link JFilterInput::clean()}.
+	 *
+	 * @return  JController  This object to support chaining.
+	 *
+	 * @since   3.1
 	 */
-	function display($cachable = false, $urlparams = false)
+	public function display($cachable = false, $urlparams = false)
 	{
-		parent::display();
+		return get_parent_class(get_parent_class(get_class()))::display($cachable, $urlparams);
+		//return get_parent_class('JControllerAdmin')::display($cachable, $urlparams);
 	}
 
 
@@ -285,4 +294,3 @@ class FlexicontentController extends JControllerLegacy
 		flexicontent_ajax::call_extfunc();
 	}
 }
-?>

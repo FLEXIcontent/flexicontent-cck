@@ -1,46 +1,45 @@
 <?php
 /**
- * @version		$Id: search.php 1699 2013-07-30 04:29:37Z ggppdk $
- * @package		Joomla
- * @subpackage	Search
- * @copyright	Copyright (C) 2005 - 2010 Open Source Matters. All rights reserved.
- * @license		GNU/GPL, see LICENSE.php
- * Joomla! is free software. This version may have been modified pursuant to the
- * GNU General Public License, and as distributed it includes or is derivative
- * of works licensed under the GNU General Public License or other free or open
- * source software licenses. See COPYRIGHT.php for copyright notices and
- * details.
+ * @package         FLEXIcontent
+ * @version         3.3
+ *
+ * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
+ * @link            http://www.flexicontent.com
+ * @copyright       Copyright © 2018, FLEXIcontent team, All Rights Reserved
+ * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
-// Check to ensure this file is included in Joomla!
-defined( '_JEXEC' ) or die( 'Restricted access' );
+defined('_JEXEC') or die('Restricted access');
 
 jimport('legacy.model.legacy');
 use Joomla\String\StringHelper;
 
-
 /**
  * FLEXIcontent Component Search Model
  *
- * @package Joomla
- * @subpackage FLEXIcontent
- * @since		2.0
  */
 class FLEXIcontentModelSearch extends JModelLegacy
 {
 	/**
-	 * view's rows
+	 * Record rows
 	 *
 	 * @var array
 	 */
 	var $_data = null;
 
 	/**
-	 * rows total
+	 * Rows total
 	 *
 	 * @var integer
 	 */
 	var $_total = null;
+
+	/**
+	 * Pagination object
+	 *
+	 * @var object
+	 */
+	var $_pagination = null;
 
 	/**
 	 * Search areas
@@ -50,59 +49,50 @@ class FLEXIcontentModelSearch extends JModelLegacy
 	var $_areas = null;
 
 	/**
-	 * Pagination object
-	 *
-	 * @var object
-	 */
-	var $_pagination = null;
-	
-	
-	/**
 	 * Constructor
 	 *
-	 * @since 1.5
+	 * @since 3.3.0
 	 */
-	function __construct()
+	public function __construct($config = array())
 	{
-		//echo "<pre>"; debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS); echo "</pre>";
-		parent::__construct();
-		
+		parent::__construct($config);
+
 		$app    = JFactory::getApplication();
 		$jinput = $app->input;
 		$option = $jinput->get('option', '', 'cmd');
 		$view   = $jinput->get('view', '', 'cmd');
 		$fcform = $jinput->get('fcform', 0, 'int');
-		$p      = $option.'.'.$view.'.';
-		
+		$p      = $option . '.' . $view . '.';
+
 		// Parameters of the view, in our case it is only the component parameters
 		$this->cparams = JComponentHelper::getParams( 'com_flexicontent' );
-		
-		
-		
+
+
+
 		// **************
 		// view's Filters
 		// **************
-		
+
 		// Various filters
 		$filter_state     = $fcform ? $jinput->get('filter_state', '', 'cmd')         :  $app->getUserStateFromRequest( $p.'filter_state', 'filter_state', '', 'cmd' );
 		$filter_type      = $fcform ? $jinput->get('filter_type',  0,  'int')         :  $app->getUserStateFromRequest( $p.'filter_type',  'filter_type',   0, 'int' );
 		$filter_fieldtype = $fcform ? $jinput->get('filter_fieldtype', '', 'cmd')     :  $app->getUserStateFromRequest( $p.'filter_fieldtype', 'filter_fieldtype', '', 'cmd' );
 		$search_itemtitle = $fcform ? $jinput->get('search_itemtitle', '', 'string')  :  $app->getUserStateFromRequest( $p.'search_itemtitle', 'search_itemtitle', '', 'string' );
 		$search_itemid    = $fcform ? $jinput->get('search_itemid',     0, 'int')     :  $app->getUserStateFromRequest( $p.'search_itemid',    'search_itemid',     0, 'int' );
-		
+
 		$this->setState('filter_state', $filter_state);
 		$this->setState('filter_type', $filter_type);
 		$this->setState('filter_fieldtype', $filter_fieldtype);
 		$this->setState('search_itemtitle', $search_itemtitle);
 		$this->setState('search_itemid', $search_itemid);
-		
+
 		$app->setUserState($p.'filter_state', $filter_state);
 		$app->setUserState($p.'filter_type', $filter_type);
 		$app->setUserState($p.'filter_fieldtype', $filter_fieldtype);
 		$app->setUserState($p.'search_itemtitle', $search_itemtitle);
 		$app->setUserState($p.'search_itemid', $search_itemid);
-		
-		
+
+
 		// Type of search index being listed
 		$indexer = $app->getUserStateFromRequest( $p.'indexer', 'indexer', '', 'cmd' );
 		if ($indexer) {
@@ -114,88 +104,88 @@ class FLEXIcontentModelSearch extends JModelLegacy
 		$this->setState('filter_indextype', $filter_indextype);
 		$app->setUserState($p.'filter_indextype', $filter_indextype);
 		$isADV = $filter_indextype=='advanced';
-		
-		
+
+
 		// Text search
 		$search = $fcform ? $jinput->get('search', '', 'string')  :  $app->getUserStateFromRequest( $p.'search',  'search',  '',  'string' );
 		$this->setState('search', $search);
 		$app->setUserState($p.'search', $search);
-		
-		
+
+
 		// ****************************************
 		// Ordering: filter_order, filter_order_Dir
 		// ****************************************
-		
+
 		$default_order     = $this->cparams->get('search_manager_order', 'a.title');  // Parameter does not exist
 		$default_order_dir = $this->cparams->get('search_manager_order_dir', 'ASC');  // Parameter does not exist
-				
+
 		$filter_order      = $fcform ? $jinput->get('filter_order',     $default_order,      'cmd')  :  $app->getUserStateFromRequest( $p.'filter_order',     'filter_order',     $default_order,      'cmd' );
 		$filter_order_Dir  = $fcform ? $jinput->get('filter_order_Dir', $default_order_dir, 'word')  :  $app->getUserStateFromRequest( $p.'filter_order_Dir', 'filter_order_Dir', $default_order_dir, 'word' );
-		
+
 		if (!$filter_order)     $filter_order     = $default_order;
 		if (!$filter_order_Dir) $filter_order_Dir = $default_order_dir;
 		if (!$isADV && !in_array($filter_order, array('a.id', 'a.title', 'ext.search_index'))) $filter_order = 'a.title';
-		
+
 		$this->setState('filter_order', $filter_order);
 		$this->setState('filter_order_Dir', $filter_order_Dir);
-		
+
 		$app->setUserState($p.'filter_order', $filter_order);
 		$app->setUserState($p.'filter_order_Dir', $filter_order_Dir);
-		
-		
-		
+
+
+
 		// *****************************
 		// Pagination: limit, limitstart
 		// *****************************
-		
+
 		$limit      = $fcform ? $jinput->get('limit', $app->getCfg('list_limit'), 'int')  :  $app->getUserStateFromRequest( $p.'limit', 'limit', $app->getCfg('list_limit'), 'int');
 		$limitstart = $fcform ? $jinput->get('limitstart',                     0, 'int')  :  $app->getUserStateFromRequest( $p.'limitstart', 'limitstart', 0, 'int' );
-		
+
 		// In case limit has been changed, adjust limitstart accordingly
 		$limitstart = ( $limit != 0 ? (floor($limitstart / $limit) * $limit) : 0 );
 		$jinput->set( 'limitstart',	$limitstart );
-		
+
 		$this->setState('limit', $limit);
 		$this->setState('limitstart', $limitstart);
-		
+
 		$app->setUserState($p.'limit', $limit);
 		$app->setUserState($p.'limitstart', $limitstart);
 	}
-	
-	
+
+
 	function getData()
 	{
 		if (!empty($this->_data)) return $this->_data;
-		
+
 		$cparams = JComponentHelper::getParams('com_flexicontent');
 		$print_logging_info = $cparams->get('print_logging_info');
 		if ( $print_logging_info )  global $fc_run_times;
-		
-		
+
+
 		// 1, get filtered, limited, ordered items
 		$query = $this->_buildQuery();
-		
+
 		if ( $print_logging_info )  $start_microtime = microtime(true);
 		$this->_db->setQuery($query, $this->getState('limitstart'), $this->getState('limit'));
 		$rows = $this->_db->loadObjectList();
 		if ( $print_logging_info ) @$fc_run_times['execute_main_query'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
-		
-		
+
+
 		// 2, get current items total for pagination
 		$this->_db->setQuery("SELECT FOUND_ROWS()");
 		$this->_total = $this->_db->loadResult();
-		
-		$filter_indextype = $this->getState( 'filter_indextype' );
+
+		$filter_indextype = $this->getState('filter_indextype');
 		$isADV = $filter_indextype=='advanced';
-		
-		
+
+
 		// 3, get item ids
 		$query_ids = array();
 		foreach ($rows as $row) {
 			$query_ids[] = $isADV ? $row->sid : $row->item_id;
 		}
-		
-		
+
+
 		// 4, get item data
 		if (count($query_ids)) $query = $this->_buildQuery($query_ids);
 		if ( $print_logging_info )  $start_microtime = microtime(true);
@@ -205,19 +195,19 @@ class FLEXIcontentModelSearch extends JModelLegacy
 			$_data = $this->_db->loadObjectList($isADV ? 'sid' : 'item_id');
 		}
 		if ( $print_logging_info ) @$fc_run_times['execute_sec_queries'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
-		
-		
+
+
 		// 5, reorder items and get cat ids
 		$this->_data = array();
 		foreach($query_ids as $query_id) {
 			$this->_data[] = $_data[$query_id];
 		}
-		
-		
+
+
 		return $this->_data;
 	}
-	
-	
+
+
 	/**
 	 * Method to get the number of relevant search index records
 	 *
@@ -233,8 +223,8 @@ class FLEXIcontentModelSearch extends JModelLegacy
 		}
 		return $this->_total;
 	}
-	
-	
+
+
 	/**
 	 * Method to build the query for the retrieval of search index records
 	 *
@@ -248,19 +238,19 @@ class FLEXIcontentModelSearch extends JModelLegacy
 		{
 			$where		= $this->_buildWhere();
 			$orderby	= $this->_buildOrderBy();
-			
-			$filter_order     = $this->getState( 'filter_order' );
-			
-			$filter_fieldtype = $this->getState( 'filter_fieldtype' );
-			$filter_state = $this->getState( 'filter_state' );
-			$filter_type  = $this->getState( 'filter_type' );
-			
-			$search_itemtitle = $this->getState( 'search_itemtitle' );
-			$search_itemid    = $this->getState( 'search_itemid' );
+
+			$filter_order     = $this->getState('filter_order');
+
+			$filter_fieldtype = $this->getState('filter_fieldtype');
+			$filter_state = $this->getState('filter_state');
+			$filter_type  = $this->getState('filter_type');
+
+			$search_itemtitle = $this->getState('search_itemtitle');
+			$search_itemid    = $this->getState('search_itemid');
 		}
-		$filter_indextype = $this->getState( 'filter_indextype' );
+		$filter_indextype = $this->getState('filter_indextype');
 		$isADV = $filter_indextype=='advanced';
-		
+
 		$query = !$query_ids ?
 			'SELECT SQL_CALC_FOUND_ROWS '.($isADV ? 'ai.sid' : 'ext.item_id') :
 			($isADV ?
@@ -300,8 +290,8 @@ class FLEXIcontentModelSearch extends JModelLegacy
 			);
 		return $query;
 	}
-	
-	
+
+
 	/**
 	 * Method to build the orderby clause of the query for the search index
 	 *
@@ -311,16 +301,16 @@ class FLEXIcontentModelSearch extends JModelLegacy
 	 */
 	function _buildOrderBy()
 	{
-		$filter_order     = $this->getState( 'filter_order' );
-		$filter_order_Dir = $this->getState( 'filter_order_Dir' );
-		
+		$filter_order     = $this->getState('filter_order');
+		$filter_order_Dir = $this->getState('filter_order_Dir');
+
 		$orderby = $filter_order.' '.$filter_order_Dir;
 		$orderby = ' ORDER BY '.$orderby;
-		
+
 		return $orderby;
 	}
-	
-	
+
+
 	/**
 	 * Method to build the where clause of the query for the fields
 	 *
@@ -332,19 +322,19 @@ class FLEXIcontentModelSearch extends JModelLegacy
 	{
 		static $where;
 		if ( isset($where) ) return $where;
-		
-		$filter_state	= $this->getState( 'filter_state' );
-		$filter_type	= $this->getState( 'filter_type' );
-		$filter_fieldtype = $this->getState( 'filter_fieldtype' );
-		$search_itemtitle	= $this->getState( 'search_itemtitle' );
-		$search_itemid		= $this->getState( 'search_itemid' );
-		
-		$filter_indextype = $this->getState( 'filter_indextype' );
+
+		$filter_state	= $this->getState('filter_state');
+		$filter_type	= $this->getState('filter_type');
+		$filter_fieldtype = $this->getState('filter_fieldtype');
+		$search_itemtitle	= $this->getState('search_itemtitle');
+		$search_itemid		= $this->getState('search_itemid');
+
+		$filter_indextype = $this->getState('filter_indextype');
 		$isADV = $filter_indextype=='advanced';
-		
-		$search  = $this->getState( 'search' );
+
+		$search  = $this->getState('search');
 		$search  = StringHelper::trim( StringHelper::strtolower( $search ) );
-		
+
 		$where = array();
 
 		if ( $isADV && $filter_fieldtype ) {
@@ -369,30 +359,33 @@ class FLEXIcontentModelSearch extends JModelLegacy
 			$where[] = 'ext.type_id = ' . (int)$filter_type;
 		}
 
-		if ($search) {
-			$escaped_search = $this->_db->escape( $search, true );
-			$where[] = ' LOWER(' .($isADV ? 'ai' : 'ext'). '.search_index) LIKE '.$this->_db->Quote( '%'.$escaped_search.'%', false );
+		if ($search)
+		{
+			$escaped_search = str_replace(' ', '%', $this->_db->escape(trim($search), true));
+			$search_quoted  = $this->_db->Quote('%' . $escaped_search . '%', false);
+
+			$where[] = ' LOWER(' .($isADV ? 'ai' : 'ext'). '.search_index) LIKE ' . $search_quoted;
 		}
-		
+
 		if ($search_itemtitle) {
 			$search_itemtitle_escaped = $this->_db->escape( $search_itemtitle, true );
 			$where[] = ' LOWER(a.title) LIKE '.$this->_db->Quote( '%'.$search_itemtitle_escaped.'%', false );
 		}
-		
+
 		if ($search_itemid) {
 			$where[] = ' a.id= '. (int)$search_itemid;
 		}
-		
+
 		$where = ( count( $where ) ? implode( ' AND ', $where ) : '' );
 		$where = trim($where) ? " WHERE ".$where : "";
-		
+
 		return $where;
-	}	
-	
-	
+	}
+
+
 	/**
 	 * Method to get types list
-	 * 
+	 *
 	 * @return array
 	 * @since 1.5
 	 */
@@ -400,8 +393,8 @@ class FLEXIcontentModelSearch extends JModelLegacy
 	{
 		return flexicontent_html::getTypesList( $type_ids, $check_perms, $published);
 	}
-	
-	
+
+
 	/**
 	 * Method to get a list pagination object.
 	 *
@@ -422,7 +415,7 @@ class FLEXIcontentModelSearch extends JModelLegacy
 		$app = JFactory::getApplication();
 		return $this->getState('limitstart', $app->getCfg('list_limit'));
 	}
-	
+
 	/**
 	 * Method to empty search indexes
 	 *
@@ -434,11 +427,11 @@ class FLEXIcontentModelSearch extends JModelLegacy
 	{
 		$app = JFactory::getApplication();
 		$db  = JFactory::getDbo();
-		
+
 		// ******************************
 		// Empty Common text-search index
 		// ******************************
-		
+
 		if ( empty($del_fieldids) ) {
 			$query = "TRUNCATE TABLE `#__flexicontent_advsearch_index`;";
 		} else {
@@ -447,16 +440,16 @@ class FLEXIcontentModelSearch extends JModelLegacy
 		}
 		$db->setQuery($query);
 		$db->execute();
-		
-		
+
+
 		// **********************
 		// Empty per field TABLES
 		// **********************
-		
+
 		$filterables = FlexicontentFields::getSearchFields('id', $indexer='advanced', null, null, $_load_params=true, 0, $search_type='filter');
 		$filterables = array_keys($filterables);
 		$filterables = array_flip($filterables);
-		
+
 		$dbprefix = $app->getCfg('dbprefix');
 		$dbname   = $app->getCfg('db');
 		$tbl_prefix = $dbprefix.'flexicontent_advsearch_index_field_';
@@ -466,23 +459,23 @@ class FLEXIcontentModelSearch extends JModelLegacy
 			";
 		$db->setQuery($query);
 		$tbl_names = $db->loadColumn();
-		
+
 		foreach($tbl_names as $tbl_name)
 		{
 			$_field_id = str_replace($tbl_prefix, '', $tbl_name);
-			
-			// Drop the table of no longer filterable field 
+
+			// Drop the table of no longer filterable field
 			if ( !isset($filterables[$_field_id]) )
 				$db->setQuery( 'DROP TABLE IF EXISTS '.$tbl_name );
-			
+
 			// Truncate (or drop/recreate) tables of fields that are still filterable. Any dropped but needed tables will be recreated below
 			else if ( empty($del_fieldids) || isset($del_fieldids[$_field_id]) )
 				//$db->setQuery( 'DROP TABLE IF EXISTS '.$tbl_name );
 				$db->setQuery( 'TRUNCATE TABLE '.$tbl_name );
-			
+
 			$db->execute();
 		}
-		
+
 		// VERIFY all search tables exist
 		$tbl_names_flipped = array_flip($tbl_names);
 		foreach ($filterables as $_field_id => $_ignored)
@@ -507,6 +500,6 @@ class FLEXIcontentModelSearch extends JModelLegacy
 			$db->setQuery($query);
 			$db->execute();
 		}
-		
+
 	}
 }

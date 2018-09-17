@@ -159,6 +159,24 @@ div.statetoggler > div.statetoggler_inner > div.stateopener {
 	text-align: right;
 	vertical-align: baseline;
 	cursor: pointer;
+	text-decoration: none;
+	position: relative;
+}
+div.statetoggler > div.statetoggler_inner > div.stateopener span.fc_expired,
+div.statetoggler > div.statetoggler_inner > div.stateopener span.fc_scheduled {
+	position: absolute;
+	left: -2px;
+	right: -2px;
+	top: 45%;
+	bottom: 35%;
+	border-top: 1px solid gray;
+	border-bottom: 1px solid gray;
+	opacity: 1;
+}
+div.statetoggler > div.statetoggler_inner > div.stateopener span.fc_expired + span:before,
+div.statetoggler > div.statetoggler_inner > div.stateopener span.fc_scheduled + span:before {
+	opacity: 0.4;
+	color: black;
 }
 div.statetoggler > div.statetoggler_inner > div.stateopener.ajax-loader {
 	background-position: center;

@@ -1,37 +1,58 @@
 <?php
 /**
- * @version 1.5 stable $Id: import.php 1650 2013-03-11 10:27:06Z ggppdk $
- * @package Joomla
- * @subpackage FLEXIcontent
- * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
- * @license GNU/GPL v2
+ * @package         FLEXIcontent
+ * @version         3.3
  *
- * FLEXIcontent is a derivative work of the excellent QuickFAQ component
- * @copyright (C) 2008 Christoph Lukes
- * see www.schlu.net for more information
- *
- * FLEXIcontent is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
+ * @link            http://www.flexicontent.com
+ * @copyright       Copyright © 2018, FLEXIcontent team, All Rights Reserved
+ * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
-defined('_JEXEC') or die('Restricted access');
+defined('_JEXEC') or die;
 
+use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 
-// Register autoloader for parent controller, in case controller is executed by another component
-JLoader::register('FlexicontentController', JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'controller.php');
+/**
+ * Register autoloader for parent controller, in case controller is executed by another component
+ * We use JPATH_BASE since parent controller with same name ... exists in frontend too (thus custom code can use it)
+ * NOTE: -Only- if this controller is needed by frontend URLs ... then create a derived controller in frontend 'controllers' folder
+ */
+JLoader::register('FlexicontentController', JPATH_BASE . DS . 'components' . DS . 'com_flexicontent' . DS . 'controller.php');
+
+// Manually import in case used by frontend, then model will not be autoloaded correctly via getModel('name')
+require_once JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'models' . DS . 'tag.php';
 
 /**
- * FLEXIcontent Component Import Controller
+ * FLEXIcontent Apps manager Controller
  *
- * @package Joomla
- * @subpackage FLEXIcontent
- * @since 1.0
+ * @since 3.3
  */
 class FlexicontentControllerAppsman extends FlexicontentController
 {
+	var $records_dbtbl = null;
+
+	var $records_jtable = null;
+
+	var $record_name = 'appsman';
+
+	var $record_name_pl = null;
+
+	var $_NAME = 'APPSMAN';
+
+	var $record_alias = 'not_applicable';
+
+	var $runMode = 'standalone';
+
+	var $exitHttpHead = null;
+
+	var $exitMessages = array();
+
+	var $exitLogTexts = array();
+
+	var $exitSuccess  = true;
+
 	static $allowed_tables = array(
 		'flexicontent_fields',
 		'flexicontent_types',
@@ -56,11 +77,13 @@ class FlexicontentControllerAppsman extends FlexicontentController
 	/**
 	 * Constructor
 	 *
-	 * @since 1.0
+	 * @param   array   $config    associative array of configuration settings.
+	 *
+	 * @since 3.3
 	 */
-	function __construct()
+	public function __construct($config = array())
 	{
-		parent::__construct();
+		parent::__construct($config);
 
 		// Register Extra task
 		$this->registerTask('initxml',  'import');
@@ -70,6 +93,9 @@ class FlexicontentControllerAppsman extends FlexicontentController
 		$this->registerTask('exportxml', 'export');
 		$this->registerTask('exportsql', 'export');
 		$this->registerTask('exportcsv', 'export');
+
+		// Can manage ACL
+		$this->canManage = JFactory::getUser()->authorise('core.admin', 'com_flexicontent');
 	}
 
 
@@ -80,42 +106,45 @@ class FlexicontentControllerAppsman extends FlexicontentController
 		$user     = JFactory::getUser();
 		$session  = JFactory::getSession();
 
-		// Get/Create the model
-		$model = $this->getModel('appsman');
+		// Get the model
+		$model = $this->getModel($this->record_name);
 
-		// ************************
-		// Calculate / check access
-		// ************************
+		// Calculate access
+		$is_authorised = $this->canManage;
 
-		$is_authorised = $user->authorise('core.admin', 'com_flexicontent');
-
+		// Check access
 		if (!$is_authorised)
 		{
-			JError::raiseWarning(403, JText::_('FLEXI_NO_ACCESS'));
-			$this->setRedirect($_SERVER['HTTP_REFERER']);
+			$app->enqueueMessage(JText::_('FLEXI_ALERTNOTAUTH_TASK'), 'error');
+			$app->setHeader('status', 403, true);
+
+			$this->setRedirect($this->refererURL);
 
 			return;
 		}
 
-		// ******************************************
-		// Security Concern: check for allowed tables
-		// ******************************************
+
+		/**
+		 * Security Concern: check for allowed tables
+		 */
 
 		$table = strtolower($this->input->get('table', 'flexicontent_fields', 'cmd'));
 
 		if (!in_array($table, self::$allowed_tables))
 		{
-			JError::raiseWarning(403, JText::_('FLEXI_NO_ACCESS' . ' Table: ' . $table . ' not in allowed tables'));
-			$this->setRedirect($_SERVER['HTTP_REFERER']);
+			$app->enqueueMessage(JText::_('FLEXI_NO_ACCESS' . ' Table: ' . $table . ' not in allowed tables'), 'error');
+			$app->setHeader('status', 403, true);
+
+			$this->setRedirect($this->refererURL);
 
 			return;
 		}
 
 		$ids_are_integers = $table != 'flexicontent_templates';
 
-		// ************
-		// Get rows ids
-		// ************
+		/**
+		 * Get rows ids
+		 */
 
 		$cid = $this->input->get('cid', array(), 'array');
 
@@ -143,9 +172,10 @@ class FlexicontentControllerAppsman extends FlexicontentController
 			$conf[$table][$_id] = 1;
 		}
 
-		// ******************************************
-		// Some tables have related DB data, add them
-		// ******************************************
+
+		/**
+		 * Some tables have related DB data, add them
+		 */
 
 		$customHandler_msg = array();
 		$customHandler = 'getRelatedIds_' . $table;
@@ -167,33 +197,42 @@ class FlexicontentControllerAppsman extends FlexicontentController
 
 		$customHandler_msg = empty($customHandler_msg) ? '' : "<br/>\n" . implode("<br/>\n", $customHandler_msg);
 
-		// ********************************************************************
-		// Set row ids into session, and redirect back to refere with a message
-		// ********************************************************************
+		/**
+		 * Set row ids into session, and redirect back to refere with a message
+		 */
 
 		$session->set('appsman_export', $conf, 'flexicontent');
 
 		$app->enqueueMessage('TABLE: <strong>' . $table . '</strong><br/>' . $count_new . ' new records added, ' . $count_old . ' existing records updated' . $customHandler_msg, 'notice');
-		$this->setRedirect($_SERVER['HTTP_REFERER']);
+		$this->setRedirect($this->refererURL);
 
 		return;
 	}
 
 
-
-	function exportclear()
+	/**
+	 * Clear export configuration from session
+	 *
+	 * @return void
+	 *
+	 * @since	3.3
+	 */
+	public function exportclear()
 	{
 		$app      = JFactory::getApplication();
 		$user     = JFactory::getUser();
 		$session  = JFactory::getSession();
 
-		// Calculate / check access
-		$is_authorised = $user->authorise('core.admin', 'com_flexicontent');
+		// Calculate access
+		$is_authorised = $this->canManage;
 
+		// Check access
 		if (!$is_authorised)
 		{
-			JError::raiseWarning(403, JText::_('FLEXI_NO_ACCESS'));
-			$this->setRedirect($_SERVER['HTTP_REFERER']);
+			$app->enqueueMessage(JText::_('FLEXI_ALERTNOTAUTH_TASK'), 'error');
+			$app->setHeader('status', 403, true);
+
+			$this->setRedirect($this->refererURL);
 
 			return;
 		}
@@ -201,14 +240,18 @@ class FlexicontentControllerAppsman extends FlexicontentController
 		$session->set('appsman_export', "", 'flexicontent');
 
 		$app->enqueueMessage('Export list cleared', 'notice');
-		$this->setRedirect($_SERVER['HTTP_REFERER']);
-
-		return;
+		$this->setRedirect($this->refererURL);
 	}
 
 
-
-	function import()
+	/**
+	 * Logic to import the configuration of an 'application', the 'process*' tasks are aliased to this task
+	 *
+	 * @return void
+	 *
+	 * @since 3.3
+	 */
+	public function import()
 	{
 		$app      = JFactory::getApplication();
 		$user     = JFactory::getUser();
@@ -216,7 +259,7 @@ class FlexicontentControllerAppsman extends FlexicontentController
 		$document = JFactory::getDocument();
 		$has_zlib = version_compare(PHP_VERSION, '5.4.0', '>=');
 
-		$this->input->set('view', 'appsman');
+		$this->input->set('view', $this->record_name);
 		$this->input->set('hidemainmenu', 1);
 
 		// Get/Create the view
@@ -226,38 +269,38 @@ class FlexicontentControllerAppsman extends FlexicontentController
 		$view = $this->getView($viewName, $viewType, '', array('base_path' => $this->basePath, 'layout' => $viewLayout));
 
 		// Get/Create the model
-		$model = $this->getModel('appsman');
+		$model = $this->getModel($this->record_name);
 
 		// Push the model into the view (as default), later we will call the view display method instead of calling parent's display task, because it will create a 2nd model instance !!
 		$view->setModel($model, true);
 		$view->document = $document;
 
-		// ************************
-		// Calculate / check access
-		// ************************
+		// Calculate access
+		$is_authorised = $this->canManage;
 
-		$is_authorised = $user->authorise('core.admin', 'com_flexicontent');
-
+		// Check access
 		if (!$is_authorised)
 		{
-			JError::raiseWarning(403, JText::_('FLEXI_NO_ACCESS'));
-			$this->setRedirect($_SERVER['HTTP_REFERER']);
+			$app->setHeader('status', '403 Forbidden', true);
+			$app->enqueueMessage(JText::_('FLEXI_ALERTNOTAUTH_TASK'), 'error');
 
-			return;
+			$this->setRedirect($this->refererURL);
+
+			return false;
 		}
 
 		$link = $_SERVER['HTTP_REFERER'];  // 'index.php?option=com_flexicontent&view=appsman';
 		$task = strtolower($this->input->get('task', '', 'cmd'));
 
-		// *************************
-		// Execute according to task
-		// *************************
+		/**
+		 * Execute according to task
+		 */
 
 		switch ($task)
 		{
-			// ***********************************************************************************************
-			// RESET/CLEAR an already started import task, e.g. import process was interrupted for some reason
-			// ***********************************************************************************************
+			/**
+			 * RESET/CLEAR an already started import task, e.g. import process was interrupted for some reason
+			 */
 
 			case 'clearxml':
 
@@ -273,9 +316,9 @@ class FlexicontentControllerAppsman extends FlexicontentController
 				return;
 			break;
 
-			// *****************************************************
-			// EXECUTE an already initialized (prepared) import task
-			// *****************************************************
+			/**
+			 * EXECUTE an already initialized (prepared) import task
+			 */
 
 			case 'processxml':
 
@@ -385,13 +428,12 @@ class FlexicontentControllerAppsman extends FlexicontentController
 				// echo "<pre>"; print_r($xml); echo "</pre>";
 			exit;
 
-			// CONTINUE to do the import task
-			// ...
+			// CONTINUE to do the import task ...
 			break;
 
-			// *************************************************************************
-			// INITIALIZE (prepare) import by getting configuration and reading XML file
-			// *************************************************************************
+			/**
+			 * INITIALIZE (prepare) import by getting configuration and reading XML file
+			 */
 
 			case 'initxml':
 
@@ -430,9 +472,9 @@ class FlexicontentControllerAppsman extends FlexicontentController
 
 			break;
 
-			// ************************
-			// UNKNWOWN task, terminate
-			// ************************
+			/**
+			 * UNKNWOWN task, terminate
+			 */
 
 			default:
 
@@ -450,7 +492,14 @@ class FlexicontentControllerAppsman extends FlexicontentController
 	}
 
 
-	function export()
+	/**
+	 * Logic to export 'application' data into an archive, other export tasks are aliased to this task
+	 *
+	 * @return void
+	 *
+	 * @since 3.3
+	 */
+	public function export()
 	{
 		$app      = JFactory::getApplication();
 		$user     = JFactory::getUser();
@@ -479,7 +528,7 @@ class FlexicontentControllerAppsman extends FlexicontentController
 		if (!$is_authorised)
 		{
 			JError::raiseWarning(403, JText::_('FLEXI_NO_ACCESS'));
-			$this->setRedirect($_SERVER['HTTP_REFERER']);
+			$this->setRedirect($this->refererURL);
 
 			return;
 		}
@@ -524,7 +573,7 @@ class FlexicontentControllerAppsman extends FlexicontentController
 					JError::raiseWarning($error_code, $error_text);
 				}
 
-				$this->setRedirect($_SERVER['HTTP_REFERER']);
+				$this->setRedirect($this->refererURL);
 
 				return;
 			}
@@ -540,7 +589,7 @@ class FlexicontentControllerAppsman extends FlexicontentController
 			if (empty($rows))
 			{
 				$app->enqueueMessage("No rows to export", 'notice');
-				$this->setRedirect($_SERVER['HTTP_REFERER']);
+				$this->setRedirect($this->refererURL);
 
 				return;
 			}
@@ -608,7 +657,7 @@ class FlexicontentControllerAppsman extends FlexicontentController
 		// Check for error
 		if (!$content)
 		{
-			$this->setRedirect($_SERVER['HTTP_REFERER']);
+			$this->setRedirect($this->refererURL);
 
 			return;
 		}
@@ -625,17 +674,17 @@ class FlexicontentControllerAppsman extends FlexicontentController
 
 		else
 		{
-			// *****************************
-			// Create temporary archive name
-			// *****************************
+			/**
+			 * Create temporary archive name
+			 */
 
 			$tmp_ffname = 'fcmd_uid_' . $user->id . '_' . date('Y-m-d__H-i-s');
 			$archivename = $tmp_ffname . '.zip';
 			$archivepath = JPath::clean($app->getCfg('tmp_path') . DS . $archivename);
 
-			// *******************************************
-			// Create a new Zip archive on the server disk
-			// *******************************************
+			/**
+			 * Create a new Zip archive on the server disk
+			 */
 
 			$zip = new flexicontent_zip;  // Extends ZipArchive
 			$res = $zip->open($archivepath, ZipArchive::CREATE);
@@ -647,9 +696,9 @@ class FlexicontentControllerAppsman extends FlexicontentController
 
 			$zip->addFromString($filename, $content);
 
-			// ***********************************************
-			// Get extra files for those tables that need this
-			// ***********************************************
+			/**
+			 * Get extra files for those tables that need this
+			 */
 
 			foreach (self::$allowed_tables as $table)
 			{
@@ -678,9 +727,9 @@ class FlexicontentControllerAppsman extends FlexicontentController
 			$downloadsize = filesize($archivepath);
 		}
 
-		// *******************
-		// Output HTTP headers
-		// *******************
+		/**
+		 * Output HTTP headers
+		 */
 
 		header("Pragma: public"); // Required
 		header("Expires: 0");
@@ -691,9 +740,9 @@ class FlexicontentControllerAppsman extends FlexicontentController
 		header("Content-Transfer-Encoding: Binary");
 		header("Content-Length: " . $downloadsize);
 
-		// ***************
-		// Output the file
-		// ***************
+		/**
+		 * Output the file
+		 */
 
 		if ($export_type)
 		{
@@ -702,8 +751,12 @@ class FlexicontentControllerAppsman extends FlexicontentController
 		}
 		else
 		{
-			// Read archive file from the server disk
-			$chunksize = 1 * (1024 * 1024); // 1MB, highest possible for fread should be 8MB
+			/**
+			 * When more than 1MB, (highest possible for fread should be 8MB)
+			 * read archive file from the server disk in chunks
+			 */
+			$MB_limit = 1;
+			$chunksize = $MB_limit * (1024 * 1024);
 
 			if (1 || $filesize > $chunksize)
 			{
@@ -720,14 +773,17 @@ class FlexicontentControllerAppsman extends FlexicontentController
 			}
 			else
 			{
-				// This is good for small files, it will read an output the file into
-				// memory and output it, it will cause a memory exhausted error on large files
+				/**
+				 * This is good for small files, it will read an output the file into
+				 * memory and output it, it will cause a memory exhausted error on large files
+				 */
 				ob_clean();
 				flush();
 				readfile($archivepath);
 			}
 
-			unlink($archivepath); // Remove temporary archive file
+			// Remove temporary archive file
+			unlink($archivepath);
 		}
 
 		$app->close();

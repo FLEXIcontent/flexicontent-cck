@@ -1,22 +1,15 @@
 <?php
 /**
- * @version 1.5 stable $Id: view.html.php 1900 2014-05-03 07:25:51Z ggppdk $
- * @package Joomla
- * @subpackage FLEXIcontent
- * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
- * @license GNU/GPL v2
- * 
- * FLEXIcontent is a derivative work of the excellent QuickFAQ component
- * @copyright (C) 2008 Christoph Lukes
- * see www.schlu.net for more information
+ * @package         FLEXIcontent
+ * @version         3.3
  *
- * FLEXIcontent is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
+ * @link            http://www.flexicontent.com
+ * @copyright       Copyright © 2018, FLEXIcontent team, All Rights Reserved
+ * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
-defined( '_JEXEC' ) or die( 'Restricted access' );
+defined('_JEXEC') or die('Restricted access');
 
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
@@ -24,7 +17,7 @@ use Joomla\Utilities\ArrayHelper;
 JLoader::register('FlexicontentViewBaseRecords', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/base/view_records.php');
 
 /**
- * HTML View class for the FLEXIcontent categories screen
+ * HTML View class for the categories backend manager
  *
  * @package Joomla
  * @subpackage FLEXIcontent
@@ -32,51 +25,63 @@ JLoader::register('FlexicontentViewBaseRecords', JPATH_ADMINISTRATOR . '/compone
  */
 class FlexicontentViewCategories extends FlexicontentViewBaseRecords
 {
-	function display( $tpl = null )
+	var $title_propname = 'title';
+	var $state_propname = 'published';
+
+	public function display($tpl = null)
 	{
-		// ***
-		// *** Initialise variables
-		// ***
+		/**
+		 * Initialise variables
+		 */
 
 		global $globalcats;
-		$app     = JFactory::getApplication();
-		$jinput  = $app->input;
-		$option  = $jinput->get('option', '', 'cmd');
-		$view    = $jinput->get('view', '', 'cmd');
+		$app      = JFactory::getApplication();
+		$jinput   = $app->input;
+		$option   = $jinput->get('option', '', 'cmd');
+		$view     = $jinput->get('view', '', 'cmd');
+		$task     = $jinput->get('task', '', 'cmd');
 
 		$cparams  = JComponentHelper::getParams( 'com_flexicontent' );
 		$user     = JFactory::getUser();
 		$db       = JFactory::getDbo();
 		$document = JFactory::getDocument();
+		$session  = JFactory::getSession();
+
 		$order_property = 'a.lft';
-		
+
 		// Get model
 		$model = $this->getModel();
 
-		$print_logging_info = $cparams->get('print_logging_info');
-		if ( $print_logging_info )  global $fc_run_times;
+		// Performance statistics
+		if ($print_logging_info = $cparams->get('print_logging_info'))
+		{
+			global $fc_run_times;
+		}
 
 
-
-		// ***
-		// *** Get filters
-		// ***
+		/**
+		 * Get filters and ordering
+		 */
 
 		$count_filters = 0;
 
+		// Order and order direction
+		$filter_order      = $model->getState('filter_order');
+		$filter_order_Dir  = $model->getState('filter_order_Dir');
+
 		// Various filters
-		$filter_state     = $model->getState( 'filter_state' );
-		$filter_cats      = $model->getState( 'filter_cats' );
-		$filter_level     = $model->getState( 'filter_level' );
-		$filter_access    = $model->getState( 'filter_access' );
-		$filter_language	= $model->getState( 'filter_language' );
+		$filter_state     = $model->getState('filter_state');
+		$filter_cats      = $model->getState('filter_cats');
+		$filter_level     = $model->getState('filter_level');
+		$filter_access    = $model->getState('filter_access');
+		$filter_language  = $model->getState('filter_language');
 
 		if ($filter_state) $count_filters++;
 		if ($filter_cats) $count_filters++;
 		if ($filter_level) $count_filters++;
 		if ($filter_access) $count_filters++;
 		if ($filter_language) $count_filters++;
-		
+
 		// Item ID filter
 		$filter_id = $model->getState('filter_id');
 		if ($filter_id) $count_filters++;
@@ -86,26 +91,11 @@ class FlexicontentViewCategories extends FlexicontentViewBaseRecords
 		$search = $model->getState('search');
 		$search = StringHelper::trim(StringHelper::strtolower($search));
 
-		// Order and order direction
-		$filter_order     = $model->getState('filter_order');
-		$filter_order_Dir = $model->getState('filter_order_Dir');
 
+		/**
+		 * Add css and js to document
+		 */
 
-
-		// ***
-		// *** Important usability messages
-		// ***
-
-		if ( $cparams->get('show_usability_messages', 1) )
-		{
-		}
-		
-		
-		
-		// ***
-		// *** Add css and js to document
-		// ***
-		
 		!JFactory::getLanguage()->isRtl()
 			? $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', FLEXI_VHASH)
 			: $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', FLEXI_VHASH);
@@ -122,32 +112,278 @@ class FlexicontentViewCategories extends FlexicontentViewBaseRecords
 		$document->addScriptVersion(JUri::root(true).'/components/com_flexicontent/assets/js/validate.js', FLEXI_VHASH);
 
 
-
-		// ***
-		// *** Create Submenu & Toolbar
-		// ***
-
-		// Get user's global permissions
-		$perms = FlexicontentHelperPerm::getPerm();
+		/**
+		 * Create Submenu & Toolbar
+		 */
 
 		// Create Submenu (and also check access to current view)
 		FLEXIUtilities::ManagerSideMenu('CanCats');
-		
+
 		// Create document/toolbar titles
-		$doc_title = JText::_( 'FLEXI_CATEGORIES' );
+		$doc_title = JText::_('FLEXI_CATEGORIES');
 		$site_title = $document->getTitle();
-		JToolbarHelper::title( $doc_title, 'fc_categories' );
+		JToolbarHelper::title($doc_title, 'fc_categories');
 		$document->setTitle($doc_title .' - '. $site_title);
 
 		// Create the toolbar
+		$this->setToolbar();
+
+
+		/**
+		 * Get data from the model
+		 */
+
+		if ( $print_logging_info )  $start_microtime = microtime(true);
+		$rows = $this->get('Items');
+		if ( $print_logging_info ) @$fc_run_times['execute_main_query'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+
+		// Get assigned items
+		$rowids = array();
+
+		foreach ($rows as $row)
+		{
+			$rowids[] = $row->id;
+		}
+
+		if ( $print_logging_info )  $start_microtime = microtime(true);
+		//$rowtotals = $model->getAssignedItems($rowids);
+		$byStateTotals = $model->countItemsByState($rowids);
+		if ( $print_logging_info ) @$fc_run_times['execute_sec_queries'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+
+		foreach ($rows as $row)
+		{
+			//$row->nrassigned = isset($rowtotals[$row->id]) ? $rowtotals[$row->id]->nrassigned : 0;
+			$row->byStateTotals = isset($byStateTotals[$row->id]) ? $byStateTotals[$row->id] : array();
+		}
+
+		// Parse configuration for every category
+   	foreach ($rows as $cat)
+		{
+			$cat->config = new JRegistry($cat->config);
+		}
+
+		$this->state = $this->get('State');
+
+		// Preprocess the list of items to find ordering divisions.
+		foreach ($rows as &$item)
+		{
+			$this->ordering[$item->parent_id][] = $item->id;
+		}
+		unset($item);  // unset the variable reference to avoid trouble if variable is reused, thus overwritting last pointed variable
+
+		// Create pagination object
+		$pagination = $this->get('Pagination');
+
+
+		/**
+		 * Add usage information notices if these are enabled
+		 */
+
+		$conf_link = '<a href="index.php?option=com_config&amp;view=component&amp;component=com_flexicontent&amp;path=" class="' . $this->btn_sm_class . ' btn-info">'.JText::_("FLEXI_CONFIG").'</a>';
+
+		if ($cparams->get('show_usability_messages', 1))
+		{
+		}
+
+
+		/**
+		 * Create List Filters
+		 */
+
+		$lists = array();
+
+		$categories = $globalcats;
+		$lists['copyid'] = flexicontent_cats::buildcatselect($categories, 'copycid', '', 2, 'class="use_select2_lib"', false, true, $actions_allowed=array('core.edit'));
+		$lists['destid'] = flexicontent_cats::buildcatselect($categories, 'destcid[]', '', false, 'class="use_select2_lib" size="10" multiple="true"', false, true, $actions_allowed=array('core.edit'));
+
+
+		// Build category filter (it's subtree will be displayed)
+		$lists['filter_cats'] = $this->getFilterDisplay(array(
+			'label' => JText::_('FLEXI_CATEGORY'),
+			'html' => flexicontent_cats::buildcatselect(
+				$categories,
+				'filter_cats',
+				$filter_cats,
+				'-',
+				array(
+					'class' => 'use_select2_lib',
+					'onchange' => 'document.adminForm.limitstart.value=0; Joomla.submitform();',
+				),
+				$check_published = true,
+				$check_perms = false
+			)
+		));
+
+
+		// Build depth level filter
+		$options	= array();
+		$options[]	= JHtml::_('select.option', '', '-'/*JText::_('FLEXI_SELECT_MAX_DEPTH')*/);
+
+		for ($i = 1; $i <= 10; $i++)
+		{
+			$options[]	= JHtml::_('select.option', $i, $i);
+		}
+
+		$fieldname = 'filter_level';
+		$elementid = 'filter_level';
+
+		$lists['filter_level'] = $this->getFilterDisplay(array(
+			'label' => JText::_('FLEXI_MAX_DEPTH'),
+			'html' => JHtml::_('select.genericlist',
+				$options,
+				$fieldname,
+				array(
+					'class' => 'use_select2_lib',
+					'onchange' => 'document.adminForm.limitstart.value=0; Joomla.submitform();',
+				),
+				'value',
+				'text',
+				$filter_level,
+				$elementid,
+				$translate = true
+			)
+		));
+
+
+		// Build publication state filter
+		$options = JHtml::_('jgrid.publishedOptions');
+		array_unshift($options, JHtml::_('select.option', '', '-'/*JText::_('JOPTION_SELECT_PUBLISHED')*/) );
+
+		$fieldname = 'filter_state';
+		$elementid = 'filter_state';
+
+		$lists['filter_state'] = $this->getFilterDisplay(array(
+			'label' => JText::_('FLEXI_STATE'),
+			'html' => JHtml::_('select.genericlist',
+				$options,
+				$fieldname,
+				array(
+					'class' => 'use_select2_lib',
+					'onchange' => 'document.adminForm.limitstart.value=0; Joomla.submitform();',
+				),
+				'value',
+				'text',
+				$filter_state,
+				$elementid,
+				$translate = true
+			)
+		));
+
+
+		// Build access level filter
+		$options = JHtml::_('access.assetgroups');
+		array_unshift($options, JHtml::_('select.option', '', '-'/*JText::_('JOPTION_SELECT_ACCESS')*/) );
+
+		$fieldname = 'filter_access';
+		$elementid = 'filter_access';
+
+		$lists['filter_access'] = $this->getFilterDisplay(array(
+			'label' => JText::_('FLEXI_ACCESS'),
+			'html' => JHtml::_('select.genericlist',
+				$options,
+				$fieldname,
+				array(
+					'class' => 'use_select2_lib',
+					'onchange' => 'document.adminForm.limitstart.value=0; Joomla.submitform();',
+				),
+				'value',
+				'text',
+				$filter_access,
+				$elementid,
+				$translate = true
+			)
+		));
+
+
+		// Build language filter
+		$lists['filter_language'] = $this->getFilterDisplay(array(
+			'label' => JText::_('FLEXI_LANGUAGE'),
+			'html' => flexicontent_html::buildlanguageslist(
+				'filter_language',
+				array(
+					'class' => 'use_select2_lib',
+					'onchange' => 'document.adminForm.limitstart.value=0; Joomla.submitform();',
+				),
+				$filter_language,
+				'-'
+			)
+		));
+
+
+		// Build id list filter
+		$lists['filter_id'] = $this->getFilterDisplay(array(
+			'label' => JText::_('FLEXI_ID'),
+			'html' => '<input type="text" name="filter_id" id="filter_id" size="6" value="' . $filter_id . '" class="inputbox" style="width:auto;" />',
+		));
+
+
+		// Text search filter value
+		$lists['search']= $search;
+
+
+		// Table ordering
+		$lists['order_Dir'] = $filter_order_Dir;
+		$lists['order'] = $filter_order;
+
+		$orderingx = ($lists['order'] == $order_property && strtolower($lists['order_Dir']) == 'asc') ? $order_property : '';
+
+
+		/**
+		 * Assign data to template
+		 */
+
+		$this->count_filters = $count_filters;
+
+		$this->lists = $lists;
+		$this->rows = $rows;
+		$this->pagination = $pagination;
+
+		$this->perms = FlexicontentHelperPerm::getPerm();
+		$this->orderingx = $orderingx;
+		$this->user = $user;
+
+		$this->option = $option;
+		$this->view = $view;
+
+		$this->sidebar = FLEXI_J30GE ? JHtmlSidebar::render() : null;
+
+
+		/**
+		 * Render view's template
+		 */
+
+		if ( $print_logging_info ) { global $fc_run_times; $start_microtime = microtime(true); }
+
+		parent::display($tpl);
+
+		if ( $print_logging_info ) @$fc_run_times['template_render'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+	}
+
+
+
+	/**
+	 * Method to configure the toolbar for this view.
+	 *
+	 * @access	public
+	 * @return	void
+	 */
+	function setToolbar()
+	{
+		$user     = JFactory::getUser();
+		$document = JFactory::getDocument();
+		$toolbar  = JToolbar::getInstance('toolbar');
+		$perms    = FlexicontentHelperPerm::getPerm();
+
 		$js = '';
 
 		$contrl = "categories.";
 		$contrl_singular = "category.";
-		$toolbar = JToolbar::getInstance('toolbar');
+
 		$loading_msg = flexicontent_html::encodeHTML(JText::_('FLEXI_LOADING') .' ... '. JText::_('FLEXI_PLEASE_WAIT'), 2);
-		
-		$add_divider = false;
+
+		// Get if state filter is active
+		$model = $this->getModel();
+		$filter_state = $model->getState('filter_state');
 
 		if ($user->authorise('core.create', 'com_flexicontent'))
 		{
@@ -155,25 +391,26 @@ class FlexicontentViewCategories extends FlexicontentViewBaseRecords
 		}
 		else
 		{
-			$usercats = FlexicontentHelperPerm::getAllowedCats($user, $actions_allowed = array('core.create')
-				, $require_all = true, $check_published = true, $specific_catids = false, $find_first = true
+			$usercats = FlexicontentHelperPerm::getAllowedCats(
+				$user,
+				$actions_allowed = array('core.create'),
+				$require_all = true,
+				$check_published = true,
+				$specific_catids = false,
+				$find_first = true
 			);
 			$cancreate_cat  = count($usercats) > 0;
 		}
-		
+
 		if ($cancreate_cat)
 		{
 			JToolbarHelper::addNew($contrl_singular.'add');
-			$add_divider = true;
 		}
 
 		if ($user->authorise('core.edit', 'com_flexicontent') || $user->authorise('core.edit.own', 'com_flexicontent'))
 		{
 			JToolbarHelper::editList($contrl_singular.'edit');
-			$add_divider = true;
 		}
-		
-		$add_divider = false;
 
 		$btn_arr = array();
 
@@ -220,7 +457,6 @@ class FlexicontentViewCategories extends FlexicontentViewBaseRecords
 		if ($filter_state == -2 && $user->authorise('core.delete', 'com_flexicontent'))
 		{
 			//JToolbarHelper::deleteList(JText::_('FLEXI_ARE_YOU_SURE'), $contrl.'remove');
-			// This will work in J2.5+ too and is offers more options (above a little bogus in J1.5, e.g. bad HTML id tag)
 			$msg_alert   = JText::sprintf('FLEXI_SELECT_LIST_ITEMS_TO', JText::_('FLEXI_DELETE'));
 			$msg_confirm = JText::_('FLEXI_ARE_YOU_SURE');
 			$btn_task    = $contrl.'remove';
@@ -269,7 +505,6 @@ class FlexicontentViewCategories extends FlexicontentViewBaseRecords
 		JToolbarHelper::custom( $btn_task, 'params.png', 'params_f2.png', 'FLEXI_COPY_PARAMS', false );
 
 		//$toolbar->appendButton('Popup', 'move', JText::_('FLEXI_BATCH'), JUri::base(true) . '/index.php?option=com_flexicontent&amp;view=categories&amp;layout=batch&amp;tmpl=component', 800, 440);
-		if ($add_divider) JToolbarHelper::divider();
 
 		JToolbarHelper::checkin($contrl.'checkin');
 
@@ -284,7 +519,7 @@ class FlexicontentViewCategories extends FlexicontentViewBaseRecords
 				'Export now',
 				$btn_name, $full_js='', $msg_alert='', $msg_confirm=JText::_('FLEXI_EXPORT_NOW_AS_XML'),
 				$btn_task, $extra_js, $btn_list=false, $btn_menu=true, $btn_confirm=true, $btn_class="btn-info", $btn_icon);
-			
+
 			$btn_icon = 'icon-box-add';
 			$btn_name = 'box-add';
 			$btn_task    = 'appsman.addtoexport';
@@ -294,7 +529,7 @@ class FlexicontentViewCategories extends FlexicontentViewBaseRecords
 				$btn_name, $full_js='', $msg_alert='', $msg_confirm=JText::_('FLEXI_ADD_TO_EXPORT_LIST'),
 				$btn_task, $extra_js, $btn_list=false, $btn_menu=true, $btn_confirm=true, $btn_class="btn-info", $btn_icon);
 		}
-		
+
 		if ($perms->CanConfig)
 		{
 			JToolbarHelper::custom($contrl.'rebuild', 'refresh.png', 'refresh_f2.png', 'JTOOLBAR_REBUILD', false);
@@ -305,7 +540,7 @@ class FlexicontentViewCategories extends FlexicontentViewBaseRecords
 			$_height = ($fc_screen_height && $fc_screen_height-128 > 550 ) ? ($fc_screen_height-128 > 1000 ? 1000 : $fc_screen_height-128 ) : 550;
 			JToolbarHelper::preferences('com_flexicontent', $_height, $_width, 'Configuration');
 		}
-		
+
 		if ($js)
 		{
 			$document->addScriptDeclaration('
@@ -314,192 +549,5 @@ class FlexicontentViewCategories extends FlexicontentViewBaseRecords
 				});
 			');
 		}
-
-
-		// Get data from the model
-		if ( $print_logging_info )  $start_microtime = microtime(true);
-		$rows = $this->get( 'Items' );
-		if ( $print_logging_info ) @$fc_run_times['execute_main_query'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
-
-		// Get assigned items
-		$rowids = array();
-		foreach ($rows as $row) $rowids[] = $row->id;
-		if ( $print_logging_info )  $start_microtime = microtime(true);
-		//$rowtotals = $model->getAssignedItems($rowids);
-		$byStateTotals = $model->countItemsByState($rowids);
-		if ( $print_logging_info ) @$fc_run_times['execute_sec_queries'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
-		foreach ($rows as $row) {
-			//$row->nrassigned = isset($rowtotals[$row->id]) ? $rowtotals[$row->id]->nrassigned : 0;
-			$row->byStateTotals = isset($byStateTotals[$row->id]) ? $byStateTotals[$row->id] : array();
-		}
-		
-		// Parse configuration for every category
-   	foreach ($rows as $cat)  $cat->config = new JRegistry($cat->config);
-		
-		$this->state = $this->get('State');
-
-		// Preprocess the list of items to find ordering divisions.
-		foreach ($rows as &$item)
-		{
-			$this->ordering[$item->parent_id][] = $item->id;
-		}
-		unset($item);  // unset the variable reference to avoid trouble if variable is reused, thus overwritting last pointed variable
-
-		// Create pagination object
-		$pagination = $this->get( 'Pagination' );
-		$drag_reorder_max = 150;
-
-
-		// ***
-		// *** Create List Filters
-		// ***
-
-		$lists = array();
-
-		$categories = & $globalcats;
-		$lists['copyid'] = flexicontent_cats::buildcatselect($categories, 'copycid', '', 2, 'class="use_select2_lib"', false, true, $actions_allowed=array('core.edit'));
-		$lists['destid'] = flexicontent_cats::buildcatselect($categories, 'destcid[]', '', false, 'class="use_select2_lib" size="10" multiple="true"', false, true, $actions_allowed=array('core.edit'));
-
-
-		// build category filter (it's subtree will be displayed)
-		$categories = $globalcats;
-		$lists['filter_cats'] = $this->getFilterDisplay(array(
-			'label' => JText::_('FLEXI_CATEGORY'),
-			'html' => flexicontent_cats::buildcatselect(
-				$categories,
-				'filter_cats',
-				$filter_cats,
-				'-',
-				array(
-					'class' => 'use_select2_lib',
-					'onchange' => 'document.adminForm.limitstart.value=0; Joomla.submitform();',
-				),
-				$check_published = true,
-				$check_perms = false
-			)
-		));
-
-		// build depth level filter
-		$options	= array();
-		$options[]	= JHtml::_('select.option', '', '-'/*JText::_('FLEXI_SELECT_MAX_DEPTH')*/);
-
-		for ($i = 1; $i <= 10; $i++)
-		{
-			$options[]	= JHtml::_('select.option', $i, $i);
-		}
-
-		$fieldname = 'filter_level';
-		$elementid = 'filter_level';
-
-		$lists['filter_level'] = $this->getFilterDisplay(array(
-			'label' => JText::_('FLEXI_MAX_DEPTH'),
-			'html' => JHtml::_('select.genericlist',
-				$options,
-				$fieldname,
-				array(
-					'class' => 'use_select2_lib',
-					'onchange' => 'document.adminForm.limitstart.value=0; Joomla.submitform();',
-				),
-				'value',
-				'text',
-				$filter_level,
-				$elementid,
-				$translate = true
-			)
-		));
-
-		// build publication state filter
-		$options = JHtml::_('jgrid.publishedOptions');
-		array_unshift($options, JHtml::_('select.option', '', '-'/*JText::_('JOPTION_SELECT_PUBLISHED')*/) );
-
-		$fieldname = 'filter_state';
-		$elementid = 'filter_state';
-
-		$lists['filter_state'] = $this->getFilterDisplay(array(
-			'label' => JText::_('FLEXI_STATE'),
-			'html' => JHtml::_('select.genericlist',
-				$options,
-				$fieldname,
-				array(
-					'class' => 'use_select2_lib',
-					'onchange' => 'document.adminForm.limitstart.value=0; Joomla.submitform();',
-				),
-				'value',
-				'text',
-				$filter_state,
-				$elementid,
-				$translate = true
-			)
-		));
-		
-		// build access level filter
-		$options = JHtml::_('access.assetgroups');
-		array_unshift($options, JHtml::_('select.option', '', '-'/*JText::_('JOPTION_SELECT_ACCESS')*/) );
-
-		$fieldname = 'filter_access';
-		$elementid = 'filter_access';
-
-		$lists['filter_access'] = $this->getFilterDisplay(array(
-			'label' => JText::_('FLEXI_ACCESS'),
-			'html' => JHtml::_('select.genericlist',
-				$options,
-				$fieldname,
-				array(
-					'class' => 'use_select2_lib',
-					'onchange' => 'document.adminForm.limitstart.value=0; Joomla.submitform();',
-				),
-				'value',
-				'text',
-				$filter_access,
-				$elementid,
-				$translate = true
-			)
-		));
-
-		// build language filter
-		$lists['filter_language'] = $this->getFilterDisplay(array(
-			'label' => JText::_('FLEXI_LANGUAGE'),
-			'html' => flexicontent_html::buildlanguageslist(
-				'filter_language',
-				array(
-					'class' => 'use_select2_lib',
-					'onchange' => 'document.adminForm.limitstart.value=0; Joomla.submitform();',
-				),
-				$filter_language,
-				'-'
-			)
-		));
-
-		// build id list filter
-		$lists['filter_id'] = $this->getFilterDisplay(array(
-			'label' => JText::_('FLEXI_ID'),
-			'html' => '<input type="text" name="filter_id" id="filter_id" size="6" value="' . $filter_id . '" class="inputbox" style="width:auto;" />',
-		));
-
-		// text search filter
-		$lists['search']= $search;
-		
-		// table ordering
-		$lists['order_Dir'] = $filter_order_Dir;
-		$lists['order'] = $filter_order;
-
-		$orderingx = ($lists['order'] == $order_property && strtolower($lists['order_Dir']) == 'asc') ? $order_property : '';
-
-		//assign data to template
-		$this->count_filters = $count_filters;
-
-		$this->lists = $lists;
-		$this->rows = $rows;
-		$this->pagination = $pagination;
-
-		$this->perms = $perms;
-		$this->orderingx = $orderingx;
-		$this->user = $user;
-
-		$this->option = $option;
-		$this->view = $view;
-
-		$this->sidebar = FLEXI_J30GE ? JHtmlSidebar::render() : null;
-		parent::display($tpl);
 	}
 }

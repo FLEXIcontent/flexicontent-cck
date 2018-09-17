@@ -1,50 +1,72 @@
 <?php
 /**
- * @version 1.5 stable $Id: categories.php 171 2010-03-20 00:44:02Z emmanuel.danan $
- * @package Joomla
- * @subpackage FLEXIcontent
- * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
- * @license GNU/GPL v2
+ * @package         FLEXIcontent
+ * @version         3.3
  *
- * FLEXIcontent is a derivative work of the excellent QuickFAQ component
- * @copyright (C) 2008 Christoph Lukes
- * see www.schlu.net for more information
- *
- * FLEXIcontent is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
+ * @link            http://www.flexicontent.com
+ * @copyright       Copyright © 2018, FLEXIcontent team, All Rights Reserved
+ * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
-defined('_JEXEC') or die('Restricted access');
+defined('_JEXEC') or die;
 
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 
-// Import parent controller
-jimport('legacy.controller.admin');
+JLoader::register('FlexicontentControllerBaseAdmin', JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'controllers' . DS . 'base' . DS . 'baseadmin.php');
+
+// Manually import models in case used by frontend, then models will not be autoloaded correctly via getModel('name')
+require_once JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'models' . DS . 'category.php';
+require_once JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'models' . DS . 'categories.php';
 
 /**
- * FLEXIcontent Component Categories Controller
+ * FLEXIcontent Categories Controller (RAW)
  *
- * @package Joomla
- * @subpackage FLEXIcontent
- * @since 1.0
+ * NOTE: -Only- if this controller is needed by frontend URLs, then create a derived controller in frontend 'controllers' folder
+ *
+ * @since 3.3
  */
-class FlexicontentControllerCategories extends JControllerAdmin
+class FlexicontentControllerCategories extends FlexicontentControllerBaseAdmin
 {
+	var $records_dbtbl = 'categories';
+
+	var $records_jtable = 'flexicontent_categories';
+
+	var $record_name = 'category';
+
+	var $record_name_pl = 'categories';
+
+	var $_NAME = 'CATEGORY';
+
+	var $record_alias = 'alias';
+
+	var $runMode = 'standalone';
+
+	var $exitHttpHead = null;
+
+	var $exitMessages = array();
+
+	var $exitLogTexts = array();
+
+	var $exitSuccess  = true;
+
 	/**
 	 * Constructor
 	 *
-	 * @since 1.0
+	 * @param   array   $config    associative array of configuration settings.
+	 *
+	 * @since 3.3
 	 */
-	function __construct()
+	public function __construct($config = array())
 	{
-		$this->text_prefix = 'com_content';
-		parent::__construct();
+		parent::__construct($config);
 
-		// Register Extra task
-		$this->registerTask('params', 'params');
+		// The prefix to use with controller messages.
+		$this->text_prefix = 'COM_CONTENT';
+
+		// Register task aliases
+		$this->registerTask('params',     'params');
 	}
 
 
@@ -61,10 +83,7 @@ class FlexicontentControllerCategories extends JControllerAdmin
 	 */
 	public function getModel($name = 'Categories', $prefix = 'FlexicontentModel', $config = array('ignore_request' => true))
 	{
-		if ($this->input->get('task', '', 'cmd') == __FUNCTION__)
-		{
-			die(__FUNCTION__ . ' : direct call not allowed');
-		}
+		$this->input->get('task', '', 'cmd') !== __FUNCTION__ or die(__FUNCTION__ . ' : direct call not allowed');
 
 		$name = $name ?: 'Categories';
 		require_once JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'models' . DS . strtolower($name) . '.php';
@@ -133,17 +152,5 @@ class FlexicontentControllerCategories extends JControllerAdmin
 		{
 			echo '<div class="copyfailed">' . 'Skipped ' . count($unauthorized) . ' uneditable categories with ids: ' . implode(', ', $unauthorized) . '</div>';
 		}
-	}
-
-	/**
-	 * Logic to change the state of a category
-	 *
-	 * @access public
-	 * @return void
-	 * @since 1.0
-	 */
-	function setitemstate()
-	{
-		flexicontent_html::setitemstate($this, 'json', $_record_type = 'category');
 	}
 }

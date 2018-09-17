@@ -454,7 +454,6 @@ class FlexicontentModelItem extends ParentClassItem
 	}
 
 
-
 	/**
 	 * Method to increment the hit counter for the item
 	 *
@@ -500,7 +499,6 @@ class FlexicontentModelItem extends ParentClassItem
 	{
 		return flexicontent_db::getFavoured($type=0, $this->_id, JFactory::getUser()->id);
 	}
-
 
 
 	/**

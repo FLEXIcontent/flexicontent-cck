@@ -151,8 +151,8 @@ $list_total_cols = 8;
 		$cats_texts = flexicontent_tmpl::getLayoutTexts('category');
 		foreach ($this->rows as $row) :
 			$copylink 	= 'index.php?option=com_flexicontent&amp;view=templates&amp;layout=duplicate&amp;tmpl=component&amp;source='. $row->name;
-			$itemlink	= 'index.php?option=com_flexicontent&amp;view=template&amp;type=items&amp;folder='.$row->name;
-			$catlink	= 'index.php?option=com_flexicontent&amp;view=template&amp;type=category&amp;folder='.$row->name;
+			$itemlink	= 'index.php?option=com_flexicontent&amp;view=template&amp;type=items&amp;folder=' . $row->name . '&amp;' . JSession::getFormToken() . '=1';
+			$catlink	= 'index.php?option=com_flexicontent&amp;view=template&amp;type=category&amp;folder=' . $row->name . '&amp;' . JSession::getFormToken() . '=1';
 			
 			$defaulttitle_item = !empty($row->items)    ? @ $item_texts->{$row->name}->title    : '';
 			$defaulttitle_cat  = !empty($row->category) ? @ $cats_texts->{$row->name}->title : '';

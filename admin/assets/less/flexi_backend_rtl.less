@@ -248,7 +248,7 @@ div.adminthumbs.fcmanthumbs {
 }
 
 
-/* containers */
+/* Common CSS of containers */
 .flexicontent #fc-filters-box,
 .flexicontent #mainChooseColBox,
 .flexicontent #itemusage-filters {
@@ -257,9 +257,7 @@ div.adminthumbs.fcmanthumbs {
 	vertical-align: top;
 	min-height: 34px;
 }
-.flexicontent #fc-filters-box {
-	padding-right: 0px;
-}
+
 .flexicontent #fc-mini-help,
 .flexicontent #fc-filters-box.fcman-abs,
 .flexicontent #mainChooseColBox.fcman-abs {
@@ -271,6 +269,10 @@ div.adminthumbs.fcmanthumbs {
 	top: 100%;
 	text-align: right;
 	padding: 6px;
+}
+.flexicontent #fc-filters-box.fcman-abs {
+	left: 0;	
+	min-width: 346px;
 }
 
 .flexicontent #mainChooseColBox > #mainChooseColBox_cols {
@@ -360,6 +362,7 @@ div.adminthumbs.fcmanthumbs {
 // ***
 
 .flexicontent #fc-filters-box {
+	padding-right: 0px;
 
 	/* Icons customization */
 	[class^="icon-arrow-"] {
@@ -436,8 +439,8 @@ div.adminthumbs.fcmanthumbs {
 		#startdate,
 		#enddate {
 			font-size: 11px !important;
-			min-width: 76px;
-			max-width: 76px;
+			min-width: 99px;
+			max-width: 99px;
 			height: 16px !important;
 			padding: 13px 8px !important;
 			box-sizing: border-box;
@@ -516,7 +519,8 @@ div.adminthumbs.fcmanthumbs {
 	}
 	.input-group-prepend > .input-group-text + input,
 	.input-prepend > .add-on + input {
-		width: 160px !important;
+		width: 194px !important;
+		border-radius: 4px;
 	}
 	.input-prepend > input,
 	.input-append > input {
@@ -526,12 +530,12 @@ div.adminthumbs.fcmanthumbs {
 	/* SELECT2 */
 	/* Single-choice */
 	.select2-container .select2-choice {
-		width: 164px !important;
+		width: 198px !important;
 	}
 	
 	/* Multi-choises */
 	.select2-container-multi {
-		width: 172px !important;
+		width: 206px !important;
 		
 	 .select2-choices {
 			margin: 0 !important;

@@ -1,48 +1,45 @@
 <?php
 /**
- * @version 1.5 stable $Id: import.php 1650 2013-03-11 10:27:06Z ggppdk $
- * @package Joomla
- * @subpackage FLEXIcontent
- * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
- * @license GNU/GPL v2
+ * @package         FLEXIcontent
+ * @version         3.3
  *
- * FLEXIcontent is a derivative work of the excellent QuickFAQ component
- * @copyright (C) 2008 Christoph Lukes
- * see www.schlu.net for more information
- *
- * FLEXIcontent is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
+ * @link            http://www.flexicontent.com
+ * @copyright       Copyright © 2018, FLEXIcontent team, All Rights Reserved
+ * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
-defined('_JEXEC') or die('Restricted access');
+defined('_JEXEC') or die;
 
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 
-// Register autoloader for parent controller, in case controller is executed by another component
-JLoader::register('FlexicontentController', JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'controller.php');
+JLoader::register('FlexicontentControllerBaseAdmin', JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'controllers' . DS . 'base' . DS . 'baseadmin.php');
+
+// Manually import models in case used by frontend, then models will not be autoloaded correctly via getModel('name')
+require_once JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'models' . DS . 'import.php';
 
 /**
- * FLEXIcontent Component Import Controller
+ * FLEXIcontent Import Controller
  *
- * @package Joomla
- * @subpackage FLEXIcontent
- * @since 1.0
+ * NOTE: -Only- if this controller is needed by frontend URLs, then create a derived controller in frontend 'controllers' folder
+ *
+ * @since 3.3
  */
-class FlexicontentControllerImport extends FlexicontentController
+class FlexicontentControllerImport extends FlexicontentControllerBaseAdmin
 {
 	/**
 	 * Constructor
 	 *
-	 * @since 1.0
+	 * @param   array   $config    associative array of configuration settings.
+	 *
+	 * @since 3.3
 	 */
-	function __construct()
+	public function __construct($config = array())
 	{
-		parent::__construct();
+		parent::__construct($config);
 
-		// Register Extra task
+		// Register task aliases
 		$this->registerTask('initcsv',   'importcsv');
 		$this->registerTask('clearcsv',  'importcsv');
 		$this->registerTask('testcsv',   'importcsv');
@@ -649,7 +646,7 @@ class FlexicontentControllerImport extends FlexicontentController
 				$this->checkfiles($conf, $parse_log, $task);
 				$this->parsevalues($conf, $parse_log, $task);
 
-				if ($task == 'initcsv')
+				if ($task === 'initcsv')
 				{
 					// Set import configuration and file data into session
 					$session->set('csvimport_config',
@@ -710,7 +707,7 @@ class FlexicontentControllerImport extends FlexicontentController
 		$jinput->set('import_docs_folder', $conf['docs_folder']);
 		$jinput->set('id_col', $conf['id_col']);
 
-		$lineno  = $task == 'testcsv' ? 1 : $lineno + 1;
+		$lineno  = $task === 'testcsv' ? 1 : $lineno + 1;
 		$linelim = $items_per_call ? $lineno + $items_per_call - 1 : $itemcount;
 		$linelim = $linelim > $itemcount ? $itemcount : $linelim;
 
@@ -908,7 +905,7 @@ class FlexicontentControllerImport extends FlexicontentController
 			$session->set('csvimport_lineno', $lineno, 'flexicontent');
 
 			// If testing format then output some information
-			if ($task == 'testcsv')
+			if ($task === 'testcsv')
 			{
 				if ($lineno == 1)
 				{
@@ -1010,7 +1007,7 @@ class FlexicontentControllerImport extends FlexicontentController
 		// fclose($fp);
 
 		// Done nothing more to do
-		if ($task == 'testcsv')
+		if ($task === 'testcsv')
 		{
 			echo $parse_log;
 			echo "\n\n\n" . '<b>please click</b> <a href="' . $link . '">here</a> to return previous page' . "\n\n\n";
@@ -1213,7 +1210,7 @@ class FlexicontentControllerImport extends FlexicontentController
 				$msg = "Redundadant columns at record row " . $lineno . ", Found # columns: " . count($fields) . " > expected: " . $colcount;
 				JLog::add($msg, JLog::NOTICE, 'com_flexicontent.importcsv');
 
-				if ($task == 'testcsv')
+				if ($task === 'testcsv')
 				{
 					$parse_log .= $msg;
 				}

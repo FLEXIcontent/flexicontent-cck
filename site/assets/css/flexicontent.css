@@ -825,6 +825,24 @@ div.statetoggler > div.statetoggler_inner > div.stateopener {
 	text-align: left;
 	vertical-align: baseline;
 	cursor: pointer;
+	text-decoration: none;
+	position: relative;
+}
+div.statetoggler > div.statetoggler_inner > div.stateopener span.fc_expired,
+div.statetoggler > div.statetoggler_inner > div.stateopener span.fc_scheduled {
+	position: absolute;
+	left: -2px;
+	right: -2px;
+	top: 45%;
+	bottom: 35%;
+	border-top: 1px solid gray;
+	border-bottom: 1px solid gray;
+	opacity: 1;
+}
+div.statetoggler > div.statetoggler_inner > div.stateopener span.fc_expired + span:before,
+div.statetoggler > div.statetoggler_inner > div.stateopener span.fc_scheduled + span:before {
+	opacity: 0.4;
+	color: black;
 }
 div.statetoggler > div.statetoggler_inner > div.stateopener.ajax-loader {
 	background-position: center;
@@ -1697,12 +1715,6 @@ table.adminlist thead th .filterdel img {
 table.adminlist td {
 	padding: 4px;
 }
-table.adminlist tr td:first-child::after {
-	content: "";
-	display: inline-block;
-	vertical-align: middle;
-	min-height: 30px;
-}
 table.adminlist input[type="text"] {
 	width: auto !important;
 	padding-left: 0px !important;
@@ -1766,10 +1778,15 @@ table.adminlist tfoot th {
 	border-width: 0px !important;
 	text-align: center;
 }
-table.adminlist td.order {
-	text-align: center;
-	white-space: nowrap;
-	width: auto;
+table.adminlist th.col_cb {
+	padding-bottom: 0px;
+}
+table.adminlist td.col_cb {
+	padding-top: 7px;
+}
+table.adminlist td.col_notes {
+	padding-top: 7px;
+	font-size: 110%;
 }
 table.adminlist .pagination {
 	display: flex;
@@ -3110,6 +3127,11 @@ body .form-horizontal .control-group {
 }
 #flexicontent .form-horizontal > .nav-tabs > li > a {
 	text-align: center;
+}
+div#permissions .tab-content {
+	position: sticky;
+	top: 90px;
+	max-height: calc(100vh - 350px);
 }
 .fc-tabbed-field-box {
 	padding: 0 !important;

@@ -1,118 +1,91 @@
 <?php
 /**
- * @version 1.5 stable $Id: view.html.php 1901 2014-05-07 02:37:25Z ggppdk $
- * @package Joomla
- * @subpackage FLEXIcontent
- * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
- * @license GNU/GPL v2
- * 
- * FLEXIcontent is a derivative work of the excellent QuickFAQ component
- * @copyright (C) 2008 Christoph Lukes
- * see www.schlu.net for more information
+ * @package         FLEXIcontent
+ * @version         3.3
  *
- * FLEXIcontent is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
+ * @link            http://www.flexicontent.com
+ * @copyright       Copyright © 2018, FLEXIcontent team, All Rights Reserved
+ * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
-defined( '_JEXEC' ) or die( 'Restricted access' );
+defined('_JEXEC') or die('Restricted access');
 
-jimport('legacy.view.legacy');
 use Joomla\String\StringHelper;
+use Joomla\Utilities\ArrayHelper;
+
+JLoader::register('FlexicontentViewBaseRecords', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/base/view_records.php');
 
 /**
- * View class for the FLEXIcontent categories screen
+ * HTML View class for the FLEXIcontent fields screen
  *
  * @package Joomla
  * @subpackage FLEXIcontent
  * @since 1.0
  */
-class FlexicontentViewFields extends JViewLegacy 
+class FlexicontentViewFields extends FlexicontentViewBaseRecords
 {
 	function display( $tpl = null )
 	{
-		// ***
-		// *** Initialise variables
-		// ***
+		/**
+		 * Initialise variables
+		 */
 
+		global $globalcats;
 		$app     = JFactory::getApplication();
 		$jinput  = $app->input;
 		$option  = $jinput->get('option', '', 'cmd');
 		$view    = $jinput->get('view', '', 'cmd');
+		$task    = $jinput->get('task', '', 'cmd');
 
 		$cparams  = JComponentHelper::getParams( 'com_flexicontent' );
 		$user     = JFactory::getUser();
 		$db       = JFactory::getDbo();
 		$document = JFactory::getDocument();
-		
+		$session  = JFactory::getSession();
+
 		// Get model
 		$model = $this->getModel();
 
-		$print_logging_info = $cparams->get('print_logging_info');
-		if ( $print_logging_info )  global $fc_run_times;
+		// Performance statistics
+		if ($print_logging_info = $cparams->get('print_logging_info'))
+		{
+			global $fc_run_times;
+		}
 
 
-
-		// ***
-		// *** Get filters
-		// ***
+		/**
+		 * Get filters and ordering
+		 */
 
 		$count_filters = 0;
 
+		// Order and order direction
+		$filter_order      = $model->getState('filter_order');
+		$filter_order_Dir  = $model->getState('filter_order_Dir');
+
 		// Various filters
-		$filter_fieldtype = $model->getState( 'filter_fieldtype' );
-		$filter_assigned  = $model->getState( 'filter_assigned' );
-		$filter_type      = $model->getState( 'filter_type' );
-		$filter_state     = $model->getState( 'filter_state' );
-		$filter_access    = $model->getState( 'filter_access' );
+		$filter_fieldtype = $model->getState('filter_fieldtype');
+		$filter_assigned  = $model->getState('filter_assigned');
+		$filter_type      = $model->getState('filter_type');
+		$filter_state     = $model->getState('filter_state');
+		$filter_access    = $model->getState('filter_access');
 
 		if ($filter_fieldtype) $count_filters++;
 		if ($filter_assigned) $count_filters++;
 		if ($filter_type) $count_filters++;
 		if ($filter_state) $count_filters++;
 		if ($filter_access) $count_filters++;
-		
+
 		// Text search
 		$search = $model->getState('search');
 		$search = StringHelper::trim(StringHelper::strtolower($search));
 
-		// Order and order direction
-		$filter_order     = $model->getState('filter_order');
-		$filter_order_Dir = $model->getState('filter_order_Dir');
 
+		/**
+		 * Add css and js to document
+		 */
 
-
-		// ***
-		// *** Important usability messages
-		// ***
-
-		if ( $cparams->get('show_usability_messages', 1) )
-		{
-			/*$conf_link = '<a href="index.php?option=com_config&view=component&component=com_flexicontent&path=" class="btn btn-info btn-small">'.JText::_("FLEXI_CONFIG").'</a>';
-			$notice_content_type_order = $app->getUserStateFromRequest( $option.'.'.$view.'.notice_content_type_order',	'notice_content_type_order',	0, 'int' );
-			if (!$notice_content_type_order)
-			{
-				$app->setUserState( $option.'.'.$view.'.notice_content_type_order', 1 );
-				JFactory::getDocument()->addStyleDeclaration("#system-message-container .alert.alert-info > .alert-heading { display:none; }");
-				
-				$disable_use_notices = '<span class="fc-nowrap-box fc-disable-notices-box">'. JText::_('FLEXI_USABILITY_MESSAGES_TURN_OFF_IN').' '.$conf_link.'</span><div class="fcclear"></div>';
-				$app->enqueueMessage(JText::_('FLEXI_FILTER_BY_TYPE_BEFORE_ACTIONS') .' '. $disable_use_notices, 'notice');
-			}*/
-		}
-		
-		$this->minihelp = '
-			<div id="fc-mini-help" class="fc-mssg fc-info" style="display:none;">
-				'.JText::_('FLEXI_FILTER_BY_TYPE_BEFORE_ACTIONS') .' <br/><br/>
-				'.JText::_('FLEXI_FIELDS_ORDER_NO_TYPE_FILTER_ACTIVE').'
-			</div>
-		';
-		
-		
-		// ***
-		// *** Add css and js to document
-		// ***
-		
 		!JFactory::getLanguage()->isRtl()
 			? $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', FLEXI_VHASH)
 			: $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', FLEXI_VHASH);
@@ -129,14 +102,13 @@ class FlexicontentViewFields extends JViewLegacy
 		$document->addScriptVersion(JUri::root(true).'/components/com_flexicontent/assets/js/validate.js', FLEXI_VHASH);
 
 
-
-		// ***
-		// *** Create Submenu & Toolbar
-		// ***
+		/**
+		 * Create Submenu & Toolbar
+		 */
 
 		// Create Submenu (and also check access to current view)
 		FLEXIUtilities::ManagerSideMenu('CanFields');
-		
+
 		// Create document/toolbar titles
 		$doc_title = JText::_( 'FLEXI_FIELDS' );
 		$site_title = $document->getTitle();
@@ -147,35 +119,67 @@ class FlexicontentViewFields extends JViewLegacy
 		$this->setToolbar();
 
 
-		// Get data from the model
+		/**
+		 * Get data from the model
+		 */
+
 		if ( $print_logging_info )  $start_microtime = microtime(true);
-		$rows       = $this->get( 'Items' );
-		$allrows    = $this->get( 'AllItems' );
+
+		$rows = $this->get('Items');
+		$rowsFG = $model->getItemsByConditions(
+			array(
+			'where' => array('t.field_type = "fieldgroup"')
+			)
+		);
+
 		if ( $print_logging_info ) @$fc_run_times['execute_main_query'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 
-
 		// Create pagination object
-		$pagination = $this->get( 'Pagination' );
-		$inline_ss_max = 50000;
-		$drag_reorder_max = 200;
-		if ( $pagination->limit > $drag_reorder_max ) $cparams->set('draggable_reordering', 0);
+		$pagination = $this->get('Pagination');
 
 		// Create content types
-		$types = $this->get( 'Typeslist' );
+		$types = $this->get('Typeslist');
 
 
-		// ***
-		// *** Create List Filters
-		// ***
+		/**
+		 * Add usage information notices if these are enabled
+		 */
+
+		$conf_link = '<a href="index.php?option=com_config&amp;view=component&amp;component=com_flexicontent&amp;path=" class="' . $this->btn_sm_class . ' btn-info">'.JText::_("FLEXI_CONFIG").'</a>';
+
+		if ($cparams->get('show_usability_messages', 1))
+		{
+			/*$conf_link = '<a href="index.php?option=com_config&view=component&component=com_flexicontent&path=" class="btn btn-info btn-small">'.JText::_("FLEXI_CONFIG").'</a>';
+			$notice_content_type_order = $app->getUserStateFromRequest( $option.'.'.$view.'.notice_content_type_order',	'notice_content_type_order',	0, 'int' );
+			if (!$notice_content_type_order)
+			{
+				$app->setUserState( $option.'.'.$view.'.notice_content_type_order', 1 );
+				JFactory::getDocument()->addStyleDeclaration("#system-message-container .alert.alert-info > .alert-heading { display:none; }");
+
+				$disable_use_notices = '<span class="fc-nowrap-box fc-disable-notices-box">'. JText::_('FLEXI_USABILITY_MESSAGES_TURN_OFF_IN').' '.$conf_link.'</span><div class="fcclear"></div>';
+				$app->enqueueMessage(JText::_('FLEXI_FILTER_BY_TYPE_BEFORE_ACTIONS') .' '. $disable_use_notices, 'notice');
+			}*/
+		}
+
+		$this->minihelp = '
+			<div id="fc-mini-help" class="fc-mssg fc-info" style="display:none;">
+				'.JText::_('FLEXI_FILTER_BY_TYPE_BEFORE_ACTIONS') .' <br/><br/>
+				'.JText::_('FLEXI_FIELDS_ORDER_NO_TYPE_FILTER_ACTIVE').'
+			</div>
+		';
+
+		/**
+		 * Create List Filters
+		 */
 
 		$lists = array();
-		
-		// build item-type filter
+
+		// Build item-type filter
 		$lists['filter_type'] = ($filter_type|| 1 ? '<div class="add-on">'.JText::_('FLEXI_TYPE').'</div>' : '').
 			flexicontent_html::buildtypesselect($types, 'filter_type', $filter_type, '-'/*2*/, 'class="use_select2_lib" size="1" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', 'filter_type');
 
 
-		// build orphaned/assigned filter
+		// Build orphaned/assigned filter
 		$assigned 	= array();
 		$assigned[] = JHtml::_('select.option',  '', '-'/*JText::_( 'FLEXI_ALL_FIELDS' )*/ );
 		$assigned[] = JHtml::_('select.option',  'O', JText::_( 'FLEXI_ORPHANED' ) );
@@ -183,9 +187,9 @@ class FlexicontentViewFields extends JViewLegacy
 
 		$lists['assigned'] = ($filter_assigned || 1 ? '<div class="add-on">'.JText::_('FLEXI_ASSIGNED').'</div>' : '').
 			JHtml::_('select.genericlist', $assigned, 'filter_assigned', 'class="use_select2_lib" size="1" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', 'value', 'text', $filter_assigned );
-		
-		
-		// build field-type filter
+
+
+		// Build field-type filter
 		$fieldTypes = flexicontent_db::getFieldTypes($_grouped = true, $_usage=true, $_published=false);  // Field types with content type ASSIGNMENT COUNTING
 		$ALL = StringHelper::strtoupper(JText::_( 'FLEXI_ALL' )) . ' : ';
 		$fftypes = array();
@@ -207,21 +211,22 @@ class FlexicontentViewFields extends JViewLegacy
 		}
 		$lists['fftype'] = ($filter_fieldtype || 1 ? '<div class="add-on">'.JText::_('FLEXI_FIELD_TYPE').'</div>' : '').
 			flexicontent_html::buildfieldtypeslist($fftypes, 'filter_fieldtype', $filter_fieldtype, ($_grouped ? 1 : 0), 'class="use_select2_lib" size="1" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"');
-		
-		
-		// build publication state filter
+
+
+		// Build publication state filter
 		$states 	= array();
 		$states[] = JHtml::_('select.option',  '', '-'/*JText::_( 'FLEXI_SELECT_STATE' )*/ );
 		$states[] = JHtml::_('select.option',  'P', JText::_( 'FLEXI_PUBLISHED' ) );
 		$states[] = JHtml::_('select.option',  'U', JText::_( 'FLEXI_UNPUBLISHED' ) );
-		//$states[] = JHtml::_('select.option',  '-2', JText::_( 'FLEXI_TRASHED' ) );
-		
+		//$states[] = JHtml::_('select.option',  'A', JText::_( 'FLEXI_ARCHIVED' ) );
+		//$states[] = JHtml::_('select.option',  'T', JText::_( 'FLEXI_TRASHED' ) );
+
 		$lists['state'] = ($filter_state || 1 ? '<div class="add-on">'.JText::_('FLEXI_STATE').'</div>' : '').
 			JHtml::_('select.genericlist', $states, 'filter_state', 'class="use_select2_lib" size="1" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', 'value', 'text', $filter_state );
 			//JHtml::_('grid.state', $filter_state );
-		
-		
-		// build access level filter
+
+
+		// Build access level filter
 		$options = JHtml::_('access.assetgroups');
 		array_unshift($options, JHtml::_('select.option', '', '-'/*JText::_('JOPTION_SELECT_ACCESS')*/) );
 		$fieldname =  $elementid = 'filter_access';
@@ -230,11 +235,11 @@ class FlexicontentViewFields extends JViewLegacy
 			JHtml::_('select.genericlist', $options, $fieldname, $attribs, 'value', 'text', $filter_access, $elementid, $translate=true );
 
 
-		// text search filter
+		// Text search filter value
 		$lists['search']= $search;
 
 
-		// table ordering
+		// Table ordering
 		$lists['order_Dir'] = $filter_order_Dir;
 		$lists['order'] = $filter_order;
 		$ordering = !$filter_type
@@ -242,25 +247,37 @@ class FlexicontentViewFields extends JViewLegacy
 			: ($lists['order'] == 'typeordering');
 
 
-		//assign data to template
+		/**
+		 * Assign data to template
+		 */
+
 		$this->count_filters = $count_filters;
-		$this->permission = FlexicontentHelperPerm::getPerm();
+		$this->perms = FlexicontentHelperPerm::getPerm();
 		$this->filter_type = $filter_type;
 
 		$this->lists = $lists;
 		$this->rows = $rows;
-		$this->allrows = $allrows;
+		$this->rowsFG = $rowsFG;
 		$this->types = $types;
 
 		$this->ordering = $ordering;
 		$this->pagination = $pagination;
 
-		$this->inline_ss_max = $inline_ss_max;
 		$this->option = $option;
 		$this->view = $view;
 
 		$this->sidebar = FLEXI_J30GE ? JHtmlSidebar::render() : null;
+
+
+		/**
+		 * Render view's template
+		 */
+
+		if ( $print_logging_info ) { global $fc_run_times; $start_microtime = microtime(true); }
+
 		parent::display($tpl);
+
+		if ( $print_logging_info ) @$fc_run_times['template_render'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 	}
 
 
@@ -273,24 +290,23 @@ class FlexicontentViewFields extends JViewLegacy
 	 */
 	function setToolbar()
 	{
-		// Get user's global permissions
-		$user  = JFactory::getUser();
-		$perms = FlexicontentHelperPerm::getPerm();
+		$user     = JFactory::getUser();
+		$document = JFactory::getDocument();
+		$toolbar  = JToolbar::getInstance('toolbar');
+		$perms    = FlexicontentHelperPerm::getPerm();
 
 		$js = '';
 
 		$contrl = "fields.";
 		$contrl_singular = "field.";
 
-		$document = JFactory::getDocument();
-		$toolbar = JToolbar::getInstance('toolbar');
 		$loading_msg = flexicontent_html::encodeHTML(JText::_('FLEXI_LOADING') .' ... '. JText::_('FLEXI_PLEASE_WAIT'), 2);
 
 		if ($perms->CanEditField)
 		{
 			$ctrl_task = '&task=fields.selectsearchflag';
 			$popup_load_url = JUri::base(true) . '/index.php?option=com_flexicontent'.$ctrl_task.'&tmpl=component';
-			
+
 			$btn_name = 'basicindex';
 			$btn_task = '';
 			$full_js  = ';';
@@ -298,7 +314,7 @@ class FlexicontentViewFields extends JViewLegacy
 			flexicontent_html::addToolBarButton(
 				JText::_('FLEXI_TOGGLE_SEARCH_FLAG'), $btn_name, $full_js, $msg_alert=JText::_('FLEXI_SELECT_FIELDS_TO_TOGGLE_PROPERTY'), $msg_confirm='',
 				$btn_task, $extra_js, $btn_list=true, $btn_menu=true, $btn_confirm=false, $btn_class="");
-			
+
 			$js .= "
 				jQuery('#toolbar-basicindex a.toolbar, #toolbar-basicindex button')
 					.attr('onclick', 'javascript:;')
@@ -307,7 +323,7 @@ class FlexicontentViewFields extends JViewLegacy
 			";
 			JHtml::_('behavior.modal', '#toolbar-basicindex a.toolbar, #toolbar-basicindex button');
 		}
-		
+
 		if ($perms->CanCopyFields)
 		{
 			JToolbarHelper::custom( $contrl.'copy', 'copy.png', 'copy_f2.png', 'FLEXI_COPY' );
@@ -317,10 +333,12 @@ class FlexicontentViewFields extends JViewLegacy
 
 		JToolbarHelper::publishList($contrl.'publish');
 		JToolbarHelper::unpublishList($contrl.'unpublish');
+
 		if ($perms->CanAddField)
 		{
 			JToolbarHelper::addNew($contrl.'add');
 		}
+
 		if ($perms->CanEditField)
 		{
 			JToolbarHelper::editList($contrl.'edit');
@@ -350,7 +368,7 @@ class FlexicontentViewFields extends JViewLegacy
 				'Export now',
 				$btn_name, $full_js='', $msg_alert='', $msg_confirm=JText::_('FLEXI_EXPORT_NOW_AS_XML'),
 				$btn_task, $extra_js, $btn_list=false, $btn_menu=true, $btn_confirm=true, $btn_class="btn-info", $btn_icon);
-			
+
 			$btn_icon = 'icon-box-add';
 			$btn_name = 'box-add';
 			$btn_task    = 'appsman.addtoexport';
@@ -360,7 +378,7 @@ class FlexicontentViewFields extends JViewLegacy
 				$btn_name, $full_js='', $msg_alert='', $msg_confirm=JText::_('FLEXI_ADD_TO_EXPORT_LIST'),
 				$btn_task, $extra_js, $btn_list=false, $btn_menu=true, $btn_confirm=true, $btn_class="btn-info", $btn_icon);
 		}
-		
+
 		/*$btn_icon = 'icon-download';
 		$btn_name = 'download';
 		$btn_task    = 'fields.exportsql';
@@ -368,8 +386,8 @@ class FlexicontentViewFields extends JViewLegacy
 		flexicontent_html::addToolBarButton(
 			'Export SQL', $btn_name, $full_js='', $msg_alert='', $msg_confirm='Field\'s configuration will be exported as SQL',
 			$btn_task, $extra_js, $btn_list=false, $btn_menu=true, $btn_confirm=true, $btn_class="btn-warning", $btn_icon);
-		
-		
+
+
 		$btn_icon = 'icon-download';
 		$btn_name = 'download';
 		$btn_task    = 'fields.exportcsv';
@@ -377,8 +395,8 @@ class FlexicontentViewFields extends JViewLegacy
 		flexicontent_html::addToolBarButton(
 			'Export CSV', $btn_name, $full_js='', $msg_alert='', $msg_confirm='Field\'s configuration will be exported as CSV',
 			$btn_task, $extra_js, $btn_list=false, $btn_menu=true, $btn_confirm=true, $btn_class="btn-warning", $btn_icon);*/
-		
-		
+
+
 		if ($perms->CanConfig)
 		{
 			JToolbarHelper::divider(); JToolbarHelper::spacer();
@@ -389,7 +407,7 @@ class FlexicontentViewFields extends JViewLegacy
 			$_height = ($fc_screen_height && $fc_screen_height-128 > 550 ) ? ($fc_screen_height-128 > 1000 ? 1000 : $fc_screen_height-128 ) : 550;
 			JToolbarHelper::preferences('com_flexicontent', $_height, $_width, 'Configuration');
 		}
-		
+
 		if ($js)
 		{
 			$document->addScriptDeclaration('
@@ -399,5 +417,4 @@ class FlexicontentViewFields extends JViewLegacy
 			');
 		}
 	}
-
 }

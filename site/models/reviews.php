@@ -10,6 +10,6 @@
  */
 
 // no direct access
-defined( '_JEXEC' ) or die( 'Restricted access' );
+defined('_JEXEC' ) or die('Restricted access');
 
 JLoader::register('FlexicontentModelReviews', JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'models'.DS.'reviews.php');

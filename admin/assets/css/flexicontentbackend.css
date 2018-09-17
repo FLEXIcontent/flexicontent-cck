@@ -825,6 +825,24 @@ div.statetoggler > div.statetoggler_inner > div.stateopener {
 	text-align: left;
 	vertical-align: baseline;
 	cursor: pointer;
+	text-decoration: none;
+	position: relative;
+}
+div.statetoggler > div.statetoggler_inner > div.stateopener span.fc_expired,
+div.statetoggler > div.statetoggler_inner > div.stateopener span.fc_scheduled {
+	position: absolute;
+	left: -2px;
+	right: -2px;
+	top: 45%;
+	bottom: 35%;
+	border-top: 1px solid gray;
+	border-bottom: 1px solid gray;
+	opacity: 1;
+}
+div.statetoggler > div.statetoggler_inner > div.stateopener span.fc_expired + span:before,
+div.statetoggler > div.statetoggler_inner > div.stateopener span.fc_scheduled + span:before {
+	opacity: 0.4;
+	color: black;
 }
 div.statetoggler > div.statetoggler_inner > div.stateopener.ajax-loader {
 	background-position: center;
@@ -1697,12 +1715,6 @@ table.adminlist thead th .filterdel img {
 table.adminlist td {
 	padding: 4px;
 }
-table.adminlist tr td:first-child::after {
-	content: "";
-	display: inline-block;
-	vertical-align: middle;
-	min-height: 30px;
-}
 table.adminlist input[type="text"] {
 	width: auto !important;
 	padding-left: 0px !important;
@@ -1766,10 +1778,15 @@ table.adminlist tfoot th {
 	border-width: 0px !important;
 	text-align: center;
 }
-table.adminlist td.order {
-	text-align: center;
-	white-space: nowrap;
-	width: auto;
+table.adminlist th.col_cb {
+	padding-bottom: 0px;
+}
+table.adminlist td.col_cb {
+	padding-top: 7px;
+}
+table.adminlist td.col_notes {
+	padding-top: 7px;
+	font-size: 110%;
 }
 table.adminlist .pagination {
 	display: flex;
@@ -3111,6 +3128,11 @@ body .form-horizontal .control-group {
 #flexicontent .form-horizontal > .nav-tabs > li > a {
 	text-align: center;
 }
+div#permissions .tab-content {
+	position: sticky;
+	top: 90px;
+	max-height: calc(100vh - 350px);
+}
 .fc-tabbed-field-box {
 	padding: 0 !important;
 }
@@ -3348,9 +3370,6 @@ div.adminthumbs.fcmanthumbs {
 	vertical-align: top;
 	min-height: 34px;
 }
-.flexicontent #fc-filters-box {
-	padding-left: 0px;
-}
 .flexicontent #fc-mini-help,
 .flexicontent #fc-filters-box.fcman-abs,
 .flexicontent #mainChooseColBox.fcman-abs {
@@ -3362,6 +3381,10 @@ div.adminthumbs.fcmanthumbs {
 	top: 100%;
 	text-align: left;
 	padding: 6px;
+}
+.flexicontent #fc-filters-box.fcman-abs {
+	right: 0;
+	min-width: 346px;
 }
 .flexicontent #mainChooseColBox > #mainChooseColBox_cols {
 	display: inline-block;
@@ -3430,6 +3453,9 @@ div.adminthumbs.fcmanthumbs {
 	float: none;
 	clear: both;
 }
+.flexicontent #fc-filters-box {
+	padding-left: 0px;
+}
 .flexicontent #fc-filters-box [class^="icon-arrow-"] {
 	vertical-align: middle;
 	font-size: 18px;
@@ -3491,8 +3517,8 @@ div.adminthumbs.fcmanthumbs {
 .flexicontent #fc-filters-box .fc-filter #startdate,
 .flexicontent #fc-filters-box .fc-filter #enddate {
 	font-size: 11px !important;
-	min-width: 76px;
-	max-width: 76px;
+	min-width: 99px;
+	max-width: 99px;
 	height: 16px !important;
 	padding: 13px 8px !important;
 	box-sizing: border-box;
@@ -3548,17 +3574,18 @@ div.adminthumbs.fcmanthumbs {
 }
 .flexicontent #fc-filters-box .fc-filter .input-group-prepend > .input-group-text + input,
 .flexicontent #fc-filters-box .fc-filter .input-prepend > .add-on + input {
-	width: 160px !important;
+	width: 194px !important;
+	border-radius: 4px;
 }
 .flexicontent #fc-filters-box .fc-filter .input-prepend > input,
 .flexicontent #fc-filters-box .fc-filter .input-append > input {
 	margin: 0 !important;
 }
 .flexicontent #fc-filters-box .fc-filter .select2-container .select2-choice {
-	width: 164px !important;
+	width: 198px !important;
 }
 .flexicontent #fc-filters-box .fc-filter .select2-container-multi {
-	width: 172px !important;
+	width: 206px !important;
 }
 .flexicontent #fc-filters-box .fc-filter .select2-container-multi .select2-choices {
 	margin: 0 !important;

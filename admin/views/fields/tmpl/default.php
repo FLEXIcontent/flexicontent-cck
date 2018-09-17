@@ -1,19 +1,12 @@
 <?php
 /**
- * @version 1.5 stable $Id$
- * @package Joomla
- * @subpackage FLEXIcontent
- * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
- * @license GNU/GPL v2
+ * @package         FLEXIcontent
+ * @version         3.3
  *
- * FLEXIcontent is a derivative work of the excellent QuickFAQ component
- * @copyright (C) 2008 Christoph Lukes
- * see www.schlu.net for more information
- *
- * FLEXIcontent is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
+ * @link            http://www.flexicontent.com
+ * @copyright       Copyright © 2018, FLEXIcontent team, All Rights Reserved
+ * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
 defined('_JEXEC') or die('Restricted access');
@@ -131,24 +124,24 @@ foreach($this->types as $type)
  * Iterate thtrough all fields and create information needed for displaying fieldgroup information of every field
  */
 
-$allrows_byid = array();
-
-foreach ($this->allrows as $row)
+foreach ($this->rowsFG as $row)
 {
 	// Handle displaying information: FIELDGROUP feature
 	if ($row->field_type === 'fieldgroup')
 	{
 		$row->parameters = new JRegistry($row->attribs);
 		$fid_arr = preg_split('/[\s]*,[\s]*/', $row->parameters->get('fields'));
-		$grouped_fields[$row->id] = array();  // Add this in case it is empty (= has no fields in it)
-		foreach($fid_arr as $_fid) $f2g_map[$_fid] = $row;
-	}
 
-	// This is used to display information for: depends-on-master field feature (and in future for more cases)
-	$allrows_byid[$row->id] = $row;
+		$grouped_fields[$row->id] = array();
+
+		foreach($fid_arr as $_fid)
+		{
+			$f2g_map[$_fid] = $row;
+		}
+	}
 }
 
-foreach ($this->allrows as $row)
+foreach ($this->rows as $row)
 {
 	if (isset($f2g_map[$row->id]))
 	{
@@ -160,6 +153,7 @@ foreach ($this->allrows as $row)
 		{
 			// Field of group is included in current list add info to it
 			$rows_byid[$row->id]->grouping_field = $grouping_field;
+
 			if (empty($rows_byid[$row->id]->parameters))
 			{
 				$rows_byid[$row->id]->parameters = new JRegistry($rows_byid[$row->id]->attribs);
@@ -309,10 +303,10 @@ function delAllFilters() {
 				<?php
 				echo $image_ordering_tip;
 				echo !$this->filter_type
-					? JHtml::_('grid.sort', 'FLEXI_GLOBAL_ORDER', 't.ordering', $this->lists['order_Dir'], $this->lists['order'])
+					? JHtml::_('grid.sort', 'FLEXI_GLOBAL_ORDER', 'a.ordering', $this->lists['order_Dir'], $this->lists['order'])
 					: JHtml::_('grid.sort', 'FLEXI_TYPE_ORDER', 'typeordering', $this->lists['order_Dir'], $this->lists['order']);
 
-				if ($this->permission->CanOrderFields && $this->ordering):
+				if ($this->perms->CanOrderFields && $this->ordering):
 					//echo str_replace('rel="tooltip"', '', JHtml::_('grid.order', $this->rows, 'filesave.png', $ctrl.'saveorder'));
 				endif;
 				?>
@@ -325,35 +319,35 @@ function delAllFilters() {
 				<label for="checkall-toggle" class="green single"></label>
 			</th>
 
-			<?php /*<th style="padding:0px;"><?php echo JHtml::_('grid.sort', 'FLEXI_FIELD_DESCRIPTION', 't.description', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>*/ ?>
+			<?php /*<th style="padding:0px;"><?php echo JHtml::_('grid.sort', 'FLEXI_FIELD_DESCRIPTION', 'a.description', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>*/ ?>
 
-			<th class="hideOnDemandClass title" colspan="2" style="text-align:left; padding-left:24px;"><?php echo JHtml::_('grid.sort', 'FLEXI_FIELD_LABEL', 't.label', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
-			<th class="hideOnDemandClass title" style="text-align:left;"><?php echo JHtml::_('grid.sort', 'FLEXI_FIELD_NAME', 't.name', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
-			<th class="hideOnDemandClass title" style="text-align:left;"><?php echo JHtml::_('grid.sort', 'FLEXI_FIELD_TYPE', 't.field_type', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th class="hideOnDemandClass title" colspan="2" style="text-align:left; padding-left:24px;"><?php echo JHtml::_('grid.sort', 'FLEXI_FIELD_LABEL', 'a.label', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th class="hideOnDemandClass title" style="text-align:left;"><?php echo JHtml::_('grid.sort', 'FLEXI_FIELD_NAME', 'a.name', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th class="hideOnDemandClass title" style="text-align:left;"><?php echo JHtml::_('grid.sort', 'FLEXI_FIELD_TYPE', 'a.field_type', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<th class="hideOnDemandClass nowrap">
 				<?php echo '<small class="badge">'.JText::_( 'Content Lists' ).'</small>'; ?><br/>
 				<small>
-					<?php echo JHtml::_('grid.sort', 'FLEXI_FIELD_CONTENT_LIST_TEXT_SEARCHABLE', 't.issearch', $this->lists['order_Dir'], $this->lists['order'] ); ?> /
-					<?php echo JHtml::_('grid.sort', 'FLEXI_FIELD_CONTENT_LIST_FILTERABLE', 't.isfilter', $this->lists['order_Dir'], $this->lists['order'] ); ?>
+					<?php echo JHtml::_('grid.sort', 'FLEXI_FIELD_CONTENT_LIST_TEXT_SEARCHABLE', 'a.issearch', $this->lists['order_Dir'], $this->lists['order'] ); ?> /
+					<?php echo JHtml::_('grid.sort', 'FLEXI_FIELD_CONTENT_LIST_FILTERABLE', 'a.isfilter', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				</small>
 				<span class="column_toggle_lbl" style="display:none;"><?php echo '<small class="badge">'.JText::_( 'Content Lists' ).'</small>'; ?></span>
 			</th>
 			<th class="hideOnDemandClass nowrap">
 				<?php echo '<small class="badge">'.JText::_( 'Search view' ).'</small>'; ?><br/>
 				<small>
-					<?php echo JHtml::_('grid.sort', 'FLEXI_FIELD_ADVANCED_TEXT_SEARCHABLE', 't.isadvsearch', $this->lists['order_Dir'], $this->lists['order'] ); ?> /
-					<?php echo JHtml::_('grid.sort', 'FLEXI_FIELD_ADVANCED_FILTERABLE', 't.isadvfilter', $this->lists['order_Dir'], $this->lists['order'] ); ?>
+					<?php echo JHtml::_('grid.sort', 'FLEXI_FIELD_ADVANCED_TEXT_SEARCHABLE', 'a.isadvsearch', $this->lists['order_Dir'], $this->lists['order'] ); ?> /
+					<?php echo JHtml::_('grid.sort', 'FLEXI_FIELD_ADVANCED_FILTERABLE', 'a.isadvfilter', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				</small>
 				<span class="column_toggle_lbl" style="display:none;"><?php echo '<small class="badge">'.JText::_( 'Search view' ).'</small>'; ?></span>
 			</th>
 			<th class="hideOnDemandClass left" colspan="2"><?php echo JHtml::_('grid.sort', 'FLEXI_ASSIGNED_TYPES', 'nrassigned', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
-			<th class="hideOnDemandClass left"><?php echo JHtml::_('grid.sort', 'FLEXI_ACCESS', 't.access', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
-			<th class="hideOnDemandClass center"><?php echo JHtml::_('grid.sort', 'FLEXI_PUBLISHED', 't.published', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
-			<th class="hideOnDemandClass"><?php echo JHtml::_('grid.sort', 'FLEXI_ID', 't.id', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th class="hideOnDemandClass left"><?php echo JHtml::_('grid.sort', 'FLEXI_ACCESS', 'a.access', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th class="hideOnDemandClass center"><?php echo JHtml::_('grid.sort', 'FLEXI_PUBLISHED', 'a.published', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th class="hideOnDemandClass"><?php echo JHtml::_('grid.sort', 'FLEXI_ID', 'a.id', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 		</tr>
 	</thead>
 
-	<tbody <?php echo $ordering_draggable && $this->permission->CanOrderFields && $this->ordering ? 'id="sortable_fcitems"' : ''; ?> >
+	<tbody <?php echo $ordering_draggable && $this->perms->CanOrderFields && $this->ordering ? 'id="sortable_fcitems"' : ''; ?> >
 		<?php
 		$canCheckinRecords = $user->authorise('core.admin', 'com_checkin');
 		$_desc_label = JText::_('FLEXI_FIELD_DESCRIPTION', true);
@@ -458,8 +452,8 @@ function delAllFilters() {
    		?>
 		<tr class="<?php echo "row$k"; ?>" style="<?php echo $row_css; ?>">
 
-			<?php if ($this->permission->CanOrderFields) : ?>
-			<td class="order left">
+			<?php if ($this->perms->CanOrderFields) : ?>
+			<td class="col_order nowrap left">
 				<?php
 					$show_orderUp   = $i > 0;
 					$show_orderDown = $i < $total_rows-1;
@@ -580,7 +574,7 @@ function delAllFilters() {
 					// Handle displaying information: depends-on-master field
 					if (!empty($row->parameters) && $row->parameters->get('cascade_after'))
 					{
-						$_r = $allrows_byid[ $row->parameters->get('cascade_after') ];
+						$_r = $rowsFG[ $row->parameters->get('cascade_after') ];
 						$_link = 'index.php?option=com_flexicontent&amp;task=fields.edit&amp;view=field&amp;id='. $_r->id;
 						echo '
 						<a style="padding:2px;" href="'.$_link.'" title="'.$edit_entry.'">

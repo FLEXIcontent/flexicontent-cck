@@ -1,22 +1,14 @@
 <?php
 /**
- * @version 1.5 stable $Id: tagelement.php 1577 2012-12-02 15:10:44Z ggppdk $
- * @package Joomla
- * @subpackage FLEXIcontent
- * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
- * @license GNU/GPL v2
- * 
- * FLEXIcontent is a derivative work of the excellent QuickFAQ component
- * @copyright (C) 2008 Christoph Lukes
- * see www.schlu.net for more information
+ * @package         FLEXIcontent
+ * @version         3.3
  *
- * FLEXIcontent is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
+ * @link            http://www.flexicontent.com
+ * @copyright       Copyright © 2018, FLEXIcontent team, All Rights Reserved
+ * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
-// no direct access
 defined('_JEXEC') or die('Restricted access');
 
 jimport('legacy.model.legacy');
@@ -25,9 +17,6 @@ use Joomla\String\StringHelper;
 /**
  * Flexicontent Component Tagelement Model
  *
- * @package Joomla
- * @subpackage FLEXIcontent
- * @since		1.0
  */
 class FlexicontentModelTagelement extends JModelLegacy
 {
@@ -50,9 +39,9 @@ class FlexicontentModelTagelement extends JModelLegacy
 	 *
 	 * @since 0.9
 	 */
-	function __construct()
+	public function __construct($config = array())
 	{
-		parent::__construct();
+		parent::__construct($config);
 
 		$app = JFactory::getApplication();
 		$option = JRequest::getVar('option');
@@ -85,16 +74,18 @@ class FlexicontentModelTagelement extends JModelLegacy
 		return $this->_data;
 	}
 
+
 	/**
-	 * Total nr of events
+	 * Method to get the total nr of the records
 	 *
-	 * @access public
 	 * @return integer
+	 *
+	 * @since	1.5
 	 */
-	function getTotal()
+	public function getTotal()
 	{
-		// Lets load the content if it doesn't already exist
-		if (empty($this->_total))
+		// Lets load the records if it was not calculated already via using SQL_CALC_FOUND_ROWS + 'SELECT FOUND_ROWS()'
+		if ($this->_total === null)
 		{
 			$query = $this->_buildQuery();
 			$this->_total = $this->_getListCount($query);
@@ -103,15 +94,17 @@ class FlexicontentModelTagelement extends JModelLegacy
 		return $this->_total;
 	}
 
+
 	/**
-	 * Method to get a pagination object for the events
+	 * Method to get a pagination object for the records
 	 *
-	 * @access public
-	 * @return integer
+	 * @return object
+	 *
+	 * @since	1.5
 	 */
-	function getPagination()
+	public function getPagination()
 	{
-		// Lets load the content if it doesn't already exist
+		// Create pagination object if it doesn't already exist
 		if (empty($this->_pagination))
 		{
 			require_once (JPATH_COMPONENT_SITE.DS.'helpers'.DS.'pagination.php');
@@ -138,7 +131,7 @@ class FlexicontentModelTagelement extends JModelLegacy
 					. $where
 					. $orderby
 					;
-					
+
 		return $query;
 	}
 
@@ -179,14 +172,18 @@ class FlexicontentModelTagelement extends JModelLegacy
 
 		$where[] = 't.published = 1';
 
-		if ($search) {
-			$escaped_search = FLEXI_J16GE ? $this->_db->escape( $search, true ) : $this->_db->getEscaped( $search, true );
-			$where[] = ' LOWER(t.name) LIKE '.$this->_db->Quote( '%'.$escaped_search.'%', false );
+		if ($search)
+		{
+			$escaped_search = str_replace(' ', '%', $this->_db->escape(trim($search), true));
+			$search_quoted  = $this->_db->Quote('%' . $escaped_search . '%', false);
+
+			$where[] = ' LOWER(t.name) LIKE ' . $search_quoted;
 		}
 
-		$where 		= ( count( $where ) ? ' WHERE ' . implode( ' AND ', $where ) : '' );
+		$where = count($where)
+			? ' WHERE ' . implode(' AND ', $where)
+			: '';
 
 		return $where;
 	}
-}//Class end
-?>
+}

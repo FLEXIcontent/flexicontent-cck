@@ -505,12 +505,6 @@ table.adminlist {
 	td {
 		padding: 4px;
 	}
-	tr td:first-child::after {
-		content: "";
-		display: inline-block;
-		vertical-align: middle;
-		min-height: 30px;
-	}
 	input[type="text"] {
 		width: auto !important;  /* forced to avoid fitting problems */
 		padding-left: 0px !important;  /* forced to save space */
@@ -587,11 +581,22 @@ table.adminlist {
 		text-align: center;
 	}
 
-	/* ORDER column no wrapping and proper alignment */
-	td.order {
-		text-align: center;
-		white-space: nowrap;
-		width: auto;
+	/* ORDER column */
+	td.col_order {
+	}
+			
+	/* Checkbox column */
+	th.col_cb {
+		padding-bottom: 0px;
+	}
+	td.col_cb {
+		padding-top: 7px;
+	}
+
+	/* Notes column (scheduled, expired, review needed, other?) */
+	td.col_notes {
+		padding-top: 7px;
+		font-size: 110%;
 	}
 
 	/* IF PAGINATION is inside the table the force center alignment */
@@ -2215,6 +2220,12 @@ body .form-horizontal .control-group
 
 #flexicontent .form-horizontal > .nav-tabs > li > a {
 	text-align: center;
+}
+
+div#permissions .tab-content {
+	position: sticky;
+	top: 90px;
+	max-height: calc(~"100vh - 350px");
 }
 
 .fc-tabbed-field-box {

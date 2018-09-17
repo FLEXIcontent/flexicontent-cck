@@ -3776,7 +3776,7 @@ class FlexicontentFields
 			'isSearchView' => $isSearchView,
 		);
 
-		$layouts_path = JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'layouts';
+		$layouts_path = $app->isSite() ? null : JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'layouts';
 
 		$filter->html = '';
 

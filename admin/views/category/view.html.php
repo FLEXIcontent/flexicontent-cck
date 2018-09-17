@@ -1,27 +1,20 @@
 <?php
 /**
- * @version 1.5 stable $Id: view.html.php 1823 2013-12-23 03:27:29Z ggppdk $
- * @package Joomla
- * @subpackage FLEXIcontent
- * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
- * @license GNU/GPL v2
- * 
- * FLEXIcontent is a derivative work of the excellent QuickFAQ component
- * @copyright (C) 2008 Christoph Lukes
- * see www.schlu.net for more information
+ * @package         FLEXIcontent
+ * @version         3.3
  *
- * FLEXIcontent is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
+ * @link            http://www.flexicontent.com
+ * @copyright       Copyright © 2018, FLEXIcontent team, All Rights Reserved
+ * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
-defined( '_JEXEC' ) or die( 'Restricted access' );
+defined('_JEXEC') or die('Restricted access');
 
 jimport('legacy.view.legacy');
 
 /**
- * View class for the FLEXIcontent category screen
+ * HTML View class for the FLEXIcontent category screen
  *
  * @package Joomla
  * @subpackage FLEXIcontent
@@ -29,11 +22,11 @@ jimport('legacy.view.legacy');
  */
 class FlexicontentViewCategory extends JViewLegacy
 {
-	function display($tpl = null)
+	public function display($tpl = null)
 	{
-		// ***
-		// *** Initialise variables
-		// ***
+		/**
+		 * Initialise variables
+		 */
 
 		global $globalcats;
 		$app      = JFactory::getApplication();
@@ -61,7 +54,7 @@ class FlexicontentViewCategory extends JViewLegacy
 		// ***
 		// *** Get record data, and check if record is already checked out
 		// ***
-		
+
 		// Get model and load the record data
 		$model = $this->getModel();
 		$row   = $this->get('Item');
@@ -100,16 +93,16 @@ class FlexicontentViewCategory extends JViewLegacy
 		// ***
 		// *** Global permissions checking
 		// ***
-		
+
 		// Get global permissions
 		$perms = FlexicontentHelperPerm::getPerm();
-		
+
 		// Check no access to categories management (Global permission)
 		if ( !$perms->CanCats )
 		{
 			$app->redirect('index.php?option=com_flexicontent', JText::_( 'FLEXI_NO_ACCESS' ));
 		}
-		
+
 		// Check no privilege to create new category under any category
 		if ( $isnew && (!$perms->CanCats || !FlexicontentHelperPerm::getPermAny('core.create')) )
 		{
@@ -121,7 +114,7 @@ class FlexicontentViewCategory extends JViewLegacy
 		// ***
 		// *** Record Permissions (needed because this view can be called without a controller task)
 		// ***
-				
+
 		// Get edit privilege for current category
 		if (!$isnew)
 		{
@@ -129,7 +122,7 @@ class FlexicontentViewCategory extends JViewLegacy
 			$rights = FlexicontentHelperPerm::checkAllItemAccess($user->id, 'category', $row->id);
 			$canedit_cat = in_array('edit', $rights) || (in_array('edit.own', $rights) && $isOwner);
 		}
-		
+
 		// Get if we can create inside at least one (com_content) category
 		if ( $user->authorise('core.create', 'com_flexicontent') )
 		{
@@ -142,15 +135,15 @@ class FlexicontentViewCategory extends JViewLegacy
 			);
 			$cancreate_cat = count($usercats) > 0;
 		}
-		
+
 		// Creating new category: Check if user can create inside any existing category
 		if ( $isnew && !$cancreate_cat )
 		{
-			$acc_msg = JText::_( 'FLEXI_NO_ACCESS_CREATE' ) ."<br/>". (FLEXI_J16GE ? JText::_( 'FLEXI_CANNOT_ADD_CATEGORY_REASON' ) : ""); 
+			$acc_msg = JText::_( 'FLEXI_NO_ACCESS_CREATE' ) ."<br/>". (FLEXI_J16GE ? JText::_( 'FLEXI_CANNOT_ADD_CATEGORY_REASON' ) : "");
 			JError::raiseWarning( 403, $acc_msg);
 			$app->redirect('index.php?option=com_flexicontent&view=categories');
 		}
-		
+
 		// Editing existing category: Check if user can edit existing (current) category
 		if ( !$isnew && !$canedit_cat )
 		{
@@ -163,7 +156,7 @@ class FlexicontentViewCategory extends JViewLegacy
 		// ***
 		// *** Include needed files and add needed js / css files
 		// ***
-		
+
 		// Add css to document
 		!JFactory::getLanguage()->isRtl()
 			? $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', FLEXI_VHASH)
@@ -171,7 +164,7 @@ class FlexicontentViewCategory extends JViewLegacy
 		!JFactory::getLanguage()->isRtl()
 			? $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/j3x.css', FLEXI_VHASH)
 			: $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/j3x_rtl.css', FLEXI_VHASH);
-		
+
 		// Add JS frameworks
 		flexicontent_html::loadJQuery();
 		flexicontent_html::loadFramework('select2');
@@ -197,7 +190,7 @@ class FlexicontentViewCategory extends JViewLegacy
 
 		// Creation flag used to decide if adding save and new / save as copy buttons are allowed
 		$cancreate = $cancreate_cat;
-		
+
 		// SET toolbar title
 		!$isnew
 			? JToolbarHelper::title( JText::_( 'FLEXI_EDIT_CATEGORY' ), 'fc_categoryedit' )   // Editing existing review
@@ -213,7 +206,7 @@ class FlexicontentViewCategory extends JViewLegacy
 		$btn_arr = array();
 
 		// Add ajax apply only for existing records
-		if ( !$isnew )
+		if (!$isnew)
 		{
 			$btn_name = 'apply_ajax';
 			$btn_task = $ctrl.'.apply_ajax';
@@ -249,7 +242,7 @@ class FlexicontentViewCategory extends JViewLegacy
 		$btn_task = $ctrl.'.save';
 
 		//JToolbarHelper::save($btn_task);  //JToolbarHelper::custom( $btn_task, 'save.png', 'save.png', 'JSAVE', false );
-		
+
 		$btn_arr[$btn_name] = flexicontent_html::addToolBarButton(
 			'JSAVE', $btn_name, $full_js="Joomla.submitbutton('".$ctrl.".save')", $msg_alert='', $msg_confirm='',
 			$btn_task, $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false, $btn_class="".$tip_class, $btn_icon="icon-save",
@@ -312,13 +305,13 @@ class FlexicontentViewCategory extends JViewLegacy
 		// ***
 		// *** Add modal editing of template layout
 		// ***
-		
+
 		if (!$isnew && $perms->CanTemplates)
 		{
 			$inheritcid_comp = $cparams->get('inheritcid', -1);
 			$inheritcid = $catparams->get('inheritcid', '');
 			$inherit_parent = $inheritcid==='-1' || ($inheritcid==='' && $inheritcid_comp);
-			
+
 
 			if (!$inherit_parent || $row->parent_id==='1')
 				$row_clayout = $catparams->get('clayout', $cparams->get('clayout', 'blog'));
@@ -337,14 +330,15 @@ class FlexicontentViewCategory extends JViewLegacy
 					}
 				}
 			}
-			
+
 			$edit_layout = htmlspecialchars(JText::_('FLEXI_EDIT_LAYOUT_N_GLOBAL_PARAMETERS'), ENT_QUOTES, 'UTF-8');
 			flexicontent_html::addToolBarButton(
 				'FLEXI_EDIT_LAYOUT_N_GLOBAL_PARAMETERS', $btn_name='edit_layout_params',
 				$full_js="var url = jQuery(this).attr('data-href'); fc_showDialog(url, 'fc_modal_popup_container', 0, 0, 0, 0, {title:'".$edit_layout."'}); return false;",
 				$msg_alert='', $msg_confirm='',
 				$btn_task='', $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false, $btn_class="btn-info".$tip_class, $btn_icon="icon-pencil",
-				'data-placement="bottom" data-href="index.php?option=com_flexicontent&amp;view=template&amp;type=category&amp;tmpl=component&amp;ismodal=1&amp;folder='.$row_clayout.
+				'data-placement="bottom" data-href="index.php?option=com_flexicontent&amp;view=template&amp;type=category&amp;tmpl=component&amp;ismodal=1&amp;folder=' . $row_clayout
+					. '&amp;' . JSession::getFormToken() . '=1' .
 				'" title="Edit the display layout of this category. <br/><br/>Note: this layout maybe assigned to other categories, thus changing it will effect them too"'
 			);
 		}
@@ -369,7 +363,7 @@ class FlexicontentViewCategory extends JViewLegacy
 		foreach ($tmpls as $tmpl)
 		{
 			if ($tmpl->name != $_clayout) continue;
-			
+
 			$jform = new JForm('com_flexicontent.template.category', array('control' => 'jform', 'load_data' => false));
 			$jform->load($tmpl->params);
 			$tmpl->params = $jform;
@@ -396,7 +390,7 @@ class FlexicontentViewCategory extends JViewLegacy
 		$fieldname = 'jform[parent_id]';
 		$Lists['parent_id'] = flexicontent_cats::buildcatselect($globalcats, $fieldname, $row->parent_id, $top=1, 'class="use_select2_lib"',
 			$check_published, $check_perms, $actions_allowed, $require_all=true, $skip_subtrees=array(), $disable_subtrees=array($row->id));
-		
+
 		$check_published = false;
 		$check_perms = true;
 		$actions_allowed=array('core.edit', 'core.edit.own');
@@ -404,11 +398,11 @@ class FlexicontentViewCategory extends JViewLegacy
 		$fieldname = 'jform[copycid]';
 		$Lists['copycid']    = flexicontent_cats::buildcatselect($globalcats, $fieldname, '', $top=2, 'class="use_select2_lib"', $check_published, $check_perms, $actions_allowed, $require_all=false)
 			. '<span class="fc-mssg-inline fc-info fc-small">' . JText::_('FLEXI_PLEASE_USE_SAVE_OR_APPLY_N_RELOAD_BUTTONS') . '</span>';
-		
+
 		$custom_options[''] = 'FLEXI_USE_GLOBAL';
 		$custom_options['0'] = 'FLEXI_COMPONENT_ONLY';
 		$custom_options['-1'] = 'FLEXI_PARENT_CAT_MULTI_LEVEL';
-		
+
 		$check_published = false;
 		$check_perms = true;
 		$actions_allowed=array('core.edit', 'core.edit.own');
@@ -441,7 +435,7 @@ class FlexicontentViewCategory extends JViewLegacy
 		// ***
 		// *** Assign variables to view
 		// ****
-		
+
 		$this->document = $document;
 		$this->Lists    = $Lists;
 		$this->row      = $row;

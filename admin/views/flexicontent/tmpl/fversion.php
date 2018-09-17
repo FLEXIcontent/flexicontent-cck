@@ -16,7 +16,7 @@
 * GNU General Public License for more details.
 */
 
-defined( '_JEXEC' ) or die( 'Restricted access' );
+defined('_JEXEC') or die('Restricted access');
 $app = JFactory::getApplication();
 $template	= $app->getTemplate();
 if($this->check['connect'] == 0) {

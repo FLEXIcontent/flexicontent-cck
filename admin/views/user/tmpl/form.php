@@ -1,19 +1,12 @@
 <?php
 /**
- * @version 1.5 stable $Id: default.php 1079 2012-01-02 00:18:34Z ggppdk $
- * @package Joomla
- * @subpackage FLEXIcontent
- * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
- * @license GNU/GPL v2
- * 
- * FLEXIcontent is a derivative work of the excellent QuickFAQ component
- * @copyright (C) 2008 Christoph Lukes
- * see www.schlu.net for more information
+ * @package         FLEXIcontent
+ * @version         3.3
  *
- * FLEXIcontent is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
+ * @link            http://www.flexicontent.com
+ * @copyright       Copyright © 2018, FLEXIcontent team, All Rights Reserved
+ * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
 defined('_JEXEC') or die('Restricted access');
@@ -32,13 +25,11 @@ $text = intval($edit)
 $cparams = JComponentHelper::getParams ('com_media');
 $date_format = FLEXI_J16GE ? 'Y-m-d H:i:s' : '%Y-%m-%d %H:%M:%S';
 
-// Encode (UTF-8 charset) HTML entities form data so that they can be set as form field values
-JFilterOutput::objectHTMLSafe( $this->user, ENT_QUOTES, $exclude_keys = '' );
 
-if ($this->user->get('lastvisitDate') == "0000-00-00 00:00:00") {
+if ($this->row->get('lastvisitDate') == "0000-00-00 00:00:00") {
 	$lvisit = JText::_( 'Never' );
 } else {
-	$lvisit	= JHtml::_('date', $this->user->get('lastvisitDate'), $date_format);
+	$lvisit	= JHtml::_('date', $this->row->get('lastvisitDate'), $date_format);
 }
 
 // Load JS tabber lib
@@ -705,15 +696,15 @@ $this->document->addScriptDeclaration($js);
 	<div class="fcclear"></div>
 
 	<input type="hidden" name="option" value="com_flexicontent" />
-	<input type="hidden" name="id" value="<?php echo $this->user->get('id'); ?>" />
-	<input type="hidden" name="cid[]" value="<?php echo $this->user->get('id'); ?>" />
-	<input type="hidden" name="controller" value="<?php echo $this->controller; ?>" />
-	<input type="hidden" name="view" value="<?php echo $this->view; ?>" />
+	<input type="hidden" name="id" value="<?php echo $this->row->get('id'); ?>" />
+	<input type="hidden" name="cid[]" value="<?php echo $this->row->get('id'); ?>" />
+	<input type="hidden" name="controller" value="users" />
+	<input type="hidden" name="view" value="user" />
 	<input type="hidden" name="task" value="" />
 	<input type="hidden" name="contact_id" value="" />
-	<?php if (FLEXI_J16GE ? !$this->me->authorise( 'com_users', 'email_events' ) : !$this->me->authorize( 'com_users', 'email_events' )) { ?>
-	<input type="hidden" name="sendEmail" value="0" />
-	<?php } ?>
+	<?php if (!JFactory::getUser()->authorise('com_users', 'email_events')) : ?>
+		<input type="hidden" name="sendEmail" value="0" />
+	<?php endif; ?>
 	<?php echo JHtml::_( 'form.token' ); ?>
 
 </form>

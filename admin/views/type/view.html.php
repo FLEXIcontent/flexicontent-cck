@@ -16,7 +16,7 @@
  * GNU General Public License for more details.
  */
 
-defined( '_JEXEC' ) or die( 'Restricted access' );
+defined('_JEXEC') or die('Restricted access');
 
 jimport('legacy.view.legacy');
 
@@ -130,7 +130,7 @@ class FlexicontentViewType extends JViewLegacy
 		$btn_arr = array();
 
 		// Add ajax apply only for existing records
-		if ( !$isnew )
+		if (!$isnew)
 		{
 			$btn_name = 'apply_ajax';
 			$btn_task = $ctrl.'.apply_ajax';

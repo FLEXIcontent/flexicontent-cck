@@ -1,52 +1,82 @@
 <?php
 /**
- * @version 1.5 stable $Id: items.php 1782 2013-10-08 22:47:51Z ggppdk $
- * @package Joomla
- * @subpackage FLEXIcontent
- * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
- * @license GNU/GPL v2
+ * @package         FLEXIcontent
+ * @version         3.3
  *
- * FLEXIcontent is a derivative work of the excellent QuickFAQ component
- * @copyright (C) 2008 Christoph Lukes
- * see www.schlu.net for more information
- *
- * FLEXIcontent is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
+ * @link            http://www.flexicontent.com
+ * @copyright       Copyright © 2018, FLEXIcontent team, All Rights Reserved
+ * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
-defined('_JEXEC') or die('Restricted access');
+defined('_JEXEC') or die;
 
-// Register autoloader for parent controller, in case controller is executed by another component
-JLoader::register('FlexicontentController', JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'controller.php');
+use Joomla\String\StringHelper;
+use Joomla\Utilities\ArrayHelper;
+
+JLoader::register('FlexicontentControllerBaseAdmin', JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'controllers' . DS . 'base' . DS . 'baseadmin.php');
+
+// Manually import models in case used by frontend, then models will not be autoloaded correctly via getModel('name')
+require_once JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'models' . DS . 'item.php';
+require_once JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'models' . DS . 'items.php';
 
 /**
- * FLEXIcontent Component Item Controller
+ * FLEXIcontent Items Controller (RAW)
  *
- * @package Joomla
- * @subpackage FLEXIcontent
- * @since 1.0
+ * NOTE: -Only- if this controller is needed by frontend URLs, then create a derived controller in frontend 'controllers' folder
+ *
+ * @since 3.3
  */
-class FlexicontentControllerItems extends FlexicontentController
+class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 {
-	static $record_limit = 5000;
+	var $records_dbtbl  = 'content';
+
+	var $records_jtable = 'flexicontent_items';
+
+	var $record_name = 'item';
+
+	var $record_name_pl = 'items';
+
+	var $_NAME = 'ITEM';
+
+	var $record_alias = 'alias';
+
+	var $runMode = 'standalone';
+
+	var $exitHttpHead = null;
+
+	var $exitMessages = array();
+
+	var $exitLogTexts = array();
+
+	var $exitSuccess  = true;
 
 	/**
 	 * Constructor
 	 *
-	 * @since 1.0
+	 * @param   array   $config    associative array of configuration settings.
+	 *
+	 * @since 3.3
 	 */
-	function __construct()
+	public function __construct($config = array())
 	{
-		parent::__construct();
+		parent::__construct($config);
+
+		// Register task aliases
 	}
 
 
-	function getversionlist()
+	/**
+	 * Logic to print a table of versions for a record
+	 *
+	 * @return void
+	 *
+	 * @since 3.3
+	 */
+	public function getversionlist()
 	{
 		// Check for request forgeries
-		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
+		JSession::checkToken('request') or die(JText::_('JINVALID_TOKEN'));
 
 		@ob_end_clean();
 		$id     = $this->input->getInt('id', 0);
@@ -61,7 +91,7 @@ class FlexicontentControllerItems extends FlexicontentController
 		$view 		= JHtml::image('administrator/components/com_flexicontent/assets/images/magnifier.png', JText::_('FLEXI_VIEW'));
 		$comment 	= JHtml::image('administrator/components/com_flexicontent/assets/images/comments.png', JText::_('FLEXI_COMMENT'));
 
-		$model 	= $this->getModel('item');
+		$model = $this->getModel($this->record_name);
 		$model->setId($id);
 		$item = $model->getItem($id);
 
@@ -111,7 +141,7 @@ class FlexicontentControllerItems extends FlexicontentController
 			</tr>';
 		}
 
-		exit;
+		jexit();
 	}
 
 
@@ -132,7 +162,7 @@ class FlexicontentControllerItems extends FlexicontentController
 
 		$itemmodel->resetHits();
 
-		$this->_cleanRecordsCache(0, $itemmodel);
+		$this->_cleanCache();
 
 		jexit('0');
 	}
@@ -155,7 +185,7 @@ class FlexicontentControllerItems extends FlexicontentController
 
 		$itemmodel->resetVotes();
 
-		$this->_cleanRecordsCache(0, $itemmodel);
+		$this->_cleanCache();
 
 		jexit(JText::_('FLEXI_NOT_RATED_YET'));
 	}
@@ -235,7 +265,7 @@ class FlexicontentControllerItems extends FlexicontentController
 		}
 		else
 		{
-			$model = $this->getModel('item');
+			$model = $this->getModel($this->record_name);
 			$tagobjs = $model->gettags($this->input->get('q', '', 'string'));
 
 			if ($tagobjs)
@@ -318,7 +348,7 @@ class FlexicontentControllerItems extends FlexicontentController
 			// echo "<b>". JText::_( 'FLEXI_SELECT_STATE' ).":</b>";
 			echo "<br /><br />";
 		?>
-			
+
 		<?php
 		foreach ($state as $shortname => $statedata)
 		{
@@ -506,7 +536,7 @@ class FlexicontentControllerItems extends FlexicontentController
 	}
 
 
-	function index()
+	public function index()
 	{
 		@ob_end_clean();
 		header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
@@ -575,8 +605,8 @@ class FlexicontentControllerItems extends FlexicontentController
 		// jexit('fail | ' . $max_execution_time);
 
 		// Get records models
-		$records_model = $this->getModel('items');
-		$record_model  = $this->getModel('item');
+		$records_model = $this->getModel($this->record_name_pl);
+		$record_model  = $this->getModel($this->record_name);
 
 		$query_count         = 0;
 		$max_items_per_query = 100;
@@ -738,19 +768,6 @@ class FlexicontentControllerItems extends FlexicontentController
 
 
 	/**
-	 * Logic to change the state of an item
-	 *
-	 * @access public
-	 * @return void
-	 * @since 3.2
-	 */
-	function setitemstate()
-	{
-		flexicontent_html::setitemstate($this, 'json', $_record_type = 'item');
-	}
-
-
-	/**
 	 * Method to check session token, item exists, is editable
 	 *
 	 * return string | object   return error string or item model of editable item
@@ -759,9 +776,6 @@ class FlexicontentControllerItems extends FlexicontentController
 	 */
 	private function _getEditorModel()
 	{
-		// Check for request forgeries
-		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
-
 		$app    = JFactory::getApplication();
 		$jinput = $app->input;
 		$id = $jinput->getInt('id', 0);
@@ -771,7 +785,7 @@ class FlexicontentControllerItems extends FlexicontentController
 			return JText::_('Item not found');
 		}
 
-		$model = $this->getModel('item');
+		$model = $this->getModel($this->record_name);
 		$model->setId($id);
 		$item = $model->getItem();
 
@@ -791,25 +805,27 @@ class FlexicontentControllerItems extends FlexicontentController
 
 
 	/**
-	 * Method to clean cache of specific records (if implemented by the model)
+	 * Method for clearing cache of data depending on records type
 	 *
-	 * @since 3.2.1.13
+	 * @return void
+	 *
+	 * @since 3.2.0
 	 */
-	private function _cleanRecordsCache($cid = 0, $itemmodel = null)
+	protected function _cleanCache()
 	{
-		if ($this->input->get('task', '', 'cmd') == __FUNCTION__)
-		{
-			die(__FUNCTION__ . ' : direct call not allowed');
-		}
+		$this->input->get('task', '', 'cmd') !== __FUNCTION__ or die(__FUNCTION__ . ' : direct call not allowed');
 
-		// Clean this as it contains Joomla frontend view cache)
+		parent::_cleanCache();
+
 		$cache_site = FLEXIUtilities::getCache($group = '', $client = 0);
-		$cache_site->clean('com_flexicontent');
+		$cache_site->clean('com_flexicontent_items');
+		$cache_site->clean('com_flexicontent_filters');
 
-		// Also pass item IDs array in case of doing special cache cleaning per item
-		$itemmodel = $itemmodel ?: $this->getModel('item');
-		$cid = $cid ?: $itemmodel->get('id');
-		$itemmodel->cleanCache(null, 0, $cid);
-		$itemmodel->cleanCache(null, 1, $cid);
+		$cache_admin = FLEXIUtilities::getCache($group = '', $client = 1);
+		$cache_admin->clean('com_flexicontent_items');
+		$cache_admin->clean('com_flexicontent_filters');
+
+		// Also clean this as it contains Joomla frontend view cache of the component)
+		$cache_site->clean('com_flexicontent');
 	}
 }

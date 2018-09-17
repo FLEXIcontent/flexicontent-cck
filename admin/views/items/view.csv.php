@@ -17,7 +17,7 @@
  */
 
 // no direct access
-defined( '_JEXEC' ) or die( 'Restricted access' );
+defined('_JEXEC') or die('Restricted access');
 
 jimport('legacy.view.legacy');
 jimport('joomla.filesystem.file');

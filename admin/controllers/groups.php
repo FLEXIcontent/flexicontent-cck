@@ -1,29 +1,57 @@
 <?php
 /**
- * @package     Joomla.Administrator
- * @subpackage  com_flexicontent
+ * @package         FLEXIcontent
+ * @version         3.3
  *
- * @copyright   Copyright (C) 2005 - 2017 Open Source Matters, Inc. All rights reserved.
- * @license     GNU General Public License version 2 or later; see LICENSE.txt
+ * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
+ * @link            http://www.flexicontent.com
+ * @copyright       Copyright © 2018, FLEXIcontent team, All Rights Reserved
+ * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
 defined('_JEXEC') or die;
 
-// Import parent controller
-jimport('legacy.controller.admin');
+use Joomla\String\StringHelper;
+use Joomla\Utilities\ArrayHelper;
+
+JLoader::register('FlexicontentControllerBaseAdmin', JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'controllers' . DS . 'base' . DS . 'baseadmin.php');
+
+// Manually import models in case used by frontend, then models will not be autoloaded correctly via getModel('name')
+require_once JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'models' . DS . 'groups.php';
 
 /**
- * User groups list controller class.
+ * FLEXIcontent (User) Groups Controller
  *
- * @since  1.6
+ * NOTE: -Only- if this controller is needed by frontend URLs, then create a derived controller in frontend 'controllers' folder
+ *
+ * @since 3.3
  */
-class FlexicontentControllerGroups extends JControllerAdmin
+class FlexicontentControllerGroups extends FlexicontentControllerBaseAdmin
 {
+
 	/**
 	 * @var     string  The prefix to use with controller messages.
 	 * @since   1.6
 	 */
-	protected $text_prefix = 'COM_USERS_GROUPS';
+	protected $text_prefix;
+
+	/**
+	 * Constructor
+	 *
+	 * @param   array   $config    associative array of configuration settings.
+	 *
+	 * @since 3.3
+	 */
+	public function __construct($config = array())
+	{
+		parent::__construct($config);
+
+		// The prefix to use with controller messages.
+		$this->text_prefix = 'COM_USERS_GROUPS';
+
+		// Register task aliases
+	}
+
 
 	/**
 	 * Proxy for getModel.
@@ -36,9 +64,14 @@ class FlexicontentControllerGroups extends JControllerAdmin
 	 *
 	 * @since   1.6
 	 */
-	public function getModel($name = 'Group', $prefix = 'FlexicontentModel', $config = array())
+	public function getModel($name = 'Group', $prefix = 'FlexicontentModel', $config = array('ignore_request' => true))
 	{
-		return parent::getModel($name, $prefix, array('ignore_request' => true));
+		$this->input->get('task', '', 'cmd') !== __FUNCTION__ or die(__FUNCTION__ . ' : direct call not allowed');
+
+		$name = $name ?: 'Group';
+		require_once JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'models' . DS . strtolower($name) . '.php';
+
+		return parent::getModel($name, $prefix, $config);
 	}
 
 	/**

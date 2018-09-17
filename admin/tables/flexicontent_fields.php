@@ -1,19 +1,12 @@
 <?php
 /**
- * @version 1.5 stable $Id: flexicontent_fields.php 1138 2012-02-07 03:01:38Z ggppdk $
- * @package Joomla
- * @subpackage FLEXIcontent
- * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
- * @license GNU/GPL v2
- * 
- * FLEXIcontent is a derivative work of the excellent QuickFAQ component
- * @copyright (C) 2008 Christoph Lukes
- * see www.schlu.net for more information
+ * @package         FLEXIcontent
+ * @version         3.3
  *
- * FLEXIcontent is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
+ * @link            http://www.flexicontent.com
+ * @copyright       Copyright © 2018, FLEXIcontent team, All Rights Reserved
+ * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
 defined('_JEXEC') or die('Restricted access');
@@ -151,114 +144,43 @@ class flexicontent_fields extends _flexicontent_fields
 	public function __construct(& $db)
 	{
 		$this->_records_dbtbl  = 'flexicontent_' . $this->_record_name . 's';
-		$this->_records_jtable = 'flexicontent_' . $this->_record_name . 's';
 		$this->_NAME = strtoupper($this->_record_name);
 
 		parent::__construct('#__' . $this->_records_dbtbl, 'id', $db);
 	}
 
 
-	// overloaded check function
+	/**
+	 * Method to load a row from the database by primary key and bind the fields to the Table instance properties.
+	 *
+	 * @param   mixed    $keys   An optional primary key value to load the row by, or an array of fields to match. If not set the instance property value is used.
+	 * @param   boolean  $reset  True to reset the default values before loading the new row.
+	 *
+	 * @return  boolean  True if successful. False if row not found.
+	 *
+	 * @since   3.3
+	 * @throws  \InvalidArgumentException, \RuntimeException, \UnexpectedValueException
+	 */
+	public function load($keys = null, $reset = true)
+	{
+		return parent::load($keys, $reset);
+	}
+
+
+	/**
+	 * Method to perform sanity checks on the Table instance properties to ensure they are safe to store in the database.
+	 *
+	 * Child classes should override this method to make sure the data they are storing in the database is safe and as expected before storage.
+	 *
+	 * @return  boolean  True if the instance is sane and able to be stored in the database.
+	 *
+	 * @since   3.3
+	 */
 	public function check()
 	{
-		$title = $this->_title;
-		$alias = $this->_alias;
-		$original_alias = $this->$alias;
+		$config = (object) array('ascii_alias' => $this->iscore);
 
-		// Check if 'title' was not given
-		if (trim( $this->$title ) == '')
-		{
-			$msg = JText::_( 'FLEXI_ADD_' . strtoupper($title) );
-			JFactory::getApplication()->enqueueMessage($msg, 'error');
-			return false;
-		}
-
-		$valid_pattern = $this->_allow_underscore ? '/^[a-z_]+[a-z_0-9-]+$/i' : '/^[a-z]+[a-z0-9-]+$/i' ;
-		$is_ascii = $this->iscore;
-		$is_ascii = $is_ascii || preg_match($valid_pattern, $this->$alias);
-		if (!$is_ascii)
-		{
-			$bad_alias = $this->$alias;
-			$this->$alias = $this->$title;
-		}
-
-		// Use 'title' as alias if 'alias' is empty
-		if (empty($this->$alias))
-		{
-			$this->$alias = $this->$title;
-		}
-
-
-		// ***
-		// *** Make alias unique, unless it already ascii
-		// ***
-
-		if (!$is_ascii)
-		{
-			// Use record's language or use SITE's default language in case of record's language is ALL (or empty)
-			$language = !empty($this->language) && $this->language != '*'
-				? $this->language
-				: JComponentHelper::getParams('com_languages')->get('site', '*');
-
-			// Make alias safe, also transliterating it - EITHER - if unicode aliases are not enabled - OR - if force ascii alias for current record type is true 
-			$this->$alias = $this->stringURLSafe($this->$alias, $language, $this->_force_ascii_alias);
-
-			// Check for empty alias and fallback to using current date
-			if (trim(str_replace('-', '', $this->$alias)) == '')
-			{
-				$this->$alias = JFactory::getDate()->format('Y-m-d-H-i-s');
-			}
-		}
-
-		// Force dash instead of underscore (if such configuration)
-		if (!$this->_allow_underscore)
-		{
-			$this->$alias = str_replace('_', '-', $this->$alias);
-		}
-
-
-		// ***
-		// *** Make alias unique
-		// ***
-
-		$n = 1;
-		$possible_alias = $this->$alias;
-		while (1)
-		{
-			$query = 'SELECT id'
-				. ' FROM #__' . $this->_records_dbtbl
-				. ' WHERE ' . $alias . ' = '.$this->_db->Quote($possible_alias);
-			$this->_db->setQuery($query);
-
-			$xid = intval($this->_db->loadResult());
-			if ($xid && $xid != intval($this->id))
-			{
-				$bad_original_alias = $original_alias;
-				$possible_alias = $this->$alias . '-' . (++$n);
-				continue;
-			}
-			break;
-		}
-		$this->$alias = $possible_alias;
-
-
-		// ***
-		// *** Add some warning messages
-		// ***
-
-		if (!empty($bad_alias))
-		{
-			$msg = JText::sprintf('FLEXI_WARN_' . $this->_NAME . '_' . strtoupper($alias) . '_CORRECTED', $bad_alias, $this->$alias);
-			JFactory::getApplication()->enqueueMessage($msg, 'notice');
-		}
-
-		else if (!empty($bad_original_alias))
-		{
-			$msg = JText::sprintf('FLEXI_THIS_' . $this->_NAME . '_' . strtoupper($alias) . '_ALREADY_EXIST', $this->name);
-			JFactory::getApplication()->enqueueMessage($msg, 'warning');
-		}
-
-		return true;
+		return parent::_check_record($config);
 	}
 
 

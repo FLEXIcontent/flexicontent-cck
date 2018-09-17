@@ -398,12 +398,6 @@ table.adminlist thead th .filterdel img {
 table.adminlist td {
 	padding: 4px;
 }
-table.adminlist tr td:first-child::after {
-	content: "";
-	display: inline-block;
-	vertical-align: middle;
-	min-height: 30px;
-}
 table.adminlist input[type="text"] {
 	width: auto !important;
 	padding-right: 0px !important;

@@ -1,22 +1,14 @@
 <?php
 /**
- * @version 1.5 stable $Id: itemcompare.php 1341 2010-03-20 00:44:02Z ggppdk $
- * @package Joomla
- * @subpackage FLEXIcontent
- * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
- * @license GNU/GPL v2
- * 
- * FLEXIcontent is a derivative work of the excellent QuickFAQ component
- * @copyright (C) 2008 Christoph Lukes
- * see www.schlu.net for more information
+ * @package         FLEXIcontent
+ * @version         3.3
  *
- * FLEXIcontent is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
+ * @link            http://www.flexicontent.com
+ * @copyright       Copyright © 2018, FLEXIcontent team, All Rights Reserved
+ * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
-// no direct access
 defined('_JEXEC') or die('Restricted access');
 
 use Joomla\String\StringHelper;
@@ -25,11 +17,8 @@ use Joomla\Utilities\ArrayHelper;
 jimport('legacy.model.legacy');
 
 /**
- * FLEXIcontent Component Category Model
+ * FLEXIcontent Component Itemcompare Model
  *
- * @package Joomla
- * @subpackage FLEXIcontent
- * @since		1.0
  */
 class FlexicontentModelItemcompare extends JModelLegacy
 {
@@ -45,9 +34,9 @@ class FlexicontentModelItemcompare extends JModelLegacy
 	 *
 	 * @since 1.0
 	 */
-	function __construct()
+	public function __construct($config = array())
 	{
-		parent::__construct();
+		parent::__construct($config);
 
 		$app = JFactory::getApplication();
 		$jinput = $app->input;
@@ -55,7 +44,7 @@ class FlexicontentModelItemcompare extends JModelLegacy
 		$id = $jinput->get('id', array(0), 'array');
 		ArrayHelper::toInteger($id, array(0));
 		$pk = (int) $id[0];
-		
+
 		if (!$pk)
 		{
 			$cid = $jinput->get('cid', array(0), 'array');
@@ -70,17 +59,19 @@ class FlexicontentModelItemcompare extends JModelLegacy
 	/**
 	 * Method to set the identifier
 	 *
-	 * @access	public
-	 * @param	int item identifier
+	 * @param		int	    $id        record identifier
+	 * @param		int	    $version   record's version
+	 *
+	 * @since	3.3.0
 	 */
-	function setId($id,$version)
+	public function setId($id, $version)
 	{
 		// Set item id and wipe data
 		$this->_id	    = $id;
 		$this->_version	= $version;
-		$this->_item	= null;
+		$this->_item    = null;
 	}
-	
+
 	/**
 	 * Overridden get method to get properties from the item
 	 *
@@ -108,15 +99,15 @@ class FlexicontentModelItemcompare extends JModelLegacy
 	 * @since	1.0
 	 */
 	function &getItem()
-	{		
+	{
 		if ($this->_loadItem())
-		{		
+		{
 			if (StringHelper::strlen($this->_item->fulltext) > 1) {
 				$this->_item->text = $this->_item->introtext . "<hr id=\"system-readmore\" />" . $this->_item->fulltext;
 			} else {
 				$this->_item->text = $this->_item->introtext;
 			}
-			
+
 			$query = 'SELECT name'
 					. ' FROM #__users'
 					. ' WHERE id = '. (int) $this->_item->created_by
@@ -174,7 +165,7 @@ class FlexicontentModelItemcompare extends JModelLegacy
 
 	/**
 	 * Method to get the type parameters of an item
-	 * 
+	 *
 	 * @return string
 	 * @since 1.5
 	 */
@@ -189,20 +180,20 @@ class FlexicontentModelItemcompare extends JModelLegacy
 		$tparams = $this->_db->loadResult();
 		return $tparams;
 	}
-	
-	
+
+
 	function getCustomFieldsValues($item_id=0, $version=0)
 	{
 		if (!$item_id)  $item_id = $this->_id;
 		if (!$item_id)  return array();
-		
+
 		static $field_values;
 		if ( isset($field_values[$item_id][$version] ) )
 			return $field_values[$item_id][$version];
-		
+
 		$cparams = JComponentHelper::getParams('com_flexicontent');
 		$use_versioning = $cparams->get('use_versioning', 1);
-		
+
 		$query = 'SELECT field_id, value, valueorder, suborder'
 			.( ($version<=0 || !$use_versioning) ? ' FROM #__flexicontent_fields_item_relations AS fv' : ' FROM #__flexicontent_items_versions AS fv' )
 			.' WHERE fv.item_id = ' . (int)$item_id
@@ -211,13 +202,13 @@ class FlexicontentModelItemcompare extends JModelLegacy
 			;
 		$this->_db->setQuery($query);
 		$rows = $this->_db->loadObjectList();
-		
+
 		// Add values to cached array
 		$field_values[$item_id][$version] = array();
 		foreach ($rows as $row) {
 			$field_values[$item_id][$version][$row->field_id][$row->valueorder-1][$row->suborder-1] = $row->value;
 		}
-		
+
 		foreach ($field_values[$item_id][$version] as & $fv) {
 			foreach ($fv as & $ov) {
 				if (count($ov) == 1) $ov = reset($ov);
@@ -225,14 +216,14 @@ class FlexicontentModelItemcompare extends JModelLegacy
 			unset($ov);
 		}
 		unset($fv);
-		
+
 		return $field_values[$item_id][$version];
 	}
-	
-	
+
+
 	/**
 	 * Method to get extrafields which belongs to the item type
-	 * 
+	 *
 	 * @return object
 	 * @since 1.5
 	 */
@@ -249,10 +240,10 @@ class FlexicontentModelItemcompare extends JModelLegacy
 				;
 		$this->_db->setQuery($query);
 		$fields = $this->_db->loadObjectList();
-		
+
 		$cus_vals = $this->getCustomFieldsValues($this->_id, 0);
 		$ver_vals = $this->getCustomFieldsValues($this->_id, $this->_version);
-		
+
 		foreach ($fields as $field) {
 			$field->item_id 	= (int)$this->_id;
 			$field->value 		= @ $cus_vals[$field->id];  // ignore not set
@@ -266,7 +257,7 @@ class FlexicontentModelItemcompare extends JModelLegacy
 
 	/**
 	 * Method to get the versions count
-	 * 
+	 *
 	 * @return int
 	 * @since 1.5
 	 */
@@ -278,13 +269,13 @@ class FlexicontentModelItemcompare extends JModelLegacy
 				;
 		$this->_db->setQuery($query);
 		$versionscount = $this->_db->loadResult();
-		
+
 		return $versionscount;
 	}
-	
+
 	/**
 	 * Method to get the first version kept
-	 * 
+	 *
 	 * @return int
 	 * @since 1.5
 	 */
@@ -297,28 +288,27 @@ class FlexicontentModelItemcompare extends JModelLegacy
 				;
 		$this->_db->setQuery($query, ($max-1), 1);
 		$firstversion = $this->_db->loadResult();
-		
+
 		return $firstversion;
 	}
 
 	/**
 	 * Method to get the versionlist which belongs to the item
-	 * 
+	 *
 	 * @return object
 	 * @since 1.5
 	 */
 	function getVersionList()
 	{
-		$query 	= 'SELECT v.version_id AS nr, v.created AS date, u.name AS modifier, v.comment AS comment'
+		$query 	= 'SELECT v.version_id AS nr, v.created AS date, ua.name AS modifier, v.comment AS comment'
 				.' FROM #__flexicontent_versions AS v'
-				.' LEFT JOIN #__users AS u ON v.created_by = u.id'
-				.' WHERE item_id = ' . (int)$this->_id
+				.' LEFT JOIN #__users AS ua ON ua.id = v.created_by'
+				.' WHERE item_id = ' . (int) $this->_id
 				.' ORDER BY version_id ASC'
 				;
 		$this->_db->setQuery($query);
 		$versions = $this->_db->loadObjectList();
 
 		return $versions;
-	}	
+	}
 }
-?>

@@ -258,7 +258,8 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_templates` (
   `layout` varchar(20) NOT NULL default '',
   `position` varchar(100) NOT NULL default '',
   `fields` text NOT NULL,
-  PRIMARY KEY  (`template`,`cfgname`,`layout`,`position`)
+  PRIMARY KEY  (`id`),
+  KEY `configuration` (`template`,`cfgname`,`layout`,`position`)
 ) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`;
 
 CREATE TABLE IF NOT EXISTS `#__flexicontent_layouts_conf` (

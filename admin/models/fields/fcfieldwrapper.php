@@ -1,25 +1,18 @@
 <?php
 /**
-* @version 1.5 stable $Id: types.php 1340 2012-06-06 02:30:49Z ggppdk $
-* @package Joomla
-* @subpackage FLEXIcontent
-* @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
-* @license GNU/GPL v2
-*
-* FLEXIcontent is a derivative work of the excellent QuickFAQ component
-* @copyright (C) 2008 Christoph Lukes
-* see www.schlu.net for more information
-*
-* FLEXIcontent is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-*/
+ * @package         FLEXIcontent
+ * @version         3.3
+ *
+ * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
+ * @link            http://www.flexicontent.com
+ * @copyright       Copyright © 2018, FLEXIcontent team, All Rights Reserved
+ * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
+ */
 
-// Check to ensure this file is included in Joomla!
 defined('_JEXEC') or die('Restricted access');
 
 use Joomla\String\StringHelper;
+use Joomla\Utilities\ArrayHelper;
 
 // Load the helper classes
 if (!defined('DS'))  define('DS',DIRECTORY_SEPARATOR);
@@ -117,14 +110,14 @@ class JFormFieldFCFieldWrapper extends JFormField
 			if (
 				// SKIP backend hidden fields from this listing
 				($field->iscore && $field->field_type!='maintext')   ||   $field->parameters->get('backend_hidden')  ||   in_array($field->formhidden, array(2,3))   ||
-				
+
 				// Skip hide-if-empty fields from this listing
 				( empty($field->html) && ($field->formhidden==4 || in_array($field->field_type, $hide_ifempty_fields)) )
 			) continue;
-			
+
 			// check to SKIP (hide) field e.g. description field ('maintext'), alias field etc
 			if ( $item->tparams->get('hide_'.$field->field_type) ) continue;
-			
+
 			$not_in_tabs = "";
 			if ($field->field_type=='groupmarker')
 			{
@@ -181,7 +174,7 @@ class JFormFieldFCFieldWrapper extends JFormField
 			{
 				$label_attrs = 'class="' . $lbl_class . ' ' . $label_class . '"';
 			}
-			
+
 			// Some fields may force a container width ?
 			$display_label_form = $field->parameters->get('display_label_form', 1);
 			$row_k = 1 - $row_k;
