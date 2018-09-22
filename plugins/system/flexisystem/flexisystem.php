@@ -20,6 +20,9 @@
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
 jimport('cms.plugin.plugin');
+use Joomla\String\StringHelper;
+use Joomla\Utilities\ArrayHelper;
+
 if (!defined('DS'))  define('DS',DIRECTORY_SEPARATOR);
 
 require_once (JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'defineconstants.php');
@@ -1051,10 +1054,9 @@ class plgSystemFlexisystem extends JPlugin
 					$query 	= 'SELECT t.id, t.alias'
 						. ' FROM #__flexicontent_items_ext AS e'
 						. ' JOIN #__flexicontent_types AS t ON e.type_id = t.id'
-						. ' WHERE e.item_id='.(int)$id
-						;
-					$db->setQuery( $query );
-					$type = $db->loadObject();
+						. ' WHERE e.item_id=' . (int) $id
+					;
+					$type = $db->setQuery($query)->loadObject();
 					if ($type)
 					{
 						$css[] = "type-id-".$type->id;        // Type's id
@@ -1065,7 +1067,26 @@ class plgSystemFlexisystem extends JPlugin
 			
 			elseif ($view === 'category')
 			{
-				if ($cid = $app->input->get('cid', 0, 'int'))            $css[] = "catid-".$cid;  // Category id
+				// Category id
+				if ($cid = $app->input->get('cid', 0, 'int'))
+				{
+					$cid = is_array($cid) ? (int) reset($cid) : (int) $cid;
+
+					if ($cid)
+					{
+						$css[] = 'catid-' . $cid;
+					}
+				}
+				elseif ($cids = $app->input->get('cids', array(), 'array'))
+				{
+					$catids = !is_array($cids)
+						? preg_split("/[\s]*,[\s]*/", $cids)
+						: $cids;
+					ArrayHelper::toInteger($catids, array());
+
+					$css[] = 'mcats-' . implode(' mcats-', $catids);
+				}
+
 				if ($authorid = $app->input->get('authorid', 0, 'int'))  $css[] = "authorid-".$authorid; // Author id
 				if ($tagid = $app->input->get('tagid', 0, 'int'))        $css[] = "tagid-".$tagid;  // Tag id
 				if ($layout = $app->input->get('layout', '', 'cmd'))     $css[] = "cat-layout-".$layout;   // Category 'layout': tags, favs, author, myitems, mcats
