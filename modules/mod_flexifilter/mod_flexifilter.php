@@ -123,7 +123,7 @@ $current_cid = $is_flexiview ? $jinput->get($catid_fieldname, 0, 'int') : 0;
 
 // Catch case that 'cid' is an array (legacy bug of 'mcats' menu item ?)
 $current_cid = is_array($current_cid) ? (int) reset($current_cid) : $current_cid;
-JFactory::getApplication()->input->set($catid_fieldname, $current_cid);
+JFactory::getApplication()->input->set($catid_fieldname, $current_cid ?: null);
 
 // Decide to use specific category ID or use current category ID
 $force_specific_cid = !$display_cat_list && $config_catid;
@@ -269,14 +269,15 @@ $orderby_selector = flexicontent_html::orderby_selector( $params, $form_name, $a
 // 2. Get category, this is needed so that we get only the allowed filters of the category
 // allowed filters are set in the category options (configuration)
 
-$saved_cid = $jinput->get('cid', '', 'string');   // save cid ...
-$saved_layout = $jinput->get('layout', '', 'string'); // save layout ...
-$saved_option = $option; // save option ...
-$saved_view   = $view; // save view ...
+$saved_cid    = $jinput->get('cid');
+$saved_cids   = $jinput->get('cids');
+$saved_layout = $jinput->get('layout');
+$saved_option = $jinput->get('option');
+$saved_view   = $jinput->get('view');
 
 $target_layout = $mcats_selection || !$catid ? 'mcats' : '';
 $jinput->set('layout', $target_layout);
-$jinput->set($target_layout=='mcats' ? 'cids' : 'cid', $limit_filters_to_cat ? $catid : 0);
+$jinput->set($target_layout === 'mcats' ? 'cids' : 'cid', $limit_filters_to_cat ? $catid : 0);
 $jinput->set('option', 'com_flexicontent');
 $jinput->set('view', 'category');
 
@@ -368,10 +369,11 @@ if (!empty($filters))
 }
 
 // Restore variables
-$jinput->set('cid', $saved_cid); // restore cid
-$jinput->set('layout', $saved_layout); // restore layout
-$jinput->set('option', $saved_option); // restore option
-$jinput->set('view', $saved_view); // restore view
+$jinput->set('cid', $saved_cid);
+$jinput->set('cids', $saved_cids);
+$jinput->set('layout', $saved_layout);
+$jinput->set('option', $saved_option);
+$jinput->set('view', $saved_view);
 
 // Load needed JS libs & CSS styles
 flexicontent_html::loadFramework('jQuery');
