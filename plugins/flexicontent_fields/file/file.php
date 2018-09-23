@@ -691,8 +691,8 @@ class plgFlexicontent_fieldsFile extends FCField
 		$buttonsposition = $field->parameters->get('buttonsposition', 1);
 		$use_infoseptxt   = $field->parameters->get( 'use_info_separator', 0 ) ;
 		$use_actionseptxt = $field->parameters->get( 'use_action_separator', 0 ) ;
-		$infoseptxt   = $use_infoseptxt   ?  ' '.$field->parameters->get( 'info_separator', '' ).' '    :  ' ';
-		$actionseptxt = $use_actionseptxt ?  ' '.$field->parameters->get( 'action_separator', '' ).' '  :  ' ';
+		$infoseptxt   = $use_infoseptxt   ?  ' '.$field->parameters->get( 'info_separator', '' ).' '    :  '<br>';
+		$actionseptxt = $use_actionseptxt ?  ' '.$field->parameters->get( 'action_separator', '' ).' '  :  '<br>';
 
 		$allowdownloads = $field->parameters->get( 'allowdownloads', 1 ) ;
 		$downloadstext  = $allowdownloads==2 ? $field->parameters->get( 'downloadstext', 'FLEXI_DOWNLOAD' ) : 'FLEXI_DOWNLOAD';
@@ -801,24 +801,31 @@ class plgFlexicontent_fieldsFile extends FCField
 
 		$n = 0;
 
-		// Get All file information at once (Data maybe cached already)
-		// TODO (maybe) e.g. contentlists should could call this function ONCE for all file fields,
-		// This may be done by adding a new method to fields to prepare multiple fields with a single call
+		/**
+		 * Get All file information at once (Data maybe cached already)
+		 * TODO (maybe) e.g. contentlists should could call this function ONCE for all file fields,
+		 * This may be done by adding a new method to fields to prepare multiple fields with a single call
+		 */
 		$files_data = $this->getFileData( $values, $published=true );   //if ($field->id==NNN) { echo "<pre>"; print_r($files_data); exit; }
 
-		// Optimization, do some stuff outside the loop
+		// Legacy layout support, create 'hits_icon' variable
 		static $hits_icon = null;
-		if ($hits_icon===null && ($display_hits==1 || $display_hits==3)) {
 
-			if ($display_hits==1) {
+		if ($hits_icon === null && $add_hits_img)
+		{
+			if ($display_hits==1)
+			{
 				$_tooltip_title   = '';
 				$_tooltip_content = '%s '.JText::_( 'FLEXI_HITS', true );
 				$_attribs = 'class="'.$tooltip_class.' fcicon-hits" title="'.JHtml::tooltipText($_tooltip_title, $_tooltip_content, 0, 0).'"';
-			} else {
+			}
+			else
+			{
 				$_attribs = ' class="fcicon-hits"';
 			}
 
-			$hits_icon = JHtml::image('components/com_flexicontent/assets/images/'.'user.png', JText::_( 'FLEXI_HITS' ), $_attribs) . ' ';
+			//$hits_icon = JHtml::image('components/com_flexicontent/assets/images/'.'user.png', JText::_( 'FLEXI_HITS' ), $_attribs) . ' ';
+			$hits_icon = '<span class="icon-eye" ' . $_attribs . '></span>';
 		}
 
 		$show_filename = $display_filename || $prop=='namelist';
