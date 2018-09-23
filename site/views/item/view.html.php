@@ -81,10 +81,12 @@ class FlexicontentViewItem extends JViewLegacy
 		
 		// Get model
 		$model  = $this->getModel();
+
 		// Indicate to model that current view IS item form
 		$model->isForm = false;
-		
-		$cid = $model->_cid ? $model->_cid : $model->get('catid');  // Get current category id
+
+		// Get current category id
+		$cid = $model->_cid ? $model->_cid : $model->get('catid');
 		
 		// Decide version to load
 		$version = $jinput->get( 'version', 0, 'int' );   // Load specific item version (non-zero), 0 version: is unversioned data, -1 version: is latest version (=default for edit form)
@@ -93,6 +95,7 @@ class FlexicontentViewItem extends JViewLegacy
 		
 		// Allow ilayout from HTTP request, this will be checked during loading item parameters
 		$model->setItemLayout('__request__');
+
 		// Indicate to model to merge menu parameters if menu matches
 		$model->mergeMenuParams = true;
 		
