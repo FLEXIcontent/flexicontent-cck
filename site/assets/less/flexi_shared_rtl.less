@@ -2140,6 +2140,12 @@ body .form-horizontal .control-group
 	text-align: center;
 }
 
+div#permissions .tab-content {
+	position: sticky;
+	top: 90px;
+	max-height: calc(~"100vh - 350px");
+}
+
 .fc-tabbed-field-box {
 	padding: 0 !important;
 	textarea,
@@ -2151,4 +2157,246 @@ body .form-horizontal .control-group
 		padding-left: 2% !important;
 		padding-right: 2% !important;
 	}
+}
+
+.fcspacer-8 {
+	margin-top: 8px !important;
+}
+.fcspacer-16 {
+	margin-top: 16px !important;
+}
+.fcspacer-24 {
+	margin-top: 24px !important;
+}
+.fcspacer-32 {
+	margin-top: 32px !important;
+}
+
+.flexicontent .btn-toolbar .btn-wrapper {
+	float: right;
+	display: block;
+	margin: 0 0 0 8px;
+}
+
+
+/**
+ * Duplicate BS4 classes TODO move to seperate file to allow loading only in J3
+ */
+
+.sr-only {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	padding: 0;
+	margin: -1px;
+	overflow: hidden;
+	clip: rect(0,0,0,0);
+	border: 0;
+}
+
+
+
+/**************************************
+ * File / image Field and other Plugins
+ **************************************/
+
+/*[class^="fcfile_"], [class*=" fcfile_"] {}*/
+
+/* File field viewing: file title */
+/*.fcfile_title {}*/
+
+/* File field viewing: information blocks */
+.fcfile_hits, .fcfile_lang, .fcfile_size, .fcfile_descr_tip {
+	margin: 2px 8px;
+}
+.fcfile_descr_inline {
+  margin: 16px 0 !important;
+	width: 100% !important;
+	box-sizing: border-box !important;
+}
+
+/* File field viewing: mime icon external container */
+.fcfile_mime {
+}
+.fcfile_name {
+	background: #f0f0f0;
+	margin: 2px 2px 12px 2px;
+	border-top: 1px solid #d0d0d0;
+	border-bottom: 1px solid #d0d0d0;
+	padding: 6px 4px;
+	font-weight: 500;
+	font-size: 140%;
+}
+
+/* File field viewing: property icons */
+.fcfile_mime .fcicon-mime,
+.fcfile_hits .fcicon-hits,
+.fcfile_size .fcicon-size, 
+.fcfile_lang .fcicon-lang,
+.fcfile_descr_tip .fcicon-descr {
+	vertical-align: middle;
+}
+
+.fcfile_hits .label,
+.fcfile_size .label, 
+.fcfile_lang .label,
+.fcfile_descr_tip .label {
+	min-width: 40px;
+	text-align: left;
+}
+
+/* File field viewing: action buttons */
+.fcfile_actions {
+	margin: 4px;
+	clear: both;
+	display: block;
+	width: 100% !important;
+	box-sizing: border-box !important;
+}
+.fcfile_actions > a, .fcfile_actions > input, .fcfile_actions > form > input {
+  margin: 4px 0;
+	width: 100% !important;
+	box-sizing: border-box !important;
+}
+.fcfile_actions > form {
+	width: 100% !important;
+	box-sizing: border-box !important;
+	margin: 0px !important;
+	padding: 0px !important;
+}
+
+/* File field viewing: totals */
+.fcfile_total {
+	margin: 8px 0 !important;
+}
+.fcfile_total_count_label,
+.fcfile_total_hits_label {
+	font-weight: bold;
+}
+
+
+/* Image field viewing: thumbnails */
+img.fc_field_image {
+	display: inline-block;
+	margin: 0px 4px 6px 0px;
+	padding: 1px;
+	border: 1px solid lightgray;
+	.fc.rounded.corners(5px);
+}
+div .fc_image_thumb {
+	display: inline-block;
+	text-decoration: none;
+	float: right;
+}
+
+/* Image field viewing: thumbnail container */
+div .fc_img_container {
+	display: inline-block;
+	margin: 2px 8px 2px 0px;
+}
+
+
+/* Image field viewing: inline tooltip */
+div .fc_img_tooltip_data {
+	display: inline-block;
+	vertical-align: top;
+	margin: 2px 12px 6px 4px;
+}
+div .fc_img_tooltip_title {
+	line-height: 1em;
+	font-weight: bold;
+}
+div .fc_img_tooltip_desc {
+	line-height: 1em;
+}
+
+
+/* Address international field, map container */
+div .fc_addressint_map {
+	box-sizing: border-box;
+	width: 100%;
+	height: 100%;
+	margin: 0;
+	padding: 0;
+}
+div .fc_addressint_map_canvas {
+	box-sizing: border-box;
+	width: 100%;
+	height: 100%;
+	margin: 0;
+	padding: 0;
+}
+
+
+/* Core fields: categories, tags */
+div span.fc_categories, div span.fc_tags {
+	border-bottom: 1px dashed gray;
+}
+div a.fc_categories, div a.fc_tags {
+}
+div .fc_categories.fc_ismain_cat {
+	font-weight: bold;
+}
+div .fc_categories:not(.fc_ismain_cat) {
+	font-weight: normal;
+}
+
+
+
+/* Radio/checkbox/select/etc (indexed fields) viewing: the non-selected values */
+div .fc_field_unsused_val {
+	display: inline-block;
+}
+div .fc_field_unsused_val,
+div .fc_field_unsused_val .fc_ifield_val_txt {
+	font-style: italic;
+	text-decoration: line-through;
+}
+div .fc_field_unsused_val .fc_ifield_val_txt {
+	opacity: 0.7;
+	filter: alpha(opacity=70);
+}
+div .fc_field_unsused_val [class^="fc-icon-"], 
+div .fc_field_unsused_val [class*=" fc-icon-"],
+div .fc_field_unsused_val img {
+	opacity:0.4;
+	filter:alpha(opacity=40);
+}
+.fc_ifield_val_box {
+	float: right;
+	display: inline-block;
+	margin: 0 12px 0 0;
+}
+.fc_ifield_val_box .fc_ifield_val_img,
+.fc_ifield_val_box .fc_ifield_val_txt {
+	float:right;
+	display: inline-block;
+	clear: both;
+	padding: 0px;
+	margin: 2px;
+}
+.fc_ifield_val_box .alert.fc_ifield_val_txt {
+	padding: 2px 6px;
+}
+
+/* fieldgroup field viewing: default container for values */
+div.fc-fieldgrp-value-box {
+	.fc.rounded.corners(4px);
+	border: 1px solid lightgray;
+	display: block;
+	float: right;
+	
+	box-sizing: border-box;
+	/*max-width: 98%;
+	min-width: 48%;*/
+	width: 100%;
+	margin: 4px 1%;
+	padding: 6px 4px;
+	vertical-align: top;
+}
+
+/* favourites field viewing: information containers */
+[class*="fcfavs-"].fc-mssg-inline {
+	position: relative;
+	margin: 1px 2px;
 }

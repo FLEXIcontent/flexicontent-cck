@@ -691,8 +691,8 @@ class plgFlexicontent_fieldsFile extends FCField
 		$buttonsposition = $field->parameters->get('buttonsposition', 1);
 		$use_infoseptxt   = $field->parameters->get( 'use_info_separator', 0 ) ;
 		$use_actionseptxt = $field->parameters->get( 'use_action_separator', 0 ) ;
-		$infoseptxt   = $use_infoseptxt   ?  ' '.$field->parameters->get( 'info_separator', '' ).' '    :  ' ';
-		$actionseptxt = $use_actionseptxt ?  ' '.$field->parameters->get( 'action_separator', '' ).' '  :  ' ';
+		$infoseptxt   = $use_infoseptxt   ?  ' '.$field->parameters->get( 'info_separator', '' ).' '    :  '<br>';
+		$actionseptxt = $use_actionseptxt ?  ' '.$field->parameters->get( 'action_separator', '' ).' '  :  '<br>';
 
 		$allowdownloads = $field->parameters->get( 'allowdownloads', 1 ) ;
 		$downloadstext  = $allowdownloads==2 ? $field->parameters->get( 'downloadstext', 'FLEXI_DOWNLOAD' ) : 'FLEXI_DOWNLOAD';
@@ -801,24 +801,31 @@ class plgFlexicontent_fieldsFile extends FCField
 
 		$n = 0;
 
-		// Get All file information at once (Data maybe cached already)
-		// TODO (maybe) e.g. contentlists should could call this function ONCE for all file fields,
-		// This may be done by adding a new method to fields to prepare multiple fields with a single call
+		/**
+		 * Get All file information at once (Data maybe cached already)
+		 * TODO (maybe) e.g. contentlists should could call this function ONCE for all file fields,
+		 * This may be done by adding a new method to fields to prepare multiple fields with a single call
+		 */
 		$files_data = $this->getFileData( $values, $published=true );   //if ($field->id==NNN) { echo "<pre>"; print_r($files_data); exit; }
 
-		// Optimization, do some stuff outside the loop
+		// Legacy layout support, create 'hits_icon' variable
 		static $hits_icon = null;
-		if ($hits_icon===null && ($display_hits==1 || $display_hits==3)) {
 
-			if ($display_hits==1) {
+		if ($hits_icon === null && $add_hits_img)
+		{
+			if ($display_hits==1)
+			{
 				$_tooltip_title   = '';
 				$_tooltip_content = '%s '.JText::_( 'FLEXI_HITS', true );
 				$_attribs = 'class="'.$tooltip_class.' fcicon-hits" title="'.JHtml::tooltipText($_tooltip_title, $_tooltip_content, 0, 0).'"';
-			} else {
+			}
+			else
+			{
 				$_attribs = ' class="fcicon-hits"';
 			}
 
-			$hits_icon = JHtml::image('components/com_flexicontent/assets/images/'.'user.png', JText::_( 'FLEXI_HITS' ), $_attribs) . ' ';
+			//$hits_icon = JHtml::image('components/com_flexicontent/assets/images/'.'user.png', JText::_( 'FLEXI_HITS' ), $_attribs) . ' ';
+			$hits_icon = '<span class="icon-eye" ' . $_attribs . '></span>';
 		}
 
 		$show_filename = $display_filename || $prop=='namelist';
@@ -1122,7 +1129,7 @@ class plgFlexicontent_fieldsFile extends FCField
 					$fman = new FlexicontentControllerFilemanager();
 					$fman->runMode = 'interactive';
 
-					$app->input->set('return-url', null);
+					$app->input->set('return', null);
 					$app->input->set('secure', $v['secure']);
 					$app->input->set('stamp', $v['stamp']);
 					$app->input->set('file-title', $v['file-title']);
@@ -1280,28 +1287,30 @@ class plgFlexicontent_fieldsFile extends FCField
 	{
 		// Find which file data are already cached, and if no new file ids to query, then return cached only data
 		static $cached_data = array();
+
 		$return_data = array();
 		$new_ids = array();
 		$file_ids = (array) $fid;
+
 		foreach ($file_ids as $file_id)
 		{
-			$f = (int)$file_id;
-			if ( !isset($cached_data[$f]) && $f)
+			$f = (int) $file_id;
+			if (!isset($cached_data[$f]) && $f)
+			{
 				$new_ids[] = $f;
+			}
 		}
 
 		// Get file data not retrieved already
-		if ( count($new_ids) )
+		if (count($new_ids))
 		{
 			// Only query files that are not already cached
 			$db = JFactory::getDbo();
 			$query = 'SELECT * '. $extra_select //filename, filename_original, altname, description, ext, id'
-					. ' FROM #__flexicontent_files'
-					. ' WHERE id IN ('. implode(',', $new_ids) . ')'
-					. ($published ? '  AND published = 1' : '')
-					;
-			$db->setQuery($query);
-			$new_data = $db->loadObjectList('id');
+				. ' FROM #__flexicontent_files'
+				. ' WHERE id IN ('. implode(',', $new_ids) . ')'
+				. ($published ? '  AND published = 1' : '');
+			$new_data = $db->setQuery($query)->loadObjectList('id');
 
 			if ($new_data) foreach($new_data as $file_id => $file_data)
 			{
@@ -1312,14 +1321,14 @@ class plgFlexicontent_fieldsFile extends FCField
 		// Finally get file data in correct order
 		foreach($file_ids as $file_id)
 		{
-			$f = (int)$file_id;
-			if ( isset($cached_data[$f]) && $f)
+			$f = (int) $file_id;
+			if (isset($cached_data[$f]) && $f)
 			{
 				$return_data[$file_id] = $cached_data[$f];
 			}
 		}
 
-		return !is_array($fid) ? @$return_data[(int)$fid] : $return_data;
+		return !is_array($fid) ? @ $return_data[(int) $fid] : $return_data;
 	}
 
 

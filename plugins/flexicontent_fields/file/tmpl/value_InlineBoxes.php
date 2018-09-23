@@ -34,13 +34,14 @@ foreach($values as $file_id)
 	$abspath = str_replace(DS, '/', JPath::clean($basePath.DS.$file_data->filename));
 
 	$_size = '-';
+
 	if ($display_size)
 	{
 		if ($file_data->url)
 		{
 			$_size = (int)$file_data->size ? (int)$file_data->size : '-';
 		}
-		else if (file_exists($abspath))
+		elseif (file_exists($abspath))
 		{
 			$_size = filesize($abspath);
 		}
@@ -92,78 +93,80 @@ foreach($values as $file_id)
 		$_tooltip_title   = '';
 		$_tooltip_content = JText::_( 'FLEXI_FIELD_FILE_TYPE', true ) .': '. $file_data->ext;
 		$icon = '
-		<span class="fcfile_mime" style="float: left; display:inline-block;">
+		<span class="fcfile_mime">
 			' . JHtml::image($file_data->icon, $file_data->ext, 'class="fcicon-mime '.$tooltip_class.'" title="'.JHtml::tooltipText($_tooltip_title, $_tooltip_content, 1, 0).'"') . '
 		</span>';
 	}
 
 	// b. LANGUAGE: either as icon or as inline text or both
-	$lang = ''; $lang_str = '';
+	$lang = '';
 	$file_data->language = $file_data->language=='' ? '*' : $file_data->language;
-	if ($display_lang && $file_data->language!='*')  // ... skip 'ALL' language ... maybe allow later
+
+	// Skip 'ALL' language ... maybe allow later
+	//if ($display_lang && $file_data->language !== '*')
+	if ($display_lang)
 	{
-		$lang = '
-		<span class="fcfile_lang">
-			<span class="fcfile_lang_label label">' .JTEXT::_('FLEXI_LANGUAGE'). '</span>
-			<span class="fcfile_lang_value value">';
-		if ( $add_lang_img && @ $langs->{$file_data->language}->imgsrc )
-		{
-			if (!$add_lang_txt)
-			{
-				$_tooltip_title   = JText::_( 'FLEXI_LANGUAGE', true );
-				$_tooltip_content = $file_data->language=='*' ? JText::_("FLEXI_ALL") : $langs->{$file_data->language}->name;
-				$_attribs = 'class="'.$tooltip_class.' fcicon-lang" title="'.JHtml::tooltipText($_tooltip_title, $_tooltip_content, 0, 0).'" alt="'.$_tooltip_title.'" ';
-			}
-			else
-			{
-				$_attribs = ' class="fcicon-lang"';
-			}
-			$lang .= "\n".'<img src="'.$langs->{$file_data->language}->imgsrc.'" '.$_attribs.' /> ';
-		}
-		if ( $add_lang_txt )
-		{
-			$lang .= $file_data->language=='*' ? JText::_("FLEXI_ALL_LANGUAGES") : $langs->{$file_data->language}->name;
-		}
-		$lang .= '
-			</span>
-		</span>';
+		$lang = '<span class="fcfile_lang fc-iblock">';
+
+		$lang .= $display_lang == 1 || $display_lang == 3 ? '<span class="icon-flag fcicon-lang"></span> ' : '';
+		$lang .= $display_lang == 2 || $display_lang == 3 ? '<span class="fcfile_lang_label label">' .JTEXT::_('FLEXI_LANGUAGE'). '</span> ' : '';
+		$lang .= '<span class="fcfile_lang_value value">' . ($file_data->language === '*' ? JText::_('FLEXI_MULTIPLE') . ' ' . strtolower(JText::_('FLEXI_OR')) . ' ' . strtolower(JText::_('FLEXI_NA')) : $langs->{$file_data->language}->name) . '</span>';
+
+		$lang .= '</span>';
 	}
 
 
-	// c. SIZE: in KBs / MBs
+	/**
+	 * c. SIZE: in KBs / MBs
+	 */
 	$sizeinfo = '';
+
 	if ($display_size)
 	{
-		$sizeinfo = '<span class="fcfile_size">';
-		$sizeinfo .= '<span class="fcfile_size_label label">' .JTEXT::_('FLEXI_FIELD_FILE_SIZE'). '</span> ';
-		if ( !is_numeric($_size) )
-			$sizeinfo .= '<span class="fcfile_size_value value">'.$_size.'</span>';
-		else if ($display_size==1)
-			$sizeinfo .= '<span class="fcfile_size_value value">'.number_format($_size / 1024, 0).'&nbsp;'.JTEXT::_('FLEXI_FIELD_FILE_KBS').'</span>';
-		else if ($display_size==2)
-			$sizeinfo .= '<span class="fcfile_size_value value">'.number_format($_size / 1048576, 2).'&nbsp;'.JTEXT::_('FLEXI_FIELD_FILE_MBS').'</span>';
+		$sizeinfo .= '
+		<span class="fcfile_size fc-iblock">';
+
+		$sizeinfo .= $display_size == 1 || $display_size == 3 ? '<span class="icon-archive fcicon-size"></span> ' : '';
+		$sizeinfo .= $display_size == 2 || $display_size == 3 ? '<span class="fcfile_size_label label">' . JTEXT::_('FLEXI_FIELD_FILE_SIZE') . '</span> ' : '';
+
+		if (!is_numeric($_size))
+		{
+			$sizeinfo .= '<span class="fcfile_size_value value">' . $_size . '</span>';
+		}
+		elseif ($_size < 1048576)
+		{
+			$sizeinfo .= '<span class="fcfile_size_value value">' . number_format($_size / 1024, 0) . '&nbsp;'.JTEXT::_('FLEXI_FIELD_FILE_KBS').'</span>';
+		}
+		elseif ($_size < 1073741824)
+		{
+			$sizeinfo .= '<span class="fcfile_size_value value">' . number_format($_size / 1048576, 2) . '&nbsp;'.JTEXT::_('FLEXI_FIELD_FILE_MBS').'</span>';
+		}
 		else
-			$sizeinfo .= '<span class="fcfile_size_value value">'.number_format($_size / 1073741824, 2).'&nbsp;'.JTEXT::_('FLEXI_FIELD_FILE_GBS').'</span>';
+		{
+			$sizeinfo .= '<span class="fcfile_size_value value">' . number_format($_size / 1073741824, 2) . '&nbsp;'.JTEXT::_('FLEXI_FIELD_FILE_GBS').'</span>';
+		}
+
 		$sizeinfo .= '</span>';
 	}
 
 
-	// d. HITS: either as icon or as inline text or both
+	/**
+	 * d. HITS: either as icon or as inline text or both
+	 */
 	$hits = '';
+
 	if ($display_hits)
 	{
-		$hits = '<span class="fcfile_hits">';
-		if ( $add_hits_img && @ $hits_icon ) {
-			$hits .= sprintf($hits_icon, $file_data->hits);
-		}
-		if ( $add_hits_txt ) {
-			$hits .= '
-				<span class="fcfile_hits_label label">' .JTEXT::_('FLEXI_FIELD_FILE_HITS'). '</span>
-				<span class="fcfile_hits_value value">'.$file_data->hits.'</span>
-			';
-		}
+		$hits = '
+		<span class="fcfile_hits fc-iblock">';
+
+		$hits .= $display_hits == 1 || $display_hits == 3 ? '<span class="icon-eye fcicon-hits"></span> ' : '';
+		$hits .= $display_hits == 2 || $display_hits == 3 ? '<span class="fcfile_hits_label label">' .JTEXT::_('FLEXI_FIELD_FILE_HITS'). '</span> ' : '';
+		$hits .= '<span class="fcfile_hits_value value">'.$file_data->hits.'</span>';
+
 		$hits .= '</span>';
 	}
+
 	$field->hits_total += $file_data->hits;
 
 
@@ -178,33 +181,41 @@ foreach($values as $file_id)
 	$name_escaped = htmlspecialchars($name_str, ENT_COMPAT, 'UTF-8');
 
 	$name_classes = $file_classes . ' fcfile_title';
-	$name_html = '<h3 class="'.$name_classes.'">'. $name_str . '</h3>';
+	$name_html = '<span class="' . $name_classes . '">'. $name_str . '</span>';
 
 
 	// f. DESCRIPTION: either as tooltip or as inline text
 	$descr_tip = $descr_inline = $descr_icon = '';
 	if (!empty($file_data->description))
 	{
-		if ( !$authorized )
+		// Not authorized
+		if (!$authorized)
 		{
-			if ($noaccess_display != 2 )
+			if ($noaccess_display != 2)
 			{
 				$descr_tip  = JHtml::tooltipText($name_str, $file_data->description, 0, 1);
 				$descr_icon = '<img src="components/com_flexicontent/assets/images/comments.png" class="hasTooltip" alt="'.$name_escaped.'" title="'. $descr_tip .'"/>';
 				$descr_inline  = '';
 			}
 		}
-		else if ($display_descr==1 || $prop=='namelist')   // As tooltip
+
+		// As tooltip
+		elseif ($display_descr==1 || $prop=='namelist')
 		{
 			$descr_tip  = JHtml::tooltipText($name_str, $file_data->description, 0, 1);
 			$descr_icon = '<img src="components/com_flexicontent/assets/images/comments.png" class="hasTooltip" alt="'.$name_escaped.'" title="'. $descr_tip .'"/>';
 			$descr_inline  = '';
 		}
-		else if ($display_descr==2)  // As inline text
+
+		// As inline text
+		elseif ($display_descr==2)
 		{
 			$descr_inline = ' <div class="fcfile_descr_inline alert alert-info">'. nl2br($file_data->description) . '</div>';
 		}
-		if ($descr_icon) $descr_icon = '
+
+		if ($descr_icon)
+		{
+			$descr_icon = '
 			<span class="fcfile_descr_tip">
 				<span class="fcfile_descr_tip_label label">
 					' .JTEXT::_('FLEXI_DESCRIPTION'). '
@@ -212,6 +223,7 @@ foreach($values as $file_id)
 				'. $descr_icon . '
 			</span>
 		';
+		}
 	}
 
 
@@ -220,15 +232,18 @@ foreach($values as $file_id)
 	// ***
 
 	$html = '';
+	$noauth = '';
 
 
-	// [1]: either create the download link -or- use no authorized link ...
-	if ( !$authorized )
+	/**
+	 * Either create the download link -or- use no authorized link ...
+	 */
+	if (!$authorized)
 	{
 		$dl_link = $noaccess_url;
 		if ($noaccess_msg)
 		{
-			$html .= '<span class="fcfile_noauth_msg alert fc-iblock">' .$noaccess_msg. '</span> ';
+			$noauth = '<div class="fcfile_noauth_msg alert alert-warning">' .$noaccess_msg. '</div> ';
 		}
 	}
 	else
@@ -243,19 +258,26 @@ foreach($values as $file_id)
 	$filename_shown_as_link = $filename_shown && $link_filename && !$usebutton;
 
 
+	// [0]: filename (if visible)
+	if (($filename_shown && !$filename_shown_as_link) || $not_downloadable)
+	{
+		$html .= '<div class="fcfile_name">' . $icon . ' ' . $name_html . '</div>';
+	}
+
+
+	// [1]: Not authorized message
+	$html .= $noauth;
+
+
 	// [2]: Add information properties: filename, and icons with optional inline text
 	$info_arr = array();
-	if ( ($filename_shown && !$filename_shown_as_link) || $not_downloadable )
-	{
-		$info_arr[] = $icon .' '. $name_html;
-	}
 
 	if ($lang)       $info_arr[] = $lang;
 	if ($sizeinfo)   $info_arr[] = $sizeinfo;
 	if ($hits)       $info_arr[] = $hits;
 	if ($descr_icon) $info_arr[] = $descr_icon;
 
-	$html .= implode($infoseptxt, $info_arr);
+	$html .= '<div class="fcclear"></div>' . implode($infoseptxt, $info_arr);
 
 
 	// [3]: Add the file description (if displayed inline)
@@ -294,31 +316,32 @@ foreach($values as $file_id)
 		// DOWNLOAD: single file instant download
 		if ($allowdownloads)
 		{
-			// NO ACCESS: add file info via form field elements, in case the URL target needs to use them
-			$file_data_fields = "";
-			if ( !$authorized && $noaccess_addvars)
+			// NO ACCESS: add file info via URL variables, in case the URL target needs to use them
+			if (!$authorized && $noaccess_addvars)
 			{
-				$file_data_fields =
-					'<input type="hidden" name="fc_field_id" value="'.$field->id.'"/>'."\n".
-					'<input type="hidden" name="fc_item_id" value="'.$item->id.'"/>'."\n".
-					'<input type="hidden" name="fc_file_id" value="'.$file_id.'"/>'."\n";
+				$vars = array(
+					'fc_field_id="' . $field->id,
+					'fc_item_id="' . $item->id,
+					'fc_file_id="' . $file_id,
+				);
+				$dl_link .= strpos($dl_link, '?') !== false ? '&amp;' : '?';
+				$dl_link .= implode('&amp;', $vars);
 			}
 
 			// The download button in a mini form ...
-			$actions_arr[] = ''
-				.'<form id="form-download-'.$field->id.'-'.($n+1).'" method="post" action="'.$dl_link.'" style="display:inline-block;" ' . ($non_file_url ? 'target="_blank"' : '') . '>'
-				.$file_data_fields
-				.'<input type="submit" name="download-'.$field->id.'[]" class="'.$file_classes.' btn-success fcfile_downloadFile" title="'.$downloadsinfo.'" value="'.$downloadstext.'"/>'
-				.'</form>'."\n";
+			$actions_arr[] = '
+				<a href="' . $dl_link . '" class="' . $file_classes . ' btn-success fcfile_downloadFile" title="'.htmlspecialchars($downloadsinfo, ENT_COMPAT, 'UTF-8').'" ' . ($non_file_url ? 'target="_blank"' : '') . '>
+					' . $downloadstext . '
+				</a>';
 		}
 
 		if ($authorized && $allowview && !$file_data->url)
 		{
 			$actions_arr[] = '
-				<a href="'.$dl_link.(strpos($dl_link,'?')!==false ? '&amp;' : '?').'method=view" ' .($viewinside==2 ? 'target="_blank"' : '')
-					.' class="'.($viewinside==0 ? 'fancybox ' : '').$file_classes.' btn-info fcfile_viewFile" '.($viewinside==0 ? 'data-fancybox-type="iframe" ' : '')
-					.($viewinside==1 ? ' onclick="var url = jQuery(this).attr(\'href\');  fc_showDialog(url, \'fc_modal_popup_container\', 0, 0, 0, 0, {title:\''. $filetitle_escaped .'\'}); return false;" ' : '').' title="'.$viewinfo.'" style="line-height:1.3em;" >
-					'. $viewtext.'
+				<a href="' . $dl_link . (strpos($dl_link, '?') !== false ? '&amp;' : '?') . 'method=view" ' . ($viewinside==2 ? 'target="_blank"' : '')
+					. ' class="'.($viewinside==0 ? 'fancybox ' : '').$file_classes.' btn-info fcfile_viewFile" '.($viewinside==0 ? 'data-fancybox-type="iframe" ' : '')
+					. ($viewinside==1 ? ' onclick="var url = jQuery(this).attr(\'href\');  fc_showDialog(url, \'fc_modal_popup_container\', 0, 0, 0, 0, {title:\''. $filetitle_escaped .'\'}); return false;" ' : '').' title="'.$viewinfo.'" style="line-height:1.3em;" >
+					' . $viewtext . '
 				</a>';
 			$fancybox_needed = 1;
 		}
@@ -336,7 +359,7 @@ foreach($values as $file_id)
 				. ' data-contentid="'. $item->id .'"'
 				. ' data-fileid="'. $file_data->id .'"';
 			$actions_arr[] =
-				'<input type="button" '. $attribs .' value="'.$addtocarttext.'" />';
+				'<input type="button" '. $attribs .' value="'.htmlspecialchars($addtocarttext, ENT_COMPAT, 'UTF-8').'" />';
 		}
 
 
@@ -353,8 +376,8 @@ foreach($values as $file_id)
 				.'&task=call_extfunc&exttype=plugins&extfolder=flexicontent_fields&extname=file&extfunc=share_file_form'
 				.'&file_id='.$file_id.'&content_id='.$item->id.'&field_id='.$field->id;
 			$actions_arr[] =
-				'<input type="button" class="'.$file_classes.' fcfile_shareFile" title="'.$shareinfo.'" data-href="'.$send_form_url.'" value="'.$sharetext.'" '.
-					' onclick="var url = jQuery(this).attr(\'data-href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 800, 800, 0, {title:\''.$sharetext.'\'}); return false;" '.
+				'<input type="button" class="'.$file_classes.' fcfile_shareFile" title="'.$shareinfo.'" data-href="'.$send_form_url.'" value="'.htmlspecialchars($sharetext, ENT_COMPAT, 'UTF-8').'" '.
+					' onclick="var url = jQuery(this).attr(\'data-href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 800, 800, 0, {title:\''.htmlspecialchars($sharetext, ENT_COMPAT, 'UTF-8').'\'}); return false;" '.
 				'/>';
 		}
 	}
@@ -373,16 +396,19 @@ foreach($values as $file_id)
 			// NO ACCESS: add file info via URL variables, in case the URL target needs to use them
 			if ( !$authorized && $noaccess_addvars)
 			{
-				$dl_link .=
-					'&fc_field_id="'.$field->id.
-					'&fc_item_id="'.$item->id.
-					'&fc_file_id="'.$file_id;
+				$vars = array(
+					'fc_field_id="' . $field->id,
+					'fc_item_id="' . $item->id,
+					'fc_file_id="' . $file_id,
+				);
+				$dl_link .= strpos($dl_link, '?') !== false ? '&amp;' : '?';
+				$dl_link .= implode('&amp;', $vars);
 			}
 
 			// The download link, if filename/title not shown, then display a 'download' prompt text
 			$actions_arr[] =
 				($filename_shown && $link_filename ? $icon.' ' : '')
-				.'<a href="' . $dl_link . '" class="' . $file_classes . ' fcfile_downloadFile" title="' . $downloadsinfo . '" ' . ($non_file_url ? 'target="_blank"' : '') . '>'
+				.'<a href="' . $dl_link . '" class="' . $file_classes . ' fcfile_downloadFile" title="' . htmlspecialchars($downloadsinfo, ENT_COMPAT, 'UTF-8') . '" ' . ($non_file_url ? 'target="_blank"' : '') . '>'
 				.($filename_shown && $link_filename ? $name_str : $downloadstext)
 				.'</a>';
 		}
@@ -390,7 +416,7 @@ foreach($values as $file_id)
 		if ($authorized && $allowview && !$file_data->url)
 		{
 			$actions_arr[] = '
-				<a href="'.$dl_link.(strpos($dl_link,'?')!==false ? '&amp;' : '?').'method=view" class="fancybox '.$file_classes.' fcfile_viewFile" data-fancybox-type="iframe" title="'.$viewinfo.'" >
+				<a href="' . $dl_link . (strpos($dl_link, '?') !== false ? '&amp;' : '?') . 'method=view" class="fancybox ' . $file_classes . ' fcfile_viewFile" data-fancybox-type="iframe" title="' . $viewinfo . '" >
 					'.$viewtext.'
 				</a>';
 			$fancybox_needed = 1;
@@ -435,8 +461,7 @@ foreach($values as $file_id)
 
 	//Display the buttons "DOWNLOAD, SHARE, ADD TO CART" before or after the filename
 	$html =
-		($buttonsposition ? $html : '') .
-		(count($actions_arr) ?  $infoseptxt : '') . '
+		($buttonsposition ? $html : '') . '
 		<div class="fcfile_actions">
 			' . implode($actionseptxt, $actions_arr) . '
 		</div>' .
