@@ -23,10 +23,6 @@ use Joomla\String\StringHelper;
 
 /**
  * View class for the FLEXIcontent import screen
- *
- * @package Joomla
- * @subpackage FLEXIcontent
- * @since 1.0
  */
 class FlexicontentViewImport extends JViewLegacy
 {

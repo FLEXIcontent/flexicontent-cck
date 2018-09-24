@@ -30,4 +30,15 @@ else
 	class FlexicontentModelGroups extends UsersModelGroups
 	{
 	}
+
+
+	/**
+	 * START OF MODEL SPECIFIC METHODS
+	 */
+
+
+	/**
+	 * START OF MODEL LEGACY METHODS
+	 */
+
 }

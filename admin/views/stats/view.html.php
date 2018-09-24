@@ -23,10 +23,6 @@ jimport('legacy.view.legacy');
 
 /**
  * HTML View class for the Stats View
- *
- * @package Joomla
- * @subpackage FLEXIcontent
- * @since 1.0
  */
 class FlexicontentViewStats extends JViewLegacy
 {

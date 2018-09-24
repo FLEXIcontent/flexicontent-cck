@@ -15,13 +15,11 @@ jimport('legacy.view.legacy');
 
 /**
  * HTML View class for the FLEXIcontent tag screen
- *
- * @package Joomla
- * @subpackage FLEXIcontent
- * @since 1.0
  */
 class FlexicontentViewTag extends JViewLegacy
 {
+	var $proxy_option = 'com_tags';
+
 	public function display($tpl = null)
 	{
 		/**
@@ -34,20 +32,23 @@ class FlexicontentViewTag extends JViewLegacy
 		$user     = JFactory::getUser();
 		$cparams  = JComponentHelper::getParams('com_flexicontent');
 
-		// Get url vars and some constants
-		$option     = $jinput->get('option', '', 'cmd');
-		$view       = $jinput->get('view', '', 'cmd');
+		$option   = $jinput->get('option', '', 'cmd');
+		$view     = $jinput->get('view', '', 'cmd');
+		$task     = $jinput->get('task', '', 'cmd');
+
+		$isAdmin  = $app->isAdmin();
+		$isCtmpl  = $jinput->getCmd('tmpl') === 'component';
 
 		$tip_class = ' hasTooltip';
 		$manager_view = $ctrl = 'tags';
 		$js = '';
 
-		// Load Joomla 'com_tags' language files
-		JFactory::getLanguage()->load('com_tags', JPATH_ADMINISTRATOR, 'en-GB', true);
-		JFactory::getLanguage()->load('com_tags', JPATH_ADMINISTRATOR, null, true);
-
-		$isAdmin = $app->isAdmin();
-		$componentTmpl = $app->input->getCmd('tmpl') === 'component';
+		// Load Joomla language files of other extension
+		if (!empty($this->proxy_option))
+		{
+			JFactory::getLanguage()->load($this->proxy_option, JPATH_ADMINISTRATOR, 'en-GB', true);
+			JFactory::getLanguage()->load($this->proxy_option, JPATH_ADMINISTRATOR, null, true);
+		}
 
 
 		if (!$isAdmin)
@@ -118,8 +119,11 @@ class FlexicontentViewTag extends JViewLegacy
 		flexicontent_html::loadFramework('select2');
 		flexicontent_html::loadFramework('flexi-lib-form');
 
+		// Load custom behaviours: form validation, popup tooltips
+		JHtml::_('behavior.formvalidation');
+		JHtml::_('bootstrap.tooltip');
+
 		// Add js function to overload the joomla submitform validation
-		JHtml::_('behavior.formvalidation');  // load default validation JS to make sure it is overriden
 		$document->addScriptVersion(JUri::root(true).'/components/com_flexicontent/assets/js/admin.js', FLEXI_VHASH);
 		$document->addScriptVersion(JUri::root(true).'/components/com_flexicontent/assets/js/validate.js', FLEXI_VHASH);
 
@@ -165,7 +169,7 @@ class FlexicontentViewTag extends JViewLegacy
 		}
 
 		// Apply & Reload button   ***   (Apply Type, is a special case of new that has not loaded custom fieds yet, due to type not defined on initial form load)
-		if ($isAdmin && !$componentTmpl)
+		if ($isAdmin && !$isCtmpl)
 		{
 			$btn_name = 'apply';
 			$btn_task = $ctrl.'.apply';
@@ -200,7 +204,7 @@ class FlexicontentViewTag extends JViewLegacy
 
 
 		// Add a save and new button, if user can create new records
-		if (!$componentTmpl && $cancreate)
+		if (!$isCtmpl && $cancreate)
 		{
 			$btn_name = 'save2new';
 			$btn_task = $ctrl.'.save2new';
@@ -231,7 +235,7 @@ class FlexicontentViewTag extends JViewLegacy
 
 
 		// Cancel button
-		if ($isAdmin && !$componentTmpl)
+		if ($isAdmin && !$isCtmpl)
 		{
 			$isnew
 				? JToolbarHelper::cancel($ctrl.'.cancel')
@@ -321,7 +325,11 @@ class FlexicontentViewTag extends JViewLegacy
 
 		//JFilterOutput::objectHTMLSafe( $row, ENT_QUOTES, $exclude_keys = '' );
 
-		// Assign data to template
+
+		/**
+		 * Assign variables to view
+		 */
+
 		$this->row      = $row;
 		$this->form     = $form;
 

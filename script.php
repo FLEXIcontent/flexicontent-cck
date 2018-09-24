@@ -71,7 +71,7 @@ class com_flexicontentInstallerScript
 		}
 
 		// First check PHP minimum version is running
-		$PHP_VERSION_NEEDED = '5.3.10';
+		$PHP_VERSION_NEEDED = '5.4.0';
 		if (version_compare(PHP_VERSION, $PHP_VERSION_NEEDED, '<'))
 		{
 			// load english language file for 'com_flexicontent' component then override with current language file

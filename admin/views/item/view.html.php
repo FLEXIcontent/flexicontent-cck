@@ -26,10 +26,6 @@ JLoader::register('FlexicontentViewBaseRecord', JPATH_ADMINISTRATOR . '/componen
 
 /**
  * HTML View class for the Item Screen
- *
- * @package Joomla
- * @subpackage FLEXIcontent
- * @since 1.0
  */
 class FlexicontentViewItem extends FlexicontentViewBaseRecord
 {

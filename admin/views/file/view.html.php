@@ -22,10 +22,6 @@ jimport('legacy.view.legacy');
 
 /**
  * View class for the FLEXIcontent file screen
- *
- * @package Joomla
- * @subpackage FLEXIcontent
- * @since 1.0
  */
 class FlexicontentViewFile extends JViewLegacy
 {
@@ -305,11 +301,19 @@ class FlexicontentViewFile extends JViewLegacy
 			$document->addScriptDeclaration("jQuery(document).ready(function() { jQuery('#access').val(1).trigger('change'); });");
 		}
 
-		// Encode (UTF-8 charset) HTML entities form data so that they can be set as form field values
-		// NOTE: we will use JForm to output fields so this is redundant
+
+		/**
+		 * Encode (UTF-8 charset) HTML entities form data so that they can be set as form field values
+		 * NOTE: we will use JForm to output fields so this is redundant
+		 */
+
 		//JFilterOutput::objectHTMLSafe( $row, ENT_QUOTES, $exclude_keys = '' );
 
-		// Assign data to template
+
+		/**
+		 * Assign variables to view
+		 */
+
 		$this->row    = $row;
 		$this->form   = $form;
 		$this->rowdata  = $rowdata;

@@ -1,19 +1,12 @@
 <?php
 /**
- * @version 1.5 stable $Id: view.html.php 1902 2014-05-10 16:06:11Z ggppdk $ 
- * @package Joomla
- * @subpackage FLEXIcontent
- * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
- * @license GNU/GPL v2
- * 
- * FLEXIcontent is a derivative work of the excellent QuickFAQ component
- * @copyright (C) 2008 Christoph Lukes
- * see www.schlu.net for more information
+ * @package         FLEXIcontent
+ * @version         3.3
  *
- * FLEXIcontent is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
+ * @link            http://www.flexicontent.com
+ * @copyright       Copyright © 2018, FLEXIcontent team, All Rights Reserved
+ * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
 defined('_JEXEC') or die('Restricted access');
@@ -23,111 +16,147 @@ use Joomla\String\StringHelper;
 
 /**
  * View class for the FLEXIcontent search indexes screen
- *
- * @package Joomla
- * @subpackage FLEXIcontent
- * @since 1.0
  */
-class FLEXIcontentViewSearch extends JViewLegacy
+class FLEXIcontentViewSearch extends FlexicontentViewBaseRecords
 {
-	function display( $tpl = null )
-	{
-		// ***
-		// *** Initialise variables
-		// ***
+	var $proxy_option = null;
+	var $title_propname = null;
+	var $state_propname = null;
 
-		$app     = JFactory::getApplication();
-		$jinput  = $app->input;
-		
-		$layout  = $jinput->get('layout', '', 'cmd');
+	public function display($tpl = null)
+	{
+		/**
+		 * Initialise variables
+		 */
+
+		global $globalcats;
+		$app      = JFactory::getApplication();
+		$jinput   = $app->input;
+		$document = JFactory::getDocument();
+		$user     = JFactory::getUser();
+		$cparams  = JComponentHelper::getParams('com_flexicontent');
+		$session  = JFactory::getSession();
+		$db       = JFactory::getDbo();
+
+		$option   = $jinput->getCmd('option', '');
+		$view     = $jinput->getCmd('view', '');
+		$task     = $jinput->getCmd('task', '');
+		$layout   = $jinput->getString('layout', 'default');
+
 		if ($layout === 'indexer')
 		{
-			parent::display($tpl);
-			return;
+			return parent::display($tpl);
 		}
 
-		$option  = $jinput->get('option', '', 'cmd');
-		$view    = $jinput->get('view', '', 'cmd');
+		$isAdmin  = $app->isAdmin();
+		$isCtmpl  = $jinput->getCmd('tmpl') === 'component';
 
-		$cparams  = JComponentHelper::getParams( 'com_flexicontent' );
-		$user     = JFactory::getUser();
-		$db       = JFactory::getDbo();
-		$document = JFactory::getDocument();
-		
+		// Some flags & constants
+		;
+
+		// Load Joomla language files of other extension
+		if (!empty($this->proxy_option))
+		{
+			JFactory::getLanguage()->load($this->proxy_option, JPATH_ADMINISTRATOR, 'en-GB', true);
+			JFactory::getLanguage()->load($this->proxy_option, JPATH_ADMINISTRATOR, null, true);
+		}
+
 		// Get model
 		$model = $this->getModel();
 
-		$print_logging_info = $cparams->get('print_logging_info');
-		if ( $print_logging_info )  global $fc_run_times;
+		// Performance statistics
+		if ($print_logging_info = $cparams->get('print_logging_info'))
+		{
+			global $fc_run_times;
+		}
 
 
-
-		// ***
-		// *** Get filters
-		// ***
+		/**
+		 * Get filters and ordering
+		 */
 
 		$count_filters = 0;
 
-		// Various filters
-		$filter_indextype = $model->getState( 'filter_indextype' );
-		$isADV = $filter_indextype=='advanced';
+		// Order and order direction
+		$filter_order      = $model->getState('filter_order');
+		$filter_order_Dir  = $model->getState('filter_order_Dir');
 
-		$filter_fieldtype = $model->getState( 'filter_fieldtype' );
-		$filter_type      = $model->getState( 'filter_type' );
-		$filter_state     = $model->getState( 'filter_state' );
+		// Various filters
+		$filter_indextype = $model->getState('filter_indextype');
+		$isADV = $filter_indextype === 'advanced';
+
+		$filter_fieldtype = $model->getState('filter_fieldtype');
+		$filter_type      = $model->getState('filter_type');
+		$filter_state     = $model->getState('filter_state');
 
 		if ($filter_fieldtype) $count_filters++;
 		if ($filter_type) $count_filters++;
 		if ($filter_state) $count_filters++;
-		
+
 		// Text search
 		$search = $model->getState('search');
 		$search = StringHelper::trim(StringHelper::strtolower($search));
-
-		// Order and order direction
-		$filter_order     = $model->getState('filter_order');
-		$filter_order_Dir = $model->getState('filter_order_Dir');
 
 
 		$search_itemtitle	= $model->getState( 'search_itemtitle' );
 		$search_itemid		= $model->getState( 'search_itemid' );
 		$search_itemid		= !empty($search_itemid) ? (int)$search_itemid : '';
 		if ($search_itemtitle) $count_filters++; if ($search_itemid) $count_filters++;
-		
+
 		$filter_indextype	= $model->getState( 'filter_indextype' );
-		
+
 		$f_active['filter_fieldtype']	= (boolean)$filter_fieldtype;
 		$f_active['filter_type']	= (boolean)$filter_type;
 		$f_active['filter_state']	= (boolean)$filter_state;
-		
+
 		$f_active['search']			= strlen($search);
 		$f_active['search_itemtitle']	= strlen($search_itemtitle);
 		$f_active['search_itemid']		= (boolean)$search_itemid;
-		
-		
-		
-		// ***
-		// *** Add css and js to document
-		// ***
-		
-		!JFactory::getLanguage()->isRtl()
-			? $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', FLEXI_VHASH)
-			: $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', FLEXI_VHASH);
-		!JFactory::getLanguage()->isRtl()
-			? $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/j3x.css', FLEXI_VHASH)
-			: $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/j3x_rtl.css', FLEXI_VHASH);
-
-		// Add JS frameworks
-		flexicontent_html::loadFramework('select2');
 
 
-		// ***
-		// *** Create Submenu & Toolbar
-		// ***
+		/**
+		 * Add css and js to document
+		 */
+
+		if ($layout !== 'indexer')
+		{
+			// Add css to document
+			if ($isAdmin)
+			{
+				!JFactory::getLanguage()->isRtl()
+					? $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', FLEXI_VHASH)
+					: $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', FLEXI_VHASH);
+				!JFactory::getLanguage()->isRtl()
+					? $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/j3x.css', FLEXI_VHASH)
+					: $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/j3x_rtl.css', FLEXI_VHASH);
+			}
+			else
+			{
+				!JFactory::getLanguage()->isRtl()
+					? $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontent.css', FLEXI_VHASH)
+					: $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontent_rtl.css', FLEXI_VHASH);
+			}
+
+			// Add JS frameworks
+			flexicontent_html::loadFramework('select2');
+
+			// Load custom behaviours: form validation, popup tooltips
+			JHtml::_('behavior.formvalidation');
+			JHtml::_('bootstrap.tooltip');
+
+			// Add js function to overload the joomla submitform validation
+			$document->addScriptVersion(JUri::root(true).'/components/com_flexicontent/assets/js/admin.js', FLEXI_VHASH);
+			$document->addScriptVersion(JUri::root(true).'/components/com_flexicontent/assets/js/validate.js', FLEXI_VHASH);
+		}
+
+
+		/**
+		 * Create Submenu & Toolbar
+		 */
 
 		// Create Submenu (and also check access to current view)
 		FLEXIUtilities::ManagerSideMenu('CanIndex');
-		
+
 		// Create document/toolbar titles
 		$doc_title = JText::_( 'FLEXI_SEARCH_INDEX' );
 		$site_title = $document->getTitle();
@@ -141,12 +170,12 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		// Get types
 		$types			= $this->get( 'Typeslist' );
 		$fieldtypes = flexicontent_db::getFieldTypes($_grouped=false, $_usage=true, $_published=false);
-		
+
 		// Build select lists
 		$lists = array();
 
 		$js = '';
-		
+
 		//build backend visible filter
 		if ($isADV)
 		{
@@ -157,24 +186,24 @@ class FLEXIcontentViewSearch extends JViewLegacy
 			foreach ($fieldtypes as $field_type => $ftdata) {
 				$fftypes[] = JHtml::_('select.option', $field_type, '-'.$ftdata->assigned.'- '. $field_type);
 			}
-			
+
 			$lists['filter_fieldtype'] = ($filter_fieldtype || 1 ? '<div class="add-on">'.JText::_('FLEXI_FIELD_TYPE').'</div>' : '').
 				JHtml::_('select.genericlist', $fftypes, 'filter_fieldtype', 'class="use_select2_lib" size="1" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', 'value', 'text', $filter_fieldtype );
 		}
-		
+
 		//build type select list
 		$lists['filter_type'] = ($filter_type|| 1 ? '<div class="add-on">'.JText::_('FLEXI_TYPE').'</div>' : '').
 			flexicontent_html::buildtypesselect($types, 'filter_type', $filter_type, '-'/*true*/, 'class="use_select2_lib" size="1" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', 'filter_type');
-		
+
 		//publish unpublished filter
 		$ffstates = array();
 		$ffstates[] = JHtml::_('select.option',  '', '-' /*JText::_( 'FLEXI_SELECT_STATE' )*/ );
 		$ffstates[] = JHtml::_('select.option',  'P', JText::_( 'FLEXI_PUBLISHED' ) );
 		$ffstates[] = JHtml::_('select.option',  'U', JText::_( 'FLEXI_UNPUBLISHED' ) );
-		
+
 		$lists['filter_state'] = ($filter_state || 1 ? '<div class="add-on">'.JText::_('FLEXI_STATE').'</div>' : '').
 			JHtml::_('select.genericlist', $ffstates, 'filter_state', 'class="use_select2_lib" size="1" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', 'value', 'text', $filter_state );
-		
+
 		// build filter index type record listing
 		$itn['basic'] = JText::_( 'FLEXI_INDEX_BASIC' );
 		$itn['advanced'] = JText::_( 'FLEXI_INDEX_ADVANCED' );
@@ -189,16 +218,16 @@ class FLEXIcontentViewSearch extends JViewLegacy
 			$lists['filter_indextype'] .= '<input type="radio" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()" class="inputbox" size="1" '.$checked.' value="'.$i.'" id="filter_indextype'.$i.'" name="filter_indextype" />';
 			$lists['filter_indextype'] .= '<label class="" id="filter_indextype'.$i.'-lbl" for="filter_indextype'.$i.'">'.$v.'</label>';
 		}
-		
-		// table ordering
+
+		// Table ordering
 		$lists['order_Dir'] = $filter_order_Dir;
 		$lists['order'] = $filter_order;
-		
-		// search index & item title  filter
+
+		// Search index & item title filter
 		$lists['search']= $search;
 		$lists['search_itemtitle']= $search_itemtitle;
 		$lists['search_itemid']= $search_itemid;
-		
+
 		$rows   = $this->get('Data');  // MUST BE BEFORE getCount and getPagination because it also calculates total rows
 		$total  = $this->get('Count');
 		$pagination = $this->get('Pagination');
@@ -207,12 +236,12 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		if ($filter_fieldtype)
 		{
 			$js .= "jQuery('.col_fieldtype').addClass('filtered_column');";
-		}		
+		}
 
 		if ($search)
 		{
 			$js .= "jQuery('.col_search').addClass('filtered_column');";
-		}		
+		}
 
 		if ($js)
 		{
@@ -230,13 +259,13 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		$notice_ft_min_word_len	= $app->getUserStateFromRequest( $option.'.fields.notice_ft_min_word_len',	'notice_ft_min_word_len',	0, 'int' );
 		//if ( $cparams->get('show_usability_messages', 1) )     // Important usability messages
 		//{
-		
+
 		$old_add_search_prefix = $app->getUserState('add_search_prefix', null);
-		
+
 		$add_search_prefix = $cparams->get('add_search_prefix', 0);
 		$app->setUserState('add_search_prefix', $add_search_prefix);
-		
-		
+
+
 		if ($old_add_search_prefix !== null && $old_add_search_prefix != $add_search_prefix) {
 			$app->enqueueMessage('Parameter: "Searching small/common words" has changed, please recreate (just once) the search indexes, otherwise text search will not work', 'warning');
 		}
@@ -253,23 +282,36 @@ class FLEXIcontentViewSearch extends JViewLegacy
 					and then click to re-INDEX both search indexes', 'notice');
 			}
 		}
-		
-		
-		
+
+
+
 		$this->count_filters = $count_filters;
-		$this->lists = $lists;
-		$this->pagination = $pagination;
-		$this->rows = $rows;
+
+		$this->lists       = $lists;
+		$this->rows        = $rows;
+		$this->pagination  = $pagination;
 		$this->total = $total;
 		$this->limitstart = $limitstart;
 		$this->f_active = $f_active;
-		
+
+		$this->perms  = FlexicontentHelperPerm::getPerm();
 		$this->option = $option;
-		$this->view = $view;
+		$this->view   = $view;
+		$this->state  = $this->get('State');
 		$this->isADV = $isADV;
-		
+
 		$this->sidebar = FLEXI_J30GE ? JHtmlSidebar::render() : null;
+
+
+		/**
+		 * Render view's template
+		 */
+
+		if ( $print_logging_info ) { global $fc_run_times; $start_microtime = microtime(true); }
+
 		parent::display($tpl);
+
+		if ( $print_logging_info ) @$fc_run_times['template_render'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 	}
 
 
@@ -281,16 +323,16 @@ class FLEXIcontentViewSearch extends JViewLegacy
 	 */
 	function setToolbar()
 	{
-		// Get user's global permissions
-		$user  = JFactory::getUser();
-		$perms = FlexicontentHelperPerm::getPerm();
+		$user     = JFactory::getUser();
+		$document = JFactory::getDocument();
+		$toolbar  = JToolbar::getInstance('toolbar');
+		$perms    = FlexicontentHelperPerm::getPerm();
 
 		$js = '';
+
 		$contrl = "search.";
 		$contrl_singular = null;
 
-		$document = JFactory::getDocument();
-		$toolbar = JToolbar::getInstance('toolbar');
 		$loading_msg = flexicontent_html::encodeHTML(JText::_('FLEXI_LOADING') .' ... '. JText::_('FLEXI_PLEASE_WAIT'), 2);
 		$tip_class = ' hasTooltip';
 
@@ -381,7 +423,7 @@ class FLEXIcontentViewSearch extends JViewLegacy
 			$_height = ($fc_screen_height && $fc_screen_height-128 > 550 ) ? ($fc_screen_height-128 > 1000 ? 1000 : $fc_screen_height-128 ) : 550;
 			JToolbarHelper::preferences('com_flexicontent', $_height, $_width, 'Configuration');
 		}
-		
+
 		if ($js)
 		{
 			$document->addScriptDeclaration('
@@ -391,5 +433,4 @@ class FLEXIcontentViewSearch extends JViewLegacy
 			');
 		}
 	}
-
 }

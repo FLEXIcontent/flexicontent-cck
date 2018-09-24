@@ -121,7 +121,7 @@ if (empty($this->cols['usage']))  // This is 2 columns so remove 1 more
 
 
 // Calculated configuration values
-$isAdmin = $app->isAdmin();
+$isAdmin  = $app->isAdmin();
 $dbFolder = !strlen($this->target_dir) || $this->target_dir==2  ?  ''  :  ($this->target_dir==0 ? 'M' : 'S');
 $_tmpl = $isFilesElement ? 'component' : '';
 

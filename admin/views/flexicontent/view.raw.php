@@ -23,10 +23,6 @@ jimport('legacy.view.legacy');
 
 /**
  * HTML View class for the FLEXIcontent View
- *
- * @package Joomla
- * @subpackage FLEXIcontent
- * @since 1.0
  */
 class FlexicontentViewFlexicontent extends JViewLegacy
 {
@@ -47,7 +43,8 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 		$print_logging_info = $params->get('print_logging_info');
 		
 		// Special displaying when getting flexicontent version
-		$layout = $app->input->get('layout', '', 'CMD');
+		$layout = $app->input->getString('layout', '');
+
 		if ($layout=='fversion')
 		{
 			$this->fversion($tpl, $params);

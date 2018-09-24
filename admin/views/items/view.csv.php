@@ -24,10 +24,6 @@ jimport('joomla.filesystem.file');
 
 /**
  * HTML View class for the Category View
- *
- * @package Joomla
- * @subpackage FLEXIcontent
- * @since 1.0
  */
 class FlexicontentViewItems extends JViewLegacy
 {

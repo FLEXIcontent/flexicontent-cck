@@ -55,28 +55,49 @@ class FlexicontentControllerCategory extends JControllerForm
 	}
 
 
-	function add()
+	/**
+	 * Method to add a new record.
+	 *
+	 * @return  boolean  True if the record can be added, false if not.
+	 *
+	 * @since   1.6
+	 */
+	public function add()
 	{
-		parent::add();
+		return parent::add();
 	}
 
 
-	function edit($key = null, $urlVar = null)
+	/**
+	 * Method to edit an existing record.
+	 *
+	 * @param   string  $key     The name of the primary key of the URL variable.
+	 * @param   string  $urlVar  The name of the URL variable if different from the primary key
+	 *                           (sometimes required to avoid router collisions).
+	 *
+	 * @return  boolean  True if access level check and checkout passes, false otherwise.
+	 *
+	 * @since   1.6
+	 */
+	public function edit($key = null, $urlVar = null)
 	{
-		$cid = $this->input->get->get('cid', array(), 'array');
-
-		if (count($cid))
-		{
-			$this->input->post->set('cid', $cid);
-		}
-
-		parent::edit($key, $urlVar);
+		return parent::edit($key, $urlVar);
 	}
 
 
-	function save($key = null, $urlVar = null)
+	/**
+	 * Method to save a record.
+	 *
+	 * @param   string  $key     The name of the primary key of the URL variable.
+	 * @param   string  $urlVar  The name of the URL variable if different from the primary key (sometimes required to avoid router collisions).
+	 *
+	 * @return  boolean  True if successful, false otherwise.
+	 *
+	 * @since   1.6
+	 */
+	public function save($key = null, $urlVar = null)
 	{
-		parent::save();
+		$result = parent::save($key, $urlVar);
 
 		if ($this->input->get('fc_doajax_submit'))
 		{
@@ -85,12 +106,23 @@ class FlexicontentControllerCategory extends JControllerForm
 			// Ajax submit, do not rerender the view
 			jexit(flexicontent_html::get_system_messages_html());
 		}
+
+		return $result;
 	}
 
 
-	function cancel($key = null)
+	/**
+	 * Method to cancel an edit.
+	 *
+	 * @param   string  $key  The name of the primary key of the URL variable.
+	 *
+	 * @return  boolean  True if access level checks pass, false otherwise.
+	 *
+	 * @since   1.6
+	 */
+	public function cancel($key = null)
 	{
-		parent::cancel();
+		return parent::cancel($key);
 	}
 
 

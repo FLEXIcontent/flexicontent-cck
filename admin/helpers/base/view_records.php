@@ -1,34 +1,23 @@
 <?php
 /**
- * @version 1.5 stable $Id$
- * @package Joomla
- * @subpackage FLEXIcontent
- * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
- * @license GNU/GPL v2
- * 
- * FLEXIcontent is a derivative work of the excellent QuickFAQ component
- * @copyright (C) 2008 Christoph Lukes
- * see www.schlu.net for more information
+ * @package         FLEXIcontent
+ * @version         3.3
  *
- * FLEXIcontent is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
+ * @link            http://www.flexicontent.com
+ * @copyright       Copyright © 2018, FLEXIcontent team, All Rights Reserved
+ * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
-defined( '_JEXEC' ) or die( 'Restricted access' );
+defined('_JEXEC') or die('Restricted access');
 
 use Joomla\String\StringHelper;
-use Joomla\Utilities\ArrayHelper;;
+use Joomla\Utilities\ArrayHelper;
 
 jimport('legacy.view.legacy');
 
 /**
- * View class for the FLEXIcontent categories screen
- *
- * @package Joomla
- * @subpackage FLEXIcontent
- * @since 1.0
+ * HTML View class for backend managers (Base)
  */
 class FlexicontentViewBaseRecords extends JViewLegacy
 {
@@ -40,7 +29,7 @@ class FlexicontentViewBaseRecords extends JViewLegacy
 	var $inp_grp_class = FLEXI_J40GE ? 'input-group' : 'input-prepend';
 	var $select_class  = FLEXI_J40GE ? 'use_select2_lib' : 'use_select2_lib';
 	//var $txt_grp_class = FLEXI_J40GE ? 'input-group-text' : 'add-on';
-	
+
 	public function getFilterDisplay($filter)
 	{
 		$label_extra_class = isset($filter['label_extra_class']) ? $filter['label_extra_class'] : '';
@@ -76,5 +65,17 @@ class FlexicontentViewBaseRecords extends JViewLegacy
 				</div>
 			';
 		}
+	}
+
+
+	/**
+	 * Method to get the CSS for backend management listings
+	 *
+	 * @return	int
+	 *
+	 * @since	3.3.0
+	 */
+	public function addCssJs()
+	{
 	}
 }

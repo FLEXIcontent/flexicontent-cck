@@ -23,10 +23,6 @@ use Joomla\String\StringHelper;
 
 /**
  * View class for the itemelement screen
- *
- * @package Joomla
- * @subpackage FLEXIcontent
- * @since 1.0
  */
 class FlexicontentViewItemelement extends JViewLegacy
 {

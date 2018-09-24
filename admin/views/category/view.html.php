@@ -15,13 +15,11 @@ jimport('legacy.view.legacy');
 
 /**
  * HTML View class for the FLEXIcontent category screen
- *
- * @package Joomla
- * @subpackage FLEXIcontent
- * @since 1.0
  */
 class FlexicontentViewCategory extends JViewLegacy
 {
+	var $proxy_option = 'com_categories';
+
 	public function display($tpl = null)
 	{
 		/**
@@ -34,26 +32,34 @@ class FlexicontentViewCategory extends JViewLegacy
 		$document = JFactory::getDocument();
 		$user     = JFactory::getUser();
 		$cparams  = JComponentHelper::getParams('com_flexicontent');
+		$perms    = FlexicontentHelperPerm::getPerm();
+		$db       = JFactory::getDbo();
 
 		// Get url vars and some constants
 		$option     = $jinput->get('option', '', 'cmd');
 		$view       = $jinput->get('view', '', 'cmd');
+		$task       = $jinput->get('task', '', 'cmd');
 		$controller = $jinput->get('controller', '', 'cmd');
+
+		$isAdmin  = $app->isAdmin();
+		$isCtmpl  = $jinput->getCmd('tmpl') === 'component';
 
 		$tip_class = ' hasTooltip';
 		$manager_view = 'categories';
 		$ctrl = 'category';
 		$js = '';
 
-		// Load Joomla 'com_categories' language files
-		JFactory::getLanguage()->load('com_categories', JPATH_ADMINISTRATOR, 'en-GB', true);
-		JFactory::getLanguage()->load('com_categories', JPATH_ADMINISTRATOR, null, true);
+		// Load Joomla language files of other extension
+		if (!empty($this->proxy_option))
+		{
+			JFactory::getLanguage()->load($this->proxy_option, JPATH_ADMINISTRATOR, 'en-GB', true);
+			JFactory::getLanguage()->load($this->proxy_option, JPATH_ADMINISTRATOR, null, true);
+		}
 
 
-
-		// ***
-		// *** Get record data, and check if record is already checked out
-		// ***
+		/**
+		 * Get record data, and check if record is already checked out
+		 */
 
 		// Get model and load the record data
 		$model = $this->getModel();
@@ -93,9 +99,6 @@ class FlexicontentViewCategory extends JViewLegacy
 		// ***
 		// *** Global permissions checking
 		// ***
-
-		// Get global permissions
-		$perms = FlexicontentHelperPerm::getPerm();
 
 		// Check no access to categories management (Global permission)
 		if ( !$perms->CanCats )
@@ -153,20 +156,28 @@ class FlexicontentViewCategory extends JViewLegacy
 		}
 
 
-		// ***
-		// *** Include needed files and add needed js / css files
-		// ***
+		/**
+		 * Include needed files and add needed js / css files
+		 */
 
 		// Add css to document
-		!JFactory::getLanguage()->isRtl()
-			? $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', FLEXI_VHASH)
-			: $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', FLEXI_VHASH);
-		!JFactory::getLanguage()->isRtl()
-			? $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/j3x.css', FLEXI_VHASH)
-			: $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/j3x_rtl.css', FLEXI_VHASH);
+		if ($isAdmin)
+		{
+			!JFactory::getLanguage()->isRtl()
+				? $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', FLEXI_VHASH)
+				: $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', FLEXI_VHASH);
+			!JFactory::getLanguage()->isRtl()
+				? $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/j3x.css', FLEXI_VHASH)
+				: $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/j3x_rtl.css', FLEXI_VHASH);
+		}
+		else
+		{
+			!JFactory::getLanguage()->isRtl()
+				? $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontent.css', FLEXI_VHASH)
+				: $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontent_rtl.css', FLEXI_VHASH);
+		}
 
 		// Add JS frameworks
-		flexicontent_html::loadJQuery();
 		flexicontent_html::loadFramework('select2');
 		flexicontent_html::loadFramework('touch-punch');
 		flexicontent_html::loadFramework('prettyCheckable');
@@ -174,7 +185,7 @@ class FlexicontentViewCategory extends JViewLegacy
 		flexicontent_html::loadFramework('flexi-lib-form');
 
 		// Load custom behaviours: form validation, popup tooltips
-		JHtml::_('behavior.formvalidation');  // load default validation JS to make sure it is overriden
+		JHtml::_('behavior.formvalidation');
 		JHtml::_('bootstrap.tooltip');
 
 		// Add js function to overload the joomla submitform validation
@@ -182,11 +193,17 @@ class FlexicontentViewCategory extends JViewLegacy
 		$document->addScriptVersion(JUri::root(true).'/components/com_flexicontent/assets/js/validate.js', FLEXI_VHASH);
 
 
+		/**
+		 * Create the toolbar
+		 */
 
-		// ***
-		// *** Create the toolbar
-		// ***
 		$toolbar = JToolbar::getInstance('toolbar');
+
+		// Include JToolbarHelper
+		if (!$isAdmin)
+		{
+			require_once JPATH_ADMINISTRATOR . '/includes/toolbar.php';
+		}
 
 		// Creation flag used to decide if adding save and new / save as copy buttons are allowed
 		$cancreate = $cancreate_cat;
@@ -197,10 +214,9 @@ class FlexicontentViewCategory extends JViewLegacy
 			: JToolbarHelper::title( JText::_( 'FLEXI_NEW_CATEGORY' ), 'fc_categoryadd' );    // Creating new review
 
 
-
-		// ***
-		// *** Apply buttons
-		// ***
+		/**
+		 * Apply buttons
+		 */
 
 		// Apply button
 		$btn_arr = array();
@@ -218,24 +234,27 @@ class FlexicontentViewCategory extends JViewLegacy
 		}
 
 		// Apply & Reload button   ***   (Apply Type, is a special case of new that has not loaded custom fieds yet, due to type not defined on initial form load)
-		$btn_name = 'apply';
-		$btn_task = $ctrl.'.apply';
-		$btn_title = !$isnew ? 'FLEXI_APPLY_N_RELOAD' : 'FLEXI_ADD';
+		if ($isAdmin && !$isCtmpl)
+		{
+			$btn_name = 'apply';
+			$btn_task = $ctrl.'.apply';
+			$btn_title = !$isnew ? 'FLEXI_APPLY_N_RELOAD' : 'FLEXI_ADD';
 
-		//JToolbarHelper::apply($btn_task, $btn_title, false);
+			//JToolbarHelper::apply($btn_task, $btn_title, false);
 
-		$btn_arr[$btn_name] = flexicontent_html::addToolBarButton(
-			$btn_title, $btn_name, $full_js="Joomla.submitbutton('".$btn_task."')", $msg_alert='', $msg_confirm='',
-			$btn_task, $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false, $btn_class="".$tip_class, $btn_icon="icon-save",
-			'data-placement="right" title=""', $auto_add = 0);
+			$btn_arr[$btn_name] = flexicontent_html::addToolBarButton(
+				$btn_title, $btn_name, $full_js="Joomla.submitbutton('".$btn_task."')", $msg_alert='', $msg_confirm='',
+				$btn_task, $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false, $btn_class="".$tip_class, $btn_icon="icon-save",
+				'data-placement="right" title=""', $auto_add = 0);
+		}
 
 		flexicontent_html::addToolBarDropMenu($btn_arr, 'apply_btns_group');
 
 
+		/**
+		 * Save buttons
+		 */
 
-		// ***
-		// *** Save buttons
-		// ***
 		$btn_arr = array();
 
 		$btn_name = 'save';
@@ -250,7 +269,7 @@ class FlexicontentViewCategory extends JViewLegacy
 
 
 		// Add a save and new button, if user can create new records
-		if ($cancreate)
+		if (!$isCtmpl && $cancreate)
 		{
 			$btn_name = 'save2new';
 			$btn_task = $ctrl.'.save2new';
@@ -276,13 +295,17 @@ class FlexicontentViewCategory extends JViewLegacy
 					'data-placement="right" title="'.JText::_('FLEXI_SAVE_AS_COPY_INFO', true).'"', $auto_add = 0);
 			}
 		}
+
 		flexicontent_html::addToolBarDropMenu($btn_arr, 'save_btns_group');
 
 
 		// Cancel button
-		$isnew
-			? JToolbarHelper::cancel($ctrl.'.cancel')
-			: JToolbarHelper::cancel($ctrl.'.cancel', 'JTOOLBAR_CLOSE');
+		if ($isAdmin && !$isCtmpl)
+		{
+			$isnew
+				? JToolbarHelper::cancel($ctrl.'.cancel', 'FLEXI_CANCEL')
+				: JToolbarHelper::cancel($ctrl.'.cancel', 'FLEXI_CLOSE_FORM');
+		}
 
 
 		// Preview button
@@ -344,9 +367,9 @@ class FlexicontentViewCategory extends JViewLegacy
 		}
 
 
-		// ***
-		// *** Get Layouts, load language of current selected template and apply Layout parameters values into the fields
-		// ***
+		/**
+		 * Get Layouts, load language of current selected template and apply Layout parameters values into the fields
+		 */
 
 		// Load language file of currently selected template
 		$_clayout = $catparams->get('clayout');
@@ -380,7 +403,7 @@ class FlexicontentViewCategory extends JViewLegacy
 		}
 
 		//build selectlists
-		$Lists = array();
+		$lists = array();
 
 		// Build category selectors
 		$check_published = false;
@@ -388,7 +411,7 @@ class FlexicontentViewCategory extends JViewLegacy
 		$actions_allowed=array('core.create');
 
 		$fieldname = 'jform[parent_id]';
-		$Lists['parent_id'] = flexicontent_cats::buildcatselect($globalcats, $fieldname, $row->parent_id, $top=1, 'class="use_select2_lib"',
+		$lists['parent_id'] = flexicontent_cats::buildcatselect($globalcats, $fieldname, $row->parent_id, $top=1, 'class="use_select2_lib"',
 			$check_published, $check_perms, $actions_allowed, $require_all=true, $skip_subtrees=array(), $disable_subtrees=array($row->id));
 
 		$check_published = false;
@@ -396,7 +419,7 @@ class FlexicontentViewCategory extends JViewLegacy
 		$actions_allowed=array('core.edit', 'core.edit.own');
 
 		$fieldname = 'jform[copycid]';
-		$Lists['copycid']    = flexicontent_cats::buildcatselect($globalcats, $fieldname, '', $top=2, 'class="use_select2_lib"', $check_published, $check_perms, $actions_allowed, $require_all=false)
+		$lists['copycid']    = flexicontent_cats::buildcatselect($globalcats, $fieldname, '', $top=2, 'class="use_select2_lib"', $check_published, $check_perms, $actions_allowed, $require_all=false)
 			. '<span class="fc-mssg-inline fc-info fc-small">' . JText::_('FLEXI_PLEASE_USE_SAVE_OR_APPLY_N_RELOAD_BUTTONS') . '</span>';
 
 		$custom_options[''] = 'FLEXI_USE_GLOBAL';
@@ -408,7 +431,7 @@ class FlexicontentViewCategory extends JViewLegacy
 		$actions_allowed=array('core.edit', 'core.edit.own');
 
 		$fieldname = 'jform[special][inheritcid]';
-		$Lists['inheritcid'] = flexicontent_cats::buildcatselect($globalcats, $fieldname, $catparams->get('inheritcid', ''),$top=false, 'class="use_select2_lib"',
+		$lists['inheritcid'] = flexicontent_cats::buildcatselect($globalcats, $fieldname, $catparams->get('inheritcid', ''),$top=false, 'class="use_select2_lib"',
 			$check_published, $check_perms, $actions_allowed, $require_all=false, $skip_subtrees=array(), $disable_subtrees=array(), $custom_options);
 
 		// Check access level exists
@@ -420,10 +443,10 @@ class FlexicontentViewCategory extends JViewLegacy
 		}
 
 
+		/**
+		 * Add inline js to head
+		 */
 
-		// ***
-		// *** Add inline js to head
-		// ***
 		if ($js)
 		{
 			$document->addScriptDeclaration('jQuery(document).ready(function(){'
@@ -432,14 +455,22 @@ class FlexicontentViewCategory extends JViewLegacy
 		}
 
 
-		// ***
-		// *** Assign variables to view
-		// ****
+		/**
+		 * Encode (UTF-8 charset) HTML entities form data so that they can be set as form field values
+		 * NOTE: we will use JForm to output fields so this is redundant
+		 */
+
+		//JFilterOutput::objectHTMLSafe( $row, ENT_QUOTES, $exclude_keys = '' );
+
+
+		/**
+		 * Assign variables to view
+		 */
 
 		$this->document = $document;
-		$this->Lists    = $Lists;
 		$this->row      = $row;
 		$this->form     = $form;
+		$this->lists    = $lists;
 		$this->perms    = $perms;
 		$this->tmpls    = $tmpls;
 		$this->cparams  = $cparams;

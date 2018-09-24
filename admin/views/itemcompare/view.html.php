@@ -22,10 +22,6 @@ jimport('legacy.view.legacy');
 
 /**
  * View class for the FLEXIcontent item comparison screen
- *
- * @package Joomla
- * @subpackage FLEXIcontent
- * @since 1.0
  */
 class FlexicontentViewItemcompare extends JViewLegacy {
 
