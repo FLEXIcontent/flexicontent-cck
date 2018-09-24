@@ -15,13 +15,11 @@ jimport('legacy.view.legacy');
 
 /**
  * HTML View class for the FLEXIcontent user screen
- *
- * @package Joomla
- * @subpackage FLEXIcontent
- * @since 1.0
  */
 class FlexicontentViewUser extends JViewLegacy
 {
+	var $proxy_option = 'com_users';
+
 	public function display($tpl = null)
 	{
 		/**
@@ -33,18 +31,26 @@ class FlexicontentViewUser extends JViewLegacy
 		$document = JFactory::getDocument();
 		$user     = JFactory::getUser();
 		$cparams  = JComponentHelper::getParams('com_flexicontent');
+		$perms    = FlexicontentHelperPerm::getPerm();
 		$db       = JFactory::getDbo();
+		$option   = $jinput->get('option', '', 'cmd');
+		$view     = $jinput->get('view', '', 'cmd');
+		$task     = $jinput->get('task', '', 'cmd');
+		$controller = $jinput->get('controller', '', 'cmd');
 
-		// Get url vars and some constants
-		$option     = $jinput->get('option', '', 'cmd');
-		$view       = $jinput->get('view', '', 'cmd');
+		$isAdmin  = $app->isAdmin();
+		$isCtmpl  = $jinput->getCmd('tmpl') === 'component';
 
 		$tip_class = ' hasTooltip';
 		$manager_view = $ctrl = 'users';
 		$js = '';
 
-		$isAdmin = $app->isAdmin();
-		$componentTmpl = $app->input->getCmd('tmpl') === 'component';
+		// Load Joomla language files of other extension
+		if (!empty($this->proxy_option))
+		{
+			JFactory::getLanguage()->load($this->proxy_option, JPATH_ADMINISTRATOR, 'en-GB', true);
+			JFactory::getLanguage()->load($this->proxy_option, JPATH_ADMINISTRATOR, null, true);
+		}
 
 
 		if (!$isAdmin)
@@ -63,7 +69,6 @@ class FlexicontentViewUser extends JViewLegacy
 			// Frontend form layout is named 'form' instead of 'default', 'default' in frontend is typically used for viewing would be used for
 			$this->setLayout('form');
 		}
-
 
 
 		/**
@@ -113,15 +118,13 @@ class FlexicontentViewUser extends JViewLegacy
 		flexicontent_html::loadFramework('flexi-lib');
 		flexicontent_html::loadFramework('flexi-lib-form');
 
+		// Load custom behaviours: form validation, popup tooltips
+		JHtml::_('behavior.formvalidation');
+		JHtml::_('bootstrap.tooltip');
+
 		// Add js function to overload the joomla submitform validation
-		JHtml::_('behavior.formvalidation');  // load default validation JS to make sure it is overriden
 		$document->addScriptVersion(JUri::root(true).'/components/com_flexicontent/assets/js/admin.js', FLEXI_VHASH);
 		$document->addScriptVersion(JUri::root(true).'/components/com_flexicontent/assets/js/validate.js', FLEXI_VHASH);
-
-		// load language file for com_users component
-		JFactory::getLanguage()->load('com_users', JPATH_ADMINISTRATOR, 'en-GB', true);
-		JFactory::getLanguage()->load('com_users', JPATH_ADMINISTRATOR, null, true);
-
 
 
 		/**
@@ -267,12 +270,9 @@ class FlexicontentViewUser extends JViewLegacy
 		}
 
 
-		// **********************************************************************************
-		// Get Templates and apply Template Parameters values into the form fields structures
-		// **********************************************************************************
-
-		$themes		= flexicontent_tmpl::getTemplates();
-		$tmpls		= $themes->category;
+		/**
+		 * Get Layouts, load language of current selected template and apply Layout parameters values into the fields
+		 */
 
 		// Load language file of currently selected template
 		$_clayout = $params_authorcat->get('clayout');
@@ -281,8 +281,11 @@ class FlexicontentViewUser extends JViewLegacy
 			FLEXIUtilities::loadTemplateLanguageFile($_clayout);
 		}
 
-		$params_author = new JRegistry($row->params);
+		// Get the category layouts, checking template of current layout for modifications
+		$themes		= flexicontent_tmpl::getTemplates($_clayout);
+		$tmpls		= $themes->category;
 
+		// Create JForm for the layout and apply Layout parameters values into the fields
 		foreach ($tmpls as $tmpl)
 		{
 			if ($tmpl->name != $_clayout) continue;
@@ -339,8 +342,10 @@ class FlexicontentViewUser extends JViewLegacy
 
 		$this->row      = $row;
 		$this->form     = $form;
+		$this->perms    = $perms;
+
 		$this->usergroups = $usergroups;
-		$this->contact = $contact;
+		$this->contact    = $contact;
 
 		$this->cparams = $cparams;
 		$this->iparams = $cparams;
@@ -351,7 +356,7 @@ class FlexicontentViewUser extends JViewLegacy
 		$this->jform_authorbasic = $jform_authorbasic;
 		$this->jform_authorcat   = $jform_authorcat;
 
-		$this->tmpls = $tmpls;
+		$this->tmpls    = $tmpls;
 		$this->params_author = $params_author;
 
 		parent::display($tpl);

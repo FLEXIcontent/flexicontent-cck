@@ -33,7 +33,7 @@ $cparams = JComponentHelper::getParams('com_flexicontent');
 $app     = JFactory::getApplication();
 $document= JFactory::getDocument();
 $jinput  = $app->input;
-$format  = $jinput->get('format', 'html', 'cmd');
+$format  = $jinput->getCmd('format', 'html');
 
 // No PDF support in J2.5, but too late to do this here, it must be done before JDocument instatiation
 // Furthermore, user may have installed 3rd party extension to handle PDF format
@@ -287,13 +287,15 @@ if ( $cparams->get('default_menuitem_nopathway',1) )
 
 
 
-// ********************************
-// Load common js libs / frameworks
-// ********************************
+/**
+ * Load common js libs / frameworks
+ */
 
-$view   = $jinput->get('view', '', 'cmd');  // Re-get view it may have changed
-$layout = $jinput->get('layout', '', 'string');
-if ( $format == 'html' )
+// Re-get view it may have changed
+$view   = $jinput->getCmd('view', '');
+$layout = $jinput->getString('layout', '');
+
+if ($format === 'html')
 {
 	// Load mootools
 	//JHtml::_('behavior.framework', true);

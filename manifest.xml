@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<extension type="component" version="3.4.0" method="upgrade">
+<extension type="component" version="3.7.0" method="upgrade">
 	<name>FLEXIcontent</name>
 	<!-- The following elements are optional and free of formatting constraints -->
 	<creationDate>29 June 2018</creationDate>
@@ -13,7 +13,7 @@
 	<!-- The description is optional and defaults to the name -->
 	<description>COM_FLEXICONTENT_DESCRIPTION</description>
 	
-	<!-- Runs on install/uninstall/update; New in 2.5 -->
+	<!-- Runs on install/uninstall/update -->
 	<scriptfile>script.php</scriptfile>
 	
 	<install> <!-- Runs on install -->
@@ -30,7 +30,7 @@
 		</sql>
 	</uninstall>
 	
-	<update> <!-- Runs on update; New in 2.5 -->
+	<update> <!-- Runs on update -->
 		<schemas>
 		</schemas>
 	</update>

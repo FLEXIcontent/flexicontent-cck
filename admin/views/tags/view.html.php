@@ -18,17 +18,15 @@ JLoader::register('FlexicontentViewBaseRecords', JPATH_ADMINISTRATOR . '/compone
 
 /**
  * HTML View class for the tags backend manager
- *
- * @package Joomla
- * @subpackage FLEXIcontent
- * @since 1.0
  */
 class FlexicontentViewTags extends FlexicontentViewBaseRecords
 {
+	var $proxy_option   = 'com_tags';
 	var $title_propname = 'name';
 	var $state_propname = 'published';
+	var $db_tbl         = 'flexicontent_tags';
 
-	function display( $tpl = null )
+	public function display($tpl = null)
 	{
 		/**
 		 * Initialise variables
@@ -37,15 +35,29 @@ class FlexicontentViewTags extends FlexicontentViewBaseRecords
 		global $globalcats;
 		$app      = JFactory::getApplication();
 		$jinput   = $app->input;
-		$option   = $jinput->get('option', '', 'cmd');
-		$view     = $jinput->get('view', '', 'cmd');
-		$task     = $jinput->get('task', '', 'cmd');
-
-		$cparams  = JComponentHelper::getParams( 'com_flexicontent' );
-		$user     = JFactory::getUser();
-		$db       = JFactory::getDbo();
 		$document = JFactory::getDocument();
+		$user     = JFactory::getUser();
+		$cparams  = JComponentHelper::getParams('com_flexicontent');
 		$session  = JFactory::getSession();
+		$db       = JFactory::getDbo();
+
+		$option   = $jinput->getCmd('option', '');
+		$view     = $jinput->getCmd('view', '');
+		$task     = $jinput->getCmd('task', '');
+		$layout   = $jinput->getString('layout', 'default');
+
+		$isAdmin  = $app->isAdmin();
+		$isCtmpl  = $jinput->getCmd('tmpl') === 'component';
+
+		// Some flags & constants
+		;
+
+		// Load Joomla language files of other extension
+		if (!empty($this->proxy_option))
+		{
+			JFactory::getLanguage()->load($this->proxy_option, JPATH_ADMINISTRATOR, 'en-GB', true);
+			JFactory::getLanguage()->load($this->proxy_option, JPATH_ADMINISTRATOR, null, true);
+		}
 
 		// Get model
 		$model = $this->getModel();
@@ -83,20 +95,36 @@ class FlexicontentViewTags extends FlexicontentViewBaseRecords
 		 * Add css and js to document
 		 */
 
-		!JFactory::getLanguage()->isRtl()
-			? $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', FLEXI_VHASH)
-			: $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', FLEXI_VHASH);
-		!JFactory::getLanguage()->isRtl()
-			? $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/j3x.css', FLEXI_VHASH)
-			: $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/j3x_rtl.css', FLEXI_VHASH);
+		if ($layout !== 'indexer')
+		{
+			// Add css to document
+			if ($isAdmin)
+			{
+				!JFactory::getLanguage()->isRtl()
+					? $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', FLEXI_VHASH)
+					: $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', FLEXI_VHASH);
+				!JFactory::getLanguage()->isRtl()
+					? $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/j3x.css', FLEXI_VHASH)
+					: $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/j3x_rtl.css', FLEXI_VHASH);
+			}
+			else
+			{
+				!JFactory::getLanguage()->isRtl()
+					? $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontent.css', FLEXI_VHASH)
+					: $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontent_rtl.css', FLEXI_VHASH);
+			}
 
-		// Add JS frameworks
-		flexicontent_html::loadFramework('select2');
+			// Add JS frameworks
+			flexicontent_html::loadFramework('select2');
 
-		// Add js function to overload the joomla submitform validation
-		JHtml::_('behavior.formvalidation');  // load default validation JS to make sure it is overriden
-		$document->addScriptVersion(JUri::root(true).'/components/com_flexicontent/assets/js/admin.js', FLEXI_VHASH);
-		$document->addScriptVersion(JUri::root(true).'/components/com_flexicontent/assets/js/validate.js', FLEXI_VHASH);
+			// Load custom behaviours: form validation, popup tooltips
+			JHtml::_('behavior.formvalidation');
+			JHtml::_('bootstrap.tooltip');
+
+			// Add js function to overload the joomla submitform validation
+			$document->addScriptVersion(JUri::root(true).'/components/com_flexicontent/assets/js/admin.js', FLEXI_VHASH);
+			$document->addScriptVersion(JUri::root(true).'/components/com_flexicontent/assets/js/validate.js', FLEXI_VHASH);
+		}
 
 
 		/**
@@ -131,7 +159,7 @@ class FlexicontentViewTags extends FlexicontentViewBaseRecords
 
 
 		/**
-		 * Get assigned items (via separate query), that iif not already retrieved
+		 * Get assigned items (via separate query), do this is if not already retrieved
 		 * when we order by assigned items, then this is already done via main DB query
 		 */
 
@@ -172,6 +200,7 @@ class FlexicontentViewTags extends FlexicontentViewBaseRecords
 
 		$lists = array();
 
+
 		// Build publication state filter
 		$options = JHtml::_('jgrid.publishedOptions');
 		array_unshift($options, JHtml::_('select.option', '', '-'/*JText::_('JOPTION_SELECT_PUBLISHED')*/) );
@@ -195,6 +224,7 @@ class FlexicontentViewTags extends FlexicontentViewBaseRecords
 				$translate = true
 			)
 		));
+
 
 		// Build orphaned/assigned filter
 		$options 	= array();
@@ -223,7 +253,7 @@ class FlexicontentViewTags extends FlexicontentViewBaseRecords
 		));
 
 		// Text search filter value
-		$lists['search']= $search;
+		$lists['search'] = $search;
 
 
 		// Table ordering
@@ -237,12 +267,14 @@ class FlexicontentViewTags extends FlexicontentViewBaseRecords
 
 		$this->count_filters = $count_filters;
 
-		$this->lists = $lists;
-		$this->rows = $rows;
-		$this->pagination = $pagination;
+		$this->lists       = $lists;
+		$this->rows        = $rows;
+		$this->pagination  = $pagination;
 
+		$this->perms  = FlexicontentHelperPerm::getPerm();
 		$this->option = $option;
-		$this->view = $view;
+		$this->view   = $view;
+		$this->state  = $this->get('State');
 
 		$this->sidebar = FLEXI_J30GE ? JHtmlSidebar::render() : null;
 
@@ -342,7 +374,6 @@ class FlexicontentViewTags extends FlexicontentViewBaseRecords
 
 		if ($perms->CanConfig)
 		{
-			JToolbarHelper::divider(); JToolbarHelper::spacer();
 			$session = JFactory::getSession();
 			$fc_screen_width = (int) $session->get('fc_screen_width', 0, 'flexicontent');
 			$_width  = ($fc_screen_width && $fc_screen_width-84 > 940 ) ? ($fc_screen_width-84 > 1400 ? 1400 : $fc_screen_width-84 ) : 940;

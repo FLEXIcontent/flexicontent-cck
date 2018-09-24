@@ -18,13 +18,10 @@ JLoader::register('FlexicontentViewBaseRecords', JPATH_ADMINISTRATOR . '/compone
 
 /**
  * HTML View class for the items backend manager
- *
- * @package Joomla
- * @subpackage FLEXIcontent
- * @since 1.0
  */
 class FlexicontentViewItems extends FlexicontentViewBaseRecords
 {
+	var $proxy_option = 'com_content';
 	var $title_propname = 'title';
 	var $state_propname = 'state';
 
@@ -37,19 +34,30 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 		global $globalcats;
 		$app      = JFactory::getApplication();
 		$jinput   = $app->input;
-		$option   = $jinput->get('option', '', 'cmd');
-		$view     = $jinput->get('view', '', 'cmd');
-		$task     = $jinput->get('task', '', 'cmd');
+		$document = JFactory::getDocument();
+		$user     = JFactory::getUser();
+		$cparams  = JComponentHelper::getParams('com_flexicontent');
+		$session  = JFactory::getSession();
+		$db       = JFactory::getDbo();
+
+		$option   = $jinput->getCmd('option', '');
+		$view     = $jinput->getCmd('view', '');
+		$task     = $jinput->getCmd('task', '');
+		$layout   = $jinput->getString('layout', 'default');
 		$cid      = $jinput->get('cid', array(), 'array');
 
-		$cparams  = JComponentHelper::getParams( 'com_flexicontent' );
-		$user     = JFactory::getUser();
-		$db       = JFactory::getDbo();
-		$document = JFactory::getDocument();
-		$session  = JFactory::getSession();
+		$isAdmin  = $app->isAdmin();
+		$isCtmpl  = $jinput->getCmd('tmpl') === 'component';
 
-		// Some flags
+		// Some flags & constants
 		$useAssocs = flexicontent_db::useAssociations();
+
+		// Load Joomla language files of other extension
+		if (!empty($this->proxy_option))
+		{
+			JFactory::getLanguage()->load($this->proxy_option, JPATH_ADMINISTRATOR, 'en-GB', true);
+			JFactory::getLanguage()->load($this->proxy_option, JPATH_ADMINISTRATOR, null, true);
+		}
 
 		// Get model
 		$model = $this->getModel();
@@ -136,9 +144,10 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 		if ($startdate) $count_filters++;
 		if ($enddate)   $count_filters++;
 
-		// Item ID filter
+		// Record ID filter
 		$filter_id = $model->getState('filter_id');
-		if ($filter_id) $count_filters++;
+		if (strlen($filter_id)) $count_filters++;
+
 
 		// Text search
 		$scope  = $model->getState('scope');
@@ -150,25 +159,36 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 		 * Add css and js to document
 		 */
 
-		!JFactory::getLanguage()->isRtl()
-			? $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', FLEXI_VHASH)
-			: $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', FLEXI_VHASH);
-		!JFactory::getLanguage()->isRtl()
-			? $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/j3x.css', FLEXI_VHASH)
-			: $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/j3x_rtl.css', FLEXI_VHASH);
+		if ($layout !== 'indexer')
+		{
+			// Add css to document
+			if ($isAdmin)
+			{
+				!JFactory::getLanguage()->isRtl()
+					? $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', FLEXI_VHASH)
+					: $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', FLEXI_VHASH);
+				!JFactory::getLanguage()->isRtl()
+					? $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/j3x.css', FLEXI_VHASH)
+					: $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/j3x_rtl.css', FLEXI_VHASH);
+			}
+			else
+			{
+				!JFactory::getLanguage()->isRtl()
+					? $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontent.css', FLEXI_VHASH)
+					: $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontent_rtl.css', FLEXI_VHASH);
+			}
 
-		!JFactory::getLanguage()->isRtl()
-			? $document->addStyleSheetVersion(JUri::root(true).'/components/com_flexicontent/assets/css/flexi_form.css', FLEXI_VHASH)
-			: $document->addStyleSheetVersion(JUri::root(true).'/components/com_flexicontent/assets/css/flexi_form_rtl.css', FLEXI_VHASH);
+			// Add JS frameworks
+			flexicontent_html::loadFramework('select2');
 
-		// Add JS frameworks
-		flexicontent_html::loadFramework('select2');
-		JHtml::_('behavior.calendar');
+			// Load custom behaviours: form validation, popup tooltips
+			JHtml::_('behavior.formvalidation');
+			JHtml::_('bootstrap.tooltip');
 
-		// Add js function to overload the joomla submitform validation
-		JHtml::_('behavior.formvalidation');  // load default validation JS to make sure it is overriden
-		$document->addScriptVersion(JUri::root(true).'/components/com_flexicontent/assets/js/admin.js', FLEXI_VHASH);
-		$document->addScriptVersion(JUri::root(true).'/components/com_flexicontent/assets/js/validate.js', FLEXI_VHASH);
+			// Add js function to overload the joomla submitform validation
+			$document->addScriptVersion(JUri::root(true).'/components/com_flexicontent/assets/js/admin.js', FLEXI_VHASH);
+			$document->addScriptVersion(JUri::root(true).'/components/com_flexicontent/assets/js/validate.js', FLEXI_VHASH);
+		}
 
 		$js = '';
 
@@ -766,20 +786,20 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 		$this->count_filters = $count_filters;
 		$this->filter_catsinstate = $filter_catsinstate;
 
-		$this->lists = $lists;
-		$this->rows = $rows;
-		$this->itemCats = $itemCats;
-		$this->itemTags = $itemTags;
-		$this->extra_fields = $extraCols;
-		$this->custom_filts = $customFilts;
+		$this->lists       = $lists;
+		$this->rows        = $rows;
+		$this->itemCats    = $itemCats;
+		$this->itemTags    = $itemTags;
+		$this->extra_fields= $extraCols;
+		$this->custom_filts= $customFilts;
 		$this->lang_assocs = $useAssocs ? $langAssocs : null;
-		$this->langs = $langs;
-		$this->cid = $cid;
-		$this->pagination = $pagination;
+		$this->langs       = $langs;
+		$this->cid         = $cid;
+		$this->pagination  = $pagination;
+
 		$this->reOrderingActive = $reOrderingActive;
-		$this->perms = FlexicontentHelperPerm::getPerm();
-		$this->unassociated = $unassociated;
-		$this->badcatitems = $badcatitems;
+		$this->unassociated     = $unassociated;
+		$this->badcatitems      = $badcatitems;
 
 		// filters
 		$this->filter_id = $filter_id;
@@ -805,8 +825,10 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 		$this->startdate = $startdate;
 		$this->enddate = $enddate;
 
+		$this->perms  = FlexicontentHelperPerm::getPerm();
 		$this->option = $option;
-		$this->view = $view;
+		$this->view   = $view;
+		$this->state  = $this->get('State');
 
 		$this->sidebar = FLEXI_J30GE ? JHtmlSidebar::render() : null;
 
@@ -969,16 +991,16 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 	 */
 	function setToolbar()
 	{
-		// Get user's global permissions
-		$user  = JFactory::getUser();
-		$perms = FlexicontentHelperPerm::getPerm();
+		$user     = JFactory::getUser();
+		$document = JFactory::getDocument();
+		$toolbar  = JToolbar::getInstance('toolbar');
+		$perms    = FlexicontentHelperPerm::getPerm();
 
 		$js = '';
+
 		$contrl = "items.";
 		$contrl_singular = "item.";
 
-		$document = JFactory::getDocument();
-		$toolbar = JToolbar::getInstance('toolbar');
 		$loading_msg = flexicontent_html::encodeHTML(JText::_('FLEXI_LOADING') .' ... '. JText::_('FLEXI_PLEASE_WAIT'), 2);
 
 		$hasEdit    = $perms->CanEdit    || $perms->CanEditOwn;

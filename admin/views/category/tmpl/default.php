@@ -87,7 +87,7 @@ $this->document->addScriptDeclaration($js);
 								<?php echo $this->form->getLabel('parent_id'); ?>
 							</div>
 							<div class="controls">
-								<?php echo $this->Lists['parent_id']; ?>
+								<?php echo $this->lists['parent_id']; ?>
 							</div>
 						</div>
 
@@ -536,7 +536,7 @@ $this->document->addScriptDeclaration($js);
 						<div class="control-group">
 							<div class="control-label"><?php echo $field->label; ?></div>
 							<div class="controls">
-								<?php echo $this->Lists[$field->fieldname]; ?>
+								<?php echo $this->lists[$field->fieldname]; ?>
 							</div>
 						</div>
 					<?php endforeach; ?>
@@ -547,7 +547,7 @@ $this->document->addScriptDeclaration($js);
 							<?php echo $this->form->getLabel('copycid'); ?>
 						</div>
 						<div class="controls">
-							<?php echo $this->Lists['copycid']; ?>
+							<?php echo $this->lists['copycid']; ?>
 						</div>
 					</div>
 

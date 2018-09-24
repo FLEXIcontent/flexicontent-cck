@@ -18,34 +18,46 @@ JLoader::register('FlexicontentViewBaseRecords', JPATH_ADMINISTRATOR . '/compone
 
 /**
  * HTML View class for the FLEXIcontent users screen
- *
- * @package Joomla
- * @subpackage FLEXIcontent
- * @since 1.0
  */
 class FlexicontentViewUsers extends FlexicontentViewBaseRecords
 {
-	function display( $tpl = null )
-	{
-		JFactory::getLanguage()->load('com_users', JPATH_ADMINISTRATOR, 'en-GB', $force_reload = false);
-		JFactory::getLanguage()->load('com_users', JPATH_ADMINISTRATOR, null, $force_reload = false);
+	var $proxy_option   = 'com_users';
+	var $title_propname = 'username';
+	var $state_propname = 'block';
+	var $db_tbl         = 'users';
 
+	public function display($tpl = null)
+	{
 		/**
 		 * Initialise variables
 		 */
 
 		global $globalcats;
-		$app     = JFactory::getApplication();
-		$jinput  = $app->input;
-		$option  = $jinput->get('option', '', 'cmd');
-		$view    = $jinput->get('view', '', 'cmd');
-		$task    = $jinput->get('task', '', 'cmd');
-
-		$cparams  = JComponentHelper::getParams( 'com_flexicontent' );
-		$user     = JFactory::getUser();
-		$db       = JFactory::getDbo();
+		$app      = JFactory::getApplication();
+		$jinput   = $app->input;
 		$document = JFactory::getDocument();
+		$user     = JFactory::getUser();
+		$cparams  = JComponentHelper::getParams('com_flexicontent');
 		$session  = JFactory::getSession();
+		$db       = JFactory::getDbo();
+
+		$option   = $jinput->getCmd('option', '');
+		$view     = $jinput->getCmd('view', '');
+		$task     = $jinput->getCmd('task', '');
+		$layout   = $jinput->getString('layout', 'default');
+
+		$isAdmin  = $app->isAdmin();
+		$isCtmpl  = $jinput->getCmd('tmpl') === 'component';
+
+		// Some flags & constants
+		;
+
+		// Load Joomla language files of other extension
+		if (!empty($this->proxy_option))
+		{
+			JFactory::getLanguage()->load($this->proxy_option, JPATH_ADMINISTRATOR, 'en-GB', true);
+			JFactory::getLanguage()->load($this->proxy_option, JPATH_ADMINISTRATOR, null, true);
+		}
 
 		// Get model
 		$model = $this->getModel();
@@ -89,9 +101,10 @@ class FlexicontentViewUsers extends FlexicontentViewBaseRecords
 		if ($startdate) $count_filters++;
 		if ($enddate)   $count_filters++;
 
-		// Author id filter
-		$filter_id  = $model->getState('filter_id');
-		if (strlen($filter_id))  $count_filters++;
+		// Record ID filter
+		$filter_id = $model->getState('filter_id');
+		if (strlen($filter_id)) $count_filters++;
+
 
 		// Text search
 		$search = $model->getState('search');
@@ -102,23 +115,36 @@ class FlexicontentViewUsers extends FlexicontentViewBaseRecords
 		 * Add css and js to document
 		 */
 
-		!JFactory::getLanguage()->isRtl()
-			? $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', FLEXI_VHASH)
-			: $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', FLEXI_VHASH);
-		!JFactory::getLanguage()->isRtl()
-			? $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/j3x.css', FLEXI_VHASH)
-			: $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/j3x_rtl.css', FLEXI_VHASH);
+		if ($layout !== 'indexer')
+		{
+			// Add css to document
+			if ($isAdmin)
+			{
+				!JFactory::getLanguage()->isRtl()
+					? $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', FLEXI_VHASH)
+					: $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', FLEXI_VHASH);
+				!JFactory::getLanguage()->isRtl()
+					? $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/j3x.css', FLEXI_VHASH)
+					: $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/j3x_rtl.css', FLEXI_VHASH);
+			}
+			else
+			{
+				!JFactory::getLanguage()->isRtl()
+					? $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontent.css', FLEXI_VHASH)
+					: $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontent_rtl.css', FLEXI_VHASH);
+			}
 
-		// Add JS frameworks
-		flexicontent_html::loadFramework('select2');
+			// Add JS frameworks
+			flexicontent_html::loadFramework('select2');
 
-		// Add js function to overload the joomla submitform validation
-		JHtml::_('behavior.formvalidation');  // load default validation JS to make sure it is overriden
-		$document->addScriptVersion(JUri::root(true).'/components/com_flexicontent/assets/js/admin.js', FLEXI_VHASH);
-		$document->addScriptVersion(JUri::root(true).'/components/com_flexicontent/assets/js/validate.js', FLEXI_VHASH);
+			// Load custom behaviours: form validation, popup tooltips
+			JHtml::_('behavior.formvalidation');
+			JHtml::_('bootstrap.tooltip');
 
-		JHtml::_('behavior.calendar');
-
+			// Add js function to overload the joomla submitform validation
+			$document->addScriptVersion(JUri::root(true).'/components/com_flexicontent/assets/js/admin.js', FLEXI_VHASH);
+			$document->addScriptVersion(JUri::root(true).'/components/com_flexicontent/assets/js/validate.js', FLEXI_VHASH);
+		}
 
 		$js = "jQuery(document).ready(function(){";
 		if ($search)            $js .= "jQuery('.col_title').addClass('filtered_column');";
@@ -162,7 +188,9 @@ class FlexicontentViewUsers extends FlexicontentViewBaseRecords
 		 */
 
 		if ( $print_logging_info )  $start_microtime = microtime(true);
+
 		$rows = $this->get('Items');
+
 		if ( $print_logging_info ) @$fc_run_times['execute_main_query'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 
 		// Create pagination object
@@ -174,26 +202,34 @@ class FlexicontentViewUsers extends FlexicontentViewBaseRecords
 		 * Get user-To-usergoup mapping for users in current page
 		 */
 
-		$user_ids = array();
-		foreach ($rows as $row)
+		if (1)
 		{
-			$row->usergroups = array();
-			if ($row->id) $user_ids[] = $row->id;
-		}
+			$user_ids = array();
 
-		$query = 'SELECT user_id, group_id FROM #__user_usergroup_map ' . (count($user_ids) ? 'WHERE user_id IN ('.implode(',',$user_ids).')'  :  '');
-		$ugdata_arr = $db->setQuery($query)->loadObjectList();
-
-		foreach ($ugdata_arr as $ugdata)
-		{
-			$usergroups[$ugdata->user_id][] = $ugdata->group_id;
-		}
-
-		foreach ($rows as $row)
-		{
-			if ($row->id)
+			foreach ($rows as $row)
 			{
-				$row->usergroups = $usergroups[$row->id];
+				$row->usergroups = array();
+
+				if ($row->id)
+				{
+					$user_ids[] = $row->id;
+				}
+			}
+
+			$query = 'SELECT user_id, group_id FROM #__user_usergroup_map ' . (count($user_ids) ? 'WHERE user_id IN ('.implode(',',$user_ids).')'  :  '');
+			$ugdata_arr = $db->setQuery($query)->loadObjectList();
+
+			foreach ($ugdata_arr as $ugdata)
+			{
+				$usergroups[$ugdata->user_id][] = $ugdata->group_id;
+			}
+
+			foreach ($rows as $row)
+			{
+				if ($row->id)
+				{
+					$row->usergroups = $usergroups[$row->id];
+				}
 			}
 		}
 
@@ -274,7 +310,7 @@ class FlexicontentViewUsers extends FlexicontentViewBaseRecords
 
 
 		// Text search filter value
-		$lists['search']= $search;
+		$lists['search'] = $search;
 
 		// Search id
 		$lists['filter_id'] = $filter_id;
@@ -301,10 +337,10 @@ class FlexicontentViewUsers extends FlexicontentViewBaseRecords
 
 		$this->count_filters = $count_filters;
 
-		$this->lists = $lists;
-		$this->rows = $rows;
-		$this->pagination = $pagination;
-		$this->usergroups = $usergroups;
+		$this->lists       = $lists;
+		$this->rows        = $rows;
+		$this->pagination  = $pagination;
+		$this->usergroups  = $usergroups;
 
 		// filters
 		$this->filter_id = $filter_id;
@@ -319,8 +355,10 @@ class FlexicontentViewUsers extends FlexicontentViewBaseRecords
 		$this->startdate = $startdate;
 		$this->enddate = $enddate;
 
+		$this->perms  = FlexicontentHelperPerm::getPerm();
 		$this->option = $option;
-		$this->view = $view;
+		$this->view   = $view;
+		$this->state  = $this->get('State');
 
 		$this->sidebar = FLEXI_J30GE ? JHtmlSidebar::render() : null;
 

@@ -18,15 +18,13 @@ JLoader::register('FlexicontentViewBaseRecords', JPATH_ADMINISTRATOR . '/compone
 
 /**
  * HTML View class for the categories backend manager
- *
- * @package Joomla
- * @subpackage FLEXIcontent
- * @since 1.0
  */
 class FlexicontentViewCategories extends FlexicontentViewBaseRecords
 {
+	var $proxy_option   = 'com_categories';
 	var $title_propname = 'title';
 	var $state_propname = 'published';
+	var $db_tbl         = 'categories';
 
 	public function display($tpl = null)
 	{
@@ -37,17 +35,29 @@ class FlexicontentViewCategories extends FlexicontentViewBaseRecords
 		global $globalcats;
 		$app      = JFactory::getApplication();
 		$jinput   = $app->input;
-		$option   = $jinput->get('option', '', 'cmd');
-		$view     = $jinput->get('view', '', 'cmd');
-		$task     = $jinput->get('task', '', 'cmd');
-
-		$cparams  = JComponentHelper::getParams( 'com_flexicontent' );
-		$user     = JFactory::getUser();
-		$db       = JFactory::getDbo();
 		$document = JFactory::getDocument();
+		$user     = JFactory::getUser();
+		$cparams  = JComponentHelper::getParams('com_flexicontent');
 		$session  = JFactory::getSession();
+		$db       = JFactory::getDbo();
 
+		$option   = $jinput->getCmd('option', '');
+		$view     = $jinput->getCmd('view', '');
+		$task     = $jinput->getCmd('task', '');
+		$layout   = $jinput->getString('layout', 'default');
+
+		$isAdmin  = $app->isAdmin();
+		$isCtmpl  = $jinput->getCmd('tmpl') === 'component';
+
+		// Some flags & constants
 		$order_property = 'a.lft';
+
+		// Load Joomla language files of other extension
+		if (!empty($this->proxy_option))
+		{
+			JFactory::getLanguage()->load($this->proxy_option, JPATH_ADMINISTRATOR, 'en-GB', true);
+			JFactory::getLanguage()->load($this->proxy_option, JPATH_ADMINISTRATOR, null, true);
+		}
 
 		// Get model
 		$model = $this->getModel();
@@ -82,9 +92,9 @@ class FlexicontentViewCategories extends FlexicontentViewBaseRecords
 		if ($filter_access) $count_filters++;
 		if ($filter_language) $count_filters++;
 
-		// Item ID filter
+		// Record ID filter
 		$filter_id = $model->getState('filter_id');
-		if ($filter_id) $count_filters++;
+		if (strlen($filter_id)) $count_filters++;
 
 
 		// Text search
@@ -96,20 +106,36 @@ class FlexicontentViewCategories extends FlexicontentViewBaseRecords
 		 * Add css and js to document
 		 */
 
-		!JFactory::getLanguage()->isRtl()
-			? $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', FLEXI_VHASH)
-			: $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', FLEXI_VHASH);
-		!JFactory::getLanguage()->isRtl()
-			? $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/j3x.css', FLEXI_VHASH)
-			: $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/j3x_rtl.css', FLEXI_VHASH);
+		if ($layout !== 'indexer')
+		{
+			// Add css to document
+			if ($isAdmin)
+			{
+				!JFactory::getLanguage()->isRtl()
+					? $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', FLEXI_VHASH)
+					: $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', FLEXI_VHASH);
+				!JFactory::getLanguage()->isRtl()
+					? $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/j3x.css', FLEXI_VHASH)
+					: $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/j3x_rtl.css', FLEXI_VHASH);
+			}
+			else
+			{
+				!JFactory::getLanguage()->isRtl()
+					? $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontent.css', FLEXI_VHASH)
+					: $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontent_rtl.css', FLEXI_VHASH);
+			}
 
-		// Add JS frameworks
-		flexicontent_html::loadFramework('select2');
+			// Add JS frameworks
+			flexicontent_html::loadFramework('select2');
 
-		// Add js function to overload the joomla submitform validation
-		JHtml::_('behavior.formvalidation');  // load default validation JS to make sure it is overriden
-		$document->addScriptVersion(JUri::root(true).'/components/com_flexicontent/assets/js/admin.js', FLEXI_VHASH);
-		$document->addScriptVersion(JUri::root(true).'/components/com_flexicontent/assets/js/validate.js', FLEXI_VHASH);
+			// Load custom behaviours: form validation, popup tooltips
+			JHtml::_('behavior.formvalidation');
+			JHtml::_('bootstrap.tooltip');
+
+			// Add js function to overload the joomla submitform validation
+			$document->addScriptVersion(JUri::root(true).'/components/com_flexicontent/assets/js/admin.js', FLEXI_VHASH);
+			$document->addScriptVersion(JUri::root(true).'/components/com_flexicontent/assets/js/validate.js', FLEXI_VHASH);
+		}
 
 
 		/**
@@ -134,26 +160,38 @@ class FlexicontentViewCategories extends FlexicontentViewBaseRecords
 		 */
 
 		if ( $print_logging_info )  $start_microtime = microtime(true);
+
 		$rows = $this->get('Items');
+
 		if ( $print_logging_info ) @$fc_run_times['execute_main_query'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 
-		// Get assigned items
-		$rowids = array();
+		// Create pagination object
+		$pagination = $this->get('Pagination');
 
-		foreach ($rows as $row)
+
+		/**
+		 * Get assigned items (via separate query), do this is if not already retrieved
+		 */
+
+		if (1)
 		{
-			$rowids[] = $row->id;
-		}
+			$rowids = array();
 
-		if ( $print_logging_info )  $start_microtime = microtime(true);
-		//$rowtotals = $model->getAssignedItems($rowids);
-		$byStateTotals = $model->countItemsByState($rowids);
-		if ( $print_logging_info ) @$fc_run_times['execute_sec_queries'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+			foreach ($rows as $row)
+			{
+				$rowids[] = $row->id;
+			}
 
-		foreach ($rows as $row)
-		{
-			//$row->nrassigned = isset($rowtotals[$row->id]) ? $rowtotals[$row->id]->nrassigned : 0;
-			$row->byStateTotals = isset($byStateTotals[$row->id]) ? $byStateTotals[$row->id] : array();
+			if ( $print_logging_info )  $start_microtime = microtime(true);
+			//$rowtotals = $model->getAssignedItems($rowids);
+			$byStateTotals = $model->countItemsByState($rowids);
+			if ( $print_logging_info ) @$fc_run_times['execute_sec_queries'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+
+			foreach ($rows as $row)
+			{
+				//$row->nrassigned = isset($rowtotals[$row->id]) ? $rowtotals[$row->id]->nrassigned : 0;
+				$row->byStateTotals = isset($byStateTotals[$row->id]) ? $byStateTotals[$row->id] : array();
+			}
 		}
 
 		// Parse configuration for every category
@@ -162,17 +200,11 @@ class FlexicontentViewCategories extends FlexicontentViewBaseRecords
 			$cat->config = new JRegistry($cat->config);
 		}
 
-		$this->state = $this->get('State');
-
 		// Preprocess the list of items to find ordering divisions.
-		foreach ($rows as &$item)
+		foreach ($rows as $item)
 		{
 			$this->ordering[$item->parent_id][] = $item->id;
 		}
-		unset($item);  // unset the variable reference to avoid trouble if variable is reused, thus overwritting last pointed variable
-
-		// Create pagination object
-		$pagination = $this->get('Pagination');
 
 
 		/**
@@ -252,7 +284,7 @@ class FlexicontentViewCategories extends FlexicontentViewBaseRecords
 		$fieldname = 'filter_state';
 		$elementid = 'filter_state';
 
-		$lists['filter_state'] = $this->getFilterDisplay(array(
+		$lists[$elementid] = $this->getFilterDisplay(array(
 			'label' => JText::_('FLEXI_STATE'),
 			'html' => JHtml::_('select.genericlist',
 				$options,
@@ -277,7 +309,7 @@ class FlexicontentViewCategories extends FlexicontentViewBaseRecords
 		$fieldname = 'filter_access';
 		$elementid = 'filter_access';
 
-		$lists['filter_access'] = $this->getFilterDisplay(array(
+		$lists[$elementid] = $this->getFilterDisplay(array(
 			'label' => JText::_('FLEXI_ACCESS'),
 			'html' => JHtml::_('select.genericlist',
 				$options,
@@ -318,14 +350,16 @@ class FlexicontentViewCategories extends FlexicontentViewBaseRecords
 
 
 		// Text search filter value
-		$lists['search']= $search;
+		$lists['search'] = $search;
 
 
 		// Table ordering
 		$lists['order_Dir'] = $filter_order_Dir;
 		$lists['order'] = $filter_order;
 
-		$orderingx = ($lists['order'] == $order_property && strtolower($lists['order_Dir']) == 'asc') ? $order_property : '';
+		$orderingx = $lists['order'] == $order_property && strtolower($lists['order_Dir']) == 'asc'
+			? $order_property
+			: '';
 
 
 		/**
@@ -334,16 +368,15 @@ class FlexicontentViewCategories extends FlexicontentViewBaseRecords
 
 		$this->count_filters = $count_filters;
 
-		$this->lists = $lists;
-		$this->rows = $rows;
-		$this->pagination = $pagination;
+		$this->lists       = $lists;
+		$this->rows        = $rows;
+		$this->pagination  = $pagination;
+		$this->orderingx   = $orderingx;
 
-		$this->perms = FlexicontentHelperPerm::getPerm();
-		$this->orderingx = $orderingx;
-		$this->user = $user;
-
+		$this->perms  = FlexicontentHelperPerm::getPerm();
 		$this->option = $option;
-		$this->view = $view;
+		$this->view   = $view;
+		$this->state  = $this->get('State');
 
 		$this->sidebar = FLEXI_J30GE ? JHtmlSidebar::render() : null;
 
@@ -513,8 +546,8 @@ class FlexicontentViewCategories extends FlexicontentViewBaseRecords
 		{
 			$btn_icon = 'icon-download';
 			$btn_name = 'download';
-			$btn_task    = 'appsman.exportxml';
-			$extra_js    = " var f=document.getElementById('adminForm'); f.elements['view'].value='appsman'; jQuery('<input>').attr({type: 'hidden', name: 'table', value: 'categories'}).appendTo(jQuery(f));";
+			$btn_task = 'appsman.exportxml';
+			$extra_js = " var f=document.getElementById('adminForm'); f.elements['view'].value='appsman'; jQuery('<input>').attr({type: 'hidden', name: 'table', value: '" . $this->db_tbl . "'}).appendTo(jQuery(f));";
 			flexicontent_html::addToolBarButton(
 				'Export now',
 				$btn_name, $full_js='', $msg_alert='', $msg_confirm=JText::_('FLEXI_EXPORT_NOW_AS_XML'),
@@ -522,8 +555,8 @@ class FlexicontentViewCategories extends FlexicontentViewBaseRecords
 
 			$btn_icon = 'icon-box-add';
 			$btn_name = 'box-add';
-			$btn_task    = 'appsman.addtoexport';
-			$extra_js    = " var f=document.getElementById('adminForm'); f.elements['view'].value='appsman'; jQuery('<input>').attr({type: 'hidden', name: 'table', value: 'categories'}).appendTo(jQuery(f));";
+			$btn_task = 'appsman.addtoexport';
+			$extra_js = " var f=document.getElementById('adminForm'); f.elements['view'].value='appsman'; jQuery('<input>').attr({type: 'hidden', name: 'table', value: '" . $this->db_tbl . "'}).appendTo(jQuery(f));";
 			flexicontent_html::addToolBarButton(
 				'Add to export',
 				$btn_name, $full_js='', $msg_alert='', $msg_confirm=JText::_('FLEXI_ADD_TO_EXPORT_LIST'),
