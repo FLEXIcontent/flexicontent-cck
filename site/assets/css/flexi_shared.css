@@ -341,7 +341,7 @@ div.sorter-full-width > ul.fcrecords > li.fcrecord .addfield_handle,
 div.sorter-full-width > ul.fcrecords > li.fcrecord .delfield_handle {
 	float: none;
 }
-table.adminlist {
+table.fcmanlist {
 	position: relative !important;
 	background: transparent !important;
 	border-spacing: 0px !important;

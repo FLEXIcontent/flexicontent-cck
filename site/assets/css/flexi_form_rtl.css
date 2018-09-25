@@ -679,3 +679,6 @@ body .nowrap_hidden {
 	border-left: 1px solid transparent !important;
 	border-right: 1px solid transparent !important;
 }
+body .fcsubform-compact div.container_fcfield div.row-fluid {
+	width: 300px;
+}

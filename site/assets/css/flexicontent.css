@@ -679,6 +679,9 @@ body .nowrap_hidden {
 	border-left: 1px solid transparent !important;
 	border-right: 1px solid transparent !important;
 }
+body .fcsubform-compact div.container_fcfield div.row-fluid {
+	width: 300px;
+}
 body .fc-close {
 	color: #000000;
 	float: right;
@@ -1611,7 +1614,7 @@ div.sorter-full-width > ul.fcrecords > li.fcrecord .addfield_handle,
 div.sorter-full-width > ul.fcrecords > li.fcrecord .delfield_handle {
 	float: none;
 }
-table.adminlist {
+table.fcmanlist {
 	position: relative !important;
 	background: transparent !important;
 	border-spacing: 0px !important;
