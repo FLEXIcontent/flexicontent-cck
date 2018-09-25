@@ -20,7 +20,7 @@
 	
 	<fields name="attribs">
 		
-		<fieldset name="group-fcloadmodule-config" repeat="1" icon_class="icon-cog" label="Configuration" addfieldpath="/administrator/components/com_flexicontent/elements">
+		<fieldset name="group-fcloadmodule-config" hidden="true" icon_class="icon-cog" label="Configuration" addfieldpath="/administrator/components/com_flexicontent/elements">
 			<field name="module_method" type="multilist" subtype="radio" default="1" label="FLEXI_FIELD_MODULE_METHOD" description="FLEXI_FIELD_MODULE_METHOD_DESC" toggle_related="1" class="btn-group btn-group-yesno">
 				<option value="1" show_list="module-mode" hide_list="position-mode">FLEXI_FIELD_MODULE_UNIQUE</option>
 				<option value="2" show_list="position-mode" hide_list="module-mode">FLEXI_FIELD_MODULE_POSITION</option>
@@ -32,7 +32,7 @@
 		</fieldset>
 
 
-		<fieldset name="group-fcloadmodule-viewing" repeat="1" icon_class="icon-eye" label="FLEXI_FIELD_VIEWING" addfieldpath="/administrator/components/com_flexicontent/elements">
+		<fieldset name="group-fcloadmodule-viewing" hidden="true" icon_class="icon-eye" label="FLEXI_FIELD_VIEWING" addfieldpath="/administrator/components/com_flexicontent/elements">
 			<field name="" type="separator" default="FLEXI_FIELD_LABEL_AND_ACCESS" level="level1" />
 			<field name="display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>

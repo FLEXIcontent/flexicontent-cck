@@ -19,10 +19,10 @@
 	<config>
 	<fields name="attribs">
 
-		<!--fieldset name="standard" repeat="1">
+		<!--fieldset name="standard" hidden="true">
 		</fieldset-->
 
-		<fieldset name="group-sharedmedia-editing" repeat="1" icon_class="icon-pencil" label="FLEXI_FIELD_EDITING" addfieldpath="/administrator/components/com_flexicontent/elements">
+		<fieldset name="group-sharedmedia-editing" hidden="true" icon_class="icon-pencil" label="FLEXI_FIELD_EDITING" addfieldpath="/administrator/components/com_flexicontent/elements">
 
 			<field name="" type="separator" default="FLEXI_FIELD_VALUES" level="level1" />
 
@@ -90,7 +90,7 @@
 
 		</fieldset>
 
-		<fieldset name="group-sharedmedia-viewing" repeat="1" icon_class="icon-screen" label="FLEXI_FIELD_VIEWING" addfieldpath="/administrator/components/com_flexicontent/elements">
+		<fieldset name="group-sharedmedia-viewing" hidden="true" icon_class="icon-screen" label="FLEXI_FIELD_VIEWING" addfieldpath="/administrator/components/com_flexicontent/elements">
 
 			<field name="" type="separator" default="FLEXI_FIELD_LABEL_AND_ACCESS" level="level1" />
 
@@ -144,7 +144,7 @@
 			<field name="closetag" type="text" default="" filter="raw" label="FLEXI_FIELD_CLOSING_TEXT" description="FLEXI_FIELD_CLOSING_TEXT_DESC" />
 
 		</fieldset>
-		<fieldset name="group-sharedmedia-v-playback" repeat="1" icon_class="icon-music" label_prefix="FLEXI_FIELD_VIEWING" label="Playback" addfieldpath="/administrator/components/com_flexicontent/elements">
+		<fieldset name="group-sharedmedia-v-playback" hidden="true" icon_class="icon-music" label_prefix="FLEXI_FIELD_VIEWING" label="Playback" addfieldpath="/administrator/components/com_flexicontent/elements">
 
 			<field name="" type="separator" default="Media" level="level1" />
 			<field name="" type="separator" default="Media Info" level="level2" />
@@ -185,7 +185,7 @@
 
 		</fieldset>
 
-		<fieldset name="group-sharedmedia-apis" repeat="1" icon_class="icon-cog" label="APIs (keys, etc)" addfieldpath="/administrator/components/com_flexicontent/elements">
+		<fieldset name="group-sharedmedia-apis" hidden="true" icon_class="icon-cog" label="APIs (keys, etc)" addfieldpath="/administrator/components/com_flexicontent/elements">
 
 			<field name="" type="separator" default="PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_EMBED_METHOD_DESC" level="level4" class="alert alert-info fcpadded"/>
 			<field name="use_native_apis" type="multilist" subtype="radio" toggle_related="1" default="0" label="Embed with" description="Disable to also use native APIs" class="btn-group group-fcmethod">

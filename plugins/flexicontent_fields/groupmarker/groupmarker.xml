@@ -19,10 +19,10 @@
 
 	<fields name="attribs">
 
-		<!--fieldset name="standard" repeat="1">
+		<!--fieldset name="standard" hidden="true">
 		</fieldset-->
 
-		<fieldset name="group-groupmarker-editing" repeat="1" icon_class="icon-pencil" label="FLEXI_FIELD_EDITING" addfieldpath="/administrator/components/com_flexicontent/elements">
+		<fieldset name="group-groupmarker-editing" hidden="true" icon_class="icon-pencil" label="FLEXI_FIELD_EDITING" addfieldpath="/administrator/components/com_flexicontent/elements">
 
 			<field name="marker_type" type="multilist" default="fieldset_open" label="FLEXI_MARKER" description="FLEXI_MARKER_DESC" toggle_related="1">
 				<group label="FLEXI_TABS">
