@@ -20,10 +20,10 @@
 	<config>
 	<fields name="attribs">
 
-		<!--fieldset name="standard" repeat="1">
+		<!--fieldset name="standard" hidden="true">
 		</fieldset-->
 
-		<fieldset name="group-toolbar-viewing" repeat="1" icon_class="icon-screen" label="FLEXI_FIELD_VIEWING" addfieldpath="/administrator/components/com_flexicontent/elements">
+		<fieldset name="group-toolbar-viewing" hidden="true" icon_class="icon-screen" label="FLEXI_FIELD_VIEWING" addfieldpath="/administrator/components/com_flexicontent/elements">
 
 			<field name="" type="separator" default="FLEXI_FIELD_LABEL_AND_ACCESS" level="level1" />
 
@@ -87,7 +87,7 @@
 			<field name="target" type="text" default="flexicontent" label="FLEXI_FIELD_TOOLBAR_TARGET" depend_class="hiddefield-mode2" description="FLEXI_FIELD_TOOLBAR_TARGET_DESC" />
 
 		</fieldset>
-		<fieldset name="group-toolbar-social" repeat="1" icon_class="icon-users" label="FLEXI_SOCIAL" addfieldpath="/administrator/components/com_flexicontent/elements">
+		<fieldset name="group-toolbar-social" hidden="true" icon_class="icon-users" label="FLEXI_SOCIAL" addfieldpath="/administrator/components/com_flexicontent/elements">
 
 			<field name="" type="separator" default="FLEXI_FIELD_TOOLBAR_SOCIAL_BUTTONS" description="FLEXI_FIELD_TOOLBAR_SOCIAL_BUTTONS_DESC" level="level1" />
 
@@ -157,7 +157,7 @@
 			</field-->
 
 		</fieldset>
-		<fieldset name="group-toolbar-addthis-item" repeat="1" icon_class="icon-folder-3" label="Social - Item View" addfieldpath="/administrator/components/com_flexicontent/elements">
+		<fieldset name="group-toolbar-addthis-item" hidden="true" icon_class="icon-folder-3" label="Social - Item View" addfieldpath="/administrator/components/com_flexicontent/elements">
 
 			<field name="" type="separator" default="FLEXI_FIELD_TOOLBAR_SOCIAL_BUTTONS" description="FLEXI_FIELD_TOOLBAR_SOCIAL_BUTTONS_DESC" level="level1" />
 			<field name="display_social" type="multilist" subtype="radio" default="1" label="FLEXI_FIELD_TOOLBAR_SHOW_ADDTHIS" toggle_related="1" description="FLEXI_FIELD_TOOLBAR_SHOW_ADDTHIS_DESC" class="btn-group btn-group-yesno">
@@ -212,7 +212,7 @@
 			</field>
 
 		</fieldset>
-		<fieldset name="group-toolbar-addthis-cat" repeat="1" icon_class="icon-stack" label="Social - Category view" addfieldpath="/administrator/components/com_flexicontent/elements">
+		<fieldset name="group-toolbar-addthis-cat" hidden="true" icon_class="icon-stack" label="Social - Category view" addfieldpath="/administrator/components/com_flexicontent/elements">
 
 			<field name="" type="separator" default="FLEXI_FIELD_TOOLBAR_SOCIAL_BUTTONS" description="FLEXI_FIELD_TOOLBAR_SOCIAL_BUTTONS_DESC" level="level1" />
 			<field name="display_social_cat" type="multilist" subtype="radio" default="0" label="FLEXI_FIELD_TOOLBAR_SHOW_ADDTHIS" toggle_related="1" description="FLEXI_FIELD_TOOLBAR_SHOW_ADDTHIS_DESC" class="btn-group btn-group-yesno">

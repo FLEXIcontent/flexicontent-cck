@@ -18,10 +18,10 @@
 	<config>
 	<fields name="attribs">
 		
-		<!--fieldset name="standard" repeat="1">
+		<!--fieldset name="standard" hidden="true">
 		</fieldset-->
 		
-		<fieldset name="group-jprofile-viewing" repeat="1" icon_class="icon-screen" label="FLEXI_FIELD_VIEWING" addfieldpath="/administrator/components/com_flexicontent/elements">
+		<fieldset name="group-jprofile-viewing" hidden="true" icon_class="icon-screen" label="FLEXI_FIELD_VIEWING" addfieldpath="/administrator/components/com_flexicontent/elements">
 			
 			<field name="" type="separator" default="FLEXI_FIELD_LABEL_AND_ACCESS" level="level1" />
 			

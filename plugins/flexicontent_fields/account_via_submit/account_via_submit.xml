@@ -30,10 +30,10 @@
 	<config>
 	<fields name="attribs">
 		
-		<!--fieldset name="standard" repeat="1">
+		<!--fieldset name="standard" hidden="true">
 		</fieldset-->
 		
-		<fieldset name="group-account_via_submit-editing" repeat="1" icon_class="icon-pencil" label="FLEXI_FIELD_EDITING" addfieldpath="/administrator/components/com_flexicontent/elements">
+		<fieldset name="group-account_via_submit-editing" hidden="true" icon_class="icon-pencil" label="FLEXI_FIELD_EDITING" addfieldpath="/administrator/components/com_flexicontent/elements">
 			
 			<field name="" type="separator" default="FLEXI_FIELD_VALUES" level="level1" />
 			
@@ -81,7 +81,7 @@
 			</field>
 			
 		</fieldset>
-		<fieldset name="group-account_via_submit-accountman" repeat="1" icon_class="icon-user" label="User creation / Edit coupons" description="... create new users, and/or allow them to edit items as guests" addfieldpath="/administrator/components/com_flexicontent/elements">
+		<fieldset name="group-account_via_submit-accountman" hidden="true" icon_class="icon-user" label="User creation / Edit coupons" description="... create new users, and/or allow them to edit items as guests" addfieldpath="/administrator/components/com_flexicontent/elements">
 
 			<field name="handle_existing_email" type="radio" default="0" label="Email exists" description="" class="btn-group btn-group-yesno">
 				<option value="0">Cancel item creation</option>
