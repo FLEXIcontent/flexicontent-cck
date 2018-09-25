@@ -144,6 +144,12 @@ function delAllFilters()
 
 	<div id="fc-managers-header">
 
+		<?php if (!empty($this->lists['scope_tip'])) : ?>
+		<div class="fc-filter-head-box filter-search nowrap_box" style="margin: 0;">
+			<?php echo $this->lists['scope_tip']; ?>
+		</div>
+		<?php endif; ?>
+
 		<div class="fc-filter-head-box filter-search nowrap_box">
 			<div class="btn-group <?php echo $this->ina_grp_class; ?>">
 				<?php
@@ -158,13 +164,14 @@ function delAllFilters()
 				</div>
 
 				<div id="fc-filters-box" <?php if (!$this->count_filters || !$tools_cookies['fc-filters-box-disp']) echo 'style="display:none;"'; ?> class="fcman-abs" onclick="var event = arguments[0] || window.event; event.stopPropagation();">
-
-					<?php echo $this->lists['filter_cats']; ?>
-					<?php echo $this->lists['filter_level']; ?>
-					<?php echo $this->lists['filter_state']; ?>
-					<?php echo $this->lists['filter_access']; ?>
-					<?php echo $this->lists['filter_language']; ?>
-					<?php echo $this->lists['filter_id']; ?>
+					<?php
+					echo $this->lists['filter_cats'];
+					echo $this->lists['filter_level'];
+					echo $this->lists['filter_state'];
+					echo $this->lists['filter_access'];
+					echo $this->lists['filter_language'];
+					echo $this->lists['filter_id'];
+					?>
 
 					<div id="fc-filters-slide-btn" class="icon-arrow-up-2 btn btn-outline-secondary" title="<?php echo JText::_('FLEXI_HIDE'); ?>" style="cursor: pointer;" onclick="fc_toggle_box_via_btn('fc-filters-box', document.getElementById('fc_filters_box_btn'), 'btn-primary');"></div>
 					<input type="hidden" id="fc-filters-box-disp" name="fc-filters-box-disp" value="<?php echo $tools_cookies['fc-filters-box-disp']; ?>" />
@@ -444,7 +451,7 @@ function delAllFilters()
 				 * Display title with edit link ... (row editable and not checked out)
 				 * Display title with no edit link ... if row is not-editable for any reason (no ACL or checked-out by other user)
 				 */
-				echo JHtml::_($hlpname . '.edit_link', $row, $i, 'category', $row->canEdit);
+				echo JHtml::_($hlpname . '.edit_link', $row, $i, $row->canEdit, array('ctrl' => 'category'));
 				?>
 
 				<?php	if (!empty($row->note)) : ?>

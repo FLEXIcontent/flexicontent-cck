@@ -2621,5 +2621,4 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 			if ($debug_initial_perms) JFactory::getApplication()->enqueueMessage( 'No update needed for component asset with extra rules', 'notice' );
 		}
 	}
->>>>>>> d1d17b246... [WIP] New revised MVC with base classes and traits
 }

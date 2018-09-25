@@ -198,13 +198,13 @@ class FlexicontentModelTemplate extends FCModelAdmin
 	function save($data)
 	{
 		// Store field positions
-		$this->storeFieldPositions($this->folder, $this->cfgname, $this->type, $this->_config['positions'], $data);
+		$this->storeFieldPositions($this->_folder, $this->_cfgname, $this->_type, $this->_config['positions'], $data);
 
 		// Store Layout configurations (template parameters)
-		$this->storeLayoutConf($this->folder, $this->cfgname, $this->type, $this->_config['attribs']);
+		$this->storeLayoutConf($this->_folder, $this->_cfgname, $this->_type, $this->_config['attribs']);
 
 		// Store LESS configuration (less variables)
-		$this->storeLessConf($this->folder, $this->cfgname, $this->type, $this->_config['attribs']);
+		$this->storeLessConf($this->_folder, $this->_cfgname, $this->_type, $this->_config['attribs']);
 
 		return true;
 	}

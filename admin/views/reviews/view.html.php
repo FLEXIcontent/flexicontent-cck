@@ -236,7 +236,7 @@ class FlexicontentViewReviews extends FlexicontentViewBaseRecords
 
 		// Table ordering
 		$lists['order_Dir'] = $filter_order_Dir;
-		$lists['order'] = $filter_order;
+		$lists['order']     = $filter_order;
 
 
 		/**

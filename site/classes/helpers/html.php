@@ -4266,6 +4266,18 @@ class flexicontent_html
 		// $displaytype: 1, is grouped
 		else
 		{
+			if (is_array($attribs))
+			{
+				$attrs = '';
+
+				foreach ($attribs as $k => $v)
+				{
+					$attrs .= ' ' . $k . '="' . $v . '"';
+				}
+				
+				$attribs = $attrs;
+			}
+
 			$field_types = array();
 			$n = 0;
 			$in_grp = false;

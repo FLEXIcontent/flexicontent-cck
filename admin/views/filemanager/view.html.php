@@ -21,9 +21,10 @@ JLoader::register('FlexicontentViewBaseRecords', JPATH_ADMINISTRATOR . '/compone
  */
 class FlexicontentViewFilemanager extends FlexicontentViewBaseRecords
 {
-	var $proxy_option = null;
+	var $proxy_option   = null;
 	var $title_propname = 'filename';
 	var $state_propname = 'published';
+	var $db_tbl         = 'flexicontent_files';
 
 	public function display($tpl = null)
 	{
@@ -61,19 +62,14 @@ class FlexicontentViewFilemanager extends FlexicontentViewBaseRecords
 		// Get model
 		$model = $this->getModel();
 
+		// Performance statistics
+		if ($print_logging_info = $cparams->get('print_logging_info'))
+		{
+			global $fc_run_times;
+		}
+
 		//$authorparams = flexicontent_db::getUserConfig($user->id);
 		$langs = FLEXIUtilities::getLanguages('code');
-
-		//$jq_params = new JRegistry();
-		//$jq_params->set('jquery_ver', '1');
-		//$jq_params->set('jquery_ui_ver', '1.10.2');
-		//$jq_params->set('jquery_ui_theme', 'ui-lightness');
-		//flexicontent_html::loadJQuery( $add_jquery = 1, $add_jquery_ui = 1, $add_jquery_ui_css = 1, $add_remote = 2, $jq_params );
-
-		flexicontent_html::loadFramework('select2');
-		//JHtml::_('behavior.tooltip');
-		// Load the form validation behavior
-		JHtml::_('behavior.formvalidation');
 
 
 		// Get user's global permissions
@@ -288,6 +284,7 @@ class FlexicontentViewFilemanager extends FlexicontentViewBaseRecords
 			$rows_pending = $view === 'fileselement'
 				? $model->getDataPending()
 				: false;
+
 			if (empty($rows_pending))
 			{
 				$rows = $model->getData();
@@ -301,6 +298,7 @@ class FlexicontentViewFilemanager extends FlexicontentViewBaseRecords
 			$rows_pending = $view === 'fileselement'
 				? $model->getFilesFromPath($u_item_id, $fieldid, null, true)
 				: false;
+
 			if (empty($rows_pending))
 			{
 				$rows = $model->getFilesFromPath($u_item_id, $fieldid, null, false);
@@ -314,8 +312,8 @@ class FlexicontentViewFilemanager extends FlexicontentViewBaseRecords
 		unset($session_files['names_pending']);
 		$session->set($upload_context, $session_files);
 
+		// Create pagination object
 		$pagination = $this->get('Pagination');
-		//$users = $this->get('Users');
 
 		// Get item using at least one file (-of- the currently listed files)
 		/*$items_single	= $model->getItemsSingleprop( array('file','minigallery') );
@@ -347,26 +345,21 @@ class FlexicontentViewFilemanager extends FlexicontentViewBaseRecords
 		$allowed_langs = null;
 		$lists['file-lang'] = flexicontent_html::buildlanguageslist('file-lang', 'class="use_select2_lib"', '*', $display_file_lang_as, $allowed_langs, $published_only=false);
 
-		// Build access list
-		//$lists['file-access'] = JHtml::_('access.assetgrouplist', 'access', null, $attribs=' class="use_select2_lib" ', $config=array(/*'title' => JText::_('FLEXI_SELECT'), */'id' => 'access'));
 
+		// Build access level filter
 		$options = JHtml::_('access.assetgroups');
 		$elementid = $fieldname = 'file-access';
 		$attribs = 'class="use_select2_lib"';
 		$lists['file-access'] = JHtml::_('select.genericlist', $options, $fieldname, $attribs, 'value', 'text', null, $elementid, $translate=true );
 
 
-		/*************
-		 ** FILTERS **
-		 *************/
-
-		// language filter
+		// Build language filter
 		$lists['language'] = ($filter_lang || 1 ? '<div class="add-on">'.JText::_('FLEXI_LANGUAGE').'</div>' : '').
 			flexicontent_html::buildlanguageslist('filter_lang', 'class="use_select2_lib" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()" size="1" ', $filter_lang, '-'/*2*/);
 
 
 		// Text search filter value
-		$lists['search'] 	= $search;
+		$lists['search'] = $search;
 
 		//search filter
 		$filters = array();
@@ -376,11 +369,11 @@ class FlexicontentViewFilemanager extends FlexicontentViewBaseRecords
 		$filters[] = JHtml::_('select.option', '3', JText::_( 'FLEXI_DESCRIPTION' ) );
 		$lists['scope'] = '
 			<span class="hasTooltip" style="display:inline-block; padding:0; margin:0;" title="'.JText::_('FLEXI_SEARCH_TEXT_INSIDE').'"><i class="icon-info"></i></span>
-			'.JHtml::_('select.genericlist', $filters, 'scope', 'size="1" class="use_select2_lib fc_skip_highlight fc_is_selarrow" onchange="jQuery(\'#search\').attr(\'placeholder\', jQuery(this).find(\'option:selected\').text());" ', 'value', 'text', $scope );
-		
-		if (1)
+			'.JHtml::_('select.genericlist', $filters, 'scope', 'size="1" class="use_select2_lib fc_skip_highlight" onchange="jQuery(\'#search\').attr(\'placeholder\', jQuery(this).find(\'option:selected\').text());" ', 'value', 'text', $scope );
+
+		if ($layout !== 'image' || $view !== 'fileselement')
 		{
-			//build url/file filterlist
+			// Build url/file filter
 			$url 	= array();
 			$url[] 	= JHtml::_('select.option',  '', '-'/*JText::_( 'FLEXI_ALL_FILES' )*/ );
 			$url[] 	= JHtml::_('select.option',  'F', JText::_( 'FLEXI_FILE' ) );
@@ -389,7 +382,7 @@ class FlexicontentViewFilemanager extends FlexicontentViewBaseRecords
 			$lists['url'] = ($filter_url || 1 ? '<div class="add-on">'.JText::_('FLEXI_ALL_FILES').'</div>' : '').
 				JHtml::_('select.genericlist', $url, 'filter_url', 'class="use_select2_lib" size="1" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', 'value', 'text', $filter_url );
 
-			//build stamp filterlist
+			// Build stamp filter
 			$stamp 	= array();
 			$stamp[] 	= JHtml::_('select.option',  '', '-'/*JText::_( 'FLEXI_ALL_FILES' )*/ );
 			$stamp[] 	= JHtml::_('select.option',  '0', JText::_( 'FLEXI_NO' ) );
@@ -435,11 +428,11 @@ class FlexicontentViewFilemanager extends FlexicontentViewBaseRecords
 				flexicontent_html::builduploaderlist('filter_uploader', 'class="use_select2_lib" size="1" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', $filter_uploader, '-'/*1*/);
 		}
 
-		// table ordering
-		$lists['order_Dir']	= $filter_order_Dir;
-		$lists['order']			= $filter_order;
+		// Table ordering
+		$lists['order_Dir'] = $filter_order_Dir;
+		$lists['order']     = $filter_order;
 
-		// uploadstuff
+		// Uploadstuff
 		jimport('joomla.client.helper');
 		$require_ftp = !JClientHelper::hasCredentials('ftp');
 
@@ -455,9 +448,9 @@ class FlexicontentViewFilemanager extends FlexicontentViewBaseRecords
 
 		$this->params      = $cparams;
 		$this->lists       = $lists;
-		$this->rows        = $rows_pending ?: $rows ;
-		$this->is_pending = $rows_pending ? true : false;
-		$this->langs  = $langs;
+		$this->rows        = $rows_pending ?: $rows;
+		$this->is_pending  = $rows_pending ? true : false;
+		$this->langs       = $langs;
 
 		$this->folder_mode = $folder_mode;
 		$this->assign_mode = $assign_mode;
@@ -479,6 +472,7 @@ class FlexicontentViewFilemanager extends FlexicontentViewBaseRecords
 
 		$this->option = $option;
 		$this->view   = $view;
+		$this->state  = $this->get('State');
 
 		if ($view === 'fileselement')
 		{
@@ -491,8 +485,18 @@ class FlexicontentViewFilemanager extends FlexicontentViewBaseRecords
 		{
 			$this->sidebar = FLEXI_J30GE ? JHtmlSidebar::render() : null;
 		}
+
+		/**
+		 * Render view's template
+		 */
+
+		if ( $print_logging_info ) { global $fc_run_times; $start_microtime = microtime(true); }
+
 		parent::display($tpl);
+
+		if ( $print_logging_info ) @$fc_run_times['template_render'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 	}
+
 
 
 	/**

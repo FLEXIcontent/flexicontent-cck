@@ -197,7 +197,7 @@ class FlexicontentViewFields extends FlexicontentViewBaseRecords
 		}
 
 		$this->minihelp = '
-			<div id="fc-mini-help" class="fc-mssg fc-info" style="display:none;">
+			<div id="fc-mini-help" class="fc-mssg fc-info" style="display:none; min-width: 600px;">
 				'.JText::_('FLEXI_FILTER_BY_TYPE_BEFORE_ACTIONS') .' <br/><br/>
 				'.JText::_('FLEXI_FIELDS_ORDER_NO_TYPE_FILTER_ACTIVE').'
 			</div>
@@ -210,19 +210,46 @@ class FlexicontentViewFields extends FlexicontentViewBaseRecords
 
 		$lists = array();
 
-		// Build item-type filter
-		$lists['filter_type'] = ($filter_type|| 1 ? '<div class="add-on">'.JText::_('FLEXI_TYPE').'</div>' : '').
-			flexicontent_html::buildtypesselect($types, 'filter_type', $filter_type, '-'/*2*/, 'class="use_select2_lib" size="1" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', 'filter_type');
+		// Build item type filter
+		$lists['filter_type'] = $this->getFilterDisplay(array(
+			'label' => JText::_('FLEXI_TYPE'),
+			'html' => flexicontent_html::buildtypesselect(
+				$types,
+				'filter_type',
+				$filter_type,
+				0,
+				array(
+					'class' => 'use_select2_lib',
+					'size' => '3',
+					'onchange' => 'document.adminForm.limitstart.value=0; Joomla.submitform();',
+				),
+				'filter_type'
+			),
+		));
+
 
 
 		// Build orphaned/assigned filter
-		$assigned 	= array();
-		$assigned[] = JHtml::_('select.option',  '', '-'/*JText::_( 'FLEXI_ALL_FIELDS' )*/ );
-		$assigned[] = JHtml::_('select.option',  'O', JText::_( 'FLEXI_ORPHANED' ) );
-		$assigned[] = JHtml::_('select.option',  'A', JText::_( 'FLEXI_ASSIGNED' ) );
+		$options 	= array();
+		$options[] = JHtml::_('select.option',  '', '-'/*JText::_( 'FLEXI_ALL_FIELDS' )*/ );
+		$options[] = JHtml::_('select.option',  'O', JText::_( 'FLEXI_ORPHANED' ) );
+		$options[] = JHtml::_('select.option',  'A', JText::_( 'FLEXI_ASSIGNED' ) );
 
-		$lists['assigned'] = ($filter_assigned || 1 ? '<div class="add-on">'.JText::_('FLEXI_ASSIGNED').'</div>' : '').
-			JHtml::_('select.genericlist', $assigned, 'filter_assigned', 'class="use_select2_lib" size="1" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', 'value', 'text', $filter_assigned );
+		$lists['filter_assigned'] = $this->getFilterDisplay(array(
+			'label' => JText::_('FLEXI_ASSIGNED'),
+			'html' => JHtml::_('select.genericlist',
+				$options,
+				'filter_assigned', 
+				array(
+					'class' => 'use_select2_lib',
+					'size' => '1',
+					'onchange' => 'document.adminForm.limitstart.value=0; Joomla.submitform();',
+				),
+				'value',
+				'text',
+				$filter_assigned
+			),
+		));
 
 
 		// Build field-type filter
@@ -245,21 +272,53 @@ class FlexicontentViewFields extends FlexicontentViewBaseRecords
 				$fftypes[$field_group]['items'][] = array('value' => $ftdata->field_type, 'text' => '-'.$ftdata->assigned.'- '. $ftdata->friendly);
 			}
 		}
-		$lists['fftype'] = ($filter_fieldtype || 1 ? '<div class="add-on">'.JText::_('FLEXI_FIELD_TYPE').'</div>' : '').
-			flexicontent_html::buildfieldtypeslist($fftypes, 'filter_fieldtype', $filter_fieldtype, ($_grouped ? 1 : 0), 'class="use_select2_lib" size="1" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"');
+
+		// Build item type filter
+		$lists['filter_fieldtype'] = $this->getFilterDisplay(array(
+			'label' => JText::_('FLEXI_FIELD_TYPE'),
+			'html' => flexicontent_html::buildfieldtypeslist(
+				$fftypes,
+				'filter_fieldtype',
+				$filter_fieldtype,
+				($_grouped ? 1 : 0),
+				array(
+					'class' => 'use_select2_lib',
+					'size' => '1',
+					'onchange' => 'document.adminForm.limitstart.value=0; Joomla.submitform();',
+				),
+				'filter_fieldtype'
+			),
+		));
+
 
 
 		// Build publication state filter
-		$states 	= array();
-		$states[] = JHtml::_('select.option',  '', '-'/*JText::_( 'FLEXI_SELECT_STATE' )*/ );
-		$states[] = JHtml::_('select.option',  'P', JText::_( 'FLEXI_PUBLISHED' ) );
-		$states[] = JHtml::_('select.option',  'U', JText::_( 'FLEXI_UNPUBLISHED' ) );
-		//$states[] = JHtml::_('select.option',  'A', JText::_( 'FLEXI_ARCHIVED' ) );
-		//$states[] = JHtml::_('select.option',  'T', JText::_( 'FLEXI_TRASHED' ) );
+		$options 	= array();
+		$options[] = JHtml::_('select.option',  '', '-'/*JText::_( 'FLEXI_SELECT_STATE' )*/ );
+		$options[] = JHtml::_('select.option',  'P', JText::_( 'FLEXI_PUBLISHED' ) );
+		$options[] = JHtml::_('select.option',  'U', JText::_( 'FLEXI_UNPUBLISHED' ) );
+		//$options[] = JHtml::_('select.option',  'A', JText::_( 'FLEXI_ARCHIVED' ) );
+		//$options[] = JHtml::_('select.option',  'T', JText::_( 'FLEXI_TRASHED' ) );
 
-		$lists['state'] = ($filter_state || 1 ? '<div class="add-on">'.JText::_('FLEXI_STATE').'</div>' : '').
-			JHtml::_('select.genericlist', $states, 'filter_state', 'class="use_select2_lib" size="1" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', 'value', 'text', $filter_state );
-			//JHtml::_('grid.state', $filter_state );
+		$fieldname = 'filter_state';
+		$elementid = 'filter_state';
+
+		$lists[$elementid] = $this->getFilterDisplay(array(
+			'label' => JText::_('FLEXI_STATE'),
+			'html' => JHtml::_('select.genericlist',
+				$options,
+				$fieldname,
+				array(
+					'class' => 'use_select2_lib',
+					'onchange' => 'document.adminForm.limitstart.value=0; Joomla.submitform();',
+				),
+				'value',
+				'text',
+				$filter_state,
+				$elementid,
+				$translate = true
+			)
+		));
 
 
 		// Build access level filter
@@ -268,9 +327,24 @@ class FlexicontentViewFields extends FlexicontentViewBaseRecords
 
 		$fieldname = 'filter_access';
 		$elementid = 'filter_access';
-		$attribs = 'class="use_select2_lib" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"';
-		$lists['access'] = ($filter_access || 1 ? '<div class="add-on">'.JText::_('FLEXI_ACCESS').'</div>' : '').
-			JHtml::_('select.genericlist', $options, $fieldname, $attribs, 'value', 'text', $filter_access, $elementid, $translate=true );
+
+		$lists[$elementid] = $this->getFilterDisplay(array(
+			'label' => JText::_('FLEXI_ACCESS'),
+			'html' => JHtml::_('select.genericlist',
+				$options,
+				$fieldname,
+				array(
+					'class' => 'use_select2_lib',
+					'onchange' => 'document.adminForm.limitstart.value=0; Joomla.submitform();',
+				),
+				'value',
+				'text',
+				$filter_access,
+				$elementid,
+				$translate = true
+			)
+		));
+
 
 
 		// Text search filter value
@@ -279,7 +353,7 @@ class FlexicontentViewFields extends FlexicontentViewBaseRecords
 
 		// Table ordering
 		$lists['order_Dir'] = $filter_order_Dir;
-		$lists['order'] = $filter_order;
+		$lists['order']     = $filter_order;
 
 		$ordering = !$filter_type
 			? ($lists['order'] == 't.ordering')
@@ -382,6 +456,7 @@ class FlexicontentViewFields extends FlexicontentViewBaseRecords
 		{
 			JToolbarHelper::editList($contrl.'edit');
 		}
+
 		if ($perms->CanDeleteField)
 		{
 			//JToolbarHelper::deleteList(JText::_('FLEXI_ARE_YOU_SURE'), $contrl.'remove');
@@ -418,10 +493,11 @@ class FlexicontentViewFields extends FlexicontentViewBaseRecords
 				$btn_task, $extra_js, $btn_list=false, $btn_menu=true, $btn_confirm=true, $btn_class="btn-info", $btn_icon);
 		}
 
-		/*$btn_icon = 'icon-download';
+		/*
+		$btn_icon = 'icon-download';
 		$btn_name = 'download';
-		$btn_task    = 'fields.exportsql';
-		$extra_js    = "";
+		$btn_task = 'fields.exportsql';
+		$extra_js = "";
 		flexicontent_html::addToolBarButton(
 			'Export SQL', $btn_name, $full_js='', $msg_alert='', $msg_confirm='Field\'s configuration will be exported as SQL',
 			$btn_task, $extra_js, $btn_list=false, $btn_menu=true, $btn_confirm=true, $btn_class="btn-warning", $btn_icon);
@@ -429,8 +505,8 @@ class FlexicontentViewFields extends FlexicontentViewBaseRecords
 
 		$btn_icon = 'icon-download';
 		$btn_name = 'download';
-		$btn_task    = 'fields.exportcsv';
-		$extra_js    = "";
+		$btn_task = 'fields.exportcsv';
+		$extra_js = "";
 		flexicontent_html::addToolBarButton(
 			'Export CSV', $btn_name, $full_js='', $msg_alert='', $msg_confirm='Field\'s configuration will be exported as CSV',
 			$btn_task, $extra_js, $btn_list=false, $btn_menu=true, $btn_confirm=true, $btn_class="btn-warning", $btn_icon);*/

@@ -11,17 +11,20 @@
 
 defined('_JEXEC') or die('Restricted access');
 
-jimport('legacy.view.legacy');
 use Joomla\String\StringHelper;
+use Joomla\Utilities\ArrayHelper;
+
+JLoader::register('FlexicontentViewBaseRecords', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/base/view_records.php');
 
 /**
  * View class for the FLEXIcontent search indexes screen
  */
 class FLEXIcontentViewSearch extends FlexicontentViewBaseRecords
 {
-	var $proxy_option = null;
+	var $proxy_option   = null;
 	var $title_propname = null;
 	var $state_propname = null;
+	var $db_tbl         = null;
 
 	public function display($tpl = null)
 	{
@@ -167,11 +170,26 @@ class FLEXIcontentViewSearch extends FlexicontentViewBaseRecords
 		$this->setToolbar();
 
 
-		// Get types
-		$types			= $this->get( 'Typeslist' );
+		/**
+		 * Get data from the model
+		 */
+
+		if ( $print_logging_info )  $start_microtime = microtime(true);
+
+		// Get item types
+		$types = $this->get('Typeslist');
+
+		// Get field types
 		$fieldtypes = flexicontent_db::getFieldTypes($_grouped=false, $_usage=true, $_published=false);
 
-		// Build select lists
+		if ( $print_logging_info ) @$fc_run_times['execute_main_query'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+
+
+
+		/**
+		 * Create List Filters
+		 */
+
 		$lists = array();
 
 		$js = '';
@@ -221,7 +239,7 @@ class FLEXIcontentViewSearch extends FlexicontentViewBaseRecords
 
 		// Table ordering
 		$lists['order_Dir'] = $filter_order_Dir;
-		$lists['order'] = $filter_order;
+		$lists['order']     = $filter_order;
 
 		// Search index & item title filter
 		$lists['search']= $search;
@@ -313,6 +331,7 @@ class FLEXIcontentViewSearch extends FlexicontentViewBaseRecords
 
 		if ( $print_logging_info ) @$fc_run_times['template_render'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 	}
+
 
 
 	/**
@@ -415,7 +434,6 @@ class FLEXIcontentViewSearch extends FlexicontentViewBaseRecords
 		// Configuration button
 		if ($perms->CanConfig)
 		{
-			JToolbarHelper::divider(); JToolbarHelper::spacer();
 			$session = JFactory::getSession();
 			$fc_screen_width = (int) $session->get('fc_screen_width', 0, 'flexicontent');
 			$_width  = ($fc_screen_width && $fc_screen_width-84 > 940 ) ? ($fc_screen_width-84 > 1400 ? 1400 : $fc_screen_width-84 ) : 940;

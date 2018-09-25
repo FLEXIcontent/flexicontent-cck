@@ -14,6 +14,10 @@ defined('_JEXEC') or die;
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 
+jimport('joomla.filesystem.file');
+jimport('joomla.filesystem.folder');
+jimport('joomla.filesystem.path');
+
 JLoader::register('FlexicontentControllerBaseAdmin', JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'controllers' . DS . 'base' . DS . 'baseadmin.php');
 
 // Manually import models in case used by frontend, then models will not be autoloaded correctly via getModel('name')

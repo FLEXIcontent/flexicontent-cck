@@ -398,11 +398,7 @@ table.fcmanlist thead th .filterdel img {
 table.fcmanlist td {
 	padding: 4px;
 }
-<<<<<<< HEAD
 table.fcmanlist input[type="text"] {
-=======
-table.adminlist input[type="text"] {
->>>>>>> d1d17b246... [WIP] New revised MVC with base classes and traits
 	width: auto !important;
 	padding-left: 0px !important;
 	padding-right: 0px !important;
@@ -465,23 +461,11 @@ table.fcmanlist tfoot th {
 	border-width: 0px !important;
 	text-align: center;
 }
-<<<<<<< HEAD
 table.fcmanlist th.col_cb {
 	padding-bottom: 0px;
 }
 table.fcmanlist td.col_cb {
 	padding-top: 7px;
-=======
-table.adminlist th.col_cb {
-	padding-bottom: 0px;
-}
-table.adminlist td.col_cb {
-	padding-top: 7px;
-}
-table.adminlist td.col_notes {
-	padding-top: 7px;
-	font-size: 110%;
->>>>>>> d1d17b246... [WIP] New revised MVC with base classes and traits
 }
 table.fcmanlist td.col_notes {
 	padding-top: 7px;
