@@ -355,7 +355,7 @@ class FlexicontentViewCategories extends FlexicontentViewBaseRecords
 
 		// Table ordering
 		$lists['order_Dir'] = $filter_order_Dir;
-		$lists['order'] = $filter_order;
+		$lists['order']     = $filter_order;
 
 		$orderingx = $lists['order'] == $order_property && strtolower($lists['order_Dir']) == 'asc'
 			? $order_property

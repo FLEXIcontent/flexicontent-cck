@@ -125,6 +125,12 @@ function delAllFilters()
 
 	<div id="fc-managers-header">
 
+		<?php if (!empty($this->lists['scope_tip'])) : ?>
+		<div class="fc-filter-head-box filter-search nowrap_box" style="margin: 0;">
+			<?php echo $this->lists['scope_tip']; ?>
+		</div>
+		<?php endif; ?>
+
 		<div class="fc-filter-head-box filter-search nowrap_box">
 			<div class="btn-group <?php echo $this->ina_grp_class; ?>">
 				<?php
@@ -187,8 +193,7 @@ function delAllFilters()
 
 	<div class="fcclear"></div>
 
-
-	<table id="adminListTableFCtags" class="adminlist table fcmanlist">
+	<table id="adminListTableFCtags" class="adminlist table fcmanlist" itemscope itemtype="http://schema.org/WebPage">
 	<thead>
 		<tr>
 
@@ -289,7 +294,7 @@ function delAllFilters()
 				 * Display title with edit link ... (row editable and not checked out)
 				 * Display title with no edit link ... if row is not-editable for any reason (no ACL or checked-out by other user)
 				 */
-				echo JHtml::_($hlpname . '.edit_link', $row, $i, null, $row->canEdit);
+				echo JHtml::_($hlpname . '.edit_link', $row, $i, $row->canEdit);
 				?>
 			</td>
 
@@ -312,7 +317,12 @@ function delAllFilters()
 
 			<td class="center hidden-tablet hidden-phone">
 				<?php
-				echo JHtml::_($hlpname . '.edit_link_jrecord', $row, $i, null, $row->canEdit);
+				echo JHtml::_($hlpname . '.edit_link', $row, $i, $row->canEdit, $config = array(
+					'option'  => 'com_tags',
+					'ctrl'    => 'tag',
+					'keyprop' => 'jtag_id',
+					'useModal' => true,
+				));
 				?>
 			</td>
 		</tr>

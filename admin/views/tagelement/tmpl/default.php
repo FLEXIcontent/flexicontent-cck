@@ -44,7 +44,7 @@ defined('_JEXEC') or die('Restricted access');
 	<tfoot>
 		<tr>
 			<td colspan="10">
-				<?php echo $this->pageNav->getListFooter(); ?>
+				<?php echo $this->pagination->getListFooter(); ?>
 			</td>
 		</tr>
 	</tfoot>
@@ -57,7 +57,7 @@ defined('_JEXEC') or die('Restricted access');
 		foreach ($this->rows as $row) {
    		?>
 		<tr class="<?php echo "row$k"; ?>">
-			<td><?php echo $this->pageNav->getRowOffset( $i ); ?></td>
+			<td><?php echo $this->pagination->getRowOffset( $i ); ?></td>
 			<td align="left">
 					<a style="cursor:pointer" onclick="window.parent.qfSelectTag('<?php echo $row->id; ?>', '<?php echo str_replace( array("'", "\""), array("\\'", ""), $row->name ); ?>');">
 					<?php echo htmlspecialchars($row->name, ENT_QUOTES, 'UTF-8'); ?>

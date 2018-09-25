@@ -88,15 +88,15 @@ $ordering_draggable = $cparams->get('draggable_reordering', 1);
 
 if ($this->reOrderingActive)
 {
-	$image_ordering_tip = '<img src="components/com_flexicontent/assets/images/comments.png" class="' . $ico_class . ' ' . $this->tooltip_class . '" alt="Reordering" title="'.flexicontent_html::getToolTip('FLEXI_REORDERING', 'FLEXI_REORDERING_ENABLED_DESC', 1, 1).'" /> ';
-	//$image_ordering_tip = '<span class="icon-info ' . $this->tooltip_class . '" title="' . flexicontent_html::getToolTip('FLEXI_REORDERING', 'FLEXI_REORDERING_ENABLED_DESC', 1, 1).'"></span>';
-	$drag_handle_box = '<div class="fc_drag_handle%s" title="'.JText::_('FLEXI_ORDER_SAVE_WHEN_DONE', true).'"></div>';
+	$image_ordering_tip = '<img src="components/com_flexicontent/assets/images/comments.png" class="' . $ico_class . ' ' . $this->tooltip_class . '" alt="Reordering" title="' . flexicontent_html::getToolTip('FLEXI_REORDERING', 'FLEXI_REORDERING_ENABLED_DESC', 1, 1) . '" /> ';
+	//$image_ordering_tip = '<span class="icon-info ' . $this->tooltip_class . '" title="' . flexicontent_html::getToolTip('FLEXI_REORDERING', 'FLEXI_REORDERING_ENABLED_DESC', 1, 1) . '"></span>';
+	$drag_handle_box = '<div class="fc_drag_handle%s" title="' . JText::_('FLEXI_ORDER_SAVE_WHEN_DONE', true) . '"></div>';
 }
 else
 {
 	$image_ordering_tip = '<img src="components/com_flexicontent/assets/images/comments.png" class="' . $ico_class . ' ' . $this->tooltip_class . '" alt="Reordering" title="'.flexicontent_html::getToolTip('FLEXI_REORDERING', 'FLEXI_REORDERING_DISABLED_DESC', 1, 1).'" /> ';
 	//$image_ordering_tip = '<span class="icon-info ' . $this->tooltip_class . '" title="' . flexicontent_html::getToolTip('FLEXI_REORDERING', 'FLEXI_REORDERING_DISABLED_DESC', 1, 1) . '"></span>';
-	$drag_handle_box = '<div class="fc_drag_handle%s" title="'.JText::_('FLEXI_ORDER_COLUMN_FIRST', true).'" ></div>';
+	$drag_handle_box = '<div class="fc_drag_handle%s" title="' . JText::_('FLEXI_ORDER_COLUMN_FIRST', true) . '" ></div>';
 	$image_saveorder    = '';
 }
 
@@ -415,9 +415,12 @@ jQuery(document).ready(function(){
 	<form action="index.php?option=<?php echo $this->option; ?>&amp;view=<?php echo $this->view; ?>" method="post" name="adminForm" id="adminForm" style="<?php echo ($this->unassociated && !count($this->rows) ? 'display: none;' : ''); ?>">
 
 	<div id="fc-managers-header">
+
+		<?php if (!empty($this->lists['scope_tip'])) : ?>
 		<div class="fc-filter-head-box filter-search nowrap_box" style="margin: 0;">
 			<?php echo $this->lists['scope_tip']; ?>
 		</div>
+		<?php endif; ?>
 
 		<div class="fc-filter-head-box filter-search nowrap_box">
 			<div class="btn-group <?php echo $this->ina_grp_class; ?>">
@@ -888,7 +891,7 @@ jQuery(document).ready(function(){
 				 * Display title with edit link ... (row editable and not checked out)
 				 * Display title with no edit link ... if row is not-editable for any reason (no ACL or checked-out by other user)
 				 */
-				echo JHtml::_($hlpname . '.edit_link', $row, $i, null, $row->canEdit);
+				echo JHtml::_($hlpname . '.edit_link', $row, $i, $row->canEdit);
 				?>
 			</td>
 

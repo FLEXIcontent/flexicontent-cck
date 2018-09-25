@@ -21,9 +21,10 @@ JLoader::register('FlexicontentViewBaseRecords', JPATH_ADMINISTRATOR . '/compone
  */
 class FlexicontentViewItems extends FlexicontentViewBaseRecords
 {
-	var $proxy_option = 'com_content';
+	var $proxy_option   = 'com_content';
 	var $title_propname = 'title';
 	var $state_propname = 'state';
+	var $db_tbl         = 'content';
 
 	public function display($tpl = null)
 	{
@@ -668,7 +669,7 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 
 		// Table ordering
 		$lists['order_Dir'] = $filter_order_Dir;
-		$lists['order'] = $filter_order;
+		$lists['order']     = $filter_order;
 
 
 		// Build tags filter

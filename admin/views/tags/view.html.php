@@ -17,7 +17,7 @@ use Joomla\Utilities\ArrayHelper;
 JLoader::register('FlexicontentViewBaseRecords', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/base/view_records.php');
 
 /**
- * HTML View class for the tags backend manager
+ * HTML View class for the FLEXIcontent tags screen
  */
 class FlexicontentViewTags extends FlexicontentViewBaseRecords
 {
@@ -258,7 +258,7 @@ class FlexicontentViewTags extends FlexicontentViewBaseRecords
 
 		// Table ordering
 		$lists['order_Dir'] = $filter_order_Dir;
-		$lists['order'] = $filter_order;
+		$lists['order']     = $filter_order;
 
 
 		/**

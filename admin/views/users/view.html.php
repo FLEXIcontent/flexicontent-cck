@@ -174,7 +174,7 @@ class FlexicontentViewUsers extends FlexicontentViewBaseRecords
 		FLEXIUtilities::ManagerSideMenu('CanAuthors');
 
 		// Create document/toolbar titles
-		$doc_title = JText::_( 'FLEXI_AUTHORS' );
+		$doc_title = JText::_('FLEXI_AUTHORS');
 		$site_title = $document->getTitle();
 		JToolbarHelper::title( $doc_title, 'authors' );
 		$document->setTitle($doc_title .' - '. $site_title);
@@ -255,7 +255,7 @@ class FlexicontentViewUsers extends FlexicontentViewBaseRecords
 		}*/
 
 		$this->minihelp = '
-			<div id="fc-mini-help" class="fc-mssg fc-info" style="display:none;">
+			<div id="fc-mini-help" class="fc-mssg fc-info" style="display:none; min-width: 600px;">
 				'.JText::_('FLEXI_BY_DEFAULT_ONLY_AUTHORS_WITH_ITEMS_SHOWN') .'
 			</div>
 		';
@@ -317,7 +317,7 @@ class FlexicontentViewUsers extends FlexicontentViewBaseRecords
 
 		// Table ordering
 		$lists['order_Dir'] = $filter_order_Dir;
-		$lists['order'] = $filter_order;
+		$lists['order']     = $filter_order;
 
 		// build dates option list
 		$dates = array();
