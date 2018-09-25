@@ -368,9 +368,16 @@ $this->document->addScriptDeclaration($js);
 		<div id="fieldspecificproperties">
 			<div class="fctabber fields_tabset" id="field_specific_props_tabset">
 			<?php
+			// Remove hidden attribute
+			foreach ($form->getXml()->config->fields->fieldset as $fieldset)
+			{
+				$fieldset->attributes()->hidden = null;
+			}
+
 			$fieldSets = $form->getFieldsets('attribs');
 			$field_type = $form->getValue("field_type", NULL, "text");
 			$prefix_len = strlen('group-'.$field_type.'-');
+
 			if ($field_type) foreach ($fieldSets as $name => $fieldSet)
 			{
 				if ($name!='basic' && $name!='standard' && (substr($name, 0, $prefix_len)!='group-'.$field_type.'-' || $name==='group-'.$field_type) ) continue;

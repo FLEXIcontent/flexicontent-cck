@@ -20,16 +20,16 @@
 
 	<fields name="attribs">
 
-		<!--fieldset name="standard" repeat="1">
+		<!--fieldset name="standard" hidden="true">
 		</fieldset-->
 
-		<fieldset name="group-relation_reverse-data" repeat="1" icon_class="icon-database" label="Reversing" addfieldpath="/administrator/components/com_flexicontent/elements">
+		<fieldset name="group-relation_reverse-data" hidden="true" icon_class="icon-database" label="Reversing" addfieldpath="/administrator/components/com_flexicontent/elements">
 
 			<field name="" type="separator" default="FLEXI_RIFLD_ITEMS_RELATED_VIA_CHOOSE_FIELD" level="level3" class="alert alert-success fcpadded"/>
 			<field name="reverse_field" type="fields" field_type="relation" label="FLEXI_FIELD_CHOOSE_FIELD_TO_REVERSE" description="FLEXI_FIELD_CHOOSE_FIELD_TO_REVERSE_DESC" />
 
 		</fieldset>
-		<fieldset name="group-relation_reverse-editing-ilist" repeat="1" icon_class="icon-pencil" label="FLEXI_FIELD_EDITING" addfieldpath="/administrator/components/com_flexicontent/elements">
+		<fieldset name="group-relation_reverse-editing-ilist" hidden="true" icon_class="icon-pencil" label="FLEXI_FIELD_EDITING" addfieldpath="/administrator/components/com_flexicontent/elements">
 
 			<field name="" type="separator" default="FLEXI_RIFLD_RELATED_ITEMS_LIST" level="tabset_start" box_type="1" />
 			<field name="" type="separator" default="FLEXI_RIFLD_RELATED_ITEMS_LIST" icon_class="icon-list-2" level="tab_open" box_type="1" />
@@ -113,7 +113,7 @@
 			<field name="" type="separator" default="FLEXI_RIFLD_RELATED_ITEMS_LIST" level="tabset_close" box_type="1" />
 			<field name="" type="separator" default="FLEXI_FIELD_EDITING" level="tabset_close" box_type="1" />
 		</fieldset>
-		<fieldset name="group-relation_reverse-viewing" repeat="1" icon_class="icon-screen" label="FLEXI_FIELD_VIEWING" addfieldpath="/administrator/components/com_flexicontent/elements">
+		<fieldset name="group-relation_reverse-viewing" hidden="true" icon_class="icon-screen" label="FLEXI_FIELD_VIEWING" addfieldpath="/administrator/components/com_flexicontent/elements">
 
 			<field name="" type="separator" default="FLEXI_FIELD_VIEWING" level="tabset_start" box_type="1" />
 			<field name="" type="separator" default="FLEXI_BASIC" icon_class="icon-vcard" level="tab_open" box_type="1" />
