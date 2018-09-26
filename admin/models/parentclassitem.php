@@ -909,6 +909,17 @@ class ParentClassItem extends FCModelAdmin
 				$item->tags = array_reverse($item->tags);
 			}
 
+			echo empty($this->debug_tags) ? null : '<pre>' . __FUNCTION__ . '(): item->tags: ' . print_r($item->tags, true) . '</pre>';
+
+			if ($task === 'edit' && $option === 'com_flexicontent')
+			{
+				// Merge (if needed) Joomla tags assignment into FC tags assignments
+				$this->mergeJTagsAssignments($item, $_jtags = null, $_replaceTags = false);
+
+				// Merge (if needed) FC tags assignment into Joomla tags assignments ... do this if we are executing FLEXIcontent component
+				$this->saveJTagsAssignments($item->tags, $item->id);
+			}
+
 			// -- Retrieve categories field value (if not using versioning)
 			if ( $use_versioning && $version )
 			{
@@ -2372,6 +2383,9 @@ class ParentClassItem extends FCModelAdmin
 				// Reverse compatibility steps
 				$jinput->set('view', $view);
 				$jinput->set('option', $option);
+
+				$fctag_ids = isset($data['tags']) ? $data['tags'] : array();
+				$this->saveJTagsAssignments($fctag_ids, $item->id);
 
 				if ( $print_logging_info ) @$fc_run_times['onContentAfterSave_event'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 			}
