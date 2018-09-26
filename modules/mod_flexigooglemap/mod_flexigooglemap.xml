@@ -25,7 +25,6 @@
 
 	<languages folder="language">
 		<language tag="en-GB">en-GB/en-GB.mod_flexigooglemap.ini</language>
-		<language tag="fr-FR">fr-FR/fr-FR.mod_flexigooglemap.ini</language>
 	</languages>
 	
 	<config>
