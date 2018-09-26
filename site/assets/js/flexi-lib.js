@@ -1096,7 +1096,7 @@
 			// 7. Create column checkbox and append it to str
 			var ffieldid   = 'columnchoose_' + data_tbl_id + '_' + col;
 			var ffieldname = 'columnchoose_' + data_tbl_id + '[' + col + ']';
-			str = str + '<input align="right" id="' + ffieldid + '" name="' + ffieldname + '" type="checkbox" data-colno="' + col + '" ' + checked_str + ' onclick="fc_tbl_toggle_column(\''+container_div_id+'\', \''+data_tbl_id+'\', '+col+', 0);">'
+			str = str + '<input id="' + ffieldid + '" name="' + ffieldname + '" type="checkbox" data-colno="' + col + '" ' + checked_str + ' onclick="fc_tbl_toggle_column(\''+container_div_id+'\', \''+data_tbl_id+'\', '+col+', 0);">'
 			+ '<label id="' + ffieldid + '_label" style="color:'+fontcolor_str+';" for="' + ffieldid + '">' + col_display_name + '</label>';
 		}
 	

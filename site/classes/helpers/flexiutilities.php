@@ -381,16 +381,18 @@ class FLEXIUtilities
 	static function getCache($group='', $client=0)
 	{
 		$conf = JFactory::getConfig();
+
 		//$client = 0;//0 is site, 1 is admin
 		$options = array(
-			'defaultgroup'	=> $group,
-			'storage' 		=> $conf->get('cache_handler', ''),
-			'caching'		=> true,
-			'cachebase'		=> ($client == 1) ? JPATH_ADMINISTRATOR . '/cache' : $conf->get('cache_path', JPATH_SITE . '/cache')
+			'defaultgroup' => $group,
+			'storage' => $conf->get('cache_handler', ''),
+			'caching' => true,
+			'cachebase' => ($client == 1 ? JPATH_ADMINISTRATOR . '/cache' : $conf->get('cache_path', JPATH_SITE . '/cache'))
 		);
 
 		jimport('joomla.cache.cache');
 		$cache = JCache::getInstance('', $options);
+
 		return $cache;
 	}
 

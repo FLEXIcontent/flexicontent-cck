@@ -186,6 +186,26 @@ div.statetoggler {
 			text-align: left;
 			vertical-align: baseline;
 			cursor: pointer;
+			text-decoration: none;
+			position: relative;
+
+			span.fc_expired,
+			span.fc_scheduled {
+				position: absolute;
+				left: -2px;
+				right: -2px;
+				top: 45%;
+				bottom: 35%;
+				border-top: 1px solid gray;
+				border-bottom: 1px solid gray;
+				opacity: 1;
+			}
+
+			span.fc_expired + span:before,
+			span.fc_scheduled + span:before {
+				opacity: 0.4;
+				color: black;
+			}
 		}
 		> div.stateopener.ajax-loader {
 			background-position: center;
@@ -690,4 +710,18 @@ body .btn-group.fc-group > .statetoggler.btn.btn-small {
 	width: 100%;
 	margin: 0 0 8px 0;
 	text-align: left;
+}
+
+div span.fc_icon_disabled {
+	position: absolute;
+	left: 4px;
+	right: 4px;
+	top: 45%;
+	bottom: 40%;
+	/*border-top: 1px solid gray;
+	border-bottom: 1px solid gray;*/
+	opacity: 1;
+}
+div span.fc_icon_disabled + span:before {
+	color: gray;
 }

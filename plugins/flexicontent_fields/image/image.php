@@ -1986,7 +1986,7 @@ class plgFlexicontent_fieldsImage extends FCField
 						$fman = new FlexicontentControllerFilemanager();
 						$fman->runMode = 'interactive';
 
-						$app->input->set('return-url', null);
+						$app->input->set('return', null);
 						$app->input->set('file-dir-path', DS.$import_media_folder . $sub_folder);
 						$app->input->set('file-filter-re', preg_quote($filename));
 						$app->input->set('secure', 1);

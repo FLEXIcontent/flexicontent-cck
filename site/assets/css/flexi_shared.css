@@ -398,12 +398,6 @@ table.fcmanlist thead th .filterdel img {
 table.fcmanlist td {
 	padding: 4px;
 }
-table.fcmanlist tr td:first-child::after {
-	content: "";
-	display: inline-block;
-	vertical-align: middle;
-	min-height: 30px;
-}
 table.fcmanlist input[type="text"] {
 	width: auto !important;
 	padding-left: 0px !important;

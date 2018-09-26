@@ -147,8 +147,6 @@ jQuery(document).ready(function(){
 			return;
 		}
 
-		var currentURL = window.location;
-
 		if (1)
 		{
 			var url = live_site_base +
@@ -203,8 +201,6 @@ jQuery(document).ready(function(){
 				return;
 			}
 		}
-
-		var currentURL = window.location;
 
 		if (1)
 		{

@@ -1057,7 +1057,7 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 					$fman = new FlexicontentControllerFilemanager();
 					$fman->runMode = 'interactive';
 
-					$app->input->set('return-url', null);
+					$app->input->set('return', null);
 					$app->input->set('secure', $v['secure']);
 					$app->input->set('stamp', $v['stamp']);
 					$app->input->set('file-title', $v['file-title']);
