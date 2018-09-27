@@ -1830,15 +1830,33 @@ table.fc-form-tbl td.key > .fc-prop-lbl {
 	font-style: italic !important;
 }
 
+/* Hide it (almost), till JS is initialized */
+select.fc_is_selmultiple.use_select2_lib {
+	max-height: 0 !important;
+}
 /* Avoid page jumping effect until this is rendered via JS */
-select.use_select2_lib {
-	height: 1em !important;
-	width: 1.4em !important;
+select.fc_is_selarrow.use_select2_lib {
+	max-width: 1.4em !important;
 	margin: 0 !important;
 	padding: 0 !important;
 	box-sizing: border-box !important;
-	border: 1px !important;
+	border: 0 !important;
 	display: inline-block;
+}
+select.fc_is_selarrow.use_select2_lib:hover, select.fc_is_selarrow.use_select2_lib:focus {
+	max-width: unset !important;
+}
+
+select[multiple].use_select2_lib {
+	font-size: 14px !important;
+	max-height: 2.6em !important;
+}
+select[multiple].use_select2_lib:hover, select[multiple].use_select2_lib:focus {
+	position: absolute;
+	z-index: 1050;
+	height: 15em !important;
+	max-height: unset !important;
+	box-shadow: 0 2px 4px rgba(0,0,0,0.15) inset, 0 1px 2px rgba(0,0,0,0.15);
 }
 
 
