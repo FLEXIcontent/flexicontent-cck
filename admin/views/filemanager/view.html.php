@@ -369,7 +369,7 @@ class FlexicontentViewFilemanager extends FlexicontentViewBaseRecords
 		$filters[] = JHtml::_('select.option', '3', JText::_( 'FLEXI_DESCRIPTION' ) );
 		$lists['scope'] = '
 			<span class="hasTooltip" style="display:inline-block; padding:0; margin:0;" title="'.JText::_('FLEXI_SEARCH_TEXT_INSIDE').'"><i class="icon-info"></i></span>
-			'.JHtml::_('select.genericlist', $filters, 'scope', 'size="1" class="use_select2_lib fc_skip_highlight" onchange="jQuery(\'#search\').attr(\'placeholder\', jQuery(this).find(\'option:selected\').text());" ', 'value', 'text', $scope );
+			'.JHtml::_('select.genericlist', $filters, 'scope', 'size="1" class="use_select2_lib fc_skip_highlight fc_is_selarrow" onchange="jQuery(\'#search\').attr(\'placeholder\', jQuery(this).find(\'option:selected\').text());" ', 'value', 'text', $scope );
 
 		if ($layout !== 'image' || $view !== 'fileselement')
 		{

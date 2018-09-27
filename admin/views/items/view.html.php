@@ -576,7 +576,7 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 			'scope',
 			array(
 				'size' => '1',
-				'class' => $this->select_class . ' fc_skip_highlight',
+				'class' => $this->select_class . ' fc_skip_highlight fc_is_selarrow',
 				'onchange' => 'jQuery(\'#search\').attr(\'placeholder\', jQuery(this).find(\'option:selected\').text());',
 			),
 			'value',
