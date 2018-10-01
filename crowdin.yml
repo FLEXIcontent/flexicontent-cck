@@ -3,3 +3,7 @@ files:
     translation: /**/%locale%/%locale%.%file_name%.ini
     translation_replace:
       en-GB.: 
+  - source: /**/en-GB.*.ini
+    translation: /**/%locale%.%file_name%.ini
+    translation_replace:
+      en-GB.: 
