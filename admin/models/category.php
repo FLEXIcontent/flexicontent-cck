@@ -98,11 +98,17 @@ class FlexicontentModelCategory extends FCModelAdmin
 	var $extension_proxy = 'com_content';
 
 	/**
-	 * Records real extension
+	 * Context to use for registering (language) associations
 	 *
 	 * @var string
 	 */
 	var $associations_context = 'com_categories.item';
+
+
+	/**
+	 * Groups of Fields that can be partially present in the form
+	 */
+	var $mergeableGroups = array('params');
 
 	/**
 	 * Various record specific properties
@@ -638,7 +644,7 @@ class FlexicontentModelCategory extends FCModelAdmin
 					if ($language->lang_code == $data_language) continue;
 					$field = $fieldset->addChild('field');
 					$field->addAttribute('name', $language->lang_code);
-					$field->addAttribute('type', 'qfcategory');
+					$field->addAttribute('type', 'fccategory');
 					$field->addAttribute('language', $language->lang_code);
 					$field->addAttribute('label', $language->title);
 					$field->addAttribute('class', 'label');
@@ -775,7 +781,7 @@ class FlexicontentModelCategory extends FCModelAdmin
 		// *** By doing partial merging of these arrays we support having only a sub-set of them inside the form
 		// *** we will use mergeAttributes() instead of bind(), thus fields that are not set will maintain their current DB values,
 		// ***
-		$mergeProperties = array('params');
+		$mergeProperties = $this->mergeableGroups;
 		$mergeOptions = array(
 			'params_fset'  => 'params',
 			'layout_type'  => 'category',

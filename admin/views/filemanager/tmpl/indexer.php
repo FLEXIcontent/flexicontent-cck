@@ -31,7 +31,7 @@ $index_urls   = $app->input->get('index_urls', 0, 'int');
 <div style="heading">
 	<?php echo JText::_('FLEXI_TASK_RUNNING'); ?> ... <br/>
 	
-<script type="text/javascript">
+<script>
 jQuery(document).ready(function() {
 	var total_time = 0;
 	var records_per_call = 1000;

@@ -12,6 +12,18 @@
 defined('_JEXEC') or die('Restricted access');
 
 use Joomla\String\StringHelper;
+JHtml::addIncludePath(JPATH_COMPONENT . '/helpers/html');
+
+global $globalcats;
+$app     = JFactory::getApplication();
+$jinput  = $app->input;
+$config  = JFactory::getConfig();
+$user    = JFactory::getUser();
+$cparams = JComponentHelper::getParams('com_flexicontent');
+$ctrl    = 'types.';
+$hlpname = 'fctypes';
+$isAdmin = $app->isAdmin();
+
 
 $tip_class = ' hasTooltip';
 $btn_class = 'btn';  //'fc_button fcsimple';
@@ -53,7 +65,7 @@ flexicontent_html::jscode_to_showhide_table(
 	$start_html = '',  //'<span class="badge ' . (FLEXI_J40GE ? 'badge-dark' : 'badge-inverse') . '">' . JText::_('FLEXI_COLUMNS', true) . '<\/span> &nbsp; ',
 	$end_html = '<div id="fc-columns-slide-btn" class="icon-arrow-up-2 btn btn-outline-secondary" title="' . JText::_('FLEXI_HIDE') . '" style="cursor: pointer;" onclick="fc_toggle_box_via_btn(\\\'mainChooseColBox\\\', document.getElementById(\\\'fc_mainChooseColBox_btn\\\'), \\\'btn-primary\\\');"><\/div>'
 );
-$tools_cookies['fc-filters-box-disp'] = JFactory::getApplication()->input->cookie->get('fc-filters-box-disp', 0, 'int');
+$tools_cookies['fc-filters-box-disp'] = 0; //JFactory::getApplication()->input->cookie->get('fc-filters-box-disp', 0, 'int');
 
 
 
@@ -62,12 +74,8 @@ $tools_cookies['fc-filters-box-disp'] = JFactory::getApplication()->input->cooki
  */
 
 
-$attribs_preview    = ' class="fc-preview-btn ntxt '.$btn_s_class.' '.$tip_class.'" title="'.flexicontent_html::getToolTip( 'FLEXI_PREVIEW', 'FLEXI_DISPLAY_ENTRY_IN_FRONTEND_DESC', 1, 1).'" ';
-$attribs_rsslist    = ' class="fc-rss-list-btn ntxt '.$btn_s_class.' '.$tip_class.'" title="'.flexicontent_html::getToolTip( 'FLEXI_FEED_RSS', 'FLEXI_DISPLAY_RSS_IN_FRONTEND_DESC', 1, 1).'" ';
 $attribs_editlayout = ' class="fc-edit-layout-btn ntxt '.$btn_s_class.' '.$tip_class.'" title="'.flexicontent_html::getToolTip( 'FLEXI_EDIT_LAYOUT_N_GLOBAL_PARAMETERS', null, 1, 1).'" ';
 
-$image_preview = JHtml::image( 'components/com_flexicontent/assets/images/'.'monitor_go.png', JText::_('FLEXI_PREVIEW'), ' class="'.$ico_class.'"');
-$image_rsslist = JHtml::image( FLEXI_ICONPATH.'livemarks.png', JText::_('FLEXI_FEED'), ' class="'.$ico_class.'"');
 $image_editlayout = 0 ?
 	JHtml::image('components/com_flexicontent/assets/images/'.'layout_edit.png', htmlspecialchars(JText::_('FLEXI_EDIT_LAYOUT_N_GLOBAL_PARAMETERS'), ENT_QUOTES, 'UTF-8'), ' class="'.$ico_class.'"') :
 	'<span class="'.$ico_class.'"><span class="icon-edit"></span></span>' ;
@@ -77,7 +85,7 @@ $default_template_tip = '<img src="components/com_flexicontent/assets/images/com
 ?>
 
 
-<script type="text/javascript">
+<script>
 
 // delete active filter
 function delFilter(name)
@@ -174,7 +182,7 @@ function delAllFilters()
 		<div class="fc-filter-head-box nowrap_box">
 
 			<div class="btn-group">
-				<div id="fc_mainChooseColBox_btn" class="<?php echo $out_class; ?> hidden-phone" onclick="fc_toggle_box_via_btn('mainChooseColBox', this, 'btn-primary');">
+				<div id="fc_mainChooseColBox_btn" class="<?php echo $out_class . ' ' . $this->tooltip_class; ?> hidden-phone" onclick="fc_toggle_box_via_btn('mainChooseColBox', this, 'btn-primary');" title="<?php echo flexicontent_html::getToolTip('', 'FLEXI_ABOUT_AUTO_HIDDEN_COLUMNS', 1, 1); ?>">
 					<?php echo JText::_( 'FLEXI_COLUMNS' ); ?><sup id="columnchoose_totals"></sup>
 				</div>
 
@@ -227,17 +235,42 @@ function delAllFilters()
 				</div>
 			</th>
 
+			<th class="hideOnDemandClass left">
+				<?php echo JHtml::_('grid.sort', 'FLEXI_STATUS', 'a.' . $this->state_propname, $this->lists['order_Dir'], $this->lists['order'] ); ?>
+			</th>
 
-			<th class="hideOnDemandClass title"><?php echo JHtml::_('grid.sort', 'FLEXI_TYPE_NAME', 'a.name', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
-			<th class="hideOnDemandClass col_redirect hidden-tablet hidden-phone"><?php echo $article_viewing_tip . JText::_( 'FLEXI_JOOMLA_ARTICLE_VIEW' )."<br/><small>(" . JText::_( 'FLEXI_ALLOWED') .' / '. JText::_( 'FLEXI_REROUTED' ) .' / '. JText::_( 'FLEXI_REDIRECTED' ) . ")</small>"; ?></th>
-			<th class="hideOnDemandClass hidden-phone" colspan="2"><?php echo $default_template_tip.JText::_( 'FLEXI_TEMPLATE' )."<br/><small>(".JText::_( 'FLEXI_PROPERTY_DEFAULT' )." ".JText::_( 'FLEXI_TEMPLATE_ITEM' ).")</small>"; ?></th>
-			<th class="hideOnDemandClass hidden-tablet hidden-phone"><?php echo JHtml::_('grid.sort', 'FLEXI_ALIAS', 'a.alias', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
-			<th class="hideOnDemandClass text-center"><?php echo JHtml::_('grid.sort', 'FLEXI_FIELDS', 'fassigned', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
-			<th class="hideOnDemandClass text-center"><?php echo JHtml::_('grid.sort', 'FLEXI_ITEMS', 'iassigned', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
-			<!--th class="hideOnDemandClass"><?php // echo JHtml::_('grid.sort', 'ITEMS', 'iassigned', $this->lists['order_Dir'], $this->lists['order'] ); ?></th-->
-			<th class="hideOnDemandClass"><?php echo JHtml::_('grid.sort', 'FLEXI_ACCESS', 'a.access', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
-			<th class="hideOnDemandClass text-center hidden-phone"><?php echo JText::_( 'FLEXI_PUBLISHED' ); ?></th>
-			<th class="hideOnDemandClass col_id text-center hidden-tablet hidden-phone"><?php echo JHtml::_('grid.sort', 'FLEXI_ID', 'a.id', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th class="hideOnDemandClass title">
+				<?php echo JHtml::_('grid.sort', 'FLEXI_TYPE_NAME', 'a.name', $this->lists['order_Dir'], $this->lists['order'] ); ?>
+			</th>
+
+			<th class="hideOnDemandClass col_redirect hidden-phone hidden-tablet">
+				<?php echo $article_viewing_tip . JText::_( 'FLEXI_JOOMLA_ARTICLE_VIEW' )."<br/><small>(" . JText::_( 'FLEXI_ALLOWED') .' / '. JText::_( 'FLEXI_REROUTED' ) .' / '. JText::_( 'FLEXI_REDIRECTED' ) . ")</small>"; ?>
+			</th>
+
+			<th class="left hideOnDemandClass hidden-phone hidden-tablet" colspan="2">
+				<?php echo $default_template_tip.JText::_( 'FLEXI_TEMPLATE' )."<br/><small>(".JText::_( 'FLEXI_PROPERTY_DEFAULT' )." ".JText::_( 'FLEXI_TEMPLATE_ITEM' ).")</small>"; ?>
+			</th>
+
+			<th class="hideOnDemandClass hidden-phone hidden-tablet">
+				<?php echo JHtml::_('grid.sort', 'FLEXI_ALIAS', 'a.alias', $this->lists['order_Dir'], $this->lists['order'] ); ?>
+			</th>
+
+			<th class="hideOnDemandClass center">
+				<?php echo JHtml::_('grid.sort', 'FLEXI_FIELDS', 'fassigned', $this->lists['order_Dir'], $this->lists['order'] ); ?>
+			</th>
+
+			<th class="hideOnDemandClass center">
+				<?php echo JHtml::_('grid.sort', 'FLEXI_ITEMS', 'iassigned', $this->lists['order_Dir'], $this->lists['order'] ); ?>
+			</th>
+
+			<th class="hideOnDemandClass hidden-phone">
+				<?php echo JHtml::_('grid.sort', 'FLEXI_ACCESS', 'a.access', $this->lists['order_Dir'], $this->lists['order'] ); ?>
+			</th>
+
+			<th class="hideOnDemandClass col_id center hidden-phone hidden-tablet">
+				<?php echo JHtml::_('grid.sort', 'FLEXI_ID', 'a.id', $this->lists['order_Dir'], $this->lists['order'] ); ?>
+			</th>
+
 		</tr>
 	</thead>
 
@@ -245,82 +278,70 @@ function delAllFilters()
 		<?php
 		$canCheckinRecords = $user->authorise('core.admin', 'com_checkin');
 
-		$k = 0;
+		// Add 1 collapsed row to the empty table to allow border styling to apply
+		if (!count($this->rows))
+		{
+			echo '<tr class="collapsed_row"><td colspan="'.$list_total_cols.'"></td></tr>';
+		}
 
-		if (!count($this->rows)) echo '<tr class="collapsed_row"><td colspan="'.$list_total_cols.'"></td></tr>';  // Collapsed row to allow border styling to apply		$k = 0;
-		for ($i=0, $n=count($this->rows); $i < $n; $i++)
+		foreach ($this->rows as $i => $row)
 		{
 			$row = & $this->rows[$i];
 			$link 		= 'index.php?option=com_flexicontent&amp;task=types.edit&amp;view=type&amp;id='. $row->id;
-			$published 	= JHtml::_('jgrid.published', $row->published, $i, 'types.' );
-			$access		= flexicontent_html::userlevel('access['.$row->id.']', $row->access, 'onchange="return listItemTask(\'cb'.$i.'\',\'types.access\')" class="use_select2_lib fc_skip_highlight"');
 
-			$fields_url = 'index.php?option=com_flexicontent&amp;view=fields&amp;filter_type='. $row->id;
-			$items_url  = 'index.php?option=com_flexicontent&amp;view=items&amp;filter_type='. $row->id;
-			$layout_url = 'index.php?option=com_flexicontent&amp;view=template&amp;type=items&amp;tmpl=component&amp;ismodal=1&amp;folder=' . $row->config->get("ilayout") . '&amp;' . JSession::getFormToken() . '=1';
+			$fields_link = 'index.php?option=com_flexicontent&amp;view=fields&amp;filter_type='. $row->id;
+			$items_link  = 'index.php?option=com_flexicontent&amp;view=items&amp;filter_type='. $row->id;
+
+			// Permissions
+			$row->canCheckin   = empty($row->checked_out) || $row->checked_out == $user->id || $canCheckinRecords;
+			$row->canEdit      = 1;
+			$row->canEditState = 1;
+			$row->canDelete    = 1;
+
 			$canEdit    = 1;
-			$canEditOwn = 1;
+
+			$stateIsChangeable = $row->canCheckin && $row->canEditState;
+			$row_ilayout       = $row->config->get('ilayout');
    		?>
-		<tr class="<?php echo "row$k"; ?>">
+		<tr class="<?php echo 'row' . ($i % 2); ?>">
 
 			<td class="hidden-phone">
-				<div class="adminlist-table-row"></div>
-				<?php echo $this->pagination->getRowOffset( $i ); ?>
+				<?php echo $this->pagination->getRowOffset($i); ?>
 			</td>
 
-			<td>
-				<?php echo JHtml::_('grid.id', $i, $row->id); ?>
-				<label for="cb<?php echo $i; ?>" class="green single"></label>
+			<td class="col_cb">
+				<!--div class="adminlist-table-row"></div-->
+				<?php echo JHtml::_($hlpname . '.grid_id', $i, $row->id); ?>
 			</td>
-			<td class="left">
+
+			<td class="col_status" style="padding-right: 8px;">
+				<div class="btn-group fc-group fc-types">
+					<?php
+					//echo JHtml::_('jgrid.published', $row->state, $i, $ctrl, $stateIsChangeable);
+					//echo JHtml::_($hlpname . '.published', $row->state, $i, $stateIsChangeable);
+
+					echo JHtml::_($hlpname . '.statebutton', $row, $i);
+					?>
+				</div>
+			</td>
+
+			<td class="col_title">
 				<?php
+				/**
+				 * Display an edit pencil or a check-in button if: either (a) current user has Global
+				 * Checkin privilege OR (b) record checked out by current user, otherwise display a lock
+				 */
+				echo JHtml::_($hlpname . '.checkedout', $row, $user, $i);
 
-				// Display an icon with checkin link, if current user has checked out current item
-				if ($row->checked_out) {
-					// Record check-in is allowed if either (a) current user has Global Checkin privilege OR (b) record checked out by current user
-					$canCheckin = $canCheckinRecords || $row->checked_out == $user->id;
-					if ($canCheckin) {
-						//echo JHtml::_('jgrid.checkedout', $i, $row->editor, $row->checked_out_time, 'types.', $canCheckin);
-						$task_str = 'types.checkin';
-						if ($row->checked_out === $user->id)
-						{
-							$_tip_title = JText::sprintf('FLEXI_CLICK_TO_RELEASE_YOUR_LOCK_DESC', $row->editor, $row->checked_out_time);
-						}
-						else
-						{
-							echo '<input id="cb'.$i.'" type="checkbox" value="'.$row->id.'" name="cid[]" style="display:none!important;">';
-							$_tip_title = JText::sprintf('FLEXI_CLICK_TO_RELEASE_FOREIGN_LOCK_DESC', $row->editor, $row->checked_out_time);
-						}
-						$_tip_title = htmlspecialchars($_tip_title, ENT_QUOTES, 'UTF-8');
-						?>
-						<a class="btn btn-micro <?php echo $tip_class; ?>" title="<?php echo $_tip_title; ?>" href="javascript:;" onclick="var ccb=document.getElementById('cb<?php echo $i;?>'); ccb.checked=1; ccb.form.task.value='<?php echo $task_str; ?>'; ccb.form.submit();">
-							<span class="icon-checkedout"></span>
-						</a>
-						<?php
-					} else {
-						echo '<span class="fc-noauth">'.JText::sprintf('FLEXI_RECORD_CHECKED_OUT_DIFF_USER').'</span><br/>';
-					}
-				}
-
-				$translated_label = JText::_($row->name);
-				$original_label_text = ($translated_label != $row->name) ? '<br/><small>'.$row->name.'</small>' : '';
-
-				// Display title with no edit link ... if row checked out by different user -OR- is uneditable
-				if ( ( $row->checked_out && $row->checked_out != $user->id ) || ( !$canEdit ) ) {
-					echo htmlspecialchars($translated_label, ENT_QUOTES, 'UTF-8');
-
-				// Display title with edit link ... (row editable and not checked out)
-				} else {
-				?>
-					<a href="<?php echo $link; ?>" title="<?php echo $edit_entry; ?>">
-						<?php echo htmlspecialchars($translated_label, ENT_QUOTES, 'UTF-8'); ?>
-					</a>
-					<?php echo $original_label_text;?>
-				<?php
-				}
+				/**
+				 * Display title with edit link ... (row editable and not checked out)
+				 * Display title with no edit link ... if row is not-editable for any reason (no ACL or checked-out by other user)
+				 */
+				echo JHtml::_($hlpname . '.edit_link', $row, $i, $row->canEdit);
 				?>
 			</td>
-			<td class="col_redirect hidden-tablet hidden-phone">
+
+			<td class="col_redirect hidden-phone hidden-tablet">
 				<?php
 					$jarticle_url_handling_txts = array(0 => 'FLEXI_ROUTE_TO_ITEM_VIEW', 1 => 'FLEXI_ALLOWED', '2' => 'FLEXI_REDIRECT_TO_ITEM_VIEW');
 					$allow_jview = $row->config->get("allow_jview");
@@ -334,45 +355,48 @@ function delAllFilters()
 				?>
 			</td>
 
-			<td class="hidden-phone col_edit_layout">
-				<?php if ($this->perms->CanTemplates) : ?>
-				<a <?php echo $attribs_editlayout; ?> href="<?php echo $layout_url; ?>" onclick="var url = jQuery(this).attr('href'); fc_showDialog(url, 'fc_modal_popup_container', 0, 0, 0, 0, {title:'<?php echo $edit_layout; ?>'}); return false;" >
-					<?php echo $image_editlayout;?>
-				</a>
-				<?php endif; ?>
-			</td>
-			<td class="hidden-phone col_template">
-				<small><?php echo $row->config->get("ilayout"); ?></small>
+			<td class="col_edit_layout hidden-phone hidden-tablet">
+				<?php echo JHtml::_($hlpname . '.edit_layout', $row, '__modal__', $i, $this->perms->CanTemplates, $row_ilayout); ?>
 			</td>
 
-			<td class="hidden-tablet hidden-phone col_alias">
-				<small><?php
-				if (StringHelper::strlen($row->alias) > 25) {
-					echo StringHelper::substr( htmlspecialchars($row->alias, ENT_QUOTES, 'UTF-8'), 0 , 25).'...';
-				} else {
-					echo htmlspecialchars($row->alias, ENT_QUOTES, 'UTF-8');
-				}
-				?></small>
+			<td class="col_template hidden-phone hidden-tablet">
+				<small><?php echo $row_ilayout; ?></small>
 			</td>
-			<td class="text-center">
-				<a class="badge fc-assignments-btn" href="<?php echo $fields_url; ?>">
+
+			<td class="col_alias hidden-phone hidden-tablet">
+				<?php echo StringHelper::strlen($row->alias) > 25
+					? StringHelper::substr( htmlspecialchars($row->alias, ENT_QUOTES, 'UTF-8'), 0 , 25) . '...'
+					: htmlspecialchars($row->alias, ENT_QUOTES, 'UTF-8');
+				?>
+			</td>
+
+			<td class="center">
+				<a class="badge fc-assignments-btn" href="<?php echo $fields_link; ?>">
 					<?php echo $row->fassigned; ?>
 				</a>
 			</td>
-			<td class="text-center">
-				<a class="badge badge-info fc-assignments-btn" href="<?php echo $items_url; ?>">
+
+			<td class="center">
+				<a class="badge badge-info fc-assignments-btn" href="<?php echo $items_link; ?>">
 					<?php echo $row->iassigned; ?>
 				</a>
 			</td>
-			<td>
-				<?php echo $access; ?>
+
+			<td class="col_access hidden-phone">
+				<?php echo $row->canEdit
+					? flexicontent_html::userlevel('access['.$row->id.']', $row->access, 'onchange="return listItemTask(\'cb'.$i.'\',\''.$ctrl.'access\')" class="use_select2_lib fc_skip_highlight"')
+					: $this->escape($row->access_level);
+				?>
 			</td>
-			<td class="text-center hidden-phone">
-				<?php echo $published; ?>
+
+			<td class="col_id hidden-phone hidden-tablet">
+				<?php echo $row->id; ?>
 			</td>
-			<td class="text-center hidden-tablet hidden-phone col_id"><?php echo $row->id; ?></td>
+
 		</tr>
-		<?php $k = 1 - $k; } ?>
+		<?php
+		}
+		?>
 	</tbody>
 
 	<tfoot>

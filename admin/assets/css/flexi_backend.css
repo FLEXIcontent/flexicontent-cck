@@ -149,7 +149,7 @@ icon-typeadd:before,
 	float: none !important;
 	vertical-align: middle !important;
 	display: inline-block !important;
-	margin-left: 12px;
+	margin: 0;
 }
 .flexicontent #adminForm .fc_drag_handle_none,
 .flexicontent #adminForm .fc_drag_handle {
@@ -223,6 +223,16 @@ div.adminthumbs.fcmanthumbs {
 #flexicontent input.fcitem_order_no {
 	text-align: center;
 }
+.flexicontent #fc-managers-header select.fc_is_selarrow {
+	max-width: 1.4em !important;
+}
+.flexicontent #fc-managers-header select.fc_is_selarrow:hover,
+.flexicontent #fc-managers-header select.fc_is_selarrow:focus {
+	max-width: unset !important;
+}
+.flexicontent #fc-managers-header select.fc_is_selarrow + #search {
+	margin-left: 1.3em !important;
+}
 .flexicontent #fc-managers-header #search {
 	margin: 0px !important;
 	padding: 4px !important;
@@ -278,6 +288,12 @@ div.adminthumbs.fcmanthumbs {
 	padding: 4px;
 	float: none;
 	clear: both;
+}
+@media only screen and (max-width: 480px) {
+	.flexicontent #fc-managers-header #search {
+		width: 112px;
+		min-width: 112px;
+	}
 }
 .flexicontent #fc-filters-box {
 	padding-left: 0px;
@@ -980,11 +996,11 @@ img.btn.btn-small.fc-man-icon-s {
 	font-family: verdana;
 }
 .flexicontent .fcmanlist :not(.btn-group) > .btn.btn-small {
-	padding: 2px 2px 1px 3px;
+	padding: 2px 2px 0px 3px;
 	font-size: 14px;
 }
 .flexicontent .fcmanlist :not(.btn-group) > .btn.btn-micro {
-	padding: 2px 1px 1px 2px;
+	padding: 1px 1px 1px 1px;
 	font-size: 12px;
 }
 .flexicontent .fcmanlist :not(.btn-group) > .btn.btn-mini {

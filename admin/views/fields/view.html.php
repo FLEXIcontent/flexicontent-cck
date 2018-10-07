@@ -87,9 +87,13 @@ class FlexicontentViewFields extends FlexicontentViewBaseRecords
 		$filter_state     = $model->getState('filter_state');
 		$filter_access    = $model->getState('filter_access');
 
+		$reOrderingActive = !$filter_type
+			? ($filter_order === 'a.ordering')
+			: ($filter_order === 'typeordering');
+
 		if ($filter_fieldtype) $count_filters++;
 		if ($filter_assigned) $count_filters++;
-		if ($filter_type) $count_filters++;
+		if ($filter_type && !$reOrderingActive) $count_filters++;
 		if ($filter_state) $count_filters++;
 		if ($filter_access) $count_filters++;
 
@@ -157,19 +161,110 @@ class FlexicontentViewFields extends FlexicontentViewBaseRecords
 
 		if ( $print_logging_info )  $start_microtime = microtime(true);
 
+
+		// Get fields
 		$rows = $this->get('Items');
 
-		// Fields assigned to fieldgroups
-		$rowsFG = $model->getItemsByConditions(
-			array(
-			'where' => array('t.field_type = "fieldgroup"')
-			)
-		);
-
-		// Known Field types
+		// Get -all- content types
 		$types = $this->get('Typeslist');
 
+		$rowsByIds    = array();
+		$master_fids  = array(0);
+		$grouped_fids = array(0);
+
+		$CA_fieldids  = array();
+		$FG_fieldids  = array();
+
+		foreach ($rows as $row)
+		{
+			$rowsByIds[$row->id] = $row;
+
+			// Load field parameters
+			$row->parameters = new JRegistry($row->attribs);
+
+			// Find ids of master fields (if any)
+			$cascade_after = (int) $row->parameters->get('cascade_after');
+
+			if ($cascade_after)
+			{
+				$CA_fieldids[$cascade_after] = $row->id;
+				$master_fids[] = $cascade_after;
+			}
+
+			// Find ids of master fields (if any)
+			if ($row->field_type === 'fieldgroup')
+			{
+				$FG_fieldids[$row->id] = preg_split('/[\s]*,[\s]*/', $row->parameters->get('fields'));
+				$grouped_fids = array_merge($grouped_fids, $FG_fieldids[$row->id]);
+			}
+		}
+
+		// Get grouped fields inside a fieldgroup field of -current- page
+		$rowsInGroup = $model->getItemsByConditions(array(
+			'where' => array('t.id IN (' . implode(',', $grouped_fids) . ')'),
+		));
+
+
+		/**
+		 * Get -all- fieldgroup fields ('fieldgroup' field-type) and iterate through all them to create the
+		 * information needed for displaying fieldgroup information of every grouped field in current list
+		 */
+
+		$rowsFG = $model->getItemsByConditions(array(
+			'where' => array('t.field_type = "fieldgroup"'),
+		));
+
+		foreach ($rowsFG as $row)
+		{
+			// Handle displaying information: FIELDGROUP feature
+			$row->parameters = new JRegistry($row->attribs);
+			$ingroup_fids = preg_split('/[\s]*,[\s]*/', $row->parameters->get('fields'));
+
+			// For fields of group that are included in current list, add reference to their group field
+			foreach($ingroup_fids as $grouped_field_id)
+			{
+				if (isset($rowsByIds[$grouped_field_id]))
+				{
+					$rowsByIds[$grouped_field_id]->grouping_field = $row;
+				}
+			}
+
+			// Check if fieldgroup field is present in current list and create its list of grouped fields
+			if (isset($FG_fieldids[$row->id]))
+			{
+				$rowsByIds[$row->id]->grouped_fields = array();
+
+				foreach ($FG_fieldids[$row->id] as $grouped_field_id)
+				{
+					if (isset($rowsInGroup[$grouped_field_id]))
+					{
+						$rowsByIds[$row->id]->grouped_fields[] = $rowsInGroup[$grouped_field_id];
+					}
+				}
+			}
+		}
+
+
+		/**
+		 * Get master fields of fields in -current- page and use them to create the information
+		 * needed for displaying master field information of every field cascading after them
+		 */
+
+		$rowsMasters = $model->getItemsByConditions(array(
+			'where' => array('t.id IN (' . implode(',', $master_fids) . ')'),
+		));
+		
+		foreach ($rows as $row)
+		{
+			if ($row->parameters->get('cascade_after'))
+			{
+				$row->master_field = $rowsMasters[$row->parameters->get('cascade_after')];
+			}
+		}
+
+
 		if ( $print_logging_info ) @$fc_run_times['execute_main_query'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+
 
 		// Create pagination object
 		$pagination = $this->get('Pagination');
@@ -211,16 +306,44 @@ class FlexicontentViewFields extends FlexicontentViewBaseRecords
 		$lists = array();
 
 		// Build item type filter
+		$options = array();
+		foreach($types as $t)
+		{
+			$o = clone($t);
+			if ($reOrderingActive)
+			{
+				$o->name = JText::_('FLEXI_ITEM_FORM') . ' : ' . $o->name;
+			}
+			$options[] = $o;
+		}
+		array_unshift($options, (object) array('id' => 0, 'name' => ($reOrderingActive ? 'FLEXI_FILTERS' : '-')/*JText::_('FLEXI_SELECT_TYPE')*/));
+
+		if (!$filter_type)
+		{
+			$_img_title = JText::_('FLEXI_GLOBAL_ORDER', true);
+			$_img_title_desc = JText::_('FLEXI_GLOBAL_ORDER_DESC', true);
+		}
+		else
+		{
+			$_img_title = JText::_('FLEXI_TYPE_ORDER', true);
+			$_img_title_desc = JText::_('FLEXI_TYPE_ORDER_DESC', true);
+		}
+
 		$lists['filter_type'] = $this->getFilterDisplay(array(
-			'label' => JText::_('FLEXI_TYPE'),
+			'label' => ($reOrderingActive ? JText::_('FLEXI_ORDER') : JText::_('FLEXI_TYPE')),
+			'label_extra_class' => ($reOrderingActive ? 'fc-lbl-inverted fc-lbl-short icon-info-2 ' . $this->popover_class : ''),
+			'label_extra_attrs' => array(
+				'data-placement' => 'bottom',
+				'data-content' => flexicontent_html::getToolTip($_img_title, $_img_title_desc, 0, 1),
+			),
 			'html' => flexicontent_html::buildtypesselect(
-				$types,
+				$options,
 				'filter_type',
 				$filter_type,
 				0,
 				array(
 					'class' => 'use_select2_lib',
-					'size' => '3',
+					'size' => '1',
 					'onchange' => 'document.adminForm.limitstart.value=0; Joomla.submitform();',
 				),
 				'filter_type'
@@ -255,21 +378,23 @@ class FlexicontentViewFields extends FlexicontentViewBaseRecords
 		// Build field-type filter
 		$fieldTypes = flexicontent_db::getFieldTypes($_grouped = true, $_usage=true, $_published=false);  // Field types with content type ASSIGNMENT COUNTING
 		$ALL = StringHelper::strtoupper(JText::_( 'FLEXI_ALL' )) . ' : ';
-		$fftypes = array();
-		$fftypes[] = array('value' => '', 'text' => '-'/*JText::_( 'FLEXI_ALL_FIELDS_TYPE' )*/ );
-		$fftypes[] = array('value' => 'BV', 'text' => $ALL . JText::_( 'FLEXI_BACKEND_FIELDS' ) );
-		$fftypes[] = array('value' => 'C',  'text' => $ALL . JText::_( 'FLEXI_CORE_FIELDS' ) );
-		$fftypes[] = array('value' => 'NC', 'text' => $ALL . JText::_( 'FLEXI_CUSTOM_NON_CORE_FIELDS' ));
+		$options = array();
+		$options[] = array('value' => '', 'text' => '-'/*JText::_( 'FLEXI_ALL_FIELDS_TYPE' )*/ );
+		$options[] = array('value' => 'BV', 'text' => $ALL . JText::_( 'FLEXI_BACKEND_FIELDS' ) );
+		$options[] = array('value' => 'C',  'text' => $ALL . JText::_( 'FLEXI_CORE_FIELDS' ) );
+		$options[] = array('value' => 'NC', 'text' => $ALL . JText::_( 'FLEXI_CUSTOM_NON_CORE_FIELDS' ));
 		$n = 0;
+
 		foreach ($fieldTypes as $field_group => $ft_types)
 		{
-			$fftypes[$field_group] = array();
-			$fftypes[$field_group]['id'] = 'field_group_' . ($n++);
-			$fftypes[$field_group]['text'] = $field_group;
-			$fftypes[$field_group]['items'] = array();
+			$options[$field_group] = array();
+			$options[$field_group]['id'] = 'field_group_' . ($n++);
+			$options[$field_group]['text'] = $field_group;
+			$options[$field_group]['items'] = array();
+
 			foreach ($ft_types as $field_type => $ftdata)
 			{
-				$fftypes[$field_group]['items'][] = array('value' => $ftdata->field_type, 'text' => '-'.$ftdata->assigned.'- '. $ftdata->friendly);
+				$options[$field_group]['items'][] = array('value' => $ftdata->field_type, 'text' => '-'.$ftdata->assigned.'- '. $ftdata->friendly);
 			}
 		}
 
@@ -277,7 +402,7 @@ class FlexicontentViewFields extends FlexicontentViewBaseRecords
 		$lists['filter_fieldtype'] = $this->getFilterDisplay(array(
 			'label' => JText::_('FLEXI_FIELD_TYPE'),
 			'html' => flexicontent_html::buildfieldtypeslist(
-				$fftypes,
+				$options,
 				'filter_fieldtype',
 				$filter_fieldtype,
 				($_grouped ? 1 : 0),
@@ -355,10 +480,6 @@ class FlexicontentViewFields extends FlexicontentViewBaseRecords
 		$lists['order_Dir'] = $filter_order_Dir;
 		$lists['order']     = $filter_order;
 
-		$ordering = !$filter_type
-			? ($lists['order'] == 't.ordering')
-			: ($lists['order'] == 'typeordering');
-
 
 		/**
 		 * Assign data to template
@@ -369,10 +490,11 @@ class FlexicontentViewFields extends FlexicontentViewBaseRecords
 
 		$this->lists       = $lists;
 		$this->rows        = $rows;
-		$this->rowsFG      = $rowsFG;
+
 		$this->types       = $types;
 		$this->pagination  = $pagination;
-		$this->ordering    = $ordering;
+
+		$this->reOrderingActive = $reOrderingActive;
 
 		$this->perms  = FlexicontentHelperPerm::getPerm();
 		$this->option = $option;

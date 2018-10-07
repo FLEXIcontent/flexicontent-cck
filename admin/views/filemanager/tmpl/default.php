@@ -37,8 +37,9 @@ flexicontent_html::jscode_to_showhide_table(
 	$start_html = '<span class="label">'.JText::_('FLEXI_COLUMNS', true).'<\/span>',
 	$end_html = '<div class="icon-arrow-up-2" title="'.JText::_('FLEXI_HIDE').'" style="cursor: pointer;" onclick="fc_toggle_box_via_btn(\\\'mainChooseColBox\\\', document.getElementById(\\\'fc_mainChooseColBox_btn\\\'), \\\'btn-primary\\\');"><\/div>'
 );
-$tools_cookies['fc-filters-box-disp'] = JFactory::getApplication()->input->cookie->get('fc-filters-box-disp', 0, 'int');
+$tools_cookies['fc-filters-box-disp'] = 0; //JFactory::getApplication()->input->cookie->get('fc-filters-box-disp', 0, 'int');
 
+$ctrl       = 'filemanager.';
 $ctrl_task  = 'task=filemanager.';
 $ctrl_task_authors = 'task=users.';
 $action_url = JUri::base(true) . '/index.php?option=com_flexicontent&amp;' . JSession::getFormToken() . '=1&amp;' . $ctrl_task;
@@ -546,10 +547,17 @@ if ($js)
 		<?php if (!$this->folder_mode) : ?>
 
 			<div id="fc-managers-header">
-				<span class="fc-filter nowrap_box" style="margin: 1px;">
-					<?php echo $this->lists['scope']; ?>
-				</span>
+
+				<?php if (!empty($this->lists['scope_tip'])) : ?>
+				<div class="fc-filter-head-box filter-search nowrap_box" style="margin: 0;">
+					<?php echo $this->lists['scope_tip']; ?>
+				</div>
+				<?php endif; ?>
+
 				<div class="btn-group input-append fc-filter filter-search">
+					<?php
+						echo !empty($this->lists['scope']) ? $this->lists['scope'] : '';
+					?>
 					<input type="text" name="search" id="search" placeholder="<?php echo JText::_( 'FLEXI_SEARCH' ); ?>" value="<?php echo htmlspecialchars($this->lists['search'], ENT_QUOTES, 'UTF-8'); ?>" class="inputbox" />
 					<button title="" data-original-title="<?php echo JText::_('FLEXI_SEARCH'); ?>" class="<?php echo $btn_class.' '.$tip_class; ?>" onclick="document.adminForm.limitstart.value=0; Joomla.submitform();"><?php echo FLEXI_J30GE ? '<i class="icon-search"></i>' : JText::_('FLEXI_GO'); ?></button>
 					<button title="" data-original-title="<?php echo JText::_('FLEXI_RESET_FILTERS'); ?>" class="<?php echo $btn_class.' '.$tip_class; ?>" onclick="document.adminForm.limitstart.value=0; delAllFilters(); Joomla.submitform();"><?php echo FLEXI_J30GE ? '<i class="icon-remove"></i>' : JText::_('FLEXI_CLEAR'); ?></button>
@@ -760,11 +768,11 @@ if ($js)
 				<?php endif; ?>
 
 				<?php if (!empty($this->cols['upload_time'])) : ?>
-					<th class="center hideOnDemandClass hidden-tablet hidden-phone"><?php echo JHtml::_('grid.sort', 'FLEXI_UPLOAD_TIME', 'f.uploaded', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+					<th class="center hideOnDemandClass hidden-phone hidden-tablet"><?php echo JHtml::_('grid.sort', 'FLEXI_UPLOAD_TIME', 'f.uploaded', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 				<?php endif; ?>
 
 				<?php if (!empty($this->cols['file_id'])) : ?>
-					<th class="center hideOnDemandClass hidden-tablet hidden-phone"><?php echo JHtml::_('grid.sort', 'FLEXI_ID', 'f.id', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+					<th class="center hideOnDemandClass hidden-phone hidden-tablet"><?php echo JHtml::_('grid.sort', 'FLEXI_ID', 'f.id', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 				<?php endif; ?>
 
 				<?php if ($isFilesElement) : /* Direct delete button for fileselement view */ ?>
@@ -888,11 +896,11 @@ if ($js)
 		   		?>
 				<tr class="<?php echo 'row'.$k; ?>">
 					<td class="center hidden-phone">
-						<div class="adminlist-table-row"></div>
-						<?php echo $this->pagination->getRowOffset( $i ); ?>
+						<?php echo $this->pagination->getRowOffset($i); ?>
 					</td>
 
 					<td class="center <?php echo ($file_is_selected ? ' is-pending-file' : ''); ?>">
+						<!--div class="adminlist-table-row"></div-->
 						<?php echo JHtml::_('grid.id', $i, !$this->folder_mode ? $row->id : rawurlencode($filename)); ?>
 						<label for="cb<?php echo $i; ?>" class="green single" onclick="fman_sync_cid(<?php echo $i; ?>, 1);"></label>
 					</td>
@@ -968,20 +976,16 @@ if ($js)
 
 				<?php if (!empty($this->cols['state'])) : ?>
 					<td class="center">
-						<?php echo JHtml::_('jgrid.published', $row->published, $i, 'filemanager.' ); ?>
+						<?php echo JHtml::_('jgrid.published', $row->published, $i, $ctrl); ?>
 					</td>
 				<?php endif; ?>
 
 				<?php if (!empty($this->cols['access'])) : ?>
 					<td class="center hidden-phone">
 					<?php
-					$is_authorised = $this->CanFiles && ($this->CanViewAllFiles || $user->id == $row->uploaded_by);
-					if ($is_authorised) {
-						$access = flexicontent_html::userlevel('access['.$row->id.']', $row->access, 'onchange="return listItemTask(\'cb'.$i.'\',\'filemanager.access\')"');
-					} else {
-						$access = strlen($row->access_level) ? $this->escape($row->access_level) : '-';
-					}
-					echo $access;
+					echo $this->CanFiles && ($this->CanViewAllFiles || $user->id == $row->uploaded_by)
+						? flexicontent_html::userlevel('access['.$row->id.']', $row->access, 'onchange="return listItemTask(\'cb'.$i.'\',\''.$ctrl.'access\')" class="use_select2_lib fc_skip_highlight"')
+						: (strlen($row->access_level) ? $this->escape($row->access_level) : '-');
 					?>
 					</td>
 				<?php endif; ?>
@@ -1040,14 +1044,14 @@ if ($js)
 				<?php endif; ?>
 
 				<?php if (!empty($this->cols['upload_time'])) : ?>
-					<td class="center hidden-tablet hidden-phone">
+					<td class="center hidden-phone hidden-tablet">
 						<?php echo JHtml::Date( $row->uploaded, JText::_( 'DATE_FORMAT_LC3' )." H:i" ); ?>
 					</td>
 				<?php endif; ?>
 
 
 				<?php if (!empty($this->cols['file_id'])) : ?>
-					<td class="center hidden-tablet hidden-phone"><?php echo $row->id; ?></td>
+					<td class="center hidden-phone hidden-tablet"><?php echo $row->id; ?></td>
 				<?php endif; ?>
 
 					<?php if ($isFilesElement) : /* Direct delete button for fileselement view */ ?>

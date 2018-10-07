@@ -66,16 +66,17 @@ class JFormFieldFlexicategories extends JFormField
 
 		$values = $this->value;
 
-		if ( !empty($attributes['joinwith']) )
+		if (!empty($attributes['joinwith']))
 		{
 			$values = explode( $attributes['joinwith'],  $values );
 		}
+
 		if ( empty($values) )							$values = array();
 		else if ( ! is_array($values) )		$values = !FLEXI_J16GE ? array($values) : explode("|", $values);
 		
 		$fieldname	= FLEXI_J16GE ? $this->name : $control_name.'['.$name.']';
 		$element_id = FLEXI_J16GE ? $this->id : $control_name.$name;
-		$ffname = @$attributes['name'];
+		$ffname = (string) $this->element['name'];
 		
 		$published_only = (boolean) @$attributes['published_only'];
 		$parent_id   = (int) @$attributes['parent_id'];
@@ -85,10 +86,15 @@ class JFormFieldFlexicategories extends JFormField
 		$attribs = '';
 		
 		// Steps needed for multi-value select field element, e.g. code to maximize select field
-		if ( @$attributes['multiple']=='multiple' || @$attributes['multiple']=='true' )
+		$multiple = (string) $this->element['multiple'];
+		$size = (int) $this->element['size'];
+
+		$isMultiple = $multiple === 'multiple' ||  $multiple === 'true';
+		
+		if ($isMultiple)
 		{
 			$attribs .= ' multiple="multiple" ';
-			$attribs .= (@$attributes['size']) ? ' size="'.$attributes['size'].'" ' : ' size="8" ';
+			$attribs .= ' size="' . ($size ?: 8). '" ';
 		}
 		
 		$top = @$attributes['top'] ? $attributes['top'] : false;
@@ -101,31 +107,41 @@ class JFormFieldFlexicategories extends JFormField
 		
 		
 		// Add onClick functions (e.g. joining values to a string)
-		if ( !empty($attributes['joinwith']) && !$function_added) {
+		if (!empty($attributes['joinwith']) && !$function_added)
+		{
 			$function_added = true;
-			$js = "
-			function FLEXIClickCategory(obj, name) {
-				values=new Array();
-				for(i=0,j=0;i<obj.options.length;i++) {
-					if(obj.options[i].selected==true)
+			$js = '
+			function FLEXIClickCategory(obj, name)
+			{
+				values = new Array();
+
+				for (i = 0, j = 0; i < obj.options.length; i++)
+				{
+					if (obj.options[i].selected == true)
+					{
 						values[j++] = obj.options[i].value;
+					}
 				}
-				value_list = values.join(',');
-				document.getElementById('a_id_'+name).value = value_list;
-				//alert(document.getElementById('a_id_'+name).value);
-			}";
-			$doc = JFactory::getDocument();
-			$doc->addScriptDeclaration($js);
+
+				value_list = values.join(\',\');
+				document.getElementById(\'a_id_\' + name).value = value_list;
+			}';
+
+			JFactory::getDocument()->addScriptDeclaration($js);
 		}
 		
 		$html = '';
-		if ( !empty($attributes['joinwith']) ) {
+
+		if (!empty($attributes['joinwith']))
+		{
 			$select_fieldname = '_'.$ffname.'_';
 			$text_fieldname = str_replace('[]', '', $fieldname);
 			
 			$attribs .= ' onclick="FLEXIClickCategory(this,\''.$ffname.'\');" ';
 			$html    .= "\n<input type=\"hidden\" id=\"a_id_{$ffname}\" name=\"$text_fieldname\" value=\"".@$values[0]."\" />";
-		} else {
+		}
+		else
+		{
 			$select_fieldname = $fieldname;
 		}
 		
@@ -138,4 +154,3 @@ class JFormFieldFlexicategories extends JFormField
 		return $html;
 	}
 }
-?>

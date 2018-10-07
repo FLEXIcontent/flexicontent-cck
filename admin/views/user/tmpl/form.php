@@ -44,7 +44,7 @@ $js = "
 $this->document->addScriptDeclaration($js);
 ?>
 
-<script type="text/javascript">
+<script>
 	/*jQuery(document).ready(function() {
 		jQuery('input[type=password]').each(function() {
 			jQuery(this).val('');

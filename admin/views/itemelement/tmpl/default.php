@@ -1,19 +1,12 @@
 <?php
 /**
- * @version 1.5 stable $Id: default.php 1267 2012-05-07 10:55:21Z ggppdk $
- * @package Joomla
- * @subpackage FLEXIcontent
- * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
- * @license GNU/GPL v2
- * 
- * FLEXIcontent is a derivative work of the excellent QuickFAQ component
- * @copyright (C) 2008 Christoph Lukes
- * see www.schlu.net for more information
+ * @package         FLEXIcontent
+ * @version         3.3
  *
- * FLEXIcontent is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
+ * @link            http://www.flexicontent.com
+ * @copyright       Copyright © 2018, FLEXIcontent team, All Rights Reserved
+ * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
 defined('_JEXEC') or die('Restricted access');
@@ -44,10 +37,17 @@ function delFilter(name)
 }
 
 function delAllFilters() {
-	delFilter('search'); delFilter('filter_type'); delFilter('filter_state');
-	delFilter('filter_cats'); delFilter('filter_author'); delFilter('filter_id');
-	delFilter('startdate'); delFilter('enddate'); delFilter('filter_lang');
-	delFilter('filter_tag'); delFilter('filter_access');
+	delFilter('search');
+	delFilter('filter_type');
+	delFilter('filter_state');
+	delFilter('filter_cats');
+	delFilter('filter_author');
+	delFilter('filter_id');
+	delFilter('startdate');
+	delFilter('enddate');
+	delFilter('filter_lang');
+	delFilter('filter_tag');
+	delFilter('filter_access');
 	jQuery('#filter_subcats').val('1');
 	jQuery('.fc_field_filter').val('');
 }
@@ -67,7 +67,7 @@ function delAllFilters() {
 				<button title="<?php echo JText::_('FLEXI_RESET_FILTERS'); ?>" class="<?php echo $btn_class; ?>" onclick="document.adminForm.limitstart.value=0; delAllFilters(); Joomla.submitform();"><?php echo FLEXI_J30GE ? '<i class="icon-remove"></i>' : JText::_('FLEXI_CLEAR'); ?></button>
 			</span>
 		</span>
-		
+
 		<span class="fc-filter nowrap_box">
 			<span class="limit nowrap_box" style="display: inline-block;">
 				<label class="label">
@@ -78,11 +78,11 @@ function delAllFilters() {
 				if (strpos($pagination_footer, '"limit"') === false) echo $this->pagination->getLimitBox();
 				?>
 			</span>
-			
+
 			<span class="fc_item_total_data nowrap_box badge badge-info">
 				<?php echo @$this->resultsCounter ? $this->resultsCounter : $this->pagination->getResultsCounter(); // custom Results Counter ?>
 			</span>
-			
+
 			<?php if (($getPagesCounter = $this->pagination->getPagesCounter())): ?>
 			<span class="fc_pages_counter nowrap_box fc-mssg-inline fc-info fc-nobgimage">
 				<?php echo $getPagesCounter; ?>
@@ -90,28 +90,28 @@ function delAllFilters() {
 			<?php endif; ?>
 		</span>
 	</div>
-	
+
 	<div id="fc-filters-box">
 		<span class="fc-filter nowrap_box">
 			<?php echo $this->lists['filter_type'];	?>
 		</span>
-		
+
 		<span class="fc-filter nowrap_box">
 		<?php echo $this->lists['filter_lang']; ?>
 		</span>
-		
+
 		<span class="fc-filter nowrap_box">
 		<?php echo $this->lists['filter_author']; ?>
 		</span>
-		
+
 		<span class="fc-filter nowrap_box">
 		<?php echo $this->lists['filter_cats']; ?>
 		</span>
-		
+
 		<span class="fc-filter nowrap_box">
 		<?php echo $this->lists['filter_state']; ?>
 		</span>
-		
+
 		<span class="fc-filter nowrap_box">
 		<?php echo $this->lists['filter_access']; ?>
 		</span>
@@ -119,7 +119,7 @@ function delAllFilters() {
 
 
 
-	<table class="adminlist">
+	<table class="adminlist table fcmanlist" itemscope itemtype="http://schema.org/WebPage">
 	<thead>
 		<tr>
 			<th><?php echo JText::_( 'FLEXI_NUM' ); ?></th>
@@ -146,7 +146,7 @@ function delAllFilters() {
 		$k = 0;
 		for ($i=0, $n=count($this->rows); $i < $n; $i++) {
 			$row = $this->rows[$i];
-			
+
 				if ( $row->state == 1 ) {
 					$img = 'tick.png';
 					$alt = JText::_( 'FLEXI_PUBLISHED' );
@@ -176,12 +176,12 @@ function delAllFilters() {
 				}
    		?>
 		<tr class="<?php echo "row$k"; ?>">
-			
+
 			<td>
-				<div class="adminlist-table-row"></div>
-				<?php echo $this->pagination->getRowOffset( $i ); ?>
+				<!--div class="adminlist-table-row"></div-->
+				<?php echo $this->pagination->getRowOffset($i); ?>
 			</td>
-			
+
 			<td align="left">
 				<?php
 					$activate_row = !empty($row->is_current_association) || empty($this->lang_assocs[$row->id]);
@@ -253,34 +253,34 @@ function delAllFilters() {
 			<?php endif ; ?>
 
 			<td align="center" class="col_type"><?php echo $row->type_name; ?></td>
-			
+
 			<td align="left" class="col_cat">
 				<?php echo $globalcats[$row->catid]->title; ?>
 			</td>
 
 			<td align="center"><?php echo $row->author; ?></td>
-			
+
 			<td align="center">
 				<?php if ($img) : ?>
 					<img src="<?php  echo $app->isAdmin() ? "../" : ""; ?>components/com_flexicontent/assets/images/<?php echo $img;?>" width="16" height="16" border="0" alt="<?php echo $alt; ?>" title="<?php echo $alt; ?>" />
 				<?php endif; ?>
 			</td>
-			
+
 			<td align="center"><?php echo $row->access_level; ?></td>
-			
+
 			<td align="center" class="col_lang">
-				
+
 				<?php if ( 0 && !empty($row->lang) && !empty($this->langs->{$row->lang}->imgsrc) ) : ?>
 					<img class="<?php echo $tip_class; ?>" title="<?php echo flexicontent_html::getToolTip(JText::_( 'FLEXI_LANGUAGE' ), ($row->lang=='*' ? JText::_("All") : (!empty($row->lang) ? $this->langs->{$row->lang}->name : '')), 0, 1); ?>"
 						src="<?php echo $this->langs->{$row->lang}->imgsrc; ?>" alt="<?php echo $row->lang; ?>" />
 				<?php elseif( !empty($row->lang) ) : ?>
 					<?php echo ($row->lang=='*'  ?  JText::_("All")  :  (!empty($row->lang) ? $this->langs->{$row->lang}->name : '')); ?>
 				<?php endif; ?>
-				
+
 			</td>
-			
+
 			<td align="center"><?php echo $row->id; ?></td>
-			
+
 		</tr>
 		<?php
 			$k = 1 - $k;

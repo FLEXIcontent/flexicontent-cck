@@ -21,7 +21,7 @@ defined('_JEXEC') or die('Restricted access');
 $ctrl_task = FLEXI_J16GE ? 'task=tags.' : 'controller=tags&task=';
 $close_popup_js = FLEXI_J16GE ? "window.parent.SqueezeBox.close();" : "window.parent.document.getElementById('sbox-window').close();";
 ?>
-<script type="text/javascript">
+<script>
 window.addEvent('domready', function(){
 	$('adminForm').addEvent('submit', function(e) {
 		e = new Event(e).stop();

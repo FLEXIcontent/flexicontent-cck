@@ -24,7 +24,7 @@ defined('_JEXEC') or die('Restricted access');
 	form.lang_submit select#lang {  float:none;	margin:0px;  }
 </style>
 
-<script type="text/javascript">
+<script>
 	window.addEvent('domready', function(){
 		$('lang').addEvent('change', function(e) {
 			if(MooTools.version>="1.2.4") {

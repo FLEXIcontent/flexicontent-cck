@@ -34,7 +34,7 @@ $import_task = 'task=import.';
 	<?php echo JHtml::_( 'form.token' ); ?>
 </form>
 
-<script type="text/javascript">
+<script>
 
 jQuery(document).ready(function()
 {

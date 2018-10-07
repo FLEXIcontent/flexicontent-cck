@@ -32,10 +32,10 @@ $edit_entry = JText::_('FLEXI_EDIT_TYPE', true);
 $fcfilter_attrs_row  = ' class="input-prepend fc-xpended-row" ';
 
 $list_total_cols = $this->isADV ? 9 : 4;
-$tools_cookies['fc-filters-box-disp'] = JFactory::getApplication()->input->cookie->get('fc-filters-box-disp', 0, 'int');
+$tools_cookies['fc-filters-box-disp'] = 0; //JFactory::getApplication()->input->cookie->get('fc-filters-box-disp', 0, 'int');
 ?>
 
-<script type="text/javascript">
+<script>
 
 // the function overloads joomla standard event
 function submitform(pressbutton)
@@ -178,7 +178,7 @@ function delAllFilters() {
 	<?php echo '<span class="label">'.JText::_('FLEXI_LISTING_RECORDS').': </span>'.$this->lists['filter_indextype']; ?>
 	<div class="fcclear"></div>
 	
-	<table id="adminListTableFCsearch<?php echo $this->isADV ? '_advanced' : '_basic'; ?>" class="adminlist table fcmanlist">
+	<table id="adminListTableFCsearch<?php echo $this->isADV ? '_advanced' : '_basic'; ?>" class="adminlist table fcmanlist" itemscope itemtype="http://schema.org/WebPage">
 	<thead>
 		<tr>
 			<th><?php echo JText::_( 'FLEXI_NUM' ); ?></th>
@@ -224,13 +224,15 @@ function delAllFilters() {
 		foreach ($this->rows as $row): ?>
 		<tr class="<?php echo 'row', $o; ?>">
 			<td>
-				<div class="adminlist-table-row"></div>
-				<?php echo $this->pagination->getRowOffset( $i ); ?>
+				<!--div class="adminlist-table-row"></div-->
+				<?php echo $this->pagination->getRowOffset($i); ?>
 			</td>
+
 			<!--td>
 				<?php echo JHtml::_('grid.id', $i, ($this->isADV ? $row->field_id.'|' : '').$row->item_id); ?>
 				<label for="cb<?php echo $i; ?>" class="green single"></label>
 			</td-->
+
 			<td>
 				<?php echo $row->item_id; ?>
 			</td>

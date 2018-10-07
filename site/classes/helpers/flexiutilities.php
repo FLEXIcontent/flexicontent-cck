@@ -822,7 +822,7 @@ class FLEXIUtilities
 			}
 
 			$perms->CanTypes
-				? call_user_func($addEntry, '<span class="fcsb-icon-types icon-tree"></span>'.JText::_( 'FLEXI_TYPES' ), 'index.php?option=com_flexicontent&view=types', $view=='types') : null;
+				? call_user_func($addEntry, '<span class="fcsb-icon-types icon-briefcase"></span>'.JText::_( 'FLEXI_TYPES' ), 'index.php?option=com_flexicontent&view=types', $view=='types') : null;
 			$perms->CanFields
 				? call_user_func($addEntry, '<span class="fcsb-icon-fields icon-signup"></span>'.JText::_( 'FLEXI_FIELDS' ), 'index.php?option=com_flexicontent&view=fields', $view=='fields') : null;
 			$perms->CanTags

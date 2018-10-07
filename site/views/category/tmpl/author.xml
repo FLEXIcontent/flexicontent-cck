@@ -15,7 +15,7 @@
 			<field name="authorid" type="fcauthor" default="0" label="FLEXI_SELECT_ONE_AUTHOR" description="FLEXI_SELECT_ONE_AUTHOR_DESC">
 				<option value="">FLEXI_SELECT</option>
 			</field> 
-			<field name="cid" type="qfcategory" default="0" label="FLEXI_SELECT_AUTHOR_CATEGORY" description="FLEXI_SELECT_AUTHOR_CATEGORY_DESC" />
+			<field name="cid" type="fccategory" default="0" label="FLEXI_SELECT_AUTHOR_CATEGORY" description="FLEXI_SELECT_AUTHOR_CATEGORY_DESC" />
 		</fieldset> 
 	</fields>
 	

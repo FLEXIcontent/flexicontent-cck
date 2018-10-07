@@ -20,7 +20,7 @@ defined('_JEXEC') or die('Restricted access');
 
 $close_popup_js = FLEXI_J16GE ? "window.parent.SqueezeBox.close();" : "window.parent.document.getElementById('sbox-window').close();";
 ?>
-<script type="text/javascript">
+<script>
 	window.addEvent('domready', function(){
 		$('import').addEvent('click', function(e) {
 			e = new Event(e).stop();

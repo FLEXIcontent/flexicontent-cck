@@ -146,7 +146,7 @@ class FlexicontentViewUsers extends FlexicontentViewBaseRecords
 			$document->addScriptVersion(JUri::root(true).'/components/com_flexicontent/assets/js/validate.js', FLEXI_VHASH);
 		}
 
-		$js = "jQuery(document).ready(function(){";
+		$js = '';
 		if ($search)            $js .= "jQuery('.col_title').addClass('filtered_column');";
 		if ($filter_itemscount) $js .= "jQuery('.col_itemscount').addClass('filtered_column');";
 		if ($filter_usergrp)    $js .= "jQuery('.col_usergrp').addClass('filtered_column');";
@@ -162,8 +162,15 @@ class FlexicontentViewUsers extends FlexicontentViewBaseRecords
 				$js .= "jQuery('.col_visited').addClass('filtered_column');";
 			}
 		}
-		$js .= "});";
-		$document->addScriptDeclaration($js);
+
+		if ($js)
+		{
+			$document->addScriptDeclaration('
+				jQuery(document).ready(function(){
+					' . $js . '
+				});
+			');
+		}
 
 
 		/**
@@ -343,14 +350,7 @@ class FlexicontentViewUsers extends FlexicontentViewBaseRecords
 		$this->usergroups  = $usergroups;
 
 		// filters
-		$this->filter_id = $filter_id;
-		$this->filter_itemscount = $filter_itemscount;
-		$this->filter_usergrp = $filter_usergrp;
-		$this->filter_logged = $filter_logged;
-		$this->filter_state = $filter_state;
-		$this->filter_active = $filter_active;
 		$this->search = $search;
-		$this->filter_id = $filter_id;
 		$this->date = $date;
 		$this->startdate = $startdate;
 		$this->enddate = $enddate;

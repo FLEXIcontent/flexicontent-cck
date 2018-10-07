@@ -117,17 +117,6 @@ class flexicontent_html
 	}
 
 
-	static function gridOrderBtn($rows, $image = 'filesave.png', $task = 'saveorder')
-	{
-		//return str_replace('rel="tooltip"', '', JHtml::_('grid.order', $rows, $image, $task));
-		return '
-		<a href="javascript:;" onclick="saveorder(' . (count($rows) - 1) . ', \'' . $task . '\')" class="saveorder btn btn-small btn-primary pull-right">
-			<span class="icon-menu-2"></span>
-			' . JText::_('JLIB_HTML_SAVE_ORDER') . '
-		</a>';
-	}
-
-
 	static function & checkPHPLimits($required=null, $recommended=null)
 	{
 		if (!$required)    $required=array('max_input_vars'=>1000, 'suhosin.post.max_vars'=>1000, 'suhosin.request.max_vars'=>1000);
@@ -2167,10 +2156,10 @@ class flexicontent_html
 		$trash_unsupported   = false; //in_array($record_name, array('...', '...');
 
 		// Determine priveleges of the current user on the given item
-		if (!in_array($record_name, array('item', 'category', 'tag', 'review')))
+		/*if (!in_array($record_name, array('item', 'category', 'tag', 'review', 'type')))
 		{
 			die('flexicontent_html::' . __FUNCTION__ . '() , unknown type: ' . $record_name);
-		}
+		}*/
 
 		// Check if locked, (we catch case that property checked_out does not exist using empty()
 		$canCheckin = empty($record->checked_out) || $record->checked_out == $user->id || $user->authorise('core.admin', 'com_checkin');
@@ -2708,7 +2697,8 @@ class flexicontent_html
 			'state_propname' => 'state',
 			'addToggler'     => true,
 			'tipPlacement'   => null,
-			'class'          => null, 
+			'class'          => null,
+			'locked'         => false,
 		);
 	
 		$user    = JFactory::getUser();
@@ -2761,7 +2751,7 @@ class flexicontent_html
 		$has_delete  = $has_delete && empty($trash_unsupported);
 		$has_archive = $has_archive && empty($archive_unsupported);
 
-		$canChangeState = $has_edit_state || $has_delete || $has_archive;
+		$canChangeState = ($has_edit_state || $has_delete || $has_archive) && !$config->locked;
 
 		// Some string and flags
 		$nullDate       = JFactory::getDbo()->getNullDate();
@@ -4175,8 +4165,11 @@ class flexicontent_html
 		foreach ($types as $type)
 		{
 			$allowed = true;
+
 			if ($check_perms)
-				$allowed = in_array($type->id, $selected_arr) || !$type->itemscreatable || $user->authorise('core.create', 'com_flexicontent.type.' . $type->id);
+			{
+				$allowed = !$type->id || in_array($type->id, $selected_arr) || !$type->itemscreatable || $user->authorise('core.create', 'com_flexicontent.type.' . $type->id);
+			}
 
 			if ( !$allowed && $type->itemscreatable == 1 ) continue;
 
@@ -4266,17 +4259,9 @@ class flexicontent_html
 		// $displaytype: 1, is grouped
 		else
 		{
-			if (is_array($attribs))
-			{
-				$attrs = '';
-
-				foreach ($attribs as $k => $v)
-				{
-					$attrs .= ' ' . $k . '="' . $v . '"';
-				}
-				
-				$attribs = $attrs;
-			}
+			$attribs = is_array($attribs)
+				? ArrayHelper::toString($attribs)
+				: $attribs;
 
 			$field_types = array();
 			$n = 0;
@@ -5185,7 +5170,7 @@ class flexicontent_html
 			  <button type="button" class="' . $drop_btn_class . '" data-toggle="dropdown">
 			    <span class="caret"></span>
 			  </button>').'
-				<ul class="dropdown-menu dropdown-menu-right" x-placement="bottom-end" role="menu">
+				<ul class="dropdown-menu dropdown-menu-right" role="menu">
 					<li>' . implode("</li>\n<li>", $btn_arr) . '</li>
 				</ul>
 			</div>';

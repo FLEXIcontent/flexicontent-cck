@@ -34,14 +34,21 @@ class FlexicontentModelType extends FCModelAdmin
 	 *
 	 * @var string
 	 */
-	var $records_dbtbl = null;
+	var $records_dbtbl = 'flexicontent_types';
 
 	/**
 	 * Record jtable name
 	 *
 	 * @var string
 	 */
-	var $records_jtable = null;
+	var $records_jtable = 'flexicontent_types';
+
+	/**
+	 * Column names
+	 */
+	var $state_col   = 'published';
+	var $name_col    = 'name';
+	var $parent_col  = null;
 
 	/**
 	 * Record primary key
@@ -87,11 +94,33 @@ class FlexicontentModelType extends FCModelAdmin
 	var $extension_proxy = null;
 
 	/**
-	 * Use language associations
+	 * Context to use for registering (language) associations
 	 *
 	 * @var string
 	 */
 	var $associations_context = false;
+
+	/**
+	 * A message queue when appropriate
+	 *
+	 * @var string
+	 */
+	var $_messages= array();
+
+	/**
+	 * Various record specific properties
+	 *
+	 */
+
+	/**
+	 * List filters that are always applied
+	 */
+	var $hard_filters = array();
+
+	/**
+	 * Groups of Fields that can be partially present in the form
+	 */
+	var $mergeableGroups = array('attribs');
 
 	/**
 	 * Various record specific properties
@@ -102,7 +131,7 @@ class FlexicontentModelType extends FCModelAdmin
 	/**
 	 * Constructor
 	 *
-	 * @since 1.0
+	 * @since 3.3.0
 	 */
 	public function __construct($config = array())
 	{
@@ -290,7 +319,7 @@ class FlexicontentModelType extends FCModelAdmin
 		$data['attribs']['layouts'] = !empty($raw_data['layouts']) ? $raw_data['layouts'] : null;
 
 		// We will use mergeAttributes() instead of bind(), thus fields that are not set will maintain their current DB values,
-		$mergeProperties = array('attribs');
+		$mergeProperties = $this->mergeableGroups;
 		$mergeOptions = array(
 			'params_fset'  => 'attribs',
 			'layout_type'  => 'item',

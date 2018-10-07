@@ -118,7 +118,7 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 	 */
 	public function cancel()
 	{
-		return parent::checkin();
+		return parent::cancel();
 	}
 
 

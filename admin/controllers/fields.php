@@ -98,6 +98,129 @@ class FlexicontentControllerFields extends FlexicontentControllerBaseAdmin
 
 
 	/**
+	 * Logic to order up/down a record
+	 *
+	 * @return void
+	 *
+	 * @since 3.3
+	 */
+	public function reorder($dir = null)
+	{
+		// Check for request forgeries
+		JSession::checkToken('request') or die(JText::_('JINVALID_TOKEN'));
+
+		$app   = JFactory::getApplication();
+		$model = $this->getModel($this->record_name_pl);
+		$user  = JFactory::getUser();
+
+		// Calculate ACL access
+		$is_authorised = $user->authorise('flexicontent.orderfields', 'com_flexicontent');
+
+		// Check access
+		if (!$is_authorised)
+		{
+			$app->setHeader('status', '403 Forbidden', true);
+			$app->enqueueMessage(JText::_('FLEXI_ALERTNOTAUTH_TASK'), 'error');
+			$app->redirect($this->returnURL);
+		}
+
+		// Get record id and ordering group
+		$cid         = $this->input->get('cid', array(0), 'array');
+		$filter_type = $this->input->get('filter_type', array(0), 'array');
+
+		ArrayHelper::toInteger($cid);
+		ArrayHelper::toInteger($filter_type);
+
+		// Make sure direction is set
+		$dir = $dir ?: ($this->task === 'orderup' ? -1 : 1);
+
+		if (!$model->move($dir, reset($filter_type)))
+		{
+			$app->setHeader('status', '500 Internal Server Error', true);
+			$app->enqueueMessage(JText::_('FLEXI_ERROR_SAVING_ORDER') . ': ' . $model->getError(), 'error');
+			$app->redirect($this->returnURL);
+		}
+
+		// Note we no longer set the somewhat redundant message: JText::_('FLEXI_NEW_ORDERING_SAVED')
+		$this->setRedirect($this->returnURL);
+	}
+
+
+	/**
+	 * Logic to orderup a record, wrapper for reorder method
+	 *
+	 * @return void
+	 *
+	 * @since 3.3
+	 */
+	public function orderup()
+	{
+		$this->reorder($dir = -1);
+	}
+
+
+	/**
+	 * Logic to orderdown a record, wrapper for reorder method
+	 *
+	 * @return void
+	 *
+	 * @since 3.3
+	 */
+	public function orderdown()
+	{
+		$this->reorder($dir = 1);
+	}
+
+
+	/**
+	 * Logic to mass order records
+	 *
+	 * @return void
+	 *
+	 * @since 3.3
+	 */
+	public function saveorder()
+	{
+		// Check for request forgeries
+		JSession::checkToken('request') or die(JText::_('JINVALID_TOKEN'));
+
+		$app   = JFactory::getApplication();
+		$model = $this->getModel($this->record_name_pl);
+		$user  = JFactory::getUser();
+
+		// Calculate ACL access
+		$is_authorised = $user->authorise('flexicontent.orderfields', 'com_flexicontent');
+
+		// Check access
+		if (!$is_authorised)
+		{
+			$app->setHeader('status', 403);
+			$app->enqueueMessage(JText::_('FLEXI_ALERTNOTAUTH_TASK'), 'error');
+			$app->redirect($this->returnURL);
+		}
+
+		// Get record ids, new orderings and the ordering group
+		$cid         = $this->input->get('cid', array(0), 'array');
+		$order       = $this->input->get('order', array(0), 'array');
+		$filter_type = $this->input->get('filter_type', array(0), 'array');
+
+		ArrayHelper::toInteger($cid);
+		ArrayHelper::toInteger($order);
+		ArrayHelper::toInteger($filter_type);
+
+		if (!$model->saveorder($cid, $order, reset($filter_type)))
+		{
+			$app->setHeader('status', 500);
+			$app->enqueueMessage(JText::_('FLEXI_ERROR_SAVING_ORDER') . ': ' . $model->getError(), 'error');
+			$app->redirect($this->returnURL);
+		}
+
+		// Note we no longer set the somewhat redundant message: JText::_('FLEXI_NEW_ORDERING_SAVED')
+		$this->setRedirect($this->returnURL);
+	}
+
+
+	/**
 	 * Check in a record
 	 *
 	 * @since	3.3
@@ -117,7 +240,7 @@ class FlexicontentControllerFields extends FlexicontentControllerBaseAdmin
 	 */
 	public function cancel()
 	{
-		return parent::checkin();
+		return parent::cancel();
 	}
 
 
@@ -278,114 +401,6 @@ class FlexicontentControllerFields extends FlexicontentControllerBaseAdmin
 		return true;
 	}
 
-
-	/**
-	 * Logic to order up/down a field
-	 *
-	 * @return void
-	 *
-	 * @since 1.0
-	 */
-	public function reorder($dir=null)
-	{
-		// Check for request forgeries
-		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
-
-		// Get variables: model, user, field id, new ordering
-		$app   = JFactory::getApplication();
-		$model = $this->getModel($this->record_name_pl);
-		$user  = JFactory::getUser();
-
-		// Get ids of the fields
-		$cid = $this->input->get('cid', array(0), 'array');
-
-		// Calculate access
-		$is_authorised = $user->authorise('flexicontent.orderfields', 'com_flexicontent');
-
-		// Check access
-		if (!$is_authorised)
-		{
-			$app->enqueueMessage(JText::_('FLEXI_ALERTNOTAUTH_TASK'), 'error');
-			$app->setHeader('status', 403, true);
-		}
-		elseif ($model->move($dir))
-		{
-			// Success
-		}
-		else
-		{
-			$msg = JText::_('FLEXI_OPERATION_FAILED') . ' : ' . $model->getError();
-			throw new Exception($msg, 500);
-		}
-
-		$this->setRedirect($this->returnURL);
-	}
-
-
-	/**
-	 * Logic to orderup a field
-	 *
-	 * @return void
-	 *
-	 * @since 1.0
-	 */
-	public function orderup()
-	{
-		$this->reorder($dir = -1);
-	}
-
-	/**
-	 * Logic to orderdown a field
-	 *
-	 * @return void
-	 *
-	 * @since 1.0
-	 */
-	public function orderdown()
-	{
-		$this->reorder($dir = 1);
-	}
-
-	/**
-	 * Logic to mass ordering fields
-	 *
-	 * @return void
-	 *
-	 * @since 1.0
-	 */
-	public function saveorder()
-	{
-		// Check for request forgeries
-		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
-
-		// Get variables: model, user, field id, new ordering
-		$model = $this->getModel($this->record_name_pl);
-		$user  = JFactory::getUser();
-
-		// Get ids of the fields
-		$cid = $this->input->get('cid', array(0), 'array');
-		$order = $this->input->get('order', array(0), 'array');
-
-		// Calculate access
-		$is_authorised = $user->authorise('flexicontent.orderfields', 'com_flexicontent');
-
-		// Check access
-		if (!$is_authorised)
-		{
-			JError::raiseWarning(403, JText::_('FLEXI_ALERTNOTAUTH_TASK'));
-		}
-		elseif (!$model->saveorder($cid, $order))
-		{
-			$msg = JText::_('FLEXI_OPERATION_FAILED') . ' : ' . $model->getError();
-			throw new Exception($msg, 500);
-		}
-		else
-		{
-			$msg = JText::_('FLEXI_NEW_ORDERING_SAVED');
-		}
-
-		$this->setRedirect($this->returnURL, $msg);
-	}
 
 
 	/**

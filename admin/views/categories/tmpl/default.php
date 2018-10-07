@@ -46,7 +46,7 @@ flexicontent_html::jscode_to_showhide_table(
 	$start_html = '',  //'<span class="badge ' . (FLEXI_J40GE ? 'badge-dark' : 'badge-inverse') . '">' . JText::_('FLEXI_COLUMNS', true) . '<\/span> &nbsp; ',
 	$end_html = '<div id="fc-columns-slide-btn" class="icon-arrow-up-2 btn btn-outline-secondary" title="' . JText::_('FLEXI_HIDE') . '" style="cursor: pointer;" onclick="fc_toggle_box_via_btn(\\\'mainChooseColBox\\\', document.getElementById(\\\'fc_mainChooseColBox_btn\\\'), \\\'btn-primary\\\');"><\/div>'
 );
-$tools_cookies['fc-filters-box-disp'] = JFactory::getApplication()->input->cookie->get('fc-filters-box-disp', 0, 'int');
+$tools_cookies['fc-filters-box-disp'] = 0; //JFactory::getApplication()->input->cookie->get('fc-filters-box-disp', 0, 'int');
 
 
 
@@ -66,7 +66,7 @@ $state_icons = array('ALL_P'=>'publish', 'ALL_U'=>'unpublish', 'A'=>'archive', '
  * Order stuff and table related variables
  */
 
-$list_total_cols = 14;
+$list_total_cols = 13;
 
 $listOrder = $this->lists['order'];
 $listDirn  = $this->lists['order_Dir'];
@@ -81,7 +81,7 @@ if ($saveOrder)
 ?>
 
 
-<script type="text/javascript">
+<script>
 
 // delete active filter
 function delFilter(name)
@@ -186,9 +186,16 @@ function delAllFilters()
 		<div class="fc-filter-head-box nowrap_box">
 
 			<div class="btn-group">
-				<div id="fc_mainChooseColBox_btn" class="<?php echo $out_class; ?> hidden-phone" onclick="fc_toggle_box_via_btn('mainChooseColBox', this, 'btn-primary');">
+				<div id="fc_mainChooseColBox_btn" class="<?php echo $out_class . ' ' . $this->tooltip_class; ?> hidden-phone" onclick="fc_toggle_box_via_btn('mainChooseColBox', this, 'btn-primary');" title="<?php echo flexicontent_html::getToolTip('', 'FLEXI_ABOUT_AUTO_HIDDEN_COLUMNS', 1, 1); ?>">
 					<?php echo JText::_( 'FLEXI_COLUMNS' ); ?><sup id="columnchoose_totals"></sup>
 				</div>
+
+				<?php if (!empty($this->minihelp) && FlexicontentHelperPerm::getPerm()->CanConfig): ?>
+				<div id="fc-mini-help_btn" class="<?php echo $out_class; ?>" onclick="fc_toggle_box_via_btn('fc-mini-help', this, 'btn-primary');" >
+					<span class="icon-help"></span>
+					<?php echo $this->minihelp; ?>
+				</div>
+				<?php endif; ?>
 			</div>
 			<div id="mainChooseColBox" class="group-fcset fcman-abs" style="display:none;"></div>
 
@@ -218,7 +225,7 @@ function delAllFilters()
 	<div class="fcclear"></div>
 
 
-	<table id="adminListTableFCcats" class="adminlist table fcmanlist">
+	<table id="adminListTableFCcats" class="adminlist table fcmanlist" itemscope itemtype="http://schema.org/WebPage">
 	<thead>
 		<tr>
 
@@ -226,7 +233,7 @@ function delAllFilters()
 				<?php echo JText::_( 'FLEXI_NUM' ); ?>
 			</th-->
 
-			<th class="col_order nowrap center hidden-phone">
+			<th class="col_order center hidden-phone">
 				<?php echo JHtml::_('searchtools.sort', '', 'a.lft', $listDirn, $listOrder, null, 'asc', 'JGRID_HEADING_ORDERING', 'icon-menu-2'); ?>
 			</th>
 
@@ -288,7 +295,7 @@ function delAllFilters()
 				<?php echo JHtml::_('grid.sort', 'JGRID_HEADING_LANGUAGE', 'language', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
 
-			<th class="hideOnDemandClass col_id center hidden-tablet hidden-phone">
+			<th class="hideOnDemandClass col_id center hidden-phone hidden-tablet">
 				<?php echo JHtml::_('grid.sort', 'FLEXI_ID', 'a.id', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
 
@@ -394,8 +401,7 @@ function delAllFilters()
 		<tr class="<?php echo 'row' . ($i % 2); ?>" sortable-group-id="<?php echo $row->parent_id; ?>" item-id="<?php echo $row->id ?>" parents="<?php echo $parentsStr ?>" level="<?php echo $row->level ?>">
 
 			<!--td class="left col_rowcount hidden-phone">
-				<div class="adminlist-table-row"></div>
-				<?php /*echo $this->pagination->getRowOffset($i);*/ ?>
+				<?php echo $this->pagination->getRowOffset($i); ?>
 			</td-->
 
 			<td class="col_order nowrap center hidden-phone">
@@ -419,6 +425,7 @@ function delAllFilters()
 			</td>
 
 			<td class="col_cb">
+				<!--div class="adminlist-table-row"></div-->
 				<?php echo JHtml::_($hlpname . '.grid_id', $i, $row->id); ?>
 			</td>
 
@@ -510,27 +517,12 @@ function delAllFilters()
 			</td>
 
 			<td class="col_access hidden-phone">
-				<?php echo $row->canEdit && $this->perms->CanAccLvl
-					? flexicontent_html::userlevel('access['.$row->id.']', $row->access, 'class="use_select2_lib" onchange="return listItemTask(\'cb'.$i.'\',\''.$ctrl.'.access\')"')
+				<?php echo $row->canEdit
+					? flexicontent_html::userlevel('access['.$row->id.']', $row->access, 'onchange="return listItemTask(\'cb'.$i.'\',\''.$ctrl.'access\')" class="use_select2_lib fc_skip_highlight"')
 					: $this->escape($row->access_level); ?>
 			</td>
 
-			<!--td class="left order">
-			 <?php if ($stateIsChangeable) : ?>
-				<?php $disabled = $saveOrder ?  '' : 'disabled="disabled"'; ?>
-				<input type="text" name="order[]" size="5" value="<?php echo $orderkey + 1;?>" <?php echo $disabled ?> class="text-area-order" style="text-align: center" />
-				<?php $originalOrders[] = $orderkey + 1; ?>
-
-				<?php if ($saveOrder) : ?>
-					<span><?php echo $this->pagination->orderUpIcon($i, isset($this->ordering[$row->parent_id][$orderkey - 1]), $ctrl.'orderup', 'JLIB_HTML_MOVE_UP', $this->orderingx); ?></span>
-					<span><?php echo $this->pagination->orderDownIcon($i, $this->pagination->total, isset($this->ordering[$row->parent_id][$orderkey + 1]), $ctrl.'orderdown', 'JLIB_HTML_MOVE_DOWN', $this->orderingx); ?></span>
-				<?php endif; ?>
-			<?php else : ?>
-				<?php echo $orderkey + 1;?>
-			<?php endif; ?>
-			</td-->
-
-			<td class="left nowrap hidden-phone">
+			<td class="col_language left nowrap hidden-phone">
 			<?php if ($row->language=='*'):?>
 				<?php echo JText::alt('JALL','language'); ?>
 			<?php else:?>
@@ -538,7 +530,7 @@ function delAllFilters()
 			<?php endif;?>
 			</td>
 
-			<td class="col_id center hidden-tablet hidden-phone">
+			<td class="col_id center hidden-phone hidden-tablet">
 				<span title="<?php echo sprintf('%d-%d', $row->lft, $row->rgt);?>">
 				<?php echo $row->id; ?>
 				</span>

@@ -95,11 +95,17 @@ class ParentClassItem extends FCModelAdmin
 	var $extension_proxy = null;
 
 	/**
-	 * Use language associations
+	 * Context to use for registering (language) associations
 	 *
 	 * @var string
 	 */
 	var $associations_context = 'com_content.item';
+
+
+	/**
+	 * Groups of Fields that can be partially present in the form
+	 */
+	var $mergeableGroups = array('attribs', 'metadata');
 
 	/**
 	 * Various record specific properties
@@ -158,9 +164,9 @@ class ParentClassItem extends FCModelAdmin
 	/**
 	 * Constructor
 	 *
-	 * @since 1.0
+	 * @since 3.3.0
 	 */
-	function __construct()
+	public function __construct($config = array())
 	{
 		if (JFactory::getApplication()->isSite())
 		{
@@ -170,7 +176,7 @@ class ParentClassItem extends FCModelAdmin
 		$this->debug_tags = false;
 		$this->use_jtable_publishing = true;
 
-		parent::__construct();
+		parent::__construct($config);
 
 		$jinput = JFactory::getApplication()->input;
 
@@ -1018,6 +1024,18 @@ class ParentClassItem extends FCModelAdmin
 	 */
 	public function getForm($data = array(), $loadData = true)
 	{
+		static $cache = array();
+		$cache_index = $this->_id . '.' . (string) $loadData;
+
+		if (!$data)
+		{
+
+			if (isset($cache[$cache_index]))
+			{
+				return $cache[$cache_index];
+			}
+		}
+
 		$app = JFactory::getApplication();
 		$perms = FlexicontentHelperPerm::getPerm();
 
@@ -1034,10 +1052,12 @@ class ParentClassItem extends FCModelAdmin
 
 		if ($this->_id)
 		{
-			$this->_prepareMergeJsonParams('images');
-			$this->_prepareMergeJsonParams('urls');
-			$this->_prepareMergeJsonParams('attribs');
-			$this->_prepareMergeJsonParams('metadata');
+			$json_columns = array('images', 'urls', 'attribs', 'metadata');
+
+			foreach($json_columns as $colname)
+			{
+				$this->_prepareMergeJsonParams($colname);
+			}
 		}
 		else
 		{
@@ -1172,6 +1192,11 @@ class ParentClassItem extends FCModelAdmin
 				$form->setFieldAttribute('catid', 'filter', 'unset');
 			}
 		}*/
+
+		if (!$data)
+		{
+			$cache[$cache_index] = $form;
+		}
 
 		return $form;
 	}
@@ -1840,7 +1865,7 @@ class ParentClassItem extends FCModelAdmin
 		// *** By doing partial merging of these arrays we support having only a sub-set of them inside the form
 		// *** we will use mergeAttributes() instead of bind(), thus fields that are not set will maintain their current DB values,
 		// ***
-		$mergeProperties = array('attribs', 'metadata');
+		$mergeProperties = $this->mergeableGroups;
 		$mergeOptions = array(
 			'params_fset'  => 'attribs',
 			'layout_type'  => 'item',
@@ -5269,14 +5294,18 @@ class ParentClassItem extends FCModelAdmin
 	private function _prepareMergeJsonParams($colname)
 	{
 		$registry = new JRegistry;
+
 		try
 		{
-			$registry->loadString($this->_record->$colname);
+			is_array($this->_record->$colname)
+				? $registry->loadArray($this->_record->$colname)
+				: $registry->loadString($this->_record->$colname);
 		}
 		catch (Exception $e)
 		{
 			$registry = flexicontent_db::check_fix_JSON_column($colname, $this->records_dbtbl, 'id', $this->_record->id, $this->_record->$colname);
 		}
+
 		$this->_record->$colname = $registry->toArray();
 		$this->_record->itemparams->merge($registry);
 	}
@@ -6306,6 +6335,70 @@ class ParentClassItem extends FCModelAdmin
 				. ' VALUES ' . implode(',', $tag_vals)
 				;
 			$db->setQuery($query)->execute();
+		}
+	}
+
+
+	/**
+	 * Method to handle partial form data
+	 *
+	 * @param   JForm   $form   A JForm object.
+	 * @param   mixed   $data   The data expected for the form.
+	 *
+	 * @return  void
+	 *
+	 * @since   3.3.0
+	 */
+	protected function handlePartialForm($form, & $data)
+	{
+		if (JFactory::getApplication()->isAdmin())
+		{
+			return;
+		}
+
+		$this->_loadItemParams();
+
+		if (empty($this->_record) || empty($this->_record->parameters))
+		{
+			return;
+		}
+
+		foreach($this->mergeableGroups as $grp_name)
+		{
+			if ($grp_name === 'metadata')
+			{
+				if ($this->_record->parameters->get('usemetadata_fe', 1) < 1)
+				{
+					unset($data['metakey']);
+					unset($data['metadesc']);
+				}
+
+				if ($this->_record->parameters->get('usemetadata_fe', 1) < 2)
+				{
+					foreach ($form->getGroup($grp_name) as $field)
+					{
+						unset($data[$grp_name][$field->fieldname]);
+					}
+				}
+
+				continue;
+			}
+
+			foreach ($form->getFieldsets($grp_name) as $fsname => $fieldSet)
+			{
+				$skip = ($fsname === 'params-basic' && $this->_record->parameters->get('usedisplaydetails_fe', 0) < 1)
+					|| ($fsname === 'params-advanced' && $this->_record->parameters->get('usedisplaydetails_fe', 0) < 2)
+					|| ($fsname === 'params-seoconf' && $this->_record->parameters->get('useseoconf_fe', 0) < 1)
+					;
+
+				if ($skip)
+				{
+					foreach ($form->getFieldset($fsname) as $field)
+					{
+						unset($data[$grp_name][$field->fieldname]);
+					}
+				}
+			}
 		}
 	}
 }

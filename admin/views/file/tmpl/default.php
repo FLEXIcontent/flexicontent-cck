@@ -18,7 +18,7 @@
 
 defined('_JEXEC') or die('Restricted access');
 ?>
-<script type="text/javascript">
+<script>
 function submitbutton(pressbutton)
 {
 	var form = document.adminForm;

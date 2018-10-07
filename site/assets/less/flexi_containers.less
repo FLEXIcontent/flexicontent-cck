@@ -714,14 +714,32 @@ body .btn-group.fc-group > .statetoggler.btn.btn-small {
 
 div span.fc_icon_disabled {
 	position: absolute;
-	left: 4px;
-	right: 4px;
+	left: -2px;
+	right: -2px;
 	top: 45%;
-	bottom: 40%;
-	/*border-top: 1px solid gray;
-	border-bottom: 1px solid gray;*/
+	bottom: 35%;
 	opacity: 1;
+	width: 70%;
+	left: 15%;
 }
 div span.fc_icon_disabled + span:before {
 	color: gray;
+}
+
+div span.fc_icon_disabled.fc_icon_na {
+	border-top: 1px solid gray;
+	border-bottom: 1px solid gray;
+}
+
+*:not(:hover) > .fc-icon-orange:before {
+	color: darkorange !important;
+}
+*:not(:hover) > .fc-icon-red:before {
+	color: darkred !important;
+}
+*:not(:hover) > .fc-icon-green:before {
+	color: darkgreen !important;
+}
+*:not(:hover) > .fc-icon-gray:before {
+	color: lightgray !important;
 }

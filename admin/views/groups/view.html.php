@@ -21,10 +21,6 @@ JLoader::register('FlexicontentViewBaseRecords', JPATH_ADMINISTRATOR . '/compone
  */
 class FlexicontentViewGroups extends FlexicontentViewBaseRecords
 {
-	protected $items;
-	protected $pagination;
-	protected $state;
-
 	var $proxy_option   = 'com_users';
 	var $title_propname = 'title';
 	var $state_propname = null;
@@ -66,15 +62,10 @@ class FlexicontentViewGroups extends FlexicontentViewBaseRecords
 		// Get model
 		$model = $this->getModel();
 
-		$this->items		= $model->getItems();
-		$this->pagination	= $this->get('Pagination');
-
-		// Check for errors.
-		if (count($errors = $this->get('Errors')))
+		// Performance statistics
+		if ($print_logging_info = $cparams->get('print_logging_info'))
 		{
-			$app->setHeader('status', '500', true);
-			$app->enqueueMessage(implode("\n", $errors), 'error');
-			return false;
+			global $fc_run_times;
 		}
 
 
@@ -144,6 +135,21 @@ class FlexicontentViewGroups extends FlexicontentViewBaseRecords
 
 
 		/**
+		 * Get data from the model
+		 */
+
+		if ( $print_logging_info )  $start_microtime = microtime(true);
+
+		$rows = $this->get('Items');
+
+		if ( $print_logging_info ) @$fc_run_times['execute_main_query'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+
+		// Create pagination object
+		$pagination = $this->get('Pagination');
+
+
+
+		/**
 		 * Create List Filters
 		 */
 
@@ -159,6 +165,8 @@ class FlexicontentViewGroups extends FlexicontentViewBaseRecords
 		$this->count_filters = $count_filters;
 
 		$this->lists       = $lists;
+		$this->rows        = $rows;
+		$this->pagination  = $pagination;
 		$this->perms  = FlexicontentHelperPerm::getPerm();
 		$this->option = $option;
 		$this->view   = $view;
