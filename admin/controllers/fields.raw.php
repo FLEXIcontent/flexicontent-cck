@@ -29,6 +29,28 @@ require_once JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' .
  */
 class FlexicontentControllerFields extends FlexicontentControllerBaseAdmin
 {
+	var $records_dbtbl  = 'flexicontent_fields';
+
+	var $records_jtable = 'flexicontent_fields';
+
+	var $record_name = 'field';
+
+	var $record_name_pl = 'fields';
+
+	var $_NAME = 'FIELD';
+
+	var $record_alias = 'name';
+
+	var $runMode = 'standalone';
+
+	var $exitHttpHead = null;
+
+	var $exitMessages = array();
+
+	var $exitLogTexts = array();
+
+	var $exitSuccess  = true;
+
 	/**
 	 * Constructor
 	 *
@@ -74,19 +96,19 @@ class FlexicontentControllerFields extends FlexicontentControllerBaseAdmin
 	 */
 	function getIndexedFieldJSON()
 	{
-		$user  = JFactory::getUser();
-		$app   = JFactory::getApplication();
+		$user   = JFactory::getUser();
+		$app    = JFactory::getApplication();
 		$jinput = $app->input;
 
 		$field_id  = $jinput->get('field_id', 0, 'int');
 
-		$is_authorised = !$field_id ?
-			$user->authorise('flexicontent.createfield', 'com_flexicontent') :
-			$user->authorise('flexicontent.editfield', 'com_flexicontent.field.' . $field_id);
+		$is_authorised = !$field_id
+			? $user->authorise('flexicontent.createfield', 'com_flexicontent')
+			: $user->authorise('flexicontent.editfield', 'com_flexicontent.field.' . $field_id);
 
 		if (!$is_authorised)
 		{
-			die(JText::_('FLEXI_ALERTNOTAUTH_TASK'));
+			jexit(JText::_('FLEXI_ALERTNOTAUTH_TASK'));
 		}
 
 		// Get field configuration
@@ -119,11 +141,9 @@ class FlexicontentControllerFields extends FlexicontentControllerBaseAdmin
 				$error_mssg = JText::_('FLEXI_FIELD_INVALID_ELEMENTS');
 			}
 
-			echo '';
-			exit;
+			jexit($error_mssg);
 		}
 
-		echo json_encode(array_values($elements));
-		exit;
+		jexit(json_encode(array_values($elements)));
 	}
 }

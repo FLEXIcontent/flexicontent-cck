@@ -1,6 +1,7 @@
 <?php
 
 $files = array(
+	JPATH_ADMINISTRATOR . '/components/com_flexicontent/views/items/tmpl/copy.php',
 	JPATH_ADMINISTRATOR . '/components/com_flexicontent/views/types/view.raw.php',
 	JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/html/users.php',
 	JPATH_ADMINISTRATOR . '/components/com_flexicontent/controllers/archive.php',
@@ -13,6 +14,7 @@ $files = array(
 	JPATH_SITE . '/librairies/fancybox/CHANGELOG.md',
 	JPATH_ADMINISTRATOR . '/components/com_flexicontent/elements/qfcategory.php',
 	JPATH_ADMINISTRATOR . '/components/com_flexicontent/models/qfcategoryelement.php',
+	JPATH_ADMINISTRATOR . '/components/com_flexicontent/assets/js/copymove.js',
 	JPATH_SITE . '/modules/mod_flexiadvsearch/elements/qfcategory.php',
 	JPATH_SITE . '/modules/mod_flexicategories/elements/qfcategory.php',
 	JPATH_SITE . '/modules/mod_flexicontent/elements/qfcategory.php',

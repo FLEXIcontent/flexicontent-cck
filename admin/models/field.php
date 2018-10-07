@@ -44,6 +44,13 @@ class FlexicontentModelField extends FCModelAdmin
 	var $records_jtable = 'flexicontent_fields';
 
 	/**
+	 * Column names
+	 */
+	var $state_col   = 'published';
+	var $name_col    = 'label';
+	var $parent_col  = null;//'parent_id';
+
+	/**
 	 * Record primary key
 	 *
 	 * @var int
@@ -103,7 +110,7 @@ class FlexicontentModelField extends FCModelAdmin
 	/**
 	 * Constructor
 	 *
-	 * @since 3.3.0
+	 * @since 1.0
 	 */
 	public function __construct($config = array())
 	{

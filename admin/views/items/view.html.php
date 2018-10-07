@@ -74,10 +74,10 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 		 * Batch task variable
 		 */
 
-		if ($task === 'copy')
+		if ($task === 'batch')
 		{
 			$behaviour = $jinput->get('copy_behaviour', 'copy/move', 'string');
-			$this->setLayout('copy');
+			$this->setLayout('batch');
 			$this->_displayCopyMove($tpl, $cid, $behaviour);
 			return;
 		}
@@ -907,7 +907,7 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 		// Add js to document
 		//JHtml::_('behavior.tooltip');
 		flexicontent_html::loadFramework('select2');
-		$document->addScriptVersion(JUri::base(true).'/components/com_flexicontent/assets/js/copymove.js', FLEXI_VHASH);
+		$document->addScriptVersion(JUri::base(true).'/components/com_flexicontent/assets/js/batchprocess.js', FLEXI_VHASH);
 
 		// Add js function to overload the joomla submitform validation
 		JHtml::_('behavior.formvalidation');  // load default validation JS to make sure it is overriden
@@ -925,7 +925,7 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 		$document->setTitle($doc_title .' - '. $site_title);
 
 		// Create the toolbar
-		JToolbarHelper::save($contrl . 'copymove');
+		JToolbarHelper::save($contrl . 'batchprocess');
 		JToolbarHelper::cancel($contrl . 'cancel');
 
 		//Get data from the model
@@ -1036,6 +1036,7 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 		$document = JFactory::getDocument();
 		$toolbar  = JToolbar::getInstance('toolbar');
 		$perms    = FlexicontentHelperPerm::getPerm();
+		$session  = JFactory::getSession();
 
 		$js = '';
 
@@ -1181,8 +1182,8 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 
 		if ($CanAddAny && $perms->CanCopy)
 		{
-			$btn_task = $contrl . 'copy';
-			JToolbarHelper::custom( $btn_task, 'copy.png', 'copy_f2.png', 'FLEXI_BATCH' /*'FLEXI_COPY_MOVE'*/ );
+			$btn_task = $contrl . 'batch';
+			JToolbarHelper::custom($btn_task, 'copy.png', 'copy_f2.png', 'FLEXI_BATCH');
 			$useAssocs = flexicontent_db::useAssociations();
 			if ($useAssocs)
 			{
@@ -1242,7 +1243,6 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 
 		if ($perms->CanConfig)
 		{
-			$session = JFactory::getSession();
 			$fc_screen_width = (int) $session->get('fc_screen_width', 0, 'flexicontent');
 			$_width  = ($fc_screen_width && $fc_screen_width-84 > 940 ) ? ($fc_screen_width-84 > 1400 ? 1400 : $fc_screen_width-84 ) : 940;
 			$fc_screen_height = (int) $session->get('fc_screen_height', 0, 'flexicontent');

@@ -315,14 +315,6 @@ class FlexicontentViewFilemanager extends FlexicontentViewBaseRecords
 		// Create pagination object
 		$pagination = $this->get('Pagination');
 
-		// Get item using at least one file (-of- the currently listed files)
-		/*$items_single	= $model->getItemsSingleprop( array('file','minigallery') );
-		$items_multi	= $model->getItemsMultiprop ( $field_props=array('image'=>'originalname'), $value_props=array('image'=>'filename') );
-		$items = array();
-		foreach ($items_single as $item_id => $_item) $items[$item_id] = $_item;
-		foreach ($items_multi  as $item_id => $_item) $items[$item_id] = $_item;
-		ksort($items);*/
-
 		$assigned_fields_labels = array('image'=>'image/gallery', 'file'=>'file', 'minigallery'=>'minigallery');
 		$assigned_fields_icons = array('image'=>'picture_link', 'file'=>'page_link', 'minigallery'=>'film_link');
 
@@ -532,6 +524,7 @@ class FlexicontentViewFilemanager extends FlexicontentViewBaseRecords
 		$document = JFactory::getDocument();
 		$toolbar  = JToolbar::getInstance('toolbar');
 		$perms    = FlexicontentHelperPerm::getPerm();
+		$session  = JFactory::getSession();
 
 		$js = '';
 
@@ -542,10 +535,11 @@ class FlexicontentViewFilemanager extends FlexicontentViewBaseRecords
 		$tip_class = ' hasTooltip';
 
 		$user  = JFactory::getUser();
-		$perms = FlexicontentHelperPerm::getPerm();
-		$session = JFactory::getSession();
 
-		JToolbarHelper::editList($contrl.'edit');
+		if (1)
+		{
+			JToolbarHelper::editList($contrl.'edit');
+		}
 		JToolbarHelper::checkin($contrl.'checkin');
 		JToolbarHelper::deleteList(JText::_('FLEXI_ARE_YOU_SURE'), 'filemanager.remove');
 
@@ -617,8 +611,6 @@ class FlexicontentViewFilemanager extends FlexicontentViewBaseRecords
 
 		if ($perms->CanConfig)
 		{
-			JToolbarHelper::divider(); JToolbarHelper::spacer();
-			$session = JFactory::getSession();
 			$fc_screen_width = (int) $session->get('fc_screen_width', 0, 'flexicontent');
 			$_width  = ($fc_screen_width && $fc_screen_width-84 > 940 ) ? ($fc_screen_width-84 > 1400 ? 1400 : $fc_screen_width-84 ) : 940;
 			$fc_screen_height = (int) $session->get('fc_screen_height', 0, 'flexicontent');

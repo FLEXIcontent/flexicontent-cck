@@ -1219,13 +1219,13 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 
 
 	/**
-	 * Logic to copy/move the items
+	 * Logic to handle batch actions on records: copy / move / update
 	 *
 	 * @return void
 	 *
 	 * @since 1.5
 	 */
-	public function copymove()
+	public function batchprocess()
 	{
 		// Check for request forgeries
 		JSession::checkToken('request') or die(JText::_('JINVALID_TOKEN'));
@@ -1341,12 +1341,14 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		$auth_cid = $cid;
 		$clean_cache_flag = false;
 
-		// Try to copy/move items
-		if ($this->task === 'copymove')
+
+		/**
+		 * Execute batch
+		 */
+		switch ($method)
 		{
 			// Copy CASE
-			if ($method == 1)
-			{
+			case 1:
 				if ($model->copyitems($auth_cid, $keeptags, $prefix, $suffix, $copynr, $lang, $state))
 				{
 					$msg = JText::sprintf('FLEXI_ITEMS_COPY_SUCCESS', count($auth_cid));
@@ -1358,11 +1360,10 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 					$app->enqueueMessage(JText::_('FLEXI_ERROR_COPY_ITEMS') . " " . $model->getError(), 'error');
 					$msg = '';
 				}
-			}
+				break;
 
 			// Update CASE (optionally moving)
-			elseif ($method == 2)
-			{
+			case 2:
 				$msg = JText::sprintf('FLEXI_ITEMS_MOVE_SUCCESS', count($auth_cid));
 
 				foreach ($auth_cid as $itemid)
@@ -1376,11 +1377,10 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 				}
 
 				$clean_cache_flag = true;
-			}
+				break;
 
 			// Copy and update CASE (optionally moving)
-			else
-			{
+			default:
 				if ($model->copyitems($auth_cid, $keeptags, $prefix, $suffix, $copynr, $lang, $state, $method, $maincat, $seccats, $type_id, $access))
 				{
 					$msg = JText::sprintf('FLEXI_ITEMS_COPYMOVE_SUCCESS', count($auth_cid));
@@ -1392,10 +1392,10 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 					JError::raiseWarning(500, $msg . " " . $model->getError());
 					$msg = '';
 				}
-			}
-
-			$link 	= 'index.php?option=com_flexicontent&view=items';
+				break;
 		}
+
+		$link = 'index.php?option=com_flexicontent&view=items';
 
 		// CLEAN THE CACHE so that our changes appear realtime
 		if ($clean_cache_flag)
@@ -1578,7 +1578,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 	 *
 	 * @since 3.3
 	 */
-	public function changestate($state = 1)
+	public function changestate($state = null)
 	{
 		// Check for request forgeries
 		JSession::checkToken('request') or die(JText::_('JINVALID_TOKEN'));
@@ -1605,12 +1605,35 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 			return;
 		}
 
-		$state = strlen($state) ? $state : $this->input->get('newstate', '', 'string');
-		$stateids = array ( 'PE' => -3, 'OQ' => -4, 'IP' => -5, 'P' => 1, 'U' => 0, 'A' => (FLEXI_J16GE ? 2 : -1), 'T' => -2 );
-		$statenames = array ( 'PE' => 'FLEXI_PENDING', 'OQ' => 'FLEXI_TO_WRITE', 'IP' => 'FLEXI_IN_PROGRESS', 'P' => 'FLEXI_PUBLISHED', 'U' => 'FLEXI_UNPUBLISHED', 'A' => 'FLEXI_ARCHIVED', 'T' => 'FLEXI_TRASHED' );
+		$stateids = array(
+			'PE' => -3,
+			'OQ' => -4,
+			'IP' => -5,
+			'P'  =>  1,
+			'U'  =>  0,
+			'A'  =>  2,
+			'T'  => -2
+		);
+		$statenames = array(
+			-3 => 'FLEXI_PENDING',
+			-4 => 'FLEXI_TO_WRITE',
+			-5 => 'FLEXI_IN_PROGRESS',
+			 1 => 'FLEXI_PUBLISHED',
+			 0 => 'FLEXI_UNPUBLISHED',
+			 2 => 'FLEXI_ARCHIVED',
+			-2 => 'FLEXI_TRASHED'
+		);
+
+		$state = strlen($state)
+			? $state
+			: $this->input->get('newstate', '', 'string');
+
+		$state = isset($stateids[$state])
+			? $stateids[$state]
+			: (int) $state;
 
 		// Check for valid state
-		if (!isset($stateids[$state]))
+		if (! in_array($state, $stateids))
 		{
 			$app->enqueueMessage(JText::_('Invalid State') . ': ' . $state, 'error');
 			$app->redirect($this->returnURL);
@@ -1636,9 +1659,9 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 			$permission = FlexicontentHelperPerm::getPerm();
 			$has_archive    = $permission->CanArchives;
 
-			$has_edit_state = $has_edit_state && in_array($stateids[$state], array(0,1,-3,-4,-5));
-			$has_delete     = $has_delete     && $stateids[$state] == -2;
-			$has_archive    = $has_archive    && $stateids[$state] == (FLEXI_J16GE ? 2 : -1);
+			$has_edit_state = $has_edit_state && in_array($state, array(0,1,-3,-4,-5));
+			$has_delete     = $has_delete     && $state == -2;
+			$has_archive    = $has_archive    && $state == (FLEXI_J16GE ? 2 : -1);
 
 			if ($has_edit_state || $has_delete || $has_archive)
 			{
@@ -1666,7 +1689,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 			// Note we will clean it only once later after the loop
 			foreach ($auth_cid as $item_id)
 			{
-				$record_model->setitemstate($item_id, $stateids[$state], $_cleanCache = false);
+				$record_model->setitemstate($item_id, $state, $_cleanCache = false);
 			}
 
 			$msg = count($auth_cid) . " " . JText::_('FLEXI_ITEMS') . " : &nbsp; " . JText::_('FLEXI_ITEMS_STATE_CHANGED_TO') . " -- " . JText::_($statenames[$state]) . " --";
@@ -2018,6 +2041,19 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 
 
 	/**
+	 * Logic to set the access level of the records
+	 *
+	 * @return void
+	 *
+	 * @since 3.3
+	 */
+	public function access()
+	{
+		parent::access();
+	}
+
+
+	/**
 	 * Method to fetch the tags edit field for the edit form, this is currently NOT USED
 	 *
 	 * @since 1.5
@@ -2157,26 +2193,13 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 
 
 	/**
-	 * Logic to set the access level of the records
+	 * Logic to display batch form for modifying multiple records
 	 *
 	 * @return void
 	 *
 	 * @since 3.3
 	 */
-	public function access()
-	{
-		parent::access();
-	}
-
-
-	/**
-	 * Logic to display form for copy/move items
-	 *
-	 * @return void
-	 *
-	 * @since 3.3
-	 */
-	public function copy()
+	public function batch()
 	{
 		// Check for request forgeries
 		JSession::checkToken('request') or die(JText::_('JINVALID_TOKEN'));

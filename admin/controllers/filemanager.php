@@ -39,6 +39,8 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 
 	var $_NAME = 'FILE';
 
+	var $record_alias = 'filename';
+
 	var $runMode = 'standalone';
 
 	var $exitHttpHead = null;
@@ -362,11 +364,20 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 	 */
 	public function checkin()
 	{
-		// Check for request forgeries
-		JSession::checkToken('request') or die(JText::_('JINVALID_TOKEN'));
+		parent::checkin();
+	}
 
-		$redirect_url = $this->returnURL;
-		flexicontent_db::checkin($this->records_jtable, $redirect_url, $this);
+
+	/**
+	 * Cancel the edit, check in the record and return to the records manager
+	 *
+	 * @return bool
+	 *
+	 * @since 3.3
+	 */
+	public function cancel()
+	{
+		return parent::cancel();
 	}
 
 
@@ -1142,28 +1153,6 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 	}
 
 
-	/**
-	 * Cancel the edit, check in the record and return to the records manager
-	 *
-	 * @return bool
-	 *
-	 * @since 3.3
-	 */
-	public function cancel()
-	{
-		// Check for request forgeries
-		JSession::checkToken('request') or die(JText::_('JINVALID_TOKEN'));
-
-		// DO not check access for checkin the item, method checkin() will do it
-		$id = $this->input->get->post->get('id', 0, 'int');
-		$this->input->set('cid', $id);
-
-		// Check in the record (if possible) and redirect (typically) to records manager
-		$this->checkin();
-
-		return true;
-	}
-
 
 	/**
 	 * Logic to modify the state of records, other state modifications tasks are wrappers to this task
@@ -1484,7 +1473,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 
 		// Try to load by unique ID or NAME
 		else
-		{	
+		{
 			$record = $model->getItem();
 		}
 

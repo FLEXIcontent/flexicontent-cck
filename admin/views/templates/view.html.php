@@ -183,6 +183,7 @@ class FlexicontentViewTemplates extends FlexicontentViewBaseRecords
 		$document = JFactory::getDocument();
 		$toolbar  = JToolbar::getInstance('toolbar');
 		$perms    = FlexicontentHelperPerm::getPerm();
+		$session  = JFactory::getSession();
 
 		$js = '';
 
@@ -212,7 +213,6 @@ class FlexicontentViewTemplates extends FlexicontentViewBaseRecords
 
 		if ($perms->CanConfig)
 		{
-			$session = JFactory::getSession();
 			$fc_screen_width = (int) $session->get('fc_screen_width', 0, 'flexicontent');
 			$_width  = ($fc_screen_width && $fc_screen_width-84 > 940 ) ? ($fc_screen_width-84 > 1400 ? 1400 : $fc_screen_width-84 ) : 940;
 			$fc_screen_height = (int) $session->get('fc_screen_height', 0, 'flexicontent');
