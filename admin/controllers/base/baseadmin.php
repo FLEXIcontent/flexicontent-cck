@@ -517,7 +517,8 @@ class FlexicontentControllerBaseAdmin extends FlexicontentController
 
 		// Set record ID (JForm) into the request array variable cid[] (expected by the 'checkin' task)
 		$raw_data = $this->input->get('jform', array(), 'array');
-		$this->input->set('cid', (int) $raw_data['id']);
+		$cid = $raw_data['id'] ? (int) $raw_data['id'] : $this->input->getInt('id', 0);
+		$this->input->set('cid', $cid);
 
 		// Check in the record (if possible) and redirect (typically) to records manager
 		$this->checkin();

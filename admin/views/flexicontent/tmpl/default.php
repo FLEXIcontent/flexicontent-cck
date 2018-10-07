@@ -18,10 +18,11 @@
 
 defined('_JEXEC') or die('Restricted access');
 
-$app       = JFactory::getApplication();
-$option    = $app->input->get('option', '', 'CMD');
-$user      = JFactory::getUser();
-$template  = $app->getTemplate();
+$app      = JFactory::getApplication();
+$option   = $app->input->get('option', '', 'CMD');
+$user     = JFactory::getUser();
+$template = $app->getTemplate();
+$session  = JFactory::getSession();
 
 $btn_class = FLEXI_J30GE ? 'btn' : 'fc_button';
 $tooltip_class = FLEXI_J30GE ? 'hasTooltip' : 'hasTip';
@@ -159,7 +160,6 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 			echo '<div class="fc-mssg fc-warning">';
 			if ( !$config_saved )
 			{
-				$session = JFactory::getSession();
 				$fc_screen_width = (int) $session->get('fc_screen_width', 0, 'flexicontent');
 				$_width = ($fc_screen_width && $fc_screen_width-84 > 940 ) ? ($fc_screen_width-84 > 1400 ? 1400 : $fc_screen_width-84 ) : 940;
 				$fc_screen_height = (int) $session->get('fc_screen_height', 0, 'flexicontent');

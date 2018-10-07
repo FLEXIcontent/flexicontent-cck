@@ -2923,22 +2923,16 @@ class flexicontent_html
 				$tooltip_placement = !$params->get('btn_grp_dropdown', 0) ? 'bottom' : 'left';
 			}
 
-			//$allowed_states = array();
-			//$allowed_states[] = '<div>'.$jtext['action'].'</div>');
 			foreach ($state_ids as $i => $state_id)
 			{
 				$state_data[] = array('i'=>$state_id);
-				/*$allowed_states[] ='
-					<span onclick="fc_statehandler_singleton.setstate(\''.$state_id.'\', \'' . $record->id . '\')">
-						'.($use_font_icons ? '<span class="icon-'.$font_icons[$state_id].'"></span>' : '<img src="'.$img_path.$state_imgs[$state_id].'" alt="s" /> ').$state_tips[$state_id].'
-					</span>';*/
 			}
 			$tooltip_title = flexicontent_html::getToolTip($state_text ? $state_text : JText::_( 'FLEXI_PUBLISH_INFORMATION' ), ' &nbsp; '.implode("\n<br/> &nbsp; \n", $publish_info).'<br/>'.$jtext['change_state'], 0);
 			$output = '
-			<div class="statetoggler '.$button_classes.' '.$tooltip_class.'" ' . ($tooltip_placement ? ' data-placement="' . $tooltip_placement . '"' : '') . ' title="'.$tooltip_title.'" onclick="fc_statehandler_singleton.toggleSelector(this)">
+			<div class="statetoggler ' . $button_classes . ' ' . $tooltip_class . '" ' . ($tooltip_placement ? ' data-placement="' . $tooltip_placement . '"' : '') . ' title="' . $tooltip_title . '" onclick="fc_statehandler_singleton.toggleSelector(this)">
 				<div class="statetoggler_inner">
 					<div id="row' . $record->id . '" class="stateopener ntxt">
-						'.$stateicon.'
+						' . $stateicon . '
 					</div>
 					<div class="options" data-id="' . $record->id . '" data-st="'.htmlspecialchars(json_encode($state_data), ENT_COMPAT, 'UTF-8').'">'/*.implode('', $allowed_states)*/.'</div>
 				</div>
@@ -2956,16 +2950,17 @@ class flexicontent_html
 			$tooltip_title = flexicontent_html::getToolTip(JText::_( 'FLEXI_PUBLISH_INFORMATION' ), implode("\n<br/>\n", $publish_info), 0);
 			$output = '
 				<div id="row' . $record->id . '" class="statetoggler_disabled ' . $config->class . '">
-					<span class="'.$tooltip_class.'" title="'.$tooltip_title.'">
-						'.$stateicon.'
+					<span class="disabled ' . $tooltip_class . '" title="' . $tooltip_title . '">
+						' . $stateicon . '
 					</span>
 				</div>';
 			$output	= $jtext['icon_sep'] .$output. $jtext['icon_sep'];
 		}
 
+		// Frontend with no permissions to edit / delete / archive
 		else
 		{
-			$output = '';  // frontend with no permissions to edit / delete / archive
+			$output = '';
 		}
 
 		return $output;

@@ -39,6 +39,8 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 
 	var $_NAME = 'FILE';
 
+	var $record_alias = 'filename';
+
 	var $runMode = 'standalone';
 
 	var $exitHttpHead = null;

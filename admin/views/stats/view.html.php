@@ -36,6 +36,7 @@ class FlexicontentViewStats extends JViewLegacy
 		//initialise variables
 		$document = JFactory::getDocument();
 		$user     = JFactory::getUser();
+		$session  = JFactory::getSession();
 		
 		// Get data from the model
 		$genstats   = $this->get( 'Generalstats' );
@@ -106,8 +107,6 @@ class FlexicontentViewStats extends JViewLegacy
 		//JToolbarHelper::Back();
 		if ($perms->CanConfig)
 		{
-			//JToolbarHelper::divider(); JToolbarHelper::spacer();
-			$session = JFactory::getSession();
 			$fc_screen_width = (int) $session->get('fc_screen_width', 0, 'flexicontent');
 			$_width  = ($fc_screen_width && $fc_screen_width-84 > 940 ) ? ($fc_screen_width-84 > 1400 ? 1400 : $fc_screen_width-84 ) : 940;
 			$fc_screen_height = (int) $session->get('fc_screen_height', 0, 'flexicontent');

@@ -1679,12 +1679,10 @@ class FlexicontentModelItems extends FCModelAdminList
 
 		$use_versioning = $this->cparams->get('use_versioning', 1);
 
-		require_once("components/com_flexicontent/models/item.php");
 
-
-		// ************************************************************************
-		// Try to find Falang/Joomfish, to import translation data, if so requested
-		// ************************************************************************
+		/**
+		 * Try to find Falang/Joomfish, to import translation data, if so requested
+		 */
 
 		$_FALANG = false;
 		$this->_db->setQuery('SHOW TABLES LIKE "'.$dbprefix.'falang_content"');
@@ -1705,7 +1703,8 @@ class FlexicontentModelItems extends FCModelAdminList
 
 		// Detect version of joomfish tables
 		$_FISH22GE = false;
-		if ($_FISH) {
+		if ($_FISH)
+		{
 			$this->_db->setQuery('SHOW TABLES LIKE "'.$dbprefix.'jf_languages_ext"');
 			$_FISH22GE = (boolean) count($this->_db->loadObjectList());
 		}
@@ -1734,9 +1733,9 @@ class FlexicontentModelItems extends FCModelAdminList
 		}
 
 
-		// ************************************************************
-		// Loop through the items, copying, moving, or translating them
-		// ************************************************************
+		/**
+		 * Loop through the items, copying, moving, or translating them
+		 */
 
 		foreach ($cid as $itemid)
 		{
@@ -1891,9 +1890,10 @@ class FlexicontentModelItems extends FCModelAdminList
 				}
 
 
-				// ***********************************************************
-				// Copy custom fields, translating the fields if so configured
-				// ***********************************************************
+				/**
+				 * Copy custom fields, translating the fields if so configured
+				 */
+
 				$doTranslation = $translate_method == 3 || $translate_method == 4;
 				$query 	= 'SELECT fir.*, f.* '
 						. ' FROM #__flexicontent_fields_item_relations as fir'
@@ -1916,8 +1916,7 @@ class FlexicontentModelItems extends FCModelAdminList
 							. ' VALUES(' . $field->field_id . ', ' . $field->item_id . ', ' . $field->valueorder . ', ' . $field->suborder . ', ' . $this->_db->Quote($field->value)
 							. ')'
 							;
-						$this->_db->setQuery($query);
-						$this->_db->execute();
+						$this->_db->setQuery($query)->execute();
 						flexicontent_db::setValues_commonDataTypes($field);
 					}
 				}
@@ -1939,8 +1938,7 @@ class FlexicontentModelItems extends FCModelAdminList
 						. ' WHERE item_id = '. $sourceid
 						. ' AND version = ' . $curversion
 						;
-				$this->_db->setQuery($query);
-				$curversions = $this->_db->loadObjectList();
+				$curversions = $this->_db->setQuery($query)->loadObjectList();
 
 				foreach ($curversions as $cv)
 				{
@@ -1948,8 +1946,7 @@ class FlexicontentModelItems extends FCModelAdminList
 						. ' VALUES(1 ,'  . $cv->field_id . ', ' . $row->id . ', ' . $cv->valueorder . ', ' . $cv->suborder . ', ' . $this->_db->Quote($cv->value)
 						. ')'
 						;
-					$this->_db->setQuery($query);
-					$this->_db->execute();
+					$this->_db->setQuery($query)->execute();
 				}
 
 				// get the item categories
@@ -1965,8 +1962,7 @@ class FlexicontentModelItems extends FCModelAdminList
 					$query 	= 'INSERT INTO #__flexicontent_cats_item_relations (`catid`, `itemid`)'
 							.' VALUES(' . $cat . ',' . $row->id . ')'
 							;
-					$this->_db->setQuery($query);
-					$this->_db->execute();
+					$this->_db->setQuery($query)->execute();
 				}
 
 				if ($keeptags)
@@ -1976,16 +1972,14 @@ class FlexicontentModelItems extends FCModelAdminList
 							. ' FROM #__flexicontent_tags_item_relations'
 							. ' WHERE itemid = '. $sourceid
 							;
-					$this->_db->setQuery($query);
-					$tags = $this->_db->loadColumn();
+					$tags = $this->_db->setQuery($query)->loadColumn();
 
 					foreach($tags as $tag)
 					{
 						$query 	= 'INSERT INTO #__flexicontent_tags_item_relations (`tid`, `itemid`)'
 								.' VALUES(' . $tag . ',' . $row->id . ')'
 								;
-						$this->_db->setQuery($query);
-						$this->_db->execute();
+						$this->_db->setQuery($query)->execute();
 					}
 				}
 
@@ -1993,15 +1987,11 @@ class FlexicontentModelItems extends FCModelAdminList
 				{
 					$this->moveitem($row->id, $maincat, $seccats);
 				}
-				else if ($method == 99 && ($maincat || $seccats))
+				elseif ($method == 99 && ($maincat || $seccats))
 				{
 					$row->catid = $maincat ? $maincat : $row->catid;
 					$this->moveitem($row->id, $row->catid, $seccats);
 				}
-				// Load item model and save it once, e.g. updating Joomla featured FLAG data
-				//$itemmodel = new FlexicontentModelItem();
-				//$itemmodel->getItem($row->id);
-				//$itemmodel->store((array)$row);
 
 				// If new item is a tranlation, load the language associations of item
 				// that was copied, and save the associations, adding the new item to them
