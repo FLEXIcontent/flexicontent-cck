@@ -20,7 +20,7 @@ JHtml::_('behavior.formvalidation');
 $canDo = UsersHelper::getActions();
 ?>
 
-<script type="text/javascript">
+<script>
 	Joomla.submitbutton = function(task)
 	{
 		if (task == 'group.cancel' || document.formvalidator.isValid(document.getElementById('adminForm'))) {

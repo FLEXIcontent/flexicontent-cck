@@ -1363,6 +1363,7 @@ class FlexicontentController extends JControllerLegacy
 	 */
 	public function edit()
 	{
+		$app      = JFactory::getApplication();
 		$document = JFactory::getDocument();
 
 		$this->input->set('view', $this->record_name);

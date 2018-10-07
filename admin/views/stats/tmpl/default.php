@@ -53,7 +53,7 @@ $ctrl_users = "task=users.";
 	else :
 ?>
 
-	<script type="text/javascript">
+	<script>
     require.config({
         packages: [
             {
@@ -299,7 +299,7 @@ $ctrl_users = "task=users.";
 			}
 		 ?>
 
-	    <script type="text/javascript">
+	    <script>
 	       
 			var optionpie = {
 			      tooltip : {
@@ -616,7 +616,7 @@ $ctrl_users = "task=users.";
 				}
 			 ?>
 
-		    <script type="text/javascript">
+		    <script>
 		       
 				var optionpie2 = {
 				      tooltip : {

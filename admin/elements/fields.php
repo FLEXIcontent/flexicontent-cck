@@ -88,39 +88,40 @@ class JFormFieldFields extends JFormField
 
 		$and = '';
 
-		if ((boolean) $this->element['isnotcore'])
+		if ((int) $this->element['isnotcore'])
 		{
 			$and .= ' AND iscore = 0';
 		}
 
-		$issearch = $this->element['issearch'];
-		if ( strlen($issearch) )
+		$issearch = (string) $this->element['issearch'];
+
+		if (strlen($issearch) && $issearch !== '*')
 		{
 			$and .= ' AND issearch='. (int)$issearch;
 		}
 
-		$isadvsearch = $this->element['isadvsearch'];
+		$isadvsearch = (string) $this->element['isadvsearch'];
 
-		if ( strlen($isadvsearch) )
+		if (strlen($isadvsearch) && $isadvsearch !== '*')
 		{
-			$and .= ' AND isadvsearch='. (int)$isadvsearch;
+			$and .= ' AND isadvsearch=' . (int) $isadvsearch;
 		}
 
-		$isadvfilter = $this->element['isadvfilter'];
+		$isadvfilter = (string) $this->element['isadvfilter'];
 
-		if (strlen($isadvfilter))
+		if (strlen($isadvfilter) && $isadvfilter !== '*')
 		{
-			$and .= ' AND isadvfilter='. (int)$isadvfilter;
+			$and .= ' AND isadvfilter=' . (int) $isadvfilter;
 		}
 
 		// For 'Filters' type not set means value 1 otherwise means any ('*')
-		$isfilter = $this->element['isfilter']
-			? (int) $attributes['isfilter']
+		$isfilter = strlen((string) $this->element['isfilter'])
+			? (string) $this->element['isfilter']
 			: ($this->type === 'Filters' ? 1 : '*');
 
-		if ($isfilter !== '*')
+		if (strlen($isfilter) && $isfilter !== '*')
 		{
-			$and .= ' AND isfilter='. (int)$isfilter;
+			$and .= ' AND isfilter=' . (int) $isfilter;
 		}
 
 		// For 'Filters' type not set means true otherwise false
@@ -150,7 +151,7 @@ class JFormFieldFields extends JFormField
 		}
 
 		// Limit to current type
-		$type_id_variable = $this->element['type_id_variable'];
+		$type_id_variable = (string) $this->element['type_id_variable'];
 
 		if ($type_id_variable)
 		{

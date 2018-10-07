@@ -33,7 +33,7 @@ foreach ($values as $n => $value)
 	elseif ($url_target === 'multibox')
 	{
 		$field->{$prop}[] = $pretext.'
-		<script>document.write(\'<a style="'.$style.'" href="'.$urllink.'" id="mb'.$uniqueid.'" class="fc_image_thumb mb field_' . $field->id . '" rel="width:\'+(jQuery(window).width()-150)+\',height:\'+(jQuery(window).height()-150)+\'">\')</script>
+		<script>document.write(\'<a style="'.$style.'" href="'.$urllink.'" id="mb'.$uniqueid.'" class="fc_image_thumb mb field_' . $field->id . '" data-rel="width:\'+(jQuery(window).width()-150)+\',height:\'+(jQuery(window).height()-150)+\'">\')</script>
 			'.$img_legend.'
 		<script>document.write(\'</a>\')</script>
 		<div class="multiBoxDesc mbox_img_url mb'.$uniqueid.'">

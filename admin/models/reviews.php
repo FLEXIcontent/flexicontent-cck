@@ -30,10 +30,11 @@ class FlexicontentModelReviews extends FCModelAdminList
 	/**
 	 * Column names and record name
 	 */
-	var $record_name = 'review';
-	var $state_col   = 'state';
-	var $name_col    = 'title';
-	var $parent_col  = null;
+	var $record_name    = 'review';
+	var $state_col      = 'state';
+	var $name_col       = 'title';
+	var $parent_col     = null;
+	var $created_by_col = 'user_id';
 
 	/**
 	 * (Default) Behaviour Flags

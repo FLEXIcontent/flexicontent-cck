@@ -4,7 +4,7 @@ defined('_JEXEC') or die;
 JHtml::_('behavior.keepalive');
 ?>
 
-<script type="text/javascript">
+<script>
 	Joomla.submitbutton = function(pressbutton) {
 		var form = document.getElementById('mailtoForm');
 

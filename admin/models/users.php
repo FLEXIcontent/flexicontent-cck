@@ -50,6 +50,10 @@ class FlexicontentModelUsers extends FCModelAdminList
 	var $default_order_dir = 'DESC';
 
 	/**
+	 * List filters that are always applied
+	 */
+
+	/**
 	 * Record rows
 	 *
 	 * @var array
@@ -309,6 +313,51 @@ class FlexicontentModelUsers extends FCModelAdminList
 		return $q
 			? ' HAVING ' . (count($having) ? implode(' AND ', $having) : ' 1 ')
 			: $having;
+	}
+
+
+	/**
+	 * Method to find which records are not authorized
+	 *
+	 * @param   array     $cid     array of record ids to check
+	 * @param   string    $rule    string of the ACL rule to check
+	 *
+	 * @return	array     The records having assignments
+	 *
+	 * @since	3.3.0
+	 */
+	public function filterByPermission($cid, $rule)
+	{
+		ArrayHelper::toInteger($cid);
+
+		// If cannot manage then all records are not changeable
+		if (!$this->canManage)
+		{
+			return $cid;
+		}
+
+		$cid_noauth  = array();
+
+		return $cid_noauth;
+	}
+
+
+	/**
+	 * Method to find which records having assignments blocking a state change
+	 *
+	 * @param		array     $cid      array of record ids to check
+	 * @param		string    $tostate  action related to assignments
+	 *
+	 * @return	array     The records having assignments
+	 */
+	public function filterByAssignments($cid = array(), $tostate = -2)
+	{
+		ArrayHelper::toInteger($cid);
+		$cid_wassocs = array();
+
+		// We will not return assignments, as users maybe used everywhere ... behave like none of them has assignments
+
+		return $cid_wassocs;
 	}
 
 

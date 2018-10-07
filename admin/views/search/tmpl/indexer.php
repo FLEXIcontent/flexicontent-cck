@@ -30,7 +30,7 @@ $rebuildmode  = $app->input->get('rebuildmode', '', 'cmd');
 <div style="heading">
 	<?php echo JText::_('FLEXI_TASK_RUNNING'); ?> ... <?php echo FlexicontentFields::getPDFParser() ? 'Indexing PDF files enabled ...' : ''; ?> <br/>
 	
-<script type="text/javascript">
+<script>
 jQuery(document).ready(function() {
 	var total_time = 0;
 	var records_per_call = 1000;

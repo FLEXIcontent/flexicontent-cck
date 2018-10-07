@@ -18,7 +18,7 @@
 
 defined('_JEXEC') or die('Restricted access');
 ?>
-<script type="text/javascript">
+<script>
 window.addEvent('domready', function(){
 	$('adminForm').addEvent('submit', function(e) {
 		$('log-bind').set('html','<p class="centerimg"><img src="components/com_flexicontent/assets/images/ajax-loader.gif" style="vertical-align: middle;"><\/p>');

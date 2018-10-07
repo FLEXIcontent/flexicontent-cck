@@ -1,25 +1,23 @@
 <?php
 /**
- * @version 1.5 stable $Id: default.php 1746 2013-09-01 21:44:12Z ggppdk $
- * @package Joomla
- * @subpackage FLEXIcontent
- * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
- * @license GNU/GPL v2
- * 
- * FLEXIcontent is a derivative work of the excellent QuickFAQ component
- * @copyright (C) 2008 Christoph Lukes
- * see www.schlu.net for more information
+ * @package         FLEXIcontent
+ * @version         3.3
  *
- * FLEXIcontent is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
+ * @link            http://www.flexicontent.com
+ * @copyright       Copyright © 2018, FLEXIcontent team, All Rights Reserved
+ * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
 defined('_JEXEC') or die('Restricted access');
 $app = JFactory::getApplication();
 $option = $app->input->get('option');
 global $globalcats;
+
+$useAssocs = flexicontent_db::useAssociations();
+
+$list_total_cols = 7;
+if ( $useAssocs ) $list_total_cols++;
 
 $tip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
 $btn_class = FLEXI_J30GE ? 'btn' : 'fc_button fcsimple';
@@ -39,10 +37,18 @@ function delFilter(name)
 }
 
 function delAllFilters() {
-	delFilter('search'); delFilter('filter_type'); delFilter('filter_state');
-	delFilter('filter_cats'); delFilter('filter_author'); delFilter('filter_id');
-	delFilter('startdate'); delFilter('enddate'); delFilter('filter_lang');
-	delFilter('filter_tag'); delFilter('filter_access'); delFilter('filter_level');
+	delFilter('search');
+	delFilter('filter_type');
+	delFilter('filter_state');
+	delFilter('filter_cats');
+	delFilter('filter_author');
+	delFilter('filter_id');
+	delFilter('startdate');
+	delFilter('enddate');
+	delFilter('filter_lang');
+	delFilter('filter_tag');
+	delFilter('filter_access');
+	delFilter('filter_level');
 	jQuery('#filter_subcats').val('1');
 	jQuery('.fc_field_filter').val('');
 }
@@ -50,7 +56,7 @@ function delAllFilters() {
 
 <div id="flexicontent" class="flexicontent">
 
-<form action="index.php?option=com_flexicontent&amp;view=qfcategoryelement&amp;tmpl=component" method="post" name="adminForm" id="adminForm">
+<form action="index.php?option=com_flexicontent&amp;view=fccategoryelement&amp;tmpl=component" method="post" name="adminForm" id="adminForm">
 
 	<div id="fc-managers-header">
 		<span class="fc-filter nowrap_box">
@@ -62,7 +68,7 @@ function delAllFilters() {
 				<button title="<?php echo JText::_('FLEXI_RESET_FILTERS'); ?>" class="<?php echo $btn_class; ?>" onclick="document.adminForm.limitstart.value=0; delAllFilters(); Joomla.submitform();"><?php echo FLEXI_J30GE ? '<i class="icon-remove"></i>' : JText::_('FLEXI_CLEAR'); ?></button>
 			</span>
 		</span>
-		
+
 		<span class="fc-filter nowrap_box">
 			<span class="limit nowrap_box" style="display: inline-block;">
 				<label class="label">
@@ -73,11 +79,11 @@ function delAllFilters() {
 				if (strpos($pagination_footer, '"limit"') === false) echo $this->pagination->getLimitBox();
 				?>
 			</span>
-			
+
 			<span class="fc_item_total_data nowrap_box badge badge-info">
 				<?php echo @$this->resultsCounter ? $this->resultsCounter : $this->pagination->getResultsCounter(); // custom Results Counter ?>
 			</span>
-			
+
 			<?php if (($getPagesCounter = $this->pagination->getPagesCounter())): ?>
 			<span class="fc_pages_counter nowrap_box fc-mssg-inline fc-info fc-nobgimage">
 				<?php echo $getPagesCounter; ?>
@@ -85,41 +91,47 @@ function delAllFilters() {
 			<?php endif; ?>
 		</span>
 	</div>
-	
+
 	<div id="fc-filters-box">
-		
+
 		<span class="fc-filter nowrap_box">
 		<?php echo $this->lists['filter_lang']; ?>
 		</span>
-		
+
 		<span class="fc-filter nowrap_box">
 		<?php echo $this->lists['filter_author']; ?>
 		</span>
-		
+
 		<span class="fc-filter nowrap_box">
 		<?php echo $this->lists['filter_cats']; ?>
 		</span>
-		
+
 		<span class="fc-filter nowrap_box">
 		<?php echo $this->lists['filter_level']; ?>
 		</span>
-		
+
 		<span class="fc-filter nowrap_box">
 		<?php echo $this->lists['filter_state']; ?>
 		</span>
-		
+
 		<span class="fc-filter nowrap_box">
 		<?php echo $this->lists['filter_access']; ?>
 		</span>
 	</div>
 
 
-
-	<table class="adminlist table fcmanlist">
+	<table id="adminListTableFCfccategoryelement" class="adminlist table fcmanlist" itemscope itemtype="http://schema.org/WebPage">
 	<thead>
 		<tr>
 			<th><?php echo JText::_( 'FLEXI_NUM' ); ?></th>
 			<th class="title"><?php echo JHtml::_('grid.sort', 'FLEXI_CATEGORY', 'c.title', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+
+		<?php if ( $useAssocs ) : ?>
+			<th class="left hideOnDemandClass">
+				<?php echo JText::_( 'FLEXI_ASSOCIATIONS' ); ?>
+			</th>
+		<?php endif; ?>
+
 			<th width="" nowrap="nowrap"><?php echo JHtml::_('grid.sort', 'FLEXI_AUTHOR', 'author', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<th width="" nowrap="nowrap"><?php echo JText::_( 'FLEXI_PUBLISHED' ); ?></th>
 			<th width=""><?php echo JHtml::_('grid.sort', 'FLEXI_ACCESS', 'c.access', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
@@ -144,18 +156,21 @@ function delAllFilters() {
 		<tr class="<?php echo "row$k"; ?>">
 
 			<td>
-				<div class="adminlist-table-row"></div>
-				<?php echo $this->pagination->getRowOffset( $i ); ?>
+				<!--div class="adminlist-table-row"></div-->
+				<?php echo $this->pagination->getRowOffset($i); ?>
 			</td>
 
 			<td align="left" class="col_title">
 				<?php
+
 					$parentcats_ids = isset($globalcats[$row->id]) ? $globalcats[$row->id]->ancestorsarray : array();
 					$pcpath = array();
+
 					foreach($parentcats_ids as $pcid)
 					{
 						$pcpath[] = $globalcats[$pcid]->title;
 					}
+
 					$pcpath = implode($pcpath, ' / ');
 				?>
 				<?php if ($row->level>1) echo str_repeat('.&nbsp;&nbsp;&nbsp;', $row->level-1)."<sup>|_</sup>"; ?>
@@ -177,9 +192,9 @@ function delAllFilters() {
 					$row->language_title ? $this->escape($row->language_title) : JText::_('JUNDEFINED');
 				?>
 			</td>
-			
+
 			<td align="center"><?php echo $row->id; ?></td>
-			
+
 		</tr>
 		<?php
 			$k = 1 - $k;
@@ -190,7 +205,7 @@ function delAllFilters() {
 
 	<tfoot>
 		<tr>
-			<td colspan="7">
+			<td colspan="<?php echo $list_total_cols; ?>">
 				<?php echo $this->pagination->getListFooter(); ?>
 			</td>
 		</tr>

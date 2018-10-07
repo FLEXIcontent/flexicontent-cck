@@ -32,7 +32,7 @@ defined('_JEXEC') or die('Restricted access');
 		</tr>
 	</table>
 
-	<table class="adminlist">
+	<table id="adminListTableFCtagelement" class="adminlist table fcmanlist" itemscope itemtype="http://schema.org/WebPage">
 	<thead>
 		<tr>
 			<th><?php echo JText::_( 'FLEXI_NUM' ); ?></th>
@@ -57,7 +57,7 @@ defined('_JEXEC') or die('Restricted access');
 		foreach ($this->rows as $row) {
    		?>
 		<tr class="<?php echo "row$k"; ?>">
-			<td><?php echo $this->pagination->getRowOffset( $i ); ?></td>
+			<td><?php echo $this->pagination->getRowOffset($i); ?></td>
 			<td align="left">
 					<a style="cursor:pointer" onclick="window.parent.qfSelectTag('<?php echo $row->id; ?>', '<?php echo str_replace( array("'", "\""), array("\\'", ""), $row->name ); ?>');">
 					<?php echo htmlspecialchars($row->name, ENT_QUOTES, 'UTF-8'); ?>

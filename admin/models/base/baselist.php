@@ -35,10 +35,11 @@ abstract class FCModelAdminList extends JModelList
 	/**
 	 * Column names and record name
 	 */
-	var $record_name = 'record';
-	var $state_col   = 'published';
-	var $name_col    = 'title';
-	var $parent_col  = null;
+	var $record_name    = 'record';
+	var $state_col      = 'published';
+	var $name_col       = 'title';
+	var $parent_col     = null;
+	var $created_by_col = 'created_by';
 
 	/**
 	 * (Default) Behaviour Flags
@@ -288,7 +289,7 @@ abstract class FCModelAdminList extends JModelList
 
 		$has_checked_out_col = property_exists($table, 'checked_out');
 		$has_access_col      = property_exists($table, 'access');
-		$has_created_by_col  = property_exists($table, 'created_by');
+		$has_created_by_col  = property_exists($table, $this->created_by_col);
 
 		// Create a query with all its clauses: WHERE, HAVING and ORDER BY, etc
 		$query = $this->_db->getQuery(true)
@@ -314,7 +315,7 @@ abstract class FCModelAdminList extends JModelList
 		if ($has_created_by_col)
 		{
 			$query->select('ua.name AS author_name')
-				->leftJoin('#__users AS ua ON ua.id = a.created_by');
+				->leftJoin('#__users AS ua ON ua.id = a.' . $this->created_by_col);
 		}
 
 		// Get the WHERE, HAVING and ORDER BY clauses for the query
@@ -336,7 +337,7 @@ abstract class FCModelAdminList extends JModelList
 	 *
 	 * @return  JDatabaseQuery|array
 	 *
-	 * @since 1.0
+	 * @since 3.3.0
 	 */
 	protected function _buildContentOrderBy($q = false)
 	{
@@ -587,29 +588,29 @@ abstract class FCModelAdminList extends JModelList
 	 * Method to move a record upwards or downwards
 	 *
 	 * @param  integer    $direction   A value of 1  or -1 to indicate moving up or down respectively
+	 * @param  integer    $parent_id   The id of the parent if applicable
 	 *
 	 * @return	boolean	  True on success
 	 *
 	 * @since	3.3.0
 	 */
-	public function move($direction)
+	public function move($direction, $parent_id)
 	{
 		$table = $this->getTable($this->records_jtable, '');
-		$where = $this->parent_col
-			? $this->_db->Quote($this->parent_col) . ' = ' . $table->catid
-			: '';
 
 		if (!$table->load($this->_id))
 		{
 			$this->setError($table->getError());
-
 			return false;
 		}
+
+		$where = $this->parent_col
+			? $this->_db->Quote($this->parent_col) . ' = ' . (int) ($parent_id ?: $table->catid)
+			: '';
 
 		if (!$table->move($direction, $where))
 		{
 			$this->setError($table->getError());
-
 			return false;
 		}
 
@@ -953,6 +954,37 @@ abstract class FCModelAdminList extends JModelList
 		}
 
 		return $this->_db->setQuery($query)->loadObjectList('id');
+	}
+
+
+	/**
+	 * Method to save the reordered nested set tree.
+	 * First we save the new order values in the lft values of the changed ids.
+	 * Then we invoke the table rebuild to implement the new ordering.
+	 *
+	 * @param   array    $pks       An array of primary key ids.
+	 * @param   integer  $order     The lft or ordering value
+	 * @param   integer  $group_id  The parent ID of the group / category being reorder, this is needed when records are assigned to multiple groups / categories
+	 *
+	 * @return  boolean   Boolean true on success, false on failure
+	 *
+	 * @since   3.3.0
+	 */
+	public function saveorder($pks, $order, $group_id = 0)
+	{
+		// Get an instance of the table object.
+		$table = $this->getTable();
+
+		if (!$table->saveorder($pks, $order))
+		{
+			$this->setError($table->getError());
+			return false;
+		}
+
+		// Clear the cache
+		$this->cleanCache();
+
+		return true;
 	}
 
 

@@ -8,6 +8,7 @@
  * @copyright       Copyright © 2018, FLEXIcontent team, All Rights Reserved
  * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
+
 defined('_JEXEC') or die('Restricted access');
 
 use Joomla\String\StringHelper;
@@ -29,10 +30,11 @@ class FlexicontentModelFields extends FCModelAdminList
 	/**
 	 * Column names and record name
 	 */
-	var $record_name = 'field';
-	var $state_col   = 'published';
-	var $name_col    = 'name';
-	var $parent_col  = null;
+	var $record_name    = 'field';
+	var $state_col      = 'published';
+	var $name_col       = 'name';
+	var $parent_col     = null;
+	var $created_by_col = null;
 
 	/**
 	 * (Default) Behaviour Flags
@@ -96,19 +98,17 @@ class FlexicontentModelFields extends FCModelAdminList
 		/**
 		 * View's Filters
 		 * Inherited filters : filter_state, filter_access, search
+		 * Inside method _setStateOrder(): filter_type
 		 */
 
 		// Various filters
 		$filter_fieldtype = $fcform ? $jinput->get('filter_fieldtype', '', 'cmd') : $app->getUserStateFromRequest($p . 'filter_fieldtype', 'filter_fieldtype', '', 'cmd');
-		$filter_type      = $fcform ? $jinput->get('filter_type', 0, 'int') : $app->getUserStateFromRequest($p . 'filter_type', 'filter_type', 0, 'int');
 		$filter_assigned  = $fcform ? $jinput->get('filter_assigned', '', 'cmd') : $app->getUserStateFromRequest($p . 'filter_assigned', 'filter_assigned', '', 'cmd');
 
 		$this->setState('filter_fieldtype', $filter_fieldtype);
-		$this->setState('filter_type', $filter_type);
 		$this->setState('filter_assigned', $filter_assigned);
 
 		$app->setUserState($p . 'filter_fieldtype', $filter_fieldtype);
-		$app->setUserState($p . 'filter_type', $filter_type);
 		$app->setUserState($p . 'filter_assigned', $filter_assigned);
 
 
@@ -315,77 +315,285 @@ class FlexicontentModelFields extends FCModelAdminList
 	/**
 	 * Method to move a record upwards or downwards
 	 *
-	 * @param  integer    $direction   A value of 1  or -1 to indicate moving up or down respectively
+	 * @param   integer   $direction  A value of 1  or -1 to indicate moving up or down respectively
+	 * @param   integer   $typeid     The ID of the item type whose fields are being reorder, needed as fields are assigned to multiple item types
 	 *
 	 * @return	boolean	  True on success
 	 *
 	 * @since	3.3.0
 	 */
-	public function move($direction)
+	public function move($direction, $typeid)
 	{
-		$filter_type = $this->getState('filter_type');
+		$app = JFactory::getApplication();
 
-		if (!$filter_type)
+		// Load the moved record
+		$table = $this->getTable($this->records_jtable, '');
+
+		if (!$table->load($this->_id))
 		{
-			return parent::move($direction);
+			$this->setError($table->getError());
+			return false;
 		}
+
+		// Use filter value if content type was not given
+		$typeid = $typeid ?: $this->getState('filter_type');
+		$multi_assigns_ordering = (boolean) $typeid;
+
+
+		/**
+		 * CASE 1
+		 *
+		 * Global ordering (no content type), use ordering column inside DB table itself
+		 * do reordering via JTable calls
+		 */
+
+		if (!$multi_assigns_ordering)
+		{
+			// Access check must done at the controller code for component level ACL 'flexicontent.orderfields'
+			return parent::move($direction, 0);
+		}
+
+
+		/**
+		 * CASE 2
+		 *
+		 * Specific item type ordering (multi-type assignments), use ordering column at the fields-types relation DB table
+		 * we will not use JTable calls for changing order,
+		 * instead we will use custom optimized queries to update multiple records at once
+		 */
 
 		else
 		{
-			$query = 'SELECT field_id, ordering'
-				. ' FROM #__flexicontent_fields_type_relations'
-				. ' WHERE type_id = ' . $filter_type
-				. ' AND field_id = ' . $this->_id
+			/**
+			 * Verify currently moved field is assigned to given type and also get its current ordering value
+			 */
+
+			$query = $this->_db->getQuery(true)
+				->select('rel.field_id, rel.ordering')
+				->from('#__flexicontent_fields_type_relations AS rel')
+				->where('rel.type_id = ' . (int) $typeid)
+				->where('rel.field_id = ' . (int) $this->_id)
 			;
 			$origin = $this->_db->setQuery($query, 0, 1)->loadObject();
 
-			$sql = 'SELECT field_id, ordering FROM #__flexicontent_fields_type_relations';
+			if (!$origin)
+			{
+				$this->setError('Field to move is not assigned to given type');
+				return false;
+			}
+
+			/**
+			 * Find the NEXT or PREVIOUS field having same (typeid), to use it for swapping the ordering numbers
+			 */
+
+			$query
+				->clear('where')
+				->where(array(
+					'rel.type_id = ' . (int) $typeid,
+				));
 
 			if ($direction < 0)
 			{
-				$sql .= ' WHERE ordering < ' . (int) $origin->ordering;
-				$sql .= ' AND type_id = ' . $filter_type;
-				$sql .= ' ORDER BY ordering DESC';
+				$query
+					->where('rel.ordering >= 0 AND rel.ordering < ' . (int) $origin->ordering)
+					->order('ordering DESC');
 			}
 			elseif ($direction > 0)
 			{
-				$sql .= ' WHERE ordering > ' . (int) $origin->ordering;
-				$sql .= ' AND type_id = ' . $filter_type;
-				$sql .= ' ORDER BY ordering';
-			}
-			else
-			{
-				$sql .= ' WHERE ordering = ' . (int) $origin->ordering;
-				$sql .= ' AND type_id = ' . $filter_type;
-				$sql .= ' ORDER BY ordering';
+				$query
+					->where('rel.ordering >= 0 AND rel.ordering > ' . (int) $origin->ordering)
+					->order('ordering ASC');
 			}
 
-			$row = $this->_db->setQuery($sql, 0, 1)->loadObject();
+			$row = $this->_db->setQuery($query, 0, 1)->loadObject();
 
+			/**
+			 * NEXT or PREVIOUS record found, swap its order with currently moved record
+			 */
 			if (isset($row))
 			{
-				$query = 'UPDATE #__flexicontent_fields_type_relations'
-					. ' SET ordering = ' . (int) $row->ordering
-					. ' WHERE field_id = ' . (int) $origin->field_id
-					. ' AND type_id = ' . $filter_type
+				$query = $this->_db->getQuery(true)
+					->update('#__flexicontent_fields_type_relations')
+					->set('ordering = ' . (int) $row->ordering)
+					->where('field_id = ' . (int) $origin->field_id)
+					->where('type_id = ' . (int) $typeid)
 				;
 				$this->_db->setQuery($query)->execute();
 
-				$query = 'UPDATE #__flexicontent_fields_type_relations'
-					. ' SET ordering = ' . (int) $origin->ordering
-					. ' WHERE field_id = ' . (int) $row->field_id
-					. ' AND type_id = ' . $filter_type
+				$query = $this->_db->getQuery(true)
+					->update('#__flexicontent_fields_type_relations')
+					->set('ordering = ' . (int) $origin->ordering)
+					->where('field_id = ' . (int) $row->field_id)
+					->where('type_id = ' . (int) $typeid)
 				;
 				$this->_db->setQuery($query)->execute();
-
-				$origin->ordering = $row->ordering;
 			}
+
+			/**
+			 * NEXT or PREVIOUS record NOT found, raise a notice
+			 */
 			else
 			{
-				$query = 'UPDATE #__flexicontent_fields_type_relations'
-					. ' SET ordering = ' . (int) $origin->ordering
-					. ' WHERE field_id = ' . (int) $origin->field_id
-					. ' AND type_id = ' . $filter_type
+				$app->enqueueMessage(
+					JText::_('Previous/Next record was not found or has same ordering, trying saving ordering once to create incrementing unique ordering numbers'),
+					'notice'
+				);
+			}
+
+			return true;
+		}
+	}
+
+
+	/**
+	 * Saves the manually set order of records.
+	 *
+	 * @param   array     $pks        An array of primary key ids
+	 * @param   array     $order      An array of new ordering values
+	 * @param   integer   $typeid     The ID of the item type whose fields are being reorder, needed as fields are assigned to multiple item types
+	 *
+	 * @return  boolean   Boolean true on success, false on failure
+	 *
+	 * @since   3.3.0
+	 */
+	public function saveorder($pks, $order, $typeid = 0)
+	{
+		$app = JFactory::getApplication();
+
+		$typeid = $typeid ?: $this->getState('filter_type');
+
+
+		/**
+		 * CASE 1
+		 *
+		 * Global ordering (no content type), use ordering column inside DB table itself
+		 * do reordering via JTable calls
+		 */
+
+		if (!$typeid)
+		{
+			// Access check must done at the controller code for component level ACL 'flexicontent.orderfields'
+			$table = $this->getTable($this->records_jtable, '');
+
+			// Update ordering values
+			for ($i = 0; $i < count($pks); $i++)
+			{
+				$table->load((int) $pks[$i]);
+
+
+				// Save JTable record only if ordering differs
+				if ($table->ordering != $order[$i])
+				{
+					$table->ordering = $order[$i];
+
+					if (!$table->store())
+					{
+						$this->setError($table->getError());
+
+						return false;
+					}
+				}
+			}
+
+			/**
+			 * Compact the ordering numbers
+			 */
+
+			$table->reorder();
+
+			return true;
+		}
+
+
+		/**
+		 * CASE 2
+		 *
+		 * Specific item type ordering (multi-type assignments), use ordering column at the fields-types relation DB table
+		 * we will not use JTable calls for changing order,
+		 * instead we will use custom optimized queries to update multiple records at once
+		 */
+
+		else
+		{
+			$query = $this->_db->getQuery(true)
+				->select('rel.field_id, rel.ordering')
+				->from('#__flexicontent_fields_type_relations AS rel')
+				->where('rel.type_id = ' . (int) $typeid)
+				->order('rel.ordering')
+			;
+			$rows = $this->_db->setQuery($query)->loadObjectList('field_id');
+
+			/**
+			 * Update the record-to-group relations tableusing the given ordering numbers
+			 * TODO: merge this with the re-compacting (reordering) code ...
+			 */
+			$new_order_wheres = array();
+
+			for ($i = 0; $i < count($pks); $i++)
+			{
+				$row = $rows[$pks[$i]];
+
+				if ($row->ordering != $order[$i])
+				{
+					$row->ordering = $order[$i];
+
+					$where_case = 'type_id = ' . (int) $typeid . ' AND field_id = ' . (int) $row->field_id;
+					$new_order_wheres[$where_case] = ' WHEN ' . $where_case . ' THEN ' . (int) $row->ordering;
+				}
+			}
+
+			if (count($new_order_wheres))
+			{
+				$query = $this->_db->getQuery(true)
+					->update('#__flexicontent_fields_type_relations')
+					->set('ordering = CASE ' . implode(' ', $new_order_wheres) . ' END ')
+					->where('(' . implode(') OR (', array_keys($new_order_wheres)) . ')')
+				;
+				$this->_db->setQuery($query)->execute();
+			}
+
+			/**
+			 * Get ordering of all records in current group (we will compact them below)
+			 */
+
+			$query = $this->_db->getQuery(true)
+				->select('rel.field_id, rel.ordering')
+				->from('#__flexicontent_fields_type_relations AS rel')
+				->where('rel.ordering >= 0')
+				->where('rel.type_id = ' . (int) $typeid)
+				->order('rel.ordering')
+			;
+			$rows = $this->_db->setQuery($query)->loadObjectList('field_id');
+
+			/**
+			 * Compact the ordering numbers
+			 */
+
+			$n = 1;
+			$new_order_wheres = array();
+
+			foreach ($rows as $row)
+			{
+				if ($row->ordering >= 0)
+				{
+					if ($row->ordering != $n)
+					{
+						$row->ordering = $n;
+
+						$where_case = 'type_id = ' . (int) $typeid . ' AND field_id = ' . (int) $row->field_id;
+						$new_order_wheres[$where_case] = ' WHEN ' . $where_case . ' THEN ' .  (int) $row->ordering;
+					}
+
+					$n++;
+				}
+			}
+
+			if (count($new_order_wheres))
+			{
+				$query = $this->_db->getQuery(true)
+					->update('#__flexicontent_fields_type_relations')
+					->set('ordering = CASE ' . implode(' ', $new_order_wheres) . ' END ')
+					->where('(' . implode(') OR (', array_keys($new_order_wheres)) . ')')
 				;
 				$this->_db->setQuery($query)->execute();
 			}
@@ -411,19 +619,22 @@ class FlexicontentModelFields extends FCModelAdminList
 			// Delete also field - type relations
 			$query = $this->_db->getQuery(true)
 				->delete('#__flexicontent_fields_type_relations')
-				->where('field_id IN (' . $cid_list . ')');
+				->where('field_id IN (' . $cid_list . ')')
+			;
 			$this->_db->setQuery($query)->execute();
 
 			// Delete also field values
 			$query = $this->_db->getQuery(true)
 				->delete('#__flexicontent_fields_item_relations')
-				->where('field_id IN (' . $cid_list . ')');
+				->where('field_id IN (' . $cid_list . ')')
+			;
 			$this->_db->setQuery($query)->execute();
 
 			// Delete also versioned field values
 			$query = $this->_db->getQuery(true)
 				->delete('#__flexicontent_items_versions')
-				->where('field_id IN (' . $cid_list . ')');
+				->where('field_id IN (' . $cid_list . ')')
+			;
 			$this->_db->setQuery($query)->execute();
 		}
 	}
@@ -576,7 +787,6 @@ class FlexicontentModelFields extends FCModelAdminList
 				$cid_wassocs = $this->filterByCoreTypes($cid);
 				break;
 
-
 			// Unpublish
 			case 0:
 				// Find being CORE non-unpublishable
@@ -611,11 +821,10 @@ class FlexicontentModelFields extends FCModelAdminList
 		$fcform = $jinput->get('fcform', 0, 'int');
 		$p      = $option . '.' . $view . '.';
 
-		$filter_type = $this->getState('filter_type');
-
 		$default_order     = $this->default_order;
 		$default_order_dir = $this->default_order_dir;
 
+		$filter_type      = $fcform ? $jinput->get('filter_type', 0, 'int') : $app->getUserStateFromRequest($p . 'filter_type', 'filter_type', 0, 'int');
 		$filter_order     = $fcform ? $jinput->get('filter_order', $default_order, 'cmd') : $app->getUserStateFromRequest($p . 'filter_order', 'filter_order', $default_order, 'cmd');
 		$filter_order_Dir = $fcform ? $jinput->get('filter_order_Dir', $default_order_dir, 'word') : $app->getUserStateFromRequest($p . 'filter_order_Dir', 'filter_order_Dir', $default_order_dir, 'word');
 
@@ -629,18 +838,20 @@ class FlexicontentModelFields extends FCModelAdminList
 			$filter_order_Dir = $default_order_dir;
 		}
 
-		if ($filter_type && $filter_order == 'a.ordering')
+		if ($filter_type && $filter_order === 'a.ordering')
 		{
 			$filter_order = 'typeordering';
 		}
-		else if (!$filter_type && $filter_order == 'typeordering')
+		else if (!$filter_type && $filter_order === 'typeordering')
 		{
 			$filter_order = 'a.ordering';
 		}
 
+		$this->setState('filter_type', $filter_type);
 		$this->setState('filter_order', $filter_order);
 		$this->setState('filter_order_Dir', $filter_order_Dir);
 
+		$app->setUserState($p . 'filter_type', $filter_type);
 		$app->setUserState($p . 'filter_order', $filter_order);
 		$app->setUserState($p . 'filter_order_Dir', $filter_order_Dir);
 	}
@@ -722,83 +933,6 @@ class FlexicontentModelFields extends FCModelAdminList
 		;
 
 		return $this->_db->setQuery($query)->loadColumn();
-	}
-
-
-	/**
-	 * Saves the manually set order of records.
-	 *
-	 * @param   array    $pks    An array of primary key ids.
-	 * @param   integer  $order  An array of new ordering values
-	 *
-	 * @return  boolean|\JException  Boolean true on success, false on failure, or \JException if no items are selected
-	 *
-	 * @since   1.6
-	 */
-	public function saveorder($cid = array(), $order = array())
-	{
-		$filter_type = $this->getState('filter_type');
-
-		if (!$filter_type)
-		{
-			// Access check should be done at the controller code, but parent::saveorder includes this again ...
-			return parent::saveorder($cid, $order);
-		}
-
-		/**
-		 * Ordering of field inside a specific content type 
-		 * As there is a composite primary key in the relations table we aren't able to use the standard methods from JTable
-		 */
-		$query = 'SELECT field_id, ordering'
-			. ' FROM #__flexicontent_fields_type_relations'
-			. ' WHERE type_id = ' . $filter_type
-			. ' ORDER BY ordering'
-		;
-		$rows = $this->_db->setQuery($query)->loadObjectList('field_id');
-
-		for ($i = 0; $i < count($cid); $i++)
-		{
-			if ($rows[$cid[$i]]->ordering != $order[$i])
-			{
-				$rows[$cid[$i]]->ordering = $order[$i];
-
-				$query = 'UPDATE #__flexicontent_fields_type_relations'
-					. ' SET ordering=' . $order[$i]
-					. ' WHERE type_id = ' . $filter_type
-					. ' AND field_id = ' . $cid[$i]
-				;
-				$this->_db->setQuery($query)->execute();
-			}
-		}
-
-		// Specific reorder procedure because the relations table has a composite primary key
-		$query = 'SELECT field_id, ordering'
-			. ' FROM #__flexicontent_fields_type_relations'
-			. ' WHERE ordering >= 0'
-			. ' AND type_id = ' . (int) $filter_type
-			. ' ORDER BY ordering'
-		;
-		$orders = $this->_db->setQuery($query)->loadObjectList();
-
-		// compact the ordering numbers
-		for ($i = 0, $n = count($orders); $i < $n; $i++)
-		{
-			if ($orders[$i]->ordering >= 0)
-			{
-				if ($orders[$i]->ordering != $i + 1)
-				{
-					$orders[$i]->ordering = $i + 1;
-					$query = 'UPDATE #__flexicontent_fields_type_relations'
-						. ' SET ordering = ' . (int) $orders[$i]->ordering
-						. ' WHERE field_id = ' . (int) $orders[$i]->field_id
-						. ' AND type_id = ' . (int) $filter_type
-					;
-					$this->_db->setQuery($query)->execute();
-				}
-			}
-		}
-
-		return true;
 	}
 
 

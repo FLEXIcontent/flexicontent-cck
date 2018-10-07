@@ -46,7 +46,7 @@ flexicontent_html::jscode_to_showhide_table(
 	$start_html = '',  //'<span class="badge ' . (FLEXI_J40GE ? 'badge-dark' : 'badge-inverse') . '">' . JText::_('FLEXI_COLUMNS', true) . '<\/span> &nbsp; ',
 	$end_html = '<div id="fc-columns-slide-btn" class="icon-arrow-up-2 btn btn-outline-secondary" title="' . JText::_('FLEXI_HIDE') . '" style="cursor: pointer;" onclick="fc_toggle_box_via_btn(\\\'mainChooseColBox\\\', document.getElementById(\\\'fc_mainChooseColBox_btn\\\'), \\\'btn-primary\\\');"><\/div>'
 );
-$tools_cookies['fc-filters-box-disp'] = JFactory::getApplication()->input->cookie->get('fc-filters-box-disp', 0, 'int');
+$tools_cookies['fc-filters-box-disp'] = 0; //JFactory::getApplication()->input->cookie->get('fc-filters-box-disp', 0, 'int');
 
 
 
@@ -61,12 +61,12 @@ $tools_cookies['fc-filters-box-disp'] = JFactory::getApplication()->input->cooki
  * Order stuff and table related variables
  */
 
-$list_total_cols = 10;
+$list_total_cols = 9;
 
 ?>
 
 
-<script type="text/javascript">
+<script>
 
 // delete active filter
 function delFilter(name)
@@ -163,9 +163,16 @@ function delAllFilters()
 		<div class="fc-filter-head-box nowrap_box">
 
 			<div class="btn-group">
-				<div id="fc_mainChooseColBox_btn" class="<?php echo $out_class; ?> hidden-phone" onclick="fc_toggle_box_via_btn('mainChooseColBox', this, 'btn-primary');">
+				<div id="fc_mainChooseColBox_btn" class="<?php echo $out_class . ' ' . $this->tooltip_class; ?> hidden-phone" onclick="fc_toggle_box_via_btn('mainChooseColBox', this, 'btn-primary');" title="<?php echo flexicontent_html::getToolTip('', 'FLEXI_ABOUT_AUTO_HIDDEN_COLUMNS', 1, 1); ?>">
 					<?php echo JText::_( 'FLEXI_COLUMNS' ); ?><sup id="columnchoose_totals"></sup>
 				</div>
+
+				<?php if (!empty($this->minihelp) && FlexicontentHelperPerm::getPerm()->CanConfig): ?>
+				<div id="fc-mini-help_btn" class="<?php echo $out_class; ?>" onclick="fc_toggle_box_via_btn('fc-mini-help', this, 'btn-primary');" >
+					<span class="icon-help"></span>
+					<?php echo $this->minihelp; ?>
+				</div>
+				<?php endif; ?>
 			</div>
 			<div id="mainChooseColBox" class="group-fcset fcman-abs" style="display:none;"></div>
 
@@ -195,7 +202,7 @@ function delAllFilters()
 	<div class="fcclear"></div>
 
 
-	<table id="adminListTableFCreviews" class="adminlist table fcmanlist">
+	<table id="adminListTableFCreviews" class="adminlist table fcmanlist" itemscope itemtype="http://schema.org/WebPage">
 	<thead>
 		<tr>
 
@@ -222,24 +229,24 @@ function delAllFilters()
 				<?php echo JHtml::_('grid.sort', 'FLEXI_REVIEW_APPROVED', 'a.approved', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
 
-			<th class="hideOnDemandClass col_id center hidden-tablet hidden-phone">
-				<?php echo JHtml::_('grid.sort', 'FLEXI_ID', 'a.id', $this->lists['order_Dir'], $this->lists['order'] ); ?>
+			<th class="hideOnDemandClass center hidden-phone hidden-tablet">
+				<?php echo JHtml::_('grid.sort', 'FLEXI_REVIEW_REVIEWER', 'a.user_id', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
 
-			<th class="hideOnDemandClass center">
-				<?php echo JHtml::_('grid.sort', 'FLEXI_AUTHOR', 'a.user_id', $this->lists['order_Dir'], $this->lists['order'] ); ?>
-			</th>
-
-			<th class="hideOnDemandClass center">
+			<th class="hideOnDemandClass center hidden-phone hidden-tablet">
 				<?php echo JHtml::_('grid.sort', 'FLEXI_REVIEW_EMAIL', 'a.email', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
 
-			<th class="hideOnDemandClass center">
+			<th class="hideOnDemandClass center hidden-phone">
 				<?php echo JHtml::_('grid.sort', 'FLEXI_CREATED', 'a.submit_date', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
 
-			<th class="hideOnDemandClass center">
+			<th class="hideOnDemandClass center hidden-phone hidden-tablet">
 				<?php echo JHtml::_('grid.sort', 'FLEXI_MODIFIED', 'a.update_date', $this->lists['order_Dir'], $this->lists['order'] ); ?>
+			</th>
+
+			<th class="hideOnDemandClass col_id center hidden-phone hidden-tablet">
+				<?php echo JHtml::_('grid.sort', 'FLEXI_ID', 'a.id', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
 
 		</tr>
@@ -266,25 +273,26 @@ function delAllFilters()
 			$row->canDelete    = $canManage;
 
 			$stateIsChangeable = $row->canCheckin && $row->canEditState;
+
+			$content = $row->type === 'item' && isset($this->contentRows[$row->content_id])
+				? $this->contentRows[$row->content_id]
+				: null;
    		?>
 
 		<tr class="<?php echo 'row' . ($i % 2); ?>">
 
 			<!--td class="left col_rowcount hidden-phone">
-				<div class="adminlist-table-row"></div>
-				<?php /*echo $this->pagination->getRowOffset($i);*/ ?>
+				<?php echo $this->pagination->getRowOffset($i); ?>
 			</td-->
 
 			<td class="col_cb">
+				<!--div class="adminlist-table-row"></div-->
 				<?php echo JHtml::_($hlpname . '.grid_id', $i, $row->id); ?>
 			</td>
 
 			<td class="col_status" style="padding-right: 8px;">
 				<div class="btn-group fc-group fc-reviews">
 					<?php
-					$content = $row->type === 'item' && isset($this->contentRows[$row->content_id])
-						? $this->contentRows[$row->content_id]
-						: null;
 					//echo JHtml::_('jgrid.published', $row->published, $i, $ctrl, $stateIsChangeable);
 					//echo JHtml::_($hlpname . '.published', $row->published, $i, $stateIsChangeable);
 
@@ -307,6 +315,7 @@ function delAllFilters()
 				 * Display title with no edit link ... if row is not-editable for any reason (no ACL or checked-out by other user)
 				 */
 				echo JHtml::_($hlpname . '.edit_link', $row, $i, $row->canEdit);
+				echo $content ? '<br><small>[' . $content->title . ']</small>' : '';
 				?>
 			</td>
 
@@ -319,15 +328,11 @@ function delAllFilters()
 				?>
 			</td>
 
-			<td class="col_id center hidden-tablet hidden-phone">
-				<?php echo $row->id; ?>
+			<td class="center hidden-phone hidden-tablet">
+				<?php echo $row->author_name ?: JText::_('FLEXI_GUEST'); ?>
 			</td>
 
-			<td class="center hidden-tablet hidden-phone">
-				<?php echo $row->user_id; ?>
-			</td>
-
-			<td class="center hidden-tablet hidden-phone">
+			<td class="center hidden-phone hidden-tablet">
 				<?php echo $row->email; ?>
 			</td>
 
@@ -335,9 +340,14 @@ function delAllFilters()
 				<?php echo $row->submit_date; ?>
 			</td>
 
-			<td class="center hidden-tablet hidden-phone">
+			<td class="center hidden-phone hidden-tablet">
 				<?php echo $row->update_date; ?>
 			</td>
+
+			<td class="col_id center hidden-phone hidden-tablet">
+				<?php echo $row->id; ?>
+			</td>
+
 		</tr>
 		<?php
 		}

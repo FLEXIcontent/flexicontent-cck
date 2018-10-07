@@ -55,6 +55,13 @@ abstract class FCModelAdmin extends JModelAdmin
 	var $records_jtable = null;
 
 	/**
+	 * Column names
+	 */
+	var $state_col   = null;
+	var $name_col    = null;
+	var $parent_col  = null;
+
+	/**
 	 * Record primary key
 	 *
 	 * @var int
@@ -98,14 +105,14 @@ abstract class FCModelAdmin extends JModelAdmin
 	var $extension_proxy = null;
 
 	/**
-	 * Use language associations
+	 * Context to use for registering (language) associations
 	 *
 	 * @var string
 	 */
 	var $associations_context = false;
 
 	/**
-	 * Use language associations
+	 * A message queue when appropriate
 	 *
 	 * @var string
 	 */
@@ -116,13 +123,15 @@ abstract class FCModelAdmin extends JModelAdmin
 	 *
 	 */
 
-	// Record parent column name
-	var $parent_col = null;
-
 	/**
 	 * List filters that are always applied
 	 */
 	var $hard_filters = array();
+
+	/**
+	 * Groups of Fields that can be partially present in the form
+	 */
+	var $mergeableGroups = array();
 
 
 	/**
@@ -757,6 +766,28 @@ abstract class FCModelAdmin extends JModelAdmin
 
 
 	/**
+	 * Method to validate the form data.
+	 *
+	 * @param   \JForm  $form   The form to validate against.
+	 * @param   array   $data   The data to validate.
+	 * @param   string  $group  The name of the field group to validate.
+	 *
+	 * @return  array|boolean  Array of filtered data if valid, false otherwise.
+	 *
+	 * @see     \JFormRule
+	 * @see     \JFilterInput
+	 * @since   3.3.0
+	 */
+	public function validate($form, $data, $group = null)
+	{
+		// Handle a form that has some of its part missing according to configuration
+		$this->handlePartialForm($this->getForm(), $data);
+
+		return parent::validate($data, $group);
+	}
+
+
+	/**
 	 * Auto-populate the model state.
 	 *
 	 * Note. Calling getState in this method will result in recursion.
@@ -920,6 +951,10 @@ abstract class FCModelAdmin extends JModelAdmin
 	 */
 	function mergeAttributes(&$item, &$data, $properties, $options)
 	{
+		// Handle things like non present array fields
+		$form = $this->getForm();
+		$this->_canonicalData($form, $data);
+
 		//***
 		//*** Filter layout parameters if the were given, and merge them into existing layout parameters (in DB)
 		//***
@@ -1289,6 +1324,54 @@ abstract class FCModelAdmin extends JModelAdmin
 		{
 			$record->params = new JRegistry($record->params);
 		}
+	}
+
+
+	/**
+	 * Method to canonicalize the form data
+	 *
+	 * @param   JForm   $form   A JForm object.
+	 * @param   mixed   $data   The data expected for the form.
+	 *
+	 * @return  void
+	 *
+	 * @since   3.3.0
+	 */
+	protected function _canonicalData($form, & $data)
+	{
+		foreach($this->mergeableGroups as $grp_name)
+		{
+			if (is_object($data))
+			{
+				continue;
+			}
+
+			foreach ($form->getFieldsets($grp_name) as $fsname => $fieldSet)
+			{
+				foreach ($form->getFieldset($fsname) as $field)
+				{
+					if (!isset($data[$grp_name][$field->fieldname]))
+					{
+						$data[$grp_name][$field->fieldname] = false;
+					}
+				}
+			}
+		}
+	}
+
+
+	/**
+	 * Method to handle partial form data
+	 *
+	 * @param   JForm   $form   A JForm object.
+	 * @param   mixed   $data   The data expected for the form.
+	 *
+	 * @return  void
+	 *
+	 * @since   3.3.0
+	 */
+	protected function handlePartialForm($form, & $data)
+	{
 	}
 
 

@@ -17,9 +17,9 @@ use Joomla\Utilities\ArrayHelper;
 JLoader::register('FlexicontentViewBaseRecords', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/base/view_records.php');
 
 /**
- * HTML View class for the FLEXIcontent qfcategoryelement screen
+ * HTML View class for the FLEXIcontent fccategoryelement screen
  */
-class FlexicontentViewQfcategoryelement extends FlexicontentViewBaseRecords
+class FlexicontentViewFccategoryelement extends FlexicontentViewBaseRecords
 {
 	var $proxy_option   = null;
 	var $title_propname = null;
@@ -69,25 +69,32 @@ class FlexicontentViewQfcategoryelement extends FlexicontentViewBaseRecords
 			global $fc_run_times;
 		}
 
-		$language    = !$assocs_id ? JRequest::getCmd('language') : $app->getUserStateFromRequest( $option.'.'.$view.'.language', 'language', '', 'string' );
-		$created_by  = !$assocs_id ? JRequest::getCmd('created_by') : $app->getUserStateFromRequest( $option.'.'.$view.'.created_by', 'created_by', 0, 'int' );
-
 		if ($assocs_id)
 		{
+			$item_lang   = $app->getUserStateFromRequest( $option.'.'.$view.'.item_lang', 'item_lang', '', 'string' );
+			$created_by  = $app->getUserStateFromRequest( $option.'.'.$view.'.created_by', 'created_by', 0, 'int' );
+
 			$assocanytrans = $user->authorise('flexicontent.assocanytrans', 'com_flexicontent');
-			if (!$assocanytrans && !$created_by)  $created_by = $user->id;
+
+			if (!$assocanytrans && !$created_by)
+			{
+				$created_by = $user->id;
+			}
 		}
 
 		// get filter values
-		$filter_order     = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_order',     'filter_order',     'c.lft'	, 'cmd' );
-		$filter_order_Dir = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_order_Dir',	'filter_order_Dir',	''			, 'cmd' );
+		$filter_order     = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_order',     'filter_order',     'c.lft'		 , 'cmd' );
+		$filter_order_Dir = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_order_Dir',	'filter_order_Dir',	''				 , 'cmd' );
 
 		$filter_state  = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_state',  'filter_state',   '',    'cmd' );
 		$filter_cats   = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_cats',   'filter_cats',    0,     'int' );
 		$filter_level  = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_level',  'filter_level',   0,     'int' );
 		$filter_access = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_access', 'filter_access',  '',    'string' );
-		$filter_lang   = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_lang',   'filter_lang',    '',    'cmd' );
+		$filter_lang   = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_lang',   'filter_lang',    '',    'string' );
 		$filter_author = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_author', 'filter_author',  '',    'cmd' );
+
+		$filter_lang   = $assocs_id && $item_lang  ? $item_lang  : $filter_lang;
+		$filter_author = $assocs_id && $created_by ? $created_by : $filter_author;
 
 		$search = $app->getUserStateFromRequest( $option.'.'.$view.'.search', 			'search', 			'', 'string' );
 		$search = $db->escape( StringHelper::trim(StringHelper::strtolower( $search ) ) );
@@ -153,6 +160,8 @@ class FlexicontentViewQfcategoryelement extends FlexicontentViewBaseRecords
 		$rows = $this->get('Items');
 
 		$authors = $this->get('Authorslist');
+		$langs   = FLEXIUtilities::getLanguages('code');
+		$lang_assocs = $assocs_id ? $this->get('LangAssocs') : array();
 
 		if ( $print_logging_info ) @$fc_run_times['execute_main_query'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 
@@ -201,7 +210,7 @@ class FlexicontentViewQfcategoryelement extends FlexicontentViewBaseRecords
 
 		// Build author filter
 		$lists['filter_author'] = '<label class="label">'.JText::_('FLEXI_AUTHOR').'</label>'.
-			($assocs_id && $created_by ?
+			($assocs_id && !$assocanytrans && $created_by ?
 				'<span class="badge badge-info">'.JFactory::getUser($created_by)->name.'</span>' :
 				flexicontent_html::buildauthorsselect($authors, 'filter_author', $filter_author, '-'/*true*/, 'class="use_select2_lib" size="3" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"')
 			);
@@ -227,8 +236,8 @@ class FlexicontentViewQfcategoryelement extends FlexicontentViewBaseRecords
 
 		// Build language filter
 		$lists['filter_lang'] = '<label class="label">'.JText::_('FLEXI_LANGUAGE').'</label>'.
-			($assocs_id && $language ?
-				'<span class="badge badge-info">'.$language.'</span>' :
+			($assocs_id && $item_lang ?
+				'<span class="badge badge-info">'.$item_lang.'</span>' :
 				flexicontent_html::buildlanguageslist('filter_lang', 'class="use_select2_lib" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', $filter_lang, '-'/*2*/)
 			);
 
@@ -241,9 +250,20 @@ class FlexicontentViewQfcategoryelement extends FlexicontentViewBaseRecords
 
 		$this->lists       = $lists;
 		$this->rows        = $rows;
+		$this->langs       = $langs;
+		$this->lang_assocs = $lang_assocs;
 		$this->pagination  = $pagination;
 		$this->ordering    = $ordering;
 
+
+		/**
+		 * Render view's template
+		 */
+
+		if ( $print_logging_info ) { global $fc_run_times; $start_microtime = microtime(true); }
+
 		parent::display($tpl);
+
+		if ( $print_logging_info ) @$fc_run_times['template_render'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 	}
 }

@@ -39,7 +39,7 @@
 			<field name="" type="separator" default="FLEXI_FILTER_TARGET_CAT" level="level1" />
 
 			<field name="" type="separator" default="FLEXI_FILTER_CATEGORY_PARAM_EXPLANATION" level="level3" class="alert alert-info fcpadded" />
-			<field name="catid" type="qfcategory" paramset="params" label="FLEXI_FILTER_SPECIFIC_DEFAULT_CURRENT_CATEGORY" description="FLEXI_FILTER_SPECIFIC_DEFAULT_CURRENT_CATEGORY_DESC" />
+			<field name="catid" type="fccategory" paramset="params" label="FLEXI_FILTER_SPECIFIC_DEFAULT_CURRENT_CATEGORY" description="FLEXI_FILTER_SPECIFIC_DEFAULT_CURRENT_CATEGORY_DESC" />
 			<field name="cat_itemid" type="fcmenuitem" default="" component="com_flexicontent" link_filters="view=category%%cid=" label="FLEXI_FILTER_MOD_SPECIFIC_CAT_MENU_ITEMID" description="FLEXI_FILTER_MOD_SPECIFIC_CAT_MENU_ITEMID_DESC">
 				<option value="">FLEXI_SELECT</option>
 			</field>

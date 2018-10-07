@@ -15,19 +15,19 @@ require_once('fcbase.php');
 
 
 /**
- * Fcfields HTML helper
+ * Fcusers HTML helper
  *
  * @since  3.3
  */
-abstract class JHtmlFcfields extends JHtmlFcbase
+abstract class JHtmlFcusers extends JHtmlFcbase
 {
 	static $tooltip_class  = FLEXI_J40GE ? 'hasTooltip' : 'hasTooltip';
 	static $btn_sm_class   = FLEXI_J40GE ? 'btn btn-sm' : 'btn btn-small';
 	static $btn_iv_class   = FLEXI_J40GE ? 'btn-dark' : 'btn-inverse';
 	static $btn_mbar_class = FLEXI_J40GE ? 'btn-outline-info' : '';
-	static $ctrl = 'fields';
-	static $name = 'field';
-	static $title_propname = 'title';
-	static $state_propname = 'state';
+	static $ctrl = 'users';
+	static $name = 'user';
+	static $title_propname = 'name';
+	static $state_propname = 'block';
 	static $layout_type = null;
 }

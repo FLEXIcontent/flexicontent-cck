@@ -1,19 +1,12 @@
 <?php
 /**
- * @version 1.5 stable $Id$
- * @package Joomla
- * @subpackage FLEXIcontent
- * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
- * @license GNU/GPL v2
- * 
- * FLEXIcontent is a derivative work of the excellent QuickFAQ component
- * @copyright (C) 2008 Christoph Lukes
- * see www.schlu.net for more information
+ * @package         FLEXIcontent
+ * @version         3.3
  *
- * FLEXIcontent is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
+ * @link            http://www.flexicontent.com
+ * @copyright       Copyright © 2018, FLEXIcontent team, All Rights Reserved
+ * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
 defined('_JEXEC') or die('Restricted access');
@@ -32,7 +25,7 @@ flexicontent_html::jscode_to_showhide_table(
 	$start_html = '<span class="label">' . JText::_('FLEXI_COLUMNS', true) . '<\/span> &nbsp; ',
 	$end_html = '<div class="icon-arrow-up-2 btn" title="' . JText::_('FLEXI_HIDE') . '" style="cursor: pointer;" onclick="fc_toggle_box_via_btn(\\\'mainChooseColBox\\\', document.getElementById(\\\'fc_mainChooseColBox_btn\\\'), \\\'btn-primary\\\');"><\/div>'
 );
-$tools_cookies['fc-filters-box-disp'] = JFactory::getApplication()->input->cookie->get('fc-filters-box-disp', 0, 'int');
+$tools_cookies['fc-filters-box-disp'] = 0; //JFactory::getApplication()->input->cookie->get('fc-filters-box-disp', 0, 'int');
 
 $edit_entry = JText::_('FLEXI_EDIT', true);
 $view_entry = JText::_('FLEXI_VIEW', true);
@@ -53,7 +46,7 @@ $listDirn	= $this->escape($this->state->get('list.direction'));
 $list_total_cols = 6;
 
 ?>
-<script type="text/javascript">
+<script>
 	Joomla.submitbutton = function(task)
 	{
 		if (task == 'groups.delete')
@@ -99,14 +92,14 @@ $list_total_cols = 6;
 			<button title="" data-original-title="<?php echo JText::_('FLEXI_SEARCH'); ?>" class="<?php echo $btn_class.' '.$tip_class; ?>" onclick="document.adminForm.limitstart.value=0; Joomla.submitform();"><?php echo FLEXI_J30GE ? '<i class="icon-search"></i>' : JText::_('FLEXI_GO'); ?></button>
 			<button title="" data-original-title="<?php echo JText::_('FLEXI_RESET_FILTERS'); ?>" class="<?php echo $btn_class.' '.$tip_class; ?>" onclick="document.adminForm.limitstart.value=0; delAllFilters(); Joomla.submitform();"><?php echo FLEXI_J30GE ? '<i class="icon-remove"></i>' : JText::_('FLEXI_CLEAR'); ?></button>
 		</div>
-		
+
 		<?php $_class = FLEXI_J30GE ? ' btn' : ' fc_button fcsimple fcsmall'; ?>
 		<span class="btn-group fc-filter">
 			<span id="fc_filters_box_btn" class="<?php echo $_class.($this->count_filters ? ' btn-primary' : ''); ?>" onclick="fc_toggle_box_via_btn('fc-filters-box', this, 'btn-primary', false, undefined, 1);"><?php echo JText::_( 'FLEXI_FILTERS' ) . ($this->count_filters  ? ' <sup>'.$this->count_filters.'</sup>' : ''); ?></span>
 			<span id="fc_mainChooseColBox_btn" class="<?php echo $_class; ?>" onclick="fc_toggle_box_via_btn('mainChooseColBox', this, 'btn-primary');"><?php echo JText::_( 'FLEXI_COLUMNS' ); ?><sup id="columnchoose_totals"></sup></span>
 		</span>
 		<input type="hidden" id="fc-filters-box-disp" name="fc-filters-box-disp" value="<?php echo $tools_cookies['fc-filters-box-disp']; ?>" />
-		
+
 		<span class="fc-filter nowrap_box">
 			<span class="limit nowrap_box">
 				<?php
@@ -114,11 +107,11 @@ $list_total_cols = 6;
 				if (strpos($pagination_footer, '"limit"') === false) echo $this->pagination->getLimitBox();
 				?>
 			</span>
-			
+
 			<span class="fc_item_total_data nowrap_box fc-mssg-inline fc-info fc-nobgimage">
 				<?php echo @$this->resultsCounter ? $this->resultsCounter : $this->pagination->getResultsCounter(); // custom Results Counter ?>
 			</span>
-			
+
 			<?php if (($getPagesCounter = $this->pagination->getPagesCounter())): ?>
 			<span class="fc_pages_counter nowrap_box fc-mssg-inline fc-info fc-nobgimage">
 				<?php echo $getPagesCounter; ?>
@@ -126,16 +119,16 @@ $list_total_cols = 6;
 			<?php endif; ?>
 		</span>
 	</div>
-	
-	
+
+
 	<div id="fc-filters-box" <?php if (!$this->count_filters || !$tools_cookies['fc-filters-box-disp']) echo 'style="display:none;"'; ?> class="">
 		<!--<span class="label"><?php echo JText::_( 'FLEXI_FILTERS' ); ?></span>-->
-		
+
 		<div id="fc-filters-slide-btn" class="icon-arrow-up-2 btn btn-outline-secondary" title="<?php echo JText::_('FLEXI_HIDE'); ?>" style="cursor: pointer;" onclick="fc_toggle_box_via_btn('fc-filters-box', document.getElementById('fc_filters_box_btn'), 'btn-primary');"></div>
 	</div>
-	
+
 	<div id="mainChooseColBox" class="well well-small" style="display:none;"></div>
-	
+
 	<div class="fcclear"></div>
 
 	<table id="adminListTableFCgroups" class="adminlist table fcmanlist" style="min-width: 400px;">
@@ -156,11 +149,11 @@ $list_total_cols = 6;
 				<?php echo JText::_('JGRID_HEADING_ID'); ?>
 			</th>
 		</tr>
-		
+
 	</thead>
 
 	<tbody>
-	<?php foreach ($this->items as $i => $item) :
+	<?php foreach ($this->rows as $i => $item) :
 		$canCreate	= $user->authorise('core.create',		'com_users');
 		$canEdit	= $user->authorise('core.edit',			'com_users');
 		// If this group is super admin and this user is not super admin, $canEdit is false
@@ -171,10 +164,10 @@ $list_total_cols = 6;
 	?>
 		<tr class="row<?php echo $i % 2; ?>">
 			<td>
-				<div class="adminlist-table-row"></div>
-				<?php echo $this->pagination->getRowOffset( $i ); ?>
+				<?php echo $this->pagination->getRowOffset($i); ?>
 			</td>
 			<td>
+				<!--div class="adminlist-table-row"></div-->
 				<?php echo JHtml::_('grid.id', $i, $item->id); ?>
 				<label for="cb<?php echo $i; ?>" class="green single"></label>
 			</td>

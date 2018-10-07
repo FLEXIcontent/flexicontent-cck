@@ -15,23 +15,35 @@ use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 use Joomla\CMS\Table\Table;
 
-jimport('legacy.model.list');
+require_once('base/baselist.php');
 
 /**
  * FLEXIcontent Component Items Model
  *
  */
-class FlexicontentModelItems extends JModelList
+class FlexicontentModelItems extends FCModelAdminList
 {
+
 	var $records_dbtbl = 'content';
 	var $records_jtable = 'flexicontent_items';
 
+	/**
+	 * Column names and record name
+	 */
 	var $record_name = 'item';
 	var $state_col   = 'state';
 	var $name_col    = 'title';
 	var $parent_col  = 'catid';
-	var $listViaAccess = false;  // This will be done via component configuration
 
+	/**
+	 * (Default) Behaviour Flags
+	 */
+	var $listViaAccess = false;
+	var $copyRelations = false;
+
+	/**
+	 * Search and ordering columns
+	 */
 	var $search_cols = array('title', 'alias');
 	var $default_order = 'i.id';
 	var $default_order_dir = 'DESC';
@@ -124,17 +136,12 @@ class FlexicontentModelItems extends JModelList
 		 * View's Filters
 		 */
 
-		// Order type
-		$filter_order_type = $fcform ? $jinput->get('filter_order_type', 1,                  'int')  :  $app->getUserStateFromRequest( $p.'filter_order_type',	'filter_order_type', 1, 'int' );
-		$this->setState('filter_order_type', $filter_order_type);
-		$app->setUserState($p.'filter_order_type', $filter_order_type);
-
 		// Category filtering
 		$filter_cats        = $fcform ? $jinput->get('filter_cats',        '', 'int')  :  $app->getUserStateFromRequest( $p.'filter_cats',        'filter_cats',       '',  'int' );
 		$filter_subcats     = $fcform ? $jinput->get('filter_subcats',     0,  'int')  :  $app->getUserStateFromRequest( $p.'filter_subcats',     'filter_subcats',     1,  'int' );
 		$filter_catsinstate = $fcform ? $jinput->get('filter_catsinstate', 1,  'int')  :  $app->getUserStateFromRequest( $p.'filter_catsinstate', 'filter_catsinstate', 1,  'int' );
 
-		if ($filter_order_type && $filter_cats && ($filter_order=='i.ordering' || $filter_order=='catsordering'))
+		if ($this->getState('filter_order_type') && $filter_cats && ($this->getState('filter_order') === 'i.ordering' || $this->getState('filter_order') === 'catsordering'))
 		{
 			$jinput->set( 'filter_subcats',	0 );
 			$filter_subcats = 0;
@@ -236,13 +243,6 @@ class FlexicontentModelItems extends JModelList
 
 		$app->setUserState($p.'scope', $scope);
 		$app->setUserState($p.'search', $search);
-
-
-		/**
-		 * Ordering: filter_order, filter_order_Dir
-		 */
-
-		$this->_setStateOrder();
 
 
 		/**
@@ -1107,7 +1107,7 @@ class FlexicontentModelItems extends JModelList
 		$extra_joins = '';
 		if (!$query_ids)
 		{
-			$where		= $this->_buildContentWhere($extra_joins, $tmp_only);
+			$where		= $this->_buildContentJoinsWhere($extra_joins, $tmp_only);
 			$orderby	= $this->_buildContentOrderBy();
 		}
 
@@ -1202,13 +1202,16 @@ class FlexicontentModelItems extends JModelList
 
 
 	/**
-	 * Method to build the orderby clause of the query for the Items
+	 * Method to build the orderby clause of the query for the records
 	 *
-	 * @access private
-	 * @return string
-	 * @since 1.0
+	 * @param		JDatabaseQuery|bool   $q   DB Query object or bool to indicate returning an array or rendering the clause
+	 *
+	 * @return  JDatabaseQuery|array
+	 *
+	 * @since 3.3.0
 	 */
-	function _buildContentOrderBy()
+
+	protected function _buildContentOrderBy($q = false)
 	{
 		$filter_order_type= $this->getState('filter_order_type');
 		$filter_order     = $this->getState('filter_order');
@@ -1249,7 +1252,7 @@ class FlexicontentModelItems extends JModelList
 	 * @return string
 	 * @since 1.0
 	 */
-	function _buildContentWhere(& $extra_joins = '', $tmp_only = false)
+	function _buildContentJoinsWhere(& $extra_joins = '', $tmp_only = false)
 	{
 		$session = JFactory::getSession();
 		$user    = JFactory::getUser();
@@ -1260,6 +1263,7 @@ class FlexicontentModelItems extends JModelList
 		 * FLAGs to decide which items to list
 		 */
 
+		// Note 'all items' is already granted to super admins, so no need to check the is-super-admin ('core.admin') separately
 		$allitems	= $perms->DisplayAllItems;
 		$viewable_items = $this->cparams->get('iman_viewable_items', 1);
 		$editable_items = $this->cparams->get('iman_editable_items', 0);
@@ -2153,7 +2157,7 @@ class FlexicontentModelItems extends JModelList
 	 */
 	function moveitem($itemid, $maincat, $seccats = null, $lang, $state=null, $type_id=0, $access=null)
 	{
-		$item = JTable::getInstance('flexicontent_items', '');
+		$item = $this->getTable($this->records_jtable, '');
 		$item->load($itemid);
 		$item->catid    = $maincat ? $maincat : $item->catid;
 		$item->language = $lang ? $lang : $item->language;
@@ -2250,85 +2254,125 @@ class FlexicontentModelItems extends JModelList
 		return true;
 	}
 
-	
+
 	/**
 	 * Method to move a record upwards or downwards
 	 *
-	 * @param  integer    $direction   A value of 1  or -1 to indicate moving up or down respectively
+	 * @param   integer   $direction  A value of 1  or -1 to indicate moving up or down respectively
+	 * @param   integer   $catid      The ID of the category being reorder, needed as items are assigned to multiple categories
 	 *
 	 * @return	boolean	  True on success
 	 *
 	 * @since	3.3.0
 	 */
-	public function move($direction, $ord_catid, $prev_order, $item_cb)
+	public function move($direction, $catid)
 	{
 		$app = JFactory::getApplication();
 
-		// Every state group has different ordering
-		$table = JTable::getInstance('flexicontent_items', '');
+		// Load the moved record
+		$table = $this->getTable($this->records_jtable, '');
 
 		if (!$table->load($this->_id))
 		{
 			$this->setError($table->getError());
 			return false;
 		}
-		$stategrps = array(1=>'published', 0=>'unpublished', -2=>'trashed', -3=>'unpublished', -4=>'unpublished', -5=>'published');
-		$row_stategrp = @ $stategrps[$table->state];
 
+		$stategrps = array(
+			 1 => 'published',
+			 0 => 'unpublished',
+			-2 => 'trashed',
+			-3 => 'unpublished',
+			-4 => 'unpublished',
+			-5 => 'published',
+		);
+		$row_stategrp = isset($stategrps[$table->state])
+			? $stategrps[$table->state]
+			: null;
+
+		// Every state group has different ordering
 		switch ($row_stategrp)
 		{
-		case 'published':
-			$item_states = JText::_( 'FLEXI_GRP_PUBLISHED' );
-			$state_where = 'state IN (1,-5)';
-			break;
-		case 'unpublished':
-			$item_states = JText::_( 'FLEXI_GRP_UNPUBLISHED' );
-			$state_where = 'state IN (0,-3,-4)';
-			break;
-		case 'trashed':
-			$item_states = JText::_( 'FLEXI_GRP_TRASHED' );
-			$state_where = 'state = -2';
-			break;
-		case 'archived':
-			$item_states = JText::_( 'FLEXI_GRP_ARCHIVED' );
-			$state_where = 'state = 2';
-			break;
-		default:
-			$this->setError('Item state seems to be unknown. Ordering groups include items in state groups: (a) published (b) unpublished (c) archived (d) trashed');
-			return false;
+			case 'published':
+				$item_states = JText::_('FLEXI_GRP_PUBLISHED');
+				$state_where = 'state IN (1,-5)';
+				break;
+			case 'unpublished':
+				$item_states = JText::_('FLEXI_GRP_UNPUBLISHED');
+				$state_where = 'state IN (0,-3,-4)';
+				break;
+			case 'trashed':
+				$item_states = JText::_('FLEXI_GRP_TRASHED');
+				$state_where = 'state = -2';
+				break;
+			case 'archived':
+				$item_states = JText::_('FLEXI_GRP_ARCHIVED');
+				$state_where = 'state = 2';
+				break;
+			default:
+				$this->setError('Item state seems to be unknown. Ordering groups include items in state groups: (a) published (b) unpublished (c) archived (d) trashed');
+				return false;
 		}
 
-		$filter_order_type= $this->getState('filter_order_type');
-		$filter_order     = $this->getState('filter_order');
-		$filter_order_Dir = $this->getState('filter_order_Dir');
+		$filter_order_type = $this->getState('filter_order_type');
+		$multi_assigns_ordering = (boolean) $filter_order_type;
 
-		$direction = strtolower($filter_order_Dir) == 'desc' ? - $direction : $direction;
+		// Correct direction according to current value of the 'direction' filter
+		$direction = strtolower($this->getState('filter_order_Dir')) == 'desc' ? - $direction : $direction;
 
-		if (!$filter_order_type)
+
+		/**
+		 * CASE 1
+		 *
+		 * Joomla ordering (main category only), use ordering column inside DB table itself
+		 * do reordering via JTable calls
+		 * but instead of (catid) only ordering groups, we will use (catid, state-group, language)
+		 */
+
+		if (!$multi_assigns_ordering)
 		{
-			$where = 'catid = ' . $table->catid . ' AND ' . $state_where . ' AND language = ' . $this->_db->Quote($table->language);
+			// Ignore passed $catid as NA
+			$catid = $table->catid;
 
+			$where = array(
+				'catid = ' . (int) $catid,
+				$state_where,
+				'language = ' . $this->_db->Quote($table->language),
+			);
+
+			// Access check must done at the controller code for component level ACL 'flexicontent.orderitems'
 			if (!$table->move($direction, $where))
 			{
 				$this->setError($table->getError());
 				return false;
 			}
 
-			//$app->enqueueMessage(JText::sprintf('Current re-ordering involved items in %s item states', $item_states) ,'message');
 			return true;
 		}
+
+
+		/**
+		 * CASE 2
+		 *
+		 * FC per category ordering (multi-cats assignments), use ordering column at the item-categories relation DB table
+		 * we will not use JTable calls for changing order,
+		 * instead we will use custom optimized queries to update multiple records at once
+		 */
+
 		else
 		{
-			$row_item_cb = array_search($this->_id, $item_cb);
-			$row_ord_catid  = $ord_catid [$row_item_cb];
-			$row_prev_order = $prev_order[$row_item_cb];
+			/**
+			 * Verify currently moved item exists in given category and also get its current ordering value
+			 */
+			$catid = $catid ?: $table->catid;
 
-			// Verify currently moved item exists in given category !!!
-			$query = 'SELECT itemid, ordering'
-				. ' FROM #__flexicontent_cats_item_relations'
-				. ' WHERE catid = ' . $row_ord_catid
-				. ' AND itemid = ' . $this->_id
-				;
+			$query = $this->_db->getQuery(true)
+				->select('rel.itemid, rel.ordering, i.state, i.language')
+				->from('#__flexicontent_cats_item_relations AS rel')
+				->innerJoin('#__content AS i ON i.id = rel.itemid')
+				->where('rel.catid = ' . (int) $catid)
+				->where('rel.itemid = ' . (int) $this->_id)
+			;
 			$origin = $this->_db->setQuery($query, 0, 1)->loadObject();
 
 			if (!$origin)
@@ -2337,70 +2381,66 @@ class FlexicontentModelItems extends JModelList
 				return false;
 			}
 
-			elseif ($row_prev_order != (int) $origin->ordering)
-			{
-				$app->enqueueMessage('Someone has already changed order of this item, but doing reordering anyway', 'warning');
-				$row_prev_order = (int) $origin->ordering;
-			}
+			/**
+			 * Find the NEXT or PREVIOUS item having same (catid, state group, language), to use it for swapping the ordering numbers
+			 */
 
-			// Find the NEXT or PREVIOUS item in category to use it for swapping the ordering numbers
-			$sql = 'SELECT rel.itemid, rel.ordering, i.state, ie.language'
-					. ' FROM #__flexicontent_cats_item_relations AS rel'
-					. ' JOIN #__flexicontent_items_ext AS ie ON rel.itemid=ie.item_id'
-					. ' JOIN #__content AS i ON i.id=rel.itemid'
-					;
+			$query
+				->clear('where')
+				->where(array(
+					'rel.catid = ' . $catid,
+					$state_where,
+					'i.language = ' . $this->_db->Quote($table->language),
+				));
+
 			if ($direction < 0)
 			{
-				$sql .= ' WHERE rel.ordering >= 0 AND rel.ordering < '.(int) $origin->ordering;
-				$sql .= ' AND rel.catid = ' . $row_ord_catid .' AND '. $state_where . ' AND ie.language ='. $this->_db->Quote($table->language);
-				$sql .= ' ORDER BY ordering DESC';
+				$query
+					->where('rel.ordering >= 0 AND rel.ordering < ' . (int) $origin->ordering)
+					->order('ordering DESC');
 			}
 			elseif ($direction > 0)
 			{
-				$sql .= ' WHERE rel.ordering >= 0 AND rel.ordering > '.(int) $origin->ordering;
-				$sql .= ' AND rel.catid = ' . $row_ord_catid .' AND '. $state_where . ' AND ie.language ='. $this->_db->Quote($table->language);
-				$sql .= ' ORDER BY rel.ordering';
-			}
-			else
-			{
-				$this->setError('Cannot move item, neither UP nor Down, because given direction is zero');
-				return false;
+				$query
+					->where('rel.ordering >= 0 AND rel.ordering > ' . (int) $origin->ordering)
+					->order('ordering ASC');
 			}
 
-			$row = $this->_db->setQuery($sql, 0, 1)->loadObject();
+			$row = $this->_db->setQuery($query, 0, 1)->loadObject();
 
+			/**
+			 * NEXT or PREVIOUS record found, swap its order with currently moved record
+			 */
 			if (isset($row))
 			{
-				// NEXT or PREVIOUS item found, swap its order with currently moved item
-				$query = 'UPDATE #__flexicontent_cats_item_relations'
-					. ' SET ordering = '. (int) $table->ordering
-					. ' WHERE itemid = '. (int) $origin->itemid
-					. ' AND catid = ' . $row_ord_catid
-					;
-				$this->_db->setQuery( $query );  //echo $query."\n";
-				$this->_db->execute();
-
-				$query = 'UPDATE #__flexicontent_cats_item_relations'
-					. ' SET ordering = '.(int) $origin->ordering
-					. ' WHERE itemid = '. (int) $table->itemid
-					. ' AND catid = ' . $row_ord_catid
-					;
+				$query = $this->_db->getQuery(true)
+					->update('#__flexicontent_cats_item_relations')
+					->set('ordering = ' . (int) $row->ordering)
+					->where('itemid = ' . (int) $origin->itemid)
+					->where('catid = ' . $catid)
+				;
 				$this->_db->setQuery($query)->execute();
 
-				$origin->ordering = $table->ordering;
+				$query = $this->_db->getQuery(true)
+					->update('#__flexicontent_cats_item_relations')
+					->set('ordering = ' . (int) $origin->ordering)
+					->where('itemid = ' . (int) $row->itemid)
+					->where('catid = ' . $catid)
+				;
+				$this->_db->setQuery($query)->execute();
 			}
+
+			/**
+			 * NEXT or PREVIOUS record NOT found, raise a notice
+			 */
 			else
 			{
-				// NEXT or PREVIOUS item NOT found, raise a notice
 				$app->enqueueMessage(
-					JText::sprintf('Previous/Next item in category and in STATE group (%s) was not found or has same ordering,
-					trying saving ordering to create incrementing ordering numbers for those items that have positive orderings
-					NOTE: negative are reserved as "sticky" and are not automatically reordered', $row_stategrp),
+					JText::_('Previous/Next record was not found or has same ordering, trying saving ordering once to create incrementing unique ordering numbers'),
 					'notice'
 				);
 			}
 
-			//exit;
 			return true;
 		}
 	}
@@ -2409,41 +2449,68 @@ class FlexicontentModelItems extends JModelList
 	/**
 	 * Saves the manually set order of records.
 	 *
-	 * @param   array    $pks    An array of primary key ids.
-	 * @param   integer  $order  An array of new ordering values
+	 * @param   array     $pks        An array of primary key ids
+	 * @param   array     $order      An array of new ordering values
+	 * @param   integer   $catid      The ID of the category being reorder, needed as items are assigned to multiple categories
 	 *
-	 * @return  boolean|\JException  Boolean true on success, false on failure, or \JException if no items are selected
+	 * @return  boolean   Boolean true on success, false on failure
 	 *
-	 * @since   1.6
+	 * @since   3.3.0
 	 */
-	public function saveorder($cid = array(), $order = array(), $ord_catid = array(), $prev_order = array())
+	public function saveorder($pks, $order, $catid = 0)
 	{
 		$app = JFactory::getApplication();
 
 		$filter_order_type = $this->getState('filter_order_type');
 
-		$state_grp_arr   = array(1=>'published', 0=>'unpublished', 2=>'archived', -2=>'trashed', -3=>'unpublished', -4=>'unpublished', -5=>'published');
-		$state_where_arr = array(
-			'published'=>'state IN (1,-5)', 'unpublished'=>'state IN (0,-3,-4)', 'trashed'=>'state = -2',
-			'archived'=>'state = 2', ''=> 'state NOT IN (2,1,0,-2,-3,-4,-5)'
+		$state_grp_arr = array(
+			 1 => 'published',
+			 0 => 'unpublished',
+			 2 => 'archived',
+			-2 => 'trashed',
+			-3 => 'unpublished',
+			-4 => 'unpublished',
+			-5 => 'published',
 		);
 
-		$table = $this->getTable($this->records_jtable, '');
+		$state_where_clauses = array(
+			'published'   => 'state IN (1, -5)',
+			'unpublished' => 'state IN (0,-3,-4)',
+			'trashed'     => 'state = -2',
+			'archived'    => 'state = 2',
+			''            => 'state NOT IN (2, 1, 0, -2, -3, -4, -5)',
+		);
+
+
+		/**
+		 * CASE 1
+		 *
+		 * Joomla ordering (main category only), use ordering column inside DB table itself
+		 * do reordering via JTable calls
+		 * but instead of (catid) only ordering groups, we will use (catid, state-group, language)
+		 */
 
 		if (!$filter_order_type)
 		{
+			// Access check must done at the controller code for component level ACL 'flexicontent.orderitems'
+			$table = $this->getTable($this->records_jtable, '');
+
 			// Update ordering values
-			$altered_catids = array();
-			$ord_count = array();
+			$recompact_grps = array();
+			$ord_count      = array();
 
-			for( $i=0; $i < count($cid); $i++ )
+			for ($i = 0; $i < count($pks); $i++)
 			{
-				$table->load((int) $cid[$i]);
-				$row_stategrp = isset($state_grp_arr[$table->state]) ? $state_grp_arr[$table->state] : null;
+				$table->load((int) $pks[$i]);
 
+				$row_stategrp = isset($state_grp_arr[$table->state])
+					? $state_grp_arr[$table->state]
+					: null;
+
+				// Save JTable record only if ordering differs
 				if ($table->ordering != $order[$i])
 				{
-					$altered_catids[$table->catid][$row_stategrp][$table->language] = 1;
+					$recompact_grps[$table->catid][$row_stategrp][$table->language] = 1;
 					$table->ordering = $order[$i];
 
 					if (!$table->store())
@@ -2452,10 +2519,11 @@ class FlexicontentModelItems extends JModelList
 
 						return false;
 					}
-
 				}
 
-				// Detect columns with duplicate orderings, to force reordering them
+				/**
+				 * Detect group with duplicate orderings, to force a JTable:reorder() call
+				 */
 				else
 				{
 					$_cid = $table->catid;
@@ -2463,79 +2531,93 @@ class FlexicontentModelItems extends JModelList
 
 					if (isset($ord_count[$_cid][$row_stategrp][$table->language][$_ord]))
 					{
-						$altered_catids[$_cid][$row_stategrp][$table->language] = 1;
+						$recompact_grps[$_cid][$row_stategrp][$table->language] = 1;
 						$ord_count[$_cid][$row_stategrp][$table->language][$_ord] ++;
 					}
 					else
 					{
 						$ord_count[$_cid][$row_stategrp][$table->language][$_ord] = 1;
 					}
-
 				}
-
 			}
 
-			//echo "<pre>"; print_r($altered_catids);
-
-			foreach ($altered_catids as $altered_catid => $state_groups)
+			/**
+			 * Compact the ordering numbers
+			 */
+			foreach ($recompact_grps as $reorder_catid => $state_groups)
 			{
 				foreach ($state_groups as $state_group => $lang_groups)
 				{
 					foreach ($lang_groups as $lang_group => $ignore)
 					{
-						if ( $lang_group != '_' ) {
-							$app->enqueueMessage(JText::sprintf('FLEXI_ITEM_REORDER_GROUP_RESULTS_LANG', JText::_('FLEXI_ORDER_JOOMLA_GLOBAL'), $state_group, $lang_group, $altered_catid), "message");
-							$table->reorder('catid = '.$altered_catid.' AND '.$state_where_arr[$state_group] .' AND language ='. $this->_db->Quote($lang_group));
-						} else {
-							$app->enqueueMessage(JText::sprintf('FLEXI_ITEM_REORDER_GROUP_RESULTS', JText::_('FLEXI_ORDER_JOOMLA_GLOBAL'), $state_group, $altered_catid), "message");
-							$table->reorder('catid = '.$altered_catid.' AND '.$state_where_arr[$state_group]);
-						}
+						$table->reorder(array(
+							'catid = ' . $reorder_catid,
+							$state_where_clauses[$state_group],
+							'language = ' . $this->_db->Quote($lang_group),
+						));
+
+						// Note: 'FLEXI_ITEM_REORDER_GROUP_RESULTS' should be used if grouping with where-language is not included
+						$app->enqueueMessage(JText::sprintf('FLEXI_ITEM_REORDER_GROUP_RESULTS_LANG', JText::_('FLEXI_ORDER_JOOMLA_GLOBAL'), $state_group, $lang_group, $reorder_catid), 'message');
 					}
 				}
 			}
 
-			//exit;
 			return true;
 		}
+
+
+		/**
+		 * CASE 2
+		 *
+		 * FC per category ordering (multi-cats assignments), use ordering column at the item-categories relation DB table
+		 * we will not use JTable calls for changing order,
+		 * instead we will use custom optimized queries to update multiple records at once
+		 */
+
 		else
 		{
-			// Here goes the second method for saving order.
-			// As there is a composite primary key in the relations table we aren't able to use the standard methods from JTable
-			$altered_catids = array();
-			$ord_count = array();
-			for( $i=0; $i < count($cid); $i++ )
+			$recompact_grps = array();
+			$ord_count      = array();
+
+			/**
+			 * Update the record-to-group relations tableusing the given ordering numbers
+			 * TODO: merge this with the re-compacting (reordering) code ...
+			 */
+			$new_order_wheres = array();
+
+			for ($i = 0; $i < count($pks); $i++)
 			{
-				$query 	= 'SELECT rel.itemid, rel.ordering, i.state, ie.language'
-						. ' FROM #__flexicontent_cats_item_relations AS rel'
-						. ' JOIN #__flexicontent_items_ext AS ie ON rel.itemid=ie.item_id'
-						. ' JOIN #__content AS i ON i.id=rel.itemid'
-						. ' WHERE rel.ordering >= 0'
-						. ' AND rel.itemid = ' . (int)$cid[$i]
-						;
-				$row = $this->_db->setQuery($query)->loadObject();
+				$query = $this->_db->getQuery(true)
+					->select('rel.itemid, rel.ordering, i.state, i.language')
+					->from('#__flexicontent_cats_item_relations AS rel')
+					->innerJoin('#__content AS i ON i.id = rel.itemid')
+					->where('rel.ordering >= 0')
+					->where('rel.catid = ' . (int) $catid)
+					->where('rel.itemid = ' . (int) $pks[$i])
+				;
+				$table = $this->_db->setQuery($query, 0, 1)->loadObject();
 
-				$row_stategrp = @ $state_grp_arr[$table->state];
+				$row_stategrp = isset($state_grp_arr[$table->state])
+					? $state_grp_arr[$table->state]
+					: null;
 
-				if ($prev_order[$i] != $order[$i])
+				if ($table->ordering != $order[$i])
 				{
-					$altered_catids[ (int)$ord_catid[$i] ][$row_stategrp][$table->language] = 1;
-					$query = 'UPDATE #__flexicontent_cats_item_relations'
-							.' SET ordering=' . (int)$order[$i]
-							.' WHERE catid = ' . (int)$ord_catid[$i]
-							.' AND itemid = ' . (int)$cid[$i]
-							;
-					$this->_db->setQuery($query);  //echo "$query <br/>";
-					$this->_db->execute();
+					$where_case = 'catid = ' . (int) $catid . ' AND itemid = ' . (int) $pks[$i];
+					$new_order_wheres[$where_case] = ' WHEN ' . $where_case . ' THEN ' .  (int) $order[$i];
+
+					$recompact_grps[$catid][$row_stategrp][$table->language] = 1;
 				}
 
+				// Detect columns with duplicate orderings, to force reordering them
 				else
 				{
-					// Detect columns with duplicate orderings, to force reordering them
-					$_cid = $ord_catid[$i];  $_ord = $prev_order[$i];
+					$_cid = $catid;
+					$_ord = $table->ordering;
 
 					if (isset($ord_count[$_cid][$row_stategrp][$table->language][$_ord]))
 					{
-						$altered_catids[$_cid][$row_stategrp][$table->language] = 1;
+						$recompact_grps[$_cid][$row_stategrp][$table->language] = 1;
 						$ord_count[$_cid][$row_stategrp][$table->language][$_ord] ++;
 					}
 					else
@@ -2545,53 +2627,78 @@ class FlexicontentModelItems extends JModelList
 				}
 			}
 
-			//echo "<pre>"; print_r($altered_catids); echo "</pre>";
+			if (count($new_order_wheres))
+			{
+				$query = $this->_db->getQuery(true)
+					->update('#__flexicontent_cats_item_relations')
+					->set('ordering = CASE ' . implode(' ', $new_order_wheres) . ' END ')
+					->where('(' . implode(') OR (', array_keys($new_order_wheres)) . ')');
+				$this->_db->setQuery($query)->execute();
+			}
 
-			foreach ($altered_catids as $altered_catid => $state_groups)
+			/**
+			 * Do 1 query per ordering group to find groups that need to compated (reordered)
+			 * we only have 1 category with a few states and languages, so this is only a small number of queries
+			 */
+			$new_order_wheres = array();
+
+			foreach ($recompact_grps as $reorder_catid => $state_groups)
 			{
 				foreach ($state_groups as $state_group => $lang_groups)
 				{
 					foreach ($lang_groups as $lang_group => $ignore)
 					{
 						// Specific reorder procedure because the relations table has a composite primary key
-						$query 	= 'SELECT rel.itemid, rel.ordering, state'
-								. ' FROM #__flexicontent_cats_item_relations AS rel'
-								. ' JOIN #__flexicontent_items_ext AS ie ON rel.itemid=ie.item_id'
-								. ' JOIN #__content AS i ON i.id=rel.itemid'
-								. ' WHERE rel.ordering >= 0'
-								. ' AND rel.catid = '. $altered_catid .' AND '. $state_where_arr[$state_group] . ( $lang_group != '_' ? ' AND ie.language ='. $this->_db->Quote($lang_group) : '')
-								. ' ORDER BY rel.ordering'
-								;
-						$this->_db->setQuery( $query );  //echo "$query <br/>";
-						$rows = $this->_db->loadObjectList();
+						$query = $this->_db->getQuery(true)
+							->select('rel.itemid, rel.ordering, i.state, i.language')
+							->from('#__flexicontent_cats_item_relations AS rel')
+							->innerJoin('#__content AS i ON i.id = rel.itemid')
+							->where('rel.ordering >= 0')
+							->where('rel.catid = ' . (int) $reorder_catid)
+							->where($state_where_clauses[$state_group])
+							->where('i.language = ' . $this->_db->Quote($lang_group))
+							->order('rel.ordering')
+						;
+						$rows = $this->_db->setQuery($query)->loadObjectList();
 
 						// Compact the ordering numbers
-						$cnt = 0;
-						foreach ($rows as $row)
+						$n = 0;
+
+						foreach ($rows as $table)
 						{
 							if ($table->ordering >= 0)
 							{
-								if ($table->ordering != $i+1)
+								if ($table->ordering != $n)
 								{
-									$table->ordering = $cnt++;
-									$query 	= 'UPDATE #__flexicontent_cats_item_relations'
-										. ' SET ordering = '. (int) $table->ordering
-										. ' WHERE itemid = '. (int) $table->itemid
-										. ' AND catid = '. $altered_catid
-										;
-									$this->_db->setQuery($query)->execute();
+									$table->ordering = $n;
+
+									$where_case = 'catid = ' . (int) $reorder_catid . ' AND itemid = ' . (int) $table->itemid;
+									$new_order_wheres[$where_case] = ' WHEN ' . $where_case . ' THEN ' .  (int) $table->ordering;
 								}
+
+								$n++;
 							}
 						}
 
-						$lang_group != '_'
-							? $app->enqueueMessage(JText::sprintf('FLEXI_ITEM_REORDER_GROUP_RESULTS_LANG', JText::_('FLEXI_ORDER_FC_PER_CATEGORY'), $state_group, $lang_group, $altered_catid), "message")
-							: $app->enqueueMessage(JText::sprintf('FLEXI_ITEM_REORDER_GROUP_RESULTS', JText::_('FLEXI_ORDER_FC_PER_CATEGORY'), $state_group, $altered_catid), "message");
+						// Note: 'FLEXI_ITEM_REORDER_GROUP_RESULTS' should be used if grouping with where-language is not included
+						$lang = $lang_group === '*'
+							? JText::_('FLEXI_ALL')
+							: $lang_group;
+						$app->enqueueMessage(JText::sprintf('FLEXI_ITEM_REORDER_GROUP_RESULTS_LANG', JText::_('FLEXI_ORDER_FC_PER_CATEGORY'), $state_group, $lang, $reorder_catid), 'message');
 					}
 				}
 			}
 
-			//exit;
+			if (count($new_order_wheres))
+			{
+				$query = $this->_db->getQuery(true)
+					->update('#__flexicontent_cats_item_relations')
+					->set('ordering = CASE ' . implode(' ', $new_order_wheres) . ' END ')
+					->where('(' . implode(') OR (', array_keys($new_order_wheres)) . ')')
+				;
+				$this->_db->setQuery($query)->execute();
+			}
+
 			return true;
 		}
 	}
@@ -3430,7 +3537,10 @@ class FlexicontentModelItems extends JModelList
 		$fcform = $jinput->get('fcform', 0, 'int');
 		$p      = $option . '.' . $view . '.';
 
-		$filter_order_type = $this->getState('filter_order_type');
+		// Order type
+		$filter_order_type = $fcform ? $jinput->get('filter_order_type', 1,                  'int')  :  $app->getUserStateFromRequest( $p.'filter_order_type',	'filter_order_type', 1, 'int' );
+		$this->setState('filter_order_type', $filter_order_type);
+		$app->setUserState($p.'filter_order_type', $filter_order_type);
 
 		$default_order     = $this->cparams->get('items_manager_order', $this->default_order);
 		$default_order_dir = $this->cparams->get('items_manager_order_dir', $this->default_order_dir);

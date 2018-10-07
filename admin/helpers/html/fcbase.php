@@ -30,6 +30,7 @@ abstract class JHtmlFcbase
 	static $title_propname = 'title';
 	static $state_propname = 'state';
 	static $layout_type = null;
+	static $translateable_props = array();
 
 
 	/**
@@ -72,22 +73,25 @@ abstract class JHtmlFcbase
 		}
 		else
 		{
-			$link = "javascript: return false;";
+			$link = '';
+
 			$disabled_class = 'disabled';
-			$disabled_btn = '<span class="fc_icon_disabled"></span>';
+			$disabled_btn   = '<span class="fc_icon_disabled"></span>';
 		}
 
 		$attribs = ''
 			. ' class="fc-preview-btn ntxt ' . $disabled_class . ' ' .  static::$btn_mbar_class . ' ' . static::$btn_sm_class . ' ' . static::$tooltip_class . '"'
 			. ' title="' . flexicontent_html::getToolTip('FLEXI_PREVIEW', 'FLEXI_DISPLAY_ENTRY_IN_FRONTEND_DESC', 1, 1) . '"'
-			. ' href="' . $link .'"'
-			. '	target="' . $target . '"';
+			. ($link ? ' href="' . $link .'"' : '')
+			. ($link ? ' target="' . $target . '"' : '');
+
+		$tag = $link ? 'a' : 'span';
 
 		return '
-		<a ' . $attribs . '>
+		<' . $tag . ' ' . $attribs . '>
 			' . $disabled_btn . '
 			<span class="' . $config['iconClass'] . '"></span>
-		</a> ';
+		</' . $tag . '> ';
 	}
 
 
@@ -111,7 +115,7 @@ abstract class JHtmlFcbase
 
 		if (!$row->canCheckin)
 		{
-			return '<span class="icon-lock ' . static::$tooltip_class . '" title="' . htmlspecialchars(JHtml::tooltipText('FLEXI_RECORD_CHECKED_OUT_DIFF_USER', true, false), ENT_QUOTES, 'UTF-8') . '"></span> ';
+			return '<span class="icon-lock ' . static::$tooltip_class . '" title="' . JHtml::tooltipText('', 'FLEXI_RECORD_CHECKED_OUT_DIFF_USER', true, false) . '"></span> ';
 		}
 
 		$_tip_title = $row->checked_out == $user->id
@@ -120,7 +124,7 @@ abstract class JHtmlFcbase
 
 		return 
 		($row->checked_out != $user->id ? '<input id="cb'.$i.'" type="checkbox" value="'.$row->id.'" name="cid[]" style="display:none!important;">' : '') . '
-		<a class="btn btn-micro btn-outline-secondary ntxt ' . static::$tooltip_class . '" title="' . htmlspecialchars(JHtml::tooltipText($_tip_title, true, false), ENT_QUOTES, 'UTF-8') . '" href="javascript:;" onclick="var ccb=document.getElementById(\'cb'.$i.'\'); ccb.checked=1; ccb.form.task.value=\'' . static::$ctrl . '.checkin\'; ccb.form.submit();">
+		<a class="btn btn-micro btn-outline-secondary ntxt ' . static::$tooltip_class . '" title="' . JHtml::tooltipText('', $_tip_title, true, false) . '" href="javascript:;" onclick="var ccb=document.getElementById(\'cb'.$i.'\'); ccb.checked=1; ccb.form.task.value=\'' . static::$ctrl . '.checkin\'; ccb.form.submit();">
 			<span class="icon-checkedout"></span>
 		</a>
 		';
@@ -132,14 +136,12 @@ abstract class JHtmlFcbase
 	 *
 	 * @param   object   $row        The row
 	 * @param   int      $i          Row number
+	 * @param   bool     $locked     Row number
 	 *
 	 * @return  string       HTML code
 	 */
-	public static function statebutton($row, $i)
+	public static function statebutton($row, $i, $locked = false)
 	{
-		static $params = null;
-		static $addToggler = true;
-		static $tipPlacement = 'top';
 		static $config = null;
 
 		if ($config === null)
@@ -148,13 +150,16 @@ abstract class JHtmlFcbase
 				'controller' => static::$ctrl,
 				'record_name' => static::$name,
 				'state_propname' => static::$state_propname,
-				'addToggler' => $addToggler,
-				'tipPlacement' => $tipPlacement,
+				'addToggler' => true,
+				'tipPlacement' => 'top',
 				'class' => static::$btn_sm_class . ' ' . static::$btn_mbar_class,
+				'locked' => false,
 			);
 		}
 
-		return flexicontent_html::statebutton($row, $params, $config);
+		$config->locked = $locked;
+
+		return flexicontent_html::statebutton($row, null, $config);
 	}
 
 
@@ -200,50 +205,86 @@ abstract class JHtmlFcbase
 	/**
 	 * Create the edit record link
 	 *
+	 * Configuration array parameter uses:
+	 *   'ctrl' : controller name,
+	 *   'option' : component name,
+	 *   'keyprop' : property with the record id,
+	 *   'onclick' : onclick JS, we will create a link, like this: <a onclick="..." href="javascript:;" data-href="URL">...</a>
+	 *   'useModal' : create a modal, link will be same as onclick above
+	 *
 	 * @param   object   $row         The row
 	 * @param   int      $i           Row number
 	 * @param   boolean  $canEdit     Is user allowed to edit the item
-	 * @param   array    $config      Configuration array, 'ctrl' : controller name, 'option' : component name, 'jtag_id' : 'property name holding the id', 'useModal' : edit in modal
+	 * @param   array    $config      Configuration array
 	 *
 	 * @return  string       HTML code
 	 */
 	public static function edit_link($row, $i, $canEdit, $config = array())
 	{
+		$title = in_array(static::$title_propname, static::$translateable_props)
+			? JText::_($row->{static::$title_propname})
+			: $row->{static::$title_propname};
+
+		$title_escaped = htmlspecialchars($title, ENT_QUOTES, 'UTF-8');
+
+		$title_untranslated = $title !== $row->{static::$title_propname} ? '<br/><small>[ ' . $title_escaped . ' ]</small>' : '';
+
 		// Display title with no edit link ... if row is not-editable for any reason (no ACL or checked-out by other user)
 		if (!$canEdit || ($row->checked_out && (int) $row->checked_out !== (int) JFactory::getUser()->id))
 		{
-			return htmlspecialchars($row->{static::$title_propname}, ENT_QUOTES, 'UTF-8');
+			return $title_escaped . $title_untranslated;
 		}
 
 		// Display title with edit link ... (row editable and not checked out)
 		$option    = isset($config['option']) ? $config['option'] : 'com_flexicontent';
 		$ctrl      = isset($config['ctrl']) ? $config['ctrl'] : static::$name;
 		$keyname   = isset($config['keyname']) ? $config['keyname'] : 'id';
+
+		// By default icon is Off so that it can be added outside the link 
+		$iconOnly  = isset($config['iconOnly']) ? $config['iconOnly'] : false;
+		$iconClass = isset($config['iconClass']) ? $config['iconClass'] : ($iconOnly ? 'icon-pencil' : false);
+
+		$icon_prefix = $iconClass && !$iconOnly ? '<span class="' . $iconClass . '"></span>' : '';
+		$icon_linked = $iconClass && $iconOnly ? '<span class="' . $iconClass . '"></span>' : '';
+
+		// The edit link
 		$edit_task = 'task=' . $ctrl . '.edit';
 		$edit_link = 'index.php?option=' . $option . '&amp;' . $edit_task . '&amp;view=' . static::$name . '&amp;'
 			. 'id=' . $row->{$keyname};
 
 		$attrs = ' title="' . JText::_('FLEXI_EDIT', true) . '" class="fc-iblock text-dark" ';
 
-		if (!empty($config['useModal']))
+
+		if (!empty($config['onclick']))
 		{
-			$attrs .= " onclick=\"var url = jQuery(this).attr('data-href'); var the_dialog = fc_showDialog(url, 'fc_modal_popup_container', 0, 0, 0, fc_edit_jtag_modal_close, {title:'" . JText::_('FLEXI_EDIT_JTAG') . "', loadFunc: fc_edit_jtag_modal_load}); return false;\" ";
+			$attrs .= ' onclick="' . $config['onclick'] . '"';
+		}
+		elseif (!empty($config['useModal']))
+		{
+			$attrs .= ' onclick="' . 'var url = jQuery(this).attr(\'data-href\'); ' .
+				'var the_dialog = fc_showDialog(url, \'fc_modal_popup_container\', 0, 0, 0, ' . JText::_($config['useModal']->onclosefunc) . ', ' .
+				'{title:\'' . JText::_($config['useModal']->title,  true) . '\', loadFunc: ' . JText::_($config['useModal']->onloadfunc) . '}); return false;' .
+			'"';
 		}
 
 		// Display title with no edit link ... if row is not-editable for any reason (no ACL or checked-out by other user)
-		if (!empty($config['useModal']))
+		
+		if (!empty($config['onclick']) || !empty($config['useModal']))
 		{
-			return '
+			return $icon_prefix . '
 			<a href="javascript:;" data-href="' . $edit_link . '" ' . $attrs . '>
-				<span class="icon-pencil"></span>
+				' . $icon_linked . '
+				' . ($iconOnly ? '' : $title_escaped) . '
 			</a>';
 		}
 		else
 		{
-			return '
+			return $icon_prefix . '
 			<a href="' . $edit_link . '" ' . $attrs . '>
-				' . htmlspecialchars($row->{static::$title_propname}, ENT_QUOTES, 'UTF-8') . '
-			</a>';
+				' . $icon_linked . '
+				' . ($iconOnly ? '' : $title_escaped) . '
+			</a>
+			' . ($iconOnly ? '' : $title_untranslated);
 		}
 	}
 
@@ -334,5 +375,104 @@ abstract class JHtmlFcbase
 		<a ' . $attribs . '>
 			<span class="icon-pencil"></span>
 		</a> ';
+	}
+
+
+	/**
+	 * Create the save order button
+	 *
+	 * @param   array    $rows     The array of records
+	 * @param   object   $config   Configuration object
+	 *
+	 * The $config object has
+	 * -- string   $icon_class    An icon class for the button
+	 * -- string   $custom_txt    Button text
+	 * -- string   $custom_tip    Button tooltip
+	 * -- string   $task_value    The task to execute
+	 *
+	 * @return  string       HTML code
+	 */
+	public static function saveorder_btn($rows, $config = null)
+	{
+		$config = (object) array(
+			'icon_class' => (!empty($config->icon_class) ? $config->icon_class: 'icon-checkbox'),
+			'custom_txt' => (!empty($config->custom_txt) ? $config->custom_txt : ''),
+			'custom_tip' => (!empty($config->custom_tip) ? $config->custom_tip : JText::_('JLIB_HTML_SAVE_ORDER')),
+			'task_value' => (!empty($config->task_value) ? $config->task_value : static::$ctrl . '.saveorder'),
+		);
+
+		return '
+		<a href="javascript:;" onclick="saveorder(' . (count($rows) - 1) . ', \'' . $config->task_value . '\')" '
+				. ' class="saveorder btn btn-small btn-primary' . ($config->custom_tip ? ' hasTooltip' : '') . '" '
+				. ' title="' . JText::_($config->custom_tip ?: '') . '" style="padding: 6px 4px 4px 6px;">
+			<span class="' . $config->icon_class . '"></span>
+			<span class="hidden-phone">' . JText::_($config->custom_txt ?: '') . '</span>
+		</a>';
+	}
+
+
+	/**
+	 * Create the manual order toggle button
+	 *
+	 * @param   array    $rows     The array of records
+	 * @param   object   $config   Configuration object
+	 *
+	 * The $config object has
+	 * -- string   $icon_class    An icon class for the button
+	 * -- string   $custom_txt    Button text
+	 * -- string   $custom_tip    Button tooltip
+	 * -- string   $click_attr    The onclick attribute of the button, typically to toggle visibility of the ordering input tags
+	 *
+	 * @return  string       HTML code
+	 */
+	public static function manualorder_btn($rows, $config = null)
+	{
+		$config = (object) array(
+			'icon_class' => (!empty($config->icon_class) ? $config->icon_class: 'icon-cog'),
+			'custom_txt' => (!empty($config->custom_txt) ? $config->custom_txt : ''),
+			'custom_tip' => (!empty($config->custom_tip) ? $config->custom_tip : JText::_('FLEXI_MANUAL_ORDER')),
+			'click_attr' => (!empty($config->click_attr) ? $config->click_attr : 'jQuery(\'.fcitem_order_no\').slideToggle();'),
+		);
+
+		return '
+		<a href="javascript:;" onclick="' . $config->click_attr . '" data-placement="bottom" '
+				. ' class="saveorder btn btn-small' . ($config->custom_tip ? ' hasTooltip' : '') . '" '
+				. ' title="' . JText::_($config->custom_tip ?: '') . '" style="padding: 6px 4px 4px 6px;">
+			<span class="' . $config->icon_class . '"></span>
+			<span class="hidden-phone">' . JText::_($config->custom_txt ?: '') . '</span>
+		</a>';
+	}
+
+
+	/**
+	 * Create the RSS link icon
+	 *
+	 * @param   object   $row        The row
+	 * @param   int      $i          Row number
+	 * @param   string   $propname   The column name of the property containing the text
+	 *
+	 * @return  string       HTML code
+	 */
+	public static function info_text($row, $i, $propname = 'description', $tip_title = 'FLEXI_DESCRIPTION')
+	{
+		$uncut_length = 0;
+
+		$text = !$row->$propname ? '' : flexicontent_html::striptagsandcut(
+			$row->$propname,
+			$cut_text_length = 50,
+			$uncut_length,
+			$ops = array(
+				'cut_at_word' => true,
+				'more_toggler' => false,//true,
+				'more_icon' => 'icon-paragraph-center',
+				'more_txt' => 2,
+				'modal_title' => $row->{static::$title_propname}
+			)
+		);
+
+		if (!empty($text))
+		{
+			echo '<span class="icon-info ' . static::$tooltip_class . '" title="' . flexicontent_html::getToolTip(JText::_('FLEXI_FIELD_DESCRIPTION', true), $text, 0, 1) . '"></span>';
+		}
 	}
 }

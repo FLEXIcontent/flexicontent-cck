@@ -71,13 +71,24 @@ class FlexicontentViewItemelement extends FlexicontentViewBaseRecords
 
 		if ($assocs_id)
 		{
-			$language    = $app->getUserStateFromRequest( $option.'.'.$view.'.language', 'language', '', 'string' );
 			$type_id     = $app->getUserStateFromRequest( $option.'.'.$view.'.type_id', 'type_id', 0, 'int' );
+			$item_lang   = $app->getUserStateFromRequest( $option.'.'.$view.'.item_lang', 'item_lang', '', 'string' );
 			$created_by  = $app->getUserStateFromRequest( $option.'.'.$view.'.created_by', 'created_by', 0, 'int' );
 
-			$type_data = $model->getTypeData( $assocs_id, $type_id );
 			$assocanytrans = $user->authorise('flexicontent.assocanytrans', 'com_flexicontent');
-			if (!$assocanytrans && !$created_by)  $created_by = $user->id;
+
+			if (!$assocanytrans && !$created_by)
+			{
+				$created_by = $user->id;
+			}
+
+			$_type_id = null;
+			$type_data = $model->getTypeData($assocs_id, $_type_id);
+
+			if (!$assocanytrans && !$type_id)
+			{
+				$type_id = $_type_id;
+			}
 		}
 
 		// get filter values
@@ -90,6 +101,10 @@ class FlexicontentViewItemelement extends FlexicontentViewBaseRecords
 		$filter_access = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_access', 'filter_access',  '',    'string' );
 		$filter_lang   = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_lang',   'filter_lang',    '',    'string' );
 		$filter_author = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_author', 'filter_author',  '',    'cmd' );
+
+		$filter_type   = $assocs_id && $type_id    ? $type_id    : $filter_type;
+		$filter_lang   = $assocs_id && $item_lang  ? $item_lang  : $filter_lang;
+		$filter_author = $assocs_id && $created_by ? $created_by : $filter_author;
 
 		$search = $app->getUserStateFromRequest( $option.'.'.$view.'.search', 			'search', 			'', 'string' );
 		$search = $db->escape( StringHelper::trim(StringHelper::strtolower( $search ) ) );
@@ -190,14 +205,14 @@ class FlexicontentViewItemelement extends FlexicontentViewBaseRecords
 
 		// Build type filter
 		$lists['filter_type'] = '<label class="label">'.JText::_('FLEXI_TYPE').'</label>'.
-			($assocs_id && !empty($type_data) ?
+			($assocs_id && !$assocanytrans && $type_id ?
 				'<span class="badge badge-info">'.$type_data->name.'</span>' :
 				flexicontent_html::buildtypesselect($types, 'filter_type', $filter_type, '-'/*true*/, 'class="use_select2_lib" size="1" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', 'filter_type')
 			);
 
 		// Build author filter
 		$lists['filter_author'] = '<label class="label">'.JText::_('FLEXI_AUTHOR').'</label>'.
-			($assocs_id && $created_by ?
+			($assocs_id && !$assocanytrans && $created_by ?
 				'<span class="badge badge-info">'.JFactory::getUser($created_by)->name.'</span>' :
 				flexicontent_html::buildauthorsselect($authors, 'filter_author', $filter_author, '-'/*true*/, 'class="use_select2_lib" size="3" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"')
 			);
@@ -228,8 +243,8 @@ class FlexicontentViewItemelement extends FlexicontentViewBaseRecords
 
 		// Build language filter
 		$lists['filter_lang'] = '<label class="label">'.JText::_('FLEXI_LANGUAGE').'</label>'.
-			($assocs_id && $language ?
-				'<span class="badge badge-info">'.$language.'</span>' :
+			($assocs_id && $item_lang ?
+				'<span class="badge badge-info">'.$item_lang.'</span>' :
 				flexicontent_html::buildlanguageslist('filter_lang', 'class="use_select2_lib" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', $filter_lang, '-'/*2*/)
 			);
 

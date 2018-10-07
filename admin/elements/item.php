@@ -1,22 +1,14 @@
 <?php
 /**
- * @version 1.5 stable $Id: item.php
- * @package Joomla
- * @subpackage FLEXIcontent
- * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
- * @license GNU/GPL v2
- * 
- * FLEXIcontent is a derivative work of the excellent QuickFAQ component
- * @copyright (C) 2008 Christoph Lukes
- * see www.schlu.net for more information
+ * @package         FLEXIcontent
+ * @version         3.3
  *
- * FLEXIcontent is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
+ * @link            http://www.flexicontent.com
+ * @copyright       Copyright © 2018, FLEXIcontent team, All Rights Reserved
+ * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
-// Check to ensure this file is included in Joomla!
 defined('_JEXEC') or die('Restricted access');
 
 use Joomla\String\StringHelper;
@@ -85,7 +77,7 @@ class JFormFieldItem extends JFormField
 
 		// HTML tag parameters for required field
 		$required_param = $required ? ' required="required" class="required" aria-required="true" ' : '';
-		
+
 		static $js_added = false;
 		if (!$js_added) {
 			$js = "
@@ -98,7 +90,7 @@ class JFormFieldItem extends JFormField
 				jQuery('#'+element_id + '_edit').addClass('hidden');
 				return false;
 			};
-			
+
 			var fc_select_element_id;
 			function fcSelectItem(id, cid, title)
 			{
@@ -118,21 +110,21 @@ class JFormFieldItem extends JFormField
 			//JHtml::_('behavior.modal', 'a.modal');
 			flexicontent_html::loadFramework('flexi-lib');
 		}
-		
+
 		$app    = JFactory::getApplication();
 		$jinput = $app->input;
 		$option = $jinput->get('option', '', 'CMD');
 		$view   = $jinput->get('view', '', 'CMD');
-		
+
 		$assocs_id  = 0;
 		$language   = $this->element['language'];
-		
+
 		if ($language && $option=='com_flexicontent' && $view=='item')
 		{
 			$id = $jinput->get('id', array(0), 'array');
 			ArrayHelper::toInteger($id);
 			$assocs_id = (int) $id[0];
-			
+
 			if (!$assocs_id)
 			{
 				$cid = $jinput->get('cid', array(0), 'array');
@@ -146,7 +138,7 @@ class JFormFieldItem extends JFormField
 		$link .= $this->element['created_by'] ? '&amp;created_by=' . $this->element['created_by'] : '';
 		$link .= $language ? '&amp;item_lang=' . $language : '';
 		$link .= ($language && $assocs_id) ? '&amp;assocs_id=' . $assocs_id : '';
-		
+
 		//$rel = '{handler: \'iframe\', size: {x:((window.getSize().x<1100)?window.getSize().x-100:1000), y: window.getSize().y-100}}';
 		$_select = JText::_( 'FLEXI_SELECT_ITEM', true);
 		return '

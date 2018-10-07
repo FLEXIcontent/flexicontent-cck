@@ -308,6 +308,79 @@ class flexicontent_items extends _flexicontent_items
 		return parent::getFields($reload);
 	}
 
+	
+	/**
+	 * Method to compact the ordering values of rows in a group of rows defined by an SQL WHERE clause.
+	 *
+	 * @param   string  $where  WHERE clause to use for limiting the selection of rows to compact the ordering values.
+	 *
+	 * @return  mixed  Boolean  True on success.
+	 *
+	 * @since   11.1
+	 * @throws  \UnexpectedValueException
+	 */
+	public function reorder($where = '')
+	{
+		parent::reorder($where);
+
+		/**
+		 * Sync reordering into temporary data DB table
+		 */
+		if (is_array($where))
+		{
+			foreach ($where as $i => $w)
+			{
+				$where[$i] = 'i.' . $where[$i];
+			}
+
+			$query = $this->_db->getQuery(true)
+				->update('#__flexicontent_items_tmp AS t')
+				->innerJoin('#__content AS i ON t.id = i.id')
+				->set('t.ordering = i.ordering')
+				->where($where);
+
+			$this->_db->setQuery($query)->execute();
+		}
+	}
+
+
+	/**
+	 * Method to move a row in the ordering sequence of a group of rows defined by an SQL WHERE clause.
+	 *
+	 * Negative numbers move the row up in the sequence and positive numbers move it down.
+	 *
+	 * @param   integer  $delta  The direction and magnitude to move the row in the ordering sequence.
+	 * @param   string   $where  WHERE clause to use for limiting the selection of rows to compact the ordering values.
+	 *
+	 * @return  boolean  True on success.
+	 *
+	 * @since   11.1
+	 * @throws  \UnexpectedValueException
+	 */
+	public function move($delta, $where = '')
+	{
+		parent::reorder($where);
+
+		/**
+		 * Sync reordering into temporary data DB table
+		 */
+		if (is_array($where))
+		{
+			foreach ($where as $i => $w)
+			{
+				$where[$i] = 'i.' . $where[$i];
+			}
+
+			$query = $this->_db->getQuery(true)
+				->update('#__flexicontent_items_tmp AS t')
+				->innerJoin('#__content AS i ON t.id = i.id')
+				->set('t.ordering = i.ordering')
+				->where($where);
+
+			$this->_db->setQuery($query)->execute();
+		}
+	}
+
 
 	/**
 	 * Method to reset class properties to the defaults set in the class

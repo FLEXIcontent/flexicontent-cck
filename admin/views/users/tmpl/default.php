@@ -44,9 +44,9 @@ $rem_filt_txt = JText::_('FLEXI_REMOVE_FILTER');
 $rem_filt_tip = ' class="'.$tip_class.' filterdel" title="'.flexicontent_html::getToolTip('FLEXI_ACTIVE_FILTER', 'FLEXI_CLICK_TO_REMOVE_THIS_FILTER', 1, 1).'" ';
 
 $fcfilter_attrs_row  = ' class="input-prepend fc-xpended-row" ';
-$tools_cookies['fc-filters-box-disp'] = JFactory::getApplication()->input->cookie->get('fc-filters-box-disp', 0, 'int');
+$tools_cookies['fc-filters-box-disp'] = 0; //JFactory::getApplication()->input->cookie->get('fc-filters-box-disp', 0, 'int');
 ?>
-<script type="text/javascript">
+<script>
 
 // the function overloads joomla standard event
 function submitform(pressbutton)
@@ -222,7 +222,7 @@ function delAllFilters() {
 	
 	<div class="fcclear"></div>
 	
-	<table id="adminListTableFCusers" class="adminlist table fcmanlist">
+	<table id="adminListTableFCusers" class="adminlist table fcmanlist" itemscope itemtype="http://schema.org/WebPage">
 	<thead>
 		<tr>
 			<th><?php echo JText::_( 'FLEXI_NUM' ); ?></th>
@@ -235,7 +235,7 @@ function delAllFilters() {
 				<?php echo JHtml::_('grid.sort',   'FLEXI_NAME', 'a.name', @$this->lists['order_Dir'], @$this->lists['order'] ); ?>
 				<?php if ($this->search) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
-					<img src="components/com_flexicontent/assets/images/delete.png" alt="<?php echo $rem_filt_txt ?>" class="fc-man-icon-s" onclick="delFilter('search');document.adminForm.submit();" />
+					<span class="icon-cancel-circle btn btn-micro" onclick="delFilter('search'); document.adminForm.submit();"></span>
 				</span>
 				<?php endif; ?>
 			</th>
@@ -246,54 +246,54 @@ function delAllFilters() {
 
 			<th class="hideOnDemandClass nowrap">
 				<?php echo JHtml::_('grid.sort',   'FLEXI_USER_LOGGED', 'loggedin', @$this->lists['order_Dir'], @$this->lists['order'] ); ?>
-				<?php if ($this->filter_logged) : ?>
+				<?php if ($this->getModel()->getState('filter_logged')) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
-					<img src="components/com_flexicontent/assets/images/delete.png" alt="<?php echo $rem_filt_txt ?>" class="fc-man-icon-s" onclick="delFilter('filter_logged');document.adminForm.submit();" />
+					<span class="icon-cancel-circle btn btn-micro" onclick="delFilter('filter_logged'); document.adminForm.submit();"></span>
 				</span>
 				<?php endif; ?>
 			</th>
 
 			<th class="hideOnDemandClass nowrap">
 				<?php echo JHtml::_('grid.sort',   'COM_USERS_HEADING_ENABLED', 'a.block', @$this->lists['order_Dir'], @$this->lists['order'] ); ?>
-				<?php if (strlen($this->filter_state)) : ?>
+				<?php if (strlen($this->getModel()->getState('filter_state'))) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
-					<img src="components/com_flexicontent/assets/images/delete.png" alt="<?php echo $rem_filt_txt ?>" class="fc-man-icon-s" onclick="delFilter('filter_state');document.adminForm.submit();" />
+					<span class="icon-cancel-circle btn btn-micro" onclick="delFilter('filter_state'); document.adminForm.submit();"></span>
 				</span>
 				<?php endif; ?>
 			</th>
 
 			<th class="hideOnDemandClass nowrap hidden-phone">
 				<?php echo JHtml::_('grid.sort',   'COM_USERS_HEADING_ACTIVATED', 'a.activation', @$this->lists['order_Dir'], @$this->lists['order'] ); ?>
-				<?php if (strlen($this->filter_active)) : ?>
+				<?php if (strlen($this->getModel()->getState('filter_active'))) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
-					<img src="components/com_flexicontent/assets/images/delete.png" alt="<?php echo $rem_filt_txt ?>" class="fc-man-icon-s" onclick="delFilter('filter_active');document.adminForm.submit();" />
+					<span class="icon-cancel-circle btn btn-micro" onclick="delFilter('filter_active'); document.adminForm.submit();"></span>
 				</span>
 				<?php endif; ?>
 			</th>
 
 			<th class="hideOnDemandClass nowrap">
 				<?php echo JText::_( 'FLEXI_USERGROUPS' ); ?>
-				<?php if ($this->filter_usergrp) : ?>
+				<?php if ($this->getModel()->getState('filter_usergrp')) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
-					<img src="components/com_flexicontent/assets/images/delete.png" alt="<?php echo $rem_filt_txt ?>" class="fc-man-icon-s" onclick="delFilter('filter_usergrp');document.adminForm.submit();" />
+					<span class="icon-cancel-circle btn btn-micro" onclick="delFilter('filter_usergrp'); document.adminForm.submit();"></span>
 				</span>
 				<?php endif; ?>
 			</th>
 
 			<th class="hideOnDemandClass nowrap">
 				<?php echo JHtml::_('grid.sort',   'FLEXI_ITEMS', 'itemscount', @$this->lists['order_Dir'], @$this->lists['order'] ); ?>
-				<?php if ($this->filter_itemscount) : ?>
+				<?php if ($this->getModel()->getState('filter_itemscount')) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
-					<img src="components/com_flexicontent/assets/images/delete.png" alt="<?php echo $rem_filt_txt ?>" class="fc-man-icon-s" onclick="delFilter('filter_itemscount');document.adminForm.submit();" />
+					<span class="icon-cancel-circle btn btn-micro" onclick="delFilter('filter_itemscount'); document.adminForm.submit();"></span>
 				</span>
 				<?php endif; ?>
 			</th>
 
 			<th class="hideOnDemandClass nowrap">
 				<?php echo JHtml::_('grid.sort',   'FLEXI_FILES_MBS', 'uploadssize', @$this->lists['order_Dir'], @$this->lists['order'] ); ?>
-				<?php if (@$this->filter_uploadssize) : ?>
+				<?php if ($this->getModel()->getState('filter_uploadssize')) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
-					<img src="components/com_flexicontent/assets/images/delete.png" alt="<?php echo $rem_filt_txt ?>" class="fc-man-icon-s" onclick="delFilter('filter_uploadssize');document.adminForm.submit();" />
+					<span class="icon-cancel-circle btn btn-micro" onclick="delFilter('filter_uploadssize'); document.adminForm.submit();"></span>
 				</span>
 				<?php endif; ?>
 			</th>
@@ -309,7 +309,7 @@ function delAllFilters() {
 					if (($this->startdate && ($this->startdate != JText::_('FLEXI_FROM'))) || ($this->enddate && ($this->startdate != JText::_('FLEXI_TO')))) :
 				?>
 				<span <?php echo $rem_filt_tip; ?>>
-					<img src="components/com_flexicontent/assets/images/delete.png" alt="<?php echo $rem_filt_txt ?>" class="fc-man-icon-s" onclick="delFilter('startdate');delFilter('enddate');document.adminForm.submit();" />
+					<span class="icon-cancel-circle btn btn-micro" onclick="delFilter('startdate');delFilter('enddate'); document.adminForm.submit();"></span>
 				</span>
 				<?php
 					endif;
@@ -324,7 +324,7 @@ function delAllFilters() {
 					if (($this->startdate && ($this->startdate != JText::_('FLEXI_FROM'))) || ($this->enddate && ($this->startdate != JText::_('FLEXI_TO')))) :
 				?>
 				<span <?php echo $rem_filt_tip; ?>>
-					<img src="components/com_flexicontent/assets/images/delete.png" alt="<?php echo $rem_filt_txt ?>" class="fc-man-icon-s" onclick="delFilter('startdate');delFilter('enddate');document.adminForm.submit();" />
+					<span class="icon-cancel-circle btn btn-micro" onclick="delFilter('startdate');delFilter('enddate'); document.adminForm.submit();"></span>
 				</span>
 				<?php
 					endif;
@@ -334,9 +334,9 @@ function delAllFilters() {
 
 			<th class="hideOnDemandClass nowrap">
 				<?php echo JHtml::_('grid.sort',   'FLEXI_ID', 'a.id', @$this->lists['order_Dir'], @$this->lists['order'] ); ?>
-				<?php if ($this->filter_id) : ?>
+				<?php if ($this->getModel()->getState('filter_id')) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
-					<img src="components/com_flexicontent/assets/images/delete.png" alt="<?php echo $rem_filt_txt ?>" class="fc-man-icon-s" onclick="delFilter('filter_id');document.adminForm.submit();" />
+					<span class="icon-cancel-circle btn btn-micro" onclick="delFilter('filter_id'); document.adminForm.submit();"></span>
 				</span>
 				<?php endif; ?>
 			</th>
@@ -388,10 +388,10 @@ function delAllFilters() {
 			?>
 			<tr class="<?php echo "row$k"; ?>">
 				<td class="center">
-					<div class="adminlist-table-row"></div>
-					<?php echo $i+1+$this->pagination->limitstart;?>
+					<?php echo $this->pagination->getRowOffset($i); ?>
 				</td>
 				<td class="center">
+					<!--div class="adminlist-table-row"></div-->
 					<?php echo JHtml::_('grid.id', $i, $row->id); ?>
 					<label for="cb<?php echo $i; ?>" class="green single"></label>
 				</td>

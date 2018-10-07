@@ -1102,49 +1102,50 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 	 *
 	 * @since 3.3
 	 */
-	public function reorder($dir=null)
+	public function reorder($dir = null)
 	{
 		// Check for request forgeries
 		JSession::checkToken('request') or die(JText::_('JINVALID_TOKEN'));
 
-		// Get variables: model, user, item id
+		$app   = JFactory::getApplication();
 		$model = $this->getModel($this->record_name_pl);
 		$user  = JFactory::getUser();
 
-		$cid = $this->input->get('cid', array(0), 'array');
-		$ord_catid  = $this->input->get('ord_catid', array(0), 'array');
-		$prev_order = $this->input->get('prev_order', array(0), 'array');
-		$item_cb    = $this->input->get('item_cb', array(0), 'array');
-
-		ArrayHelper::toInteger($cid);
-		ArrayHelper::toInteger($ord_catid);
-		ArrayHelper::toInteger($prev_order);
-		ArrayHelper::toInteger($item_cb);
-
-		// Calculate access of orderitems ACL
-		$canOrder = $user->authorise('flexicontent.orderitems', 'com_flexicontent');
+		// Calculate ACL access
+		$is_authorised = $user->authorise('flexicontent.orderitems', 'com_flexicontent');
 
 		// Check access
-		if (!$canOrder)
+		if (!$is_authorised)
 		{
 			$app->setHeader('status', '403 Forbidden', true);
 			$app->enqueueMessage(JText::_('FLEXI_ALERTNOTAUTH_TASK'), 'error');
 			$app->redirect($this->returnURL);
 		}
 
-		if (!$model->move($dir, $ord_catid, $prev_order, $item_cb))
+		// Get record id and ordering group
+		$cid         = $this->input->get('cid', array(0), 'array');
+		$filter_cats = $this->input->get('filter_cats', array(0), 'array');
+
+		ArrayHelper::toInteger($cid);
+		ArrayHelper::toInteger($filter_cats);
+
+		// Make sure direction is set
+		$dir = $dir ?: ($this->task === 'orderup' ? -1 : 1);
+
+		if (!$model->move($dir, reset($filter_cats)))
 		{
 			$app->setHeader('status', '500 Internal Server Error', true);
 			$app->enqueueMessage(JText::_('FLEXI_ERROR_SAVING_ORDER') . ': ' . $model->getError(), 'error');
 			$app->redirect($this->returnURL);
 		}
 
-		$this->setRedirect($this->returnURL);  // , JText::_('FLEXI_NEW_ORDERING_SAVED')
+		// Note we no longer set the somewhat redundant message: JText::_('FLEXI_NEW_ORDERING_SAVED')
+		$this->setRedirect($this->returnURL);
 	}
 
 
 	/**
-	 * Logic to orderup an item, wrapper for reorder method
+	 * Logic to orderup a record, wrapper for reorder method
 	 *
 	 * @return void
 	 *
@@ -1157,7 +1158,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 
 
 	/**
-	 * Logic to orderdown an item, wrapper for reorder method
+	 * Logic to orderdown a record, wrapper for reorder method
 	 *
 	 * @return void
 	 *
@@ -1170,7 +1171,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 
 
 	/**
-	 * Logic to mass ordering items
+	 * Logic to mass order records
 	 *
 	 * @return void
 	 *
@@ -1181,39 +1182,39 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		// Check for request forgeries
 		JSession::checkToken('request') or die(JText::_('JINVALID_TOKEN'));
 
-		// Get variables: model, user, item id, new ordering
+		$app   = JFactory::getApplication();
 		$model = $this->getModel($this->record_name_pl);
 		$user  = JFactory::getUser();
 
-		$cid = $this->input->get('cid', array(0), 'array');
-		$order = $this->input->get('order', array(0), 'array');
-		$ord_catid = $this->input->get('ord_catid', array(0), 'array');
-		$prev_order = $this->input->get('prev_order', array(0), 'array');
-
-		ArrayHelper::toInteger($cid);
-		ArrayHelper::toInteger($order);
-		ArrayHelper::toInteger($ord_catid);
-		ArrayHelper::toInteger($prev_order);
-
-		// Calculate access of orderitems ACL
-		$canOrder = $user->authorise('flexicontent.orderitems', 'com_flexicontent');
+		// Calculate ACL access
+		$is_authorised = $user->authorise('flexicontent.orderitems', 'com_flexicontent');
 
 		// Check access
-		if (!$canOrder)
+		if (!$is_authorised)
 		{
 			$app->setHeader('status', 403);
 			$app->enqueueMessage(JText::_('FLEXI_ALERTNOTAUTH_TASK'), 'error');
 			$app->redirect($this->returnURL);
 		}
 
-		if (!$model->saveorder($cid, $order, $ord_catid, $prev_order))
+		// Get record ids, new orderings and the ordering group
+		$cid         = $this->input->get('cid', array(0), 'array');
+		$order       = $this->input->get('order', array(0), 'array');
+		$filter_cats = $this->input->get('filter_cats', array(0), 'array');
+
+		ArrayHelper::toInteger($cid);
+		ArrayHelper::toInteger($order);
+		ArrayHelper::toInteger($filter_cats);
+
+		if (!$model->saveorder($cid, $order, reset($filter_cats)))
 		{
 			$app->setHeader('status', 500);
 			$app->enqueueMessage(JText::_('FLEXI_ERROR_SAVING_ORDER') . ': ' . $model->getError(), 'error');
 			$app->redirect($this->returnURL);
 		}
 
-		$this->setRedirect($this->returnURL);  // , JText::_('FLEXI_NEW_ORDERING_SAVED')
+		// Note we no longer set the somewhat redundant message: JText::_('FLEXI_NEW_ORDERING_SAVED')
+		$this->setRedirect($this->returnURL);
 	}
 
 

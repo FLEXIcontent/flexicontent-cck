@@ -165,10 +165,10 @@ $list_total_cols = 8;
 			?>
 		<tr class="<?php echo "row$k"; ?>" id="<?php echo 'up-'.$row->name ?>">
 			<td>
-				<div class="adminlist-table-row"></div>
 				<?php echo $i+1; ?>
 			</td>
 			<td>
+				<!--div class="adminlist-table-row"></div-->
 				<?php echo JHtml::_('grid.id', $i, $row->id); ?>
 				<label for="cb<?php echo $i; ?>" class="green single"></label>
 			</td>

@@ -11,7 +11,7 @@
 	<fields name="request" addfieldpath="/administrator/components/com_flexicontent/elements">
 		<fieldset name="request">
 			<field name="layout" type="hidden" default="myitems" label="Layout" description="" />
-			<field name="cid" type="qfcategory" default="0" label="FLEXI_SELECT_MYITEMS_CATEGORY" description="FLEXI_SELECT_MYITEMS_CATEGORY_DESC" />
+			<field name="cid" type="fccategory" default="0" label="FLEXI_SELECT_MYITEMS_CATEGORY" description="FLEXI_SELECT_MYITEMS_CATEGORY_DESC" />
 		</fieldset> 
 	</fields>
 	

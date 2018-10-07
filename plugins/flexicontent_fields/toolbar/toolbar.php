@@ -418,7 +418,7 @@ class plgFlexicontent_fieldsToolbar extends FCField
 			if (!$addthis_added && JFactory::getApplication()->input->get('format', 'html') === 'html')
 			{
 				$document->addCustomTag('
-					<script type="text/javascript">
+					<script>
 					var addthis_config = {
 						services_exclude: "print,email"
 					}

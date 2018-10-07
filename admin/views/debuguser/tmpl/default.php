@@ -59,7 +59,8 @@ $listDirn	= $this->escape($this->state->get('list.direction'));
 		<span class="check-d swatch"><?php echo JText::sprintf('COM_USERS_DEBUG_EXPLICIT_DENY', '&#10007;');?></span>
 	</div>
 
-	<table class="adminlist">
+
+	<table id="adminListTableFCdebuguser" class="adminlist table fcmanlist" itemscope itemtype="http://schema.org/WebPage">
 		<thead>
 			<tr>
 				<th class="left">

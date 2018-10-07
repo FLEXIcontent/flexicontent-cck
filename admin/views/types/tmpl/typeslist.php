@@ -52,18 +52,18 @@ echo '
 				<a class="<?php echo $btn_class; ?>" href="<?php echo $link; ?>" target="_parent" style="color: gray; cursor: not-allowed;">
 					<?php echo $type->name; ?>
 					<small class="muted">
-						<?php echo $type->description
-							? flexicontent_html::striptagsandcut(
-									$type->description, $cut_text_length = 220, $uncut_length,
-									$ops = array(
-										'cut_at_word' => true,
-										'more_toggler' => true,
-										'more_icon' => 'icon-paragraph-center',
-										'more_txt' => 2,
-										'modal_title' => $type->name
-									)
+						<?php echo $type->description ? JText::_('FLEXI_NO_DESCRIPTION') :
+							flexicontent_html::striptagsandcut(
+								$type->description, $cut_text_length = 220, $uncut_length,
+								$ops = array(
+									'cut_at_word' => true,
+									'more_toggler' => true,
+									'more_icon' => 'icon-paragraph-center',
+									'more_txt' => 2,
+									'modal_title' => $type->name
 								)
-							: JText::_('FLEXI_NO_DESCRIPTION'); ?>
+							);
+						?>
 					</small>
 				</a>
 			</li>

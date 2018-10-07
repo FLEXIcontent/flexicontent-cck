@@ -46,7 +46,7 @@ flexicontent_html::jscode_to_showhide_table(
 	$start_html = '',  //'<span class="badge ' . (FLEXI_J40GE ? 'badge-dark' : 'badge-inverse') . '">' . JText::_('FLEXI_COLUMNS', true) . '<\/span> &nbsp; ',
 	$end_html = '<div id="fc-columns-slide-btn" class="icon-arrow-up-2 btn btn-outline-secondary" title="' . JText::_('FLEXI_HIDE') . '" style="cursor: pointer;" onclick="fc_toggle_box_via_btn(\\\'mainChooseColBox\\\', document.getElementById(\\\'fc_mainChooseColBox_btn\\\'), \\\'btn-primary\\\');"><\/div>'
 );
-$tools_cookies['fc-filters-box-disp'] = JFactory::getApplication()->input->cookie->get('fc-filters-box-disp', 0, 'int');
+$tools_cookies['fc-filters-box-disp'] = 0; //JFactory::getApplication()->input->cookie->get('fc-filters-box-disp', 0, 'int');
 
 
 
@@ -61,12 +61,12 @@ $tools_cookies['fc-filters-box-disp'] = JFactory::getApplication()->input->cooki
  * Order stuff and table related variables
  */
 
-$list_total_cols = 8;
+$list_total_cols = 7;
 
 ?>
 
 
-<script type="text/javascript">
+<script>
 
 // delete active filter
 function delFilter(name)
@@ -162,9 +162,16 @@ function delAllFilters()
 		<div class="fc-filter-head-box nowrap_box">
 
 			<div class="btn-group">
-				<div id="fc_mainChooseColBox_btn" class="<?php echo $out_class; ?> hidden-phone" onclick="fc_toggle_box_via_btn('mainChooseColBox', this, 'btn-primary');">
+				<div id="fc_mainChooseColBox_btn" class="<?php echo $out_class . ' ' . $this->tooltip_class; ?> hidden-phone" onclick="fc_toggle_box_via_btn('mainChooseColBox', this, 'btn-primary');" title="<?php echo flexicontent_html::getToolTip('', 'FLEXI_ABOUT_AUTO_HIDDEN_COLUMNS', 1, 1); ?>">
 					<?php echo JText::_( 'FLEXI_COLUMNS' ); ?><sup id="columnchoose_totals"></sup>
 				</div>
+
+				<?php if (!empty($this->minihelp) && FlexicontentHelperPerm::getPerm()->CanConfig): ?>
+				<div id="fc-mini-help_btn" class="<?php echo $out_class; ?>" onclick="fc_toggle_box_via_btn('fc-mini-help', this, 'btn-primary');" >
+					<span class="icon-help"></span>
+					<?php echo $this->minihelp; ?>
+				</div>
+				<?php endif; ?>
 			</div>
 			<div id="mainChooseColBox" class="group-fcset fcman-abs" style="display:none;"></div>
 
@@ -192,6 +199,7 @@ function delAllFilters()
 
 
 	<div class="fcclear"></div>
+
 
 	<table id="adminListTableFCtags" class="adminlist table fcmanlist" itemscope itemtype="http://schema.org/WebPage">
 	<thead>
@@ -224,11 +232,11 @@ function delAllFilters()
 				<?php echo JHtml::_('grid.sort', 'FLEXI_ASSIGNED_TO', 'nrassigned', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
 
-			<th class="hideOnDemandClass col_id center hidden-tablet hidden-phone">
+			<th class="hideOnDemandClass col_id center hidden-phone hidden-tablet">
 				<?php echo JHtml::_('grid.sort', 'FLEXI_ID', 'a.id', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
 
-			<th class="hideOnDemandClass center hidden-tablet hidden-phone">
+			<th class="hideOnDemandClass center hidden-phone hidden-tablet">
 				<?php echo JHtml::_('grid.sort', 'FLEXI_JTAG_ID', 'a.jtag_id', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
 
@@ -261,11 +269,11 @@ function delAllFilters()
 		<tr class="<?php echo 'row' . ($i % 2); ?>">
 
 			<!--td class="left col_rowcount hidden-phone">
-				<div class="adminlist-table-row"></div>
-				<?php /*echo $this->pagination->getRowOffset($i);*/ ?>
+				<?php echo $this->pagination->getRowOffset($i); ?>
 			</td-->
 
 			<td class="col_cb">
+				<!--div class="adminlist-table-row"></div-->
 				<?php echo JHtml::_($hlpname . '.grid_id', $i, $row->id); ?>
 			</td>
 
@@ -311,17 +319,22 @@ function delAllFilters()
 				</a>
 			</td>
 
-			<td class="col_id center hidden-tablet hidden-phone">
+			<td class="col_id center hidden-phone hidden-tablet">
 				<?php echo $row->id; ?>
 			</td>
 
-			<td class="center hidden-tablet hidden-phone">
+			<td class="center hidden-phone hidden-tablet">
 				<?php
 				echo JHtml::_($hlpname . '.edit_link', $row, $i, $row->canEdit, $config = array(
-					'option'  => 'com_tags',
-					'ctrl'    => 'tag',
-					'keyprop' => 'jtag_id',
-					'useModal' => true,
+					'option'   => 'com_tags',
+					'ctrl'     => 'tag',
+					'keyname'  => 'jtag_id',
+					'iconOnly' => 'jtag_id',
+					'useModal' => (object) array(
+						'title'       =>'FLEXI_EDIT_JTAG',
+						'onloadfunc'  =>'fc_edit_jtag_modal_load',
+						'onclosefunc' =>'fc_edit_jtag_modal_close',
+					),
 				));
 				?>
 			</td>
@@ -361,3 +374,20 @@ function delAllFilters()
 
 </form>
 </div><!-- #flexicontent end -->
+
+
+<?php
+JFactory::getDocument()->addScriptDeclaration('
+	function fc_edit_jtag_modal_load( container )
+	{
+		if ( container.find("iframe").get(0).contentWindow.location.href.indexOf("view=tags") != -1 )
+		{
+			container.dialog("close");
+		}
+	}
+	function fc_edit_jtag_modal_close()
+	{
+		window.location.reload(false);
+		document.body.innerHTML = Joomla.JText._("FLEXI_UPDATING_CONTENTS") + \' <img id="page_loading_img" src="components/com_flexicontent/assets/images/ajax-loader.gif">\';
+	}
+');

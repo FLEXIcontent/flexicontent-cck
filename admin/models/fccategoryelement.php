@@ -21,20 +21,36 @@ use Joomla\CMS\Table\User;
  * Flexicontent Component Categoryelement Model
  *
  */
-class FlexicontentModelQfcategoryelement extends JModelList
+class FlexicontentModelFccategoryelement extends JModelList
 {
 	var $records_dbtbl = 'categories';
 	var $records_jtable = 'flexicontent_categories';
 
-	var $state_col = 'published';
-	var $name_col  = 'title';
+	/**
+	 * Column names and record name
+	 */
 	var $record_name = 'category';
-	var $parent_col = 'parent_id';
-	var $listViaAccess = true;
+	var $state_col   = 'published';
+	var $name_col    = 'title';
+	var $parent_col  = 'parent_id';
 
-	var $search_cols = array('title', 'alias', 'note');
-	var $default_order = 'a.lft';
+	/**
+	 * (Default) Behaviour Flags
+	 */
+	var $listViaAccess = true;
+	var $copyRelations = false;
+
+	/**
+	 * Search and ordering columns
+	 */
+	var $search_cols       = array('title', 'alias', 'note');
+	var $default_order     = 'a.lft';
 	var $default_order_dir = 'ASC';
+
+	/**
+	 * List filters that are always applied
+	 */
+	var $hard_filters = array('extension' => FLEXI_CAT_EXTENSION);
 
 	/**
 	 * Record rows
@@ -49,6 +65,13 @@ class FlexicontentModelQfcategoryelement extends JModelList
 	 * @var integer
 	 */
 	var $_total = null;
+
+	/**
+	 * Associated item translations
+	 *
+	 * @var array
+	 */
+	var $_translations = null;
 
 	/**
 	 * Pagination object
@@ -73,6 +96,8 @@ class FlexicontentModelQfcategoryelement extends JModelList
 		$fcform = $jinput->get('fcform', 0, 'int');
 		$p      = $option . '.' . $view . '.';
 
+		// Parameters of the view, in our case it is only the component parameters
+		$this->cparams = JComponentHelper::getParams( 'com_flexicontent' );
 
 		/**
 		 * Pagination: limit, limitstart
@@ -98,7 +123,7 @@ class FlexicontentModelQfcategoryelement extends JModelList
 	/**
 	 * Method to build the query for the records
 	 *
-	 * @return string
+	 * @return JDatabaseQuery   The DB Query object
 	 *
 	 * @since 3.3.0
 	 */
@@ -132,8 +157,9 @@ class FlexicontentModelQfcategoryelement extends JModelList
 	function _buildContentOrderBy($query = null)
 	{
 		$app = JFactory::getApplication();
-		$option = JRequest::getVar('option');
-		$view   = JRequest::getVar('view');
+		$jinput  = $app->input;
+		$option  = $jinput->get('option', '', 'cmd');
+		$view    = $jinput->get('view', '', 'cmd');
 
 		$filter_order     = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_order',     'filter_order',     'c.lft',      'cmd' );
 		$filter_order_Dir = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_order_Dir', 'filter_order_Dir', '',           'cmd' );
@@ -147,7 +173,7 @@ class FlexicontentModelQfcategoryelement extends JModelList
 
 
 	/**
-	 * Build the where clause
+	 * Method to build the where clause of the query for the records
 	 *
 	 * @access private
 	 * @return string
@@ -156,18 +182,23 @@ class FlexicontentModelQfcategoryelement extends JModelList
 	{
 		$app    = JFactory::getApplication();
 		$user   = JFactory::getUser();
-		$option = JRequest::getVar('option');
-		$view   = JRequest::getVar('view');
 
-		$assocs_id   = JRequest::getInt( 'assocs_id', 0 );
+		$jinput  = $app->input;
+		$option  = $jinput->get('option', '', 'cmd');
+		$view    = $jinput->get('view', '', 'cmd');
+
+		$assocs_id = $jinput->get('assocs_id', 0, 'int');
 
 		if ($assocs_id)
 		{
-			$language    = $app->getUserStateFromRequest( $option.'.'.$view.'.language', 'language', '', 'string' );
+			$item_lang   = $app->getUserStateFromRequest( $option.'.'.$view.'.item_lang', 'item_lang', '', 'string' );
 			$created_by  = $app->getUserStateFromRequest( $option.'.'.$view.'.created_by', 'created_by', 0, 'int' );
 
 			$assocanytrans = $user->authorise('flexicontent.assocanytrans', 'com_flexicontent');
-			if (!$assocanytrans && !$created_by) {
+
+			// Limit to creator if creator not privileged
+			if (!$assocanytrans && !$created_by)
+			{
 				$created_by = $user->id;
 				$app->setUserState( $option.'.'.$view.'.created_by', $created_by );
 			}
@@ -177,11 +208,11 @@ class FlexicontentModelQfcategoryelement extends JModelList
 		$filter_cats   = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_cats',  'filter_cats',  0,  'int' );
 
 		$filter_level  = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_level', 'filter_level', 0,  'int' );
-		$filter_lang   = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_lang',  'filter_lang',  '', 'cmd' );
+		$filter_lang   = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_lang',  'filter_lang',  '', 'string' );
 		$filter_author = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_author','filter_author','', 'cmd' );
-		$filter_access = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_access','filter_access','', 'string' );
+		$filter_access = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_access','filter_access','', 'int' );
 
-		$filter_lang   = $assocs_id && $language   ? $language   : $filter_lang;
+		$filter_lang   = $assocs_id && $item_lang  ? $item_lang  : $filter_lang;
 		$filter_author = $assocs_id && $created_by ? $created_by : $filter_author;
 
 		$search = $app->getUserStateFromRequest( $option.'.'.$view.'.search', 'search', '', 'string' );
@@ -194,12 +225,12 @@ class FlexicontentModelQfcategoryelement extends JModelList
 		if (is_numeric($filter_state)) {
 			$where[] = 'c.published = ' . (int) $filter_state;
 		}
-		elseif ( $filter_state === '') {
+		/*elseif ( $filter_state === '') {
 			$where[] = 'c.published IN (0, 1)';
-		}
+		}*/
 
-		// Filter by access level
-		if ( strlen($filter_access) ) {
+		// Filter by Access level
+		if ($filter_access) {
 			$where[] = 'c.access = '.(int) $filter_access;
 		}
 
@@ -256,9 +287,10 @@ class FlexicontentModelQfcategoryelement extends JModelList
 	}
 
 
-	// ***********************************
-	// *** MODEL SPECIFIC HELPER FUNCTIONS
-	// ***********************************
+	/**
+	 * MODEL SPECIFIC HELPER FUNCTIONS
+	 */
+
 
 	/**
 	 * Method to get author list for filtering
@@ -279,4 +311,34 @@ class FlexicontentModelQfcategoryelement extends JModelList
 		return $this->_db->loadObjectList();
 	}
 
+
+	/**
+	 * Method to get item (language) associations
+	 *
+	 * @param		int			The id of the item
+	 *
+	 * @return	array		The array of associations
+	 */
+	function getLangAssocs()
+	{
+		// If items array is empty, just return empty array
+		if (empty($this->_data))
+		{
+			return array();
+		}
+
+		// Get associated translations
+		elseif ($this->_translations === null)
+		{
+			$ids = array();
+			foreach ($this->_data as $item)
+			{
+				$ids[] = $item->id;
+			}
+
+			$this->_translations = flexicontent_db::getLangAssocs($ids);
+		}
+
+		return $this->_translations;
+	}
 }

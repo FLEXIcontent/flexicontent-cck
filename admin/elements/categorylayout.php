@@ -346,7 +346,7 @@ jQuery(document).ready(function() {
 		}
 		return
 			JHtml::_('select.genericlist', $layouts, $fieldname, $attribs, 'value', 'text', $value, $element_id)
-			.@$tip_text.@$tip_text2;
+			. @ $tip_text . @ $tip_text2;
 	}
 	
 	
@@ -366,15 +366,16 @@ jQuery(document).ready(function() {
 		if ( @$attributes['labelclass'] ) {
 			$class .= ' '.$attributes['labelclass'];
 		}
-		$title = "...";
-		if ($this->element['description']) {
-			$title = flexicontent_html::getToolTip($label, $this->element['description'], 1, 1);
-		}
+
+		$title = (string) $this->element['description']
+			? flexicontent_html::getToolTip($label, (string) $this->element['description'], 1, 1)
+			: '...';
+
 		return '<label style=""  class="'.$class.'" title="'.$title.'" >'.JText::_($label).'</label>';
 	}
-	
-	function set($property, $value) {
+
+	function set($property, $value)
+	{
 		$this->$property = $value;
 	}
-	
 }

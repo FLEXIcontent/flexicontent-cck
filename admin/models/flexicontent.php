@@ -5,7 +5,7 @@
  *
  * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
  * @link            http://www.flexicontent.com
- * @copyright       Copyright © 2018, FLEXIcontent team, All Rights Reserved
+ * @copyright       Copyright Â© 2018, FLEXIcontent team, All Rights Reserved
  * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
@@ -1656,6 +1656,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 			'addressint'=>'FLEXIcontent - Address International / Google Maps',
 			'checkbox'=>'FLEXIcontent - Checkbox',
 			'checkboximage'=>'FLEXIcontent - Checkbox Image',
+			'color'=>'FLEXIcontent - Color',
 			'core'=>'FLEXIcontent - Core Fields (Joomla article properties)',
 			'date'=>'FLEXIcontent - Date / Timestamp / Publish Up-Down Dates',
 			'email'=>'FLEXIcontent - Email',
@@ -1724,6 +1725,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 			'plg_flexicontent_fields_addressint',
 			'plg_flexicontent_fields_checkbox',
 			'plg_flexicontent_fields_checkboximage',
+			'plg_flexicontent_fields_color',
 			'plg_flexicontent_fields_core',
 			'plg_flexicontent_fields_date',
 			'plg_flexicontent_fields_email',

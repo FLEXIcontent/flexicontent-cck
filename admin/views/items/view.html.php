@@ -92,7 +92,6 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 		// File id filtering
 		$fileid_to_itemids = $session->get('fileid_to_itemids', array(),'flexicontent');
 		$filter_fileid     = $model->getState('filter_fileid');
-		if ($filter_fileid) $count_filters++;
 
 		// Category filtering
 		$filter_cats        = $model->getState('filter_cats');
@@ -112,9 +111,10 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 			? $filter_order == 'i.ordering'
 			: $filter_order == 'catsordering';
 
+		if ($filter_fileid) $count_filters++;
 		if ($filter_cats && !$reOrderingActive) $count_filters++;
-		if ($filter_subcats!=1 && !$reOrderingActive) $count_filters++;
-		if ($filter_catsinstate!=1) $count_filters++;
+		if ($filter_subcats != 1 && !$reOrderingActive) $count_filters++;
+		if ($filter_catsinstate != 1) $count_filters++;
 		if (strlen($filter_featured)) $count_filters++;
 
 
@@ -193,14 +193,18 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 
 		$js = '';
 
-		if ($filter_cats)   $js .= "jQuery('.col_cats').addClass('filtered_column');";
-		if ($filter_type)   $js .= "jQuery('.col_type').addClass('filtered_column');";
-		if ($filter_author) $js .= "jQuery('.col_authors').addClass('filtered_column');";
-		if ($filter_state)  $js .= "jQuery('.col_status').addClass('filtered_column');";
-		if ($filter_lang)   $js .= "jQuery('.col_lang').addClass('filtered_column');";
-		if ($filter_access) $js .= "jQuery('.col_access').addClass('filtered_column');";
-		if ($filter_tag)    $js .= "jQuery('.col_tag').addClass('filtered_column');";
-		if ($filter_id)     $js .= "jQuery('.col_id').addClass('filtered_column');";
+		if ($filter_state || strlen($filter_featured))
+		{
+			$js .= "jQuery('.col_status').addClass('filtered_column');";
+		}
+		if (strlen($search)) $js .= "jQuery('.col_title').addClass('filtered_column');";
+		if ($filter_cats)    $js .= "jQuery('.col_cats').addClass('filtered_column');";
+		if ($filter_type)    $js .= "jQuery('.col_type').addClass('filtered_column');";
+		if ($filter_author)  $js .= "jQuery('.col_authors').addClass('filtered_column');";
+		if ($filter_lang)    $js .= "jQuery('.col_lang').addClass('filtered_column');";
+		if ($filter_access)  $js .= "jQuery('.col_access').addClass('filtered_column');";
+		if ($filter_tag)     $js .= "jQuery('.col_tag').addClass('filtered_column');";
+		if ($filter_id)      $js .= "jQuery('.col_id').addClass('filtered_column');";
 		if ($startdate || $enddate)
 		{
 			if ($date == 1) {
@@ -209,8 +213,15 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 				$js .= "jQuery('.col_revised').addClass('filtered_column');";
 			}
 		}
-		if (strlen($search)) $js .= "jQuery('.col_title').addClass('filtered_column');";
 
+		if ($js)
+		{
+			$document->addScriptDeclaration('
+				jQuery(document).ready(function(){
+					' . $js . '
+				});
+			');
+		}
 
 		/**
 		 * Create Submenu & Toolbar
@@ -350,14 +361,20 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 			array('value' => 'ORPHAN', 'text' => JText::_('FLEXI_GRP_ORPHAN'))
 		);
 
-		$attribs = 'class="use_select2_lib" multiple="multiple" size="3" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"';
 		$lists['filter_state'] = $this->getFilterDisplay(array(
 			'label' => JText::_('FLEXI_STATE'),
 			'html' => JHtml::_('select.groupedlist', $states, 'filter_state[]',
 				array(
 					'id' => 'filter_state',
 					'group.id' => 'id',
-					'list.attr' => $attribs,
+					'list.attr' => array(
+						'class' => $this->select_class,
+						'multiple' => 'multiple',
+						'size' => '3',
+						'onmouseenter' => 'if (typeof this.oVal == \'undefined\') this.oVal = jQuery(this).val(); this.valChanged = false;',
+						'onchange' => 'this.valChanged = JSON.stringify(this.oVal) !== JSON.stringify(jQuery(this).val()); if (this.valChanged && this != document.activeElement) {document.adminForm.limitstart.value=0; Joomla.submitform();}',
+						'onblur' => 'this.oVal = jQuery(this).val(); if (this.valChanged) {document.adminForm.limitstart.value=0; Joomla.submitform();}',
+					),
 					'list.select' => $filter_state,
 				)
 			),
@@ -366,27 +383,30 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 
 
 		// Build include sub-categories filter
-		$subcats_na = $filter_order_type && $filter_cats && ($filter_order=='i.ordering' || $filter_order=='catsordering');
+		$subcats_na = $filter_order_type && $filter_cats && ($filter_order === 'i.ordering' || $filter_order === 'catsordering');
 
 		$lists['filter_subcats'] = $this->getFilterDisplay(array(
 			'label' => JText::_('FLEXI_SUBCATEGORIES'),
 			'label_extra_class' => ($reOrderingActive ? ' fc-lbl-short' : ''),
 			'html' =>
 				($subcats_na ? '<div style="display:none">' : '') . '
-					<div class="group-fcset">
+					<div class="group-fcset" style="display: inline-block;">
 						<input type="checkbox" id="filter_subcats" name="filter_subcats" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()" value="1" '.($filter_subcats ? ' checked="checked" ' : '').' />
 						<label id="filter_subcats-lbl" for="filter_subcats" style="margin: 0 12px; vertical-align: middle;"></label>
-					</div>
-					'. ($subcats_na ? '<img src="components/com_flexicontent/assets/images/comments.png" style="margin: 4px 0 0 8px;" class="'.$this->tooltip_class.'" title="'.JText::_( 'FLEXI_SUBCATEGORIES_NOT_INCLUDED_DURING_CATORDER', true ).' &lt;br/&gt; &lt;br/&gt; '.JText::_('FLEXI_SUBCATEGORIES_NOT_INCLUDED_DURING_CATORDER_DESC', true).'" />' : '')
-				. ($subcats_na ? '</div>' : ''),
+					</div>'
+				. ($subcats_na ? '</div>' : '')
+				. ($subcats_na ? '<span class="icon-question ' . $this->popover_class . '" style="margin: 0 8px; font-size: 12px;" data-content="'
+					. flexicontent_html::getToolTip('FLEXI_SUBCATEGORIES_NOT_INCLUDED_DURING_CATORDER', 'FLEXI_SUBCATEGORIES_NOT_INCLUDED_DURING_CATORDER_DESC', 1 , 1)
+					. '" ></span>' : ''),
 		));
 
 
 		// Build featured filter
-		$featured_ops = array();
-		$featured_ops[] = JHtml::_('select.option', '', '-');
-		$featured_ops[] = JHtml::_('select.option', '0', JText::_('FLEXI_NO'));
-		$featured_ops[] = JHtml::_('select.option', '1', JText::_('FLEXI_YES'));
+		$featured_ops = array(
+			JHtml::_('select.option', '', '-'),
+			JHtml::_('select.option', '0', JText::_('FLEXI_NO')),
+			JHtml::_('select.option', '1', JText::_('FLEXI_YES')),
+		);
 
 		$lists['filter_featured'] = $this->getFilterDisplay(array(
 			'label' => JText::_('FLEXI_FEATURED'),
@@ -395,7 +415,7 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 				'filter_featured',
 				array(
 					'size' => '1',
-					'class' => 'use_select2_lib fc_skip_highlight',
+					'class' => $this->select_class . ' fc_skip_highlight',
 					'onchange' => 'document.adminForm.limitstart.value=0; Joomla.submitform();',
 				),
 				'value',
@@ -431,7 +451,7 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 				'filter_catsinstate',
 				array(
 					'size' => '1',
-					'class' => 'use_select2_lib' . ($filter_catsinstate != 1 ? '' : ' fc_skip_highlight'),
+					'class' => $this->select_class . ($filter_catsinstate != 1 ? '' : ' fc_skip_highlight'),
 					'onchange' => 'document.adminForm.limitstart.value=0; Joomla.submitform();',
 				),
 				'value',
@@ -458,9 +478,10 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 
 
 		// Build order type selector
-		$order_types = array();
-		$order_types[] = JHtml::_('select.option', '0', JText::_('FLEXI_ORDER_JOOMLA_GLOBAL').' ('.JText::_('FLEXI_ORDER_JOOMLA_GLOBAL_ABOUT').')' );
-		$order_types[] = JHtml::_('select.option', '1', JText::_('FLEXI_ORDER_FC_PER_CATEGORY').' ('.JText::_('FLEXI_ORDER_FC_PER_CATEGORY_ABOUT').')' );
+		$order_types = array(
+			JHtml::_('select.option', '0', JText::_('FLEXI_ORDER_JOOMLA_GLOBAL') . ' (' . JText::_('FLEXI_ORDER_JOOMLA_GLOBAL_ABOUT') . ')'),
+			JHtml::_('select.option', '1', JText::_('FLEXI_ORDER_FC_PER_CATEGORY') . ' (' . JText::_('FLEXI_ORDER_FC_PER_CATEGORY_ABOUT') . ')'),
+		);
 
 		if (!$filter_order_type)
 		{
@@ -476,17 +497,17 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 		//$lists['filter_order_type'] = JHtml::_('select.radiolist', $order_types, 'filter_order_type', 'size="1" class="inputbox" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', 'value', 'text', $filter_order_type );
 		$lists['filter_order_type'] = $this->getFilterDisplay(array(
 			'label' => JText::_('FLEXI_ORDER_TYPE'),
-			'label_extra_class' => 'fc-lbl-inverted fc-lbl-padded icon-info-2 ' . $this->tooltip_class,
+			'label_extra_class' => 'fc-lbl-inverted fc-lbl-short icon-info-2 ' . $this->popover_class,
 			'label_extra_attrs' => array(
 				'data-placement' => 'bottom',
-				'title' => flexicontent_html::getToolTip($_img_title, $_img_title_desc, 0, 1),
+				'data-content' => flexicontent_html::getToolTip($_img_title, $_img_title_desc, 0, 1),
 			),
 			'html' => JHtml::_('select.genericlist',
 				$order_types,
 				'filter_order_type',
 				array(
 					'size' => '1',
-					'class' => 'use_select2_lib fc_skip_highlight',
+					'class' => $this->select_class . ' fc_skip_highlight',
 					'onchange' => 'document.adminForm.limitstart.value=0; Joomla.submitform();',
 				),
 				'value',
@@ -506,9 +527,9 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 				$categories,
 				'filter_cats',
 				$filter_cats,
-				(1 ? '-' : 2),
+				($filter_order !== 'i.ordering' && $filter_order !== 'catsordering' ? '-' : 2),
 				array(
-					'class' => 'use_select2_lib',
+					'class' => $this->select_class,
 					'size' => '1',
 					'onchange' => 'document.adminForm.limitstart.value=0; Joomla.submitform();',
 				),
@@ -527,10 +548,12 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 				$filter_type,
 				0,
 				array(
-					'class' => 'use_select2_lib',
+					'class' => $this->select_class,
 					'multiple' => 'multiple',
 					'size' => '3',
-					'onchange' => 'document.adminForm.limitstart.value=0; Joomla.submitform();',
+					'onmouseenter' => 'if (typeof this.oVal == \'undefined\') this.oVal = jQuery(this).val(); this.valChanged = false;',
+					'onchange' => 'this.valChanged = JSON.stringify(this.oVal) !== JSON.stringify(jQuery(this).val()); if (this.valChanged && this != document.activeElement) {document.adminForm.limitstart.value=0; Joomla.submitform();}',
+					'onblur' => 'this.oVal = jQuery(this).val(); if (this.valChanged) {document.adminForm.limitstart.value=0; Joomla.submitform();}',
 				),
 				'filter_type'
 			),
@@ -546,10 +569,12 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 				$selected = $filter_author,
 				$displaytype = 0,
 				array(
-					'class' => 'use_select2_lib',
+					'class' => $this->select_class,
 					'multiple' => 'multiple',
 					'size' => '3',
-					'onchange' => 'document.adminForm.limitstart.value=0; Joomla.submitform();',
+					'onmouseenter' => 'if (typeof this.oVal == \'undefined\') this.oVal = jQuery(this).val(); this.valChanged = false;',
+					'onchange' => 'this.valChanged = JSON.stringify(this.oVal) !== JSON.stringify(jQuery(this).val()); if (this.valChanged && this != document.activeElement) {document.adminForm.limitstart.value=0; Joomla.submitform();}',
+					'onblur' => 'this.oVal = jQuery(this).val(); if (this.valChanged) {document.adminForm.limitstart.value=0; Joomla.submitform();}',
 				)
 			),
 		));
@@ -558,26 +583,31 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 
 
 		// Build text search scope 
-		$scopes = array();
-		$scopes[1] = JText::_('FLEXI_TITLE');
-		$scopes[2] = JText::_('FLEXI_DESCRIPTION');
-		$scopes[4] = JText::_('FLEXI_FIELDS_IN_BASIC_SEARCH_INDEX');
-		$_scopes = array();
+		$scopes = array(
+			1 => JText::_('FLEXI_TITLE'),
+			2 => JText::_('FLEXI_DESCRIPTION'),
+			4 => JText::_('FLEXI_FIELDS_IN_BASIC_SEARCH_INDEX'),
+		);
+
 		$this->scope_title = $scopes[$scope];
+		$options = array();
 
 		foreach ($scopes as $i => $v)
 		{
-			$_scopes[] = JHtml::_('select.option', $i, $v);
+			$options[] = JHtml::_('select.option', $i, $v);
 		}
-		//$lists['scope'] = JHtml::_('select.radiolist', $_scopes, 'scope', 'size="1" class="inputbox"', 'value', 'text', $scope );
-		$lists['scope_tip'] = '<span class="' . $this->tooltip_class . '" title="'.JText::_('FLEXI_SEARCH_TEXT_INSIDE').'" style="display: inline-block;"><i class="icon-info-2"></i></span>';
+
+		array_unshift($options, JHtml::_('select.option', 0, JText::_('FLEXI_SEARCH_TEXT_INSIDE'), 'value', 'text', 'disabled'));
+
+		$lists['scope_tip'] = ''; //'<span class="hidden-phone ' . $this->tooltip_class . '" title="'.JText::_('FLEXI_SEARCH_TEXT_INSIDE').'" style="display: inline-block;"><i class="icon-info-2"></i></span>';
 		$lists['scope'] = JHtml::_('select.genericlist',
-			$_scopes,
+			$options,
 			'scope',
 			array(
 				'size' => '1',
-				'class' => $this->select_class . ' fc_skip_highlight fc_is_selarrow',
-				'onchange' => 'jQuery(\'#search\').attr(\'placeholder\', jQuery(this).find(\'option:selected\').text());',
+				'class' => $this->select_class . ' fc_skip_highlight fc_is_selarrow ' . $this->tooltip_class,
+				'onchange' => 'jQuery(\'#search\').attr(\'placeholder\', jQuery(this).find(\'option:selected\').text()); jQuery(this).blur();',
+				'title' => JText::_('FLEXI_SEARCH_TEXT_INSIDE'),
 			),
 			'value',
 			'text',
@@ -594,21 +624,8 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 		}*/
 
 
-		// Build date filter scope
-		$dates[1] = JText::_( 'FLEXI_CREATED' );
-		$dates[2] = JText::_( 'FLEXI_REVISED' );
-		$dates[3] = JText::_( 'FLEXI_PUBLISH_UP' );
-		$dates[4] = JText::_( 'FLEXI_PUBLISH_DOWN' );
-		$_dates = array();
-
-		foreach ($dates as $i => $v)
-		{
-			$_dates[] = JHtml::_('select.option', $i, $v);
-		}
-
-
 		/**
-		 * Create dates displayed using current user's timezone
+		 * Create note about dates displayed using current user's timezone
 		 */
 
 		$site_zone = $app->getCfg('offset');
@@ -622,16 +639,24 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 
 		$date_note_msg = JText::sprintf(FLEXI_J16GE ? 'FLEXI_DATES_IN_USER_TIMEZONE_NOTE' : 'FLEXI_DATES_IN_SITE_TIMEZONE_NOTE', ' ', $tz_info);
 
-		//$lists['date'] = JHtml::_('select.radiolist', $_dates, 'date', 'size="1" class="inputbox"', 'value', 'text', $date );
+
+		// Build date filter scope
+		$options = array(
+			JHtml::_('select.option', 1, JText::_('FLEXI_CREATED')),
+			JHtml::_('select.option', 2, JText::_('FLEXI_REVISED')),
+			JHtml::_('select.option', 3, JText::_('FLEXI_PUBLISH_UP')),
+			JHtml::_('select.option', 4, JText::_('FLEXI_PUBLISH_DOWN')),
+		);
+
 		$lists['filter_date'] = $this->getFilterDisplay(array(
 			'label' => null, //JText::_('FLEXI_DATE'),
 			'html' => JHtml::_('select.genericlist',
-				$_dates,
+				$options,
 				'date',
 				array(
 					'size' => '1',
 					'style' => 'margin: 0',
-					'class' => 'use_select2_lib fc_skip_highlight',
+					'class' => $this->select_class . ' fc_skip_highlight',
 					'data-placement' => 'top',
 					'title' => flexicontent_html::getToolTip(null, $date_note_msg, 0, 1),
 				),
@@ -644,23 +669,27 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 			. JHtml::_('calendar', $enddate, 'enddate', 'enddate', '%Y-%m-%d', array('class'=>'', 'size'=>'8',  'maxlength'=>'19', 'style'=>'width:auto', 'placeholder'=>JText::_('FLEXI_TO')))
 		));
 
-		/*$lists['date']  = '';
-		foreach ($dates as $i => $v) {
-			$checked = $date == $i ? ' checked="checked" ' : '';
-			$lists['date'] .= '<input type="radio" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()" class="inputbox" '.$checked.' value="'.$i.'" id="date'.$i.'" name="date" />';
-			$lists['date'] .= '<label class="" id="date'.$i.'-lbl" for="date'.$i.'">'.$v.'</label>';
-		}*/
-
 
 		// Build bind-to-type limit
-		$bind_limits = array();
-		$bind_limits[] = JHtml::_('select.option', 250, '250 ' . JText::_( 'FLEXI_ITEMS' ) );
-		$bind_limits[] = JHtml::_('select.option', 500, '500 ' . JText::_( 'FLEXI_ITEMS' ) );
-		$bind_limits[] = JHtml::_('select.option', 750, '750 ' . JText::_( 'FLEXI_ITEMS' ) );
-		$bind_limits[] = JHtml::_('select.option', 1000,'1000 ' . JText::_( 'FLEXI_ITEMS' ) );
-		$bind_limits[] = JHtml::_('select.option', 1500,'1500 ' . JText::_( 'FLEXI_ITEMS' ) );
-		$bind_limits[] = JHtml::_('select.option', 2000,'2000 ' . JText::_( 'FLEXI_ITEMS' ) );
-		$lists['bind_limits'] = JHtml::_('select.genericlist', $bind_limits, 'bind_limit', ' class="use_select2_lib" ', 'value', 'text', $bind_limit, 'bind_limit' );
+		$bind_limits = array(
+			JHtml::_('select.option', 250, '250 ' . JText::_('FLEXI_ITEMS')),
+			JHtml::_('select.option', 500, '500 ' . JText::_('FLEXI_ITEMS')),
+			JHtml::_('select.option', 750, '750 ' . JText::_('FLEXI_ITEMS')),
+			JHtml::_('select.option', 1000,'1000 ' . JText::_('FLEXI_ITEMS')),
+			JHtml::_('select.option', 1500,'1500 ' . JText::_('FLEXI_ITEMS')),
+			JHtml::_('select.option', 2000,'2000 ' . JText::_('FLEXI_ITEMS')),
+		);
+		$lists['bind_limits'] = JHtml::_('select.genericlist',
+			$bind_limits,
+			'bind_limit',
+			array(
+				'class' => $this->select_class,
+			),
+			'value',
+			'text',
+			$bind_limit,
+			'bind_limit'
+		);
 
 
 		// Text search filter value
@@ -678,10 +707,12 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 			'html' => flexicontent_html::buildtagsselect(
 				$name = 'filter_tag[]',
 				array(
-					'class' => 'use_select2_lib',
-					'onchange' => 'document.adminForm.limitstart.value=0; Joomla.submitform();',
+					'class' => $this->select_class,
 					'multiple' => 'multiple',
 					'size' => '3',
+					'onmouseenter' => 'if (typeof this.oVal == \'undefined\') this.oVal = jQuery(this).val(); this.valChanged = false;',
+					'onchange' => 'this.valChanged = JSON.stringify(this.oVal) !== JSON.stringify(jQuery(this).val()); if (this.valChanged && this != document.activeElement) {document.adminForm.limitstart.value=0; Joomla.submitform();}',
+					'onblur' => 'this.oVal = jQuery(this).val(); if (this.valChanged) {document.adminForm.limitstart.value=0; Joomla.submitform();}',
 				),
 				$selected = $filter_tag,
 				$displaytype = 0
@@ -695,10 +726,12 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 			'html' => flexicontent_html::buildlanguageslist(
 				$name = 'filter_lang[]',
 				array(
-					'class' => 'use_select2_lib',
-					'onchange' => 'document.adminForm.limitstart.value=0; Joomla.submitform();',
+					'class' => $this->select_class,
 					'multiple' => 'multiple',
 					'size' => '3',
+					'onmouseenter' => 'if (typeof this.oVal == \'undefined\') this.oVal = jQuery(this).val(); this.valChanged = false;',
+					'onchange' => 'this.valChanged = JSON.stringify(this.oVal) !== JSON.stringify(jQuery(this).val()); if (this.valChanged && this != document.activeElement) {document.adminForm.limitstart.value=0; Joomla.submitform();}',
+					'onblur' => 'this.oVal = jQuery(this).val(); if (this.valChanged) {document.adminForm.limitstart.value=0; Joomla.submitform();}',
 				),
 				$selected = $filter_lang,
 				$displaytype = 1
@@ -708,19 +741,37 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 
 		// Build access level filter
 		$access_levels = JHtml::_('access.assetgroups');
-		/*if ( $cparams->get('iman_viewable_items', 1) )  // only viewable items is enabled, skip the non available levels to avoid user confusion
+
+		// Note 'all items' is already granted to super admins, so no need to check the is-super-admin ('core.admin') separately
+		$allitems       = FlexicontentHelperPerm::getPerm()->DisplayAllItems;
+		$viewable_items = $cparams->get('iman_viewable_items', 1);
+		$editable_items = $cparams->get('iman_editable_items', 0);
+		
+		// If can list only viewable items, then skip the non available levels to avoid user confusion
+		if (!$allitems && $viewable_items)
 		{
 			$_aid_arr = array_flip(JAccess::getAuthorisedViewLevels($user->id));
 			$_levels = array();
 			foreach($access_levels as $i => $level)
 			{
-				if ( isset($_aid_arr[$level->value]) )
+				if (isset($_aid_arr[$level->value]))
+				{
 					$_levels[] = $level;
-				//else $access_levels[$i]->disable = 1;
+				}
+				else
+				{
+					// The alternative is to render the selector having some access levels disabled ...
+					$access_levels[$i]->disable = 1;
+				}
 			}
+
 			$access_levels = $_levels;
-		}*/  // Above code is maybe problematic (e.g. in multi-sites), need to test more
-		//array_unshift($access_levels, JHtml::_('select.option', '', '-'/*'JOPTION_SELECT_ACCESS'*/) );
+		}
+		else
+		{
+			$options = $access_levels;
+		}
+
 		$fieldname = 'filter_access[]';  // make multivalue
 		$elementid = 'filter_access';
 
@@ -730,9 +781,12 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 				$access_levels,
 				$fieldname,
 				array(
-					'class' => 'use_select2_lib',
-					'onchange' => 'document.adminForm.limitstart.value=0; Joomla.submitform();',
+					'class' => $this->select_class,
+					'size' => '3',
 					'multiple' => 'multiple',
+					'onmouseenter' => 'if (typeof this.oVal == \'undefined\') this.oVal = jQuery(this).val(); this.valChanged = false;',
+					'onchange' => 'this.valChanged = JSON.stringify(this.oVal) !== JSON.stringify(jQuery(this).val()); if (this.valChanged && this != document.activeElement) {document.adminForm.limitstart.value=0; Joomla.submitform();}',
+					'onblur' => 'this.oVal = jQuery(this).val(); if (this.valChanged) {document.adminForm.limitstart.value=0; Joomla.submitform();}',
 				),
 				'value',
 				'text',
@@ -765,7 +819,7 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 					'filter_fileid',
 					array(
 						'size' => '1',
-						'class' => 'use_select2_lib' . ($filter_fileid ? '' : ' fc_skip_highlight'),
+						'class' => $this->select_class . ($filter_fileid ? '' : ' fc_skip_highlight'),
 						'onchange' => 'document.adminForm.limitstart.value=0; Joomla.submitform();',
 					),
 					'value',
@@ -802,23 +856,9 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 		$this->unassociated     = $unassociated;
 		$this->badcatitems      = $badcatitems;
 
-		// filters
-		$this->filter_id = $filter_id;
-		$this->filter_state = $filter_state;
-		$this->filter_author = $filter_author;
-		$this->filter_type = $filter_type;
-
-		$this->filter_cats = $filter_cats;
-		$this->filter_subcats = $filter_subcats;
-		$this->filter_catsinstate = $filter_catsinstate;
-
+		// Filters related to ordering
 		$this->filter_order_type = $filter_order_type;
 		$this->filter_order = $filter_order;
-
-		$this->filter_lang = $filter_lang;
-		$this->filter_access = $filter_access;
-		$this->filter_tag = $filter_tag;
-		$this->filter_fileid = $filter_fileid;
 
 		$this->scope = $scope;
 		$this->search = $search;

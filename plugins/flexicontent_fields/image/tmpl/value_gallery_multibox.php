@@ -19,7 +19,7 @@ foreach ($values as $n => $value)
 	if ($result === _FC_CONTINUE_) continue;
 	if ($result === _FC_BREAK_) break;
 
-	$group_str = $group_name ? 'rel="['.$group_name.']"' : '';
+	$group_str = $group_name ? 'data-rel="['.$group_name.']"' : '';
 	$field->{$prop}[] = $pretext.
 		'<a style="'.$style.'" href="'.JUri::root(true).'/'.$srcl.'" id="mb'.$uniqueid.'" class="fc_image_thumb mb field_' . $field->id . '" '.$group_str.' >
 			'.$img_legend.'

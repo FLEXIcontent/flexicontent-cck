@@ -11,24 +11,56 @@
 
 defined('_JEXEC') or die('Restricted access');
 
-jimport('legacy.model.legacy');
+jimport('legacy.model.list');
 use Joomla\String\StringHelper;
+use Joomla\Utilities\ArrayHelper;
+use Joomla\CMS\Table\Table;
+use Joomla\CMS\Table\User;
 
 /**
  * Flexicontent Component Itemelement Model
  *
  */
-class FlexicontentModelItemelement extends JModelLegacy
+class FlexicontentModelItemelement extends JModelList
 {
+	var $records_dbtbl  = 'content';
+	var $records_jtable = 'flexicontent_items';
+
 	/**
-	 * view's rows
+	 * Column names and record name
+	 */
+	var $record_name = 'item';
+	var $state_col   = 'state';
+	var $name_col    = 'title';
+	var $parent_col  = 'catid';
+
+	/**
+	 * (Default) Behaviour Flags
+	 */
+	var $listViaAccess = true;
+	var $copyRelations = false;
+
+	/**
+	 * Search and ordering columns
+	 */
+	var $search_cols       = array('title', 'alias', 'note');
+	var $default_order     = 'i.ordering';
+	var $default_order_dir = 'ASC';
+
+	/**
+	 * List filters that are always applied
+	 */
+	var $hard_filters = array('extension' => FLEXI_CAT_EXTENSION);
+
+	/**
+	 * Record rows
 	 *
 	 * @var array
 	 */
 	var $_data = null;
 
 	/**
-	 * rows total
+	 * Rows total
 	 *
 	 * @var integer
 	 */
@@ -51,7 +83,7 @@ class FlexicontentModelItemelement extends JModelLegacy
 	/**
 	 * Constructor
 	 *
-	 * @since 1.5
+	 * @since 3.3.0
 	 */
 	public function __construct($config = array())
 	{
@@ -62,14 +94,14 @@ class FlexicontentModelItemelement extends JModelLegacy
 		$option = $jinput->get('option', '', 'cmd');
 		$view   = $jinput->get('view', '', 'cmd');
 		$fcform = $jinput->get('fcform', 0, 'int');
-		$p      = $option.'.'.$view.'.';
+		$p      = $option . '.' . $view . '.';
 
 		// Parameters of the view, in our case it is only the component parameters
 		$this->cparams = JComponentHelper::getParams( 'com_flexicontent' );
 
-		// *****************************
-		// Pagination: limit, limitstart
-		// *****************************
+		/**
+		 * Pagination: limit, limitstart
+		 */
 
 		$limit      = $fcform ? $jinput->get('limit', $app->getCfg('list_limit'), 'int')  :  $app->getUserStateFromRequest( $p.'limit', 'limit', $app->getCfg('list_limit'), 'int');
 		$limitstart = $fcform ? $jinput->get('limitstart',                     0, 'int')  :  $app->getUserStateFromRequest( $p.'limitstart', 'limitstart', 0, 'int' );
@@ -258,7 +290,6 @@ class FlexicontentModelItemelement extends JModelLegacy
 	 *
 	 * @access private
 	 * @return string
-	 * @since 1.0
 	 */
 	function _buildContentOrderBy($query = null)
 	{
@@ -279,11 +310,10 @@ class FlexicontentModelItemelement extends JModelLegacy
 
 
 	/**
-	 * Method to build the where clause of the query for the Items
+	 * Method to build the where clause of the query for the records
 	 *
 	 * @access private
 	 * @return string
-	 * @since 1.0
 	 */
 	function _buildContentWhere($query = null)
 	{
@@ -302,13 +332,20 @@ class FlexicontentModelItemelement extends JModelLegacy
 			$item_lang   = $app->getUserStateFromRequest( $option.'.'.$view.'.item_lang', 'item_lang', '', 'string' );
 			$created_by  = $app->getUserStateFromRequest( $option.'.'.$view.'.created_by', 'created_by', 0, 'int' );
 
-			//$type_data = $this->getTypeData( $assocs_id, $type_id );
-
 			$assocanytrans = $user->authorise('flexicontent.assocanytrans', 'com_flexicontent');
+
+			// Limit to creator if creator not privileged
 			if (!$assocanytrans && !$created_by)
 			{
 				$created_by = $user->id;
 				$app->setUserState( $option.'.'.$view.'.created_by', $created_by );
+			}
+
+			// Limit to same type if creator not privileged
+			if (!$assocanytrans && !$type_id)
+			{
+				$this->getTypeData($assocs_id, $type_id);
+				$app->setUserState( $option.'.'.$view.'.type_id', $type_id );
 			}
 		}
 
@@ -328,7 +365,7 @@ class FlexicontentModelItemelement extends JModelLegacy
 		$search = StringHelper::trim( StringHelper::strtolower( $search ) );
 
 		$where = array();
-		if (!FLEXI_J16GE) $where[] = ' sectionid = ' . FLEXI_SECTION;
+		$where[] = "c.extension = '".FLEXI_CAT_EXTENSION."' ";
 
 		// Filter by publications state
 		if (is_numeric($filter_state)) {
@@ -354,7 +391,7 @@ class FlexicontentModelItemelement extends JModelLegacy
 		}
 
 		// Filter by Access level
-		if ( $filter_access ) {
+		if ($filter_access) {
 			$where[] = 'i.access = '.(int) $filter_access;
 		}
 
@@ -378,8 +415,8 @@ class FlexicontentModelItemelement extends JModelLegacy
 			$where[] = 'i.created_by = ' . $filter_author;
 		}
 
-		// Implement View Level Access
-		if (!$user->authorise('core.admin'))
+		// Filter via View Level Access, if user is not super-admin
+		if (!JFactory::getUser()->authorise('core.admin') && ($app->isSite() || $this->listViaAccess))
 		{
 			$groups	= implode(',', JAccess::getAuthorisedViewLevels($user->id));
 			$where[] = 'i.access IN ('.$groups.')';
@@ -417,9 +454,9 @@ class FlexicontentModelItemelement extends JModelLegacy
 	 * @return array
 	 * @since 1.5
 	 */
-	function getTypeslist ( $type_ids=false, $check_perms = false, $published=true )
+	function getTypeslist ($type_ids = false, $check_perms = false, $published = true)
 	{
-		return flexicontent_html::getTypesList( $type_ids, $check_perms, $published);
+		return flexicontent_html::getTypesList($type_ids, $check_perms, $published);
 	}
 
 
@@ -449,7 +486,7 @@ class FlexicontentModelItemelement extends JModelLegacy
 	 * @return array
 	 * @since 1.5
 	 */
-	function getTypeData( $item_id, &$type_id=false )
+	function getTypeData($item_id, &$type_id = false)
 	{
 		if ( !$item_id && !$type_id )  return false;
 
