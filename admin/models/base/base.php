@@ -783,7 +783,7 @@ abstract class FCModelAdmin extends JModelAdmin
 		// Handle a form that has some of its part missing according to configuration
 		$this->handlePartialForm($this->getForm(), $data);
 
-		return parent::validate($data, $group);
+		return parent::validate($form, $data, $group);
 	}
 
 

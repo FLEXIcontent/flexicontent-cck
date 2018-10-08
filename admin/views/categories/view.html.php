@@ -517,7 +517,7 @@ class FlexicontentViewCategories extends FlexicontentViewBaseRecords
 		if (count($btn_arr))
 		{
 			$drop_btn = '
-				<button type="button" class="btn btn-small dropdown-toggle" data-toggle="dropdown">
+				<button type="button" class="' . $this->btn_sm_class . ' dropdown-toggle" data-toggle="dropdown">
 					<span title="'.JText::_('FLEXI_CHANGE_STATE').'" class="icon-menu"></span>
 					'.JText::_('FLEXI_CHANGE_STATE').'
 					<span class="caret"></span>

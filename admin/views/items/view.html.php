@@ -527,7 +527,7 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 				$categories,
 				'filter_cats',
 				$filter_cats,
-				($filter_order !== 'i.ordering' && $filter_order !== 'catsordering' ? '-' : 2),
+				($filter_order !== 'i.ordering' && $filter_order !== 'catsordering' ? '-' : 0),
 				array(
 					'class' => $this->select_class,
 					'size' => '1',

@@ -136,18 +136,26 @@ class FlexicontentModelItems extends FCModelAdminList
 		 * View's Filters
 		 */
 
+		global $globalcats;
+
 		// Category filtering
 		$filter_cats        = $fcform ? $jinput->get('filter_cats',        '', 'int')  :  $app->getUserStateFromRequest( $p.'filter_cats',        'filter_cats',       '',  'int' );
 		$filter_subcats     = $fcform ? $jinput->get('filter_subcats',     0,  'int')  :  $app->getUserStateFromRequest( $p.'filter_subcats',     'filter_subcats',     1,  'int' );
 		$filter_catsinstate = $fcform ? $jinput->get('filter_catsinstate', 1,  'int')  :  $app->getUserStateFromRequest( $p.'filter_catsinstate', 'filter_catsinstate', 1,  'int' );
 
-		if ($this->getState('filter_order_type') && $filter_cats && ($this->getState('filter_order') === 'i.ordering' || $this->getState('filter_order') === 'catsordering'))
+		if ($this->getState('filter_order') === 'i.ordering' || $this->getState('filter_order') === 'catsordering')
 		{
-			$jinput->set( 'filter_subcats',	0 );
-			$filter_subcats = 0;
+			if (!$filter_cats)
+			{
+				$cat = reset($globalcats);
+				$filter_cats = $cat->id;
+			}
+			if ($this->getState('filter_order_type') && $filter_cats)
+			{
+				$jinput->set( 'filter_subcats',	0 );
+				$filter_subcats = 0;
+			}
 		}
-
-		global $globalcats;
 
 		if ($filter_cats && !isset($globalcats[$filter_cats]))
 		{

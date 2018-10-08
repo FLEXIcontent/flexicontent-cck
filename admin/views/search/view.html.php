@@ -403,7 +403,7 @@ class FLEXIcontentViewSearch extends FlexicontentViewBaseRecords
 		if (count($btn_arr))
 		{
 			$drop_btn = '
-				<button type="button" class="btn btn-small btn-primary dropdown-toggle" data-toggle="dropdown">
+				<button type="button" class="' . $this->btn_sm_class . ' btn-primary dropdown-toggle" data-toggle="dropdown">
 					<span title="'.JText::_('FLEXI_SEARCH_INDEXES').'" class="icon-menu"></span>
 					'.JText::_('FLEXI_SEARCH_INDEXES').'
 					<span class="caret"></span>
