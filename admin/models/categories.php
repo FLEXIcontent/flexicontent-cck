@@ -28,13 +28,30 @@ class FlexicontentModelCategories extends FCModelAdminList
 
 	use FCModelTraitNestableRecord;
 
-	var $records_dbtbl  = 'categories';
+	/**
+	 * Record name
+	 *
+	 * @var string
+	 */
+	var $record_name = 'category';
+
+	/**
+	 * Record database table
+	 *
+	 * @var string
+	 */
+	var $records_dbtbl = 'categories';
+
+	/**
+	 * Record jtable name
+	 *
+	 * @var string
+	 */
 	var $records_jtable = 'flexicontent_categories';
 
 	/**
-	 * Column names and record name
+	 * Column names
 	 */
-	var $record_name = 'category';
 	var $state_col   = 'published';
 	var $name_col    = 'title';
 	var $parent_col  = 'parent_id';
@@ -328,22 +345,23 @@ class FlexicontentModelCategories extends FCModelAdminList
 	/**
 	 * Method to get parameters of parent categories
 	 *
-	 * @access public
-	 * @return	string
-	 * @since	1.6
+	 * @param   integer  $pk  The category id
+	 * @return	string   An array of JSON strings
+	 *
+	 * @since	3.3.0
 	 */
-	public function getParentParams($cid)
+	public function getParentParams($pk)
 	{
-		if (empty($cid))
+		if (empty($pk))
 		{
 			return array();
 		}
 
 		global $globalcats;
 
-		$query = ' SELECT id, params'
+		$query = 'SELECT id, params'
 			. ' FROM #__categories'
-			. ' WHERE id IN (' . $globalcats[$cid]->ancestors . ')'
+			. ' WHERE id IN (' . $globalcats[$pk]->ancestors . ')'
 			. ' ORDER BY level ASC'
 		;
 		return $this->_db->setQuery($query)->loadObjectList('id');

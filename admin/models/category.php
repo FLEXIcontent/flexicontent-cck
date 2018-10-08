@@ -24,6 +24,7 @@ require_once('base/traitnestable.php');
  */
 class FlexicontentModelCategory extends FCModelAdmin
 {
+
 	use FCModelTraitNestableRecord;
 
 	/**
@@ -920,11 +921,11 @@ class FlexicontentModelCategory extends FCModelAdmin
 	 * Method to get parameters of parent categories
 	 *
 	 * @param   integer  $pk  The category id
-	 * @return	string   An arrar of JSON strings
+	 * @return	string   An array of JSON strings
 	 *
 	 * @since	3.3.0
 	 */
-	protected function getParentParams($pk)
+	public function getParentParams($pk)
 	{
 		if (empty($pk))
 		{
@@ -932,14 +933,12 @@ class FlexicontentModelCategory extends FCModelAdmin
 		}
 
 		global $globalcats;
-		$db = JFactory::getDbo();
 
-		// Select the required fields from the table.
-		$query = ' SELECT id, params '
-			. ' FROM #__categories '
-			. ' WHERE id IN (' . $globalcats[$pk]->ancestors . ') '
-			. ' ORDER BY level ASC '
-			;
-		return $db->setQuery($query)->loadObjectList('id');
+		$query = 'SELECT id, params'
+			. ' FROM #__categories'
+			. ' WHERE id IN (' . $globalcats[$pk]->ancestors . ')'
+			. ' ORDER BY level ASC'
+		;
+		return $this->_db->setQuery($query)->loadObjectList('id');
 	}
 }

@@ -284,8 +284,12 @@ class FlexicontentController extends JControllerAdmin
 	 */
 	public function display($cachable = false, $urlparams = false)
 	{
-		return get_parent_class(get_parent_class(get_class()))::display($cachable, $urlparams);
-		//return get_parent_class('JControllerAdmin')::display($cachable, $urlparams);
+		/**
+		 * Alternative way to get clasname could be: get_parent_class('JControllerAdmin')
+		 * Also for PHP < 7.0 we need class name inside a string variable
+		 */
+		$class = get_parent_class(get_parent_class(get_class()));
+		return $class::display($cachable, $urlparams);
 	}
 
 
