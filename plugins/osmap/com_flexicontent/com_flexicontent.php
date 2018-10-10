@@ -210,7 +210,7 @@ class osmap_com_flexicontent
 						$cids = explode(',', $cids);
 					}
 
-					ArrayHelper::toInteger($cids);
+					JArrayHelper::toInteger($cids);
 
 					foreach ($cids as $cid)
 					{

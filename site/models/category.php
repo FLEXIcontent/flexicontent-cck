@@ -234,7 +234,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 					$_cids = explode(',', $_cids);
 				}
 
-				ArrayHelper::toInteger($_cids);
+				JArrayHelper::toInteger($_cids);
 				$this->_ids = $_cids;
 
 				// Clear category id, it is not used by this layout
@@ -1370,7 +1370,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 				$_cids = explode(',', $_cids);
 			}
 
-			ArrayHelper::toInteger($_cids);
+			JArrayHelper::toInteger($_cids);
 
 			$this->_params->set('txt_ac_cid', 'NA');
 			$this->_params->set('txt_ac_cids', $_cids);
@@ -2521,7 +2521,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 				break;
 
 			case 'tags':
-				ArrayHelper::toInteger($values);  // Sanitize filter values as integers
+				JArrayHelper::toInteger($values);  // Sanitize filter values as integers
 				$query  = 'SELECT itemid'
 						. ' FROM #__flexicontent_tags_item_relations'
 						. ' WHERE tid IN ('. implode(",", $values) .')';  // no db quoting needed since these were typecasted to ints

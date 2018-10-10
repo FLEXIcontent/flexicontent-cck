@@ -5161,7 +5161,7 @@ class flexicontent_html
 				$cids = explode(',', $cids);
 			}
 
-			ArrayHelper::toInteger($cids);
+			JArrayHelper::toInteger($cids);
 			$layout_vars['cids'] = implode(',' , $cids);
 		}
 

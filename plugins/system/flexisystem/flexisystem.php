@@ -1078,7 +1078,7 @@ class plgSystemFlexisystem extends JPlugin
 					$catids = !is_array($cids)
 						? preg_split("/[\s]*,[\s]*/", $cids)
 						: $cids;
-					ArrayHelper::toInteger($catids, array());
+					JArrayHelper::toInteger($catids, array());
 
 					$css[] = 'mcats-' . implode(' mcats-', $catids);
 				}
