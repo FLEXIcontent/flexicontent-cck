@@ -1915,7 +1915,7 @@ class FlexicontentController extends JControllerLegacy
 
 		$name = $this->input->get('name', null, 'string');
 		$cid  = $this->input->get('id', array(0), 'array');
-		ArrayHelper::toInteger($cid, array(0));
+		$cid  = ArrayHelper::toInteger($cid, array(0));
 		$cid  = (int) $cid[0];
 
 		// Check if tag exists (id exists or name exists)
@@ -1997,7 +1997,7 @@ class FlexicontentController extends JControllerLegacy
 		$user  = JFactory::getUser();
 
 		$cid = $this->input->get('id', array(), 'array');
-		ArrayHelper::toInteger($cid, array());
+		$cid = ArrayHelper::toInteger($cid);
 
 		require_once(JPATH_ROOT.DS."administrator".DS."components".DS."com_flexicontent".DS."models".DS."items.php");
 		$model = new FlexicontentModelItems;
@@ -3367,7 +3367,7 @@ class FlexicontentController extends JControllerLegacy
 	{
 		$db = JFactory::getDbo();
 
-		ArrayHelper::toInteger($cid);
+		$cid = ArrayHelper::toInteger($cid);
 		$cols_list = implode(',', array_filter($cols, array($db, 'quoteName')));
 
 		$query = $db->getQuery(true)

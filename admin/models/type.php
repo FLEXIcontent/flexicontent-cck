@@ -118,6 +118,16 @@ class FlexicontentModelType extends FCModelAdmin
 	var $hard_filters = array();
 
 	/**
+	 * Array of supported state conditions of the record
+	 *  Set to non-empty string to use a custom title text for the condition
+	 *  Use empty to use default and optimize HTML / JS
+	 */
+	var $supported_conditions = array(
+		0 => 'FLEXI_DISABLED',
+		1 => 'FLEXI_ENABLED',
+	);
+
+	/**
 	 * Groups of Fields that can be partially present in the form
 	 */
 	var $mergeableGroups = array('attribs');

@@ -725,7 +725,7 @@ class ParentClassItem extends FCModelAdmin
 					{
 						$item->associations[$tag] = $association->id;
 					}
-					ArrayHelper::toInteger($item->associations);
+					$item->associations = ArrayHelper::toInteger($item->associations);
 				}
 			}
 
@@ -3888,7 +3888,7 @@ class ParentClassItem extends FCModelAdmin
 			$cids = array($this->_id);
 		}
 
-		ArrayHelper::toInteger($cids);
+		$cids = ArrayHelper::toInteger($cids);
 
 		if (!$cids)
 		{
@@ -5025,7 +5025,7 @@ class ParentClassItem extends FCModelAdmin
 	{
 		$db  = $this->_db;
 		$pks = (array) $pks;
-		ArrayHelper::toInteger($pks);
+		$pks = ArrayHelper::toInteger($pks);
 
 		if (count($pks))
 		{
@@ -5182,8 +5182,8 @@ class ParentClassItem extends FCModelAdmin
 			: array();
 
 		// Force arrays of integers
-		ArrayHelper::toInteger($cats);
-		ArrayHelper::toInteger($featured_cats);
+		$cats = ArrayHelper::toInteger($cats);
+		$featured_cats = ArrayHelper::toInteger($featured_cats);
 
 		// Auto-assign a not set main category, to be the first out of secondary categories,
 		if ( empty($data['catid']) && !empty($cats[0]) )
@@ -5278,7 +5278,7 @@ class ParentClassItem extends FCModelAdmin
 
 
 		// Make tags unique
-		ArrayHelper::toInteger($tags);
+		$tags = ArrayHelper::toInteger($tags);
 		$tags = array_keys(array_flip($tags));
 
 		// Set tags back using itsreal name of field: 'tags'       INSTEAD OF 'tag'

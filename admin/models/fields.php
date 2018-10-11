@@ -24,13 +24,30 @@ require_once('base/baselist.php');
 class FlexicontentModelFields extends FCModelAdminList
 {
 
+	/**
+	 * Record name
+	 *
+	 * @var string
+	 */
+	var $record_name    = 'field';
+
+	/**
+	 * Record database table
+	 *
+	 * @var string
+	 */
 	var $records_dbtbl  = 'flexicontent_fields';
+
+	/**
+	 * Record jtable name
+	 *
+	 * @var string
+	 */
 	var $records_jtable = 'flexicontent_fields';
 
 	/**
-	 * Column names and record name
+	 * Column names
 	 */
-	var $record_name    = 'field';
 	var $state_col      = 'published';
 	var $name_col       = 'name';
 	var $parent_col     = null;
@@ -48,6 +65,11 @@ class FlexicontentModelFields extends FCModelAdminList
 	var $search_cols       = array('name', 'label');
 	var $default_order     = 'a.ordering';
 	var $default_order_dir = 'ASC';
+
+	/**
+	 * List filters that are always applied
+	 */
+	var $hard_filters = array();
 
 	/**
 	 * Record rows
@@ -679,8 +701,9 @@ class FlexicontentModelFields extends FCModelAdminList
 			}
 
 			$table->id    = 0;
-			$table->$name = $this->record_name . ($this->_getLastId() + 1);
 			$table->label = $table->label . ' [copy]';
+			$table->$name = $this->record_name . ($this->_getLastId() + 1);
+
 			$table->check();
 			$table->store();
 
@@ -738,7 +761,7 @@ class FlexicontentModelFields extends FCModelAdminList
 	 */
 	public function filterByPermission($cid, $rule)
 	{
-		ArrayHelper::toInteger($cid);
+		$cid = ArrayHelper::toInteger($cid);
 
 		// If cannot manage then all records are not changeable
 		if (!$this->canManage)
@@ -777,7 +800,7 @@ class FlexicontentModelFields extends FCModelAdminList
 	 */
 	public function filterByAssignments($cid = array(), $tostate = -2)
 	{
-		ArrayHelper::toInteger($cid);
+		$cid = ArrayHelper::toInteger($cid);
 		$cid_wassocs = array();
 
 		switch ($tostate)
@@ -924,7 +947,7 @@ class FlexicontentModelFields extends FCModelAdminList
 	 */
 	function filterByCoreTypes($cid = array())
 	{
-		ArrayHelper::toInteger($cid);
+		$cid = ArrayHelper::toInteger($cid);
 
 		$query = 'SELECT id '
 			. ' FROM #__flexicontent_fields'

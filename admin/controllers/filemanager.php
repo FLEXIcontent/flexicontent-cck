@@ -991,7 +991,8 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 
 		if ($file_mode != 'folder_mode')
 		{
-			ArrayHelper::toInteger($cid, array()); // These are file ids, for DB-mode
+			// These are file ids, for DB-mode
+			$cid = ArrayHelper::toInteger($cid);
 		}
 
 		if (!is_array($cid) || count($cid) < 1)
@@ -1185,7 +1186,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 		}
 
 		$cid = $this->input->get('cid', array(), 'array');
-		ArrayHelper::toInteger($cid, array());
+		$cid = ArrayHelper::toInteger($cid);
 
 		if (!is_array($cid) || count($cid) < 1)
 		{
@@ -1558,7 +1559,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 		$model = $this->getModel('filemanager');
 
 		$cid   = $this->input->get('cid', array(), 'array');
-		ArrayHelper::toInteger($cid);
+		$cid = ArrayHelper::toInteger($cid);
 
 		// Check at least one item was selected
 		if (!count($cid))
@@ -1588,7 +1589,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 		}
 
 		$accesses = $this->input->get('access', array(), 'array');
-		ArrayHelper::toInteger($accesses);
+		$accesses = ArrayHelper::toInteger($accesses);
 		$access = $accesses[$file_id];
 
 		if (!$model->saveaccess($file_id, $access))

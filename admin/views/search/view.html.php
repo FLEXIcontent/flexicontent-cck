@@ -216,8 +216,8 @@ class FLEXIcontentViewSearch extends FlexicontentViewBaseRecords
 		//publish unpublished filter
 		$ffstates = array();
 		$ffstates[] = JHtml::_('select.option',  '', '-' /*JText::_( 'FLEXI_SELECT_STATE' )*/ );
-		$ffstates[] = JHtml::_('select.option',  'P', JText::_( 'FLEXI_PUBLISHED' ) );
-		$ffstates[] = JHtml::_('select.option',  'U', JText::_( 'FLEXI_UNPUBLISHED' ) );
+		$ffstates[] = JHtml::_('select.option',  'ALL_P', JText::_('FLEXI_GRP_PUBLISHED') . ' ' . JText::_('FLEXI_STATE_S'));
+		$ffstates[] = JHtml::_('select.option',  'ALL_U', JText::_('FLEXI_GRP_UNPUBLISHED') . ' ' . JText::_('FLEXI_STATE_S'));
 
 		$lists['filter_state'] = ($filter_state || 1 ? '<div class="add-on">'.JText::_('FLEXI_STATE').'</div>' : '').
 			JHtml::_('select.genericlist', $ffstates, 'filter_state', 'class="use_select2_lib" size="1" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', 'value', 'text', $filter_state );

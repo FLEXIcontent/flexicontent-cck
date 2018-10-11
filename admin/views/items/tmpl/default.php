@@ -15,15 +15,16 @@ use Joomla\String\StringHelper;
 JHtml::addIncludePath(JPATH_COMPONENT . '/helpers/html');
 
 global $globalcats;
-$app     = JFactory::getApplication();
-$jinput  = $app->input;
-$config  = JFactory::getConfig();
-$user    = JFactory::getUser();
-$cparams = JComponentHelper::getParams('com_flexicontent');
-$ctrl    = 'items.';
-$hlpname = 'fcitems';
-$isAdmin = $app->isAdmin();
-$canOrder= $this->perms->CanOrder;
+$app      = JFactory::getApplication();
+$jinput   = $app->input;
+$config   = JFactory::getConfig();
+$user     = JFactory::getUser();
+$session  = JFactory::getSession();
+$document = JFactory::getDocument();
+$cparams  = JComponentHelper::getParams('com_flexicontent');
+$ctrl     = 'items.';
+$hlpname  = 'fcitems';
+$isAdmin  = $app->isAdmin();
 
 $items_task = 'task=items.';
 $cats_task  = 'task=category.';
@@ -76,6 +77,7 @@ $featimg = JHtml::image ( 'administrator/components/com_flexicontent/assets/imag
  * Order stuff and table related variables
  */
 
+$canOrder= $this->perms->CanOrder;
 $list_total_cols = 18;
 
 if ($useAssocs)
@@ -200,19 +202,25 @@ function submitform(pressbutton)
 	form.submit();
 }
 
-// delete active filter
+// Delete a specific list filter
 function delFilter(name)
 {
 	//if(window.console) window.console.log('Clearing filter:'+name);
 	var myForm = jQuery('#adminForm');
 	var filter = jQuery('#'+name);
-	if (filter.attr('type')=='checkbox')
+
+	if (!filter.length)
+	{
+		return;
+	}
+	else if (filter.attr('type') == 'checkbox')
 	{
 		filter.checked = '';
 	}
 	else
 	{
 		filter.val('');
+
 		// Case that input has Calendar JS attached
 		if (filter.attr('data-alt-value'))
 		{

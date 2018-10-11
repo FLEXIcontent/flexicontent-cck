@@ -339,7 +339,7 @@ class FlexicontentModelReview extends FCModelAdmin
 	public function approved($cid = array(), $value = 0, $cleanCache = true)
 	{
 		$cid = (array) $cid;
-		ArrayHelper::toInteger($cid);
+		$cid = ArrayHelper::toInteger($cid);
 		$affected = 0;
 
 		if (count($cid))

@@ -29,13 +29,30 @@ abstract class FCModelAdminList extends JModelList
 	use FCModelTraitBase;
 	use FCModelTraitLegacyList;
 
+	/**
+	 * Record name
+	 *
+	 * @var string
+	 */
+	var $record_name    = 'record';
+
+	/**
+	 * Record database table
+	 *
+	 * @var string
+	 */
 	var $records_dbtbl  = 'flexicontent_records';
+
+	/**
+	 * Record jtable name
+	 *
+	 * @var string
+	 */
 	var $records_jtable = 'flexicontent_records';
 
 	/**
-	 * Column names and record name
+	 * Column names
 	 */
-	var $record_name    = 'record';
 	var $state_col      = 'published';
 	var $name_col       = 'title';
 	var $parent_col     = null;
@@ -517,7 +534,7 @@ abstract class FCModelAdminList extends JModelList
 	 */
 	public function changestate($cid, $state = 1)
 	{
-		ArrayHelper::toInteger($cid);
+		$cid = ArrayHelper::toInteger($cid);
 
 		// Verify that records ACL has been checked
 		$ids = array();
@@ -534,7 +551,7 @@ abstract class FCModelAdminList extends JModelList
 		{
 			$user = JFactory::getUser();
 
-			ArrayHelper::toInteger($ids);
+			$ids = ArrayHelper::toInteger($ids);
 			$cid_list = implode(',', $ids);
 
 			$query = $this->_db->getQuery(true)
@@ -623,8 +640,8 @@ abstract class FCModelAdminList extends JModelList
 	 * This will also mark ACL changeable records into model, this is required by changestate to have an effect
 	 *
 	 * @param		array			$cid          array of record ids to check
-	 * @param		array			$cid_noauth   (variable by reference) to return an array of non-authorized record ids
-	 * @param		array			$cid_wassocs  (variable by reference) to return an array of 'locked' record ids
+	 * @param		array			$cid_noauth   (variable by reference), pass authorizing -ignored- IDs and return an array of non-authorized record ids
+	 * @param		array			$cid_wassocs  (variable by reference), pass assignments -ignored- IDs and return an array of 'locked' record ids
 	 *
 	 * @return	boolean	  True when at least 1 publishable record found
 	 *
@@ -632,9 +649,13 @@ abstract class FCModelAdminList extends JModelList
 	 */
 	public function canchangestate(& $cid, & $cid_noauth = null, & $cid_wassocs = null, $tostate = 0)
 	{
+		$authorizing_ignored = $cid_noauth ? array_flip($cid_noauth) : array();
+		$assignments_ignored = $cid_wassocs ? array_flip($cid_wassocs) : array();
+
 		$cid_noauth  = array();
 		$cid_wassocs = array();
 
+		// Add children records
 		if (in_array('FCModelTraitNestableRecord', class_uses($this)))
 		{
 			// If publishing then add all parents to the list, so that they get published too
@@ -659,8 +680,24 @@ abstract class FCModelAdminList extends JModelList
 		// Find ACL disallowed
 		$cid_noauth = $this->filterByPermission($cid, $tostate == -2 ? 'core.delete' : 'core.edit.state');
 
+		foreach ($cid_noauth as $i => $id)
+		{
+			if (isset($authorizing_ignored[$id]))
+			{
+				unset($cid_noauth[$i]);
+			}
+		}
+
 		// Find having blocking assignments (if applicable for this record type)
 		$cid_wassocs = $this->filterByAssignments($cid, $tostate);
+
+		foreach ($cid_wassocs as $i => $id)
+		{
+			if (isset($assignments_ignored[$id]))
+			{
+				unset($cid_wassocs[$i]);
+			}
+		}
 
 		return !count($cid_noauth) && !count($cid_wassocs);
 	}
@@ -677,7 +714,7 @@ abstract class FCModelAdminList extends JModelList
 	 */
 	public function delete($cid)
 	{
-		ArrayHelper::toInteger($cid);
+		$cid = ArrayHelper::toInteger($cid);
 
 		// Verify that records ACL has been checked
 		$ids = array();
@@ -692,7 +729,7 @@ abstract class FCModelAdminList extends JModelList
 
 		if (count($ids))
 		{
-			ArrayHelper::toInteger($ids);
+			$ids = ArrayHelper::toInteger($ids);
 			$cid_list = implode(',', $ids);
 
 			// Delete records themselves
@@ -743,11 +780,13 @@ abstract class FCModelAdminList extends JModelList
 
 		foreach ($cid as $id)
 		{
-			$table        = $this->getTable($this->records_jtable, '');
+			$table = $this->getTable($this->records_jtable, '');
 			$table->load($id);
+
 			$table->id    = 0;
 			$table->$name = $table->$name . ' [copy]';
 			$table->alias = JFilterOutput::stringURLSafe($table->$name);
+
 			$table->check();
 			$table->store();
 
@@ -834,7 +873,7 @@ abstract class FCModelAdminList extends JModelList
 	 */
 	public function filterByPermission($cid, $rule)
 	{
-		ArrayHelper::toInteger($cid);
+		$cid = ArrayHelper::toInteger($cid);
 
 		// If cannot manage then all records are not changeable
 		if (!$this->canManage)
@@ -862,7 +901,7 @@ abstract class FCModelAdminList extends JModelList
 	 */
 	public function filterByAssignments($cid = array(), $tostate = -2)
 	{
-		ArrayHelper::toInteger($cid);
+		$cid = ArrayHelper::toInteger($cid);
 		$cid_wassocs = array();
 
 		switch ($tostate)
@@ -904,7 +943,7 @@ abstract class FCModelAdminList extends JModelList
 
 		if (!$filter_order)
 		{
-			$filter_order     = $default_order;
+			$filter_order = $default_order;
 		}
 
 		if (!$filter_order_Dir)

@@ -108,7 +108,7 @@ class FlexicontentControllerCategories extends FlexicontentControllerBaseAdmin
 		$copyid	= $this->input->getInt('copycid', 0);
 		$destid	= $this->input->get('destcid', array(), 'array');
 
-		ArrayHelper::toInteger($destid);
+		$destid = ArrayHelper::toInteger($destid);
 
 		$user = JFactory::getUser();
 		$model = $this->getModel('category');

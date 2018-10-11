@@ -37,7 +37,7 @@ trait FCModelTraitNestableRecord
 		// Initialize variables
 		$return = true;
 
-		ArrayHelper::toInteger($cid);
+		$cid = ArrayHelper::toInteger($cid);
 
 		$id_col = $type === 'children' ? 'id' : $this->parent_col;
 		$source = $type === 'children' ? $this->parent_col : 'id';

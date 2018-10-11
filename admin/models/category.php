@@ -554,7 +554,7 @@ class FlexicontentModelCategory extends FCModelAdmin
 					$item->associations = FLEXI_J40GE
 						? CategoriesHelper::getAssociations($item->id, $item->extension)
 						: \CategoriesHelper::getAssociations($item->id, $item->extension);
-					ArrayHelper::toInteger($item->associations);
+					$item->associations = ArrayHelper::toInteger($item->associations);
 				}
 				else
 				{

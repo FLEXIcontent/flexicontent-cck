@@ -15,20 +15,16 @@ use Joomla\String\StringHelper;
 JHtml::addIncludePath(JPATH_COMPONENT . '/helpers/html');
 
 global $globalcats;
-$app     = JFactory::getApplication();
-$jinput  = $app->input;
-$config  = JFactory::getConfig();
-$user    = JFactory::getUser();
-$cparams = JComponentHelper::getParams('com_flexicontent');
-$ctrl    = 'types.';
-$hlpname = 'fctypes';
-$isAdmin = $app->isAdmin();
-
-$user    = JFactory::getUser();
-$cparams = JComponentHelper::getParams('com_flexicontent');
-
-$list_total_cols = 12;
-
+$app      = JFactory::getApplication();
+$jinput   = $app->input;
+$config   = JFactory::getConfig();
+$user     = JFactory::getUser();
+$session  = JFactory::getSession();
+$document = JFactory::getDocument();
+$cparams  = JComponentHelper::getParams('com_flexicontent');
+$ctrl     = 'types.';
+$hlpname  = 'fctypes';
+$isAdmin  = $app->isAdmin();
 
 
 
@@ -74,24 +70,42 @@ $image_editlayout = 0 ?
 
 $article_viewing_tip  = '<img src="components/com_flexicontent/assets/images/comments.png" class="fc-man-icon-s ' . $this->tooltip_class . '" data-placement="bottom" alt="'.JText::_('FLEXI_JOOMLA_ARTICLE_VIEW', true).'" title="'.flexicontent_html::getToolTip('FLEXI_JOOMLA_ARTICLE_VIEW', 'FLEXI_ALLOW_ARTICLE_VIEW_DESC', 1, 1).'" /> ';
 $default_template_tip = '<img src="components/com_flexicontent/assets/images/comments.png" class="fc-man-icon-s ' . $this->tooltip_class . '" data-placement="bottom" alt="'.JText::_( 'FLEXI_TYPE_DEFAULT_TEMPLATE', true ).'" title="'.flexicontent_html::getToolTip('FLEXI_TYPE_DEFAULT_TEMPLATE', 'FLEXI_TYPE_DEFAULT_TEMPLATE_DESC', 1, 1).'" /> ';
-?>
 
 
-<script>
+/**
+ * Order stuff and table related variables
+ */
 
-// delete active filter
+$list_total_cols = 12;
+
+
+/**
+ * Add inline JS
+ */
+
+$js = '';
+
+$js .= "
+
+// Delete a specific list filter
 function delFilter(name)
 {
 	//if(window.console) window.console.log('Clearing filter:'+name);
 	var myForm = jQuery('#adminForm');
 	var filter = jQuery('#'+name);
-	if (filter.attr('type')=='checkbox')
+
+	if (!filter.length)
+	{
+		return;
+	}
+	else if (filter.attr('type') == 'checkbox')
 	{
 		filter.checked = '';
 	}
 	else
 	{
 		filter.val('');
+
 		// Case that input has Calendar JS attached
 		if (filter.attr('data-alt-value'))
 		{
@@ -109,7 +123,18 @@ function delAllFilters()
 	delFilter('filter_order_Dir');
 }
 
-</script>
+";
+
+if ($js)
+{
+	$document->addScriptDeclaration('
+		jQuery(document).ready(function()
+		{
+			' . $js . '
+		});
+	');
+}
+?>
 
 
 <div id="flexicontent" class="flexicontent">

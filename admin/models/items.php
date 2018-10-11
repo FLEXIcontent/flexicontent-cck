@@ -24,16 +24,35 @@ require_once('base/baselist.php');
 class FlexicontentModelItems extends FCModelAdminList
 {
 
+
+	/**
+	 * Record name
+	 *
+	 * @var string
+	 */
+	var $record_name = 'item';
+
+	/**
+	 * Record database table
+	 *
+	 * @var string
+	 */
 	var $records_dbtbl = 'content';
+
+	/**
+	 * Record jtable name
+	 *
+	 * @var string
+	 */
 	var $records_jtable = 'flexicontent_items';
 
 	/**
-	 * Column names and record name
+	 * Column names
 	 */
-	var $record_name = 'item';
-	var $state_col   = 'state';
-	var $name_col    = 'title';
-	var $parent_col  = 'catid';
+	var $state_col      = 'state';
+	var $name_col       = 'title';
+	var $parent_col     = 'catid';
+	var $created_by_col = 'created_by';
 
 	/**
 	 * (Default) Behaviour Flags
@@ -47,6 +66,11 @@ class FlexicontentModelItems extends FCModelAdminList
 	var $search_cols = array('title', 'alias');
 	var $default_order = 'i.id';
 	var $default_order_dir = 'DESC';
+
+	/**
+	 * List filters that are always applied
+	 */
+	var $hard_filters = array();
 
 	/**
 	 * Record rows
@@ -128,10 +152,6 @@ class FlexicontentModelItems extends FCModelAdminList
 		$fcform = $jinput->get('fcform', 0, 'int');
 		$p      = $option . '.' . $view . '.';
 
-		// Parameters of the view, in our case it is only the component parameters
-		$this->cparams = JComponentHelper::getParams( 'com_flexicontent' );
-
-
 		/**
 		 * View's Filters
 		 */
@@ -205,12 +225,12 @@ class FlexicontentModelItems extends FCModelAdminList
 		$this->setState('filter_state', $filter_state);
 		$this->setState('filter_access', $filter_access);
 
-		$app->setUserState($p.'filter_tag', $filter_tag);
-		$app->setUserState($p.'filter_lang', $filter_lang);
-		$app->setUserState($p.'filter_type', $filter_type);
-		$app->setUserState($p.'filter_author', $filter_author);
-		$app->setUserState($p.'filter_state', $filter_state);
-		$app->setUserState($p.'filter_access', $filter_access);
+		$app->setUserState($p . 'filter_tag', $filter_tag);
+		$app->setUserState($p . 'filter_lang', $filter_lang);
+		$app->setUserState($p . 'filter_type', $filter_type);
+		$app->setUserState($p . 'filter_author', $filter_author);
+		$app->setUserState($p . 'filter_state', $filter_state);
+		$app->setUserState($p . 'filter_access', $filter_access);
 
 
 		// Date filters
@@ -228,11 +248,11 @@ class FlexicontentModelItems extends FCModelAdminList
 
 
 		// Record ID filter
-		$filter_id  = $fcform ? $jinput->get('filter_id', '', 'int') : $app->getUserStateFromRequest($p.'filter_id', 'filter_id', '', 'int');
-		$filter_id  = $filter_id ? $filter_id : '';  // needed to make text input field be empty
+		$filter_id = $fcform ? $jinput->get('filter_id', '', 'int') : $app->getUserStateFromRequest($p . 'filter_id', 'filter_id', '', 'int');
+		$filter_id = $filter_id ? $filter_id : '';  // needed to make text input field be empty
 
 		$this->setState('filter_id', $filter_id);
-		$app->setUserState($p.'filter_id', $filter_id);
+		$app->setUserState($p . 'filter_id', $filter_id);
 
 
 		// File ID filter
@@ -244,36 +264,36 @@ class FlexicontentModelItems extends FCModelAdminList
 
 		// Text search
 		$scope  = $fcform ? $jinput->get('scope',  1,  'int')     :  $app->getUserStateFromRequest( $p.'scope',   'scope',   1,   'int' );
-		$search = $fcform ? $jinput->get('search', '', 'string')  :  $app->getUserStateFromRequest( $p.'search',  'search',  '',  'string' );
+		$search = $fcform ? $jinput->get('search', '', 'string') : $app->getUserStateFromRequest($p . 'search', 'search', '', 'string');
 
 		$this->setState('scope', $scope);
 		$this->setState('search', $search);
 
-		$app->setUserState($p.'scope', $scope);
-		$app->setUserState($p.'search', $search);
+		$app->setUserState($p . 'scope', $scope);
+		$app->setUserState($p . 'search', $search);
 
 
 		/**
 		 * Pagination: limit, limitstart
 		 */
 
-		$limit      = $fcform ? $jinput->get('limit', $app->getCfg('list_limit'), 'int')  :  $app->getUserStateFromRequest( $p.'limit', 'limit', $app->getCfg('list_limit'), 'int');
-		$limitstart = $fcform ? $jinput->get('limitstart',                     0, 'int')  :  $app->getUserStateFromRequest( $p.'limitstart', 'limitstart', 0, 'int' );
+		$limit      = $fcform ? $jinput->get('limit', $app->getCfg('list_limit'), 'int') : $app->getUserStateFromRequest($p . 'limit', 'limit', $app->getCfg('list_limit'), 'int');
+		$limitstart = $fcform ? $jinput->get('limitstart', 0, 'int') : $app->getUserStateFromRequest($p . 'limitstart', 'limitstart', 0, 'int');
 
 		// In case limit has been changed, adjust limitstart accordingly
 		$limitstart = ( $limit != 0 ? (floor($limitstart / $limit) * $limit) : 0 );
-		$jinput->set( 'limitstart',	$limitstart );
+		$jinput->set('limitstart', $limitstart);
 
 		$this->setState('limit', $limit);
 		$this->setState('limitstart', $limitstart);
 
-		$app->setUserState($p.'limit', $limit);
-		$app->setUserState($p.'limitstart', $limitstart);
+		$app->setUserState($p . 'limit', $limit);
+		$app->setUserState($p . 'limitstart', $limitstart);
 
 
 		// For some model function that use single id
 		$array = $jinput->get('cid', array(0), 'array');
-		$this->setId((int)$array[0]);
+		$this->setId((int) $array[0]);
 
 		// Manage view permission
 		$this->canManage = FlexicontentHelperPerm::getPerm()->CanManage;
@@ -558,7 +578,7 @@ class FlexicontentModelItems extends FCModelAdminList
 		}
 
 		$im_custom_filters = preg_split("/[\s]*,[\s]*/", $im_custom_filters);
-		ArrayHelper::toInteger($im_custom_filters, null);
+		$im_custom_filters = ArrayHelper::toInteger($im_custom_filters);
 
 		// Field's has_access flag
 		$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
@@ -1039,7 +1059,7 @@ class FlexicontentModelItems extends FCModelAdminList
 		$nullDate = $this->_db->Quote($this->_db->getNullDate());
 		$nowDate  = $this->_db->Quote( JFactory::getDate()->toSql() );
 
-		ArrayHelper::toInteger($filter_tag, null);
+		$filter_tag   = ArrayHelper::toInteger($filter_tag);
 		$filter_state = empty($filter_state) ? array() :
 			(!is_array($filter_state) ? array($filter_state) : $filter_state);
 
@@ -1218,7 +1238,6 @@ class FlexicontentModelItems extends FCModelAdminList
 	 *
 	 * @since 3.3.0
 	 */
-
 	protected function _buildContentOrderBy($q = false)
 	{
 		$filter_order_type= $this->getState('filter_order_type');
@@ -1524,19 +1543,19 @@ class FlexicontentModelItems extends FCModelAdminList
 
 		if (!empty($filter_tag))
 		{
-			ArrayHelper::toInteger($filter_tag, null);
+			$filter_tag = ArrayHelper::toInteger($filter_tag);
 			$where[] = 'tg.tid IN (' . implode( ',', $filter_tag) .')';
 		}
 
 		if (!empty($filter_type))
 		{
-			ArrayHelper::toInteger($filter_type, null);
+			$filter_type = ArrayHelper::toInteger($filter_type);
 			$where[] = ($tmp_only ? 'i.' : 'ie.') . 'type_id IN (' . implode( ',', $filter_type) .')';
 		}
 
 		if (!empty($filter_author))
 		{
-			ArrayHelper::toInteger($filter_author, null);
+			$filter_author = ArrayHelper::toInteger($filter_author);
 			$where[] = 'i.created_by IN (' . implode( ',', $filter_author) .')';
 		}
 
@@ -1564,7 +1583,7 @@ class FlexicontentModelItems extends FCModelAdminList
 
 		if (!empty($filter_access))
 		{
-			ArrayHelper::toInteger($filter_access, null);
+			$filter_access = ArrayHelper::toInteger($filter_access);
 			$where[] = 'i.access IN (' . implode( ',', $filter_access) .')';
 		}
 
@@ -2702,74 +2721,6 @@ class FlexicontentModelItems extends FCModelAdminList
 	}
 
 
-	/**
-	 * Method to check if given records can not be deleted due to assignments or due to permissions
-	 *
-	 * @param		array			$cid          array of record ids to check
-	 * @param		array			$cid_noauth   (variable by reference) to return an array of non-authorized record ids
-	 * @param		array			$cid_wassocs  (variable by reference) to return an array of 'locked' record ids
-	 *
-	 * @return	boolean	  True when at least 1 deleteable record found
-	 *
-	 * @since	3.3
-	 */
-	public function candelete(& $cid, & $cid_noauth = null, & $cid_wassocs = null)
-	{
-		$cid_noauth  = array();
-		$cid_wassocs = array();
-
-		// Add children records
-		if (in_array('FCModelTraitNestableRecord', class_uses($this)))
-		{
-			foreach ($cid as $id)
-			{
-				$this->_addPathRecords($id, $cid, 'children');
-			}
-		}
-
-		// Find ACL disallowed
-		$cid_noauth = $this->filterByPermission($cid, 'core.delete');
-
-		// Find having blocking assignments (if applicable for this record type)
-		$cid_wassocs = $this->filterByAssignments($cid, -2);
-
-		return !count($cid_noauth) && !count($cid_wassocs);
-	}
-
-
-	/**
-	 * Method to check if given records can not change state due to assignments or due to permissions
-	 *
-	 * @param		array			$cid          array of record ids to check
-	 * @param		array			$cid_noauth   (variable by reference) to return an array of non-authorized record ids
-	 * @param		array			$cid_wassocs  (variable by reference) to return an array of 'locked' record ids
-	 *
-	 * @return	boolean	  True when at least 1 publishable record found
-	 *
-	 * @since	3.3.0
-	 */
-	public function canchangestate(& $cid, & $cid_noauth = null, & $cid_wassocs = null, $tostate = 0)
-	{
-		$cid_noauth  = array();
-		$cid_wassocs = array();
-
-		// Add children records
-		if (in_array('FCModelTraitNestableRecord', class_uses($this)))
-		{
-			foreach ($cid as $id)
-			{
-				$this->_addPathRecords($id, $cid, 'children');
-			}
-		}
-
-		// Find ACL disallowed
-		$cid_noauth = $this->filterByPermission($cid, $tostate == -2 ? 'core.delete': 'core.edit.state');
-
-		// Find having blocking assignments (if applicable for this record type)
-		$cid_wassocs = $this->filterByAssignments($cid, $tostate);
-
-		return !count($cid_noauth) && !count($cid_wassocs);
-	}
 
 
 	/**
@@ -2792,7 +2743,7 @@ class FlexicontentModelItems extends FCModelAdminList
 
 		if ( !count( $cid ) ) return false;
 
-		ArrayHelper::toInteger($cid);
+		$cid = ArrayHelper::toInteger($cid);
 		$cid_list = implode( ',', $cid );
 
 		if ($itemmodel)
@@ -2954,47 +2905,6 @@ class FlexicontentModelItems extends FCModelAdminList
 	}
 
 
-	/**
-	 * Method to set the access level of the records
-	 *
-	 * @param		integer		id of the record
-	 * @param		integer		access level
-	 *
-	 * @return	boolean		True on success
-	 *
-	 * @since		1.5
-	 */
-	public function saveaccess($id, $access)
-	{
-		$table = $this->getTable($this->records_jtable, '');
-
-		$cid      = is_array($id) ? $id : array($id);
-		$accesses = is_array($access) ? $access : array($access);
-
-		foreach($cid as $id)
-		{
-			$table->load($id);
-			$table->id = $id;
-			$table->access = $accesses[$id];
-
-			if (!$table->check())
-			{
-				$this->setError($table->getError());
-
-				return false;
-			}
-
-			if (!$table->store())
-			{
-				$this->setError($table->getError());
-
-				return false;
-			}
-		}
-
-		return true;
-	}
-
 
 	/**
 	 * Method to fetch the assigned categories
@@ -3116,7 +3026,7 @@ class FlexicontentModelItems extends FCModelAdminList
 		if ($types !== null) return $types;
 
 		$filter_type = $this->getState('filter_type');
-		ArrayHelper::toInteger($filter_type, null);
+		$filter_type = ArrayHelper::toInteger($filter_type);
 
 		if ( empty($filter_type) ) return array();
 
@@ -3329,7 +3239,7 @@ class FlexicontentModelItems extends FCModelAdminList
 		// Get field data, so that we can identify the fields and take special action for each of them
 		else
 		{
-			ArrayHelper::toInteger($fields, null);
+			$fields = ArrayHelper::toInteger($fields);
 
 			$query = 'SELECT *'
 				. ' FROM #__flexicontent_fields'
@@ -3450,7 +3360,7 @@ class FlexicontentModelItems extends FCModelAdminList
 	 */
 	public function filterByPermission($cid, $rule)
 	{
-		ArrayHelper::toInteger($cid);
+		$cid = ArrayHelper::toInteger($cid);
 
 		// If cannot manage then all records are not changeable
 		if (!$this->canManage)
@@ -3501,7 +3411,7 @@ class FlexicontentModelItems extends FCModelAdminList
 	 */
 	public function filterByAssignments($cid = array(), $tostate = -2)
 	{
-		ArrayHelper::toInteger($cid);
+		$cid = ArrayHelper::toInteger($cid);
 		$cid_wassocs = array();
 
 		switch ($tostate)
@@ -3536,7 +3446,7 @@ class FlexicontentModelItems extends FCModelAdminList
 		$p      = $option . '.' . $view . '.';
 
 		// Order type
-		$filter_order_type = $fcform ? $jinput->get('filter_order_type', 1,                  'int')  :  $app->getUserStateFromRequest( $p.'filter_order_type',	'filter_order_type', 1, 'int' );
+		$filter_order_type = $fcform ? $jinput->get('filter_order_type', 1, 'int') : $app->getUserStateFromRequest($p . 'filter_order_type', 'filter_order_type', 1, 'int' );
 		$this->setState('filter_order_type', $filter_order_type);
 		$app->setUserState($p.'filter_order_type', $filter_order_type);
 
@@ -3544,11 +3454,18 @@ class FlexicontentModelItems extends FCModelAdminList
 		$default_order_dir = $this->cparams->get('items_manager_order_dir', $this->default_order_dir);
 		$default_order = $default_order !== '1' ? $default_order : '';   // '1' is 'unordered'
 
-		$filter_order      = $fcform ? $jinput->get('filter_order',     $default_order,      'cmd')  :  $app->getUserStateFromRequest( $p.'filter_order',     'filter_order',     $default_order,      'cmd' );
-		$filter_order_Dir  = $fcform ? $jinput->get('filter_order_Dir', $default_order_dir, 'word')  :  $app->getUserStateFromRequest( $p.'filter_order_Dir', 'filter_order_Dir', $default_order_dir, 'word' );
+		$filter_order     = $fcform ? $jinput->get('filter_order', $default_order, 'cmd') : $app->getUserStateFromRequest($p . 'filter_order', 'filter_order', $default_order, 'cmd');
+		$filter_order_Dir = $fcform ? $jinput->get('filter_order_Dir', $default_order_dir, 'word') : $app->getUserStateFromRequest($p . 'filter_order_Dir', 'filter_order_Dir', $default_order_dir, 'word');
 
-		if (!$filter_order)     $filter_order     = $default_order;
-		if (!$filter_order_Dir) $filter_order_Dir = $default_order_dir;
+		if (!$filter_order)
+		{
+			$filter_order = $default_order;
+		}
+
+		if (!$filter_order_Dir)
+		{
+			$filter_order_Dir = $default_order_dir;
+		}
 
 		// Filter order is selected via current setting of filter_order_type selector
 		$filter_order	= ($filter_order_type && ($filter_order == 'i.ordering')) ? 'catsordering' : $filter_order;
@@ -3559,8 +3476,8 @@ class FlexicontentModelItems extends FCModelAdminList
 		$this->setState('filter_order', $filter_order);
 		$this->setState('filter_order_Dir', $filter_order_Dir);
 
-		$app->setUserState($p.'filter_order', $filter_order);
-		$app->setUserState($p.'filter_order_Dir', $filter_order_Dir);
+		$app->setUserState($p . 'filter_order', $filter_order);
+		$app->setUserState($p . 'filter_order_Dir', $filter_order_Dir);
 	}
 
 

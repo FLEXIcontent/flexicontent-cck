@@ -176,7 +176,7 @@ class FlexicontentControllerImport extends FlexicontentControllerBaseAdmin
 				$conf['maincat'] 	= $jinput->get('maincat', 0, 'int');
 				$conf['maincat_col'] = $jinput->get('maincat_col', 0, 'int');
 				$conf['seccats'] = $jinput->get('seccats', array(), 'array');
-				ArrayHelper::toInteger($conf['seccats']);
+				$conf['seccats'] = ArrayHelper::toInteger($conf['seccats']);
 				$conf['seccats_col'] = $jinput->get('seccats_col', 0, 'int');
 
 				// Tags

@@ -73,13 +73,13 @@ class JFormFieldItemlayout extends JFormFieldList
 		
 		// Get RECORED id of current view
 		$id = $jinput->get('id', array(0), 'array');
-		ArrayHelper::toInteger($id, array(0));
+		$id = ArrayHelper::toInteger($id, array(0));
 		$pk = (int) $id[0];
 		
 		if (!$pk)
 		{
 			$cid = $jinput->get('cid', array(0), 'array');
-			ArrayHelper::toInteger($cid, array(0));
+			$cid = ArrayHelper::toInteger($cid, array(0));
 			$pk = (int) $cid[0];
 		}
 		

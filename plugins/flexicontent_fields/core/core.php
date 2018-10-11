@@ -691,7 +691,7 @@ class plgFlexicontent_fieldsCore extends FCField
 
 				$cid    = $app->isSite() ? $app->input->get('cid', 0, 'int') : 0;
 				$cids   = $app->input->get('cids', array(), 'array');
-				ArrayHelper::toInteger($cids, array());
+				$cids   = ArrayHelper::toInteger($cids);
 
 				$cats = array();
 

@@ -269,11 +269,13 @@ class FlexicontentModelTags extends FCModelAdminList
 
 		foreach ($cid as $id)
 		{
-			$table        = $this->getTable($this->records_jtable, '');
+			$table = $this->getTable($this->records_jtable, '');
 			$table->load($id);
+
 			$table->id    = 0;
 			$table->$name = $table->$name . ' [copy]';
 			$table->alias = JFilterOutput::stringURLSafe($table->$name);
+
 			$table->check();
 			$table->store();
 
@@ -316,7 +318,7 @@ class FlexicontentModelTags extends FCModelAdminList
 	 */
 	public function filterByAssignments($cid = array(), $tostate = -2)
 	{
-		ArrayHelper::toInteger($cid);
+		$cid = ArrayHelper::toInteger($cid);
 		$cid_wassocs = array();
 
 		switch ($tostate)

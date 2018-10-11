@@ -121,13 +121,13 @@ class JFormFieldFccategory extends JFormField
 		if ($language && $option=='com_flexicontent' && $view=='category')
 		{
 			$id = $jinput->get('id', array(0), 'array');
-			ArrayHelper::toInteger($id);
+			$id = ArrayHelper::toInteger($id);
 			$assocs_id = (int) $id[0];
 
 			if (!$assocs_id)
 			{
 				$cid = $jinput->get('cid', array(0), 'array');
-				ArrayHelper::toInteger($cid);
+				$cid = ArrayHelper::toInteger($cid);
 				$assocs_id = (int) $cid[0];
 			}
 		}

@@ -82,8 +82,8 @@ class JFormFieldFclayout extends JFormFieldGroupedList
 		) $view = 'module';
 
 		$cid = $jinput->get('cid', array(0), 'array');
-		ArrayHelper::toInteger($cid);
-		$pk = $cid[0];
+		$cid = ArrayHelper::toInteger($cid);
+		$pk = (int) $cid[0];
 		if (!$pk) $pk = $jinput->get('id', 0, 'int');
 		
 		

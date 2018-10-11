@@ -328,7 +328,7 @@ class FlexicontentViewCategories extends FlexicontentViewBaseRecords
 
 
 		// Build language filter
-		$lists['filter_language'] = $this->getFilterDisplay(array(
+		$lists['filter_lang'] = $this->getFilterDisplay(array(
 			'label' => JText::_('FLEXI_LANGUAGE'),
 			'html' => flexicontent_html::buildlanguageslist(
 				'filter_language',

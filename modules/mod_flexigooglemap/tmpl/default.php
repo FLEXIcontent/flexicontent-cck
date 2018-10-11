@@ -97,7 +97,7 @@ flexicontent_html::loadFramework('google-maps', '', $params);
 	<div id="fc_module_map_<?php echo $module->id;?>" style="width:<?php echo $width; ?>;height:<?php echo $height; ?>;"></div>
 
 	<script type="text/javascript" src="modules/mod_flexigooglemap/assets/js/markerclusterer.js"></script>
-	<script type="text/javascript">
+	<script>
 
 	function fc_MapMod_autoCenter_<?php echo $module->id;?>(map, markers)
 	{

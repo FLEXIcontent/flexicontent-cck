@@ -128,8 +128,8 @@ class FlexicontentControllerFields extends FlexicontentControllerBaseAdmin
 		$cid         = $this->input->get('cid', array(0), 'array');
 		$filter_type = $this->input->get('filter_type', array(0), 'array');
 
-		ArrayHelper::toInteger($cid);
-		ArrayHelper::toInteger($filter_type);
+		$cid = ArrayHelper::toInteger($cid);
+		$filter_type = ArrayHelper::toInteger($filter_type);
 
 		// Make sure direction is set
 		$dir = $dir ?: ($this->task === 'orderup' ? -1 : 1);
@@ -204,9 +204,9 @@ class FlexicontentControllerFields extends FlexicontentControllerBaseAdmin
 		$order       = $this->input->get('order', array(0), 'array');
 		$filter_type = $this->input->get('filter_type', array(0), 'array');
 
-		ArrayHelper::toInteger($cid);
-		ArrayHelper::toInteger($order);
-		ArrayHelper::toInteger($filter_type);
+		$cid = ArrayHelper::toInteger($cid);
+		$order = ArrayHelper::toInteger($order);
+		$filter_type = ArrayHelper::toInteger($filter_type);
 
 		if (!$model->saveorder($cid, $order, reset($filter_type)))
 		{
@@ -426,7 +426,7 @@ class FlexicontentControllerFields extends FlexicontentControllerBaseAdmin
 
 		// Get and santize records ids
 		$cid = $this->input->get('cid', array(), 'array');
-		ArrayHelper::toInteger($cid);
+		$cid = ArrayHelper::toInteger($cid);
 
 		// Check at least one item was selected
 		if (!count($cid))
@@ -563,7 +563,7 @@ class FlexicontentControllerFields extends FlexicontentControllerBaseAdmin
 
 		// Get and santize records ids
 		$cid = $this->input->get('cid', array(), 'array');
-		ArrayHelper::toInteger($cid);
+		$cid = ArrayHelper::toInteger($cid);
 
 		// Check at least one item was selected
 		if (!count($cid))

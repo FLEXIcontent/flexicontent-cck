@@ -191,11 +191,8 @@ class FlexicontentViewTypes extends FlexicontentViewBaseRecords
 		// Build publication state filter
 		$options 	= array();
 		$options[] = JHtml::_('select.option',  '', '-'/*JText::_( 'FLEXI_SELECT_STATE' )*/ );
-		$options[] = JHtml::_('select.option',  'P', JText::_( 'FLEXI_PUBLISHED' ) );
-		$options[] = JHtml::_('select.option',  'U', JText::_( 'FLEXI_UNPUBLISHED' ) );
-		//$options[] = JHtml::_('select.option',  'A', JText::_( 'FLEXI_ARCHIVED' ) );
-		//$options[] = JHtml::_('select.option',  'T', JText::_( 'FLEXI_TRASHED' ) );
-
+		$options[] = JHtml::_('select.option',  'P', JText::_('FLEXI_ENABLED'));
+		$options[] = JHtml::_('select.option',  'U', JText::_('FLEXI_DISABLED'));
 
 		$fieldname = 'filter_state';
 		$elementid = 'filter_state';
@@ -303,20 +300,20 @@ class FlexicontentViewTypes extends FlexicontentViewBaseRecords
 
 		$contrl = "types.";
 
-		JToolbarHelper::custom( $contrl.'copy', 'copy.png', 'copy_f2.png', 'FLEXI_COPY' );
-
-		JToolbarHelper::publishList($contrl.'publish');
-		JToolbarHelper::unpublishList($contrl.'unpublish');
-
 		if (1)
 		{
 			JToolbarHelper::addNew($contrl.'add');
 		}
 
-		if (1)
+		if (0)
 		{
 			JToolbarHelper::editList($contrl.'edit');
 		}
+
+		JToolbarHelper::publishList($contrl.'publish', 'JTOOLBAR_ENABLE', true);
+		JToolbarHelper::unpublishList($contrl.'unpublish', 'JTOOLBAR_DISABLE', true);
+
+		JToolbarHelper::custom( $contrl.'copy', 'copy.png', 'copy_f2.png', 'FLEXI_COPY' );
 
 		if (1)
 		{

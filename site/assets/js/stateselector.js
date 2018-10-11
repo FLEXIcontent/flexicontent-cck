@@ -112,13 +112,19 @@ var fc_statehandler = function(options)
 
 			if (ops.children().length == 0)
 			{
-				var html = '';//'<div>' + Joomla.JText._('FLEXI_ACTION') + '</div>';
-				var iid = ops.data('id');
+				var html = ''; //'<div>' + Joomla.JText._('FLEXI_ACTION') + '</div>';
+
+				var iid    = ops.data('id');
 				var states = ops.data('st');
-				jQuery(states).each(function(index, item){
+				var titles = ops.data('tt');
+
+				jQuery(states).each(function(index, item)
+				{
+					var action_text = (titles && !! titles[item.i]) ? (Joomla.JText._('FLEXI_SET_STATE_TO') + ' ' + titles[item.i]) : fc_state_descrs[item.i];
+
 					html += fc_statehandler_singleton.options.font_icons
-						? '<span onclick="fc_statehandler_singleton.setState(\'' + item.i + '\', \'' + iid + '\')"><span class="icon-' + fc_state_icons[item.i] + '"></span>' + fc_state_descrs[item.i] + '</span>'
-						: '<span onclick="fc_statehandler_singleton.setState(\'' + item.i + '\', \'' + iid + '\')"><img src="' + fc_statehandler_singleton.options.img_path + fc_state_imgs[item.i] + '"/>' + fc_state_descrs[item.i] + '</span>';
+						? '<span onclick="fc_statehandler_singleton.setState(\'' + item.i + '\', \'' + iid + '\')"><span class="icon-' + fc_state_icons[item.i] + '"></span>' + action_text + '</span>'
+						: '<span onclick="fc_statehandler_singleton.setState(\'' + item.i + '\', \'' + iid + '\')"><img src="' + fc_statehandler_singleton.options.img_path + fc_state_imgs[item.i] + '"/>' + action_text + '</span>';
 				});
 				jQuery(html).appendTo(ops);
 			}

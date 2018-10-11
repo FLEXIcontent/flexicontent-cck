@@ -551,7 +551,7 @@ class FlexicontentControllerBaseAdmin extends FlexicontentController
 
 		// Get and santize records ids
 		$cid = $this->input->get('cid', array(), 'array');
-		ArrayHelper::toInteger($cid);
+		$cid = ArrayHelper::toInteger($cid);
 
 		// Check at least one item was selected
 		if (!count($cid))
@@ -641,7 +641,7 @@ class FlexicontentControllerBaseAdmin extends FlexicontentController
 
 		// Get and santize records ids
 		$cid = $this->input->get('cid', array(), 'array');
-		ArrayHelper::toInteger($cid);
+		$cid = ArrayHelper::toInteger($cid);
 
 		// Check at least one item was selected
 		if (!count($cid))
@@ -746,7 +746,7 @@ class FlexicontentControllerBaseAdmin extends FlexicontentController
 
 		// Get and santize records ids
 		$cid = $this->input->get('cid', array(), 'array');
-		ArrayHelper::toInteger($cid);
+		$cid = ArrayHelper::toInteger($cid);
 
 		// Check at least one item was selected
 		if (!count($cid))
@@ -919,7 +919,7 @@ class FlexicontentControllerBaseAdmin extends FlexicontentController
 
 		// Get and santize records ids
 		$cid = $this->input->get('cid', array(), 'array');
-		ArrayHelper::toInteger($cid);
+		$cid = ArrayHelper::toInteger($cid);
 
 		// Check at least one item was selected
 		if (!count($cid))
@@ -974,7 +974,7 @@ class FlexicontentControllerBaseAdmin extends FlexicontentController
 
 		// Get new record access
 		$accesses = $this->input->get('access', array(), 'array');
-		ArrayHelper::toInteger($accesses);
+		$accesses = ArrayHelper::toInteger($accesses);
 
 		// Change access of the record(s)
 		$result = $model->saveaccess($cid, $accesses);
@@ -1118,7 +1118,7 @@ class FlexicontentControllerBaseAdmin extends FlexicontentController
 	{
 		$db = JFactory::getDbo();
 
-		ArrayHelper::toInteger($cid);
+		$cid = ArrayHelper::toInteger($cid);
 		$cols_list = implode(',', array_filter($cols, array($db, 'quoteName')));
 
 		$query = $db->getQuery(true)

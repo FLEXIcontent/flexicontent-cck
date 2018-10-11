@@ -191,11 +191,13 @@ class FlexicontentModelTypes extends FCModelAdminList
 
 		foreach ($cid as $id)
 		{
-			$table        = $this->getTable($this->records_jtable, '');
+			$table = $this->getTable($this->records_jtable, '');
 			$table->load($id);
+
 			$table->id    = 0;
 			$table->$name = $table->$name . ' [copy]';
 			$table->alias = JFilterOutput::stringURLSafe($table->$name);
+
 			$table->check();
 			$table->store();
 
@@ -253,22 +255,23 @@ class FlexicontentModelTypes extends FCModelAdminList
 	 */
 	public function filterByAssignments($cid = array(), $tostate = -2)
 	{
-		ArrayHelper::toInteger($cid);
+		$cid = ArrayHelper::toInteger($cid);
 		$cid_wassocs = array();
 
 		switch ($tostate)
 		{
 			// Trash
 			case -2:
-
-			// Unpublish
-			case 0:
 				$query = 'SELECT DISTINCT type_id'
 					. ' FROM #__flexicontent_items_ext'
 					. ' WHERE type_id IN (' . implode(',', $cid) . ')'
 				;
 
 				$cid_wassocs = $this->_db->setQuery($query)->loadColumn();
+				break;
+
+			// Unpublish
+			case 0:
 				break;
 		}
 

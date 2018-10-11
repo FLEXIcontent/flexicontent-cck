@@ -234,7 +234,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 					$_cids = explode(',', $_cids);
 				}
 
-				ArrayHelper::toInteger($_cids);
+				$_cids = ArrayHelper::toInteger($_cids);
 				$this->_ids = $_cids;
 
 				// Clear category id, it is not used by this layout
@@ -1364,7 +1364,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 				$_cids = explode(',', $_cids);
 			}
 
-			ArrayHelper::toInteger($_cids);
+			$_cids = ArrayHelper::toInteger($_cids);
 
 			$this->_params->set('txt_ac_cid', 'NA');
 			$this->_params->set('txt_ac_cids', $_cids);
@@ -2459,7 +2459,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 				break;
 
 			case 'createdby':
-				ArrayHelper::toInteger($values);  // Sanitize filter values as integers
+				$values = ArrayHelper::toInteger($values);  // Sanitize filter values as integers
 				$query  = 'SELECT id'
 						. ' FROM #__flexicontent_items_tmp'
 						. ' WHERE created_by IN ('. implode(",", $values) .')';
@@ -2467,7 +2467,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 				break;
 
 			case 'modifiedby':
-				ArrayHelper::toInteger($values);  // Sanitize filter values as integers
+				$values = ArrayHelper::toInteger($values);  // Sanitize filter values as integers
 				$query  = 'SELECT id'
 						. ' FROM #__flexicontent_items_tmp'
 						. ' WHERE modified_by IN ('. implode(",", $values) .')';
@@ -2475,7 +2475,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 				break;
 
 			case 'type':
-				ArrayHelper::toInteger($values);  // Sanitize filter values as integers
+				$values = ArrayHelper::toInteger($values);  // Sanitize filter values as integers
 				$query  = 'SELECT id'
 						. ' FROM #__flexicontent_items_tmp'
 						. ' WHERE type_id IN ('. implode(",", $values) .')';
@@ -2494,7 +2494,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 				break;
 
 			case 'categories':
-				ArrayHelper::toInteger($values);  // Sanitize filter values as integers
+				$values = ArrayHelper::toInteger($values);  // Sanitize filter values as integers
 				global $globalcats;
 				$display_subcats = $this->_params->get('display_subcategories_items', 2);   // include subcategory items
 				$query_catids = array();
@@ -2515,7 +2515,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 				break;
 
 			case 'tags':
-				ArrayHelper::toInteger($values);  // Sanitize filter values as integers
+				$values = ArrayHelper::toInteger($values);  // Sanitize filter values as integers
 				$query  = 'SELECT itemid'
 						. ' FROM #__flexicontent_tags_item_relations'
 						. ' WHERE tid IN ('. implode(",", $values) .')';  // no db quoting needed since these were typecasted to ints

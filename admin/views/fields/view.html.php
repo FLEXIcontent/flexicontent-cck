@@ -168,16 +168,27 @@ class FlexicontentViewFields extends FlexicontentViewBaseRecords
 		// Get -all- content types
 		$types = $this->get('Typeslist');
 
+		/**
+		 * Support language strings in content type names
+		 */
+		foreach($types as $type)
+		{
+			$type->jname = JText::_($type->name);
+		}
+
 		$rowsByIds    = array();
-		$master_fids  = array(0);
-		$grouped_fids = array(0);
+		$master_fids  = array();
+		$grouped_fids = array();
 
 		$CA_fieldids  = array();
 		$FG_fieldids  = array();
 
 		foreach ($rows as $row)
 		{
-			$rowsByIds[$row->id] = $row;
+			$id = $row->id;
+
+			// Assign to index via id
+			$rowsByIds[$id] = $row;
 
 			// Load field parameters
 			$row->parameters = new JRegistry($row->attribs);
@@ -187,20 +198,22 @@ class FlexicontentViewFields extends FlexicontentViewBaseRecords
 
 			if ($cascade_after)
 			{
-				$CA_fieldids[$cascade_after] = $row->id;
+				$CA_fieldids[$cascade_after] = $id;
 				$master_fids[] = $cascade_after;
 			}
 
 			// Find ids of master fields (if any)
 			if ($row->field_type === 'fieldgroup')
 			{
-				$FG_fieldids[$row->id] = preg_split('/[\s]*,[\s]*/', $row->parameters->get('fields'));
-				$grouped_fids = array_merge($grouped_fids, $FG_fieldids[$row->id]);
+				$FG_fieldids[$id] = array_filter(preg_split('/[\s]*,[\s]*/', $row->parameters->get('fields')), function($v) { return (trim($v) !== ''); });
+				$FG_fieldids[$id] = ArrayHelper::toInteger($FG_fieldids[$id]);
+
+				$grouped_fids = array_merge($grouped_fids, $FG_fieldids[$id]);
 			}
 		}
 
 		// Get grouped fields inside a fieldgroup field of -current- page
-		$rowsInGroup = $model->getItemsByConditions(array(
+		$rowsInGroup = !count($grouped_fids) ? array() : $model->getItemsByConditions(array(
 			'where' => array('t.id IN (' . implode(',', $grouped_fids) . ')'),
 		));
 
@@ -216,9 +229,13 @@ class FlexicontentViewFields extends FlexicontentViewBaseRecords
 
 		foreach ($rowsFG as $row)
 		{
+			$id = $row->id;
+
 			// Handle displaying information: FIELDGROUP feature
 			$row->parameters = new JRegistry($row->attribs);
-			$ingroup_fids = preg_split('/[\s]*,[\s]*/', $row->parameters->get('fields'));
+
+			$ingroup_fids = array_filter(preg_split('/[\s]*,[\s]*/', $row->parameters->get('fields')), function($v) { return (trim($v) !== ''); });
+			$ingroup_fids = ArrayHelper::toInteger($ingroup_fids);
 
 			// For fields of group that are included in current list, add reference to their group field
 			foreach($ingroup_fids as $grouped_field_id)
@@ -230,15 +247,15 @@ class FlexicontentViewFields extends FlexicontentViewBaseRecords
 			}
 
 			// Check if fieldgroup field is present in current list and create its list of grouped fields
-			if (isset($FG_fieldids[$row->id]))
+			if (isset($rowsByIds[$id]))
 			{
-				$rowsByIds[$row->id]->grouped_fields = array();
+				$rowsByIds[$id]->grouped_fields = array();
 
-				foreach ($FG_fieldids[$row->id] as $grouped_field_id)
+				foreach ($ingroup_fids as $grouped_field_id)
 				{
 					if (isset($rowsInGroup[$grouped_field_id]))
 					{
-						$rowsByIds[$row->id]->grouped_fields[] = $rowsInGroup[$grouped_field_id];
+						$rowsByIds[$id]->grouped_fields[] = $rowsInGroup[$grouped_field_id];
 					}
 				}
 			}
@@ -250,7 +267,7 @@ class FlexicontentViewFields extends FlexicontentViewBaseRecords
 		 * needed for displaying master field information of every field cascading after them
 		 */
 
-		$rowsMasters = $model->getItemsByConditions(array(
+		$rowsMasters = !count($master_fids) ? array() : $model->getItemsByConditions(array(
 			'where' => array('t.id IN (' . implode(',', $master_fids) . ')'),
 		));
 		
@@ -351,7 +368,6 @@ class FlexicontentViewFields extends FlexicontentViewBaseRecords
 		));
 
 
-
 		// Build orphaned/assigned filter
 		$options 	= array();
 		$options[] = JHtml::_('select.option',  '', '-'/*JText::_( 'FLEXI_ALL_FIELDS' )*/ );
@@ -398,6 +414,7 @@ class FlexicontentViewFields extends FlexicontentViewBaseRecords
 			}
 		}
 
+
 		// Build item type filter
 		$lists['filter_fieldtype'] = $this->getFilterDisplay(array(
 			'label' => JText::_('FLEXI_FIELD_TYPE'),
@@ -416,14 +433,13 @@ class FlexicontentViewFields extends FlexicontentViewBaseRecords
 		));
 
 
-
 		// Build publication state filter
 		$options 	= array();
 		$options[] = JHtml::_('select.option',  '', '-'/*JText::_( 'FLEXI_SELECT_STATE' )*/ );
-		$options[] = JHtml::_('select.option',  'P', JText::_( 'FLEXI_PUBLISHED' ) );
-		$options[] = JHtml::_('select.option',  'U', JText::_( 'FLEXI_UNPUBLISHED' ) );
-		//$options[] = JHtml::_('select.option',  'A', JText::_( 'FLEXI_ARCHIVED' ) );
-		//$options[] = JHtml::_('select.option',  'T', JText::_( 'FLEXI_TRASHED' ) );
+		$options[] = JHtml::_('select.option',  'P', JText::_('FLEXI_PUBLISHED'));
+		$options[] = JHtml::_('select.option',  'U', JText::_('FLEXI_UNPUBLISHED'));
+		$options[] = JHtml::_('select.option',  'A', JText::_('FLEXI_ARCHIVED'));
+		$options[] = JHtml::_('select.option',  'T', JText::_('FLEXI_TRASHED'));
 
 		$fieldname = 'filter_state';
 		$elementid = 'filter_state';
@@ -501,8 +517,10 @@ class FlexicontentViewFields extends FlexicontentViewBaseRecords
 		$this->view   = $view;
 		$this->state  = $this->get('State');
 
-		$this->sidebar = FLEXI_J30GE ? JHtmlSidebar::render() : null;
-
+		if (!$jinput->getCmd('nosidebar'))
+		{
+			$this->sidebar = FLEXI_J30GE ? JHtmlSidebar::render() : null;
+		}
 
 		/**
 		 * Render view's template
@@ -632,8 +650,8 @@ class FlexicontentViewFields extends FlexicontentViewBaseRecords
 		$extra_js = "";
 		flexicontent_html::addToolBarButton(
 			'Export CSV', $btn_name, $full_js='', $msg_alert='', $msg_confirm='Field\'s configuration will be exported as CSV',
-			$btn_task, $extra_js, $btn_list=false, $btn_menu=true, $btn_confirm=true, $btn_class="btn-warning", $btn_icon);*/
-
+			$btn_task, $extra_js, $btn_list=false, $btn_menu=true, $btn_confirm=true, $btn_class="btn-warning", $btn_icon);
+		*/
 
 		if ($perms->CanConfig)
 		{

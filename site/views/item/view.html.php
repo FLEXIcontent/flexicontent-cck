@@ -1278,7 +1278,7 @@ class FlexicontentViewItem extends JViewLegacy
 		$form_cid = !empty($session_data['cid'])
 			? $session_data['cid']
 			: $item->categories;
-		ArrayHelper::toInteger($form_cid);
+		$form_cid = ArrayHelper::toInteger($form_cid);
 
 
 		// ***

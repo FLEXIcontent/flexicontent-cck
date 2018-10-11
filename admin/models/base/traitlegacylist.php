@@ -53,8 +53,8 @@ trait FCModelTraitLegacyList
 	 * Method to check if given records can not be deleted due to assignments or due to permissions
 	 *
 	 * @param		array			$cid          array of record ids to check
-	 * @param		array			$cid_noauth   (variable by reference) to return an array of non-authorized record ids
-	 * @param		array			$cid_wassocs  (variable by reference) to return an array of 'locked' record ids
+	 * @param		array			$cid_noauth   (variable by reference), pass authorizing -ignored- IDs and return an array of non-authorized record ids
+	 * @param		array			$cid_wassocs  (variable by reference), pass assignments -ignored- IDs and return an array of 'locked' record ids
 	 *
 	 * @return	boolean	  True when at least 1 deleteable record found
 	 *
@@ -62,15 +62,16 @@ trait FCModelTraitLegacyList
 	 */
 	public function candelete(& $cid, & $cid_noauth = null, & $cid_wassocs = null)
 	{
-		return $this->changestate($cid, $cid_noauth, $cid_wassocs, $tostate = -2);
+		return $this->canchangestate($cid, $cid_noauth, $cid_wassocs, $tostate = -2);
 	}
+
 
 	/**
 	 * Method to check if given records can not be unpublished due to assignments or due to permissions
 	 *
 	 * @param		array			$cid          array of record ids to check
-	 * @param		array			$cid_noauth   (variable by reference) to return an array of non-authorized record ids
-	 * @param		array			$cid_wassocs  (variable by reference) to return an array of 'locked' record ids
+	 * @param		array			$cid_noauth   (variable by reference), pass authorizing -ignored- IDs and return an array of non-authorized record ids
+	 * @param		array			$cid_wassocs  (variable by reference), pass assignments -ignored- IDs and return an array of 'locked' record ids
 	 *
 	 * @return	boolean	  True when at least 1 publishable record found
 	 *
@@ -78,6 +79,6 @@ trait FCModelTraitLegacyList
 	 */
 	public function canunpublish(& $cid, & $cid_noauth = null, & $cid_wassocs = null)
 	{
-		return $this->changestate($cid, $cid_noauth, $cid_wassocs, $tostate = 0);
+		return $this->canchangestate($cid, $cid_noauth, $cid_wassocs, $tostate = 0);
 	}
 }

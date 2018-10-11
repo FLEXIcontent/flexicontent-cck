@@ -2819,7 +2819,7 @@ class plgFlexicontent_fieldsImage extends FCField
 		$file_id = $db->loadResult();
 		if (!$file_id)  return true;
 
-		$ignored['item_id'] = $item->id;
+		$ignored = array($item->id);
 
 		$fm = new FlexicontentModelFilemanager();
 		return $fm->candelete( array($file_id), $ignored );
