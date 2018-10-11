@@ -210,7 +210,7 @@ class FlexicontentControllerCategories extends FlexicontentControllerBaseAdmin
 
 		// Get and santize records ids
 		$cid = $this->input->get('cid', array(), 'array');
-		ArrayHelper::toInteger($cid);
+		$cid = ArrayHelper::toInteger($cid);
 
 		// Check at least one item was selected
 		if (!count($cid))
@@ -289,7 +289,7 @@ class FlexicontentControllerCategories extends FlexicontentControllerBaseAdmin
 
 		// Get and santize records ids
 		$cid = $this->input->get('cid', array(), 'array');
-		ArrayHelper::toInteger($cid);
+		$cid = ArrayHelper::toInteger($cid);
 
 		// Check at least one item was selected
 		if (!count($cid))
@@ -319,7 +319,7 @@ class FlexicontentControllerCategories extends FlexicontentControllerBaseAdmin
 
 		// Get new record access
 		$accesses = $this->input->get('access', array(), 'array');
-		ArrayHelper::toInteger($accesses);
+		$accesses = ArrayHelper::toInteger($accesses);
 		$access = $accesses[$id];
 
 		if (!$model->saveaccess($id, $access))

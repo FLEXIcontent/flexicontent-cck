@@ -129,6 +129,18 @@ abstract class FCModelAdmin extends JModelAdmin
 	var $hard_filters = array();
 
 	/**
+	 * Array of supported state conditions of the record
+	 *  Set to non-empty string to use a custom title text for the condition
+	 *  Use empty to use default and optimize HTML / JS
+	 */
+	var $supported_conditions = array(
+		 0 => '', //'FLEXI_UNPUBLISHED',
+		 1 => '', //'FLEXI_PUBLISHED',
+		 2 => '', //'FLEXI_ARCHIVED',
+		-2 => '', //'FLEXI_TRASHED'
+	);
+
+	/**
 	 * Groups of Fields that can be partially present in the form
 	 */
 	var $mergeableGroups = array();
@@ -163,7 +175,7 @@ abstract class FCModelAdmin extends JModelAdmin
 				$id = $jinput->get($key, array(), 'array');
 				if (count($id))
 				{
-					ArrayHelper::toInteger($id);
+					$id = ArrayHelper::toInteger($id);
 					$pk = (int) $id[0];
 				}
 			}
@@ -1429,7 +1441,7 @@ abstract class FCModelAdmin extends JModelAdmin
 
 		// Sanitize id
 		$cid = (array) $id;
-		ArrayHelper::toInteger($cid, null);
+		$cid = ArrayHelper::toInteger($cid);
 
 		// Recursively add all ancestors or descendants if this is a nested record
 		if (in_array('FCModelTraitNestableRecord', class_uses($this)))
@@ -1453,7 +1465,7 @@ abstract class FCModelAdmin extends JModelAdmin
 			}
 		}
 
-		ArrayHelper::toInteger($cid, null);
+		$cid = ArrayHelper::toInteger($cid);
 		$cid_list = implode(',', $cid);
 
 		if (!empty($this->event_recid_col))
@@ -1508,7 +1520,7 @@ abstract class FCModelAdmin extends JModelAdmin
 				{
 					if (in_array($this->state_col, $this->tbl_ext_cols[$tbl_name]))
 					{
-						ArrayHelper::toInteger($config['rids'], null);
+						$config['rids'] = ArrayHelper::toInteger($config['rids']);
 						$rids_list =  implode( ',', $config['rids']);
 
 						$query = $this->_db->getQuery(true)

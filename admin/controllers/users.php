@@ -224,7 +224,7 @@ class FlexicontentControllerUsers extends FlexicontentControllerBaseAdmin
 		$curIsSuperAdmin = $me->authorise('core.admin', 'root.1');
 
 		$cid = JRequest::getVar('cid', array(), '', 'array');
-		ArrayHelper::toInteger($cid);
+		$cid = ArrayHelper::toInteger($cid);
 
 		if (count($cid) < 1)
 		{
@@ -321,7 +321,7 @@ class FlexicontentControllerUsers extends FlexicontentControllerBaseAdmin
 		if (!$check_uids)
 		{
 			$cid = JRequest::getVar('cid', array(), '', 'array');
-			ArrayHelper::toInteger($cid);
+			$cid = ArrayHelper::toInteger($cid);
 			$block = JRequest::getVar('task') == 'block';
 		}
 		else
@@ -411,13 +411,15 @@ class FlexicontentControllerUsers extends FlexicontentControllerBaseAdmin
 		// Check for request forgeries
 		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 
-		$app = JFactory::getApplication();
-		$db  = JFactory::getDbo();
+		$app    = JFactory::getApplication();
+		$jinput = $app->input;
+		$db     = JFactory::getDbo();
 		$task   = $this->getTask();
-		$cids   = JRequest::getVar('cid', array(), '', 'array');
-		$client = JRequest::getVar('client', 0, '', 'int');
 
-		ArrayHelper::toInteger($cids);
+		$cids   = $jinput->get('cid', array(), 'array');
+		$client = $jinput->getInt('client', 0);
+
+		$cids = ArrayHelper::toInteger($cids);
 
 		if (count($cids) < 1)
 		{

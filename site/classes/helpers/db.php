@@ -850,7 +850,7 @@ class flexicontent_db
 	static function checkin($jtable_name, $redirect_url, $controller)
 	{
 		$cid = JFactory::getApplication()->input->get('cid', array(0), 'array');
-		ArrayHelper::toInteger($cid);
+		$cid = ArrayHelper::toInteger($cid);
 
 		$user = JFactory::getUser();
 		$controller->setRedirect($redirect_url, '');
@@ -995,7 +995,7 @@ class flexicontent_db
 
 		if (is_array($contenttypes_list))
 		{
-			ArrayHelper::toInteger($contenttypes_list);
+			$contenttypes_list = ArrayHelper::toInteger($contenttypes_list);
 			$contenttypes_list = implode(',', $contenttypes_list);
 		}
 
@@ -1114,7 +1114,7 @@ class flexicontent_db
 		$associations[$item->language] = $item->id;
 
 		// Make sure associations ids are integers
-		ArrayHelper::toInteger($associations);
+		$associations = ArrayHelper::toInteger($associations);
 
 		$db = JFactory::getDbo();
 		$query = $db->getQuery(true)

@@ -15,15 +15,16 @@ use Joomla\String\StringHelper;
 JHtml::addIncludePath(JPATH_COMPONENT . '/helpers/html');
 
 global $globalcats;
-$app     = JFactory::getApplication();
-$jinput  = $app->input;
-$config  = JFactory::getConfig();
-$user    = JFactory::getUser();
-$cparams = JComponentHelper::getParams('com_flexicontent');
-$ctrl    = 'fields.';
-$hlpname = 'fcfields';
-$isAdmin = $app->isAdmin();
-$canOrder= $this->perms->CanOrderFields;
+$app      = JFactory::getApplication();
+$jinput   = $app->input;
+$config   = JFactory::getConfig();
+$user     = JFactory::getUser();
+$session  = JFactory::getSession();
+$document = JFactory::getDocument();
+$cparams  = JComponentHelper::getParams('com_flexicontent');
+$ctrl     = 'fields.';
+$hlpname  = 'fcfields';
+$isAdmin  = $app->isAdmin();
 
 
 
@@ -64,11 +65,11 @@ $tools_cookies['fc-filters-box-disp'] = 0; //JFactory::getApplication()->input->
 
 
 
-
 /**
  * Order stuff and table related variables
  */
 
+$canOrder = $this->perms->CanOrderFields;
 $list_total_cols = 13;
 
 $ordering_draggable = $cparams->get('draggable_reordering', 1);
@@ -99,32 +100,34 @@ $ord_col = !$this->filter_type
 $ord_grp = 1;
 
 
+
 /**
- * Prepare usage of content types
+ * Add inline JS
  */
-foreach($this->types as $type)
-{
-	$type->jname = JText::_($type->name);
-}
 
-?>
+$js = '';
 
+$js .= "
 
-<script>
-
-// delete active filter
+// Delete a specific list filter
 function delFilter(name)
 {
 	//if(window.console) window.console.log('Clearing filter:'+name);
 	var myForm = jQuery('#adminForm');
 	var filter = jQuery('#'+name);
-	if (filter.attr('type')=='checkbox')
+
+	if (!filter.length)
+	{
+		return;
+	}
+	else if (filter.attr('type') == 'checkbox')
 	{
 		filter.checked = '';
 	}
 	else
 	{
 		filter.val('');
+
 		// Case that input has Calendar JS attached
 		if (filter.attr('data-alt-value'))
 		{
@@ -145,7 +148,18 @@ function delAllFilters()
 	delFilter('filter_order_Dir');
 }
 
-</script>
+";
+
+if ($js)
+{
+	$document->addScriptDeclaration('
+		jQuery(document).ready(function()
+		{
+			' . $js . '
+		});
+	');
+}
+?>
 
 
 <div id="flexicontent" class="flexicontent">

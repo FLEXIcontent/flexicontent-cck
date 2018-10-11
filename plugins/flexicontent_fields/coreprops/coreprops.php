@@ -347,7 +347,7 @@ class plgFlexicontent_fieldsCoreprops extends FCField
 			case 'language':
 				if ($props_type=='id')
 				{
-					ArrayHelper::toInteger($value);  // Sanitize filter values as integers
+					$value = ArrayHelper::toInteger($value);  // Sanitize filter values as integers
 				}
 
 				$filter->filter_colname     = $props_type;

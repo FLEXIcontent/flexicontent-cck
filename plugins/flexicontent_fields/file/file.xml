@@ -155,7 +155,7 @@
 			<field name="" type="separator" default="FLEXI_FILELIST_COLUMNS" description="FLEXI_FILELIST_COLUMNS_DESC" level="level3" depend_class="use-myfiles-on" />
 			<field name="filelist_cols" type="fccheckbox" default="" display_useglobal="0"
 				checkoptions="FLEXI_ACCESS,FLEXI_TARGET_DIRECTORY,FLEXI_STATE,FLEXI_LANGUAGE,FLEXI_UPLOADER,FLEXI_UPLOAD_TIME,FLEXI_ID,FLEXI_HITS,FLEXI_USAGE"
-				checkvals="access,target,state,lang,uploader,upload_time,file_id,hits,usage"
+				checkvals="state,access,lang,hits,target,stamp,usage,uploader,upload_time,file_id"
 				defaultvals="upload_time,hits"
 				label="FLEXI_COLUMNS" description="FLEXI_FILELIST_COLUMNS_DESC" depend_class="use-myfiles-on" />
 

@@ -121,7 +121,7 @@ class FlexicontentControllerTags extends FlexicontentControllerBaseAdmin
 
 		$name = $this->input->get('name', null, 'string');
 		$cid  = $this->input->get('cid', array(0), 'array');
-		ArrayHelper::toInteger($cid, array(0));
+		$cid  = ArrayHelper::toInteger($cid, array(0));
 		$cid  = (int) $cid[0];
 
 		// Check if tag exists (id exists or name exists)

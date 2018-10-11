@@ -223,7 +223,7 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		$contenttypes = $params->get('contenttypes', array(), 'array');
 
 		// Sanitize them as integers and as an array
-		ArrayHelper::toInteger($contenttypes);
+		$contenttypes = ArrayHelper::toInteger($contenttypes);
 
 		// Make sure these are unique too
 		$contenttypes = array_unique($contenttypes);
@@ -257,7 +257,7 @@ class FLEXIcontentViewSearch extends JViewLegacy
 			$form_contenttypes = $jinput->get('contenttypes', array(), 'array');
 
 			// Sanitize them as integers and as an array
-			ArrayHelper::toInteger($form_contenttypes);
+			$form_contenttypes = ArrayHelper::toInteger($form_contenttypes);
 
 			// Make sure these are unique too
 			$form_contenttypes = array_unique($form_contenttypes);

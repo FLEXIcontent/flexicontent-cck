@@ -150,7 +150,7 @@ class FlexicontentControllerAppsman extends FlexicontentController
 
 		if ($ids_are_integers)
 		{
-			ArrayHelper::toInteger($cid, array());
+			$cid = ArrayHelper::toInteger($cid);
 		}
 
 		$conf = $session->get('appsman_export', array(), 'flexicontent');
@@ -550,7 +550,7 @@ class FlexicontentControllerAppsman extends FlexicontentController
 
 			if ($ids_are_integers)
 			{
-				ArrayHelper::toInteger($cid, array());
+				$cid = ArrayHelper::toInteger($cid);
 			}
 
 			if (!$table)

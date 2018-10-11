@@ -277,7 +277,7 @@ class FlexicontentControllerTypes extends FlexicontentControllerBaseAdmin
 
 		// Get and santize records ids
 		$cid = $this->input->get('cid', array(), 'array');
-		ArrayHelper::toInteger($cid);
+		$cid = ArrayHelper::toInteger($cid);
 
 		// Check at least one item was selected
 		if (!count($cid))
@@ -342,7 +342,7 @@ class FlexicontentControllerTypes extends FlexicontentControllerBaseAdmin
 
 		// Get and santize records ids
 		$cid = $this->input->get('cid', array(), 'array');
-		ArrayHelper::toInteger($cid);
+		$cid = ArrayHelper::toInteger($cid);
 
 		// Check at least one item was selected
 		if (!count($cid))

@@ -68,8 +68,14 @@ class FlexicontentViewFilemanager extends FlexicontentViewBaseRecords
 			global $fc_run_times;
 		}
 
-		//$authorparams = flexicontent_db::getUserConfig($user->id);
 		$langs = FLEXIUtilities::getLanguages('code');
+		/*
+		$authorparams = flexicontent_db::getUserConfig($user->id);
+		$allowed_langs = !$authorparams ? null : $authorparams->get('langs_allowed',null);
+		$allowed_langs = !$allowed_langs ? null : FLEXIUtilities::paramToArray($allowed_langs);
+		*/
+		$allowed_langs = null;
+		$display_file_lang_as = $cparams->get('display_file_lang_as', 3);
 
 
 		// Get user's global permissions
@@ -100,9 +106,12 @@ class FlexicontentViewFilemanager extends FlexicontentViewBaseRecords
 			}
 		}
 
-		if (!$fieldid && $view === 'fileselement') die('no valid field ID');
+		if (!$fieldid && $view === 'fileselement')
+		{
+			jexit('<div class="alert alert-info">no valid field ID</div>');
+		}
+
 		$_view = $view . $fieldid;
-		//$folder_mode = !$fieldid ? 0 : $app->getUserStateFromRequest( $option.'.'.$_view.'.folder_mode', 'folder_mode', 0, 'int' );
 
 
 		/**
@@ -115,6 +124,8 @@ class FlexicontentViewFilemanager extends FlexicontentViewBaseRecords
 		$filter_order      = $model->getState('filter_order');
 		$filter_order_Dir  = $model->getState('filter_order_Dir');
 
+		$filter_state     = $app->getUserStateFromRequest( $option.'.'.$_view.'.filter_state',     'filter_state', '', 'int');
+		$filter_access    = $app->getUserStateFromRequest( $option.'.'.$_view.'.filter_access',    'filter_access', '', 'int');
 		$filter_lang			= $app->getUserStateFromRequest( $option.'.'.$_view.'.filter_lang',      'filter_lang',      '',          'string' );
 		$filter_url       = $app->getUserStateFromRequest( $option.'.'.$_view.'.filter_url',       'filter_url',       '',          'word' );
 		$filter_secure    = $app->getUserStateFromRequest( $option.'.'.$_view.'.filter_secure',    'filter_secure',    '',          'word' );
@@ -136,25 +147,36 @@ class FlexicontentViewFilemanager extends FlexicontentViewBaseRecords
 
 		}
 
-		// Column selection of optional columns given
-		if ( !empty($filelist_cols) )
-		{
-			foreach($filelist_cols as $col) $cols[$col] = 1;
-			unset($cols['_SAVED_']);
-		}
 
-		// Column selection of optional columns not given
-		else
+		/**
+		 * Column selection of optional columns given
+		 */
+
+		if (!empty($filelist_cols))
 		{
-			// Filemanager view, add all columns
-			if ($view === 'filemanager')
+			foreach($filelist_cols as $col)
 			{
-				foreach($optional_cols as $col) $cols[$col] = 1;
+				$cols[$col] = 1;
 			}
 
-			// Fileselement view, show none of optional columns
-			else ;
+			unset($cols['_SAVED_']);
 		}
+		
+		/*
+		 * Column selection of optional columns not given)
+		 */
+
+		// Filemanager view, add all columns
+		elseif ($view === 'filemanager')
+		{
+			foreach($optional_cols as $col)
+			{
+				$cols[$col] = 1;
+			}
+		}
+
+		// Fileselement view, add none of optional columns
+		else ;
 
 		$filter_ext       = $app->getUserStateFromRequest( $option.'.'.$_view.'.filter_ext',       'filter_ext',       '',          'alnum' );
 		$filter_uploader  = $app->getUserStateFromRequest( $option.'.'.$_view.'.filter_uploader',  'filter_uploader',  '',           'int' );
@@ -162,6 +184,8 @@ class FlexicontentViewFilemanager extends FlexicontentViewBaseRecords
 
 		if ($layout !== 'image')
 		{
+			if ($filter_state) $count_filters++;
+			if ($filter_access) $count_filters++;
 			if ($filter_lang) $count_filters++;
 			if ($filter_url) $count_filters++;
 			if ($filter_stamp) $count_filters++;
@@ -323,35 +347,120 @@ class FlexicontentViewFilemanager extends FlexicontentViewBaseRecords
 
 
 		/**
+		 * FILE UPLOAD FORM
+		 */
+
+		$ffields = array();
+
+		// Language form field
+		$elementid = 'file-lang';
+		$fieldname = 'file-lang';
+
+		$ffields['file-lang'] = flexicontent_html::buildlanguageslist(
+			$fieldname,
+			array(
+				'class' => 'use_select2_lib',
+			),
+			'*',
+			$display_file_lang_as,
+			$allowed_langs,
+			$published_only = false
+		);
+
+
+		// Access level form field
+		$elementid = 'file-access';
+		$fieldname = 'file-access';
+
+		$options = JHtml::_('access.assetgroups');
+
+		$ffields['file-access'] = JHtml::_('select.genericlist',
+			$options,
+			$fieldname,
+			array(
+				'class' => 'use_select2_lib',
+			),
+			'value',
+			'text',
+			null,
+			$elementid,
+			$translate = true
+		);
+
+
+		/**
 		 * Create List Filters
 		 */
 
 		$lists = array();
 
-		// ** FILE UPLOAD FORM **
+		// Build language filter
+		$lists['filter_lang'] = $this->getFilterDisplay(array(
+			'label' => JText::_('FLEXI_LANGUAGE'),
+			'html' => flexicontent_html::buildlanguageslist(
+				'filter_lang',
+				array(
+					'class' => 'use_select2_lib',
+					'onchange' => 'document.adminForm.limitstart.value=0; Joomla.submitform();',
+				),
+				$filter_lang,
+				'-'
+			)
+		));
 
-		// Build languages list
-		//$allowed_langs = !$authorparams ? null : $authorparams->get('langs_allowed',null);
-		//$allowed_langs = !$allowed_langs ? null : FLEXIUtilities::paramToArray($allowed_langs);
-		$display_file_lang_as = $cparams->get('display_file_lang_as', 3);
-		$allowed_langs = null;
-		$lists['file-lang'] = flexicontent_html::buildlanguageslist('file-lang', 'class="use_select2_lib"', '*', $display_file_lang_as, $allowed_langs, $published_only=false);
+		// Build publication state filter
+		$options 	= array();
+		$options[] = JHtml::_('select.option',  '', '-'/*JText::_( 'FLEXI_SELECT_STATE' )*/ );
+		$options[] = JHtml::_('select.option',  'P', JText::_( 'FLEXI_PUBLISHED' ) );
+		$options[] = JHtml::_('select.option',  'U', JText::_( 'FLEXI_UNPUBLISHED' ) );
+		//$options[] = JHtml::_('select.option',  'A', JText::_( 'FLEXI_ARCHIVED' ) );
+		//$options[] = JHtml::_('select.option',  'T', JText::_( 'FLEXI_TRASHED' ) );
+
+		$fieldname = 'filter_state';
+		$elementid = 'filter_state';
+
+		$lists[$elementid] = $this->getFilterDisplay(array(
+			'label' => JText::_('FLEXI_STATE'),
+			'html' => JHtml::_('select.genericlist',
+				$options,
+				$fieldname,
+				array(
+					'class' => 'use_select2_lib',
+					'onchange' => 'document.adminForm.limitstart.value=0; Joomla.submitform();',
+				),
+				'value',
+				'text',
+				$filter_state,
+				$elementid,
+				$translate = true
+			)
+		));
 
 
 		// Build access level filter
 		$options = JHtml::_('access.assetgroups');
-		$elementid = $fieldname = 'file-access';
-		$attribs = 'class="use_select2_lib"';
-		$lists['file-access'] = JHtml::_('select.genericlist', $options, $fieldname, $attribs, 'value', 'text', null, $elementid, $translate=true );
+		array_unshift($options, JHtml::_('select.option', '', '-'/*JText::_('JOPTION_SELECT_ACCESS')*/) );
 
+		$fieldname = 'filter_access';
+		$elementid = 'filter_access';
 
-		// Build language filter
-		$lists['language'] = ($filter_lang || 1 ? '<div class="add-on">'.JText::_('FLEXI_LANGUAGE').'</div>' : '').
-			flexicontent_html::buildlanguageslist('filter_lang', 'class="use_select2_lib" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()" size="1" ', $filter_lang, '-'/*2*/);
+		$lists[$elementid] = $this->getFilterDisplay(array(
+			'label' => JText::_('FLEXI_ACCESS'),
+			'html' => JHtml::_('select.genericlist',
+				$options,
+				$fieldname,
+				array(
+					'class' => 'use_select2_lib',
+					'onchange' => 'document.adminForm.limitstart.value=0; Joomla.submitform();',
+				),
+				'value',
+				'text',
+				$filter_access,
+				$elementid,
+				$translate = true
+			)
+		));
 
-
-		// Text search filter value
-		$lists['search'] = $search;
 
 		// Build text search scope 
 		$scopes = array(
@@ -369,14 +478,17 @@ class FlexicontentViewFilemanager extends FlexicontentViewBaseRecords
 			$options[] = JHtml::_('select.option', $i, $v);
 		}
 
-		$lists['scope_tip'] = '<span class="' . $this->tooltip_class . '" title="'.JText::_('FLEXI_SEARCH_TEXT_INSIDE').'" style="display: inline-block;"><i class="icon-info-2"></i></span>';
+		array_unshift($options, JHtml::_('select.option', 0, JText::_('FLEXI_SEARCH_TEXT_INSIDE'), 'value', 'text', 'disabled'));
+
+		$lists['scope_tip'] = ''; //'<span class="hidden-phone ' . $this->tooltip_class . '" title="'.JText::_('FLEXI_SEARCH_TEXT_INSIDE').'" style="display: inline-block;"><i class="icon-info-2"></i></span>';
 		$lists['scope'] = JHtml::_('select.genericlist',
 			$options,
 			'scope',
 			array(
 				'size' => '1',
-				'class' => $this->select_class . ' fc_skip_highlight fc_is_selarrow',
+				'class' => $this->select_class . ' fc_skip_highlight fc_is_selarrow ' . $this->tooltip_class,
 				'onchange' => 'jQuery(\'#search\').attr(\'placeholder\', jQuery(this).find(\'option:selected\').text()); jQuery(this).blur();',
+				'title' => JText::_('FLEXI_SEARCH_TEXT_INSIDE'),
 			),
 			'value',
 			'text',
@@ -392,8 +504,20 @@ class FlexicontentViewFilemanager extends FlexicontentViewBaseRecords
 			$url[] 	= JHtml::_('select.option',  'F', JText::_( 'FLEXI_FILE' ) );
 			$url[] 	= JHtml::_('select.option',  'U', JText::_( 'FLEXI_URL' ) );
 
-			$lists['url'] = ($filter_url || 1 ? '<div class="add-on">'.JText::_('FLEXI_ALL_FILES').'</div>' : '').
-				JHtml::_('select.genericlist', $url, 'filter_url', 'class="use_select2_lib" size="1" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', 'value', 'text', $filter_url );
+			$lists['filter_url'] = $this->getFilterDisplay(array(
+				'label' => JText::_('FLEXI_ALL_FILES'),
+				'html' => JHtml::_('select.genericlist',
+					$url,
+					'filter_url',
+					array(
+						'class' => 'use_select2_lib',
+						'onchange' => 'document.adminForm.limitstart.value=0; Joomla.submitform();',
+					),
+					'value',
+					'text',
+					$filter_url
+				)
+			));
 
 			// Build stamp filter
 			$stamp 	= array();
@@ -401,22 +525,31 @@ class FlexicontentViewFilemanager extends FlexicontentViewBaseRecords
 			$stamp[] 	= JHtml::_('select.option',  '0', JText::_( 'FLEXI_NO' ) );
 			$stamp[] 	= JHtml::_('select.option',  '1', JText::_( 'FLEXI_YES' ) );
 
-			$lists['stamp'] = ($filter_stamp || 1 ? '<div class="add-on">'.JText::_('FLEXI_DOWNLOAD_STAMPING').'</div>' : '').
-				JHtml::_('select.genericlist', $stamp, 'filter_stamp', 'class="use_select2_lib" size="1" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', 'value', 'text', $filter_stamp );
+			$lists['filter_stamp'] = $this->getFilterDisplay(array(
+				'label' => JText::_('FLEXI_DOWNLOAD_STAMPING'),
+				'html' => JHtml::_('select.genericlist',
+					$stamp,
+					'filter_stamp',
+					array(
+						'class' => 'use_select2_lib',
+						'onchange' => 'document.adminForm.limitstart.value=0; Joomla.submitform();',
+					),
+					'value',
+					'text',
+					$filter_stamp
+				)
+			));
 		}
 
-		//item lists
-		/*$items_list = array();
-		$items_list[] = JHtml::_('select.option', '', '- '. JText::_( 'FLEXI_FILTER_BY_ITEM' ) .' -' );
-		foreach($items as $item) {
-			$items_list[] = JHtml::_('select.option', $item->id, JText::_( $item->title ) . ' (#' . $item->id . ')' );
-		}
-		$lists['item_id'] = JHtml::_('select.genericlist', $items_list, 'item_id', 'size="1" class="use_select2_lib" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', 'value', 'text', $filter_item );*/
-		$lists['item_id'] = '<input type="text" name="item_id" size="1" class="inputbox" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()" value="'.$filter_item.'" />';
+		// Build content item id filter
+		$lists['item_id'] = $this->getFilterDisplay(array(
+			'label' => JText::_('Item id'),
+			'html' => '<input type="text" name="item_id" size="1" class="inputbox" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()" value="'.$filter_item.'" />',
+		));
 
 		//build secure/media filterlist
 		$_secure_info = '<i data-placement="bottom" class="icon-info hasTooltip" title="'.flexicontent_html::getToolTip('FLEXI_URL_SECURE', 'FLEXI_URL_SECURE_DESC', 1, 1).'"></i>';
-		$lists['secure'] = ($filter_secure || 1 ? '<div class="add-on">' . $_secure_info . ' ' . JText::_('FLEXI_URL_SECURE') . '</div>' : '');
+
 		if ($target_dir==2)
 		{
 			$secure 	= array();
@@ -424,22 +557,64 @@ class FlexicontentViewFilemanager extends FlexicontentViewBaseRecords
 			$secure[] 	= JHtml::_('select.option',  'S', JText::_( 'FLEXI_SECURE_DIR' ) );
 			$secure[] 	= JHtml::_('select.option',  'M', JText::_( 'FLEXI_MEDIA_DIR' ) );
 
-			$lists['secure'] .=
-				JHtml::_('select.genericlist', $secure, 'filter_secure', 'class="use_select2_lib" size="1" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', 'value', 'text', $filter_secure );
+			$lists['filter_secure'] = $this->getFilterDisplay(array(
+				'label' => $_secure_info . ' ' . JText::_('FLEXI_URL_SECURE'),
+				'html' => JHtml::_('select.genericlist',
+					$secure,
+					'filter_secure',
+					array(
+						'class' => 'use_select2_lib',
+						'onchange' => 'document.adminForm.limitstart.value=0; Joomla.submitform();',
+					),
+					'value',
+					'text',
+					$filter_secure
+				)
+			));
 		}
 		else
-			$lists['secure'] .= '<span class="badge badge-info">'.JText::_($target_dir==0 ? 'FLEXI_MEDIA_DIR' : 'FLEXI_SECURE_DIR').'</span>';
+		{
+			$lists['filter_secure'] = $this->getFilterDisplay(array(
+				'label' => $_secure_info . ' ' . JText::_('FLEXI_URL_SECURE'),
+				'html' => '<span class="badge badge-info">' . JText::_($target_dir == 0 ? 'FLEXI_MEDIA_DIR' : 'FLEXI_SECURE_DIR') . '</span>',
+			));
+		}
 
 		//build ext filterlist
-		$lists['ext'] = ($filter_ext || 1 ? '<div class="add-on">'.JText::_('FLEXI_ALL_EXT').'</div>' : '').
-			flexicontent_html::buildfilesextlist('filter_ext', 'class="use_select2_lib" size="1" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', $filter_ext, '-'/*1*/);
+		$lists['filter_ext'] = $this->getFilterDisplay(array(
+			'label' => JText::_('FLEXI_ALL_EXT'),
+			'html' => flexicontent_html::buildfilesextlist(
+				'filter_ext',
+				array(
+					'class' => 'use_select2_lib',
+					'onchange' => 'document.adminForm.limitstart.value=0; Joomla.submitform();',
+				),
+				$filter_ext,
+				'-'
+			)
+		));
 
 		//build uploader filterlist
 		if ($perms->CanViewAllFiles && !empty($cols['uploader']))
 		{
-			$lists['uploader'] = ($filter_uploader || 1 ? '<div class="add-on">'.JText::_('FLEXI_ALL_UPLOADERS').'</div>' : '').
-				flexicontent_html::builduploaderlist('filter_uploader', 'class="use_select2_lib" size="1" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', $filter_uploader, '-'/*1*/);
+			$lists['filter_uploader'] = $this->getFilterDisplay(array(
+				'label' => JText::_('FLEXI_ALL_UPLOADERS'),
+				'html' => flexicontent_html::builduploaderlist(
+					'filter_uploader',
+					array(
+						'class' => 'use_select2_lib',
+						'onchange' => 'document.adminForm.limitstart.value=0; Joomla.submitform();',
+					),
+					$filter_uploader,
+					'-'
+				)
+			));
 		}
+
+
+		// Text search filter value
+		$lists['search'] = $search;
+
 
 		// Table ordering
 		$lists['order_Dir'] = $filter_order_Dir;
@@ -460,6 +635,7 @@ class FlexicontentViewFilemanager extends FlexicontentViewBaseRecords
 		$this->count_filters = $count_filters;
 
 		$this->params      = $cparams;
+		$this->ffields     = $ffields;
 		$this->lists       = $lists;
 		$this->rows        = $rows_pending ?: $rows;
 		$this->is_pending  = $rows_pending ? true : false;
@@ -468,6 +644,8 @@ class FlexicontentViewFilemanager extends FlexicontentViewBaseRecords
 		$this->folder_mode = $folder_mode;
 		$this->assign_mode = $assign_mode;
 		$this->pagination  = $pagination;
+
+		$this->perms  = FlexicontentHelperPerm::getPerm();
 
 		$this->CanFiles   = $perms->CanFiles;
 		$this->CanUpload  = $perms->CanUpload;
@@ -494,7 +672,7 @@ class FlexicontentViewFilemanager extends FlexicontentViewBaseRecords
 			$this->thumb_h    = $thumb_h;
 			$this->targetid   = $targetid;
 		}
-		else
+		elseif (!$jinput->getCmd('nosidebar'))
 		{
 			$this->sidebar = FLEXI_J30GE ? JHtmlSidebar::render() : null;
 		}
@@ -577,7 +755,7 @@ class FlexicontentViewFilemanager extends FlexicontentViewBaseRecords
 		if (count($btn_arr))
 		{
 			$drop_btn = '
-				<button type="button" class="btn btn-small btn-primary dropdown-toggle" data-toggle="dropdown">
+				<button type="button" class="' . $this->btn_sm_class . ' btn-primary dropdown-toggle" data-toggle="dropdown">
 					<span title="'.JText::_('FLEXI_MAINTENANCE').'" class="icon-menu"></span>
 					'.JText::_('FLEXI_MAINTENANCE').'
 					<span class="caret"></span>

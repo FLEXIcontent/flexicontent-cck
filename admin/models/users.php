@@ -328,7 +328,7 @@ class FlexicontentModelUsers extends FCModelAdminList
 	 */
 	public function filterByPermission($cid, $rule)
 	{
-		ArrayHelper::toInteger($cid);
+		$cid = ArrayHelper::toInteger($cid);
 
 		// If cannot manage then all records are not changeable
 		if (!$this->canManage)
@@ -352,7 +352,7 @@ class FlexicontentModelUsers extends FCModelAdminList
 	 */
 	public function filterByAssignments($cid = array(), $tostate = -2)
 	{
-		ArrayHelper::toInteger($cid);
+		$cid = ArrayHelper::toInteger($cid);
 		$cid_wassocs = array();
 
 		// We will not return assignments, as users maybe used everywhere ... behave like none of them has assignments

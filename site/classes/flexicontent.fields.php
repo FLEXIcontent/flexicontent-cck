@@ -209,7 +209,8 @@ class FlexicontentFields
 
 		$db   = JFactory::getDbo();
 		$user = JFactory::getUser();
-		ArrayHelper::toInteger($field_ids);
+
+		$field_ids = ArrayHelper::toInteger($field_ids);
 
 		// Field's has_access flag
 		if ($check_access)
@@ -243,8 +244,8 @@ class FlexicontentFields
 	static function & getFieldValsById($field_ids, $item_ids, $version=0)
 	{
 		$db = JFactory::getDbo();
-		ArrayHelper::toInteger($field_ids);
-		ArrayHelper::toInteger($item_ids);
+		$field_ids = ArrayHelper::toInteger($field_ids);
+		$item_ids  = ArrayHelper::toInteger($item_ids);
 
 		$query = 'SELECT item_id, field_id, value, valueorder, suborder'
 			. ($version ? ' FROM #__flexicontent_items_versions':' FROM #__flexicontent_fields_item_relations')
@@ -1363,7 +1364,7 @@ class FlexicontentFields
 		{
 			$item = $items[0];
 			if ( !count($item->tags) ) return array();
-			ArrayHelper::toInteger($item->tags);
+			$item->tags = ArrayHelper::toInteger($item->tags);
 
 			$query 	= 'SELECT DISTINCT t.id, t.name, CASE WHEN CHAR_LENGTH(t.alias) THEN CONCAT_WS(\':\', t.id, t.alias) ELSE t.id END as slug'
 				. ' FROM #__flexicontent_tags AS t'
@@ -1389,7 +1390,7 @@ class FlexicontentFields
 		}
 
 		if (empty($cids)) return array();
-		ArrayHelper::toInteger($cids);
+		$cids = ArrayHelper::toInteger($cids);
 
 		$query = 'SELECT t.tid, t.itemid'
 			. ' FROM #__flexicontent_tags_item_relations AS t'
@@ -1451,7 +1452,7 @@ class FlexicontentFields
 		if ($versioned_item)
 		{
 			$item = $items[0];
-			ArrayHelper::toInteger($item->categories);
+			$item->categories = ArrayHelper::toInteger($item->categories);
 
 			$query = 'SELECT DISTINCT c.id, c.title, CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as slug'
 				. ' FROM #__categories AS c'
@@ -1476,7 +1477,7 @@ class FlexicontentFields
 		}
 
 		if (empty($cids)) return array();
-		ArrayHelper::toInteger($cids);
+		$cids = ArrayHelper::toInteger($cids);
 
 		$query = 'SELECT c.catid, c.itemid'
 			. ' FROM #__flexicontent_cats_item_relations AS c'

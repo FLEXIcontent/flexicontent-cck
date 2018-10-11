@@ -705,7 +705,7 @@ class flexicontent_html
 		$limit_options = $params->get('limit_options', '5,10,20,30,50,100,150,200');
 		$limit_options = preg_split("/[\s]*,[\s]*/", $limit_options);
 
-		ArrayHelper::toInteger($limit_options, array());
+		$limit_options = ArrayHelper::toInteger($limit_options);
 
 		if (!in_array($default_limit, $limit_options))
 		{
@@ -2152,11 +2152,11 @@ class flexicontent_html
 		$state  = $jinput->get('state', 0, 'int');
 		$perms  = FlexicontentHelperPerm::getPerm();
 
-		$archive_unsupported = false; //in_array($record_name, array('...', '...');
-		$trash_unsupported   = false; //in_array($record_name, array('...', '...');
+		$archive_unsupported = !isset($model->supported_conditions[2]);
+		$trash_unsupported   = !isset($model->supported_conditions[-2]);
 
 		// Determine priveleges of the current user on the given item
-		/*if (!in_array($record_name, array('item', 'category', 'tag', 'review', 'type')))
+		/*if (!in_array($record_name, array('item', 'category', 'tag', 'review', 'type', 'field', 'file')))
 		{
 			die('flexicontent_html::' . __FUNCTION__ . '() , unknown type: ' . $record_name);
 		}*/
@@ -2167,7 +2167,9 @@ class flexicontent_html
 		// Determine privileges of the current user on the given item
 		$has_edit_state = $model->canEditState($record);
 		$has_delete     = $model->canDelete($record);
-		$has_archive    = $record_name === 'item' ? $has_edit_state && $perms->CanArchives : $has_edit_state;
+		$has_archive    = $record_name === 'item'
+			? $has_edit_state && $perms->CanArchives
+			: $has_edit_state;
 
 		// Clear access if record is locked
 		$has_edit_state = $canCheckin && $has_edit_state;
@@ -2723,8 +2725,9 @@ class flexicontent_html
 			die('flexicontent_html::' . __FUNCTION__ . '() , unknown type: ' . $record_name);
 		}
 
-		$archive_unsupported = false; //in_array($record_name, array('...', '...');
-		$trash_unsupported   = false; //in_array($record_name, array('...', '...');
+		$archive_unsupported = !isset($model->supported_conditions[2]);
+		$trash_unsupported   = !isset($model->supported_conditions[-2]);
+
 		$refresh_on_success  = in_array($config->record_name, array('category')) ? 'true' : 'false';
 
 
@@ -2775,6 +2778,7 @@ class flexicontent_html
 				JText::script('FLEXI_SET_STATE_AS_PENDING', true);
 				JText::script('FLEXI_SET_STATE_AS_TO_WRITE', true);
 			}
+			JText::script('FLEXI_SET_STATE_TO', true);
 			JText::script('FLEXI_PUBLISH_THIS_ITEM', true);
 			JText::script('FLEXI_UNPUBLISH_THIS_ITEM', true);
 			JText::script('FLEXI_ARCHIVE_THIS_ITEM', true);
@@ -2808,10 +2812,46 @@ class flexicontent_html
 
 		if (!$state_names)
 		{
-			$state_names  = array(1=>JText::_('FLEXI_PUBLISHED'), -5=>JText::_('FLEXI_IN_PROGRESS'), 0=>JText::_('FLEXI_UNPUBLISHED'), -3=>JText::_('FLEXI_PENDING'), -4=>JText::_('FLEXI_TO_WRITE'), 2=>JText::_('FLEXI_ARCHIVED'), -2=>JText::_('FLEXI_TRASHED'), 'u'=>JText::_('FLEXI_UNKNOWN'));
-			$state_descrs = array(1=>JText::_('FLEXI_PUBLISH_THIS_ITEM'), -5=>JText::_('FLEXI_SET_STATE_AS_IN_PROGRESS'), 0=>JText::_('FLEXI_UNPUBLISH_THIS_ITEM'), -3=>JText::_('FLEXI_SET_STATE_AS_PENDING'), -4=>JText::_('FLEXI_SET_STATE_AS_TO_WRITE'), 2=>JText::_('FLEXI_ARCHIVE_THIS_ITEM'), -2=>JText::_('FLEXI_TRASH_THIS_ITEM'), 'u'=>'FLEXI_UNKNOWN');
-			$state_imgs   = array(1=>'accept.png', -5=>'publish_g.png', 0=>'publish_x.png', -3=>'publish_r.png', -4=>'publish_y.png', 2=>'archive.png', -2=>'trash.png', 'u'=>'unknown.png');
-			$font_icons   = array(1=>'publish', -5=>'checkmark-2', 0=>'unpublish', -3=>'question', -4=>'pencil-2', 2=>'archive', -2=>'trash', 'u'=>'question-2');
+			$state_names = array(
+				 1  => JText::_('FLEXI_PUBLISHED'),
+				-5  => JText::_('FLEXI_IN_PROGRESS'),
+				 0  => JText::_('FLEXI_UNPUBLISHED'),
+				-3  => JText::_('FLEXI_PENDING'),
+				-4  => JText::_('FLEXI_TO_WRITE'),
+				 2  => JText::_('FLEXI_ARCHIVED'),
+				-2  => JText::_('FLEXI_TRASHED'),
+				'u' => JText::_('FLEXI_UNKNOWN'),
+			);
+			$state_descrs = array(
+				 1  => JText::_('FLEXI_PUBLISH_THIS_ITEM'),
+				-5  => JText::_('FLEXI_SET_STATE_AS_IN_PROGRESS'),
+				 0  => JText::_('FLEXI_UNPUBLISH_THIS_ITEM'),
+				-3  => JText::_('FLEXI_SET_STATE_AS_PENDING'),
+				-4  => JText::_('FLEXI_SET_STATE_AS_TO_WRITE'),
+				 2  => JText::_('FLEXI_ARCHIVE_THIS_ITEM'),
+				-2  => JText::_('FLEXI_TRASH_THIS_ITEM'),
+				'u' => JText::_('FLEXI_UNKNOWN'),
+			);
+			$state_imgs = array(
+				 1  => 'accept.png',
+				-5  => 'publish_g.png',
+				 0  => 'publish_x.png',
+				-3  => 'publish_r.png',
+				-4  => 'publish_y.png',
+				 2  => 'archive.png',
+				-2  => 'trash.png',
+				'u' => 'unknown.png',
+			);
+			$font_icons = array(
+				 1  => 'publish',
+				-5  => 'checkmark-2',
+				 0  => 'unpublish',
+				-3  => 'question',
+				-4  => 'pencil-2',
+				 2  => 'archive',
+				-2  => 'trash',
+				'u' => 'question-2',
+			);
 
 			$tooltip_class = ' hasTooltip';
 			$state_tips = array();
@@ -2858,7 +2898,9 @@ class flexicontent_html
 			$state = 'u';
 		}
 
-		$state_text = '';
+		$state_text = !empty($model->supported_conditions[$state])
+			? JText::_($model->supported_conditions[$state])
+			: null;
 		$stateicon = flexicontent_html::stateicon($state, $icon_params, 'html', $state_text, $record, $show_status = 2);
 
 		$tz_string = JFactory::getApplication()->getCfg('offset');
@@ -2893,7 +2935,7 @@ class flexicontent_html
 			// Only add user's permitted states on the current item
 			if ($has_edit_state)
 			{
-				$state_ids = $config->record_name == 'item'
+				$state_ids = $config->record_name === 'item'
 					? array(1, -5, 0, -3, -4)
 					: array(1, 0);
 			}
@@ -2923,18 +2965,35 @@ class flexicontent_html
 				$tooltip_placement = !$params->get('btn_grp_dropdown', 0) ? 'bottom' : 'left';
 			}
 
+			$state_js_ids = array();
+			$state_js_titles = array();
+
 			foreach ($state_ids as $i => $state_id)
 			{
-				$state_data[] = array('i'=>$state_id);
+				$state_js_ids[] = array('i' => $state_id);
+
+				if (!empty($model->supported_conditions[$i]))
+				{
+					$state_js_titles[$state_id] = JText::_($model->supported_conditions[$state_id]);
+				}
 			}
-			$tooltip_title = flexicontent_html::getToolTip($state_text ? $state_text : JText::_( 'FLEXI_PUBLISH_INFORMATION' ), ' &nbsp; '.implode("\n<br/> &nbsp; \n", $publish_info).'<br/>'.$jtext['change_state'], 0);
+
+			$state_js_ids_list    = count($state_js_ids) ? ' data-st="' . htmlspecialchars(json_encode($state_js_ids), ENT_COMPAT, 'UTF-8') . '" ' : '';
+			$state_js_titles_list = count($state_js_titles) ? ' data-tt="' . htmlspecialchars(json_encode($state_js_titles), ENT_COMPAT, 'UTF-8') . '" ' : '';
+
+			$tooltip_title = flexicontent_html::getToolTip(
+				$state_text ?: JText::_('FLEXI_PUBLISH_INFORMATION'),
+				' &nbsp; ' . implode("\n<br/> &nbsp; \n", $publish_info) . '<br/>' . $jtext['change_state'],
+				0, 1
+			);
+
 			$output = '
 			<div class="statetoggler ' . $button_classes . ' ' . $tooltip_class . '" ' . ($tooltip_placement ? ' data-placement="' . $tooltip_placement . '"' : '') . ' title="' . $tooltip_title . '" onclick="fc_statehandler_singleton.toggleSelector(this)">
 				<div class="statetoggler_inner">
 					<div id="row' . $record->id . '" class="stateopener ntxt">
 						' . $stateicon . '
 					</div>
-					<div class="options" data-id="' . $record->id . '" data-st="'.htmlspecialchars(json_encode($state_data), ENT_COMPAT, 'UTF-8').'">'/*.implode('', $allowed_states)*/.'</div>
+					<div class="options" data-id="' . $record->id . '" ' . $state_js_ids_list . ' ' . $state_js_titles_list . '></div>
 				</div>
 			</div>';
 		}
@@ -2944,7 +3003,7 @@ class flexicontent_html
 		{
 			if ($canChangeState)
 			{
-				$publish_info[] = '<br/>'.JText::_('FLEXI_STATE_CHANGER_DISABLED');
+				$publish_info[] = '<br/>' . JText::_('FLEXI_STATE_CHANGER_DISABLED');
 			}
 
 			$tooltip_title = flexicontent_html::getToolTip(JText::_( 'FLEXI_PUBLISH_INFORMATION' ), implode("\n<br/>\n", $publish_info), 0);
@@ -3312,7 +3371,7 @@ class flexicontent_html
 	 * @param array $params
 	 * @since 1.0
 	 */
-	static function stateicon($state, $params, $type = 'html', &$state_text=null, $item = null, $show_status = 0)
+	static function stateicon($state, $params, $type = 'html', &$state_text = null, $item = null, $show_status = 0)
 	{
 		static $jtext_state = null;
 		static $tooltip_class = ' hasTooltip';
@@ -3406,7 +3465,7 @@ class flexicontent_html
 			: (!empty($is_scheduled) ? '<span class="fc_scheduled"></span>' : '');
 
 		$show_icons = (int) $params->get('show_icons', 1);
-		$state_text = $state_names[$state];
+		$state_text = $state_text ?: $state_names[$state];
 
 		// Return state name if not showing icons
 		if (!$show_icons)
@@ -3447,9 +3506,9 @@ class flexicontent_html
 		{
 			$data['html'] = ($use_font
 				? '<span class="' . $data['class'] . '"></span>'
-				: JHtml::image('components/com_flexicontent/assets/images/'.$state_imgs[$state], $state_names[$state], '')
+				: JHtml::image('components/com_flexicontent/assets/images/'.$state_imgs[$state], $state_text, '')
 			) . ($show_icons === 2
-				? '<span class="fc-mssg-inline fc-info fc-iblock fc-nobgimage">' . $state_names[$state] . '</span>'
+				? '<span class="fc-mssg-inline fc-info fc-iblock fc-nobgimage">' . $state_text . '</span>'
 				: ''
 			);
 
@@ -3465,9 +3524,9 @@ class flexicontent_html
 		}
 		$state_icons[$state][$popup_type] = ($use_font
 			? '<span ' . $tag_attribs . '></span>'
-			: JHtml::image('components/com_flexicontent/assets/images/'.$state_imgs[$state], $state_names[$state], $tag_attribs)
+			: JHtml::image('components/com_flexicontent/assets/images/'.$state_imgs[$state], $state_text, $tag_attribs)
 		) . ($show_icons === 2
-				? '<span class="fc-mssg-inline fc-info fc-iblock fc-nobgimage">' . $state_names[$state] . '</span>'
+				? '<span class="fc-mssg-inline fc-info fc-iblock fc-nobgimage">' . $state_text . '</span>'
 				: ''
 		);
 
@@ -4541,27 +4600,58 @@ class flexicontent_html
 		static $state_names = null;
 		static $state_descrs = null;
 		static $state_imgs = null;
-		if ( !$state_names ) {
-			$state_names = array(1=>JText::_('FLEXI_PUBLISHED'), -5=>JText::_('FLEXI_IN_PROGRESS'), 0=>JText::_('FLEXI_UNPUBLISHED'), -3=>JText::_('FLEXI_PENDING'), -4=>JText::_('FLEXI_TO_WRITE'), 2=>JText::_('FLEXI_ARCHIVED'), -2=>JText::_('FLEXI_TRASHED'), ''=>JText::_('FLEXI_UNKNOWN'));
-			$state_descrs = array(1=>JText::_('FLEXI_PUBLISH_THIS_ITEM'), -5=>JText::_('FLEXI_SET_STATE_AS_IN_PROGRESS'), 0=>JText::_('FLEXI_UNPUBLISH_THIS_ITEM'), -3=>JText::_('FLEXI_SET_STATE_AS_PENDING'), -4=>JText::_('FLEXI_SET_STATE_AS_TO_WRITE'), 2=>JText::_('FLEXI_ARCHIVE_THIS_ITEM'), -2=>JText::_('FLEXI_TRASH_THIS_ITEM'), ''=>'FLEXI_UNKNOWN');
-			$state_imgs = array(1=>'accept.png', -5=>'publish_g.png', 0=>'publish_x.png', -3=>'publish_r.png', -4=>'publish_y.png', 2=>'archive.png', -2=>'trash.png', ''=>'unknown.png');
+
+		if (!$state_names)
+		{
+			$state_names = array(
+				 1  => JText::_('FLEXI_PUBLISHED'),
+				-5  => JText::_('FLEXI_IN_PROGRESS'),
+				 0  => JText::_('FLEXI_UNPUBLISHED'),
+				-3  => JText::_('FLEXI_PENDING'),
+				-4  => JText::_('FLEXI_TO_WRITE'),
+				 2  => JText::_('FLEXI_ARCHIVED'),
+				-2  => JText::_('FLEXI_TRASHED'),
+				'u' => JText::_('FLEXI_UNKNOWN'),
+			);
+			$state_descrs = array(
+				 1 => JText::_('FLEXI_PUBLISH_THIS_ITEM'),
+				-5 => JText::_('FLEXI_SET_STATE_AS_IN_PROGRESS'),
+				 0 => JText::_('FLEXI_UNPUBLISH_THIS_ITEM'),
+				-3 => JText::_('FLEXI_SET_STATE_AS_PENDING'),
+				-4 => JText::_('FLEXI_SET_STATE_AS_TO_WRITE'),
+				 2 => JText::_('FLEXI_ARCHIVE_THIS_ITEM'),
+				-2 => JText::_('FLEXI_TRASH_THIS_ITEM'),
+				'' => 'FLEXI_UNKNOWN',
+			);
+			$state_imgs = array(
+				 1 => 'accept.png',
+				-5 => 'publish_g.png',
+				 0 => 'publish_x.png',
+				-3 => 'publish_r.png',
+				-4 => 'publish_y.png',
+				 2 => 'archive.png',
+				-2 => 'trash.png',
+				'' => 'unknown.png',
+			);
 		}
 
-		$state[] = JHtml::_('select.option',  '', JText::_( !is_numeric($displaytype) && is_string($displaytype) ? $displaytype : 'FLEXI_DO_NOT_CHANGE' ) );
-		$state[] = JHtml::_('select.option',  -4, $state_names[-4] );
-		$state[] = JHtml::_('select.option',  -3, $state_names[-3] );
-		$state[] = JHtml::_('select.option',  -5, $state_names[-5] );
-		$state[] = JHtml::_('select.option',   1, $state_names[1] );
-		$state[] = JHtml::_('select.option',   0, $state_names[0] );
-		$state[] = JHtml::_('select.option',   2, $state_names[2] );
-		$state[] = JHtml::_('select.option',  -2, $state_names[-2] );
+		$state[] = JHtml::_('select.option', '', JText::_(!is_numeric($displaytype) && is_string($displaytype) ? $displaytype : 'FLEXI_DO_NOT_CHANGE'));
+		$state[] = JHtml::_('select.option', -4, $state_names[-4]);
+		$state[] = JHtml::_('select.option', -3, $state_names[-3]);
+		$state[] = JHtml::_('select.option', -5, $state_names[-5]);
+		$state[] = JHtml::_('select.option',  1, $state_names[1]);
+		$state[] = JHtml::_('select.option',  0, $state_names[0]);
+		$state[] = JHtml::_('select.option',  2, $state_names[2]);
+		$state[] = JHtml::_('select.option', -2, $state_names[-2]);
 
 		$tagid = $tagid ? $tagid : str_replace( '[', '_', preg_replace('#\]|\[\]#', '',($name)) );
 
-		if ( $displaytype==1 || (!is_numeric($displaytype) && is_string($displaytype)) )
+		if ($displaytype == 1 || (!is_numeric($displaytype) && is_string($displaytype)))
+		{
 			$list = JHtml::_('select.genericlist', $state, $name, $attribs, 'value', 'text', $selected, $tagid);
+		}
 
-		else if ($displaytype==2)
+		elseif ($displaytype == 2)
 		{
 			$state_ids   = array(1, -5, 0, -3, -4); // published: 1, -5   unpublished: 0, -3, -4
 			$state_ids[] = 2;  // archived
@@ -4580,7 +4670,8 @@ class flexicontent_html
 			$list 	.= JText::_( 'FLEXI_USE_STATE_COLUMN' );
 			$list 	.= '</label>';
 
-			foreach ($state_ids as $i => $state_id) {
+			foreach ($state_ids as $i => $state_id)
+			{
 				//if ($state_id==0 || $state_id==2) $list .= "<br/>";
 				$checked = $state_id==$selected ? ' checked="checked"' : '';
 				$list 	.= '<input id="state'.$state_id.'" type="radio" name="state" class="state" value="'.$state_id.'" '.$checked.'/>';
@@ -4592,7 +4683,9 @@ class flexicontent_html
 		}
 
 		else
+		{
 			$list = 'Bad type in buildstateslist()';
+		}
 
 		return $list;
 	}
@@ -4920,7 +5013,7 @@ class flexicontent_html
 		$type_ids_list = false;
 		if ( !empty($type_ids) && is_array($type_ids) )
 		{
-			ArrayHelper::toInteger($type_ids, null);
+			$type_ids = ArrayHelper::toInteger($type_ids);
 			$type_ids_list = implode(',', $type_ids);
 		}
 
@@ -5508,7 +5601,7 @@ class flexicontent_html
 				$cids = explode(',', $cids);
 			}
 
-			ArrayHelper::toInteger($cids);
+			$cids = ArrayHelper::toInteger($cids);
 			$layout_vars['cids'] = implode(',' , $cids);
 		}
 

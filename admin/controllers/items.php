@@ -1126,8 +1126,8 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		$cid         = $this->input->get('cid', array(0), 'array');
 		$filter_cats = $this->input->get('filter_cats', array(0), 'array');
 
-		ArrayHelper::toInteger($cid);
-		ArrayHelper::toInteger($filter_cats);
+		$cid = ArrayHelper::toInteger($cid);
+		$filter_cats = ArrayHelper::toInteger($filter_cats);
 
 		// Make sure direction is set
 		$dir = $dir ?: ($this->task === 'orderup' ? -1 : 1);
@@ -1202,9 +1202,9 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		$order       = $this->input->get('order', array(0), 'array');
 		$filter_cats = $this->input->get('filter_cats', array(0), 'array');
 
-		ArrayHelper::toInteger($cid);
-		ArrayHelper::toInteger($order);
-		ArrayHelper::toInteger($filter_cats);
+		$cid = ArrayHelper::toInteger($cid);
+		$order = ArrayHelper::toInteger($order);
+		$filter_cats = ArrayHelper::toInteger($filter_cats);
 
 		if (!$model->saveorder($cid, $order, reset($filter_cats)))
 		{
@@ -1236,7 +1236,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		$user  = JFactory::getUser();
 
 		$cid = $this->input->get('cid', array(), 'array');
-		ArrayHelper::toInteger($cid);
+		$cid = ArrayHelper::toInteger($cid);
 
 		// Check at least one item was selected
 		if (!count($cid))
@@ -1593,7 +1593,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 
 		// Get and santize records ids
 		$cid = $this->input->get('cid', array(), 'array');
-		ArrayHelper::toInteger($cid);
+		$cid = ArrayHelper::toInteger($cid);
 
 		// Check at least one item was selected
 		if (!count($cid))
@@ -1722,7 +1722,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		$app   = JFactory::getApplication();
 
 		$cid = $this->input->get('cid', array(), 'array');
-		ArrayHelper::toInteger($cid);
+		$cid = ArrayHelper::toInteger($cid);
 
 		if (!count($cid))
 		{
@@ -1762,7 +1762,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 
 		// Get and santize records ids
 		$cid = $this->input->get('cid', array(), 'array');
-		ArrayHelper::toInteger($cid);
+		$cid = ArrayHelper::toInteger($cid);
 
 		// Check at least one item was selected
 		if (!count($cid))
@@ -2210,7 +2210,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		$user  = JFactory::getUser();
 
 		$cid = $this->input->get('cid', array(), 'array');
-		ArrayHelper::toInteger($cid);
+		$cid = ArrayHelper::toInteger($cid);
 
 		// Check at least one item was selected
 		if (!count($cid))

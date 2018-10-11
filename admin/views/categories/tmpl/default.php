@@ -112,7 +112,7 @@ function delAllFilters()
 	delFilter('filter_id');
 	delFilter('filter_level');
 	delFilter('filter_access');
-	delFilter('filter_language');
+	delFilter('filter_lang');
 	delFilter('filter_order');
 	delFilter('filter_order_Dir');
 }
@@ -169,7 +169,7 @@ function delAllFilters()
 					echo $this->lists['filter_level'];
 					echo $this->lists['filter_state'];
 					echo $this->lists['filter_access'];
-					echo $this->lists['filter_language'];
+					echo $this->lists['filter_lang'];
 					echo $this->lists['filter_id'];
 					?>
 

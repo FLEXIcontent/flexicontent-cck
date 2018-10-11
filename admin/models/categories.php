@@ -52,9 +52,9 @@ class FlexicontentModelCategories extends FCModelAdminList
 	/**
 	 * Column names
 	 */
-	var $state_col   = 'published';
-	var $name_col    = 'title';
-	var $parent_col  = 'parent_id';
+	var $state_col      = 'published';
+	var $name_col       = 'title';
+	var $parent_col     = 'parent_id';
 
 	/**
 	 * (Default) Behaviour Flags
@@ -238,7 +238,7 @@ class FlexicontentModelCategories extends FCModelAdminList
 	 */
 	public function filterByPermission($cid, $rule)
 	{
-		ArrayHelper::toInteger($cid);
+		$cid = ArrayHelper::toInteger($cid);
 
 		// If cannot manage then all records are not changeable
 		if (!$this->canManage)
@@ -289,7 +289,7 @@ class FlexicontentModelCategories extends FCModelAdminList
 	 */
 	public function filterByAssignments($cid = array(), $tostate = -2)
 	{
-		ArrayHelper::toInteger($cid);
+		$cid = ArrayHelper::toInteger($cid);
 		$cid_wassocs = array();
 
 		switch ($tostate)

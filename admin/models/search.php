@@ -122,9 +122,20 @@ class FLEXIcontentModelSearch extends JModelLegacy
 		$filter_order      = $fcform ? $jinput->get('filter_order',     $default_order,      'cmd')  :  $app->getUserStateFromRequest( $p.'filter_order',     'filter_order',     $default_order,      'cmd' );
 		$filter_order_Dir  = $fcform ? $jinput->get('filter_order_Dir', $default_order_dir, 'word')  :  $app->getUserStateFromRequest( $p.'filter_order_Dir', 'filter_order_Dir', $default_order_dir, 'word' );
 
-		if (!$filter_order)     $filter_order     = $default_order;
-		if (!$filter_order_Dir) $filter_order_Dir = $default_order_dir;
-		if (!$isADV && !in_array($filter_order, array('a.id', 'a.title', 'ext.search_index'))) $filter_order = 'a.title';
+		if (!$filter_order)
+		{
+			$filter_order = $default_order;
+		}
+
+		if (!$filter_order_Dir)
+		{
+			$filter_order_Dir = $default_order_dir;
+		}
+
+		if (!$isADV && !in_array($filter_order, array('a.id', 'a.title', 'ext.search_index')))
+		{
+			$filter_order = 'a.title';
+		}
 
 		$this->setState('filter_order', $filter_order);
 		$this->setState('filter_order_Dir', $filter_order_Dir);
@@ -321,7 +332,11 @@ class FLEXIcontentModelSearch extends JModelLegacy
 	function _buildWhere()
 	{
 		static $where;
-		if ( isset($where) ) return $where;
+
+		if (isset($where))
+		{
+			return $where;
+		}
 
 		$filter_state	= $this->getState('filter_state');
 		$filter_type	= $this->getState('filter_type');
@@ -333,30 +348,41 @@ class FLEXIcontentModelSearch extends JModelLegacy
 		$isADV = $filter_indextype=='advanced';
 
 		$search  = $this->getState('search');
-		$search  = StringHelper::trim( StringHelper::strtolower( $search ) );
+		$search  = StringHelper::trim(StringHelper::strtolower($search));
 
 		$where = array();
 
-		if ( $isADV && $filter_fieldtype ) {
-			if ( $filter_fieldtype == 'C' ) {
+		if ($isADV && $filter_fieldtype)
+		{
+			if ($filter_fieldtype === 'C' )
+			{
 				$where[] = 'f.iscore = 1';
-			} else if ($filter_fieldtype == 'NC' ) {
+			}
+			elseif ($filter_fieldtype === 'NC')
+			{
 				$where[] = 'f.iscore = 0';
-			} else {
-				$where[] = 'f.field_type = "'.$filter_fieldtype.'"';
+			}
+			else
+			{
+				$where[] = 'f.field_type = ' . $this->_db->quote($filter_fieldtype);
 			}
 		}
 
-		if ( $filter_state ) {
-			if ( $filter_state == 'P' ) {
+		if ($filter_state)
+		{
+			if ($filter_state === 'ALL_P')
+			{
 				$where[] = 'a.state IN (1, -5)';
-			} else if ($filter_state == 'U' ) {
+			}
+			elseif ($filter_state === 'ALL_U')
+			{
 				$where[] = 'a.state NOT IN (1, -5)';
 			}
 		}
 
-		if ( $filter_type ) {
-			$where[] = 'ext.type_id = ' . (int)$filter_type;
+		if ($filter_type)
+		{
+			$where[] = 'ext.type_id = ' . (int) $filter_type;
 		}
 
 		if ($search)
@@ -364,20 +390,22 @@ class FLEXIcontentModelSearch extends JModelLegacy
 			$escaped_search = str_replace(' ', '%', $this->_db->escape(trim($search), true));
 			$search_quoted  = $this->_db->Quote('%' . $escaped_search . '%', false);
 
-			$where[] = ' LOWER(' .($isADV ? 'ai' : 'ext'). '.search_index) LIKE ' . $search_quoted;
+			$where[] = ' LOWER(' . ($isADV ? 'ai' : 'ext') . '.search_index) LIKE ' . $search_quoted;
 		}
 
-		if ($search_itemtitle) {
-			$search_itemtitle_escaped = $this->_db->escape( $search_itemtitle, true );
-			$where[] = ' LOWER(a.title) LIKE '.$this->_db->Quote( '%'.$search_itemtitle_escaped.'%', false );
+		if ($search_itemtitle)
+		{
+			$search_itemtitle_escaped = $this->_db->escape($search_itemtitle, true);
+			$where[] = ' LOWER(a.title) LIKE ' . $this->_db->Quote('%' . $search_itemtitle_escaped . '%', false);
 		}
 
-		if ($search_itemid) {
-			$where[] = ' a.id= '. (int)$search_itemid;
+		if ($search_itemid)
+		{
+			$where[] = ' a.id= ' . (int) $search_itemid;
 		}
 
-		$where = ( count( $where ) ? implode( ' AND ', $where ) : '' );
-		$where = trim($where) ? " WHERE ".$where : "";
+		$where = count($where) ? implode(' AND ', $where) : '';
+		$where = trim($where) ? ' WHERE ' . $where : '';
 
 		return $where;
 	}
@@ -402,16 +430,22 @@ class FLEXIcontentModelSearch extends JModelLegacy
 	 * @return	object	A JPagination object.
 	 * @since	1.0
 	 */
-	public function getPagination() {
-		if (!empty($this->_pagination)) {
+	public function getPagination()
+	{
+		if (!empty($this->_pagination))
+		{
 			return $this->_pagination;
 		}
+
 		jimport('cms.pagination.pagination');
 		$this->_pagination = new JPagination($this->getCount(), $this->getState('limitstart'), $this->getState('limit'));
 
 		return $this->_pagination;
 	}
-	function getLimitStart() {
+
+
+	function getLimitStart()
+	{
 		$app = JFactory::getApplication();
 		return $this->getState('limitstart', $app->getCfg('list_limit'));
 	}
