@@ -100,17 +100,19 @@ foreach($values as $file_id)
 
 	// b. LANGUAGE: either as icon or as inline text or both
 	$lang = '';
-	$file_data->language = $file_data->language=='' ? '*' : $file_data->language;
+	$file_data->language = $file_data->language == '' ? '*' : $file_data->language;
 
-	// Skip 'ALL' language ... maybe allow later
-	//if ($display_lang && $file_data->language !== '*')
+	// Also show 'ALL' language
 	if ($display_lang)
 	{
 		$lang = '<span class="fcfile_lang fc-iblock">';
 
 		$lang .= $display_lang == 1 || $display_lang == 3 ? '<span class="icon-flag fcicon-lang"></span> ' : '';
 		$lang .= $display_lang == 2 || $display_lang == 3 ? '<span class="fcfile_lang_label label">' .JTEXT::_('FLEXI_LANGUAGE'). '</span> ' : '';
-		$lang .= '<span class="fcfile_lang_value value">' . ($file_data->language === '*' ? JText::_('FLEXI_MULTIPLE') . ' ' . strtolower(JText::_('FLEXI_OR')) . ' ' . strtolower(JText::_('FLEXI_NA')) : $langs->{$file_data->language}->name) . '</span>';
+		$lang .=
+		'<span class="fcfile_lang_value value">'
+			. ($file_data->language === '*' ? JText::_('FLEXI_FIELD_FILE_ALL_LANGS') : $langs->{$file_data->language}->name) .
+		'</span>';
 
 		$lang .= '</span>';
 	}
