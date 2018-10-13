@@ -926,7 +926,7 @@ class FlexicontentFields
 		static $_fields_plgs = array();
 
 		static $_initialize = false;
-		static $_view, $_option, $limitstart;
+		static $_view, $_option;
 		static $dispatcher, $fcdispatcher;
 
 		$jinput = JFactory::getApplication()->input;
@@ -947,7 +947,6 @@ class FlexicontentFields
 			// some request and other variables
 			$_view   = $jinput->get('view', '', 'cmd');
 			$_option = $jinput->get('option', '', 'cmd');
-			$limitstart	= $jinput->get('limitstart', 0, 'int');
 			$_initialize = true;
 
 			// ***********************************************************************
@@ -957,7 +956,12 @@ class FlexicontentFields
 			$dispatcher   = JEventDispatcher::getInstance();
 			$fcdispatcher = FCDispatcher::getInstance_FC($debug);
 		}
-
+		
+		// Use limitstart only for maintext core field
+		$is_maintext = $field->iscore && $field->field_type === 'maintext';
+		$limitstart = $is_maintext
+			? $jinput->get('limitstart', 0, 'int')
+			: null;
 
 		// CASE: FLEXIcontent item view:
 		// Set triggering 'context' to 'com_content.article', (and also set the 'view' request variable)
@@ -991,13 +995,15 @@ class FlexicontentFields
 
 		if ($debug) echo "<br><br>Executing plugins for <b>".$field->name."</b>:<br>";
 
-		if ( !@$_fields_plgs[$field->name] )
+		if (empty($_fields_plgs[$field->name]))
 		{
 			// Make sure the necessary plugin are already loaded, but do not try to load them again since this will harm performance
 			if (!$field->parameters->get('plugins'))
 			{
 				$_plgs = null;
-				if (!@$_plgs_loaded['__ALL__']) {
+
+				if (empty($_plgs_loaded['__ALL__']))
+				{
 					JPluginHelper::importPlugin('content', $plugin = null, $autocreate = true, $dispatcher);
 					$_plgs_loaded['__ALL__'] = 1;
 				}
@@ -1006,11 +1012,20 @@ class FlexicontentFields
 			{
 				$_plgs = $field->parameters->get('plugins');
 				$_plgs = $_plgs ? $_plgs : array();
-				$_plgs = is_array($_plgs) ? $_plgs : explode('|', $_plgs);  // compatibility because old versions did not JSON encode the parameters
 
-				if (!@$_plgs_loaded['__ALL__'])  foreach ($_plgs as $_plg)  if (!@$_plgs_loaded[$_plg]) {
-					JPluginHelper::importPlugin('content', $_plg, $autocreate = true, $dispatcher);
-					$_plgs_loaded[$_plg] = 1;
+				// Compatibility because old versions did not JSON encode the parameters
+				$_plgs = is_array($_plgs) ? $_plgs : explode('|', $_plgs);
+
+				if (empty($_plgs_loaded['__ALL__']))
+				{
+					foreach ($_plgs as $_plg)
+					{
+						if (empty($_plgs_loaded[$_plg]))
+						{
+							JPluginHelper::importPlugin('content', $_plg, $autocreate = true, $dispatcher);
+							$_plgs_loaded[$_plg] = 1;
+						}
+					}
 				}
 			}
 
@@ -1018,14 +1033,6 @@ class FlexicontentFields
 		}
 
 		$plg_arr = $_fields_plgs[$field->name];
-
-
-		/**
-		 * Suppress some plugins from triggering for compatibility reasons, e.g. plugins: jcomments, jom_comment_bot
-		 * because we will get comments HTML manually inside the template files
-		 */
-		$suppress_arr = array('jcomments', 'jom_comment_bot');
-		FLEXIUtilities::suppressPlugins($suppress_arr, 'suppress' );
 
 
 		/**
@@ -1060,6 +1067,7 @@ class FlexicontentFields
 		{
 			$record->readmore_link = $item->readmore_link;
 		}
+
 
 		/**
 		 * Set needed record properties, expected by plugins
@@ -1106,9 +1114,6 @@ class FlexicontentFields
 		// Needed by legacy non-updated plugins
 		!FLEXI_J40GE ? JRequest::setVar('view', $_view) : null;
 		!FLEXI_J40GE ? JRequest::setVar('option', $_option) : null;
-
-		// Restore suppressed plugins
-		FLEXIUtilities::suppressPlugins( $suppress_arr,'restore' );
 	}
 
 
