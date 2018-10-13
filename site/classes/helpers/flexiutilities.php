@@ -692,26 +692,12 @@ class FLEXIUtilities
 
 	/**
 	 * Suppresses given plugins (= prevents them from triggering)
+	 * USELESS no longer working
 	 *
-	 * @return void
-	 * @since 1.5
+	 * DEPRECATED to be removed in 3.3.x
 	 */
-	static function suppressPlugins( $name_arr, $action ) {
-		static $plgs = array();
-
-		foreach	($name_arr as $name)
-		{
-			if (!isset($plgs[$name])) {
-				JPluginHelper::importPlugin('content', $name);
-				$plgs[$name] = JPluginHelper::getPlugin('content', $name);
-			}
-			if ($plgs[$name] && $action=='suppress') {
-				$plgs[$name]->type = '_suppress';
-			}
-			if ($plgs[$name] && $action=='restore') {
-				$plgs[$name]->type = 'content';
-			}
-		}
+	static function suppressPlugins($name_arr, $action)
+	{
 	}
 
 
