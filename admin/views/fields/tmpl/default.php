@@ -164,7 +164,7 @@ function delAllFilters() {
 		<span class="btn-group fc-filter">
 			<span id="fc_filters_box_btn" class="<?php echo $_class.($this->count_filters ? ' btn-primary' : ''); ?>" onclick="fc_toggle_box_via_btn('fc-filters-box', this, 'btn-primary', false, undefined, 1);"><?php echo JText::_( 'FLEXI_FILTERS' ) . ($this->count_filters  ? ' <sup>'.$this->count_filters.'</sup>' : ''); ?></span>
 			<span id="fc_mainChooseColBox_btn" class="<?php echo $_class; ?>" onclick="fc_toggle_box_via_btn('mainChooseColBox', this, 'btn-primary');"><?php echo JText::_( 'FLEXI_COLUMNS' ); ?><sup id="columnchoose_totals"></sup></span>
-			<span id="fc-toggle-types_btn" class="<?php echo $_class; ?> hasTooltip" title="<?php echo JText::_('FLEXI_ASSIGNED_TYPES'); ?>" onclick="jQuery(this).data('box_showing', !jQuery(this).data('box_showing')); jQuery(this).data('box_showing') ? jQuery('.fc_assignments_box.fc_types').show() : jQuery('.fc_assignments_box.fc_types').hide();" ><span class="icon-tree"></span></span>
+			<span id="fc-toggle-types_btn" class="<?php echo $_class; ?> hasTooltip" title="<?php echo JText::_('FLEXI_ASSIGNED_TYPES'); ?>" onclick="jQuery(this).data('box_showing', !jQuery(this).data('box_showing')); jQuery(this).data('box_showing') ? jQuery('.fc_assignments_box.fc_types').show() : jQuery('.fc_assignments_box.fc_types').hide();" ><span class="icon-briefcase"></span></span>
 			<span id="fc-mini-help_btn" class="<?php echo $_class; ?>" onclick="fc_toggle_box_via_btn('fc-mini-help', this, 'btn-primary');"><span class="icon-help"></span></span>
 		</span>
 		<input type="hidden" id="fc-filters-box-disp" name="fc-filters-box-disp" value="<?php echo $tools_cookies['fc-filters-box-disp']; ?>" />
@@ -632,7 +632,7 @@ function delAllFilters() {
 					}
 					echo count($row_types) > 3 ? '
 						<span class="btn btn-mini hasTooltip nowrap_box" onclick="jQuery(this).next().toggle();" title="'.flexicontent_html::getToolTip(JText::_('FLEXI_ASSIGNED_TYPES'), '<ul class="fc_plain"><li>'.implode('</li><li>', $type_names).'</li></ul>', 0, 1).'">
-							'.count($row_types).' <i class="icon-tree"></i>
+							'.count($row_types).' <i class="icon-briefcase"></i>
 						</span>
 						<div class="fc_assignments_box fc_types">' : '';
 					echo count($row_types) > 8
