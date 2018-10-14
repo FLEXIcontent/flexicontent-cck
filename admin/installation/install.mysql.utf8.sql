@@ -253,6 +253,7 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_versions` (
 ) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`;
 
 CREATE TABLE IF NOT EXISTS `#__flexicontent_templates` (
+  `id` int(11) unsigned NOT NULL auto_increment,
   `template` varchar(50) NOT NULL default '',
   `cfgname` varchar(50) NOT NULL default '',
   `layout` varchar(20) NOT NULL default '',

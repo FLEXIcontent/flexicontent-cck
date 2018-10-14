@@ -127,12 +127,16 @@ class FlexicontentViewFileselement extends FlexicontentViewBaseRecords
 		$filter_order      = $model->getState('filter_order');
 		$filter_order_Dir  = $model->getState('filter_order_Dir');
 
-		$filter_state     = $app->getUserStateFromRequest( $option.'.'.$_view.'.filter_state',     'filter_state', '', 'int');
-		$filter_access    = $app->getUserStateFromRequest( $option.'.'.$_view.'.filter_access',    'filter_access', '', 'int');
-		$filter_lang			= $app->getUserStateFromRequest( $option.'.'.$_view.'.filter_lang',      'filter_lang',      '',          'string' );
-		$filter_url       = $app->getUserStateFromRequest( $option.'.'.$_view.'.filter_url',       'filter_url',       '',          'word' );
-		$filter_secure    = $app->getUserStateFromRequest( $option.'.'.$_view.'.filter_secure',    'filter_secure',    '',          'word' );
-		$filter_stamp     = $app->getUserStateFromRequest( $option.'.'.$_view.'.filter_stamp',     'filter_stamp',     '',          'word' );
+		$filter_state     = $model->getState('filter_state');
+		$filter_access    = $model->getState('filter_access');
+		$filter_lang			= $model->getState('filter_lang');
+		$filter_url       = $model->getState('filter_url');
+		$filter_secure    = $model->getState('filter_secure');
+		$filter_stamp     = $model->getState('filter_stamp');
+
+		$filter_ext       = $model->getState('filter_ext');
+		$filter_uploader  = $model->getState('filter_uploader');
+		$filter_item      = $model->getState('filter_item');
 
 		$target_dir = $layout === 'image' ? 0 : 2;  // 0: Force media, 1: force secure, 2: allow selection
 		$optional_cols = array('state', 'access', 'lang', 'hits', 'target', 'stamp', 'usage', 'uploader', 'upload_time', 'file_id');
@@ -181,18 +185,14 @@ class FlexicontentViewFileselement extends FlexicontentViewBaseRecords
 		// Fileselement view, add none of optional columns
 		else ;
 
-		$filter_ext       = $app->getUserStateFromRequest( $option.'.'.$_view.'.filter_ext',       'filter_ext',       '',          'alnum' );
-		$filter_uploader  = $app->getUserStateFromRequest( $option.'.'.$_view.'.filter_uploader',  'filter_uploader',  '',           'int' );
-		$filter_item      = $app->getUserStateFromRequest( $option.'.'.$_view.'.item_id',          'item_id',          '',           'int' );
-
 		if ($layout !== 'image')
 		{
-			if ($filter_state) $count_filters++;
-			if ($filter_access) $count_filters++;
-			if ($filter_lang) $count_filters++;
-			if ($filter_url) $count_filters++;
-			if ($filter_stamp) $count_filters++;
-			if ($filter_secure) $count_filters++;
+			if (strlen($filter_state) && !empty($cols['state'])) $count_filters++;
+			if (strlen($filter_access) && !empty($cols['access'])) $count_filters++;
+			if (strlen($filter_lang) && !empty($cols['lang'])) $count_filters++;
+			if (strlen($filter_url)) $count_filters++;
+			if (strlen($filter_stamp) && !empty($cols['stamp'])) $count_filters++;
+			if (strlen($filter_secure) && !empty($cols['target'])) $count_filters++;
 		}
 
 		// ?? Force unsetting language and target_dir columns if LAYOUT is image file list
@@ -205,9 +205,9 @@ class FlexicontentViewFileselement extends FlexicontentViewBaseRecords
 		// Case of uploader column not applicable or not allowed
 		if (!$folder_mode && !$perms->CanViewAllFiles) unset($cols['uploader']);
 
-		if ($filter_ext) $count_filters++;
-		if ($filter_uploader && !empty($cols['uploader'])) $count_filters++;
-		if ($filter_item) $count_filters++;
+		if (strlen($filter_ext)) $count_filters++;
+		if (strlen($filter_uploader) && !empty($cols['uploader'])) $count_filters++;
+		if (strlen($filter_item)) $count_filters++;
 
 		$u_item_id = $view === 'fileselement' ? $app->getUserStateFromRequest( $option.'.'.$_view.'.u_item_id', 'u_item_id', 0, 'string' ) : null;
 
@@ -227,9 +227,6 @@ class FlexicontentViewFileselement extends FlexicontentViewBaseRecords
 		$scope  = $model->getState('scope');
 		$search = $model->getState('search');
 		$search = StringHelper::trim(StringHelper::strtolower($search));
-
-		$filter_uploader  = $filter_uploader ? $filter_uploader : '';
-		$filter_item      = $filter_item ? $filter_item : '';
 
 
 		// *** TODO: (enhancement) get recently deleted file(s), and remove their assignments from current form
@@ -604,6 +601,59 @@ class FlexicontentViewFileselement extends FlexicontentViewBaseRecords
 			)
 		));
 
+		// Build publication state filter
+		$options 	= array();
+		$options[] = JHtml::_('select.option',  '', '-'/*JText::_( 'FLEXI_SELECT_STATE' )*/ );
+		$options[] = JHtml::_('select.option',  'P', JText::_( 'FLEXI_PUBLISHED' ) );
+		$options[] = JHtml::_('select.option',  'U', JText::_( 'FLEXI_UNPUBLISHED' ) );
+		//$options[] = JHtml::_('select.option',  'A', JText::_( 'FLEXI_ARCHIVED' ) );
+		//$options[] = JHtml::_('select.option',  'T', JText::_( 'FLEXI_TRASHED' ) );
+
+		$fieldname = 'filter_state';
+		$elementid = 'filter_state';
+
+		$lists[$elementid] = $this->getFilterDisplay(array(
+			'label' => JText::_('FLEXI_STATE'),
+			'html' => JHtml::_('select.genericlist',
+				$options,
+				$fieldname,
+				array(
+					'class' => 'use_select2_lib',
+					'onchange' => 'document.adminForm.limitstart.value=0; Joomla.submitform();',
+				),
+				'value',
+				'text',
+				$filter_state,
+				$elementid,
+				$translate = true
+			)
+		));
+
+
+		// Build access level filter
+		$options = JHtml::_('access.assetgroups');
+		array_unshift($options, JHtml::_('select.option', '', '-'/*JText::_('JOPTION_SELECT_ACCESS')*/) );
+
+		$fieldname = 'filter_access';
+		$elementid = 'filter_access';
+
+		$lists[$elementid] = $this->getFilterDisplay(array(
+			'label' => JText::_('FLEXI_ACCESS'),
+			'html' => JHtml::_('select.genericlist',
+				$options,
+				$fieldname,
+				array(
+					'class' => 'use_select2_lib',
+					'onchange' => 'document.adminForm.limitstart.value=0; Joomla.submitform();',
+				),
+				'value',
+				'text',
+				$filter_access,
+				$elementid,
+				$translate = true
+			)
+		));
+
 
 		// Build text search scope 
 		$scopes = array(
@@ -665,8 +715,8 @@ class FlexicontentViewFileselement extends FlexicontentViewBaseRecords
 			// Build stamp filter
 			$stamp 	= array();
 			$stamp[] 	= JHtml::_('select.option',  '', '-'/*JText::_( 'FLEXI_ALL_FILES' )*/ );
-			$stamp[] 	= JHtml::_('select.option',  '0', JText::_( 'FLEXI_NO' ) );
-			$stamp[] 	= JHtml::_('select.option',  '1', JText::_( 'FLEXI_YES' ) );
+			$stamp[] 	= JHtml::_('select.option',  'N', JText::_( 'FLEXI_NO' ) );
+			$stamp[] 	= JHtml::_('select.option',  'Y', JText::_( 'FLEXI_YES' ) );
 
 			$lists['filter_stamp'] = $this->getFilterDisplay(array(
 				'label' => JText::_('FLEXI_DOWNLOAD_STAMPING'),

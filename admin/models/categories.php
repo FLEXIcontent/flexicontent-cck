@@ -117,7 +117,7 @@ class FlexicontentModelCategories extends FCModelAdminList
 		$option = $jinput->get('option', '', 'cmd');
 		$view   = $jinput->get('view', '', 'cmd');
 		$fcform = $jinput->get('fcform', 0, 'int');
-		$p      = $option . '.' . $view . '.';
+		$p      = $this->ovid;
 
 
 		/**
@@ -128,15 +128,15 @@ class FlexicontentModelCategories extends FCModelAdminList
 		// Various filters
 		$filter_cats     = $fcform ? $jinput->get('filter_cats', 0, 'int') : $app->getUserStateFromRequest($p . 'filter_cats', 'filter_cats', 0, 'int');
 		$filter_level    = $fcform ? $jinput->get('filter_level', '', 'int') : $app->getUserStateFromRequest($p . 'filter_level', 'filter_level', '', 'int');
-		$filter_language = $fcform ? $jinput->get('filter_language', '', 'string') : $app->getUserStateFromRequest($p . 'filter_language', 'filter_language', '', 'string');
+		$filter_lang     = $fcform ? $jinput->get('filter_lang', '', 'string') : $app->getUserStateFromRequest($p . 'filter_lang', 'filter_lang', '', 'string');
 
 		$this->setState('filter_cats', $filter_cats);
 		$this->setState('filter_level', $filter_level);
-		$this->setState('filter_language', $filter_language);
+		$this->setState('filter_lang', $filter_lang);
 
 		$app->setUserState($p . 'filter_cats', $filter_cats);
 		$app->setUserState($p . 'filter_level', $filter_level);
-		$app->setUserState($p . 'filter_language', $filter_language);
+		$app->setUserState($p . 'filter_lang', $filter_lang);
 
 
 		// Manage view permission
@@ -189,7 +189,7 @@ class FlexicontentModelCategories extends FCModelAdminList
 		// Various filters
 		$filter_cats     = $this->getState('filter_cats');
 		$filter_level    = $this->getState('filter_level');
-		$filter_language = $this->getState('filter_language');
+		$filter_lang     = $this->getState('filter_lang');
 
 		// Limit category list to those contain in the subtree of the choosen category
 		if ($filter_cats)
@@ -210,9 +210,9 @@ class FlexicontentModelCategories extends FCModelAdminList
 		}
 
 		// Filter by language
-		if ($filter_language)
+		if ($filter_lang)
 		{
-			$where[] = 'a.language = ' . $this->_db->Quote($filter_language);
+			$where[] = 'a.language = ' . $this->_db->Quote($filter_lang);
 		}
 
 		if ($q instanceof \JDatabaseQuery)

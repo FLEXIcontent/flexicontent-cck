@@ -30,25 +30,19 @@ require_once JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' .
 class FlexicontentControllerTags extends FlexicontentControllerBaseAdmin
 {
 	var $records_dbtbl = 'flexicontent_tags';
-
 	var $records_jtable = 'flexicontent_tags';
 
 	var $record_name = 'tag';
-
 	var $record_name_pl = 'tags';
 
 	var $_NAME = 'TAG';
-
 	var $record_alias = 'alias';
 
 	var $runMode = 'standalone';
 
 	var $exitHttpHead = null;
-
 	var $exitMessages = array();
-
 	var $exitLogTexts = array();
-
 	var $exitSuccess  = true;
 
 	/**

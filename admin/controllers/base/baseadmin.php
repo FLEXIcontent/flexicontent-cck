@@ -29,25 +29,19 @@ class FlexicontentControllerBaseAdmin extends FlexicontentController
 	static $record_limit = 5000;
 
 	var $records_dbtbl = 'flexicontent_records';
-
 	var $records_jtable = 'flexicontent_records';
 
 	var $record_name = 'record';
-
 	var $record_name_pl = 'records';
 
 	var $_NAME = 'RECORD';
-
 	var $record_alias = 'alias';
 
 	var $runMode = 'standalone';
 
 	var $exitHttpHead = null;
-
 	var $exitMessages = array();
-
 	var $exitLogTexts = array();
-
 	var $exitSuccess  = true;
 
 	/**

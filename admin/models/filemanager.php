@@ -134,84 +134,69 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 	 */
 	public function __construct($config = array())
 	{
-		parent::__construct($config);
-
 		$app    = JFactory::getApplication();
 		$jinput = $app->input;
 		$option = $jinput->get('option', '', 'cmd');
 		$view   = $jinput->get('view', '', 'cmd');
 		$fcform = $jinput->get('fcform', 0, 'int');
-		$p      = $option . '.' . $view . '.';
-
-		$this->fieldid = $jinput->get('field', null, 'int');  // not yet used for filemanager view, only for fileselement views
-		$this->viewid  = $view.$this->fieldid;
+		
+		// This has no effect in filemanager view (maybe later), currently only for fileselement views
+		$this->fieldid = $jinput->get('field', null, 'int');
+		$this->viewid  = $view . $this->fieldid;
 		$this->sess_assignments = true;
 
+		// Session data group
+		$this->ovid = $option . '.' . ($this->viewid ?: $view) . '.';
+		$p          = $this->ovid;
+
+		// Call parent after setting ... $this->viewid
+		parent::__construct($config);
 
 
-		// ***
-		// *** Load backend language file if model gets loaded in frontend
-		// ***
-		if ( JFactory::getApplication()->isSite() )
+		/**
+		 * Load backend language file if model gets loaded in frontend
+		 */
+		if (JFactory::getApplication()->isSite())
 		{
 			JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, 'en-GB', true);
 			JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, true);
 		}
 
 
-
 		/**
 		 * View's Filters
+		 * Inherited filters : filter_state, filter_access, scope, search
 		 */
 
 		// Various filters
-		$filter_state  = $fcform ? $jinput->get('filter_state', '', 'cmd') : $app->getUserStateFromRequest($p . 'filter_state', 'filter_state', '', 'cmd');
-		$filter_access = $fcform ? $jinput->get('filter_access', '', 'int') : $app->getUserStateFromRequest($p . 'filter_access', 'filter_access', '', 'int');
+		$filter_lang     = $fcform ? $jinput->get('filter_lang', '', 'string') : $app->getUserStateFromRequest($p . 'filter_lang', 'filter_lang', '', 'string');
+		$filter_uploader = $fcform ? $jinput->get('filter_uploader', 0, 'int') : $app->getUserStateFromRequest($p . 'filter_uploader', 'filter_uploader', 0, 'int');
+		$filter_secure   = $fcform ? $jinput->get('filter_secure', '', 'alnum') : $app->getUserStateFromRequest($p . 'filter_secure', 'filter_secure', '', 'alnum');
+		$filter_stamp    = $fcform ? $jinput->get('filter_stamp', '', 'alnum') : $app->getUserStateFromRequest($p . 'filter_stamp', 'filter_stamp', '', 'alnum');
+		$filter_url      = $fcform ? $jinput->get('filter_url', '', 'alnum') : $app->getUserStateFromRequest($p . 'filter_url', 'filter_url', '', 'alnum');
+		$filter_ext      = $fcform ? $jinput->get('filter_ext', '', 'alnum') : $app->getUserStateFromRequest($p . 'filter_ext', 'filter_ext', '', 'alnum');
+		$filter_item     = $fcform ? $jinput->get('item_id', 0, 'int') : $app->getUserStateFromRequest($p . 'item_id', 'item_id', 0, 'int');
 
-		$this->setState('filter_state', $filter_state);
-		$this->setState('filter_access', $filter_access);
+		$this->setState('filter_lang', $filter_lang);
+		$this->setState('filter_uploader', $filter_uploader ?: '');
+		$this->setState('filter_secure', $filter_secure);
+		$this->setState('filter_stamp', $filter_stamp);
+		$this->setState('filter_url', $filter_url);
+		$this->setState('filter_ext', $filter_ext);
+		$this->setState('filter_item', $filter_item ?: '');
 
-		$app->setUserState($p . 'filter_state', $filter_state);
-		$app->setUserState($p . 'filter_access', $filter_access);
-		// Text search
-		$search = $fcform ? $jinput->get('search', '', 'string') : $app->getUserStateFromRequest($p . 'search', 'search', '', 'string');
-		$this->setState('search', $search);
-		$app->setUserState($p . 'search', $search);
+		$app->setUserState($p . 'filter_lang', $filter_lang);
+		$app->setUserState($p . 'filter_uploader', $filter_uploader ?: '');
+		$app->setUserState($p . 'filter_secure', $filter_secure);
+		$app->setUserState($p . 'filter_stamp', $filter_stamp);
+		$app->setUserState($p . 'filter_url', $filter_url);
+		$app->setUserState($p . 'filter_ext', $filter_ext);
+		$app->setUserState($p . 'filter_item', $filter_item ?: '');
 
-		// Text search scope
-		$scope  = $fcform ? $jinput->get('scope',  1,  'int')     :  $app->getUserStateFromRequest( $p.'scope',   'scope',   1,   'int' );
-		$this->setState('scope', $scope);
-		$app->setUserState($p.'scope', $scope);
-
-
-		/**
-		 * Ordering: filter_order, filter_order_Dir
-		 */
-
-		$this->_setStateOrder();
-
-
-		/**
-		 * Pagination: limit, limitstart
-		 */
-
-		$limit      = $fcform ? $jinput->get('limit', $app->getCfg('list_limit'), 'int') : $app->getUserStateFromRequest($p . 'limit', 'limit', $app->getCfg('list_limit'), 'int');
-		$limitstart = $fcform ? $jinput->get('limitstart', 0, 'int') : $app->getUserStateFromRequest($p . 'limitstart', 'limitstart', 0, 'int');
-
-		// In case limit has been changed, adjust limitstart accordingly
-		$limitstart = ( $limit != 0 ? (floor($limitstart / $limit) * $limit) : 0 );
-		$jinput->set('limitstart', $limitstart);
-
-		$this->setState('limit', $limit);
-		$this->setState('limitstart', $limitstart);
-
-		$app->setUserState($p . 'limit', $limit);
-		$app->setUserState($p . 'limitstart', $limitstart);
-
-
-		// For some model function that use single id
-		$array = $jinput->get('cid', array(0), 'array');
-		$this->setId((int) $array[0]);
+		// TODO add this filter to view-template files, as it is missing
+		$filter_assigned = $fcform ? $jinput->get('filter_assigned', '', 'alnum') : $app->getUserStateFromRequest($p . 'filter_assigned', 'filter_assigned', '', 'alnum');
+		$this->setState('filter_assigned', $filter_assigned);
+		$app->setUserState($p . 'filter_assigned', $filter_assigned);
 
 		// Manage view permission
 		$this->canManage = FlexicontentHelperPerm::getPerm()->CanFiles;
@@ -263,7 +248,7 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 			}
 
 			$this->_data_pending = $this->_getList($query);
-			$this->_db->setQuery("SELECT FOUND_ROWS()");
+			$this->_db->setQuery('SELECT FOUND_ROWS()');
 			$this->_total_pending = $this->_db->loadResult();
 		}
 
@@ -695,11 +680,15 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 		{
 			$fields[$fieldid]->parameters = new JRegistry($fields[$fieldid]->attribs);
 
-			$app  = JFactory::getApplication();
-			$user = JFactory::getUser();
-			$option = $app->input->get('option', '', 'cmd');
-			$view   = $app->input->get('view', '', 'cmd');
-			$u_item_id = $itemid ?: $app->getUserStateFromRequest( $option.'.'.$view.'.u_item_id', 'u_item_id', 0, 'string' );
+			$app    = JFactory::getApplication();
+			$jinput = $app->input;
+			$user   = JFactory::getUser();
+			$option = $jinput->get('option', '', 'cmd');
+			$view   = $jinput->get('view', '', 'cmd');
+			$p      = $option . '.' . $view . '.';
+
+			$u_item_id = $itemid ?: $app->getUserStateFromRequest($p . 'u_item_id', 'u_item_id', 0, 'string');
+
 			if (is_numeric($u_item_id))
 			{
 				$u_item_id = (int) $u_item_id;
@@ -732,10 +721,6 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 	 */
 	function _buildQuery($assigned_fields = array(), $ids_only = false, $u_item_id = 0)
 	{
-		$app    = JFactory::getApplication();
-		$jinput = $app->input;
-		$option = $jinput->get('option', '', 'cmd');
-
 		// Get the WHERE, HAVING and ORDER BY clauses for the query
 		$join    = $this->_buildContentJoin();
 		$where   = $this->_pending
@@ -763,11 +748,11 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 			? -1
 			: (int) $u_item_id;
 
-		$filter_item = $u_item_id ?: $app->getUserStateFromRequest( $option.'.'.$this->viewid.'.item_id',   'item_id',   '',   'int' );
+		$filter_item = $u_item_id ?: (int) $this->getState('filter_item');
 
 		if ($filter_item)
 		{
-			$join	.= ' JOIN #__flexicontent_fields_item_relations AS rel ON rel.item_id = '. $filter_item .' AND a.id = rel.value ';
+			$join	.= ' JOIN #__flexicontent_fields_item_relations AS rel ON rel.item_id = ' . (int) $filter_item . ' AND a.id = rel.value ';
 			$join	.= ' JOIN #__flexicontent_fields AS fi ON fi.id = rel.field_id AND fi.field_type = ' . $this->_db->Quote('file');
 		}
 
@@ -983,13 +968,14 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 		$search = $this->getState('search');
 		$search = StringHelper::trim(StringHelper::strtolower($search));
 
-		$filter_state     = $app->getUserStateFromRequest(  $option.'.'.$this->viewid.'.filter_state',     'filter_state', '', 'int');
-		$filter_access    = $app->getUserStateFromRequest(  $option.'.'.$this->viewid.'.filter_access',    'filter_access', '', 'int');
-		$filter_lang			= $app->getUserStateFromRequest(  $option.'.'.$this->viewid.'.filter_lang',      'filter_lang',      '',          'string' );
-		$filter_uploader  = $app->getUserStateFromRequest(  $option.'.'.$this->viewid.'.filter_uploader',  'filter_uploader',  0,           'int' );
-		$filter_url       = $app->getUserStateFromRequest(  $option.'.'.$this->viewid.'.filter_url',       'filter_url',       '',          'word' );
-		$filter_secure    = $app->getUserStateFromRequest(  $option.'.'.$this->viewid.'.filter_secure',    'filter_secure',    '',          'word' );
-		$filter_ext       = $app->getUserStateFromRequest(  $option.'.'.$this->viewid.'.filter_ext',       'filter_ext',       '',          'alnum' );
+		$filter_state     = $this->getState('filter_state');
+		$filter_access    = $this->getState('filter_access');
+		$filter_lang			= $this->getState('filter_lang');
+		$filter_uploader  = $this->getState('filter_uploader');
+		$filter_secure    = $this->getState('filter_secure');
+		$filter_stamp     = $this->getState('filter_stamp');
+		$filter_url       = $this->getState('filter_url');
+		$filter_ext       = $this->getState('filter_ext');
 
 
 		$permission = FlexicontentHelperPerm::getPerm();
@@ -1047,42 +1033,60 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 		}
 
 		// Limit via parameter, 2: List any file and respect 'filter_secure' URL variable, 1: limit to secure, 0: limit to media
-		if ( strlen($target_dir) && $target_dir!=2 )
+		if (strlen($target_dir) && $target_dir != 2)
 		{
 			$filter_secure = $target_dir ? 'S' : 'M';   // force secure / media
 		}
 
 		// Limit via parameter, 1: limit to current user as uploader, 0: list files from any uploader, and respect 'filter_uploader' URL variable
-		if ($limit_by_uploader) {
-			$where[] = ' uploaded_by = ' . $user->id;
-		} else if ( !$CanViewAllFiles ) {
-			$where[] = ' uploaded_by = ' . (int)$user->id;
-		} else if ( $filter_uploader ) {
-			$where[] = ' uploaded_by = ' . $filter_uploader;
+		if ($limit_by_uploader)
+		{
+			$where[] = ' uploaded_by = ' . (int) $user->id;
+		}
+		elseif (!$CanViewAllFiles)
+		{
+			$where[] = ' uploaded_by = ' . (int) $user->id;
+		}
+		elseif (strlen($filter_uploader))
+		{
+			$where[] = ' uploaded_by = ' . (int) $filter_uploader;
 		}
 
-		if ( $filter_lang ) {
-			$where[] = ' language = '. $this->_db->Quote( $filter_lang );
+		if (strlen($filter_lang))
+		{
+			$where[] = ' language = ' . $this->_db->Quote($filter_lang);
 		}
 
-		if ( $filter_url ) {
-			if ( $filter_url == 'F' ) {
-				$where[] = ' url = 0';
-			} else if ($filter_url == 'U' ) {
-				$where[] = ' url = 1';
-			}
+		if ($filter_url === 'F')
+		{
+			$where[] = ' url = 0';
+		}
+		elseif ($filter_url === 'U')
+		{
+			$where[] = ' url = 1';
 		}
 
-		if ( $filter_secure ) {
-			if ( $filter_secure == 'M' ) {
-				$where[] = ' secure = 0';
-			} else if ($filter_secure == 'S' ) {
-				$where[] = ' secure = 1';
-			}
+		if ($filter_stamp === 'Y')
+		{
+			$where[] = ' stamp = 1';
+		}
+		elseif ($filter_stamp === 'N')
+		{
+			$where[] = ' stamp = 0';
 		}
 
-		if ( $filter_ext ) {
-			$where[] = ' ext = ' . $this->_db->Quote( $filter_ext );
+		if ($filter_secure === 'M')
+		{
+			$where[] = ' secure = 0';
+		}
+		elseif ($filter_secure === 'S')
+		{
+			$where[] = ' secure = 1';
+		}
+
+		if (strlen($filter_ext))
+		{
+			$where[] = ' ext = ' . $this->_db->Quote($filter_ext);
 		}
 
 		if ($search)
@@ -1107,6 +1111,7 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 			{
 				$search_where[] = ' LOWER(a.description) LIKE ' . $search_quoted;
 			}
+
 			$where[] = '( '. implode( ' OR ', $search_where ) .' )';
 		}
 
@@ -1125,20 +1130,17 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 	 */
 	function _buildContentHaving($q = false)
 	{
-		$app    = JFactory::getApplication();
-		$jinput = $app->input;
-		$option = $jinput->get('option', '', 'cmd');
-
-		$filter_assigned	= $app->getUserStateFromRequest(  $option.'.'.$this->viewid.'.filter_assigned', 'filter_assigned', '', 'word' );
+		$filter_assigned = $this->getState('filter_assigned');
 
 		$having = '';
 
-		if ( $filter_assigned ) {
-			if ( $filter_assigned == 'O' ) {
-				$having = ' HAVING COUNT(rel.fileid) = 0';
-			} else if ($filter_assigned == 'A' ) {
-				$having = ' HAVING COUNT(rel.fileid) > 0';
-			}
+		if ($filter_assigned === 'O')
+		{
+			$having = ' HAVING COUNT(rel.fileid) = 0';
+		}
+		elseif ($filter_assigned === 'A')
+		{
+			$having = ' HAVING COUNT(rel.fileid) > 0';
 		}
 
 		return $having;
@@ -1305,7 +1307,7 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 		$jinput = $app->input;
 		$option = $jinput->get('option', '', 'cmd');
 
-		$filter_uploader  = $app->getUserStateFromRequest( $option.'.'.$this->viewid.'.filter_uploader',  'filter_uploader',  0,   'int' );
+		$filter_uploader = $this->getState('filter_uploader');
 
 		$field_type_list = $this->_db->Quote( implode( "','", $field_types ), $escape=false );
 
@@ -1378,7 +1380,7 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 		$jinput = $app->input;
 		$option = $jinput->get('option', '', 'cmd');
 
-		$filter_uploader  = $app->getUserStateFromRequest( $option.'.'.$this->viewid.'.filter_uploader',  'filter_uploader',  0,   'int' );
+		$filter_uploader = $this->getState('filter_uploader');
 
 		$where = array();
 

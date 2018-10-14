@@ -133,7 +133,7 @@ if (!$this->folder_mode || !$this->CanViewAllFiles)
 {
 	unset($this->cols['uploader']);
 }
-if (!$this->folder_mode)
+if ($this->folder_mode)
 {
 	unset($this->cols['file_id']);
 }

@@ -30,25 +30,19 @@ require_once JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' .
 class FlexicontentControllerCategories extends FlexicontentControllerBaseAdmin
 {
 	var $records_dbtbl = 'categories';
-
 	var $records_jtable = 'flexicontent_categories';
 
 	var $record_name = 'category';
-
 	var $record_name_pl = 'categories';
 
 	var $_NAME = 'CATEGORY';
-
 	var $record_alias = 'alias';
 
 	var $runMode = 'standalone';
 
 	var $exitHttpHead = null;
-
 	var $exitMessages = array();
-
 	var $exitLogTexts = array();
-
 	var $exitSuccess  = true;
 
 	/**

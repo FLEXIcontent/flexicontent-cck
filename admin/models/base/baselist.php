@@ -109,6 +109,12 @@ abstract class FCModelAdminList extends JModelList
 	 */
 	var $_id = null;
 
+	/**
+	 * A view id for distinguishing session data e.g. filters, this is usally just the 'view' URL var
+	 *
+	 * @var string
+	 */
+	var $viewid = null;
 
 	/**
 	 * Constructor
@@ -124,7 +130,10 @@ abstract class FCModelAdminList extends JModelList
 		$option = $jinput->get('option', '', 'cmd');
 		$view   = $jinput->get('view', '', 'cmd');
 		$fcform = $jinput->get('fcform', 0, 'int');
-		$p      = $option . '.' . $view . '.';
+
+		// Session data group
+		$this->ovid = $option . '.' . ($this->viewid ?: $view) . '.';
+		$p          = $this->ovid;
 
 		// Parameters of the view, in our case it is only the component parameters
 		$this->cparams = JComponentHelper::getParams('com_flexicontent');
@@ -138,8 +147,8 @@ abstract class FCModelAdminList extends JModelList
 		 */
 
 		// Various filters
-		$filter_state  = $fcform ? $jinput->get('filter_state', '', 'cmd') : $app->getUserStateFromRequest($p . 'filter_state', 'filter_state', '', 'cmd');
-		$filter_access = $fcform ? $jinput->get('filter_access', '', 'int') : $app->getUserStateFromRequest($p . 'filter_access', 'filter_access', '', 'int');
+		$filter_state  = $fcform ? $jinput->get('filter_state', '', 'alnum') : $app->getUserStateFromRequest($p . 'filter_state', 'filter_state', '', 'alnum');
+		$filter_access = $fcform ? $jinput->get('filter_access', '', 'alnum') : $app->getUserStateFromRequest($p . 'filter_access', 'filter_access', '', 'alnum');
 
 		$this->setState('filter_state', $filter_state);
 		$this->setState('filter_access', $filter_access);
@@ -153,6 +162,11 @@ abstract class FCModelAdminList extends JModelList
 
 		$this->setState('filter_id', $filter_id);
 		$app->setUserState($p . 'filter_id', $filter_id);
+
+		// Text search scope
+		$scope = $fcform ? $jinput->get('scope', 1, 'int') : $app->getUserStateFromRequest($p . 'scope', 'scope', 1, 'int');
+		$this->setState('scope', $scope);
+		$app->setUserState($p . 'scope', $scope);
 
 		// Text search
 		$search = $fcform ? $jinput->get('search', '', 'string') : $app->getUserStateFromRequest($p . 'search', 'search', '', 'string');
@@ -436,7 +450,7 @@ abstract class FCModelAdminList extends JModelList
 		// Filter by access level
 		if (property_exists($table, 'access'))
 		{
-			if ($filter_access)
+			if (strlen($filter_access))
 			{
 				$where[] = 'a.access = ' . (int) $filter_access;
 			}
@@ -930,10 +944,8 @@ abstract class FCModelAdminList extends JModelList
 	{
 		$app    = JFactory::getApplication();
 		$jinput = $app->input;
-		$option = $jinput->get('option', '', 'cmd');
-		$view   = $jinput->get('view', '', 'cmd');
 		$fcform = $jinput->get('fcform', 0, 'int');
-		$p      = $option . '.' . $view . '.';
+		$p      = $this->ovid;
 
 		$default_order     = $this->default_order;
 		$default_order_dir = $this->default_order_dir;
