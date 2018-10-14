@@ -400,15 +400,15 @@ class FlexicontentModelItem extends ParentClassItem
 
 		if (!$ilayout)
 		{
-			$desktop_ilayout = $itemParams->get('ilayout', $typeParams->get('ilayout', 'default'));
-			$ilayout = !$useMobile
-				? $desktop_ilayout
-				: $itemParams->get('ilayout_mobile', $typeParams->get('ilayout_mobile', $desktop_ilayout));
+			$desktop_ilayout = $itemParams->get('ilayout') ?: ($typeParams->get('ilayout') ?: 'default');
+			$mobile_ilayout  = $itemParams->get('ilayout_mobile') ?: ($typeParams->get('ilayout_mobile') ?: $desktop_ilayout);
+
+			$ilayout = !$useMobile ? $desktop_ilayout : $mobile_ilayout;
 		}
 
 		// Verify the layout is within allowed templates, that is Content Type 's default template OR Content Type allowed templates
 		$allowed_tmpls = $typeParams->get('allowed_ilayouts');
-		$type_default_layout = $typeParams->get('ilayout', 'default');
+		$type_default_layout = $typeParams->get('ilayout') ?: 'default';
 
 		$allowed_tmpls = empty($allowed_tmpls)
 			? array()

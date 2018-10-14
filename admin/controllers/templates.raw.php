@@ -400,7 +400,11 @@ class FlexicontentControllerTemplates extends FlexicontentControllerBaseAdmin
 						if ($cssprep && FLEXI_J37GE && $inh_params)
 						{
 							$_value = $form_layout->getValue($fieldname, $groupname, $inh_params->get($fieldname));
+
+							// Not only set the disabled attribute but also clear the required attribute to avoid issues with some fields (like 'color' field)
 							$form_layout->setFieldAttribute($fieldname, 'disabled', 'true', $field->group);
+							$form_layout->setFieldAttribute($fieldname, 'required', 'false', $field->group);
+
 							$field->setup($form_layout->getFieldXml($fieldname, $field->group), $_value, $field->group);
 						}
 
