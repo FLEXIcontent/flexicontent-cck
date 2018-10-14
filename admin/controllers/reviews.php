@@ -30,25 +30,19 @@ require_once JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' .
 class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 {
 	var $records_dbtbl = 'flexicontent_reviews';
-
 	var $records_jtable = 'flexicontent_reviews';
 
 	var $record_name = 'review';
-
 	var $record_name_pl = 'reviews';
 
 	var $_NAME = 'REVIEW';
-
 	var $record_alias = 'not_applicable';
 
 	var $runMode = 'standalone';
 
 	var $exitHttpHead = null;
-
 	var $exitMessages = array();
-
 	var $exitLogTexts = array();
-
 	var $exitSuccess  = true;
 
 	/**

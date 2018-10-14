@@ -150,10 +150,11 @@ class FlexicontentModelItems extends FCModelAdminList
 		$option = $jinput->get('option', '', 'cmd');
 		$view   = $jinput->get('view', '', 'cmd');
 		$fcform = $jinput->get('fcform', 0, 'int');
-		$p      = $option . '.' . $view . '.';
+		$p      = $this->ovid;
 
 		/**
 		 * View's Filters
+		 * Inherited filters : scope, search
 		 */
 
 		global $globalcats;
@@ -260,17 +261,6 @@ class FlexicontentModelItems extends FCModelAdminList
 
 		$this->setState('filter_fileid', $filter_fileid);
 		$app->setUserState($p.'filter_fileid', $filter_fileid);
-
-
-		// Text search
-		$scope  = $fcform ? $jinput->get('scope',  1,  'int')     :  $app->getUserStateFromRequest( $p.'scope',   'scope',   1,   'int' );
-		$search = $fcform ? $jinput->get('search', '', 'string') : $app->getUserStateFromRequest($p . 'search', 'search', '', 'string');
-
-		$this->setState('scope', $scope);
-		$this->setState('search', $search);
-
-		$app->setUserState($p . 'scope', $scope);
-		$app->setUserState($p . 'search', $search);
 
 
 		/**
@@ -3440,10 +3430,8 @@ class FlexicontentModelItems extends FCModelAdminList
 	{
 		$app    = JFactory::getApplication();
 		$jinput = $app->input;
-		$option = $jinput->get('option', '', 'cmd');
-		$view   = $jinput->get('view', '', 'cmd');
 		$fcform = $jinput->get('fcform', 0, 'int');
-		$p      = $option . '.' . $view . '.';
+		$p      = $this->ovid;
 
 		// Order type
 		$filter_order_type = $fcform ? $jinput->get('filter_order_type', 1, 'int') : $app->getUserStateFromRequest($p . 'filter_order_type', 'filter_order_type', 1, 'int' );

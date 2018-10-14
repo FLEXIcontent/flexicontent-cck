@@ -30,25 +30,19 @@ require_once JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' .
 class FlexicontentControllerFields extends FlexicontentControllerBaseAdmin
 {
 	var $records_dbtbl  = 'flexicontent_fields';
-
 	var $records_jtable = 'flexicontent_fields';
 
 	var $record_name = 'field';
-
 	var $record_name_pl = 'fields';
 
 	var $_NAME = 'FIELD';
-
 	var $record_alias = 'name';
 
 	var $runMode = 'standalone';
 
 	var $exitHttpHead = null;
-
 	var $exitMessages = array();
-
 	var $exitLogTexts = array();
-
 	var $exitSuccess  = true;
 
 	/**

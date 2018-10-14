@@ -30,25 +30,19 @@ require_once JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' .
 class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 {
 	var $records_dbtbl  = 'flexicontent_files';
-
 	var $records_jtable = 'flexicontent_files';
 
 	var $record_name = 'file';
-
 	var $record_name_pl = 'filemanager';
 
 	var $_NAME = 'FILE';
-
 	var $record_alias = 'filename';
 
 	var $runMode = 'standalone';
 
 	var $exitHttpHead = null;
-
 	var $exitMessages = array();
-
 	var $exitLogTexts = array();
-
 	var $exitSuccess  = true;
 
 	/**

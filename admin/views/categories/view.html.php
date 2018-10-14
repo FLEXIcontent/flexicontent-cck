@@ -84,13 +84,13 @@ class FlexicontentViewCategories extends FlexicontentViewBaseRecords
 		$filter_cats      = $model->getState('filter_cats');
 		$filter_level     = $model->getState('filter_level');
 		$filter_access    = $model->getState('filter_access');
-		$filter_language  = $model->getState('filter_language');
+		$filter_lang      = $model->getState('filter_lang');
 
 		if ($filter_state) $count_filters++;
 		if ($filter_cats) $count_filters++;
 		if ($filter_level) $count_filters++;
 		if ($filter_access) $count_filters++;
-		if ($filter_language) $count_filters++;
+		if ($filter_lang) $count_filters++;
 
 		// Record ID filter
 		$filter_id = $model->getState('filter_id');
@@ -331,12 +331,12 @@ class FlexicontentViewCategories extends FlexicontentViewBaseRecords
 		$lists['filter_lang'] = $this->getFilterDisplay(array(
 			'label' => JText::_('FLEXI_LANGUAGE'),
 			'html' => flexicontent_html::buildlanguageslist(
-				'filter_language',
+				'filter_lang',
 				array(
 					'class' => 'use_select2_lib',
 					'onchange' => 'document.adminForm.limitstart.value=0; Joomla.submitform();',
 				),
-				$filter_language,
+				$filter_lang,
 				'-'
 			)
 		));

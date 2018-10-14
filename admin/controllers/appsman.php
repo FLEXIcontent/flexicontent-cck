@@ -32,25 +32,19 @@ require_once JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' .
 class FlexicontentControllerAppsman extends FlexicontentController
 {
 	var $records_dbtbl = null;
-
 	var $records_jtable = null;
 
 	var $record_name = 'appsman';
-
 	var $record_name_pl = null;
 
 	var $_NAME = 'APPSMAN';
-
 	var $record_alias = 'not_applicable';
 
 	var $runMode = 'standalone';
 
 	var $exitHttpHead = null;
-
 	var $exitMessages = array();
-
 	var $exitLogTexts = array();
-
 	var $exitSuccess  = true;
 
 	static $allowed_tables = array(
