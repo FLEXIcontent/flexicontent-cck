@@ -361,7 +361,7 @@ function delAllFilters() {
 				$row->groupname = implode(', ', $row->groupname);
 
 				$users_task = 'task=users.';
-				$edit_link  = 'index.php?option=com_flexicontent&amp;controller=users&amp;view=user&amp;'.$users_task.'edit&amp;cid='. $row->id. '';
+				$edit_link  = 'index.php?option=com_flexicontent&amp;controller=users&amp;view=user&amp;'.$users_task.'edit&amp;id='. $row->id. '';
 
 				$img_path  = '../components/com_flexicontent/assets/images/';
 				$tick_img  = $img_path . 'tick.png';

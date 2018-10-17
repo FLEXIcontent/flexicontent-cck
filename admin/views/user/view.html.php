@@ -225,8 +225,6 @@ class FlexicontentViewUser extends JViewLegacy
 		$_clayout = $params_authorcat->get('clayout');
 		if ($_clayout) FLEXIUtilities::loadTemplateLanguageFile( $_clayout );
 		
-		$params_author = new JRegistry($user->params);
-		
 		foreach ($tmpls as $tmpl)
 		{
 			if ($tmpl->name != $_clayout) continue;
@@ -286,7 +284,6 @@ class FlexicontentViewUser extends JViewLegacy
 
 		$this->tmpls = $tmpls;
 		$this->form  = $form;
-		$this->params_author = $params_author;
 
 		parent::display($tpl);
 	}
