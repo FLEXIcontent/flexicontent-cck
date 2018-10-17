@@ -720,7 +720,7 @@ class FlexicontentViewItem extends JViewLegacy
 		// ***
 		$langAssocs = $useAssocs && $page_params->get('uselang_fe')==1 ? $this->get( 'LangAssocs' ) : false;
 		$langs = FLEXIUtilities::getLanguages('code');
-		FLEXIUtilities::loadTemplateLanguageFile( $page_params->get('ilayout', 'default') );
+		FLEXIUtilities::loadTemplateLanguageFile($page_params->get('ilayout') ?: 'default');
 
 
 		// ***
