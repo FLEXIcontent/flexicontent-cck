@@ -23,14 +23,6 @@ require_once('base/baselist.php');
  */
 class FlexicontentModelFields extends FCModelAdminList
 {
-
-	/**
-	 * Record name
-	 *
-	 * @var string
-	 */
-	var $record_name    = 'field';
-
 	/**
 	 * Record database table
 	 *
@@ -702,7 +694,7 @@ class FlexicontentModelFields extends FCModelAdminList
 
 			$table->id    = 0;
 			$table->label = $table->label . ' [copy]';
-			$table->$name = $this->record_name . ($this->_getLastId() + 1);
+			$table->$name = 'field' . ($this->_getLastId() + 1);
 
 			$table->check();
 			$table->store();

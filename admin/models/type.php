@@ -23,11 +23,11 @@ require_once('base/base.php');
 class FlexicontentModelType extends FCModelAdmin
 {
 	/**
-	 * Record name
+	 * Record name, (parent class property), this is used for: naming session data, XML file of class, etc
 	 *
 	 * @var string
 	 */
-	var $record_name = 'type';
+	protected $name = 'type';
 
 	/**
 	 * Record database table
@@ -65,7 +65,7 @@ class FlexicontentModelType extends FCModelAdmin
 	var $_record = null;
 
 	/**
-	 * Events context to use during model FORM events triggering
+	 * Events context to use during model FORM events and diplay PREPARE events triggering
 	 *
 	 * @var object
 	 */
@@ -182,7 +182,7 @@ class FlexicontentModelType extends FCModelAdmin
 		// Set some new record specific properties, note most properties already have proper values
 		// Either the DB default values (set by getTable() method) or the values set by _afterLoad() method
 		$record->id							= 0;
-		$record->name						= null;  //$this->record_name . ($this->_getLastId() + 1);
+		$record->name						= null;  //$this->getName() . ($this->_getLastId() + 1);
 		$record->alias					= null;
 		$record->published			= 1;
 		$record->itemscreatable	= 0;
@@ -333,7 +333,7 @@ class FlexicontentModelType extends FCModelAdmin
 		$mergeOptions = array(
 			'params_fset'  => 'attribs',
 			'layout_type'  => 'item',
-			'model_names'  => array($this->option => $this->record_name),
+			'model_names'  => array($this->option => $this->getName()),
 			'cssprep_save' => false,
 		);
 		$this->mergeAttributes($record, $data, $mergeProperties, $mergeOptions);

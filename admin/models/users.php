@@ -29,9 +29,8 @@ class FlexicontentModelUsers extends FCModelAdminList
 	var $records_jtable = 'JTableUser';
 
 	/**
-	 * Column names and record name
+	 * Column names
 	 */
-	var $record_name = 'user';
 	var $state_col   = 'block';
 	var $name_col    = 'name';
 	var $parent_col  = null;

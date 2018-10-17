@@ -27,9 +27,8 @@ class FlexicontentModelItemelement extends JModelList
 	var $records_jtable = 'flexicontent_items';
 
 	/**
-	 * Column names and record name
+	 * Column names
 	 */
-	var $record_name = 'item';
 	var $state_col   = 'state';
 	var $name_col    = 'title';
 	var $parent_col  = 'catid';

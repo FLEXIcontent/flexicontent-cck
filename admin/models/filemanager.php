@@ -26,14 +26,6 @@ require_once('base/baselist.php');
  */
 class FlexicontentModelFilemanager extends FCModelAdminList
 {
-
-	/**
-	 * Record name
-	 *
-	 * @var string
-	 */
-	var $record_name    = 'file';
-
 	/**
 	 * Record database table
 	 *

@@ -29,13 +29,6 @@ class FlexicontentModelCategories extends FCModelAdminList
 	use FCModelTraitNestableRecord;
 
 	/**
-	 * Record name
-	 *
-	 * @var string
-	 */
-	var $record_name = 'category';
-
-	/**
 	 * Record database table
 	 *
 	 * @var string

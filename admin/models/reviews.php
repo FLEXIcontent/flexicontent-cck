@@ -28,9 +28,8 @@ class FlexicontentModelReviews extends FCModelAdminList
 	var $records_jtable = 'flexicontent_reviews';
 
 	/**
-	 * Column names and record name
+	 * Column names
 	 */
-	var $record_name    = 'review';
 	var $state_col      = 'state';
 	var $name_col       = 'title';
 	var $parent_col     = null;

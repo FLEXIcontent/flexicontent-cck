@@ -28,11 +28,11 @@ class FlexicontentModelCategory extends FCModelAdmin
 	use FCModelTraitNestableRecord;
 
 	/**
-	 * Record name
+	 * Record name, (parent class property), this is used for: naming session data, XML file of class, etc
 	 *
 	 * @var string
 	 */
-	var $record_name = 'category';
+	protected $name = 'category';
 
 	/**
 	 * Record database table
@@ -70,11 +70,18 @@ class FlexicontentModelCategory extends FCModelAdmin
 	var $_record = null;
 
 	/**
-	 * Events context to use during model FORM events triggering
+	 * Events context to use during model FORM events and diplay PREPARE events triggering
 	 *
 	 * @var object
 	 */
 	var $events_context = 'com_content.category';
+
+	/**
+	 * Record's type alias string
+	 *
+	 * @var        string
+	 */
+	var $type_alias = 'com_content.category';
 
 	/**
 	 * Flag to indicate adding new records with next available ordering (at the end),
@@ -124,7 +131,6 @@ class FlexicontentModelCategory extends FCModelAdmin
 	 */
 	var $hard_filters = array('extension' => FLEXI_CAT_EXTENSION);
 
-
 	/**
 	 * Constructor
 	 *
@@ -168,7 +174,7 @@ class FlexicontentModelCategory extends FCModelAdmin
 		$record->id							= 0;
 		$record->parent_id			= 0;
 		$record->title					= null;
-		$record->name						= null;  //$this->record_name . ($this->_getLastId() + 1);
+		$record->name						= null;  //$this->getName() . ($this->_getLastId() + 1);
 		$record->alias					= null;
 		$record->description		= null;
 		$record->extension			= FLEXI_CAT_EXTENSION;
@@ -446,14 +452,12 @@ class FlexicontentModelCategory extends FCModelAdmin
 		$this->setState($this->getName().'.language', isset($data['language']) ? $data['language'] : null);
 
 		// Get the form.
-		$form = $this->loadForm($this->option.'.'.$this->getName(), $this->getName(), array('control' => 'jform', 'load_data' => $loadData));
+		$form = parent::getForm($data, $loadData);
 
 		if (empty($form))
 		{
 			return false;
 		}
-		$form->option = $this->option;
-		$form->context = $this->getName();
 
 		// Modify the form based on Edit State access controls.
 		if (empty($data['extension']))
@@ -694,7 +698,7 @@ class FlexicontentModelCategory extends FCModelAdmin
 	{
 		$record  = $record ?: $this->_record;
 		$user    = JFactory::getUser();
-		$asset   = $record && !$record->id ? 'com_content.category.' . $record->id : $this->option;
+		$asset   = $record && !$record->id ? $this->type_alias . '.' . $record->id : $this->option;
 		$isOwner = $record && $user->id && $record->created_user_id = $user->id;
 
 		$canDo    = $user->authorise('core.edit', $asset);
@@ -715,7 +719,7 @@ class FlexicontentModelCategory extends FCModelAdmin
 	{
 		$record  = $record ?: $this->_record;
 		$user    = JFactory::getUser();
-		$asset   = $record && !$record->id ? 'com_content.category.' . $record->id : $this->option;
+		$asset   = $record && !$record->id ? $this->type_alias . '.' . $record->id : $this->option;
 		$isOwner = $record && $user->id && $record->created_user_id = $user->id;
 
 		$canDo    = $user->authorise('core.edit.state', $asset);
@@ -736,7 +740,7 @@ class FlexicontentModelCategory extends FCModelAdmin
 	{
 		$record  = $record ?: $this->_record;
 		$user    = JFactory::getUser();
-		$asset   = $record && !$record->id ? 'com_content.category.' . $record->id : $this->option;
+		$asset   = $record && !$record->id ? $this->type_alias . '.' . $record->id : $this->option;
 		$isOwner = $record && $user->id && $record->created_user_id = $user->id;
 
 		$canDo    = $user->authorise('core.delete.state', $asset);
@@ -786,7 +790,7 @@ class FlexicontentModelCategory extends FCModelAdmin
 		$mergeOptions = array(
 			'params_fset'  => 'params',
 			'layout_type'  => 'category',
-			'model_names'  => array($this->option => $this->record_name, 'com_categories' => 'category'),
+			'model_names'  => array($this->option => $this->getName(), 'com_categories' => 'category'),
 			'cssprep_save' => false,
 		);
 		$this->mergeAttributes($record, $data, $mergeProperties, $mergeOptions);
