@@ -24,11 +24,11 @@ require_once('base/base.php');
 class ParentClassItem extends FCModelAdmin
 {
 	/**
-	 * Record name
+	 * Record name, (parent class property), this is used for: naming session data, XML file of class, etc
 	 *
 	 * @var string
 	 */
-	var $record_name = 'item';
+	protected $name = 'item';
 
 	/**
 	 * Record database table
@@ -66,11 +66,18 @@ class ParentClassItem extends FCModelAdmin
 	var $_record = null;
 
 	/**
-	 * Events context to use during model FORM events triggering
+	 * Events context to use during model FORM events and diplay PREPARE events triggering
 	 *
 	 * @var object
 	 */
 	var $events_context = 'com_content.article';
+
+	/**
+	 * Record's type alias string
+	 *
+	 * @var        string
+	 */
+	public $type_alias = 'com_content.article';
 
 	/**
 	 * Flag to indicate adding new records with next available ordering (at the end),
@@ -153,13 +160,6 @@ class ParentClassItem extends FCModelAdmin
 	 * @var array
 	 */
 	var $_translations = null;
-
-	/**
-	 * Model typeAlias string.
-	 *
-	 * @var        string
-	 */
-	public $typeAlias = 'com_content.article';
 
 	/**
 	 * Constructor
@@ -1072,15 +1072,12 @@ class ParentClassItem extends FCModelAdmin
 		$this->_record->cid = $this->_record->categories;
 
 		// Get the form.
-		$events_context = $this->events_context ?: $this->option.'.'.$this->getName();
-		$form = $this->loadForm($events_context, $this->getName(), array('control' => 'jform', 'load_data' => $loadData));
+		$form = parent::getForm($data, $loadData);
 
 		if (empty($form))
 		{
 			return false;
 		}
-		$form->option = $this->option;
-		$form->context = $this->getName();
 
 		unset($this->_record->cid);
 
@@ -1321,9 +1318,10 @@ class ParentClassItem extends FCModelAdmin
 	function getItemAccess()
 	{
 		$iparams_extra = new JRegistry;
-		$user		= JFactory::getUser();
+
+		$user		 = JFactory::getUser();
 		$session = JFactory::getSession();
-		$asset	= $this->typeAlias . '.' . $this->_id;
+		$asset	 = $this->type_alias . '.' . $this->_id;
 
 		// Check if item was editable, but was rendered non-editable
 		$hasTmpEdit = false;
@@ -1869,7 +1867,7 @@ class ParentClassItem extends FCModelAdmin
 		$mergeOptions = array(
 			'params_fset'  => 'attribs',
 			'layout_type'  => 'item',
-			'model_names'  => array($this->option => $this->record_name, 'com_content' => 'article'),
+			'model_names'  => array($this->option => $this->getName(), 'com_content' => 'article'),
 			'cssprep_save' => false,
 		);
 		$this->mergeAttributes($item, $data, $mergeProperties, $mergeOptions);
@@ -5410,7 +5408,7 @@ class ParentClassItem extends FCModelAdmin
 		// Existing item, use item specific permissions
 		if (!empty($record->id))
 		{
-			$asset = $this->typeAlias . '.' . $record->id;
+			$asset = $this->type_alias . '.' . $record->id;
 			$allowed =
 				($hasTypeEdit && $user->authorise('core.edit', $asset)) ||
 				($hasTypeEditOwn && $user->authorise('core.edit.own', $asset) && ($isOwner || $hasCoupon));  // hasCoupon acts as item owner
@@ -5455,7 +5453,7 @@ class ParentClassItem extends FCModelAdmin
 		// Existing item, use item specific permissions
 		if (!empty($record->id))
 		{
-			$asset = $this->typeAlias . '.' . $record->id;
+			$asset = $this->type_alias . '.' . $record->id;
 			$allowed =
 				($hasTypeEditState && $user->authorise('core.edit.state', $asset)) ||
 				($hasTypeEditStateOwn && $user->authorise('core.edit.state.own', $asset) && ($isOwner || $hasCoupon));  // hasCoupon acts as item owner
@@ -5498,7 +5496,7 @@ class ParentClassItem extends FCModelAdmin
 		// Existing item, use item specific permissions
 		if (!empty($record->id))
 		{
-			$asset = $this->typeAlias . '.' . $record->id;
+			$asset = $this->type_alias . '.' . $record->id;
 			$allowed = $user->authorise('core.delete', $asset) || ($user->authorise('core.delete.own', $asset) && $isOwner);
 		}
 
@@ -6182,7 +6180,7 @@ class ParentClassItem extends FCModelAdmin
 		$this->initBatch();
 		$db = $this->_db;
 
-		$contentType = $contentType ?: $this->typeAlias;
+		$contentType = $contentType ?: $this->type_alias;
 		$id = (int) ($id ?: $this->_id);
 
 		// Create the query
@@ -6274,12 +6272,12 @@ class ParentClassItem extends FCModelAdmin
 
 		// Make sure re-usable member properties have been initialized
 		$this->initBatch();
-		$asset = $this->typeAlias . '.' . $id;
+		$asset = $this->type_alias . '.' . $id;
 
 		// Create the tags helper instance will update the Joomla tags of the article, using the given tags observer instance
 		if (!FLEXI_J40GE)
 		{
-			$this->createTagsHelper($this->tagsObserver, $this->type, $id, $this->typeAlias, $this->table);
+			$this->createTagsHelper($this->tagsObserver, $this->type, $id, $this->type_alias, $this->table);
 		}
 
 		// Load data of FLEXIcontent tags

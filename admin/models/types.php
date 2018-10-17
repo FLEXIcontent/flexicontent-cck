@@ -28,9 +28,8 @@ class FlexicontentModelTypes extends FCModelAdminList
 	var $records_jtable = 'flexicontent_types';
 
 	/**
-	 * Column names and record name
+	 * Column names
 	 */
-	var $record_name = 'type';
 	var $state_col   = 'published';
 	var $name_col    = 'name';
 	var $parent_col  = null;

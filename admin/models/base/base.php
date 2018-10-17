@@ -34,11 +34,11 @@ abstract class FCModelAdmin extends JModelAdmin
 	var $record_keys = array('id', 'cid');
 
 	/**
-	 * Record name
+	 * Record name, (parent class property), this is used for: naming session data, XML file of class, etc
 	 *
 	 * @var string
 	 */
-	var $record_name = null;
+	protected $name = null;
 
 	/**
 	 * Record database table
@@ -76,11 +76,18 @@ abstract class FCModelAdmin extends JModelAdmin
 	var $_record = null;
 
 	/**
-	 * Events context to use during model FORM events triggering
+	 * Events context to use during model FORM events and diplay PREPARE events triggering
 	 *
 	 * @var object
 	 */
 	var $events_context = null;
+
+	/**
+	 * Record's type alias string
+	 *
+	 * @var        string
+	 */
+	var $type_alias = null;
 
 	/**
 	 * Flag to indicate adding new records with next available ordering (at the end),
@@ -159,10 +166,11 @@ abstract class FCModelAdmin extends JModelAdmin
 		$this->option = 'com_flexicontent';
 
 		// Initialize using default naming if not already set
-		$this->records_dbtbl  = $this->records_dbtbl  ?: 'flexicontent_' . $this->record_name . 's';
-		$this->records_jtable = $this->records_jtable ?: 'flexicontent_' . $this->record_name . 's';
-		$this->record_name    = $this->record_name    ?: $this->getName();
-		$this->events_context = $this->events_context ?: $this->option . '.' . $this->record_name;
+		$this->records_dbtbl  = $this->records_dbtbl  ?: 'flexicontent_' . $this->getName() . 's';
+		$this->records_jtable = $this->records_jtable ?: 'flexicontent_' . $this->getName() . 's';
+
+		$this->events_context = $this->events_context ?: $this->option . '.' . $this->getName();
+		$this->type_alias     = $this->type_alias     ?: $this->option . '.' . $this->getName();
 
 		$jinput = JFactory::getApplication()->input;
 		$pk = null;
@@ -653,13 +661,20 @@ abstract class FCModelAdmin extends JModelAdmin
 	 */
 	public function getForm($data = array(), $loadData = true)
 	{
+		// Set form path in case we are called form different extension
+		\JForm::addFormPath(JPATH_BASE.DS.'components'.DS.'com_flexicontent' . '/models/forms');
+		\JForm::addFieldPath(JPATH_BASE.DS.'components'.DS.'com_flexicontent' . '/models/fields');
+
 		// Get the form.
-		$form = $this->loadForm($this->events_context, $this->getName(), array('control' => 'jform', 'load_data' => $loadData));
+		$form_name    = $this->option . '.' . $this->getName();
+		$xml_filename = $this->getName();
+		$form = $this->loadForm($form_name, $xml_filename, array('control' => 'jform', 'load_data' => $loadData));
 
 		if (empty($form))
 		{
 			return false;
 		}
+
 		$form->option = $this->option;
 		$form->context = $this->getName();
 
@@ -1131,7 +1146,7 @@ abstract class FCModelAdmin extends JModelAdmin
 			// Get UCM Type data
 			$this->contentType = new \JUcmType;
 			$this->type = $this->contentType->getTypeByTable($this->tableClassName)
-				?: $this->contentType->getTypeByAlias($this->typeAlias);
+				?: $this->contentType->getTypeByAlias($this->type_alias);
 
 			// Get tabs observer
 			if (!FLEXI_J40GE)
@@ -1537,7 +1552,7 @@ abstract class FCModelAdmin extends JModelAdmin
 		/**
 		 * Update version table
 		 */
-		if ($this->record_name === 'item')
+		if ($this->getName() === 'item')
 		{
 			$v = FLEXIUtilities::getCurrentVersions((int) $id);
 

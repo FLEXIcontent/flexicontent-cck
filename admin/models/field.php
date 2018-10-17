@@ -23,11 +23,11 @@ require_once('base/base.php');
 class FlexicontentModelField extends FCModelAdmin
 {
 	/**
-	 * Record name
+	 * Record name, (parent class property), this is used for: naming session data, XML file of class, etc
 	 *
 	 * @var string
 	 */
-	var $record_name = 'field';
+	protected $name = 'field';
 
 	/**
 	 * Record database table
@@ -65,7 +65,7 @@ class FlexicontentModelField extends FCModelAdmin
 	var $_record = null;
 
 	/**
-	 * Events context to use during model FORM events triggering
+	 * Events context to use during model FORM events and diplay PREPARE events triggering
 	 *
 	 * @var object
 	 */
@@ -152,7 +152,7 @@ class FlexicontentModelField extends FCModelAdmin
 		// Either the DB default values (set by getTable() method) or the values set by _afterLoad() method
 		$record->id							= 0;
 		$record->field_type			= 'text';
-		$record->name						= null;  //$this->record_name . ($this->_getLastId() + 1);
+		$record->name						= null;  //$this->getName() . ($this->_getLastId() + 1);
 		$record->label					= null;
 		$record->description		= null;
 		$record->isfilter				= 0;

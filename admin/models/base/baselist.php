@@ -25,16 +25,8 @@ require_once('traitlegacylist.php');
  */
 abstract class FCModelAdminList extends JModelList
 {
-
 	use FCModelTraitBase;
 	use FCModelTraitLegacyList;
-
-	/**
-	 * Record name
-	 *
-	 * @var string
-	 */
-	var $record_name    = 'record';
 
 	/**
 	 * Record database table

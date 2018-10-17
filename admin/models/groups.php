@@ -50,9 +50,8 @@ class FlexicontentModelGroups extends FCModelAdminList
 	var $records_jtable = 'JTableUserGroup';
 
 	/**
-	 * Column names and record name
+	 * Column names
 	 */
-	var $record_name = 'group';
 	var $state_col   = null;
 	var $name_col    = 'title';
 	var $parent_col  = 'parent_id';

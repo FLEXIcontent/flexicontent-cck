@@ -23,15 +23,6 @@ require_once('base/baselist.php');
  */
 class FlexicontentModelItems extends FCModelAdminList
 {
-
-
-	/**
-	 * Record name
-	 *
-	 * @var string
-	 */
-	var $record_name = 'item';
-
 	/**
 	 * Record database table
 	 *

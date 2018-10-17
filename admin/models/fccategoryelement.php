@@ -27,9 +27,8 @@ class FlexicontentModelFccategoryelement extends JModelList
 	var $records_jtable = 'flexicontent_categories';
 
 	/**
-	 * Column names and record name
+	 * Column names
 	 */
-	var $record_name = 'category';
 	var $state_col   = 'published';
 	var $name_col    = 'title';
 	var $parent_col  = 'parent_id';

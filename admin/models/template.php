@@ -23,11 +23,11 @@ require_once('base/base.php');
 class FlexicontentModelTemplate extends FCModelAdmin
 {
 	/**
-	 * Record name
+	 * Record name, (parent class property), this is used for: naming session data, XML file of class, etc
 	 *
 	 * @var string
 	 */
-	var $record_name = 'template';
+	protected $name = 'template';
 
 	/**
 	 * Record database table
@@ -58,7 +58,7 @@ class FlexicontentModelTemplate extends FCModelAdmin
 	var $_record = null;
 
 	/**
-	 * Events context to use during model FORM events triggering
+	 * Events context to use during model FORM events and diplay PREPARE events triggering
 	 *
 	 * @var object
 	 */
