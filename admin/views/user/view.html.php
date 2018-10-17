@@ -357,7 +357,6 @@ class FlexicontentViewUser extends JViewLegacy
 		$this->jform_authorcat   = $jform_authorcat;
 
 		$this->tmpls    = $tmpls;
-		$this->params_author = $params_author;
 
 		parent::display($tpl);
 	}
