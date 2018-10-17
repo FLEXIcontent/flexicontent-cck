@@ -572,7 +572,7 @@ class flexicontent_html
 	 * @return 	string  : the HTML of the item view, also the CSS / JS file would have been loaded
 	 * @since 1.5
 	 */
-	function renderItem($item_id, $view=FLEXI_ITEMVIEW, $ilayout='')
+	function renderItem($item_id, $view=FLEXI_ITEMVIEW, $ilayout = '')
 	{
 		JTable::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'tables');
 		require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.fields.php');
@@ -589,20 +589,23 @@ class flexicontent_html
 		$aid = JAccess::getAuthorisedViewLevels($user->id);
 
 		// Get Item's specific ilayout
-		if ($ilayout=='') {
-			$ilayout = $item->parameters->get('ilayout', '');
+		if (!$ilayout)
+		{
+			$ilayout = $item->parameters->get('ilayout');
 		}
+
 		// Get type's ilayout
-		if ($ilayout=='') {
+		if (!$ilayout)
+		{
 			$type = JTable::getInstance('flexicontent_types', '');
 			$type->id = $item->type_id;
 			$type->load();
 			$type->params = new JRegistry($type->attribs);
-			$ilayout = $type->params->get('ilayout', 'default');
+			$ilayout = $type->params->get('ilayout') ?: 'default';
 		}
 
 		// Get cached template data, re-parsing XML/LESS files, also loading any template language files of a specific template
-		$themes = flexicontent_tmpl::getTemplates( array($ilayout) );
+		$themes = flexicontent_tmpl::getTemplates(array($ilayout));
 
 		// Get Fields
 		list($item) = FlexicontentFields::getFields($item, $view, $item->parameters, $aid);
@@ -619,7 +622,12 @@ class flexicontent_html
 		$this->tmpl = '.item.'.$ilayout;
 		$this->print_link = JRoute::_('index.php?view='.FLEXI_ITEMVIEW.'&id='.$item->slug.'&pop=1&tmpl=component&print=1');
 		$this->pageclass_sfx = '';
-		if (!isset($this->item->event)) $this->item->event = new stdClass();
+
+		if (!isset($this->item->event))
+		{
+			$this->item->event = new stdClass();
+		}
+
 		$this->item->event->beforeDisplayContent = '';
 		$this->item->event->afterDisplayTitle = '';
 		$this->item->event->afterDisplayContent = '';
@@ -627,13 +635,20 @@ class flexicontent_html
 
 		// start capturing output into a buffer
 		ob_start();
+
 		// Include the requested template filename in the local scope (this will execute the view logic).
-		if ( file_exists(JPATH_SITE.DS.'templates'.DS.$app->getTemplate().DS.'html'.DS.'com_flexicontent'.DS.'templates'.DS.$ilayout) )
+		if (file_exists(JPATH_SITE.DS.'templates'.DS.$app->getTemplate().DS.'html'.DS.'com_flexicontent'.DS.'templates'.DS.$ilayout))
+		{
 			include JPATH_SITE.DS.'templates'.DS.$app->getTemplate().DS.'html'.DS.'com_flexicontent'.DS.'templates'.DS.$ilayout.DS.'item.php';
-		else if (file_exists(JPATH_COMPONENT.DS.'templates'.DS.$ilayout))
+		}
+		elseif (file_exists(JPATH_COMPONENT.DS.'templates'.DS.$ilayout))
+		{
 			include JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'templates'.DS.$ilayout.DS.'item.php';
+		}
 		else
+		{
 			include JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'templates'.DS.'default'.DS.'item.php';
+		}
 
 		// done with the requested template; get the buffer and clear it.
 		$item_html = ob_get_contents();
