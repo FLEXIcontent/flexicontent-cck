@@ -421,6 +421,7 @@ if ($js)
 		$canCheckinRecords = $user->authorise('core.admin', 'com_checkin');
 
 		$padcount = 0;
+		$padspacer_next = '';
 
 		$total_rows = count($this->rows);
 
@@ -432,9 +433,9 @@ if ($js)
 
 		foreach ($this->rows as $i => $row)
 		{
-			$padspacer = '';
 			$row_css = '';
 			$repeat = $padcount;
+			$padspacer = $padspacer_next;
 
 			// Create coloring and padding for groupmarker fields if filtering by specific type is enabled
 			if ($this->filter_type && $row->field_type === 'groupmarker')
@@ -456,12 +457,15 @@ if ($js)
 					case 'fieldset_close':
 						$row_css = 'color:darkred;';
 						$repeat = --$padcount;
+
+						// Use new padspacer instead of previous one
+						$padspacer = str_repeat('&nbsp;|_&nbsp;', $padcount);
 						break;
 				}
-
-				$padspacer .= str_repeat('&nbsp;|_&nbsp;', $padcount);
 			}
 
+			// Calculate padding for next row
+			$padspacer_next = str_repeat('&nbsp;|_&nbsp;', $padcount);
 
 			$rights = FlexicontentHelperPerm::checkAllItemAccess($user->id, 'field', $row->id);
 			$row->canCheckin   = $canCheckinRecords;

@@ -1694,13 +1694,16 @@ class ParentClassItem extends FCModelAdmin
 
 
 	/**
-	 * Method to store the item
+	 * Method to create or update a record a record
 	 *
-	 * @access	public
+	 * @param		array			$data        Array of record data to use for creating or updating a record
+	 * @param		boolean   $checkACL    Whether to check ACL: edit.state.*, and editfieldvalue
+	 *
 	 * @return	boolean	True on success
-	 * @since	1.0
+	 *
+	 * @since	3.3.0
 	 */
-	function store($data)
+	function store($data, $checkACL = true)
 	{
 		global $fc_run_times;
 		$start_microtime = microtime(true);
@@ -1749,7 +1752,7 @@ class ParentClassItem extends FCModelAdmin
 		// *** Load existing item into the empty item model
 		// ***
 
-		if ( !$isNew )
+		if (!$isNew)
 		{
 			$item->load( $data['id'] );
 
@@ -1881,201 +1884,251 @@ class ParentClassItem extends FCModelAdmin
 		}
 
 
-		// ***
-		// *** Retrieve submit configuration for new items in frontend
-		// ***
+		/**
+		 * ACL CHECKs
+		 */
 
-		if ( $app->isSite() && $isNew && !empty($data['submit_conf']) )
+		if ($checkACL)
 		{
-			$h = $data['submit_conf'];
-			$session = JFactory::getSession();
-			$item_submit_conf = $session->get('item_submit_conf', array(),'flexicontent');
-			$submit_conf = !empty($item_submit_conf[$h]) ? $item_submit_conf[$h] : null;
+			/**
+			 * Retrieve submit configuration for new items in frontend
+			 */
 
-			$autopublished    = $submit_conf && !empty($submit_conf['autopublished'])    ? $submit_conf['autopublished']    : null;  // Override flag for both TYPE and CATEGORY ACL
-			$overridecatperms = $submit_conf && !empty($submit_conf['overridecatperms']) ? $submit_conf['overridecatperms'] : null;  // Override flag for CATEGORY ACL
-
-			if ( $autopublished)
+			if ($app->isSite() && $isNew && !empty($data['submit_conf']))
 			{
-				// Dates forced during autopublishing
-				if ( !empty($submit_conf['autopublished_up_interval']) )
+				$h = $data['submit_conf'];
+				$session = JFactory::getSession();
+				$item_submit_conf = $session->get('item_submit_conf', array(),'flexicontent');
+				$submit_conf = !empty($item_submit_conf[$h]) ? $item_submit_conf[$h] : null;
+
+				$autopublished    = $submit_conf && !empty($submit_conf['autopublished'])    ? $submit_conf['autopublished']    : null;  // Override flag for both TYPE and CATEGORY ACL
+				$overridecatperms = $submit_conf && !empty($submit_conf['overridecatperms']) ? $submit_conf['overridecatperms'] : null;  // Override flag for CATEGORY ACL
+
+				if ( $autopublished)
 				{
-					$publish_up_date = JFactory::getDate(); // Gives editor's timezone by default
-					$publish_up_date->modify('+ '.$submit_conf['autopublished_up_interval'].' minutes');
-					$publish_up_forced = $publish_up_date->toSql();
-				}
-				if ( !empty($submit_conf['autopublished_down_interval']) )
-				{
-					$publish_down_date = JFactory::getDate(); // Gives editor's timezone by default
-					$publish_down_date->modify('+ '.$submit_conf['autopublished_down_interval'].' minutes');
-					$publish_down_forced = $publish_down_date->toSql();
-				}
-			}
-		}
-		else
-		{
-			$autopublished    = 0;
-			$overridecatperms = 0;
-		}
-
-
-		// ***
-		// *** SECURITY concern: Check form tampering of categories, of:
-		// *** (a) menu overridden categories for frontent item submit
-		// *** (b) or check user has 'create' privilege in item categories
-		// ***
-
-		$allowed_cid = $overridecatperms ?
-			@ $submit_conf['cids'] :
-			FlexicontentHelperPerm::getAllowedCats($user, $actions_allowed = array('core.create'), $require_all=true) ;
-		if ($overridecatperms && @ $submit_conf['maincatid']) $allowed_cid[] = $submit_conf['maincatid'];  // add the "default" main category to allowed categories
-
-		// Force main category if main category selector (maincatid_show:1) was disabled (and default main category was configured)
-		if ($overridecatperms && @ $submit_conf['maincatid_show'] == 1 && @ $submit_conf['maincatid']) $data['catid'] = $submit_conf['maincatid'];
-
-		if ( !empty($allowed_cid) )
-		{
-			// Add existing item's categories into the user allowed categories
-			$allowed_cid = array_merge($allowed_cid, $item->categories);
-
-			// Check main category tampering
-			if ( !in_array($data['catid'], $allowed_cid) && $data['catid'] != $item->catid )
-			{
-				$this->setError( 'main category is not in allowed list (form tampered ?)' );
-				return false;
-			}
-
-			// Check multi category tampering
-			$postcats = isset($submit_conf['postcats']) ? $submit_conf['postcats'] : null;
-			if ( !$isNew || !$overridecatperms || $postcats==2 )
-				$data['categories'] = array_intersect ($data['categories'], $allowed_cid );
-			else if ( $postcats==0 )
-				$data['categories'] = $allowed_cid;
-			else if ( $postcats==1 )
-				$data['categories'] = array($data['catid']);
-			// Make sure values are unique
-			$data['categories'] = array_keys(array_flip($data['categories']));
-		}
-
-
-		// ***
-		// *** SECURITY concern: Prevent users from changing the item owner and creation date unless either they are super admin or they have special ACL privileges
-		// ***
-
-		if ( !$user->authorise('flexicontent.editcreator', 'com_flexicontent') )
-		{
-			unset( $data['created_by'] );
-			unset( $data['created_by_alias'] );
-		}
-
-
-		if ( !$user->authorise('flexicontent.editcreationdate', 'com_flexicontent') )
-		{
-			unset( $data['created'] );
-		}
-
-
-		// ***
-		// *** SECURITY concern: Check can edit state using proper owner, type and new category (all of them FORCED above)
-		// ***
-
-		// Save old main category & creator (owner)
-		$old_created_by = $item->created_by;
-		$old_catid      = $item->catid;
-
-		// Set proper into the item record proper owner (FORCED above) and type(FORCED above) + new main category
-		$item->created_by = isset($data['created_by']) ? $data['created_by'] : $item->created_by;
-		$item->catid      = $data['catid'];
-		$item->type_id    = isset($data['type_id']) ? $data['type_id'] : $item->type_id;
-		$canEditState = $this->canEditState( $item );
-
-		// Restore old main category & creator (owner) (in case following code chooses to keep them)
-		$item->created_by = $old_created_by;
-		$item->catid      = $old_catid;
-
-		// If cannot edit state or is frontend, then prevent user from changing 'featured' & 'ordering'
-		if ( !$canEditState || $app->isSite() )
-		{
-			unset( $data['featured'] );
-			unset( $data['ordering'] );
-		}
-
-		// If cannot edit state then do extra filtering of fields
-		// Note some fields are not filtered since item will go under approval
-		if ( !$canEditState )
-		{
-			$AutoApproveChanges = $user->authorise('flexicontent.autoapprovechanges',	'com_flexicontent');
-			$data['vstate'] = $AutoApproveChanges ? 2 : 1;
-
-			// Allow 'publish_up' & 'publish_down' only for NEW items (we may override these with specific value below ...)
-			if (!$isNew)
-			{
-				unset( $data['publish_up'] );
-				unset( $data['publish_down'] );
-			}
-
-			// Override the above values with forced auto-publishing data
-			if ( !empty($publish_up_forced) )   $data['publish_up']   = $publish_up_forced;
-			if ( !empty($publish_down_forced) ) $data['publish_down'] = $publish_down_forced;
-
-			$pubished_state = 1;  $draft_state = -4;  $pending_approval_state = -3;
-
-			// For existing items, force pending-state approval when user cannot publish, and versioning is OFF (aka not possible to use 'currently' active version + unapproved new version)
-			if (!$isNew)
-			{
-				$catid_changed_n_vers_off = $old_catid != $data['catid'] && !$use_versioning;
-
-				if ($catid_changed_n_vers_off)
-				{
-					$app->enqueueMessage(JText::_('FLEXI_WARNING_CONTENT_UNPUBLISHED_CAT_CHANGED_REAPPROVAL_NEEDED'), 'warning');
+					// Dates forced during autopublishing
+					if (!empty($submit_conf['autopublished_up_interval']))
+					{
+						$publish_up_date = JFactory::getDate(); // Gives editor's timezone by default
+						$publish_up_date->modify('+ '.$submit_conf['autopublished_up_interval'].' minutes');
+						$publish_up_forced = $publish_up_date->toSql();
+					}
+					if (!empty($submit_conf['autopublished_down_interval']))
+					{
+						$publish_down_date = JFactory::getDate(); // Gives editor's timezone by default
+						$publish_down_date->modify('+ '.$submit_conf['autopublished_down_interval'].' minutes');
+						$publish_down_forced = $publish_down_date->toSql();
+					}
 				}
 
-				$data['state'] = $catid_changed_n_vers_off
-					? $pending_approval_state
-					: $item->state;
+				// Other submit configuration
+				$submit_cids  = isset($submit_conf['cids']) ? $submit_conf['cids'] : null;
+				$maincatid    = isset($submit_conf['maincatid']) ? (int) $submit_conf['maincatid'] : 0;
+				$maincat_show = isset($submit_conf['maincat_show']) ? (int) $submit_conf['maincat_show'] : 0;
+				$postcats     = isset($submit_conf['postcats']) ? (int) $submit_conf['postcats'] : 0;
 			}
-
-			// Autopublishing new item via menu configuration
-			else if ($autopublished)
-			{
-				$data['state'] = $pubished_state;
-			}
-
-			// The preselected forced state of -NEW- items for users that CANNOT publish, and autopublish via menu item is disabled
 			else
 			{
-				$data['state'] = $app->isAdmin()
-					? $cparams->get('non_publishers_item_state', $draft_state)  // Use the configured setting for backend items
-					: $cparams->get('non_publishers_item_state_fe', $pending_approval_state);  // Use the configured setting for frontend items
+				$autopublished    = 0;
+				$overridecatperms = 0;
+
+				// Other submit configuration
+				$submit_cids  = null;
+				$maincatid    = 0;
+				$maincat_show = 0;
+				$postcats     = 0;
+			}
+
+
+			/**
+			 * SECURITY concern: Check form tampering of categories, of:
+			 * (a) menu overridden categories for frontent item submit
+			 * (b) or check user has 'create' privilege in item categories
+			 */
+
+			$allowed_cid = $overridecatperms
+				? $submit_cids
+				: FlexicontentHelperPerm::getAllowedCats($user, $actions_allowed = array('core.create'), $require_all=true);
+
+			// Add the "default" main category to allowed categories
+			if ($overridecatperms && $maincatid)
+			{
+				$allowed_cid[] = $maincatid;
+			}
+
+			// Force main category if main category selector (maincat_show:1) was disabled (and default main category was configured)
+			if ($overridecatperms && $maincat_show === 1 && $maincatid)
+			{
+				$data['catid'] = $maincatid;
+			}
+
+			if (!empty($allowed_cid))
+			{
+				// Add existing item's categories into the user allowed categories
+				$allowed_cid = array_merge($allowed_cid, $item->categories);
+
+				// Check main category tampering
+				if (!in_array($data['catid'], $allowed_cid) && $data['catid'] != $item->catid)
+				{
+					$this->setError( 'main category is not in allowed list (form tampered ?)' );
+					return false;
+				}
+
+				// Check multi category tampering
+				if (!$isNew || !$overridecatperms || $postcats === 2)
+				{
+					$data['categories'] = array_intersect($data['categories'], $allowed_cid);
+				}
+				elseif ($postcats === 1)
+				{
+					$data['categories'] = array($data['catid']);
+				}
+				// $postcats === 0 or other
+				else
+				{
+					$data['categories'] = $allowed_cid;
+				}
+
+				// Make sure values are unique
+				$data['categories'] = array_keys(array_flip($data['categories']));
+			}
+
+
+			/**
+			 * SECURITY concern: Prevent users from changing the item owner and creation date unless either they are super admin or they have special ACL privileges
+			 */
+
+			if (!$user->authorise('flexicontent.editcreator', 'com_flexicontent'))
+			{
+				unset($data['created_by']);
+				unset($data['created_by_alias']);
+			}
+
+			if (!$user->authorise('flexicontent.editcreationdate', 'com_flexicontent'))
+			{
+				unset($data['created']);
+			}
+
+
+			/**
+			 * SECURITY concern: Check can edit state using proper owner, type and new category (all of them FORCED above)
+			 */
+
+			// Save old main category & creator (owner)
+			$old_created_by = $item->created_by;
+			$old_catid      = $item->catid;
+
+			// Set proper into the item record proper owner (FORCED above) and type(FORCED above) + new main category
+			$item->created_by = isset($data['created_by']) ? $data['created_by'] : $item->created_by;
+			$item->catid      = $data['catid'];
+			$item->type_id    = isset($data['type_id']) ? $data['type_id'] : $item->type_id;
+
+			$canEditState     = $this->canEditState($item);
+
+			// Restore old main category & creator (owner) (in case following code chooses to keep them)
+			$item->created_by = $old_created_by;
+			$item->catid      = $old_catid;
+
+			// If cannot edit state or is frontend, then prevent user from changing 'featured' & 'ordering'
+			if (!$canEditState || $app->isSite())
+			{
+				unset($data['featured']);
+				unset($data['ordering']);
+			}
+
+
+			/**
+			 * ACL CHECK: if no edit state then do extra filtering of fields
+			 * Note some fields are not filtered since item will go under approval
+			 */
+			if (!$canEditState)
+			{
+				$AutoApproveChanges = $user->authorise('flexicontent.autoapprovechanges',	'com_flexicontent');
+				$data['vstate'] = $AutoApproveChanges ? 2 : 1;
+
+				// Allow 'publish_up' & 'publish_down' only for NEW items (we may override these with specific value below ...)
+				if (!$isNew)
+				{
+					unset($data['publish_up']);
+					unset($data['publish_down']);
+				}
+
+				// Override the above values with forced auto-publishing data
+				if (!empty($publish_up_forced))
+				{
+					$data['publish_up'] = $publish_up_forced;
+				}
+
+				if (!empty($publish_down_forced))
+				{
+					$data['publish_down'] = $publish_down_forced;
+				}
+
+				$pubished_state = 1;
+				$draft_state = -4;
+				$pending_approval_state = -3;
+
+				// For existing items, force pending-state approval when user cannot publish, and versioning is OFF (aka not possible to use 'currently' active version + unapproved new version)
+				if (!$isNew)
+				{
+					$catid_changed_n_vers_off = $old_catid != $data['catid'] && !$use_versioning;
+
+					if ($catid_changed_n_vers_off)
+					{
+						$app->enqueueMessage(JText::_('FLEXI_WARNING_CONTENT_UNPUBLISHED_CAT_CHANGED_REAPPROVAL_NEEDED'), 'warning');
+					}
+
+					$data['state'] = $catid_changed_n_vers_off
+						? $pending_approval_state
+						: $item->state;
+				}
+
+				// Autopublishing new item via menu configuration
+				elseif ($autopublished)
+				{
+					$data['state'] = $pubished_state;
+				}
+
+				// The preselected forced state of -NEW- items for users that CANNOT publish, and autopublish via menu item is disabled
+				else
+				{
+					$data['state'] = $app->isAdmin()
+						? $cparams->get('non_publishers_item_state', $draft_state)  // Use the configured setting for backend items
+						: $cparams->get('non_publishers_item_state_fe', $pending_approval_state);  // Use the configured setting for frontend items
+				}
+			}
+
+			/**
+			 * SECURITY concern: Check form tampering of allowed languages
+			 */
+
+			$authorparams = flexicontent_db::getUserConfig($user->get('id'));
+			$allowed_langs = $authorparams->get('langs_allowed',null);
+			$allowed_langs = !$allowed_langs ? null : FLEXIUtilities::paramToArray($allowed_langs);
+
+			if (!$isNew && $allowed_langs)
+			{
+				$allowed_langs[] = $item->language;
+			}
+
+			if ($allowed_langs && isset($data['language']) && !in_array($data['language'], $allowed_langs))
+			{
+				$app->enqueueMessage('You are not allowed to assign language: '.$data['language'].' to Content Items', 'warning');
+				unset($data['language']);
+				if ($isNew) return false;
+			}
+
+			if ($app->isSite() && !in_array($cparams->get('uselang_fe', 1), array(1,3)) && isset($data['language']))
+			{
+				$app->enqueueMessage('You are not allowed to set language to this content items', 'warning');
+				unset($data['language']);
+				if ($isNew) return false;
 			}
 		}
 
-
-		// ***
-		// *** SECURITY concern: Check form tampering of allowed languages
-		// ***
-
-		$authorparams = flexicontent_db::getUserConfig($user->get('id'));
-		$allowed_langs = $authorparams->get('langs_allowed',null);
-		$allowed_langs = !$allowed_langs ? null : FLEXIUtilities::paramToArray($allowed_langs);
-
-		if (!$isNew && $allowed_langs)
+		else
 		{
-			$allowed_langs[] = $item->language;
-		}
-
-		if ( $allowed_langs && isset($data['language']) && !in_array($data['language'], $allowed_langs) )
-		{
-			$app->enqueueMessage('You are not allowed to assign language: '.$data['language'].' to Content Items', 'warning');
-			unset($data['language']);
-			if ($isNew) return false;
-		}
-
-		if ( $app->isSite() && !in_array($cparams->get('uselang_fe', 1), array(1,3)) && isset($data['language']) )
-		{
-			$app->enqueueMessage('You are not allowed to set language to this content items', 'warning');
-			unset($data['language']);
-			if ($isNew) return false;
+			$canEditState = true;
 		}
 
 
@@ -2325,7 +2378,7 @@ class ParentClassItem extends FCModelAdmin
 			// null indicates to retrieve it inside saveFields
 			$files = null;  // $_FILES;  //$app->input->files->get('files');
 			$core_data_via_events = null;
-			$result = $this->saveFields($isNew, $item, $data, $files, $old_item, $core_data_via_events);
+			$result = $this->saveFields($isNew, $item, $data, $files, $old_item, $core_data_via_events, $checkACL);
 
 			if ( $print_logging_info ) $fc_run_times['item_store_custom'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 
@@ -2339,7 +2392,8 @@ class ParentClassItem extends FCModelAdmin
 		}
 
 		$version_approved = $isNew || $data['vstate']==2;
-		if( $result==='abort' )
+
+		if ($result === 'abort')
 		{
 			if ($isNew)
 			{
@@ -2536,9 +2590,12 @@ class ParentClassItem extends FCModelAdmin
 	 * @return	boolean	True on success
 	 * @since	1.0
 	 */
-	function saveFields($isNew, &$item, &$data, &$files, &$old_item=null, &$core_data_via_events=null)
+	function saveFields($isNew, &$item, &$data, &$files, &$old_item = null, &$core_data_via_events = null, $checkACL = true)
 	{
-		if (!$old_item) $old_item = & $item;
+		if (!$old_item)
+		{
+			$old_item = & $item;
+		}
 
 		$app   = JFactory::getApplication();
 		$user  = JFactory::getUser();
@@ -2627,7 +2684,7 @@ class ParentClassItem extends FCModelAdmin
 			// Set vstate property into the field object to allow this to be changed be the before saving  field event handler
 			$field->item_vstate = $data['vstate'];
 
-			$is_editable = !$field->valueseditable || $user->authorise('flexicontent.editfieldvalues', 'com_flexicontent.field.' . $field->id);
+			$is_editable = !$checkACL || !$field->valueseditable || $user->authorise('flexicontent.editfieldvalues', 'com_flexicontent.field.' . $field->id);
 			$maintain_dbval = false;
 
 			// FORM HIDDEN FIELDS (FRONTEND/BACKEND) AND (ACL) UNEDITABLE FIELDS: maintain their DB value ...
@@ -2760,10 +2817,9 @@ class ParentClassItem extends FCModelAdmin
 		if ( $print_logging_info ) $start_microtime = microtime(true);
 
 
-
-		// ***
-		// *** Clean-up per field search-index TABLES
-		// ***
+		/**
+		 * Clean-up per field search-index TABLES
+		 */
 
 		$filterables = FlexicontentFields::getSearchFields('id', $indexer='advanced', null, null, $_load_params=true, 0, $search_type='filter');
 		$filterables = array_keys($filterables);
@@ -2771,13 +2827,12 @@ class ParentClassItem extends FCModelAdmin
 
 		$dbprefix = $app->getCfg('dbprefix');
 		$dbname   = $app->getCfg('db');
-		$tbl_prefix = $dbprefix.'flexicontent_advsearch_index_field_';
-		$query = "SELECT TABLE_NAME
+		$tbl_prefix = $dbprefix . 'flexicontent_advsearch_index_field_';
+		$query = 'SELECT TABLE_NAME
 			FROM INFORMATION_SCHEMA.TABLES
-			WHERE TABLE_SCHEMA = '".$dbname."' AND TABLE_NAME LIKE '".$tbl_prefix."%'
-			";
-		$this->_db->setQuery($query);
-		$tbl_names = $this->_db->loadColumn();
+			WHERE TABLE_SCHEMA = ' . $this->_db->Quote($dbname) . ' AND TABLE_NAME LIKE ' . $this->_db->Quote($tbl_prefix . '%')
+		;
+		$tbl_names = $this->_db->setQuery($query)->loadColumn();
 
 		foreach($tbl_names as $tbl_name)
 		{
@@ -2792,17 +2847,15 @@ class ParentClassItem extends FCModelAdmin
 			// Remove item's old advanced search index entries
 			else
 			{
-				$query = "DELETE FROM ".$tbl_name." WHERE item_id=". $item->id;
-				$this->_db->setQuery($query);
-				$this->_db->execute();
+				$query = 'DELETE FROM ' . $tbl_name . ' WHERE item_id = ' . (int) $item->id;
+				$this->_db->setQuery($query)->execute();
 			}
 		}
 
 
-
-		// ***
-		// *** VERIFY all search tables exist
-		// ***
+		/**
+		 * VERIFY all search tables exist
+		 */
 
 		$tbl_names_flipped = array_flip($tbl_names);
 		foreach ($filterables as $_field_id => $_ignored)
@@ -2830,11 +2883,10 @@ class ParentClassItem extends FCModelAdmin
 		}
 
 
-
-		// ***
-		// *** Loop through Fields triggering onIndexAdvSearch, onIndexSearch Event handlers, this was seperated from the before save field
-		// *** event, so that we will update search indexes only if the above has not canceled saving OR has not canceled version approval
-		// ***
+		/**
+		 * Loop through Fields triggering onIndexAdvSearch, onIndexSearch Event handlers, this was seperated from the before save field
+		 * event, so that we will update search indexes only if the above has not canceled saving OR has not canceled version approval
+		 */
 
 		$ai_query_vals = array();
 		$ai_query_vals_f = array();
@@ -2845,49 +2897,64 @@ class ParentClassItem extends FCModelAdmin
 			{
 				$field_type = $field->iscore ? 'core' : $field->field_type;
 
-				if ( $data['vstate']==2 || $isNew)    // update (regardless of state!!) search indexes if document version is approved OR item is new
+				// Update (regardless of state!!) search indexes if document version is approved OR item is new
+				if ($data['vstate'] == 2 || $isNew)
 				{
 					// Trigger plugin Event 'onIndexAdvSearch' to update field-item pair records in advanced search index
 					FLEXIUtilities::call_FC_Field_Func($field_type, 'onIndexAdvSearch', array( &$field, &$field->postdata, &$item ));
-					if ( isset($field->ai_query_vals) ) {
-						foreach ($field->ai_query_vals as $query_val) $ai_query_vals[] = $query_val;
-						if ( isset($filterables[$field->id]) ) {  // Current for advanced index only
+
+					if (isset($field->ai_query_vals))
+					{
+						foreach ($field->ai_query_vals as $query_val)
+						{
+							$ai_query_vals[] = $query_val;
+						}
+
+						// Current for advanced index only
+						if (isset($filterables[$field->id]))
+						{
 							foreach ($field->ai_query_vals as $query_val) $ai_query_vals_f[$field->id][] = $query_val;
 						}
 					}
-					//echo $field->name .":".implode(",", @$field->ai_query_vals ? $field->ai_query_vals : array() )."<br/>";
 
 					// Trigger plugin Event 'onIndexSearch' to update item 's (basic) search index record
 					FLEXIUtilities::call_FC_Field_Func($field_type, 'onIndexSearch', array( &$field, &$field->postdata, &$item ));
-					if ( isset($field->search[$item->id]) && strlen($field->search[$item->id]) ) $searchindex[] = $field->search[$item->id];
-					//echo $field->name .":".@$field->search[$item->id]."<br/>";
+
+					if (isset($field->search[$item->id]) && strlen($field->search[$item->id]))
+					{
+						$searchindex[] = $field->search[$item->id];
+					}
 				}
 			}
 		}
 
 		// Remove item's old advanced search index entries
 		$query = "DELETE FROM #__flexicontent_advsearch_index WHERE item_id=". $item->id;
-		$this->_db->setQuery($query);
-		$this->_db->execute();
+		$this->_db->setQuery($query)->execute();
 
 		// Store item's advanced search index entries
 		$queries = array();
-		if ( count($ai_query_vals) )  // check for zero search index records
+
+		if (count($ai_query_vals))
 		{
 			$queries[] = "INSERT INTO #__flexicontent_advsearch_index "
 				." (field_id,item_id,extraid,search_index,value_id) VALUES "
 				.implode(",", $ai_query_vals);
-			$this->_db->setQuery($query);
-			$this->_db->execute();
+
+			$this->_db->setQuery($query)->execute();
 		}
-		foreach( $ai_query_vals_f as $_field_id => $_query_vals) {  // Current for advanced index only
+
+		// Current for advanced index only
+		foreach($ai_query_vals_f as $_field_id => $_query_vals)
+		{
 			$queries[] = "INSERT INTO #__flexicontent_advsearch_index_field_".$_field_id
 				." (field_id,item_id,extraid,search_index,value_id) VALUES "
 				.implode(",", $_query_vals);
 		}
-		foreach( $queries as $query ) {
-			$this->_db->setQuery($query);
-			$this->_db->execute();
+
+		foreach ($queries as $query)
+		{
+			$this->_db->setQuery($query)->execute();
 		}
 
 		// Assigned created basic search index into item object
@@ -2905,21 +2972,19 @@ class ParentClassItem extends FCModelAdmin
 
 
 
-		// ***
-		// *** IF new version is approved, remove old version values from the field table
-		// ***
+		/**
+		 * IF new version is approved, remove old version values from the field table
+		 */
 
 		if ( $print_logging_info ) $start_microtime = microtime(true);
 
-		if($data['vstate']==2)
+		if ($data['vstate'] == 2)
 		{
-			//echo "delete __flexicontent_fields_item_relations, item_id: " .$item->id;
-			$query = 'DELETE FROM #__flexicontent_fields_item_relations WHERE item_id = '.$item->id;
-			$this->_db->setQuery($query);
-			$this->_db->execute();
-			$query = 'DELETE FROM #__flexicontent_items_versions WHERE item_id='.$item->id.' AND version='.((int)$last_version+1);
-			$this->_db->setQuery($query);
-			$this->_db->execute();
+			$query = 'DELETE FROM #__flexicontent_fields_item_relations WHERE item_id = ' . (int) $item->id;
+			$this->_db->setQuery($query)->execute();
+
+			$query = 'DELETE FROM #__flexicontent_items_versions WHERE item_id = ' . (int) $item->id . ' AND version=' . ((int) $last_version + 1);
+			$this->_db->setQuery($query)->execute();
 
 			$untranslatable_fields = array();
 			if ($fields) foreach($fields as $field)
@@ -2932,8 +2997,7 @@ class ParentClassItem extends FCModelAdmin
 					if (! $mval_query)
 					{
 						$query = 'DELETE FROM #__flexicontent_fields_item_relations WHERE item_id IN ('.implode(',',$assoc_item_ids).') AND field_id='.$field->id;
-						$this->_db->setQuery($query);
-						$this->_db->execute();
+						$this->_db->setQuery($query)->execute();
 					}
 					else
 					{
@@ -2945,15 +3009,14 @@ class ParentClassItem extends FCModelAdmin
 			if (count($untranslatable_fields))
 			{
 				$query = 'DELETE FROM #__flexicontent_fields_item_relations WHERE item_id IN ('.implode(',',$assoc_item_ids).') AND field_id IN ('.implode(',',$untranslatable_fields) .')';
-				$this->_db->setQuery($query);
-				$this->_db->execute();
+				$this->_db->setQuery($query)->execute();
 			}
 		}
 
 
-		// ***
-		// *** Loop through Fields saving the field values
-		// ***
+		/**
+		 * Loop through Fields saving the field values
+		 */
 
 		if ($fields)
 		{
@@ -2997,6 +3060,7 @@ class ParentClassItem extends FCModelAdmin
 						if ( !empty($field->use_suborder) && is_array($posted_value) )
 						{
 							$obj->suborder = 1;
+
 							foreach ($posted_value as $v)
 							{
 								$obj->value = $v;
@@ -3009,7 +3073,9 @@ class ParentClassItem extends FCModelAdmin
 							}
 							unset($v);
 						}
-						else if ( isset($obj->value) && strlen(trim($obj->value)) )    // ISSET will also skip -null-, but valueorder will be incremented (e.g. we want this for fields in a field group)
+
+						// ISSET will also skip -null-, but valueorder will be incremented (e.g. we want this for fields in a field group)
+						elseif (isset($obj->value) && strlen(trim($obj->value)))
 						//else if ( isset($obj->value) && ($use_ingroup || strlen(trim($obj->value))) )
 						{
 							//echo "<pre>"; print_r($obj); echo "</pre>";
@@ -3027,13 +3093,15 @@ class ParentClassItem extends FCModelAdmin
 					{
 						// UNSET version it it used only verion data table, and insert only if value non-empty
 						unset($obj->version);
-						if ( !empty($field->use_suborder) && is_array($posted_value) ) {
+
+						if (!empty($field->use_suborder) && is_array($posted_value))
+						{
 							$obj->suborder = 1;
 							foreach ($posted_value as $v)
 							{
 								$obj->value = $v;
 
-								if (! $mval_query)
+								if (!$mval_query)
 								{
 									$this->_db->insertObject('#__flexicontent_fields_item_relations', $obj);
 									flexicontent_db::setValues_commonDataTypes($obj);
@@ -3050,7 +3118,9 @@ class ParentClassItem extends FCModelAdmin
 							}
 							unset($v);
 						}
-						else if ( isset($obj->value) && strlen(trim($obj->value)) )    // ISSET will also skip -null-, but valueorder will be incremented (e.g. we want this for fields in a field group)
+
+						// ISSET will also skip -null-, but valueorder will be incremented (e.g. we want this for fields in a field group)
+						elseif (isset($obj->value) && strlen(trim($obj->value)))
 						//else if ( isset($obj->value) && ($use_ingroup || strlen(trim($obj->value))) )
 						{
 							if (! $mval_query)
@@ -3097,35 +3167,35 @@ class ParentClassItem extends FCModelAdmin
 			}
 
 
-			// ***
-			// *** Insert values in item fields versioning table
-			// ***
+			/**
+			 * Insert values in item fields versioning table
+			 */
 
-			if ( count($ver_query_vals) )
+			if (count($ver_query_vals))
 			{
 				$query = "INSERT INTO #__flexicontent_items_versions "
 					." (field_id,item_id,valueorder,suborder,version,value"
 					//.",qindex01,qindex02,qindex03"
 					.") VALUES "
 					."\n".implode(",\n", $ver_query_vals);
-				$this->_db->setQuery($query);
-				$this->_db->execute();
+
+				$this->_db->setQuery($query)->execute();
 			}
 
 
-			// ***
-			// *** Insert values in item fields relation table
-			// ***
+			/**
+			 * Insert values in item fields relation table
+			 */
 
-			if ( count($rel_query_vals) )
+			if (count($rel_query_vals))
 			{
 				$query = "INSERT INTO #__flexicontent_fields_item_relations "
 					." (field_id,item_id,valueorder,suborder,value"
 					//.",qindex01,qindex02,qindex03"
 					.") VALUES "
 					."\n".implode(",\n", $rel_query_vals);
-				$this->_db->setQuery($query);
-				$this->_db->execute();
+
+				$this->_db->setQuery($query)->execute();
 			}
 
 			// Update values of common data types
@@ -3133,9 +3203,9 @@ class ParentClassItem extends FCModelAdmin
 			//echo "<pre>"; print_r($rel_update_objs); exit;
 
 
-			// ***
-			// *** Save other versioned item data into the field versioning table
-			// ***
+			/**
+			 * Save other versioned item data into the field versioning table
+			 */
 
 			// a. Save a version of item properties that do not have a corresponding CORE Field
 			if ( $record_versioned_data )
@@ -3179,9 +3249,9 @@ class ParentClassItem extends FCModelAdmin
 		if ( $print_logging_info ) @$fc_run_times['fields_value_saving'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 
 
-		// ***
-		// *** Trigger onAfterSaveField Event
-		// ***
+		/**
+		 * Trigger onAfterSaveField Event
+		 */
 
 		if ( $fields )
 		{
