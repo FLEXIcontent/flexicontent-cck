@@ -1871,7 +1871,7 @@ class FlexicontentViewItem extends JViewLegacy
 		$submit_conf = array(
 			'cids'            => $cids,
 			'maincatid'       => $page_params->get("maincatid"),        // Default main category out of the overriden categories
-			'maincatid_show'  => $page_params->get("maincatid_show", 2),
+			'maincat_show'  => $page_params->get("maincat_show", 2),
 			'postcats'        => $postcats,
 			'overridecatperms'=> $overridecatperms,
 			'override_mulcatsperms' => $override_mulcatsperms,
