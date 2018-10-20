@@ -545,10 +545,11 @@ div table.adminform td {
 	}
 
 	.fcfav-toggle-btn {
-		padding: 4px 4px 2px 4px;
+		padding: 0;
 		vertical-align: middle;
 		cursor: pointer;
 		display: inline-block;
+		box-sizing: content-box;
 	}
 
 	.fcfav-reponse-tip {
@@ -588,6 +589,14 @@ div table.adminform td {
 		opacity: 0.4;
 		filter: alpha(opacity=40);
 		color: darkgray;
+	}
+
+	.toggle {
+		box-sizing: content-box;
+	}
+	.toggle-handle {
+		padding: 0 12px;
+		border: 1px solid gray;
 	}
 }
 
