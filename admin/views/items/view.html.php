@@ -415,7 +415,7 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 				'filter_featured',
 				array(
 					'size' => '1',
-					'class' => $this->select_class . ' fc_skip_highlight',
+					'class' => $this->select_class,
 					'onchange' => 'document.adminForm.limitstart.value=0; Joomla.submitform();',
 				),
 				'value',
@@ -451,7 +451,7 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 				'filter_catsinstate',
 				array(
 					'size' => '1',
-					'class' => $this->select_class . ($filter_catsinstate != 1 ? '' : ' fc_skip_highlight'),
+					'class' => $this->select_class,
 					'onchange' => 'document.adminForm.limitstart.value=0; Joomla.submitform();',
 				),
 				'value',
@@ -507,7 +507,7 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 				'filter_order_type',
 				array(
 					'size' => '1',
-					'class' => $this->select_class . ' fc_skip_highlight',
+					'class' => $this->select_class,
 					'onchange' => 'document.adminForm.limitstart.value=0; Joomla.submitform();',
 				),
 				'value',
@@ -605,7 +605,7 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 			'scope',
 			array(
 				'size' => '1',
-				'class' => $this->select_class . ' fc_skip_highlight fc_is_selarrow ' . $this->tooltip_class,
+				'class' => $this->select_class . ' fc_is_selarrow ' . $this->tooltip_class,
 				'onchange' => 'jQuery(\'#search\').attr(\'placeholder\', jQuery(this).find(\'option:selected\').text()); jQuery(this).blur();',
 				'title' => JText::_('FLEXI_SEARCH_TEXT_INSIDE'),
 			),
@@ -656,7 +656,7 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 				array(
 					'size' => '1',
 					'style' => 'margin: 0',
-					'class' => $this->select_class . ' fc_skip_highlight',
+					'class' => $this->select_class,
 					'data-placement' => 'top',
 					'title' => flexicontent_html::getToolTip(null, $date_note_msg, 0, 1),
 				),
@@ -819,7 +819,7 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 					'filter_fileid',
 					array(
 						'size' => '1',
-						'class' => $this->select_class . ($filter_fileid ? '' : ' fc_skip_highlight'),
+						'class' => $this->select_class,
 						'onchange' => 'document.adminForm.limitstart.value=0; Joomla.submitform();',
 					),
 					'value',

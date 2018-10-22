@@ -748,33 +748,34 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 			$join	.= ' JOIN #__flexicontent_fields AS fi ON fi.id = rel.field_id AND fi.field_type = ' . $this->_db->Quote('file');
 		}
 
-		if ( !$ids_only )
+		if (!$ids_only)
 		{
 			$join .= ' LEFT JOIN #__viewlevels AS level ON level.id = a.access';
 		}
 
-		if ( $ids_only )
+		if ($ids_only)
 		{
 			$columns[] = 'a.id';
 		}
 		else
 		{
-			$columns[] = 'SQL_CALC_FOUND_ROWS a.*, u.name AS uploader,'
-				.' CASE WHEN a.filename_original<>"" THEN a.filename_original ELSE a.filename END AS filename_displayed ';
-			if ( !empty($assigned_fields) )
+			$columns[] = 'SQL_CALC_FOUND_ROWS a.*, '
+				. ' u.name AS editor, '
+				. ' up.name AS uploader, '
+				. ' CASE WHEN a.filename_original<>"" THEN a.filename_original ELSE a.filename END AS filename_displayed ';
+
+			foreach ($assigned_fields as $field_type)
 			{
-				foreach ($assigned_fields as $field_type)
-				{
-					// Field relation sub query for counting file assignment to this field type
-					$assigned_query	= 'SELECT COUNT(value)'
-						. ' FROM #__flexicontent_fields_item_relations AS rel'
-						. ' JOIN #__flexicontent_fields AS fi ON fi.id = rel.field_id'
-						. ' WHERE fi.field_type = ' . $this->_db->Quote($field_type)
-						. ' AND value = a.id'
-						;
-					$columns[] = '('.$assigned_query.') AS assigned_'.$field_type;
-				}
+				// Field relation sub query for counting file assignment to this field type
+				$assigned_query	= 'SELECT COUNT(value)'
+					. ' FROM #__flexicontent_fields_item_relations AS rel'
+					. ' JOIN #__flexicontent_fields AS fi ON fi.id = rel.field_id'
+					. ' WHERE fi.field_type = ' . $this->_db->Quote($field_type)
+					. ' AND value = a.id'
+					;
+				$columns[] = '('.$assigned_query.') AS assigned_'.$field_type;
 			}
+
 			$columns[] = 'CASE WHEN level.title IS NULL THEN CONCAT_WS(\'\', \'deleted:\', a.access) ELSE level.title END AS access_level';
 		}
 
@@ -857,8 +858,8 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 			? $session_files['ids_pending']
 			: array();
 
-		$orderby 	= $file_ids
-			? ' ORDER BY FIELD(a.id, '. implode(', ', $file_ids) .')'
+		$orderby = $file_ids
+			? ' ORDER BY FIELD(a.id, ' . implode(', ', ArrayHelper::toInteger($file_ids)) . ')'
 			: '';
 		return $orderby;
 	}
@@ -866,7 +867,10 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 
 	function _buildContentJoin()
 	{
-		$join = ' JOIN #__users AS u ON u.id = a.uploaded_by';
+		$join = '';
+		$join .= ' LEFT JOIN #__users AS u ON u.id = a.checked_out';
+		$join .= ' JOIN #__users AS up ON up.id = a.uploaded_by';
+
 		return $join;
 	}
 
@@ -894,9 +898,9 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 			? $session_files['ids_pending']
 			: array();
 
-		return !$file_ids
-			? false
-			: ' WHERE a.id IN ('.implode(', ', $file_ids).')';
+		return $file_ids
+			? ' WHERE a.id IN (' . implode(',', ArrayHelper::toInteger($file_ids)) . ')'
+			: false;
 	}
 
 
@@ -1157,12 +1161,12 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 			return 'SELECT 1 FROM #__users WHERE 1=0';
 		}
 
-		$query = 'SELECT u.id, u.name'
+		$query = 'SELECT up.id, up.name'
 			. ' FROM #__flexicontent_files AS a'
-			. ' LEFT JOIN #__users AS u ON u.id = a.uploaded_by'
+			. ' LEFT JOIN #__users AS up ON up.id = a.uploaded_by'
 			. $where
-			. ' GROUP BY u.id'
-			. ' ORDER BY u.name'
+			. ' GROUP BY up.id'
+			. ' ORDER BY up.name'
 			;
 		return $query;
 	}
@@ -1217,10 +1221,10 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 		$query = 'SELECT id'
 			. ' FROM #__flexicontent_files'
 			. ' WHERE '
-			. '  filename IN ('.implode(',', array_keys($filenames)).')'
-			. ($target_dir != 2 ? '  AND secure = '. (int)$target_dir : '');
-		$this->_db->setQuery($query);
-		$file_ids = $this->_db->loadColumn();
+			. '  filename IN (' . implode(',', array_keys($filenames)) . ')'
+			. ($target_dir != 2 ? '  AND secure = ' . (int) $target_dir : '')
+		;
+		$file_ids = $this->_db->setQuery($query)->loadColumn();
 
 		// Also include files uploaded during current session for current field / item pair
 		if ($field->item_id)
@@ -1235,7 +1239,9 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 			$file_ids = array_merge($file_ids, $new_file_ids);
 		}
 
-		return !$file_ids ? '' : ' a.id IN ('.implode(', ', $file_ids).')';
+		return $file_ids
+			? ' a.id IN (' . implode(', ', ArrayHelper::toInteger($file_ids)) . ')'
+			: '';
 	}
 
 
@@ -1308,26 +1314,34 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 		$file_ids_list = '';
 		if ( count($file_ids) ) {
 			$file_ids_list = ' AND a.id IN (' . "'". implode("','", $file_ids)  ."')";
-		} else {
+		}
+		else
+		{
 			$permission = FlexicontentHelperPerm::getPerm();
 			$CanViewAllFiles = $permission->CanViewAllFiles;
 
-			if ( !$CanViewAllFiles ) {
-				$where[] = ' a.uploaded_by = ' . (int)$user->id;
-			} else if ( $filter_uploader ) {
-				$where[] = ' a.uploaded_by = ' . $filter_uploader;
+			if (!$CanViewAllFiles)
+			{
+				$where[] = ' a.uploaded_by = ' . (int) $user->id;
+			}
+			elseif ($filter_uploader)
+			{
+				$where[] = ' a.uploaded_by = ' . (int) $filter_uploader;
 			}
 		}
 
 		if (!empty($ignored))
 		{
-			$ignored = ArrayHelper::toInteger($ignored);
-			$where[] = ' i.id NOT IN ('. implode(',', $ignored) .')';
+			$where[] = ' i.id NOT IN (' . implode(',', ArrayHelper::toInteger($ignored)) . ')';
 		}
 
-		$where = ( count( $where ) ? ' WHERE ' . implode( ' AND ', $where ) : '' );
-		$groupby = !$count_items  ?  ' GROUP BY i.id'  :  ' GROUP BY a.id';   // file maybe used in more than one fields or ? in more than one values for same field
-		$orderby = !$count_items  ?  ' ORDER BY i.title ASC'  :  '';
+		$where = count($where)
+			? ' WHERE ' . implode(' AND ', $where)
+			: '';
+
+		// Group by since file maybe used in more than one fields or ? in more than one values for same field
+		$groupby = !$count_items ? ' GROUP BY i.id'  :  ' GROUP BY a.id';
+		$orderby = !$count_items ? ' ORDER BY i.title ASC'  :  '';
 
 		// File field relation sub query
 		$query = 'SELECT '. ($count_items  ?  'a.id as file_id, COUNT(i.id) as item_count'  :  'i.id as id, i.title')
@@ -1335,7 +1349,7 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 			. ' JOIN #__flexicontent_fields_item_relations AS rel ON rel.item_id = i.id'
 			. ' JOIN #__flexicontent_fields AS fi ON fi.id = rel.field_id AND fi.field_type IN ('. $field_type_list .')'
 			. ' JOIN #__flexicontent_files AS a ON a.id=rel.value '. $file_ids_list
-			//. ' JOIN #__users AS u ON u.id = a.uploaded_by'
+			//. ' JOIN #__users AS up ON up.id = a.uploaded_by'
 			. $where
 			. $groupby
 			. $orderby
@@ -1377,28 +1391,38 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 		$where = array();
 
 		$file_ids_list = '';
-		if ( count($file_ids) ) {
-			$file_ids_list = ' AND a.id IN (' . "'". implode("','", $file_ids)  ."')";
-		} else {
+
+		if (count($file_ids))
+		{
+			$file_ids_list = ' AND a.id IN (' . implode(',', ArrayHelper::toInteger($file_ids)) . ')';
+		}
+		else
+		{
 			$permission = FlexicontentHelperPerm::getPerm();
 			$CanViewAllFiles = $permission->CanViewAllFiles;
 
-			if ( !$CanViewAllFiles ) {
-				$where[] = ' a.uploaded_by = ' . (int)$user->id;
-			} else if ( $filter_uploader ) {
-				$where[] = ' a.uploaded_by = ' . $filter_uploader;
+			if (!$CanViewAllFiles)
+			{
+				$where[] = ' a.uploaded_by = ' . (int) $user->id;
+			}
+			elseif ($filter_uploader)
+			{
+				$where[] = ' a.uploaded_by = ' . (int) $filter_uploader;
 			}
 		}
 
 		if (!empty($ignored))
 		{
-			$ignored = ArrayHelper::toInteger($ignored);
-			$where[] = ' i.id NOT IN ('. implode(',', $ignored) .')';
+			$where[] = ' i.id NOT IN (' . implode(',', ArrayHelper::toInteger($ignored)) . ')';
 		}
 
-		$where 		= ( count( $where ) ? ' WHERE ' . implode( ' AND ', $where ) : '' );
-		$groupby = !$count_items  ?  ' GROUP BY i.id'  :  ' GROUP BY a.id';   // file maybe used in more than one fields or ? in more than one values for same field
-		$orderby = !$count_items  ?  ' ORDER BY i.title ASC'  :  '';
+		$where = count($where)
+			? ' WHERE ' . implode(' AND ', $where)
+			: '';
+
+		// Group by since file maybe used in more than one fields or ? in more than one values for same field
+		$groupby = !$count_items ? ' GROUP BY i.id'  :  ' GROUP BY a.id';
+		$orderby = !$count_items ? ' ORDER BY i.title ASC'  :  '';
 
 		// Serialized values are like : "__field_propname__";s:33:"__value__"
 		$format_str = 'CONCAT("%%","\"%s\";s:%%:%%\"",%s,"\"%%")';
@@ -1422,7 +1446,7 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 				. ' JOIN #__flexicontent_fields_item_relations AS rel ON rel.item_id = i.id'
 				. ' JOIN #__flexicontent_fields AS fi ON fi.id = rel.field_id AND fi.field_type IN ('. $this->_db->Quote( $field_type ) .')' . $field_ids_list
 				. ' JOIN #__flexicontent_files AS a ON rel.value LIKE ' . $like_str . ' AND a.'.$value_prop.'<>""' . $file_ids_list
-				//. ' JOIN #__users AS u ON u.id = a.uploaded_by'
+				//. ' JOIN #__users AS up ON up.id = a.uploaded_by'
 				. $where
 				. $groupby
 				. $orderby

@@ -332,7 +332,7 @@ class FlexicontentViewUsers extends FlexicontentViewBaseRecords
 		$dates[] = JHtml::_('select.option',  '2', JText::_( 'Last Visit' ) );
 
 		$lists['date'] = //'<div class="add-on">'.JText::_('FLEXI_DATE').'</div>'.
-			JHtml::_('select.genericlist', $dates, 'date', 'size="1" class="use_select2_lib fc_skip_highlight"', 'value', 'text', $date, 'date' );
+			JHtml::_('select.genericlist', $dates, 'date', 'size="1" class="use_select2_lib"', 'value', 'text', $date, 'date' );
 
 		$lists['startdate'] = JHtml::_('calendar', $startdate, 'startdate', 'startdate', '%Y-%m-%d', array('class'=>'', 'size'=>'8',  'maxlength'=>'19', 'style'=>'width:auto', 'placeholder'=>JText::_('FLEXI_FROM')));
 		$lists['enddate'] 	= JHtml::_('calendar', $enddate, 'enddate', 'enddate', '%Y-%m-%d', array('class'=>'', 'size'=>'8',  'maxlength'=>'19', 'style'=>'width:auto', 'placeholder'=>JText::_('FLEXI_TO')));

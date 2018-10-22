@@ -286,6 +286,9 @@ if ($js)
 			echo '<tr class="collapsed_row"><td colspan="'.$list_total_cols.'"></td></tr>';
 		}
 
+		// In the case we skip rows, we need a reliable incrementing counter with no holes, used for e.g. even / odd row class
+		$k = 0;
+
 		foreach ($this->rows as $i => $row)
 		{
 			// Permissions
@@ -301,7 +304,7 @@ if ($js)
 				: null;
    		?>
 
-		<tr class="<?php echo 'row' . ($i % 2); ?>">
+		<tr class="<?php echo 'row' . ($k % 2); ?>">
 
 			<!--td class="left col_rowcount hidden-phone">
 				<?php echo $this->pagination->getRowOffset($i); ?>
@@ -372,6 +375,7 @@ if ($js)
 
 		</tr>
 		<?php
+			$k++;
 		}
 		?>
 	</tbody>

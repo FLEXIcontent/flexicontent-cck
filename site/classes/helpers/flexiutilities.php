@@ -845,7 +845,7 @@ class FLEXIUtilities
 
 			$appsman_path = JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'views'.DS.'appsman';
 
-			if (file_exists($appsman_path))
+			if (file_exists($appsman_path) && version_compare(FLEXI_VERSION, '3.3.99', '>'))
 			{
 				if ($perms->CanConfig)	call_user_func($addEntry, '<span class="fcsb-icon-wrench icon-wrench"></span>'.JText::_( 'FLEXI_WEBSITE_APPS_IMPORT_EXPORT' ), 'index.php?option=com_flexicontent&view=appsman', $view=='appsman');
 			}

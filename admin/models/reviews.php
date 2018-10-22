@@ -23,8 +23,18 @@ require_once('base/baselist.php');
  */
 class FlexicontentModelReviews extends FCModelAdminList
 {
-
+	/**
+	 * Record database table
+	 *
+	 * @var string
+	 */
 	var $records_dbtbl  = 'flexicontent_reviews';
+
+	/**
+	 * Record jtable name
+	 *
+	 * @var string
+	 */
 	var $records_jtable = 'flexicontent_reviews';
 
 	/**
@@ -47,6 +57,11 @@ class FlexicontentModelReviews extends FCModelAdminList
 	var $search_cols       = array('title');
 	var $default_order     = 'a.title';
 	var $default_order_dir = 'ASC';
+
+	/**
+	 * List filters that are always applied
+	 */
+	var $hard_filters = array();
 
 	/**
 	 * Record rows
@@ -80,7 +95,7 @@ class FlexicontentModelReviews extends FCModelAdminList
 	/**
 	 * Constructor
 	 *
-	 * @since 3.3.0
+	 * @since   3.3.0
 	 */
 	public function __construct($config = array())
 	{
@@ -91,7 +106,7 @@ class FlexicontentModelReviews extends FCModelAdminList
 		$option = $jinput->get('option', '', 'cmd');
 		$view   = $jinput->get('view', '', 'cmd');
 		$fcform = $jinput->get('fcform', 0, 'int');
-		$p      = $option . '.' . $view . '.';
+		$p      = $this->ovid;
 
 
 		/**
@@ -113,9 +128,9 @@ class FlexicontentModelReviews extends FCModelAdminList
 	/**
 	 * Method to build the query for the records
 	 *
-	 * @return JDatabaseQuery   The DB Query object
+	 * @return  JDatabaseQuery   The DB Query object
 	 *
-	 * @since 3.3.0
+	 * @since   3.3.0
 	 */
 	protected function getListQuery()
 	{
@@ -134,7 +149,7 @@ class FlexicontentModelReviews extends FCModelAdminList
 	 *
 	 * @return  JDatabaseQuery|array
 	 *
-	 * @since 1.0
+	 * @since   3.3.0
 	 */
 	protected function _buildContentWhere($q = false)
 	{
@@ -169,7 +184,7 @@ class FlexicontentModelReviews extends FCModelAdminList
 	 *
 	 * @return	void
 	 *
-	 * @since		3.3.0
+	 * @since   3.3.0
 	 */
 	protected function _deleteRelatedData($cid)
 	{
@@ -185,7 +200,7 @@ class FlexicontentModelReviews extends FCModelAdminList
 	 *
 	 * @return	array		Array of old-to new record ids of copied record IDs
 	 *
-	 * @since		1.0
+	 * @since   3.3.0
 	 */
 	public function copy($cid, $copyRelations = null)
 	{
@@ -226,7 +241,7 @@ class FlexicontentModelReviews extends FCModelAdminList
 	 *
 	 * @return	void
 	 *
-	 * @since		3.3.0
+	 * @since   3.3.0
 	 */
 	protected function _copyRelatedData($ids_map)
 	{
@@ -241,6 +256,8 @@ class FlexicontentModelReviews extends FCModelAdminList
 	 * @param		string    $tostate  action related to assignments
 	 *
 	 * @return	array     The records having assignments
+	 *
+	 * @since   3.3.0
 	 */
 	public function filterByAssignments($cid = array(), $tostate = -2)
 	{
@@ -270,12 +287,13 @@ class FlexicontentModelReviews extends FCModelAdminList
 	/**
 	 * Method to get the associated content rows for the given reviews
 	 *
-	 * @access   public
-	 * @param    array   Reviews array
-	 * @return   array
-	 * @since    3.3
+	 * @param		array   $reviews  Reviews array
+	 *
+	 * @return	array   An Array of content items corresponding to the given reviews
+	 *
+	 * @since   3.3.0
 	 */
-	function getContentRows($reviews)
+	public function getContentRows($reviews)
 	{
 		if (!$reviews)
 		{

@@ -148,13 +148,18 @@ class FlexicontentModelUsers extends FCModelAdminList
 	 */
 	protected function getListQuery()
 	{
-		$table           = $this->getTable($this->records_jtable, '');
-		$has_checked_out = property_exists($table, 'checked_out');
-		$editor_col      = $has_checked_out ? $this->_db->quoteName('u.name') : $this->_db->Quote('');
+		$table = $this->getTable($this->records_jtable, '');
+
+		$has_checked_out_col = property_exists($table, 'checked_out');
+		$has_access_col      = property_exists($table, 'access');
+		$has_created_by_col  = property_exists($table, $this->created_by_col);
+
+		$editor_col_quoted   = $has_checked_out_col ? $this->_db->quoteName('u.name') : $this->_db->Quote('');
 
 		// Create a query with all its clauses: WHERE, HAVING and ORDER BY, etc
 		$query = $this->_db->getQuery(true)
-			->select('SQL_CALC_FOUND_ROWS a.*, ' . $editor_col . ' AS editor')
+			->select('SQL_CALC_FOUND_ROWS a.*')
+			->select($editor_col_quoted . ' AS editor')
 			->select('s.userid IS NOT NULL AS loggedin')
 			->select('(SELECT COUNT(*) FROM #__content AS i WHERE i.created_by = a.id) AS itemscount')
 			->select('(SELECT SUM(size) FROM #__flexicontent_files AS f WHERE f.uploaded_by = a.id) AS uploadssize')
@@ -162,6 +167,12 @@ class FlexicontentModelUsers extends FCModelAdminList
 			->leftJoin('#__flexicontent_authors_ext AS ue ON a.id = ue.user_id')
 			->leftJoin('#__session AS s ON s.userid = a.id')
 			->group('a.id');
+
+		// Join over the users for the current editor name
+		if ($has_checked_out_col)
+		{
+			$query->leftJoin('#__users AS u ON u.id = a.checked_out');
+		}
 
 		/**
 		 * Filtering by usergroup, right join with usergroups DB table, to limit users to those belonging to the selected group

@@ -99,7 +99,7 @@ class FlexicontentModelCategories extends FCModelAdminList
 	/**
 	 * Constructor
 	 *
-	 * @since 3.3.0
+	 * @since   3.3.0
 	 */
 	public function __construct($config = array())
 	{
@@ -140,9 +140,9 @@ class FlexicontentModelCategories extends FCModelAdminList
 	/**
 	 * Method to build the query for the records
 	 *
-	 * @return JDatabaseQuery   The DB Query object
+	 * @return  JDatabaseQuery   The DB Query object
 	 *
-	 * @since 3.3.0
+	 * @since   3.3.0
 	 */
 	protected function getListQuery()
 	{
@@ -172,7 +172,7 @@ class FlexicontentModelCategories extends FCModelAdminList
 	 *
 	 * @return  JDatabaseQuery|array
 	 *
-	 * @since 1.0
+	 * @since   3.3.0
 	 */
 	protected function _buildContentWhere($q = false)
 	{
@@ -227,7 +227,7 @@ class FlexicontentModelCategories extends FCModelAdminList
 	 *
 	 * @return	array     The records having assignments
 	 *
-	 * @since	3.3.0
+	 * @since   3.3.0
 	 */
 	public function filterByPermission($cid, $rule)
 	{
@@ -279,6 +279,8 @@ class FlexicontentModelCategories extends FCModelAdminList
 	 * @param		string    $tostate  action related to assignments
 	 *
 	 * @return	array     The records having assignments
+	 *
+	 * @since   3.3.0
 	 */
 	public function filterByAssignments($cid = array(), $tostate = -2)
 	{
@@ -314,9 +316,11 @@ class FlexicontentModelCategories extends FCModelAdminList
 	/**
 	 * Method to count assigned items for the given categories
 	 *
-	 * @access public
-	 * @return	string
-	 * @since	1.6
+	 * @param		array     $cid      array of record ids to check
+	 *
+	 * @return	array     An array of objects with category assignments counts
+	 *
+	 * @since   3.3.0
 	 */
 	public function getAssignedItems($cids)
 	{

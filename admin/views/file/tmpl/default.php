@@ -87,8 +87,8 @@ $disabled = $this->row->url ? '' : ' disabled="disabled"';
 						'authorId' => '',
 						'previewWidth' => 480,
 						'previewHeight' => 360,
-						'name' => 'file-jmedia-data',
-						'id' => 'file-jmedia-data',
+						'name' => 'filename_original',
+						'id' => 'filename_original',
 						'value' => strlen($this->row->filename_original) ? $this->row->filename_original : $this->row->filename,
 						'folder' => '',
 					);
