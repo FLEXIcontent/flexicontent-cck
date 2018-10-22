@@ -314,10 +314,12 @@ abstract class FCModelAdminList extends JModelList
 		$has_access_col      = property_exists($table, 'access');
 		$has_created_by_col  = property_exists($table, $this->created_by_col);
 
+		$editor_col_quoted   = $has_checked_out_col ? $this->_db->quoteName('u.name') : $this->_db->Quote('');
+
 		// Create a query with all its clauses: WHERE, HAVING and ORDER BY, etc
 		$query = $this->_db->getQuery(true)
 			->select('SQL_CALC_FOUND_ROWS a.*')
-			->select(($has_checked_out_col ? 'u.name' : $this->_db->Quote('')) . ' AS editor')
+			->select($editor_col_quoted . ' AS editor')
 			->from('#__' . $this->records_dbtbl . ' AS a')
 			->group('a.id');
 

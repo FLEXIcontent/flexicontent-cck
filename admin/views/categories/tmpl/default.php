@@ -518,7 +518,7 @@ function delAllFilters()
 
 			<td class="col_access hidden-phone">
 				<?php echo $row->canEdit
-					? flexicontent_html::userlevel('access['.$row->id.']', $row->access, 'onchange="return listItemTask(\'cb'.$i.'\',\''.$ctrl.'access\')" class="use_select2_lib fc_skip_highlight"')
+					? flexicontent_html::userlevel('access['.$row->id.']', $row->access, 'onchange="return listItemTask(\'cb'.$i.'\',\''.$ctrl.'access\')" class="use_select2_lib"')
 					: $this->escape($row->access_level); ?>
 			</td>
 

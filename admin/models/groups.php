@@ -172,15 +172,26 @@ class FlexicontentModelGroups extends FCModelAdminList
 	 */
 	protected function getListQuery()
 	{
-		$table           = $this->getTable($this->records_jtable, '');
-		$has_checked_out = property_exists($table, 'checked_out');
-		$editor_col      = $has_checked_out ? $this->_db->quoteName('u.name') : $this->_db->Quote('');
+		$table = $this->getTable($this->records_jtable, '');
+
+		$has_checked_out_col = property_exists($table, 'checked_out');
+		$has_access_col      = property_exists($table, 'access');
+		$has_created_by_col  = property_exists($table, $this->created_by_col);
+
+		$editor_col_quoted   = $has_checked_out_col ? $this->_db->quoteName('u.name') : $this->_db->Quote('');
 
 		// Create a query with all its clauses: WHERE, HAVING and ORDER BY, etc
 		$query = $this->_db->getQuery(true)
-			->select('SQL_CALC_FOUND_ROWS a.*, ' . $editor_col . ' AS editor')
+			->select('SQL_CALC_FOUND_ROWS a.*')
+			->select($editor_col_quoted . ' AS editor')
 			->from('#__' . $this->records_dbtbl . ' AS a')
 			->group('a.id');
+
+		// Join over the users for the current editor name
+		if ($has_checked_out_col)
+		{
+			$query->leftJoin('#__users AS u ON u.id = a.checked_out');
+		}
 
 		/**
 		 * Get user counts. Disabled we will use seperate query that will use groups of current page only

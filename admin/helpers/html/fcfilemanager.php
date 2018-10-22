@@ -19,7 +19,7 @@ require_once('fcbase.php');
  *
  * @since  3.3
  */
-abstract class JHtmlFcfilemanagersextends JHtmlFcbase
+abstract class JHtmlFcfilemanager extends JHtmlFcbase
 {
 	static $tooltip_class  = FLEXI_J40GE ? 'hasTooltip' : 'hasTooltip';
 	static $btn_sm_class   = FLEXI_J40GE ? 'btn btn-sm' : 'btn btn-small';
@@ -27,7 +27,7 @@ abstract class JHtmlFcfilemanagersextends JHtmlFcbase
 	static $btn_mbar_class = FLEXI_J40GE ? 'btn-outline-info' : '';
 	static $ctrl = 'filemanager';
 	static $name = 'file';
-	static $title_propname = 'filename';
+	static $title_propname = 'filename_displayed';
 	static $state_propname = 'published';
 	static $layout_type = null;
 }

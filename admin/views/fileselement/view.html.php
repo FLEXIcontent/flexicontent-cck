@@ -679,7 +679,7 @@ class FlexicontentViewFileselement extends FlexicontentViewBaseRecords
 			'scope',
 			array(
 				'size' => '1',
-				'class' => $this->select_class . ' fc_skip_highlight fc_is_selarrow ' . $this->tooltip_class,
+				'class' => $this->select_class . ' fc_is_selarrow ' . $this->tooltip_class,
 				'onchange' => 'jQuery(\'#search\').attr(\'placeholder\', jQuery(this).find(\'option:selected\').text()); jQuery(this).blur();',
 				'title' => JText::_('FLEXI_SEARCH_TEXT_INSIDE'),
 			),

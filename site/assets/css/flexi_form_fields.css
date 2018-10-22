@@ -780,17 +780,7 @@ table.fc_uploader_header_tbl td:last-child {
 	word-wrap: break-word;
 	color: black;
 	text-align: initial;
-	margin: 1px 4px 2px 4px;
-}
-.flexicontent a.fc_set_file_assignment.isedit_link {
-	color: #3071a9;
-}
-.flexicontent a.fc_set_file_assignment.isedit_link > span {
-	margin-right: 4px;
-}
-.flexicontent a.fc_set_file_assignment.isedit_link > .icon-pencil:before {
-	color: #555;
-	margin-top: -2px;
+	margin: 1px 0px 2px 0px;
 }
 .flexicontent a.fc_set_file_assignment.striketext {
 	color: gray;

@@ -11,6 +11,8 @@
 
 defined('_JEXEC') or die;
 
+use Joomla\String\StringHelper;
+use Joomla\Utilities\ArrayHelper;
 JHtml::_('bootstrap.tooltip');
 
 
@@ -211,6 +213,7 @@ abstract class JHtmlFcbase
 	 *   'keyprop' : property with the record id,
 	 *   'onclick' : onclick JS, we will create a link, like this: <a onclick="..." href="javascript:;" data-href="URL">...</a>
 	 *   'useModal' : create a modal, link will be same as onclick above
+	 *   'attribs' : attributes of the link (except for onclick which must be given seperately)
 	 *
 	 * @param   object   $row         The row
 	 * @param   int      $i           Row number
@@ -225,8 +228,13 @@ abstract class JHtmlFcbase
 			? JText::_($row->{static::$title_propname})
 			: $row->{static::$title_propname};
 
-		$title_escaped = htmlspecialchars($title, ENT_QUOTES, 'UTF-8');
+		// Limit title length
+		$title_cut = StringHelper::strlen($title) > 100
+			? htmlspecialchars(StringHelper::substr($title, 100), ENT_QUOTES, 'UTF-8') . '...'
+			: htmlspecialchars($title, ENT_QUOTES, 'UTF-8');
 
+		// Escape & title length
+		$title_escaped = htmlspecialchars($title_cut, ENT_QUOTES, 'UTF-8');
 		$title_untranslated = $title !== $row->{static::$title_propname} ? '<br/><small>[ ' . $title_escaped . ' ]</small>' : '';
 
 		// Display title with no edit link ... if row is not-editable for any reason (no ACL or checked-out by other user)
@@ -244,16 +252,39 @@ abstract class JHtmlFcbase
 		$iconOnly  = isset($config['iconOnly']) ? $config['iconOnly'] : false;
 		$iconClass = isset($config['iconClass']) ? $config['iconClass'] : ($iconOnly ? 'icon-pencil' : false);
 
-		$icon_prefix = $iconClass && !$iconOnly ? '<span class="' . $iconClass . '"></span>' : '';
-		$icon_linked = $iconClass && $iconOnly ? '<span class="' . $iconClass . '"></span>' : '';
+		if (!empty($config['nolinkPrefix']))
+		{
+			$nolinkPrefix = $config['nolinkPrefix'];
+		}
+		else
+		{
+			$nolinkPrefix = $iconClass && !$iconOnly ? '<span class="' . $iconClass . '"></span>' : '';
+		}
+
+		if (!empty($config['linkedPrefix']))
+		{
+			$linkedPrefix = $config['linkedPrefix'];
+		}
+		else
+		{
+			$linkedPrefix = $iconClass && $iconOnly ? '<span class="' . $iconClass . '"></span>' : '';
+		}
 
 		// The edit link
 		$edit_task = 'task=' . $ctrl . '.edit';
 		$edit_link = 'index.php?option=' . $option . '&amp;' . $edit_task . '&amp;view=' . static::$name . '&amp;'
 			. 'id=' . $row->{$keyname};
 
-		$attrs = ' title="' . JText::_('FLEXI_EDIT', true) . '" class="fc-iblock text-dark" ';
-
+		if (!empty($config['attribs']))
+		{
+			$attrs = is_array($config['attribs'])
+				? ArrayHelper::toString($config['attribs'])
+				: $config['attribs'];
+		}
+		else
+		{
+			$attrs = ' class="fc-iblock text-dark" title="' . JText::_('FLEXI_EDIT', true) . '" ';
+		}
 
 		if (!empty($config['onclick']))
 		{
@@ -271,17 +302,17 @@ abstract class JHtmlFcbase
 		
 		if (!empty($config['onclick']) || !empty($config['useModal']))
 		{
-			return $icon_prefix . '
+			return $nolinkPrefix . '
 			<a href="javascript:;" data-href="' . $edit_link . '" ' . $attrs . '>
-				' . $icon_linked . '
+				' . $linkedPrefix . '
 				' . ($iconOnly ? '' : $title_escaped) . '
 			</a>';
 		}
 		else
 		{
-			return $icon_prefix . '
+			return $nolinkPrefix . '
 			<a href="' . $edit_link . '" ' . $attrs . '>
-				' . $icon_linked . '
+				' . $linkedPrefix . '
 				' . ($iconOnly ? '' : $title_escaped) . '
 			</a>
 			' . ($iconOnly ? '' : $title_untranslated);
@@ -298,12 +329,13 @@ abstract class JHtmlFcbase
 	 * @param   string   $name        The name of the form element
 	 * @param   string   $stub        The name of stub identifier
 	 * @param   string   $title       The name of the item
+	 * @param   string   $onclick     The js to execute onclick
 	 *
 	 * @return  mixed    String of html with a checkbox if item is not checked out, null if checked out.
 	 *
 	 * @since   3.3
 	 */
-	public static function grid_id($rowNum, $recId, $checkedOut = false, $name = 'cid', $stub = 'cb', $title = '')
+	public static function grid_id($rowNum, $recId, $checkedOut = false, $name = 'cid', $stub = 'cb', $title = '', $onclick = '')
 	{
 		if ($checkedOut)
 		{
@@ -313,7 +345,9 @@ abstract class JHtmlFcbase
 		return '
 			<div class="group-fcset">
 				<input type="checkbox" id="' . $stub . $rowNum . '" name="' . $name . '[]" value="' . $recId . '" onclick="Joomla.isChecked(this.checked);">
-				<label for="' . $stub . $rowNum . '" class="green single"><span class="sr-only">' . JText::_('JSELECT') . ' ' . htmlspecialchars($title, ENT_COMPAT, 'UTF-8') . '</span></label>
+				<label for="' . $stub . $rowNum . '" class="green single" ' . ($onclick ? 'onclick="' . $onclick . '"' : '') . '>
+					<span class="sr-only">' . JText::_('JSELECT') . ' ' . htmlspecialchars($title, ENT_COMPAT, 'UTF-8') . '</span>
+				</label>
 			</div>';
 	}
 

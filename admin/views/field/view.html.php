@@ -378,7 +378,7 @@ class FlexicontentViewField extends JViewLegacy
 				$fftypes[$field_group]['items'][] = array('value' => $ftdata->field_type, 'text' => $ftdata->friendly);
 			}
 		}
-		$_attribs = ' class="use_select2_lib fc_skip_highlight" ' . ($row->iscore ? ' disabled="disabled" ' : '');
+		$_attribs = ' class="use_select2_lib" ' . ($row->iscore ? ' disabled="disabled" ' : '');
 		$lists['field_type'] = flexicontent_html::buildfieldtypeslist($fftypes, 'jform[field_type]', $row->field_type, ($_grouped ? 1 : 0), $_attribs);
 
 		// Build (content) type select list
