@@ -671,18 +671,7 @@ class FlexicontentViewItem extends JViewLegacy
 		$document->addStyleSheetVersion(JUri::root(true).'/components/com_flexicontent/assets/css/flexi_form_fields.css', FLEXI_VHASH);
 
 		// Add JS frameworks
-		$has_J2S = JPluginHelper::isEnabled('content', 'j2store');
-		if (!$has_J2S) foreach ($fields as $field)
-		{
-			$has_J2S = $has_J2S || $field->field_type == 'j2store';
-			if ($has_J2S) break;
-		}
-		$_params = new JRegistry();
-		$_params->set('load-ui-dialog', 1);
-		$_params->set('load-ui-menu', $has_J2S ? 0 : 1);
-		$_params->set('load-ui-autocomplete', $has_J2S ? 0 : 1);
-
-		flexicontent_html::loadJQuery( $add_jquery = 1, $add_jquery_ui = 1, $add_jquery_ui_css = 1, $add_remote = 1, $_params);   //flexicontent_html::loadFramework('jQuery');
+		flexicontent_html::loadFramework('jQuery');
 		flexicontent_html::loadFramework('select2');
 		flexicontent_html::loadFramework('touch-punch');
 		flexicontent_html::loadFramework('prettyCheckable');
