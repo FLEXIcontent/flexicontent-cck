@@ -67,13 +67,19 @@ class plgFlexicontent_fieldsAuthoritems extends FCField
 				0,
 				0,
 				array(
-					'layout' => 'author',
-					'authorid' => $authorslug
+					'layout'   => 'author',
+					'authorid' => $authorslug,
 				)
 			));
 		}
 
-		$field->{$prop} = '<a href="'.$author_links[$item->created_by].'" itemprop="author">'.JText::_('FLEXI_FIELD_AI_MORE_ITEMS_BY_THIS_AUTHOR').'</a>';
+		// Get layout name
+		$viewlayout = $field->parameters->get('viewlayout', '');
+		$viewlayout = $viewlayout ? 'value_'.$viewlayout : 'value_default';
+
+		// Create field's HTML, using layout file
+		$field->{$prop} = array();
+		include(self::getViewPath($field->field_type, $viewlayout));
 	}
 
 
