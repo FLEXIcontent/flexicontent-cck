@@ -24,16 +24,26 @@ require_once('base/baselist.php');
  */
 class FlexicontentModelUsers extends FCModelAdminList
 {
-
+	/**
+	 * Record database table
+	 *
+	 * @var string
+	 */
 	var $records_dbtbl  = 'users';
+
+	/**
+	 * Record jtable name
+	 *
+	 * @var string
+	 */
 	var $records_jtable = 'JTableUser';
 
 	/**
 	 * Column names
 	 */
-	var $state_col   = 'block';
-	var $name_col    = 'name';
-	var $parent_col  = null;
+	var $state_col      = 'block';
+	var $name_col       = 'name';
+	var $parent_col     = null;
 
 	/**
 	 * (Default) Behaviour Flags
@@ -51,6 +61,7 @@ class FlexicontentModelUsers extends FCModelAdminList
 	/**
 	 * List filters that are always applied
 	 */
+	var $hard_filters = array();
 
 	/**
 	 * Record rows
@@ -73,13 +84,6 @@ class FlexicontentModelUsers extends FCModelAdminList
 	 */
 	var $_pagination = null;
 
-	/**
-	 * Single record id (used in operations)
-	 *
-	 * @var int
-	 */
-	var $_id = null;
-
 
 	/**
 	 * Constructor
@@ -95,7 +99,7 @@ class FlexicontentModelUsers extends FCModelAdminList
 		$option = $jinput->get('option', '', 'cmd');
 		$view   = $jinput->get('view', '', 'cmd');
 		$fcform = $jinput->get('fcform', 0, 'int');
-		$p      = $option . '.' . $view . '.';
+		$p      = $this->ovid;
 
 
 		/**
@@ -142,9 +146,9 @@ class FlexicontentModelUsers extends FCModelAdminList
 	/**
 	 * Method to build the query for the records
 	 *
-	 * @return JDatabaseQuery   The DB Query object
+	 * @return  JDatabaseQuery   The DB Query object
 	 *
-	 * @since 3.3.0
+	 * @since   3.3.0
 	 */
 	protected function getListQuery()
 	{
@@ -200,7 +204,7 @@ class FlexicontentModelUsers extends FCModelAdminList
 	 *
 	 * @return  JDatabaseQuery|array
 	 *
-	 * @since 1.0
+	 * @since   3.3.0
 	 */
 	protected function _buildContentWhere($q = false)
 	{
@@ -359,6 +363,8 @@ class FlexicontentModelUsers extends FCModelAdminList
 	 * @param		string    $tostate  action related to assignments
 	 *
 	 * @return	array     The records having assignments
+	 *
+	 * @since   3.3.0
 	 */
 	public function filterByAssignments($cid = array(), $tostate = -2)
 	{

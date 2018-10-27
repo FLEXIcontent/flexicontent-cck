@@ -45,6 +45,13 @@ trait FCModelTraitLegacyList
 	 */
 	public function publish($cid, $state = 1)
 	{
+		/**
+		 * Perform ACL and Assignments checks, sets results into state
+		 */
+		$cid_noauth  = null;
+		$cid_wassocs = null;
+		$this->canchangestate($cid, $cid_noauth, $cid_wassocs, $tostate = $state);
+
 		return $this->changestate($cid, $state);
 	}
 

@@ -25,12 +25,11 @@ $cparams  = JComponentHelper::getParams('com_flexicontent');
 $ctrl     = 'items.';
 $hlpname  = 'fcitems';
 $isAdmin  = $app->isAdmin();
+$useAssocs= flexicontent_db::useAssociations();
 
 $items_task = 'task=items.';
 $cats_task  = 'task=category.';
-
-$_sh404sef = defined('SH404SEF_IS_RUNNING') && $config->get('sef');
-$useAssocs = flexicontent_db::useAssociations();
+$_sh404sef  = defined('SH404SEF_IS_RUNNING') && $config->get('sef');
 
 
 
@@ -56,7 +55,7 @@ $_NULL_DATE_     = JFactory::getDbo()->getNullDate();
 
 flexicontent_html::jscode_to_showhide_table(
 	'mainChooseColBox',
-	'adminListTableFCitems',
+	'adminListTableFC' . $this->view,
 	$start_html = '',  //'<span class="badge ' . (FLEXI_J40GE ? 'badge-dark' : 'badge-inverse') . '">' . JText::_('FLEXI_COLUMNS', true) . '<\/span> &nbsp; ',
 	$end_html = '<div id="fc-columns-slide-btn" class="icon-arrow-up-2 btn btn-outline-secondary" title="' . JText::_('FLEXI_HIDE') . '" style="cursor: pointer;" onclick="fc_toggle_box_via_btn(\\\'mainChooseColBox\\\', document.getElementById(\\\'fc_mainChooseColBox_btn\\\'), \\\'btn-primary\\\');"><\/div>'
 );
@@ -77,16 +76,12 @@ $featimg = JHtml::image ( 'administrator/components/com_flexicontent/assets/imag
  * Order stuff and table related variables
  */
 
-$canOrder= $this->perms->CanOrder;
-$list_total_cols = 18;
-
-if ($useAssocs)
-{
-	$list_total_cols++;
-}
+$list_total_cols = 19
+	+ ($useAssocs ? 1 : 0);
 
 $list_total_cols += count($this->extra_fields);
 
+$canOrder = $this->perms->CanOrder;
 $ordering_draggable = $cparams->get('draggable_reordering', 1);
 
 if ($this->reOrderingActive)
@@ -596,7 +591,7 @@ jQuery(document).ready(function(){
 
 	<div class="fcclear"></div>
 
-	<table id="adminListTableFCitems" class="adminlist table fcmanlist" itemscope itemtype="http://schema.org/WebPage">
+	<table id="adminListTableFC<?php echo $this->view; ?>" class="adminlist table fcmanlist" itemscope itemtype="http://schema.org/WebPage">
 	<thead>
 		<tr>
 
@@ -662,9 +657,9 @@ jQuery(document).ready(function(){
 				<?php endif; ?>
 			</th>
 
-		<?php if ( $useAssocs ) : ?>
+		<?php if ($useAssocs) : ?>
 			<th class="hideOnDemandClass left hidden-phone hidden-tablet">
-				<?php echo JText::_( 'FLEXI_ASSOCIATIONS' ); ?>
+				<?php echo JText::_('FLEXI_ASSOCIATIONS'); ?>
 			</th>
 		<?php endif; ?>
 
@@ -771,6 +766,7 @@ jQuery(document).ready(function(){
 
 	<tbody <?php echo $ordering_draggable && $canOrder && $this->reOrderingActive ? 'id="sortable_fcitems"' : ''; ?> >
 		<?php
+		$k = 0;
 		$canCheckinRecords = $user->authorise('core.admin', 'com_checkin');
 
 		$needsApproval = false;
@@ -801,7 +797,7 @@ jQuery(document).ready(function(){
 			$row->lang = !empty($row->lang) ? $row->lang : '*';
    		?>
 
-		<tr class="<?php echo 'row' . ($i % 2); ?>">
+		<tr class="<?php echo 'row' . ($k % 2); ?>">
 
 			<!--td class="left col_rowcount hidden-phone">
 				<?php echo $this->pagination->getRowOffset($i); ?>
@@ -910,49 +906,39 @@ jQuery(document).ready(function(){
 				<?php echo $row->author; ?>
 			</td>
 
-			<td class="col_lang hidden-phone" title="<?php echo ($row->lang=='*' ? JText::_("All") : $this->langs->{$row->lang}->name); ?>">
-				<?php if ( 0 && !empty($row->lang) && !empty($this->langs->{$row->lang}->imgsrc) ) : ?>
-					<img src="<?php echo $this->langs->{$row->lang}->imgsrc; ?>" alt="<?php echo $row->lang; ?>" />
-				<?php elseif( !empty($row->lang) ) : ?>
-					<?php echo $row->lang=='*' ? JText::_("FLEXI_ALL") : $row->lang;?>
-				<?php endif; ?>
-
+			<td class="col_lang hidden-phone">
+				<?php
+					/**
+					 * Display language
+					 */
+					echo JHtml::_($hlpname . '.lang_display', $row, $i, $this->langs, $use_icon = false); ?>
 			</td>
 
 
-			<?php if ( $useAssocs ) : ?>
+			<?php if ($useAssocs) : ?>
 			<td class="hidden-phone hidden-tablet">
 				<?php
-				if ( !empty($this->lang_assocs[$row->id]) )
+				if (!empty($this->lang_assocs[$row->id]))
 				{
-					$row_modified = strtotime($row->modified);
-					if (!$row_modified)
-					{
-						$row_modified = strtotime($row->created);
-					}
+					$row_modified = strtotime($row->modified) ?: strtotime($row->created);
 
 					foreach($this->lang_assocs[$row->id] as $assoc_item)
 					{
 						// Joomla article manager show also current item, so we will not skip it
 						$is_current = $assoc_item->id == $row->id;
+						$assoc_modified = strtotime($assoc_item->modified) ?: strtotime($assoc_item->created);
 
-						$assoc_modified = strtotime($assoc_item->modified);
-						if (!$assoc_modified)
-						{
-							$assoc_modified = strtotime($assoc_item->created);
-						}
-
-						$_link  = 'index.php?option=com_flexicontent&amp;'.$items_task.'edit&amp;cid='. $assoc_item->id;
+						$_link  = 'index.php?option=com_flexicontent&amp;task='.$ctrl.'edit&amp;cid='. $assoc_item->id;
 						$_title = flexicontent_html::getToolTip(
 							($is_current ? '' : JText::_( $assoc_modified < $row_modified ? 'FLEXI_EARLIER_THAN_THIS' : 'FLEXI_LATER_THAN_THIS')),
-							( !empty($this->langs->{$assoc_item->lang}->imgsrc) ? ' <img src="'.$this->langs->{$assoc_item->lang}->imgsrc.'" alt="'.$assoc_item->lang.'" /> ' : '').
-							($assoc_item->lang=='*' ? JText::_("FLEXI_ALL") : $this->langs->{$assoc_item->lang}->name).' <br/> '.
+							( !empty($this->langs->{$assoc_item->lang}) ? ' <img src="'.$this->langs->{$assoc_item->lang}->imgsrc.'" alt="'.$assoc_item->lang.'" /> ' : '').
+							($assoc_item->lang === '*' ? JText::_('FLEXI_ALL') : (!empty($this->langs->{$assoc_item->lang}) ? $this->langs->{$assoc_item->lang}->name: '?')).' <br/> '.
 							$assoc_item->title, 0, 1
 						);
 
 						echo '
 						<a class="fc_assoc_translation label label-association ' . $this->tooltip_class . ($assoc_modified < $row_modified ? ' fc_assoc_later_mod' : '').'" target="_blank" href="'.$_link.'" title="'.$_title.'" >
-							'.($assoc_item->lang=='*' ? JText::_("FLEXI_ALL") : strtoupper($assoc_item->shortcode)).'
+							'.($assoc_item->lang=='*' ? JText::_('FLEXI_ALL') : strtoupper($assoc_item->shortcode ?: '?')).'
 						</a>';
 					}
 				}
@@ -1064,7 +1050,7 @@ jQuery(document).ready(function(){
 				}
 				echo $_maincat;
 				echo count($row_cats) ? ' 
-					<span class="btn btn-mini ' . $this->tooltip_class . 'nowrap_box" onclick="jQuery(this).next().toggle(400);" title="'.flexicontent_html::getToolTip(JText::_('FLEXI_SECONDARY_CATEGORIES'), '<ul class="fc_plain"><li>'.implode('</li><li>', $cat_names).'</li></ul>', 0, 1).'">
+					<span class="btn btn-mini ' . $this->popover_class . ' nowrap_box" onclick="jQuery(this).next().toggle(400);" data-content="'.flexicontent_html::getToolTip(JText::_('FLEXI_CATEGORIES'), '<ul class="fc_plain"><li>'.implode('</li><li>', $cat_names).'</li></ul>', 0, 1).'">
 						'.count($row_cats).' <i class="icon-tree-2"></i>
 					</span>
 					<div class="fc_assignments_box fc_cats">' : '';
@@ -1088,7 +1074,7 @@ jQuery(document).ready(function(){
 						}
 					}
 					echo count($row_tags) ? '
-						<span class="btn btn-mini ' . $this->tooltip_class . 'nowrap_box" onclick="jQuery(this).next().toggle(400);" title="'.flexicontent_html::getToolTip(JText::_('FLEXI_TAGS'), '<ul class="fc_plain"><li>'.implode('</li><li>', $tag_names).'</li></ul>', 0, 1).'">
+						<span class="btn btn-mini ' . $this->popover_class . ' nowrap_box" onclick="jQuery(this).next().toggle(400);" data-content="'.flexicontent_html::getToolTip(JText::_('FLEXI_TAGS'), '<ul class="fc_plain"><li>'.implode('</li><li>', $tag_names).'</li></ul>', 0, 1).'">
 							'.count($row_tags).' <i class="icon-tags"></i>
 						</span>
 						<div class="fc_assignments_box fc_tags">' : '';
@@ -1125,7 +1111,9 @@ jQuery(document).ready(function(){
 
 		</tr>
 		<?php
+			$k++;
 		}
+
 		if ($needsApproval)
 		{
 			$ctrl_task = 'items.approval';
@@ -1134,6 +1122,7 @@ jQuery(document).ready(function(){
 			JToolbarHelper::spacer();
 			JToolbarHelper::custom($ctrl_task, 'apply.png', 'apply.png', 'FLEXI_APPROVAL_REQUEST');
 		}
+
 		JToolbarHelper::spacer();
 		JToolbarHelper::spacer();
 		?>
@@ -1161,9 +1150,9 @@ jQuery(document).ready(function(){
 
 	<!-- Common management form fields -->
 	<input type="hidden" name="boxchecked" value="0" />
-	<input type="hidden" name="option" value="com_flexicontent" />
-	<input type="hidden" name="controller" value="items" />
-	<input type="hidden" name="view" value="items" />
+	<input type="hidden" name="option" value="<?php echo $this->option; ?>" />
+	<input type="hidden" name="controller" value="<?php echo $this->view; ?>" />
+	<input type="hidden" name="view" value="<?php echo $this->view; ?>" />
 	<input type="hidden" name="task" value="" />
 	<input type="hidden" id="filter_order" name="filter_order" value="<?php echo $this->lists['order']; ?>" />
 	<input type="hidden" id="filter_order_Dir" name="filter_order_Dir" value="<?php echo $this->lists['order_Dir']; ?>" />

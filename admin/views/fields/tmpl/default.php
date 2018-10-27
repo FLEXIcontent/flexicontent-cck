@@ -152,12 +152,7 @@ function delAllFilters()
 
 if ($js)
 {
-	$document->addScriptDeclaration('
-		jQuery(document).ready(function()
-		{
-			' . $js . '
-		});
-	');
+	$document->addScriptDeclaration($js);
 }
 ?>
 
@@ -647,18 +642,14 @@ if ($js)
 		?>
 	</tbody>
 
-	<tfoot>
-		<tr>
-			<td colspan="<?php echo $list_total_cols; ?>" style="text-align: left;">
-				<?php echo $pagination_footer; ?>
-			</td>
-		</tr>
-	</tfoot>
-
 	</table>
 
-	<div class="fcclear"></div>
+	<div>
+		<?php echo $pagination_footer; ?>
+	</div>
 
+
+	<!-- This manager form fields -->
 	<input type="hidden" name="propname" value="" />
 
 	<!-- Common management form fields -->

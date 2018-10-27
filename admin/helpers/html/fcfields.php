@@ -169,7 +169,7 @@ abstract class JHtmlFcfields extends JHtmlFcbase
 				foreach ($row->grouped_fields as $field)
 				{
 					$field_links[] = static::edit_link($field, $i, $row->canEdit, $config = array(
-						'iconClass' =>'icon-edit',
+						'nolinkPrefix' => '<span class="icon-edit"></span>',
 						'useModal' => (object) array(
 							'title' =>'FLEXI_EDIT',
 							'onloadfunc' =>'fc_edit_fcfield_modal_load',

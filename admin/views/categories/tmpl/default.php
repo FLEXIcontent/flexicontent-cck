@@ -15,14 +15,17 @@ use Joomla\String\StringHelper;
 JHtml::addIncludePath(JPATH_COMPONENT . '/helpers/html');
 
 global $globalcats;
-$app     = JFactory::getApplication();
-$jinput  = $app->input;
-$config  = JFactory::getConfig();
-$user    = JFactory::getUser();
-$cparams = JComponentHelper::getParams('com_flexicontent');
-$ctrl    = 'categories.';
-$hlpname = 'fccats';
-$isAdmin = $app->isAdmin();
+$app      = JFactory::getApplication();
+$jinput   = $app->input;
+$config   = JFactory::getConfig();
+$user     = JFactory::getUser();
+$session  = JFactory::getSession();
+$document = JFactory::getDocument();
+$cparams  = JComponentHelper::getParams('com_flexicontent');
+$ctrl     = 'categories.';
+$hlpname  = 'fccats';
+$isAdmin  = $app->isAdmin();
+$useAssocs= flexicontent_db::useAssociations();
 
 
 
@@ -42,7 +45,7 @@ $out_class = FLEXI_J40GE ? 'btn btn-outline-dark' : 'btn';
 
 flexicontent_html::jscode_to_showhide_table(
 	'mainChooseColBox',
-	'adminListTableFCcats',
+	'adminListTableFC' . $this->view,
 	$start_html = '',  //'<span class="badge ' . (FLEXI_J40GE ? 'badge-dark' : 'badge-inverse') . '">' . JText::_('FLEXI_COLUMNS', true) . '<\/span> &nbsp; ',
 	$end_html = '<div id="fc-columns-slide-btn" class="icon-arrow-up-2 btn btn-outline-secondary" title="' . JText::_('FLEXI_HIDE') . '" style="cursor: pointer;" onclick="fc_toggle_box_via_btn(\\\'mainChooseColBox\\\', document.getElementById(\\\'fc_mainChooseColBox_btn\\\'), \\\'btn-primary\\\');"><\/div>'
 );
@@ -56,17 +59,26 @@ $tools_cookies['fc-filters-box-disp'] = 0; //JFactory::getApplication()->input->
 
 $infoimage = JHtml::image ( 'administrator/components/com_flexicontent/assets/images/comments.png', JText::_( 'FLEXI_NOTES' ), ' class="fc-man-icon-s" ' );
 
-$state_names = array('ALL_P'=>JText::_('FLEXI_PUBLISHED'), 'ALL_U'=>JText::_('FLEXI_UNPUBLISHED'), 'A'=>JText::_('FLEXI_ARCHIVED'), 'T'=>JText::_('FLEXI_TRASHED'));
-$state_imgs  = array('ALL_P'=>'tick.png', 'ALL_U'=>'publish_x.png', 'A'=>'archive.png', 'T'=>'trash.png');
-$state_icons = array('ALL_P'=>'publish', 'ALL_U'=>'unpublish', 'A'=>'archive', 'T'=>'trash');
-
+$state_names = array(
+	'ALL_P' => JText::_('FLEXI_PUBLISHED'),
+	'ALL_U' => JText::_('FLEXI_UNPUBLISHED'),
+	'A'     => JText::_('FLEXI_ARCHIVED'),
+	'T'     => JText::_('FLEXI_TRASHED'),
+);
+$state_icons = array(
+	'ALL_P' => 'publish',
+	'ALL_U' => 'unpublish',
+	'A'     => 'archive',
+	'T'     => 'trash',
+);
 
 
 /**
  * Order stuff and table related variables
  */
 
-$list_total_cols = 13;
+$list_total_cols = 13
+	+ ($useAssocs ? 1 : 0);
 
 $listOrder = $this->lists['order'];
 $listDirn  = $this->lists['order_Dir'];
@@ -75,27 +87,38 @@ $saveOrder = ($listOrder == 'a.lft' && strtolower($listDirn) == 'asc');
 if ($saveOrder)
 {
 	$saveOrderingUrl = 'index.php?option=com_flexicontent&task='.$ctrl.'saveOrderAjax&format=raw';
-	JHtml::_('sortablelist.sortable', 'adminListTableFCcats', 'adminForm', strtolower($listDirn), $saveOrderingUrl, false, true);
+	JHtml::_('sortablelist.sortable', 'adminListTableFC' . $this->view, 'adminForm', strtolower($listDirn), $saveOrderingUrl, false, true);
 }
 
-?>
 
 
-<script>
+/**
+ * Add inline JS
+ */
 
-// delete active filter
+$js = '';
+
+$js .= "
+
+// Delete a specific list filter
 function delFilter(name)
 {
 	//if(window.console) window.console.log('Clearing filter:'+name);
 	var myForm = jQuery('#adminForm');
 	var filter = jQuery('#'+name);
-	if (filter.attr('type')=='checkbox')
+
+	if (!filter.length)
+	{
+		return;
+	}
+	else if (filter.attr('type') == 'checkbox')
 	{
 		filter.checked = '';
 	}
 	else
 	{
 		filter.val('');
+
 		// Case that input has Calendar JS attached
 		if (filter.attr('data-alt-value'))
 		{
@@ -106,18 +129,26 @@ function delFilter(name)
 
 function delAllFilters()
 {
+	jQuery('.fc_field_filter').val('');
 	delFilter('search');
+	delFilter('filter_level');
 	delFilter('filter_state');
 	delFilter('filter_cats');
+	delFilter('filter_author');
 	delFilter('filter_id');
-	delFilter('filter_level');
-	delFilter('filter_access');
 	delFilter('filter_lang');
+	delFilter('filter_access');
 	delFilter('filter_order');
 	delFilter('filter_order_Dir');
 }
 
-</script>
+";
+
+if ($js)
+{
+	$document->addScriptDeclaration($js);
+}
+?>
 
 
 <div id="flexicontent" class="flexicontent">
@@ -167,6 +198,7 @@ function delAllFilters()
 					<?php
 					echo $this->lists['filter_cats'];
 					echo $this->lists['filter_level'];
+					echo $this->lists['filter_author'];				
 					echo $this->lists['filter_state'];
 					echo $this->lists['filter_access'];
 					echo $this->lists['filter_lang'];
@@ -222,10 +254,7 @@ function delAllFilters()
 	</div>
 
 
-	<div class="fcclear"></div>
-
-
-	<table id="adminListTableFCcats" class="adminlist table fcmanlist" itemscope itemtype="http://schema.org/WebPage">
+	<table id="adminListTableFC<?php echo $this->view; ?>" class="adminlist table fcmanlist" itemscope itemtype="http://schema.org/WebPage">
 	<thead>
 		<tr>
 
@@ -248,11 +277,21 @@ function delAllFilters()
 				<?php echo JHtml::_('grid.sort', 'FLEXI_STATUS', 'a.' . $this->state_propname, $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
 
-			<th class="hideOnDemandClass title">
+			<th class="hideOnDemandClass col_title">
 				<?php echo JHtml::_('grid.sort', 'FLEXI_TITLE', 'a.' . $this->title_propname, $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				//
 				<?php echo JHtml::_('grid.sort', 'FLEXI_ALIAS', 'a.alias', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
+
+			<th class="hideOnDemandClass hidden-phone">
+				<?php echo JHtml::_('grid.sort', 'FLEXI_LANGUAGE', 'a.language', $this->lists['order_Dir'], $this->lists['order'] ); ?>
+			</th>
+
+		<?php if ($useAssocs) : ?>
+			<th class="hideOnDemandClass <?php echo !$this->assocs_id ? 'hidden-phone hidden-tablet' : ''; ?>">
+				<?php echo JText::_('FLEXI_ASSOCIATIONS'); ?>
+			</th>
+		<?php endif; ?>
 
 			<th class="left hideOnDemandClass hidden-phone hidden-tablet" colspan="2">
 				<?php echo JText::_('FLEXI_TEMPLATE'); ?>
@@ -291,10 +330,6 @@ function delAllFilters()
 				<?php echo $this->orderingx ? str_replace('rel="tooltip"', '', JHtml::_('grid.order', $this->rows, 'filesave.png', $ctrl.'saveorder' )) : ''; ?>
 			</th-->
 
-			<th class="hideOnDemandClass hidden-phone">
-				<?php echo JHtml::_('grid.sort', 'JGRID_HEADING_LANGUAGE', 'language', $this->lists['order_Dir'], $this->lists['order'] ); ?>
-			</th>
-
 			<th class="hideOnDemandClass col_id center hidden-phone hidden-tablet">
 				<?php echo JHtml::_('grid.sort', 'FLEXI_ID', 'a.id', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
@@ -304,6 +339,7 @@ function delAllFilters()
 
 	<tbody>
 		<?php
+		$k = 0;
 		$canCheckinRecords = $user->authorise('core.admin', 'com_checkin');
 
 		$originalOrders = array();
@@ -341,14 +377,14 @@ function delAllFilters()
 				$parentsStr = ' ' . $_currentParentId;
 				for ($i2 = 0; $i2 < $row->level; $i2++)
 				{
-					foreach ($this->ordering as $k => $v)
+					foreach ($this->ordering as $m => $v)
 					{
 						$v = implode('-', $v);
 						$v = '-' . $v . '-';
 						if (strpos($v, '-' . $_currentParentId . '-') !== false)
 						{
-							$parentsStr .= ' ' . $k;
-							$_currentParentId = $k;
+							$parentsStr .= ' ' . $m;
+							$_currentParentId = $m;
 							break;
 						}
 					}
@@ -398,7 +434,7 @@ function delAllFilters()
 			$items_link = 'index.php?option=com_flexicontent&amp;view=items&amp;filter_catsinstate=99&amp;filter_subcats=0&amp;filter_cats='. $row->id.'&amp;fcform=1&amp;filter_state=';
    		?>
 
-		<tr class="<?php echo 'row' . ($i % 2); ?>" sortable-group-id="<?php echo $row->parent_id; ?>" item-id="<?php echo $row->id ?>" parents="<?php echo $parentsStr ?>" level="<?php echo $row->level ?>">
+		<tr class="<?php echo 'row' . ($k % 2); ?>" sortable-group-id="<?php echo $row->parent_id; ?>" item-id="<?php echo $row->id ?>" parents="<?php echo $parentsStr ?>" level="<?php echo $row->level ?>">
 
 			<!--td class="left col_rowcount hidden-phone">
 				<?php echo $this->pagination->getRowOffset($i); ?>
@@ -473,6 +509,47 @@ function delAllFilters()
 				?>]</small>
 			</td>
 
+			<td class="col_lang hidden-phone">
+				<?php
+					/**
+					 * Display language
+					 */
+					echo JHtml::_($hlpname . '.lang_display', $row, $i, $this->langs, $use_icon = false); ?>
+			</td>
+
+
+			<?php if ($useAssocs) : ?>
+			<td class="<?php echo !$this->assocs_id ? 'hidden-phone hidden-tablet' : ''; ?>">
+				<?php
+				if (!empty($this->lang_assocs[$row->id]))
+				{
+					$row_modified = strtotime($row->modified_time) ?: strtotime($row->created_time);
+
+					foreach($this->lang_assocs[$row->id] as $assoc_item)
+					{
+						// Joomla article manager show also current item, so we will not skip it
+						$is_current = $assoc_item->id == $row->id;
+						$assoc_modified = strtotime($assoc_item->modified) ?: strtotime($assoc_item->created);
+
+						$_link  = 'index.php?option=com_flexicontent&amp;task='.$ctrl.'edit&amp;cid='. $assoc_item->id;
+						$_title = flexicontent_html::getToolTip(
+							($is_current ? '' : JText::_( $assoc_modified < $row_modified ? 'FLEXI_EARLIER_THAN_THIS' : 'FLEXI_LATER_THAN_THIS')),
+							( !empty($this->langs->{$assoc_item->lang}) ? ' <img src="'.$this->langs->{$assoc_item->lang}->imgsrc.'" alt="'.$assoc_item->lang.'" /> ' : '').
+							($assoc_item->lang === '*' ? JText::_('FLEXI_ALL') : (!empty($this->langs->{$assoc_item->lang}) ? $this->langs->{$assoc_item->lang}->name: '?')).' <br/> '.
+							$assoc_item->title, 0, 1
+						);
+
+						echo '
+						<a class="fc_assoc_translation label label-association ' . $this->tooltip_class . ($assoc_modified < $row_modified ? ' fc_assoc_later_mod' : '').'" target="_blank" href="'.$_link.'" title="'.$_title.'" >
+							'.($assoc_item->lang=='*' ? JText::_('FLEXI_ALL') : strtoupper($assoc_item->shortcode ?: '?')).'
+						</a>';
+					}
+				}
+				?>
+			</td>
+			<?php endif ; ?>
+
+
 			<td class="col_edit_layout hidden-phone hidden-tablet">
 				<?php echo JHtml::_($hlpname . '.edit_layout', $row, '__modal__', $i, $this->perms->CanTemplates, $row_clayout); ?>
 			</td>
@@ -522,44 +599,32 @@ function delAllFilters()
 					: $this->escape($row->access_level); ?>
 			</td>
 
-			<td class="col_language left nowrap hidden-phone">
-			<?php if ($row->language=='*'):?>
-				<?php echo JText::alt('JALL','language'); ?>
-			<?php else:?>
-				<?php echo $row->language_title ? $this->escape($row->language_title) : JText::_('JUNDEFINED'); ?>
-			<?php endif;?>
-			</td>
-
 			<td class="col_id center hidden-phone hidden-tablet">
-				<span title="<?php echo sprintf('%d-%d', $row->lft, $row->rgt);?>">
 				<?php echo $row->id; ?>
-				</span>
 			</td>
 
 		</tr>
 		<?php
+			$k++;
 		}
 		?>
 	</tbody>
 
-	<tfoot>
-		<tr>
-			<td colspan="<?php echo $list_total_cols; ?>" style="text-align: left;">
-				<?php echo $pagination_footer; ?>
-			</td>
-		</tr>
-	</tfoot>
-
 	</table>
 
-	<div class="fcclear"></div>
+	<div>
+		<?php echo $pagination_footer; ?>
+	</div>
+
+
+	<!-- This manager form fields -->
 	<input type="hidden" name="original_order_values" value="<?php echo implode(',', $originalOrders); ?>" />
 
 	<!-- Common management form fields -->
 	<input type="hidden" name="boxchecked" value="0" />
-	<input type="hidden" name="option" value="com_flexicontent" />
-	<!---input type="hidden" name="controller" value="categories" /-->
-	<input type="hidden" name="view" value="categories" />
+	<input type="hidden" name="option" value="<?php echo $this->option; ?>" />
+	<!--input type="hidden" name="controller" value="<?php echo $this->view; ?>" /-->
+	<input type="hidden" name="view" value="<?php echo $this->view; ?>" />
 	<input type="hidden" name="task" value="" />
 	<input type="hidden" id="filter_order" name="filter_order" value="<?php echo $this->lists['order']; ?>" />
 	<input type="hidden" id="filter_order_Dir" name="filter_order_Dir" value="<?php echo $this->lists['order_Dir']; ?>" />

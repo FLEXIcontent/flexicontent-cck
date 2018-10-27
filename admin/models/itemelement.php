@@ -11,27 +11,40 @@
 
 defined('_JEXEC') or die('Restricted access');
 
-jimport('legacy.model.list');
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 use Joomla\CMS\Table\Table;
 use Joomla\CMS\Table\User;
 
+require_once('base/baselist.php');
+
 /**
  * Flexicontent Component Itemelement Model
  *
  */
-class FlexicontentModelItemelement extends JModelList
+class FlexicontentModelItemelement extends FCModelAdminList
 {
+	/**
+	 * Record database table
+	 *
+	 * @var string
+	 */
 	var $records_dbtbl  = 'content';
+
+	/**
+	 * Record jtable name
+	 *
+	 * @var string
+	 */
 	var $records_jtable = 'flexicontent_items';
 
 	/**
 	 * Column names
 	 */
-	var $state_col   = 'state';
-	var $name_col    = 'title';
-	var $parent_col  = 'catid';
+	var $state_col      = 'state';
+	var $name_col       = 'title';
+	var $parent_col     = 'catid';
+	var $created_by_col = 'created_by';
 
 	/**
 	 * (Default) Behaviour Flags
@@ -43,13 +56,13 @@ class FlexicontentModelItemelement extends JModelList
 	 * Search and ordering columns
 	 */
 	var $search_cols       = array('title', 'alias', 'note');
-	var $default_order     = 'i.ordering';
-	var $default_order_dir = 'ASC';
+	var $default_order     = 'a.id';
+	var $default_order_dir = 'DESC';
 
 	/**
 	 * List filters that are always applied
 	 */
-	var $hard_filters = array('extension' => FLEXI_CAT_EXTENSION);
+	var $hard_filters = array('c.extension' => FLEXI_CAT_EXTENSION);
 
 	/**
 	 * Record rows
@@ -66,18 +79,19 @@ class FlexicontentModelItemelement extends JModelList
 	var $_total = null;
 
 	/**
-	 * Associated item translations
-	 *
-	 * @var array
-	 */
-	var $_translations = null;
-
-	/**
 	 * Pagination object
 	 *
 	 * @var object
 	 */
 	var $_pagination = null;
+
+	/**
+	 * Associated record translations
+	 *
+	 * @var array
+	 */
+	var $_translations = null;
+
 
 	/**
 	 * Constructor
@@ -86,6 +100,11 @@ class FlexicontentModelItemelement extends JModelList
 	 */
 	public function __construct($config = array())
 	{
+		// Make session index more specific ...
+		$this->assocs_id = JFactory::getApplication()->input->getInt('assocs_id', 0);
+		$this->view_id   = JFactory::getApplication()->input->getCmd('view', '') . $this->assocs_id;
+
+		// Call parent after setting ... $this->view_id
 		parent::__construct($config);
 
 		$app    = JFactory::getApplication();
@@ -93,27 +112,65 @@ class FlexicontentModelItemelement extends JModelList
 		$option = $jinput->get('option', '', 'cmd');
 		$view   = $jinput->get('view', '', 'cmd');
 		$fcform = $jinput->get('fcform', 0, 'int');
-		$p      = $option . '.' . $view . '.';
+		$p      = $this->ovid;
 
-		// Parameters of the view, in our case it is only the component parameters
-		$this->cparams = JComponentHelper::getParams( 'com_flexicontent' );
 
 		/**
-		 * Pagination: limit, limitstart
+		 * View's Filters
+		 * Inherited filters : filter_state, filter_access, filter_lang, filter_author, filter_id, search
 		 */
 
-		$limit      = $fcform ? $jinput->get('limit', $app->getCfg('list_limit'), 'int')  :  $app->getUserStateFromRequest( $p.'limit', 'limit', $app->getCfg('list_limit'), 'int');
-		$limitstart = $fcform ? $jinput->get('limitstart',                     0, 'int')  :  $app->getUserStateFromRequest( $p.'limitstart', 'limitstart', 0, 'int' );
+		// Various filters
+		$filter_cats     = $fcform ? $jinput->get('filter_cats', 0, 'int') : $app->getUserStateFromRequest($p . 'filter_cats', 'filter_cats', 0, 'int');
+		$filter_type     = $fcform ? $jinput->get('filter_type', 0, 'int') : $app->getUserStateFromRequest($p . 'filter_type', 'filter_type', 0, 'int');
 
-		// In case limit has been changed, adjust limitstart accordingly
-		$limitstart = ( $limit != 0 ? (floor($limitstart / $limit) * $limit) : 0 );
-		$jinput->set( 'limitstart',	$limitstart );
+		$this->setState('filter_cats', $filter_cats);
+		$this->setState('filter_type', $filter_type);
 
-		$this->setState('limit', $limit);
-		$this->setState('limitstart', $limitstart);
+		$app->setUserState($p . 'filter_cats', $filter_cats);
+		$app->setUserState($p . 'filter_type', $filter_type);
 
-		$app->setUserState($p.'limit', $limit);
-		$app->setUserState($p.'limitstart', $limitstart);
+		/**
+		 * Set locked filters into state
+		 */
+		if ($this->assocs_id)
+		{
+			$type_id     = $app->getUserStateFromRequest($p . 'type_id', 'type_id', 0, 'int');
+			$item_lang   = $app->getUserStateFromRequest($p . 'item_lang', 'item_lang', '', 'string');
+			$created_by  = $app->getUserStateFromRequest($p . 'created_by', 'created_by', 0, 'int');
+
+			$assocanytrans = JFactory::getUser()->authorise('flexicontent.assocanytrans', 'com_flexicontent');
+
+			// Limit to creator if creator not privileged
+			if (!$assocanytrans && !$created_by)
+			{
+				$created_by = JFactory::getUser()->id;
+
+				$this->setState('created_by', $created_by);
+				$app->setUserState($p . 'created_by', $created_by);
+			}
+
+			// Limit to same type if creator not privileged
+			if (!$assocanytrans && !$type_id)
+			{
+				$this->getTypeData($this->assocs_id, $type_id);
+
+				$this->setState('type_id', $type_id);
+				$app->setUserState($p . 'type_id', $type_id);
+			}
+
+			$filter_type   = $this->assocs_id && $type_id    ? $type_id    : $this->getState('filter_type');
+			$filter_lang   = $this->assocs_id && $item_lang  ? $item_lang  : $this->getState('filter_lang');
+			$filter_author = $this->assocs_id && $created_by ? $created_by : $this->getState('filter_author');
+
+			$this->setState('filter_type', $filter_type);
+			$this->setState('filter_lang', $filter_lang);
+			$this->setState('filter_author', $filter_author);
+
+			$app->setUserState($p . 'filter_type', $filter_type);
+			$app->setUserState($p . 'filter_lang', $filter_lang);
+			$app->setUserState($p . 'filter_author', $filter_author);
+		}
 	}
 
 
@@ -125,23 +182,27 @@ class FlexicontentModelItemelement extends JModelList
 	 */
 	function getData()
 	{
-		$app     = JFactory::getApplication();
-		$jinput  = $app->input;
-		$cid     = $jinput->get('cid', array(), 'array');
+		// Catch case of guest user submitting in frontend
+		if (!JFactory::getUser()->id)
+		{
+			return $this->_data = array();
+		}
 
-		$assocs_id = $jinput->get('assocs_id', 0, 'int');
 		$lang_assocs = array();
 
-		if ($assocs_id)
+		if ($this->assocs_id)
 		{
-			$lang_assocs = flexicontent_db::getLangAssocs(array($assocs_id));
+			$lang_assocs = flexicontent_db::getLangAssocs(
+				array($this->assocs_id),
+				null
+			);
 		}
 
 		$print_logging_info = $this->cparams->get('print_logging_info');
 		if ( $print_logging_info )  global $fc_run_times;
 
-		// Lets load the Items if it doesn't already exist
-		if ( $this->_data === null )
+		// Lets load the records if it doesn't already exist
+		if ($this->_data === null)
 		{
 			if (1)
 			{
@@ -171,18 +232,18 @@ class FlexicontentModelItemelement extends JModelList
 			$_data = array();
 			if (count($query_ids))
 			{
-				$_data = $this->_db->setQuery($query)->loadObjectList('item_id');
+				$_data = $this->_db->setQuery($query)->loadObjectList('id');
 			}
 			if ( $print_logging_info ) @$fc_run_times['execute_sec_queries'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 
 			// 5, reorder items and get cat ids
 			$this->_data = array();
-			foreach($query_ids as $item_id)
+			foreach($query_ids as $id)
 			{
-				$item = $_data[$item_id];
+				$item = $_data[$id];
 				$this->_data[] = $item;
 
-				if (isset($lang_assocs[$assocs_id][$item_id]))
+				if (isset($lang_assocs[$this->assocs_id][$id]))
 				{
 					$item->is_current_association = 1;
 				}
@@ -205,10 +266,10 @@ class FlexicontentModelItemelement extends JModelList
 		// Catch case of guest user submitting in frontend
 		if (!JFactory::getUser()->id)
 		{
-			return array();
+			return $this->_total = 0;
 		}
 
-		// Lets load the records if it doesn't already exist
+		// Lets load the records if it was not calculated already via using SQL_CALC_FOUND_ROWS + 'SELECT FOUND_ROWS()'
 		if ($this->_total === null)
 		{
 			$query = $this->_buildQuery();
@@ -240,212 +301,129 @@ class FlexicontentModelItemelement extends JModelList
 
 
 	/**
-	 * Method to build the query for the Items
+	 * Method to build the query for the records
 	 *
-	 * @access private
-	 * @return string
-	 * @since 1.0
+	 * @return  JDatabaseQuery   The DB Query object
+	 *
+	 * @since   3.3.0
 	 */
-	function _buildQuery($query_ids = false)
+	protected function _buildQuery($query_ids = false)
 	{
 		if (!$query_ids)
 		{
-			$query = 'SELECT SQL_CALC_FOUND_ROWS i.id'
-				. ' FROM #__flexicontent_items_tmp AS i'
-				. ' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id'
-				. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'
-				. ' LEFT JOIN #__viewlevels as level ON level.id = i.access'
-				. ' LEFT JOIN #__users as ua ON ua.id = i.created_by'
-				. ' LEFT JOIN #__flexicontent_types AS t ON t.id = ie.type_id'
-				. ' LEFT JOIN #__categories AS c ON i.catid = c.id'
-				. $this->_buildContentWhere()
-				. ' GROUP BY i.id'
-				. $this->_buildContentOrderBy()
-				;
+			$query = $this->_db->getQuery(true)
+				->select('SQL_CALC_FOUND_ROWS a.id')
+				->select('ua.name AS author')
+				->select('t.name AS type_name')
+				->from('#__flexicontent_items_tmp AS a')
+				->join('LEFT', '#__users as ua ON ua.id = a.' . $this->created_by_col)
+				->join('LEFT', '#__flexicontent_items_ext AS ie ON ie.item_id = a.id')
+				->join('LEFT', '#__flexicontent_types AS t ON t.id = ie.type_id')
+				->join('LEFT', '#__flexicontent_cats_item_relations AS rel ON rel.itemid = a.id')
+				->join('LEFT', '#__categories AS c ON a.catid = c.id')
+			;
+
+			// Get the WHERE, HAVING and ORDER BY clauses for the query
+			$this->_buildContentWhere($query);
+			$this->_buildContentHaving($query);
+			$this->_buildContentOrderBy($query);
+
+			// Add always-active ("hard") filters
+			$this->_buildHardFiltersWhere($query);
 		}
 		else
 		{
-			$query = 'SELECT i.*, ie.item_id as item_id, i.language AS lang'
-				. ', ua.name AS author, t.name AS type_name, CASE WHEN level.title IS NULL THEN CONCAT_WS(\'\', \'deleted:\', i.access) ELSE level.title END AS access_level'
-				. ' FROM #__flexicontent_items_tmp AS i'
-				. ' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id'
-				. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'
-				. ' LEFT JOIN #__viewlevels as level ON level.id = i.access'
-				. ' LEFT JOIN #__users as ua ON ua.id = i.created_by'
-				. ' LEFT JOIN #__flexicontent_types AS t ON t.id = ie.type_id'
-				. ' LEFT JOIN #__categories AS c ON i.catid = c.id'
-				. ' WHERE i.id IN ('. implode(',', $query_ids) .')'
-				. ' GROUP BY i.id'
-				;
+			$query = $this->_db->getQuery(true)
+				->select('a.*')
+				->select('CASE WHEN level.title IS NULL THEN CONCAT_WS(\'\', \'deleted:\', a.access) ELSE level.title END AS access_level')
+				->select('ua.name AS author')
+				->select('t.name AS type_name')
+				->from('#__' . $this->records_dbtbl . ' AS a')
+				->join('LEFT', '#__viewlevels as level ON level.id = a.access')
+				->join('LEFT', '#__users as ua ON ua.id = a.' . $this->created_by_col)
+				->join('LEFT', '#__flexicontent_items_ext AS ie ON ie.item_id = a.id')
+				->join('LEFT', '#__flexicontent_types AS t ON t.id = ie.type_id')
+				->join('LEFT', '#__flexicontent_cats_item_relations AS rel ON rel.itemid = a.id')
+				->join('LEFT', '#__categories AS c ON a.catid = c.id')
+				->where('a.id IN (' . implode(',', $query_ids) . ')')
+				->group('a.id');
 		}
 
-		//echo $query ."<br/><br/>";
+		//echo nl2br(str_replace('#__', 'jos_', $query));
+		//echo str_replace('#__', 'jos_', $query->__toString());
+
 		return $query;
-	}
-
-
-	/**
-	 * Method to build the orderby clause of the query for the Items
-	 *
-	 * @access private
-	 * @return string
-	 */
-	function _buildContentOrderBy($query = null)
-	{
-		$app = JFactory::getApplication();
-		$jinput  = $app->input;
-		$option  = $jinput->get('option', '', 'cmd');
-		$view    = $jinput->get('view', '', 'cmd');
-
-		$filter_order     = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_order',     'filter_order',     'i.ordering', 'cmd' );
-		$filter_order_Dir = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_order_Dir', 'filter_order_Dir', '',           'cmd' );
-
-		$orderby = $filter_order.' '.$filter_order_Dir . ($filter_order != 'i.ordering' ? ', i.ordering' : '');
-		if ($query)
-			$query->order($orderby);
-		else
-			return ' ORDER BY '. $orderby;
 	}
 
 
 	/**
 	 * Method to build the where clause of the query for the records
 	 *
-	 * @access private
-	 * @return string
+	 * @param		JDatabaseQuery|bool   $q   DB Query object or bool to indicate returning an array or rendering the clause
+	 *
+	 * @return  JDatabaseQuery|array
+	 *
+	 * @since   3.3.0
 	 */
-	function _buildContentWhere($query = null)
+	protected function _buildContentWhere($q = false)
 	{
-		$app    = JFactory::getApplication();
-		$user   = JFactory::getUser();
+		// Inherited filters : filter_state, filter_access, filter_lang, filter_author, filter_id, search
+		$where = parent::_buildContentWhere(false);
 
-		$jinput  = $app->input;
-		$option  = $jinput->get('option', '', 'cmd');
-		$view    = $jinput->get('view', '', 'cmd');
-
-		$assocs_id = $jinput->get('assocs_id', 0, 'int');
-
-		if ($assocs_id)
-		{
-			$type_id     = $app->getUserStateFromRequest( $option.'.'.$view.'.type_id', 'type_id', 0, 'int' );
-			$item_lang   = $app->getUserStateFromRequest( $option.'.'.$view.'.item_lang', 'item_lang', '', 'string' );
-			$created_by  = $app->getUserStateFromRequest( $option.'.'.$view.'.created_by', 'created_by', 0, 'int' );
-
-			$assocanytrans = $user->authorise('flexicontent.assocanytrans', 'com_flexicontent');
-
-			// Limit to creator if creator not privileged
-			if (!$assocanytrans && !$created_by)
-			{
-				$created_by = $user->id;
-				$app->setUserState( $option.'.'.$view.'.created_by', $created_by );
-			}
-
-			// Limit to same type if creator not privileged
-			if (!$assocanytrans && !$type_id)
-			{
-				$this->getTypeData($assocs_id, $type_id);
-				$app->setUserState( $option.'.'.$view.'.type_id', $type_id );
-			}
-		}
-
-		$filter_state  = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_state', 'filter_state', '', 'cmd' );
-		$filter_cats   = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_cats',  'filter_cats',  0,  'int' );
-
-		$filter_type   = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_type',  'filter_type',  0,  'int' );
-		$filter_lang   = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_lang',  'filter_lang',  '', 'string' );
-		$filter_author = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_author','filter_author','', 'cmd' );
-		$filter_access = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_access','filter_access','', 'int' );
-
-		$filter_type   = $assocs_id && $type_id    ? $type_id    : $filter_type;
-		$filter_lang   = $assocs_id && $item_lang  ? $item_lang  : $filter_lang;
-		$filter_author = $assocs_id && $created_by ? $created_by : $filter_author;
-
-		$search = $app->getUserStateFromRequest( $option.'.'.$view.'.search', 'search', '', 'string' );
-		$search = StringHelper::trim( StringHelper::strtolower( $search ) );
-
-		$where = array();
-		$where[] = "c.extension = '".FLEXI_CAT_EXTENSION."' ";
-
-		// Filter by publications state
-		if (is_numeric($filter_state)) {
-			$where[] = 'i.state = ' . (int) $filter_state;
-		}
-		/*elseif ( $filter_state === '') {
-			$where[] = 'i.state IN (0, 1)';
-		}*/
-		elseif ( $filter_state ) {
-			if ( $filter_state == 'P' ) {
-				$where[] = 'i.state = 1';
-			} else if ($filter_state == 'U' ) {
-				$where[] = 'i.state = 0';
-			} else if ($filter_state == 'PE' ) {
-				$where[] = 'i.state = -3';
-			} else if ($filter_state == 'OQ' ) {
-				$where[] = 'i.state = -4';
-			} else if ($filter_state == 'IP' ) {
-				$where[] = 'i.state = -5';
-			} else if ($filter_state == 'A' ) {
-				$where[] = 'i.state = 2';
-			}
-		}
-
-		// Filter by Access level
-		if ($filter_access) {
-			$where[] = 'i.access = '.(int) $filter_access;
-		}
+		// Various filters
+		$filter_cats     = $this->getState('filter_cats');
+		$filter_type     = $this->getState('filter_type');
 
 		// Filter by assigned category
-		if ( $filter_cats ) {
+		if ($filter_cats)
+		{
 			$where[] = 'rel.catid = ' . $filter_cats;
 		}
 
-		// Filter by type.
-		if ( $filter_type ) {
-			$where[] = 'ie.type_id = ' . $filter_type;
-		}
-
-		// Filter by language
-		if ( $filter_lang ) {
-			$where[] = 'i.language = ' . $this->_db->Quote($filter_lang);
-		}
-
-		// Filter by author / owner
-		if ( strlen($filter_author) ) {
-			$where[] = 'i.created_by = ' . $filter_author;
-		}
-
-		// Filter via View Level Access, if user is not super-admin
-		if (!JFactory::getUser()->authorise('core.admin') && ($app->isSite() || $this->listViaAccess))
+		// Filter by type
+		if ($filter_type)
 		{
-			$groups	= implode(',', JAccess::getAuthorisedViewLevels($user->id));
-			$where[] = 'i.access IN ('.$groups.')';
+			$where[] = 'ie.type_id = ' . (int) $filter_type;
 		}
 
-		// Filter by search word (can be also be  id:NN  OR author:AAAAA)
-		if ( !empty($search) ) {
-			if (stripos($search, 'id:') === 0) {
-				$where[] = 'i.id = '.(int) substr($search, 3);
-			}
-			elseif (stripos($search, 'author:') === 0) {
-				$search = $this->_db->Quote('%'.$this->_db->escape(substr($search, 7), true).'%');
-				$where[] = '(ua.name LIKE '.$search.' OR ua.username LIKE '.$search.')';
-			}
-			else {
-				$search = $this->_db->Quote('%'.$this->_db->escape($search, true).'%');
-				$where[] = '(i.title LIKE '.$search.' OR i.alias LIKE '.$search.')';
-			}
+		if ($q instanceof \JDatabaseQuery)
+		{
+			return $where ? $q->where($where) : $q;
 		}
 
-		if ($query)
-			foreach($where as $w) $query->where($w);
-		else
-			return count($where) ? ' WHERE '.implode(' AND ', $where) : '';
+		return $q
+			? ' WHERE ' . (count($where) ? implode(' AND ', $where) : ' 1 ')
+			: $where;
 	}
 
 
 	/**
-	 * MODEL SPECIFIC HELPER FUNCTIONS
+	 * Method to get item (language) associations
+	 *
+	 * @param		array   $ids       An array of records is
+	 * @param		object  $config    An object with configuration for getting associations
+	 *
+	 * @return	array   An array with associations of the records list
+	 *
+	 * @since   3.3.0
 	 */
+	public function getLangAssocs($ids = null, $config = null)
+	{
+		$config = $config ?: (object) array(
+			'table'    => $this->records_dbtbl,
+			'context'  => 'com_content.item',
+			'created'  => 'created',
+			'modified' => 'modified',
+		);
+
+		return parent::getLangAssocs($ids, $config);
+	}
+
+
+	/**
+	 * START OF MODEL SPECIFIC METHODS
+	 */
+
 
 	/**
 	 * Method to get types list
@@ -456,26 +434,6 @@ class FlexicontentModelItemelement extends JModelList
 	function getTypeslist ($type_ids = false, $check_perms = false, $published = true)
 	{
 		return flexicontent_html::getTypesList($type_ids, $check_perms, $published);
-	}
-
-
-	/**
-	 * Method to get author list for filtering
-	 *
-	 * @return array
-	 * @since 1.5
-	 */
-	function getAuthorslist ()
-	{
-		$query = 'SELECT i.created_by AS id, ua.name AS name'
-				. ' FROM #__content AS i'
-				. ' LEFT JOIN #__users as ua ON ua.id = i.created_by'
-				. ' GROUP BY i.created_by'
-				. ' ORDER BY ua.name'
-				;
-		$this->_db->setQuery($query);
-
-		return $this->_db->loadObjectList();
 	}
 
 
@@ -503,36 +461,5 @@ class FlexicontentModelItemelement extends JModelList
 
 		$type_data = $this->getTypeslist();
 		return isset($type_data[$type_id])  ?  $type_data[$type_id]  :  false;
-	}
-
-
-	/**
-	 * Method to get item (language) associations
-	 *
-	 * @param		int			The id of the item
-	 *
-	 * @return	array		The array of associations
-	 */
-	function getLangAssocs()
-	{
-		// If items array is empty, just return empty array
-		if (empty($this->_data))
-		{
-			return array();
-		}
-
-		// Get associated translations
-		elseif ($this->_translations === null)
-		{
-			$ids = array();
-			foreach ($this->_data as $item)
-			{
-				$ids[] = $item->id;
-			}
-
-			$this->_translations = flexicontent_db::getLangAssocs($ids);
-		}
-
-		return $this->_translations;
 	}
 }

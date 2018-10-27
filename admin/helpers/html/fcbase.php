@@ -212,6 +212,7 @@ abstract class JHtmlFcbase
 	 *   'option' : component name,
 	 *   'keyprop' : property with the record id,
 	 *   'onclick' : onclick JS, we will create a link, like this: <a onclick="..." href="javascript:;" data-href="URL">...</a>
+	 *   'noTitle' : do add title text inside the link
 	 *   'useModal' : create a modal, link will be same as onclick above
 	 *   'attribs' : attributes of the link (except for onclick which must be given seperately)
 	 *
@@ -233,7 +234,7 @@ abstract class JHtmlFcbase
 			? htmlspecialchars(StringHelper::substr($title, 100), ENT_QUOTES, 'UTF-8') . '...'
 			: htmlspecialchars($title, ENT_QUOTES, 'UTF-8');
 
-		// Escape & title length
+		// Escape & translate
 		$title_escaped = htmlspecialchars($title_cut, ENT_QUOTES, 'UTF-8');
 		$title_untranslated = $title !== $row->{static::$title_propname} ? '<br/><small>[ ' . $title_escaped . ' ]</small>' : '';
 
@@ -248,27 +249,11 @@ abstract class JHtmlFcbase
 		$ctrl      = isset($config['ctrl']) ? $config['ctrl'] : static::$name;
 		$keyname   = isset($config['keyname']) ? $config['keyname'] : 'id';
 
-		// By default icon is Off so that it can be added outside the link 
-		$iconOnly  = isset($config['iconOnly']) ? $config['iconOnly'] : false;
-		$iconClass = isset($config['iconClass']) ? $config['iconClass'] : ($iconOnly ? 'icon-pencil' : false);
+		// HTML before the link
+		$nolinkPrefix = isset($config['nolinkPrefix']) ? $config['nolinkPrefix'] : '';
 
-		if (!empty($config['nolinkPrefix']))
-		{
-			$nolinkPrefix = $config['nolinkPrefix'];
-		}
-		else
-		{
-			$nolinkPrefix = $iconClass && !$iconOnly ? '<span class="' . $iconClass . '"></span>' : '';
-		}
-
-		if (!empty($config['linkedPrefix']))
-		{
-			$linkedPrefix = $config['linkedPrefix'];
-		}
-		else
-		{
-			$linkedPrefix = $iconClass && $iconOnly ? '<span class="' . $iconClass . '"></span>' : '';
-		}
+		// HTML at the start of the link 
+		$linkedPrefix = isset($config['linkedPrefix']) ? $config['linkedPrefix'] : '';
 
 		// The edit link
 		$edit_task = 'task=' . $ctrl . '.edit';
@@ -305,7 +290,7 @@ abstract class JHtmlFcbase
 			return $nolinkPrefix . '
 			<a href="javascript:;" data-href="' . $edit_link . '" ' . $attrs . '>
 				' . $linkedPrefix . '
-				' . ($iconOnly ? '' : $title_escaped) . '
+				' . (empty($config['noTitle']) ? $title_escaped : '') . '
 			</a>';
 		}
 		else
@@ -313,9 +298,9 @@ abstract class JHtmlFcbase
 			return $nolinkPrefix . '
 			<a href="' . $edit_link . '" ' . $attrs . '>
 				' . $linkedPrefix . '
-				' . ($iconOnly ? '' : $title_escaped) . '
+				' . (empty($config['noTitle']) ? $title_escaped : '') . '
 			</a>
-			' . ($iconOnly ? '' : $title_untranslated);
+			' . (empty($config['noTitle']) ? $title_untranslated : '');
 		}
 	}
 
@@ -507,6 +492,36 @@ abstract class JHtmlFcbase
 		if (!empty($text))
 		{
 			echo '<span class="icon-info ' . static::$tooltip_class . '" title="' . flexicontent_html::getToolTip(JText::_('FLEXI_FIELD_DESCRIPTION', true), $text, 0, 1) . '"></span>';
+		}
+	}
+
+
+	/**
+	 * Create the language display icon or text of a row
+	 *
+	 * @param   object   $row        The row
+	 * @param   int      $i          Row number
+	 * @param   array    $langs      Data of available languages
+	 * @param   bool     $use_icon   Create an flag icon instead of textual display
+	 * @param   string   $undefined  Language string for non-set language
+	 *
+	 * @return  string       HTML code
+	 */
+	public static function lang_display($row, $i, $langs, $use_icon = false, $undefined = 'JUNDEFINED')
+	{
+		if ($use_icon && !empty($row->language) && !empty($langs->{$row->language}->imgsrc))
+		{
+			return '<img class="' . static::$tooltip_class . '" '.
+				' title=' . flexicontent_html::getToolTip(JText::_('FLEXI_LANGUAGE'), ($row->language === '*' ? JText::_('FLEXI_ALL') : (!empty($row->language) ? $langs->{$row->language}->name : '')), 0, 1) . '" ' .
+				' src="' . $langs->{$row->language}->imgsrc . '" alt="'. $row->language . '" />';
+		}
+		elseif ($row->language === '*')
+		{
+			return JText::alt('JALL','language');
+		}
+		else
+		{
+			return !empty($row->language) ? $langs->{$row->language}->name : JText::_($undefined);
 		}
 	}
 }

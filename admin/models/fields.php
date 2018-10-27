@@ -84,13 +84,6 @@ class FlexicontentModelFields extends FCModelAdminList
 	 */
 	var $_pagination = null;
 
-	/**
-	 * Single record id (used in operations)
-	 *
-	 * @var int
-	 */
-	var $_id = null;
-
 
 	/**
 	 * Constructor
@@ -106,7 +99,7 @@ class FlexicontentModelFields extends FCModelAdminList
 		$option = $jinput->get('option', '', 'cmd');
 		$view   = $jinput->get('view', '', 'cmd');
 		$fcform = $jinput->get('fcform', 0, 'int');
-		$p      = $option . '.' . $view . '.';
+		$p      = $this->ovid;
 
 
 		/**
@@ -174,9 +167,9 @@ class FlexicontentModelFields extends FCModelAdminList
 	/**
 	 * Method to build the query for the records
 	 *
-	 * @return JDatabaseQuery   The DB Query object
+	 * @return  JDatabaseQuery   The DB Query object
 	 *
-	 * @since 3.3.0
+	 * @since   3.3.0
 	 */
 	protected function getListQuery()
 	{
@@ -201,7 +194,7 @@ class FlexicontentModelFields extends FCModelAdminList
 	 *
 	 * @return  JDatabaseQuery|array
 	 *
-	 * @since 1.0
+	 * @since   3.3.0
 	 */
 	protected function _buildContentWhere($q = false)
 	{
@@ -624,7 +617,7 @@ class FlexicontentModelFields extends FCModelAdminList
 	 *
 	 * @return	void
 	 *
-	 * @since		3.3.0
+	 * @since   3.3.0
 	 */
 	protected function _deleteRelatedData($cid)
 	{
@@ -662,7 +655,7 @@ class FlexicontentModelFields extends FCModelAdminList
 	 *
 	 * @return	array		Array of old-to new record ids of copied record IDs
 	 *
-	 * @since		1.0
+	 * @since   3.3.0
 	 */
 	public function copy($cid, $copyRelations = null)
 	{
@@ -720,7 +713,7 @@ class FlexicontentModelFields extends FCModelAdminList
 	 *
 	 * @return	void
 	 *
-	 * @since		3.3.0
+	 * @since   3.3.0
 	 */
 	protected function _copyRelatedData($ids_map)
 	{
@@ -789,6 +782,8 @@ class FlexicontentModelFields extends FCModelAdminList
 	 * @param		string    $tostate  action related to assignments
 	 *
 	 * @return	array     The records having assignments
+	 *
+	 * @since   3.3.0
 	 */
 	public function filterByAssignments($cid = array(), $tostate = -2)
 	{
@@ -834,7 +829,7 @@ class FlexicontentModelFields extends FCModelAdminList
 		$option = $jinput->get('option', '', 'cmd');
 		$view   = $jinput->get('view', '', 'cmd');
 		$fcform = $jinput->get('fcform', 0, 'int');
-		$p      = $option . '.' . $view . '.';
+		$p      = $this->ovid;
 
 		$default_order     = $this->default_order;
 		$default_order_dir = $this->default_order_dir;

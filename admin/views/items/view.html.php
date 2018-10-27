@@ -249,13 +249,14 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 
 		$bind_limit = $jinput->get('bind_limit', ($unassociated >= 1000 ? 1000 : 250), 'int');
 
-		$rows     	= $model->getData();
-		$pagination	= $model->getPagination();
-		$types			= $model->getTypeslist();
-		$authors		= $model->getAuthorslist();
-		// these depend on data rows and must be called after getting data
-		$extraCols  = $model->getExtraCols();
-		$customFilts= $model->getCustomFilts();
+		$rows        = $model->getItems();
+		$pagination  = $model->getPagination();
+		$types       = $model->getTypeslist();
+		$authors     = $model->getAuthorslist();
+
+		// These depend on data rows and must be called after getting data
+		$extraCols   = $model->getExtraCols();
+		$customFilts = $model->getCustomFilts();
 
 		foreach($customFilts as $filter)
 		{
@@ -265,8 +266,8 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 			}
 		}
 
-		$itemCats   = $model->getItemCats();
-		$itemTags   = $model->getItemTags();
+		$itemCats    = $model->getItemCats();
+		$itemTags    = $model->getItemTags();
 
 		// Get Field values to be used for rendering custom columns
 		if ($extraCols)
@@ -274,12 +275,9 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 			FlexicontentFields::getFields($rows, 'category');
 		}
 
-		if ($useAssocs)
-		{
-			$langAssocs = $this->get('LangAssocs');
-		}
-		$langs = FLEXIUtilities::getLanguages('code');
-		$categories = $globalcats ?: array();
+		$lang_assocs = $useAssocs ? $model->getLangAssocs() : array();
+		$langs       = FLEXIUtilities::getLanguages('code');
+		$categories  = $globalcats ?: array();
 
 
 		$drag_reorder_max = 200;
@@ -331,56 +329,6 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 
 		$lists = array();
 
-		// Build publication state filter
-		$states 	= array();
-		//$states[]['items'][] = array('value' => '', 'text' => '-' /*JText::_('FLEXI_SELECT_STATE')*/);
-
-		$grp = 'single_status_states';
-		$states[$grp] = array();
-		$states[$grp]['id'] = 'single_status_states';
-		$states[$grp]['text'] = JText::_('FLEXI_SINGLE_STATUS');
-		$states[$grp]['items'] = array(
-			array('value' => 'P', 'text' => JText::_('FLEXI_PUBLISHED')),
-			array('value' => 'U', 'text' => JText::_('FLEXI_UNPUBLISHED')),
-			array('value' => 'PE', 'text' => JText::_('FLEXI_PENDING')),
-			array('value' => 'OQ', 'text' => JText::_('FLEXI_TO_WRITE')),
-			array('value' => 'IP', 'text' => JText::_('FLEXI_IN_PROGRESS')),
-			array('value' => 'RV', 'text' => JText::_('FLEXI_REVISED_VER')),
-			array('value' => 'A', 'text' => JText::_('FLEXI_ARCHIVED')),
-			array('value' => 'T', 'text' => JText::_('FLEXI_TRASHED'))
-		);
-
-		$grp = 'status_groups_states';
-		$states[$grp] = array();
-		$states[$grp]['id'] = 'status_groups_states';
-		$states[$grp]['text'] = JText::_('FLEXI_STATUS_GROUPS');
-		$states[$grp]['items'] = array(
-			array('value' => 'ALL', 'text' => JText::_('FLEXI_GRP_ALL') . ' ' . JText::_('FLEXI_STATE_S')),
-			array('value' => 'ALL_P', 'text' => JText::_('FLEXI_GRP_PUBLISHED') . ' ' . JText::_('FLEXI_STATE_S')),
-			array('value' => 'ALL_U', 'text' => JText::_('FLEXI_GRP_UNPUBLISHED') . ' ' . JText::_('FLEXI_STATE_S')),
-			array('value' => 'ORPHAN', 'text' => JText::_('FLEXI_GRP_ORPHAN'))
-		);
-
-		$lists['filter_state'] = $this->getFilterDisplay(array(
-			'label' => JText::_('FLEXI_STATE'),
-			'html' => JHtml::_('select.groupedlist', $states, 'filter_state[]',
-				array(
-					'id' => 'filter_state',
-					'group.id' => 'id',
-					'list.attr' => array(
-						'class' => $this->select_class,
-						'multiple' => 'multiple',
-						'size' => '3',
-						'onmouseenter' => 'if (typeof this.oVal == \'undefined\') this.oVal = jQuery(this).val(); this.valChanged = false;',
-						'onchange' => 'this.valChanged = JSON.stringify(this.oVal) !== JSON.stringify(jQuery(this).val()); if (this.valChanged && this != document.activeElement) {document.adminForm.limitstart.value=0; Joomla.submitform();}',
-						'onblur' => 'this.oVal = jQuery(this).val(); if (this.valChanged) {document.adminForm.limitstart.value=0; Joomla.submitform();}',
-					),
-					'list.select' => $filter_state,
-				)
-			),
-			//JHtml::_('grid.state', $filter_state),
-		));
-
 
 		// Build include sub-categories filter
 		$subcats_na = $filter_order_type && $filter_cats && ($filter_order === 'i.ordering' || $filter_order === 'catsordering');
@@ -402,17 +350,20 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 
 
 		// Build featured filter
-		$featured_ops = array(
+		$options = array(
 			JHtml::_('select.option', '', '-'),
 			JHtml::_('select.option', '0', JText::_('FLEXI_NO')),
 			JHtml::_('select.option', '1', JText::_('FLEXI_YES')),
 		);
 
+		$fieldname = 'filter_featured';
+		$elementid = 'filter_featured';
+
 		$lists['filter_featured'] = $this->getFilterDisplay(array(
 			'label' => JText::_('FLEXI_FEATURED'),
 			'html' => JHtml::_('select.genericlist',
-				$featured_ops,
-				'filter_featured',
+				$options,
+				$fieldname,
 				array(
 					'size' => '1',
 					'class' => $this->select_class,
@@ -421,23 +372,23 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 				'value',
 				'text',
 				$filter_featured,
-				'filter_featured',
+				$elementid,
 				$translate = true
 			),
 		));
 
 
 		// Build category-state filter
-		$catsinstate[1] = JText::_( 'FLEXI_PUBLISHED' );
-		$catsinstate[0] = JText::_( 'FLEXI_UNPUBLISHED' );
-		$catsinstate[99] = JText::_( 'FLEXI_ANY' );
-		$catsinstate[2] = JText::_( 'FLEXI_ARCHIVED' );
-		$catsinstate[-2] = JText::_( 'FLEXI_TRASHED' );
-		$_catsinstate = array();
-		foreach ($catsinstate as $i => $v)
-		{
-			$_catsinstate[] = JHtml::_('select.option', $i, $v);
-		}
+		$options = array(
+			JHtml::_('select.option', 1, 'FLEXI_PUBLISHED'),
+			JHtml::_('select.option', 0, 'FLEXI_UNPUBLISHED'),
+			JHtml::_('select.option', 99, 'FLEXI_UNPUBLISHED'),
+			JHtml::_('select.option', 2, 'FLEXI_ARCHIVED'),
+			JHtml::_('select.option', -2, 'FLEXI_TRASHED'),
+		);
+
+		$fieldname = 'filter_catsinstate';
+		$elementid = 'filter_catsinstate';
 
 		$lists['filter_catsinstate'] = $this->getFilterDisplay(array(
 			'label' => JText::_('FLEXI_IN_CAT_STATE'),
@@ -447,8 +398,8 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 				'title' => flexicontent_html::getToolTip(JText::_('FLEXI_LIST_ITEMS_IN_CATS', true), JText::_('FLEXI_LIST_ITEMS_IN_CATS_DESC', true), 0, 1),
 			),
 			'html' => JHtml::_('select.genericlist',
-				$_catsinstate,
-				'filter_catsinstate',
+				$options,
+				$fieldname,
 				array(
 					'size' => '1',
 					'class' => $this->select_class,
@@ -457,13 +408,14 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 				'value',
 				'text',
 				$filter_catsinstate,
-				'filter_catsinstate'
-			)
+				$elementid
+			),
 		));
 
-		//$lists['filter_catsinstate'] = JHtml::_('select.radiolist', $_catsinstate, 'filter_catsinstate', 'size="1" class="inputbox" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', 'value', 'text', $filter_catsinstate );
-		/*$lists['filter_catsinstate']  = '';
-		foreach ($catsinstate as $i => $v) {
+		/*$lists['filter_catsinstate'] = JHtml::_('select.radiolist', $options, 'filter_catsinstate', 'size="1" class="inputbox" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', 'value', 'text', $filter_catsinstate );
+		$lists['filter_catsinstate']  = '';
+		foreach ($catsinstate as $i => $v)
+		{
 			$checked = $filter_catsinstate == $i ? ' checked="checked" ' : '';
 			$lists['filter_catsinstate'] .= '<input type="radio" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()" class="inputbox" '.$checked.' value="'.$i.'" id="filter_catsinstate'.$i.'" name="filter_catsinstate" />';
 			$lists['filter_catsinstate'] .= '<label class="" id="filter_catsinstate'.$i.'-lbl" for="filter_catsinstate'.$i.'">'.$v.'</label>';
@@ -533,53 +485,62 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 					'size' => '1',
 					'onchange' => 'document.adminForm.limitstart.value=0; Joomla.submitform();',
 				),
-				$check_published=false,
-				$check_perms=false
+				$check_published = false,
+				$check_perms = false
 			),
 		));
 
 
 		// Build item type filter
-		$lists['filter_type'] = $this->getFilterDisplay(array(
-			'label' => JText::_('FLEXI_TYPE'),
-			'html' => flexicontent_html::buildtypesselect(
-				$types,
-				'filter_type[]',
-				$filter_type,
-				0,
-				array(
-					'class' => $this->select_class,
-					'multiple' => 'multiple',
-					'size' => '3',
-					'onmouseenter' => 'if (typeof this.oVal == \'undefined\') this.oVal = jQuery(this).val(); this.valChanged = false;',
-					'onchange' => 'this.valChanged = JSON.stringify(this.oVal) !== JSON.stringify(jQuery(this).val()); if (this.valChanged && this != document.activeElement) {document.adminForm.limitstart.value=0; Joomla.submitform();}',
-					'onblur' => 'this.oVal = jQuery(this).val(); if (this.valChanged) {document.adminForm.limitstart.value=0; Joomla.submitform();}',
+		if (1)
+		{
+			$lists['filter_type'] = $this->getFilterDisplay(array(
+				'label' => JText::_('FLEXI_TYPE'),
+				'html' => flexicontent_html::buildtypesselect(
+					$types,
+					'filter_type[]',
+					$filter_type,
+					$displaytype = 0,
+					array(
+						'class' => $this->select_class,
+						'multiple' => 'multiple',
+						'size' => '3',
+						'onmouseenter' => 'if (typeof this.oVal == \'undefined\') this.oVal = jQuery(this).val(); this.valChanged = false;',
+						'onchange' => 'this.valChanged = JSON.stringify(this.oVal) !== JSON.stringify(jQuery(this).val()); if (this.valChanged && this != document.activeElement) {document.adminForm.limitstart.value=0; Joomla.submitform();}',
+						'onblur' => 'this.oVal = jQuery(this).val(); if (this.valChanged) {document.adminForm.limitstart.value=0; Joomla.submitform();}',
+					),
+					'filter_type'
 				),
-				'filter_type'
-			),
-		));
+			));
+		}
 
 
-		// Build authors filter
-		$lists['filter_author'] = $this->getFilterDisplay(array(
-			'label' => JText::_('FLEXI_AUTHOR'),
-			'html' => flexicontent_html::buildauthorsselect(
-				$authors,
-				$name = 'filter_author[]',
-				$selected = $filter_author,
-				$displaytype = 0,
-				array(
-					'class' => $this->select_class,
-					'multiple' => 'multiple',
-					'size' => '3',
-					'onmouseenter' => 'if (typeof this.oVal == \'undefined\') this.oVal = jQuery(this).val(); this.valChanged = false;',
-					'onchange' => 'this.valChanged = JSON.stringify(this.oVal) !== JSON.stringify(jQuery(this).val()); if (this.valChanged && this != document.activeElement) {document.adminForm.limitstart.value=0; Joomla.submitform();}',
-					'onblur' => 'this.oVal = jQuery(this).val(); if (this.valChanged) {document.adminForm.limitstart.value=0; Joomla.submitform();}',
-				)
-			),
-		));
+		// Build author filter
+		if (1)
+		{
+			$lists['filter_author'] = $this->getFilterDisplay(array(
+				'label' => JText::_('FLEXI_AUTHOR'),
+				'html' => flexicontent_html::buildauthorsselect(
+					$authors,
+					$name = 'filter_author[]',
+					$selected = $filter_author,
+					$displaytype = 0,
+					array(
+						'class' => $this->select_class,
+						'multiple' => 'multiple',
+						'size' => '3',
+						'onmouseenter' => 'if (typeof this.oVal == \'undefined\') this.oVal = jQuery(this).val(); this.valChanged = false;',
+						'onchange' => 'this.valChanged = JSON.stringify(this.oVal) !== JSON.stringify(jQuery(this).val()); if (this.valChanged && this != document.activeElement) {document.adminForm.limitstart.value=0; Joomla.submitform();}',
+						'onblur' => 'this.oVal = jQuery(this).val(); if (this.valChanged) {document.adminForm.limitstart.value=0; Joomla.submitform();}',
+					)
+				),
+			));
+		}
 
-		if ($badcatitems) $lists['default_cat'] = flexicontent_cats::buildcatselect($categories, 'default_cat', '', 2, 'class="use_select2_lib"', false, false);
+		if ($badcatitems)
+		{
+			$lists['default_cat'] = flexicontent_cats::buildcatselect($categories, 'default_cat', '', 2, 'class="use_select2_lib"', false, false);
+		}
 
 
 		// Build text search scope 
@@ -720,22 +681,80 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 		));
 
 
-		// Build languages filter
-		$lists['filter_lang'] = $this->getFilterDisplay(array(
-			'label' => JText::_('FLEXI_LANGUAGE'),
-			'html' => flexicontent_html::buildlanguageslist(
-				$name = 'filter_lang[]',
-				array(
-					'class' => $this->select_class,
-					'multiple' => 'multiple',
-					'size' => '3',
-					'onmouseenter' => 'if (typeof this.oVal == \'undefined\') this.oVal = jQuery(this).val(); this.valChanged = false;',
-					'onchange' => 'this.valChanged = JSON.stringify(this.oVal) !== JSON.stringify(jQuery(this).val()); if (this.valChanged && this != document.activeElement) {document.adminForm.limitstart.value=0; Joomla.submitform();}',
-					'onblur' => 'this.oVal = jQuery(this).val(); if (this.valChanged) {document.adminForm.limitstart.value=0; Joomla.submitform();}',
+		// Build language filter
+		if (1)
+		{
+			$lists['filter_lang'] = $this->getFilterDisplay(array(
+				'label' => JText::_('FLEXI_LANGUAGE'),
+				'html' => flexicontent_html::buildlanguageslist(
+					$name = 'filter_lang[]',
+					array(
+						'class' => $this->select_class,
+						'multiple' => 'multiple',
+						'size' => '3',
+						'onmouseenter' => 'if (typeof this.oVal == \'undefined\') this.oVal = jQuery(this).val(); this.valChanged = false;',
+						'onchange' => 'this.valChanged = JSON.stringify(this.oVal) !== JSON.stringify(jQuery(this).val()); if (this.valChanged && this != document.activeElement) {document.adminForm.limitstart.value=0; Joomla.submitform();}',
+						'onblur' => 'this.oVal = jQuery(this).val(); if (this.valChanged) {document.adminForm.limitstart.value=0; Joomla.submitform();}',
+					),
+					$selected = $filter_lang,
+					$displaytype = 1
 				),
-				$selected = $filter_lang,
-				$displaytype = 1
+			));
+		}
+
+		// Build publication state filter
+		$options = array();
+		//$options[]['items'][] = array('value' => '', 'text' => '-' /*JText::_('FLEXI_SELECT_STATE')*/);
+
+		$grp = 'single_status_states';
+		$options[$grp] = array();
+		$options[$grp]['id'] = 'single_status_states';
+		$options[$grp]['text'] = JText::_('FLEXI_SINGLE_STATUS');
+		$options[$grp]['items'] = array(
+			array('value' => 'P', 'text' => JText::_('FLEXI_PUBLISHED')),
+			array('value' => 'U', 'text' => JText::_('FLEXI_UNPUBLISHED')),
+			array('value' => 'PE', 'text' => JText::_('FLEXI_PENDING')),
+			array('value' => 'OQ', 'text' => JText::_('FLEXI_TO_WRITE')),
+			array('value' => 'IP', 'text' => JText::_('FLEXI_IN_PROGRESS')),
+			array('value' => 'RV', 'text' => JText::_('FLEXI_REVISED_VER')),
+			array('value' => 'A', 'text' => JText::_('FLEXI_ARCHIVED')),
+			array('value' => 'T', 'text' => JText::_('FLEXI_TRASHED'))
+		);
+
+		$grp = 'status_groups_states';
+		$options[$grp] = array();
+		$options[$grp]['id'] = 'status_groups_states';
+		$options[$grp]['text'] = JText::_('FLEXI_STATUS_GROUPS');
+		$options[$grp]['items'] = array(
+			array('value' => 'ALL', 'text' => JText::_('FLEXI_GRP_ALL') . ' ' . JText::_('FLEXI_STATE_S')),
+			array('value' => 'ALL_P', 'text' => JText::_('FLEXI_GRP_PUBLISHED') . ' ' . JText::_('FLEXI_STATE_S')),
+			array('value' => 'ALL_U', 'text' => JText::_('FLEXI_GRP_UNPUBLISHED') . ' ' . JText::_('FLEXI_STATE_S')),
+			array('value' => 'ORPHAN', 'text' => JText::_('FLEXI_GRP_ORPHAN'))
+		);
+
+		$fieldname = 'filter_state[]';  // make multivalue
+		$elementid = 'filter_state';
+
+		$lists[$elementid] = $this->getFilterDisplay(array(
+			'label' => JText::_('FLEXI_STATE'),
+			'html' => JHtml::_('select.groupedlist',
+				$options,
+				$fieldname,
+				array(
+					'id' => 'filter_state',
+					'group.id' => 'id',
+					'list.attr' => array(
+						'class' => $this->select_class,
+						'multiple' => 'multiple',
+						'size' => '3',
+						'onmouseenter' => 'if (typeof this.oVal == \'undefined\') this.oVal = jQuery(this).val(); this.valChanged = false;',
+						'onchange' => 'this.valChanged = JSON.stringify(this.oVal) !== JSON.stringify(jQuery(this).val()); if (this.valChanged && this != document.activeElement) {document.adminForm.limitstart.value=0; Joomla.submitform();}',
+						'onblur' => 'this.oVal = jQuery(this).val(); if (this.valChanged) {document.adminForm.limitstart.value=0; Joomla.submitform();}',
+					),
+					'list.select' => $filter_state,
+				)
 			),
+			//JHtml::_('grid.state', $filter_state),
 		));
 
 
@@ -752,6 +771,7 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 		{
 			$_aid_arr = array_flip(JAccess::getAuthorisedViewLevels($user->id));
 			$_levels = array();
+
 			foreach($access_levels as $i => $level)
 			{
 				if (isset($_aid_arr[$level->value]))
@@ -765,7 +785,7 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 				}
 			}
 
-			$access_levels = $_levels;
+			$options = $_levels;
 		}
 		else
 		{
@@ -775,10 +795,10 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 		$fieldname = 'filter_access[]';  // make multivalue
 		$elementid = 'filter_access';
 
-		$lists['filter_access'] = $this->getFilterDisplay(array(
+		$lists[$elementid] = $this->getFilterDisplay(array(
 			'label' => JText::_('FLEXI_ACCESS'),
 			'html' => JHtml::_('select.genericlist',
-				$access_levels,
+				$options,
 				$fieldname,
 				array(
 					'class' => $this->select_class,
@@ -825,7 +845,7 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 					'value',
 					'text',
 					$filter_fileid
-				)
+				),
 			));
 		}
 		else
@@ -847,7 +867,7 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 		$this->itemTags    = $itemTags;
 		$this->extra_fields= $extraCols;
 		$this->custom_filts= $customFilts;
-		$this->lang_assocs = $useAssocs ? $langAssocs : null;
+		$this->lang_assocs = $lang_assocs;
 		$this->langs       = $langs;
 		$this->cid         = $cid;
 		$this->pagination  = $pagination;

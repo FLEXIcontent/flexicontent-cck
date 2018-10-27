@@ -348,14 +348,27 @@ function delAllFilters() {
 
 		<?php
 			$k = 0;
-			for ($i=0, $n=count( $this->rows ); $i < $n; $i++)
+
+			// Add 1 collapsed row to the empty table to allow border styling to apply
+			if (!count($this->rows))
 			{
-				$row = $this->rows[$i];
-				if (!$row->id) continue;
+				echo '<tr class="collapsed_row"><td colspan="'.$list_total_cols.'"></td></tr>';
+			}
+
+			foreach ($this->rows as $i => $row)
+			{
+				if (!$row->id)
+				{
+					continue;
+				}
+
 				$row->groupname = array();
-				foreach($row->usergroups as $row_ugrp_id) {
+
+				foreach($row->usergroups as $row_ugrp_id)
+				{
 					$row->groupname[] = $this->usergroups[$row_ugrp_id]->title;
 				}
+
 				$row->groupname = implode(', ', $row->groupname);
 
 				$users_task = 'task=users.';
@@ -386,7 +399,9 @@ function delAllFilters() {
 					</a>';
 				}
 			?>
-			<tr class="<?php echo "row$k"; ?>">
+
+			<tr class="<?php echo 'row' . ($k % 2); ?>">
+
 				<td class="center">
 					<?php echo $this->pagination->getRowOffset($i); ?>
 				</td>
@@ -442,20 +457,17 @@ function delAllFilters() {
 				</td>
 			</tr>
 			<?php
-				$k = 1 - $k;
-				}
+				$k++;
+			}
 			?>
 		</tbody>
 
-		<tfoot>
-			<tr>
-				<td colspan="<?php echo $list_total_cols; ?>" style="text-align: left;">
-					<?php echo $pagination_footer; ?>
-				</td>
-			</tr>
-		</tfoot>
-
 	</table>
+
+
+	<div>
+		<?php echo $pagination_footer; ?>
+	</div>
 
 
 	<!-- Common management form fields -->

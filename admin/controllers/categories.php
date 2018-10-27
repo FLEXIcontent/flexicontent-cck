@@ -73,8 +73,8 @@ class FlexicontentControllerCategories extends FlexicontentControllerBaseAdmin
 		$this->canManage = FlexicontentHelperPerm::getPerm()->CanCats;
 
 		// Error messages
-		$this->err_locked_recs_unpublish = 'FLEXI_YOU_CANNOT_UNPUBLISH_THESE_RECORDS';
-		$this->err_locked_recs_remove = 'FLEXI_YOU_CANNOT_REMOVE_RECORDS';
+		$this->err_locked_recs_changestate = 'FLEXI_YOU_CANNOT_CHANGE_STATE_OF_THESE_RECORDS_WITH_ASSOCIATED_DATA';
+		$this->err_locked_recs_remove = 'FLEXI_YOU_CANNOT_REMOVE_THESE_RECORDS_WITH_ASSOCIATED_DATA';
 		$this->warn_locked_recs_skipped = 'FLEXI_SKIPPED_RECORDS_WITH_ASSOCIATIONS';
 
 		// Load Joomla 'com_categories' language files
@@ -227,7 +227,7 @@ class FlexicontentControllerCategories extends FlexicontentControllerBaseAdmin
 		if (!$is_authorised)
 		{
 			count($cid_locked)
-				? $app->enqueueMessage(JText::_($this->err_locked_recs_remove), 'error')
+				? $app->enqueueMessage(JText::_($this->err_locked_recs_remove), 'warning')
 				: $app->enqueueMessage(JText::_('FLEXI_ALERTNOTAUTH_TASK'), 'error');
 			$app->setHeader('status', 403, true);
 			$this->setRedirect($this->returnURL);

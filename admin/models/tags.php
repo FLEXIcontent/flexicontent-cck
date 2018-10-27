@@ -23,16 +23,26 @@ require_once('base/baselist.php');
  */
 class FlexicontentModelTags extends FCModelAdminList
 {
-
+	/**
+	 * Record database table
+	 *
+	 * @var string
+	 */
 	var $records_dbtbl  = 'flexicontent_tags';
+
+	/**
+	 * Record jtable name
+	 *
+	 * @var string
+	 */
 	var $records_jtable = 'flexicontent_tags';
 
 	/**
 	 * Column names
 	 */
-	var $state_col   = 'published';
-	var $name_col    = 'name';
-	var $parent_col  = null;
+	var $state_col      = 'published';
+	var $name_col       = 'name';
+	var $parent_col     = null;
 
 	/**
 	 * (Default) Behaviour Flags
@@ -46,6 +56,11 @@ class FlexicontentModelTags extends FCModelAdminList
 	var $search_cols       = array('name', 'alias');
 	var $default_order     = 'a.name';
 	var $default_order_dir = 'ASC';
+
+	/**
+	 * List filters that are always applied
+	 */
+	var $hard_filters = array();
 
 	/**
 	 * Record rows
@@ -69,13 +84,6 @@ class FlexicontentModelTags extends FCModelAdminList
 	var $_pagination = null;
 
 	/**
-	 * Single record id (used in operations)
-	 *
-	 * @var int
-	 */
-	var $_id = null;
-
-	/**
 	 * Joomla 3.x Tags helper object
 	 *
 	 * @var int
@@ -97,7 +105,7 @@ class FlexicontentModelTags extends FCModelAdminList
 		$option = $jinput->get('option', '', 'cmd');
 		$view   = $jinput->get('view', '', 'cmd');
 		$fcform = $jinput->get('fcform', 0, 'int');
-		$p      = $option . '.' . $view . '.';
+		$p      = $this->ovid;
 
 
 		/**
@@ -122,9 +130,9 @@ class FlexicontentModelTags extends FCModelAdminList
 	/**
 	 * Method to build the query for the records
 	 *
-	 * @return JDatabaseQuery   The DB Query object
+	 * @return  JDatabaseQuery   The DB Query object
 	 *
-	 * @since 3.3.0
+	 * @since   3.3.0
 	 */
 	protected function getListQuery()
 	{
@@ -172,7 +180,7 @@ class FlexicontentModelTags extends FCModelAdminList
 	 *
 	 * @return  JDatabaseQuery|array
 	 *
-	 * @since 1.0
+	 * @since   3.3.0
 	 */
 	protected function _buildContentWhere($q = false)
 	{
@@ -235,16 +243,20 @@ class FlexicontentModelTags extends FCModelAdminList
 	 *
 	 * @return	void
 	 *
-	 * @since		3.3.0
+	 * @since   3.3.0
 	 */
 	protected function _deleteRelatedData($cid)
 	{
 		if (count($cid))
 		{
+			$cid = ArrayHelper::toInteger($cid);
+			$cid_list = implode(',', $cid);
+
 			// Delete also tag - item relations
 			$query = $this->_db->getQuery(true)
 				->delete('#__flexicontent_tags_item_relations')
-				->where('tid IN (' . $cid_list . ')');
+				->where('tid IN (' . $cid_list . ')')
+			;
 			$this->_db->setQuery($query)->execute();
 		}
 	}
@@ -258,7 +270,7 @@ class FlexicontentModelTags extends FCModelAdminList
 	 *
 	 * @return	array		Array of old-to new record ids of copied record IDs
 	 *
-	 * @since		1.0
+	 * @since   3.3.0
 	 */
 	public function copy($cid, $copyRelations = null)
 	{
@@ -299,7 +311,7 @@ class FlexicontentModelTags extends FCModelAdminList
 	 *
 	 * @return	void
 	 *
-	 * @since		3.3.0
+	 * @since   3.3.0
 	 */
 	protected function _copyRelatedData($ids_map)
 	{
@@ -314,6 +326,8 @@ class FlexicontentModelTags extends FCModelAdminList
 	 * @param		string    $tostate  action related to assignments
 	 *
 	 * @return	array     The records having assignments
+	 *
+	 * @since   3.3.0
 	 */
 	public function filterByAssignments($cid = array(), $tostate = -2)
 	{

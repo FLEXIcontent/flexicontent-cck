@@ -50,6 +50,7 @@ class FlexicontentViewCategories extends FlexicontentViewBaseRecords
 		$isCtmpl  = $jinput->getCmd('tmpl') === 'component';
 
 		// Some flags & constants
+		$useAssocs = flexicontent_db::useAssociations();
 		$order_property = 'a.lft';
 
 		// Load Joomla language files of other extension
@@ -85,12 +86,14 @@ class FlexicontentViewCategories extends FlexicontentViewBaseRecords
 		$filter_level     = $model->getState('filter_level');
 		$filter_access    = $model->getState('filter_access');
 		$filter_lang      = $model->getState('filter_lang');
+		$filter_author    = $model->getState('filter_author');
 
 		if ($filter_state) $count_filters++;
 		if ($filter_cats) $count_filters++;
 		if ($filter_level) $count_filters++;
 		if ($filter_access) $count_filters++;
 		if ($filter_lang) $count_filters++;
+		if ($filter_author) $count_filters++;
 
 		// Record ID filter
 		$filter_id = $model->getState('filter_id');
@@ -161,7 +164,12 @@ class FlexicontentViewCategories extends FlexicontentViewBaseRecords
 
 		if ( $print_logging_info )  $start_microtime = microtime(true);
 
-		$rows = $this->get('Items');
+		$rows        = $model->getItems();
+		$authors     = $model->getAuthorslist();
+
+		$lang_assocs = $useAssocs ? $model->getLangAssocs() : array();
+		$langs       = FLEXIUtilities::getLanguages('code');
+		$categories  = $globalcats ?: array();
 
 		if ( $print_logging_info ) @$fc_run_times['execute_main_query'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 
@@ -197,7 +205,7 @@ class FlexicontentViewCategories extends FlexicontentViewBaseRecords
 		// Parse configuration for every category
    	foreach ($rows as $cat)
 		{
-			$cat->config = new JRegistry($cat->config);
+			$cat->config = new JRegistry($cat->params);
 		}
 
 		// Preprocess the list of items to find ordering divisions.
@@ -224,32 +232,37 @@ class FlexicontentViewCategories extends FlexicontentViewBaseRecords
 
 		$lists = array();
 
-		$categories = $globalcats;
 		$lists['copyid'] = flexicontent_cats::buildcatselect($categories, 'copycid', '', 2, 'class="use_select2_lib"', false, true, $actions_allowed=array('core.edit'));
 		$lists['destid'] = flexicontent_cats::buildcatselect($categories, 'destcid[]', '', false, 'class="use_select2_lib" size="10" multiple="true"', false, true, $actions_allowed=array('core.edit'));
 
 
-		// Build category filter (it's subtree will be displayed)
-		$lists['filter_cats'] = $this->getFilterDisplay(array(
+
+		// Build category filter
+		$fieldname = 'filter_cats';
+		$elementid = 'filter_cats';
+
+		$lists[$elementid] = $this->getFilterDisplay(array(
 			'label' => JText::_('FLEXI_CATEGORY'),
 			'html' => flexicontent_cats::buildcatselect(
 				$categories,
-				'filter_cats',
+				$fieldname,
 				$filter_cats,
-				'-',
+				$displaytype = '-',
 				array(
-					'class' => 'use_select2_lib',
+					'class' => $this->select_class,
+					'size' => '1',
 					'onchange' => 'document.adminForm.limitstart.value=0; Joomla.submitform();',
 				),
 				$check_published = true,
 				$check_perms = false
-			)
+			),
 		));
 
 
 		// Build depth level filter
-		$options	= array();
-		$options[]	= JHtml::_('select.option', '', '-'/*JText::_('FLEXI_SELECT_MAX_DEPTH')*/);
+		$options	= array(
+			JHtml::_('select.option', '', '-'/*'FLEXI_SELECT_MAX_DEPTH'*/),
+		);
 
 		for ($i = 1; $i <= 10; $i++)
 		{
@@ -259,27 +272,52 @@ class FlexicontentViewCategories extends FlexicontentViewBaseRecords
 		$fieldname = 'filter_level';
 		$elementid = 'filter_level';
 
-		$lists['filter_level'] = $this->getFilterDisplay(array(
-			'label' => JText::_('FLEXI_MAX_DEPTH'),
-			'html' => JHtml::_('select.genericlist',
-				$options,
-				$fieldname,
-				array(
-					'class' => 'use_select2_lib',
-					'onchange' => 'document.adminForm.limitstart.value=0; Joomla.submitform();',
+		if (1)
+		{
+			$lists[$elementid] = $this->getFilterDisplay(array(
+				'label' => JText::_('FLEXI_MAX_DEPTH'),
+				'html' => JHtml::_('select.genericlist',
+					$options,
+					$fieldname,
+					array(
+						'class' => $this->select_class,
+						'size' => '1',
+						'onchange' => 'document.adminForm.limitstart.value=0; Joomla.submitform();',
+					),
+					'value',
+					'text',
+					$filter_level,
+					$elementid,
+					$translate = true
 				),
-				'value',
-				'text',
-				$filter_level,
-				$elementid,
-				$translate = true
-			)
-		));
+			));
+		}
+
+		// Build author filter
+		$fieldname = 'filter_author';
+		$elementid = 'filter_author';
+
+		if (1)
+		{
+			$lists[$elementid] = $this->getFilterDisplay(array(
+				'label' => JText::_('FLEXI_AUTHOR'),
+				'html' => flexicontent_html::buildauthorsselect(
+					$authors,
+					$fieldname,
+					$filter_author,
+					$displaytype = '-',
+					array(
+						'class' => $this->select_class,
+						'onchange' => 'document.adminForm.limitstart.value=0; Joomla.submitform();',
+					)
+				),
+			));
+		}
 
 
 		// Build publication state filter
 		$options = JHtml::_('jgrid.publishedOptions');
-		array_unshift($options, JHtml::_('select.option', '', '-'/*JText::_('JOPTION_SELECT_PUBLISHED')*/) );
+		array_unshift($options, JHtml::_('select.option', '', '-'/*'FLEXI_SELECT_STATE'*/));
 
 		$fieldname = 'filter_state';
 		$elementid = 'filter_state';
@@ -290,7 +328,8 @@ class FlexicontentViewCategories extends FlexicontentViewBaseRecords
 				$options,
 				$fieldname,
 				array(
-					'class' => 'use_select2_lib',
+					'class' => $this->select_class,
+					'size' => '1',
 					'onchange' => 'document.adminForm.limitstart.value=0; Joomla.submitform();',
 				),
 				'value',
@@ -298,13 +337,13 @@ class FlexicontentViewCategories extends FlexicontentViewBaseRecords
 				$filter_state,
 				$elementid,
 				$translate = true
-			)
+			),
 		));
 
 
 		// Build access level filter
 		$options = JHtml::_('access.assetgroups');
-		array_unshift($options, JHtml::_('select.option', '', '-'/*JText::_('JOPTION_SELECT_ACCESS')*/) );
+		array_unshift($options, JHtml::_('select.option', '', '-'/*'JOPTION_SELECT_ACCESS'*/));
 
 		$fieldname = 'filter_access';
 		$elementid = 'filter_access';
@@ -315,7 +354,7 @@ class FlexicontentViewCategories extends FlexicontentViewBaseRecords
 				$options,
 				$fieldname,
 				array(
-					'class' => 'use_select2_lib',
+					'class' => $this->select_class,
 					'onchange' => 'document.adminForm.limitstart.value=0; Joomla.submitform();',
 				),
 				'value',
@@ -323,7 +362,7 @@ class FlexicontentViewCategories extends FlexicontentViewBaseRecords
 				$filter_access,
 				$elementid,
 				$translate = true
-			)
+			),
 		));
 
 
@@ -370,6 +409,8 @@ class FlexicontentViewCategories extends FlexicontentViewBaseRecords
 
 		$this->lists       = $lists;
 		$this->rows        = $rows;
+		$this->langs       = $langs;
+		$this->lang_assocs = $lang_assocs;
 		$this->pagination  = $pagination;
 		$this->orderingx   = $orderingx;
 

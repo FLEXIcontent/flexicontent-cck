@@ -236,7 +236,7 @@ function delAllFilters()
 				<?php echo JHtml::_('grid.sort', 'FLEXI_ID', 'a.id', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
 
-			<th class="hideOnDemandClass center hidden-phone hidden-tablet">
+			<th class="hideOnDemandClass center hidden-phone hidden-tablet" colspan="2">
 				<?php echo JHtml::_('grid.sort', 'FLEXI_JTAG_ID', 'a.jtag_id', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
 
@@ -324,37 +324,42 @@ function delAllFilters()
 			</td>
 
 			<td class="center hidden-phone hidden-tablet">
+				<?php echo '<i style="color: #777;">' . $row->jtag_id . '</i>'; ?>
+			</td>
+
+			<td class="center hidden-phone hidden-tablet">
 				<?php
 				echo JHtml::_($hlpname . '.edit_link', $row, $i, $row->canEdit, $config = array(
 					'option'   => 'com_tags',
 					'ctrl'     => 'tag',
 					'keyname'  => 'jtag_id',
-					'iconOnly' => 'jtag_id',
+					'noTitle'  => true,
+					'linkedPrefix' => '<span class="icon-pencil-2"></span><span class="icon-tag"></span>',
+					'attribs' => array(
+						'class'       => $this->btn_sm_class,
+						'title'       => JText::_('FLEXI_EDIT_JTAG'),
+					),
 					'useModal' => (object) array(
-						'title'       =>'FLEXI_EDIT_JTAG',
-						'onloadfunc'  =>'fc_edit_jtag_modal_load',
-						'onclosefunc' =>'fc_edit_jtag_modal_close',
+						'title'       => 'FLEXI_EDIT_JTAG',
+						'onloadfunc'  => 'fc_edit_jtag_modal_load',
+						'onclosefunc' => 'fc_edit_jtag_modal_close',
 					),
 				));
 				?>
 			</td>
+
 		</tr>
 		<?php
 		}
 		?>
 	</tbody>
 
-	<tfoot>
-		<tr>
-			<td colspan="<?php echo $list_total_cols; ?>" style="text-align: left;">
-				<?php echo $pagination_footer; ?>
-			</td>
-		</tr>
-	</tfoot>
-
 	</table>
 
-	<div class="fcclear"></div>
+	<div>
+		<?php echo $pagination_footer; ?>
+	</div>
+
 
 	<!-- Common management form fields -->
 	<input type="hidden" name="boxchecked" value="0" />

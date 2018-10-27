@@ -129,7 +129,7 @@ class FlexicontentModelCategory extends FCModelAdmin
 	/**
 	 * List filters that are always applied
 	 */
-	var $hard_filters = array('extension' => FLEXI_CAT_EXTENSION);
+	var $hard_filters = array('a.extension' => FLEXI_CAT_EXTENSION);
 
 	/**
 	 * Constructor
