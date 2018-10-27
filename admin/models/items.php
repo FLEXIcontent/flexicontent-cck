@@ -54,8 +54,8 @@ class FlexicontentModelItems extends FCModelAdminList
 	/**
 	 * Search and ordering columns
 	 */
-	var $search_cols = array('title', 'alias');
-	var $default_order = 'i.id';
+	var $search_cols       = array('title', 'alias', 'note');
+	var $default_order     = 'i.id';
 	var $default_order_dir = 'DESC';
 
 	/**
@@ -83,13 +83,6 @@ class FlexicontentModelItems extends FCModelAdminList
 	 * @var object
 	 */
 	var $_pagination = null;
-
-	/**
-	 * Single record id (used in operations)
-	 *
-	 * @var int
-	 */
-	var $_id = null;
 
 	/**
 	 * Extra field columns to display for every listed item
@@ -121,11 +114,12 @@ class FlexicontentModelItems extends FCModelAdminList
 	var $_tags = null;
 
 	/**
-	 * Associated item translations
+	 * Associated record translations
 	 *
 	 * @var array
 	 */
 	var $_translations = null;
+
 
 	/**
 	 * Constructor
@@ -142,6 +136,7 @@ class FlexicontentModelItems extends FCModelAdminList
 		$view   = $jinput->get('view', '', 'cmd');
 		$fcform = $jinput->get('fcform', 0, 'int');
 		$p      = $this->ovid;
+
 
 		/**
 		 * View's Filters
@@ -302,12 +297,13 @@ class FlexicontentModelItems extends FCModelAdminList
 
 
 	/**
-	 * Method to get item data
+	 * Method to get records data
 	 *
-	 * @access public
-	 * @return object
+	 * @return array
+	 *
+	 * @since	3.3.0
 	 */
-	function getData()
+	public function getItems()
 	{
 		static $tconfig = array();
 
@@ -320,7 +316,7 @@ class FlexicontentModelItems extends FCModelAdminList
 		if ( $print_logging_info )  global $fc_run_times;
 
 		// Lets load the Items if it doesn't already exist
-		if ( $this->_data === null )
+		if ($this->_data === null)
 		{
 			if ($task === 'copy')
 			{
@@ -410,37 +406,6 @@ class FlexicontentModelItems extends FCModelAdminList
 		}
 
 		return $this->_data;
-	}
-
-
-	/**
-	 * Method to get item (language) associations
-	 *
-	 * @param		int			The id of the item
-	 *
-	 * @return	array		The array of associations
-	 */
-	function getLangAssocs()
-	{
-		// If items array is empty, just return empty array
-		if (empty($this->_data))
-		{
-			return array();
-		}
-
-		// Get associated translations
-		elseif ($this->_translations === null)
-		{
-			$ids = array();
-			foreach ($this->_data as $item)
-			{
-				$ids[] = $item->id;
-			}
-
-			$this->_translations = flexicontent_db::getLangAssocs($ids);
-		}
-
-		return $this->_translations;
 	}
 
 
@@ -1017,13 +982,13 @@ class FlexicontentModelItems extends FCModelAdminList
 
 
 	/**
-	 * Method to build the query for the Items
+	 * Method to build the query for the records
 	 *
-	 * @access private
-	 * @return string
-	 * @since 1.0
+	 * @return  JDatabaseQuery   The DB Query object
+	 *
+	 * @since   3.3.0
 	 */
-	function _buildQuery($query_ids = false)
+	protected function _buildQuery($query_ids = false)
 	{
 		$use_versioning = $this->cparams->get('use_versioning', 1);
 		$lang  = 'ie.language AS lang, ie.lang_parent_id, ';
@@ -1217,7 +1182,7 @@ class FlexicontentModelItems extends FCModelAdminList
 	 *
 	 * @return  JDatabaseQuery|array
 	 *
-	 * @since 3.3.0
+	 * @since   3.3.0
 	 */
 	protected function _buildContentOrderBy($q = false)
 	{
@@ -2989,9 +2954,9 @@ class FlexicontentModelItems extends FCModelAdminList
 	 * @return array
 	 * @since 1.5
 	 */
-	function getTypeslist ( $type_ids=false, $check_perms = false, $published=true )
+	function getTypeslist ($type_ids = false, $check_perms = false, $published = true)
 	{
-		return flexicontent_html::getTypesList( $type_ids, $check_perms, $published);
+		return flexicontent_html::getTypesList($type_ids, $check_perms, $published);
 	}
 
 
@@ -3389,6 +3354,8 @@ class FlexicontentModelItems extends FCModelAdminList
 	 * @param		string    $tostate  action related to assignments
 	 *
 	 * @return	array     The records having assignments
+	 *
+	 * @since   3.3.0
 	 */
 	public function filterByAssignments($cid = array(), $tostate = -2)
 	{
@@ -3457,6 +3424,29 @@ class FlexicontentModelItems extends FCModelAdminList
 
 		$app->setUserState($p . 'filter_order', $filter_order);
 		$app->setUserState($p . 'filter_order_Dir', $filter_order_Dir);
+	}
+
+
+	/**
+	 * Method to get item (language) associations
+	 *
+	 * @param		array   $ids       An array of records is
+	 * @param		object  $config    An object with configuration for getting associations
+	 *
+	 * @return	array   An array with associations of the records list
+	 *
+	 * @since   3.3.0
+	 */
+	public function getLangAssocs($ids = null, $config = null)
+	{
+		$config = $config ?: (object) array(
+			'table'    => $this->records_dbtbl,
+			'context'  => 'com_content.item',
+			'created'  => 'created',
+			'modified' => 'modified',
+		);
+
+		return parent::getLangAssocs($ids, $config);
 	}
 
 

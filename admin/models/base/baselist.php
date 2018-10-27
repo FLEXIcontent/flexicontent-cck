@@ -95,6 +95,13 @@ abstract class FCModelAdminList extends JModelList
 	var $_pagination = null;
 
 	/**
+	 * Associated record translations
+	 *
+	 * @var array
+	 */
+	var $_translations = null;
+
+	/**
 	 * Single record id (used in operations)
 	 *
 	 * @var int
@@ -106,7 +113,8 @@ abstract class FCModelAdminList extends JModelList
 	 *
 	 * @var string
 	 */
-	var $viewid = null;
+	var $view_id = null;
+
 
 	/**
 	 * Constructor
@@ -124,7 +132,7 @@ abstract class FCModelAdminList extends JModelList
 		$fcform = $jinput->get('fcform', 0, 'int');
 
 		// Session data group
-		$this->ovid = $option . '.' . ($this->viewid ?: $view) . '.';
+		$this->ovid = $option . '.' . ($this->view_id ?: $view) . '.';
 		$p          = $this->ovid;
 
 		// Parameters of the view, in our case it is only the component parameters
@@ -141,12 +149,18 @@ abstract class FCModelAdminList extends JModelList
 		// Various filters
 		$filter_state  = $fcform ? $jinput->get('filter_state', '', 'alnum') : $app->getUserStateFromRequest($p . 'filter_state', 'filter_state', '', 'alnum');
 		$filter_access = $fcform ? $jinput->get('filter_access', '', 'alnum') : $app->getUserStateFromRequest($p . 'filter_access', 'filter_access', '', 'alnum');
+		$filter_lang   = $fcform ? $jinput->get('filter_lang', '', 'string') : $app->getUserStateFromRequest($p . 'filter_lang', 'filter_lang', '', 'string');
+		$filter_author = $fcform ? $jinput->get('filter_author', '', 'cmd') : $app->getUserStateFromRequest($p . 'filter_author', 'filter_author', '', 'string');
 
 		$this->setState('filter_state', $filter_state);
 		$this->setState('filter_access', $filter_access);
+		$this->setState('filter_lang', $filter_lang);
+		$this->setState('filter_author', $filter_author);
 
 		$app->setUserState($p . 'filter_state', $filter_state);
 		$app->setUserState($p . 'filter_access', $filter_access);
+		$app->setUserState($p . 'filter_lang', $filter_lang);
+		$app->setUserState($p . 'filter_author', $filter_author);
 
 		// Record ID filter
 		$filter_id = $fcform ? $jinput->get('filter_id', '', 'int') : $app->getUserStateFromRequest($p . 'filter_id', 'filter_id', '', 'int');
@@ -302,9 +316,9 @@ abstract class FCModelAdminList extends JModelList
 	/**
 	 * Method to build the query for the records
 	 *
-	 * @return JDatabaseQuery   The DB Query object
+	 * @return  JDatabaseQuery   The DB Query object
 	 *
-	 * @since 3.3.0
+	 * @since   3.3.0
 	 */
 	protected function getListQuery()
 	{
@@ -389,7 +403,7 @@ abstract class FCModelAdminList extends JModelList
 	 *
 	 * @return  JDatabaseQuery|array
 	 *
-	 * @since 1.0
+	 * @since   3.3.0
 	 */
 	protected function _buildContentWhere($q = false)
 	{
@@ -398,6 +412,8 @@ abstract class FCModelAdminList extends JModelList
 		// Various filters
 		$filter_state  = $this->getState('filter_state');
 		$filter_access = $this->getState('filter_access');
+		$filter_lang   = $this->getState('filter_lang');
+		$filter_author = $this->getState('filter_author');
 		$filter_id     = $this->getState('filter_id');
 
 		// Text search
@@ -427,6 +443,18 @@ abstract class FCModelAdminList extends JModelList
 					$where[] = 'a.' . $this->state_col . ' = -2';
 					break;
 
+				case 'PE':
+					$where[] = 'a.' . $this->state_col . ' = -3';
+					break;
+
+				case 'OQ':
+					$where[] = 'a.' . $this->state_col . ' = -4';
+					break;
+
+				case 'IP':
+					$where[] = 'a.' . $this->state_col . ' = -5';
+					break;
+
 				default:
 					// ALL: published & unpublished, but exclude archived, trashed
 					if (!strlen($filter_state))
@@ -439,6 +467,19 @@ abstract class FCModelAdminList extends JModelList
 						$where[] = 'a.' . $this->state_col . ' = ' . (int) $filter_state;
 					}
 			}
+		}
+
+
+		// Filter by language
+		if ($filter_lang)
+		{
+			$where[] = 'a.language = ' . $this->_db->Quote($filter_lang);
+		}
+
+		// Filter by author / owner
+		if (strlen($filter_author))
+		{
+			$where[] = 'a.' . $this->created_by_col . ' = ' . (int) $filter_author;
 		}
 
 		// Filter by access level
@@ -468,12 +509,12 @@ abstract class FCModelAdminList extends JModelList
 		{
 			if (stripos($search, 'id:') === 0)
 			{
-				$query->where('a.id = ' . (int) substr($search, 3));
+				$where[] = 'a.id = ' . (int) substr($search, 3);
 			}
 			elseif (stripos($search, 'author:') === 0)
 			{
 				$search_quoted = $this->_db->Quote('%' . $this->_db->escape(substr($search, 7), true) . '%');
-				$query->where('(ua.name LIKE ' . $search_quoted . ' OR ua.username LIKE ' . $search_quoted . ')');
+				$where[] = '(ua.name LIKE ' . $search_quoted . ' OR ua.username LIKE ' . $search_quoted . ')';
 			}
 			else
 			{
@@ -647,11 +688,12 @@ abstract class FCModelAdminList extends JModelList
 	 * Method to check if given records can not change state due to assignments or due to permissions
 	 * This will also mark ACL changeable records into model, this is required by changestate to have an effect
 	 *
-	 * @param		array			$cid          array of record ids to check
-	 * @param		array			$cid_noauth   (variable by reference), pass authorizing -ignored- IDs and return an array of non-authorized record ids
-	 * @param		array			$cid_wassocs  (variable by reference), pass assignments -ignored- IDs and return an array of 'locked' record ids
+	 * @param   array     $cid          array of record ids to check
+	 * @param   array     $cid_noauth   (variable by reference), pass authorizing -ignored- IDs and return an array of non-authorized record ids
+	 * @param   array     $cid_wassocs  (variable by reference), pass assignments -ignored- IDs and return an array of 'locked' record ids
+	 * @param   integer   $tostate      (variable by reference), pass assignments -ignored- IDs and return an array of 'locked' record ids
 	 *
-	 * @return	boolean	  True when at least 1 publishable record found
+	 * @return  boolean   True when at least 1 publishable record found
 	 *
 	 * @since	3.3.0
 	 */
@@ -999,6 +1041,66 @@ abstract class FCModelAdminList extends JModelList
 		}
 
 		return $this->_db->setQuery($query)->loadObjectList('id');
+	}
+
+
+	/**
+	 * Method to get author list for filtering
+	 *
+	 * @return	array   An array with all users owning at least 1 record
+	 *
+	 * @since   3.3.0
+	 */
+	public function getAuthorslist()
+	{
+		$query = $this->_db->getQuery(true)
+			->select('a.' . $this->created_by_col . ' AS id, ua.name AS name')
+			->from('#__' . $this->records_dbtbl . ' AS a')
+			->join('LEFT', '#__users as ua ON ua.id = a.' . $this->created_by_col)
+			->group('a.' . $this->created_by_col)
+			->order('ua.name');
+
+		return $this->_db->setQuery($query)->loadObjectList();
+	}
+
+
+	/**
+	 * Method to get item (language) associations
+	 *
+	 * @param		array   $ids       An array of records is
+	 * @param		object  $config    An object with configuration for getting associations
+	 *
+	 * @return	array   An array with associations of the records list
+	 *
+	 * @since   3.3.0
+	 */
+	public function getLangAssocs($ids = null, $config = null)
+	{
+		if ($ids)
+		{
+			return flexicontent_db::getLangAssocs($ids, $config);
+		}
+
+		// If items array is empty, just return empty array
+		elseif (empty($this->_data))
+		{
+			return array();
+		}
+
+		// Get associated translations
+		elseif ($this->_translations === null)
+		{
+			$ids = array();
+
+			foreach ($this->_data as $item)
+			{
+				$ids[] = $item->id;
+			}
+
+			$this->_translations = flexicontent_db::getLangAssocs($ids, $config);
+		}
+
+		return $this->_translations;
 	}
 
 

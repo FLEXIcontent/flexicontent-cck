@@ -276,15 +276,11 @@ function delAllFilters() {
 		<?php endforeach; ?>
 	</tbody>
 
-	<tfoot>
-		<tr>
-			<td colspan="<?php echo $list_total_cols; ?>" style="text-align: left;">
-				<?php echo $pagination_footer; ?>
-			</td>
-		</tr>
-	</tfoot>
-
 	</table>
+
+	<div>
+		<?php echo $pagination_footer; ?>
+	</div>
 
 
 	<!-- Common management form fields -->

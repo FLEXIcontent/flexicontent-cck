@@ -24,11 +24,23 @@ JLoader::register('FlexicontentController', JPATH_BASE . DS . 'components' . DS 
 trait FCControllerTraitBase
 {
 	/**
+	 * Logic to publish records
+	 *
+	 * @return  void
+	 *
+	 * @since   3.3.0
+	 */
+	public function publish()
+	{
+		self::changestate(1);
+	}
+
+	/**
 	 * Logic to unpublish records
 	 *
-	 * @return void
+	 * @return  void
 	 *
-	 * @since 1.5
+	 * @since   3.3.0
 	 */
 	public function unpublish()
 	{
@@ -39,9 +51,9 @@ trait FCControllerTraitBase
 	/**
 	 * Logic to archive records
 	 *
-	 * @return void
+	 * @return  void
 	 *
-	 * @since 1.5
+	 * @since   3.3.0
 	 */
 	public function archive()
 	{
@@ -52,9 +64,9 @@ trait FCControllerTraitBase
 	/**
 	 * Logic to trash records
 	 *
-	 * @return void
+	 * @return  void
 	 *
-	 * @since 1.5
+	 * @since   3.3.0
 	 */
 	public function trash()
 	{

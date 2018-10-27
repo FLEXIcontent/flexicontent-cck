@@ -43,10 +43,10 @@ trait FCModelTraitNestableRecord
 		$source = $type === 'children' ? $this->parent_col : 'id';
 
 		$query = $this->_db->getQuery(true)
-			->select($id_col)
-			->from('#__' . $this->records_dbtbl)
-			->where($source . ' = ' . (int) $id)
-			->where($id_col . ' <> 1')
+			->select('a.' . $id_col)
+			->from('#__' . $this->records_dbtbl . ' AS a')
+			->where('a.' . $source . ' = ' . (int) $id)
+			->where('a.' . $id_col . ' <> 1')
 		;
 		$this->_buildHardFiltersWhere($query);
 

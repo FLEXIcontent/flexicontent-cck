@@ -525,96 +525,6 @@ class FlexicontentControllerBaseAdmin extends FlexicontentController
 
 
 	/**
-	 * Logic to publish records
-	 *
-	 * @return void
-	 *
-	 * @since 3.3
-	 */
-	public function publish()
-	{
-		// Check for request forgeries
-		JSession::checkToken('request') or die(JText::_('JINVALID_TOKEN'));
-
-		// Initialize variables
-		$app   = JFactory::getApplication();
-		$user  = JFactory::getUser();
-
-		// Get model
-		$model = $this->getModel($this->record_name_pl);
-
-		// Get and santize records ids
-		$cid = $this->input->get('cid', array(), 'array');
-		$cid = ArrayHelper::toInteger($cid);
-
-		// Check at least one item was selected
-		if (!count($cid))
-		{
-			$app->enqueueMessage(JText::_('FLEXI_SELECT_ITEM_PUBLISH'), 'error');
-			$app->setHeader('status', 500, true);
-			$this->setRedirect($this->returnURL);
-
-			return;
-		}
-
-		// Calculate access
-		$cid_noauth = array();
-		$is_authorised = $this->canManage;
-
-		// Find and excluded records that we can not change their state
-		if ($is_authorised)
-		{
-			$record_model = $this->getModel($this->record_name);
-
-			foreach ($cid as $i => $_id)
-			{
-				$record = $record_model->getRecord($_id);
-
-				if (!$record_model->canEditState($record))
-				{
-					$cid_noauth[] = $_id;
-					unset($cid[$i]);
-				}
-			}
-
-			$is_authorised = count($cid);
-		}
-
-		// Check access
-		if (!$is_authorised)
-		{
-			$app->enqueueMessage(JText::_('FLEXI_ALERTNOTAUTH_TASK'), 'error');
-			$app->setHeader('status', 403, true);
-			$this->setRedirect($this->returnURL);
-
-			return;
-		}
-		elseif (count($cid_noauth))
-		{
-			$app->enqueueMessage("You cannot change state of records : ", implode(', ', $cid_noauth), 'warning');
-		}
-
-		// Change state of the record(s)
-		$result = $model->publish($cid, 1);
-
-		// Clear dependent cache data
-		$this->_cleanCache();
-
-		// Check for errors during state changing
-		if (!$result)
-		{
-			$msg = JText::_('FLEXI_OPERATION_FAILED') . ' : ' . $model->getError();
-			throw new Exception($msg, 500);
-		}
-
-		$total = count($cid);
-		$msg = $total . ' ' . JText::_('FLEXI_' . $this->_NAME . '_PUBLISHED');
-
-		$this->setRedirect($this->returnURL, $msg);
-	}
-
-
-	/**
 	 * Logic to modify the state of records, other state modifications tasks are wrappers to this task
 	 *
 	 * @return void
@@ -660,7 +570,7 @@ class FlexicontentControllerBaseAdmin extends FlexicontentController
 		if (!$is_authorised)
 		{
 			count($cid_locked)
-				? $app->enqueueMessage(JText::_($this->err_locked_recs_unpublish), 'error')
+				? $app->enqueueMessage(JText::_($this->err_locked_recs_changestate), 'warning')
 				: $app->enqueueMessage(JText::_('FLEXI_ALERTNOTAUTH_TASK'), 'error');
 			$app->setHeader('status', 403, true);
 			$this->setRedirect($this->returnURL);
@@ -763,7 +673,7 @@ class FlexicontentControllerBaseAdmin extends FlexicontentController
 		if (!$is_authorised)
 		{
 			count($cid_locked)
-				? $app->enqueueMessage(JText::_($this->err_locked_recs_remove), 'error')
+				? $app->enqueueMessage(JText::_($this->err_locked_recs_remove), 'warning')
 				: $app->enqueueMessage(JText::_('FLEXI_ALERTNOTAUTH_TASK'), 'error');
 			$app->setHeader('status', 403, true);
 			$this->setRedirect($this->returnURL);

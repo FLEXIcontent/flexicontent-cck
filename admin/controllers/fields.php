@@ -72,7 +72,7 @@ class FlexicontentControllerFields extends FlexicontentControllerBaseAdmin
 		$this->canManage = FlexicontentHelperPerm::getPerm()->CanFields;
 
 		// Error messages
-		$this->err_locked_recs_unpublish = 'FLEXI_YOU_CANNOT_UNPUBLISH_THESE_FIELDS';
+		$this->err_locked_recs_changestate = 'FLEXI_YOU_CANNOT_UNPUBLISH_THESE_CORE_FIELDS_DUE_TO_VERSIONING';
 		$this->err_locked_recs_remove = 'FLEXI_YOU_CANNOT_REMOVE_CORE_FIELDS';
 		$this->warn_locked_recs_skipped = 'FLEXI_SKIPPED_RECORDS_BEING_OF_CORE_TYPE';
 	}

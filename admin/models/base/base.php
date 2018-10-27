@@ -328,14 +328,14 @@ abstract class FCModelAdmin extends JModelAdmin
 		}
 		elseif ($pk)
 		{
+			$table = $this->getTable();
+
 			/**
 			 * If PK is not an integer, then possibly we were given a name,
 			 * try to match it with columns 'name' or 'alias', if they exist
 			 */
 			if (!is_integer($pk))
 			{
-				$table = $this->getTable();
-
 				$pk_col = null;
 				$columns = array('name', 'alias');
 

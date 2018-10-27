@@ -332,7 +332,10 @@ foreach ($this->rows as $i => $row)
 	$js .= '  _file_data[' . $i . '] = ' . json_encode($data) . ";\n";
 }
 
-$document->addScriptDeclaration($js);
+if ($js)
+{
+	$document->addScriptDeclaration($js);
+}
 $js = '';
 
 
@@ -979,7 +982,6 @@ if ($js)
 						else
 						{
 							echo JHtml::_($hlpname . '.edit_link', $row, $i, $row->canEdit, array(
-								'iconClass' => false,
 								'linkedPrefix' => '<span class="icon-checkbox"></span><span class="icon-new"></span>',
 								'onclick' => 'if (jQuery(this).hasClass(\'striketext\')) return; ' . $row->file_assign_link,
 								'attribs' => array(
@@ -1026,12 +1028,12 @@ if ($js)
 				<?php $row->language = empty($row->language) ? '' : $row->language; /* Set language ALL when language is empty */ ?>
 
 				<?php if (!empty($this->cols['lang'])) : ?>
-					<td class="center col_lang hidden-phone">
-						<?php if ( 0 && !empty($row->language) && !empty($this->langs->{$row->language}->imgsrc) ) : ?>
-							<img title="<?php echo $row->language=='*' ? JText::_("FLEXI_ALL") : $this->langs->{$row->language}->name; ?>" src="<?php echo $this->langs->{$row->language}->imgsrc; ?>" alt="<?php echo $row->language; ?>" />
-						<?php elseif( !empty($row->language) ) : ?>
-							<?php echo $row->language=='*' ? JText::_("FLEXI_ALL") : $this->langs->{$row->language}->name;?>
-						<?php endif; ?>
+					<td class="col_lang hidden-phone">
+						<?php
+							/**
+							 * Display language
+							 */
+							echo JHtml::_($hlpname . '.lang_display', $row, $i, $this->langs, $use_icon = false, ''); ?>
 					</td>
 				<?php endif; ?>
 

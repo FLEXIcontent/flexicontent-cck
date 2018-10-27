@@ -1061,14 +1061,21 @@ class flexicontent_db
 	}
 
 
-	static function getLangAssocs($ids)
+	static function getLangAssocs($ids, $config = null)
 	{
+		$config = $config ?: (object) array(
+			'table' => 'content',
+			'context' => 'com_content.item',
+			'created' => 'created',
+			'modified' => 'modified',
+		);
+
 		$db = JFactory::getDbo();
-		$query = 'SELECT a.id as item_id, i.id as id, i.title, i.created, i.modified, i.language as language, i.language as lang'
+		$query = 'SELECT a.id as item_id, i.id as id, i.title, i.' . $config->created . ' as created, i.' . $config->modified . ' as modified, i.language as language, i.language as lang'
 			. ' FROM #__associations AS a'
 			. ' JOIN #__associations AS k ON a.`key`=k.`key`'
-			. ' JOIN #__content AS i ON i.id = k.id'
-			. ' WHERE a.id IN ('. implode(',', $ids) .') AND a.context = "com_content.item"';
+			. ' JOIN ' . $db->quoteName('#__' . $config->table) . ' AS i ON i.id = k.id'
+			. ' WHERE a.id IN ('. implode(',', $ids) .') AND a.context = ' . $db->quote($config->context);
 		$db->setQuery($query);
 		$associations = $db->loadObjectList();
 

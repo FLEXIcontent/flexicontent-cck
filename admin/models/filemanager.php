@@ -90,14 +90,6 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 	var $_pagination = null;
 
 	/**
-	 * Single record id (used in operations)
-	 *
-	 * @var int
-	 */
-	var $_id = null;
-
-
-	/**
 	 * flags to indicate adding file - item assignments to session
 	 *
 	 * @var bool
@@ -126,23 +118,22 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 	 */
 	public function __construct($config = array())
 	{
+		// Make session index more specific ...
+		// This has no effect in filemanager view (maybe later), currently only for fileselement views
+		$this->fieldid = JFactory::getApplication()->input->getInt('field', null);
+		$this->view_id = JFactory::getApplication()->input->getCmd('view', '') . $this->fieldid;
+
+		// Call parent after setting ... $this->view_id
+		parent::__construct($config);
+
 		$app    = JFactory::getApplication();
 		$jinput = $app->input;
 		$option = $jinput->get('option', '', 'cmd');
 		$view   = $jinput->get('view', '', 'cmd');
 		$fcform = $jinput->get('fcform', 0, 'int');
+		$p      = $this->ovid;
 		
-		// This has no effect in filemanager view (maybe later), currently only for fileselement views
-		$this->fieldid = $jinput->get('field', null, 'int');
-		$this->viewid  = $view . $this->fieldid;
 		$this->sess_assignments = true;
-
-		// Session data group
-		$this->ovid = $option . '.' . ($this->viewid ?: $view) . '.';
-		$p          = $this->ovid;
-
-		// Call parent after setting ... $this->viewid
-		parent::__construct($config);
 
 
 		/**
@@ -677,7 +668,7 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 			$user   = JFactory::getUser();
 			$option = $jinput->get('option', '', 'cmd');
 			$view   = $jinput->get('view', '', 'cmd');
-			$p      = $option . '.' . $view . '.';
+			$p      = $this->ovid;
 
 			$u_item_id = $itemid ?: $app->getUserStateFromRequest($p . 'u_item_id', 'u_item_id', 0, 'string');
 

@@ -52,9 +52,9 @@ class FlexicontentModelGroups extends FCModelAdminList
 	/**
 	 * Column names
 	 */
-	var $state_col   = null;
-	var $name_col    = 'title';
-	var $parent_col  = 'parent_id';
+	var $state_col      = null;
+	var $name_col       = 'title';
+	var $parent_col     = 'parent_id';
 
 	/**
 	 * (Default) Behaviour Flags
@@ -72,6 +72,7 @@ class FlexicontentModelGroups extends FCModelAdminList
 	/**
 	 * List filters that are always applied
 	 */
+	var $hard_filters = array();
 
 	/**
 	 * Record rows
@@ -94,13 +95,6 @@ class FlexicontentModelGroups extends FCModelAdminList
 	 */
 	var $_pagination = null;
 
-	/**
-	 * Single record id (used in operations)
-	 *
-	 * @var int
-	 */
-	var $_id = null;
-
 
 	/**
 	 * Constructor
@@ -116,7 +110,7 @@ class FlexicontentModelGroups extends FCModelAdminList
 		$option = $jinput->get('option', '', 'cmd');
 		$view   = $jinput->get('view', '', 'cmd');
 		$fcform = $jinput->get('fcform', 0, 'int');
-		$p      = $option . '.' . $view . '.';
+		$p      = $this->ovid;
 
 
 		/**
@@ -166,9 +160,9 @@ class FlexicontentModelGroups extends FCModelAdminList
 	/**
 	 * Method to build the query for the records
 	 *
-	 * @return JDatabaseQuery   The DB Query object
+	 * @return  JDatabaseQuery   The DB Query object
 	 *
-	 * @since 3.3.0
+	 * @since   3.3.0
 	 */
 	protected function getListQuery()
 	{
@@ -214,7 +208,7 @@ class FlexicontentModelGroups extends FCModelAdminList
 	 *
 	 * @return  JDatabaseQuery|array
 	 *
-	 * @since 1.0
+	 * @since   3.3.0
 	 */
 	protected function _buildContentWhere($q = false)
 	{
@@ -243,7 +237,7 @@ class FlexicontentModelGroups extends FCModelAdminList
 	 *
 	 * @return	array     The records having assignments
 	 *
-	 * @since	3.3.0
+	 * @since   3.3.0
 	 */
 	public function filterByPermission($cid, $rule)
 	{
@@ -268,6 +262,8 @@ class FlexicontentModelGroups extends FCModelAdminList
 	 * @param		string    $tostate  action related to assignments
 	 *
 	 * @return	array     The records having assignments
+	 *
+	 * @since   3.3.0
 	 */
 	public function filterByAssignments($cid = array(), $tostate = -2)
 	{
@@ -292,7 +288,7 @@ class FlexicontentModelGroups extends FCModelAdminList
 	 *
 	 * @return  array
 	 *
-	 * @since   3.6.3
+	 * @since   3.0.0
 	 */
 	private function populateExtraData(array $items)
 	{

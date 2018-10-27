@@ -84,18 +84,11 @@ class FlexicontentModelReviews extends FCModelAdminList
 	 */
 	var $_pagination = null;
 
-	/**
-	 * Single record id (used in operations)
-	 *
-	 * @var int
-	 */
-	var $_id = null;
-
 
 	/**
 	 * Constructor
 	 *
-	 * @since   3.3.0
+	 * @since 3.3.0
 	 */
 	public function __construct($config = array())
 	{

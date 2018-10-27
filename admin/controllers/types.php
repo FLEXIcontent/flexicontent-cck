@@ -71,7 +71,7 @@ class FlexicontentControllerTypes extends FlexicontentControllerBaseAdmin
 		$this->canManage = FlexicontentHelperPerm::getPerm()->CanTypes;
 
 		// Error messages
-		$this->err_locked_recs_unpublish = 'FLEXI_YOU_CANNOT_UNPUBLISH_THIS_TYPE_THERE_ARE_STILL_ITEMS_ASSOCIATED';
+		$this->err_locked_recs_changestate = 'FLEXI_YOU_CANNOT_CHANGE_STATE_OF_THIS_TYPE_THERE_ARE_STILL_ITEMS_ASSOCIATED';
 		$this->err_locked_recs_remove = 'FLEXI_YOU_CANNOT_REMOVE_THIS_TYPE_THERE_ARE_STILL_ITEMS_ASSOCIATED';
 		$this->warn_locked_recs_skipped = 'FLEXI_SKIPPED_RECORDS_WITH_ASSOCIATIONS';
 	}

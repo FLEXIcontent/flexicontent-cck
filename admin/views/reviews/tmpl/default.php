@@ -25,6 +25,7 @@ $cparams  = JComponentHelper::getParams('com_flexicontent');
 $ctrl     = 'reviews.';
 $hlpname  = 'fcreviews';
 $isAdmin  = $app->isAdmin();
+$useAssocs= false;
 
 
 
@@ -44,7 +45,7 @@ $out_class = FLEXI_J40GE ? 'btn btn-outline-dark' : 'btn';
 
 flexicontent_html::jscode_to_showhide_table(
 	'mainChooseColBox',
-	'adminListTableFCreviews',
+	'adminListTableFC' . $this->view,
 	$start_html = '',  //'<span class="badge ' . (FLEXI_J40GE ? 'badge-dark' : 'badge-inverse') . '">' . JText::_('FLEXI_COLUMNS', true) . '<\/span> &nbsp; ',
 	$end_html = '<div id="fc-columns-slide-btn" class="icon-arrow-up-2 btn btn-outline-secondary" title="' . JText::_('FLEXI_HIDE') . '" style="cursor: pointer;" onclick="fc_toggle_box_via_btn(\\\'mainChooseColBox\\\', document.getElementById(\\\'fc_mainChooseColBox_btn\\\'), \\\'btn-primary\\\');"><\/div>'
 );
@@ -62,7 +63,9 @@ $tools_cookies['fc-filters-box-disp'] = 0; //JFactory::getApplication()->input->
  * Order stuff and table related variables
  */
 
-$list_total_cols = 9;
+$list_total_cols = 9
+	+ ($useAssocs ? 1 : 0);
+
 
 
 /**
@@ -113,12 +116,7 @@ function delAllFilters()
 
 if ($js)
 {
-	$document->addScriptDeclaration('
-		jQuery(document).ready(function()
-		{
-			' . $js . '
-		});
-	');
+	$document->addScriptDeclaration($js);
 }
 ?>
 
@@ -224,7 +222,7 @@ if ($js)
 	<div class="fcclear"></div>
 
 
-	<table id="adminListTableFCreviews" class="adminlist table fcmanlist" itemscope itemtype="http://schema.org/WebPage">
+	<table id="adminListTableFC<?php echo $this->view; ?>" class="adminlist table fcmanlist" itemscope itemtype="http://schema.org/WebPage">
 	<thead>
 		<tr>
 
@@ -380,23 +378,18 @@ if ($js)
 		?>
 	</tbody>
 
-	<tfoot>
-		<tr>
-			<td colspan="<?php echo $list_total_cols; ?>" style="text-align: left;">
-				<?php echo $pagination_footer; ?>
-			</td>
-		</tr>
-	</tfoot>
-
 	</table>
 
-	<div class="fcclear"></div>
+	<div>
+		<?php echo $pagination_footer; ?>
+	</div>
+
 
 	<!-- Common management form fields -->
 	<input type="hidden" name="boxchecked" value="0" />
-	<input type="hidden" name="option" value="com_flexicontent" />
-	<input type="hidden" name="controller" value="reviews" />
-	<input type="hidden" name="view" value="reviews" />
+	<input type="hidden" name="option" value="<?php echo $this->option; ?>" />
+	<input type="hidden" name="controller" value="<?php echo $this->view; ?>" />
+	<input type="hidden" name="view" value="<?php echo $this->view; ?>" />
 	<input type="hidden" name="task" value="" />
 	<input type="hidden" id="filter_order" name="filter_order" value="<?php echo $this->lists['order']; ?>" />
 	<input type="hidden" id="filter_order_Dir" name="filter_order_Dir" value="<?php echo $this->lists['order_Dir']; ?>" />

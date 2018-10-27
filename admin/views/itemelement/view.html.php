@@ -21,10 +21,10 @@ JLoader::register('FlexicontentViewBaseRecords', JPATH_ADMINISTRATOR . '/compone
  */
 class FlexicontentViewItemelement extends FlexicontentViewBaseRecords
 {
-	var $proxy_option   = null;
-	var $title_propname = null;
-	var $state_propname = null;
-	var $db_tbl         = null;
+	var $proxy_option   = 'com_content';
+	var $title_propname = 'title';
+	var $state_propname = 'state';
+	var $db_tbl         = 'content';
 
 	public function display($tpl = null)
 	{
@@ -51,7 +51,7 @@ class FlexicontentViewItemelement extends FlexicontentViewBaseRecords
 		$isCtmpl  = $jinput->getCmd('tmpl') === 'component';
 
 		// Some flags & constants
-		;
+		$useAssocs = flexicontent_db::useAssociations();
 
 		// Load Joomla language files of other extension
 		if (!empty($this->proxy_option))
@@ -91,23 +91,35 @@ class FlexicontentViewItemelement extends FlexicontentViewBaseRecords
 			}
 		}
 
-		// get filter values
-		$filter_order     = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_order', 	  'filter_order', 	 'i.ordering', 'cmd' );
-		$filter_order_Dir = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_order_Dir',	'filter_order_Dir',	''				 , 'cmd' );
 
-		$filter_state  = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_state',  'filter_state',   '',    'cmd' );
-		$filter_cats   = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_cats',   'filter_cats',    0,     'int' );
-		$filter_type   = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_type',   'filter_type',    0,     'int' );
-		$filter_access = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_access', 'filter_access',  '',    'string' );
-		$filter_lang   = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_lang',   'filter_lang',    '',    'string' );
-		$filter_author = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_author', 'filter_author',  '',    'cmd' );
+		/**
+		 * Get filters and ordering
+		 */
 
-		$filter_type   = $assocs_id && $type_id    ? $type_id    : $filter_type;
-		$filter_lang   = $assocs_id && $item_lang  ? $item_lang  : $filter_lang;
-		$filter_author = $assocs_id && $created_by ? $created_by : $filter_author;
+		$count_filters = 0;
 
-		$search = $app->getUserStateFromRequest( $option.'.'.$view.'.search', 			'search', 			'', 'string' );
-		$search = $db->escape( StringHelper::trim(StringHelper::strtolower( $search ) ) );
+		// Order and order direction
+		$filter_order      = $model->getState('filter_order');
+		$filter_order_Dir  = $model->getState('filter_order_Dir');
+
+		// Various filters
+		$filter_state     = $model->getState('filter_state');
+		$filter_cats      = $model->getState('filter_cats');
+		$filter_type      = $model->getState('filter_type');
+		$filter_access    = $model->getState('filter_access');
+		$filter_lang      = $model->getState('filter_lang');
+		$filter_author    = $model->getState('filter_author');
+
+		if ($filter_state) $count_filters++;
+		if ($filter_cats) $count_filters++;
+		if ($filter_type) $count_filters++;
+		if ($filter_access) $count_filters++;
+		if ($filter_lang) $count_filters++;
+		if ($filter_author) $count_filters++;
+
+		// Text search
+		$search = $model->getState('search');
+		$search = StringHelper::trim(StringHelper::strtolower($search));
 
 
 		/**
@@ -167,12 +179,13 @@ class FlexicontentViewItemelement extends FlexicontentViewBaseRecords
 
 		if ( $print_logging_info )  $start_microtime = microtime(true);
 
-		$rows = $this->get('Data');
+		$rows        = $model->getData();
+		$authors     = $model->getAuthorslist();
+		$types       = $model->getTypeslist();
 
-		$types   = $this->get('Typeslist');
-		$authors = $this->get('Authorslist');
-		$langs   = FLEXIUtilities::getLanguages('code');
-		$lang_assocs = $assocs_id ? $this->get('LangAssocs') : array();
+		$lang_assocs = $useAssocs ? $model->getLangAssocs() : array();
+		$langs       = FLEXIUtilities::getLanguages('code');
+		$categories  = $globalcats ?: array();
 
 		if ( $print_logging_info ) @$fc_run_times['execute_main_query'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 
@@ -180,7 +193,7 @@ class FlexicontentViewItemelement extends FlexicontentViewBaseRecords
 		$pagination = $this->get('Pagination');
 
 		// Ordering active FLAG
-		$ordering = ($filter_order == 'i.ordering');
+		$ordering = $filter_order === 'a.ordering';
 
 
 
@@ -188,65 +201,184 @@ class FlexicontentViewItemelement extends FlexicontentViewBaseRecords
 		 * Create List Filters
 		 */
 
+		$lists = array();
+
+
+		// Build category filter
+		$fieldname = 'filter_cats';
+		$elementid = 'filter_cats';
+
+		$lists[$elementid] = $this->getFilterDisplay(array(
+			'label' => JText::_('FLEXI_CATEGORY'),
+			'html' => flexicontent_cats::buildcatselect(
+				$categories,
+				$fieldname,
+				$filter_cats,
+				$displaytype = '-',
+				array(
+					'class' => $this->select_class,
+					'size' => '1',
+					'onchange' => 'document.adminForm.limitstart.value=0; Joomla.submitform();',
+				),
+				$check_published = true,
+				$check_perms = false
+			),
+		));
+
+
+		// Build item type filter
+		$fieldname = 'filter_type';
+		$elementid = 'filter_type';
+
+		if (!$assocs_id || $assocanytrans || !$type_id)
+		{
+			$lists[$elementid] = $this->getFilterDisplay(array(
+				'label' => JText::_('FLEXI_TYPE'),
+				'html' => flexicontent_html::buildtypesselect(
+					$types,
+					$fieldname,
+					$filter_type,
+					$displaytype = '-',
+					array(
+						'class' => $this->select_class,
+						'size' => '1',
+						'onchange' => 'document.adminForm.limitstart.value=0; Joomla.submitform();',
+					),
+					$elementid
+				),
+			));
+		}
+		else
+		{
+			$lists[$elementid] = $this->getFilterDisplay(array(
+				'label' => JText::_('FLEXI_TYPE'),
+				'html' => '<span class="add-on"><i>' . $type_data->name . '</i></span>',
+			));
+		}
+
+
+		// Build author filter
+		$fieldname = 'filter_author';
+		$elementid = 'filter_author';
+
+		if (!$assocs_id || $assocanytrans || !$created_by)
+		{
+			$lists[$elementid] = $this->getFilterDisplay(array(
+				'label' => JText::_('FLEXI_AUTHOR'),
+				'html' => flexicontent_html::buildauthorsselect(
+					$authors,
+					$fieldname,
+					$filter_author,
+					$displaytype = '-',
+					array(
+						'class' => $this->select_class,
+						'onchange' => 'document.adminForm.limitstart.value=0; Joomla.submitform();',
+					)
+				),
+			));
+		}
+		else
+		{
+			$lists[$elementid] = $this->getFilterDisplay(array(
+				'label' => JText::_('FLEXI_AUTHOR'),
+				'html' => '<span class="add-on"><i>' . JFactory::getUser($created_by)->name . '</i></span>',
+			));
+		}
+
 
 		// Text search filter value
 		$lists['search'] = $search;
 
 
+		// Build language filter
+		$fieldname = 'filter_lang';
+		$elementid = 'filter_lang';
+
+		if (!$assocs_id || !$item_lang)
+		{
+			$lists[$elementid] = $this->getFilterDisplay(array(
+				'label' => JText::_('FLEXI_LANGUAGE'),
+				'html' => flexicontent_html::buildlanguageslist(
+					$fieldname,
+					array(
+						'class' => $this->select_class,
+						'onchange' => 'document.adminForm.limitstart.value=0; Joomla.submitform();',
+					),
+					$filter_lang,
+					$displaytype = '-'
+				),
+			));
+		}
+		else
+		{
+			$lists[$elementid] = $this->getFilterDisplay(array(
+				'label' => JText::_('FLEXI_LANGUAGE'),
+				'html' => '<span class="add-on"><i>' . $item_lang . '</i></span>',
+			));
+		}
+
+
+		// Build publication state filter
+		$options = array(
+			JHtml::_('select.option',  '', '-'/*'FLEXI_SELECT_STATE'*/),
+			JHtml::_('select.option',  'P', 'FLEXI_PUBLISHED'),
+			JHtml::_('select.option',  'U', 'FLEXI_UNPUBLISHED'),
+			JHtml::_('select.option',  'PE','FLEXI_PENDING'),
+			JHtml::_('select.option',  'OQ','FLEXI_TO_WRITE'),
+			JHtml::_('select.option',  'IP','FLEXI_IN_PROGRESS'),
+			JHtml::_('select.option',  'A', 'FLEXI_ARCHIVED'),
+		);
+
+		$fieldname = 'filter_state';
+		$elementid = 'filter_state';
+
+		$lists[$elementid] = $this->getFilterDisplay(array(
+			'label' => JText::_('FLEXI_STATE'),
+			'html' => JHtml::_('select.genericlist',
+				$options,
+				$fieldname,
+				array(
+					'class' => $this->select_class,
+					'size' => '1',
+					'onchange' => 'document.adminForm.limitstart.value=0; Joomla.submitform();',
+				),
+				'value',
+				'text',
+				$filter_state,
+				$elementid,
+				$translate = true
+			),
+		));
+
+
+		// Build access level filter
+		$options = JHtml::_('access.assetgroups');
+		array_unshift($options, JHtml::_('select.option', '', '-'/*'JOPTION_SELECT_ACCESS'*/));
+
+		$fieldname = 'filter_access';
+		$elementid = 'filter_access';
+
+		$lists[$elementid] = $this->getFilterDisplay(array(
+			'label' => JText::_('FLEXI_ACCESS'),
+			'html' => JHtml::_('select.genericlist',
+				$options,
+				$fieldname,
+				array(
+					'class' => $this->select_class,
+					'onchange' => 'document.adminForm.limitstart.value=0; Joomla.submitform();',
+				),
+				'value',
+				'text',
+				$filter_access,
+				$elementid,
+				$translate = true
+			),
+		));
+
+
 		// Table ordering
 		$lists['order_Dir'] = $filter_order_Dir;
 		$lists['order']     = $filter_order;
-
-		// Build the categories filter
-		$categories = $globalcats;
-		$lists['filter_cats'] =  '<label class="label">'.JText::_('FLEXI_CATEGORY').'</label>'.
-			flexicontent_cats::buildcatselect($categories, 'filter_cats', $filter_cats, '-'/*2*/, 'class="use_select2_lib" size="1" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', $check_published=true, $check_perms=false);
-
-
-		// Build type filter
-		$lists['filter_type'] = '<label class="label">'.JText::_('FLEXI_TYPE').'</label>'.
-			($assocs_id && !$assocanytrans && $type_id ?
-				'<span class="badge badge-info">'.$type_data->name.'</span>' :
-				flexicontent_html::buildtypesselect($types, 'filter_type', $filter_type, '-'/*true*/, 'class="use_select2_lib" size="1" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', 'filter_type')
-			);
-
-		// Build author filter
-		$lists['filter_author'] = '<label class="label">'.JText::_('FLEXI_AUTHOR').'</label>'.
-			($assocs_id && !$assocanytrans && $created_by ?
-				'<span class="badge badge-info">'.JFactory::getUser($created_by)->name.'</span>' :
-				flexicontent_html::buildauthorsselect($authors, 'filter_author', $filter_author, '-'/*true*/, 'class="use_select2_lib" size="3" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"')
-			);
-
-		// Build publication state filter
-		$states[] = JHtml::_('select.option',  '', '-'/*'FLEXI_SELECT_STATE'*/ );
-		$states[] = JHtml::_('select.option',  'P', 'FLEXI_PUBLISHED' );
-		$states[] = JHtml::_('select.option',  'U', 'FLEXI_UNPUBLISHED' );
-		$states[] = JHtml::_('select.option',  'PE','FLEXI_PENDING' );
-		$states[] = JHtml::_('select.option',  'OQ','FLEXI_TO_WRITE' );
-		$states[] = JHtml::_('select.option',  'IP','FLEXI_IN_PROGRESS' );
-		$states[] = JHtml::_('select.option',  'A', 'FLEXI_ARCHIVED' );
-
-		$fieldname =  $elementid = 'filter_state';
-		$attribs = ' class="use_select2_lib" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()" ';
-		$lists['filter_state'] = '<label class="label">'.JText::_('FLEXI_STATE').'</label>'.
-			JHtml::_('select.genericlist', $states, $fieldname, $attribs, 'value', 'text', $filter_state, $elementid
-		, $translate=true );
-
-		// Build access level filter
-		$levels = JHtml::_('access.assetgroups');
-		array_unshift($levels, JHtml::_('select.option', '', '-'/*'FLEXI_SELECT_ACCESS'*/));
-		$fieldname =  $elementid = 'filter_access';
-		$attribs = ' class="use_select2_lib" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()" ';
-		$lists['filter_access']	= '<label class="label">'.JText::_('FLEXI_ACCESS').'</label>'.
-			JHtml::_('select.genericlist', $levels, $fieldname, $attribs, 'value', 'text', $filter_access, $elementid
-		, $translate=true );
-
-		// Build language filter
-		$lists['filter_lang'] = '<label class="label">'.JText::_('FLEXI_LANGUAGE').'</label>'.
-			($assocs_id && $item_lang ?
-				'<span class="badge badge-info">'.$item_lang.'</span>' :
-				flexicontent_html::buildlanguageslist('filter_lang', 'class="use_select2_lib" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', $filter_lang, '-'/*2*/)
-			);
 
 
 		/**
@@ -255,13 +387,21 @@ class FlexicontentViewItemelement extends FlexicontentViewBaseRecords
 
 		$this->assocs_id = $assocs_id;
 		$this->filter_cats = $filter_cats;
+		$this->count_filters = $count_filters;
 
 		$this->lists       = $lists;
 		$this->rows        = $rows;
-		$this->langs       = $langs;
 		$this->lang_assocs = $lang_assocs;
+		$this->langs       = $langs;
 		$this->pagination  = $pagination;
 		$this->ordering    = $ordering;
+
+		$this->perms  = FlexicontentHelperPerm::getPerm();
+		$this->option = $option;
+		$this->view   = $view;
+		$this->state  = $this->get('State');
+
+		$this->sidebar = null;
 
 
 		/**
