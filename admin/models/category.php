@@ -743,8 +743,8 @@ class FlexicontentModelCategory extends FCModelAdmin
 		$asset   = $record && !$record->id ? $this->type_alias . '.' . $record->id : $this->option;
 		$isOwner = $record && $user->id && $record->created_user_id = $user->id;
 
-		$canDo    = $user->authorise('core.delete.state', $asset);
-		$canDoOwn	= $user->authorise('core.delete.state.own', $asset) && $isOwner;
+		$canDo    = $user->authorise('core.delete', $asset);
+		$canDoOwn	= $user->authorise('core.delete.own', $asset) && $isOwner;
 
 		return $canDo || $canDoOwn;
 	}

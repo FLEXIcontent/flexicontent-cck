@@ -136,7 +136,7 @@ class JFormFieldSeparator extends JFormFieldSpacer
 				var tr18 = jQuery("#permissions-sliders .tab-content .tab-pane tbody tr:nth-child(18)");
 				var tr22 = jQuery("#permissions-sliders .tab-content .tab-pane tbody tr:nth-child(23)");
 				var tr26 = jQuery("#permissions-sliders .tab-content .tab-pane tbody tr:nth-child(27)");
-				var tr28 = jQuery("#permissions-sliders .tab-content .tab-pane tbody tr:nth-child(29)");
+				var tr29 = jQuery("#permissions-sliders .tab-content .tab-pane tbody tr:nth-child(30)");
 				var tr35 = jQuery("#permissions-sliders .tab-content .tab-pane tbody tr:nth-child(36)");
 				var tr39 = jQuery("#permissions-sliders .tab-content .tab-pane tbody tr:nth-child(40)");
 				var tr43 = jQuery("#permissions-sliders .tab-content .tab-pane tbody tr:nth-child(44)");
@@ -151,7 +151,7 @@ class JFormFieldSeparator extends JFormFieldSpacer
 				tr18.before("<tr><td colspan=\"3\"><span class=\"fcsep_level3\">Various<\/td><\/tr>");
 				tr22.before("<tr><td colspan=\"3\"><span class=\"fcsep_level2\">Workflow<\/td><\/tr>");
 				tr26.before("<tr><td colspan=\"3\"><span class=\"fcsep_level2\">Items manager<\/td><\/tr>");
-				tr28.before("<tr><td colspan=\"3\"><span class=\"fcsep_level2\">Backend Managers (access)<\/td><\/tr>");
+				tr29.before("<tr><td colspan=\"3\"><span class=\"fcsep_level2\">Backend Managers (access)<\/td><\/tr>");
 				tr35.before("<tr><td colspan=\"3\"><span class=\"fcsep_level2\">Fields manager<\/td><\/tr>");
 				tr39.before("<tr><td colspan=\"3\"><span class=\"fcsep_level3 alert alert-info fcpadded\">Overridable in field\'s permissions<\/td><\/tr>");
 				tr43.before("<tr><td colspan=\"3\"><span class=\"fcsep_level2\">Reviews manager<\/td><\/tr>");

@@ -578,7 +578,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		$prettycheckable_added = flexicontent_html::loadFramework('prettyCheckable');  // Get if prettyCheckable was loaded
 		
 		// build state list
-		$non_publishers_stategrp    = $perms['isSuperAdmin'] || $item->state==-3 || $item->state==-4 ;
+		$non_publishers_stategrp    = $perms['canconfig'] || $item->state==-3 || $item->state==-4 ;
 		$special_privelege_stategrp = ($item->state==2 || $perms['canarchive']) || ($item->state==-2 || $perms['candelete']) ;
 		
 		$state = array();
@@ -606,8 +606,8 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 
 		// States reserved for workflow
 		$ops = array();
-		if ($item->state==-3 || $perms['isSuperAdmin'])  $ops[] = array('value' => -3, 'text' => JText::_('FLEXI_PENDING'));
-		if ($item->state==-4 || $perms['isSuperAdmin'])  $ops[] = array('value' => -4, 'text' => JText::_('FLEXI_TO_WRITE'));
+		if ($item->state==-3 || $perms['canconfig'])  $ops[] = array('value' => -3, 'text' => JText::_('FLEXI_PENDING'));
+		if ($item->state==-4 || $perms['canconfig'])  $ops[] = array('value' => -4, 'text' => JText::_('FLEXI_TO_WRITE'));
 
 		if ( $ops )
 		{
@@ -1017,6 +1017,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		
 		$perms 	= array();
 		$perms['isSuperAdmin'] = $permission->SuperAdmin;
+		$perms['canconfig']    = $permission->CanConfig;
 		$perms['multicat']     = $permission->MultiCat;
 		$perms['cantags']      = $permission->CanUseTags;
 		$perms['cancreatetags']= $permission->CanCreateTags;

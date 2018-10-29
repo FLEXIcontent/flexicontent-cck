@@ -25,8 +25,9 @@ defined('_JEXEC') or die('Restricted access');
 jimport('joomla.database.tablenested');
 jimport('joomla.access.rules');
 use Joomla\String\StringHelper;
+require_once('flexicontent_basetablenested.php');
 
-class _flexicontent_categories_common extends JTableNested
+class _flexicontent_categories_common extends flexicontent_basetablenested
 {
 	protected function __getAssetParentId(JTable $table = null, $id = null)
 	{

@@ -288,9 +288,10 @@ class FlexicontentModelItems extends FCModelAdminList
 		// Set record id and wipe data, if setting a different ID
 		if ($this->_id != $id)
 		{
-			$this->_id	 = $id;
-			$this->_data = null;
-			$this->_total= null;
+			$this->_id    = $id;
+			$this->_data  = null;
+			$this->_total = null;
+
 			$this->_extra_cols = null;
 		}
 	}
@@ -2221,8 +2222,8 @@ class FlexicontentModelItems extends FCModelAdminList
 	/**
 	 * Method to move a record upwards or downwards
 	 *
-	 * @param   integer   $direction  A value of 1  or -1 to indicate moving up or down respectively
-	 * @param   integer   $catid      The ID of the category being reorder, needed as items are assigned to multiple categories
+	 * @param   integer   $direction   A value of 1  or -1 to indicate moving up or down respectively
+	 * @param   integer   $catid       The ID of the category being reorder, needed as items are assigned to multiple categories
 	 *
 	 * @return	boolean	  True on success
 	 *
@@ -2230,8 +2231,6 @@ class FlexicontentModelItems extends FCModelAdminList
 	 */
 	public function move($direction, $catid)
 	{
-		$app = JFactory::getApplication();
-
 		// Load the moved record
 		$table = $this->getTable($this->records_jtable, '');
 
@@ -2398,7 +2397,7 @@ class FlexicontentModelItems extends FCModelAdminList
 			 */
 			else
 			{
-				$app->enqueueMessage(
+				JFactory::getApplication()->enqueueMessage(
 					JText::_('Previous/Next record was not found or has same ordering, trying saving ordering once to create incrementing unique ordering numbers'),
 					'notice'
 				);
@@ -3297,78 +3296,54 @@ class FlexicontentModelItems extends FCModelAdminList
 	/**
 	 * Method to find which records are not authorized
 	 *
-	 * @param   array     $cid     array of record ids to check
-	 * @param   string    $rule    string of the ACL rule to check
+	 * @param   array        $cid      Array of record ids to check
+	 * @param		int|string   $action   Either an ACL rule action, or a new state
 	 *
 	 * @return	array     The records having assignments
 	 *
 	 * @since	3.3.0
 	 */
-	public function filterByPermission($cid, $rule)
+	public function filterByPermission($cid, $action)
 	{
-		$cid = ArrayHelper::toInteger($cid);
-
-		// If cannot manage then all records are not changeable
-		if (!$this->canManage)
+		// State -3, -4 are automatic workflow state and manual change is allowed only to configuration managers
+		if (in_array($action, array(-3, -4) && !FlexicontentHelperPerm::getPerm()->SuperAdmin)
 		{
 			return $cid;
 		}
 
-		// Get record owners, needed for *.own ACL
-		$query = $this->_db->getQuery(true)
-			->select('c.id, c.created_by')
-			->from('#__' . $this->records_dbtbl . ' AS c')
-			->where('c.id IN (' . implode(',', $cid) . ')')
-			;
-		$rows = $this->_db->setQuery($query)->loadObjectList();
-
-		$mapped_rule = $rule;
-		$user        = JFactory::getUser();
-		$cid_noauth  = array();
-
-		foreach ($rows as $row)
+		// State 2 is archived and setting items to it, requires a special privilege (besides also required edit.state.*)
+		if (in_array($action, array(2) && !FlexicontentHelperPerm::getPerm()->CanArchives)
 		{
-			$id = $row->id;
-
-			$canDo		= $user->authorise($mapped_rule, 'com_content.article.' . $id);
-			$canDoOwn	= $user->authorise($mapped_rule . '.own', 'com_content.article.' . $id) && $row->created_by == $user->get('id');
-
-			if (!$canDo && !$canDoOwn)
-			{
-				$cid_noauth[] = $id;
-			}
-			else
-			{
-				$this->changeable_rows[$rule][$id] = 1;
-			}
+			return $cid;
 		}
 
-		return $cid_noauth;
+		return parent::filterByPermission($cid, $action);
 	}
 
 
 	/**
 	 * Method to find which records having assignments blocking a state change
 	 *
-	 * @param		array     $cid      array of record ids to check
-	 * @param		string    $tostate  action related to assignments
+	 * @param		array        $cid      Array of record ids to check
+	 * @param		int|string   $action   Either an ACL rule action, or a new state
 	 *
 	 * @return	array     The records having assignments
 	 *
 	 * @since   3.3.0
 	 */
-	public function filterByAssignments($cid = array(), $tostate = -2)
+	public function filterByAssignments($cid = array(), $action = -2)
 	{
 		$cid = ArrayHelper::toInteger($cid);
 		$cid_wassocs = array();
 
-		switch ($tostate)
+		switch ((string)$action)
 		{
-			// Trash
-			case -2:
+			// Delete
+			case 'core.delete':
 				break;
 
-			// Unpublish
+			// Trash, Unpublish
+			case -2:
 			case 0:
 				break;
 		}

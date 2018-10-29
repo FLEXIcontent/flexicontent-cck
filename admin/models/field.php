@@ -333,7 +333,9 @@ class FlexicontentModelField extends FCModelAdmin
 		$record  = $record ?: $this->_record;
 		$user    = JFactory::getUser();
 
-		return $user->authorise('flexicontent.publishfield', 'com_flexicontent.field.' . $record->id);
+		return $record->id < 7
+			?	false
+			: $user->authorise('flexicontent.publishfield', 'com_flexicontent.field.' . $record->id);
 	}
 
 
@@ -349,7 +351,9 @@ class FlexicontentModelField extends FCModelAdmin
 		$record  = $record ?: $this->_record;
 		$user    = JFactory::getUser();
 
-		return $user->authorise('flexicontent.deletefield', 'com_flexicontent.field.' . $record->id);
+		return $record->id < 7
+			?	false
+			: $user->authorise('flexicontent.deletefield', 'com_flexicontent.field.' . $record->id);
 	}
 
 

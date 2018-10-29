@@ -236,7 +236,7 @@ class FlexicontentViewGroups extends FlexicontentViewBaseRecords
 			);
 		}
 
-		if ($canDo->get('core.edit'))
+		if (0 && $canDo->get('core.edit'))
 		{
 			JToolbarHelper::editList('group.edit');
 		}
