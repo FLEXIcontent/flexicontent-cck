@@ -2180,24 +2180,27 @@ class flexicontent_html
 		$canCheckin = empty($record->checked_out) || $record->checked_out == $user->id || $user->authorise('core.admin', 'com_checkin');
 
 		// Determine privileges of the current user on the given item
+		$has_config     = $user->authorise('core.admin', 'com_flexicontent');
 		$has_edit_state = $model->canEditState($record);
-		$has_delete     = $model->canDelete($record);
+		$has_trash      = $has_edit_state;
 		$has_archive    = $record_name === 'item'
 			? $has_edit_state && $perms->CanArchives
 			: $has_edit_state;
 
 		// Clear access if record is locked
 		$has_edit_state = $canCheckin && $has_edit_state;
-		$has_delete     = $canCheckin && $has_delete;
+		$has_trash      = $canCheckin && $has_trash;
 		$has_archive    = $canCheckin && $has_archive;
 
 		// Clear access if state is not supported
-		$has_delete  = $has_delete && empty($trash_unsupported);
+		$has_trash   = $has_trash && empty($trash_unsupported);
 		$has_archive = $has_archive && empty($archive_unsupported);
 
 		// Has access to specific state, and doing the specific state change
-		$has_n_doing_edit_state = $has_edit_state && in_array($state, array(0,1,-3,-4,-5));
-		$has_n_doing_delete     = $has_delete && $state === -2;
+		$has_n_doing_edit_state = $has_edit_state && (
+			in_array($state, array(0,1,-5)) || ($has_config && in_array($state, array(-3,-4)))
+		);
+		$has_n_doing_delete     = $has_trash && $state === -2;
 		$has_n_doing_archive    = $has_archive && $state === 2;
 
 		// Check if user can change of the item to the requested state
@@ -2956,13 +2959,11 @@ class flexicontent_html
 			}
 
 			if ($has_archive)
-			
 			{
 				$state_ids[] = 2;
 			}
 
 			if ($has_delete)
-			
 			{
 				$state_ids[] = -2;
 			}

@@ -232,26 +232,16 @@ class FlexicontentModelGroups extends FCModelAdminList
 	/**
 	 * Method to find which records are not authorized
 	 *
-	 * @param   array     $cid     array of record ids to check
-	 * @param   string    $rule    string of the ACL rule to check
+	 * @param   array        $cid      Array of record ids to check
+	 * @param		int|string   $action   Either an ACL rule action, or a new state
 	 *
 	 * @return	array     The records having assignments
 	 *
 	 * @since   3.3.0
 	 */
-	public function filterByPermission($cid, $rule)
+	public function filterByPermission($cid, $action)
 	{
-		$cid = ArrayHelper::toInteger($cid);
-
-		// If cannot manage then all records are not changeable
-		if (!$this->canManage)
-		{
-			return $cid;
-		}
-
-		$cid_noauth  = array();
-
-		return $cid_noauth;
+		return parent::filterByPermission($cid, $action);
 	}
 
 
@@ -267,12 +257,7 @@ class FlexicontentModelGroups extends FCModelAdminList
 	 */
 	public function filterByAssignments($cid = array(), $tostate = -2)
 	{
-		$cid = ArrayHelper::toInteger($cid);
-		$cid_wassocs = array();
-
-		// We will not return assignments ?
-
-		return $cid_wassocs;
+		return parent::filterByAssignments($cid, $tostate);
 	}
 
 

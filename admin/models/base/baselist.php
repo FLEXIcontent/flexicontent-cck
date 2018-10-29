@@ -147,8 +147,8 @@ abstract class FCModelAdminList extends JModelList
 		 */
 
 		// Various filters
-		$filter_state  = $fcform ? $jinput->get('filter_state', '', 'alnum') : $app->getUserStateFromRequest($p . 'filter_state', 'filter_state', '', 'alnum');
-		$filter_access = $fcform ? $jinput->get('filter_access', '', 'alnum') : $app->getUserStateFromRequest($p . 'filter_access', 'filter_access', '', 'alnum');
+		$filter_state  = $fcform ? $jinput->get('filter_state', '', 'cmd') : $app->getUserStateFromRequest($p . 'filter_state', 'filter_state', '', 'cmd');
+		$filter_access = $fcform ? $jinput->get('filter_access', '', 'cmd') : $app->getUserStateFromRequest($p . 'filter_access', 'filter_access', '', 'cmd');
 		$filter_lang   = $fcform ? $jinput->get('filter_lang', '', 'string') : $app->getUserStateFromRequest($p . 'filter_lang', 'filter_lang', '', 'string');
 		$filter_author = $fcform ? $jinput->get('filter_author', '', 'cmd') : $app->getUserStateFromRequest($p . 'filter_author', 'filter_author', '', 'string');
 
@@ -653,8 +653,8 @@ abstract class FCModelAdminList extends JModelList
 	/**
 	 * Method to move a record upwards or downwards
 	 *
-	 * @param  integer    $direction   A value of 1  or -1 to indicate moving up or down respectively
-	 * @param  integer    $parent_id   The id of the parent if applicable
+	 * @param   integer   $direction   A value of 1  or -1 to indicate moving up or down respectively
+	 * @param   integer   $parent_id   The id of the parent if applicable
 	 *
 	 * @return	boolean	  True on success
 	 *
@@ -662,6 +662,7 @@ abstract class FCModelAdminList extends JModelList
 	 */
 	public function move($direction, $parent_id)
 	{
+		// Load the moved record
 		$table = $this->getTable($this->records_jtable, '');
 
 		if (!$table->load($this->_id))
@@ -685,19 +686,19 @@ abstract class FCModelAdminList extends JModelList
 
 
 	/**
-	 * Method to check if given records can not change state due to assignments or due to permissions
-	 * This will also mark ACL changeable records into model, this is required by changestate to have an effect
+	 * Method to check if a set of records can not have the provided action performed due to assignments or due to permissions
+	 * This will also mark ACL allowed records into model, this is required by methods like changestate to have an effect
 	 *
-	 * @param   array     $cid          array of record ids to check
-	 * @param   array     $cid_noauth   (variable by reference), pass authorizing -ignored- IDs and return an array of non-authorized record ids
-	 * @param   array     $cid_wassocs  (variable by reference), pass assignments -ignored- IDs and return an array of 'locked' record ids
-	 * @param   integer   $tostate      (variable by reference), pass assignments -ignored- IDs and return an array of 'locked' record ids
+	 * @param   array       $cid          array of record ids to check
+	 * @param   array       $cid_noauth   (variable by reference), pass authorizing -ignored- IDs and return an array of non-authorized record ids
+	 * @param   array       $cid_wassocs  (variable by reference), pass assignments -ignored- IDs and return an array of 'locked' record ids
+	 * @param   int|string  $action       ACL rule name or new state value, to use this for calculating ACL
 	 *
 	 * @return  boolean   True when at least 1 publishable record found
 	 *
 	 * @since	3.3.0
 	 */
-	public function canchangestate(& $cid, & $cid_noauth = null, & $cid_wassocs = null, $tostate = 0)
+	public function canDoAction(& $cid, & $cid_noauth = null, & $cid_wassocs = null, $action = 0)
 	{
 		$authorizing_ignored = $cid_noauth ? array_flip($cid_noauth) : array();
 		$assignments_ignored = $cid_wassocs ? array_flip($cid_wassocs) : array();
@@ -709,7 +710,7 @@ abstract class FCModelAdminList extends JModelList
 		if (in_array('FCModelTraitNestableRecord', class_uses($this)))
 		{
 			// If publishing then add all parents to the list, so that they get published too
-			if ($state == 1)
+			if (is_int($action) && (int) $action === 1)
 			{
 				foreach ($cid as $_id)
 				{
@@ -728,7 +729,7 @@ abstract class FCModelAdminList extends JModelList
 		}
 
 		// Find ACL disallowed
-		$cid_noauth = $this->filterByPermission($cid, $tostate == -2 ? 'core.delete' : 'core.edit.state');
+		$cid_noauth = $this->filterByPermission($cid, $action);
 
 		foreach ($cid_noauth as $i => $id)
 		{
@@ -739,7 +740,7 @@ abstract class FCModelAdminList extends JModelList
 		}
 
 		// Find having blocking assignments (if applicable for this record type)
-		$cid_wassocs = $this->filterByAssignments($cid, $tostate);
+		$cid_wassocs = $this->filterByAssignments($cid, $action);
 
 		foreach ($cid_wassocs as $i => $id)
 		{
@@ -802,13 +803,28 @@ abstract class FCModelAdminList extends JModelList
 	 *
 	 * @param		array			$cid          array of record ids to delete their related Data
 	 *
-	 * @return	void
+	 * @return	bool      True on success
 	 *
-	 * @since		3.3.0
+	 * @since   3.3.0
 	 */
 	protected function _deleteRelatedData($cid)
 	{
-		
+		return true;
+	}
+
+
+	/**
+	 * Method to delete records relations like record assignments
+	 *
+	 * @param		array			$cid          array of record ids to delete their related data
+	 *
+	 * @return	bool      True on success
+	 *
+	 * @since		3.3.0
+	 */
+	public function delete_relations($cid)
+	{
+		return true;
 	}
 
 
@@ -820,7 +836,7 @@ abstract class FCModelAdminList extends JModelList
 	 *
 	 * @return	array		Array of old-to new record ids of copied record IDs
 	 *
-	 * @since		1.0
+	 * @since   3.3.0
 	 */
 	public function copy($cid, $copyRelations = null)
 	{
@@ -859,13 +875,10 @@ abstract class FCModelAdminList extends JModelList
 	 *
 	 * @param   array     $ids_map     array of old to new record ids
 	 *
-	 * @return	void
-	 *
-	 * @since		3.3.0
+	 * @since   3.3.0
 	 */
 	protected function _copyRelatedData($ids_map)
 	{
-		
 	}
 
 
@@ -914,28 +927,70 @@ abstract class FCModelAdminList extends JModelList
 	/**
 	 * Method to find which records are not authorized
 	 *
-	 * @param   array     $cid     array of record ids to check
-	 * @param   string    $rule    string of the ACL rule to check
+	 * @param   array        $cid      Array of record ids to check
+	 * @param		int|string   $action   Either an ACL rule action, or a new state
 	 *
 	 * @return	array     The records having assignments
 	 *
 	 * @since	3.3.0
 	 */
-	public function filterByPermission($cid, $rule)
+	public function filterByPermission($cid, $action)
 	{
-		$cid = ArrayHelper::toInteger($cid);
+		$user  = JFactory::getUser();
+		$table = $this->getTable($this->records_jtable, '');
+
+		$cid   = ArrayHelper::toInteger($cid);
+		$rule  = is_int($action) ? 'core.edit.state' : $action;
 
 		// If cannot manage then all records are not changeable
 		if (!$this->canManage)
 		{
 			return $cid;
 		}
+		
+		// If not tracking assets then return zero non-allowed records
+		if (!property_exists($table, 'asset_id'))
+		{
+			return array();
+		}
 
-		$cid_noauth = array();
+		$has_created_by_col = property_exists($table, $this->created_by_col);
 
-		// All records changeable
-		$ids                     = array_flip($cid);
-		$this->changeable_rows[$rule] = $ids;
+		// Get record owners, needed for *.own ACL
+		$query = $this->_db->getQuery(true)
+			->select('c.' . $table->getKeyName() . ' AS id')
+			->from('#__' . $this->records_dbtbl . ' AS c')
+			->where('c.' . $table->getKeyName() . ' IN (' . implode(',', $cid) . ')');
+
+		if ($has_created_by_col)
+		{
+			$query->select('c.' . $this->created_by_col . ' AS created_by');
+		}
+
+		$rows = $this->_db->setQuery($query)->loadObjectList('id');
+
+		$cid_noauth   = array();
+		$asset_prefix = $table->getAssetPrefix();
+		$mapped_rule  = isset($this->rules_map[$rule]) ? $this->rules_map[$rule] : $rule;
+
+		foreach ($rows as $id => $row)
+		{
+			$asset = $asset_prefix . '.' . $id;
+
+			$canDo		= $user->authorise($mapped_rule, $asset);
+			$canDoOwn	= $has_created_by_col
+				? $user->authorise($mapped_rule . '.own', $asset) && $row->created_by == $user->get('id')
+				: false;
+
+			if (!$canDo && !$canDoOwn)
+			{
+				$cid_noauth[] = $id;
+			}
+			else
+			{
+				$this->changeable_rows[$rule][$id] = 1;
+			}
+		}
 
 		return $cid_noauth;
 	}
@@ -944,23 +999,26 @@ abstract class FCModelAdminList extends JModelList
 	/**
 	 * Method to find which records having assignments blocking a state change
 	 *
-	 * @param		array     $cid      array of record ids to check
-	 * @param		string    $tostate  action related to assignments
+	 * @param		array        $cid      Array of record ids to check
+	 * @param		int|string   $action   Either an ACL rule action, or a new state
 	 *
 	 * @return	array     The records having assignments
+	 *
+	 * @since   3.3.0
 	 */
-	public function filterByAssignments($cid = array(), $tostate = -2)
+	public function filterByAssignments($cid = array(), $action = -2)
 	{
 		$cid = ArrayHelper::toInteger($cid);
 		$cid_wassocs = array();
 
-		switch ($tostate)
+		switch ((string)$action)
 		{
-			// Trash
-			case -2:
+			// Delete
+			case 'core.delete':
 				break;
 
-			// Unpublish
+			// Trash, Unpublish
+			case -2:
 			case 0:
 				break;
 		}

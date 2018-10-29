@@ -24,7 +24,6 @@ jimport('legacy.controller.form');
  */
 class FlexicontentControllerGroup extends JControllerForm
 {
-
 	/**
 	 * @var     string  The prefix to use with controller messages.
 	 * @since   1.6

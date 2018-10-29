@@ -209,78 +209,40 @@ class FlexicontentModelCategories extends FCModelAdminList
 	/**
 	 * Method to find which records are not authorized
 	 *
-	 * @param   array     $cid     array of record ids to check
-	 * @param   string    $rule    string of the ACL rule to check
+	 * @param		array        $cid      Array of record ids to check
+	 * @param		int|string   $action   Either an ACL rule action, or a new state
 	 *
 	 * @return	array     The records having assignments
 	 *
 	 * @since   3.3.0
 	 */
-	public function filterByPermission($cid, $rule)
+	public function filterByPermission($cid, $action)
 	{
-		$cid = ArrayHelper::toInteger($cid);
-		$cid_list = implode( ',', $cid );
-
-		// If cannot manage then all records are not changeable
-		if (!$this->canManage)
-		{
-			return $cid;
-		}
-
-		// Get record owners, needed for *.own ACL
-		$query = $this->_db->getQuery(true)
-			->select('c.id, c.created_user_id')
-			->from('#__' . $this->records_dbtbl . ' AS c')
-			->where('c.id IN (' . $cid_list . ')')
-		;
-		$rows = $this->_db->setQuery($query)->loadObjectList();
-
-		$mapped_rule = $rule;
-		$user        = JFactory::getUser();
-		$cid_noauth  = array();
-
-		foreach ($rows as $row)
-		{
-			$id = $row->id;
-
-			$canDo    = $user->authorise($mapped_rule, 'com_content.category.' . $id);
-			$canDoOwn = $user->authorise($mapped_rule . '.own', 'com_content.category.' . $id) && $row->created_user_id == $user->get('id');
-
-			if (!$canDo && !$canDoOwn)
-			{
-				$cid_noauth[] = $id;
-			}
-			else
-			{
-				$this->changeable_rows[$rule][$id] = 1;
-			}
-		}
-
-		return $cid_noauth;
+		return parent::filterByPermission($cid, $action);
 	}
 
 
 	/**
 	 * Method to find which records having assignments blocking a state change
 	 *
-	 * @param		array     $cid      array of record ids to check
-	 * @param		string    $tostate  action related to assignments
+	 * @param		array        $cid      Array of record ids to check
+	 * @param		int|string   $action   Either an ACL rule action, or a new state
 	 *
 	 * @return	array     The records having assignments
 	 *
 	 * @since   3.3.0
 	 */
-	public function filterByAssignments($cid = array(), $tostate = -2)
+	public function filterByAssignments($cid = array(), $action = -2)
 	{
 		$cid = ArrayHelper::toInteger($cid);
 		$cid_list = implode( ',', $cid );
 
 		$cid_wassocs = array();
 
-		switch ($tostate)
+		switch ((string)$action)
 		{
-			// Trash
-			case -2:
+			// Delete
+			case 'core.delete':
 				$query = 'SELECT DISTINCT catid'
 					. ' FROM #__flexicontent_cats_item_relations'
 					. ' WHERE catid IN (' . $cid_list . ')'
@@ -289,7 +251,8 @@ class FlexicontentModelCategories extends FCModelAdminList
 				$cid_wassocs = $this->_db->setQuery($query)->loadColumn();
 				break;
 
-			// Unpublish
+			// Trash, Unpublish
+			case -2:
 			case 0:
 				break;
 		}

@@ -62,11 +62,14 @@ class FlexicontentHelperPerm
 		$user_id = $user->id;
 		$permission = new stdClass;
 		
-		// !!! This is the Super User Privelege of GLOBAL Configuration		(==> (for J2.5) core.admin ACTION allowed on ROOT ASSET: 'root.1')
-		$permission->SuperAdmin		= JAccess::check($user->id, 'core.admin', 'root.1');
+		/**
+		 * This is the Super User Privilege of Global Configuration	(core.admin ACTION allowed on ROOT ASSET: 'root.1')
+		 * Alternative way is JAccess::check($user->id, 'core.admin', 'root.1'), but this will fail with emergency root user
+		 */
+		$permission->SuperAdmin		= $user->authorise('core.admin', 'root.1');
 		
-		//!!! ALLOWs USERS to change component's CONFIGURATION						(==> (for J2.5) core.admin ACTION allowed on COMPONENT ASSET: e.g. 'com_flexicontent')
-		$permission->CanConfig		= $user->authorise('core.admin', 				'com_flexicontent');
+		//!!! ALLOWs USERS to change component's Configuration (core.admin ACTION allowed on COMPONENT ASSET: e.g. 'com_flexicontent')
+		$permission->CanConfig		= $user->authorise('core.admin', 'com_flexicontent');
 				
 		//!!! ALLOWs USERS in JOOMLA BACKEND : (not used in J1.5)
 		//   (a) to view the FLEXIcontent menu item in Components Menu and
@@ -108,6 +111,7 @@ class FlexicontentHelperPerm
 		$permission->CanOrder     = $user->authorise('flexicontent.orderitems', 'com_flexicontent'); // (backend) Reorder items inside the category
 		$permission->CanParams    = 1; // Legacy permission, we will not use it in FC v3.0.15+
 		$permission->CanVersion   = $user->authorise('flexicontent.versioning', 'com_flexicontent'); // (backend) Use item versioning
+		$permission->CanArchives  = $user->authorise('flexicontent.managearchives', 'com_flexicontent'); // Allow setting items to Archived state
 		
 		$permission->AssocAnyTrans      = $user->authorise('flexicontent.assocanytrans',      'com_flexicontent'); // (item edit form) associate any translation
 		$permission->EditCreationDate   = $user->authorise('flexicontent.editcreationdate',   'com_flexicontent'); // (item edit form) edit creation date
@@ -133,7 +137,6 @@ class FlexicontentHelperPerm
 		
 		// VARIOUS management TABS: types, archives, statistics, templates, tags
 		$permission->CanTypes      = $user->authorise('flexicontent.managetypes',      'com_flexicontent'); // (backend) Allow management of Item Types
-		$permission->CanArchives   = $user->authorise('flexicontent.managearchives',   'com_flexicontent'); // (backend) Allow management of Archives
 		$permission->CanTemplates  = $user->authorise('flexicontent.managetemplates',  'com_flexicontent'); // (backend) Allow management of Templates
 		$permission->CanStats      = $user->authorise('flexicontent.managestats',      'com_flexicontent'); // (backend) Allow management of Statistics
 		$permission->CanImport     = $user->authorise('flexicontent.manageimport',     'com_flexicontent'); // (backend) Allow management of (Content) Import

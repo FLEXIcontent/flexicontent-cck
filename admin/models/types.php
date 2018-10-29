@@ -163,7 +163,7 @@ class FlexicontentModelTypes extends FCModelAdminList
 	 *
 	 * @param		array			$cid          array of record ids to delete their related Data
 	 *
-	 * @return	void
+	 * @return	bool      True on success
 	 *
 	 * @since   3.3.0
 	 */
@@ -171,12 +171,17 @@ class FlexicontentModelTypes extends FCModelAdminList
 	{
 		if (count($cid))
 		{
+			$cid = ArrayHelper::toInteger($cid);
+			$cid_list = implode(',', $cid);
+
 			// Delete also field - type relations
 			$query = $this->_db->getQuery(true)
 				->delete('#__flexicontent_fields_type_relations')
 				->where('type_id IN (' . $cid_list . ')');
 			$this->_db->setQuery($query)->execute();
 		}
+
+		return true;
 	}
 
 
@@ -255,22 +260,22 @@ class FlexicontentModelTypes extends FCModelAdminList
 	/**
 	 * Method to find which records having assignments blocking a state change
 	 *
-	 * @param		array     $cid      array of record ids to check
-	 * @param		string    $tostate  action related to assignments
+	 * @param		array        $cid      Array of record ids to check
+	 * @param		int|string   $action   Either an ACL rule action, or a new state
 	 *
 	 * @return	array     The records having assignments
 	 *
 	 * @since   3.3.0
 	 */
-	public function filterByAssignments($cid = array(), $tostate = -2)
+	public function filterByAssignments($cid = array(), $action = -2)
 	{
 		$cid = ArrayHelper::toInteger($cid);
 		$cid_wassocs = array();
 
-		switch ($tostate)
+		switch ((string)$action)
 		{
-			// Trash
-			case -2:
+			// Delete
+			case 'core.delete':
 				$query = 'SELECT DISTINCT type_id'
 					. ' FROM #__flexicontent_items_ext'
 					. ' WHERE type_id IN (' . implode(',', $cid) . ')'
@@ -279,7 +284,12 @@ class FlexicontentModelTypes extends FCModelAdminList
 				$cid_wassocs = $this->_db->setQuery($query)->loadColumn();
 				break;
 
-			// Unpublish
+			// Trash (currently not allowed)
+			case -2:
+				$cid_wassocs = $cid;
+				break;
+
+			// Unpublish (=Disable)
 			case 0:
 				break;
 		}

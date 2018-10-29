@@ -41,7 +41,7 @@ trait FCModelTraitLegacyList
 	 *
 	 * @return	boolean	True on success
 	 *
-	 * @since	3.3.0
+	 * @since   3.3.0
 	 */
 	public function publish($cid, $state = 1)
 	{
@@ -50,26 +50,44 @@ trait FCModelTraitLegacyList
 		 */
 		$cid_noauth  = null;
 		$cid_wassocs = null;
-		$this->canchangestate($cid, $cid_noauth, $cid_wassocs, $tostate = $state);
+		$this->canDoAction($cid, $cid_noauth, $cid_wassocs, $tostate = $state);
 
 		return $this->changestate($cid, $state);
 	}
 
 
 	/**
+	 * Method to check if given records can not be changed to the given state due to assignments or due to permissions
+	 *
+	 * @param   array       $cid          array of record ids to check
+	 * @param   array       $cid_noauth   (variable by reference), pass authorizing -ignored- IDs and return an array of non-authorized record ids
+	 * @param   array       $cid_wassocs  (variable by reference), pass assignments -ignored- IDs and return an array of 'locked' record ids
+	 * @param   int         $tostate      New state value
+	 *
+	 * @return  boolean   True when at least 1 changeable record found
+	 *
+	 * @since   3.3.0
+	 */
+	public function canchangestate($cid, & $cid_noauth = null, & $cid_wassocs = null, $tostate = 0)
+	{
+		return $this->canDoAction($cid, $cid_noauth, $cid_wassocs, $action = $tostate);
+	}
+
+
+	/**
 	 * Method to check if given records can not be deleted due to assignments or due to permissions
 	 *
-	 * @param		array			$cid          array of record ids to check
-	 * @param		array			$cid_noauth   (variable by reference), pass authorizing -ignored- IDs and return an array of non-authorized record ids
-	 * @param		array			$cid_wassocs  (variable by reference), pass assignments -ignored- IDs and return an array of 'locked' record ids
+	 * @param   array       $cid          array of record ids to check
+	 * @param   array       $cid_noauth   (variable by reference), pass authorizing -ignored- IDs and return an array of non-authorized record ids
+	 * @param   array       $cid_wassocs  (variable by reference), pass assignments -ignored- IDs and return an array of 'locked' record ids
 	 *
 	 * @return	boolean	  True when at least 1 deleteable record found
 	 *
-	 * @since	3.3
+	 * @since   3.3.0
 	 */
-	public function candelete(& $cid, & $cid_noauth = null, & $cid_wassocs = null)
+	public function candelete($cid, & $cid_noauth = null, & $cid_wassocs = null)
 	{
-		return $this->canchangestate($cid, $cid_noauth, $cid_wassocs, $tostate = -2);
+		return $this->canDoAction($cid, $cid_noauth, $cid_wassocs, $action = 'core.delete');
 	}
 
 
@@ -82,10 +100,10 @@ trait FCModelTraitLegacyList
 	 *
 	 * @return	boolean	  True when at least 1 publishable record found
 	 *
-	 * @since	3.3.0
+	 * @since   3.3.0
 	 */
-	public function canunpublish(& $cid, & $cid_noauth = null, & $cid_wassocs = null)
+	public function canunpublish($cid, & $cid_noauth = null, & $cid_wassocs = null)
 	{
-		return $this->canchangestate($cid, $cid_noauth, $cid_wassocs, $tostate = 0);
+		return $this->canDoAction($cid, $cid_noauth, $cid_wassocs, $action = 0);
 	}
 }

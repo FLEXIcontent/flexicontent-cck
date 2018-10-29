@@ -43,23 +43,29 @@ window.addEvent('domready', function(){
 	});
 }); 
 </script>
+<style>
+	body.contentpane.component,
+	body.contentpane.modal {
+		height: 100%;
+	}
+</style>
 
-<form action="index.php?option=com_flexicontent&".$ctrl_task."import&layout=import&<?php echo FLEXI_J16GE ? 'format=raw' : 'tmpl=component';?>" method="post" name="adminForm" id="adminForm">
+<form action="index.php?option=com_flexicontent&".$ctrl_task."import&layout=import&<?php echo FLEXI_J16GE ? 'format=raw' : 'tmpl=component';?>" method="post" name="adminForm" id="adminForm" style="height: 92%;">
 
-	<fieldset>
+	<fieldset style="height: 92%;">
 		<legend style="font-size:12px; font-style:arial;" >
 			<?php echo JText::_( 'FLEXI_IMPORT_TAGS' ); ?>
-			<img class="hasTooltip tags" title="<?php echo JText::_( 'FLEXI_IMPORT_TAGS_DESC', true ); ?>" style="float:none; margin:0 0 -4px 4px;" src="components/com_flexicontent/assets/images/information.png" border="0" alt="Note"/>
+			<img class="hasTooltip tags" data-placement="bottom" title="<?php echo JText::_('FLEXI_IMPORT_TAGS_DESC', true); ?>" style="float:none; margin:0 0 -4px 4px;" src="components/com_flexicontent/assets/images/information.png" border="0" alt="Note"/>
 		</legend>
-		<textarea id="taglist" name="taglist" rows="20" cols="51" style="font-size:11px; font-style:arial;"></textarea>
+		<textarea id="taglist" name="taglist" style="width: 84%; padding: 4%; margin: 0 4% 8px 4%; height: 90%"></textarea>
 	</fieldset>
 	<table width="100%" align="center">
 		<tr>
 			<td width="50%" align="right">
-			<input id="import" type="submit" class="fc_button" value="<?php echo JText::_( 'FLEXI_IMPORT_TAGS_BUTTON' ); ?>" />
+			<input id="import" type="submit" class="btn btn-success" value="<?php echo JText::_( 'FLEXI_IMPORT_TAGS_BUTTON' ); ?>" />
 			</td>
 			<td width="50%" align="left">
-			<input type="button" class="fc_button" onclick="window.parent.document.adminForm.submit();<?php echo $close_popup_js;?>" value="<?php echo JText::_( 'FLEXI_CLOSE_IMPORT_TAGS' ); ?>" />			
+			<input type="button" class="btn" onclick="window.parent.document.adminForm.submit();<?php echo $close_popup_js;?>" value="<?php echo JText::_( 'FLEXI_CLOSE_IMPORT_TAGS' ); ?>" />			
 			</td>
 		</tr>
 	</table>

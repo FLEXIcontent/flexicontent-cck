@@ -171,21 +171,6 @@ class FlexicontentModelReviews extends FCModelAdminList
 
 
 	/**
-	 * Method to delete related data of records
-	 *
-	 * @param		array			$cid          array of record ids to delete their related Data
-	 *
-	 * @return	void
-	 *
-	 * @since   3.3.0
-	 */
-	protected function _deleteRelatedData($cid)
-	{
-		
-	}
-
-
-	/**
 	 * Method to copy records
 	 *
 	 * @param		array			$cid          array of record ids to copy
@@ -245,25 +230,26 @@ class FlexicontentModelReviews extends FCModelAdminList
 	/**
 	 * Method to find which records having assignments blocking a state change
 	 *
-	 * @param		array     $cid      array of record ids to check
-	 * @param		string    $tostate  action related to assignments
+	 * @param		array        $cid      Array of record ids to check
+	 * @param		int|string   $action   Either an ACL rule action, or a new state
 	 *
 	 * @return	array     The records having assignments
 	 *
 	 * @since   3.3.0
 	 */
-	public function filterByAssignments($cid = array(), $tostate = -2)
+	public function filterByAssignments($cid = array(), $action = -2)
 	{
 		$cid = ArrayHelper::toInteger($cid);
 		$cid_wassocs = array();
 
-		switch ($tostate)
+		switch ((string)$action)
 		{
-			// Trash
-			case -2:
+			// Delete
+			case 'core.delete':
 				break;
 
-			// Unpublish
+			// Trash, Unpublish
+			case -2:
 			case 0:
 				break;
 		}

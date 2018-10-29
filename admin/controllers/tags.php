@@ -56,17 +56,6 @@ class FlexicontentControllerTags extends FlexicontentControllerBaseAdmin
 	{
 		parent::__construct($config);
 
-		// Register task aliases
-		$this->registerTask('add',          'edit');
-		$this->registerTask('apply',        'save');
-		$this->registerTask('apply_ajax',   'save');
-		$this->registerTask('save2new',     'save');
-		$this->registerTask('save2copy',    'save');
-
-		$this->registerTask('exportxml', 'export');
-		$this->registerTask('exportsql', 'export');
-		$this->registerTask('exportcsv', 'export');
-
 		// Can manage ACL
 		$this->canManage = FlexicontentHelperPerm::getPerm()->CanTags;
 
@@ -74,6 +63,7 @@ class FlexicontentControllerTags extends FlexicontentControllerBaseAdmin
 		$this->err_locked_recs_changestate = 'FLEXI_YOU_CANNOT_CHANGE_STATE_OF_THESE_RECORDS_WITH_ASSOCIATED_DATA';
 		$this->err_locked_recs_remove = 'FLEXI_YOU_CANNOT_REMOVE_THESE_RECORDS_WITH_ASSOCIATED_DATA';
 		$this->warn_locked_recs_skipped = 'FLEXI_SKIPPED_RECORDS_WITH_ASSOCIATIONS';
+		$this->relations_deleted = 'FLEXI_ASSIGNMENTS_DELETED';
 	}
 
 

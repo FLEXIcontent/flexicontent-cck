@@ -356,11 +356,6 @@ if ($js)
 
 			<th class="hideOnDemandClass left">
 				<?php echo JHtml::_('grid.sort', 'FLEXI_STATUS', 'i.' . $this->state_propname, $this->lists['order_Dir'], $this->lists['order'] ); ?>
-				<?php if ($this->getModel()->getState('filter_state')) : ?>
-				<span <?php echo $rem_filt_tip; ?>>
-					<span class="icon-cancel-circle btn btn-micro" onclick="delFilter('filter_state'); document.adminForm.submit();"></span>
-				</span>
-				<?php endif; ?>
 			</th>
 
 			<?php /*<th style="padding:0px;"><?php echo JHtml::_('grid.sort', 'FLEXI_FIELD_DESCRIPTION', 'a.description', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>*/ ?>

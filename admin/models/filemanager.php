@@ -1463,19 +1463,17 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 
 
 	/**
-	 * Method to check if given files can not be deleted e.g. due to assignments
+	 * Method to check if given records can not be deleted due to assignments or due to permissions
 	 *
-	 * @param		array			$cid            array of record ids to check
-	 * @param		array			$ignored        array of record ids to ignore during checks
-	 * @param		array			$s_field_types  array of single property field types that stored file IDs
-	 * @param		array			$m_field_types  array of field value properties storing file references (indexed by field types)
-	 * @param		array			$m_value_props  array of file properties to compare the given field value properties (indexed by field types)
+	 * @param   array       $cid          array of record ids to check
+	 * @param   array       $cid_noauth   (variable by reference), pass authorizing -ignored- IDs and return an array of non-authorized record ids
+	 * @param   array       $cid_wassocs  (variable by reference), pass assignments -ignored- IDs and return an array of 'locked' record ids
 	 *
-	 * @return	boolean	  True when they can be deleted
+	 * @return	boolean	  True when at least 1 deleteable record found
 	 *
-	 * @since	1.5
+	 * @since   3.3.0
 	 */
-	public function candelete(&$cid, &$cid_noauth = NULL, &$cid_wassocs = NULL)
+	public function candelete($cid, & $cid_noauth = null, & $cid_wassocs = null)
 	{
 		$authorizing_ignored = $cid_noauth ? array_flip($cid_noauth) : array();
 		$assignments_ignored = $cid_wassocs ? array_flip($cid_wassocs) : array();
@@ -1511,11 +1509,15 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 	/**
 	 * Method to check if given records can not be unpublished due to assignments or due to permissions
 	 *
-	 * @access	public
-	 * @return	boolean
-	 * @since	1.5
+	 * @param		array			$cid          array of record ids to check
+	 * @param		array			$cid_noauth   (variable by reference), pass authorizing -ignored- IDs and return an array of non-authorized record ids
+	 * @param		array			$cid_wassocs  (variable by reference), pass assignments -ignored- IDs and return an array of 'locked' record ids
+	 *
+	 * @return	boolean	  True when at least 1 publishable record found
+	 *
+	 * @since   3.3.0
 	 */
-	public function canunpublish(&$cid, &$cid_noauth = NULL, &$cid_wassocs = NULL)
+	public function canunpublish($cid, & $cid_noauth = null, & $cid_wassocs = null)
 	{
 		if ($checkACL)
 		{

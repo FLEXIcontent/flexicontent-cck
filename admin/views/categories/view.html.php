@@ -456,6 +456,10 @@ class FlexicontentViewCategories extends FlexicontentViewBaseRecords
 
 		$loading_msg = flexicontent_html::encodeHTML(JText::_('FLEXI_LOADING') .' ... '. JText::_('FLEXI_PLEASE_WAIT'), 2);
 
+		$hasEdit      = $perms->CanEdit    || $perms->CanEditOwn;
+		$hasEditState = $perms->CanPublish || $perms->CanPublishOwn;
+		$hasDelete    = $perms->CanDelete  || $perms->CanDeleteOwn;
+
 		// Get if state filter is active
 		$model = $this->getModel();
 		$filter_state = $model->getState('filter_state');
@@ -482,14 +486,14 @@ class FlexicontentViewCategories extends FlexicontentViewBaseRecords
 			JToolbarHelper::addNew($contrl_singular.'add');
 		}
 
-		if ($user->authorise('core.edit', 'com_flexicontent') || $user->authorise('core.edit.own', 'com_flexicontent'))
+		if (0 && $hasEdit)
 		{
 			JToolbarHelper::editList($contrl_singular.'edit');
 		}
 
 		$btn_arr = array();
 
-		if ( $user->authorise('core.edit.state', 'com_flexicontent') || $user->authorise('core.edit.state.own', 'com_flexicontent') )
+		if ($hasEditState)
 		{
 			$btn_text = 'JTOOLBAR_PUBLISH';
 			$btn_name = 'publish';
@@ -529,7 +533,7 @@ class FlexicontentViewCategories extends FlexicontentViewBaseRecords
 			//JToolbarHelper::archiveList($contrl.'archive');
 		}
 
-		if ($filter_state == -2 && $user->authorise('core.delete', 'com_flexicontent'))
+		if ($filter_state == -2 && $hasDelete)
 		{
 			//JToolbarHelper::deleteList(JText::_('FLEXI_ARE_YOU_SURE'), $contrl.'remove');
 			$msg_alert   = JText::sprintf('FLEXI_SELECT_LIST_ITEMS_TO', JText::_('FLEXI_DELETE'));
@@ -540,7 +544,7 @@ class FlexicontentViewCategories extends FlexicontentViewBaseRecords
 				'FLEXI_DELETE', 'delete', '', $msg_alert, $msg_confirm,
 				$btn_task, $extra_js, $btn_list=true, $btn_menu=true, $btn_confirm=true);
 		}
-		elseif ($user->authorise('core.edit.state', 'com_flexicontent'))
+		elseif ($hasEdit)
 		{
 			$btn_text = 'JTOOLBAR_TRASH';
 			$btn_name = 'trash';

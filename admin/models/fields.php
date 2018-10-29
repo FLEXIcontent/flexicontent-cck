@@ -322,8 +322,8 @@ class FlexicontentModelFields extends FCModelAdminList
 	/**
 	 * Method to move a record upwards or downwards
 	 *
-	 * @param   integer   $direction  A value of 1  or -1 to indicate moving up or down respectively
-	 * @param   integer   $typeid     The ID of the item type whose fields are being reorder, needed as fields are assigned to multiple item types
+	 * @param   integer   $direction   A value of 1  or -1 to indicate moving up or down respectively
+	 * @param   integer   $typeid      The ID of the item type whose fields are being reorder, needed as fields are assigned to multiple item types
 	 *
 	 * @return	boolean	  True on success
 	 *
@@ -331,8 +331,6 @@ class FlexicontentModelFields extends FCModelAdminList
 	 */
 	public function move($direction, $typeid)
 	{
-		$app = JFactory::getApplication();
-
 		// Load the moved record
 		$table = $this->getTable($this->records_jtable, '');
 
@@ -441,7 +439,7 @@ class FlexicontentModelFields extends FCModelAdminList
 			 */
 			else
 			{
-				$app->enqueueMessage(
+				JFactory::getApplication()->enqueueMessage(
 					JText::_('Previous/Next record was not found or has same ordering, trying saving ordering once to create incrementing unique ordering numbers'),
 					'notice'
 				);
@@ -615,7 +613,7 @@ class FlexicontentModelFields extends FCModelAdminList
 	 *
 	 * @param		array			$cid          array of record ids to delete their related Data
 	 *
-	 * @return	void
+	 * @return	bool      True on success
 	 *
 	 * @since   3.3.0
 	 */
@@ -644,6 +642,8 @@ class FlexicontentModelFields extends FCModelAdminList
 			;
 			$this->_db->setQuery($query)->execute();
 		}
+
+		return true;
 	}
 
 
@@ -711,8 +711,6 @@ class FlexicontentModelFields extends FCModelAdminList
 	 *
 	 * @param   array     $ids_map     array of old to new record ids
 	 *
-	 * @return	void
-	 *
 	 * @since   3.3.0
 	 */
 	protected function _copyRelatedData($ids_map)
@@ -737,75 +735,61 @@ class FlexicontentModelFields extends FCModelAdminList
 	/**
 	 * Method to find which records are not authorized
 	 *
-	 * @param   array     $cid     array of record ids to check
-	 * @param   string    $rule    string of the ACL rule to check
+	 * @param   array        $cid      Array of record ids to check
+	 * @param		int|string   $action   Either an ACL rule action, or a new state
 	 *
 	 * @return	array     The records having assignments
 	 *
 	 * @since	3.3.0
 	 */
-	public function filterByPermission($cid, $rule)
+	public function filterByPermission($cid, $action)
 	{
-		$cid = ArrayHelper::toInteger($cid);
+		$this->rules_map = array(
+			'core.delete'     => 'flexicontent.deletefield',
+			'core.edit.state' => 'flexicontent.publishfield',
+		);
 
-		// If cannot manage then all records are not changeable
-		if (!$this->canManage)
-		{
-			return $cid;
-		}
-
-		$mapped_rule = $rule === 'core.delete' ? 'flexicontent.deletefield' : $rule;
-		$mapped_rule = $rule === 'core.edit.state' ? 'flexicontent.publishfield' : $rule;
-		$user        = JFactory::getUser();
-		$cid_noauth  = array();
-
-		foreach ($cid as $i => $id)
-		{
-			if (!$user->authorise($mapped_rule, 'com_flexicontent.field.' . $id))
-			{
-				$cid_noauth[] = $id;
-			}
-			else
-			{
-				$this->changeable_rows[$rule][$id] = 1;
-			}
-		}
-
-		return $cid_noauth;
+		return parent::filterByPermission($cid, $action);
 	}
 
 
 	/**
 	 * Method to find which records having assignments blocking a state change
 	 *
-	 * @param		array     $cid      array of record ids to check
-	 * @param		string    $tostate  action related to assignments
+	 * @param		array        $cid      Array of record ids to check
+	 * @param		int|string   $action   Either an ACL rule action, or a new state
 	 *
 	 * @return	array     The records having assignments
 	 *
 	 * @since   3.3.0
 	 */
-	public function filterByAssignments($cid = array(), $tostate = -2)
+	public function filterByAssignments($cid = array(), $action = -2)
 	{
 		$cid = ArrayHelper::toInteger($cid);
 		$cid_wassocs = array();
 
-		switch ($tostate)
+		switch ((string)$action)
 		{
-			// Trash
-			case -2:
+			// Delete
+			case 'core.delete':
 				$cid_wassocs = $this->filterByCoreTypes($cid);
 				break;
 
-			// Unpublish
+			// Trash, Unpublish, Archive, any state change
+			case -2:
 			case 0:
-				// Find being CORE non-unpublishable
-				foreach ($cid as $i => $id)
+			case 2:
+			default:
+				// Filter by CORE fields that should be remain published
+				if ($action != 1)
 				{
-					// The fields having ID 1 to 6, are needed for versioning, filtering and search indexing
-					if ($id < 7)
+					foreach ($cid as $i => $id)
 					{
-						$cid_wassocs[] = $id;
+						// The fields having ID 1 to 6, are needed for versioning, filtering and search indexing
+						if ($id < 7)
+						{
+							$cid_wassocs[] = $id;
+						}
 					}
 				}
 				break;
@@ -826,8 +810,6 @@ class FlexicontentModelFields extends FCModelAdminList
 	{
 		$app    = JFactory::getApplication();
 		$jinput = $app->input;
-		$option = $jinput->get('option', '', 'cmd');
-		$view   = $jinput->get('view', '', 'cmd');
 		$fcform = $jinput->get('fcform', 0, 'int');
 		$p      = $this->ovid;
 

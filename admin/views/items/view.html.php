@@ -992,58 +992,6 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 	}
 
 
-
-	/**
-	 * Method to create state buttons for setting a new state for many items
-	 *
-	 * @since 1.5
-	 */
-	function getStateButtons()
-	{
-		// Use general permissions since we do not have examine any specific item
-		$perms = FlexicontentHelperPerm::getPerm();
-
-		$auth_publish = $perms->CanPublish || $perms->CanPublishOwn;
-		$auth_delete  = $perms->CanDelete  || $perms->CanDeleteOwn;
-		$auth_archive = $perms->CanArchives;
-
-		if ($auth_publish)
-		{
-			$state['P'] = array( 'name' =>'FLEXI_PUBLISHED', 'desc' =>'', 'btn_icon' => 'icon-publish', 'btn_class' => '_btn-success', 'btn_name'=>'publish' );
-			$state['IP'] = array( 'name' =>'FLEXI_IN_PROGRESS', 'desc' =>'FLEXI_IN_PROGRESS_SLIDER', 'btn_icon' => 'icon-checkmark-2', 'btn_class' => '_btn-success', 'btn_name'=>'inprogress' );
-			$state['U'] = array( 'name' =>'FLEXI_UNPUBLISHED', 'desc' =>'', 'btn_icon' => 'icon-unpublish', 'btn_class' => '', 'btn_name'=>'unpublish' );
-			$state['PE'] = array( 'name' =>'FLEXI_PENDING', 'desc' =>'FLEXI_PENDING_SLIDER', 'btn_icon' => 'icon-question', 'btn_class' => '', 'btn_name'=>'pending' );
-			$state['OQ'] = array( 'name' =>'FLEXI_TO_WRITE', 'desc' =>'FLEXI_DRAFT_SLIDER', 'btn_icon' => 'icon-pencil', 'btn_class' => '', 'btn_name'=>'draft' );
-		}
-		if ($auth_archive)
-		{
-			$state['A'] = array( 'name' =>'FLEXI_ARCHIVE', 'desc' =>'', 'btn_icon' => 'icon-archive', 'btn_class' => '_btn-info', 'btn_name'=>'archived' );
-		}
-		if ($auth_delete)
-		{
-			$state['T'] = array( 'name' =>'FLEXI_TRASH', 'desc' =>'', 'btn_icon' => 'icon-trash', 'btn_class' => '_btn-inverse', 'btn_name'=>'trashed' );
-		}
-
-		$contrl = "items.";
-		$btn_arr = array();
-
-		foreach($state as $shortname => $statedata)
-		{
-			$btn_name = $statedata['btn_name'];
-			$full_js="window.parent.fc_parent_form_submit('fc_modal_popup_container', 'adminForm', {'newstate':'" . $shortname . "', 'task': '" . $contrl . "changestate'}, {'task':'" . $contrl . "changestate', 'is_list':true});";
-			$btn_arr[$btn_name] = flexicontent_html::addToolBarButton(
-				$statedata['name'], $btn_name, $full_js,
-				$msg_alert = JText::_('FLEXI_NO_ITEMS_SELECTED'), $msg_confirm = JText::_('FLEXI_ARE_YOU_SURE'),
-				$btn_task='', $extra_js='', $btn_list=true, $btn_menu=true, $btn_confirm=false,
-				$statedata['btn_class'] . ' ' . $this->btn_sm_class . ' btn-fcaction ' . (FLEXI_J40GE ? 'btn-info' : '') . ' ' . $this->tooltip_class, $statedata['btn_icon'],
-				'data-placement="right" title="' . flexicontent_html::encodeHTML(JText::_($statedata['desc']), 2) . '"', $auto_add = 0, $tag_type='button'
-			);
-		}
-
-		return $btn_arr;
-	}
-
-
 	/**
 	 * Method to configure the toolbar for this view.
 	 *
@@ -1057,6 +1005,7 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 		$toolbar  = JToolbar::getInstance('toolbar');
 		$perms    = FlexicontentHelperPerm::getPerm();
 		$session  = JFactory::getSession();
+		$useAssocs= flexicontent_db::useAssociations();
 
 		$js = '';
 
@@ -1065,9 +1014,10 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 
 		$loading_msg = flexicontent_html::encodeHTML(JText::_('FLEXI_LOADING') .' ... '. JText::_('FLEXI_PLEASE_WAIT'), 2);
 
-		$hasEdit    = $perms->CanEdit    || $perms->CanEditOwn;
-		$hasPublish = $perms->CanPublish || $perms->CanPublishOwn;
-		$hasDelete  = $perms->CanDelete  || $perms->CanDeleteOwn;
+		$hasEdit      = $perms->CanEdit    || $perms->CanEditOwn;
+		$hasEditState = $perms->CanPublish || $perms->CanPublishOwn;
+		$hasDelete    = $perms->CanDelete  || $perms->CanDeleteOwn;
+		$hasArchive   = $perms->CanArchives;
 
 		// Check if user can create in at least one published category
 		require_once("components/com_flexicontent/models/item.php");
@@ -1097,9 +1047,6 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 		{
 			if ($filter_state && in_array('T', $filter_state))
 			{
-				//$btn_msg = JText::_('FLEXI_ARE_YOU_SURE');
-				//$btn_task = $contrl . 'remove';
-				//JToolbarHelper::deleteList($btn_msg, $btn_task);
 				$msg_alert   = JText::sprintf('FLEXI_SELECT_LIST_ITEMS_TO', JText::_('FLEXI_DELETE'));
 				$msg_confirm = JText::_('FLEXI_ARE_YOU_SURE');
 				$btn_task    = $contrl . 'remove';
@@ -1109,33 +1056,10 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 					$btn_task, $extra_js, $btn_list=true, $btn_menu=true, $btn_confirm=true, $btn_class="btn-warning"
 				);
 			}
-			/*else
-			{
-				$msg_alert   = JText::sprintf('FLEXI_SELECT_LIST_ITEMS_TO', JText::_('FLEXI_TRASH'));
-				$msg_confirm = JText::_('FLEXI_TRASH_CONFIRM').' '.JText::_('FLEXI_NOTES').': '.JText::_('FLEXI_DELETE_PERMANENTLY');
-				$btn_task    = $contrl . 'changestate';
-				$extra_js    = "document.adminForm.newstate.value='T';";
-				flexicontent_html::addToolBarButton(
-					'FLEXI_TRASH', 'trash', '', $msg_alert, $msg_confirm,
-					$btn_task, $extra_js, $btn_list=true, $btn_menu=true, $btn_confirm=true, $btn_class=""
-				);
-			}*/
 		}
 
-		/*if ($perms->CanArchives && (!$filter_state || !in_array('A',$filter_state)))
-		{
-			$msg_alert   = JText::sprintf('FLEXI_SELECT_LIST_ITEMS_TO', JText::_('FLEXI_ARCHIVE'));
-			$msg_confirm = JText::_('FLEXI_ARCHIVE_CONFIRM');
-			$btn_task    = $contrl . 'changestate';
-			$extra_js    = "document.adminForm.newstate.value='A';";
-			flexicontent_html::addToolBarButton(
-				'FLEXI_ARCHIVE', 'archive', $full_js='', $msg_alert, $msg_confirm,
-				$btn_task, $extra_js, $btn_list=true, $btn_menu=true, $btn_confirm=true, $btn_class=""
-			);
-		}*/
-
 		if (
-			($perms->CanArchives && $filter_state && in_array('A', $filter_state)) ||
+			($hasArchive  && $filter_state && in_array('A', $filter_state)) ||
 			($hasDelete   && $filter_state && in_array('T', $filter_state))
 		) {
 			$msg_alert   = JText::sprintf('FLEXI_SELECT_LIST_ITEMS_TO', JText::_('FLEXI_RESTORE'));
@@ -1157,54 +1081,32 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 		}
 
 
-		if ($hasPublish)
+		if ($hasEditState || $hasDelete)
 		{
-			/*$popup_load_url = JUri::base(true) . '/index.php?option=com_flexicontent&task=items.selectstate&format=raw';
+			$states_applicable = array('P' => 0, 'U' => 0, 'A' => 0, 'T' => 0);
 
-			$btn_task = '';
-			//$toolbar->appendButton('Popup', 'publish', JText::_('FLEXI_CHANGE_STATE'), str_replace('&', '&amp;', $popup_load_url), 800, 300);  //JToolbarHelper::publishList( $btn_task );
-			$js .= "
-				jQuery('#toolbar-publish a.toolbar, #toolbar-publish button')
-					.attr('href', '".$popup_load_url."')
-					.attr('onclick', 'var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 780, 300, false, {\'title\': \'".flexicontent_html::encodeHTML(JText::_('FLEXI_CHANGE_STATE'), 2)."\', \'modal\': true}); return false;');
-			";
-			JToolbarHelper::custom( $btn_task, 'publish.png', 'publish_f2.png', 'FLEXI_CHANGE_STATE', true );*/
+			// In-Progress (Published)
+			$states_applicable['IP'] => 0;
 
-			/*$msg_alert   = JText::_('FLEXI_NO_ITEMS_SELECTED');
-			$msg_confirm = JText::_('FLEXI_ARE_YOU_SURE');
-			$btn_task    = '';
-			$extra_js    = "";
-			$full_js     = "
-				jQuery('#toolbar-publish a.toolbar, #toolbar-publish button')
-					.attr('href', '".$popup_load_url."')
-					.attr('onclick', 'var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 780, 300, false, {\'title\': \'".flexicontent_html::encodeHTML(JText::_('FLEXI_CHANGE_STATE'), 2)."\', \'modal\': true}); return false;');
-			";
-			flexicontent_html::addToolBarButton(
-				'FLEXI_CHANGE_STATE', 'publish', $full_js, $msg_alert, $msg_confirm,
-				$btn_task, $extra_js, $btn_list=true, $btn_menu=true, $btn_confirm=true, $btn_class="",
-				$btn_icon="icon-publish", $attrs='', $auto_add = true, $tag_type='button'
-			);*/
-
-			$btn_arr = $this->getStateButtons();
-
-			if (count($btn_arr))
+			// Automatic workflow states: Pending-Approval, Draft
+			if ($perms->SuperAdmin)
 			{
-				$drop_btn = '
-					<button type="button" class="' . $this->btn_sm_class . ' btn-info dropdown-toggle" data-toggle="dropdown">
-						<span title="'.JText::_('FLEXI_CHANGE_STATE').'" class="icon-menu"></span>
-						'.JText::_('FLEXI_CHANGE_STATE').'
-						<span class="caret"></span>
-					</button>';
-				array_unshift($btn_arr, $drop_btn);
-				flexicontent_html::addToolBarDropMenu($btn_arr, 'action_btns_group', ' ');
+				$states_applicable['PE'] = 0;
+				$states_applicable['OQ'] = 0;
 			}
+
+			$btn_arr = $this->getStateButtons(
+				$perms,
+				$states_applicable
+			);
+			$this->addStateButtons($btn_arr);
 		}
 
 		if ($CanAddAny && $perms->CanCopy)
 		{
 			$btn_task = $contrl . 'batch';
 			JToolbarHelper::custom($btn_task, 'copy.png', 'copy_f2.png', 'FLEXI_BATCH');
-			$useAssocs = flexicontent_db::useAssociations();
+
 			if ($useAssocs)
 			{
 				JToolbarHelper::custom( 'translate', 'flag', 'translate', 'FLEXI_TRANSLATE' );
@@ -1252,7 +1154,7 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 		if (count($btn_arr))
 		{
 			$drop_btn = '
-				<button type="button" class="' . $this->btn_sm_class . ' btn-primary dropdown-toggle" data-toggle="dropdown">
+				<button type="button" class="' . $this->btn_sm_class . ' dropdown-toggle" data-toggle="dropdown">
 					<span title="'.JText::_('FLEXI_MAINTENANCE').'" class="icon-menu"></span>
 					'.JText::_('FLEXI_MAINTENANCE').'
 					<span class="caret"></span>

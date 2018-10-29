@@ -396,12 +396,9 @@ class FlexicontentViewUsers extends FlexicontentViewBaseRecords
 
 		$loading_msg = flexicontent_html::encodeHTML(JText::_('FLEXI_LOADING') .' ... '. JText::_('FLEXI_PLEASE_WAIT'), 2);
 
-		JToolbarHelper::custom( 'logout', 'cancel.png', 'cancel_f2.png', 'Logout' );
-
 		//JToolbarHelper::addNew($contrl.'add');
 		JText::script("FLEXI_UPDATING_CONTENTS", true);
-
-		$js .= '
+		$document->addScriptDeclaration('
 			function fc_edit_juser_modal_load( container )
 			{
 				if ( container.find("iframe").get(0).contentWindow.location.href.indexOf("view=users") != -1 )
@@ -414,9 +411,9 @@ class FlexicontentViewUsers extends FlexicontentViewBaseRecords
 				window.location.reload(false);
 				document.body.innerHTML = Joomla.JText._("FLEXI_UPDATING_CONTENTS") + \' <img id="page_loading_img" src="components/com_flexicontent/assets/images/ajax-loader.gif">\';
 			}
-		';
+		');
 
-		$modal_title = JText::_('Add new Joomla user', true);
+		$modal_title = JText::_('FLEXI_NEW', true);
 		$tip_class = ' hasTooltip';
 		JToolbarHelper::divider();
 		flexicontent_html::addToolBarButton(
@@ -427,7 +424,12 @@ class FlexicontentViewUsers extends FlexicontentViewBaseRecords
 			'data-placement="bottom" data-href="index.php?option=com_users&amp;task=user.edit&amp;id=0" title="Add new Joomla user"'
 		);
 
-		JToolbarHelper::editList($contrl.'edit');
+		JToolbarHelper::custom('logout', 'cancel.png', 'cancel_f2.png', 'Logout');
+
+		if (0 && $canDo->get('core.edit'))
+		{
+			JToolbarHelper::editList($contrl.'edit');
+		}
 
 		if ($canDo->get('core.delete'))
 		{

@@ -852,7 +852,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 		$fileaccess = $this->input->get('file-url-access', 1, 'int');
 		$fileaccess = flexicontent_html::dataFilter($fileaccess, 11, 'ACCESSLEVEL', 0);  // Validate access level exists (set to public otherwise)
 
-		$ext      = $this->input->get('file-url-ext', null, 'alnum');
+		$ext      = $this->input->get('file-url-ext', null, 'cmd');
 		$filesize = $this->input->get('file-url-size', 0, 'int');
 		$size_unit = $this->input->get('size_unit', 'KBs', 'cmd');
 

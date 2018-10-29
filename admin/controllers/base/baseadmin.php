@@ -56,9 +56,25 @@ class FlexicontentControllerBaseAdmin extends FlexicontentController
 		parent::__construct($config);
 
 		/**
+		 * Register task aliases
+		 */
+		$this->registerTask('add',          'edit');
+		$this->registerTask('apply',        'save');
+		$this->registerTask('apply_ajax',   'save');
+		$this->registerTask('save2new',     'save');
+		$this->registerTask('save2copy',    'save');
+
+		$this->registerTask('remove_cascade',   'remove');
+		$this->registerTask('remove_relations', 'remove');
+
+		$this->registerTask('exportxml', 'export');
+		$this->registerTask('exportsql', 'export');
+		$this->registerTask('exportcsv', 'export');
+
+
+		/**
 		 * OVERRIDE parent controlker registerTask() mappings, TODO all wrap to same tasl 'publish' or 'changestate'
 		 */
-
 		$this->registerTask('unpublish', 'unpublish');
 		$this->registerTask('archive', 'archive');
 		$this->registerTask('trash', 'trash');
@@ -561,7 +577,7 @@ class FlexicontentControllerBaseAdmin extends FlexicontentController
 		$cid_noauth = array();
 		$cid_locked = array();
 
-		$model->canchangestate($cid, $cid_noauth, $cid_locked, $state);
+		$model->canDoAction($cid, $cid_noauth, $cid_locked, $state);
 		$cid = array_diff($cid, $cid_noauth, $cid_locked);
 
 		$is_authorised = count($cid);
@@ -594,8 +610,11 @@ class FlexicontentControllerBaseAdmin extends FlexicontentController
 		// Check for errors during state changing
 		if (!$result)
 		{
-			$msg = JText::_('FLEXI_OPERATION_FAILED') . ' : ' . $model->getError();
-			throw new Exception($msg, 500);
+			$app->enqueueMessage(JText::_('FLEXI_OPERATION_FAILED') . ' : ' . $model->getError(), 'error');
+			$app->setHeader('status', '500', true);
+			$this->setRedirect($this->returnURL);
+
+			return;
 		}
 
 		// Set success message
@@ -612,7 +631,7 @@ class FlexicontentControllerBaseAdmin extends FlexicontentController
 
 		$msg .= JText::sprintf('FLEXI_N_RECORDS', count($cid));
 
-		$this->setRedirect($this->returnURL, $msg);
+		$this->setRedirect($this->returnURL, $msg, 'success');
 	}
 
 
@@ -662,10 +681,14 @@ class FlexicontentControllerBaseAdmin extends FlexicontentController
 			return;
 		}
 
-		// Calculate access
+		// Calculate access, if cascade removal, then pass via 'cid_locked' all records as ignore-assignments records
 		$cid_noauth = array();
-		$cid_locked = array();
-		$model->candelete($cid, $cid_noauth, $cid_locked);
+		$cid_locked = in_array($this->task, array('remove_cascade', 'remove_relations'))
+			? $cid
+			: array();
+
+		$model->canDoAction($cid, $cid_noauth, $cid_locked, 'core.delete');
+
 		$cid = array_diff($cid, $cid_noauth, $cid_locked);
 		$is_authorised = count($cid);
 
@@ -688,8 +711,19 @@ class FlexicontentControllerBaseAdmin extends FlexicontentController
 			? $app->enqueueMessage(JText::sprintf('FLEXI_SKIPPED_RECORDS_NOT_AUTHORISED', count($cid_noauth), JText::_('FLEXI_' . $this->_NAME . 'S')) . '<br/>', 'warning')
 			: false;
 
-		// Delete the record(s)
-		$result = $model->delete($cid);
+		// Delete the record assignments
+		switch ($this->task)
+		{
+			case 'remove_relations':
+				$result = $model->delete_relations($cid);
+				break;
+
+			// Delete the record or records and their assignments
+			case 'remove':
+			case 'remove_cascade':
+				$result = $model->delete($cid);
+				break;
+		}
 
 		// Clear dependent cache data
 		$this->_cleanCache();
@@ -697,14 +731,19 @@ class FlexicontentControllerBaseAdmin extends FlexicontentController
 		// Check for errors during deletion
 		if (!$result)
 		{
-			$msg = JText::_('FLEXI_OPERATION_FAILED') . ' : ' . $model->getError();
-			throw new Exception($msg, 500);
+			$app->enqueueMessage(JText::_('FLEXI_OPERATION_FAILED') . ' : ' . $model->getError(), 'error');
+			$app->setHeader('status', '500', true);
+			$this->setRedirect($this->returnURL);
+
+			return;
 		}
 
 		$total = count($cid);
-		$msg = $total . ' ' . JText::_('FLEXI_' . $this->_NAME . 'S_DELETED');
+		$msg = $this->task === 'remove_relations'
+			? JText::sprintf($this->relations_deleted, $total)
+			: $total . ' ' . JText::_('FLEXI_' . $this->_NAME . 'S_DELETED');
 
-		$this->setRedirect($this->returnURL, $msg);
+		$this->setRedirect($this->returnURL, $msg, 'success');
 	}
 
 
@@ -895,7 +934,7 @@ class FlexicontentControllerBaseAdmin extends FlexicontentController
 
 		$msg = JText::sprintf('FLEXI_RECORDS_MODIFIED', count($cid));
 
-		$this->setRedirect($this->returnURL, $msg);
+		$this->setRedirect($this->returnURL, $msg, 'success');
 	}
 
 
