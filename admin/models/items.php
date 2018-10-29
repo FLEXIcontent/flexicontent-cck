@@ -3306,13 +3306,13 @@ class FlexicontentModelItems extends FCModelAdminList
 	public function filterByPermission($cid, $action)
 	{
 		// State -3, -4 are automatic workflow state and manual change is allowed only to configuration managers
-		if (in_array($action, array(-3, -4) && !FlexicontentHelperPerm::getPerm()->SuperAdmin)
+		if (in_array($action, array(-3, -4)) && !FlexicontentHelperPerm::getPerm()->SuperAdmin)
 		{
 			return $cid;
 		}
 
 		// State 2 is archived and setting items to it, requires a special privilege (besides also required edit.state.*)
-		if (in_array($action, array(2) && !FlexicontentHelperPerm::getPerm()->CanArchives)
+		if (in_array($action, array(2)) && !FlexicontentHelperPerm::getPerm()->CanArchives)
 		{
 			return $cid;
 		}

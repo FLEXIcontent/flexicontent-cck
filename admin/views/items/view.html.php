@@ -1086,7 +1086,7 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 			$states_applicable = array('P' => 0, 'U' => 0, 'A' => 0, 'T' => 0);
 
 			// In-Progress (Published)
-			$states_applicable['IP'] => 0;
+			$states_applicable['IP'] = 0;
 
 			// Automatic workflow states: Pending-Approval, Draft
 			if ($perms->SuperAdmin)
@@ -1095,10 +1095,7 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 				$states_applicable['OQ'] = 0;
 			}
 
-			$btn_arr = $this->getStateButtons(
-				$perms,
-				$states_applicable
-			);
+			$btn_arr = $this->getStateButtons($states_applicable);
 			$this->addStateButtons($btn_arr);
 		}
 
