@@ -3707,6 +3707,10 @@ class FlexicontentFields
 		//$filter->html = $label_filter==1 ? $filter->label.': ' : '';
 		$filter->html = '';
 		
+		// Pass filter options and value for custom templates
+		$filter->options = [];
+		$filter->value = $value;
+		
 		// *** Do not create any HTML just return empty string to indicate a filter that should be skipped
 		if ( $hide_disabled_values && empty($results) )
 		{
@@ -3760,6 +3764,18 @@ class FlexicontentFields
 			{
 				if ( !strlen($result->value) ) continue;
 				$options[] = JHtml::_('select.option', $result->value, $result->text, 'value', 'text', $disabled = ($faceted_filter==2 && !$result->found));
+			}
+				
+			// Save filter options
+			foreach($options as $option) {
+				if($option->value != '') {
+					$filter->options[] = [
+						'value' => $option->value,
+						'text' => $option->text,
+						'disabled' => $option->disable,
+						'selected' => $option->value == $value ? true : false,
+					];
+				}
 			}
 			
 			// Create HTML tag attributes
@@ -3828,6 +3844,14 @@ class FlexicontentFields
 						if ($result->value==$value1) $start = $i;
 						if ($result->value==$value2) $end   = $i;
 						$i++;
+						
+						// Save filter options
+						$filter->options[] = [
+							'value' => $result->value,
+							'text' => $result->text,
+							'disabled' => false,
+							'selected' => $result->value == $value1 || $result->value == $value2 ? true : false
+						];
 					}
 					// Set max according considering the skipped empty values
 					$max = ($i-1)+($display_filter_as==7 ? 0 : 1); //count($results)-1;
@@ -4100,6 +4124,16 @@ class FlexicontentFields
 				$result_text_encoded = htmlspecialchars($result->text, ENT_COMPAT, 'UTF-8');
 
 				$filter->html .= '<li class="fc_checkradio_option'.$checked_class_li.'" style="'.$value_style.'">';
+				
+				// Save filter options
+				if($result->value != '') {
+					$filter->options[] = [
+						'value' => $result->value,
+						'text' => $result->text,
+						'disabled' => $disable_attr != '' ? true : false,
+						'checked' => $checked ? true : false
+					];
+				}
 				
 				// *** PLACE image before label (and e.g. (default) above the label)
 				if ($filter_vals_display == 2)
