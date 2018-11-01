@@ -434,9 +434,10 @@ class plgFlexicontent_fieldsPhonenumbers extends FCField
 						. $value['phone2'] . $value['phone3']
 						. '">';
 			}
-			$html .= ($display_country_code ? $country_code_prefix . $value['cc'] . $separator_cc_phone1 : '')
-					. ($display_area_code    ? $value['phone1'] . $separator_phone1_phone2 : '')
-					. $value['phone2'] . $separator_phone2_phone3 . $value['phone3']
+			$html .= ($display_country_code ? $country_code_prefix . $value['cc'] : '') 
+					. ($display_country_code || $display_area_code ? $separator_cc_phone1 : '')
+					. ($display_area_code ? $value['phone1'] : '')
+					. $separator_phone1_phone2 . $value['phone2'] . $separator_phone2_phone3 . $value['phone3']
 					. ($add_tel_link ? '</a>' : '')
 					. $closetag;
 
