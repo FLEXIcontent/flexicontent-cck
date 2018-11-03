@@ -322,15 +322,15 @@ class plgSystemFlexisystem extends JPlugin
 
 
 		// Detect resolution we will do this regardless of ... using mobile layouts
-		if ($this->cparams->get('use_mobile_layouts') || $app->isAdmin()) $this->detectClientResolution($this->cparams);
-
-		// Exclude pagebreak outputing dialog from redirection
-		if ( $option=='com_content' && ($layout=='pagebreak' || $layout=='modal') ) return;
+		if ($this->cparams->get('use_mobile_layouts') || $app->isAdmin())
+		{
+			$this->detectClientResolution($this->cparams);
+		}
 
 		// Redirect backend article / category management, and frontend article view
-		$app->isAdmin() ?
-			$this->redirectAdminComContent() :
-			$this->redirectSiteComContent() ;
+		$app->isAdmin()
+			? $this->redirectAdminComContent()
+			: $this->redirectSiteComContent();
 	}
 
 
@@ -354,8 +354,18 @@ class plgSystemFlexisystem extends JPlugin
 			return;
 		}
 
+		// Get request variables used to determine whether to apply redirection
 		$view   = $app->input->get('view', '', 'cmd');
 		$task   = $app->input->get('task', '', 'string');  // NOTE during this event 'task' is (controller.task), thus we use filtering 'string'
+		$layout = $app->input->get('layout', '', 'cmd');
+
+		/**
+		 * Exclude 'pagebreak' outputing dialog and Joomla article / category selection from a modal e.g. from a menu item, or from an editor
+		 */
+		if ($layout === 'pagebreak' || $layout === 'modal')
+		{
+			return;
+		}
 
 		// Split the task into 'controller' and task
 		$_ct = explode('.', $task);
@@ -372,6 +382,7 @@ class plgSystemFlexisystem extends JPlugin
 		// Get URLs excluded from redirection
 		$excluded_urls = $this->params->get('excluded_redirect_urls');
 		$excluded_urls = preg_split("/[\s]*%%[\s]*/", $excluded_urls);
+
 		if (empty($excluded_urls[count($excluded_urls)-1]))
 		{
 			unset($excluded_urls[count($excluded_urls)-1]);
@@ -385,18 +396,10 @@ class plgSystemFlexisystem extends JPlugin
 		foreach ($excluded_urls as $excluded_url)
 		{
 			$quoted = preg_quote($excluded_url, "#");
-			if(preg_match("#$quoted#", $uri)) return;
-		}
-
-		// Get request variables used to determine whether to apply redirection
-		$layout   = $app->input->get('layout', '', 'cmd');
-		//$function = $app->input->get('function', '', 'cmd');
-		//$editor   = $app->input->get('editor', '', 'cmd');
-
-		// Selecting Joomla article / category from a modal e.g. from a menu item, or from an editor
-		if ($layout=="modal")
-		{
-			return;
+			if (preg_match("#$quoted#", $uri))
+			{
+				return;
+			}
 		}
 
 
@@ -1078,7 +1081,7 @@ class plgSystemFlexisystem extends JPlugin
 					$catids = !is_array($cids)
 						? preg_split("/[\s]*,[\s]*/", $cids)
 						: $cids;
-					JArrayHelper::toInteger($catids, array());
+					$catids = ArrayHelper::toInteger($catids);
 
 					$css[] = 'mcats-' . implode(' mcats-', $catids);
 				}
