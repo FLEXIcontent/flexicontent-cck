@@ -25,6 +25,7 @@ class FlexicontentViewFilemanager extends FlexicontentViewBaseRecords
 	var $title_propname = 'filename';
 	var $state_propname = 'published';
 	var $db_tbl         = 'flexicontent_files';
+	var $name_singular  = 'file';
 
 	public function display($tpl = null)
 	{
@@ -50,7 +51,7 @@ class FlexicontentViewFilemanager extends FlexicontentViewBaseRecords
 		$isCtmpl  = $jinput->getCmd('tmpl') === 'component';
 
 		// Some flags & constants
-		;
+		$useAssocs = flexicontent_db::useAssociations();
 
 		// Load Joomla language files of other extension
 		if (!empty($this->proxy_option))
@@ -60,7 +61,8 @@ class FlexicontentViewFilemanager extends FlexicontentViewBaseRecords
 		}
 
 		// Get model
-		$model = $this->getModel();
+		$model   = $this->getModel();
+		$model_s = $this->getModel($this->name_singular);
 
 		// Performance statistics
 		if ($print_logging_info = $cparams->get('print_logging_info'))
@@ -700,25 +702,54 @@ class FlexicontentViewFilemanager extends FlexicontentViewBaseRecords
 		$toolbar  = JToolbar::getInstance('toolbar');
 		$perms    = FlexicontentHelperPerm::getPerm();
 		$session  = JFactory::getSession();
+		$useAssocs= flexicontent_db::useAssociations();
 
 		$js = '';
 
-		$contrl = "filemanager.";
-		$contrl_singular = "file.";
+		$contrl = $this->ctrl . '.';
+		$contrl_s = $this->name_singular . '.';
 
 		$loading_msg = flexicontent_html::encodeHTML(JText::_('FLEXI_LOADING') .' ... '. JText::_('FLEXI_PLEASE_WAIT'), 2);
-		$tip_class = ' hasTooltip';
 
-		$user  = JFactory::getUser();
+		// Get if state filter is active
+		$model   = $this->getModel();
+		$model_s = $this->getModel($this->name_singular);
+		$filter_state = $model->getState('filter_state');
 
-		if (1)
+		$hasCreate    = $perms->CanFiles;
+		$hasEdit      = $perms->CanFiles;
+		$hasEditState = $perms->CanFiles;
+		$hasDelete    = $perms->CanFiles;
+		$hasCopy      = $perms->CanFiles;
+
+
+		if ($hasCreate)
+		{
+			// TODO add links to specific tabs
+			//JToolbarHelper::addNew($contrl.'add');
+		}
+
+		if (0 && $hasEdit)
 		{
 			JToolbarHelper::editList($contrl.'edit');
 		}
-		JToolbarHelper::checkin($contrl.'checkin');
 		JToolbarHelper::deleteList(JText::_('FLEXI_ARE_YOU_SURE'), 'filemanager.remove');
 
+		/**
+		 * Maintenance button (Check-in, Verify Tag mappings, Assignments + Record)
+		 */
+
 		$btn_arr = array();
+
+		//JToolbarHelper::checkin($contrl . 'checkin');
+		$btn_task  = $contrl . 'checkin';
+		$btn_arr[] = flexicontent_html::addToolBarButton(
+			'JTOOLBAR_CHECKIN', $btn_name = 'checkin', $full_js = '',
+			$msg_alert = '', $msg_confirm = '',
+			$btn_task, $extra_js = '', $btn_list=true, $btn_menu=true, $btn_confirm=false,
+			$this->btn_sm_class . ' btn-fcaction ' . (FLEXI_J40GE ? $this->btn_iv_class : '') . ' ' . $this->popover_class, $btn_icon='icon-checkin',
+			'data-placement="right" data-content="' . flexicontent_html::encodeHTML(JText::_('FLEXI_MAINTENANCE_CHECKIN_DESC'), 2) . '"', $auto_add = 0, $tag_type='button'
+		);
 
 		if ($perms->CanConfig)
 		{
@@ -731,7 +762,7 @@ class FlexicontentViewFilemanager extends FlexicontentViewBaseRecords
 				$btn_text, $btn_name, $full_js,
 				$msg_alert = JText::_('FLEXI_NO_ITEMS_SELECTED'), $msg_confirm = '',
 				$btn_task='', $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false,
-				'btn btn-fcaction ' . $tip_class, 'icon-loop',
+				'btn btn-fcaction ' . $this->tooltip_class, 'icon-loop',
 				'data-placement="right" data-taskurl="' . $popup_load_url .'" title="' . flexicontent_html::encodeHTML(JText::_('FLEXI_INDEX_FILE_STATISTICS_DESC'), 'd') . '"', $auto_add = 0, $tag_type='button')
 				;
 
@@ -744,7 +775,7 @@ class FlexicontentViewFilemanager extends FlexicontentViewBaseRecords
 				$btn_text, $btn_name, $full_js,
 				$msg_alert = JText::_('FLEXI_NO_ITEMS_SELECTED'), $msg_confirm = '',
 				$btn_task='', $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false,
-				'btn btn-fcaction ' . $tip_class, 'icon-loop',
+				'btn btn-fcaction ' . $this->tooltip_class, 'icon-loop',
 				'data-placement="right" data-taskurl="' . $popup_load_url .'" title="' . flexicontent_html::encodeHTML(JText::_('FLEXI_INDEX_FILE_STATISTICS_DESC'), 'd') . '"', $auto_add = 0, $tag_type='button')
 				;
 		}
@@ -752,11 +783,12 @@ class FlexicontentViewFilemanager extends FlexicontentViewBaseRecords
 		if (count($btn_arr))
 		{
 			$drop_btn = '
-				<button type="button" class="' . $this->btn_sm_class . ' btn-primary dropdown-toggle" data-toggle="dropdown">
-					<span title="'.JText::_('FLEXI_MAINTENANCE').'" class="icon-menu"></span>
+				<button type="button" class="' . $this->btn_sm_class . ' dropdown-toggle" data-toggle="dropdown">
+					<span title="'.JText::_('FLEXI_MAINTENANCE').'" class="icon-tools"></span>
 					'.JText::_('FLEXI_MAINTENANCE').'
 					<span class="caret"></span>
 				</button>';
+
 			array_unshift($btn_arr, $drop_btn);
 			flexicontent_html::addToolBarDropMenu($btn_arr, 'maintenance-btns-group', ' ');
 		}
@@ -792,6 +824,7 @@ class FlexicontentViewFilemanager extends FlexicontentViewBaseRecords
 			$_height = ($fc_screen_height && $fc_screen_height-128 > 550 ) ? ($fc_screen_height-128 > 1000 ? 1000 : $fc_screen_height-128 ) : 550;
 			JToolbarHelper::preferences('com_flexicontent', $_height, $_width, 'Configuration');
 		}
+
 
 		if ($js)
 		{

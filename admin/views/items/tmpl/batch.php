@@ -214,18 +214,20 @@ else $defprefix = JText::_( 'FLEXI_DEFAULT_PREFIX');
 </fieldset>
 
 <fieldset class="panelform" id="row_keeptags">
-<span class="label-fcouter"><label class="label"><?php echo JText::_( 'FLEXI_KEEP_TAGS' ); ?></label></span>
-<div class="container_fcfield">
-<input id="keeptags0" type="radio" name="keeptags" value="0"/>
-<label for="keeptags0">
-<?php echo JText::_( 'FLEXI_NO' ); ?>
-</label>
+	<span class="label-fcouter"><label class="label"><?php echo JText::_( 'FLEXI_KEEP_TAGS' ); ?></label></span>
+	<div class="container_fcfield">
+		<div class="group-fcset fc_input_set">
+			<input id="keeptags0" type="radio" name="keeptags" value="0"/>
+			<label for="keeptags0">
+			<?php echo JText::_( 'FLEXI_NO' ); ?>
+			</label>
 
-<input id="keeptags1" type="radio" name="keeptags" value="1" checked="checked" />
-<label for="keeptags1">
-<?php echo JText::_( 'FLEXI_YES' ); ?>
-</label>
-</div>
+			<input id="keeptags1" type="radio" name="keeptags" value="1" checked="checked" />
+			<label for="keeptags1">
+			<?php echo JText::_( 'FLEXI_YES' ); ?>
+			</label>
+		</div>
+	</div>
 </fieldset>
 
 <fieldset class="panelform" id="row_maincat">
@@ -236,18 +238,20 @@ else $defprefix = JText::_( 'FLEXI_DEFAULT_PREFIX');
 </fieldset>
 
 <fieldset class="panelform" id="row_keepseccats">
-<span class="label-fcouter"><label class="label"><?php echo JText::_( 'FLEXI_KEEP_SEC_CATS' ); ?></label></span>
-<div class="container_fcfield">
-<input id="keepseccats0" type="radio" name="keepseccats" value="0" onclick="seccats_on();" />
-<label for="keepseccats0">
-<?php echo JText::_( 'FLEXI_NO' ); ?>
-</label>
+	<span class="label-fcouter"><label class="label"><?php echo JText::_( 'FLEXI_KEEP_SEC_CATS' ); ?></label></span>
+	<div class="container_fcfield">
+		<div class="group-fcset fc_input_set">
+			<input id="keepseccats0" type="radio" name="keepseccats" value="0" onclick="seccats_on();" />
+			<label for="keepseccats0">
+			<?php echo JText::_( 'FLEXI_NO' ); ?>
+			</label>
 
-<input id="keepseccats1" type="radio" name="keepseccats" value="1" onclick="seccats_off();" />
-<label for="keepseccats1">
-<?php echo JText::_( 'FLEXI_YES' ); ?>
-</label>
-</div>
+			<input id="keepseccats1" type="radio" name="keepseccats" value="1" onclick="seccats_off();" />
+			<label for="keepseccats1">
+			<?php echo JText::_( 'FLEXI_YES' ); ?>
+			</label>
+		</div>
+	</div>
 </fieldset>
 
 <fieldset class="panelform" id="row_seccats">

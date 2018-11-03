@@ -72,8 +72,14 @@ class FlexicontentControllerTypes extends FlexicontentControllerBaseAdmin
 
 		// Error messages
 		$this->err_locked_recs_changestate = 'FLEXI_YOU_CANNOT_CHANGE_STATE_OF_THIS_TYPE_THERE_ARE_STILL_ITEMS_ASSOCIATED';
-		$this->err_locked_recs_remove = 'FLEXI_YOU_CANNOT_REMOVE_THIS_TYPE_THERE_ARE_STILL_ITEMS_ASSOCIATED';
-		$this->warn_locked_recs_skipped = 'FLEXI_SKIPPED_RECORDS_WITH_ASSOCIATIONS';
+		$this->err_locked_recs_delete      = 'FLEXI_YOU_CANNOT_REMOVE_THIS_TYPE_THERE_ARE_STILL_ITEMS_ASSOCIATED';
+
+		// Warning messages
+		$this->warn_locked_recs_skipped    = 'FLEXI_SKIPPED_N_ROWS_WITH_ASSOCIATIONS';
+		$this->warn_noauth_recs_skipped    = 'FLEXI_SKIPPED_N_ROWS_UNAUTHORISED';		
+
+		// Messages about related data
+		$this->msg_relations_deleted = 'FLEXI_ASSIGNMENTS_DELETED';
 	}
 
 

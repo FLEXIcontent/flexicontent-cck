@@ -33,28 +33,6 @@ trait FCModelTraitLegacyList
 		return $this->getItems();
 	}
 
-	/**
-	 * (Legacy) Method to publish / unpublish / etc a record
-	 *
-	 * @param		array			$cid          Array of record ids to set to a new state
-	 * @param		integer   $state        The new state
-	 *
-	 * @return	boolean	True on success
-	 *
-	 * @since   3.3.0
-	 */
-	public function publish($cid, $state = 1)
-	{
-		/**
-		 * Perform ACL and Assignments checks, sets results into state
-		 */
-		$cid_noauth  = null;
-		$cid_wassocs = null;
-		$this->canDoAction($cid, $cid_noauth, $cid_wassocs, $tostate = $state);
-
-		return $this->changestate($cid, $state);
-	}
-
 
 	/**
 	 * Method to check if given records can not be changed to the given state due to assignments or due to permissions

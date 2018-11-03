@@ -73,9 +73,12 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 		$this->canManage = FlexicontentHelperPerm::getPerm()->CanReviews;
 
 		// Error messages
-		$this->err_locked_recs_changestate = 'FLEXI_YOU_CANNOT_CHANGE_STATE_OF_THESE_RECORDS_WITH_ASSOCIATED_DATA';
-		$this->err_locked_recs_remove = 'FLEXI_YOU_CANNOT_REMOVE_THESE_RECORDS_WITH_ASSOCIATED_DATA';
-		$this->warn_locked_recs_skipped = 'FLEXI_SKIPPED_RECORDS_WITH_ASSOCIATIONS';
+		$this->err_locked_recs_changestate = 'FLEXI_ROW_STATE_NOT_MODIFIED_DUE_ASSOCIATED_DATA';
+		$this->err_locked_recs_delete      = 'FLEXI_ROWS_NOT_DELETED_DUE_ASSOCIATED_DATA';
+
+		// Warning messages
+		$this->warn_locked_recs_skipped    = 'FLEXI_SKIPPED_N_ROWS_WITH_ASSOCIATIONS';
+		$this->warn_noauth_recs_skipped    = 'FLEXI_SKIPPED_N_ROWS_UNAUTHORISED';		
 	}
 
 

@@ -47,8 +47,13 @@ class FlexicontentModelTypes extends FCModelAdminList
 	/**
 	 * (Default) Behaviour Flags
 	 */
-	var $listViaAccess = false;
-	var $copyRelations = true;
+	protected $listViaAccess = false;
+	protected $copyRelations = true;
+
+	/**
+	 * Supported Features Flags
+	 */
+	const canDelRelated = false;
 
 	/**
 	 * Search and ordering columns
@@ -159,15 +164,15 @@ class FlexicontentModelTypes extends FCModelAdminList
 
 
 	/**
-	 * Method to delete related data of records
+	 * Method to delete records relations like record assignments
 	 *
-	 * @param		array			$cid          array of record ids to delete their related Data
+	 * @param		array			$cid      array of record ids to delete their related data
 	 *
 	 * @return	bool      True on success
 	 *
-	 * @since   3.3.0
+	 * @since		3.3.0
 	 */
-	protected function _deleteRelatedData($cid)
+	public function delete_relations($cid)
 	{
 		if (count($cid))
 		{
@@ -177,8 +182,14 @@ class FlexicontentModelTypes extends FCModelAdminList
 			// Delete also field - type relations
 			$query = $this->_db->getQuery(true)
 				->delete('#__flexicontent_fields_type_relations')
-				->where('type_id IN (' . $cid_list . ')');
+				->where('type_id IN (' . $cid_list . ')')
+			;
 			$this->_db->setQuery($query)->execute();
+
+			/**
+			 * This is incomplete as it does not delete content items,
+			 * so this should never be called if content items exist
+			 */
 		}
 
 		return true;
@@ -197,7 +208,7 @@ class FlexicontentModelTypes extends FCModelAdminList
 	 */
 	public function copy($cid, $copyRelations = null)
 	{
-		$copyRelations = copyValues === null ? $this->copyValues : $copyRelations;
+		$copyRelations = $copyValues === null ? $this->copyValues : $copyRelations;
 		$ids_map       = array();
 		$name          = $this->name_col;
 

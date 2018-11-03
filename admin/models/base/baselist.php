@@ -53,8 +53,14 @@ abstract class FCModelAdminList extends JModelList
 	/**
 	 * (Default) Behaviour Flags
 	 */
-	var $listViaAccess = false;
-	var $copyRelations = true;
+	protected $listViaAccess = false;
+	protected $copyRelations = true;
+
+
+	/**
+	 * Supported Features Flags
+	 */
+	const canDelRelated = false;
 
 	/**
 	 * Search and ordering columns
@@ -219,7 +225,7 @@ abstract class FCModelAdminList extends JModelList
 	 *
 	 * @param		int	    $id        record identifier
 	 *
-	 * @since	3.3.0
+	 * @since   3.3.0
 	 */
 	public function setId($id)
 	{
@@ -230,6 +236,21 @@ abstract class FCModelAdminList extends JModelList
 			$this->_data  = null;
 			$this->_total = null;
 		}
+	}
+
+
+	/**
+	 * Method to set which record identifier that should be loaded when getItems() is called
+	 *
+	 * @param		array			$cid          array of record ids to load
+	 *
+	 * @since	  3.3.0
+	 */
+	public function setIds($cid)
+	{
+		$this->_ids   = ArrayHelper::toInteger($cid);
+		$this->_data  = null;
+		$this->_total = null;
 	}
 
 
@@ -572,7 +593,30 @@ abstract class FCModelAdminList extends JModelList
 
 
 	/**
-	 * Method to change publication state a record
+	 * Method to publish / unpublish / etc a record, also checking ACL and assignments
+	 *
+	 * @param		array			$cid          Array of record ids to set to a new state
+	 * @param		integer   $state        The new state
+	 *
+	 * @return	boolean	True on success
+	 *
+	 * @since   3.3.0
+	 */
+	public function publish($cid, $state = 1)
+	{
+		/**
+		 * Perform ACL and Assignments checks, sets results into state
+		 */
+		$cid_noauth  = null;
+		$cid_wassocs = null;
+		$this->canDoAction($cid, $cid_noauth, $cid_wassocs, $tostate = $state);
+
+		return $this->changestate($cid, $state);
+	}
+
+
+	/**
+	 * Method to change publication state a record (assumes ACL / assignments already checked)
 	 *
 	 * @param		array			$cid          Array of record ids to set to a new state
 	 * @param		integer   $state        The new state
@@ -791,7 +835,7 @@ abstract class FCModelAdminList extends JModelList
 			$this->_db->setQuery($query)->execute();
 
 			// Also delete related Data, like 'assignments'
-			$this->_deleteRelatedData($cid);
+			$this->delete_relations($cid);
 		}
 
 		return true;
@@ -799,24 +843,9 @@ abstract class FCModelAdminList extends JModelList
 
 
 	/**
-	 * Method to delete related data of records
-	 *
-	 * @param		array			$cid          array of record ids to delete their related Data
-	 *
-	 * @return	bool      True on success
-	 *
-	 * @since   3.3.0
-	 */
-	protected function _deleteRelatedData($cid)
-	{
-		return true;
-	}
-
-
-	/**
 	 * Method to delete records relations like record assignments
 	 *
-	 * @param		array			$cid          array of record ids to delete their related data
+	 * @param		array			$cid      array of record ids to delete their related data
 	 *
 	 * @return	bool      True on success
 	 *
@@ -840,7 +869,7 @@ abstract class FCModelAdminList extends JModelList
 	 */
 	public function copy($cid, $copyRelations = null)
 	{
-		$copyRelations = copyValues === null ? $this->copyValues : $copyRelations;
+		$copyRelations = $copyValues === null ? $this->copyValues : $copyRelations;
 		$ids_map       = array();
 		$name          = $this->name_col;
 
@@ -959,6 +988,7 @@ abstract class FCModelAdminList extends JModelList
 		// Get record owners, needed for *.own ACL
 		$query = $this->_db->getQuery(true)
 			->select('c.' . $table->getKeyName() . ' AS id')
+			->select('c.' . $this->state_col . ' AS state')
 			->from('#__' . $this->records_dbtbl . ' AS c')
 			->where('c.' . $table->getKeyName() . ' IN (' . implode(',', $cid) . ')');
 
@@ -977,12 +1007,20 @@ abstract class FCModelAdminList extends JModelList
 		{
 			$asset = $asset_prefix . '.' . $id;
 
-			$canDo		= $user->authorise($mapped_rule, $asset);
-			$canDoOwn	= $has_created_by_col
-				? $user->authorise($mapped_rule . '.own', $asset) && $row->created_by == $user->get('id')
-				: false;
+			if ($row->state == -2)
+			{
+				$canDo		= $user->authorise($mapped_rule, $asset);
+				$canDoOwn	= $has_created_by_col
+					? $user->authorise($mapped_rule . '.own', $asset) && $row->created_by == $user->get('id')
+					: false;
+				$allowed = $canDo || $canDoOwn;
+			}
+			else
+			{
+				$allowed = false;
+			}
 
-			if (!$canDo && !$canDoOwn)
+			if (!$allowed)
 			{
 				$cid_noauth[] = $id;
 			}

@@ -34,6 +34,8 @@ class FlexicontentViewFileselement extends FlexicontentViewBaseRecords
 		/**
 		 * Initialise variables
 		 */
+		// Use filemanager controller
+		$this->ctrl = 'filemanager';
 
 		global $globalcats;
 		$app      = JFactory::getApplication();

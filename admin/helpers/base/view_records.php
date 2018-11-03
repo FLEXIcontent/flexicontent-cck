@@ -29,7 +29,47 @@ class FlexicontentViewBaseRecords extends JViewLegacy
 	var $inp_grp_class = FLEXI_J40GE ? 'input-group' : 'input-prepend';
 	var $select_class  = FLEXI_J40GE ? 'use_select2_lib' : 'use_select2_lib';
 	//var $txt_grp_class = FLEXI_J40GE ? 'input-group-text' : 'add-on';
+	var $ctrl;
 
+
+	public function __construct($config = array())
+	{
+		parent::__construct($config);
+
+		// Default controller is same name as the view
+		$this->ctrl = $this->getName();
+	}
+
+
+	/**
+	 * Method to get the model object
+	 *
+	 * @param   string  $name  The name of the model (optional)
+	 *
+	 * @return  mixed  \JModelLegacy object
+	 *
+	 * @since   3.0
+	 */
+	public function getModel($name = null)
+	{
+		if ($name === null)
+		{
+			return parent::getModel($name);
+		}
+		else
+		{
+			return \JModelLegacy::getInstance($name, $prefix = 'FlexicontentModel', $config = array('ignore_request' => true));
+		}
+	}
+
+	/**
+	 * Method to create the HTML container of a filter
+	 *
+	 * @param   array    $filter     Contains the configuration of the filter, most notable properties the 'label' text and the 'html' (form elements) of the filter
+	 * @return  string   The created HTML container
+	 *
+	 * @since   3.3.0
+	 */
 	public function getFilterDisplay($filter)
 	{
 		$label_extra_class = isset($filter['label_extra_class']) ? $filter['label_extra_class'] : '';
@@ -71,9 +111,9 @@ class FlexicontentViewBaseRecords extends JViewLegacy
 	/**
 	 * Method to get the CSS for backend management listings
 	 *
-	 * @return	int
+	 * @return  void
 	 *
-	 * @since	3.3.0
+	 * @since   3.3.0
 	 */
 	public function addCssJs()
 	{
@@ -81,7 +121,11 @@ class FlexicontentViewBaseRecords extends JViewLegacy
 
 
 	/**
-	 * Method to add the state changing buttons for setting a new state for multiple records
+	 * Method to add the state changing buttons for setting a new state for multiple records as a dropdown
+	 *
+	 * @param   array    $btn_arr    An array of state buttons
+	 *
+	 * @return  void
 	 *
 	 * @since   3.3.0
 	 */
@@ -91,7 +135,7 @@ class FlexicontentViewBaseRecords extends JViewLegacy
 		{
 			$drop_btn = '
 				<button type="button" class="' . $this->btn_sm_class . ' dropdown-toggle" data-toggle="dropdown">
-					<span title="'.JText::_('FLEXI_CHANGE_STATE').'" class="icon-menu"></span>
+					<span title="'.JText::_('FLEXI_CHANGE_STATE').'" class="icon-checkmark"></span>
 					'.JText::_('FLEXI_CHANGE_STATE').'
 					<span class="caret"></span>
 				</button>';
@@ -104,44 +148,81 @@ class FlexicontentViewBaseRecords extends JViewLegacy
 	/**
 	 * Method to create state changing buttons for setting a new state for multiple records
 	 *
+	 * @param   array    $applicable   An array of flags indicating which buttons are applicable
+	 *
 	 * @since   3.3.0
 	 */
-	public function getStateButtons($applicable = null)
+	public function getStateButtons($states_applicable = null)
 	{
-		// Use general permissions since we do not have examine any specific item
-		$applicable = $applicable ?: array(
-			'P' => 0,
-			'U' => 0,
-			'A' => 0,
-			'T' => 0,
+		// Permissions should have been checked by the caller
+		$states_applicable = $states_applicable ?: array(
+			 1 => true,
+			 0 => true,
+			 2 => true,
+			-2 => true,
 		);
 
-		$states['P'] = array('btn_text' =>'FLEXI_PUBLISHED', 'btn_desc' =>'', 'btn_icon' => 'icon-publish', 'btn_class' => '', 'btn_name'=>'publish');
-		$states['IP'] = array('btn_text' =>'FLEXI_IN_PROGRESS', 'btn_desc' =>'FLEXI_IN_PROGRESS_SLIDER', 'btn_icon' => 'icon-checkmark-2', 'btn_class' => '', 'btn_name'=>'inprogress');
-		$states['U'] = array('btn_text' =>'FLEXI_UNPUBLISHED', 'btn_desc' =>'', 'btn_icon' => 'icon-unpublish', 'btn_class' => '', 'btn_name'=>'unpublish');
-		$states['PE'] = array('btn_text' =>'FLEXI_PENDING', 'btn_desc' =>'FLEXI_PENDING_SLIDER', 'btn_icon' => 'icon-question', 'btn_class' => '', 'btn_name'=>'pending');
-		$states['OQ'] = array('btn_text' =>'FLEXI_TO_WRITE', 'btn_desc' =>'FLEXI_DRAFT_SLIDER', 'btn_icon' => 'icon-pencil', 'btn_class' => '', 'btn_name'=>'draft');
-		$states['A'] = array('btn_text' =>'FLEXI_ARCHIVE', 'btn_desc' =>'', 'btn_icon' => 'icon-archive', 'btn_class' => '_btn-info', 'btn_name'=>'archived');
-		$states['T'] = array('btn_text' =>'FLEXI_TRASH', 'btn_desc' =>'', 'btn_icon' => 'icon-trash', 'btn_class' => '_btn-inverse', 'btn_name'=>'trashed');
+		$state_aliases = array(
+			 1 => 'P',
+			-5 => 'IP',
+			 0 => 'U',
+			-3 => 'PE',
+			-4 => 'OQ',
+			 2 => 'A',
+			-2 => 'T',
+		);
 
-		$contrl = "items.";
+		$states = array(
+			 1 => array('btn_text' =>'FLEXI_PUBLISHED', 'btn_desc' =>'', 'btn_icon' => 'icon-publish', 'btn_class' => '', 'btn_name'=>'publish'),
+			-5 => array('btn_text' =>'FLEXI_IN_PROGRESS', 'btn_desc' =>'FLEXI_IN_PROGRESS_SLIDER', 'btn_icon' => 'icon-checkmark-2', 'btn_class' => '', 'btn_name'=>'inprogress'),
+			 0 => array('btn_text' =>'FLEXI_UNPUBLISHED', 'btn_desc' =>'', 'btn_icon' => 'icon-unpublish', 'btn_class' => '', 'btn_name'=>'unpublish'),
+			-3 => array('btn_text' =>'FLEXI_PENDING', 'btn_desc' =>'FLEXI_PENDING_SLIDER', 'btn_icon' => 'icon-question', 'btn_class' => '', 'btn_name'=>'pending'),
+			-4 => array('btn_text' =>'FLEXI_TO_WRITE', 'btn_desc' =>'FLEXI_DRAFT_SLIDER', 'btn_icon' => 'icon-pencil', 'btn_class' => '', 'btn_name'=>'draft'),
+			 2 => array('btn_text' =>'FLEXI_ARCHIVE', 'btn_desc' =>'', 'btn_icon' => 'icon-archive', 'btn_class' => '_btn-info', 'btn_name'=>'archived'),
+			-2 => array('btn_text' =>'FLEXI_TRASH', 'btn_desc' =>'', 'btn_icon' => 'icon-trash', 'btn_class' => '_btn-inverse', 'btn_name'=>'trashed'),
+		);
+
+		$contrl  = $this->ctrl . '.';
 		$btn_arr = array();
 
-		foreach($states as $alias => $s)
+		foreach($states as $sid => $s)
 		{
-			if (isset($applicable[$alias]))
-			{
-				$btn_text = $s['btn_text'];
-				$btn_name = $applicable[$alias] ?: $s['btn_name'];
-				$btn_task = '';
+			$alias = $state_aliases[$sid];
 
-				$full_js = "window.parent.fc_parent_form_submit('fc_modal_popup_container', 'adminForm', {'newstate':'" . $alias . "', 'task': '" . $contrl . "changestate'}, {'task':'" . $contrl . "changestate', 'is_list':true});";
+			$applicable = isset($states_applicable[$sid])
+				? $states_applicable[$sid]
+				: null;
+
+			$applicable = isset($states_applicable[$alias])
+				? $states_applicable[$alias]
+				: $applicable;
+
+			if ($applicable !== null)
+			{
+				$state_name = is_string($applicable) ? $applicable : $s['btn_name'];
+
+				$full_js = "window.parent.fc_parent_form_submit(" .
+					"'fc_modal_popup_container', 'adminForm', " .
+					"{'newstate':'" . $sid . "', 'task': '" . $contrl . "changestate'}, " .
+					"{'task':'" . $contrl . "changestate', 'is_list':true}" .
+				");";
+
 				$btn_arr[$btn_name] = flexicontent_html::addToolBarButton(
-					$btn_text, $btn_name, $full_js,
-					$msg_alert = JText::_('FLEXI_NO_ITEMS_SELECTED'), $msg_confirm = JText::_('FLEXI_ARE_YOU_SURE'),
-					$btn_task, $extra_js='', $btn_list=true, $btn_menu=true, $btn_confirm=false,
-					$s['btn_class'] . ' ' . $this->btn_sm_class . ' btn-fcaction ' . (FLEXI_J40GE ? 'btn-info' : '') . ' ' . $this->tooltip_class, $s['btn_icon'],
-					'data-placement="right" title="' . flexicontent_html::encodeHTML(JText::_($s['btn_desc']), 2) . '"', $auto_add = 0, $tag_type='button'
+					$btn_text = $s['btn_text'],
+					$btn_name = $state_name,
+					$full_js,
+					$msg_alert = JText::_('FLEXI_NO_ITEMS_SELECTED'),
+					$msg_confirm = '',
+					$btn_task = '',
+					$extra_js = '',
+					$btn_list = true,
+					$btn_menu = true,
+					$btn_confirm = false,
+					$s['btn_class'] . ' ' . $this->btn_sm_class . ' btn-fcaction ' . (FLEXI_J40GE ? 'btn-info' : '') . ' ' . $this->tooltip_class,
+					$s['btn_icon'],
+					$attribs = 'data-placement="right" title="' . flexicontent_html::encodeHTML(JText::_($s['btn_desc']), 2) . '"',
+					$auto_add = 0,
+					$tag_type='button'
 				);
 			}
 		}

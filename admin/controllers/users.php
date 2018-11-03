@@ -211,9 +211,13 @@ class FlexicontentControllerUsers extends FlexicontentControllerBaseAdmin
 
 
 	/**
-	 * Removes the record(s) from the database
+	 * Logic to delete records
+	 *
+	 * @return void
+	 *
+	 * @since 3.3
 	 */
-	function remove()
+	public function remove()
 	{
 		// Check for request forgeries
 		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));

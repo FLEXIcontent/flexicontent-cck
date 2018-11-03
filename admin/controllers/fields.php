@@ -73,8 +73,14 @@ class FlexicontentControllerFields extends FlexicontentControllerBaseAdmin
 
 		// Error messages
 		$this->err_locked_recs_changestate = 'FLEXI_YOU_CANNOT_UNPUBLISH_THESE_CORE_FIELDS_DUE_TO_VERSIONING';
-		$this->err_locked_recs_remove = 'FLEXI_YOU_CANNOT_REMOVE_CORE_FIELDS';
-		$this->warn_locked_recs_skipped = 'FLEXI_SKIPPED_RECORDS_BEING_OF_CORE_TYPE';
+		$this->err_locked_recs_delete      = 'FLEXI_YOU_CANNOT_REMOVE_CORE_FIELDS';
+
+		// Warning messages
+		$this->warn_locked_recs_skipped    = 'FLEXI_SKIPPED_N_ROWS_BEING_OF_CORE_TYPE';
+		$this->warn_noauth_recs_skipped    = 'FLEXI_SKIPPED_N_ROWS_UNAUTHORISED';		
+
+		// Messages about related data
+		$this->msg_relations_deleted = 'FLEXI_VALUES_DELETED';
 	}
 
 

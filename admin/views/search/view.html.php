@@ -351,7 +351,7 @@ class FLEXIcontentViewSearch extends FlexicontentViewBaseRecords
 		$js = '';
 
 		$contrl = "search.";
-		$contrl_singular = null;
+		$contrl_s = null;
 
 		$loading_msg = flexicontent_html::encodeHTML(JText::_('FLEXI_LOADING') .' ... '. JText::_('FLEXI_PLEASE_WAIT'), 2);
 		$tip_class = ' hasTooltip';

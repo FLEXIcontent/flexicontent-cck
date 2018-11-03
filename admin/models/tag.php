@@ -98,7 +98,7 @@ class FlexicontentModelTag extends FCModelAdmin
 	var $event_recid_col = 'jtag_id';
 
 	/**
-	 * Use language associations
+	 * Context to use for registering (language) associations
 	 *
 	 * @var string
 	 */

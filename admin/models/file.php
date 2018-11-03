@@ -87,11 +87,20 @@ class FlexicontentModelFile extends FCModelAdmin
 	var $extension_proxy = null;
 
 	/**
-	 * Use language associations
+	 * Context to use for registering (language) associations
 	 *
 	 * @var string
 	 */
 	var $associations_context = false;
+
+	/**
+	 * Array of supported state conditions of the record
+	 */
+	const supported_conditions = array(
+		 1 => 'FLEXI_PUBLISHED',
+		 0 => 'FLEXI_UNPUBLISHED',
+		-2 => 'FLEXI_TRASHED',
+	);
 
 	/**
 	 * Various record specific properties
@@ -102,11 +111,13 @@ class FlexicontentModelFile extends FCModelAdmin
 	/**
 	 * Constructor
 	 *
-	 * @since 1.0
+	 * @since 3.3.0
 	 */
 	public function __construct($config = array())
 	{
 		parent::__construct($config);
+
+		$this->canManage = FlexicontentHelperPerm::getPerm()->CanFiles;
 	}
 
 

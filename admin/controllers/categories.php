@@ -59,23 +59,24 @@ class FlexicontentControllerCategories extends FlexicontentControllerBaseAdmin
 		// The prefix to use with controller messages.
 		$this->text_prefix = 'COM_CONTENT';
 
-		// Register task aliases
+		/**
+		 * Register task aliases
+		 */
 		$this->registerTask('params',     'params');
 		$this->registerTask('orderdown',  'orderdown');
 		$this->registerTask('orderup',    'orderup');
 		$this->registerTask('saveorder',  'saveorder');
-		$this->registerTask('publish',    'publish');
-		$this->registerTask('unpublish',  'unpublish');
-		$this->registerTask('archive',    'archive');
-		$this->registerTask('trash',      'trash');
 
 		// Can manage ACL
 		$this->canManage = FlexicontentHelperPerm::getPerm()->CanCats;
 
 		// Error messages
-		$this->err_locked_recs_changestate = 'FLEXI_YOU_CANNOT_CHANGE_STATE_OF_THESE_RECORDS_WITH_ASSOCIATED_DATA';
-		$this->err_locked_recs_remove = 'FLEXI_YOU_CANNOT_REMOVE_THESE_RECORDS_WITH_ASSOCIATED_DATA';
-		$this->warn_locked_recs_skipped = 'FLEXI_SKIPPED_RECORDS_WITH_ASSOCIATIONS';
+		$this->err_locked_recs_changestate = 'FLEXI_ROW_STATE_NOT_MODIFIED_DUE_ASSOCIATED_DATA';
+		$this->err_locked_recs_delete      = 'FLEXI_ROWS_NOT_DELETED_DUE_ASSOCIATED_DATA';
+
+		// Warning messages
+		$this->warn_locked_recs_skipped    = 'FLEXI_SKIPPED_N_ROWS_WITH_ASSOCIATIONS';
+		$this->warn_noauth_recs_skipped    = 'FLEXI_SKIPPED_N_ROWS_UNAUTHORISED';		
 
 		// Load Joomla 'com_categories' language files
 		JFactory::getLanguage()->load('com_categories', JPATH_ADMINISTRATOR, 'en-GB', true);
@@ -133,18 +134,28 @@ class FlexicontentControllerCategories extends FlexicontentControllerBaseAdmin
 	 */
 	public function publish()
 	{
-		self::changestate(1);  // parent::publish();
+		parent::publish();
+	}
+
+	/**
+	 * Logic to unpublish records
+	 *
+	 * @return void
+	 *
+	 * @since 3.3
+	 */
+	public function unpublish()
+	{
+		parent::unpublish();
 	}
 
 
 	/**
 	 * Logic to orderup a category
 	 *
-	 * @access public
-	 * @return void;
-	 * @since 1.0
+	 * @since   3.3.0
 	 */
-	function orderup()
+	public function orderup()
 	{
 		// Check for request forgeries
 		JSession::checkToken('request') or die(JText::_('JINVALID_TOKEN'));
@@ -163,11 +174,9 @@ class FlexicontentControllerCategories extends FlexicontentControllerBaseAdmin
 	/**
 	 * Logic to orderdown a category
 	 *
-	 * @access public
-	 * @return void
-	 * @since 1.0
+	 * @since   3.3.0
 	 */
-	function orderdown()
+	public function orderdown()
 	{
 		// Check for request forgeries
 		JSession::checkToken('request') or die(JText::_('JINVALID_TOKEN'));
@@ -180,85 +189,6 @@ class FlexicontentControllerCategories extends FlexicontentControllerBaseAdmin
 		$this->_cleanCache();
 
 		$this->setRedirect($this->returnURL);
-	}
-
-
-	/**
-	 * Logic to delete records
-	 *
-	 * @return void
-	 *
-	 * @since 3.3
-	 */
-	public function remove()
-	{
-		// Check for request forgeries
-		JSession::checkToken('request') or die(JText::_('JINVALID_TOKEN'));
-
-		// Initialize variables
-		$app   = JFactory::getApplication();
-		$user  = JFactory::getUser();
-
-		// Get model
-		$model = $this->getModel($this->record_name_pl);
-
-		// Get and santize records ids
-		$cid = $this->input->get('cid', array(), 'array');
-		$cid = ArrayHelper::toInteger($cid);
-
-		// Check at least one item was selected
-		if (!count($cid))
-		{
-			$app->enqueueMessage(JText::_('FLEXI_SELECT_ITEM_DELETE'), 'error');
-			$app->setHeader('status', 500, true);
-			$this->setRedirect($this->returnURL);
-
-			return;
-		}
-
-		// Calculate access
-		$cid_noauth = array();
-		$cid_locked = array();
-		$model->candelete($cid, $cid_noauth, $cid_locked);
-		$cid = array_diff($cid, $cid_noauth, $cid_locked);
-		$is_authorised = count($cid);
-
-		// Check access
-		if (!$is_authorised)
-		{
-			count($cid_locked)
-				? $app->enqueueMessage(JText::_($this->err_locked_recs_remove), 'warning')
-				: $app->enqueueMessage(JText::_('FLEXI_ALERTNOTAUTH_TASK'), 'error');
-			$app->setHeader('status', 403, true);
-			$this->setRedirect($this->returnURL);
-
-			return;
-		}
-
-		count($cid_locked)
-			? $app->enqueueMessage(JText::sprintf($this->warn_locked_recs_skipped, count($cid_locked), JText::_('FLEXI_' . $this->_NAME . 'S')) . '<br/>', 'warning')
-			: false;
-		count($cid_noauth)
-			? $app->enqueueMessage(JText::sprintf('FLEXI_SKIPPED_RECORDS_NOT_AUTHORISED', count($cid_noauth), JText::_('FLEXI_' . $this->_NAME . 'S')) . '<br/>', 'warning')
-			: false;
-
-		// Delete the record(s)
-		$result = $model->delete($cid);
-
-		// Clear dependent cache data
-		$this->_cleanCache();
-
-		// Check for errors during deletion
-		if (!$result)
-		{
-			$msg = JText::_('FLEXI_OPERATION_FAILED') . ' : ' . $model->getError();
-			throw new Exception($msg, 500);
-		}
-
-		$total = count($cid);
-		$msg = $total . ' ' . JText::_('FLEXI_' . $this->_NAME . 'S_DELETED');
-
-		$this->setRedirect($this->returnURL, $msg);
 	}
 
 

@@ -45,12 +45,20 @@ class FlexicontentViewItemcompare extends JViewLegacy {
 		$css = 'body, td, th { font-size: 11px; } .novalue { color: gray; font-style: italic; }';
 		$document->addStyleDeclaration($css);
 
-		//Get data from the model
+		/**
+		 * Get data from the model
+		 */
 		$model			= $this->getModel();
 		$row     		= $model->getItem();
 		$fields			= $model->getExtrafields();
 		$versions		= $model->getVersionList();
 		$tparams		= $model->getTypeparams();
+
+		// Calculate inheritied item parameters
+		$iparams_only    = new JRegistry($row->attribs);
+		$row->parameters = new JRegistry;
+		$row->parameters->merge($tparams);
+		$row->parameters->merge($iparams_only);
 				
 		// Create the type parameters
 		$tparams = new JRegistry($tparams);
@@ -59,16 +67,18 @@ class FlexicontentViewItemcompare extends JViewLegacy {
 		foreach ($fields as $field)
 		{
 			// Render current field value
-			if ($field->iscore) {
-				$items_params = null;
-				FLEXIUtilities::call_FC_Field_Func('core', 'onDisplayCoreFieldValue', array( &$field, &$row, &$items_params, false, false, false, false, false, null, 'display' ));
+			if ($field->iscore)
+			{
+				FLEXIUtilities::call_FC_Field_Func('core', 'onDisplayCoreFieldValue', array(&$field, &$row, &$row->parameters, false, false, false, false, false, null, 'display'));
 			}
-			else if ($field->value) {
+			elseif ($field->value)
+			{
 				//$results = $dispatcher->trigger('onDisplayFieldValue', array( &$field, $row ));
 				$field_type = $field->field_type;
-				FLEXIUtilities::call_FC_Field_Func($field_type, 'onDisplayFieldValue', array( &$field, $row ));
+				FLEXIUtilities::call_FC_Field_Func($field_type, 'onDisplayFieldValue', array(&$field, $row));
 			}
-			else {
+			else
+			{
 				$field->display = '<span class="novalue">' . JText::_('FLEXI_NO_VALUE') . '</span>';
 			}
 			
@@ -78,8 +88,7 @@ class FlexicontentViewItemcompare extends JViewLegacy {
 				if ( in_array($field->field_type, array(/*'tags', 'categories', */'maintext')) )
 				{
 					// TODO render more core fields for versioned value, $field->version is raw we need to convert it to $categories, $tags, etc
-					$items_params = null;
-					FLEXIUtilities::call_FC_Field_Func('core', 'onDisplayCoreFieldValue', array( &$field, &$row, &$items_params, false, false, false, false, false, $field->version, 'displayversion' ));
+					FLEXIUtilities::call_FC_Field_Func('core', 'onDisplayCoreFieldValue', array(&$field, &$row, &$row->parameters, false, false, false, false, false, $field->version, 'displayversion'));
 				}
 				else if ($field->iscore) {
 					$field->displayversion = $field->version;

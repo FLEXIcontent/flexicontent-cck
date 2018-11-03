@@ -64,6 +64,7 @@ class FlexicontentControllerBaseAdmin extends FlexicontentController
 		$this->registerTask('save2new',     'save');
 		$this->registerTask('save2copy',    'save');
 
+		// These will be usable only if (plural) records model has 'canDelRelated' Flag
 		$this->registerTask('remove_cascade',   'remove');
 		$this->registerTask('remove_relations', 'remove');
 
@@ -73,8 +74,10 @@ class FlexicontentControllerBaseAdmin extends FlexicontentController
 
 
 		/**
-		 * OVERRIDE parent controlker registerTask() mappings, TODO all wrap to same tasl 'publish' or 'changestate'
+		 * OVERRIDE parent controler registerTask() mappings
+		 * Wrap them to 'publish' (which is a Wrapper to our 'changestate' method)
 		 */
+		$this->registerTask('publish',    'publish');
 		$this->registerTask('unpublish', 'unpublish');
 		$this->registerTask('archive', 'archive');
 		$this->registerTask('trash', 'trash');
@@ -95,6 +98,25 @@ class FlexicontentControllerBaseAdmin extends FlexicontentController
 
 		// Can manage ACL
 		$this->canManage = false;
+
+		/**
+		 * Common messages, the derived controller may override these
+		 */
+
+		// Error messages
+		$this->err_locked_recs_changestate = 'FLEXI_ROW_STATE_NOT_MODIFIED_DUE_ASSOCIATED_DATA';
+		$this->err_locked_recs_delete      = 'FLEXI_ROWS_NOT_DELETED_DUE_ASSOCIATED_DATA';
+		$this->err_noauth_recs_changestate = 'FLEXI_ROW_STATE_NOT_MODIFIED_DUE_NO_ACCESS';
+		$this->err_noauth_recs_delete      = 'FLEXI_ROWS_NOT_DELETED_DUE_NO_ACCESS_OR_NOT_IN_TRASH';
+
+		// Warning messages
+		$this->warn_locked_recs_skipped     = 'FLEXI_SKIPPED_N_ROWS_WITH_ASSOCIATIONS';
+		$this->warn_locked_recs_skipped_del = 'FLEXI_SKIPPED_N_ROWS_WITH_ASSOCIATIONS';
+		$this->warn_noauth_recs_skipped     = 'FLEXI_SKIPPED_N_ROWS_UNAUTHORISED';		
+		$this->warn_noauth_recs_skipped_del = 'FLEXI_SKIPPED_N_ROWS_DUE_TO_NO_ACL_OR_NOT_IN_TRASH';
+
+		// Messages about related data
+		$this->msg_relations_deleted        ='FLEXI_ASSIGNMENTS_DELETED';
 	}
 
 
@@ -586,8 +608,8 @@ class FlexicontentControllerBaseAdmin extends FlexicontentController
 		if (!$is_authorised)
 		{
 			count($cid_locked)
-				? $app->enqueueMessage(JText::_($this->err_locked_recs_changestate), 'warning')
-				: $app->enqueueMessage(JText::_('FLEXI_ALERTNOTAUTH_TASK'), 'error');
+				? $app->enqueueMessage(JText::sprintf($this->err_locked_recs_changestate, JText::_('FLEXI_' . $this->_NAME . 'S')), 'error')
+				: $app->enqueueMessage(JText::sprintf($this->err_noauth_recs_changestate, JText::_('FLEXI_' . $this->_NAME . 'S')), 'error');
 			$app->setHeader('status', 403, true);
 			$this->setRedirect($this->returnURL);
 
@@ -595,10 +617,14 @@ class FlexicontentControllerBaseAdmin extends FlexicontentController
 		}
 
 		count($cid_locked)
-			? $app->enqueueMessage(JText::sprintf($this->warn_locked_recs_skipped, count($cid_locked), JText::_('FLEXI_' . $this->_NAME . 'S')) . '<br/>', 'warning')
+			? $app->enqueueMessage(JText::sprintf($this->warn_locked_recs_skipped, count($cid_locked), JText::_('FLEXI_' . $this->_NAME . 'S'))
+				. ' <br> ' . JText::_('FLEXI_ROWS_SKIPPED') . ' : '
+				. implode(',', $cid_locked), 'warning')
 			: false;
 		count($cid_noauth)
-			? $app->enqueueMessage(JText::sprintf('FLEXI_SKIPPED_RECORDS_NOT_AUTHORISED', count($cid_noauth), JText::_('FLEXI_' . $this->_NAME . 'S')) . '<br/>', 'warning')
+			? $app->enqueueMessage(JText::sprintf($this->warn_noauth_recs_skipped, count($cid_noauth), JText::_('FLEXI_' . $this->_NAME . 'S'))
+				. ' <br> ' . JText::_('FLEXI_ROWS_SKIPPED') . ' : '
+				. implode(',', $cid_locked), 'warning')
 			: false;
 
 		// Change state of the record(s)
@@ -619,9 +645,9 @@ class FlexicontentControllerBaseAdmin extends FlexicontentController
 
 		// Set success message
 		$msg_arr = array(
-			1 => 'FLEXI_PUBLISHED',
-			0 => 'FLEXI_UNPUBLISHED',
-			2 => 'FLEXI_ARCHIVED',
+			 1 => 'FLEXI_PUBLISHED',
+			 0 => 'FLEXI_UNPUBLISHED',
+			 2 => 'FLEXI_ARCHIVED',
 			-2 => 'FLEXI_TRASHED',
 		);
 
@@ -667,6 +693,16 @@ class FlexicontentControllerBaseAdmin extends FlexicontentController
 		// Get model
 		$model = $this->getModel($this->record_name_pl);
 
+		// Check that request action is supported by the model
+		if (in_array($this->task, array('remove_cascade', 'remove_relations')) && !$model::canDelRelated)
+		{
+			$app->enqueueMessage(JText::_('Unsupported task called'), 'error');
+			$app->setHeader('status', 500, true);
+			$this->setRedirect($this->returnURL);
+
+			return;
+		}
+
 		// Get and santize records ids
 		$cid = $this->input->get('cid', array(), 'array');
 		$cid = ArrayHelper::toInteger($cid);
@@ -696,8 +732,8 @@ class FlexicontentControllerBaseAdmin extends FlexicontentController
 		if (!$is_authorised)
 		{
 			count($cid_locked)
-				? $app->enqueueMessage(JText::_($this->err_locked_recs_remove), 'warning')
-				: $app->enqueueMessage(JText::_('FLEXI_ALERTNOTAUTH_TASK'), 'error');
+				? $app->enqueueMessage(JText::sprintf($this->err_locked_recs_delete, JText::_('FLEXI_' . $this->_NAME . 'S')), 'warning')
+				: $app->enqueueMessage(JText::sprintf($this->err_noauth_recs_delete, JText::_('FLEXI_' . $this->_NAME . 'S')), 'error');
 			$app->setHeader('status', 403, true);
 			$this->setRedirect($this->returnURL);
 
@@ -705,10 +741,14 @@ class FlexicontentControllerBaseAdmin extends FlexicontentController
 		}
 
 		count($cid_locked)
-			? $app->enqueueMessage(JText::sprintf($this->warn_locked_recs_skipped, count($cid_locked), JText::_('FLEXI_' . $this->_NAME . 'S')) . '<br/>', 'warning')
+			? $app->enqueueMessage(JText::sprintf($this->warn_locked_recs_skipped_del, count($cid_locked), JText::_('FLEXI_' . $this->_NAME . 'S'))
+				. ' <br> ' . JText::_('FLEXI_ROWS_SKIPPED') . ' : '
+				. implode(',', $cid_locked), 'warning')
 			: false;
 		count($cid_noauth)
-			? $app->enqueueMessage(JText::sprintf('FLEXI_SKIPPED_RECORDS_NOT_AUTHORISED', count($cid_noauth), JText::_('FLEXI_' . $this->_NAME . 'S')) . '<br/>', 'warning')
+			? $app->enqueueMessage(JText::sprintf($this->warn_noauth_recs_skipped_del, count($cid_noauth), JText::_('FLEXI_' . $this->_NAME . 'S'))
+				. ' <br> ' . JText::_('FLEXI_ROWS_SKIPPED') . ' : '
+				. implode(',', $cid_noauth), 'warning')
 			: false;
 
 		// Delete the record assignments
@@ -740,7 +780,7 @@ class FlexicontentControllerBaseAdmin extends FlexicontentController
 
 		$total = count($cid);
 		$msg = $this->task === 'remove_relations'
-			? JText::sprintf($this->relations_deleted, $total)
+			? JText::sprintf($this->msg_relations_deleted, $total)
 			: $total . ' ' . JText::_('FLEXI_' . $this->_NAME . 'S_DELETED');
 
 		$this->setRedirect($this->returnURL, $msg, 'success');

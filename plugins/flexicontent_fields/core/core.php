@@ -285,11 +285,11 @@ class plgFlexicontent_fieldsCore extends FCField
 					break;
 
 				case 'favourites': // favourites button
-					$favourites = $_favourites===false
+					$favourites = $_favourites === false && isset($item->favs)
 						? $item->favs
 						: $_favourites;
 
-					$favoured = $_favoured===false
+					$favoured = $_favoured === false && isset($item->fav)
 						? $item->fav
 						: $_favoured;
 
@@ -357,47 +357,47 @@ class plgFlexicontent_fieldsCore extends FCField
 						continue;
 					}
 
-					// Special display variables
-					if ($raw_values!==null)
+					// Special display using raw value
+					if ($raw_values !== null)
 					{
 						$field->{$prop} = $raw_values[0];
 					}
-					else if ($prop != 'display')
+
+					// Specific display variables
+					elseif ($prop !== 'display')
 					{
-						switch ($prop) {
+						switch ($prop)
+						{
 							case 'display_if': $field->{$prop} = $item->introtext . chr(13).chr(13) . $item->fulltext;  break;
 							case 'display_i' : $field->{$prop} = $item->introtext;  break;
 							case 'display_f' : $field->{$prop} = $item->fulltext;   break;
 						}
 					}
 
-					// Check for no fulltext present and force using introtext
-					else if ( !$item->fulltext )
+					// Check for fulltext being empty and force using introtext
+					elseif (!$item->fulltext)
 					{
 						$field->{$prop} = $item->introtext;
 					}
 
-					// Multi-item views: category/tags/favourites/module etc, only show introtext, but we have added 'force_full' item parameter
-					// to allow showing the fulltext too. This parameter can be inherited by category/menu parameters or be set inside template files
-					else if ($view != FLEXI_ITEMVIEW)
+					/**
+					 * Multi-item views and listings: category, tags, favourites, module etc, only show introtext,
+					 * but we have added 'force_full' item parameter to allow showing the fulltext too.
+					 * This parameter can be inherited by category/menu parameters or be set inside template files
+					 */
+					elseif ($view !== 'item')
 					{
-						if ( $item->parameters->get('force_full', 0) )
-						{
-							$field->{$prop} = $item->introtext . chr(13).chr(13) . $item->fulltext;
-						} else {
-							$field->{$prop} = $item->introtext;
-						}
+						$field->{$prop} = $item->parameters->get('force_full', 0)
+							? $item->introtext . chr(13) . chr(13) . $item->fulltext
+							: $item->introtext;
 					}
 
 					// ITEM view only shows fulltext, introtext is shown only if 'show_intro' item parameter is set
 					else
 					{
-						if ( $item->parameters->get('show_intro', 1) )
-						{
-							$field->{$prop} = $item->introtext . chr(13).chr(13) . $item->fulltext;
-						} else {
-							$field->{$prop} = $item->fulltext;
-						}
+						$field->{$prop} = $item->parameters->get('show_intro', 1)
+							? $item->introtext . chr(13).chr(13) . $item->fulltext
+							: $item->fulltext;
 					}
 
 					if ($isItemsManager)
