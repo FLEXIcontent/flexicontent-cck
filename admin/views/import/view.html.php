@@ -315,7 +315,7 @@ class FlexicontentViewImport extends JViewLegacy
 		$js = '';
 
 		$contrl = "import.";
-		$contrl_singular = null;
+		$contrl_s = null;
 
 		$document = JFactory::getDocument();
 		$toolbar = JToolbar::getInstance('toolbar');

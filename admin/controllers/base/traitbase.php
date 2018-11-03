@@ -32,7 +32,7 @@ trait FCControllerTraitBase
 	 */
 	public function publish()
 	{
-		self::changestate(1);
+		$this->changestate(1);
 	}
 
 	/**
@@ -44,7 +44,7 @@ trait FCControllerTraitBase
 	 */
 	public function unpublish()
 	{
-		self::changestate(0);
+		$this->changestate(0);
 	}
 
 
@@ -57,7 +57,7 @@ trait FCControllerTraitBase
 	 */
 	public function archive()
 	{
-		self::changestate(2);
+		$this->changestate(2);
 	}
 
 
@@ -70,6 +70,6 @@ trait FCControllerTraitBase
 	 */
 	public function trash()
 	{
-		self::changestate(-2);
+		$this->changestate(-2);
 	}
 }

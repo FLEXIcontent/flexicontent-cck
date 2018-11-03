@@ -48,8 +48,13 @@ class FlexicontentModelFields extends FCModelAdminList
 	/**
 	 * (Default) Behaviour Flags
 	 */
-	var $listViaAccess = false;
-	var $copyRelations = false;
+	protected $listViaAccess = false;
+	protected $copyRelations = false;
+
+	/**
+	 * Supported Features Flags
+	 */
+	const canDelRelated = true;
 
 	/**
 	 * Search and ordering columns
@@ -609,38 +614,56 @@ class FlexicontentModelFields extends FCModelAdminList
 
 
 	/**
-	 * Method to delete related data of records
+	 * Method to delete records relations like record assignments
 	 *
-	 * @param		array			$cid          array of record ids to delete their related Data
+	 * @param		array			$cid      array of record ids to delete their related data
 	 *
 	 * @return	bool      True on success
 	 *
-	 * @since   3.3.0
+	 * @since		3.3.0
 	 */
-	protected function _deleteRelatedData($cid)
+	public function delete_relations($cid)
 	{
 		if (count($cid))
 		{
-			// Delete also field - type relations
+			$cid = ArrayHelper::toInteger($cid);
+			$cid_list = implode(',', $cid);
+
+			// Delete field - type relations
 			$query = $this->_db->getQuery(true)
 				->delete('#__flexicontent_fields_type_relations')
 				->where('field_id IN (' . $cid_list . ')')
 			;
 			$this->_db->setQuery($query)->execute();
 
-			// Delete also field values
+			// Delete field values
 			$query = $this->_db->getQuery(true)
 				->delete('#__flexicontent_fields_item_relations')
 				->where('field_id IN (' . $cid_list . ')')
 			;
 			$this->_db->setQuery($query)->execute();
 
-			// Delete also versioned field values
+			// Delete versioned field values
 			$query = $this->_db->getQuery(true)
 				->delete('#__flexicontent_items_versions')
 				->where('field_id IN (' . $cid_list . ')')
 			;
 			$this->_db->setQuery($query)->execute();
+
+			// Delete advanced search index data
+			$query = $this->_db->getQuery(true)
+				->delete('#__flexicontent_advsearch_index')
+				->where('field_id IN (' . $cid_list . ')')
+			;
+			$this->_db->setQuery($query)->execute();
+
+			// Delete advanced search index data in individual field tables
+			foreach($cid as $id)
+			{
+				$query = 'DROP TABLE IF EXISTS #__flexicontent_advsearch_index_field_' . (int) $id
+				;
+				$this->_db->setQuery($query)->execute();
+			}
 		}
 
 		return true;
@@ -659,7 +682,7 @@ class FlexicontentModelFields extends FCModelAdminList
 	 */
 	public function copy($cid, $copyRelations = null)
 	{
-		$copyRelations = copyValues === null ? $this->copyValues : $copyRelations;
+		$copyRelations = $copyValues === null ? $this->copyValues : $copyRelations;
 		$ids_map       = array();
 		$name          = $this->name_col;
 

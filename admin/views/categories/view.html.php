@@ -25,6 +25,7 @@ class FlexicontentViewCategories extends FlexicontentViewBaseRecords
 	var $title_propname = 'title';
 	var $state_propname = 'published';
 	var $db_tbl         = 'categories';
+	var $name_singular  = 'category';
 
 	public function display($tpl = null)
 	{
@@ -61,7 +62,8 @@ class FlexicontentViewCategories extends FlexicontentViewBaseRecords
 		}
 
 		// Get model
-		$model = $this->getModel();
+		$model   = $this->getModel();
+		$model_s = $this->getModel($this->name_singular);
 
 		// Performance statistics
 		if ($print_logging_info = $cparams->get('print_logging_info'))
@@ -260,7 +262,7 @@ class FlexicontentViewCategories extends FlexicontentViewBaseRecords
 
 
 		// Build depth level filter
-		$options	= array(
+		$options = array(
 			JHtml::_('select.option', '', '-'/*'FLEXI_SELECT_MAX_DEPTH'*/),
 		);
 
@@ -316,7 +318,13 @@ class FlexicontentViewCategories extends FlexicontentViewBaseRecords
 
 
 		// Build publication state filter
-		$options = JHtml::_('jgrid.publishedOptions');
+		//$options = JHtml::_('jgrid.publishedOptions');
+		$options = array();
+
+		foreach ($model_s::supported_conditions as $condition_value => $condition_name)
+		{
+			$options[] = JHtml::_('select.option', $condition_value, JText::_($condition_name));
+		}
 		array_unshift($options, JHtml::_('select.option', '', '-'/*'FLEXI_SELECT_STATE'*/));
 
 		$fieldname = 'filter_state';
@@ -448,20 +456,18 @@ class FlexicontentViewCategories extends FlexicontentViewBaseRecords
 		$toolbar  = JToolbar::getInstance('toolbar');
 		$perms    = FlexicontentHelperPerm::getPerm();
 		$session  = JFactory::getSession();
+		$useAssocs= flexicontent_db::useAssociations();
 
 		$js = '';
 
-		$contrl = "categories.";
-		$contrl_singular = "category.";
+		$contrl = $this->ctrl . '.';
+		$contrl_s = $this->name_singular . '.';
 
 		$loading_msg = flexicontent_html::encodeHTML(JText::_('FLEXI_LOADING') .' ... '. JText::_('FLEXI_PLEASE_WAIT'), 2);
 
-		$hasEdit      = $perms->CanEdit    || $perms->CanEditOwn;
-		$hasEditState = $perms->CanPublish || $perms->CanPublishOwn;
-		$hasDelete    = $perms->CanDelete  || $perms->CanDeleteOwn;
-
 		// Get if state filter is active
-		$model = $this->getModel();
+		$model   = $this->getModel();
+		$model_s = $this->getModel($this->name_singular);
 		$filter_state = $model->getState('filter_state');
 
 		if ($user->authorise('core.create', 'com_flexicontent'))
@@ -481,60 +487,43 @@ class FlexicontentViewCategories extends FlexicontentViewBaseRecords
 			$cancreate_cat  = count($usercats) > 0;
 		}
 
-		if ($cancreate_cat)
+		$hasCreate    = $cancreate_cat;
+		$hasEdit      = $perms->CanEdit    || $perms->CanEditOwn;
+		$hasEditState = $perms->CanPublish || $perms->CanPublishOwn;
+		$hasDelete    = $perms->CanDelete  || $perms->CanDeleteOwn;
+
+		if ($hasCreate)
 		{
-			JToolbarHelper::addNew($contrl_singular.'add');
+			JToolbarHelper::addNew($contrl_s.'add');
 		}
 
 		if (0 && $hasEdit)
 		{
-			JToolbarHelper::editList($contrl_singular.'edit');
+			JToolbarHelper::editList($contrl_s.'edit');
 		}
 
 		$btn_arr = array();
+		$states_applicable = array();
 
 		if ($hasEditState)
 		{
-			$btn_text = 'JTOOLBAR_PUBLISH';
-			$btn_name = 'publish';
-			$btn_task = $contrl . 'publish';
-			$btn_arr[] = flexicontent_html::addToolBarButton(
-				$btn_text, $btn_name, $full_js = '',
-				$msg_alert = JText::_('FLEXI_NO_ITEMS_SELECTED'), $msg_confirm = '',
-				$btn_task, $extra_js='', $btn_list=true, $btn_menu=true, $btn_confirm=false,
-				'btn btn-fcaction', 'icon-checkbox',
-				'', $auto_add = 0, $tag_type='button'
-			);
+			$states_applicable = array_merge($states_applicable, array('P' => 0, 'U' => 0, 'A' => 0));
 
-			$btn_text = 'JTOOLBAR_UNPUBLISH';
-			$btn_name = 'unpublish';
-			$btn_task = $contrl . 'unpublish';
-			$btn_arr[] = flexicontent_html::addToolBarButton(
-				$btn_text, $btn_name, $full_js = '',
-				$msg_alert = JText::_('FLEXI_NO_ITEMS_SELECTED'), $msg_confirm = '',
-				$btn_task, $extra_js='', $btn_list=true, $btn_menu=true, $btn_confirm=false,
-				'btn btn-fcaction', 'icon-cancel',
-				'', $auto_add = 0, $tag_type='button'
-			);
-
-			$btn_text = 'JTOOLBAR_ARCHIVE';
-			$btn_name = 'archive';
-			$btn_task = $contrl . 'archive';
-			$btn_arr[] = flexicontent_html::addToolBarButton(
-				$btn_text, $btn_name, $full_js = '',
-				$msg_alert = JText::_('FLEXI_NO_ITEMS_SELECTED'), $msg_confirm = '',
-				$btn_task, $extra_js='', $btn_list=true, $btn_menu=true, $btn_confirm=false,
-				'btn btn-fcaction', 'icon-archive',
-				'', $auto_add = 0, $tag_type='button'
-			);
-
-			//JToolbarHelper::publishList($contrl.'publish');
-			//JToolbarHelper::unpublishList($contrl.'unpublish');
-			//JToolbarHelper::archiveList($contrl.'archive');
+			/*
+			JToolbarHelper::publishList($contrl.'publish', 'JTOOLBAR_PUBLISH', true);
+			JToolbarHelper::unpublishList($contrl.'unpublish', 'JTOOLBAR_UNPUBLISH', true);
+			JToolbarHelper::archiveList($contrl.'archive', 'JTOOLBAR_ARCHIVE', true);
+			*/
 		}
 
+
+		/**
+		 * Delete data buttons (Record , Assignments, Assignments + Record)
+		 */
 		if ($filter_state == -2 && $hasDelete)
 		{
+			$btn_arr = array();
+
 			//JToolbarHelper::deleteList(JText::_('FLEXI_ARE_YOU_SURE'), $contrl.'remove');
 			$msg_alert   = JText::sprintf('FLEXI_SELECT_LIST_ITEMS_TO', JText::_('FLEXI_DELETE'));
 			$msg_confirm = JText::_('FLEXI_ARE_YOU_SURE');
@@ -546,32 +535,20 @@ class FlexicontentViewCategories extends FlexicontentViewBaseRecords
 		}
 		elseif ($hasEdit)
 		{
-			$btn_text = 'JTOOLBAR_TRASH';
-			$btn_name = 'trash';
-			$btn_task = $contrl . 'trash';
-			$btn_arr[] = flexicontent_html::addToolBarButton(
-				$btn_text, $btn_name, $full_js = '',
-				$msg_alert = JText::_('FLEXI_NO_ITEMS_SELECTED'), $msg_confirm = '',
-				$btn_task, $extra_js='', $btn_list=true, $btn_menu=true, $btn_confirm=false,
-				'btn btn-fcaction', 'icon-trash',
-				'', $auto_add = 0, $tag_type='button'
-			);
-			//JToolbarHelper::trash($contrl.'trash');
+			if (isset($model_s::supported_conditions[-2]))
+			{
+				$states_applicable['T'] = 0;
+				//JToolbarHelper::trash($contrl.'trash');
+			}
 		}
 
-		if (count($btn_arr))
-		{
-			$drop_btn = '
-				<button type="button" class="' . $this->btn_sm_class . ' dropdown-toggle" data-toggle="dropdown">
-					<span title="'.JText::_('FLEXI_CHANGE_STATE').'" class="icon-menu"></span>
-					'.JText::_('FLEXI_CHANGE_STATE').'
-					<span class="caret"></span>
-				</button>';
-			array_unshift($btn_arr, $drop_btn);
-			flexicontent_html::addToolBarDropMenu($btn_arr, 'change-state-btns-group', ' ');
-		}
+		$btn_arr = $this->getStateButtons($states_applicable);
+		$this->addStateButtons($btn_arr);
 
-		// Copy Parameters
+
+		/**
+		 * Copy Parameters
+		 */
 		$btn_task = '';
 		$popup_load_url = JUri::base(true) . '/index.php?option=com_flexicontent&view=categories&layout=params&tmpl=component';
 		//$toolbar->appendButton('Popup', 'params', JText::_('FLEXI_COPY_PARAMS'), str_replace('&', '&amp;', $popup_load_url), 600, 440);
@@ -581,11 +558,46 @@ class FlexicontentViewCategories extends FlexicontentViewBaseRecords
 				.attr('onclick', 'var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 600, 440, function(){document.body.innerHTML=\'<span class=\"fc_loading_msg\">"
 					.$loading_msg."<\/span>\'; window.location.reload(false)}, {\'title\': \'".flexicontent_html::encodeHTML(JText::_('FLEXI_COPY_PARAMS'), 2)."\'}); return false;');
 		";
-		JToolbarHelper::custom( $btn_task, 'params.png', 'params_f2.png', 'FLEXI_COPY_PARAMS', false );
+		JToolbarHelper::custom( $btn_task, 'params.png', 'params_f2.png', 'FLEXI_COPY_CONFIG', false );
 
 		//$toolbar->appendButton('Popup', 'move', JText::_('FLEXI_BATCH'), JUri::base(true) . '/index.php?option=com_flexicontent&amp;view=categories&amp;layout=batch&amp;tmpl=component', 800, 440);
 
-		JToolbarHelper::checkin($contrl.'checkin');
+
+		/**
+		 * Maintenance button (Check-in, Verify Tag mappings, Assignments + Record)
+		 */
+
+		$btn_arr = array();
+
+		//JToolbarHelper::checkin($contrl . 'checkin');
+		$btn_task  = $contrl . 'checkin';
+		$btn_arr[] = flexicontent_html::addToolBarButton(
+			'JTOOLBAR_CHECKIN', $btn_name = 'checkin', $full_js = '',
+			$msg_alert = '', $msg_confirm = '',
+			$btn_task, $extra_js = '', $btn_list=true, $btn_menu=true, $btn_confirm=false,
+			$this->btn_sm_class . ' btn-fcaction ' . (FLEXI_J40GE ? $this->btn_iv_class : '') . ' ' . $this->popover_class, $btn_icon='icon-checkin',
+			'data-placement="right" data-content="' . flexicontent_html::encodeHTML(JText::_('FLEXI_MAINTENANCE_CHECKIN_DESC'), 2) . '"', $auto_add = 0, $tag_type='button'
+		);
+
+		if ($perms->CanConfig)
+		{
+			//JToolbarHelper::custom($contrl.'rebuild', 'refresh.png', 'refresh_f2.png', 'JTOOLBAR_REBUILD', false);
+
+			$btn_task  = $contrl . 'rebuild';
+			$btn_arr[] = flexicontent_html::addToolBarButton(
+				'JTOOLBAR_REBUILD', $btn_name = 'rebuild', $full_js = '',
+				$msg_alert = '', $msg_confirm = '',
+				$btn_task, $extra_js = '', $btn_list=false, $btn_menu=true, $btn_confirm=false,
+				$this->btn_sm_class . ' btn-fcaction ' . (FLEXI_J40GE ? $this->btn_iv_class : '') . ' ' . $this->popover_class, $btn_icon='icon-refresh',
+				'data-placement="right" data-content="' . flexicontent_html::encodeHTML(JText::_(''), 2) . '"', $auto_add = 0, $tag_type='button'
+			);
+
+			$fc_screen_width = (int) $session->get('fc_screen_width', 0, 'flexicontent');
+			$_width  = ($fc_screen_width && $fc_screen_width-84 > 940 ) ? ($fc_screen_width-84 > 1400 ? 1400 : $fc_screen_width-84 ) : 940;
+			$fc_screen_height = (int) $session->get('fc_screen_height', 0, 'flexicontent');
+			$_height = ($fc_screen_height && $fc_screen_height-128 > 550 ) ? ($fc_screen_height-128 > 1000 ? 1000 : $fc_screen_height-128 ) : 550;
+			JToolbarHelper::preferences('com_flexicontent', $_height, $_width, 'Configuration');
+		}
 
 		$appsman_path = JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'views'.DS.'appsman';
 		if (file_exists($appsman_path))
@@ -594,29 +606,38 @@ class FlexicontentViewCategories extends FlexicontentViewBaseRecords
 			$btn_name = 'download';
 			$btn_task = 'appsman.exportxml';
 			$extra_js = " var f=document.getElementById('adminForm'); f.elements['view'].value='appsman'; jQuery('<input>').attr({type: 'hidden', name: 'table', value: '" . $this->db_tbl . "'}).appendTo(jQuery(f));";
-			flexicontent_html::addToolBarButton(
+			$btn_arr[] = flexicontent_html::addToolBarButton(
 				'Export now',
 				$btn_name, $full_js='', $msg_alert='', $msg_confirm=JText::_('FLEXI_EXPORT_NOW_AS_XML'),
-				$btn_task, $extra_js, $btn_list=false, $btn_menu=true, $btn_confirm=true, $btn_class="btn-info", $btn_icon);
+				$btn_task, $extra_js, $btn_list=false, $btn_menu=true, $btn_confirm=true,
+				$this->btn_sm_class . ' btn-fcaction ' . (FLEXI_J40GE ? $this->btn_iv_class : '') . ' ' . $this->popover_class, $btn_icon,
+			'data-placement="right" data-content="' . flexicontent_html::encodeHTML(JText::_(''), 2) . '"', $auto_add = 0, $tag_type='button'
+			);
 
 			$btn_icon = 'icon-box-add';
 			$btn_name = 'box-add';
 			$btn_task = 'appsman.addtoexport';
 			$extra_js = " var f=document.getElementById('adminForm'); f.elements['view'].value='appsman'; jQuery('<input>').attr({type: 'hidden', name: 'table', value: '" . $this->db_tbl . "'}).appendTo(jQuery(f));";
-			flexicontent_html::addToolBarButton(
+			$btn_arr[] = flexicontent_html::addToolBarButton(
 				'Add to export',
 				$btn_name, $full_js='', $msg_alert='', $msg_confirm=JText::_('FLEXI_ADD_TO_EXPORT_LIST'),
-				$btn_task, $extra_js, $btn_list=false, $btn_menu=true, $btn_confirm=true, $btn_class="btn-info", $btn_icon);
+				$btn_task, $extra_js, $btn_list=false, $btn_menu=true, $btn_confirm=true,
+				$this->btn_sm_class . ' btn-fcaction ' . (FLEXI_J40GE ? $this->btn_iv_class : '') . ' ' . $this->popover_class, $btn_icon,
+			'data-placement="right" data-content="' . flexicontent_html::encodeHTML(JText::_(''), 2) . '"', $auto_add = 0, $tag_type='button'
+			);
 		}
 
-		if ($perms->CanConfig)
+		if (count($btn_arr))
 		{
-			JToolbarHelper::custom($contrl.'rebuild', 'refresh.png', 'refresh_f2.png', 'JTOOLBAR_REBUILD', false);
-			$fc_screen_width = (int) $session->get('fc_screen_width', 0, 'flexicontent');
-			$_width  = ($fc_screen_width && $fc_screen_width-84 > 940 ) ? ($fc_screen_width-84 > 1400 ? 1400 : $fc_screen_width-84 ) : 940;
-			$fc_screen_height = (int) $session->get('fc_screen_height', 0, 'flexicontent');
-			$_height = ($fc_screen_height && $fc_screen_height-128 > 550 ) ? ($fc_screen_height-128 > 1000 ? 1000 : $fc_screen_height-128 ) : 550;
-			JToolbarHelper::preferences('com_flexicontent', $_height, $_width, 'Configuration');
+			$drop_btn = '
+				<button type="button" class="' . $this->btn_sm_class . ' dropdown-toggle" data-toggle="dropdown">
+					<span title="'.JText::_('FLEXI_MAINTENANCE').'" class="icon-tools"></span>
+					'.JText::_('FLEXI_MAINTENANCE').'
+					<span class="caret"></span>
+				</button>';
+
+			array_unshift($btn_arr, $drop_btn);
+			flexicontent_html::addToolBarDropMenu($btn_arr, 'maintenance-btns-group', ' ');
 		}
 
 		if ($js)

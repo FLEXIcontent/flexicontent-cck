@@ -110,6 +110,19 @@ class ParentClassItem extends FCModelAdmin
 
 
 	/**
+	 * Array of supported state conditions of the record
+	 */
+	const supported_conditions = array(
+		 1 => 'FLEXI_PUBLISHED',
+		 0 => 'FLEXI_UNPUBLISHED',
+		-5 => 'FLEXI_IN_PROGRESS',
+		-3 => 'FLEXI_PENDING',
+		-4 => 'FLEXI_TO_WRITE',
+		 2 => 'FLEXI_ARCHIVED',
+		-2 => 'FLEXI_TRASHED'
+	);
+
+	/**
 	 * Groups of Fields that can be partially present in the form
 	 */
 	var $mergeableGroups = array('attribs', 'metadata');

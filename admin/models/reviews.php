@@ -48,8 +48,8 @@ class FlexicontentModelReviews extends FCModelAdminList
 	/**
 	 * (Default) Behaviour Flags
 	 */
-	var $listViaAccess = false;
-	var $copyRelations = true;
+	protected $listViaAccess = false;
+	protected $copyRelations = true;
 
 	/**
 	 * Search and ordering columns
@@ -182,7 +182,7 @@ class FlexicontentModelReviews extends FCModelAdminList
 	 */
 	public function copy($cid, $copyRelations = null)
 	{
-		$copyRelations = copyValues === null ? $this->copyValues : $copyRelations;
+		$copyRelations = $copyValues === null ? $this->copyValues : $copyRelations;
 		$ids_map       = array();
 		$name          = $this->name_col;
 

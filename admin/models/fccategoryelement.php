@@ -53,8 +53,8 @@ class FlexicontentModelFccategoryelement extends FCModelAdminList
 	/**
 	 * (Default) Behaviour Flags
 	 */
-	var $listViaAccess = true;
-	var $copyRelations = false;
+	protected $listViaAccess = true;
+	protected $copyRelations = false;
 
 	/**
 	 * Search and ordering columns

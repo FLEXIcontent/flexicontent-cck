@@ -47,8 +47,13 @@ class FlexicontentModelTags extends FCModelAdminList
 	/**
 	 * (Default) Behaviour Flags
 	 */
-	var $listViaAccess = false;
-	var $copyRelations = false;
+	protected $listViaAccess = false;
+	protected $copyRelations = false;
+
+	/**
+	 * Supported Features Flags
+	 */
+	const canDelRelated = true;
 
 	/**
 	 * Search and ordering columns
@@ -237,15 +242,15 @@ class FlexicontentModelTags extends FCModelAdminList
 
 
 	/**
-	 * Method to delete related data of records
+	 * Method to delete records relations like record assignments
 	 *
-	 * @param		array			$cid          array of record ids to delete their related Data
+	 * @param		array			$cid      array of record ids to delete their related data
 	 *
 	 * @return	bool      True on success
 	 *
-	 * @since   3.3.0
+	 * @since		3.3.0
 	 */
-	protected function _deleteRelatedData($cid)
+	public function delete_relations($cid)
 	{
 		if (count($cid))
 		{
@@ -265,21 +270,6 @@ class FlexicontentModelTags extends FCModelAdminList
 
 
 	/**
-	 * Method to delete records relations like record assignments
-	 *
-	 * @param		array			$cid          array of record ids to delete their related data
-	 *
-	 * @return	bool      True on success
-	 *
-	 * @since		3.3.0
-	 */
-	public function delete_relations($cid)
-	{
-		return $this->_deleteRelatedData($cid);
-	}
-
-
-	/**
 	 * Method to copy records
 	 *
 	 * @param		array			$cid          array of record ids to copy
@@ -291,7 +281,7 @@ class FlexicontentModelTags extends FCModelAdminList
 	 */
 	public function copy($cid, $copyRelations = null)
 	{
-		$copyRelations = copyValues === null ? $this->copyValues : $copyRelations;
+		$copyRelations = $copyValues === null ? $this->copyValues : $copyRelations;
 		$ids_map       = array();
 		$name          = $this->name_col;
 

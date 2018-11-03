@@ -19,21 +19,6 @@ var fc_state_icons = {
 	'-2': 'trash',
 	'u': 'question-2'
 };
-var fc_state_descrs;
-
-jQuery(document).ready(function() {
-	fc_state_descrs = {
-		'1': Joomla.JText._('FLEXI_PUBLISH_THIS_ITEM'),
-		'-5': Joomla.JText._('FLEXI_SET_STATE_AS_IN_PROGRESS'),
-		'0': Joomla.JText._('FLEXI_UNPUBLISH_THIS_ITEM'),
-		'-3': Joomla.JText._('FLEXI_SET_STATE_AS_PENDING'),
-		'-4': Joomla.JText._('FLEXI_SET_STATE_AS_TO_WRITE'),
-		'2': Joomla.JText._('FLEXI_ARCHIVE_THIS_ITEM'),
-		'-2': Joomla.JText._('FLEXI_TRASH_THIS_ITEM'),
-		'u': Joomla.JText._('FLEXI_UNKNOWN')
-	};
-});
-
 
 var fc_statehandler = function(options)
 {
@@ -49,7 +34,7 @@ var fc_statehandler = function(options)
 		refresh_on_success: false
 	};
 	
-	if( typeof options !== 'undefined') for (var key in options)
+	if( typeof options != 'undefined') for (var key in options)
 	{
 		this.options[key] = options[key];  //window.console.log(key, options[key]);
 	};
@@ -75,7 +60,7 @@ var fc_statehandler = function(options)
 				row.removeClass('ajax-loader').html(data.html);
 				toggler.attr('data-original-title', data.title);
 
-				if (typeof data.error !== 'undefined')
+				if (typeof data.error != 'undefined')
 				{
 					jQuery('#system-message-container').html(data.error);
 				}
@@ -103,6 +88,17 @@ var fc_statehandler = function(options)
 		var toggler = jQuery(el);
 		var ops = toggler.find('.options');
 
+		var fc_state_titles = typeof _fc_state_titles != 'undefined' ? _fc_state_titles : {
+			 '1': 'FLEXI_PUBLISH_THIS_ITEM',
+			'-5': 'FLEXI_SET_STATE_AS_IN_PROGRESS',
+			 '0': 'FLEXI_UNPUBLISH_THIS_ITEM',
+			'-3': 'FLEXI_SET_STATE_AS_PENDING',
+			 '-4': 'FLEXI_SET_STATE_AS_TO_WRITE',
+				'2': 'FLEXI_ARCHIVE_THIS_ITEM',
+			'-2': 'FLEXI_TRASH_THIS_ITEM',
+			 'u': 'FLEXI_UNKNOWN'
+		};
+
 		if ( ops.is(':hidden') )
 		{
 			this.active_selector_box = null;
@@ -120,7 +116,7 @@ var fc_statehandler = function(options)
 
 				jQuery(states).each(function(index, item)
 				{
-					var action_text = (titles && !! titles[item.i]) ? (Joomla.JText._('FLEXI_SET_STATE_TO') + ' ' + titles[item.i]) : fc_state_descrs[item.i];
+					var action_text = (titles && !! titles[item.i]) ? (Joomla.JText._('FLEXI_SET_STATE_TO') + ' ' + titles[item.i]) : Joomla.JText._(fc_state_titles[item.i]);
 
 					html += fc_statehandler_singleton.options.font_icons
 						? '<span onclick="fc_statehandler_singleton.setState(\'' + item.i + '\', \'' + iid + '\')"><span class="icon-' + fc_state_icons[item.i] + '"></span>' + action_text + '</span>'

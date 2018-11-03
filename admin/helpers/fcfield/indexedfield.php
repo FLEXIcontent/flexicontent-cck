@@ -705,7 +705,7 @@ class FCIndexedField extends FCField
 				$field->html[] = '
 					'.($display_as_select ?
 						$opentag . JHtml::_('select.genericlist', $options, $fieldname_n, $attribs . $this_val_attribs . ' class="'.$input_classes.'" data-uniqueRowNum="'.$n.'"', 'value', 'text', $value, $elementid_n) . $closetag :
-						'<div id="'.$elementid_n.'" class="fc_input_set">'.$form_field.'</div>'
+						'<div id="'.$elementid_n.'" class="group-fcset fc_input_set">'.$form_field.'</div>'
 					).'
 					'.($cascade_after ? '<span class="field_cascade_loading"></span>' : '').'
 					'.($use_ingroup   ? '<input type="hidden" class="fcfield_value_holder" name="'.$valueholder_nm.'['.$n.']" id="'.$valueholder_id.'_'.$n.'" value="-">' : '').'

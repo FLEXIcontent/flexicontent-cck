@@ -145,6 +145,18 @@ icon-typeadd:before,
 		margin-left: 32px;
 	}
 }
+#toolbar .dropdown-menu span.icon-upload {
+	color: darkorange;
+}
+#toolbar .dropdown-menu span.icon-download {
+	color: darkcyan;
+}
+#toolbar .dropdown-menu span.icon-box-add {
+	color: darkcyan;
+}
+#toolbar .dropdown-menu span.icon-upload {
+	color: darkorange;
+}
 .flexicontent #adminForm a.saveorder {
 	float: none !important;
 	vertical-align: middle !important;

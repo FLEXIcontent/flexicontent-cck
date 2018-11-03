@@ -223,7 +223,7 @@ class FlexicontentViewFccategoryelement extends FlexicontentViewBaseRecords
 
 
 		// Build depth level filter
-		$options	= array(
+		$options = array(
 			JHtml::_('select.option', '', '-'/*'FLEXI_SELECT_MAX_DEPTH'*/),
 		);
 

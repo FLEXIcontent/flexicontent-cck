@@ -281,7 +281,7 @@ class FlexicontentViewAppsman extends JViewLegacy
 		$js = '';
 
 		$contrl = "appsman.";
-		$contrl_singular = null;
+		$contrl_s = null;
 
 		$document = JFactory::getDocument();
 		$toolbar = JToolbar::getInstance('toolbar');

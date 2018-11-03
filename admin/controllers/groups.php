@@ -50,6 +50,10 @@ class FlexicontentControllerGroups extends FlexicontentControllerBaseAdmin
 		$this->text_prefix = 'COM_USERS_GROUPS';
 
 		// Register task aliases
+		// ...
+
+		// Can manage ACL
+		$this->canManage = FlexicontentHelperPerm::getPerm()->CanUsers;
 	}
 
 
@@ -74,6 +78,7 @@ class FlexicontentControllerGroups extends FlexicontentControllerBaseAdmin
 		return parent::getModel($name, $prefix, $config);
 	}
 
+
 	/**
 	 * Removes an item.
 	 *
@@ -85,10 +90,12 @@ class FlexicontentControllerGroups extends FlexicontentControllerBaseAdmin
 	 */
 	public function delete()
 	{
-		if (!JFactory::getUser()->authorise('core.admin', $this->option))
+		if (!$this->canManage)
 		{
-			JError::raiseError(500, JText::_('JERROR_ALERTNOAUTHOR'));
-			jexit();
+			$app = JFactory::getApplication();
+			$app->setHeader('status', 403);
+			$app->enqueueMessage(JText::_('FLEXI_ALERTNOTAUTH_TASK'), 'error');
+			$app->redirect($this->returnURL);
 		}
 
 		return parent::delete();
@@ -105,13 +112,15 @@ class FlexicontentControllerGroups extends FlexicontentControllerBaseAdmin
 	 */
 	public function publish()
 	{
-		if (!JFactory::getUser()->authorise('core.admin', $this->option))
+		if (!$this->canManage)
 		{
-			JError::raiseError(500, JText::_('JERROR_ALERTNOAUTHOR'));
-			jexit();
+			$app = JFactory::getApplication();
+			$app->setHeader('status', 403);
+			$app->enqueueMessage(JText::_('FLEXI_ALERTNOTAUTH_TASK'), 'error');
+			$app->redirect($this->returnURL);
 		}
 
-		return parent::publish();
+		parent::publish();
 	}
 
 	/**
@@ -125,10 +134,12 @@ class FlexicontentControllerGroups extends FlexicontentControllerBaseAdmin
 	 */
 	public function reorder()
 	{
-		if (!JFactory::getUser()->authorise('core.admin', $this->option))
+		if (!$this->canManage)
 		{
-			JError::raiseError(500, JText::_('JERROR_ALERTNOAUTHOR'));
-			jexit();
+			$app = JFactory::getApplication();
+			$app->setHeader('status', 403);
+			$app->enqueueMessage(JText::_('FLEXI_ALERTNOTAUTH_TASK'), 'error');
+			$app->redirect($this->returnURL);
 		}
 
 		return parent::reorder();
@@ -145,10 +156,12 @@ class FlexicontentControllerGroups extends FlexicontentControllerBaseAdmin
 	 */
 	public function saveorder()
 	{
-		if (!JFactory::getUser()->authorise('core.admin', $this->option))
+		if (!$this->canManage)
 		{
-			JError::raiseError(500, JText::_('JERROR_ALERTNOAUTHOR'));
-			jexit();
+			$app = JFactory::getApplication();
+			$app->setHeader('status', 403);
+			$app->enqueueMessage(JText::_('FLEXI_ALERTNOTAUTH_TASK'), 'error');
+			$app->redirect($this->returnURL);
 		}
 
 		return parent::saveorder();
@@ -165,10 +178,12 @@ class FlexicontentControllerGroups extends FlexicontentControllerBaseAdmin
 	 */
 	public function checkin()
 	{
-		if (!JFactory::getUser()->authorise('core.admin', $this->option))
+		if (!$this->canManage)
 		{
-			JError::raiseError(500, JText::_('JERROR_ALERTNOAUTHOR'));
-			jexit();
+			$app = JFactory::getApplication();
+			$app->setHeader('status', 403);
+			$app->enqueueMessage(JText::_('FLEXI_ALERTNOTAUTH_TASK'), 'error');
+			$app->redirect($this->returnURL);
 		}
 
 		return parent::checkin();

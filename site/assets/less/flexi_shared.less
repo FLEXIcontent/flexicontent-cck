@@ -765,30 +765,7 @@ span.fc_select_button {
 span.fc_select_button:hover {
 	background-color: white;
 }
-
-div label.state_box,
-div label.lang_box {
-	display: inline-block;
-	margin: 4px 12px 0px 0px;
-	padding: 0px !important;
-	vertical-align: top;
-	line-height: 1em;
-	white-space: nowrap;
-}
-div label.state_box input,
-div label.state_box img,
-div label.lang_box input,
-div label.lang_box img {
-	display: inline-block;
-	margin: 0px;
-	padding: 0px;
-	vertical-align: top;
-}
-div label.lang_box img {
-	border: 1px solid lightgray;
-}
-
-/* language associations */
+/* Language associations */
 .fc_assoc_translation img {
 	border: 1px solid lightgray;
 	padding: 0px;
@@ -2090,7 +2067,9 @@ div.current ul.config-option-list li fieldset {
 }
 
 .prettyradio input, .prettycheckbox input {
-	display:inline-block !important; visibility:hidden !important; float:left !important;
+	display: none !important;
+	padding: 0 !important;
+	margin: 0 !important;
 }
 
 .prettyradio > a.disabled,
@@ -2520,4 +2499,3 @@ div.fc-fieldgrp-value-box {
 	position: relative;
 	margin: 1px 2px;
 }
-

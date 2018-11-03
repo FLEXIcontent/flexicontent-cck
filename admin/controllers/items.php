@@ -65,6 +65,9 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		$this->registerTask('save2copy',    'save');
 
 		$this->registerTask('unfeatured',   'featured');
+
+		$this->registerTask('copy',         'batch');
+		$this->registerTask('translate',    'batch');
 	}
 
 
@@ -1318,10 +1321,9 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		// Set warning for uneditable items
 		if (count($non_auth_cid))
 		{
-			$msg_noauth = JText::_('FLEXI_CANNOT_COPY_ASSETS');
-			$msg_noauth .= ": " . implode(',', $non_auth_cid) . " - " . JText::_('FLEXI_REASON_NO_EDIT_PERMISSION') . " - " . JText::_('FLEXI_IDS_SKIPPED');
-
-			$app->enqueueMessage($msg_noauth, 'notice');
+			$msg_noauth = JText::_('FLEXI_CANNOT_COPY_ASSETS') . ' ' . JText::_('FLEXI_REASON_NO_EDIT_PERMISSION')
+				. '<br>' . JText::_('FLEXI_ROWS_SKIPPED') . ' : '. implode(',', $non_auth_cid);
+			$app->enqueueMessage($msg_noauth, 'warning');
 
 			if (!count($auth_cid))  // Cancel task if no items can be copied
 			{
@@ -1492,20 +1494,28 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 
 
 	/**
-	 * WRAPPER method for changestate TASK
+	 * Logic to publish records
+	 *
+	 * @return void
+	 *
+	 * @since 3.3
 	 */
 	public function publish()
 	{
-		$this->changestate('P');
+		parent::publish();
 	}
 
 
 	/**
-	 * WRAPPER method for changestate TASK
+	 * Logic to unpublish records
+	 *
+	 * @return void
+	 *
+	 * @since 3.3
 	 */
 	public function unpublish()
 	{
-		$this->changestate('U');
+		parent::unpublish();
 	}
 
 
@@ -1672,9 +1682,9 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		// Set warning for undeletable items
 		if (count($non_auth_cid))
 		{
-			$msg_noauth = JText::_('FLEXI_CANNOT_CHANGE_STATE_ASSETS');
-			$msg_noauth .= ": " . implode(',', $non_auth_cid) . " - " . JText::_('FLEXI_REASON_NO_PUBLISH_PERMISSION') . " - " . JText::_('FLEXI_IDS_SKIPPED');
-			JError::raiseNotice(500, $msg_noauth);
+			$msg_noauth = JText::_('FLEXI_CANNOT_CHANGE_STATE_ASSETS') . ' ' . JText::_('FLEXI_REASON_NO_PUBLISH_PERMISSION')
+				. '<br>' . JText::_('FLEXI_ROWS_SKIPPED') . ' : '. implode(',', $non_auth_cid);
+			$app->enqueueMessage($msg_noauth, 'warning');
 		}
 
 		// Set state, (model will also handle cache cleaning)
@@ -1741,84 +1751,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 	 */
 	public function remove()
 	{
-		// Check for request forgeries
-		JSession::checkToken('request') or die(JText::_('JINVALID_TOKEN'));
-
-		// Initialize variables
-		$app   = JFactory::getApplication();
-		$db    = JFactory::getDbo();
-		$user  = JFactory::getUser();
-
-		// Get model
-		$model = $this->getModel($this->record_name_pl);
-		$record_model = $this->getModel($this->record_name);
-		$msg = '';
-
-		// Get and santize records ids
-		$cid = $this->input->get('cid', array(), 'array');
-		$cid = ArrayHelper::toInteger($cid);
-
-		// Check at least one item was selected
-		if (!count($cid))
-		{
-			$app->enqueueMessage(JText::_('FLEXI_SELECT_ITEM_DELETE'), 'error');
-			$app->setHeader('status', 500, true);
-			$this->setRedirect($this->returnURL);
-
-			return;
-		}
-
-		// Remove unauthorized (undeletable) items
-		$auth_cid = array();
-		$non_auth_cid = array();
-
-		// Get record owner and other record data
-		$q = $this->_getRecordsQuery($cid, array('id', 'created_by', 'catid'));
-		$itemdata = $db->setQuery($q)->loadObjectList('id');
-
-		// Check authorization for delete operation
-		foreach ($cid as $id)
-		{
-			$isOwner = $itemdata[$id]->created_by == $user->id;
-			$asset = 'com_content.article.' . $id;
-			$canDelete = $user->authorise('core.delete', $asset) || ($user->authorise('core.delete.own', $asset) && $isOwner);
-
-			if ($canDelete)
-			{
-				$auth_cid[] = $id;
-			}
-			else
-			{
-				$non_auth_cid[] = $id;
-			}
-		}
-
-		// echo "<pre>"; echo "authorized:\n"; print_r($auth_cid); echo "\n\nNOT authorized:\n"; print_r($non_auth_cid); echo "</pre>"; exit;
-
-		// Set warning for undeletable items
-		if (count($non_auth_cid))
-		{
-			$msg_noauth = count($non_auth_cid) < 2
-				? JText::_('FLEXI_CANNOT_DELETE_ITEM')
-				: JText::_('FLEXI_CANNOT_DELETE_ITEMS');
-			$msg_noauth .= ": " . implode(',', $non_auth_cid) . " - " . JText::_('FLEXI_REASON_NO_DELETE_PERMISSION') . " - " . JText::_('FLEXI_IDS_SKIPPED');
-
-			$app->enqueueMessage($msg_noauth, 'error');
-			$app->redirect($this->returnURL);
-		}
-
-		// Try to delete
-		if (count($auth_cid) && !$model->delete($auth_cid, $record_model))
-		{
-			$app->enqueueMessage(JText::_('FLEXI_OPERATION_FAILED'), 'error');
-			$app->redirect($this->returnURL);
-		}
-
-		// Clear dependent cache data
-		$this->_cleanCache();
-
-		$msg = count($auth_cid) . ' ' . JText::_('FLEXI_ITEMS_DELETED');
-		$this->setRedirect($this->returnURL, $msg);
+		parent::remove();
 	}
 
 
@@ -2268,10 +2201,9 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		// Set warning for uneditable items
 		if (count($non_auth_cid))
 		{
-			$msg_noauth = JText::_('FLEXI_CANNOT_COPY_ASSETS');
-			$msg_noauth .= ": " . implode(',', $non_auth_cid) . " - " . JText::_('FLEXI_REASON_NO_EDIT_PERMISSION') . " - " . JText::_('FLEXI_IDS_SKIPPED');
-
-			$app->enqueueMessage($msg_noauth, 'notice');
+			$msg_noauth = JText::_('FLEXI_CANNOT_COPY_ASSETS') . ' ' . JText::_('FLEXI_REASON_NO_EDIT_PERMISSION')
+				. '<br>' . JText::_('FLEXI_ROWS_SKIPPED') . ' : '. implode(',', $non_auth_cid);
+			$app->enqueueMessage($msg_noauth, 'warning');
 
 			if (!count($auth_cid))  // Cancel task if no items can be copied
 			{

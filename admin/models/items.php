@@ -48,8 +48,8 @@ class FlexicontentModelItems extends FCModelAdminList
 	/**
 	 * (Default) Behaviour Flags
 	 */
-	var $listViaAccess = false;
-	var $copyRelations = false;
+	protected $listViaAccess = false;
+	protected $copyRelations = false;
 
 	/**
 	 * Search and ordering columns
@@ -298,6 +298,23 @@ class FlexicontentModelItems extends FCModelAdminList
 
 
 	/**
+	 * Method to set which record identifier that should be loaded when getItems() is called
+	 *
+	 * @param		array			$cid          array of record ids to load
+	 *
+	 * @since	  3.3.0
+	 */
+	public function setIds($cid)
+	{
+		$this->_ids   = ArrayHelper::toInteger($cid);
+		$this->_data  = null;
+		$this->_total = null;
+
+		$this->_extra_cols = null;
+	}
+
+
+	/**
 	 * Method to get records data
 	 *
 	 * @return array
@@ -308,20 +325,15 @@ class FlexicontentModelItems extends FCModelAdminList
 	{
 		static $tconfig = array();
 
-		$app     = JFactory::getApplication();
-		$jinput  = $app->input;
-		$task    = $jinput->get('task', '', 'cmd');
-		$cid     = $jinput->get('cid', array(), 'array');
-
 		$print_logging_info = $this->cparams->get('print_logging_info');
 		if ( $print_logging_info )  global $fc_run_times;
 
 		// Lets load the Items if it doesn't already exist
 		if ($this->_data === null)
 		{
-			if ($task === 'copy')
+			if (!empty($this->_ids))
 			{
-				$query_ids = $cid;
+				$query_ids = $this->_ids;
 			}
 			else
 			{

@@ -125,16 +125,6 @@ class FlexicontentController extends JControllerAdmin
 				}
 			}
 		}
-		
-		// Register Extra task
-		$this->registerTask( 'apply'	, 'save' );
-		
-		$task = $this->input->get('task', '', 'CMD');
-		if (is_string($task) && $task=="translate")
-		{
-			$this->input->set('task', 'copy');
-			$this->input->set('copy_behaviour', 'translate');
-		}
 	}
 
 

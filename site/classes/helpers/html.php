@@ -2167,8 +2167,8 @@ class flexicontent_html
 		$state  = $jinput->get('state', 0, 'int');
 		$perms  = FlexicontentHelperPerm::getPerm();
 
-		$archive_unsupported = !isset($model->supported_conditions[2]);
-		$trash_unsupported   = !isset($model->supported_conditions[-2]);
+		$archive_unsupported = !isset($model::supported_conditions[2]);
+		$trash_unsupported   = !isset($model::supported_conditions[-2]);
 
 		// Determine priveleges of the current user on the given item
 		/*if (!in_array($record_name, array('item', 'category', 'tag', 'review', 'type', 'field', 'file')))
@@ -2743,10 +2743,27 @@ class flexicontent_html
 			die('flexicontent_html::' . __FUNCTION__ . '() , unknown type: ' . $record_name);
 		}
 
-		$archive_unsupported = !isset($model->supported_conditions[2]);
-		$trash_unsupported   = !isset($model->supported_conditions[-2]);
+		$archive_unsupported = !isset($model::supported_conditions[2]);
+		$trash_unsupported   = !isset($model::supported_conditions[-2]);
 
 		$refresh_on_success  = in_array($config->record_name, array('category')) ? 'true' : 'false';
+		
+		static $state_names_added = null;
+		if (!$state_names_added)
+		{
+			$state_names_added = true;
+			$state_names_js = array();
+			
+			foreach ($model::supported_conditions as $state_id => $state_name)
+			{
+				JText::script($state_name, true);
+				$state_names_js[] = "'" . $state_id . "' : '" . $state_name . "'";
+			}
+
+			JFactory::getDocument()->addScriptDeclaration('
+				var _fc_state_titles = { ' . implode(' , ', $state_names_js) . '};
+			');
+		}
 
 
 		/**
@@ -2916,8 +2933,8 @@ class flexicontent_html
 			$state = 'u';
 		}
 
-		$state_text = !empty($model->supported_conditions[$state])
-			? JText::_($model->supported_conditions[$state])
+		$state_text = !empty($model::supported_conditions[$state])
+			? JText::_($model::supported_conditions[$state])
 			: null;
 		$stateicon = flexicontent_html::stateicon($state, $icon_params, 'html', $state_text, $record, $show_status = 2);
 
@@ -2988,9 +3005,9 @@ class flexicontent_html
 			{
 				$state_js_ids[] = array('i' => $state_id);
 
-				if (!empty($model->supported_conditions[$i]))
+				if (!empty($model::supported_conditions[$state_id]))
 				{
-					$state_js_titles[$state_id] = JText::_($model->supported_conditions[$state_id]);
+					//$state_js_titles[$state_id] = JText::_($model::supported_conditions[$state_id]);
 				}
 			}
 
@@ -4435,7 +4452,7 @@ class flexicontent_html
 	 * @return object
 	 * @since 1.5
 	 */
-	static function buildlanguageslist($name, $attribs, $selected, $displaytype=1, $allowed_langs=null, $published_only=true, $disable_langs=null, $add_all=true, $conf=false)
+	static function buildlanguageslist($name, $attribs, $selected, $displaytype=1, $allowed_langs=null, $published_only=true, $disable_langs=null, $add_all=true, $radio_conf=false)
 	{
 		$db = JFactory::getDbo();
 		$tagid = null; // ... not provided
@@ -4444,24 +4461,36 @@ class flexicontent_html
 		$selected_found = false;
 		$all_langs = FLEXIUtilities::getlanguageslist($published_only, $add_all);
 		$user_langs = null;
-		if ($allowed_langs) {
+
+		if ($allowed_langs)
+		{
 			$_allowed = array_flip($allowed_langs);
+
 			foreach ($all_langs as $index => $lang)
-				if ( isset($_allowed[$lang->code] ) ) {
+			{
+				if (isset($_allowed[$lang->code]))
+				{
 					$user_langs[] = $lang;
 					// Check if selected language was added to the user langs
 					$selected_found = ($lang->code == $selected) ? true : $selected_found;
 				}
-		} else {
-			$user_langs = & $all_langs;
+			}
+		}
+		else
+		{
+			$user_langs = $all_langs;
 			$selected_found = true;
 		}
 
-		if ($disable_langs) {
+		if ($disable_langs)
+		{
 			$_disabled = array_flip($disable_langs);
 			$_user_langs = array();
-			foreach ($user_langs as $index => $lang) {
-				if ( !isset($_disabled[$lang->code] ) ) {
+
+			foreach ($user_langs as $index => $lang)
+			{
+				if (!isset($_disabled[$lang->code]))
+				{
 					$_user_langs[] = $lang;
 					// Check if selected language was added to the user langs
 					$selected_found = ($lang->code == $selected) ? true : $selected_found;
@@ -4470,62 +4499,89 @@ class flexicontent_html
 			$user_langs = $_user_langs;
 		}
 
-		if ( !count($user_langs) )  return "user is not allowed to use any language";
-		if (!$selected_found) $selected = $user_langs[0]->code;  // Force first language to be selected
-
-		if ( $conf && empty($conf['flags']) && empty($conf['texts']) ) {
-			$conf['flags'] = $conf['texts'] = 1;
+		if (!count($user_langs))
+		{
+			return "user is not allowed to use any language";
+		}
+		
+		// Force first language to be selected
+		if (!$selected_found)
+		{
+			$selected = $user_langs[0]->code;
 		}
 
-		$required = '';
-		if ( $conf && !empty($conf['required']) ) {
-			$required = ' required validate-radio ';
+		/**
+		 * For radio cases
+		 */
+		if ($radio_conf && empty($radio_conf['flags']) && empty($radio_conf['texts']))
+		{
+			$radio_conf['flags'] = $radio_conf['texts'] = 1;
 		}
+
+		$required = $radio_conf && !empty($radio_conf['required'])
+			? ' required validate-radio '
+			: '';
 
 		$langs = array();
 		switch ($displaytype)
 		{
 			// Drop-down SELECT of ALL languages
 			case 1: case 2: default:
+				// WITH custom prompt to select language
 				if (!is_numeric($displaytype) && is_string($displaytype))
-					// WITH custom prompt to select language
+				{
 					$langs[] = JHtml::_('select.option',  '', $displaytype);
+				}
 
-				else if ($displaytype==2)
-					// WITH empty prompt to select language, e.g. used in items/category manager
+				// WITH empty prompt to select language, e.g. used in items/category manager
+				elseif ($displaytype == 2)
+				{
 					$langs[] = JHtml::_('select.option',  '', JText::_( 'FLEXI_SELECT_LANGUAGE' ));
+				}
 
-				foreach ($user_langs as $lang) {
+				foreach ($user_langs as $lang)
+				{
 					$langs[] = JHtml::_('select.option',  $lang->code, $lang->name );
 				}
+
 				$list = JHtml::_('select.genericlist', $langs, $name, $attribs, 'value', 'text', $selected, $tagid);
 				break;
 
-			// RADIO selection of ALL languages , e.g. item form,
-			case 3:   // flag icons only
+			// RADIO selection of ALL languages (Flag icons only) e.g. item form,
+			case 3:   
 				$checked	= '';
-				$list		= '';
+				$list = '<div class="group-fcset fc_input_set">';
 
-				foreach ($user_langs as $lang) {
-					if ($lang->code == $selected) {
+				foreach ($user_langs as $lang)
+				{
+					if ($lang->code == $selected)
+					{
 						$checked = ' checked="checked"';
 					}
-					$list 	.= '<input id="'.$tagid.'_'.$lang->id.'" type="radio" name="'.$name.'" value="'.$lang->code.'"'.$checked.' class="'.$required.'" data-element-grpid="'.$tagid.'" />';
-					$list 	.= '<label class="lang_box" for="'.$tagid.'_'.$lang->id.'" title="'.$lang->name.'" >';
-					if($lang->shortcode=="*") {
-						$list .= JText::_('FLEXI_ALL');  // Can appear in J1.6+ only
-					} else {
+
+					$list .= '<input id="'.$tagid.'_'.$lang->id.'" type="radio" name="'.$name.'" value="'.$lang->code.'"'.$checked.' class="'.$required.'" data-element-grpid="'.$tagid.'" />';
+					$list .= '<label class="lang_box" for="'.$tagid.'_'.$lang->id.'" title="'.$lang->name.'" >';
+
+					if ($lang->shortcode === '*')
+					{
+						$list .= JText::_('FLEXI_ALL');
+					}
+					else
+					{
 						// Add Flag if configure and it exists
-						if (!$conf || $conf['flags']) {
-							$list .= !empty($lang->imgsrc)  ?  '<img src="'.$lang->imgsrc.'" alt="'.$lang->name.'" />'  :  $lang->code;
+						if (!$radio_conf || $radio_conf['flags'])
+						{
+							$list .= !empty($lang->imgsrc)
+								? '<img src="' . $lang->imgsrc . '" alt="' . $lang->name . '" />'
+								:  $lang->code;
 						}
 
 						// Add text if configured
-						if ( !$conf || $conf['texts']==1 ) {
+						if ( !$radio_conf || $radio_conf['texts']==1 ) {
 							$list .= $lang->code;
-						} else if ( $conf['texts']==2 ) {
+						} else if ( $radio_conf['texts']==2 ) {
 							$list .= $lang->title;
-						} else if ( $conf['texts']==3 ) {
+						} else if ( $radio_conf['texts']==3 ) {
 							$list .= $lang->title_native;
 						} else if ( $conf['texts']==4 ) {
 							$list .= $lang->name;
@@ -4534,71 +4590,102 @@ class flexicontent_html
 						}
 					}
 
-					$list 	.= '</label>';
+					$list .= '</label>';
 					$checked	= '';
 				}
+				$list .= '</div>';
 				break;
-			case 4:   // RADIO selection of ALL languages, with empty default option "Keep original language", e.g. when copying/moving items
+
+			// RADIO selection of ALL languages, with empty default option "Keep original language", e.g. when copying/moving items
+			case 4:
 				$list  = '<input id="lang9999" type="radio" name="'.$name.'" class="'.$required.'" value="" checked="checked" data-element-grpid="'.$tagid.'" />';
 				$list .= '<label class="lang_box" for="lang9999" title="'.JText::_( 'FLEXI_NOCHANGE_LANGUAGE_DESC' ).'" >';
 				$list .= JText::_( 'FLEXI_NOCHANGE_LANGUAGE' );
 				$list .= '</label><div class="fcclear"></div>';
+				$list .= '<div class="group-fcset fc_input_set">';
 
-				foreach ($user_langs as $lang) {
-					$list 	.= '<input id="'.$tagid.'_'.$lang->id.'" type="radio" name="'.$name.'" class="'.$required.'" value="'.$lang->code.'" data-element-grpid="'.$tagid.'" />';
-					$list 	.= '<label class="lang_box" for="'.$tagid.'_'.$lang->id.'" title="'.$lang->name.'">';
-					if($lang->shortcode=="*") {
-						$list 	.= JText::_('FLEXI_ALL');  // Can appear in J1.6+ only
-					} else if (@$lang->imgsrc) {
-						$list 	.= '<img src="'.$lang->imgsrc.'" alt="'.$lang->name.'" />';
-					} else {
-						$list 	.= $lang->name;
+				foreach ($user_langs as $lang)
+				{
+					$list .= '<input id="'.$tagid.'_'.$lang->id.'" type="radio" name="'.$name.'" class="'.$required.'" value="'.$lang->code.'" data-element-grpid="'.$tagid.'" />';
+					$list .= '<label class="lang_box" for="'.$tagid.'_'.$lang->id.'" title="'.$lang->name.'">';
+
+					if ($lang->shortcode === '*')
+					{
+						$list .= JText::_('FLEXI_ALL');
 					}
-					$list 	.= '&nbsp;</label>';
-				}
-				break;
-			case 5:   // RADIO selection of ALL languages, EXCLUDE selected language, e.g. when translating items into another language
-			case 7:   // also exclude '*' (ALL) language
-				$list		= '';
-				foreach ($user_langs as $lang) {
-					if ($lang->code==$selected) continue;
-					if ($displaytype==7 && $lang->shortcode=="*") continue;
-					$list 	.= '<input id="'.$tagid.'_'.$lang->id.'" type="radio" name="'.$name.'" class="'.$required.'" value="'.$lang->code.'" data-element-grpid="'.$tagid.'" />';
-					$list 	.= '<label class="lang_box" for="'.$tagid.'_'.$lang->id.'" title="'.$lang->name.'">';
-					if($lang->shortcode=="*") {
-						$list 	.= JText::_('FLEXI_ALL');  // Can appear in J1.6+ only
-					} else if (@$lang->imgsrc) {
-						$list 	.= '<img src="'.$lang->imgsrc.'" alt="'.$lang->name.'" />';
-					} else {
-						$list 	.= $lang->name;
+					elseif (@$lang->imgsrc)
+					{
+						$list .= '<img src="'.$lang->imgsrc.'" alt="'.$lang->name.'" />';
 					}
-					$list 	.= '</label>';
+					else
+					{
+						$list .= $lang->name;
+					}
+					$list .= '&nbsp;</label>';
 				}
+				$list .= '</div>';
 				break;
-			case 6:   // RADIO selection of ALL languages, with empty option "Use language column", e.g. used in CSV import view
-				$list		= '';
+
+			// RADIO selection of ALL languages, EXCLUDE selected language, e.g. when translating items into another language
+			case 5:
+
+			// Also exclude '*' (ALL) language
+			case 7:
+				$list = '<div class="group-fcset fc_input_set">';
+
+				foreach ($user_langs as $lang)
+				{
+					if ($lang->code == $selected) continue;
+					if ($displaytype == 7 && $lang->shortcode === '*') continue;
+
+					$list .= '<input id="'.$tagid.'_'.$lang->id.'" type="radio" name="'.$name.'" class="'.$required.'" value="'.$lang->code.'" data-element-grpid="'.$tagid.'" />';
+					$list .= '<label class="lang_box" for="'.$tagid.'_'.$lang->id.'" title="'.$lang->name.'">';
+
+					if ($lang->shortcode === '*')
+					{
+						$list .= JText::_('FLEXI_ALL');
+					} else if (@$lang->imgsrc) {
+						$list .= '<img src="'.$lang->imgsrc.'" alt="'.$lang->name.'" />';
+					} else {
+						$list .= $lang->name;
+					}
+					$list .= '</label>';
+				}
+				$list .= '</div>';
+				break;
+
+			// RADIO selection of ALL languages, with empty option "Use language column", e.g. used in CSV import view
+			case 6:
+				$list = '<div class="group-fcset fc_input_set">';
 
 				$checked = $selected == '-99' ? 'checked="checked"' : '';
-				$list 	.= '<input id="lang-99" type="radio" name="'.$name.'" class="'.$required.'" value="-99" '.$checked.' data-element-grpid="'.$tagid.'" />';
+				$list .= '<input id="lang-99" type="radio" name="'.$name.'" class="'.$required.'" value="-99" '.$checked.' data-element-grpid="'.$tagid.'" />';
 				$tooltip_class = ' hasTooltip';
 				$tooltip_title = flexicontent_html::getToolTip('FLEXI_USE_LANGUAGE_COLUMN', 'FLEXI_USE_LANGUAGE_COLUMN_TIP', 1, 1);
-				$list 	.= '<label class="lang_box'.$tooltip_class.'" for="lang-99" title="'.$tooltip_title.'">';
-				$list 	.= JText::_( 'FLEXI_USE_LANGUAGE_COLUMN' );
-				$list 	.= '</label>';
+				$list .= '<label class="lang_box'.$tooltip_class.'" for="lang-99" title="'.$tooltip_title.'">';
+				$list .= JText::_( 'FLEXI_USE_LANGUAGE_COLUMN' );
+				$list .= '</label>';
 
-				foreach ($user_langs as $lang) {
+				foreach ($user_langs as $lang)
+				{
 					$checked = $lang->code==$selected ? 'checked="checked"' : '';
-					$list 	.= '<input id="'.$tagid.'_'.$lang->id.'" type="radio" name="'.$name.'" class="'.$required.'" value="'.$lang->code.'" '.$checked.' data-element-grpid="'.$tagid.'" />';
-					$list 	.= '<label class="lang_box" for="'.$tagid.'_'.$lang->id.'" title="'.$lang->name.'">';
-					if($lang->shortcode=="*") {
-						$list 	.= JText::_('FLEXI_ALL');  // Can appear in J1.6+ only
-					/*} else if (@$lang->imgsrc) {
-						$list 	.= '<img src="'.$lang->imgsrc.'" alt="'.$lang->name.'" />';*/
-					} else {
-						$list 	.= $lang->name;
+					$list .= '<input id="'.$tagid.'_'.$lang->id.'" type="radio" name="'.$name.'" class="'.$required.'" value="'.$lang->code.'" '.$checked.' data-element-grpid="'.$tagid.'" />';
+					$list .= '<label class="lang_box" for="'.$tagid.'_'.$lang->id.'" title="'.$lang->name.'">';
+					if ($lang->shortcode === '*')
+					{
+						$list .= JText::_('FLEXI_ALL');
 					}
-					$list 	.= '&nbsp;</label>';
+					/*elseif (@$lang->imgsrc)
+					{
+						$list .= '<img src="'.$lang->imgsrc.'" alt="'.$lang->name.'" />';
+					}*/
+					else
+					{
+						$list .= $lang->name;
+					}
+					$list .= '&nbsp;</label>';
 				}
+				$list .= '</div>';
 				break;
 		}
 		return $list;
@@ -4679,22 +4766,22 @@ class flexicontent_html
 			$list = '';
 
 			$checked = $selected == '-99' ? ' checked="checked"' : '';
-			$list 	.= '<input id="state-99" type="radio" name="state" class="state" value="-99" '.$checked.'/>';
+			$list .= '<input id="state-99" type="radio" name="state" class="state" value="-99" '.$checked.'/>';
 			$tooltip_class = ' hasTooltip';
 			$tooltip_title = flexicontent_html::getToolTip('FLEXI_USE_STATE_COLUMN', 'FLEXI_USE_STATE_COLUMN_TIP', 1, 1);
-			$list 	.= '<label class="state_box'.$tooltip_class.'" for="state-99" title="'.$tooltip_title.'">';
-			$list 	.= JText::_( 'FLEXI_USE_STATE_COLUMN' );
-			$list 	.= '</label>';
+			$list .= '<label class="state_box'.$tooltip_class.'" for="state-99" title="'.$tooltip_title.'">';
+			$list .= JText::_( 'FLEXI_USE_STATE_COLUMN' );
+			$list .= '</label>';
 
 			foreach ($state_ids as $i => $state_id)
 			{
 				//if ($state_id==0 || $state_id==2) $list .= "<br/>";
 				$checked = $state_id==$selected ? ' checked="checked"' : '';
-				$list 	.= '<input id="state'.$state_id.'" type="radio" name="state" class="state" value="'.$state_id.'" '.$checked.'/>';
-				$list 	.= '<label class="state_box" for="state'.$state_id.'" title="'.$state_names[$state_id].'" style="color:'.$state_colors[$state_id].';">';
-				$list 	.= $state_names[$state_id];
-				//$list 	.= '<img src="'.$img_path.$state_imgs[$state_id].'" width="16" height="16" style="border-width:0;" alt="'.$state_names[$state_id].'" />';
-				$list 	.= '</label>';
+				$list .= '<input id="state'.$state_id.'" type="radio" name="state" class="state" value="'.$state_id.'" '.$checked.'/>';
+				$list .= '<label class="state_box" for="state'.$state_id.'" title="'.$state_names[$state_id].'" style="color:'.$state_colors[$state_id].';">';
+				$list .= $state_names[$state_id];
+				//$list .= '<img src="'.$img_path.$state_imgs[$state_id].'" width="16" height="16" style="border-width:0;" alt="'.$state_names[$state_id].'" />';
+				$list .= '</label>';
 			}
 		}
 

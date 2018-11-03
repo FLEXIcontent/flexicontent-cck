@@ -137,14 +137,12 @@ abstract class FCModelAdmin extends JModelAdmin
 
 	/**
 	 * Array of supported state conditions of the record
-	 *  Set to non-empty string to use a custom title text for the condition
-	 *  Use empty to use default and optimize HTML / JS
 	 */
-	var $supported_conditions = array(
-		 0 => '', //'FLEXI_UNPUBLISHED',
-		 1 => '', //'FLEXI_PUBLISHED',
-		 2 => '', //'FLEXI_ARCHIVED',
-		-2 => '', //'FLEXI_TRASHED'
+	const supported_conditions = array(
+		 1 => 'FLEXI_PUBLISHED',
+		 0 => 'FLEXI_UNPUBLISHED',
+		 2 => 'FLEXI_ARCHIVED',
+		-2 => 'FLEXI_TRASHED'
 	);
 
 	/**

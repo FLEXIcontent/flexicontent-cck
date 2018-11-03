@@ -62,7 +62,7 @@ class FlexicontentControllerGroup extends JControllerForm
 	 */
 	protected function allowSave($data, $key = 'id')
 	{
-		return (JFactory::getUser()->authorise('core.admin', $this->option) && parent::allowSave($data, $key));
+		return (JFactory::getUser()->authorise('core.admin', 'com_users') && parent::allowSave($data, $key));
 	}
 
 	/**
