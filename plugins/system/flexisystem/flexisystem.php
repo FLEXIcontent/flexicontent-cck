@@ -322,15 +322,15 @@ class plgSystemFlexisystem extends JPlugin
 
 
 		// Detect resolution we will do this regardless of ... using mobile layouts
-		if ($this->cparams->get('use_mobile_layouts') || $app->isAdmin()) $this->detectClientResolution($this->cparams);
-
-		// Exclude pagebreak outputing dialog from redirection
-		if ( $option=='com_content' && ($layout=='pagebreak' || $layout=='modal') ) return;
+		if ($this->cparams->get('use_mobile_layouts') || $app->isAdmin())
+		{
+			$this->detectClientResolution($this->cparams);
+		}
 
 		// Redirect backend article / category management, and frontend article view
-		$app->isAdmin() ?
-			$this->redirectAdminComContent() :
-			$this->redirectSiteComContent() ;
+		$app->isAdmin()
+			? $this->redirectAdminComContent()
+			: $this->redirectSiteComContent();
 	}
 
 
@@ -354,8 +354,18 @@ class plgSystemFlexisystem extends JPlugin
 			return;
 		}
 
+		// Get request variables used to determine whether to apply redirection
 		$view   = $app->input->get('view', '', 'cmd');
 		$task   = $app->input->get('task', '', 'string');  // NOTE during this event 'task' is (controller.task), thus we use filtering 'string'
+		$layout = $app->input->get('layout', '', 'cmd');
+
+		/**
+		 * Exclude 'pagebreak' outputing dialog and Joomla article / category selection from a modal e.g. from a menu item, or from an editor
+		 */
+		if ($layout === 'pagebreak' || $layout === 'modal')
+		{
+			return;
+		}
 
 		// Split the task into 'controller' and task
 		$_ct = explode('.', $task);
@@ -372,6 +382,7 @@ class plgSystemFlexisystem extends JPlugin
 		// Get URLs excluded from redirection
 		$excluded_urls = $this->params->get('excluded_redirect_urls');
 		$excluded_urls = preg_split("/[\s]*%%[\s]*/", $excluded_urls);
+
 		if (empty($excluded_urls[count($excluded_urls)-1]))
 		{
 			unset($excluded_urls[count($excluded_urls)-1]);
@@ -385,18 +396,10 @@ class plgSystemFlexisystem extends JPlugin
 		foreach ($excluded_urls as $excluded_url)
 		{
 			$quoted = preg_quote($excluded_url, "#");
-			if(preg_match("#$quoted#", $uri)) return;
-		}
-
-		// Get request variables used to determine whether to apply redirection
-		$layout   = $app->input->get('layout', '', 'cmd');
-		//$function = $app->input->get('function', '', 'cmd');
-		//$editor   = $app->input->get('editor', '', 'cmd');
-
-		// Selecting Joomla article / category from a modal e.g. from a menu item, or from an editor
-		if ($layout=="modal")
-		{
-			return;
+			if (preg_match("#$quoted#", $uri))
+			{
+				return;
+			}
 		}
 
 
@@ -1078,7 +1081,7 @@ class plgSystemFlexisystem extends JPlugin
 					$catids = !is_array($cids)
 						? preg_split("/[\s]*,[\s]*/", $cids)
 						: $cids;
-					JArrayHelper::toInteger($catids, array());
+					$catids = ArrayHelper::toInteger($catids);
 
 					$css[] = 'mcats-' . implode(' mcats-', $catids);
 				}
@@ -2090,22 +2093,18 @@ class plgSystemFlexisystem extends JPlugin
 			$model->setId($data->id, $data->catid, $data->type_id);
 		}
 
-		// Get the item
-		$item = $model->getItem($data->id, $check_view_access=false);
+		// Get the item, clone it to avoid setting to it extra JRegistry / Array properties
+		// like fields, parameters that will slow down or cause recursion during JForm operations like bind
+		$fcform_item = clone($model->getItem($data->id, $check_view_access=false));
 
 		// Get the item's fields
-		$fields = $model->getExtrafields();
-		$item->fields = & $fields;
+		$fcform_item->fields = $model->getExtrafields();
 
 		// Get type parameters
-		$tparams = $model->getTypeparams();
-		$tparams = new JRegistry($tparams);
-		$item->tparams = & $tparams;
+		$fcform_item->tparams = new JRegistry($model->getTypeparams());
 
 		// Set component + type as item parameters
-		$item->params = new JRegistry();
-		$item->params->merge($cparams);
-		$item->params->merge($item->tparams);
+		$fcform_item->parameters = $model->getComponentTypeParams();
 
 
 		// ***
@@ -2154,7 +2153,7 @@ class plgSystemFlexisystem extends JPlugin
 		// ***
 
 		$jcustom = $app->getUserState('com_flexicontent.edit.item.custom');
-		foreach ($fields as $field)
+		foreach ($fcform_item->fields as $field)
 		{
 			if (!$field->iscore)
 			{
@@ -2172,13 +2171,14 @@ class plgSystemFlexisystem extends JPlugin
 		// *** (b) Create the edit html of the CUSTOM fields by triggering 'onDisplayField'
 		// ***
 
-		foreach ($fields as $field)
+		foreach ($fcform_item->fields as $field)
 		{
-			FlexicontentFields::getFieldFormDisplay($field, $item, $user);
+			FlexicontentFields::getFieldFormDisplay($field, $fcform_item, $user);
 		}
 
-		global $form_fcitem; // TODO remove this global
-		$form_fcitem = $item;
+		// Set item for rendering flexicontent fields
+		require_once(JPath::clean(JPATH_ROOT.'/administrator/components/com_flexicontent/models/fields/fcfieldwrapper.php'));
+		JFormFieldFCFieldWrapper::$fcform_item = $fcform_item;
 
 		// Get flexicontent fields
 		$form->load('
@@ -2186,8 +2186,8 @@ class plgSystemFlexisystem extends JPlugin
 				<fields name="attribs">
 					<fieldset
 						name="fcfields"
-						label="' . ( $item->typename
-							? JText::_('FLEXI_TYPE_NAME') . ' : ' . JText::_($item->typename)
+						label="' . ( $fcform_item->typename
+							? JText::_('FLEXI_TYPE_NAME') . ' : ' . JText::_($fcform_item->typename)
 							: JText::_('FLEXI_TYPE_NOT_DEFINED')
 						) . '"
 						description=""

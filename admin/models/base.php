@@ -1,33 +1,25 @@
 <?php
 /**
- * @version 1.5 stable $Id: item.php 1244 2012-04-12 05:07:35Z ggppdk $
- * @package Joomla
- * @subpackage FLEXIcontent
- * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
- * @license GNU/GPL v2
- * 
- * FLEXIcontent is a derivative work of the excellent QuickFAQ component
- * @copyright (C) 2008 Christoph Lukes
- * see www.schlu.net for more information
+ * @package         FLEXIcontent
+ * @version         3.3
  *
- * FLEXIcontent is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
+ * @link            http://www.flexicontent.com
+ * @copyright       Copyright © 2018, FLEXIcontent team, All Rights Reserved
+ * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
-// no direct access
-defined( '_JEXEC' ) or die( 'Restricted access' );
+defined('_JEXEC') or die('Restricted access');
+
+use Joomla\String\StringHelper;
+use Joomla\Utilities\ArrayHelper;
+use Joomla\CMS\Table\Table;
 
 jimport('legacy.model.admin');
-use Joomla\String\StringHelper;
 
 /**
- * FLEXIcontent Component BASE Model
+ * FLEXIcontent Component BASE (form) Model
  *
- * @package Joomla
- * @subpackage FLEXIcontent
- * @since		1.0
  */
 abstract class FCModelAdmin extends JModelAdmin
 {
@@ -39,14 +31,14 @@ abstract class FCModelAdmin extends JModelAdmin
 	var $record_keys = array('id', 'cid');
 
 	/**
-	 * Record name
+	 * Record name, (parent class property), this is used for: naming session data, XML file of class, etc
 	 *
 	 * @var string
 	 */
-	var $record_name = null;
+	protected $name = null;
 
 	/**
-	 * Record database table 
+	 * Record database table
 	 *
 	 * @var string
 	 */
@@ -74,11 +66,18 @@ abstract class FCModelAdmin extends JModelAdmin
 	var $_record = null;
 
 	/**
-	 * Events context to use during model FORM events triggering
+	 * Events context to use during model FORM events and diplay PREPARE events triggering
 	 *
 	 * @var object
 	 */
 	var $events_context = null;
+
+	/**
+	 * Record's type alias string
+	 *
+	 * @var        string
+	 */
+	var $type_alias = null;
 
 	/**
 	 * Flag to indicate adding new records with next available ordering (at the end),
@@ -103,14 +102,14 @@ abstract class FCModelAdmin extends JModelAdmin
 	var $extension_proxy = null;
 
 	/**
-	 * Use language associations
+	 * Context to use for registering (language) associations
 	 *
 	 * @var string
 	 */
 	var $associations_context = false;
 
 	/**
-	 * Use language associations
+	 * A message queue when appropriate
 	 *
 	 * @var string
 	 */
@@ -120,20 +119,36 @@ abstract class FCModelAdmin extends JModelAdmin
 	 * Various record specific properties
 	 *
 	 */
-	// ...
+
+	/**
+	 * List filters that are always applied
+	 */
+	var $hard_filters = array();
+
+	/**
+	 * Groups of Fields that can be partially present in the form
+	 */
+	var $mergeableGroups = array();
+
 
 	/**
 	 * Constructor
 	 *
-	 * @since 1.0
+	 * @since 3.3.0
 	 */
-	function __construct()
+	public function __construct($config = array())
 	{
-		parent::__construct();
+		parent::__construct($config);
+
+		// Make sure this is correct if called from different component ...
+		$this->option = 'com_flexicontent';
 
 		// Initialize using default naming if not already set
-		$this->records_dbtbl  = $this->records_dbtbl  ?: 'flexicontent_' . $this->record_name . 's';
-		$this->records_jtable = $this->records_jtable ?: 'flexicontent_' . $this->record_name . 's';
+		$this->records_dbtbl  = $this->records_dbtbl  ?: 'flexicontent_' . $this->getName() . 's';
+		$this->records_jtable = $this->records_jtable ?: 'flexicontent_' . $this->getName() . 's';
+
+		$this->events_context = $this->events_context ?: $this->option . '.' . $this->getName();
+		$this->type_alias     = $this->type_alias     ?: $this->option . '.' . $this->getName();
 
 		$jinput = JFactory::getApplication()->input;
 		$pk = null;
@@ -146,7 +161,7 @@ abstract class FCModelAdmin extends JModelAdmin
 				$id = $jinput->get($key, array(), 'array');
 				if (count($id))
 				{
-					JArrayHelper::toInteger($id);
+					$id = ArrayHelper::toInteger($id);
 					$pk = (int) $id[0];
 				}
 			}
@@ -165,12 +180,13 @@ abstract class FCModelAdmin extends JModelAdmin
 
 
 	/**
-	 * Method to set the identifier
+	 * Method to set the record identifier
 	 *
-	 * @access	public
-	 * @param	int record identifier
+	 * @param		int	    $id        record identifier
+	 *
+	 * @since	3.3.0
 	 */
-	function setId($id)
+	public function setId($id)
 	{
 		// Set record id and wipe data, if setting a different ID
 		if ($this->_id != $id)
@@ -185,10 +201,9 @@ abstract class FCModelAdmin extends JModelAdmin
 	/**
 	 * Method to get the record identifier
 	 *
-	 * @access	public
 	 * @return	int record identifier
 	 */
-	function getId()
+	public function getId()
 	{
 		return $this->_id;
 	}
@@ -197,13 +212,14 @@ abstract class FCModelAdmin extends JModelAdmin
 	/**
 	 * Overridden get method to get properties from the record
 	 *
-	 * @access	public
 	 * @param	string	$property	The name of the property
 	 * @param	mixed	$value		The value of the property to set
+	 *
 	 * @return 	mixed 				The value of the property
+	 *
 	 * @since	1.0
 	 */
-	function get($property, $default=null)
+	public function get($property, $default=null)
 	{
 		if ($this->_record || $this->_loadRecord())
 		{
@@ -219,13 +235,14 @@ abstract class FCModelAdmin extends JModelAdmin
 	/**
 	 * Overridden set method to pass properties on to the record
 	 *
-	 * @access	public
 	 * @param	  string	 $property	 The name of the property
 	 * @param	  mixed	   $value		   The value of the property to set
+	 *
 	 * @return	boolean  True on success
+	 *
 	 * @since	1.5
 	 */
-	function set($property, $value=null)
+	public function set($property, $value=null)
 	{
 		if ($this->_record || $this->_loadRecord())
 		{
@@ -240,26 +257,27 @@ abstract class FCModelAdmin extends JModelAdmin
 	/**
 	 * Set method to pass properties on to the model object
 	 *
-	 * @access	public
 	 * @param	  string	 $property	 The name of the property
 	 * @param	  mixed	   $value		   The value of the property to set
+	 *
 	 * @return	void
+	 *
 	 * @since	3.2
 	 */
-	function setProperty($property, $value=null)
+	public function setProperty($property, $value=null)
 	{
 		$this->$property = $value;
 	}
 
 
 	/**
-	 * Legacy method to get the record
+	 * Method to get a record via an alternative way that allows using multiple property values
 	 *
-	 * @access	public
 	 * @return	object
+	 *
 	 * @since	1.0
 	 */
-	function & getRecord($pk = null)
+	public function getRecord($pk = null)
 	{
 		if ($this->_loadRecord($pk))
 		{
@@ -276,8 +294,8 @@ abstract class FCModelAdmin extends JModelAdmin
 	/**
 	 * Method to load record data
 	 *
-	 * @access	protected
 	 * @return	boolean	True on success
+	 *
 	 * @since	1.0
 	 */
 	protected function _loadRecord($pk = null)
@@ -296,7 +314,9 @@ abstract class FCModelAdmin extends JModelAdmin
 			$name = $name_property ? $name : null;
 		}
 
-		// Lets load the record if it doesn't already exist
+		/**
+		 * Lets load the record if not already loaded
+		 */
 		if ( $this->_record===null || ($name && $this->_record->$name_property != $name) || (!$name && $this->_record->id != $pk) )
 		{
 			// If PK was provided and it is also not a name, then treat it as a primary key value
@@ -354,11 +374,10 @@ abstract class FCModelAdmin extends JModelAdmin
 	/**
 	 * Method to initialise the record data
 	 *
-	 * @access	protected
-	 * @param	object    $record   The record being initialized
-	 * @param	boolean   $uid      If true then only a new record will be initialized without running the _afterLoad() method
+	 * @param   object      $record    The record being initialized
+	 * @param   boolean     $initOnly  If true then only a new record will be initialized without running the _afterLoad() method
 	 * @return	boolean	True on success
-	 * @since	1.0
+	 * @since	1.5
 	 */
 	protected function _initRecord(&$record = null, $initOnly = false)
 	{
@@ -427,15 +446,15 @@ abstract class FCModelAdmin extends JModelAdmin
 		// Make sure we have a record id to checkout the record with
 		if ( !$pk ) $pk = $this->_id;
 		if ( !$pk ) return true;
-		
+
 		// Get current user
 		$user	= JFactory::getUser();
 		$uid	= $user->get('id');
-		
+
 		// Lets get table record and checkout the it
 		$tbl = $this->getTable();
 		if ( $tbl->checkout($uid, $this->_id) ) return true;
-		
+
 		// Reaching this points means checkout failed
 		$this->setError( JText::_("FLEXI_ALERT_CHECKOUT_FAILED") . ' : ' . $tbl->getError() );
 		return false;
@@ -453,7 +472,7 @@ abstract class FCModelAdmin extends JModelAdmin
 	 *
 	 * @since   3.2.0
 	 */
-	function isCheckedOut( $uid=0 )
+	public function isCheckedOut( $uid=0 )
 	{
 		if ($this->_id < 1)  return false;
 
@@ -472,6 +491,7 @@ abstract class FCModelAdmin extends JModelAdmin
 		}
 	}
 
+
 	/**
 	 * Legacy method to store the record, use save() instead
 	 *
@@ -481,7 +501,7 @@ abstract class FCModelAdmin extends JModelAdmin
 	 *
 	 * @since   3.2.0
 	 */
-	function store($data)
+	public function store($data)
 	{
 		return $this->save($data);
 	}
@@ -499,6 +519,7 @@ abstract class FCModelAdmin extends JModelAdmin
 	function save($data)
 	{
 		// Initialise variables
+		$app        = JFactory::getApplication();
 		$dispatcher = JEventDispatcher::getInstance();
 
 		// Note that 'data' is typically post['jform'] and it is validated by the caller e.g. the controller
@@ -555,8 +576,12 @@ abstract class FCModelAdmin extends JModelAdmin
 		}
 
 		// Trigger the before save event (typically: onContentBeforeSave)
-		$result = $dispatcher->trigger($this->event_before_save, array($this->option . '.' . $this->name, &$record, $isNew, $data));
-		if (in_array(false, $result, true))
+		$results = FLEXI_J40GE
+			? $app->triggerEvent($this->event_before_save, array($this->option . '.' . $this->name, &$record, $isNew, $data))
+			: $dispatcher->trigger($this->event_before_save, array($this->option . '.' . $this->name, &$record, $isNew, $data));
+
+		// Abort record store if any plugin returns a result === false
+		if (is_array($results) && in_array(false, $results, true))
 		{
 			$this->setError($record->getError());
 			return false;
@@ -568,10 +593,10 @@ abstract class FCModelAdmin extends JModelAdmin
 			$this->setError($record->getError());
 			return false;
 		}
-		
+
 		// Saving asset was handled by the JTable:store() of this CLASS model
 		// ...
-		
+
 		$this->_record = $record;			 // Get the new / updated record object
 		$this->_id     = $record->id;  // Get id of newly created records
 		$this->setState($this->getName() . '.id', $record->id);  // Set new id into state
@@ -579,58 +604,26 @@ abstract class FCModelAdmin extends JModelAdmin
 		// Update language Associations
 		$this->saveAssociations($record, $data);
 
-		// Trigger the after save event (typically: onContentBeforeSave)
-		$dispatcher->trigger($this->event_after_save, array($this->option . '.' . $this->name, &$record, $isNew, $data));
+		// Trigger the after save event (typically: onContentAfterSave)
+		$results = FLEXI_J40GE
+			? $app->triggerEvent($this->event_after_save, array($this->option . '.' . $this->name, &$record, $isNew, $data))
+			: $dispatcher->trigger($this->event_after_save, array($this->option . '.' . $this->name, &$record, $isNew, $data));
+
+		// Abort further actions if any plugin returns a result === false
+		/*if (is_array($results) && in_array(false, $results, true))
+		{
+			$this->setError($record->getError());
+			return false;
+		}*/
 
 		// Extra steps after loading record, and before calling JTable::bind()
 		$this->_afterStore($record, $data);
 
 		// Clear the cache
-		$this->cleanCache();
+		$this->cleanCache(null, 0);
+		$this->cleanCache(null, 1);
 
 		return true;
-	}
-
-
-	/**
-	 * Custom clean the cache
-	 *
-	 * @param   string   $group      Clean cache only in the given group
-	 * @param   integer  $client_id  Site Cache (0) / Admin Cache (1) or both Caches (-1)
-	 *
-	 * @return  void
-	 *
-	 * @since   3.2.0
-	 */
-	public function cleanCache($group = NULL, $client_id = -1)
-	{
-		if ($client_id === -1)
-		{
-			parent::cleanCache($group ?: 'com_flexicontent', 0);
-			parent::cleanCache($group ?: 'com_flexicontent', 1);
-		}
-		else
-		{
-			parent::cleanCache($group ?: 'com_flexicontent', $client_id);
-		}
-	}
-	
-
-	/**
-	 * Returns a Table object, always creating it
-	 *
-	 * @param	type	The table type to instantiate
-	 * @param	string	A prefix for the table class name. Optional.
-	 * @param	array	Configuration array for model. Optional.
-	 *
-	 * @return	JTable	A database object
-	 *
-	 * @since   3.2.0
-	*/
-	public function getTable($type = null, $prefix = '', $config = array())
-	{
-		$type = $type ?: $this->records_jtable;
-		return JTable::getInstance($type, $prefix, $config);
 	}
 
 
@@ -646,14 +639,20 @@ abstract class FCModelAdmin extends JModelAdmin
 	 */
 	public function getForm($data = array(), $loadData = true)
 	{
+		// Set form path in case we are called form different extension
+		\JForm::addFormPath(JPATH_BASE.DS.'components'.DS.'com_flexicontent' . '/models/forms');
+		\JForm::addFieldPath(JPATH_BASE.DS.'components'.DS.'com_flexicontent' . '/models/fields');
+
 		// Get the form.
-		$events_context = $this->events_context ?: $this->option.'.'.$this->getName();
-		$form = $this->loadForm($events_context, $this->getName(), array('control' => 'jform', 'load_data' => $loadData));
+		$form_name    = $this->option . '.' . $this->getName();
+		$xml_filename = $this->getName();
+		$form = $this->loadForm($form_name, $xml_filename, array('control' => 'jform', 'load_data' => $loadData));
 
 		if (empty($form))
 		{
 			return false;
 		}
+
 		$form->option = $this->option;
 		$form->context = $this->getName();
 
@@ -685,8 +684,7 @@ abstract class FCModelAdmin extends JModelAdmin
 		{
 		}
 
-		$events_context = $this->events_context ?: $this->option.'.'.$this->getName();
-		$this->preprocessData($events_context, $data);
+		$this->preprocessData($this->events_context, $data);
 
 		return $data;
 	}
@@ -705,14 +703,14 @@ abstract class FCModelAdmin extends JModelAdmin
 	{
 		$pk = $pk ? (int) $pk : $this->_id;
 		$pk = $pk ? $pk : (int) $this->getState($this->getName().'.id');
-		
+
 		static $items = array();
 		if ( $pk && isset($items[$pk]) ) return $items[$pk];
-		
+
 		// Instatiate the JTable
 		$table = $this->getTable();
 
-		if ($pk > 0)
+		if ($pk)
 		{
 			// Attempt to load the row.
 			$return = $table->load($pk);
@@ -740,7 +738,7 @@ abstract class FCModelAdmin extends JModelAdmin
 		// Before any other manipulations and before other any other data is added,
 		// convert our JTable record to a JObject coping only public properies
 		$_prop_arr = $table->getProperties($public_only = true);
-		$item = JArrayHelper::toObject($_prop_arr, 'JObject');
+		$item = ArrayHelper::toObject($_prop_arr, 'JObject');
 
 		// Add to cache if not a new record
 		if ($pk)
@@ -863,13 +861,14 @@ abstract class FCModelAdmin extends JModelAdmin
 	/**
 	 * Method to check if the user can edit the record
 	 *
-	 * @access	public
 	 * @return	boolean	True on success
+	 *
 	 * @since	3.2.0
 	 */
-	function canEdit($record=null)
+	public function canEdit($record = null)
 	{
 		$record = $record ?: $this->_record;
+		$user = JFactory::getUser();
 
 		return parent::canEdit($record);
 	}
@@ -878,13 +877,14 @@ abstract class FCModelAdmin extends JModelAdmin
 	/**
 	 * Method to check if the user can edit record 's state
 	 *
-	 * @access	public
 	 * @return	boolean	True on success
+	 *
 	 * @since	3.2.0
 	 */
-	function canEditState($record=null)
+	public function canEditState($record = null)
 	{
 		$record = $record ?: $this->_record;
+		$user = JFactory::getUser();
 
 		return parent::canEditState($record);
 	}
@@ -893,11 +893,11 @@ abstract class FCModelAdmin extends JModelAdmin
 	/**
 	 * Method to check if the user can delete the record
 	 *
-	 * @access	public
 	 * @return	boolean	True on success
+	 *
 	 * @since	3.2.0
 	 */
-	function canDelete($record=null)
+	public function canDelete($record = null)
 	{
 		$record = $record ?: $this->_record;
 
@@ -907,11 +907,11 @@ abstract class FCModelAdmin extends JModelAdmin
 
 	/**
 	 * Helper method to format a value as array
-	 * 
+	 *
 	 * @return object
 	 * @since 3.2.0
 	 */
-	function formatToArray($value)
+	public function formatToArray($value)
 	{
 		if (is_object($value))
 		{
@@ -928,7 +928,7 @@ abstract class FCModelAdmin extends JModelAdmin
 	/**
 	 * Helper method to PARTLY bind LAYOUT and other ARRAY properties
 	 * so that any fields missing completely from the form can maintain their old values
-	 * 
+	 *
 	 * @return object
 	 * @since 3.2.0
 	 */
@@ -963,12 +963,20 @@ abstract class FCModelAdmin extends JModelAdmin
 		//***
 		//*** Filter via all given JForms
 		//***
-		
+
 		foreach($options['model_names'] as $extension_name => $model_name)
 		{
 			// Check XML file exists
 			$model_xml_filepath = JPath::clean(JPATH_BASE.DS.'components'.DS . $extension_name . DS.'models'.DS.'forms'.DS . $model_name . '.xml');
-			if (!file_exists($model_xml_filepath))
+			$file_exists = file_exists($model_xml_filepath);
+
+			if (!$file_exists && FLEXI_J40GE)
+			{
+				$model_xml_filepath = JPath::clean(JPATH_BASE.DS.'components'.DS . $extension_name . DS.'forms'.DS . $model_name . '.xml');
+				$file_exists = file_exists($model_xml_filepath);
+			}
+
+			if (!$file_exists)
 			{
 				throw new Exception('Error reading model \'s form XML file : ' . $model_xml_filepath . ' file not found', 500);
 			}
@@ -1037,6 +1045,7 @@ abstract class FCModelAdmin extends JModelAdmin
 	{
 		// Check 'name' columns and then check 'alias' column exists, if none then clear $name
 		$table = $this->getTable();
+
 		$name_property = property_exists($table, 'name')
 			? 'name'
 			: (property_exists($table, 'alias')
@@ -1046,23 +1055,57 @@ abstract class FCModelAdmin extends JModelAdmin
 					: null
 				)
 			);
+
 		$name = $name_property ? $name : null;
 
-		$name_quoted = $name ? $this->_db->Quote($name) : null;
-		if (!$name_quoted)
+		if ($name)
 		{
-			return false;
+			$query = $this->_db->getQuery(true)
+				->select('*')
+				->from('#__' . $this->records_dbtbl)
+				->where($this->_db->quoteName('name') . ' = ' . $this->_db->Quote($name))
+			;
+			return $this->_db->setQuery($query)->loadObjectList('id');
 		}
 
-		$query = 'SELECT *'
-			. ' FROM #__' . $this->records_dbtbl
-			. ' WHERE '
-			. ( $name_quoted
-				? ' name='.$name_quoted
-				: ' id=' . (int) $pk
-			);
-		$this->_db->setQuery($query);
-		return $this->_db->loadObjectList('id');
+		return false;
+	}
+
+
+	/**
+	 * Method to initialize member variables used by batch methods and other methods like saveorder()
+	 *
+	 * @return  void
+	 *
+	 * @since   3.3.0
+	 */
+	public function initBatch()
+	{
+		if ($this->batchSet === null)
+		{
+			$this->batchSet = true;
+
+			// Get current user
+			$this->user = \JFactory::getUser();
+
+			// Get table
+			$this->table = $this->getTable($this->records_dbtbl, 'JTable');
+
+			// Get table class name
+			$tc = explode('\\', get_class($this->table));
+			$this->tableClassName = end($tc);
+
+			// Get UCM Type data
+			$this->contentType = new \JUcmType;
+			$this->type = $this->contentType->getTypeByTable($this->tableClassName)
+				?: $this->contentType->getTypeByAlias($this->type_alias);
+
+			// Get tabs observer
+			if (!FLEXI_J40GE)
+			{
+				$this->tagsObserver = $this->table->getObserverOfClass('Joomla\CMS\Table\Observer\Tags');
+			}
+		}
 	}
 
 
@@ -1080,7 +1123,6 @@ abstract class FCModelAdmin extends JModelAdmin
 	/**
 	 * Method to register a message to the message Queue
 	 *
-	 * @access	protected
 	 * @param	object   $message   The message object
 	 *
 	 * @since	3.2.0
@@ -1094,7 +1136,6 @@ abstract class FCModelAdmin extends JModelAdmin
 	/**
 	 * Method to add a message to the message Queue
 	 *
-	 * @access	protected
 	 * @param	object   $message   The message object
 	 *
 	 * @since	3.2.0
@@ -1124,9 +1165,8 @@ abstract class FCModelAdmin extends JModelAdmin
 	 *
 	 * Note. Typically called inside this MODEL 's store()
 	 *
-	 * @access	protected
-	 * @param	object   $record   The record object
-	 * @param	array    $data     The new data array
+	 * @param   object     $record   The record object
+	 * @param   array      $data     The new data array
 	 *
 	 * @since	3.2.0
 	 */
@@ -1153,7 +1193,7 @@ abstract class FCModelAdmin extends JModelAdmin
 		$title_prop = isset($data['title']) ? 'title' : (isset($data['label']) ? 'label' : (isset($data['name']) ? 'name' : null));
 
 		// Alter the title for save as copy
-		if ($task == 'save2copy')
+		if ($task === 'save2copy')
 		{
 			list($title, $alias) = $this->generateNewTitle(
 				$parent_id,
@@ -1178,9 +1218,8 @@ abstract class FCModelAdmin extends JModelAdmin
 	 *
 	 * Note. Typically called inside this MODEL 's store()
 	 *
-	 * @access	protected
-	 * @param	object   $record   The record object
-	 * @param	array    $data     The new data array
+	 * @param   object     $record   The record object
+	 * @param   array      $data     The new data array
 	 *
 	 * @since	3.2.0
 	 */
@@ -1194,7 +1233,6 @@ abstract class FCModelAdmin extends JModelAdmin
 	 *
 	 * Note. Typically called inside this MODEL 's store()
 	 *
-	 * @access	protected
 	 * @param	object   $record   The record object
 	 *
 	 * @since	3.2.0
@@ -1219,4 +1257,51 @@ abstract class FCModelAdmin extends JModelAdmin
 			$record->params = new JRegistry($record->params);
 		}
 	}
+
+
+	/**
+	 * Custom clean the cache
+	 *
+	 * @param   string   $group      Clean cache only in the given group
+	 * @param   integer  $client_id  Site Cache (0) / Admin Cache (1) or both Caches (-1)
+	 *
+	 * @return  void
+	 *
+	 * @since   3.2.0
+	 */
+	protected function cleanCache($group = NULL, $client_id = -1)
+	{
+		if ($client_id === -1)
+		{
+			parent::cleanCache($group ?: 'com_flexicontent', 0);
+			parent::cleanCache($group ?: 'com_flexicontent', 1);
+		}
+		else
+		{
+			parent::cleanCache($group ?: 'com_flexicontent', $client_id);
+		}
+	}
+	
+
+	/**
+	 * Returns a Table object, always creating it
+	 *
+	 * @param	type	The table type to instantiate
+	 * @param	string	A prefix for the table class name. Optional.
+	 * @param	array	Configuration array for model. Optional.
+	 *
+	 * @return	JTable	A database object
+	 *
+	 * @since   3.2.0
+	*/
+	public function getTable($type = null, $prefix = '', $config = array())
+	{
+		$type = $type ?: $this->records_jtable;
+		return JTable::getInstance($type, $prefix, $config);
+	}
+
+	/**
+	 * START OF MODEL SPECIFIC METHODS
+	 */
+
 }
