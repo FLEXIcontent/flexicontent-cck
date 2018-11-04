@@ -493,9 +493,10 @@ class ParentClassItem extends FCModelAdmin
 		}
 
 		// Only retrieve item if not already, ZERO $force_version means unversioned data or maintain currently loaded version
-		else if ( isset($this->_record) && (!$force_version || $force_version==$this->_version) )
+		elseif (isset($this->_record) && (!$force_version || $force_version==$this->_version))
 		{
 			//echo "********************************<br/>\n RETURNING ALREADY loaded item: {$pk}<br/> ********************************<br/><br/><br/>";
+			//echo "<pre>"; debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS); echo "</pre>";
 			return (boolean) $this->_record;
 		}
 
@@ -1288,7 +1289,38 @@ class ParentClassItem extends FCModelAdmin
 
 		if (empty($data))
 		{
-			$data = $this->getItem(null, $check_view_access=false, $no_cache=false, $force_version=0);
+			$item = $this->getItem(null, $check_view_access=false, $no_cache=false, $force_version=0);
+
+			/**
+			 * Clone the item, skipping any extra JRegistry / Array properties like fields and parameters
+			 * that will slow down or cause recursion during JForm operations like bind
+			 */
+
+			$data = $this->getTable();
+
+			foreach($item as $i => $v)
+			{
+				
+				if ($i === 'fields' || $i === 'parameters')
+				{
+					continue;
+				}
+
+				if (is_object($v))
+				{
+					/**
+					 * Form fieldsets like 'params', if they are a registry object they may
+					 * cause a failure due to some 3rd party plugins, convert them to arrays
+					 */
+					$data->$i = $v instanceof Registry
+						? $data->params->toArray()
+						: clone $v;
+				}
+				else
+				{
+					$data->$i = $v;
+				}
+			}
 		}
 		else
 		{
@@ -1306,12 +1338,6 @@ class ParentClassItem extends FCModelAdmin
 				if ( isset($data['language']) )  $this->_record->language  = $data['language'];
 				if ( isset($data['catid']) )     $this->_record->catid  = $data['catid'];
 			}
-		}
-
-		// If there are params fieldsets in the form it will fail with a registry object
-		if (isset($data->params) && $data->params instanceof Registry)
-		{
-			$data->params = $data->params->toArray();
 		}
 
 		$events_context = $this->events_context ?: $this->option.'.'.$this->getName();
@@ -1332,9 +1358,9 @@ class ParentClassItem extends FCModelAdmin
 	{
 		$iparams_extra = new JRegistry;
 
-		$user		 = JFactory::getUser();
+		$user    = JFactory::getUser();
 		$session = JFactory::getSession();
-		$asset	 = $this->type_alias . '.' . $this->_id;
+		$asset   = $this->type_alias . '.' . $this->_id;
 
 		// Check if item was editable, but was rendered non-editable
 		$hasTmpEdit = false;
@@ -1773,7 +1799,7 @@ class ParentClassItem extends FCModelAdmin
 			$query = $db->getQuery(true)
 				->select('DISTINCT tid')
 				->from('#__flexicontent_tags_item_relations')
-				->where('itemid = ' . $item->id);
+				->where('itemid = ' . (int) $item->id);
 			$item->tags = $db->setQuery($query)->loadColumn();
 			$item->tags = array_reverse($item->tags);
 
@@ -1781,7 +1807,7 @@ class ParentClassItem extends FCModelAdmin
 			$query = $db->getQuery(true)
 				->select('DISTINCT catid')
 				->from('#__flexicontent_cats_item_relations')
-				->where('itemid = ' . $item->id);
+				->where('itemid = ' . (int) $item->id);
 			$item->categories = $db->setQuery($query)->loadColumn();
 
 			// We need to convert FC item state TO a joomla's article state ... when triggering the before save content event
@@ -3956,7 +3982,6 @@ class ParentClassItem extends FCModelAdmin
 	 * @return object
 	 * @since 1.0
 	 */
-
 	public function getVotes($cids = null)
 	{
 		if ($cids && !is_array($cids))
@@ -5924,7 +5949,7 @@ class ParentClassItem extends FCModelAdmin
 
 					if (!$result)
 					{
-						$this->setError(FLEXI_J40GE ? $e->getMessage() : $this->table->getError());
+						$this->setError($this->table->getError());
 
 						return false;
 					}

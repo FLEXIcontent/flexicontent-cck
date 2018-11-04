@@ -113,7 +113,7 @@ class flexicontent_tags extends flexicontent_basetable
 			}
 		}
 
-		$this->tbl_fields = $tbl_fields;
+		$this->_tbl_fields = $tbl_fields;
 
 		// Now get and return fields of the main table
 		return parent::getFields($reload);
@@ -142,7 +142,7 @@ class flexicontent_tags extends flexicontent_basetable
 		}
 
 		// Get the default values for the class from every joined table.
-		foreach ($this->tbl_fields as $tbl => $props_arr)
+		foreach ($this->_tbl_fields as $tbl => $props_arr)
 		{
 			foreach ($props_arr as $k => $v)
 			{
@@ -334,7 +334,7 @@ class flexicontent_tags extends flexicontent_basetable
 		foreach ($this->getProperties() as $p => $v)
 		{
 			// If the property is in the join properties array we add it to the items_ext object
-			if (isset($this->tbl_fields[$this->_tbl_ext][$p]))
+			if (isset($this->_tbl_fields[$this->_tbl_ext][$p]))
 			{
 				if ($p === $tk_ext)
 				{
@@ -347,7 +347,7 @@ class flexicontent_tags extends flexicontent_basetable
 			}
 				
 			// Add it to the main record properties
-			if (isset($this->tbl_fields[$this->_tbl][$p]))
+			if (isset($this->_tbl_fields[$this->_tbl][$p]))
 			{
 				$record->$p = $v;
 			}
@@ -491,7 +491,7 @@ class flexicontent_tags extends flexicontent_basetable
 			}
 		}
 
-		foreach($this->tbl_fields as $tbl => $tbl_fields)
+		foreach($this->_tbl_fields as $tbl => $tbl_fields)
 		{
 			foreach($tbl_fields as $propname => $field)
 			{
