@@ -3386,7 +3386,7 @@ class flexicontent_html
 		$button_classes .= ' hasTooltip';
 		$tooltip_title = flexicontent_html::getToolTip($btn_title, $btn_desc, 0);
 
-		$output	= ' <a href="'.$link.'" class="'.$button_classes.'" data-placement="' . $tooltip_placement . '" title="'.$tooltip_title.'">'.$image.$caption.'</a>';
+		$output = ' <a href="' . $link . '" class="' . $button_classes . '" data-placement="' . $tooltip_placement . '" title="' . $tooltip_title . '">' . $image.$caption . '</a>';
 
 		if (!$auto_relations)
 		{
@@ -3766,7 +3766,7 @@ class flexicontent_html
 		}
 
 		return '
-		<div class="'.$field->name.'-group">
+		<div class="' . $field->name . '-group">
 			' . $html . '
 		</div>';
 	}
@@ -3816,7 +3816,7 @@ class flexicontent_html
 		 // Note  will need to remove static calculation, if this gets implemented per type
 		static $has_acclvl, $acclvl;
 
-		if ($has_acclvl===null)
+		if ($has_acclvl === null)
 		{
 			$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
 			$acclvl = (int) $field->parameters->get('submit_acclvl', 1);
@@ -3884,7 +3884,7 @@ class flexicontent_html
 			);
 		}
 
-		if ($vote_counter !== 'default' &&  $vote_counter !== '')
+		if ($vote_counter !== 'default' && $vote_counter !== '')
 		{
 			$counter = $vote_counter ? 1 : 0;
 		}
@@ -3895,7 +3895,7 @@ class flexicontent_html
 
 		// Display info e.g. counter if unrated, TODO add parameter
 		$show_unrated = (int) $field->parameters->get('show_unrated', 0);
-		$show_percentage = (int) $field->parameters->get(($int_xid ? 'extra_counter_show_percentage' : 'main_counter_show_percentage'), 0);
+		$show_percentage = (int) $field->parameters->get($int_xid ? 'extra_counter_show_percentage' : 'main_counter_show_percentage', 0);
 		$class = $field->name . '-row';
 
 		// Get number of displayed stars, configuration
@@ -4154,9 +4154,9 @@ class flexicontent_html
 		 */
 
 		$displayData = array(
-			'field' => $field,
-			'item' => $item,
-			'type' => 'item',
+			'field'      => $field,
+			'item'       => $item,
+			'type'       => 'item',
 			'favourites' => $favourites,
 		);
 
@@ -4182,9 +4182,9 @@ class flexicontent_html
 		 */
 
 		$displayData = array(
-			'field' => $field,
-			'item' => $item,
-			'type' => 'item',
+			'field'    => $field,
+			'item'     => $item,
+			'type'     => 'item',
 			'favoured' => $favoured,
 		);
 

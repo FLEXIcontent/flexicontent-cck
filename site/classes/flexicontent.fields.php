@@ -381,15 +381,17 @@ class FlexicontentFields
 					$item->parameters = flexicontent_db::check_fix_JSON_column('attribs', 'content', 'id', $item->id, $item->attribs);
 				}
 			}
+
+			// Property 'params' is an alias of property 'parameters'
 			$item->params = $item->parameters;
 
-			$item->text  = $item->introtext . chr(13).chr(13) . $item->fulltext;
+			$item->text  = $item->introtext . chr(13) . chr(13) . $item->fulltext;
 			$item->tags  = $tags;
 			$item->cats  = $cats;
 			$item->favs  = $favourites;
 			$item->fav   = $favoured;
 
-			$item->creator 	= !empty($author->alias) ? $author->alias : (!empty($author->name) 		? $author->name 	: '') ;
+			$item->creator 	= !empty($author->alias) ? $author->alias : (!empty($author->name) ? $author->name : '');
 			$item->author		= & $item->creator;  // An alias ... of creator
 			$item->modifier	= !empty($modifier->name)      ? $modifier->name  : $item->creator;   // If never modified, set modifier to be the creator
 			$item->modified	= $item->modified != $nullDate ? $item->modified  : $item->created;   // If never modified, set modification date to be the creation date
@@ -878,7 +880,7 @@ class FlexicontentFields
 		// *****************************************
 		// Trigger content plugins on the field text
 		// *****************************************
-		
+
 		$skip_trigger_plgs = $method === 'csv_export' ? true : $skip_trigger_plgs;
 
 		if ( !$skip_trigger_plgs && !isset($_trigger_plgs_ft[$field_name]) )
@@ -956,7 +958,7 @@ class FlexicontentFields
 			$dispatcher   = JEventDispatcher::getInstance();
 			$fcdispatcher = FCDispatcher::getInstance_FC($debug);
 		}
-		
+
 		// Use limitstart only for maintext core field
 		$is_maintext = $field->iscore && $field->field_type === 'maintext';
 		$limitstart = $is_maintext
@@ -2371,7 +2373,7 @@ class FlexicontentFields
 
 		$where .=
 			// Limit to given search fields list
-			(!empty($search_fields) && is_array($search_fields) ? " AND f.name IN (". implode('","', $search_fields) . ") " : "") .
+			(!empty($search_fields) && is_array($search_fields) ? " AND f.name IN (" . implode('","', $search_fields) . ") " : "") .
 
 			// Limit to given search fields list
 			(!empty($search_fields) && is_string($search_fields) ? " AND f.name IN (" . $search_fields . ") " : "") .
@@ -2386,7 +2388,7 @@ class FlexicontentFields
 			. ' GROUP BY f.id'
 
 			// If single type given then retrieve ordering for fields of this type
-			. ' ORDER BY ' . ($content_types && count($content_types) ===1
+			. ' ORDER BY ' . ($content_types && count($content_types) === 1
 				? ' ftr.ordering, f.name'
 				: ' f.ordering, f.name'
 			)
@@ -2404,7 +2406,7 @@ class FlexicontentFields
 				// Skip fields not being capable of advanced/basic search
 				if ($indexer === 'basic')
 				{
-					if (! FlexicontentFields::getPropertySupport($field->field_type, $field->iscore, $search_type=='filter' ? 'supportfilter' : 'supportsearch'))
+					if (! FlexicontentFields::getPropertySupport($field->field_type, $field->iscore, $search_type === 'filter' ? 'supportfilter' : 'supportsearch'))
 					{
 						$nsp_fields[$field_id] = $field;
 						continue;
@@ -2730,7 +2732,9 @@ class FlexicontentFields
 		}
 
 		// Make sure posted data is an array
-		$unserialize = isset($field->unserialize) ? $field->unserialize : (count($required_props) || count($search_props));
+		$unserialize = isset($field->unserialize)
+			? $field->unserialize
+			: (count($required_props) || count($search_props));
 
 		// Create the new search data
 		foreach($items_values as $itemid => $item_values)
@@ -3833,13 +3837,14 @@ class FlexicontentFields
 			$filter->html = $filter->html . ' ' . $closetag_filter;
 		}
 
-		if ( $print_logging_info )
+		if ($print_logging_info)
 		{
 			$current_filter_creation = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 			$flt_active_count = isset($filters_where) ? count($filters_where) : 0;
 			$faceted_str = array(0=>'non-FACETED ', 1=>'FACETED: current view &nbsp; (cacheable) ', 2=>'FACETED: current filters:'." (".$flt_active_count.' active) ');
 
 			$fc_run_times['create_filter'][$filter->name] = $current_filter_creation + (!empty($fc_run_times['create_filter'][$filter->name]) ? $fc_run_times['create_filter'][$filter->name] : 0);
+
 			if (isset($fc_run_times['_create_filter_init']))
 			{
 				$fc_run_times['create_filter'][$filter->name] -= $fc_run_times['_create_filter_init'];
@@ -4653,6 +4658,7 @@ class FlexicontentFields
 
 		// Use ACCESS Level, usually this is only for shown filters
 		$and_access = '';
+
 		if ($check_access)
 		{
 			$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
@@ -4673,7 +4679,7 @@ class FlexicontentFields
 
 		if (!$filters)
 		{
-			// Need to do return a reference (also can not return false here as it will mean an error)
+			// Create variable to return a reference (also can not return false here as it will mean an error)
 			$filters = array();
 			return $filters;
 		}
@@ -4693,7 +4699,7 @@ class FlexicontentFields
 		// Not re-ordering, but index them via fieldname in this case too (for consistency)
 		else
 		{
-			foreach($filters as $filter)
+			foreach ($filters as $filter)
 			{
 				$filters_tmp[$filter->name] = $filter;
 			}
