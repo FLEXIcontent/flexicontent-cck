@@ -1,5 +1,9 @@
 <?php			
 
+/**
+ * Place override at: /templates/TEMPLATENAME/html/layouts/com_flexicontent/items_list_filters/
+ */
+
 extract($displayData);
 $_s = $isSearchView ? '_s' : '';
 

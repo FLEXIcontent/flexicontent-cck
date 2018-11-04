@@ -3788,17 +3788,20 @@ class FlexicontentFields
 
 		$layouts_path = $app->isSite() ? null : JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'layouts';
 
-		$filter->html = '';
-
 		// *** Do not create any HTML just return empty string to indicate a filter that should be skipped
-		if ( $hide_disabled_values && empty($results) )
+		if ($hide_disabled_values && empty($results))
 		{
-			// no HTML
+			$filter->html = '';
 		}
 
-		// *** Create the form field(s) used for filtering
+		/**
+		 * Create the form field(s) used for filtering, note output is captured into filter->html, but we do 'echo JLayoutHelper::render()' for debugging
+		 * Place override at: /templates/TEMPLATENAME/html/layouts/com_flexicontent/items_list_filters/
+		 */
 		else
 		{
+			$filter->html = '';
+
 			switch ($display_filter_as)
 			{
 				// 0: Select (single value selectable), 2: Dual select (value range), 6: Multi Select (multiple values selectable)
@@ -3817,7 +3820,6 @@ class FlexicontentFields
 					break;
 
 				default:
-					//echo JLayoutHelper::render('items_list_filters.radiocheck', $displayData, $layouts_path);
 					$filter->html = 'Case ' . $display_filter_as . ' not implemented';
 					break;
 			}
