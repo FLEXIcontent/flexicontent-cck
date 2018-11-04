@@ -664,7 +664,7 @@ abstract class FCModelAdmin extends JModelAdmin
 		\JForm::addFieldPath(JPATH_BASE.DS.'components'.DS.'com_flexicontent' . '/models/fields');
 
 		// Get the form.
-		$form_name    = $this->option . '.' . $this->getName();
+		$form_name    = $this->events_context;
 		$xml_filename = $this->getName();
 		$form = $this->loadForm($form_name, $xml_filename, array('control' => 'jform', 'load_data' => $loadData));
 
@@ -698,7 +698,14 @@ abstract class FCModelAdmin extends JModelAdmin
 
 		if (empty($data))
 		{
-			$data = $this->getItem();
+			$item = $this->getItem();
+
+			/**
+			 * Because the record data are meant for JForm before any other manipulations and before any
+			 * other data is added, convert our JTable record to a JObject coping only public properies
+			 */
+			$_prop_arr = $item->getProperties($public_only = true);
+			$data = ArrayHelper::toObject($_prop_arr, 'JObject');
 		}
 		else
 		{
@@ -725,7 +732,11 @@ abstract class FCModelAdmin extends JModelAdmin
 		$pk = $pk ? $pk : (int) $this->getState($this->getName().'.id');
 
 		static $items = array();
-		if ( $pk && isset($items[$pk]) ) return $items[$pk];
+
+		if ($pk && isset($items[$pk]))
+		{
+			return $items[$pk];
+		}
 
 		// Instatiate the JTable
 		$table = $this->getTable();
@@ -755,17 +766,13 @@ abstract class FCModelAdmin extends JModelAdmin
 		// Extra steps after loading
 		$this->_afterLoad($this->_record);
 
-		// Before any other manipulations and before other any other data is added,
-		// convert our JTable record to a JObject coping only public properies
-		$_prop_arr = $table->getProperties($public_only = true);
-		$item = ArrayHelper::toObject($_prop_arr, 'JObject');
-
 		// Add to cache if not a new record
 		if ($pk)
 		{
 			$items[$pk] = $this->_record;
 		}
-		return $item;
+
+		return $this->_record;
 	}
 
 

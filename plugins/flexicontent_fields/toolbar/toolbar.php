@@ -54,7 +54,7 @@ class plgFlexicontent_fieldsToolbar extends FCField
 		$document	= JFactory::getDocument();
 
 		$lang = $document->getLanguage();
-		$lang = $item->params->get('language', $lang);
+		$lang = $item->parameters->get('language', $lang);
 		$lang = $lang ? $lang : 'en-GB';
 		$lang = substr($lang, 0, 2);
 		$lang = in_array($lang, array('en','es','it','th')) ? $lang : 'en';

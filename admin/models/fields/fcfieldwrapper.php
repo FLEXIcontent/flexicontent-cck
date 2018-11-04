@@ -35,6 +35,7 @@ class JFormFieldFCFieldWrapper extends JFormField
 	protected $_inherited;
 
 	static $css_js_added = null;
+	static $fcform_item = null;
 
 	/**
 	* Element name
@@ -72,8 +73,8 @@ class JFormFieldFCFieldWrapper extends JFormField
 		$app->input->set('unique_tmp_itemid', $unique_tmp_itemid);
 		$app->setUserState($option.'.edit.item.unique_tmp_itemid', $unique_tmp_itemid);  // Save temporary unique item id into the session
 
-		global $form_fcitem;
-		$html = $this->renderFieldsForm($form_fcitem);
+		// Create containers for the already rendered the fields
+		$html = $this->renderFieldsForm(static::$fcform_item);
 		$html = $html ?: '<span class="alert alert-info">' . JText::_( 'FLEXI_NO_FIELDS_TO_TYPE' ) .' </span>';
 		return '</div></div>
 		<div class="flexicontent" id="flexicontent">'
@@ -99,7 +100,7 @@ class JFormFieldFCFieldWrapper extends JFormField
 		$hide_ifempty_fields = array('fcloadmodule', 'fcpagenav', 'toolbar');
 		$row_k = 0;
 
-		$lbl_class = ' ' . $item->params->get(JFactory::getApplication()->isAdmin() ? 'form_lbl_class_be' : 'form_lbl_class_fe');
+		$lbl_class = ' ' . $item->parameters->get(JFactory::getApplication()->isAdmin() ? 'form_lbl_class_be' : 'form_lbl_class_fe');
 		$tip_class = ' hasTooltip';
 
 		$FC_jfields_html['images'] = '<span class="alert alert-info">Edit in \'Image and links\' TABs</span>';

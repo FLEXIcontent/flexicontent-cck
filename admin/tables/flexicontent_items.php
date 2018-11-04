@@ -302,7 +302,7 @@ class flexicontent_items extends _flexicontent_items
 			}
 		}
 
-		$this->tbl_fields = $tbl_fields;
+		$this->_tbl_fields = $tbl_fields;
 
 		// Now get and return fields of the main table
 		return parent::getFields($reload);
@@ -404,7 +404,7 @@ class flexicontent_items extends _flexicontent_items
 		}
 
 		// Get the default values for the class from every joined table.
-		foreach ($this->tbl_fields as $tbl => $props_arr)
+		foreach ($this->_tbl_fields as $tbl => $props_arr)
 		{
 			// Skip this table as it contains copies of the other tables , they do not have their own values
 			if ($tbl === $this->_tbl_tmp)
@@ -747,13 +747,13 @@ class flexicontent_items extends _flexicontent_items
 		foreach ($this->getProperties() as $p => $v)
 		{
 			// If the property is in the join properties array we add it to the items_tmp object (coming either from tbl or tbl_ext or from other joined table)
-			if (isset($this->tbl_fields[$this->_tbl_tmp][$p]))
+			if (isset($this->_tbl_fields[$this->_tbl_tmp][$p]))
 			{
 				$record_tmp->$p = $v;
 			}
 			
 			// If the property is in the join properties array we add it to the items_ext object
-			if (isset($this->tbl_fields[$this->_tbl_ext][$p]))
+			if (isset($this->_tbl_fields[$this->_tbl_ext][$p]))
 			{
 				$record_ext->$p = $v;
 				
