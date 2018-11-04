@@ -12,7 +12,7 @@ static $js_and_css_added = false;
 if (!$js_and_css_added)
 {
 	$document = JFactory::getDocument();
-	$cparams  = JComponentHelper::getParams( 'com_flexicontent' );
+	$cparams  = JComponentHelper::getParams('com_flexicontent');
 	$use_font = $cparams->get('use_font_icons', 1);
 
 	$icon_del_fav = !$use_font
