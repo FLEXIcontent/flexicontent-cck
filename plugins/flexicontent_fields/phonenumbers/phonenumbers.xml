@@ -151,12 +151,12 @@
 			<field name="label_suffix" type="text" default="" size="10" label="PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_LABEL_SUFFIX" description="PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_LABEL_SUFFIX_DESC" />
 			
 			<field name="" type="separator" default="PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_COUNTRY_CODE" description="" level="level3" />
-			<field name="country_code_prefix" type="text" default="+" size="3" label="PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_COUNTRY_CODE_PREFIX" description="PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_COUNTRY_CODE_PREFIX_DESC" />
-			<field name="separator_cc_phone1" type="text" default=" " size="3" label="PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_COUNTRY_AREA_SEP" description="PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_COUNTRY_AREA_SEP_DESC" />
+			<field name="country_code_prefix" type="text" default="" size="3" label="PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_COUNTRY_CODE_PREFIX" description="PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_COUNTRY_CODE_PREFIX_DESC" />
+			<field name="separator_cc_phone1" type="text" default="" size="3" label="PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_COUNTRY_AREA_SEP" description="PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_COUNTRY_AREA_SEP_DESC" />
 			
 			<field name="" type="separator" default="PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_PHONE_NUMBER" description="" level="level3" />
-			<field name="separator_phone1_phone2" type="text" default="-" size="3" label="PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_AREA_PART2_SEP" description="PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_AREA_PART2_SEP_DESC" />
-			<field name="separator_phone2_phone3" type="text" default="-" size="3" label="PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_PART2_PART3_SEP" description="PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_PART2_PART3_SEP_DESC" />
+			<field name="separator_phone1_phone2" type="text" default="" size="3" label="PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_AREA_PART2_SEP" description="PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_AREA_PART2_SEP_DESC" />
+			<field name="separator_phone2_phone3" type="text" default="" size="3" label="PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_PART2_PART3_SEP" description="PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_PART2_PART3_SEP_DESC" />
 
 			<field name="" type="separator" default="FLEXI_FIELD_VALUE_LIST" description="" icon_class="icon-stack" level="tab_open" box_type="1" />
 			
