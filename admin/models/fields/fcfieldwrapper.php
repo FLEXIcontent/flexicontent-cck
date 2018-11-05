@@ -1,25 +1,18 @@
 <?php
 /**
-* @version 1.5 stable $Id: types.php 1340 2012-06-06 02:30:49Z ggppdk $
-* @package Joomla
-* @subpackage FLEXIcontent
-* @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
-* @license GNU/GPL v2
-*
-* FLEXIcontent is a derivative work of the excellent QuickFAQ component
-* @copyright (C) 2008 Christoph Lukes
-* see www.schlu.net for more information
-*
-* FLEXIcontent is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-*/
+ * @package         FLEXIcontent
+ * @version         3.3
+ *
+ * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
+ * @link            http://www.flexicontent.com
+ * @copyright       Copyright © 2018, FLEXIcontent team, All Rights Reserved
+ * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
+ */
 
-// Check to ensure this file is included in Joomla!
 defined('_JEXEC') or die('Restricted access');
 
 use Joomla\String\StringHelper;
+use Joomla\Utilities\ArrayHelper;
 
 // Load the helper classes
 if (!defined('DS'))  define('DS',DIRECTORY_SEPARATOR);
@@ -42,6 +35,7 @@ class JFormFieldFCFieldWrapper extends JFormField
 	protected $_inherited;
 
 	static $css_js_added = null;
+	static $fcform_item = null;
 
 	/**
 	* Element name
@@ -79,8 +73,8 @@ class JFormFieldFCFieldWrapper extends JFormField
 		$app->input->set('unique_tmp_itemid', $unique_tmp_itemid);
 		$app->setUserState($option.'.edit.item.unique_tmp_itemid', $unique_tmp_itemid);  // Save temporary unique item id into the session
 
-		global $form_fcitem;
-		$html = $this->renderFieldsForm($form_fcitem);
+		// Create containers for the already rendered the fields
+		$html = $this->renderFieldsForm(static::$fcform_item);
 		$html = $html ?: '<span class="alert alert-info">' . JText::_( 'FLEXI_NO_FIELDS_TO_TYPE' ) .' </span>';
 		return '</div></div>
 		<div class="flexicontent" id="flexicontent">'
@@ -106,7 +100,7 @@ class JFormFieldFCFieldWrapper extends JFormField
 		$hide_ifempty_fields = array('fcloadmodule', 'fcpagenav', 'toolbar');
 		$row_k = 0;
 
-		$lbl_class = ' ' . $item->params->get(JFactory::getApplication()->isAdmin() ? 'form_lbl_class_be' : 'form_lbl_class_fe');
+		$lbl_class = ' ' . $item->parameters->get(JFactory::getApplication()->isAdmin() ? 'form_lbl_class_be' : 'form_lbl_class_fe');
 		$tip_class = ' hasTooltip';
 
 		$FC_jfields_html['images'] = '<span class="alert alert-info">Edit in \'Image and links\' TABs</span>';
@@ -117,14 +111,14 @@ class JFormFieldFCFieldWrapper extends JFormField
 			if (
 				// SKIP backend hidden fields from this listing
 				($field->iscore && $field->field_type!='maintext')   ||   $field->parameters->get('backend_hidden')  ||   in_array($field->formhidden, array(2,3))   ||
-				
+
 				// Skip hide-if-empty fields from this listing
 				( empty($field->html) && ($field->formhidden==4 || in_array($field->field_type, $hide_ifempty_fields)) )
 			) continue;
-			
+
 			// check to SKIP (hide) field e.g. description field ('maintext'), alias field etc
 			if ( $item->tparams->get('hide_'.$field->field_type) ) continue;
-			
+
 			$not_in_tabs = "";
 			if ($field->field_type=='groupmarker')
 			{
