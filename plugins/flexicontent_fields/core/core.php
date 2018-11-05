@@ -191,6 +191,7 @@ class plgFlexicontent_fieldsCore extends FCField
 
 			if($field->iscore != 1) continue;
 			$field->item_id = $item->id;
+			$field->item_title = $item->title;
 
 			// Replace item properties or values of other fields
 			if (!$pretext_cacheable)
@@ -272,9 +273,31 @@ class plgFlexicontent_fieldsCore extends FCField
 
 				case 'voting': // voting button
 					// TODO: if ($raw_values!==null) $vote = convert ... $raw_values;
-					$vote = $_vote===false
+					$vote = $_vote === false
 						? $item->vote
 						: $_vote;
+
+
+					// Enable/disable according to current view
+					$vote_submit_inview = FLEXIUtilities::paramToArray($field->parameters->get('vote_submit_inview', array('item')));
+					$composite_inview   = FLEXIUtilities::paramToArray($field->parameters->get('composite_inview', array('item')));
+					$enable_extra_votes = $field->parameters->get('enable_extra_votes', 0);
+
+					$allow_vote = in_array($view, $vote_submit_inview) || ($isItemsManager && in_array('backend', $vote_submit_inview));
+					$show_composite = in_array($view, $composite_inview) || ($isItemsManager && in_array('backend', $composite_inview));
+
+					// Disable vote submit if voting disabled or if extra voting characteristics are not visible
+					if (!$allow_vote || ($enable_extra_votes && !$show_composite))
+					{
+						$vote = $vote ?: new stdClass;
+						$vote->allow_vote = false;
+					}
+
+					// Do not show extra votes
+					if (!$show_composite)
+					{
+						$field->parameters->set('enable_extra_votes', 0);
+					}
 
 					$field->value[] = 'button';  // A dummy value to force display
 
@@ -395,7 +418,7 @@ class plgFlexicontent_fieldsCore extends FCField
 					else
 					{
 						$field->{$prop} = $item->parameters->get('show_intro', 1)
-							? $item->introtext . chr(13).chr(13) . $item->fulltext
+							? $item->introtext . chr(13) . chr(13) . $item->fulltext
 							: $item->fulltext;
 					}
 
@@ -437,7 +460,8 @@ class plgFlexicontent_fieldsCore extends FCField
 		$is_ingroup  = !empty($field->ingroup);
 
 		// Get viewing layout
-		$field->item_id = $item->id;
+		$field->item_id    = $item->id;
+		$field->item_title = $item->title;
 
 		switch ($field->field_type)
 		{

@@ -40,7 +40,7 @@
 			</field>
 			
 			<field name="" type="separator" default="FLEXI_FIELD_VALUE" level="level1" />
-			<field name="viewlayout" type="fcfilelist" default="" label="FLEXI_FIELD_SELECT_VIEW_LAYOUT_CORE" description="FLEXI_FIELD_SELECT_VIEW_LAYOUT_CORE_DESC" directory="plugins/flexicontent_fields/core/tmpl/title/" filter="value*" exclude="" stripext="1" stripprefix="value_" hide_none="1" hide_default="1" labelclass="label label-warning" />
+			<field name="viewlayout" type="fcfilelist" default="" label="FLEXI_FIELD_SELECT_VIEW_LAYOUT_CORE" description="FLEXI_FIELD_SELECT_VIEW_LAYOUT_CORE_DESC" directory="plugins/flexicontent_fields/core/tmpl/title/" filter="value*" exclude="" stripext="1" stripprefix="value_" hide_none="1" hide_default="1" />
 
 			<field name="" type="separator" default="FLEXI_FIELD_CONTENT_PLUGINS" description="FLEXI_FIELD_CONTENT_PLUGINS_DESC" class="fc-mssg-inline fc-info fc-nobgimage" level="level3"/>
 			<field name="trigger_onprepare_content" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT" description="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT_DESC" class="btn-group btn-group-yesno">
@@ -117,7 +117,7 @@
 			</field>
 			
 			<field name="" type="separator" default="FLEXI_FIELD_VALUE" level="level1" />
-			<field name="viewlayout" type="fcfilelist" default="" label="FLEXI_FIELD_SELECT_VIEW_LAYOUT_CORE" description="FLEXI_FIELD_SELECT_VIEW_LAYOUT_CORE_DESC" directory="plugins/flexicontent_fields/core/tmpl/created/" filter="value*" exclude="" stripext="1" stripprefix="value_" hide_none="1" hide_default="1" labelclass="label label-warning" />
+			<field name="viewlayout" type="fcfilelist" default="" label="FLEXI_FIELD_SELECT_VIEW_LAYOUT_CORE" description="FLEXI_FIELD_SELECT_VIEW_LAYOUT_CORE_DESC" directory="plugins/flexicontent_fields/core/tmpl/created/" filter="value*" exclude="" stripext="1" stripprefix="value_" hide_none="1" hide_default="1" />
 
 			<field name="date_format" type="multilist" subtype="list" toggle_related="1" default="" label="FLEXI_FIELD_DATE_FORMAT" description="FLEXI_FIELD_CUSTOM_FORMAT_J16GE_DESC">
 				<option value="DATE_FORMAT_LC1" show_list="" hide_list="custom-date-mode">DATE_FORMAT_LC1</option>
@@ -432,7 +432,7 @@
 			</field>
 			
 			<field name="" type="separator" default="FLEXI_FIELD_VALUE" level="level1" />
-			<field name="viewlayout" type="fcfilelist" default="" label="FLEXI_FIELD_SELECT_VIEW_LAYOUT_CORE" description="FLEXI_FIELD_SELECT_VIEW_LAYOUT_CORE_DESC" directory="plugins/flexicontent_fields/core/tmpl/modified/" filter="value*" exclude="" stripext="1" stripprefix="value_" hide_none="1" hide_default="1" labelclass="label label-warning" />
+			<field name="viewlayout" type="fcfilelist" default="" label="FLEXI_FIELD_SELECT_VIEW_LAYOUT_CORE" description="FLEXI_FIELD_SELECT_VIEW_LAYOUT_CORE_DESC" directory="plugins/flexicontent_fields/core/tmpl/modified/" filter="value*" exclude="" stripext="1" stripprefix="value_" hide_none="1" hide_default="1" />
 
 			<field name="date_format" type="multilist" subtype="list" toggle_related="1" default="" label="FLEXI_FIELD_DATE_FORMAT" description="FLEXI_FIELD_CUSTOM_FORMAT_J16GE_DESC">
 				<option value="DATE_FORMAT_LC1" show_list="" hide_list="custom-date-mode">DATE_FORMAT_LC1</option>
@@ -994,8 +994,11 @@
 		
 		
 		<fieldset name="group-voting-viewing" hidden="true" icon_class="icon-screen" label="FLEXI_FIELD_VIEWING" addfieldpath="/administrator/components/com_flexicontent/elements"><!-- voting -->
-			
-			<field name="" type="separator" default="FLEXI_FIELD_LABEL_AND_ACCESS" level="level1" />
+
+			<field name="" type="separator" default="FLEXI_FIELD_VIEWING" level="tabset_start" box_type="1" />
+			<field name="" type="separator" default="FLEXI_BASIC" icon_class="icon-vcard" level="tab_open" box_type="1" />
+
+			<field name="" type="separator" default="FLEXI_FIELD_LABEL_AND_ACCESS" level="level2" />
 			<field name="display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -1005,13 +1008,32 @@
 				<option value="1" show_list="field-acc-msg" hide_list="">FLEXI_YES</option>
 			</field>
 			<field name="no_acc_msg" type="text" default="" label="FLEXI_FIELD_NOACCESS_MSG" description="FLEXI_FIELD_NOACCESS_MSG_DESC" depend_class="field-acc-msg"/>
+
+			<field name="" type="separator" default="FLEXI_EXPORT" level="level2" />
 			<field name="include_in_csv_export" type="radio" default="0" label="FLEXI_FIELD_INCLUDE_IN_CSV_EXPORT" description="FLEXI_FIELD_INCLUDE_IN_CSV_EXPORT_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_FIELD_RAW_VALUES</option>
+			</field>
+
+			<field name="" type="separator" default="FLEXI_LAYOUT" description="" icon_class="icon-file-2" level="tab_open" box_type="1" />
+			<field name="viewlayout" type="fcfilelist" default="" label="FLEXI_FIELD_SELECT_VIEW_LAYOUT_CORE" description="FLEXI_FIELD_SELECT_VIEW_LAYOUT_CORE_DESC" directory="plugins/flexicontent_fields/core/tmpl/voting/" filter="value*" exclude="" stripext="1" stripprefix="value_" hide_none="1" hide_default="1" />
+
+			<field name="" type="separator" default="FLEXI_FIELD_VOTING" description="" level="level2" />
+			<field name="vote_submit_inview" type="fccheckbox" default=""
+				checkoptions="FLEXI_ITEMS,FLEXI_CATEGORY,FLEXI_BACKEND" checkvals="item,category,backend" defaultvals="item"
+				label="FLEXI_FIELD_ENABLE_IN_VIEWS" description="FLEXI_FIELD_ENABLE_IN_VIEWS_DESC" />
+
+			<field name="" type="separator" default="FLEXI_FIELD_VALUE_LIST" description="" icon_class="icon-stack" level="tab_open" box_type="1" />
+
+			<field name="" type="separator" default="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL" description="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL_DESC_FIELD" level="level2" />
+			<field name="remove_space" type="radio" default="0" label="FLEXI_REMOVE_SPACE" description="FLEXI_REMOVE_SPACE_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			
-			<field name="" type="separator" default="FLEXI_FIELD_VALUE" level="level1" />
-			<field name="viewlayout" type="fcfilelist" default="" label="FLEXI_FIELD_SELECT_VIEW_LAYOUT_CORE" description="FLEXI_FIELD_SELECT_VIEW_LAYOUT_CORE_DESC" directory="plugins/flexicontent_fields/core/tmpl/voting/" filter="value*" exclude="" stripext="1" stripprefix="value_" hide_none="1" hide_default="1" labelclass="label label-warning" />
+			<field name="pretext" type="text" default="" filter="raw" label="FLEXI_FIELD_VALUE_PREFIX_TEXT" description="FLEXI_FIELD_VALUE_PREFIX_TEXT_DESC" />
+			<field name="posttext" type="text" default="" filter="raw" label="FLEXI_FIELD_VALUE_SUFFIX_TEXT" description="FLEXI_FIELD_VALUE_SUFFIX_TEXT_DESC" />
+
+			<field name="" type="separator" default="FLEXI_CONTENT_PLUGINS" description="" icon_class="icon-power-cord" level="tab_open" box_type="1" />
 
 			<field name="" type="separator" default="FLEXI_FIELD_CONTENT_PLUGINS" description="FLEXI_FIELD_CONTENT_PLUGINS_DESC" class="fc-mssg-inline fc-info fc-nobgimage" level="level3"/>
 			<field name="trigger_onprepare_content" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT" description="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT_DESC" class="btn-group btn-group-yesno">
@@ -1023,15 +1045,9 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="plugins" type="pluginlist" label="FLEXI_FIELD_CHOOSE_SPECIFIC_PLUGINS" description="FLEXI_FIELD_CHOOSE_SPECIFIC_PLUGINS_DESC" depend_class="plg-trigger-mode" />
-			
-			<field name="" type="separator" default="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL" description="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL_DESC_FIELD" level="level2" />
-			<field name="remove_space" type="radio" default="0" label="FLEXI_REMOVE_SPACE" description="FLEXI_REMOVE_SPACE_DESC" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			<field name="pretext" type="text" default="" filter="raw" label="FLEXI_FIELD_VALUE_PREFIX_TEXT" description="FLEXI_FIELD_VALUE_PREFIX_TEXT_DESC" />
-			<field name="posttext" type="text" default="" filter="raw" label="FLEXI_FIELD_VALUE_SUFFIX_TEXT" description="FLEXI_FIELD_VALUE_SUFFIX_TEXT_DESC" />
-			
+
+
+			<field name="" type="separator" default="FLEXI_FIELD_VIEWING" level="tabset_close" box_type="1" />
 		</fieldset>
 		<fieldset name="group-voting-submission" hidden="true" icon_class="icon-unlock" label="FLEXI_FIELD_VOTE_PERMISSIONS" description="FLEXI_FIELD_VOTE_PERMISSIONS_DESC" addfieldpath="/administrator/components/com_flexicontent/elements">
 			
@@ -1152,6 +1168,11 @@
 				<option value="0" show_list="" hide_list="composite-voting-mode">FLEXI_NO</option>
 				<option value="1" show_list="composite-voting-mode" hide_list="">FLEXI_YES</option>
 			</field>
+
+			<field name="composite_inview" type="fccheckbox" default=""
+				checkoptions="FLEXI_ITEMS,FLEXI_CATEGORY,FLEXI_BACKEND" checkvals="item,category,backend" defaultvals="item"
+				label="FLEXI_FIELD_ENABLE_IN_VIEWS" description="FLEXI_FIELD_ENABLE_IN_VIEWS_DESC" depend_class="composite-voting-mode" />
+
 			<field name="extra_votes_configs" type="multilist" subtype="radio" default="" label="FLEXI_PRESET_CONFIGURATIONS" description="FLEXI_PRESET_CONFIGURATIONS_DESC" toggle_related="1" fccustom_revert="1" class="btn-group group-fcmethod" depend_class="composite-voting-mode">
 				<option value="">FLEXI_CUSTOMIZE</option>
 				<option value="1" fcconfigs="{'extra_votes':'1##Quality##\nIf it is hard to break down%%\n\n2##Speed##\nHow fast it travels%%\n\n3##Accuracy##\nIf descripton was correct and complete%%\n\n4##Appearance##\nHow good it looks%%'}">FLEXI_LOAD_EXAMPLE</option>
@@ -1203,7 +1224,7 @@
 			</field>
 			
 			<field name="" type="separator" default="FLEXI_FIELD_VALUE" level="level1" />
-			<field name="viewlayout" type="fcfilelist" default="" label="FLEXI_FIELD_SELECT_VIEW_LAYOUT_CORE" description="FLEXI_FIELD_SELECT_VIEW_LAYOUT_CORE_DESC" directory="plugins/flexicontent_fields/core/tmpl/favourites/" filter="value*" exclude="" stripext="1" stripprefix="value_" hide_none="1" hide_default="1" labelclass="label label-warning" />
+			<field name="viewlayout" type="fcfilelist" default="" label="FLEXI_FIELD_SELECT_VIEW_LAYOUT_CORE" description="FLEXI_FIELD_SELECT_VIEW_LAYOUT_CORE_DESC" directory="plugins/flexicontent_fields/core/tmpl/favourites/" filter="value*" exclude="" stripext="1" stripprefix="value_" hide_none="1" hide_default="1" />
 
 			<field name="allow_guests_favs" type="radio" default="1" label="FLEXI_FAVOURED_ALLOW_GUESTS" description="FLEXI_FAVOURED_ALLOW_GUESTS_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
@@ -1262,7 +1283,7 @@
 			</field>
 			
 			<field name="" type="separator" default="FLEXI_FIELD_VALUES" level="level1" />
-			<field name="viewlayout" type="fcfilelist" default="" label="FLEXI_FIELD_SELECT_VIEW_LAYOUT_CORE" description="FLEXI_FIELD_SELECT_VIEW_LAYOUT_CORE_DESC" directory="plugins/flexicontent_fields/core/tmpl/categories/" filter="value*" exclude="" stripext="1" stripprefix="value_" hide_none="1" hide_default="1" labelclass="label label-warning" />
+			<field name="viewlayout" type="fcfilelist" default="" label="FLEXI_FIELD_SELECT_VIEW_LAYOUT_CORE" description="FLEXI_FIELD_SELECT_VIEW_LAYOUT_CORE_DESC" directory="plugins/flexicontent_fields/core/tmpl/categories/" filter="value*" exclude="" stripext="1" stripprefix="value_" hide_none="1" hide_default="1" />
 			
 			<field name="" type="separator" default="FLEXI_FIELD_CONTENT_PLUGINS" description="FLEXI_FIELD_CONTENT_PLUGINS_DESC" class="fc-mssg-inline fc-info fc-nobgimage" level="level3"/>
 			<field name="trigger_onprepare_content" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT" description="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT_DESC" class="btn-group btn-group-yesno">
@@ -1362,7 +1383,7 @@
 			</field>
 			
 			<field name="" type="separator" default="FLEXI_FIELD_VALUES" level="level1" />
-			<field name="viewlayout" type="fcfilelist" default="" label="FLEXI_FIELD_SELECT_VIEW_LAYOUT_CORE" description="FLEXI_FIELD_SELECT_VIEW_LAYOUT_CORE_DESC" directory="plugins/flexicontent_fields/core/tmpl/tags/" filter="value*" exclude="" stripext="1" stripprefix="value_" hide_none="1" hide_default="1" labelclass="label label-warning" />
+			<field name="viewlayout" type="fcfilelist" default="" label="FLEXI_FIELD_SELECT_VIEW_LAYOUT_CORE" description="FLEXI_FIELD_SELECT_VIEW_LAYOUT_CORE_DESC" directory="plugins/flexicontent_fields/core/tmpl/tags/" filter="value*" exclude="" stripext="1" stripprefix="value_" hide_none="1" hide_default="1" />
 			
 			<field name="" type="separator" default="FLEXI_FIELD_CONTENT_PLUGINS" description="FLEXI_FIELD_CONTENT_PLUGINS_DESC" class="fc-mssg-inline fc-info fc-nobgimage" level="level3"/>
 			<field name="trigger_onprepare_content" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT" description="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT_DESC" class="btn-group btn-group-yesno">
