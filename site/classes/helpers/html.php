@@ -3902,7 +3902,7 @@ class flexicontent_html
 					</div>'.
 					(!(int)$percent || $int_xid ? '' : '
 					<span itemprop="aggregateRating" itemscope itemtype="http://schema.org/AggregateRating">
-						<meta itemprop="itemReviewed" content="'.htmlspecialchars($field->item->title, ENT_QUOTES, 'UTF-8').'" />
+						<meta itemprop="itemReviewed" content="'.htmlspecialchars($field->item_title, ENT_QUOTES, 'UTF-8').'" />
 						<meta itemprop="ratingValue" content="'.round($percent).'" />
 						<meta itemprop="bestRating"  content="100" />
 						<meta itemprop="ratingCount" content="'.$rating_count.'" />

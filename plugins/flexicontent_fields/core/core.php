@@ -10,6 +10,10 @@
  */
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
+
+use Joomla\String\StringHelper;
+use Joomla\Utilities\ArrayHelper;
+
 JLoader::register('FCField', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/fcfield/parentfield.php');
 
 class plgFlexicontent_fieldsCore extends FCField
@@ -187,7 +191,7 @@ class plgFlexicontent_fieldsCore extends FCField
 
 			if($field->iscore != 1) continue;
 			$field->item_id = $item->id;
-			$field->item = $item;
+			$field->item_title = $item->title;
 
 			// Replace item properties or values of other fields
 			if (!$pretext_cacheable)
@@ -269,9 +273,31 @@ class plgFlexicontent_fieldsCore extends FCField
 
 				case 'voting': // voting button
 					// TODO: if ($raw_values!==null) $vote = convert ... $raw_values;
-					$vote = $_vote===false
+					$vote = $_vote === false
 						? $item->vote
 						: $_vote;
+
+
+					// Enable/disable according to current view
+					$vote_submit_inview = FLEXIUtilities::paramToArray($field->parameters->get('vote_submit_inview', array('item')));
+					$composite_inview   = FLEXIUtilities::paramToArray($field->parameters->get('composite_inview', array('item')));
+					$enable_extra_votes = $field->parameters->get('enable_extra_votes', 0);
+
+					$allow_vote = in_array($view, $vote_submit_inview) || ($isItemsManager && in_array('backend', $vote_submit_inview));
+					$show_composite = in_array($view, $composite_inview) || ($isItemsManager && in_array('backend', $composite_inview));
+
+					// Disable vote submit if voting disabled or if extra voting characteristics are not visible
+					if (!$allow_vote || ($enable_extra_votes && !$show_composite))
+					{
+						$vote = $vote ?: new stdClass;
+						$vote->allow_vote = false;
+					}
+
+					// Do not show extra votes
+					if (!$show_composite)
+					{
+						$field->parameters->set('enable_extra_votes', 0);
+					}
 
 					$field->value[] = 'button';  // A dummy value to force display
 
@@ -281,11 +307,11 @@ class plgFlexicontent_fieldsCore extends FCField
 					break;
 
 				case 'favourites': // favourites button
-					$favourites = $_favourites===false
+					$favourites = $_favourites === false && isset($item->favs)
 						? $item->favs
 						: $_favourites;
 
-					$favoured = $_favoured===false
+					$favoured = $_favoured === false && isset($item->fav)
 						? $item->fav
 						: $_favoured;
 
@@ -353,47 +379,47 @@ class plgFlexicontent_fieldsCore extends FCField
 						continue;
 					}
 
-					// Special display variables
-					if ($raw_values!==null)
+					// Special display using raw value
+					if ($raw_values !== null)
 					{
 						$field->{$prop} = $raw_values[0];
 					}
-					else if ($prop != 'display')
+
+					// Specific display variables
+					elseif ($prop !== 'display')
 					{
-						switch ($prop) {
+						switch ($prop)
+						{
 							case 'display_if': $field->{$prop} = $item->introtext . chr(13).chr(13) . $item->fulltext;  break;
 							case 'display_i' : $field->{$prop} = $item->introtext;  break;
 							case 'display_f' : $field->{$prop} = $item->fulltext;   break;
 						}
 					}
 
-					// Check for no fulltext present and force using introtext
-					else if ( !$item->fulltext )
+					// Check for fulltext being empty and force using introtext
+					elseif (!$item->fulltext)
 					{
 						$field->{$prop} = $item->introtext;
 					}
 
-					// Multi-item views: category/tags/favourites/module etc, only show introtext, but we have added 'force_full' item parameter
-					// to allow showing the fulltext too. This parameter can be inherited by category/menu parameters or be set inside template files
-					else if ($view != FLEXI_ITEMVIEW)
+					/**
+					 * Multi-item views and listings: category, tags, favourites, module etc, only show introtext,
+					 * but we have added 'force_full' item parameter to allow showing the fulltext too.
+					 * This parameter can be inherited by category/menu parameters or be set inside template files
+					 */
+					elseif ($view !== 'item')
 					{
-						if ( $item->parameters->get('force_full', 0) )
-						{
-							$field->{$prop} = $item->introtext . chr(13).chr(13) . $item->fulltext;
-						} else {
-							$field->{$prop} = $item->introtext;
-						}
+						$field->{$prop} = $item->parameters->get('force_full', 0)
+							? $item->introtext . chr(13) . chr(13) . $item->fulltext
+							: $item->introtext;
 					}
 
 					// ITEM view only shows fulltext, introtext is shown only if 'show_intro' item parameter is set
 					else
 					{
-						if ( $item->parameters->get('show_intro', 1) )
-						{
-							$field->{$prop} = $item->introtext . chr(13).chr(13) . $item->fulltext;
-						} else {
-							$field->{$prop} = $item->fulltext;
-						}
+						$field->{$prop} = $item->parameters->get('show_intro', 1)
+							? $item->introtext . chr(13) . chr(13) . $item->fulltext
+							: $item->fulltext;
 					}
 
 					if ($isItemsManager)
@@ -422,6 +448,44 @@ class plgFlexicontent_fieldsCore extends FCField
 		}
 	}
 
+
+	// Method to create field's HTML display for item form
+	function onDisplayField(&$field, &$item)
+	{
+		$field->label = JText::_($field->label);
+		$use_ingroup = $field->parameters->get('use_ingroup', 0);
+		if (!isset($field->formhidden_grp)) $field->formhidden_grp = $field->formhidden;
+		if ($use_ingroup) $field->formhidden = 3;
+		if ($use_ingroup && empty($field->ingroup)) return;
+		$is_ingroup  = !empty($field->ingroup);
+
+		// Get viewing layout
+		$field->item_id    = $item->id;
+		$field->item_title = $item->title;
+
+		switch ($field->field_type)
+		{
+			case 'voting': // voting button
+				$vote_iform_display = (int) $field->parameters->get('vote_iform_display', 0);
+
+				if (!$vote_iform_display)
+				{
+					$field->formhidden = 3;
+					return;
+				}
+
+				// TODO: if ($raw_values !== null) $vote = convert ... $raw_values;
+				$vote = !empty($item->vote) ? $item->vote : null;
+				if ($vote)
+				{
+					$vote->allow_vote = $vote_iform_display && $vote_iform_display !== 2;
+				}
+
+				// Create field's HTML
+				$field->html = flexicontent_html::ItemVote( $field, 'all', $vote );
+				break;
+		}
+	}
 
 
 	// ***
@@ -570,8 +634,9 @@ class plgFlexicontent_fieldsCore extends FCField
 
 				$filter_ffname = 'filter_'.$filter->id;
 				$filter_ffid   = $formName.'_'.$filter->id.'_val';
+				$title_value   = (isset($value[0]) ? $value[0] : '');
 
-				$filter->html	.= '<input id="'.$filter_ffid.'" name="'.$filter_ffname.'" '.$attribs_str.' type="text" size="20" value="'.$value.'" />';
+				$filter->html	.= '<input id="'.$filter_ffid.'" name="'.$filter_ffname.'" '.$attribs_str.' type="text" size="20" value="'.htmlspecialchars($title_value, ENT_COMPAT, 'UTF-8' ).'" />';
 			break;
 
 			case 'createdby':     // Authors
@@ -648,7 +713,7 @@ class plgFlexicontent_fieldsCore extends FCField
 
 				$cid    = $app->isSite() ? $app->input->get('cid', 0, 'int') : 0;
 				$cids   = $app->input->get('cids', array(), 'array');
-				JArrayHelper::toInteger($cids, array());
+				$cids   = ArrayHelper::toInteger($cids);
 
 				$cats = array();
 
