@@ -120,7 +120,7 @@ class FlexicontentModelItem extends ParentClassItem
 		// FLAGS: item_is_published, item_is_scheduled, item_is_expired, ancestor_cats_published
 		// *********************************************************************************************
 
-		$item_is_published = $this->_record->state == 1 || $this->_record->state == -5 || $this->_record->state == (FLEXI_J16GE ? 2:-1);
+		$item_is_published = $this->_record->state == 1 || $this->_record->state == -5 || $this->_record->state == 2;
 		$item_is_scheduled = $this->_record->publication_scheduled;
 		$item_is_expired   = $this->_record->publication_expired;
 		if ( $cid )
@@ -165,13 +165,13 @@ class FlexicontentModelItem extends ParentClassItem
 		// STEP C: CHECK item state, if publication state is not ignored terminate with 404 NOT found, otherwise add a notice
 		// NOTE: Asking all users to login when item is not active maybe wrong approach, so instead we raise 404 error, but we
 		// will ask them to login only if previewing a latest or specific version (so ignore publication FLAG includes this case)
-		// (a) Check that item is PUBLISHED (1,-5) or ARCHIVED (-1)
+		// (a) Check that item is PUBLISHED (1,-5) or ARCHIVED (2)
 		// (b) Check that item has expired publication date
 		// (c) Check that item has scheduled publication date
 		// (d) Check that current item category or all items categories are published
 		//***********************************************************************************************************************
 
-		// (a) Check that item is PUBLISHED (1,-5) or ARCHIVED (-1)
+		// (a) Check that item is PUBLISHED (1,-5) or ARCHIVED (2)
 
 		// SPECIAL workflow case, regardless of (view/edit privilege), allow users to view unpublished owned content, (a) if waiting for approval, or (b) if can request approval
 		if ( !$caneditstate && ($item_state_pending || $item_state_draft) && $isOwner )
