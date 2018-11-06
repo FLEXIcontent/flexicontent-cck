@@ -59,7 +59,7 @@ abstract class JHtmlFcbase
 			}
 
 			// Build a frontend SEF url
-			$link = flexicontent_html::getSefUrl($record_url);
+			$link = flexicontent_html::getSefUrl($record_url . '&preview=2');
 
 			// Add extra query string e.g. feed / type variables
 			if (!empty($config['equery']))

@@ -525,21 +525,37 @@ class ParentClassItem extends FCModelAdmin
 		// ***
 
 		// Force version to zero (load current version), when not using versioning mode
-		if ( !$use_versioning )
+		if (!$use_versioning)
 		{
 			$version = 0;
 		}
+
+		// Force a specific version
 		else if ($force_version)
 		{
-			$version = (int)$force_version;
-			if ($version == -1) {
-				// Load latest, but catch cases when we enable versioning mode after an item has been saved in unversioning mode
-				// in these case we will load CURRENT version instead of the default for the item edit form which is the LATEST (for backend/fontend)
+			$version = (int) $force_version;
+
+			/**
+			 * Load latest, but catch cases when we enable versioning mode after an item has been saved in unversioning mode
+			 * in these case we will load CURRENT version instead of the default for the item edit form which is the LATEST (for backend/fontend)
+			 */
+
+			if ($version === -1)
+			{
 				//echo "LOADING LATEST: current_version >= last_version : $current_version >= $last_version <br/>";
 				$version = ($current_version >= $last_version) ? 0 : $last_version;
 			}
-		} else {
-			$version = 0; // Load unversioned data
+			// Force currently active version for negative version passed
+			else
+			{
+				$version = $version > 0 ? $version : 0;
+			}
+		}
+
+		// Load currently active version
+		else
+		{
+			$version = 0;
 		}
 
 		// Check if item is alredy loaded and is of correct version

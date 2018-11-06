@@ -1,19 +1,12 @@
 <?php
 /**
- * @version 1.5 stable $Id$
- * @package Joomla
- * @subpackage FLEXIcontent
- * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
- * @license GNU/GPL v2
+ * @package         FLEXIcontent
+ * @version         3.3
  *
- * FLEXIcontent is a derivative work of the excellent QuickFAQ component
- * @copyright (C) 2008 Christoph Lukes
- * see www.schlu.net for more information
- *
- * FLEXIcontent is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
+ * @link            http://www.flexicontent.com
+ * @copyright       Copyright © 2018, FLEXIcontent team, All Rights Reserved
+ * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
 // no direct access
@@ -90,10 +83,23 @@ class FlexicontentViewItem extends JViewLegacy
 		// Get current category id
 		$cid = $model->_cid ? $model->_cid : $model->get('catid');
 
-		// Decide version to load
-		$version = $jinput->get( 'version', 0, 'int' );   // Load specific item version (non-zero), 0 version: is unversioned data, -1 version: is latest version (=default for edit form)
-		$preview = $jinput->get( 'preview', 0, 'int' );   // Preview versioned data FLAG ... if previewing and version is not set then ... we load version -1 (=latest version)
-		$version = $preview && !$version ? -1 : $version;
+		/**
+		 * Decide version to load,
+		 * Note: A non zero version forces a login, version meaning is
+		 *   0 : is currently active version,
+		 *  -1: preview latest version (this is also the default for edit form),
+		 *  -2: preview currently active (version 0)
+		 * > 0: is a specific version
+		 * Preview flag forces a specific item version if version is not set
+		 */
+		$version = $jinput->getInt('version', 0);
+		/**
+		 * Preview versioned data FLAG ... if preview is set and version is not then
+		 *  1: load version -1 (version latest)
+		 *  2: load version -2 (version currently active (0))
+		 */
+		$preview = $jinput->getInt('preview', 0);
+		$version = $preview && !$version ? - $preview : $version;
 
 		// Allow ilayout from HTTP request, this will be checked during loading item parameters
 		$model->setItemLayout('__request__');
@@ -102,11 +108,14 @@ class FlexicontentViewItem extends JViewLegacy
 		$model->mergeMenuParams = true;
 
 
-		// Try to load existing item, an 404 error will be raised if item is not found. Also value 2 for check_view_access
-		// indicates to raise 404 error for ZERO primary key too, instead of creating and returning a new item object
+		/**
+		 * Try to load existing item, an 404 error will be raised if item is not found. Also value 2 for check_view_access
+		 * indicates to raise 404 error for ZERO primary key too, instead of creating and returning a new item object
+		 * Get the item, loading item data and doing parameters merging
+		 */
+
 		$start_microtime = microtime(true);
 
-		// Get the item, loading item data and doing parameters merging
 		$item = $model->getItem(null, $_check_view_access=2, $_no_cache=$version, $_force_version=$version);  // ZERO version means unversioned data
 		$_run_time = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 
@@ -599,7 +608,7 @@ class FlexicontentViewItem extends JViewLegacy
 		$model->mergeMenuParams = true;
 
 		// FORCE model to load versioned data (URL specified version or latest version (last saved))
-		$version = $jinput->get('version', 0, 'int');   // Load specific item version (non-zero), 0 version: is unversioned data, -1 version: is latest version (=default for edit form)
+		$version = $jinput->getInt('version', 0);   // Load specific item version (non-zero), 0 version: is unversioned data, -1 version: is latest version (=default for edit form)
 
 		// Get the item, loading item data and doing parameters merging
 		$item = $model->getItem(null, $check_view_access=false, $no_cache=true, $force_version=($version!=0 ? $version : -1));  // -1 version means latest
