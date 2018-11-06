@@ -936,11 +936,13 @@ jQuery(document).ready(function(){
 						FlexicontentHelperRoute::getItemRoute($row->id.':'.$row->alias, $row->categoryslug, 0, $row)
 
 						// Force language to be switched to the language of the record, thus showing the record (and not its associated translation of current FE language)
-						. ($sef_lang ? '&lang=' . $sef_lang : '');
+						. ($sef_lang ? '&lang=' . $sef_lang : '')
+
+						// Force a login if previewing not possible because record unpublished / inaccessible, preview === 2 means to preview the current active version
+						. '&preview=2';
 
 					// Build a frontend SEF url
 					$record_url = flexicontent_html::getSefUrl($record_url);
-
 					$previewlink = $record_url;
 
 					echo flexicontent_html::statebutton( $row, null, $addToggler = ($this->pagination->limit <= $this->inline_ss_max), 'top', 'btn btn-small' );

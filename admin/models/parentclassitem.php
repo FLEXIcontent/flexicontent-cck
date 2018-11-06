@@ -209,6 +209,9 @@ class ParentClassItem extends FCModelAdmin
 	 */
 	function setId($id, $currcatid = null, $typeid = null, $ilayout = null)
 	{
+		// A cache of categories assigned to every item
+		static $item_cids = array();
+
 		// Set record id and wipe data, if setting a different ID
 		if ($this->_id != $id)
 		{
@@ -232,11 +235,19 @@ class ParentClassItem extends FCModelAdmin
 		// Verify current category is assigned
 		if ($this->_id)
 		{
-			$query = 'SELECT catid '
-				. ' FROM #__flexicontent_cats_item_relations '
-				. ' WHERE itemid = ' . (int) $this->_id
-				. '  AND catid = '. (int) $this->_cid;
-			$this->_cid = (int) $this->_db->setQuery($query)->loadResult();
+			if (!isset($item_cids[$this->_id]))
+			{
+				$query = 'SELECT catid '
+					. ' FROM #__flexicontent_cats_item_relations '
+					. ' WHERE itemid = ' . (int) $this->_id;
+
+				$item_cids[$this->_id] = $this->_db->setQuery($query)->loadObjectList('catid');
+			}
+
+			if (!isset($item_cids[$this->_id][$this->_cid]))
+			{
+				$this->_cid = 0;
+			}
 		}
 
 		// Set item layout
@@ -365,16 +376,13 @@ class ParentClassItem extends FCModelAdmin
 			 * Successfully loaded existing item, do some extra manipulation of the loaded item ...
 			 */
 
-			if ( !$app->isAdmin() )
-			{
-				// Load item parameters with heritage
-				$this->_loadItemParams($no_cache);
+			// Load item parameters with heritage
+			$this->_loadItemParams($no_cache);
 
-				// Check item viewing access
-				if ($check_view_access)
-				{
-					$this->_check_viewing_access($force_version);
-				}
+			// Check item viewing access
+			if ($check_view_access)
+			{
+				$this->_check_viewing_access($force_version);
 			}
 		}
 
@@ -407,11 +415,9 @@ class ParentClassItem extends FCModelAdmin
 		elseif (!$this->_record)
 		{
 			$this->_initRecord();
-			if ( !$app->isAdmin() )
-			{
-				// Load item parameters with heritage, (SUBMIT ITEM FORM)
-				$this->_loadItemParams($no_cache);
-			}
+
+			// Load item parameters with heritage, (SUBMIT ITEM FORM)
+			$this->_loadItemParams($no_cache);
 		}
 
 		// Verify item's type. This method verify new item type exists or gets item type for existing item
@@ -466,9 +472,10 @@ class ParentClassItem extends FCModelAdmin
 		}
 
 		// Only retrieve item if not already, ZERO $force_version means unversioned data or maintain currently loaded version
-		else if ( isset($this->_record) && (!$force_version || $force_version==$this->_version) )
+		elseif (isset($this->_record) && (!$force_version || $force_version==$this->_version))
 		{
 			//echo "********************************<br/>\n RETURNING ALREADY loaded item: {$pk}<br/> ********************************<br/><br/><br/>";
+			//echo "<pre>"; debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS); echo "</pre>";
 			return (boolean) $this->_record;
 		}
 
@@ -497,21 +504,37 @@ class ParentClassItem extends FCModelAdmin
 		// ***
 
 		// Force version to zero (load current version), when not using versioning mode
-		if ( !$use_versioning )
+		if (!$use_versioning)
 		{
 			$version = 0;
 		}
+
+		// Force a specific version
 		else if ($force_version)
 		{
-			$version = (int)$force_version;
-			if ($version == -1) {
-				// Load latest, but catch cases when we enable versioning mode after an item has been saved in unversioning mode
-				// in these case we will load CURRENT version instead of the default for the item edit form which is the LATEST (for backend/fontend)
+			$version = (int) $force_version;
+
+			/**
+			 * Load latest, but catch cases when we enable versioning mode after an item has been saved in unversioning mode
+			 * in these case we will load CURRENT version instead of the default for the item edit form which is the LATEST (for backend/fontend)
+			 */
+
+			if ($version === -1)
+			{
 				//echo "LOADING LATEST: current_version >= last_version : $current_version >= $last_version <br/>";
 				$version = ($current_version >= $last_version) ? 0 : $last_version;
 			}
-		} else {
-			$version = 0; // Load unversioned data
+			// Force currently active version for negative version passed
+			else
+			{
+				$version = $version > 0 ? $version : 0;
+			}
+		}
+
+		// Load currently active version
+		else
+		{
+			$version = 0;
 		}
 
 		// Check if item is alredy loaded and is of correct version
@@ -676,6 +699,10 @@ class ParentClassItem extends FCModelAdmin
 
 				$item = & $data;
 			}
+
+			// Retrieve voting information
+			$votes = $this->getVotes();
+			$item->vote = isset($votes[$this->_id]) ? $votes[$this->_id] : null;
 
 			// Use configured type if existing item has no type
 			$this->_typeid = $item->type_id ?: $this->_typeid;
@@ -1251,7 +1278,38 @@ class ParentClassItem extends FCModelAdmin
 
 		if (empty($data))
 		{
-			$data = $this->getItem(null, $check_view_access=false, $no_cache=false, $force_version=0);
+			$item = $this->getItem(null, $check_view_access=false, $no_cache=false, $force_version=0);
+
+			/**
+			 * Clone the item, skipping any extra JRegistry / Array properties like fields and parameters
+			 * that will slow down or cause recursion during JForm operations like bind
+			 */
+
+			$data = $this->getTable();
+
+			foreach($item as $i => $v)
+			{
+				
+				if ($i === 'fields' || $i === 'parameters')
+				{
+					continue;
+				}
+
+				if (is_object($v))
+				{
+					/**
+					 * Form fieldsets like 'params', if they are a registry object they may
+					 * cause a failure due to some 3rd party plugins, convert them to arrays
+					 */
+					$data->$i = $v instanceof Registry
+						? $data->params->toArray()
+						: clone $v;
+				}
+				else
+				{
+					$data->$i = $v;
+				}
+			}
 		}
 		else
 		{
@@ -1271,7 +1329,7 @@ class ParentClassItem extends FCModelAdmin
 			}
 		}
 
-		// If there are params fieldsets in the form it will fail with a registry object
+		// (UNNEEDED ?) If there are params fieldsets in the form it will fail with a registry object
 		if (isset($data->params) && $data->params instanceof Registry)
 		{
 			$data->params = $data->params->toArray();
@@ -3499,6 +3557,188 @@ class ParentClassItem extends FCModelAdmin
 
 
 	/**
+	 * Method to load content article parameters
+	 *
+	 * @access	private
+	 * @return	void
+	 * @since	1.5
+	 */
+	function _loadItemParams($force=false)
+	{
+		if (!$force && !empty($this->_record->parameters)) return;
+
+		$app = JFactory::getApplication();
+		$menu = $app->getMenu()->getActive();  // Retrieve currently active menu item (NOTE: this applies when Itemid variable or menu item alias exists in the URL)
+		$isnew = !$this->_id;
+
+
+		/**
+		 * Retrieve RELATED parameters that will be merged into item's parameters
+		 */
+
+		// Retrieve COMPONENT parameters
+		$compParams = JComponentHelper::getComponent('com_flexicontent')->params;
+
+		// Retrieve parameters of current category (NOTE: this applies when cid variable exists in the URL)
+		$catParams = "";
+		if ( $this->_cid )
+		{
+			$query = 'SELECT c.title, c.params FROM #__categories AS c WHERE c.id = ' . (int) $this->_cid;
+			$this->_db->setQuery($query);
+			$catData = $this->_db->loadObject();
+			$catParams = $catData->params;
+			$this->_record->category_title = $catData->title;
+		}
+		$catParams = new JRegistry($catParams);
+
+		// Retrieve/Create item's Content Type parameters
+		$typeParams = $this->getTypeparams();
+		$typeParams = new JRegistry($typeParams);
+
+		// Create item parameters
+		if ( !is_object($this->_record->attribs) )
+		{
+			try
+			{
+				$itemParams = new JRegistry($this->_record->attribs);
+			}
+			catch (Exception $e)
+			{
+				$itemParams = flexicontent_db::check_fix_JSON_column('attribs', 'content', 'id', $this->_record->id, $this->_record->attribs);
+			}
+		}
+		else
+		{
+			$itemParams = $this->_record->attribs;
+		}
+
+		// Retrieve Layout's parameters, also deciding the layout
+		if ($app->isAdmin() || !empty($this->isForm))
+		{
+			$ilayout = $itemParams->get('ilayout', $typeParams->get('ilayout', 'default'));
+			$this->setItemLayout($ilayout);
+		}
+		else
+		{
+			$this->decideLayout($compParams, $typeParams, $itemParams);
+		}
+
+		$layoutParams = $this->getLayoutparams();
+		$layoutParams = new JRegistry($layoutParams);  //print_r($layoutParams);
+
+
+		/**
+		 * Start merging of parameters, OVERRIDE ORDER: layout(template-manager)/component/category/type/item/menu/access
+		 */
+
+		// a0. Merge Layout parameters into the page configuration
+		$params = new JRegistry();
+		$params->merge($layoutParams);
+
+		// a1. Start with empty registry, then merge COMPONENT parameters
+		$params->merge($compParams);
+
+		// b. Merge parameters from current category, but prevent some settings from propagating ... to the item, that are meant for
+		//    category view only, these are legacy settings that were removed from category.xml, but may exist in saved configurations
+		$catParams->set('show_title', '');
+		$catParams->set('show_editbutton', '');
+		$params->merge($catParams);
+
+		// c. Merge TYPE parameters into the page configuration
+		$params->merge($typeParams);
+
+		// d. Merge ITEM parameters into the page configuration
+		$params->merge($itemParams);
+
+		// e. Merge ACCESS permissions into the page configuration
+		$accessperms = $this->getItemAccess();
+		$params->merge($accessperms);
+
+		// d. Merge the active menu parameters, verify menu item points to current FLEXIcontent object
+		if ( $menu && !empty($this->mergeMenuParams) )
+		{
+			if (!empty($this->isForm))
+			{
+				$this->menu_matches = false;
+				$view_ok = 'item' == @$menu->query['view'] || 'article' == @$menu->query['view'];
+				$this->menu_matches = $view_ok;
+			}
+			else
+			{
+				$view_ok = 'item' == @$menu->query['view'] || 'article' == @$menu->query['view'];
+				$cid_ok  = $app->input->get('cid', 0, 'INT') == (int) @$menu->query['cid'];
+				$id_ok   = $app->input->get('id', 0, 'INT')  == (int) @$menu->query['id'];
+				$this->menu_matches = $view_ok /*&& $cid_ok*/ && $id_ok;
+			}
+		}
+
+		// Active menu did not match to current item
+		else
+		{
+			$this->menu_matches = false;
+		}
+
+		// MENU ITEM matched, merge parameters and use its page heading (but use menu title if the former is not set)
+		if ( $this->menu_matches )
+		{
+			$params->merge($menu->params);
+			$default_heading = $menu->title;
+
+			// Cross set (show_) page_heading / page_title for compatibility of J2.5+ with J1.5 template (and for J1.5 with J2.5 template)
+			$params->def('page_heading', $params->get('page_title',   $default_heading));
+			$params->def('page_title',   $params->get('page_heading', $default_heading));
+		  $params->def('show_page_heading', $params->get('show_page_title',   0));
+		  $params->def('show_page_title',   $params->get('show_page_heading', 0));
+		}
+
+		// MENU ITEM did not match, clear page title (=browser window title) and page heading so that they are calculated below
+		else
+		{
+			// Clear some menu parameters
+			//$params->set('pageclass_sfx',	'');  // CSS class SUFFIX is behavior, so do not clear it ?
+
+			// Calculate default page heading (=called page title in J1.5), which in turn will be document title below !! ...
+			$default_heading = empty($this->isForm) ? $this->_record->title :
+				(!$isnew ? JText::_( 'FLEXI_EDIT' ) : JText::_( 'FLEXI_NEW' ));
+
+			// Decide to show page heading (=J1.5 page title), there is no need for this in item view
+			$show_default_heading = 0;
+
+			// Set both (show_) page_heading / page_title for compatibility of J2.5+ with J1.5 template (and for J1.5 with J2.5 template)
+			$params->set('page_title',   $default_heading);
+			$params->set('page_heading', $default_heading);
+		  $params->set('show_page_heading', $show_default_heading);
+			$params->set('show_page_title',   $show_default_heading);
+		}
+
+		// Prevent showing the page heading if (a) IT IS same as item title and (b) item title is already configured to be shown
+		if ( $params->get('show_title', 1) ) {
+			if ($params->get('page_heading') == $this->_record->title) $params->set('show_page_heading', 0);
+			if ($params->get('page_title')   == $this->_record->title) $params->set('show_page_title',   0);
+		}
+
+		// Also convert metadata property string to registry object
+		try
+		{
+			$this->_record->metadata = new JRegistry($this->_record->metadata);
+		}
+		catch (Exception $e)
+		{
+			$this->_record->metadata = flexicontent_db::check_fix_JSON_column('metadata', 'content', 'id', $this->_record->id);
+		}
+
+		// Manually apply metadata from type parameters ... currently only 'robots' makes sense to exist per type
+		if ( !$this->_record->metadata->get('robots') )   !$this->_record->metadata->set('robots', $typeParams->get('robots'));
+
+
+		/**
+		 * Finally set 'parameters' property of the item
+		 */
+		$this->_record->parameters = $params;
+	}
+
+
+	/**
 	 * Method to fetch used tags IDs as an array when performing an edit action
 	 *
 	 * @param int id
@@ -3976,29 +4216,9 @@ class ParentClassItem extends FCModelAdmin
 	 */
 	function getTypeparams($forced_typeid = 0)
 	{
-		static $typeparams = array();
+		$typeid = $forced_typeid ?: $this->_typeid;
 
-		$typeid = $forced_typeid ?: ($this->_id ? 0 : $this->_typeid);
-
-		if ($typeid && isset($typeparams[$typeid]))
-		{
-			return $typeparams[$typeid];
-		}
-
-		$query = 'SELECT t.id, t.attribs'
-			. ' FROM #__flexicontent_types AS t'
-			.( !$forced_typeid && $this->_id
-				? ' JOIN #__flexicontent_items_ext AS ie ON ie.type_id = t.id WHERE ie.item_id = ' . (int) $this->_id
-				: ' WHERE t.id = ' . (int) ($forced_typeid ?: $this->_typeid)
-			);
-		$data = $this->_db->setQuery($query)->loadObject();
-
-		// Cache and return
-		if (!$data)
-		{
-			return '';
-		}
-		return $typeparams[$data->id] = $data->attribs;
+		return flexicontent_db::getTypeAttribs(false, $typeid, 0);
 	}
 
 
