@@ -605,7 +605,7 @@
 }
 #flexicontent .fc_file_uploader .plupload_container {
 	padding: 0;
-	min-width: 500px;
+	/*min-width: 500px;*/
 }
 #flexicontent .fc_file_uploader .plupload_container input {
 	height: 2.4em;
