@@ -300,12 +300,11 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 			<span class="fc-board-button-inner">
 
 				<?php if ($link) : ?><a href="<?php echo $link; ?>" class="fc-board-button-link" <?php echo $link_attribs; ?>><?php endif; ?>
-					<?php if ($image) {
-						echo JHtml::image('administrator/components/com_flexicontent/assets/images/'.$image, $text, $img_attribs);
-					}else {
-					echo	'<span class="' .$iconfont. ' fc-dashboard-icon"></span>';
-					}
-						?>
+					<?php
+						echo $image
+						? JHtml::image('administrator/components/com_flexicontent/assets/images/'.$image, $text, $img_attribs)
+						: '<span class="' . $iconfont . ' fc-dashboard-icon"></span>';
+					?>
 					<span class="fc-board-btn-text <?php echo $link ? '' : ' fcdisabled'; ?>"><?php echo $text; ?></span>
 				<?php if ($link) : ?></a><?php endif; ?>
 
@@ -314,3 +313,4 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 		<?php
 	}
 }
+
