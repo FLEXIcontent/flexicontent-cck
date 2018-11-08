@@ -42,11 +42,51 @@ $ctrl_users = "task=users.";
 	<div id="j-main-container" class="span12 col-md-12">
 
 <?php endif;?>
-			<script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/2.2.0/echarts.js"></script>
-			<script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/2.2.0/chart/line.js"></script>
-			<script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/2.2.0/chart/bar.js"></script>
-			<script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/2.2.0/chart/pie.js"></script>
-			<script src="	https://cdnjs.cloudflare.com/ajax/libs/zrender/2.0.7/zrender.js"></script>
+
+
+<?php
+	// BOF: Load echart libraries
+	$error_msg = '';
+
+	if (!file_exists(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'echarts'))
+	{
+		$error_msg .= '<div class="alert alert-error">echarts library not installed in ' . JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'echarts' . '</div>';
+	}
+
+	if (!file_exists(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'zrender'))
+	{
+		$error_msg .= '<div class="alert alert-error">zrender library not installed in ' . JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'zrender' . '</div>';
+	}
+	
+	if (!$error_msg) : ?>
+
+	<script>
+    require.config({
+        packages: [
+            {
+                name: 'echarts',
+                location: '../components/com_flexicontent/librairies/echarts',
+                main: 'echarts'
+            },
+            {
+                name: 'zrender',
+                location: '../components/com_flexicontent/librairies/zrender',
+                main: 'zrender'
+            }
+        ]
+    });
+	</script>
+
+<?php else : ?>
+
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/2.2.0/echarts.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/2.2.0/chart/line.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/2.2.0/chart/bar.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/2.2.0/chart/pie.js"></script>
+	<script src="	https://cdnjs.cloudflare.com/ajax/libs/zrender/2.0.7/zrender.js"></script>
+
+<?php endif; ?>
+
 
 	<table class="fc-table-list fc-tbl-short" style="margin:20px 0 20px 0; width:100%; box-sizing: border-box;">
 	<tr>
@@ -739,7 +779,6 @@ $ctrl_users = "task=users.";
 	</div>
 	<!-- End of Most and less Popular-->
 
-<?php //endif; /* EOF: Load echart libraries */ ?>
 
 	<div class="fcclear"></div>
 
