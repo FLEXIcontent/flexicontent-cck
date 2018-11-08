@@ -3603,8 +3603,14 @@ div.adminthumbs.fcmanthumbs {
 	padding: 6px;
 }
 .flexicontent #fc-filters-box.fcman-abs {
-	left: 0;
 	min-width: 346px;
+	max-width: 100%;
+}
+.flexicontent #fc-filters-box.fcman-abs,
+.flexicontent #mainChooseColBox.fcman-abs {
+	right: unset;
+	left: 0;
+	box-sizing: border-box;
 }
 .flexicontent #mainChooseColBox > #mainChooseColBox_cols {
 	display: inline-block;
