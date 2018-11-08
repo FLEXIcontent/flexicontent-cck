@@ -5,7 +5,7 @@
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
  * @license GNU/GPL v2
- * 
+ *
  * FLEXIcontent is a derivative work of the excellent QuickFAQ component
  * @copyright (C) 2008 Christoph Lukes
  * see www.schlu.net for more information
@@ -38,24 +38,24 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 		$params   = JComponentHelper::getParams('com_flexicontent');
 		$document	= JFactory::getDocument();
 		$session  = JFactory::getSession();
-		$user     = JFactory::getUser();		
+		$user     = JFactory::getUser();
 		$db       = JFactory::getDbo();
 		$print_logging_info = $params->get('print_logging_info');
 
 		// Load the file system librairies
 		jimport('joomla.filesystem.folder');
 		jimport('joomla.filesystem.file');
-		
+
 		// activate the tooltips
 		//JHtml::_('behavior.tooltip');
-		
+
 		// Get model
 		$model = $this->getModel('flexicontent');
-		
+
 		// initialise template related variables
 		$template	= $app->getTemplate();
 		$themes		= flexicontent_tmpl::getThemes();
-		
+
 		// Get data from the model
 		if ( $print_logging_info )  global $fc_run_times;
 		if ( $print_logging_info ) $start_microtime = microtime(true);
@@ -66,13 +66,13 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 		$revised    = $model->getRevised($_total);     $totalrows['revised'] = $_total;
 		$inprogress = $model->getInprogress($_total);  $totalrows['inprogress'] = $_total;
 		if ( $print_logging_info ) $fc_run_times['quick_sliders'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
-		
-		
+
+
 		// 1. CHECK REQUIRED NON-AUTOMATIC TASKs
 		//  THEY ARE TASKs THAT USER MUST COMPLETE MANUALLY
 		$existcat 	= $model->getExistcat();
 		$existmenu 	= $model->getExistmenu();
-		
+
 		// 2. OPTIONAL AUTOMATIC TASKS,
 		//  THESE ARE SEPARETELY CHECKED, AS THEY ARE NOT OBLIGATORY BUT RATHER RECOMMENDED
 		$allplgpublish = $session->get('flexicontent.allplgpublish');
@@ -80,24 +80,24 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 			$allplgpublish = $model->getAllPluginsPublished();
 		}
 		$optional_tasks = !$allplgpublish; // || ..
-		
+
 		// 3. OBLIGATORY AUTOMATIC TASKS, THAT WILL BLOCK COMPONENT USE UNTIL THEY ARE COMPLETED
 		$postinst_integrity_ok = $session->get('flexicontent.postinstall');
 		// THE FOLLOWING WILL ONLY BE DISPLAYED IF $DOPOSTINSTALL IS INCOMPLETE
 		// SO WHY CALCULATE THEM, WE SKIP THEM, USER MUST LOG OUT ANYWAY TO SEE THEM ...
-		
+
 		if(($postinst_integrity_ok===NULL) || ($postinst_integrity_ok===false))
 		{
 			$use_versioning = $params->get('use_versioning', 1);
-			
+
 			$existtype 			= $model->getExistType();
 			$existmenuitems	= $model->getExistMenuItems();
 			$existfields 		= $model->getExistCoreFields();
-			
+
 			$existfplg 			= $model->getExistFieldsPlugins();
 			$existseplg 		= $model->getExistSearchPlugin();
 			$existsyplg 		= $model->getExistSystemPlugin();
-			
+
 			$existcats					= !$model->getItemsNoCat();
 			$langsynced	 				= $model->getExistLanguageColumns() && !$model->getItemsBadLang();
 			$existversions 			= $model->getExistVersionsTable();
@@ -108,7 +108,7 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 			$nooldfieldsdata	= $model->getNoOldFieldsData();
 			$missingversion		= true; //!$use_versioning || !$model->checkCurrentVersionData();
 			$cachethumb				= $model->getCacheThumbPerms();
-			
+
 			$existdbindexes    = ! (boolean) ($missingindexes = $model->getExistDBindexes($check_only=false));
 			$itemcountingdok   = $model->getItemCountingDataOK();
 			$initialpermission = $model->checkInitialPermission();
@@ -123,13 +123,13 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 		  $existdbindexes = $itemcountingdok = $initialpermission = true;
 		  $missingindexes = array();
 		}
-		
-		
-		
+
+
+
 		// **************************
 		// Add css and js to document
 		// **************************
-		
+
 		!JFactory::getLanguage()->isRtl()
 			? $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', FLEXI_VHASH)
 			: $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', FLEXI_VHASH);
@@ -142,24 +142,24 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 		// *****************************
 		// Get user's global permissions
 		// *****************************
-		
+
 		$perms = FlexicontentHelperPerm::getPerm();
-		
-		
-		
+
+
+
 		// ************************
 		// Create Submenu & Toolbar
 		// ************************
-		
+
 		// Create Submenu (and also check access to current view)
 		FLEXIUtilities::ManagerSideMenu(null);
-		
+
 		// Create document/toolbar titles
 		$doc_title = JText::_( 'FLEXI_DASHBOARD' );
 		$site_title = $document->getTitle();
 		JToolbarHelper::title( $doc_title, 'flexicontent' );
 		$document->setTitle($doc_title .' - '. $site_title);
-		
+
 		$js = "jQuery(document).ready(function(){";
 
 		// Create the toolbar
@@ -204,7 +204,7 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 
 		$js .= "});";
 		$document->addScriptDeclaration($js);
-		
+
 		// Lists
 		jimport('joomla.filesystem.folder');
 		$lists 		= array();
@@ -212,9 +212,9 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 		$folder 	= JPATH_ADMINISTRATOR.DS.'language';
 		$langs 		= JFolder::folders($folder);
 		$activelang = JComponentHelper::getParams('com_languages')->get('administrator', 'en-GB');
-		
+
 		foreach ($langs as $lang) {
-			$options[] = JHtml::_('select.option', $lang, $lang);		
+			$options[] = JHtml::_('select.option', $lang, $lang);
 		}
 		$lists['languages'] = JHtml::_('select.genericlist', $options, 'lang', '', 'value', 'text', $activelang);
 
@@ -226,7 +226,7 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 		$fromname = $app->getCfg('fromname');
 		$website 	= $app->getCfg('live_site');
 
-				
+
 		$this->pending = $pending;
 		$this->revised = $revised;
 		$this->draft = $draft;
@@ -245,21 +245,21 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 		// install check
 		$this->dopostinstall = $postinst_integrity_ok;
 		$this->allplgpublish = $allplgpublish;
-		
+
 		$this->existtype = isset($existtype) ? $existtype : null;
 		$this->existmenuitems = isset($existmenuitems) ? $existmenuitems : null;
 		$this->existfields = isset($existfields) ? $existfields : null;
-		
+
 		$this->existfplg = isset($existfplg) ? $existfplg : null;
 		$this->existseplg = isset($existseplg) ? $existseplg : null;
 		$this->existsyplg = isset($existsyplg) ? $existsyplg : null;
-		
+
 		$this->existcats = isset($existcats) ? $existcats : null;
 		$this->langsynced = isset($langsynced) ? $langsynced : null;
 		$this->existversions = isset($existversions) ? $existversions : null;
 		$this->existversionsdata = isset($existversionsdata) ? $existversionsdata : null;
 		$this->existauthors = isset($existauthors) ? $existauthors : null;
-		
+
 		$this->deprecatedfiles = isset($deprecatedfiles) ? $deprecatedfiles : null;
 		$this->nooldfieldsdata = isset($nooldfieldsdata) ? $nooldfieldsdata : null;
 		$this->missingversion = isset($missingversion) ? $missingversion : null;
@@ -269,7 +269,7 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 		$this->missingindexes = isset($missingindexes) ? $missingindexes : null;
 		$this->itemcountingdok = isset($itemcountingdok) ? $itemcountingdok : null;
 		$this->initialpermission = isset($initialpermission) ? $initialpermission : null;
-		
+
 		// assign Rights to the template
 		$this->perms = $perms;
 		$this->document = $document;
@@ -287,7 +287,7 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 	 * @param string $text image description
 	 * @param boolean $modal 1 for loading in modal
 	 */
-	function quickiconButton( $link, $image, $text, $modal = 0, $modal_create_iframe = 1, $modal_width=0, $modal_height=0)
+	function quickiconButton( $link, $image, $iconfont, $text, $modal = 0, $modal_create_iframe = 1, $modal_width=0, $modal_height=0)
 	{
 		//initialise variables
 		$lang = JFactory::getLanguage();
@@ -300,7 +300,12 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 			<span class="fc-board-button-inner">
 
 				<?php if ($link) : ?><a href="<?php echo $link; ?>" class="fc-board-button-link" <?php echo $link_attribs; ?>><?php endif; ?>
-					<?php echo JHtml::image('administrator/components/com_flexicontent/assets/images/'.$image, $text, $img_attribs); ?>
+					<?php if ($image) {
+						echo JHtml::image('administrator/components/com_flexicontent/assets/images/'.$image, $text, $img_attribs);
+					}else {
+					echo	'<span class="' .$iconfont. ' fc-dashboard-icon"></span>';
+					}
+						?>
 					<span class="fc-board-btn-text <?php echo $link ? '' : ' fcdisabled'; ?>"><?php echo $text; ?></span>
 				<?php if ($link) : ?></a><?php endif; ?>
 
