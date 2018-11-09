@@ -596,7 +596,8 @@ if ($js)
 			<td class="col_access hidden-phone">
 				<?php echo $row->canEdit
 					? flexicontent_html::userlevel('access['.$row->id.']', $row->access, 'onchange="return listItemTask(\'cb'.$i.'\',\''.$ctrl.'access\')" class="use_select2_lib"')
-					: $this->escape($row->access_level); ?>
+					: $this->escape($row->access_level);
+				?>
 			</td>
 
 			<td class="col_id center hidden-phone hidden-tablet">
@@ -612,6 +613,7 @@ if ($js)
 
 	</table>
 
+
 	<div>
 		<?php echo $pagination_footer; ?>
 	</div>
@@ -621,6 +623,7 @@ if ($js)
 	<input type="hidden" name="original_order_values" value="<?php echo implode(',', $originalOrders); ?>" />
 
 	<!-- Common management form fields -->
+	<input type="hidden" name="newstate" id="newstate" value="" />
 	<input type="hidden" name="boxchecked" value="0" />
 	<input type="hidden" name="option" value="<?php echo $this->option; ?>" />
 	<!--input type="hidden" name="controller" value="<?php echo $this->view; ?>" /-->

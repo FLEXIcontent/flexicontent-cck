@@ -1130,6 +1130,7 @@ jQuery(document).ready(function(){
 
 	</table>
 
+
 	<div>
 		<?php echo $pagination_footer; ?>
 	</div>
@@ -1144,11 +1145,9 @@ jQuery(document).ready(function(){
 		<div class="fc-iblock" style="width: 140px; min-height:2em; vertical-align: top; padding: 6px;"><span class="icon-pencil-2" style="font-size: 16px;"></span> <?php echo JText::_( 'FLEXI_TO_WRITE_DESC' ); ?> <br> (<?php echo JText::_( 'FLEXI_UNPUBLISHED' ); ?>)</div>
 	</div>
 
-	<div class="fcclear"></div>
-
-	<input type="hidden" name="newstate" id="newstate" value="" />
 
 	<!-- Common management form fields -->
+	<input type="hidden" name="newstate" id="newstate" value="" />
 	<input type="hidden" name="boxchecked" value="0" />
 	<input type="hidden" name="option" value="<?php echo $this->option; ?>" />
 	<input type="hidden" name="controller" value="<?php echo $this->view; ?>" />
