@@ -9,7 +9,7 @@
  * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
-defined('_JEXEC') or die('Restricted access');
+defined('_JEXEC') or die;
 
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
@@ -56,7 +56,9 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 	{
 		parent::__construct($config);
 
-		// Register task aliases
+		/**
+		 * Register task aliases
+		 */
 		$this->registerTask('add',          'edit');
 		$this->registerTask('apply_type',   'save');
 		$this->registerTask('apply',        'save');
@@ -1584,130 +1586,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 	 */
 	public function changestate($state = null)
 	{
-		// Check for request forgeries
-		JSession::checkToken('request') or die(JText::_('JINVALID_TOKEN'));
-
-		// Initialize variables
-		$app   = JFactory::getApplication();
-		$db    = JFactory::getDbo();
-		$user  = JFactory::getUser();
-
-		$record_model = $this->getModel($this->record_name);
-		$msg = '';
-
-		// Get and santize records ids
-		$cid = $this->input->get('cid', array(), 'array');
-		$cid = ArrayHelper::toInteger($cid);
-
-		// Check at least one item was selected
-		if (!count($cid))
-		{
-			$app->enqueueMessage(JText::_('FLEXI_NO_ITEMS_SELECTED'), 'error');
-			$app->setHeader('status', 500, true);
-			$this->setRedirect($this->returnURL);
-
-			return;
-		}
-
-		$stateids = array(
-			'PE' => -3,
-			'OQ' => -4,
-			'IP' => -5,
-			'P'  =>  1,
-			'U'  =>  0,
-			'A'  =>  2,
-			'T'  => -2
-		);
-		$statenames = array(
-			-3 => 'FLEXI_PENDING',
-			-4 => 'FLEXI_TO_WRITE',
-			-5 => 'FLEXI_IN_PROGRESS',
-			 1 => 'FLEXI_PUBLISHED',
-			 0 => 'FLEXI_UNPUBLISHED',
-			 2 => 'FLEXI_ARCHIVED',
-			-2 => 'FLEXI_TRASHED'
-		);
-
-		$state = strlen($state)
-			? $state
-			: $this->input->get('newstate', '', 'string');
-
-		$state = isset($stateids[$state])
-			? $stateids[$state]
-			: (int) $state;
-
-		// Check for valid state
-		if (! in_array($state, $stateids))
-		{
-			$app->enqueueMessage(JText::_('Invalid State') . ': ' . $state, 'error');
-			$app->redirect($this->returnURL);
-		}
-
-		// Remove unauthorized (undeletable) items
-		$auth_cid = array();
-		$non_auth_cid = array();
-
-		// Get record owner and other record data
-		$q = $this->_getRecordsQuery($cid, array('id', 'created_by', 'catid'));
-		$itemdata = $db->setQuery($q)->loadObjectList('id');
-
-		// Check authorization for publish operation
-		foreach ($cid as $id)
-		{
-			// Determine priveleges of the current user on the given item
-			$asset = 'com_content.article.' . $itemdata[$id]->id;
-			$has_edit_state = $user->authorise('core.edit.state', $asset) || ($user->authorise('core.edit.state.own', $asset) && $itemdata[$id]->created_by == $user->get('id'));
-			$has_delete     = $user->authorise('core.delete', $asset) || ($user->authorise('core.delete.own', $asset) && $itemdata[$id]->created_by == $user->get('id'));
-
-			// ...
-			$permission = FlexicontentHelperPerm::getPerm();
-			$has_archive    = $permission->CanArchives;
-
-			$has_edit_state = $has_edit_state && in_array($state, array(0,1,-3,-4,-5));
-			$has_delete     = $has_delete     && $state == -2;
-			$has_archive    = $has_archive    && $state == (FLEXI_J16GE ? 2 : -1);
-
-			if ($has_edit_state || $has_delete || $has_archive)
-			{
-				$auth_cid[] = $id;
-			}
-			else
-			{
-				$non_auth_cid[] = $id;
-			}
-		}
-
-		// echo "<pre>"; echo "authorized:\n"; print_r($auth_cid); echo "\n\nNOT authorized:\n"; print_r($non_auth_cid); echo "</pre>"; exit;
-
-		// Set warning for undeletable items
-		if (count($non_auth_cid))
-		{
-			$msg_noauth = JText::_('FLEXI_CANNOT_CHANGE_STATE_ASSETS') . ' ' . JText::_('FLEXI_REASON_NO_PUBLISH_PERMISSION')
-				. '<br>' . JText::_('FLEXI_ROWS_SKIPPED') . ' : '. implode(',', $non_auth_cid);
-			$app->enqueueMessage($msg_noauth, 'warning');
-		}
-
-		// Set state, (model will also handle cache cleaning)
-		if (count($auth_cid))
-		{
-			// Note we will clean it only once later after the loop
-			foreach ($auth_cid as $item_id)
-			{
-				$record_model->setitemstate($item_id, $state, $_cleanCache = false);
-			}
-
-			$msg = count($auth_cid) . " " . JText::_('FLEXI_ITEMS') . " : &nbsp; " . JText::_('FLEXI_ITEMS_STATE_CHANGED_TO') . " -- " . JText::_($statenames[$state]) . " --";
-
-			if ($state == 'T')
-			{
-				$msg .= '<br/> ' . JText::_('FLEXI_NOTES') . ': ' . JText::_('FLEXI_DELETE_PERMANENTLY');
-			}
-
-			// CLEAN THE CACHE so that our changes appear realtime
-			$this->_cleanCache();
-		}
-
-		$this->setRedirect($this->returnURL, $msg);
+		return parent::changestate($state);
 	}
 
 
@@ -1827,7 +1706,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 
 		// Try to load by unique ID or NAME
 		else
-		{	
+		{
 			$model->isForm = true;
 
 			// Force model to load versioned data (URL specified version or latest version (last saved))
@@ -1929,7 +1808,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		if ($model->isCheckedOut($user->get('id')))
 		{
 			$app->setHeader('status', '400 Bad Request', true);
-			$app->enqueueMessage(JText::_('FLEXI_EDITED_BY_ANOTHER_ADMIN'), 'error');
+			$app->enqueueMessage(JText::_('FLEXI_EDITED_BY_ANOTHER_ADMIN'), 'warning');
 
 			if ($this->input->getCmd('tmpl') !== 'component')
 			{
@@ -1985,10 +1864,10 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 	 *
 	 * @since 1.5
 	 */
-	function gettags()
+	public function gettags()
 	{
 		// Check for request forgeries
-		JSession::checkToken() or jexit(JText::_('JINVALID_TOKEN'));
+		JSession::checkToken() or die(JText::_('JINVALID_TOKEN'));
 
 		$id    = $this->input->get('id', 0, 'int');
 		$record_model = $this->getModel($this->record_name);

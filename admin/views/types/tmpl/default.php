@@ -418,12 +418,19 @@ if ($js)
 		<?php echo $pagination_footer; ?>
 	</div>
 
+	<div style="margin-top: 48px;">
+		<div class="fc-iblock" style="width: 140px; min-height:2em; vertical-align: top; padding: 6px;"><span class="icon-publish" style="font-size: 16px;"></span> <?php echo JText::_( 'FLEXI_ENABLED' ); ?></div>
+		<div class="fc-iblock" style="width: 140px; min-height:2em; vertical-align: top; padding: 6px;"><span class="icon-unpublish" style="font-size: 16px;"></span> <?php echo JText::_( 'FLEXI_DISABLED' ); ?></div>
+		<div class="fc-iblock" style="width: 140px; min-height:2em; vertical-align: top; padding: 6px;"><span class="icon-trash" style="font-size: 16px;"></span>	<?php echo JText::_( 'FLEXI_TRASHED' ); ?></div>
+	</div>
+
 
 	<!-- Common management form fields -->
+	<input type="hidden" name="newstate" id="newstate" value="" />
 	<input type="hidden" name="boxchecked" value="0" />
-	<input type="hidden" name="option" value="com_flexicontent" />
-	<input type="hidden" name="controller" value="types" />
-	<input type="hidden" name="view" value="types" />
+	<input type="hidden" name="option" value="<?php echo $this->option; ?>" />
+	<input type="hidden" name="controller" value="<?php echo $this->view; ?>" />
+	<input type="hidden" name="view" value="<?php echo $this->view; ?>" />
 	<input type="hidden" name="task" value="" />
 	<input type="hidden" id="filter_order" name="filter_order" value="<?php echo $this->lists['order']; ?>" />
 	<input type="hidden" id="filter_order_Dir" name="filter_order_Dir" value="<?php echo $this->lists['order_Dir']; ?>" />

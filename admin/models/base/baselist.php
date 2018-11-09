@@ -1007,18 +1007,11 @@ abstract class FCModelAdminList extends JModelList
 		{
 			$asset = $asset_prefix . '.' . $id;
 
-			if ($row->state == -2)
-			{
-				$canDo		= $user->authorise($mapped_rule, $asset);
-				$canDoOwn	= $has_created_by_col
-					? $user->authorise($mapped_rule . '.own', $asset) && $row->created_by == $user->get('id')
-					: false;
-				$allowed = $canDo || $canDoOwn;
-			}
-			else
-			{
-				$allowed = false;
-			}
+			$canDo		= $user->authorise($mapped_rule, $asset);
+			$canDoOwn	= $has_created_by_col
+				? $user->authorise($mapped_rule . '.own', $asset) && $row->created_by == $user->get('id')
+				: false;
+			$allowed = $canDo || $canDoOwn;
 
 			if (!$allowed)
 			{
@@ -1126,8 +1119,12 @@ abstract class FCModelAdminList extends JModelList
 		else
 		{
 			$query = $this->_db->getQuery(true)
-				->select('t.*')
 				->from('#__' . $this->records_dbtbl . ' AS t');
+
+			if (!isset($clauses['select']))
+			{
+				$query->select('t.*');
+			}
 		}
 
 		// Add the given SQL clauses

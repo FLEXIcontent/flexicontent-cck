@@ -569,17 +569,19 @@ class FlexicontentControllerBaseAdmin extends FlexicontentController
 	 *
 	 * @since 3.3
 	 */
-	public function changestate($state = 1)
+	public function changestate($state = null)
 	{
 		// Check for request forgeries
 		JSession::checkToken('request') or die(JText::_('JINVALID_TOKEN'));
 
 		// Initialize variables
 		$app   = JFactory::getApplication();
+		$db    = JFactory::getDbo();
 		$user  = JFactory::getUser();
 
-		// Get model
+		// Get models
 		$model = $this->getModel($this->record_name_pl);
+		$record_model = $this->getModel($this->record_name);
 
 		// Get and santize records ids
 		$cid = $this->input->get('cid', array(), 'array');
@@ -593,6 +595,31 @@ class FlexicontentControllerBaseAdmin extends FlexicontentController
 			$this->setRedirect($this->returnURL);
 
 			return;
+		}
+
+		$state_aliases = array(
+			'PE' => -3,
+			'OQ' => -4,
+			'IP' => -5,
+			'P'  =>  1,
+			'U'  =>  0,
+			'A'  =>  2,
+			'T'  => -2
+		);
+
+		$state = strlen($state)
+			? $state
+			: $this->input->get('newstate', '', 'string');
+
+		$state = isset($state_aliases[$state])
+			? $state_aliases[$state]
+			: (is_numeric($state) ? (int) $state : null);
+
+		// Check for valid state
+		if ($state === null || !isset($record_model::supported_conditions[$state]))
+		{
+			$app->enqueueMessage(JText::_('Invalid State') . ': ' . $state, 'error');
+			$app->redirect($this->returnURL);
 		}
 
 		// Calculate access
@@ -627,36 +654,39 @@ class FlexicontentControllerBaseAdmin extends FlexicontentController
 				. implode(',', $cid_locked), 'warning')
 			: false;
 
-		// Change state of the record(s)
-		$result = $model->publish($cid, $state);
+		// Do not modify records that already in target state
+		$record_table = $model->getTable();
+		$cid = array_keys($model->getItemsByConditions(
+			array(
+				'select' => array($db->quoteName($record_table->getKeyName()) . ' AS id'),
+				'where'  => array(
+					$db->quoteName($record_table->getKeyName()) . ' IN (' . implode(',', ArrayHelper::toInteger($cid)) . ')',
+					$model->state_col . ' <> '. (int) $state,
+				),
+			), false
+		));
 
-		// Clear dependent cache data
-		$this->_cleanCache();
-
-		// Check for errors during state changing
-		if (!$result)
+		if (count($cid))
 		{
-			$app->enqueueMessage(JText::_('FLEXI_OPERATION_FAILED') . ' : ' . $model->getError(), 'error');
-			$app->setHeader('status', '500', true);
-			$this->setRedirect($this->returnURL);
+			// Change state of the record(s)
+			$result = $model->changestate($cid, $state);
 
-			return;
+			// Clear dependent cache data
+			$this->_cleanCache();
+
+			// Check for errors during state changing
+			if (!$result)
+			{
+				$app->enqueueMessage(JText::_('FLEXI_OPERATION_FAILED') . ' : ' . $model->getError(), 'error');
+				$app->setHeader('status', '500', true);
+				$this->setRedirect($this->returnURL);
+
+				return;
+			}
 		}
 
-		// Set success message
-		$msg_arr = array(
-			 1 => 'FLEXI_PUBLISHED',
-			 0 => 'FLEXI_UNPUBLISHED',
-			 2 => 'FLEXI_ARCHIVED',
-			-2 => 'FLEXI_TRASHED',
-		);
-
-		$msg = isset($msg_arr[$state])
-			? JText::_($msg_arr[$state]) . ' : '
-			: '';
-
-		$msg .= JText::sprintf('FLEXI_N_RECORDS', count($cid));
-
+		// Set success message and redirect
+		$msg = JText::sprintf('FLEXI_N_RECORDS_CHANGED_TO', count($cid)) . ' ' . JText::_($record_model::supported_conditions[$state]);
 		$this->setRedirect($this->returnURL, $msg, 'success');
 	}
 
