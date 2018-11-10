@@ -5,7 +5,7 @@
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
  * @license GNU/GPL v2
- * 
+ *
  * FLEXIcontent is a derivative work of the excellent QuickFAQ component
  * @copyright (C) 2008 Christoph Lukes
  * see www.schlu.net for more information
@@ -138,7 +138,7 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 				JFactory::getApplication()->enqueueMessage($mssg, 'warning', '');
 			}
 		}
-		
+
 		if ( isset($php_lims['warning']) )
 			$_title .= ' - <span class="badge badge-important">Warning</span>';
 		else if ( isset($php_lims['notice']) )
@@ -146,7 +146,7 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 		else
 			$_title .= ' - <span class="badge badge-success">OK</span>';
 		?>
-		
+
 		<div id="fc-dash-boardbtns">
 		<?php
 		if (!$this->dopostinstall)
@@ -187,7 +187,7 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 
 			<div class="fc-board-set-inner"><?php
 			$link = 'index.php?option='.$option.'&amp;view=items';
-			if (!isset($sbtns['items'])) FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-items.png', JText::_( 'FLEXI_ITEMS' ) );
+			if (!isset($sbtns['items'])) FlexicontentViewFlexicontent::quickiconButton( $link, '', 'icon-items', JText::_( 'FLEXI_ITEMS' ) );
 			if (!isset($sbtns['additem']))
 			{
 				// Check if user can create in at least one published category
@@ -197,7 +197,7 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 				if ($CanAddAny) {
 					//$link = 'index.php?option='.$option.'&amp;view=item';
 					$link = 'index.php?option='.$option.'&amp;view=types&amp;format=raw';
-					FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-item-add.png', JText::_( 'FLEXI_NEW_ITEM' ), 1, 1, 600, 450 );
+					FlexicontentViewFlexicontent::quickiconButton( $link, '', 'icon-apply', JText::_( 'FLEXI_NEW_ITEM' ), 1, 1, 600, 450 );
 				}
 			}
 			/*if ($this->perms->CanArchives && !isset($sbtns['archives']))
@@ -208,12 +208,12 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 			if ($this->perms->CanCats && !isset($sbtns['addcat']))
 			{
 				$link = 'index.php?option='.$option.'&amp;view=categories';
-				if (!isset($sbtns['cats'])) FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-categories.png', JText::_( 'FLEXI_CATEGORIES' ) );
+				if (!isset($sbtns['cats'])) FlexicontentViewFlexicontent::quickiconButton( $link, '' ,'icon-folder', JText::_( 'FLEXI_CATEGORIES' ) );
 				$canCreateAny = FlexicontentHelperPerm::getPermAny('core.create');
 				if ($canCreateAny)
 				{
 					$link = 'index.php?option='.$option.'&amp;view=category';
-					FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-category-add.png', JText::_( 'FLEXI_NEW_CATEGORY' ) );
+					FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-folder-plus', JText::_( 'FLEXI_NEW_CATEGORY' ) );
 				}
 			}
 			if (isset($sbtns['comments']))
@@ -241,13 +241,13 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 						$link_title = JText::_('FLEXI_COMMENTS');
 						break;
 				}
-				FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-comments.png', $link_title, 1 );
+				FlexicontentViewFlexicontent::quickiconButton( $link, '', 'icon-comment', $link_title, 1 );
 			}
 			elseif ($this->params->get('comments')==1 && !$this->perms->JComments_Installed)
 			{
 				echo '<span class="fc-board-button_sep"></span>';
 				$link = '';
-				FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-comments.png', JText::_( 'FLEXI_JCOMMENTS_MISSING' ), 1 );
+				FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-comment' , JText::_( 'FLEXI_JCOMMENTS_MISSING' ), 1 );
 			}
 			?>
 			</div>
@@ -265,12 +265,12 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 			{
 				if (!isset($sbtns['types'])) {
 					$link = 'index.php?option='.$option.'&amp;view=types';
-					FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-types.png', JText::_( 'FLEXI_TYPES' ) );
+					FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-briefcase', JText::_( 'FLEXI_TYPES' ) );
 					$add_sep = true;
 				}
 				if (!isset($sbtns['addtype'])) {
 					$link = 'index.php?option='.$option.'&amp;view=type';
-					FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-type-add.png', JText::_( 'FLEXI_NEW_TYPE' ) );
+					FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-file-add', JText::_( 'FLEXI_NEW_TYPE' ) );
 					$add_sep = true;
 				}
 			}
@@ -278,12 +278,12 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 			{
 				if (!isset($sbtns['fields'])) {
 					$link = 'index.php?option='.$option.'&amp;view=fields';
-					FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-fields.png', JText::_( 'FLEXI_FIELDS' ) );
+					FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-signup', JText::_( 'FLEXI_FIELDS' ) );
 					$add_sep = true;
 				}
 				if (!isset($sbtns['addfield'])) {
 					$link = 'index.php?option='.$option.'&amp;view=field';
-					FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-field-add.png', JText::_( 'FLEXI_NEW_FIELD' ) );
+					FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-file-add', JText::_( 'FLEXI_NEW_FIELD' ) );
 					$add_sep = true;
 				}
 				$addTagsBtns  = $this->perms->CanTags && (!isset($sbtns['tags']) || !isset($sbtns['addtag']));
@@ -295,17 +295,17 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 			{
 				if (!isset($sbtns['tags'])) {
 					$link = 'index.php?option='.$option.'&amp;view=tags';
-					FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-tags.png', JText::_( 'FLEXI_TAGS' ) );
+					FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-tags', JText::_( 'FLEXI_TAGS' ) );
 				}
 				if (!isset($sbtns['addtag'])) {
 					$link = 'index.php?option='.$option.'&amp;view=tag';
-					FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-tag-add.png', JText::_( 'FLEXI_NEW_TAG' ) );
+					FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-file-add', JText::_( 'FLEXI_NEW_TAG' ) );
 				}
 			}
 			if ($this->perms->CanFiles && !isset($sbtns['files']))
 			{
 				$link = 'index.php?option='.$option.'&amp;view=filemanager';
-				FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-files.png', JText::_( 'FLEXI_FILEMANAGER' ) );
+				FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-images' , JText::_( 'FLEXI_FILEMANAGER' ) );
 			}
 			?>
 			</div>
@@ -322,22 +322,22 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 			if ($this->perms->CanTemplates && !isset($sbtns['templates']))
 			{
 				$link = 'index.php?option='.$option.'&amp;view=templates';
-				FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-templates.png', JText::_( 'FLEXI_TEMPLATES' ) );
+				FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-eye', JText::_( 'FLEXI_TEMPLATES' ) );
 				$add_sep = true;
 			}
 			if ($this->perms->CanIndex && !isset($sbtns['index']))
 			{
 				$link = 'index.php?option='.$option.'&amp;view=search';
-				FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-searchindex.png', JText::_( 'FLEXI_SEARCH_INDEXES' ) );
+				FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-search', JText::_( 'FLEXI_SEARCH_INDEXES' ) );
 				$add_sep = true;
 			}
 			if ($this->perms->CanStats && !isset($sbtns['stats']))
 			{
 				if ($add_sep)
 					echo '<span class="fc-board-button_sep"></span>';
-				
+
 				$link = 'index.php?option='.$option.'&amp;view=stats';
-				FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-statistics.png', JText::_( 'FLEXI_STATISTICS' ) );
+				FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-chart', JText::_( 'FLEXI_STATISTICS' ) );
 			}
 			?>
 			</div>
@@ -354,22 +354,22 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 			{
 				if (!isset($sbtns['users'])) {
 					$link = 'index.php?option='.$option.'&amp;view=users';
-					FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-authors.png', JText::_( 'FLEXI_USERS' ) );
+					FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-users', JText::_( 'FLEXI_USERS' ) );
 				}
 				if (!isset($sbtns['adduser'])) {
 					$link = 'index.php?option='.$option.'&amp;'.(FLEXI_J16GE ? 'task=users.add' : 'controller=users&amp;task=add');
-					FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-author-add.png', JText::_( 'FLEXI_ADD_USER' ) );
+					FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-file-add', JText::_( 'FLEXI_ADD_USER' ) );
 				}
 			}
 			if ($this->perms->CanGroups)
 			{
 				if (!isset($sbtns['groups'])) {
 					$link = 'index.php?option='.$option.'&amp;view=groups';
-					FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-groups.png', JText::_( 'FLEXI_GROUPS' ) );
+					FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-users', JText::_( 'FLEXI_GROUPS' ) );
 				}
 				if (!isset($sbtns['addgroup'])) {
 					$link = 'index.php?option='.$option.'&amp;'.(FLEXI_J16GE ? 'task=groups.add' : 'controller=groups&amp;task=add');
-					FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-groups-add.png', JText::_( 'FLEXI_ADD_GROUP' ) );
+					FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-file-add', JText::_( 'FLEXI_ADD_GROUP' ) );
 				}
 			}
 			?>
@@ -387,25 +387,25 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 			if ($this->perms->CanImport && !isset($sbtns['import']))
 			{
 				$link = 'index.php?option='.$option.'&amp;view=import';
-				FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-import.png', JText::_( 'FLEXI_IMPORT' ) );
-				$add_sep = true;	
+				FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-upload', JText::_( 'FLEXI_IMPORT' ) );
+				$add_sep = true;
 			}
 			if ($this->perms->CanPlugins)
 			{
 				if ($add_sep && (!isset($sbtns['plgfields']) || !isset($sbtns['plgsystem']) || !isset($sbtns['plgflexicontent'])))
 					echo '<span class="fc-board-button_sep"></span>';
-				
+
 				if (!isset($sbtns['plgfields'])) {
 					$link = 'index.php?option=com_plugins&amp;filter_folder=flexicontent_fields';
-					FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-plugins.png', JText::_( 'FLEXI_PLUGINS' ). ' - Fields', 1 );
+					FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-power-cord', JText::_( 'FLEXI_PLUGINS' ). ' - Fields', 1 );
 				}
 				if (!isset($sbtns['plgsystem'])) {
 					$link = 'index.php?option=com_plugins&amp;filter_folder=system&amp;filter_search=flexi';
-					FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-plugins.png', JText::_( 'FLEXI_PLUGINS' ). ' - System', 1 );
+					FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-cube', JText::_( 'FLEXI_PLUGINS' ). ' - System', 1 );
 				}
 				if (!isset($sbtns['plgflexicontent'])) {
 					$link = 'index.php?option=com_plugins&amp;filter_folder=flexicontent';
-					FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-plugins.png', JText::_( 'FLEXI_PLUGINS' ). ' - Flexicontent', 1 );
+					FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-puzzle', JText::_( 'FLEXI_PLUGINS' ). ' - Flexicontent', 1 );
 				}
 			}
 			if ( $this->perms->CanEdit )
@@ -425,7 +425,7 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 
 			<div class="fc-board-set-inner"><?php
 			$link = $this->params->get('support_url');
-			FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-help.png', JText::_( 'FLEXI_SUPPORT' ), 1 );
+			FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-help', JText::_( 'FLEXI_SUPPORT' ), 1 );
 
 			// Read installation file
 			/*$manifest_path = JPATH_ADMINISTRATOR .DS. 'components' .DS. 'com_flexicontent' .DS. 'manifest.xml';
@@ -471,7 +471,7 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 			';
 		}
 		?>
-		
+
 		</div> <!-- END OF #fc-dash-boardbtns -->
 
 
@@ -525,7 +525,7 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 				$show_all_link = 'index.php?option=com_flexicontent&amp;view=items&amp;filter_state=PE';
 			?>
 			<table class="table">
-				
+
 				<thead>
 				<tr>
 					<th><?php echo JText::_('FLEXI_TITLE'); ?></th>
@@ -533,7 +533,7 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 					<th><?php echo JText::_('FLEXI_AUTHOR'); ?></th>
 				</tr>
 				</thead>
-				
+
 				<tbody>
 				<?php
 				$k = 0;
@@ -584,7 +584,7 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 				$show_all_link = 'index.php?option=com_flexicontent&amp;view=items&amp;filter_state=RV';
 			?>
 			<table class="table">
-				
+
 				<thead>
 				<tr>
 					<th><?php echo JText::_('FLEXI_TITLE'); ?></th>
@@ -592,7 +592,7 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 					<th><?php echo JText::_('FLEXI_NF_MODIFIER'); ?></th>
 				</tr>
 				</thead>
-				
+
 				<tbody>
 				<?php
 				$k = 0;
@@ -644,7 +644,7 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 				$show_all_link = 'index.php?option=com_flexicontent&amp;view=items&amp;filter_state=IP';
 			?>
 			<table class="table">
-				
+
 				<thead>
 				<tr>
 					<th><?php echo JText::_('FLEXI_TITLE'); ?></th>
@@ -652,7 +652,7 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 					<th><?php echo JText::_('FLEXI_AUTHOR'); ?></th>
 				</tr>
 				</thead>
-				
+
 				<tbody>
 				<?php
 				$k = 0;
@@ -690,7 +690,7 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 					</td>
 				</tr>
 				</tbody>
-				
+
 
 			</table>
 			<?php
@@ -705,7 +705,7 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 				$show_all_link = 'index.php?option=com_flexicontent&amp;view=items&amp;filter_state=OQ';
 			?>
 			<table class="table">
-				
+
 				<thead>
 				<tr>
 					<th><?php echo JText::_('FLEXI_TITLE'); ?></th>
@@ -713,7 +713,7 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 					<th><?php echo JText::_('FLEXI_AUTHOR'); ?></th>
 				</tr>
 				</thead>
-				
+
 				<tbody>
 			<?php
 				$k = 0;
@@ -804,25 +804,25 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 							<span class="label label-info <?php echo $tooltip_class;?>" title="Core developer">Georgios Papadakis</span><br/><br/>
 							<a class="<?php echo $btn_class.(FLEXI_J16GE ? ' btn-primary ' : ' ').$tooltip_class;?>" style="" href="http://www.flexicontent.org" title="FLEXIcontent home page" target="_blank">FLEXIcontent.org</a>
 						</span>
-						
+
 						<span class="fc-mssg-inline fc-nobgimage fc-noborder nowrap_box">
 							<span class="label label-info <?php echo $tooltip_class;?>" title="Core Developer">Marvelic Engine</span><br/><br/>
 							<a class="<?php echo $btn_class.(FLEXI_J30GE ? ' btn-small ' : ' fcsmall fcsimple ').$tooltip_class;?>" style="" href="http://www.marvelic.co.th" target="_blank" title="<?php echo flexicontent_html::getToolTip("Marvelic Engine", "Marvelic Engine is a Joomla consultancy based in Bangkok, Thailand. Support services include consulting, Joomla implementation, training, and custom extensions development.", 0, 1); ?>">
 								marvelic.co.th
 							</a>
 						</span>
-						
+
 						<span class="fc-mssg-inline fc-nobgimage fc-noborder nowrap_box">
 							<span class="label <?php echo $tooltip_class;?>" title="Core Developer">Suriya Kaewmungmuang</span>
 						</span>
-						
+
 						<span class="fc-mssg-inline fc-nobgimage fc-noborder nowrap_box">
 							<span class="label <?php echo $tooltip_class;?>" title="Core Developer">Yannick Berges</span><br/><br/>
 							<a class="<?php echo $btn_class.(FLEXI_J30GE ? ' btn-small ' : ' fcsmall fcsimple ').$tooltip_class;?>" style="" href="http://com3elles.com/" target="_blank" title="<?php echo flexicontent_html::getToolTip("Com'3Elles", "Com'3Elles, agence de communication, conseil et formations", 0, 1); ?>">
 								com3elles.com
 							</a>
 						</span>
-						
+
 						<span class="fc-mssg-inline fc-nobgimage fc-noborder nowrap_box">
 							<span class="label <?php echo $tooltip_class;?>" title="Developer / Contributor">Ruben Reyes</span><br/><br/>
 							<a class="<?php echo $btn_class.(FLEXI_J30GE ? ' btn-small ' : ' fcsmall fcsimple ').$tooltip_class;?>" style="" href="http://www.lyquix.com" target="_blank" title="<?php echo flexicontent_html::getToolTip("Lyquix", "Lyquix - Philadelphia Marketing, Advertising, Web Design and Development Agency", 0, 1); ?>">
@@ -830,13 +830,13 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 							</a>
 						</span>
 					</span>
-					
+
 				</div>
 			<?php echo !$hide_fc_license_credits ? '</fieldset>' : ''; ?>
-			
+
 			</div>
 			<?php $fc_logo_license = ob_get_clean(); ?>
-			
+
 			<?php
 			// Place PHP/DB requirements at bottom if no warning found
 			if ( !isset($php_lims['warning']) && $this->perms->CanConfig ) :
