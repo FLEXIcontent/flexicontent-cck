@@ -668,25 +668,60 @@ class FlexicontentControllerBaseAdmin extends FlexicontentController
 
 		if (count($cid))
 		{
-			// Change state of the record(s)
-			$result = $model->changestate($cid, $state);
+			// Some record types need to be changed atomically to allow plugin triggering ... and other custom code execution
+			$atomic_change_record_types = array('item');
+
+			/**
+			 * Change state of the record(s), note cache will be cleaned in subsequent step
+			 */
+			if (in_array($this->record_name, $atomic_change_record_types))
+			{
+				$count = 0 ;
+
+				foreach ($cid as $item_id)
+				{
+					$result = $record_model->setitemstate($item_id, $state, $_cleanCache = false);
+
+					// Check for errors during state changing
+					if ($result === false)
+					{
+						$app->enqueueMessage(JText::_('FLEXI_OPERATION_FAILED') . ' : ' . $record_model->getError(), 'warning');
+					}
+					else
+					{
+						$count++;
+					}
+				}
+
+				$result = true;
+			}
+			else
+			{
+				$result = $model->changestate($cid, $state);
+
+				// Check for errors during state changing
+				if ($result === false)
+				{
+					$app->enqueueMessage(JText::_('FLEXI_OPERATION_FAILED') . ' : ' . $model->getError(), 'error');
+					$app->setHeader('status', '500', true);
+					$this->setRedirect($this->returnURL);
+				}
+
+				$count = (int) $result;
+			}
 
 			// Clear dependent cache data
 			$this->_cleanCache();
 
 			// Check for errors during state changing
-			if (!$result)
+			if ($result === false)
 			{
-				$app->enqueueMessage(JText::_('FLEXI_OPERATION_FAILED') . ' : ' . $model->getError(), 'error');
-				$app->setHeader('status', '500', true);
-				$this->setRedirect($this->returnURL);
-
 				return;
 			}
 		}
 
 		// Set success message and redirect
-		$msg = JText::sprintf('FLEXI_N_RECORDS_CHANGED_TO', count($cid)) . ' ' . JText::_($record_model::supported_conditions[$state]);
+		$msg = JText::sprintf('FLEXI_N_RECORDS_CHANGED_TO', $count) . ' ' . JText::_($record_model::supported_conditions[$state]);
 		$this->setRedirect($this->returnURL, $msg, 'success');
 	}
 
