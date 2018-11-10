@@ -1494,7 +1494,8 @@ abstract class FCModelAdmin extends JModelAdmin
 				->select($this->_db->qn($this->event_recid_col))
 				->from('#__' . $this->records_dbtbl)
 				->set($this->_db->qn($this->state_col) . ' = ' . (int) $state)
-				->where('id IN (' . $cid_list . ')');
+				->where('id IN (' . $cid_list . ')')
+			;
 			$event_ids = $this->_db->setQuery($query)->loadColumn();
 
 			foreach ($event_ids as $i => $v)
@@ -1531,7 +1532,8 @@ abstract class FCModelAdmin extends JModelAdmin
 			$query = $this->_db->getQuery(true)
 				->update('#__' . $this->records_dbtbl)
 				->set($this->_db->qn($this->state_col) . ' = ' . (int) $state)
-				->where('id IN (' . $cid_list . ')');
+				->where('id IN (' . $cid_list . ')')
+			;
 			$this->_db->setQuery($query)->execute();
 
 			if (!empty($this->_setstate_tbls))
@@ -1546,7 +1548,8 @@ abstract class FCModelAdmin extends JModelAdmin
 						$query = $this->_db->getQuery(true)
 							->update('#__' . $tbl_name)
 							->set($this->_db->qn($config['state_col']) . ' = ' . (int) $state)
-							->where($this->_db->qn($config['recid_col']) . ' IN (' . $cid_list . ')');
+							->where($this->_db->qn($config['recid_col']) . ' IN (' . $cid_list . ')')
+						;
 						$this->_db->setQuery($query)->execute();
 					}
 				}
@@ -1567,7 +1570,7 @@ abstract class FCModelAdmin extends JModelAdmin
 				. ' AND valueorder = 1'
 				. ' AND field_id = 10'
 				. ' AND version = ' . (int) $v['version']
-				;
+			;
 			$this->_db->setQuery($query)->execute();
 		}
 
@@ -1644,7 +1647,7 @@ abstract class FCModelAdmin extends JModelAdmin
 			{
 				if (!$event_failed_notice_added)
 				{
-					$app->enqueueMessage('State change events reported a failure during handling the change to the new state', 'warning');
+					$this->setError('State change events reported a failure during handling the change to the new state');
 					$event_failed_notice_added = true;
 				}
 

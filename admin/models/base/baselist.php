@@ -598,20 +598,22 @@ abstract class FCModelAdminList extends JModelList
 	 * @param		array			$cid          Array of record ids to set to a new state
 	 * @param		integer   $state        The new state
 	 *
-	 * @return	boolean	True on success
+	 * @return	boolean	  True on success
 	 *
 	 * @since   3.3.0
 	 */
 	public function publish($cid, $state = 1)
 	{
 		/**
-		 * Perform ACL and Assignments checks, sets results into state
+		 * Perform ACL and Assignments checks before calling the changestate method, this should be done at the controller,
+		 * but we add it here for compatibility, if this code is removed, and also not done by the caller (e.g. controller),
+		 * then ZERO records will be modified
 		 */
 		$cid_noauth  = null;
 		$cid_wassocs = null;
 		$this->canDoAction($cid, $cid_noauth, $cid_wassocs, $tostate = $state);
 
-		return $this->changestate($cid, $state);
+		return $this->changestate($cid, $state) !== false;
 	}
 
 
@@ -621,7 +623,7 @@ abstract class FCModelAdminList extends JModelList
 	 * @param		array			$cid          Array of record ids to set to a new state
 	 * @param		integer   $state        The new state
 	 *
-	 * @return	boolean	True on success
+	 * @return	boolean	  The number of records modified, false on failure
 	 *
 	 * @since	3.3.0
 	 */
@@ -670,9 +672,12 @@ abstract class FCModelAdminList extends JModelList
 			}
 
 			$this->_db->setQuery($query)->execute();
+
+			// Return modified record count, by subtracting effected from initial count
+			return (int) $this->_db->getAffectedRows();
 		}
 
-		return true;
+		return 0;
 	}
 
 
@@ -976,14 +981,9 @@ abstract class FCModelAdminList extends JModelList
 		{
 			return $cid;
 		}
-		
-		// If not tracking assets then return zero non-allowed records
-		if (!property_exists($table, 'asset_id'))
-		{
-			return array();
-		}
 
-		$has_created_by_col = property_exists($table, $this->created_by_col);
+		$has_assets_tracking = property_exists($table, 'asset_id');
+		$has_created_by_col  = property_exists($table, $this->created_by_col);
 
 		// Get record owners, needed for *.own ACL
 		$query = $this->_db->getQuery(true)
@@ -1000,12 +1000,13 @@ abstract class FCModelAdminList extends JModelList
 		$rows = $this->_db->setQuery($query)->loadObjectList('id');
 
 		$cid_noauth   = array();
-		$asset_prefix = $table->getAssetPrefix();
+		$asset_prefix = $has_assets_tracking ? $table->getAssetPrefix() : null;
 		$mapped_rule  = isset($this->rules_map[$rule]) ? $this->rules_map[$rule] : $rule;
 
 		foreach ($rows as $id => $row)
 		{
-			$asset = $asset_prefix . '.' . $id;
+			// If this record type does not track assets, then check ACL rule according to component asset
+			$asset = $has_assets_tracking ? $asset_prefix . '.' . $id : $this->option;
 
 			$canDo		= $user->authorise($mapped_rule, $asset);
 			$canDoOwn	= $has_created_by_col
