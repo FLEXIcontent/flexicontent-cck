@@ -733,7 +733,8 @@ class FlexicontentViewFilemanager extends FlexicontentViewBaseRecords
 		{
 			JToolbarHelper::editList($contrl.'edit');
 		}
-		JToolbarHelper::deleteList(JText::_('FLEXI_ARE_YOU_SURE'), 'filemanager.remove');
+
+		//JToolbarHelper::deleteList(JText::_('FLEXI_ARE_YOU_SURE'), 'filemanager.remove');
 
 		/**
 		 * Maintenance button (Check-in, Verify Tag mappings, Assignments + Record)

@@ -481,7 +481,7 @@ if ($enable_multi_uploader)
 		'edit_properties' => true,
 		'add_size_slider' => true,
 		'refresh_on_complete' => true,
-		'height_spare' => ($isFilesElement ? 320 : 460),
+		'height_spare' => ($isFilesElement ? 350 : 430),
 		'thumb_size_slider_cfg' => "{
 			name: '".$cfg->slider_name."',
 			step_values: ".$step_values.",
@@ -506,10 +506,10 @@ if ($enable_multi_uploader)
 			var uploderTab = 0;
 			var IEversion = fc_isIE();
 			var is_IE8_IE9 = IEversion && IEversion < 10;
-			if (is_IE8_IE9) fctabber["fileman_tabset"].tabShow(uploderTab);
+			if (is_IE8_IE9) fctabber["fc-fileman-addfiles"].tabShow(uploderTab);
 
 			// Show outer container of uploader
-			jQuery("#filemanager-2").show();
+			jQuery("#fc-fileman-formbox-2").show();
 			jQuery("#'.$uploader_tag_id . $up_sfx_n.'").css("min-height", 180);
 
 			// Show uploader
@@ -519,10 +519,10 @@ if ($enable_multi_uploader)
 			'.$uploader_tag_id.'.autoResize("'.$up_sfx_n.'");
 
 			// Uploader does not initialize properly when hidden in IE8 / IE9 with "runtime": "html4" (it does if using "runtime": "flash")
-			if (!is_IE8_IE9 || fc_has_flash_addon()) fctabber["fileman_tabset"].tabShow(defaultTab);
+			if (!is_IE8_IE9 || fc_has_flash_addon()) fctabber["fc-fileman-addfiles"].tabShow(defaultTab);
 
 			// Hide basic uploader form if using multi-uploader script
-			jQuery("#filemanager-1").hide();
+			jQuery("#fc-fileman-formbox-1").hide();
 		}, 20);
 	';
 }
@@ -560,7 +560,7 @@ if ($js)
 <div id="flexicontent" class="flexicontent">
 
 
-<div class="<?php echo FLEXI_J40GE ? 'row' : 'row-fluid'; ?>">
+<div class="<?php echo FLEXI_J40GE ? 'row' : 'row-fluid'; ?>" id="fileman">
 
 <?php if (!empty( $this->sidebar)) : ?>
 
@@ -584,7 +584,7 @@ if ($js)
 
 
 <?php /* echo JHtml::_('tabs.start'); */ ?>
-<!--<div class="fctabber" id="fileman_tabset">-->
+<!--<div class="fctabber" id="fc-fileman-addfiles">-->
 <div class="<?php echo FLEXI_J40GE ? 'row' : 'row-fluid'; ?>">
 
 	<!-- File listing -->
@@ -594,7 +594,8 @@ if ($js)
 	<div class="tabbertab" id="filelist_tab" data-icon-class="icon-list">
 		<h3 class="tabberheading hasTooltip" data-placement="bottom" title="<?php echo JText::_('FLEXI_FILES_REGISTRY_DESC'); ?>"> <?php echo JText::_('FLEXI_FILES_REGISTRY'); ?> </h3>
 	-->
-	<div class="span6 col-md-6" id="filelist_tab" data-icon-class="icon-list">
+	<div class="span6 col-md-6" id="fc-fileman-fileslist-col" data-icon-class="icon-list">
+		<fieldset class="fc-formbox" id="fc-fileman-formbox-0">
 
 		<form action="index.php?option=<?php echo $this->option; ?>&amp;view=<?php echo $this->view; ?>&amp;layout=<?php echo $this->layout; ?>&amp;field=<?php echo $this->fieldid?>" method="post" name="adminForm" id="adminForm">
 
@@ -677,48 +678,62 @@ if ($js)
 			<?php endif; ?>
 
 
-				<div class="nowrap_box">
-					<div class="<?php echo $this->btn_sm_class; ?>" style="padding: 0 0 0 4px;">
+				<div class="nowrap_box" style="margin: 6px 0;">
+					<div class="<?php echo $this->btn_sm_class . ' ' . $this->tooltip_class; ?>" style="padding: 0 0 0 4px;"
+						data-title="<?php echo flexicontent_html::getToolTip('', 'JGLOBAL_CHECK_ALL', 1, 1); ?>" data-placement="bottom"
+					>
 						<div class="group-fcset" style="display: inline-block; vertical-align: middle;">
 							<input type="checkbox" name="checkall-toggle" id="checkall-toggle" value=""
 								onclick="Joomla.checkAll(this); fman_set_cids(jQuery(this));" style="display: none;" />
-							<label for="checkall-toggle" class="green single"
-							 data-title="<?php echo JText::_('JGLOBAL_CHECK_ALL'); ?>"
-							 class="hasTooltip" style="color: inherit;"
-							 >&nbsp; <?php echo JText::_('FLEXI_ALL'); ?></label> &nbsp;
+							<label for="checkall-toggle" class="green single" style="color: inherit;">
+								&nbsp;<?php echo JText::_('FLEXI_ALL'); ?>
+							</label>&nbsp;
 						</div>
 					</div>
 
-
-				<?php if ($isFilesElement): ?>
-					<div class="fc-iblock nowrap_box" style="position: relative; vertical-align: middle;">
-						<span class="btn btn-success <?php echo $this->btn_sm_class . ' ' . $this->tooltip_class; ?>" id="insert_selected_btn" onclick="fc_fileselement_assign_files(jQuery(this));">
-							<span class="icon-plus"></span> <?php echo JText::_(/*'FLEXI_FILEMAN_INSERT_SELECTED'*/'FLEXI_INSERT'); ?>
+					<?php echo '
+						<span style="cursor: pointer;" class="fc_shown_1271 ' . $this->btn_sm_class . ' btn-success ' . $this->tooltip_class . '"
+							onclick="var box = document.getElementById(\'fc-fileman-addfiles\'); fc_fm_add_handle = fc_showAsDialog(box, 0, 0, null, { title: \'' . JText::_('FLEXI_ADD_FILE',  true) . '\', visibleOnClose: 1, paddingW: 10, paddingH: 10}); return false;"
+							data-title="' . flexicontent_html::getToolTip('', 'FLEXI_ADD_FILE', 1, 1) . '" data-placement="bottom"
+						>
+							<span class="icon-new"></span>' . JText::_('FLEXI_NEW') . '
 						</span>
-						<span class="<?php echo $this->btn_sm_class . ' ' . $this->tooltip_class; ?>" onclick="fc_fileselement_delete_files()" data-title="<?php echo flexicontent_html::getToolTip('', 'FLEXI_DELETE', 1, 1); ?>">
+					'; ?>
+
+					<?php if ($isFilesElement): ?>
+						<div class="fc-iblock nowrap_box" style="position: relative; vertical-align: middle;">
+							<span class="btn btn-primary <?php echo $this->btn_sm_class . ' ' . $this->tooltip_class; ?>" id="insert_selected_btn" onclick="fc_fileselement_assign_files(jQuery(this));"
+								data-title="<?php echo flexicontent_html::getToolTip('', 'FLEXI_FILEMAN_INSERT_SELECTED', 1, 1); ?>" data-placement="bottom">
+								<span class="icon-plus"></span> <?php echo JText::_('FLEXI_INSERT'); ?>
+							</span>
+							<span class="<?php echo $this->btn_sm_class . ' ' . $this->tooltip_class; ?>" onclick="fc_fileselement_delete_files()" data-title="<?php echo flexicontent_html::getToolTip('', 'FLEXI_DELETE', 1, 1); ?>" data-placement="bottom">
+								<span class="icon-remove" style="color: darkred;"></span>
+							</span>
+						</div>
+					<?php else: ?>
+						<span class="<?php echo $this->btn_sm_class . ' ' . $this->tooltip_class; ?>" onclick="if (document.adminForm.boxchecked.value == 0) { alert(Joomla.JText._('JLIB_HTML_PLEASE_MAKE_A_SELECTION_FROM_THE_LIST')); } else { if (confirm('Are you sure ?')) { Joomla.submitbutton('filemanager.remove'); } }" data-title="<?php echo flexicontent_html::getToolTip('', 'FLEXI_DELETE', 1, 1); ?>" data-placement="bottom">
 							<span class="icon-remove" style="color: darkred;"></span>
 						</span>
-					</div>
-				<?php endif; ?>
+					<?php endif; ?>
 
 
 					<div class="btn-group" style="margin: 0 12px;">
 						<button type="button" class="<?php echo $this->btn_sm_class; ?> list-view <?php echo $this->tooltip_class; ?> active" id="btn-fman-list-view"
 							onclick="fc_toggle_view_mode(jQuery(this)); var c = jQuery('#fc_mainChooseColBox_btn'); c.removeClass('disabled').css('pointer-events', '');" data-toggle_selector=".fman_list_element" style="min-width: 40px;"
-							data-title="<?php echo JText::_('FLEXI_FILEMAN_DETAILS', true); ?>"
+							data-title="<?php echo flexicontent_html::getToolTip('', 'FLEXI_FILEMAN_DETAILS', 1, 1); ?>" data-placement="bottom"
 							>
 							<i class="icon-list-view"></i>
 						</button>
 						<button type="button" class="<?php echo $this->btn_sm_class; ?> grid-view <?php echo $this->tooltip_class; ?>" id="btn-fman-grid-view"
-							onclick="fc_toggle_view_mode(jQuery(this)); var c = jQuery('#fc_mainChooseColBox_btn'); c.hasClass('btn-primary') ? c.click() : false; c.addClass('disabled').css('pointer-events', 'none');;" data-toggle_selector=".fman_grid_element" style="min-width: 40px;"
-							data-title="<?php echo JText::_('FLEXI_FILEMAN_GRID', true); ?>"
+							onclick="fc_toggle_view_mode(jQuery(this)); var c = jQuery('#fc_mainChooseColBox_btn'); c.hasClass('btn-primary') ? c.click() : false; c.addClass('disabled').css('pointer-events', 'none');" data-toggle_selector=".fman_grid_element" style="min-width: 40px;"
+							data-title="<?php echo flexicontent_html::getToolTip('', 'FLEXI_FILEMAN_GRID', 1, 1); ?>" data-placement="bottom"
 							>
 							<i class="icon-grid-view"></i>
 						</button>
 					</div>
 
 					<div class="fc-iblock nowrap_box" style="position: relative; vertical-align: middle;">
-						<div id="fc_mainChooseColBox_btn" class="<?php echo $this->btn_sm_class . ' ' . $out_class . ' ' . $this->tooltip_class; ?> hidden-phone" onclick="fc_toggle_box_via_btn('mainChooseColBox', this, 'btn-primary');" data-title="<?php echo flexicontent_html::getToolTip('', 'FLEXI_ABOUT_AUTO_HIDDEN_COLUMNS', 1, 1); ?>">
+						<div id="fc_mainChooseColBox_btn" class="<?php echo $this->btn_sm_class . ' ' . $out_class . ' ' . $this->tooltip_class; ?> hidden-phone" onclick="fc_toggle_box_via_btn('mainChooseColBox', this, 'btn-primary');" data-title="<?php echo flexicontent_html::getToolTip('', 'FLEXI_ABOUT_AUTO_HIDDEN_COLUMNS', 1, 1); ?>" data-placement="bottom">
 							<span class="icon-contract"></span><sup id="columnchoose_totals"></sup>
 						</div>
 
@@ -732,6 +747,9 @@ if ($js)
 					</div>
 					<?php endif; ?>
 
+				</div>
+
+				<div class= "fc-iblock" style="margin: 8px 6px;">
 					<select id="fc-fileman-list-thumb-size-sel" name="fc-fileman-list-thumb-size-sel" style="display: none;"></select>
 					<div id="fc-fileman-list-thumb-size_nouislider" class="fman_list_element" style="display: none; max-width: 180px;"></div>
 					<div class="fc_slider_input_box">
@@ -743,7 +761,6 @@ if ($js)
 					<div class="fc_slider_input_box">
 						<input id="fc-fileman-grid-thumb-size-val" name="fc-fileman-grid-thumb-size-val" type="text" size="12" value="140" />
 					</div>
-
 				</div>
 
 			</div>
@@ -783,7 +800,7 @@ if ($js)
 				<?php endif; ?>
 
 				<?php if ($this->folder_mode) : ?>
-					<th class="center hideOnDemandClass"><?php echo JText::_( 'FLEXI_SIZE' ); ?></th>
+					<th class="center hideOnDemandClass"><?php echo JText::_('FLEXI_SIZE'); ?></th>
 				<?php else : ?>
 					<th class="center hideOnDemandClass"><?php echo JHtml::_('grid.sort', 'FLEXI_SIZE', 'a.size', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 				<?php endif; ?>
@@ -842,6 +859,8 @@ if ($js)
 
 				foreach ($this->rows as $i => $row)
 				{
+					$row->checked_out = $this->folder_mode ? 0 : $row->checked_out;
+
 					// Permissions
 					$row->canCheckin   = empty($row->checked_out) || $row->checked_out == $user->id || $canCheckinRecords;
 					$row->canEdit      = $canManage;
@@ -1165,6 +1184,8 @@ if ($js)
 
 				foreach ($this->rows as $i => $row)
 				{
+					$row->checked_out = $this->folder_mode ? 0 : $row->checked_out;
+
 					// Permissions
 					$row->canCheckin   = empty($row->checked_out) || $row->checked_out == $user->id || $canCheckinRecords;
 					$row->canEdit      = $canManage;
@@ -1254,17 +1275,20 @@ if ($js)
 			<input type="hidden" name="filename" value="" />
 		</form>
 
+		</fieldset>
+
 	</div>
 
 
 	<!-- File(s) by uploading -->
-	<div class="span6 col-md-6">
+	<div class="span6 col-md-6" id="fc-fileman-addfiles-col">
+
 	<?php /*echo JHtml::_('tabs.panel', JText::_( 'FLEXI_UPLOAD_FILES' ), 'fileupload' );*/ ?>
 	<?php /* echo JHtml::_('tabs.start'); */ ?>
 
-		<div class="fctabber" id="fileman_tabset">
+		<div class="fctabber fc_hidden_1270" id="fc-fileman-addfiles">
 
-			<div class="tabbertab" id="local_tab" data-icon2-class="icon-upload fc-icon-orange" data-icon-class="icon-new fc-icon-green">
+			<div class="tabbertab" id="local_tab" data-icon2-class="icon-upload fc-icon-orange" data-icon-class="fc-icon-green">
 				<h3 class="tabberheading hasTooltip" data-placement="bottom" title="<?php echo JText::_( 'FLEXI_UPLOAD_FILES_DESC' ); ?>"> <?php echo JText::_( 'FLEXI_UPLOAD_FILES' ); ?> </h3>
 
 				<?php if (!$this->CanUpload && ($this->layout != 'image' || !$isFilesElement)) : /* image layout of fileselement view is not subject to upload check */ ?>
@@ -1282,13 +1306,13 @@ if ($js)
 											<label class="fc-prop-lbl" for="username"><?php echo JText::_( 'FLEXI_USERNAME' ); ?></label>
 									</td>
 									<td>
-										<input type="text" id="username" name="username" class="input-xlarge" size="70" value="" />
+										<input type="text" id="username" name="username" class="input-xxlarge" size="70" value="" />
 									</td>
 									<td class="key">
 											<label class="fc-prop-lbl" for="password"><?php echo JText::_( 'FLEXI_PASSWORD' ); ?></label>
 									</td>
 									<td>
-											<input type="password" id="password" name="password" class="input-xlarge" size="70" value="" />
+											<input type="password" id="password" name="password" class="input-xxlarge" size="70" value="" />
 									</td>
 								</tr>
 							</tbody>
@@ -1298,7 +1322,7 @@ if ($js)
 				<?php endif; ?>
 
 				<!-- File Upload Form -->
-				<fieldset class="filemanager-tab" >
+				<fieldset class="fc-fileman-tab" >
 					<?php
 					// Configuration
 					$phpUploadLimit = flexicontent_upload::getPHPuploadLimit();
@@ -1318,19 +1342,19 @@ if ($js)
 					$show_server_limit = $server_limit_exceeded && ! $enable_multi_uploader;  // plupload JS overcomes server limitations so we will not display it, if using plupload
 
 					echo '
-					<span id="fc_DispinfoBox_btn" class="btn" onclick="fc_toggle_box_via_btn(\'upload_info_box\', this, \'btn-primary\');"><i class="icon-info"></i>'. JText::_( 'FLEXI_FILES_INFO_UPLOAD' ).'</span>
+					<span id="fc_dispInfoBox_btn" class="' . $this->btn_sm_class . '" onclick="fc_toggle_box_via_btn(\'upload_info_box\', this, \'btn-primary\');"><i class="icon-info"></i>'. JText::_( 'FLEXI_FILES_INFO_UPLOAD' ).'</span>
 					'.
 					($enable_multi_uploader ? '
-						<button class="' . $btn_class . ' ' . $this->tooltip_class.'" onclick="jQuery(\'#filemanager-1\').toggle(); jQuery(\'#filemanager-2\').toggle(); setTimeout(function(){ '.$uploader_tag_id.'.autoResize(\''.$up_sfx_n.'\'); }, 100);"
-							id="single_multi_uploader" title="'.JText::_( 'FLEXI_TOGGLE_BASIC_UPLOADER_DESC' ).'" style=""
-						>
+						<span class="' . $this->btn_sm_class . ' ' . $this->tooltip_class.'" onclick="jQuery(\'#fc-fileman-formbox-1\').toggle(); jQuery(\'#fc-fileman-formbox-2\').toggle(); setTimeout(function(){ '.$uploader_tag_id.'.autoResize(\''.$up_sfx_n.'\'); }, 100);"
+							id="single_multi_uploader" data-title="' . flexicontent_html::getToolTip('', 'FLEXI_TOGGLE_BASIC_UPLOADER_DESC', 1, 1) . '" style="float: ' . (JFactory::getLanguage()->isRTL() ? 'left;' : 'right;') . '"
+						data-placement="'. (JFactory::getLanguage()->isRTL() ? 'right' : 'left') . '">
 							'.JText::_( 'FLEXI_TOGGLE_BASIC_UPLOADER' ).'
-						</button>
+						</span>
 					' : '') . '
 
 				<div class="fcclear"></div>
 
-				<div id="upload_info_box" style="display:none; margin: 16px 0;">
+				<div id="upload_info_box" style="display:none; margin: 16px 0 0 0;">
 					<!--span class="label" style="font-size: 11px; margin-right:12px;" >'.JText::_( 'FLEXI_UPLOAD_LIMITS' ).'</span-->
 					<div class="fc-fileman-upload-limits-box" style="font-size: 14px !important;">
 					<table class="fc_uploader_header_tbl">
@@ -1392,14 +1416,21 @@ if ($js)
 
 					</table>
 					</div>
+
+					<div class="fc-mssg-inline fc-nobgimage fc-success" style="margin: 8px 0;">
+						<span class="icon-info"></span>
+						' . JText::_('FLEXI_FILES_CLICK_TO_EDIT_PROPERTIES') . '
+					</div>
+
 				</div>
+				<div style="margin: 16px 0 0 0;"></div>
 					';
 					?>
 
 				<div class="fcclear"></div>
 
 				<div id="filePropsForm_box_outer" style="display:none;">
-					<fieldset class="actions flexicontent" id="filePropsForm_box">
+					<fieldset class="fc-formbox flexicontent" id="filePropsForm_box">
 						<form action="<?php echo $action_url . 'saveprops'; ?>&amp;format=raw" name="filePropsForm" id="filePropsForm" method="get" enctype="multipart/form-data">
 
 							<!--span class="fcsep_level0" style="margin: 16px 0 12px 0; "><?php echo JText::_('FLEXI_FILE_PROPERTIES'); ?></span-->
@@ -1505,10 +1536,17 @@ if ($js)
 				</div>
 
 
-					<fieldset class="actions" id="filemanager-1">
+					<fieldset class="fc-formbox" id="fc-fileman-formbox-1">
 						<form action="<?php echo $action_url . 'upload'; ?>" name="uploadFileForm" id="uploadFileForm" method="post" enctype="multipart/form-data">
 
-							<span class="fcsep_level0" style="margin: 16px 0 12px 0; "><?php echo JText::_('FLEXI_BASIC_UPLOADER'); ?></span>
+							<span class="fcsep_level0" style="margin: 0 0 12px 0; background-color: #444; border-radius: 0; font-weight: normal;">
+								<span class="icon-plus" style="font-size: 36px; width: 1em; height: 1em; line-height: 1em; box-sizing: content-box; vertical-align: top;"></span>
+								<span style="display: inline-block;">
+									<span style="font-size: 16px;"><?php echo JText::_('FLEXI_BASIC_UPLOADER'); ?></span>
+									<br>
+									<span style="font-size: 12px;"><?php echo JText::_('FLEXI_TOGGLE_BASIC_UPLOADER_DESC'); ?></span>
+								</span>
+							</span>
 							<table class="fc-form-tbl fcinner" id="file-upload-form-container">
 
 								<tr>
@@ -1532,7 +1570,7 @@ if ($js)
 										</label>
 									</td>
 									<td id="file-title-container">
-										<input type="text" id="file-title" size="44" class="required input-xlarge" name="file-title" />
+										<input type="text" id="file-title" size="44" class="required input-xxlarge" name="file-title" />
 									</td>
 								</tr>
 
@@ -1543,7 +1581,7 @@ if ($js)
 										</label>
 									</td>
 									<td id="file-desc-container" style="vertical-align: top;">
-										<textarea name="file-desc" cols="24" rows="3" id="file-desc_uploadFileForm" class="input-xlarge"></textarea>
+										<textarea name="file-desc" cols="24" rows="3" id="file-desc_uploadFileForm" class="input-xxlarge"></textarea>
 									</td>
 								</tr>
 
@@ -1605,11 +1643,7 @@ if ($js)
 
 					</fieldset>
 
-					<fieldset class="actions" id="filemanager-2" style="display:none;">
-						<div class="fc-mssg-inline fc-nobgimage fc-success" style="margin: 8px 0;">
-							<span class="icon-info"></span>
-							<?php echo JText::_('FLEXI_FILES_CLICK_TO_EDIT_PROPERTIES'); ?>
-						</div>
+					<fieldset class="fc-formbox" id="fc-fileman-formbox-2" style="display:none;">
 						<?php echo $uploader_html->container; ?>
 					</fieldset>
 
@@ -1627,12 +1661,12 @@ if ($js)
 			<?php
 				$tab_title = $use_jmedia_man ? 'FLEXI_ADD_LINK' : 'FLEXI_ADD_URL';
 			?>
-			<div class="tabbertab" id="fileurl_tab" data-icon2-class="icon-link fc-icon-gray" data-icon-class="icon-new fc-icon-green">
+			<div class="tabbertab" id="fileurl_tab" data-icon2-class="icon-link fc-icon-gray" data-icon-class="fc-icon-green">
 				<h3 class="tabberheading hasTooltip" data-placement="bottom" title="<?php echo JText::_($tab_title . '_DESC'); ?>"> <?php echo JText::_($tab_title); ?> </h3>
 
 				<form action="<?php echo $action_url . 'addurl'; ?>" class="form-validate form-horizontal" name="addUrlForm" id="addUrlForm" method="post">
-					<fieldset class="filemanager-tab" >
-						<fieldset class="actions" id="filemanager-3">
+					<fieldset class="fc-fileman-tab" >
+						<fieldset class="fc-formbox" id="fc-fileman-formbox-3">
 
 							<table class="fc-form-tbl fcinner" id="file-url-form-container">
 
@@ -1662,7 +1696,7 @@ if ($js)
 										</label>
 									</td>
 									<td id="file-url-data-container">
-										<input type="text" id="file-url-data" size="44" class="required input-xlarge" name="file-url-data" style="padding-top: 3px; padding-bottom: 3px;" />
+										<input type="text" id="file-url-data" size="44" class="required input-xxlarge" name="file-url-data" style="padding-top: 3px; padding-bottom: 3px;" />
 									</td>
 								</tr>
 
@@ -1707,7 +1741,7 @@ if ($js)
 										</label>
 									</td>
 									<td id="file-url-title-container">
-										<input type="text" id="file-url-title" size="44" class="required input-xlarge" name="file-url-title" />
+										<input type="text" id="file-url-title" size="44" class="required input-xxlarge" name="file-url-title" />
 									</td>
 								</tr>
 
@@ -1718,7 +1752,7 @@ if ($js)
 										</label>
 									</td>
 									<td id="file-url-desc-container">
-										<textarea name="file-url-desc" cols="24" rows="3" id="file-url-desc" class="input-xlarge"></textarea>
+										<textarea name="file-url-desc" cols="24" rows="3" id="file-url-desc" class="input-xxlarge"></textarea>
 									</td>
 								</tr>
 
@@ -1751,7 +1785,7 @@ if ($js)
 										</label>
 									</td>
 									<td id="file-url-ext-container">
-										<input type="text" id="file-url-ext" size="5" class="required input-xlarge" name="file-url-ext" />
+										<input type="text" id="file-url-ext" size="5" class="required input-xxlarge" name="file-url-ext" />
 									</td>
 								</tr>
 
@@ -1762,7 +1796,7 @@ if ($js)
 										</label>
 									</td>
 									<td id="file-url-size-container">
-										<input type="text" id="file-url-size" size="44" class="input-xlarge" name="file-url-size" />
+										<input type="text" id="file-url-size" size="44" class="input-xxlarge" name="file-url-size" />
 										<select id="size_unit" name="size_unit" class="use_select2_lib">
 											<option value="KBs" selected="selected">KBs</option>
 											<option value="MBs">MBs</option>
@@ -1792,12 +1826,12 @@ if ($js)
 		<?php if (!$isFilesElement) : ?>
 
 			<?php /*echo JHtml::_('tabs.panel', JText::_( 'FLEXI_ADD_FILE_FROM_SERVER' ), 'filefromserver' );*/ ?>
-			<div class="tabbertab" id="server_tab" data-icon2-class="icon-stack fc-icon-gray" data-icon-class="icon-new fc-icon-green">
+			<div class="tabbertab" id="server_tab" data-icon2-class="icon-stack fc-icon-gray" data-icon-class="fc-icon-green">
 				<h3 class="tabberheading hasTooltip" data-placement="bottom" title="<?php echo JText::_( 'FLEXI_BATCH_ADD_FILES_DESC' ); ?>"> <?php echo JText::_( 'FLEXI_BATCH_ADD_FILES' ); ?> </h3>
 
 				<form action="index.php?option=com_flexicontent&amp;<?php echo $ctrl_task; ?>addlocal&amp;<?php echo JSession::getFormToken() . '=1'; ?>" class="form-validate form-horizontal" name="addFileForm" id="addFileForm" method="post">
-					<fieldset class="filemanager-tab" >
-						<fieldset class="actions" id="filemanager-4">
+					<fieldset class="fc-fileman-tab" >
+						<fieldset class="fc-formbox" id="fc-fileman-formbox-4">
 
 							<table class="fc-form-tbl fcinner" id="add-files-form-container">
 
@@ -1808,7 +1842,7 @@ if ($js)
 										</label>
 									</td>
 									<td>
-										<input type="text" id="file-dir-path" size="50" value="/tmp" class="required input-xlarge" name="file-dir-path" />
+										<input type="text" id="file-dir-path" size="50" value="/tmp" class="required input-xxlarge" name="file-dir-path" />
 									</td>
 								</tr>
 
@@ -1833,7 +1867,7 @@ if ($js)
 										</label>
 									</td>
 									<td>
-										<input type="text" id="file-filter-ext" size="50" value="" class="input-xlarge" name="file-filter-ext" />
+										<input type="text" id="file-filter-ext" size="50" value="" class="input-xxlarge" name="file-filter-ext" />
 									</td>
 								</tr>
 
@@ -1844,7 +1878,7 @@ if ($js)
 										</label>
 									</td>
 									<td>
-										<textarea name="file-desc" cols="24" rows="6" id="file-desc_addFileForm" class="input-xlarge"></textarea>
+										<textarea name="file-desc" cols="24" rows="6" id="file-desc_addFileForm" class="input-xxlarge"></textarea>
 									</td>
 								</tr>
 
@@ -1855,7 +1889,7 @@ if ($js)
 										</label>
 									</td>
 									<td>
-										<input type="text" id="file-filter-re" size="50" value="" class="input-xlarge" name="file-filter-re" />
+										<input type="text" id="file-filter-re" size="50" value="" class="input-xxlarge" name="file-filter-re" />
 									</td>
 								</tr>
 

@@ -37,7 +37,7 @@ fc_plupload = function(options)
 		var window_w = $( window ).width();
 
 		// Also set filelist height
-		var max_filelist_h = 568;
+		var max_filelist_h = 800;
 		var plupload_filelist_h = max_filelist_h > (window_h - this.options.height_spare) ? (window_h - this.options.height_spare) : max_filelist_h;
 		uploader_container.find('.plupload_filelist:not(.plupload_filelist_header):not(.plupload_filelist_footer)').css({ 'height': plupload_filelist_h+'px' });
 	}
@@ -177,7 +177,9 @@ fc_plupload = function(options)
 					if (up.getOption('refresh_on_complete'))
 					{
 						window.document.body.innerHTML = '<span class="fc_loading_msg">Reloading ... please wait</span>';
-						window.location.reload(false);  //window.location.replace(window.location.href);
+						//window.location.replace(window.location.href);
+						//window.location.reload(false);
+						window.location.href = window.location.href;
 					}
 					var _this = $(up).data('fc_plupload_instance');
 					$.each(files, function(i, file) {
@@ -303,6 +305,9 @@ fc_plupload = function(options)
 
 		var uploader_header = uploader_container.find('.plupload_header_content');
 
+		// Remove useless title 'Using runtime ...'
+		uploader_container.find('.plupload_container').removeAttr('title');
+
 		/*if (uploader_header.find('.fc-uploader-loading').length==0)
 		{
 			uploader_header.prepend('\
@@ -327,14 +332,14 @@ fc_plupload = function(options)
 		{
 			uploader_header
 			.prepend('\
-				<span class="btn fc_plupload_toggleThumbs_btn" style="float:right; margin: 12px 8px;" onclick="jQuery(this).closest(\'.plupload_container\').toggleClass(\'fc_uploader_hide_preview\');">\
-					<span class="icon-image"></span> <span class="fc_hidden_960">' + Joomla.JText._('FLEXI_THUMBNAILS') + '</span>\
+				<span class="btn fc_plupload_toggleThumbs_btn hasTooltip" title="' + Joomla.JText._('FLEXI_THUMBNAILS') + '" style="float:right; margin: 12px 8px;" onclick="jQuery(this).closest(\'.plupload_container\').toggleClass(\'fc_uploader_hide_preview\');">\
+					<span class="icon-image"></span>\
 				</span>\
 			')
 			.prepend('\
 			<div class="btn-group" style="margin: 12px; float: right;">\
-				<button type="button" class="btn list-view hasTooltip active" id="btn-upload-list-view" onclick="fc_toggle_view_mode(jQuery(this)); jQuery(this).next().removeClass(\'active\'); jQuery(this).addClass(\'active\'); jQuery(this).closest(\'.plupload_scroll\').parent().removeClass(\'fc_uploader_thumbs_view\');" data-toggle_selector=".fc_uploader_list_element" style="width: 60px;" title="Details"><i class="icon-list-view"></i></button>\
-				<button type="button" class="btn grid-view hasTooltip" id="btn-upload-grid-view" onclick="fc_toggle_view_mode(jQuery(this)); jQuery(this).prev().removeClass(\'active\'); jQuery(this).addClass(\'active\'); jQuery(this).closest(\'.plupload_scroll\').parent().addClass(\'fc_uploader_thumbs_view\');" data-toggle_selector=".fc_uploader_grid_element" style="width: 60px;" title="Grid"><i class="icon-grid-view"></i></button>\
+				<button type="button" class="btn list-view hasTooltip active" id="btn-upload-list-view" onclick="fc_toggle_view_mode(jQuery(this)); jQuery(this).next().removeClass(\'active\'); jQuery(this).addClass(\'active\'); jQuery(this).closest(\'.plupload_scroll\').parent().removeClass(\'fc_uploader_thumbs_view\');" data-toggle_selector=".fc_uploader_list_element" style="width: 24px;" title="Details"><i class="icon-list-view"></i></button>\
+				<button type="button" class="btn grid-view hasTooltip" id="btn-upload-grid-view" onclick="fc_toggle_view_mode(jQuery(this)); jQuery(this).prev().removeClass(\'active\'); jQuery(this).addClass(\'active\'); jQuery(this).closest(\'.plupload_scroll\').parent().addClass(\'fc_uploader_thumbs_view\');" data-toggle_selector=".fc_uploader_grid_element" style="width: 24px;" title="Grid"><i class="icon-grid-view"></i></button>\
 			</div>\
 			');
 		}
@@ -472,7 +477,7 @@ fc_plupload = function(options)
 				form.find('[name="file-props-name"]').val( part_name );
 
 				// Now show the form
-				fc_file_props_handle = fc_showAsDialog(form_box, 800, 600, null, { title: Joomla.JText._('FLEXI_FILE_PROPERTIES') });
+				fc_file_props_handle = fc_showAsDialog(form_box.get(0), 600, 600, null, { title: Joomla.JText._('FLEXI_FILE_PROPERTIES'), paddingW: 10, paddingH: 10,  });
 			});
 		}
 
@@ -620,7 +625,7 @@ fc_plupload = function(options)
 
 		// Set data
 		var props_msg_box = file_row.find('.fileprops_message');
-		props_msg_box.html('<div class="fc_loading_msg">' + Joomla.JText._('FLEXI_APPLYING_DOT') + '</div>');
+		props_msg_box.html('<div class="fc_loading_msg fc_loading_box">' + Joomla.JText._('FLEXI_APPLYING_DOT') + '</div>');
 		props_msg_box.css({display: '', opacity: ''});   // show message
 		props_msg_box.parent().find('.plupload_img_preview').css('display', 'none');  // Hide preview image
 
