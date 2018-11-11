@@ -310,7 +310,7 @@ else // XTD Image plugin
 	<div style="height: 20%;">
 		<form class="form-vertical" style="display:block; position: relative;" action="<?php echo JUri::base(); ?>index.php?option=com_media&amp;task=file.upload&amp;tmpl=component&amp;<?php echo $this->session->getName() . '=' . $this->session->getId(); ?>&amp;<?php echo JSession::getFormToken(); ?>=1&amp;asset=<?php echo $asset; ?>&amp;author=<?php echo $author; ?>&amp;view=images" id="uploadForm" class="form-horizontal" name="uploadForm" method="post" enctype="multipart/form-data">
 			<div id="uploadform" class="well">
-				<fieldset id="upload-noflash" class="actions">
+				<fieldset id="upload-noflash" class="fc-formbox">
 					<div class="row" style="margin: 0;">
 						<div class="span6 control-group">
 							<!--div class="control-label">

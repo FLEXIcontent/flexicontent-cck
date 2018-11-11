@@ -1,34 +1,59 @@
 
-
 /****************************
  * Filemanager / Fileselement
  ****************************/
 
-/* Filemanager upload TABs */
-#fileman_tabset {
-	margin-bottom: 32px;
-}
-#fileman_tabset div.tabbertab {
-	padding: 8px 16px 16px 16px;
+/**
+ * Various
+ */
+
+body {
+	.fc-fileman-tab {
+		margin: 0px;
+		padding: 4px 0 0 0;
+		border: 0;
+	}
+
+	fieldset.fc-formbox {
+		margin: 0px;
+		padding: 0px;
+
+		.btn-group {
+			:active, .active {
+				box-shadow: inset 0px 0px 5px #c1c1c1;
+				outline: none;
+			}
+		}
+	}
 }
 
-/* File upload limits in uploads forms (filemanager, etc) */
-#fileman_tabset .fc-about-box {
-	padding: 0 8px;
-	margin: 2px 0;
-	text-align: left;
-	float: left;
-	width: 100%;
-	box-sizing: border-box;
-	display: block;
-	font-size: 14px;
-}
-.fc-sys-upload-limit-box img,
-.fc-php-upload-limit-box img {
-	vertical-align: top;
-	float: none;
-	border: none;
-	margin: 0;
+/* Filemanager add file(s) TABs */
+#fc-fileman-addfiles {
+	margin-bottom: 32px;
+	
+	div.tabbertab {
+		padding: 8px 16px 12px 16px;
+	}
+
+	/* File upload limits in uploads forms (filemanager, etc) */
+	.fc-about-box {
+		padding: 0 8px;
+		margin: 2px 0;
+		text-align: left;
+		float: left;
+		width: 100%;
+		box-sizing: border-box;
+		display: block;
+		font-size: 14px;
+	}
+
+	.fc-sys-upload-limit-box img,
+	.fc-php-upload-limit-box img {
+		vertical-align: top;
+		float: none;
+		border: none;
+		margin: 0;
+	}
 }
 
 *:not(:hover) > .fc-fileman-upload-icon:before,
@@ -42,18 +67,18 @@
 	color: lightgray !important;
 }
 
-#flexicontent {
+body {
 
 	div div.fc_uploader_size_slider,
 	div .plupload_header_content > div.fc_uploader_size_slider {
-		width: 220px;
+		width: 180px;
 		margin: 0;
 		display: inline-block;
 		float: right;
 	}
 
 	div .plupload_header_content > div.fc_uploader_size_slider {
-		margin: 16px 16px 0 0;
+		margin: 16px 16px 0 22px;
 	}
 
 	div select.fc_uploader_size_select,
@@ -263,7 +288,7 @@
 	background-image: repeating-linear-gradient(135deg,#707070,#707070 6px,#676767 6px,#676767 12px);
 	opacity: 0.8;
 	filter: alpha(opacity=80);
-	z-index: 2000;
+	z-index: 1002;
 }
 
 
@@ -289,12 +314,12 @@
 
 
 /* Filemanager's plupload (multi-upload script) CSS, special cases */
-#flexicontent .fc_file_uploader.fc_uploader_thumbs_view.fc_auto_uploader {
+body .fc_file_uploader.fc_uploader_thumbs_view.fc_auto_uploader {
 	.plupload_start {
 		display: none !important;
 	}
 }
-#flexicontent .fc_file_uploader.fc_uploader_thumbs_view.fc_compact_uploader {
+body .fc_file_uploader.fc_uploader_thumbs_view.fc_compact_uploader {
 	display: inline-block;
 
 	.plupload_scroll > .plupload_container {
@@ -321,13 +346,13 @@
 		}
 	}
 }
-#flexicontent .fc_file_uploader .plupload_scroll > .plupload_container ul.plupload_filelist.ui-sortable {
+body .fc_file_uploader .plupload_scroll > .plupload_container ul.plupload_filelist.ui-sortable {
 	> li {
 		cursor: move;
 	}
 }
-#flexicontent .fc_file_uploader.fc_uploader_thumbs_view .plupload_scroll > .plupload_container ul.plupload_filelist,
-#flexicontent .fc_file_uploader .plupload_scroll > .plupload_container ul.plupload_filelist {
+body .fc_file_uploader.fc_uploader_thumbs_view .plupload_scroll > .plupload_container ul.plupload_filelist,
+body .fc_file_uploader .plupload_scroll > .plupload_container ul.plupload_filelist {
 	> li.plupload_droptext {
 		cursor: initial;
 		font-size: 28px;
@@ -348,12 +373,14 @@
 }
 
 /* Filemanager's plupload (multi-upload script) INLINE Uploader CSS*/
-#flexicontent .fc_file_uploader.fc_inline_uploader {
+body .fc_file_uploader.fc_inline_uploader {
 	margin: 0;
 
 	.plupload_scroll > .plupload_container {
 		min-width: unset !important;
 		width: unset;
+		margin-left: 0;
+		margin-right: 0;
 
 		ul.plupload_filelist {
 			height: auto;
@@ -415,7 +442,7 @@
 }
 
 
-#flexicontent {
+body {
 	.fc_file_uploader.fc_uploader_thumbs_view.thumb_90 ul.plupload_filelist > li { width: 92px; height: 150px; }
 	.fc_file_uploader.fc_uploader_thumbs_view.thumb_120 ul.plupload_filelist > li { width: 122px; height: 180px; }
 	.fc_file_uploader.fc_uploader_thumbs_view.thumb_150 ul.plupload_filelist > li { width: 152px; height: 210px; }
@@ -500,7 +527,7 @@
 }
 
 
-#flexicontent .fc_file_uploader.fc_uploader_thumbs_view .plupload_scroll > .plupload_container {
+body .fc_file_uploader.fc_uploader_thumbs_view .plupload_scroll > .plupload_container {
 	.plupload_filelist_header {
 		display: none;
 	}
@@ -591,7 +618,7 @@
 }
 
 
-#flexicontent .fc_file_uploader:not(.fc_uploader_thumbs_view) .plupload_container:not(.fc_uploader_hide_preview) ul.plupload_filelist {
+body .fc_file_uploader:not(.fc_uploader_thumbs_view) .plupload_container:not(.fc_uploader_hide_preview) ul.plupload_filelist {
 	> li.plupload_uploading {
 		height: unset;
 		max-height: 64px;
@@ -600,7 +627,7 @@
 		height: 64px;
 	}
 }
-#flexicontent .fc_file_uploader {
+body .fc_file_uploader {
 	width: auto;
 	overflow: visible;
 	padding: 0;
@@ -637,6 +664,18 @@
 		span.plupload_img_preview {
 			display: none !important;
 		}
+		.fc_plupload_toggleThumbs_btn {
+			color: black;
+		}
+	}
+	.plupload_container:not(.fc_uploader_hide_preview) {
+		.fc_plupload_toggleThumbs_btn {
+			background: darkgreen;
+			color: white;
+			box-shadow: inset 0px 0px 5px #c1c1c1;
+			outline: none;
+			border: 1px solid white;
+		}
 	}
 	.plupload_container ul.plupload_filelist > li {
 		position: relative;
@@ -644,7 +683,10 @@
 
 	.plupload_container {
 		padding: 0;
-		min-width: 500px;
+		min-width: 530px;
+		width: unset;
+		margin-left: -12px;
+		margin-right: -12px;
 
 		input {
 			height: 2.4em;
@@ -673,13 +715,23 @@
 			}
 			.plupload_file_name {
 				display: inline-block;
-				width: 200px;
+				width: 35%;
+				max-width: 240px;
+				white-space: normal;
+				overflow-wrap: break-word;
+				word-wrap: break-word;
+				word-break: break-all;
+				max-height: 3em;
+				overflow: hidden;
 
 				> span:first-of-type {
 					display: inline-block;
 					width: auto;
-					white-space: nowrap;
-					word-wrap: normal;
+					white-space: normal;
+					overflow-wrap: break-word;
+					word-wrap: break-word;
+					word-break: break-all;
+					max-height: 3em;
 					overflow: hidden;
 				}
 			}
@@ -873,15 +925,42 @@ table.fc_uploader_header_tbl {
 }
 
 
-@media (max-width: 1200px) {
-	#flexicontent .fc_file_uploader {
-		.plupload_header_content {
-			padding: 0 0 0 16px;
-			background: none;
+#fc-fileman-fileslist-col {
+	overflow: hidden;
+}
+
+@media (max-width: 1360px) {
+	body .fc_file_uploader {
+		.plupload_container {
+			min-width: 490px;
 		}
-		.plupload_header_text {
-			display: none;
+		.plupload_scroll
+		{
+			ul.plupload_filelist {
+				.plupload_file_name {
+					width: 130px;
+					> span:first-of-type {
+						width: 130px;
+					}
+				}
+			}
 		}
+	}
+}
+
+@media (min-width: 1271px) {
+	body .fc_shown_1271 {
+		display: none;
+	}
+}
+
+@media (max-width: 1270px) {
+	#fc-fileman-fileslist-col {
+		overflow: unset;
+	}
+
+	.fc_hidden_1270 {
+		display: none;
 	}
 }
 @media (max-width: 960px) {
@@ -892,26 +971,32 @@ table.fc_uploader_header_tbl {
 		max-width: 200px;
 	}
 
-	#flexicontent .fc_file_uploader {
+	body .fc_file_uploader {
 		#btn-upload-list-view,
 		#btn-upload-grid-view {
 			width: auto !important;
 		}
-		.plupload_header_title {
-			display: none;
+	}
+}
+
+@media (max-width: 720px) {
+	.fc_hidden_720 {
+		display: none;
+	}
+
+
+	body .fc_file_uploader {
+		.plupload_file_size, .plupload_file_status, .plupload_progress {
+			width: 60px;
+			font-size: 90%;
 		}
 		.plupload_header_content {
-			padding: 0;
+			padding: 0 0 0 16px;
+			background: none;
 		}
 	}
 }
-@media (max-width: 720px) {
-	#flexicontent .fc_file_uploader {
-		.plupload_file_size, .plupload_file_status, .plupload_progress {
-			width: 72px;
-		}
-	}
-}
+
 @media (max-width: 640px) {
 	.fc_hidden_640 {
 		display: none;
@@ -920,7 +1005,11 @@ table.fc_uploader_header_tbl {
 		max-width: 180px;
 	}
 
-	#flexicontent .fc_file_uploader {
+	body #fc-fileman-addfiles ul.tabbernav > li {
+		margin: 4px 0px -1px 4px;
+	}
+
+	body .fc_file_uploader {
 		.plupload_container {
 			min-width: 416px;
 		}
@@ -948,8 +1037,26 @@ table.fc_uploader_header_tbl {
 		max-width: 140px;
 		word-wrap: break-word;
 	}
-	
-	#flexicontent .fc_file_uploader:not(.fc_uploader_thumbs_view) {
+	body .fc_file_uploader {
+		.plupload_container {
+		}
+		.plupload_header_text {
+			display: none;
+		}
+	}
+
+	body fieldset.fc-formbox {
+		margin-left: -12px;
+		margin-right: -12px;
+	}
+}
+@media (max-width: 460px) {
+	.fc_set_file_assignment {
+		max-width: 100px;
+		word-wrap: break-word;
+	}
+
+	body .fc_file_uploader:not(.fc_uploader_thumbs_view) {
 		.plupload_scroll
 		{
 			ul.plupload_filelist {
@@ -960,29 +1067,36 @@ table.fc_uploader_header_tbl {
 			}
 		}
 	}
-}
-@media (max-width: 460px) {
-	.fc_set_file_assignment {
-		max-width: 100px;
-		word-wrap: break-word;
-	}
-}	
-@media (max-width: 460px) {
-	#flexicontent .fc_file_uploader {
+
+	body .fc_file_uploader {
 		.plupload_container {
-			margin-left: -32px;
-		}
-	}
-}
-@media (min-width: 460px) AND (max-width: 480px) {
-	#flexicontent .fc_file_uploader {
-		.plupload_container {
+			min-width: 370px;
 			margin-left: -16px;
+			margin-right: -16px;
+		}
+		.plupload_scroll
+		{
+			ul.plupload_filelist {
+				.plupload_file_name {
+					width: 92px;
+					> span:first-of-type {
+						width: 92px;
+					}
+				}
+			}
+		}
+		div .plupload_header_content > div.fc_uploader_size_slider {
+			width: 120px;
+		}
+		.plupload_header_title {
+			display: none;
 		}
 	}
+
 }
-@media (max-width: 900px) {
-	#flexicontent .fc_file_uploader:not(.fc_uploader_thumbs_view) {
+
+@media (max-width: 640px) {
+	body .fc_file_uploader:not(.fc_uploader_thumbs_view) {
 		.plupload_container ul.plupload_filelist > li.plupload_uploading {
 			height: unset;
 			max-height: 32px;
@@ -1005,32 +1119,5 @@ table.fc_uploader_header_tbl {
 			min-height: 28px;
 		}
 	}
-}
-
-
-/* Filemanager various */
-.filemanager img {
-	vertical-align: middle;
-}
-.filemanager-tab {
-	margin: 0px;
-	padding: 4px 0 0 0;
-	border: 0;
-}
-#filemanager-zone fieldset.actions {
-	margin: 0px;
-	padding: 0px;
-}
-#filemanager-zone textarea#file-desc,
-#filemanager-zone textarea#file-url-desc {
-	width: 100%;
-	max-width: 600px;
-}
-#file-upload {
-	font-size: 11px;
-	width: 246px;
-	height: 24px;
-	border-radius: 6px;
-	min-width: 40%;
 }
 

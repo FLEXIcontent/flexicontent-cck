@@ -1363,8 +1363,11 @@ div.fc-inherited-value {
 	right: 30px;
 	overflow: auto;
 }
-.ui-dialog.fc-fixed-dialog {
-	z-index: 2050;
+body .ui-dialog.fc-fixed-dialog {
+	z-index: 10051 !important;
+}
+body  .ui-dialog.fc-fixed-dialog + .ui-widget-overlay {
+	z-index: 10050 !important;
 }
 .ui-dialog.fc-fixed-dialog.fc-no-scroll {
 	overflow: hidden;
@@ -1377,6 +1380,14 @@ body > #system-message-container {
 }
 body > #system-message-container .alert {
 	margin: 0;
+}
+body .fc_loading_box {
+	border: gray;
+	box-shadow: inset 0px 0px 5px #777;
+	border-radius: 4px;
+	padding-right: 12px;
+	padding-top: 8px;
+	padding-bottom: 8px;
 }
 .com_flexicontent .ui-autocomplete-loading {
 	background: #eee url('../images/ajax-loader.gif') no-repeat 4% center;

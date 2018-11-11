@@ -230,12 +230,12 @@ abstract class JHtmlFcbase
 			: $row->{static::$title_propname};
 
 		// Limit title length
-		$title_cut = StringHelper::strlen($title) > 100
+		$row->title_cut = StringHelper::strlen($title) > 100
 			? htmlspecialchars(StringHelper::substr($title, 100), ENT_QUOTES, 'UTF-8') . '...'
 			: htmlspecialchars($title, ENT_QUOTES, 'UTF-8');
 
 		// Escape & translate
-		$title_escaped = htmlspecialchars($title_cut, ENT_QUOTES, 'UTF-8');
+		$title_escaped = htmlspecialchars($row->title_cut, ENT_QUOTES, 'UTF-8');
 		$title_untranslated = $title !== $row->{static::$title_propname} ? '<br/><small>[ ' . $title_escaped . ' ]</small>' : '';
 
 		// Display title with no edit link ... if row is not-editable for any reason (no ACL or checked-out by other user)
