@@ -2364,7 +2364,7 @@ class FlexicontentFields
 			// ALL non-search fields (either OFF or unpublished)
 			case 'non-search':
 				$where = $indexer === 'basic' ? ' f.issearch IN (-1,0)' : ' ( f.isadvsearch IN (-1,0) AND f.isadvfilter IN (-1,0) )';
-				$where = '('.$where.' OR f.published = 0)';
+				$where = '('.$where.' OR f.published <> 0)';
 				break;
 
 			default:

@@ -585,16 +585,16 @@ class FlexicontentControllerSearch extends FlexicontentControllerBaseAdmin
 			$db->setQuery($query);
 			$db->execute();
 
-			// Force SEARCH properties of unpublished fields to be: normal OFF
+			// Force SEARCH properties of non-published fields to be: normal OFF
 			if ($indexer === 'basic')
 			{
-				$query = 'UPDATE #__flexicontent_fields SET issearch = 0 WHERE published=0';
+				$query = 'UPDATE #__flexicontent_fields SET issearch = 0 WHERE published <> 1';
 				$db->setQuery($query);
 				$db->execute();
 			}
 			else
 			{
-				$query = 'UPDATE #__flexicontent_fields SET isadvsearch = 0, isadvfilter = 0  WHERE published=0';
+				$query = 'UPDATE #__flexicontent_fields SET isadvsearch = 0, isadvfilter = 0  WHERE published <> 1';
 				$db->setQuery($query);
 				$db->execute();
 			}
