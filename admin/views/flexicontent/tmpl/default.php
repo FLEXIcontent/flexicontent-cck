@@ -192,12 +192,14 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 			{
 				// Check if user can create in at least one published category
 				require_once("components/com_flexicontent/models/item.php");
+
 				$itemmodel = new FlexicontentModelItem();
 				$CanAddAny = $itemmodel->getItemAccess()->get('access-create');
-				if ($CanAddAny) {
-					//$link = 'index.php?option='.$option.'&amp;view=item';
-					$link = 'index.php?option='.$option.'&amp;view=types&amp;format=raw';
-					FlexicontentViewFlexicontent::quickiconButton( $link, '', 'icon-apply', JText::_( 'FLEXI_NEW_ITEM' ), 1, 1, 600, 450 );
+
+				if ($CanAddAny)
+				{
+					$link = 'index.php?option='.$option.'&amp;view=types&amp;tmpl=component&amp;layout=typeslist&amp;action=new';
+					FlexicontentViewFlexicontent::quickiconButton($link, '', 'icon-apply', JText::_('FLEXI_NEW_ITEM' ), 1, 1, 1200, 0);
 				}
 			}
 			/*if ($this->perms->CanArchives && !isset($sbtns['archives']))
