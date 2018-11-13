@@ -33,6 +33,7 @@ $itemmodel_name = 'FlexicontentModelItem';
 $itemmodel = new $itemmodel_name();
 
 //module config
+$mapapi = $params->get('mapapi', 'googlemap');
 $height = $params->get('height', '300px');
 $width  = $params->get('width', '200px');
 $mapcenter = $params->get('mapcenter', '48.8566667, 2.3509871');
@@ -88,11 +89,18 @@ if ($markermode==0 && $markerimage && $img_info = getimagesize(JPATH::clean(JPAT
 	$scaledSize = 'scaledSize: new google.maps.Size('. $img_info[0] . ', ' . $img_info[1] . ')';
 }*/
 
-// Add google maps API
-flexicontent_html::loadFramework('google-maps', '', $params);
+// Loadframework
+switch ($mapapi) {
+	case 'googlemap';
+		flexicontent_html::loadFramework('google-maps', '', $params);
+		break;
+	case 'openstreetmap';
+		flexicontent_html::loadFramework('openstreetmap', '', $params);
+		break;
+}
 
 ?>
-
+<?php if ($mapapi == 'googlemap') : ?>
 <div id="mod_fleximap_default<?php echo $module->id;?>" class="mod_fleximap map<?php echo $moduleclass_sfx ?>" style="width:<?php echo $width; ?>;height:<?php echo $height; ?>;">
 	<div id="fc_module_map_<?php echo $module->id;?>" style="width:<?php echo $width; ?>;height:<?php echo $height; ?>;"></div>
 
@@ -202,4 +210,68 @@ flexicontent_html::loadFramework('google-maps', '', $params);
 	fc_MapMod_initialize_<?php echo $module->id;?>();
 
 	</script>
+<?php endif ;?>
+<?php if ($mapapi == 'openstreetmap') : ?>
+		<script type="text/javascript">
+		// init map
+			var lat = 48.852969;
+			var lon = 2.349903;
+			var mymap = null;
+			<?php if ($clustermode) { // add cluster mode
+				echo "var markerClusters;";
+			}?>
+		// init list of items
+		var locations = [ <?php echo implode(",",  $tMapTips); ?>  ];
+		function initMap() {
+			var markers = [];
+			mymap = L.map('mod_fleximap_default<?php echo $module->id;?>').setView([lat, lon], 11);
+			<?php if ($clustermode) {
+				echo "markerClusters = L.markerClusterGroup({ disableClusteringAtZoom: ".$maxzoommarker.",removeOutsideVisibleBounds:true,animate:true, maxClusterRadius :".$gridsize," }); ";// create cluster and add zoom limitation
+			}
+			?>
+			// Title display
+			L.tileLayer('https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png', {
+				// Datas sources
+				attribution: 'données © OpenStreetMap/ODbL - rendu OSM France',
+				minZoom: 1,
+				maxZoom: 20
+			}).addTo(mymap);
+			for (var i = 0; i < locations.length; i++) {
+				<?php if(empty($markerdisplay)): ?>
+						var myIcon = L.icon({
+							iconUrl: <?php echo $markerdisplay; ?>,
+							iconSize: [40, 67],
+							iconAnchor: [25, 67],
+							popupAnchor: [-3, -67],
+						});
+						<?php endif; ?>
+						// TODO Add Mapbox key and title loading for custom display
+						marker = new L.marker([locations[i][1],locations[i][2]] <?php if(empty($markerdisplay)): ?>,{ icon: myIcon }<?php endif; ?>)
+							.bindPopup(locations[i][0])
+						<?php if ($clustermode == 0){
+							echo	'.addTo(mymap);';
+						}
+						?>
+
+						<?php if ($clustermode) {
+						echo "markerClusters.addLayer(marker);";
+					}
+					?>
+						markers.push(marker);
+			}
+			var group = new L.featureGroup(markers);
+			<?php if ($clustermode) {
+				echo "mymap.addLayer(markerClusters);";
+			}
+			?>
+			mymap.fitBounds(group.getBounds().pad(0.5));
+		}
+			window.onload = function(){
+				initMap();
+			};
+		</script>
+
+		<div id="mod_fleximap_default<?php echo $module->id;?>" class="mod_fleximap <?php echo $moduleclass_sfx ?>" style="width:<?php echo $width; ?>;height:<?php echo $height; ?>;">
+		</div>
+	<?php endif ;?>
 </div>
