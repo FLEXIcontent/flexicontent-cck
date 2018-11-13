@@ -229,4 +229,52 @@ class FlexicontentViewBaseRecords extends JViewLegacy
 
 		return $btn_arr;
 	}
+
+
+	/**
+	 * Method to get configuration state of FC managers for current user (from cookie)
+	 *
+	 * @param   string  $name  The name of the model (optional)
+	 *
+	 * @return  object  The configuration object
+	 *
+	 * @since   3.3.0
+	 */
+	public function getUserStatePrefs($fc_man_name = null)
+	{
+		$cookie_name = 'fc_managers_conf';
+		$fc_man_name = $fc_man_name ?: 'fc_' . $this->view;
+
+		JFactory::getDocument()->addScriptDeclaration('
+		var FCMAN_conf = {};
+		FCMAN_conf.fc_man_config_cookie = "' . $cookie_name . '";
+		FCMAN_conf.fc_man_manager_name  = "' . $fc_man_name . '";
+		');
+
+		$jinput = JFactory::getApplication()->input;
+
+		$FcMansConf = $jinput->cookie->get($cookie_name, '{}', 'string');
+
+		// Parse FC managers configuration cookie
+		try
+		{
+			$FcMansConf = json_decode($FcMansConf);
+
+			// Reset cookie if it is not a class, or if the version hash does not matches (reset column chooser on every version upgrade)
+			if (!$FcMansConf || !isset($FcMansConf->vhash) || $FcMansConf->vhash !== FLEXI_VHASH)
+			{
+				$FcMansConf = new stdClass();
+				$FcMansConf->vhash = FLEXI_VHASH;
+				$jinput->cookie->set($cookie_name, json_encode($FcMansConf), time()+60*60*24*30, JUri::base(true), '');
+			}
+		}
+		catch (Exception $e)
+		{
+			$FcMansConf = new stdClass();
+			$FcMansConf->vhash = FLEXI_VHASH;
+			$jinput->cookie->set($cookie_name, json_encode($FcMansConf), time()+60*60*24*30, JUri::base(true), '');
+		}
+
+		return $FcMansConf;
+	}
 }

@@ -925,8 +925,11 @@ table.fc_uploader_header_tbl {
 }
 
 
-#fc-fileman-fileslist-col {
+#fc-fileman-fileslist-col.span6.col-md-6 {
 	overflow: hidden;
+	.fc_item_total_data {
+		display: none;
+	}
 }
 
 @media (max-width: 1360px) {
@@ -949,17 +952,24 @@ table.fc_uploader_header_tbl {
 }
 
 @media (min-width: 1271px) {
-	body .fc_shown_1271 {
+	body .fc_shown_1271,
+	#flexicontent .fc_shown_1271 {
 		display: none;
+	}
+	#fc-fileman-fileslist-col.span6.col-md-6 {
+		#fc-managers-header {
+			width: 40vw;
+		}
 	}
 }
 
 @media (max-width: 1270px) {
-	#fc-fileman-fileslist-col {
+	#fc-fileman-fileslist-col.span6.col-md-6 {
 		overflow: unset;
 	}
 
-	.fc_hidden_1270 {
+	body .fc_hidden_1270,
+	#flexicontent .fc_hidden_1270 {
 		display: none;
 	}
 }
