@@ -66,7 +66,7 @@ class FCPagination extends JPagination
 		
 		$is_featured_only = $app->getUserState('use_limit_before_search_filt') == 2;
 
-		if ($fc_view_total > 0)
+		/*if ($fc_view_total > 0)
 		{
 			// Check for maximum allowed of results
 			$fc_view_limit_max = $view !== 'search'
@@ -82,7 +82,7 @@ class FCPagination extends JPagination
 					' . JText::_($is_featured_only ? 'FLEXI_FEATURED' : 'FLEXI_TOTAL') . '
 				</span>
 
-				<span class="flexi item_total_value">
+				<span class="flexi value item_total_value">
 					' . $fc_view_total . ' ' . JText::_( $items_total_msg ) . '
 				</span>
 
@@ -90,11 +90,27 @@ class FCPagination extends JPagination
 					' . JText::_('FLEXI_DISPLAYING') . '
 				</span>
 
-				<span class="flexi item_total_value">
+				<span class="flexi value item_total_value">
 					' . $fromResult . ' - ' . $toResult . ' ' . JText::_('FLEXI_ITEM_S') . '
 				</span>';
+		}*/
+
+		if ($fc_view_total > 0)
+		{
+			// Check for maximum allowed of results
+			$fc_view_limit_max = $view !== 'search'
+				? 0
+				: (int) $app->getUserState('fc_view_limit_max_'.$view);
+
+			$items_total_msg = 1 // $fc_view_limit_max && ($this->total >= $fc_view_limit_max)
+				? 'FLEXI_ITEM_S_OR_MORE'
+				: '';
+
+			$html = !$items_total_msg
+				? JText::sprintf('JLIB_HTML_RESULTS_OF', $fromResult, $toResult, $fc_view_total)
+				: JText::sprintf('JLIB_HTML_RESULTS_OF', $fromResult, $toResult, $fc_view_total);// . ' (' . JText::_($items_total_msg) . ')';
 		}
-		
+
 		else
 		{
 			$html = "\n" . JText::_('JLIB_HTML_NO_RECORDS_FOUND');

@@ -12,7 +12,7 @@
 defined('_JEXEC') or die('Restricted access');
 
 use Joomla\String\StringHelper;
-JHtml::addIncludePath(JPATH_COMPONENT . '/helpers/html');
+JHtml::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/html');
 
 global $globalcats;
 $app      = JFactory::getApplication();
@@ -25,6 +25,7 @@ $cparams  = JComponentHelper::getParams('com_flexicontent');
 $ctrl     = 'filemanager.';
 $hlpname  = 'fcfilemanager';
 $isAdmin  = $app->isAdmin();
+$useAssocs= false;
 
 $ctrl_task  = 'task=filemanager.';
 $ctrl_task_authors = 'task=users.';
@@ -111,7 +112,25 @@ flexicontent_html::jscode_to_showhide_table(
 	$start_html = '',  //'<span class="badge ' . (FLEXI_J40GE ? 'badge-dark' : 'badge-inverse') . '">' . JText::_('FLEXI_COLUMNS', true) . '<\/span> &nbsp; ',
 	$end_html = '<div id="fc-columns-slide-btn" class="icon-arrow-up-2 btn btn-outline-secondary" title="' . JText::_('FLEXI_HIDE') . '" style="cursor: pointer;" onclick="fc_toggle_box_via_btn(\\\'mainChooseColBox\\\', document.getElementById(\\\'fc_mainChooseColBox_btn\\\'), \\\'btn-primary\\\');"><\/div>'
 );
-$tools_cookies['fc-filters-box-disp'] = 0; //JFactory::getApplication()->input->cookie->get('fc-filters-box-disp', 0, 'int');
+
+//$tools_state['fc-filters-box-disp'] = JFactory::getApplication()->input->cookie->get('fc-filters-box-disp', 0, 'int');
+//$tools_state['fc-filters-box-disp'] = 0; //JFactory::getApplication()->input->cookie->get('fc-filters-box-disp', 0, 'int');
+
+
+// Get all managers conf
+$fc_man_name = 'fc_' . $this->view . ((int) $this->fieldid ? '_' . (int) $this->fieldid : '');
+$FcMansConf = $this->getUserStatePrefs($fc_man_name);
+
+// Get specific manager data
+$tools_state = isset($FcMansConf->$fc_man_name)
+	? $FcMansConf->$fc_man_name
+	: (object) array(
+		'filters_box' => 0,
+		'addfiles_box' => 1,
+	);
+
+$show_addfiles = !empty($tools_state->addfiles_box);
+$show_addfiles ? 1 : 0;
 
 
 
@@ -594,7 +613,7 @@ if ($js)
 	<div class="tabbertab" id="filelist_tab" data-icon-class="icon-list">
 		<h3 class="tabberheading hasTooltip" data-placement="bottom" title="<?php echo JText::_('FLEXI_FILES_REGISTRY_DESC'); ?>"> <?php echo JText::_('FLEXI_FILES_REGISTRY'); ?> </h3>
 	-->
-	<div class="span6 col-md-6" id="fc-fileman-fileslist-col" data-icon-class="icon-list">
+	<div class="<?php echo $show_addfiles ? 'span6 col-md-6' : ''; ?> fullwidth_1270" id="fc-fileman-fileslist-col" data-icon-class="icon-list">
 		<fieldset class="fc-formbox" id="fc-fileman-formbox-0">
 
 		<form action="index.php?option=<?php echo $this->option; ?>&amp;view=<?php echo $this->view; ?>&amp;layout=<?php echo $this->layout; ?>&amp;field=<?php echo $this->fieldid?>" method="post" name="adminForm" id="adminForm">
@@ -622,7 +641,7 @@ if ($js)
 							<?php echo ($this->count_filters  ? ' <sup>' . $this->count_filters . '</sup>' : ''); ?>
 						</div>
 
-						<div id="fc-filters-box" <?php if (!$this->count_filters || !$tools_cookies['fc-filters-box-disp']) echo 'style="display:none;"'; ?> class="fcman-abs" onclick="var event = arguments[0] || window.event; event.stopPropagation();">
+						<div id="fc-filters-box" <?php if (!$this->count_filters || !$tools_state->filters_box) echo 'style="display:none;"'; ?> class="fcman-abs" onclick="var event = arguments[0] || window.event; event.stopPropagation();">
 							<?php
 							/**
 							 * When layout == image then some filters are not applicable
@@ -643,7 +662,6 @@ if ($js)
 							?>
 
 							<div id="fc-filters-slide-btn" class="icon-arrow-up-2 btn btn-outline-secondary" title="<?php echo JText::_('FLEXI_HIDE'); ?>" style="cursor: pointer;" onclick="fc_toggle_box_via_btn('fc-filters-box', document.getElementById('fc_filters_box_btn'), 'btn-primary');"></div>
-							<input type="hidden" id="fc-filters-box-disp" name="fc-filters-box-disp" value="<?php echo $tools_cookies['fc-filters-box-disp']; ?>" />
 						</div>
 
 						<button title="" data-original-title="<?php echo JText::_('FLEXI_RESET_FILTERS'); ?>" class="<?php echo $btn_class . (FLEXI_J40GE ? ' btn-outline-dark ' : ' ') . $this->tooltip_class; ?>" onclick="document.adminForm.limitstart.value=0; delAllFilters(); Joomla.submitform();"><?php echo FLEXI_J30GE ? '<i class="icon-cancel"></i>' : JText::_('FLEXI_CLEAR'); ?></button>
@@ -677,6 +695,7 @@ if ($js)
 
 			<?php endif; ?>
 
+				<div class="fcclear"></div>
 
 				<div class="nowrap_box" style="margin: 6px 0;">
 					<div class="<?php echo $this->btn_sm_class . ' ' . $this->tooltip_class; ?>" style="padding: 0 0 0 4px;"
@@ -696,9 +715,26 @@ if ($js)
 							onclick="var box = document.getElementById(\'fc-fileman-addfiles\'); fc_fm_add_handle = fc_showAsDialog(box, 0, 0, null, { title: \'' . JText::_('FLEXI_ADD_FILE',  true) . '\', visibleOnClose: 1, paddingW: 10, paddingH: 10}); return false;"
 							data-title="' . flexicontent_html::getToolTip('', 'FLEXI_ADD_FILE', 1, 1) . '" data-placement="bottom"
 						>
-							<span class="icon-new"></span>' . JText::_('FLEXI_NEW') . '
+							<span class="icon-upload"></span>
 						</span>
 					'; ?>
+					<?php echo '
+						<span style="' . ($show_addfiles ? 'display: none;' : '') . '" class="fc_hidden_1270 btn-success fc_noeffect ' . $this->btn_sm_class . ' ' . $this->tooltip_class . '"
+							onclick="var tagid = \'fc-fileman-addfiles-col\'; var fileslist_col = jQuery(\'#fc-fileman-fileslist-col\'); var isv = jQuery(\'#\' + tagid).is(\':visible\'); isv ? fileslist_col.removeClass(\'span6 col-md-6\') : fileslist_col.addClass(\'span6 col-md-6\'); fc_config_store(FCMAN_conf, \'addfiles_box\', (isv ? 0 : 1)); fc_toggle_box_via_btn(tagid, this, \'\', jQuery(this).next()); return false;"
+							data-title="' . flexicontent_html::getToolTip('', 'FLEXI_ADD_FILE', 1, 1) . '" data-placement="bottom"
+						>
+							<span class="icon-upload"></span>
+						</span>
+					'; ?>
+					<?php echo '
+						<span style="' . (!$show_addfiles ? 'display: none;' : '') . '" class="fc_hidden_1270 fc_noeffect ' . $this->btn_sm_class . ' ' . $this->tooltip_class . '"
+							onclick="var tagid = \'fc-fileman-addfiles-col\'; var fileslist_col = jQuery(\'#fc-fileman-fileslist-col\'); var isv = jQuery(\'#\' + tagid).is(\':visible\'); isv ? fileslist_col.removeClass(\'span6 col-md-6\') : fileslist_col.addClass(\'span6 col-md-6\'); fc_config_store(FCMAN_conf, \'addfiles_box\', (isv ? 0 : 1)); fc_toggle_box_via_btn(tagid, this, \'\', jQuery(this).prev()); return false;"
+							data-title="' . flexicontent_html::getToolTip('', 'FLEXI_EXPAND', 1, 1) . '" data-placement="bottom"
+						>
+							<span class="icon-expand-2"></span>
+						</span>
+					'; ?>
+
 
 					<?php if ($isFilesElement): ?>
 						<div class="fc-iblock nowrap_box" style="position: relative; vertical-align: middle;">
@@ -711,7 +747,7 @@ if ($js)
 							</span>
 						</div>
 					<?php else: ?>
-						<span class="<?php echo $this->btn_sm_class . ' ' . $this->tooltip_class; ?>" onclick="if (document.adminForm.boxchecked.value == 0) { alert(Joomla.JText._('JLIB_HTML_PLEASE_MAKE_A_SELECTION_FROM_THE_LIST')); } else { if (confirm('Are you sure ?')) { Joomla.submitbutton('filemanager.remove'); } }" data-title="<?php echo flexicontent_html::getToolTip('', 'FLEXI_DELETE', 1, 1); ?>" data-placement="bottom">
+						<span class="<?php echo $this->btn_sm_class . ' ' . $this->tooltip_class; ?>" onclick="if (document.adminForm.boxchecked.value == 0) { alert(Joomla.JText._('FLEXI_NO_ITEMS_SELECTED')); } else { if (confirm(Joomla.JText._('FLEXI_ARE_YOU_SURE'))) { Joomla.submitbutton('filemanager.remove'); } }" data-title="<?php echo flexicontent_html::getToolTip('', 'FLEXI_DELETE', 1, 1); ?>" data-placement="bottom">
 							<span class="icon-remove" style="color: darkred;"></span>
 						</span>
 					<?php endif; ?>
@@ -1281,7 +1317,7 @@ if ($js)
 
 
 	<!-- File(s) by uploading -->
-	<div class="span6 col-md-6" id="fc-fileman-addfiles-col">
+	<div class="span6 col-md-6" id="fc-fileman-addfiles-col" <?php echo !$show_addfiles ? ' style="display: none;" ' : ''; ?> >
 
 	<?php /*echo JHtml::_('tabs.panel', JText::_( 'FLEXI_UPLOAD_FILES' ), 'fileupload' );*/ ?>
 	<?php /* echo JHtml::_('tabs.start'); */ ?>

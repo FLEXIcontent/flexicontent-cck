@@ -427,19 +427,21 @@ class flexicontent_html
 		{
 			$fc_columnchooser = $jinput->cookie->get('fc_columnchooser', '{}', 'string');
 
-			// Parse the favourites
+			// Parse the COLUMNS cookie
 			try
 			{
 				$fc_columnchooser = json_decode($fc_columnchooser);
 
-				// Make sure it is a class
-				if (!$fc_columnchooser || !isset($fc_columnchooser->vhash) || $fc_columnchooser->vhash !== FLEXI_VHASH)
+				// Reset cookie if it is not a class, or if the version hash does not matches (reset column chooser on every version upgrade)
+				if (!is_object($fc_columnchooser) || !isset($fc_columnchooser->vhash) || $fc_columnchooser->vhash !== FLEXI_VHASH)
 				{
 					$fc_columnchooser = new stdClass();
 					$fc_columnchooser->vhash = FLEXI_VHASH;
 					$jinput->cookie->set('fc_columnchooser', json_encode($fc_columnchooser), time()+60*60*24*30, JUri::base(true), '');
 				}
-				else if (isset($fc_columnchooser->$data_tbl_id))
+
+				// Get specific table data
+				elseif (isset($fc_columnchooser->$data_tbl_id))
 				{
 					$columnchoose = preg_split("/[\s]*,[\s]*/", $fc_columnchooser->$data_tbl_id);
 					foreach($columnchoose as $i => $id)

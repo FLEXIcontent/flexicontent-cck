@@ -912,6 +912,30 @@
 	}
 
 
+	// Store a configuration cookie (like current user choices)
+	function fc_config_store(conf, prop_name, prop_value)
+	{
+		var cookieName  = conf.fc_man_config_cookie;
+		var managerName = conf.fc_man_manager_name;
+		var cookieValue = fclib_getCookie(cookieName);
+
+		//window.console.log('Using cookieName: ' + cookieName + ', managerName: ' + managerName);
+		//window.console.log(cookieName + ', Old value: ' +cookieValue);
+
+		cookieValue = jQuery.parseJSON(cookieValue ? cookieValue : '{}');
+
+		if (typeof cookieValue[managerName] == 'undefined')
+		{
+			cookieValue[managerName] = {};
+		}
+		cookieValue[managerName][prop_name] = prop_value;
+		window.console.log(cookieName + ', New value: ' + JSON.stringify(cookieValue));
+
+		var nDays = 30;
+		fclib_setCookie(cookieName, JSON.stringify(cookieValue), nDays);
+	}
+
+
 	//******************************************
 	//*** Column hide/show related functions ***
 	//******************************************
@@ -1316,34 +1340,38 @@
 
 
 	/* Toggle box via a button and set CSS class to indicate that it is open  */
-	function fc_toggle_box_via_btn(theBox, btn, btnClass, btnNew, mode, useCookie)
+	function fc_toggle_box_via_btn(theBox, btn, btnClass, btnNew, mode, cookieName)
 	{
 		var box = typeof theBox=='string' ? jQuery('#'+theBox) : theBox;
 
 		if (btnNew)
 		{
-			btnNew.show();
+			// Show but remove 'display' property to allow CSS classes to take effect (possibly hiding it)
+			btnNew.show().css('display', '');
 			jQuery(btn).hide();
 		}
-		var el = !!useCookie ? jQuery('#' + theBox + '-disp') : false;
+		var cookieName = !!cookieName ? (typeof cookieName=='string' ? cookieName : theBox + '-disp') : false;
+		//window.console.log(cookieName);
 
 		if (
 			(typeof mode!=='undefined' && parseInt(mode)) ||  // use the mode provided
 			(typeof mode==='undefined' && box.is(':hidden'))  // if any of the elements collection 'box' is hidden then open them all
 		) {
-			if (el) fclib_setCookie(el.get(0).name, 1, 0);
+			if (cookieName) fclib_setCookie(cookieName, 1, 0);
 			jQuery(btn).data('fc_noeffect') || jQuery(btn).hasClass('fc_noeffect') ?
 				box.show() :
 				box.slideDown(400) ;
-			jQuery(btn).addClass(btnClass).data('fc_noeffect', null).removeClass('fc_noeffect');
+			// Only remove 'data-fc_noeffect' but not the fc_noeffect class
+			jQuery(btn).addClass(btnClass).data('fc_noeffect', null);
 		}
 		else
 		{
-			if (el) fclib_setCookie(el.get(0).name, 0, 0);
+			if (cookieName) fclib_setCookie(cookieName, 0, 0);
 			jQuery(btn).data('fc_noeffect') || jQuery(btn).hasClass('fc_noeffect') ?
 				box.hide() :
 				box.slideUp(400) ;
-			jQuery(btn).removeClass(btnClass).data('fc_noeffect', null).removeClass('fc_noeffect');
+			// Only remove 'data-fc_noeffect' but not the fc_noeffect class
+			jQuery(btn).removeClass(btnClass).data('fc_noeffect', null)
 		}
 	}
 
