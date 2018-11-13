@@ -58,13 +58,25 @@ class flexicontent_html
 
 	static function load_class_config()
 	{
-		$cparams = JComponentHelper::getParams( 'com_flexicontent' );
+		$cparams = JComponentHelper::getParams('com_flexicontent');
+
 		$icon_classes = $cparams->get('font_icon_classes');
-		$icon_classes = $icon_classes ? preg_split("/[\s]*,[\s]*/", $icon_classes) : array();
+		$icon_classes = $icon_classes
+			? preg_split("/[\s]*,[\s]*/", $icon_classes)
+			: array();
+
 		self::$icon_classes = array();
-		foreach ($icon_classes as $d) {
+
+		foreach ($icon_classes as $d)
+		{
 			$data = preg_split("/[\s]*:[\s]*/", $d);
-			if (count($data)!=2) { echo "Misconfigured parameter 'Icon classes': ".$d; continue; }
+
+			if (count($data) !== 2)
+			{
+				echo "Misconfigured parameter 'Icon classes': " . $d;
+				continue;
+			}
+
 			self::$icon_classes[$data[0]] = $data[1];
 		}
 	}
@@ -2249,32 +2261,28 @@ class flexicontent_html
 	 */
 	static function createFcBtnIcon($params, $config, & $icon)
 	{
-		static $icon_class = null;
-
 		$show_icons = (int) $params->get('show_icons', 2);
 		$use_font   = (int) $params->get('use_font_icons', 1);
 
 		if ($show_icons && $use_font)
 		{
-			if ($icon_class === null)
+			if (self::$icon_classes === null)
 			{
-				if (self::$icon_classes === null)
-				{
-					self::load_class_config();
-				}
-
-				$icon_class = !empty(self::$icon_classes[$config->iconname])
-					? self::$icon_classes[$config->iconname]
-					: $config->icondefault;
-
-				if ($show_icons === 2)
-				{
-					$icon_class .= ' fcIconPadRight';
-				}
+				self::load_class_config();
 			}
 
-			$icon = '<i class="'.$icon_class.'"></i>';
+			$icon_class = !empty(self::$icon_classes[$config->iconname])
+				? self::$icon_classes[$config->iconname]
+				: $config->icondefault;
+
+			if ($show_icons === 2)
+			{
+				$icon_class .= ' fcIconPadRight';
+			}
+
+			$icon = '<i class="' . $icon_class . '"></i>';
 		}
+
 		elseif ($show_icons)
 		{
 			$icon = JHtml::image(FLEXI_ICONPATH . $config->iconimage, JText::_($config->icontitle), $attribs = '');
@@ -2734,7 +2742,15 @@ class flexicontent_html
 		}
 
 		$recordClass = 'FlexicontentModel' . ucfirst($config->record_name);
-		JLoader::register($recordClass, JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'models'.DS.$config->record_name.'.php');
+
+		// Check if already loaded
+		if (!class_exists($recordClass))
+		{
+			// Prefer frontend record model if it exists
+			!$isAdmin && file_exists(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'models'.DS.$config->record_name.'.php')
+				? JLoader::register($recordClass, JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'models'.DS.$config->record_name.'.php')
+				: JLoader::register($recordClass, JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'models'.DS.$config->record_name.'.php');
+		}
 
 		try
 		{
