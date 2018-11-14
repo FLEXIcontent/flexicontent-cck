@@ -1031,6 +1031,11 @@ class FlexicontentViewCategory extends JViewLegacy
 		$_revert = array('%21'=>'!', '%2A'=>'*', '%27'=>"'", '%28'=>'(', '%29'=>')');
 		foreach($jinput->get->get->getArray() as $i => $v)
 		{
+			if (isset($menu->query[$i]) && $menu->query[$i] === $v)
+			{
+				continue;
+			}
+
 			// URL-encode filter values
 			$is_fcfilter = substr($i, 0, 6) === 'filter';
 
