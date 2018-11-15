@@ -439,11 +439,11 @@ function FLEXIcontentBuildRoute(&$query)
 		}
 
 		// Handle adding category ID and view if not already handled above
-		if (!$layout && !count($segments) && ($mview !== $view || $mcid !== $cid))
+		if (!$layout && !count($segments) && $cid && ($mview !== $view || $mcid !== $cid))
 		{
 			/**
-			 * Adding explicit view /item/ is disabled for no-cid item URLs (thus they are 1-segment URLs),
-			 * or the given menu item is not of category view, so ... we need to explicitly declare
+			 * If adding explicit view /item/ is disabled for no-cid item URLs (thus they are 1-segment URLs),
+			 * or the given menu item is not of category view, then ... we need to explicitly declare
 			 * that this URL is a category URL, otherwise it will be wrongly interpreted as 'item' URL
 			 */
 			if (!$add_item_sef_segment && $mview === 'category')
