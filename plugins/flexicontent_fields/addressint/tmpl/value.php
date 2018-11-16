@@ -6,6 +6,8 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 $view = JFactory::getApplication()->input->get('view', '', 'CMD');
 
 // get parameters
+$map_api = $field->parameters->get('mapapi', 'googlemap');
+
 $google_maps_js_api_key = $field->parameters->get('google_maps_js_api_key', '');
 $google_maps_static_api_key = $field->parameters->get('google_maps_static_api_key', $google_maps_js_api_key);  // Fallback to edit key
 
@@ -187,7 +189,7 @@ foreach ($this->values as $n => $value)
 			$addr = str_replace('{{'.$match.'}}', ($match == 'country' ? (!empty($value['country']) ? JText::_('PLG_FC_ADDRESSINT_CC_'.$value['country']) : '') : $prop_val), $addr);
 		}
 
-		$addr = '<div class="address">' . $addr . '</div>';
+		$addr = '<div class="address">' . $addr . '</div';
 	}
 
 	// generate link to google maps directions
@@ -237,7 +239,7 @@ foreach ($this->values as $n => $value)
 				</div>';
 		}
 
-		if ($map_embed_type == 'int')
+		if ($map_embed_type == 'int' && $map_api == 'googlemap')
 		{
 			$map .= '
 			<div class="fc_addressint_map">
@@ -252,6 +254,15 @@ foreach ($this->values as $n => $value)
 					($map_width || $map_height  ?  'style="min-width:'.$map_width.'px; min-height:'.$map_height.'px;"' : '').'
 				>
 				</div>
+			</div>
+			';
+		}
+
+    if ($map_embed_type == 'int' && $map_api == 'openstreetmap')
+		{
+			$map .= '
+			<div id="mymap" '.($map_width || $map_height  ?  'style="min-width:'.$map_width.'px; min-height:'.$map_height.'px;"' : '').'>
+
 			</div>
 			';
 		}
@@ -283,7 +294,7 @@ foreach ($this->values as $n => $value)
 
 static $addressint_view_js_added = null;
 
-if ( $addressint_view_js_added === null && $map_embed_type == 'int' )
+if ( $addressint_view_js_added === null && $map_embed_type == 'int' && $map_api =='googlemap')
 {
 	$addressint_view_js_added = true;
 	$js = '
@@ -335,5 +346,27 @@ if ( $addressint_view_js_added === null && $map_embed_type == 'int' )
 
 	// Load google maps library
 	flexicontent_html::loadFramework('google-maps', '', $field->parameters);
+	JFactory::getDocument()->addScriptDeclaration($js);
+}
+if ( $addressint_view_js_added === null && $map_embed_type == 'int' && $map_api =='openstreetmap')
+{
+	$addressint_view_js_added = true;
+	$js = '
+  function initMap() {
+                  mymap = L.map("mymap").setView(['.($value['lat'] ? $value['lat'] : '0').','.($value['lon'] ? $value['lon'] : '0').'], '.($value['zoom'] ? $value['zoom'] : $map_zoom).');
+                  L.tileLayer(\'https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png\', {
+                      attribution: \'données © <a href="//osm.org/copyright">OpenStreetMap</a>/ODbL - rendu <a href="//openstreetmap.fr">OSM France</a>\',
+                      minZoom: 1,
+                      maxZoom: 20
+                  }).addTo(mymap);
+                  var marker = L.marker(['.($value['lat'] ? $value['lat'] : '0').','.($value['lon'] ? $value['lon'] : '0').']).addTo(mymap);
+              		marker.bindPopup(\''.$addr.$map_directions.'\');
+              }
+  			window.onload = function(){
+  				initMap();
+  			};
+';
+	// Load google maps library
+	flexicontent_html::loadFramework('openstreetmap', '', $field->parameters);
 	JFactory::getDocument()->addScriptDeclaration($js);
 }
