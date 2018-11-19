@@ -4,7 +4,7 @@
  * @version         3.2
  *
  * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
- * @link            http://www.flexicontent.com
+ * @link            https://flexicontent.org
  * @copyright       Copyright © 2017, FLEXIcontent team, All Rights Reserved
  * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
@@ -158,7 +158,7 @@ class plgFlexicontent_fieldsImage extends FCField
 
 
 		// Intro / Full mode
-		if ( $image_source == -1 )
+		if ($image_source === -1)
 		{
 			$field->html = $use_ingroup ?
 				array('<div class="alert alert-warning fc-small fc-iblock">Field is configured to use intro/full images, please disable use in group</div>') :
@@ -169,7 +169,7 @@ class plgFlexicontent_fieldsImage extends FCField
 
 		// Add JS /CSS for Media manager mode, and also check their PHP layouts overides exist
 		static $mm_mode_common_js_added = false;
-		if ( $image_source == -2 && !$mm_mode_common_js_added )
+		if ($image_source === -2 && !$mm_mode_common_js_added)
 		{
 			// Check and if needed install Joomla template overrides into current Joomla template
 			flexicontent_html::install_template_overrides();
@@ -279,7 +279,7 @@ class plgFlexicontent_fieldsImage extends FCField
 				.'&amp;'.JSession::getFormToken().'=1';
 
 		// Media manager mode
-		if ( $image_source == -2 )
+		if ($image_source === -2)
 		{
 			//$start_microtime = microtime(true);
 
@@ -309,7 +309,7 @@ class plgFlexicontent_fieldsImage extends FCField
 			JText::script("FLEXI_FIELD_IMAGE_CLEAR_MEDIA_URL_FIRST", true);
 			JText::script("FLEXI_FIELD_IMAGE_ENTER_MEDIA_URL", true);
 			JText::script("FLEXI_FIELD_MEDIA_URL", true);
-			JText::script("FLEXI_ERROR", true);			
+			JText::script("FLEXI_ERROR", true);
 			$document->addScriptVersion(JUri::root(true) . '/plugins/flexicontent_fields/image/js/form.js', FLEXI_VHASH);
 		}
 
@@ -550,7 +550,7 @@ class plgFlexicontent_fieldsImage extends FCField
 
 				// When removing a field value we need to check if it had value and decrement the value counter
 				var originalfftag = 'input.originalname';
-				var existingfftag = '".($image_source == 0 ? "select" : "input")."' + '.existingname';
+				var existingfftag = '".($image_source === 0 ? "select" : "input")."' + '.existingname';
 				var originalname = row.find( originalfftag ).val();
 				var existingname = row.find( existingfftag ).val();
 				var hasvalue = row.find( 'input.hasvalue').val();
@@ -742,7 +742,7 @@ class plgFlexicontent_fieldsImage extends FCField
 			$addExistingURL = sprintf($filesElementURL, $elementid_n);
 			$addExistingURL_onclick = "fcfield_image.dialog_handle['".$field_name_js."'] = fc_field_dialog_handle_".$field->id." = fc_showDialog(jQuery(this).attr('data-href'), 'fc_modal_popup_container', 0, 0, 0, 0, {title: '".JText::_('FLEXI_SELECT_IMAGE', true)."', paddingW: 10, paddingH: 16});";
 
-			if ( $image_source >= 0 )
+			if ($image_source >= 0)
 			{
 				$existingname = '
 					<input type="hidden" class="existingname fcfield_textval" id="'.$elementid_n.'_existingname" name="'.$fieldname_n.'[existingname]" value="'.htmlspecialchars(!empty($value['existingname']) ? $value['existingname'] : '', ENT_COMPAT, 'UTF-8').'" />
@@ -751,7 +751,7 @@ class plgFlexicontent_fieldsImage extends FCField
 				$select_existing = '';
 			}
 
-			else if ( $image_source == -2 )
+			elseif ($image_source === -2)
 			{
 				$mm_id = $elementid_n.'_existingname';
 				$img_path = $value['originalname'];
@@ -814,8 +814,14 @@ class plgFlexicontent_fieldsImage extends FCField
 			{
 				$img_link = rawurlencode(
 					JUri::root(true).'/'.$dir_url
-					.($image_source ? '/item_'.$u_item_id . '_field_'.$field->id : '')
-					.($item->id && empty($value['existingname'])  ?  '/m_' .$extra_prefix .basename($image_subpath)  :  '/original/' .$image_subpath)
+					. ($image_source
+						? '/item_' . $u_item_id . '_field_' . $field->id
+						: ''
+					)
+					. ($item->id && empty($value['existingname'])
+						? '/m_' . $extra_prefix . basename($image_subpath)
+						: '/original/' . $image_subpath
+					)
 				);
 
 				if (isset($value['existingname']))
@@ -919,7 +925,7 @@ class plgFlexicontent_fieldsImage extends FCField
 				</tr>';
 
 			// DB-mode needs a 'pick_existing_n'
-			if ( $image_source == 0 )
+			if ($image_source === 0)
 			{
 				$pick_existing_n = $pick_existing ? str_replace('__FORMFLDNAME__', $fieldname_n.'[existingname]', $pick_existing) : '';
 				$pick_existing_n = $pick_existing ? str_replace('__FORMFLDID__', $elementid_n.'_existingname', $pick_existing_n) : '';
@@ -1003,7 +1009,7 @@ class plgFlexicontent_fieldsImage extends FCField
 			'.$existingname.'
 			<div class="fcclear"></div>
 
-			'.($image_source == -2 || $image_source == -1  ?  // Do not add image preview box if using Joomla Media Manager (or intro/full mode)
+			'.($image_source === -2 || $image_source === -1  ?  // Do not add image preview box if using Joomla Media Manager (or intro/full mode)
 				$select_existing.'
 				<div class="fcclear"></div>
 			' : '
@@ -1160,7 +1166,7 @@ class plgFlexicontent_fieldsImage extends FCField
 		$u_item_id = ($of_usage && $item->lang_parent_id && $item->lang_parent_id != $item->id)  ?  $item->lang_parent_id  :  $item->id;
 
 		// FLAG to indicate if images are shared across fields, has the effect of adding field id to image thumbnails
-		$multiple_image_usages = $image_source == 0 && $all_media && $unique_thumb_method == 0;
+		$multiple_image_usages = $image_source === 0 && $all_media && $unique_thumb_method == 0;
 		$extra_prefix = $multiple_image_usages  ?  'fld' . $field->id . '_'  :  '';
 
 		$usemediaurl      = (int) $field->parameters->get('use_mediaurl', 0);
@@ -1237,7 +1243,7 @@ class plgFlexicontent_fieldsImage extends FCField
 		$values = $values ? $values : $field->value;
 
 		// Intro-full mode get their values from item's parameters
-		if ( $image_source == -1 )
+		if ($image_source === -1)
 		{
 			$values = array();
 
@@ -1255,7 +1261,7 @@ class plgFlexicontent_fieldsImage extends FCField
 					break;
 			}
 
-			if ( $item->images )
+			if ($item->images)
 			{
 				if (!is_object($item->images))
 				{
@@ -1269,13 +1275,13 @@ class plgFlexicontent_fieldsImage extends FCField
 					}
 				}
 
-				$_image_path = $item->images->get('image_'.$_image_name, '');
+				$_image_path = $item->images->get('image_' . $_image_name, '');
 
 				// Use 'fulltext' image if 'intro' image is empty
-				if (!$_image_path && $_image_name=='intro')
+				if (!$_image_path && $_image_name === 'intro')
 				{
 					$_image_name = 'fulltext';
-					$_image_path = $item->images->get('image_'.$_image_name, '');
+					$_image_path = $item->images->get('image_' . $_image_name, '');
 				}
 
 				$image_IF = array();
@@ -1284,9 +1290,9 @@ class plgFlexicontent_fieldsImage extends FCField
 				$image_IF['image_path']  = $_image_path;
 				// field attributes (value)
 				$image_IF['originalname'] = basename($_image_path);
-				$image_IF['alt']   = $item->images->get('image_'.$_image_name.'_alt', '');
-				$image_IF['title'] = $item->images->get('image_'.$_image_name.'_alt', '');
-				$image_IF['desc']  = $item->images->get('image_'.$_image_name.'_caption', '');
+				$image_IF['alt']   = $item->images->get('image_' . $_image_name.'_alt', '');
+				$image_IF['title'] = $item->images->get('image_' . $_image_name.'_alt', '');
+				$image_IF['desc']  = $item->images->get('image_' . $_image_name.'_caption', '');
 				$image_IF['cust1'] = '';
 				$image_IF['cust2'] = '';
 				$image_IF['urllink'] = '';
@@ -1299,6 +1305,7 @@ class plgFlexicontent_fieldsImage extends FCField
 		// Check for deleted image files or image files that cannot be thumbnailed,
 		// rebuilding thumbnails as needed, and then assigning checked values to a new array
 		$usable_values = array();
+
 		if ($values)
 		{
 			// Handle file-ids as values
@@ -1594,59 +1601,67 @@ class plgFlexicontent_fieldsImage extends FCField
 		// *** Extra thumbnails sub-folder for various
 
 		// Default value
-		if ( $field->using_default_value )
+		if ($field->using_default_value)
+		{
 			$extra_folder = '';
+		}
 
 		// Intro-full image mode
-		else if ( $image_source == -1 )
+		elseif ($image_source === -1)
+		{
 			$extra_folder = 'intro_full';
+		}
 
 		// Media manager mode
-		else if ( $image_source == -2 )
+		elseif ($image_source === -2)
+		{
 			$extra_folder = 'mediaman';
+		}
 
 		// Various Folder-mode(s) ... TODO: $image_source > 1
-		else if ( $image_source >= 1 )
+		elseif ($image_source >= 1)
+		{
 			$extra_folder = 'item_'.$u_item_id.'_field_'.$field->id;  // Folder-mode 1
+		}
 
 		// DB-mode
 		else
+		{
 			$extra_folder = '';
+		}
 
 		// Create thumbs/image Folder and URL paths
 		$thumb_folder  = JPATH_SITE .DS. JPath::clean( $dir .($extra_folder ? DS.$extra_folder : '') );
 		$thumb_urlpath = $dir_url .($extra_folder ? '/'. $extra_folder : '');
 
-		if ( $field->using_default_value )
+		if ($field->using_default_value)
 		{
 			// default image of this field, these are relative paths up to site root
 			$orig_urlpath  = str_replace('\\', '/', dirname($image_DF['default_image']));
 		}
+
+		// Intro-full image mode, image names are relative paths up to the site root
+		elseif ($image_source === -1)
+		{
+			$orig_urlpath  = str_replace('\\', '/', dirname($image_IF['image_path']));
+		}
+
+		// Media manager mode, image names are paths relative to the site root
+		elseif ($image_source === -2)
+		{
+			$orig_urlpath = array();  // calculate later inside value loop
+		}
+
+		// Various Folder-mode(s) ... TODO: $image_source > 1
+		elseif ($image_source >= 1)
+		{
+			$orig_urlpath  = $thumb_urlpath . '/original';  // Folder-mode 1
+		}
+
+		// DB-mode
 		else
 		{
-			// Intro-full image mode, image names are relative paths up to the site root
-			if ( $image_source == -1 )
-			{
-				$orig_urlpath  = str_replace('\\', '/', dirname($image_IF['image_path']));
-			}
-
-			// Media manager mode, image names are paths relative to the site root
-			else if ( $image_source == -2 )
-			{
-				$orig_urlpath = array();  // calculate later inside value loop
-			}
-
-			// Various Folder-mode(s) ... TODO: $image_source > 1
-			else if ( $image_source >= 1 )
-			{
-				$orig_urlpath  = $thumb_urlpath . '/original';  // Folder-mode 1
-			}
-
-			// DB-mode
-			else
-			{
-				$orig_urlpath = str_replace('\\', '/', $configured_file_path);
-			}
+			$orig_urlpath = str_replace('\\', '/', $configured_file_path);
 		}
 
 

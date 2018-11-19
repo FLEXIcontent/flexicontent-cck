@@ -4,7 +4,7 @@
  * @subpackage      mod_flexicontent
  * 
  * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
- * @link            http://www.flexicontent.com
+ * @link            https://flexicontent.org
  * @copyright       Copyright © 2017, FLEXIcontent team, All Rights Reserved
  * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
