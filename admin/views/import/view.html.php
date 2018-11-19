@@ -4,7 +4,7 @@
  * @version         3.3
  *
  * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
- * @link            http://www.flexicontent.com
+ * @link            https://flexicontent.org
  * @copyright       Copyright © 2018, FLEXIcontent team, All Rights Reserved
  * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
@@ -41,6 +41,12 @@ class FlexicontentViewImport extends FlexicontentViewBaseRecords
 		$task     = $jinput->getCmd('task', '');
 		$layout   = $jinput->getString('layout', 'default');
 
+		$isAdmin  = $app->isAdmin();
+		$isCtmpl  = $jinput->getCmd('tmpl') === 'component';
+
+		// Some flags & constants
+		$useAssocs = flexicontent_db::useAssociations();
+
 
 		// Get model
 		$model   = $this->getModel();
@@ -57,33 +63,49 @@ class FlexicontentViewImport extends FlexicontentViewBaseRecords
 		$session->set('csvimport_parse_log', null, 'flexicontent');
 
 
-		// ***
-		// *** Add css and js to document
-		// ***
 
-		!JFactory::getLanguage()->isRtl()
-			? $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', FLEXI_VHASH)
-			: $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', FLEXI_VHASH);
-		!JFactory::getLanguage()->isRtl()
-			? $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/j3x.css', FLEXI_VHASH)
-			: $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/j3x_rtl.css', FLEXI_VHASH);
+		/**
+		 * Add css and js to document
+		 */
 
-		// Add JS frameworks
-		flexicontent_html::loadFramework('select2');
-		$prettycheckable_added = flexicontent_html::loadFramework('prettyCheckable');
-		flexicontent_html::loadFramework('flexi-lib');
-		flexicontent_html::loadFramework('flexi-lib-form');
+		if ($layout !== 'indexer')
+		{
+			// Add css to document
+			if ($isAdmin)
+			{
+				!JFactory::getLanguage()->isRtl()
+					? $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', FLEXI_VHASH)
+					: $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', FLEXI_VHASH);
+				!JFactory::getLanguage()->isRtl()
+					? $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/j3x.css', FLEXI_VHASH)
+					: $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/j3x_rtl.css', FLEXI_VHASH);
+			}
+			else
+			{
+				!JFactory::getLanguage()->isRtl()
+					? $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontent.css', FLEXI_VHASH)
+					: $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontent_rtl.css', FLEXI_VHASH);
+			}
 
-		// Add js function to overload the joomla submitform validation
-		JHtml::_('behavior.formvalidation');  // load default validation JS to make sure it is overriden
-		$document->addScriptVersion(JUri::root(true).'/components/com_flexicontent/assets/js/admin.js', FLEXI_VHASH);
-		$document->addScriptVersion(JUri::root(true).'/components/com_flexicontent/assets/js/validate.js', FLEXI_VHASH);
+			// Add JS frameworks
+			flexicontent_html::loadFramework('select2');
+			$prettycheckable_added = flexicontent_html::loadFramework('prettyCheckable');
+			flexicontent_html::loadFramework('flexi-lib');
+			flexicontent_html::loadFramework('flexi-lib-form');
+
+			// Load custom behaviours: form validation, popup tooltips
+			JHtml::_('behavior.formvalidation');
+			JHtml::_('bootstrap.tooltip');
+
+			// Add js function to overload the joomla submitform validation
+			$document->addScriptVersion(JUri::root(true).'/components/com_flexicontent/assets/js/admin.js', FLEXI_VHASH);
+			$document->addScriptVersion(JUri::root(true).'/components/com_flexicontent/assets/js/validate.js', FLEXI_VHASH);
+		}
 
 
-
-		// ***
-		// *** Create Submenu & Toolbar
-		// ***
+		/**
+		 * Create Submenu & Toolbar
+		 */
 
 		// Create Submenu (and also check access to current view)
 		FLEXIUtilities::ManagerSideMenu('CanImport');
@@ -108,59 +130,95 @@ class FlexicontentViewImport extends FlexicontentViewBaseRecords
 		$categories = $globalcats;
 
 
-		// ************************************
-		// Decide layout to load: 'import*.php'
-		// ************************************
+		if (!$jinput->getCmd('nosidebar'))
+		{
+			$this->sidebar = FLEXI_J30GE ? JHtmlSidebar::render() : null;
+		}
 
-		$this->setLayout('import');
-		$this->sidebar = FLEXI_J30GE ? JHtmlSidebar::render() : null;
+		/**
+		 * Decide which layout to load: 'import.php' or 'import_*.php'
+		 */
 
 
-		// Execute the import task, load the log-like AJAX-based layout (import_process.php), to display results including any warnings
+
+		/**
+		 * Execute the import task, display a log-like AJAX-based layout,
+		 * to display results including any warnings
+		 * LAYOUT: -- import_process.php --
+		 */
 		if (!empty($this->conf) && $task === 'processcsv')
 		{
-			$this->conf = $this->conf;
+			$this->setLayout('import');
 			parent::display('process');
 			return;
 		}
 
-		// Configuration has been parsed, display a 'preview' layout:  (import_list.php)
+		/**
+		 * Configuration has been parsed, display a 'preview' layout
+		 * LAYOUT: -- import_list.php --
+		 */
 		elseif (!empty($this->conf))
 		{
-			$this->conf = $this->conf;
 			$this->cparams = $cparams;
 			$this->types = $types;
 			$this->languages = $languages;
 			$this->categories = $globalcats;
+
+			// Load import_list.php
+			$this->setLayout('import');
 			parent::display('list');
 			return;
 		}
 
-		// Session config is empty, means import form has not been submited, display the form
-		// We will display import form which is not 'default.php', it is 'import.php'
-		// else ...
+		/**
+		 * Session config is empty, means import form has not been submited
+		 * We will display import form which is 'import.php' if $tpl is empty
+		 * LAYOUT: -- import.php -- (or -- import_${tpl}.php -- )
+		 */
+		else
+		{
+			$this->setLayout('import');
+		}
 
 
-		// Check is session table DATA column is not mediumtext (16MBs, it can be 64 KBs ('text') in some sites that were not properly upgraded)
+		/**
+		 * Check is session table DATA column is not mediumtext (16MBs)
+		 * As it can be 64 KBs ('text') in some sites that were not properly upgraded
+		 * A text or small size will make importing large CSV files to fail
+		 */
+
 		$tblname  = 'session';
 		$dbprefix = $app->getCfg('dbprefix');
 		$dbname   = $app->getCfg('db');
-		$db->setQuery("SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = '".$dbname."' AND TABLE_NAME = '".$dbprefix.$tblname."'");
+		$db->setQuery(
+			'SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS'
+			. ' WHERE TABLE_SCHEMA = ' . $db->quote($dbname)
+			. '  AND TABLE_NAME = ' . $db->quote($dbprefix . $tblname)
+		);
 		$jession_coltypes = $db->loadAssocList('COLUMN_NAME');
 		$_dataColType = strtolower($jession_coltypes['data']['DATA_TYPE']);
-		$_dataCol_wrongSize = ($_dataColType != 'mediumtext') && ($_dataColType != 'longtext');
+		$_dataCol_wrongSize = ($_dataColType !== 'mediumtext') && ($_dataColType !== 'longtext');
 
-		// If data type is "text" it is safe to assume that it can be converted to "mediumtext",
-		// since "text" means that session table is not memory storage,
-		// plus it is already stored externally aka operation will be quick ?
-		/*if ($_dataCol_wrongSize && $_dataColType == 'text')
+		/**
+		 * If data type is "text" it is safe to assume that it can be converted to "mediumtext",
+		 * since "text" means that session table is not memory storage,
+		 * plus it is already stored externally aka operation will be quick ?
+		 */
+		/*if ($_dataCol_wrongSize && $_dataColType === 'text')
 		{
 			$db->setQuery("ALTER TABLE `#__session` MODIFY `data` MEDIUMTEXT");
 			$db->execute();
 			$_dataCol_wrongSize = false;
 		}*/
-		if ($_dataCol_wrongSize) {
-			$app->enqueueMessage("Joomla DB table: <b>'session'</b> has a <b>'data'</b> column with type: <b>'".$_dataColType."'</b>, instead of expected type <b>'mediumtext'</b>. Trying to import large data files may fail", "notice");
+
+		if ($_dataCol_wrongSize)
+		{
+			$app->enqueueMessage('Joomla DB table: <b>\'session\'</b> has a <b>\'data\'</b> column with type: ' .
+					'<span class="badge">' . $_dataColType .	'</span>' .
+					'<br>Expected column type: <span class="badge badge-info">mediumtext</span>.' .
+					'<br>Trying to import large data files may fail',
+				'notice'
+			);
 		}
 
 
@@ -212,19 +270,24 @@ class FlexicontentViewImport extends FlexicontentViewBaseRecords
 
 
 
-		// ******************
-		// Create form fields
-		// ******************
+		/**
+		 * Create form fields
+		 */
+
+		// Build content type field
 		$lists['type_id'] = flexicontent_html::buildtypesselect($types, 'type_id', $formvals['type_id'], true, 'class="required use_select2_lib"', 'type_id');
 
-		$actions_allowed = array('core.create');  // Creating categorories tree for item assignment, we use the 'create' privelege
+		// Creating categorories tree for item assignment, we use the 'create' privelege
+		$actions_allowed = array('core.create');
 
-		// build the main category select list
+
+		// Build main category field
 		$attribs = 'class="use_select2_lib required"';
 		$fieldname = 'maincat';
 		$lists['maincat'] = flexicontent_cats::buildcatselect($categories, $fieldname, $formvals['maincat'], 2, $attribs, false, true, $actions_allowed);
 
-		// build the secondary categories select list
+
+		// Build secondary categories field
 		$class  = "use_select2_lib";
 		$attribs = 'multiple="multiple" size="10" class="'.$class.'"';
 		$fieldname = 'seccats[]';
@@ -232,15 +295,15 @@ class FlexicontentViewImport extends FlexicontentViewBaseRecords
 			$actions_allowed, $require_all=true);
 
 
-		// build languages list
 		// Retrieve author configuration
 		$authorparams = flexicontent_db::getUserConfig($user->id);
-
+		
+		// Get current user's allowed languages
 		$allowed_langs = $authorparams->get('langs_allowed',null);
 		$allowed_langs = !$allowed_langs ? null : FLEXIUtilities::paramToArray($allowed_langs);
 
-		// We will not use the default getInput() function of J1.6+ since we want to create a radio selection field with flags
-		// we could also create a new class and override getInput() method but maybe this is an overkill, we may do it in the future
+
+		// Build language field
 		$lists['languages'] = flexicontent_html::buildlanguageslist('language'
 			, ' style="vertical-align:top;" onchange="var m=jQuery(\'#fc_import_about_langcol\'); this.value ? m.hide(600) : m.show(600);"'
 			, $formvals['language'], 6/*'- '.JText::_('FLEXI_USE_LANGUAGE_COLUMN').' -'*/, $allowed_langs, $published_only=true
@@ -256,7 +319,8 @@ class FlexicontentViewImport extends FlexicontentViewBaseRecords
 				'.JText::_('FLEXI_USE_STATE_COLUMN_TIP').'
 			</span>';
 
-		// build access level filter
+
+		// Build access level field
 		$access_levels = JHtml::_('access.assetgroups');
 		array_unshift($access_levels, JHtml::_('select.option', '0', "Use 'access' column") );
 		array_unshift($access_levels, JHtml::_('select.option', '', 'FLEXI_SELECT_ACCESS_LEVEL') );
@@ -265,25 +329,34 @@ class FlexicontentViewImport extends FlexicontentViewBaseRecords
 		$attribs = 'class="required use_select2_lib"';
 		$lists['access'] = JHtml::_('select.genericlist', $access_levels, $fieldname, $attribs, 'value', 'text', $formvals['access'], $elementid, $translate=true );
 
+
 		// Ignore warnings because component may not be installed
-		$warnHandlers = JERROR::getErrorHandling( E_WARNING );
-		JERROR::setErrorHandling( E_WARNING, 'ignore' );
+		$warnHandlers = JERROR::getErrorHandling(E_WARNING);
+		JERROR::setErrorHandling(E_WARNING, 'ignore');
 
 		// Reset the warning handler(s)
-		foreach( $warnHandlers as $mode )  JERROR::setErrorHandling( E_WARNING, $mode );
+		foreach($warnHandlers as $mode)
+		{
+			JERROR::setErrorHandling(E_WARNING, $mode);
+		}
 
 
-		// ********************************************************************************
-		// Get field names (from the header line (row 0), and remove it form the data array
-		// ********************************************************************************
+		/**
+		 * Get field names (from the header line (row 0), and remove it form the data array
+		 */
+
 		$file_field_types_list = '"image","file"';
 		$q = 'SELECT id, name, label, field_type FROM #__flexicontent_fields AS fi'
 			//.' JOIN #__flexicontent_fields_type_relations AS ftrel ON ftrel.field_id = fi.id AND ftrel.type_id='.$type_id;
-			.' WHERE fi.field_type IN ('. $file_field_types_list .')';
-		$db->setQuery($q);
-		$file_fields = $db->loadObjectList('name');
+			.' WHERE fi.field_type IN ('. $file_field_types_list .')'
+		;
+		$file_fields = $db->setQuery($q)->loadObjectList('name');
 
-		//assign data to template
+
+		/**
+		 * Assign data to template
+		 */
+
 		$this->model = $model;
 		$this->lists = $lists;
 		$this->user = $user;
@@ -327,7 +400,6 @@ class FlexicontentViewImport extends FlexicontentViewBaseRecords
 				$btn_title = empty($this->lineno)
 					? 'FLEXI_IMPORT_START_TASK'
 					: 'FLEXI_IMPORT_CONTINUE_TASK';
-				//JToolbarHelper::custom($btn_task, 'save.png', 'save.png', $btn_title, $list_check = false);
 
 				flexicontent_html::addToolBarButton(
 					$btn_title, $btn_name = 'processcsv', $full_js = '',

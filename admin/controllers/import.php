@@ -4,7 +4,7 @@
  * @version         3.3
  *
  * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
- * @link            http://www.flexicontent.com
+ * @link            https://flexicontent.org
  * @copyright       Copyright © 2018, FLEXIcontent team, All Rights Reserved
  * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
@@ -577,7 +577,7 @@ class FlexicontentControllerImport extends FlexicontentControllerBaseAdmin
 					// Throw error if we are only IMPORTING (creating) new items but existing item ids were found
 					if ($conf['id_col'] == 1 && $conf['existing_ids'] && count($conf['existing_ids']))
 					{
-						$app->enqueueMessage('File has ' . count($conf['existing_ids']) . ' item IDs that already exist: ' . implode(", ", $conf['existing_ids']) . ', <br/>Please fix or enable -updating- of existing items too', 'error');
+						$app->enqueueMessage('File has ' . count($conf['existing_ids']) . ' item IDs that already exist: ' . implode(", ", array_keys($conf['existing_ids'])) . ', <br/>Please fix or enable -updating- of existing items too', 'error');
 						$app->redirect($link);
 					}
 
