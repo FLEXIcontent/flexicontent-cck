@@ -25,6 +25,7 @@ class FlexicontentViewUsers extends FlexicontentViewBaseRecords
 	var $title_propname = 'username';
 	var $state_propname = 'block';
 	var $db_tbl         = 'users';
+	var $name_singular  = 'user';
 
 	public function display($tpl = null)
 	{
@@ -50,7 +51,7 @@ class FlexicontentViewUsers extends FlexicontentViewBaseRecords
 		$isCtmpl  = $jinput->getCmd('tmpl') === 'component';
 
 		// Some flags & constants
-		;
+		$useAssocs = flexicontent_db::useAssociations();
 
 		// Load Joomla language files of other extension
 		if (!empty($this->proxy_option))
@@ -60,7 +61,8 @@ class FlexicontentViewUsers extends FlexicontentViewBaseRecords
 		}
 
 		// Get model
-		$model = $this->getModel();
+		$model   = $this->getModel();
+		$model_s = $this->getModel($this->name_singular);
 
 		// Performance statistics
 		if ($print_logging_info = $cparams->get('print_logging_info'))
@@ -87,14 +89,15 @@ class FlexicontentViewUsers extends FlexicontentViewBaseRecords
 		$filter_active    = $model->getState('filter_active');
 
 		if ($filter_itemscount) $count_filters++;
-		if ($filter_usergrp)    $count_filters++;
-		if (strlen($filter_logged))     $count_filters++;
-		if (strlen($filter_state))      $count_filters++;
-		if (strlen($filter_active))     $count_filters++;
+		if ($filter_usergrp) $count_filters++;
+		if (strlen($filter_logged)) $count_filters++;
+		if (strlen($filter_state)) $count_filters++;
+		if (strlen($filter_active)) $count_filters++;
 
-		$date       = $model->getState('date');
-		$startdate  = $model->getState('startdate');
-		$enddate    = $model->getState('enddate');
+		// Date filters
+		$date      = $model->getState('date');
+		$startdate = $model->getState('startdate');
+		$enddate   = $model->getState('enddate');
 
 		$startdate = $db->escape( StringHelper::trim(StringHelper::strtolower( $startdate ) ) );
 		$enddate   = $db->escape( StringHelper::trim(StringHelper::strtolower( $enddate ) ) );
@@ -107,6 +110,7 @@ class FlexicontentViewUsers extends FlexicontentViewBaseRecords
 
 
 		// Text search
+		$scope  = $model->getState('scope');
 		$search = $model->getState('search');
 		$search = StringHelper::trim(StringHelper::strtolower($search));
 
@@ -146,14 +150,22 @@ class FlexicontentViewUsers extends FlexicontentViewBaseRecords
 			$document->addScriptVersion(JUri::root(true).'/components/com_flexicontent/assets/js/validate.js', FLEXI_VHASH);
 		}
 
-		$js = '';
-		if ($search)            $js .= "jQuery('.col_title').addClass('filtered_column');";
-		if ($filter_itemscount) $js .= "jQuery('.col_itemscount').addClass('filtered_column');";
-		if ($filter_usergrp)    $js .= "jQuery('.col_usergrp').addClass('filtered_column');";
-		if ($filter_logged)     $js .= "jQuery('.col_logged').addClass('filtered_column');";
-		if (strlen($filter_state))    $js .= "jQuery('.col_status').addClass('filtered_column');";
-		if (strlen($filter_active))   $js .= "jQuery('.col_active').addClass('filtered_column');";
-		if ($filter_id)         $js .= "jQuery('.col_id').addClass('filtered_column');";
+		$js =
+
+			($search ? "jQuery('.col_title').addClass('filtered_column');" : '') .
+
+			($filter_itemscount ? "jQuery('.col_itemscount').addClass('filtered_column');" : '') .
+
+			($filter_usergrp ? "jQuery('.col_usergrp').addClass('filtered_column');" : '') .
+
+			($filter_logged ? "jQuery('.col_logged').addClass('filtered_column');" : '') .
+
+			(strlen($filter_state) ? "jQuery('.col_status').addClass('filtered_column');" : '') .
+
+			(strlen($filter_active) ? "jQuery('.col_active').addClass('filtered_column');" : '') .
+
+			($filter_id ? "jQuery('.col_id').addClass('filtered_column');" : '');
+
 		if ($startdate || $enddate)
 		{
 			if ($date == 1) {
@@ -191,12 +203,13 @@ class FlexicontentViewUsers extends FlexicontentViewBaseRecords
 
 
 		/**
-		 * Get data from the model
+		 * Get data from the model, note data retrieval must be before 
+		 * getTotal() and getPagination() because it also calculates total rows
 		 */
 
 		if ( $print_logging_info )  $start_microtime = microtime(true);
 
-		$rows = $this->get('Items');
+		$rows        = $model->getItems();
 
 		if ( $print_logging_info ) @$fc_run_times['execute_main_query'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 
@@ -247,9 +260,9 @@ class FlexicontentViewUsers extends FlexicontentViewBaseRecords
 
 		$conf_link = '<a href="index.php?option=com_config&amp;view=component&amp;component=com_flexicontent&amp;path=" class="' . $this->btn_sm_class . ' btn-info">'.JText::_("FLEXI_CONFIG").'</a>';
 
-		/*if ( $cparams->get('show_usability_messages', 1) )
+		if ($cparams->get('show_usability_messages', 1))
 		{
-			$notice_author_with_items_only	= $app->getUserStateFromRequest( $option.'.users.notice_author_with_items_only',	'notice_author_with_items_only',	0, 'int' );
+			/*$notice_author_with_items_only	= $app->getUserStateFromRequest( $option.'.users.notice_author_with_items_only',	'notice_author_with_items_only',	0, 'int' );
 
 			if (!$notice_author_with_items_only)
 			{
@@ -258,8 +271,8 @@ class FlexicontentViewUsers extends FlexicontentViewBaseRecords
 
 				$disable_use_notices = '<span class="fc-nowrap-box fc-disable-notices-box">'. JText::_('FLEXI_USABILITY_MESSAGES_TURN_OFF_IN').' '.$conf_link.'</span><div class="fcclear"></div>';
 				$app->enqueueMessage(JText::_('FLEXI_BY_DEFAULT_ONLY_AUTHORS_WITH_ITEMS_SHOWN') .' '. $disable_use_notices, 'notice');
-			}
-		}*/
+			}*/
+		}
 
 		$this->minihelp = '
 			<div id="fc-mini-help" class="fc-mssg fc-info" style="display:none; min-width: 600px;">
@@ -274,68 +287,238 @@ class FlexicontentViewUsers extends FlexicontentViewBaseRecords
 
 		$lists = array();
 
-		// Get list of Groups for dropdown filter
-		$query = 'SELECT *, id AS value, title AS text FROM #__usergroups';
-		$usergroups = $db->setQuery($query)->loadObjectList('id');
+
+		// Build number of owned items filter
+		$fieldname = 'filter_itemscount';
+		$elementid = 'filter_itemscount';
+		$value     = $filter_itemscount;
+
+		$options = array(
+			JHtml::_('select.option',  '', '-' /*'# Owned items'*/),
+			JHtml::_('select.option',  1, 'FLEXI_NONE'),
+			JHtml::_('select.option',  2, 'FLEXI_ONE_OR_MORE'),
+		);
+
+		$lists[$elementid] = $this->getFilterDisplay(array(
+			'label' => '# ' . JText::_('FLEXI_ITEMS'),
+			'html' => JHtml::_('select.genericlist',
+				$options,
+				$fieldname,
+				array(
+					'class' => $this->select_class,
+					'size' => '1',
+					'onchange' => 'document.adminForm.limitstart.value=0; Joomla.submitform();',
+				),
+				'value',
+				'text',
+				$value,
+				$elementid,
+				$translate = true
+			),
+		));
 
 
-		$types[]		= JHtml::_('select.option',  '', '-' /*JText::_( 'Select Group' )*/ );
-		foreach( $usergroups as $ugrp )
+		// Build logged users filter
+		$fieldname = 'filter_usergrp';
+		$elementid = 'filter_usergrp';
+		$value     = $filter_usergrp;
+
+		$options = array(
+			JHtml::_('select.option',  '', '-' /*'Select Group'*/),
+		);
+
+		$usergroups = $db->setQuery('SELECT * FROM #__usergroups')->loadObjectList('id');
+
+		foreach($usergroups as $ugrp)
 		{
-			$types[]	= JHtml::_('select.option',  $ugrp->value, JText::_( $ugrp->text ) );
+			$options[] = JHtml::_('select.option', $ugrp->id, $ugrp->title);
 		}
 
-		$itemscount_options[] = JHtml::_('select.option',  '', '-');
-		$itemscount_options[] = JHtml::_('select.option',  1, JText::_( 'None' ) );
-		$itemscount_options[] = JHtml::_('select.option',  2, JText::_( 'One or more' ) );
-		$lists['filter_itemscount'] = ($filter_itemscount || 1 ? '<div class="add-on"># '.JText::_('FLEXI_ITEMS').'</div>' : '').
-			JHtml::_('select.genericlist', $itemscount_options, 'filter_itemscount', 'class="use_select2_lib" size="1" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', 'value', 'text', $filter_itemscount );
+		$lists[$elementid] = $this->getFilterDisplay(array(
+			'label' => JText::_('FLEXI_USERGROUPS'),
+			'html' => JHtml::_('select.genericlist',
+				$options,
+				$fieldname,
+				array(
+					'class' => $this->select_class,
+					'size' => '1',
+					'onchange' => 'document.adminForm.limitstart.value=0; Joomla.submitform();',
+				),
+				'value',
+				'text',
+				$value,
+				$elementid,
+				$translate = true
+			),
+		));
 
-		$lists['filter_usergrp'] = ($filter_usergrp || 1 ? '<div class="add-on">'.JText::_('Select Group').'</div>' : '').
-			JHtml::_('select.genericlist', $types, 'filter_usergrp', 'class="use_select2_lib" style="width:auto;" size="1" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', 'value', 'text', $filter_usergrp );
 
-		// get list of Log Status for dropdown filter
-		$logged[] = JHtml::_('select.option',  '', '-' /*JText::_( 'Select Log Status' )*/);
-		$logged[] = JHtml::_('select.option',  '1', JText::_( 'JYES' ) );
-		$logged[] = JHtml::_('select.option',  '0', JText::_( 'JNO' ) );
-		$lists['filter_logged'] = ($filter_logged || 1 ? '<div class="add-on">'.JText::_('FLEXI_USER_LOGGED').'</div>' : '').
-			JHtml::_('select.genericlist', $logged, 'filter_logged', 'class="use_select2_lib" size="1" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', 'value', 'text', $filter_logged );
+		// Build logged users filter
+		$fieldname = 'filter_logged';
+		$elementid = 'filter_logged';
+		$value     = $filter_logged;
 
-		// get list of Log Status for dropdown filter
-		$state[] = JHtml::_('select.option',  '', '-' /*JText::_( 'COM_USERS_FILTER_STATE' )*/);
-		$state[] = JHtml::_('select.option', '0', JText::_('JENABLED'));
-		$state[] = JHtml::_('select.option', '1', JText::_('JDISABLED'));
-		$lists['filter_state'] = ($filter_state || 1 ? '<div class="add-on">'.JText::_('COM_USERS_HEADING_ENABLED').'</div>' : '').
-			JHtml::_('select.genericlist', $state, 'filter_state', 'class="use_select2_lib" size="1" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', 'value', 'text', $filter_state );
+		$options = array(
+			JHtml::_('select.option',  '', '-' /*'Select Log Status'*/),
+			JHtml::_('select.option',  '1', 'JYES'),
+			JHtml::_('select.option',  '0', 'JNO'),
+		);
 
-		// get list of Log Status for dropdown filter
-		$active[] = JHtml::_('select.option',  '', '-' /*JText::_( 'COM_USERS_FILTER_ACTIVE' )*/);
-		$active[] = JHtml::_('select.option', '0', JText::_('COM_USERS_ACTIVATED'));
-		$active[] = JHtml::_('select.option', '1', JText::_('COM_USERS_UNACTIVATED'));
-		$lists['filter_active'] = ($filter_active || 1 ? '<div class="add-on">'.JText::_('COM_USERS_HEADING_ACTIVATED').'</div>' : '').
-			JHtml::_('select.genericlist', $active, 'filter_active', 'class="use_select2_lib" size="1" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', 'value', 'text', $filter_active );
+		$lists[$elementid] =$this->getFilterDisplay(array(
+			'label' => JText::_('FLEXI_USER_LOGGED'),
+			'html' => JHtml::_('select.genericlist',
+				$options,
+				$fieldname,
+				array(
+					'class' => $this->select_class,
+					'size' => '1',
+					'onchange' => 'document.adminForm.limitstart.value=0; Joomla.submitform();',
+				),
+				'value',
+				'text',
+				$value,
+				$elementid,
+				$translate = true
+			),
+		));
+
+		// Build enabled users filter
+		$fieldname = 'filter_state';
+		$elementid = 'filter_state';
+		$value     = $filter_state;
+
+		//$options = JHtml::_('jgrid.publishedOptions');
+		$options = array(
+			JHtml::_('select.option',  '', '-' /*'COM_USERS_FILTER_STATE'*/),
+			JHtml::_('select.option', '0', 'JENABLED'),
+			JHtml::_('select.option', '1', 'JDISABLED'),
+		);
+
+		$lists[$elementid] = $this->getFilterDisplay(array(
+			'label' => JText::_('COM_USERS_HEADING_ENABLED'),
+			'html' => JHtml::_('select.genericlist',
+				$options,
+				$fieldname,
+				array(
+					'class' => $this->select_class,
+					'size' => '1',
+					'onchange' => 'document.adminForm.limitstart.value=0; Joomla.submitform();',
+				),
+				'value',
+				'text',
+				$value,
+				$elementid,
+				$translate = true
+			),
+		));
+
+
+		// Build activated users filter
+		$fieldname = 'filter_active';
+		$elementid = 'filter_active';
+		$value     = $filter_active;
+
+		$options = array(
+			JHtml::_('select.option',  '', '-' /*'COM_USERS_FILTER_ACTIVE'*/),
+			JHtml::_('select.option', '0', 'COM_USERS_ACTIVATED'),
+			JHtml::_('select.option', '1', 'COM_USERS_UNACTIVATED'),
+		);
+
+		$lists[$elementid] = $this->getFilterDisplay(array(
+			'label' => JText::_('COM_USERS_HEADING_ACTIVATED'),
+			'html' => JHtml::_('select.genericlist',
+				$options,
+				$fieldname,
+				array(
+					'class' => $this->select_class,
+					'size' => '1',
+					'onchange' => 'document.adminForm.limitstart.value=0; Joomla.submitform();',
+				),
+				'value',
+				'text',
+				$value,
+				$elementid,
+				$translate = true
+			),
+		));
+
+
+		// Build id list filter
+		$fieldname = 'filter_id';
+		$elementid = 'filter_id';
+		$value     = $filter_id;
+
+		$lists[$elementid] = $this->getFilterDisplay(array(
+			'label' => JText::_('FLEXI_ID'),
+			'html' => '<input type="text" name="' . $fieldname . '" id="' . $elementid . '" size="6" value="' . $filter_id . '" class="inputbox" style="width:auto;" />',
+		));
+
+
+		// Build text search scope
+		$scopes = null;
+
+		$lists['scope_tip'] = '';
+		$lists['scope'] = $this->getScopeSelectorDisplay($scopes, $scope);
+		$this->scope_title = $scopes[$scope];
 
 
 		// Text search filter value
 		$lists['search'] = $search;
 
-		// Search id
-		$lists['filter_id'] = $filter_id;
 
 		// Table ordering
 		$lists['order_Dir'] = $filter_order_Dir;
 		$lists['order']     = $filter_order;
 
-		// build dates option list
-		$dates = array();
-		$dates[] = JHtml::_('select.option',  '1', JText::_( 'Registered' ) );
-		$dates[] = JHtml::_('select.option',  '2', JText::_( 'Last Visit' ) );
 
-		$lists['date'] = //'<div class="add-on">'.JText::_('FLEXI_DATE').'</div>'.
-			JHtml::_('select.genericlist', $dates, 'date', 'size="1" class="use_select2_lib"', 'value', 'text', $date, 'date' );
+		/**
+		 * Create note about dates displayed using current user's timezone
+		 */
 
-		$lists['startdate'] = JHtml::_('calendar', $startdate, 'startdate', 'startdate', '%Y-%m-%d', array('class'=>'', 'size'=>'8',  'maxlength'=>'19', 'style'=>'width:auto', 'placeholder'=>JText::_('FLEXI_FROM')));
-		$lists['enddate'] 	= JHtml::_('calendar', $enddate, 'enddate', 'enddate', '%Y-%m-%d', array('class'=>'', 'size'=>'8',  'maxlength'=>'19', 'style'=>'width:auto', 'placeholder'=>JText::_('FLEXI_TO')));
+		$site_zone = $app->getCfg('offset');
+		$user_zone = JFactory::getUser()->getParam('timezone', $site_zone);
+
+		$tz = new DateTimeZone( $user_zone );
+		$tz_offset = $tz->getOffset(new JDate()) / 3600;
+		$tz_info = $tz_offset
+			? ' UTC +' . $tz_offset . ' (' . $user_zone . ')'
+			: ' UTC ' . $tz_offset . ' (' . $user_zone . ')';
+
+		$date_note_msg = JText::sprintf(FLEXI_J16GE ? 'FLEXI_DATES_IN_USER_TIMEZONE_NOTE' : 'FLEXI_DATES_IN_SITE_TIMEZONE_NOTE', ' ', $tz_info);
+
+
+		// Build date filter scope
+		$fieldname = 'date';
+		$elementid = 'date';
+		$value     = $date;
+
+		$options = array(
+			JHtml::_('select.option',  '1', 'FLEXI_REGISTERED'),
+			JHtml::_('select.option',  '2', 'FLEXI_USER_LAST_VISIT'),
+		);
+
+		$lists['filter_date'] = $this->getFilterDisplay(array(
+			'label' => null, //JText::_('FLEXI_DATE'),
+			'html' => JHtml::_('select.genericlist',
+				$options,
+				$fieldname,
+				array(
+					'size' => '1',
+					'style' => 'margin: 0',
+					'class' => $this->select_class . ' ' . $this->tooltip_class,
+					'data-placement' => 'bottom',
+					'title' => flexicontent_html::getToolTip(null, $date_note_msg, 0, 1),
+				),
+				'value',
+				'text',
+				$value,
+				$elementid,
+				$translate = true
+			)
+			. JHtml::_('calendar', $startdate, 'startdate', 'startdate', '%Y-%m-%d', array('class'=>'', 'size'=>'8',  'maxlength'=>'19', 'style'=>'width:auto', 'placeholder'=>JText::_('FLEXI_FROM')))
+			. JHtml::_('calendar', $enddate, 'enddate', 'enddate', '%Y-%m-%d', array('class'=>'', 'size'=>'8',  'maxlength'=>'19', 'style'=>'width:auto', 'placeholder'=>JText::_('FLEXI_TO')))
+		));
+
 
 
 		/**
@@ -350,7 +533,6 @@ class FlexicontentViewUsers extends FlexicontentViewBaseRecords
 		$this->usergroups  = $usergroups;
 
 		// filters
-		$this->search = $search;
 		$this->date = $date;
 		$this->startdate = $startdate;
 		$this->enddate = $enddate;
@@ -360,8 +542,10 @@ class FlexicontentViewUsers extends FlexicontentViewBaseRecords
 		$this->view   = $view;
 		$this->state  = $this->get('State');
 
-		$this->sidebar = FLEXI_J30GE ? JHtmlSidebar::render() : null;
-
+		if (!$jinput->getCmd('nosidebar'))
+		{
+			$this->sidebar = FLEXI_J30GE ? JHtmlSidebar::render() : null;
+		}
 
 		/**
 		 * Render view's template
@@ -388,15 +572,17 @@ class FlexicontentViewUsers extends FlexicontentViewBaseRecords
 		$document = JFactory::getDocument();
 		$toolbar  = JToolbar::getInstance('toolbar');
 		$perms    = FlexicontentHelperPerm::getPerm();
+		$session  = JFactory::getSession();
+		$useAssocs= flexicontent_db::useAssociations();
 		$canDo    = UsersHelper::getActions();
 
 		$js = '';
 
-		$contrl = "users.";
+		$contrl = $this->ctrl . '.';
+		$contrl_s = $this->name_singular . '.';
 
 		$loading_msg = flexicontent_html::encodeHTML(JText::_('FLEXI_LOADING') .' ... '. JText::_('FLEXI_PLEASE_WAIT'), 2);
 
-		//JToolbarHelper::addNew($contrl.'add');
 		JText::script("FLEXI_UPDATING_CONTENTS", true);
 		$document->addScriptDeclaration('
 			function fc_edit_juser_modal_load( container )
@@ -413,16 +599,20 @@ class FlexicontentViewUsers extends FlexicontentViewBaseRecords
 			}
 		');
 
-		$modal_title = JText::_('FLEXI_NEW', true);
-		$tip_class = ' hasTooltip';
-		JToolbarHelper::divider();
-		flexicontent_html::addToolBarButton(
-			'FLEXI_NEW', $btn_name='add_juser',
-			$full_js="var url = jQuery(this).attr('data-href'); var the_dialog = fc_showDialog(url, 'fc_modal_popup_container', 0, 0, 0, fc_edit_juser_modal_close, {title:'".$modal_title."', loadFunc: fc_edit_juser_modal_load}); return false;",
-			$msg_alert='', $msg_confirm='',
-			$btn_task='', $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false, $btn_class=$this->btn_sm_class . " btn-success " . $this->tooltip_class, $btn_icon="icon-new icon-white",
-			'data-placement="bottom" data-href="index.php?option=com_users&amp;task=user.edit&amp;id=0" title="Add new Joomla user"'
-		);
+		if ($canDo->get('core.create'))
+		{
+			//JToolbarHelper::addNew($contrl.'add');
+
+			$modal_title = JText::_('FLEXI_NEW', true);
+			JToolbarHelper::divider();
+			flexicontent_html::addToolBarButton(
+				'FLEXI_NEW', $btn_name='add_juser',
+				$full_js="var url = jQuery(this).attr('data-href'); var the_dialog = fc_showDialog(url, 'fc_modal_popup_container', 0, 0, 0, fc_edit_juser_modal_close, {title:'".$modal_title."', loadFunc: fc_edit_juser_modal_load}); return false;",
+				$msg_alert='', $msg_confirm='',
+				$btn_task='', $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false, $btn_class=$this->btn_sm_class . " btn-success " . $this->tooltip_class, $btn_icon="icon-new icon-white",
+				'data-placement="bottom" data-href="index.php?option=com_users&amp;task=user.edit&amp;id=0" title="Add new Joomla user"'
+			);
+		}
 
 		JToolbarHelper::custom('logout', 'cancel.png', 'cancel_f2.png', 'Logout');
 

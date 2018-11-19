@@ -25,6 +25,7 @@ class FlexicontentViewItemelement extends FlexicontentViewBaseRecords
 	var $title_propname = 'title';
 	var $state_propname = 'state';
 	var $db_tbl         = 'content';
+	var $name_singular  = 'item';
 
 	public function display($tpl = null)
 	{
@@ -61,7 +62,8 @@ class FlexicontentViewItemelement extends FlexicontentViewBaseRecords
 		}
 
 		// Get model
-		$model = $this->getModel();
+		$model   = $this->getModel();
+		$model_s = $this->getModel($this->name_singular);
 
 		// Performance statistics
 		if ($print_logging_info = $cparams->get('print_logging_info'))
@@ -110,14 +112,15 @@ class FlexicontentViewItemelement extends FlexicontentViewBaseRecords
 		$filter_lang      = $model->getState('filter_lang');
 		$filter_author    = $model->getState('filter_author');
 
-		if ($filter_state) $count_filters++;
+		if (strlen($filter_state)) $count_filters++;
 		if ($filter_cats) $count_filters++;
 		if ($filter_type) $count_filters++;
-		if ($filter_access) $count_filters++;
+		if (strlen($filter_access)) $count_filters++;
 		if ($filter_lang) $count_filters++;
-		if ($filter_author) $count_filters++;
+		if (strlen($filter_author)) $count_filters++;
 
 		// Text search
+		$scope  = $model->getState('scope');
 		$search = $model->getState('search');
 		$search = StringHelper::trim(StringHelper::strtolower($search));
 
@@ -174,7 +177,8 @@ class FlexicontentViewItemelement extends FlexicontentViewBaseRecords
 
 
 		/**
-		 * Get data from the model
+		 * Get data from the model, note data retrieval must be before 
+		 * getTotal() and getPagination() because it also calculates total rows
 		 */
 
 		if ( $print_logging_info )  $start_microtime = microtime(true);
@@ -207,13 +211,14 @@ class FlexicontentViewItemelement extends FlexicontentViewBaseRecords
 		// Build category filter
 		$fieldname = 'filter_cats';
 		$elementid = 'filter_cats';
+		$value     = $filter_cats;
 
 		$lists[$elementid] = $this->getFilterDisplay(array(
 			'label' => JText::_('FLEXI_CATEGORY'),
 			'html' => flexicontent_cats::buildcatselect(
 				$categories,
 				$fieldname,
-				$filter_cats,
+				$value,
 				$displaytype = '-',
 				array(
 					'class' => $this->select_class,
@@ -260,6 +265,7 @@ class FlexicontentViewItemelement extends FlexicontentViewBaseRecords
 		// Build author filter
 		$fieldname = 'filter_author';
 		$elementid = 'filter_author';
+		$value     = $filter_author;
 
 		if (!$assocs_id || $assocanytrans || !$created_by)
 		{
@@ -268,10 +274,11 @@ class FlexicontentViewItemelement extends FlexicontentViewBaseRecords
 				'html' => flexicontent_html::buildauthorsselect(
 					$authors,
 					$fieldname,
-					$filter_author,
+					$value,
 					$displaytype = '-',
 					array(
 						'class' => $this->select_class,
+						'size' => '1',
 						'onchange' => 'document.adminForm.limitstart.value=0; Joomla.submitform();',
 					)
 				),
@@ -284,10 +291,6 @@ class FlexicontentViewItemelement extends FlexicontentViewBaseRecords
 				'html' => '<span class="add-on"><i>' . JFactory::getUser($created_by)->name . '</i></span>',
 			));
 		}
-
-
-		// Text search filter value
-		$lists['search'] = $search;
 
 
 		// Build language filter
@@ -331,6 +334,7 @@ class FlexicontentViewItemelement extends FlexicontentViewBaseRecords
 
 		$fieldname = 'filter_state';
 		$elementid = 'filter_state';
+		$value     = $filter_state;
 
 		$lists[$elementid] = $this->getFilterDisplay(array(
 			'label' => JText::_('FLEXI_STATE'),
@@ -344,7 +348,7 @@ class FlexicontentViewItemelement extends FlexicontentViewBaseRecords
 				),
 				'value',
 				'text',
-				$filter_state,
+				$value,
 				$elementid,
 				$translate = true
 			),
@@ -357,6 +361,7 @@ class FlexicontentViewItemelement extends FlexicontentViewBaseRecords
 
 		$fieldname = 'filter_access';
 		$elementid = 'filter_access';
+		$value     = $filter_access;
 
 		$lists[$elementid] = $this->getFilterDisplay(array(
 			'label' => JText::_('FLEXI_ACCESS'),
@@ -365,15 +370,28 @@ class FlexicontentViewItemelement extends FlexicontentViewBaseRecords
 				$fieldname,
 				array(
 					'class' => $this->select_class,
+					'size' => '1',
 					'onchange' => 'document.adminForm.limitstart.value=0; Joomla.submitform();',
 				),
 				'value',
 				'text',
-				$filter_access,
+				$value,
 				$elementid,
 				$translate = true
 			),
 		));
+
+
+		// Build text search scope
+		$scopes = null;
+
+		$lists['scope_tip'] = '';
+		$lists['scope'] = $this->getScopeSelectorDisplay($scopes, $scope);
+		$this->scope_title = $scopes[$scope];
+
+
+		// Text search filter value
+		$lists['search'] = $search;
 
 
 		// Table ordering

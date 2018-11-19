@@ -85,10 +85,11 @@ class FlexicontentViewTypes extends FlexicontentViewBaseRecords
 		$filter_state     = $model->getState('filter_state');
 		$filter_access    = $model->getState('filter_access');
 
-		if ($filter_state) $count_filters++;
-		if ($filter_access) $count_filters++;
+		if (strlen($filter_state)) $count_filters++;
+		if (strlen($filter_access)) $count_filters++;
 
 		// Text search
+		$scope  = $model->getState('scope');
 		$search = $model->getState('search');
 		$search = StringHelper::trim(StringHelper::strtolower($search));
 
@@ -149,7 +150,8 @@ class FlexicontentViewTypes extends FlexicontentViewBaseRecords
 
 
 		/**
-		 * Get data from the model
+		 * Get data from the model, note data retrieval must be before 
+		 * getTotal() and getPagination() because it also calculates total rows
 		 */
 
 		if ( $print_logging_info )  $start_microtime = microtime(true);
@@ -191,6 +193,10 @@ class FlexicontentViewTypes extends FlexicontentViewBaseRecords
 
 
 		// Build publication state filter
+		$fieldname = 'filter_state';
+		$elementid = 'filter_state';
+		$value     = $filter_state;
+
 		//$options = JHtml::_('jgrid.publishedOptions');
 		$options = array();
 
@@ -199,9 +205,6 @@ class FlexicontentViewTypes extends FlexicontentViewBaseRecords
 			$options[] = JHtml::_('select.option', $condition_value, JText::_($condition_name));
 		}
 		array_unshift($options, JHtml::_('select.option', '', '-'/*'FLEXI_STATE'*/));
-
-		$fieldname = 'filter_state';
-		$elementid = 'filter_state';
 
 		$lists[$elementid] = $this->getFilterDisplay(array(
 			'label' => JText::_('FLEXI_STATE'),
@@ -215,7 +218,7 @@ class FlexicontentViewTypes extends FlexicontentViewBaseRecords
 				),
 				'value',
 				'text',
-				$filter_state,
+				$value,
 				$elementid,
 				$translate = true
 			),
@@ -228,6 +231,7 @@ class FlexicontentViewTypes extends FlexicontentViewBaseRecords
 
 		$fieldname = 'filter_access';
 		$elementid = 'filter_access';
+		$value     = $filter_access;
 
 		$lists[$elementid] = $this->getFilterDisplay(array(
 			'label' => JText::_('FLEXI_ACCESS'),
@@ -236,15 +240,24 @@ class FlexicontentViewTypes extends FlexicontentViewBaseRecords
 				$fieldname,
 				array(
 					'class' => $this->select_class,
+					'size' => '1',
 					'onchange' => 'document.adminForm.limitstart.value=0; Joomla.submitform();',
 				),
 				'value',
 				'text',
-				$filter_access,
+				$value,
 				$elementid,
 				$translate = true
-			)
+			),
 		));
+
+
+		// Build text search scope
+		$scopes = null;
+
+		$lists['scope_tip'] = '';
+		$lists['scope'] = $this->getScopeSelectorDisplay($scopes, $scope);
+		$this->scope_title = $scopes[$scope];
 
 
 		// Text search filter value
@@ -321,7 +334,6 @@ class FlexicontentViewTypes extends FlexicontentViewBaseRecords
 		$hasEditState = $perms->CanTypes;
 		$hasDelete    = $perms->CanTypes;
 		$hasCopy      = $perms->CanTypes;
-
 
 		if ($hasCreate)
 		{

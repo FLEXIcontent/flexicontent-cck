@@ -54,7 +54,11 @@ class FlexicontentModelUsers extends FCModelAdminList
 	/**
 	 * Search and ordering columns
 	 */
-	var $search_cols       = array('username', 'email', 'name');
+	var $search_cols = array(
+		'FLEXI_USER_NAME' => 'username',
+		'FLEXI_USER_EMAIL' => 'email',
+		'FLEXI_NAME' => 'name',
+	);
 	var $default_order     = 'a.id';
 	var $default_order_dir = 'DESC';
 
@@ -92,19 +96,25 @@ class FlexicontentModelUsers extends FCModelAdminList
 	 */
 	public function __construct($config = array())
 	{
-		parent::__construct($config);
-
 		$app    = JFactory::getApplication();
 		$jinput = $app->input;
-		$option = $jinput->get('option', '', 'cmd');
-		$view   = $jinput->get('view', '', 'cmd');
-		$fcform = $jinput->get('fcform', 0, 'int');
-		$p      = $this->ovid;
+		$option = $jinput->getCmd('option', '');
+		$view   = $jinput->getCmd('view', '');
+		$layout = $jinput->getString('layout', 'default');
+		$fcform = $jinput->getInt('fcform', 0);
+
+		// Make session index more specific ... (if needed by this model)
+		//$this->view_id = $view . '_' . $layout;
+
+		// Call parent after setting ... $this->view_id
+		parent::__construct($config);
+
+		$p = $this->ovid;
 
 
 		/**
 		 * View's Filters
-		 * Inherited filters : filter_state, filter_id, search
+		 * Inherited filters : filter_state, filter_id, scope, search
 		 */
 
 		// Various filters
@@ -223,10 +233,6 @@ class FlexicontentModelUsers extends FCModelAdminList
 		$startdate = StringHelper::trim(StringHelper::strtolower($startdate));
 		$enddate   = StringHelper::trim(StringHelper::strtolower($enddate));
 
-		// Text search
-		$search = $this->getState('search');
-		$search = StringHelper::trim(StringHelper::strtolower($search));
-
 		// Register, last-visit, last-login dates
 		$date_filter_types = array(
 			1 => 'a.registerDate',
@@ -328,6 +334,7 @@ class FlexicontentModelUsers extends FCModelAdminList
 			? ' HAVING ' . (count($having) ? implode(' AND ', $having) : ' 1 ')
 			: $having;
 	}
+
 
 	/**
 	 * Method to find which records are not authorized

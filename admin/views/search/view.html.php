@@ -55,7 +55,7 @@ class FLEXIcontentViewSearch extends FlexicontentViewBaseRecords
 		$isCtmpl  = $jinput->getCmd('tmpl') === 'component';
 
 		// Some flags & constants
-		;
+		$useAssocs = flexicontent_db::useAssociations();
 
 		// Load Joomla language files of other extension
 		if (!empty($this->proxy_option))
@@ -65,7 +65,8 @@ class FLEXIcontentViewSearch extends FlexicontentViewBaseRecords
 		}
 
 		// Get model
-		$model = $this->getModel();
+		$model   = $this->getModel();
+		$model_s = null;
 
 		// Performance statistics
 		if ($print_logging_info = $cparams->get('print_logging_info'))
@@ -94,9 +95,10 @@ class FLEXIcontentViewSearch extends FlexicontentViewBaseRecords
 
 		if ($filter_fieldtype) $count_filters++;
 		if ($filter_type) $count_filters++;
-		if ($filter_state) $count_filters++;
+		if (strlen($filter_state)) $count_filters++;
 
 		// Text search
+		$scope  = $model->getState('scope');
 		$search = $model->getState('search');
 		$search = StringHelper::trim(StringHelper::strtolower($search));
 
@@ -171,10 +173,14 @@ class FLEXIcontentViewSearch extends FlexicontentViewBaseRecords
 
 
 		/**
-		 * Get data from the model
+		 * Get data from the model, note data retrieval must be before 
+		 * getTotal() and getPagination() because it also calculates total rows
 		 */
 
 		if ( $print_logging_info )  $start_microtime = microtime(true);
+
+		$rows        = $model->getData();
+		$pagination  = $model->getPagination();
 
 		// Get item types
 		$types = $this->get('Typeslist');
@@ -194,42 +200,83 @@ class FLEXIcontentViewSearch extends FlexicontentViewBaseRecords
 
 		$js = '';
 
-		//build backend visible filter
+		// Build field type filter
 		if ($isADV)
 		{
 			$fftypes = array();
 			$fftypes[] = JHtml::_('select.option',  '', '-' /*JText::_( 'FLEXI_ALL_FIELDS_TYPE' )*/ );
 			$fftypes[] = JHtml::_('select.option',  'C', JText::_( 'FLEXI_CORE_FIELDS' ) );
 			$fftypes[] = JHtml::_('select.option',  'NC', JText::_( 'FLEXI_CUSTOM_NON_CORE_FIELDS' ) );
-			foreach ($fieldtypes as $field_type => $ftdata) {
+			foreach ($fieldtypes as $field_type => $ftdata)
+			{
 				$fftypes[] = JHtml::_('select.option', $field_type, '-'.$ftdata->assigned.'- '. $field_type);
 			}
 
-			$lists['filter_fieldtype'] = ($filter_fieldtype || 1 ? '<div class="add-on">'.JText::_('FLEXI_FIELD_TYPE').'</div>' : '').
-				JHtml::_('select.genericlist', $fftypes, 'filter_fieldtype', 'class="use_select2_lib" size="1" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', 'value', 'text', $filter_fieldtype );
+			$lists['filter_fieldtype'] = $this->getFilterDisplay(array(
+				'label' => JText::_('FLEXI_FIELD_TYPE'),
+				'html' => JHtml::_('select.genericlist',
+					$fftypes,
+					'filter_fieldtype',
+					array(
+						'class' => $this->select_class,
+						'size' => '1',
+						'onchange' => 'document.adminForm.limitstart.value=0; Joomla.submitform();',
+					),
+					'value',
+					'text',
+					$filter_fieldtype
+				),
+			));
 		}
 
-		//build type select list
-		$lists['filter_type'] = ($filter_type|| 1 ? '<div class="add-on">'.JText::_('FLEXI_TYPE').'</div>' : '').
-			flexicontent_html::buildtypesselect($types, 'filter_type', $filter_type, '-'/*true*/, 'class="use_select2_lib" size="1" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', 'filter_type');
+		// Build item type filter
+		$lists['filter_type'] = $this->getFilterDisplay(array(
+			'label' => JText::_('FLEXI_TYPE'),
+			'html' => flexicontent_html::buildtypesselect(
+				$types,
+				'filter_type',
+				$filter_type,
+				'-'/*true*/,
+				array(
+					'class' => $this->select_class,
+					'size' => '1',
+					'onchange' => 'document.adminForm.limitstart.value=0; Joomla.submitform();',
+				),
+				'filter_type'
+			),
+		));
 
-		//publish unpublished filter
+		// Build state filter (grouping published and unpublished states)
 		$ffstates = array();
 		$ffstates[] = JHtml::_('select.option',  '', '-' /*JText::_( 'FLEXI_SELECT_STATE' )*/ );
 		$ffstates[] = JHtml::_('select.option',  'ALL_P', JText::_('FLEXI_GRP_PUBLISHED') . ' ' . JText::_('FLEXI_STATE_S'));
 		$ffstates[] = JHtml::_('select.option',  'ALL_U', JText::_('FLEXI_GRP_UNPUBLISHED') . ' ' . JText::_('FLEXI_STATE_S'));
 
-		$lists['filter_state'] = ($filter_state || 1 ? '<div class="add-on">'.JText::_('FLEXI_STATE').'</div>' : '').
-			JHtml::_('select.genericlist', $ffstates, 'filter_state', 'class="use_select2_lib" size="1" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', 'value', 'text', $filter_state );
+		$lists['filter_state'] = $this->getFilterDisplay(array(
+			'label' => JText::_('FLEXI_STATE'),
+			'html' => JHtml::_('select.genericlist',
+				$ffstates,
+				'filter_state',
+				array(
+					'class' => $this->select_class,
+					'size' => '1',
+					'onchange' => 'document.adminForm.limitstart.value=0; Joomla.submitform();',
+				),
+				'value',
+				'text',
+				$filter_state
+			),
+		));
 
-		// build filter index type record listing
+		// Build index type filter
 		$itn['basic'] = JText::_( 'FLEXI_INDEX_BASIC' );
 		$itn['advanced'] = JText::_( 'FLEXI_INDEX_ADVANCED' );
 		$indextypes = array();
 		//foreach ($itn as $i => $v) $indextypes[] = JHtml::_('select.option', $i, $v);
 		//$lists['filter_indextype'] = JHtml::_('select.radiolist', $indextypes, 'filter_indextype', 'size="1" class="inputbox" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', 'value', 'text', $filter_indextype );
 
-		$lists['filter_indextype'] = '';
+		$lists['filter_indextype'] = '<div class="fc-iblock group-fcset radio" style="vertical-align: middle">';
+
 		foreach ($itn as $i => $v)
 		{
 			$checked = $filter_indextype == $i ? ' checked="checked" ' : '';
@@ -237,19 +284,40 @@ class FLEXIcontentViewSearch extends FlexicontentViewBaseRecords
 			$lists['filter_indextype'] .= '<label class="" id="filter_indextype'.$i.'-lbl" for="filter_indextype'.$i.'">'.$v.'</label>';
 		}
 
+		$lists['filter_indextype'] .= '</div>';
+
+
+		// Build text search scope
+		$scopes = array(
+			'-1' => JText::_('FLEXI_INDEXED_CONTENT'),
+		);
+
+		$lists['scope_tip'] = '';
+		$lists['scope'] = $this->getScopeSelectorDisplay($scopes, $scope);
+		$this->scope_title = $scopes[$scope];
+
+
+		// Text search filter value
+		$lists['search'] = $search;
+
+
 		// Table ordering
 		$lists['order_Dir'] = $filter_order_Dir;
 		$lists['order']     = $filter_order;
 
-		// Search index & item title filter
-		$lists['search']= $search;
-		$lists['search_itemtitle']= $search_itemtitle;
-		$lists['search_itemid']= $search_itemid;
 
-		$rows   = $this->get('Data');  // MUST BE BEFORE getCount and getPagination because it also calculates total rows
-		$total  = $this->get('Count');
-		$pagination = $this->get('Pagination');
-		$limitstart = $this->get('LimitStart');
+		// Build item title filter
+		$lists['search_itemtitle'] = $this->getFilterDisplay(array(
+			'label' => JText::_('FLEXI_TITLE'),
+			'html' => '<input type="text" name="search_itemtitle" id="search_itemtitle" value="' . htmlspecialchars($search_itemtitle, ENT_QUOTES, 'UTF-8') . '" class="text_area" onchange="document.adminForm.submit();" size="30"/>',
+		));
+
+
+		// Build item id filter
+		$lists['search_itemid'] = $this->getFilterDisplay(array(
+			'label' => JText::_('FLEXI_ID'),
+			'html' => '<input type="text" name="search_itemid" id="search_itemid" value="' . htmlspecialchars($search_itemid, ENT_QUOTES, 'UTF-8') . '" class="text_area" onchange="document.adminForm.submit();" size="6" />',
+		));
 
 		if ($filter_fieldtype)
 		{
@@ -308,9 +376,7 @@ class FLEXIcontentViewSearch extends FlexicontentViewBaseRecords
 		$this->lists       = $lists;
 		$this->rows        = $rows;
 		$this->pagination  = $pagination;
-		$this->total = $total;
-		$this->limitstart = $limitstart;
-		$this->f_active = $f_active;
+		$this->f_active    = $f_active;
 
 		$this->perms  = FlexicontentHelperPerm::getPerm();
 		$this->option = $option;
@@ -318,8 +384,10 @@ class FLEXIcontentViewSearch extends FlexicontentViewBaseRecords
 		$this->state  = $this->get('State');
 		$this->isADV = $isADV;
 
-		$this->sidebar = FLEXI_J30GE ? JHtmlSidebar::render() : null;
-
+		if (!$jinput->getCmd('nosidebar'))
+		{
+			$this->sidebar = FLEXI_J30GE ? JHtmlSidebar::render() : null;
+		}
 
 		/**
 		 * Render view's template
@@ -354,7 +422,6 @@ class FLEXIcontentViewSearch extends FlexicontentViewBaseRecords
 		$contrl_s = null;
 
 		$loading_msg = flexicontent_html::encodeHTML(JText::_('FLEXI_LOADING') .' ... '. JText::_('FLEXI_PLEASE_WAIT'), 2);
-		$tip_class = ' hasTooltip';
 
 		$btn_arr = array();
 
@@ -369,7 +436,7 @@ class FLEXIcontentViewSearch extends FlexicontentViewBaseRecords
 				$btn_text, $btn_name, $full_js,
 				$msg_alert = JText::_('FLEXI_NO_ITEMS_SELECTED'), $msg_confirm = '',
 				$btn_task='', $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false,
-				'btn btn-fcaction ' . $tip_class, 'icon-loop',
+				'btn btn-fcaction ' . $this->tooltip_class, 'icon-loop',
 				'data-placement="right" data-taskurl="' . $popup_load_url .'" title=""', $auto_add = 0, $tag_type='button')
 				;
 
@@ -382,7 +449,7 @@ class FLEXIcontentViewSearch extends FlexicontentViewBaseRecords
 				$btn_text, $btn_name, $full_js,
 				$msg_alert = JText::_('FLEXI_NO_ITEMS_SELECTED'), $msg_confirm = '',
 				$btn_task='', $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false,
-				'btn btn-fcaction ' . $tip_class, 'icon-loop',
+				'btn btn-fcaction ' . $this->tooltip_class, 'icon-loop',
 				'data-placement="right" data-taskurl="' . $popup_load_url .'" title=""', $auto_add = 0, $tag_type='button')
 				;
 
@@ -395,7 +462,7 @@ class FLEXIcontentViewSearch extends FlexicontentViewBaseRecords
 				$btn_text, $btn_name, $full_js,
 				$msg_alert = JText::_('FLEXI_NO_ITEMS_SELECTED'), $msg_confirm = '',
 				$btn_task='', $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false,
-				'btn btn-fcaction ' . $tip_class, 'icon-loop',
+				'btn btn-fcaction ' . $this->tooltip_class, 'icon-loop',
 				'data-placement="right" data-taskurl="' . $popup_load_url .'" title=""', $auto_add = 0, $tag_type='button')
 				;
 		}

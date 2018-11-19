@@ -120,7 +120,8 @@ class FlexicontentViewTagelement extends FlexicontentViewBaseRecords
 
 
 		/**
-		 * Get data from the model
+		 * Get data from the model, note data retrieval must be before 
+		 * getTotal() and getPagination() because it also calculates total rows
 		 */
 
 		if ( $print_logging_info )  $start_microtime = microtime(true);

@@ -1825,6 +1825,7 @@ class flexicontent_html
 				JText::script('FLEXI_LOADING_IMAGES',true);
 				JText::script('FLEXI_THUMBNAILS',true);
 				JText::script("FLEXI_NO_ITEMS_SELECTED", true);
+				JText::script("FLEXI_ARE_YOU_SURE", true);
 				break;
 
 			// Used only by content / configuration forms, that have form elements needing this

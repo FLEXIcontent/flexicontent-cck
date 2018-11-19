@@ -48,6 +48,7 @@ class FlexicontentViewItemcompare extends JViewLegacy {
 		/**
 		 * Get data from the model
 		 */
+
 		$model			= $this->getModel();
 		$row     		= $model->getItem();
 		$fields			= $model->getExtrafields();

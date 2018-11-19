@@ -12,7 +12,7 @@
 defined('_JEXEC') or die('Restricted access');
 
 use Joomla\String\StringHelper;
-JHtml::addIncludePath(JPATH_COMPONENT . '/helpers/html');
+JHtml::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/html');
 
 global $globalcats;
 $app      = JFactory::getApplication();
@@ -25,6 +25,7 @@ $cparams  = JComponentHelper::getParams('com_flexicontent');
 $ctrl     = 'types.';
 $hlpname  = 'fctypes';
 $isAdmin  = $app->isAdmin();
+$useAssocs= flexicontent_db::useAssociations();
 
 
 
@@ -49,11 +50,27 @@ $view_items  = JText::_('FLEXI_VIEW', true); //JText::_('FLEXI_VIEW_ITEMS', true
 
 flexicontent_html::jscode_to_showhide_table(
 	'mainChooseColBox',
-	'adminListTableFCtypes',
+	'adminListTableFC' . $this->view,
 	$start_html = '',  //'<span class="badge ' . (FLEXI_J40GE ? 'badge-dark' : 'badge-inverse') . '">' . JText::_('FLEXI_COLUMNS', true) . '<\/span> &nbsp; ',
 	$end_html = '<div id="fc-columns-slide-btn" class="icon-arrow-up-2 btn btn-outline-secondary" title="' . JText::_('FLEXI_HIDE') . '" style="cursor: pointer;" onclick="fc_toggle_box_via_btn(\\\'mainChooseColBox\\\', document.getElementById(\\\'fc_mainChooseColBox_btn\\\'), \\\'btn-primary\\\');"><\/div>'
 );
-$tools_cookies['fc-filters-box-disp'] = 0; //JFactory::getApplication()->input->cookie->get('fc-filters-box-disp', 0, 'int');
+
+
+
+/**
+ * Get cookie-based preferences of current user
+ */
+
+// Get all managers preferences
+$fc_man_name = 'fc_' . $this->getModel()->view_id;
+$FcMansConf = $this->getUserStatePrefs($fc_man_name);
+
+// Get specific manager data
+$tools_state = isset($FcMansConf->$fc_man_name)
+	? $FcMansConf->$fc_man_name
+	: (object) array(
+		'filters_box' => 0,
+	);
 
 
 
@@ -77,6 +94,7 @@ $default_template_tip = '<img src="components/com_flexicontent/assets/images/com
  */
 
 $list_total_cols = 12;
+
 
 
 /**
@@ -175,14 +193,13 @@ if ($js)
 					<?php echo ($this->count_filters  ? ' <sup>' . $this->count_filters . '</sup>' : ''); ?>
 				</div>
 
-				<div id="fc-filters-box" <?php if (!$this->count_filters || !$tools_cookies['fc-filters-box-disp']) echo 'style="display:none;"'; ?> class="fcman-abs" onclick="var event = arguments[0] || window.event; event.stopPropagation();">
+				<div id="fc-filters-box" <?php if (!$this->count_filters || !$tools_state->filters_box) echo 'style="display:none;"'; ?> class="fcman-abs" onclick="var event = arguments[0] || window.event; event.stopPropagation();">
 					<?php
 					echo $this->lists['filter_state'];
 					echo $this->lists['filter_access'];
 					?>
 
 					<div id="fc-filters-slide-btn" class="icon-arrow-up-2 btn btn-outline-secondary" title="<?php echo JText::_('FLEXI_HIDE'); ?>" style="cursor: pointer;" onclick="fc_toggle_box_via_btn('fc-filters-box', document.getElementById('fc_filters_box_btn'), 'btn-primary');"></div>
-					<input type="hidden" id="fc-filters-box-disp" name="fc-filters-box-disp" value="<?php echo $tools_cookies['fc-filters-box-disp']; ?>" />
 				</div>
 
 				<button title="" data-original-title="<?php echo JText::_('FLEXI_RESET_FILTERS'); ?>" class="<?php echo $btn_class . (FLEXI_J40GE ? ' btn-outline-dark ' : ' ') . $this->tooltip_class; ?>" onclick="document.adminForm.limitstart.value=0; delAllFilters(); Joomla.submitform();"><?php echo FLEXI_J30GE ? '<i class="icon-cancel"></i>' : JText::_('FLEXI_CLEAR'); ?></button>
@@ -194,8 +211,8 @@ if ($js)
 		<div class="fc-filter-head-box nowrap_box">
 
 			<div class="btn-group">
-				<div id="fc_mainChooseColBox_btn" class="<?php echo $out_class . ' ' . $this->tooltip_class; ?> hidden-phone" onclick="fc_toggle_box_via_btn('mainChooseColBox', this, 'btn-primary');" title="<?php echo flexicontent_html::getToolTip('', 'FLEXI_ABOUT_AUTO_HIDDEN_COLUMNS', 1, 1); ?>">
-					<?php echo JText::_( 'FLEXI_COLUMNS' ); ?><sup id="columnchoose_totals"></sup>
+				<div id="fc_mainChooseColBox_btn" class="<?php echo $out_class . ' ' . $this->tooltip_class; ?> hidden-phone" onclick="fc_toggle_box_via_btn('mainChooseColBox', this, 'btn-primary');" title="<?php echo flexicontent_html::getToolTip('FLEXI_COLUMNS', 'FLEXI_ABOUT_AUTO_HIDDEN_COLUMNS', 1, 1); ?>">
+					<span class="icon-contract"></span><sup id="columnchoose_totals"></sup>
 				</div>
 
 				<?php if (!empty($this->minihelp) && FlexicontentHelperPerm::getPerm()->CanConfig): ?>
@@ -232,7 +249,8 @@ if ($js)
 
 	<div class="fcclear"></div>
 
-	<table id="adminListTableFCtypes" class="adminlist table fcmanlist" itemscope itemtype="http://schema.org/WebPage">
+
+	<table id="adminListTableFC<?php echo $this->view; ?>" class="adminlist table fcmanlist" itemscope itemtype="http://schema.org/WebPage">
 	<thead>
 		<tr>
 
@@ -280,7 +298,7 @@ if ($js)
 			</th>
 
 			<th class="hideOnDemandClass col_id center hidden-phone hidden-tablet">
-				<?php echo JHtml::_('grid.sort', 'FLEXI_ID', 'a.id', $this->lists['order_Dir'], $this->lists['order'] ); ?>
+				<?php echo JHtml::_('grid.sort', 'FLEXI_ID', 'a.id', $this->lists['order_Dir'], $this->lists['order']); ?>
 			</th>
 
 		</tr>
@@ -314,7 +332,7 @@ if ($js)
 
 			$stateIsChangeable = $row->canCheckin && $row->canEditState;
 			$row_ilayout       = $row->config->get('ilayout');
-   		?>
+			?>
 		<tr class="<?php echo 'row' . ($i % 2); ?>">
 
 			<td class="hidden-phone">

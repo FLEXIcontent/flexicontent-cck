@@ -440,7 +440,7 @@ class flexicontent_db
 	 * @access public
 	 * @return string
 	 */
-	static function buildRatingOrderingColumn(& $rating_join = null, $colname = 'votes')
+	static function buildRatingOrderingColumn(& $rating_join = null, $colname = 'votes', $ta = 'i')
 	{
 		$voting_field = reset(FlexicontentFields::getFieldsByIds(array(11)));
 		$voting_field->parameters = new JRegistry($voting_field->attribs);
@@ -459,7 +459,7 @@ class flexicontent_db
 			$_weights[] = 'WHEN ' . $i . ' THEN ROUND(' . $weight_factor . ' * cr.rating_sum / cr.rating_count * ' . (100 / $rating_resolution) . ')';
 		}
 
-		$rating_join = '#__content_rating AS cr ON cr.content_id = i.id';
+		$rating_join = '#__content_rating AS cr ON cr.content_id = ' . $ta . '.id';
 		$_rating_percentage = 'CASE cr.rating_count'
 			. ' ' . implode(' ', $_weights)
 			. ' ELSE IF (ISNULL (cr.rating_count)'

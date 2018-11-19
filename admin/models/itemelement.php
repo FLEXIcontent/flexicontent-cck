@@ -55,7 +55,11 @@ class FlexicontentModelItemelement extends FCModelAdminList
 	/**
 	 * Search and ordering columns
 	 */
-	var $search_cols       = array('title', 'alias', 'note');
+	var $search_cols = array(
+		'FLEXI_TITLE' => 'title',
+		'FLEXI_ALIAS' => 'alias',
+		'FLEXI_NOTES' => 'note',
+	);
 	var $default_order     = 'a.id';
 	var $default_order_dir = 'DESC';
 
@@ -100,19 +104,21 @@ class FlexicontentModelItemelement extends FCModelAdminList
 	 */
 	public function __construct($config = array())
 	{
-		// Make session index more specific ...
-		$this->assocs_id = JFactory::getApplication()->input->getInt('assocs_id', 0);
-		$this->view_id   = JFactory::getApplication()->input->getCmd('view', '') . $this->assocs_id;
+		$app    = JFactory::getApplication();
+		$jinput = $app->input;
+		$option = $jinput->getCmd('option', '');
+		$view   = $jinput->getCmd('view', '');
+		$layout = $jinput->getString('layout', 'default');
+		$fcform = $jinput->getInt('fcform', 0);
+
+		// Make session index more specific ... (if needed by this model)
+		$this->assocs_id = $jinput->getInt('assocs_id', 0);
+		$this->view_id   = $view . '_' . $layout . ($this->assocs_id ? '' . $this->assocs_id : '');
 
 		// Call parent after setting ... $this->view_id
 		parent::__construct($config);
 
-		$app    = JFactory::getApplication();
-		$jinput = $app->input;
-		$option = $jinput->get('option', '', 'cmd');
-		$view   = $jinput->get('view', '', 'cmd');
-		$fcform = $jinput->get('fcform', 0, 'int');
-		$p      = $this->ovid;
+		$p = $this->ovid;
 
 
 		/**

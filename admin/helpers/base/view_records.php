@@ -243,7 +243,7 @@ class FlexicontentViewBaseRecords extends JViewLegacy
 	public function getUserStatePrefs($fc_man_name = null)
 	{
 		$cookie_name = 'fc_managers_conf';
-		$fc_man_name = $fc_man_name ?: 'fc_' . $this->view;
+		$fc_man_name = $fc_man_name ?: 'fc_' . $this->view_id;
 
 		JFactory::getDocument()->addScriptDeclaration('
 		var FCMAN_conf = {};
@@ -276,5 +276,66 @@ class FlexicontentViewBaseRecords extends JViewLegacy
 		}
 
 		return $FcMansConf;
+	}
+
+
+	/**
+	 * Method to get the display of text search scope selector
+	 *
+	 * @param   array   $scopes  The available scopes
+	 *
+	 * @return  string  The HTML display of the scope selector
+	 *
+	 * @since   3.3.0
+	 */	
+	public function getScopeSelectorDisplay(& $scopes, $value, $fieldname = 'scope', $elementid = 'scope')
+	{
+		$model = $this->getModel();
+		
+		if (!$scopes)
+		{
+			$scopes = array('-1' => '- ' . JText::_('FLEXI_ALL') . ' -');
+
+			foreach ($model->search_cols as $label => $column_name)
+			{
+				// Numeric label means do not add this search case to the scope selector
+				if (!is_numeric($label))
+				{
+					$scopes['a.' . $column_name] = JText::_($label);
+				}
+			}
+
+			// Remove scope for searching text in all search columns, if only 1 column was added
+			if (count($scopes) === 2)
+			{
+				unset($scopes['-1']);
+			}
+		}
+
+		$this->scope_title = $scopes[$value];
+		$options = array();
+
+		foreach ($scopes as $i => $v)
+		{
+			$options[] = JHtml::_('select.option', $i, $v);
+		}
+
+		array_unshift($options, JHtml::_('select.option', 0, JText::_('FLEXI_SEARCH_TEXT_INSIDE'), 'value', 'text', 'disabled'));
+
+		return JHtml::_('select.genericlist',
+			$options,
+			$fieldname,
+			array(
+				'size' => '1',
+				'class' => $this->select_class . ' fc_is_selarrow ' . $this->tooltip_class,
+				'onchange' => 'jQuery(\'#search\').attr(\'placeholder\', jQuery(this).find(\'option:selected\').text()); jQuery(this).blur();',
+				'title' => JText::_('FLEXI_SEARCH_TEXT_INSIDE'),
+			),
+			'value',
+			'text',
+			$value,
+			$elementid,
+			$translate = false
+		);
 	}
 }

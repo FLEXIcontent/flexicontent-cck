@@ -25,6 +25,7 @@ class FlexicontentViewFccategoryelement extends FlexicontentViewBaseRecords
 	var $title_propname = 'title';
 	var $state_propname = 'published';
 	var $db_tbl         = 'categories';
+	var $name_singular  = 'category';
 
 	public function display($tpl = null)
 	{
@@ -61,7 +62,8 @@ class FlexicontentViewFccategoryelement extends FlexicontentViewBaseRecords
 		}
 
 		// Get model
-		$model = $this->getModel();
+		$model   = $this->getModel();
+		$model_s = $this->getModel($this->name_singular);
 
 		// Performance statistics
 		if ($print_logging_info = $cparams->get('print_logging_info'))
@@ -101,14 +103,15 @@ class FlexicontentViewFccategoryelement extends FlexicontentViewBaseRecords
 		$filter_lang      = $model->getState('filter_lang');
 		$filter_author    = $model->getState('filter_author');
 
-		if ($filter_state) $count_filters++;
+		if (strlen($filter_state)) $count_filters++;
 		if ($filter_cats) $count_filters++;
 		if ($filter_level) $count_filters++;
-		if ($filter_access) $count_filters++;
+		if (strlen($filter_access)) $count_filters++;
 		if ($filter_lang) $count_filters++;
-		if ($filter_author) $count_filters++;
+		if (strlen($filter_author)) $count_filters++;
 
 		// Text search
+		$scope  = $model->getState('scope');
 		$search = $model->getState('search');
 		$search = StringHelper::trim(StringHelper::strtolower($search));
 
@@ -165,7 +168,8 @@ class FlexicontentViewFccategoryelement extends FlexicontentViewBaseRecords
 
 
 		/**
-		 * Get data from the model
+		 * Get data from the model, note data retrieval must be before 
+		 * getTotal() and getPagination() because it also calculates total rows
 		 */
 
 		if ( $print_logging_info )  $start_microtime = microtime(true);
@@ -203,13 +207,14 @@ class FlexicontentViewFccategoryelement extends FlexicontentViewBaseRecords
 		// Build category filter
 		$fieldname = 'filter_cats';
 		$elementid = 'filter_cats';
+		$value     = $filter_cats;
 
 		$lists[$elementid] = $this->getFilterDisplay(array(
 			'label' => JText::_('FLEXI_CATEGORY'),
 			'html' => flexicontent_cats::buildcatselect(
 				$categories,
 				$fieldname,
-				$filter_cats,
+				$value,
 				$displaytype = '-',
 				array(
 					'class' => $this->select_class,
@@ -234,6 +239,7 @@ class FlexicontentViewFccategoryelement extends FlexicontentViewBaseRecords
 
 		$fieldname = 'filter_level';
 		$elementid = 'filter_level';
+		$value     = $filter_level;
 
 		if (1)
 		{
@@ -249,7 +255,7 @@ class FlexicontentViewFccategoryelement extends FlexicontentViewBaseRecords
 					),
 					'value',
 					'text',
-					$filter_level,
+					$value,
 					$elementid,
 					$translate = true
 				),
@@ -259,6 +265,7 @@ class FlexicontentViewFccategoryelement extends FlexicontentViewBaseRecords
 		// Build author filter
 		$fieldname = 'filter_author';
 		$elementid = 'filter_author';
+		$value     = $filter_author;
 
 		if (!$assocs_id || $assocanytrans || !$created_by)
 		{
@@ -267,10 +274,11 @@ class FlexicontentViewFccategoryelement extends FlexicontentViewBaseRecords
 				'html' => flexicontent_html::buildauthorsselect(
 					$authors,
 					$fieldname,
-					$filter_author,
+					$value,
 					$displaytype = '-',
 					array(
 						'class' => $this->select_class,
+						'size' => '1',
 						'onchange' => 'document.adminForm.limitstart.value=0; Joomla.submitform();',
 					)
 				),
@@ -283,10 +291,6 @@ class FlexicontentViewFccategoryelement extends FlexicontentViewBaseRecords
 				'html' => '<span class="add-on"><i>' . JFactory::getUser($created_by)->name . '</i></span>',
 			));
 		}
-
-
-		// Text search filter value
-		$lists['search'] = $search;
 
 
 		// Build language filter
@@ -318,11 +322,18 @@ class FlexicontentViewFccategoryelement extends FlexicontentViewBaseRecords
 
 
 		// Build publication state filter
-		$options = JHtml::_('jgrid.publishedOptions');
+		//$options = JHtml::_('jgrid.publishedOptions');
+		$options = array();
+
+		foreach ($model_s::supported_conditions as $condition_value => $condition_name)
+		{
+			$options[] = JHtml::_('select.option', $condition_value, $condition_name);
+		}
 		array_unshift($options, JHtml::_('select.option', '', '-'/*'FLEXI_SELECT_STATE'*/));
 
 		$fieldname = 'filter_state';
 		$elementid = 'filter_state';
+		$value     = $filter_state;
 
 		$lists[$elementid] = $this->getFilterDisplay(array(
 			'label' => JText::_('FLEXI_STATE'),
@@ -336,7 +347,7 @@ class FlexicontentViewFccategoryelement extends FlexicontentViewBaseRecords
 				),
 				'value',
 				'text',
-				$filter_state,
+				$value,
 				$elementid,
 				$translate = true
 			),
@@ -349,6 +360,7 @@ class FlexicontentViewFccategoryelement extends FlexicontentViewBaseRecords
 
 		$fieldname = 'filter_access';
 		$elementid = 'filter_access';
+		$value     = $filter_access;
 
 		$lists[$elementid] = $this->getFilterDisplay(array(
 			'label' => JText::_('FLEXI_ACCESS'),
@@ -357,15 +369,28 @@ class FlexicontentViewFccategoryelement extends FlexicontentViewBaseRecords
 				$fieldname,
 				array(
 					'class' => $this->select_class,
+					'size' => '1',
 					'onchange' => 'document.adminForm.limitstart.value=0; Joomla.submitform();',
 				),
 				'value',
 				'text',
-				$filter_access,
+				$value,
 				$elementid,
 				$translate = true
 			),
 		));
+
+
+		// Build text search scope
+		$scopes = null;
+
+		$lists['scope_tip'] = '';
+		$lists['scope'] = $this->getScopeSelectorDisplay($scopes, $scope);
+		$this->scope_title = $scopes[$scope];
+
+
+		// Text search filter value
+		$lists['search'] = $search;
 
 
 		// Table ordering
@@ -382,8 +407,8 @@ class FlexicontentViewFccategoryelement extends FlexicontentViewBaseRecords
 
 		$this->lists       = $lists;
 		$this->rows        = $rows;
-		$this->langs       = $langs;
 		$this->lang_assocs = $lang_assocs;
+		$this->langs       = $langs;
 		$this->pagination  = $pagination;
 		$this->ordering    = $ordering;
 
