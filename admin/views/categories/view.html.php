@@ -90,12 +90,12 @@ class FlexicontentViewCategories extends FlexicontentViewBaseRecords
 		$filter_lang      = $model->getState('filter_lang');
 		$filter_author    = $model->getState('filter_author');
 
-		if ($filter_state) $count_filters++;
+		if (strlen($filter_state)) $count_filters++;
 		if ($filter_cats) $count_filters++;
 		if ($filter_level) $count_filters++;
-		if ($filter_access) $count_filters++;
+		if (strlen($filter_access)) $count_filters++;
 		if ($filter_lang) $count_filters++;
-		if ($filter_author) $count_filters++;
+		if (strlen($filter_author)) $count_filters++;
 
 		// Record ID filter
 		$filter_id = $model->getState('filter_id');
@@ -103,6 +103,7 @@ class FlexicontentViewCategories extends FlexicontentViewBaseRecords
 
 
 		// Text search
+		$scope  = $model->getState('scope');
 		$search = $model->getState('search');
 		$search = StringHelper::trim(StringHelper::strtolower($search));
 
@@ -161,7 +162,8 @@ class FlexicontentViewCategories extends FlexicontentViewBaseRecords
 
 
 		/**
-		 * Get data from the model
+		 * Get data from the model, note data retrieval must be before 
+		 * getTotal() and getPagination() because it also calculates total rows
 		 */
 
 		if ( $print_logging_info )  $start_microtime = microtime(true);
@@ -242,13 +244,14 @@ class FlexicontentViewCategories extends FlexicontentViewBaseRecords
 		// Build category filter
 		$fieldname = 'filter_cats';
 		$elementid = 'filter_cats';
+		$value     = $filter_cats;
 
 		$lists[$elementid] = $this->getFilterDisplay(array(
 			'label' => JText::_('FLEXI_CATEGORY'),
 			'html' => flexicontent_cats::buildcatselect(
 				$categories,
 				$fieldname,
-				$filter_cats,
+				$value,
 				$displaytype = '-',
 				array(
 					'class' => $this->select_class,
@@ -273,6 +276,7 @@ class FlexicontentViewCategories extends FlexicontentViewBaseRecords
 
 		$fieldname = 'filter_level';
 		$elementid = 'filter_level';
+		$value     = $filter_level;
 
 		if (1)
 		{
@@ -288,7 +292,7 @@ class FlexicontentViewCategories extends FlexicontentViewBaseRecords
 					),
 					'value',
 					'text',
-					$filter_level,
+					$value,
 					$elementid,
 					$translate = true
 				),
@@ -298,6 +302,7 @@ class FlexicontentViewCategories extends FlexicontentViewBaseRecords
 		// Build author filter
 		$fieldname = 'filter_author';
 		$elementid = 'filter_author';
+		$value     = $filter_author;
 
 		if (1)
 		{
@@ -306,10 +311,11 @@ class FlexicontentViewCategories extends FlexicontentViewBaseRecords
 				'html' => flexicontent_html::buildauthorsselect(
 					$authors,
 					$fieldname,
-					$filter_author,
+					$value,
 					$displaytype = '-',
 					array(
 						'class' => $this->select_class,
+						'size' => '1',
 						'onchange' => 'document.adminForm.limitstart.value=0; Joomla.submitform();',
 					)
 				),
@@ -323,12 +329,13 @@ class FlexicontentViewCategories extends FlexicontentViewBaseRecords
 
 		foreach ($model_s::supported_conditions as $condition_value => $condition_name)
 		{
-			$options[] = JHtml::_('select.option', $condition_value, JText::_($condition_name));
+			$options[] = JHtml::_('select.option', $condition_value, $condition_name);
 		}
 		array_unshift($options, JHtml::_('select.option', '', '-'/*'FLEXI_SELECT_STATE'*/));
 
 		$fieldname = 'filter_state';
 		$elementid = 'filter_state';
+		$value     = $filter_state;
 
 		$lists[$elementid] = $this->getFilterDisplay(array(
 			'label' => JText::_('FLEXI_STATE'),
@@ -342,7 +349,7 @@ class FlexicontentViewCategories extends FlexicontentViewBaseRecords
 				),
 				'value',
 				'text',
-				$filter_state,
+				$value,
 				$elementid,
 				$translate = true
 			),
@@ -355,6 +362,7 @@ class FlexicontentViewCategories extends FlexicontentViewBaseRecords
 
 		$fieldname = 'filter_access';
 		$elementid = 'filter_access';
+		$value     = $filter_access;
 
 		$lists[$elementid] = $this->getFilterDisplay(array(
 			'label' => JText::_('FLEXI_ACCESS'),
@@ -363,11 +371,12 @@ class FlexicontentViewCategories extends FlexicontentViewBaseRecords
 				$fieldname,
 				array(
 					'class' => $this->select_class,
+					'size' => '1',
 					'onchange' => 'document.adminForm.limitstart.value=0; Joomla.submitform();',
 				),
 				'value',
 				'text',
-				$filter_access,
+				$value,
 				$elementid,
 				$translate = true
 			),
@@ -380,7 +389,8 @@ class FlexicontentViewCategories extends FlexicontentViewBaseRecords
 			'html' => flexicontent_html::buildlanguageslist(
 				'filter_lang',
 				array(
-					'class' => 'use_select2_lib',
+					'class' => $this->select_class,
+					'size' => '1',
 					'onchange' => 'document.adminForm.limitstart.value=0; Joomla.submitform();',
 				),
 				$filter_lang,
@@ -389,11 +399,19 @@ class FlexicontentViewCategories extends FlexicontentViewBaseRecords
 		));
 
 
-		// Build id list filter
+		// Build record id filter
 		$lists['filter_id'] = $this->getFilterDisplay(array(
 			'label' => JText::_('FLEXI_ID'),
 			'html' => '<input type="text" name="filter_id" id="filter_id" size="6" value="' . $filter_id . '" class="inputbox" style="width:auto;" />',
 		));
+
+
+		// Build text search scope
+		$scopes = null;
+
+		$lists['scope_tip'] = '';
+		$lists['scope'] = $this->getScopeSelectorDisplay($scopes, $scope);
+		$this->scope_title = $scopes[$scope];
 
 
 		// Text search filter value
@@ -611,7 +629,7 @@ class FlexicontentViewCategories extends FlexicontentViewBaseRecords
 				$btn_name, $full_js='', $msg_alert='', $msg_confirm=JText::_('FLEXI_EXPORT_NOW_AS_XML'),
 				$btn_task, $extra_js, $btn_list=false, $btn_menu=true, $btn_confirm=true,
 				$this->btn_sm_class . ' btn-fcaction ' . (FLEXI_J40GE ? $this->btn_iv_class : '') . ' ' . $this->popover_class, $btn_icon,
-			'data-placement="right" data-content="' . flexicontent_html::encodeHTML(JText::_(''), 2) . '"', $auto_add = 0, $tag_type='button'
+				'data-placement="right" data-content="' . flexicontent_html::encodeHTML(JText::_(''), 2) . '"', $auto_add = 0, $tag_type='button'
 			);
 
 			$btn_icon = 'icon-box-add';
@@ -623,7 +641,7 @@ class FlexicontentViewCategories extends FlexicontentViewBaseRecords
 				$btn_name, $full_js='', $msg_alert='', $msg_confirm=JText::_('FLEXI_ADD_TO_EXPORT_LIST'),
 				$btn_task, $extra_js, $btn_list=false, $btn_menu=true, $btn_confirm=true,
 				$this->btn_sm_class . ' btn-fcaction ' . (FLEXI_J40GE ? $this->btn_iv_class : '') . ' ' . $this->popover_class, $btn_icon,
-			'data-placement="right" data-content="' . flexicontent_html::encodeHTML(JText::_(''), 2) . '"', $auto_add = 0, $tag_type='button'
+				'data-placement="right" data-content="' . flexicontent_html::encodeHTML(JText::_(''), 2) . '"', $auto_add = 0, $tag_type='button'
 			);
 		}
 

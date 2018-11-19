@@ -96,10 +96,11 @@ class FlexicontentViewFields extends FlexicontentViewBaseRecords
 		if ($filter_fieldtype) $count_filters++;
 		if ($filter_assigned) $count_filters++;
 		if ($filter_type && !$reOrderingActive) $count_filters++;
-		if ($filter_state) $count_filters++;
-		if ($filter_access) $count_filters++;
+		if (strlen($filter_state)) $count_filters++;
+		if (strlen($filter_access)) $count_filters++;
 
 		// Text search
+		$scope  = $model->getState('scope');
 		$search = $model->getState('search');
 		$search = StringHelper::trim(StringHelper::strtolower($search));
 
@@ -158,7 +159,8 @@ class FlexicontentViewFields extends FlexicontentViewBaseRecords
 
 
 		/**
-		 * Get data from the model
+		 * Get data from the model, note data retrieval must be before 
+		 * getTotal() and getPagination() because it also calculates total rows
 		 */
 
 		if ( $print_logging_info )  $start_microtime = microtime(true);
@@ -357,7 +359,7 @@ class FlexicontentViewFields extends FlexicontentViewBaseRecords
 				$filter_type,
 				0,
 				array(
-					'class' => 'use_select2_lib',
+					'class' => $this->select_class,
 					'size' => '1',
 					'onchange' => 'document.adminForm.limitstart.value=0; Joomla.submitform();',
 				),
@@ -378,7 +380,7 @@ class FlexicontentViewFields extends FlexicontentViewBaseRecords
 				$options,
 				'filter_assigned', 
 				array(
-					'class' => 'use_select2_lib',
+					'class' => $this->select_class,
 					'size' => '1',
 					'onchange' => 'document.adminForm.limitstart.value=0; Joomla.submitform();',
 				),
@@ -422,7 +424,7 @@ class FlexicontentViewFields extends FlexicontentViewBaseRecords
 				$filter_fieldtype,
 				($_grouped ? 1 : 0),
 				array(
-					'class' => 'use_select2_lib',
+					'class' => $this->select_class,
 					'size' => '1',
 					'onchange' => 'document.adminForm.limitstart.value=0; Joomla.submitform();',
 				),
@@ -486,6 +488,14 @@ class FlexicontentViewFields extends FlexicontentViewBaseRecords
 				$translate = true
 			)
 		));
+
+
+		// Build text search scope
+		$scopes = null;
+
+		$lists['scope_tip'] = '';
+		$lists['scope'] = $this->getScopeSelectorDisplay($scopes, $scope);
+		$this->scope_title = $scopes[$scope];
 
 
 		// Text search filter value

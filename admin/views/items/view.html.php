@@ -111,7 +111,7 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 
 		// Ordering filter
 		$reOrderingActive = !$filter_order_type
-			? $filter_order == 'i.ordering'
+			? $filter_order == 'a.ordering'
 			: $filter_order == 'catsordering';
 
 		if ($filter_fileid) $count_filters++;
@@ -123,7 +123,7 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 
 		// Various filters
 		$filter_tag       = $model->getState('filter_tag');
-		$filter_lang	    = $model->getState('filter_lang');
+		$filter_lang      = $model->getState('filter_lang');
 		$filter_type      = $model->getState('filter_type');
 		$filter_author    = $model->getState('filter_author');
 		$filter_state     = $model->getState('filter_state');
@@ -134,14 +134,17 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 		if (is_array($filter_state) && in_array('ORPHAN', $filter_state))  $filter_state = array('ORPHAN');
 
 		// Count active filters
-		if ($filter_tag)   $count_filters++;  if ($filter_lang)   $count_filters++;
-		if ($filter_type)  $count_filters++;  if ($filter_author) $count_filters++;
-		if ($filter_state) $count_filters++;  if ($filter_access) $count_filters++;
+		if ($filter_tag) $count_filters++;
+		if ($filter_lang) $count_filters++;
+		if ($filter_type) $count_filters++;
+		if ($filter_author) $count_filters++;
+		if ($filter_state) $count_filters++;
+		if ($filter_access) $count_filters++;
 
 		// Date filters
-		$date	 				= $model->getState('date');
-		$startdate	 	= $model->getState('startdate');
-		$enddate	 		= $model->getState('enddate');
+		$date      = $model->getState('date');
+		$startdate = $model->getState('startdate');
+		$enddate   = $model->getState('enddate');
 
 		$startdate = $db->escape( StringHelper::trim(StringHelper::strtolower( $startdate ) ) );
 		$enddate   = $db->escape( StringHelper::trim(StringHelper::strtolower( $enddate ) ) );
@@ -226,6 +229,7 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 			');
 		}
 
+
 		/**
 		 * Create Submenu & Toolbar
 		 */
@@ -244,7 +248,8 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 
 
 		/**
-		 * Get data from the model
+		 * Get data from the model, note data retrieval must be before 
+		 * getTotal() and getPagination() because it also calculates total rows
 		 */
 
 		$badcatitems  = (int) $model->getUnboundedItems($limit=10000000, $count_only=true, $checkNoExtData=false, $checkInvalidCat=true);
@@ -334,7 +339,7 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 
 
 		// Build include sub-categories filter
-		$subcats_na = $filter_order_type && $filter_cats && ($filter_order === 'i.ordering' || $filter_order === 'catsordering');
+		$subcats_na = $filter_order_type && $filter_cats && ($filter_order === 'a.ordering' || $filter_order === 'catsordering');
 
 		$lists['filter_subcats'] = $this->getFilterDisplay(array(
 			'label' => JText::_('FLEXI_SUBCATEGORIES'),
@@ -383,11 +388,11 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 
 		// Build category-state filter
 		$options = array(
-			JHtml::_('select.option', 1, 'FLEXI_PUBLISHED'),
-			JHtml::_('select.option', 0, 'FLEXI_UNPUBLISHED'),
-			JHtml::_('select.option', 99, 'FLEXI_UNPUBLISHED'),
-			JHtml::_('select.option', 2, 'FLEXI_ARCHIVED'),
-			JHtml::_('select.option', -2, 'FLEXI_TRASHED'),
+			JHtml::_('select.option', 1, JText::_('FLEXI_PUBLISHED')),
+			JHtml::_('select.option', 0, JText::_('FLEXI_UNPUBLISHED')),
+			JHtml::_('select.option', 99, JText::_('FLEXI_UNPUBLISHED')),
+			JHtml::_('select.option', 2, JText::_('FLEXI_ARCHIVED')),
+			JHtml::_('select.option', -2, JText::_('FLEXI_TRASHED')),
 		);
 
 		$fieldname = 'filter_catsinstate';
@@ -482,7 +487,7 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 				$categories,
 				'filter_cats',
 				$filter_cats,
-				($filter_order !== 'i.ordering' && $filter_order !== 'catsordering' ? '-' : 0),
+				($filter_order !== 'a.ordering' && $filter_order !== 'catsordering' ? '-' : 0),
 				array(
 					'class' => $this->select_class,
 					'size' => '1',
@@ -546,48 +551,6 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 		}
 
 
-		// Build text search scope 
-		$scopes = array(
-			1 => JText::_('FLEXI_TITLE'),
-			2 => JText::_('FLEXI_DESCRIPTION'),
-			4 => JText::_('FLEXI_FIELDS_IN_BASIC_SEARCH_INDEX'),
-		);
-
-		$this->scope_title = $scopes[$scope];
-		$options = array();
-
-		foreach ($scopes as $i => $v)
-		{
-			$options[] = JHtml::_('select.option', $i, $v);
-		}
-
-		array_unshift($options, JHtml::_('select.option', 0, JText::_('FLEXI_SEARCH_TEXT_INSIDE'), 'value', 'text', 'disabled'));
-
-		$lists['scope_tip'] = ''; //'<span class="hidden-phone ' . $this->tooltip_class . '" title="'.JText::_('FLEXI_SEARCH_TEXT_INSIDE').'" style="display: inline-block;"><i class="icon-info-2"></i></span>';
-		$lists['scope'] = JHtml::_('select.genericlist',
-			$options,
-			'scope',
-			array(
-				'size' => '1',
-				'class' => $this->select_class . ' fc_is_selarrow ' . $this->tooltip_class,
-				'onchange' => 'jQuery(\'#search\').attr(\'placeholder\', jQuery(this).find(\'option:selected\').text()); jQuery(this).blur();',
-				'title' => JText::_('FLEXI_SEARCH_TEXT_INSIDE'),
-			),
-			'value',
-			'text',
-			$scope,
-			'scope'
-		);
-
-		/*$lists['scope']  = '';
-		foreach ($scopes as $i => $v)
-		{
-			$checked = $scope == $i ? ' checked="checked" ' : '';
-			$lists['scope'] .= '<input type="radio" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()" class="inputbox" '.$checked.' value="'.$i.'" id="scope'.$i.'" name="scope" />';
-			$lists['scope'] .= '<label class="" id="scope'.$i.'-lbl" for="scope'.$i.'">'.$v.'</label>';
-		}*/
-
-
 		/**
 		 * Create note about dates displayed using current user's timezone
 		 */
@@ -605,32 +568,56 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 
 
 		// Build date filter scope
+		$fieldname = 'date';
+		$elementid = 'date';
+		$value     = $date;
+
 		$options = array(
-			JHtml::_('select.option', 1, JText::_('FLEXI_CREATED')),
-			JHtml::_('select.option', 2, JText::_('FLEXI_REVISED')),
-			JHtml::_('select.option', 3, JText::_('FLEXI_PUBLISH_UP')),
-			JHtml::_('select.option', 4, JText::_('FLEXI_PUBLISH_DOWN')),
+			JHtml::_('select.option', 1, 'FLEXI_CREATED'),
+			JHtml::_('select.option', 2, 'FLEXI_REVISED'),
+			JHtml::_('select.option', 3, 'FLEXI_PUBLISH_UP'),
+			JHtml::_('select.option', 4, 'FLEXI_PUBLISH_DOWN'),
 		);
 
 		$lists['filter_date'] = $this->getFilterDisplay(array(
 			'label' => null, //JText::_('FLEXI_DATE'),
 			'html' => JHtml::_('select.genericlist',
 				$options,
-				'date',
+				$fieldname,
 				array(
 					'size' => '1',
 					'style' => 'margin: 0',
-					'class' => $this->select_class,
-					'data-placement' => 'top',
+					'class' => $this->select_class . ' ' . $this->tooltip_class,
+					'data-placement' => 'bottom',
 					'title' => flexicontent_html::getToolTip(null, $date_note_msg, 0, 1),
 				),
 				'value',
 				'text',
-				$date,
-				'date'
+				$value,
+				$elementid,
+				$translate = true
 			)
 			. JHtml::_('calendar', $startdate, 'startdate', 'startdate', '%Y-%m-%d', array('class'=>'', 'size'=>'8',  'maxlength'=>'19', 'style'=>'width:auto', 'placeholder'=>JText::_('FLEXI_FROM')))
 			. JHtml::_('calendar', $enddate, 'enddate', 'enddate', '%Y-%m-%d', array('class'=>'', 'size'=>'8',  'maxlength'=>'19', 'style'=>'width:auto', 'placeholder'=>JText::_('FLEXI_TO')))
+		));
+
+
+		// Build language filter
+		$lists['filter_lang'] = $this->getFilterDisplay(array(
+			'label' => JText::_('FLEXI_LANGUAGE'),
+			'html' => flexicontent_html::buildlanguageslist(
+				$name = 'filter_lang[]',
+				array(
+					'class' => $this->select_class,
+					'multiple' => 'multiple',
+					'size' => '3',
+					'onmouseenter' => 'if (typeof this.oVal == \'undefined\') this.oVal = jQuery(this).val(); this.valChanged = false;',
+					'onchange' => 'this.valChanged = JSON.stringify(this.oVal) !== JSON.stringify(jQuery(this).val()); if (this.valChanged && this != document.activeElement) {document.adminForm.limitstart.value=0; Joomla.submitform();}',
+					'onblur' => 'this.oVal = jQuery(this).val(); if (this.valChanged) {document.adminForm.limitstart.value=0; Joomla.submitform();}',
+				),
+				$selected = $filter_lang,
+				$displaytype = 1
+			),
 		));
 
 
@@ -654,6 +641,18 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 			$bind_limit,
 			'bind_limit'
 		);
+
+
+		// Build text search scope
+		$scopes = array(
+			'a.title' => JText::_('FLEXI_TITLE'),
+			'a.introtext' => JText::_('FLEXI_DESCRIPTION') . ' (' . JText::_('FLEXI_INTROTEXT') . ')',
+			'ie.search_index' => JText::_('FLEXI_FIELDS_IN_BASIC_SEARCH_INDEX'),
+		);
+
+		$lists['scope_tip'] = ''; //'<span class="hidden-phone ' . $this->tooltip_class . '" title="'.JText::_('FLEXI_SEARCH_TEXT_INSIDE').'" style="display: inline-block;"><i class="icon-info-2"></i></span>';
+		$lists['scope'] = $this->getScopeSelectorDisplay($scopes, $scope);
+		$this->scope_title = $scopes[$scope];
 
 
 		// Text search filter value
@@ -683,27 +682,6 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 			),
 		));
 
-
-		// Build language filter
-		if (1)
-		{
-			$lists['filter_lang'] = $this->getFilterDisplay(array(
-				'label' => JText::_('FLEXI_LANGUAGE'),
-				'html' => flexicontent_html::buildlanguageslist(
-					$name = 'filter_lang[]',
-					array(
-						'class' => $this->select_class,
-						'multiple' => 'multiple',
-						'size' => '3',
-						'onmouseenter' => 'if (typeof this.oVal == \'undefined\') this.oVal = jQuery(this).val(); this.valChanged = false;',
-						'onchange' => 'this.valChanged = JSON.stringify(this.oVal) !== JSON.stringify(jQuery(this).val()); if (this.valChanged && this != document.activeElement) {document.adminForm.limitstart.value=0; Joomla.submitform();}',
-						'onblur' => 'this.oVal = jQuery(this).val(); if (this.valChanged) {document.adminForm.limitstart.value=0; Joomla.submitform();}',
-					),
-					$selected = $filter_lang,
-					$displaytype = 1
-				),
-			));
-		}
 
 		// Build publication state filter
 		$options = array();
@@ -884,7 +862,6 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 		$this->filter_order = $filter_order;
 
 		$this->scope = $scope;
-		$this->search = $search;
 		$this->date = $date;
 		$this->startdate = $startdate;
 		$this->enddate = $enddate;

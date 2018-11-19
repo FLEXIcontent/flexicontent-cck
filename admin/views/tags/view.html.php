@@ -89,6 +89,7 @@ class FlexicontentViewTags extends FlexicontentViewBaseRecords
 		if (strlen($filter_assigned)) $count_filters++;
 
 		// Text search
+		$scope  = $model->getState('scope');
 		$search = $model->getState('search');
 		$search = StringHelper::trim(StringHelper::strtolower($search));
 
@@ -147,7 +148,8 @@ class FlexicontentViewTags extends FlexicontentViewBaseRecords
 
 
 		/**
-		 * Get data from the model
+		 * Get data from the model, note data retrieval must be before 
+		 * getTotal() and getPagination() because it also calculates total rows
 		 */
 
 		if ( $print_logging_info )  $start_microtime = microtime(true);
@@ -204,6 +206,10 @@ class FlexicontentViewTags extends FlexicontentViewBaseRecords
 
 
 		// Build publication state filter
+		$fieldname = 'filter_state';
+		$elementid = 'filter_state';
+		$value     = $filter_state;
+
 		//$options = JHtml::_('jgrid.publishedOptions');
 		$options = array();
 
@@ -212,9 +218,6 @@ class FlexicontentViewTags extends FlexicontentViewBaseRecords
 			$options[] = JHtml::_('select.option', $condition_value, JText::_($condition_name));
 		}
 		array_unshift($options, JHtml::_('select.option', '', '-'/*'FLEXI_STATE'*/));
-
-		$fieldname = 'filter_state';
-		$elementid = 'filter_state';
 
 		$lists[$elementid] = $this->getFilterDisplay(array(
 			'label' => JText::_('FLEXI_STATE'),
@@ -228,7 +231,7 @@ class FlexicontentViewTags extends FlexicontentViewBaseRecords
 				),
 				'value',
 				'text',
-				$filter_state,
+				$value,
 				$elementid,
 				$translate = true
 			),
@@ -236,13 +239,15 @@ class FlexicontentViewTags extends FlexicontentViewBaseRecords
 
 
 		// Build orphaned/assigned filter
-		$options 	= array();
-		$options[] = JHtml::_('select.option',  '', '-'/*JText::_('FLEXI_ALL_TAGS')*/);
-		$options[] = JHtml::_('select.option',  'O', JText::_( 'FLEXI_ORPHANED' ) );
-		$options[] = JHtml::_('select.option',  'A', JText::_( 'FLEXI_ASSIGNED' ) );
+		$options = array(
+			JHtml::_('select.option',  '', '-'/*'FLEXI_ALL_TAGS'*/),
+			JHtml::_('select.option',  'O', 'FLEXI_ORPHANED'),
+			JHtml::_('select.option',  'A', 'FLEXI_ASSIGNED'),
+		);
 
 		$fieldname = 'filter_assigned';
 		$elementid = 'filter_assigned';
+		$value     = $filter_assigned;
 
 		$lists[$elementid] = $this->getFilterDisplay(array(
 			'label' => JText::_('FLEXI_ASSIGNED'),
@@ -251,15 +256,24 @@ class FlexicontentViewTags extends FlexicontentViewBaseRecords
 				$fieldname,
 				array(
 					'class' => $this->select_class,
+					'size' => '1',
 					'onchange' => 'document.adminForm.limitstart.value=0; Joomla.submitform();',
 				),
 				'value',
 				'text',
-				$filter_assigned,
+				$value,
 				$elementid,
 				$translate = true
-			)
+			),
 		));
+
+
+		// Build text search scope
+		$scopes = null;
+
+		$lists['scope_tip'] = '';
+		$lists['scope'] = $this->getScopeSelectorDisplay($scopes, $scope);
+		$this->scope_title = $scopes[$scope];
 
 
 		// Text search filter value
@@ -286,8 +300,10 @@ class FlexicontentViewTags extends FlexicontentViewBaseRecords
 		$this->view   = $view;
 		$this->state  = $this->get('State');
 
-		$this->sidebar = FLEXI_J30GE ? JHtmlSidebar::render() : null;
-
+		if (!$jinput->getCmd('nosidebar'))
+		{
+			$this->sidebar = FLEXI_J30GE ? JHtmlSidebar::render() : null;
+		}
 
 		/**
 		 * Render view's template

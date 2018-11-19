@@ -1563,17 +1563,17 @@
 
 			<field name="items_manager_extra_fields" type="textarea" default="" rows="2" cols="60" label="FLEXI_ITEMS_MANAGER_EXTRA_FIELDS" description="FLEXI_ITEMS_MANAGER_EXTRA_FIELDS_DESC" class="input-xxlarge" />
 			<field name="items_manager_custom_filters" type="filters" default="" isfilter="*" field_type="select,selectmutiple,radio,radioimage,checkbox,checkboximage" label="FLEXI_ITEMS_MANAGER_CUSTOM_FILTERS_LIST" description="FLEXI_ITEMS_MANAGER_CUSTOM_FILTERS_LIST_DESC" />
-			<field name="items_manager_order" type="list" default="i.id" label="FLEXI_ITEMS_MANAGER_ORDER" description="FLEXI_ITEMS_MANAGER_ORDER_DESC" class="use_select2_lib">
+			<field name="items_manager_order" type="list" default="a.id" label="FLEXI_ITEMS_MANAGER_ORDER" description="FLEXI_ITEMS_MANAGER_ORDER_DESC" class="use_select2_lib">
 				<option value="1">FLEXI_ITEMS_MANAGER_ORDER_UNORDERED</option>
 				<option value="lang">FLEXI_ITEMS_MANAGER_ORDER_LANGUAGE</option>
 				<option value="type_name">FLEXI_ITEMS_MANAGER_ORDER_CONTENT_TYPE</option>
-				<option value="i.access">FLEXI_ITEMS_MANAGER_ORDER_ACCESS_SCOPE</option>
-				<option value="i.title">FLEXI_ITEMS_MANAGER_ORDER_TITLE</option>
-				<option value="i.ordering">FLEXI_ITEMS_MANAGER_ORDER_ITEM_ORDERING_FIELD</option>
-				<option value="i.created">FLEXI_ITEMS_MANAGER_ORDER_CREATION_DATE</option>
-				<option value="i.modified">FLEXI_ITEMS_MANAGER_ORDER_MODIFICATION_DATE</option>
-				<option value="i.hits">FLEXI_ITEMS_MANAGER_ORDER_MOST_HITS</option>
-				<option value="i.id">FLEXI_ITEMS_MANAGER_ORDER_ITEM_ID</option>
+				<option value="a.access">FLEXI_ITEMS_MANAGER_ORDER_ACCESS_SCOPE</option>
+				<option value="a.title">FLEXI_ITEMS_MANAGER_ORDER_TITLE</option>
+				<option value="a.ordering">FLEXI_ITEMS_MANAGER_ORDER_ITEM_ORDERING_FIELD</option>
+				<option value="a.created">FLEXI_ITEMS_MANAGER_ORDER_CREATION_DATE</option>
+				<option value="a.modified">FLEXI_ITEMS_MANAGER_ORDER_MODIFICATION_DATE</option>
+				<option value="a.hits">FLEXI_ITEMS_MANAGER_ORDER_MOST_HITS</option>
+				<option value="a.id">FLEXI_ITEMS_MANAGER_ORDER_ITEM_ID</option>
 			</field>
 			<field name="items_manager_order_dir" type="fcradio" default="DESC" label="FLEXI_ITEMS_MANAGER_ORDER_DIR" description="FLEXI_ITEMS_MANAGER_ORDER_DIR_DESC" class="btn-group group-fcinfo">
 				<option value="ASC">FLEXI_ITEMS_MANAGER_ORDER_DIR_NORMAL</option>

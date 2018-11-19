@@ -46,7 +46,7 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 	var $state_col      = 'published';
 	var $name_col       = 'filename';
 	var $parent_col     = null;
-	var $created_by_col = 'uploaded';
+	var $created_by_col = 'uploaded_by';
 
 	/**
 	 * (Default) Behaviour Flags
@@ -57,7 +57,12 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 	/**
 	 * Search and ordering columns
 	 */
-	var $search_cols       = array('filename', 'filename_original', 'altname', 'description');
+	var $search_cols = array(
+		'FLEXI_FILENAME' => 'filename',
+		0 => 'filename_original',
+		'FLEXI_FILE_DISPLAY_TITLE' => 'altname',
+		'FLEXI_DESCRIPTION'=> 'description',
+	);
 	var $default_order     = 'a.uploaded';
 	var $default_order_dir = 'DESC';
 
@@ -111,6 +116,7 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 	 */
 	var $_users = null;
 
+
 	/**
 	 * Constructor
 	 *
@@ -118,28 +124,29 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 	 */
 	public function __construct($config = array())
 	{
-		// Make session index more specific ...
-		// This has no effect in filemanager view (maybe later), currently only for fileselement views
-		$this->fieldid = JFactory::getApplication()->input->getInt('field', null);
-		$this->view_id = JFactory::getApplication()->input->getCmd('view', '') . $this->fieldid;
+		$app    = JFactory::getApplication();
+		$jinput = $app->input;
+		$option = $jinput->getCmd('option', '');
+		$view   = $jinput->getCmd('view', '');
+		$layout = $jinput->getString('layout', 'default');
+		$fcform = $jinput->getInt('fcform', 0);
+
+		// Make session index more specific ... (if needed by this model)
+		$this->fieldid = $jinput->getInt('field', null);
+		$this->view_id = $view . '_' . $layout . ($this->fieldid ? '_' . $this->fieldid : '');
 
 		// Call parent after setting ... $this->view_id
 		parent::__construct($config);
 
-		$app    = JFactory::getApplication();
-		$jinput = $app->input;
-		$option = $jinput->get('option', '', 'cmd');
-		$view   = $jinput->get('view', '', 'cmd');
-		$fcform = $jinput->get('fcform', 0, 'int');
-		$p      = $this->ovid;
-		
+		$p = $this->ovid;
+
 		$this->sess_assignments = true;
 
 
 		/**
 		 * Load backend language file if model gets loaded in frontend
 		 */
-		if (JFactory::getApplication()->isSite())
+		if ($app->isSite())
 		{
 			JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, 'en-GB', true);
 			JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, true);
@@ -752,7 +759,7 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 		{
 			$columns[] = 'SQL_CALC_FOUND_ROWS a.*, '
 				. ' u.name AS editor, '
-				. ' up.name AS uploader, '
+				. ' ua.name AS uploader, '
 				. ' CASE WHEN a.filename_original<>"" THEN a.filename_original ELSE a.filename END AS filename_displayed ';
 
 			foreach ($assigned_fields as $field_type)
@@ -860,7 +867,7 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 	{
 		$join = '';
 		$join .= ' LEFT JOIN #__users AS u ON u.id = a.checked_out';
-		$join .= ' JOIN #__users AS up ON up.id = a.uploaded_by';
+		$join .= ' JOIN #__users AS ua ON ua.id = a.uploaded_by';
 
 		return $join;
 	}
@@ -902,7 +909,7 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 	 *
 	 * @return  JDatabaseQuery|array
 	 *
-	 * @since 1.0
+	 * @since   3.3.0
 	 */
 	protected function _buildContentWhere($q = true)
 	{
@@ -950,7 +957,7 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 			}
 		}
 
-		// Text search
+		// Text search and search scope
 		$scope  = $this->getState('scope');
 		$search = $this->getState('search');
 		$search = StringHelper::trim(StringHelper::strtolower($search));
@@ -1003,10 +1010,34 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 			}
 		}
 
+		// Filter by language
+		if (strlen($filter_lang))
+		{
+			$where[] = 'a.language = ' . $this->_db->Quote($filter_lang);
+		}
+
+		/**
+		 * Limit via parameter,
+		 * 1: limit to current user as uploader,
+		 * 0: list files from any uploader, and respect 'filter_uploader' URL variable
+		 */
+
+		// Limit to current user
+		if ($limit_by_uploader || !$CanViewAllFiles)
+		{
+			$where[] = 'a.' . $this->created_by_col . ' = ' . (int) $user->id;
+		}
+
+		// Filter by uploader
+		elseif (strlen($filter_uploader))
+		{
+			$where[] = 'a.' . $this->created_by_col . ' = ' . (int) $filter_uploader;
+		}
+
 		// Filter by access level
 		if (property_exists($table, 'access'))
 		{
-			if ($filter_access)
+			if (strlen($filter_access))
 			{
 				$where[] = 'a.access = ' . (int) $filter_access;
 			}
@@ -1023,25 +1054,6 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 		if (strlen($target_dir) && $target_dir != 2)
 		{
 			$filter_secure = $target_dir ? 'S' : 'M';   // force secure / media
-		}
-
-		// Limit via parameter, 1: limit to current user as uploader, 0: list files from any uploader, and respect 'filter_uploader' URL variable
-		if ($limit_by_uploader)
-		{
-			$where[] = ' uploaded_by = ' . (int) $user->id;
-		}
-		elseif (!$CanViewAllFiles)
-		{
-			$where[] = ' uploaded_by = ' . (int) $user->id;
-		}
-		elseif (strlen($filter_uploader))
-		{
-			$where[] = ' uploaded_by = ' . (int) $filter_uploader;
-		}
-
-		if (strlen($filter_lang))
-		{
-			$where[] = ' language = ' . $this->_db->Quote($filter_lang);
 		}
 
 		if ($filter_url === 'F')
@@ -1076,30 +1088,61 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 			$where[] = ' ext = ' . $this->_db->Quote($filter_ext);
 		}
 
-		if ($search)
+		if (!empty($this->search_cols) && strlen($search))
 		{
-			$escaped_search = str_replace(' ', '%', $this->_db->escape(trim($search), true));
-			$search_quoted  = $this->_db->Quote('%' . $escaped_search . '%', false);
-
-			$search_where = array();
-
-			if ($scope == 1 || $scope == 0)
+			if (stripos($search, 'id:') === 0)
 			{
-				$search_where[] = ' LOWER(a.filename) LIKE ' . $search_quoted;
-				$search_where[] = ' LOWER(a.filename_original) LIKE ' . $search_quoted;
+				$where[] = 'a.id = ' . (int) substr($search, 3);
 			}
-
-			if ($scope == 2 || $scope == 0)
+			elseif (stripos($search, 'author:') === 0)
 			{
-				$search_where[] = ' LOWER(a.altname) LIKE ' . $search_quoted;
+				$search_quoted = $this->_db->Quote('%' . $this->_db->escape(substr($search, 7), true) . '%');
+				$where[] = '(ua.name LIKE ' . $search_quoted . ' OR ua.username LIKE ' . $search_quoted . ')';
 			}
-
-			if ($scope == 3 || $scope == 0)
+			else
 			{
-				$search_where[] = ' LOWER(a.description) LIKE ' . $search_quoted;
-			}
+				$escaped_search = str_replace(' ', '%', $this->_db->escape(trim($search), true));
+				$search_quoted  = $this->_db->Quote('%' . $escaped_search . '%', false);
 
-			$where[] = '( '. implode( ' OR ', $search_where ) .' )';
+				$table     = $this->getTable($this->records_jtable, '');
+				$textwhere = array();
+				$col_name  = str_replace('a.', '', $scope);
+
+				if ($scope === '-1')
+				{
+					foreach ($this->search_cols as $search_col)
+					{
+						if (property_exists($table, $search_col))
+						{
+							$textwhere[] = 'LOWER(a.' . $search_col . ') LIKE ' . $search_quoted;
+						}
+					}
+				}
+				elseif ($scope === 'a.filename')
+				{
+					$textwhere[] = ' LOWER(a.filename) LIKE ' . $search_quoted;
+					$textwhere[] = ' LOWER(a.filename_original) LIKE ' . $search_quoted;
+				}
+				elseif (in_array($col_name, $this->search_cols) && property_exists($table, $col_name))
+				{
+					// Scope is user input, was filtered as CMD but also use quoteName() on the column
+					$textwhere[] = 'LOWER(' . $this->_db->quoteName($scope) . ') LIKE ' . $search_quoted;
+				}
+				else
+				{
+					JFactory::getApplication()->enqueueMessage('Text search scope ' . $scope . ' is unknown, search failed', 'warning');
+				}
+
+				if ($textwhere)
+				{
+					$where[] = '(' . implode(' OR ', $textwhere) . ')';
+				}
+			}
+		}
+
+		if ($q instanceof \JDatabaseQuery)
+		{
+			return $where ? $q->where($where) : $q;
 		}
 
 		return $q
@@ -1111,26 +1154,35 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 	/**
 	 * Method to build the having clause of the query for the files
 	 *
-	 * @access private
-	 * @return string
+	 * @param		JDatabaseQuery|bool   $q   DB Query object or bool to indicate returning an array or rendering the clause
+	 *
+	 * @return  JDatabaseQuery|array
+	 *
 	 * @since 1.0
 	 */
-	function _buildContentHaving($q = false)
+	protected function _buildContentHaving($q = true)
 	{
 		$filter_assigned = $this->getState('filter_assigned');
 
-		$having = '';
+		$having = array();
 
 		if ($filter_assigned === 'O')
 		{
-			$having = ' HAVING COUNT(rel.fileid) = 0';
+			$having[] = 'COUNT(rel.fileid) = 0';
 		}
 		elseif ($filter_assigned === 'A')
 		{
-			$having = ' HAVING COUNT(rel.fileid) > 0';
+			$having[] = 'COUNT(rel.fileid) > 0';
 		}
 
-		return $having;
+		if ($q instanceof \JDatabaseQuery)
+		{
+			return $having ? $q->having($having) : $q;
+		}
+
+		return $q
+			? ' HAVING ' . (count($having) ? implode(' AND ', $having) : ' 1 ')
+			: $having;
 	}
 
 
@@ -1152,12 +1204,12 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 			return 'SELECT 1 FROM #__users WHERE 1=0';
 		}
 
-		$query = 'SELECT up.id, up.name'
+		$query = 'SELECT ua.id, ua.name'
 			. ' FROM #__flexicontent_files AS a'
-			. ' LEFT JOIN #__users AS up ON up.id = a.uploaded_by'
+			. ' LEFT JOIN #__users AS ua ON ua.id = a.uploaded_by'
 			. $where
-			. ' GROUP BY up.id'
-			. ' ORDER BY up.name'
+			. ' GROUP BY ua.id'
+			. ' ORDER BY ua.name'
 			;
 		return $query;
 	}
@@ -1340,7 +1392,7 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 			. ' JOIN #__flexicontent_fields_item_relations AS rel ON rel.item_id = i.id'
 			. ' JOIN #__flexicontent_fields AS fi ON fi.id = rel.field_id AND fi.field_type IN ('. $field_type_list .')'
 			. ' JOIN #__flexicontent_files AS a ON a.id=rel.value '. $file_ids_list
-			//. ' JOIN #__users AS up ON up.id = a.uploaded_by'
+			//. ' JOIN #__users AS ua ON ua.id = a.uploaded_by'
 			. $where
 			. $groupby
 			. $orderby
@@ -1437,7 +1489,7 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 				. ' JOIN #__flexicontent_fields_item_relations AS rel ON rel.item_id = i.id'
 				. ' JOIN #__flexicontent_fields AS fi ON fi.id = rel.field_id AND fi.field_type IN ('. $this->_db->Quote( $field_type ) .')' . $field_ids_list
 				. ' JOIN #__flexicontent_files AS a ON rel.value LIKE ' . $like_str . ' AND a.'.$value_prop.'<>""' . $file_ids_list
-				//. ' JOIN #__users AS up ON up.id = a.uploaded_by'
+				//. ' JOIN #__users AS ua ON ua.id = a.uploaded_by'
 				. $where
 				. $groupby
 				. $orderby
@@ -1742,47 +1794,6 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 		return $cid;
 	}
 
-
-
-	/**
-	 * Method to set the access level of the records
-	 *
-	 * @access	public
-	 * @param		integer		id of the record
-	 * @param		integer		access level
-	 * @return	boolean		True on success
-	 * @since		1.5
-	 */
-	function saveaccess($id, $access)
-	{
-		$row = $this->getTable($this->records_jtable, '');
-
-		$cid      = is_array($id) ? $id : array($id);
-		$accesses = is_array($access) ? $access : array($access);
-
-		foreach($cid as $id)
-		{
-			$row->load($id);
-			$row->id = $id;
-			$row->access = $accesses[$id];
-
-			if (!$row->check())
-			{
-				$this->setError($row->getError());
-
-				return false;
-			}
-
-			if (!$row->store())
-			{
-				$this->setError($row->getError());
-
-				return false;
-			}
-		}
-
-		return true;
-	}
 
 
 	/**

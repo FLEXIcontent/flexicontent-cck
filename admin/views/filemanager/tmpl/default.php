@@ -108,17 +108,19 @@ $up_sfx_n = $this->fieldid ?: '_';
 
 flexicontent_html::jscode_to_showhide_table(
 	'mainChooseColBox',
-	'adminListTableFCfiles' . $this->layout . $this->fieldid,
+	'adminListTableFC' . $this->getModel()->view_id,
 	$start_html = '',  //'<span class="badge ' . (FLEXI_J40GE ? 'badge-dark' : 'badge-inverse') . '">' . JText::_('FLEXI_COLUMNS', true) . '<\/span> &nbsp; ',
 	$end_html = '<div id="fc-columns-slide-btn" class="icon-arrow-up-2 btn btn-outline-secondary" title="' . JText::_('FLEXI_HIDE') . '" style="cursor: pointer;" onclick="fc_toggle_box_via_btn(\\\'mainChooseColBox\\\', document.getElementById(\\\'fc_mainChooseColBox_btn\\\'), \\\'btn-primary\\\');"><\/div>'
 );
 
-//$tools_state['fc-filters-box-disp'] = JFactory::getApplication()->input->cookie->get('fc-filters-box-disp', 0, 'int');
-//$tools_state['fc-filters-box-disp'] = 0; //JFactory::getApplication()->input->cookie->get('fc-filters-box-disp', 0, 'int');
 
 
-// Get all managers conf
-$fc_man_name = 'fc_' . $this->view . ((int) $this->fieldid ? '_' . (int) $this->fieldid : '');
+/**
+ * Get cookie-based preferences of current user
+ */
+
+// Get all managers preferences
+$fc_man_name = 'fc_' . $this->getModel()->view_id;
 $FcMansConf = $this->getUserStatePrefs($fc_man_name);
 
 // Get specific manager data
@@ -769,7 +771,7 @@ if ($js)
 					</div>
 
 					<div class="fc-iblock nowrap_box" style="position: relative; vertical-align: middle;">
-						<div id="fc_mainChooseColBox_btn" class="<?php echo $this->btn_sm_class . ' ' . $out_class . ' ' . $this->tooltip_class; ?> hidden-phone" onclick="fc_toggle_box_via_btn('mainChooseColBox', this, 'btn-primary');" data-title="<?php echo flexicontent_html::getToolTip('', 'FLEXI_ABOUT_AUTO_HIDDEN_COLUMNS', 1, 1); ?>" data-placement="bottom">
+						<div id="fc_mainChooseColBox_btn" class="<?php echo $this->btn_sm_class . ' ' . $out_class . ' ' . $this->tooltip_class; ?> hidden-phone" onclick="fc_toggle_box_via_btn('mainChooseColBox', this, 'btn-primary');" data-title="<?php echo flexicontent_html::getToolTip('FLEXI_COLUMNS', 'FLEXI_ABOUT_AUTO_HIDDEN_COLUMNS', 1, 1); ?>" data-placement="bottom">
 							<span class="icon-contract"></span><sup id="columnchoose_totals"></sup>
 						</div>
 
@@ -801,7 +803,7 @@ if ($js)
 
 			</div>
 
-			<table id="adminListTableFCfiles<?php echo $this->layout.$this->fieldid; ?>" class="adminlist table fcmanlist fman_list_element">
+			<table id="adminListTableFC<?php echo $this->getModel()->view_id; ?>" class="adminlist table fcmanlist fman_list_element">
 			<thead>
     		<tr>
 					<th class="center hidden-phone"><?php echo JText::_( 'FLEXI_NUM' ); ?></th>
@@ -870,7 +872,9 @@ if ($js)
 				<?php endif; ?>
 
 				<?php if (!empty($this->cols['file_id'])) : ?>
-					<th class="center hideOnDemandClass hidden-phone hidden-tablet"><?php echo JHtml::_('grid.sort', 'FLEXI_ID', 'a.id', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+					<th class="center hideOnDemandClass col_id hidden-phone hidden-tablet">
+						<?php echo JHtml::_('grid.sort', 'FLEXI_ID', 'a.id', $this->lists['order_Dir'], $this->lists['order']); ?>
+					</th>
 				<?php endif; ?>
 
 				<?php if ($isFilesElement) : /* Direct delete button for fileselement view */ ?>
@@ -1015,7 +1019,7 @@ if ($js)
 					{
 						$item_link = !$isAdmin ? '' : 'index.php?option=com_flexicontent&amp;view=items&amp;filter_catsinstate=99&amp;filter_fileid='. $row->id.'&amp;fcform=1&amp;filter_state=ALL';
 					}
-		   		?>
+					?>
 				<tr class="<?php echo 'row' . ($k % 2); ?>">
 					<td class="center hidden-phone">
 						<?php echo $this->pagination->getRowOffset($i); ?>
@@ -1159,7 +1163,9 @@ if ($js)
 
 
 				<?php if (!empty($this->cols['file_id'])) : ?>
-					<td class="center hidden-phone hidden-tablet"><?php echo $row->id; ?></td>
+					<td class="center col_id hidden-phone hidden-tablet">
+						<?php echo $row->id; ?>
+					</td>
 				<?php endif; ?>
 
 					<?php if ($isFilesElement) : /* Direct delete button for fileselement view */ ?>
@@ -1272,7 +1278,7 @@ if ($js)
 							$row->assigned = JText::_( 'FLEXI_NOT_ASSIGNED' );
 						}
 					}
-		   		?>
+					?>
 
 				<div class="fc-fileman-grid-thumb-box thumb_<?php echo $thumb_size['fm-grid'] ; ?>" onclick="fman_sync_cid(<?php echo $i; ?>, 0);">
 					<?php

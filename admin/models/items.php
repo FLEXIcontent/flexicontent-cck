@@ -54,8 +54,12 @@ class FlexicontentModelItems extends FCModelAdminList
 	/**
 	 * Search and ordering columns
 	 */
-	var $search_cols       = array('title', 'alias', 'note');
-	var $default_order     = 'i.id';
+	var $search_cols = array(
+		'FLEXI_TITLE' => 'title',
+		'FLEXI_ALIAS' => 'alias',
+		'FLEXI_NOTES' => 'note',
+	);
+	var $default_order     = 'a.id';
 	var $default_order_dir = 'DESC';
 
 	/**
@@ -128,14 +132,20 @@ class FlexicontentModelItems extends FCModelAdminList
 	 */
 	public function __construct($config = array())
 	{
-		parent::__construct($config);
-
 		$app    = JFactory::getApplication();
 		$jinput = $app->input;
-		$option = $jinput->get('option', '', 'cmd');
-		$view   = $jinput->get('view', '', 'cmd');
-		$fcform = $jinput->get('fcform', 0, 'int');
-		$p      = $this->ovid;
+		$option = $jinput->getCmd('option', '');
+		$view   = $jinput->getCmd('view', '');
+		$layout = $jinput->getString('layout', 'default');
+		$fcform = $jinput->getInt('fcform', 0);
+
+		// Make session index more specific ... (if needed by this model)
+		//$this->view_id = $view . '_' . $layout;
+
+		// Call parent after setting ... $this->view_id
+		parent::__construct($config);
+
+		$p = $this->ovid;
 
 
 		/**
@@ -150,7 +160,7 @@ class FlexicontentModelItems extends FCModelAdminList
 		$filter_subcats     = $fcform ? $jinput->get('filter_subcats',     0,  'int')  :  $app->getUserStateFromRequest( $p.'filter_subcats',     'filter_subcats',     1,  'int' );
 		$filter_catsinstate = $fcform ? $jinput->get('filter_catsinstate', 1,  'int')  :  $app->getUserStateFromRequest( $p.'filter_catsinstate', 'filter_catsinstate', 1,  'int' );
 
-		if ($this->getState('filter_order') === 'i.ordering' || $this->getState('filter_order') === 'catsordering')
+		if ($this->getState('filter_order') === 'a.ordering' || $this->getState('filter_order') === 'catsordering')
 		{
 			if (!$filter_cats)
 			{
@@ -248,29 +258,6 @@ class FlexicontentModelItems extends FCModelAdminList
 		$this->setState('filter_fileid', $filter_fileid);
 		$app->setUserState($p.'filter_fileid', $filter_fileid);
 
-
-		/**
-		 * Pagination: limit, limitstart
-		 */
-
-		$limit      = $fcform ? $jinput->get('limit', $app->getCfg('list_limit'), 'int') : $app->getUserStateFromRequest($p . 'limit', 'limit', $app->getCfg('list_limit'), 'int');
-		$limitstart = $fcform ? $jinput->get('limitstart', 0, 'int') : $app->getUserStateFromRequest($p . 'limitstart', 'limitstart', 0, 'int');
-
-		// In case limit has been changed, adjust limitstart accordingly
-		$limitstart = ( $limit != 0 ? (floor($limitstart / $limit) * $limit) : 0 );
-		$jinput->set('limitstart', $limitstart);
-
-		$this->setState('limit', $limit);
-		$this->setState('limitstart', $limitstart);
-
-		$app->setUserState($p . 'limit', $limit);
-		$app->setUserState($p . 'limitstart', $limitstart);
-
-
-		// For some model function that use single id
-		$array = $jinput->get('cid', array(0), 'array');
-		$this->setId((int) $array[0]);
-
 		// Manage view permission
 		$this->canManage = FlexicontentHelperPerm::getPerm()->CanManage;
 	}
@@ -281,16 +268,14 @@ class FlexicontentModelItems extends FCModelAdminList
 	 *
 	 * @param		int	    $id        record identifier
 	 *
-	 * @since	3.3.0
+	 * @since   3.3.0
 	 */
 	public function setId($id)
 	{
 		// Set record id and wipe data, if setting a different ID
 		if ($this->_id != $id)
 		{
-			$this->_id    = $id;
-			$this->_data  = null;
-			$this->_total = null;
+			parent:: setId($id);
 
 			$this->_extra_cols = null;
 		}
@@ -306,9 +291,7 @@ class FlexicontentModelItems extends FCModelAdminList
 	 */
 	public function setIds($cid)
 	{
-		$this->_ids   = ArrayHelper::toInteger($cid);
-		$this->_data  = null;
-		$this->_total = null;
+		parent:: setIds($cid);
 
 		$this->_extra_cols = null;
 	}
@@ -963,35 +946,16 @@ class FlexicontentModelItems extends FCModelAdminList
 	 */
 	public function getTotal()
 	{
-		// Lets load the records if it doesn't already exist
+		// Lets load the records if it was not calculated already via using SQL_CALC_FOUND_ROWS + 'SELECT FOUND_ROWS()'
 		if ($this->_total === null)
 		{
-			$query = $this->_buildQuery();
-			$this->_total = $this->_getListCount($query);
+			$this->_total = (int) $this->_getListCount($this->_buildQuery());
 		}
 
 		return $this->_total;
 	}
 
 
-	/**
-	 * Method to get a pagination object for the records
-	 *
-	 * @return object
-	 *
-	 * @since	1.5
-	 */
-	public function getPagination()
-	{
-		// Create pagination object if it doesn't already exist
-		if (empty($this->_pagination))
-		{
-			require_once (JPATH_COMPONENT_SITE.DS.'helpers'.DS.'pagination.php');
-			$this->_pagination = new FCPagination( $this->getTotal(), $this->getState('limitstart'), $this->getState('limit') );
-		}
-
-		return $this->_pagination;
-	}
 
 
 	/**
@@ -1005,7 +969,7 @@ class FlexicontentModelItems extends FCModelAdminList
 	{
 		$use_versioning = $this->cparams->get('use_versioning', 1);
 		$lang  = 'ie.language AS lang, ie.lang_parent_id, ';
-		$lang .= 'CASE WHEN ie.lang_parent_id=0 THEN i.id ELSE ie.lang_parent_id END AS lang_parent_id, ';
+		$lang .= 'CASE WHEN ie.lang_parent_id=0 THEN a.id ELSE ie.lang_parent_id END AS lang_parent_id, ';
 
 		$filter_tag 		= $this->getState('filter_tag');
 		$filter_state   = $this->getState('filter_state');
@@ -1022,7 +986,7 @@ class FlexicontentModelItems extends FCModelAdminList
 		$filter_state = empty($filter_state) ? array() :
 			(!is_array($filter_state) ? array($filter_state) : $filter_state);
 
-		$subquery 	= 'SELECT name FROM #__users WHERE id = i.created_by';
+		$subquery 	= 'SELECT name FROM #__users WHERE id = a.created_by';
 
 		if (!$query_ids)
 		{
@@ -1038,12 +1002,12 @@ class FlexicontentModelItems extends FCModelAdminList
 		if ( $query_ids || in_array($filter_order, array('rating_count','rating')) )
 		{
 			$rating_join = null;
-			$ratings_col = ', ' . flexicontent_db::buildRatingOrderingColumn($rating_join, $colname = 'rating');
+			$ratings_col = ', ' . flexicontent_db::buildRatingOrderingColumn($rating_join, $colname = 'rating', 'a');
 		}
 
 		if ( !$query_ids )
 		{
-			$query = 'SELECT SQL_CALC_FOUND_ROWS i.id '
+			$query = 'SELECT SQL_CALC_FOUND_ROWS a.id '
 				. ( in_array($filter_order, array('rating_count','rating')) ?
 					', cr.rating_count AS rating_count' . $ratings_col : ''
 					)
@@ -1051,17 +1015,17 @@ class FlexicontentModelItems extends FCModelAdminList
 					', COUNT(DISTINCT fi.field_id) AS matched_custom ' : ''
 					)
 				. ( in_array('RV', $filter_state) ?
-					', i.version' : ''
+					', a.version' : ''
 					)
-				. ( in_array($filter_order, array('i.ordering','catsordering')) ?
-					', CASE WHEN i.state IN (1,-5) THEN 0 ELSE (CASE WHEN i.state IN (0,-3,-4) THEN 1 ELSE (CASE WHEN i.state IN (2) THEN 2 ELSE (CASE WHEN i.state IN (-2) THEN 3 ELSE 4 END) END) END) END as state_order ' : ''
+				. ( in_array($filter_order, array('a.ordering','catsordering')) ?
+					', CASE WHEN a.state IN (1,-5) THEN 0 ELSE (CASE WHEN a.state IN (0,-3,-4) THEN 1 ELSE (CASE WHEN a.state IN (2) THEN 2 ELSE (CASE WHEN a.state IN (-2) THEN 3 ELSE 4 END) END) END) END as state_order ' : ''
 					)
 				;
 		}
 		else
 		{
 			$query =
-				'SELECT i.*, ie.item_id as item_id, ie.search_index AS search_index, ie.type_id, '. $lang .' cousr.name AS editor'
+				'SELECT a.*, ie.item_id as item_id, ie.search_index AS search_index, ie.type_id, '. $lang .' cousr.name AS editor'
 				. ($filter_cats || $filter_catsinstate != 99 ?
 					', rel.catid as rel_catid' : ''
 					)
@@ -1070,17 +1034,17 @@ class FlexicontentModelItems extends FCModelAdminList
 				. ', c.title AS maincat_title'
 				. ', GROUP_CONCAT(DISTINCT icats.catid SEPARATOR  ",") AS relcats'
 				. ', GROUP_CONCAT(DISTINCT tg.tid    SEPARATOR  ",") AS taglist'
-				. ', CASE WHEN level.title IS NULL THEN CONCAT_WS(\'\', \'deleted:\', i.access) ELSE level.title END AS access_level'
-				. ( in_array($filter_order, array('i.ordering', 'catsordering')) ?
-					', CASE WHEN i.state IN (1,-5) THEN 0 ELSE (CASE WHEN i.state IN (0,-3,-4) THEN 1 ELSE (CASE WHEN i.state IN (2) THEN 2 ELSE (CASE WHEN i.state IN (-2) THEN 3 ELSE 4 END) END) END) END as state_order' : ''
+				. ', CASE WHEN level.title IS NULL THEN CONCAT_WS(\'\', \'deleted:\', a.access) ELSE level.title END AS access_level'
+				. ( in_array($filter_order, array('a.ordering', 'catsordering')) ?
+					', CASE WHEN a.state IN (1,-5) THEN 0 ELSE (CASE WHEN a.state IN (0,-3,-4) THEN 1 ELSE (CASE WHEN a.state IN (2) THEN 2 ELSE (CASE WHEN a.state IN (-2) THEN 3 ELSE 4 END) END) END) END as state_order' : ''
 					)
 				. ($filter_cats && !$filter_subcats ?
 					', rel.ordering as catsordering' : ', \'\' as catsordering'
 					)
-				. ', CASE WHEN i.publish_up = '.$nullDate.' OR i.publish_up <= '.$nowDate.' THEN 0 ELSE 1 END as publication_scheduled'
-				. ', CASE WHEN i.publish_down = '.$nullDate.' OR i.publish_down >= '.$nowDate.' THEN 0 ELSE 1 END as publication_expired'
-				. ', t.name AS type_name, (' . $subquery . ') AS author, i.attribs AS config, t.attribs as tconfig'
-				. ($use_versioning ? ', CASE WHEN i.version = MAX(fv.version_id) THEN 0 ELSE MAX(fv.version_id) END as unapproved_version ' : ', 0 as unapproved_version')
+				. ', CASE WHEN a.publish_up = '.$nullDate.' OR a.publish_up <= '.$nowDate.' THEN 0 ELSE 1 END as publication_scheduled'
+				. ', CASE WHEN a.publish_down = '.$nullDate.' OR a.publish_down >= '.$nowDate.' THEN 0 ELSE 1 END as publication_expired'
+				. ', t.name AS type_name, (' . $subquery . ') AS author, a.attribs AS config, t.attribs as tconfig'
+				. ($use_versioning ? ', CASE WHEN a.version = MAX(fv.version_id) THEN 0 ELSE MAX(fv.version_id) END as unapproved_version ' : ', 0 as unapproved_version')
 				;
 		}
 
@@ -1100,53 +1064,53 @@ class FlexicontentModelItems extends FCModelAdminList
 
 		$query .= ''
 				. ($use_tmp
-					? ' FROM #__flexicontent_items_tmp AS i'
-					: ' FROM #__content AS i')
+					? ' FROM #__flexicontent_items_tmp AS a'
+					: ' FROM #__content AS a')
 
 				. (!$tmp_only
-					? ' JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id'
+					? ' JOIN #__flexicontent_items_ext AS ie ON ie.item_id = a.id'
 					: '')
 
-				. ' JOIN #__categories AS c ON c.id = i.catid'
+				. ' JOIN #__categories AS c ON c.id = a.catid'
 
 				. (!$query_ids && count($customFiltsActive)
-					? ' JOIN #__flexicontent_fields_item_relations as fi ON i.id=fi.item_id'
+					? ' JOIN #__flexicontent_fields_item_relations as fi ON a.id=fi.item_id'
 					: '')
 
-				. ' LEFT JOIN #__flexicontent_tags_item_relations AS tg ON i.id=tg.itemid'
+				. ' LEFT JOIN #__flexicontent_tags_item_relations AS tg ON a.id=tg.itemid'
 
 				. ($query_ids || in_array($filter_order, array('rating_count', 'rating'))
 					? ' LEFT JOIN ' . $rating_join
 					: '')
 
 				. (!$query_ids && in_array('RV', $filter_state)
-					? ' JOIN #__flexicontent_versions AS fv ON i.id=fv.item_id'
+					? ' JOIN #__flexicontent_versions AS fv ON a.id=fv.item_id'
 					: '')
 
 				. ($query_ids && $use_versioning
-					? ' LEFT JOIN #__flexicontent_versions AS fv ON i.id=fv.item_id'
+					? ' LEFT JOIN #__flexicontent_versions AS fv ON a.id=fv.item_id'
 					: '')
 
 				// Used to get list of the assigned categories (left join and not inner join, needed to INCLUDE items do not have records in the multi-cats-items TABLE)
 				. ($query_ids
-					? ' LEFT JOIN #__flexicontent_cats_item_relations AS icats ON icats.itemid = i.id'
+					? ' LEFT JOIN #__flexicontent_cats_item_relations AS icats ON icats.itemid = a.id'
 					: '')
 
 				// Limit to items according to their assigned categories (left join and not inner join, needed to INCLUDE items do not have records in the multi-cats-items TABLE)
-				. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'
+				. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = a.id'
 					. ($filter_cats && !$filter_subcats ? ' AND rel.catid=' . $filter_cats : '') // Force rel.catid to be of the specific filtered category (rel.catid is used by ordering code)
 
 				// Get type info, (left join and not inner join, needed to INCLUDE items without type !!)
-				. ' LEFT JOIN #__flexicontent_types AS t ON t.id = ' . ($tmp_only ? 'i.' : 'ie.') . 'type_id'
+				. ' LEFT JOIN #__flexicontent_types AS t ON t.id = ' . ($tmp_only ? 'a.' : 'ie.') . 'type_id'
 
 				// Get user info of that checkout the item, left join and not inner join, needed to INCLUDE items checkedout by a deleted user
 				. ($query_ids
-					? ' LEFT JOIN #__users AS cousr ON cousr.id = i.checked_out'
+					? ' LEFT JOIN #__users AS cousr ON cousr.id = a.checked_out'
 					: '')
 
 				// Get access level info, (left join and not inner join, needed to INCLUDE items with bad access levels)
 				. ($query_ids
-					? ' LEFT JOIN #__viewlevels AS level ON level.id = i.access'
+					? ' LEFT JOIN #__viewlevels AS level ON level.id = a.access'
 					: '')
 
 				. $extra_joins
@@ -1158,7 +1122,7 @@ class FlexicontentModelItems extends FCModelAdminList
 
 			if (in_array('RV', $filter_state))
 			{
-				$having[] = ' i.version<>MAX(fv.version_id) ';
+				$having[] = ' a.version<>MAX(fv.version_id) ';
 			}
 
 			if (count($customFiltsActive))
@@ -1169,7 +1133,7 @@ class FlexicontentModelItems extends FCModelAdminList
 			// We will use GROUP BY to be able to calculate the aggregated column 'matched_custom' (aggregate function COUNT)
 			$query .= ''
 				. $where
-				. ' GROUP BY i.id'
+				. ' GROUP BY a.id'
 				. (count($having) ? ' HAVING ' . implode(' AND ', $having) : '')
 				. $orderby
 				;
@@ -1178,8 +1142,8 @@ class FlexicontentModelItems extends FCModelAdminList
 		{
 			// We will use GROUP BY to be able to calculate the aggregated columns 'relcats' and 'taglist' (aggregate function GROUP_CONCAT)
 			$query .= ''
-				. ' WHERE i.id IN (' . implode(',', $query_ids) . ')'
-				. ' GROUP BY i.id'
+				. ' WHERE a.id IN (' . implode(',', $query_ids) . ')'
+				. ' GROUP BY a.id'
 				;
 		}
 
@@ -1207,17 +1171,17 @@ class FlexicontentModelItems extends FCModelAdminList
 		{
 			case 'type_name':
 				$_filter_order = 't.name';
-				$orderby 	= ' ORDER BY ' . $_filter_order . ' ' . $filter_order_Dir . ', i.id ASC';
+				$orderby 	= ' ORDER BY ' . $_filter_order . ' ' . $filter_order_Dir . ', a.id ASC';
 				break;
-			case 'i.ordering':
-				$orderby 	= ' ORDER BY i.catid, state_order, i.language, ' . $filter_order . ' ' . $filter_order_Dir . ', i.id DESC';
+			case 'a.ordering':
+				$orderby 	= ' ORDER BY a.catid, state_order, a.language, ' . $filter_order . ' ' . $filter_order_Dir . ', a.id DESC';
 				break;
 			case 'catsordering':
 				$_filter_order = 'rel.ordering';
-				$orderby 	= ' ORDER BY rel.catid, state_order, i.language, ' . $_filter_order . ' ' . $filter_order_Dir . ', i.id DESC';
+				$orderby 	= ' ORDER BY rel.catid, state_order, a.language, ' . $_filter_order . ' ' . $filter_order_Dir . ', a.id DESC';
 				break;
-			case 'i.modified':
-				$orderby 	= ' ORDER BY ' . $filter_order . ' ' . $filter_order_Dir . ', i.created ' . ' ' . $filter_order_Dir;
+			case 'a.modified':
+				$orderby 	= ' ORDER BY ' . $filter_order . ' ' . $filter_order_Dir . ', a.created ' . ' ' . $filter_order_Dir;
 				break;
 			case 'rating':
 				$orderby 	= ' ORDER BY ' . $filter_order . ' ' . $filter_order_Dir . ', cr.rating_count ' . ' ' . $filter_order_Dir;
@@ -1270,7 +1234,7 @@ class FlexicontentModelItems extends FCModelAdminList
 
 			return empty($itemids)
 				? ' WHERE 0 '
-				: ' WHERE i.id IN ('. implode(',', $itemids) .') ';
+				: ' WHERE a.id IN ('. implode(',', $itemids) .') ';
 		}
 
 
@@ -1332,7 +1296,7 @@ class FlexicontentModelItems extends FCModelAdminList
 			$aid_list = implode(",", $aid_arr);
 			$where[] = ' t.access IN (0,'.$aid_list.')';
 			$where[] = ' c.access IN (0,'.$aid_list.')';
-			$where[] = ' i.access IN (0,'.$aid_list.')';
+			$where[] = ' a.access IN (0,'.$aid_list.')';
 		}
 
 		$extra_joins .= $joinaccess;
@@ -1356,7 +1320,7 @@ class FlexicontentModelItems extends FCModelAdminList
 
 				if ($allowedcats)
 				{
-					$_edit_where .= '( i.catid IN (' . implode( ', ', $allowedcats ) . ') )';
+					$_edit_where .= '( a.catid IN (' . implode( ', ', $allowedcats ) . ') )';
 				}
 
 				if ($allowedcats && $allowedcats_own)
@@ -1366,7 +1330,7 @@ class FlexicontentModelItems extends FCModelAdminList
 
 				if ($allowedcats_own)
 				{
-					$_edit_where .= '( i.catid IN (' . implode( ', ', $allowedcats_own ) . ') AND i.created_by='.$user->id.')';
+					$_edit_where .= '( a.catid IN (' . implode( ', ', $allowedcats_own ) . ') AND a.created_by='.$user->id.')';
 				}
 
 				$where[] = $_edit_where .' )';
@@ -1382,8 +1346,8 @@ class FlexicontentModelItems extends FCModelAdminList
 		{
 			// CURRENTLY in main or secondary category.  -TODO-  maybe add limiting by main category, if ... needed
 
-			$cat_type = !$this->getState('filter_order_type') && $this->getState('filter_order') === 'i.ordering'
-				? 'i.catid'
+			$cat_type = !$this->getState('filter_order_type') && $this->getState('filter_order') === 'a.ordering'
+				? 'a.catid'
 				: 'rel.catid';
 
 			if ($filter_subcats)
@@ -1439,7 +1403,7 @@ class FlexicontentModelItems extends FCModelAdminList
 
 		if (strlen($filter_featured))
 		{
-			$where[] = 'i.featured = ' . $filter_featured;
+			$where[] = 'a.featured = ' . $filter_featured;
 		}
 
 
@@ -1449,8 +1413,8 @@ class FlexicontentModelItems extends FCModelAdminList
 
 		if (empty($filter_state))
 		{
-			$where[] = 'i.state <> -2';
-			$where[] = 'i.state <> 2';
+			$where[] = 'a.state <> -2';
+			$where[] = 'a.state <> 2';
 		}
 
 		else
@@ -1471,7 +1435,7 @@ class FlexicontentModelItems extends FCModelAdminList
 			}
 			elseif (isset($FS['ORPHAN']))
 			{
-				$where[] = 'i.state NOT IN(2,-2,1,0,-3,-4,-5)';
+				$where[] = 'a.state NOT IN(2,-2,1,0,-3,-4,-5)';
 			}
 			else
 			{
@@ -1490,7 +1454,7 @@ class FlexicontentModelItems extends FCModelAdminList
 
 				if (!empty($states))
 				{
-					$where[] = 'i.state IN ('.implode(',', $states).')';
+					$where[] = 'a.state IN ('.implode(',', $states).')';
 				}
 			}
 		}
@@ -1509,18 +1473,18 @@ class FlexicontentModelItems extends FCModelAdminList
 		if (!empty($filter_type))
 		{
 			$filter_type = ArrayHelper::toInteger($filter_type);
-			$where[] = ($tmp_only ? 'i.' : 'ie.') . 'type_id IN (' . implode( ',', $filter_type) .')';
+			$where[] = ($tmp_only ? 'a.' : 'ie.') . 'type_id IN (' . implode( ',', $filter_type) .')';
 		}
 
 		if (!empty($filter_author))
 		{
 			$filter_author = ArrayHelper::toInteger($filter_author);
-			$where[] = 'i.created_by IN (' . implode( ',', $filter_author) .')';
+			$where[] = 'a.created_by IN (' . implode( ',', $filter_author) .')';
 		}
 
 		if ($filter_id)
 		{
-			$where[] = 'i.id = ' . $filter_id;
+			$where[] = 'a.id = ' . $filter_id;
 		}
 
 		if (!empty($filter_lang))
@@ -1537,13 +1501,13 @@ class FlexicontentModelItems extends FCModelAdminList
 				}
 			}
 
-			$where[] = 'i.language IN (' . implode( ',', $filter_langs) .')';
+			$where[] = 'a.language IN (' . implode( ',', $filter_langs) .')';
 		}
 
 		if (!empty($filter_access))
 		{
 			$filter_access = ArrayHelper::toInteger($filter_access);
-			$where[] = 'i.access IN (' . implode( ',', $filter_access) .')';
+			$where[] = 'a.access IN (' . implode( ',', $filter_access) .')';
 		}
 
 
@@ -1583,15 +1547,15 @@ class FlexicontentModelItems extends FCModelAdminList
 
 			switch($scope)
 			{
-				case 1:
-					$where[] = ' LOWER(i.' . $this->name_col . ') LIKE ' . $search_quoted;
+				case 'a.' . $this->name_col:
+					$where[] = ' LOWER(a.' . $this->name_col . ') LIKE ' . $search_quoted;
 					break;
 
-				case 2:
-					$where[] = '(LOWER(i.introtext) LIKE ' . $search_quoted . ' OR LOWER(i.fulltext)  LIKE ' . $search_quoted . ') ';
+				case 'a.introtext':
+					$where[] = '(LOWER(a.introtext) LIKE ' . $search_quoted . ' OR LOWER(a.fulltext)  LIKE ' . $search_quoted . ') ';
 					break;
 
-				case 4:
+				case 'ie.search_index':
 					$where[] = ' MATCH (ie.search_index) AGAINST (' . $this->_db->Quote($search_prefix . $escaped_search . '*', false ).' IN BOOLEAN MODE)';
 					break;
 			}
@@ -1611,26 +1575,26 @@ class FlexicontentModelItems extends FCModelAdminList
 			switch($date)
 			{
 				case 1:
-					if ($startdate) $_where[] = ' i.created >= ' . $this->_db->Quote($startdate);
-					if ($enddate)   $_where[] = ' i.created <= ' . $this->_db->Quote($enddate);
+					if ($startdate) $_where[] = ' a.created >= ' . $this->_db->Quote($startdate);
+					if ($enddate)   $_where[] = ' a.created <= ' . $this->_db->Quote($enddate);
 					$where[] = '( ' . implode(' AND ', $_where) . ' )';
 					break;
 
 				case 2:
-					if ($startdate)  $_where[] = '( i.modified >= ' . $this->_db->Quote($startdate) . ' OR ( i.modified = ' . $this->_db->Quote($nullDate) . ' AND i.created >= ' . $this->_db->Quote($startdate) . '))';
-					if ($enddate)    $_where[] = '( i.modified <= ' . $this->_db->Quote($enddate)   . ' OR ( i.modified = ' . $this->_db->Quote($nullDate) . ' AND i.created <= ' . $this->_db->Quote($enddate) . '))';
+					if ($startdate)  $_where[] = '( a.modified >= ' . $this->_db->Quote($startdate) . ' OR ( a.modified = ' . $this->_db->Quote($nullDate) . ' AND a.created >= ' . $this->_db->Quote($startdate) . '))';
+					if ($enddate)    $_where[] = '( a.modified <= ' . $this->_db->Quote($enddate)   . ' OR ( a.modified = ' . $this->_db->Quote($nullDate) . ' AND a.created <= ' . $this->_db->Quote($enddate) . '))';
 					$where[] = '( ' . implode(' AND ', $_where) . ' )';
 					break;
 
 				case 3:
-					if ($startdate) $_where[] = '( i.publish_up >= ' . $this->_db->Quote($startdate) . ' OR ( i.publish_up = ' . $this->_db->Quote($nullDate) . ' AND i.created >= ' . $this->_db->Quote($startdate) . '))';
-					if ($enddate)   $_where[] = '( i.publish_up <= ' . $this->_db->Quote($enddate) . ' OR ( i.publish_up = ' . $this->_db->Quote($nullDate) . ' AND i.created >= ' . $this->_db->Quote($startdate) . '))';
+					if ($startdate) $_where[] = '( a.publish_up >= ' . $this->_db->Quote($startdate) . ' OR ( a.publish_up = ' . $this->_db->Quote($nullDate) . ' AND a.created >= ' . $this->_db->Quote($startdate) . '))';
+					if ($enddate)   $_where[] = '( a.publish_up <= ' . $this->_db->Quote($enddate) . ' OR ( a.publish_up = ' . $this->_db->Quote($nullDate) . ' AND a.created >= ' . $this->_db->Quote($startdate) . '))';
 					$where[] = '( ' . implode(' AND ', $_where) . ' )';
 					break;
 
 				case 4:
-					if ($startdate) $_where[] = ' i.publish_down >= ' . $this->_db->Quote($startdate);
-					if ($enddate)   $_where[] = ' i.publish_down <= ' . $this->_db->Quote($enddate);
+					if ($startdate) $_where[] = ' a.publish_down >= ' . $this->_db->Quote($startdate);
+					if ($enddate)   $_where[] = ' a.publish_down <= ' . $this->_db->Quote($enddate);
 					$where[] = '( ' . implode(' AND ', $_where) . ' )';
 					break;
 			}
@@ -2341,9 +2305,9 @@ class FlexicontentModelItems extends FCModelAdminList
 			$catid = $catid ?: $table->catid;
 
 			$query = $this->_db->getQuery(true)
-				->select('rel.itemid, rel.ordering, i.state, i.language')
+				->select('rel.itemid, rel.ordering, a.state, a.language')
 				->from('#__flexicontent_cats_item_relations AS rel')
-				->innerJoin('#__content AS i ON i.id = rel.itemid')
+				->innerJoin('#__content AS a ON a.id = rel.itemid')
 				->where('rel.catid = ' . (int) $catid)
 				->where('rel.itemid = ' . (int) $this->_id)
 			;
@@ -2364,7 +2328,7 @@ class FlexicontentModelItems extends FCModelAdminList
 				->where(array(
 					'rel.catid = ' . $catid,
 					$state_where,
-					'i.language = ' . $this->_db->Quote($table->language),
+					'a.language = ' . $this->_db->Quote($table->language),
 				));
 
 			if ($direction < 0)
@@ -2562,9 +2526,9 @@ class FlexicontentModelItems extends FCModelAdminList
 			for ($i = 0; $i < count($pks); $i++)
 			{
 				$query = $this->_db->getQuery(true)
-					->select('rel.itemid, rel.ordering, i.state, i.language')
+					->select('rel.itemid, rel.ordering, a.state, a.language')
 					->from('#__flexicontent_cats_item_relations AS rel')
-					->innerJoin('#__content AS i ON i.id = rel.itemid')
+					->innerJoin('#__content AS a ON a.id = rel.itemid')
 					->where('rel.ordering >= 0')
 					->where('rel.catid = ' . (int) $catid)
 					->where('rel.itemid = ' . (int) $pks[$i])
@@ -2624,13 +2588,13 @@ class FlexicontentModelItems extends FCModelAdminList
 					{
 						// Specific reorder procedure because the relations table has a composite primary key
 						$query = $this->_db->getQuery(true)
-							->select('rel.itemid, rel.ordering, i.state, i.language')
+							->select('rel.itemid, rel.ordering, a.state, a.language')
 							->from('#__flexicontent_cats_item_relations AS rel')
-							->innerJoin('#__content AS i ON i.id = rel.itemid')
+							->innerJoin('#__content AS a ON a.id = rel.itemid')
 							->where('rel.ordering >= 0')
 							->where('rel.catid = ' . (int) $reorder_catid)
 							->where($state_where_clauses[$state_group])
-							->where('i.language = ' . $this->_db->Quote($lang_group))
+							->where('a.language = ' . $this->_db->Quote($lang_group))
 							->order('rel.ordering')
 						;
 						$rows = $this->_db->setQuery($query)->loadObjectList();
@@ -2925,9 +2889,9 @@ class FlexicontentModelItems extends FCModelAdminList
 	 */
 	function getItemsWithTags(&$total=null, $start=0, $limit=5000)
 	{
-		$query = 'SELECT SQL_CALC_FOUND_ROWS DISTINCT i.id '
-			. ' FROM #__content AS i'
-			. ' JOIN #__flexicontent_tags_item_relations AS tg ON i.id = tg.itemid'
+		$query = 'SELECT SQL_CALC_FOUND_ROWS DISTINCT a.id '
+			. ' FROM #__content AS a'
+			. ' JOIN #__flexicontent_tags_item_relations AS tg ON a.id = tg.itemid'
 			. ($limit ? ' LIMIT ' . (int) $start . ', ' . (int) $limit : '')
 			;
 		$item_ids = $this->_db->setQuery($query)->loadColumn();
@@ -3007,10 +2971,10 @@ class FlexicontentModelItems extends FCModelAdminList
 	 */
 	function getAuthorslist ()
 	{
-		$query = 'SELECT i.created_by AS id, ua.name AS name'
-				. ' FROM #__content AS i'
-				. ' LEFT JOIN #__users AS ua ON ua.id = i.created_by'
-				. ' GROUP BY i.created_by'
+		$query = 'SELECT a.created_by AS id, ua.name AS name'
+				. ' FROM #__content AS a'
+				. ' LEFT JOIN #__users AS ua ON ua.id = a.created_by'
+				. ' GROUP BY a.created_by'
 				. ' ORDER BY ua.name'
 				;
 		$this->_db->setQuery($query);
@@ -3253,7 +3217,7 @@ class FlexicontentModelItems extends FCModelAdminList
 		$queries = array();
 
 		// Find item having tags
-		if ( !empty($get_items_with_tags) )
+		if (!empty($get_items_with_tags))
 		{
 			$queries[] = "SELECT DISTINCT t.itemid "
 				." FROM #__flexicontent_tags_item_relations AS t"
@@ -3272,8 +3236,8 @@ class FlexicontentModelItems extends FCModelAdminList
 				;
 		}
 
-		$query = 'SELECT SQL_CALC_FOUND_ROWS i.*'
-			. ' FROM (('. implode(') UNION ( ', $queries) . ')) AS i'
+		$query = 'SELECT SQL_CALC_FOUND_ROWS a.*'
+			. ' FROM (('. implode(') UNION ( ', $queries) . ')) AS a'
 			. ($limit ? ' LIMIT ' . (int) $start . ', ' . (int) $limit : '')
 			;
 		$item_list = $this->_db->setQuery($query)->loadColumn();
@@ -3375,7 +3339,8 @@ class FlexicontentModelItems extends FCModelAdminList
 	{
 		$app    = JFactory::getApplication();
 		$jinput = $app->input;
-		$fcform = $jinput->get('fcform', 0, 'int');
+		$view   = $jinput->getCmd('view', '');
+		$fcform = $jinput->getInt('fcform', 0);
 		$p      = $this->ovid;
 
 		// Order type
@@ -3383,8 +3348,9 @@ class FlexicontentModelItems extends FCModelAdminList
 		$this->setState('filter_order_type', $filter_order_type);
 		$app->setUserState($p.'filter_order_type', $filter_order_type);
 
-		$default_order     = $this->cparams->get('items_manager_order', $this->default_order);
-		$default_order_dir = $this->cparams->get('items_manager_order_dir', $this->default_order_dir);
+		// Use ordering parameter from component configuration if these exist and are set
+		$default_order     = str_replace('i.', 'a.', $this->cparams->get($view . '_manager_order', $this->default_order));
+		$default_order_dir = $this->cparams->get($view . '_manager_order_dir', $this->default_order_dir);
 		$default_order = $default_order !== '1' ? $default_order : '';   // '1' is 'unordered'
 
 		$filter_order     = $fcform ? $jinput->get('filter_order', $default_order, 'cmd') : $app->getUserStateFromRequest($p . 'filter_order', 'filter_order', $default_order, 'cmd');
@@ -3401,8 +3367,8 @@ class FlexicontentModelItems extends FCModelAdminList
 		}
 
 		// Filter order is selected via current setting of filter_order_type selector
-		$filter_order	= ($filter_order_type && ($filter_order == 'i.ordering')) ? 'catsordering' : $filter_order;
-		$filter_order	= (!$filter_order_type && ($filter_order == 'catsordering')) ? 'i.ordering' : $filter_order;
+		$filter_order	= ($filter_order_type && ($filter_order == 'a.ordering')) ? 'catsordering' : $filter_order;
+		$filter_order	= (!$filter_order_type && ($filter_order == 'catsordering')) ? 'a.ordering' : $filter_order;
 		$jinput->set( 'filter_order', $filter_order );
 		$jinput->set( 'filter_order_Dir', $filter_order_Dir );
 

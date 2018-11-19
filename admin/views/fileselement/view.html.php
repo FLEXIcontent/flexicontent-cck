@@ -25,6 +25,7 @@ class FlexicontentViewFileselement extends FlexicontentViewBaseRecords
 	var $title_propname = 'filename';
 	var $state_propname = 'published';
 	var $db_tbl         = 'flexicontent_files';
+	var $name_singular  = 'file';
 
 	public function display($tpl = null)
 	{
@@ -55,7 +56,7 @@ class FlexicontentViewFileselement extends FlexicontentViewBaseRecords
 		$isCtmpl  = $jinput->getCmd('tmpl') === 'component';
 
 		// Some flags & constants
-		;
+		$useAssocs = flexicontent_db::useAssociations();
 
 		// Load Joomla language files of other extension
 		if (!empty($this->proxy_option))
@@ -65,7 +66,8 @@ class FlexicontentViewFileselement extends FlexicontentViewBaseRecords
 		}
 
 		// Get model
-		$model = $this->getModel();
+		$model   = $this->getModel();
+		$model_s = $this->getModel($this->name_singular);
 
 		// Performance statistics
 		if ($print_logging_info = $cparams->get('print_logging_info'))
@@ -312,7 +314,8 @@ class FlexicontentViewFileselement extends FlexicontentViewBaseRecords
 
 
 		/**
-		 * Get data from the model
+		 * Get data from the model, note data retrieval must be before 
+		 * getTotal() and getPagination() because it also calculates total rows
 		 */
 
 		// DB mode
@@ -554,7 +557,7 @@ class FlexicontentViewFileselement extends FlexicontentViewBaseRecords
 		$ffields['file-lang'] = flexicontent_html::buildlanguageslist(
 			$fieldname,
 			array(
-				'class' => 'use_select2_lib',
+				'class' => $this->select_class,
 			),
 			'*',
 			$display_file_lang_as,
@@ -573,7 +576,7 @@ class FlexicontentViewFileselement extends FlexicontentViewBaseRecords
 			$options,
 			$fieldname,
 			array(
-				'class' => 'use_select2_lib',
+				'class' => $this->select_class,
 			),
 			'value',
 			'text',
@@ -595,7 +598,8 @@ class FlexicontentViewFileselement extends FlexicontentViewBaseRecords
 			'html' => flexicontent_html::buildlanguageslist(
 				'filter_lang',
 				array(
-					'class' => 'use_select2_lib',
+					'class' => $this->select_class,
+					'size' => '1',
 					'onchange' => 'document.adminForm.limitstart.value=0; Joomla.submitform();',
 				),
 				$filter_lang,
@@ -620,7 +624,8 @@ class FlexicontentViewFileselement extends FlexicontentViewBaseRecords
 				$options,
 				$fieldname,
 				array(
-					'class' => 'use_select2_lib',
+					'class' => $this->select_class,
+					'size' => '1',
 					'onchange' => 'document.adminForm.limitstart.value=0; Joomla.submitform();',
 				),
 				'value',
@@ -645,7 +650,8 @@ class FlexicontentViewFileselement extends FlexicontentViewBaseRecords
 				$options,
 				$fieldname,
 				array(
-					'class' => 'use_select2_lib',
+					'class' => $this->select_class,
+					'size' => '1',
 					'onchange' => 'document.adminForm.limitstart.value=0; Joomla.submitform();',
 				),
 				'value',
@@ -653,43 +659,9 @@ class FlexicontentViewFileselement extends FlexicontentViewBaseRecords
 				$filter_access,
 				$elementid,
 				$translate = true
-			)
+			),
 		));
 
-
-		// Build text search scope 
-		$scopes = array(
-			0 =>  '- ' . JText::_('FLEXI_ALL') . ' -',
-			1 => JText::_('FLEXI_FILENAME'),
-			2 => JText::_('FLEXI_FILE_DISPLAY_TITLE'),
-			3 => JText::_('FLEXI_DESCRIPTION'),
-		);
-
-		$this->scope_title = $scopes[$scope];
-		$options = array();
-
-		foreach ($scopes as $i => $v)
-		{
-			$options[] = JHtml::_('select.option', $i, $v);
-		}
-
-		array_unshift($options, JHtml::_('select.option', 0, JText::_('FLEXI_SEARCH_TEXT_INSIDE'), 'value', 'text', 'disabled'));
-
-		$lists['scope_tip'] = ''; //'<span class="hidden-phone ' . $this->tooltip_class . '" title="'.JText::_('FLEXI_SEARCH_TEXT_INSIDE').'" style="display: inline-block;"><i class="icon-info-2"></i></span>';
-		$lists['scope'] = JHtml::_('select.genericlist',
-			$options,
-			'scope',
-			array(
-				'size' => '1',
-				'class' => $this->select_class . ' fc_is_selarrow ' . $this->tooltip_class,
-				'onchange' => 'jQuery(\'#search\').attr(\'placeholder\', jQuery(this).find(\'option:selected\').text()); jQuery(this).blur();',
-				'title' => JText::_('FLEXI_SEARCH_TEXT_INSIDE'),
-			),
-			'value',
-			'text',
-			$scope,
-			'scope'
-		);
 
 		if ($layout !== 'image' || $view !== 'fileselement')
 		{
@@ -705,7 +677,8 @@ class FlexicontentViewFileselement extends FlexicontentViewBaseRecords
 					$url,
 					'filter_url',
 					array(
-						'class' => 'use_select2_lib',
+						'class' => $this->select_class,
+						'size' => '1',
 						'onchange' => 'document.adminForm.limitstart.value=0; Joomla.submitform();',
 					),
 					'value',
@@ -726,7 +699,8 @@ class FlexicontentViewFileselement extends FlexicontentViewBaseRecords
 					$stamp,
 					'filter_stamp',
 					array(
-						'class' => 'use_select2_lib',
+						'class' => $this->select_class,
+						'size' => '1',
 						'onchange' => 'document.adminForm.limitstart.value=0; Joomla.submitform();',
 					),
 					'value',
@@ -742,7 +716,7 @@ class FlexicontentViewFileselement extends FlexicontentViewBaseRecords
 			'html' => '<input type="text" name="item_id" size="1" class="inputbox" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()" value="'.$filter_item.'" />',
 		));
 
-		//build secure/media filterlist
+		// Build target folder (secure / media) filter
 		$_secure_info = '<i data-placement="bottom" class="icon-info hasTooltip" title="'.flexicontent_html::getToolTip('FLEXI_URL_SECURE', 'FLEXI_URL_SECURE_DESC', 1, 1).'"></i>';
 
 		if ($target_dir==2)
@@ -758,7 +732,8 @@ class FlexicontentViewFileselement extends FlexicontentViewBaseRecords
 					$secure,
 					'filter_secure',
 					array(
-						'class' => 'use_select2_lib',
+						'class' => $this->select_class,
+						'size' => '1',
 						'onchange' => 'document.adminForm.limitstart.value=0; Joomla.submitform();',
 					),
 					'value',
@@ -775,13 +750,14 @@ class FlexicontentViewFileselement extends FlexicontentViewBaseRecords
 			));
 		}
 
-		//build ext filterlist
+		// Build extension filter
 		$lists['filter_ext'] = $this->getFilterDisplay(array(
 			'label' => JText::_('FLEXI_ALL_EXT'),
 			'html' => flexicontent_html::buildfilesextlist(
 				'filter_ext',
 				array(
-					'class' => 'use_select2_lib',
+					'class' => $this->select_class,
+					'size' => '1',
 					'onchange' => 'document.adminForm.limitstart.value=0; Joomla.submitform();',
 				),
 				$filter_ext,
@@ -789,7 +765,7 @@ class FlexicontentViewFileselement extends FlexicontentViewBaseRecords
 			)
 		));
 
-		//build uploader filterlist
+		// Build uploader filter
 		if ($perms->CanViewAllFiles && !empty($cols['uploader']))
 		{
 			$lists['filter_uploader'] = $this->getFilterDisplay(array(
@@ -797,7 +773,8 @@ class FlexicontentViewFileselement extends FlexicontentViewBaseRecords
 				'html' => flexicontent_html::builduploaderlist(
 					'filter_uploader',
 					array(
-						'class' => 'use_select2_lib',
+						'class' => $this->select_class,
+						'size' => '1',
 						'onchange' => 'document.adminForm.limitstart.value=0; Joomla.submitform();',
 					),
 					$filter_uploader,
@@ -805,6 +782,16 @@ class FlexicontentViewFileselement extends FlexicontentViewBaseRecords
 				)
 			));
 		}
+
+
+		// Build text search scope
+		$scopes = !$folder_mode ? null : array(
+			1 => JText::_('FLEXI_FILENAME'),
+		);
+
+		$lists['scope_tip'] = '';
+		$lists['scope'] = $this->getScopeSelectorDisplay($scopes, $scope);
+		$this->scope_title = $scopes[$scope];
 
 
 		// Text search filter value

@@ -25,6 +25,7 @@ class FlexicontentViewGroups extends FlexicontentViewBaseRecords
 	var $title_propname = 'title';
 	var $state_propname = null;
 	var $db_tbl         = 'usergroups';
+	var $name_singular  = 'usergroup';
 
 	public function display($tpl = null)
 	{
@@ -50,7 +51,7 @@ class FlexicontentViewGroups extends FlexicontentViewBaseRecords
 		$isCtmpl  = $jinput->getCmd('tmpl') === 'component';
 
 		// Some flags & constants
-		;
+		$useAssocs = flexicontent_db::useAssociations();
 
 		// Load Joomla language files of other extension
 		if (!empty($this->proxy_option))
@@ -60,7 +61,8 @@ class FlexicontentViewGroups extends FlexicontentViewBaseRecords
 		}
 
 		// Get model
-		$model = $this->getModel();
+		$model   = $this->getModel();
+		$model_s = $this->getModel($this->name_singular);
 
 		// Performance statistics
 		if ($print_logging_info = $cparams->get('print_logging_info'))
@@ -75,8 +77,19 @@ class FlexicontentViewGroups extends FlexicontentViewBaseRecords
 
 		$count_filters = 0;
 
+		// Order and order direction
+		$filter_order      = $model->getState('filter_order');
+		$filter_order_Dir  = $model->getState('filter_order_Dir');
+
+		// Various filters
+		// Record ID filter
+		$filter_id = $model->getState('filter_id');
+		if (strlen($filter_id)) $count_filters++;
+
+
 		// Text search
-		$search = $app->getUserStateFromRequest( $option.'.'.$view.'.search', 			'search', 			'', 'string' );
+		$scope  = $model->getState('scope');
+		$search = $model->getState('search');
 		$search = StringHelper::trim(StringHelper::strtolower($search));
 
 
@@ -115,6 +128,18 @@ class FlexicontentViewGroups extends FlexicontentViewBaseRecords
 			$document->addScriptVersion(JUri::root(true).'/components/com_flexicontent/assets/js/validate.js', FLEXI_VHASH);
 		}
 
+		$js = '';
+		if ($search)            $js .= "jQuery('.col_title').addClass('filtered_column');";
+		if ($filter_id)         $js .= "jQuery('.col_id').addClass('filtered_column');";
+
+		if ($js)
+		{
+			$document->addScriptDeclaration('
+				jQuery(document).ready(function(){
+					' . $js . '
+				});
+			');
+		}
 
 
 		/**
@@ -135,18 +160,29 @@ class FlexicontentViewGroups extends FlexicontentViewBaseRecords
 
 
 		/**
-		 * Get data from the model
+		 * Get data from the model, note data retrieval must be before 
+		 * getTotal() and getPagination() because it also calculates total rows
 		 */
 
 		if ( $print_logging_info )  $start_microtime = microtime(true);
 
-		$rows = $this->get('Items');
+		$rows        = $model->getItems();
 
 		if ( $print_logging_info ) @$fc_run_times['execute_main_query'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 
 		// Create pagination object
 		$pagination = $this->get('Pagination');
 
+
+		/**
+		 * Add usage information notices if these are enabled
+		 */
+
+		$conf_link = '<a href="index.php?option=com_config&amp;view=component&amp;component=com_flexicontent&amp;path=" class="' . $this->btn_sm_class . ' btn-info">'.JText::_("FLEXI_CONFIG").'</a>';
+
+		if ($cparams->get('show_usability_messages', 1))
+		{
+		}
 
 
 		/**
@@ -155,8 +191,24 @@ class FlexicontentViewGroups extends FlexicontentViewBaseRecords
 
 		$lists = array();
 
+
+		// Build text search scope
+		$scopes = null;
+
+		$lists['scope_tip'] = '';
+		$lists['scope'] = $this->getScopeSelectorDisplay($scopes, $scope);
+		$this->scope_title = $scopes[$scope];
+
+
+		// Text search filter value
 		$lists['search'] = $search;
 
+		// Search id
+		$lists['filter_id'] = $filter_id;
+
+		// Table ordering
+		$lists['order_Dir'] = $filter_order_Dir;
+		$lists['order']     = $filter_order;
 
 		/**
 		 * Assign data to template
@@ -167,13 +219,16 @@ class FlexicontentViewGroups extends FlexicontentViewBaseRecords
 		$this->lists       = $lists;
 		$this->rows        = $rows;
 		$this->pagination  = $pagination;
+
 		$this->perms  = FlexicontentHelperPerm::getPerm();
 		$this->option = $option;
 		$this->view   = $view;
 		$this->state  = $this->get('State');
 
-		$this->sidebar = FLEXI_J30GE ? JHtmlSidebar::render() : null;
-
+		if (!$jinput->getCmd('nosidebar'))
+		{
+			$this->sidebar = FLEXI_J30GE ? JHtmlSidebar::render() : null;
+		}
 
 		/**
 		 * Render view's template
@@ -200,32 +255,38 @@ class FlexicontentViewGroups extends FlexicontentViewBaseRecords
 		$document = JFactory::getDocument();
 		$toolbar  = JToolbar::getInstance('toolbar');
 		$perms    = FlexicontentHelperPerm::getPerm();
+		$session  = JFactory::getSession();
+		$useAssocs= flexicontent_db::useAssociations();
 		$canDo    = UsersHelper::getActions();
 
 		$js = '';
 
-		$contrl = "groups.";
+		$contrl = $this->ctrl . '.';
+		$contrl_s = $this->name_singular . '.';
+
+		$loading_msg = flexicontent_html::encodeHTML(JText::_('FLEXI_LOADING') .' ... '. JText::_('FLEXI_PLEASE_WAIT'), 2);
+
+		JText::script("FLEXI_UPDATING_CONTENTS", true);
+		$document->addScriptDeclaration('
+			function fc_edit_jgroup_modal_load( container )
+			{
+				if ( container.find("iframe").get(0).contentWindow.location.href.indexOf("view=groups") != -1 )
+				{
+					container.dialog("close");
+				}
+			}
+			function fc_edit_jgroup_modal_close()
+			{
+				window.location.reload(false);
+				document.body.innerHTML = Joomla.JText._("FLEXI_UPDATING_CONTENTS") + \' <img id="page_loading_img" src="components/com_flexicontent/assets/images/ajax-loader.gif">\';
+			}
+		');
 
 		if ($canDo->get('core.create'))
 		{
 			//JToolbarHelper::addNew($contrl.'add');
-			JText::script("FLEXI_UPDATING_CONTENTS", true);
-			$document->addScriptDeclaration('
-				function fc_edit_jgroup_modal_load( container )
-				{
-					if ( container.find("iframe").get(0).contentWindow.location.href.indexOf("view=groups") != -1 )
-					{
-						container.dialog("close");
-					}
-				}
-				function fc_edit_jgroup_modal_close()
-				{
-					window.location.reload(false);
-					document.body.innerHTML = Joomla.JText._("FLEXI_UPDATING_CONTENTS") + \' <img id="page_loading_img" src="components/com_flexicontent/assets/images/ajax-loader.gif">\';
-				}
-			');
 
-			$modal_title = JText::_('Add new Joomla group', true);
+			$modal_title = JText::_('FLEXI_NEW', true);
 			JToolbarHelper::divider();
 			flexicontent_html::addToolBarButton(
 				'FLEXI_NEW', $btn_name='add_jgroup',
@@ -238,7 +299,7 @@ class FlexicontentViewGroups extends FlexicontentViewBaseRecords
 
 		if (0 && $canDo->get('core.edit'))
 		{
-			JToolbarHelper::editList('group.edit');
+			JToolbarHelper::editList($contrl_s.'edit');
 		}
 
 		if ($canDo->get('core.delete'))

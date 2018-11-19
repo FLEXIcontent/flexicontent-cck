@@ -65,7 +65,12 @@ abstract class FCModelAdminList extends JModelList
 	/**
 	 * Search and ordering columns
 	 */
-	var $search_cols       = array('title', 'alias', 'name', 'label');
+	var $search_cols = array(
+		'FLEXI_TITLE' => 'title',
+		'FLEXI_ALIAS' => 'alias',
+		'FLEXI_NAME' => 'name',
+		'FLEXI_LABEL' => 'label',
+	);
 	var $default_order     = 'a.title';
 	var $default_order_dir = 'ASC';
 
@@ -129,17 +134,17 @@ abstract class FCModelAdminList extends JModelList
 	 */
 	public function __construct($config = array())
 	{
-		parent::__construct($config);
-
 		$app    = JFactory::getApplication();
 		$jinput = $app->input;
-		$option = $jinput->get('option', '', 'cmd');
-		$view   = $jinput->get('view', '', 'cmd');
-		$fcform = $jinput->get('fcform', 0, 'int');
+		$option = $jinput->getCmd('option', '');
+		$view   = $jinput->getCmd('view', '');
+		$layout = $jinput->getString('layout', 'default');
+		$fcform = $jinput->getInt('fcform', 0);
+
+		parent::__construct($config);
 
 		// Session data group
-		$this->ovid = $option . '.' . ($this->view_id ?: $view) . '.';
-		$p          = $this->ovid;
+		$p = $this->ovid = $option . '.' . ($this->view_id ?: $view . '_' . $layout) . '.';
 
 		// Parameters of the view, in our case it is only the component parameters
 		$this->cparams = JComponentHelper::getParams('com_flexicontent');
@@ -176,7 +181,8 @@ abstract class FCModelAdminList extends JModelList
 		$app->setUserState($p . 'filter_id', $filter_id);
 
 		// Text search scope
-		$scope = $fcform ? $jinput->get('scope', 1, 'int') : $app->getUserStateFromRequest($p . 'scope', 'scope', 1, 'int');
+		$default_scope = in_array($this->name_col, $this->search_cols) ? 'a.' . $this->name_col : '-1';
+		$scope = $fcform ? $jinput->get('scope', $default_scope , 'cmd') : $app->getUserStateFromRequest($p . 'scope', 'scope', $default_scope, 'cmd');
 		$this->setState('scope', $scope);
 		$app->setUserState($p . 'scope', $scope);
 
@@ -437,7 +443,8 @@ abstract class FCModelAdminList extends JModelList
 		$filter_author = $this->getState('filter_author');
 		$filter_id     = $this->getState('filter_id');
 
-		// Text search
+		// Text search and search scope
+		$scope  = $this->getState('scope');
 		$search = $this->getState('search');
 		$search = StringHelper::trim(StringHelper::strtolower($search));
 
@@ -490,15 +497,28 @@ abstract class FCModelAdminList extends JModelList
 			}
 		}
 
-
 		// Filter by language
-		if ($filter_lang)
+		if (strlen($filter_lang))
 		{
 			$where[] = 'a.language = ' . $this->_db->Quote($filter_lang);
 		}
 
+		/**
+		 * Limit via parameter,
+		 * 1: limit to current user as author,
+		 * 0: list files from any uploader, and respect 'filter_uploader' URL variable
+		 */
+		$limit_by_author = 0;  // TODO: implement like in filemanager parameters
+		$CanViewAllRecords = true;  // Unused, except for filemanager, set to true for all other case
+
+		// Limit to current user
+		if ($limit_by_author || !$CanViewAllRecords)
+		{
+			$where[] = 'a.' . $this->created_by_col . ' = ' . (int) $user->id;
+		}
+
 		// Filter by author / owner
-		if (strlen($filter_author))
+		elseif (strlen($filter_author))
 		{
 			$where[] = 'a.' . $this->created_by_col . ' = ' . (int) $filter_author;
 		}
@@ -544,16 +564,32 @@ abstract class FCModelAdminList extends JModelList
 
 				$table     = $this->getTable($this->records_jtable, '');
 				$textwhere = array();
+				$col_name  = str_replace('a.', '', $scope);
 
-				foreach ($this->search_cols as $search_col)
+				if ($scope === '-1')
 				{
-					if (property_exists($table, $search_col))
+					foreach ($this->search_cols as $search_col)
 					{
-						$textwhere[] = 'LOWER(a.' . $search_col . ') LIKE ' . $search_quoted;
+						if (property_exists($table, $search_col))
+						{
+							$textwhere[] = 'LOWER(a.' . $search_col . ') LIKE ' . $search_quoted;
+						}
 					}
 				}
+				elseif (in_array($col_name, $this->search_cols) && property_exists($table, $col_name))
+				{
+					// Scope is user input, was filtered as CMD but also use quoteName() on the column
+					$textwhere[] = 'LOWER(' . $this->_db->quoteName($scope) . ') LIKE ' . $search_quoted;
+				}
+				else
+				{
+					JFactory::getApplication()->enqueueMessage('Text search scope ' . $scope . ' is unknown, search failed', 'warning');
+				}
 
-				$where[] = '(' . implode(' OR ', $textwhere) . ')';
+				if ($textwhere)
+				{
+					$where[] = '(' . implode(' OR ', $textwhere) . ')';
+				}
 			}
 		}
 
@@ -1070,11 +1106,13 @@ abstract class FCModelAdminList extends JModelList
 	{
 		$app    = JFactory::getApplication();
 		$jinput = $app->input;
-		$fcform = $jinput->get('fcform', 0, 'int');
+		$view   = $jinput->getCmd('view', '');
+		$fcform = $jinput->getInt('fcform', 0);
 		$p      = $this->ovid;
 
-		$default_order     = $this->default_order;
-		$default_order_dir = $this->default_order_dir;
+		// Use ordering parameter from component configuration if these exist and are set
+		$default_order     = $this->cparams->get($view . '_manager_order', $this->default_order);
+		$default_order_dir = $this->cparams->get($view . '_manager_order_dir', $this->default_order_dir);
 
 		$filter_order     = $fcform ? $jinput->get('filter_order', $default_order, 'cmd') : $app->getUserStateFromRequest($p . 'filter_order', 'filter_order', $default_order, 'cmd');
 		$filter_order_Dir = $fcform ? $jinput->get('filter_order_Dir', $default_order_dir, 'word') : $app->getUserStateFromRequest($p . 'filter_order_Dir', 'filter_order_Dir', $default_order_dir, 'word');

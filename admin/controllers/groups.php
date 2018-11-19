@@ -53,7 +53,7 @@ class FlexicontentControllerGroups extends FlexicontentControllerBaseAdmin
 		// ...
 
 		// Can manage ACL
-		$this->canManage = FlexicontentHelperPerm::getPerm()->CanUsers;
+		$this->canManage = FlexicontentHelperPerm::getPerm()->CanAuthors;
 	}
 
 

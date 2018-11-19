@@ -43,13 +43,16 @@ class FlexicontentControllerUsers extends FlexicontentControllerBaseAdmin
 		$this->registerTask('save2new',     'save');
 		$this->registerTask('flogout',      'logout');
 		$this->registerTask('unblock',      'block');
+
+		// Can manage ACL
+		$this->canManage = FlexicontentHelperPerm::getPerm()->CanAuthors;
 	}
 
 
 	/**
 	 * Displays a view
 	 */
-	function display($cachable = false, $urlparams = false)
+	public function display($cachable = false, $urlparams = false)
 	{
 		$task = $this->getTask();
 

@@ -55,7 +55,7 @@ defined('_JEXEC') or die('Restricted access');
 		$i = 0;
 		$n = count($this->rows);
 		foreach ($this->rows as $row) {
-   		?>
+			?>
 		<tr class="<?php echo "row$k"; ?>">
 			<td><?php echo $this->pagination->getRowOffset($i); ?></td>
 			<td align="left">

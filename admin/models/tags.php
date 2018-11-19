@@ -43,6 +43,7 @@ class FlexicontentModelTags extends FCModelAdminList
 	var $state_col      = 'published';
 	var $name_col       = 'name';
 	var $parent_col     = null;
+	var $created_by_col = null;
 
 	/**
 	 * (Default) Behaviour Flags
@@ -58,7 +59,10 @@ class FlexicontentModelTags extends FCModelAdminList
 	/**
 	 * Search and ordering columns
 	 */
-	var $search_cols       = array('name', 'alias');
+	var $search_cols = array(
+		'FLEXI_NAME' => 'name',
+		'FLEXI_ALIAS' => 'alias',
+	);
 	var $default_order     = 'a.name';
 	var $default_order_dir = 'ASC';
 
@@ -103,14 +107,20 @@ class FlexicontentModelTags extends FCModelAdminList
 	 */
 	public function __construct($config = array())
 	{
-		parent::__construct($config);
-
 		$app    = JFactory::getApplication();
 		$jinput = $app->input;
-		$option = $jinput->get('option', '', 'cmd');
-		$view   = $jinput->get('view', '', 'cmd');
-		$fcform = $jinput->get('fcform', 0, 'int');
-		$p      = $this->ovid;
+		$option = $jinput->getCmd('option', '');
+		$view   = $jinput->getCmd('view', '');
+		$layout = $jinput->getString('layout', 'default');
+		$fcform = $jinput->getInt('fcform', 0);
+
+		// Make session index more specific ... (if needed by this model)
+		//$this->view_id = $view . '_' . $layout;
+
+		// Call parent after setting ... $this->view_id
+		parent::__construct($config);
+
+		$p = $this->ovid;
 
 
 		/**

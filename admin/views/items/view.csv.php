@@ -83,7 +83,8 @@ class FlexicontentViewItems extends JViewLegacy
 
 
 		/**
-		 * Get data from the model
+		 * Get data from the model, note data retrieval must be before 
+		 * getTotal() and getPagination() because it also calculates total rows
 		 */
 
 		$items   = $this->get('Data');

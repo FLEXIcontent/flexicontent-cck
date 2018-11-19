@@ -65,7 +65,9 @@ class FlexicontentModelGroups extends FCModelAdminList
 	/**
 	 * Search and ordering columns
 	 */
-	var $search_cols       = array('title', 'alias', 'note');
+	var $search_cols = array(
+		'FLEXI_TITLE' => 'title',
+	);
 	var $default_order     = 'a.lft';
 	var $default_order_dir = 'ASC';
 
@@ -103,14 +105,20 @@ class FlexicontentModelGroups extends FCModelAdminList
 	 */
 	public function __construct($config = array())
 	{
-		parent::__construct($config);
-
 		$app    = JFactory::getApplication();
 		$jinput = $app->input;
-		$option = $jinput->get('option', '', 'cmd');
-		$view   = $jinput->get('view', '', 'cmd');
-		$fcform = $jinput->get('fcform', 0, 'int');
-		$p      = $this->ovid;
+		$option = $jinput->getCmd('option', '');
+		$view   = $jinput->getCmd('view', '');
+		$layout = $jinput->getString('layout', 'default');
+		$fcform = $jinput->getInt('fcform', 0);
+
+		// Make session index more specific ... (if needed by this model)
+		//$this->view_id = $view . '_' . $layout;
+
+		// Call parent after setting ... $this->view_id
+		parent::__construct($config);
+
+		$p = $this->ovid;
 
 
 		/**
@@ -212,7 +220,7 @@ class FlexicontentModelGroups extends FCModelAdminList
 	 */
 	protected function _buildContentWhere($q = false)
 	{
-		// Inherited filters : search
+		// Inherited filters : filter_id, search
 		$where = parent::_buildContentWhere(false);
 
 		// Various filters
