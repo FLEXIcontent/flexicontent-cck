@@ -2178,6 +2178,55 @@ class plgFlexicontent_fieldsImage extends FCField
 	}
 
 
+	// Method to do extra handling of field's values after all fields have validated their posted data, and are ready to be saved
+	// $item->fields['fieldname']->postdata contains values of other fields
+	// $item->fields['fieldname']->filedata contains files of other fields (normally this is empty due to using AJAX for file uploading)
+	function onAllFieldsPostDataValidated( &$field, &$item )
+	{
+		$auto_intro_full = (int) $field->parameters->get('auto_intro_full', 0);
+		
+		if ($auto_intro_full === 1)
+		{
+			try
+			{
+				if (is_string($item->images))
+				{
+					$item->images = json_decode($item->images ?: '{}');
+				}
+			}
+			catch (Exception $e)
+			{
+				$item->images = json_decode('{}');
+			}
+			//JFactory::getApplication()->enqueueMessage('<pre>' . print_r($item->images, true) . '</pre>' , 'notice');
+
+			$p = $item->fields[$field->name]->postdata;
+			//JFactory::getApplication()->enqueueMessage('<pre>Field: ' . $field->name . '<br>' . print_r($p, true) . '</pre>' , 'notice');
+
+			if ($p && reset($p))
+			{
+				$value = unserialize(reset($p));
+				//JFactory::getApplication()->enqueueMessage(print_r($value, true), 'notice');
+				list($file_path, $src_path, $dest_path, $field_index, $extra_prefix) = $this->getThumbPaths($field, $item, $value, $relative = true);
+				$thumb_M = $dest_path . 'm_' . $extra_prefix . $value['originalname'];
+				$thumb_L = $dest_path . 'l_' . $extra_prefix . $value['originalname'];
+				/*JFactory::getApplication()->enqueueMessage('<pre>Field: '
+					. $field->name . '<br>'
+					. $file_path . "\n"
+					. $dest_path . "\n"
+					. $field_index . "\n"
+					. $thumb_M . "\n"
+					. $thumb_L . "\n"
+					. '</pre>'
+					, 'notice');*/
+				$item->images->image_intro = $thumb_M;
+				$item->images->image_fulltext = $thumb_L;
+			}
+
+			$item->images = json_encode($item->images);
+		}
+	}
+
 
 	// ***
 	// *** CATEGORY/SEARCH FILTERING METHODS
@@ -2704,7 +2753,7 @@ class plgFlexicontent_fieldsImage extends FCField
 
 
 		// Extra thumbnails sub-folder
-		list($file_path, $src_path, $dest_path, $field_index) = $this->getThumbPaths($field, $item, $value);
+		list($file_path, $src_path, $dest_path, $field_index, $extra_prefix) = $this->getThumbPaths($field, $item, $value);
 
 
 		// Return cached data, avoiding rechecking/recreating image thumbnails multiple times
@@ -2728,18 +2777,6 @@ class plgFlexicontent_fieldsImage extends FCField
 		{
 			$this->protectImagePath($field, $src_path);
 		}
-
-		// Configuration
-		$image_source = (int) $field->parameters->get('image_source', 0);
-		$image_source = $image_source > 1 ? $this->nonImplementedMode($image_source, $field) : $image_source;
-
-		$all_media    = $field->parameters->get('list_all_media_files', 0);
-		$unique_thumb_method = $field->parameters->get('unique_thumb_method', 0);
-
-		// *** FLAG to indicate if images are shared across fields, has the effect of adding field id to image thumbnails
-		$multiple_image_usages = $image_source == 0 && $all_media && $unique_thumb_method == 0;
-		$multiple_image_usages = $multiple_image_usages || !empty($value['default_image']);
-		$extra_prefix = $multiple_image_usages  ?  'fld' . $field->id . '_'  :  '';
 
 
 		/**
@@ -2999,7 +3036,7 @@ class plgFlexicontent_fieldsImage extends FCField
 	 * Get folder path used by image thubmnails
 	 */
 
-	function getThumbPaths($field, $item, $value)
+	function getThumbPaths($field, $item, $value, $rel = false)
 	{
 		$image_source = (int) $field->parameters->get('image_source', 0);
 		$image_source = $image_source > 1 ? $this->nonImplementedMode($image_source, $field) : $image_source;
@@ -3024,14 +3061,14 @@ class plgFlexicontent_fieldsImage extends FCField
 		if (!empty($value['default_image']))
 		{
 			$extra_folder = '';
-			$src_path = JPath::clean( JPATH_SITE .DS. dirname($value['default_image']) .DS );
+			$src_path = JPath::clean( (!$rel ? JPATH_SITE . DS : '') . dirname($value['default_image']) .DS );
 		}
 
 		// Intro-full image mode, ('image_path' is a FILE path of an intro / full image)
 		elseif ($image_source === -1)
 		{
 			$extra_folder = 'intro_full';
-			$src_path = JPath::clean( JPATH_SITE .DS. dirname($value['image_path']) .DS );
+			$src_path = JPath::clean( (!$rel ? JPATH_SITE . DS : '') . dirname($value['image_path']) .DS );
 		}
 
 		// Media manager mode
@@ -3045,7 +3082,7 @@ class plgFlexicontent_fieldsImage extends FCField
 		elseif ($image_source >= 1)
 		{
 			$extra_folder = 'item_'.$u_item_id . '_field_'.$field->id;
-			$src_path = JPath::clean( JPATH_SITE .DS. $dir .DS. $extra_folder .DS. 'original' .DS );
+			$src_path = JPath::clean( (!$rel ? JPATH_SITE . DS : '') . $dir .DS. $extra_folder .DS. 'original' .DS );
 		}
 
 		// DB-mode
@@ -3060,7 +3097,7 @@ class plgFlexicontent_fieldsImage extends FCField
 
 		// Full path of original file  - and - Destination folder
 		$file_path = JPath::clean( $src_path . $filename );
-		$dest_path = JPath::clean( JPATH_SITE .DS. $dir .DS. ($extra_folder ? $extra_folder .DS : '') );
+		$dest_path = JPath::clean( (!$rel ? JPATH_SITE . DS : '') . $dir .DS. ($extra_folder ? $extra_folder .DS : '') );
 
 
 		/**
@@ -3080,8 +3117,20 @@ class plgFlexicontent_fieldsImage extends FCField
 			$field_index = 'field_'.$field->id;
 		}
 
+		// Configuration
+		$image_source = (int) $field->parameters->get('image_source', 0);
+		$image_source = $image_source > 1 ? $this->nonImplementedMode($image_source, $field) : $image_source;
+
+		$all_media    = $field->parameters->get('list_all_media_files', 0);
+		$unique_thumb_method = $field->parameters->get('unique_thumb_method', 0);
+
+		// *** FLAG to indicate if images are shared across fields, has the effect of adding field id to image thumbnails
+		$multiple_image_usages = $image_source == 0 && $all_media && $unique_thumb_method == 0;
+		$multiple_image_usages = $multiple_image_usages || !empty($value['default_image']);
+		$extra_prefix = $multiple_image_usages  ?  'fld' . $field->id . '_'  :  '';
+
 		//echo 'file_path: ' . $file_path ."<br/>" . 'dest_path: ' . $dest_path ."<br/><br/>";
-		return array($file_path, $src_path, $dest_path, $field_index);
+		return array($file_path, $src_path, $dest_path, $field_index, $extra_prefix);
 	}
 
 
