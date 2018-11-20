@@ -786,7 +786,7 @@ class FlexicontentViewFileselement extends FlexicontentViewBaseRecords
 
 		// Build text search scope
 		$scopes = !$folder_mode ? null : array(
-			1 => JText::_('FLEXI_FILENAME'),
+			'a.filename' => JText::_('FLEXI_FILENAME'),
 		);
 
 		$lists['scope_tip'] = '';
