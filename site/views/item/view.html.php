@@ -1736,6 +1736,7 @@ class FlexicontentViewItem extends JViewLegacy
 		$perms['canversion']   = $permission->CanVersion;
 		$perms['editcreationdate'] = $permission->EditCreationDate;
 		$perms['editcreator']  = $permission->EditCreator;
+		$perms['editpublishupdown'] = $permission->EditPublishUpDown;
 
 		// Get general edit/publish/delete permissions (we will override these for existing items)
 		$perms['canedit']    = $permission->CanEdit    || $permission->CanEditOwn;

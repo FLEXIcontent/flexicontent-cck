@@ -116,6 +116,7 @@ class FlexicontentHelperPerm
 		$permission->AssocAnyTrans      = $user->authorise('flexicontent.assocanytrans',      'com_flexicontent'); // (item edit form) associate any translation
 		$permission->EditCreationDate   = $user->authorise('flexicontent.editcreationdate',   'com_flexicontent'); // (item edit form) edit creation date
 		$permission->EditCreator        = $user->authorise('flexicontent.editcreator',        'com_flexicontent'); // (item edit form) edit creator (owner)
+		$permission->EditPublishUpDown  = $user->authorise('flexicontent.editpublishupdown',  'com_flexicontent'); // (item edit form) edit publish up / down (for non-publishers)
 		$permission->IgnoreViewState    = $user->authorise('flexicontent.ignoreviewstate',    'com_flexicontent'); // (Frontend Content Lists) ignore view state
 		$permission->RequestApproval    = $user->authorise('flexicontent.requestapproval',    'com_flexicontent'); // (Workflow) Send Approval Requests (for ANY draft items)
 		$permission->AutoApproveChanges = $user->authorise('flexicontent.autoapprovechanges', 'com_flexicontent'); // (Workflow) Can publish document changes regardless of edit state

@@ -991,14 +991,14 @@ if ($typeid && $this->params->get('usepublicationdetails_fe', 1)) : // timezone_
 		<?php ob_start(); ?>
 			<div class="control-group">
 				<div class="control-label" id="publish_up-lbl-outer"><?php echo str_replace('class="', 'class="' . $lbl_class . ' label-fcinner ', $this->form->getLabel('publish_up')); ?></div>
-				<div class="controls container_fcfield"><?php echo /*$this->perms['canpublish']*/ $this->form->getInput('publish_up'); ?></div>
+				<div class="controls container_fcfield"><?php echo /*$this->perms['canpublish'] || $this->perms['editpublishupdown']*/ $this->form->getInput('publish_up'); ?></div>
 			</div>
 		<?php $captured['publish_up'] = ob_get_clean(); ?>
 
 		<?php ob_start(); ?>
 			<div class="control-group">
 				<div class="control-label" id="publish_down-lbl-outer"><?php echo str_replace('class="', 'class="' . $lbl_class . ' label-fcinner ', $this->form->getLabel('publish_down')); ?></div>
-				<div class="controls container_fcfield"><?php echo /*$this->perms['canpublish']*/ $this->form->getInput('publish_down'); ?></div>
+				<div class="controls container_fcfield"><?php echo /*$this->perms['canpublish'] || $this->perms['editpublishupdown']*/ $this->form->getInput('publish_down'); ?></div>
 			</div>
 		<?php $captured['publish_down'] = ob_get_clean(); ?>
 

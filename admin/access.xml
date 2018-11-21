@@ -28,7 +28,8 @@
 		<!-- Various -->
 		<action name="flexicontent.accesslevel" title="Edit Access Level (also in items manager)" description="Allow users in the group to set the Access Level of items that they can edit" />
 		<action name="flexicontent.editcreationdate" title="Edit creation date" description="Allow users in the group to edit creation date of an item. &lt;br/&gt; &lt;br/&gt; NOTE: that is usually reserved for super administrators since creation date is important for subscription sites and other site behavior" />
-		<action name="flexicontent.editcreator" title="Edit creator (owner)" description="Allow users in the group to edit creator (aka owner) of an item. &lt;br/&gt; &lt;br/&gt; NOTE: that is usually reserved for super administrators since creator (ownere) is important for subscription sites and other site behavior" />
+		<action name="flexicontent.editcreator" title="Edit creator (owner)" description="Allow users in the group to edit creator (aka owner) of an item. &lt;br/&gt; &lt;br/&gt; NOTE: that is usually reserved for super administrators since creator (owner) is important for subscription sites and other site behavior" />
+		<action name="flexicontent.editpublishupdown" title="Edit publish up /down (non-publishers)" description="Allow users in the group to edit creator (aka owner) of an item. &lt;br/&gt; &lt;br/&gt; NOTE: this has no effect on users that have Edit-State privilege" />
 		<action name="flexicontent.versioning" title="Use versions" description="Allow users in the group to use multiple Versions per Item" />
 		<action name="flexicontent.assocanytrans" title="Associate items authored by other users and of any type" description="Allow users in the group to associate translations (items) authored by any user, without limiting to same item type" />
 
