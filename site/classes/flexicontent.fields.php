@@ -1956,36 +1956,46 @@ class FlexicontentFields
 
 
 	// Common method to get the allowed element values (field values with index,label,... properties) for fields that use indexed values
-	static function indexedField_getElements($field, $item, $extra_props=array(), &$item_pros=true, $create_filter=false, $and_clause=false)
+	static function indexedField_getElements($field, $item, $extra_props=array(), &$item_pros=true, $is_filter=false, $and_clause=false)
 	{
-		static $_elements_cache = null;
-		if ( isset($_elements_cache[$field->id]) ) return $_elements_cache[$field->id];
-		$canCache = true;
+		static $_elements_cache = array();
 
-		$sql_mode = $field->parameters->get( 'sql_mode', 0 ) ;   // For fields that use this parameter
-		$field_elements = $field->parameters->get( 'field_elements', '' ) ;
-		$lang_filter_values = $field->parameters->get( 'lang_filter_values', 1);
+		// For fields that use this parameter
+		$sql_mode = (int) $field->parameters->get('sql_mode', 0);
+		$canCache = ! $field->parameters->get('nocache');
+
+		if ($canCache && isset($_elements_cache[$field->id][$is_filter]))
+		{
+			return $_elements_cache[$field->id][$is_filter];
+		}
+
+		$field_elements = $field->parameters->get('field_elements', '') ;
+		$lang_filter_values = $field->parameters->get('lang_filter_values', 1);
 
 		$default_extra_props = array('image', 'valgrp', 'state');
 
-		if ($create_filter)
+		if ($is_filter)
 		{
-			$filter_customize_options = $field->parameters->get('filter_customize_options', 0);
+			$filter_customize_options = (int) $field->parameters->get('filter_customize_options', 0);
 			$filter_custom_options    = $field->parameters->get('filter_custom_options', '');
 
 			// Custom query for value retrieval
-			if ( $filter_customize_options && $filter_custom_options)
+			if ($filter_customize_options && $filter_custom_options)
 			{
-				$sql_mode =  $filter_customize_options==1;
+				$sql_mode = $filter_customize_options === 1;
 				$field_elements = $filter_custom_options;
 			}
 
 			// Default query for value retrieval
-			else if ( !$field_elements )
+			elseif (!$field_elements)
 			{
 				$sql_mode = 1;
-				$field_elements = "SELECT value, value as text FROM #__flexicontent_fields_item_relations as fir WHERE field_id='{field_id}' AND value != '' GROUP BY value";
+				$field_elements = 'SELECT DISTINCT value, value as text '
+					. ' FROM #__flexicontent_fields_item_relations '
+					. ' WHERE field_id={field->id} AND value != ""'
+				;
 			}
+
 			// Set parameters may be used later
 			$field->parameters->set('sql_mode', $sql_mode);
 			$field->parameters->set('field_elements', $field_elements);
@@ -2003,6 +2013,7 @@ class FlexicontentFields
 			// Get/verify query string, check if item properties and other replacements are allowed and replace them
 			$query = preg_match('#^select#i', $field_elements) ? $field_elements : '';
 			$query = FlexicontentFields::doQueryReplacements($field_elements, $field, $item, $item_pros, $canCache);
+
 			if ($query)
 			{
 				$query = preg_replace('/_valgrp_in_/ui', ($and_clause ? $and_clause : ' 1 '), $query);
@@ -2010,24 +2021,28 @@ class FlexicontentFields
 
 			// Execute SQL query to retrieve the field value - label pair, and any other extra properties
 			$results = false;
-			if ( $query )
+
+			if ($query)
 			{
-				$db->setQuery($query);
-				$results = $db->loadObjectList('value');
+				$results = $db->setQuery($query)->loadObjectList('value');
 			}
 
 			if ($results && $lang_filter_values)
 			{
 				foreach ($results as $val=>$result)
 				{
-					$results[$val]->text  = JText::_($result->text);  // the text label
+					$results[$val]->text  = JText::_($result->text);
 				}
 			}
 
 			// !! CHECK: DB query failed or produced an error (AN EMPTY ARRAY IS NOT AN ERROR)
 			if (!$query || !is_array($results))
 			{
-				if ( $canCache && !$and_clause ) $_elements_cache[$field->id] = false;
+				if ($canCache && !$and_clause)
+				{
+					$_elements_cache[$field->id][$is_filter] = false;
+				}
+
 				return false;
 			}
 		}
@@ -2038,26 +2053,32 @@ class FlexicontentFields
 		{
 			// Parse the elements used by field unsetting last element if empty
 			$listelements = preg_split("/[\s]*%%[\s]*/", $field_elements);
-			if ( empty($listelements[count($listelements)-1]) )
+
+			if (empty($listelements[count($listelements)-1]))
 			{
 				unset($listelements[count($listelements)-1]);
 			}
 
 			$props_needed = 2 + count($extra_props);
+
 			// Split elements into their properties: value, label, extra_prop1, extra_prop2
 			$listarrays = array();
 			$results = array();
+
 			foreach ($listelements as $listelement)
 			{
 				$listelement_props  = preg_split("/[\s]*::[\s]*/", $listelement);
+
 				// Compatibility with previously stored elements, ignore missing 'valgrp' and 'state'
 				if (count($listelement_props) < $props_needed && count($listelement_props)==3 && $extra_props[1]=='valgrp')  $listelement_props[] = null;
 				if (count($listelement_props) < $props_needed && count($listelement_props)==4 && $extra_props[2]=='state')   $listelement_props[] = null;
+
 				if (count($listelement_props) < $props_needed)
 				{
 					echo "Error in field: ".$field->label." while splitting element: ".$listelement." properties needed: ".$props_needed." properties found: ".count($listelement_props);
-					return ($_elements_cache[$field->id] = false);
+					return ($_elements_cache[$field->id][$is_filter] = false);
 				}
+
 				$val = $listelement_props[0];
 				$results[$val] = new stdClass();
 				$results[$val]->value = $listelement_props[0];
@@ -2075,7 +2096,11 @@ class FlexicontentFields
 		}
 
 		// Return found elements, caching them if possible (if no item specific elements are used)
-		if ( $canCache && !$and_clause ) $_elements_cache[$field->id] = & $results;
+		if ($canCache && !$and_clause)
+		{
+			$_elements_cache[$field->id][$is_filter] = & $results;
+		}
+
 		return $results;
 	}
 

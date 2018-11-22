@@ -594,7 +594,7 @@ class FlexicontentModelItems extends FCModelAdminList
 
 			$item_pros = false;
 			$extra_props = ($filter->field_type == 'radioimage' || $filter->field_type == 'checkboximage') ? array('image', 'valgrp', 'state') : array();
-			$elements = FlexicontentFields::indexedField_getElements($filter, $item=null, $extra_props, $item_pros, $create_filter=true);
+			$elements = FlexicontentFields::indexedField_getElements($filter, $item=null, $extra_props, $item_pros, $is_filter=true);
 
 			$filter->isfilter = 1;
 
