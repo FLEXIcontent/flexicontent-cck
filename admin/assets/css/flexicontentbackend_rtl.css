@@ -2,12 +2,10 @@
 	display: inline-block;
 	margin: 1px 2px 1px 2px;
 }
-.flexicontent *:not(.input-group) > * > div.use_select2_lib,
-.flexicontent *:not(.input-append):not(.input-prepend) > div.use_select2_lib {
+.flexicontent *:not(.input-append):not(.input-prepend):not(.input-group) > div.use_select2_lib {
 	margin: 1px 2px 1px 2px;
 }
-.flexicontent *:not(.input-group) > select:not(.custom-select),
-.flexicontent *:not(.input-append):not(.input-prepend) > select:not(.custom-select) {
+.flexicontent *:not(.input-append):not(.input-prepend):not(.input-group) > select:not(.custom-select) {
 	display: inline-block;
 	margin: 1px 2px 1px 2px;
 	padding: 4px;
@@ -1550,10 +1548,13 @@ body .fc-nowrap-box .nowrap_box .label,
 	padding: 0px;
 }
 #flexicontent [class^="fc-xpended"] div.select2-container,
-#flexicontent [class^="fc-xpended"] div.select2-container,
-#flexicontent [class*="fc-xpended"] div.select2-container,
 #flexicontent [class*="fc-xpended"] div.select2-container {
-	vertical-align: top;
+	vertical-align: middle;
+	margin: 0;
+}
+#flexicontent [class^="fc-xpended"] div.select2-container:first-child .select2-choice .select2-arrow,
+#flexicontent [class*="fc-xpended"] div.select2-container:first-child .select2-choice .select2-arrow {
+	border-radius: 0;
 }
 #flexicontent [class^="fc-xpended"] div.select2-container .select2-choice > .select2-chosen,
 #flexicontent [class^="fc-xpended"] div.select2-container .select2-choice > .select2-chosen,

@@ -306,8 +306,13 @@ class plgFlexicontent_fieldsText extends FCField
 			$sel_fieldname = 'custom['.$field->name.'_sel][]';
 			$sel_options = plgFlexicontent_fieldsText::buildSelectOptions($field, $item);
 			$select_field = JHtml::_('select.genericlist', $sel_options, $sel_fieldname, $sel_attribs, 'value', 'text', array());
-		} else {
-			$select_field='';
+			$select_field_placement = (int) $field->parameters->get('select_field_placement', 0);
+		}
+
+		else
+		{
+			$select_field = '';
+			$select_field_placement = -1;
 		}
 
 
@@ -376,9 +381,12 @@ class plgFlexicontent_fieldsText extends FCField
 				.$posttext;
 
 			$field->html[] = '
-				'.($auto_value ? '' : $select_field).'
-				'.$text_field.'
-				'.($auto_value ? '<span class="fc-mssg-inline fc-info fc-nobgimage">' . JText::_('FLEXI_AUTO') . '</span>' : '').'
+				<div class="' . $input_grp_class . ' fc-xpended">
+					'.($auto_value || $select_field_placement !== 0 ? '' : $select_field).'
+					'.$text_field.'
+					'.($auto_value || $select_field_placement !== 1 ? '' : $select_field).'
+					'.($auto_value ? '<span class="fc-mssg-inline fc-info fc-nobgimage">' . JText::_('FLEXI_AUTO') . '</span>' : '').'
+				</div>
 				'.($use_ingroup || !$multiple || $auto_value ? '' : '
 				<div class="'.$input_grp_class.' fc-xpended-btns">
 					'.$move2.'

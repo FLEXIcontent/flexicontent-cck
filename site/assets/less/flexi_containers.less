@@ -518,9 +518,12 @@ body .fc-nowrap-box,
 	}
 
 	/* FIX select2 choosen value not showing when used inside an append/prepend group */
-	div.select2-container,
 	div.select2-container {
-		vertical-align: top;
+		vertical-align: middle;
+		margin: 0;
+	}
+	div.select2-container:first-child .select2-choice .select2-arrow {
+		border-radius: 0;
 	}
 	div.select2-container .select2-choice > .select2-chosen,
 	div.select2-container .select2-choice > .select2-chosen {
