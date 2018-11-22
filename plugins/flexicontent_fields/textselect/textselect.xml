@@ -161,13 +161,15 @@
 			<field name="posttext_form" type="text" default="" filter="JComponentHelper::filterText" label="FLEXI_FIELD_VALUE_SUFFIX_TEXT" description="FLEXI_FIELD_VALUE_SUFFIX_TEXT_DESC" />
 
 			<field name="" type="separator" default="FLEXI_FIELD_DROP_DOWN_SELECT" level="level2" />
-			<field name="select_field_mode" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_FIELD_SELECT_FIELD_MODE" description="FLEXI_FIELD_SELECT_FIELD_MODE_DESC"
+			<field name="select_field_mode" type="multilist" subtype="list" toggle_related="1" default="0" label="FLEXI_FIELD_SELECT_FIELD_MODE" description="FLEXI_FIELD_SELECT_FIELD_MODE_DESC"
 				inline_tip="SELECT ... AS value, ... AS text ... FROM ... WHERE _valgrp_in_ AND (...)" tip_class="elements_sql" tip_img="comments.png"  preview_img="database_green.png"
 				inline_tip2="value1::label1%%&lt;br/&gt; value2::label2%% ..." tip_class2="elements_list" tip_img2="comments.png" preview_img2="text_area.png"
-				class="btn-group group-fcmethod">
-				<option value="0" show_list="" hide_list="elements_list,elements_sql,elements_box">FLEXI_FIELD_TXTSELECT_ALL_EXISTING_VALS</option>
+				class="">
 				<option value="1" show_list="elements_list,elements_box" hide_list="elements_sql" fcreadonly="{'field_elements':1}">FLEXI_FIELD_TXTSELECT_CUSTOM_ELEMENTS</option>
 				<option value="2" show_list="elements_sql,elements_box" hide_list="elements_list" fcreadonly="{'field_elements':0}" force_list="elements_field" >FLEXI_FIELD_TXTSELECT_CUSTOM_SQL_QUERY</option>
+				<option value="0" show_list="" hide_list="elements_list,elements_sql,elements_box">FLEXI_FIELD_TXTSELECT_ALL_EXISTING_VALS</option>
+				<option value="-1" show_list="elements_list,elements_box" hide_list="elements_sql" fcreadonly="{'field_elements':1}">FLEXI_FIELD_TXTSELECT_ALL_EXISTING_N_CUSTOM_ELEMENTS</option>
+				<option value="-2" show_list="elements_sql,elements_box" hide_list="elements_list" fcreadonly="{'field_elements':0}" force_list="elements_field" >FLEXI_FIELD_TXTSELECT_ALL_EXISTING_N_CUSTOM_SQL_QUERY</option>
 			</field>
 
 			<field name="select_field_elements" type="fcsortablelist" subtype="elements"

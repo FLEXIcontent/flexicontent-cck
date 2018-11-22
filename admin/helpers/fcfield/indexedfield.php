@@ -1424,7 +1424,7 @@ class FCIndexedField extends FCField
 		
 		// Get indexed element values
 		$item_pros = false;
-		$elements = FlexicontentFields::indexedField_getElements($filter, $item=null, static::$extra_props, $item_pros, $create_filter=true);
+		$elements = FlexicontentFields::indexedField_getElements($filter, $item=null, static::$extra_props, $item_pros, $is_filter=true);
 		
 
 		// ***

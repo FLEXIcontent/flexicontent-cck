@@ -879,32 +879,76 @@ class plgFlexicontent_fieldsText extends FCField
 	function buildSelectOptions(&$field, &$item)
 	{
 		// Drop-down select elements depend on 'select_field_mode'
-		$select_field_mode = $field->parameters->get('select_field_mode', 0);
-		if ( $select_field_mode == 0 ) {
-			// All existing values
-			$field_elements = ' SELECT DISTINCT value, value as text '
-				.' FROM #__flexicontent_fields_item_relations '
-				.' WHERE field_id={field->id} AND value != "" GROUP BY value';
-		} else {
-			// Predefined elements or Elements via an SQL query
+		$select_field_mode = (int) $field->parameters->get('select_field_mode', 0);
+
+		$results_predefined = array();
+		$results_existing   = array();
+
+		// Predefined elements, 1: Custom List, 2: Elements via an SQL query
+		if ($select_field_mode != 0)
+		{
 			$field_elements = $field->parameters->get('select_field_elements');
+
+			// Call function that parses or retrieves element via sql
+			$field->parameters->set('sql_mode', $select_field_mode === 2 || $select_field_mode === -2);
+			$field->parameters->set('field_elements', $field_elements);
+			$results_predefined = FlexicontentFields::indexedField_getElements($field, $item);
 		}
 
-		// Call function that parses or retrieves element via sql
-		$field->parameters->set('sql_mode', $select_field_mode==0 || $select_field_mode==2);
-		$field->parameters->set('field_elements', $field_elements);
-		$results = FlexicontentFields::indexedField_getElements($field, $item);
+		// All existing values
+		if ($select_field_mode <= 0)
+		{
+			$field_elements = 'SELECT DISTINCT value, value as text '
+				. ' FROM #__flexicontent_fields_item_relations '
+				. ' WHERE field_id={field->id} AND value != ""'
+			;
+
+			// Call function that parses or retrieves element via sql
+			$field->parameters->set('sql_mode', 1);
+			$field->parameters->set('field_elements', $field_elements);
+			$field->parameters->set('nocache', 1);
+			$results_existing = FlexicontentFields::indexedField_getElements($field, $item);
+			$field->parameters->set('nocache', null);
+		}
+
 
 		$options = array();
-		$default_prompt = $select_field_mode==0 ? 'FLEXI_FIELD_SELECT_EXISTING_VALUE' : 'FLEXI_FIELD_SELECT_VALUE';
+		$default_prompt = $select_field_mode === 0
+			? 'FLEXI_FIELD_SELECT_EXISTING_VALUE'
+			: 'FLEXI_FIELD_SELECT_VALUE';
 		$field_prompt = $field->parameters->get('select_field_prompt', $default_prompt);
-		$options[] = JHtml::_('select.option', '', '-'.JText::_($field_prompt).'-');
+		$options[] = JHtml::_('select.option', '', JText::_($field_prompt));
 
 		$lang_filter_values = $field->parameters->get( 'lang_filter_values', 0);
-		if ($results) foreach($results as $result) {
-			if ( !strlen($result->value) ) continue;
-			$options[] = JHtml::_('select.option', $result->value, ($lang_filter_values ? JText::_($result->text) : $result->text));
+
+		if ($results_predefined)
+		{
+			foreach($results_predefined as $result)
+			{
+				if (strlen($result->value))
+				{
+					$options[] = JHtml::_('select.option',
+						$result->value,
+						($lang_filter_values ? JText::_($result->text) : $result->text)
+					);
+				}
+			}
 		}
+
+		if ($results_existing)
+		{
+			foreach($results_existing as $result)
+			{
+				if (strlen($result->value) && (!$results_predefined || !isset($results_predefined[$result->value])))
+				{
+					$options[] = JHtml::_('select.option',
+						$result->value,
+						($lang_filter_values ? JText::_($result->text) : $result->text)
+					);
+				}
+			}
+		}
+
 		return $options;
 	}
 
