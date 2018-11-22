@@ -429,10 +429,13 @@ body .fc-nowrap-box .nowrap_box .label,
 	padding: 0px;
 }
 #flexicontent [class^="fc-xpended"] div.select2-container,
-#flexicontent [class^="fc-xpended"] div.select2-container,
-#flexicontent [class*="fc-xpended"] div.select2-container,
 #flexicontent [class*="fc-xpended"] div.select2-container {
-	vertical-align: top;
+	vertical-align: middle;
+	margin: 0;
+}
+#flexicontent [class^="fc-xpended"] div.select2-container:first-child .select2-choice .select2-arrow,
+#flexicontent [class*="fc-xpended"] div.select2-container:first-child .select2-choice .select2-arrow {
+	border-radius: 0;
 }
 #flexicontent [class^="fc-xpended"] div.select2-container .select2-choice > .select2-chosen,
 #flexicontent [class^="fc-xpended"] div.select2-container .select2-choice > .select2-chosen,
