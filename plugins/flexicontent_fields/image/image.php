@@ -941,8 +941,8 @@ class plgFlexicontent_fieldsImage extends FCField
 					'refresh_on_complete' => false,
 					'thumb_size_default' => $thumb_size_default,
 					'toggle_btn' => array(
-						'class' => $add_on_class.' fcfield-uploadvalue' . $font_icon_class,
-						'text' => '',
+						'class' => ($file_btns_position ? $add_on_class : '') . ' fcfield-uploadvalue' . $font_icon_class,
+						'text' => (!$file_btns_position ? '&nbsp; ' . JText::_('FLEXI_UPLOAD') : ''),
 						'onclick' => 'var box = jQuery(this).closest(\'.fcfieldval_container\').find(\'.fcimg_preview_box\'); box.parent().find(\'.fc_file_uploader\').is(\':visible\') ? box.show() : box.hide(); box.is(\':visible\') ? jQuery(this).removeClass(\'active\') : jQuery(this).addClass(\'active\'); ',
 						'action' => null
 					),
@@ -954,23 +954,29 @@ class plgFlexicontent_fieldsImage extends FCField
 				);
 
 				$multi_icon = $form_font_icons ? ' <span class="icon-stack"></span>' : '<span class="pages_stack"></span>';
-				$btn_classes = 'fc-files-modal-link ' . $add_on_class . ' ' . $font_icon_class;
+				$btn_classes = 'fc-files-modal-link ' . ($file_btns_position ? $add_on_class : '') . ' ' . $font_icon_class;
 				$uploader_html->multiUploadBtn = '';  /*'
 					<span data-href="'.$addExistingURL.'" onclick="'.$addExistingURL_onclick.'" class="'.$btn_classes.' fc-up fcfield-uploadvalue multi">
-						&nbsp; ' . $multi_icon . ' ' . ($file_btns_position==2 ? JText::_('FLEXI_UPLOAD') : '') . '
+						&nbsp; ' . $multi_icon . ' ' . (!$file_btns_position || $file_btns_position==2 ? JText::_('FLEXI_UPLOAD') : '') . '
 					</span>';*/
 				$uploader_html->myFilesBtn = '
 					<span data-href="'.$addExistingURL.'" onclick="'.$addExistingURL_onclick.'" class="'.$btn_classes.' fc-sel fcfield-selectvalue multi">
-						&nbsp; ' . $multi_icon . ' ' . ($file_btns_position==2 ? JText::_('FLEXI_MY_FILES') : '') . '
+						' .  ($file_btns_position ? $multi_icon : '') . ' ' . (!$file_btns_position || $file_btns_position==2 ? '&nbsp; ' . JText::_('FLEXI_MY_FILES') : '') . ' ' . (!$file_btns_position ? $multi_icon : '') .'
 					</span>';
 				$uploader_html->mediaUrlBtn = !$usemediaurl ? '' : '
-					<span class="' . $add_on_class . ' fcfield-medialurlvalue ' . $font_icon_class . '" onclick="fcfield_image.toggleMediaURL(\''.$elementid_n.'\', \''.$field_name_js.'\'); return false;">
-						&nbsp; ' . ($file_btns_position==2 ? JText::_('FLEXI_FIELD_MEDIA_URL') : '') . '
+					<span class="' . ($file_btns_position ? $add_on_class : '') . ' fcfield-medialurlvalue ' . $font_icon_class . '" onclick="fcfield_image.toggleMediaURL(\''.$elementid_n.'\', \''.$field_name_js.'\'); return false;">
+						' . (!$file_btns_position || $file_btns_position==2 ? '&nbsp; ' . JText::_('FLEXI_FIELD_MEDIA_URL') : '') . '
 					</span>';
 				$uploader_html->clearBtn = '
 					<span class="' . $add_on_class . ' fcfield-clearvalue ' . $font_icon_class . '" title="'.JText::_('FLEXI_CLEAR').'" onclick="fcfield_image.clearField(this, {}, \''.$field_name_js.'\');">
 					</span>';
 			}
+
+			$drop_btn_class =
+				(FLEXI_J40GE
+					? 'btn btn-sm toolbar dropdown-toggle dropdown-toggle-split'
+					: 'btn btn-small toolbar dropdown-toggle'
+				);
 
 			$field->html[] = '
 			'.(!$multiple ? '' : '
@@ -979,19 +985,24 @@ class plgFlexicontent_fieldsImage extends FCField
 				<div class="'.$input_grp_class.' fc-xpended-btns">
 					'.$move2.'
 					'.$remove_button.'
-					'.(!$add_position ? '' : $add_here).'
+					'.(!$add_position ? '' : $add_here)
+					.($use_inline_uploaders && !$file_btns_position ?'
+					<div class="buttons btn-group">
+						<span role="button" class="' . $drop_btn_class . ' fcfield-addvalue ' . $font_icon_class . '" data-toggle="dropdown">
+							<span class="caret"></span>
+						</span>
+						<ul class="dropdown-menu" role="menu">
+							<li>'.$uploader_html->toggleBtn.'</li>
+							<li>'.$uploader_html->multiUploadBtn.'</li>
+							<li>'.$uploader_html->myFilesBtn.'</li>
+							<li>'.$uploader_html->mediaUrlBtn.'</li>
+						</ul>
+					</div>
+					'.$uploader_html->clearBtn.'
+					' : '') . '
 				</div>
 				').'
 			')
-			.($use_inline_uploaders && !$file_btns_position ?'
-			<div class="'.$input_grp_class.' fc-xpended-btns" style="margin-left: 8px !important;">
-				'.$uploader_html->toggleBtn.'
-				'.$uploader_html->multiUploadBtn.'
-				'.$uploader_html->myFilesBtn.'
-				'.$uploader_html->mediaUrlBtn.'
-				'.$uploader_html->clearBtn.'
-			</div>
-			' : '')
 			.($use_inline_uploaders && $file_btns_position ? '
 			<div class="fcclear"></div>
 			<div class="btn-group" style="margin: 4px 0 16px 0; display: inline-block;">
@@ -2184,7 +2195,7 @@ class plgFlexicontent_fieldsImage extends FCField
 	function onAllFieldsPostDataValidated( &$field, &$item )
 	{
 		$auto_intro_full = (int) $field->parameters->get('auto_intro_full', 0);
-		
+
 		if ($auto_intro_full === 1)
 		{
 			try

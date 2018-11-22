@@ -61,10 +61,12 @@ body .plupload_header_content > select.fc_uploader_size_select {
 	display: inline-block;
 	float: right;
 }
+body #flexicontent div .container_fcfield div.fc_uploader_size_slider,
 body div .container_fcfield div.fc_uploader_size_slider {
 	margin: 8px 24px 16px 20px;
 	float: none;
 }
+body #flexicontent div .container_fcfield select.fc_uploader_size_select,
 body div .container_fcfield select.fc_uploader_size_select {
 	margin: 4px;
 	float: none;
@@ -1323,6 +1325,21 @@ div.container_fcfield div.toggle_all_values_buttons_box {
 #flexicontent span.fcfield-expand-view.fcfont-icon {
 	padding: 0px;
 }
+#flexicontent span.fcfield-expand-view.fcfont-icon {
+	padding: 0px;
+}
+#flexicontent .buttons.btn-group .btn {
+	padding: 4px 6px;
+}
+#flexicontent .buttons.btn-group .btn .caret {
+	margin: 2px 0 4px 0;
+	vertical-align: middle;
+}
+#flexicontent .buttons.btn-group > ul.dropdown-menu > li > span {
+	display: block;
+	cursor: pointer;
+	user-select: none;
+}
 #flexicontent .fcfield-button-add {
 	vertical-align: top !important;
 	float: none !important;
@@ -1405,6 +1422,7 @@ div.container_fcfield div.toggle_all_values_buttons_box {
 }
 #flexicontent span.fcfield-insertvalue.fc_after.fcfont-icon:before {
 	content: "]";
+	font-size: 8px !important;
 }
 #flexicontent span.fcfield-insertvalue.fc_before.fcfont-icon:before {
 	content: "\e207";
@@ -1414,10 +1432,11 @@ div.container_fcfield div.toggle_all_values_buttons_box {
 }
 #flexicontent span.fcfield-insertvalue.fc_before.fcfont-icon:after {
 	content: " ]";
+	font-size: 8px !important;
 }
 #flexicontent span.fcfield-insertvalue:before,
 #flexicontent span.fcfield-insertvalue:after {
-	color: LimeGreen;
+	color: #555;
 }
 #flexicontent .fcfield-expand-view {
 	background: url(../images/arrow-resize.png) 50% 50% no-repeat;

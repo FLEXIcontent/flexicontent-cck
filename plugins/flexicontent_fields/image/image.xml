@@ -66,7 +66,7 @@
 				<option value="2">FLEXI_FIELD_INLINE_PREPEND_BTN</option>
 				<option value="3">FLEXI_FIELD_INLINE_BOTH_BTN</option>
 			</field>
-			<field name="file_btns_position" type="multilist" subtype="radio" default="2" label="FLEXI_FIELD_FILE_BTNS_POSITION" description="FLEXI_FIELD_FILE_BTNS_POSITION_DESC" depend_class="fieldgroupoff multivalue-mode" class="btn-group group-fcinfo">
+			<field name="file_btns_position" type="multilist" subtype="radio" default="0" label="FLEXI_FIELD_FILE_BTNS_POSITION" description="FLEXI_FIELD_FILE_BTNS_POSITION_DESC" depend_class="fieldgroupoff multivalue-mode" class="btn-group group-fcinfo">
 				<option value="0">FLEXI_FIELD_INTEGRATED_ICONS</option>
 				<option value="1">FLEXI_FIELD_SEPARATE_ROW_ICONS</option>
 				<option value="2">FLEXI_FIELD_SEPARATE_ROW_ICONS_TEXT</option>

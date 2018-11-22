@@ -61,10 +61,12 @@ body .plupload_header_content > select.fc_uploader_size_select {
 	display: inline-block;
 	float: right;
 }
+body #flexicontent div .container_fcfield div.fc_uploader_size_slider,
 body div .container_fcfield div.fc_uploader_size_slider {
 	margin: 8px 24px 16px 20px;
 	float: none;
 }
+body #flexicontent div .container_fcfield select.fc_uploader_size_select,
 body div .container_fcfield select.fc_uploader_size_select {
 	margin: 4px;
 	float: none;

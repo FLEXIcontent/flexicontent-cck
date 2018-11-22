@@ -437,6 +437,25 @@ div.container_fcfield div.toggle_all_values_buttons_box {
 		padding: 0px;
 	}
 
+	span.fcfield-expand-view.fcfont-icon {
+		padding: 0px;
+	}
+
+	.buttons.btn-group {
+		.btn {
+			padding: 4px 6px;
+			.caret {
+				margin: 2px 0 4px 0;
+				vertical-align: middle;
+			}
+		}
+
+		> ul.dropdown-menu > li > span {
+			display: block;
+			cursor: pointer;
+			user-select: none; 
+		}
+	}
 
 	/* FIELDs: ADD link container */
 	.fcfield-button-add {
@@ -533,6 +552,7 @@ div.container_fcfield div.toggle_all_values_buttons_box {
 	}
 	span.fcfield-insertvalue.fc_after.fcfont-icon:before {
 		content: "]";
+		font-size: 8px !important;
 	}
 	span.fcfield-insertvalue.fc_before.fcfont-icon:before {
 		content: "\e207";
@@ -542,10 +562,11 @@ div.container_fcfield div.toggle_all_values_buttons_box {
 	}
 	span.fcfield-insertvalue.fc_before.fcfont-icon:after {
 		content: " ]";
+		font-size: 8px !important;
 	}
 	span.fcfield-insertvalue:before,
 	span.fcfield-insertvalue:after {
-		color: LimeGreen;
+		color: #555;
 	}
 
 	/* FIELDs: Maximize view space button */
