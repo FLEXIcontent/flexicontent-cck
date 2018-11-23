@@ -67,10 +67,13 @@ class plgFlexicontent_fieldsText extends FCField
 		// *** Number of values
 		// ***
 
-		$multiple   = $use_ingroup || (int) $field->parameters->get( 'allow_multiple', 0 ) ;
-		$max_values = $use_ingroup ? 0 : (int) $field->parameters->get( 'max_values', 0 ) ;
-		$required   = $field->parameters->get( 'required', 0 ) ;
-		$add_position = (int) $field->parameters->get( 'add_position', 3 ) ;
+		$multiple   = $use_ingroup || (int) $field->parameters->get('allow_multiple', 0);
+		$max_values = $use_ingroup ? 0 : (int) $field->parameters->get('max_values', 0);
+		$required   = (int) $field->parameters->get('required', 0);
+		$add_position = (int) $field->parameters->get('add_position', 3);
+
+		// If we are multi-value and not inside fieldgroup then add the control buttons (move, delete, add before/after)
+		$add_ctrl_btns = !$use_ingroup && $multiple;
 
 
 		// ***
@@ -138,13 +141,14 @@ class plgFlexicontent_fieldsText extends FCField
 		// Name Safe Element ID
 		$elementid_ns = str_replace('-', '_', $elementid);
 
-		$js = "";
-		$css = "";
+		$js = '';
+		$css = '';
 
-		if ($multiple) // handle multiple records
+		// Handle multiple records
+		if ($multiple)
 		{
 			// Add the drag and drop sorting feature
-			if (!$use_ingroup) $js .= "
+			if ($add_ctrl_btns) $js .= "
 			jQuery(document).ready(function(){
 				jQuery('#sortables_".$field->id."').sortable({
 					handle: '.fcfield-drag-handle',
@@ -228,7 +232,7 @@ class plgFlexicontent_fieldsText extends FCField
 				";
 
 			// Add new element to sortable objects (if field not in group)
-			if (!$use_ingroup) $js .= "
+			if ($add_ctrl_btns) $js .= "
 				//jQuery('#sortables_".$field->id."').sortable('refresh');  // Refresh was done appendTo ?
 				";
 
@@ -245,6 +249,7 @@ class plgFlexicontent_fieldsText extends FCField
 				rowCount".$field->id."++;       // incremented / decremented
 				uniqueRowNum".$field->id."++;   // incremented only
 			}
+
 
 			function deleteField".$field->id."(el, groupval_box, fieldval_box)
 			{
@@ -281,13 +286,18 @@ class plgFlexicontent_fieldsText extends FCField
 			$add_here = '';
 			$add_here .= $add_position==2 || $add_position==3 ? '<span class="' . $add_on_class . ' fcfield-insertvalue fc_before ' . $font_icon_class . '" onclick="addField'.$field->id.'(null, jQuery(this).closest(\'ul\'), jQuery(this).closest(\'li\'), {insert_before: 1});" title="'.JText::_( 'FLEXI_ADD_BEFORE' ).'"></span> ' : '';
 			$add_here .= $add_position==1 || $add_position==3 ? '<span class="' . $add_on_class . ' fcfield-insertvalue fc_after ' . $font_icon_class . '"  onclick="addField'.$field->id.'(null, jQuery(this).closest(\'ul\'), jQuery(this).closest(\'li\'), {insert_before: 0});" title="'.JText::_( 'FLEXI_ADD_AFTER' ).'"></span> ' : '';
-		} else {
+		}
+
+		// Field not multi-value
+		else
+		{
 			$remove_button = '';
 			$move2 = '';
 			$add_here = '';
 			$js .= '';
 			$css .= '';
 		}
+
 
 		// Drop-Down select for textselect field type
 		if ($field->field_type === 'textselect')
@@ -387,7 +397,7 @@ class plgFlexicontent_fieldsText extends FCField
 					'.($auto_value || $select_field_placement !== 1 ? '' : $select_field).'
 					'.($auto_value ? '<span class="fc-mssg-inline fc-info fc-nobgimage">' . JText::_('FLEXI_AUTO') . '</span>' : '').'
 				</div>
-				'.($use_ingroup || !$multiple || $auto_value ? '' : '
+				'.(!$add_ctrl_btns || $auto_value ? '' : '
 				<div class="'.$input_grp_class.' fc-xpended-btns">
 					'.$move2.'
 					'.$remove_button.'

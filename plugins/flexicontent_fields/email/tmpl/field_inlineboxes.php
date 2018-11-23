@@ -38,6 +38,7 @@
 			</div>';
 
 		$text = '';
+
 		if ($usetitle)
 		{
 			$value['text'] = !empty($value['text']) ? $value['text'] : $default_title;
@@ -51,7 +52,7 @@
 		}
 
 		$field->html[] = '
-			'.($use_ingroup || !$multiple ? '' : '
+			'.(!$add_ctrl_btns ? '' : '
 			<div class="'.$input_grp_class.' fc-xpended-btns">
 				'.$move2.'
 				'.$remove_button.'

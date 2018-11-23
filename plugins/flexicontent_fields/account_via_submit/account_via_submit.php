@@ -54,7 +54,7 @@ class plgFlexicontent_fieldsAccount_via_submit extends FCField
 		// ****************
 		// Number of values
 		// ****************
-		$required   = $field->parameters->get( 'required', 0 ) ;
+		$required   = (int) $field->parameters->get('required', 0);
 		$required   = $required ? ' required' : '';
 
 
@@ -112,7 +112,7 @@ class plgFlexicontent_fieldsAccount_via_submit extends FCField
 		$fieldname = 'custom['.$field->name.']';
 		$elementid = 'custom_'.$field->name;
 
-		$js = "";
+		$js = '';
 		$css = '
 		div[class^="fcfield_avs_box-"] {
 			clear: both;
