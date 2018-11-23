@@ -65,11 +65,14 @@ class plgFlexicontent_fieldsFieldgroup extends FCField
 		// ****************
 		// Number of values
 		// ****************
-		$multiple   = $use_ingroup || (int) $field->parameters->get( 'allow_multiple', 0 ) ;
-		$max_values = $use_ingroup ? 0 : (int) $field->parameters->get( 'max_values', 0 ) ;
-		$required   = $field->parameters->get( 'required', 0 ) ;
+		$multiple   = $use_ingroup || (int) $field->parameters->get('allow_multiple', 0);
+		$max_values = $use_ingroup ? 0 : (int) $field->parameters->get('max_values', 0);
+		$required   = (int) $field->parameters->get('required', 0);
 		$required   = $required ? ' required' : '';
-		$add_position = (int) $field->parameters->get( 'add_position', 3 ) ;
+		$add_position = (int) $field->parameters->get('add_position', 3);
+
+		// If we are multi-value and not inside fieldgroup then add the control buttons (move, delete, add before/after)
+		$add_ctrl_btns = !$use_ingroup && $multiple;
 
 
 		// **************
@@ -95,13 +98,14 @@ class plgFlexicontent_fieldsFieldgroup extends FCField
 		}
 
 
-		$js = "";
-		$css = "";
+		$js = '';
+		$css = '';
 
-		if ($multiple) // handle multiple records
+		// Handle multiple records
+		if ($multiple)
 		{
 			// Add the drag and drop sorting feature
-			if (!$use_ingroup) $js .= "
+			if ($add_ctrl_btns) $js .= "
 			jQuery(document).ready(function(){
 				jQuery('#sortables_".$field->id."').sortable({
 					handle: '.fcfield-drag-handle',
@@ -222,7 +226,7 @@ class plgFlexicontent_fieldsFieldgroup extends FCField
 				";
 
 			// Add new element to sortable objects (if field not in group) -- NOTE: remove_previous: 2 means remove element without do any cleanup actions
-			if (!$use_ingroup) $js .= "
+			if ($add_ctrl_btns) $js .= "
 				//jQuery('#sortables_".$field->id."').sortable('refresh');  // Refresh was done appendTo ?
 
 				// Add new values for each field
@@ -329,7 +333,7 @@ class plgFlexicontent_fieldsFieldgroup extends FCField
 		for ($n = 0; $n < $max_count; $n++)
 		{
 			$field->html[$n] = '
-				'.($use_ingroup || !$multiple ? '' : '
+				'.(!$add_ctrl_btns ? '' : '
 				<div class="'.$input_grp_class.' fc-xpended-btns">
 					'.$move2.'
 					'.$remove_button.'

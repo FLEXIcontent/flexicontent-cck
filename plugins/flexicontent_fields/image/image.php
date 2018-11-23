@@ -95,11 +95,14 @@ class plgFlexicontent_fieldsImage extends FCField
 		// *** Number of values
 		// ***
 
-		$multiple   = $use_ingroup || (int) $field->parameters->get( 'allow_multiple', 0 ) ;
+		$multiple   = $use_ingroup || (int) $field->parameters->get('allow_multiple', 0);
 		$max_values = $use_ingroup ? 0 : !$multiple ? 1 : (int) $field->parameters->get( 'max_values', 0 ) ;
-		$required   = $field->parameters->get( 'required', 0 ) ;
+		$required   = (int) $field->parameters->get('required', 0);
 		$required_class = $required ? ' required' : '';
-		$add_position = (int) $field->parameters->get( 'add_position', 3 ) ;
+		$add_position = (int) $field->parameters->get('add_position', 3);
+
+		// If we are multi-value and not inside fieldgroup then add the control buttons (move, delete, add before/after)
+		$add_ctrl_btns = !$use_ingroup && $multiple;
 		$fields_box_placing = (int) $field->parameters->get('fields_box_placing', 1);
 
 		$image_source = (int) $field->parameters->get('image_source', 0);
@@ -255,7 +258,7 @@ class plgFlexicontent_fieldsImage extends FCField
 
 
 		// Initialise property with default value
-		if ( !$field->value )
+		if (!$field->value)
 		{
 			$field->value = array();
 			$field->value[0]['originalname'] = '';
@@ -319,14 +322,14 @@ class plgFlexicontent_fieldsImage extends FCField
 		fcfield_image.debugToConsole["'.$field_name_js.'"] = 0;
 		fcfield_image.use_native_apis["'.$field_name_js.'"] = 0;
 		';
-
 		$css = '';
 
-
-		if (1) // handle multiple records
+		// Handle multiple records
+		//if ($multiple)
+		if (1)  // This if contains more than multile record handlings, TODO: split it
 		{
 			// Add the drag and drop sorting feature
-			if (!$use_ingroup && $multiple) $js .= "
+			if ($add_ctrl_btns) $js .= "
 			jQuery(document).ready(function(){
 				jQuery('#sortables_".$field->id."').sortable({
 					handle: '.fcfield-drag-handle',
@@ -361,6 +364,7 @@ class plgFlexicontent_fieldsImage extends FCField
 					return 'cancel';
 				}
 
+				// Find last container of fields and clone it to create a new container of fields
 				var lastField = fieldval_box ? fieldval_box : jQuery(el).prev().children().last();
 				var newField  = lastField.clone();
 				newField.find('.fc-has-value').removeClass('fc-has-value');
@@ -497,7 +501,7 @@ class plgFlexicontent_fieldsImage extends FCField
 				";
 
 			// Add new element to sortable objects (if field not in group)
-			if (!$use_ingroup) $js .= "
+			if ($add_ctrl_btns) $js .= "
 				//jQuery('#sortables_".$field->id."').sortable('refresh');  // Refresh was done appendTo ?
 				";
 
@@ -538,6 +542,7 @@ class plgFlexicontent_fieldsImage extends FCField
 				// return HTML Tag ID of field containing the file ID, needed when creating file rows to assign multi-fields at once
 				return '".$elementid."_' + (uniqueRowNum".$field->id." - 1) + '_existingname';
 			}
+
 
 			function deleteField".$field->id."(el, groupval_box, fieldval_box)
 			{
@@ -593,15 +598,18 @@ class plgFlexicontent_fieldsImage extends FCField
 			$add_here .= $add_position==1 || $add_position==3 ? '<span class="' . $add_on_class . ' fcfield-insertvalue fc_after ' . $font_icon_class . '"  onclick="addField'.$field->id.'(null, jQuery(this).closest(\'ul\'), jQuery(this).closest(\'li\'), {insert_before: 0});" title="'.JText::_( 'FLEXI_ADD_AFTER' ).'"></span> ' : '';
 		}
 
+		// Field not multi-value
 		if (!$multiple)
 		{
-			$add_here = '';
+			$remove_button = '';
 			$move2 = '';
+			$add_here = '';
 			$js .= '';
 			$css .= '';
 		}
 
-		// Common JS/CSS
+
+		// Added field's custom CSS / JS
 		$image_folder = JUri::root(true).'/'.$dir_url;
 		$js .= "
 			/**
@@ -979,9 +987,8 @@ class plgFlexicontent_fieldsImage extends FCField
 				);
 
 			$field->html[] = '
-			'.(!$multiple ? '' : '
-				'.(!$none_props ? '<div class="fcclear"></div>' : '').'
-				'.($use_ingroup || !$multiple ? '' : '
+				'.($multiple && !$none_props ? '<div class="fcclear"></div>' : '').'
+				'.(!$add_ctrl_btns ? '' : '
 				<div class="'.$input_grp_class.' fc-xpended-btns">
 					'.$move2.'
 					'.$remove_button.'
@@ -1002,52 +1009,51 @@ class plgFlexicontent_fieldsImage extends FCField
 					' : '') . '
 				</div>
 				').'
-			')
-			.($use_inline_uploaders && $file_btns_position ? '
-			<div class="fcclear"></div>
-			<div class="btn-group" style="margin: 4px 0 16px 0; display: inline-block;">
-				<div class="'.$input_grp_class.' fc-xpended-btns">
-					'.$uploader_html->toggleBtn.'
-					'.$uploader_html->multiUploadBtn.'
-					'.$uploader_html->myFilesBtn.'
-					'.$uploader_html->mediaUrlBtn.'
-					'.$uploader_html->clearBtn.'
-				</div>
-			</div>
-			' : '') . '
-			'.$originalname.'
-			<div class="fcclear"></div>
-			'.$existingname.'
-			<div class="fcclear"></div>
-
-			'.($image_source === -2 || $image_source === -1  ?  // Do not add image preview box if using Joomla Media Manager (or intro/full mode)
-				$select_existing.'
+				'.($use_inline_uploaders && ($file_btns_position || !$add_ctrl_btns) ? '
 				<div class="fcclear"></div>
-			' : '
-				<div class="fcimg_preview_box fc-box thumb_'.$thumb_size_default.'">
-					'.$imgpreview.'
-					'.$fcimg_preview_msg.'
-					<div class="fcclear"></div>
-				'.$select_existing.'
+				<div class="btn-group" style="margin: 4px 0 16px 0; display: inline-block;">
+					<div class="'.$input_grp_class.' fc-xpended-btns">
+						'.$uploader_html->toggleBtn.'
+						'.$uploader_html->multiUploadBtn.'
+						'.$uploader_html->myFilesBtn.'
+						'.$uploader_html->mediaUrlBtn.'
+						'.$uploader_html->clearBtn.'
+					</div>
 				</div>
-				'.(!empty($uploader_html) ? $uploader_html->container : '').'
-			').'
-			'
+				' : '') . '
+				'.$originalname.'
+				<div class="fcclear"></div>
+				'.$existingname.'
+				<div class="fcclear"></div>
 
-			.(($linkto_url || $usemediaurl || $usealt || $usetitle || $usedesc || $usecust1 || $usecust2) ?
-			'
-			<div class="fcimg_value_props">
-				<table class="fc-form-tbl fcinner fccompact">
-					' . @ $urllink . '
-					' . @ $mediaurl . '
-					' . @ $alt . '
-					' . @ $title . '
-					' . @ $desc . '
-					' . @ $cust1 . '
-					' . @ $cust2 . '
-				</table>
-			</div>'
-			: '');
+				'.($image_source === -2 || $image_source === -1  ?  // Do not add image preview box if using Joomla Media Manager (or intro/full mode)
+					$select_existing.'
+					<div class="fcclear"></div>
+				' : '
+					<div class="fcimg_preview_box fc-box thumb_'.$thumb_size_default.'">
+						'.$imgpreview.'
+						'.$fcimg_preview_msg.'
+						<div class="fcclear"></div>
+					'.$select_existing.'
+					</div>
+					'.(!empty($uploader_html) ? $uploader_html->container : '').'
+				').'
+				'
+
+				.(($linkto_url || $usemediaurl || $usealt || $usetitle || $usedesc || $usecust1 || $usecust2) ?
+				'
+				<div class="fcimg_value_props">
+					<table class="fc-form-tbl fcinner fccompact">
+						' . @ $urllink . '
+						' . @ $mediaurl . '
+						' . @ $alt . '
+						' . @ $title . '
+						' . @ $desc . '
+						' . @ $cust1 . '
+						' . @ $cust2 . '
+					</table>
+				</div>'
+				: '');
 
 			$n++;
 			$image_added = true;
@@ -1065,8 +1071,13 @@ class plgFlexicontent_fieldsImage extends FCField
 		if ($css) $document->addStyleDeclaration($css);
 
 
-		if ($use_ingroup) { // do not convert the array to string if field is in a group
-		} else if (1 || $multiple) { // handle multiple records
+		// Do not convert the array to string if field is in a group
+		if ($use_ingroup);
+
+		// Handle multiple records
+		//elseif ($multiple)
+		elseif(1)  // because of JS seeking the parent containers, use UL/LI instead of DIV
+		{
 			$field->html = !count($field->html) ? '' :
 				'<li class="'.$value_classes.'">'.
 					implode('</li><li class="'.$value_classes.'">', $field->html).
@@ -1078,7 +1089,11 @@ class plgFlexicontent_fieldsImage extends FCField
 						'.JText::_( 'FLEXI_ADD_VALUE' ).'
 					</span>
 				</div>';
-		} else {  // handle single values
+		}
+
+		// Handle single values
+		else
+		{
 			$field->html = '<div class="fcfieldval_container valuebox fcfieldval_container_'.$field->id.'">' . $field->html[0] .'</div>';
 		}
 

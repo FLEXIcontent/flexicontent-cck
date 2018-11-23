@@ -76,11 +76,14 @@ class plgFlexicontent_fieldsDate extends FCField
 		// *** Number of values
 		// ***
 
-		$multiple   = $use_ingroup || (int) $field->parameters->get( 'allow_multiple', 0 ) ;
-		$max_values = $use_ingroup ? 0 : (int) $field->parameters->get( 'max_values', 0 ) ;
-		$required   = $field->parameters->get( 'required', 0 ) ;
+		$multiple   = $use_ingroup || (int) $field->parameters->get('allow_multiple', 0);
+		$max_values = $use_ingroup ? 0 : (int) $field->parameters->get('max_values', 0);
+		$required   = (int) $field->parameters->get('required', 0);
 		$required_class = $required ? ' required' : '';
-		$add_position = (int) $field->parameters->get( 'add_position', 3 ) ;
+		$add_position = (int) $field->parameters->get('add_position', 3);
+
+		// If we are multi-value and not inside fieldgroup then add the control buttons (move, delete, add before/after)
+		$add_ctrl_btns = !$use_ingroup && $multiple;
 
 		$minyear = $field->parameters->get('minyear', '');
 		$maxyear = $field->parameters->get('maxyear', '');
@@ -182,13 +185,14 @@ class plgFlexicontent_fieldsDate extends FCField
 		$fieldname = 'custom['.$field->name.']';
 		$elementid = 'custom_'.$field->name;
 
-		$js = "";
-		$css = "";
+		$js = '';
+		$css = '';
 
-		if ($multiple) // handle multiple records
+		// Handle multiple records
+		if ($multiple)
 		{
 			// Add the drag and drop sorting feature
-			if (!$use_ingroup) $js .= "
+			if ($add_ctrl_btns) $js .= "
 			jQuery(document).ready(function(){
 				jQuery('#sortables_".$field->id."').sortable({
 					handle: '.fcfield-drag-handle',
@@ -287,7 +291,7 @@ class plgFlexicontent_fieldsDate extends FCField
 				";
 
 			// Add new element to sortable objects (if field not in group)
-			if (!$use_ingroup) $js .= "
+			if ($add_ctrl_btns) $js .= "
 				//jQuery('#sortables_".$field->id."').sortable('refresh');  // Refresh was done appendTo ?
 				";
 
@@ -340,7 +344,11 @@ class plgFlexicontent_fieldsDate extends FCField
 			$add_here = '';
 			$add_here .= $add_position==2 || $add_position==3 ? '<span class="' . $add_on_class . ' fcfield-insertvalue fc_before ' . $font_icon_class . '" onclick="addField'.$field->id.'(null, jQuery(this).closest(\'ul\'), jQuery(this).closest(\'li\'), {insert_before: 1});" title="'.JText::_( 'FLEXI_ADD_BEFORE' ).'"></span> ' : '';
 			$add_here .= $add_position==1 || $add_position==3 ? '<span class="' . $add_on_class . ' fcfield-insertvalue fc_after ' . $font_icon_class . '"  onclick="addField'.$field->id.'(null, jQuery(this).closest(\'ul\'), jQuery(this).closest(\'li\'), {insert_before: 0});" title="'.JText::_( 'FLEXI_ADD_AFTER' ).'"></span> ' : '';
-		} else {
+		}
+
+		// Field not multi-value
+		else
+		{
 			$remove_button = '';
 			$move2 = '';
 			$add_here = '';
@@ -420,7 +428,7 @@ class plgFlexicontent_fieldsDate extends FCField
 				<div class="fcfield_box' .($required ? ' required_box' : ''). ' fc-iblock" data-label_text="'.$field->label.'">
 					' . $html . '
 				</div>
-				'.($use_ingroup || !$multiple ? '' : '
+				'.(!$add_ctrl_btns ? '' : '
 				<div class="'.$input_grp_class.' fc-xpended-btns">
 					'.$move2.'
 					'.$remove_button.'

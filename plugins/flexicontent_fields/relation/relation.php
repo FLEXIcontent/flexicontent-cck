@@ -77,10 +77,13 @@ class plgFlexicontent_fieldsRelation extends FCField
 		// *** Number of values
 		// ***
 
-		$multiple   = $use_ingroup || (int) $field->parameters->get( 'allow_multiple', 0 ) ;
-		$max_values = $use_ingroup ? 0 : (int) $field->parameters->get( 'max_values', 0 ) ;
-		$required   = $field->parameters->get( 'required', 0 ) ;
-		$add_position = (int) $field->parameters->get( 'add_position', 3 ) ;
+		$multiple   = $use_ingroup || (int) $field->parameters->get('allow_multiple', 0);
+		$max_values = $use_ingroup ? 0 : (int) $field->parameters->get('max_values', 0);
+		$required   = (int) $field->parameters->get('required', 0);
+		$add_position = (int) $field->parameters->get('add_position', 3);
+
+		// If we are multi-value and not inside fieldgroup then add the control buttons (move, delete, add before/after)
+		$add_ctrl_btns = !$use_ingroup && $multiple;
 
 
 		// ***
@@ -133,13 +136,14 @@ class plgFlexicontent_fieldsRelation extends FCField
 		}
 
 
-		$js = "";
-		$css = "";
+		$js = '';
+		$css = '';
 
-		if ($multiple) // handle multiple records
+		// Handle multiple records
+		if ($multiple)
 		{
 			// Add the drag and drop sorting feature
-			if (!$use_ingroup) $js .= "
+			if ($add_ctrl_btns) $js .= "
 			jQuery(document).ready(function(){
 				jQuery('#sortables_".$field->id."').sortable({
 					handle: '.fcfield-drag-handle',
@@ -255,7 +259,7 @@ class plgFlexicontent_fieldsRelation extends FCField
 				";
 
 			// Add new element to sortable objects (if field not in group)
-			if (!$use_ingroup) $js .= "
+			if ($add_ctrl_btns) $js .= "
 				//jQuery('#sortables_".$field->id."').sortable('refresh');  // Refresh was done appendTo ?
 				";
 
@@ -309,7 +313,11 @@ class plgFlexicontent_fieldsRelation extends FCField
 			$add_here = '';
 			$add_here .= $add_position==2 || $add_position==3 ? '<span class="' . $add_on_class . ' fcfield-insertvalue fc_before ' . $font_icon_class . '" onclick="addField'.$field->id.'(null, jQuery(this).closest(\'ul\'), jQuery(this).closest(\'li\'), {insert_before: 1});" title="'.JText::_( 'FLEXI_ADD_BEFORE' ).'"></span> ' : '';
 			$add_here .= $add_position==1 || $add_position==3 ? '<span class="' . $add_on_class . ' fcfield-insertvalue fc_after ' . $font_icon_class . '"  onclick="addField'.$field->id.'(null, jQuery(this).closest(\'ul\'), jQuery(this).closest(\'li\'), {insert_before: 0});" title="'.JText::_( 'FLEXI_ADD_AFTER' ).'"></span> ' : '';
-		} else {
+		}
+
+		// Field not multi-value
+		else
+		{
 			$remove_button = '';
 			$move2 = '';
 			$add_here = '';
@@ -442,7 +450,7 @@ class plgFlexicontent_fieldsRelation extends FCField
 
 			$field->html[] = '
 				'.($use_ingroup   ? '<input type="hidden" class="fcfield_value_holder" name="'.$valueholder_nm.'['.$n.']" id="'.$valueholder_id.'_'.$n.'" value="-">' : '').'
-				'.($use_ingroup || !$multiple ? '' : '
+				'.(!$add_ctrl_btns ? '' : '
 				<div class="' . $input_grp_class . ' fc-xpended-btns">
 					'.$move2.'
 					'.$remove_button.'
@@ -725,8 +733,8 @@ class plgFlexicontent_fieldsRelation extends FCField
 		$use_ingroup = $field->parameters->get('use_ingroup', 0);
 		if ( !is_array($post) && !strlen($post) && !$use_ingroup ) return;
 
-		$max_values = $use_ingroup ? 0 : (int) $field->parameters->get( 'max_values', 0 ) ;
-		$multiple   = $use_ingroup || (int) $field->parameters->get( 'allow_multiple', 0 ) ;
+		$max_values = $use_ingroup ? 0 : (int) $field->parameters->get('max_values', 0);
+		$multiple   = $use_ingroup || (int) $field->parameters->get('allow_multiple', 0);
 		$is_importcsv = JFactory::getApplication()->get('task', '', 'cmd') == 'importcsv';
 		$field->use_suborder = $multiple;
 

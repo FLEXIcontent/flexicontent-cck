@@ -5,7 +5,7 @@
  *
  * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
  * @link            https://flexicontent.org
- * @copyright       Copyright © 2017, FLEXIcontent team, All Rights Reserved
+ * @copyright       Copyright Â© 2017, FLEXIcontent team, All Rights Reserved
  * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
@@ -58,10 +58,13 @@ class plgFlexicontent_fieldsColor extends FCField
 		// *** Number of values
 		// ***
 
-		$multiple   = $use_ingroup || (int) $field->parameters->get( 'allow_multiple', 0 ) ;
-		$max_values = $use_ingroup ? 0 : (int) $field->parameters->get( 'max_values', 0 ) ;
-		$required   = $field->parameters->get( 'required', 0 ) ;
-		$add_position = (int) $field->parameters->get( 'add_position', 3 ) ;
+		$multiple   = $use_ingroup || (int) $field->parameters->get('allow_multiple', 0);
+		$max_values = $use_ingroup ? 0 : (int) $field->parameters->get('max_values', 0);
+		$required   = (int) $field->parameters->get('required', 0);
+		$add_position = (int) $field->parameters->get('add_position', 3);
+
+		// If we are multi-value and not inside fieldgroup then add the control buttons (move, delete, add before/after)
+		$add_ctrl_btns = !$use_ingroup && $multiple;
 		$fields_box_placing = (int) $field->parameters->get('fields_box_placing', 1);
 
 
@@ -131,13 +134,14 @@ class plgFlexicontent_fieldsColor extends FCField
 		// Name Safe Element ID
 		$elementid_ns = str_replace('-', '_', $elementid);
 
-		$js = "";
-		$css = "";
+		$js = '';
+		$css = '';
 
-		if ($multiple) // handle multiple records
+		// Handle multiple records
+		if ($multiple)
 		{
 			// Add the drag and drop sorting feature
-			if (!$use_ingroup) $js .= "
+			if ($add_ctrl_btns) $js .= "
 			jQuery(document).ready(function(){
 				jQuery('#sortables_".$field->id."').sortable({
 					handle: '.fcfield-drag-handle',
@@ -177,8 +181,8 @@ class plgFlexicontent_fieldsColor extends FCField
 				";
 
 			// NOTE: HTML tag id of this form element needs to match the -for- attribute of label HTML tag of this FLEXIcontent field, so that label will be marked invalid when needed
-			// Update the new color field
 			$js .= "
+			// Update the new color field
 				var theInput = newField.find('input, select').first();
 				var theInput_dv = theInput.attr('data-defvals');
 				(theInput_dv && theInput_dv.length) ?
@@ -230,7 +234,7 @@ class plgFlexicontent_fieldsColor extends FCField
 				";
 
 			// Add new element to sortable objects (if field not in group)
-			if (!$use_ingroup) $js .= "
+			if ($add_ctrl_btns) $js .= "
 				//jQuery('#sortables_".$field->id."').sortable('refresh');  // Refresh was done appendTo ?
 				";
 
@@ -302,13 +306,18 @@ class plgFlexicontent_fieldsColor extends FCField
 			$add_here = '';
 			$add_here .= $add_position==2 || $add_position==3 ? '<span class="' . $add_on_class . ' fcfield-insertvalue fc_before ' . $font_icon_class . '" onclick="addField'.$field->id.'(null, jQuery(this).closest(\'ul\'), jQuery(this).closest(\'li\'), {insert_before: 1});" title="'.JText::_( 'FLEXI_ADD_BEFORE' ).'"></span> ' : '';
 			$add_here .= $add_position==1 || $add_position==3 ? '<span class="' . $add_on_class . ' fcfield-insertvalue fc_after ' . $font_icon_class . '"  onclick="addField'.$field->id.'(null, jQuery(this).closest(\'ul\'), jQuery(this).closest(\'li\'), {insert_before: 0});" title="'.JText::_( 'FLEXI_ADD_AFTER' ).'"></span> ' : '';
-		} else {
+		}
+
+		// Field not multi-value
+		else
+		{
 			$remove_button = '';
 			$move2 = '';
 			$add_here = '';
 			$js .= '';
 			$css .= '';
 		}
+
 
 		// Added field's custom CSS / JS
 		if ($multiple) $js .= "
@@ -353,7 +362,7 @@ class plgFlexicontent_fieldsColor extends FCField
 
 			$field->html[] = '
 				'.$jfield_html.'
-				'.($use_ingroup || !$multiple ? '' : '
+				'.(!$add_ctrl_btns ? '' : '
 				<div class="'.$input_grp_class.' fc-xpended-btns">
 					'.$move2.'
 					'.$remove_button.'

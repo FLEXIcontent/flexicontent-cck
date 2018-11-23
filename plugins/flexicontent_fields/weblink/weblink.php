@@ -58,13 +58,16 @@ class plgFlexicontent_fieldsWeblink extends FCField
 		// *** Number of values
 		// ***
 
-		$multiple   = $use_ingroup || (int) $field->parameters->get( 'allow_multiple', 0 ) ;
-		$max_values = $use_ingroup ? 0 : (int) $field->parameters->get( 'max_values', 0 ) ;
+		$multiple   = $use_ingroup || (int) $field->parameters->get('allow_multiple', 0);
+		$max_values = $use_ingroup ? 0 : (int) $field->parameters->get('max_values', 0);
 
 		$required = $field->parameters->get('required', 0);
 		$required_class = $required ? ' required' : '';
 
-		$add_position = (int) $field->parameters->get( 'add_position', 3 ) ;
+		$add_position = (int) $field->parameters->get('add_position', 3);
+
+		// If we are multi-value and not inside fieldgroup then add the control buttons (move, delete, add before/after)
+		$add_ctrl_btns = !$use_ingroup && $multiple;
 		$fields_box_placing = (int) $field->parameters->get('fields_box_placing', 1);
 		$show_values_expand_btn = (int) $field->parameters->get('show_values_expand_btn', 1);
 
@@ -151,7 +154,7 @@ class plgFlexicontent_fieldsWeblink extends FCField
 		}
 
 		// Initialise property with default value
-		if ( !$field->value )
+		if (!$field->value)
 		{
 			$field->value = array();
 			$field->value[0]['link']  = $default_link;
@@ -184,13 +187,14 @@ class plgFlexicontent_fieldsWeblink extends FCField
 		}
 
 
-		$js = "";
-		$css = "";
+		$js = '';
+		$css = '';
 
-		if ($multiple) // handle multiple records
+		// Handle multiple records
+		if ($multiple)
 		{
 			// Add the drag and drop sorting feature
-			if (!$use_ingroup) $js .= "
+			if ($add_ctrl_btns) $js .= "
 			jQuery(document).ready(function(){
 				jQuery('#sortables_".$field->id."').sortable({
 					handle: '.fcfield-drag-handle',
@@ -333,7 +337,7 @@ class plgFlexicontent_fieldsWeblink extends FCField
 				";
 
 			// Add new element to sortable objects (if field not in group)
-			if (!$use_ingroup) $js .= "
+			if ($add_ctrl_btns) $js .= "
 				//jQuery('#sortables_".$field->id."').sortable('refresh');  // Refresh was done appendTo ?
 				";
 
@@ -390,13 +394,18 @@ class plgFlexicontent_fieldsWeblink extends FCField
 			$add_here = '';
 			$add_here .= $add_position==2 || $add_position==3 ? '<span class="' . $add_on_class . ' fcfield-insertvalue fc_before ' . $font_icon_class . '" onclick="addField'.$field->id.'(null, jQuery(this).closest(\'ul\'), jQuery(this).closest(\'li\'), {insert_before: 1});" title="'.JText::_( 'FLEXI_ADD_BEFORE' ).'"></span> ' : '';
 			$add_here .= $add_position==1 || $add_position==3 ? '<span class="' . $add_on_class . ' fcfield-insertvalue fc_after ' . $font_icon_class . '"  onclick="addField'.$field->id.'(null, jQuery(this).closest(\'ul\'), jQuery(this).closest(\'li\'), {insert_before: 0});" title="'.JText::_( 'FLEXI_ADD_AFTER' ).'"></span> ' : '';
-		} else {
+		}
+
+		// Field not multi-value
+		else
+		{
 			$remove_button = '';
 			$move2 = '';
 			$add_here = '';
 			$js .= '';
 			$css .= '';
 		}
+
 
 		// Added field's custom CSS / JS
 		if ($multiple) $js .= "
