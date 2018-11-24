@@ -1279,10 +1279,14 @@ class plgFlexicontent_fieldsImage extends FCField
 				case 'item':
 					$_image_name = $field->parameters->get('img-if-for-itemlist', '2') === '1' ? 'intro' : 'fulltext';
 					break;
+
 				case 'category':
 					$_image_name = $field->parameters->get('img-if-for-catlist', '1') === '1' ? 'intro' : 'fulltext';
 					break;
+
 				case 'module':
+				case 'sublist':
+				default:
 					$_image_name = $field->parameters->get('img-if-for-modlist', '1') === '1' ? 'intro' : 'fulltext';
 					break;
 			}
