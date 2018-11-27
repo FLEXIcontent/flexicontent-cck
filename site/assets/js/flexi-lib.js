@@ -13,28 +13,31 @@
 		var paddingW = (!!params && !!params.paddingW ? params.paddingW : 70);
 		var paddingH = (!!params && !!params.paddingH ? params.paddingH : 120);
 
-		var w = maxWidth  ? maxWidth  : window.innerWidth - paddingW;
-		var h = maxHeight ? maxHeight : window.innerHeight - paddingH;
+		var visibleWidth  = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+		var visibleHeight = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+
+		var w = maxWidth  ? maxWidth  : visibleWidth - paddingW;
+		var h = maxHeight ? maxHeight : visibleHeight - paddingH;
 
 		// Add fixed scrolling class and ... also add auto-width / auto-height classes so dimensions are treated as MAX values
 		params.dialogClass = typeof params.dialogClass !== 'undefined'  ?  params.dialogClass  :  'fc-fixed-dialog';
 		params.dialogClass += ' fc-autow-dialog';
 		params.dialogClass += ' fc-autoh-dialog';
 
-		if (window.innerWidth < 600 || window.innerHeight < 600)
+		if (visibleWidth < 600 || visibleHeight < 600)
 		{
-			params.winwidth  = w  > (window.innerWidth - 10)  ? (window.innerWidth - 10)  : w;
-			params.winheight = h  > (window.innerHeight - 10) ? (window.innerHeight - 10) : h;
+			params.winwidth  = w  > (visibleWidth - 10)  ? (visibleWidth - 10)  : w;
+			params.winheight = h  > (visibleHeight - 10) ? (visibleHeight - 10) : h;
 		}
 		else
 		{
-			params.winwidth  = w  > (window.innerWidth - paddingW)  ? (window.innerWidth - paddingW)  : w;
-			params.winheight = h  > (window.innerHeight - paddingH) ? (window.innerHeight - paddingH) : h;
+			params.winwidth  = w  > (visibleWidth - paddingW)  ? (visibleWidth - paddingW)  : w;
+			params.winheight = h  > (visibleHeight - paddingH) ? (visibleHeight - paddingH) : h;
 		}
 		//window.console.log ('winwidth  : ' + params.winwidth  + ', winheight : ' + params.winheight );
 
-		params.winleft = (window.innerWidth  - params.winwidth)  / 2 - 5;
-		params.wintop  = (window.innerHeight - params.winheight) / 2 - 5;
+		params.winleft = (visibleWidth  - params.winwidth)  / 2 - 5;
+		params.wintop  = (visibleHeight - params.winheight) / 2 - 5;
 		//window.console.log ('winleft : ' + params.winleft + ', wintop : ' + params.wintop);
 
 		return params;
@@ -324,7 +327,7 @@
 		var cTop = elem.offset().top;
 		var cHeight = elem.outerHeight(true);
 		var windowTop = jQuery(window).scrollTop();
-		var visibleHeight = window.innerHeight;
+		var visibleHeight = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
 		var top_extra = 90;
 		var bottom_extra = 80;
 
@@ -1371,7 +1374,7 @@
 				box.hide() :
 				box.slideUp(400) ;
 			// Only remove 'data-fc_noeffect' but not the fc_noeffect class
-			jQuery(btn).removeClass(btnClass).data('fc_noeffect', null)
+			jQuery(btn).removeClass(btnClass).data('fc_noeffect', null);
 		}
 	}
 

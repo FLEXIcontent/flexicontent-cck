@@ -43,10 +43,10 @@
 			<field name="" type="separator" default="MOD_FLEXIMAP_API" level="level1" />
 			<field
 				name="mapapi" type="radio" default="googlemap"
-				label="MOD_FLEXIMAP_APIMODE" description="MOD_FLEXIGOOGLEMAP_APIDMODE_DESC"
+				label="MOD_FLEXIMAP_APIMODE" description="MOD_FLEXIMAP_APIMODE_DESC"
 				class="btn-group group-fcinfo"
 				>
-				<option value="googlemap">MOD_FLEXIMAP_API_GOOGLE</option>
+				<option value="googlemap">MOD_FLEXIMAP_API_GOOGLEMAP</option>
 				<option value="openstreetmap">MOD_FLEXIMAP_API_OPENSTREETMAP</option>
 			</field>
 			<field
@@ -176,7 +176,7 @@
 			<field name="mapstyle" type="textarea" hint="[Your style code]" label="MOD_FLEXIGOOGLEMAP_STYLE" description="MOD_FLEXIGOOGLEMAP_STYLE_DESC" cols="120" rows="3" filter="raw" showon="mapapi:googlemap"/>
 
 			<field name="" type="separator" default="MOD_FLEXIGOOGLEMAP_MARKER_GROUPING" level="level2" />
-			<field name="" type="separator" default="MOD_FLEXIGOOGLEMAP_MARKER_GROUPING_ABOUT" level="level3" class="alert alert-info fcpadded"  />
+			<field name="" type="separator" default="MOD_FLEXIGOOGLEMAP_MARKER_GROUPING_ABOUT" level="level3" class="alert alert-info fcpadded" />
 
 			<field
 				name="clustermode" type="radio"

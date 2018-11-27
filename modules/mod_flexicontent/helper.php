@@ -2466,10 +2466,9 @@ class modFlexicontentHelper
 			$cat_tbl_alias = 'c', $user_tbl_alias = 'u', $default_order = '', $default_order_dir = ''
 		);
 		$query = 'SELECT c.id, c.title, c.description, c.params '
-			. ( FLEXI_J16GE ? '' : ', c.image ' )  // NO image column in J1.6 and higher, image is in parameters
 			. ', CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug'
 			. ' FROM #__categories AS c'
-			. (FLEXI_J16GE ? ' LEFT JOIN #__users AS u ON u.id = c.created_user_id' : '')
+			. ' LEFT JOIN #__users AS u ON u.id = c.created_user_id'
 			. ' WHERE c.id IN (' . implode(',', $cids) . ')'
 			. $orderby
 			;
