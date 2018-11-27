@@ -789,7 +789,7 @@ class FLEXIUtilities
 
 			$reviews_path = JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'views'.DS.'reviews';
 
-			if (file_exists($reviews_path))
+			if (file_exists($reviews_path) && version_compare(FLEXI_VERSION, '3.2.99', '>'))
 			{
 				$query = 'SELECT * FROM #__flexicontent_fields WHERE field_type="voting"';
 				$field = $db->setQuery($query)->loadObject();

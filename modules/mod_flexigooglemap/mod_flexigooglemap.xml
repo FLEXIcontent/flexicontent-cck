@@ -26,10 +26,10 @@
 	<languages folder="language">
 		<language tag="en-GB">en-GB/en-GB.mod_flexigooglemap.ini</language>
 	</languages>
-	
+
 	<config>
 	<fields name="params" addfieldpath="modules/mod_flexigooglemap/elements/">
-		
+
 		<fieldset name="basic">
 
 			<field name="" type="separator" default="FLEXI_TEMPLATE_LAYOUT" description="" level="level1" class="fc-ngmargin" />
@@ -40,7 +40,15 @@
 				tmpl_container="mod_tmpl_layout" params_source="file"
 				/> <!-- params_source="inline" -->
 
-			<field name="" type="separator" default="MOD_FLEXIGOOGLEMAP_CONFIG" level="level1" />
+			<field name="" type="separator" default="MOD_FLEXIMAP_API" level="level1" />
+			<field
+				name="mapapi" type="radio" default="googlemap"
+				label="MOD_FLEXIMAP_APIMODE" description="MOD_FLEXIMAP_APIMODE_DESC"
+				class="btn-group group-fcinfo"
+				>
+				<option value="googlemap">MOD_FLEXIMAP_API_GOOGLEMAP</option>
+				<option value="openstreetmap">MOD_FLEXIMAP_API_OPENSTREETMAP</option>
+			</field>
 			<field
 				name="catidmode" type="radio" default="0"
 				label="MOD_FLEXIGOOGLEMAP_CATIDMODE" description="MOD_FLEXIGOOGLEMAP_CATIDMODE_DESC"
@@ -74,12 +82,12 @@
 			<field
 				name="apikey" type="text" default=""
 				label="MOD_FLEXIGOOGLEMAP_APIKEY" description="MOD_FLEXIGOOGLEMAP_APIKEY_DESC"
-				require="true"
+				require="true" showon="mapapi:googlemap"
 			/>
 			<field name="" type="separator" default="MOD_FLEXIGOOGLEMAP_DISPLAY" level="level1" />
 			<field
 				name="maptype" type="list" default="ROADMAP"
-				label="MOD_FLEXIGOOGLEMAP_MAPTYPE" description="MOD_FLEXIGOOGLEMAP_MAPTYPE_DESC"
+				label="MOD_FLEXIGOOGLEMAP_MAPTYPE" description="MOD_FLEXIGOOGLEMAP_MAPTYPE_DESC" showon="mapapi:googlemap"
 				>
 				<option value="ROADMAP">MOD_FLEXIGOOGLEMAP_ROADMAP</option>
 				<option value="HYBRID">MOD_FLEXIGOOGLEMAP_HYBRID</option>
@@ -154,18 +162,18 @@
 				showon="markermode:1"
 			/>
 
-			<field name="" type="separator" default="MOD_FLEXIGOOGLEMAP_BEHAVIOUR_N_STYLE" level="level3" />
+			<field name="" type="separator" default="MOD_FLEXIGOOGLEMAP_BEHAVIOUR_N_STYLE" level="level3" showon="mapapi:googlemap" />
 			<field
 				name="animationmarker" type="radio"
 				default="1" label="MOD_FLEXIGOOGLEMAP_ANIMATIONMARKER"
 				description="MOD_FLEXIGOOGLEMAP_ANIMATIONMARKER_DESC"
-				class="btn-group"
+				class="btn-group" showon="mapapi:googlemap"
 				>
 				<option value="0">MOD_FLEXIGOOGLEMAP_NO</option>
 				<option value="1">MOD_FLEXIGOOGLEMAP_YES</option>
 			</field>
 
-			<field name="mapstyle" type="textarea" hint="[Your style code]" label="MOD_FLEXIGOOGLEMAP_STYLE" description="MOD_FLEXIGOOGLEMAP_STYLE_DESC" cols="120" rows="3" filter="raw"/>
+			<field name="mapstyle" type="textarea" hint="[Your style code]" label="MOD_FLEXIGOOGLEMAP_STYLE" description="MOD_FLEXIGOOGLEMAP_STYLE_DESC" cols="120" rows="3" filter="raw" showon="mapapi:googlemap"/>
 
 			<field name="" type="separator" default="MOD_FLEXIGOOGLEMAP_MARKER_GROUPING" level="level2" />
 			<field name="" type="separator" default="MOD_FLEXIGOOGLEMAP_MARKER_GROUPING_ABOUT" level="level3" class="alert alert-info fcpadded" />
@@ -303,7 +311,7 @@
 			<field name="php_rule" type="textarea" filter="JComponentHelper::filterText" rows="5" cols="40" label="FLEXI_PHP_RULE_CODE" description="FLEXI_PHP_RULE_CODE_DESC" class="using_php_rule input-xxlarge" />
 
 		</fieldset>
-		
+
 		<fieldset name="mod_tmpl_layout" label="FLEXI_MOD_TMPL_LAYOUT_OPTIONS" description="FLEXI_MOD_TMPL_LAYOUT_OPTIONS_DESC">
 		</fieldset>
 
@@ -315,7 +323,7 @@
 			</field>
 
 		</fieldset>
-		
+
 	</fields>
 	</config>
 </extension>

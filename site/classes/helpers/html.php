@@ -1215,7 +1215,8 @@ class flexicontent_html
 
 		static $load_frameworks = null;
 		static $load_jquery = null;
-		if ( !isset($load_frameworks[$framework]) )
+
+		if (!isset($load_frameworks[$framework]))
 		{
 			$flexiparams = JComponentHelper::getParams('com_flexicontent');
 			//$load_frameworks = $flexiparams->get('load_frameworks', array('jQuery','image-picker','masonry','select2','inputmask','prettyCheckable','fancybox'));
@@ -1341,10 +1342,38 @@ class flexicontent_html
 				break;
 
 			case 'google-maps':
-				//$force_language = $mode == 'form' ? '&amp;language=' . flexicontent_html::getUserCurrentLang() : '';
-				$force_language = '&amp;language=' . flexicontent_html::getUserCurrentLang();
-				$google_maps_js_api_key = $params->get('google_maps_js_api_key', $params->get('apikey'));
-				$document->addScript('https://maps.google.com/maps/api/js?libraries=geometry,places' . ($google_maps_js_api_key ? '&amp;key=' . $google_maps_js_api_key : '') . $force_language);
+				//$force_language = $mode == 'form' ? '&language=' . flexicontent_html::getUserCurrentLang() : '';
+				$force_language = '&language=' . flexicontent_html::getUserCurrentLang();
+				$apikey = trim($params->get('google_maps_js_api_key', $params->get('apikey')));
+
+				// Key is not empty
+				if ($apikey)
+				{
+					// Get head object
+					$head_obj = $document->mergeHeadData(array(1=>1));
+
+					// Unset any previous URL that had no KEY
+					unset($head_obj->_links['https://maps.google.com/maps/api/js?libraries=geometry,places' . $force_language]);
+				}
+
+				// Key is empty
+				else
+				{
+					// Unset framework-added Flag, to allow retry with other module or field configuration, that may have configured a KEY
+					unset($load_frameworks[$framework]);
+				}
+
+				// Add map link 
+				$document->addScript('https://maps.google.com/maps/api/js?libraries=geometry,places' . ($apikey ? '&key=' . $apikey : '') . $force_language);
+				break;
+
+			case 'openstreetmap' :
+				$framework_path = JUri::root(true).$lib_path.'/leaflet';
+				$document->addStyleSheet($framework_path.'/leaflet.css');
+				$document->addStyleSheet($framework_path.'/MarkerCluster.css');
+				$document->addStyleSheet($framework_path.'/MarkerCluster.Default.css');
+				$document->addScript($framework_path.'/leaflet.js');
+				$document->addScript($framework_path.'/leaflet.markercluster.js');
 				break;
 
 			case 'select2':
@@ -2731,7 +2760,7 @@ class flexicontent_html
 			'class'          => null,
 			'locked'         => false,
 		);
-	
+
 		$user    = JFactory::getUser();
 		$isAdmin = JFactory::getApplication()->isAdmin();
 		$isPrint = JFactory::getApplication()->input->getInt('print', 0);
@@ -2766,13 +2795,13 @@ class flexicontent_html
 		$trash_unsupported   = !isset($model::supported_conditions[-2]);
 
 		$refresh_on_success  = in_array($config->record_name, array('category')) ? 'true' : 'false';
-		
+
 		static $state_names_added = null;
 		if (!$state_names_added)
 		{
 			$state_names_added = true;
 			$state_names_js = array();
-			
+
 			foreach ($model::supported_conditions as $state_id => $state_name)
 			{
 				JText::script($state_name, true);
@@ -4522,7 +4551,7 @@ class flexicontent_html
 		{
 			return "user is not allowed to use any language";
 		}
-		
+
 		// Force first language to be selected
 		if (!$selected_found)
 		{
@@ -4567,7 +4596,7 @@ class flexicontent_html
 				break;
 
 			// RADIO selection of ALL languages (Flag icons only) e.g. item form,
-			case 3:   
+			case 3:
 				$checked	= '';
 				$list = '<div class="group-fcset fc_input_set">';
 
