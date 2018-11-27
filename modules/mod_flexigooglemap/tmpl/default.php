@@ -249,9 +249,9 @@ switch ($mapapi)
 			L.tileLayer('https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png',
 			{
 				// Datas sources
-				attribution: 'données © OpenStreetMap/ODbL - rendu OSM France',
+				attribution: '<?php echo JText::_('OPENSTREETMAP_ATTRIBUTION_TXT'); ?>',
 				minZoom: 1,
-				maxZoom: 20
+				maxZoom: <?php echo $maxzoom; ?>
 			})
 			.addTo(theMap_<?php echo $module->id;?>);
 
@@ -293,4 +293,3 @@ switch ($mapapi)
 
 
 <?php endif ;?>
-
