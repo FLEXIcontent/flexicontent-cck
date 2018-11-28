@@ -5,11 +5,12 @@
  *
  * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
  * @link            https://flexicontent.org
- * @copyright       Copyright © 2018, FLEXIcontent team, All Rights Reserved
+ * @copyright       Copyright Â© 2018, FLEXIcontent team, All Rights Reserved
  * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
 defined('_JEXEC') or die('Restricted access');
+
 use Joomla\String\StringHelper;
 require_once('flexicontent_basetable.php');
 
@@ -63,7 +64,7 @@ class flexicontent_tags extends flexicontent_basetable
 	 * @access protected
 	 */
 	var $_tbl_ext = '#__tags';
-	
+
 	/**
 	 * Name of the foreign key in the link table
 	 * $_tbl_key property maps to this property
@@ -303,9 +304,15 @@ class flexicontent_tags extends flexicontent_basetable
 	 */
 	public function check()
 	{
-		$config = (object) array('ascii_alias' => false);
+		$config = (object) array('automatic_alias' => true);
 
-		return parent::_check_record($config);
+		// Check common properties, like title and alias 
+		if (parent::_check_record($config) === false)
+		{
+			return false;
+		}
+
+		return true;
 	}
 
 
@@ -345,7 +352,7 @@ class flexicontent_tags extends flexicontent_basetable
 					$record_ext->$p = $v;
 				}
 			}
-				
+
 			// Add it to the main record properties
 			if (isset($this->_tbl_fields[$this->_tbl][$p]))
 			{
@@ -441,7 +448,7 @@ class flexicontent_tags extends flexicontent_basetable
 		$asset->parent_id = $parentId;
 		$asset->name  = $name;
 		$asset->title = $title;
-		
+
 		if ($this->_rules instanceof JAccessRules)
 		{
 			$asset->rules = (string) $this->_rules;
@@ -501,7 +508,7 @@ class flexicontent_tags extends flexicontent_basetable
 				}
 			}
 		}
-		
+
 		return parent::getProperties($public);
 	}
 }

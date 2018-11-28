@@ -32,122 +32,145 @@ trait flexicontent_basetable_trait
 		$langFrom    = array();
 		$langTo      = array();
 
-		// BULGARIAN
-		if ($language == 'bg-BG') {
-			$bgLangFrom = array('А', 'а', 'Б', 'б', 'В', 'в', 'Г', 'г', 'Д', 'д', 'Е', 'е', 'Ж', 'ж', 'З', 'з', 'И', 'и', 'Й', 'й', 'К', 'к', 'Л', 'л', 'М', 'м', 'Н', 'н', 'О', 'о', 'П', 'п', 'Р', 'р', 'С', 'с', 'Т', 'т', 'У', 'у', 'Ф', 'ф', 'Х', 'х', 'Ц', 'ц', 'Ч', 'ч', 'Ш', 'ш', 'Щ', 'щ', 'Ъ', 'ъ', 'Ьо', 'ьо', 'Ю', 'ю', 'Я', 'я');
-			$bgLangTo   = array('A', 'a', 'B', 'b', 'V', 'v', 'G', 'g', 'D', 'd', 'E', 'e', 'Zh', 'zh', 'Z', 'z', 'I', 'i', 'J', 'j', 'K', 'k', 'L', 'l', 'M', 'm', 'N', 'n', 'O', 'o', 'P', 'p', 'R', 'r', 'S', 's', 'T', 't', 'U', 'u', 'F', 'f', 'H', 'h', 'C', 'c', 'Ch', 'ch', 'Sh', 'sh', 'Sht', 'sht', 'Y', 'y', 'Io', 'io', 'Ju', 'ju', 'Ja', 'ja');
-			$langFrom   = array_merge ($langFrom, $bgLangFrom);
-			$langTo     = array_merge ($langTo, $bgLangTo);
+		switch($language)
+		{
+			// BULGARIAN
+			case 'bg-BG':
+				$bgLangFrom = array('А', 'а', 'Б', 'б', 'В', 'в', 'Г', 'г', 'Д', 'д', 'Е', 'е', 'Ж', 'ж', 'З', 'з', 'И', 'и', 'Й', 'й', 'К', 'к', 'Л', 'л', 'М', 'м', 'Н', 'н', 'О', 'о', 'П', 'п', 'Р', 'р', 'С', 'с', 'Т', 'т', 'У', 'у', 'Ф', 'ф', 'Х', 'х', 'Ц', 'ц', 'Ч', 'ч', 'Ш', 'ш', 'Щ', 'щ', 'Ъ', 'ъ', 'Ьо', 'ьо', 'Ю', 'ю', 'Я', 'я');
+				$bgLangTo   = array('A', 'a', 'B', 'b', 'V', 'v', 'G', 'g', 'D', 'd', 'E', 'e', 'Zh', 'zh', 'Z', 'z', 'I', 'i', 'J', 'j', 'K', 'k', 'L', 'l', 'M', 'm', 'N', 'n', 'O', 'o', 'P', 'p', 'R', 'r', 'S', 's', 'T', 't', 'U', 'u', 'F', 'f', 'H', 'h', 'C', 'c', 'Ch', 'ch', 'Sh', 'sh', 'Sht', 'sht', 'Y', 'y', 'Io', 'io', 'Ju', 'ju', 'Ja', 'ja');
+				$langFrom   = array_merge ($langFrom, $bgLangFrom);
+				$langTo     = array_merge ($langTo, $bgLangTo);
+				break;
+
+			// CZECH
+			case 'cz-CZ':
+				$czLangFrom = array('á','č','ď','é','ě','í','ň','ó','ř','š','ť','ú','ů','ý','ž','Á','Č','Ď','É','Ě','Í','Ň','Ó','Ř','Š','Ť','Ú','Ů','Ý','Ž');
+				$czLangTo   = array('a','c','d','e','e','i','n','o','r','s','t','u','u','y','z','a','c','d','e','e','i','ň','o','r','s','t','u','u','y','z');
+				$langFrom   = array_merge ($langFrom, $czLangFrom);
+				$langTo     = array_merge ($langTo, $czLangTo);
+				break;
+
+			// CROATIAN
+			case 'hr-HR':
+			case 'hr-BA':
+				$hrLangFrom = array('č','ć','đ','š','ž','Č','Ć','Đ','Š','Ž');
+				$hrLangTo   = array('c','c','d','s','z','c','c','d','s','z');
+				$langFrom   = array_merge ($langFrom, $hrLangFrom);
+				$langTo     = array_merge ($langTo, $hrLangTo);
+				break;
+
+			// GREEK
+			case 'el-GR':
+				$grLangFrom = array('α', 'β', 'γ', 'δ', 'ε', 'ζ', 'η', 'θ',  'η', 'ι', 'κ', 'λ', 'μ', 'ν', 'ξ',  'ο', 'π', 'ρ', 'σ', 'τ', 'υ', 'φ', 'χ', 'ψ',  'ω', 'Α', 'Β', 'Γ', 'Δ', 'Ε', 'Ζ', 'Η', 'Θ',  'Ι', 'Κ', 'Λ', 'Μ', 'Ν', 'Ξ',  'Ο', 'Π', 'Ρ', 'Σ', 'Τ', 'Υ', 'Φ', 'Χ', 'Ψ',  'Ω', 'Ά', 'Έ', 'Ή', 'Ί', 'Ύ', 'Ό', 'Ώ', 'ά', 'έ', 'ή', 'ί', 'ύ', 'ό', 'ώ', 'ΰ', 'ΐ', 'ϋ', 'ϊ', 'ς', '«', '»' );
+				$grLangTo   = array('a', 'b', 'g', 'd', 'e', 'z', 'h', 'th', 'i', 'i', 'k', 'l', 'm', 'n', 'ks', 'o', 'p', 'r', 's', 't', 'u', 'f', 'x', 'ps', 'o', 'A', 'B', 'G', 'D', 'E', 'Z', 'I', 'Th', 'I', 'K', 'L', 'M', 'N', 'Ks', 'O', 'P', 'R', 'S', 'T', 'Y', 'F', 'X', 'Ps', 'O', 'A', 'E', 'I', 'I', 'U', 'O', 'O', 'a', 'e', 'i', 'i', 'u', 'o', 'o', 'u', 'i', 'u', 'i', 's', '_', '_' );
+				$langFrom   = array_merge ($langFrom, $grLangFrom);
+				$langTo     = array_merge ($langTo, $grLangTo);
+				break;
+
+			// HUNGARIAN
+			case 'hu-HU':
+				$huLangFrom = array('á','é','ë','í','ó','ö','ő','ú','ü','ű','Á','É','Ë','Í','Ó','Ö','Ő','Ú','Ü','Ű');
+				$huLangTo   = array('a','e','e','i','o','o','o','u','u','u','a','e','e','i','o','o','o','u','u','u');
+				$langFrom   = array_merge ($langFrom, $huLangFrom);
+				$langTo     = array_merge ($langTo, $huLangTo);
+				break;
+
+			// POLISH
+			case 'pl-PL':
+				$plLangFrom = array('ą','ć','ę','ł','ń','ó','ś','ź','ż','Ą','Ć','Ę','Ł','Ń','Ó','Ś','Ź','Ż');
+				$plLangTo   = array('a','c','e','l','n','o','s','z','z','a','c','e','l','n','o','s','z','z');
+				$langFrom   = array_merge ($langFrom, $plLangFrom);
+				$langTo     = array_merge ($langTo, $plLangTo);
+				break;
+
+			// RUSSIAN
+			case 'ru-RU':
+				$ruLangFrom = array('А', 'а', 'Б', 'б', 'В', 'в', 'Г', 'г', 'Д', 'д', 'Е', 'е', 'Ё', 'ё', 'Ж', 'ж', 'З', 'з', 'И', 'и', 'Й', 'й', 'К', 'к', 'Л', 'л', 'М', 'м', 'Н', 'н', 'О', 'о', 'П', 'п', 'Р', 'р', 'С', 'с', 'Т', 'т', 'У', 'у', 'Ф', 'ф', 'Х', 'х', 'Ц', 'ц', 'Ч', 'ч', 'Ш', 'ш', 'Щ', 'щ', 'Ъ', 'ъ', 'Ы', 'ы', 'Ь', 'ь', 'Э', 'э', 'Ю', 'ю', 'Я', 'я');
+				$ruLangTo   = array('A', 'a', 'B', 'b', 'V', 'v', 'G', 'g', 'D', 'd', 'E', 'e', 'Jo', 'jo', 'Zh', 'zh', 'Z', 'z', 'I', 'i', 'J', 'j', 'K', 'k', 'L', 'l', 'M', 'm', 'N', 'n', 'O', 'o', 'P', 'p', 'R', 'r', 'S', 's', 'T', 't', 'U', 'u', 'F', 'f', 'H', 'h', 'C', 'c', 'Ch', 'ch', 'Sh', 'sh', 'Shh', 'shh', '', '', 'Y', 'y', '', '', 'Je', 'je', 'Ju', 'ju', 'Ja', 'ja');
+				$langFrom   = array_merge ($langFrom, $ruLangFrom);
+				$langTo     = array_merge ($langTo, $ruLangTo);
+				break;
+
+			// SLOVAK
+			case 'sk-SK':
+				$skLangFrom = array('á','ä','č','ď','é','í','ľ','ĺ','ň','ó','ô','ŕ','š','ť','ú','ý','ž','Á','Ä','Č','Ď','É','Í','Ľ','Ĺ','Ň','Ó','Ô','Ŕ','Š','Ť','Ú','Ý','Ž');
+				$skLangTo   = array('a','a','c','d','e','i','l','l','n','o','o','r','s','t','u','y','z','a','a','c','d','e','i','l','l','n','o','o','r','s','t','u','y','z');
+				$langFrom   = array_merge ($langFrom, $skLangFrom);
+				$langTo     = array_merge ($langTo, $skLangTo);
+				break;
+
+			// SLOVENIAN
+			case 'sl-SI':
+				$slLangFrom = array('č','š','ž','Č','Š','Ž');
+				$slLangTo   = array('c','s','z','c','s','z');
+				$langFrom   = array_merge ($langFrom, $slLangFrom);
+				$langTo     = array_merge ($langTo, $slLangTo);
+				break;
+
+			// LITHUANIAN
+			case 'lt-LT':
+				$ltLangFrom = array('ą','č','ę','ė','į','š','ų','ū','ž','Ą','Č','Ę','Ė','Į','Š','Ų','Ū','Ž');
+				$ltLangTo   = array('a','c','e','e','i','s','u','u','z','A','C','E','E','I','S','U','U','Z');
+				$langFrom   = array_merge ($langFrom, $ltLangFrom);
+				$langTo     = array_merge ($langTo, $ltLangTo);
+				break;
+
+			// ICELANDIC
+			case 'is-IS':
+				$isLangFrom = array('þ', 'æ', 'ð', 'ö', 'í', 'ó', 'é', 'á', 'ý', 'ú', 'Þ', 'Æ', 'Ð', 'Ö', 'Í', 'Ó', 'É', 'Á', 'Ý', 'Ú');
+				$isLangTo   = array('th','ae','d', 'o', 'i', 'o', 'e', 'a', 'y', 'u', 'Th','Ae','D', 'O', 'I', 'O', 'E', 'A', 'Y', 'U');
+				$langFrom   = array_merge ($langFrom, $isLangFrom);
+				$langTo     = array_merge ($langTo, $isLangTo);
+				break;
+
+			// TURKISH
+			case 'tr-TR':
+				$tuLangFrom = array('ş','ı','ö','ü','ğ','ç','Ş','İ','Ö','Ü','Ğ','Ç');
+				$tuLangTo   = array('s','i','o','u','g','c','S','I','O','U','G','C');
+				$langFrom   = array_merge ($langFrom, $tuLangFrom);
+				$langTo     = array_merge ($langTo, $tuLangTo);
+				break;
+
+			default:
+				break;
 		}
 
-		// CZECH
-		if ($language == 'cz-CZ') {
-			$czLangFrom = array('á','č','ď','é','ě','í','ň','ó','ř','š','ť','ú','ů','ý','ž','Á','Č','Ď','É','Ě','Í','Ň','Ó','Ř','Š','Ť','Ú','Ů','Ý','Ž');
-			$czLangTo   = array('a','c','d','e','e','i','n','o','r','s','t','u','u','y','z','a','c','d','e','e','i','ň','o','r','s','t','u','u','y','z');
-			$langFrom   = array_merge ($langFrom, $czLangFrom);
-			$langTo     = array_merge ($langTo, $czLangTo);
+		/**
+		 * Because default code in JLanguage::transliterate will call
+		 *
+ 		 * a. (ll_CC)Localise::transliterate() ... if it exists
+		 * b. Transliterate::utf8_latin_to_ascii($string)
+		 *
+		 * the above will handle letters like: 'ä','ö','ü','ß','Ä','Ö','Ü'
+		 * that is if the above letters were not already transliterate for the given language by this
+		 */
+
+		// DISABLED ... to match the default behaviour decribed above
+		if (0)
+		{
+			/**
+			 * GERMAN - because of german names used in Czech, Hungarian, Polish or Slovak (because of possible
+			 * match - e.g. German ä => ae, but Slovak ä => a ... for all but German language we will use:
+			 * a not ae, u not ue, o not oe, but ß will be ss
+			 */
+			$deLangFrom  = array('ä','ö','ü','ß','Ä','Ö','Ü');
+			$deLangTo    = substr($language, 0, 3) === 'de-'
+				? array('ae','oe','ue','ss','ae','oe','ue')
+				: array('a','o','u','ss','a','o','u');
+
+			$langFrom = array_merge ($langFrom, $deLangFrom);
+			$langTo   = array_merge ($langTo, $deLangTo);
+			$string   = StringHelper::str_ireplace($langFrom, $langTo, $string);
+			$string   = StringHelper::strtolower($string);
 		}
-
-		// CROATIAN
-		if ($language == 'hr-HR' || $language == 'hr-BA') {
-			$hrLangFrom = array('č','ć','đ','š','ž','Č','Ć','Đ','Š','Ž');
-			$hrLangTo   = array('c','c','d','s','z','c','c','d','s','z');
-			$langFrom   = array_merge ($langFrom, $hrLangFrom);
-			$langTo     = array_merge ($langTo, $hrLangTo);
-		}
-
-		// GREEK
-		if ($language == 'el-GR') {
-			$grLangFrom = array('α', 'β', 'γ', 'δ', 'ε', 'ζ', 'η', 'θ',  'η', 'ι', 'κ', 'λ', 'μ', 'ν', 'ξ',  'ο', 'π', 'ρ', 'σ', 'τ', 'υ', 'φ', 'χ', 'ψ',  'ω', 'Α', 'Β', 'Γ', 'Δ', 'Ε', 'Ζ', 'Η', 'Θ',  'Ι', 'Κ', 'Λ', 'Μ', 'Ν', 'Ξ',  'Ο', 'Π', 'Ρ', 'Σ', 'Τ', 'Υ', 'Φ', 'Χ', 'Ψ',  'Ω', 'Ά', 'Έ', 'Ή', 'Ί', 'Ύ', 'Ό', 'Ώ', 'ά', 'έ', 'ή', 'ί', 'ύ', 'ό', 'ώ', 'ΰ', 'ΐ', 'ϋ', 'ϊ', 'ς', '«', '»' );
-			$grLangTo   = array('a', 'b', 'g', 'd', 'e', 'z', 'h', 'th', 'i', 'i', 'k', 'l', 'm', 'n', 'ks', 'o', 'p', 'r', 's', 't', 'u', 'f', 'x', 'ps', 'o', 'A', 'B', 'G', 'D', 'E', 'Z', 'I', 'Th', 'I', 'K', 'L', 'M', 'N', 'Ks', 'O', 'P', 'R', 'S', 'T', 'Y', 'F', 'X', 'Ps', 'O', 'A', 'E', 'I', 'I', 'U', 'O', 'O', 'a', 'e', 'i', 'i', 'u', 'o', 'o', 'u', 'i', 'u', 'i', 's', '_', '_' );
-			$langFrom   = array_merge ($langFrom, $grLangFrom);
-			$langTo     = array_merge ($langTo, $grLangTo);
-		}
-
-		// HUNGARIAN
-		if ($language == 'hu-HU') {
-			$huLangFrom = array('á','é','ë','í','ó','ö','ő','ú','ü','ű','Á','É','Ë','Í','Ó','Ö','Ő','Ú','Ü','Ű');
-			$huLangTo   = array('a','e','e','i','o','o','o','u','u','u','a','e','e','i','o','o','o','u','u','u');
-			$langFrom   = array_merge ($langFrom, $huLangFrom);
-			$langTo     = array_merge ($langTo, $huLangTo);
-		}
-
-		// POLISH
-		if ($language == 'pl-PL') {
-			$plLangFrom = array('ą','ć','ę','ł','ń','ó','ś','ź','ż','Ą','Ć','Ę','Ł','Ń','Ó','Ś','Ź','Ż');
-			$plLangTo   = array('a','c','e','l','n','o','s','z','z','a','c','e','l','n','o','s','z','z');
-			$langFrom   = array_merge ($langFrom, $plLangFrom);
-			$langTo     = array_merge ($langTo, $plLangTo);
-		}
-
-		// RUSSIAN
-		if ($language == 'ru-RU') {
-			$ruLangFrom = array('А', 'а', 'Б', 'б', 'В', 'в', 'Г', 'г', 'Д', 'д', 'Е', 'е', 'Ё', 'ё', 'Ж', 'ж', 'З', 'з', 'И', 'и', 'Й', 'й', 'К', 'к', 'Л', 'л', 'М', 'м', 'Н', 'н', 'О', 'о', 'П', 'п', 'Р', 'р', 'С', 'с', 'Т', 'т', 'У', 'у', 'Ф', 'ф', 'Х', 'х', 'Ц', 'ц', 'Ч', 'ч', 'Ш', 'ш', 'Щ', 'щ', 'Ъ', 'ъ', 'Ы', 'ы', 'Ь', 'ь', 'Э', 'э', 'Ю', 'ю', 'Я', 'я');
-			$ruLangTo   = array('A', 'a', 'B', 'b', 'V', 'v', 'G', 'g', 'D', 'd', 'E', 'e', 'Jo', 'jo', 'Zh', 'zh', 'Z', 'z', 'I', 'i', 'J', 'j', 'K', 'k', 'L', 'l', 'M', 'm', 'N', 'n', 'O', 'o', 'P', 'p', 'R', 'r', 'S', 's', 'T', 't', 'U', 'u', 'F', 'f', 'H', 'h', 'C', 'c', 'Ch', 'ch', 'Sh', 'sh', 'Shh', 'shh', '', '', 'Y', 'y', '', '', 'Je', 'je', 'Ju', 'ju', 'Ja', 'ja');
-			$langFrom   = array_merge ($langFrom, $ruLangFrom);
-			$langTo     = array_merge ($langTo, $ruLangTo);
-		}
-
-		// SLOVAK
-		if ($language == 'sk-SK') {
-			$skLangFrom = array('á','ä','č','ď','é','í','ľ','ĺ','ň','ó','ô','ŕ','š','ť','ú','ý','ž','Á','Ä','Č','Ď','É','Í','Ľ','Ĺ','Ň','Ó','Ô','Ŕ','Š','Ť','Ú','Ý','Ž');
-			$skLangTo   = array('a','a','c','d','e','i','l','l','n','o','o','r','s','t','u','y','z','a','a','c','d','e','i','l','l','n','o','o','r','s','t','u','y','z');
-			$langFrom   = array_merge ($langFrom, $skLangFrom);
-			$langTo     = array_merge ($langTo, $skLangTo);
-		}
-
-		// SLOVENIAN
-		if ($language == 'sl-SI') {
-			$slLangFrom = array('č','š','ž','Č','Š','Ž');
-			$slLangTo   = array('c','s','z','c','s','z');
-			$langFrom   = array_merge ($langFrom, $slLangFrom);
-			$langTo     = array_merge ($langTo, $slLangTo);
-		}
-
-		// LITHUANIAN
-		if ($language == 'lt-LT') {
-			$ltLangFrom = array('ą','č','ę','ė','į','š','ų','ū','ž','Ą','Č','Ę','Ė','Į','Š','Ų','Ū','Ž');
-			$ltLangTo   = array('a','c','e','e','i','s','u','u','z','A','C','E','E','I','S','U','U','Z');
-			$langFrom   = array_merge ($langFrom, $ltLangFrom);
-			$langTo     = array_merge ($langTo, $ltLangTo);
-		}
-
-		// ICELANDIC
-		if ($language == 'is-IS') {
-			$isLangFrom = array('þ', 'æ', 'ð', 'ö', 'í', 'ó', 'é', 'á', 'ý', 'ú', 'Þ', 'Æ', 'Ð', 'Ö', 'Í', 'Ó', 'É', 'Á', 'Ý', 'Ú');
-			$isLangTo   = array('th','ae','d', 'o', 'i', 'o', 'e', 'a', 'y', 'u', 'Th','Ae','D', 'O', 'I', 'O', 'E', 'A', 'Y', 'U');
-			$langFrom   = array_merge ($langFrom, $isLangFrom);
-			$langTo     = array_merge ($langTo, $isLangTo);
-		}
-
-		// TURKISH
-		if ($language == 'tr-TR') {
-			$tuLangFrom = array('ş','ı','ö','ü','ğ','ç','Ş','İ','Ö','Ü','Ğ','Ç');
-			$tuLangTo   = array('s','i','o','u','g','c','S','I','O','U','G','C');
-			$langFrom   = array_merge ($langFrom, $tuLangFrom);
-			$langTo     = array_merge ($langTo, $tuLangTo);
-		}
-
-
-		// GERMAN - because of german names used in Czech, Hungarian, Polish or Slovak (because of possible
-		// match - e.g. German a => ae, but Slovak a => a ... we can use only one, so we use:
-		// a not ae, u not ue, o not oe, ? will be ss
-
-		$deLangFrom  = array('ä','ö','ü','ß','Ä','Ö','Ü');
-		$deLangTo    = array('a','o','u','ss','a','o','u');
-		//$deLangTo  = array('ae','oe','ue','ss','ae','oe','ue');
-
-		$langFrom    = array_merge ($langFrom, $deLangFrom);
-		$langTo      = array_merge ($langTo, $deLangTo);
-
-		$string = StringHelper::str_ireplace($langFrom, $langTo, $string);
-		$string = StringHelper::strtolower($string);
 
 		return $string;
 	}
 
 
 	/**
+	 * A replacement of JApplicationHelper::stringURLSafe(), that adds support for languages that does not define (ll_CC)Localise::transliterate() , but do need transliteration
+	 *
 	 * Make given string safe, also transliterating it - EITHER - if unicode aliases are not enabled - OR - if force ascii alias for current record type is true
 	 *
 	 * @param   string   $string       The string to make safe
@@ -160,28 +183,69 @@ trait flexicontent_basetable_trait
 	 */
 	public function stringURLSafe($string, $language = '', $force_ascii)
 	{
-		if (JFactory::getConfig()->get('unicodeslugs') == 1 && !$force_ascii)
+		// Return a cleaned unicode alias
+		if (JFactory::getConfig()->get('unicodeslugs') && !$force_ascii)
 		{
-			$output = JFilterOutput::stringURLUnicodeSlug($string);
+			return JFilterOutput::stringURLUnicodeSlug($string);
 		}
-		else
-		{
-			if ($language === '*' || $language === '')
-			{
-				$languageParams = JComponentHelper::getParams('com_languages');
-				$language = $languageParams->get('site');
-			}
 
-			if ($language !== '*' && !JLanguage::getInstance($language)->getTransliterator())
+
+		/**
+		 * Proceed to create a transliterated ASCII alias
+		 */
+
+		// Use record's language or use SITE's default language in case of record's language is ALL (or empty)
+		$language = !empty($language) && $language !== '*'
+			? $language
+			: JComponentHelper::getParams('com_languages')->get('site', '*');
+
+		if ($language !== '*')
+		{
+			/**
+			 * If language does not have (ll_CC)Localise::transliterate()
+			 * then run our own transliterate method
+			 */
+			if (!JLanguage::getInstance($language)->getTransliterator())
 			{
 				// Remove any '-' from the string since they will be used as concatenaters
 				$string = str_replace('-', ' ', $string);
 
+				// Do the transliteration using our custom transliterate method
 				$string = $this->transliterate($string, $language);
 			}
 
-			$output = JFilterOutput::stringURLSafe($string, $language);
+			/**
+			 * Language has (ll_CC)Localise::transliterate(), run it ONLY if ASCII alias is being forced
+			 * since if not forced then it will be run by JFilterOutput::stringURLSafe($string, $language)
+			 */
+			else
+			{
+				// Detect that unicode aliases are enabled but this ascii alias is forced for this record
+				$unicodeslugs_override = JFactory::getConfig()->get('unicodeslugs') && $force_ascii;
+
+				// Detect old joomla versions (Joomla <=3.5.x) that will not run the transliterator element's language
+				$r = new ReflectionMethod('JApplicationHelper', 'stringURLSafe');
+				$supports_content_language_transliteration = count( $r->getParameters() ) > 1;
+
+				if ($unicodeslugs_override || !$supports_content_language_transliteration)
+				{
+					// Remove any '-' from the string since they will be used as concatenaters
+					$this->$alias = str_replace('-', ' ', $this->$alias);
+
+					// Do the transliteration according to ELEMENT's language transliterator: (ll_CC)Localise::transliterate()
+					$this->$alias = JLanguage::getInstance($language)->transliterate($this->$alias);
+				}
+			}
 		}
+
+		/**
+		 * Make alias safe and transliterate it, using default implementation this will call
+		 * a. Prepare string doing things like: Replace any '-' with ' '
+		 * b. (ll_CC)Localise::transliterate() ... if it exists
+		 * c. Transliterate::utf8_latin_to_ascii($string)
+		 * d. Replace remaining non valid characters, and trim dashes '-'
+		 */
+		$output = JFilterOutput::stringURLSafe($string, $language);
 
 		return $output;
 	}
@@ -203,22 +267,29 @@ trait flexicontent_basetable_trait
 		$original_alias = $this->$alias;
 
 		// Check if 'title' was not given
-		if (trim( $this->$title ) == '')
+		if (trim($this->$title) == '')
 		{
-			$msg = JText::_( 'FLEXI_ADD_' . strtoupper($title) );
+			$msg = JText::_('FLEXI_ADD_' . strtoupper($title));
 			JFactory::getApplication()->enqueueMessage($msg, 'error');
+			//$this->setError($msg);
 			return false;
 		}
 
 		$valid_pattern = $this->_allow_underscore ? '/^[a-z_]+[a-z_0-9-]+$/i' : '/^[a-z]+[a-z0-9-]+$/i' ;
 
-		$is_ascii = $config && isset($config->ascii_alias) ? $config->ascii_alias : false;
-		$is_ascii = $is_ascii || preg_match($valid_pattern, $this->$alias);
+		$automatic_alias = $config && isset($config->automatic_alias) ? $config->automatic_alias : true;
+		$alias_is_valid  = preg_match($valid_pattern, $this->$alias);
 
-		if (!$is_ascii)
+		if (!$alias_is_valid)
 		{
-			$bad_alias = $this->$alias;
-			$this->$alias = $this->$title;
+			// Store bad alias to include it in a message
+			$invalid_chars_alias = $original_alias;
+
+			/**
+			 * Create a valid alias from title, if automatic alias is allowed,
+			 * otherwise we will filter current alias, and fail if either result or original alias are empty
+			 */
+			$this->$alias = $automatic_alias ? $this->$title : $this->$alias;
 		}
 
 		// Use 'title' as alias if 'alias' is empty
@@ -228,19 +299,14 @@ trait flexicontent_basetable_trait
 		}
 
 
-		// ***
-		// *** Make alias unique, unless it already ascii
-		// ***
+		/**
+		 * Make alias ascii, unless it is already ascii
+		 */
 
-		if (!$is_ascii)
+		if (!$alias_is_valid)
 		{
-			// Use record's language or use SITE's default language in case of record's language is ALL (or empty)
-			$language = !empty($this->language) && $this->language != '*'
-				? $this->language
-				: JComponentHelper::getParams('com_languages')->get('site', '*');
-
-			// Make alias safe, also transliterating it - EITHER - if unicode aliases are not enabled - OR - if force ascii alias for current record type is true 
-			$this->$alias = $this->stringURLSafe($this->$alias, $language, $this->_force_ascii_alias);
+			// Make alias safe, also transliterating it - EITHER - if unicode aliases are not enabled - OR - if force ascii alias for current record type is true
+			$this->$alias = $this->stringURLSafe($this->$alias, $this->language, $this->_force_ascii_alias);
 
 			// Check for empty alias and fallback to using current date
 			if (trim(str_replace('-', '', $this->$alias)) == '')
@@ -256,43 +322,56 @@ trait flexicontent_basetable_trait
 		}
 
 
-		// ***
-		// *** Make alias unique
-		// ***
+		/**
+		 * Make alias unique
+		 */
 
 		$n = 1;
+		$max_retries = 1000;
 		$possible_alias = $this->$alias;
-		while (1)
+
+		while ($n < $max_retries)
 		{
-			$query = 'SELECT id'
-				. ' FROM #__' . $this->_records_dbtbl
-				. ' WHERE ' . $alias . ' = '.$this->_db->Quote($possible_alias);
-			$this->_db->setQuery($query);
+			$query = $this->_db->getQuery(true)
+				->select('id')
+				->from('#__' . $this->_records_dbtbl)
+				->where($this->_db->quoteName($alias) . ' = ' . $this->_db->Quote($possible_alias))
+			;
+			$xid = (int) $this->_db->setQuery($query)->loadResult();
 
-			$xid = intval($this->_db->loadResult());
-
-			if ($xid && $xid != intval($this->id))
+			if ($xid && $xid !== (int) $this->id)
 			{
-				$bad_original_alias = $original_alias;
+				$non_unique_alias = $original_alias;
 				$possible_alias = $this->$alias . '-' . (++$n);
 				continue;
 			}
+
 			break;
 		}
+
 		$this->$alias = $possible_alias;
 
 
-		// ***
-		// *** Add some warning messages
-		// ***
+		/**
+		 * Add some warning messages
+		 */
 
-		if (!empty($bad_alias))
+		// Warn on too many duplicate aliases
+		if ($n >= $max_retries)
 		{
-			$msg = JText::sprintf('FLEXI_WARN_' . $this->_NAME . '_' . strtoupper($alias) . '_CORRECTED', $bad_alias, $this->$alias);
+			$msg = 'Too many retries ' . $max_retries . ' to find a unique alias for alias: ' . $original_alias;
+			JFactory::getApplication()->enqueueMessage($msg, 'warning');
+		}
+
+		// Warn on invalid characters alias changed (but do not add message on empty original alias)
+		elseif (!empty($invalid_chars_alias))
+		{
+			$msg = JText::sprintf('FLEXI_WARN_' . $this->_NAME . '_' . strtoupper($alias) . '_CORRECTED', $invalid_chars_alias, $this->$alias);
 			JFactory::getApplication()->enqueueMessage($msg, 'notice');
 		}
 
-		elseif (!empty($bad_original_alias))
+		// Warn on non unique original alias changed (but do not add message on empty original alias)
+		elseif (!empty($non_unique_alias))
 		{
 			$msg = JText::sprintf('FLEXI_THIS_' . $this->_NAME . '_' . strtoupper($alias) . '_ALREADY_EXIST', $this->name);
 			JFactory::getApplication()->enqueueMessage($msg, 'warning');
@@ -324,7 +403,7 @@ trait flexicontent_basetable_trait
 
 		$ext_ids = array();
 		$tmp_ids = array();
-		
+
 		foreach($pks as $pk)
 		{
 			$record->load($pk);
@@ -368,7 +447,7 @@ trait flexicontent_basetable_trait
 	 * @return  string   The asset name of the currently loaded record
 	 *
 	 * @since   3.3.0
-	 */	
+	 */
 	public function getAssetName()
 	{
 		return $this->_getAssetName();
@@ -381,7 +460,7 @@ trait flexicontent_basetable_trait
 	 * @return  string   The asset prefix
 	 *
 	 * @since   3.3.0
-	 */	
+	 */
 	public function getAssetPrefix()
 	{
 		$assetName = $this->_getAssetName();

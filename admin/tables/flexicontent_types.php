@@ -5,7 +5,7 @@
  *
  * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
  * @link            https://flexicontent.org
- * @copyright       Copyright © 2018, FLEXIcontent team, All Rights Reserved
+ * @copyright       Copyright Â© 2018, FLEXIcontent team, All Rights Reserved
  * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
@@ -53,13 +53,6 @@ else {
 }
 
 
-/**
- * FLEXIcontent table class
- *
- * @package Joomla
- * @subpackage FLEXIcontent
- * @since 1.0
- */
 class flexicontent_types extends _flexicontent_types
 {
 	/**
@@ -142,9 +135,15 @@ class flexicontent_types extends _flexicontent_types
 	 */
 	public function check()
 	{
-		$config = (object) array('ascii_alias' => false);
+		$config = (object) array('automatic_alias' => true);
 
-		return parent::_check_record($config);
+		// Check common properties, like title and alias 
+		if (parent::_check_record($config) === false)
+		{
+			return false;
+		}
+
+		return true;
 	}
 
 

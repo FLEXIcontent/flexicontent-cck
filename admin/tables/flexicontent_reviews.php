@@ -10,6 +10,7 @@
  */
 
 defined('_JEXEC') or die('Restricted access');
+
 use Joomla\String\StringHelper;
 require_once('flexicontent_basetable.php');
 

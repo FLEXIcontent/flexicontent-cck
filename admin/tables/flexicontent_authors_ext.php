@@ -1,37 +1,24 @@
 <?php
 /**
- * @version 1.0 $Id: flexicontent_authors_ext.php 864 2011-08-28 00:44:02Z ggppdk $
- * @package Joomla
- * @subpackage FLEXIcontent
- * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
- * @license GNU/GPL v2
- * 
- * FLEXIcontent is a derivative work of the excellent QuickFAQ component
- * @copyright (C) 2008 Christoph Lukes
- * see www.schlu.net for more information
+ * @package         FLEXIcontent
+ * @version         3.3
  *
- * FLEXIcontent is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
+ * @link            https://flexicontent.org
+ * @copyright       Copyright © 2018, FLEXIcontent team, All Rights Reserved
+ * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
 defined('_JEXEC') or die('Restricted access');
 
-/**
- * FLEXIcontent table class
- *
- * @package Joomla
- * @subpackage FLEXIcontent
- * @since 1.0
- */
+
 class flexicontent_authors_ext extends JTable
 {
 	/**
 	 * Primary Key
 	 * @var int
 	 */
-	 
+
 	/** @var int */
 	var $user_id 	= null;
 	/** @var string */
@@ -42,7 +29,7 @@ class flexicontent_authors_ext extends JTable
 	function __construct(& $db) {
 		parent::__construct('#__flexicontent_authors_ext', 'user_id', $db);
 	}
-	
+
 	// overloaded check function
 	function check()
 	{
@@ -61,24 +48,26 @@ class flexicontent_authors_ext extends JTable
 				return false;
 			}
 		}
-		
+
 		return true;
 	}
 
-  /**
-   * Overloaded bind function
-   *
-   * @param array $array  Array or object of values to bind
-   * @param mixed $ignore Array or space separated list of fields not to bind
-   *
-   * @return null|string Success returns null, failure returns an error
-   * @access public
-   * @see    JTable:bind
-   */
-  function bind( $array, $ignore = '' )
+	/**
+	 * Overloaded bind function
+	 *
+	 * @param   array  $array   Named array
+	 * @param   mixed  $ignore  An optional array or space separated list of properties
+	 *                          to ignore while binding.
+	 *
+	 * @return  mixed  Null if operation was satisfactory, otherwise returns an error string
+	 *
+	 * @see     JTable:bind
+	 * @since   11.1
+	 */
+	public function bind($array, $ignore = '')
   {
   	// Convert params from arrays to text, so that they can be stored in the text DB column
-  	
+
   	// ****************************************************
   	// AUTHOR BASIC PARAMETERS (author-specific parameters)
   	// ****************************************************
@@ -95,7 +84,7 @@ class flexicontent_authors_ext extends JTable
 	  	}
 	  	$array['author_basicparams'] = $params;
   	}
-  	
+
   	// ************************************************************************
   	// CATEGORY PARAMETERS (will be saved but used only if override is enabled)
   	// ************************************************************************
@@ -112,11 +101,11 @@ class flexicontent_authors_ext extends JTable
 	  	}
 			$array['author_catparams'] = $params;
   	}
-  	
+
   	return parent::bind( $array, $ignore );
   }
-  
-  
+
+
   /**
    * Overloaded load function
    *
@@ -127,11 +116,11 @@ class flexicontent_authors_ext extends JTable
    * @access public
    * @see    JTable:load
    */
-  function load ($keys = NULL,$reset = true) {  	
+  function load ($keys = NULL,$reset = true) {
   	return parent::load( $keys, $reset );
   }
-  
-  
+
+
   /**
    * Overloaded save function
    *
@@ -164,6 +153,5 @@ class flexicontent_authors_ext extends JTable
 		}
 		return true;
 	}
-  
+
 }
-?>

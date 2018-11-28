@@ -53,13 +53,7 @@ else {
 }
 
 
-/**
- * FLEXIcontent table class
- *
- * @package Joomla
- * @subpackage FLEXIcontent
- * @since 1.0
- */
+
 class flexicontent_fields extends _flexicontent_fields
 {
 	/**
@@ -178,9 +172,16 @@ class flexicontent_fields extends _flexicontent_fields
 	 */
 	public function check()
 	{
-		$config = (object) array('ascii_alias' => $this->iscore);
+		// Do not change alias of core fields that, keep the one provided by the model / caller
+		$config = (object) array('automatic_alias' => !$this->iscore);
 
-		return parent::_check_record($config);
+		// Check common properties, like title and alias 
+		if (parent::_check_record($config) === false)
+		{
+			return false;
+		}
+
+		return true;
 	}
 
 
@@ -244,12 +245,12 @@ class flexicontent_fields extends _flexicontent_fields
 					}
 				}
 			}
-			
+
 			// (b) Assign the rules
 			$rules = new JAccessRules($array['rules']);
 			$this->setRules($rules);
 		}
-		
+
 		return parent::bind($array, $ignore);
 	}
 }
