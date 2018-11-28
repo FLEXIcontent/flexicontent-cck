@@ -209,18 +209,6 @@ class FlexicontentModelField extends FCModelAdmin
 	{
 		$data_obj = $data && is_array($data) ? (object) $data : $data;
 
-		// If no given DATA then try to use posted data to determine new field type
-		if (empty($data_obj))
-		{
-			$jform_data = JFactory::getApplication()->input->get('jform', array(), 'array');
-			if ($jform_data && isset($jform_data['field_type']))
-			{
-				$data_obj = new stdClass();
-				$data_obj->iscore = isset($jform_data['iscore']) ? (int) $jform_data['iscore'] : 0;
-				$data_obj->field_type = JFilterInput::getInstance()->clean($jform_data['field_type'], 'CMD');
-			}
-		}
-
 		jimport('joomla.filesystem.file');
 		jimport('joomla.filesystem.folder');
 
@@ -240,6 +228,25 @@ class FlexicontentModelField extends FCModelAdmin
 		if (!JFile::exists($plugin_path))
 		{
 			throw new Exception('Error field XML file for field type: - ' . $this->field_type . '- was not found');
+		}
+		
+		/**
+		 * Do not allow changing some properties
+		 */
+
+		if (!empty($this->_record->iscore))
+		{
+			$form->setFieldAttribute('name', 'readonly', 'true');
+			$form->setFieldAttribute('name', 'filter', 'unset');
+		}
+
+		$form->setFieldAttribute('iscore', 'readonly', 'true');
+		$form->setFieldAttribute('iscore', 'filter', 'unset');
+
+		if ($this->_record->id > 0 && $this->_record->id < 7)
+		{
+			$form->setFieldAttribute('published', 'readonly', 'true');
+			$form->setFieldAttribute('published', 'filter', 'unset');
 		}
 
 
@@ -396,16 +403,6 @@ class FlexicontentModelField extends FCModelAdmin
 		}
 
 		/**
-		 * Return error if request tries to mark a new field as CORE
-		 */
-		if (!$data['id'] && !empty($data['iscore']))
-		{
-			$this->setError('Field\'s "iscore" property is ON, but creating new fields as CORE is not allowed');
-
-			return false;
-		}
-
-		/**
 		 * Positions are always posted, otherwise they must be cleared
 		 */
 		if (!isset($data['positions']))
@@ -463,7 +460,7 @@ class FlexicontentModelField extends FCModelAdmin
 		// Convert field positions to an array
 		if (!is_array($record->positions))
 		{
-			$record->positions = explode('\n', $record->positions);
+			$record->positions = explode("\n", $record->positions);
 		}
 
 		// Load type assigments (an array of type IDs)
@@ -491,7 +488,10 @@ class FlexicontentModelField extends FCModelAdmin
 	{
 		$field = $this->_record;
 
-		// Override 'types' for core fields, since the core field must be assigned to all types
+		/**
+		 * Override 'types' for core fields, since the core field must be assigned to all types
+		 * but alllow core fields 'voting', 'favourites, to selectively assigned to types
+		 */
 		if ($field->iscore && !in_array($field->field_type, array('voting', 'favourites'), true))
 		{
 			$query = $this->_db->getQuery(true)

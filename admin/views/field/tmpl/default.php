@@ -39,7 +39,8 @@ $js = "
 ";
 
 // Handle some readonly (server-side ignored) properties of CORE fields
-$js .= "
+// ... done by model's preprocessForm() method, but left here as an example
+/*$js .= "
 	jQuery( document ).ready(function() {".
 		($form->getValue("id") > 0 && $form->getValue("id") < 7 ? "
 		setTimeout(function(){ 
@@ -50,7 +51,7 @@ $js .= "
 		}, 1);
 		" : '')."
 	});
-";
+";*/
 $this->document->addScriptDeclaration($js);
 ?>
 
@@ -429,10 +430,7 @@ $this->document->addScriptDeclaration($js);
 	<input type="hidden" name="controller" value="fields" />
 	<input type="hidden" name="view" value="field" />
 	<input type="hidden" name="task" value="" />
-	<?php if ($form->getValue('iscore') == 1) : ?>
-		<input type="hidden" name="jform[iscore]" value="<?php echo $form->getValue("iscore"); ?>" />
-		<input type="hidden" name="jform[name]" value="<?php echo $form->getValue("name"); ?>" />
-	<?php endif; ?>
+	<?php echo $form->getInput('iscore'); ?>
 
 </form>
 </div>
