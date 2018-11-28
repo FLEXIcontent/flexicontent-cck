@@ -5,11 +5,12 @@
  *
  * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
  * @link            https://flexicontent.org
- * @copyright       Copyright © 2018, FLEXIcontent team, All Rights Reserved
+ * @copyright       Copyright Â© 2018, FLEXIcontent team, All Rights Reserved
  * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
 defined('_JEXEC') or die('Restricted access');
+
 use Joomla\String\StringHelper;
 use Joomla\CMS\Event\AbstractEvent;
 use Joomla\Database\DatabaseDriver;
@@ -44,7 +45,7 @@ class _flexicontent_items_common extends flexicontent_basetable
 				$assetId = (int) $result;
 			}
 		}
-		
+
 		// Return the asset id.
 		if ($assetId)
 		{
@@ -84,13 +85,6 @@ else
 }
 
 
-/**
- * FLEXIcontent table class
- *
- * @package Joomla
- * @subpackage FLEXIcontent
- * @since 1.0
- */
 class flexicontent_items extends _flexicontent_items
 {
 	/** @var int Primary key */
@@ -206,7 +200,7 @@ class flexicontent_items extends _flexicontent_items
 	 * @access protected
 	 */
 	var $_tbl_ext			= '#__flexicontent_items_ext';
-	
+
 	/**
 	 * Name of the foreign key in the link table
 	 * $_tbl_key property maps to this property
@@ -216,7 +210,7 @@ class flexicontent_items extends _flexicontent_items
 	 */
 	var $_frn_key_ext			= 'item_id';
 	var $_tbl_key_ext			= 'id';
-	
+
 	/**
 	 * Name of the data tmp table
 	 *
@@ -224,7 +218,7 @@ class flexicontent_items extends _flexicontent_items
 	 * @access protected
 	 */
 	var $_tbl_tmp			= '#__flexicontent_items_tmp';
-	
+
 	/**
 	 * Name of the foreign key in the link table
 	 * $_tbl_key property maps to this property
@@ -242,25 +236,23 @@ class flexicontent_items extends _flexicontent_items
 	 *
 	 * @param   JDatabaseDriver  $db  Database driver object.
 	 *
-	 * @since  11.1
+	 * @since  3.3
 	 */
 	public function __construct($db)
 	{
-		//JTable::addIncludePath(JPATH_SITE . '/libraries/src/Table');
-
 		$this->_records_dbtbl  = 'content';
 		$this->_NAME = strtoupper($this->_record_name);
 
 		parent::__construct('#__' . $this->_records_dbtbl, 'id', $db);
 
-		// Set the alias since the column is called state
+		// Set the alias for 'published' column (if different than the default)
 		$this->setColumnAlias('published', 'state');
 	}
 
 
 	/**
 	 * Method to compute the default name of the asset.
-	 * The default name is in the form `table_name.id` which we will override
+	 * The default name is in the form `table_name.id` (which we will override)
 	 * where id is the value of the primary key of the table.
 	 *
 	 * @return	string
@@ -268,6 +260,7 @@ class flexicontent_items extends _flexicontent_items
 	 */
 	protected function _getAssetName()
 	{
+		// we use 'com_content' instead of $this->extension which contains 'com_flexicontent'
 		$k = $this->_tbl_key;
 
 		return 'com_content.article.' . (int) $this->$k;
@@ -281,7 +274,7 @@ class flexicontent_items extends _flexicontent_items
 	 *
 	 * @return  mixed  An array of the field names, or false if an error occurs.
 	 *
-	 * @since   11.1
+	 * @since   3.3
 	 * @throws  UnexpectedValueException
 	 */
 	public function getFields($reload = false)
@@ -308,7 +301,7 @@ class flexicontent_items extends _flexicontent_items
 		return parent::getFields($reload);
 	}
 
-	
+
 	/**
 	 * Method to compact the ordering values of rows in a group of rows defined by an SQL WHERE clause.
 	 *
@@ -571,66 +564,20 @@ class flexicontent_items extends _flexicontent_items
 	 */
 	public function check()
 	{
-		// check for empty title
-		if (trim($this->title) == '')
+		$config = (object) array('automatic_alias' => true);
+
+		// Check common properties, like title and alias 
+		if (parent::_check_record($config) === false)
 		{
-			$this->setError(JText::_( 'FLEXI_ARTICLES_MUST_HAVE_A_TITLE' ));
 			return false;
 		}
-		
-		// check for empty alias
-		if (empty($this->alias))
-		{
-			$this->alias = $this->title;
-		}
-		
-		// FLAGs
-		$unicodeslugs = JFactory::getConfig()->get('unicodeslugs');
-		
-		$r = new ReflectionMethod('JApplicationHelper', 'stringURLSafe');
-		$supports_content_language_transliteration = count( $r->getParameters() ) > 1;
 
-
-		// Use ITEM's language or use SITE's default language in case of ITEM's language is ALL (or empty)
-		$language = $this->language && $this->language != '*'
-			? $this->language
-			: JComponentHelper::getParams('com_languages')->get('site', '*') ;
-
-		if ($language !== '*' && !JLanguage::getInstance($language)->getTransliterator())
-		{
-			// Remove any '-' from the string since they will be used as concatenaters
-			$this->alias = str_replace('-', ' ', $this->alias);
-
-			$this->alias = $this->transliterate($this->alias, $language);
-		}
-
-		// workaround for old joomla versions (Joomla <=3.5.x) that do not allowing to set transliteration language to be element's language
-		elseif (!$unicodeslugs && !$supports_content_language_transliteration)
-		{
-			// Remove any '-' from the string since they will be used as concatenaters
-			$this->alias = str_replace('-', ' ', $this->alias);
-
-			// Do the transliteration accorting to ELEMENT's language
-			$this->alias = JLanguage::getInstance($language)->transliterate($this->alias);
-		}
-
-
-		// make alias safe and transliterate it
-		$this->alias = JApplicationHelper::stringURLSafe($this->alias, $this->language);
-
-
-		// check for empty alias and fallback to using current date
-		if (trim(str_replace('-', '', $this->alias)) == '')
-		{
-			$this->alias = JFactory::getDate()->format('Y-m-d-H-i-s');
-		}
-		
-		// make fulltext empty if it only contains empty spaces
+		// Make fulltext empty if it only contains empty spaces
 		if (trim(str_replace('&nbsp;', '', $this->fulltext)) == '')
 		{
 			$this->fulltext = '';
 		}
-		
+
 		// clean up keywords -- eliminate extra spaces between phrases and cr (\r) and lf (\n) characters from string
 		if (!empty($this->metakey))
 		{
@@ -640,7 +587,7 @@ class flexicontent_items extends _flexicontent_items
 
 			// Create array using commas as delimiter
 			$keys = explode(',', $after_clean);
-			$clean_keys = array(); 
+			$clean_keys = array();
 
 			foreach($keys as $key)
 			{
@@ -652,7 +599,7 @@ class flexicontent_items extends _flexicontent_items
 
 			$this->metakey = implode(", ", $clean_keys); // put array back together delimited by ", "
 		}
-		
+
 		// clean up description -- eliminate quotes and <> brackets
 		if (!empty($this->metadesc))
 		{
@@ -662,6 +609,7 @@ class flexicontent_items extends _flexicontent_items
 
 		return true;
 	}
+
 
 	/**
 	 * Overloaded bind function
@@ -673,7 +621,7 @@ class flexicontent_items extends _flexicontent_items
 	 * @return  mixed  Null if operation was satisfactory, otherwise returns an error string
 	 *
 	 * @see     JTable:bind
-	 * @since   11.1
+	 * @since   3.3
 	 */
 	public function bind($array, $ignore = '')
 	{
@@ -690,7 +638,8 @@ class flexicontent_items extends _flexicontent_items
 			$registry->loadArray($array['urls']);
 			$array['urls'] = (string)$registry;
 		}
-		
+
+		// Bind parameters (params or attribs)
 		if (isset($array['attribs']) && is_array($array['attribs']))
 		{
 			$registry = new JRegistry;
@@ -698,6 +647,7 @@ class flexicontent_items extends _flexicontent_items
 			$array['attribs'] = (string)$registry;
 		}
 
+		// Bind metadata
 		if (isset($array['metadata']) && is_array($array['metadata']))
 		{
 			$registry = new JRegistry;
@@ -717,11 +667,13 @@ class flexicontent_items extends _flexicontent_items
 
 
 	/**
-	 * Overloaded store function
+	 * Overloaded JTable::store
 	 *
-	 * @return boolean
+	 * @param   boolean  $updateNulls  True to update fields even if they are null.
 	 *
-	 * @since 1.5
+	 * @return  boolean  True on success.
+	 *
+	 * @since   3.3
 	 */
 	public function store($updateNulls = false)
 	{
@@ -751,18 +703,18 @@ class flexicontent_items extends _flexicontent_items
 			{
 				$record_tmp->$p = $v;
 			}
-			
+
 			// If the property is in the join properties array we add it to the items_ext object
 			if (isset($this->_tbl_fields[$this->_tbl_ext][$p]))
 			{
 				$record_ext->$p = $v;
-				
+
 				// Also use main table for article's language column
 				if ($p === 'language')
 				{
 					$record->$p = $v;
 				}
-			
+
 				// Master item id for (translation groups), (Deprecated, TODO remove)
 				if ($p === 'lang_parent_id')
 				{
@@ -770,7 +722,7 @@ class flexicontent_items extends _flexicontent_items
 					$record_tmp->$p = 0;//$record->id;
 				}
 			}
-				
+
 			// Add it to the main record properties
 			else
 			{
@@ -816,7 +768,7 @@ class flexicontent_items extends _flexicontent_items
 			{
 				$tmp_exists = (boolean) $this->_db->setQuery('SELECT COUNT(*) FROM ' . $this->_tbl_tmp . ' WHERE ' . $fk_tmp . '=' . (int) $record_tmp->$fk_tmp)->loadResult();
 			}
-			
+
 			// Update extended data record
 			if ($ext_exists)
 			{
@@ -905,7 +857,7 @@ class flexicontent_items extends _flexicontent_items
 		$asset->parent_id = $parentId;
 		$asset->name  = $name;
 		$asset->title = $title;
-		
+
 		if ($this->_rules instanceof JAccessRules)
 		{
 			$asset->rules = (string) $this->_rules;
@@ -932,6 +884,4 @@ class flexicontent_items extends _flexicontent_items
 
 		return true;
 	}
-
-
 }

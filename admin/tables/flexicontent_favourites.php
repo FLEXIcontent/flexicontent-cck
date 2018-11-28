@@ -11,13 +11,7 @@
 
 defined('_JEXEC') or die('Restricted access');
 
-/**
- * FLEXIcontent table class
- *
- * @package Joomla
- * @subpackage FLEXIcontent
- * @since 1.0
- */
+
 class flexicontent_favourites extends JTable
 {
 	/**
@@ -35,7 +29,7 @@ class flexicontent_favourites extends JTable
 	 * @var int
 	 */
 	var $userid				= null;
-	/** @var int */	
+	/** @var int */
 	var $notify				= null;
 
 	function __construct(& $db) {
