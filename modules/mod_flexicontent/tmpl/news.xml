@@ -19,7 +19,13 @@
 
 			<field name="item_tab_featured" type="separator" default="Featured items" icon_class="icon-list" level="tab_open" box_type="1" />
 
-			<field name="item_columns_feat" type="list" default="3" label="FLEXI_UMOD_NUM_OF_COLUMNS" description="FLEXI_UMOD_NUM_OF_COLUMNS_DESC">
+			<field name="news_item_placement_feat" type="multilist" subtype="radio" default="1" toggle_related="1" label="FLEXI_ITEMS_PLACEMENT" description="FLEXI_ITEMS_PLACEMENT_DESC" class="btn-group group-fcinfo">
+				<option value="0" show_list="items_in_cols_feat">FLEXI_CLEARED</option>
+				<option value="1" show_list="items_in_cols_feat">FLEXI_AS_MASONRY_TILES</option>
+				<option value="2" hide_list="items_in_cols_feat">FLEXI_TABS</option>
+				<option value="3" hide_list="items_in_cols_feat">FLEXI_ACCORDION</option>
+			</field>
+			<field name="item_columns_feat" type="list" default="3" label="FLEXI_UMOD_NUM_OF_COLUMNS" description="FLEXI_UMOD_NUM_OF_COLUMNS_DESC" depend_class="items_in_cols_feat">
 				<option value="1">1</option>
 				<option value="2">2</option>
 				<option value="3">3</option>
@@ -28,10 +34,6 @@
 				<option value="6">6</option>
 				<option value="7">7</option>
 				<option value="8">8</option>
-			</field>
-			<field name="news_item_placement_feat" type="radio" default="0" label="FLEXI_ITEMS_PLACEMENT" description="FLEXI_ITEMS_PLACEMENT_DESC" class="btn-group group-fcinfo">
-				<option value="0">FLEXI_CLEARED</option>
-				<option value="1">FLEXI_AS_MASONRY_TILES</option>
 			</field>
 			<field name="news_hl_items_onnav_feat" type="radio" default="0" label="Highlight items" description="Highlight currently 'active' and 'hovered' items by adding CSS classes" class="btn-group">
 				<option value="0">FLEXI_NO</option>
@@ -72,7 +74,13 @@
 			
 			<field name="item_tab_standard" type="separator" default="Standard items" icon_class="icon-list" level="tab_open" box_type="1" />
 			
-			<field name="item_columns" type="list" default="4" label="FLEXI_UMOD_NUM_OF_COLUMNS" description="FLEXI_UMOD_NUM_OF_COLUMNS_DESC">
+			<field name="news_item_placement" type="multilist" subtype="radio" default="1" toggle_related="1" label="FLEXI_ITEMS_PLACEMENT" description="FLEXI_ITEMS_PLACEMENT_DESC" class="btn-group group-fcinfo">
+				<option value="0" show_list="items_in_cols">FLEXI_CLEARED</option>
+				<option value="1" show_list="items_in_cols">FLEXI_AS_MASONRY_TILES</option>
+				<option value="2" hide_list="items_in_cols">FLEXI_TABS</option>
+				<option value="3" hide_list="items_in_cols">FLEXI_ACCORDION</option>
+			</field>
+			<field name="item_columns" type="list" default="3" label="FLEXI_UMOD_NUM_OF_COLUMNS" description="FLEXI_UMOD_NUM_OF_COLUMNS_DESC" depend_class="items_in_cols">
 				<option value="1">1</option>
 				<option value="2">2</option>
 				<option value="3">3</option>
@@ -81,10 +89,6 @@
 				<option value="6">6</option>
 				<option value="7">7</option>
 				<option value="8">8</option>
-			</field>
-			<field name="news_item_placement" type="radio" default="1" label="FLEXI_ITEMS_PLACEMENT" description="FLEXI_ITEMS_PLACEMENT_DESC" class="btn-group group-fcinfo">
-				<option value="0">FLEXI_CLEARED</option>
-				<option value="1">FLEXI_AS_MASONRY_TILES</option>
 			</field>
 			<field name="news_hl_items_onnav" type="radio" default="0" label="Highlight items" description="Highlight currently 'active' and 'hovered' items by adding CSS classes" class="btn-group">
 				<option value="0">FLEXI_NO</option>

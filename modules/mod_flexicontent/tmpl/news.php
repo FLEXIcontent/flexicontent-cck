@@ -129,25 +129,67 @@ $img_auto_dims_css_feat=" width: 100%; height: auto; display: block !important; 
 $img_auto_dims_css=" width: 100%; height: auto; display: block !important; border: 0 !important;";
 
 
-// Featured
-$item_columns_feat = $params->get('item_columns_feat', 3);
-$item_placement_feat = $params->get($layout.'_item_placement_feat', 0);  // 0: cleared, 1: as masonry tiles
-$cols_class_feat = ($item_columns_feat <= 1)  ?  ''  :  'cols_'.$item_columns_feat;
+/**
+ * Featured
+ * item placement 0: cleared, 1: as masonry tiles, 2: tabs, 3: accordion (sliders)
+ */
+$item_placement_feat = (int) $params->get($layout.'_item_placement_feat', 0);
+$item_columns_feat   = (int) $params->get('item_columns_feat', 3);
+$cols_class_feat     = $item_columns_feat <= 1 ? '' : 'cols_' . $item_columns_feat;
 
-// Standard
-$item_placement_std = $params->get($layout.'_item_placement', 0);  // -1: other, 0: cleared, 1: as masonry tiles
-$item_columns_std = $params->get('item_columns', 4);
-$cols_class_std  = ($item_columns_std  <= 1)  ?  ''  :  'cols_'.$item_columns_std;
+/**
+ * Standard
+ * item placement 0: cleared, 1: as masonry tiles, 2: tabs, 3: accordion (sliders)
+ */
+$item_placement_std = (int) $params->get($layout.'_item_placement', 0);
+$item_columns_std   = (int) $params->get('item_columns', 4);
+$cols_class_std     = $item_columns_std  <= 1 ? '' : 'cols_' . $item_columns_std;
 
 $document = JFactory::getDocument();
+$jcookie  = JFactory::getApplication()->input->cookie;
 
-// Add masonry JS
-if ( ($item_placement_feat == 1 && $item_columns_feat > 1) || ($item_placement_std == 1 && $item_columns_std > 1) )
+
+/**
+ * Add masonry JS
+ */
+if (($item_placement_feat === 1 && $item_columns_feat > 1) || ($item_placement_std === 1 && $item_columns_std > 1))
 {
 	flexicontent_html::loadFramework('masonry');
 	flexicontent_html::loadFramework('imagesLoaded');
 }
-$container_id = $module->id . (count($catdata_arr)>1 && $catdata ? '_'.$catdata->id : '');
+
+
+/**
+ * Get active Tabs / Sliders (accordion) from cookie
+ */
+if ($item_placement_feat === 2 || $item_placement_std === 2 || $item_placement_feat === 3 || $item_placement_std === 3)
+{
+	$cookie_name = 'fc_modules_data';
+	$fcMods_conf = $jcookie->get($cookie_name, '{}', 'string');
+
+	try
+	{
+		$fcMods_conf = json_decode($fcMods_conf);
+	}
+	catch (Exception $e)
+	{
+		$jcookie->set($cookie_name, '{}', time()+60*60*24, JUri::base(true), '');
+	}
+
+	$fcMods_conf = is_object($fcMods_conf)
+		? $fcMods_conf
+		: (new stdClass);
+
+	$fcMod_conf = isset($fcMods_conf->{$module->id})
+		? $fcMods_conf->{$module->id}
+		: (new stdClass);
+
+	$active_tagids_feat = isset($fcMod_conf->active_tagids_feat) ? $fcMod_conf->active_tagids_feat : (new stdClass);
+	$active_tagids_std  = isset($fcMod_conf->active_tagids_std) ? $fcMod_conf->active_tagids_std : (new stdClass);
+}
+
+
+$container_id = $module->id . (count($catdata_arr) > 1 && $catdata ? '_' . $catdata->id : '');
 ?>
 
 
@@ -194,26 +236,29 @@ $container_id = $module->id . (count($catdata_arr)>1 && $catdata ? '_'.$catdata-
 		'field'=>JText::sprintf( 'FLEXI_UMOD_CUSTOM_FIELD', $orderby_custom_field->label)
 	);
 
-	$separator = "";
+	$separator  = '';
 	$rowtoggler = 0;
 
 	foreach ($ordering as $ord) :
   	echo $separator;
-	  if (isset($list[$ord]['featured']) || isset($list[$ord]['standard'])) {
-  	  $separator = "<div class='ordering_separator' ></div>";
-    } else {
-  	  $separator = "";
+
+	  if (!isset($list[$ord]['featured']) && !isset($list[$ord]['standard']))
+		{
+  	  $separator = '';
   	  continue;
   	}
+
+ 	  $separator = '<div class="ordering_separator"></div>';
+
   	// PREPEND ORDER if using more than 1 orderings ...
-  	$order_name = $ord ? $ord : 'default';
-		$uniq_ord_id = (count($list)>1 ? $order_name : '').$container_id;
+  	$order_name = $ord ?: 'default';
+		$uniq_ord_id = (count($list) > 1 ? $order_name : '') . $container_id;
 	?>
 
 
 	<!-- BOF DIV mod_flexicontent -->
 
-	<div id="<?php echo 'order_'.$order_name.$container_id; ?>" class="mod_flexicontent">
+	<div id="<?php echo 'order_' . $order_name . $container_id; ?>" class="mod_flexicontent">
 
 
 		<?php	if ($ordering_addtitle && $ord) : ?>
@@ -229,21 +274,45 @@ $container_id = $module->id . (count($catdata_arr)>1 && $catdata ? '_'.$catdata-
 
 		<div class="mod_flexicontent_featured mod_fcitems_box_featured_<?php echo $uniq_ord_id; ?>" id="mod_fcitems_box_featured_<?php echo $uniq_ord_id; ?>">
 
-			<?php $oe_class = $rowtoggler ? 'odd' : 'even'; ?>
-
-			<?php foreach ($list[$ord]['featured'] as $item) : ?>
 			<?php
+			$oe_class = $rowtoggler ? 'odd' : 'even';
+
+			if ($item_placement_feat === 2 || $item_placement_feat === 3)
+			{
+				$first_item        = reset($list[$ord]['featured']);
+				$itemset_tagid     = 'fc_umod_itemset_feat_' . $uniq_ord_id;
+
+				$last_active_tagid = isset($active_tagids_feat->$itemset_tagid)
+					? $active_tagids_feat->$itemset_tagid
+					: $itemset_tagid . '_' . $first_item->id;
+
+				echo $item_placement_feat === 2
+					? JHtml::_('bootstrap.startTabSet', $itemset_tagid, array('active' => $last_active_tagid))
+					: JHtml::_('bootstrap.startAccordion', $itemset_tagid, array('active' => $last_active_tagid));
+			}
+
+			foreach ($list[$ord]['featured'] as $item) :
+
+				if ($item_placement_feat === 2 || $item_placement_feat === 3)
+				{
+					echo $item_placement_feat === 2
+						? JHtml::_('bootstrap.addTab', $itemset_tagid, $itemset_tagid . '_' . $item->id, $item->title)
+						: JHtml::_('bootstrap.addSlide', $itemset_tagid, $item->title, $itemset_tagid . '_' . $item->id);
+				}
+
 				$img_force_dims_css_feat = $img_auto_dims_css_feat;
-				if ($item_img_fit_feat==0/* || $content_layout_feat <= 3*/)
+
+				if ($item_img_fit_feat == 0 /* || $content_layout_feat <= 3*/)
 				{
 					$img_force_dims_css_feat .= ($item->image_w ? ' max-width:'. $item->image_w.'px; ' : '') . ($item->image_h ? ' max-height:'. $item->image_h.'px; ' : '');
 				}
 
-				if ($rowcount%$item_columns_feat==0)
+				if ($rowcount % $item_columns_feat === 0)
 				{
-					$oe_class = $oe_class=='odd' ? 'even' : 'odd';
+					$oe_class = $oe_class === 'odd' ? 'even' : 'odd';
 					$rowtoggler = !$rowtoggler;
 				}
+
 				$rowcount++;
 			?>
 
@@ -392,13 +461,75 @@ $container_id = $module->id . (count($catdata_arr)>1 && $catdata ? '_'.$catdata-
 			<!-- EOF item -->
 
 			<?php
-			if ($item_placement_feat == 0)  // 0: clear, 1: as masonry tiles
+				if ($item_placement_feat === 2 || $item_placement_feat === 3)
+				{
+					echo $item_placement_feat === 2
+						? JHtml::_('bootstrap.endTab')
+						: JHtml::_('bootstrap.endSlide');
+				}
+				elseif ($item_placement_feat === 0)  // 0: clear, 1: as masonry tiles
+				{
+					//echo !($rowcount%$item_columns_feat) ? '<div class="modclear"></div>' : '';
+				}
+
+			endforeach;
+
+			if ($item_placement_feat === 2 || $item_placement_feat === 3)
 			{
-				//echo !($rowcount%$item_columns_feat) ? '<div class="modclear"></div>' : '';
+				echo $item_placement_feat === 2
+					? JHtml::_('bootstrap.endTabSet')
+					: JHtml::_('bootstrap.endAccordion');
+
+				JFactory::getDocument()->addScriptDeclaration("
+				(function($) {
+					$(document).ready(function ()
+					{
+						$('#" . $itemset_tagid . ($item_placement_feat === 2 ? 'Tabs' : '') . "').on('shown', function ()
+						{
+							var fcMods_conf = fclib_getCookie('" . $cookie_name ."');
+							try { fcMods_conf = JSON.parse(fcMods_conf); } catch(e) { fcMods_conf = {}; }
+
+							fcMods_conf['" . $module->id ."'] = fcMods_conf['" . $module->id ."'] || {};
+							fcMods_conf['" . $module->id ."']['active_tagids_feat'] = fcMods_conf['" . $module->id ."']['active_tagids_feat'] || {};
+							" . ($item_placement_feat === 2
+								? "fcMods_conf['" . $module->id ."']['active_tagids_feat']['" . $itemset_tagid . "'] = $('#" . $itemset_tagid . "Tabs').next().find('.active').attr('id');"
+								: "fcMods_conf['" . $module->id ."']['active_tagids_feat']['" . $itemset_tagid . "'] = $('#" . $itemset_tagid . " .in').attr('id');") . "
+							fclib_setCookie('" . $cookie_name ."', JSON.stringify(fcMods_conf), 7);
+							window.console.log(JSON.stringify(fcMods_conf));
+						});
+
+						$('#" . $itemset_tagid . ($item_placement_feat === 2 ? 'Tabs' : '') . "').on('hidden', function ()
+						{
+							var fcMods_conf = fclib_getCookie('" . $cookie_name ."');
+							try { fcMods_conf = JSON.parse(fcMods_conf); } catch(e) { fcMods_conf = {}; }
+
+							fcMods_conf['" . $module->id ."'] = fcMods_conf['" . $module->id ."'] || {};
+							fcMods_conf['" . $module->id ."']['active_tagids_feat'] = fcMods_conf['" . $module->id ."']['active_tagids_feat'] || {};
+							fcMods_conf['" . $module->id ."']['active_tagids_feat']['" . $itemset_tagid . "'] = null;
+							fclib_setCookie('" . $cookie_name ."', JSON.stringify(fcMods_conf), 7);
+							window.console.log(JSON.stringify(fcMods_conf));
+						});
+
+						var fcMods_conf = fclib_getCookie('" . $cookie_name ."');
+						try { fcMods_conf = JSON.parse(fcMods_conf); } catch(e) { fcMods_conf = {}; }
+
+						fcMods_conf['" . $module->id ."'] = fcMods_conf['" . $module->id ."'] || {};
+						fcMods_conf['" . $module->id ."']['active_tagids_feat'] = fcMods_conf['" . $module->id ."']['active_tagids_feat'] || {};
+
+						if (!!fcMods_conf['" . $module->id ."']['active_tagids_feat']['" . $itemset_tagid . "'])
+						{
+							// Hide default active slide
+							$('#" . $itemset_tagid ." .collapse').removeClass('in');
+
+							// Show the last active slide
+							$('#' + fcMods_conf['" . $module->id ."']['active_tagids_feat']['" . $itemset_tagid . "']).addClass('in');
+						}
+					});
+				})(jQuery);
+				");
 			}
 			?>
 
-			<?php endforeach; ?>
 		</div>
 
 		<!-- EOF DIV mod_flexicontent_featured (featured items) -->
@@ -418,23 +549,46 @@ $container_id = $module->id . (count($catdata_arr)>1 && $catdata ? '_'.$catdata-
 
 		<div class="mod_flexicontent_standard mod_fcitems_box_standard_<?php echo $uniq_ord_id; ?>" id="mod_fcitems_box_standard_<?php echo $uniq_ord_id; ?>">
 
-			<?php $oe_class = $rowtoggler ? 'odd' : 'even'; $n=-1; ?>
-
-			<?php foreach ($list[$ord]['standard'] as $item) : ?>
 			<?php
+			$oe_class = $rowtoggler ? 'odd' : 'even';
+
+			if ($item_placement_std === 2 || $item_placement_std === 3)
+			{
+				$first_item        = reset($list[$ord]['standard']);
+				$itemset_tagid     = 'fc_umod_itemset_std_' . $uniq_ord_id;
+
+				$last_active_tagid = isset($active_tagids_std->$itemset_tagid)
+					? $active_tagids_std->$itemset_tagid
+					: $itemset_tagid . '_' . $first_item->id;
+
+				echo $item_placement_std === 2
+					? JHtml::_('bootstrap.startTabSet', $itemset_tagid, array('active' => $last_active_tagid))
+					: JHtml::_('bootstrap.startAccordion', $itemset_tagid, array('active' => $last_active_tagid));
+			}
+
+			foreach ($list[$ord]['standard'] as $item) :
+
+				if ($item_placement_std === 2 || $item_placement_std === 3)
+				{
+					echo $item_placement_std === 2
+						? JHtml::_('bootstrap.addTab', $itemset_tagid, $itemset_tagid . '_' . $item->id, $item->title)
+						: JHtml::_('bootstrap.addSlide', $itemset_tagid, $item->title, $itemset_tagid . '_' . $item->id);
+				}
+
 				$img_force_dims_css = $img_auto_dims_css;
-				if ($item_img_fit==0/* || $content_layout <= 3*/)
+
+				if ($item_img_fit == 0 /* || $content_layout <= 3*/)
 				{
 					$img_force_dims_css .= ($item->image_w ? ' max-width:'. $item->image_w.'px; ' : '') . ($item->image_h ? ' max-height:'. $item->image_h.'px; ' : '');
 				}
 
 				if ($rowcount%$item_columns_std==0)
 				{
-					$oe_class = $oe_class=='odd' ? 'even' : 'odd';
+					$oe_class = $oe_class === 'odd' ? 'even' : 'odd';
 					$rowtoggler = !$rowtoggler;
 				}
+
 				$rowcount++;
-				$n++;
 			?>
 
 			<!-- BOF item -->	
@@ -584,13 +738,75 @@ $container_id = $module->id . (count($catdata_arr)>1 && $catdata ? '_'.$catdata-
 			<!-- EOF item -->
 
 			<?php
-			if ($item_placement_std == 0)  // 0: clear, 1: as masonry tiles
+			if ($item_placement_std === 2 || $item_placement_std === 3)
+			{
+				echo $item_placement_std === 2
+					? JHtml::_('bootstrap.endTab')
+					: JHtml::_('bootstrap.endSlide');
+			}
+			elseif ($item_placement_std === 0)  // 0: clear, 1: as masonry tiles
 			{
 				//echo !($rowcount%$item_columns_std) ? '<div class="modclear"></div>' : '';
 			}
 			?>
 
-			<?php endforeach; ?>
+			<?php
+			endforeach;
+			if ($item_placement_std === 2 || $item_placement_std === 3)
+			{
+				echo $item_placement_std === 2
+					? JHtml::_('bootstrap.endTabSet')
+					: JHtml::_('bootstrap.endAccordion');
+
+				JFactory::getDocument()->addScriptDeclaration("
+				(function($) {
+					$(document).ready(function ()
+					{
+						$('#" . $itemset_tagid . ($item_placement_std === 2 ? 'Tabs' : '') . "').on('shown', function ()
+						{
+							var fcMods_conf = fclib_getCookie('" . $cookie_name ."');
+							try { fcMods_conf = JSON.parse(fcMods_conf); } catch(e) { fcMods_conf = {}; }
+
+							fcMods_conf['" . $module->id ."'] = fcMods_conf['" . $module->id ."'] || {};
+							fcMods_conf['" . $module->id ."']['active_tagids_std'] = fcMods_conf['" . $module->id ."']['active_tagids_std'] || {};
+							" . ($item_placement_std === 2
+								? "fcMods_conf['" . $module->id ."']['active_tagids_std']['" . $itemset_tagid . "'] = $('#" . $itemset_tagid . "Tabs').next().find('.active').attr('id');"
+								: "fcMods_conf['" . $module->id ."']['active_tagids_std']['" . $itemset_tagid . "'] = $('#" . $itemset_tagid . " .in').attr('id');") . "
+							fclib_setCookie('" . $cookie_name ."', JSON.stringify(fcMods_conf), 7);
+							window.console.log(JSON.stringify(fcMods_conf));
+						});
+
+						$('#" . $itemset_tagid . ($item_placement_std === 2 ? 'Tabs' : '') . "').on('hidden', function ()
+						{
+							var fcMods_conf = fclib_getCookie('" . $cookie_name ."');
+							try { fcMods_conf = JSON.parse(fcMods_conf); } catch(e) { fcMods_conf = {}; }
+
+							fcMods_conf['" . $module->id ."'] = fcMods_conf['" . $module->id ."'] || {};
+							fcMods_conf['" . $module->id ."']['active_tagids_std'] = fcMods_conf['" . $module->id ."']['active_tagids_std'] || {};
+							fcMods_conf['" . $module->id ."']['active_tagids_std']['" . $itemset_tagid . "'] = null;
+							fclib_setCookie('" . $cookie_name ."', JSON.stringify(fcMods_conf), 7);
+							window.console.log(JSON.stringify(fcMods_conf));
+						});
+
+						var fcMods_conf = fclib_getCookie('" . $cookie_name ."');
+						try { fcMods_conf = JSON.parse(fcMods_conf); } catch(e) { fcMods_conf = {}; }
+
+						fcMods_conf['" . $module->id ."'] = fcMods_conf['" . $module->id ."'] || {};
+						fcMods_conf['" . $module->id ."']['active_tagids_std'] = fcMods_conf['" . $module->id ."']['active_tagids_std'] || {};
+
+						if (!!fcMods_conf['" . $module->id ."']['active_tagids_std']['" . $itemset_tagid . "'])
+						{
+							// Hide default active slide
+							$('#" . $itemset_tagid ." .collapse').removeClass('in');
+
+							// Show the last active slide
+							$('#' + fcMods_conf['" . $module->id ."']['active_tagids_std']['" . $itemset_tagid . "']).addClass('in');
+						}
+					});
+				})(jQuery);
+				");
+			}
+			?>
 		</div>
 
 		<!-- EOF DIV mod_flexicontent_standard (standard items) -->

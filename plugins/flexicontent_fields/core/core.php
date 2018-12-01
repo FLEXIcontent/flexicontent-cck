@@ -182,15 +182,20 @@ class plgFlexicontent_fieldsCore extends FCField
 		{
 			//if (!is_object($_field)) echo $item->id." - ".$_field ."<br/>";
 			if (is_object($_field))
+			{
 				$field = $_field;
-
-			else if (!empty($item->fields))
+			}
+			elseif (!empty($item->fields))
+			{
 				$field = $item->fields[$_field];
+			}
+			else
+			{
+				// Item with no type ?
+				continue;
+			}
 
-			else continue;   // Item with no type ?
-
-			if($field->iscore != 1) continue;
-			$field->item_id = $item->id;
+			$field->item_id    = $item->id;
 			$field->item_title = $item->title;
 
 			// Replace item properties or values of other fields
@@ -482,7 +487,7 @@ class plgFlexicontent_fieldsCore extends FCField
 				}
 
 				// Create field's HTML
-				$field->html = flexicontent_html::ItemVote( $field, 'all', $vote );
+				$field->html = flexicontent_html::ItemVote($field, 'all', $vote);
 				break;
 		}
 	}
