@@ -3830,7 +3830,7 @@ class flexicontent_html
 	 * @param int or string 	$xid
 	 * @since 1.0
 	 */
-	static function ItemVoteDisplay( &$field, $id, $rating_sum, $rating_count, $xid, $xiddata='', $stars_override=0, $allow_vote=true, $vote_counter='default', $counter_show_label=true, $add_review_form=0, $xids=array(), $review_type='item' )
+	static function ItemVoteDisplay($field, $id, $rating_sum, $rating_count, $xid, $xiddata='', $stars_override=0, $allow_vote=true, $vote_counter='default', $counter_show_label=true, $add_review_form=0, $xids=array(), $review_type='item')
 	{
 		static $acclvl_names  = null;
 		static $star_tooltips = null;
@@ -3844,7 +3844,7 @@ class flexicontent_html
 		if (!is_object($xiddata))
 		{
 			$label = $xiddata;
-			$desc = '';
+			$desc  = '';
 		}
 
 		// Label & description
@@ -3941,10 +3941,11 @@ class flexicontent_html
 			$counter = (int) $field->parameters->get($int_xid ? 'extra_counter' : 'main_counter', 1);
 		}
 
-		// Display info e.g. counter if unrated, TODO add parameter
-		$show_unrated = (int) $field->parameters->get('show_unrated', 0);
-		$show_percentage = (int) $field->parameters->get($int_xid ? 'extra_counter_show_percentage' : 'main_counter_show_percentage', 0);
 		$class = $field->name . '-row';
+
+		// Display info e.g. counter if unrated, TODO add parameter
+		$show_unrated    = (int) $field->parameters->get('show_unrated', 0);
+		$show_percentage = (int) $field->parameters->get($int_xid ? 'extra_counter_show_percentage' : 'main_counter_show_percentage', 0);
 
 		// Get number of displayed stars, configuration
 		$rating_resolution = (int)$field->parameters->get('rating_resolution', 5);

@@ -517,25 +517,34 @@ class modFlexicontentHelper
 					$lists[$ord]['featured'][$i]->image_h	= $_thumb_h;
 					$lists[$ord]['featured'][$i]->hits	= $row->hits;
 					$lists[$ord]['featured'][$i]->hits_rendered = '';
-					if ($display_hits_feat && $has_access_hits) {
+
+					if ($display_hits_feat && $has_access_hits)
+					{
 						FlexicontentFields::loadFieldConfig($hitsfield, $row);
 						$lists[$ord]['featured'][$i]->hits_rendered .= $params->get('hits_label_feat') ? '<span class="hits_label_feat">'.JText::_($hitsfield->label).'</span> ' : '';
 						$lists[$ord]['featured'][$i]->hits_rendered .= $hits_icon;
 						$lists[$ord]['featured'][$i]->hits_rendered .= ' ('.$row->hits.(!$params->get('hits_label_feat') ? ' '.JTEXT::_('FLEXI_HITS_L') : '').')';
 					}
+
 					$lists[$ord]['featured'][$i]->voting = '';
-					if ($display_voting_feat && $has_access_voting) {
+
+					if ($display_voting_feat && $has_access_voting)
+					{
 						FlexicontentFields::loadFieldConfig($votingfield, $row);
-						$votingfield->item = $row;
+						$votingfield->item_id    = $row->id;
+						$votingfield->item_title = $row->title;
 						$lists[$ord]['featured'][$i]->voting .= $params->get('voting_label_feat') ? '<span class="voting_label_feat">'.JText::_($votingfield->label).'</span> ' : '';
-						$lists[$ord]['featured'][$i]->voting .= '<div class="voting_value_feat">' . flexicontent_html::ItemVoteDisplay( $votingfield, $row->id, $row->rating_sum, $row->rating_count, 'main', '', $params->get('vote_stars_feat',1), $params->get('allow_vote_feat',0), $params->get('vote_counter_feat',1), !$params->get('voting_label_feat') ) .'</div>';
+						$lists[$ord]['featured'][$i]->voting .= '<div class="voting_value_feat">' . flexicontent_html::ItemVoteDisplay($votingfield, $row->id, $row->rating_sum, $row->rating_count, 'main', '', $params->get('vote_stars_feat',1), $params->get('allow_vote_feat',0), $params->get('vote_counter_feat',1), !$params->get('voting_label_feat') ) .'</div>';
 					}
-					if ($display_comments_feat) {
+
+					if ($display_comments_feat)
+					{
 						$lists[$ord]['featured'][$i]->comments = $row->comments_total;
 						$lists[$ord]['featured'][$i]->comments_rendered = $params->get('comments_label_feat') ? '<span class="comments_label_feat">'.JText::_('FLEXI_COMMENTS').'</span> ' : '';
 						$lists[$ord]['featured'][$i]->comments_rendered .= $comments_icon;
 						$lists[$ord]['featured'][$i]->comments_rendered .= ' ('.$row->comments_total.(!$params->get('comments_label_feat') ? ' '.JTEXT::_('FLEXI_COMMENTS_L') : '').')';
 					}
+
 					$lists[$ord]['featured'][$i]->catid = $row->catid;
 					$lists[$ord]['featured'][$i]->itemcats = explode("," , $row->itemcats);
 
@@ -687,19 +696,26 @@ class modFlexicontentHelper
 						$lists[$ord]['standard'][$i]->hits_rendered .= $hits_icon;
 						$lists[$ord]['standard'][$i]->hits_rendered .= ' ('.$row->hits.(!$params->get('hits_label') ? ' '.JTEXT::_('FLEXI_HITS_L') : '').')';
 					}
+
 					$lists[$ord]['standard'][$i]->voting = '';
-					if ($display_voting && $has_access_voting) {
+
+					if ($display_voting && $has_access_voting)
+					{
 						FlexicontentFields::loadFieldConfig($votingfield, $row);
-						$votingfield->item = $row;
+						$votingfield->item_id    = $row->id;
+						$votingfield->item_title = $row->title;
 						$lists[$ord]['standard'][$i]->voting .= $params->get('voting_label') ? '<span class="voting_label">'.JText::_($votingfield->label).'</span> ' : '';
-						$lists[$ord]['standard'][$i]->voting .= '<div class="voting_value">' . flexicontent_html::ItemVoteDisplay( $votingfield, $row->id, $row->rating_sum, $row->rating_count, 'main', '', $params->get('vote_stars',1), $params->get('allow_vote',0), $params->get('vote_counter',1), !$params->get('voting_label')) .'</div>';
+						$lists[$ord]['standard'][$i]->voting .= '<div class="voting_value">' . flexicontent_html::ItemVoteDisplay($votingfield, $row->id, $row->rating_sum, $row->rating_count, 'main', '', $params->get('vote_stars',1), $params->get('allow_vote',0), $params->get('vote_counter',1), !$params->get('voting_label')) .'</div>';
 					}
-					if ($display_comments) {
+
+					if ($display_comments)
+					{
 						$lists[$ord]['standard'][$i]->comments = $row->comments_total;
 						$lists[$ord]['standard'][$i]->comments_rendered = $params->get('comments_label') ? '<span class="comments_label">'.JText::_('FLEXI_COMMENTS').'</span> ' : '';
 						$lists[$ord]['standard'][$i]->comments_rendered .= $comments_icon;
 						$lists[$ord]['standard'][$i]->comments_rendered .= ' ('.$row->comments_total.(!$params->get('comments_label') ? ' '.JTEXT::_('FLEXI_COMMENTS_L') : '').')';
 					}
+
 					$lists[$ord]['standard'][$i]->catid = $row->catid;
 					$lists[$ord]['standard'][$i]->itemcats = explode("," , $row->itemcats);
 
