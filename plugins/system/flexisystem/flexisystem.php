@@ -1867,7 +1867,7 @@ class plgSystemFlexisystem extends JPlugin
 		// *** Handle syncing permissions between com_content and com_flexicontent assets
 		// ***
 
-		if ( $context=='com_config.component' && ($option == 'com_content' || $option == 'com_flexicontent') )
+		if ($context === 'com_config.component' && ($option === 'com_content' || $option === 'com_flexicontent'))
 		{
 			$rules_arr = @ $_POST['jform']['rules'];
 			$option_other = $option == 'com_content'  ?  'com_flexicontent'  :  'com_content';
@@ -1941,7 +1941,7 @@ class plgSystemFlexisystem extends JPlugin
 		// ***
 
 		// Check for com_modules context
-		if ($context=='com_modules.module' || $context=='com_advancedmodules.module' || substr($context, 0, 10) === "com_falang")
+		if ($context === 'com_modules.module' || $context === 'com_advancedmodules.module' || substr($context, 0, 10) === 'com_falang')
 		{
 			// Check for non-empty layout parameter
 			$layout = $_POST['jform']['params']['layout'];
@@ -2431,6 +2431,12 @@ class plgSystemFlexisystem extends JPlugin
 	 */
 	public function onContentBeforeSave($context, $item, $isNew, $data = array())
 	{
+		// Workaround for wrong event triggering bug in Advanced module manager 7.x (up to at least version 7.9.2)
+		if ($context === 'com_advancedmodules.module')
+		{
+			return $this->onExtensionBeforeSave($context, $item, $isNew);
+		}
+
 		if (($context !== 'com_content.article' && $context !== 'com_content.form') || JFactory::getApplication()->input->get('isflexicontent', false, 'CMD'))
 		{
 			return true;
@@ -2481,6 +2487,12 @@ class plgSystemFlexisystem extends JPlugin
 	 */
 	public function onContentAfterSave($context, $item, $isNew, $data = array())
 	{
+		// Workaround for wrong event triggering bug in Advanced module manager 7.x (up to at least version 7.9.2)
+		if ($context === 'com_advancedmodules.module')
+		{
+			return $this->onExtensionAfterSave($context, $item, $isNew);
+		}
+
 		if (($context !== 'com_content.article' && $context !== 'com_content.form') || JFactory::getApplication()->input->get('isflexicontent', false, 'CMD'))
 		{
 			return true;
