@@ -296,7 +296,7 @@
 		<fieldset name="group-addressint-config" hidden="true" icon_class="icon-key" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MAP_PROVIDER" addfieldpath="/administrator/components/com_flexicontent/elements">
 
 			<field name="" type="separator" default="FLEXI_FIELD_EDITING" level="level2" />
-			<field name="google_maps_js_api_key" type="text" default="" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_GOOGLE_MAPS_API_KEY_EDITING" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_GOOGLE_MAPS_API_KEY_EDITING_DESC" required="true"/>
+			<field name="google_maps_js_api_key" type="text" default="" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_GOOGLE_MAPS_API_KEY_EDITING" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_GOOGLE_MAPS_API_KEY_EDITING_DESC" />
 			<field name="" type="separator" default="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_GOOGLE_MAPS_GET_API_KEY_INFO" level="level3" class="alert alert-success"/>
 
 			<field name="" type="separator" default="FLEXI_FIELD_VIEWING" level="level2" />

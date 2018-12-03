@@ -267,8 +267,15 @@ $container_id = $module->id . (count($catdata_arr) > 1 && $catdata ? '_' . $catd
 
 	<?php if (isset($list[$ord]['featured'])) : ?>
 
-		<?php	$rowcount = 0; ?>
+		<?php
+		$rowcount = 0;
+		$item_ids_index = array();
 
+		foreach ($list[$ord]['featured'] as $item)
+		{
+			$item_ids_index[$item->id] = 1;
+		}
+		?>
 
 		<!-- BOF DIV mod_flexicontent_featured (featured items) -->
 
@@ -284,6 +291,13 @@ $container_id = $module->id . (count($catdata_arr) > 1 && $catdata ? '_' . $catd
 
 				$last_active_tagid = isset($active_tagids_feat->$itemset_tagid)
 					? $active_tagids_feat->$itemset_tagid
+					: $itemset_tagid . '_' . $first_item->id;
+
+				$tagid_parts = explode('_', $last_active_tagid);
+				$activated_itemid = end($tagid_parts);
+
+				$last_active_tagid = isset($item_ids_index[$activated_itemid])
+					? $last_active_tagid
 					: $itemset_tagid . '_' . $first_item->id;
 
 				echo $item_placement_feat === 2
@@ -542,8 +556,15 @@ $container_id = $module->id . (count($catdata_arr) > 1 && $catdata ? '_' . $catd
 
 	<?php if (isset($list[$ord]['standard'])) : ?>
 
-		<?php	$rowcount = 0; ?>
+		<?php
+		$rowcount = 0;
+		$item_ids_index = array();
 
+		foreach ($list[$ord]['standard'] as $item)
+		{
+			$item_ids_index[$item->id] = 1;
+		}
+		?>
 
 		<!-- BOF DIV mod_flexicontent_standard (standard items) -->
 
@@ -559,6 +580,13 @@ $container_id = $module->id . (count($catdata_arr) > 1 && $catdata ? '_' . $catd
 
 				$last_active_tagid = isset($active_tagids_std->$itemset_tagid)
 					? $active_tagids_std->$itemset_tagid
+					: $itemset_tagid . '_' . $first_item->id;
+
+				$tagid_parts = explode('_', $last_active_tagid);
+				$activated_itemid = end($tagid_parts);
+
+				$last_active_tagid = isset($item_ids_index[$activated_itemid])
+					? $last_active_tagid
 					: $itemset_tagid . '_' . $first_item->id;
 
 				echo $item_placement_std === 2
