@@ -50,20 +50,32 @@ class FlexicontentControllerImport extends FlexicontentControllerBaseAdmin
 	}
 
 
-	function processcsv()
+	/**
+	 * Execute the import task, display a log-like AJAX-based layout,
+	 * to display results including any warnings
+	 * LAYOUT: -- import_process.php --
+	 *
+	 * @return void
+	 *
+	 * @since 3.3
+	 */
+	public function processcsv()
 	{
 		parent::display();
 	}
 
 
 	/**
-	 * Logic to import csv files with content item data
+	 * Logic to handle various tasks for importing csv files with content item data
+	 * These run before the final "processcsv" task that will create the content items
 	 *
-	 * @access public
+	 * TODO: move code parts to helper methods
+	 *
 	 * @return void
-	 * @since 1.5
+	 *
+	 * @since 3.3
 	 */
-	function importcsv()
+	public function importcsv()
 	{
 		$app = JFactory::getApplication();
 		$jinput = $app->input;
@@ -343,11 +355,16 @@ class FlexicontentControllerImport extends FlexicontentControllerBaseAdmin
 
 				$conf['columns'] = flexicontent_html::arrayTrim($contents[0]);
 				unset($contents[0]);
-				$q = 'SELECT id, name, field_type, label FROM #__flexicontent_fields AS fi'
-					. ' JOIN #__flexicontent_fields_type_relations AS ftrel ON ftrel.field_id = fi.id AND ftrel.type_id=' . $conf['type_id'];
-				$db->setQuery($q);
-				$conf['custom_fields'] = $db->loadObjectList('name');
-				unset($conf['custom_fields']['tags']); // Prevent Automated Raw insertion of tags, we will use special code
+
+				$q = $db->getQuery(true)
+					->select('fi.*')
+					->from('#__flexicontent_fields AS fi')
+					->join('INNER', '#__flexicontent_fields_type_relations AS ftrel ON ftrel.field_id = fi.id AND ftrel.type_id = ' . (int) $conf['type_id'])
+					;
+				$conf['custom_fields'] = $db->setQuery($q)->loadObjectList('name');
+
+				// Prevent automated raw insertion of tags, we will use special code
+				unset($conf['custom_fields']['tags']);
 
 				// ***
 				// *** Check for REQUIRED columns and decide CORE property columns to use
@@ -734,11 +751,42 @@ class FlexicontentControllerImport extends FlexicontentControllerBaseAdmin
 			$data['access']  = $conf['access'];
 
 			// Prepare request variable used by the item's Model
-			if ($task != 'testcsv')
+			if ($task !== 'testcsv')
 			{
+				$q = $db->getQuery(true)
+					->select('fi.*')
+					->from('#__flexicontent_fields AS fi')
+					->join('INNER', '#__flexicontent_fields_type_relations AS ftrel ON ftrel.field_id = fi.id AND ftrel.type_id = ' . (int) $conf['type_id'])
+					;
+				$custom_fields = $db->setQuery($q)->loadObjectList('name');
+
+				$_item = (object) array('type_id' => $conf['type_id']);
+
+				foreach($custom_fields as $field)
+				{
+					FlexicontentFields::loadFieldConfig($field, $_item);
+				}
+
+
+				/**
+				 * Assign field values to appropriates index of $data array
+				 * so that they are used for binding / and by custom field saving
+				 */
 				foreach ($_d as $fieldname => $field_values)
 				{
-					if ($fieldname == 'tags_names')
+					// Manipulate the imported field values according to fields configuration (Pro feature)
+					if (isset($custom_fields[$fieldname]))
+					{
+						$errors = null;
+						$field_values = $this->manipulateImportFieldValues($custom_fields[$fieldname], $field_values, $errors);
+
+						foreach ($errors as $err)
+						{
+							echo '<div>' . $err . '</div>';
+						}
+					}
+
+					if ($fieldname === 'tags_names')
 					{
 						if ($conf['tags_col'] == 1)
 						{
@@ -782,7 +830,7 @@ class FlexicontentControllerImport extends FlexicontentControllerBaseAdmin
 						}
 					}
 
-					elseif ($fieldname == 'tags_raw')
+					elseif ($fieldname === 'tags_raw')
 					{
 						if ($conf['tags_col'] == 2)
 						{
@@ -804,12 +852,12 @@ class FlexicontentControllerImport extends FlexicontentControllerBaseAdmin
 						$data[$fieldname] = $field_values;
 					}
 
-					elseif ($fieldname == 'attribs')
+					elseif ($fieldname === 'attribs')
 					{
 						$data['attribs'] = $field_values;
 					}
 
-					elseif ($fieldname == 'metadata')
+					elseif ($fieldname === 'metadata')
 					{
 						$data['metadata'] = $field_values;
 					}
@@ -973,37 +1021,36 @@ class FlexicontentControllerImport extends FlexicontentControllerBaseAdmin
 				if (in_array($conf['id_col'], array(1, 2)) && $c_item_id && $isNew)
 				{
 					$item_id = $itemmodel->getId();
-					$q = "UPDATE #__content SET id='" . $c_item_id . "' WHERE id='" . $item_id . "'";
-					$db->setQuery($q);
-					$db->execute();
-					$q = "UPDATE #__flexicontent_items_ext SET item_id='" . $c_item_id . "' WHERE item_id='" . $item_id . "'";
-					$db->setQuery($q);
-					$db->execute();
-					$q = "UPDATE #__flexicontent_items_tmp SET id='" . $c_item_id . "' WHERE id='" . $item_id . "'";
-					$db->setQuery($q);
-					$db->execute();
-					$q = "UPDATE #__flexicontent_tags_item_relations SET itemid='" . $c_item_id . "' WHERE itemid='" . $item_id . "'";
-					$db->setQuery($q);
-					$db->execute();
-					$q = "UPDATE #__flexicontent_cats_item_relations SET itemid='" . $c_item_id . "' WHERE itemid='" . $item_id . "'";
-					$db->setQuery($q);
-					$db->execute();
-					$q = "UPDATE #__flexicontent_fields_item_relations SET item_id='" . $c_item_id . "' WHERE item_id='" . $item_id . "'";
-					$db->setQuery($q);
-					$db->execute();
-					$q = "UPDATE #__flexicontent_items_versions SET item_id='" . $c_item_id . "' WHERE item_id='" . $item_id . "'";
-					$db->setQuery($q);
-					$db->execute();
-					$q = "UPDATE #__flexicontent_versions SET item_id='" . $c_item_id . "' WHERE item_id='" . $item_id . "'";
-					$db->setQuery($q);
-					$db->execute();
-					$q = "UPDATE #__flexicontent_favourites SET itemid='" . $c_item_id . "' WHERE itemid='" . $item_id . "'";
-					$db->setQuery($q);
-					$db->execute();
 
-					$q = "UPDATE #__assets SET id='" . $c_item_id . "' WHERE id='" . $item_id . "'";
-					$db->setQuery($q);
-					$db->execute();
+					$q = "UPDATE #__content SET id='" . (int) $c_item_id . "' WHERE id='" . (int) $item_id . "'";
+					$db->setQuery($q)->execute();
+
+					$q = "UPDATE #__flexicontent_items_ext SET item_id='" . (int) $c_item_id . "' WHERE item_id='" . (int) $item_id . "'";
+					$db->setQuery($q)->execute();
+
+					$q = "UPDATE #__flexicontent_items_tmp SET id='" . (int) $c_item_id . "' WHERE id='" . (int) $item_id . "'";
+					$db->setQuery($q)->execute();
+
+					$q = "UPDATE #__flexicontent_tags_item_relations SET itemid='" . (int) $c_item_id . "' WHERE itemid='" . (int) $item_id . "'";
+					$db->setQuery($q)->execute();
+
+					$q = "UPDATE #__flexicontent_cats_item_relations SET itemid='" . (int) $c_item_id . "' WHERE itemid='" . (int) $item_id . "'";
+					$db->setQuery($q)->execute();
+
+					$q = "UPDATE #__flexicontent_fields_item_relations SET item_id='" . (int) $c_item_id . "' WHERE item_id='" . (int) $item_id . "'";
+					$db->setQuery($q)->execute();
+
+					$q = "UPDATE #__flexicontent_items_versions SET item_id='" . (int) $c_item_id . "' WHERE item_id='" . (int) $item_id . "'";
+					$db->setQuery($q)->execute();
+
+					$q = "UPDATE #__flexicontent_versions SET item_id='" . (int) $c_item_id . "' WHERE item_id='" . (int) $item_id . "'";
+					$db->setQuery($q)->execute();
+
+					$q = "UPDATE #__flexicontent_favourites SET itemid='" . (int) $c_item_id . "' WHERE itemid='" . (int) $item_id . "'";
+					$db->setQuery($q)->execute();
+
+					$q = "UPDATE #__assets SET id='" . (int) $c_item_id . "' WHERE id='" . (int) $item_id . "'";
+					$db->setQuery($q)->execute();
 				}
 			}
 		}
@@ -1042,8 +1089,17 @@ class FlexicontentControllerImport extends FlexicontentControllerBaseAdmin
 	}
 
 
-	function checkfiles(&$conf, &$parse_log, &$task)
+	/**
+	 * Logic to check existence of files that will be assigned to created items
+	 *
+	 * @return void
+	 *
+	 * @since 3.3
+	 */
+	protected function checkfiles(&$conf, &$parse_log, &$task)
 	{
+		$this->input->get('task', '', 'cmd') !== __FUNCTION__ or die(__FUNCTION__ . ' : direct call not allowed');
+
 		$app = JFactory::getApplication();
 		$jinput = $app->input;
 
@@ -1202,8 +1258,17 @@ class FlexicontentControllerImport extends FlexicontentControllerBaseAdmin
 	}
 
 
-	function parsevalues(&$conf, &$parse_log, &$task)
+	/**
+	 * Logic to parse field values strings, splitting every string to multiple values and possibly every value to multiple properties
+	 *
+	 * @return void
+	 *
+	 * @since 3.3
+	 */
+	protected function parsevalues(&$conf, &$parse_log, &$task)
 	{
+		$this->input->get('task', '', 'cmd') !== __FUNCTION__ or die(__FUNCTION__ . ' : direct call not allowed');
+
 		$colcount = count($conf['columns']);
 		$conf['contents_parsed'] = array();
 
@@ -1395,4 +1460,51 @@ class FlexicontentControllerImport extends FlexicontentControllerBaseAdmin
 		}
 	}
 
+
+	/**
+	 * Logic to manipulate the imported field values according to fields configuration (Pro feature)
+	 *
+	 * @return void
+	 *
+	 * @since 3.3
+	 */
+	protected function manipulateImportFieldValues($field, $values, & $errors)
+	{
+		$this->input->get('task', '', 'cmd') !== __FUNCTION__ or die(__FUNCTION__ . ' : direct call not allowed');
+
+		static $plg = null;
+
+		// Create a plugin instance if not already created
+		if ($plg === null)
+		{
+			$extfolder = 'system';
+			$extname   = 'flexisyspro';
+			$className = 'plg' . ucfirst($extfolder) . $extname;
+			$plgPath   = JPATH_SITE . '/plugins/'.$extfolder.'/'.$extname.'/'.$extname.'.php';
+
+			if (!file_exists($plgPath))
+			{
+				$plg = false;
+			}
+
+			// Create plugin instance
+			else
+			{
+				$dispatcher   = JEventDispatcher::getInstance();
+				$plg_db_data  = JPluginHelper::getPlugin($extfolder, $extname);
+
+				$plg = new $className($dispatcher, array(
+					'type'   => $extfolder,
+					'name'   => $extname,
+					'params' => $plg_db_data->params,
+				));
+			}
+		}
+
+		$errors = array();
+
+		return $plg
+			? $plg->manipulateImportFieldValues($field, $values, $errors)
+			: $values;
+	}
 }

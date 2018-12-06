@@ -156,6 +156,25 @@
 			<field name="opentag_form" type="text" default="" label="FLEXI_FIELD_OPENING_TEXT" description="FLEXI_FIELD_OPENING_TEXT_DESC" />
 			<field name="closetag_form" type="text" default="" label="FLEXI_FIELD_CLOSING_TEXT" description="FLEXI_FIELD_CLOSING_TEXT_DESC" />
 
+			<field name="" type="separator" default="FLEXI_IMPORT" description="" icon_class="icon-upload" level="tab_open" box_type="1" />
+
+			<field name="" type="separator" default="FLEXI_FIELDS_IMPORT_MANIPULATE_VALUES_DURING_IMPORT" level="level2" />
+			<field name="" type="separator" default="FLEXI_FC_PRO_ONLY_INFO" level="level4" class="alert alert-warning fcpadded" />
+
+			<field name="import_fv_remap_mode" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_FIELDS_IMPORT_REMAP_VALUES" description="FLEXI_FIELDS_IMPORT_REMAP_VALUES_DESC" class="btn-group group-fcmethod">
+				<option value="0" hide_list="import-remap">FLEXI_NO</option>
+				<option value="1" show_list="import-remap">FLEXI_YES</option>
+			</field>
+			<field name="import_fv_remap" type="textarea" label="FLEXI_FIELDS_IMPORT_VALUE_REMAPPINGS" description="FLEXI_FIELDS_IMPORT_VALUE_REMAPPINGS_DESC" depend_class="import-remap" />
+
+			<field name="import_fv_ccode_mode" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_FIELDS_IMPORT_VALUES_MANIPULATION" description="FLEXI_FIELDS_IMPORT_VALUES_MANIPULATION_DESC" class="btn-group group-fcmethod">
+				<option value="0" hide_list="import-ccode">FLEXI_NO</option>
+				<option value="2" show_list="import-ccode">FLEXI_USE_CUSTOM_CODE</option>
+			</field>
+			<field name="import_fv_ccode" type="editor" editor="codemirror" syntax="php" rows="4" cols="80" height="100px" class="fc-unset-width" filter="RAW"
+				default="&lt;?php&#13;&#10;$some_param = $field->parameters->get('some_param');&#13;&#10;&#13;&#10;foreach($values as $i => $v)&#13;&#10;{&#13;&#10;  $values[$i] = 'Example ' .  $i . ' : ' . $v;&#13;&#10;}&#13;&#10;&#13;&#10;return $values;"
+				label="FLEXI_CREATE_VIA_CUSTOM_CODE" description="FLEXI_CREATE_VIA_CUSTOM_CODE_DESC" depend_class="import-ccode" />
+
 			<field name="" type="separator" default="FLEXI_FIELD_EDITING" level="tabset_close" box_type="1" />
 		</fieldset>
 

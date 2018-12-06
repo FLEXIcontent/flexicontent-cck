@@ -1729,9 +1729,18 @@ class FlexicontentFields
 		}
 
 		static $is_form=null;
+
 		if ($is_form===null)
 		{
-			$is_form = $app->input->get('task', '', 'cmd')=='edit' && $app->input->get('option', '', 'cmd')=='com_flexicontent';
+			$is_form = (
+				in_array($app->input->getCmd('task', ''), array('add', 'edit')) &&
+				$app->input->getCmd('view', '') === 'item' &&
+				$app->input->getCmd('option', '') === 'com_flexicontent'
+			) || (
+				$app->input->getCmd('layout', '') === 'form' &&
+				$app->input->getCmd('view', '') === 'article' &&
+				$app->input->getCmd('option', '') === 'com_content'
+			);
 		}
 
 		// Create basic field data if no field given

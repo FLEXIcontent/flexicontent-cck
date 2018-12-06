@@ -3653,14 +3653,19 @@ class flexicontent_html
 		if (!$tooltip_class)
 		{
 			$tooltip_class = ' hasTooltip';
-			$show_icons = $params->get('show_icons');
-			if ( $show_icons ) {
+			$show_icons = (int) $params->get('show_icons');
+
+			if ($show_icons)
+			{
 				$voteup = JHtml::image('components/com_flexicontent/assets/images/'.'thumb_up.png', JText::_( 'FLEXI_GOOD' ), NULL);
 				$votedown = JHtml::image('components/com_flexicontent/assets/images/'.'thumb_down.png', JText::_( 'FLEXI_BAD' ), NULL);
-			} else {
+			}
+			else
+			{
 				$voteup = JText::_( 'FLEXI_GOOD' ). '&nbsp;';
 				$votedown = '&nbsp;'.JText::_( 'FLEXI_BAD' );
 			}
+
 			$tip_vote_up = flexicontent_html::getToolTip('FLEXI_VOTE_UP', 'FLEXI_VOTE_UP_TIP', 1, 1);
 			$tip_vote_down = flexicontent_html::getToolTip('FLEXI_VOTE_DOWN', 'FLEXI_VOTE_DOWN_TIP', 1, 1);
 		}
