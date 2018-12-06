@@ -15,21 +15,21 @@
 		<filename>index.html</filename>
 		<folder>tmpl</folder>
 	</files>
-	
+
 	<config>
 	<fields name="attribs">
-		
+
 		<fieldset name="group-textarea-editing" hidden="true" icon_class="icon-pencil" label="FLEXI_FIELD_EDITING" addfieldpath="/administrator/components/com_flexicontent/elements">
-			
+
 			<field name="" type="separator" default="FLEXI_FIELD_EDITING" level="tabset_start" box_type="1" />
 
 			<field name="" type="separator" default="FLEXI_FIELD_VALUES" icon_class="icon-database" level="tab_open" box_type="1" />
-			
+
 			<field name="use_ingroup" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_USE_IN_FIELD_GROUP" description="FLEXI_USE_IN_FIELD_GROUP_DESC" inline_tip="FLEXI_USE_IN_FIELD_GROUP_INSTRUCTIONS" tip_class="fieldgroupon" tip_img="comments.png" preview_img="insert_merge_field.png" class="btn-group group-fcinfo">
 				<option value="0" show_list="fieldgroupoff" hide_list="fieldgroupon">FLEXI_NO</option>
 				<option value="1" show_list="fieldgroupon" hide_list="fieldgroupoff">FLEXI_YES</option>
 			</field>
-			
+
 			<field name="" type="separator" default="FLEXI_FIELD_NUMBER_OF_VALUES" description="" depend_class="fieldgroupoff" level="level2" />
 			<field name="allow_multiple" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_FIELD_ALLOW_MULTIPLE" description="FLEXI_FIELD_ALLOW_MULTIPLE_DESC" depend_class="fieldgroupoff" class="btn-group btn-group-yesno">
 				<option value="0" show_list="" hide_list="multivalue-mode">FLEXI_NO</option>
@@ -46,7 +46,7 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			
+
 			<field name="" type="separator" default="FLEXI_VALUE_CREATION_LABEL" level="level2" />
 			<field name="default_value" type="textarea" filter="raw" default="" label="FLEXI_PROPERTY_DEFAULT" description="FLEXI_PROPERTY_DEFAULT_DESC" />
 			<field name="default_value_use" type="list" default="0" label="FLEXI_OPTIONAL_PROPERTIES_DEFAULT_USAGE" description="FLEXI_OPTIONAL_PROPERTIES_DEFAULT_USAGE_DESC">
@@ -77,7 +77,7 @@
 				label="FLEXI_CREATE_VIA_CUSTOM_CODE" description="FLEXI_CREATE_VIA_CUSTOM_CODE_DESC" depend_class="auto-value-code"/>
 
 			<field name="" type="separator" default="FLEXI_FORM_FIELD_CONF" description="FLEXI_FORM_FIELD_CONF_DESC" icon_class="icon-checkbox-unchecked" level="tab_open" box_type="1" />
-			
+
 			<field name="display_label_form" type="multilist" subtype="radio" toggle_related="1" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC" class="btn-group btn-group-yesno">
 				<option value="0" show_list="custom_placeholder" hide_list="">FLEXI_NO</option>
 				<option value="1" show_list="custom_placeholder" hide_list="">FLEXI_FLOATED_LEFT</option>
@@ -89,14 +89,14 @@
 				<option value="1" show_list="using-html-editor" hide_list="using-plain-area">FLEXI_HTML_EDITOR</option>
 				<option value="0" show_list="using-plain-area" hide_list="using-html-editor">FLEXI_SIMPLE_TEXTAREA</option>
 			</field>
-			
-			
+
+
 			<field name="" type="separator" default="FLEXI_SIMPLE_TEXTAREA" description="FLEXI_SIMPLE_TEXTAREA_DESC" level="level2" depend_class="using-plain-area" />
 			<field name="placeholder" type="text" default="" label="FLEXI_FIELD_PLACEHOLDER" description="FLEXI_FIELD_PLACEHOLDER_DESC" depend_class="using-plain-area custom_placeholder" />
 			<field name="maxlength" type="text" default="" size="6" label="FLEXI_MAX_TXT_LEN" description="FLEXI_MAX_TXT_LEN_DESC" depend_class="using-plain-area" />
 			<field name="rows" type="text" default="3" size="3" label="FLEXI_FIELD_ROWS" description="FLEXI_FIELD_ROWS_DESC" />
 			<field name="cols" type="text" default="80" size="3" label="FLEXI_FIELD_COLS" description="FLEXI_FIELD_COLS_DESC" />
-			
+
 			<field name="" type="separator" default="FLEXI_HTML_EDITOR" description="FLEXI_HTML_EDITOR_DESC" level="level2" depend_class="using-html-editor" />
 			<field name="" type="separator" default="FLEXI_FIELD_ABOUT_USING_MULVALUE_WITH_JEDITORS" description="FLEXI_FIELD_ABOUT_USING_MULVALUE_WITH_JEDITORS_DESC" level="level4" class="alert alert-warning fcpadded fcinlineblock" depend_class="using-html-editor" />
 			<field name="" type="separator" default="FLEXI_FIELD_PREFER_DEFAULT_JEDITOR" description="FLEXI_FIELD_PREFER_DEFAULT_JEDITOR_DESC" level="level4" class="alert alert-warning fcpadded fcinlineblock" depend_class="using-html-editor" />
@@ -113,13 +113,30 @@
 			</field>
 			<field name="skip_buttons" type="pluginlist" plggroup="editors-xtd" default="" label="FLEXI_SKIP_EDITOR_BUTTONS_LIST" description="FLEXI_SKIP_EDITOR_BUTTONS_LIST_DESC" depend_class="using-html-editor using-editor-btns" />
 
+			<field name="" type="separator" default="FLEXI_IMPORT" description="" icon_class="icon-upload" level="tab_open" box_type="1" />
+
+			<field name="" type="separator" default="FLEXI_FIELDS_IMPORT_MANIPULATE_VALUES_DURING_IMPORT" level="level2" />
+			<field name="" type="separator" default="FLEXI_FC_PRO_ONLY_INFO" level="level4" class="alert alert-warning fcpadded" />
+
+			<field name="import_fv_remap_mode" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_FIELDS_IMPORT_REMAP_VALUES" description="FLEXI_FIELDS_IMPORT_REMAP_VALUES_DESC" class="btn-group group-fcmethod">
+				<option value="0" hide_list="import-remap">FLEXI_NO</option>
+				<option value="1" show_list="import-remap">FLEXI_YES</option>
+			</field>
+			<field name="import_fv_remap" type="textarea" label="FLEXI_FIELDS_IMPORT_VALUE_REMAPPINGS" description="FLEXI_FIELDS_IMPORT_VALUE_REMAPPINGS_DESC" depend_class="import-remap" />
+
+			<field name="import_fv_ccode_mode" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_FIELDS_IMPORT_VALUES_MANIPULATION" description="FLEXI_FIELDS_IMPORT_VALUES_MANIPULATION_DESC" class="btn-group group-fcmethod">
+				<option value="0" hide_list="import-ccode">FLEXI_NO</option>
+				<option value="2" show_list="import-ccode">FLEXI_USE_CUSTOM_CODE</option>
+			</field>
+			<field name="import_fv_ccode" type="editor" editor="codemirror" syntax="php" rows="4" cols="80" height="100px" class="fc-unset-width" filter="RAW"
+				default="&lt;?php&#13;&#10;$some_param = $field->parameters->get('some_param');&#13;&#10;&#13;&#10;foreach($values as $i => $v)&#13;&#10;{&#13;&#10;  $values[$i] = 'Example ' .  $i . ' : ' . $v;&#13;&#10;}&#13;&#10;&#13;&#10;return $values;"
+				label="FLEXI_CREATE_VIA_CUSTOM_CODE" description="FLEXI_CREATE_VIA_CUSTOM_CODE_DESC" depend_class="import-ccode" />
 
 			<field name="" type="separator" default="FLEXI_FIELD_EDITING" level="tabset_close" box_type="1" />
 		</fieldset>
 		<fieldset name="group-textarea-viewing" hidden="true" icon_class="icon-screen" label="FLEXI_FIELD_VIEWING" addfieldpath="/administrator/components/com_flexicontent/elements">
 
 			<field name="" type="separator" default="FLEXI_FIELD_VIEWING" level="tabset_start" box_type="1" />
-
 			<field name="" type="separator" default="FLEXI_BASIC" icon_class="icon-vcard" level="tab_open" box_type="1" />
 
 			<field name="" type="separator" default="FLEXI_FIELD_LABEL_AND_ACCESS" level="level2" />
@@ -145,7 +162,6 @@
 			</field>
 
 			<field name="" type="separator" default="FLEXI_LAYOUT" description="" icon_class="icon-file-2" level="tab_open" box_type="1" />
-
 			<field name="viewlayout" type="fcfilelist" default="" label="FLEXI_FIELD_SELECT_VIEW_LAYOUT" description="FLEXI_FIELD_SELECT_VIEW_LAYOUT_DESC" directory="plugins/flexicontent_fields/textarea/tmpl/" filter="value*" exclude="" stripext="1" stripprefix="value_" hide_none="1" hide_default="1" />
 
 			<field name="" type="separator" default="FLEXI_FIELD_VALUE_DISPLAY" level="level2" />
@@ -162,7 +178,7 @@
 				<option value="1">FLEXI_UNSAFE_HTML</option>
 				<option value="2">FLEXI_ALL_HTML</option>
 			</field>
-			
+
 			<field name="" type="separator" default="FLEXI_CATEGORY_VIEWS" level="level2" />
 			<field name="cut_text_catview" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_FIELD_STRIP_N_CUT" description="FLEXI_FIELD_STRIP_N_CUT_DESC" class="btn-group btn-group-yesno">
 				<option value="0" show_list="" hide_list="cut_text_catview">FLEXI_NO</option>
@@ -224,13 +240,13 @@
 			<field name="" type="separator" default="FLEXI_FIELD_VIEWING" level="tabset_close" box_type="1" />
 		</fieldset>
 		<fieldset name="group-textarea-seo" hidden="true" icon_class="icon-search" label="FLEXI_SEO" addfieldpath="/administrator/components/com_flexicontent/elements">
-		
+
 			<field name="" type="separator" default="FLEXI_MICRODATA_SUPPORT" description="FLEXI_MICRODATA_SUPPORT_DESC" level="level1" />
 			<field name="microdata_itemprop" type="microdataprops" label="FLEXI_MICRODATA_ITEMPROP" description="FLEXI_MICRODATA_ITEMPROP_DESC" />
-			
+
 		</fieldset>
 		<fieldset name="group-textarea-social" hidden="true" icon_class="icon-users" label="FLEXI_SOCIAL" addfieldpath="/administrator/components/com_flexicontent/elements">
-			
+
 			<field name="" type="separator" default="FLEXI_SOCIAL_SUPPORT" description="FLEXI_SOCIAL_SUPPORT_IMG_DESC" level="level1" />
 			<field name="useogp" type="multilist" subtype="radio" default="0" label="FLEXI_SOCIAL_SUGGEST_FIELD" description="FLEXI_SOCIAL_SUGGEST_TXT_DESC" toggle_related="1" class="btn-group btn-group-yesno">
 				<option value="0" show_list="" hide_list="social-mode">FLEXI_NO</option>
@@ -241,10 +257,10 @@
 				<option value="2">FLEXI_DESCRIPTION</option>
 			</field>
 			<field name="ogpmaxlen" type="text" default="300" label="FLEXI_SOCIAL_TXT_MAXLEN_LISTING" description="FLEXI_SOCIAL_TXT_MAXLEN_LISTING_DESC" depend_class="social-mode" />
-			
+
 		</fieldset>
 		<fieldset name="group-textarea-filtering" hidden="true" icon_class="icon-filter" label="FLEXI_FILTERING_CONF" description="FLEXI_FILTERING_CONF_DESC" addfieldpath="/administrator/components/com_flexicontent/elements">
-			
+
 			<field name="" type="separator" default="FLEXI_FILTERING" level="tabset_start" box_type="1" />
 			<field name="" type="separator" default="FLEXI_CATEGORY_BASED_VIEWS" icon_class="icon-list" level="tab_open" box_type="1" />
 
@@ -257,7 +273,7 @@
 			<field name="display_filter_as" type="multilist" default="0" label="FLEXI_DISPLAY_FILTER_AS" toggle_related="1" description="FLEXI_DISPLAY_FILTER_AS_DESC" class="use_select2_lib">
 				<option value="1" show_list="" hide_list="filt-drop-down,filt-as-slider">FLEXI_DISPLAY_AS_TEXT_SEARCH</option>
 			</field>
-			
+
 			<field name="" type="separator" default="FLEXI_ADVANCED_SEARCH_VIEW" icon_class="icon-list" level="tab_open" box_type="1" />
 			<field name="display_label_filter_s" type="radio" default="2" label="FLEXI_LABEL_FILTER_WITH_OVERRIDE" description="FLEXI_LABEL_FILTER_WITH_OVERRIDE_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
@@ -269,30 +285,30 @@
 			</field>
 
 			<field name="" type="separator" default="FLEXI_FILTERING" level="tabset_close" box_type="1" />
-			
+
 		</fieldset>
 		<fieldset name="group-textarea-tabulate" hidden="true" icon_class="icon-puzzle" label="Tabs (RegEx)" description="Split textarea into TABs via regular expression" addfieldpath="/administrator/components/com_flexicontent/elements">
-			
+
 			<field name="" type="separator" default="FLEXI_FIELD_TXTAREA_PARSE_JOOMLA_TABS_PLUGIN_CODE" description="" level="level1" />
-			
+
 			<field name="editorarea_per_tab" type="multilist" subtype="radio" default="0" label="FLEXI_ENABLE" toggle_related="1" description="Enable to try to identify TABs via regex patterns" class="btn-group btn-group-yesno">
 				<option value="0" show_list="" hide_list="textarea-tabs-mod">FLEXI_NO</option>
 				<option value="1" show_list="textarea-tabs-mod" hide_list="">FLEXI_YES</option>
 			</field>
-			
+
 			<field name="" type="separator" default="FLEXI_FIELD_TXTAREA_REGULAR_EXPRESSION_PATTERNS" depend_class="textarea-tabs-mod" description="" level="level2" />
-			
+
 			<field name="" type="separator" default="FLEXI_FIELD_TXTAREA_TABSET_PATTERNS" depend_class="textarea-tabs-mod" description="" level="level3" />
 			<field name="start_of_tabs_pattern" type="text" default="" size="56" label="FLEXI_FIELD_TXTAREA_TABSET_START_PATTERN" description="FLEXI_FIELD_TXTAREA_REGEXP_PLG_CODE" depend_class="textarea-tabs-mod" />
 			<field name="end_of_tabs_pattern" type="text" default="" size="56" label="FLEXI_FIELD_TXTAREA_TABSET_END_PATTERN" description="FLEXI_FIELD_TXTAREA_REGEXP_PLG_CODE" depend_class="textarea-tabs-mod" />
-			
+
 			<field name="" type="separator" default="FLEXI_FIELD_TXTAREA_TAB_PATTERNS" depend_class="textarea-tabs-mod" description="" level="level3" />
 			<field name="start_of_tab_pattern" type="text" default="" size="56" label="FLEXI_FIELD_TXTAREA_TAB_START_PATTERN" description="FLEXI_FIELD_TXTAREA_REGEXP_PLG_CODE" depend_class="textarea-tabs-mod" />
 			<field name="end_of_tab_pattern" type="text" default="" size="56" label="FLEXI_FIELD_TXTAREA_TAB_END_PATTERN" description="FLEXI_FIELD_TXTAREA_REGEXP_PLG_CODE" depend_class="textarea-tabs-mod" />
-			
+
 			<field name="" type="separator" default="FLEXI_FIELD_TXTAREA_INSIDE_TAB_START_TEXT" depend_class="textarea-tabs-mod" description="" level="level4" />
 			<field name="title_tab_pattern" type="text" default="" size="56" label="FLEXI_FIELD_TXTAREA_TAB_TITLE_PATTERN" description="FLEXI_FIELD_TXTAREA_TAB_TITLE_PATTERN_DESC" depend_class="textarea-tabs-mod" />
-			
+
 			<field name="" type="separator" default="Extra editor areas" depend_class="textarea-tabs-mod" description="Add extra editor areas for each case" level="level2" />
 			<field name="force_beforetabs" type="multilist" subtype="radio" default="1" label="Before tabset" depend_class="textarea-tabs-mod" description="Add extra editor area" class="btn-group group-fcinfo">
 				<option value="0">FLEXI_AUTO</option>
@@ -308,12 +324,12 @@
 			</field>
 
 		</fieldset>
-		
+
 	</fields>
 	</config>
-	
+
 	<languages>
 		<language tag="en-GB">en-GB.plg_flexicontent_fields_textarea.ini</language>
 	</languages>
-	
+
 </extension>
