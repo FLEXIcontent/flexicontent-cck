@@ -8,11 +8,11 @@ class FLEXIUtilities
 		static $disabledFuncs = null;
 		$func = strtolower($function);
 		if ($disabledFuncs !== null) return isset($disabledFuncs[$func]);
-		
+
 		$disabledFuncs = array();
 		$disable_local  = explode(',',     strtolower(@ini_get('disable_functions')));
 		$disable_global = explode(',', strtolower(@get_cfg_var('disable_functions')));
-		
+
 		foreach ($disable_local as $key => $value) {
 			$disabledFuncs[trim($value)] = 'local';
 		}
@@ -23,11 +23,11 @@ class FLEXIUtilities
 			$disabledFuncs['shell_exec']     = 'local';
 			$disabledFuncs['set_time_limit'] = 'local';
 		}
-		
+
 		return isset($disabledFuncs[$func]);
 	}
-	
-	
+
+
 	/**
 	 * Load all template language files to override or add new language strings
 	 *
@@ -38,7 +38,7 @@ class FLEXIUtilities
 	{
 		if (!$tmplnames)
 			$tmplnames = flexicontent_tmpl::getThemes($tmpldir);
-		
+
 		// Load all language files (iterate 'category' layout type)
 		static $langs = array();
 		foreach ($tmplnames as $tmplname) if ( !isset($langs[$tmplname]) )
@@ -47,8 +47,8 @@ class FLEXIUtilities
 			FLEXIUtilities::loadTemplateLanguageFile( $tmplname );
 		}
 	}
-	
-	
+
+
 	/**
 	 * Load Template-Specific language file to override or add new language strings
 	 *
@@ -59,36 +59,36 @@ class FLEXIUtilities
 	{
 		static $print_logging_info = null;
 		$print_logging_info = $print_logging_info !== null  ?  $print_logging_info  :  JComponentHelper::getParams('com_flexicontent')->get('print_logging_info');
-		
+
 		if ($print_logging_info) {
 			global $fc_run_times; $start_microtime = microtime(true);
 			if ( !isset($fc_run_times['templates_parsing_ini']) ) $fc_run_times['templates_parsing_ini'] = 0;
 		}
-		
+
 		//echo "Loading language file for template: ". $tmplname ."<br/>";
 		// Check that template name was given
 		$tmplname = empty($tmplname) ? 'default' : $tmplname;
-		
+
 		// This is normally component/module/plugin name, we could use 'category', 'items', etc to have a view specific language file
 		// e.g. en/en.category.ini, but this is an overkill and make result into duplication of strings ... better all in one file
 		//$extension = $extension ? $extension : 'com_flexicontent';
-		
+
 		// Get current UI language, because language file paths use LL-CC (language-country)
 		$language_tag = $language_tag ? $language_tag : JFactory::getLanguage()->getTag();
-		
+
 		// We will use template folder as BASE of language files instead of joomla's language folder
 		// Since FLEXIcontent templates are meant to be user-editable it makes sense to place language files inside them
 		$tmpldir  = $tmpldir ? $tmpldir : JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'templates';
 		$base_dir = $tmpldir.DS.$tmplname;
-		
+
 		// Final use joomla's API to load our template's language files -- (load english template language file then override with current language file)
 		JFactory::getLanguage()->load($extension, $base_dir, 'en-GB', $reload=true);        // Fallback to english language template file
 		JFactory::getLanguage()->load($extension, $base_dir, $language_tag, $reload=true);  // User's current language template file
-		
+
 		if ($print_logging_info) $fc_run_times['templates_parsing_ini'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 	}
-	
-	
+
+
 	/**
 	 * Method to get information of site languages
 	 *
@@ -99,56 +99,50 @@ class FLEXIUtilities
 	{
 		$app = JFactory::getApplication();
 		$db = JFactory::getDbo();
-		static $pub_languages = null;
-		static $all_languages = null;
-		
-		if ( $published_only ) {
-			if ($pub_languages) return $pub_languages;
-			else $pub_languages = false;
-		}
-		
-		if ( !$published_only ) {
-			if ($all_languages) return $all_languages;
-			else $all_languages = false;
-		}
-		
-		
-		// ******************
-		// Retrieve languages
-		// ******************
-		
-		$query = 'SELECT DISTINCT lc.lang_id as id, lc.image as image_prefix, lc.lang_code as code, lc.title_native, lc.sef, '
-			//. ' CASE WHEN CHAR_LENGTH(lc.title_native) THEN CONCAT(lc.title, " (", lc.title_native, ")") ELSE lc.title END as name '
-			. ' lc.title as name '
-			.' FROM #__languages as lc '
-			.' WHERE 1 '.($published_only ? ' AND lc.published=1' : '')
-			. ' ORDER BY lc.ordering ASC '
-			;
-	
-		if ( !empty($query) )
+		static $langs_cache = array();
+		//static $pub_languages = array();
+		//static $all_languages = array();
+
+		if (isset($langs_cache[$published_only][$add_all]))
 		{
-			$db->setQuery($query);
-			$languages = $db->loadObjectList('id');
-			//echo "<pre>"; print_r($languages); echo "</pre>"; exit;
+			return $langs_cache[$published_only][$add_all];
 		}
-		
-		
+
+
+		/**
+		 * Retrieve languages
+		 */
+
+		$query = $db->getQuery(true)
+			->select('DISTINCT lc.lang_id as id, lc.image as image_prefix, lc.lang_code as code, lc.title_native, lc.sef')
+			//->select('CASE WHEN CHAR_LENGTH(lc.title_native) THEN CONCAT(lc.title, " (", lc.title_native, ")") ELSE lc.title END as name')
+			->select('lc.title as name')
+			->from('#__languages as lc')
+			->where($published_only ? 'lc.published = 1' : '1')
+			->order('lc.ordering ASC')
+			;
+
+		$languages = $db->setQuery($query)->loadObjectList('id');
+		//echo "<pre>"; print_r($languages); echo "</pre>"; exit;
+
+
 		// *********************
 		// Calculate image paths
 		// *********************
-		
+
 		$imgpath	= $app->isAdmin() ? '../images/':'images/';
 		$mediapath	= $app->isAdmin() ? '../media/mod_languages/images/' : 'media/mod_languages/images/';
-		
-		
+
+
 		// ************************
 		// Prepare language objects
 		// ************************
-		
+
 		$_languages = array();
-		
+
 		// Add 'ALL' option
-		if ($add_all) {
+		if ($add_all)
+		{
 			$lang_all = new stdClass();
 			$lang_all->code = '*';
 			$lang_all->name = JText::_('FLEXI_ALL');
@@ -156,39 +150,38 @@ class FLEXIUtilities
 			$lang_all->id = 0;
 			$_languages = array( 0 => $lang_all);
 		}
-		
-		// Check if no languages found and return
-		if ( empty($languages) )  return $_languages;
-		
-		foreach ($languages as $lang) {
+
+		// Check if no languages found, set cache and return
+		if (empty($languages))
+		{
+			$langs_cache[$published_only][$add_all] = $_languages;
+			return $_languages;
+		}
+
+		foreach ($languages as $lang)
+		{
 			// Calculate/Fix languages data
-			$lang->shortcode = strpos($lang->code,'-') ?
-				substr($lang->code, 0, strpos($lang->code,'-')) :
-				$lang->code;
+			$lang->shortcode = strpos($lang->code,'-')
+				? substr($lang->code, 0, strpos($lang->code,'-'))
+				: $lang->code;
+
 			//$lang->id = $lang->extension_id;
 			$image_prefix = $lang->image_prefix ? $lang->image_prefix : $lang->shortcode;
+
 			// $lang->image, holds a custom image path
-			$lang->imgsrc = @$lang->image ? $imgpath . $lang->image : $mediapath . $image_prefix . '.gif';
+			$lang->imgsrc = @$lang->image
+				? $imgpath . $lang->image
+				: $mediapath . $image_prefix . '.gif';
+
 			$_languages[$lang->id] = $lang;
 		}
 
-		// Also prepend '*' (ALL) language to language array
-		//echo "<pre>"; print_r($languages); echo "</pre>"; exit;
-
-		// Select language -ALL- if none selected
-		//$selected = $selected ? $selected : '*';    // WRONG behavior commented out
-		
-		$languages = $_languages;
-		
-		if ( $published_only ) {
-			$pub_languages = $_languages;
-		} else {
-			$all_languages = $_languages;
-		}
+		// Set cache and return
+		$langs_cache[$published_only][$add_all] = $_languages;
 		return $_languages;
 	}
-	
-	
+
+
 	/**
 	 * Method to build an array of languages hashed by id or by language code
 	 *
@@ -199,10 +192,10 @@ class FLEXIUtilities
 	{
 		static $langs = array();
 		static $languages;
-		
+
 		if (isset($langs[$hash])) return $langs[$hash];
 		if (!$languages) $languages = FLEXIUtilities::getlanguageslist($published_only);
-		
+
 		$langs[$hash] = new stdClass();
 		foreach ($languages as $language) {
 			$langs[$hash]->{$language->$hash} = $language;
@@ -533,7 +526,7 @@ class FLEXIUtilities
 	static function ords_to_unistr($ords, $encoding = 'UTF-8')
 	{
 		if (!extension_loaded('mbstring')) return '';
-		
+
 		// Turns an array of ordinal values into a string of unicode characters
 		$str = '';
 		for($i = 0; $i < sizeof($ords); $i++){
@@ -543,7 +536,7 @@ class FLEXIUtilities
 			$str .= pack("N",$v);
 		}
 		$str = mb_convert_encoding($str, $encoding, "UCS-4BE");
-		
+
 		return($str);
 	}
 
@@ -558,7 +551,7 @@ class FLEXIUtilities
 	static function unistr_to_ords($str, $encoding = 'UTF-8')
 	{
 		if (!extension_loaded('mbstring')) return array();
-		
+
 		// Turns a string of unicode characters into an array of ordinal values,
 		// Even if some of those characters are multibyte.
 		$ords = array();
@@ -573,10 +566,10 @@ class FLEXIUtilities
 			$val = unpack("N",$s2);
 			$ords[] = $val[1];
 		}
-		
+
 		return($ords);
 	}
-	
+
 
 	/*
 	 * Method to confirm if a given string is a valid MySQL date
@@ -730,14 +723,14 @@ class FLEXIUtilities
 		{
 			$app->redirect('index.php?option=com_flexicontent', JText::_('FLEXI_NO_ACCESS'), 'warning');
 		}
-		
+
 		// Get post-installation FLAG (session variable), and current view (HTTP request variable)
 		$dopostinstall = $session->get('flexicontent.postinstall');
 		$view = $jinput->get('view', 'flexicontent', 'cmd');
-		
+
 		// Create Submenu, Dashboard (HOME is always added, other will appear only if post-installation tasks are done)
 		$addEntry = array(FLEXI_J30GE ? 'JHtmlSidebar' : 'JSubMenuHelper', 'addEntry');
-		
+
 		call_user_func($addEntry, '<h2 class="fcsbnav-content-editing">'.JText::_( 'FLEXI_NAV_SD_CONTENT_EDITING' ).'</h2>', '', '');
 		call_user_func($addEntry, '<span class="fcsb-icon-flexicontent icon-home"></span>'.JText::_( 'FLEXI_HOME' ), 'index.php?option=com_flexicontent', !$view || $view=='flexicontent');
 
@@ -801,7 +794,7 @@ class FLEXIUtilities
 					call_user_func($addEntry, '<span class="fcsb-icon-reviews icon-comments-2"></span>'.JText::_( 'FLEXI_REVIEWS' ), 'index.php?option=com_flexicontent&view=reviews', $view=='reviews');
 				}
 			}
-			
+
 			if ($perms->CanTypes || $perms->CanFields || $perms->CanTags || $perms->CanFiles)
 			{
 				call_user_func($addEntry, '<h2 class="fcsbnav-type-fields">'.JText::_( 'FLEXI_NAV_SD_TYPES_N_FIELDS' ).'</h2>', '', '');
@@ -815,7 +808,7 @@ class FLEXIUtilities
 				? call_user_func($addEntry, '<span class="fcsb-icon-tags icon-tags"></span>'.JText::_( 'FLEXI_TAGS' ), 'index.php?option=com_flexicontent&view=tags', $view=='tags') : null;
 			$perms->CanFiles
 				? call_user_func($addEntry, '<span class="fcsb-icon-filemanager icon-images"></span>'.JText::_( 'FLEXI_FILEMANAGER' ), 'index.php?option=com_flexicontent&view=filemanager', $view=='filemanager') : null;
-			
+
 			if ($perms->CanTemplates || $perms->CanIndex || $perms->CanStats)
 			{
 				call_user_func($addEntry, '<h2 class="fcsbnav-content-viewing">'.JText::_( 'FLEXI_NAV_SD_CONTENT_VIEWING' ).'</h2>', '', '');
@@ -827,7 +820,7 @@ class FLEXIUtilities
 				? call_user_func($addEntry, '<span class="fcsb-icon-search icon-search"></span>'.JText::_( 'FLEXI_SEARCH_INDEXES' ), 'index.php?option=com_flexicontent&view=search', $view=='search') : null;
 			$perms->CanStats
 				? call_user_func($addEntry, '<span class="fcsb-icon-stats icon-chart"></span>'.JText::_( 'FLEXI_STATISTICS' ), 'index.php?option=com_flexicontent&view=stats', $view=='stats') : null;
-			
+
 			if ($perms->CanAuthors || $perms->CanGroups /*|| $perms->CanArchives*/)
 			{
 				call_user_func($addEntry, '<h2 class="fcsbnav-users">'.JText::_( 'FLEXI_NAV_SD_USERS_N_GROUPS' ).'</h2>', '', '');
@@ -837,7 +830,7 @@ class FLEXIUtilities
 				? call_user_func($addEntry, '<span class="fcsb-icon-users icon-user"></span>'.JText::_( 'FLEXI_USERS' ), 'index.php?option=com_flexicontent&view=users', $view=='users') : null;
 			$perms->CanGroups
 				? call_user_func($addEntry, '<span class="fcsb-icon-groups icon-users"></span>'.JText::_( 'FLEXI_GROUPS' ), 'index.php?option=com_flexicontent&view=groups', $view=='groups') : null;
-		
+
 			if ($perms->CanConfig || $perms->CanImport || $perms->CanPlugins)
 			{
 				call_user_func($addEntry, '<h2 class="fcsbnav-expert">'.JText::_( 'FLEXI_NAV_SD_EXPERT_USAGE' ).'</h2>', '', '');
