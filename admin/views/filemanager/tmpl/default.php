@@ -1096,7 +1096,7 @@ if ($js)
 					<td class="center hidden-phone">
 					<?php
 					echo $this->CanFiles && ($this->CanViewAllFiles || $user->id == $row->uploaded_by)
-						? flexicontent_html::userlevel('access[' . $row->id . ']', $row->access, 'onchange="return listItemTask(\'cb' . $i . '\',\'' . $ctrl . 'access\')" class="use_select2_lib"')
+						? flexicontent_html::userlevel('access[' . $row->id . ']', $row->access, 'onchange="return listItemTask(\'cb' . $i . '\',\'' . $ctrl . 'access\')"')
 						: (strlen($row->access_level) ? $this->escape($row->access_level) : '-');
 					?>
 					</td>

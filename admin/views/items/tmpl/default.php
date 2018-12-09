@@ -984,7 +984,7 @@ jQuery(document).ready(function(){
 
 			<td class="col_access hidden-phone hidden-tablet">
 				<?php echo $row->canEdit && $this->perms->CanAccLvl
-					? flexicontent_html::userlevel('access['.$row->id.']', $row->access, 'onchange="return listItemTask(\'cb'.$i.'\',\''.$ctrl.'access\')" class="use_select2_lib"')
+					? flexicontent_html::userlevel('access['.$row->id.']', $row->access, 'onchange="return listItemTask(\'cb'.$i.'\',\''.$ctrl.'access\')"')
 					: $row->access_level; ?>
 			</td>
 
