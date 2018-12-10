@@ -36,9 +36,8 @@ class FlexicontentViewField extends JViewLegacy
 		$user     = JFactory::getUser();
 
 		// Get url vars and some constants
-		$cid = $jinput->get('cid', 0, 'int');
-		$field_type = $jinput->get('field_type', '', 'cmd');
-
+		$cid = $jinput->getInt('cid', 0);
+		$field_type = $jinput->getCmd('field_type', null);
 
 
 		// ***
@@ -47,11 +46,20 @@ class FlexicontentViewField extends JViewLegacy
 		
 		// Get model and load the record data
 		$model = $this->getModel();
-		$row   = $this->get('Item');
+
+		// Set requested field type into the model, so that we will display the correct type-specific parameters of the new field type
+		// Note: this needs to be done --before-- calling anything that loads JForm (aka also before loading the record)
+		if ($field_type)
+		{
+			$model->setFieldType($field_type);
+		}
+
+		$row   = $model->getItem();
 		$isnew = ! $row->id;
 
 		// Get JForm
-		$form  = $this->get('Form');
+		$form  = $model->getForm();
+
 		if (!$form)
 		{
 			jexit($model->getError());

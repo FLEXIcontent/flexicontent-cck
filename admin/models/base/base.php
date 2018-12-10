@@ -536,7 +536,7 @@ abstract class FCModelAdmin extends JModelAdmin
 	 *
 	 * @since   3.2.0
 	 */
-	function save($data)
+	public function save($data)
 	{
 		// Initialise variables
 		$app        = JFactory::getApplication();
