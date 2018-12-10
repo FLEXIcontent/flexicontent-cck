@@ -104,8 +104,7 @@ class FlexicontentModelField extends FCModelAdmin
 	 * Various record specific properties
 	 *
 	 */
-	var $field_type = null;
-	var $plugin_name = null;
+	protected $forced_field_type = null;
 
 	/**
 	 * Constructor
@@ -115,6 +114,17 @@ class FlexicontentModelField extends FCModelAdmin
 	public function __construct($config = array())
 	{
 		parent::__construct($config);
+
+		$jinput = JFactory::getApplication()->input;
+		$filter = JFilterInput::getInstance();
+
+		$data = $jinput->post->get('jform', array(), 'array');
+
+		// Force new field_type, so that type-specific parameters will be validated according to the new field type
+		if (isset($data['field_type']))
+		{
+			$this->setFieldType($data['field_type']);
+		}
 
 		$this->canManage    = FlexicontentHelperPerm::getPerm()->CanFields;
 		$this->canCreate    = FlexicontentHelperPerm::getPerm()->CanAddField;
@@ -178,17 +188,15 @@ class FlexicontentModelField extends FCModelAdmin
 
 
 	/**
-	 * Legacy method to store the record, use save() instead
+	 * Method to set a new field type. The type will be validated if it exists during JForm preprocessing
 	 *
-	 * @param   array  $data  The form data.
+	 * @param   string  $field_type  The forced field type
 	 *
-	 * @return  boolean  True on success.
-	 *
-	 * @since   3.2.0
+	 * @since   3.3.0
 	 */
-	public function store($data)
+	public function setFieldType($field_type)
 	{
-		return parent::store($data);
+		$this->forced_field_type = JFilterInput::getInstance()->clean($field_type, 'CMD');
 	}
 
 
@@ -215,21 +223,40 @@ class FlexicontentModelField extends FCModelAdmin
 		// Initialise variables.
 		$client = JApplicationHelper::getClientInfo(0);
 
-		// Get plugin name from field type
+
+		/**
+		 * Get plugin name from field type
+		 * Use overridden field type if this was set, e.g. switching current to a new field type
+		 */
 		$plugin_name = $data_obj
 			? (!empty($data_obj->iscore) ? 'core' : $data_obj->field_type)
-			: ($this->plugin_name ?: 'text');
+			: 'text';
+		$plugin_name = $this->forced_field_type ?: $plugin_name;
 
-		// URL variable with name -- 'field_type' overrides current type
-		$plugin_name = JFactory::getApplication()->input->get('field_type', $plugin_name, 'CMD');
 
-		// Try to load plugin file: /plugins/folder/element/element.xml
+		/**
+		 * Try to load plugin file: /plugins/folder/element/element.xml
+		 */
 		$plugin_path = JPath::clean(JPATH_PLUGINS . DS . 'flexicontent_fields' . DS . $plugin_name . DS . $plugin_name . '.xml');
+
 		if (!JFile::exists($plugin_path))
 		{
-			throw new Exception('Error field XML file for field type: - ' . $this->field_type . '- was not found');
+			throw new Exception('Error field XML file for field type: - ' . $plugin_name . '- was not found');
 		}
-		
+
+
+		/**
+		 * Set new field_type, this is needed e.g. after for form reload due to some error
+		 */
+
+		$this->_record->field_type = $plugin_name;
+
+		if ($data_obj && empty($data_obj->iscore))
+		{
+			$data_obj->field_type = $plugin_name;
+		}
+
+
 		/**
 		 * Do not allow changing some properties
 		 */
@@ -465,10 +492,6 @@ class FlexicontentModelField extends FCModelAdmin
 
 		// Load type assigments (an array of type IDs)
 		$record->tid = $this->getFieldType($record->id);
-
-		// Needed during preprocessForm to load correct XML file
-		$this->field_type  = $record->field_type;
-		$this->plugin_name = $record->iscore ? 'core' : $record->field_type;
 	}
 
 
