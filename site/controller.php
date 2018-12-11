@@ -70,6 +70,9 @@ class FlexicontentController extends JControllerLegacy
 
 		// Get return URL from HTTP request and validate it
 		$this->returnURL = $this->_getReturnUrl();
+
+		// For frontend default return is refererURL
+		$this->returnURL = $this->returnURL ?: $this->refererURL;
 	}
 
 
@@ -153,22 +156,6 @@ class FlexicontentController extends JControllerLegacy
 		$data['type_id'] = empty($data['type_id'])
 			? $model->get('type_id')
 			: (int) $data['type_id'];
-
-		// Set frontend record form as default return URL
-		if ($app->isSite())
-		{
-			$Itemid = $this->input->get('Itemid', 0, 'int');  // Maintain current menu item if this was given
-
-			if (!$isnew)
-			{
-				$item_url = JRoute::_(FlexicontentHelperRoute::getItemRoute($record->slug, $record->categoryslug, $Itemid));
-				$this->returnURL = $item_url . ( strstr($item_url, '?') ? '&' : '?' ) . 'task=edit';
-			}
-			elseif ($Itemid)
-			{
-				$this->returnURL = JRoute::_('index.php?Itemid=' . $Itemid);
-			}
-		}
 
 		// The save2copy task needs to be handled slightly differently.
 		if ($this->task === 'save2copy')
@@ -3325,8 +3312,8 @@ class FlexicontentController extends JControllerLegacy
 	{
 		$this->input->get('task', '', 'cmd') !== __FUNCTION__ or die(__FUNCTION__ . ' : direct call not allowed');
 
-		// Get HTTP request variable 'return', but also use 'referer' as fallback for legacy forms support
-		$return = $this->input->get('return', $this->input->get('referer', null, 'base64'), 'base64');
+		// Get HTTP request variable 'return' (base64 encoded)
+		$return = $this->input->get('return', null, 'base64');
 
 		// Base64 decode the return URL
 		if ($return)
@@ -3334,18 +3321,25 @@ class FlexicontentController extends JControllerLegacy
 			$return = base64_decode($return);
 		}
 
+		// Also try 'referer' (form posted, encode with htmlspecialchars)
+		else
+		{
+			$referer = $this->input->getString('referer', null);
+			$return = $referer ? htmlspecialchars_decode($referer) : null;
+		}
+
 		// Check return URL if empty or not safe and set a default one
 		if (!$return || !flexicontent_html::is_safe_url($return))
 		{
 			$app = JFactory::getApplication();
 
-			if ($app->isAdmin() && $this->view === $this->record_name)
+			if ($app->isAdmin() && ($this->view === $this->record_name || $this->view === $this->record_name_pl))
 			{
 				$return = 'index.php?option=com_flexicontent&view=' . $this->record_name_pl;
 			}
 			else
 			{
-				$return = $app->isAdmin() ? false : JUri::base();
+				$return = null; //$app->isAdmin() ? 'index.php?option=com_flexicontent' : JUri::base();
 			}
 		}
 
