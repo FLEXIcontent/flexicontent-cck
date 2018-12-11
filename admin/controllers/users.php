@@ -96,15 +96,14 @@ class FlexicontentControllerUsers extends FlexicontentControllerBaseAdmin
 		$SiteName	= $config->get('sitename');
 
 		// Create a new JUser object for the given user id, and calculate / retrieve some information about the user
-		$id = JRequest::getVar('id', 0, 'post', 'int');
+		$id   = $this->input->getInt('id', 0);
 		$user = new JUser($id);
 
 		$curIsSuperAdmin = $me->authorise('core.admin', 'root.1');
 		$isSuperAdmin = $user->authorise('core.admin', 'root.1');
 		$saving_myself = $user->id == $me->id;
 
-		$post = JRequest::get('post');
-		$data = & $post['jform'];
+		$data = $this->input->get('jform', array(), 'array');
 
 		// Merge template FIELDS-set this should include at least 'clayout' and optionally 'clayout_mobile' parameters
 		if (!empty($data['templates']))
@@ -230,7 +229,7 @@ class FlexicontentControllerUsers extends FlexicontentControllerBaseAdmin
 		$me    = JFactory::getUser();
 		$curIsSuperAdmin = $me->authorise('core.admin', 'root.1');
 
-		$cid = JRequest::getVar('cid', array(), '', 'array');
+		$cid = $this->input->get('cid', array(), 'array');
 		$cid = ArrayHelper::toInteger($cid);
 
 		if (count($cid) < 1)
@@ -327,9 +326,9 @@ class FlexicontentControllerUsers extends FlexicontentControllerBaseAdmin
 
 		if (!$check_uids)
 		{
-			$cid = JRequest::getVar('cid', array(), '', 'array');
-			$cid = ArrayHelper::toInteger($cid);
-			$block = JRequest::getVar('task') == 'block';
+			$cid   = $this->input->get('cid', array(), 'array');
+			$cid   = ArrayHelper::toInteger($cid);
+			$block = $this->input->getCmd('task') === 'block';
 		}
 		else
 		{
@@ -419,14 +418,12 @@ class FlexicontentControllerUsers extends FlexicontentControllerBaseAdmin
 		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 
 		$app    = JFactory::getApplication();
-		$jinput = $app->input;
 		$db     = JFactory::getDbo();
+
 		$task   = $this->getTask();
-
-		$cids   = $jinput->get('cid', array(), 'array');
-		$client = $jinput->getInt('client', 0);
-
-		$cids = ArrayHelper::toInteger($cids);
+		$cids   = $this->input->get('cid', array(), 'array');
+		$cids   = ArrayHelper::toInteger($cids);
+		$client = $this->input->getInt('client', 0);
 
 		if (count($cids) < 1)
 		{
@@ -472,11 +469,10 @@ class FlexicontentControllerUsers extends FlexicontentControllerBaseAdmin
 	}
 
 
-
 	function contact()
 	{
-		$contact_id = JRequest::getVar('contact_id', '', 'post', 'int');
-		$this->setRedirect('index.php?option=com_contact&task=edit&cid[]=' . $contact_id);
-	}
+		$contact_id = $this->input->getInt('contact_id', 0);
 
+		$this->setRedirect('index.php?option=com_contact&task=edit&id=' . $contact_id);
+	}
 }
