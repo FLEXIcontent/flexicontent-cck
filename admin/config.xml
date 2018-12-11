@@ -1583,10 +1583,11 @@
 		<field name="" type="separator" default="FLEXI_IMPORT_MANAGER" icon_class="icon-upload" level="tab_open" box_type="1" remove_boxes="2" />
 
 			<field name="" type="separator" default="FLEXI_BASIC" label="" level="level1" />
-			<field name="import_id_col" type="fcradio" default="0" label="FLEXI_IMPORT_CUSTOM_ITEM_ID" description="FLEXI_IMPORT_ALL_IDS_CHECKED_BEFORE_IMPORT" class="btn-group group-fcinfo">
-				<option value="0">FLEXI_IMPORT_AUTO_NEW_ID</option>
-				<option value="1">FLEXI_IMPORT_USE_ID_COL_CREATE_ITEMS</option>
-				<option value="2">FLEXI_IMPORT_USE_ID_COL_CREATE_UPDATE_ITEMS</option>
+			<field name="import_id_col" type="multilist" subtype="radio" default="0" toggle_related="1" label="FLEXI_IMPORT_CUSTOM_ITEM_ID" description="FLEXI_IMPORT_ALL_IDS_CHECKED_BEFORE_IMPORT" class="btn-group group-fcmethod fcoffactive" inline_text="FLEXI_IMPORT_USE_ID_COL" text_class="fc-mssg-inline fc-info fc-small import_use_id_col"
+			>
+				<option value="0" hide_list="import_use_id_col" show_list="">FLEXI_IMPORT_AUTO_NEW_ID</option>
+				<option value="1" hide_list="" show_list="import_use_id_col">FLEXI_IMPORT_CREATE_ITEMS</option>
+				<option value="2" hide_list="" show_list="import_use_id_col">FLEXI_IMPORT_CREATE_UPDATE_ITEMS</option>
 			</field>
 			<field name="import_lang" type="fclanguage" default="*" label="FLEXI_LANGUAGE" description="Enter * OR en-GB or fr-FR or de-DE ..." />
 			<field name="import_state" type="list" default="1" label="FLEXI_STATE" description="...">
