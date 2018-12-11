@@ -1124,13 +1124,20 @@ class FlexicontentControllerBaseAdmin extends FlexicontentController
 	{
 		$this->input->get('task', '', 'cmd') !== __FUNCTION__ or die(__FUNCTION__ . ' : direct call not allowed');
 
-		// Get HTTP request variable 'return', but also use 'referer' as fallback for legacy forms support
-		$return = $this->input->get('return', $this->input->get('referer', null, 'base64'), 'base64');
+		// Get HTTP request variable 'return' (base64 encoded)
+		$return = $this->input->get('return', null, 'base64');
 
 		// Base64 decode the return URL
 		if ($return)
 		{
 			$return = base64_decode($return);
+		}
+
+		// Also try 'referer' (form posted, encode with htmlspecialchars)
+		else
+		{
+			$referer = $this->input->getString('referer', null);
+			$return = $referer ? htmlspecialchars_decode($referer) : null;
 		}
 
 		// Check return URL if empty or not safe and set a default one
@@ -1144,7 +1151,7 @@ class FlexicontentControllerBaseAdmin extends FlexicontentController
 			}
 			else
 			{
-				$return = $app->isAdmin() ? false : JUri::base();
+				$return = null; //$app->isAdmin() ? 'index.php?option=com_flexicontent' : JUri::base();
 			}
 		}
 

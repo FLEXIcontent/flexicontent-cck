@@ -34,13 +34,13 @@ class FlexicontentViewItem extends JViewLegacy
 	 *
 	 * @since 1.0
 	 */
-	function display( $tpl = null )
+	public function display($tpl = null)
 	{
 		$app      = JFactory::getApplication();
 		$jinput   = $app->input;
 
 		// Check for form layout
-		if($this->getLayout() == 'form' || in_array($jinput->get('task', '', 'cmd'), array('add','edit')) )
+		if ($this->getLayout() === 'form' || in_array($jinput->getCmd('task', ''), array('add','edit')))
 		{
 			// Important set layout to be form since various category view SEF links may have this variable set
 			$this->setLayout('form');
@@ -1189,6 +1189,8 @@ class FlexicontentViewItem extends JViewLegacy
 		$this->captcha_errmsg = isset($captcha_errmsg) ? $captcha_errmsg : null;
 		$this->captcha_field  = isset($captcha_field)  ? $captcha_field  : null;
 
+		$this->referer = $this->_getReturnUrl();
+
 
 		// ***
 		// *** Clear custom form data from session
@@ -2141,5 +2143,65 @@ class FlexicontentViewItem extends JViewLegacy
 		}
 
 		return $field->input;
+	}
+
+
+	/**
+	 * Get return URL via a client request variable, checking if it is safe (otherwise home page will be used)
+	 *
+	 * @return  string  A validated URL to be used typical as redirect URL when a task completes
+	 *
+	 * @since 3.3
+	 */
+	protected function _getReturnUrl()
+	{
+		$app         = JFactory::getApplication();
+		$this->input = $app->input;
+
+		// Get HTTP request variable 'return' (base64 encoded)
+		$return = $this->input->get('return', null, 'base64');
+
+		// Base64 decode the return URL
+		if ($return)
+		{
+			$return = base64_decode($return);
+		}
+
+		// Also try 'referer' (form posted, encode with htmlspecialchars)
+		else
+		{
+			$referer = $this->input->getString('referer', null);
+
+			// Get referer URL from HTTP request and validate it
+			if ($referer)
+			{
+				$referer = htmlspecialchars_decode($referer);
+			}
+			else
+			{
+				$referer = !empty($_SERVER['HTTP_REFERER']) && flexicontent_html::is_safe_url($_SERVER['HTTP_REFERER'])
+					? $_SERVER['HTTP_REFERER']
+					: JUri::base();
+			}
+
+			$return = $referer;
+		}
+
+		// Check return URL if empty or not safe and set a default one
+		if (!$return || !flexicontent_html::is_safe_url($return))
+		{
+			$app = JFactory::getApplication();
+
+			if ($app->isAdmin() && ($this->view === $this->record_name || $this->view === $this->record_name_pl))
+			{
+				$return = 'index.php?option=com_flexicontent&view=' . $this->record_name_pl;
+			}
+			else
+			{
+				$return = $app->isAdmin() ? false : JUri::base();
+			}
+		}
+
+		return $return;
 	}
 }

@@ -58,10 +58,6 @@ $btn_class = 'btn';  // 'fc_button';
 $tip_class = ' hasTooltip';
 $lbl_class = ' ' . $this->params->get('form_lbl_class_fe', '');
 
-// Calculate refer parameter for returning to this page when user ends editing/submitting
-$return = JFactory::getApplication()->input->getString('return', '');
-$return = $return ? base64_decode($return) : @ $_SERVER['HTTP_REFERER'];
-$return_encoded = htmlspecialchars($return, ENT_COMPAT, 'UTF-8');
 
 $lang = JFactory::getApplication()->input->getCmd('lang', '');
 $site_languages = FLEXIUtilities::getLanguages();
@@ -1992,7 +1988,7 @@ if ( count($tab_fields['below']) || count($captured) ) : ?>
 		<?php echo JHtml::_( 'form.token' ); ?>
 		<input type="hidden" name="task" id="task" value="" />
 		<input type="hidden" name="option" value="com_flexicontent" />
-		<input type="hidden" name="return" value="<?php echo $return_encoded; ?>" />
+		<input type="hidden" name="referer" value="<?php echo htmlspecialchars($this->referer, ENT_COMPAT, 'UTF-8'); ?>" />
 		<?php if ( $isnew && $typeid ) : ?>
 			<input type="hidden" name="jform[type_id]" value="<?php echo $typeid; ?>" />
 		<?php endif;?>
