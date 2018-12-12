@@ -54,11 +54,15 @@ hr.fcclearline {
 /**********************************************************************
  * FLEXIcontent buttons for links: print, pdf, email, rss, approval etc
  **********************************************************************/
+#flexicontent .buttons.fc-iblock {
+	display: inline-block;
+	float: none;
+}
 #flexicontent .buttons {
-	display: block;
+	display: inline-block;
 	margin: 0px;
 	padding: 0px;
-	float: left;
+	float: left;  /* TODO do remove this, using an alternative */
 	position: relative; /* needed for absolute placed elements inside */
 }
 #flexicontent .buttons.fcleft {

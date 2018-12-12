@@ -35,8 +35,12 @@ hr.fcclearline {
 #flexicontent .fcodd {
 	background-color: #f2f2f2;
 }
+#flexicontent .buttons.fc-iblock {
+	display: inline-block;
+	float: none;
+}
 #flexicontent .buttons {
-	display: block;
+	display: inline-block;
 	margin: 0px;
 	padding: 0px;
 	float: left;
