@@ -994,7 +994,7 @@ class plgFlexicontent_fieldsImage extends FCField
 					'.$remove_button.'
 					'.(!$add_position ? '' : $add_here)
 					.($use_inline_uploaders && !$file_btns_position ?'
-					<div class="buttons btn-group">
+					<div class="buttons btn-group fc-iblock">
 						<span role="button" class="' . $drop_btn_class . ' fcfield-addvalue ' . $font_icon_class . '" data-toggle="dropdown">
 							<span class="caret"></span>
 						</span>

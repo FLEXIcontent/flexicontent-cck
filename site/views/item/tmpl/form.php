@@ -1111,7 +1111,7 @@ if ( $typeid && $this->params->get('usemetadata_fe', 1) ) : ob_start(); // metad
 				<div class="control-group">
 					<div class="control-label">' . $field->label . '</div>
 					<div class="controls container_fcfield">
-						' . $field->input . '
+						' . $this->getFieldInheritedDisplay($field, $this->row->parameters) . '
 					</div>
 				</div>
 				';
@@ -1135,7 +1135,7 @@ if ( $typeid && $this->params->get('useseoconf_fe', 0) ) : ob_start(); // seocon
 		<div class="control-group">
 			<div class="control-label">' . $field->label . '</div>
 			<div class="controls container_fcfield">
-				' . $field->input . '
+				' . $this->getFieldInheritedDisplay($field, $this->row->parameters) . '
 			</div>
 		</div>
 		';
@@ -1179,7 +1179,7 @@ if ( $typeid && $this->params->get('usedisplaydetails_fe') || $has_custom_params
 				<?php if ( $this->params->get('allowdisablingcomments_fe') && $name=='params-advanced' && $field->fieldname=='comments')  continue; ?>
 				<?php echo $field->label; ?>
 				<div class="container_fcfield">
-					<?php echo $field->input;?>
+					<?php echo $this->getFieldInheritedDisplay($field, $this->row->parameters);?>
 				</div>
 				<div class="fcclear"></div>
 			<?php endforeach; ?>
@@ -1212,7 +1212,7 @@ if ( $typeid && $this->params->get('selecttheme_fe') ) : ?>
 							'.str_replace('class="', 'class="' . $lbl_class . ' label-fcinner ', $field->label).'
 						</div>
 						<div class="controls container_fcfield">
-							'.$field->input.'
+							' . $this->getFieldInheritedDisplay($field, $this->row->parameters) . '
 						</div>
 					</div>
 					';
@@ -1306,7 +1306,7 @@ if ( $typeid && $this->params->get('selecttheme_fe') ) : ?>
 											:
 											str_replace('jform_attribs_', 'jform_layouts_'.$tmpl->name.'_',
 												str_replace('[attribs]', '[layouts]['.$tmpl->name.']',
-													flexicontent_html::getInheritedFieldDisplay($field, $this->row->parameters)
+													$this->getFieldInheritedDisplay($field, $this->row->parameters)
 													//$form_layout->getInput($fieldname, $groupname/*, $value*/)   // Value already set, no need to pass it
 												)
 											)
@@ -1719,7 +1719,7 @@ foreach ($fieldSets as $name => $fieldSet) :
 					<?php echo $field->input; ?>
 				</span>
 			<?php else :
-				echo ($field->getAttribute('type')=='separator' || $field->hidden || !$field->label) ? $field->input : '
+				echo ($field->getAttribute('type') === 'separator' || $field->hidden || !$field->label) ? $field->input : '
 				<div class="control-group">
 					<div class="control-label" id="jform_attribs_'.$field->fieldname.'-lbl-outer">
 						' . str_replace('class="', 'class="' . $lbl_class . ' label-fcinner ', str_replace(' for="', ' data-for="', $field->label)) . '
@@ -1795,7 +1795,7 @@ foreach ($fieldSets as $name => $fieldSet) :
 						' . str_replace('class="', 'class="' . $lbl_class . ' label-fcinner ', str_replace(' for="', ' data-for="', $field->label)) . '
 					</div>
 					<div class="controls container_fcfield">
-						' . $field->input . '
+						' . $this->getFieldInheritedDisplay($field, $this->row->parameters) . '
 					</div>
 				</div>
 				';

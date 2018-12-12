@@ -1351,7 +1351,9 @@ if ($this->item->type_id) {
 				<fieldset class="panelform">
 					<?php echo ($field->label ? '
 						<span class="label-fcouter" id="jform_metadata_'.$field->fieldname.'-lbl-outer">'.str_replace('class="', 'class="' . $lbl_class . ' label-fcinner ', str_replace(' for="', ' data-for="', $field->label)).'</span>
-						<div class="container_fcfield">'.$field->input.'</div>
+						<div class="container_fcfield">
+							' . $this->getFieldInheritedDisplay($field, $this->iparams) . '
+						</div>
 					' : $field->input); ?>
 				</fieldset>
 			<?php endif; ?>
@@ -1370,7 +1372,9 @@ if ($this->item->type_id) {
 				<fieldset class="panelform">
 					<?php echo ($field->label ? '
 						<span class="label-fcouter" id="jform_attribs_'.$field->fieldname.'-lbl-outer">'.str_replace('class="', 'class="' . $lbl_class . ' label-fcinner ', str_replace(' for="', ' data-for="', $field->label)).'</span>
-						<div class="container_fcfield">'.$field->input.'</div>
+						<div class="container_fcfield">
+							' . $this->getFieldInheritedDisplay($field, $this->iparams) . '
+						</div>
 					' : $field->input); ?>
 				</fieldset>
 			<?php endif; ?>
@@ -1415,7 +1419,9 @@ if ($this->item->type_id) {
 					<fieldset class="panelform">
 						<?php echo ($field->label ? '
 							<span class="label-fcouter" id="jform_attribs_'.$field->fieldname.'-lbl-outer">'.str_replace('class="', 'class="' . $lbl_class . ' label-fcinner ', str_replace(' for="', ' data-for="', $field->label)).'</span>
-							<div class="container_fcfield">'.$field->input.'</div>
+							<div class="container_fcfield">
+								' . $this->getFieldInheritedDisplay($field, $this->iparams) . '
+							</div>
 						' : $field->input); ?>
 					</fieldset>
 				<?php endif; ?>
@@ -1454,7 +1460,9 @@ if ($this->item->type_id) {
 						<fieldset class="panelform">
 							<?php echo ($field->label ? '
 								<span class="label-fcouter" id="jform_attribs_'.$field->fieldname.'-lbl-outer">'.str_replace('class="', 'class="' . $lbl_class . ' label-fcinner ', str_replace(' for="', ' data-for="', $field->label)).'</span>
-								<div class="container_fcfield">'.$field->input.'</div>
+								<div class="container_fcfield">
+									' . $this->getFieldInheritedDisplay($field, $this->iparams) . '
+								</div>
 							' : $field->input); ?>
 						</fieldset>
 					<?php endif; ?>
@@ -1526,7 +1534,7 @@ if ( count($FC_jfields_html) ) : ?>
 			<?php
 			foreach ($this->form->getFieldset('themes') as $field):
 
-				if (!$field->label || $field->hidden)
+				if ($field->getAttribute('type') === 'separator' || !$field->label || $field->hidden)
 				{
 					echo $field->input;
 					continue;
@@ -1541,7 +1549,7 @@ if ( count($FC_jfields_html) ) : ?>
 							'.str_replace('class="', 'class="' . $lbl_class . ' label-fcinner ', $field->label).'
 						</div>
 						<div class="controls container_fcfield">
-							'.$field->input.'
+							' . $this->getFieldInheritedDisplay($field, $this->iparams) . '
 						</div>
 					</div>
 					';
@@ -1615,7 +1623,7 @@ if ( count($FC_jfields_html) ) : ?>
 								$field->setup($form_layout->getFieldXml($fieldname, $field->group), $_value, $field->group);
 							}
 
-							echo ($field->getAttribute('type')=='separator' || $field->hidden || !$field->label)
+							echo ($field->getAttribute('type') === 'separator' || !$field->label || $field->hidden)
 							 ? $field->input
 							 : '
 								<div class="control-group" id="'.$field->id.'-container">
@@ -1634,7 +1642,7 @@ if ( count($FC_jfields_html) ) : ?>
 											:
 											str_replace('jform_attribs_', 'jform_layouts_'.$tmpl->name.'_',
 												str_replace('[attribs]', '[layouts]['.$tmpl->name.']',
-													flexicontent_html::getInheritedFieldDisplay($field, $this->iparams)
+													$this->getFieldInheritedDisplay($field, $this->iparams)
 													//$form_layout->getInput($fieldname, $groupname/*, $value*/)   // Value already set, no need to pass it
 												)
 											)

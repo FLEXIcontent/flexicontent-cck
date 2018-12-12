@@ -2204,4 +2204,17 @@ class FlexicontentViewItem extends JViewLegacy
 
 		return $return;
 	}
+
+
+	/**
+	 * Method to get the display of field while showing the inherited value
+	 *
+	 * @return	int
+	 *
+	 * @since	3.3.0
+	 */
+	public function getFieldInheritedDisplay($field, $params)
+	{
+		return flexicontent_html::getInheritedFieldDisplay($field, $params);
+	}
 }
