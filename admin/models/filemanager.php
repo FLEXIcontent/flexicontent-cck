@@ -1322,9 +1322,13 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 		// Some fields may not be using DB, create a limitation for them
 		switch($field_type) {
 			case 'image':
-				$query = "SELECT id FROM #__flexicontent_fields WHERE field_type='image' AND attribs NOT LIKE '%image_source=1%'";
-				$this->_db->setQuery($query);
-				$field_ids = $this->_db->loadColumn();
+				$query = $this->_db->getQuery(true)
+					->select('id')
+					->from('#__flexicontent_fields')
+					->where('field_type = ' . $this->_db->Quote('image'))
+					->where('attribs LIKE ' . $this->_db->Quote('%"image_source":"0"%'))
+					;
+				$field_ids = $this->_db->setQuery($query)->loadColumn();
 				break;
 
 			default:
