@@ -1,0 +1,10 @@
+{
+  "url": "https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}",
+  "settings": {
+	"id": "mapbox.high-contrast",
+	"attribution": "<a href='https://www.mapbox.com/about/maps/' target='_blank'>Mapbox</a> Map data &copy; <a href='https://www.openstreetmap.org/'>OpenStreetMap</a> contributors",
+    "minZoom": 1, 
+    "maxZoom": 18,
+	"accessToken":"#mapbox-key#"
+  } 
+}

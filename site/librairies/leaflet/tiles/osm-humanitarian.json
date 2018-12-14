@@ -1,0 +1,9 @@
+{
+  "id": "humanitarian",
+  "url": "https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png",
+  "settings": {
+	  "attribution": "Map data &copy; <a href='https://www.openstreetmap.org/'>OpenStreetMap</a> contributors", 
+      "minZoom": 1, 
+      "maxZoom": 20
+    } 
+}
