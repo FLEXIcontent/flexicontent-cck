@@ -266,19 +266,25 @@ class modFlexigooglemapHelper
 
 		switch ($markermode)
 		{
-			case 1:   // 'Letter' mode
+			// 'Letter' mode
+			case 1:
 				$color_to_file = array(
-					'red'=>'spotlight-waypoint-b.png', 'green'=>'spotlight-waypoint-a.png', ''=>'spotlight-waypoint-b.png' /* '' is for not set*/
+					'red'   => 'spotlight-waypoint-b.png',
+					'green' => 'spotlight-waypoint-a.png',
+					''      => 'spotlight-waypoint-b.png' /* '' is for not set*/
 				);
+
 				return "'https://mts.googleapis.com/vt/icon/name=icons/spotlight/"
 					. $color_to_file[$params->get('markercolor', '')]
 					. "?text=" . $params->get('lettermarker')
 					. "&psize=16&font=fonts/arialuni_t.ttf&color=ff330000&scale=1&ax=44&ay=48"
 					. "'";
 
-			default:  // 'Local image file' mode
+			// 'Local image file' mode or empty
+			case 0:
+			default:
 				$markerimage = $params->get('markerimage');
-				return $markerimage ? ("'" . JUri::root(true) . '/' . $markerimage . "'") : 'null';
+				return $markerimage ? ("'" . JUri::root(true) . '/' . $markerimage . "'") : null;
 		}
 	}
 

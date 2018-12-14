@@ -136,7 +136,7 @@
 
 			<field
 				name="markermode" type="radio"
-				default="0" label="MOD_FLEXIGOOGLEMAP_MARKERMODE"
+				default="-1" label="MOD_FLEXIGOOGLEMAP_MARKERMODE"
 				description="MOD_FLEXIGOOGLEMAP_MARKERMODE_DESC"
 				class="btn-group group-fcinfo"
 				>
