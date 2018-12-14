@@ -1808,10 +1808,11 @@ class plgFlexicontent_fieldsImage extends FCField
 		if ( !is_array($post) && !strlen($post) && !$use_ingroup ) return;
 
 		// Get configuration
-		$app  = JFactory::getApplication();
-		$is_importcsv = $app->input->get('task', '', 'cmd') == 'importcsv';
+		$app = JFactory::getApplication();
+
+		$is_importcsv        = $app->input->get('task', '', 'cmd') === 'importcsv';
 		$import_media_folder = $app->input->get('import_media_folder', '', 'string');
-		$id_col = $app->input->get('id_col', 0, 'int');
+		$id_col              = $app->input->get('id_col', 0, 'int');
 
 		$unique_tmp_itemid = $app->input->get('unique_tmp_itemid', '', 'string');
 		$unique_tmp_itemid = substr($unique_tmp_itemid, 0, 1000);
@@ -1822,10 +1823,9 @@ class plgFlexicontent_fieldsImage extends FCField
 
 
 		// Set a warning message for overriden/changed files: form.php (frontend) or default.php (backend)
-		if ( !$is_importcsv && empty($unique_tmp_itemid) )
+		if (!$is_importcsv && empty($unique_tmp_itemid))
 		{
-			$app = JFactory::getApplication();
-			$app->enqueueMessage( 'WARNING, field: '.$field->label.' requires variable -unique_tmp_itemid- please update your '.($app->isSite() ? 'form.php':'default.php'), 'warning');
+			$app->enqueueMessage('Field: ' . $field->label . ' requires variable -unique_tmp_itemid- please update your ' . ($app->isSite() ? 'form.php' : 'default.php'), 'warning');
 		}
 
 		// Execute once
@@ -1859,7 +1859,7 @@ class plgFlexicontent_fieldsImage extends FCField
 		// *** Special steps for image field in Folder-mode(s)
 		// ***
 
-		if ( $image_source >= 1 )
+		if ($image_source >= 1)
 		{
 			$dir = $field->parameters->get('dir');
 			$unique_tmp_itemid = substr(JFactory::getApplication()->input->get('unique_tmp_itemid', '', 'string'), 0, 1000);
@@ -1867,20 +1867,34 @@ class plgFlexicontent_fieldsImage extends FCField
 			$dest_path = JPath::clean( JPATH_SITE .DS. $dir . DS. 'item_'.$item->id . '_field_'.$field->id .DS );
 			//if ( $image_source > 1 ) ; // TODO
 
-			// Create original images folder if doing CSV import and folder does not exist
-			if ( $is_importcsv )
+			/**
+			 * Create original images folder if doing CSV import and folder does not exist
+			 */
+			if ($is_importcsv)
 			{
 				$dest_path_original = $dest_path. 'original' .DS;
-				if ( !JFolder::exists($dest_path_original) && !JFolder::create($dest_path_original) ) {
-					JError::raiseWarning(100, $field->label .': Error. Unable to create folder: '. $dest_path_original );
-					return false;  // Cancel item creation
+
+				if (!JFolder::exists($dest_path_original) && !JFolder::create($dest_path_original))
+				{
+					// Cancel item creation
+					$app->enqueueMessage('Field: ' . $field->label . ' : Unable to create folder: ' . $dest_path_original, 'error');
+					return false;
 				}
 			}
 
-			// New items have no item id during submission, thus we need to rename the temporary name of images upload folder
-			else if ( $unique_tmp_itemid && $item->id != $unique_tmp_itemid ) {
-				$temppath = JPath::clean( JPATH_SITE .DS. $dir . DS. 'item_'.$unique_tmp_itemid. '_field_'.$field->id .DS );
-				JFolder::move($temppath, $dest_path);
+			/**
+			 * New items have no item id during submission, thus we need to
+			 * either rename the temporary name of the images upload folder (NEW ITEM SAVED)
+			 * or copy the images upload folder (SAVE AS COPY)
+			 */
+			elseif ($unique_tmp_itemid && $item->id != $unique_tmp_itemid)
+			{
+				$temppath = JPath::clean(JPATH_SITE .DS. $dir .DS. 'item_' . $unique_tmp_itemid . '_field_' . $field->id .DS);
+				$save_as_copy = $unique_tmp_itemid == (int) $unique_tmp_itemid;
+
+				$save_as_copy
+					? JFolder::copy($temppath, $dest_path)
+					: JFolder::move($temppath, $dest_path);
 			}
 		}
 
@@ -1889,7 +1903,7 @@ class plgFlexicontent_fieldsImage extends FCField
 		// *** Special steps for image field in MM-mode
 		// ***
 
-		if ( $image_source == -2 )
+		if ($image_source === -2)
 		{
 			$dest_path_media = 'images/';
 			$dest_path_media_full = JPath::clean( JPATH_SITE .DS. $dest_path_media );
@@ -1976,7 +1990,7 @@ class plgFlexicontent_fieldsImage extends FCField
 				$sub_folder = dirname($v['originalname']);
 				$sub_folder = $sub_folder && $sub_folder!='.' ? DS.$sub_folder : '';
 
-				if ( $image_source >= 1 )
+				if ($image_source >= 1)
 				{
 					$src_file_path  = JPath::clean( $srcpath_original . $v['originalname'] );
 					$dest_file_path = JPath::clean( $dest_path_original . $filename );
@@ -1998,7 +2012,7 @@ class plgFlexicontent_fieldsImage extends FCField
 						: '';
 				}
 
-				elseif ( $image_source == -2 )
+				elseif ($image_source == -2)
 				{
 					$src_file_path  = JPath::clean( $srcpath_original . $v['originalname'] );
 					$dest_file_path = JPath::clean( $dest_path_media_full . $filename );
@@ -2011,7 +2025,7 @@ class plgFlexicontent_fieldsImage extends FCField
 							chmod($dest_file_path, 0644);
 						}
 					}
-					elseif ( JFile::exists($dest_file_path) )
+					elseif (JFile::exists($dest_file_path))
 					{
 						$result = true;
 					}
@@ -2020,7 +2034,7 @@ class plgFlexicontent_fieldsImage extends FCField
 						: '';
 				}
 
-				elseif ( $image_source == 0 )
+				elseif ($image_source === 0)
 				{
 					if ($v['originalname'] == (int) $v['originalname'] && $id_col >= 2)
 					{
@@ -2108,7 +2122,7 @@ class plgFlexicontent_fieldsImage extends FCField
 
 
     // Remove no longer used files, if limiting existing image list to current field, or if existing image list is hidden/disabled
-    if ( $image_source == 0 && ($field->parameters->get('auto_delete_unused', 1) || !$field->parameters->get('list_all_media_files', 0)) )
+    if ($image_source === 0 && ($field->parameters->get('auto_delete_unused', 1) || !$field->parameters->get('list_all_media_files', 0)))
     {
 			// Get existing field values,
 			if (!isset($item->fieldvalues))
@@ -2136,8 +2150,8 @@ class plgFlexicontent_fieldsImage extends FCField
 					$canDeleteImage = $this->canDeleteImage($field, $filename, $item);
 					if ($canDeleteImage)
 					{
-						$this->removeOriginalFile( $field, $filename );
-						//JFactory::getApplication()->enqueueMessage($field->label . ' ['.$n.'] : ' . 'Deleted image file: '.$filename.' from server storage');
+						$this->removeOriginalFile($field, $filename);
+						//$app->enqueueMessage('Field: ' . $field->label . ' ['.$n.'] : ' . 'Deleted image file: ' . $filename . ' from server storage');
 					}
 				}
 			}
@@ -2147,7 +2161,10 @@ class plgFlexicontent_fieldsImage extends FCField
 		// null indicates to increment valueorder without adding a value
 		foreach($post as $i => $v)
 		{
-			if ($v!==null) $post[$i] = serialize($v);
+			if ($v !== null)
+			{
+				$post[$i] = serialize($v);
+			}
 		}
 	}
 
@@ -2183,13 +2200,14 @@ class plgFlexicontent_fieldsImage extends FCField
 	// Method called just before the item is deleted to remove custom item data related to the field
 	function onBeforeDeleteField(&$field, &$item)
 	{
+		$app = JFactory::getApplication();
 		$dir = $field->parameters->get('dir');
 
 		$image_source = (int) $field->parameters->get('image_source', 0);
 		$image_source = $image_source > 1 ? $this->nonImplementedMode($image_source, $field) : $image_source;
 		$target_dir   = (int) $field->parameters->get('target_dir', 1);
 
-		if ( $image_source >= 1 )
+		if ($image_source >= 1)
 		{
 			jimport('joomla.filesystem.file');
 			jimport('joomla.filesystem.folder');
@@ -2199,9 +2217,9 @@ class plgFlexicontent_fieldsImage extends FCField
 			$dest_path = JPath::clean( JPATH_SITE .DS. $dir . DS. 'item_'.$item->id   . '_field_'.$field->id .DS);
 			//if ( $image_source > 1 ) ; // TODO
 
-			if ( JFolder::exists($dest_path) && !JFolder::delete($dest_path) )
+			if (JFolder::exists($dest_path) && !JFolder::delete($dest_path))
 			{
-				JError::raiseNotice(100, $field->label .': Notice: Unable to delete folder: '. $dest_path );
+				$app->enqueueMessage('Field: ' . $field->label . ': Notice: Unable to delete folder: ' . $dest_path, 'warning');
 				return false;
 			}
 		}
@@ -2434,39 +2452,52 @@ class plgFlexicontent_fieldsImage extends FCField
 
 		if ( isset($file['name']) && $file['name'] != '' )
 		{
-			// only handle the secure folder
+			// Only handle the secure folder
 			$path = ($target_dir ? COM_FLEXICONTENT_FILEPATH : COM_FLEXICONTENT_MEDIAPATH).DS;
 
-			//sanitize filename further and make unique
-			$upload_check = flexicontent_upload::check($file, $err_text, $params);  // Check that file contents are safe, and also make the filename safe, transliterating it according to given language (this forces lowercase)
-			$filename     = flexicontent_upload::sanitize($path, $file['name']);    // Sanitize the file name (filesystem-safe, (this should have been done above already)) and also return an unique filename for the given folder
+			/**
+			 * Check that file contents are safe, and make filename file-system safe
+			 * transliterating it according to given language (this forces lowercase)
+			 */
+			$upload_check = flexicontent_upload::check($file, $err_text, $params);
+
+			/**
+			 * Sanitize the file name (filesystem-safe, (this should have been done above already))
+			 * and also return an unique filename for the given folder
+			 */
+			$filename     = flexicontent_upload::sanitize($path, $file['name']);
 			$filepath     = JPath::clean($path.$filename);
 
 			//perform security check according
 			if (!$upload_check)
 			{
-				if ($format == 'json')
+				if ($format === 'json')
 				{
 					jimport('joomla.error.log');
 					$log = JLog::getInstance('com_flexicontent.error.php');
-					$log->addEntry(array('comment' => 'Invalid: '.$filepath.': '.$err_text));
+					$log->addEntry(array(
+						'comment' => 'Invalid: ' . $filepath . ': ' . $err_text
+					));
 					header('HTTP/1.0 415 Unsupported Media Type');
 					die('Error. Unsupported Media Type!');
 				}
 
-				JError::raiseNotice(100, $field->label . ' : ' . JText::_($err_text));
+				$app->enqueueMessage('Field: ' . $field->label . ' : ' . JText::_($err_text), 'error');
 				return false;
 			}
 
 			//get the extension to record it in the DB
 			$ext = strtolower(flexicontent_upload::getExt($filename));
 
-			// - we allow Joomla default security to execute
-			// - if user really uploads an image file, it should not be trigger anyway
+			/**
+			 * We allow Joomla default security to execute, if user really uploads an image file, it should not be trigger anyway
+			 */
 			$upload_success = JFile::upload($file['tmp_name'], $filepath);
-			if ( !$upload_success )
+
+			if (!$upload_success)
 			{
-				if ($format == 'json') {
+				if ($format === 'json')
+				{
 					jimport('joomla.error.log');
 					$log = JLog::getInstance('com_flexicontent.error.php');
 					$log->addEntry(array('comment' => 'Cannot upload: '.$filepath));
@@ -2474,9 +2505,11 @@ class plgFlexicontent_fieldsImage extends FCField
 					jexit('Error. File already exists');
 				}
 
-				JError::raiseWarning(100, $field->label . ' : ' . JText::_('Error. Unable to upload file'));
+				$app->enqueueMessage('Field: ' . $field->label . ' : ' . JText::_('FLEXI_UNABLE_TO_UPLOAD_FILE'), 'error');
 				return false;
-			} else {
+			}
+			else
+			{
 				$db     = JFactory::getDbo();
 				$user   = JFactory::getUser();
 				$config = JFactory::getConfig();
@@ -2496,7 +2529,7 @@ class plgFlexicontent_fieldsImage extends FCField
 				$obj->uploaded		= $date->toSql();
 				$obj->uploaded_by	= $user->get('id');
 
-				if ($format == 'json')
+				if ($format === 'json')
 				{
 					jimport('joomla.error.log');
 					$log = JLog::getInstance();
@@ -2525,8 +2558,7 @@ class plgFlexicontent_fieldsImage extends FCField
 		}
 		else
 		{
-			$err_text = 'File upload failed';
-			JError::raiseNotice(100, $field->label . ' : ' . JText::_($err_text));
+			$app->enqueueMessage('Field: ' . $field->label . ' : ' . JText::_('FLEXI_UNABLE_TO_UPLOAD_FILE'), 'error');
 			return false;
 		}
 	}
@@ -2538,11 +2570,14 @@ class plgFlexicontent_fieldsImage extends FCField
 
 	function create_thumb( &$field, $filename, $size, $src_path='', $dest_path='', $copy_original=0, $extra_prefix='' )
 	{
+		$app = JFactory::getApplication();
+
 		static $dest_paths_arr = array();
 
 		// Execute once
 		static $initialized = null;
-		if ( !$initialized )
+		
+		if (!$initialized)
 		{
 			$initialized = 1;
 			jimport('joomla.filesystem.file');
@@ -2574,30 +2609,47 @@ class plgFlexicontent_fieldsImage extends FCField
 		$wmpos	= $field->parameters->get('wm_position');
 
 		// Create destination folder if it does not exist
-		if ( !JFolder::exists($dest_path) && !JFolder::create($dest_path) ) {
-			JError::raiseWarning(100, $field->label . ' : ' . JText::_('Error. Unable to create folders'));
+		if (!JFolder::exists($dest_path) && !JFolder::create($dest_path))
+		{
+			$app->enqueueMessage('Field: ' . $field->label . ' : ' . JText::_('Error. Unable to create folders'), 'error');
 			return false;
 		}
 
 		// Make sure folder is writtable by phpthumb
-		if ( !isset($dest_paths_arr[$dest_path]) && JPath::canChmod($dest_path) ) {
-			//JPath::setPermissions($dest_path, '0644', '0755');  // *** VERY SLOW does chmod on all folder / subfolder files
+		if (!isset($dest_paths_arr[$dest_path]) && JPath::canChmod($dest_path))
+		{
+			/**
+			 * JPath::setPermissions() is VERY SLOW, because it does chmod() on all folder / subfolder files
+			 */
+			//JPath::setPermissions($dest_path, '0644', '0755');
 			chmod($dest_path, 0755);
 		}
-		$dest_paths_arr[$dest_path] = 1;  // Avoid trying to set folder permission multiple times
+
+		// Avoid trying to set folder permission multiple times
+		$dest_paths_arr[$dest_path] = 1;
 
 		// EITHER copy original image file as current thumbnail (FLAG 'copy_original' is set)
-		if ($copy_original) {
+		if ($copy_original)
+		{
 			$result = JFile::copy( $src_path.$filename,  $filepath );
 		}
 
 		// OR Create the thumnail by calling phpthumb
-		else {
-			$result = $this->imagePhpThumb( $src_path, $dest_path, $prefix, $filename, $ext, $w, $h, $quality, $size, $crop, $usewm, $wmfile, $wmop, $wmpos );
+		else
+		{
+			$result = $this->imagePhpThumb(
+				$src_path, $dest_path,
+				$prefix, $filename, $ext,
+				$w, $h, $quality, $size, $crop,
+				$usewm, $wmfile, $wmop, $wmpos
+			);
 		}
 
 		// Make sure the created thumbnail has correct permissions
-		if ( $result && JPath::canChmod($filepath) )  chmod($filepath, 0644);
+		if ($result && JPath::canChmod($filepath))
+		{
+			chmod($filepath, 0644);
+		}
 
 		return $result;
 	}
@@ -2611,6 +2663,7 @@ class plgFlexicontent_fieldsImage extends FCField
 	function imagePhpThumb( $src_path, $dest_path, $prefix, $filename, $ext, $width, $height, $quality, $size, $crop, $usewm, $wmfile, $wmop, $wmpos )
 	{
 		static $initialized = null;
+
 		if ($initialized === null)
 		{
 			$initialized = 1;
@@ -2679,9 +2732,11 @@ class plgFlexicontent_fieldsImage extends FCField
 	 * Removes an orignal image file and its thumbnails
 	 */
 
-	function removeOriginalFile( $field, $filename )
+	public function removeOriginalFile($field, $filename)
 	{
-		$db = JFactory::getDbo();
+		$app = JFactory::getApplication();
+		$db  = JFactory::getDbo();
+
 		jimport('joomla.filesystem.file');
 		jimport('joomla.filesystem.path');
 
@@ -2690,14 +2745,14 @@ class plgFlexicontent_fieldsImage extends FCField
 		$target_dir   = (int) $field->parameters->get('target_dir', 1);
 
 		// Folder-mode 1
-		if ( $image_source >= 1 )
+		if ($image_source >= 1)
 		{
 			$thumbfolder = JPath::clean(JPATH_SITE .DS. $field->parameters->get('dir') .DS. 'item_'.$field->item_id . '_field_'.$field->id);
 			$origfolder  = $thumbfolder .DS. 'original' .DS;
 		}
 
 		// DB-mode
-		else if ( $image_source == 0 )
+		elseif ($image_source === 0)
 		{
 			$thumbfolder = JPath::clean( JPATH_SITE .DS. $field->parameters->get('dir') );
 			$origfolder  = JPath::clean( ($target_dir ? COM_FLEXICONTENT_FILEPATH : COM_FLEXICONTENT_MEDIAPATH) );
@@ -2706,40 +2761,36 @@ class plgFlexicontent_fieldsImage extends FCField
 		// Negative, intro-full mode, this should be unreachable, because
 		else
 		{
-			echo "image field id: ".$field->id." is in intro-full mode, removeOriginalFile() should not have been called";
+			echo '<div class="alert alert-warning">image field id: ' . $field->id . ' is in intro-full mode, removeOriginalFile() should not have been called</div>';
 		}
 
 		// a. Delete the thumbnails
-		$errors		= array();
-		$sizes 		= array('l','m','s','b');
+		$errors = array();
+		$sizes  = array('l','m','s','b');
+
 		foreach ($sizes as $size)
 		{
 			$dest_path = $thumbfolder . DS . $size . '_' . $filename;
-			if ( JFile::exists($dest_path) && !JFile::delete($dest_path) )
+
+			if (JFile::exists($dest_path) && !JFile::delete($dest_path))
 			{
-				// Handle failed delete, currently this is not outputed, since thumbnails may not have been created, or may have been deleted manually ??
-				JError::raiseNotice(100, JText::_('FLEXI_FIELD_UNABLE_TO_DELETE_FILE') .": ". $dest_path);
+				$app->enqueueMessage('Field: ' . $field->label . ' : ' . JText::_('FLEXI_FIELD_UNABLE_TO_DELETE_FILE') .": ". $dest_path, 'warning');
 			}
 		}
 
 		// b. Delete the original image from file manager
 		$src_path = JPath::clean($origfolder.DS.$filename);
+
 		if (!JFile::delete($src_path))
 		{
-			JError::raiseNotice(100, JText::_('FLEXI_FIELD_UNABLE_TO_DELETE_FILE') .": ". $src_path);
+			$app->enqueueMessage('Field: ' . $field->label . ' : ' . JText::_('FLEXI_FIELD_UNABLE_TO_DELETE_FILE') . ': ' . $src_path, 'warning');
 		}
 
 		// For DB-mode, also delete file from database
-		if ( $image_source == 0 )
+		if ($image_source === 0)
 		{
-			$query = 'DELETE FROM #__flexicontent_files'
-				. ' WHERE ' . $db->quoteName('filename') . ' = ' . $db->Quote($filename);
-			$db->setQuery( $query );
-			if(!$db->execute())
-			{
-				$this->setError($db->getErrorMsg());
-				return false;
-			}
+			$query = 'DELETE FROM #__flexicontent_files  WHERE ' . $db->quoteName('filename') . ' = ' . $db->Quote($filename);
+			$db->setQuery($query)->execute();
 		}
 
 		return true;
