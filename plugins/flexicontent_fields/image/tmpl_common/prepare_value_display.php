@@ -35,7 +35,10 @@
 	{
 		if ($dirname = dirname($image_subpath))
 		{
-			$orig_urlpath .=  '/'. str_replace('\\', '/', $dirname);
+			if ($dirname !== '.')
+			{
+				$orig_urlpath .=  '/' . str_replace('\\', '/', $dirname);
+			}
 		}
 	}
 
@@ -219,12 +222,20 @@
 		: (isset(self::$index_to_thumb_size[$thumb_size]) ? self::$index_to_thumb_size[$thumb_size] : 's');
 
 	$crop = $field->parameters->get('method_'.$size);
-	$w = $field->parameters->get('w_' . $size, self::$default_widths[$size]);
-	$h = $field->parameters->get('h_' . $size, self::$default_heights[$size]);
-	
-	$img_size_attrs = $crop
-		? ' style="width: ' . $w . 'px; height: ' . $h . 'px;" '
-		: ' style="max-width: ' . $w . 'px; max-height: ' . $h . 'px;" ';
+
+	if ($size !== 'o')
+	{
+		$w = $field->parameters->get('w_' . $size, self::$default_widths[$size]);
+		$h = $field->parameters->get('h_' . $size, self::$default_heights[$size]);
+
+		$img_size_attrs = $crop
+			? ' style="width: ' . $w . 'px; height: ' . $h . 'px;" '
+			: ' style="max-width: ' . $w . 'px; max-height: ' . $h . 'px;" ';
+	}
+	else
+	{
+		$img_size_attrs = '';
+	}
 
 	switch ($prop)
 	{
