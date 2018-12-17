@@ -1258,7 +1258,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		 * Add collaboration button
 		 */
 
-		$do_collaboration = JPluginHelper::isEnabled('system', 'flexisyspro');
+		$has_pro = JPluginHelper::isEnabled($extfolder = 'system', $extname = 'flexisyspro');
 		$com_mailto_found = file_exists(JPATH_SITE.DS.'components'.DS.'com_mailto'.DS.'helpers'.DS.'mailto.php');
 
 		if ($com_mailto_found)
@@ -1266,21 +1266,21 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 			require_once(JPATH_SITE.DS.'components'.DS.'com_mailto'.DS.'helpers'.DS.'mailto.php');
 			$status = 'width=700,height=360,menubar=yes,resizable=yes';
 			$btn_title = JText::_('FLEXI_COLLABORATE_EMAIL_ABOUT_THIS_ITEM');
-			$btn_info  = JText::_('FLEXI_COLLABORATE_EMAIL_ABOUT_THIS_ITEM_INFO');
-			$send_form_url = 'index.php?option=com_flexicontent&tmpl=component'
+			$btn_info  = flexicontent_html::encodeHTML(JText::_('FLEXI_COLLABORATE_EMAIL_ABOUT_THIS_ITEM_INFO'), 2);
+			$task_url = 'index.php?option=com_flexicontent&tmpl=component'
 				.'&task=call_extfunc&exttype=plugins&extfolder=system&extname=flexisyspro&extfunc=collaborate_form'
 				.'&content_id='.$item->id;
-			$full_js = $do_collaboration
+			$full_js = $has_pro
 				? "var url = jQuery(this).attr('data-href'); fc_showDialog(url, 'fc_modal_popup_container', 0, 800, 800, 0, {title:'" . JText::_($btn_title) . "'}); return false;"
 				: "var box = jQuery('#fc_available_in_pro'); fc_file_props_handle = fc_showAsDialog(box, 480, 320, null, {title:'" . JText::_($btn_title) . "'}); return false;";
 
 			$btn_name='collaborate';
-			$btn_arr[$btn_name] = '<div id="fc_available_in_pro" style="display: none;">Available in FLEXIcontent PRO version</div>' . flexicontent_html::addToolBarButton(
+			$btn_arr[$btn_name] = '<div id="fc_available_in_pro" style="display: none;">' . JText::_('FLEXI_AVAILABLE_IN_PRO_VERSION') . '</div>' . flexicontent_html::addToolBarButton(
 					$btn_title, $btn_name, $full_js ,
 					$msg_alert='', $msg_confirm='',
 					$btn_task='', $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false,
 					$btn_class='btn-fcaction ' . (FLEXI_J40GE ? $this->btn_iv_class : '') . ' ' . $this->tooltip_class, $btn_icon="icon-mail",
-					'data-placement="right" data-href="'.$send_form_url.'" title="Send email to other reviewers"', $auto_add = 0
+					'data-placement="right" data-href="' . $task_url . '" title="' . $btn_info . '"', $auto_add = 0
 				);
 		}
 

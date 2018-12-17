@@ -27,23 +27,12 @@ jimport('joomla.filesystem.file');
  */
 class FlexicontentViewItems extends JViewLegacy
 {
-	function encodeCSVField($string)
-	{
-		if (strpos($string, ',') !== false || strpos($string, '"') !== false || strpos($string, "\n") !== false) 
-		{
-			$string = '"' . str_replace('"', '""', $string) . '"';
-		}
-		//return mb_convert_encoding($string, 'UTF-16LE', 'UTF-8');
-		return $string;
-	}
-	
-	
 	/**
 	 * Creates the page's display
 	 *
 	 * @since 1.0
 	 */
-	function display( $tpl = null )
+	public function display($tpl = null)
 	{
 		// Initialize framework variables
 		$user    = JFactory::getUser();
@@ -51,25 +40,19 @@ class FlexicontentViewItems extends JViewLegacy
 		$app     = JFactory::getApplication();
 		$jinput  = $app->input;
 
+
 		// Get model
 		$model  = $this->getModel();
+
 
 		/**
 		 * Get configuration parameters
 		 * For backend this is component parameters only
 		 * For frontend this category parameters as VIEW's parameters (category parameters are merged parameters in order: layout(template-manager)/component/ancestors-cats/category/author/menu)
 		 */
-		if ($app->isAdmin())
-		{
-			$params = JComponentHelper::getParams('com_flexicontent');
-		}
-
-		else
-		{
-			// Get the category, loading category data and doing parameters merging
-			$category = $this->get('Category');
-			$params = $category->parameters;
-		}
+		$params = $app->isAdmin()
+			? JComponentHelper::getParams('com_flexicontent')
+			: $model->getCategory()->parameters;
 
 		// Check if CSV export button is enabled for current view
 		$show_csvbutton = $app->isAdmin()
@@ -82,58 +65,88 @@ class FlexicontentViewItems extends JViewLegacy
 		}
 
 
-		/**
-		 * Get data from the model, note data retrieval must be before 
-		 * getTotal() and getPagination() because it also calculates total rows
-		 */
+		// Map of CORE to item properties
+		$core_props = array(
 
-		$items   = $this->get('Data');
+			// Core fields (Having field property 'iscore': 1)
+			'title'        => 'title',
+			'created_by'   => 'author',
+			'modified_by'  => 'modifier',
+			'created'      => 'created',
+			'modified'     => 'modified',
+			
+			// Core-property fields (Having field type: 'coreprops')
+			'id'           => 'id',
+			'access'       => 'access',
+			'alias'        => 'alias',
+			'lang'         => 'language',
+			'language'     => 'language',
+			'category'     => 'catid',
+			'created_by_alias' => 'created_by_alias',
+			'publish_up'   =>'publish_up',
+			'publish_down' =>'publish_down',
+		);
+
+		$has_pro    = JPluginHelper::isEnabled($extfolder = 'system', $extname = 'flexisyspro');
+		$export_all = $has_pro && $app->isAdmin() && $jinput->getCmd('items_set', '') === 'all';
+
+		if ($export_all)
+		{
+			// Create plugin instance
+			$className   = 'plg' . ucfirst($extfolder) . $extname;
+			$dispatcher  = JEventDispatcher::getInstance();
+			$plg_db_data = JPluginHelper::getPlugin($extfolder, $extname);
+
+			$plg = new $className($dispatcher, array(
+				'type'   => $extfolder,
+				'name'   => $extname,
+				'params' => $plg_db_data->params,
+			));
+
+			if (!method_exists($plg, 'getItemsSet'))
+			{
+				$app->enqueueMessage('FLEXI_PRO_VERSION_OUTDATED', 'warning');
+				$app->redirect($this->_getSafeReferer());
+			}
+		}
+
+		if ($export_all)
+		{
+			$items = $plg->getItemsSet($model, $_init = true);
+		}
+		else
+		{
+			$limit = $model->getState('limit') > 100 ? 100 : $model->getState('limit');
+			$model->setState('limit', $limit);
+			$items = $model->getData();
+		}
+
+		$item0 = reset($items);
+
+		// Use &test=1 to test / preview item data of first item
+		/*if ($jinput->getInt('test', 0))
+		{
+			echo "<pre>"; print_r($item0); exit;
+		}*/
 
 		// Get field values
 		$_vars = null;
-		FlexicontentFields::getItemFields($items, $_vars, $_view='category', $aid);
+		FlexicontentFields::getItemFields($items, $_vars, $_view = 'category', $aid);
 
 		// Zero unneeded search index text
-		foreach ($items as $item) $item->search_index = '';
-
-		// Use &test=1 to test / preview item data of first item
-		/*if ($jinput->get('test', 0, 'cmd'))
+		foreach ($items as $item)
 		{
-			$item = reset($items); echo "<pre>"; print_r($item); exit;
-		}*/
+			$item->search_index = '';
+		}
 
 
 		/**
 		 * Find fields that will be added to CSV export
 		 */
 
-		// Map of CORE to item properties
-		$core_props = array(
-
-			// Core fields (Having field property 'iscore': 1)
-			'title'=>'title',
-			'created_by'=>'author',
-			'modified_by'=>'modifier',
-			'created'=>'created',
-			'modified'=>'modified',
-			
-			// Core-property fields (Having field type: 'coreprops')
-			'id'=>'id',
-			'access'=>'access',
-			'alias'=>'alias',
-			'lang'=>'language',
-			'language'=>'language',
-			'category'=>'catid',
-			'created_by_alias'=>'created_by_alias',
-			'publish_up'=>'publish_up',
-			'publish_down'=>'publish_down',
-		);
-
 		$total_fields = 0;
-		$delim = '';
-		$item0 = reset($items);
 		
-		foreach( $item0->fields as $field )
+		foreach($item0->fields as $field)
 		{
 			FlexicontentFields::loadFieldConfig($field, $item0);
 
@@ -143,25 +156,31 @@ class FlexicontentViewItems extends JViewLegacy
 			{
 				continue;
 			}
+
 			$total_fields++;
 
 			// Render field's CSV display
-			if ( $include_in_csv_export === 2 )
+			if ($include_in_csv_export === 2)
 			{
-				FlexicontentFields::getFieldDisplay($items, $field->name, $values=null, $method='csv_export');
+				FlexicontentFields::getFieldDisplay($items, $field->name, $values = null, $method = 'csv_export');
 			}
 		}
-	
-		if ($total_fields==0)
+
+
+		// Abort if no fields were configured for CSV export
+		if ($total_fields === 0)
 		{
-			$app->enqueueMessage("Fist record in list does not have any fields that supports CSV export and that are also marked as CSV exportable in their configuration", "notice");
+			$app->enqueueMessage('FLEXI_CSV_EXPORT_NO_ITEMS_MARKED_FOR_CSV_EXPORT', 'warning');
+			$app->redirect($this->_getSafeReferer());
+		}
 
-			$referer = @$_SERVER['HTTP_REFERER'];
-			$referer = flexicontent_html::is_safe_url($referer)
-				? $referer
-				: JUri::base();
 
-			$app->redirect($referer);
+		/**
+		 * 0. Try to set no limit to PHP executon
+		 */
+		if (!FLEXIUtilities::funcIsDisabled('set_time_limit'))
+		{
+			@set_time_limit(0);
 		}
 
 
@@ -184,95 +203,146 @@ class FlexicontentViewItems extends JViewLegacy
 		 * 2. Output HEADERS row
 		 */
 
-		foreach( $item0->fields as $field )
+		$delim = '';
+
+		foreach($item0->fields as $field)
 		{
 			$include_in_csv_export = (int) $field->parameters->get('include_in_csv_export', 0);
-			if ( !$include_in_csv_export )
+
+			if (!$include_in_csv_export)
 			{
 				continue;
 			}
 
-			echo $delim . $this->encodeCSVField($field->label);
+			echo $delim . $this->_encodeCSVField($field->label);
 			$delim = ",";
 			$total_fields++;
 		}
 		echo "\n";
 
 
+		// Try to create CSV export with all items
+		$limitstart = 0;
+		$limit      = 2000;
+		
+		$model->setState('limit', $limit);
+
 		/**
 		 * 3. Output data rows
 		 */
-
-		foreach($items as $item)
+		while (!empty($items))
 		{
-			$delim = '';
-			foreach($item0->fields as $field_name => $field)
+			foreach($items as $item)
 			{
-				$include_in_csv_export = (int) $field->parameters->get('include_in_csv_export', 0);
-				$csv_strip_html = (int) $field->parameters->get('csv_strip_html', 0);
+				$delim = '';
 
-				if ( !$include_in_csv_export )
+				foreach($item0->fields as $field_name => $field)
 				{
-					continue;
-				}
+					$include_in_csv_export = (int) $field->parameters->get('include_in_csv_export', 0);
+					$csv_strip_html = (int) $field->parameters->get('csv_strip_html', 0);
 
-				echo $delim;
-				$delim = ',';
-				$vals = '';
-
-				// CASE 1: RENDERED value display !
-				if ($include_in_csv_export === 2)
-				{
-					// Check that field created a non-empty 'display' property named: "csv_export"
-					$vals = isset($item->onDemandFields[$field->name]->csv_export)
-						? $item->onDemandFields[$field->name]->csv_export
-						: '';
-
-					// Smart strip HTML tags without cutting the text
-					if ($csv_strip_html)
+					if (!$include_in_csv_export)
 					{
-						$vals = flexicontent_html::striptagsandcut($vals);
+						continue;
 					}
-				}
 
-				// CASE 2: CORE properties (special case), TODO: Implement this as "RENDERED value display" (and make it default output for them ?)
-				elseif ($field->iscore && isset($core_props[$field_name]))
-				{
-					$prop = $core_props[$field_name];
-					$vals = $item->$prop;
-				}
+					echo $delim;
+					$delim = ',';
+					$vals = '';
 
-				elseif ($field->field_type === 'coreprops' && $include_in_csv_export === 1)
-				{
-					$props_type = $field->parameters->get('props_type', '');
-					$prop = isset($core_props[$props_type]) ? $core_props[$props_type] : $props_type;
-					$vals = isset($item->$prop) ? $item->$prop : '';
-				}
-
-				// CASE 3: RAW value display !
-				elseif (isset($item->fieldvalues[$field->id]))
-				{
-					if (is_array(reset($item->fieldvalues[$field->id])))
+					// CASE 1: RENDERED value display !
+					if ($include_in_csv_export === 2)
 					{
-						$vals = array();
+						// Check that field created a non-empty 'display' property named: "csv_export"
+						$vals = isset($item->onDemandFields[$field->name]->csv_export)
+							? $item->onDemandFields[$field->name]->csv_export
+							: '';
 
-						foreach ($item->fieldvalues[$field->id] as $v)
+						// Smart strip HTML tags without cutting the text
+						if ($csv_strip_html)
 						{
-							$vals = implode(' | ', $v);
+							$vals = flexicontent_html::striptagsandcut($vals);
 						}
 					}
 
-					else
+					// CASE 2: CORE properties (special case), TODO: Implement this as "RENDERED value display" (and make it default output for them ?)
+					elseif ($field->iscore && isset($core_props[$field_name]))
 					{
-						$vals = $item->fieldvalues[$field->id];
+						$prop = $core_props[$field_name];
+						$vals = $item->$prop;
 					}
+
+					elseif ($field->field_type === 'coreprops' && $include_in_csv_export === 1)
+					{
+						$props_type = $field->parameters->get('props_type', '');
+						$prop = isset($core_props[$props_type]) ? $core_props[$props_type] : $props_type;
+						$vals = isset($item->$prop) ? $item->$prop : '';
+					}
+
+					// CASE 3: RAW value display !
+					elseif (isset($item->fieldvalues[$field->id]))
+					{
+						if (is_array(reset($item->fieldvalues[$field->id])))
+						{
+							$vals = array();
+
+							foreach ($item->fieldvalues[$field->id] as $v)
+							{
+								$vals = implode(' | ', $v);
+							}
+						}
+
+						else
+						{
+							$vals = $item->fieldvalues[$field->id];
+						}
+					}
+
+					echo $this->_encodeCSVField( is_array($vals) ? implode(', ', $vals ) : $vals );
 				}
 
-				echo $this->encodeCSVField( is_array($vals) ? implode(', ', $vals ) : $vals );
+				echo "\n";
 			}
 
-			echo "\n";
+			// Get data from the model
+			$items = $export_all
+				? $plg->getItemsSet($model)
+				: array();
+
+			// Get field values
+			$_vars = null;
+			FlexicontentFields::getItemFields($items, $_vars, $_view = 'category', $aid);
+
+			// Zero unneeded search index text
+			foreach ($items as $item)
+			{
+				$item->search_index = '';
+			}
 		}
-		jexit();  // need to exist here !! to avoid any other output
+
+		// Need to exist here !! to avoid any other output
+		jexit();
+	}
+
+
+	protected function _encodeCSVField($string)
+	{
+		if (strpos($string, ',') !== false || strpos($string, '"') !== false || strpos($string, "\n") !== false) 
+		{
+			$string = '"' . str_replace('"', '""', $string) . '"';
+		}
+
+		//return mb_convert_encoding($string, 'UTF-16LE', 'UTF-8');
+		return $string;
+	}
+
+
+	protected function _getSafeReferer($string)
+	{
+		// Get safe referer in case we abort
+		$referer = !empty($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : null;
+		return flexicontent_html::is_safe_url($referer)
+			? $referer
+			: JUri::base();
 	}
 }
