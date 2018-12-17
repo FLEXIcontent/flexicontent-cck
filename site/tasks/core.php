@@ -158,7 +158,9 @@ class FlexicontentTasksCore
 
 		if ($filtercat)
 		{
-			$lang_where .= '   AND ( i.language LIKE ' . $db->Quote( $lang .'%' ) . ' OR i.language="*" ) ';
+			$lta = 'i';
+			//$lang_where .= ' AND ( '.$lta.'.language LIKE ' . $db->Quote( $lang .'%' ) . ' OR '.$lta.'.language="*" ) ';
+			$lang_where .= ' AND (' . $lta . ' .language = ' . $db->Quote(JFactory::getLanguage()->getTag()) . ' OR ' . $lta . '.language = "' . $db->Quote('*') . '")';
 		}
 
 		$access_where = '';
@@ -183,7 +185,7 @@ class FlexicontentTasksCore
 		$query 	= 'SELECT si.item_id, si.search_index'    //.', '. $_text_match. ' AS score'  // THIS MAYBE SLOW
 			.' FROM #__' . $tbl . ' AS si'
 			.' JOIN '. ($use_tmp ? '#__flexicontent_items_tmp' : '#__content') .' AS i ON i.id = si.item_id'
-			.(($access_where && !$use_tmp) || ($lang_where && !FLEXI_J16GE && !$use_tmp) || $type!='basic_index' ?
+			.(($access_where && !$use_tmp) || ($filtercat && !$use_tmp) || $type !== 'basic_index' ?
 				' JOIN #__flexicontent_items_ext AS ie ON i.id = ie.item_id ' : '')
 			.($access_where ? ' JOIN #__flexicontent_types AS ty ON ie.type_id = ty.id' : '')
 			.($access_where ? ' JOIN #__categories AS mc ON mc.id = i.catid' : '')
