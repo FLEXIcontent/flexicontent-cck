@@ -5,7 +5,7 @@
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
  * @license GNU/GPL v2
- * 
+ *
  * FLEXIcontent is a derivative work of the excellent QuickFAQ component
  * @copyright (C) 2008 Christoph Lukes
  * see www.schlu.net for more information
@@ -36,7 +36,7 @@ class FLEXIcontentModelSearch extends JModelLegacy
 	 * @var array
 	 */
 	var $_data = null;
-	
+
 	/**
 	 * Items list total
 	 *
@@ -50,21 +50,21 @@ class FLEXIcontentModelSearch extends JModelLegacy
 	 * @var integer
 	 */
 	var $_areas = null;
-	
+
 	/**
 	 * Pagination object
 	 *
 	 * @var object
 	 */
 	var $_pagination = null;
-	
+
 	/**
 	 * Search view parameters via menu item or via search module or ... via global configuration selected menu item
 	 *
 	 * @var object
 	 */
 	var $_params = null;
-	
+
 	/**
 	 * Constructor
 	 *
@@ -73,7 +73,7 @@ class FLEXIcontentModelSearch extends JModelLegacy
 	function __construct()
 	{
 		parent::__construct();
-		
+
 		// ***
 		// *** Set id and load parameters
 		// ***
@@ -89,37 +89,46 @@ class FLEXIcontentModelSearch extends JModelLegacy
 		// Make sure limitstart is set
 		$app->input->set('limitstart', $limitstart);
 		$app->input->set('start', $limitstart);
-		
+
 		$this->setState('limit', $limit);
 		$this->setState('limitstart', $limitstart);
-		
-		
+
+
 		// *************************
 		// Set the search parameters
 		// *************************
 		$keyword  = urldecode( $app->input->getString('searchword', $app->input->getString('q')) );
-		
+
 		$default_searchphrase = $params->get('default_searchphrase', 'all');
 		$match = $app->input->getWord('searchphrase', $app->input->getWord('p', $default_searchphrase));
-		
+
 		$default_searchordering = $params->get('default_searchordering', 'newest');
 		$ordering = $app->input->getWord('ordering', $app->input->getWord('o', $default_searchordering));
-		
+
 		$this->setSearch($keyword, $match, $ordering);
-		
-		
-		// ********************
-		// Set the search areas
-		// ********************
-		$areas = $app->input->getVar('areas');
+
+
+		/**
+		 * Set the search areas
+		 */
+		$areas = $app->input->get('areas', null, 'array');
+
+		if ($areas)
+		{
+			foreach ($areas as $i => $area)
+			{
+				$areas[$i] = JFilterInput::getInstance()->clean($area, 'cmd');
+			}
+		}
+
 		$this->setAreas($areas);
-		
-		
-		// ******************************
-		// Get minimum word search length
-		// ******************************
-		$option = $app->input->getVar('option');
-		
+
+
+		/**
+		 * Get minimum word search length
+		 */
+		$option = $app->input->getCmd('option');
+
 		//if ( !$app->getUserState( $option.'.min_word_len', 0 ) ) {  // Do not cache to allow configuration changes
 			$db = JFactory::getDbo();
 			$db->setQuery("SHOW VARIABLES LIKE '%ft_min_word_len%'");
@@ -131,8 +140,8 @@ class FLEXIcontentModelSearch extends JModelLegacy
 			$app->setUserState($option.'.min_word_len', $min_word_len);
 		//}
 	}
-	
-	
+
+
 	/**
 	 * Method to set initialize data, setting an element id for the view
 	 *
@@ -148,8 +157,8 @@ class FLEXIcontentModelSearch extends JModelLegacy
 		$this->_params  = null;
 		$this->_loadParams();
 	}
-	
-	
+
+
 	/**
 	 * Method to set the search parameters
 	 *
@@ -217,17 +226,16 @@ class FLEXIcontentModelSearch extends JModelLegacy
 			}
 
 			$this->_total	= count($rows);
-			if($this->getState('limit') > 0) {
-				$this->_data    = array_splice($rows, $this->getState('limitstart'), $this->getState('limit'));
-			} else {
-				$this->_data = $rows;
-			}
+
+			$this->_data = $this->getState('limit') > 0
+				? array_splice($rows, $this->getState('limitstart'), $this->getState('limit'))
+				: $rows;
 		}
-		
+
 		return $this->_data;
 	}
-	
-	
+
+
 	/**
 	 * Method to get the total number of items
 	 *
@@ -238,8 +246,8 @@ class FLEXIcontentModelSearch extends JModelLegacy
 	{
 		return $this->_total;
 	}
-	
-	
+
+
 	/**
 	 * Method to get the pagination object
 	 *
@@ -257,8 +265,8 @@ class FLEXIcontentModelSearch extends JModelLegacy
 		}
 		return $this->_pagination;
 	}
-	
-	
+
+
 	/**
 	 * Method to get the search areas
 	 *
@@ -270,14 +278,14 @@ class FLEXIcontentModelSearch extends JModelLegacy
 		if ( !empty($this->_areas['search']) ) {
 			return $this->_areas;
 		}
-		
+
 		// Return (only) the area of advanced search plugin, when search areas selector is not shown
 		$params = & $this->_params;
 		if( !$params->get('show_searchareas', 0) ) {
 			$this->_areas['search'] = array('flexicontent' => 'FLEXICONTENT');
 			return $this->_areas;
 		}
-		
+
 		// Using other search areas, get all search
 		JPluginHelper::importPlugin( 'search');
 		$dispatcher = JEventDispatcher::getInstance();
@@ -286,25 +294,25 @@ class FLEXIcontentModelSearch extends JModelLegacy
 		foreach ($searchareas as $area) {
 			$areas = array_merge( $areas, $area );
 		}
-		
+
 		// DISABLE search area 'content' of Joomla articles search plugin
 		unset($areas['content']);
-		
+
 		// DISABLE -FIELD- search areas of standard flexisearch plugin
 		$unset_areas = array('FlexisearchTitle', 'FlexisearchDesc', 'FlexisearchFields', 'FlexisearchMeta', 'FlexisearchTags');
 		foreach($unset_areas as $_unset_area) unset($areas[$_unset_area]);
-		
+
 		// DISABLE -CONTENT TYPES- search areas of standard flexisearch plugin
 		foreach($areas as $_sindex => $_slabel) {
 			if (strpos($_sindex, 'FlexisearchType') !== false)  unset($areas[$_sindex]);
 		}
-		
+
 		// Cache search areas and return them
 		$this->_areas['search'] = $areas;
 		return $this->_areas;
 	}
-	
-	
+
+
 	/**
 	 * Method to load parameters
 	 *
@@ -315,25 +323,25 @@ class FLEXIcontentModelSearch extends JModelLegacy
 	function _loadParams()
 	{
 		if ( $this->_params !== NULL ) return;
-		
+
 		$app  = JFactory::getApplication();
 		$menu = $app->getMenu()->getActive();     // Retrieve active menu
-		
+
 		// Get the COMPONENT only parameter
 		$params  = new JRegistry();
 		$cparams = JComponentHelper::getParams('com_flexicontent');
 		$params->merge($cparams);
-		
+
 		// Merge the active menu parameters
 		if ($menu)
 		{
 			$params->merge($menu->params);
 		}
-		
+
 		$this->_params = $params;
 	}
-	
-	
+
+
 	/**
 	 * Method to get view's parameters
 	 *
@@ -344,5 +352,5 @@ class FLEXIcontentModelSearch extends JModelLegacy
 	{
 		return $this->_params;
 	}
-	
+
 }

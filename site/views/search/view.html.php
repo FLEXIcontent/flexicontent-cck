@@ -660,8 +660,15 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		if( $params->get('show_searchareas', 0) )
 		{
 			// Get Content Types currently selected in the Search Form
-			$form_areas = $jinput->getString('areas', array());
-			//if ( empty($form_areas) || !count($form_areas) )  $form_areas = array('flexicontent');
+			$form_areas = $jinput->get('areas', array(), 'array');
+
+			if ($form_areas)
+			{
+				foreach ($form_areas as $i => $area)
+				{
+					$form_areas[$i] = JFilterInput::getInstance()->clean($area, 'cmd');
+				}
+			}
 
 			$checked = empty($form_areas) || !count($form_areas);
 			$checked_attr = $checked ? 'checked="checked"' : '';

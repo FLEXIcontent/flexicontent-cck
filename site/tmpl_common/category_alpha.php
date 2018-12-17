@@ -59,7 +59,7 @@ for($i=count($groupcssclasses); $i<count($groups); $i++) {
 	$groupcssclasses[$i] = 'letters';
 }
 
-$selected_letter = JFactory::getApplication()->input->getVar('letter', '');
+$selected_letter = JFactory::getApplication()->input->get('letter', '');
 ?>
 
 <div id="fc_alpha">
