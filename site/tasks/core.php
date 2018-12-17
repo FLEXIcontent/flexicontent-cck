@@ -160,7 +160,7 @@ class FlexicontentTasksCore
 		{
 			$lta = 'i';
 			//$lang_where .= ' AND ( '.$lta.'.language LIKE ' . $db->Quote( $lang .'%' ) . ' OR '.$lta.'.language="*" ) ';
-			$lang_where .= ' AND (' . $lta . ' .language = ' . $db->Quote(JFactory::getLanguage()->getTag()) . ' OR ' . $lta . '.language = "' . $db->Quote('*') . '")';
+			$lang_where .= ' AND (' . $lta . ' .language = ' . $db->Quote(JFactory::getLanguage()->getTag()) . ' OR ' . $lta . '.language = ' . $db->Quote('*') . ')';
 		}
 
 		$access_where = '';
