@@ -1071,10 +1071,11 @@ class FlexicontentModelCategory extends JModelLegacy {
 
 		// Filter the category view with the active language
 		// But not language filter: favourites
-		if ($filtercat && $this->_layout!='favs')
+		if ($filtercat && $this->_layout !== 'favs')
 		{
 			$lta = 'i';
-			$where .= ' AND ( '.$lta.'.language LIKE ' . $db->Quote( $lang .'%' ) . (FLEXI_J16GE ? ' OR '.$lta.'.language="*" ' : '') . ' ) ';
+			//$where .= ' AND ( '.$lta.'.language LIKE ' . $db->Quote( $lang .'%' ) . ' OR '.$lta.'.language="*" ) ';
+			$where .= ' AND (' . $lta . ' .language = ' . $db->Quote(JFactory::getLanguage()->getTag()) . ' OR ' . $lta . '.language = "' . $db->Quote('*') . '")';
 		}
 
 		$where .= !FLEXI_J16GE ? ' AND i.sectionid = ' . FLEXI_SECTION : '';
@@ -1611,7 +1612,8 @@ class FlexicontentModelCategory extends JModelLegacy {
 		if ($filtercat)
 		{
 			$lta = $use_tmp ? 'i': 'ie';
-			$where .= ' AND ( '.$lta.'.language LIKE ' . $db->Quote( $lang .'%' ) . ' OR '.$lta.'.language="*" ) ';
+			//$where .= ' AND ( '.$lta.'.language LIKE ' . $db->Quote( $lang .'%' ) . ' OR '.$lta.'.language="*" ) ';
+			$where .= ' AND (' . $lta . ' .language = ' . $db->Quote(JFactory::getLanguage()->getTag()) . ' OR ' . $lta . '.language = "' . $db->Quote('*') . '")';
 		}
 
 		// Get privilege to view non viewable items (upublished, archived, trashed, expired, scheduled).

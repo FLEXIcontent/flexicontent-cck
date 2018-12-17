@@ -478,7 +478,8 @@ class FlexicontentModelTags extends JModelLegacy
 		if ($filtertag)
 		{
 			$lta = 'i';
-			$where .= ' AND ( '.$lta.'.language LIKE ' . $db->Quote( $lang .'%' ) . (FLEXI_J16GE ? ' OR '.$lta.'.language="*" ' : '') . ' ) ';
+			//$where .= ' AND ( '.$lta.'.language LIKE ' . $db->Quote( $lang .'%' ) . ' OR '.$lta.'.language="*" ) ';
+			$where .= ' AND (' . $lta . ' .language = ' . $db->Quote(JFactory::getLanguage()->getTag()) . ' OR ' . $lta . '.language = "' . $db->Quote('*') . '")';
 		}
 
 		// Get privilege to view non viewable items (upublished, archived, trashed, expired, scheduled).

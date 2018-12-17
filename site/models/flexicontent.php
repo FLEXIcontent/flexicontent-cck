@@ -207,36 +207,41 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		$show_noauth = $params->get('show_noauth', 0);    // Show unauthorized items
 		
 		// Build where clause
-		$sub_where  = ' WHERE cc.published = 1';
-		$sub_where .= ' AND c.id = cc.id';
+		$where  = ' WHERE cc.published = 1';
+		$where .= ' AND c.id = cc.id';
 		
 		// Filter the category view with the current user language
-		if ($filtercat) {
+		if ($filtercat)
+		{
 			$lta = $use_tmp ? 'i': 'ie';
-			$sub_where .= ' AND ( '.$lta.'.language LIKE ' . $db->Quote( $lang .'%' ) . ' OR '.$lta.'.language="*" ) ';
+			//$where .= ' AND ( '.$lta.'.language LIKE ' . $db->Quote( $lang .'%' ) . ' OR '.$lta.'.language="*" ) ';
+			$where .= ' AND (' . $lta . ' .language = ' . $db->Quote(JFactory::getLanguage()->getTag()) . ' OR ' . $lta . '.language = "' . $db->Quote('*') . '")';
 		}
 		
 		// Get privilege to view non viewable items (upublished, archived, trashed, expired, scheduled).
 		// NOTE:  ACL view level is checked at a different place
 		$ignoreState = $user->authorise('flexicontent.ignoreviewstate', 'com_flexicontent');
 		
-		if (!$ignoreState) {
+		if (!$ignoreState)
+		{
 			// Limit by publication state. Exception: when displaying personal user items or items modified by the user
-			$sub_where .= ' AND ( i.state IN (1, -5) OR ( i.created_by = '.$user->id.' AND i.created_by != 0 ) )';   //.' OR ( i.modified_by = '.$user->id.' AND i.modified_by != 0 ) )';
+			$where .= ' AND ( i.state IN (1, -5) OR ( i.created_by = '.$user->id.' AND i.created_by != 0 ) )';   //.' OR ( i.modified_by = '.$user->id.' AND i.modified_by != 0 ) )';
 			
 			// Limit by publish up/down dates. Exception: when displaying personal user items or items modified by the user
-			$sub_where .= ' AND ( ( i.publish_up = '.$db->Quote($nullDate).' OR i.publish_up <= '.$_nowDate.' ) OR ( i.created_by = '.$user->id.' AND i.created_by != 0 ) )';       //.' OR ( i.modified_by = '.$user->id.' AND i.modified_by != 0 ) )';
-			$sub_where .= ' AND ( ( i.publish_down = '.$db->Quote($nullDate).' OR i.publish_down >= '.$_nowDate.' ) OR ( i.created_by = '.$user->id.' AND i.created_by != 0 ) )';   //.' OR ( i.modified_by = '.$user->id.' AND i.modified_by != 0 ) )';
+			$where .= ' AND ( ( i.publish_up = '.$db->Quote($nullDate).' OR i.publish_up <= '.$_nowDate.' ) OR ( i.created_by = '.$user->id.' AND i.created_by != 0 ) )';       //.' OR ( i.modified_by = '.$user->id.' AND i.modified_by != 0 ) )';
+			$where .= ' AND ( ( i.publish_down = '.$db->Quote($nullDate).' OR i.publish_down >= '.$_nowDate.' ) OR ( i.created_by = '.$user->id.' AND i.created_by != 0 ) )';   //.' OR ( i.modified_by = '.$user->id.' AND i.modified_by != 0 ) )';
 		}
 		
 		// Select only items that user has view access, checking item, category, content type access level
 		$and = $asscat_and = '';
-		if (!$show_noauth) {
+
+		if (!$show_noauth)
+		{
 			$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
 			$aid_list = implode(",", $aid_arr);
-			$sub_where .= ' AND ty.access IN (0,'.$aid_list.')';
-			$sub_where .= ' AND cc.access IN (0,'.$aid_list.')';
-			$sub_where .= ' AND  i.access IN (0,'.$aid_list.')';
+			$where .= ' AND ty.access IN (0,'.$aid_list.')';
+			$where .= ' AND cc.access IN (0,'.$aid_list.')';
+			$where .= ' AND  i.access IN (0,'.$aid_list.')';
 			$and       .= ' AND  c.access IN (0,'.$aid_list.')';
 		}
 		
@@ -255,7 +260,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 			. (!$use_tmp ? ' JOIN #__flexicontent_items_ext AS ie ON rel.itemid = ie.item_id' : '')
 			. ' JOIN #__flexicontent_types AS ty ON '. (!$use_tmp ? 'ie' : 'i'). '.type_id = ty.id'
 			. ' JOIN #__categories AS cc ON cc.id = rel.catid'
-			. $sub_where
+			. $where
 			. ' ) AS assigneditems'
 			;
 		
@@ -373,13 +378,15 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		$show_noauth = $params->get('show_noauth', 0);    // Show unauthorized items
 		
 		// Build where clause
-		$sub_where  = ' WHERE cc.published = 1';
-		$sub_where .= ' AND c.id = cc.id';
+		$where  = ' WHERE cc.published = 1';
+		$where .= ' AND c.id = cc.id';
 		
 		// Filter the category view with the current user language
-		if ($filtercat) {
+		if ($filtercat)
+		{
 			$lta = $use_tmp ? 'i': 'ie';
-			$sub_where .= ' AND ( '.$lta.'.language LIKE ' . $db->Quote( $lang .'%' ) . ' OR '.$lta.'.language="*" ) ';
+			//$where .= ' AND ( '.$lta.'.language LIKE ' . $db->Quote( $lang .'%' ) . ' OR '.$lta.'.language="*" ) ';
+			$where .= ' AND (' . $lta . ' .language = ' . $db->Quote(JFactory::getLanguage()->getTag()) . ' OR ' . $lta . '.language = "' . $db->Quote('*') . '")';
 		}
 		
 		// Get privilege to view non viewable items (upublished, archived, trashed, expired, scheduled).
@@ -388,11 +395,11 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		
 		if (!$ignoreState) {
 			// Limit by publication state. Exception: when displaying personal user items or items modified by the user
-			$sub_where .= ' AND ( i.state IN (1, -5) OR ( i.created_by = '.$user->id.' AND i.created_by != 0 ) )';   //.' OR ( i.modified_by = '.$user->id.' AND i.modified_by != 0 ) )';
+			$where .= ' AND ( i.state IN (1, -5) OR ( i.created_by = '.$user->id.' AND i.created_by != 0 ) )';   //.' OR ( i.modified_by = '.$user->id.' AND i.modified_by != 0 ) )';
 			
 			// Limit by publish up/down dates. Exception: when displaying personal user items or items modified by the user
-			$sub_where .= ' AND ( ( i.publish_up = '.$db->Quote($nullDate).' OR i.publish_up <= '.$_nowDate.' ) OR ( i.created_by = '.$user->id.' AND i.created_by != 0 ) )';       //.' OR ( i.modified_by = '.$user->id.' AND i.modified_by != 0 ) )';
-			$sub_where .= ' AND ( ( i.publish_down = '.$db->Quote($nullDate).' OR i.publish_down >= '.$_nowDate.' ) OR ( i.created_by = '.$user->id.' AND i.created_by != 0 ) )';   //.' OR ( i.modified_by = '.$user->id.' AND i.modified_by != 0 ) )';
+			$where .= ' AND ( ( i.publish_up = '.$db->Quote($nullDate).' OR i.publish_up <= '.$_nowDate.' ) OR ( i.created_by = '.$user->id.' AND i.created_by != 0 ) )';       //.' OR ( i.modified_by = '.$user->id.' AND i.modified_by != 0 ) )';
+			$where .= ' AND ( ( i.publish_down = '.$db->Quote($nullDate).' OR i.publish_down >= '.$_nowDate.' ) OR ( i.created_by = '.$user->id.' AND i.created_by != 0 ) )';   //.' OR ( i.modified_by = '.$user->id.' AND i.modified_by != 0 ) )';
 		}
 		
 		// Select only items that user has view access, checking item, category, content type access level
@@ -400,9 +407,9 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		if (!$show_noauth) {
 			$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
 			$aid_list = implode(",", $aid_arr);
-			$sub_where .= ' AND ty.access IN (0,'.$aid_list.')';
-			$sub_where .= ' AND cc.access IN (0,'.$aid_list.')';
-			$sub_where .= ' AND  i.access IN (0,'.$aid_list.')';
+			$where .= ' AND ty.access IN (0,'.$aid_list.')';
+			$where .= ' AND cc.access IN (0,'.$aid_list.')';
+			$where .= ' AND  i.access IN (0,'.$aid_list.')';
 			$and       .= ' AND  c.access IN (0,'.$aid_list.')';
 			$asscat_and.= ' AND sc.access IN (0,'.$aid_list.')';
 		}
@@ -419,7 +426,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 			. (!$use_tmp ? ' JOIN #__flexicontent_items_ext AS ie ON rel.itemid = ie.item_id' : '')
 			. ' JOIN #__flexicontent_types AS ty ON '. (!$use_tmp ? 'ie' : 'i'). '.type_id = ty.id'
 			. ' JOIN #__categories AS cc ON cc.id = rel.catid'
-			. $sub_where
+			. $where
 			. ' ) AS assignedsubitems,'
 			
 			. ' ('
