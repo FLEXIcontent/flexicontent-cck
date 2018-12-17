@@ -1148,7 +1148,7 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 
 
 		/**
-		 * Maintenance button (Check-in, Verify Tag mappings, Assignments + Record)
+		 * Maintenance button (Check-in, CSV export, Verify Tag mappings, Assignments + Record)
 		 */
 
 		$btn_arr = array();
@@ -1160,18 +1160,50 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 			'JTOOLBAR_CHECKIN', $btn_name = 'checkin', $full_js = '',
 			$msg_alert = '', $msg_confirm = '',
 			$btn_task, $extra_js = '', $btn_list=true, $btn_menu=true, $btn_confirm=false,
-			$this->btn_sm_class . ' btn-fcaction ' . (FLEXI_J40GE ? $this->btn_iv_class : '') . ' ' . $this->popover_class, $btn_icon='icon-checkin',
-			'data-placement="right" data-content="' . flexicontent_html::encodeHTML(JText::_('FLEXI_MAINTENANCE_CHECKIN_DESC'), 2) . '"', $auto_add = 0, $tag_type='button'
+			$this->btn_sm_class . ' btn-fcaction ' . (FLEXI_J40GE ? $this->btn_iv_class : '') . ' ' . $this->tooltip_class, $btn_icon='icon-checkin',
+			'data-placement="right" data-title="' . flexicontent_html::encodeHTML(JText::_('FLEXI_MAINTENANCE_CHECKIN_DESC'), 2) . '"', $auto_add = 0, $tag_type='button'
 		);
+
 		if (JComponentHelper::getParams('com_flexicontent')->get('show_csvbutton_be', 0))
 		{
-			$full_js   = "window.location.replace('" . JUri::base(true) . '/index.php?option=com_flexicontent&view=items&format=csv'. "')";
+			$btn_title = JText::_('FLEXI_CSV_EXPORT_CURRENT_PAGE', true);
+			$btn_info  = flexicontent_html::encodeHTML(JText::_('FLEXI_CSV_EXPORT_CURRENT_PAGE_INFO'), 2);
+			$task_url  = JUri::base(true) . '/index.php?option=com_flexicontent&view=items&format=csv';
+
+			$full_js   = "window.location.replace('" . $task_url . "')";
 			$btn_arr[] = flexicontent_html::addToolBarButton(
-				'CSV', 'csvexport', $full_js, $msg_alert='', $msg_confirm='',
+				$btn_title, 'csvexport', $full_js, $msg_alert='', $msg_confirm='',
 				$btn_task='', $extra_js="", $btn_list=false, $btn_menu=true, $btn_confirm=false,
-				$this->btn_sm_class . ' btn-fcaction ' . (FLEXI_J40GE ? $this->btn_iv_class : '') . ' ' . $this->popover_class, $btn_icon='icon-download',
-				'data-placement="right" data-content="' . flexicontent_html::encodeHTML(JText::_(''), 2) . '"', $auto_add = 0, $tag_type='button'
+				$this->btn_sm_class . ' btn-fcaction ' . (FLEXI_J40GE ? $this->btn_iv_class : '') . ' ' . $this->tooltip_class, $btn_icon='icon-download',
+				'data-placement="right" data-title="' . $btn_info . '"', $auto_add = 0, $tag_type='button'
 			);
+
+
+			/**
+			 * Add all-items CSV Export button
+			 */
+
+			$has_pro = JPluginHelper::isEnabled($extfolder = 'system', $extname = 'flexisyspro');
+
+			if (1)
+			{
+				$btn_title = JText::_('FLEXI_CSV_EXPORT_ALL_ITEMS', true);
+				$btn_info  = flexicontent_html::encodeHTML(JText::_('FLEXI_CSV_EXPORT_ALL_ITEMS_INFO'), 2);
+				$task_url  = JUri::base(true) . '/index.php?option=com_flexicontent&view=items&format=csv&items_set=all';
+
+				$full_js = $has_pro
+					? "window.location.replace('" . $task_url . "')"
+					: "var box = jQuery('#fc_available_in_pro'); fc_file_props_handle = fc_showAsDialog(box, 480, 320, null, {title:'" . JText::_($btn_title) . "'}); return false;";
+
+				$btn_name='collaborate';
+				$btn_arr[$btn_name] = '<div id="fc_available_in_pro" style="display: none;">' . JText::_('FLEXI_AVAILABLE_IN_PRO_VERSION') . '</div>' . flexicontent_html::addToolBarButton(
+						$btn_title, $btn_name, $full_js ,
+						$msg_alert='', $msg_confirm='',
+						$btn_task='', $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false,
+						$btn_class='btn-fcaction ' . (FLEXI_J40GE ? $this->btn_iv_class : '') . ' ' . $this->tooltip_class, $btn_icon="icon-download",
+						'data-placement="right" data-href="' . $task_url . '" data-title="' . $btn_info . '"', $auto_add = 0
+					);
+			}
 		}
 
 		if ($perms->CanCreateTags)
@@ -1184,8 +1216,8 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 				'FLEXI_2WAY_TAG_ASSIGNMENTS_SYNC', $btn_name, $full_js,
 				$msg_alert = JText::_('FLEXI_NO_ITEMS_SELECTED'), $msg_confirm = '',
 				$btn_task='', $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false,
-				$this->btn_sm_class . ' btn-fcaction ' . (FLEXI_J40GE ? $this->btn_iv_class : '') . ' ' . $this->popover_class, 'icon-loop',
-				'data-placement="right" data-taskurl="' . $popup_load_url .'" data-content="' . flexicontent_html::encodeHTML(JText::_('FLEXI_2WAY_TAG_ASSIGNMENTS_SYNC_DESC'), 2) . '"', $auto_add = 0, $tag_type='button'
+				$this->btn_sm_class . ' btn-fcaction ' . (FLEXI_J40GE ? $this->btn_iv_class : '') . ' ' . $this->tooltip_class, 'icon-loop',
+				'data-placement="right" data-taskurl="' . $popup_load_url .'" data-title="' . flexicontent_html::encodeHTML(JText::_('FLEXI_2WAY_TAG_ASSIGNMENTS_SYNC_DESC'), 2) . '"', $auto_add = 0, $tag_type='button'
 			);
 		}
 

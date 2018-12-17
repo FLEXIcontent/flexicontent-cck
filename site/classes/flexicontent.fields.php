@@ -295,7 +295,10 @@ class FlexicontentFields
 	 */
 	static function & getItemFields(&$items, &$vars=null, $view=FLEXI_ITEMVIEW, $aid=false)
 	{
-		if ( empty($items) ) return;
+		if (empty($items))
+		{
+			return $items;
+		}
 
 		static $type_fields = array();
 
