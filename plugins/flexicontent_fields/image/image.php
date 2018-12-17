@@ -1868,17 +1868,20 @@ class plgFlexicontent_fieldsImage extends FCField
 			//if ( $image_source > 1 ) ; // TODO
 
 			/**
-			 * Create original images folder if doing CSV import and folder does not exist
+			 * Create original images folder if doing CSV import and folder does not exist, and there are images (values) for this field
 			 */
 			if ($is_importcsv)
 			{
-				$dest_path_original = $dest_path. 'original' .DS;
-
-				if (!JFolder::exists($dest_path_original) && !JFolder::create($dest_path_original))
+				if ($post)
 				{
-					// Cancel item creation
-					$app->enqueueMessage('Field: ' . $field->label . ' : Unable to create folder: ' . $dest_path_original, 'error');
-					return false;
+					$dest_path_original = $dest_path. 'original' .DS;
+
+					if (!JFolder::exists($dest_path_original) && !JFolder::create($dest_path_original))
+					{
+						// Cancel item creation
+						$app->enqueueMessage('Field: ' . $field->label . ' : Unable to create folder: ' . $dest_path_original, 'error');
+						return false;
+					}
 				}
 			}
 
@@ -1892,9 +1895,12 @@ class plgFlexicontent_fieldsImage extends FCField
 				$temppath = JPath::clean(JPATH_SITE .DS. $dir .DS. 'item_' . $unique_tmp_itemid . '_field_' . $field->id .DS);
 				$save_as_copy = $unique_tmp_itemid == (int) $unique_tmp_itemid;
 
-				$save_as_copy
-					? JFolder::copy($temppath, $dest_path)
-					: JFolder::move($temppath, $dest_path);
+				if (file_exists($temppath))
+				{
+					$save_as_copy
+						? JFolder::copy($temppath, $dest_path)
+						: JFolder::move($temppath, $dest_path);
+				}
 			}
 		}
 
