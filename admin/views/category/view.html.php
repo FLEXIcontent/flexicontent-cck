@@ -11,29 +11,36 @@
 
 defined('_JEXEC') or die('Restricted access');
 
-jimport('legacy.view.legacy');
+use Joomla\String\StringHelper;
+use Joomla\Utilities\ArrayHelper;
+
+JLoader::register('FlexicontentViewBaseRecord', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/base/view_record.php');
 
 /**
- * HTML View class for the FLEXIcontent category screen
+ * HTML View class for the Category screen
  */
-class FlexicontentViewCategory extends JViewLegacy
+class FlexicontentViewCategory extends FlexicontentViewBaseRecord
 {
 	var $proxy_option = 'com_categories';
 
+	/**
+	 * Display the view
+	 */
 	public function display($tpl = null)
 	{
 		/**
-		 * Initialise variables
+		 * Initialize variables, flags, etc
 		 */
 
 		global $globalcats;
-		$app      = JFactory::getApplication();
-		$jinput   = $app->input;
-		$document = JFactory::getDocument();
-		$user     = JFactory::getUser();
-		$cparams  = JComponentHelper::getParams('com_flexicontent');
-		$perms    = FlexicontentHelperPerm::getPerm();
-		$db       = JFactory::getDbo();
+
+		$app        = JFactory::getApplication();
+		$jinput     = $app->input;
+		$document   = JFactory::getDocument();
+		$user       = JFactory::getUser();
+		$db         = JFactory::getDbo();
+		$cparams    = JComponentHelper::getParams('com_flexicontent');
+		$perms      = FlexicontentHelperPerm::getPerm();
 
 		// Get url vars and some constants
 		$option     = $jinput->get('option', '', 'cmd');
@@ -49,14 +56,14 @@ class FlexicontentViewCategory extends JViewLegacy
 		$ctrl = 'category';
 		$js = '';
 
-		// Load Joomla language files of other extension
-		if (!empty($this->proxy_option))
-		{
-			JFactory::getLanguage()->load($this->proxy_option, JPATH_ADMINISTRATOR, 'en-GB', true);
-			JFactory::getLanguage()->load($this->proxy_option, JPATH_ADMINISTRATOR, null, true);
-		}
 
+		/**
+		 * Common view
+		 */
 
+		$this->prepare_common_fcview();
+
+		
 		/**
 		 * Get record data, and check if record is already checked out
 		 */
@@ -199,12 +206,6 @@ class FlexicontentViewCategory extends JViewLegacy
 
 		$toolbar = JToolbar::getInstance('toolbar');
 
-		// Include JToolbarHelper
-		if (!$isAdmin)
-		{
-			require_once JPATH_ADMINISTRATOR . '/includes/toolbar.php';
-		}
-
 		// Creation flag used to decide if adding save and new / save as copy buttons are allowed
 		$cancreate = $cancreate_cat;
 
@@ -299,12 +300,12 @@ class FlexicontentViewCategory extends JViewLegacy
 		flexicontent_html::addToolBarDropMenu($btn_arr, 'save_btns_group');
 
 
-		// Cancel button
+		// Cancel button, TODO frontend modal close
 		if ($isAdmin && !$isCtmpl)
 		{
 			$isnew
-				? JToolbarHelper::cancel($ctrl.'.cancel', 'FLEXI_CANCEL')
-				: JToolbarHelper::cancel($ctrl.'.cancel', 'FLEXI_CLOSE_FORM');
+				? JToolbarHelper::cancel($ctrl.'.cancel', $isAdmin ? 'JTOOLBAR_CANCEL' : 'FLEXI_CANCEL')
+				: JToolbarHelper::cancel($ctrl.'.cancel', $isAdmin ? 'JTOOLBAR_CLOSE' : 'FLEXI_CLOSE_FORM');
 		}
 
 
@@ -316,7 +317,7 @@ class FlexicontentViewCategory extends JViewLegacy
 			$previewlink = JRoute::_(JUri::root() . $record_link, $xhtml=false)
 				;
 			$toolbar->appendButton( 'Custom', '
-				<button class="preview btn btn-small btn-fcaction btn-info spaced-btn" onClick="window.open(\''.$previewlink.'\');">
+				<button class="preview btn btn-small btn-fcaction btn-info spaced-btn" onclick="window.open(\''.$previewlink.'\'); return false;">
 					<span title="'.JText::_('FLEXI_PREVIEW').'" class="icon-screen"></span>
 					'.JText::_('FLEXI_PREVIEW').'
 				</button>', 'preview'
@@ -324,11 +325,7 @@ class FlexicontentViewCategory extends JViewLegacy
 		}
 
 
-
-		// ***
-		// *** Add modal editing of template layout
-		// ***
-
+		// Modal edit button of template layout
 		if (!$isnew && $perms->CanTemplates)
 		{
 			$inheritcid_comp = $cparams->get('inheritcid', -1);

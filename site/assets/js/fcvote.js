@@ -3,8 +3,8 @@ jQuery(document).ready(function(){
 	//var live_site_root = url.substring(0, url.indexOf('/', 14)) + fc_root_uri;
 	
 	var currentURL = window.location;
-	var live_site_root = currentURL.protocol + '//' + currentURL.host + fc_root_uri;
-	var live_site_base = currentURL.protocol + '//' + currentURL.host + fc_base_uri;
+	window.live_site_root = currentURL.protocol + '//' + currentURL.host + fc_root_uri;
+	window.live_site_base = currentURL.protocol + '//' + currentURL.host + fc_base_uri;
 	var under_vote = false;
 	
 	if (jQuery('.fcvote').length)

@@ -11,64 +11,55 @@
 
 defined('_JEXEC') or die('Restricted access');
 
-jimport('legacy.view.legacy');
+use Joomla\String\StringHelper;
+use Joomla\Utilities\ArrayHelper;
+
+JLoader::register('FlexicontentViewBaseRecord', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/base/view_record.php');
 
 /**
- * HTML View class for the FLEXIcontent user screen
+ * HTML View class for the User screen
  */
-class FlexicontentViewUser extends JViewLegacy
+class FlexicontentViewUser extends FlexicontentViewBaseRecord
 {
 	var $proxy_option = 'com_users';
 
+	/**
+	 * Display the view
+	 */
 	public function display($tpl = null)
 	{
 		/**
-		 * Initialise variables
+		 * Initialize variables, flags, etc
 		 */
 
-		$app      = JFactory::getApplication();
-		$jinput   = $app->input;
-		$document = JFactory::getDocument();
-		$user     = JFactory::getUser();
-		$cparams  = JComponentHelper::getParams('com_flexicontent');
-		$perms    = FlexicontentHelperPerm::getPerm();
-		$db       = JFactory::getDbo();
-		$option   = $jinput->get('option', '', 'cmd');
-		$view     = $jinput->get('view', '', 'cmd');
-		$task     = $jinput->get('task', '', 'cmd');
+		$app        = JFactory::getApplication();
+		$jinput     = $app->input;
+		$document   = JFactory::getDocument();
+		$user       = JFactory::getUser();
+		$db         = JFactory::getDbo();
+		$cparams    = JComponentHelper::getParams('com_flexicontent');
+		$perms      = FlexicontentHelperPerm::getPerm();
+
+		// Get url vars and some constants
+		$option     = $jinput->get('option', '', 'cmd');
+		$view       = $jinput->get('view', '', 'cmd');
+		$task       = $jinput->get('task', '', 'cmd');
 		$controller = $jinput->get('controller', '', 'cmd');
 
 		$isAdmin  = $app->isAdmin();
 		$isCtmpl  = $jinput->getCmd('tmpl') === 'component';
 
 		$tip_class = ' hasTooltip';
-		$manager_view = $ctrl = 'users';
+		$manager_view = 'users';
+		$ctrl = 'users';
 		$js = '';
 
-		// Load Joomla language files of other extension
-		if (!empty($this->proxy_option))
-		{
-			JFactory::getLanguage()->load($this->proxy_option, JPATH_ADMINISTRATOR, 'en-GB', true);
-			JFactory::getLanguage()->load($this->proxy_option, JPATH_ADMINISTRATOR, null, true);
-		}
 
+		/**
+		 * Common view
+		 */
 
-		if (!$isAdmin)
-		{
-			// Note : we use some strings from administrator part, so we will also load administrator language file
-			// TODO: remove this need by moving common language string to different file ?
-
-			// Load english language file for 'com_content' component then override with current language file
-			JFactory::getLanguage()->load('com_content', JPATH_ADMINISTRATOR, 'en-GB', true);
-			JFactory::getLanguage()->load('com_content', JPATH_ADMINISTRATOR, null, true);
-
-			// Load english language file for 'com_flexicontent' component then override with current language file
-			JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, 'en-GB', true);
-			JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, true);
-
-			// Frontend form layout is named 'form' instead of 'default', 'default' in frontend is typically used for viewing would be used for
-			$this->setLayout('form');
-		}
+		$this->prepare_common_fcview();
 
 
 		/**
@@ -132,12 +123,6 @@ class FlexicontentViewUser extends JViewLegacy
 		 */
 
 		$toolbar = JToolbar::getInstance('toolbar');
-
-		// Include JToolbarHelper
-		if (!$isAdmin)
-		{
-			require_once JPATH_ADMINISTRATOR . '/includes/toolbar.php';
-		}
 
 		// Creation flag used to decide if adding save and new / save as copy buttons are allowed
 		$cancreate = false;  // We will not create new users in our backend
@@ -326,6 +311,18 @@ class FlexicontentViewUser extends JViewLegacy
 
 
 		/**
+		 * Add inline js to head
+		 */
+
+		if ($js)
+		{
+			$document->addScriptDeclaration('jQuery(document).ready(function(){'
+				.$js.
+			'});');
+		}
+
+
+		/**
 		 * Encode (UTF-8 charset) HTML entities form data so that they can be set as form field values
 		 * NOTE: We do NOT yet use JForm thus this is needed
 		 */
@@ -343,20 +340,19 @@ class FlexicontentViewUser extends JViewLegacy
 		$this->row      = $row;
 		$this->form     = $form;
 		$this->perms    = $perms;
+		$this->tmpls    = $tmpls;
 
 		$this->usergroups = $usergroups;
 		$this->contact    = $contact;
 
-		$this->cparams = $cparams;
-		$this->iparams = $cparams;
+		$this->cparams  = $cparams;
+		$this->iparams  = $cparams;
 
 		$this->params_authorbasic = $params_authorbasic;
 		$this->params_authorcat   = $params_authorcat;
 
 		$this->jform_authorbasic = $jform_authorbasic;
 		$this->jform_authorcat   = $jform_authorcat;
-
-		$this->tmpls    = $tmpls;
 
 		parent::display($tpl);
 	}

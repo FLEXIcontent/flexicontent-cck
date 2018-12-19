@@ -128,8 +128,8 @@ class FlexicontentHelperPerm
 		$permission->MultiCat     = $user->authorise('flexicontent.multicat',    'com_flexicontent'); // (item edit form) allow user to assign items to multiple categories
 		
 		// REVIEWs: management tab and usage
-		$permission->CanReviews       = $user->authorise('flexicontent.managereviews',  'com_flexicontent') && version_compare(FLEXI_VERSION, '3.3.99', '>');
-		$permission->CanCreateReviews = $user->authorise('flexicontent.createreviews',  'com_flexicontent') && version_compare(FLEXI_VERSION, '3.3.99', '>');
+		$permission->CanReviews       = $user->authorise('flexicontent.managereviews',  'com_flexicontent') && version_compare(FLEXI_VERSION, '3.2.99', '>');
+		$permission->CanCreateReviews = $user->authorise('flexicontent.createreviews',  'com_flexicontent') && version_compare(FLEXI_VERSION, '3.2.99', '>');
 		
 		// TAGS: management tab and usage
 		$permission->CanTags       = $user->authorise('flexicontent.managetags',  'com_flexicontent'); // (backend) Allow management of Item Types

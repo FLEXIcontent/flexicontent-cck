@@ -711,7 +711,6 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		$dbprefix = $app->getCfg('dbprefix');
 		$dbname   = $app->getCfg('db');
 
-		jimport('cms.version.version');
 		$jversion = new JVersion;
 
 		$collation_version = $session->get('flexicontent.collation_version');

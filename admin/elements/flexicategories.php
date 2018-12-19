@@ -106,7 +106,7 @@ class JFormFieldFlexicategories extends JFormField
 		$attribs .= $classes .' style="float:left;" ';
 		
 		
-		// Add onClick functions (e.g. joining values to a string)
+		// Add onclick functions (e.g. joining values to a string)
 		if (!empty($attributes['joinwith']) && !$function_added)
 		{
 			$function_added = true;

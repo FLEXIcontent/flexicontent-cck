@@ -478,7 +478,7 @@ class FlexicontentController extends JControllerLegacy
 		 * Perform validation / manipulation of the already validated data,
 		 * run this even if validation failed, in case we want to handle this case too
 		 */
-		$extraChecks = $this->_afterModelValidation($validated_data, $data);
+		$extraChecks = $this->_afterModelValidation($validated_data, $data, $model);
 
 
 		/**
@@ -3252,13 +3252,14 @@ class FlexicontentController extends JControllerLegacy
 	 * Method for extra form validation after JForm validation is executed
 	 *
 	 * @param   array     $validated_data  The already jform-validated data of the record
+	 * @param   object    $model            The Model object of current controller instance
 	 * @param   array     $data            The original posted data of the record
 	 *
 	 * @return  boolean   true on success, false on failure
 	 *
 	 * @since 3.3
 	 */
-	protected function _afterModelValidation(& $validated_data, & $data)
+	protected function _afterModelValidation(& $validated_data, & $data, $model)
 	{
 		$this->input->get('task', '', 'cmd') !== __FUNCTION__ or die(__FUNCTION__ . ' : direct call not allowed');
 

@@ -5,54 +5,62 @@
  *
  * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
  * @link            https://flexicontent.org
- * @copyright       Copyright © 2018, FLEXIcontent team, All Rights Reserved
+ * @copyright       Copyright Â© 2018, FLEXIcontent team, All Rights Reserved
  * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
 defined('_JEXEC') or die('Restricted access');
 
-jimport('legacy.view.legacy');
+use Joomla\String\StringHelper;
+use Joomla\Utilities\ArrayHelper;
+
+JLoader::register('FlexicontentViewBaseRecord', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/base/view_record.php');
 jimport('joomla.filesystem.file');
 
 /**
- * View class for the FLEXIcontent field screen
+ * HTML View class for the Field screen
  */
-class FlexicontentViewField extends JViewLegacy
+class FlexicontentViewField extends FlexicontentViewBaseRecord
 {
 	var $proxy_option = null;
 
+	/**
+	 * Display the view
+	 */
 	public function display($tpl = null)
 	{
 		/**
-		 * Initialise variables
+		 * Initialize variables, flags, etc
 		 */
 
-		$app      = JFactory::getApplication();
-		$jinput   = $app->input;
-		$document = JFactory::getDocument();
-		$user     = JFactory::getUser();
-		$cparams  = JComponentHelper::getParams('com_flexicontent');
-		$perms    = FlexicontentHelperPerm::getPerm();
-		$db       = JFactory::getDbo();
+		$app        = JFactory::getApplication();
+		$jinput     = $app->input;
+		$document   = JFactory::getDocument();
+		$user       = JFactory::getUser();
+		$db         = JFactory::getDbo();
+		$cparams    = JComponentHelper::getParams('com_flexicontent');
+		$perms      = FlexicontentHelperPerm::getPerm();
 
 		// Get url vars and some constants
 		$option     = $jinput->get('option', '', 'cmd');
 		$view       = $jinput->get('view', '', 'cmd');
 		$task       = $jinput->get('task', '', 'cmd');
+		$controller = $jinput->get('controller', '', 'cmd');
 
 		$isAdmin  = $app->isAdmin();
 		$isCtmpl  = $jinput->getCmd('tmpl') === 'component';
 
 		$tip_class = ' hasTooltip';
-		$manager_view = $ctrl = 'fields';
+		$manager_view = 'fields';
+		$ctrl = 'fields';
 		$js = '';
 
-		// Load Joomla language files of other extension
-		if (!empty($this->proxy_option))
-		{
-			JFactory::getLanguage()->load($this->proxy_option, JPATH_ADMINISTRATOR, 'en-GB', true);
-			JFactory::getLanguage()->load($this->proxy_option, JPATH_ADMINISTRATOR, null, true);
-		}
+
+		/**
+		 * Common view
+		 */
+
+		$this->prepare_common_fcview();
 
 
 		/**
@@ -123,15 +131,9 @@ class FlexicontentViewField extends JViewLegacy
 
 		$toolbar = JToolbar::getInstance('toolbar');
 
-		// Include JToolbarHelper
-		if (!$isAdmin)
-		{
-			require_once JPATH_ADMINISTRATOR . '/includes/toolbar.php';
-		}
-
 		// Creation flag used to decide if adding save and new / save as copy buttons are allowed
 		$cancreate = true;
-		
+
 		// SET toolbar title
 		!$isnew
 			? JToolbarHelper::title( JText::_( 'FLEXI_EDIT_FIELD' ), 'fieldedit' )
@@ -223,12 +225,12 @@ class FlexicontentViewField extends JViewLegacy
 		flexicontent_html::addToolBarDropMenu($btn_arr, 'save_btns_group');
 
 
-		// Cancel button
+		// Cancel button, TODO frontend modal close
 		if ($isAdmin && !$isCtmpl)
 		{
 			$isnew
-				? JToolbarHelper::cancel($ctrl.'.cancel', 'FLEXI_CANCEL')
-				: JToolbarHelper::cancel($ctrl.'.cancel', 'FLEXI_CLOSE_FORM');
+				? JToolbarHelper::cancel($ctrl.'.cancel', $isAdmin ? 'JTOOLBAR_CANCEL' : 'FLEXI_CANCEL')
+				: JToolbarHelper::cancel($ctrl.'.cancel', $isAdmin ? 'JTOOLBAR_CLOSE' : 'FLEXI_CLOSE_FORM');
 		}
 
 
@@ -236,7 +238,7 @@ class FlexicontentViewField extends JViewLegacy
 		{
 			$onclick_js = empty($_SERVER['HTTPS']) && $model->helpModal
 				? 'var url = jQuery(this).attr(\'data-href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 0, 0, false, {\'title\': \''.flexicontent_html::encodeHTML(JText::_($model->helpTitle), 2).'\'}); return false;'
-				: 'var url = jQuery(this).attr(\'data-href\'); window.open(url);';
+				: 'var url = jQuery(this).attr(\'data-href\'); window.open(url); return false;';
 			$js .= "
 				jQuery('#toolbar-help a.toolbar, #toolbar-help button').attr('data-href', '".$model->helpURL."').attr('onclick', \"".$onclick_js."\");
 			";
@@ -244,10 +246,9 @@ class FlexicontentViewField extends JViewLegacy
 		}
 
 
-
-		// ***
-		// *** Display appropriate messages: import and check current field
-		// ***
+		/**
+		 * Display appropriate messages: import and check current field
+		 */
 		
 		// Import Joomla plugin that implements the type of current field
 		$extfolder = 'flexicontent_fields';
@@ -292,9 +293,10 @@ class FlexicontentViewField extends JViewLegacy
 
 
 
-		// ***
-		// *** Check which properties are supported by current field
-		// ***
+		/**
+		 * Check which properties are supported by current field
+		 */
+
 		$ft_support = FlexicontentFields::getPropertySupport($row->field_type, $row->iscore);
 		
 		$supportsearch          = $ft_support->supportsearch;
@@ -317,10 +319,10 @@ class FlexicontentViewField extends JViewLegacy
 		}
 
 
-
-		// ***
-		// *** Add JS for AJAX reloading field parameters after field type change
-		// ***
+		/**
+		 * Add JS for AJAX reloading field parameters after field type change
+		 */
+	
 		if (!$row->iscore)
 		{
 			$_field_id = 'jform_field_type';
@@ -421,7 +423,10 @@ class FlexicontentViewField extends JViewLegacy
 		$this->row      = $row;
 		$this->form     = $form;
 		$this->lists    = $lists;
-		$this->perms    = FlexicontentHelperPerm::getPerm();
+		$this->perms    = $perms;
+		$this->cparams  = $cparams;
+		$this->view     = $view;
+		$this->controller = $controller;
 
 		$this->typesselected            = $typesselected;
 		$this->supportsearch            = $supportsearch;

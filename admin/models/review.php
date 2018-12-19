@@ -327,6 +327,81 @@ class FlexicontentModelReview extends FCModelAdmin
 
 
 	/**
+	 * Method to validate the data posted by the reviewer
+	 *
+	 * @param   array     $data  The (already JForm validated) record data
+	 *
+	 * @return  boolean   true on success, false on failure
+	 *
+	 * @since   3.3
+	 */
+	public function reviewerValidation($data)
+	{
+		$user = JFactory::getUser();
+		$db   = JFactory::getDbo();
+
+		$review_id   = $data['id'];
+		$content_id  = $data['content_id'];
+		$review_type = $data['type'];
+
+		$errors = array();
+
+		// Validate title, decode entities, and strip HTML
+		$title = flexicontent_html::dataFilter($data['title'], $maxlength=255, 'STRING', 0);
+
+		// Validate email
+		$email = $user->id ? $user->email : flexicontent_html::dataFilter($data['email'], $maxlength=255, 'EMAIL', 0);
+
+		// Validate text, decode entities and strip HTML
+		$text = flexicontent_html::dataFilter($data['text'], $maxlength=10000, 'STRING', 0);
+
+
+		/**
+		 * Check for validation failures on posted data
+		 */
+
+		if (!$content_id)
+		{
+			$this->setError('Content being reviewed not given (content_id is zero)');
+			return false;
+		}
+
+		if (!$email)
+		{
+			$this->setError('Email is invalid or empty');
+			return false;
+		}
+
+		if (!$user->id)
+		{
+			$query = 'SELECT id FROM #__users WHERE email = ' . $db->Quote($email);
+			$reviewer = $db->setQuery($query)->loadObject();
+
+			if ($reviewer)
+			{
+				$this->setError('Please login');
+				return false;
+			}
+		}
+
+		if (!$text)
+		{
+			$this->setError('Text is invalid or empty');
+			return false;
+		}
+
+		if ($review_type !== 'item')
+		{
+			$this->setError('review_type <> item is not yet supported');
+			return false;
+		}
+
+		// Return the further validated data
+		return $data;
+	}
+
+
+	/**
 	 * Method to toggle approved flag of a review
 	 *
 	 * @param		array			$cid          Array of record ids to set to a new state

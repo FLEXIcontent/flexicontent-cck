@@ -438,7 +438,7 @@ $this->document->addScriptDeclaration($js);
 						<div class="control-group">
 							<div class="control-label">'.$field->label.'</div>
 							<div class="controls">
-								' . flexicontent_html::getInheritedFieldDisplay($field, $this->iparams) . '
+								' . $this->getFieldInheritedDisplay($field, $this->iparams) . '
 							</div>
 						</div>
 						';
@@ -463,7 +463,7 @@ $this->document->addScriptDeclaration($js);
 						<div class="control-group">
 							<div class="control-label">'.$field->label.'</div>
 							<div class="controls">
-								' . flexicontent_html::getInheritedFieldDisplay($field, $this->iparams) . '
+								' . $this->getFieldInheritedDisplay($field, $this->iparams) . '
 							</div>
 						</div>
 						';
@@ -506,7 +506,7 @@ $this->document->addScriptDeclaration($js);
 						<div class="control-group">
 							<div class="control-label">'.$field->label.'</div>
 							<div class="controls">
-								' . flexicontent_html::getInheritedFieldDisplay($field, $this->iparams) . '
+								' . $this->getFieldInheritedDisplay($field, $this->iparams) . '
 							</div>
 						</div>
 						';
@@ -586,7 +586,7 @@ $this->document->addScriptDeclaration($js);
 															:
 															str_replace('jform_attribs_', 'jform_layouts_'.$tmpl->name.'_',
 																str_replace('[attribs]', '[layouts]['.$tmpl->name.']',
-																	flexicontent_html::getInheritedFieldDisplay($field, $this->iparams)
+																	$this->getFieldInheritedDisplay($field, $this->iparams)
 																	//$form_layout->getInput($fieldname, $groupname/*, $value*/)   // Value already set, no need to pass it
 																)
 															)
@@ -631,7 +631,7 @@ $this->document->addScriptDeclaration($js);
 								<div class="control-group">
 									<div class="control-label">'.$field->label.'</div>
 									<div class="controls">
-										' . flexicontent_html::getInheritedFieldDisplay($field, $this->iparams) . '
+										' . $this->getFieldInheritedDisplay($field, $this->iparams) . '
 									</div>
 								</div>
 								';
@@ -660,7 +660,7 @@ $this->document->addScriptDeclaration($js);
 						<div class="control-group">
 							<div class="control-label">'.$field->label.'</div>
 							<div class="controls">
-								' . flexicontent_html::getInheritedFieldDisplay($field, $this->iparams) . '
+								' . $this->getFieldInheritedDisplay($field, $this->iparams) . '
 							</div>
 						</div>
 						';
@@ -685,7 +685,7 @@ $this->document->addScriptDeclaration($js);
 						<div class="control-group">
 							<div class="control-label">'.$field->label.'</div>
 							<div class="controls">
-								' . flexicontent_html::getInheritedFieldDisplay($field, $this->iparams) . '
+								' . $this->getFieldInheritedDisplay($field, $this->iparams) . '
 							</div>
 						</div>
 						';

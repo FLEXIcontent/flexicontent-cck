@@ -39,7 +39,6 @@ class FlexicontentController extends JControllerAdmin
 		$print_logging_info = $params->get('print_logging_info');
 		if ( $print_logging_info )  global $fc_run_times;
 
-		jimport('cms.version.version');
 		$jversion = new JVersion;
 
 		$config_saved = $params->get('flexi_cat_extension', 0);

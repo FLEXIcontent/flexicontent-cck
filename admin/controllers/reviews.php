@@ -361,27 +361,34 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 	 * Method for extra form validation after JForm validation is executed
 	 *
 	 * @param   array     $validated_data  The already jform-validated data of the record
+	 * @param   object    $model           The Model object of current controller instance
 	 * @param   array     $data            The original posted data of the record
 	 *
 	 * @return  boolean   true on success, false on failure
 	 *
 	 * @since 3.3
 	 */
-	protected function _afterModelValidation(& $validated_data, & $data)
+	protected function _afterModelValidation(& $validated_data, & $data, $model)
 	{
 		$this->input->get('task', '', 'cmd') !== __FUNCTION__ or die(__FUNCTION__ . ' : direct call not allowed');
 
-		if (!parent::_afterModelValidation($validated_data, $data))
+		if (!parent::_afterModelValidation($validated_data, $data, $model))
 		{
 			return false;
 		}
 
 		/**
-		 * If user can not manager reviews then do "Review validation on the posted data"
+		 * If user can not manage reviews then do "Review validation on the posted data"
 		 */
+
 		if (!$this->canManage)
 		{
-			$validated_data = $this->reviewerValidation($validated_data, $form);
+			$validated_data = $model->reviewerValidation($validated_data);
+
+			if (!$validated_data)
+			{
+				return false;
+			}
 		}
 
 		return true;
@@ -399,11 +406,6 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 	{
 		$this->input->get('task', '', 'cmd') !== __FUNCTION__ or die(__FUNCTION__ . ' : direct call not allowed');
 
-		if (!parent::_afterModelValidation($validated_data, $data))
-		{
-			return false;
-		}
-
 		return true;
 	}
 
@@ -411,87 +413,6 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 	/**
 	 * START OF CONTROLLER SPECIFIC METHODS
 	 */
-
-
-	/**
-	 * Method to validate the data posted by the reviewer
-	 *
-	 * @param   array     $data       The posted record data
-	 *
-	 * @return  the data
-	 *
-	 * @since   3.3
-	 */
-	public function reviewerValidation($data)
-	{
-		$this->input->get('task', '', 'cmd') !== __FUNCTION__ or die(__FUNCTION__ . ' : direct call not allowed');
-
-		$app  = JFactory::getApplication();
-		$user = JFactory::getUser();
-		$db   = JFactory::getDbo();
-		$model = $this->getModel($this->record_name);
-		$form  = $model->getForm();
-
-		$review_id   = $data['id'];
-		$content_id  = $data['content_id'];
-		$review_type = $data['type'];
-
-		$errors = array();
-
-		// Validate title, decode entities, and strip HTML
-		$title = flexicontent_html::dataFilter($data['title'], $maxlength=255, 'STRING', 0);
-
-		// Validate email
-		$email = $user->id ? $user->email : flexicontent_html::dataFilter($data['email'], $maxlength=255, 'EMAIL', 0);
-
-		// Validate text, decode entities and strip HTML
-		$text = flexicontent_html::dataFilter($this->input->get('text', '', 'string'), $maxlength=10000, 'STRING', 0);
-
-
-		/**
-		 * Check for validation failures on posted data
-		 */
-
-		if (!$content_id)
-		{
-			$form->setError('content_id is zero');
-			return false;
-		}
-
-		if (!$email)
-		{
-			$form->setError('Email is invalid or empty');
-			return false;
-		}
-
-		if (!$user->id)
-		{
-			$query = 'SELECT id FROM #__users WHERE email = ' . $db->Quote($email);
-			$reviewer = $db->setQuery($query)->loadObject();
-
-			if ($reviewer)
-			{
-				$form->setError('Please login');
-				return false;
-			}
-		}
-
-		if (!$text)
-		{
-			$form->setError('Text is invalid or empty');
-			return false;
-		}
-
-		if ($review_type !== 'item')
-		{
-			$form->setError('review_type <> item is not yet supported');
-			return false;
-		}
-
-		// Send response to client
-		return $data;
-	}
-
 
 
 	/**

@@ -11,62 +11,55 @@
 
 defined('_JEXEC') or die('Restricted access');
 
-jimport('legacy.view.legacy');
+use Joomla\String\StringHelper;
+use Joomla\Utilities\ArrayHelper;
+
+JLoader::register('FlexicontentViewBaseRecord', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/base/view_record.php');
 
 /**
- * HTML View class for the FLEXIcontent tag screen
+ * HTML View class for the Tag screen
  */
-class FlexicontentViewTag extends JViewLegacy
+class FlexicontentViewTag extends FlexicontentViewBaseRecord
 {
 	var $proxy_option = 'com_tags';
 
+	/**
+	 * Display the view
+	 */
 	public function display($tpl = null)
 	{
 		/**
-		 * Initialise variables
+		 * Initialize variables, flags, etc
 		 */
 
-		$app      = JFactory::getApplication();
-		$jinput   = $app->input;
-		$document = JFactory::getDocument();
-		$user     = JFactory::getUser();
-		$cparams  = JComponentHelper::getParams('com_flexicontent');
+		$app        = JFactory::getApplication();
+		$jinput     = $app->input;
+		$document   = JFactory::getDocument();
+		$user       = JFactory::getUser();
+		$db         = JFactory::getDbo();
+		$cparams    = JComponentHelper::getParams('com_flexicontent');
+		$perms      = FlexicontentHelperPerm::getPerm();
 
-		$option   = $jinput->get('option', '', 'cmd');
-		$view     = $jinput->get('view', '', 'cmd');
-		$task     = $jinput->get('task', '', 'cmd');
+		// Get url vars and some constants
+		$option     = $jinput->get('option', '', 'cmd');
+		$view       = $jinput->get('view', '', 'cmd');
+		$task       = $jinput->get('task', '', 'cmd');
+		$controller = $jinput->get('controller', '', 'cmd');
 
 		$isAdmin  = $app->isAdmin();
 		$isCtmpl  = $jinput->getCmd('tmpl') === 'component';
 
 		$tip_class = ' hasTooltip';
-		$manager_view = $ctrl = 'tags';
+		$manager_view = 'tags';
+		$ctrl = 'tags';
 		$js = '';
 
-		// Load Joomla language files of other extension
-		if (!empty($this->proxy_option))
-		{
-			JFactory::getLanguage()->load($this->proxy_option, JPATH_ADMINISTRATOR, 'en-GB', true);
-			JFactory::getLanguage()->load($this->proxy_option, JPATH_ADMINISTRATOR, null, true);
-		}
 
+		/**
+		 * Common view
+		 */
 
-		if (!$isAdmin)
-		{
-			// Note : we use some strings from administrator part, so we will also load administrator language file
-			// TODO: remove this need by moving common language string to different file ?
-
-			// Load english language file for 'com_content' component then override with current language file
-			JFactory::getLanguage()->load('com_content', JPATH_ADMINISTRATOR, 'en-GB', true);
-			JFactory::getLanguage()->load('com_content', JPATH_ADMINISTRATOR, null, true);
-
-			// Load english language file for 'com_flexicontent' component then override with current language file
-			JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, 'en-GB', true);
-			JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, true);
-
-			// Frontend form layout is named 'form' instead of 'default', 'default' in frontend is typically used for viewing would be used for
-			$this->setLayout('form');
-		}
+		$this->prepare_common_fcview();
 
 
 		/**
@@ -117,6 +110,7 @@ class FlexicontentViewTag extends JViewLegacy
 
 		// Add JS frameworks
 		flexicontent_html::loadFramework('select2');
+		flexicontent_html::loadFramework('flexi-lib');
 		flexicontent_html::loadFramework('flexi-lib-form');
 
 		// Load custom behaviours: form validation, popup tooltips
@@ -133,12 +127,6 @@ class FlexicontentViewTag extends JViewLegacy
 		 */
 
 		$toolbar = JToolbar::getInstance('toolbar');
-
-		// Include JToolbarHelper
-		if (!$isAdmin)
-		{
-			require_once JPATH_ADMINISTRATOR . '/includes/toolbar.php';
-		}
 
 		// Creation flag used to decide if adding save and new / save as copy buttons are allowed
 		$cancreate = true;
@@ -234,12 +222,12 @@ class FlexicontentViewTag extends JViewLegacy
 		flexicontent_html::addToolBarDropMenu($btn_arr, 'save_btns_group');
 
 
-		// Cancel button
+		// Cancel button, TODO frontend modal close
 		if ($isAdmin && !$isCtmpl)
 		{
 			$isnew
-				? JToolbarHelper::cancel($ctrl.'.cancel')
-				: JToolbarHelper::cancel($ctrl.'.cancel', 'JTOOLBAR_CLOSE');
+				? JToolbarHelper::cancel($ctrl.'.cancel', $isAdmin ? 'JTOOLBAR_CANCEL' : 'FLEXI_CANCEL')
+				: JToolbarHelper::cancel($ctrl.'.cancel', $isAdmin ? 'JTOOLBAR_CLOSE' : 'FLEXI_CLOSE_FORM');
 		}
 
 
@@ -251,7 +239,7 @@ class FlexicontentViewTag extends JViewLegacy
 			$previewlink = JRoute::_(JUri::root() . $record_link, $xhtml=false)
 				;
 			$toolbar->appendButton( 'Custom', '
-				<button class="preview btn btn-small btn-fcaction btn-info spaced-btn" onClick="window.open(\''.$previewlink.'\');">
+				<button class="preview btn btn-small btn-fcaction btn-info spaced-btn" onclick="window.open(\''.$previewlink.'\'); return false;">
 					<span title="'.JText::_('FLEXI_PREVIEW').'" class="icon-screen"></span>
 					'.JText::_('FLEXI_PREVIEW').'
 				</button>', 'preview'
@@ -330,8 +318,13 @@ class FlexicontentViewTag extends JViewLegacy
 		 * Assign variables to view
 		 */
 
+		$this->document = $document;
 		$this->row      = $row;
 		$this->form     = $form;
+		$this->perms    = $perms;
+		$this->cparams  = $cparams;
+		$this->view     = $view;
+		$this->controller = $controller;
 
 		parent::display($tpl);
 	}
