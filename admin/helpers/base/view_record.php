@@ -32,6 +32,68 @@ class FlexicontentViewBaseRecord extends JViewLegacy
 
 
 	/**
+	 * Constructor
+	 *
+	 * @since 3.3.0
+	 */
+	public function __construct($config = array())
+	{
+		parent::__construct($config);
+	}
+
+
+	/**
+	 * Constructor
+	 *
+	 * @since 3.3.0
+	 */
+	public function prepare_common_fcview($config = array())
+	{
+		$isAdmin = JFactory::getApplication()->isAdmin();
+
+		/**
+		 * Load Joomla language files of other extension
+		 */
+		if (!empty($this->proxy_option))
+		{
+			JFactory::getLanguage()->load($this->proxy_option, JPATH_ADMINISTRATOR, 'en-GB', true);
+			JFactory::getLanguage()->load($this->proxy_option, JPATH_ADMINISTRATOR, null, true);
+		}
+
+		/**
+		 * Note : we use some strings from administrator part, so we will also load administrator language file
+		 * TODO: remove this need by moving common language string to different file ?
+		 */
+		if (!$isAdmin)
+		{
+			// Load english language file for 'com_content' component then override with current language file
+			JFactory::getLanguage()->load('com_content', JPATH_ADMINISTRATOR, 'en-GB', true);
+			JFactory::getLanguage()->load('com_content', JPATH_ADMINISTRATOR, null, true);
+
+			// Load english language file for 'com_flexicontent' component then override with current language file
+			JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, 'en-GB', true);
+			JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, true);
+
+			// Frontend form layout is named 'form' instead of 'default', 'default' in frontend is typically used for viewing would be used for
+			$this->setLayout('form');
+		}
+
+		/**
+		 * In older Joomla versions include Toolbar Helper in frontend
+		 */
+		if (JFactory::getApplication()->isSite())
+		{
+			$jversion = new JVersion;
+
+			if (version_compare($jversion->getShortVersion(), '3.9.0', 'lt'))
+			{
+				require_once JPATH_ADMINISTRATOR . '/includes/toolbar.php';
+			}
+		}
+	}
+
+
+	/**
 	 * Method to get the CSS for backend record screens (typically edit forms)
 	 *
 	 * @return	int

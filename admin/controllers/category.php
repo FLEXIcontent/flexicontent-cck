@@ -101,7 +101,7 @@ class FlexicontentControllerCategory extends JControllerForm
 
 		if ($this->input->get('fc_doajax_submit'))
 		{
-			JFactory::getApplication()->enqueueMessage(JText::_('FLEXI_ITEM_SAVED'), 'message');
+			JFactory::getApplication()->enqueueMessage(JText::_('FLEXI_CATEGORY_SAVED'), 'message');
 
 			// Ajax submit, do not rerender the view
 			jexit(flexicontent_html::get_system_messages_html());

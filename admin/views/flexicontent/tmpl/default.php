@@ -749,7 +749,11 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 				<tr>
 					<td colspan="3">
 						... &nbsp;
-						<?php echo '<span class="'.$btn_class.'" onclick="window.open(\''.$show_all_link.'\')" >' . JText::_('FLEXI_SHOW_ALL') . ' ( ' . JText::_('FLEXI_ITEMS_MANAGER') . ' )</span><br/>'; ?>
+						<?php echo '
+						<a href="javascript:;" role="button" class="' . $btn_class . '" onclick="window.open(\''.$show_all_link.'\'); return false;" >
+							' . JText::_('FLEXI_SHOW_ALL') . ' ( ' . JText::_('FLEXI_ITEMS_MANAGER') . ' )
+						</a><br/>';
+						?>
 					</td>
 				</tr>
 				</tbody>

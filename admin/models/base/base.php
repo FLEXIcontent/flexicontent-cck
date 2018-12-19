@@ -320,14 +320,14 @@ abstract class FCModelAdmin extends JModelAdmin
 	 */
 	protected function _loadRecord($pk = null)
 	{
+		$table = $this->getTable();
+
 		if (is_array($pk))
 		{
 			$data = $pk;
 		}
 		elseif ($pk)
 		{
-			$table = $this->getTable();
-
 			/**
 			 * If PK is not an integer, then possibly we were given a name,
 			 * try to match it with columns 'name' or 'alias', if they exist

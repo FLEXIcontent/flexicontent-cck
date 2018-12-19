@@ -339,17 +339,18 @@ class FlexicontentControllerFields extends FlexicontentControllerBaseAdmin
 	 * Method for extra form validation after JForm validation is executed
 	 *
 	 * @param   array     $validated_data  The already jform-validated data of the record
+	 * @param   object    $model            The Model object of current controller instance
 	 * @param   array     $data            The original posted data of the record
 	 *
 	 * @return  boolean   true on success, false on failure
 	 *
 	 * @since 3.3
 	 */
-	protected function _afterModelValidation(& $validated_data, & $data)
+	protected function _afterModelValidation(& $validated_data, & $data, $model)
 	{
 		$this->input->get('task', '', 'cmd') !== __FUNCTION__ or die(__FUNCTION__ . ' : direct call not allowed');
 
-		if (!parent::_afterModelValidation($validated_data, $data))
+		if (!parent::_afterModelValidation($validated_data, $data, $model))
 		{
 			return false;
 		}
@@ -381,11 +382,6 @@ class FlexicontentControllerFields extends FlexicontentControllerBaseAdmin
 	protected function _beforeModelStore(& $validated_data, & $data, $model)
 	{
 		$this->input->get('task', '', 'cmd') !== __FUNCTION__ or die(__FUNCTION__ . ' : direct call not allowed');
-
-		if (!parent::_afterModelValidation($validated_data, $data))
-		{
-			return false;
-		}
 
 		/**
 		 * Do not allow custom fields to be marked as CORE

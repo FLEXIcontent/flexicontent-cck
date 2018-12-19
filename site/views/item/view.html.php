@@ -5,12 +5,11 @@
  *
  * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
  * @link            https://flexicontent.org
- * @copyright       Copyright © 2018, FLEXIcontent team, All Rights Reserved
+ * @copyright       Copyright Â© 2018, FLEXIcontent team, All Rights Reserved
  * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
-// no direct access
-defined( '_JEXEC' ) or die( 'Restricted access' );
+defined('_JEXEC') or die('Restricted access');
 
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
@@ -487,12 +486,11 @@ class FlexicontentViewItem extends JViewLegacy
 		JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, true);
 
 
-		// ***
-		// *** Initialize variables, flags, etc
-		// ***
+		/**
+		 * Initialize variables, flags, etc
+		 */
 
 		global $globalcats;
-		$categories = & $globalcats;
 
 		$app        = JFactory::getApplication();
 		$jinput     = $app->input;
@@ -503,6 +501,9 @@ class FlexicontentViewItem extends JViewLegacy
 		$user       = JFactory::getUser();
 		$db         = JFactory::getDbo();
 		$uri        = JUri::getInstance();
+		$cparams    = JComponentHelper::getParams('com_flexicontent');
+
+		// Get url vars and some constants
 		$option     = $jinput->get('option', '', 'cmd');
 		$nullDate   = $db->getNullDate();
 		$useAssocs  = flexicontent_db::useAssociations();
@@ -514,7 +515,6 @@ class FlexicontentViewItem extends JViewLegacy
 
 		// Get the COMPONENT only parameter, since we do not have item parameters yet, but we need to do some work before creating the item
 		$page_params  = new JRegistry();
-		$cparams = JComponentHelper::getParams('com_flexicontent');
 		$page_params->merge($cparams);
 
 		// Runtime stats
@@ -1165,10 +1165,10 @@ class FlexicontentViewItem extends JViewLegacy
 		$this->form   = $form;  // most core field are created via calling JForm methods
 
 		if ($useAssocs)  $this->lang_assocs = $langAssocs;
-		$this->langs  = $langs;
-		$this->params = $page_params;
-		$this->lists  = $lists;
-		$this->user   = $user;
+		$this->langs   = $langs;
+		$this->params  = $page_params;
+		$this->lists   = $lists;
+		$this->user    = $user;
 
 		$this->subscribers   = $subscribers;
 		$this->usedtagsdata  = $usedtagsdata;
@@ -1225,10 +1225,12 @@ class FlexicontentViewItem extends JViewLegacy
 		$option   = $jinput->get('option', '', 'cmd');
 
 		global $globalcats;
-		$categories = $globalcats;			// get the categories tree
-		$types = $model->getTypeslist();
+
+		$categories    = $globalcats;
+		$types         = $model->getTypeslist();
 		$typesselected = $model->getItemType();
 		$subscribers   = $model->getSubscribersCount();
+
 		$isnew = !$item->id;
 
 
@@ -1720,11 +1722,22 @@ class FlexicontentViewItem extends JViewLegacy
 	 */
 	function _getItemPerms()
 	{
-		$user = JFactory::getUser();	// get current user
-		$permission = FlexicontentHelperPerm::getPerm();  // get global perms
-		$model = $this->getModel();
+		// Get view's model
+		$model      = $this->getModel();
 
-		$perms 	= array();
+		// Return cached result
+		static $perms_cache = array();
+
+		if (isset($perms_cache[$model->get('id')]))
+		{
+			return $perms_cache[$model->get('id')];
+		}
+
+		// Get user, user's global permissions
+		$permission = FlexicontentHelperPerm::getPerm();
+		$user       = JFactory::getUser();
+
+		$perms = array();
 		$perms['isSuperAdmin'] = $permission->SuperAdmin;
 		$perms['canconfig']    = $permission->CanConfig;
 		$perms['multicat']     = $permission->MultiCat;
@@ -1751,7 +1764,7 @@ class FlexicontentViewItem extends JViewLegacy
 		$perms['canchange_featcat'] = $permission->CanChangeFeatCat;
 
 		// OVERRIDE global with existing item's atomic settings
-		if ( $model->get('id') )
+		if ($model->get('id'))
 		{
 			// the following include the "owned" checks too
 			$itemAccess = $model->getItemAccess();
@@ -1762,13 +1775,15 @@ class FlexicontentViewItem extends JViewLegacy
 
 		// Get can change categories ACL access
 		$type = $model->getItemType();
-		if ( $type->id )
+		if ($type->id)
 		{
 			$perms['canchange_cat']     = $user->authorise('flexicontent.change.cat', 'com_flexicontent.type.' . $type->id);
 			$perms['canchange_seccat']  = $user->authorise('flexicontent.change.cat.sec', 'com_flexicontent.type.' . $type->id);
 			$perms['canchange_featcat'] = $user->authorise('flexicontent.change.cat.feat', 'com_flexicontent.type.' . $type->id);
 		}
 
+		// Cache and return result
+		$perms_cache[$model->get('id')] = $perms;
 		return $perms;
 	}
 
