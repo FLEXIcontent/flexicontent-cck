@@ -15,12 +15,17 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 // - RETURNED HTML is used as 'toc' 
 // - Optionally set 'visible pages HTML' into $this->_text 
 
-$custom_allpages = JText::_( $this->params->get('custom_allpages', 'FLEXIBREAK_ALL_PAGES') );
-$display_method  = $this->params->get('display_method', 1);
-$multipage_toc = $this->params->get('multipage_toc', 1);
+$custom_allpages = JText::_($this->params->get('custom_allpages', 'FLEXIBREAK_ALL_PAGES'));
+$display_method  = (int) $this->params->get('display_method', 1);
+$multipage_toc   = (int) $this->params->get('multipage_toc', 1);
 
-$onclick    = $display_method == 1  ?  'javascript:return false;'  : '';  // need to disable anchor following
-$link_class = $display_method == 1  ?  ' tocPaginated' : ($display_method==0 ? ' tocScrolled' : ' tocReloaded');
+// Needed to disable anchor following
+$onclick = $display_method === 1 
+	? 'javascript:return false;'
+	: '';
+$link_class = $display_method === 1
+	? ' tocPaginated'
+	: ($display_method === 0 ? ' tocScrolled' : ' tocReloaded');
 
 $sef_link   = JRoute::_($this->nonsef_link);  // Get current SEF link of current item
 
@@ -29,7 +34,7 @@ if ($multipage_toc) : /* TOC Start */ ?>
 	<div class="contenttoc" id="articleTOC">
 	<a id="articleToc"></a>
 		<?php if ( $this->params->get('toc_title', 1) ) : ?>
-		<p class="tocHeader"><?php echo JText::_( 'FLEXIBREAK_TABLE_OF_CONTENT' ) ?></p>
+		<p class="tocHeader"><?php echo JText::_('FLEXIBREAK_TABLE_OF_CONTENT') ?></p>
 		<?php endif; ?>
 		
 		<ul class="tocList">
@@ -41,11 +46,13 @@ if ($multipage_toc) : /* TOC Start */ ?>
 				
 				switch($display_method)
 				{
-					case 2:  case 1:
+					case 2:
+					case 1:
 						$link = $page->link;
 						break;
-					
-					default: case 0:
+
+					case 0:
+					default:
 						$link = $sef_link.'#'.$page->id;
 						break;
 				}
@@ -67,7 +74,12 @@ if ($multipage_toc) : /* TOC Start */ ?>
 		
 		</ul>
 
-		<?php if ( $this->params->get('pagination', 1) == 1 ) echo $this->loadTemplate('pagination_js'); ?>
+		<?php
+		if ($this->params->get('pagination', 1) == 1)
+		{
+			echo $this->loadTemplate('pagination_js');
+		}
+		?>
 	</div>
 
 <?php endif; /* TOC End */ ?>
@@ -77,4 +89,8 @@ if ($multipage_toc) : /* TOC Start */ ?>
 // Create 'visible pages text' (visible without page reload)
 // Below is default code, that can handle display_method: 0, 1, 2
 $this->_text = '';
-for ($i = 0; $i < $this->pagescount; $i++)  $this->_text .= $this->_getPageText($this->row, $i, $this->showall);
+
+for ($i = 0; $i < $this->pagescount; $i++)
+{
+	$this->_text .= $this->_getPageText($this->row, $i, $this->showall);
+}

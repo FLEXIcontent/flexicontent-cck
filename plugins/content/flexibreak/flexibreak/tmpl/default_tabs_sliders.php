@@ -11,14 +11,16 @@ if ($this->showall)
 {
 	// return;  // Return will also work as all pages text will be used by default
 	$this->_text = '';
-	for ($i = 0; $i <= $this->pagescount; $i++) {
+
+	for ($i = 0; $i <= $this->pagescount; $i++)
+	{
 		$this->_text .= $this->texts[$i] . ($i < $this->pagescount ? '<hr class="articlePageEnd" />' : '');
 	}
 	return;
 }
 
-$display_method = $this->params->get('display_method', 1);
-$style = $display_method == 4 ? 'sliders' : 'tabs';
+$display_method = (int) $this->params->get('display_method', 1);
+$style = $display_method === 4 ? 'sliders' : 'tabs';
 
 // Add introduction text
 $t[] = $this->texts[0];
@@ -30,6 +32,7 @@ if ($this->pagescount)
 	
 	// Create 1 TAB / Slider per page
 	$n = !empty($this->texts[0]) ? -1 : 0;
+
 	for ($i = 1; $i <= $this->pagescount; $i++)
 	{
 		$page = $this->_generateToc($this->row, $i);  // Create page data of current page, needed to create TOC navigation entries (in our case TAB / Slider handle)
