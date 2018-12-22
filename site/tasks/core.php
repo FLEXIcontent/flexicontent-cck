@@ -307,7 +307,11 @@ class FlexicontentTasksCore
 		}
 		else
 		{
-			$tagobjs = $this->_gettags($app->input->get('q', '', 'string'));
+			// If (search) text is just whitespace then set limit to a much higher value
+			$q = $app->input->get('q', '', 'string');
+			$limit = $q && !trim($q) ? 10000 : 500;
+
+			$tagobjs = $this->_gettags($q, $limit);
 
 			if ($tagobjs)
 			{
@@ -394,30 +398,33 @@ class FlexicontentTasksCore
 
 
 	/**
-	 * Method to fetch tags according to a given mask
+	 * Method to fetch tags according to a given text
 	 * 
 	 * @return object
 	 * @since 1.0
 	 */
-	private function _getTags($mask="", $limit=500)
+	private function _getTags($text = '', $limit = 500)
 	{
-		$app     = JFactory::getApplication();
-		$jinput  = $app->input;
-		if ($jinput->get('task', '', 'cmd') == __FUNCTION__) die(__FUNCTION__ . ' : direct call not allowed');
+		if (JFactory::getApplication()->input->get('task', '', 'cmd') == __FUNCTION__) die(__FUNCTION__ . ' : direct call not allowed');
 
 		$db = JFactory::getDbo();
 
-		$escaped_mask = $db->escape($mask, true);
-		$quoted_mask  = $db->Quote('%' . $escaped_mask . '%', false);
-
-		$mask_where = $mask ? ' name LIKE ' . $quoted_mask . ' AND ' : '';
-
-		$query = 'SELECT * '
-			. ' FROM #__flexicontent_tags'
-			. ' WHERE ' . $mask_where . ' published = 1'
-			. ' ORDER BY name LIMIT 0, ' . (int) $limit
+		$query = $db->getQuery(true)
+			->select('*')
+			->from('#__flexicontent_tags')
+			->where('published = 1')
+			->order('name')
 			;
-		$tags = $db->setQuery($query)->loadObjectlist();
+
+		if (trim($text))
+		{
+			$escaped_text = $db->escape($text, true);
+			$quoted_text  = $db->Quote('%' . $escaped_text . '%', false);
+
+			$query->where('name LIKE ' . $quoted_text);
+		}
+
+		$tags = $db->setQuery($query, 0, (int) $limit)->loadObjectlist();
 
 		return $tags;
 	}
