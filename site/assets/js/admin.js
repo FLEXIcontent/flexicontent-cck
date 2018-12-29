@@ -354,7 +354,7 @@ Joomla.serializeForm = function (form, result)
 
 		else if (field.checked)
 		{
-			arr[arr.length] = { name: field.name, value: field.value.length ? field.value : 'on' };
+			arr[arr.length] = { name: field.name, value: field.value.length ? field.value : (field_type == 'checkbox' ? 'on' : '') };
 		}
 	}
 	
