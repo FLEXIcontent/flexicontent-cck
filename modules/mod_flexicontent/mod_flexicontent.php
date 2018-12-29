@@ -142,7 +142,10 @@ if (!is_array($ordering))  $ordering = explode(',', $ordering);
 $moduleclass_sfx= $params->get('moduleclass_sfx', '');
 $layout 				= $params->get('layout', 'default');
 
-$add_ccs      = (int) $params->get('add_ccs', $flexiparams->get('disablecss', 0) ? 0 : 1);
+// Workaround for legacy seriazed form submit bug, posting empty radio as value 'on'
+$disable_css  = (int) $flexiparams->get('disablecss', 0);
+$add_ccs      = $params->get('add_ccs');
+$add_ccs      = is_numeric($add_ccs) ? (int) $add_ccs : ($disable_css ? 0 : 1);
 $add_tooltips = (int) $params->get('add_tooltips', 1);
 
 $width 					= $params->get('width');
