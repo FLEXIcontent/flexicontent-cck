@@ -56,7 +56,7 @@
 			<field name="exact_values" type="text" default="0" size="2" label="FLEXI_FIELD_EXACT_OPTIONS" description="FLEXI_FIELD_EXACT_OPTIONS_DESC" />
 
 			<field name="" type="separator" default="FLEXI_FORM_FIELD_CONF" description="FLEXI_FORM_FIELD_CONF_DESC" icon_class="icon-downarrow" level="tab_open" box_type="1" />
-			<field name="" type="separator" default="FLEXI_FORM_FIELD_CONF_DESC" description="" icon_class="icon-signup" level="level3" class="alert alert-info fcpadded" />
+			<field name="" type="separator" default="FLEXI_FORM_FIELD_CONF_DESC" description="" level="level3" class="alert alert-info fcpadded" />
 
 			<field name="display_label_form" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC" class="btn-group btn-group-yesno">
 				<option value="1">FLEXI_FLOATED_LEFT</option>
@@ -99,9 +99,9 @@
 
 
 
-			<field name="" type="separator" default="FLEXI_RIFLD_CATEGORY_SELECTOR" icon_class="icon-signup" level="tab_open" box_type="1" />
-
+			<field name="" type="separator" default="FLEXI_RIFLD_CATEGORY_SELECTOR" description="FLEXI_RIFLD_CATEGORY_SELECTOR_INFO" icon_class="icon-signup" level="tab_open" box_type="1" />
 			<field name="" type="separator" default="FLEXI_RIFLD_CATEGORY_SELECTOR_INFO" level="level3" class="alert alert-info fcpadded" />
+
 			<field name="method_cat" type="multilist" subtype="radio" toggle_related="1" default="1" label="FLEXI_RIFLD_SELECTABLE_CATEGORIES" description="FLEXI_RIFLD_SELECTABLE_CATEGORIES_DESC" class="btn-group group-fcinfo">
 				<option value="1" show_list="" hide_list="cat_method_on">FLEXI_ALL</option>
 				<option value="2" show_list="cat_method_on" hide_list="">FLEXI_EXCLUDE</option>
@@ -118,8 +118,8 @@
 			</field>
 
 
-			<field name="" type="separator" default="FLEXI_RIFLD_SELECTABLE_ITEMS" icon_class="icon-signup" level="tab_open" box_type="1" />
-			<field name="" type="separator" default="FLEXI_RIFLD_SELECTABLE_ITEMS_DESC" description="" icon_class="icon-signup" level="level3" class="alert alert-info fcpadded" />
+			<field name="" type="separator" default="FLEXI_RIFLD_SELECTABLE_ITEMS" description="FLEXI_RIFLD_SELECTABLE_ITEMS_DESC" icon_class="icon-signup" level="tab_open" box_type="1" />
+			<field name="" type="separator" default="FLEXI_RIFLD_SELECTABLE_ITEMS_DESC" level="level3" class="alert alert-info fcpadded" />
 
 			<field name="subcat_items" type="radio" default="1" label="List sub category items" description="When a category is selected the sub-category items will be listed too" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>

@@ -193,7 +193,8 @@ tabberObj.prototype.init = function(e)
 	if (!document.getElementsByTagName) { return false; }
 
 	/* If the main DIV has an ID then save it. */
-	if (e.id) {
+	if (e.id)
+	{
 		this.id = e.id;
 	}
 
@@ -202,12 +203,12 @@ tabberObj.prototype.init = function(e)
 
 	/* Loop through an array of all the child nodes within our tabber element. */
 	childNodes = e.childNodes;
-	for(i=0; i < childNodes.length; i++) {
 
+	for (i = 0; i < childNodes.length; i++)
+	{
 		/* Find the nodes where class="tabbertab" */
-		if(childNodes[i].className &&
-			 childNodes[i].className.match(this.REclassTab)) {
-			
+		if (childNodes[i].className && childNodes[i].className.match(this.REclassTab))
+		{
 			/* Create a new object to save info about this tab */
 			t = new Object();
 			
@@ -220,7 +221,8 @@ tabberObj.prototype.init = function(e)
 			/* If the class name contains classTabDefault,
 				 then select this tab by default.
 			*/
-			if (childNodes[i].className.match(this.REclassTabDefault)) {
+			if (childNodes[i].className.match(this.REclassTabDefault))
+			{
 				defaultTab = this.tabs.length-1;
 			}
 		}
@@ -270,6 +272,7 @@ tabberObj.prototype.init = function(e)
 					decode_entities.innerHTML = headingElement.innerHTML;
 					t.headingText = decode_entities.value;
 					t.headingTitle = headingElement.title;
+					t.headingDataTitle = headingElement.dataset.title;
 					t.headingContent = headingElement.dataset.content;
 					t.headingPlacement = headingElement.dataset.placement;
 					if (headingElement.hasAttribute('class'))
@@ -322,9 +325,24 @@ tabberObj.prototype.init = function(e)
 		}
 		DOM_a.appendChild(document.createTextNode(t.headingText));
 		DOM_a.href = "javascript:void(null);";
-		DOM_a.title = t.headingTitle;
-		DOM_a.dataset.content = t.headingContent;
-		DOM_a.dataset.placement = t.headingPlacement;
+
+		if (t.headingTitle)
+		{
+			DOM_a.title = t.headingTitle;
+		}
+		if (t.headingDataTitle)
+		{
+			DOM_a.dataset.title = t.headingDataTitle;
+		}
+		if (t.headingContent)
+		{
+			DOM_a.dataset.content = t.headingContent;
+		}
+		if (t.headingPlacement)
+		{
+			DOM_a.dataset.placement = t.headingPlacement;
+		}
+
 		DOM_a.onclick = this.navClick;
 		if (tab_classes)
 		{
@@ -362,6 +380,21 @@ tabberObj.prototype.init = function(e)
 
 		/* Add the list element to the list */
 		DOM_ul.appendChild(DOM_li);
+
+		if (DOM_a.tabber_hasClass('hasTooltip') && !!jQuery)
+		{
+			try{
+				jQuery(DOM_a).tooltip({html: true, container: DOM_a});
+			}catch(e){}
+		}
+
+		if (DOM_a.tabber_hasClass('hasPopover') && !!jQuery)
+		{
+			try {
+				jQuery(DOM_a).popover({html: true, container: DOM_a, trigger : 'hover focus'});
+			}
+			catch(e) {}
+		}
 	}
 
 	/* Add the UL list to the beginning of the tabber div */

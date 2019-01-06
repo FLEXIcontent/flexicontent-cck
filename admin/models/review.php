@@ -233,7 +233,7 @@ class FlexicontentModelReview extends FCModelAdmin
 		$record  = $record ?: $this->_record;
 		$user    = JFactory::getUser();
 
-		$isOwner = $record && $record->user_id = $user->id;
+		$isOwner = $record && $record->user_id == $user->id;
 
 		return !$record || !$record->id
 			? $this->canCreate

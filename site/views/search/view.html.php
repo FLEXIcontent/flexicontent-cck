@@ -285,7 +285,7 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		if ($type_based_search && $canseltypes && !empty($form_contenttypes))
 		{
 			$single_contenttype = reset($form_contenttypes);
-			$contenttypes = $form_contenttypes = array($single_contenttype);
+			$form_contenttypes = $contenttypes = array($single_contenttype);
 		}
 		else
 		{
@@ -394,7 +394,7 @@ class FLEXIcontentViewSearch extends JViewLegacy
 
 			if ($canseltypes && $show_filters)
 			{
-				foreach($filtflds as $field_name)
+				foreach ($filtflds as $field_name)
 				{
 					if (empty($filters_tmp[$field_name]))
 					{
@@ -517,11 +517,14 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		if( $txtmode==2 && count($fields_text) )
 		{
 			// Get selected text fields in the Search Form
-			$form_txtflds = $jinput->getString('txtflds', array());
+			$form_txtflds = $jinput->get('txtflds', array(), 'array');
 
-			if (!$form_txtflds || empty($form_txtflds))
+			if ($form_txtflds)
 			{
-				$form_txtflds = array(); //array('__FC_ALL__'); //array_keys($fields_text);
+				foreach ($form_txtflds as $i => $form_txtfld)
+				{
+					$form_txtflds[$i] = JFilterInput::getInstance()->clean($form_txtfld, 'string');
+				}
 			}
 
 			$lists['txtflds'] = JHtml::_('select.genericlist',
@@ -642,7 +645,7 @@ class FLEXIcontentViewSearch extends JViewLegacy
 
 		// *** Selector for filter combination
 		/*
-		if($show_filtersop = $params->get('show_filtersop', 1))
+		if ($show_filtersop = $params->get('show_filtersop', 1))
 		{
 			$default_filtersop = $params->get('default_filtersop', 'all');
 			$filtersop = $jinput->getCmd('filtersop', $default_filtersop);

@@ -230,7 +230,7 @@ class FlexicontentModelFile extends FCModelAdmin
 	{
 		$record  = $record ?: $this->_record;
 		$user    = JFactory::getUser();
-		$isOwner = $record && $user->id && $record->uploaded_by = $user->id;
+		$isOwner = $record && $user->id && $record->uploaded_by == $user->id;
 
 		$canupload = $user->authorise('flexicontent.uploadfiles', 'com_flexicontent');
 		$canedit = $user->authorise('flexicontent.editfile', 'com_flexicontent');
@@ -252,7 +252,7 @@ class FlexicontentModelFile extends FCModelAdmin
 	{
 		$record  = $record ?: $this->_record;
 		$user    = JFactory::getUser();
-		$isOwner = $record && $user->id && $record->uploaded_by = $user->id;
+		$isOwner = $record && $user->id && $record->uploaded_by == $user->id;
 
 		$canpublish = $user->authorise('flexicontent.publishfile', 'com_flexicontent');
 		$canpublishown = $user->authorise('flexicontent.publishownfile', 'com_flexicontent') && $isOwner;
@@ -273,7 +273,7 @@ class FlexicontentModelFile extends FCModelAdmin
 	{
 		$record  = $record ?: $this->_record;
 		$user    = JFactory::getUser();
-		$isOwner = $record && $user->id && $record->uploaded_by = $user->id;
+		$isOwner = $record && $user->id && $record->uploaded_by == $user->id;
 
 		$candelete = $user->authorise('flexicontent.deletefile', 'com_flexicontent');
 		$candeleteown = $user->authorise('flexicontent.deleteownfile', 'com_flexicontent') && $isOwner;
