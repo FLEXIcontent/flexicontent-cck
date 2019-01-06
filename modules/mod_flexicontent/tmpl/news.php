@@ -190,6 +190,76 @@ if ($item_placement_feat === 2 || $item_placement_std === 2 || $item_placement_f
 
 
 $container_id = $module->id . (count($catdata_arr) > 1 && $catdata ? '_' . $catdata->id : '');
+
+
+/**
+ * Content display via Parameter-based Layout
+ */
+$feat_params_layout = (int) $params->get($layout.'_params_layout_feat', 1);
+$std_params_layout  = (int) $params->get($layout.'_params_layout', 1);
+$css_prefix = '#mod_flexicontent_' . $module->id;
+
+
+/**
+ * Content display via Builder-based Layouts
+ */
+$feat_builder_layout_num = (int) $params->get($layout.'_builder_layout_feat', 1);
+$std_builder_layout_num  = (int) $params->get($layout.'_builder_layout', 1);
+
+if ($feat_builder_layout_num)
+{
+	$builder_layout_name = 'builder_layout' . $feat_builder_layout_num;
+	$feat_builder_layout = trim($params->get($builder_layout_name . '_html'));
+
+	if ($feat_builder_layout)
+	{
+		modFlexicontentHelper::loadBuilderLayoutAssets(
+			$module,
+			$params,
+			$builder_layout_name,
+			$css_prefix . ' .mod_flexicontent_featured '
+		);
+
+		$matches = null;
+		preg_match_all('/\sid="([a-zA-Z0-9_-]*)"/', $feat_builder_layout, $matches);
+
+		foreach ($matches[0] as $i => $k)
+		{
+			$tagid = $matches[1][$i];
+			$feat_builder_layout = str_replace('id="' . $tagid . '"', 'id="' . $tagid . '_{{fc-item-id}}"', $feat_builder_layout);
+			$feat_builder_layout = str_replace('"#' . $tagid . '"', '"#' . $tagid . '_{{fc-item-id}}"', $feat_builder_layout);
+			$feat_builder_layout = str_replace("'#" . $tagid . "'", "'#" . $tagid . "_{{fc-item-id}}'", $feat_builder_layout);
+		}
+	}
+}
+
+
+if ($std_builder_layout_num)
+{
+	$builder_layout_name = 'builder_layout' . $std_builder_layout_num;
+	$std_builder_layout  = trim($params->get('builder_layout' . $std_builder_layout_num . '_html'));
+
+	if ($std_builder_layout)
+	{
+		modFlexicontentHelper::loadBuilderLayoutAssets(
+			$module,
+			$params,
+			$builder_layout_name,
+			$css_prefix . ' .mod_flexicontent_standard '
+		);
+
+		$matches = null;
+		preg_match_all('/\sid="([a-zA-Z0-9_-]*)"/', $std_builder_layout, $matches);
+
+		foreach ($matches[0] as $i => $k)
+		{
+			$tagid = $matches[1][$i];
+			$std_builder_layout = str_replace('id="' . $tagid . '"', 'id="' . $tagid . '_{{fc-item-id}}"', $std_builder_layout);
+			$std_builder_layout = str_replace('"#' . $tagid . '"', '"#' . $tagid . '_{{fc-item-id}}"', $std_builder_layout);
+			$std_builder_layout = str_replace("'#" . $tagid . "'", "'#" . $tagid . "_{{fc-item-id}}'", $std_builder_layout);
+		}
+	}
+}
 ?>
 
 
@@ -334,6 +404,10 @@ $container_id = $module->id . (count($catdata_arr) > 1 && $catdata ? '_' . $catd
 			<div class="mod_flexicontent_featured_wrapper<?php echo $mod_do_hlight_feat; ?><?php echo ' '.$oe_class .($item->is_active_item ? ' fcitem_active' : '') .($cols_class_feat ? ' '.$cols_class_feat : ''); ?>">
 			<div class="mod_flexicontent_featured_wrapper_innerbox">
 
+
+			<?php if ($feat_params_layout) : /* BOF: Content display via Parameter-based Layout */ ?>
+
+
 				<!-- BOF item title -->
 				<?php ob_start(); ?>
 
@@ -469,6 +543,18 @@ $container_id = $module->id . (count($catdata_arr) > 1 && $catdata ? '_' . $catd
 				<?php endif; ?>
 
 				<?php echo $content_layout_feat==2 ? $captured_image : '';?>
+
+
+			<?php endif; /* EOF: Content display via Parameter-based Layout */ ?>
+
+
+			<?php
+				// Content display via Builder-based Layouts
+				echo $feat_builder_layout
+					? str_replace('{{fc-item-id}}', $item->id, $feat_builder_layout)
+					: '';
+			?>
+
 
 			</div>  <!-- EOF wrapper_innerbox -->
 			</div>  <!-- EOF wrapper -->
@@ -626,6 +712,10 @@ $container_id = $module->id . (count($catdata_arr) > 1 && $catdata ? '_' . $catd
 			>
 			<div class="mod_flexicontent_standard_wrapper_innerbox">
 
+
+			<?php if ($std_params_layout) : /* BOF: Content display via Parameter-based Layout */ ?>
+
+
 				<!-- BOF item title -->
 				<?php ob_start(); ?>
 
@@ -760,6 +850,18 @@ $container_id = $module->id . (count($catdata_arr) > 1 && $catdata ? '_' . $catd
 				<?php endif; ?>
 
 				<?php echo $content_layout==2 ? $captured_image : '';?>
+
+
+			<?php endif; /* EOF: Content display via Parameter-based Layout */ ?>
+
+
+			<?php
+				// Content display via Builder-based Layouts
+				echo $std_builder_layout
+					? str_replace('{{fc-item-id}}', $item->id, $std_builder_layout)
+					: '';
+			?>
+
 
 			</div>  <!-- EOF wrapper_innerbox -->
 			</div>  <!-- EOF wrapper -->

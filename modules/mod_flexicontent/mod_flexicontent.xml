@@ -938,6 +938,35 @@
 		<field name="" type="separator" default="FLEXI_MOD_TMPL_CONTENT_VIA_LAYOUT_BUILDER" description="" icon_class="icon-puzzle" level="tab_open" box_type="1" />
 		<field name="" type="separator" default="FLEXI_MOD_TMPL_CONTENT_CONFIG_NOT_USED_BY_ALL_TEMPLATES_INFO" level="level3" class="alert alert-info fcpadded" />
 
+			<field name="" type="separator" default="Layout 1" level="level1" />
+			<field name="builder_layout1" type="fclayoutbuilder" default="" label="Layout builder" description="..." class=""
+				editor_sfx="builder_layout1"
+				lessfile="modules/mod_flexicontent/builder/less/standard_items_list_{{id}}.less"
+			/>
+
+			<field name="builder_layout1_html" type="textarea" filter="raw" readonly="readonly" rows="2" default="" label="HTML" description="..." class="input-xxlarge"/>
+			<field name="builder_layout1_js" type="hidden" filter="raw" default="" label="JS" description="..." class="" />
+			<field name="builder_layout1_css" type="textarea" readonly="readonly" filter="raw" rows="2" default="" label="CSS" description="..." class="input-xxlarge" />
+			<field name="builder_layout1_styles" type="hidden" filter="raw" default="" label="Styles" description="..." class=""/>
+			<field name="builder_layout1_components" type="hidden" filter="raw" default="" label="Components" description="..." class=""/>
+			<field name="builder_layout1_assets" type="hidden" filter="raw" default="" label="Assets" description="..." class=""/>
+			<field name="builder_layout1_hash" type="hidden" filter="JHtmlFclayoutbuilder::createUrlHash" default="" label="Hash" description="..." class="" />
+			<field name="builder_layout1_less" type="hidden" filter="JHtmlFclayoutbuilder::prepareLess" default="/modules/mod_flexicontent/builder/less/builder_layout1_{{id}}" label="LESS" description="..." class="" />
+
+			<field name="" type="separator" default="Layout 2" level="level1" />
+			<field name="builder_layout2" type="fclayoutbuilder" default="" label="Layout builder" description="..." class=""
+				editor_sfx="builder_layout2"
+				lessfile="modules/mod_flexicontent/builder/less/standard_items_list_{{id}}.less"
+			/>
+
+			<field name="builder_layout2_html" type="textarea" filter="raw" readonly="readonly" rows="2" default="" label="HTML" description="..." class="input-xxlarge"/>
+			<field name="builder_layout2_js" type="hidden" filter="raw" default="" label="JS" description="..." class="" />
+			<field name="builder_layout2_css" type="textarea" readonly="readonly" filter="raw" rows="2" default="" label="CSS" description="..." class="input-xxlarge" />
+			<field name="builder_layout2_styles" type="hidden" filter="raw" default="" label="Styles" description="..." class=""/>
+			<field name="builder_layout2_components" type="hidden" filter="raw" default="" label="Components" description="..." class=""/>
+			<field name="builder_layout2_assets" type="hidden" filter="raw" default="" label="Assets" description="..." class=""/>
+			<field name="builder_layout2_hash" type="hidden" filter="JHtmlFclayoutbuilder::createUrlHash" default="" label="Hash" description="..." class="" />
+			<field name="builder_layout2_less" type="hidden" filter="JHtmlFclayoutbuilder::prepareLess" default="/modules/mod_flexicontent/builder/less/builder_layout2_{{id}}" label="LESS" description="..." class="" />
 
 		<field name="" type="separator" default="Items List Tabset" level="tabset_close" tab_class="s-fake" box_type="1" />
 		<field name="" type="separator" default="Display Tabset" level="tabset_close" tab_class="s-fake" box_type="1" />

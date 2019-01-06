@@ -17,7 +17,7 @@ use Joomla\String\StringHelper;
 
 class modFlexicontentHelper
 {
-	public static function getList(&$params, &$totals = null)
+	public static function getList($params, &$totals = null)
 	{
 		global $modfc_jprof, $mod_fc_run_times;
 
@@ -762,7 +762,7 @@ class modFlexicontentHelper
 		return $lists_arr;
 	}
 
-	public static function getItems(&$params, $ordering, &$totals=null)
+	public static function getItems($params, $ordering, &$totals=null)
 	{
 		global $dump, $globalcats;
 		global $modfc_jprof, $mod_fc_run_times;
@@ -2385,7 +2385,7 @@ class modFlexicontentHelper
 	/*
 	 * Find which categories will be shown, retrieve their data and return them
 	 */
-	public static function getCategoryData(&$params)
+	public static function getCategoryData($params)
 	{
 		if (!$params->get('apply_config_per_category', 0)) return false;
 
@@ -2575,7 +2575,7 @@ class modFlexicontentHelper
 	/*
 	 * Verify parameters, altering them if needed
 	 */
-	public static function verifyParams( &$params )
+	public static function verifyParams($params)
 	{
 		// Calculate menu itemid for item links
 		$app    = JFactory::getApplication();
@@ -2616,7 +2616,7 @@ class modFlexicontentHelper
 	/*
 	 * Retrieve comments for given items, item array has the structure: items[catid][ordername][]
 	 */
-	public static function getComments(&$params, &$items)
+	public static function getComments($params, &$items)
 	{
 		$db = JFactory::getDbo();
 
@@ -2670,5 +2670,36 @@ class modFlexicontentHelper
 		}
 
 		return $comments;
+	}
+
+
+	public static function loadBuilderLayoutAssets($module, $params, $layout_name, $css_prefix)
+	{
+		/**
+		 * This will compile CSS from LESS, if not done already
+		 */
+		$location   = '/modules/mod_flexicontent/builder/';
+		$css_file   = 'css/' . $layout_name . '_' . $module->id . '.css';
+
+		JHtml::addIncludePath(JPATH_SITE . '/components/com_flexicontent/helpers/html');
+		JHtml::_('fclayoutbuilder.createCss',
+			$module,
+			$params,
+			$config = (object) array(
+				'location'    => $location,
+				'css_prefix'  => $css_prefix,
+				'layout_name' => $layout_name,
+			)
+		);
+
+		/**
+		 * Load CSS / JS files
+		 */
+		flexicontent_html::loadframework('grapesjs_view');
+
+		JFactory::getDocument()->addStyleSheetVersion(
+			JUri::base(true) . $location . $css_file,
+			$params->get($layout_name . '_hash')
+		);
 	}
 }

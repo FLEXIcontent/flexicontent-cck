@@ -10,15 +10,40 @@
 	<authorUrl>www.flexicontent.org</authorUrl>
 	<version>1.0</version>
 	<description>Flexicontent Universal Content Module, 'news' Layout parameters</description>
-	
+
 	<fields name="params">
-		
+
 		<fieldset name="layout" addfieldpath="/administrator/components/com_flexicontent/elements">
-			
-		<field name="item_tabset_start" type="separator" default="ITEM_TABSET" level="tabset_start" />
+
+		<field name="item_tabset_start" type="separator" default="ITEM_TABSET" level="tabset_start" tab_class="s-fake" box_type="1" />
+
+			<field name="item_tab_content" type="separator" default="Content" icon_class="icon-database" level="tab_open" box_type="1" />
+
+			<field name="" type="separator" default="FLEXI_MOD_TMPL_CONTENT_VIA_PARAMETERS" level="level2" />
+			<field name="news_params_layout_feat" type="radio" default="1" label="Featured items" description="" class="btn-group">
+				<option value="0">FLEXI_DISABLE</option>
+				<option value="1">FLEXI_ENABLE</option>
+			</field>
+			<field name="news_params_layout" type="radio" default="1" label="Standard items" description="" class="btn-group">
+				<option value="0">FLEXI_DISABLE</option>
+				<option value="1">FLEXI_ENABLE</option>
+			</field>
+
+			<field name="" type="separator" default="FLEXI_MOD_TMPL_CONTENT_VIA_LAYOUT_BUILDER" level="level2" />
+			<field name="news_builder_layout_feat" type="multilist" subtype="radio" default="1" label="Featured items" description="" class="btn-group group-fcmethod">
+				<option value="0">FLEXI_DISABLE</option>
+				<option value="1">Layout 1</option>
+				<option value="2">Layout 2</option>
+			</field>
+			<field name="news_builder_layout" type="multilist" subtype="radio" default="1" label="Standard items" description="" class="btn-group group-fcmethod">
+				<option value="0">FLEXI_DISABLE</option>
+				<option value="1">Layout 1</option>
+				<option value="2">Layout 2</option>
+			</field>
 
 			<field name="item_tab_featured" type="separator" default="Featured items" icon_class="icon-list" level="tab_open" box_type="1" />
 
+			<field name="" type="separator" default="Basic" level="level2" />
 			<field name="news_item_placement_feat" type="multilist" subtype="radio" default="1" toggle_related="1" label="FLEXI_ITEMS_PLACEMENT" description="FLEXI_ITEMS_PLACEMENT_DESC" class="btn-group group-fcinfo">
 				<option value="0" show_list="items_in_cols_feat">FLEXI_CLEARED</option>
 				<option value="1" show_list="items_in_cols_feat">FLEXI_AS_MASONRY_TILES</option>
@@ -39,7 +64,7 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="2">On Hover</option>
 			</field>
-			
+
 			<field name="" type="separator" default="Content / image placement" level="level2" />
 			<field name="news_content_layout_feat" type="radio" default="3" label="Content Placement &lt;br/&gt; &lt;small&gt; in regards to image &lt;/small&gt;" description="Select to placement content next, or above/below (cleared) or over (ovelayed) the item image. Note: overlayed will crop content that does not fit from the bottom part" class="btn-group group-fcinfo">
 				<option value="0">Floated (Right)</option>
@@ -59,7 +84,7 @@
 				<option value="0">Auto-Fit</option>
 				<option value="1">Auto-Fit and Stretch</option>
 			</field>
-			
+
 			<field name="" type="separator" default="(inline) CSS Styles for Inner Container (px)" level="level2" />
 			<field name="news_inner_inline_css_feat" type="radio" default="0" label="FLEXI_ENABLE" description="Select to set styling of inner item containers" class="btn-group">
 				<option value="0">No (use default/custom CSS)</option>
@@ -70,10 +95,11 @@
 			<field name="news_border_width_feat" type="text" default="1" label="border width" description="This is the border width applied around the items" />
 			<field name="news_margin_top_bottom_feat" type="text" default="4" label="margin top/bottom" description="This is the margin applied at top and bottom of the items" />
 			<field name="news_margin_left_right_feat" type="text" default="4" label="margin left/right" description="This is the margin applied at left and right of the items" />
-			
-			
+
+
 			<field name="item_tab_standard" type="separator" default="Standard items" icon_class="icon-list" level="tab_open" box_type="1" />
-			
+
+			<field name="" type="separator" default="Basic" level="level2" />
 			<field name="news_item_placement" type="multilist" subtype="radio" default="1" toggle_related="1" label="FLEXI_ITEMS_PLACEMENT" description="FLEXI_ITEMS_PLACEMENT_DESC" class="btn-group group-fcinfo">
 				<option value="0" show_list="items_in_cols">FLEXI_CLEARED</option>
 				<option value="1" show_list="items_in_cols">FLEXI_AS_MASONRY_TILES</option>
@@ -94,7 +120,7 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="2">On Hover</option>
 			</field>
-			
+
 			<field name="" type="separator" default="Content / image placement" level="level2" />
 			<field name="news_content_layout" type="radio" default="3" label="Content Placement &lt;br/&gt; &lt;small&gt; in regards to image &lt;/small&gt;" description="Select to placement content next, or above/below (cleared) or over (ovelayed) the item image. Note: overlayed will crop content that does not fit from the bottom part" class="btn-group group-fcinfo">
 				<option value="0">Floated (Right)</option>
@@ -114,7 +140,7 @@
 				<option value="0">Auto-Fit</option>
 				<option value="1">Auto-Fit and Stretch</option>
 			</field>
-			
+
 			<field name="" type="separator" default="(inline) CSS Styles for Inner Container (px)" level="level2" />
 			<field name="news_inner_inline_css" type="radio" default="0" label="FLEXI_ENABLE" description="Select to set styling of inner item containers" class="btn-group">
 				<option value="0">No (use default/custom CSS)</option>
@@ -125,11 +151,11 @@
 			<field name="news_border_width" type="text" default="1" label="border width" description="This is the border width applied around the items" />
 			<field name="news_margin_top_bottom" type="text" default="4" label="margin top/bottom" description="This is the margin applied at top and bottom of the items" />
 			<field name="news_margin_left_right" type="text" default="4" label="margin left/right" description="This is the margin applied at left and right of the items" />
-			
+
 		<field name="item_tabset_end" type="separator" default="ITEM_TABSET" level="tabset_close" />
 
 		</fieldset>
-		
+
 	</fields>
-	
+
 </form>

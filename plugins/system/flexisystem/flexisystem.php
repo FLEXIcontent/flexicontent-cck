@@ -17,6 +17,7 @@ use Joomla\Utilities\ArrayHelper;
 
 if (!defined('DS'))  define('DS',DIRECTORY_SEPARATOR);
 require_once (JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'defineconstants.php');
+JLoader::register('JHtmlFclayoutbuilder', JPATH_ROOT . DS . 'components' . DS . 'com_flexicontent' . DS . 'helpers' . DS . 'html' . DS . 'fclayoutbuilder.php');
 
 /**
  * Example system plugin
