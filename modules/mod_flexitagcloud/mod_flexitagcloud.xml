@@ -10,7 +10,7 @@
 	<authorUrl>http://www.flexicontent.org</authorUrl>
 	<version>1.1</version>
 	<description>MOD_FLEXITAGSCLOUD_XML_DESCRIPTION</description>
-	
+
 	<files>
 		<filename module="mod_flexitagcloud">mod_flexitagcloud.php</filename>
 		<filename>index.html</filename>
@@ -18,16 +18,16 @@
 		<folder>elements</folder>
 		<folder>tmpl</folder>
 	</files>
-	
+
 	<languages>
 		<language tag="en-GB">languages/en-GB.mod_flexitagcloud.ini</language>
 		<language tag="en-GB">languages/en-GB.mod_flexitagcloud.sys.ini</language>
 	</languages>
-	
+
 	<config>
 	<fields name="params" addfieldpath="/modules/mod_flexitagcloud/elements">
 		<fieldset name="basic">
-			
+
 			<field name="" type="separator" default="FLEXI_TEMPLATE_LAYOUT" description="" level="level1" class="fc-ngmargin" />
 			<field name="" type="separator" default="Please set layout parameters in &lt;b&gt;Layout: ... TAB&lt;/b&gt;. CSS/HTML developers please read: &lt;u&gt;&lt;b&gt; &lt;a href='http://www.flexicontent.org/documentation/faq/69-templating-module-plugin-content/274-how-to-create-a-custom-layout-for-universal-content-module-and-other-flexicontent-modules.html' target='_blank'&gt;Custom templates HOW-TO&lt;/a&gt; &lt;/b&gt; &lt;/u&gt;" level="level3" class="alert alert-info fcpadded" />
 			<field name="layout" type="fclayout" default="default" label="FLEXI_CHOOSE_TMPL"
@@ -37,17 +37,17 @@
 				/> <!-- params_source="inline" -->
 
 			<field name="" type="separator" default="FLEXI_BASIC_CONFIGURATION" level="level1" />
-			
+
 			<field name="min_size" type="text" default="1" label="FLEXI_MIN_SIZE" description="FLEXI_MIN_SIZE_DESC" />
 			<field name="max_size" type="text" default="10" label="FLEXI_MAX_SIZE" description="FLEXI_MAX_SIZE_DESC" />
 			<field name="count" type="text" default="25" label="FLEXI_COUNT" description="FLEXI_COUNT_DESC" />
-			
+
 			<field name="seo_mode" type="radio" default="1" label="FLEXI_SEO_MODE" description="FLEXI_SEO_MODE_DESC" class="btn-group">
 				<option value="1">FLEXI_YES</option>
 				<option value="0">FLEXI_NO</option>
 			</field>
 			<field name="force_itemid" type="text" default="" label="FLEXI_FORCE_ITEMID" description="FLEXI_FORCE_ITEMID_DESC" />
-			
+
 			<field name="" type="separator" default="FLEXI_CATEGORIES" level="level2" />
 			<field name="" type="separator" default="Show tags of items in the following categories. &lt;br/&gt; &lt;b&gt;Current category&lt;/b&gt; is &lt;br/&gt;- either currently viewed category &lt;br/&gt;- or main category of the item currently viewed" level="level3" class="alert alert-info" />
 			<field name="method" type="multilist" subtype="radio" default="1" label="FLEXI_CATEGORY" description="FLEXI_METHOD_DESC" toggle_related="1" class="btn-group" >
@@ -106,18 +106,18 @@
 			<field name="php_rule" type="textarea" filter="JComponentHelper::filterText" rows="5" cols="40" label="FLEXI_PHP_RULE_CODE" description="FLEXI_PHP_RULE_CODE_DESC" class="using_php_rule input-xxlarge" />
 
 		</fieldset>
-		
+
 		<fieldset name="mod_tmpl_layout" label="FLEXI_MOD_TMPL_LAYOUT_OPTIONS" description="FLEXI_MOD_TMPL_LAYOUT_OPTIONS_DESC">
 		</fieldset>
-		
+
 		<fieldset name="tags_view_items" label="FLEXI_PARAMETERS_TAGGED_ITEMS_VIEW_LEGACY" addfieldpath="/administrator/components/com_flexicontent/elements">
 
 			<field name="" type="separator" default="FLEXI_MOD_TAGS_ABOUT_CONFIGURING_TAGS_VIEW" level="level3" class="alert alert-warning" />
-			
+
 
 			<field name="" type="separator" default="FLEXI_PARAMETERS_TAGS_VIEW_LEGACY" level="tabset_start" box_type="1" />
 			<field name="" type="separator" default="FLEXI_FIELDS" icon_class="icon-signup" level="tab_open" box_type="1" />
-			
+
 			<field name="sep_image" type="separator" default="FLEXI_IMAGE" description="FLEXI_USE_IMAGE" level="level2" />
 			<field name="use_image" type="multilist" subtype="radio" default="0" toggle_related="1" label="FLEXI_SHOW" description="..." class="btn-group">
 				<option value="0" show_list="" hide_list="display_images">FLEXI_NO</option>
@@ -140,7 +140,7 @@
 				<option value="0">FLEXI_SCALE</option>
 				<option value="1">FLEXI_CROP</option>
 			</field>
-			
+
 			<field name="" type="separator" default="FLEXI_SHOWMODIFIED" description="FLEXI_SHOWMODIFIED_DESC" level="level2" />
 			<field name="show_modify_date" type="multilist" subtype="radio"  toggle_related="1" default="0" label="FLEXI_SHOW" description="..." class="btn-group">
 				<option value="0" show_list="" hide_list="disp_moddate">FLEXI_NO</option>
@@ -154,7 +154,7 @@
 				<option value="DATE_FORMAT_CUSTOM" show_list="custom_moddate" hide_list="">FLEXI_FIELD_CUSTOM_FORMAT</option>
 			</field>
 			<field name="custom_date" type="text" default="" label="FLEXI_FIELD_CUSTOM_FORMAT" description="FLEXI_FIELD_CUSTOM_FORMAT_DESC" class="disp_moddate custom_moddate" />
-			
+
 			<field name="" type="separator" default="FLEXI_EXTRA_FIELDS" description="FLEXI_EXTRA_FIELDS_DESC" level="level2" />
 			<field name="use_fields" type="multilist" subtype="radio" default="0" toggle_related="1" label="FLEXI_SHOW" description="..." class="btn-group">
 				<option value="0" show_list="" hide_list="disp_custom_flds">FLEXI_NO</option>
@@ -174,7 +174,7 @@
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
 			</field>
-			
+
 			<field name="" type="separator" default="FLEXI_SEO" icon_class="icon-bookmark" level="tab_open" box_type="1" />
 
 			<field name="add_canonical" type="radio" default="" label="FLEXI_ADD_REL_CANONICAL" description="FLEXI_ADD_REL_CANONICAL_DESC" class="btn-group">
@@ -182,7 +182,7 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			
+
 			<field name="" type="separator" default="FLEXI_ITEMS_ORDER" description="FLEXI_ITEMS_ORDER_DESC" icon_class="icon-shuffle" level="tab_open" box_type="1" />
 
 			<field name="orderby" type="list" default="" label="FLEXI_PRIMARY_ORDER" description="FLEXI_PRIMARY_ORDER_DESC">
@@ -209,7 +209,7 @@
 				<option value="2">FLEXI_FLOAT</option>
 				<option value="3">FLEXI_DATE</option>
 			</field>
-			
+
 			<field name="" type="separator" default="FLEXI_FRONTEND_OVERRIDES" description="FLEXI_FRONTEND_OVERRIDES_DESC" icon_class="icon-cog" level="tab_open" box_type="1" />
 
 			<field name="limit_override" type="radio" default="" label="FLEXI_NUM_PER_PAGE" description="FLEXI_NUM_PER_PAGE_DESC" class="btn-group">
@@ -228,7 +228,7 @@
 				checkoptions="FLEXI_ORDER_DEFAULT_INITIAL,FLEXI_ORDER_OLDEST_FIRST,FLEXI_ORDER_MOST_RECENT_FIRST,FLEXI_ORDER_LAST_MODIFIED_FIRST, FLEXI_ORDER_TITLE_ALPHABETICAL,FLEXI_ORDER_TITLE_ALPHABETICAL_REVERSE,FLEXI_ORDER_AUTHOR_ALPHABETICAL,FLEXI_ORDER_AUTHOR_ALPHABETICAL_REVERSE, FLEXI_ORDER_MOST_HITS,FLEXI_ORDER_LEAST_HITS,FLEXI_ORDER_CONFIGURED_ORDER"
 				checkvals="_preconfigured_,date,rdate,modified,alpha,ralpha,author,rauthor,hits,rhits,order" defaultvals=""
 				label="FLEXI_PRIMARY_ORDER_OPTIONS" description="FLEXI_PRIMARY_ORDER_OPTIONS_DESC" />
-			
+
 
 			<!--field name="" type="separator" default="FLEXI_ALPHA_INDEX" description="FLEXI_ALPHA_INDEX_DESC" icon_class="icon-search" level="tab_open" box_type="1" />
 
@@ -241,7 +241,7 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field-->
-			
+
 			<field name="" type="separator" default="FLEXI_TEXT_SEARCH" description="FLEXI_TEXT_SEARCH_DESC" icon_class="icon-search" level="tab_open" box_type="1" />
 
 			<field name="use_search" type="radio" default="" label="FLEXI_SHOW_SEARCH" description="FLEXI_SHOW_SEARCH_DESC" class="btn-group">
@@ -259,7 +259,7 @@
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
 			</field>
-			
+
 			<field name="show_search_go" type="radio" default="" label="FLEXI_SEARCH_GO_BUTTON" description="FLEXI_SEARCH_GO_BUTTON_DESC" class="btn-group">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_HIDE</option>
@@ -274,27 +274,29 @@
 		<field name="" type="separator" default="FLEXI_PARAMETERS_TAGS_VIEW_LEGACY" level="tabset_close" box_type="1" />
 
 		</fieldset>
-		
-		<fieldset name="FLEXI_MOD_ADVANCED_CACHE_STYLING" label="FLEXI_MOD_ADVANCED_CACHE_STYLING">
-			
+
+		<fieldset name="advanced">
+
 			<field name="" type="separator" default="FLEXI_CACHING" level="level1" />
 			<field name="cache" type="list" default="1" label="FLEXI_CACHING" description="FLEXI_CACHING_DESC">
 				<option value="1">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_NO_CACHING</option>
 			</field>
 			<field name="cache_time" type="text" default="900" label="FLEXI_CACHE_TIME" description="FLEXI_CACHE_TIME_DESC" />
-			
-			<field name="" type="separator" default="FLEXI_MODULE_STYLING" level="level1" />
-			<field name="moduleclass_sfx" type="text" default="" label="FLEXI_MODULE_CLASS_SUFFIX" description="FLEXI_MODULE_CLASS_SUFFIX_DESC" />
+
+			<field name="" type="separator" default="CSS / JS" level="level1" />
 			<field name="add_ccs" type="radio" default="" label="FLEXI_ADD_DEFAULT_CSS" description="FLEXI_ADD_DEFAULT_CSS_DESC" class="btn-group">
 				<option value="">Use component setting</option>
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 				<option value="2">CSS links inside HTML (allows capturing)</option>
 			</field>
-			
+
+			<field name="" type="separator" default="Module Container" level="level1" />
+			<field name="moduleclass_sfx" type="text" default="" label="FLEXI_MODULE_CLASS_SUFFIX" description="FLEXI_MODULE_CLASS_SUFFIX_DESC" />
+
 		</fieldset>
-		
+
 	</fields>
 	</config>
 </extension>

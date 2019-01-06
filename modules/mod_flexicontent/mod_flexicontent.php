@@ -142,16 +142,19 @@ if (!is_array($ordering))  $ordering = explode(',', $ordering);
 $moduleclass_sfx= $params->get('moduleclass_sfx', '');
 $layout 				= $params->get('layout', 'default');
 
-// Workaround for legacy seriazed form submit bug, posting empty radio as value 'on'
+// Workaround for legacy serialized form submit bug, posting empty radio as value 'on'
 $disable_css  = (int) $flexiparams->get('disablecss', 0);
 $add_ccs      = $params->get('add_ccs');
 $add_ccs      = is_numeric($add_ccs) ? (int) $add_ccs : ($disable_css ? 0 : 1);
-$add_tooltips = (int) $params->get('add_tooltips', 1);
+$add_tooltips = (int) $params->get('add_tooltips', (int) $flexiparams->get('add_tooltips', 1));
 
 $width 					= $params->get('width');
 $height 				= $params->get('height');
 
-// Get module basic fields parameters
+
+/**
+ * Get module basic fields parameters
+ */
 
 // Standard
 $display_title 		= $params->get('display_title');
@@ -177,7 +180,10 @@ $mod_readmore_feat		= $params->get('mod_readmore_feat');
 $mod_use_image_feat 	= $params->get('mod_use_image_feat');
 $mod_link_image_feat 	= $params->get('mod_link_image_feat');
 
-// Get module custom fields parameters
+
+/**
+ * Get module custom fields parameters
+ */
 
 // Standard
 $use_fields 				= $params->get('use_fields',1);
@@ -206,7 +212,10 @@ $custom3 				= $params->get('custom3');
 $custom4 				= $params->get('custom4');
 $custom5 				= $params->get('custom5');
 
-// Create Item List Data
+
+/**
+ * Create Item List Data
+ */
 $list_totals = $params->get('show_found_items', 0) ? array() : null;   // NULL indicates not to calculate totals
 $list_arr = modFlexicontentHelper::getList($params, $list_totals);
 
@@ -278,10 +287,19 @@ if ($add_ccs && $layout)
 	}
 }
 
-// Include module header, but make sure that file exists, because otherwise the Joomla module helper will include ... 'default.php'
-// module template ! thus a Joomla override template header is allowed only if template header.php file exists locally too !!
-if ( file_exists(dirname(__FILE__).DS.'tmpl'.DS.$layout.DS.'header.php') )
+/**
+ * Include module header, but make sure that file exists, because otherwise the Joomla module helper will include ... 'default.php'
+ * module template ! thus a Joomla override template header is allowed only if template header.php file exists locally too !!
+ */
+if (file_exists(dirname(__FILE__).DS.'tmpl'.DS.$layout.DS.'header.php'))
+{
+	ob_start();
 	require(JModuleHelper::getLayoutPath('mod_flexicontent', $layout.'/header'));
+	$header_html = ob_get_contents();
+	ob_end_clean();
+}
+
+$main_html = '';
 
 // Render Layout, (once per category if apply per category is enabled ...)
 foreach ($catdata_arr as $catid => $catdata)
@@ -310,19 +328,45 @@ foreach ($catdata_arr as $catid => $catdata)
 		: !empty($list_totals[$catid]) || (!$can_skip_category && isset($list_totals[$catid]));
 
 	// Decide whether to skip rendering of the layout
-	if ( !$items_exist && $can_skip_category && !$showing_total && !$params->get('display_favlist', 0) )
+	if (!$items_exist && $can_skip_category && !$showing_total && !$params->get('display_favlist', 0))
 	{
 		continue;
 	}
 
+	ob_start();
 	require(JModuleHelper::getLayoutPath('mod_flexicontent', $layout));
+	$main_html .= ob_get_contents();
+	ob_end_clean();
 }
 
-// Include module footer, e.g. includes module's Read More, because otherwise the Joomla module helper will include ... 'default.php'
-// module template ! thus a Joomla override template header is allowed only if template header.php file exists locally too !!
-if ( file_exists(dirname(__FILE__).DS.'tmpl'.DS.$layout.DS.'footer.php') )
+
+/**
+ * Include module footer, e.g. includes module's Read More, because otherwise the Joomla module helper will include ... 'default.php'
+ * module template ! thus a Joomla override template header is allowed only if template header.php file exists locally too !!
+ */
+if (file_exists(dirname(__FILE__).DS.'tmpl'.DS.$layout.DS.'footer.php'))
 {
+	ob_start();
 	require(JModuleHelper::getLayoutPath('mod_flexicontent', $layout.'/footer'));
+	$footer_html = ob_get_contents();
+	ob_end_clean();
+}
+
+
+/**
+ * Output header_html, main_html, footer_html, adding a container DIV
+ */
+
+if ($main_html)
+{
+	$extName = basename(__FILE__, '.php');
+	echo '
+	<div id="' . $extName . '_' . $module->id . '">
+		' . $header_html . '
+		' . $main_html . '
+		' . $footer_html . '
+	</div>
+	';
 }
 
 
