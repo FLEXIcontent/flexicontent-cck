@@ -12,7 +12,7 @@ JHtml::_('bootstrap.tooltip');
 
 
 /**
- * Fcitems HTML helper
+ * Fcuploader HTML helper
  *
  * @since  3.2
  */

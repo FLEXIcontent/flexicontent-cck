@@ -43,7 +43,7 @@ jQuery(document).ready(function(){
 
 			var rating = jQuery(this).text();
 
-			var voteurl = live_site_base +
+			var voteurl = window.live_site_base +
 				'/index.php?option=com_flexicontent&task=reviews.ajaxvote&user_rating=' + rating + '&cid=' + itemID + '&xid=' + xid;
 
 			jQuery.ajax({
@@ -149,18 +149,18 @@ jQuery(document).ready(function(){
 
 		if (1)
 		{
-			var url = live_site_base +
-				'/index.php?option=com_flexicontent&task=reviews.edit&view=reviews&id=0&tmpl=component&tagid=' + tagid +
-				'&content_id=' + content_id + '&review_type=' + review_type +
-				'&lang=' + (typeof fc_sef_lang != 'undefined' ? fc_sef_lang : '');
+			var url = window.live_site_base
+				+ '/index.php?option=com_flexicontent&task=reviews.edit&view=reviews&id=0&tmpl=component&tagid=' + tagid
+				+ '&content_id=' + content_id + '&review_type=' + review_type
+				+ '&lang=' + (typeof fc_sef_lang != 'undefined' ? fc_sef_lang : '');
 
 			fc_showDialog(url, 'fc_modal_popup_container', 0, 800, 800, 0, {title: 'Review this item'});
 		}
 		else
 		{
-			var url = live_site_root +
-				'/index.php?option=com_flexicontent&format=raw&task=getreviewform&tagid=' + tagid +
-				'&content_id=' + content_id + '&review_type=' + review_type;
+			var url = window.live_site_root
+				+ '/index.php?option=com_flexicontent&format=raw&task=getreviewform&tagid=' + tagid
+				+ '&content_id=' + content_id + '&review_type=' + review_type;
 
 			box_loading.empty().addClass('ajax-loader').css('display', 'inline-block');
 
@@ -204,7 +204,8 @@ jQuery(document).ready(function(){
 
 		if (1)
 		{
-			var url = live_site_base + '/index.php?option=com_flexicontent&task=reviews.edit&view=reviews&id=0&tmpl=component&tagid='
+			var url = window.live_site_base
+				+ '/index.php?option=com_flexicontent&task=reviews.edit&view=reviews&id=0&tmpl=component&tagid='
 				+ tagid + '&content_id=' + content_id + '&review_type=' + review_type
 				+ '&lang=' + (typeof fc_sef_lang != 'undefined' ? fc_sef_lang : '');
 
@@ -212,7 +213,8 @@ jQuery(document).ready(function(){
 		}
 		else
 		{
-			var url = live_site_root + "/index.php?option=com_flexicontent&format=raw&task=storereviewform";
+			var url = window.live_site_root
+				+ '/index.php?option=com_flexicontent&format=raw&task=storereviewform';
 
 			box_loading.empty().addClass('ajax-loader').css('display', 'inline-block');
 

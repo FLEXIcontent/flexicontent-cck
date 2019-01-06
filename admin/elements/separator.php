@@ -170,8 +170,13 @@ class JFormFieldSeparator extends JFormFieldSpacer
 
 	function getInput()
 	{
-		static $tabset_id = 0;
+		static $tabset_stack = array();
+		static $tab_stack = array();
+
+		static $tabset_next_id = -1;
+		static $tabset_id;
 		static $tab_id;
+
 		static $is_fc = null;
 
 		if (self::$css_js_added===null)
@@ -205,6 +210,7 @@ class JFormFieldSeparator extends JFormFieldSpacer
 		$classes .= $is_level ? ' fcsep_'.$level : '';
 
 		$tip = '';
+
 		if (!$value_printf)
 		{
 			$title = JText::_($value);
@@ -222,17 +228,22 @@ class JFormFieldSeparator extends JFormFieldSpacer
 		}
 
 		$desc = JText::_($description);
+
 		if ($desc)
 		{
-			$classes .= ' hasTooltip';
-			$tip = 'title="'.flexicontent_html::getToolTip($title, $desc, 0, 1).'"';
+			$classes .= 'hasTooltip';
+			$tip = ' data-placement="top" data-title="'.flexicontent_html::getToolTip($title, $desc, 0, 1).'" ';
 		}
+
 		$icon_class = @$attributes['icon_class'];
 
 		$box_count = @ $attributes['remove_boxes'];
 		$box_count = strlen($box_count) ? (int) $box_count : ($is_fc ? 0 : 2);
 		$_bof = $box_count ? ($box_count == 2 ? '</div></div>' : str_repeat("</div>", $box_count)) : '';
-		$_eof = $box_count ? ($box_count == 2 ? '<div class="fc_empty_box"><div>'   : str_repeat("<div>",  $box_count)) : '';
+		$_eof = $box_count ? ($box_count == 2
+			? '<div class="fc_empty_box"><div>'
+			: str_repeat("<div>",  $box_count)
+		) : '';
 
 		$box_type = @$attributes['box_type'];
 		if (!$is_level) switch ($level)
@@ -242,13 +253,20 @@ class JFormFieldSeparator extends JFormFieldSpacer
 			break;
 
 		case 'tabset_start':
+			array_push($tabset_stack, $tabset_id);
+			array_push($tab_stack, $tab_id);
+			$tabset_id = ++$tabset_next_id;
+
 			$tab_id = 0;
 			return $box_type==2
-				? $_bof . JHtml::_('tabs.start','core-tabs-cat-props-'.($tabset_id++), array('useCookie'=>1)) . $_eof
-				: $_bof . "\n". '<div class="fctabber '.$tab_class.' '.$classes.'" id="tabset_attrs_'.($tabset_id++).'">' . $_eof;
+				? $_bof . JHtml::_('tabs.start','core-tabs-cat-props-' . $tabset_id, array('useCookie'=>1)) . $_eof
+				: $_bof . "\n". '<div class="fctabber '.$tab_class.' '.$classes.'" id="tabset_attrs_' . $tabset_id . '">' . $_eof;
 			break;
 
 		case 'tabset_close':
+			$tabset_id = array_pop($tabset_stack);
+			$tab_id    = array_pop($tab_stack);
+
 			return $box_type==2
 				? $_bof . JHtml::_('tabs.end') . $_eof
 				: $_bof . '
@@ -267,7 +285,7 @@ class JFormFieldSeparator extends JFormFieldSpacer
 				return $_bof . '
 					' . ($tab_id > 0 ? '</div>' : '') . '
 					<div class="tabbertab" id="tab_attrs_'.$tabset_id.'_'.($tab_id++).'" data-icon-class="'.$icon_class.'" >
-						<h3 class="tabberheading '.$classes.'" '.$tip.'>'.$title.'</h3>
+						<h3 class="tabberheading ' . $classes . '" ' . $tip . '>' . $title . '</h3>
 					' . $_eof;
 			}
 			break;

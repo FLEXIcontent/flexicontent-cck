@@ -116,7 +116,7 @@ switch ($cols)
 		{
 			foreach($cat->subcats as $subcat)
 			{
-	      if ($subcat->assignedcats || $subcat->assignedsubitems)
+				if ($subcat->assignedcats || $subcat->assignedsubitems)
 				{
 					$subcats_are_empty = 0;
 					break;

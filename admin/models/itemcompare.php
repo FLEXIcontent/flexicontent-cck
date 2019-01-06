@@ -273,6 +273,7 @@ class FlexicontentModelItemcompare extends JModelLegacy
 		return $versionscount;
 	}
 
+
 	/**
 	 * Method to get the first version kept
 	 *
@@ -291,6 +292,7 @@ class FlexicontentModelItemcompare extends JModelLegacy
 
 		return $firstversion;
 	}
+
 
 	/**
 	 * Method to get the versionlist which belongs to the item
