@@ -1292,6 +1292,50 @@ class flexicontent_html
 				}
 				break;
 
+			case 'grapejs':
+
+				$framework_path = JUri::root(true).$lib_path.'/grapesjs';
+
+				$document->addStyleSheet($framework_path.'/stylesheets/toastr.min.css');
+				$document->addStyleSheet('https://unpkg.com/grapesjs@0.14.50/dist/css/grapes.min.css'); //stylesheets/grapes.min.css?v0.14.49
+				$document->addStyleSheet($framework_path.'/stylesheets/grapesjs-preset-webpage.min.css?0.1.10');
+				$document->addStyleSheet($framework_path.'/stylesheets/tooltip.css');
+				$document->addStyleSheet($framework_path.'/stylesheets/grapesjs-plugin-filestack.css');
+				$document->addStyleSheet($framework_path.'/stylesheets/demos.css');
+
+				$document->addScript('https://static.filestackapi.com/v3/filestack.js');
+				$document->addScript($framework_path.'/js/toastr.min.js');
+				$document->addScript('https://unpkg.com/grapesjs@0.14.50/dist/grapes.js');  //js/grapes.min.js?v0.14.49
+
+				// GrapesJS Plugins
+				//$document->addScript('https://unpkg.com/grapesjs-blocks-basic');
+				$document->addScript($framework_path.'/js/grapesjs-preset-webpage.min.js?0.1.10');
+				$document->addScript($framework_path.'/js/grapesjs-lory-slider.min.js?0.1.5');
+				$document->addScript($framework_path.'/js/grapesjs-tabs.min.js?0.1.1');
+				$document->addScript($framework_path.'/js/grapesjs-custom-code.min.js?0.1.1');
+				$document->addScript($framework_path.'/js/grapesjs-touch.min.js?0.1.1');
+				$document->addScript($framework_path.'/js/grapesjs-parser-postcss.min.js?0.1.1');
+				$document->addScript($framework_path.'/js/grapesjs-tooltip.min.js?0.1.1');
+				break;
+
+			case 'grapesjs_view':
+				$js .= "
+					jQuery(document).ready(function(){
+						jQuery('.tab-container').click(function(e)
+						{
+							e.preventDefault();
+							return true;
+						});
+					});
+				";
+				break;
+
+			case 'sabberworm':
+
+				$framework_folder = JPATH_ROOT.$lib_path.'/php_css_parser';
+				require_once(JPath::clean($framework_folder . '/autoload.php'));
+				break;
+
 			case 'mousewheel':
 				if ($load_jquery) flexicontent_html::loadJQuery();
 
