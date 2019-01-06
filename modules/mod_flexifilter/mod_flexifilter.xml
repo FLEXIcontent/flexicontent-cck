@@ -9,7 +9,7 @@
 	<authorUrl>http://www.flexicontent.org</authorUrl>
 	<version>3.2</version>
 	<description>MOD_FLEXIFILTER_XML_DESCRIPTION</description>
-	
+
 	<files>
 		<filename module="mod_flexifilter">mod_flexifilter.php</filename>
 		<filename>index.html</filename>
@@ -18,16 +18,16 @@
 		<folder>tmpl</folder>
 		<folder>tmpl_common</folder>
 	</files>
-	
+
 	<languages>
 		<language tag="en-GB">languages/en-GB.mod_flexifilter.ini</language>
 		<language tag="en-GB">languages/en-GB.mod_flexifilter.sys.ini</language>
 	</languages>
-	
+
 	<config>
 	<fields name="params" addfieldpath="/modules/mod_flexifilter/elements">
 		<fieldset name="basic">
-		
+
 			<field name="" type="separator" default="FLEXI_TEMPLATE_LAYOUT" level="level1" class="fc-ngmargin" />
 			<field name="" type="separator" default="Please set layout parameters in &lt;b&gt;Layout: ... TAB&lt;/b&gt;. CSS/HTML developers please read: &lt;u&gt;&lt;b&gt; &lt;a href='http://www.flexicontent.org/documentation/faq/69-templating-module-plugin-content/274-how-to-create-a-custom-layout-for-universal-content-module-and-other-flexicontent-modules.html' target='_blank'&gt;Custom templates HOW-TO&lt;/a&gt; &lt;/b&gt; &lt;/u&gt;" level="level3" class="alert alert-info fcpadded" />
 			<field name="layout" type="fclayout" default="default" label="FLEXI_CHOOSE_TMPL"
@@ -57,7 +57,7 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			
+
 			<field name="" type="separator" default="FLEXI_FILTER_TARGET_VIEW" level="level3" class="disp_catselector" />
 			<field name="" type="separator" default="This effects if category selector will allow selecting multiple categories" level="level4" class="alert alert-info fcpadded disp_catselector" />
 			<field name="mcats_selection" type="multilist" subtype="list" toggle_related="1" default="0" label="FLEXI_FILTER_FORM_TARGET" description="FLEXI_FILTER_FORM_TARGET_DESC" class="disp_catselector" >
@@ -69,9 +69,9 @@
 			<field name="mcats_itemid" type="fcmenuitem" component="com_flexicontent" link_filters="view=category%%layout=mcats%%!cids=" default="" disable="separator" state="1" published="1" label="FLEXI_FILTER_MCATS_VIEW_ITEM" description="FLEXI_FILTER_MCATS_VIEW_ITEM_DESC" class="mcats_menuid disp_catselector">
 				<option value="">FLEXI_SELECT</option>
 			</field>
-						
+
 			<field name="" type="separator" default="FLEXI_SEARCH_FILTER_FORM" description="" level="level0" />
-			
+
 			<field name="ff_placement" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_SEARCH_FILTER_FORM_PLACEMENT" description="FLEXI_SEARCH_FILTER_FORM_PLACEMENT_DESC" class="btn-group group-fcsuccess">
 				<option value="0" show_list="" hide_list="using_slider">FLEXI_SEARCH_FILTER_FORM_INLINE</option>
 				<option value="1" show_list="using_slider" hide_list="">FLEXI_SEARCH_FILTER_FORM_SLIDER</option>
@@ -86,7 +86,7 @@
 				<option value="1">FLEXI_YES_AS_TIP</option>
 				<option value="2">FLEXI_YES_AS_INLINE</option>
 			</field>
-			
+
 			<field name="" type="separator" default="FLEXI_BUTTONS" level="level2" />
 			<field name="show_search_go" type="multilist" subtype="radio" default="1" label="FLEXI_SEARCH_GO_BUTTON" description="FLEXI_SEARCH_GO_BUTTON_DESC" class="btn-group group-fcsuccess">
 				<option value="0">FLEXI_AUTO</option>
@@ -103,7 +103,7 @@
 				<option value="btn btn-inverse" show_list="" hide_list="custom_goclass">FLEXI_BUTTON_CLASS_INVERSE</option>
 			</field>
 			<field name="flexi_button_class_go_custom" type="text" size="20" default="" label="FLEXI_BUTTON_CLASS_GO_CUSTOM" description="FLEXI_BUTTON_CLASS_GO_CUSTOM_DESC" class="custom_goclass input-xxlarge" />
-			
+
 			<field name="show_search_reset" type="multilist" subtype="radio" toggle_related="1" default="1" label="FLEXI_SEARCH_RESET_BUTTON" description="FLEXI_SEARCH_RESET_BUTTON_DESC" class="btn-group">
 				<option value="0" show_list="" hide_list="disp_resetbtn">FLEXI_HIDE</option>
 				<option value="1" show_list="disp_resetbtn" hide_list="">FLEXI_SHOW</option>
@@ -119,7 +119,7 @@
 				<option value="btn btn-inverse" show_list="" hide_list="custom_resetclass">FLEXI_BUTTON_CLASS_INVERSE</option>
 			</field>
 			<field name="flexi_button_class_reset_custom" type="text" size="20" default="" label="FLEXI_BUTTON_CLASS_RESET_CUSTOM" description="FLEXI_BUTTON_CLASS_RESET_CUSTOM_DESC" class="disp_resetbtn custom_resetclass input-xxlarge" />
-			
+
 			<field name="" type="separator" default="FLEXI_TEXT_SEARCH" description="FLEXI_TEXT_SEARCH_DESC" level="level1" />
 			<field name="use_search" type="multilist" subtype="radio" toggle_related="1" default="1" label="FLEXI_SHOW_SEARCH" description="FLEXI_SHOW_SEARCH_DESC" class="btn-group">
 				<option value="0" show_list="" hide_list="usesearch">FLEXI_NO</option>
@@ -146,7 +146,7 @@
 				<option value="natural">FLEXI_NATURAL_PHRASE</option>
 				<option value="natural_expanded">FLEXI_NATURAL_PHRASE_MORE_RESULTS</option>
 			</field>
-			
+
 			<field name="" type="separator" default="FLEXI_FIELD_FILTERING" description="FLEXI_FIELD_FILTERING_DESC" level="level1" />
 			<field name="use_filters" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_DISPLAY_FILTERS" description="FLEXI_DISPLAY_FILTERS_DESC" class="btn-group">
 				<option value="0" show_list="" hide_list="usefilters">FLEXI_NO</option>
@@ -158,9 +158,9 @@
 				<option value="2" show_list="usefilters_below" hide_list="">FLEXI_FILTER_DISPLAYED_FILTERS_SELECTED</option>
 				<option value="3" show_list="usefilters_below" hide_list="">FLEXI_FILTER_DISPLAYED_FILTERS_SELECTED_SET_IN_CAT_PARAMS</option>
 			</field>
-			
+
 			<field name="filters" type="filters" multiple="false" default="" label="FLEXI_SELECT_FILTERS" description="FLEXI_SELECT_FILTERS_DESC" class="usefilters usefilters_below" />
-			
+
 			<field name="show_filter_labels" type="radio" default="1" label="FLEXI_FILTER_LABELS" description="FLEXI_FILTER_LABELS_DESC" class="usefilters btn-group group-success" >
 				<option value="0">FLEXI_FIELD_CONFIGURED_BEHAVIOR</option>
 				<option value="1">FLEXI_OUTSIDE_FILTER</option>
@@ -195,7 +195,7 @@
 				<option value="1" show_list="usepersistantfilter" hide_list="">FLEXI_YES</option>
 			</field>
 			<field name="persistent_filters" default="" type="textarea" rows="5" cols="32" label="FLEXI_LOCKED_FILTER_VALUES" description="FLEXI_LOCKED_FILTER_VALUES_DESC" class="usepersistantfilter input-xxlarge"/>
-			
+
 		</fieldset>
 
 		<fieldset name="FLEXI_MODULE_DISPLAYING_RULES" label="FLEXI_MODULE_DISPLAYING_RULES" description="FLEXI_MODULE_DISPLAYING_RULES_DESC">
@@ -229,19 +229,18 @@
 			<field name="php_rule" type="textarea" filter="JComponentHelper::filterText" rows="5" cols="40" label="FLEXI_PHP_RULE_CODE" description="FLEXI_PHP_RULE_CODE_DESC" class="using_php_rule input-xxlarge" />
 
 		</fieldset>
-		
+
 		<fieldset name="mod_tmpl_layout" label="FLEXI_MOD_TMPL_LAYOUT_OPTIONS" description="FLEXI_MOD_TMPL_LAYOUT_OPTIONS_DESC">
 		</fieldset>
 
-		<fieldset name="FLEXI_MOD_ADVANCED_CACHE_STYLING" label="FLEXI_MOD_ADVANCED_CACHE_STYLING">
-			
+		<fieldset name="advanced">
+
 			<field name="" type="separator" default="FLEXI_CACHING" level="level1" />
 			<field name="cache" type="list" default="0" label="FLEXI_CACHING" description="FLEXI_CACHING_DESC">
 				<option value="0">FLEXI_NO_CACHING</option>
 			</field>
-			
-			<field name="" type="separator" default="FLEXI_MODULE_STYLING" level="level1" />
-			<field name="moduleclass_sfx" type="text" default="" label="FLEXI_MODULE_CLASS_SUFFIX" description="FLEXI_MODULE_CLASS_SUFFIX_DESC" />
+
+			<field name="" type="separator" default="CSS / JS" level="level1" />
 			<field name="add_ccs" type="radio" default="" label="FLEXI_ADD_DEFAULT_CSS" description="FLEXI_ADD_DEFAULT_CSS_DESC" class="btn-group">
 				<option value="">Use component setting</option>
 				<option value="0">FLEXI_NO</option>
@@ -249,12 +248,16 @@
 				<option value="2">CSS links inside HTML (allows capturing)</option>
 			</field>
 			<field name="add_tooltips" type="radio" default="1" label="FLEXI_ADD_TOOLTIPS_JS" description="FLEXI_ADD_TOOLTIPS_JS_DESC" class="btn-group">
+				<option value="">Use component setting</option>
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			
+
+			<field name="" type="separator" default="Module Container" level="level1" />
+			<field name="moduleclass_sfx" type="text" default="" label="FLEXI_MODULE_CLASS_SUFFIX" description="FLEXI_MODULE_CLASS_SUFFIX_DESC" />
+
 		</fieldset>
-		
+
 	</fields>
 	</config>
 </extension>

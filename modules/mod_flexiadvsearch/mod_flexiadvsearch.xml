@@ -9,7 +9,7 @@
 	<authorUrl>http://www.flexicontent.org</authorUrl>
 	<version>3.2</version>
 	<description>MOD_FLEXIADVSEARCH_XML_DESCRIPTION</description>
-	
+
 	<files>
 		<filename module="mod_flexiadvsearch">mod_flexiadvsearch.php</filename>
 		<filename>index.html</filename>
@@ -18,15 +18,15 @@
 		<folder>tmpl</folder>
 		<folder>tmpl_common</folder>
 	</files>
-	
+
 	<languages>
 		<language tag="en-GB">languages/en-GB.mod_flexiadvsearch.ini</language>
 		<language tag="en-GB">languages/en-GB.mod_flexiadvsearch.sys.ini</language>
 	</languages>
-	
+
 	<config>
 	<fields name="params" addfieldpath="/modules/mod_flexiadvsearch/elements">
-		
+
 		<fieldset name="basic">
 
 			<field name="" type="separator" default="FLEXI_TEMPLATE_LAYOUT" description="" level="level1" class="fc-ngmargin" />
@@ -43,13 +43,13 @@
 				<option value="1" show_list="force_menuitem" hide_list="">FLEXI_MOD_MENU_ITEMID_CUSTOM</option>
 			</field>
 			<field name="itemid_force_value" type="text" default="" label="FLEXI_MOD_CUSTOM_MENU_ITEMID" description="FLEXI_MOD_CUSTOM_MENU_ITEMID" class="force_menuitem"/>
-			
+
 			<field name="" type="separator" default="FLEXI_BASIC_CONFIGURATION" level="level1" />
-			
+
 			<field name="" type="separator" default="FLEXI_MOD_TEXT_SEARCH_FIELD" level="level2" />
 			<field name="search_inner_width" type="text" default="20" label="FLEXI_MOD_TEXT_SEARCH_WIDTH" description="FLEXI_MOD_TEXT_SEARCH_WIDTH_DESC" />
 			<field name="search_inner_prompt" type="text" default="FLEXI_ADV_MOD_SEARCH_PROMPT" label="FLEXI_MOD_TEXT_SEARCH_PROMPT" description="FLEXI_MOD_TEXT_SEARCH_PROMPT_DESC" class="input-xxlarge" />
-			
+
 			<field name="" type="separator" default="FLEXI_MOD_GO_BUTTON" level="level2" />
 			<field name="button" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_MOD_SHOW_GO_BUTTON" description="FLEXI_MOD_SHOW_GO_BUTTON_DESC" class="btn-group">
 				<option value="0" show_list="" hide_list="disp_gobtn">FLEXI_NO</option>
@@ -78,7 +78,7 @@
 			</field>
 			<field name="button_image" type="text" default="" label="FLEXI_MOD_BUTTON_IMAGE_SRC" description="FLEXI_MOD_BUTTON_IMAGE_SRC" class="disp_gobtn gobtn_img input-xxlarge"/>
 			<field name="button_text"  type="text" default="FLEXI_ADV_MOD_GO" label="FLEXI_MOD_BUTTON_TEXT" description="FLEXI_MOD_BUTTON_TEXT_DESC" class="disp_gobtn gobtn_txt input-xxlarge"/>
-			
+
 			<field name="" type="separator" default="FLEXI_MOD_DIRECT_BUTTON" level="level2" />
 			<field name="direct_button" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_MOD_SHOW_DIRECT_BUTTON" description="FLEXI_MOD_SHOW_DIRECT_BUTTON_DESC" class="btn-group">
 				<option value="0" show_list="" hide_list="disp_directbtn">FLEXI_NO</option>
@@ -164,21 +164,20 @@
 			<field name="php_rule" type="textarea" filter="JComponentHelper::filterText" rows="5" cols="40" label="FLEXI_PHP_RULE_CODE" description="FLEXI_PHP_RULE_CODE_DESC" class="using_php_rule input-xxlarge" />
 
 		</fieldset>
-		
+
 		<fieldset name="mod_tmpl_layout" label="FLEXI_MOD_TMPL_LAYOUT_OPTIONS" description="FLEXI_MOD_TMPL_LAYOUT_OPTIONS_DESC">
 		</fieldset>
 
-		<fieldset name="FLEXI_MOD_ADVANCED_CACHE_STYLING" label="FLEXI_MOD_ADVANCED_CACHE_STYLING">
-			
+		<fieldset name="advanced">
+
 			<field name="" type="separator" default="FLEXI_CACHING" level="level1" />
 			<field name="cache" type="list" default="1" label="FLEXI_CACHING" description="FLEXI_CACHING_DESC">
 				<option value="1">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_NO_CACHING</option>
 			</field>
 			<field name="cache_time" type="text" default="900" label="FLEXI_CACHE_TIME" description="FLEXI_CACHE_TIME_DESC" />
-			
-			<field name="" type="separator" default="FLEXI_MODULE_STYLING" level="level1" />
-			<field name="moduleclass_sfx" type="text" default="" label="FLEXI_MODULE_CLASS_SUFFIX" description="FLEXI_MODULE_CLASS_SUFFIX_DESC" />
+
+			<field name="" type="separator" default="CSS / JS" level="level1" />
 			<field name="add_ccs" type="radio" default="" label="FLEXI_ADD_DEFAULT_CSS" description="FLEXI_ADD_DEFAULT_CSS_DESC" class="btn-group">
 				<option value="">Use component setting</option>
 				<option value="0">FLEXI_NO</option>
@@ -186,12 +185,16 @@
 				<option value="2">CSS links inside HTML (allows capturing)</option>
 			</field>
 			<field name="add_tooltips" type="radio" default="1" label="FLEXI_ADD_TOOLTIPS_JS" description="FLEXI_ADD_TOOLTIPS_JS_DESC" class="btn-group">
+				<option value="">Use component setting</option>
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			
+
+			<field name="" type="separator" default="Module Container" level="level1" />
+			<field name="moduleclass_sfx" type="text" default="" label="FLEXI_MODULE_CLASS_SUFFIX" description="FLEXI_MODULE_CLASS_SUFFIX_DESC" />
+
 		</fieldset>
-		
+
 	</fields>
 	</config>
 </extension>

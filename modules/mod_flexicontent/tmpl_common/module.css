@@ -1,11 +1,17 @@
 
 /* MODULE STYLING EXTERNAL CONTAINER */
 .mod_flexicontent_wrapper {
+	box-sizing: border-box;
 	overflow: hidden;
 	position: relative;
 	top: 0;
 	left: 0;
 	margin:0 0 24px 0;
+}
+
+/* All elements */
+.mod_flexicontent_wrapper * {
+	box-sizing: border-box;
 }
 
 /* ITEM (AND OTHER DATA) SEPARATOR */

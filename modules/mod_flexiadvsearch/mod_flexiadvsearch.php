@@ -24,6 +24,7 @@ require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'
 
 //require_once (JPATH_SITE.DS.'modules'.DS.'mod_flexicontent'.DS.'classes'.DS.'datetime.php');
 //JTable::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'tables');
+JLoader::register('JFormFieldFclayoutbuilder', JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'elements' . DS . 'fclayoutbuilder.php');
 
 
 // Decide whether to show module contents
@@ -113,11 +114,11 @@ require_once (dirname(__FILE__).DS.'helper.php');
 $moduleclass_sfx= $params->get('moduleclass_sfx', '');
 $layout 				= $params->get('layout', 'default');
 
-// Workaround for legacy seriazed form submit bug, posting empty radio as value 'on'
+// Workaround for legacy serialized form submit bug, posting empty radio as value 'on'
 $disable_css  = (int) $flexiparams->get('disablecss', 0);
 $add_ccs      = $params->get('add_ccs');
 $add_ccs      = is_numeric($add_ccs) ? (int) $add_ccs : ($disable_css ? 0 : 1);
-$add_tooltips = (int) $params->get('add_tooltips', 1);
+$add_tooltips = (int) $params->get('add_tooltips', (int) $flexiparams->get('add_tooltips', 1));
 
 $text      = JText::_($params->get('text', 'FLEXI_ADV_MOD_SEARCH_PROMPT'));
 $width     = intval($params->get('width', 20));
