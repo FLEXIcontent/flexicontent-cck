@@ -187,7 +187,7 @@ class FlexicontentViewReviews extends FlexicontentViewBaseRecords
 		//$options = JHtml::_('jgrid.publishedOptions');
 		$options = array();
 
-		foreach ($model_s::supported_conditions as $condition_value => $condition_name)
+		foreach ($model_s->supported_conditions as $condition_value => $condition_name)
 		{
 			$options[] = JHtml::_('select.option', $condition_value, JText::_($condition_name));
 		}
@@ -340,7 +340,7 @@ class FlexicontentViewReviews extends FlexicontentViewBaseRecords
 
 		if ($hasEditState)
 		{
-			$states_applicable = $model_s::supported_conditions;
+			$states_applicable = $model_s->supported_conditions;
 			unset($states_applicable[-2]);
 
 			/*
@@ -406,7 +406,7 @@ class FlexicontentViewReviews extends FlexicontentViewBaseRecords
 		}
 		elseif ($hasEdit)
 		{
-			if (isset($model_s::supported_conditions[-2]))
+			if (isset($model_s->supported_conditions[-2]))
 			{
 				$states_applicable['T'] = 0;
 				//JToolbarHelper::trash($contrl.'trash');

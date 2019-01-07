@@ -2255,8 +2255,8 @@ class flexicontent_html
 		$state  = $jinput->get('state', 0, 'int');
 		$perms  = FlexicontentHelperPerm::getPerm();
 
-		$archive_unsupported = !isset($model::supported_conditions[2]);
-		$trash_unsupported   = !isset($model::supported_conditions[-2]);
+		$archive_unsupported = !isset($model->supported_conditions[2]);
+		$trash_unsupported   = !isset($model->supported_conditions[-2]);
 
 		// Determine priveleges of the current user on the given item
 		/*if (!in_array($record_name, array('item', 'category', 'tag', 'review', 'type', 'field', 'file')))
@@ -2835,8 +2835,8 @@ class flexicontent_html
 			die('flexicontent_html::' . __FUNCTION__ . '() , unknown type: ' . $record_name);
 		}
 
-		$archive_unsupported = !isset($model::supported_conditions[2]);
-		$trash_unsupported   = !isset($model::supported_conditions[-2]);
+		$archive_unsupported = !isset($model->supported_conditions[2]);
+		$trash_unsupported   = !isset($model->supported_conditions[-2]);
 
 		$refresh_on_success  = in_array($config->record_name, array('category')) ? 'true' : 'false';
 
@@ -2846,7 +2846,7 @@ class flexicontent_html
 			$state_names_added = true;
 			$state_names_js = array();
 
-			foreach ($model::supported_conditions as $state_id => $state_name)
+			foreach ($model->supported_conditions as $state_id => $state_name)
 			{
 				JText::script($state_name, true);
 				$state_names_js[] = "'" . $state_id . "' : '" . $state_name . "'";
@@ -3025,8 +3025,8 @@ class flexicontent_html
 			$state = 'u';
 		}
 
-		$state_text = !empty($model::supported_conditions[$state])
-			? JText::_($model::supported_conditions[$state])
+		$state_text = !empty($model->supported_conditions[$state])
+			? JText::_($model->supported_conditions[$state])
 			: null;
 		$stateicon = flexicontent_html::stateicon($state, $icon_params, 'html', $state_text, $record, $show_status = 2);
 
@@ -3097,9 +3097,9 @@ class flexicontent_html
 			{
 				$state_js_ids[] = array('i' => $state_id);
 
-				if (!empty($model::supported_conditions[$state_id]))
+				if (!empty($model->supported_conditions[$state_id]))
 				{
-					//$state_js_titles[$state_id] = JText::_($model::supported_conditions[$state_id]);
+					//$state_js_titles[$state_id] = JText::_($model->supported_conditions[$state_id]);
 				}
 			}
 
