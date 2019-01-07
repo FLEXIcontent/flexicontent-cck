@@ -616,7 +616,7 @@ class FlexicontentControllerBaseAdmin extends FlexicontentController
 			: (is_numeric($state) ? (int) $state : null);
 
 		// Check for valid state
-		if ($state === null || !isset($record_model::supported_conditions[$state]))
+		if ($state === null || !isset($record_model->supported_conditions[$state]))
 		{
 			$app->enqueueMessage(JText::_('Invalid State') . ': ' . $state, 'error');
 			$app->redirect($this->returnURL);
@@ -721,7 +721,7 @@ class FlexicontentControllerBaseAdmin extends FlexicontentController
 		}
 
 		// Set success message and redirect
-		$msg = JText::sprintf('FLEXI_N_RECORDS_CHANGED_TO', $count) . ' ' . JText::_($record_model::supported_conditions[$state]);
+		$msg = JText::sprintf('FLEXI_N_RECORDS_CHANGED_TO', $count) . ' ' . JText::_($record_model->supported_conditions[$state]);
 		$this->setRedirect($this->returnURL, $msg, 'success');
 	}
 

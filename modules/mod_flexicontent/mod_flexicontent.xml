@@ -16,6 +16,7 @@
 		<filename>helper.php</filename>
 		<folder>elements</folder>
 		<folder>classes</folder>
+		<folder>builder</folder>
 		<folder>tmpl</folder>
 		<folder>tmpl_common</folder>
 	</files>

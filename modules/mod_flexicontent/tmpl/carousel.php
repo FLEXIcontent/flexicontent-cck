@@ -290,6 +290,7 @@ if ($transition)
  */
 $feat_params_layout = (int) $params->get($layout.'_params_layout_feat', 1);
 $std_params_layout  = (int) $params->get($layout.'_params_layout', 1);
+$css_prefix = '#mod_flexicontent_' . $module->id;
 
 
 /**
@@ -305,7 +306,12 @@ if ($feat_builder_layout_num)
 
 	if ($feat_builder_layout)
 	{
-		modFlexicontentHelper::loadBuilderLayoutAssets($module, $params, $builder_layout_name);
+		modFlexicontentHelper::loadBuilderLayoutAssets(
+			$module,
+			$params,
+			$builder_layout_name,
+			$css_prefix . ' .mod_flexicontent_featured '
+		);
 
 		$matches = null;
 		preg_match_all('/\sid="([a-zA-Z0-9_-]*)"/', $feat_builder_layout, $matches);
@@ -328,7 +334,12 @@ if ($std_builder_layout_num)
 
 	if ($std_builder_layout)
 	{
-		modFlexicontentHelper::loadBuilderLayoutAssets($module, $params, $builder_layout_name);
+		modFlexicontentHelper::loadBuilderLayoutAssets(
+			$module,
+			$params,
+			$builder_layout_name,
+			$css_prefix . ' .mod_flexicontent_standard '
+		);
 
 		$matches = null;
 		preg_match_all('/\sid="([a-zA-Z0-9_-]*)"/', $std_builder_layout, $matches);

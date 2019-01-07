@@ -327,7 +327,7 @@ class FlexicontentViewCategories extends FlexicontentViewBaseRecords
 		//$options = JHtml::_('jgrid.publishedOptions');
 		$options = array();
 
-		foreach ($model_s::supported_conditions as $condition_value => $condition_name)
+		foreach ($model_s->supported_conditions as $condition_value => $condition_name)
 		{
 			$options[] = JHtml::_('select.option', $condition_value, $condition_name);
 		}
@@ -553,7 +553,7 @@ class FlexicontentViewCategories extends FlexicontentViewBaseRecords
 		}
 		elseif ($hasEdit)
 		{
-			if (isset($model_s::supported_conditions[-2]))
+			if (isset($model_s->supported_conditions[-2]))
 			{
 				$states_applicable['T'] = 0;
 				//JToolbarHelper::trash($contrl.'trash');
