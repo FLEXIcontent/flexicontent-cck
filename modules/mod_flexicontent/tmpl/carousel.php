@@ -303,6 +303,10 @@ if ($feat_builder_layout_num)
 {
 	$builder_layout_name = 'builder_layout' . $feat_builder_layout_num;
 	$feat_builder_layout = trim($params->get($builder_layout_name . '_html'));
+	
+	$sub_prefix = $feat_builder_layout_num !== $std_builder_layout_num
+		? ' .mod_flexicontent_featured '
+		: '';
 
 	if ($feat_builder_layout)
 	{
@@ -310,7 +314,7 @@ if ($feat_builder_layout_num)
 			$module,
 			$params,
 			$builder_layout_name,
-			$css_prefix . ' .mod_flexicontent_featured '
+			$css_prefix . $sub_prefix
 		);
 
 		$matches = null;
@@ -332,13 +336,18 @@ if ($std_builder_layout_num)
 	$builder_layout_name = 'builder_layout' . $std_builder_layout_num;
 	$std_builder_layout  = trim($params->get('builder_layout' . $std_builder_layout_num . '_html'));
 
-	if ($std_builder_layout)
+	$sub_prefix = $feat_builder_layout_num !== $std_builder_layout_num
+		? ' .mod_flexicontent_standard '
+		: '';
+
+	// Only if it has non-empty sub_prefix
+	if ($std_builder_layout && $sub_prefix)
 	{
 		modFlexicontentHelper::loadBuilderLayoutAssets(
 			$module,
 			$params,
 			$builder_layout_name,
-			$css_prefix . ' .mod_flexicontent_standard '
+			$css_prefix . $sub_prefix
 		);
 
 		$matches = null;
