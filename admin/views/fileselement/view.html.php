@@ -131,9 +131,10 @@ class FlexicontentViewFileselement extends FlexicontentViewBaseRecords
 		$filter_order      = $model->getState('filter_order');
 		$filter_order_Dir  = $model->getState('filter_order_Dir');
 
+		// Various filters
 		$filter_state     = $model->getState('filter_state');
 		$filter_access    = $model->getState('filter_access');
-		$filter_lang			= $model->getState('filter_lang');
+		$filter_lang      = $model->getState('filter_lang');
 		$filter_url       = $model->getState('filter_url');
 		$filter_secure    = $model->getState('filter_secure');
 		$filter_stamp     = $model->getState('filter_stamp');
@@ -191,12 +192,12 @@ class FlexicontentViewFileselement extends FlexicontentViewBaseRecords
 
 		if ($layout !== 'image')
 		{
-			if (strlen($filter_state) && !empty($cols['state'])) $count_filters++;
-			if (strlen($filter_access) && !empty($cols['access'])) $count_filters++;
-			if (strlen($filter_lang) && !empty($cols['lang'])) $count_filters++;
+			if (strlen($filter_state)) $count_filters++;
+			if (strlen($filter_access)) $count_filters++;
+			if (strlen($filter_lang)) $count_filters++;
 			if (strlen($filter_url)) $count_filters++;
-			if (strlen($filter_stamp) && !empty($cols['stamp'])) $count_filters++;
-			if (strlen($filter_secure) && !empty($cols['target'])) $count_filters++;
+			if (strlen($filter_stamp)) $count_filters++;
+			if (strlen($filter_secure)) $count_filters++;
 		}
 
 		// ?? Force unsetting language and target_dir columns if LAYOUT is image file list
@@ -210,7 +211,7 @@ class FlexicontentViewFileselement extends FlexicontentViewBaseRecords
 		if (!$folder_mode && !$perms->CanViewAllFiles) unset($cols['uploader']);
 
 		if (strlen($filter_ext)) $count_filters++;
-		if (strlen($filter_uploader) && !empty($cols['uploader'])) $count_filters++;
+		if (strlen($filter_uploader)) $count_filters++;
 		if (strlen($filter_item)) $count_filters++;
 
 		$u_item_id = $view === 'fileselement' ? $app->getUserStateFromRequest( $option.'.'.$_view.'.u_item_id', 'u_item_id', 0, 'string' ) : null;
@@ -592,23 +593,11 @@ class FlexicontentViewFileselement extends FlexicontentViewBaseRecords
 
 		$lists = array();
 
-		// Build language filter
-		$lists['filter_lang'] = $this->getFilterDisplay(array(
-			'label' => JText::_('FLEXI_LANGUAGE'),
-			'html' => flexicontent_html::buildlanguageslist(
-				'filter_lang',
-				array(
-					'class' => $this->select_class,
-					'size' => '1',
-					'onchange' => 'document.adminForm.limitstart.value=0; Joomla.submitform();',
-				),
-				$filter_lang,
-				'-'
-			)
-		));
 
 		// Build publication state filter
-		$options 	= array();
+		//$options = JHtml::_('jgrid.publishedOptions');
+		$options = array();
+
 		$options[] = JHtml::_('select.option',  '', '-'/*JText::_( 'FLEXI_SELECT_STATE' )*/ );
 		$options[] = JHtml::_('select.option',  'P', JText::_( 'FLEXI_PUBLISHED' ) );
 		$options[] = JHtml::_('select.option',  'U', JText::_( 'FLEXI_UNPUBLISHED' ) );
@@ -617,6 +606,7 @@ class FlexicontentViewFileselement extends FlexicontentViewBaseRecords
 
 		$fieldname = 'filter_state';
 		$elementid = 'filter_state';
+		$value     = $filter_state;
 
 		$lists[$elementid] = $this->getFilterDisplay(array(
 			'label' => JText::_('FLEXI_STATE'),
@@ -630,19 +620,20 @@ class FlexicontentViewFileselement extends FlexicontentViewBaseRecords
 				),
 				'value',
 				'text',
-				$filter_state,
+				$value,
 				$elementid,
 				$translate = true
-			)
+			),
 		));
 
 
 		// Build access level filter
 		$options = JHtml::_('access.assetgroups');
-		array_unshift($options, JHtml::_('select.option', '', '-'/*JText::_('JOPTION_SELECT_ACCESS')*/) );
+		array_unshift($options, JHtml::_('select.option', '', '-'/*'JOPTION_SELECT_ACCESS'*/));
 
 		$fieldname = 'filter_access';
 		$elementid = 'filter_access';
+		$value     = $filter_access;
 
 		$lists[$elementid] = $this->getFilterDisplay(array(
 			'label' => JText::_('FLEXI_ACCESS'),
@@ -656,10 +647,26 @@ class FlexicontentViewFileselement extends FlexicontentViewBaseRecords
 				),
 				'value',
 				'text',
-				$filter_access,
+				$value,
 				$elementid,
 				$translate = true
 			),
+		));
+
+
+		// Build language filter
+		$lists['filter_lang'] = $this->getFilterDisplay(array(
+			'label' => JText::_('FLEXI_LANGUAGE'),
+			'html' => flexicontent_html::buildlanguageslist(
+				'filter_lang',
+				array(
+					'class' => $this->select_class,
+					'size' => '1',
+					'onchange' => 'document.adminForm.limitstart.value=0; Joomla.submitform();',
+				),
+				$filter_lang,
+				'-'
+			)
 		));
 
 
@@ -687,6 +694,7 @@ class FlexicontentViewFileselement extends FlexicontentViewBaseRecords
 				)
 			));
 
+
 			// Build stamp filter
 			$stamp 	= array();
 			$stamp[] 	= JHtml::_('select.option',  '', '-'/*JText::_( 'FLEXI_ALL_FILES' )*/ );
@@ -710,11 +718,13 @@ class FlexicontentViewFileselement extends FlexicontentViewBaseRecords
 			));
 		}
 
+
 		// Build content item id filter
 		$lists['item_id'] = $this->getFilterDisplay(array(
 			'label' => JText::_('Item id'),
 			'html' => '<input type="text" name="item_id" size="1" class="inputbox" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()" value="'.$filter_item.'" />',
 		));
+
 
 		// Build target folder (secure / media) filter
 		$_secure_info = '<i data-placement="bottom" class="icon-info hasTooltip" title="'.flexicontent_html::getToolTip('FLEXI_URL_SECURE', 'FLEXI_URL_SECURE_DESC', 1, 1).'"></i>';
@@ -750,6 +760,7 @@ class FlexicontentViewFileselement extends FlexicontentViewBaseRecords
 			));
 		}
 
+
 		// Build extension filter
 		$lists['filter_ext'] = $this->getFilterDisplay(array(
 			'label' => JText::_('FLEXI_ALL_EXT'),
@@ -765,8 +776,9 @@ class FlexicontentViewFileselement extends FlexicontentViewBaseRecords
 			)
 		));
 
+
 		// Build uploader filter
-		if ($perms->CanViewAllFiles && !empty($cols['uploader']))
+		if ($perms->CanViewAllFiles)
 		{
 			$lists['filter_uploader'] = $this->getFilterDisplay(array(
 				'label' => JText::_('FLEXI_ALL_UPLOADERS'),
