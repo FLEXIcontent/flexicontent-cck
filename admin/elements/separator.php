@@ -231,7 +231,7 @@ class JFormFieldSeparator extends JFormFieldSpacer
 
 		if ($desc)
 		{
-			$classes .= 'hasTooltip';
+			$classes .= ' hasTooltip';
 			$tip = ' data-placement="top" data-title="'.flexicontent_html::getToolTip($title, $desc, 0, 1).'" ';
 		}
 
