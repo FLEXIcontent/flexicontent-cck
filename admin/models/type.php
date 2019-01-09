@@ -120,7 +120,7 @@ class FlexicontentModelType extends FCModelAdmin
 	/**
 	 * Array of supported state conditions of the record
 	 */
-	const supported_conditions = array(
+	var $supported_conditions = array(
 		 1 => 'FLEXI_ENABLED',
 		 0 => 'FLEXI_DISABLED',
 		-2 => 'FLEXI_TRASHED',
