@@ -187,12 +187,12 @@ class FlexicontentViewFilemanager extends FlexicontentViewBaseRecords
 
 		if ($layout !== 'image')
 		{
-			if (strlen($filter_state) && !empty($cols['state'])) $count_filters++;
-			if (strlen($filter_access) && !empty($cols['access'])) $count_filters++;
-			if (strlen($filter_lang) && !empty($cols['lang'])) $count_filters++;
+			if (strlen($filter_state)) $count_filters++;
+			if (strlen($filter_access)) $count_filters++;
+			if (strlen($filter_lang)) $count_filters++;
 			if (strlen($filter_url)) $count_filters++;
-			if (strlen($filter_stamp) && !empty($cols['stamp'])) $count_filters++;
-			if (strlen($filter_secure) && !empty($cols['target'])) $count_filters++;
+			if (strlen($filter_stamp)) $count_filters++;
+			if (strlen($filter_secure)) $count_filters++;
 		}
 
 		// ?? Force unsetting language and target_dir columns if LAYOUT is image file list
@@ -206,7 +206,7 @@ class FlexicontentViewFilemanager extends FlexicontentViewBaseRecords
 		if (!$folder_mode && !$perms->CanViewAllFiles) unset($cols['uploader']);
 
 		if (strlen($filter_ext)) $count_filters++;
-		if (strlen($filter_uploader) && !empty($cols['uploader'])) $count_filters++;
+		if (strlen($filter_uploader)) $count_filters++;
 		if (strlen($filter_item)) $count_filters++;
 
 		$u_item_id = $view === 'fileselement' ? $app->getUserStateFromRequest( $option.'.'.$_view.'.u_item_id', 'u_item_id', 0, 'string' ) : null;
@@ -580,7 +580,7 @@ class FlexicontentViewFilemanager extends FlexicontentViewBaseRecords
 
 
 		// Build uploader filter
-		if ($perms->CanViewAllFiles && !empty($cols['uploader']))
+		if ($perms->CanViewAllFiles)
 		{
 			$lists['filter_uploader'] = $this->getFilterDisplay(array(
 				'label' => JText::_('FLEXI_ALL_UPLOADERS'),
