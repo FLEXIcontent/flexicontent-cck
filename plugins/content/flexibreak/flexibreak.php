@@ -383,7 +383,8 @@ class plgContentFlexiBreak extends JPlugin
 
 		$string = html_entity_decode($string, ENT_QUOTES, 'UTF-8');
 
-		$table = new flexicontent_items(JFactory::getDbo());
+		//$table = new flexicontent_items(JFactory::getDbo());
+		$table = JTable::getInstance($type = 'flexicontent_items', $prefix = '', $config = array());
 
 		// Create ASCII (transliterate) hashtags
 		$force_ascii_hashtags = $this->params->get('force_ascii_hashtags', 1);

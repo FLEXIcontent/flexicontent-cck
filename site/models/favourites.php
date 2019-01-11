@@ -442,7 +442,10 @@ class FlexicontentModelFavourites extends JModelLegacy
 		// *** Create WHERE clause part for Text Search
 		// ***
 
-		$text = $jinput->getString('filter', $jinput->getString('q', ''));
+		$q = $jinput->getString('q', '');
+		$q = $q !== parse_url(@$_SERVER["REQUEST_URI"], PHP_URL_PATH) ? $q : '';
+
+		$text = $jinput->getString('filter', $q);
 
 		// Check for LIKE %word% search, for languages without spaces
 		$filter_word_like_any = $this->_params->get('filter_word_like_any', 0);
