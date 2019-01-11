@@ -905,7 +905,10 @@ class plgSearchFlexiadvsearch extends JPlugin
 
 		if ($text === null)
 		{
-			$text = $app->input->get('filter', $app->input->get('q', '', 'string'), 'string');
+			$q = $app->input->getString('q', '');
+			$q = $q !== parse_url(@$_SERVER["REQUEST_URI"], PHP_URL_PATH) ? $q : '';
+
+			$text = $app->input->getString('filter', $q);
 		}
 
 		// Set _relevant _active_* FLAG
