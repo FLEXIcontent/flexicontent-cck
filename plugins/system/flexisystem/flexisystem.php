@@ -2447,10 +2447,9 @@ class plgSystemFlexisystem extends JPlugin
 		//*** Maintain flexicontent-specific article parameters
 		//***
 
-		JLoader::register('FlexicontentModelItem', JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'models'.DS.'item.php');
+		$this->_loadFcHelpersAndLanguage();
 		$model = new FlexicontentModelItem();
 
-		JTable::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'tables');
 		$record = JTable::getInstance($type = 'flexicontent_items', $prefix = '', $config = array());
 		$record->load($item->id);
 
@@ -2576,9 +2575,9 @@ class plgSystemFlexisystem extends JPlugin
 		//***
 
 		$item_params = JFactory::getSession()->get('flexicontent.item.data', null, 'flexicontent');
+
 		if ($item_params)
 		{
-			JTable::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'tables');
 			$record = JTable::getInstance($type = 'flexicontent_items', $prefix = '', $config = array());
 			$record->load($item->id);
 			$record->bind($item_params);
