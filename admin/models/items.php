@@ -1051,8 +1051,8 @@ class FlexicontentModelItems extends FCModelAdminList
 		$scope  = $this->getState('scope');
 		$search = $this->getState('search');
 
-		$use_tmp = !$query_ids && (!$search || $scope!=2);
-		$tmp_only = $use_tmp && (!$search || $scope!=4);
+		$use_tmp = !$query_ids && (!$search || $scope != 'a.introtext');
+		$tmp_only = $use_tmp && (!$search || $scope != 'ie.search_index');
 
 		// Get the WHERE and ORDER BY clauses for the query
 		$extra_joins = '';
