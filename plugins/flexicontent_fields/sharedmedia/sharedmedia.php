@@ -556,6 +556,65 @@ class plgFlexicontent_fieldsSharedmedia extends FCField
 		$autostart    = $field->parameters->get('autostart', 0);
 		$player_position = $field->parameters->get('player_position', 0);
 		$display_edit_size_form = $field->parameters->get('display_edit_size_form', 1);
+		$sticky_video = $field->parameters->get('sticky_video', 0);
+		$sticky_video_width = $field->parameters->get('sticky_video_width', '300px');
+		$sticky_video_position = $field->parameters->get('sticky_video_position', 'bottomright');
+		switch ($sticky_video_position) { //TODO add offset option fot top fixe navigation
+    case 'bottomright':
+        $sticky_video_position = "bottom: 0;right: 0;";
+        break;
+    case 'topright':
+        $sticky_video_position = "top: 0;right: 0;";
+        break;
+    case 'middleright':
+        $sticky_video_position = "top: 38%;right: 0;";
+        break;
+		case 'bottomleft':
+		    $sticky_video_position = "bottom: 0;left: 0;";
+		    break;
+		case 'topleft':
+		    $sticky_video_position = "top: 0;left: 0;";
+		    break;
+		case 'middleleft':
+		   $sticky_video_position = "top: 38%;left: 0;";
+		   break;
+		case 'topcenter':
+			$sticky_video_position = "top: 0;left: 38%;";
+			break;
+		case 'bottomcenter':
+			$sticky_video_position = "bottom: 0;left: 38%;";
+			break;
+			}
+		if ($sticky_video){
+			$document = JFactory::getDocument();//TODO check code to add auto calcul between video width and height and js position line 594+ 596
+			$js ="
+			jQuery(document).ready(function () {
+			var ha = (jQuery('.fc_sharedmedia_player_outer').offset().top + jQuery('.fc_sharedmedia_player_outer').height());
+			jQuery(window).scroll(function(){
+				if (jQuery(window).scrollTop() > ha + 500 ) {
+    			jQuery('.fc_sharedmedia_player_outer').css('bottom','0');
+				} else if ( jQuery(window).scrollTop() < ha + 200) {
+    			jQuery('.fc_sharedmedia_player_outer').removeClass('out').addClass('in');
+				} else {
+  				jQuery('.fc_sharedmedia_player_outer').removeClass('in').addClass('out');
+    			jQuery('.fc_sharedmedia_player_outer').css('bottom','-500px');
+  			};
+			});
+			});
+			"; //TODO add in js select play video in scrolldown for now only last video is scroll down
+			$css ="
+			.fc_sharedmedia_player_outer.out {
+  			position: fixed;
+				$sticky_video_position;
+  			width: $sticky_video_width;
+  			z-index: 999;
+  			animation: an 0.5s;
+				}
+				.fc_sharedmedia_player_outer.in { animation: ac 1s; }
+				";
+			$document->addStyleDeclaration($css);
+			$document->addScriptDeclaration($js);
+		}
 
 		$unserialize_vals = true;
 		if ($unserialize_vals)

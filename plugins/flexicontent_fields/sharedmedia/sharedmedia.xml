@@ -183,6 +183,22 @@
 				<option value="1">PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_PLAYER_POSITION_AFTER</option>
 			</field>
 
+			<field name="sticky_video" type="multilist" subtype="radio" default="0" label="PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_PLAYER_STICKY" description="PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_PLAYER_STICKY_DESC" toggle_related="1" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="disp-sticky">FLEXI_NO</option>
+				<option value="1" show_list="disp-sticky" hide_list="">FLEXI_YES</option>
+			</field>
+			<field name="sticky_video_width" type="text" default="300px" label="PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_PLAYER_STICKY_WIDTH" description="PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_PLAYER_STICKY_WIDTH_DESC" depend_class="disp-sticky" />
+			<field name="sticky_video_position" type="list" default="bottomright" label="PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_PLAYER_STICKY_POSITION" description="PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_PLAYER_STICKY_POSITION_DESC"  depend_class="disp-sticky">
+				<option value="topleft">PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_PLAYER_POSITION_TOPLEFT</option>
+				<option value="topcenter">PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_PLAYER_POSITION_TOPCENTER</option>
+				<option value="topright">PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_PLAYER_POSITION_TOPRIGHT</option>
+				<option value="middleleft">PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_PLAYER_POSITION_MIDDLELEFT</option>
+				<option value="middleright">PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_PLAYER_POSITION_MIDDLERIGHT</option>
+				<option value="bottomleft">PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_PLAYER_POSITION_BOTTOMLEFT</option>
+				<option value="bottomcenter">PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_PLAYER_POSITION_BOTTOMCENTER</option>
+				<option value="bottomright">PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_PLAYER_POSITION_BOTTOMRIGHT</option>
+			</field>
+
 		</fieldset>
 
 		<fieldset name="group-sharedmedia-apis" hidden="true" icon_class="icon-cog" label="APIs (keys, etc)" addfieldpath="/administrator/components/com_flexicontent/elements">
