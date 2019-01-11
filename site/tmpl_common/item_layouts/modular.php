@@ -67,7 +67,7 @@ $page_heading_shown =
 $mainAreaTag = 'div';
 
 // SEO, header level of title tag
-$itemTitleHeaderLevel = '2';
+$itemTitleHeaderLevel = $page_heading_shown ? '2' : '1';
 
 // SEO, header level of tab title tag
 $tabsHeaderLevel = $itemTitleHeaderLevel == '2'  ?  '3' : '2';
