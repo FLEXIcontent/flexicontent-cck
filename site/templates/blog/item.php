@@ -80,7 +80,7 @@ $page_heading_shown =
 $mainAreaTag = 'div';
 
 // SEO, header level of title tag
-$itemTitleHeaderLevel = '2';
+$itemTitleHeaderLevel = $page_heading_shown ? '2' : '1';
 
 $page_classes  = 'flexicontent group';
 $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
