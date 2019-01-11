@@ -308,7 +308,9 @@ class FlexicontentTasksCore
 		else
 		{
 			// If (search) text is just whitespace then set limit to a much higher value
-			$q = $app->input->get('q', '', 'string');
+			$q = $app->input->getString('q', '');
+			$q = $q !== parse_url(@$_SERVER["REQUEST_URI"], PHP_URL_PATH) ? $q : '';
+
 			$limit = $q && !trim($q) ? 10000 : 500;
 
 			$tagobjs = $this->_gettags($q, $limit);

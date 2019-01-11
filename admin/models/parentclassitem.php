@@ -112,7 +112,7 @@ class ParentClassItem extends FCModelAdmin
 	/**
 	 * Array of supported state conditions of the record
 	 */
-	const supported_conditions = array(
+	var $supported_conditions = array(
 		 1 => 'FLEXI_PUBLISHED',
 		 0 => 'FLEXI_UNPUBLISHED',
 		-5 => 'FLEXI_IN_PROGRESS',

@@ -97,7 +97,11 @@ class FLEXIcontentModelSearch extends JModelLegacy
 		// *************************
 		// Set the search parameters
 		// *************************
-		$keyword  = urldecode( $app->input->getString('searchword', $app->input->getString('q')) );
+
+		$q = $app->input->getString('q', '');
+		$q = $q !== parse_url(@$_SERVER["REQUEST_URI"], PHP_URL_PATH) ? $q : '';
+
+		$keyword  = urldecode($app->input->getString('searchword', $q));
 
 		$default_searchphrase = $params->get('default_searchphrase', 'all');
 		$match = $app->input->getWord('searchphrase', $app->input->getWord('p', $default_searchphrase));

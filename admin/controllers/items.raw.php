@@ -259,8 +259,11 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		}
 		else
 		{
+			$q = $this->input->getString('q', '');
+			$q = $q !== parse_url(@$_SERVER["REQUEST_URI"], PHP_URL_PATH) ? $q : '';
+
 			$model = $this->getModel($this->record_name);
-			$tagobjs = $model->gettags($this->input->get('q', '', 'string'));
+			$tagobjs = $model->gettags($q);
 
 			if ($tagobjs)
 			{
