@@ -90,7 +90,7 @@ jQuery(function() {
 		// position of carousel (navigation thubmnails), 0: disable, 1: below, 2: above
 		carousel_position = 1,
 		carousel_visible = 2,
-		
+
 		// other carousel options
 		carousel_thumb_width = 120,
 		carousel_transition = 'scroll',
@@ -116,7 +116,7 @@ jQuery(function() {
 			carousel_easing       = !!ops && typeof ops.carousel_easing       != 'undefined' ? ops.carousel_easing       : 'swing';
 			carousel_easing_inout = !!ops && typeof ops.carousel_easing_inout != 'undefined' ? ops.carousel_easing_inout : 'easeOut';
 			carousel_speed        = !!ops && typeof ops.carousel_speed        != 'undefined' ? ops.carousel_speed        : 600;
-			
+
 			mode = carousel_position && carousel_visible ? 'carousel' : 'fullview';
 
 			// (not necessary) preloading the images here...
@@ -124,22 +124,22 @@ jQuery(function() {
 			{
 				// add options
 				if (carousel_position && carousel_visible != 1) _addViewModes();
-				
+
 				// add slideshow image wrapper
 				_addImageWrapper();
-				
+
 				// show first image
 				_showImage( $items.eq( current ) );
-					
+
 			});
-			
+
 			// initialize the carousel
 			if (mode === 'carousel')
 			{
 				_initCarousel();
 			}
 
-			// Handle slideshow autoplay 
+			// Handle slideshow autoplay
 			if (slideshow_auto_play)
 			{
 				function triggerAutoPlay()
@@ -183,7 +183,7 @@ jQuery(function() {
 
 			// set elastislide's current to current
 			$esCarousel.elastislide( 'setCurrent', current );
-			
+
 		},
 
 
@@ -228,7 +228,7 @@ jQuery(function() {
 		{
 			// adds the structure for the slideshow image and the navigation buttons (if total items > 1)
 			// also initializes the navigation events
-			
+
 			if (carousel_position == 2)
 				jQuery('#img-wrapper-tmpl_unique_gal_id').tmpl( {itemsCount : itemsCount} ).appendTo( $rgGallery );
 			else
@@ -313,6 +313,8 @@ jQuery(function() {
 			$item.addClass('selected');
 
 			var $thumb = $item.find('img'),
+				imagew = $thumb.attr('width') || '',
+				imageh = $thumb.attr('height') || '',
 				imagesrc = $thumb.data(slideshow_thumb_size),
 				title = $thumb.data('description');
 
@@ -326,7 +328,7 @@ jQuery(function() {
 			var $active = $rgGallery.find('div.rg-image img.active');
 			if (!$active.length)
 			{
-				$active = jQuery('<img src="' + imagesrc + '" class="active" />').hide();
+				$active = jQuery('<img src="' + imagesrc + '" width="' + imagew + '" height="' + imageh + '" class="active" />').hide();
 				$rgGallery.find('div.rg-image').append($active);
 				$active.ready( function()
 				{
@@ -341,9 +343,10 @@ jQuery(function() {
 
 			// Add new image if not already added to the container
 			var $image = $rgGallery.find('div.rg-image img[src$=\'' + imagesrc + '\']');
+
 			if (!$image.length)
 			{
-				$image = jQuery('<img src="' + imagesrc + '" />');
+				$image = jQuery('<img src="' + imagesrc + '" width="' + imagew + '" height="' + imageh + '" />');
 				$rgGallery.find('div.rg-image').append($image);
 			}
 
@@ -421,7 +424,7 @@ jQuery(function() {
 
 	/*
 	Example to add more items to the gallery:
-	
+
 	var $new  = jQuery('<li><a href="#"><img src="images/thumbs/1.jpg" data-large="images/1.jpg" alt="image01" data-description="From off a hill whose concave womb reworded" /></a></li>');
 	Gallery.addItems( $new );
 	*/

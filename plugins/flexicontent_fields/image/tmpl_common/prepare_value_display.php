@@ -222,20 +222,47 @@
 		: (isset(self::$index_to_thumb_size[$thumb_size]) ? self::$index_to_thumb_size[$thumb_size] : 's');
 
 	$crop = $field->parameters->get('method_'.$size);
+	$img_size_attrs = '';
 
 	if ($size !== 'o')
 	{
 		$w = $field->parameters->get('w_' . $size, self::$default_widths[$size]);
 		$h = $field->parameters->get('h_' . $size, self::$default_heights[$size]);
+		
+		// Inform about smaller image sizes than the current selected
+		$srcset = array();
+		$_sizes = array();
 
-		$img_size_attrs = $crop
-			? ' style="width: ' . $w . 'px; height: ' . $h . 'px;" '
-			: ' style="max-width: ' . $w . 'px; max-height: ' . $h . 'px;" ';
+		if ($size === 'l')
+		{
+			$w_l = $field->parameters->get('w_l', self::$default_widths['l']);
+			$srcset[] = JUri::root() . $srcl . ' ' . $w_l . 'w';
+			$_sizes[] = '(min-width: ' . $w_l . 'px) ' . $w_l . 'px';
+		}
+
+		if ($size === 'l' || $size === 'm')
+		{
+			$w_m = $field->parameters->get('w_m', self::$default_widths['m']);
+			$srcset[] = JUri::root() . $srcm . ' ' . $w_m . 'w';
+			$_sizes[] = '(min-width: ' . $w_m . 'px) ' . $w_m . 'px';
+
+			$w_s = $field->parameters->get('w_s', self::$default_widths['s']);
+			$srcset[] = JUri::root() . $srcs . ' ' . $w_s . 'w';
+			$_sizes[] = $w_s . 'px';
+		}
+
+		if (count($srcset))
+		{
+			$img_size_attrs .= ' srcset="' . implode($srcset, ', ') . '"';
+			$img_size_attrs .= ' sizes="' . implode($_sizes, ', ') . '"';
+		}
+
+		// Inform browser of real images sizes and of desired image size
+		$img_size_attrs .= ' width="' . $w . '" height="' . $h . '" style="width: auto; height: auto;" ';
+		// This following does not combine well with SRCSET / SIZES ...
+		/*$img_size_attrs .= $crop ? ' style="width: ' . $w . 'px; height: ' . $h . 'px;' : ' style="max-width: ' . $w . 'px; max-height: ' . $h . 'px;" ';*/
 	}
-	else
-	{
-		$img_size_attrs = '';
-	}
+
 
 	switch ($prop)
 	{

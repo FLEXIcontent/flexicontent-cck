@@ -29,9 +29,43 @@ foreach ($values as $n => $value)
 	if ($result === _FC_CONTINUE_) continue;
 	if ($result === _FC_BREAK_) break;
 
+	// Inform about smaller image sizes than the current selected
+	$srcset = array();
+	$_sizes = array();
+
+	$img_size_attrs = '';
+
+	if ($size === 'l')
+	{
+		$w_l = $field->parameters->get('w_l', self::$default_widths['l']);
+		$srcset[] = JUri::root() . $srcl . ' ' . $w_l . 'w';
+		$_sizes[] = '(min-width: ' . $w_l . 'px) ' . $w_l . 'px';
+	}
+
+	if ($size === 'l' || $size === 'm')
+	{
+		$w_m = $field->parameters->get('w_m', self::$default_widths['m']);
+		$srcset[] = JUri::root() . $srcm . ' ' . $w_m . 'w';
+		$_sizes[] = '(min-width: ' . $w_m . 'px) ' . $w_m . 'px';
+
+		$w_s = $field->parameters->get('w_s', self::$default_widths['s']);
+		$srcset[] = JUri::root() . $srcs . ' ' . $w_s . 'w';
+		$_sizes[] = $w_s . 'px';
+	}
+
+	if (count($srcset))
+	{
+		$img_size_attrs .= ' srcset="' . implode($srcset, ', ') . '"';
+		$img_size_attrs .= ' sizes="' . implode($_sizes, ', ') . '"';
+	}
+
+	// Inform browser of real images sizes and of desired image size
+	$img_size_attrs .= ' width="' . $w . '" height="' . $h . '" style="width: auto; height: auto;" ';
+
 	$title_attr = $desc_encoded ? $desc_encoded : $title_encoded;
 	$img_legend_custom ='
-		<img src="'.JUri::root(true).'/'.$src.'" alt ="'.$alt_encoded.'"'.$legend.' class="'.$class.'"
+		<img src="'.JUri::root(true).'/'.$src.'" alt="' . $alt_encoded . '"' . $legend . ' class="' . $class . '"
+			' . $img_size_attrs . '
 			data-medium="' . JUri::root(true).'/'.$srcm . '"
 			data-large="' . JUri::root(true).'/'.$srcl . '"
 			data-description="' . $title_attr . '" itemprop="image"/>
