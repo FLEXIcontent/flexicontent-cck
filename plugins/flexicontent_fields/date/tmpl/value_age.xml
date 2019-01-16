@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<form>
+
+	<name>Date field layout -- Default (Date)</name>
+	<author>ggppdk</author>
+	<creationDate>January 2019</creationDate>
+	<copyright>Copyright (C) 2018 ggppdk</copyright>
+	<license>GNU/GPL v2</license>
+	<authorEmail>flexicontentck@gmail.com</authorEmail>
+	<authorUrl>www.flexicontent.org</authorUrl>
+	<version>1.0</version>
+	<description>Flexicontent fields - Date field layout - Default parameters</description>
+	
+	<fields name="attribs">
+		
+		<fieldset name="layout" addfieldpath="/administrator/components/com_flexicontent/elements">
+
+			<field name="" type="separator" default="Age Units" level="level2" />
+			<field name="age_unit_type" type="radio" default="7" label="Unit type" description="" class="btn-group group-fcinfo">
+				<!--option value="1">FLEXI_FIELD_DATE_MINUTES</option-->
+				<!--option value="2">FLEXI_FIELD_DATE_HOURS</option-->
+				<option value="3">FLEXI_FIELD_DATE_DAYS</option>
+				<!--option value="4">FLEXI_FIELD_DATE_WEEKS</option-->
+				<option value="5">FLEXI_FIELD_DATE_MONTHS</option>
+				<!--option value="6">FLEXI_FIELD_DATE_QUARTERS</option-->
+				<option value="7">FLEXI_FIELD_DATE_YEARS</option>
+			</field>
+			<field name="show_age_unit" type="radio" default="1" label="Show age unit" description="Whether to show configured unit e.g. 'Year'. (Usually it is best to include this into the field label)" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="sm_unit_only_until" type="text" filter="int" default="2" label="Smaller unit only until" description="When age is very small, you can display only the smaller age units, by setting a limit here" />
+			<field name="append_sm_unit_until" type="text" filter="int" default="4" label="Append smaller unit below" description="When age is small, you can append the smaller age units, by setting a limit here" />
+			<field name="append_sm_unit_pfx" type="text" filter="int" default=" +&amp;nbsp;" label="Text before smaller unit" description="This can be a comma e.g. 3, 11 months, meaning 3 years and 11 months" />
+			<field name="append_sm_unit_sfx" type="text" filter="int" default="" label="Text after smaller unit" description="This can be a comma e.g. 3, 11 months, meaning 3 years and 11 months" />
+
+			<field name="" type="separator" default="Valid Ages" level="level2" />
+			<field name="valid_age_max" type="text" filter="int" default="0" label="Max valid age (years)" description="Ages large than this will be shown as 'Invalid'" />
+			<field name="invalid_age_text" type="text" default="FLEXI_NA" label="Text for invalid age" description="Language string for invalid age" />
+
+		</fieldset>
+
+	</fields>
+	
+</form>

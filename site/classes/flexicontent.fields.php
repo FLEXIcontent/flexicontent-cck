@@ -1,19 +1,12 @@
 <?php
 /**
- * @version 1.5 stable $Id: flexicontent.fields.php 1990 2014-10-14 02:17:49Z ggppdk $
- * @package Joomla
- * @subpackage FLEXIcontent
- * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
- * @license GNU/GPL v2
+ * @package         FLEXIcontent
+ * @version         3.3
  *
- * FLEXIcontent is a derivative work of the excellent QuickFAQ component
- * @copyright (C) 2008 Christoph Lukes
- * see www.schlu.net for more information
- *
- * FLEXIcontent is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
+ * @link            https://flexicontent.org
+ * @copyright       Copyright © 2017, FLEXIcontent team, All Rights Reserved
+ * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
@@ -2235,14 +2228,13 @@ class FlexicontentFields
 		static $d;
 		static $c;
 
-		if (JFactory::getApplication()->isAdmin()) return '';
-
 		// Parse field variable if not already parsed
 		if ( !isset($parsed[$field->id][$varname]) )
 		{
 			$parsed[$field->id][$varname] = true;
 
 			$result = preg_match_all("/\{\{([a-zA-Z_0-9-]+)(##)?([0-9]+)?(##)?([a-zA-Z_0-9-]+)?\}\}/", $variable, $field_matches);
+
 			if ($result)
 			{
 				$d[$field->id][$varname]['fulltxt']   = $field_matches[0];
@@ -2286,14 +2278,17 @@ class FlexicontentFields
 			$fieldid = @ $item->fields[$fieldname]->id;
 			$value   = @ $item->fieldvalues[$fieldid][$valueno];
 
-			if ( !$fieldid )
+			if (!$fieldid)
 			{
-				$value = 'Field with name: '.$fieldname.' not found';
+				$value = JFactory::getApplication()->isAdmin()
+					? 'Field with name: '.$fieldname.' not found'
+					: '';
 				$variable = str_replace($fulltxt, $value, $variable);
 				continue;
 			}
 
 			$is_indexable = $propname && preg_match("/^_([a-zA-Z_0-9]+)_$/", $propname, $prop_matches) && ($propname = $prop_matches[1]);
+
 			if ($fieldid <= 14 )
 			{
 				if ($fieldid==13)
@@ -2306,7 +2301,7 @@ class FlexicontentFields
 				}
 			}
 
-			else if ( $is_indexable )
+			elseif ($is_indexable)
 			{
 				if ( $propname!='value' ) // no need for value to retrieve custom elements
 				{
@@ -2321,7 +2316,7 @@ class FlexicontentFields
 				}
 			}
 
-			else if ( $propname )
+			elseif ($propname)
 			{
 				$value = flexicontent_db::unserialize_array($value, $force_array=false, $force_value=false);
 				$value = $value && isset($value[$propname]) ? $value[$propname] : '';
@@ -2340,9 +2335,11 @@ class FlexicontentFields
 		{
 			$propname = $c[$field->id][$varname]['propname'][$i];
 
-			if ( !isset($item->{$propname}) )
+			if (!isset($item->{$propname}))
 			{
-				$value = 'Item property with name: '.$propname.' not found';
+				$value = JFactory::getApplication()->isAdmin()
+					? 'Item property with name: '.$propname.' not found'
+					: '';
 				$variable = str_replace($fulltxt, $value, $variable);
 				continue;
 			}
@@ -3034,16 +3031,38 @@ class FlexicontentFields
 			if (!isset($valCols[$field->field_type]))
 			{
 				$date_filter_group = $field->parameters->get('date_filter_group'.$_s, 'month');
-				if ($date_filter_group=='year') { $date_valformat='%Y'; }
-				else if ($date_filter_group=='month') { $date_valformat='%Y-%m'; }
-				else { $date_valformat='%Y-%m-%d'; }
+				$filter_as_age = $field->parameters->get('filter_as_age'.$_s, 0);
+
+				if ($date_filter_group === 'year')
+				{
+					$date_valformat  = '%Y';
+					$filter_age_type = 'YEAR';
+				}
+				elseif ($date_filter_group === 'month')
+				{
+					$date_valformat  = '%Y-%m';
+					$filter_age_type = 'MONTH';
+				}
+				else
+				{
+					$date_valformat  = '%Y-%m-%d';
+					$filter_age_type = 'DAY';
+				}
 
 				// Display date 'label' can be different than the (aggregated) date value
 				$date_filter_label_format = $field->parameters->get('date_filter_label_format'.$_s, '');
 				$date_txtformat = $date_filter_label_format ? $date_filter_label_format : $date_valformat;  // If empty then same as value
 
-				$valCols[$field->field_type] = sprintf(' DATE_FORMAT(i.%s, "%s") ', $field->field_type, $date_valformat);
-				$txtCols[$field->field_type]  = sprintf(' DATE_FORMAT(i.%s, "%s") ', $field->field_type, $date_txtformat);
+				if (!$filter_as_age)
+				{
+					$valCols[$field->field_type] = sprintf(' DATE_FORMAT(i.%s, "%s") ', $field->field_type, $date_valformat);
+					$txtCols[$field->field_type] = sprintf(' DATE_FORMAT(i.%s, "%s") ', $field->field_type, $date_txtformat);
+				}
+				else
+				{
+					$valCols[$field->field_type] = sprintf(' TIMESTAMPDIFF(' . $filter_age_type . ', i.%s, CURDATE()) ', $field->field_type);
+					$txtCols[$field->field_type] = sprintf(' TIMESTAMPDIFF(' . $filter_age_type . ', i.%s, CURDATE()) ', $field->field_type);
+				}
 			}
 
 			$valuecol = $valCols[$field->field_type];
@@ -3232,29 +3251,36 @@ class FlexicontentFields
 
 		if (isset($filter->filter_valueformat))
 		{
-			$date_suffix = '';
+			$value_suffix = '';
 
 			if ($isDate)
 			{
-				switch($filter->parameters->get('date_filter_group', 'month'))
+				$date_filter_group = $filter->parameters->get('date_filter_group', 'month');
+				$filter_as_age     = $filter->parameters->get('filter_as_age', 0);
+
+				if (!$filter_as_age)
 				{
-					case 'year':
-						$date_suffix = '-1-1';
-						break;
-					case 'month':
-						$date_suffix = '-1';
-						break;
+					switch($date_filter_group)
+					{
+						case 'year':
+							$value_suffix = '-1-1';
+							break;
+						case 'month':
+							$value_suffix = '-1';
+							break;
+					}
 				}
 			}
 
 			foreach($value as $i => $val)
 			{
 				$typecasted_val = !$filter_compare_type
-					? $db->Quote($value[$i] . $date_suffix)
-					: ($filter_compare_type==1 ? intval($value[$i]) : floatval($value[$i]));
+					? $db->Quote($value[$i] . $value_suffix)
+					: ($filter_compare_type === 1 ? intval($value[$i]) : floatval($value[$i]));
 
 				$value[$i] = str_replace('__filtervalue__', $typecasted_val, $filter->filter_valueformat);
 			}
+
 			$quoted = true;
 		}
 
@@ -3399,6 +3425,9 @@ class FlexicontentFields
 				. ' WHERE rel.field_id=' . $filter->id
 				. $valueswhere ;
 		}
+
+		// TEST FILTER VALUE MATCH SQL
+		//echo $filter->label . '<pre>' . $query . '</pre>';
 
 		if ($require_all_values && count($value) > 1)
 		{
@@ -4341,18 +4370,24 @@ class FlexicontentFields
 		// Format string according to language
 		if (!empty($language))
 		{
-			$date_txtformat = str_replace('%', '', $filter->date_txtformat);
-			$nullDate = $db->getNullDate();
-			$is_year_group = $filter->parameters->get('date_filter_group', 'month') === 'year';
-			foreach($results as &$r)
+			$filter_as_age = $filter->parameters->get('filter_as_age', 0);
+
+			if (!$filter_as_age)
 			{
-				if ($r->value && $r->value !== $nullDate)
+				$date_txtformat = str_replace('%', '', $filter->date_txtformat);
+				$nullDate = $db->getNullDate();
+				$is_year_group = $filter->parameters->get('date_filter_group', 'month') === 'year';
+
+				foreach($results as &$r)
 				{
-					$date = new JDate($is_year_group ? $r->value . '-1-1' : $r->value);   // JDate can not handle just year (YYYY) so we use YYYY-1-1
-					$r->text = $date->format($date_txtformat);
+					if ($r->value && $r->value !== $nullDate)
+					{
+						$date = new JDate($is_year_group ? $r->value . '-1-1' : $r->value);   // JDate can not handle just year (YYYY) so we use YYYY-1-1
+						$r->text = $date->format($date_txtformat);
+					}
 				}
+				unset($r);
 			}
-			unset($r);
 		}
 
 		return $results;
@@ -4500,18 +4535,24 @@ class FlexicontentFields
 		// Format string according to language
 		if (!empty($language))
 		{
-			$date_txtformat = str_replace('%', '', $filter->date_txtformat);
-			$nullDate = $db->getNullDate();
-			$is_year_group = $filter->parameters->get('date_filter_group_s', 'month') === 'year';
-			foreach($results as &$r)
+			$filter_as_age = $filter->parameters->get('filter_as_age_s', 0);
+
+			if (!$filter_as_age)
 			{
-				if ($r->value && $r->value !== $nullDate)
+				$date_txtformat = str_replace('%', '', $filter->date_txtformat);
+				$nullDate = $db->getNullDate();
+				$is_year_group = $filter->parameters->get('date_filter_group_s', 'month') === 'year';
+
+				foreach($results as &$r)
 				{
-					$date = new JDate($is_year_group ? $r->value . '-1-1' : $r->value);   // JDate can not handle just year (YYYY) so we use YYYY-1-1
-					$r->text = $date->format($date_txtformat);
+					if ($r->value && $r->value !== $nullDate)
+					{
+						$date = new JDate($is_year_group ? $r->value . '-1-1' : $r->value);   // JDate can not handle just year (YYYY) so we use YYYY-1-1
+						$r->text = $date->format($date_txtformat);
+					}
 				}
+				unset($r);
 			}
-			unset($r);
 		}
 
 		static $search_prefix = null;
