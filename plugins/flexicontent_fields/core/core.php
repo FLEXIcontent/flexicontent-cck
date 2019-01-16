@@ -71,7 +71,6 @@ class plgFlexicontent_fieldsCore extends FCField
 		static $initialized = null;
 		static $app, $document, $option, $format, $realview;
 		static $itemViewId, $isItemsManager, $isHtmlViewFE;
-		static $isMobile, $isTablet, $useMobile;
 		static $cut_options;
 
 		if ($initialized === null)
@@ -89,13 +88,6 @@ class plgFlexicontent_fieldsCore extends FCField
 			$isHtmlViewFE   = $format === 'html' && $app->isSite();
 
 			$cparams   = JComponentHelper::getParams( 'com_flexicontent' );
-
-			// Get isMobile / isTablet Flags
-			$force_desktop_layout = $cparams->get('force_desktop_layout', 0 );
-			$mobileDetector = flexicontent_html::getMobileDetector();
-			$isMobile = $mobileDetector->isMobile();
-			$isTablet = $mobileDetector->isTablet();
-			$useMobile = $force_desktop_layout  ?  $isMobile && !$isTablet  :  $isMobile;
 
 			$cut_options = array(
 				'cut_at_word' => true,
@@ -830,9 +822,19 @@ class plgFlexicontent_fieldsCore extends FCField
 			case 'created':  // creation dates
 			case 'modified': // modification dates
 				$date_filter_group = $filter->parameters->get('date_filter_group'.$_s, 'month');
-				if ($date_filter_group=='year') { $date_valformat='%Y'; }
-				else if ($date_filter_group=='month') { $date_valformat='%Y-%m'; }
-				else { $date_valformat='%Y-%m-%d'; }
+
+				if ($date_filter_group === 'year')
+				{
+					$date_valformat='%Y';
+				}
+				elseif ($date_filter_group === 'month')
+				{
+					$date_valformat='%Y-%m';
+				}
+				else
+				{
+					$date_valformat = '%Y-%m-%d';
+				}
 
 				// Display date 'label' can be different than the (aggregated) date value
 				$date_filter_label_format = $filter->parameters->get('date_filter_label_format'.$_s, '');

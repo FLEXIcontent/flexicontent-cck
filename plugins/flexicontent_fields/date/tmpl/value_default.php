@@ -4,7 +4,7 @@ $n = 0;
 foreach ($values as $value)
 {
 	// If time is not allowed then disgard it from the value
-	if ( strlen($value) && !$date_allowtime )
+	if (strlen($value) && !$date_allowtime)
 	{
 		@ list($date, $time) = preg_split('#\s+#', $value, $limit=2);
 	}
@@ -14,7 +14,7 @@ foreach ($values as $value)
 	}
 
 	// Try to parse the date string
-	if ( !empty($date) )
+	if (!empty($date))
 	{
 		try {
 			$date = JHtml::_('date', $date, $dateformat, $timezone ).$tz_info;
@@ -24,7 +24,7 @@ foreach ($values as $value)
 	}
 
 	// Skip empty value, adding an empty placeholder if field inside in field group
-	if ( empty($date) )
+	if (empty($date))
 	{
 		if ( $is_ingroup )
 		{
