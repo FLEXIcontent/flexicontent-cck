@@ -413,7 +413,10 @@ if ($add_ccs && $layout)
 		}
 
 		// Module 's core CSS
-		echo flexicontent_html::getInlineLinkOnce(JUri::base(true).'/modules/'.$modulename.'/tmpl_common/module.css', array('version'=>FLEXI_VHASH));
+		if (file_exists(dirname(__FILE__).DS.'tmpl_common'.DS.'module.css'))
+		{
+			echo flexicontent_html::getInlineLinkOnce(JUri::base(true).'/modules/'.$modulename.'/tmpl_common/module.css', array('version'=>FLEXI_VHASH));
+		}
 
 		// Component CSS with optional override
 		echo flexicontent_html::getInlineLinkOnce(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontent.css', array('version'=>FLEXI_VHASH));
@@ -433,7 +436,10 @@ if ($add_ccs && $layout)
 		}
 
 		// Module 's core CSS
-		$document->addStyleSheetVersion(JUri::base(true).'/modules/'.$modulename.'/tmpl_common/module.css', FLEXI_VHASH);
+		if (file_exists(dirname(__FILE__).DS.'tmpl_common'.DS.'module.css'))
+		{
+			$document->addStyleSheetVersion(JUri::base(true).'/modules/'.$modulename.'/tmpl_common/module.css', FLEXI_VHASH);
+		}
 
 		// Component CSS with optional override
 		$document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontent.css', FLEXI_VHASH);
