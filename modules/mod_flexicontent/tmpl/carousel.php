@@ -525,6 +525,11 @@ $container_id = $module->id . (count($catdata_arr) > 1 && $catdata ? '_' . $catd
 				{
 					$img_force_dims_css_feat .= ($item->image_w ? ' max-width:'. $item->image_w.'px; ' : '') . ($item->image_h ? ' max-height:'. $item->image_h.'px; ' : '');
 				}
+				
+				$img_size_feat = 
+					($item->image_w ? ' width="' . $item->image_w . '"' : '') .
+					($item->image_h ? ' height="' . $item->image_h . '"' : '')
+					;
 
 				if ($rowcount % $item_columns_feat === 0)
 				{
@@ -580,10 +585,10 @@ $container_id = $module->id . (count($catdata_arr) > 1 && $catdata ? '_' . $catd
 						<div class="image_featured <?php echo $img_container_class_feat;?>">
 							<?php if ($mod_link_image_feat) : ?>
 								<a href="<?php echo $item->link; ?>">
-									<img style="<?php echo $img_force_dims_css_feat; ?>" src="<?php echo $item->image; ?>" alt="<?php echo flexicontent_html::striptagsandcut($item->fulltitle, 60); ?>" />
+									<img <?php echo $img_size_feat; ?> style="<?php echo $img_force_dims_css_feat; ?>" src="<?php echo $item->image; ?>" alt="<?php echo flexicontent_html::striptagsandcut($item->fulltitle, 60); ?>" />
 								</a>
 							<?php else : ?>
-								<img style="<?php echo $img_force_dims_css_feat; ?>" src="<?php echo $item->image; ?>" alt="<?php echo flexicontent_html::striptagsandcut($item->fulltitle, 60); ?>" />
+								<img <?php echo $img_size_feat; ?> style="<?php echo $img_force_dims_css_feat; ?>" src="<?php echo $item->image; ?>" alt="<?php echo flexicontent_html::striptagsandcut($item->fulltitle, 60); ?>" />
 							<?php endif; ?>
 						</div>
 
@@ -810,6 +815,11 @@ $container_id = $module->id . (count($catdata_arr) > 1 && $catdata ? '_' . $catd
 					$img_force_dims_css .= ($item->image_w ? ' max-width:'. $item->image_w.'px; ' : '') . ($item->image_h ? ' max-height:'. $item->image_h.'px; ' : '');
 				}
 
+				$img_size = 
+					($item->image_w ? ' width="' . $item->image_w . '"' : '') .
+					($item->image_h ? ' height="' . $item->image_h . '"' : '')
+					;
+
 				if ($rowcount%$item_columns_std==0)
 				{
 					$oe_class = $oe_class === 'odd' ? 'even' : 'odd';
@@ -867,10 +877,10 @@ $container_id = $module->id . (count($catdata_arr) > 1 && $catdata ? '_' . $catd
 						<div class="image_standard <?php echo $img_container_class;?>">
 							<?php if ($mod_link_image) : ?>
 								<a href="<?php echo $item->link; ?>">
-									<img style="<?php echo $img_force_dims_css; ?>" src="<?php echo $item->image; ?>" alt="<?php echo flexicontent_html::striptagsandcut($item->fulltitle, 60); ?>" />
+									<img <?php echo $img_size; ?> style="<?php echo $img_force_dims_css; ?>" src="<?php echo $item->image; ?>" alt="<?php echo flexicontent_html::striptagsandcut($item->fulltitle, 60); ?>" />
 								</a>
 							<?php else : ?>
-								<img style="<?php echo $img_force_dims_css; ?>" src="<?php echo $item->image; ?>" alt="<?php echo flexicontent_html::striptagsandcut($item->fulltitle, 60); ?>" />
+								<img <?php echo $img_size; ?> style="<?php echo $img_force_dims_css; ?>" src="<?php echo $item->image; ?>" alt="<?php echo flexicontent_html::striptagsandcut($item->fulltitle, 60); ?>" />
 							<?php endif; ?>
 						</div>
 
