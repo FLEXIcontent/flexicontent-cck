@@ -262,7 +262,13 @@ class modFlexigooglemapHelper
 	public static function getMarkerURL(&$params)
 	{
 		// Get marker mode, 'lettermarkermode' was old parameter name, (in future wew may more more modes, so the old parameter name was renamed)
-		$markermode = $params->get('markermode', $params->get('lettermarkermode', 0));
+		$markermode  = (int) $params->get('markermode', $params->get('lettermarkermode', 0));
+		$markerimage = $params->get('markerimage', '');
+
+		if ($markermode !== 1 && !$markerimage)
+		{
+			$markermode = 1;
+		}
 
 		switch ($markermode)
 		{
@@ -283,9 +289,7 @@ class modFlexigooglemapHelper
 			// 'Local image file' mode or empty
 			case 0:
 			default:
-				$markerimage = $params->get('markerimage');
-				return $markerimage ? ("'" . JUri::root(true) . '/' . $markerimage . "'") : null;
+				return "'" . JUri::root(true) . '/' . $markerimage . "'";
 		}
 	}
-
 }

@@ -153,7 +153,7 @@ switch ($mapapi)
 			var iconCounter = 0;
 
 			customMarkerIcons[0] = {
-				url: <?php echo $markerdisplay; ?>
+				url: <?php echo $markerdisplay ?: 'null'; ?>
 				// Instead of guessing image placement we will leave this to defaults
 				//,scaledSize: <?php echo $scaledSize; ?>
 				//,origin: new google.maps.Point(0, 0)
