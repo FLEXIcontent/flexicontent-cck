@@ -645,9 +645,12 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 
 		// Build text search scope
 		$scopes = array(
-			'a.title' => JText::_('FLEXI_TITLE'),
-			'a.introtext' => JText::_('FLEXI_DESCRIPTION') . ' (' . JText::_('FLEXI_INTROTEXT') . ')',
+			'a.title'         => JText::_('FLEXI_TITLE'),
+			'_desc_'          => JText::_('FLEXI_DESCRIPTION'),
 			'ie.search_index' => JText::_('FLEXI_FIELDS_IN_BASIC_SEARCH_INDEX'),
+			'a.metadesc'      => 'Meta (' . JText::_('FLEXI_DESCRIPTION') . ')',
+			'a.metakey'       => 'Meta (' . JText::_('FLEXI_KEYWORDS') . ')',
+			'_meta_'          => 'Meta (' . JText::_('FLEXI_DESCRIPTION') . ' + ' . JText::_('FLEXI_KEYWORDS') . ')',
 		);
 
 		$lists['scope_tip'] = ''; //'<span class="hidden-phone ' . $this->tooltip_class . '" title="'.JText::_('FLEXI_SEARCH_TEXT_INSIDE').'" style="display: inline-block;"><i class="icon-info-2"></i></span>';
