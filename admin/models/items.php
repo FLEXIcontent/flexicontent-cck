@@ -1051,8 +1051,8 @@ class FlexicontentModelItems extends FCModelAdminList
 		$scope  = $this->getState('scope');
 		$search = $this->getState('search');
 
-		$use_tmp = !$query_ids && (!$search || $scope != 'a.introtext');
-		$tmp_only = $use_tmp && (!$search || $scope != 'ie.search_index');
+		$use_tmp = !$query_ids && (!$search || !in_array($scope, array('_desc_', '_meta_', 'a.metadesc', 'a.metakey')));
+		$tmp_only = $use_tmp && (!$search || $scope !== 'ie.search_index');
 
 		// Get the WHERE and ORDER BY clauses for the query
 		$extra_joins = '';
@@ -1547,11 +1547,17 @@ class FlexicontentModelItems extends FCModelAdminList
 
 			switch($scope)
 			{
+				case 'a.metadesc':
+				case 'a.metakey':
 				case 'a.' . $this->name_col:
-					$where[] = ' LOWER(a.' . $this->name_col . ') LIKE ' . $search_quoted;
+					$where[] = ' LOWER(' . $scope . ') LIKE ' . $search_quoted;
 					break;
 
-				case 'a.introtext':
+				case '_meta_':
+					$where[] = '(LOWER(a.metadesc) LIKE ' . $search_quoted . ' OR LOWER(a.metakey)  LIKE ' . $search_quoted . ') ';
+					break;
+
+				case '_desc_':
 					$where[] = '(LOWER(a.introtext) LIKE ' . $search_quoted . ' OR LOWER(a.fulltext)  LIKE ' . $search_quoted . ') ';
 					break;
 
