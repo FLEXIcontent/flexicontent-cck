@@ -235,20 +235,28 @@
 
 		if ($size === 'l')
 		{
-			$w_l = $field->parameters->get('w_l', self::$default_widths['l']);
-			$srcset[] = JUri::root() . $srcl . ' ' . $w_l . 'w';
-			$_sizes[] = '(min-width: ' . $w_l . 'px) ' . $w_l . 'px';
+			if ($srcl)
+			{
+				$w_l = $field->parameters->get('w_l', self::$default_widths['l']);
+				$srcset[] = (!$isURL ? JUri::root() : '') . $srcl . ' ' . $w_l . 'w';
+				$_sizes[] = '(min-width: ' . $w_l . 'px) ' . $w_l . 'px';
+			}
 		}
 
 		if ($size === 'l' || $size === 'm')
 		{
-			$w_m = $field->parameters->get('w_m', self::$default_widths['m']);
-			$srcset[] = JUri::root() . $srcm . ' ' . $w_m . 'w';
-			$_sizes[] = '(min-width: ' . $w_m . 'px) ' . $w_m . 'px';
-
-			$w_s = $field->parameters->get('w_s', self::$default_widths['s']);
-			$srcset[] = JUri::root() . $srcs . ' ' . $w_s . 'w';
-			$_sizes[] = $w_s . 'px';
+			if ($srcm)
+			{
+				$w_m = $field->parameters->get('w_m', self::$default_widths['m']);
+				$srcset[] = (!$isURL ? JUri::root() : '') . $srcm . ' ' . $w_m . 'w';
+				$_sizes[] = '(min-width: ' . $w_m . 'px) ' . $w_m . 'px';
+			}
+			if ($srcs)
+			{
+				$w_s = $field->parameters->get('w_s', self::$default_widths['s']);
+				$srcset[] = (!$isURL ? JUri::root() : '') . $srcs . ' ' . $w_s . 'w';
+				$_sizes[] = $w_s . 'px';
+			}
 		}
 
 		if (count($srcset))

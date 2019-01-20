@@ -115,6 +115,12 @@ class plgFlexicontent_fieldsWeblink extends FCField
 		$default_link = ($item->version == 0 || $link_usage > 0) ? $field->parameters->get( 'default_link', '' ) : '';
 		$default_link = $default_link ? JText::_($default_link) : '';
 
+		// URL image (optional)
+		$useimage      = $field->parameters->get( 'use_image', 0 ) ;
+		$image_usage   = $field->parameters->get( 'image_usage', 0 ) ;
+		$default_image = ($item->version == 0 || $image_usage > 0) ? JText::_($field->parameters->get( 'default_image', '' )) : '';
+		$default_image = $default_image ? JText::_($default_image) : '';
+
 		// URL title (optional)
 		$usetitle      = $field->parameters->get( 'use_title', 0 ) ;
 		$title_usage   = $field->parameters->get( 'title_usage', 0 ) ;
@@ -158,6 +164,7 @@ class plgFlexicontent_fieldsWeblink extends FCField
 		{
 			$field->value = array();
 			$field->value[0]['link']  = $default_link;
+			$field->value[0]['image'] = $default_image;
 			$field->value[0]['title'] = $default_title;
 			$field->value[0]['linktext']= $default_text;
 			$field->value[0]['id']    = $default_id;
@@ -175,15 +182,56 @@ class plgFlexicontent_fieldsWeblink extends FCField
 		// Field name and HTML TAG id
 		$fieldname = 'custom['.$field->name.']';
 		$elementid = 'custom_'.$field->name;
+		$field_name_js = str_replace('-', '_', $field->name);
 
 
 		// Joomla article links mode
-		if ( $link_source == -1 )
+		if ($link_source === -1)
 		{
 			$field->html = $use_ingroup ?
 				array('<div class="alert alert-warning fc-small fc-iblock">Field is configured to use Joomla article links, please disable use in group</div>') :
 				'_JOOMLA_ARTICLE_LINKS_HTML_';
 			return;
+		}
+
+
+		// Add JS /CSS for using Media manager, and also check their PHP layouts overides exist
+		static $mm_mode_common_js_added = false;
+
+		if ($useimage && !$mm_mode_common_js_added)
+		{
+			// Check and if needed install Joomla template overrides into current Joomla template
+			flexicontent_html::install_template_overrides();
+
+			// We will use the mootools based media manager
+			JHtml::_('behavior.framework', true);
+
+			// Load the modal behavior script.
+			JHtml::_('behavior.modal'/*, '.fc_image_field_mm_modal'*/);
+
+			// Include media field JS, detecting different version of Joomla
+			if (file_exists($path = JPATH_ROOT.'/media/media/js/mediafield-mootools.min.js'))
+			{
+				$media_js = 'media/mediafield-mootools.min.js';
+			}
+			else
+			{
+				$media_js = file_exists($path = JPATH_ROOT.'/media/media/js/mediafield.min.js')
+					? 'media/mediafield.min.js'
+					: 'media/mediafield.js';
+			}
+
+			JHtml::_('script', $media_js, $mootools_framework = true, $media_folder_relative_path = true, false, false, true);
+
+			// Tooltips for image path and image popup preview
+			JHtml::_('behavior.tooltip', '.hasTipImgpath', array('onShow' => 'jMediaRefreshImgpathTip'));
+			JHtml::_('behavior.tooltip', '.hasTipPreview', array('onShow' => 'jMediaRefreshPreviewTip'));
+			$mm_mode_common_js_added = true;
+
+			JText::script("FLEXI_FIELD_WEBLINK_ENTER_MEDIA_URL", true);
+			JText::script("FLEXI_FIELD_MEDIA_URL", true);
+			JText::script("FLEXI_ERROR", true);
+			$document->addScriptVersion(JUri::root(true) . '/plugins/flexicontent_fields/weblink/js/form.js', FLEXI_VHASH);
 		}
 
 
@@ -231,16 +279,19 @@ class plgFlexicontent_fieldsWeblink extends FCField
 				var lastField = fieldval_box ? fieldval_box : jQuery(el).prev().children().last();
 				var newField  = lastField.clone();
 				newField.find('.fc-has-value').removeClass('fc-has-value');
+
+				// New element's field name and id
+				var element_id = '".$elementid . "_' + uniqueRowNum".$field->id.";
 				";
 
 			// NOTE: HTML tag id of this form element needs to match the -for- attribute of label HTML tag of this FLEXIcontent field, so that label will be marked invalid when needed
 			// Update new URL's address
 			$js .= "
 				theInput = newField.find('input.urllink').first();
-				theInput.val(".json_encode($default_link).");
+				theInput.attr('value', ".json_encode($default_link).");
 				theInput.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][link]');
-				theInput.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_link');
-				newField.find('.urllink-lbl').first().attr('for','".$elementid."_'+uniqueRowNum".$field->id."+'_link');
+				theInput.attr('id', element_id + '_link');
+				newField.find('.urllink-lbl').first().attr('for', element_id + '_link');
 
 				// Update inputmask
 				var has_inputmask = newField.find('input.has_inputmask').length != 0;
@@ -252,29 +303,58 @@ class plgFlexicontent_fieldsWeblink extends FCField
 				newField.find('input.autoprefix').each(function() {
 					var elem = jQuery(this);
 					elem.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][autoprefix]');
-					elem.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_autoprefix_'+nr);
+					elem.attr('id', element_id + '_autoprefix_'+nr);
 					elem.next().removeClass('active');
 					elem.prop('checked', false);
-					elem.next().attr('for', '".$elementid."_'+uniqueRowNum".$field->id."+'_autoprefix_'+nr);
+					elem.next().attr('for', element_id + '_autoprefix_'+nr);
 					nr++;
 				});
 				";
 
 			// Update new URL optional properties
+			if ($useimage) $js .= "
+				theInput = newField.find('input.urlimage').first();
+				theInput.attr('value', ".json_encode($default_image).");
+				theInput.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][image]');
+				theInput.attr('id', element_id + '_image');
+				newField.find('.urlimage-lbl').first().attr('for', element_id + '_image');
+				";
+
+			if ($useimage)
+			{
+				$js .= "
+				var elements = ['img_fetch_btn', 'img_clear_btn'];
+				for	(var i = 0; i < elements.length; i++)
+				{
+					theInput = newField.find('.' + elements[i]).first();
+					var el_name = elements[i].replace(/^img_/, '');
+					theInput.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+']['+el_name+']');
+					theInput.attr('id', element_id + '_' + el_name);
+				}
+
+				newField.find('.img_fetch_btn').attr('onclick', 'fcfield_weblink.fetchData(\'' + element_id + '\', \'".$field_name_js."\'); return false;');
+				newField.find('.img_clear_btn').attr('onclick', 'fcfield_weblink.clearData(\'' + element_id + '\', \'".$field_name_js."\'); return false;');
+				newField.find('.fcfield_message_box').attr('id','fcfield_message_box_' + element_id);
+
+				// Clear any existing message
+				jQuery('#fcfield_message_box_' + element_id).html('');
+				";
+			}
+
 			if ($usetitle) $js .= "
 				theInput = newField.find('input.urltitle').first();
-				theInput.val(".json_encode($default_title).");
+				theInput.attr('value', ".json_encode($default_title).");
 				theInput.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][title]');
-				theInput.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_title');
-				newField.find('.urltitle-lbl').first().attr('for','".$elementid."_'+uniqueRowNum".$field->id."+'_title');
+				theInput.attr('id', element_id + '_title');
+				newField.find('.urltitle-lbl').first().attr('for', element_id + '_title');
 				";
 
 			if ($usetext) $js .= "
 				theInput = newField.find('input.urllinktext').first();
-				theInput.val(".json_encode($default_text).");
+				theInput.attr('value', ".json_encode($default_text).");
 				theInput.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][linktext]');
-				theInput.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_linktext');
-				newField.find('.urllinktext-lbl').first().attr('for','".$elementid."_'+uniqueRowNum".$field->id."+'_linktext');
+				theInput.attr('id', element_id + '_linktext');
+				newField.find('.urllinktext-lbl').first().attr('for', element_id + '_linktext');
 				";
 
 			// Do not load the default from viewing configuration !, this will allow re-configuring default in viewing configuration at any time
@@ -282,16 +362,16 @@ class plgFlexicontent_fieldsWeblink extends FCField
 				theField = newField.find('".($useclass==1 ? 'input' : 'select').".urlclass').first();
 				theField.val('');
 				theField.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][class]');
-				theField.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_class');
-				newField.find('.urlclass-lbl').first().attr('for','".$elementid."_'+uniqueRowNum".$field->id."+'_class');
+				theField.attr('id', element_id + '_class');
+				newField.find('.urlclass-lbl').first().attr('for', element_id + '_class');
 				";
 
 			if ($useid) $js .= "
 				theInput = newField.find('input.urlid').first();
-				theInput.val(".json_encode($default_id).");
+				theInput.attr('value', ".json_encode($default_id).");
 				theInput.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][id]');
-				theInput.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_id');
-				newField.find('.urlid-lbl').first().attr('for','".$elementid."_'+uniqueRowNum".$field->id."+'_id');
+				theInput.attr('id', element_id + '_id');
+				newField.find('.urlid-lbl').first().attr('for', element_id + '_id');
 				";
 
 			// Do not load the default from viewing configuration !, this will allow re-configuring default in viewing configuration at any time
@@ -299,16 +379,16 @@ class plgFlexicontent_fieldsWeblink extends FCField
 				theInput = newField.find('select.urltarget').first();
 				theInput.val('');
 				theInput.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][target]');
-				theInput.attr('target','".$elementid."_'+uniqueRowNum".$field->id."+'_target');
-				newField.find('.urltarget-lbl').first().attr('for','".$elementid."_'+uniqueRowNum".$field->id."+'_target');
+				theInput.attr('target', element_id + '_target');
+				newField.find('.urltarget-lbl').first().attr('for', element_id + '_target');
 				";
 
 			if ($usehits) $js .="
 				theInput = newField.find('input.urlhits').first();
 				theInput.val('0');
 				theInput.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][hits]');
-				theInput.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_hits');
-				newField.find('.urlhits-lbl').first().attr('for','".$elementid."_'+uniqueRowNum".$field->id."+'_hits');
+				theInput.attr('id', element_id + '_hits');
+				newField.find('.urlhits-lbl').first().attr('for', element_id + '_hits');
 
 				// Destroy any select2 elements
 				var sel2_elements = newField.find('div.select2-container');
@@ -319,7 +399,7 @@ class plgFlexicontent_fieldsWeblink extends FCField
 				}
 
 				// Set hits to zero for new row value
-				newField.find('span span').html('0');
+				newField.find('span.hitcount').html('0 ' + " . json_encode(JText::_('FLEXI_HITS')) . ");
 				";
 
 			// Add new field to DOM
@@ -346,6 +426,36 @@ class plgFlexicontent_fieldsWeblink extends FCField
 				//newField.fadeOut({ duration: 400, easing: 'swing' }).fadeIn({ duration: 200, easing: 'swing' });
 				if (scroll_visible) fc_scrollIntoView(newField, 1);
 				if (animate_visible) newField.css({opacity: 0.1}).animate({ opacity: 1 }, 800, function() { jQuery(this).css('opacity', ''); });
+
+				// Set tooltip data placeholders
+				var _name = '_image';
+				newField.find('.media-preview').html('<span class=\"hasTipPreview\" title=\"&lt;strong&gt;" . JText::_('JLIB_FORM_MEDIA_PREVIEW_SELECTED_IMAGE', true)
+					. "&lt;/strong&gt;&lt;br /&gt;&lt;span style=&quot;display: block;&quot; id=&quot;' + element_id + _name + '_preview_empty&quot; style=&quot;display:none&quot;&gt;" . JText::_('JLIB_FORM_MEDIA_PREVIEW_EMPTY', true)
+					. "&lt;/span&gt;&lt;span style=&quot;display: block;&quot; id=&quot;' + element_id + _name + '_preview_img&quot;&gt;&lt;img src=&quot;&quot; alt=&quot;" . JText::_('JLIB_FORM_MEDIA_PREVIEW_SELECTED_IMAGE', true)
+					. "&quot; id=&quot;' + element_id + _name + '_preview&quot; class=&quot;media-preview&quot; style=&quot; style=&quot;max-width:480px; max-height:360&quot; &quot; /&gt;&lt;/span&gt;\"><span class=\"icon-eye\" aria-hidden=\"true\"></span><span class=\"icon-image\" aria-hidden=\"true\"></span> "
+					. JText::_('FLEXI_FIELD_WEBLINK_URLIMAGE', true)
+					. "</span>');
+
+				// Enable tooltips on new element
+				newField.find('.hasTooltip').tooltip({html: true, container: newField});
+				newField.find('.hasPopover').popover({html: true, container: newField, trigger : 'hover focus'});
+
+				// Show tooltips
+				var tipped_elements = newField.find('.hasTipImgpath, .hasTipPreview');
+				tipped_elements.each(function() {
+					var title = this.get('title');
+					if (title) {
+						var parts = title.split('::', 2);
+						this.store('tip:title', parts[0]);
+						this.store('tip:text', parts[1]);
+					}
+				});
+
+				if (tipped_elements.length)
+				{
+					var imgpath_JTooltips = new Tips(jQuery(newField).find('.hasTipImgpath').get(0), { \"maxTitleChars\": 50, \"fixed\": false, \"onShow\": jMediaRefreshImgpathTip});
+					var imgprev_JTooltips = new Tips(jQuery(newField).find('.hasTipPreview').get(0), { \"maxTitleChars\": 50, \"fixed\": false, \"onShow\": jMediaRefreshPreviewTip});
+				}
 
 				// Enable tooltips on new element
 				newField.find('.hasTooltip').tooltip({html: true, container: newField});
@@ -521,6 +631,12 @@ class plgFlexicontent_fieldsWeblink extends FCField
 		$default_link = ($link_usage == 2) ? $field->parameters->get( 'default_link', '' ) : '';
 		$default_link = $default_link ? JText::_($default_link) : '';
 
+		// URL image (optional)
+		$useimage      = $field->parameters->get( 'use_image', 0 ) ;
+		$image_usage   = $field->parameters->get( 'image_usage', 0 ) ;
+		$default_image = ($item->version == 0 || $image_usage > 0) ? JText::_($field->parameters->get( 'default_image', '' )) : '';
+		$default_image = $default_image ? JText::_($default_image) : '';
+
 		// URL title (optional)
 		$usetitle      = $field->parameters->get( 'use_title', 0 ) ;
 		$title_usage   = $field->parameters->get( 'title_usage', 0 ) ;
@@ -553,6 +669,13 @@ class plgFlexicontent_fieldsWeblink extends FCField
 		$display_hits = $field->parameters->get( 'display_hits', 0 ) ;
 		$add_hits_img = $display_hits == 1 || $display_hits == 3;
 		$add_hits_txt = $display_hits == 2 || $display_hits == 3 || $isMobile;
+
+		// URL image
+		$display_image = $field->parameters->get( 'display_image', 1 ) ;
+
+		// Playback videos
+		$playback_videos = $field->parameters->get( 'playback_videos', 1 ) ;
+	
 
 		// Compatibility with old layouts
 		$target_param = $default_target ? ' target="'.$default_target.'" ' : '';
@@ -626,6 +749,7 @@ class plgFlexicontent_fieldsWeblink extends FCField
 			$values[0]['class']    = $default_class;
 			$values[0]['id']       = $default_id;
 			$values[0]['target']   = '';  // do not set viewing default !, this will allow re-configuring default in viewing at any time ...
+			$values[0]['image']    = '';
 			$values[0]['hits']     = 0;
 			$values[0] = serialize($values[0]);
 		}
@@ -809,6 +933,7 @@ class plgFlexicontent_fieldsWeblink extends FCField
 		$domain = JUri::getInstance('SERVER')->gethost();
 
 		// URL title (optional)
+		$useimage   = $field->parameters->get( 'use_image', 0 ) ;
 		$usetitle   = $field->parameters->get( 'use_title', 0 ) ;
 		$usetext    = $field->parameters->get( 'use_text', 0 ) ;
 		$useclass   = $field->parameters->get( 'use_class', 0 ) ;
@@ -937,6 +1062,7 @@ class plgFlexicontent_fieldsWeblink extends FCField
 			$newpost[$new]['link'] = $prefixed_link;
 
 			// Validate other value properties
+			$newpost[$new]['image']   = !$useimage  ? '' : flexicontent_html::dataFilter(@$v['image'], 200, 'STRING', 0);
 			$newpost[$new]['title']   = !$usetitle  ? '' : flexicontent_html::dataFilter(@$v['title'], 4000, 'STRING', 0);
 			$newpost[$new]['linktext']= !$usetext   ? '' : flexicontent_html::dataFilter(@$v['linktext'], 4000, 'STRING', 0);
 			$newpost[$new]['class']   = !$useclass  ? '' : flexicontent_html::dataFilter(@$v['class'], 200, 'STRING', 0);

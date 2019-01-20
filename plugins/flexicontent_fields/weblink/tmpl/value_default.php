@@ -29,8 +29,9 @@ foreach ($values as $value)
 	}
 
 	// Check if link is 'internal' aka 'safer', but make it absolute before checking it !
-	$link = $this->make_absolute_url($value['link']);
+	$link       = $this->make_absolute_url($value['link']);
 	$isInternal = JUri::isInternal($link);
+	$isVideo    = $playback_videos && (strpos($value['link'], 'youtube') !== false || strpos($value['link'], 'vimeo') !== false);
 
 	// If not using property or property is empty, then use default property value
 	// NOTE: default property values have been cleared, if (propertyname_usage != 2)
@@ -39,6 +40,7 @@ foreach ($values as $value)
 	$class    = ($useclass  && !empty($value['class'])   )  ?  $value['class']    : $default_class;
 	$id       = ($useid     && !empty($value['id'])      )  ?  $value['id']       : $default_id;
 	$target   = ($usetarget && !empty($value['target'])  )  ?  $value['target']   : $default_target;
+	$image    = ($useimage  && !empty($value['image'])  )   ?  $value['image']    : $default_image;
 	$hits     = isset($value['hits']) ? (int) $value['hits'] : 0;
 
 	// New window is forced for external links
@@ -52,12 +54,39 @@ foreach ($values as $value)
 		// 1: nofollow all, 0: nofollow external, -1: allow following (indexing) any link
 		. ($add_rel_nofollow == 1 || ($add_rel_nofollow == 0 && !$isInternal) ? ' nofollow' : '');
 
-	$link_params = '';
-	if ($target == '_popup')
+	$link_params  = '';
+	$playbackicon = '';
+
+	static $fbox_loaded = null;
+
+	if ($isVideo)
+	{
+		if ($fbox_loaded)
+		{
+			$fbox_loaded = true;
+			flexicontent_html::loadFramework('fancybox');
+		}
+		
+		// Video providers natively supported by this JS gallery
+		if (strpos($value['link'], 'youtube') !== false || strpos($value['link'], 'vimeo') !== false)
+		{
+			$link_params  .= ' data-fancybox="item_' . $item->id . '_field_' . $field->id . '" ';
+			$playbackicon  = '<div style="font-size: 48px; opacity: 0.8; background: white; position: absolute; right: 50%; bottom: calc(50% - 12px);"><div class="icon-video-2" style="color: font-size: 48px;"></div></div>';
+		}
+
+		// Non video URL or a video provider not supported natively by this JS gallery
+		else
+		{
+			$link_params .= ' data-type="iframe"';
+		}
+
+		//$link_params .= ' onclick="fc_field_dialog_handle_'.$field->id.' = fc_showDialog(jQuery(this).attr(\'href\'), \'fc_modal_popup_container\', 0, 0, 0, 0, {title: \'\'}); return false;" ';
+	}
+	elseif ($target === '_popup')
 	{
 		$link_params .= ' onclick="fc_field_dialog_handle_'.$field->id.' = fc_showDialog(jQuery(this).attr(\'href\'), \'fc_modal_popup_container\', 0, 0, 0, 0, {title: \'\'}); return false;" ';
 	}
-	else if ($target == '_modal')
+	else if ($target === '_modal')
 	{
 		$link_params .= ' onclick="window.open(this.href, \'targetWindow\', \'toolbar=no,location=no,status=no,menubar=no,scrollbars=yes,resizable=yes,width=600,height=600\'); return false;" ';
 	}
@@ -65,14 +94,15 @@ foreach ($values as $value)
 	{
 		$link_params .= $target ? ' target="'.$target.'"' : '';
 	}
+
 	$link_params .= ''
-		. ($title  ? ' title="' . $title . '"' : '')
+		. ($title  ? ' title="' . htmlspecialchars($title, ENT_COMPAT, 'UTF-8') . '"' : '')
 		. ($id     ? ' id="' . $id . '"' : '')
 		. ($class ? ' class="' . $class . '"' : '')
 		. ($rel    ? ' rel="' . $rel . '" ' : '');
 
 	// Direct access to the web-link, hits counting not possible
-	if ( $field->parameters->get('use_direct_link', 0) || $field->parameters->get('link_source', 0) ==-1 )
+	if ($isVideo || $field->parameters->get('use_direct_link', 0) || $field->parameters->get('link_source', 0) == -1)
 	{
 		$href = $link;
 	}
@@ -84,16 +114,34 @@ foreach ($values as $value)
 	}
 
 	// If linking text is  URL convert from Punycode to UTF8
-	if ( empty($linktext) )
+	if (empty($linktext))
 	{
 		$linktext = $title ? $title : $this->cleanurl( JStringPunycode::urlToUTF8($link) );
 	}
 
+	// Create URL image with playback icon if it is video
+	$img_tag = '';
+
+	if ($display_image)
+	{
+		$img_src = ($image && file_exists(JPATH_ROOT . '/' . $image))  ?  JUri::root() . $image  :  $image;
+		$img_tag = $img_src ? '<br>
+			<div style="position: relative; display: inline-block;">
+				<img src="' . $img_src . '" alt="' . htmlspecialchars($title, ENT_COMPAT, 'UTF-8') . '" width="160" height="120" style="width: 160px; width: 120px; "/>
+				' . $playbackicon . '
+			</div>
+		' : '';
+	}
+
 	// Create indirect link to web-link address with custom displayed text
-	$html = '<a href="' .$href. '" '.$link_params.' itemprop="url">' .$linktext. '</a>';
+	$html = '<a href="' .$href. '" '.$link_params.' itemprop="url">'
+		. $linktext
+		. $img_tag
+	. '</a>';
 
 	// HITS: either as icon or as inline text or both
 	$hits_html = '';
+
 	if ($display_hits && $hits)
 	{
 		$hits_html = '
