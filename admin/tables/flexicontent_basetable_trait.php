@@ -364,7 +364,7 @@ trait flexicontent_basetable_trait
 		}
 
 		// Warn on invalid characters alias changed (but do not add message on empty original alias)
-		elseif (!empty($invalid_chars_alias))
+		elseif (!empty($invalid_chars_alias) && $invalid_chars_alias !== $this->alias)
 		{
 			$msg = JText::sprintf('FLEXI_WARN_' . $this->_NAME . '_' . strtoupper($alias) . '_CORRECTED', $invalid_chars_alias, $this->$alias);
 			JFactory::getApplication()->enqueueMessage($msg, 'notice');
