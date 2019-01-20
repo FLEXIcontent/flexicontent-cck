@@ -14,6 +14,7 @@
 		<filename plugin="weblink">weblink.php</filename>
 		<filename>index.html</filename>
 		<folder>tmpl</folder>
+		<folder>js</folder>
 	</files>
 
 	<config>
@@ -100,6 +101,18 @@
 			</field>
 
 			<field name="" type="separator" default="FLEXI_OPTIONAL_PROPERTIES" description="FLEXI_OPTIONAL_PROPERTIES_DESC" level="level1" depend_class="not_jurls" />
+
+			<field name="" type="separator" default="FLEXI_FIELD_WEBLINK_URLIMAGE" level="level2" depend_class="not_jurls" />
+			<field name="use_image" type="multilist" subtype="radio" default="0" label="FLEXI_ENABLE_PROPERTY" toggle_related="1" description="FLEXI_ENABLE_PROPERTY_DESC" class="btn-group btn-group-yesno" depend_class="not_jurls" >
+				<option value="0" show_list="" hide_list="hiddefield-mode">FLEXI_NO</option>
+				<option value="1" show_list="hiddefield-mode" hide_list="">FLEXI_YES</option>
+			</field>
+			<field name="default_image" type="media" default="" label="FLEXI_PROPERTY_DEFAULT" depend_class="not_jurls hiddefield-mode" description="FLEXI_PROPERTY_DEFAULT_DESC" />
+			<field name="image_usage" type="list" default="0" label="FLEXI_OPTIONAL_PROPERTIES_DEFAULT_USAGE" depend_class="not_jurls hiddefield-mode" description="FLEXI_OPTIONAL_PROPERTIES_DEFAULT_USAGE_DESC">
+				<option value="0">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_NEW</option>
+				<option value="1">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_ALL</option>
+				<option value="2">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_AND_ON_EMPTY</option>
+			</field>
 
 			<field name="" type="separator" default="FLEXI_FIELD_WEBLINK_URLTITLE" level="level2" depend_class="not_jurls" />
 			<field name="use_title" type="multilist" subtype="radio" default="0" label="FLEXI_ENABLE_PROPERTY" toggle_related="1" description="FLEXI_ENABLE_PROPERTY_DESC" class="btn-group btn-group-yesno" depend_class="not_jurls" >
@@ -241,6 +254,15 @@
 				<option value="1">FLEXI_ICON</option>
 				<option value="2">FLEXI_TEXT</option>
 				<option value="3">FLEXI_BOTH</option>
+			</field>
+			<field name="display_image" type="radio" default="1" label="Display image" description="Display image if one has beeng associated with the URL" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+
+			<field name="playback_videos" type="radio" default="1" label="Playback videos" description="Playback video URLs instead of opening the URL" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
 			</field>
 
 			<field name="" type="separator" default="FLEXI_FIELD_VALUE_LIST" description="" icon_class="icon-stack" level="tab_open" box_type="1" />

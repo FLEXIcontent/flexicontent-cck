@@ -88,7 +88,7 @@
 					{
 						if (typeof response.error !== "undefined")
 						{
-							msg_box.html("<span class=\"alert alert-info fc-iblock fcpadded\">" + response.error + " <br>This seems link a non-media URL</span>");
+							msg_box.html("<span class=\"alert alert-info fc-iblock fcpadded\">Reply: " + response.error + " <br>This link is a not video / media URL ?</span>");
 						}
 						else
 						{
@@ -125,6 +125,21 @@
 		});
 	}
 
+	fcfield_image.update_path_tip = function(el)
+	{
+		var tipped_elements = jQuery(el).closest('.fc-field-props-box').find('.hasTipImgpath, .hasTipPreview');
+
+		tipped_elements.each(function()
+		{
+			var title = this.get('title') || this.get('value');
+			if (title)
+			{
+				var parts = title.split('::', 2);
+				this.store('tip:title', parts[0]);
+				this.store('tip:text', parts[1]);
+			}
+		});
+	}
 
 	fcfield_image.incrementValCnt = function(config_name)
 	{

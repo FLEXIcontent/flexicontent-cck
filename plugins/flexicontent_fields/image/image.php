@@ -172,6 +172,7 @@ class plgFlexicontent_fieldsImage extends FCField
 
 		// Add JS /CSS for Media manager mode, and also check their PHP layouts overides exist
 		static $mm_mode_common_js_added = false;
+
 		if ($image_source === -2 && !$mm_mode_common_js_added)
 		{
 			// Check and if needed install Joomla template overrides into current Joomla template
@@ -184,9 +185,16 @@ class plgFlexicontent_fieldsImage extends FCField
 			JHtml::_('behavior.modal'/*, '.fc_image_field_mm_modal'*/);
 
 			// Include media field JS, detecting different version of Joomla
-			if( file_exists($path = JPATH_ROOT.'/media/media/js/mediafield-mootools.min.js') ) $media_js = 'media/mediafield-mootools.min.js';
-			else if( file_exists($path = JPATH_ROOT.'/media/media/js/mediafield.min.js') ) $media_js = 'media/mediafield.min.js';
-			else $media_js = 'media/mediafield.js';
+			if (file_exists($path = JPATH_ROOT.'/media/media/js/mediafield-mootools.min.js'))
+			{
+				$media_js = 'media/mediafield-mootools.min.js';
+			}
+			else
+			{
+				$media_js = file_exists($path = JPATH_ROOT.'/media/media/js/mediafield.min.js')
+					? 'media/mediafield.min.js'
+					: 'media/mediafield.js';
+			}
 
 			JHtml::_('script', $media_js, $mootools_framework = true, $media_folder_relative_path = true, false, false, true);
 
@@ -447,11 +455,11 @@ class plgFlexicontent_fieldsImage extends FCField
 					theInput.attr('id', element_id + '_' + el_name);
 				}
 
-				newField.find('input.img_mediaurl').val(".json_encode($default_mediaurl).");
+				newField.find('input.img_mediaurl').attr('value', ".json_encode($default_mediaurl).");
 
 				newField.find('.fcfield-medialurlvalue').attr('onclick', 'fcfield_image.toggleMediaURL(\'' + element_id + '\', \'".$field_name_js."\');');
-				newField.find('.img_fetch_btn').attr('onclick', 'fcfield_image.fetchData(\'' + element_id + '\', \'".$field_name_js."\');');
-				newField.find('.img_clear_btn').attr('onclick', 'fcfield_image.clearData(\'' + element_id + '\', \'".$field_name_js."\');');
+				newField.find('.img_fetch_btn').attr('onclick', 'fcfield_image.fetchData(\'' + element_id + '\', \'".$field_name_js."\'); return false;');
+				newField.find('.img_clear_btn').attr('onclick', 'fcfield_image.clearData(\'' + element_id + '\', \'".$field_name_js."\'); return false;');
 				newField.find('.fcfield_message_box').attr('id','fcfield_message_box_' + element_id);
 
 				// Clear any existing message
@@ -460,29 +468,29 @@ class plgFlexicontent_fieldsImage extends FCField
 			}
 
 			if ($usealt) $js .= "
-				newField.find('input.imgalt').val(".json_encode($default_alt).");
+				newField.find('input.imgalt').attr('value', ".json_encode($default_alt).");
 				newField.find('input.imgalt').attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][alt]');
 				newField.find('input.imgalt').attr('id', element_id + '_alt');
 				";
 
 			if ($usetitle) $js .= "
-				newField.find('input.imgtitle').val(".json_encode($default_title).");
+				newField.find('input.imgtitle').attr('value', ".json_encode($default_title).");
 				newField.find('input.imgtitle').attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][title]');
 				newField.find('input.imgtitle').attr('id', element_id + '_title');
 				";
 
 			if ($usedesc) $js .= "
-				newField.find('textarea.imgdesc').val(".json_encode($default_desc).");
+				newField.find('textarea.imgdesc').attr('value', ".json_encode($default_desc).");
 				newField.find('textarea.imgdesc').attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][desc]');
 				";
 
 			if ($usecust1) $js .= "
-				newField.find('input.imgcust1').val(".json_encode($default_cust1).");
+				newField.find('input.imgcust1').attr('value', ".json_encode($default_cust1).");
 				newField.find('input.imgcust1').attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][cust1]');
 				";
 
 			if ($usecust2) $js .= "
-				newField.find('input.imgcust2').val(".json_encode($default_cust2).");
+				newField.find('input.imgcust2').attr('value', ".json_encode($default_cust2).");
 				newField.find('input.imgcust2').attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][cust2]');
 				";
 
@@ -512,7 +520,12 @@ class plgFlexicontent_fieldsImage extends FCField
 				if (animate_visible) newField.css({opacity: 0.1}).animate({ opacity: 1 }, 800, function() { jQuery(this).css('opacity', ''); });
 
 				// Set tooltip data placeholders
-				newField.find('.media-preview').html('<span class=\"hasTipPreview\" title=\"&lt;strong&gt;Selected image.&lt;/strong&gt;&lt;br /&gt;&lt;div id=&quot;' + element_id + '_existingname_preview_empty&quot; style=&quot;display:none&quot;&gt;No image selected.&lt;/div&gt;&lt;div id=&quot;' + element_id + '_existingname_preview_img&quot;&gt;&lt;img src=&quot;&quot; alt=&quot;Selected image.&quot; id=&quot;' + element_id + '_existingname_preview&quot; class=&quot;media-preview&quot; style=&quot; style=&quot;max-width:480px; max-height:360&quot; &quot; /&gt;&lt;/div&gt;\"><i class=\"icon-eye\"></i></span>');
+				var _name = '_existingname';
+				newField.find('.media-preview').html('<span class=\"hasTipPreview\" title=\"&lt;strong&gt;" . JText::_('JLIB_FORM_MEDIA_PREVIEW_SELECTED_IMAGE', true)
+					. "&lt;/strong&gt;&lt;br /&gt;&lt;span style=&quot;display: block;&quot; id=&quot;' + element_id + _name + '_preview_empty&quot; style=&quot;display:none&quot;&gt;" . JText::_('JLIB_FORM_MEDIA_PREVIEW_EMPTY', true)
+					. "&lt;/span&gt;&lt;span style=&quot;display: block;&quot; id=&quot;' + element_id + _name + '_preview_img&quot;&gt;&lt;img src=&quot;&quot; alt=&quot;" . JText::_('JLIB_FORM_MEDIA_PREVIEW_SELECTED_IMAGE', true)
+					. "&quot; id=&quot;' + element_id + _name + '_preview&quot; class=&quot;media-preview&quot; style=&quot; style=&quot;max-width:480px; max-height:360&quot; &quot; /&gt;&lt;/span&gt;\"><span class=\"icon-eye\" aria-hidden=\"true\"></span><span class=\"icon-image\" aria-hidden=\"true\"></span> "
+					. "</span>');
 
 				// Enable tooltips on new element
 				newField.find('.hasTooltip').tooltip({html: true, container: newField});
@@ -528,7 +541,9 @@ class plgFlexicontent_fieldsImage extends FCField
 						this.store('tip:text', parts[1]);
 					}
 				});
-				if ( tipped_elements.length ) {
+
+				if (tipped_elements.length)
+				{
 					var imgpath_JTooltips = new Tips(jQuery(newField).find('.hasTipImgpath').get(0), { \"maxTitleChars\": 50, \"fixed\": false, \"onShow\": jMediaRefreshImgpathTip});
 					var imgprev_JTooltips = new Tips(jQuery(newField).find('.hasTipPreview').get(0), { \"maxTitleChars\": 50, \"fixed\": false, \"onShow\": jMediaRefreshPreviewTip});
 				}
@@ -765,7 +780,7 @@ class plgFlexicontent_fieldsImage extends FCField
 				$img_path = $value['originalname'];
 				$img_src  = ($img_path && file_exists(JPATH_ROOT . '/' . $img_path))  ?  JUri::root() . $img_path  :  '';
 				$img_attr = array('id' => $mm_id . '_preview', 'class' => 'media-preview', 'style' => ' style="max-width:480px; max-height:360" ');
-				$img = $img_src  ?  JHtml::image($img_src, JText::_('JLIB_FORM_MEDIA_PREVIEW_ALT'), $img_attr)  :  '';
+				$img = JHtml::image($img_src ?: 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=', JText::_('JLIB_FORM_MEDIA_PREVIEW_ALT'), $img_attr);
 
 				$previewImg = '
 				<div id="' . $mm_id . '_preview_img"' . ($img_src ? '' : ' style="display:none"') . '>
@@ -779,7 +794,7 @@ class plgFlexicontent_fieldsImage extends FCField
 				$tooltip = $previewImgEmpty . $previewImg;
 				$tooltip_options = array(
 					'title' => JText::_('JLIB_FORM_MEDIA_PREVIEW_SELECTED_IMAGE'),
-					'text' => '<span class="icon-eye" aria-hidden="true"></span>',
+					'text' => '<span class="icon-eye" aria-hidden="true"></span><span class="icon-image" aria-hidden="true">',
 					'class' => 'hasTipPreview'
 				);
 
@@ -790,7 +805,7 @@ class plgFlexicontent_fieldsImage extends FCField
 						'.JHtml::tooltip($tooltip, $tooltip_options).'
 					</div>
 					<input type="text" name="'.$fieldname_n.'[existingname]" id="'.$mm_id.'" value="'.htmlspecialchars($img_path, ENT_COMPAT, 'UTF-8').'" readonly="readonly"
-						class="existingname input-xxlarge field-media-input hasTipImgpath"  title="'.htmlspecialchars('<span id="TipImgpath"></span>', ENT_COMPAT, 'UTF-8').'" data-basepath="'.JUri::root().'"
+						class="existingname input-large field-media-input hasTipImgpath" onchange="fcfield_image.update_path_tip(this);" title="'.htmlspecialchars('<span id="TipImgpath"></span>', ENT_COMPAT, 'UTF-8').'" data-basepath="'.JUri::root().'"
 					/>
 					<a class="fc_image_field_mm_modal btn '.$tooltip_class.'" title="'.JText::_('FLEXI_SELECT_IMAGE').'" onclick="var mm_id=jQuery(this).parent().find(\'.existingname\').attr(\'id\'); fcfield_image.currElement[\''.$field_name_js.'\']=mm_id; SqueezeBox.open(\''.$mm_link.'\', {size:{x: ((window.innerWidth-120) > 1360 ? 1360 : (window.innerWidth-120)), y: ((window.innerHeight-220) > 800 ? 800 : (window.innerHeight-220))}, handler: \'iframe\', onClose: function() { fcfield_image.incrementValCnt(\''.$field_name_js.'\'); } });  return false;">
 						'.JText::_('FLEXI_SELECT').'
