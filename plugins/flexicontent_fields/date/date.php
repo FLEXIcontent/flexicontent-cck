@@ -400,7 +400,12 @@ class plgFlexicontent_fieldsDate extends FCField
 			}
 			else
 			{
+				$onChange = $field->parameters->get( 'onchangeaction', '' ) ;
 				$attribs_arr = array('class'=>'fcfield_date use_fcfield_box input-medium' . $required_class);
+
+				if($onChange) {
+					$attribs_arr['onChange'] = $onChange;
+				}
 
 				if (strlen($minyear))
 				{

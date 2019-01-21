@@ -368,6 +368,8 @@ class plgFlexicontent_fieldsText extends FCField
 		// Add placeholder tag parameter if not using validation mask, (if using vaildation mask then placeholder should be added a validation mask property)
 		$attribs .= $placeholder ? ' placeholder="'.htmlspecialchars( $placeholder, ENT_COMPAT, 'UTF-8' ).'" ' : '';
 
+		$onChange = $field->parameters->get( 'onchangeaction', '' ) ;
+		$attribs = $onChange?' onChange="'.$onChange.'"':"";
 
 		// ***
 		// *** Create field's HTML display for item form

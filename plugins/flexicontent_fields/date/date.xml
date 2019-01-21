@@ -105,7 +105,7 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-
+			<field name="onchangeaction" type="textarea" default="" size="2" label="onChange" description="onChange" />
 			<field name="" type="separator" default="FLEXI_IMPORT" description="" icon_class="icon-upload" level="tab_open" box_type="1" />
 
 			<field name="" type="separator" default="FLEXI_FIELDS_IMPORT_MANIPULATE_VALUES_DURING_IMPORT" level="level2" />
