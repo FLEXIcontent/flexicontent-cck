@@ -43,6 +43,16 @@ class plgFlexicontent_fieldsDate extends FCField
 		if ($use_ingroup) $field->formhidden = 3;
 		if ($use_ingroup && empty($field->ingroup)) return;
 
+		/**
+		 * Check if using 'auto_value_code', clear 'auto_value', if function not set
+		 */
+		$auto_value = (int) $field->parameters->get('auto_value', 0);
+		if ($auto_value === 2)
+		{
+			$auto_value_code = $field->parameters->get('auto_value_code', '');
+			$auto_value_code = preg_replace('/^<\?php(.*)(\?>)?$/s', '$1', $auto_value_code);
+		}
+		$auto_value = $auto_value === 2 && !$auto_value_code ? 0 : $auto_value;
 
 		$date_source = (int) $field->parameters->get('date_source', 0);
 
@@ -406,8 +416,13 @@ class plgFlexicontent_fieldsDate extends FCField
 			else
 			{
 				$attribs_arr = array(
-					'class' => 'fcfield_date use_fcfield_box input-medium' . $required_class
+					'class' => 'fcfield_date use_fcfield_box input-medium' . $required_class . ($auto_value ? ' fcfield_auto_value' : '')
 				);
+
+				if ($auto_value)
+				{
+					$attribs_arr['readonly'] = 'readonly';
+				}
 
 				if($onChange)
 				{
@@ -441,7 +456,8 @@ class plgFlexicontent_fieldsDate extends FCField
 				<div class="fcfield_box' .($required ? ' required_box' : ''). ' fc-iblock" data-label_text="'.$field->label.'">
 					' . $html . '
 				</div>
-				'.(!$add_ctrl_btns ? '' : '
+				'.($auto_value ? '<span class="fc-mssg-inline fc-info fc-nobgimage">' . JText::_('FLEXI_AUTO') . '</span>' : '').'
+				'.(!$add_ctrl_btns || $auto_value ? '' : '
 				<div class="'.$input_grp_class.' fc-xpended-btns">
 					'.$move2.'
 					'.$remove_button.'
@@ -449,7 +465,7 @@ class plgFlexicontent_fieldsDate extends FCField
 				</div>
 				');
 
-			if ($disable_keyboardinput)
+			if ($disable_keyboardinput || $auto_value)
 			{
 				$per_val_js = "
 					jQuery('#".$elementid_n."').on('keydown keypress keyup', false);
@@ -837,6 +853,22 @@ class plgFlexicontent_fieldsDate extends FCField
 	function onAllFieldsPostDataValidated( &$field, &$item )
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
+
+		/**
+		 * Check if using 'auto_value_code', clear 'auto_value', if function not set
+		 */
+		$auto_value = (int) $field->parameters->get('auto_value', 0);
+		if ($auto_value === 2)
+		{
+			$auto_value_code = $field->parameters->get('auto_value_code', '');
+			$auto_value_code = preg_replace('/^<\?php(.*)(\?>)?$/s', '$1', $auto_value_code);
+		}
+		$auto_value = $auto_value === 2 && !$auto_value_code ? 0 : $auto_value;
+
+		if (!$auto_value)
+		{
+			return;
+		}
 
 		// Check for system plugin
 		$extfolder = 'system';
