@@ -43,7 +43,9 @@ class plgFlexicontent_fieldsText extends FCField
 		if ($use_ingroup) $field->formhidden = 3;
 		if ($use_ingroup && empty($field->ingroup)) return;
 
-		// Check if using 'auto_value_code', clear 'auto_value', if function not set
+		/**
+		 * Check if using 'auto_value_code', clear 'auto_value', if function not set
+		 */
 		$auto_value = (int) $field->parameters->get('auto_value', 0);
 		if ($auto_value === 2)
 		{
@@ -193,8 +195,8 @@ class plgFlexicontent_fieldsText extends FCField
 				var theInput = newField.find('input.fcfield_textval').first();
 				var theInput_dv = theInput.attr('data-defvals');
 				(theInput_dv && theInput_dv.length) ?
-					theInput.val( theInput.attr('data-defvals') ) :
-					theInput.val(".json_encode($default_value).") ;
+					theInput.attr('value', theInput.attr('data-defvals')) :
+					theInput.attr('value', ".json_encode($default_value).") ;
 				theInput.attr('name', '".$fieldname."['+uniqueRowNum".$field->id."+']');
 				theInput.attr('id', '".$elementid."_'+uniqueRowNum".$field->id.");
 
@@ -369,13 +371,13 @@ class plgFlexicontent_fieldsText extends FCField
 		$attribs .= $placeholder ? ' placeholder="'.htmlspecialchars( $placeholder, ENT_COMPAT, 'UTF-8' ).'" ' : '';
 
 
-		// ***
-		// *** Create field's HTML display for item form
-		// ***
+		/**
+		 * Create field's HTML display for item form
+		 */
 
 		$field->html = array();
 		$n = 0;
-		//if ($use_ingroup) {print_r($field->value);}
+
 		foreach ($field->value as $value)
 		{
 			if ( !strlen($value) && !$use_ingroup && $n) continue;  // If at least one added, skip empty if not in field group
@@ -754,7 +756,9 @@ class plgFlexicontent_fieldsText extends FCField
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 
-		// Check if using 'auto_value_code', clear 'auto_value', if function not set
+		/**
+		 * Check if using 'auto_value_code', clear 'auto_value', if function not set
+		 */
 		$auto_value = (int) $field->parameters->get('auto_value', 0);
 		if ($auto_value === 2)
 		{

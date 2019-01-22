@@ -43,6 +43,17 @@ class plgFlexicontent_fieldsDate extends FCField
 		if ($use_ingroup) $field->formhidden = 3;
 		if ($use_ingroup && empty($field->ingroup)) return;
 
+		/**
+		 * Check if using 'auto_value_code', clear 'auto_value', if function not set
+		 */
+		$auto_value = (int) $field->parameters->get('auto_value', 0);
+		if ($auto_value === 2)
+		{
+			$auto_value_code = $field->parameters->get('auto_value_code', '');
+			$auto_value_code = preg_replace('/^<\?php(.*)(\?>)?$/s', '$1', $auto_value_code);
+		}
+		$auto_value = $auto_value === 2 && !$auto_value_code ? 0 : $auto_value;
+
 		$date_source = (int) $field->parameters->get('date_source', 0);
 
 		if ($date_source === 1 || $date_source === 2)
@@ -185,6 +196,9 @@ class plgFlexicontent_fieldsDate extends FCField
 		$fieldname = 'custom['.$field->name.']';
 		$elementid = 'custom_'.$field->name;
 
+		// Name Safe Element ID
+		$elementid_ns = str_replace('-', '_', $elementid);
+
 		$js = '';
 		$css = '';
 
@@ -235,7 +249,7 @@ class plgFlexicontent_fieldsDate extends FCField
 			// Update the new (date) input field
 			$js .= "
 				var theInput = newField.find('input.fcfield_date').first();
-				theInput.val('');
+				theInput.attr('value', '');
 				theInput.attr('name', '".$fieldname."['+uniqueRowNum".$field->id."+']');
 				theInput.attr('id', '".$elementid."_'+uniqueRowNum".$field->id.");
 
@@ -400,7 +414,14 @@ class plgFlexicontent_fieldsDate extends FCField
 			}
 			else
 			{
-				$attribs_arr = array('class'=>'fcfield_date use_fcfield_box input-medium' . $required_class);
+				$attribs_arr = array(
+					'class' => 'fcfield_date use_fcfield_box input-medium' . $required_class . ($auto_value ? ' fcfield_auto_value' : '')
+				);
+
+				if ($auto_value)
+				{
+					$attribs_arr['readonly'] = 'readonly';
+				}
 
 				if (strlen($minyear))
 				{
@@ -429,7 +450,8 @@ class plgFlexicontent_fieldsDate extends FCField
 				<div class="fcfield_box' .($required ? ' required_box' : ''). ' fc-iblock" data-label_text="'.$field->label.'">
 					' . $html . '
 				</div>
-				'.(!$add_ctrl_btns ? '' : '
+				'.($auto_value ? '<span class="fc-mssg-inline fc-info fc-nobgimage">' . JText::_('FLEXI_AUTO') . '</span>' : '').'
+				'.(!$add_ctrl_btns || $auto_value ? '' : '
 				<div class="'.$input_grp_class.' fc-xpended-btns">
 					'.$move2.'
 					'.$remove_button.'
@@ -437,7 +459,7 @@ class plgFlexicontent_fieldsDate extends FCField
 				</div>
 				');
 
-			if ($disable_keyboardinput)
+			if ($disable_keyboardinput || $auto_value)
 			{
 				$per_val_js = "
 					jQuery('#".$elementid_n."').on('keydown keypress keyup', false);
@@ -814,10 +836,55 @@ class plgFlexicontent_fieldsDate extends FCField
 			$new++;
 		}
 		$post = $newpost;
-		/*if ($use_ingroup) {
-			$app = JFactory::getApplication();
-			$app->enqueueMessage( print_r($post, true), 'warning');
-		}*/
+
+		//if ($use_ingroup) JFactory::getApplication()->enqueueMessage( print_r($post, true), 'warning');
+	}
+
+
+	// Method to do extra handling of field's values after all fields have validated their posted data, and are ready to be saved
+	// $item->fields['fieldname']->postdata contains values of other fields
+	// $item->fields['fieldname']->filedata contains files of other fields (normally this is empty due to using AJAX for file uploading)
+	function onAllFieldsPostDataValidated( &$field, &$item )
+	{
+		if ( !in_array($field->field_type, static::$field_types) ) return;
+
+		/**
+		 * Check if using 'auto_value_code', clear 'auto_value', if function not set
+		 */
+		$auto_value = (int) $field->parameters->get('auto_value', 0);
+		if ($auto_value === 2)
+		{
+			$auto_value_code = $field->parameters->get('auto_value_code', '');
+			$auto_value_code = preg_replace('/^<\?php(.*)(\?>)?$/s', '$1', $auto_value_code);
+		}
+		$auto_value = $auto_value === 2 && !$auto_value_code ? 0 : $auto_value;
+
+		if (!$auto_value)
+		{
+			return;
+		}
+
+		// Check for system plugin
+		$extfolder = 'system';
+		$extname   = 'flexisyspro';
+		$className = 'plg'. ucfirst($extfolder).$extname;
+		$plgPath = JPATH_SITE . '/plugins/'.$extfolder.'/'.$extname.'/'.$extname.'.php';
+
+		if (!file_exists($plgPath))
+		{
+			JFactory::getApplication()->enqueueMessage('Automatic field value for field  \'' . $field->label . '\' is only supported by FLEXIcontent PRO version, please disable this feature in field configuration', 'notice');
+			return;
+		}
+		//require_once $plgPath;
+
+		// Create plugin instance
+		$dispatcher   = JEventDispatcher::getInstance();
+		$plg_db_data  = JPluginHelper::getPlugin($extfolder, $extname);
+		$plg = new $className($dispatcher, array('type'=>$extfolder, 'name'=>$extname, 'params'=>$plg_db_data->params));
+
+		// Create automatic value
+		$plg->onAllFieldsPostDataValidated($field, $item);
+//echo '<pre>'; print_r($field); die ('here');
 	}
 
 

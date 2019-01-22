@@ -46,7 +46,9 @@ class plgFlexicontent_fieldsTextarea extends FCField
 		if ($use_ingroup) $field->formhidden = 3;
 		if ($use_ingroup && empty($field->ingroup)) return;
 
-		// Check if using 'auto_value_code', clear 'auto_value', if function not set
+		/**
+		 * Check if using 'auto_value_code', clear 'auto_value', if function not set
+		 */
 		$auto_value = (int) $field->parameters->get('auto_value', 0);
 		if ($auto_value === 2)
 		{
@@ -864,7 +866,9 @@ class plgFlexicontent_fieldsTextarea extends FCField
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 
-		// Check if using 'auto_value_code', clear 'auto_value', if function not set
+		/**
+		 * Check if using 'auto_value_code', clear 'auto_value', if function not set
+		 */
 		$auto_value = (int) $field->parameters->get('auto_value', 0);
 		if ($auto_value === 2)
 		{
