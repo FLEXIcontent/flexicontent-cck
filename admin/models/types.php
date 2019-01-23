@@ -217,7 +217,7 @@ class FlexicontentModelTypes extends FCModelAdminList
 	 */
 	public function copy($cid, $copyRelations = null)
 	{
-		$copyRelations = $copyValues === null ? $this->copyValues : $copyRelations;
+		$copyRelations = $copyRelations === null ? $this->copyValues : $copyRelations;
 		$ids_map       = array();
 		$name          = $this->name_col;
 
