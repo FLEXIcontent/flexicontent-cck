@@ -105,6 +105,7 @@ class plgFlexicontent_fieldsDate extends FCField
 		// Input field display size & max characters
 		$size       = (int) $field->parameters->get( 'size', 30 ) ;
 		$disable_keyboardinput = (int) $field->parameters->get('disable_keyboardinput', 0);
+		$onChange = $field->parameters->get('onchange', '');
 
 
 		// *******************************************
@@ -421,6 +422,11 @@ class plgFlexicontent_fieldsDate extends FCField
 				if ($auto_value)
 				{
 					$attribs_arr['readonly'] = 'readonly';
+				}
+
+				if($onChange)
+				{
+					$attribs_arr['onChange'] = $onChange;
 				}
 
 				if (strlen($minyear))

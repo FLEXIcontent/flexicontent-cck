@@ -114,6 +114,7 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
+			<field name="onchange" type="textarea" default="" size="2" label="onChange" description="onChange" />
 
 			<field name="" type="separator" default="FLEXI_IMPORT" description="" icon_class="icon-upload" level="tab_open" box_type="1" />
 
@@ -229,7 +230,6 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="plugins" type="pluginlist" label="FLEXI_FIELD_CHOOSE_SPECIFIC_PLUGINS" description="FLEXI_FIELD_CHOOSE_SPECIFIC_PLUGINS_DESC" depend_class="plg-trigger-mode" />
-
 
 			<field name="" type="separator" default="FLEXI_FIELD_VIEWING" level="tabset_close" box_type="1" />
 		</fieldset>
