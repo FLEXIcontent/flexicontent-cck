@@ -338,6 +338,26 @@ class FLEXIcontentViewSearch extends FlexicontentViewBaseRecords
 			');
 		}
 
+		// Add modal edit code
+		if (1)
+		{
+			JText::script("FLEXI_UPDATING_CONTENTS", true);
+			$document->addScriptDeclaration('
+				function fc_edit_fcitem_modal_load( container )
+				{
+					if ( container.find("iframe").get(0).contentWindow.location.href.indexOf("view=items") != -1 )
+					{
+						container.dialog("close");
+					}
+				}
+				function fc_edit_fcitem_modal_close()
+				{
+					window.location.reload(false);
+					document.body.innerHTML = Joomla.JText._("FLEXI_UPDATING_CONTENTS") + \' <img id="page_loading_img" src="components/com_flexicontent/assets/images/ajax-loader.gif">\';
+				}
+			');
+		}
+
 		$query = "SHOW VARIABLES LIKE '%ft_min_word_len%'";
 		$db->setQuery($query);
 		$_dbvariable = $db->loadObject();

@@ -1,28 +1,23 @@
 <?php
 /**
- * @version 1.5 stable $Id: view.html.php 1900 2014-05-03 07:25:51Z ggppdk $
- * @package Joomla
- * @subpackage FLEXIcontent
- * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
- * @license GNU/GPL v2
+ * @package         FLEXIcontent
+ * @version         3.3
  *
- * FLEXIcontent is a derivative work of the excellent QuickFAQ component
- * @copyright (C) 2008 Christoph Lukes
- * see www.schlu.net for more information
- *
- * FLEXIcontent is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
+ * @link            https://flexicontent.org
+ * @copyright       Copyright © 2018, FLEXIcontent team, All Rights Reserved
+ * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
-// no direct access
 defined('_JEXEC') or die('Restricted access');
 
-jimport('legacy.view.legacy');
+use Joomla\String\StringHelper;
+use Joomla\Utilities\ArrayHelper;
+
+JLoader::register('FlexicontentViewBaseRecords', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/base/view_records.php');
 
 /**
- * HTML View class for the FLEXIcontent View
+ * HTML View class for the FLEXIcontent (backend) dashboard screen
  */
 class FlexicontentViewFlexicontent extends JViewLegacy
 {
@@ -204,6 +199,26 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 
 		$js .= "});";
 		$document->addScriptDeclaration($js);
+
+		// Add modal edit code
+		if (1)
+		{
+			JText::script("FLEXI_UPDATING_CONTENTS", true);
+			$document->addScriptDeclaration('
+				function fc_edit_fcitem_modal_load( container )
+				{
+					if ( container.find("iframe").get(0).contentWindow.location.href.indexOf("view=items") != -1 )
+					{
+						container.dialog("close");
+					}
+				}
+				function fc_edit_fcitem_modal_close()
+				{
+					window.location.reload(false);
+					document.body.innerHTML = Joomla.JText._("FLEXI_UPDATING_CONTENTS") + \' <img id="page_loading_img" src="components/com_flexicontent/assets/images/ajax-loader.gif">\';
+				}
+			');
+		}
 
 		// Lists
 		jimport('joomla.filesystem.folder');
