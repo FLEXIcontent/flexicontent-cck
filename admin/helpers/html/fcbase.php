@@ -247,6 +247,7 @@ abstract class JHtmlFcbase
 		// Display title with edit link ... (row editable and not checked out)
 		$option    = isset($config['option']) ? $config['option'] : 'com_flexicontent';
 		$ctrl      = isset($config['ctrl']) ? $config['ctrl'] : static::$name;
+		$view      = isset($config['view']) ? $config['view'] : static::$name;
 		$keyname   = isset($config['keyname']) ? $config['keyname'] : 'id';
 
 		// HTML before the link
@@ -257,7 +258,7 @@ abstract class JHtmlFcbase
 
 		// The edit link
 		$edit_task = 'task=' . $ctrl . '.edit';
-		$edit_link = 'index.php?option=' . $option . '&amp;' . $edit_task . '&amp;view=' . static::$name . '&amp;'
+		$edit_link = 'index.php?option=' . $option . '&amp;' . $edit_task . '&amp;view=' . $view . '&amp;'
 			. 'id=' . $row->{$keyname};
 
 		if (!empty($config['attribs']))

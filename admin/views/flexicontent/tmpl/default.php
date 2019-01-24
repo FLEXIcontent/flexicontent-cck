@@ -1,28 +1,25 @@
 <?php
 /**
- * @version 1.5 stable $Id: default.php 1887 2014-04-24 23:53:14Z ggppdk $
- * @package Joomla
- * @subpackage FLEXIcontent
- * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
- * @license GNU/GPL v2
+ * @package         FLEXIcontent
+ * @version         3.3
  *
- * FLEXIcontent is a derivative work of the excellent QuickFAQ component
- * @copyright (C) 2008 Christoph Lukes
- * see www.schlu.net for more information
- *
- * FLEXIcontent is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
+ * @link            https://flexicontent.org
+ * @copyright       Copyright © 2018, FLEXIcontent team, All Rights Reserved
+ * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
 defined('_JEXEC') or die('Restricted access');
+
+use Joomla\String\StringHelper;
+JHtml::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/html');
 
 $app      = JFactory::getApplication();
 $option   = $app->input->get('option', '', 'CMD');
 $user     = JFactory::getUser();
 $template = $app->getTemplate();
 $session  = JFactory::getSession();
+$hlpname  = 'fcbase';
 
 $btn_class = FLEXI_J30GE ? 'btn' : 'fc_button';
 $tooltip_class = FLEXI_J30GE ? 'hasTooltip' : 'hasTip';
@@ -540,26 +537,22 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 				<?php
 				$k = 0;
 				$n = count($this->pending);
-				for ($i=0, $n; $i < $n; $i++) {
-					$row = $this->pending[$i];
-					$rights = FlexicontentHelperPerm::checkAllItemAccess($user->id, 'item', $row->id);
-					$canEdit 		= in_array('edit', $rights);
-					$canEditOwn	= in_array('edit.own', $rights) && $row->created_by == $user->id;
-					$link = 'index.php?option=com_flexicontent&amp;'.$items_task.'edit&amp;cid='. $row->id;
+
+				for ($i = 0, $n; $i < $n; $i++)
+				{
+					$row          = $this->pending[$i];
+					$assetName    = 'com_content.article.' . $row->id;
+					$isAuthor     = $row->created_by && $row->created_by == $user->id;
+					$row->canEdit = $user->authorise('core.edit', $assetName) || ($isAuthor && $user->authorise('core.edit.own', $assetName));
 				?>
 				<tr>
 					<td>
 					<?php
-					if ((!$canEdit) && (!$canEditOwn)) {
-						echo htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8');
-					} else {
-					?>
-						<?php echo ($i+1).". "; ?>
-						<a href="<?php echo $link; ?>" title="<?php echo $edit_item_txt; ?>" <?php echo $onclick_modal_edit; ?>>
-							<?php echo htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8'); ?>
-						</a>
-					<?php
-					}
+					echo JHtml::_($hlpname . '.edit_link', $row, $i, $row->canEdit, $config = array(
+						'ctrl'     => 'items',
+						'view'     => 'item',
+						'onclick'  => 'var url = jQuery(this).attr(\'data-href\'); var the_dialog = fc_showDialog(url, \'fc_modal_popup_container\', 0, 0, 0, fc_edit_fcitem_modal_close, {title:\'' . JText::_('FLEXI_EDIT', true) . '\', loadFunc: fc_edit_fcitem_modal_load}); return false;" ',
+					));
 					?>
 					</td>
 					<td><?php echo JHtml::_('date',  $row->created); ?></td>
@@ -599,26 +592,22 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 				<?php
 				$k = 0;
 				$n = count($this->revised);
-				for ($i=0, $n; $i < $n; $i++) {
-					$row = $this->revised[$i];
-					$rights = FlexicontentHelperPerm::checkAllItemAccess($user->id, 'item', $row->id);
-					$canEdit 		= in_array('edit', $rights);
-					$canEditOwn	= in_array('edit.own', $rights) && $row->created_by == $user->id;
-					$link = 'index.php?option=com_flexicontent&amp;'.$items_task.'edit&amp;cid='. $row->id;
+
+				for ($i = 0, $n; $i < $n; $i++)
+				{
+					$row          = $this->revised[$i];
+					$assetName    = 'com_content.article.' . $row->id;
+					$isAuthor     = $row->created_by && $row->created_by == $user->id;
+					$row->canEdit = $user->authorise('core.edit', $assetName) || ($isAuthor && $user->authorise('core.edit.own', $assetName));
 				?>
 				<tr>
 					<td>
 					<?php
-					if ((!$canEdit) && (!$canEditOwn)) {
-						echo htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8');
-					} else {
-					?>
-						<?php echo ($i+1).". "; ?>
-						<a href="<?php echo $link; ?>" title="<?php echo $edit_item_txt; ?>" <?php echo $onclick_modal_edit; ?>>
-							<?php echo htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8'); ?>
-						</a>
-					<?php
-					}
+					echo JHtml::_($hlpname . '.edit_link', $row, $i, $row->canEdit, $config = array(
+						'ctrl'     => 'items',
+						'view'     => 'item',
+						'onclick'  => 'var url = jQuery(this).attr(\'data-href\'); var the_dialog = fc_showDialog(url, \'fc_modal_popup_container\', 0, 0, 0, fc_edit_fcitem_modal_close, {title:\'' . JText::_('FLEXI_EDIT', true) . '\', loadFunc: fc_edit_fcitem_modal_load}); return false;" ',
+					));
 					?>
 					</td>
 					<td><?php echo JHtml::_('date',  $row->modified); ?></td>
@@ -659,26 +648,22 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 				<?php
 				$k = 0;
 				$n = count($this->inprogress);
-				for ($i=0, $n; $i < $n; $i++) {
-					$row = $this->inprogress[$i];
-					$rights = FlexicontentHelperPerm::checkAllItemAccess($user->id, 'item', $row->id);
-					$canEdit 		= in_array('edit', $rights);
-					$canEditOwn	= in_array('edit.own', $rights) && $row->created_by == $user->id;
-					$link = 'index.php?option=com_flexicontent&amp;'.$items_task.'edit&amp;cid='. $row->id;
+
+				for ($i = 0, $n; $i < $n; $i++)
+				{
+					$row          = $this->inprogress[$i];
+					$assetName    = 'com_content.article.' . $row->id;
+					$isAuthor     = $row->created_by && $row->created_by == $user->id;
+					$row->canEdit = $user->authorise('core.edit', $assetName) || ($isAuthor && $user->authorise('core.edit.own', $assetName));
 			?>
 				<tr>
 					<td>
 					<?php
-					if ((!$canEdit) && (!$canEditOwn)) {
-						echo htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8');
-					} else {
-					?>
-						<?php echo ($i+1).". "; ?>
-						<a href="<?php echo $link; ?>" title="<?php echo $edit_item_txt; ?>" <?php echo $onclick_modal_edit; ?>>
-							<?php echo htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8'); ?>
-						</a>
-					<?php
-					}
+					echo JHtml::_($hlpname . '.edit_link', $row, $i, $row->canEdit, $config = array(
+						'ctrl'     => 'items',
+						'view'     => 'item',
+						'onclick'  => 'var url = jQuery(this).attr(\'data-href\'); var the_dialog = fc_showDialog(url, \'fc_modal_popup_container\', 0, 0, 0, fc_edit_fcitem_modal_close, {title:\'' . JText::_('FLEXI_EDIT', true) . '\', loadFunc: fc_edit_fcitem_modal_load}); return false;" ',
+					));
 					?>
 					</td>
 					<td><?php echo JHtml::_('date',  $row->created); ?></td>
@@ -720,26 +705,22 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 			<?php
 				$k = 0;
 				$n = count($this->draft);
-				for ($i=0, $n; $i < $n; $i++) {
-					$row = $this->draft[$i];
-					$rights = FlexicontentHelperPerm::checkAllItemAccess($user->id, 'item', $row->id);
-					$canEdit 		= in_array('edit', $rights);
-					$canEditOwn	= in_array('edit.own', $rights) && $row->created_by == $user->id;
-					$link = 'index.php?option=com_flexicontent&amp;'.$items_task.'edit&amp;cid='. $row->id;
+
+				for ($i = 0, $n; $i < $n; $i++)
+				{
+					$row          = $this->draft[$i];
+					$assetName    = 'com_content.article.' . $row->id;
+					$isAuthor     = $row->created_by && $row->created_by == $user->id;
+					$row->canEdit = $user->authorise('core.edit', $assetName) || ($isAuthor && $user->authorise('core.edit.own', $assetName));
 			?>
 				<tr>
 					<td>
 					<?php
-					if ((!$canEdit) && (!$canEditOwn)) {
-						echo htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8');
-					} else {
-					?>
-						<?php echo ($i+1).". "; ?>
-						<a href="<?php echo $link; ?>" title="<?php echo $edit_item_txt; ?>" <?php echo $onclick_modal_edit; ?>>
-							<?php echo htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8'); ?>
-						</a>
-					<?php
-					}
+					echo JHtml::_($hlpname . '.edit_link', $row, $i, $row->canEdit, $config = array(
+						'ctrl'     => 'items',
+						'view'     => 'item',
+						'onclick'  => 'var url = jQuery(this).attr(\'data-href\'); var the_dialog = fc_showDialog(url, \'fc_modal_popup_container\', 0, 0, 0, fc_edit_fcitem_modal_close, {title:\'' . JText::_('FLEXI_EDIT', true) . '\', loadFunc: fc_edit_fcitem_modal_load}); return false;" ',
+					));
 					?>
 					</td>
 					<td><?php echo JHtml::_('date',  $row->created); ?></td>

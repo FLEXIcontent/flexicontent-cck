@@ -46,7 +46,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 
 		$use_tmp = true;
 		$query_select_ids = 'SELECT SQL_CALC_FOUND_ROWS c.id';
-		$query_select_data = 'SELECT c.id, c.title, c.catid, c.created, cr.name as creator, c.created_by, c.modified, c.modified_by, mr.name as modifier';
+		$query_select_data = 'SELECT c.id, c.title, c.catid, c.created, cr.name as creator, c.created_by, c.modified, c.modified_by, mr.name as modifier, c.checked_out';
 
 		$query_from_join = ''
 				. ' FROM '.($use_tmp ? '#__flexicontent_items_tmp' : '#__content').' as c'
@@ -69,8 +69,10 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		$total = $this->_db->loadResult();
 
 		$genstats = array();
-		if ( !empty($ids) ) {
-			$query = $query_select_data . $query_from_join . ' WHERE c.id IN ('.implode(',',$ids).')';
+
+		if (!empty($ids))
+		{
+			$query = $query_select_data . str_replace('#__flexicontent_items_tmp', '#__content', $query_from_join) . ' WHERE c.id IN ('.implode(',',$ids).')';
 			$this->_db->SetQuery($query, 0, 5);
 			$_data = $this->_db->loadObjectList('id');
 
@@ -94,7 +96,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 
 		$use_tmp = true;
 		$query_select_ids = 'SELECT SQL_CALC_FOUND_ROWS c.id'.', c.version, MAX(fv.version_id)';
-		$query_select_data = 'SELECT c.id, c.title, c.catid, c.created, cr.name as creator, c.created_by, c.modified, c.modified_by, mr.name as modifier'
+		$query_select_data = 'SELECT c.id, c.title, c.catid, c.created, cr.name as creator, c.created_by, c.modified, c.modified_by, mr.name as modifier, c.checked_out'
 			.', c.version, MAX(fv.version_id)';
 
 		$query_from_join = ''
@@ -121,9 +123,10 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		$total = $this->_db->loadResult();
 
 		$genstats = array();
-		if ( !empty($ids) )
+
+		if (!empty($ids))
 		{
-			$query = $query_select_data . $query_from_join . ' WHERE c.id IN ('.implode(',',$ids).')'
+			$query = $query_select_data . str_replace('#__flexicontent_items_tmp', '#__content', $query_from_join) . ' WHERE c.id IN ('.implode(',',$ids).')'
 				.' GROUP BY fv.item_id ';
 			$this->_db->SetQuery($query, 0, 5);
 			$_data = $this->_db->loadObjectList('id');
@@ -149,7 +152,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 
 		$use_tmp = true;
 		$query_select_ids = 'SELECT SQL_CALC_FOUND_ROWS c.id';
-		$query_select_data = 'SELECT c.id, c.title, c.catid, c.created, cr.name as creator, c.created_by, c.modified, c.modified_by, mr.name as modifier';
+		$query_select_data = 'SELECT c.id, c.title, c.catid, c.created, cr.name as creator, c.created_by, c.modified, c.modified_by, mr.name as modifier, c.checked_out';
 
 		$query_from_join = ''
 				. ' FROM '.($use_tmp ? '#__flexicontent_items_tmp' : '#__content').' as c'
@@ -172,8 +175,10 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		$total = $this->_db->loadResult();
 
 		$genstats = array();
-		if ( !empty($ids) ) {
-			$query = $query_select_data . $query_from_join . ' WHERE c.id IN ('.implode(',',$ids).')';
+
+		if (!empty($ids))
+		{
+			$query = $query_select_data . str_replace('#__flexicontent_items_tmp', '#__content', $query_from_join) . ' WHERE c.id IN ('.implode(',',$ids).')';
 			$this->_db->SetQuery($query, 0, 5);
 			$_data = $this->_db->loadObjectList('id');
 
@@ -197,7 +202,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 
 		$use_tmp = true;
 		$query_select_ids = 'SELECT SQL_CALC_FOUND_ROWS c.id';
-		$query_select_data = 'SELECT c.id, c.title, c.catid, c.created, cr.name as creator, c.created_by, c.modified, c.modified_by, mr.name as modifier';
+		$query_select_data = 'SELECT c.id, c.title, c.catid, c.created, cr.name as creator, c.created_by, c.modified, c.modified_by, mr.name as modifier, c.checked_out';
 
 		$query_from_join = ''
 				. ' FROM '.($use_tmp ? '#__flexicontent_items_tmp' : '#__content').' as c'
@@ -220,8 +225,10 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		$total = $this->_db->loadResult();
 
 		$genstats = array();
-		if ( !empty($ids) ) {
-			$query = $query_select_data . $query_from_join . ' WHERE c.id IN ('.implode(',',$ids).')';
+
+		if (!empty($ids))
+		{
+			$query = $query_select_data . str_replace('#__flexicontent_items_tmp', '#__content', $query_from_join) . ' WHERE c.id IN ('.implode(',',$ids).')';
 			$this->_db->SetQuery($query, 0, 5);
 			$_data = $this->_db->loadObjectList('id');
 
