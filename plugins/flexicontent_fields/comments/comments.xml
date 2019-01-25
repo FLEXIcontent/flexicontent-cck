@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="utf-8"?>
+<extension type="plugin" version="1.6" group="flexicontent_fields" method="upgrade">
+	<name>PLG_FLEXICONTENT_FIELDS_COMMENTS</name>
+	<author>Yannick Berges, George Papadakis</author>
+	<creationDate>Jan 2019</creationDate>
+	<copyright>Copyright (C) 2009-2019 Berges Yannick</copyright>
+	<license>GNU/GPL v2</license>
+	<authorEmail>yannick@com3elles.com</authorEmail>
+	<authorUrl>www.flexicontent.org</authorUrl>
+	<version>1</version>
+	<documentation url="http://www.flexicontent.org/documentation/faq.html" title="FLEXI_ABOUT" modal="1" icon="info" />
+	<description>PLG_FLEXICONTENT_FIELDS_COMMENTS_DESC</description>
+
+	<files>
+		<filename plugin="comments">comments.php</filename>
+		<filename>index.html</filename>
+	</files>
+
+	<config>
+	<fields name="attribs">
+
+		<!--fieldset name="standard" hidden="true">
+		</fieldset-->
+
+		<fieldset name="group-comments-api" hidden="true" icon_class="icon-screen" label="PLG_FLEXICONTENT_FIELDS_COMMENTS_API_TITLE" addfieldpath="/administrator/components/com_flexicontent/elements">
+
+			<field name="" type="separator" default="PLG_FLEXICONTENT_FIELDS_COMMENTS_API_TITLE" level="level1" />
+			<field name="comment_api" type="multilist" subtype="radio" toggle_related="1" default="0" label="PLG_FLEXICONTENT_FIELDS_COMMENTS_API" description="PLG_FLEXICONTENT_FIELDS_COMMENTS_API_DESC" class="btn-group btn-group-yesno">
+				<option value="disqus" show_list="disqusoption" hide_list="facebookoption">Disqus</option>
+				<option value="facebook" show_list="facebookoption" hide_list="disqusoption">Facebook</option>
+			</field>
+			<field
+				name="method_category" type="multilist" subtype="radio" toggle_related="1" default="0"
+				label="PLG_FLEXICONTENT_FIELDS_COMMENTS_EXCL_CATEGORIES" description="PLG_FLEXICONTENT_FIELDS_COMMENTS_EXCL_CATEGORIES_DESC"
+				class="btn-group group-fcmethod"
+				>
+				<option value="0" show_list="" hide_list="catoption">PLG_FLEXICONTENT_FIELDS_COMMENTS_CATEGORYMETHODE_NONE</option>
+				<option value="1" show_list="catoption" hide_list="">PLG_FLEXICONTENT_FIELDS_COMMENTS_CATEGORYMETHODE_INCLUDE</option>
+				<option value="-1" show_list="catoption" hide_list="">PLG_FLEXICONTENT_FIELDS_COMMENTS_CATEGORYMETHODE_EXCLUDE</option>
+			</field>
+
+			<field name="catid" type="flexicategories" multiple="true" label="PLG_FLEXICONTENT_FIELDS_COMMENTS_CAT" description="PLG_FLEXICONTENT_FIELDS_COMMENTS_CAT_DESC" depend_class="catoption"/>
+
+				<field name="" type="separator" default="PLG_FLEXICONTENT_FIELDS_COMMENTS_API_DISQUS" description="PLG_FLEXICONTENT_FIELDS_API_FB_LANGUAGE_DESC" level="level1" depend_class="disqusoption" />
+				<field
+					name="pforum_shortname"
+					type="text"
+					default=""
+					size="40"
+					label="PLG_FLEXICONTENT_FIELDS_COMMENTS_DISQUS_FORMNAME"
+					description="PLG_FLEXICONTENT_FIELDS_COMMENTS_DISQUS_FORMNAME_DESC"
+					depend_class="disqusoption"/>
+
+					<field
+						name=""
+						type="separator"
+						default="PLG_FLEXICONTENT_FIELDS_COMMENTS_GET_DISQUSAPI_KEY_INFO"
+						level="level3"
+						class="alert alert-success"
+						depend_class="disqusoption"/>
+						/>
+
+			<field name="" type="separator" default="PLG_FLEXICONTENT_FIELDS_COMMENTS_API_FB" description="PLG_FLEXICONTENT_FIELDS_API_FB_LANGUAGE_DESC" level="level1" depend_class="facebookoption" />
+			<field
+				name="fappId"
+				type="text"
+				default=""
+				size="40"
+				label="PLG_FLEXICONTENT_FIELDS_COMMENTS_APPID"
+				description="PLG_FLEXICONTENT_FIELDS_COMMENTS_APPID_DESC"
+				depend_class="facebookoption"/>
+			<field
+				name="fadminID"
+				type="text"
+				default=""
+				size="60"
+				label="PLG_FLEXICONTENT_FIELDS_COMMENTS_ADMIN_ID"
+				description="PLG_FLEXICONTENT_FIELDS_COMMENTS_ADMIN_ID_DESC"
+				depend_class="facebookoption"/>
+
+			<field
+				name=""
+				type="separator"
+				default="PLG_FLEXICONTENT_FIELDS_COMMENTS_GET__FBAPI_KEY_INFO"
+				level="level3"
+				class="alert alert-success"
+				depend_class="facebookoption"/>
+				/>
+
+				<field name="" type="separator" default="PLG_FLEXICONTENT_FIELDS_COMMENTS_LANGUAGE" description="PLG_FLEXICONTENT_FIELDS_COMMENTS_LANGUAGE_DESC" level="level1" />
+			<field name="autolanguage" type="multilist" subtype="radio" toggle_related="1" default="0" label="PLG_FLEXICONTENT_FIELDS_COMMENTS_AUTOLANGUAGE" description="PLG_FLEXICONTENT_FIELDS_COMMENTS_AUTOLANGUAGE_DESC" class="btn-group btn-group-yesno">
+				<option value="0" show_list="selectlang" hide_list="">FLEXI_NO</option>
+				<option value="1" show_list="" hide_list="selectlang">FLEXI_YES</option>
+			</field>
+			<field name="comment_language" type="list" label="PLG_FLEXICONTENT_FIELDS_COMMENTS_LANGUAGE" description="PLG_FLEXICONTENT_FIELDS_COMMENTS_LANGUAGE_DESC" default="en_GB" depend_class="selectlang">
+				<option value="af_ZA">Afrikaans</option>
+				<option value="gn_PY">Guaraní</option>
+				<option value="ay_BO">Aymara</option>
+				<option value="az_AZ">Azeri</option>
+				<option value="id_ID">Indonesian</option>
+				<option value="ms_MY">Malay</option>
+				<option value="jv_ID">Javanese</option>
+				<option value="bs_BA">Bosnian</option>
+				<option value="ca_ES">Catalan</option>
+				<option value="cs_CZ">Czech</option>
+				<option value="ck_US">Cherokee</option>
+				<option value="cy_GB">Welsh</option>
+				<option value="da_DK">Danish</option>
+				<option value="se_NO">Northern Sámi</option>
+				<option value="de_DE">German</option>
+				<option value="et_EE">Estonian</option>
+				<option value="ثn_IN">English (India)</option>
+				<option value="en_PI">English (Pirate)</option>
+				<option value="en_GB">English (UK)</option>
+				<option value="en_UD">English (Upside Down)</option>
+				<option value="en_US">English (US)</option>
+				<option value="es_LA">Spanish</option>
+				<option value="es_CL">Spanish (Chile)</option>
+				<option value="es_CO">Spanish (Colombia)</option>
+				<option value="es_ES">Spanish (Spain)</option>
+				<option value="es_MX">Spanish (Mexico)</option>
+				<option value="es_VE">Spanish (Venezuela)</option>
+				<option value="eo_EO">Esperanto</option>
+				<option value="eu_ES">Basque</option>
+				<option value="tl_PH">Filipino</option>
+				<option value="fo_FO">Faroese</option>
+				<option value="fr_FR">French (France)</option>
+				<option value="fr_CA">French (Canada)</option>
+				<option value="fy_NL">Frisian</option>
+				<option value="ga_IE">Irish</option>
+				<option value="gl_ES">Galician</option>
+				<option value="ko_KR">Korean</option>
+				<option value="hr_HR">Croatian</option>
+				<option value="xh_ZA">Xhosa</option>
+				<option value="zu_ZA">Zulu</option>
+				<option value="is_IS">Icelandic</option>
+				<option value="it_IT">Italian</option>
+				<option value="ka_GE">Georgian</option>
+				<option value="sw_KE">Swahili</option>
+				<option value="tl_ST">Klingon</option>
+				<option value="ku_TR">Kurdish</option>
+				<option value="lv_LV">Latvian</option>
+				<option value="fb_LT">Leet Speak</option>
+				<option value="lt_LT">Lithuanian</option>
+				<option value="li_NL">Limburgish</option>
+				<option value="la_VA">Latin</option>
+				<option value="hu_HU">Hungarian</option>
+				<option value="mg_MG">Malagasy</option>
+				<option value="mt_MT">Maltese</option>
+				<option value="nl_NL">Dutch</option>
+				<option value="nl_BE">Dutch (België)</option>
+				<option value="ja_JP">Japanese</option>
+				<option value="nb_NO">Norwegian (bokmal)</option>
+				<option value="nn_NO">Norwegian (nynorsk)</option>
+				<option value="uz_UZ">Uzbek</option>
+				<option value="pl_PL">Polish</option>
+				<option value="pt_BR">Portuguese (Brazil)</option>
+				<option value="pt_PT">Portuguese (Portugal)</option>
+				<option value="qu_PE">Quechua</option>
+				<option value="ro_RO">Romanian</option>
+				<option value="rm_CH">Romansh</option>
+				<option value="ru_RU">Russian</option>
+				<option value="sq_AL">Albanian</option>
+				<option value="sk_SK">Slovak</option>
+				<option value="sl_SI">Slovenian</option>
+				<option value="so_SO">Somali</option>
+				<option value="fi_FI">Finnish</option>
+				<option value="sv_SE">Swedish</option>
+				<option value="th_TH">Thai</option>
+				<option value="vi_VN">Vietnamese</option>
+				<option value="tr_TR">Turkish</option>
+				<option value="zh_CN">Simplified Chinese (China)</option>
+				<option value="zh_TW">Traditional Chinese (Taiwan)</option>
+				<option value="zh_HK">Traditional Chinese (Hong Kong)</option>
+				<option value="el_GR">Greek</option>
+				<option value="gx_GR">Classical Greek</option>
+				<option value="be_BY">Belarusian</option>
+				<option value="bg_BG">Bulgarian</option>
+				<option value="kk_KZ">Kazakh</option>
+				<option value="mk_MK">Macedonian</option>
+				<option value="mn_MN">Mongolian</option>
+				<option value="sr_RS">Serbian</option>
+				<option value="tt_RU">Tatar</option>
+				<option value="tg_TJ">Tajik</option>
+				<option value="uk_UA">Ukrainian</option>
+				<option value="hy_AM">Armenian</option>
+				<option value="yi_DE">Yiddish</option>
+				<option value="he_IL">Hebrew</option>
+				<option value="ur_PK">Urdu</option>
+				<option value="ar_AR">Arabic</option>
+				<option value="ps_AF">Pashto</option>
+				<option value="fa_IR">Persian</option>
+				<option value="sy_SY">Syriac</option>
+				<option value="ne_NP">Nepali</option>
+				<option value="mr_IN">Marathi</option>
+				<option value="sa_IN">Sanskrit</option>
+				<option value="hi_IN">Hindi</option>
+				<option value="bn_IN">Bengali</option>
+				<option value="pa_IN">Punjabi</option>
+				<option value="gu_IN">Gujarati</option>
+				<option value="ta_IN">Tamil</option>
+				<option value="te_IN">Telugu</option>
+				<option value="kn_IN">Kannada</option>
+				<option value="ml_IN">Malayalam</option>
+				<option value="km_KH">Khmer</option>
+			</field>
+
+		</fieldset>
+		<fieldset name="group-comments-viewing" hidden="true" icon_class="icon-users" label="PLG_FLEXICONTENT_FIELDS_VIEWING" addfieldpath="/administrator/components/com_flexicontent/elements">
+			<field name="" type="separator" default="PLG_FLEXICONTENT_FIELDS_COMMENTS_FB_DISPLAY" description="PLG_FLEXICONTENT_FIELDS_COMMENTS_FB_DISPLAY_DESC" level="level1" depend_class="facebookoption" />
+			<field name="" type="separator" default="PLG_FLEXICONTENT_FIELDS_COMMENTS_DISQUS_DISPLAY" description="PLG_FLEXICONTENT_FIELDS_COMMENTS_DISQUS_DISPLAY_DESC" level="level1" depend_class="disqusoption" />
+			<field
+				name="fdata-num-posts"
+				type="text"
+				default="4"
+				size="10"
+				label="PLG_FLEXICONTENT_FIELDS_COMMENTS_NUM_POSTS"
+				description="PLG_FLEXICONTENT_FIELDS_COMMENTS_NUM_POSTS_DESC"
+				depend_class="facebookoption"/>
+			<field
+				name="fdata-width"
+				type="text"
+				default="500"
+				size="10"
+				label="PLG_FLEXICONTENT_FIELDS_COMMENTS_WIDTH"
+				description="PLG_FLEXICONTENT_FIELDS_COMMENTS_WIDTH_DESC"
+				depend_class="facebookoption" />
+			<field
+				name="fdata-colorscheme"
+				type="list"
+				default=""
+				label="PLG_FLEXICONTENT_FIELDS_COMMENTS_COLORSCHEME"
+				description="PLG_FLEXICONTENT_FIELDS_COMMENTS_COLORSCHEME_DESC"
+				depend_class="facebookoption">
+					<option value="">Light</option>
+					<option value="dark">Dark</option></field>
+		</fieldset>
+	</fields>
+	</config>
+
+	<languages>
+		<language tag="en-GB">en-GB.plg_flexicontent_fields_comments.ini</language>
+	</languages>
+
+</extension>
