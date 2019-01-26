@@ -207,6 +207,7 @@ class FlexicontentModelItems extends FCModelAdminList
 		$filter_author = $fcform ? $jinput->get('filter_author', false, 'array')  :  $app->getUserStateFromRequest( $p.'filter_author', 'filter_author', false, 'array');
 		$filter_state  = $fcform ? $jinput->get('filter_state',  false, 'array')  :  $app->getUserStateFromRequest( $p.'filter_state',  'filter_state',  false, 'array');
 		$filter_access = $fcform ? $jinput->get('filter_access', false, 'array')  :  $app->getUserStateFromRequest( $p.'filter_access', 'filter_access', false, 'array');
+		$filter_meta   = $fcform ? $jinput->get('filter_meta',   '',    'int')    :  $app->getUserStateFromRequest( $p.'filter_meta',   'filter_meta',   '',    'int');
 
 		if (!is_array($filter_tag))    $filter_tag    = strlen($filter_tag)    ? array($filter_tag)    : array();
 		if (!is_array($filter_lang))   $filter_lang   = strlen($filter_lang)   ? array($filter_lang)   : array();
@@ -214,6 +215,7 @@ class FlexicontentModelItems extends FCModelAdminList
 		if (!is_array($filter_author)) $filter_author = strlen($filter_author) ? array($filter_author) : array(); // Support for ZERO author id
 		if (!is_array($filter_state))  $filter_state  = strlen($filter_state)  ? array($filter_state)  : array();
 		if (!is_array($filter_access)) $filter_access = strlen($filter_access) ? array($filter_access) : array();
+		//if (!is_array($filter_meta))   $filter_meta   = strlen($filter_meta)   ? array($filter_meta)   : array();
 
 		$this->setState('filter_tag', $filter_tag);
 		$this->setState('filter_lang', $filter_lang);
@@ -221,6 +223,7 @@ class FlexicontentModelItems extends FCModelAdminList
 		$this->setState('filter_author', $filter_author);
 		$this->setState('filter_state', $filter_state);
 		$this->setState('filter_access', $filter_access);
+		$this->setState('filter_meta', $filter_meta);
 
 		$app->setUserState($p . 'filter_tag', $filter_tag);
 		$app->setUserState($p . 'filter_lang', $filter_lang);
@@ -228,6 +231,7 @@ class FlexicontentModelItems extends FCModelAdminList
 		$app->setUserState($p . 'filter_author', $filter_author);
 		$app->setUserState($p . 'filter_state', $filter_state);
 		$app->setUserState($p . 'filter_access', $filter_access);
+		$app->setUserState($p . 'filter_meta', $filter_meta);
 
 
 		// Date filters
@@ -974,6 +978,7 @@ class FlexicontentModelItems extends FCModelAdminList
 		$filter_tag 		= $this->getState('filter_tag');
 		$filter_state   = $this->getState('filter_state');
 		$filter_order   = $this->getState('filter_order');
+		$filter_meta    = $this->getState('filter_meta');
 
 		$filter_cats        = $this->getState('filter_cats');
 		$filter_subcats     = $this->getState('filter_subcats');
@@ -1051,7 +1056,7 @@ class FlexicontentModelItems extends FCModelAdminList
 		$scope  = $this->getState('scope');
 		$search = $this->getState('search');
 
-		$use_tmp = !$query_ids && (!$search || !in_array($scope, array('_desc_', '_meta_', 'a.metadesc', 'a.metakey')));
+		$use_tmp = !$query_ids && !$filter_meta && (!$search || !in_array($scope, array('_desc_', '_meta_', 'a.metadesc', 'a.metakey')));
 		$tmp_only = $use_tmp && (!$search || $scope !== 'ie.search_index');
 
 		// Get the WHERE and ORDER BY clauses for the query
@@ -1249,6 +1254,7 @@ class FlexicontentModelItems extends FCModelAdminList
 		$filter_author	= $this->getState('filter_author');
 		$filter_state   = $this->getState('filter_state');
 		$filter_access  = $this->getState('filter_access');
+		$filter_meta    = $this->getState('filter_meta');
 
 		// category related filters
 		$filter_cats        = $this->getState('filter_cats');
@@ -1508,6 +1514,23 @@ class FlexicontentModelItems extends FCModelAdminList
 		{
 			$filter_access = ArrayHelper::toInteger($filter_access);
 			$where[] = 'a.access IN (' . implode( ',', $filter_access) .')';
+		}
+
+
+		if (!empty($filter_meta))
+		{
+			switch($filter_meta)
+			{
+				case 1: 
+					$where[] = 'a.metakey = ' . $this->_db->Quote('');
+					break;
+				case 2: 
+					$where[] = 'a.metadesc = ' . $this->_db->Quote('');
+					break;
+				case 3: 
+					$where[] = '(a.metakey = ' . $this->_db->Quote('') . ' OR a.metadesc = ' . $this->_db->Quote('') . ')';
+					break;
+			}
 		}
 
 
