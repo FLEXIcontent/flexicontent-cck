@@ -247,7 +247,7 @@ class FlexicontentViewReviews extends FlexicontentViewBaseRecords
 
 		$lists['scope_tip'] = '';
 		$lists['scope'] = $this->getScopeSelectorDisplay($scopes, $scope);
-		$this->scope_title = $scopes[$scope];
+		$this->scope_title = isset($scopes[$scope]) ? $scopes[$scope] : reset($scopes);
 
 
 		// Text search filter value

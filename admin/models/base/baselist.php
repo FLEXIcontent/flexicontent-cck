@@ -181,7 +181,7 @@ abstract class FCModelAdminList extends JModelList
 		$app->setUserState($p . 'filter_id', $filter_id);
 
 		// Text search scope
-		$default_scope = in_array($this->name_col, $this->search_cols) ? 'a.' . $this->name_col : '-1';
+		$default_scope = ''; //in_array($this->name_col, $this->search_cols) ? 'a.' . $this->name_col : '-1';
 		$scope = $fcform ? $jinput->get('scope', $default_scope , 'cmd') : $app->getUserStateFromRequest($p . 'scope', 'scope', $default_scope, 'cmd');
 		$this->setState('scope', $scope);
 		$app->setUserState($p . 'scope', $scope);

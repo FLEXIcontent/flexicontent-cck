@@ -658,7 +658,7 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 
 		$lists['scope_tip'] = ''; //'<span class="hidden-phone ' . $this->tooltip_class . '" title="'.JText::_('FLEXI_SEARCH_TEXT_INSIDE').'" style="display: inline-block;"><i class="icon-info-2"></i></span>';
 		$lists['scope'] = $this->getScopeSelectorDisplay($scopes, $scope);
-		$this->scope_title = $scopes[$scope];
+		$this->scope_title = isset($scopes[$scope]) ? $scopes[$scope] : reset($scopes);
 
 
 		// Text search filter value
