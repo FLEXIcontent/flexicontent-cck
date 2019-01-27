@@ -1567,8 +1567,8 @@ body .fc-nowrap-box .nowrap_box .label,
 #flexicontent [class*="fc-xpended"] div.select2-container .select2-choice > .select2-chosen,
 #flexicontent [class*="fc-xpended"] div.select2-container .select2-choice > .select2-chosen {
 	font-size: 12px;
-	line-height: 26px;
-	min-height: 26px;
+	line-height: 100%;
+	min-height: 100%;
 	font-weight: normal !important;
 }
 #flexicontent [class^="fc-xpended"] select,
@@ -3473,7 +3473,7 @@ select[multiple].use_select2_lib:focus {
 .tooltip .tooltip-inner {
 	white-space: normal !important;
 	word-wrap: break-word !important;
-	min-width: 320px;
+	min-width: 220px;
 }
 div.pane-sliders ul.adminformlist li select {
 	margin-bottom: 0px;

@@ -104,23 +104,29 @@
 
 			<field name="" type="separator" default="FLEXI_FIELD_WEBLINK_URLIMAGE" level="level2" depend_class="not_jurls" />
 			<field name="use_image" type="multilist" subtype="radio" default="0" label="FLEXI_ENABLE_PROPERTY" toggle_related="1" description="FLEXI_ENABLE_PROPERTY_DESC" class="btn-group btn-group-yesno" depend_class="not_jurls" >
-				<option value="0" show_list="" hide_list="hiddefield-mode">FLEXI_NO</option>
-				<option value="1" show_list="hiddefield-mode" hide_list="">FLEXI_YES</option>
+				<option value="0" show_list="" hide_list="fcprop-image,fcprop-specific-images">FLEXI_NO</option>
+				<option value="1" show_list="fcprop-image" hide_list="fcprop-specific-images">FLEXI_YES_SELECT_ANY</option>
+				<option value="2" show_list="fcprop-image,fcprop-specific-images" hide_list="">FLEXI_YES_SELECT_SPECIFIC</option>
 			</field>
-			<field name="default_image" type="media" default="" label="FLEXI_PROPERTY_DEFAULT" depend_class="not_jurls hiddefield-mode" description="FLEXI_PROPERTY_DEFAULT_DESC" />
-			<field name="image_usage" type="list" default="0" label="FLEXI_OPTIONAL_PROPERTIES_DEFAULT_USAGE" depend_class="not_jurls hiddefield-mode" description="FLEXI_OPTIONAL_PROPERTIES_DEFAULT_USAGE_DESC">
+			<field name="default_image" type="media" default="" label="FLEXI_PROPERTY_DEFAULT" depend_class="not_jurls fcprop-image" description="FLEXI_PROPERTY_DEFAULT_DESC" />
+			<field name="image_usage" type="list" default="0" label="FLEXI_OPTIONAL_PROPERTIES_DEFAULT_USAGE" depend_class="not_jurls fcprop-image" description="FLEXI_OPTIONAL_PROPERTIES_DEFAULT_USAGE_DESC">
 				<option value="0">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_NEW</option>
 				<option value="1">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_ALL</option>
 				<option value="2">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_AND_ON_EMPTY</option>
 			</field>
+			<field name="image_choices" type="subform" label="Specific images" description="" layout="joomla.form.field.subform.repeatable-table" icon="list" multiple="true" depend_class="fcprop-specific-images">
+				<form name="specific_images_list" repeat="true">
+					<field name="sub_path" type="media" label="FLEXI_IMAGE" description="" />
+				</form>
+			</field>
 
 			<field name="" type="separator" default="FLEXI_FIELD_WEBLINK_URLTITLE" level="level2" depend_class="not_jurls" />
 			<field name="use_title" type="multilist" subtype="radio" default="0" label="FLEXI_ENABLE_PROPERTY" toggle_related="1" description="FLEXI_ENABLE_PROPERTY_DESC" class="btn-group btn-group-yesno" depend_class="not_jurls" >
-				<option value="0" show_list="" hide_list="hiddefield-mode">FLEXI_NO</option>
-				<option value="1" show_list="hiddefield-mode" hide_list="">FLEXI_YES</option>
+				<option value="0" show_list="" hide_list="fcprop-title">FLEXI_NO</option>
+				<option value="1" show_list="fcprop-title" hide_list="">FLEXI_YES</option>
 			</field>
-			<field name="default_title" type="text" default="" label="FLEXI_PROPERTY_DEFAULT" depend_class="not_jurls hiddefield-mode" description="FLEXI_PROPERTY_DEFAULT_DESC" />
-			<field name="title_usage" type="list" default="0" label="FLEXI_OPTIONAL_PROPERTIES_DEFAULT_USAGE" depend_class="not_jurls hiddefield-mode" description="FLEXI_OPTIONAL_PROPERTIES_DEFAULT_USAGE_DESC">
+			<field name="default_title" type="text" default="" label="FLEXI_PROPERTY_DEFAULT" depend_class="not_jurls fcprop-title" description="FLEXI_PROPERTY_DEFAULT_DESC" />
+			<field name="title_usage" type="list" default="0" label="FLEXI_OPTIONAL_PROPERTIES_DEFAULT_USAGE" depend_class="not_jurls fcprop-title" description="FLEXI_OPTIONAL_PROPERTIES_DEFAULT_USAGE_DESC">
 				<option value="0">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_NEW</option>
 				<option value="1">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_ALL</option>
 				<option value="2">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_AND_ON_EMPTY</option>
@@ -128,37 +134,44 @@
 
 			<field name="" type="separator" default="FLEXI_FIELD_WEBLINK_URLLINK_TEXT" level="level2" depend_class="not_jurls" />
 			<field name="use_text" type="multilist" subtype="radio" default="0" label="FLEXI_ENABLE_PROPERTY" toggle_related="1" description="FLEXI_ENABLE_PROPERTY_DESC" class="btn-group btn-group-yesno" depend_class="not_jurls" >
-				<option value="0" show_list="" hide_list="hiddefield-mode2">FLEXI_NO</option>
-				<option value="1" show_list="hiddefield-mode2" hide_list="">FLEXI_YES</option>
+				<option value="0" show_list="" hide_list="fcprop-linktext">FLEXI_NO</option>
+				<option value="1" show_list="fcprop-linktext" hide_list="">FLEXI_YES</option>
 			</field>
-			<field name="default_text" type="text" default="" label="FLEXI_PROPERTY_DEFAULT" depend_class="not_jurls hiddefield-mode2" description="FLEXI_PROPERTY_DEFAULT_DESC" />
-			<field name="text_usage" type="list" default="0" label="FLEXI_OPTIONAL_PROPERTIES_DEFAULT_USAGE" depend_class="not_jurls hiddefield-mode2" description="FLEXI_OPTIONAL_PROPERTIES_DEFAULT_USAGE_DESC">
+			<field name="default_text" type="text" default="" label="FLEXI_PROPERTY_DEFAULT" depend_class="not_jurls fcprop-linktext" description="FLEXI_PROPERTY_DEFAULT_DESC" />
+			<field name="text_usage" type="list" default="0" label="FLEXI_OPTIONAL_PROPERTIES_DEFAULT_USAGE" depend_class="not_jurls fcprop-linktext" description="FLEXI_OPTIONAL_PROPERTIES_DEFAULT_USAGE_DESC">
 				<option value="0">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_NEW</option>
 				<option value="1">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_ALL</option>
 				<option value="2">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_AND_ON_EMPTY</option>
 			</field>
+
+			<field name="" type="separator" default="FLEXI_FIELD_WEBLINK_URLADDRTYPE" level="level2" depend_class="not_jurls" />
+			<field name="use_addrtype" type="multilist" subtype="radio" default="0" label="FLEXI_ENABLE_PROPERTY" toggle_related="1" description="FLEXI_ENABLE_PROPERTY_DESC" class="btn-group btn-group-yesno" depend_class="not_jurls" >
+				<option value="0" show_list="" hide_list="fcprop-addrtype">FLEXI_NO</option>
+				<option value="2" show_list="fcprop-addrtype" hide_list="">FLEXI_YES</option>
+			</field>
+			<field name="addrtype_choices" type="textarea" filter="RAW" default="" label="FLEXI_PROPERTY_SELECT_CHOICES" depend_class="not_jurls fcprop-addrtype" description="FLEXI_PROPERTY_SELECT_CHOICES_DESC" rows="5" cols="25" />
 
 			<field name="" type="separator" default="FLEXI_FIELD_WEBLINK_URLCLASS" level="level2" depend_class="not_jurls" />
 			<field name="use_class" type="multilist" subtype="radio" default="0" label="FLEXI_ENABLE_PROPERTY" toggle_related="1" description="FLEXI_ENABLE_PROPERTY_DESC" class="btn-group btn-group-yesno" depend_class="not_jurls" >
-				<option value="0" show_list="" hide_list="hiddefield-mode3,hiddefield-mode4">FLEXI_NO</option>
-				<option value="1" show_list="hiddefield-mode3" hide_list="hiddefield-mode4">FLEXI_YES</option>
-				<option value="2" show_list="hiddefield-mode3,hiddefield-mode4" hide_list="">FLEXI_YES_AS_SELECT</option>
+				<option value="0" show_list="" hide_list="fcfield-class-as-txt,fcfield-class-as-sel">FLEXI_NO</option>
+				<option value="1" show_list="fcfield-class-as-txt" hide_list="fcfield-class-as-sel">FLEXI_YES_AS_TEXT_INPUT</option>
+				<option value="2" show_list="fcfield-class-as-txt,fcfield-class-as-sel" hide_list="">FLEXI_YES_AS_SELECT</option>
 			</field>
-			<field name="default_class" type="text" default="" label="FLEXI_PROPERTY_DEFAULT" depend_class="not_jurls hiddefield-mode3" description="FLEXI_PROPERTY_DEFAULT_DESC" />
-			<field name="class_usage" type="list" default="0" label="FLEXI_OPTIONAL_PROPERTIES_DEFAULT_USAGE" depend_class="not_jurls hiddefield-mode3" description="FLEXI_OPTIONAL_PROPERTIES_DEFAULT_USAGE_DESC">
+			<field name="default_class" type="text" default="" label="FLEXI_PROPERTY_DEFAULT" depend_class="not_jurls fcfield-class-as-txt" description="FLEXI_PROPERTY_DEFAULT_DESC" />
+			<field name="class_usage" type="list" default="0" label="FLEXI_OPTIONAL_PROPERTIES_DEFAULT_USAGE" depend_class="not_jurls fcfield-class-as-txt" description="FLEXI_OPTIONAL_PROPERTIES_DEFAULT_USAGE_DESC">
 				<option value="0">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_NEW</option>
 				<option value="1">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_ALL</option>
 				<option value="2">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_AND_ON_EMPTY</option>
 			</field>
-			<field name="class_choices" type="textarea" filter="RAW" default="" label="FLEXI_PROPERTY_SELECT_CHOICES" depend_class="not_jurls hiddefield-mode4" description="FLEXI_PROPERTY_SELECT_CHOICES_DESC" rows="5" cols="25" />
+			<field name="class_choices" type="textarea" filter="RAW" default="" label="FLEXI_PROPERTY_SELECT_CHOICES" depend_class="not_jurls fcfield-class-as-sel" description="FLEXI_PROPERTY_SELECT_CHOICES_DESC" rows="5" cols="25" />
 
 			<field name="" type="separator" default="FLEXI_FIELD_WEBLINK_URLID" level="level2" depend_class="not_jurls" />
 			<field name="use_id" type="multilist" subtype="radio" default="0" label="FLEXI_ENABLE_PROPERTY" toggle_related="1" description="FLEXI_ENABLE_PROPERTY_DESC" class="btn-group btn-group-yesno" depend_class="not_jurls" >
-				<option value="0" show_list="" hide_list="hiddefield-mode5">FLEXI_NO</option>
-				<option value="1" show_list="hiddefield-mode5" hide_list="">FLEXI_YES</option>
+				<option value="0" show_list="" hide_list="fcprop-tagid">FLEXI_NO</option>
+				<option value="1" show_list="fcprop-tagid" hide_list="">FLEXI_YES</option>
 			</field>
-			<field name="default_id" type="text" default="" label="FLEXI_PROPERTY_DEFAULT" depend_class="not_jurls hiddefield-mode5" description="FLEXI_PROPERTY_DEFAULT_DESC" />
-			<field name="id_usage" type="list" default="0" label="FLEXI_OPTIONAL_PROPERTIES_DEFAULT_USAGE" depend_class="not_jurls hiddefield-mode5" description="FLEXI_OPTIONAL_PROPERTIES_DEFAULT_USAGE_DESC">
+			<field name="default_id" type="text" default="" label="FLEXI_PROPERTY_DEFAULT" depend_class="not_jurls fcprop-tagid" description="FLEXI_PROPERTY_DEFAULT_DESC" />
+			<field name="id_usage" type="list" default="0" label="FLEXI_OPTIONAL_PROPERTIES_DEFAULT_USAGE" depend_class="not_jurls fcprop-tagid" description="FLEXI_OPTIONAL_PROPERTIES_DEFAULT_USAGE_DESC">
 				<option value="0">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_NEW</option>
 				<option value="1">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_ALL</option>
 				<option value="2">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_AND_ON_EMPTY</option>
