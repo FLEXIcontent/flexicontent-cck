@@ -712,6 +712,8 @@ class plgFlexicontent_fieldsWeblink extends FCField
 
 		// URL image
 		$display_image = $field->parameters->get( 'display_image', 1 ) ;
+		$image_w       = (int) $field->parameters->get( 'image_w', 320 ) ;
+		$image_h       = (int) $field->parameters->get( 'image_h', 240 ) ;
 
 		// Playback videos
 		$playback_videos = $field->parameters->get( 'playback_videos', 1 ) ;

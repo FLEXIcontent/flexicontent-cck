@@ -268,14 +268,20 @@
 				<option value="2">FLEXI_TEXT</option>
 				<option value="3">FLEXI_BOTH</option>
 			</field>
-			<field name="display_image" type="radio" default="1" label="Display image" description="Display image if one has beeng associated with the URL" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
 
-			<field name="playback_videos" type="radio" default="1" label="Playback videos" description="Playback video URLs instead of opening the URL" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
+			<field name="" type="separator" default="FLEXI_IMAGE" description="" level="level4" class="alert alert-info fcpadded" />
+			<field name="display_image" type="multilist" subtype="radio" toggle_related="1"  default="1" label="FLEXI_SHOW" description="Display image if one has beeng associated with the URL" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="display_urlimage">FLEXI_NO</option>
+				<option value="1" show_list="display_urlimage" hide_list="">FLEXI_YES</option>
+				<option value="2" show_list="display_urlimage" hide_list="">FLEXI_FIELD_WEBLINK_YES_HIDE_LINKING_TEXT</option>
+			</field>
+			<field name="image_w" type="text" filter="int" default="320" label="FLEXI_IMAGE_WIDTH" description="" depend_class="display_urlimage" />
+			<field name="image_h" type="text" filter="int" default="240" label="FLEXI_IMAGE_HEIGHT" description="" depend_class="display_urlimage" />
+
+			<field name="" type="separator" default="Video URLs" description="" level="level4" class="alert alert-info fcpadded" />
+			<field name="playback_videos" type="radio" default="1" label="FLEXI_BEHAVIOUR" description="Playback video URLs instead of opening the URL" class="btn-group group-fcmethod fcoffactive">
+				<option value="0">Link</option>
+				<option value="1">Playback</option>
 			</field>
 
 			<field name="" type="separator" default="FLEXI_FIELD_VALUE_LIST" description="" icon_class="icon-stack" level="tab_open" box_type="1" />

@@ -116,26 +116,28 @@ foreach ($values as $value)
 	// If linking text is  URL convert from Punycode to UTF8
 	if (empty($linktext))
 	{
-		$linktext = $title ? $title : $this->cleanurl( JStringPunycode::urlToUTF8($link) );
+		$linktext = $title ? $title : $this->cleanurl(JStringPunycode::urlToUTF8($link));
 	}
 
 	// Create URL image with playback icon if it is video
 	$img_tag = '';
 
-	if ($display_image)
+	if ($display_image && $image)
 	{
-		$img_src = ($image && file_exists(JPATH_ROOT . '/' . $image))  ?  JUri::root() . $image  :  $image;
-		$img_tag = $img_src ? '<br>
+		$img_src = file_exists(JPATH_ROOT . '/' . $image)
+			? JUri::root() . $image
+			: $image;
+		$img_tag = ($display_image == 1 ? '<br>' : '') . '
 			<div style="position: relative; display: inline-block;">
-				<img src="' . $img_src . '" alt="' . htmlspecialchars($title, ENT_COMPAT, 'UTF-8') . '" width="160" height="120" style="width: 160px; width: 120px; "/>
+				<img src="' . $img_src . '" alt="' . htmlspecialchars($title, ENT_COMPAT, 'UTF-8') . '" width="' . $image_w . '" height="' . $image_h . '" style="width: ' . $image_w . 'px; width: ' . $image_h . 'px; "/>
 				' . $playbackicon . '
 			</div>
-		' : '';
+		';
 	}
 
 	// Create indirect link to web-link address with custom displayed text
 	$html = '<a href="' .$href. '" '.$link_params.' itemprop="url">'
-		. $linktext
+		. ($img_tag && $display_image == 2 ? '' : $linktext)
 		. $img_tag
 	. '</a>';
 
