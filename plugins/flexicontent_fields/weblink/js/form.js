@@ -28,7 +28,28 @@
 
 		var ajax_url;
 		var ajax_type;
+		var urlType = '';
 
+		// Try youtube
+		var myregexp = /(?:youtube(?:-nocookie)?\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/ ]{11})/i;
+		if (url.match(myregexp) != null)
+		{
+			urlType = "youtube";
+		}
+
+		// Try vimeo
+		var myregexp = /https?:\/\/(www\.)?vimeo.com\/(\d+)($|\/)/;
+		if (url.match(myregexp) != null)
+		{
+			urlType = "vimeo";
+		}
+		
+		if (!urlType)
+		{
+			msg_box.html("<span class=\"alert alert-warning fc-iblock fcpadded\">" + Joomla.JText._('FLEXI_FIELD_WEBLINK_ENTER_MEDIA_URL_WARNING') + "</span>");
+			return;
+		}
+	
 		// try noembed.com
 		ajax_url = "https://noembed.com/embed?url="+encodeURIComponent(url); // TODO check if needed to add more URL vars
 		ajax_type = "json";
@@ -64,14 +85,16 @@
 						if (typeof response.error !== "undefined")
 						{
 							msg_box.html("<span class=\"alert alert-warning fc-iblock fcpadded\">Reply: " + response.error + " <br>This link is a not video / media URL ?</span>");
+
+							// Clear existing value
+							fcfield_weblink.clearImageThumb(jQuery("#"+element_id_n+"_image").get(0), {}, config_name);
 						}
 						else
 						{
 							//fcfield_weblink.noembedCallback(element_id_n, response, config_name);
 							jQuery("#"+element_id_n+"_mediathumburl").val(response.thumbnail_url);
 
-							// Clear existing value
-							fcfield_weblink.clearField(jQuery("#"+element_id_n+"_image").get(0), {}, config_name);
+							// Clear image base path since we will use full URL
 							jQuery("#"+element_id_n+"_image").data('basepath', '');
 
 							// Assign fetched preview URL
@@ -119,28 +142,13 @@
 	}
 
 
-	fcfield_weblink.clearField = function(el, options, config_name)
+	fcfield_weblink.clearImageThumb = function(el, options, config_name)
 	{
-		var box = jQuery(el).closest('.fcfieldval_container');
-
-		options = options || {};
-		options.hide_image = options.hide_image || false;
-		options.keep_props = options.keep_props || false;
-
-		if (options.hide_image)
-		{
-			box.find('.fcimg_preview_box').hide();
-		}
-		else
-		{
-			box.find('.urlimage').val('');
-			box.find('.preview_image').attr('src', 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=');
-
-		}
-		if (options.keep_props)
-		{
-			box.find('input, textarea').val('');
-		}
+		var box   = jQuery(el).closest('.fcfieldval_container');
+		var mm_el = box.find('.urlimage');
+		var mm_id = mm_el.attr('id'); 
+		mm_el.data('basepath', '');
+		jInsertFieldValue('', mm_id);
 	}
 
 	fcfield_weblink.assignVideoImage = function(tagid, file, preview_url, keep_modal, preview_caption, config_name)
