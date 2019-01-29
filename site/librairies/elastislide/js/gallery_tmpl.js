@@ -387,10 +387,15 @@ jQuery(function() {
 					$image.css('z-index', 3).addClass('active'); // Make the newly activated image the top one
 				});*/
 
-				if( title )
+				if (title)
 				{
-					$rgGallery.find('div.rg-caption').show().children('p').empty().text( title );
+					$rgGallery.find('div.rg-caption').show().children('p').empty().text(title);
 				}
+				else
+				{
+					$rgGallery.find('div.rg-caption').hide().children('p').empty();
+				}
+
 				$loader.hide();
 
 				if( mode === 'carousel' )

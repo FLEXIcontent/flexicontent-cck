@@ -26,9 +26,13 @@ class plgFlexicontent_fieldsImage extends FCField
 	static $default_widths  = array('l' => 800,'m' => 400,'s' => 120,'b' => 40);
 	static $default_heights = array('l' => 600,'m' => 300,'s' => 90,'b' => 30);
 
-	static $display_to_thumb_size = array('display_backend_src' => 'b', 'display_small_src' => 's', 'display_medium_src' => 'm', 'display_large_src' => 'l', 'display_original_src' => 'o');
+	static $display_to_thumb_size = array(
+		'display_backend_src' => 'b', 'display_small_src' => 's', 'display_medium_src' => 'm', 'display_large_src' => 'l', 'display_original_src' => 'o',
+		'display_backend_thumb' => 'b', 'display_small_thumb' => 's', 'display_medium_thumb' => 'm', 'display_large_thumb' => 'l', 'display_original_thumb' => 'o',
+	);
 	static $index_to_thumb_size = array(-1 => 'b', 1 => 's', 2 => 'm', 3 => 'l', 4 => 'o');
 
+	static $thumb_only_displays = array('display_backend_thumb' => 0, 'display_small_thumb' => 1, 'display_medium_thumb' => 2, 'display_large_thumb' => 3, 'display_original_thumb' => 4);
 	static $value_only_displays = array('display_backend_src' => 0, 'display_small_src' => 1, 'display_medium_src' => 2, 'display_large_src' => 3, 'display_original_src' => 4);
 	static $single_displays = array('display_single' => 0, 'display_single_total' => 1, 'display_single_link' => 2, 'display_single_total_link' => 3);
 	static $js_added = array();
@@ -1443,7 +1447,7 @@ class plgFlexicontent_fieldsImage extends FCField
 		// *** Check for no values and no default value, and return empty display
 		// ***
 
-		if ( empty($values) )
+		if (empty($values))
 		{
 			$field->{$prop} = $is_ingroup ? array() : '';
 			return;

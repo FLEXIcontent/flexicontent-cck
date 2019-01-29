@@ -83,10 +83,19 @@ foreach ($values as $n => $value)
 // *** Add per field custom JS
 // ***
 
-if ( !isset(static::$js_added[$field->id][__FILE__]) )
+if (!isset(static::$js_added[$field->id][__FILE__]))
 {
 	flexicontent_html::loadFramework('elastislide');
 
+	static::$js_added[$field->id][__FILE__] = array();
+}
+
+// ***
+// *** Add - per (field, item) pair - custom JS
+// ***
+
+if (!isset(static::$js_added[$field->id][__FILE__][$item->id]))
+{
 	$uid = 'es_'.$field->name."_fcitem".$item->id;
 	$js = file_get_contents(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'elastislide'.DS.'js'.DS.'gallery_tmpl.js');
 	$js = str_replace('unique_gal_id', $uid, $js);
@@ -154,7 +163,7 @@ if ( !isset(static::$js_added[$field->id][__FILE__]) )
 	</script>
 	');
 
-	static::$js_added[$field->id][__FILE__] = true;
+	static::$js_added[$field->id][__FILE__][$item->id] = true;
 }
 
 

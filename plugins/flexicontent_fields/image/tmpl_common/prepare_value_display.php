@@ -275,34 +275,63 @@
 	switch ($prop)
 	{
 		case 'display_backend':
+		case 'display_backend_thumb':
 			$img_legend   = '<img src="'.$abs_srcb.'" alt="'.$alt_encoded.'"'.$legend.' class="'.$class.'" itemprop="image" ' . $img_size_attrs . ' />';
 			$img_nolegend = '<img src="'.$abs_srcb.'" alt="'.$alt_encoded.'" class="'.$class.'" itemprop="image" ' . $img_size_attrs . ' />';
 			break;
 
 		case 'display_small':
+		case 'display_small_thumb':
 			$img_legend   = '<img src="'.$abs_srcs.'" alt="'.$alt_encoded.'"'.$legend.' class="'.$class.'" itemprop="image" ' . $img_size_attrs . ' />';
 			$img_nolegend = '<img src="'.$abs_srcs.'" alt="'.$alt_encoded.'" class="'.$class.'" itemprop="image" ' . $img_size_attrs . ' />';
 			break;
 
 		case 'display_medium':
+		case 'display_medium_thumb':
 			$img_legend   = '<img src="'.$abs_srcm.'" alt="'.$alt_encoded.'"'.$legend.' class="'.$class.'" itemprop="image" ' . $img_size_attrs . ' />';
 			$img_nolegend = '<img src="'.$abs_srcm.'" alt="'.$alt_encoded.'" class="'.$class.'" itemprop="image" ' . $img_size_attrs . ' />';
 			break;
 
 		case 'display_large':
+		case 'display_large_thumb':
 			$img_legend   = '<img src="'.$abs_srcl.'" alt="'.$alt_encoded.'"'.$legend.' class="'.$class.'" itemprop="image" ' . $img_size_attrs . ' />';
 			$img_nolegend = '<img src="'.$abs_srcl.'" alt="'.$alt_encoded.'" class="'.$class.'" itemprop="image" ' . $img_size_attrs . ' />';
 			break;
 
 		case 'display_original':
+		case 'display_original_thumb':
 			$img_legend   = '<img src="'.$abs_srco.'" alt="'.$alt_encoded.'"'.$legend.' class="'.$class.'" itemprop="image" ' . $img_size_attrs . ' />';
 			$img_nolegend = '<img src="'.$abs_srco.'" alt="'.$alt_encoded.'" class="'.$class.'" itemprop="image" ' . $img_size_attrs . ' />';
 			break;
 
-		case 'display': default:
+		case 'display':
+		default:
 			$img_legend   = '<img src="'.$abs_src.'" alt="'.$alt_encoded.'"'.$legend.' class="'.$class.'" itemprop="image" ' . $img_size_attrs . ' />';
 			$img_nolegend = '<img src="'.$abs_src.'" alt="'.$alt_encoded.'" class="'.$class.'" itemprop="image" ' . $img_size_attrs . ' />';
 			break;
+	}
+
+
+	/**
+	 * CHECK if we were asked for thumbnail only display
+	 * if so we will not be creating the HTML code for Image / Gallery
+	 */
+
+	if (isset(self::$thumb_only_displays[$prop]))
+	{
+		if ($use_ingroup)
+		{
+			// In case of field displayed via in fieldgroup, this is an array
+			$field->{$prop}[$n] = $img_legend;
+		}
+
+		// Field displayed not via fieldgroup return only the 1st value
+		elseif ($i === 0)
+		{
+			$field->{$prop} = $img_legend;
+		}
+
+		return _FC_CONTINUE_;
 	}
 
 

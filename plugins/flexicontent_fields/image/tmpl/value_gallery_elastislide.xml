@@ -17,12 +17,12 @@
 
 			<field name="" type="separator" default="Slideshow options &lt;small&gt;(Main image) &lt;/small&gt;" level="level1" />
 
-			<field name="PPFX_slideshow_thumb_size" type="radio" default="large" label="Thumbnail size" description="This does not effect the width of display but it effects image quality and loading speed"  depend_class="slideshow_ops" >
+			<field name="PPFX_slideshow_thumb_size" type="radio" default="large" label="Thumbnail size" description="This does not effect the width of display but it effects image quality and loading speed"  depend_class="slideshow_ops" class="btn-group">
 				<option value="medium">FLEXI_MEDIUM</option>
 				<option value="large">FLEXI_LARGE</option>
 			</field>
 
-			<field name="PPFX_slideshow_auto_play" type="radio" default="1" label="Autoplay" description="Auto start slideshow" depend_class="slideshow_ops" >
+			<field name="PPFX_slideshow_auto_play" type="radio" default="1" label="Autoplay" description="Auto start slideshow" depend_class="slideshow_ops" class="btn-group">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
