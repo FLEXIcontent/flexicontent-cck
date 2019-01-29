@@ -2624,16 +2624,28 @@ class FlexicontentFields
 	{
 		$cparams = JComponentHelper::getParams('com_flexicontent');
 		$index_pdf_files = $cparams->get('index_pdf_files', 0);
-		$pdfparser_path = $cparams->get('pdfparser_path', '');
 
 		static $parser = null;
-		if ($parser !== null) return $parser;
+
+		if (!$index_pdf_files || $parser !== null)
+		{
+			return $parser;
+		}
+
 		$parser = false;
 
-		if (!$index_pdf_files || !$pdfparser_path) return $parser;
-
-		jimport('joomla.filesystem.path' );
+		/**
+		 * Smalot\PdfParser (no longer used replaced with smaller alternative)
+		 */
+		/*
+		$pdfparser_path = $cparams->get('pdfparser_path', 'components/com_flexicontent/librairies/pdfparser');
+		jimport('joomla.filesystem.path');
 		$pdfparser_path = JPATH::clean($pdfparser_path);
+
+		if (!$pdfparser_path)
+		{
+			return $parser;
+		}
 
 		if (! is_dir($pdfparser_path) || ! is_readable($pdfparser_path))
 		{
@@ -2654,10 +2666,13 @@ class FlexicontentFields
 			return $parser;
 		}
 
-		// Create paser
-		//require_once(JPATH::clean($vendor_path.DS.'autoload.php'));
-		//require_once(JPATH::clean($pdfparser_path.DS.'src'.DS.'Smalot'.DS.'PdfParser'.DS.'Parser.php'));
-		//$parser = new \Smalot\PdfParser\Parser();
+		// Create parser
+		require_once(JPATH::clean($vendor_path.DS.'autoload.php'));
+		require_once(JPATH::clean($pdfparser_path.DS.'src'.DS.'Smalot'.DS.'PdfParser'.DS.'Parser.php'));
+		$parser = new \Smalot\PdfParser\Parser();
+
+		return $parser;
+		*/
 
 		// Create parser
 		require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'helpers'.DS.'pdf.php');
