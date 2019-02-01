@@ -525,7 +525,6 @@ body .fc-nowrap-box,
 	div.select2-container:first-child .select2-choice .select2-arrow {
 		border-radius: 0;
 	}
-	div.select2-container .select2-choice > .select2-chosen,
 	div.select2-container .select2-choice > .select2-chosen {
 		font-size: 12px;
 		line-height: 100%;
@@ -535,27 +534,20 @@ body .fc-nowrap-box,
 	
 	/* Force proper styling of selects inside an append/prepend group */
 	select,
-	select,
 	div.select2-container > ul.select2-choices,
-	div.select2-container > ul.select2-choices,
-	div.select2-container > a.select2-choice,
 	div.select2-container > a.select2-choice {
 		border-top-left-radius: 6px;
 		border-bottom-left-radius: 6px;
-		border-top-right-radius: 6px;
-		border-bottom-right-radius: 6px;
+		border-top-right-radius: 0px;
+		border-bottom-right-radius: 0px;
 		margin-top: 0;
 		vertical-align: top;
 		font-size: 13px;
 	}
 	
 	fieldset > label.btn:first-of-type,
-	fieldset > label.btn:first-of-type,
-	select:not(:first-child),
 	select:not(:first-child),
 	div.select2-container:not(:first-child) > ul.select2-choices,
-	div.select2-container:not(:first-child) > ul.select2-choices,
-	div.select2-container:not(:first-child) > a.select2-choice,
 	div.select2-container:not(:first-child) > a.select2-choice {
 		border-top-left-radius: 0;
 		border-bottom-left-radius: 0;
@@ -563,14 +555,20 @@ body .fc-nowrap-box,
 		margin-right: 0 !important;
 	}
 	select:not(:last-child),
-	select:not(:last-child),
 	div.select2-container:nth-last-child(n+3) > ul.select2-choices,
-	div.select2-container:nth-last-child(n+3) > ul.select2-choices,
-	div.select2-container:nth-last-child(n+3) > a.select2-choice,
 	div.select2-container:nth-last-child(n+3) > a.select2-choice {
 		border-top-right-radius: 0;
 		border-bottom-right-radius: 0;
-		margin-right: 0 !important;
+	}
+	select:last-child,
+	div.select2-container:nth-last-child(2) {
+		border-top-right-radius: 6px !important;
+		border-bottom-right-radius: 6px !important;
+		> ul.select2-choices,
+		> a.select2-choice {
+			border-top-right-radius: 4px !important;
+			border-bottom-right-radius: 4px !important;
+		}
 	}
 	div.select2-container .select2-input {
 		border-radius: 4px;

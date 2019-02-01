@@ -69,10 +69,13 @@ class plgFlexicontent_fieldsText extends FCField
 		// *** Number of values
 		// ***
 
-		$multiple   = $use_ingroup || (int) $field->parameters->get('allow_multiple', 0);
-		$max_values = $use_ingroup ? 0 : (int) $field->parameters->get('max_values', 0);
-		$required   = (int) $field->parameters->get('required', 0);
+		$multiple     = $use_ingroup || (int) $field->parameters->get('allow_multiple', 0);
+		$max_values   = $use_ingroup ? 0 : (int) $field->parameters->get('max_values', 0);
+		$required     = (int) $field->parameters->get('required', 0);
 		$add_position = (int) $field->parameters->get('add_position', 3);
+
+		// Classes for marking field required
+		$required_class = $required ? ' required' : '';
 
 		// If we are multi-value and not inside fieldgroup then add the control buttons (move, delete, add before/after)
 		$add_ctrl_btns = !$use_ingroup && $multiple;
@@ -128,7 +131,7 @@ class plgFlexicontent_fieldsText extends FCField
 		}
 
 		// Initialise property with default value
-		if ( !$field->value || (count($field->value)==1 && $field->value[0] === null) )
+		if (!$field->value || (count($field->value) === 1 && $field->value[0] === null))
 		{
 			$field->value = $default_values;
 		}
@@ -337,7 +340,7 @@ class plgFlexicontent_fieldsText extends FCField
 		if ($js)  $document->addScriptDeclaration($js);
 		if ($css) $document->addStyleDeclaration($css);
 
-		$classes  = 'fcfield_textval' . ($required ? ' required' : '');
+		$classes  = 'fcfield_textval' . $required_class;
 
 		// Set field to 'Automatic' on successful validation'
 		if ($auto_value)
