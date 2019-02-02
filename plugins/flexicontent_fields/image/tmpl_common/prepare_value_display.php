@@ -266,7 +266,7 @@
 		}
 
 		// Inform browser of real images sizes and of desired image size
-		$img_size_attrs .= ' width="' . $w . '" height="' . $h . '" style="width: auto; height: auto;" ';
+		$img_size_attrs .= ' width="' . $w . '" height="' . $h . '" style="width: auto; height: auto; min-width: 100%;" ';
 		// This following does not combine well with SRCSET / SIZES ...
 		/*$img_size_attrs .= $crop ? ' style="width: ' . $w . 'px; height: ' . $h . 'px;' : ' style="max-width: ' . $w . 'px; max-height: ' . $h . 'px;" ';*/
 	}

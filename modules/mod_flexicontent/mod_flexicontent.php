@@ -98,7 +98,7 @@ $mod_fc_run_times = array();
 require_once(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.helper.php');
 
 static $mod_initialized = null;
-$modulename = 'mod_flexicontent';
+$modulename = $module->module;
 if ($mod_initialized === null)
 {
 	flexicontent_html::loadModuleLanguage($modulename);
@@ -117,12 +117,13 @@ require_once (dirname(__FILE__).DS.'helper.php');
 modFlexicontentHelper::verifyParams( $params );
 
 // Get module ordering & count parameters
-$ordering					= $params->get('ordering', array());
-$ordering_addtitle= $params->get('ordering_addtitle',1);
-$count 					= (int)$params->get('count', 5);
-$featured				= (int)$params->get('count_feat', 1);
+$ordering					 = $params->get('ordering', array());
+$ordering_addtitle = $params->get('ordering_addtitle', 1);
 
-if ( $ordering_addtitle && (int)$params->get('orderbycustomfieldid', 0) && in_array('field', $ordering) )
+$count 					= (int) $params->get('count', 5);
+$featured				= (int) $params->get('count_feat', 1);
+
+if ($ordering_addtitle && (int)$params->get('orderbycustomfieldid', 0) && in_array('field', $ordering))
 {
 	$orderbycustomfieldid = (int)$params->get('orderbycustomfieldid', 0);
 	JTable::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'tables');
@@ -130,14 +131,15 @@ if ( $ordering_addtitle && (int)$params->get('orderbycustomfieldid', 0) && in_ar
 	$orderby_custom_field->load($orderbycustomfieldid);
 }
 
-if ( empty($orderby_custom_field) ) {
+if (empty($orderby_custom_field))
+{
 	$orderby_custom_field = new stdClass();
 	$orderby_custom_field->label = 'NA';
 }
 
 // Default ordering is 'added' if none ordering is set. Also make sure $ordering is an array (of ordering groups)
-if ( empty($ordering) )    $ordering = array('added');
-if (!is_array($ordering))  $ordering = explode(',', $ordering);
+$ordering = empty($ordering) ? array('added') : $ordering;
+$ordering = !is_array($ordering) ? explode(',', $ordering) : $ordering;
 
 // Get module's basic display parameters
 $moduleclass_sfx= $params->get('moduleclass_sfx', '');
@@ -317,7 +319,7 @@ foreach ($catdata_arr as $catid => $catdata)
 	$items_exist = false;
 	foreach ($ordering as $ord)
 	{
-		if ( !empty($list[$ord]['featured']) || !empty($list[$ord]['standard']) )
+		if (!empty($list[$ord]['featured']) || !empty($list[$ord]['standard']))
 		{
 			$items_exist = true;
 			break;
@@ -368,11 +370,9 @@ if ($main_html)
 {
 	$extName = basename(__FILE__, '.php');
 	echo '
-	<div id="' . $extName . '_' . $module->id . '">
 		' . $header_html . '
 		' . $main_html . '
 		' . $footer_html . '
-	</div>
 	';
 }
 
