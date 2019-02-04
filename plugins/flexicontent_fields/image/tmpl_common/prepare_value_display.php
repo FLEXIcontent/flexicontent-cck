@@ -87,9 +87,9 @@
 	$urllink = isset($value['urllink']) ? $value['urllink'] : '';
 	//if ($urllink && false === strpos($urllink, '://')) $urllink = 'http://' . $urllink;
 
-	// Create a popup tooltip (legend)
 	$class = 'fc_field_image';
 
+	// Create a popup tooltip (legend)
 	if ($uselegend && (!empty($title_encoded) || !empty($desc_encoded)))
 	{
 		$class .= ' ' . $tooltip_class;
@@ -266,7 +266,7 @@
 		}
 
 		// Inform browser of real images sizes and of desired image size
-		$img_size_attrs .= ' width="' . $w . '" height="' . $h . '" style="width: auto; height: auto; min-width: 100%;" ';
+		$img_size_attrs .= ' width="' . $w . '" height="' . $h . '" style="height: auto; max-width: 100%;" ';
 		// This following does not combine well with SRCSET / SIZES ...
 		/*$img_size_attrs .= $crop ? ' style="width: ' . $w . 'px; height: ' . $h . 'px;' : ' style="max-width: ' . $w . 'px; max-height: ' . $h . 'px;" ';*/
 	}
