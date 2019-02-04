@@ -60,7 +60,7 @@ foreach ($values as $n => $value)
 	}
 
 	// Inform browser of real images sizes and of desired image size
-	$img_size_attrs .= ' width="' . $w . '" height="' . $h . '" style="width: auto; height: auto; min-width: 100%;" ';
+	$img_size_attrs .= ' width="' . $w . '" height="' . $h . '" style="height: auto; max-width: 100%;" ';
 
 	$title_attr = $desc_encoded ? $desc_encoded : $title_encoded;
 	$img_legend_custom ='
