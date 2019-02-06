@@ -655,7 +655,7 @@ class FlexicontentModelItems extends FCModelAdminList
 		$item_ids = array();
 		foreach($this->_data as $item) $item_ids[] = $item->id;
 		$field_ids = array_keys($this->_extra_cols);
-		$db = JFactory::getDbo();
+
 		$query = 'SELECT field_id, value, item_id, valueorder, suborder'
 				.' FROM #__flexicontent_fields_item_relations'
 				.' WHERE item_id IN (' . implode(',', $item_ids) .')'
@@ -663,11 +663,12 @@ class FlexicontentModelItems extends FCModelAdminList
 				.' AND value > "" '
 				.' ORDER BY item_id, field_id, valueorder, suborder'  // first 2 parts are not needed ...
 				;
-		$db->setQuery($query);
-		$values = $db->loadObjectList();
+		$values = $this->_db->setQuery($query)->loadObjectList();
 
 		$fieldvalues = array();
-		foreach ($values as $v) {
+
+		foreach ($values as $v)
+		{
 			//$field_name = $this->_extra_cols[$v->field_id]->name;
 			$fieldvalues[$v->item_id][ $v->field_id ][$v->valueorder - 1][$v->suborder - 1] = $v->value;
 		}
@@ -897,13 +898,13 @@ class FlexicontentModelItems extends FCModelAdminList
 	function updateItemCountingData($rows = false, $catid = 0)
 	{
 		$app = JFactory::getApplication();
-		$db = JFactory::getDbo();
 
 		$cache_tbl = "#__flexicontent_items_tmp";
 		$tbls = array($cache_tbl);
+
 		foreach ($tbls as $tbl)
 		{
-			$tbl_fields[$tbl] = $db->getTableColumns($tbl);
+			$tbl_fields[$tbl] = $this->_db->getTableColumns($tbl);
 		}
 
 		// Get the column names
@@ -934,8 +935,13 @@ class FlexicontentModelItems extends FCModelAdminList
 		$query .= $row_ids ? ' WHERE c.id IN (' . implode(',', $row_ids) . ')' : '';
 		$query .= $catid ? ' WHERE c.catid = ' . $catid : '';
 
-		$db->setQuery($query);
-		try { $result = $db->execute(); } catch (Exception $e) { $result = false; echo $e->getMessage(); }
+		try {
+			$result = $this->_db->setQuery($query)->execute();
+		}
+		catch (Exception $e) {
+			$result = false;
+			echo $e->getMessage();
+		}
 
 		return $result;
 	}
@@ -1672,9 +1678,12 @@ class FlexicontentModelItems extends FCModelAdminList
 		$_FISH = (boolean) count($this->_db->loadObjectList());
 
 		// Try to find old joomfish tables (with J1.5 jos prefix)
-		if (!$_FISH) {
+		if (!$_FISH)
+		{
 			$this->_db->setQuery('SHOW TABLES LIKE "jos_jf_content"');
-			if ( count($this->_db->loadObjectList()) ) {
+
+			if (count($this->_db->loadObjectList()))
+			{
 				$_FISH = true;
 				$dbprefix = 'jos_';
 			}
@@ -1693,7 +1702,7 @@ class FlexicontentModelItems extends FCModelAdminList
 
 		// Get if translation is to be performed, 1: FLEXI_DUPLICATEORIGINAL,  2: FLEXI_USE_JF_DATA,  3: FLEXI_AUTO_TRANSLATION,  4: FLEXI_FIRST_JF_THEN_AUTO
 		$translate_method = $method == 99
-			? $jinput->get('translate_method', 1, 'int')
+			? $jinput->getInt('translate_method', 1)
 			: $translate_method = 0;
 
 		// If translation method import the translator class
@@ -2124,15 +2133,20 @@ class FlexicontentModelItems extends FCModelAdminList
 	 * @return	boolean	True on success
 	 * @since	1.5
 	 */
-	function moveitem($itemid, $maincat, $seccats = null, $lang, $state=null, $type_id=0, $access=null)
+	function moveitem($itemid, $maincat, $seccats = null, $lang = null, $state = null, $type_id = 0, $access = null)
 	{
 		$item = $this->getTable($this->records_jtable, '');
 		$item->load($itemid);
-		$item->catid    = $maincat ? $maincat : $item->catid;
-		$item->language = $lang ? $lang : $item->language;
-		$item->state    = strlen($state) ? $state : $item->state;  // keep original if: null, ''
-		$item->type_id  = $type_id ? $type_id : $item->type_id;    // keep original if: null, zero, ''
-		$item->access   = $access ? $access : $item->access;       // keep original if: null, zero, ''
+
+		// Keep original if: null, zero, ''
+		$item->catid    = $maincat ?: $item->catid;
+		$item->language = $lang ?: $item->language;
+		$item->type_id  = $type_id ?: $item->type_id;
+		$item->access   = $access ?: $item->access;
+
+		// keep original if: null, ''
+		$item->state = strlen($state) ? $state : $item->state;
+
 		$item->store();
 
 		if ($seccats === null)
