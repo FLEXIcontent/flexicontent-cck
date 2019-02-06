@@ -207,6 +207,7 @@ class plgFlexicontent_fieldsCore extends FCField
 			if (!$closetag_cacheable) $closetag		= FlexicontentFields::replaceFieldValue( $field, $item, $_closetag, 'closetag', $closetag_cacheable );   // used by some fields
 
 			$field->value = array();
+
 			switch ($field->field_type)
 			{
 				case 'created': // created
@@ -369,11 +370,12 @@ class plgFlexicontent_fieldsCore extends FCField
 					break;
 
 				case 'maintext': // main text
-
+				
+					// If doing CSV export then do output all text and skip further handling
 					if ($prop === 'csv_export')
 					{
 						$field->{$prop} = $item->introtext . chr(13).chr(13) . $item->fulltext;
-						continue;
+						break;
 					}
 
 					// Special display using raw value
