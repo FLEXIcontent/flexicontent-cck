@@ -724,7 +724,7 @@ class FCIndexedField extends FCField
 						. JHtml::_('select.genericlist', $options, $fieldname_n, $attribs . $this_val_attribs . ' class="'.$input_classes.'" data-uniqueRowNum="'.$n.'"', 'value', 'text', $value, $elementid_n)
 						. ($auto_value ? '<span class="fc-mssg-inline fc-info fc-nobgimage">' . JText::_('FLEXI_AUTO') . '</span>' : '')
 						. $closetag :
-						'<div id="'.$elementid_n.'" class="group-fcset fc_input_set">
+						'<div id="'.$elementid_n.'" class="' . ($use_jslib === 3 ? 'group-fcset ' : '') . 'fc_input_set">
 							' . $form_field . '
 							'.($auto_value ? '<span class="fc-mssg-inline fc-info fc-nobgimage">' . JText::_('FLEXI_AUTO') . '</span>' : '').'
 						</div>'
