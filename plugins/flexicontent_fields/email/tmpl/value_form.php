@@ -180,6 +180,7 @@ foreach ($values as $value)
 			'.$subject_field.'
 			'.$message_field.'
 			'.$consent_field.'
+			'.$captcha_div.'
 
 		<input type="submit" name="submit" value="'.JText::_('FLEXI_FIELD_EMAIL_SUBMIT_LABEL_VALUE').'" class="'.$submit_class.'">
 		<input type="hidden" name="emailtask" value="plg.email.submit" />
