@@ -133,7 +133,7 @@ foreach ($values as $value)
 	if ($message_field_display && !$display_placeholder){
 		$message_field = '<div class="field">
 		<label for="'.$message_value.'">'.JText::_('FLEXI_FIELD_EMAIL_MESSAGE_LABEL_VALUE').
-		'</label> <input type="text" name="message" id="'.$message_value.'" class="'.$required.'">
+		'</label> <textarea name="message" id="'.$message_value.'" class="'.$required.'" rows="5" cols="33"></textarea>
 		</div>';
 	}elseif ($message_field_display && $display_placeholder){
 		$message_field = '<div class="field">
