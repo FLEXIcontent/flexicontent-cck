@@ -315,7 +315,7 @@ class FlexicontentModelItems extends FCModelAdminList
 		$print_logging_info = $this->cparams->get('print_logging_info');
 		if ( $print_logging_info )  global $fc_run_times;
 
-		// Lets load the Items if it doesn't already exist
+		// Lets load the records if it doesn't already exist
 		if ($this->_data === null)
 		{
 			if (!empty($this->_ids))
@@ -1076,7 +1076,7 @@ class FlexicontentModelItems extends FCModelAdminList
 		$query .= ''
 				. ($use_tmp
 					? ' FROM #__flexicontent_items_tmp AS a'
-					: ' FROM #__content AS a')
+					: ' FROM #__' . $this->records_dbtbl . ' AS a')
 
 				. (!$tmp_only
 					? ' JOIN #__flexicontent_items_ext AS ie ON ie.item_id = a.id'
@@ -1564,36 +1564,13 @@ class FlexicontentModelItems extends FCModelAdminList
 
 
 		/**
-		 * TEXT search filtering
+		 * Filter according to search text and search scope
 		 */
+		$textwhere = $this->_getTextSearch();
 
-		$search_prefix = JComponentHelper::getParams( 'com_flexicontent' )->get('add_search_prefix') ? 'vvv' : '';   // SEARCH WORD Prefix
-
-		if ($search)
+		if ($textwhere)
 		{
-			$escaped_search = str_replace(' ', '%', $this->_db->escape(trim($search), true));
-			$search_quoted  = $this->_db->Quote('%' . $escaped_search . '%', false);
-
-			switch($scope)
-			{
-				case 'a.metadesc':
-				case 'a.metakey':
-				case 'a.' . $this->name_col:
-					$where[] = ' LOWER(' . $scope . ') LIKE ' . $search_quoted;
-					break;
-
-				case '_meta_':
-					$where[] = '(LOWER(a.metadesc) LIKE ' . $search_quoted . ' OR LOWER(a.metakey)  LIKE ' . $search_quoted . ') ';
-					break;
-
-				case '_desc_':
-					$where[] = '(LOWER(a.introtext) LIKE ' . $search_quoted . ' OR LOWER(a.fulltext)  LIKE ' . $search_quoted . ') ';
-					break;
-
-				case 'ie.search_index':
-					$where[] = ' MATCH (ie.search_index) AGAINST (' . $this->_db->Quote($search_prefix . $escaped_search . '*', false ).' IN BOOLEAN MODE)';
-					break;
-			}
+			$where[] = '(' . implode(' OR ', $textwhere) . ')';
 		}
 
 
@@ -3420,6 +3397,58 @@ class FlexicontentModelItems extends FCModelAdminList
 
 		$app->setUserState($p . 'filter_order', $filter_order);
 		$app->setUserState($p . 'filter_order_Dir', $filter_order_Dir);
+	}
+
+
+	/**
+	 * Method to get Text Search clause according to search scope
+	 *
+	 * @return	void
+	 *
+	 * @since 3.3.0
+	 */
+	protected function _getTextSearch()
+	{
+		// Text search and search scope
+		$scope  = $this->getState('scope');
+		$search = $this->getState('search');
+		$search = StringHelper::trim(StringHelper::strtolower($search));
+
+		// Create the text search clauses
+		$textwhere = array();
+
+		$search_prefix = JComponentHelper::getParams( 'com_flexicontent' )->get('add_search_prefix') ? 'vvv' : '';   // SEARCH WORD Prefix
+
+		if ($search)
+		{
+			$escaped_search = str_replace(' ', '%', $this->_db->escape(trim($search), true));
+			$search_quoted  = $this->_db->Quote('%' . $escaped_search . '%', false);
+
+			switch($scope)
+			{
+				case 'a.metadesc':
+				case 'a.metakey':
+				case 'a.' . $this->name_col:
+					$textwhere[] = ' LOWER(' . $scope . ') LIKE ' . $search_quoted;
+					break;
+
+				case '_meta_':
+					$textwhere[] = 'LOWER(a.metadesc) LIKE ' . $search_quoted;
+					$textwhere[] = 'LOWER(a.metakey)  LIKE ' . $search_quoted;
+					break;
+
+				case '_desc_':
+					$textwhere[] = 'LOWER(a.introtext) LIKE ' . $search_quoted;
+					$textwhere[] = 'LOWER(a.fulltext)  LIKE ' . $search_quoted;
+					break;
+
+				case 'ie.search_index':
+					$textwhere[] = ' MATCH (ie.search_index) AGAINST (' . $this->_db->Quote($search_prefix . $escaped_search . '*', false ).' IN BOOLEAN MODE)';
+					break;
+			}
+		}
+
+		return $textwhere;
 	}
 
 
