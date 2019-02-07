@@ -167,6 +167,102 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 
+			<field name="" type="separator" default="FLEXI_FIELD_EMAIL_OPTIONS" level="level1" />
+
+			<field name="" type="separator" default="FLEXI_FIELD_EMAIL_FORM_OPTION" level="level2" />
+
+			<field name="display_title_form" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_FIELD_EMAIL_TITLE_FORM_DISPLAY" description="FLEXI_FIELD_EMAIL_TITLE_FORM_DISPLAY_DESC" class="btn-group btn-group-yesno">
+			  <option value="0" show_list="" hide_list="disp_title_form">FLEXI_NO</option>
+			  <option value="1" show_list="disp_title_form" hide_list="">FLEXI_YES</option>
+			</field>
+			<field name="title_form" type="text" label="FLEXI_FIELD_EMAIL_FORM_TITLE"  defaut="FLEXI_FIELD_EMAIL_TITLEFORM_VALUE" description="FLEXI_FIELD_EMAIL_FORM_TITLE_DESC" depend_class="disp_title_form" />
+
+			<field name="disp_placeholder" default="0" type="multilist" subtype="radio" toggle_related="1" label="FLEXI_FIELD_EMAIL_PLACEHOLDER_DISPLAY" description="FLEXI_FIELD_EMAIL_PLACEHOLDER_DISPLAY_DESC" class="btn-group btn-group-yesno">
+			<option value="0">FLEXI_NO</option>
+			<option value="1">FLEXI_YES</option>
+			</field>
+
+			<field name="" type="separator" default="FLEXI_FIELD_EMAIL_FIRSTNAME_OPTION" level="level2" />
+
+			<field name="display_firstname" type="multilist" subtype="radio" toggle_related="1" default="1" label="FLEXI_FIELD_EMAIL_FIRSTNAME_DISPLAY" description="FLEXI_FIELD_EMAIL_FIRSTNAME_DISPLAY_DESC" class="btn-group btn-group-yesno">
+			  <option value="0" show_list="" hide_list="disp_firstname_label">FLEXI_NO</option>
+			  <option value="1" show_list="disp_firstname_label" hide_list="">FLEXI_YES</option>
+			</field>
+			<field name="firstname_label" type="text" label="FLEXI_FIELD_EMAIL_FIRSTNAME_LABEL"  default="FLEXI_FIELD_EMAIL_FIRSTNAME_LABEL_VALUE" description="FLEXI_FIELD_EMAIL_FIRSTNAME_LABEL_DESC" depend_class="disp_firstname_label"/>
+			<field name="firstname_required" type="multilist" subtype="radio" toggle_related="1" default="1" label="FLEXI_FIELD_EMAIL_FIELD_REQUIRED" description="FLEXI_FIELD_EMAIL_FIELD_REQUIRED_DESC" class="btn-group btn-group-yesno" depend_class="disp_firstname_label">
+			  <option value="0" >FLEXI_NO</option>
+			  <option value="1" >FLEXI_YES</option>
+			</field>
+
+			<field name="" type="separator" default="FLEXI_FIELD_EMAIL_LASTNAME_OPTION" level="level2" />
+			<field name="display_lastname" type="multilist" subtype="radio" toggle_related="1" default="1" label="FLEXI_FIELD_EMAIL_LASTNAME_DISPLAY" description="FLEXI_FIELD_EMAIL_LASTNAME_DISPLAY_DESC" class="btn-group btn-group-yesno">
+			  <option value="0" show_list="" hide_list="disp_lastname_label">FLEXI_NO</option>
+			  <option value="1" show_list="disp_lastname_label" hide_list="">FLEXI_YES</option>
+			</field>
+			<field name="lastname_label" type="text" label="FLEXI_FIELD_EMAIL_LASTNAME_LABEL"  default="FLEXI_FIELD_EMAIL_LASTNAME_LABEL_VALUE" description="FLEXI_FIELD_EMAIL_LASTNAME_LABEL_DESC" depend_class="disp_lastname_label"/>
+			<field name="lastname_required" type="multilist" subtype="radio" toggle_related="1" default="1" label="FLEXI_FIELD_EMAIL_FIELD_REQUIRED" description="FLEXI_FIELD_EMAIL_FIELD_REQUIRED_DESC" class="btn-group btn-group-yesno" depend_class="disp_lastname_label">
+			  <option value="0" >FLEXI_NO</option>
+			  <option value="1" >FLEXI_YES</option>
+			</field>
+
+			<field name="" type="separator" default="FLEXI_FIELD_EMAIL_MESSAGE_OPTION" level="level2" />
+			<field name="display_message" type="multilist" subtype="radio" toggle_related="1" default="1" label="FLEXI_FIELD_EMAIL_MESSAGE_DISPLAY" description="FLEXI_FIELD_EMAIL_MESSAGE_DISPLAY_DESC" class="btn-group btn-group-yesno">
+			  <option value="0" show_list="" hide_list="message_label">FLEXI_NO</option>
+			  <option value="1" show_list="message_label" hide_list="">FLEXI_YES</option>
+			</field>
+			<field name="message_label" type="text" label="FLEXI_FIELD_EMAIL_MESSAGE_LABEL"  default="FLEXI_FIELD_EMAIL_MESSAGE_LABEL_VALUE" description="FLEXI_FIELD_EMAIL_MESSAGE_LABEL_DESC" depend_class="message_label"/>
+			<field name="message_required" type="multilist" subtype="radio" toggle_related="1" default="1" label="FLEXI_FIELD_EMAIL_FIELD_REQUIRED" description="FLEXI_FIELD_EMAIL_FIELD_REQUIRED_DESC" class="btn-group btn-group-yesno" depend_class="message_label">
+			  <option value="0" >FLEXI_NO</option>
+			  <option value="1" >FLEXI_YES</option>
+			</field>
+
+			<field name="" type="separator" default="FLEXI_FIELD_EMAIL_SUBJECT_OPTION" level="level2" />
+			<field name="display_subject" type="multilist" subtype="radio" toggle_related="1" default="1" label="FLEXI_FIELD_EMAIL_SUBJECT_DISPLAY" description="FLEXI_FIELD_EMAIL_SUBJECT_DISPLAY_DESC" class="btn-group btn-group-yesno">
+			  <option value="0" show_list="" hide_list="subject_label">FLEXI_NO</option>
+			  <option value="1" show_list="subject_label" hide_list="">FLEXI_YES</option>
+			</field>
+			<field name="subject_label" type="text" label="FLEXI_FIELD_EMAIL_SUBJECT_LABEL"  default="FLEXI_FIELD_EMAIL_SUBJECT_LABEL_VALUE" description="FLEXI_FIELD_EMAIL_SUBJECT_LABEL_DESC" depend_class="subject_label"/>
+			<field name="subject_required" type="multilist" subtype="radio" toggle_related="1" default="1" label="FLEXI_FIELD_EMAIL_FIELD_REQUIRED" description="FLEXI_FIELD_EMAIL_FIELD_REQUIRED_DESC" class="btn-group btn-group-yesno" depend_class="subject_label">
+			  <option value="0" >FLEXI_NO</option>
+			  <option value="1" >FLEXI_YES</option>
+			</field>
+
+			<field name="" type="separator" default="FLEXI_FIELD_EMAIL_EMAILFROM_OPTION" level="level2" />
+			<field name="display_emailfrom" type="multilist" subtype="radio" toggle_related="1" default="1" label="FLEXI_FIELD_EMAIL_EMAILFROM_DISPLAY" description="FLEXI_FIELD_EMAIL_EMAILFROM_DISPLAY_DESC" class="btn-group btn-group-yesno">
+			  <option value="0" show_list="" hide_list="emailfrom_label">FLEXI_NO</option>
+			  <option value="1" show_list="emailfrom_label" hide_list="">FLEXI_YES</option>
+			</field>
+			<field name="emailfrom_label" type="text" label="FLEXI_FIELD_EMAIL_EMAILFROM_LABEL"  default="FLEXI_FIELD_EMAIL_EMAILFROM_LABEL_VALUE" description="FLEXI_FIELD_EMAIL_EMAILFROM_LABEL_DESC" depend_class="emailfrom_label"/>
+			<field name="emailfrom_required" type="multilist" subtype="radio" toggle_related="1" default="1" label="FLEXI_FIELD_EMAIL_FIELD_REQUIRED" description="FLEXI_FIELD_EMAIL_FIELD_REQUIRED_DESC" class="btn-group btn-group-yesno" depend_class="emailfrom_label">
+			  <option value="0" >FLEXI_NO</option>
+			  <option value="1" >FLEXI_YES</option>
+			</field>
+
+			<field name="" type="separator" default="FLEXI_FIELD_EMAIL_SUBMIT_OPTION" level="level2" />
+			<field name="submit_label" type="text" label="FLEXI_FIELD_EMAIL_SUBMIT_LABEL"  default="FLEXI_FIELD_EMAIL_SUBMIT_LABEL_VALUE" description="FLEXI_FIELD_EMAIL_SUBMIT_LABEL_DESC"/>
+			<field name="submit_class" type="text" label="FLEXI_FIELD_EMAIL_SUBMIT_CLASS"  default="btn" description="FLEXI_FIELD_EMAIL_SUBMIT_CLASS_DESC"/>
+
+			<field name="" type="separator" default="FLEXI_FIELD_EMAIL_CONSENT_OPTION" level="level2" />
+			<field name="display_consent" type="multilist" subtype="radio" toggle_related="1" default="1" label="FLEXI_FIELD_EMAIL_CONSENT_DISPLAY" description="FLEXI_FIELD_EMAIL_CONSENT_DISPLAY_DESC" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="consent_label">FLEXI_NO</option>
+				<option value="1" show_list="consent_label" hide_list="">FLEXI_YES</option>
+			</field>
+			<field name="text_consent" type="text" label="FLEXI_FIELD_EMAIL_CONSENT_LABEL"  default="FLEXI_FIELD_EMAIL_CONSENT_LABEL_VALUE" description="FLEXI_FIELD_EMAIL_LINK_LABEL_DESC" depend_class="consent_label"/>
+			<field name="link_consent" type="text" label="FLEXI_FIELD_EMAIL_CONSENT_LINK_LABEL"  default="" description="FLEXI_FIELD_EMAIL_CONSENT_LINK_DESC" depend_class="consent_label"/>
+
+
+			<field name="" type="separator" default="FLEXI_FIELD_EMAIL_CAPTCHA_OPTION" level="level2" />
+			<field name="display_captcha" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_FIELD_EMAIL_CAPTCHA_DISPLAY" description="FLEXI_FIELD_EMAIL_CAPTCHA_DISPLAY_DESC" class="btn-group btn-group-yesno">
+			  <option value="0" show_list="" hide_list="disp_captcha_label">FLEXI_NO</option>
+			  <option value="1" show_list="disp_captcha_label" hide_list="">FLEXI_YES</option>
+			</field>
+
+			<field name="" type="separator" default="FLEXI_FIELD_EMAIL_CONTENT_MESSAGE" level="level2" />
+			<field name="" type="separator" default="FLEXI_FC_PRO_ONLY_INFO" level="level4" class="alert alert-warning fcpadded" />
+			<field name="" type="separator" default="FLEXI_FIELD_EMAIL_CONTENT_DESC" level="level3" class="alert alert-info fcpadded" />
+			<field name="title_email" type="text" default="Title email {{field_value}}" label="FLEXI_FIELD_TITLE_EMAIL" description="FLEXI_FIELD_TITLE_EMAIL_DESC"/>
+			<field name="body_email" type="editor" editor="tinymce" syntax="html" filter="RAW" cols="20" rows="4" height="60px" class="fc-unset-width" default="{{item_title}} {{item_url}}" label="FLEXI_FIELD_BODY_EMAIL" description="FLEXI_FIELD_BODY_EMAIL_DESC" />
+
 			<field name="" type="separator" default="FLEXI_FIELD_VALUE_LIST" description="" icon_class="icon-stack" level="tab_open" box_type="1" />
 
 			<field name="" type="separator" default="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL" description="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL_DESC_FIELD" level="level2" />

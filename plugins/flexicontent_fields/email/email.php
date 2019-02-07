@@ -5,24 +5,29 @@
  *
  * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
  * @link            https://flexicontent.org
- * @copyright       Copyright © 2017, FLEXIcontent team, All Rights Reserved
+ * @copyright       Copyright ï¿½ 2017, FLEXIcontent team, All Rights Reserved
  * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
+jimport('joomla.event.plugin');
 JLoader::register('FCField', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/fcfield/parentfield.php');
 
 class plgFlexicontent_fieldsEmail extends FCField
 {
 	static $field_types = null; // Automatic, do not remove since needed for proper late static binding, define explicitely when a field can render other field types
 	var $task_callable = null;  // Field's methods allowed to be called via AJAX
-
+	protected $autoloadLanguage = true;
 	// ***
 	// *** CONSTRUCTOR
 	// ***
 
 	function __construct( &$subject, $params )
 	{
+		$app = JFactory::getApplication(); //record action in form
+		if ($app->isSite() && $app->input->get('emailtask', '', 'cmd') === 'plg.email.submit') {
+			$this->sendEmail();
+		}
 		parent::__construct( $subject, $params );
 	}
 
@@ -628,7 +633,7 @@ class plgFlexicontent_fieldsEmail extends FCField
 	}
 
 
- 	// Method to get the active filter result (an array of item ids matching field filter, or subquery returning item ids)
+	// Method to get the active filter result (an array of item ids matching field filter, or subquery returning item ids)
 	// This is for search view
 	function getFilteredSearch(&$filter, $value, $return_sql=true)
 	{
@@ -680,4 +685,102 @@ class plgFlexicontent_fieldsEmail extends FCField
 		return true;
 	}
 
+	// ***
+	// *** Helper for sendemail
+	// ***
+
+	public static function sendEmail()
+	{
+		// Load plugin language
+		$lang = JFactory::getLanguage();
+		$lang->load('plg_flexicontent_fields_email', JPATH_ADMINISTRATOR);
+		// Check for request forgeries.
+		JSession::checkToken() or jexit(JText::_('JINVALID_TOKEN'));
+
+		// Get a handle to the Joomla! application object
+		$app = JFactory::getApplication();
+
+		//Check value
+		$jinput = JFactory::getApplication()->input;
+
+		$firstname = $jinput->post->get('first_name', '', 'filter');
+		$lastname = $jinput->post->get('last_name', '', 'filter');
+		$fromname = $firstname.' '.$lastname;
+		$fromemail = $jinput->post->get('emailfrom', '', '');
+		$to =  $jinput->post->get('emailto', '', '');
+		$from = array($fromemail , $fromname);
+
+		// create variable for email
+		global $globalcats;
+		$config = JFactory::getConfig();
+		$categories = & $globalcats;
+		// Get the route helper
+		require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'route.php');
+		$itemid   = $jinput->post->get('itemid', '', 'int');
+		$title    = $jinput->post->get('itemtitle', '');
+		$alias    = $jinput->post->get('itemalias', '');
+		$maincat  = $jinput->post->get('catid', '', 'int');
+
+		//set if subject field is displayed and if we need a default title
+		$subject = $jinput->post->get('subject', '', 'filter');
+		if (empty($subject)){
+			$subject ='';
+		}else { //TODO add pro function for title remplacement
+			$subject = $jinput->post->get('subject', '', 'filter');
+		}
+		$subjectemail = JText::sprintf('FLEXI_FIELD_EMAIL_SUBJECT_DEFAULT', $firstname, $lastname, $subject);
+
+		// Create the non-SEF URL
+		$item_url = FlexicontentHelperRoute::getItemRoute($itemid.':'.$alias, $maincat);
+		// Create the SEF URL
+		$item_url = $app->isAdmin()
+			? flexicontent_html::getSefUrl($item_url)   // ..., $_xhtml= true, $_ssl=-1);
+			: JRoute::_($item_url);  // ..., $_xhtml= true, $_ssl=-1);
+		// Make URL absolute since this URL will be emailed
+		$item_url = JUri::getInstance()->toString(array('scheme', 'host', 'port')) . $item_url;
+		$sitename = $app->getCfg('sitename') . ' - ' . JUri::root();
+
+		//set if message / firstname / lastname are used field are used
+		$body =  $jinput->post->get('message', '', 'html');
+		if (empty($body))
+		{
+			$body ='';
+		}else { //TODO add pro function for message remplacement
+			$body =  $jinput->post->get('message', '', 'html');
+		}
+		if (empty($firstname))
+		{
+			$firstname ='';
+		}else	{
+			$firstname	= $jinput->post->get('first_name', '', 'filter');
+		}
+		if (empty($lastname))
+		{
+			$lastname ='';
+		}else	{
+			$lastname = $jinput->post->get('last_name', '', 'filter');
+		}
+		$message 	= JText::sprintf('FLEXI_FIELD_EMAIL_MESSAGE_DEFAULT', $title, $firstname, $lastname, $fromemail, $body, '<a href="'.$item_url.'">'.$item_url.'</a>', $sitename);
+
+		//Prepare email
+		$mailer = JFactory::getMailer();
+		$mailer->setSender($from);
+		$mailer->addRecipient($to);
+		$mailer->setSubject($subjectemail);
+		$mailer->setBody($message);
+
+		//Set email in html
+		$mailer->isHTML();
+
+		//Sendemail
+		$send = $mailer->Send();
+		if ( $send !== true )
+			{
+			    $app->enqueueMessage(JText::_('FLEXI_FIELD_EMAIL_MESSAGE_SEND_ERROR'), 'error');
+			} else {
+			    $app->enqueueMessage(JText::_('FLEXI_FIELD_EMAIL_MESSAGE_SEND_SUCCESS'), 'message');
+			}
+	}
 }
+
+?>
