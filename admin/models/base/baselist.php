@@ -545,52 +545,15 @@ abstract class FCModelAdminList extends JModelList
 			$where[] = 'a.id = ' . (int) $filter_id;
 		}
 
-		// Filter by search word (can be also be  id:NN  OR author:AAAAA)
-		if (!empty($this->search_cols) && strlen($search))
+		/**
+		 * Filter according to search text and search scope
+		 * (search text can be also be  id:NN  OR author:AAAAA)
+		 */
+		$textwhere = $this->_getTextSearch();
+
+		if ($textwhere)
 		{
-			if (stripos($search, 'id:') === 0)
-			{
-				$where[] = 'a.id = ' . (int) substr($search, 3);
-			}
-			elseif (stripos($search, 'author:') === 0)
-			{
-				$search_quoted = $this->_db->Quote('%' . $this->_db->escape(substr($search, 7), true) . '%');
-				$where[] = '(ua.name LIKE ' . $search_quoted . ' OR ua.username LIKE ' . $search_quoted . ')';
-			}
-			else
-			{
-				$escaped_search = str_replace(' ', '%', $this->_db->escape(trim($search), true));
-				$search_quoted  = $this->_db->Quote('%' . $escaped_search . '%', false);
-
-				$table     = $this->getTable($this->records_jtable, '');
-				$textwhere = array();
-				$col_name  = str_replace('a.', '', $scope);
-
-				if ($scope === '-1')
-				{
-					foreach ($this->search_cols as $search_col)
-					{
-						if (property_exists($table, $search_col))
-						{
-							$textwhere[] = 'LOWER(a.' . $search_col . ') LIKE ' . $search_quoted;
-						}
-					}
-				}
-				elseif (in_array($col_name, $this->search_cols) && property_exists($table, $col_name))
-				{
-					// Scope is user input, was filtered as CMD but also use quoteName() on the column
-					$textwhere[] = 'LOWER(' . $this->_db->quoteName($scope) . ') LIKE ' . $search_quoted;
-				}
-				else
-				{
-					JFactory::getApplication()->enqueueMessage('Text search scope ' . $scope . ' is unknown, search failed', 'warning');
-				}
-
-				if ($textwhere)
-				{
-					$where[] = '(' . implode(' OR ', $textwhere) . ')';
-				}
-			}
+			$where[] = '(' . implode(' OR ', $textwhere) . ')';
 		}
 
 		if ($q instanceof \JDatabaseQuery)
@@ -1132,6 +1095,68 @@ abstract class FCModelAdminList extends JModelList
 
 		$app->setUserState($p . 'filter_order', $filter_order);
 		$app->setUserState($p . 'filter_order_Dir', $filter_order_Dir);
+	}
+
+
+	/**
+	 * Method to get Text Search clause according to search scope
+	 *
+	 * @return	void
+	 *
+	 * @since 3.3.0
+	 */
+	protected function _getTextSearch()
+	{
+		// Text search and search scope
+		$scope  = $this->getState('scope');
+		$search = $this->getState('search');
+		$search = StringHelper::trim(StringHelper::strtolower($search));
+
+		// Create the text search clauses
+		$table     = $this->getTable($this->records_jtable, '');
+		$col_name  = str_replace('a.', '', $scope);
+		$textwhere = array();
+
+		if (!empty($this->search_cols) && strlen($search))
+		{
+			if (stripos($search, 'id:') === 0)
+			{
+				$textwhere[] = 'a.id = ' . (int) substr($search, 3);
+			}
+			elseif (stripos($search, 'author:') === 0)
+			{
+				$search_quoted = $this->_db->Quote('%' . $this->_db->escape(substr($search, 7), true) . '%');
+				$textwhere[] = 'ua.name LIKE ' . $search_quoted;
+				$textwhere[] = 'ua.username LIKE ' . $search_quoted;
+			}
+			else
+			{
+				$escaped_search = str_replace(' ', '%', $this->_db->escape(trim($search), true));
+				$search_quoted  = $this->_db->Quote('%' . $escaped_search . '%', false);
+
+				if ($scope === '-1')
+				{
+					foreach ($this->search_cols as $search_col)
+					{
+						if (property_exists($table, $search_col))
+						{
+							$textwhere[] = 'LOWER(a.' . $search_col . ') LIKE ' . $search_quoted;
+						}
+					}
+				}
+				elseif (in_array($col_name, $this->search_cols) && property_exists($table, $col_name))
+				{
+					// Scope is user input, was filtered as CMD but also use quoteName() on the column
+					$textwhere[] = 'LOWER(' . $this->_db->quoteName($scope) . ') LIKE ' . $search_quoted;
+				}
+				else
+				{
+					JFactory::getApplication()->enqueueMessage('Text search scope ' . $scope . ' is unknown, search failed', 'warning');
+				}
+			}
+		}
+
+		return $textwhere;
 	}
 
 
