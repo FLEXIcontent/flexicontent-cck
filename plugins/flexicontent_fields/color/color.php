@@ -118,7 +118,7 @@ class plgFlexicontent_fieldsColor extends FCField
 		$posttext = $field->parameters->get( 'posttext_form', '' ) ;
 
 		// Initialise property with default value
-		if ( !$field->value || (count($field->value)==1 && $field->value[0] === null) )
+		if (!$field->value || (count($field->value) === 1 && $field->value[0] === null))
 		{
 			$field->value = $default_values;
 		}

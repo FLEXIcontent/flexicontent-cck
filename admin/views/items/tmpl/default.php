@@ -255,6 +255,7 @@ function delAllFilters()
 	delFilter('filter_lang');
 	delFilter('filter_tag');
 	delFilter('filter_access');
+	delFilter('filter_meta');
 	delFilter('filter_fileid');
 	delFilter('filter_order');
 	delFilter('filter_order_Dir');
@@ -464,6 +465,7 @@ jQuery(document).ready(function(){
 					echo $this->lists['filter_lang'];
 					echo $this->lists['filter_state'];
 					echo $this->lists['filter_access'];
+					echo $this->lists['filter_meta'];
 
 					if (!$this->reOrderingActive)
 					{

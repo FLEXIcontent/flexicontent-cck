@@ -312,7 +312,7 @@ class FlexicontentViewBaseRecords extends JViewLegacy
 			}
 		}
 
-		$this->scope_title = $scopes[$value];
+		$this->scope_title = isset($scopes[$value]) ? $scopes[$value] : reset($scopes);
 		$options = array();
 
 		foreach ($scopes as $i => $v)

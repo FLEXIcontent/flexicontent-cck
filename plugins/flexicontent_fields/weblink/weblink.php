@@ -58,13 +58,13 @@ class plgFlexicontent_fieldsWeblink extends FCField
 		// *** Number of values
 		// ***
 
-		$multiple   = $use_ingroup || (int) $field->parameters->get('allow_multiple', 0);
-		$max_values = $use_ingroup ? 0 : (int) $field->parameters->get('max_values', 0);
-
-		$required = $field->parameters->get('required', 0);
-		$required_class = $required ? ' required' : '';
-
+		$multiple     = $use_ingroup || (int) $field->parameters->get('allow_multiple', 0);
+		$max_values   = $use_ingroup ? 0 : (int) $field->parameters->get('max_values', 0);
+		$required     = (int) $field->parameters->get('required', 0);
 		$add_position = (int) $field->parameters->get('add_position', 3);
+
+		// Classes for marking field required
+		$required_class = $required ? ' required' : '';
 
 		// If we are multi-value and not inside fieldgroup then add the control buttons (move, delete, add before/after)
 		$add_ctrl_btns = !$use_ingroup && $multiple;
@@ -120,6 +120,15 @@ class plgFlexicontent_fieldsWeblink extends FCField
 		$image_usage   = $field->parameters->get( 'image_usage', 0 ) ;
 		$default_image = ($item->version == 0 || $image_usage > 0) ? JText::_($field->parameters->get( 'default_image', '' )) : '';
 		$default_image = $default_image ? JText::_($default_image) : '';
+		$image_options = array('' => '-');
+
+		if ($useimage == 2)
+		{
+			foreach ($field->parameters->get('image_choices') as $image)
+			{
+				$image_options[$image->sub_path] = $image->sub_path;
+			}
+		}
 
 		// URL title (optional)
 		$usetitle      = $field->parameters->get( 'use_title', 0 ) ;
@@ -132,6 +141,9 @@ class plgFlexicontent_fieldsWeblink extends FCField
 		$text_usage   = $field->parameters->get( 'text_usage', 0 ) ;
 		$default_text = ($item->version == 0 || $text_usage > 0) ? $field->parameters->get( 'default_text', '' ) : '';
 		$default_text = $default_text ? JText::_($default_text) : '';
+
+		// URL address type (optional)
+		$useaddrtype = $field->parameters->get( 'use_addrtype', 0 ) ;
 
 		// URL class (optional)
 		$useclass      = $field->parameters->get( 'use_class', 0 ) ;
@@ -150,13 +162,20 @@ class plgFlexicontent_fieldsWeblink extends FCField
 		// URL Hits
 		$usehits    = $field->parameters->get( 'use_hits', 1 ) ;
 
+		// Address type list
+		$addrtype_choices = $field->parameters->get('addrtype_choices', '');
+		if ($useaddrtype == 2)
+		{
+			$default_option  = (object) array('value' => '', 'label' => JText::_('FLEXI_SELECT'));
+			$addrtype_options = $this->getPropertyOptions($addrtype_choices, $default_option);
+		}
 
-		// CSS class names
-		$class_choices = $field->parameters->get( 'class_choices', '') ;
-		if ($useclass==2)
+		// CSS class list
+		$class_choices = $field->parameters->get('class_choices', '');
+		if ($useclass == 2)
 		{
 			$default_option = (object) array('value' => $default_class, 'label' => JText::_('FLEXI_DEFAULT'));
-			$class_options = $this->getPropertyOptions($class_choices, $default_option);
+			$class_options  = $this->getPropertyOptions($class_choices, $default_option);
 		}
 
 		// Initialise property with default value
@@ -229,6 +248,7 @@ class plgFlexicontent_fieldsWeblink extends FCField
 			$mm_mode_common_js_added = true;
 
 			JText::script("FLEXI_FIELD_WEBLINK_ENTER_MEDIA_URL", true);
+			JText::script("FLEXI_FIELD_WEBLINK_ENTER_MEDIA_URL_WARNING", true);
 			JText::script("FLEXI_FIELD_MEDIA_URL", true);
 			JText::script("FLEXI_ERROR", true);
 			$document->addScriptVersion(JUri::root(true) . '/plugins/flexicontent_fields/weblink/js/form.js', FLEXI_VHASH);
@@ -312,17 +332,25 @@ class plgFlexicontent_fieldsWeblink extends FCField
 				";
 
 			// Update new URL optional properties
-			if ($useimage) $js .= "
+			if ($useimage)
+			{
+				$js .= "
 				theInput = newField.find('input.urlimage').first();
 				theInput.attr('value', ".json_encode($default_image).");
 				theInput.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][image]');
 				theInput.attr('id', element_id + '_image');
 				newField.find('.urlimage-lbl').first().attr('for', element_id + '_image');
-				";
+				
+				theInput = newField.find('img.media-preview').first();
+				theInput.attr('id', element_id + '_image_preview');
+				theInput.attr('src', '');
 
-			if ($useimage)
-			{
-				$js .= "
+				theInput.parent().prev().attr('id', element_id + '_image_preview_empty');
+				theInput.parent().prev().css('display', '');
+
+				theInput.parent().attr('id', element_id + '_image_preview_img');
+				theInput.parent().css('display', 'none');
+
 				var elements = ['img_fetch_btn', 'img_clear_btn'];
 				for	(var i = 0; i < elements.length; i++)
 				{
@@ -357,10 +385,19 @@ class plgFlexicontent_fieldsWeblink extends FCField
 				newField.find('.urllinktext-lbl').first().attr('for', element_id + '_linktext');
 				";
 
+			if ($useaddrtype) $js .= "
+				theField = newField.find('".($useaddrtype==1 ? 'input' : 'select').".urladdrtype').first();
+				theField.attr('value', '');
+				theField.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][addrtype]');
+				theField.attr('id', element_id + '_addrtype');
+				theField.attr('onchange', 'document.getElementById(\'' + element_id + '_link\').value = this.value');
+				newField.find('.urladdrtype-lbl').first().attr('for', element_id + '_addrtype');
+				";
+
 			// Do not load the default from viewing configuration !, this will allow re-configuring default in viewing configuration at any time
 			if ($useclass) $js .= "
 				theField = newField.find('".($useclass==1 ? 'input' : 'select').".urlclass').first();
-				theField.val('');
+				theField.attr('value', '');
 				theField.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][class]');
 				theField.attr('id', element_id + '_class');
 				newField.find('.urlclass-lbl').first().attr('for', element_id + '_class');
@@ -427,7 +464,9 @@ class plgFlexicontent_fieldsWeblink extends FCField
 				if (scroll_visible) fc_scrollIntoView(newField, 1);
 				if (animate_visible) newField.css({opacity: 0.1}).animate({ opacity: 1 }, 800, function() { jQuery(this).css('opacity', ''); });
 
-				// Set tooltip data placeholders
+				" .
+				/*
+				// Set tooltip data placeholders (this is for preview on mouseover)
 				var _name = '_image';
 				newField.find('.media-preview').html('<span class=\"hasTipPreview\" title=\"&lt;strong&gt;" . JText::_('JLIB_FORM_MEDIA_PREVIEW_SELECTED_IMAGE', true)
 					. "&lt;/strong&gt;&lt;br /&gt;&lt;span style=&quot;display: block;&quot; id=&quot;' + element_id + _name + '_preview_empty&quot; style=&quot;display:none&quot;&gt;" . JText::_('JLIB_FORM_MEDIA_PREVIEW_EMPTY', true)
@@ -435,10 +474,8 @@ class plgFlexicontent_fieldsWeblink extends FCField
 					. "&quot; id=&quot;' + element_id + _name + '_preview&quot; class=&quot;media-preview&quot; style=&quot; style=&quot;max-width:480px; max-height:360&quot; &quot; /&gt;&lt;/span&gt;\"><span class=\"icon-eye\" aria-hidden=\"true\"></span><span class=\"icon-image\" aria-hidden=\"true\"></span> "
 					. JText::_('FLEXI_FIELD_WEBLINK_URLIMAGE', true)
 					. "</span>');
-
-				// Enable tooltips on new element
-				newField.find('.hasTooltip').tooltip({html: true, container: newField});
-				newField.find('.hasPopover').popover({html: true, container: newField, trigger : 'hover focus'});
+				*/
+				"
 
 				// Show tooltips
 				var tipped_elements = newField.find('.hasTipImgpath, .hasTipPreview');
@@ -649,6 +686,9 @@ class plgFlexicontent_fieldsWeblink extends FCField
 		$default_text = ($text_usage == 2)  ?  $field->parameters->get( 'default_text', '' ) : '';
 		$default_text = $default_text ? JText::_($default_text) : '';
 
+		// URL address type (optional)
+		$useaddrtype      = $field->parameters->get( 'use_addrtype', 0 ) ;
+
 		// URL class (optional)
 		$useclass      = $field->parameters->get( 'use_class', 0 ) ;
 		$class_usage   = $field->parameters->get( 'class_usage', 0 ) ;
@@ -672,6 +712,8 @@ class plgFlexicontent_fieldsWeblink extends FCField
 
 		// URL image
 		$display_image = $field->parameters->get( 'display_image', 1 ) ;
+		$image_w       = (int) $field->parameters->get( 'image_w', 320 ) ;
+		$image_h       = (int) $field->parameters->get( 'image_h', 240 ) ;
 
 		// Playback videos
 		$playback_videos = $field->parameters->get( 'playback_videos', 1 ) ;
@@ -687,12 +729,13 @@ class plgFlexicontent_fieldsWeblink extends FCField
 		// Joomla article links mode
 		if ( $link_source == -1 )
 		{
-			$usetitle = false;
-			$usetext = true;
-			$useclass = false;
+			$usetitle  = false;
+			$usetext   = true;
+			$useaddrtype = false;
+			$useclass  = false;
 			$usetarget = true;
-			$useid = false;
-			$values = array();
+			$useid     = false;
+			$values    = array();
 
 			$target_remap = array(
 				'', $default_target,
@@ -933,13 +976,14 @@ class plgFlexicontent_fieldsWeblink extends FCField
 		$domain = JUri::getInstance('SERVER')->gethost();
 
 		// URL title (optional)
-		$useimage   = $field->parameters->get( 'use_image', 0 ) ;
-		$usetitle   = $field->parameters->get( 'use_title', 0 ) ;
-		$usetext    = $field->parameters->get( 'use_text', 0 ) ;
-		$useclass   = $field->parameters->get( 'use_class', 0 ) ;
-		$useid      = $field->parameters->get( 'use_id', 0 ) ;
-		$usetarget  = $field->parameters->get( 'use_target', 0 ) ;
-		$usehits    = $field->parameters->get( 'use_hits', 1 ) ;
+		$useimage    = $field->parameters->get( 'use_image', 0 ) ;
+		$usetitle    = $field->parameters->get( 'use_title', 0 ) ;
+		$usetext     = $field->parameters->get( 'use_text', 0 ) ;
+		$useaddrtype = $field->parameters->get( 'use_addrtype', 0 ) ;
+		$useclass    = $field->parameters->get( 'use_class', 0 ) ;
+		$useid       = $field->parameters->get( 'use_id', 0 ) ;
+		$usetarget   = $field->parameters->get( 'use_target', 0 ) ;
+		$usehits     = $field->parameters->get( 'use_hits', 1 ) ;
 
 		// Server side validation
 		$maxlength  = (int) $field->parameters->get( 'maxlength', 4000 ) ;
@@ -997,7 +1041,7 @@ class plgFlexicontent_fieldsWeblink extends FCField
 			$Abs_Path_Full = JUri::root();
 
 			// Remove joomla uri root to make it relative if relative allowed but an absolute URL was given
-			if ( !$force_absolute )
+			if (!$force_absolute)
 			{
 				if (strpos($link, $Abs_Path) === 0)
 				{
@@ -1029,15 +1073,15 @@ class plgFlexicontent_fieldsWeblink extends FCField
 			if ( parse_url($link, PHP_URL_SCHEME) ) $prefix = '';
 
 			// Is absolute without protocol, NOTHING TO DO
-			else if (strpos($link, '//') === 0) $prefix = '';
+			elseif (strpos($link, '//') === 0) $prefix = '';
 
 			// Has current domain but no protocol
 			// - just add // instead of 'http://' (to allow using current protocol)
-			else if (strpos($link, $domain) === 0) $prefix = '//';
+			elseif (strpos($link, $domain) === 0) $prefix = '//';
 
 			// Relative URL and Relative URLs are allowed (and no-autoprefix flag was set in the form)
 			// - do not add Joomla ROOT, to allow website to be moved and change subfolder
-			else if ( !$force_absolute ) $prefix = '';
+			elseif (!$force_absolute) $prefix = '';
 
 			// Relative URL but absolute URLs are forced,
 			// - either add Joomla uri root (if prefixed with 'index.php')
@@ -1062,12 +1106,13 @@ class plgFlexicontent_fieldsWeblink extends FCField
 			$newpost[$new]['link'] = $prefixed_link;
 
 			// Validate other value properties
-			$newpost[$new]['image']   = !$useimage  ? '' : flexicontent_html::dataFilter(@$v['image'], 200, 'STRING', 0);
-			$newpost[$new]['title']   = !$usetitle  ? '' : flexicontent_html::dataFilter(@$v['title'], 4000, 'STRING', 0);
-			$newpost[$new]['linktext']= !$usetext   ? '' : flexicontent_html::dataFilter(@$v['linktext'], 4000, 'STRING', 0);
-			$newpost[$new]['class']   = !$useclass  ? '' : flexicontent_html::dataFilter(@$v['class'], 200, 'STRING', 0);
-			$newpost[$new]['id']      = !$useid     ? '' : flexicontent_html::dataFilter(@$v['id'], 200, 'STRING', 0);
-			$newpost[$new]['target']  = !$usetarget ? '' : flexicontent_html::dataFilter(@$v['target'], 200, 'STRING', 0);
+			$newpost[$new]['image']    = !$useimage    ? '' : flexicontent_html::dataFilter(@$v['image'], 200, 'STRING', 0);
+			$newpost[$new]['title']    = !$usetitle    ? '' : flexicontent_html::dataFilter(@$v['title'], 4000, 'STRING', 0);
+			$newpost[$new]['linktext'] = !$usetext     ? '' : flexicontent_html::dataFilter(@$v['linktext'], 4000, 'STRING', 0);
+			$newpost[$new]['addrtype'] = !$useaddrtype ? '' : flexicontent_html::dataFilter(@$v['addrtype'], 4000, 'URL', 0);
+			$newpost[$new]['class']    = !$useclass    ? '' : flexicontent_html::dataFilter(@$v['class'], 200, 'STRING', 0);
+			$newpost[$new]['id']       = !$useid       ? '' : flexicontent_html::dataFilter(@$v['id'], 200, 'STRING', 0);
+			$newpost[$new]['target']   = !$usetarget   ? '' : flexicontent_html::dataFilter(@$v['target'], 200, 'STRING', 0);
 
 			// Hits come only from DB and not via posted data
 			$newpost[$new]['hits']    = isset($db_values[$prefixed_link]) ? (int) @ $db_values[$prefixed_link]['hits'] : 0;

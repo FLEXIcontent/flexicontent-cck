@@ -207,6 +207,7 @@ class FlexicontentModelItems extends FCModelAdminList
 		$filter_author = $fcform ? $jinput->get('filter_author', false, 'array')  :  $app->getUserStateFromRequest( $p.'filter_author', 'filter_author', false, 'array');
 		$filter_state  = $fcform ? $jinput->get('filter_state',  false, 'array')  :  $app->getUserStateFromRequest( $p.'filter_state',  'filter_state',  false, 'array');
 		$filter_access = $fcform ? $jinput->get('filter_access', false, 'array')  :  $app->getUserStateFromRequest( $p.'filter_access', 'filter_access', false, 'array');
+		$filter_meta   = $fcform ? $jinput->get('filter_meta',   '',    'int')    :  $app->getUserStateFromRequest( $p.'filter_meta',   'filter_meta',   '',    'int');
 
 		if (!is_array($filter_tag))    $filter_tag    = strlen($filter_tag)    ? array($filter_tag)    : array();
 		if (!is_array($filter_lang))   $filter_lang   = strlen($filter_lang)   ? array($filter_lang)   : array();
@@ -214,6 +215,7 @@ class FlexicontentModelItems extends FCModelAdminList
 		if (!is_array($filter_author)) $filter_author = strlen($filter_author) ? array($filter_author) : array(); // Support for ZERO author id
 		if (!is_array($filter_state))  $filter_state  = strlen($filter_state)  ? array($filter_state)  : array();
 		if (!is_array($filter_access)) $filter_access = strlen($filter_access) ? array($filter_access) : array();
+		//if (!is_array($filter_meta))   $filter_meta   = strlen($filter_meta)   ? array($filter_meta)   : array();
 
 		$this->setState('filter_tag', $filter_tag);
 		$this->setState('filter_lang', $filter_lang);
@@ -221,6 +223,7 @@ class FlexicontentModelItems extends FCModelAdminList
 		$this->setState('filter_author', $filter_author);
 		$this->setState('filter_state', $filter_state);
 		$this->setState('filter_access', $filter_access);
+		$this->setState('filter_meta', $filter_meta);
 
 		$app->setUserState($p . 'filter_tag', $filter_tag);
 		$app->setUserState($p . 'filter_lang', $filter_lang);
@@ -228,6 +231,7 @@ class FlexicontentModelItems extends FCModelAdminList
 		$app->setUserState($p . 'filter_author', $filter_author);
 		$app->setUserState($p . 'filter_state', $filter_state);
 		$app->setUserState($p . 'filter_access', $filter_access);
+		$app->setUserState($p . 'filter_meta', $filter_meta);
 
 
 		// Date filters
@@ -651,7 +655,7 @@ class FlexicontentModelItems extends FCModelAdminList
 		$item_ids = array();
 		foreach($this->_data as $item) $item_ids[] = $item->id;
 		$field_ids = array_keys($this->_extra_cols);
-		$db = JFactory::getDbo();
+
 		$query = 'SELECT field_id, value, item_id, valueorder, suborder'
 				.' FROM #__flexicontent_fields_item_relations'
 				.' WHERE item_id IN (' . implode(',', $item_ids) .')'
@@ -659,11 +663,12 @@ class FlexicontentModelItems extends FCModelAdminList
 				.' AND value > "" '
 				.' ORDER BY item_id, field_id, valueorder, suborder'  // first 2 parts are not needed ...
 				;
-		$db->setQuery($query);
-		$values = $db->loadObjectList();
+		$values = $this->_db->setQuery($query)->loadObjectList();
 
 		$fieldvalues = array();
-		foreach ($values as $v) {
+
+		foreach ($values as $v)
+		{
 			//$field_name = $this->_extra_cols[$v->field_id]->name;
 			$fieldvalues[$v->item_id][ $v->field_id ][$v->valueorder - 1][$v->suborder - 1] = $v->value;
 		}
@@ -893,13 +898,13 @@ class FlexicontentModelItems extends FCModelAdminList
 	function updateItemCountingData($rows = false, $catid = 0)
 	{
 		$app = JFactory::getApplication();
-		$db = JFactory::getDbo();
 
 		$cache_tbl = "#__flexicontent_items_tmp";
 		$tbls = array($cache_tbl);
+
 		foreach ($tbls as $tbl)
 		{
-			$tbl_fields[$tbl] = $db->getTableColumns($tbl);
+			$tbl_fields[$tbl] = $this->_db->getTableColumns($tbl);
 		}
 
 		// Get the column names
@@ -930,8 +935,13 @@ class FlexicontentModelItems extends FCModelAdminList
 		$query .= $row_ids ? ' WHERE c.id IN (' . implode(',', $row_ids) . ')' : '';
 		$query .= $catid ? ' WHERE c.catid = ' . $catid : '';
 
-		$db->setQuery($query);
-		try { $result = $db->execute(); } catch (Exception $e) { $result = false; echo $e->getMessage(); }
+		try {
+			$result = $this->_db->setQuery($query)->execute();
+		}
+		catch (Exception $e) {
+			$result = false;
+			echo $e->getMessage();
+		}
 
 		return $result;
 	}
@@ -974,6 +984,7 @@ class FlexicontentModelItems extends FCModelAdminList
 		$filter_tag 		= $this->getState('filter_tag');
 		$filter_state   = $this->getState('filter_state');
 		$filter_order   = $this->getState('filter_order');
+		$filter_meta    = $this->getState('filter_meta');
 
 		$filter_cats        = $this->getState('filter_cats');
 		$filter_subcats     = $this->getState('filter_subcats');
@@ -1051,7 +1062,7 @@ class FlexicontentModelItems extends FCModelAdminList
 		$scope  = $this->getState('scope');
 		$search = $this->getState('search');
 
-		$use_tmp = !$query_ids && (!$search || !in_array($scope, array('_desc_', '_meta_', 'a.metadesc', 'a.metakey')));
+		$use_tmp = !$query_ids && !$filter_meta && (!$search || !in_array($scope, array('_desc_', '_meta_', 'a.metadesc', 'a.metakey')));
 		$tmp_only = $use_tmp && (!$search || $scope !== 'ie.search_index');
 
 		// Get the WHERE and ORDER BY clauses for the query
@@ -1249,6 +1260,7 @@ class FlexicontentModelItems extends FCModelAdminList
 		$filter_author	= $this->getState('filter_author');
 		$filter_state   = $this->getState('filter_state');
 		$filter_access  = $this->getState('filter_access');
+		$filter_meta    = $this->getState('filter_meta');
 
 		// category related filters
 		$filter_cats        = $this->getState('filter_cats');
@@ -1511,6 +1523,23 @@ class FlexicontentModelItems extends FCModelAdminList
 		}
 
 
+		if (!empty($filter_meta))
+		{
+			switch($filter_meta)
+			{
+				case 1: 
+					$where[] = 'a.metakey = ' . $this->_db->Quote('');
+					break;
+				case 2: 
+					$where[] = 'a.metadesc = ' . $this->_db->Quote('');
+					break;
+				case 3: 
+					$where[] = '(a.metakey = ' . $this->_db->Quote('') . ' OR a.metadesc = ' . $this->_db->Quote('') . ')';
+					break;
+			}
+		}
+
+
 		/**
 		 * CUSTON filters
 		 */
@@ -1649,9 +1678,12 @@ class FlexicontentModelItems extends FCModelAdminList
 		$_FISH = (boolean) count($this->_db->loadObjectList());
 
 		// Try to find old joomfish tables (with J1.5 jos prefix)
-		if (!$_FISH) {
+		if (!$_FISH)
+		{
 			$this->_db->setQuery('SHOW TABLES LIKE "jos_jf_content"');
-			if ( count($this->_db->loadObjectList()) ) {
+
+			if (count($this->_db->loadObjectList()))
+			{
 				$_FISH = true;
 				$dbprefix = 'jos_';
 			}
@@ -1670,7 +1702,7 @@ class FlexicontentModelItems extends FCModelAdminList
 
 		// Get if translation is to be performed, 1: FLEXI_DUPLICATEORIGINAL,  2: FLEXI_USE_JF_DATA,  3: FLEXI_AUTO_TRANSLATION,  4: FLEXI_FIRST_JF_THEN_AUTO
 		$translate_method = $method == 99
-			? $jinput->get('translate_method', 1, 'int')
+			? $jinput->getInt('translate_method', 1)
 			: $translate_method = 0;
 
 		// If translation method import the translator class
@@ -2101,15 +2133,20 @@ class FlexicontentModelItems extends FCModelAdminList
 	 * @return	boolean	True on success
 	 * @since	1.5
 	 */
-	function moveitem($itemid, $maincat, $seccats = null, $lang, $state=null, $type_id=0, $access=null)
+	function moveitem($itemid, $maincat, $seccats = null, $lang = null, $state = null, $type_id = 0, $access = null)
 	{
 		$item = $this->getTable($this->records_jtable, '');
 		$item->load($itemid);
-		$item->catid    = $maincat ? $maincat : $item->catid;
-		$item->language = $lang ? $lang : $item->language;
-		$item->state    = strlen($state) ? $state : $item->state;  // keep original if: null, ''
-		$item->type_id  = $type_id ? $type_id : $item->type_id;    // keep original if: null, zero, ''
-		$item->access   = $access ? $access : $item->access;       // keep original if: null, zero, ''
+
+		// Keep original if: null, zero, ''
+		$item->catid    = $maincat ?: $item->catid;
+		$item->language = $lang ?: $item->language;
+		$item->type_id  = $type_id ?: $item->type_id;
+		$item->access   = $access ?: $item->access;
+
+		// keep original if: null, ''
+		$item->state = strlen($state) ? $state : $item->state;
+
 		$item->store();
 
 		if ($seccats === null)

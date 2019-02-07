@@ -128,6 +128,7 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 		$filter_author    = $model->getState('filter_author');
 		$filter_state     = $model->getState('filter_state');
 		$filter_access    = $model->getState('filter_access');
+		$filter_meta      = $model->getState('filter_meta');
 
 		// Support for using 'ALL', 'ORPHAN' fake states, by clearing other values
 		if (is_array($filter_state) && in_array('ALL', $filter_state))     $filter_state = array('ALL');
@@ -140,6 +141,7 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 		if ($filter_author) $count_filters++;
 		if ($filter_state) $count_filters++;
 		if ($filter_access) $count_filters++;
+		if ($filter_meta) $count_filters++;
 
 		// Date filters
 		$date      = $model->getState('date');
@@ -209,6 +211,7 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 		if ($filter_author)  $js .= "jQuery('.col_authors').addClass('filtered_column');";
 		if ($filter_lang)    $js .= "jQuery('.col_lang').addClass('filtered_column');";
 		if ($filter_access)  $js .= "jQuery('.col_access').addClass('filtered_column');";
+		if ($filter_meta)    $js .= "jQuery('.col_meta').addClass('filtered_column');";
 		if ($filter_tag)     $js .= "jQuery('.col_tag').addClass('filtered_column');";
 		if ($filter_id)      $js .= "jQuery('.col_id').addClass('filtered_column');";
 		if ($startdate || $enddate)
@@ -655,7 +658,7 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 
 		$lists['scope_tip'] = ''; //'<span class="hidden-phone ' . $this->tooltip_class . '" title="'.JText::_('FLEXI_SEARCH_TEXT_INSIDE').'" style="display: inline-block;"><i class="icon-info-2"></i></span>';
 		$lists['scope'] = $this->getScopeSelectorDisplay($scopes, $scope);
-		$this->scope_title = $scopes[$scope];
+		$this->scope_title = isset($scopes[$scope]) ? $scopes[$scope] : reset($scopes);
 
 
 		// Text search filter value
@@ -798,6 +801,39 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 				$elementid,
 				$translate = true
 			),
+		));
+
+
+		// Build meta status filter
+		$fieldname = 'filter_meta';
+		$elementid = 'filter_meta';
+		$value     = $filter_meta;
+
+		$options = array(
+			JHtml::_('select.option', '', '-'),
+			JHtml::_('select.option', 1, JText::_('FLEXI_EMPTY') . ' (' . JText::_('FLEXI_KEYWORDS') . ')'),
+			JHtml::_('select.option', 2, JText::_('FLEXI_EMPTY') . ' (' . JText::_('FLEXI_DESCRIPTION') . ')'),
+			JHtml::_('select.option', 3, JText::_('FLEXI_EMPTY') . ' (' . JText::_('FLEXI_KEYWORDS') . ' ' . JText::_('FLEXI_OR') . ' ' . JText::_('FLEXI_DESCRIPTION') . ')'),
+		);
+
+		$lists['filter_meta'] = $this->getFilterDisplay(array(
+			'label' => JText::_('FLEXI_META'),
+			'html' => JHtml::_('select.genericlist',
+				$options,
+				$fieldname,
+				array(
+					'size' => '1',
+					'class' => $this->select_class . ' ' . $this->tooltip_class,
+					'onchange' => 'document.adminForm.limitstart.value=0; Joomla.submitform();',
+					'data-placement' => 'bottom',
+					'title' => flexicontent_html::getToolTip(JText::_('FLEXI_META', true), JText::_('FLEXI_EMPTY', true), 0, 1),
+				),
+				'value',
+				'text',
+				$value,
+				$elementid,
+				$translate = true
+			)
 		));
 
 

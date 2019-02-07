@@ -96,7 +96,7 @@ $modfc_jprof->mark('START: FLEXIcontent Google Maps Module');
 require_once(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.helper.php');
 
 static $mod_initialized = null;
-$modulename = 'mod_flexigooglemap';
+$modulename = $module->module;
 if ($mod_initialized === null)
 {
 	flexicontent_html::loadModuleLanguage($modulename);

@@ -63,14 +63,17 @@ class plgFlexicontent_fieldsFile extends FCField
 		$u_item_id = $item->id ? $item->id : substr(JFactory::getApplication()->input->get('unique_tmp_itemid', '', 'string'), 0, 1000);
 
 
-		// ****************
-		// Number of values
-		// ****************
-		$multiple   = $use_ingroup || (int) $field->parameters->get( 'allow_multiple', 1 ) ;
-		$max_values = $use_ingroup ? 0 : (int) $field->parameters->get('max_values', 0);
-		$required   = (int) $field->parameters->get('required', 0);
-		$required_class = $required ? ' required' : '';
+		// ***
+		// *** Number of values
+		// ***
+
+		$multiple     = $use_ingroup || (int) $field->parameters->get( 'allow_multiple', 1 ) ;
+		$max_values   = $use_ingroup ? 0 : (int) $field->parameters->get('max_values', 0);
+		$required     = (int) $field->parameters->get('required', 0);
 		$add_position = (int) $field->parameters->get('add_position', 3);
+
+		// Classes for marking field required
+		$required_class = $required ? ' required' : '';
 
 		// If we are multi-value and not inside fieldgroup then add the control buttons (move, delete, add before/after)
 		$add_ctrl_btns = !$use_ingroup && $multiple;
