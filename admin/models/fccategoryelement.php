@@ -206,7 +206,11 @@ class FlexicontentModelFccategoryelement extends FCModelAdminList
 		// Lets load the records if it doesn't already exist
 		if ($this->_data === null)
 		{
-			if (1)
+			if (!empty($this->_ids))
+			{
+				$query_ids = $this->_ids;
+			}
+			else
 			{
 				// 1, get filtered, limited, ordered items
 				$query = $this->_buildQuery();
@@ -274,32 +278,13 @@ class FlexicontentModelFccategoryelement extends FCModelAdminList
 		// Lets load the records if it was not calculated already via using SQL_CALC_FOUND_ROWS + 'SELECT FOUND_ROWS()'
 		if ($this->_total === null)
 		{
-			$query = $this->_buildQuery();
-			$this->_total = $this->_getListCount($query);
+			$this->_total = (int) $this->_getListCount($this->_buildQuery());
 		}
 
 		return $this->_total;
 	}
 
 
-	/**
-	 * Method to get a pagination object for the records
-	 *
-	 * @return object
-	 *
-	 * @since	1.5
-	 */
-	public function getPagination()
-	{
-		// Create pagination object if it doesn't already exist
-		if (empty($this->_pagination))
-		{
-			require_once (JPATH_COMPONENT_SITE.DS.'helpers'.DS.'pagination.php');
-			$this->_pagination = new FCPagination( $this->getTotal(), $this->getState('limitstart'), $this->getState('limit') );
-		}
-
-		return $this->_pagination;
-	}
 
 
 	/**

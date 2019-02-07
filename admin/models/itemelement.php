@@ -29,7 +29,7 @@ class FlexicontentModelItemelement extends FCModelAdminList
 	 *
 	 * @var string
 	 */
-	var $records_dbtbl  = 'content';
+	var $records_dbtbl = 'content';
 
 	/**
 	 * Record jtable name
@@ -210,7 +210,11 @@ class FlexicontentModelItemelement extends FCModelAdminList
 		// Lets load the records if it doesn't already exist
 		if ($this->_data === null)
 		{
-			if (1)
+			if (!empty($this->_ids))
+			{
+				$query_ids = $this->_ids;
+			}
+			else
 			{
 				// 1, get filtered, limited, ordered items
 				$query = $this->_buildQuery();
@@ -278,32 +282,13 @@ class FlexicontentModelItemelement extends FCModelAdminList
 		// Lets load the records if it was not calculated already via using SQL_CALC_FOUND_ROWS + 'SELECT FOUND_ROWS()'
 		if ($this->_total === null)
 		{
-			$query = $this->_buildQuery();
-			$this->_total = $this->_getListCount($query);
+			$this->_total = (int) $this->_getListCount($this->_buildQuery());
 		}
 
 		return $this->_total;
 	}
 
 
-	/**
-	 * Method to get a pagination object for the records
-	 *
-	 * @return object
-	 *
-	 * @since	1.5
-	 */
-	public function getPagination()
-	{
-		// Create pagination object if it doesn't already exist
-		if (empty($this->_pagination))
-		{
-			require_once (JPATH_COMPONENT_SITE.DS.'helpers'.DS.'pagination.php');
-			$this->_pagination = new FCPagination( $this->getTotal(), $this->getState('limitstart'), $this->getState('limit') );
-		}
-
-		return $this->_pagination;
-	}
 
 
 	/**
@@ -315,13 +300,19 @@ class FlexicontentModelItemelement extends FCModelAdminList
 	 */
 	protected function _buildQuery($query_ids = false)
 	{
+		$filter_meta = $this->getState('filter_meta');
+		$scope       = $this->getState('scope');
+		$search      = $this->getState('search');
+		$use_tmp     = !$query_ids && !$filter_meta && (!$search || !in_array($scope, array('-1', '_desc_', '_meta_', 'a.metadesc', 'a.metakey')));
+		$tbl         = $use_tmp ? '#__flexicontent_items_tmp' : '#__' . $this->records_dbtbl;
+
 		if (!$query_ids)
 		{
 			$query = $this->_db->getQuery(true)
 				->select('SQL_CALC_FOUND_ROWS a.id')
 				->select('ua.name AS author')
 				->select('t.name AS type_name')
-				->from('#__flexicontent_items_tmp AS a')
+				->from($tbl . ' AS a')
 				->join('LEFT', '#__users as ua ON ua.id = a.' . $this->created_by_col)
 				->join('LEFT', '#__flexicontent_items_ext AS ie ON ie.item_id = a.id')
 				->join('LEFT', '#__flexicontent_types AS t ON t.id = ie.type_id')
@@ -400,6 +391,59 @@ class FlexicontentModelItemelement extends FCModelAdminList
 		return $q
 			? ' WHERE ' . (count($where) ? implode(' AND ', $where) : ' 1 ')
 			: $where;
+	}
+
+
+
+	/**
+	 * Method to get Text Search clause according to search scope
+	 *
+	 * @return	void
+	 *
+	 * @since 3.3.0
+	 */
+	protected function _getTextSearch()
+	{
+		// Text search and search scope
+		$scope  = $this->getState('scope');
+		$search = $this->getState('search');
+		$search = StringHelper::trim(StringHelper::strtolower($search));
+
+		// Create the text search clauses
+		$textwhere = array();
+
+		$search_prefix = JComponentHelper::getParams( 'com_flexicontent' )->get('add_search_prefix') ? 'vvv' : '';   // SEARCH WORD Prefix
+
+		if ($search)
+		{
+			$escaped_search = str_replace(' ', '%', $this->_db->escape(trim($search), true));
+			$search_quoted  = $this->_db->Quote('%' . $escaped_search . '%', false);
+
+			switch($scope)
+			{
+				case 'a.metadesc':
+				case 'a.metakey':
+				case 'a.' . $this->name_col:
+					$textwhere[] = ' LOWER(' . $scope . ') LIKE ' . $search_quoted;
+					break;
+
+				case '_meta_':
+					$textwhere[] = 'LOWER(a.metadesc) LIKE ' . $search_quoted;
+					$textwhere[] = 'LOWER(a.metakey)  LIKE ' . $search_quoted;
+					break;
+
+				case '_desc_':
+					$textwhere[] = 'LOWER(a.introtext) LIKE ' . $search_quoted;
+					$textwhere[] = 'LOWER(a.fulltext)  LIKE ' . $search_quoted;
+					break;
+
+				case 'ie.search_index':
+					$textwhere[] = ' MATCH (ie.search_index) AGAINST (' . $this->_db->Quote($search_prefix . $escaped_search . '*', false ).' IN BOOLEAN MODE)';
+					break;
+			}
+		}
+
+		return $textwhere;
 	}
 
 
