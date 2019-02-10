@@ -47,6 +47,7 @@ class plgFlexicontent_fieldsJProfile extends FCField
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 
 		static $users = null;
+
 		if ($users === null)
 		{
 			$users = array();
@@ -56,40 +57,31 @@ class plgFlexicontent_fieldsJProfile extends FCField
 		}
 
 		$displayed_user = $field->parameters->get('displayed_user', 1);
+
 		switch($displayed_user)
 		{
 			// Current user
 			case 3:
-				if ( !isset($users[-1]) ) {
-					$users[-1] = $users[$user_id] = new JUser();
-				} else {
-					$user = $users[-1];
-				}
-				$user_id = $users[-1]->id;
-				$user = $users[-1];
+				$user_id = (int) JFactory::getUser()->id;
 				break;
 
 			// User selected in item form
 			case 2:
 				$user_id = (int) reset($field->value);
-				if ( !isset($users[$user_id]) ) {
-					$user = new JUser($user_id);
-				} else {
-					$user = $users[$user_id];
-				}
 				break;
 
 			// Item's author
 			default:
 			case 1:
-				$user_id = $item->created_by;
-				if ( !isset($users[$user_id]) ) {
-					$user = new JUser($item->created_by);
-				} else {
-					$user = $users[$user_id];
-				}
+				$user_id = (int) $item->created_by;
 				break;
 		}
+		
+		// Create a new user object if needed
+		$users[$user_id] = !isset($users[$user_id])
+			? new JUser($user_id)
+			: $users[$user_id];
+		$user = $users[$user_id];
 
 		$user->params = new JRegistry($user->params);
 		$user->params = $user->params->toArray();
@@ -134,19 +126,31 @@ class plgFlexicontent_fieldsJProfile extends FCField
 		</dl>
 		';
 
+		// Community Builder
+		//Self: index.php?option=com_comprofiler&task=userprofile
+		//User: index.php?option=com_comprofiler&task=userprofile&user=USER_ID 
+
 		$profile_info = array();
-		if (!empty($user->profile->profile)) foreach($user->profile->profile as $pname => $pval) {
-			$profile_info[] = '
-				<dt><span class="label">'.$pname.'</span></dt>
-				<dd>'.$pval.'</dd>';
+
+		if (!empty($user->profile->profile))
+		{
+			foreach($user->profile->profile as $pname => $pval)
+			{
+				$profile_info[] = '
+					<dt><span class="label">' . $pname . '</span></dt>
+					<dd>' . $pval . '</dd>';
+			}
 		}
+
 		if (count($profile_info))
+		{
 			$field->{$prop} .= '
 			<br/>
 			<span class="alert alert-info fc-iblock" style="min-width:50%; margin-bottom:0px;">Profile details</span>
 			<dl class="dl-horizontal">
-				'. implode('', $profile_info).'
+				' . implode('', $profile_info) . '
 			</dl>';
+		}
 
 		//$userProfile = JUserHelper::getProfile( $user_id );
 		//echo "Main Address :" . $userProfile->profile['address1'];
@@ -233,7 +237,7 @@ class plgFlexicontent_fieldsJProfile extends FCField
 		$authorparams = flexicontent_db::getUserConfig($item->created_by);
 
 		// Render author profile
-		if ( $authordescr_itemid = $authorparams->get('authordescr_itemid') )
+		if ($authordescr_itemid = $authorparams->get('authordescr_itemid'))
 		{
 			$app = JFactory::getApplication();
 			$saved_view = $app->input->get('view', '', 'cmd');
