@@ -81,3 +81,4 @@ admin/models/mediadatas.php
 admin/tables/flexicontent_mediadatas.php
 admin/views/mediadata/
 admin/views/mediadatas/
+plugins/flexicontent_fields/mediafile/
