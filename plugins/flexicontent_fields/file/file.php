@@ -5,7 +5,7 @@
  *
  * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
  * @link            https://flexicontent.org
- * @copyright       Copyright © 2017, FLEXIcontent team, All Rights Reserved
+ * @copyright       Copyright Â© 2017, FLEXIcontent team, All Rights Reserved
  * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
@@ -1328,7 +1328,8 @@ class plgFlexicontent_fieldsFile extends FCField
 			$query = 'SELECT * '. $extra_select //filename, filename_original, altname, description, ext, id'
 				. ' FROM #__flexicontent_files'
 				. ' WHERE id IN ('. implode(',', $new_ids) . ')'
-				. ($published ? '  AND published = 1' : '');
+				. ($published ? '  AND published = 1' : '')
+			;
 			$new_data = $db->setQuery($query)->loadObjectList('id');
 
 			if ($new_data) foreach($new_data as $file_id => $file_data)

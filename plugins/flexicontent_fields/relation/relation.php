@@ -108,8 +108,8 @@ class plgFlexicontent_fieldsRelation extends FCField
 		$fieldname = 'custom['.$field->name.']';
 		$elementid = 'custom_'.$field->name;
 
-		// Name Safe Element ID
-		$elementid_ns = str_replace('-', '_', $elementid);
+		// JS safe Field name
+		$field_name_js = str_replace('-', '_', $field->name);
 
 
 		// ***
