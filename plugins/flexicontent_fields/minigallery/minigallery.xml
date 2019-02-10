@@ -17,19 +17,19 @@
 		<folder>js</folder>
 		<folder>tmpl</folder>
 	</files>
-	
+
 	<config>
 	<fields name="attribs">
-		
+
 		<!--fieldset name="standard" hidden="true">
 		</fieldset-->
-		
+
 		<fieldset name="group-minigallery-editing" hidden="true" icon_class="icon-pencil" label="FLEXI_FIELD_EDITING" addfieldpath="/administrator/components/com_flexicontent/elements">
-			
+
 			<field name="" type="separator" default="FLEXI_FIELD_EDITING" level="tabset_start" box_type="1" />
 
 			<field name="" type="separator" default="FLEXI_FIELD_VALUES" icon_class="icon-database" level="tab_open" box_type="1" />
-			
+
 			<field name="" type="separator" default="FLEXI_FIELD_NUMBER_OF_VALUES" description="" level="level2" />
 			<field name="allow_multiple" type="multilist" subtype="radio" default="1" label="FLEXI_FIELD_ALLOW_MULTIPLE" description="FLEXI_FIELD_ALLOW_MULTIPLE_DESC" toggle_related="1" depend_class="fieldgroupoff" class="btn-group btn-group-yesno">
 				<option value="1" show_list="multivalue-mode" hide_list="">FLEXI_YES</option>
@@ -49,9 +49,9 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			
+
 			<field name="" type="separator" default="FLEXI_FORM_FIELD_CONF" description="FLEXI_FORM_FIELD_CONF_DESC" icon_class="icon-checkbox" level="tab_open" box_type="1" />
-			
+
 			<field name="show_values_expand_btn" type="radio" default="1" label="FLEXI_FIELD_EDIT_EXPAND_VALUES" description="FLEXI_FIELD_EDIT_EXPAND_VALUES_DESC" class="btn-group btn-group-yesno" depend_class="fieldgroupoff">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -59,7 +59,7 @@
 
 			<field name="" type="separator" default="FLEXI_LAYOUT" description="" level="level2" />
 			<field name="formlayout" type="fcfilelist" default="" label="FLEXI_FIELD_SELECT_FORM_LAYOUT" description="FLEXI_FIELD_SELECT_FORM_LAYOUT_DESC" directory="plugins/flexicontent_fields/minigallery/tmpl/" filter="field*" exclude="" stripext="1" stripprefix="field_" hide_none="1" hide_default="1" labelclass="label label-warning" />
-			
+
 			<field name="form_file_preview" type="radio" default="1" label="File preview" description="You can enable file preview box, e.g. it will show image thumbnail if selected file is an image" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_DISABLE</option>
 				<option value="1">FLEXI_ENABLE</option>
@@ -98,7 +98,7 @@
 			<field name="iform_dir" type="radio" default="0" label="FLEXI_TARGET_DIRECTORY" description="FLEXI_CHOOSE_DIRECTORY_DESC" depend_class="inline-edit-on" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 			</field>
-			
+
 			<field name="" type="separator" default="FLEXI_DEFAULTS" description="" level="level3" depend_class="inline-edit-on" />
 			<field name="iform_title_default" type="text" default="" label="FLEXI_TITLE" description="FLEXI_FIELD_DEFAULT_VALUE" depend_class="inline-edit-on" class="btn-group btn-group-yesno" />
 			<field name="iform_desc_default" type="text" default="" label="FLEXI_DESCRIPTION" description="FLEXI_FIELD_DEFAULT_VALUE" depend_class="inline-edit-on" class="btn-group btn-group-yesno" />
@@ -116,6 +116,8 @@
 				<option value="0" show_list="use-myfiles-off" hide_list="use-myfiles-on">FLEXI_NO</option>
 				<option value="1" show_list="use-myfiles-on" hide_list="use-myfiles-off">FLEXI_YES</option>
 			</field>
+
+			<field name="" type="separator" default="FLEXI_UPLOADER" level="level3" depend_class="use-myfiles-on" />
 			<field name="autoassign" type="radio" default="1" label="FLEXI_UPLOADED_FILES_AUTO_ASSIGN" description="FLEXI_UPLOADED_FILES_AUTO_ASSIGN_DESC" depend_class="use-myfiles-on" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_UPLOADED_FILE_SELECT_N_ASSIGN</option>
@@ -124,11 +126,11 @@
 			<field name="target_dir" type="radio" default="0" label="FLEXI_TARGET_DIRECTORY" description="FLEXI_CHOOSE_DIRECTORY_DESC" depend_class="use-myfiles-on" class="btn-group group-fcinfo">
 				<option value="0">FLEXI_MEDIA</option>
 			</field>
-			
+
 			<field name="" type="separator" default="FLEXI_FILELIST_COLUMNS" description="FLEXI_FILELIST_COLUMNS_DESC" level="level3" depend_class="use-myfiles-on" />
 			<field name="filelist_cols" type="fccheckbox" default="" display_useglobal="0"
-				checkoptions="FLEXI_ACCESS,FLEXI_TARGET_DIRECTORY,FLEXI_STATE,FLEXI_LANGUAGE,FLEXI_UPLOADER,FLEXI_UPLOAD_TIME,FLEXI_ID,FLEXI_HITS,FLEXI_USAGE"
-				checkvals="access,target,state,lang,uploader,upload_time,file_id,hits,usage"
+				checkoptions="FLEXI_STATE,FLEXI_ACCESS,FLEXI_LANGUAGE,FLEXI_HITS,FLEXI_TARGET_DIRECTORY,FLEXI_USAGE,FLEXI_UPLOADER,FLEXI_UPLOAD_TIME,FLEXI_ID"
+				checkvals="state,access,lang,hits,target,usage,uploader,upload_time,file_id"
 				defaultvals="upload_time,hits"
 				label="FLEXI_COLUMNS" description="FLEXI_FILELIST_COLUMNS_DESC" depend_class="use-myfiles-on" />
 
@@ -151,9 +153,9 @@
 			<field name="" type="separator" default="FLEXI_FIELD_EDITING" level="tabset_close" box_type="1" />
 		</fieldset>
 		<fieldset name="group-minigallery-viewing" hidden="true" icon_class="icon-screen" label="FLEXI_FIELD_VIEWING" addfieldpath="/administrator/components/com_flexicontent/elements">
-			
+
 			<field name="" type="separator" default="FLEXI_FIELD_LABEL_AND_ACCESS" level="level1" />
-			
+
 			<field name="display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -167,12 +169,12 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			
+
 		</fieldset>
 		<fieldset name="group-minigallery-viewing-zoom" hidden="true" icon_class="icon-image" label_prefix="FLEXI_FIELD_VIEWING" label="FLEXI_FIELD_GALLERY_IMAGES" description="FLEXI_FIELD_GALLERY_IMAGES_DESC" addfieldpath="/administrator/components/com_flexicontent/elements">
 
 			<field name="" type="separator" default="FLEXI_FIELD_MGALLERY_POPUP_ZOOMING" description="" level="level2" />
-			
+
 			<field name="usepopup" type="multilist" subtype="radio" default="1" label="FLEXI_FIELD_MGALLERY_ADD_POPUP_JS" description="FLEXI_FIELD_MGALLERY_ADD_POPUP_JS_DESC" toggle_related="1" class="btn-group btn-group-yesno">
 				<option value="0" show_list="" hide_list="field-usepopup">FLEXI_NO</option>
 				<option value="1" show_list="field-usepopup" hide_list="">FLEXI_YES</option>
@@ -184,7 +186,7 @@
 			<field name="" type="separator" default="FLEXI_FIELD_MGALLERY_INLINE_PREVIEWING" level="level2" />
 			<field name="w_l" type="text" default="450" size="4" label="FLEXI_FIELD_GALLERY_WIDTH_LARGE" description="FLEXI_FIELD_GALLERY_WIDTH_LARGE_DESC" />
 			<field name="h_l" type="text" default="300" size="4" label="FLEXI_FIELD_GALLERY_HEIGHT_LARGE" description="FLEXI_FIELD_GALLERY_HEIGHT_LARGE_DESC" />
-			
+
 			<field name="" type="separator" default="FLEXI_THUMBNAILS" level="level2" />
 			<field name="thumbnails" type="multilist" subtype="radio" default="1" label="FLEXI_FIELD_DISPLAY_THUMBNAILS" description="FLEXI_FIELD_DISPLAY_THUMBNAILS_DESC" toggle_related="1" class="btn-group btn-group-yesno">
 				<option value="0" show_list="" hide_list="field-thumbnails">FLEXI_NO</option>
@@ -202,7 +204,7 @@
 				<option value="1">FLEXI_FIELD_DISPLAY_SCROLL_THUMBS_1</option>
 				<option value="0">FLEXI_FIELD_DISPLAY_SCROLL_THUMBS_0</option>
 			</field>
-			
+
 			<field name="" type="separator" default="FLEXI_FIELD_MGALLERY_CAPTIONS" level="level2" />
 			<field name="usecaptions" type="multilist" subtype="radio" default="1" label="FLEXI_FIELD_MGALLERY_USE_CAPTIONS" description="FLEXI_FIELD_MGALLERY_USE_CAPTIONS_DESC" toggle_related="1" class="btn-group btn-group-yesno">
 				<option value="0" show_list="" hide_list="field-usecaptions">FLEXI_NO</option>
@@ -210,10 +212,10 @@
 				<option value="2" show_list="field-usecaptions" hide_list="">FLEXI_FIELD_MGALLERY_CUSTOM_CAPTION</option>
 			</field>
 			<field name="customcaptions" type="text" default="This is a caption" label="FLEXI_FIELD_MGALLERY_CUSTOM_CAPTION" description="FLEXI_FIELD_MGALLERY_CUSTOM_CAPTION_DESC" depend_class="field-usecaptions" />
-			
+
 		</fieldset>
 		<fieldset name="group-minigallery-viewing-slideshow" hidden="true" icon_class="icon-image" label_prefix="FLEXI_FIELD_VIEWING" label="Slideshow" description="FLEXI_FIELD_GALLERY_SLIDESHOW_DESC" addfieldpath="/administrator/components/com_flexicontent/elements">
-			
+
 			<field name="controller" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_CONTROLS" description="FLEXI_FIELD_DISPLAY_CONTROLS_DESC">
 				<option value="1">FLEXI_YES</option>
 				<option value="0">FLEXI_NO</option>
@@ -239,12 +241,12 @@
 				<option value="out:in">FLEXI_FIELD_GALERY_TRANSITION_DIRECTION_OUTIN</option>
 			</field>
 			<field name="otheroptions" type="textarea" filter="RAW" default="" cols="40" rows="3" label="FLEXI_FIELD_GALERY_TRANSITION_OTHER_OPTIONS" description="FLEXI_FIELD_GALERY_TRANSITION_OTHER_OPTIONS_DESC" />
-			
+
 		</fieldset>
-		
+
 	</fields>
 	</config>
-	
+
 	<languages>
 		<language tag="en-GB">en-GB.plg_flexicontent_fields_minigallery.ini</language>
 	</languages>

@@ -185,6 +185,8 @@ class plgFlexicontent_fieldsAddressint extends FCField
 		// Field name and HTML TAG id
 		$fieldname = 'custom['.$field->name.']';
 		$elementid = 'custom_'.$field->name;
+
+		// JS safe Field name
 		$field_name_js = str_replace('-', '_', $field->name);
 
 
