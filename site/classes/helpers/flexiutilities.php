@@ -779,6 +779,12 @@ class FLEXIUtilities
 					'</a>', '', false);
 			}
 
+			$mediadatas_path = JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'views'.DS.'mediadatas';
+
+			if (file_exists($mediadatas_path) && version_compare(FLEXI_VERSION, '3.2.99', '>'))
+			{
+				call_user_func($addEntry, '<span class="fcsb-icon-mediadata icon-equalizer"></span>'.JText::_( 'FLEXI_MEDIADATAS' ), 'index.php?option=com_flexicontent&view=mediadatas', $view=='mediadatas');
+			}
 
 			$reviews_path = JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'views'.DS.'reviews';
 

@@ -41,7 +41,7 @@
 			<field name="frontend_hidden" type="hidden" default="1" />
 			<field name="backend_hidden" type="hidden" default="1" />
 			
-			<field name="displayed_user" type="multilist" subtype="radio" default="1" label="FLEXI_FIELD_JP_DISPLAYED_USER" description="FLEXI_FIELD_JP_DISPLAYED_USER_DESC" toggle_related="0" class="btn-group btn-group-yesno">
+			<field name="displayed_user" type="multilist" subtype="radio" default="1" label="FLEXI_FIELD_JP_DISPLAYED_USER" description="FLEXI_FIELD_JP_DISPLAYED_USER_DESC" toggle_related="0" class="btn-group group-fcinfo">
 				<option value="1" show_list="" hide_list="">FLEXI_FIELD_JP_ITEM_AUTHOR</option>
 				<!--option value="2" show_list="" hide_list="">FLEXI_FIELD_JP_ALLOW_SELECTION</option-->
 				<option value="3" show_list="" hide_list="">FLEXI_FIELD_JP_CURRENT_USER</option>
