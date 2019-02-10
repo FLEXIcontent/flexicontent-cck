@@ -5,7 +5,7 @@
  *
  * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
  * @link            https://flexicontent.org
- * @copyright       Copyright © 2017, FLEXIcontent team, All Rights Reserved
+ * @copyright       Copyright Â© 2017, FLEXIcontent team, All Rights Reserved
  * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
@@ -63,9 +63,10 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 		$u_item_id = $item->id ? $item->id : substr(JFactory::getApplication()->input->get('unique_tmp_itemid', '', 'string'), 0, 1000);
 
 
-		// ****************
-		// Number of values
-		// ****************
+		// ***
+		// *** Number of values
+		// ***
+
 		$multiple     = $use_ingroup || 1; //(int) $field->parameters->get( 'allow_multiple', 1 ) ;
 		$max_values   = $use_ingroup ? 0 : (int) $field->parameters->get('max_values', 0);
 		$required     = (int) $field->parameters->get('required', 0);
@@ -1137,32 +1138,42 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 	// *** VARIOUS HELPER METHODS
 	// ***
 
-	function getFileData($fid, $published=1, $extra_select='')
+
+
+
+	/**
+	 * Get DB data for the given file IDs
+	 */
+
+	function getFileData($fid, $published = 1, $extra_select = '')
 	{
 		// Find which file data are already cached, and if no new file ids to query, then return cached only data
 		static $cached_data = array();
+
 		$return_data = array();
 		$new_ids = array();
-		$file_ids = (array)$fid;
+		$file_ids = (array) $fid;
+
 		foreach ($file_ids as $file_id)
 		{
-			$f = (int)$file_id;
-			if ( !isset($cached_data[$f]) && $f)
+			$f = (int) $file_id;
+			if (!isset($cached_data[$f]) && $f)
+			{
 				$new_ids[] = $f;
+			}
 		}
 
 		// Get file data not retrieved already
-		if ( count($new_ids) )
+		if (count($new_ids))
 		{
 			// Only query files that are not already cached
 			$db = JFactory::getDbo();
 			$query = 'SELECT * '. $extra_select //filename, filename_original, altname, description, ext, id'
-					. ' FROM #__flexicontent_files'
-					. ' WHERE id IN ('. implode(',', $new_ids) . ')'
-					. ($published ? '  AND published = 1' : '')
-					;
-			$db->setQuery($query);
-			$new_data = $db->loadObjectList('id');
+				. ' FROM #__flexicontent_files'
+				. ' WHERE id IN ('. implode(',', $new_ids) . ')'
+				. ($published ? '  AND published = 1' : '')
+			;
+			$new_data = $db->setQuery($query)->loadObjectList('id');
 
 			if ($new_data) foreach($new_data as $file_id => $file_data)
 			{
@@ -1173,12 +1184,14 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 		// Finally get file data in correct order
 		foreach($file_ids as $file_id)
 		{
-			$f = (int)$file_id;
-			if ( isset($cached_data[$f]) && $f)
+			$f = (int) $file_id;
+			if (isset($cached_data[$f]) && $f)
+			{
 				$return_data[$file_id] = $cached_data[$f];
+			}
 		}
 
-		return !is_array($fid) ? @$return_data[(int)$fid] : $return_data;
+		return !is_array($fid) ? @ $return_data[(int) $fid] : $return_data;
 	}
 
 
