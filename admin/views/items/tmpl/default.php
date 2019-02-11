@@ -943,7 +943,7 @@ jQuery(document).ready(function(){
 						$is_current = $assoc_item->id == $row->id;
 						$assoc_modified = strtotime($assoc_item->modified) ?: strtotime($assoc_item->created);
 
-						$_link  = 'index.php?option=com_flexicontent&amp;task='.$ctrl.'edit&amp;cid='. $assoc_item->id;
+						$_link  = 'index.php?option=com_flexicontent&amp;task='.$ctrl.'edit&amp;id='. $assoc_item->id;
 						$_title = flexicontent_html::getToolTip(
 							($is_current ? '' : JText::_( $assoc_modified < $row_modified ? 'FLEXI_EARLIER_THAN_THIS' : 'FLEXI_LATER_THAN_THIS')),
 							( !empty($this->langs->{$assoc_item->lang}) ? ' <img src="'.$this->langs->{$assoc_item->lang}->imgsrc.'" alt="'.$assoc_item->lang.'" /> ' : '').
@@ -1042,7 +1042,7 @@ jQuery(document).ready(function(){
 					$catClass = ($isMainCat ? 'maincat' : 'secondarycat').
 						(($ix==0 && $this->reOrderingActive) ? ' orderingcat' : '');
 
-					$catLink	= 'index.php?option=com_flexicontent&amp;'.$cats_task.'edit&amp;cid='. $category->id;
+					$catLink	= 'index.php?option=com_flexicontent&amp;'.$cats_task.'edit&amp;id='. $category->id;
 					$title = htmlspecialchars($category->title, ENT_QUOTES, 'UTF-8');
 
 					$short_name = StringHelper::strlen($title) > 40  ? StringHelper::substr( $title , 0 , 40) . '...' : $title;
