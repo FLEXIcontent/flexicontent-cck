@@ -1038,7 +1038,7 @@ class _FlexicontentSiteRouter
 
 		$records = $db->setQuery($query)->loadObjectList();
 
-		if (count($records) === 1 || $tbl === '#__content')
+		if (count($records) === 1 || (count($records) && $tbl === '#__content'))
 		{
 			$record = reset($records);
 			return (int) $record->id;
