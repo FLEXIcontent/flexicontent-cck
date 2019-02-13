@@ -695,21 +695,20 @@ class plgFlexicontent_fieldsEmail extends FCField
 		// Load plugin language
 		$lang = JFactory::getLanguage();
 		$lang->load('plg_flexicontent_fields_email', JPATH_ADMINISTRATOR);
+
+		// get the params from the plugin options
+		$plugin = JPluginHelper::getPlugin('flexicontent_fields', 'email');
+		$pluginParams = new JRegistry($plugin->params);
+
 		// Check for request forgeries.
 		JSession::checkToken() or jexit(JText::_('JINVALID_TOKEN'));
 
 		// Get a handle to the Joomla! application object
 		$app = JFactory::getApplication();
 
-		//Check value
+		//get input form
 		$jinput = JFactory::getApplication()->input;
-
-		$firstname = $jinput->post->get('first_name', '', 'filter');
-		$lastname = $jinput->post->get('last_name', '', 'filter');
-		$fromname = $firstname.' '.$lastname;
-		$fromemail = $jinput->post->get('emailfrom', '', '');
-		$to =  $jinput->post->get('emailto', '', '');
-		$from = array($fromemail , $fromname);
+		//dump ($jinput, 'formulaire');
 
 		// create variable for email
 		global $globalcats;
@@ -721,15 +720,7 @@ class plgFlexicontent_fieldsEmail extends FCField
 		$title    = $jinput->post->get('itemtitle', '');
 		$alias    = $jinput->post->get('itemalias', '');
 		$maincat  = $jinput->post->get('catid', '', 'int');
-
-		//set if subject field is displayed and if we need a default title
-		$subject = $jinput->post->get('subject', '', 'filter');
-		if (empty($subject)){
-			$subject ='';
-		}else { //TODO add pro function for title remplacement
-			$subject = $jinput->post->get('subject', '', 'filter');
-		}
-		$subjectemail = JText::sprintf('FLEXI_FIELD_EMAIL_SUBJECT_DEFAULT', $firstname, $lastname, $subject);
+		$itemauthor  = $jinput->post->get('itemauthor', '', '');
 
 		// Create the non-SEF URL
 		$item_url = FlexicontentHelperRoute::getItemRoute($itemid.':'.$alias, $maincat);
@@ -741,40 +732,92 @@ class plgFlexicontent_fieldsEmail extends FCField
 		$item_url = JUri::getInstance()->toString(array('scheme', 'host', 'port')) . $item_url;
 		$sitename = $app->getCfg('sitename') . ' - ' . JUri::root();
 
-		//set if message / firstname / lastname are used field are used
-		$body =  $jinput->post->get('message', '', 'html');
-		if (empty($body))
-		{
-			$body ='';
-		}else { //TODO add pro function for message remplacement
-			$body =  $jinput->post->get('message', '', 'html');
+		// set only form value in input
+		$id = $jinput->post->get('formid', '', '');
+		$datas = $jinput->post->get($id, array(), 'array');
+		if (isset($datas['name'])){
+			$name = $datas['name'];
 		}
-		if (empty($firstname))
-		{
-			$firstname ='';
-		}else	{
-			$firstname	= $jinput->post->get('first_name', '', 'filter');
+		if (isset($datas['firstname'])){
+			$firstname = $datas['firstname'];
 		}
-		if (empty($lastname))
-		{
-			$lastname ='';
-		}else	{
-			$lastname = $jinput->post->get('last_name', '', 'filter');
+		if (isset($datas['lastname'])){
+			$lastname = $datas['lastname'];
 		}
-		$message 	= JText::sprintf('FLEXI_FIELD_EMAIL_MESSAGE_DEFAULT', $title, $firstname, $lastname, $fromemail, $body, '<a href="'.$item_url.'">'.$item_url.'</a>', $sitename);
+		// Create header email
+		if (!empty($name)){ // check if user use 1 name field or 2 separeate field
+			$fromname = $jinput->post->get('name', '', '');
+		} elseif (!empty($firstname) && !empty($lastname)){
+			$firstname = $datas['firstname'];
+			$lastname = $datas['lastname'];
+			$fromname = $firstname.' '.$lastname;
+		}
+		if (empty($fromname)){
+			$app->enqueueMessage(JText::_('FLEXI_FIELD_EMAIL_CONFIG_ERROR'), 'error');
+		}
+		$fromemail = $jinput->post->get('emailfrom', '', '');
+		$emailauthor =  $jinput->post->get('emailauthor', '', '');
+		$from = array($fromemail , $fromname);
 
-		//Prepare email
-		$mailer = JFactory::getMailer();
-		$mailer->setSender($from);
-		$mailer->addRecipient($to);
-		$mailer->setSubject($subjectemail);
-		$mailer->setBody($message);
+		//subject
+		if (isset($datas['subject'])){
+			$subject = $datas['subject'];
+		} else{
+			$subject ='';
+		}
+		$subjectemail = JText::sprintf('FLEXI_FIELD_EMAIL_SUBJECT_DEFAULT', $fromname, $subject);
 
-		//Set email in html
-		$mailer->isHTML();
+		//body
+		$body = '';
+		foreach ($datas as $field => $value) {
+				$body .= '<li>' . $value . '</li>';
+			}
+			$body = "\n\r\n\r\n" . stripslashes($body);
+			$message 	= JText::sprintf('FLEXI_FIELD_EMAIL_MESSAGE_DEFAULT', $title, $body, '<a href="'.$item_url.'">'.$item_url.'</a>', $sitename);
+
+
+		// Check whether email copy function activated
+		$copy_email_user = $pluginParams->get( 'email_user_copy','' );
+			if ($copy_email_user == true)
+			{
+				$messagecopy   = JText::sprintf('FLEXI_FIELD_EMAIL_MESSAGE_DEFAULT_COPY', $title, $body, '<a href="'.$item_url.'">'.$item_url.'</a>', $sitename);
+				$subjectcopy =  JText::sprintf('FLEXI_FIELD_EMAIL_SUBJECT_DEFAULT_COPY', $fromname, $itemauthor, $subject);
+				$mailer = JFactory::getMailer();
+				$mailer->isHTML(true);
+				$mailer ->setSender(array($emailauthor, $itemauthor));
+				$mailer ->addRecipient($fromemail);
+				$mailer ->setSubject($subjectcopy);
+				$mailer ->setBody($messagecopy);
+				$send = $mailer->Send();
+			}
+			$copy_email_admin = $pluginParams->get( 'email_admin_copy', 0 );
+			$email_admin = $pluginParams->get( 'email_admin', '' ) ;
+				if ($copy_email_admin == true)
+				{
+					$messagecopyadmin   = JText::sprintf('FLEXI_FIELD_EMAIL_MESSAGE_ADMIN_COPY', $fromname , $title, $body, '<a href="'.$item_url.'">'.$item_url.'</a>', $sitename);
+					$subjectcopyadmin =  JText::sprintf('FLEXI_FIELD_EMAIL_SUBJECT_ADMIN_COPY', $itemauthor, $subject);
+					$mailer = JFactory::getMailer();
+					$mailer->isHTML(true);
+					$mailer ->setSender($from, $fromname);
+					$mailer ->addRecipient($email_admin);
+					$mailer ->setSubject($subjectcopyadmin);
+					$mailer ->setBody($messagecopyadmin);
+					$send = $mailer->Send();
+				}
+
+			//Prepare contact email
+			$mailer = JFactory::getMailer();
+			$mailer->isHTML(true);
+			$mailer->setSender($from, $fromname);
+			$mailer->addRecipient($emailauthor);
+			$mailer->setSubject($subjectemail);
+			$mailer->setBody($message);
+		//TODO	$mailer->addAttachment(JURI::base().'/tmp/document.pdf');
 
 		//Sendemail
 		$send = $mailer->Send();
+
+		//Message in front-end
 		if ( $send !== true )
 			{
 			    $app->enqueueMessage(JText::_('FLEXI_FIELD_EMAIL_MESSAGE_SEND_ERROR'), 'error');

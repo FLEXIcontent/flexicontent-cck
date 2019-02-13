@@ -39,7 +39,22 @@ foreach ($values as $value)
 
 	// Create field's display
 	$submit_class = $field->parameters->get('submit_class', 'btn');
-	$display_placeholder = $field->parameters->get('disp_placeholder', 1);
+	$label_position = $field->parameters->get('label_position', '');
+	//label position
+	if ($label_position ==='top'){
+		$class="label-top";
+	}elseif ($label_position ==='placeholder'){
+		$class="placeholder";
+	}else{
+		$class='';
+	}
+
+	// Add styles for label position
+	$document = JFactory::getDocument();
+	$style = '.placeholder{position: absolute;left: -99999px;}.label-top{display:block;}';
+	$document->addStyleDeclaration($style);
+
+
 	// Use paremeters to decide if email should be cloaked and if we need a mailto: link
 	//title form display
 	$titleform = JText::_($field->parameters->get('title_form', ''));
@@ -48,100 +63,6 @@ foreach ($values as $value)
 		$titleformD = '<LEGEND>'.$titleform.'</LEGEND>';
 	} else {
 		$titleformD='';
-	}
-
-	//firstname field
-	$firstname_value= preg_replace("#[^a-zA-Z-0-9]#", "", JText::_('FLEXI_FIELD_EMAIL_FIRSTNAME_LABEL_VALUE'));
-	$firstname_field_display = $field->parameters->get('display_firstname_field', 1);
-	$firstname_field_required = $field->parameters->get('firstname_field_required', 1);
-	$required = $firstname_field_required ? 'required':'';
-	if ($firstname_field_display && !$display_placeholder){
-		$firstname_field = '<div class="field">
-		<label for="'.$firstname_value.'">'.JText::_('FLEXI_FIELD_EMAIL_FIRSTNAME_LABEL_VALUE').
-		'</label> <input type="text" name="first_name" id="'.$firstname_value.'" class="'.$required.'">
-		</div>';
-	}elseif ($firstname_field_display && $display_placeholder){
-        $firstname_field = '<div class="field">
-        <input type="text" name="first_name" id="'.$firstname_value.'" class="'.$required.'" placeholder="'.JText::_('FLEXI_FIELD_EMAIL_FIRSTNAME_LABEL_VALUE').'">
-		</div>';
-	}else {
-		$firstname_field='';
-	}
-
-	//lastname field
-	$lastname_value= preg_replace("#[^a-zA-Z-0-9]#", "", JText::_('FLEXI_FIELD_EMAIL_LASTNAME_LABEL_VALUE'));
-	$lastname_field_display = $field->parameters->get('display_lastname_field', 1);
-	$lastname_field_required = $field->parameters->get('lastname_field_required', 1);
-	$required = $lastname_field_required ? 'required':'';
-	if ($lastname_field_display && !$display_placeholder){
-		$lastname_field = '<div class="field">
-		<label for="'.$lastname_value.'">'.JText::_('FLEXI_FIELD_EMAIL_LASTNAME_LABEL_VALUE').
-		'</label> <input type="text" name="last_name" id="'.$lastname_value.'" class="'.$required.'">
-		</div>';
-	}elseif ($lastname_field_display && $display_placeholder){
-		$lastname_field = '<div class="field">
-		<input type="text" name="last_name" id="'.$lastname_value.'" class="'.$required.'"
-		placeholder="'.JText::_('FLEXI_FIELD_EMAIL_LASTNAME_LABEL_VALUE').'">
-		</div>';
-	}else {
-		$lastname_field='';
-	}
-
-	//emailfrom field
-	$emailfrom_value= preg_replace("#[^a-zA-Z-0-9]#", "", JText::_('FLEXI_FIELD_EMAIL_EMAILFROM_LABEL_VALUE'));
-	$emailfrom_field_display = $field->parameters->get('display_emailfrom_field', 1);
-	$emailfrom_field_required = $field->parameters->get('emailfrom_field_required', 1);
-	$required = $emailfrom_field_required ? 'required':'';
-	if ($emailfrom_field_display && !$display_placeholder){
-		$emailfrom_field = '<div class="field">
-		<label for="'.$emailfrom_value.'">'.JText::_('FLEXI_FIELD_EMAIL_EMAILFROM_LABEL_VALUE').
-		'</label> <input type="text" name="email_from" id="'.$emailfrom_value.'" class="'.$required.'">
-		</div>';
-	}elseif ($emailfrom_field_display && $display_placeholder){
-		$emailfrom_field = '<div class="field">
-		<input type="text" name="emailfrom" id="'.$emailfrom_value.'" class="'.$required.'"
-		placeholder="'.JText::_('FLEXI_FIELD_EMAIL_EMAILFROM_LABEL_VALUE').'">
-		</div>';
-	}else {
-		$emailfrom_field ='';
-	}
-
-	//subject field
-	$subject_value= preg_replace("#[^a-zA-Z-0-9]#", "", JText::_('FLEXI_FIELD_EMAIL_SUBJECT_LABEL_VALUE'));
-	$subject_field_display = $field->parameters->get('display_subject_field', 1);
-	$subject_field_required = $field->parameters->get('subject_field_required', 1);
-	$required = $subject_field_required ? 'required':'';
-	if ($subject_field_display && !$display_placeholder){
-		$subject_field = '<div class="field">
-		<label for="'.$subject_value.'">'.JText::_('FLEXI_FIELD_EMAIL_SUBJECT_LABEL_VALUE').
-		'</label> <input type="text" name="subject" id="'.$subject_value.'" class="'.$required.'">
-		</div>';
-	}elseif ($subject_field_display && $display_placeholder){
-		$subject_field = '<div class="field">
-		<input type="text" name="subject" id="'.$subject_value.'" class="'.$required.'"
-		placeholder="'.JText::_('FLEXI_FIELD_EMAIL_SUBJECT_LABEL_VALUE').'">
-		</div>';
-	}else {
-		$subject_field='';
-	}
-
-	//message field
-	$message_value = preg_replace("#[^a-zA-Z-0-9]#", "", JText::_('FLEXI_FIELD_EMAIL_MESSAGE_LABEL_VALUE'));
-	$message_field_display = $field->parameters->get('display_message_field', 1);
-	$message_field_required = $field->parameters->get('message_field_required', 1);
-	$required = $message_field_required ? 'required':'';
-	if ($message_field_display && !$display_placeholder){
-		$message_field = '<div class="field">
-		<label for="'.$message_value.'">'.JText::_('FLEXI_FIELD_EMAIL_MESSAGE_LABEL_VALUE').
-		'</label> <textarea name="message" id="'.$message_value.'" class="'.$required.'" rows="5" cols="33"></textarea>
-		</div>';
-	}elseif ($message_field_display && $display_placeholder){
-		$message_field = '<div class="field">
-		<input type="text" name="message" id="'.$message_value.'" class="'.$required.'"
-		placeholder="'.JText::_('FLEXI_FIELD_EMAIL_MESSAGE_LABEL_VALUE').'">
-		</div>';
-	}else {
-		$message_field='';
 	}
 
 	// Consent field
@@ -165,34 +86,115 @@ foreach ($values as $value)
 		}else {
 			$captcha_div='';
 		}
+		// TODO add position for label
 
 	//Fake id form, cutt email on @ and set startemail
 	$formid =  explode("@", $addr);
 	$formid = $formid[0];
+	$fields_display='';
+	$list_fields = $field->parameters->get('form_fields');
+								if ($list_fields){
+	              foreach( $list_fields as $list_fields_idx => $list_field ) {
+									//print_r ($list_field);
+									//check and create required class
+									$required ='';
+									if ($list_field->field_required){
+										$required="required";
+									}
+									//create JText value
+									$field_label = JText::_($list_field->field_label);
+
+									//create field id
+									$field_id = preg_replace("#[^a-zA-Z-0-9]#", "", JText::_($list_field->field_name));
+
+								//create field name
+									$field_name = $formid.'['.JText::_($list_field->field_name).']';
+
+									//create field value
+									$field_value = preg_replace("#[^a-zA-Z-0-9]#", "", JText::_($list_field->field_value));
+
+									//placeholder
+									$placeholder = ($label_position === 'placeholder') ? 'placeholder="'.$list_field->field_label.'"': '';
+
+									if($list_field->field_type === 'text') {
+										$fields_display .= '<div class="field"><label for="'.$field_id.'" class="'.$class.'">'.$field_label.'</label><input type="text" name="'.$field_name.'" id="'.$field_id.'" '.$placeholder.' aria-label="'.$field_label.'" class="'.$required.'"></div>';
+										}
+									if($list_field->field_type === 'email') {
+										$fields_display .= '<div class="field"><label for="'.$field_id.'" class="'.$class.'">'.$field_label.'</label><input type="email" name="'.$field_name.'" id="'.$field_id.'" '.$placeholder.' aria-label="'.$field_label.'" class="'.$required.' validate-email"></div>';
+										}
+									if($list_field->field_type === 'date') {
+											$fields_display .= '<div class="field"><label for="'.$field_id.'" class="'.$class.'">'.$field_label.'</label><input type="date" name="'.$field_name.'" id="'.$field_id.'" '.$placeholder.' aria-label="'.$field_label.'" class="'.$required.'"></div>';
+											}
+									if($list_field->field_type === 'datetime-local') {
+											$fields_display .= '<div class="field"><label for="'.$field_id.'" class="'.$class.'">'.$field_label.'</label><input type="datetime-local" name="'.$field_name.'" id="'.$field_id.'" '.$placeholder.' aria-label="'.$field_label.'" class="'.$required.'"></div>';
+											}
+									if($list_field->field_type === 'textarea') {
+										$fields_display .= '<div class="field"><label for="'.$field_id.'" class="'.$class.'">'.$field_label.'</label><textarea rows="4" cols="50" name="'.$field_name.'" '.$placeholder.' aria-label="'.$field_label.'" id="'.$field_id.'" class="'.$required.'"></textarea></div>';
+										}
+									if($list_field->field_type === 'radio') {
+										$values_field = explode(";;",$list_field->field_value);
+										$fields_display .= '<div class="field"><label for="'.$field_id.'" class="'.$class.'">'.$list_field->field_label.'</label>';
+											foreach( $values_field as $value_field ) {
+												$value =  JText::_($value_field);
+												$fields_display .= '<input type="radio" value="'.$value.'" name="'.$formid.'['.$value.']'.'" aria-label="'.$value.'"><label for="'.$field_id.'">'.$value.'</label>';
+											}
+											$fields_display .='</div>';
+									}
+									if($list_field->field_type === 'checkbox') {
+										$values_field = explode(";;",$list_field->field_value);
+										$fields_display .= '<div class="field"><label for="'.$field_id.'" class="'.$class.'">'.$list_field->field_label.'</label>';
+											foreach( $values_field as $value_field ) {
+												$value = JText::_($value_field);
+												$fields_display .= '<input type="checkbox" value="'.$value.'" name="'.$value.'" class="" aria-label="'.$value.'" ><label for="'.$field_id.'">'.$value.'</label>'; //TODO add required system
+											}
+											$fields_display .='</div>';
+									}
+									if($list_field->field_type === 'select') {
+										$values_field = explode(";;",$list_field->field_value);
+										$fields_display .= '<div class="field"><label for="'.$field_id.'" class="'.$class.'">'.$field_label.'</label><select id="'.$field_name.'" name="'.$field_name.'" aria-label="'.$field_label.'"><option value="">'.JText::_('FLEXI_SELECT').'</option>';//TODO add required system
+											foreach( $values_field as $value_field ) {
+												$value = JText::_($value_field);
+												$fields_display .='<option value="'.$value.'">'.JText::_($value_field).'</option>';
+											}
+										$fields_display .='</select></div>';
+									}
+									if($list_field->field_type === 'file') {
+										$fields_display .= '<h3>NOT COMPLETE FUNCTION</h3><div class="field"><label for="'.$field_id.'" class="'.$class.'">'.$field_label.'</label><input type="file" name="'.$field_name.'" accept="'.$value.'" id="'.$field_id.'" '.$placeholder.' aria-label="'.$field_label.'" class="'.$required.'" multiple></div>';//TODO add upload system
+									}
+									if($list_field->field_type === 'phone') {
+										$fields_display .= '<div class="field"><label for="'.$field_id.'" class="'.$class.'">'.$field_label.'</label><input type="phone" name="'.$field_name.'" pattern="'.$value.'" id="'.$field_id.'" '.$placeholder.' aria-label="'.$field_label.'" class="'.$required.'"></div>';
+									}
+									if($list_field->field_type === 'hidden') {
+										$fields_display .= '<input type="hidden" name="'.$field_name.'" id="'.$field_id.'">';
+									}
+									if($list_field->field_type === 'freehtml') {
+										$fields_display .= '<div class="field"><p>'.$field_label.'</p><p>'.JText::_($list_field->field_value).'</p></div>';
+									}
+									if($list_field->field_type === 'url') {
+										$fields_display .= '<div class="field"><label for="'.$field_id.'" class="'.$class.'">'.$field_label.'</label><input type="url" name="'.$field_name.'" pattern="'.$list_field->field_value.'" id="'.$field_id.'" '.$placeholder.' aria-label="'.$field_label.'" class="'.$required.'"></div>';
+									}
+							}
+						}
 
 	$html = '
-		<form id="contact-form-'.$formid.'" method="POST" class="form-validate">
+		<form id="contact-form-'.$formid.'" method="POST" class="form-validate" enctype="multipart/form-data">
 		<fieldset>
 			'.$titleformD.'
-			'.$firstname_field.'
-			'.$lastname_field.'
-			'.$emailfrom_field.'
-			'.$subject_field.'
-			'.$message_field.'
+			'.$fields_display.'
 			'.$consent_field.'
 			'.$captcha_div.'
-
 		<input type="submit" name="submit" value="'.JText::_('FLEXI_FIELD_EMAIL_SUBMIT_LABEL_VALUE').'" class="'.$submit_class.'">
 		<input type="hidden" name="emailtask" value="plg.email.submit" />
-		<input type="hidden" name="emailto" value="'.$addr.'" />
+		<input type="hidden" name="formid" value="'.$formid.'" />
+		<input type="hidden" name="emailauthor" value="'.$addr.'" />
 		<input type="hidden" name="itemid" value="'.$item->id.'" />
 		<input type="hidden" name="itemtitle" value="'.$item->title.'" />
 		<input type="hidden" name="itemalias" value="'.$item->alias.'" />
+		<input type="hidden" name="itemauthor" value="'.$item->author.'" />
 		<input type="hidden" name="catid" value="'.$item->catid.'" />
 		<input type="hidden" name="return" value="" />
 		'.JHtml::_("form.token").'
 		</fieldset>
-
 		</form>';
 
 

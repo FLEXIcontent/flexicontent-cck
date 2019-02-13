@@ -177,66 +177,54 @@
 			</field>
 			<field name="title_form" type="text" label="FLEXI_FIELD_EMAIL_FORM_TITLE"  defaut="FLEXI_FIELD_EMAIL_TITLEFORM_VALUE" description="FLEXI_FIELD_EMAIL_FORM_TITLE_DESC" depend_class="disp_title_form" />
 
-			<field name="disp_placeholder" default="0" type="multilist" subtype="radio" toggle_related="1" label="FLEXI_FIELD_EMAIL_PLACEHOLDER_DISPLAY" description="FLEXI_FIELD_EMAIL_PLACEHOLDER_DISPLAY_DESC" class="btn-group btn-group-yesno">
-			<option value="0">FLEXI_NO</option>
-			<option value="1">FLEXI_YES</option>
+			<field name="email_user_copy" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_FIELD_EMAIL_SEND_COPY_TO_USER" description="FLEXI_FIELD_EMAIL_SEND_COPY_TO_USER_DESC" class="btn-group btn-group-yesno">
+				<option value="0" >FLEXI_NO</option>
+				<option value="1" >FLEXI_YES</option>
 			</field>
 
-			<field name="" type="separator" default="FLEXI_FIELD_EMAIL_FIRSTNAME_OPTION" level="level2" />
+			<field name="email_admin_copy" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_FIELD_EMAIL_SEND_COPY_TO_ADMIN" description="FLEXI_FIELD_EMAIL_SEND_COPY_TO_ADMIN_DESC" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="sentoadmin">FLEXI_NO</option>
+				<option value="1" show_list="sentoadmin" hide_list="">FLEXI_YES</option>
+			</field>
+			<field name="email_admin" type="text" label="FLEXI_FIELD_EMAIL_ADMIN"  defaut="" description="FLEXI_FIELD_EMAIL_ADMIN_DESC" depend_class="sentoadmin" />
 
-			<field name="display_firstname" type="multilist" subtype="radio" toggle_related="1" default="1" label="FLEXI_FIELD_EMAIL_FIRSTNAME_DISPLAY" description="FLEXI_FIELD_EMAIL_FIRSTNAME_DISPLAY_DESC" class="btn-group btn-group-yesno">
-			  <option value="0" show_list="" hide_list="disp_firstname_label">FLEXI_NO</option>
-			  <option value="1" show_list="disp_firstname_label" hide_list="">FLEXI_YES</option>
-			</field>
-			<field name="firstname_label" type="text" label="FLEXI_FIELD_EMAIL_FIRSTNAME_LABEL"  default="FLEXI_FIELD_EMAIL_FIRSTNAME_LABEL_VALUE" description="FLEXI_FIELD_EMAIL_FIRSTNAME_LABEL_DESC" depend_class="disp_firstname_label"/>
-			<field name="firstname_required" type="multilist" subtype="radio" toggle_related="1" default="1" label="FLEXI_FIELD_EMAIL_FIELD_REQUIRED" description="FLEXI_FIELD_EMAIL_FIELD_REQUIRED_DESC" class="btn-group btn-group-yesno" depend_class="disp_firstname_label">
-			  <option value="0" >FLEXI_NO</option>
-			  <option value="1" >FLEXI_YES</option>
-			</field>
 
-			<field name="" type="separator" default="FLEXI_FIELD_EMAIL_LASTNAME_OPTION" level="level2" />
-			<field name="display_lastname" type="multilist" subtype="radio" toggle_related="1" default="1" label="FLEXI_FIELD_EMAIL_LASTNAME_DISPLAY" description="FLEXI_FIELD_EMAIL_LASTNAME_DISPLAY_DESC" class="btn-group btn-group-yesno">
-			  <option value="0" show_list="" hide_list="disp_lastname_label">FLEXI_NO</option>
-			  <option value="1" show_list="disp_lastname_label" hide_list="">FLEXI_YES</option>
-			</field>
-			<field name="lastname_label" type="text" label="FLEXI_FIELD_EMAIL_LASTNAME_LABEL"  default="FLEXI_FIELD_EMAIL_LASTNAME_LABEL_VALUE" description="FLEXI_FIELD_EMAIL_LASTNAME_LABEL_DESC" depend_class="disp_lastname_label"/>
-			<field name="lastname_required" type="multilist" subtype="radio" toggle_related="1" default="1" label="FLEXI_FIELD_EMAIL_FIELD_REQUIRED" description="FLEXI_FIELD_EMAIL_FIELD_REQUIRED_DESC" class="btn-group btn-group-yesno" depend_class="disp_lastname_label">
-			  <option value="0" >FLEXI_NO</option>
-			  <option value="1" >FLEXI_YES</option>
+			<field name="label_position" default="" type="multilist" subtype="radio" toggle_related="1" label="FLEXI_FIELD_EMAIL_LABEL_POSITION" description="FLEXI_FIELD_EMAIL_LABEL_POSITION_DESC" class="btn-group btn-group-yesno">
+			<option value="">FLEXI_LABEL_TMP_POSITION</option>
+			<option value="top">FLEXI_LABEL_TOP</option>
+			<option value="placeholder">FLEXI_LABEL_PLACEHOLDER</option>
 			</field>
 
-			<field name="" type="separator" default="FLEXI_FIELD_EMAIL_MESSAGE_OPTION" level="level2" />
-			<field name="display_message" type="multilist" subtype="radio" toggle_related="1" default="1" label="FLEXI_FIELD_EMAIL_MESSAGE_DISPLAY" description="FLEXI_FIELD_EMAIL_MESSAGE_DISPLAY_DESC" class="btn-group btn-group-yesno">
-			  <option value="0" show_list="" hide_list="message_label">FLEXI_NO</option>
-			  <option value="1" show_list="message_label" hide_list="">FLEXI_YES</option>
-			</field>
-			<field name="message_label" type="text" label="FLEXI_FIELD_EMAIL_MESSAGE_LABEL"  default="FLEXI_FIELD_EMAIL_MESSAGE_LABEL_VALUE" description="FLEXI_FIELD_EMAIL_MESSAGE_LABEL_DESC" depend_class="message_label"/>
-			<field name="message_required" type="multilist" subtype="radio" toggle_related="1" default="1" label="FLEXI_FIELD_EMAIL_FIELD_REQUIRED" description="FLEXI_FIELD_EMAIL_FIELD_REQUIRED_DESC" class="btn-group btn-group-yesno" depend_class="message_label">
-			  <option value="0" >FLEXI_NO</option>
-			  <option value="1" >FLEXI_YES</option>
-			</field>
+			<field name="" type="separator" default="FLEXI_FIELD_EMAIL_FORM_FIELDS" level="level2" />
 
-			<field name="" type="separator" default="FLEXI_FIELD_EMAIL_SUBJECT_OPTION" level="level2" />
-			<field name="display_subject" type="multilist" subtype="radio" toggle_related="1" default="1" label="FLEXI_FIELD_EMAIL_SUBJECT_DISPLAY" description="FLEXI_FIELD_EMAIL_SUBJECT_DISPLAY_DESC" class="btn-group btn-group-yesno">
-			  <option value="0" show_list="" hide_list="subject_label">FLEXI_NO</option>
-			  <option value="1" show_list="subject_label" hide_list="">FLEXI_YES</option>
-			</field>
-			<field name="subject_label" type="text" label="FLEXI_FIELD_EMAIL_SUBJECT_LABEL"  default="FLEXI_FIELD_EMAIL_SUBJECT_LABEL_VALUE" description="FLEXI_FIELD_EMAIL_SUBJECT_LABEL_DESC" depend_class="subject_label"/>
-			<field name="subject_required" type="multilist" subtype="radio" toggle_related="1" default="1" label="FLEXI_FIELD_EMAIL_FIELD_REQUIRED" description="FLEXI_FIELD_EMAIL_FIELD_REQUIRED_DESC" class="btn-group btn-group-yesno" depend_class="subject_label">
-			  <option value="0" >FLEXI_NO</option>
-			  <option value="1" >FLEXI_YES</option>
-			</field>
-
-			<field name="" type="separator" default="FLEXI_FIELD_EMAIL_EMAILFROM_OPTION" level="level2" />
-			<field name="display_emailfrom" type="multilist" subtype="radio" toggle_related="1" default="1" label="FLEXI_FIELD_EMAIL_EMAILFROM_DISPLAY" description="FLEXI_FIELD_EMAIL_EMAILFROM_DISPLAY_DESC" class="btn-group btn-group-yesno">
-			  <option value="0" show_list="" hide_list="emailfrom_label">FLEXI_NO</option>
-			  <option value="1" show_list="emailfrom_label" hide_list="">FLEXI_YES</option>
-			</field>
-			<field name="emailfrom_label" type="text" label="FLEXI_FIELD_EMAIL_EMAILFROM_LABEL"  default="FLEXI_FIELD_EMAIL_EMAILFROM_LABEL_VALUE" description="FLEXI_FIELD_EMAIL_EMAILFROM_LABEL_DESC" depend_class="emailfrom_label"/>
-			<field name="emailfrom_required" type="multilist" subtype="radio" toggle_related="1" default="1" label="FLEXI_FIELD_EMAIL_FIELD_REQUIRED" description="FLEXI_FIELD_EMAIL_FIELD_REQUIRED_DESC" class="btn-group btn-group-yesno" depend_class="emailfrom_label">
-			  <option value="0" >FLEXI_NO</option>
-			  <option value="1" >FLEXI_YES</option>
-			</field>
+			<field name="form_fields" type="subform" label="Form field" description="" layout="joomla.form.field.subform.repeatable" icon="list" multiple="true" class="fcsubform-compact">
+	<form name="form_fields_list" repeat="true">
+		<field name="field_type" type="list" label="Type" description="">
+			<option value="text">texte</option>
+			<option value="email">email</option>
+			<option value="radio">radio</option>
+			<option value="date">date</option>
+			<option value="datetime-local">date time</option>
+			<option value="checkbox">checkbox</option>
+			<option value="select">select</option>
+			<option value="text">text</option>
+			<option value="textarea">text area</option>
+			<option value="freehtml">free html</option>
+			<option value="hidden">hidden</option>
+			<option value="tel">tel</option>
+			<option value="url">url</option>
+			<option value="file">file</option>
+		</field>
+		<field name="field_name" type="text" label="FLEXI_FIELD_EMAIL_NAME_FIELD"  default="FIELD_NAME" description="FLEXI_FIELD_EMAIL_NAME_FIELD_DESC" />
+		<field name="field_label" type="text" label="FLEXI_FIELD_EMAIL_LABEL_FIELD"  default="FIELD_LABEL" description="FLEXI_FIELD_EMAIL_LABEL_FIELD_DESC" />
+		<field name="field_value" type="text" label="FLEXI_FIELD_EMAIL_VALUE_FIELD"  default="value1;;value2" description="FLEXI_FIELD_EMAIL_VALUE_FIELD_DESC" />
+		<field name="field_required" type="multilist" subtype="radio" toggle_related="1" default="1" label="FLEXI_FIELD_EMAIL_FIELD_REQUIRED" description="FLEXI_FIELD_EMAIL_FIELD_REQUIRED_DESC" class="btn-group btn-group-yesno" >
+			<option value="0" >FLEXI_NO</option>
+			<option value="1" >FLEXI_YES</option>
+		</field>
+	</form>
+</field>
+<field name="" type="separator" default="FLEXI_FIELD_EMAIL_FORM_USEDESC" level="level3" class="alert alert-info fcpadded" />
 
 			<field name="" type="separator" default="FLEXI_FIELD_EMAIL_SUBMIT_OPTION" level="level2" />
 			<field name="submit_label" type="text" label="FLEXI_FIELD_EMAIL_SUBMIT_LABEL"  default="FLEXI_FIELD_EMAIL_SUBMIT_LABEL_VALUE" description="FLEXI_FIELD_EMAIL_SUBMIT_LABEL_DESC"/>
