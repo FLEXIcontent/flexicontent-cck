@@ -133,7 +133,7 @@ foreach ($values as $value)
 										}
 									if($list_field->field_type === 'radio') {
 										$values_field = explode(";;",$list_field->field_value);
-										$fields_display .= '<div class="field"><label for="'.$field_id.'" class="'.$class.'">'.$list_field->field_label.'</label>';
+										$fields_display .= '<div class="field"><label for="'.$field_id.'" class="'.$class.'-radio">'.$list_field->field_label.'</label>';
 											foreach( $values_field as $value_field ) {
 												$value =  JText::_($value_field);
 												$fields_display .= '<input type="radio" value="'.$value.'" name="'.$formid.'['.$value.']'.'" aria-label="'.$value.'"><label for="'.$field_id.'">'.$value.'</label>';
@@ -142,7 +142,7 @@ foreach ($values as $value)
 									}
 									if($list_field->field_type === 'checkbox') {
 										$values_field = explode(";;",$list_field->field_value);
-										$fields_display .= '<div class="field"><label for="'.$field_id.'" class="'.$class.'">'.$list_field->field_label.'</label>';
+										$fields_display .= '<div class="field"><label for="'.$field_id.'" class="'.$class.'-checkbox">'.$list_field->field_label.'</label>';
 											foreach( $values_field as $value_field ) {
 												$value = JText::_($value_field);
 												$fields_display .= '<input type="checkbox" value="'.$value.'" name="'.$value.'" class="" aria-label="'.$value.'" ><label for="'.$field_id.'">'.$value.'</label>'; //TODO add required system
@@ -151,7 +151,8 @@ foreach ($values as $value)
 									}
 									if($list_field->field_type === 'select') {
 										$values_field = explode(";;",$list_field->field_value);
-										$fields_display .= '<div class="field"><label for="'.$field_id.'" class="'.$class.'">'.$field_label.'</label><select id="'.$field_name.'" name="'.$field_name.'" aria-label="'.$field_label.'"><option value="">'.JText::_('FLEXI_SELECT').'</option>';//TODO add required system
+										$select_label = ($class == 'placeholder') ? $field_label : JText::_('FLEXI_SELECT');
+										$fields_display .= '<div class="field"><label for="'.$field_id.'" class="'.$class.'">'.$field_label.'</label><select id="'.$field_name.'" name="'.$field_name.'" aria-label="'.$field_label.'"><option value="">'.$select_label.'</option>';//TODO add required system
 											foreach( $values_field as $value_field ) {
 												$value = JText::_($value_field);
 												$fields_display .='<option value="'.$value.'">'.JText::_($value_field).'</option>';
