@@ -428,7 +428,7 @@ function fc_getLayout_".$_name."(el, initial)
 		panel_header = fc_tab_handle;
 
 		// Remove empty box, to allow index number to match correct Tab container
-		panel_header.closest('.tabberlive').children('.fc_empty_box').remove();
+		panel_header.closest('.tabberlive').children('.fc_empty_box,.field-spacer').remove();
 
 		panel = panel_header.closest('.tabberlive').children().eq( panel_header.parent().index() + 1 );
 		panel_id = panel.attr('id');
