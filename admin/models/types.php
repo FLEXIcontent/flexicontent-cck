@@ -296,17 +296,14 @@ class FlexicontentModelTypes extends FCModelAdminList
 		{
 			// Delete
 			case 'core.delete':
+			// Trash (currently not allowed if item assignments exist)
+			case -2:
 				$query = 'SELECT DISTINCT type_id'
 					. ' FROM #__flexicontent_items_ext'
 					. ' WHERE type_id IN (' . implode(',', $cid) . ')'
 				;
 
 				$cid_wassocs = $this->_db->setQuery($query)->loadColumn();
-				break;
-
-			// Trash (currently not allowed)
-			case -2:
-				$cid_wassocs = $cid;
 				break;
 
 			// Unpublish (=Disable)

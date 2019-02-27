@@ -298,7 +298,7 @@ class FlexicontentControllerTypes extends FlexicontentControllerBaseAdmin
 			return;
 		}
 
-		if ($model->copy($cid) === false)
+		if ($model->copy($cid, $copyRelations = true) === false)
 		{
 			$msg = JText::_('FLEXI_TYPES_COPY_FAILED') . ' : ' . $model->getError();
 			throw new Exception($msg, 500);
