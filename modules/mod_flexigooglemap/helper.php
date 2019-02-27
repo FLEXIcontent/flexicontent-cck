@@ -100,10 +100,21 @@ class modFlexigooglemapHelper
 			$itemsLocations = modFlexigooglemapHelper::getItemsLocations($params);
 			foreach ($itemsLocations as $itemLoc)
 			{
-				if ( empty($itemLoc->value) ) continue;   // skip empty value
+				// Skip empty value
+				if (empty($itemLoc->value))
+				{
+					continue;
+				}
 
 				$coord = unserialize($itemLoc->value);
-				if ( !isset($coord['lat']) || !isset($coord['lon']) ) continue;    // skip empty value
+				$coord['lat'] = isset($coord['lat']) ? $coord['lat'] : '';
+				$coord['lon'] = isset($coord['lon']) ? $coord['lon'] : '';
+
+				// Skip address if it has empty coordinates, note latitude '0' and / or longitude '0' are not "empty", these are Equator's coordinates
+				if (!strlen($coord['lat']) || !strlen($coord['lon']))
+				{
+					continue;
+				}
 
 				$title = rtrim( addslashes($itemLoc->title) );
 				$link = '';
