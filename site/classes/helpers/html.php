@@ -390,16 +390,25 @@ class flexicontent_html
 		// Get head object
 		$head_obj = $doc->mergeHeadData(array(1=>1));
 
-		// Remove canonical inserted by SEF plugin, unsetting default directly may not be reliable, we will search for it
+		// Remove canonical inserted by SEF plugin, unsetting default directly may not be reliable, instead we will search for it
 		//unset($head_obj->_links[htmlspecialchars($defaultCanonical)]);
 		$addRel = true;
+
 		foreach($head_obj->_links as $link => $data)
 		{
-			if ($data['relation']=='canonical' && $data['relType']=='rel') {
+			if (strtolower($data['relation']) === 'canonical' && strtolower($data['relType']) === 'rel')
+			{
 				if($link == $ucanonical_encoded)
+				{
 					$addRel = false;
+				}
 				else
+				{
+					// Remove current rel canonical ... which is wrong ...
 					unset($head_obj->_links[$link]);
+					// Set add flag in case we found multiple canonicals ... and it was cleared by if statement ...
+					$addRel = true;
+				}
 			}
 		}
 
