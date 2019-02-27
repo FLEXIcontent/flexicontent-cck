@@ -1084,20 +1084,21 @@ class _FlexicontentSiteRouter
 		/**
 		 * Try finding the alias in the DB tables in the order they were given
 		 */
-		foreach ($tbls as $tbl)
+		foreach ($tbls as $_tbl)
 		{
 			// Get record ID from record's alias
 			$record_id_from_alias = $this->_fc_route_getRecordIdByAlias(
 				str_replace(':', '-', $segments[$i]),
 				$parent_id,
 				$language,
-				$tbl,
+				$_tbl,
 				$alias_col
 			);
 
 			// Only prepend record ID if it was found, otherwise prepend nothing allowing legacy SEF URLs that contain IDs to work
 			if ($record_id_from_alias)
 			{
+				$tbl          = $_tbl;
 				$segments[$i] = $record_id_from_alias . '-' . $segments[$i];
 				break;
 			}
