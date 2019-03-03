@@ -249,7 +249,10 @@ class FlexicontentModelField extends FCModelAdmin
 		 * Set new field_type, this is needed e.g. after for form reload due to some error
 		 */
 
-		$this->_record->field_type = $plugin_name;
+		if (empty($this->_record->iscore))
+		{
+			$this->_record->field_type = $plugin_name;
+		}
 
 		if ($data_obj && empty($data_obj->iscore))
 		{
