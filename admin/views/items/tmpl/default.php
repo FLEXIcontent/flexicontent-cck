@@ -53,12 +53,13 @@ $_NULL_DATE_     = JFactory::getDbo()->getNullDate();
  * JS for Columns chooser box and Filters box
  */
 
+$this->data_tbl_id = 'adminListTableFC' . $this->view;
 flexicontent_html::jscode_to_showhide_table(
 	'mainChooseColBox',
 	$this->data_tbl_id,
 	$start_html = '',  //'<span class="badge ' . (FLEXI_J40GE ? 'badge-dark' : 'badge-inverse') . '">' . JText::_('FLEXI_COLUMNS', true) . '<\/span> &nbsp; ',
 	$end_html = '<div id="fc-columns-slide-btn" class="icon-arrow-up-2 btn btn-outline-secondary" title="' . JText::_('FLEXI_HIDE') . '" style="cursor: pointer;" onclick="fc_toggle_box_via_btn(\\\'mainChooseColBox\\\', document.getElementById(\\\'fc_mainChooseColBox_btn\\\'), \\\'btn-primary\\\');"><\/div>',
-	$toggle_on_init = 0 // Initial page load (JS Performance) we already hidden columns via PHP Logic
+	$toggle_on_init = 1 // Initial page load (JS Performance) we already hidden columns via PHP Logic
 );
 
 
@@ -607,9 +608,10 @@ jQuery(document).ready(function(){
 
 	<div class="fcclear"></div>
 
-	<table id="adminListTableFC<?php echo $this->view; ?>" class="adminlist table fcmanlist" itemscope itemtype="http://schema.org/WebPage">
+	<table id="<?php echo $this->data_tbl_id; ?>" class="adminlist table fcmanlist" itemscope itemtype="http://schema.org/WebPage">
 	<thead>
 		<tr>
+			<?php $colposition = 0; ?>
 
 			<!--th class="left hidden-phone"><?php //$colposition++; ?>
 				<?php echo JText::_( 'FLEXI_NUM' ); ?>

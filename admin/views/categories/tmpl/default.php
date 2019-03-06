@@ -43,11 +43,13 @@ $out_class = FLEXI_J40GE ? 'btn btn-outline-dark' : 'btn';
  * JS for Columns chooser box and Filters box
  */
 
+$this->data_tbl_id = 'adminListTableFC' . $this->view;
 flexicontent_html::jscode_to_showhide_table(
 	'mainChooseColBox',
-	'adminListTableFC' . $this->view,
+	$this->data_tbl_id,
 	$start_html = '',  //'<span class="badge ' . (FLEXI_J40GE ? 'badge-dark' : 'badge-inverse') . '">' . JText::_('FLEXI_COLUMNS', true) . '<\/span> &nbsp; ',
-	$end_html = '<div id="fc-columns-slide-btn" class="icon-arrow-up-2 btn btn-outline-secondary" title="' . JText::_('FLEXI_HIDE') . '" style="cursor: pointer;" onclick="fc_toggle_box_via_btn(\\\'mainChooseColBox\\\', document.getElementById(\\\'fc_mainChooseColBox_btn\\\'), \\\'btn-primary\\\');"><\/div>'
+	$end_html = '<div id="fc-columns-slide-btn" class="icon-arrow-up-2 btn btn-outline-secondary" title="' . JText::_('FLEXI_HIDE') . '" style="cursor: pointer;" onclick="fc_toggle_box_via_btn(\\\'mainChooseColBox\\\', document.getElementById(\\\'fc_mainChooseColBox_btn\\\'), \\\'btn-primary\\\');"><\/div>',
+	$toggle_on_init = 1 // Initial page load (JS Performance) we already hidden columns via PHP Logic
 );
 
 
@@ -103,7 +105,7 @@ $saveOrder = ($listOrder == 'a.lft' && strtolower($listDirn) == 'asc');
 if ($saveOrder)
 {
 	$saveOrderingUrl = 'index.php?option=com_flexicontent&task='.$ctrl.'saveOrderAjax&format=raw';
-	JHtml::_('sortablelist.sortable', 'adminListTableFC' . $this->view, 'adminForm', strtolower($listDirn), $saveOrderingUrl, false, true);
+	JHtml::_('sortablelist.sortable', $this->data_tbl_id, 'adminForm', strtolower($listDirn), $saveOrderingUrl, false, true);
 }
 
 
@@ -272,83 +274,84 @@ if ($js)
 	<div class="fcclear"></div>
 
 
-	<table id="adminListTableFC<?php echo $this->view; ?>" class="adminlist table fcmanlist" itemscope itemtype="http://schema.org/WebPage">
+	<table id="<?php echo $this->data_tbl_id; ?>" class="adminlist table fcmanlist" itemscope itemtype="http://schema.org/WebPage">
 	<thead>
 		<tr>
+			<?php $colposition = 0; ?>
 
 			<!--th class="left hidden-phone">
-				<?php echo JText::_( 'FLEXI_NUM' ); ?>
+				<?php echo JText::_( 'FLEXI_NUM' ); ?><?php //$colposition++; ?>
 			</th-->
 
-			<th class="col_order center hidden-phone">
+			<th class="col_order center hidden-phone"><?php $colposition++; ?>
 				<?php echo JHtml::_('searchtools.sort', '', 'a.lft', $listDirn, $listOrder, null, 'asc', 'JGRID_HEADING_ORDERING', 'icon-menu-2'); ?>
 			</th>
 
-			<th class="col_cb left">
+			<th class="col_cb left"><?php $colposition++; ?>
 				<div class="group-fcset">
 					<input type="checkbox" name="checkall-toggle" id="checkall-toggle" value="" title="<?php echo JText::_('JGLOBAL_CHECK_ALL'); ?>" onclick="Joomla.checkAll(this)" />
 					<label for="checkall-toggle" class="green single"></label>
 				</div>
 			</th>
 
-			<th class="hideOnDemandClass left">
+			<th class="hideOnDemandClass left" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo JHtml::_('grid.sort', 'FLEXI_STATUS', 'a.' . $this->state_propname, $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
 
-			<th class="hideOnDemandClass col_title">
+			<th class="hideOnDemandClass col_title" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo JHtml::_('grid.sort', 'FLEXI_TITLE', 'a.' . $this->title_propname, $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				//
 				<?php echo JHtml::_('grid.sort', 'FLEXI_ALIAS', 'a.alias', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
 
-			<th class="hideOnDemandClass hidden-phone">
+			<th class="hideOnDemandClass hidden-phone" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo JHtml::_('grid.sort', 'FLEXI_LANGUAGE', 'a.language', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
 
 		<?php if ($useAssocs) : ?>
-			<th class="hideOnDemandClass hidden-phone hidden-tablet">
+			<th class="hideOnDemandClass hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo JText::_('FLEXI_ASSOCIATIONS'); ?>
 			</th>
 		<?php endif; ?>
 
-			<th class="left hideOnDemandClass hidden-phone hidden-tablet" colspan="2">
+			<th class="left hideOnDemandClass hidden-phone hidden-tablet" colspan="2" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo JText::_('FLEXI_TEMPLATE'); ?>
 			</th>
 
-			<!--th class="hideOnDemandClass">
+			<!--th class="hideOnDemandClass" style="<?php //echo $this->hideCol($colposition++); ?>" >
 				<?php echo JHtml::_('grid.sort', 'FLEXI_ITEMS_ASSIGNED', 'nrassigned', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th-->
 
-			<th class="hideOnDemandClass center hidden-phone hidden-tablet">
+			<th class="hideOnDemandClass center hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<span class="column_toggle_lbl" style="display:none;"><small class="badge badge-info"><?php echo $state_names['ALL_P']; ?></small></span>
 				<?php echo '<span class="' . $this->tooltip_class . ' icon-'.$state_icons['ALL_P'].'" title="'.$state_names['ALL_P'].' '.JText::_ ('FLEXI_ITEMS').'" data-placement="top" style="font-size: 16px;"></span>'; ?>
 			</th>
 
-			<th class="hideOnDemandClass center hidden-phone hidden-tablet">
+			<th class="hideOnDemandClass center hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<span class="column_toggle_lbl" style="display:none;"><small class="badge badge-info"><?php echo $state_names['ALL_U']; ?></small></span>
 				<?php echo '<span class="' . $this->tooltip_class . ' icon-'.$state_icons['ALL_U'].'" title="'.$state_names['ALL_U'].' '.JText::_ ('FLEXI_ITEMS').'" data-placement="top" style="font-size: 16px;"></span>'; ?>
 			</th>
 
-			<th class="hideOnDemandClass center hidden-phone hidden-tablet">
+			<th class="hideOnDemandClass center hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<span class="column_toggle_lbl" style="display:none;"><small class="badge badge-info"><?php echo $state_names['A']; ?></small></span>
 				<?php echo '<span class="' . $this->tooltip_class . ' icon-'.$state_icons['A'].'" title="'.$state_names['A'].' '.JText::_ ('FLEXI_ITEMS').'" data-placement="top" style="font-size: 16px;"></span>'; ?>
 			</th>
 
-			<th class="hideOnDemandClass center hidden-phone hidden-tablet">
+			<th class="hideOnDemandClass center hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<span class="column_toggle_lbl" style="display:none;"><small class="badge badge-info"><?php echo $state_names['T']; ?></small></span>
 				<?php echo '<span class="' . $this->tooltip_class . ' icon-'.$state_icons['T'].'" title="'.$state_names['T'].' '.JText::_ ('FLEXI_ITEMS').'" data-placement="top" style="font-size: 16px;"></span>'; ?>
 			</th>
 
-			<th class="hideOnDemandClass hidden-phone">
+			<th class="hideOnDemandClass hidden-phone" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo JHtml::_('grid.sort', 'FLEXI_ACCESS', 'a.access', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
 
-			<!--th class="hideOnDemandClass">
+			<!--th class="hideOnDemandClass" style="<?php //echo $this->hideCol($colposition++); ?>" >
 				<?php echo JHtml::_('grid.sort', 'FLEXI_REORDER', 'a.lft', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php echo $this->orderingx ? str_replace('rel="tooltip"', '', JHtml::_('grid.order', $this->rows, 'filesave.png', $ctrl.'saveorder' )) : ''; ?>
 			</th-->
 
-			<th class="hideOnDemandClass col_id center hidden-phone hidden-tablet">
+			<th class="hideOnDemandClass col_id center hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo JHtml::_('grid.sort', 'FLEXI_ID', 'a.id', $this->lists['order_Dir'], $this->lists['order']); ?>
 			</th>
 
@@ -375,6 +378,7 @@ if ($js)
 
 		foreach ($this->rows as $i => $row)
 		{
+			$colposition = 0;
 			$assetName = 'com_content.category.'.$row->id;
 			$isAuthor  = $row->created_user_id && $row->created_user_id == $user->id;
 
@@ -456,11 +460,11 @@ if ($js)
 
 		<tr class="<?php echo 'row' . ($k % 2); ?>" sortable-group-id="<?php echo $row->parent_id; ?>" item-id="<?php echo $row->id ?>" parents="<?php echo $parentsStr ?>" level="<?php echo $row->level ?>">
 
-			<!--td class="left col_rowcount hidden-phone">
+			<!--td class="left col_rowcount hidden-phone"><?php //$colposition++; ?>
 				<?php echo $this->pagination->getRowOffset($i); ?>
 			</td-->
 
-			<td class="col_order nowrap center hidden-phone">
+			<td class="col_order nowrap center hidden-phone"><?php $colposition++; ?>
 				<?php
 				$iconClass = '';
 				if (!$row->canEdit)
@@ -480,12 +484,12 @@ if ($js)
 				<?php endif; ?>
 			</td>
 
-			<td class="col_cb">
+			<td class="col_cb"><?php $colposition++; ?>
 				<!--div class="adminlist-table-row"></div-->
 				<?php echo JHtml::_($hlpname . '.grid_id', $i, $row->id); ?>
 			</td>
 
-			<td class="col_status" style="padding-right: 8px;">
+			<td class="col_status" style="padding-right: 8px;" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<div class="btn-group fc-group fc-categories">
 					<?php
 					//echo JHtml::_('jgrid.published', $row->published, $i, $ctrl, $stateIsChangeable);
@@ -498,7 +502,7 @@ if ($js)
 				</div>
 			</td>
 
-			<td class="col_title">
+			<td class="col_title" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php
 				echo $row->level > 1
 					? str_repeat('.&nbsp;&nbsp;', $row->level - 1) . '<sup>|_</sup>&nbsp;'
@@ -529,7 +533,7 @@ if ($js)
 				?>]</small>
 			</td>
 
-			<td class="col_lang hidden-phone">
+			<td class="col_lang hidden-phone" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php
 					/**
 					 * Display language
@@ -539,7 +543,7 @@ if ($js)
 
 
 			<?php if ($useAssocs) : ?>
-			<td class="hidden-phone hidden-tablet">
+			<td class="hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php
 				if (!empty($this->lang_assocs[$row->id]))
 				{
@@ -570,11 +574,11 @@ if ($js)
 			<?php endif ; ?>
 
 
-			<td class="col_edit_layout hidden-phone hidden-tablet">
+			<td class="col_edit_layout hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition); ?>" >
 				<?php echo JHtml::_($hlpname . '.edit_layout', $row, '__modal__', $i, $this->perms->CanTemplates, $row_clayout); ?>
 			</td>
 
-			<td class="col_template hidden-phone hidden-tablet">
+			<td class="col_template hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo $row->config->get('clayout') ? $row->config->get('clayout') : ($row_clayout ? $row_clayout : '...').'<span class="badge">inherited</span>'; ?>
 			</td>
 
@@ -591,36 +595,36 @@ if ($js)
 				$c_t = (int) @ $row->byStateTotals[-2];
 			?>
 
-			<td style="padding: 0;" class="center hidden-phone hidden-tablet">
+			<td class="center hidden-phone hidden-tablet" style="padding: 0; <?php echo $this->hideCol($colposition++); ?>" >
 				<a href="<?php echo $items_link.'ALL_P'; ?>" title="<?php echo JText::_( 'FLEXI_VIEW_ITEMS' );?>" style="color:white; margin: 0;" class="badge <?php echo $c_p ? ' badge-success' : ''; ?>">
 					<?php echo $c_p ? $c_p : '0'; ?>
 				</a>
 			</td>
-			<td style="padding: 0;" class="center hidden-phone hidden-tablet">
+			<td class="center hidden-phone hidden-tablet" style="padding: 0; <?php echo $this->hideCol($colposition++); ?>" >
 				<a href="<?php echo $items_link.'ALL_U'; ?>" title="<?php echo JText::_( 'FLEXI_VIEW_ITEMS' );?>" style="color:white; margin: 0;" class="badge <?php echo $c_u ? ' badge-important' : ''; ?>">
 					<?php echo $c_u ? $c_u : '0'; ?>
 				</a>
 			</td>
-			<td style="padding: 0;" class="center hidden-phone hidden-tablet">
+			<td class="center hidden-phone hidden-tablet" style="padding: 0; <?php echo $this->hideCol($colposition++); ?>" >
 				<a href="<?php echo $items_link.'A'; ?>" title="<?php echo JText::_( 'FLEXI_VIEW_ITEMS' );?>" style="color:white; margin: 0;" class="badge <?php echo $c_a ? ' badge-info' : ''; ?>">
 					<?php echo $c_a ? $c_a : '0'; ?>
 				</a>
 			</td>
 
-			<td style="padding: 0;" class="center hidden-phone hidden-tablet">
+			<td class="center hidden-phone hidden-tablet" style="padding: 0; <?php echo $this->hideCol($colposition++); ?>" >
 				<a href="<?php echo $items_link.'T'; ?>" title="<?php echo JText::_( 'FLEXI_VIEW_ITEMS' );?>" style="color:white; margin: 0;" class="badge <?php echo $c_t ? ' badge-inverse' : ''; ?>">
 					<?php echo $c_t ? $c_t : '0'; ?>
 				</a>
 			</td>
 
-			<td class="col_access hidden-phone">
+			<td class="col_access hidden-phone" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo $row->canEdit
 					? flexicontent_html::userlevel('access['.$row->id.']', $row->access, 'onchange="return listItemTask(\'cb'.$i.'\',\''.$ctrl.'access\')"')
 					: $this->escape($row->access_level);
 				?>
 			</td>
 
-			<td class="col_id small center hidden-phone hidden-tablet">
+			<td class="col_id center hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo $row->id; ?>
 			</td>
 
