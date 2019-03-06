@@ -338,4 +338,26 @@ class FlexicontentViewBaseRecords extends JViewLegacy
 			$translate = false
 		);
 	}
+
+
+	/**
+	 * Method to get CSS for hidding a table cell because its column is currently hidden
+	 *
+	 * @param   array   $colposition  The position of the column
+	 *
+	 * @return  string  The inline CSS to use for hidding the table cell
+	 *
+	 * @since   3.3.2
+	 */	
+	public function hideCol($colposition)
+	{
+		static $colsvisible = false;
+
+		if ($colsvisible === false)
+		{
+			$colsvisible = array_flip(flexicontent_html::getVisibleColumns($this->data_tbl_id));
+		}
+
+		return !isset($colsvisible[$colposition]) ? 'display: none;' : '';
+	}
 }

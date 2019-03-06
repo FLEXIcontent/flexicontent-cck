@@ -1105,7 +1105,7 @@
 
 
 	// *** Create column choosers row for a table. NOTE must have <th> cells at row 0
-	function create_column_choosers(container_div_id, data_tbl_id, firstload, start_text, end_text)
+	function create_column_choosers(container_div_id, data_tbl_id, firstload, start_text, end_text, toggle_on_init)
 	{
 		// 1. Get column-status array for the table with id: data_tbl_id
 		var show_col = eval('show_col_'+data_tbl_id);
@@ -1135,7 +1135,7 @@
 
 				// *** It has value of 0 or not set, set it to 1 for fc_tbl_toggle_column() function to hide it
 				show_col[col] = 1;
-				fc_tbl_toggle_column('', data_tbl_id, col, 1);
+				if (toggle_on_init) fc_tbl_toggle_column('', data_tbl_id, col, 1);
 			}
 			else
 			{
@@ -1144,7 +1144,7 @@
 
 				// *** It has value of 1 or not set, set it to 0 for fc_tbl_toggle_column() function to show it
 				show_col[col] = 0;
-				fc_tbl_toggle_column('', data_tbl_id, col, 1);
+				if (toggle_on_init) fc_tbl_toggle_column('', data_tbl_id, col, 1);
 			}
 
 			// 7. Create column checkbox and append it to str

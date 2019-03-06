@@ -421,8 +421,71 @@ class flexicontent_html
 	}
 
 
-	// *** Output the javascript to dynamically hide/show columns of a table
-	static function jscode_to_showhide_table($container_div_id, $data_tbl_id, $start_html='', $end_html='')
+	/**
+	 * Get visibility of table columns from Posted Form or from Browser Cookie
+	 */
+	static function getVisibleColumns($data_tbl_id)
+	{
+		$app  = JFactory::getApplication();
+		$jinput = $app->input;
+		
+		static $columnchoose = false;
+
+		if ($columnchoose === false)
+		{
+			// First try to find POSTED data
+			$columnchoose = $jinput->post->get('columnchoose_'.$data_tbl_id, null, 'array');
+			if ($columnchoose !== null)
+			{
+				$columnchoose = array_keys($columnchoose);
+			}
+
+			// Otherwise try to find COOKIE data
+			else
+			{
+				$fc_columnchooser = $jinput->cookie->get('fc_columnchooser', '{}', 'string');
+
+				// Parse the COLUMNS cookie
+				try
+				{
+					$fc_columnchooser = json_decode($fc_columnchooser);
+
+					// Reset cookie if it is not a class, or if the version hash does not matches (reset column chooser on every version upgrade)
+					if (!is_object($fc_columnchooser) || !isset($fc_columnchooser->vhash) || $fc_columnchooser->vhash !== FLEXI_VHASH)
+					{
+						$fc_columnchooser = new stdClass();
+						$fc_columnchooser->vhash = FLEXI_VHASH;
+						$jinput->cookie->set('fc_columnchooser', json_encode($fc_columnchooser), time()+60*60*24*30, JUri::base(true), '');
+					}
+
+					// Get specific table data
+					elseif (isset($fc_columnchooser->$data_tbl_id))
+					{
+						$columnchoose = preg_split("/[\s]*,[\s]*/", $fc_columnchooser->$data_tbl_id);
+						foreach($columnchoose as $i => $id)
+						{
+							$columnchoose[$i] = (int) $id;
+						}
+					}
+				}
+				catch (Exception $e)
+				{
+					$fc_columnchooser = new stdClass();
+					$fc_columnchooser->vhash = FLEXI_VHASH;
+					$jinput->cookie->set('fc_columnchooser', json_encode($fc_columnchooser), time()+60*60*24*30, JUri::base(true), '');
+					$columnchoose = null;
+				}
+			}
+		}
+
+		return $columnchoose;
+	}
+
+
+	/**
+	 * Output the JavaScript to dynamically hide/show columns of a table
+	 */
+	static function jscode_to_showhide_table($container_div_id, $data_tbl_id, $start_html = '', $end_html = '', $toggle_on_init = 1)
 	{
 		$document = JFactory::getDocument();
 		$app  = JFactory::getApplication();
@@ -436,49 +499,8 @@ class flexicontent_html
 		jQuery(document).ready(function() {
 		";
 
-		// Firstly try to find POSTED data
-		$columnchoose = $jinput->post->get('columnchoose_'.$data_tbl_id, null, 'array');
-		if ($columnchoose !== null)
-		{
-			$columnchoose = array_keys($columnchoose);
-		}
-
-		// Otherwise try to find COOKIE data
-		else
-		{
-			$fc_columnchooser = $jinput->cookie->get('fc_columnchooser', '{}', 'string');
-
-			// Parse the COLUMNS cookie
-			try
-			{
-				$fc_columnchooser = json_decode($fc_columnchooser);
-
-				// Reset cookie if it is not a class, or if the version hash does not matches (reset column chooser on every version upgrade)
-				if (!is_object($fc_columnchooser) || !isset($fc_columnchooser->vhash) || $fc_columnchooser->vhash !== FLEXI_VHASH)
-				{
-					$fc_columnchooser = new stdClass();
-					$fc_columnchooser->vhash = FLEXI_VHASH;
-					$jinput->cookie->set('fc_columnchooser', json_encode($fc_columnchooser), time()+60*60*24*30, JUri::base(true), '');
-				}
-
-				// Get specific table data
-				elseif (isset($fc_columnchooser->$data_tbl_id))
-				{
-					$columnchoose = preg_split("/[\s]*,[\s]*/", $fc_columnchooser->$data_tbl_id);
-					foreach($columnchoose as $i => $id)
-					{
-						$columnchoose[$i] = (int) $id;
-					}
-				}
-			}
-			catch (Exception $e)
-			{
-				$fc_columnchooser = new stdClass();
-				$fc_columnchooser->vhash = FLEXI_VHASH;
-				$jinput->cookie->set('fc_columnchooser', json_encode($fc_columnchooser), time()+60*60*24*30, JUri::base(true), '');
-				$columnchoose = null;
-			}
-		}
+		// Get visibility of table columns from Posted Form or from Browser Cookie
+		$columnchoose = self::getVisibleColumns($data_tbl_id);
 
 		if ($columnchoose) foreach ($columnchoose as $colnum)
 		{
@@ -488,7 +510,7 @@ class flexicontent_html
 
 		$firstload = $columnchoose !== null ? "false" : "true";
 		$js .= "
-			create_column_choosers('$container_div_id', '$data_tbl_id', $firstload, '".$start_html."', '".$end_html."');
+			create_column_choosers('$container_div_id', '$data_tbl_id', $firstload, '".$start_html."', '".$end_html."', " . (int) $toggle_on_init . ");
 		});
 		";
 		$document->addScriptDeclaration($js);
@@ -1883,6 +1905,7 @@ class flexicontent_html
 				JText::script("FLEXI_TYPE_TO_LIST", true);
 				JText::script("FLEXI_TYPE_TO_FILTER", true);
 				JText::script("FLEXI_UPDATING_CONTENTS", true);
+
 				break;
 
 			case 'flexi-lib':
