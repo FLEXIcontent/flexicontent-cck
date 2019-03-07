@@ -373,8 +373,8 @@ trait flexicontent_basetable_trait
 		// Warn on non unique original alias changed (but do not add message on empty original alias)
 		elseif (!empty($non_unique_alias))
 		{
-			$msg = JText::sprintf('FLEXI_THIS_' . strtoupper($alias) . '_ALREADY_EXIST', $this->$alias);
-			JFactory::getApplication()->enqueueMessage($msg, 'warning');
+			//$msg = JText::sprintf('FLEXI_THIS_' . strtoupper($alias) . '_ALREADY_EXIST', $non_unique_alias);
+			//JFactory::getApplication()->enqueueMessage($msg, 'warning');
 		}
 
 		return true;

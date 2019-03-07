@@ -137,11 +137,14 @@ $js_perValue = array();
 
 foreach ($this->values as $n => $value)
 {
+	$value['lat'] = isset($value['lat']) ? $value['lat'] : '';
+	$value['lon'] = isset($value['lon']) ? $value['lon'] : '';
+
 	// Skip value if both address and formated address are empty
 	if (
 		!isset($value['addr_display']) && !isset($value['addr_formatted']) && !isset($value['addr1']) &&
 		!isset($value['city']) && !isset($value['state']) && !isset($value['province'])  &&
-		(!isset($value['lat']) || !isset($value['lon'])) && !isset($value['url'])
+		(!strlen($value['lat']) || !strlen($value['lon'])) && !isset($value['url'])
 	) continue;
 
 	// generate address html
@@ -227,7 +230,9 @@ foreach ($this->values as $n => $value)
 	$map = '';
 	$map_tagid = 'map_canvas_' . $field->name . '_' . $n . '_' . $item->id;
 
-	if ($show_map && (!empty($value['lon']) || !empty($value['lat'])))
+
+	// Skip adding map for this address if it has empty coordinates, note latitude '0' and / or longitude '0' are not "empty", these are Equator's coordinates
+	if ($show_map && strlen($value['lon']) && strlen($value['lat']))
 	{
 		if ($map_api === 'googlemap')
 		{
