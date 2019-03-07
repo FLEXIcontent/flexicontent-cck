@@ -45,8 +45,8 @@ class plgFlexicontent_fieldsLinkslist extends FCField
 		$default_values	= $field->parameters->get( 'default_values', '' ) ;
 
 		// Prefix - Suffix - Separator (item FORM) parameters
-		$pretext			= $field->parameters->get( 'pretext_form', '' ) ;
-		$posttext			= $field->parameters->get( 'posttext_form', '' ) ;
+		$pretext  = $field->parameters->get( 'pretext_form', '' ) ;
+		$posttext = $field->parameters->get( 'posttext_form', '' ) ;
 		$separator		= $field->parameters->get( 'separator', 0 ) ;
 		$opentag			= $field->parameters->get( 'opentag_form', '' ) ;
 		$closetag			= $field->parameters->get( 'closetag_form', '' ) ;

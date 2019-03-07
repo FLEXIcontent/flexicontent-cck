@@ -358,10 +358,10 @@ class plgFlexicontent_fieldsColor extends FCField
 			$jfield->setup(new SimpleXMLElement($xml_field), $value, '');
 
 			$jfield_html = str_replace($elementid.'__'.$n.'_"', $elementid_n . '"', $jfield->input);
-			$jfield_html = $pretext . $jfield_html . $posttext;
 
-			$field->html[] = '
-				'.$jfield_html.'
+			$field->html[] = $pretext . '
+				' . $jfield_html . '
+				' . $posttext . '
 				'.(!$add_ctrl_btns ? '' : '
 				<div class="'.$input_grp_class.' fc-xpended-btns">
 					'.$move2.'
