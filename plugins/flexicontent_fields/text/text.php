@@ -389,19 +389,19 @@ class plgFlexicontent_fieldsText extends FCField
 			$elementid_n = $elementid.'_'.$n;
 
 			// NOTE: HTML tag id of this form element needs to match the -for- attribute of label HTML tag of this FLEXIcontent field, so that label will be marked invalid when needed
-			$text_field = $pretext.
+			$text_field =
 				'<input value="'.htmlspecialchars( $value, ENT_COMPAT, 'UTF-8' ).'" '
 					.$validate_mask.' id="'.$elementid_n.'" name="'.$fieldname_n.'" class="'.$classes.'" type="text" '.$attribs.'
-				/>'
-				.$posttext;
+				/>';
 
-			$field->html[] = '
+			$field->html[] = $pretext . '
 				<div class="' . $input_grp_class . ' fc-xpended">
 					'.($auto_value || $select_field_placement !== 0 ? '' : $select_field).'
-					'.$text_field.'
+					' . $text_field . '
 					'.($auto_value || $select_field_placement !== 1 ? '' : $select_field).'
 					'.($auto_value ? '<span class="fc-mssg-inline fc-info fc-nobgimage">' . JText::_('FLEXI_AUTO') . '</span>' : '').'
 				</div>
+				' . $posttext . '
 				'.(!$add_ctrl_btns || $auto_value ? '' : '
 				<div class="'.$input_grp_class.' fc-xpended-btns">
 					'.$move2.'
