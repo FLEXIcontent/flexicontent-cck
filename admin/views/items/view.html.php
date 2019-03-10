@@ -991,7 +991,7 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 		$lists['language'] = flexicontent_html::buildlanguageslist(
 			'language',
 			array(
-				'class' => 'use_select2_lib required',
+				'class' => 'use_select2_lib' . ($behaviour !== 'translate' ? '' : ' required'),
 				),
 			$selected = '',
 			$type = ($behaviour !== 'translate' ? JText::_('FLEXI_NOCHANGE_LANGUAGE') : 2),
@@ -999,7 +999,7 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 			$published_only = true,
 			$disable_langs = null,
 			$add_all = ($behaviour !== 'translate'),
-			$radio_conf = array('required'=>1)
+			$radio_conf = ($behaviour !== 'translate' ? array() : array('required' => 1))
 		 );
 
 		// build state selection
