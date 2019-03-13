@@ -908,7 +908,7 @@ if ($js)
 				foreach ($this->rows as $i => $row)
 				{
 					$row->checked_out = $this->folder_mode ? 0 : $row->checked_out;
-					$isOwner = $user->id && $row->uploaded_by == $user->id;
+					$isOwner = $user->id && !empty($row->uploaded_by) && $row->uploaded_by == $user->id;
 
 					// Permissions
 					$row->canCheckin   = empty($row->checked_out) || $row->checked_out == $user->id || $canCheckinRecords;
@@ -1067,7 +1067,8 @@ if ($js)
 						}
 						else
 						{
-							echo JHtml::_($hlpname . '.edit_link', $row, $i, $row->canEdit, array(
+							// Note we will pass true to canEdit parameter because we want to create an assign link
+							echo JHtml::_($hlpname . '.edit_link', $row, $i, true, array(
 								'linkedPrefix' => '<span class="icon-checkbox"></span><span class="icon-new"></span>',
 								'onclick' => 'if (jQuery(this).hasClass(\'striketext\')) return; ' . $row->file_assign_link,
 								'attribs' => array(
@@ -1236,7 +1237,7 @@ if ($js)
 				foreach ($this->rows as $i => $row)
 				{
 					$row->checked_out = $this->folder_mode ? 0 : $row->checked_out;
-					$isOwner = $user->id && $row->uploaded_by == $user->id;
+					$isOwner = $user->id && !empty($row->uploaded_by) && $row->uploaded_by == $user->id;
 
 					// Permissions
 					$row->canCheckin   = empty($row->checked_out) || $row->checked_out == $user->id || $canCheckinRecords;
