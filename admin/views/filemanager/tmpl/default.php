@@ -889,6 +889,14 @@ if ($js)
 				$canCheckinRecords = $user->authorise('core.admin', 'com_checkin');
 				$canManage = FlexicontentHelperPerm::getPerm()->CanFiles;
 
+				// Component level ACL we do not have per file ACL
+				$canedit       = $user->authorise('flexicontent.editfile', 'com_flexicontent');
+				$caneditown    = $user->authorise('flexicontent.editownfile', 'com_flexicontent');
+				$candelete     = $user->authorise('flexicontent.deletefile', 'com_flexicontent');
+				$candeleteown  = $user->authorise('flexicontent.deleteownfile', 'com_flexicontent');
+				$canpublish    = $user->authorise('flexicontent.publishfile', 'com_flexicontent');
+				$canpublishown = $user->authorise('flexicontent.publishownfile', 'com_flexicontent');
+
 				$file_is_selected = false;
 
 				$imageexts = array('png', 'ico', 'gif', 'bmp', 'jpg', 'jpeg');
@@ -900,12 +908,13 @@ if ($js)
 				foreach ($this->rows as $i => $row)
 				{
 					$row->checked_out = $this->folder_mode ? 0 : $row->checked_out;
+					$isOwner = $user->id && $row->uploaded_by == $user->id;
 
 					// Permissions
 					$row->canCheckin   = empty($row->checked_out) || $row->checked_out == $user->id || $canCheckinRecords;
-					$row->canEdit      = $canManage;
-					$row->canEditState = $canManage;
-					$row->canDelete    = $canManage;
+					$row->canEdit      = $canedit || ($caneditown && $isOwner);
+					$row->canEditState = $canpublish || ($canpublishown && $isOwner);
+					$row->canDelete    = $candelete || ($candeleteown && $isOwner);
 
 					unset($thumb_or_icon);
 					$filename = str_replace( array("'", "\""), array("\\'", ""), $row->filename );
@@ -1227,12 +1236,13 @@ if ($js)
 				foreach ($this->rows as $i => $row)
 				{
 					$row->checked_out = $this->folder_mode ? 0 : $row->checked_out;
+					$isOwner = $user->id && $row->uploaded_by == $user->id;
 
 					// Permissions
 					$row->canCheckin   = empty($row->checked_out) || $row->checked_out == $user->id || $canCheckinRecords;
-					$row->canEdit      = $canManage;
-					$row->canEditState = $canManage;
-					$row->canDelete    = $canManage;
+					$row->canEdit      = $canedit || ($caneditown && $isOwner);
+					$row->canEditState = $canpublish || ($canpublishown && $isOwner);
+					$row->canDelete    = $candelete || ($candeleteown && $isOwner);
 
 					unset($thumb_or_icon);
 					$filename = str_replace( array("'", "\""), array("\\'", ""), $row->filename );

@@ -972,8 +972,8 @@ class FlexicontentControllerBaseAdmin extends FlexicontentController
 		// Check at least one item was selected
 		if (!count($cid))
 		{
-			$app->enqueueMessage(JText::_('FLEXI_NO_ITEMS_SELECTED'), 'error');
 			$app->setHeader('status', '500 Internal Server Error', true);
+			$app->enqueueMessage(JText::_('FLEXI_NO_ITEMS_SELECTED'), 'error');
 			$this->setRedirect($this->returnURL);
 
 			return;
@@ -1010,7 +1010,7 @@ class FlexicontentControllerBaseAdmin extends FlexicontentController
 		if (!$is_authorised)
 		{
 			$app->enqueueMessage($msg_noauth, 'error');
-			$app->setHeader('status', 403, true);
+			$app->setHeader('status', '403 Forbidden', true);
 			$this->setRedirect($this->returnURL);
 
 			return;
