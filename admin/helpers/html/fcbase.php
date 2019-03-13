@@ -233,15 +233,16 @@ abstract class JHtmlFcbase
 		$row->title_cut = StringHelper::strlen($title) > 100
 			? htmlspecialchars(StringHelper::substr($title, 100), ENT_QUOTES, 'UTF-8') . '...'
 			: htmlspecialchars($title, ENT_QUOTES, 'UTF-8');
+		$title_cut = $row->title_cut;
 
 		// Escape & translate
 		$title_escaped = htmlspecialchars($row->title_cut, ENT_QUOTES, 'UTF-8');
-		$title_untranslated = $title !== $row->{static::$title_propname} ? '<br/><small>[ ' . $title_escaped . ' ]</small>' : '';
+		$title_untranslated = $title !== $row->{static::$title_propname} ? '<br/><small>[ ' . $title_cut . ' ]</small>' : '';
 
 		// Display title with no edit link ... if row is not-editable for any reason (no ACL or checked-out by other user)
 		if (!$canEdit || ($row->checked_out && (int) $row->checked_out !== (int) JFactory::getUser()->id))
 		{
-			return $title_escaped . $title_untranslated;
+			return $title_cut . $title_untranslated;
 		}
 
 		// Display title with edit link ... (row editable and not checked out)
@@ -291,7 +292,7 @@ abstract class JHtmlFcbase
 			return $nolinkPrefix . '
 			<a href="javascript:;" data-href="' . $edit_link . '" ' . $attrs . '>
 				' . $linkedPrefix . '
-				' . (empty($config['noTitle']) ? $title_escaped : '') . '
+				' . (empty($config['noTitle']) ? $title_cut : '') . '
 			</a>';
 		}
 		else
@@ -299,7 +300,7 @@ abstract class JHtmlFcbase
 			return $nolinkPrefix . '
 			<a href="' . $edit_link . '" ' . $attrs . '>
 				' . $linkedPrefix . '
-				' . (empty($config['noTitle']) ? $title_escaped : '') . '
+				' . (empty($config['noTitle']) ? $title_cut : '') . '
 			</a>
 			' . (empty($config['noTitle']) ? $title_untranslated : '');
 		}
