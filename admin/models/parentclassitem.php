@@ -3637,6 +3637,24 @@ class ParentClassItem extends FCModelAdmin
 			$itemParams = $this->_record->attribs;
 		}
 
+		/**
+		 * Bug fix for bad parameter merge code in item model for parameters not present in the form
+		 */
+		$iattribs = $itemParams->toArray();
+		$err = false;
+		foreach ($iattribs as $i => $v)
+		{
+			if ($v === false)
+			{
+				unset($iattribs[$i]);
+				$err = true;
+			}
+		}
+		if ($err)
+		{
+			$itemParams = new JRegistry($iattribs);
+		}
+
 		// Retrieve Layout's parameters, also deciding the layout
 		if ($app->isAdmin() || !empty($this->isForm))
 		{

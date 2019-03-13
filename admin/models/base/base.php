@@ -1058,7 +1058,8 @@ abstract class FCModelAdmin extends JModelAdmin
 					// Merge the above into the existing data Registry object of the corresponding property
 					if (!empty($db_data[$prop]))
 					{
-						$db_data_registry[$prop]->loadArray($db_data[$prop]);
+						//$db_data_registry[$prop]->loadArray($db_data[$prop]);
+						$this->mergeNewData($db_data_registry[$prop], $db_data[$prop]);
 					}
 				}
 			}
@@ -1074,12 +1075,14 @@ abstract class FCModelAdmin extends JModelAdmin
 			if (isset($data[$prop]) && is_array($data[$prop]))
 			{
 				// Overwrite existing data with new data
-				$db_data_registry[$prop]->loadArray($data[$prop]);
+				//$db_data_registry[$prop]->loadArray($data[$prop]);
+				$this->mergeNewData($db_data_registry[$prop], $data[$prop]);
 
 				// Add the layout data too (validated above)
 				if (!empty($layout_data) && $prop == $options['params_fset'])
 				{
-					$db_data_registry[$prop]->loadArray($layout_data);
+					//$db_data_registry[$prop]->loadArray($layout_data);
+					$this->mergeNewData($db_data_registry[$prop], $layout_data);
 				}
 
 				// Convert property back to string
@@ -1387,6 +1390,33 @@ abstract class FCModelAdmin extends JModelAdmin
 						$data[$grp_name][$field->fieldname] = false;
 					}
 				}
+			}
+		}
+	}
+
+
+	/**
+	 * Method to maintain merge value maintain old values if new value is === falseat have 
+	 *
+	 * @param   array   $old_data   The old data
+	 * @param   array   $new_data   The new data
+	 *
+	 * @return  void
+	 *
+	 * @since   3.3.0
+	 */
+	protected function mergeNewData(& $old_data, $new_data)
+	{
+		foreach($new_data as $i => $v)
+		{
+			if (is_array($v))
+			{
+				$this->mergeNewData($old_data[$i], $new_data[$i]);
+			}
+
+			if ($v !== false)
+			{
+				$new_data[$i] = $v;
 			}
 		}
 	}
