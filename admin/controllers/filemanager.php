@@ -56,7 +56,9 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 	{
 		parent::__construct($config);
 
-		// Register task aliases
+		/**
+		 * Register task aliases
+		 */
 		$this->registerTask('uploads', 	'upload');
 		$this->registerTask('apply',        'save');
 		$this->registerTask('apply_ajax',   'save');
@@ -67,33 +69,6 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 		$this->task   = $this->input->get('task', '', 'cmd');
 		$this->view   = $this->input->get('view', '', 'cmd');
 		$this->format = $this->input->get('format', '', 'cmd');
-
-		// Get custom return URL, if this was present in the HTTP request
-		$this->returnURL = $this->input->get('return', null, 'base64');
-		$this->returnURL = $this->returnURL ? base64_decode($this->returnURL) : $this->returnURL;
-
-		// Compatibility for upload and addlocal tasks:  null return URL means return IDs
-		if ($this->returnURL === null && in_array($this->task, array('upload', 'addurl', 'addlocal')))
-		{
-			$this->runMode = 'interactive';
-		}
-
-		// Check return URL if empty or not safe and set a default one
-		if (! $this->returnURL || ! flexicontent_html::is_safe_url($this->returnURL))
-		{
-			if ($this->view == $this->record_name || $this->view == $this->record_name_pl)
-			{
-				$this->returnURL = 'index.php?option=com_flexicontent&view=' . $this->record_name_pl;
-			}
-			elseif ($this->refererURL && $this->refererURL !== JUri::base())
-			{
-				$this->returnURL = $this->refererURL;
-			}
-			else
-			{
-				$this->returnURL = null;
-			}
-		}
 
 		// Can manage ACL
 		$this->canManage = FlexicontentHelperPerm::getPerm()->CanFiles;
@@ -133,7 +108,9 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 
 		// Get the model
 		$model = $this->getModel($this->record_name);
-		$model->setId($data['id']);  // Make sure id is correct
+
+		// Make sure Primary Key is correctly set into the model ... (needed for loading correct item)
+		$model->setId($data['id']);
 		$record = $model->getItem();
 
 		// The save2copy task needs to be handled slightly differently.
@@ -183,20 +160,15 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 		}
 
 		// Calculate access
-		$canupload = $user->authorise('flexicontent.uploadfiles', 'com_flexicontent');
-		$canedit = $user->authorise('flexicontent.editfile', 'com_flexicontent');
-		$caneditown = $user->authorise('flexicontent.editownfile', 'com_flexicontent') && $user->get('id') && $record->uploaded_by == $user->get('id');
-		$is_authorised = !$record->id
-			? $canupload
-			: $canedit || $caneditown;
+		$is_authorised = $model->canEdit($record);
 
 		// Check access
 		if (!$is_authorised)
 		{
+			$app->setHeader('status', '403 Forbidden', true);
 			$app->enqueueMessage(JText::_('FLEXI_ALERTNOTAUTH_TASK'), 'error');
-			$app->setHeader('status', 403, true);
 
-			// For errors, skip redirection if in a component-area-only view, showing error using current page, since usually we are inside a iframe modal
+			// Skip redirection back to return url if inside a component-area-only view, showing error using current page, since usually we are inside a iframe modal
 			if ($this->input->getCmd('tmpl') !== 'component')
 			{
 				$this->setRedirect($this->returnURL);
@@ -1047,8 +1019,13 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 		}
 
 		// Calculate access
-		$candelete = $user->authorise('flexicontent.deletefile', 'com_flexicontent');
-		$candeleteown = $user->authorise('flexicontent.deleteownfile', 'com_flexicontent');
+		/**
+		 * Because we do not have ACL for individual files, we will abort here if both of 'flexicontent.deletefile' or 'flexicontent.deleteownfile' are not granted at component level
+		 *
+		 * Note later we check: 'flexicontent.deleteownfile' or (ownership + 'flexicontent.deleteownfile') by using $model->getDeletable($cid)
+		 */
+		$candelete     = $user->authorise('flexicontent.deletefile', 'com_flexicontent');
+		$candeleteown  = $user->authorise('flexicontent.deleteownfile', 'com_flexicontent');
 		$is_authorised = $candelete || $candeleteown;
 
 		// Check access
@@ -1068,7 +1045,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 		$files = $db->loadObjectList('id');
 		$cid = array_keys($files);
 
-		$model = $this->getModel('filemanager');
+		$model = $this->getModel($this->record_name_pl);
 		$deletable = $model->getDeletable($cid);
 
 		// Find files that are currently in use
@@ -1166,6 +1143,11 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 		$db    = JFactory::getDbo();
 
 		// Calculate access
+		/**
+		 * Because we do not have ACL for individual files, we will abort here if both of 'flexicontent.publishfile' or 'flexicontent.publishownfile' are not granted at component level
+		 *
+		 * Note: later we will check:  $canpublish || ($user->get('id') && $files[$_id]->uploaded_by == $user->get('id'))
+		 */
 		$canpublish = $user->authorise('flexicontent.publishfile', 'com_flexicontent');
 		$canpublishown = $user->authorise('flexicontent.publishownfile', 'com_flexicontent');
 		$is_authorised = $canpublish || $canpublishown;
@@ -1458,7 +1440,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 		// Get/Create the model
 		$model = $this->getModel($this->record_name);
 
-		// Try to load review by attributes in HTTP Request
+		// Try to load file by attributes in HTTP Request
 		if (0)
 		{
 			$record = $model->getRecord(array(
@@ -1477,12 +1459,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 		$view->document = $document;
 
 		// Calculate access
-		$canupload = $user->authorise('flexicontent.uploadfiles', 'com_flexicontent');
-		$canedit = $user->authorise('flexicontent.editfile', 'com_flexicontent');
-		$caneditown = $user->authorise('flexicontent.editownfile', 'com_flexicontent') && $user->get('id') && $record->uploaded_by == $user->get('id');
-		$is_authorised = !$record->id
-			? $canupload
-			: $canedit || $caneditown;
+		$is_authorised = $model->canEdit($record);
 
 		// Check access
 		if (!$is_authorised)
@@ -1490,7 +1467,11 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 			$app->setHeader('status', '403 Forbidden', true);
 			$app->enqueueMessage(JText::_('FLEXI_ALERTNOTAUTH_TASK'), 'error');
 
-			$this->setRedirect($this->returnURL);
+			if ($this->input->getCmd('tmpl') !== 'component')
+			{
+				$this->setRedirect($this->returnURL);
+			}
+
 			return;
 		}
 
@@ -1500,7 +1481,11 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 			$app->setHeader('status', '400 Bad Request', true);
 			$app->enqueueMessage(JText::_('FLEXI_EDITED_BY_ANOTHER_ADMIN'), 'warning');
 
-			$this->setRedirect($this->returnURL);
+			if ($this->input->getCmd('tmpl') !== 'component')
+			{
+				$this->setRedirect($this->returnURL);
+			}
+
 			return;
 		}
 
@@ -1510,7 +1495,11 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 			$app->setHeader('status', '400 Bad Request', true);
 			$app->enqueueMessage(JText::_('FLEXI_OPERATION_FAILED') . ' : ' . $model->getError(), 'error');
 
-			$this->setRedirect($this->returnURL);
+			if ($this->input->getCmd('tmpl') !== 'component')
+			{
+				$this->setRedirect($this->returnURL);
+			}
+
 			return;
 		}
 
@@ -1550,15 +1539,18 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 		// Initialize variables
 		$app   = JFactory::getApplication();
 		$user  = JFactory::getUser();
-		$model = $this->getModel('filemanager');
 
-		$cid   = $this->input->get('cid', array(), 'array');
+		// Get model
+		$model = $this->getModel($this->record_name_pl);
+
+		// Get and santize records ids
+		$cid = $this->input->get('cid', array(), 'array');
 		$cid = ArrayHelper::toInteger($cid);
 
 		// Check at least one item was selected
 		if (!count($cid))
 		{
-			$app->setHeader('status', '500', true);
+			$app->setHeader('status', '500 Internal Server Error', true);
 			$app->enqueueMessage(JText::_('FLEXI_NO_ITEMS_SELECTED'), 'error');
 			$this->setRedirect($this->returnURL);
 
@@ -1576,12 +1568,14 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 		// Check access
 		if (!$is_authorised)
 		{
+			$app->enqueueMessage(JText::_('FLEXI_ALERTNOTAUTH_TASK'), 'error');
 			$app->setHeader('status', '403 Forbidden', true);
-			$this->setRedirect($this->returnURL, JText::_('FLEXI_ALERTNOTAUTH_TASK'), 'error');
+			$this->setRedirect($this->returnURL);
 
 			return;
 		}
 
+		// Get new record access
 		$accesses = $this->input->get('access', array(), 'array');
 		$accesses = ArrayHelper::toInteger($accesses);
 		$access = $accesses[$file_id];
