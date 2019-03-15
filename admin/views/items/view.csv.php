@@ -44,6 +44,9 @@ class FlexicontentViewItems extends JViewLegacy
 		// Get model
 		$model  = $this->getModel();
 
+		// Indicate to model (if frontend) to merge menu parameters if menu matches
+		$model->mergeMenuParams = !$app->isAdmin();
+
 
 		/**
 		 * Get configuration parameters
