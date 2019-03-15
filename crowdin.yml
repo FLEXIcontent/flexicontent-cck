@@ -1,9 +1,12 @@
 files:
   - source: /**/en-GB/*.ini
     translation: /**/%locale%/%locale%.%file_name%.ini
-    translation_replace:
+    translation_replace: &ref_en-GB.
       en-GB.: 
-  - source: /**/en-GB.*.ini
+  - &ref_translation_replace
+    source: /**/en-GB.*.ini
     translation: /**/%locale%.%file_name%.ini
-    translation_replace:
-      en-GB.: 
+    translation_replace: []
+  - source: /pkg_en-GB.xml
+    translation: /pkg_%locale%.xml
+    translate_content: 0
