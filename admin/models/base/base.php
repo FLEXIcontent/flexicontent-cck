@@ -983,13 +983,16 @@ abstract class FCModelAdmin extends JModelAdmin
 	 */
 	function mergeAttributes(&$item, &$data, $properties, $options)
 	{
-		// Handle things like non present array fields
+		/**
+		 * Canonicalize data set data not present in form to FALSE to indicate maintaining the DB values
+		 */
 		$form = $this->getForm();
 		$this->_canonicalData($form, $data);
 
-		//***
-		//*** Filter layout parameters if the were given, and merge them into existing layout parameters (in DB)
-		//***
+
+		/**
+		 * Filter layout parameters if the were given, and merge them into existing layout parameters (in DB)
+		 */
 
 		if (isset($options['params_fset']) && isset($options['layout_type']))
 		{
@@ -1002,9 +1005,9 @@ abstract class FCModelAdmin extends JModelAdmin
 		}
 
 
-		//***
-		//*** Create one Registry object for every existing data property
-		//***
+		/**
+		 * Create one Registry object for every existing data property
+		 */
 
 		$db_data_registry = array();
 		foreach($properties as $prop)
@@ -1058,8 +1061,7 @@ abstract class FCModelAdmin extends JModelAdmin
 					// Merge the above into the existing data Registry object of the corresponding property
 					if (!empty($db_data[$prop]))
 					{
-						//$db_data_registry[$prop]->loadArray($db_data[$prop]);
-						$this->mergeNewData($db_data_registry[$prop], $db_data[$prop]);
+						$db_data_registry[$prop]->loadArray($db_data[$prop]);
 					}
 				}
 			}
@@ -1076,13 +1078,13 @@ abstract class FCModelAdmin extends JModelAdmin
 			{
 				// Overwrite existing data with new data
 				//$db_data_registry[$prop]->loadArray($data[$prop]);
-				$this->mergeNewData($db_data_registry[$prop], $data[$prop]);
+				$this->maintainDbData($db_data_registry[$prop], $data[$prop]);
 
 				// Add the layout data too (validated above)
 				if (!empty($layout_data) && $prop == $options['params_fset'])
 				{
 					//$db_data_registry[$prop]->loadArray($layout_data);
-					$this->mergeNewData($db_data_registry[$prop], $layout_data);
+					$this->maintainDbData($db_data_registry[$prop], $layout_data);
 				}
 
 				// Convert property back to string
@@ -1396,27 +1398,27 @@ abstract class FCModelAdmin extends JModelAdmin
 
 
 	/**
-	 * Method to maintain merge value maintain old values if new value is === falseat have 
+	 * Method to maintain database values if posted specific data are missing (or validation cleared them) from the posted form (value is === false)
 	 *
-	 * @param   array   $old_data   The old data
-	 * @param   array   $new_data   The new data
+	 * @param   array   $db_data     The existing db data
+	 * @param   array   $form_data   The form submitted data but canonicalized data (missing parameters were set to false)
 	 *
 	 * @return  void
 	 *
 	 * @since   3.3.0
 	 */
-	protected function mergeNewData(& $old_data, $new_data)
+	protected function maintainDbData(& $db_data, $form_data)
 	{
-		foreach($new_data as $i => $v)
+		foreach($form_data as $i => $v)
 		{
 			if (is_array($v))
 			{
-				$this->mergeNewData($old_data[$i], $new_data[$i]);
+				$this->maintainDbData($db_data[$i], $form_data[$i]);
 			}
 
 			if ($v !== false)
 			{
-				$new_data[$i] = $v;
+				$db_data[$i] = $v;
 			}
 		}
 	}
