@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<extension type="file" version="3.2" method="upgrade">
+<extension type="tập tin" version="3.2" method="upgrade">
 	<name>English (en-GB) Language pack</name>
 	<packagename/>
 	<version/>
