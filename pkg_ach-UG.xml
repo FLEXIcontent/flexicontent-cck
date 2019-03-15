@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<extension type="crwdns25398:0crwdne25398:0" version="crwdns25400:0crwdne25400:0" method="crwdns25402:0crwdne25402:0">
+	<name>English (en-GB) Language pack</name>
+	<packagename/>
+	<version/>
+	<creationDate/>
+	<author>Flexicontent.org</author>
+	<authorEmail>traduction@flexicontent.org</authorEmail>
+	<authorUrl>http://flexicontent.org</authorUrl>
+	<copyright/>
+	<license>https://www.gnu.org/licenses/gpl-2.0.html GNU/GPL</license>
+	<url/>
+	<packager>flexicontent.org</packager>
+	<packagerurl>http://flexicontent.org</packagerurl>
+	<description><![CDATA[<div style="text-align: left;">
+<h3>Flexicontent! 3.2. Full English (en-GB) Language Package - Version 3.2</h3>
+</div>]]></description>
+	<fileset>
+
+		<!-- Front-end -->
+		<files folder="crwdns25404:0crwdne25404:0" target="crwdns25406:0crwdne25406:0">
+			<filename>en-GB.com_flexicontent.ini</filename>
+		</files>
+		<files folder="crwdns25408:0crwdne25408:0" target="crwdns25410:0crwdne25410:0">
+			<filename>en-GB.ini</filename>
+		</files>
+		<files folder="crwdns25412:0crwdne25412:0" target="crwdns25414:0crwdne25414:0">
+			<filename>en-GB.ini</filename>
+		</files>
+		<files folder="crwdns25416:0crwdne25416:0" target="crwdns25418:0crwdne25418:0">
+			<filename>en-GB.ini</filename>
+		</files>
+		<files folder="crwdns25420:0crwdne25420:0" target="crwdns25422:0crwdne25422:0">
+			<filename>en-GB.ini</filename>
+		</files>
+		<files folder="crwdns25424:0crwdne25424:0" target="crwdns25426:0crwdne25426:0">
+			<filename>en-GB.ini</filename>
+		</files>
+
+		<!-- Backend-end -->
+		<files folder="crwdns25428:0crwdne25428:0" target="crwdns25430:0crwdne25430:0">
+			<filename>en-GB.com_flexicontent.ini</filename>
+			<filename>en-GB.com_flexicontent.sys.ini</filename>
+		</files>
+
+		<!-- Modules -->
+		<files folder="crwdns25432:0crwdne25432:0" target="crwdns25434:0crwdne25434:0">
+			<filename>en-GB.mod_flexiadvsearch.ini</filename>
+			<filename>en-GB.mod_flexiadvsearch.sys.ini</filename>
+		</files>
+		<files folder="crwdns25436:0crwdne25436:0" target="crwdns25438:0crwdne25438:0">
+			<filename>en-GB.mod_flexicategories.ini</filename>
+			<filename>en-GB.mod_flexicategories.sys.ini</filename>
+		</files>
+		<files folder="crwdns25440:0crwdne25440:0" target="crwdns25442:0crwdne25442:0">
+			<filename>en-GB.mod_flexicontent.ini</filename>
+			<filename>en-GB.mod_flexicontent.sys.ini</filename>
+		</files>
+		<files folder="crwdns25444:0crwdne25444:0" target="crwdns25446:0crwdne25446:0">
+			<filename>en-GB.mod_flexifilter.ini</filename>
+			<filename>en-GB.mod_flexifilter.sys.ini</filename>
+		</files>
+		<files folder="crwdns25448:0crwdne25448:0" target="crwdns25450:0crwdne25450:0">
+			<filename>en-GB.mod_flexigooglemap.ini</filename>
+			<filename>en-GB.mod_flexigooglemap.sys.ini</filename>
+		</files>
+		<files folder="crwdns25452:0crwdne25452:0" target="crwdns25454:0crwdne25454:0">
+			<filename>en-GB.mod_flexitagcloud.ini</filename>
+			<filename>en-GB.mod_flexitagcloud.sys.ini</filename>
+		</files>
+
+		<!-- Plugins system -->
+		<files folder="crwdns25456:0crwdne25456:0" target="crwdns25458:0crwdne25458:0">
+			<filename>en-GB.plg_content_flexibreak.ini</filename>
+			<filename>en-GB.plg_content_flexibreak.sys.ini</filename>
+		</files>
+		<files folder="crwdns25460:0crwdne25460:0" target="crwdns25462:0crwdne25462:0">
+			<filename>en-GB.plg_finder_flexicontent.ini</filename>
+			<filename>en-GB.plg_finder_flexicontent.sys.ini</filename>
+		</files>
+		<files folder="crwdns25464:0crwdne25464:0" target="crwdns25466:0crwdne25466:0">
+			<filename>en-GB.plg_flexicontent_flexinotify.ini</filename>
+			<filename>en-GB.plg_flexicontent_flexinotify.sys.ini</filename>
+		</files>
+		<files folder="crwdns25468:0crwdne25468:0" target="crwdns25470:0crwdne25470:0">
+			<filename>en-GB.plg_osmap_com_flexicontent.ini</filename>
+		</files>
+		<files folder="crwdns25472:0crwdne25472:0" target="crwdns25474:0crwdne25474:0">
+			<filename>en-GB.plg_search_flexiadvsearch.ini</filename>
+			<filename>en-GB.plg_search_flexiadvsearch.sys.ini</filename>
+		</files>
+		<files folder="crwdns25476:0crwdne25476:0" target="crwdns25478:0crwdne25478:0">
+			<filename>en-GB.plg_search_flexisearch.ini</filename>
+			<filename>en-GB.plg_search_flexisearch.sys.ini</filename>
+		</files>
+		<files folder="crwdns25480:0crwdne25480:0" target="crwdns25482:0crwdne25482:0">
+			<filename>en-GB.plg_system_flexiadvroute.ini</filename>
+		</files>
+		<files folder="crwdns25484:0crwdne25484:0" target="crwdns25486:0crwdne25486:0">
+			<filename>en-GB.plg_system_flexisystem.ini</filename>
+			<filename>en-GB.plg_system_flexisystem_common_be.ini</filename>
+		</files>
+
+		<!-- Plugins flexicontent -->
+		<files folder="crwdns25488:0crwdne25488:0" target="crwdns25490:0crwdne25490:0">
+			<filename>en-GB.plg_flexicontent_fields_account_via_submit.ini</filename>
+		</files>
+		<files folder="crwdns25492:0crwdne25492:0" target="crwdns25494:0crwdne25494:0">
+			<filename>en-GB.plg_flexicontent_fields_addressint.ini</filename>
+		</files>
+		<files folder="crwdns25496:0crwdne25496:0" target="crwdns25498:0crwdne25498:0">
+			<filename>en-GB.plg_flexicontent_fields_authoritems.ini</filename>
+		</files>
+		<files folder="crwdns25500:0crwdne25500:0" target="crwdns25502:0crwdne25502:0">
+			<filename>en-GB.plg_flexicontent_fields_checkbox.ini</filename>
+		</files>
+		<files folder="crwdns25504:0crwdne25504:0" target="crwdns25506:0crwdne25506:0">
+			<filename>en-GB.plg_flexicontent_fields_checkboximage.ini</filename>
+		</files>
+		<files folder="crwdns25508:0crwdne25508:0" target="crwdns25510:0crwdne25510:0">
+			<filename>en-GB.plg_flexicontent_fields_color.ini</filename>
+		</files>
+		<files folder="crwdns25512:0crwdne25512:0" target="crwdns25514:0crwdne25514:0">
+			<filename>en-GB.plg_flexicontent_fields_comments.ini</filename>
+		</files>
+		<files folder="crwdns25516:0crwdne25516:0" target="crwdns25518:0crwdne25518:0">
+			<filename>en-GB.plg_flexicontent_fields_core.ini</filename>
+		</files>
+		<files folder="crwdns25520:0crwdne25520:0" target="crwdns25522:0crwdne25522:0">
+			<filename>en-GB.plg_flexicontent_fields_coreprops.ini</filename>
+		</files>
+		<files folder="crwdns25524:0crwdne25524:0" target="crwdns25526:0crwdne25526:0">
+			<filename>en-GB.plg_flexicontent_fields_date.ini</filename>
+		</files>
+		<files folder="crwdns25528:0crwdne25528:0" target="crwdns25530:0crwdne25530:0">
+			<filename>en-GB.plg_flexicontent_fields_email.ini</filename>
+		</files>
+		<files folder="crwdns25532:0crwdne25532:0" target="crwdns25534:0crwdne25534:0">
+			<filename>en-GB.plg_flexicontent_fields_fcloadmodule.ini</filename>
+		</files>
+		<files folder="crwdns25536:0crwdne25536:0" target="crwdns25538:0crwdne25538:0">
+			<filename>en-GB.plg_flexicontent_fields_fcpagenav.ini</filename>
+		</files>
+		<files folder="crwdns25540:0crwdne25540:0" target="crwdns25542:0crwdne25542:0">
+			<filename>en-GB.plg_flexicontent_fields_fieldgroup.ini</filename>
+		</files>
+		<files folder="crwdns25544:0crwdne25544:0" target="crwdns25546:0crwdne25546:0">
+			<filename>en-GB.plg_flexicontent_fields_file.ini</filename>
+		</files>
+		<files folder="crwdns25548:0crwdne25548:0" target="crwdns25550:0crwdne25550:0">
+			<filename>en-GB.plg_flexicontent_fields_groupmarker.ini</filename>
+		</files>
+		<files folder="crwdns25552:0crwdne25552:0" target="crwdns25554:0crwdne25554:0">
+			<filename>en-GB.plg_flexicontent_fields_image.ini</filename>
+		</files>
+		<files folder="crwdns25556:0crwdne25556:0" target="crwdns25558:0crwdne25558:0">
+			<filename>en-GB.plg_flexicontent_fields_jprofile.ini</filename>
+		</files>
+		<files folder="crwdns25560:0crwdne25560:0" target="crwdns25562:0crwdne25562:0">
+			<filename>en-GB.plg_flexicontent_fields_linkslist.ini</filename>
+		</files>
+		<files folder="crwdns25564:0crwdne25564:0" target="crwdns25566:0crwdne25566:0">
+			<filename>en-GB.plg_flexicontent_fields_minigallery.ini</filename>
+		</files>
+		<files folder="crwdns25568:0crwdne25568:0" target="crwdns25570:0crwdne25570:0">
+			<filename>en-GB.plg_flexicontent_fields_phonenumbers.ini</filename>
+		</files>
+		<files folder="crwdns25572:0crwdne25572:0" target="crwdns25574:0crwdne25574:0">
+			<filename>en-GB.plg_flexicontent_fields_radio.ini</filename>
+		</files>
+		<files folder="crwdns25576:0crwdne25576:0" target="crwdns25578:0crwdne25578:0">
+			<filename>en-GB.plg_flexicontent_fields_radioimage.ini</filename>
+		</files>
+		<files folder="crwdns25580:0crwdne25580:0" target="crwdns25582:0crwdne25582:0">
+			<filename>en-GB.plg_flexicontent_fields_relation.ini</filename>
+		</files>
+		<files folder="crwdns25584:0crwdne25584:0" target="crwdns25586:0crwdne25586:0">
+			<filename>en-GB.plg_flexicontent_fields_relation_reverse.ini</filename>
+		</files>
+		<files folder="crwdns25588:0crwdne25588:0" target="crwdns25590:0crwdne25590:0">
+			<filename>en-GB.plg_flexicontent_fields_select.ini</filename>
+		</files>
+		<files folder="crwdns25592:0crwdne25592:0" target="crwdns25594:0crwdne25594:0">
+			<filename>en-GB.plg_flexicontent_fields_selectmultiple.ini</filename>
+		</files>
+		<files folder="crwdns25596:0crwdne25596:0" target="crwdns25598:0crwdne25598:0">
+			<filename>en-GB.plg_flexicontent_fields_sharedmedia.ini</filename>
+		</files>
+		<files folder="crwdns25600:0crwdne25600:0" target="crwdns25602:0crwdne25602:0">
+			<filename>en-GB.plg_flexicontent_fields_termlist.ini</filename>
+		</files>
+		<files folder="crwdns25604:0crwdne25604:0" target="crwdns25606:0crwdne25606:0">
+			<filename>en-GB.plg_flexicontent_fields_text.ini</filename>
+		</files>
+		<files folder="crwdns25608:0crwdne25608:0" target="crwdns25610:0crwdne25610:0">
+			<filename>en-GB.plg_flexicontent_fields_textarea.ini</filename>
+		</files>
+		<files folder="crwdns25612:0crwdne25612:0" target="crwdns25614:0crwdne25614:0">
+			<filename>en-GB.plg_flexicontent_fields_textselect.ini</filename>
+		</files>
+		<files folder="crwdns25616:0crwdne25616:0" target="crwdns25618:0crwdne25618:0">
+			<filename>en-GB.plg_flexicontent_fields_toolbar.ini</filename>
+		</files>
+		<files folder="crwdns25620:0crwdne25620:0" target="crwdns25622:0crwdne25622:0">
+			<filename>en-GB.plg_flexicontent_fields_weblink.ini</filename>
+		</files>
+		</fileset>
+	<updateservers>
+		<server type="crwdns25624:0crwdne25624:0" priority="crwdns25626:0crwdne25626:0" name="crwdns25628:0crwdne25628:0">
+https://raw.githubusercontent.com/FLEXIcontent/flexicontent-translations/master/translationlist_flexicontent.xml</server>
+	</updateservers>
+</extension>
