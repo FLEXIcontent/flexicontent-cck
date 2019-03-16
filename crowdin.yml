@@ -1,16 +1,16 @@
 files:
-  - source: /**/en-GB/*.ini
-    translation: /**/%locale%/%locale%.%file_name%.ini
-    translation_replace: {
-      "en-GB.": ""
-      }
-  - source: /**/en-GB.*.ini
-    translation: /**/%locale%.%file_name%.ini
-    translation_replace: {
-      "en-GB.": ""
-      }
-  - source: /pkg_en-GB.xml
-    translation: /pkg_%locale%.xml
-     translation_replace: {
-      "en-GB.": ""
-      }
+- source: /**/en-GB/*.ini
+  translation: /**/%locale%/%locale%.%file_name%.ini
+  translation_replace: {
+  "en-GB.": ""
+  }
+- source: /**/en-GB.*.ini
+  translation: /**/%locale%.%file_name%.ini
+  translation_replace: {
+  "en-GB.": ""
+  }
+- source: /pkg_en-GB.xml
+  translation: /pkg_%locale%.xml
+  translation_replace: {
+  "en-GB.": ""
+  }
