@@ -209,8 +209,8 @@ foreach ($values as $value)
 	';
 
 	$dom_ready_js .= '
-		fcfield_addrint.initAutoComplete("'.$elementid_n.'", "'.$field->name.'");' . /* autocomplete search */'
-		'.($coords_are_empty ? '' : 'fcfield_addrint.initMap("'.$elementid_n.'", "'.$field->name.'");') . /* initialize map */'
+		fcfield_addrint.initAutoComplete("'.$elementid_n.'", "'.$field_name_js.'");' . /* autocomplete search */'
+		'.($coords_are_empty ? '' : 'fcfield_addrint.initMap("'.$elementid_n.'", "'.$field_name_js.'");') . /* initialize map */'
 	';
 
 	$field->html[$n] = '
