@@ -2368,7 +2368,10 @@ class flexicontent_html
 
 		elseif ($show_icons)
 		{
-			$icon = JHtml::image(FLEXI_ICONPATH . $config->iconimage, JText::_($config->icontitle), $attribs = '');
+			$iconpath = !empty($config->iconpath)
+				? $config->iconpath . '/' . $config->iconimage
+				: FLEXI_ICONPATH . $config->iconimage;
+			$icon = JHtml::image($iconpath, JText::_($config->icontitle), $attribs = '');
 		}
 	}
 
@@ -3455,6 +3458,7 @@ class flexicontent_html
 			'iconname' => 'new',
 			'icondefault' => 'icon-new',
 			'iconimage' => 'plus-button.png',
+			'iconpath' => 'components/com_flexicontent/assets/images',  // Use icon from flexicontent assets folder
 			'icontitle' => $btn_desc,
 		);
 
@@ -3462,10 +3466,10 @@ class flexicontent_html
 		$image = '';
 		self::createFcBtnIcon($params, $config, $image);
 
-		if (!$auto_relations)
+		/*if (!$auto_relations)
 		{
 			$image = '';
-		}
+		}*/
 
 		$button_classes = 'fc_addbutton';
 
