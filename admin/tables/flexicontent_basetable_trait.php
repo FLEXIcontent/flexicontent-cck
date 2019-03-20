@@ -275,7 +275,7 @@ trait flexicontent_basetable_trait
 			return false;
 		}
 
-		$valid_pattern = $this->_allow_underscore ? '/^[a-z_]+[a-z_0-9-]+$/i' : '/^[a-z]+[a-z0-9-]+$/i' ;
+		$valid_pattern = $this->_allow_underscore ? '/^[a-z_0-9-]+$/i' : '/^[a-z0-9-]+$/i' ;
 
 		$automatic_alias = $config && isset($config->automatic_alias) ? $config->automatic_alias : true;
 		$alias_is_valid  = preg_match($valid_pattern, $this->$alias);
