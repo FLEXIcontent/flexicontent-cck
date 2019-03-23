@@ -6497,15 +6497,17 @@ class ParentClassItem extends FCModelAdmin
 			{
 				if ($this->_record->parameters->get('usemetadata_fe', 1) < 1)
 				{
+					// Unset so that they will not be used during binding
 					unset($data['metakey']);
 					unset($data['metadesc']);
 				}
 
 				if ($this->_record->parameters->get('usemetadata_fe', 1) < 2)
 				{
+					// Set to false to indicate maintaining DB value
 					foreach ($form->getGroup($grp_name) as $field)
 					{
-						unset($data[$grp_name][$field->fieldname]);
+						$data[$grp_name][$field->fieldname] = false;
 					}
 				}
 
@@ -6521,9 +6523,10 @@ class ParentClassItem extends FCModelAdmin
 
 				if ($skip)
 				{
+					// Set to false to indicate maintaining DB value
 					foreach ($form->getFieldset($fsname) as $field)
 					{
-						unset($data[$grp_name][$field->fieldname]);
+						$data[$grp_name][$field->fieldname] = false;
 					}
 				}
 			}
