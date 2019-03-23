@@ -812,9 +812,6 @@ abstract class FCModelAdmin extends JModelAdmin
 	 */
 	public function validate($form, $data, $group = null)
 	{
-		// Handle a form that has some of its part missing according to configuration
-		$this->handlePartialForm($this->getForm(), $data);
-
 		return parent::validate($form, $data, $group);
 	}
 
@@ -983,10 +980,18 @@ abstract class FCModelAdmin extends JModelAdmin
 	 */
 	function mergeAttributes(&$item, &$data, $properties, $options)
 	{
-		/**
-		 * Canonicalize data set data not present in form to FALSE to indicate maintaining the DB values
-		 */
 		$form = $this->getForm();
+
+		/**
+		 * Mark form fields that have been skipped (according to configuration),
+		 * setting them to false to indicate maintaining their DB values
+		 */
+		$this->handlePartialForm($form, $data);
+
+		/**
+		 * Canonicalize data that should be present in the form by
+		 * setting them to '' to indicate clearing their DB values
+		 */
 		$this->_canonicalData($form, $data);
 
 
@@ -1274,13 +1279,6 @@ abstract class FCModelAdmin extends JModelAdmin
 	 */
 	protected function _prepareBind($record, & $data)
 	{
-		// Clear the 'use global value' setting value to empty string '' to allow parameter heritage to work ...
-		if (!is_object($data))
-		{
-			$this->_clearUseGlobal($data);
-			$this->_useGlobalCleared = true;
-		}
-		
 		// (For nested records) Set the new parent id if parent id not matched OR while New/Save as Copy .
 		if (in_array('FCModelTraitNestableRecord', class_uses($this)))
 		{
@@ -1370,37 +1368,9 @@ abstract class FCModelAdmin extends JModelAdmin
 		}
 	}
 
-	/**
-	 * Method to clear the 'use global' value submitted by forms
-	 *
-	 * @param   JForm   $form   A JForm object.
-	 * @param   mixed   $data   The data expected for the form.
-	 *
-	 * @return  void
-	 *
-	 * @since   3.3.0
-	 */
-	protected function _clearUseGlobal(& $data)
-	{
-		if (empty($this->_useGlobalCleared))
-		{
-			foreach($data as $i => $v)
-			{
-				if ($v == array('__USE_GLOBAL__'))
-				{
-					$data[$i] = '';
-				}
-				elseif (is_array($v))
-				{
-					$this->_clearUseGlobal($data[$i]);
-				}
-			}
-		}
-	}
-
 
 	/**
-	 * Method to canonicalize the form data
+	 * Method to canonicalize the form data that should be present in the form by setting them to '' to indicate clearing their DB values
 	 *
 	 * @param   JForm   $form   A JForm object.
 	 * @param   mixed   $data   The data expected for the form.
@@ -1411,13 +1381,6 @@ abstract class FCModelAdmin extends JModelAdmin
 	 */
 	protected function _canonicalData($form, & $data)
 	{
-		// Make sure the 'use global value' has been set to value empty string '' before canonicalizing the form data
-		if (!is_object($data))
-		{
-			$this->_clearUseGlobal($data);
-			$this->_useGlobalCleared = true;
-		}
-		
 		foreach($this->mergeableGroups as $grp_name)
 		{
 			if (is_object($data))
@@ -1431,7 +1394,11 @@ abstract class FCModelAdmin extends JModelAdmin
 				{
 					if (!isset($data[$grp_name][$field->fieldname]))
 					{
-						$data[$grp_name][$field->fieldname] = false;
+						/**
+						 * Field was not skipped but also was no value was posted,
+						 * set form value to '' so that DB value gets cleared during merging
+						 */
+						$data[$grp_name][$field->fieldname] = '';
 					}
 				}
 			}
@@ -1459,13 +1426,13 @@ abstract class FCModelAdmin extends JModelAdmin
 				$db_data[$i] = $this->maintainDbData($db_data[$i], $form_data[$i]);
 			}
 
-			// Maintain DB value
+			// Use form value
 			elseif ($v !== false)
 			{
 				$db_data[$i] = $v;
 			}
 
-			// Clear bogus value from previous save operation
+			// Clear DB value because it has bogus FALSE value from previous save operation
 			elseif ($db_data[$i] === false)
 			{
 				$db_data[$i] = '';
