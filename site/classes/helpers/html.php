@@ -2511,6 +2511,7 @@ class flexicontent_html
 			'iconname' => 'delete',
 			'icondefault' => 'icon-delete',
 			'iconimage' => 'delete.png',
+			'iconpath' => 'components/com_flexicontent/assets/images',  // Use icon from flexicontent assets folder
 			'icontitle' => 'FLEXI_DELETE',
 		);
 
