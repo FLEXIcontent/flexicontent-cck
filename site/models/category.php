@@ -2251,29 +2251,35 @@ class FlexicontentModelCategory extends JModelLegacy {
 		}
 
 		// b. Retrieve category parameters and create parameter object
-		if ($id) {
+		if ($id)
+		{
 			$query = 'SELECT params FROM #__categories WHERE id = ' . $id;
 			$this->_db->setQuery($query);
 			$catParams = $this->_db->loadResult();
-			$catParams = new JRegistry($catParams);
-		} else {
+			$catParams = $this->_new_JRegistry($catParams);
+		}
+		else
+		{
 			$catParams = new JRegistry();
 		}
 
+
 		// c. Retrieve author parameters if using displaying AUTHOR/MYITEMS layouts, and merge them into category parameters
-		if ($this->_authorid!=0) {
+		if ($this->_authorid!=0)
+		{
 			$query = 'SELECT author_basicparams, author_catparams FROM #__flexicontent_authors_ext WHERE user_id = ' . $this->_authorid;
 			$this->_db->setQuery($query);
 			$author_extdata = $this->_db->loadObject();
+
 			if ($author_extdata)
 			{
 				// Merge author basic parameters
-				$_author_basicreg = new JRegistry($author_extdata->author_basicparams);
+				$_author_basicreg = $this->_new_JRegistry($author_extdata->author_basicparams);
 				if ($_author_basicreg->get('orderbycustomfieldid')==="0") $_author_basicreg->set('orderbycustomfieldid', '');
 				$catParams->merge( $_author_basicreg );
 
 				// Merge author OVERRIDDEN category parameters
-				$_author_catreg = new JRegistry($author_extdata->author_catparams);
+				$_author_catreg = $this->_new_JRegistry($author_extdata->author_catparams);
 				if ( $_author_basicreg->get('override_currcat_config',0) ) {
 					if ($_author_catreg->get('orderbycustomfieldid')==="0") $_author_catreg->set('orderbycustomfieldid', '');
 					$catParams->merge( $_author_catreg );
@@ -2297,9 +2303,12 @@ class FlexicontentModelCategory extends JModelLegacy {
 				.' ORDER BY '.$order_clause.' DESC';
 			$this->_db->setQuery($query);
 			$catdata = $this->_db->loadObjectList('id');
-			if (!empty($catdata)) {
-				foreach ($catdata as $parentcat) {
-					$parentcat->params = new JRegistry($parentcat->params);
+
+			if (!empty($catdata))
+			{
+				foreach ($catdata as $parentcat)
+				{
+					$parentcat->params = $this->_new_JRegistry($parentcat->params);
 					array_push($heritage_stack, $parentcat);
 					$inheritcid = $parentcat->params->get('inheritcid', '');
 					$inherit_parent = $inheritcid==='-1' || ($inheritcid==='' && $inheritcid_comp);
@@ -2309,12 +2318,15 @@ class FlexicontentModelCategory extends JModelLegacy {
 		}
 
 		// CASE B: inheriting from specific category
-		else if ( $id && $inheritcid > 0 && !empty($globalcats[$inheritcid]) ){
+		elseif ($id && $inheritcid > 0 && !empty($globalcats[$inheritcid]))
+		{
 			$query = 'SELECT title, params FROM #__categories WHERE id = '. $inheritcid;
 			$this->_db->setQuery($query);
 			$catdata = $this->_db->loadObject();
-			if ($catdata) {
-				$catdata->params = new JRegistry($catdata->params);
+
+			if ($catdata)
+			{
+				$catdata->params = $this->_new_JRegistry($catdata->params);
 				array_push($heritage_stack, $catdata);
 			}
 		}
@@ -2409,7 +2421,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		// Retrieve Layout's parameters, also deciding the layout
 		$this->decideLayout($params);
 		$layoutParams = $this->getLayoutparams();
-		$layoutParams = new JRegistry($layoutParams);  //print_r($layoutParams);
+		$layoutParams = $this->_new_JRegistry($layoutParams);  //print_r($layoutParams);
 
 		// Allow global layout parameters to be inherited properly, placing on TOP of all others
 		$this->_params = clone($layoutParams);
@@ -2774,5 +2786,36 @@ class FlexicontentModelCategory extends JModelLegacy {
 	function addfav()
 	{
 		return flexicontent_db::addfav($type=1, $this->_id, JFactory::getUser()->id);
+	}
+
+
+	/**
+	 * Create a JRegistry object checking for legacy bug of bad parameter merging code in during model saving
+	 */
+	private function _new_JRegistry($params)
+	{
+		if (!is_object($params))
+		{
+			$params = new JRegistry($params);
+		}
+
+		$attribs = $params->toArray();
+		$err = false;
+
+		foreach ($attribs as $i => $v)
+		{
+			if ($v === false)
+			{
+				unset($attribs[$i]);
+				$err = true;
+			}
+		}
+
+		if ($err || !is_object($params))
+		{
+			$params = new JRegistry($attribs);
+		}
+
+		return $params;
 	}
 }

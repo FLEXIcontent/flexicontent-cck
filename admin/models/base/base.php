@@ -1078,13 +1078,13 @@ abstract class FCModelAdmin extends JModelAdmin
 			{
 				// Overwrite existing data with new data
 				//$db_data_registry[$prop]->loadArray($data[$prop]);
-				$this->maintainDbData($db_data_registry[$prop], $data[$prop]);
+				$db_data_registry[$prop] = $this->maintainDbData($db_data_registry[$prop], $data[$prop]);
 
 				// Add the layout data too (validated above)
 				if (!empty($layout_data) && $prop == $options['params_fset'])
 				{
 					//$db_data_registry[$prop]->loadArray($layout_data);
-					$this->maintainDbData($db_data_registry[$prop], $layout_data);
+					$db_data_registry[$prop] = $this->maintainDbData($db_data_registry[$prop], $layout_data);
 				}
 
 				// Convert property back to string
@@ -1274,6 +1274,13 @@ abstract class FCModelAdmin extends JModelAdmin
 	 */
 	protected function _prepareBind($record, & $data)
 	{
+		// Clear the 'use global value' setting value to empty string '' to allow parameter heritage to work ...
+		if (!is_object($data))
+		{
+			$this->_clearUseGlobal($data);
+			$this->_useGlobalCleared = true;
+		}
+		
 		// (For nested records) Set the new parent id if parent id not matched OR while New/Save as Copy .
 		if (in_array('FCModelTraitNestableRecord', class_uses($this)))
 		{
@@ -1363,6 +1370,34 @@ abstract class FCModelAdmin extends JModelAdmin
 		}
 	}
 
+	/**
+	 * Method to clear the 'use global' value submitted by forms
+	 *
+	 * @param   JForm   $form   A JForm object.
+	 * @param   mixed   $data   The data expected for the form.
+	 *
+	 * @return  void
+	 *
+	 * @since   3.3.0
+	 */
+	protected function _clearUseGlobal(& $data)
+	{
+		if (empty($this->_useGlobalCleared))
+		{
+			foreach($data as $i => $v)
+			{
+				if ($v == array('__USE_GLOBAL__'))
+				{
+					$data[$i] = '';
+				}
+				elseif (is_array($v))
+				{
+					$this->_clearUseGlobal($data[$i]);
+				}
+			}
+		}
+	}
+
 
 	/**
 	 * Method to canonicalize the form data
@@ -1376,6 +1411,13 @@ abstract class FCModelAdmin extends JModelAdmin
 	 */
 	protected function _canonicalData($form, & $data)
 	{
+		// Make sure the 'use global value' has been set to value empty string '' before canonicalizing the form data
+		if (!is_object($data))
+		{
+			$this->_clearUseGlobal($data);
+			$this->_useGlobalCleared = true;
+		}
+		
 		foreach($this->mergeableGroups as $grp_name)
 		{
 			if (is_object($data))
@@ -1407,20 +1449,30 @@ abstract class FCModelAdmin extends JModelAdmin
 	 *
 	 * @since   3.3.0
 	 */
-	protected function maintainDbData(& $db_data, $form_data)
+	protected function maintainDbData($db_data, $form_data)
 	{
 		foreach($form_data as $i => $v)
 		{
+			// Recursion
 			if (is_array($v))
 			{
-				$this->maintainDbData($db_data[$i], $form_data[$i]);
+				$db_data[$i] = $this->maintainDbData($db_data[$i], $form_data[$i]);
 			}
 
-			if ($v !== false)
+			// Maintain DB value
+			elseif ($v !== false)
 			{
 				$db_data[$i] = $v;
 			}
+
+			// Clear bogus value from previous save operation
+			elseif ($db_data[$i] === false)
+			{
+				$db_data[$i] = '';
+			}
 		}
+
+		return $db_data;
 	}
 
 

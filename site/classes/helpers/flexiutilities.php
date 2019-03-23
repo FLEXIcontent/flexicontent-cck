@@ -679,7 +679,17 @@ class FLEXIUtilities
 		} else {
 			$value = !is_array($value) ? array($value) : $value;
 		}
-		if ($remove_save_flag) foreach($value as $i =>$v) if ($v=='__SAVED__') unset($value[$i]);
+
+		if ($remove_save_flag)
+		{
+			foreach($value as $i =>$v)
+			{
+				if ($v === '__SAVED__')
+				{
+					unset($value[$i]);
+				}
+			}
+		}
 		return $value;
 	}
 

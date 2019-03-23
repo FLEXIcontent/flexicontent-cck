@@ -316,7 +316,7 @@ class ParentClassItem extends FCModelAdmin
 		if ($this->_typeid || $forced_typeid)
 		{
 			$tparams = $this->getTypeparams($forced_typeid);
-			$tparams = new JRegistry($tparams);
+			$tparams = $this->_new_JRegistry($tparams);
 			$params->merge($tparams);
 		}
 
@@ -1373,7 +1373,7 @@ class ParentClassItem extends FCModelAdmin
 	 */
 	function getItemAccess()
 	{
-		$iparams_extra = new JRegistry;
+		$iparams_extra = new JRegistry();
 
 		$user    = JFactory::getUser();
 		$session = JFactory::getSession();
@@ -3605,8 +3605,8 @@ class ParentClassItem extends FCModelAdmin
 		$compParams = JComponentHelper::getComponent('com_flexicontent')->params;
 
 		// Retrieve parameters of current category (NOTE: this applies when cid variable exists in the URL)
-		$catParams = "";
-		if ( $this->_cid )
+		$catParams = '';
+		if ($this->_cid)
 		{
 			$query = 'SELECT c.title, c.params FROM #__categories AS c WHERE c.id = ' . (int) $this->_cid;
 			$this->_db->setQuery($query);
@@ -3614,11 +3614,11 @@ class ParentClassItem extends FCModelAdmin
 			$catParams = $catData->params;
 			$this->_record->category_title = $catData->title;
 		}
-		$catParams = new JRegistry($catParams);
+		$catParams = $this->_new_JRegistry($catParams);
 
 		// Retrieve/Create item's Content Type parameters
 		$typeParams = $this->getTypeparams();
-		$typeParams = new JRegistry($typeParams);
+		$typeParams = $this->_new_JRegistry($typeParams);
 
 		// Create item parameters
 		if ( !is_object($this->_record->attribs) )
@@ -3640,20 +3640,7 @@ class ParentClassItem extends FCModelAdmin
 		/**
 		 * Bug fix for bad parameter merge code in item model for parameters not present in the form
 		 */
-		$iattribs = $itemParams->toArray();
-		$err = false;
-		foreach ($iattribs as $i => $v)
-		{
-			if ($v === false)
-			{
-				unset($iattribs[$i]);
-				$err = true;
-			}
-		}
-		if ($err)
-		{
-			$itemParams = new JRegistry($iattribs);
-		}
+		$itemParams = $this->_new_JRegistry($itemParams);
 
 		// Retrieve Layout's parameters, also deciding the layout
 		if ($app->isAdmin() || !empty($this->isForm))
@@ -3667,7 +3654,7 @@ class ParentClassItem extends FCModelAdmin
 		}
 
 		$layoutParams = $this->getLayoutparams();
-		$layoutParams = new JRegistry($layoutParams);  //print_r($layoutParams);
+		$layoutParams = $this->_new_JRegistry($layoutParams);  //print_r($layoutParams);
 
 
 		/**
@@ -4577,7 +4564,7 @@ class ParentClassItem extends FCModelAdmin
 
 			foreach ($mcats_params as $cat_params)
 			{
-				$cat_params = new JRegistry($cat_params);
+				$cat_params = $this->_new_JRegistry($cat_params);
 				if ( ! $cat_params->get('cats_enable_notifications', 0) ) continue;  // Skip this category if category-specific notifications are not enabled for this category
 
 				$cats_userlist_notify_new            = FLEXIUtilities::paramToArray( $cat_params->get('cats_userlist_notify_new'), $regex="/[\s]*,[\s]*/", $filterfunc="intval");
@@ -5434,7 +5421,7 @@ class ParentClassItem extends FCModelAdmin
 	 */
 	private function _prepareMergeJsonParams($colname)
 	{
-		$registry = new JRegistry;
+		$registry = new JRegistry();
 
 		try
 		{
@@ -6541,5 +6528,36 @@ class ParentClassItem extends FCModelAdmin
 				}
 			}
 		}
+	}
+
+
+	/**
+	 * Create a JRegistry object checking for legacy bug of bad parameter merging code in during model saving
+	 */
+	private function _new_JRegistry($params)
+	{
+		if (!is_object($params))
+		{
+			$params = new JRegistry($params);
+		}
+
+		$attribs = $params->toArray();
+		$err = false;
+
+		foreach ($attribs as $i => $v)
+		{
+			if ($v === false)
+			{
+				unset($attribs[$i]);
+				$err = true;
+			}
+		}
+
+		if ($err || !is_object($params))
+		{
+			$params = new JRegistry($attribs);
+		}
+
+		return $params;
 	}
 }
