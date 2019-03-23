@@ -139,9 +139,11 @@ class plgFlexicontent_fieldsAddressint extends FCField
 		// Countries and US states
 		include('tmpl_common'.DS.'areas.php');
 
-		// CET ALLOWED ac search types
+		// GET ALLOWED ac search types, note 'false' may have been saved for 'ac_type_allowed_list' due to legacy bug, so do not use heritage directly
 		$ac_types_default = $field->parameters->get('ac_types_default', '');
-		$ac_type_allowed_list = $field->parameters->get('ac_type_allowed_list', array('','geocode','address','establishment','(regions)','(cities)'));
+		$ac_type_allowed_list = $field->parameters->get('ac_type_allowed_list', false);
+
+		$ac_type_allowed_list = $ac_type_allowed_list ?: array('','geocode','address','establishment','(regions)','(cities)');
 		$ac_type_allowed_list = FLEXIUtilities::paramToArray($ac_type_allowed_list, false, false, true);
 
 
