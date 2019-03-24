@@ -778,7 +778,7 @@ $items_task = 'controller=items&amp;task=';
 				<div class="fc-board-set-inner">
 				<?php
 					$logo_style = ';';
-               if (!$disable_fc_logo) echo JHtml::image(JURI::base() . 'administrator/components/com_flexicontent/assets/images/logo.png', 'FLEXIcontent', ' id="fc-dash-logo" ')
+               if (!$disable_fc_logo) echo JHtml::image(JURI::base() . 'components/com_flexicontent/assets/images/logo.png', 'FLEXIcontent', ' id="fc-dash-logo" ');
 				?>
 					<span id="fc-dash-license" class="nowrap_box fc-mssg-inline fc-info fc-nobgimage" style="">
 						FLEXIcontent <?php echo FLEXI_VERSION . ' ' . FLEXI_RELEASE; ?><br/> GNU/GPL licence, Copyright &copy; 2009-2016
@@ -852,7 +852,7 @@ $items_task = 'controller=items&amp;task=';
 
 	<!-- fc_perf -->
 
-	</div>  <!-- / j-main-container -->
+	</div>  <!-- j-main-container -->
 </div>  <!-- row / row-fluid-->
 
 </form>
