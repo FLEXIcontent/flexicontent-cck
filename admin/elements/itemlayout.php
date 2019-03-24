@@ -246,7 +246,8 @@ function ilayout_loadPanel(element)
 			if (panel_header_link.hasClass('collapsed') || panel_header.hasClass('pane-toggler'))
 			{
 				//window.console.log('clicking to open: ' + panel.attr('id'));
-				panel_header_link.hasClass('collapsed') ? panel_header_link.trigger('click') : panel_header.trigger('click');
+				// This does not work inside non-focus TAB, and causes options to stay closed, so we disabled auto-opening the slider ...
+				//panel_header_link.hasClass('collapsed') ? panel_header_link.trigger('click') : panel_header.trigger('click');
 			}
 		}, 300);
 		return;
