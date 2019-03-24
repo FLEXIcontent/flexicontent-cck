@@ -554,7 +554,25 @@ class flexicontent_html
 
 		// prefix the URL if needed so that parse_url will work
 		$has_prefix = preg_match("#^http|^https|^ftp|^ftps#i", $url);
-		$url = (!$has_prefix ? "http://" : "") . $url;
+
+		if (!$has_prefix) 
+		{
+			$is_abs_noproto = strpos($url, "//") === 0;
+			$is_abs_urlpath = strpos($url, "/") === 0;
+
+			if ($is_abs_noproto)
+			{
+				$url = 'http:' . $url;
+			}
+			elseif (!$is_abs_urlpath)
+			{
+				$url = JUri::base() . $url;
+			}
+			else
+			{
+				$url = 'http://' . $url;
+			}
+		}
 
 		// Require baseonly internal url: (HOST only)
 		if ( $baseonly || $allowed_redirecturls == 'internal_base' )
