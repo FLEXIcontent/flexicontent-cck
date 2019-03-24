@@ -1320,12 +1320,15 @@ if ($js)
 			<input type="hidden" id="filter_order" name="filter_order" value="<?php echo $this->lists['order']; ?>" />
 			<input type="hidden" id="filter_order_Dir" name="filter_order_Dir" value="<?php echo $this->lists['order_Dir']; ?>" />
 			<input type="hidden" name="fcform" value="1" />
-			<?php echo JHtml::_( 'form.token' ); ?>
 
+			<?php echo JHtml::_('form.token'); ?>
 			<input type="hidden" name="fieldid" value="<?php echo $this->fieldid; ?>" />
 			<input type="hidden" name="u_item_id" value="<?php echo $this->u_item_id; ?>" />
 			<input type="hidden" name="folder_mode" value="<?php echo $this->folder_mode; ?>" />
 			<input type="hidden" name="filename" value="" />
+
+			<?php /* NOTE: return URL should use & and not &amp; for variable separation as these will be re-encoded on redirect */ ?>
+			<input type="hidden" name="return" value="<?php echo base64_encode('index.php?option=com_flexicontent&view='.$this->view.($_tmpl ? '&tmpl='.$_tmpl : '').'&field='.$this->fieldid.'&layout='.$this->layout.'&'.JSession::getFormToken().'=1'.'&folder_mode='.$this->folder_mode); ?>" />
 		</form>
 
 		</fieldset>
@@ -1578,11 +1581,13 @@ if ($js)
 								</tr>
 							</table>
 
-							<?php echo JHtml::_( 'form.token' ); ?>
+							<?php echo JHtml::_('form.token'); ?>
 							<input type="hidden" name="fieldid" value="<?php echo $this->fieldid; ?>" />
 							<input type="hidden" name="u_item_id" value="<?php echo $this->u_item_id; ?>" />
 							<input type="hidden" name="folder_mode" value="<?php echo $this->folder_mode; ?>" />
 							<input type="hidden" name="file_row_id" value="" />
+
+							<?php /* NOTE: this AJAX submitted, return URL is not needed / not applicable */?>
 						</form>
 
 					</fieldset>
@@ -1686,12 +1691,13 @@ if ($js)
 
 							<input type="submit" id="file-upload-submit" class="btn btn-success" value="<?php echo JText::_( 'FLEXI_START_UPLOAD' ); ?>" style="margin: 16px 48px 0 48px;" />
 
-							<?php echo JHtml::_( 'form.token' ); ?>
+							<?php echo JHtml::_('form.token'); ?>
 							<input type="hidden" name="fieldid" value="<?php echo $this->fieldid; ?>" />
 							<input type="hidden" name="u_item_id" value="<?php echo $this->u_item_id; ?>" />
 							<input type="hidden" name="folder_mode" value="<?php echo $this->folder_mode; ?>" />
-							<?php /* NOTE: return URL should use & and not &amp; for variable seperation as these will be re-encoded on redirect */ ?>
-							<input type="hidden" name="return" value="<?php echo base64_encode('index.php?option=com_flexicontent&view=<?php echo $this->view; ?>&field='.$this->fieldid.'&folder_mode='.$this->folder_mode.'&layout='.$this->layout.'&tmpl='.$_tmpl); ?>" />
+
+							<?php /* NOTE: return URL should use & and not &amp; for variable separation as these will be re-encoded on redirect */ ?>
+							<input type="hidden" name="return" value="<?php echo base64_encode('index.php?option=com_flexicontent&view='.$this->view.($_tmpl ? '&tmpl='.$_tmpl : '').'&field='.$this->fieldid.'&layout='.$this->layout.'&'.JSession::getFormToken().'=1'.'&folder_mode='.$this->folder_mode); ?>" />
 						</form>
 
 					</fieldset>
@@ -1717,7 +1723,8 @@ if ($js)
 			<div class="tabbertab" id="fileurl_tab" data-icon2-class="icon-link fc-icon-gray" data-icon-class="fc-icon-green">
 				<h3 class="tabberheading hasTooltip" data-placement="bottom" title="<?php echo JText::_($tab_title . '_DESC'); ?>"> <?php echo JText::_($tab_title); ?> </h3>
 
-				<form action="<?php echo $action_url . 'addurl'; ?>" class="form-validate form-horizontal" name="addUrlForm" id="addUrlForm" method="post">
+				<div class="fc_loading_msg alert alert-info" style="display:none;"> &nbsp; &nbsp; <?php echo JText::_('FLEXI_LOADING') .' ... '. JText::_('FLEXI_PLEASE_WAIT'); ?></div>
+				<form action="<?php echo $action_url . 'addurl'; ?>" class="form-validate form-horizontal" name="addUrlForm" id="addUrlForm" method="post" onsubmit="this.style.display='none'; jQuery(this).prev().show(); return true;">
 					<fieldset class="fc-fileman-tab" >
 						<fieldset class="fc-formbox" id="fc-fileman-formbox-3">
 
@@ -1866,8 +1873,8 @@ if ($js)
 						</fieldset>
 					</fieldset>
 
-					<?php /* NOTE: return URL should use & and not &amp; for variable seperation as these will be re-encoded on redirect */ ?>
-					<input type="hidden" name="return" value="<?php echo base64_encode('index.php?option=com_flexicontent&view='.$this->view.'&tmpl='.$_tmpl.'&field='.$this->fieldid.'&layout='.$this->layout); ?>" />
+					<?php /* NOTE: return URL should use & and not &amp; for variable separation as these will be re-encoded on redirect */ ?>
+					<input type="hidden" name="return" value="<?php echo base64_encode('index.php?option=com_flexicontent&view='.$this->view.($_tmpl ? '&tmpl='.$_tmpl : '').'&field='.$this->fieldid.'&layout='.$this->layout.'&'.JSession::getFormToken().'=1'); ?>" />
 				</form>
 
 			</div>
