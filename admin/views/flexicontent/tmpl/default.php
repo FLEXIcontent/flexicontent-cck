@@ -5,7 +5,7 @@
  *
  * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
  * @link            https://flexicontent.org
- * @copyright       Copyright © 2018, FLEXIcontent team, All Rights Reserved
+ * @copyright       Copyright © 2019, FLEXIcontent team, All Rights Reserved
  * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
@@ -21,8 +21,8 @@ $template = $app->getTemplate();
 $session  = JFactory::getSession();
 $hlpname  = 'fcbase';
 
-$btn_class = FLEXI_J30GE ? 'btn' : 'fc_button';
-$tooltip_class = FLEXI_J30GE ? 'hasTooltip' : 'hasTip';
+$btn_class = 'btn';
+$tooltip_class = 'hasTooltip';
 $edit_item_txt = JText::_( 'FLEXI_EDIT_ITEM' );
 
 // hide dashboard buttons
@@ -80,8 +80,8 @@ if (version_compare(PHP_VERSION, FLEXI_PHP_NEEDED, '<'))
 	return false;
 }
 
-$ctrl = FLEXI_J16GE ? 'items.' : '';
-$items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
+$ctrl = '';
+$items_task = 'controller=items&amp;task=';
 ?>
 
 <div id="flexicontent" class="flexicontent">
@@ -377,7 +377,7 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 					FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-users', JText::_( 'FLEXI_USERS' ) );
 				}
 				if (!isset($sbtns['adduser'])) {
-					$link = 'index.php?option='.$option.'&amp;'.(FLEXI_J16GE ? 'task=users.add' : 'controller=users&amp;task=add');
+					$link = 'index.php?option='.$option.'&amp;controller=users&amp;task=add';
 					FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-file-add', JText::_( 'FLEXI_ADD_USER' ) );
 				}
 			}
@@ -388,7 +388,7 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 					FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-users', JText::_( 'FLEXI_GROUPS' ) );
 				}
 				if (!isset($sbtns['addgroup'])) {
-					$link = 'index.php?option='.$option.'&amp;'.(FLEXI_J16GE ? 'task=groups.add' : 'controller=groups&amp;task=add');
+					$link = 'index.php?option='.$option.'&amp;controller=groups&amp;task=add';
 					FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-file-add', JText::_( 'FLEXI_ADD_GROUP' ) );
 				}
 			}
@@ -799,9 +799,7 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 				<div class="fc-board-set-inner">
 				<?php
 					$logo_style = ';';
-					if (!$disable_fc_logo) echo (FLEXI_J16GE ?
-						JHtml::image('administrator/components/com_flexicontent/assets/images/logo.png', 'FLEXIcontent', ' id="fc-dash-logo" ') :
-						JHtml::_('image.site', 'logo.png', '../administrator/components/com_flexicontent/assets/images/', NULL, NULL, 'FLEXIcontent', ' id="fc-dash-logo" '));
+               if (!$disable_fc_logo) echo JHtml::image(JURI::base() . 'components/com_flexicontent/assets/images/logo.png', 'FLEXIcontent', ' id="fc-dash-logo" ');
 				?>
 					<span id="fc-dash-license" class="nowrap_box fc-mssg-inline fc-info fc-nobgimage" style="">
 						FLEXIcontent <?php echo FLEXI_VERSION . ' ' . FLEXI_RELEASE; ?><br/> GNU/GPL licence, Copyright &copy; 2009-2016
@@ -810,12 +808,12 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 						<span class="fc-mssg-inline fc-nobgimage fc-noborder nowrap_box" style="text-align:center;" >
 							<span class="label label-info <?php echo $tooltip_class;?>" title="Core developer">Emmanuel Danan</span>
 							<span class="label label-info <?php echo $tooltip_class;?>" title="Core developer">Georgios Papadakis</span><br/><br/>
-							<a class="<?php echo $btn_class.(FLEXI_J16GE ? ' btn-primary ' : ' ').$tooltip_class;?>" style="" href="http://www.flexicontent.org" title="FLEXIcontent home page" target="_blank">FLEXIcontent.org</a>
+							<a class="<?php echo $btn_class.' btn-primary '.$tooltip_class;?>" style="" href="http://www.flexicontent.org" title="FLEXIcontent home page" target="_blank">FLEXIcontent.org</a>
 						</span>
 
 						<span class="fc-mssg-inline fc-nobgimage fc-noborder nowrap_box">
 							<span class="label label-info <?php echo $tooltip_class;?>" title="Core Developer">Marvelic Engine</span><br/><br/>
-							<a class="<?php echo $btn_class.(FLEXI_J30GE ? ' btn-small ' : ' fcsmall fcsimple ').$tooltip_class;?>" style="" href="http://www.marvelic.co.th" target="_blank" title="<?php echo flexicontent_html::getToolTip("Marvelic Engine", "Marvelic Engine is a Joomla consultancy based in Bangkok, Thailand. Support services include consulting, Joomla implementation, training, and custom extensions development.", 0, 1); ?>">
+							<a class="<?php echo $btn_class.' btn-small '.$tooltip_class;?>" style="" href="http://www.marvelic.co.th" target="_blank" title="<?php echo flexicontent_html::getToolTip("Marvelic Engine", "Marvelic Engine is a Joomla consultancy based in Bangkok, Thailand. Support services include consulting, Joomla implementation, training, and custom extensions development.", 0, 1); ?>">
 								marvelic.co.th
 							</a>
 						</span>
@@ -826,14 +824,14 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 
 						<span class="fc-mssg-inline fc-nobgimage fc-noborder nowrap_box">
 							<span class="label <?php echo $tooltip_class;?>" title="Core Developer">Yannick Berges</span><br/><br/>
-							<a class="<?php echo $btn_class.(FLEXI_J30GE ? ' btn-small ' : ' fcsmall fcsimple ').$tooltip_class;?>" style="" href="http://com3elles.com/" target="_blank" title="<?php echo flexicontent_html::getToolTip("Com'3Elles", "Com'3Elles, agence de communication, conseil et formations", 0, 1); ?>">
+							<a class="<?php echo $btn_class.' btn-small '.$tooltip_class;?>" style="" href="http://com3elles.com/" target="_blank" title="<?php echo flexicontent_html::getToolTip("Com'3Elles", "Com'3Elles, agence de communication, conseil et formations", 0, 1); ?>">
 								com3elles.com
 							</a>
 						</span>
 
 						<span class="fc-mssg-inline fc-nobgimage fc-noborder nowrap_box">
 							<span class="label <?php echo $tooltip_class;?>" title="Developer / Contributor">Ruben Reyes</span><br/><br/>
-							<a class="<?php echo $btn_class.(FLEXI_J30GE ? ' btn-small ' : ' fcsmall fcsimple ').$tooltip_class;?>" style="" href="http://www.lyquix.com" target="_blank" title="<?php echo flexicontent_html::getToolTip("Lyquix", "Lyquix - Philadelphia Marketing, Advertising, Web Design and Development Agency", 0, 1); ?>">
+							<a class="<?php echo $btn_class.' btn-small '.$tooltip_class;?>" style="" href="http://www.lyquix.com" target="_blank" title="<?php echo flexicontent_html::getToolTip("Lyquix", "Lyquix - Philadelphia Marketing, Advertising, Web Design and Development Agency", 0, 1); ?>">
 								lyquix.com
 							</a>
 						</span>
