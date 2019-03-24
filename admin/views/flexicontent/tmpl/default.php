@@ -80,8 +80,8 @@ if (version_compare(PHP_VERSION, FLEXI_PHP_NEEDED, '<'))
 	return false;
 }
 
-$ctrl = '';
-$items_task = 'controller=items&amp;task=';
+$ctrl = 'items.';
+$items_task = 'task=items.';
 ?>
 
 <div id="flexicontent" class="flexicontent">
@@ -356,7 +356,7 @@ $items_task = 'controller=items&amp;task=';
 					FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-users', JText::_( 'FLEXI_USERS' ) );
 				}
 				if (!isset($sbtns['adduser'])) {
-					$link = 'index.php?option='.$option.'&amp;controller=users&amp;task=add';
+					$link = 'index.php?option='.$option.'&amp;task=users.add';
 					FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-file-add', JText::_( 'FLEXI_ADD_USER' ) );
 				}
 			}
@@ -367,7 +367,7 @@ $items_task = 'controller=items&amp;task=';
 					FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-users', JText::_( 'FLEXI_GROUPS' ) );
 				}
 				if (!isset($sbtns['addgroup'])) {
-					$link = 'index.php?option='.$option.'&amp;controller=groups&amp;task=add';
+					$link = 'index.php?option='.$option.'&amp;task=groups.add';
 					FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-file-add', JText::_( 'FLEXI_ADD_GROUP' ) );
 				}
 			}
@@ -778,7 +778,10 @@ $items_task = 'controller=items&amp;task=';
 				<div class="fc-board-set-inner">
 				<?php
 					$logo_style = ';';
-               if (!$disable_fc_logo) echo JHtml::image(JURI::base() . 'components/com_flexicontent/assets/images/logo.png', 'FLEXIcontent', ' id="fc-dash-logo" ');
+					if (!$disable_fc_logo)
+					{
+						echo JHtml::image('administrator/components/com_flexicontent/assets/images/logo.png', 'FLEXIcontent', ' id="fc-dash-logo" ');
+					}
 				?>
 					<span id="fc-dash-license" class="nowrap_box fc-mssg-inline fc-info fc-nobgimage" style="">
 						FLEXIcontent <?php echo FLEXI_VERSION . ' ' . FLEXI_RELEASE; ?><br/> GNU/GPL licence, Copyright &copy; 2009-2016
