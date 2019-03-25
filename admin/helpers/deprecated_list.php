@@ -29,6 +29,7 @@ $folders = array(
 	JPATH_SITE . '/plugins/flexicontent_fields/image/media',
 	JPATH_SITE . '/librairies/fancybox/source',
 	JPATH_SITE . '/librairies/fancybox/lib',
+	JPATH_SITE . '/librairies/echarts',
 	JPATH_ADMINISTRATOR . '/components/com_flexicontent/views/archive',
 	JPATH_ADMINISTRATOR . '/components/com_flexicontent/views/qfcategoryelement',
 );
