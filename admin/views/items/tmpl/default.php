@@ -53,13 +53,11 @@ $_NULL_DATE_     = JFactory::getDbo()->getNullDate();
  * JS for Columns chooser box and Filters box
  */
 
-$this->data_tbl_id = 'adminListTableFC' . $this->view;
 flexicontent_html::jscode_to_showhide_table(
 	'mainChooseColBox',
-	$this->data_tbl_id,
+	'adminListTableFC' . $this->view,
 	$start_html = '',  //'<span class="badge ' . (FLEXI_J40GE ? 'badge-dark' : 'badge-inverse') . '">' . JText::_('FLEXI_COLUMNS', true) . '<\/span> &nbsp; ',
-	$end_html = '<div id="fc-columns-slide-btn" class="icon-arrow-up-2 btn btn-outline-secondary" title="' . JText::_('FLEXI_HIDE') . '" style="cursor: pointer;" onclick="fc_toggle_box_via_btn(\\\'mainChooseColBox\\\', document.getElementById(\\\'fc_mainChooseColBox_btn\\\'), \\\'btn-primary\\\');"><\/div>',
-	$toggle_on_init = 1 // Initial page load (JS Performance) we already hidden columns via PHP Logic
+	$end_html = '<div id="fc-columns-slide-btn" class="icon-arrow-up-2 btn btn-outline-secondary" title="' . JText::_('FLEXI_HIDE') . '" style="cursor: pointer;" onclick="fc_toggle_box_via_btn(\\\'mainChooseColBox\\\', document.getElementById(\\\'fc_mainChooseColBox_btn\\\'), \\\'btn-primary\\\');"><\/div>'
 );
 
 
@@ -608,16 +606,15 @@ jQuery(document).ready(function(){
 
 	<div class="fcclear"></div>
 
-	<table id="<?php echo $this->data_tbl_id; ?>" class="adminlist table fcmanlist" itemscope itemtype="http://schema.org/WebPage">
+	<table id="adminListTableFC<?php echo $this->view; ?>" class="adminlist table fcmanlist" itemscope itemtype="http://schema.org/WebPage">
 	<thead>
 		<tr>
-			<?php $colposition = 0; ?>
 
-			<!--th class="left hidden-phone"><?php //$colposition++; ?>
+			<!--th class="left hidden-phone">
 				<?php echo JText::_( 'FLEXI_NUM' ); ?>
 			</th-->
 
-			<th class="col_order center hidden-phone"><?php $colposition++; ?>
+			<th class="col_order center hidden-phone">
 				<?php
 				echo $canOrder ? $image_ordering_tip : '';
 				echo str_replace('_FLEXI_ORDER_',
@@ -629,17 +626,17 @@ jQuery(document).ready(function(){
 				<span class="column_toggle_lbl" style="display:none;"><?php echo JText::_( 'FLEXI_ORDER' ); ?></span>
 			</th>
 
-			<th class="col_cb left"><?php $colposition++; ?>
+			<th class="col_cb left">
 				<div class="group-fcset">
 					<input type="checkbox" name="checkall-toggle" id="checkall-toggle" value="" title="<?php echo JText::_('JGLOBAL_CHECK_ALL'); ?>" onclick="Joomla.checkAll(this)" />
 					<label for="checkall-toggle" class="green single"></label>
 				</div>
 			</th>
 
-			<th class="left"><?php $colposition++; ?>
+			<th class="left">
 			</th>
 
-			<th class="hideOnDemandClass left" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<th class="col_status hideOnDemandClass left">
 				<?php echo JHtml::_('grid.sort', 'FLEXI_STATUS', 'a.' . $this->state_propname, $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php if ($this->getModel()->getState('filter_state')) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
@@ -648,7 +645,7 @@ jQuery(document).ready(function(){
 				<?php endif; ?>
 			</th>
 
-			<th class="hideOnDemandClass left" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<th class="col_title hideOnDemandClass left">
 				<?php echo JHtml::_('grid.sort', 'FLEXI_TITLE', 'a.' . $this->title_propname, $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php if (strlen($this->getModel()->getState('search'))) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
@@ -657,7 +654,7 @@ jQuery(document).ready(function(){
 				<?php endif; ?>
 			</th>
 
-			<th class="hideOnDemandClass left hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<th class="col_authors hideOnDemandClass left hidden-phone hidden-tablet">
 				<?php echo JHtml::_('grid.sort', 'FLEXI_AUTHOR', 'a.created_by', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php if ($this->getModel()->getState('filter_author')) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
@@ -666,7 +663,7 @@ jQuery(document).ready(function(){
 				<?php endif; ?>
 			</th>
 
-			<th class="hideOnDemandClass left hidden-phone" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<th class="col_lang hideOnDemandClass center hidden-phone">
 				<?php echo JHtml::_('grid.sort', 'FLEXI_LANGUAGE', 'a.language', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php if ($this->getModel()->getState('filter_lang')) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
@@ -676,12 +673,12 @@ jQuery(document).ready(function(){
 			</th>
 
 		<?php if ($useAssocs) : ?>
-			<th class="hideOnDemandClass left hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<th class="hideOnDemandClass left hidden-phone hidden-tablet">
 				<?php echo JText::_('FLEXI_ASSOCIATIONS'); ?>
 			</th>
 		<?php endif; ?>
 
-			<th class="hideOnDemandClass left hidden-phone" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<th class="col_type hideOnDemandClass center hidden-phone">
 				<?php echo JHtml::_('grid.sort', 'FLEXI_TYPE_NAME', 'type_name', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php if ($this->getModel()->getState('filter_type')) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
@@ -690,17 +687,17 @@ jQuery(document).ready(function(){
 				<?php endif; ?>
 			</th>
 
-			<th class="hideOnDemandClass left hidden-phone hidden-tablet" colspan="2" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<th class="col_template small hideOnDemandClass left hidden-phone hidden-tablet" colspan="2">
 				<?php echo JText::_('FLEXI_TEMPLATE'); ?>
 			</th>
 
 		<?php foreach($this->extra_fields as $field) :?>
-			<th class="hideOnDemandClass left hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<th class="hideOnDemandClass left hidden-phone hidden-tablet">
 				<?php echo $field->label; ?>
 			</th>
 		<?php endforeach; ?>
 
-			<th class="hideOnDemandClass left hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<th class="col_access hideOnDemandClass left hidden-phone hidden-tablet">
 				<?php echo JHtml::_('grid.sort', 'FLEXI_ACCESS', 'a.access', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php if ($this->getModel()->getState('filter_access')) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
@@ -709,7 +706,7 @@ jQuery(document).ready(function(){
 				<?php endif; ?>
 			</th>
 
-			<th class="hideOnDemandClass left hidden-phone" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<th class="col_cats hideOnDemandClass left hidden-phone">
 				<?php echo $categories_tip; ?>
 				<?php echo JText::_( 'FLEXI_CATEGORIES' ); ?>
 				<?php if ($this->getModel()->getState('filter_cats')) : ?>
@@ -719,7 +716,7 @@ jQuery(document).ready(function(){
 				<?php endif; ?>
 			</th>
 
-			<th class="hideOnDemandClass left hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<th class="col_tag hideOnDemandClass left hidden-phone hidden-tablet">
 				<?php echo JText::_( 'FLEXI_TAGS' ); ?>
 				<?php if ($this->getModel()->getState('filter_tag')) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
@@ -728,7 +725,7 @@ jQuery(document).ready(function(){
 				<?php endif; ?>
 			</th>
 
-			<th class="hideOnDemandClass left hidden-phone" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<th class="col_created right hideOnDemandClass left hidden-phone">
 				<?php echo JHtml::_('grid.sort',   'FLEXI_CREATED', 'a.created', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php
 				if ($this->date == '1') :
@@ -743,7 +740,7 @@ jQuery(document).ready(function(){
 				?>
 			</th>
 
-			<th class="hideOnDemandClass left hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<th class="col_revised hideOnDemandClass right left hidden-phone hidden-tablet">
 				<?php echo JHtml::_('grid.sort',   'FLEXI_REVISED', 'a.modified', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php
 				if ($this->date == '2') :
@@ -758,19 +755,19 @@ jQuery(document).ready(function(){
 				?>
 			</th>
 
-			<th class="hideOnDemandClass left hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<th class="col_hits hideOnDemandClass center hidden-phone hidden-tablet">
 				<?php echo JHtml::_('grid.sort', 'JGLOBAL_HITS', 'a.hits', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
 
-			<th class="hideOnDemandClass left hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<th class="col_votes hideOnDemandClass center hidden-phone hidden-tablet">
 				<?php echo JHtml::_('grid.sort', 'JGLOBAL_VOTES', 'rating_count', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
 
-			<th class="hideOnDemandClass left hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<th class="col_ratings hideOnDemandClass center hidden-phone hidden-tablet">
 				<?php echo JHtml::_('grid.sort', 'JGLOBAL_RATINGS', 'rating', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
 
-			<th class="hideOnDemandClass col_id center hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<th class="col_id hideOnDemandClass right hidden-phone hidden-tablet">
 				<?php echo JHtml::_('grid.sort', 'JGRID_HEADING_ID', 'a.id', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php if ($this->getModel()->getState('filter_id')) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
@@ -798,7 +795,6 @@ jQuery(document).ready(function(){
 
 		foreach ($this->rows as $i => $row)
 		{
-			$colposition = 0;
 			$assetName = 'com_content.article.' . $row->id;
 			$isAuthor  = $row->created_by && $row->created_by == $user->id;
 
@@ -824,7 +820,7 @@ jQuery(document).ready(function(){
 
 		<?php if ($canOrder) : ?>
 
-			<td class="col_order nowrap center hidden-phone"><?php $colposition++; ?>
+			<td class="col_order nowrap center hidden-phone">
 				<?php
 					if ($this->reOrderingActive)
 					{
@@ -867,7 +863,7 @@ jQuery(document).ready(function(){
 
 		<?php else : ?>
 
-			<td class="center hidden-phone"><?php $colposition++; ?>
+			<td class="center hidden-phone">
 				<?php
 				echo !$this->reOrderingActive
 					? '<span class="icon-move" style="color: #d0d0d0"></span>'
@@ -877,12 +873,12 @@ jQuery(document).ready(function(){
 
 		<?php endif; ?>
 
-			<td class="col_cb"><?php $colposition++; ?>
+			<td class="col_cb">
 				<!--div class="adminlist-table-row"></div-->
 				<?php echo JHtml::_($hlpname . '.grid_id', $i, $row->id); ?>
 			</td>
 
-			<td class="col_notes nowrap"><?php $colposition++; ?>
+			<td class="col_notes nowrap">
 				<?php
 				// Display an icon if item has an unapproved latest version, thus needs revising
 				echo JHtml::_($hlpname . '.reviewing_needed', $row, $user, $i);
@@ -892,7 +888,7 @@ jQuery(document).ready(function(){
 				?>
 			</td>
 
-			<td class="col_status" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<td class="col_status">
 				<div class="btn-group fc-group fc-items">
 					<?php
 					//echo JHtml::_('jgrid.published', $row->state, $i, $ctrl, $stateIsChangeable, 'cb', $row->publish_up, $row->publish_down);
@@ -905,7 +901,7 @@ jQuery(document).ready(function(){
 				</div>
 			</td>
 
-			<td class="col_title" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<td class="col_title">
 				<?php
 				/**
 				 * Display an edit pencil or a check-in button if: either (a) current user has Global
@@ -921,11 +917,11 @@ jQuery(document).ready(function(){
 				?>
 			</td>
 
-			<td class="col_authors hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<td class="col_authors small hidden-phone hidden-tablet">
 				<?php echo $row->author; ?>
 			</td>
 
-			<td class="col_lang hidden-phone" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<td class="col_lang small center hidden-phone">
 				<?php
 					/**
 					 * Display language
@@ -935,7 +931,7 @@ jQuery(document).ready(function(){
 
 
 			<?php if ($useAssocs) : ?>
-			<td class="hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<td class="hidden-phone hidden-tablet">
 				<?php
 				if (!empty($this->lang_assocs[$row->id]))
 				{
@@ -966,21 +962,21 @@ jQuery(document).ready(function(){
 			<?php endif ; ?>
 
 
-			<td class="col_type hidden-phone" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<td class="col_type center small hidden-phone">
 				<?php echo JText::_($row->type_name); ?>
 			</td>
 
-			<td class="col_edit_layout hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition); ?>" >
+			<td class="col_edit_layout hidden-phone hidden-tablet">
 				<?php echo JHtml::_($hlpname . '.edit_layout', $row, '__modal__', $i, $this->perms->CanTemplates, $row_ilayout); ?>
 			</td>
 
-			<td class="col_template hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<td class="col_template small hidden-phone hidden-tablet">
 				<?php echo $row_ilayout.($row->config->get('ilayout') ? '' : '<sup>[1]</sup>') ?>
 			</td>
 
     <?php foreach($this->extra_fields as $field) :?>
 
-			<td class="hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<td class="hidden-phone hidden-tablet">
 		    <?php
 				// Output the field's display HTML
 				echo isset( $row->fields[$field->name]->{$field->methodname} ) ? $row->fields[$field->name]->{$field->methodname} : '';
@@ -988,13 +984,13 @@ jQuery(document).ready(function(){
 			</td>
 		<?php endforeach; ?>
 
-			<td class="col_access hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<td class="col_access hidden-phone hidden-tablet">
 				<?php echo $row->canEdit && $this->perms->CanAccLvl
 					? flexicontent_html::userlevel('access['.$row->id.']', $row->access, 'onchange="return listItemTask(\'cb'.$i.'\',\''.$ctrl.'access\')"')
 					: $row->access_level; ?>
 			</td>
 
-			<td class="col_cats hidden-phone" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<td class="col_cats small hidden-phone">
 				<?php
 				// Reorder categories place item's MAIN category first or ...
 				// place first the category being filtered (if order is 'FLEXIcontent')
@@ -1080,7 +1076,7 @@ jQuery(document).ready(function(){
 				?>
 			</td>
 
-			<td class="col_tag hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<td class="col_tag small hidden-phone hidden-tablet">
 				<?php
 					$row_tags  = array();
 					$tag_names = array();
@@ -1104,27 +1100,27 @@ jQuery(document).ready(function(){
 				?>
 			</td>
 
-			<td class="col_created hidden-phone" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<td class="col_created small right hidden-phone">
 				<?php echo JHtml::_('date',  $row->created, $date_format); ?>
 			</td>
 
-			<td class="col_revised hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<td class="col_revised small right hidden-phone hidden-tablet">
 				<?php echo ($row->modified != $_NULL_DATE_ && $row->modified != $row->created) ? JHtml::_('date', $row->modified, $date_format) : $_NEVER_; ?>
 			</td>
 
-			<td class="hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<td class="col_hits center hidden-phone hidden-tablet">
 				<?php echo '<span class="badge badge-info"> ' . ($row->hits ?: 0) . '</span>'; ?>
 			</td>
 
-			<td class="hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<td class="col_votes center hidden-phone hidden-tablet">
 				<?php echo '<span class="badge badge-success"> ' . ($row->rating_count ?: 0) . '</span>'; ?>
 			</td>
 
-			<td class="hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<td class="col_ratings center hidden-phone hidden-tablet">
 				<?php echo '<span class="badge badge-warning"> ' .sprintf('%.0f', (float) $row->rating) .'%</span>'; ?>
 			</td>
 
-			<td class="col_id center hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<td class="col_id right small hidden-phone hidden-tablet">
 				<?php echo $row->id; ?>
 			</td>
 
