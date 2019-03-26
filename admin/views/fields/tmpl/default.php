@@ -370,22 +370,22 @@ if ($js)
 				</div>
 			</th>
 
-			<th class="hideOnDemandClass left">
+			<th class="col_status hideOnDemandClass left">
 				<?php echo JHtml::_('grid.sort', 'FLEXI_STATUS', 'i.' . $this->state_propname, $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
 
 			<?php /*<th style="padding:0px;"><?php echo JHtml::_('grid.sort', 'FLEXI_FIELD_DESCRIPTION', 'a.description', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>*/ ?>
 
-			<th class="hideOnDemandClass title" colspan="2" style="text-align:left; padding-left:18px; padding-right:18px;">
+			<th class="col_title hideOnDemandClass title" colspan="2" style="text-align:left; padding-left:18px; padding-right:18px;">
 				<?php echo JHtml::_('grid.sort', 'FLEXI_FIELD_LABEL', 'a.label', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
 
-			<th class="hideOnDemandClass hidden-phone hidden-tablet">
+			<th class="col_alias hideOnDemandClass hidden-phone hidden-tablet">
 				<?php echo JHtml::_('grid.sort', 'FLEXI_FIELD_NAME', 'a.name', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<small>(<?php echo JText::_('FLEXI_ALIAS'); ?>)</small>
 			</th>
 
-			<th class="hideOnDemandClass hidden-phone">
+			<th class="col_fieldtype hideOnDemandClass hidden-phone">
 				<?php echo JHtml::_('grid.sort', 'FLEXI_FIELD_TYPE', 'a.field_type', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
 
@@ -407,7 +407,7 @@ if ($js)
 				<span class="column_toggle_lbl" style="display:none;"><?php echo '<small class="badge">'.JText::_( 'Search view' ).'</small>'; ?></span>
 			</th>
 
-			<th class="hideOnDemandClass col_ntypes left hidden-phone" colspan="2">
+			<th class="col_ntypes hideOnDemandClass left hidden-phone" colspan="2">
 				<?php echo JHtml::_('grid.sort', 'FLEXI_ASSIGNED_TYPES', 'nrassigned', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
 
@@ -534,7 +534,7 @@ if ($js)
 				<?php echo JHtml::_($hlpname . '.grid_id', $i, $row->id); ?>
 			</td>
 
-			<td class="center">
+			<td class="col_status">
 				<div class="btn-group fc-group fc-fields">
 					<?php
 					/**
@@ -577,11 +577,11 @@ if ($js)
 				<?php echo JHtml::_($hlpname . '.info_text', $row, $i, 'description', 'FLEXI_FIELD_DESCRIPTION'); ?>
 			</td>
 
-			<td class="hidden-phone hidden-tablet">
+			<td class="col_alias small hidden-phone hidden-tablet">
 				<?php echo $row->name; ?>
 			</td>
 
-			<td class="hidden-phone">
+			<td class="col_fieldtype hidden-phone">
 				<?php echo JHtml::_($hlpname . '.fieldtype_info', $row, $i); ?>
 			</td>
 
