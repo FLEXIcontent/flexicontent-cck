@@ -411,7 +411,6 @@ if ($js)
 				<?php echo JHtml::_('grid.sort', 'FLEXI_ASSIGNED_TYPES', 'nrassigned', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
 
-
 			<th class="col_access hideOnDemandClass left hidden-phone">
 				<?php echo JHtml::_('grid.sort', 'FLEXI_ACCESS', 'a.access', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
@@ -644,7 +643,7 @@ if ($js)
 				?>
 			</td>
 
-			<td class="col_id center small hidden-phone hidden-tablet">
+			<td class="col_id center hidden-phone hidden-tablet">
 				<?php echo $row->id; ?>
 			</td>
 
@@ -706,4 +705,4 @@ JFactory::getDocument()->addScriptDeclaration('
 		window.location.reload(false);
 		document.body.innerHTML = Joomla.JText._("FLEXI_UPDATING_CONTENTS") + \' <img id="page_loading_img" src="components/com_flexicontent/assets/images/ajax-loader.gif">\';
 	}
-');?>
+');

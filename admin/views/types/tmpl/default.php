@@ -85,7 +85,7 @@ $image_editlayout = 0 ?
 	JHtml::image('components/com_flexicontent/assets/images/'.'layout_edit.png', htmlspecialchars(JText::_('FLEXI_EDIT_LAYOUT_N_GLOBAL_PARAMETERS'), ENT_QUOTES, 'UTF-8'), ' class="'.$ico_class.'"') :
 	'<span class="'.$ico_class.'"><span class="icon-edit"></span></span>' ;
 $article_viewing_tip  = '<span class="icon-info ' . $this->tooltip_class . '" data-placement="bottom" title="'.flexicontent_html::getToolTip('FLEXI_JOOMLA_ARTICLE_VIEW', 'FLEXI_ALLOW_ARTICLE_VIEW_DESC', 1, 1).'"></span>';
-$default_template_tip  = '<span class="icon-info ' . $this->tooltip_class . '" data-placement="bottom" title="'.flexicontent_html::getToolTip('FLEXI_TYPE_DEFAULT_TEMPLATE', 'FLEXI_TYPE_DEFAULT_TEMPLATE_DESC', 1, 1).'"></span>';
+$default_template_tip = '<span class="icon-info ' . $this->tooltip_class . '" data-placement="bottom" title="'.flexicontent_html::getToolTip('FLEXI_TYPE_DEFAULT_TEMPLATE', 'FLEXI_TYPE_DEFAULT_TEMPLATE_DESC', 1, 1).'"></span>';
 
 /**
  * Order stuff and table related variables
@@ -417,7 +417,7 @@ if ($js)
 				?>
 			</td>
 
-			<td class="col_id center small hidden-phone hidden-tablet">
+			<td class="col_id center hidden-phone hidden-tablet">
 				<?php echo $row->id; ?>
 			</td>
 
