@@ -300,8 +300,8 @@ if ($js)
 
 			<th class="col_title hideOnDemandClass" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo JHtml::_('grid.sort', 'FLEXI_TITLE', 'a.' . $this->title_propname, $this->lists['order_Dir'], $this->lists['order'] ); ?>
-				//
-				<?php echo JHtml::_('grid.sort', 'FLEXI_ALIAS', 'a.alias', $this->lists['order_Dir'], $this->lists['order'] ); ?>
+				<small>[
+				<?php echo JHtml::_('grid.sort', 'FLEXI_ALIAS', 'a.alias', $this->lists['order_Dir'], $this->lists['order'] ); ?>]</small>
 			</th>
 
 			<th class="col_lang hideOnDemandClass hidden-phone" style="<?php echo $this->hideCol($colposition++); ?>" >
@@ -505,7 +505,7 @@ if ($js)
 			<td class="col_title" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php
 				echo $row->level > 1
-					? str_repeat('.&nbsp;&nbsp;', $row->level - 1) . '<sup>|_</sup>&nbsp;'
+					? str_repeat('<span class="muted">&#9482;&nbsp;&nbsp;</span>', $row->level - 1) . '<span class="muted">&ndash;&nbsp;&nbsp;</span>'
 					: '';
 
 				/**
