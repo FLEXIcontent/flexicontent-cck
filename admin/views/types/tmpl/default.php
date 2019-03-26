@@ -252,7 +252,7 @@ if ($js)
 	<thead>
 		<tr>
 
-			<th class="hidden-phone">
+			<th class="col_num hidden-phone">
 				<?php echo JText::_( 'FLEXI_NUM' ); ?>
 			</th>
 
@@ -333,7 +333,7 @@ if ($js)
 			?>
 		<tr class="<?php echo 'row' . ($i % 2); ?>">
 
-			<td class="hidden-phone">
+			<td class="col_num hidden-phone">
 				<?php echo $this->pagination->getRowOffset($i); ?>
 			</td>
 
