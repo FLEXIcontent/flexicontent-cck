@@ -505,7 +505,7 @@ if ($js)
 			<td class="col_title" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php
 				echo $row->level > 1
-					? str_repeat('<span class="muted">&#9482;&nbsp;&nbsp;</span>', $row->level - 1) . '<span class="muted">&ndash;&nbsp;&nbsp;</span>'
+					? str_repeat('.&nbsp;&nbsp;', $row->level - 1) . '<sup>|_</sup>&nbsp;'
 					: '';
 
 				/**
