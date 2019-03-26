@@ -858,8 +858,15 @@ class FLEXIcontentViewSearch extends JViewLegacy
 
 					$replace_count_total = 0;
 
-					// This is for LIKE %word% search for languages without spaces
-					if ($filter_word_like_any)
+					/*
+					 * LIKE %word% search (needed by languages without spaces),
+					 * (1) Skip / Ignore this for languages with spaces,
+					 * (2) Skip / Ignore this if current language supports splitting via dictionary
+					 */
+					if ($filter_word_like_any
+						&& in_array(flexicontent_html::getUserCurrentLang(), array('zh', 'jp', 'ja', 'th'))
+						&& ! FlexicontentFields::getLangHandler(JFactory::getLanguage()->getTag(), $_hasHandlerOnly = true)
+					)
 					{
 						// Do not highlight too small words, since we do not consider spaces
 						if (strlen($word_found) <= 2)
