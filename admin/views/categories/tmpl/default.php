@@ -620,7 +620,7 @@ if ($js)
 				?>
 			</td>
 
-			<td class="col_id center hidden-phone hidden-tablet">
+			<td class="col_id small center hidden-phone hidden-tablet">
 				<?php echo $row->id; ?>
 			</td>
 
