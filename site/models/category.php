@@ -1200,6 +1200,13 @@ class FlexicontentModelCategory extends JModelLegacy {
 			? 'flexicontent_items_ext'
 			: 'flexicontent_advsearch_index';
 
+		// Try to add space between words for current language using a dictionary
+		$lang_handler = FlexicontentFields::getLangHandler(JFactory::getLanguage()->getTag());
+		if ($lang_handler)
+		{
+			$text = $lang_handler->get_segment_array($clear_previous = true, trim($text));
+		}
+
 		// Prefix the words for short word / stop words matching
 		$search_prefix = $this->_params->get('add_search_prefix') ? 'vvv' : '';
 		$text_np = trim($text);
@@ -1224,12 +1231,17 @@ class FlexicontentModelCategory extends JModelLegacy {
 			$shortwords = array();
 
 			/*
-			 * LIKE %word% search (needed by languages without spaces), auto skip this for other languages
+			 * LIKE %word% search (needed by languages without spaces),
+			 * (1) Skip / Ignore this for languages with spaces,
+			 * (2) Skip / Ignore this if current language supports splitting via dictionary
 			 */
-			if ($filter_word_like_any && in_array(flexicontent_html::getUserCurrentLang(), array('zh', 'jp', 'ja', 'th')))
+			if ($filter_word_like_any
+				&& in_array(flexicontent_html::getUserCurrentLang(), array('zh', 'jp', 'ja', 'th'))
+				&& ! FlexicontentFields::getLangHandler(JFactory::getLanguage()->getTag(), $_hasHandlerOnly = true)
+			)
 			{
-				$_index_match = ' LOWER ('.$ts.'.search_index) LIKE '.$db->Quote( '%'.$escaped_text_np.'%', false );
-				$_title_relev = ' LOWER (i.title) LIKE '.$db->Quote( '%'.$escaped_text_np.'%', false );
+				$_index_match = ' LOWER ('.$ts.'.search_index) LIKE '.$db->Quote( '%'.$escaped_text.'%', false );
+				$_title_relev = ' LOWER (i.title) LIKE '.$db->Quote( '%'.$escaped_text.'%', false );
 			}
 
 			/*
