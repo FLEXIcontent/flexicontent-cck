@@ -35,8 +35,8 @@ foreach ($values as $value)
 
 	// If not using property or property is empty, then use default property value
 	// NOTE: default property values have been cleared, if (propertyname_usage != 2)
-	$title    = ($usetitle  && !empty($value['title'])   )  ?  $value['title']    : $default_title;
-	$linktext = ($usetext   && !empty($value['linktext']))  ?  $value['linktext'] : $default_text;
+	$title    = ($usetitle  && !empty($value['title'])   )  ?  JText::_($value['title'])    : $default_title;
+	$linktext = ($usetext   && !empty($value['linktext']))  ?  JText::_($value['linktext']) : $default_text;
 	$class    = ($useclass  && !empty($value['class'])   )  ?  $value['class']    : $default_class;
 	$id       = ($useid     && !empty($value['id'])      )  ?  $value['id']       : $default_id;
 	$target   = ($usetarget && !empty($value['target'])  )  ?  $value['target']   : $default_target;
