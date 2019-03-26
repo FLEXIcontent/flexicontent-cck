@@ -637,11 +637,9 @@ jQuery(document).ready(function(){
 			</th>
 
 			<th class="left"><?php $colposition++; ?>
-Remove newline
 			</th>
 
 			<th class="col_status hideOnDemandClass left" style="<?php echo $this->hideCol($colposition++); ?>" >
-Remove newline
 				<?php echo JHtml::_('grid.sort', 'FLEXI_STATUS', 'a.' . $this->state_propname, $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php if ($this->getModel()->getState('filter_state')) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
@@ -651,7 +649,6 @@ Remove newline
 			</th>
 
 			<th class="col_title hideOnDemandClass left" style="<?php echo $this->hideCol($colposition++); ?>" >
-
 				<?php echo JHtml::_('grid.sort', 'FLEXI_TITLE', 'a.' . $this->title_propname, $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php if (strlen($this->getModel()->getState('search'))) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
@@ -774,7 +771,6 @@ Remove newline
 			</th>
 
 			<th class="col_id hideOnDemandClass center hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
-
 				<?php echo JHtml::_('grid.sort', 'JGRID_HEADING_ID', 'a.id', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php if ($this->getModel()->getState('filter_id')) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
@@ -897,7 +893,6 @@ Remove newline
 			</td>
 
 			<td class="col_status" style="<?php echo $this->hideCol($colposition++); ?>" >
-
 				<div class="btn-group fc-group fc-items">
 					<?php
 					//echo JHtml::_('jgrid.published', $row->state, $i, $ctrl, $stateIsChangeable, 'cb', $row->publish_up, $row->publish_down);
@@ -911,7 +906,6 @@ Remove newline
 			</td>
 
 			<td class="col_title" style="<?php echo $this->hideCol($colposition++); ?>" >
-
 				<?php
 				/**
 				 * Display an edit pencil or a check-in button if: either (a) current user has Global
@@ -932,7 +926,6 @@ Remove newline
 			</td>
 
 			<td class="col_lang small hidden-phone" style="<?php echo $this->hideCol($colposition++); ?>" >
-
 				<?php
 					/**
 					 * Display language
@@ -974,7 +967,6 @@ Remove newline
 
 
 			<td class="col_type small hidden-phone" style="<?php echo $this->hideCol($colposition++); ?>" >
-
 				<?php echo JText::_($row->type_name); ?>
 			</td>
 
@@ -1003,7 +995,6 @@ Remove newline
 			</td>
 
 			<td class="col_cats small hidden-phone" style="<?php echo $this->hideCol($colposition++); ?>" >
-
 				<?php
 				// Reorder categories place item's MAIN category first or ...
 				// place first the category being filtered (if order is 'FLEXIcontent')
@@ -1133,7 +1124,7 @@ Remove newline
 				<?php echo '<span class="badge badge-warning"> ' .sprintf('%.0f', (float) $row->rating) .'%</span>'; ?>
 			</td>
 
-			<td class="col_id center small col_id center hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<td class="col_id center center hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo $row->id; ?>
 			</td>
 
