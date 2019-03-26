@@ -252,7 +252,7 @@ if ($js)
 	<thead>
 		<tr>
 
-			<th class="hidden-phone">
+			<th class="col_num hidden-phone">
 				<?php echo JText::_( 'FLEXI_NUM' ); ?>
 			</th>
 
@@ -263,39 +263,39 @@ if ($js)
 				</div>
 			</th>
 
-			<th class="hideOnDemandClass left">
+			<th class="col_status hideOnDemandClass left">
 				<?php echo JHtml::_('grid.sort', 'FLEXI_STATUS', 'a.' . $this->state_propname, $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
 
-			<th class="hideOnDemandClass title">
+			<th class="col_title hideOnDemandClass title">
 				<?php echo JHtml::_('grid.sort', 'FLEXI_TYPE_NAME', 'a.name', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
 
-			<th class="hideOnDemandClass col_redirect hidden-phone hidden-tablet">
+			<th class="col_redirect hideOnDemandClass hidden-phone hidden-tablet">
 				<?php echo $article_viewing_tip . JText::_( 'FLEXI_JOOMLA_ARTICLE_VIEW' )."<br/><small>(" . JText::_( 'FLEXI_ALLOWED') .' / '. JText::_( 'FLEXI_REROUTED' ) .' / '. JText::_( 'FLEXI_REDIRECTED' ) . ")</small>"; ?>
 			</th>
 
-			<th class="left hideOnDemandClass hidden-phone hidden-tablet" colspan="2">
+			<th class="col_template left hideOnDemandClass hidden-phone hidden-tablet" colspan="2">
 				<?php echo $default_template_tip.JText::_( 'FLEXI_TEMPLATE' )."<br/><small>(".JText::_( 'FLEXI_PROPERTY_DEFAULT' )." ".JText::_( 'FLEXI_TEMPLATE_ITEM' ).")</small>"; ?>
 			</th>
 
-			<th class="hideOnDemandClass hidden-phone hidden-tablet">
+			<th class="col_alias hideOnDemandClass hidden-phone hidden-tablet">
 				<?php echo JHtml::_('grid.sort', 'FLEXI_ALIAS', 'a.alias', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
 
-			<th class="hideOnDemandClass center">
+			<th class="col_fassigned hideOnDemandClass center">
 				<?php echo JHtml::_('grid.sort', 'FLEXI_FIELDS', 'fassigned', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
 
-			<th class="hideOnDemandClass center">
+			<th class="col_iassigned hideOnDemandClass center">
 				<?php echo JHtml::_('grid.sort', 'FLEXI_ITEMS', 'iassigned', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
 
-			<th class="hideOnDemandClass hidden-phone">
+			<th class="col_access hideOnDemandClass hidden-phone">
 				<?php echo JHtml::_('grid.sort', 'FLEXI_ACCESS', 'a.access', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
 
-			<th class="hideOnDemandClass col_id center hidden-phone hidden-tablet">
+			<th class="col_id hideOnDemandClass center hidden-phone hidden-tablet">
 				<?php echo JHtml::_('grid.sort', 'FLEXI_ID', 'a.id', $this->lists['order_Dir'], $this->lists['order']); ?>
 			</th>
 
@@ -333,7 +333,7 @@ if ($js)
 			?>
 		<tr class="<?php echo 'row' . ($i % 2); ?>">
 
-			<td class="hidden-phone">
+			<td class="col_num hidden-phone">
 				<?php echo $this->pagination->getRowOffset($i); ?>
 			</td>
 
@@ -398,13 +398,13 @@ if ($js)
 				?>
 			</td>
 
-			<td class="center">
+			<td class="col_fassigned center">
 				<a class="badge fc-assignments-btn" href="<?php echo $fields_link; ?>">
 					<?php echo $row->fassigned; ?>
 				</a>
 			</td>
 
-			<td class="center">
+			<td class="col_iassigned center">
 				<a class="badge badge-info fc-assignments-btn" href="<?php echo $items_link; ?>">
 					<?php echo $row->iassigned; ?>
 				</a>
