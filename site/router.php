@@ -1016,6 +1016,14 @@ class _FlexicontentSiteRouter
 			->where('i.' . $db->QuoteName($alias_col) . ' = ' . $db->Quote($alias));
 
 		/**
+		 * Limit query to categories of com_content extension !
+		 */
+		if ($tbl === '#__categories')
+		{
+			$query->where($db->QuoteName('extension') . ' = ' . $db->Quote('com_content'));
+		}
+
+		/**
 		 * Limit to parent category (or parent record), because same record alias may exist in for records in other categories
 		 */
 		if ($parent_id)
