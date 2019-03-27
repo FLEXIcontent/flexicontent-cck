@@ -162,6 +162,7 @@ if ($js)
 	</div>
 	<div id="j-main-container" class="span10 col-md-10">
 
+
 <?php else : ?>
 
 	<div id="j-main-container" class="span12 col-md-12">
@@ -266,7 +267,7 @@ if ($js)
 				</div>
 			</th>
 
-			<th class="hideOnDemandClass left nowrap">
+			<th class="col_title hideOnDemandClass left nowrap">
 				<?php echo JHtml::_('grid.sort',   'FLEXI_NAME', 'a.name', @$this->lists['order_Dir'], @$this->lists['order'] ); ?>
 				<?php if (strlen($this->getModel()->getState('search'))) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
@@ -275,11 +276,11 @@ if ($js)
 				<?php endif; ?>
 			</th>
 
-			<th class="hideOnDemandClass nowrap" >
+			<th class="col_username hideOnDemandClass nowrap" >
 				<?php echo JHtml::_('grid.sort',   'FLEXI_USER_NAME', 'a.username', @$this->lists['order_Dir'], @$this->lists['order'] ); ?>
 			</th>
 
-			<th class="hideOnDemandClass nowrap">
+			<th class="col_logged center hideOnDemandClass nowrap">
 				<?php echo JHtml::_('grid.sort',   'FLEXI_USER_LOGGED', 'loggedin', @$this->lists['order_Dir'], @$this->lists['order'] ); ?>
 				<?php if ($this->getModel()->getState('filter_logged')) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
@@ -288,7 +289,7 @@ if ($js)
 				<?php endif; ?>
 			</th>
 
-			<th class="hideOnDemandClass nowrap">
+			<th class="col_status center hideOnDemandClass nowrap">
 				<?php echo JHtml::_('grid.sort',   'COM_USERS_HEADING_ENABLED', 'a.block', @$this->lists['order_Dir'], @$this->lists['order'] ); ?>
 				<?php if (strlen($this->getModel()->getState('filter_state'))) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
@@ -297,7 +298,7 @@ if ($js)
 				<?php endif; ?>
 			</th>
 
-			<th class="hideOnDemandClass nowrap hidden-phone">
+			<th class="col_active center hideOnDemandClass nowrap hidden-phone">
 				<?php echo JHtml::_('grid.sort',   'COM_USERS_HEADING_ACTIVATED', 'a.activation', @$this->lists['order_Dir'], @$this->lists['order'] ); ?>
 				<?php if (strlen($this->getModel()->getState('filter_active'))) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
@@ -306,7 +307,7 @@ if ($js)
 				<?php endif; ?>
 			</th>
 
-			<th class="hideOnDemandClass nowrap">
+			<th class="col_usergrp hideOnDemandClass nowrap">
 				<?php echo JText::_( 'FLEXI_USERGROUPS' ); ?>
 				<?php if ($this->getModel()->getState('filter_usergrp')) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
@@ -315,7 +316,7 @@ if ($js)
 				<?php endif; ?>
 			</th>
 
-			<th class="hideOnDemandClass nowrap">
+			<th class="col_itemscount center hideOnDemandClass nowrap">
 				<?php echo JHtml::_('grid.sort',   'FLEXI_ITEMS', 'itemscount', @$this->lists['order_Dir'], @$this->lists['order'] ); ?>
 				<?php if ($this->getModel()->getState('filter_itemscount')) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
@@ -324,7 +325,7 @@ if ($js)
 				<?php endif; ?>
 			</th>
 
-			<th class="hideOnDemandClass nowrap">
+			<th class="col_uploadssize right hideOnDemandClass nowrap">
 				<?php echo JHtml::_('grid.sort',   'FLEXI_FILES_MBS', 'uploadssize', @$this->lists['order_Dir'], @$this->lists['order'] ); ?>
 				<?php if ($this->getModel()->getState('filter_uploadssize')) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
@@ -333,11 +334,11 @@ if ($js)
 				<?php endif; ?>
 			</th>
 
-			<th class="hideOnDemandClass left nowrap">
+			<th class="col_email hideOnDemandClass left nowrap">
 				<?php echo JHtml::_('grid.sort',   'FLEXI_USER_EMAIL', 'a.email', @$this->lists['order_Dir'], @$this->lists['order'] ); ?>
 			</th>
 
-			<th style="width:110px;" class="hideOnDemandClass">
+			<th style="width:110px;" class="col_registered hideOnDemandClass">
 				<?php echo JHtml::_('grid.sort',   'FLEXI_REGISTRED_DATE', 'a.registerDate', @$this->lists['order_Dir'], @$this->lists['order'] ); ?>
 				<?php
 				if ($this->date == '1') :
@@ -352,7 +353,7 @@ if ($js)
 				?>
 			</th>
 
-			<th style="width:110px;" class="hideOnDemandClass nowrap">
+			<th style="width:110px;" class="col_visited hideOnDemandClass nowrap">
 				<?php echo JHtml::_('grid.sort',   'FLEXI_USER_LAST_VISIT', 'a.lastvisitDate', @$this->lists['order_Dir'], @$this->lists['order'] ); ?>
 				<?php
 				if ($this->date == '2') :
@@ -367,7 +368,7 @@ if ($js)
 				?>
 			</th>
 
-			<th class="hideOnDemandClass col_id center hidden-phone hidden-tablet">
+			<th class="col_id center hideOnDemandClass hidden-phone hidden-tablet">
 				<?php echo JHtml::_('grid.sort', 'FLEXI_ID', 'a.id', $this->lists['order_Dir'], $this->lists['order']); ?>
 				<?php if ($this->getModel()->getState('filter_id')) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
@@ -458,37 +459,37 @@ if ($js)
 				<?php echo $row->username; ?>
 				<!-- </a> -->
 			</td>
-			<td class="center col_logged">
+			<td class="col_logged center">
 				<?php echo $row->loggedin ? '<img src="'.$tick_img.'" width="16" height="16" style="border:0;" class="fc-man-icon-s" alt="" />': ''; ?>
 			</td>
 
-			<td class="center col_status">
+			<td class="col_status center">
 				<a href="javascript:void(0);" onclick="return listItemTask('cb<?php echo $i;?>','<?php echo $block_task;?>')">
 					<img src="images/<?php echo $block_img;?>" class="<?php echo $this->tooltip_class; ?> fc-man-icon-s" width="16" height="16" style="border:0;" title="<?php echo $block_title; ?>" alt="<?php echo $block_title; ?>" />
 				</a>
 			</td>
 
-			<td class="center col_active hidden-phone">
+			<td class="col_active center hidden-phone">
 				<img src="images/<?php echo $activation_img;?>" class="<?php echo $this->tooltip_class; ?> fc-man-icon-s" width="16" height="16" style="border:0;" title="<?php echo $activation_title; ?>" alt="<?php echo $activation_title; ?>" />
 			</td>
 
-			<td class="center col_usergrp">
+			<td class="col_usergrp small">
 				<?php echo JText::_( $row->groupname ); ?>
 			</td>
-			<td class="center col_itemscount">
+			<td class="col_itemscount center">
 				<?php echo $itemscount; ?>
 			</td>
-			<td class="right col_uploadssize">
+			<td class="col_uploadssize right">
 				<?php echo number_format(($row->uploadssize / (1024*1024)) , 2); ?>
 			</td>
-			<td class="left">
+			<td class="col_email left">
 				<a href="mailto:<?php echo $row->email; ?>">
 					<?php echo $row->email; ?></a>
 			</td>
-			<td class="nowrap col_registered">
+			<td class="col_registered small nowrap">
 				<?php echo $registered; ?>
 			</td>
-			<td class="nowrap col_visited">
+			<td class="col_visited small nowrap">
 				<?php echo $lvisit; ?>
 			</td>
 
