@@ -1031,7 +1031,7 @@ class _FlexicontentSiteRouter
 			}
 		}
 
-		if ($language)
+		if ($language && ($tbl === '#__content' || $tbl === '#__categories'))
 		{
 			$query->where('(i.language = ' . $db->Quote($language) . ' OR i.language = ' . $db->Quote('*') . ')');
 		}
