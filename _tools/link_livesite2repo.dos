@@ -180,7 +180,7 @@ FOR /D %%G in ("*") DO (
 			del %joomlasite_path%\language\en-GB\en-GB.%%G.ini
 		)
 	)
-	mklink %joomlasite_path%\language\en-GB\en-GB.%%G.ini  %repository_path%\modules\%%G\languages\en-GB.%%G.ini
+	mklink %joomlasite_path%\language\en-GB\en-GB.%%G.ini  %repository_path%\modules\%%G\language\en-GB.%%G.ini
 )
 
 
