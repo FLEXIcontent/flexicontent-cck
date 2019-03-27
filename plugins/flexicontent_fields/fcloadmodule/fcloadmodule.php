@@ -33,7 +33,7 @@ class plgFlexicontent_fieldsFcloadmodule extends FCField
 	// ***
 
 	// Method to create field's HTML display for item form
-	function onDisplayField(&$field, &$item)
+	public function onDisplayField(&$field, &$item)
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 
@@ -90,14 +90,17 @@ class plgFlexicontent_fieldsFcloadmodule extends FCField
 
 
 	// Method to create field's HTML display for frontend views
-	function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')
+	public function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 
+		// Get field values
 		$values = $values ? $values : $field->value;
+
 		if (empty($values))
 		{
-			$values = array(array());
+			$values = array(0 => array(
+			));
 		}
 
 		$unserialize_vals = true;
@@ -110,13 +113,14 @@ class plgFlexicontent_fieldsFcloadmodule extends FCField
 				if ( !is_array($value) )
 				{
 					$array = $this->unserialize_array($value, $force_array=false, $force_value=false);
-					$value = $array ?: array();
+					$value = $array ?: array(
+					);
 				}
 			}
 			unset($value); // Unset this or you are looking for trouble !!!, because it is a reference and reusing it will overwrite the pointed variable !!!
 		}
 
-		// parameters shortcuts
+		// Parameters shortcuts
 		$module_method_oldname = $field->parameters->get('module-method', 1);
 		$module_method	= $field->parameters->get('module_method', $module_method_oldname );
 		$mymodule		= (int) $field->parameters->get('modules', 0);
@@ -129,9 +133,9 @@ class plgFlexicontent_fieldsFcloadmodule extends FCField
 		$mparams		= array('style'=>$style);
 
 
-		// *********************
-		// CASE: specific module
-		// *********************
+		/**
+		 * CASE: specific module
+		 */
 		if ($module_method == 1)
 		{
 			if ($mymodule == 0)
@@ -141,34 +145,43 @@ class plgFlexicontent_fieldsFcloadmodule extends FCField
 			}
 
 
-			// *****************
-			// Query module data
-			// *****************
-			$object  = $this->_getModuleObject($mymodule);
-			if ( empty($object) ) { $field->{$prop} = 'Selected module was not found, e.g. it was deleted'; return; }
+			/**
+			 * Query module data
+			 */
+			$object = $this->_getModuleObject($mymodule);
+
+			if (empty($object))
+			{
+				$field->{$prop} = 'Selected module was not found, e.g. it was deleted';
+				return;
+			}
 			//echo '<pre>'; print_r($object); echo '</pre>';
 
 
-			// *****************
-			// Get module object
-			// *****************
+			/**
+			 * Get module object
+			 */
 			$mod = JModuleHelper::getModule($object->module, $object->title);
-			//$mod = JModuleHelper::getModule(substr($object->module, 4), $object->title);
 			//echo '<pre>'; print_r($mod); echo '</pre>';
-			//echo '<pre>'; echo substr($object->module, 4) . ": ". $object->title; echo '</pre>';
+
+			// Check if module is not assigned to current menu item (not assigned to current page), and terminate
+			if (!$mod || empty($mod->id))
+			{
+				return;
+			}
 
 
-			// *****************************
-			// Set module parameter per item
-			// *****************************
+			/**
+			 * Set module parameter per item
+			 */
 			$mod_params	= $field->parameters->get( 'mod_params', '') ;
 			$mod_params	= preg_split("/[\s]*%%[\s]*/", $mod_params);
 			$mod_params = !empty($mod_params[0]) ? $mod_params : array();
 
 
-			// ***************************************************************************
-			// Apply per item configuration to the module (set module parameters per item)
-			// ***************************************************************************
+			/**
+			 * Apply per item configuration to the module (set module parameters per item)
+			 */
 			$value = reset($values);
 
 			$custom_mod_params = array();
@@ -187,18 +200,23 @@ class plgFlexicontent_fieldsFcloadmodule extends FCField
 			$mod->params = $_mod_params->toString();
 
 
-			// ************************
-			// Render the module's HTML
-			// ************************
+			/**
+			 * Render the module's HTML
+			 */
 			$display[] = $renderer->render($mod, $mparams);
 		}
 
 
-		// ************************************
-		// CASE: all modules in module position
-		// ************************************
-		else {
-			if (!$position) { $field->{$prop} = 'Error'; return; }
+		/**
+		 * CASE: all modules in module position
+		 */
+		else
+		{
+			if (!$position)
+			{
+				$field->{$prop} = 'Error';
+				return;
+			}
 			foreach (JModuleHelper::getModules($position) as $mod)
 			{
 				$display[] = $renderer->render($mod, $mparams);
@@ -216,7 +234,7 @@ class plgFlexicontent_fieldsFcloadmodule extends FCField
 	// ***
 
 	// Method to handle field's values before they are saved into the DB
-	function onBeforeSaveField( &$field, &$post, &$file, &$item )
+	public function onBeforeSaveField( &$field, &$post, &$file, &$item )
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 		if(!is_array($post) && !strlen($post)) return;
@@ -227,12 +245,12 @@ class plgFlexicontent_fieldsFcloadmodule extends FCField
 
 
 	// Method to take any actions/cleanups needed after field's values are saved into the DB
-	function onAfterSaveField( &$field, &$post, &$file, &$item ) {
+	public function onAfterSaveField( &$field, &$post, &$file, &$item ) {
 	}
 
 
 	// Method called just before the item is deleted to remove custom item data related to the field
-	function onBeforeDeleteField(&$field, &$item) {
+	public function onBeforeDeleteField(&$field, &$item) {
 	}
 
 
