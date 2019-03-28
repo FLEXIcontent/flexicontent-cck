@@ -313,7 +313,8 @@ if ($js)
 			<td class="col_title">
 				<!--div class="adminlist-table-row"></div-->
 				<?php
-					$activate_row = !empty($row->is_current_association) || empty($this->lang_assocs[$row->id]);
+					// Do not activate row selection link if doing associations and the record is in use
+					$activate_row = !$this->assocs_id || !empty($row->is_current_association) || empty($this->lang_assocs[$row->id]);
 
 					$parentcats_ids = isset($globalcats[$row->id]) ? $globalcats[$row->id]->ancestorsarray : array();
 					$pcpath = array();
