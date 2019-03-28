@@ -46,7 +46,7 @@ foreach ($values as $n => $value)
 	}
 
 	$field->{$prop}[] = $pretext.
-		'<a style="' . $style . '" ' . $attribs . ' class="fc_image_thumb" ' . $group_str . ' data-title="' . $title_attr . '" data-caption="' . $title_attr . '">
+		'<a style="' . $style . '" ' . $attribs . ' class="fc_image_thumb fancybox" ' . $group_str . ' data-title="' . $title_attr . '" data-caption="' . $title_attr . '">
 			' . $img_legend . '
 			' . $legend_icon . '
 		</a>'

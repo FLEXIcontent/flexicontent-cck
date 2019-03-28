@@ -1715,6 +1715,7 @@ class flexicontent_html
 							'closeEffect'	: 'elastic',
 							'openEasing'  : 'easeOutCubic',
 							'closeEasing' : 'easeInCubic',
+							'idleTime'    : 0
 						});
 					});
 				";
