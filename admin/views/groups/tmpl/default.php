@@ -236,19 +236,21 @@ if ($js)
 	<table id="adminListTableFC<?php echo $this->view; ?>" class="adminlist table fcmanlist" itemscope itemtype="http://schema.org/WebPage">
 	<thead>
 		<tr>
-			<th><?php echo JText::_( 'FLEXI_NUM' ); ?></th>
-			<th class="left">
-				<input type="checkbox" name="checkall-toggle" id="checkall-toggle" value="" title="<?php echo JText::_('JGLOBAL_CHECK_ALL'); ?>" onclick="Joomla.checkAll(this)" />
-				<label for="checkall-toggle" class="green single"></label>
+			<th class="col_num"><?php echo JText::_( 'FLEXI_NUM' ); ?></th>
+			<th class="col_cb left">
+				<div class="group-fcset">
+					<input type="checkbox" name="checkall-toggle" id="checkall-toggle" value="" title="<?php echo JText::_('JGLOBAL_CHECK_ALL'); ?>" onclick="Joomla.checkAll(this)" />
+					<label for="checkall-toggle" class="green single"></label>
+				</div>
 			</th>
 
-			<th class="hideOnDemandClass left">
+			<th class="col_title hideOnDemandClass left">
 				<?php echo JText::_('COM_USERS_HEADING_GROUP_TITLE'); ?>
 			</th>
-			<th class="hideOnDemandClass center" colspan="2">
+			<th class="col_usergrp hideOnDemandClass left">
 				<?php echo JText::_('COM_USERS_HEADING_USERS_IN_GROUP'); ?>
 			</th>
-			<th class="hideOnDemandClass">
+			<th class="col_id center hideOnDemandClass">
 				<?php echo JText::_('JGRID_HEADING_ID'); ?>
 			</th>
 		</tr>
@@ -265,15 +267,14 @@ if ($js)
 		$canChange	= $user->authorise('core.edit.state',	'com_users');
 	?>
 		<tr class="row<?php echo $i % 2; ?>">
-			<td>
+			<td class="col_num">
 				<?php echo $this->pagination->getRowOffset($i); ?>
 			</td>
-			<td>
+			<td class="col_cb">
 				<!--div class="adminlist-table-row"></div-->
-				<?php echo JHtml::_('grid.id', $i, $item->id); ?>
-				<label for="cb<?php echo $i; ?>" class="green single"></label>
+				<?php echo JHtml::_($hlpname . '.grid_id', $i, $item->id); ?>
 			</td>
-			<td>
+			<td class="col_title">
 				<?php echo str_repeat('<span class="gi">|&mdash;</span>', $item->level) ?>
 				<?php if ($canEdit) : ?>
 				<a href="<?php echo JRoute::_('index.php?option=com_flexicontent&task=group.edit&id='.$item->id);?>">
@@ -286,10 +287,8 @@ if ($js)
 					<?php echo JText::_('COM_USERS_DEBUG_GROUP');?></a></div></div></div>
 				<?php endif; ?>
 			</td>
-			<td class="right" style="padding:0px;">
+			<td class="col_usergrp left">
 				<?php echo '<span class="badge badge-info">'.$item->user_count.'</span>'; ?>
-			</td>
-			<td class="left">
 				<?php
 				if ($item->user_count) {
 					echo '
@@ -299,7 +298,7 @@ if ($js)
 				}
 				?>
 			</td>
-			<td class="center">
+			<td class="col_id center">
 				<?php echo (int) $item->id; ?>
 			</td>
 		</tr>
