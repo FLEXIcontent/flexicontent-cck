@@ -5967,13 +5967,20 @@ class ParentClassItem extends FCModelAdmin
 				}
 				else
 				{
-					$result = $this->tagsObserver->setNewTags($jtag_ids, $replaceTags);
-
-					if (!$result)
+					if (!FLEXI_J38GE && !$jtag_ids)
 					{
-						$this->setError($this->table->getError());
+						$this->table->tagsHelper->deleteTagData($this->table, $this->table->id);
+					}
+					else
+					{
+						$result = $this->tagsObserver->setNewTags($jtag_ids, $replaceTags);
 
-						return false;
+						if (!$result)
+						{
+							$this->setError($this->table->getError());
+
+							return false;
+						}
 					}
 				}
 				//$this->table->store();
@@ -6094,8 +6101,8 @@ class ParentClassItem extends FCModelAdmin
 		}
 
 		// We will use the tags table to store them
-		Table::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tags/tables');
-		$tagTable  = Table::getInstance('Tag', 'TagsTable');
+		JTable::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tags/tables');
+		$tagTable  = JTable::getInstance('Tag', 'TagsTable');
 		$canCreate = \JFactory::getUser()->authorise('core.create', 'com_tags');
 
 		foreach ($tags as $key => $tag)
@@ -6206,8 +6213,8 @@ class ParentClassItem extends FCModelAdmin
 		}
 
 		// We will use the tags table to store them
-		Table::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_flexicontent/tables');
-		$tagTable  = Table::getInstance('flexicontent_tags', '');
+		JTable::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_flexicontent/tables');
+		$tagTable  = JTable::getInstance('flexicontent_tags', '');
 		$canCreate = FlexicontentHelperPerm::getPerm()->CanTags;
 
 		foreach ($tags as $key => $tag)
