@@ -1144,7 +1144,7 @@ abstract class FCModelAdmin extends JModelAdmin
 	 */
 	public function initBatch()
 	{
-		if ($this->batchSet === null)
+		if ((FLEXI_J38GE && $this->batchSet === null) || (!FLEXI_J38GE && empty($this->batchSet)))
 		{
 			$this->batchSet = true;
 
@@ -1164,7 +1164,11 @@ abstract class FCModelAdmin extends JModelAdmin
 				?: $this->contentType->getTypeByAlias($this->type_alias);
 
 			// Get tabs observer
-			if (!FLEXI_J40GE)
+			if (!FLEXI_J38GE)
+			{
+				$this->tagsObserver = $this->table->getObserverOfClass('JTableObserverTags');
+			}
+			elseif (!FLEXI_J40GE)
 			{
 				$this->tagsObserver = $this->table->getObserverOfClass('Joomla\CMS\Table\Observer\Tags');
 			}
