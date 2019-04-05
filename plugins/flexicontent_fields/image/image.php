@@ -408,7 +408,7 @@ class plgFlexicontent_fieldsImage extends FCField
 				newField.find('.existingname').attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][existingname]');
 				newField.find('.existingname').attr('id', element_id + '_existingname');
 
-				newField.find('.fcimg_preview_msg').html(' ');
+				newField.find('.fcimg_preview_msg').html('');
 				newField.find('.fcimg_preview_msg').attr('name', element_id + '_fcimg_preview_msg');
 				newField.find('.fcimg_preview_msg').attr('id', element_id + '_fcimg_preview_msg');
 
@@ -760,9 +760,9 @@ class plgFlexicontent_fieldsImage extends FCField
 			else
 			{
 				$fcimg_preview_msg = '
-					<span class="fcimg_preview_msg" id="'.$elementid_n.'_fcimg_preview_msg" name="'.$elementid_n.'_fcimg_preview_msg" title="'.htmlspecialchars(($value['isURL'] ? $image_subpath : ''), ENT_COMPAT, 'UTF-8').'">' . (
+					<span class="fcimg_preview_msg" id="'.$elementid_n.'_fcimg_preview_msg" name="'.$elementid_n.'_fcimg_preview_msg" title="'.htmlspecialchars(($value['isURL'] ? $image_subpath : ''), ENT_COMPAT, 'UTF-8').'">'. (
 						$value['isURL'] ? JText::_('FLEXI_FIELD_MEDIA_URL') : $image_subpath
-					) . '</span>
+					) .'</span>
 				';
 			}
 
