@@ -408,7 +408,7 @@ class plgFlexicontent_fieldsImage extends FCField
 				newField.find('.existingname').attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][existingname]');
 				newField.find('.existingname').attr('id', element_id + '_existingname');
 
-				newField.find('.fcimg_preview_msg').html(' ');
+				newField.find('.fcimg_preview_msg').html('');
 				newField.find('.fcimg_preview_msg').attr('name', element_id + '_fcimg_preview_msg');
 				newField.find('.fcimg_preview_msg').attr('id', element_id + '_fcimg_preview_msg');
 
