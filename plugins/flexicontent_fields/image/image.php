@@ -760,7 +760,7 @@ class plgFlexicontent_fieldsImage extends FCField
 			else
 			{
 				$fcimg_preview_msg = '
-					<span class="fcimg_preview_msg" id="'.$elementid_n.'_fcimg_preview_msg" name="'.$elementid_n.'_fcimg_preview_msg" title="'.htmlspecialchars(($value['isURL'] ? $image_subpath : ''), ENT_COMPAT, 'UTF-8').'">'. (
+					<span class="fcimg_preview_msg" id="'.$elementid_n.'_fcimg_preview_msg" name="'.$elementid_n.'_fcimg_preview_msg" title="'.htmlspecialchars(($value['isURL'] ? $image_subpath : ''), ENT_COMPAT, 'UTF-8').'">' . (
 						$value['isURL'] ? JText::_('FLEXI_FIELD_MEDIA_URL') : $image_subpath
 					) . '</span>
 				';
