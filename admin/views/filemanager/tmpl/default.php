@@ -614,6 +614,7 @@ if ($js)
 	<!--
 	<div class="tabbertab" id="filelist_tab" data-icon-class="icon-list">
 		<h3 class="tabberheading hasTooltip" data-placement="bottom" title="<?php echo JText::_('FLEXI_FILES_REGISTRY_DESC'); ?>"> <?php echo JText::_('FLEXI_FILES_REGISTRY'); ?> </h3>
+
 	-->
 	<div class="<?php echo $show_addfiles ? 'span6 col-md-6' : ''; ?> fullwidth_1270" id="fc-fileman-fileslist-col" data-icon-class="icon-list">
 		<fieldset class="fc-formbox" id="fc-fileman-formbox-0">
@@ -806,12 +807,12 @@ if ($js)
 			<table id="adminListTableFC<?php echo $this->getModel()->view_id; ?>" class="adminlist table fcmanlist fman_list_element">
 			<thead>
     		<tr>
-					<th class="center hidden-phone"><?php echo JText::_( 'FLEXI_NUM' ); ?></th>
+					<th class="col_num hidden-phone"><?php echo JText::_( 'FLEXI_NUM' ); ?></th>
 
-					<th>&nbsp;</th>
+					<th class="col_cb left">&nbsp;</th>
 
-					<th class="center hideOnDemandClass"><?php echo JText::_( 'FLEXI_THUMB' ); ?></th>
-					<th class="left">
+					<th class="col_thumb hideOnDemandClass"><?php echo JText::_( 'FLEXI_THUMB' ); ?></th>
+					<th class="col_title left">
 						<?php if (!$this->folder_mode) : ?>
 							<?php echo JHtml::_('grid.sort', 'FLEXI_FILENAME', 'a.filename_displayed', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 							&nbsp; -- &nbsp;
@@ -822,57 +823,57 @@ if ($js)
 					</th>
 
 				<?php if (!empty($this->cols['state'])) : ?>
-					<th class="center hideOnDemandClass">
+					<th class="col_status center hideOnDemandClass">
 						<?php echo JHtml::_('grid.sort', 'FLEXI_PUBLISHED', 'a.published', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 					</th>
 				<?php endif; ?>
 				<?php if (!empty($this->cols['access'])) : ?>
-					<th class="center hideOnDemandClass hidden-phone">
+					<th class="col_access center hideOnDemandClass hidden-phone">
 						<?php echo JHtml::_('grid.sort', 'FLEXI_ACCESS', 'a.access', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 					</th>
 				<?php endif; ?>
 				<?php if (!empty($this->cols['lang'])) : ?>
-					<th class="center hideOnDemandClass hidden-phone">
+					<th class="col_lang center hideOnDemandClass hidden-phone">
 						<?php echo JHtml::_('grid.sort', 'FLEXI_LANGUAGE', 'a.language', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 					</th>
 				<?php endif; ?>
 
 				<?php if ($this->folder_mode) : ?>
-					<th class="center hideOnDemandClass"><?php echo JText::_('FLEXI_SIZE'); ?></th>
+					<th class="col_size center hideOnDemandClass"><?php echo JText::_('FLEXI_SIZE'); ?></th>
 				<?php else : ?>
-					<th class="center hideOnDemandClass"><?php echo JHtml::_('grid.sort', 'FLEXI_SIZE', 'a.size', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+					<th class="col_size center hideOnDemandClass"><?php echo JHtml::_('grid.sort', 'FLEXI_SIZE', 'a.size', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 				<?php endif; ?>
 
 				<?php if (!empty($this->cols['hits'])) : ?>
-					<th class="center hideOnDemandClass hidden-phone"><?php echo JHtml::_('grid.sort', 'FLEXI_HITS', 'a.hits', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+					<th class="col_hits center hideOnDemandClass hidden-phone"><?php echo JHtml::_('grid.sort', 'FLEXI_HITS', 'a.hits', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 				<?php endif; ?>
 
 				<?php if (!empty($this->cols['target'])) : ?>
-					<th class="center hideOnDemandClass hidden-phone"><?php echo $secure_folder_tip; ?><?php echo JHtml::_('grid.sort', 'FLEXI_URL_SECURE', 'a.secure', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+					<th class="col_secure center hideOnDemandClass hidden-phone"><?php echo $secure_folder_tip; ?><?php echo JHtml::_('grid.sort', 'FLEXI_URL_SECURE', 'a.secure', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 				<?php endif; ?>
 
 				<?php if (!empty($this->cols['stamp'])) : ?>
-					<th class="center hideOnDemandClass hidden-phone"><?php echo $stamp_folder_tip; ?><?php echo JHtml::_('grid.sort', 'FLEXI_DOWNLOAD_STAMPING', 'a.stamp', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+					<th class="col_stamp center hideOnDemandClass hidden-phone"><?php echo $stamp_folder_tip; ?><?php echo JHtml::_('grid.sort', 'FLEXI_DOWNLOAD_STAMPING', 'a.stamp', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 				<?php endif; ?>
 
 				<?php if (!empty($this->cols['usage'])) : ?>
-					<th class="left hideOnDemandClass hidden-phone" colspan="2"><?php echo JHtml::_('grid.sort', 'FLEXI_USAGE', 'a.assignments', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+					<th class="col_usage left hideOnDemandClass hidden-phone" colspan="2"><?php echo JHtml::_('grid.sort', 'FLEXI_USAGE', 'a.assignments', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 				<?php endif; ?>
 
 				<?php if (!$isFilesElement) : ?>
-					<th class="center hideOnDemandClass hidden-phone"><?php echo JText::_( 'FLEXI_FILE_NUM_ITEMS' ); ?> </th>
+					<th class="col_items_num center hideOnDemandClass hidden-phone"><?php echo JText::_( 'FLEXI_FILE_NUM_ITEMS' ); ?> </th>
 				<?php endif; ?>
 
 				<?php if (!empty($this->cols['uploader'])) : ?>
-					<th class="center hideOnDemandClass hidden-phone"><?php echo JHtml::_('grid.sort', 'FLEXI_UPLOADER', 'uploader', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+					<th class="col_uploader center hideOnDemandClass hidden-phone"><?php echo JHtml::_('grid.sort', 'FLEXI_UPLOADER', 'uploader', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 				<?php endif; ?>
 
 				<?php if (!empty($this->cols['upload_time'])) : ?>
-					<th class="center hideOnDemandClass hidden-phone hidden-tablet"><?php echo JHtml::_('grid.sort', 'FLEXI_UPLOAD_TIME', 'a.uploaded', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+					<th class="col_upload_time center hideOnDemandClass hidden-phone hidden-tablet"><?php echo JHtml::_('grid.sort', 'FLEXI_UPLOAD_TIME', 'a.uploaded', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 				<?php endif; ?>
 
 				<?php if (!empty($this->cols['file_id'])) : ?>
-					<th class="center hideOnDemandClass col_id hidden-phone hidden-tablet">
+					<th class="col_id center hideOnDemandClass col_id hidden-phone hidden-tablet">
 						<?php echo JHtml::_('grid.sort', 'FLEXI_ID', 'a.id', $this->lists['order_Dir'], $this->lists['order']); ?>
 					</th>
 				<?php endif; ?>
@@ -1030,11 +1031,11 @@ if ($js)
 					}
 					?>
 				<tr class="<?php echo 'row' . ($k % 2); ?>">
-					<td class="center hidden-phone">
+					<td class="col_num hidden-phone">
 						<?php echo $this->pagination->getRowOffset($i); ?>
 					</td>
 
-					<td class="center <?php echo ($file_is_selected ? ' is-pending-file' : ''); ?>">
+					<td class="col_cb <?php echo ($file_is_selected ? ' is-pending-file' : ''); ?>">
 						<!--div class="adminlist-table-row"></div-->
 						<?php echo JHtml::_($hlpname . '.grid_id', $i,
 							!$this->folder_mode ? $row->id : rawurlencode($filename),
@@ -1043,7 +1044,7 @@ if ($js)
 						?>
 					</td>
 
-					<td class="center">
+					<td class="col_thumb center">
 						<div class="fc-fileman-list-thumb-box thumb_<?php echo $thumb_size['fm-list'] ; ?>" onclick="fman_sync_cid(<?php echo $i; ?>, 0);">
 							<?php echo $thumb_or_icon; ?>
 						</div>
@@ -1097,13 +1098,13 @@ if ($js)
 					</td>
 
 				<?php if (!empty($this->cols['state'])) : ?>
-					<td class="center">
+					<td class="col_state center">
 						<?php echo JHtml::_('jgrid.published', $row->published, $i, $ctrl); ?>
 					</td>
 				<?php endif; ?>
 
 				<?php if (!empty($this->cols['access'])) : ?>
-					<td class="center hidden-phone">
+					<td class="col_access center hidden-phone">
 					<?php
 					echo $this->CanFiles && ($this->CanViewAllFiles || $user->id == $row->uploaded_by)
 						? flexicontent_html::userlevel('access[' . $row->id . ']', $row->access, 'onchange="return listItemTask(\'cb' . $i . '\',\'' . $ctrl . 'access\')"')
@@ -1115,7 +1116,7 @@ if ($js)
 				<?php $row->language = empty($row->language) ? '' : $row->language; /* Set language ALL when language is empty */ ?>
 
 				<?php if (!empty($this->cols['lang'])) : ?>
-					<td class="col_lang hidden-phone">
+					<td class="col_lang small center hidden-phone">
 						<?php
 							/**
 							 * Display language
@@ -1124,31 +1125,31 @@ if ($js)
 					</td>
 				<?php endif; ?>
 
-					<td class="center"><?php echo $row->size; ?></td>
+					<td class="col_size small center"><?php echo $row->size; ?></td>
 
 				<?php if (!empty($this->cols['hits'])) : ?>
-					<td class="center hidden-phone"><span class="badge"><?php echo empty($row->hits) ? 0 : $row->hits; ?></span></td>
+					<td class="col_hits center hidden-phone"><span class="badge badge-info"><?php echo empty($row->hits) ? 0 : $row->hits; ?></span></td>
 				<?php endif; ?>
 
 				<?php if (!empty($this->cols['target'])) : ?>
-					<td class="center hidden-phone"><?php echo $row->secure ? '<span class="badge badge-info">' . JText::_('FLEXI_YES') : '<span class="badge">' . JText::_('FLEXI_NO'); ?></span></td>
+					<td class="col_secure center hidden-phone"><?php echo $row->secure ? '<span class="badge badge-info">' . JText::_('FLEXI_YES') : '<span class="badge">' . JText::_('FLEXI_NO'); ?></span></td>
 				<?php endif; ?>
 
 				<?php if (!empty($this->cols['stamp'])) : ?>
-					<td class="center hidden-phone"><?php echo $row->stamp ? '<span class="badge badge-info">' . JText::_('FLEXI_YES') : '<span class="badge">' . JText::_('FLEXI_NO'); ?></span></td>
+					<td class="col_stamp center hidden-phone"><?php echo $row->stamp ? '<span class="badge badge-info">' . JText::_('FLEXI_YES') : '<span class="badge">' . JText::_('FLEXI_NO'); ?></span></td>
 				<?php endif; ?>
 
 				<?php if (!empty($this->cols['usage'])) : ?>
-					<td class="center hidden-phone">
+					<td class="col_usage center hidden-phone">
 						<span class="badge"><?php echo $row->assignments; ?></span>
 					</td>
-					<td class="center hidden-phone">
+					<td class="col_assigned small center hidden-phone">
 						<span class="nowrap_box"><?php echo $row->assigned; ?></span>
 					</td>
 				<?php endif; ?>
 
 				<?php if (!$isFilesElement) : ?>
-					<td class="center hidden-phone">
+					<td class="col_items_num center hidden-phone">
 						<?php echo '<a class="' . $this->btn_sm_class . '" href="'.$item_link.'" title="'.$view_entry.'">'.count($row->itemids).'</a>'; ?>
 					</td>
 				<?php endif; ?>
@@ -1166,14 +1167,14 @@ if ($js)
 				<?php endif; ?>
 
 				<?php if (!empty($this->cols['upload_time'])) : ?>
-					<td class="center hidden-phone hidden-tablet">
+					<td class="col_upload_time small center hidden-phone hidden-tablet">
 						<?php echo JHtml::Date( $row->uploaded, JText::_( 'DATE_FORMAT_LC3' )." H:i" ); ?>
 					</td>
 				<?php endif; ?>
 
 
 				<?php if (!empty($this->cols['file_id'])) : ?>
-					<td class="center col_id hidden-phone hidden-tablet">
+					<td class="col_id center hidden-phone hidden-tablet">
 						<?php echo $row->id; ?>
 					</td>
 				<?php endif; ?>
