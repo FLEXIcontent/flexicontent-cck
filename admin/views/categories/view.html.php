@@ -435,8 +435,8 @@ class FlexicontentViewCategories extends FlexicontentViewBaseRecords
 
 		$this->lists       = $lists;
 		$this->rows        = $rows;
-		$this->langs       = $langs;
 		$this->lang_assocs = $lang_assocs;
+		$this->langs       = $langs;
 		$this->pagination  = $pagination;
 		$this->orderingx   = $orderingx;
 
