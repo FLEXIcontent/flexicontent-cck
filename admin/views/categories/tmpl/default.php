@@ -306,7 +306,7 @@ if ($js)
 			</th>
 
 		<?php if ($useAssocs) : ?>
-			<th class="hideOnDemandClass <?php echo !$this->assocs_id ? 'hidden-phone hidden-tablet' : ''; ?>">
+			<th class="hideOnDemandClass hidden-phone hidden-tablet">
 				<?php echo JText::_('FLEXI_ASSOCIATIONS'); ?>
 			</th>
 		<?php endif; ?>
@@ -539,7 +539,7 @@ if ($js)
 
 
 			<?php if ($useAssocs) : ?>
-			<td class="<?php echo !$this->assocs_id ? 'hidden-phone hidden-tablet' : ''; ?>">
+			<td class="hidden-phone hidden-tablet">
 				<?php
 				if (!empty($this->lang_assocs[$row->id]))
 				{
