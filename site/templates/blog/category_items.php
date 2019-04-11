@@ -59,7 +59,7 @@ if (!empty($this->items) && ($this->params->get('lead_placement', 0)==1 || $this
 	$js = "
 		jQuery(document).ready(function(){
 	";
-	if ($this->params->get('lead_placement', 0)==1) {
+	if ($load_masonry_feat) {
 		$js .= "
 			var container_lead = document.querySelector('ul.leadingblock');
 			var msnry_lead;
@@ -71,7 +71,7 @@ if (!empty($this->items) && ($this->params->get('lead_placement', 0)==1 || $this
 			}
 		";
 	}
-	if ($this->params->get('intro_placement', 0)==1) {
+	if ($load_masonry_std) {
 		$js .= "
 			var container_intro = document.querySelector('ul.introblock');
 			var msnry_intro;
