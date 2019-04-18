@@ -47,6 +47,16 @@ if ( !isset(static::$js_added[$field->id][__FILE__]) )
 {
 	flexicontent_html::loadFramework('galleriffic');
 
+	//load options
+	$slideshow_delay = $field->parameters->get( $PPFX_ . 'slideshow_delay', '2500' );
+	$number_thumbs = $field->parameters->get( $PPFX_ . 'number_thumbs', '4' );
+	$preload_image = $field->parameters->get( $PPFX_ . 'preload_image', '10' );
+	$enable_top_pager = $field->parameters->get( $PPFX_ . 'emable_top_pager', 'true' );
+	$enable_bottom_pager = $field->parameters->get( $PPFX_ . 'emable_bottom_pager', 'true' );
+	$number_pages = $field->parameters->get( $PPFX_ . 'number_pages', '7' );
+	$auto_start = $field->parameters->get( $PPFX_ . 'auto_start', 'true' );
+	$transition_duration = $field->parameters->get( $PPFX_ . 'transition_duration', '900' );
+
 	$js = "
 	//document.write('<style>.noscript { display: none; }</style>');
 	jQuery(document).ready(function() {
@@ -67,28 +77,28 @@ if ( !isset(static::$js_added[$field->id][__FILE__]) )
 		// Initialize Advanced Galleriffic Gallery
 		jQuery('#gf_thumbs').galleriffic({
 			/*enableFancybox: true,*/
-			delay:                     2500,
-			numThumbs:                 4,
-			preloadAhead:              10,
-			enableTopPager:            true,
-			enableBottomPager:         true,
-			maxPagesToShow:            20,
+			delay:                     ".$slideshow_delay.",
+			numThumbs:                 ".$number_thumbs.",
+			preloadAhead:              ".$preload_image.",
+			enableTopPager:            ".$enable_top_pager.",
+			enableBottomPager:         ".$enable_bottom_pager.",
+			maxPagesToShow:            ".$number_pages.",
 			imageContainerSel:         '#gf_slideshow',
 			controlsContainerSel:      '#gf_controls',
 			captionContainerSel:       '#gf_caption',
 			loadingContainerSel:       '#gf_loading',
 			renderSSControls:          true,
 			renderNavControls:         true,
-			playLinkText:              'Play Slideshow',
-			pauseLinkText:             'Pause Slideshow',
-			prevLinkText:              '&lsaquo; Previous Photo',
-			nextLinkText:              'Next Photo &rsaquo;',
-			nextPageLinkText:          'Next &rsaquo;',
-			prevPageLinkText:          '&lsaquo; Prev',
+			playLinkText:              '". JText::_('FLEXI_FIELD_IMAGE_PLAY_SLIDESHOW') ."',
+			pauseLinkText:             '". JText::_('FLEXI_FIELD_IMAGE_PAUSE_SLIDESHOW') ."',
+			prevLinkText:              '". JText::_('FLEXI_FIELD_IMAGE_PREV_LINK') ."',
+			nextLinkText:              '". JText::_('FLEXI_FIELD_IMAGE_NEXT_LINK') ."',
+			nextPageLinkText:          '". JText::_('FLEXI_FIELD_IMAGE_NEXT_PAGE_LINK') ."',
+			prevPageLinkText:          '". JText::_('FLEXI_FIELD_IMAGE_PREV_PAGE_LINK') ."',
 			enableHistory:             false,
-			autoStart:                 false,
+			autoStart:                 ".$auto_start.",
 			syncTransitions:           true,
-			defaultTransitionDuration: 900,
+			defaultTransitionDuration: ".$transition_duration.",
 			onSlideChange:             function(prevIndex, nextIndex) {
 				// 'this' refers to the gallery, which is an extension of jQuery('#gf_thumbs')
 				this.find('ul.thumbs').children()
