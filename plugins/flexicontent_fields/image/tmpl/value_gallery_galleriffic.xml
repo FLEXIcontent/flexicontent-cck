@@ -10,13 +10,32 @@
 	<authorUrl>www.flexicontent.org</authorUrl>
 	<version>1.0</version>
 	<description>Flexicontent fields - Image field layout - Fancybox parameters</description>
-	
+
 	<fields name="attribs">
-		
+
 		<fieldset name="layout" addfieldpath="/administrator/components/com_flexicontent/elements">
-			<field name="" type="separator" level="level3" default="This layout does not have any layout-specific parameters (yet)" class="alert alert-info fcpadded" />
+			<field name="" type="separator" level="level3" default="" class="alert alert-info fcpadded" />
+
+			<field name="PPFX_auto_start" type="radio" default="false" abel="Auto start" description="Delay for auto transitioning to next image" class="btn-group btn-group-yesno" depend_class="slideshow_ops">
+				<option value="true">FLEXI_YES</option>
+				<option value="false">FLEXI_NO</option>
+			</field>
+			<field name="PPFX-transition_duration" type="number" default="900" label="Transition duration" description="Delay for auto transitioning to next image" depend_class="slideshow_ops" />
+			<field name="PPFX_slideshow_delay" type="text" default="2500" label="Autoplay delay" description="Delay for auto transitioning to next image" depend_class="slideshow_ops" />
+			<field name="PPFX_number_thumbs" type="number" default="4" label="Number of thumbs" description="Delay for auto transitioning to next image" depend_class="slideshow_ops" />
+			<field name="PPFX_preload_image" type="number" default="10" label="Number of preload image" description="Delay for auto transitioning to next image" depend_class="slideshow_ops" />
+			<field name="PPFX_enable_top_pager" type="radio" default="true" label="Enable top pager" description="Delay for auto transitioning to next image" class="btn-group btn-group-yesno" depend_class="slideshow_ops">
+				<option value="true">FLEXI_YES</option>
+				<option value="false">FLEXI_NO</option>
+			</field>
+			<field name="PPFX_enable_bottom_pager" type="radio" default="true" label="Enable bottom pager" description="Delay for auto transitioning to next image" class="btn-group btn-group-yesno" depend_class="slideshow_ops">
+				<option value="true">FLEXI_YES</option>
+				<option value="false">FLEXI_NO</option>
+			</field>
+			<field name="PPFX_number_pages" type="number" default="7" label="Number of page" description="Delay for auto transitioning to next image" depend_class="slideshow_ops" />
+
 		</fieldset>
 
 	</fields>
-	
+
 </form>
