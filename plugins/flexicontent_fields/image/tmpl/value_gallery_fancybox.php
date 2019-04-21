@@ -26,12 +26,12 @@ foreach ($values as $n => $value)
 	if (!empty($usemediaurl) && !empty($value['mediaurl']))
 	{
 		$attribs = 'href="' . $value['mediaurl'] . '"  ';
-		
+
 		// Video providers natively supported by this JS gallery
 		if (strpos($value['mediaurl'], 'youtube') !== false || strpos($value['mediaurl'], 'vimeo') !== false)
 		{
 			$style .= 'position: relative; display: inline-block;';
-			$legend_icon = '<div style="font-size: 48px; opacity: 0.8; background: white; position: absolute; right: 50%; bottom: calc(50% - 12px);"><div class="icon-video-2" style="color: font-size: 48px;"></div></div>';
+			$legend_icon = '<span class="fc-centered-icon-box"><span class="icon-video-2"></span></span>';
 		}
 
 		// Non video URL or a video provider not supported nativley by this JS gallery
