@@ -39,7 +39,7 @@ class modFlexiTagCloudHelper
 		$maxsize 	= (int)$params->get('max_size', '10');
 		$limit 		= (int)$params->get('count', '25');
 		$method		= (int)$params->get('method', '1');   // Category method
-		$method_types = (int)$params->get('method_type', '1');  // (current) Type method
+		$method_types = (int)$params->get('method_types', '1');  // (current) Type method
 		$cids = $params->get('categories');
 		$cids = is_array($cids)
 			? $cids
