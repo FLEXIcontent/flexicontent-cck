@@ -109,13 +109,13 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		// Add css files to the document <head> section (also load CSS joomla template override)
 		if (!$params->get('disablecss', ''))
 		{
-			$document->addStyleSheetVersion($this->baseurl.'/components/com_flexicontent/assets/css/flexicontent.css', FLEXI_VHASH);
-			$document->addStyleSheetVersion($this->baseurl.'/components/com_flexicontent/assets/css/flexi_filters.css', FLEXI_VHASH);
+			$document->addStyleSheet($this->baseurl.'/components/com_flexicontent/assets/css/flexicontent.css', array('version' => FLEXI_VHASH));
+			$document->addStyleSheet($this->baseurl.'/components/com_flexicontent/assets/css/flexi_filters.css', array('version' => FLEXI_VHASH));
 		}
 
 		if (file_exists(JPATH_SITE.DS.'templates'.DS.$app->getTemplate().DS.'css'.DS.'flexicontent.css'))
 		{
-			$document->addStyleSheetVersion($this->baseurl.'/templates/'.$app->getTemplate().'/css/flexicontent.css', FLEXI_VHASH);
+			$document->addStyleSheet($this->baseurl.'/templates/'.$app->getTemplate().'/css/flexicontent.css', array('version' => FLEXI_VHASH));
 		}
 
 

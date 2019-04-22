@@ -2697,9 +2697,9 @@ class modFlexicontentHelper
 		 */
 		flexicontent_html::loadframework('grapesjs_view');
 
-		JFactory::getDocument()->addStyleSheetVersion(
+		JFactory::getDocument()->addStyleSheet(
 			JUri::base(true) . $location . $css_file,
-			$params->get($layout_name . '_hash')
+			array('version' => $params->get($layout_name . '_hash'))
 		);
 	}
 }
