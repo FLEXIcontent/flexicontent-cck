@@ -253,7 +253,7 @@ class plgFlexicontent_fieldsWeblink extends FCField
 			JText::script("FLEXI_FIELD_WEBLINK_ENTER_MEDIA_URL_WARNING", true);
 			JText::script("FLEXI_FIELD_MEDIA_URL", true);
 			JText::script("FLEXI_ERROR", true);
-			$document->addScriptVersion(JUri::root(true) . '/plugins/flexicontent_fields/weblink/js/form.js', FLEXI_VHASH);
+			$document->addScript(JUri::root(true) . '/plugins/flexicontent_fields/weblink/js/form.js', array('version' => FLEXI_VHASH));
 		}
 
 

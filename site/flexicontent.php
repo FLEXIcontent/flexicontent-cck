@@ -309,7 +309,7 @@ if ($format === 'html')
 	}
 	
 	// Add flexi-lib JS
-	//JFactory::getDocument()->addScriptVersion( JUri::root(true).'/components/com_flexicontent/assets/js/flexi-lib.js', FLEXI_VHASH );  // Frontend/backend script
+	//JFactory::getDocument()->addScript( JUri::root(true).'/components/com_flexicontent/assets/js/flexi-lib.js', array('version' => FLEXI_VHASH));  // Frontend/backend script
 	
 	// Validate when Joomla.submitForm() is called, NOTE: for non-FC views this is done before the method is called
 	$js = '

@@ -1507,30 +1507,30 @@ class flexicontent_html
 				$ver = '3.5.4';
 				$framework_path = JUri::root(true).$lib_path.'/select2';
 				$framework_folder = JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'select2';
-				$document->addScriptVersion($framework_path.'/select2.min.js', $ver);
-				$document->addScriptVersion($framework_path.'/select2.sortable.js', $ver);
-				$document->addStyleSheetVersion($framework_path.'/select2.css', $ver);
+				$document->addScript($framework_path.'/select2.min.js', array('version' => $ver));
+				$document->addScript($framework_path.'/select2.sortable.js', array('version' => $ver));
+				$document->addStyleSheet($framework_path.'/select2.css', array('version' => $ver));
 
 				$lang_code = flexicontent_html::getUserCurrentLang();
 				if ( $lang_code && $lang_code!='en' )
 				{
 					// Try language shortcode
 					if ( file_exists($framework_folder.DS.'select2_locale_'.$lang_code.'.js') ) {
-						$document->addScriptVersion($framework_path.'/select2_locale_'.$lang_code.'.js', $ver);
+						$document->addScript($framework_path.'/select2_locale_'.$lang_code.'.js', array('version' => $ver));
 					}
 					// select2 JS 4.0.0+
 					/*if ( file_exists($framework_folder.DS.'select2'.DS.'i18n'.DS.$lang_code.'.js') ) {
-						$document->addScriptVersion($framework_path.'/select2/i18n/'.$lang_code.'.js', $ver);
+						$document->addScript($framework_path.'/select2/i18n/'.$lang_code.'.js', array('version' => $ver));
 					}*/
 					// Try country language code
 					else {
 						$country_code = flexicontent_html::getUserCurrentLang($short_tag=false);
 						if ( $country_code && file_exists($framework_folder.DS.'select2_locale_'.$country_code.'.js') ) {
-							$document->addScriptVersion($framework_path.'/select2_locale_'.$country_code.'.js', $ver);
+							$document->addScript($framework_path.'/select2_locale_'.$country_code.'.js', array('version' => $ver));
 						}
 						// select2 JS 4.0.0+
 						/*if ( $country_code && file_exists($framework_folder.DS.'select2'.DS.'i18n'.DS.$country_code.'.js') ) {
-							$document->addScriptVersion($framework_path.'/select2/i18n/'.$country_code.'.js', $ver);
+							$document->addScript($framework_path.'/select2/i18n/'.$country_code.'.js', array('version' => $ver));
 						}*/
 					}
 				}
@@ -1764,7 +1764,7 @@ class flexicontent_html
 
 				$document->addScript($framework_path.'/js/jquery.tmpl.min.js');
 				//$document->addScript($framework_path.'/js/jquery.easing.1.3.js');
-				$document->addScriptVersion(JUri::root(true).'/components/com_flexicontent/assets/js/jquery-easing.js', FLEXI_VHASH);
+				$document->addScript(JUri::root(true).'/components/com_flexicontent/assets/js/jquery-easing.js', array('version' => FLEXI_VHASH));
 
 				$document->addScript($framework_path.'/js/jquery.elastislide.js');
 				//$document->addScript($framework_path.'/js/gallery.js'); // replace with field specific: gallery_tmpl.js
@@ -1794,9 +1794,9 @@ class flexicontent_html
 				if ($load_jquery) flexicontent_html::loadJQuery();
 
 				$framework_path = JUri::root(true).$lib_path.'/fcxSlide';
-				$document->addScriptVersion($framework_path.'/class.fcxSlide.js', FLEXI_VHASH);
-				$document->addStyleSheetVersion($framework_path.'/fcxSlide.css', FLEXI_VHASH);
-				//$document->addScriptVersion($framework_path.'/class.fcxSlide.packed.js', FLEXI_VHASH);
+				$document->addScript($framework_path.'/class.fcxSlide.js', array('version' => FLEXI_VHASH));
+				$document->addStyleSheet($framework_path.'/fcxSlide.css', array('version' => FLEXI_VHASH));
+				//$document->addScript($framework_path.'/class.fcxSlide.packed.js', array('version' => FLEXI_VHASH));
 				break;
 
 			case 'imagesLoaded':
@@ -1913,8 +1913,8 @@ class flexicontent_html
 					$jcookie->set( 'fc_uid', $hashedUA, 0);
 				}
 
-				$document->addScriptVersion(JUri::root(true).'/components/com_flexicontent/assets/js/tmpl-common.js', FLEXI_VHASH);
-				$document->addScriptVersion(JUri::root(true).'/components/com_flexicontent/assets/js/jquery-easing.js', FLEXI_VHASH);
+				$document->addScript(JUri::root(true).'/components/com_flexicontent/assets/js/tmpl-common.js', array('version' => FLEXI_VHASH));
+				$document->addScript(JUri::root(true).'/components/com_flexicontent/assets/js/jquery-easing.js', array('version' => FLEXI_VHASH));
 				JText::script("FLEXI_APPLYING_FILTERING", true);
 				JText::script("FLEXI_TYPE_TO_LIST", true);
 				JText::script("FLEXI_TYPE_TO_FILTER", true);
@@ -1934,7 +1934,7 @@ class flexicontent_html
 
 				$js .= "";
 
-				$document->addScriptVersion(JUri::root(true).'/components/com_flexicontent/assets/js/flexi-lib.js', FLEXI_VHASH);
+				$document->addScript(JUri::root(true).'/components/com_flexicontent/assets/js/flexi-lib.js', array('version' => FLEXI_VHASH));
 				JText::script("FLEXI_NOT_AN_IMAGE_FILE", true);
 				JText::script('FLEXI_LOADING_IMAGES',true);
 				JText::script('FLEXI_THUMBNAILS',true);
@@ -1946,7 +1946,7 @@ class flexicontent_html
 			case 'flexi-lib-form':
 				if ($load_jquery) flexicontent_html::loadJQuery();
 
-				$document->addScriptVersion(JUri::root(true).'/components/com_flexicontent/assets/js/flexi-lib-form.js', FLEXI_VHASH);
+				$document->addScript(JUri::root(true).'/components/com_flexicontent/assets/js/flexi-lib-form.js', array('version' => FLEXI_VHASH));
 				JText::script("FLEXI_EDIT", true);
 				JText::script("FLEXI_ADD", true);
 				JText::script("FLEXI_NA", true);
@@ -2968,7 +2968,7 @@ class flexicontent_html
 			flexicontent_html::loadFramework('flexi_tmpl_common');
 
 			$doc = JFactory::getDocument();
-			$doc->addScriptVersion(JUri::root(true).'/components/com_flexicontent/assets/js/stateselector.js', FLEXI_VHASH);
+			$doc->addScript(JUri::root(true).'/components/com_flexicontent/assets/js/stateselector.js', array('version' => FLEXI_VHASH));
 			$js = '
 				var fc_statehandler_singleton = new fc_statehandler({
 					task: ' . json_encode($isAdmin ? $config->controller . '.setitemstate' : 'setitemstate') . ',
@@ -4074,8 +4074,8 @@ class flexicontent_html
 			flexicontent_html::loadFramework('flexi_tmpl_common');
 
 			$document = JFactory::getDocument();
-			$document->addStyleSheetVersion(JUri::root(true).'/components/com_flexicontent/assets/css/fcvote.css', FLEXI_VHASH);
-			$document->addScriptVersion(JUri::root(true).'/components/com_flexicontent/assets/js/fcvote.js', FLEXI_VHASH);
+			$document->addStyleSheet(JUri::root(true).'/components/com_flexicontent/assets/css/fcvote.css', array('version' => FLEXI_VHASH));
+			$document->addScript(JUri::root(true).'/components/com_flexicontent/assets/js/fcvote.js', array('version' => FLEXI_VHASH));
 
 			$image = $field->parameters->get( 'main_image', 'components/com_flexicontent/assets/images/star-medium.png' );
 			$img_path	= JUri::root(true).'/'.$image;

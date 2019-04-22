@@ -426,7 +426,7 @@ class plgFlexicontent_fieldsRelation extends FCField
 			JText::script('FLEXI_RIFLD_ERROR', false);
 			JText::script('FLEXI_RIFLD_NO_ITEMS', false);
 			JText::script('FLEXI_RIFLD_ADD_ITEM', false);
-			$document->addScriptVersion(JUri::root(true) . '/plugins/flexicontent_fields/relation/js/form.js', FLEXI_VHASH);
+			$document->addScript(JUri::root(true) . '/plugins/flexicontent_fields/relation/js/form.js', array('version' => FLEXI_VHASH));
 		}
 
 		$_classes = 'use_select2_lib fc_select2_no_check fc_select2_noselect' . ($required ? ' required' : '') . ($selected_items_sortable ? ' fc_select2_sortable' : '');
