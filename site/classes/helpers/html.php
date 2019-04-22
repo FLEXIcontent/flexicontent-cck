@@ -177,7 +177,7 @@ class flexicontent_html
 		// Get global include folders
 		if ($check_global) {
 			if ($less_folders===null) {
-				$JTEMPLATE_SITE = JPATH_SITE.'/templates/'.(!$app->isAdmin() ? $app->getTemplate() : JFactory::getDbo()->setQuery("SELECT template FROM #__template_styles WHERE client_id = 0 AND home = 1")->loadResult());
+				$JTEMPLATE_SITE = JPATH_SITE.'/templates/'.(!$app->isClient('administrator') ? $app->getTemplate() : JFactory::getDbo()->setQuery("SELECT template FROM #__template_styles WHERE client_id = 0 AND home = 1")->loadResult());
 				$less_folders = JComponentHelper::getParams('com_flexicontent')->get('less_folders', 'JPATH_COMPONENT_SITE/assets/less/ :: JTEMPLATE_SITE/less/com_flexicontent/ ::');
 				$_reps = array(
 					'JPATH_COMPONENT_SITE' => JPATH_SITE.DS.'components'.DS.'com_flexicontent', 'JPATH_COMPONENT_ADMINISTRATOR' => JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent',
@@ -313,7 +313,7 @@ class flexicontent_html
 			catch (Exception $e)
 			{
 				$error = true;
-				if ($debug || JFactory::getApplication()->isAdmin()) JFactory::getApplication()->enqueueMessage(
+				if ($debug || JFactory::getApplication()->isClient('administrator')) JFactory::getApplication()->enqueueMessage(
 					'- LESS to CSS halted ... CSS file was not changed ... please edit LESS file(s) find offending <b>lines</b> and fix or remove<br/>'. str_replace($path.$in, '<br/><b>'.$path.$in.'</b>', $e->getMessage()), 'notice'
 				);
 				continue;
@@ -1249,10 +1249,10 @@ class flexicontent_html
 			//$load_frameworks = $flexiparams->get('load_frameworks', array('jQuery','image-picker','masonry','select2','inputmask','prettyCheckable','fancybox'));
 			//$load_frameworks = FLEXIUtilities::paramToArray($load_frameworks);
 			//$load_frameworks = array_flip($load_frameworks);
-			//$load_jquery = isset($load_frameworks['jQuery']) || !$app->isSite();
-			if ( $load_jquery===null ) $load_jquery = $flexiparams->get('loadfw_jquery', 1)==1  ||  !$app->isSite();
+			//$load_jquery = isset($load_frameworks['jQuery']) || !$app->isClient('site');
+			if ( $load_jquery===null ) $load_jquery = $flexiparams->get('loadfw_jquery', 1)==1  ||  !$app->isClient('site');
 			$load_framework = $flexiparams->get( 'loadfw_'.strtolower(str_replace('-','_',$framework)), 1 );
-			$load_frameworks[$framework] = $load_framework==1  ||  ($load_framework==2 && !$app->isSite());
+			$load_frameworks[$framework] = $load_framework==1  ||  ($load_framework==2 && !$app->isClient('site'));
 		}
 
 		// Set loaded flag
@@ -2838,7 +2838,7 @@ class flexicontent_html
 		);
 
 		$user    = JFactory::getUser();
-		$isAdmin = JFactory::getApplication()->isAdmin();
+		$isAdmin = JFactory::getApplication()->isClient('administrator');
 		$isPrint = JFactory::getApplication()->input->getInt('print', 0);
 
 		// Check if state icon should not be shown (note: parameters are usually NULL in backend)
@@ -4950,7 +4950,7 @@ class flexicontent_html
 		static $loaded = array();
 		if (isset($loaded[$client])) return;
 
-		if (JFactory::getApplication()->isAdmin() && $client = 0) return;
+		if (JFactory::getApplication()->isClient('administrator') && $client = 0) return;
 
 		// Load english language file for 'com_flexicontent' and then override with current language file. Do not force a reload for either (not needed)
 		JFactory::getLanguage()->load('com_flexicontent', ($client ? JPATH_ADMINISTRATOR : JPATH_SITE), 'en-GB', $force_reload = false, $load_default = true);
@@ -5916,7 +5916,7 @@ class flexicontent_html
 
 		if (FLEXI_J40GE)
 		{
-			$isAdmin = JFactory::getApplication()->isAdmin();
+			$isAdmin = JFactory::getApplication()->isClient('administrator');
 
 			$router = Router::getInstance('site');
 			$url = $router->build($url);
@@ -5933,7 +5933,7 @@ class flexicontent_html
 		// Get frontend route instance if we are in the backend and SH404SEF is not installed
 		if ($site_router === null)
 		{
-			$isAdmin = JFactory::getApplication()->isAdmin();
+			$isAdmin = JFactory::getApplication()->isClient('administrator');
 			$isSH404SEF  = defined('SH404SEF_IS_RUNNING') && JFactory::getConfig()->get('sef');
 			// Do not merge the following 2 statements (site_instance, site_router), PHP 5.6 and lower cannot parse 2 consequent operators ::
 			$site_instance = $isAdmin && !$isSH404SEF

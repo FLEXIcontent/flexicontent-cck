@@ -75,7 +75,7 @@ class flexicontent_tmpl
 				$doc = @simplexml_load_file($tmplxml);
 				if (!$doc)
 				{
-					if (JFactory::getApplication()->isAdmin()) JFactory::getApplication()->enqueueMessage('Syntax error(s) in template XML file: '. $tmplxml, 'notice');
+					if (JFactory::getApplication()->isClient('administrator')) JFactory::getApplication()->enqueueMessage('Syntax error(s) in template XML file: '. $tmplxml, 'notice');
 					continue;
 				}
 				

@@ -44,7 +44,7 @@ class FCPagination extends JPagination
 	 */
 	function getResultsCounter()
 	{
-		if ( JFactory::getApplication()->isAdmin() )
+		if ( JFactory::getApplication()->isClient('administrator') )
 		{
 			return parent::getResultsCounter();
 		}
@@ -129,7 +129,7 @@ class FCPagination extends JPagination
 	 */
 	protected function _buildDataObject()
 	{
-		if (JFactory::getApplication()->isAdmin())
+		if (JFactory::getApplication()->isClient('administrator'))
 		{
 			return parent::_buildDataObject();
 		}
@@ -181,7 +181,7 @@ class FCPagination extends JPagination
 	 */
 	public function getLimitBox()
 	{
-		if (!JFactory::getApplication()->isAdmin())
+		if (!JFactory::getApplication()->isClient('administrator'))
 		{
 			return parent::getLimitBox();
 		}

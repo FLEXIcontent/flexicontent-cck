@@ -637,7 +637,7 @@ class plgSearchFlexiadvsearch extends JPlugin
 		// ***
 
 		$andlang = '';
-		if (	$app->isSite() &&
+		if (	$app->isClient('site') &&
 					( FLEXI_FISH || (FLEXI_J16GE && $app->getLanguageFilter()) ) &&
 					$filter_lang  // Language filtering enabled
 		) {

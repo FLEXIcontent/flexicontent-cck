@@ -61,7 +61,7 @@ class JFormFieldSeparator extends JFormFieldSpacer
 		// NOTE: this is imported by main Frontend/Backend CSS file, so import these only if it is not a flexicontent view
 		if ($option!='com_flexicontent')
 		{
-			$isAdmin = $app->isAdmin();
+			$isAdmin = $app->isClient('administrator');
 
 			if (!JFactory::getLanguage()->isRtl())
 			{

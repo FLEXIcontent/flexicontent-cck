@@ -24,7 +24,7 @@ $document = JFactory::getDocument();
 $cparams  = JComponentHelper::getParams('com_flexicontent');
 $ctrl     = 'tags.';
 $hlpname  = 'fctags';
-$isAdmin  = $app->isAdmin();
+$isAdmin  = $app->isClient('administrator');
 $useAssocs= flexicontent_db::useAssociations();
 
 

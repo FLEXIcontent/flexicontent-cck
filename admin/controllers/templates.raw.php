@@ -273,7 +273,7 @@ class FlexicontentControllerTemplates extends FlexicontentControllerBaseAdmin
 			</div>';
 		}
 
-		if (!$app->isAdmin())
+		if (!$app->isClient('administrator'))
 		{
 			JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, 'en-GB', true);
 			JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, true);

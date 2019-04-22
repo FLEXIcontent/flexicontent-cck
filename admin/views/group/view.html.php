@@ -48,7 +48,7 @@ class FlexicontentViewGroup extends FlexicontentViewBaseRecord
 		$task       = $jinput->get('task', '', 'cmd');
 		$controller = $jinput->get('controller', '', 'cmd');
 
-		$isAdmin  = $app->isAdmin();
+		$isAdmin  = $app->isClient('administrator');
 		$isCtmpl  = $jinput->getCmd('tmpl') === 'component';
 
 		$tip_class = ' hasTooltip';

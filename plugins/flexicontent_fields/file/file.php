@@ -755,7 +755,7 @@ class plgFlexicontent_fieldsFile extends FCField
 		// VERIFY downloads manager module is installed and enabled
 		static $mod_is_enabled = null;
 
-		if ($mod_is_enabled === null && $allowaddtocart && !JFactory::getApplication()->isAdmin())
+		if ($mod_is_enabled === null && $allowaddtocart && !JFactory::getApplication()->isClient('administrator'))
 		{
 			$db = JFactory::getDbo();
 			$query = "SELECT published FROM #__modules WHERE module = 'mod_flexidownloads' AND published = 1";

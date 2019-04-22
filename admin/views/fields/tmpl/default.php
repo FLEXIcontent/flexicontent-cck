@@ -24,7 +24,7 @@ $document = JFactory::getDocument();
 $cparams  = JComponentHelper::getParams('com_flexicontent');
 $ctrl     = 'fields.';
 $hlpname  = 'fcfields';
-$isAdmin  = $app->isAdmin();
+$isAdmin  = $app->isClient('administrator');
 $useAssocs= flexicontent_db::useAssociations();
 
 

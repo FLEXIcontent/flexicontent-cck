@@ -47,7 +47,7 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 		$layout   = $jinput->getString('layout', 'default');
 		$cid      = $jinput->get('cid', array(), 'array');
 
-		$isAdmin  = $app->isAdmin();
+		$isAdmin  = $app->isClient('administrator');
 		$isCtmpl  = $jinput->getCmd('tmpl') === 'component';
 
 		// Some flags & constants

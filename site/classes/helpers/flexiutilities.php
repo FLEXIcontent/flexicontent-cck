@@ -130,8 +130,8 @@ class FLEXIUtilities
 		// Calculate image paths
 		// *********************
 
-		$imgpath	= $app->isAdmin() ? '../images/':'images/';
-		$mediapath	= $app->isAdmin() ? '../media/mod_languages/images/' : 'media/mod_languages/images/';
+		$imgpath	= $app->isClient('administrator') ? '../images/':'images/';
+		$mediapath	= $app->isClient('administrator') ? '../media/mod_languages/images/' : 'media/mod_languages/images/';
 
 
 		// ************************

@@ -2280,7 +2280,7 @@ class FlexicontentFields
 
 			if (!$fieldid)
 			{
-				$value = JFactory::getApplication()->isAdmin()
+				$value = JFactory::getApplication()->isClient('administrator')
 					? 'Field with name: '.$fieldname.' not found'
 					: '';
 				$variable = str_replace($fulltxt, $value, $variable);
@@ -2337,7 +2337,7 @@ class FlexicontentFields
 
 			if (!isset($item->{$propname}))
 			{
-				$value = JFactory::getApplication()->isAdmin()
+				$value = JFactory::getApplication()->isClient('administrator')
 					? 'Item property with name: '.$propname.' not found'
 					: '';
 				$variable = str_replace($fulltxt, $value, $variable);
@@ -2866,7 +2866,7 @@ class FlexicontentFields
 							$pdf_indexing_aborted = true;
 							$indexed_pdfs[$abspath] = '';
 							$err_msg = '';
-							if (JFactory::getApplication()->isAdmin() && ($last_error = error_get_last()))
+							if (JFactory::getApplication()->isClient('administrator') && ($last_error = error_get_last()))
 							{
 								$err_msg .= implode(' ', error_get_last()) . ' <br/> ';
 								if (function_exists('error_clear_last')) error_clear_last();
@@ -2908,7 +2908,7 @@ class FlexicontentFields
 							$csv_indexing_aborted = true;
 							$indexed_csvs[$abspath] = '';
 							$err_msg = '';
-							if (JFactory::getApplication()->isAdmin() && ($last_error = error_get_last()))
+							if (JFactory::getApplication()->isClient('administrator') && ($last_error = error_get_last()))
 							{
 								$err_msg .= implode(' ', error_get_last()) . ' <br/> ';
 								if (function_exists('error_clear_last')) error_clear_last();
@@ -3867,7 +3867,7 @@ class FlexicontentFields
 			'isSearchView' => $isSearchView,
 		);
 
-		$layouts_path = $app->isSite() ? null : JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'layouts';
+		$layouts_path = $app->isClient('site') ? null : JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'layouts';
 
 		// *** Do not create any HTML just return empty string to indicate a filter that should be skipped
 		if ($hide_disabled_values && empty($results))
