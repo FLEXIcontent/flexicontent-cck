@@ -329,7 +329,7 @@ class plgFlexicontent_fieldsImage extends FCField
 			JText::script("FLEXI_FIELD_IMAGE_ENTER_MEDIA_URL", true);
 			JText::script("FLEXI_FIELD_MEDIA_URL", true);
 			JText::script("FLEXI_ERROR", true);
-			$document->addScriptVersion(JUri::root(true) . '/plugins/flexicontent_fields/image/js/form.js', FLEXI_VHASH);
+			$document->addScript(JUri::root(true) . '/plugins/flexicontent_fields/image/js/form.js', array('version' => FLEXI_VHASH));
 		}
 
 		$js = '

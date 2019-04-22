@@ -122,7 +122,7 @@ abstract class JHtmlFcuploader
 
 		JText::script("FLEXI_FILE_PROPERTIES", true);
 		JText::script("FLEXI_APPLYING_DOT", true);
-		JFactory::getDocument()->addScriptVersion(JUri::root(true).'/components/com_flexicontent/assets/js/plupload-extend.js', FLEXI_VHASH);
+		JFactory::getDocument()->addScript(JUri::root(true).'/components/com_flexicontent/assets/js/plupload-extend.js', array('version' => FLEXI_VHASH));
 
 		// Add plupload Queue handling functions and initialize a plupload Queue
 		$js = '

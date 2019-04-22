@@ -52,7 +52,7 @@ if (!$js_and_css_added)
 	flexicontent_html::loadFramework('flexi-lib');
 	flexicontent_html::loadFramework('bootstrap-toggle');
 
-	$document->addScriptVersion(JUri::root(true).'/components/com_flexicontent/assets/js/fcfav.js', FLEXI_VHASH);
+	$document->addScript(JUri::root(true).'/components/com_flexicontent/assets/js/fcfav.js', array('version' => FLEXI_VHASH));
 
 	JText::script('FLEXI_YOUR_BROWSER_DOES_NOT_SUPPORT_AJAX',true);
 	JText::script('FLEXI_LOADING',true);

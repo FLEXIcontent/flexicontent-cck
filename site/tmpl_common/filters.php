@@ -26,8 +26,8 @@ $fgInfo = FlexicontentFields::getFieldsPerGroup();
 
 // Prepare for filters inside TABs
 if ($filter_placement==3) {
-	$document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/tabber.css', FLEXI_VHASH);
-	$document->addScriptVersion(JUri::base(true).'/components/com_flexicontent/assets/js/tabber-minimized.js', FLEXI_VHASH);
+	$document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/tabber.css', array('version' => FLEXI_VHASH));
+	$document->addScript(JUri::base(true).'/components/com_flexicontent/assets/js/tabber-minimized.js', array('version' => FLEXI_VHASH));
 	$document->addScriptDeclaration(' document.write(\'<style type="text/css">.fctabber{display:none;}<\/style>\'); ');
 	static $_filter_TABsetCnt = null;
 	if ($_filter_TABsetCnt === null) $_filter_TABsCnt = -1;
@@ -81,7 +81,7 @@ elseif ($filter_instructions == 2)
 if ( $use_search || $use_filters ) : /* BOF search and filters block */
 	if (!$params->get('disablecss', ''))
 	{
-		$document->addStyleSheetVersion(JUri::root(true).'/components/com_flexicontent/assets/css/flexi_filters.css', FLEXI_VHASH);
+		$document->addStyleSheet(JUri::root(true).'/components/com_flexicontent/assets/css/flexi_filters.css', array('version' => FLEXI_VHASH));
 	}
 	$searchphrase_selector = flexicontent_html::searchphrase_selector($params, $form_name);
 ?>
