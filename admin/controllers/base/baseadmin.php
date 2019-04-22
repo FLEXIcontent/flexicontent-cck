@@ -467,7 +467,7 @@ class FlexicontentControllerBaseAdmin extends FlexicontentController
 		{
 			// REDIRECT CASE FOR APPLY / SAVE AS COPY: Save and reload the edit form
 			case 'apply':
-				if ($app->isAdmin())
+				if ($app->isClient('administrator'))
 				{
 					$link = 'index.php?option=com_flexicontent&' . $ctrl_task . 'edit&view=' . $this->record_name . '&id=' . (int) $model->get('id');
 				}
@@ -480,7 +480,7 @@ class FlexicontentControllerBaseAdmin extends FlexicontentController
 
 			// REDIRECT CASE FOR SAVE and NEW: Save and load new record form
 			case 'save2new':
-				if ($app->isAdmin())
+				if ($app->isClient('administrator'))
 				{
 					$link = 'index.php?option=com_flexicontent&view=' . $this->record_name
 						. '';
@@ -495,7 +495,7 @@ class FlexicontentControllerBaseAdmin extends FlexicontentController
 
 			// REDIRECT CASES FOR SAVING
 			default:
-				if ($app->isAdmin())
+				if ($app->isClient('administrator'))
 				{
 					$link = $this->returnURL;
 				}
@@ -872,7 +872,7 @@ class FlexicontentControllerBaseAdmin extends FlexicontentController
 		// Get/Create the view
 		$viewType   = $document->getType();
 		$viewName   = $this->input->get('view', $this->default_view, 'cmd');
-		$viewLayout = $this->input->get('layout', $app->isAdmin() ? 'default' : 'form', 'string');
+		$viewLayout = $this->input->get('layout', $app->isClient('administrator') ? 'default' : 'form', 'string');
 		$view = $this->getView($viewName, $viewType, '', array('base_path' => $this->basePath, 'layout' => $viewLayout));
 
 		// Get/Create the model
@@ -1146,13 +1146,13 @@ class FlexicontentControllerBaseAdmin extends FlexicontentController
 		{
 			$app = JFactory::getApplication();
 
-			if ($app->isAdmin() && ($this->view === $this->record_name || $this->view === $this->record_name_pl))
+			if ($app->isClient('administrator') && ($this->view === $this->record_name || $this->view === $this->record_name_pl))
 			{
 				$return = 'index.php?option=com_flexicontent&view=' . $this->record_name_pl;
 			}
 			else
 			{
-				$return = null; //$app->isAdmin() ? 'index.php?option=com_flexicontent' : JUri::base();
+				$return = null; //$app->isClient('administrator') ? 'index.php?option=com_flexicontent' : JUri::base();
 			}
 		}
 

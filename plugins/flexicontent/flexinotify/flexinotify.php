@@ -221,7 +221,7 @@ class plgFlexicontentFlexinotify extends JPlugin
 			. ($sef_lang ? '&lang=' . $sef_lang : '');
 
 		// Create the SEF URL
-		$item_url = $app->isAdmin()
+		$item_url = $app->isClient('administrator')
 			? flexicontent_html::getSefUrl($item_url)   // ..., $_xhtml= true, $_ssl=-1);
 			: JRoute::_($item_url);  // ..., $_xhtml= true, $_ssl=-1);
 

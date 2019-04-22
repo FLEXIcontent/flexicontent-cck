@@ -126,7 +126,7 @@ class FlexicontentController extends JControllerLegacy
 		$session = JFactory::getSession();
 		$perms   = FlexicontentHelperPerm::getPerm();
 
-		$ctrl_task = $app->isSite()
+		$ctrl_task = $app->isClient('site')
 			? 'task='
 			: 'task=' . $this->record_name_pl . '.';
 		$original_task = $this->task;
@@ -212,7 +212,7 @@ class FlexicontentController extends JControllerLegacy
 		$params->merge($model_params);
 
 		// For frontend merge the active menu parameters
-		if ($app->isSite())
+		if ($app->isClient('site'))
 		{
 			$menu = $app->getMenu()->getActive();
 
@@ -286,7 +286,7 @@ class FlexicontentController extends JControllerLegacy
 		 */
 
 		// No permission to change tags or tags were not displayed
-		$tags_shown = $app->isAdmin()
+		$tags_shown = $app->isClient('administrator')
 			? 1
 			: (int) $params->get('usetags_fe', 1) === 1;
 
@@ -345,7 +345,7 @@ class FlexicontentController extends JControllerLegacy
 		 */
 
 		// (FE) No category override active, and no secondary cats were submitted
-		$cid_not_submitted = $app->isAdmin() ? true : !$overridecatperms && empty($data['cid']);
+		$cid_not_submitted = $app->isClient('administrator') ? true : !$overridecatperms && empty($data['cid']);
 
 		if (!$enable_cid_selector && $cid_not_submitted)
 		{
@@ -387,7 +387,7 @@ class FlexicontentController extends JControllerLegacy
 		 */
 
 		// (FE) No category override active, and no main category was submitted
-		$catid_not_submitted = $app->isAdmin() ? true : !$overridecatperms && empty($data['catid']);
+		$catid_not_submitted = $app->isClient('administrator') ? true : !$overridecatperms && empty($data['catid']);
 
 		if (!$enable_catid_selector && $catid_not_submitted)
 		{
@@ -423,7 +423,7 @@ class FlexicontentController extends JControllerLegacy
 		/**
 		 * Check custom-injected (non-JForm field) (frontend) captcha field
 		 */
-		if ($app->isSite())
+		if ($app->isClient('site'))
 		{
 			$use_captcha    = $params->get('use_captcha', 1);     // 1 for guests, 2 for any user
 			$captcha_formop = $params->get('captcha_formop', 0);  // 0 for submit, 1 for submit/edit (aka always)
@@ -540,7 +540,7 @@ class FlexicontentController extends JControllerLegacy
 
 		// Assign template parameters of the select ilayout as an sub-array (the DB model will handle the merging of parameters)
 		// Always be set in backend, but usually not in frontend, if frontend template editing is not shown
-		if ($app->isAdmin())
+		if ($app->isClient('administrator'))
 		{
 			$ilayout = $data['attribs']['ilayout'];
 		}
@@ -606,7 +606,7 @@ class FlexicontentController extends JControllerLegacy
 		}
 
 		// Special CASEs of overriding CREATE ACL in FrontEnd via menu item
-		elseif ($app->isSite())
+		elseif ($app->isClient('site'))
 		{
 			// Allow creating via submit menu OVERRIDE
 			if ($allowunauthorize)
@@ -1033,7 +1033,7 @@ class FlexicontentController extends JControllerLegacy
 			// REDIRECT CASE FOR APPLY / SAVE AS COPY: Save and reload the edit form
 			case 'apply':
 			case 'apply_type':
-				if ($app->isAdmin())
+				if ($app->isClient('administrator'))
 				{
 					$link = 'index.php?option=com_flexicontent&' . $ctrl_task . 'edit&view=' . $this->record_name . '&id=' . (int) $model->get('id');
 				}
@@ -1052,7 +1052,7 @@ class FlexicontentController extends JControllerLegacy
 
 			// REDIRECT CASE FOR SAVE and NEW: Save and load new record form
 			case 'save2new':
-				if ($app->isAdmin())
+				if ($app->isClient('administrator'))
 				{
 					$link = 'index.php?option=com_flexicontent&view=' . $this->record_name
 						. '&typeid=' . $model->get('type_id')
@@ -1071,7 +1071,7 @@ class FlexicontentController extends JControllerLegacy
 
 			// REDIRECT CASES FOR SAVING
 			default:
-				if ($app->isAdmin())
+				if ($app->isClient('administrator'))
 				{
 					$link = $this->returnURL;
 				}
@@ -1359,7 +1359,7 @@ class FlexicontentController extends JControllerLegacy
 		// Get/Create the view
 		$viewType   = $document->getType();
 		$viewName   = $this->input->get('view', $this->default_view, 'cmd');
-		$viewLayout = $this->input->get('layout', $app->isAdmin() ? 'default' : 'form', 'string');
+		$viewLayout = $this->input->get('layout', $app->isClient('administrator') ? 'default' : 'form', 'string');
 		$view = $this->getView($viewName, $viewType, '', array('base_path' => $this->basePath, 'layout' => $viewLayout));
 
 		// Get/Create the model
@@ -3340,13 +3340,13 @@ class FlexicontentController extends JControllerLegacy
 		{
 			$app = JFactory::getApplication();
 
-			if ($app->isAdmin() && ($this->view === $this->record_name || $this->view === $this->record_name_pl))
+			if ($app->isClient('administrator') && ($this->view === $this->record_name || $this->view === $this->record_name_pl))
 			{
 				$return = 'index.php?option=com_flexicontent&view=' . $this->record_name_pl;
 			}
 			else
 			{
-				$return = null; //$app->isAdmin() ? 'index.php?option=com_flexicontent' : JUri::base();
+				$return = null; //$app->isClient('administrator') ? 'index.php?option=com_flexicontent' : JUri::base();
 			}
 		}
 

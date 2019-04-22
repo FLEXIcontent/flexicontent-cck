@@ -51,7 +51,7 @@ class FLEXIcontentViewSearch extends FlexicontentViewBaseRecords
 			return parent::display($tpl);
 		}
 
-		$isAdmin  = $app->isAdmin();
+		$isAdmin  = $app->isClient('administrator');
 		$isCtmpl  = $jinput->getCmd('tmpl') === 'component';
 
 		// Some flags & constants

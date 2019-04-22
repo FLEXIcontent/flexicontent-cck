@@ -48,7 +48,7 @@ class FlexicontentViewFccategoryelement extends FlexicontentViewBaseRecords
 		$layout   = $jinput->getString('layout', 'default');
 		$assocs_id= $jinput->getInt('assocs_id', 0);
 
-		$isAdmin  = $app->isAdmin();
+		$isAdmin  = $app->isClient('administrator');
 		$isCtmpl  = $jinput->getCmd('tmpl') === 'component';
 
 		// Some flags & constants

@@ -602,7 +602,7 @@ class plgFlexicontent_fieldsRelation extends FCField
 			$option = $app->input->get('option', '', 'cmd');
 			$realview = $app->input->get('view', 'item', 'cmd');
 			$view = $app->input->get('flexi_callview', $realview, 'cmd');
-			$isItemsManager = $app->isAdmin() && $realview=='items' && $option=='com_flexicontent';
+			$isItemsManager = $app->isClient('administrator') && $realview=='items' && $option=='com_flexicontent';
 
 			$total_in_view = $field->parameters->get('total_in_view', array('backend'));
 			$total_in_view = FLEXIUtilities::paramToArray($total_in_view);

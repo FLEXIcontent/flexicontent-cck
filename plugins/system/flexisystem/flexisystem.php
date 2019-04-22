@@ -39,7 +39,7 @@ class plgSystemFlexisystem extends JPlugin
 
 		if (!$language_loaded)
 		{
-			JFactory::getApplication()->isAdmin()
+			JFactory::getApplication()->isClient('administrator')
 				? JPlugin::loadLanguage('plg_system_flexisystem_common_be', JPATH_ADMINISTRATOR)
 				: JPlugin::loadLanguage('plg_system_flexisystem_common_fe', JPATH_ADMINISTRATOR);
 		}
@@ -71,7 +71,7 @@ class plgSystemFlexisystem extends JPlugin
 	 */
 	function onAfterInitialise()
 	{
-		if (JFactory::getApplication()->isAdmin()) $this->handleSerialized();
+		if (JFactory::getApplication()->isClient('administrator')) $this->handleSerialized();
 
 		$app  = JFactory::getApplication();
 		$task = $app->input->get('task', '', 'string');  // NOTE during this event 'task' is (controller.task), thus we use filtering 'string'
@@ -260,7 +260,7 @@ class plgSystemFlexisystem extends JPlugin
 		$task   = $app->input->get('task', '', 'string');  // NOTE during this event 'task' is (controller.task), thus we use filtering 'string'
 
 		$fcdebug = $this->cparams->get('print_logging_info')==2  ?  2  :  $session->get('fcdebug', 0, 'flexicontent');
-		$isAdmin = JFactory::getApplication()->isAdmin();
+		$isAdmin = JFactory::getApplication()->isClient('administrator');
 
 		$isFC_Config = $isAdmin ? ($option=='com_config' && ($view == 'component' || $controller='component') && $component == 'com_flexicontent')  :  false;
 		$isBE_Module_Edit = $isAdmin ? (($option=='com_modules' || $option=='com_advancedmodules') && $view == 'module')  :  false;
@@ -323,13 +323,13 @@ class plgSystemFlexisystem extends JPlugin
 
 
 		// Detect resolution we will do this regardless of ... using mobile layouts
-		if ($this->cparams->get('use_mobile_layouts') || $app->isAdmin())
+		if ($this->cparams->get('use_mobile_layouts') || $app->isClient('administrator'))
 		{
 			$this->detectClientResolution($this->cparams);
 		}
 
 		// Redirect backend article / category management, and frontend article view
-		$app->isAdmin()
+		$app->isClient('administrator')
 			? $this->redirectAdminComContent()
 			: $this->redirectSiteComContent();
 	}
@@ -1030,7 +1030,7 @@ class plgSystemFlexisystem extends JPlugin
 		$session = JFactory::getSession();
 		$format  = $app->input->getCmd('format', 'html');
 
-		if ($app->isSite() && $format === 'html')
+		if ($app->isClient('site') && $format === 'html')
 		{
 			// Count an item or category hit if appropriate
 			$this->countHit();
@@ -1143,7 +1143,7 @@ class plgSystemFlexisystem extends JPlugin
 		$app = JFactory::getApplication();
 		$format = $app->input->get('format', 'html', 'cmd');
 
-		if (!$app->isAdmin() || !JFactory::getUser()->id || $format !== 'html')
+		if (!$app->isClient('administrator') || !JFactory::getUser()->id || $format !== 'html')
 		{
 			return;
 		}

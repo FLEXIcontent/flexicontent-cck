@@ -1,6 +1,6 @@
 <?php
 use Joomla\String\StringHelper;
-$isAdmin = JFactory::getApplication()->isAdmin();
+$isAdmin = JFactory::getApplication()->isClient('administrator');
 
 // Important create a -1 "value", before any other normal values, so that it is at 1st position of the array
 $field->{$prop}[-1] = '';

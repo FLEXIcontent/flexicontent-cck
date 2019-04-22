@@ -89,7 +89,7 @@ if (!$FC_sh404sef_init)
 
 	// Include FC constants file
 	require_once (JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'defineconstants.php');
-	$IS_FISH_SITE = FLEXI_FISH && $app->isSite();
+	$IS_FISH_SITE = FLEXI_FISH && $app->isClient('site');
 
 	// Make sure that the global FC vars are arrays
 	global $fc_list_items;
