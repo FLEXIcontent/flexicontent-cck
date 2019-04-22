@@ -281,7 +281,11 @@ class plgSystemFlexisystem extends JPlugin
 			if ($isFC_Config)
 			{
 				// Make sure chosen JS file is loaded before our code, but do not attach it to any elements (YET)
-				JHtml::_('formbehavior.chosen', '#_some_iiidddd_');
+				if (!FLEXI_J40GE)
+				{
+					// Do not run this in J4 , JDocument not yet available, but chosen JS was replaced
+					JHtml::_('formbehavior.chosen', '#_some_iiidddd_');
+				}
 				//$js .= "\n"."jQuery.fn.chosen = function(){};"."\n";  // Suppress chosen function completely, (commented out ... we will allow it)
 			}
 
