@@ -181,7 +181,7 @@ class ParentClassItem extends FCModelAdmin
 	 */
 	public function __construct($config = array())
 	{
-		if (JFactory::getApplication()->isSite())
+		if (JFactory::getApplication()->isClient('site'))
 		{
 			$this->record_keys = array('id');
 		}
@@ -375,7 +375,7 @@ class ParentClassItem extends FCModelAdmin
 		$jinput  = $app->input;
 
 		// View access done is meant only for FRONTEND !!! ... force it to false
-		if ($app->isAdmin())
+		if ($app->isClient('administrator'))
 		{
 			$check_view_access = false;
 		}
@@ -574,7 +574,7 @@ class ParentClassItem extends FCModelAdmin
 		if ($version && $version != $current_version  && $task=='edit' && $option=='com_flexicontent' && !$unapproved_version_notice)
 		{
 			$unapproved_version_notice = 1;
-			if (!$app->isAdmin())
+			if (!$app->isClient('administrator'))
 			{
 				$message = (object) array('type'=>'notice', 'showAfterLoad'=>true, 'text'=>
 					JText::_('FLEXI_LOADING_UNAPPROVED_VERSION_NOTICE')
@@ -611,7 +611,7 @@ class ParentClassItem extends FCModelAdmin
 			// ***
 			// *** Item Retrieval BACKEND
 			// ***
-			if ( $app->isAdmin() )
+			if ( $app->isClient('administrator') )
 			{
 				$item   = $this->getTable();
 				$result = $item->load($pk);  // try loading existing item data
@@ -1137,7 +1137,7 @@ class ParentClassItem extends FCModelAdmin
 		// Modify the form based on Edit State access controls.
 		if (!$autoPublished && !$canEditState)
 		{
-			$frontend_new = $isNew && $app->isSite();
+			$frontend_new = $isNew && $app->isClient('site');
 
 			/* Allow 'publish_up' & 'publish_down' only for NEW items
 			 * These will either be overriden on item creation (via menu override)
@@ -1173,7 +1173,7 @@ class ParentClassItem extends FCModelAdmin
 
 
 		// (no edit state ACL or is frontend) disable & filter fields 'featured' & 'ordering' fields
-		if (!$app->isAdmin() || !$canEditState)
+		if (!$app->isClient('administrator') || !$canEditState)
 		{
 			$form->setFieldAttribute('featured', 'disabled', 'true');
 			$form->setFieldAttribute('ordering', 'disabled', 'true');
@@ -1207,7 +1207,7 @@ class ParentClassItem extends FCModelAdmin
 		// Check if item has languages associations, and disable changing category and language in frontend
 		/*$useAssocs = $this->useAssociations();
 
-		if (!$isNew && $app->isSite() && $useAssocs)
+		if (!$isNew && $app->isClient('site') && $useAssocs)
 		{
 			$associations = JLanguageAssociations::getAssociations('com_content', '#__content', 'com_content.item', $id);
 
@@ -1667,13 +1667,13 @@ class ParentClassItem extends FCModelAdmin
 
 		// Default -- Publication state.
 		// -- NOTE: this will only be used if user has publish privilege, otherwise items will be forced to (a) pending_approval state for NEW ITEMS and (b) to item's current state for EXISTING ITEMS
-		$default_state = $app->isAdmin()
+		$default_state = $app->isClient('administrator')
 			? $this->_cparams->get('new_item_state', $pubished_state = 1)      // Use the configured setting for backend items
 			: $this->_cparams->get('new_item_state_fe', $pubished_state = 1);  // Use the configured setting for frontend items
 
 		// Default -- Language
 		// -- NOTE: There are language limitations per user / usergroup that may override the defaults ...
-		$default_lang = $app->isSite()
+		$default_lang = $app->isClient('site')
 			? $this->_cparams->get('default_language_fe', '_author_lang_')
 			: '*';   // or Site default:  // flexicontent_html::getSiteDefaultLang()  // JComponentHelper::getParams('com_languages')->get('site', '*')
 		$default_lang = $default_lang === '_author_lang_'
@@ -1834,7 +1834,7 @@ class ParentClassItem extends FCModelAdmin
 			else $jm_state = $fc_state;                                      // trashed & archive states
 
 			// Frontend SECURITY concern: ONLY allow to set item type for new items !!! ... or for items without type ?!
-			if (!$app->isAdmin() && $item->type_id && ($option === 'com_flexicontent' || $item->version > 1))
+			if (!$app->isClient('administrator') && $item->type_id && ($option === 'com_flexicontent' || $item->version > 1))
 			{
 				unset($data['type_id']);
 			}
@@ -1950,7 +1950,7 @@ class ParentClassItem extends FCModelAdmin
 			 * Retrieve submit configuration for new items in frontend
 			 */
 
-			if ($app->isSite() && $isNew && !empty($data['submit_conf']))
+			if ($app->isClient('site') && $isNew && !empty($data['submit_conf']))
 			{
 				$h = $data['submit_conf'];
 				$session = JFactory::getSession();
@@ -2086,7 +2086,7 @@ class ParentClassItem extends FCModelAdmin
 			$item->catid      = $old_catid;
 
 			// If cannot edit state or is frontend, then prevent user from changing 'featured' & 'ordering'
-			if (!$canEditState || $app->isSite())
+			if (!$canEditState || $app->isClient('site'))
 			{
 				unset($data['featured']);
 				unset($data['ordering']);
@@ -2148,7 +2148,7 @@ class ParentClassItem extends FCModelAdmin
 				// The preselected forced state of -NEW- items for users that CANNOT publish, and autopublish via menu item is disabled
 				else
 				{
-					$data['state'] = $app->isAdmin()
+					$data['state'] = $app->isClient('administrator')
 						? $cparams->get('non_publishers_item_state', $draft_state)  // Use the configured setting for backend items
 						: $cparams->get('non_publishers_item_state_fe', $pending_approval_state);  // Use the configured setting for frontend items
 				}
@@ -2174,7 +2174,7 @@ class ParentClassItem extends FCModelAdmin
 				if ($isNew) return false;
 			}
 
-			if ($app->isSite() && !in_array($cparams->get('uselang_fe', 1), array(1,3)) && isset($data['language']))
+			if ($app->isClient('site') && !in_array($cparams->get('uselang_fe', 1), array(1,3)) && isset($data['language']))
 			{
 				$app->enqueueMessage('You are not allowed to set language to this content items', 'warning');
 				unset($data['language']);
@@ -2278,7 +2278,7 @@ class ParentClassItem extends FCModelAdmin
 
 		// Auto assign the default language if not set, (security of allowing language usage and of language in user's allowed languages was checked above)
 		$item->language = $item->language ?:
-			($app->isSite()
+			($app->isClient('site')
 				? $cparams->get('default_language_fe', '_author_lang_')
 				: '*'   // or Site default:  // flexicontent_html::getSiteDefaultLang()  // JComponentHelper::getParams('com_languages')->get('site', '*')
 			);
@@ -2551,12 +2551,12 @@ class ParentClassItem extends FCModelAdmin
 
 		if ( !$version_approved )
 		{
-			if ( $app->isAdmin() || $cparams->get('approval_warning_aftersubmit_fe', 1) )
+			if ( $app->isClient('administrator') || $cparams->get('approval_warning_aftersubmit_fe', 1) )
 			{
 				// Warn editor that his/her changes will need approval to before becoming active / visible
 				$canEditState
-					? JFactory::getApplication()->enqueueMessage(JText::_('FLEXI_SAVED_VERSION_WAS_NOT_APPROVED_NOTICE'.($app->isAdmin() ? '_ADMIN' : '')), 'notice')
-					: JFactory::getApplication()->enqueueMessage(JText::_('FLEXI_SAVED_VERSION_MUST_BE_APPROVED_NOTICE'.($app->isAdmin() ? '_ADMIN' : '')), 'notice');
+					? JFactory::getApplication()->enqueueMessage(JText::_('FLEXI_SAVED_VERSION_WAS_NOT_APPROVED_NOTICE'.($app->isClient('administrator') ? '_ADMIN' : '')), 'notice')
+					: JFactory::getApplication()->enqueueMessage(JText::_('FLEXI_SAVED_VERSION_MUST_BE_APPROVED_NOTICE'.($app->isClient('administrator') ? '_ADMIN' : '')), 'notice');
 			}
 			// Set modifier and modification time (as if item has been saved), so that we can use this information for updating the versioning tables
 			$datenow = JFactory::getDate();
@@ -2745,8 +2745,8 @@ class ParentClassItem extends FCModelAdmin
 
 			// FORM HIDDEN FIELDS (FRONTEND/BACKEND) AND (ACL) UNEDITABLE FIELDS: maintain their DB value ...
 			if (
-				( $app->isSite() && ($field->formhidden==1 || $field->formhidden==3 || $field->parameters->get('frontend_hidden')) ) ||
-				( $app->isAdmin() && ($field->formhidden==2 || $field->formhidden==3 || $field->parameters->get('backend_hidden')) ) ||
+				( $app->isClient('site') && ($field->formhidden==1 || $field->formhidden==3 || $field->parameters->get('frontend_hidden')) ) ||
+				( $app->isClient('administrator') && ($field->formhidden==2 || $field->formhidden==3 || $field->parameters->get('backend_hidden')) ) ||
 				!$is_editable
 			) {
 				$postdata[$field->name] = $field->value;
@@ -3643,7 +3643,7 @@ class ParentClassItem extends FCModelAdmin
 		$itemParams = $this->_new_JRegistry($itemParams);
 
 		// Retrieve Layout's parameters, also deciding the layout
-		if ($app->isAdmin() || !empty($this->isForm))
+		if ($app->isClient('administrator') || !empty($this->isForm))
 		{
 			$ilayout = $itemParams->get('ilayout', $typeParams->get('ilayout', 'default'));
 			$this->setItemLayout($ilayout);
@@ -4853,7 +4853,7 @@ class ParentClassItem extends FCModelAdmin
 			. ($sef_lang ? '&lang=' . $sef_lang : '');
 
 		// Create the SEF URL
-		$item_url = $app->isAdmin()
+		$item_url = $app->isClient('administrator')
 			? flexicontent_html::getSefUrl($item_url)   // ..., $_xhtml= true, $_ssl=-1);
 			: JRoute::_($item_url);  // ..., $_xhtml= true, $_ssl=-1);
 
@@ -6486,7 +6486,7 @@ class ParentClassItem extends FCModelAdmin
 	 */
 	protected function handlePartialForm($form, & $data)
 	{
-		if (JFactory::getApplication()->isAdmin())
+		if (JFactory::getApplication()->isClient('administrator'))
 		{
 			return;
 		}

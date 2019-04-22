@@ -93,7 +93,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		$session = JFactory::getSession();
 		$perms   = FlexicontentHelperPerm::getPerm();
 
-		$ctrl_task = $app->isSite()
+		$ctrl_task = $app->isClient('site')
 			? 'task='
 			: 'task=' . $this->record_name_pl . '.';
 		$original_task = $this->task;
@@ -125,7 +125,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 			: (int) $data['type_id'];
 
 		// Set frontend record form as default return URL
-		if ($app->isSite())
+		if ($app->isClient('site'))
 		{
 			$Itemid = $this->input->get('Itemid', 0, 'int');  // Maintain current menu item if this was given
 
@@ -195,7 +195,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		$params->merge($model_params);
 
 		// For frontend merge the active menu parameters
-		if ($app->isSite())
+		if ($app->isClient('site'))
 		{
 			$menu = $app->getMenu()->getActive();
 
@@ -269,7 +269,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		 */
 
 		// No permission to change tags or tags were not displayed
-		$tags_shown = $app->isAdmin()
+		$tags_shown = $app->isClient('administrator')
 			? 1
 			: (int) $params->get('usetags_fe', 1) === 1;
 
@@ -328,7 +328,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		 */
 
 		// (FE) No category override active, and no secondary cats were submitted
-		$cid_not_submitted = $app->isAdmin() ? true : !$overridecatperms && empty($data['cid']);
+		$cid_not_submitted = $app->isClient('administrator') ? true : !$overridecatperms && empty($data['cid']);
 
 		if (!$enable_cid_selector && $cid_not_submitted)
 		{
@@ -370,7 +370,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		 */
 
 		// (FE) No category override active, and no main category was submitted
-		$catid_not_submitted = $app->isAdmin() ? true : !$overridecatperms && empty($data['catid']);
+		$catid_not_submitted = $app->isClient('administrator') ? true : !$overridecatperms && empty($data['catid']);
 
 		if (!$enable_catid_selector && $catid_not_submitted)
 		{
@@ -406,7 +406,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		/**
 		 * Check custom-injected (non-JForm field) (frontend) captcha field
 		 */
-		if ($app->isSite())
+		if ($app->isClient('site'))
 		{
 			$use_captcha    = $params->get('use_captcha', 1);     // 1 for guests, 2 for any user
 			$captcha_formop = $params->get('captcha_formop', 0);  // 0 for submit, 1 for submit/edit (aka always)
@@ -523,7 +523,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 
 		// Assign template parameters of the select ilayout as an sub-array (the DB model will handle the merging of parameters)
 		// Always be set in backend, but usually not in frontend, if frontend template editing is not shown
-		if ($app->isAdmin())
+		if ($app->isClient('administrator'))
 		{
 			$ilayout = $data['attribs']['ilayout'];
 		}
@@ -589,7 +589,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		}
 
 		// Special CASEs of overriding CREATE ACL in FrontEnd via menu item
-		elseif ($app->isSite())
+		elseif ($app->isClient('site'))
 		{
 			// Allow creating via submit menu OVERRIDE
 			if ($allowunauthorize)
@@ -1016,7 +1016,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 			// REDIRECT CASE FOR APPLY / SAVE AS COPY: Save and reload the edit form
 			case 'apply':
 			case 'apply_type':
-				if ($app->isAdmin())
+				if ($app->isClient('administrator'))
 				{
 					$link = 'index.php?option=com_flexicontent&' . $ctrl_task . 'edit&view=' . $this->record_name . '&id=' . (int) $model->get('id');
 				}
@@ -1035,7 +1035,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 
 			// REDIRECT CASE FOR SAVE and NEW: Save and load new record form
 			case 'save2new':
-				if ($app->isAdmin())
+				if ($app->isClient('administrator'))
 				{
 					$link = 'index.php?option=com_flexicontent&view=' . $this->record_name
 						. '&typeid=' . $model->get('type_id')
@@ -1054,7 +1054,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 
 			// REDIRECT CASES FOR SAVING
 			default:
-				if ($app->isAdmin())
+				if ($app->isClient('administrator'))
 				{
 					$link = $this->returnURL;
 				}
@@ -1690,7 +1690,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		// Get/Create the view
 		$viewType   = $document->getType();
 		$viewName   = $this->input->get('view', $this->default_view, 'cmd');
-		$viewLayout = $this->input->get('layout', $app->isAdmin() ? 'default' : 'form', 'string');
+		$viewLayout = $this->input->get('layout', $app->isClient('administrator') ? 'default' : 'form', 'string');
 		$view = $this->getView($viewName, $viewType, '', array('base_path' => $this->basePath, 'layout' => $viewLayout));
 
 		// Get/Create the model

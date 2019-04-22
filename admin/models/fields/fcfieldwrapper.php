@@ -100,7 +100,7 @@ class JFormFieldFCFieldWrapper extends JFormField
 		$hide_ifempty_fields = array('fcloadmodule', 'fcpagenav', 'toolbar');
 		$row_k = 0;
 
-		$lbl_class = ' ' . $item->parameters->get(JFactory::getApplication()->isAdmin() ? 'form_lbl_class_be' : 'form_lbl_class_fe');
+		$lbl_class = ' ' . $item->parameters->get(JFactory::getApplication()->isClient('administrator') ? 'form_lbl_class_be' : 'form_lbl_class_fe');
 		$tip_class = ' hasTooltip';
 
 		$FC_jfields_html['images'] = '<span class="alert alert-info">Edit in \'Image and links\' TABs</span>';

@@ -24,7 +24,7 @@ $document = JFactory::getDocument();
 $cparams  = JComponentHelper::getParams('com_flexicontent');
 $ctrl     = 'filemanager.';
 $hlpname  = 'fcfilemanager';
-$isAdmin  = $app->isAdmin();
+$isAdmin  = $app->isClient('administrator');
 $useAssocs= false;
 
 $ctrl_task  = 'task=filemanager.';
@@ -91,7 +91,7 @@ if ($use_jmedia_man)
 
 
 // Calculated configuration values
-$isAdmin  = $app->isAdmin();
+$isAdmin  = $app->isClient('administrator');
 $dbFolder = !strlen($this->target_dir) || $this->target_dir==2  ?  ''  :  ($this->target_dir==0 ? 'M' : 'S');
 $_tmpl = $isFilesElement ? 'component' : '';
 

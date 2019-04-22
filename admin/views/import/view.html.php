@@ -41,7 +41,7 @@ class FlexicontentViewImport extends FlexicontentViewBaseRecords
 		$task     = $jinput->getCmd('task', '');
 		$layout   = $jinput->getString('layout', 'default');
 
-		$isAdmin  = $app->isAdmin();
+		$isAdmin  = $app->isClient('administrator');
 		$isCtmpl  = $jinput->getCmd('tmpl') === 'component';
 
 		// Some flags & constants

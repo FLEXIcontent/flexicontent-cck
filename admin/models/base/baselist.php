@@ -532,7 +532,7 @@ abstract class FCModelAdminList extends JModelList
 			}
 
 			// Filter via View Level Access, if user is not super-admin
-			if (!JFactory::getUser()->authorise('core.admin') && (JFactory::getApplication()->isSite() || $this->listViaAccess))
+			if (!JFactory::getUser()->authorise('core.admin') && (JFactory::getApplication()->isClient('site') || $this->listViaAccess))
 			{
 				$groups  = implode(',', JAccess::getAuthorisedViewLevels($user->id));
 				$where[] = 'a.access IN (' . $groups . ')';

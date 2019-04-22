@@ -508,7 +508,7 @@ class FlexicontentViewItem extends JViewLegacy
 		$nullDate   = $db->getNullDate();
 		$useAssocs  = flexicontent_db::useAssociations();
 
-		if ($app->isSite())
+		if ($app->isClient('site'))
 		{
 			$menu = $app->getMenu()->getActive();
 		}
@@ -620,7 +620,7 @@ class FlexicontentViewItem extends JViewLegacy
 		// *** Frontend form: replace component/menu 'params' with the merged component/category/type/item/menu ETC ... parameters
 		// ***
 
-		if ($app->isSite())
+		if ($app->isClient('site'))
 		{
 			$page_params = $item->parameters;
 		}
@@ -703,7 +703,7 @@ class FlexicontentViewItem extends JViewLegacy
 		// *** Add frontend CSS override files to the document (also load CSS joomla template override)
 		// ***
 
-		if ( $app->isSite() )
+		if ( $app->isClient('site') )
 		{
 			$document->addStyleSheetVersion($this->baseurl.'/components/com_flexicontent/assets/css/flexicontent.css', FLEXI_VHASH);
 			if (file_exists(JPATH_SITE.DS.'templates'.DS.$app->getTemplate().DS.'css'.DS.'flexicontent.css'))
@@ -1246,7 +1246,7 @@ class FlexicontentViewItem extends JViewLegacy
 				: $jinput->get('maincat', 0, 'int');
 
 			// For backend form also try the items manager 's category filter
-			if ( $app->isAdmin() && !$maincat )
+			if ( $app->isClient('administrator') && !$maincat )
 			{
 				$maincat = $app->getUserStateFromRequest( $option.'.items.filter_cats', 'filter_cats', '', 'int' );
 			}
@@ -1384,7 +1384,7 @@ class FlexicontentViewItem extends JViewLegacy
 		// *** Build featured flag
 		// ***
 
-		if ( $app->isAdmin() )
+		if ( $app->isClient('administrator') )
 		{
 			$fieldname = 'jform[featured]';
 			$elementid = 'jform_featured';
@@ -1647,7 +1647,7 @@ class FlexicontentViewItem extends JViewLegacy
 		// *** Build disable comments selector
 		// ***
 
-		if ( $app->isSite() && $page_params->get('allowdisablingcomments_fe') )
+		if ( $app->isClient('site') && $page_params->get('allowdisablingcomments_fe') )
 		{
 			// Set to zero if disabled or to "" (aka use default) for any other value.  THIS WILL FORCE comment field use default Global/Category/Content Type setting or disable it,
 			// thus a per item commenting system cannot be selected. This is OK because it makes sense to have a different commenting system per CONTENT TYPE by not per Content Item
@@ -1693,7 +1693,7 @@ class FlexicontentViewItem extends JViewLegacy
 		$allowed_langs = !$allowed_langs ? null : FLEXIUtilities::paramToArray($allowed_langs);
 		if (!$isnew && $allowed_langs) $allowed_langs[] = $item->language;
 
-		if ( $app->isSite() )
+		if ( $app->isClient('site') )
 		{
 			// Find globaly or per content type disabled languages
 			$disable_langs = $page_params->get('disable_languages_fe', array());
@@ -2207,13 +2207,13 @@ class FlexicontentViewItem extends JViewLegacy
 		{
 			$app = JFactory::getApplication();
 
-			if ($app->isAdmin() && ($this->view === $this->record_name || $this->view === $this->record_name_pl))
+			if ($app->isClient('administrator') && ($this->view === $this->record_name || $this->view === $this->record_name_pl))
 			{
 				$return = 'index.php?option=com_flexicontent&view=' . $this->record_name_pl;
 			}
 			else
 			{
-				$return = $app->isAdmin() ? false : JUri::base();
+				$return = $app->isClient('administrator') ? false : JUri::base();
 			}
 		}
 

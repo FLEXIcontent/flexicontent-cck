@@ -57,7 +57,7 @@ class plgSystemFlexiadvroute extends JPlugin
 		$app = JFactory::getApplication();
 
 		// Dont run in admin
-		if ($app->isAdmin())
+		if ($app->isClient('administrator'))
 		{
 			return;
 		}
