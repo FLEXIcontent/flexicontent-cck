@@ -589,8 +589,8 @@ class plgFlexicontent_fieldsTextarea extends FCField
 			$realview  = $app->input->get('view', '', 'cmd');
 
 			$itemViewId     = $realview === 'item' && $option === 'com_flexicontent' ? $app->input->get('id', 0, 'int') : 0;
-			$isItemsManager = $app->isAdmin() && $realview === 'items' && $option === 'com_flexicontent';
-			$isHtmlViewFE   = $format === 'html' && $app->isSite();
+			$isItemsManager = $app->isClient('administrator') && $realview === 'items' && $option === 'com_flexicontent';
+			$isHtmlViewFE   = $format === 'html' && $app->isClient('site');
 
 		}
 

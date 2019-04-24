@@ -426,7 +426,7 @@ class plgFlexicontent_fieldsRelation extends FCField
 			JText::script('FLEXI_RIFLD_ERROR', false);
 			JText::script('FLEXI_RIFLD_NO_ITEMS', false);
 			JText::script('FLEXI_RIFLD_ADD_ITEM', false);
-			$document->addScriptVersion(JUri::root(true) . '/plugins/flexicontent_fields/relation/js/form.js', FLEXI_VHASH);
+			$document->addScript(JUri::root(true) . '/plugins/flexicontent_fields/relation/js/form.js', array('version' => FLEXI_VHASH));
 		}
 
 		$_classes = 'use_select2_lib fc_select2_no_check fc_select2_noselect' . ($required ? ' required' : '') . ($selected_items_sortable ? ' fc_select2_sortable' : '');
@@ -602,7 +602,7 @@ class plgFlexicontent_fieldsRelation extends FCField
 			$option = $app->input->get('option', '', 'cmd');
 			$realview = $app->input->get('view', 'item', 'cmd');
 			$view = $app->input->get('flexi_callview', $realview, 'cmd');
-			$isItemsManager = $app->isAdmin() && $realview=='items' && $option=='com_flexicontent';
+			$isItemsManager = $app->isClient('administrator') && $realview=='items' && $option=='com_flexicontent';
 
 			$total_in_view = $field->parameters->get('total_in_view', array('backend'));
 			$total_in_view = FLEXIUtilities::paramToArray($total_in_view);

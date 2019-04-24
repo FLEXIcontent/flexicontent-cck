@@ -53,7 +53,7 @@ class plgFlexicontent_fieldsFieldgroup extends FCField
 		$db   = JFactory::getDbo();
 		$user = JFactory::getUser();
 		$app  = JFactory::getApplication();
-		$isAdmin = $app->isAdmin();
+		$isAdmin = $app->isClient('administrator');
 
 		$tooltip_class = 'hasTooltip';
 		$add_on_class    = 'btn'; //$cparams->get('bootstrap_ver', 2)==2  ?  'add-on' : 'input-group-addon';

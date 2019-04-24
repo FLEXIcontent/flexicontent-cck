@@ -177,7 +177,7 @@ class flexicontent_html
 		// Get global include folders
 		if ($check_global) {
 			if ($less_folders===null) {
-				$JTEMPLATE_SITE = JPATH_SITE.'/templates/'.(!$app->isAdmin() ? $app->getTemplate() : JFactory::getDbo()->setQuery("SELECT template FROM #__template_styles WHERE client_id = 0 AND home = 1")->loadResult());
+				$JTEMPLATE_SITE = JPATH_SITE.'/templates/'.(!$app->isClient('administrator') ? $app->getTemplate() : JFactory::getDbo()->setQuery("SELECT template FROM #__template_styles WHERE client_id = 0 AND home = 1")->loadResult());
 				$less_folders = JComponentHelper::getParams('com_flexicontent')->get('less_folders', 'JPATH_COMPONENT_SITE/assets/less/ :: JTEMPLATE_SITE/less/com_flexicontent/ ::');
 				$_reps = array(
 					'JPATH_COMPONENT_SITE' => JPATH_SITE.DS.'components'.DS.'com_flexicontent', 'JPATH_COMPONENT_ADMINISTRATOR' => JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent',
@@ -313,7 +313,7 @@ class flexicontent_html
 			catch (Exception $e)
 			{
 				$error = true;
-				if ($debug || JFactory::getApplication()->isAdmin()) JFactory::getApplication()->enqueueMessage(
+				if ($debug || JFactory::getApplication()->isClient('administrator')) JFactory::getApplication()->enqueueMessage(
 					'- LESS to CSS halted ... CSS file was not changed ... please edit LESS file(s) find offending <b>lines</b> and fix or remove<br/>'. str_replace($path.$in, '<br/><b>'.$path.$in.'</b>', $e->getMessage()), 'notice'
 				);
 				continue;
@@ -1271,10 +1271,10 @@ class flexicontent_html
 			//$load_frameworks = $flexiparams->get('load_frameworks', array('jQuery','image-picker','masonry','select2','inputmask','prettyCheckable','fancybox'));
 			//$load_frameworks = FLEXIUtilities::paramToArray($load_frameworks);
 			//$load_frameworks = array_flip($load_frameworks);
-			//$load_jquery = isset($load_frameworks['jQuery']) || !$app->isSite();
-			if ( $load_jquery===null ) $load_jquery = $flexiparams->get('loadfw_jquery', 1)==1  ||  !$app->isSite();
+			//$load_jquery = isset($load_frameworks['jQuery']) || !$app->isClient('site');
+			if ( $load_jquery===null ) $load_jquery = $flexiparams->get('loadfw_jquery', 1)==1  ||  !$app->isClient('site');
 			$load_framework = $flexiparams->get( 'loadfw_'.strtolower(str_replace('-','_',$framework)), 1 );
-			$load_frameworks[$framework] = $load_framework==1  ||  ($load_framework==2 && !$app->isSite());
+			$load_frameworks[$framework] = $load_framework==1  ||  ($load_framework==2 && !$app->isClient('site'));
 		}
 
 		// Set loaded flag
@@ -1507,30 +1507,30 @@ class flexicontent_html
 				$ver = '3.5.4';
 				$framework_path = JUri::root(true).$lib_path.'/select2';
 				$framework_folder = JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'select2';
-				$document->addScriptVersion($framework_path.'/select2.min.js', $ver);
-				$document->addScriptVersion($framework_path.'/select2.sortable.js', $ver);
-				$document->addStyleSheetVersion($framework_path.'/select2.css', $ver);
+				$document->addScript($framework_path.'/select2.min.js', array('version' => $ver));
+				$document->addScript($framework_path.'/select2.sortable.js', array('version' => $ver));
+				$document->addStyleSheet($framework_path.'/select2.css', array('version' => $ver));
 
 				$lang_code = flexicontent_html::getUserCurrentLang();
 				if ( $lang_code && $lang_code!='en' )
 				{
 					// Try language shortcode
 					if ( file_exists($framework_folder.DS.'select2_locale_'.$lang_code.'.js') ) {
-						$document->addScriptVersion($framework_path.'/select2_locale_'.$lang_code.'.js', $ver);
+						$document->addScript($framework_path.'/select2_locale_'.$lang_code.'.js', array('version' => $ver));
 					}
 					// select2 JS 4.0.0+
 					/*if ( file_exists($framework_folder.DS.'select2'.DS.'i18n'.DS.$lang_code.'.js') ) {
-						$document->addScriptVersion($framework_path.'/select2/i18n/'.$lang_code.'.js', $ver);
+						$document->addScript($framework_path.'/select2/i18n/'.$lang_code.'.js', array('version' => $ver));
 					}*/
 					// Try country language code
 					else {
 						$country_code = flexicontent_html::getUserCurrentLang($short_tag=false);
 						if ( $country_code && file_exists($framework_folder.DS.'select2_locale_'.$country_code.'.js') ) {
-							$document->addScriptVersion($framework_path.'/select2_locale_'.$country_code.'.js', $ver);
+							$document->addScript($framework_path.'/select2_locale_'.$country_code.'.js', array('version' => $ver));
 						}
 						// select2 JS 4.0.0+
 						/*if ( $country_code && file_exists($framework_folder.DS.'select2'.DS.'i18n'.DS.$country_code.'.js') ) {
-							$document->addScriptVersion($framework_path.'/select2/i18n/'.$country_code.'.js', $ver);
+							$document->addScript($framework_path.'/select2/i18n/'.$country_code.'.js', array('version' => $ver));
 						}*/
 					}
 				}
@@ -1764,7 +1764,7 @@ class flexicontent_html
 
 				$document->addScript($framework_path.'/js/jquery.tmpl.min.js');
 				//$document->addScript($framework_path.'/js/jquery.easing.1.3.js');
-				$document->addScriptVersion(JUri::root(true).'/components/com_flexicontent/assets/js/jquery-easing.js', FLEXI_VHASH);
+				$document->addScript(JUri::root(true).'/components/com_flexicontent/assets/js/jquery-easing.js', array('version' => FLEXI_VHASH));
 
 				$document->addScript($framework_path.'/js/jquery.elastislide.js');
 				//$document->addScript($framework_path.'/js/gallery.js'); // replace with field specific: gallery_tmpl.js
@@ -1794,9 +1794,9 @@ class flexicontent_html
 				if ($load_jquery) flexicontent_html::loadJQuery();
 
 				$framework_path = JUri::root(true).$lib_path.'/fcxSlide';
-				$document->addScriptVersion($framework_path.'/class.fcxSlide.js', FLEXI_VHASH);
-				$document->addStyleSheetVersion($framework_path.'/fcxSlide.css', FLEXI_VHASH);
-				//$document->addScriptVersion($framework_path.'/class.fcxSlide.packed.js', FLEXI_VHASH);
+				$document->addScript($framework_path.'/class.fcxSlide.js', array('version' => FLEXI_VHASH));
+				$document->addStyleSheet($framework_path.'/fcxSlide.css', array('version' => FLEXI_VHASH));
+				//$document->addScript($framework_path.'/class.fcxSlide.packed.js', array('version' => FLEXI_VHASH));
 				break;
 
 			case 'imagesLoaded':
@@ -1913,8 +1913,8 @@ class flexicontent_html
 					$jcookie->set( 'fc_uid', $hashedUA, 0);
 				}
 
-				$document->addScriptVersion(JUri::root(true).'/components/com_flexicontent/assets/js/tmpl-common.js', FLEXI_VHASH);
-				$document->addScriptVersion(JUri::root(true).'/components/com_flexicontent/assets/js/jquery-easing.js', FLEXI_VHASH);
+				$document->addScript(JUri::root(true).'/components/com_flexicontent/assets/js/tmpl-common.js', array('version' => FLEXI_VHASH));
+				$document->addScript(JUri::root(true).'/components/com_flexicontent/assets/js/jquery-easing.js', array('version' => FLEXI_VHASH));
 				JText::script("FLEXI_APPLYING_FILTERING", true);
 				JText::script("FLEXI_TYPE_TO_LIST", true);
 				JText::script("FLEXI_TYPE_TO_FILTER", true);
@@ -1934,7 +1934,7 @@ class flexicontent_html
 
 				$js .= "";
 
-				$document->addScriptVersion(JUri::root(true).'/components/com_flexicontent/assets/js/flexi-lib.js', FLEXI_VHASH);
+				$document->addScript(JUri::root(true).'/components/com_flexicontent/assets/js/flexi-lib.js', array('version' => FLEXI_VHASH));
 				JText::script("FLEXI_NOT_AN_IMAGE_FILE", true);
 				JText::script('FLEXI_LOADING_IMAGES',true);
 				JText::script('FLEXI_THUMBNAILS',true);
@@ -1946,7 +1946,7 @@ class flexicontent_html
 			case 'flexi-lib-form':
 				if ($load_jquery) flexicontent_html::loadJQuery();
 
-				$document->addScriptVersion(JUri::root(true).'/components/com_flexicontent/assets/js/flexi-lib-form.js', FLEXI_VHASH);
+				$document->addScript(JUri::root(true).'/components/com_flexicontent/assets/js/flexi-lib-form.js', array('version' => FLEXI_VHASH));
 				JText::script("FLEXI_EDIT", true);
 				JText::script("FLEXI_ADD", true);
 				JText::script("FLEXI_NA", true);
@@ -2860,7 +2860,7 @@ class flexicontent_html
 		);
 
 		$user    = JFactory::getUser();
-		$isAdmin = JFactory::getApplication()->isAdmin();
+		$isAdmin = JFactory::getApplication()->isClient('administrator');
 		$isPrint = JFactory::getApplication()->input->getInt('print', 0);
 
 		// Check if state icon should not be shown (note: parameters are usually NULL in backend)
@@ -2968,7 +2968,7 @@ class flexicontent_html
 			flexicontent_html::loadFramework('flexi_tmpl_common');
 
 			$doc = JFactory::getDocument();
-			$doc->addScriptVersion(JUri::root(true).'/components/com_flexicontent/assets/js/stateselector.js', FLEXI_VHASH);
+			$doc->addScript(JUri::root(true).'/components/com_flexicontent/assets/js/stateselector.js', array('version' => FLEXI_VHASH));
 			$js = '
 				var fc_statehandler_singleton = new fc_statehandler({
 					task: ' . json_encode($isAdmin ? $config->controller . '.setitemstate' : 'setitemstate') . ',
@@ -4074,8 +4074,8 @@ class flexicontent_html
 			flexicontent_html::loadFramework('flexi_tmpl_common');
 
 			$document = JFactory::getDocument();
-			$document->addStyleSheetVersion(JUri::root(true).'/components/com_flexicontent/assets/css/fcvote.css', FLEXI_VHASH);
-			$document->addScriptVersion(JUri::root(true).'/components/com_flexicontent/assets/js/fcvote.js', FLEXI_VHASH);
+			$document->addStyleSheet(JUri::root(true).'/components/com_flexicontent/assets/css/fcvote.css', array('version' => FLEXI_VHASH));
+			$document->addScript(JUri::root(true).'/components/com_flexicontent/assets/js/fcvote.js', array('version' => FLEXI_VHASH));
 
 			$image = $field->parameters->get( 'main_image', 'components/com_flexicontent/assets/images/star-medium.png' );
 			$img_path	= JUri::root(true).'/'.$image;
@@ -4972,7 +4972,7 @@ class flexicontent_html
 		static $loaded = array();
 		if (isset($loaded[$client])) return;
 
-		if (JFactory::getApplication()->isAdmin() && $client = 0) return;
+		if (JFactory::getApplication()->isClient('administrator') && $client = 0) return;
 
 		// Load english language file for 'com_flexicontent' and then override with current language file. Do not force a reload for either (not needed)
 		JFactory::getLanguage()->load('com_flexicontent', ($client ? JPATH_ADMINISTRATOR : JPATH_SITE), 'en-GB', $force_reload = false, $load_default = true);
@@ -5938,7 +5938,7 @@ class flexicontent_html
 
 		if (FLEXI_J40GE)
 		{
-			$isAdmin = JFactory::getApplication()->isAdmin();
+			$isAdmin = JFactory::getApplication()->isClient('administrator');
 
 			$router = Router::getInstance('site');
 			$url = $router->build($url);
@@ -5955,7 +5955,7 @@ class flexicontent_html
 		// Get frontend route instance if we are in the backend and SH404SEF is not installed
 		if ($site_router === null)
 		{
-			$isAdmin = JFactory::getApplication()->isAdmin();
+			$isAdmin = JFactory::getApplication()->isClient('administrator');
 			$isSH404SEF  = defined('SH404SEF_IS_RUNNING') && JFactory::getConfig()->get('sef');
 			// Do not merge the following 2 statements (site_instance, site_router), PHP 5.6 and lower cannot parse 2 consequent operators ::
 			$site_instance = $isAdmin && !$isSH404SEF

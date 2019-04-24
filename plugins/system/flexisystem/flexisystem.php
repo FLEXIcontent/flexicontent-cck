@@ -39,7 +39,7 @@ class plgSystemFlexisystem extends JPlugin
 
 		if (!$language_loaded)
 		{
-			JFactory::getApplication()->isAdmin()
+			JFactory::getApplication()->isClient('administrator')
 				? JPlugin::loadLanguage('plg_system_flexisystem_common_be', JPATH_ADMINISTRATOR)
 				: JPlugin::loadLanguage('plg_system_flexisystem_common_fe', JPATH_ADMINISTRATOR);
 		}
@@ -71,7 +71,7 @@ class plgSystemFlexisystem extends JPlugin
 	 */
 	function onAfterInitialise()
 	{
-		if (JFactory::getApplication()->isAdmin()) $this->handleSerialized();
+		if (JFactory::getApplication()->isClient('administrator')) $this->handleSerialized();
 
 		$app  = JFactory::getApplication();
 		$task = $app->input->get('task', '', 'string');  // NOTE during this event 'task' is (controller.task), thus we use filtering 'string'
@@ -260,7 +260,7 @@ class plgSystemFlexisystem extends JPlugin
 		$task   = $app->input->get('task', '', 'string');  // NOTE during this event 'task' is (controller.task), thus we use filtering 'string'
 
 		$fcdebug = $this->cparams->get('print_logging_info')==2  ?  2  :  $session->get('fcdebug', 0, 'flexicontent');
-		$isAdmin = JFactory::getApplication()->isAdmin();
+		$isAdmin = JFactory::getApplication()->isClient('administrator');
 
 		$isFC_Config = $isAdmin ? ($option=='com_config' && ($view == 'component' || $controller='component') && $component == 'com_flexicontent')  :  false;
 		$isBE_Module_Edit = $isAdmin ? (($option=='com_modules' || $option=='com_advancedmodules') && $view == 'module')  :  false;
@@ -281,7 +281,11 @@ class plgSystemFlexisystem extends JPlugin
 			if ($isFC_Config)
 			{
 				// Make sure chosen JS file is loaded before our code, but do not attach it to any elements (YET)
-				JHtml::_('formbehavior.chosen', '#_some_iiidddd_');
+				if (!FLEXI_J40GE)
+				{
+					// Do not run this in J4 , JDocument not yet available, but chosen JS was replaced
+					JHtml::_('formbehavior.chosen', '#_some_iiidddd_');
+				}
 				//$js .= "\n"."jQuery.fn.chosen = function(){};"."\n";  // Suppress chosen function completely, (commented out ... we will allow it)
 			}
 
@@ -323,13 +327,13 @@ class plgSystemFlexisystem extends JPlugin
 
 
 		// Detect resolution we will do this regardless of ... using mobile layouts
-		if ($this->cparams->get('use_mobile_layouts') || $app->isAdmin())
+		if ($this->cparams->get('use_mobile_layouts') || $app->isClient('administrator'))
 		{
 			$this->detectClientResolution($this->cparams);
 		}
 
 		// Redirect backend article / category management, and frontend article view
-		$app->isAdmin()
+		$app->isClient('administrator')
 			? $this->redirectAdminComContent()
 			: $this->redirectSiteComContent();
 	}
@@ -1030,7 +1034,7 @@ class plgSystemFlexisystem extends JPlugin
 		$session = JFactory::getSession();
 		$format  = $app->input->getCmd('format', 'html');
 
-		if ($app->isSite() && $format === 'html')
+		if ($app->isClient('site') && $format === 'html')
 		{
 			// Count an item or category hit if appropriate
 			$this->countHit();
@@ -1143,7 +1147,7 @@ class plgSystemFlexisystem extends JPlugin
 		$app = JFactory::getApplication();
 		$format = $app->input->get('format', 'html', 'cmd');
 
-		if (!$app->isAdmin() || !JFactory::getUser()->id || $format !== 'html')
+		if (!$app->isClient('administrator') || !JFactory::getUser()->id || $format !== 'html')
 		{
 			return;
 		}
@@ -2113,19 +2117,19 @@ class plgSystemFlexisystem extends JPlugin
 		// ***
 
 		!JFactory::getLanguage()->isRtl()
-			? $document->addStyleSheetVersion(JUri::root(true).'/components/com_flexicontent/assets/css/flexi_form.css', FLEXI_VHASH)
-			: $document->addStyleSheetVersion(JUri::root(true).'/components/com_flexicontent/assets/css/flexi_form_rtl.css', FLEXI_VHASH);
+			? $document->addStyleSheet(JUri::root(true).'/components/com_flexicontent/assets/css/flexi_form.css', array('version' => FLEXI_VHASH))
+			: $document->addStyleSheet(JUri::root(true).'/components/com_flexicontent/assets/css/flexi_form_rtl.css', array('version' => FLEXI_VHASH));
 
 		!JFactory::getLanguage()->isRtl()
-			? $document->addStyleSheetVersion(JUri::root(true).'/components/com_flexicontent/assets/css/flexi_containers.css', FLEXI_VHASH)
-			: $document->addStyleSheetVersion(JUri::root(true).'/components/com_flexicontent/assets/css/flexi_containers_rtl.css', FLEXI_VHASH);
+			? $document->addStyleSheet(JUri::root(true).'/components/com_flexicontent/assets/css/flexi_containers.css', array('version' => FLEXI_VHASH))
+			: $document->addStyleSheet(JUri::root(true).'/components/com_flexicontent/assets/css/flexi_containers_rtl.css', array('version' => FLEXI_VHASH));
 
 		!JFactory::getLanguage()->isRtl()
-			? $document->addStyleSheetVersion(JUri::root(true).'/components/com_flexicontent/assets/css/flexi_shared.css', FLEXI_VHASH)
-			: $document->addStyleSheetVersion(JUri::root(true).'/components/com_flexicontent/assets/css/flexi_shared_rtl.css', FLEXI_VHASH);
+			? $document->addStyleSheet(JUri::root(true).'/components/com_flexicontent/assets/css/flexi_shared.css', array('version' => FLEXI_VHASH))
+			: $document->addStyleSheet(JUri::root(true).'/components/com_flexicontent/assets/css/flexi_shared_rtl.css', array('version' => FLEXI_VHASH));
 
 		// Fields common CSS
-		$document->addStyleSheetVersion(JUri::root(true).'/components/com_flexicontent/assets/css/flexi_form_fields.css', FLEXI_VHASH);
+		$document->addStyleSheet(JUri::root(true).'/components/com_flexicontent/assets/css/flexi_form_fields.css', array('version' => FLEXI_VHASH));
 
 
 		// ***
@@ -2141,11 +2145,11 @@ class plgSystemFlexisystem extends JPlugin
 
 		// Add js function to overload the joomla submitform validation
 		JHtml::_('behavior.formvalidation');  // load default validation JS to make sure it is overriden
-		$document->addScriptVersion(JUri::root(true).'/components/com_flexicontent/assets/js/admin.js', FLEXI_VHASH);
-		$document->addScriptVersion(JUri::root(true).'/components/com_flexicontent/assets/js/validate.js', FLEXI_VHASH);
+		$document->addScript(JUri::root(true).'/components/com_flexicontent/assets/js/admin.js', array('version' => FLEXI_VHASH));
+		$document->addScript(JUri::root(true).'/components/com_flexicontent/assets/js/validate.js', array('version' => FLEXI_VHASH));
 
 		// Add js function for custom code used by FLEXIcontent item form
-		$document->addScriptVersion(JUri::root(true).'/components/com_flexicontent/assets/js/itemscreen.js', FLEXI_VHASH);
+		$document->addScript(JUri::root(true).'/components/com_flexicontent/assets/js/itemscreen.js', array('version' => FLEXI_VHASH));
 
 
 		// ***

@@ -74,7 +74,7 @@ class plgFlexicontent_fieldsJProfile extends FCField
 		$add_position = (int) $field->parameters->get('add_position', 3);
 
 		// If we are multi-value and not inside fieldgroup then add the control buttons (move, delete, add before/after)
-		$add_ctrl_btns = !$use_ingroup && $multiple && !JFactory::getApplication()->isSite();
+		$add_ctrl_btns = !$use_ingroup && $multiple && !JFactory::getApplication()->isClient('site');
 		$fields_box_placing = (int) $field->parameters->get('fields_box_placing', 1);
 
 
@@ -204,7 +204,7 @@ class plgFlexicontent_fieldsJProfile extends FCField
 				fc_validationAttach(newField);
 
 				// Initialize user selection JS
-				" . (!JFactory::getApplication()->isSite() ? "
+				" . (!JFactory::getApplication()->isClient('site') ? "
 				jQuery(newField).find('.field-user-wrapper').fieldUser();
 				fcfield_jprofile_initUserSelector(tagid);
 				" : "") . "
@@ -336,7 +336,7 @@ class plgFlexicontent_fieldsJProfile extends FCField
 			$elementid_n = $elementid.'_'.$n;
 			$elementid_jf_n = $elementid.'__'.$n.'_';
 
-			$xml_field = '<field name="'.$fieldname_n.'" type="user" ' . (JFactory::getApplication()->isSite() ? ' readonly="true" ' : '') . '/>';
+			$xml_field = '<field name="'.$fieldname_n.'" type="user" ' . (JFactory::getApplication()->isClient('site') ? ' readonly="true" ' : '') . '/>';
 			$xml_form = '<form><fields name="attribs"><fieldset name="attribs">'.$xml_field.'</fieldset></fields></form>';
 
 			$jform = new JForm('flexicontent_field.jprofile', array('control' => '', 'load_data' => true));

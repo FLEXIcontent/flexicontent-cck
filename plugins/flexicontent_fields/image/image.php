@@ -329,7 +329,7 @@ class plgFlexicontent_fieldsImage extends FCField
 			JText::script("FLEXI_FIELD_IMAGE_ENTER_MEDIA_URL", true);
 			JText::script("FLEXI_FIELD_MEDIA_URL", true);
 			JText::script("FLEXI_ERROR", true);
-			$document->addScriptVersion(JUri::root(true) . '/plugins/flexicontent_fields/image/js/form.js', FLEXI_VHASH);
+			$document->addScript(JUri::root(true) . '/plugins/flexicontent_fields/image/js/form.js', array('version' => FLEXI_VHASH));
 		}
 
 		$js = '
@@ -1184,8 +1184,8 @@ class plgFlexicontent_fieldsImage extends FCField
 			$realview  = $app->input->get('view', '', 'cmd');
 
 			$itemViewId     = $realview === 'item' && $option === 'com_flexicontent' ? $app->input->get('id', 0, 'int') : 0;
-			$isItemsManager = $app->isAdmin() && $realview === 'items' && $option === 'com_flexicontent';
-			$isHtmlViewFE   = $format === 'html' && $app->isSite();
+			$isItemsManager = $app->isClient('administrator') && $realview === 'items' && $option === 'com_flexicontent';
+			$isHtmlViewFE   = $format === 'html' && $app->isClient('site');
 
 			$cparams   = JComponentHelper::getParams( 'com_flexicontent' );
 
@@ -1848,7 +1848,7 @@ class plgFlexicontent_fieldsImage extends FCField
 		// Set a warning message for overriden/changed files: form.php (frontend) or default.php (backend)
 		if (!$is_importcsv && empty($unique_tmp_itemid))
 		{
-			$app->enqueueMessage('Field: ' . $field->label . ' requires variable -unique_tmp_itemid- please update your ' . ($app->isSite() ? 'form.php' : 'default.php'), 'warning');
+			$app->enqueueMessage('Field: ' . $field->label . ' requires variable -unique_tmp_itemid- please update your ' . ($app->isClient('site') ? 'form.php' : 'default.php'), 'warning');
 		}
 
 		// Execute once

@@ -146,7 +146,7 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 		/**
 		 * Load backend language file if model gets loaded in frontend
 		 */
-		if ($app->isSite())
+		if ($app->isClient('site'))
 		{
 			JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, 'en-GB', true);
 			JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, true);
@@ -1043,7 +1043,7 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 			}
 
 			// Filter via View Level Access, if user is not super-admin
-			if (!JFactory::getUser()->authorise('core.admin') && (JFactory::getApplication()->isSite() || $this->listViaAccess))
+			if (!JFactory::getUser()->authorise('core.admin') && (JFactory::getApplication()->isClient('site') || $this->listViaAccess))
 			{
 				$groups  = implode(',', JAccess::getAuthorisedViewLevels($user->id));
 				$where[] = 'a.access IN (' . $groups . ')';

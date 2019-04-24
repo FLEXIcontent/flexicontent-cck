@@ -45,7 +45,7 @@ class FlexicontentViewItems extends JViewLegacy
 		$model  = $this->getModel();
 
 		// Indicate to model (if frontend) to merge menu parameters if menu matches
-		$model->mergeMenuParams = !$app->isAdmin();
+		$model->mergeMenuParams = !$app->isClient('administrator');
 
 
 		/**
@@ -53,12 +53,12 @@ class FlexicontentViewItems extends JViewLegacy
 		 * For backend this is component parameters only
 		 * For frontend this category parameters as VIEW's parameters (category parameters are merged parameters in order: layout(template-manager)/component/ancestors-cats/category/author/menu)
 		 */
-		$params = $app->isAdmin()
+		$params = $app->isClient('administrator')
 			? JComponentHelper::getParams('com_flexicontent')
 			: $model->getCategory()->parameters;
 
 		// Check if CSV export button is enabled for current view
-		$show_csvbutton = $app->isAdmin()
+		$show_csvbutton = $app->isClient('administrator')
 			? $params->get('show_csvbutton_be', 0)
 			: $params->get('show_csvbutton', 0) ;
 
@@ -91,7 +91,7 @@ class FlexicontentViewItems extends JViewLegacy
 		);
 
 		$has_pro    = JPluginHelper::isEnabled($extfolder = 'system', $extname = 'flexisyspro');
-		$export_all = $has_pro && $app->isAdmin() && $jinput->getCmd('items_set', '') === 'all';
+		$export_all = $has_pro && $app->isClient('administrator') && $jinput->getCmd('items_set', '') === 'all';
 
 		if ($export_all)
 		{

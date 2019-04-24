@@ -1933,7 +1933,10 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 			// ok, component asset not missing, proceed to cross check for deleted / added actions
 			$rules = new JAccessRules($asset->rules);
 			$rules_data = $rules->getData();
-			$component_actions = JAccess::getActions($component_name, 'component');
+			$component_actions = JAccess::getActionsFromFile(
+				JPATH_ADMINISTRATOR . '/components/' . $component_name . '/access.xml',
+				"/access/section[@name='component']/"
+			);
 
 			$db_action_names = array();
 			foreach ($rules_data as $action_name => $data)  $db_action_names[]   = $action_name;
@@ -1949,8 +1952,16 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 			if ($debug_initial_perms) { echo "Deleted actions: "; print_r($deleted_actions); echo "<br> Added actions: "; print_r($added_actions); echo "<br>"; }
 		}
 
-		if ($debug_initial_perms) { echo "Component DB Rule Count " . ( ($comp_section) ? count($rules->getData()) : 0 ) . "<br />"; }
-		if ($debug_initial_perms) { echo "Component File Rule Count " . count(JAccess::getActions('com_flexicontent', 'component')) . "<br />"; }
+		if ($debug_initial_perms)
+		{
+			echo "Component DB Rule Count " . ( ($comp_section) ? count($rules->getData()) : 0 ) . "<br />";
+			echo "Component File Rule Count " .
+				count(JAccess::getActionsFromFile(
+					JPATH_ADMINISTRATOR . '/components/' . $component_name . '/access.xml',
+					"/access/section[@name='component']/"
+				)) .
+				"<br />";
+		}
 
 		// Get a list com_content TOP-LEVEL categories that have wrong asset names (do not point to 'com_content' asset)
 		// (NOTE: we do not longer force category asset creation if asset is not set, so we will not check them here)
@@ -2050,7 +2061,10 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 			// Get existing DB rules and component's actions from the access.xml file
 			$existing_rules = new JAccessRules($asset->rules);
 			$rules_data = $existing_rules->getData();
-			$component_actions = JAccess::getActions('com_flexicontent', 'component');
+			$component_actions = JAccess::getActionsFromFile(
+				JPATH_ADMINISTRATOR . '/components/' . $component_name . '/access.xml',
+				"/access/section[@name='component']/"
+			);
 
 			// Find any deleted / added actions ...
 			$db_action_names = array();
@@ -2207,7 +2221,10 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 					// Set asset rules to empty, (DO NOT set any ACTIONS, just let them inherit ... from parent)
 					$asset->rules = new JAccessRules();
 					/*
-					$actions	= JAccess::getActions($component_name, 'field');
+					$actions = JAccess::getActionsFromFile(
+						JPATH_ADMINISTRATOR . '/components/' . $component_name . '/access.xml',
+						"/access/section[@name='field']/"
+					);
 					$rules 		= json_decode($component_asset->rules);
 					foreach ($actions as $action) {
 						$fieldrules[$action->name] = $rules->{$action->name};
@@ -2268,7 +2285,10 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 					// Set asset rules to empty, (DO NOT set any ACTIONS, just let them inherit ... from parent)
 					$asset->rules = new JAccessRules();
 					/*
-					$actions	= JAccess::getActions($component_name, 'type');
+					$actions = JAccess::getActionsFromFile(
+						JPATH_ADMINISTRATOR . '/components/' . $component_name . '/access.xml',
+						"/access/section[@name='type']/"
+					);
 					$rules 		= json_decode($component_asset->rules);
 					foreach ($actions as $action) {
 						$typerules[$action->name] = $rules->{$action->name};
@@ -2375,7 +2395,11 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		// *** Get flexicontent ACTION names
 		// ***
 
-		$flexi_actions = JAccess::getActions($component, 'component');
+		$flexi_actions = JAccess::getActionsFromFile(
+			JPATH_ADMINISTRATOR . '/components/' . $component . '/access.xml',
+			"/access/section[@name='component']/"
+		);
+
 		foreach($flexi_actions as $action)
 		{
 			$flexi_action_names[$action->name] = 1;

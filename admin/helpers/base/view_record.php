@@ -49,7 +49,7 @@ class FlexicontentViewBaseRecord extends JViewLegacy
 	 */
 	public function prepare_common_fcview($config = array())
 	{
-		$isAdmin = JFactory::getApplication()->isAdmin();
+		$isAdmin = JFactory::getApplication()->isClient('administrator');
 
 		/**
 		 * Load Joomla language files of other extension
@@ -81,7 +81,7 @@ class FlexicontentViewBaseRecord extends JViewLegacy
 		/**
 		 * In older Joomla versions include Toolbar Helper in frontend
 		 */
-		if (JFactory::getApplication()->isSite())
+		if (JFactory::getApplication()->isClient('site'))
 		{
 			$jversion = new JVersion;
 

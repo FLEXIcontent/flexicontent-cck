@@ -25,7 +25,7 @@ class plgFlexicontent_fieldsEmail extends FCField
 	function __construct( &$subject, $params )
 	{
 		$app = JFactory::getApplication(); //record action in form
-		if ($app->isSite() && $app->input->get('emailtask', '', 'cmd') === 'plg.email.submit') {
+		if ($app->isClient('site') && $app->input->get('emailtask', '', 'cmd') === 'plg.email.submit') {
 			$this->sendEmail();
 		}
 		parent::__construct( $subject, $params );
@@ -725,7 +725,7 @@ class plgFlexicontent_fieldsEmail extends FCField
 		// Create the non-SEF URL
 		$item_url = FlexicontentHelperRoute::getItemRoute($itemid.':'.$alias, $maincat);
 		// Create the SEF URL
-		$item_url = $app->isAdmin()
+		$item_url = $app->isClient('administrator')
 			? flexicontent_html::getSefUrl($item_url)   // ..., $_xhtml= true, $_ssl=-1);
 			: JRoute::_($item_url);  // ..., $_xhtml= true, $_ssl=-1);
 		// Make URL absolute since this URL will be emailed

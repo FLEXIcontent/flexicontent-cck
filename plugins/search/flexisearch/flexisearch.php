@@ -154,7 +154,7 @@ class plgSearchFlexisearch extends JPlugin
 		$lang = (FLEXI_J16GE || empty($urlLang)) ? $cntLang : $urlLang;
 		
 	  // COMPONENT PARAMETERS
-		$cparams 	= $app->isSite()  ?  $app->getParams('com_flexicontent')  : JComponentHelper::getParams('com_flexicontent');
+		$cparams 	= $app->isClient('site')  ?  $app->getParams('com_flexicontent')  : JComponentHelper::getParams('com_flexicontent');
 		if (!defined('FLEXI_SECTION'))
 			define('FLEXI_SECTION', $cparams->get('flexi_section'));		// define section
 		$show_noauth = $cparams->get('show_noauth', 0);		// items the user cannot see ...
@@ -287,7 +287,7 @@ class plgSearchFlexisearch extends JPlugin
 		// **********************************************************************************************************************************************************
 		
 		$andlang = '';
-		if (	$app->isSite() &&
+		if (	$app->isClient('site') &&
 					( FLEXI_FISH || (FLEXI_J16GE && $app->getLanguageFilter()) ) &&
 					$filter_lang  // Language filtering enabled
 		) {

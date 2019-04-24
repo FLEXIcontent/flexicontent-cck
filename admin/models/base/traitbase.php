@@ -41,20 +41,32 @@ trait FCModelTraitBase
 
 
 	/**
-	 * Returns a Table object, always creating it
+	 * Method to get a table object, load it if necessary.
 	 *
-	 * @param	type	The table type to instantiate
-	 * @param	string	A prefix for the table class name. Optional.
-	 * @param	array	Configuration array for model. Optional.
+	 * @param   string  $name     The table name. Optional.
+	 * @param   string  $prefix   The class prefix. Optional.
+	 * @param   array   $options  Configuration array for model. Optional.
 	 *
-	 * @return	JTable	A database object
+	 * @return  \JTable  A \JTable object
 	 *
-	 * @since   3.3.0
-	*/
-	public function getTable($type = null, $prefix = '', $config = array())
+	 * @since   3.0
+	 * @throws  \Exception
+	 */
+	public function getTable($name = null, $prefix = '', $options = array())
 	{
-		$type = $type ?: $this->records_jtable;
-		return parent::getTable($type, $prefix, $config);
+		$name = $name ?: $this->records_jtable;
+
+		if (empty($name))
+		{
+			$name = $this->getName();
+		}
+
+		if ($table = $this->_createTable($name, $prefix, $options))
+		{
+			return $table;
+		}
+
+		throw new \Exception(\JText::sprintf('JLIB_APPLICATION_ERROR_TABLE_NAME_NOT_SUPPORTED', $name), 0);
 	}
 
 

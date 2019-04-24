@@ -112,7 +112,7 @@ abstract class JHtmlFcbase
 
 		if (!$row->checked_out)
 		{
-			return '<span class="icon-pencil-2"></span>';
+			return '<span class="icon-pencil"></span>';
 		}
 
 		if (!$row->canCheckin)

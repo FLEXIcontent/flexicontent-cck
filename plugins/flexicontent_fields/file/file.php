@@ -755,7 +755,7 @@ class plgFlexicontent_fieldsFile extends FCField
 		// VERIFY downloads manager module is installed and enabled
 		static $mod_is_enabled = null;
 
-		if ($mod_is_enabled === null && $allowaddtocart && !JFactory::getApplication()->isAdmin())
+		if ($mod_is_enabled === null && $allowaddtocart && !JFactory::getApplication()->isClient('administrator'))
 		{
 			$db = JFactory::getDbo();
 			$query = "SELECT published FROM #__modules WHERE module = 'mod_flexidownloads' AND published = 1";
@@ -1501,7 +1501,7 @@ class plgFlexicontent_fieldsFile extends FCField
 		$data->desc    = $desc;
 		$data->mailto  = $mailto;
 
-		$document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontent.css', FLEXI_VHASH);
+		$document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontent.css', array('version' => FLEXI_VHASH));
 		include('file'.DS.'share_form.php');
 		$session->set('com_flexicontent.formtime', time());
 	}
@@ -1722,7 +1722,7 @@ class plgFlexicontent_fieldsFile extends FCField
 			return $this->share_file_form();
 		}
 
-		$document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontent.css', FLEXI_VHASH);
+		$document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontent.css', array('version' => FLEXI_VHASH));
 		include('file'.DS.'share_result.php');
 	}
 

@@ -50,7 +50,7 @@ class flexicontent_db
 			$db->setQuery('UPDATE #__'.$tblname.' SET '.$colname.' = '.$db->Quote($attribs).' WHERE '.$idname.' = ' .  $db->Quote($id));
 			$db->execute();
 			$app = JFactory::getApplication();
-			if ($app->isAdmin())
+			if ($app->isClient('administrator'))
 			{
 				$app->enqueueMessage('Cleared bad JSON COLUMN: <b>'.$colname.'</b>, DB TABLE: <b>'.$tblname.'</b>, RECORD: <b>'.$id.'</b>', 'warning');
 			}
