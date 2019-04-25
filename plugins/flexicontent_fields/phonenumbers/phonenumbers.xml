@@ -13,6 +13,7 @@
 	<files>
 		<filename plugin="phonenumbers">phonenumbers.php</filename>
 		<filename>index.html</filename>
+		<folder>tmpl_common</folder>
 	</files>
 
 	<config>
