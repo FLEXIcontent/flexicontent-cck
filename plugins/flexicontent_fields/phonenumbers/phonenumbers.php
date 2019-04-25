@@ -23,7 +23,7 @@ class plgFlexicontent_fieldsPhonenumbers extends FCField
 	// ***
 
 	// Method to create field's HTML display for item form
-	function onDisplayField(&$field, &$item)
+	public function onDisplayField(&$field, &$item)
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 
@@ -99,6 +99,37 @@ class plgFlexicontent_fieldsPhonenumbers extends FCField
 			$field->value[0] = serialize($field->value[0]);
 		}
 
+		// Countries and US states
+		include('tmpl_common'.DS.'areas.php');
+
+
+		// CET ALLOWED countries, with special check for single country
+		$ac_country_default = $field->parameters->get('ac_country_default', '');
+		$ac_country_allowed_list = $field->parameters->get('ac_country_allowed_list', '');
+		$ac_country_allowed_list = array_unique(FLEXIUtilities::paramToArray($ac_country_allowed_list, "/[\s]*,[\s]*/", false, true));
+		$single_country = count($ac_country_allowed_list)==1 && $ac_country_default ? $ac_country_default : false;
+
+
+		// CREATE COUNTRY OPTIONS
+		$_list = count($ac_country_allowed_list) ? array_flip($ac_country_allowed_list) : $list_countries;
+		$allowed_country_names = array();
+		$allowed_countries = array(''=>JText::_('FLEXI_SELECT'));
+		foreach($_list as $country_code => $k)
+		{
+			$country_op = new stdClass;
+			$allowed_countries[] = $country_op;
+			$country_op->value = $country_code;
+			$country_op->text  = JText::_('PLG_FC_PHONENUMBERS_CC_'.$country_code);
+			if (count($ac_country_allowed_list)) $allowed_country_names[] = $country_op->text;
+		}
+		//echo $ac_country_options; exit;
+
+		$countries_attribs = ''
+			. ($single_country ? ' disabled="disabled" readonly="readonly"' : '')
+			. ' onchange="fcfield_addrint.toggle_USA_state(this);" ';
+
+
+
 		// CSS classes of value container
 		$value_classes  = 'fcfieldval_container valuebox fcfieldval_container_'.$field->id;
 
@@ -156,11 +187,11 @@ class plgFlexicontent_fieldsPhonenumbers extends FCField
 				theInput.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_label');
 				newField.find('.phonelabel-lbl').first().attr('for','".$elementid."_'+uniqueRowNum".$field->id."+'_label');
 
-				theInput = newField.find('input.phonecc').first();
+				theSelect = newField.find('select.phonecc').first();
 				theInput.val('');
-				theInput.attr('name','custom[".$field->name."]['+uniqueRowNum".$field->id."+'][cc]');
-				theInput.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_cc');
-				newField.find('.phonecc-lbl').first().attr('for','".$elementid."_'+uniqueRowNum".$field->id."+'_cc');
+				theSelect.attr('name','custom[".$field->name."]['+uniqueRowNum".$field->id."+'][cc]');
+				theSelect.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_cc');
+				//newField.find('.phonecc-lbl').first().attr('for','".$elementid."_'+uniqueRowNum".$field->id."+'_cc');
 
 				theInput = newField.find('input.phonenum1').first();
 				theInput.val('');
@@ -303,7 +334,8 @@ class plgFlexicontent_fieldsPhonenumbers extends FCField
 
 			$phonecc = (!$use_cc ? '' : '
 				<tr><td class="key">' .JText::_( 'PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_COUNTRY_CODE' ). '</td><td>
-					<input class="phonecc fcfield_textval inlineval" name="'.$fieldname_n.'[cc]" id="'.$elementid_n.'_cc" type="text" value="'.@$value['cc'].'" '.$cc_attribs.' />
+				'.JHtml::_('select.genericlist', $allowed_countries, $fieldname_n.'[cc]', $countries_attribs . ' class="use_select2_lib phonecc"', 'value', 'text', ($value['cc'] ? $value['cc'] : $ac_country_default), $elementid_n.'_cc').'
+
 				</td></tr>');
 
 			$phone = '
@@ -337,7 +369,7 @@ class plgFlexicontent_fieldsPhonenumbers extends FCField
 				</div>
 				').'
 				'.($use_ingroup ? '' : '<div class="fcclear"></div>').'
-				<table class="admintable"><tbody>
+				<table class="fc-form-tbl fcfullwidth fcinner"><tbody>
 				'.$phonelabel.'
 				'.$phonecc.'
 				'.$phone.'
@@ -481,7 +513,7 @@ class plgFlexicontent_fieldsPhonenumbers extends FCField
 	// ***
 
 	// Method to handle field's values before they are saved into the DB
-	function onBeforeSaveField( &$field, &$post, &$file, &$item )
+	public function onBeforeSaveField( &$field, &$post, &$file, &$item )
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 
@@ -548,12 +580,12 @@ class plgFlexicontent_fieldsPhonenumbers extends FCField
 
 
 	// Method to take any actions/cleanups needed after field's values are saved into the DB
-	function onAfterSaveField( &$field, &$post, &$file, &$item ) {
+	public function onAfterSaveField( &$field, &$post, &$file, &$item ) {
 	}
 
 
 	// Method called just before the item is deleted to remove custom item data related to the field
-	function onBeforeDeleteField(&$field, &$item) {
+	public function onBeforeDeleteField(&$field, &$item) {
 	}
 
 
