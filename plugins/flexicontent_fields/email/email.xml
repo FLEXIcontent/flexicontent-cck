@@ -228,7 +228,7 @@
 
 			<field name="" type="separator" default="FLEXI_FIELD_EMAIL_SUBMIT_OPTION" level="level2" />
 			<field name="submit_label" type="text" label="FLEXI_FIELD_EMAIL_SUBMIT_LABEL"  default="FLEXI_FIELD_EMAIL_SUBMIT_LABEL_VALUE" description="FLEXI_FIELD_EMAIL_SUBMIT_LABEL_DESC"/>
-			<field name="submit_class" type="text" label="FLEXI_FIELD_EMAIL_SUBMIT_CLASS"  default="btn" description="FLEXI_FIELD_EMAIL_SUBMIT_CLASS_DESC"/>
+			<field name="submit_class" type="text" label="FLEXI_FIELD_EMAIL_SUBMIT_CLASS"  default="btn btn-success" description="FLEXI_FIELD_EMAIL_SUBMIT_CLASS_DESC"/>
 
 			<field name="" type="separator" default="FLEXI_FIELD_EMAIL_CONSENT_OPTION" level="level2" />
 			<field name="display_consent" type="multilist" subtype="radio" toggle_related="1" default="1" label="FLEXI_FIELD_EMAIL_CONSENT_DISPLAY" description="FLEXI_FIELD_EMAIL_CONSENT_DISPLAY_DESC" class="btn-group btn-group-yesno">

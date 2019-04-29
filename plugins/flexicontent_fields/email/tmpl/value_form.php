@@ -117,19 +117,19 @@ foreach ($values as $value)
 									$placeholder = ($label_position === 'placeholder') ? 'placeholder="'.$list_field->field_label.'"': '';
 
 									if($list_field->field_type === 'text') {
-										$fields_display .= '<div class="field field_text form-group"><label for="'.$field_id.'" class="'.$class.'">'.$field_label.'</label><input type="text" name="'.$field_name.'" id="'.$field_id.'" '.$placeholder.' aria-label="'.$field_label.'" class="'.$required.'" style="margin:0"></div>';
+										$fields_display .= '<div class="field field_text form-group"><label for="'.$field_id.'" class="'.$class.'">'.$field_label.'</label><input type="text" name="'.$field_name.'" id="'.$field_id.'" '.$placeholder.' aria-label="'.$field_label.'" class="form-control '.$required.'" style="margin:0"></div>';
 										}
 									if($list_field->field_type === 'email') {
-										$fields_display .= '<div class="field field_email form-group"><label for="'.$field_id.'" class="'.$class.'">'.$field_label.'</label><input type="email" name="'.$field_name.'" id="'.$field_id.'" '.$placeholder.' aria-label="'.$field_label.'" class="'.$required.' validate-email" style="margin:0"></div>';
+										$fields_display .= '<div class="field field_email form-group"><label for="'.$field_id.'" class="'.$class.'">'.$field_label.'</label><input type="email" name="'.$field_name.'" id="'.$field_id.'" '.$placeholder.' aria-label="'.$field_label.'" class="form-control '.$required.' validate-email" style="margin:0"></div>';
 										}
 									if($list_field->field_type === 'date') {
-											$fields_display .= '<div class="field field_date form-group"><label for="'.$field_id.'" class="'.$class.'">'.$field_label.'</label><input type="date" name="'.$field_name.'" id="'.$field_id.'" '.$placeholder.' aria-label="'.$field_label.'" class="'.$required.'" style="margin:0"></div>';
+											$fields_display .= '<div class="field field_date form-group"><label for="'.$field_id.'" class="'.$class.'">'.$field_label.'</label><input type="date" name="'.$field_name.'" id="'.$field_id.'" '.$placeholder.' aria-label="'.$field_label.'" class="form-control '.$required.'" style="margin:0"></div>';
 											}
 									if($list_field->field_type === 'datetime-local') {
-											$fields_display .= '<div class="field field_datetime form-group"><label for="'.$field_id.'" class="'.$class.'">'.$field_label.'</label><input type="datetime-local" name="'.$field_name.'" id="'.$field_id.'" '.$placeholder.' aria-label="'.$field_label.'" class="'.$required.'" style="margin:0"></div>';
+											$fields_display .= '<div class="field field_datetime form-group"><label for="'.$field_id.'" class="'.$class.'">'.$field_label.'</label><input type="datetime-local" name="'.$field_name.'" id="'.$field_id.'" '.$placeholder.' aria-label="'.$field_label.'" class="form-control '.$required.'" style="margin:0"></div>';
 											}
 									if($list_field->field_type === 'textarea') {
-										$fields_display .= '<div class="field field_textarea form-group"><label for="'.$field_id.'" class="'.$class.'">'.$field_label.'</label><textarea rows="4" cols="50" name="'.$field_name.'" '.$placeholder.' aria-label="'.$field_label.'" id="'.$field_id.'" class="'.$required.'" style="width: 100%;
+										$fields_display .= '<div class="field field_textarea form-group"><label for="'.$field_id.'" class="'.$class.'">'.$field_label.'</label><textarea rows="4" cols="50" name="'.$field_name.'" '.$placeholder.' aria-label="'.$field_label.'" id="'.$field_id.'" class="form-control '.$required.'" style="width: 100%;
     margin: 0;"></textarea></div>';
 										}
 									if($list_field->field_type === 'radio') {
@@ -137,7 +137,7 @@ foreach ($values as $value)
 										$fields_display .= '<div class="field field_radio form-group"><label for="'.$field_id.'" class="'.$class.'-radio">'.$list_field->field_label.'</label>';
 											foreach( $values_field as $value_field ) {
 												$value =  JText::_($value_field);
-												$fields_display .= '<input type="radio form-group" value="'.$value.'" name="'.$formid.'['.$value.']'.'" aria-label="'.$value.'" style="margin:0"><label for="'.$field_id.'">'.$value.'</label>';
+												$fields_display .= '<input type="radio" value="'.$value.'" name="'.$formid.'['.$value.']'.'" aria-label="'.$value.'" style="margin:0" class="form-control"><label for="'.$field_id.'">'.$value.'</label>';
 											}
 											$fields_display .='</div>';
 									}
@@ -146,14 +146,14 @@ foreach ($values as $value)
 										$fields_display .= '<div class="field field_checkbox form-group"><label for="'.$field_id.'" class="'.$class.'-checkbox">'.$list_field->field_label.'</label>';
 											foreach( $values_field as $value_field ) {
 												$value = JText::_($value_field);
-												$fields_display .= '<input type="checkbox form-group" value="'.$value.'" name="'.$value.'" class="" aria-label="'.$value.'" style="margin:0" ><label for="'.$field_id.'">'.$value.'</label>'; //TODO add required system
+												$fields_display .= '<input type="checkbox" value="'.$value.'" name="'.$value.'" class="form-control" aria-label="'.$value.'" style="margin:0" ><label for="'.$field_id.'">'.$value.'</label>'; //TODO add required system
 											}
 											$fields_display .='</div>';
 									}
 									if($list_field->field_type === 'select') {
 										$values_field = explode(";;",$list_field->field_value);
 										$select_label = ($class == 'placeholder') ? $field_label : JText::_('FLEXI_SELECT');
-										$fields_display .= '<div class="field field_select"><label for="'.$field_id.'" class="'.$class.'" style="margin:0">'.$field_label.'</label><select id="'.$field_name.'" name="'.$field_name.'" aria-label="'.$field_label.'"><option value="">'.$select_label.'</option>';//TODO add required system
+										$fields_display .= '<div class="field field_select"><label for="'.$field_id.'" class="'.$class.'" style="margin:0">'.$field_label.'</label><select id="'.$field_name.'" name="'.$field_name.'" aria-label="'.$field_label.'" class="form-control"><option value="">'.$select_label.'</option>';//TODO add required system
 											foreach( $values_field as $value_field ) {
 												$value = JText::_($value_field);
 												$fields_display .='<option value="'.$value.'">'.JText::_($value_field).'</option>';
@@ -161,10 +161,10 @@ foreach ($values as $value)
 										$fields_display .='</select></div>';
 									}
 									if($list_field->field_type === 'file') {
-										$fields_display .= '<h3>NOT COMPLETE FUNCTION</h3><div class="field field_file form-group"><label for="'.$field_id.'" class="'.$class.'">'.$field_label.'</label><input type="file" name="'.$field_name.'" accept="'.$value.'" id="'.$field_id.'" '.$placeholder.' aria-label="'.$field_label.'" class="'.$required.'" multiple style="margin:0"></div>';//TODO add upload system
+										$fields_display .= '<h3>NOT COMPLETE FUNCTION</h3><div class="field field_file form-group"><label for="'.$field_id.'" class="'.$class.'">'.$field_label.'</label><input type="file" name="'.$field_name.'" accept="'.$value.'" id="'.$field_id.'" '.$placeholder.' aria-label="'.$field_label.'" class="form-control '.$required.'" multiple style="margin:0"></div>';//TODO add upload system
 									}
 									if($list_field->field_type === 'phone') {
-										$fields_display .= '<div class="field field_phone form-group"><label for="'.$field_id.'" class="'.$class.'">'.$field_label.'</label><input type="phone" name="'.$field_name.'" pattern="'.$value.'" id="'.$field_id.'" '.$placeholder.' aria-label="'.$field_label.'" class="'.$required.'" style="margin:0"></div>';
+										$fields_display .= '<div class="field field_phone form-group"><label for="'.$field_id.'" class="'.$class.'">'.$field_label.'</label><input type="phone" name="'.$field_name.'" pattern="'.$value.'" id="'.$field_id.'" '.$placeholder.' aria-label="'.$field_label.'" class="form-control '.$required.'" style="margin:0"></div>';
 									}
 									if($list_field->field_type === 'hidden') {
 										$fields_display .= '<input type="hidden" name="'.$field_name.'" id="'.$field_id.'" value="'.$field_value.'">';
@@ -173,11 +173,11 @@ foreach ($values as $value)
 										$fields_display .= '<div class="field field_html form-group"><p>'.$field_label.'</p><p>'.JText::_($list_field->field_value).'</p></div>';
 									}
 									if($list_field->field_type === 'url') {
-										$fields_display .= '<div class="field field_url form-group"><label for="'.$field_id.'" class="'.$class.'">'.$field_label.'</label><input type="url" name="'.$field_name.'" pattern="'.$list_field->field_value.'" id="'.$field_id.'" '.$placeholder.' aria-label="'.$field_label.'" class="'.$required.'" style="margin:0"></div>';
+										$fields_display .= '<div class="field field_url form-group"><label for="'.$field_id.'" class="'.$class.'">'.$field_label.'</label><input type="url" name="'.$field_name.'" pattern="'.$list_field->field_value.'" id="'.$field_id.'" '.$placeholder.' aria-label="'.$field_label.'" class="form-control '.$required.'" style="margin:0"></div>';
 									}
 									if($list_field->field_type === 'range') {
 										$values_field = explode(";;",$list_field->field_value);
-										$fields_display .= '<div class="field field_range form-group"><label for="'.$field_id.'" class="'.$class.'">'.$field_label.'</label><input type="range" name="'.$field_name.'" min="'.$values_field[0].'" max="'.$values_field[1].'" id="'.$field_id.'" '.$placeholder.' aria-label="'.$field_label.'" class="'.$required.'" style="margin:0"></div>';
+										$fields_display .= '<div class="field field_range form-group"><label for="'.$field_id.'" class="'.$class.'">'.$field_label.'</label><input type="range" name="'.$field_name.'" min="'.$values_field[0].'" max="'.$values_field[1].'" id="'.$field_id.'" '.$placeholder.' aria-label="'.$field_label.'" class="form-control '.$required.'" style="margin:0"></div>';
 									}
 							}
 						}
