@@ -1,0 +1,222 @@
+@import 'include/config.less';
+
+/* Default Theme : item template CSS file */
+
+
+/* LESS EXAMPLE variable name: 'FCI_' + parameter name */
+/* e.g. 'FCI_' + 'title_color' =>  'FCI_title_color' */
+body #flexicontent .fc_item_title,
+body #flexicontent .fc_item_title a {
+	color: @FCI_title_color;
+	background-color: @FCI_title_bg_color;
+	padding-top: @FCI_title_pad_top + px ;
+	padding-right: @FCI_title_pad_right + px;
+	padding-left: @FCI_title_pad_left + px;
+	padding-bottom: @FCI_title_pad_bottom + px;
+	border-radius: @FCI_title_border_radius + px;
+}
+
+/* background item */
+.fcitems {
+	background-color: @FCI_item_bg_color;
+	padding-top: @FCI_item_pad_top + px ;
+	padding-right: @FCI_item_pad_right + px;
+	padding-left: @FCI_item_pad_left + px;
+	padding-bottom: @FCI_item_pad_bottom + px;
+	border-radius: @FCI_item_border_radius + px;
+	border: @FCI_item_border_size + px @FCI_item_border_type @FCI_item_border_color;
+	color:@FCI_item_text_color;
+}
+
+/* Label styling */
+
+body #flexicontent .flexi.label,
+body #flexicontent .desc-title.label {
+	background-color: @FCI_label_bg_color;
+	color: @FCI_label_txt_color;
+	border-radius: @FCI_label_radius*1px;
+	padding-top: @FCI_label_pad_top + px ;
+	padding-right: @FCI_label_pad_right + px;
+	padding-left: @FCI_label_pad_left + px;
+	padding-bottom: @FCI_label_pad_bottom + px;
+}
+
+/* TAB styling */
+
+body #flexicontent ul.tabbernav > li a {
+	border: 1px solid @FCI_tab_bg_color_end;
+	background-color: @FCI_tab_bg_color_start;
+	background-image: -webkit-linear-gradient(top, @FCI_tab_bg_color_start , @FCI_tab_bg_color_end);
+	background-image: linear-gradient(to bottom, @FCI_tab_bg_color_start , @FCI_tab_bg_color_end );
+	filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr= @FCI_tab_bg_color_start , endColorstr= @FCI_tab_bg_color_end );
+	color: @FCI_tab_title_color;
+}
+
+body #flexicontent ul.tabbernav > li.tabberactive a::before {
+	border-top: 4px solid @FCI_tab_bg_color_end;
+}
+/*  ... NOT USED !!
+body #flexicontent ul.tabbernav > li.tabberactive a,
+body #flexicontent ul.tabbernav > li.tabberactive a:hover {
+	background-color: @FCI_tab_bg_color_active;
+}*/
+body #flexicontent ul.tabbernav > li:hover a {
+	border: 1px solid darken(@FCI_tab_bg_color_end, 20%);
+	background-color: darken(@FCI_tab_bg_color_start, 20%);
+	background-image: -webkit-linear-gradient(top, darken(@FCI_tab_bg_color_start, 20%) , darken(@FCI_tab_bg_color_end, 20%));
+	background-image: linear-gradient(to bottom, darken(@FCI_tab_bg_color_start, 20%) , darken(@FCI_tab_bg_color_end, 20%) );
+	filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr= darken(@FCI_tab_bg_color_start, 20%) , endColorstr= darken(@FCI_tab_bg_color_end, 20%) );
+	color: @FCI_tab_title_color;
+}
+body .tabbertab, #flexicontent .tabbertab {
+	background-color: @FCI_tab_content_bg_color;
+	border-radius : @FCI_tab_content_border_radius + px;
+}
+body ul.tabbernav, #flexicontent ul.tabbernav {
+	border-bottom: @FCI_tab_content_border_size_top + px solid @FCI_tab_content_border_color_top !important;
+}
+
+
+/* infoblock styling */
+
+body .flexi.infoblock{
+	color: @FCI_column_color;
+	background-color: @FCI_column_bg_color;
+	padding-top: @FCI_column_pad_top + px ;
+	padding-right: @FCI_column_pad_right + px;
+	padding-left: @FCI_column_pad_left + px;
+	padding-bottom: @FCI_column_pad_bottom + px;
+	border-radius: @FCI_column_border_radius + px;
+	border : @FCI_column_border_size + px @FCI_column_border_type @FCI_column_border_color;
+}
+
+// ***
+// *** A row of content
+// ***
+
+.flexi.lineinfo {
+	display: block;
+	padding: 0;
+	margin: 0 0 1em;
+	overflow: hidden;
+	clear: both;
+}
+
+
+// ***
+// *** Allow responsive width while floating
+// ***
+
+.tabbertab .flexi.element,
+.subtitle1 .flexi.element,
+.subtitle2 .flexi.element,
+.subtitle3 .flexi.element {
+	clear: none;
+	display: block;
+	float: left;
+	max-width: 96% !important;  /* Allow responsive width while floating */
+	padding: 0% !important;  /* Allow responsive width while floating */
+	margin: 0.5em 2% 0.5em 2% !important;
+}
+
+
+// ***
+// *** POSITIONS: SubtitleN
+// ***
+
+.flexi.subtitle1 {}
+.flexi.subtitle2 {}
+.flexi.subtitle3 {}
+
+
+// ***
+// *** POSITION: Top Block
+// ***
+
+.flexi.topblock {
+	overflow: hidden;
+	width: 100%;
+	margin-bottom: 10px;
+}
+.topblock .flexi.image {
+	display: block;
+	float: left;
+	max-width: 99% !important;  /* Allow responsive width while floating */
+	padding: 0% !important;  /* Allow responsive width while floating */
+	margin-right: 1%;
+	margin-left: 0%;
+	line-height: 0px;
+	border: 0px solid silver;
+}
+.topblock .flexi.image a {
+	outline: none;
+}
+.topblock .flexi.image img {
+	border: 1px solid white;
+}
+.topblock .flexi.infoblock {
+	overflow: hidden;
+}
+
+
+/* infoblock: Field block styling */
+.flexi.infoblock {
+	border: 1px solid silver;
+	margin: 0 0 10px;
+	padding: 10px;
+}
+.infoblock ul.flexi {
+	margin: 0 !important;
+	padding: 0 !important;
+}
+.infoblock ul li.flexi {
+	padding: 0;
+	background: none;
+	min-height: 10px;
+	display: -moz-inline-stack;
+	display: inline-block;
+	vertical-align: top;
+	margin: 0%;
+	zoom: 1;
+}
+
+
+/* Field values into 1 column */
+.onecols ul li.flexi {
+	width: 100%;
+}
+.onecols .flexi.label {
+	min-width: 20%;
+	margin-right: 4%;
+	margin-bottom: 6px;
+}
+.onecols .flexi.value {
+	min-width: 74%;
+	margin-right: 1%;
+}
+
+
+/* Field values into 2 columns */
+.twocols ul li.flexi {
+	min-width: 48%;
+}
+.twocols .flexi.label {
+	min-width: 34%;
+	margin: 2px 3% 6px 0;
+	box-sizing: border-box;
+}
+.twocols .flexi.value {
+	min-width: 59%;
+	margin: 2px 4% 6px 0;
+	box-sizing: border-box;
+}
+
+
+/*
+ * clearfix, for clearing a block that contains floated elements
+ * without appending an extra HTML TAG with 'clearfix' class
+ */
+
+.group {
+	overflow: auto !important;
+}

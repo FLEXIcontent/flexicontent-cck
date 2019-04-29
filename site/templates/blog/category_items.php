@@ -55,6 +55,8 @@ if (!empty($this->items) && ($this->params->get('lead_placement', 0)==1 || $this
 {
 	flexicontent_html::loadFramework('masonry');
 	flexicontent_html::loadFramework('imagesLoaded');
+	$load_masonry_feat = $this->params->get('lead_placement', 0);
+        $load_masonry_std = $this->params->get('intro_placement', 0);
 
 	$js = "
 		jQuery(document).ready(function(){

@@ -200,20 +200,20 @@
 			<field name="form_fields" type="subform" label="Form field" description="" layout="joomla.form.field.subform.repeatable" icon="list" multiple="true" class="fcsubform-compact">
 	<form name="form_fields_list" repeat="true">
 		<field name="field_type" type="list" label="Type" description="">
-			<option value="text">FLEXI_FIELD_TEXT</option>
-			<option value="email">FLEXI_FIELD_EMAIL</option>
-			<option value="radio">FLEXI_FIELD_RADIO</option>
-			<option value="date">FLEXI_FIELD_DATE</option>
-			<option value="datetime-local">FLEXI_FIELD_DATETIME</option>
-			<option value="checkbox">FLEXI_FIELD_CHECKBOX</option>
-			<option value="select">FLEXI_FIELD_SELECT</option>
-			<option value="range">FLEXI_FIELD_RANGE</option>
-			<option value="textarea">FLEXI_FIELD_TEXTAREA</option>
-			<option value="freehtml">FLEXI_FIELD_FREEHTML</option>
-			<option value="hidden">FLEXI_FIELD_HIDDEN</option>
-			<option value="tel">FLEXI_FIELD_TEL</option>
-			<option value="url">FLEXI_FIELD_URL</option>
-			<option value="file">FLEXI_FIELD_FILE</option>
+			<option value="text">FLEXI_FIELD_TYPE_TEXT</option>
+			<option value="email">FLEXI_FIELD_TYPE_EMAIL</option>
+			<option value="radio">FLEXI_FIELD_TYPE_RADIO</option>
+			<option value="date">FLEXI_FIELD_TYPE_DATE</option>
+			<option value="datetime-local">FLEXI_FIELD_TYPE_DATETIME</option>
+			<option value="checkbox">FLEXI_FIELD_TYPE_CHECKBOX</option>
+			<option value="select">FLEXI_FIELD_TYPE_SELECT</option>
+			<option value="range">FLEXI_FIELD_TYPE_RANGE</option>
+			<option value="textarea">FLEXI_FIELD_TYPE_TEXTAREA</option>
+			<option value="freehtml">FLEXI_FIELD_TYPE_FREEHTML</option>
+			<option value="hidden">FLEXI_FIELD_TYPE_HIDDEN</option>
+			<option value="tel">FLEXI_FIELD_TYPE_TEL</option>
+			<option value="url">FLEXI_FIELD_TYPE_URL</option>
+			<option value="file">FLEXI_FIELD_TYPE_FILE</option>
 		</field>
 		<field name="field_name" type="text" label="FLEXI_FIELD_EMAIL_NAME_FIELD"  default="FIELD_NAME" description="FLEXI_FIELD_EMAIL_NAME_FIELD_DESC" />
 		<field name="field_label" type="text" label="FLEXI_FIELD_EMAIL_LABEL_FIELD"  default="FIELD_LABEL" description="FLEXI_FIELD_EMAIL_LABEL_FIELD_DESC" />
