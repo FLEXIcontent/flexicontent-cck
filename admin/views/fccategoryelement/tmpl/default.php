@@ -330,7 +330,7 @@ if ($js)
 
 				<span class="<?php echo $this->tooltip_class; ?>" title="<?php echo JHtml::tooltipText(JText::_('FLEXI_SELECT'), $row->title . '<br/><br/>' . $pcpath, 0, 1); ?>">
 					<?php if ($activate_row): ?>
-						<a style="cursor: pointer;" href="javascript:;" onclick="window.parent.fcSelectCategory('<?php echo $row->id; ?>', '<?php echo str_replace( array("'", "\""), array("\\'", ""), $row->title ); ?>');" class="<?php echo $tip_class; ?>" title="<?php echo JHtml::tooltipText(JText::_('FLEXI_SELECT'), $pcpath, 0, 1); ?>" >
+						<a style="cursor: pointer;" href="javascript:;" onclick="window.parent.fcSelectCategory('<?php echo $row->id; ?>', '<?php echo str_replace( array("'", "\""), array("\\'", ""), $row->title ); ?>');" class="<?php echo $this->tooltip_class; ?>" title="<?php echo JHtml::tooltipText(JText::_('FLEXI_SELECT'), $pcpath, 0, 1); ?>" >
 					<?php else: ?>
 						<a style="cursor: default;" href="javascript:;" onclick="var box = jQuery('#assoc_not_allowed_msg'); fc_itemelement_view_handle = fc_showAsDialog(box, 300, 200, null, { title: '<?php echo JText::_('FLEXI_ABOUT', true); ?>'}); return false;">
 					<?php endif; ?>
