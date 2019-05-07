@@ -215,6 +215,7 @@ endif;
 			
 			<?php echo @ $item->editbutton; ?>
 			<?php echo @ $item->statebutton; ?>
+			<?php echo @ $item->deletebutton; ?>
 			<?php echo @ $item->approvalbutton; ?>
 			
 			<?php if ($this->params->get('show_comments_count')) : ?>
