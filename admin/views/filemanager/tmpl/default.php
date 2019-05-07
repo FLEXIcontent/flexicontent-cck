@@ -934,7 +934,7 @@ if ($js)
 
 					if (!$is_img)
 					{
-						$thumb_or_icon = JHtml::image($row->icon, $row->filename);
+						$thumb_or_icon = JHtml::image(@$row->icon, $row->filename);
 					}
 
 					if ($this->folder_mode)
