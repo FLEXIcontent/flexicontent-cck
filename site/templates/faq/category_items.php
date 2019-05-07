@@ -246,9 +246,10 @@ foreach ($cat_items as $catid => $items) :
 						<ul class="flexi-fieldlist">
 				   		<li class="flexi-field flexi-title">
 
-				   			<?php echo @ $item->editbutton; ?>
-				   			<?php echo @ $item->statebutton; ?>
-				   			<?php echo @ $item->approvalbutton; ?>
+								<?php echo @ $item->editbutton; ?>
+								<?php echo @ $item->statebutton; ?>
+								<?php echo @ $item->deletebutton; ?>
+								<?php echo @ $item->approvalbutton; ?>
 								
 								<?php if ($this->params->get('show_comments_count')) : ?>
 									<?php if ( isset($this->comments[ $item->id ]->total) ) : ?>
