@@ -357,7 +357,7 @@ if ($leadnum) :
 
 			<!-- BOF above-description-nolabel-line1 block -->
 			<?php if (isset($item->positions['above-description-line1-nolabel'])) : ?>
-			<div class="<?php echo $box_class_above_desc_1_nolbl; ?>">
+			<div class="<?php echo @$box_class_above_desc_1_nolbl; ?>">
 				<?php foreach ($item->positions['above-description-line1-nolabel'] as $field) : ?>
 				<div class="element">
 					<div class="value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></div>
@@ -384,7 +384,7 @@ if ($leadnum) :
 
 			<!-- BOF above-description-nolabel-line2 block -->
 			<?php if (isset($item->positions['above-description-line2-nolabel'])) : ?>
-			<div class="<?php echo $box_class_above_desc_2_nolbl; ?>">
+			<div class="<?php echo @$box_class_above_desc_2_nolbl; ?>">
 				<?php foreach ($item->positions['above-description-line2-nolabel'] as $field) : ?>
 				<div class="element">
 					<div class="value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></div>
@@ -700,7 +700,7 @@ if ($count > $leadnum) :
 
 			<!-- BOF above-description-nolabel-line1 block -->
 			<?php if (isset($item->positions['above-description-line1-nolabel'])) : ?>
-			<div class="<?php echo $box_class_above_desc_1_nolbl; ?>">
+			<div class="<?php echo @$box_class_above_desc_1_nolbl; ?>">
 				<?php foreach ($item->positions['above-description-line1-nolabel'] as $field) : ?>
 				<div class="element">
 					<div class="value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></div>
@@ -727,7 +727,7 @@ if ($count > $leadnum) :
 
 			<!-- BOF above-description-nolabel-line2 block -->
 			<?php if (isset($item->positions['above-description-line2-nolabel'])) : ?>
-			<div class="<?php echo $box_class_above_desc_2_nolbl; ?>">
+			<div class="<?php echo @$box_class_above_desc_2_nolbl; ?>">
 				<?php foreach ($item->positions['above-description-line2-nolabel'] as $field) : ?>
 				<div class="element">
 					<div class="value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></div>
