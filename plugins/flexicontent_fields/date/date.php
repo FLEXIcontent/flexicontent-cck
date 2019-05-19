@@ -928,6 +928,7 @@ class plgFlexicontent_fieldsDate extends FCField
 
 		$_s = $isSearchView ? '_s' : '';
 
+		$display_filter_as = $filter->parameters->get( 'display_filter_as'.$_s, 0 );  // Filter Type of Display
 		$date_filter_group = $filter->parameters->get('date_filter_group'.$_s, 'month');
 		$filter_as_age     = $filter->parameters->get('filter_as_age'.$_s, 0);
 
@@ -947,6 +948,12 @@ class plgFlexicontent_fieldsDate extends FCField
 			$filter_age_type = 'DAY';
 		}
 
+		if (in_array($display_filter_as, array(1, 3)))
+		{
+			$date_valformat = $filter->parameters->get('date_filter_label_format'.$_s, '%Y-%m-%d');
+			$filter_age_type = 'DAY';
+		}
+
 		// Display date 'label' can be different than the (aggregated) date value
 		$date_filter_label_format = $filter->parameters->get('date_filter_label_format'.$_s, '');
 		$date_txtformat = $date_filter_label_format ? $date_filter_label_format : $date_valformat;  // If empty then same as value
@@ -957,7 +964,6 @@ class plgFlexicontent_fieldsDate extends FCField
 		$db = JFactory::getDbo();
 		$nullDate_quoted = $db->Quote($db->getNullDate());
 
-		$display_filter_as = $filter->parameters->get( 'display_filter_as'.$_s, 0 );  // Filter Type of Display
 		$filter_as_range = in_array($display_filter_as, array(2,3,8));  // We don't want null date if using a range
 		$date_source = (int) $filter->parameters->get('date_source', 0);
 
@@ -980,7 +986,7 @@ class plgFlexicontent_fieldsDate extends FCField
 
 			if (!$filter_as_age)
 			{
-				$valuecol = sprintf(' CASE WHEN %s='.$nullDate_quoted.' THEN '.(!$filter_as_range ? $nullDate_quoted : $db->Quote('')).' ELSE DATE_FORMAT(%s, "%s") END ', $_value_col, $_value_col, $date_valformat);
+				$valuecol = sprintf(' CASE WHEN %s='.$nullDate_quoted.' THEN '.(!$filter_as_range ? $nullDate_quoted : $db->Quote('')).' ELSE DATE_FORMAT(%s, "%s") END ', $_value_col, $_value_col, !in_array($display_filter_as, array(1, 3)) ? $date_valformat : $date_txtformat);
 				$textcol  = sprintf(' CASE WHEN %s='.$nullDate_quoted.' THEN "'.JText::_('FLEXI_NEVER').'" ELSE DATE_FORMAT(%s, "%s") END ', $_value_col, $_value_col, $date_txtformat);
 			}
 			else
@@ -1035,6 +1041,7 @@ class plgFlexicontent_fieldsDate extends FCField
 	{
 		if ( !in_array($filter->field_type, static::$field_types) ) return;
 
+		$display_filter_as = $filter->parameters->get( 'display_filter_as', 0 );  // Filter Type of Display
 		$date_filter_group = $filter->parameters->get('date_filter_group', 'month');
 		$filter_as_age     = $filter->parameters->get('filter_as_age', 0);
 
@@ -1054,22 +1061,28 @@ class plgFlexicontent_fieldsDate extends FCField
 			$filter_age_type = 'DAY';
 		}
 
+		if (in_array($display_filter_as, array(1, 3)))
+		{
+			$date_valformat = $filter->parameters->get('date_filter_label_format', '%Y-%m-%d');
+			$filter_age_type = 'DAY';
+		}
+
 		$date_source = (int) $filter->parameters->get('date_source', 0);
 
 		if ($date_source === 0 || $date_source === 3)
 		{
-			$filter->filter_colname = !$filter_as_age
-				? sprintf(' DATE_FORMAT(rel.value, "%s") ', $date_valformat)
+			$filter->filter_colname = !$filter_as_age || in_array($display_filter_as, array(1, 3))
+				? sprintf(' rel.value ')
 				: ' TIMESTAMPDIFF(' . $filter_age_type . ', rel.value, CURDATE())';
 			$filter->filter_valuesjoin = null;   // use default query
 		}
 		elseif ($date_source === 1 || $date_source === 2)
 		{
 			$_value_col = ($date_source == 1) ? 'c.publish_up' : 'c.publish_down';
-
-			$filter->filter_colname = !$filter_as_age
-				? sprintf(' DATE_FORMAT(%s, "%s") ', $_value_col, $date_valformat)
+			$filter->filter_colname = !$filter_as_age || in_array($display_filter_as, array(1, 3))
+				? sprintf(' %s ', $_value_col)
 				: ' TIMESTAMPDIFF(' . $filter_age_type . ', ' . $_value_col . ', CURDATE())';
+
 			$filter->filter_valuesjoin = ' '; // a space to prevent using default query and instead use content table
 		}
 		else
@@ -1078,8 +1091,8 @@ class plgFlexicontent_fieldsDate extends FCField
 		}
 
 		// Format of given values must be same as format of the value-column, for filter as age  posted filter value is already a number
-		$filter->filter_valueformat = !$filter_as_age
-			? sprintf(' DATE_FORMAT(__filtervalue__, "%s") ', $date_valformat)
+		$filter->filter_valueformat = !$filter_as_age || in_array($display_filter_as, array(1, 3))
+			? sprintf(' STR_TO_DATE(__filtervalue__, "%s") ', $date_valformat)
 			: null;
 
 		return FlexicontentFields::getFiltered($filter, $value, $return_sql);
@@ -1153,6 +1166,8 @@ class plgFlexicontent_fieldsDate extends FCField
 		$_s = $for_advsearch ? '_s' : '';
 
 		$date_source       = (int) $field->parameters->get('date_source', 0);
+
+		$display_filter_as = $field->parameters->get( 'display_filter_as'.$_s, 0 );  // Filter Type of Display
 		$date_filter_group = $field->parameters->get('date_filter_group'.$_s, 'month');
 		$filter_as_age     = $field->parameters->get('filter_as_age'.$_s, 0);
 
@@ -1172,8 +1187,14 @@ class plgFlexicontent_fieldsDate extends FCField
 			$filter_age_type = 'DAY';
 		}
 
+		if (in_array($display_filter_as, array(1, 3)))
+		{
+			$date_valformat = $field->parameters->get('date_filter_label_format'.$_s, '%Y-%m-%d');
+			$filter_age_type = 'DAY';
+		}
+
 		// Display date 'label' can be different than the (aggregated) date value
-		$date_filter_label_format = $field->parameters->get('date_filter_label_format_s', '');
+		$date_filter_label_format = $field->parameters->get('date_filter_label_format'.$_s, '');
 		$date_txtformat = $date_filter_label_format ? $date_filter_label_format : $date_valformat;  // If empty then same as value
 
 		if ($post === null)
@@ -1183,13 +1204,13 @@ class plgFlexicontent_fieldsDate extends FCField
 
 			if (!$filter_as_age)
 			{
-				$valuecol = sprintf(' DATE_FORMAT('.$_value_col.', "%s") ', $date_valformat);
+				$valuecol = sprintf(' DATE_FORMAT('.$_value_col.', "%s") ', !in_array($display_filter_as, array(1, 3)) ? $date_valformat : $date_txtformat);
 				$textcol  = sprintf(' DATE_FORMAT('.$_value_col.', "%s") ', $date_txtformat);
 			}
 			else
 			{
-				$valuecol = ' TIMESTAMPDIFF(' . $filter_age_type . ', '.$_value_col.', CURDATE())';
-				$textcol  = ' TIMESTAMPDIFF(' . $filter_age_type . ', '.$_value_col.', CURDATE())';
+				$valuecol = sprintf(' TIMESTAMPDIFF(' . $filter_age_type . ',  DATE_FORMAT('.$_value_col.', "%s") , CURDATE()) ', !in_array($display_filter_as, array(1, 3)) ? $date_valformat : $date_txtformat);
+				$textcol  = sprintf(' TIMESTAMPDIFF(' . $filter_age_type . ',  DATE_FORMAT('.$_value_col.', "%s") , CURDATE()) ', $date_txtformat);
 			}
 
 			$field->field_valuesselect = ' '.$valuecol.' AS value_id, '.$textcol.' AS value';

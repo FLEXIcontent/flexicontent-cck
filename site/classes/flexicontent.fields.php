@@ -3045,6 +3045,7 @@ class FlexicontentFields
 
 			if (!isset($valCols[$field->field_type]))
 			{
+				$display_filter_as = (int) $filter->parameters->get('display_filter_as'.$_s, 0);
 				$date_filter_group = $field->parameters->get('date_filter_group'.$_s, 'month');
 				$filter_as_age = $field->parameters->get('filter_as_age'.$_s, 0);
 
@@ -3061,6 +3062,12 @@ class FlexicontentFields
 				else
 				{
 					$date_valformat  = '%Y-%m-%d';
+					$filter_age_type = 'DAY';
+				}
+
+				if (in_array($display_filter_as, array(1, 3)))
+				{
+					$date_valformat  = $field->parameters->get('date_filter_label_format'.$_s, '%Y-%m-%d');
 					$filter_age_type = 'DAY';
 				}
 
@@ -3273,7 +3280,7 @@ class FlexicontentFields
 				$date_filter_group = $filter->parameters->get('date_filter_group', 'month');
 				$filter_as_age     = $filter->parameters->get('filter_as_age', 0);
 
-				if (!$filter_as_age)
+				if (!$filter_as_age && !in_array($display_filter_as, array(1, 3)))
 				{
 					switch($date_filter_group)
 					{
