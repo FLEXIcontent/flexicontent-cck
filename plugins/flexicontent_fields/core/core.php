@@ -823,6 +823,7 @@ class plgFlexicontent_fieldsCore extends FCField
 
 			case 'created':  // creation dates
 			case 'modified': // modification dates
+				$display_filter_as = $filter->parameters->get( 'display_filter_as'.$_s, 0 );  // Filter Type of Display
 				$date_filter_group = $filter->parameters->get('date_filter_group'.$_s, 'month');
 
 				if ($date_filter_group === 'year')
@@ -836,6 +837,11 @@ class plgFlexicontent_fieldsCore extends FCField
 				else
 				{
 					$date_valformat = '%Y-%m-%d';
+				}
+
+				if (in_array($display_filter_as, array(1, 3)))
+				{
+					$date_valformat = $filter->parameters->get('date_filter_label_format'.$_s, '%Y-%m-%d');
 				}
 
 				// Display date 'label' can be different than the (aggregated) date value
@@ -987,14 +993,26 @@ class plgFlexicontent_fieldsCore extends FCField
 		$isdate = in_array($filter->field_type, array('date','created','modified')) || $filter->parameters->get('isdate',0);
 		if ($isdate)
 		{
+			$display_filter_as = $filter->parameters->get( 'display_filter_as', 0 );  // Filter Type of Display
 			$date_filter_group = $filter->parameters->get('date_filter_group', 'month');
+
 			if ($date_filter_group=='year') { $date_valformat='%Y'; }
 			else if ($date_filter_group=='month') { $date_valformat='%Y-%m';}
 			else { $date_valformat='%Y-%m-%d'; }
 
-			$filter->filter_colname    = sprintf(' DATE_FORMAT(c.%s, "%s") ', $filter->field_type, $date_valformat);
+			if (in_array($display_filter_as, array(1, 3)))
+			{
+				$date_valformat = $filter->parameters->get('date_filter_label_format', '%Y-%m-%d');
+			}
+
+			$filter->filter_colname = in_array($display_filter_as, array(1, 3))
+				? sprintf(' c.%s ', $filter->field_type)
+				: sprintf(' DATE_FORMAT(c.%s, "%s") ', $filter->field_type, $date_valformat);
 			$filter->filter_valuesjoin = ' ';   // ... a space, (indicates not needed)
-			$filter->filter_valueformat = sprintf(' DATE_FORMAT(__filtervalue__, "%s") ', $date_valformat);   // format of given values must be same as format of the value-column
+
+			$filter->filter_valueformat = in_array($display_filter_as, array(1, 3))
+				? sprintf(' STR_TO_DATE(__filtervalue__, "%s") ', $date_valformat)
+				: sprintf(' DATE_FORMAT(__filtervalue__, "%s") ', $date_valformat);   // format of given values must be same as format of the value-column
 
 			// 'isindexed' is not applicable for basic index and CORE fields
 			$filter->isindexed = 0; //in_array($filter->field_type, array('type','state','tags','categories','created','createdby','modified','modifiedby'));
@@ -1016,8 +1034,10 @@ class plgFlexicontent_fieldsCore extends FCField
 			return;
 		}
 
-		if ($filter->field_type == 'maintext' || $filter->field_type == 'title') {
-			$filter->parameters->set( 'display_filter_as_s', 1 );  // Only supports a basic filter of single text search input
+		// Only supports a basic filter of single text search input
+		if ($filter->field_type == 'maintext' || $filter->field_type == 'title')
+		{
+			$filter->parameters->set( 'display_filter_as_s', 1 );
 		}
 
 		$filter->isindexed = in_array($filter->field_type, array('type','state','tags','categories','created','createdby','modified','modifiedby'));
@@ -1135,10 +1155,17 @@ class plgFlexicontent_fieldsCore extends FCField
 		{
 			if ($nullDate===null) $nullDate	= $db->getNullDate();
 
+			$display_filter_as = $field->parameters->get( 'display_filter_as'.$_s, 0 );  // Filter Type of Display
 			$date_filter_group = $field->parameters->get('date_filter_group'.$_s, 'month');
+
 			if ($date_filter_group=='year') { $date_valformat='%Y'; }
 			else if ($date_filter_group=='month') { $date_valformat='%Y-%m'; }
 			else { $date_valformat='%Y-%m-%d'; }
+
+			if (in_array($display_filter_as, array(1, 3)))
+			{
+				$date_valformat = $field->parameters->get('date_filter_label_format'.$_s, '%Y-%m-%d');
+			}
 
 			// Display date 'label' can be different than the (aggregated) date value
 			$date_filter_label_format = $field->parameters->get('date_filter_label_format'.$_s, '');

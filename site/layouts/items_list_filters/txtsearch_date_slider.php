@@ -266,14 +266,13 @@ else
 	//JFactory::getDocument()->addStyleDeclaration("");
 }
 
-
 if ($display_filter_as==1 || $display_filter_as==7)
 {
 	if ($isDate && !$isSlider)
 	{
 		$filter->html	.= '
 			<div class="fc_filter_element">
-				'.FlexicontentFields::createCalendarField($value, $allowtime=0, $filter_ffname, $filter_ffid, $attribs_arr).'
+				'.FlexicontentFields::createCalendarField($value, $allowtime=0, $filter_ffname, $filter_ffid, $attribs_arr, $skip_on_invalid=false, $timezone=false, $filter->date_txtformat ).'
 			</div>';
 	}
 	else
@@ -293,11 +292,11 @@ else
 	{
 		$filter->html	.= '
 			<div class="fc_filter_element">
-				'.FlexicontentFields::createCalendarField(@ $value[1], $allowtime=0, $filter_ffname.'[1]', $filter_ffid.'1', $attribs_arr).'
+				'.FlexicontentFields::createCalendarField(@ $value[1], $allowtime=0, $filter_ffname.'[1]', $filter_ffid.'1', $attribs_arr, $skip_on_invalid=false, $timezone=false, $filter->date_txtformat ).'
 			</div>
 			' . ($use_font_icons ? ' <span class="fc_icon_range icon-arrow-left-4"></span><span class="fc_icon_range icon-arrow-right-4"></span> ' : ' <span class="fc_range"></span> ') . '
 			<div class="fc_filter_element">
-				'.FlexicontentFields::createCalendarField(@ $value[2], $allowtime=0, $filter_ffname.'[2]', $filter_ffid.'2', $attribs_arr).'
+				'.FlexicontentFields::createCalendarField(@ $value[2], $allowtime=0, $filter_ffname.'[2]', $filter_ffid.'2', $attribs_arr, $skip_on_invalid=false, $timezone=false, $filter->date_txtformat ).'
 			</div>';
 	}
 	else
