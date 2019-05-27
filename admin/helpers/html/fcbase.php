@@ -231,7 +231,7 @@ abstract class JHtmlFcbase
 
 		// Limit title length
 		$row->title_cut = StringHelper::strlen($title) > 100
-			? htmlspecialchars(StringHelper::substr($title, 100), ENT_QUOTES, 'UTF-8') . '...'
+			? htmlspecialchars(StringHelper::substr($title, 0, 100), ENT_QUOTES, 'UTF-8') . '...'
 			: htmlspecialchars($title, ENT_QUOTES, 'UTF-8');
 		$title_cut = $row->title_cut;
 
