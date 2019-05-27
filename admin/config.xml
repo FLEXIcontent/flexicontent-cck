@@ -569,7 +569,7 @@
 				<option value="1">FLEXI_SEARCH_FILTER_FORM_SLIDER</option>
 			</field>
 			<field name="ff_toggle_search_title" type="text" size="20" default="FLEXI_TOGGLE_SEARCH_FORM" label="FLEXI_TOGGLE_SEARCH_FORM_CUSTOM_TITLE" description="FLEXI_TOGGLE_SEARCH_FORM_CUSTOM_TITLE_DESC" class="input-xxlarge" />
-			<field name="filter_autosubmit" type="fcradio" default="0" label="FLEXI_FILTER_FORM_AUTO_SUBMIT" description="FLEXI_FILTER_FORM_AUTO_SUBMIT_DESC" class="btn-group">
+			<field name="filter_autosubmit" type="fcradio" default="1" label="FLEXI_FILTER_FORM_AUTO_SUBMIT" description="FLEXI_FILTER_FORM_AUTO_SUBMIT_DESC" class="btn-group">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
@@ -619,7 +619,7 @@
 			<field name="filter_posttext" type="text" filter="JComponentHelper::filterText" default="" label="FLEXI_RECORD_SUFFIX_TEXT" description="FLEXI_RECORD_SUFFIX_TEXT_DESC" class="input-xxlarge" />
 			<field name="filter_opentag" type="text" filter="JComponentHelper::filterText" default="" label="FLEXI_RECORD_LIST_OPENING_TEXT" description="FLEXI_RECORD_LIST_OPENING_TEXT_DESC" class="input-xxlarge" />
 			<field name="filter_closetag" type="text" filter="JComponentHelper::filterText" default="" label="FLEXI_RECORD_LIST_CLOSING_TEXT" description="FLEXI_RECORD_LIST_CLOSING_TEXT_DESC" class="input-xxlarge" />
-			<field name="filter_placement" type="fcradio" default="1" label="FLEXI_ONE_RECORD_PER_ROW" description="FLEXI_ONE_RECORD_PER_ROW_DESC" class="btn-group group-fcinfo">
+			<field name="filter_placement" type="fcradio" default="0" label="FLEXI_ONE_RECORD_PER_ROW" description="FLEXI_ONE_RECORD_PER_ROW_DESC" class="btn-group group-fcinfo">
 				<option value="0">FLEXI_NO_USE_SEPARATOR</option>
 				<option value="1">FLEXI_YES</option>
 				<option value="2">FLEXI_YES_BUT_FILTER_BELOW_LABEL</option>
