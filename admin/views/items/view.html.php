@@ -393,7 +393,7 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 		$options = array(
 			JHtml::_('select.option', 1, JText::_('FLEXI_PUBLISHED')),
 			JHtml::_('select.option', 0, JText::_('FLEXI_UNPUBLISHED')),
-			JHtml::_('select.option', 99, JText::_('FLEXI_UNPUBLISHED')),
+			JHtml::_('select.option', 99, JText::_('FLEXI_ANY')),
 			JHtml::_('select.option', 2, JText::_('FLEXI_ARCHIVED')),
 			JHtml::_('select.option', -2, JText::_('FLEXI_TRASHED')),
 		);
