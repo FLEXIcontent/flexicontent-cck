@@ -2687,6 +2687,10 @@ class FlexicontentFields
 	static function getLangHandler($language, $hasHandlerOnly = false)
 	{
 		// Currently we have dictionary only for Thai
+		$language = $language === '*'
+			? flexicontent_html::getSiteDefaultLang()
+			: $language;
+
 		if ($language != 'th-TH') return false;
 
 		/**
