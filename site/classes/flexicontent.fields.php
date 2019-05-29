@@ -3045,7 +3045,7 @@ class FlexicontentFields
 
 			if (!isset($valCols[$field->field_type]))
 			{
-				$display_filter_as = (int) $filter->parameters->get('display_filter_as'.$_s, 0);
+				$display_filter_as = (int) $field->parameters->get('display_filter_as'.$_s, 0);
 				$date_filter_group = $field->parameters->get('date_filter_group'.$_s, 'month');
 				$filter_as_age = $field->parameters->get('filter_as_age'.$_s, 0);
 
