@@ -82,7 +82,10 @@ class FlexicontentlinksItems extends JObject {
 
 		$items = array();
 		$view = isset($args->view) ? $args->view : '';
-		$categoryId = (int) $args->cid ? (int) $args->cid : 1;  // 1 is the top level category
+
+		// Get category ID. Note: 1 is the top level category
+		$categoryId = isset($args->cid ) ? (int) $args->cid : 1;
+		$categoryId = $categoryId ?: 1;
 
 		if ($view && $view!='category') return array();
 
