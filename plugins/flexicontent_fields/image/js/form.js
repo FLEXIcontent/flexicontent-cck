@@ -56,7 +56,7 @@
 
 		// try noembed.com
 		ajax_url = "https://noembed.com/embed?url="+encodeURIComponent(url); // TODO check if needed to add more URL vars
-		ajax_type = "json";
+		ajax_type = "jsonp";
 
 		var mediaID = "";
 		var apiType = "";
@@ -65,6 +65,9 @@
 
 		// Make AJAX call
 		jQuery.ajax({
+			/*beforeSend: function(xhrObj) {
+				xhrObj.setRequestHeader("Access-Control-Allow-Headers", "Origin, X-CSRF-Token, X-Requested-With, Content-Type, Accept, Authorization");
+			},*/
 			url: ajax_url,
 			dataType: ajax_type,
 			success: function(data) {
