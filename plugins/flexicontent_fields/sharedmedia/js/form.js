@@ -107,17 +107,20 @@
 				case "vimeo"      : ajax_url = "//vimeo.com/api/v2/video/"+mediaID+".json";/*?callback=fcfield_sharemedia.vimeoCallback";*/  break;
 				case "dailymotion": ajax_url = "https://api.dailymotion.com/video/"+mediaID+"?fields=description,duration,owner.screenname,thumbnail_60_url,title";/*&callback=fcfield_sharemedia.dailymotionCallback";*/  break;
 			}
-			ajax_type = "json";
+			ajax_type = "jsonp";
 		}
 		else
 		{
 			// try noembed.com
 			ajax_url = "https://noembed.com/embed?url="+encodeURIComponent(url); // TODO check if needed to add more URL vars
-			ajax_type = "json";
+			ajax_type = "jsonp";
 		}
 
 		// Make AJAX call
 		jQuery.ajax({
+			/*beforeSend: function(xhrObj) {
+				xhrObj.setRequestHeader("Access-Control-Allow-Headers", "Origin, X-CSRF-Token, X-Requested-With, Content-Type, Accept, Authorization");
+			},*/
 			url: ajax_url,
 			dataType: ajax_type,
 			success: function(data) {
