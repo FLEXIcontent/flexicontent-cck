@@ -2686,6 +2686,11 @@ class FlexicontentFields
 	// e.g. doing word segmentation for a language that does not space-separate the words
 	static function getLangHandler($language)
 	{
+		// Currently we have dictionary only for Thai
+		$language = $language === '*'
+			? flexicontent_html::getSiteDefaultLang()
+			: $language;
+
 		if ($language != 'th-TH') return false;
 
 		$cparams = JComponentHelper::getParams('com_flexicontent');
