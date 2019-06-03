@@ -115,11 +115,8 @@ class plgFlexicontent_fieldsDate extends FCField
 		// both according to given configuration
 		// *******************************************
 
-		$date_format_form = ''; //$field->parameters->get( 'date_format_form', '' ) ;
 		$show_usage     = $field->parameters->get( 'show_usage', 0 ) ;
-
 		$date_allowtime = $field->parameters->get( 'date_allowtime', 1 ) ;
-		$date_allowtime = !in_array($date_format_form, array(1,2)) ? $date_allowtime : 0;  // Allow time usage IS disabled, for 1: Year-only, 2:Month-only
 
 		$time_formats_map = array('0'=>'', '1'=>' %H:%M', '2'=>' 00:00');
 		$_time_format = $time_formats_map[$date_allowtime];
@@ -127,7 +124,7 @@ class plgFlexicontent_fieldsDate extends FCField
 		$use_editor_tz  = $field->parameters->get( 'use_editor_tz', 0 ) ;
 		$use_editor_tz  = $date_allowtime ? $use_editor_tz : 0;  // Timezone IS disabled, if time usage is disabled
 
-		$dateformat = $field->parameters->get('date_format', 'DATE_FORMAT_LC2');
+		$dateformat = $field->parameters->get('date_format_form', '%Y-%m-%d');
 
 		if ($dateformat === '_custom_')
 		{
@@ -299,7 +296,7 @@ class plgFlexicontent_fieldsDate extends FCField
 				{
 					Calendar.setup({
 						inputField:	theInput.attr('id'),
-						ifFormat:		'%Y-%m-%d".$_time_format."',
+						ifFormat:		'" . $dateformat . $_time_format . "',
 						button:			thePicker.attr('id'),
 						align:			'Tl',
 						singleClick:	true
@@ -441,7 +438,7 @@ class plgFlexicontent_fieldsDate extends FCField
 					$attribs_arr['maxYear'] = $maxyear;
 				}
 
-				$html = FlexicontentFields::createCalendarField($value, $date_allowtime, $fieldname_n, $elementid_n, $attribs_arr, $skip_on_invalid=true, $timezone);
+				$html = FlexicontentFields::createCalendarField($value, $date_allowtime, $fieldname_n, $elementid_n, $attribs_arr, $skip_on_invalid=true, $timezone, $dateformat);
 
 				if (!$html)
 				{
@@ -450,7 +447,7 @@ class plgFlexicontent_fieldsDate extends FCField
 					{
 						continue;
 					}
-					$html = FlexicontentFields::createCalendarField('', $date_allowtime, $fieldname_n, $elementid_n, $attribs_arr, $skip_on_invalid=true, $timezone);
+					$html = FlexicontentFields::createCalendarField('', $date_allowtime, $fieldname_n, $elementid_n, $attribs_arr, $skip_on_invalid=true, $timezone, $dateformat);
 				}
 			}
 
