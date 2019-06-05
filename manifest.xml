@@ -179,6 +179,7 @@
 		<plugin name="checkbox"           folder="plugins/flexicontent_fields/checkbox"           instfolder="flexicontent_fields">FLEXIcontent - Checkbox</plugin>
 		<plugin name="checkboximage"      folder="plugins/flexicontent_fields/checkboximage"      instfolder="flexicontent_fields">FLEXIcontent - Checkbox Image</plugin>
 		<plugin name="color"              folder="plugins/flexicontent_fields/color"              instfolder="flexicontent_fields">FLEXIcontent - Color</plugin>
+		<plugin name="comments"              folder="plugins/flexicontent_fields/comments"        instfolder="flexicontent_fields">FLEXIcontent - Comments</plugin>
 		<plugin name="core"               folder="plugins/flexicontent_fields/core"               instfolder="flexicontent_fields">FLEXIcontent - Core Fields (Joomla article properties)</plugin>
 		<plugin name="coreprops"          folder="plugins/flexicontent_fields/coreprops"          instfolder="flexicontent_fields">FLEXIcontent - Item Form CORE property placer</plugin>
 		<plugin name="date"               folder="plugins/flexicontent_fields/date"               instfolder="flexicontent_fields">FLEXIcontent - Date / Timestamp / Publish Up-Down Dates</plugin>
