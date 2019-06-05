@@ -886,7 +886,7 @@ if ($this->item->type_id) {
 		<div class="fc_tabset_inner">
 
 			<?php
-			$hide_ifempty_fields = array('fcloadmodule', 'fcpagenav', 'toolbar');
+			$hide_ifempty_fields = array('fcloadmodule', 'fcpagenav', 'toolbar', 'comments');
 			$row_k = 0;
 
 			foreach ($this->fields as $field) :
