@@ -150,7 +150,7 @@ $list_total_cols = $isFilesElement ? 17 : 17;  // fileselement view has 1 more c
 
 
 // Optional columns of DB-mode
-if (!$this->folder_mode || !$this->CanViewAllFiles)
+if ($this->folder_mode || !$this->CanViewAllFiles)
 {
 	unset($this->cols['uploader']);
 }
