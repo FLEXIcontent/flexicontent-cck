@@ -20,6 +20,33 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_favourites` (
   KEY `type` (`type`)
 ) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`;
 
+CREATE TABLE IF NOT EXISTS `#__flexicontent_mediadatas` (
+  `id` int(11) NOT NULL auto_increment,
+  `file_id` int(11) NOT NULL,
+  `state` tinyint(3) NOT NULL DEFAULT '1',
+  `media_type` int(11) NOT NULL default 0, /* 0: audio , 1: video */
+  `resolution` varchar(255) NULL, /* e.g. 1280x720, 1920x1080 */
+  `fps` int(11) NULL, /* e.g. 50 (frames per second) */
+  `bitrate` int(11) NULL, /* e.g. 256 , 320 (kbps) */
+  `samplerate` int(11) NULL, /* e.g. 44100 (HZ) */
+  `audiotype` varchar(255) NULL, /* e.g. 'stereo', 'mono' */
+  `duration` int(11) NOT NULL, /* e.g. 410 (seconds) */
+  `format` varchar(255) NULL, /* e.g 'audio/wav'*/
+  `checked_out` int(11) unsigned NOT NULL default '0',
+  `checked_out_time` datetime NOT NULL default '1000-01-01 00:00:00',
+  `attribs` mediumtext NULL,
+  PRIMARY KEY  (`id`),
+  KEY `state` (`state`),
+  KEY `media_type` (`media_type`),
+  KEY `resolution` (`resolution`),
+  KEY `fps` (`fps`),
+  KEY `bitrate` (`bitrate`),
+  KEY `samplerate` (`samplerate`),
+  KEY `audiotype` (`fps`),
+  KEY `duration` (`duration`)
+) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`;
+
+
 CREATE TABLE IF NOT EXISTS `#__flexicontent_reviews` (
   `id` int(11) NOT NULL auto_increment,
   `content_id` int(11) NOT NULL,
@@ -35,9 +62,9 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_reviews` (
   `useful_yes` int(11) NOT NULL DEFAULT '0',
   `useful_no` int(11) NOT NULL DEFAULT '0',
   `submit_date` datetime NOT NULL,
-  `update_date` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `update_date` datetime NOT NULL DEFAULT '1000-01-01 00:00:00',
   `checked_out` int(11) unsigned NOT NULL default '0',
-  `checked_out_time` datetime NOT NULL default '0000-00-00 00:00:00',
+  `checked_out_time` datetime NOT NULL default '1000-01-01 00:00:00',
   `attribs` mediumtext NULL,
   PRIMARY KEY  (`id`),
   KEY (`content_id`, `user_id`, `type`),
@@ -65,7 +92,7 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_fields` (
   `published` tinyint(1) NOT NULL default '0',
   `attribs` mediumtext NOT NULL,
   `checked_out` int(11) unsigned NOT NULL default '0',
-  `checked_out_time` datetime NOT NULL default '0000-00-00 00:00:00',
+  `checked_out_time` datetime NOT NULL default '1000-01-01 00:00:00',
   `access` int(11) unsigned NOT NULL default '1',
   `ordering` int(11) NOT NULL default '0',
   PRIMARY KEY  (`id`)
@@ -116,10 +143,10 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_files` (
   `size` int(11) unsigned NOT NULL default '0',
   `assignments` int(11) unsigned NOT NULL default '0',
   `stamp` tinyint(3) unsigned NOT NULL default '1',
-  `uploaded` datetime NOT NULL default '0000-00-00 00:00:00',
+  `uploaded` datetime NOT NULL default '1000-01-01 00:00:00',
   `uploaded_by` int(11) unsigned NOT NULL default '0',
   `checked_out` int(11) unsigned NOT NULL default '0',
-  `checked_out_time` datetime NOT NULL default '0000-00-00 00:00:00',
+  `checked_out_time` datetime NOT NULL default '1000-01-01 00:00:00',
   `access` int(11) unsigned NOT NULL default '1',
   `attribs` mediumtext NOT NULL,
   PRIMARY KEY  (`id`)
@@ -146,12 +173,12 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_items_tmp` (
  `alias` VARCHAR(400) NOT NULL,
  `state` tinyint(3) NOT NULL DEFAULT '0',
  `catid` int(10) unsigned NOT NULL DEFAULT '0',
- `created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+ `created` datetime NOT NULL DEFAULT '1000-01-01 00:00:00',
  `created_by` int(10) unsigned NOT NULL DEFAULT '0',
- `modified` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+ `modified` datetime NOT NULL DEFAULT '1000-01-01 00:00:00',
  `modified_by` int(10) unsigned NOT NULL DEFAULT '0',
- `publish_up` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
- `publish_down` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+ `publish_up` datetime NOT NULL DEFAULT '1000-01-01 00:00:00',
+ `publish_down` datetime NOT NULL DEFAULT '1000-01-01 00:00:00',
  `version` int(10) unsigned NOT NULL DEFAULT '1',
  `ordering` int(11) NOT NULL DEFAULT '0',
  `access` int(10) unsigned NOT NULL DEFAULT '0',
@@ -204,7 +231,7 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_tags` (
   `alias` varchar(255) NOT NULL,
   `published` tinyint(1) NOT NULL,
   `checked_out` int(11) unsigned NOT NULL default '0',
-  `checked_out_time` datetime NOT NULL default '0000-00-00 00:00:00',
+  `checked_out_time` datetime NOT NULL default '1000-01-01 00:00:00',
   `jtag_id` int(10) unsigned NULL,
   KEY `name` (`name`),
   KEY `alias` (`alias`),
@@ -230,7 +257,7 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_types` (
   `published` tinyint(1) NOT NULL,
   `itemscreatable` SMALLINT(8) NOT NULL default '0',
   `checked_out` int(11) unsigned NOT NULL default '0',
-  `checked_out_time` datetime NOT NULL default '0000-00-00 00:00:00',
+  `checked_out_time` datetime NOT NULL default '1000-01-01 00:00:00',
   `access` int(11) unsigned NOT NULL default '1',
   `attribs` mediumtext NOT NULL,
   KEY `name` (`name`),
@@ -245,7 +272,7 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_versions` (
   `item_id` int(11) unsigned NOT NULL default '0',
   `version_id` int(11) unsigned NOT NULL default '0',
   `comment` mediumtext NOT NULL,
-  `created` datetime NOT NULL default '0000-00-00 00:00:00',
+  `created` datetime NOT NULL default '1000-01-01 00:00:00',
   `created_by` int(11) unsigned NOT NULL default '0',
   `state` int(3) NOT NULL default '0',
   PRIMARY KEY  (`id`),
@@ -311,7 +338,7 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_download_coupons` (
   `token` varchar(255) NOT NULL,
   `hits` int(11) NOT NULL,
   `hits_limit` int(11) NOT NULL,
-  `expire_on` datetime NOT NULL default '0000-00-00 00:00:00',
+  `expire_on` datetime NOT NULL default '1000-01-01 00:00:00',
   PRIMARY KEY (`id`),
   KEY `user_id` (`user_id`),
   KEY `file_id` (`file_id`),

@@ -73,12 +73,12 @@ plugins/flexicontent_fields/grade/
 /nbproject/private/
 *.pdf
 
-admin/controllers/mediadatas.php
-admin/controllers/mediadatas.raw.php
-admin/helpers/html/fcmediadatas.php
-admin/models/mediadata.php
-admin/models/mediadatas.php
-admin/tables/flexicontent_mediadatas.php
-admin/views/mediadata/
-admin/views/mediadatas/
-plugins/flexicontent_fields/mediafile/
+#admin/controllers/mediadatas.php
+#admin/controllers/mediadatas.raw.php
+#admin/helpers/html/fcmediadatas.php
+#admin/models/mediadata.php
+#admin/models/mediadatas.php
+#admin/tables/flexicontent_mediadatas.php
+#admin/views/mediadata/
+#admin/views/mediadatas/
+#plugins/flexicontent_fields/mediafile/
