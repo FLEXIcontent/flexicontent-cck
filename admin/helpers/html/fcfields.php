@@ -284,7 +284,7 @@ abstract class JHtmlFcfields extends JHtmlFcbase
 
 		
 		$icon = $supportsearch
-			? '<span class="' . $issearch . '" title="' . $issearch_tip . '"></span>'
+			? '<span class="' . $issearch . ' hasTooltip" title="' . $issearch_tip . '"></span>'
 			: '<span class="icon-minus" style="color: transparent" title="NA"></span>';
 
 		if ($supportsearch && $row->canEdit)
@@ -298,7 +298,7 @@ abstract class JHtmlFcfields extends JHtmlFcbase
 
 
 		$icon = $supportfilter
-			? '<span class="' . $isfilter . '" title="' . $isfilter_tip . '"></span>'
+			? '<span class="' . $isfilter . ' hasTooltip" title="' . $isfilter_tip . '"></span>'
 			: '<span class="icon-minus" style="color: transparent" title="NA"></span>';
 
 		if ($supportfilter && $row->canEdit)
@@ -312,7 +312,7 @@ abstract class JHtmlFcfields extends JHtmlFcbase
 
 
 		$icon = $supportadvsearch
-			? '<span class="' . $isadvsearch . '" title="' . $isadvsearch_tip . '"></span>'
+			? '<span class="' . $isadvsearch . ' hasTooltip" title="' . $isadvsearch_tip . '"></span>'
 			: '<span class="icon-minus" style="color: transparent" title="NA"></span>';
 
 		if ($supportadvsearch && $row->canEdit)
@@ -325,7 +325,7 @@ abstract class JHtmlFcfields extends JHtmlFcbase
 		$html['advsearch'] = $icon;
 
 		$icon = $supportadvfilter
-			? '<span class="' . $isadvfilter . '" title="' . $isadvfilter_tip . '"></span>'
+			? '<span class="' . $isadvfilter . ' hasTooltip" title="' . $isadvfilter_tip . '"></span>'
 			: '<span class="icon-minus" style="color: transparent" title="NA"></span>';
 
 		if ($supportadvfilter && $row->canEdit)
