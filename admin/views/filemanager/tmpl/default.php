@@ -1073,6 +1073,26 @@ if ($js)
 							 * Display title with no edit link ... if row is not-editable for any reason (no ACL or checked-out by other user)
 							 */
 							echo JHtml::_($hlpname . '.edit_link', $row, $i, $row->canEdit);
+
+							// Note we will pass true to canEdit parameter because we want to create an assign link
+							echo JHtml::_($hlpname . '.edit_link', $row, $i, true, array(
+								'option'   => 'com_flexicontent',
+								'ctrl'     => 'mediadatas',
+								'view'     => 'mediadata',
+								'url_data' => '&file_id=' . $row->id,
+								'keyname'  => 'mm_id',
+								'noTitle'  => true,
+								'linkedPrefix' => '<span class="icon-music"></span>',
+								'attribs' => array(
+									'class'       => $this->btn_sm_class,
+									'title'       => JText::_('FLEXI_MEDIADATA_EDIT'),
+								),
+								'useModal' => (object) array(
+									'title'       => 'FLEXI_MEDIADATA_EDIT',
+									'onloadfunc'  => 'fc_edit_mmdata_modal_load',
+									'onclosefunc' => 'fc_edit_mmdata_modal_close',
+								),
+							));
 						}
 						else
 						{
@@ -2041,3 +2061,19 @@ if ($js)
 </div>  <!-- row / row-fluid-->
 
 </div><!-- #flexicontent end -->
+
+<?php
+JFactory::getDocument()->addScriptDeclaration('
+	function fc_edit_mmdata_modal_load( container )
+	{
+		if ( container.find("iframe").get(0).contentWindow.location.href.indexOf("view=mediadatas") != -1 )
+		{
+			container.dialog("close");
+		}
+	}
+	function fc_edit_mmdata_modal_close()
+	{
+		window.location.reload(false);
+		document.body.innerHTML = Joomla.JText._("FLEXI_UPDATING_CONTENTS") + \' <img id="page_loading_img" src="components/com_flexicontent/assets/images/ajax-loader.gif">\';
+	}
+');

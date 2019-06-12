@@ -764,6 +764,7 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 			$columns[] = 'SQL_CALC_FOUND_ROWS a.*, '
 				. ' u.name AS editor, '
 				. ' ua.name AS uploader, '
+				. ' mm.id AS mm_id, '
 				. ' CASE WHEN a.filename_original<>"" THEN a.filename_original ELSE a.filename END AS filename_displayed ';
 
 			foreach ($assigned_fields as $field_type)
@@ -872,6 +873,7 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 		$join = '';
 		$join .= ' LEFT JOIN #__users AS u ON u.id = a.checked_out';
 		$join .= ' JOIN #__users AS ua ON ua.id = a.uploaded_by';
+		$join .= ' LEFT JOIN #__flexicontent_mediadatas AS mm ON mm.file_id = a.id';
 
 		return $join;
 	}

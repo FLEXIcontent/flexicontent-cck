@@ -15,10 +15,13 @@ foreach ($field->value as $file_id)
 	$file_data         = $files_data[$file_id];
 	$filename_original = $file_data->filename_original ? $file_data->filename_original : $file_data->filename;
 
+<<<<<<< HEAD
 	$ext = strtolower(flexicontent_upload::getExt($file_data->filename));
 	$file_data->waveform_preview = 'audio_preview/' . str_ireplace('.'.$ext, '', basename($file_data->filename)) . '.mp3';
 	$file_data->waveform_peaks   = 'audio_preview/' . str_ireplace('.'.$ext, '', basename($file_data->filename)) . '.json';
 
+=======
+>>>>>>> 27f890fe6 ([WIP] Initial media data work and audio field for files)
 	$preview_css = 'width:100px; height:100px;';
 
 	if (!in_array(strtolower($file_data->ext), $imageexts))
@@ -109,6 +112,7 @@ foreach ($field->value as $file_id)
 			<div style="display:inline-block;">
 				<span class="fc_filedata_storage_name" style="display:none;">'.$file_data->filename.'</span>
 				<div class="fc_filedata_txt_nowrap nowrap_hidden">'.$file_data->filename.'<br/>'.$file_data->altname.'</div>
+<<<<<<< HEAD
 				<input class="fc_filedata_txt inlinefile-data-txt '. $info_txt_classes . $required_class .'"
 					readonly="readonly" name="'.$fieldname_n.'[file-data-txt]" id="'.$elementid_n.'_file-data-txt" '.$info_txt_tooltip.'
 					value="'.htmlspecialchars($filename_original, ENT_COMPAT, 'UTF-8').'"
@@ -117,6 +121,10 @@ foreach ($field->value as $file_id)
 					data-wfpeaks="'.htmlspecialchars($file_data->waveform_peaks, ENT_COMPAT, 'UTF-8').'"
 				/>
 				'.(!$iform_title ? '
+=======
+				<input class="fc_filedata_txt inlinefile-data-txt '. $info_txt_classes . $required_class .'" readonly="readonly" name="'.$fieldname_n.'[file-data-txt]" id="'.$elementid_n.'_file-data-txt" '.$info_txt_tooltip.' value="'.htmlspecialchars($filename_original, ENT_COMPAT, 'UTF-8').'" />
+				'.(!$iform_title ? '<br/>
+>>>>>>> 27f890fe6 ([WIP] Initial media data work and audio field for files)
 				<div class="'.$input_grp_class.' fc-xpended-row">
 					<label class="' . $add_on_class . ' fc-lbl fc_filedata_title-lbl">'.JText::_( 'FLEXI_FILE_DISPLAY_TITLE' ).'</label>
 					<span class="' . $add_on_class . ' fc_filedata_title">'. ($file_data->altname && $filename_original!=$file_data->altname ? $file_data->altname : '-').'</span>
@@ -219,7 +227,11 @@ foreach ($field->value as $file_id)
 				<input type="button" class="btn btn-primary loadBtn" value="Load" style="color: black;"/>
 			</div>
 		</div>
+<<<<<<< HEAD
 		<div id="fc_mediafile_audio_spectrum_box_' . $FN_n . '" class="fc_mediafile_audio_spectrum_box" style="display: block; margin-top: 8px; position: relative; border: 1px dashed;">
+=======
+		<div id="fc_mediafile_audio_spectrum_box_' . $FN_n . '" class="fc_mediafile_audio_spectrum_box" style="display: none; margin-top: 8px; position: relative; border: 1px dashed;">
+>>>>>>> 27f890fe6 ([WIP] Initial media data work and audio field for files)
 			<div class="progress progress-striped active" style="visibility: hidden; position: absolute; width: 70%; top: 40%; left: 15%;">
 				<div class="bar" style="width: 0%;"></div>
 			</div>
@@ -227,8 +239,13 @@ foreach ($field->value as $file_id)
 		</div>
 		';
 
+<<<<<<< HEAD
 	$per_value_js .= "
 		fcfield_mediafile.initValue('" . $field->name . '_' . $n . "', '".$field_name_js."');
+=======
+	if ($filename_original) $per_value_js .= "
+		fcfield_mediafile.initValue('" . $field->name . '_' . $n . "');
+>>>>>>> 27f890fe6 ([WIP] Initial media data work and audio field for files)
 	";
 
 	$n++;
@@ -236,8 +253,11 @@ foreach ($field->value as $file_id)
 
 
 $document->addScriptDeclaration("
+<<<<<<< HEAD
 	fcfield_mediafile_base_url['".$field_name_js."'] = '".$base_url."';
 
+=======
+>>>>>>> 27f890fe6 ([WIP] Initial media data work and audio field for files)
 	//document.addEventListener('DOMContentLoaded', function()
 	jQuery(document).ready(function()
 	{
