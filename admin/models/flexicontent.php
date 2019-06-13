@@ -963,6 +963,9 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 					'cols'=>array('field_id'=>0, 'item_id'=>0, 'valueorder'=>0, 'suborder'=>0)
 				)
 			),
+			'flexicontent_mediadatas'=>array(
+				'bitdepth'=>0,
+			),
 			'flexicontent_items_versions'=>array(
 				'value'=>32,
 				'PRIMARY'=>array(
@@ -1672,6 +1675,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 			'groupmarker'=>'FLEXIcontent - Item Form Tab / Fieldset / Custom HTML',
 			'image'=>'FLEXIcontent - Image or Gallery (image + details)',
 			'linkslist'=>'FLEXIcontent - HTML list of URLs/Anchors/JS links',
+			'mediafile'=>'FLEXIcontent - Media file player',
 			'minigallery'=>'FLEXIcontent - Mini-Gallery (image-only slideshow)',
 			'phonenumbers'=>'FLEXIcontent - Phone Numbers',
 			'radio'=>'FLEXIcontent - Radio',
@@ -1741,6 +1745,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 			'plg_flexicontent_fields_groupmarker',
 			'plg_flexicontent_fields_image',
 			'plg_flexicontent_fields_linkslist',
+			'plg_flexicontent_fields_mediafile',
 			'plg_flexicontent_fields_minigallery',
 			'plg_flexicontent_fields_phonenumbers',
 			'plg_flexicontent_fields_radio',

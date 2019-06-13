@@ -35,6 +35,11 @@
 			<option value="394">394</option>
 			<option value="512">512</option>
 		</field>
+		<field name="bitdepth" type="list" default="0" label="Bit Depth" description="Number of bits" labelclass="fc-prop-lbl">
+			<option value="16">16</option>
+			<option value="24">24</option>
+			<option value="32">32</option>
+		</field>
 		<field name="samplerate" type="list" default="0" label="Sample rate (Hz)" description="In Hz" labelclass="fc-prop-lbl">
 			<option value="22050">22050</option>
 			<option value="44100">44100</option>

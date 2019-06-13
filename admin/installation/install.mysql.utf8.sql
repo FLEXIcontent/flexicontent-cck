@@ -28,6 +28,7 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_mediadatas` (
   `resolution` varchar(255) NULL, /* e.g. 1280x720, 1920x1080 */
   `fps` int(11) NULL, /* e.g. 50 (frames per second) */
   `bitrate` int(11) NULL, /* e.g. 256 , 320 (kbps) */
+  `bitdepth` int(11) NULL, /* e.g. 16, 24, 32 (# bits) */
   `samplerate` int(11) NULL, /* e.g. 44100 (HZ) */
   `audiotype` varchar(255) NULL, /* e.g. 'stereo', 'mono' */
   `duration` int(11) NOT NULL, /* e.g. 410 (seconds) */
