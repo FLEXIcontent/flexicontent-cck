@@ -532,6 +532,7 @@ class plgFlexicontent_fieldsFile extends FCField
 		{
 			$js_added = true;
 			flexicontent_html::loadFramework('flexi-lib');
+			JHtml::addIncludePath(JPATH_SITE . '/components/com_flexicontent/helpers/html');
 		}
 
 
