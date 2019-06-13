@@ -102,10 +102,10 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="iform_dir" type="radio" default="0" label="FLEXI_TARGET_DIRECTORY" description="FLEXI_CHOOSE_DIRECTORY_DESC" depend_class="inline-edit-on" class="btn-group btn-group-yesno">
+			<!--field name="iform_dir" type="radio" default="0" label="FLEXI_TARGET_DIRECTORY" description="FLEXI_CHOOSE_DIRECTORY_DESC" depend_class="inline-edit-on" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
-			</field>
+			</field-->
 			<field name="iform_stamp" type="radio" default="0" label="FLEXI_DOWNLOAD_STAMPING" description="FLEXI_FILE_DOWNLOAD_STAMPING_DESC" depend_class="inline-edit-on" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -116,10 +116,10 @@
 			<field name="iform_desc_default" type="text" default="" label="FLEXI_DESCRIPTION" description="FLEXI_FIELD_DEFAULT_VALUE" depend_class="inline-edit-on" class="btn-group btn-group-yesno" />
 			<field name="iform_lang_default" type="fclanguage" default="*" label="FLEXI_LANGUAGE" description="FLEXI_FIELD_DEFAULT_VALUE" depend_class="inline-edit-on" class="btn-group btn-group-yesno" />
 			<field name="iform_access_default" type="accesslevel" default="1" label="FLEXI_ACCESS" description="FLEXI_FIELD_DEFAULT_VALUE" depend_class="inline-edit-on" />
-			<field name="iform_dir_default" type="radio" default="1" label="FLEXI_TARGET_DIRECTORY" description="FLEXI_FIELD_DEFAULT_VALUE" depend_class="inline-edit-on" class="btn-group group-fcinfo">
+			<!--field name="iform_dir_default" type="radio" default="0" label="FLEXI_TARGET_DIRECTORY" description="FLEXI_FIELD_DEFAULT_VALUE" depend_class="inline-edit-on" class="btn-group group-fcinfo">
 				<option value="0">FLEXI_MEDIA</option>
 				<option value="1">FLEXI_SECURE</option>
-			</field>
+			</field-->
 			<field name="iform_stamp_default" type="radio" default="1" label="FLEXI_DOWNLOAD_STAMPING" description="FLEXI_FIELD_DEFAULT_VALUE" depend_class="inline-edit-on" class="btn-group group-fcinfo">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -148,11 +148,11 @@
 				<option value="1">FLEXI_UPLOADED_FILE_SELECT_N_ASSIGN</option>
 				<option value="2">FLEXI_UPLOADED_FILE_SELECT_ONLY</option>
 			</field>
-			<field name="target_dir" type="radio" default="1" label="FLEXI_TARGET_DIRECTORY" description="FLEXI_CHOOSE_DIRECTORY_DESC" depend_class="use-myfiles-on" class="btn-group group-fcinfo">
+			<!--field name="target_dir" type="radio" default="0" label="FLEXI_TARGET_DIRECTORY" description="FLEXI_CHOOSE_DIRECTORY_DESC" depend_class="use-myfiles-on" class="btn-group group-fcinfo">
 				<option value="0">FLEXI_MEDIA</option>
 				<option value="1">FLEXI_SECURE</option>
 				<option value="2">FLEXI_ALLOW_SELECTION</option>
-			</field>
+			</field-->
 
 			<field name="" type="separator" default="FLEXI_FILELIST_COLUMNS" description="FLEXI_FILELIST_COLUMNS_DESC" level="level3" depend_class="use-myfiles-on" />
 			<field name="filelist_cols" type="fccheckbox" default="" display_useglobal="0"

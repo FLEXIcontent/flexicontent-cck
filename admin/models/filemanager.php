@@ -262,7 +262,7 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 		//  -- Single property field types: store file ids
 		//  -- Multi property field types: store file id or filename via some property name
 
-		$s_assigned_fields = array('file', 'minigallery');
+		$s_assigned_fields = array('file', 'minigallery', 'mediafile');
 		$m_assigned_fields = array('image');
 
 		$m_assigned_props = array('image'=>'originalname');
@@ -936,7 +936,7 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 		{
 			if (in_array($field->field_type, array('file', 'image')))
 				$default_dir = 1;  // 'secure' folder
-			else if (in_array($field->field_type, array('minigallery')))
+			elseif (in_array($field->field_type, array('minigallery', 'mediafile')))
 				$default_dir = 0;  // 'media' folder
 		}
 		$target_dir = $params->get('target_dir', $default_dir);
@@ -1347,7 +1347,7 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 	 * @access public
 	 * @return object
 	 */
-	function getItemsSingleprop( $field_types=array('file','minigallery'), $file_ids=array(), $count_items=false, $ignored=false )
+	function getItemsSingleprop( $field_types=array('file', 'minigallery', 'mediafile'), $file_ids=array(), $count_items=false, $ignored=false )
 	{
 		$app    = JFactory::getApplication();
 		$user   = JFactory::getUser();
@@ -1544,7 +1544,7 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 			return false;
 		}
 
-		$s_field_types = array('file', 'minigallery');
+		$s_field_types = array('file', 'minigallery', 'mediafile');
 		$m_field_props = array('image' => 'originalname');
 		$m_value_props = array('image' => 'filename');
 
@@ -1605,7 +1605,7 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 	 * @since	2.0
 	 */
 	function getDeletable($cid = array(), $ignored = false,
-		$s_field_types = array('file', 'minigallery'),
+		$s_field_types = array('file', 'minigallery', 'mediafile'),
 		$m_field_props = array('image' => 'originalname'),
 		$m_value_props = array('image' => 'filename')
 	) {

@@ -187,7 +187,8 @@ class plgFlexicontent_fieldsMediafile extends FCField
 			{
 				foreach($field->value as $v)
 				{
-					if (!isset($v['secure'])) $v['secure'] = !$iform_dir   ? 1 : (int) $field->parameters->get('iform_dir_default', 1);
+					$v['secure'] = 0;
+					//if (!isset($v['secure'])) $v['secure'] = !$iform_dir   ? 1 : (int) $field->parameters->get('iform_dir_default', 1);
 					if (!isset($v['stamp']))  $v['stamp']  = !$iform_stamp ? 1 : (int) $field->parameters->get('iform_stamp_default', 1);
 					$file_ids[] = $v['file-id'];
 					$form_data[$v['file-id']] = $v;
@@ -226,7 +227,7 @@ class plgFlexicontent_fieldsMediafile extends FCField
 			$files_data[0] = (object)array(
 				'id' => '', 'filename' => '', 'filename_original' => '', 'altname' => '', 'description' => '',
 				'url' => '',
-				'secure' => (!$iform_dir  ? 1 : (int) $field->parameters->get('iform_dir_default', 1)),
+				'secure' => 0, //(!$iform_dir  ? 1 : (int) $field->parameters->get('iform_dir_default', 1)),
 				'stamp' => (!$iform_stamp ? 1 : (int) $field->parameters->get('iform_stamp_default', 1)),
 				'ext' => '', 'published' => 1,
 				'language' => $field->parameters->get('iform_lang_default', '*'),
@@ -1128,7 +1129,7 @@ class plgFlexicontent_fieldsMediafile extends FCField
 					$Fobj->return_url     = null;
 					$Fobj->file_dir_path  = DS. $import_docs_folder . $sub_folder;
 					$Fobj->file_filter_re = preg_quote($filename);
-					$Fobj->secure = (int) $field->parameters->get('iform_dir_default', 1);
+					$Fobj->secure = 0; //(int) $field->parameters->get('iform_dir_default', 1);
 					$Fobj->stamp  = (int) $field->parameters->get('iform_stamp_default', 1);
 					$Fobj->keep   = 1;
 
@@ -1184,7 +1185,7 @@ class plgFlexicontent_fieldsMediafile extends FCField
 				$v['stamp']      = !$iform_stamp  ? 1 : ((int) $v['stamp'] ? 1 : 0);
 				if( $new_file )
 				{
-					$v['secure']   = !$iform_dir    ? 1 : ((int) $v['secure'] ? 1 : 0);
+					$v['secure']   = 0; //!$iform_dir    ? 1 : ((int) $v['secure'] ? 1 : 0);
 				}
 
 				// UPDATE existing file
@@ -1204,7 +1205,7 @@ class plgFlexicontent_fieldsMediafile extends FCField
 					$row = JTable::getInstance('flexicontent_files', '');
 					$row->load( $file_id );
 					$_filename = $row->filename_original ? $row->filename_original : $row->filename;
-					$dbdata['secure'] = $row->secure ? 1 : 0;  // !! Do not change media/secure -folder- for existing files
+					$dbdata['secure'] = 0; //$row->secure ? 1 : 0;  // !! Do not change media/secure -folder- for existing files
 
 					// Security concern, check file is assigned to current item
 					$isAssigned = $this->checkFileAssignment($field, $file_id, $item);
