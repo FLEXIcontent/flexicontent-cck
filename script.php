@@ -563,6 +563,10 @@ class com_flexicontentInstallerScript
 		$db->setQuery($query);
 		$reviews_tbl_exists = (boolean) count($db->loadObjectList());
 
+		$query = 'SHOW TABLES LIKE "' . $dbprefix . '__flexicontent_mediadatas"';
+		$db->setQuery($query);
+		$mediadatas_tbl_exists = (boolean) count($db->loadObjectList());
+
 		$query = 'SHOW TABLES LIKE "' . $dbprefix . 'flexicontent_templates"';
 		$db->setQuery($query);
 		$templates_tbl_exists = (boolean) count($db->loadObjectList());
@@ -731,6 +735,7 @@ class com_flexicontentInstallerScript
 					if ($templates_tbl_exists)        $tbls[] = "#__flexicontent_templates";
 					if ($content_cache_tbl_exists)    $tbls[] = "#__flexicontent_items_tmp";
 					if ($advsearch_index_tbl_exists)  $tbls[] = "#__flexicontent_advsearch_index";
+					if ($mediadatas_tbl_exists)  $tbls[] = "#__flexicontent_mediadatas";
 					foreach ($tbls as $tbl) $tbl_fields[$tbl] = $db->getTableColumns($tbl);
 
 					$queries = array();
@@ -1085,6 +1090,78 @@ class com_flexicontentInstallerScript
 					}
 					if ( $reviews_tbl_exists && !array_key_exists('verified', $tbl_fields['#__flexicontent_reviews']) ) {
 						$queries[] = "ALTER TABLE `#__flexicontent_reviews` ADD `verified` tinyint(3) NOT NULL DEFAULT '0' AFTER `approved`";
+					}
+
+					$upgrade_count = 0;
+
+					if (!empty($queries))
+					{
+						foreach ($queries as $query)
+						{
+							try {
+								$db->setQuery($query)->execute();
+								$upgrade_count++;
+							}
+							catch (Exception $e) {
+								echo '<span class="badge badge-error">SQL Error</span> '. $e->getMessage() . '<br/>';
+								continue;
+							}
+						}
+						echo '<span class="badge badge-success">table(s) created / upgraded: '.$upgrade_count.'</span>';
+					}
+
+					else
+					{
+						echo '<span class="badge badge-info">nothing to do</span>';
+					}
+					?>
+					</td>
+				</tr>
+
+		<?php
+		// Create flexicontent_mediadatas table if it does not exist
+		?>
+				<tr class="row0">
+					<td class="key" style="font-size:11px;">Create/Upgrade media data DB table: </td>
+					<td>
+					<?php
+
+			    $queries = array();
+
+					if (!$mediadatas_tbl_exists)
+					{
+						$queries[] = "
+						CREATE TABLE IF NOT EXISTS `#__flexicontent_mediadatas` (
+						  `id` int(11) NOT NULL auto_increment,
+						  `file_id` int(11) NOT NULL,
+						  `state` tinyint(3) NOT NULL DEFAULT '1',
+						  `media_type` int(11) NOT NULL default 0, /* 0: audio , 1: video */
+						  `resolution` varchar(255) NULL, /* e.g. 1280x720, 1920x1080 */
+						  `fps` int(11) NULL, /* e.g. 50 (frames per second) */
+						  `bitrate` int(11) NULL, /* e.g. 256 , 320 (kbps) */
+						  `bitdepth` int(11) NULL, /* e.g. 16, 24, 32 (# bits) */
+						  `samplerate` int(11) NULL, /* e.g. 44100 (HZ) */
+						  `audiotype` varchar(255) NULL, /* e.g. 'stereo', 'mono' */
+						  `duration` int(11) NOT NULL, /* e.g. 410 (seconds) */
+						  `format` varchar(255) NULL, /* e.g 'audio/wav'*/
+						  `checked_out` int(11) unsigned NOT NULL default '0',
+						  `checked_out_time` datetime NOT NULL default '1000-01-01 00:00:00',
+						  `attribs` mediumtext NULL,
+						  PRIMARY KEY  (`id`),
+						  KEY `state` (`state`),
+						  KEY `media_type` (`media_type`),
+						  KEY `resolution` (`resolution`),
+						  KEY `fps` (`fps`),
+						  KEY `bitrate` (`bitrate`),
+						  KEY `bitdepth` (`bitdepth`),
+						  KEY `samplerate` (`samplerate`),
+						  KEY `audiotype` (`fps`),
+						  KEY `duration` (`duration`)
+						) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`;";
+					}
+
+					if ($mediadatas_tbl_exists && !array_key_exists('bitdepth', $tbl_fields['#__flexicontent_mediadatas'])) {
+						$queries[] = "ALTER TABLE `#__flexicontent_mediadatas` ADD `bitdepth` INT(11) NULL AFTER `bitrate`";
 					}
 
 					$upgrade_count = 0;
