@@ -3,8 +3,9 @@
 	fcfield_mediafile.debugToConsole = [];
 	fcfield_mediafile.use_native_apis = [];
 	fcfield_mediafile.dialog_handle = [];
+	fcfield_mediafile.basePath = [];
 
-	fcfield_mediafile.initValue = function(field_name_n)
+	fcfield_mediafile.initValue = function(field_name_n, config_name)
 	{
 		//window.console.log(field_name_n);
 		var fnn  = field_name_n.replace(/-/g, '_');
@@ -145,7 +146,8 @@
 				buttons.stop.disabled = true;
 				buttons.play.disabled = true;
 
-				audio_spectrum.load(file.val());
+				var isURL = /^(f|ht)tps?:\/\//i.test(file.val());
+				isURL ? audio_spectrum.load(file.val()) : audio_spectrum.load(fcfield_mediafile.basePath[config_name] + '/' + file.val());
 			}
 		}, false);
 

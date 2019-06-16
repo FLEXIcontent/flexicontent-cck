@@ -98,6 +98,10 @@ class plgFlexicontent_fieldsMediafile extends FCField
 		$docspath    = $cparams->get('file_path', 'components/com_flexicontent/uploads');
 		$imageexts   = array('jpg','gif','png','bmp','jpeg');
 
+		$target_dir = 0;
+		$basePath = JUri::root(true) . '/' . (!$target_dir ? $mediapath : $docspath);
+		$basePath = str_replace(DS, '/', $basePath);
+
 		$thumb_size_resizer = 2; //$field->parameters->get('thumb_size_resizer', 2);
 		$thumb_size_default = 120; //$field->parameters->get('thumb_size_default', 120);
 		$preview_thumb_w = $preview_thumb_h = 600;
@@ -499,7 +503,7 @@ class plgFlexicontent_fieldsMediafile extends FCField
 				el.attr('id', 'fc_mediafile_audio_spectrum_" . $field_name_js . '_' . "'+uniqueRowNum".$field->id.");
 				el.empty();
 
-				fcfield_mediafile.initValue('".$field->name."_'+uniqueRowNum".$field->id.");
+				fcfield_mediafile.initValue('".$field->name."_'+uniqueRowNum".$field->id.", '".$field_name_js."');
 				";
 
 			// Add new element to sortable objects (if field not in group)

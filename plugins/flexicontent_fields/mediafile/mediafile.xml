@@ -153,6 +153,7 @@
 				<option value="1">FLEXI_SECURE</option>
 				<option value="2">FLEXI_ALLOW_SELECTION</option>
 			</field-->
+			<field name="target_dir" type="hidden" default="0" label="FLEXI_TARGET_DIRECTORY" description="FLEXI_CHOOSE_DIRECTORY_DESC" />
 
 			<field name="" type="separator" default="FLEXI_FILELIST_COLUMNS" description="FLEXI_FILELIST_COLUMNS_DESC" level="level3" depend_class="use-myfiles-on" />
 			<field name="filelist_cols" type="fccheckbox" default="" display_useglobal="0"

@@ -218,7 +218,7 @@ foreach ($field->value as $file_id)
 		';
 
 	if ($filename_original) $per_value_js .= "
-		fcfield_mediafile.initValue('" . $field->name . '_' . $n . "');
+		fcfield_mediafile.initValue('" . $field->name . '_' . $n . "', '".$field_name_js."');
 	";
 
 	$n++;
@@ -230,5 +230,6 @@ $document->addScriptDeclaration("
 	jQuery(document).ready(function()
 	{
 		" . $per_value_js . "
+		fcfield_mediafile.basePath['".$field_name_js."'] = '".$basePath."';
 	});
 ");
