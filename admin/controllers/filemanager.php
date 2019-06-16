@@ -824,8 +824,9 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 		$fileaccess = $this->input->get('file-url-access', 1, 'int');
 		$fileaccess = flexicontent_html::dataFilter($fileaccess, 11, 'ACCESSLEVEL', 0);  // Validate access level exists (set to public otherwise)
 
-		$ext      = $this->input->get('file-url-ext', null, 'cmd');
-		$filesize = $this->input->get('file-url-size', 0, 'int');
+		$fieldid   = $this->input->get('fieldid', 0, 'int');
+		$ext       = $this->input->get('file-url-ext', null, 'cmd');
+		$filesize  = $this->input->get('file-url-size', 0, 'int');
 		$size_unit = $this->input->get('size_unit', 'KBs', 'cmd');
 
 		jimport('joomla.utilities.date');
@@ -883,6 +884,37 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 
 		$db 	= JFactory::getDbo();
 		$user	= JFactory::getUser();
+		$field  = false;
+
+		if ($fieldid)
+		{
+			$field = $db->setQuery('SELECT * FROM #__flexicontent_fields WHERE id=' . $fieldid)->loadObject();
+			$field->parameters = new JRegistry($field->attribs);
+			$field->item_id = $u_item_id;
+		}
+
+		$default_dir = 2;
+		$secure      = 1;
+
+		if ($field)
+		{
+			if (in_array($field->field_type, array('file', 'image')))
+			{
+				$default_dir = 1;  // 'secure' folder
+			}
+			elseif (in_array($field->field_type, array('minigallery')))
+			{
+				$default_dir = 0;  // 'media' folder
+			}
+
+			$target_dir = $field->parameters->get('target_dir', $default_dir);
+
+			// Force secure / media DB folder according to field configuration
+			if (strlen($target_dir) && $target_dir != 2)
+			{
+				$secure = $target_dir ? 1 : 0;
+			}
+		}
 
 		$obj = new stdClass;
 		$obj->filename    = $url;
@@ -890,7 +922,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 		$obj->altname     = $altname;
 
 		$obj->url         = $linktype;
-		$obj->secure      = 1;
+		$obj->secure      = $secure;
 		$obj->stamp       = 0;
 		$obj->ext         = $ext;
 
