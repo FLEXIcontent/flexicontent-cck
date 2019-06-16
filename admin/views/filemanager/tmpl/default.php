@@ -1890,6 +1890,9 @@ if ($js)
 
 							<input type="submit" id="file-url-submit" class="btn btn-success validate" value="<?php echo JText::_( 'FLEXI_ADD_FILE' ); ?>" style="margin: 16px 48px 0 48px;" />
 
+							<?php echo JHtml::_('form.token'); ?>
+							<input type="hidden" name="fieldid" value="<?php echo $this->fieldid; ?>" />
+
 						</fieldset>
 					</fieldset>
 
