@@ -10,8 +10,10 @@ $field->abspath = array();
 $field->file_data = array();
 $field->hits_total = 0;
 
+$per_value_js = "";
 $n = 0;
 $i = 0;
+
 foreach($values as $file_id)
 {
 	// Skip empty value but add empty placeholder if inside fieldgroup
@@ -24,6 +26,7 @@ foreach($values as $file_id)
 		continue;
 	}
 	$file_data = $files_data[$file_id];
+	$FN_n      = $field_name_js.'_'.$n;
 
 
 	// ***
@@ -473,6 +476,24 @@ foreach($values as $file_id)
 		</div>' .
 		(!$buttonsposition ? $html : '');
 
+	$html .= '<div class="fcclear"></div>'
+	. '
+		<span id="fcview_' . $field->name . '_' . $n . '_file-data-txt" data-value="' . htmlspecialchars($filename_original, ENT_COMPAT, 'UTF-8') . '"></span>
+		<div>
+			<div id="fc_mediafile_controls_' . $FN_n . '" class="fc_mediafile_controls">
+				<input type="button" class="btn btn-success playBtn" value="Play" style="color: black;"/>
+				<input type="button" class="btn btn pauseBtn" value="Pause" style="color: black;"/>
+				<input type="button" class="btn btn stopBtn" value="Stop" style="color: black;"/>
+				<input type="button" class="btn btn-primary loadBtn" value="Load" style="color: black;"/>
+			</div>
+		</div>
+		<div id="fc_mediafile_audio_spectrum_box_' . $FN_n . '" class="fc_mediafile_audio_spectrum_box" style="display: none; margin-top: 8px; position: relative; border: 1px dashed;">
+			<div class="progress progress-striped active" style="visibility: hidden; position: absolute; width: 70%; top: 40%; left: 15%;">
+				<div class="bar" style="width: 0%;"></div>
+			</div>
+			<div id="fc_mediafile_audio_spectrum_' . $FN_n . '" class="fc_mediafile_audio_spectrum"></div>
+		</div>
+		';
 
 	// Values Prefix and Suffix Texts
 	$field->{$prop}[$n]	=  $pretext . $html . $posttext;
@@ -482,6 +503,10 @@ foreach($values as $file_id)
 	$field->abspath[$use_ingroup ? $n : $i] = $abspath;
 	$field->file_data[$use_ingroup ? $n : $i] = $file_data;
 
+	if ($filename_original) $per_value_js .= "
+		fcview_mediafile.initValue('" . $field->name . '_' . $n . "', '".$field_name_js."');
+	";
+
 	// Add microdata to every value if field -- is -- in a field group
 	if ($is_ingroup && $itemprop) $field->{$prop}[$n] = '<div style="display:inline" itemprop="'.$itemprop.'" >' .$field->{$prop}[$n]. '</div>';
 
@@ -489,6 +514,16 @@ foreach($values as $file_id)
 	$i++;
 	if (!$multiple) break;  // multiple values disabled, break out of the loop, not adding further values even if the exist
 }
+
+JFactory::getDocument()->addScriptDeclaration("
+	fcview_mediafile_base_url['".$field_name_js."'] = '".$base_url."';
+
+	//document.addEventListener('DOMContentLoaded', function()
+	jQuery(document).ready(function()
+	{
+		" . $per_value_js . "
+	});
+");
 
 
 // ***

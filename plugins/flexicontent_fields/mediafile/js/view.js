@@ -1,18 +1,17 @@
-	var fcfield_mediafile = {};
-	var fcfield_mediafile_base_url = [];
-	
-	fcfield_mediafile.debugToConsole = [];
-	fcfield_mediafile.use_native_apis = [];
-	fcfield_mediafile.dialog_handle = [];
-	fcfield_mediafile.base_url = [];
+	var fcview_mediafile = {};
+	var fcview_mediafile_base_url = [];
 
-	fcfield_mediafile.initValue = function(field_name_n, config_name)
+	fcview_mediafile.debugToConsole = [];
+	fcview_mediafile.use_native_apis = [];
+	fcview_mediafile.dialog_handle = [];
+	fcview_mediafile.base_url = [];
+
+	fcview_mediafile.initValue = function(field_name_n, config_name)
 	{
-		//window.console.log(field_name_n);
+		window.console.log(field_name_n);
 		var fnn  = field_name_n.replace(/-/g, '_');
-		var file = jQuery('#custom_' + field_name_n + '_file-data-txt');
-		var file_val = file.val();
-
+		var file = jQuery('#fcview_' + field_name_n + '_file-data-txt');
+		var file_val = file.data('value');
 
 		// Create WaveSurfer object
 		var audio_spectrum = WaveSurfer.create({
@@ -149,7 +148,7 @@
 				buttons.play.disabled = true;
 
 				var isURL = /^(f|ht)tps?:\/\//i.test(file_val);
-				isURL ? audio_spectrum.load(file_val) : audio_spectrum.load(fcfield_mediafile_base_url[config_name] + '/' + file_val);
+				isURL ? audio_spectrum.load(file_val) : audio_spectrum.load(fcview_mediafile_base_url[config_name] + '/' + file_val);
 			}
 		}, false);
 
@@ -157,17 +156,17 @@
 		if (!!file_val)
 		{
 			var isURL = /^(f|ht)tps?:\/\//i.test(file_val);
-			isURL ? audio_spectrum.load(file_val) : audio_spectrum.load(fcfield_mediafile_base_url[config_name] + '/' + file_val);
+			isURL ? audio_spectrum.load(file_val) : audio_spectrum.load(fcview_mediafile_base_url[config_name] + '/' + file_val);
 		}
 	}
 
 
-	fcfield_mediafile.fileFiltered = function(uploader, file, config_name)
+	fcview_mediafile.fileFiltered = function(uploader, file, config_name)
 	{
 	}
 
 
-	fcfield_mediafile.fileUploaded = function(uploader, file, result, config_name)
+	fcview_mediafile.fileUploaded = function(uploader, file, result, config_name)
 	{
 		// Get 'fc_plupload' class instance from uploader
 		var _this = jQuery(uploader).data('fc_plupload_instance');
@@ -187,11 +186,11 @@
 		var file = response.data;
 		file.targetid    = jQuery(uploader.settings.container).closest('.fcfieldval_container').find('.existingname').attr('id');
 		file.preview_url = jQuery(uploader.settings.container).find('.plupload_img_preview > img').attr('src');
-		fcfield_mediafile.assignFile(file.targetid, file.filename, file.preview_url, 0, config_name);
+		fcview_mediafile.assignFile(file.targetid, file.filename, file.preview_url, 0, config_name);
 	}
 
 
-	fcfield_mediafile.clearFieldUploader = function(box, config_name)
+	fcview_mediafile.clearFieldUploader = function(box, config_name)
 	{
 		var upload_container = box.find('.fc_file_uploader');
 		var upload_instance = upload_container.data('plupload_instance');
@@ -206,7 +205,7 @@
 	}
 
 
-	fcfield_mediafile.clearField = function(el, options, config_name)
+	fcview_mediafile.clearField = function(el, options, config_name)
 	{
 		var box = jQuery(el).closest('.fcfieldval_container');
 		var hasValue = box.find('.hasvalue').val();
@@ -223,7 +222,7 @@
 		}
 		else
 		{
-			fcfield_mediafile.clearFieldUploader(box, config_name);
+			fcview_mediafile.clearFieldUploader(box, config_name);
 
 			box.find('.originalname').val('');
 			box.find('.existingname').val('');
@@ -242,7 +241,7 @@
 	}
 
 
-	fcfield_mediafile.assignFile = function(value_container_id, file, keep_modal, config_name)
+	fcview_mediafile.assignFile = function(value_container_id, file, keep_modal, config_name)
 	{
 		// We use altname (aka title) that is by default (unless modified) same as 'filename_original'
 		var originalname = file.filename_original ? file.filename_original : file.filename;
@@ -286,9 +285,9 @@
 		remove_obj.removeAttr('checked').trigger('change');
 
 		// Close file select modal dialog
-		if (!keep_modal && !!fcfield_mediafile.dialog_handle[config_name])
+		if (!keep_modal && !!fcview_mediafile.dialog_handle[config_name])
 		{
-			fcfield_mediafile.dialog_handle[config_name].dialog('close');
+			fcview_mediafile.dialog_handle[config_name].dialog('close');
 		}
 
 		// Re-validate

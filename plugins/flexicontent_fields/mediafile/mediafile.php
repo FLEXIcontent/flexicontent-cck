@@ -98,9 +98,9 @@ class plgFlexicontent_fieldsMediafile extends FCField
 		$docspath    = $cparams->get('file_path', 'components/com_flexicontent/uploads');
 		$imageexts   = array('jpg','gif','png','bmp','jpeg');
 
-		$target_dir = 0;
-		$basePath = JUri::root(true) . '/' . (!$target_dir ? $mediapath : $docspath);
-		$basePath = str_replace(DS, '/', $basePath);
+		$target_dir = $field->parameters->get('target_dir', 0);
+		$base_url   = JUri::root(true) . '/' . (!$target_dir ? $mediapath : $docspath);
+		$base_url   = str_replace(DS, '/', $base_url);
 
 		$thumb_size_resizer = 2; //$field->parameters->get('thumb_size_resizer', 2);
 		$thumb_size_default = 120; //$field->parameters->get('thumb_size_default', 120);
@@ -611,7 +611,7 @@ class plgFlexicontent_fieldsMediafile extends FCField
 		";
 
 		/**
-	   * Load form JS
+		 * Load form JS
 		 */
 
 		// Add needed JS/CSS
@@ -626,7 +626,7 @@ class plgFlexicontent_fieldsMediafile extends FCField
 			//flexicontent_html::loadFramework('wavesurfer');
 			flexicontent_html::loadFramework('flexi-lib');
 			JHtml::addIncludePath(JPATH_SITE . '/components/com_flexicontent/helpers/html');
-			$document->addScript('https://unpkg.com/wavesurfer.js');
+			$document->addScript('https://unpkg.com/wavesurfer.js/dist/wavesurfer.min.js');
 			$document->addScript(JUri::root(true) . '/plugins/flexicontent_fields/mediafile/js/form.js', array('version' => FLEXI_VHASH));
 		}
 
@@ -859,11 +859,39 @@ class plgFlexicontent_fieldsMediafile extends FCField
 		$viewinfo  = JText::_('FLEXI_FIELD_FILE_VIEW_INFO', true);
 		$viewinside= $field->parameters->get( 'viewinside', 1 ) ;
 
+		$cparams  = JComponentHelper::getParams( 'com_flexicontent' );
+		$mediapath   = $cparams->get('media_path', 'components/com_flexicontent/medias');
+		$docspath    = $cparams->get('file_path', 'components/com_flexicontent/uploads');
+
+		$target_dir = $field->parameters->get('target_dir', 0);
+		$base_url   = JUri::root(true) . '/' . (!$target_dir ? $mediapath : $docspath);
+		$base_url   = str_replace(DS, '/', $base_url);
+
+		// JS safe Field name
+		$field_name_js = str_replace('-', '_', $field->name);
+
 		static $fc_lib_added = false;
 		if ($viewinside==1 && !$fc_lib_added)
 		{
 			$fc_lib_added = true;
+
 			flexicontent_html::loadFramework('flexi-lib');
+			JHtml::addIncludePath(JPATH_SITE . '/components/com_flexicontent/helpers/html');
+		}
+
+		// Add needed JS/CSS
+		static $js_added = null;
+		if ( $js_added === null )
+		{
+			$js_added = true;
+
+			JText::script('PLG_FLEXICONTENT_FIELDS_MEDIAFILE_RESPONSE_PARSING_FAILED', false);
+			JText::script('PLG_FLEXICONTENT_FIELDS_MEDIAFILE_FILE_NOT_FOUND', false);
+
+			//flexicontent_html::loadFramework('wavesurfer');
+			flexicontent_html::loadFramework('flexi-lib');
+			JFactory::getDocument()->addScript('https://unpkg.com/wavesurfer.js/dist/wavesurfer.min.js');
+			JFactory::getDocument()->addScript(JUri::root(true) . '/plugins/flexicontent_fields/mediafile/js/view.js', array('version' => FLEXI_VHASH));
 		}
 
 		$allowshare = $field->parameters->get( 'allowshare', 0 ) ;

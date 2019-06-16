@@ -226,10 +226,11 @@ foreach ($field->value as $file_id)
 
 
 $document->addScriptDeclaration("
+	fcfield_mediafile_base_url['".$field_name_js."'] = '".$base_url."';
+
 	//document.addEventListener('DOMContentLoaded', function()
 	jQuery(document).ready(function()
 	{
 		" . $per_value_js . "
-		fcfield_mediafile.basePath['".$field_name_js."'] = '".$basePath."';
 	});
 ");
