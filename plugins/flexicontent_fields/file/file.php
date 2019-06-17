@@ -95,6 +95,9 @@ class plgFlexicontent_fieldsFile extends FCField
 		$iform_dir   = $inputmode==1 ? 0 : $field->parameters->get('iform_dir',   0);
 		$iform_stamp = $inputmode==1 ? 0 : $field->parameters->get('iform_stamp', 0);
 
+		$secure_default = !$iform_dir   ? 1 : (int) $field->parameters->get('iform_dir_default', 1);
+		$stamp_default  = !$iform_stamp ? 1 : (int) $field->parameters->get('iform_stamp_default', 1);
+
 		$mediapath   = $cparams->get('media_path', 'components/com_flexicontent/medias');
 		$docspath    = $cparams->get('file_path', 'components/com_flexicontent/uploads');
 		$imageexts   = array('jpg','gif','png','bmp','jpeg');
@@ -339,7 +342,9 @@ class plgFlexicontent_fieldsFile extends FCField
 				newField.find('.fc_filedata_title').html('-');
 
 				var theInput = newField.find('input.fc_filedata_txt').first();
-				theInput.val('');
+				theInput.attr('value', '');
+				theInput.removeAttr('data-filename');
+				theInput.data('filename', null);
 				theInput.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][file-data-txt]');
 				theInput.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_file-data-txt');
 
@@ -383,8 +388,16 @@ class plgFlexicontent_fieldsFile extends FCField
 					elem.removeAttr('disabled');
 					elem.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][secure]');
 					elem.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_secure_'+nr);
-					elem.next().removeClass('active');
-					elem.prop('checked', false);
+					if (elem.val() == " . (int) $secure_default .")
+					{
+						elem.next().addClass('active');
+						elem.prop('checked', true);
+					}
+					else
+					{
+						elem.next().removeClass('active');
+						elem.prop('checked', false);
+					}
 					elem.next().attr('for', '".$elementid."_'+uniqueRowNum".$field->id."+'_secure_'+nr).attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_file-secure'+nr+'-lbl');
 					nr++;
 				});
@@ -399,8 +412,16 @@ class plgFlexicontent_fieldsFile extends FCField
 					elem.removeAttr('disabled');
 					elem.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][stamp]');
 					elem.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_stamp_'+nr);
-					elem.next().removeClass('active');
-					elem.prop('checked', false);
+					if (elem.val() == " . (int) $stamp_default .")
+					{
+						elem.next().addClass('active');
+						elem.prop('checked', true);
+					}
+					else
+					{
+						elem.next().removeClass('active');
+						elem.prop('checked', false);
+					}
 					elem.next().attr('for', '".$elementid."_'+uniqueRowNum".$field->id."+'_stamp_'+nr).attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_file-stamp'+nr+'-lbl');
 					nr++;
 				});
@@ -528,11 +549,28 @@ class plgFlexicontent_fieldsFile extends FCField
 		}
 
 
+			function fcfield_FileFiltered_".$field->id."(uploader, file)
+			{
+				fcfield_file.fileFiltered(uploader, file, '".$field_name_js."');
+			}
+			function fcfield_FileUploaded_".$field->id."(uploader, file, result)
+			{
+				fcfield_file.fileUploaded(uploader, file, result, '".$field_name_js."');
+			}
+		";
+
+		/**
+		 * Load form JS
+		 */
+
+		// Add needed JS/CSS
 		static $js_added = null;
 		if ( $js_added === null )
 		{
 			$js_added = true;
 			flexicontent_html::loadFramework('flexi-lib');
+			JHtml::addIncludePath(JPATH_SITE . '/components/com_flexicontent/helpers/html');
+			$document->addScript(JUri::root(true) . '/plugins/flexicontent_fields/file/js/form.js', array('version' => FLEXI_VHASH));
 		}
 
 
@@ -729,6 +767,7 @@ class plgFlexicontent_fieldsFile extends FCField
 		if ($viewinside==1 && !$fc_lib_added)
 		{
 			$fc_lib_added = true;
+
 			flexicontent_html::loadFramework('flexi-lib');
 		}
 
@@ -1008,7 +1047,7 @@ class plgFlexicontent_fieldsFile extends FCField
 
 					// Get fist element
 					$v = !empty($file_ids) ? reset($file_ids) : ($use_ingroup ? null : false);
-		    	$v = $v ?: ($use_ingroup ? null : false);
+					$v = $v ?: ($use_ingroup ? null : false);
 					//$_filetitle = key($file_ids);  // This is the cleaned up filename, currently not needed
 				}
 			}
@@ -1016,14 +1055,14 @@ class plgFlexicontent_fieldsFile extends FCField
 			// we were given a file ID
 			elseif (!is_array($v))
 			{
-	    	$file_id = (int) $v;
-	    	$v = $v ?: ($use_ingroup ? null : false);
+				$file_id = (int) $v;
+				$v = $v ?: ($use_ingroup ? null : false);
 			}
 
 			// Using inline property editing
 			else
 			{
-	    	$file_id = (int) $v['file-id'];
+				$file_id = (int) $v['file-id'];
 
 				$err_code = isset($_FILES['custom']['error'][$field->name][$n]['file-data'])
 					? $_FILES['custom']['error'][$field->name][$n]['file-data']
@@ -1053,6 +1092,7 @@ class plgFlexicontent_fieldsFile extends FCField
 				$v['file-lang']  = !$iform_lang   ? '' : flexicontent_html::dataFilter($v['file-lang'],   9,     'STRING', 0);
 				$v['file-access']= !$iform_access ? '' : flexicontent_html::dataFilter($v['file-access'], 9,     'ACCESSLEVEL', 0);
 				$v['stamp']      = !$iform_stamp  ? 1 : ((int) $v['stamp'] ? 1 : 0);
+
 				if( $new_file )
 				{
 					$v['secure']   = !$iform_dir    ? 1 : ((int) $v['secure'] ? 1 : 0);
