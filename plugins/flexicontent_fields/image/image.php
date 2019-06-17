@@ -416,7 +416,7 @@ class plgFlexicontent_fieldsImage extends FCField
 
 				// Update uploader related data
 				var fcUploader = newField.find('.fc_file_uploader');
-				var upBTN;
+				var upBTN, mulupBTN, mulselBTN;
 				if (fcUploader.length)
 				{
 					// Update uploader attributes
