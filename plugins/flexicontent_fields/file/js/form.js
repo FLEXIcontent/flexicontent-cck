@@ -35,9 +35,9 @@
 
 		//window.console.log(response.data);
 		var file = response.data;
-		file.targetid    = jQuery(uploader.settings.container).closest('.fcfieldval_container').find('.existingname').attr('id');
+		file.targetid    = jQuery(uploader.settings.container).closest('.fcfieldval_container').find('.fc_filedata_txt').attr('id');
 		file.preview_url = jQuery(uploader.settings.container).find('.plupload_img_preview > img').attr('src');
-		fcfield_file.assignFile(file.targetid, file.filename, file.preview_url, 0, config_name);
+		fcfield_file.assignFile(file.targetid, file, file.preview_url, 0, config_name);
 	}
 
 
@@ -59,7 +59,7 @@
 	fcfield_file.clearField = function(el, options, config_name)
 	{
 		var box = jQuery(el).closest('.fcfieldval_container');
-		//var hasValue = box.find('.hasvalue').val();
+		var hasValue = box.find('.hasvalue').val();
 		var valcounter = document.getElementById('custom_' + config_name);
 		//if (window.console) window.console.log('valcounter: ' + valcounter.value);
 
@@ -76,13 +76,12 @@
 			fcfield_file.clearFieldUploader(box, config_name);
 
 			box.find('.fc_filedata_txt').val('');
-			box.find('.fc_filedata_txt_nowrap').html('');
-			//box.find('.hasvalue').val('');
-			box.find('.fc_preview_thumb').attr('src', 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=');
+			box.find('.hasvalue').val('');
+			box.find('.preview_image').attr('src', 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=');
 			box.find('.fcimg_preview_msg').html(' ');
 			box.find('.fcimg_preview_box').show();
 
-			//if (hasValue) valcounter.value = ( valcounter.value=='' || valcounter.value=='1' )  ?  ''  :  parseInt(valcounter.value) - 1;
+			if (hasValue) valcounter.value = ( valcounter.value=='' || valcounter.value=='1' )  ?  ''  :  parseInt(valcounter.value) - 1;
 			//if (window.console) window.console.log('valcounter: ' + valcounter.value);
 		}
 		if (options.keep_props)
@@ -98,7 +97,7 @@
 		var originalname = file.filename_original ? file.filename_original : file.filename;
 		var displaytitle = file.altname && (file.altname!=file.filename) ? file.altname : '-';
 		var text_nowrap  = file.altname && (file.altname!=file.filename) ? file.filename+'<br/>'+file.altname : '';
-		
+
 		var container = jQuery('#'+value_container_id).closest('.fcfieldval_container');
 
 		container.find('.fc_fileid').val(file.id);
