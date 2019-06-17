@@ -37,7 +37,7 @@
 		var file = response.data;
 		file.targetid    = jQuery(uploader.settings.container).closest('.fcfieldval_container').find('.fc_filedata_txt').attr('id');
 		file.preview_url = jQuery(uploader.settings.container).find('.plupload_img_preview > img').attr('src');
-		fcfield_file.assignFile(file.targetid, file, file.preview_url, 0, config_name);
+		fcfield_file.assignFile(file.targetid, file, 0, config_name);
 	}
 
 
@@ -76,8 +76,11 @@
 			fcfield_file.clearFieldUploader(box, config_name);
 
 			box.find('.fc_filedata_txt').val('');
+			box.find('.fc_filedata_txt_nowrap').html('');
+			box.find('.fc_filedata_txt').removeAttr('data-filename');
+			box.find('.fc_filedata_txt').data('filename', null);
 			box.find('.hasvalue').val('');
-			box.find('.preview_image').attr('src', 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=');
+			box.find('.fc_preview_thumb').attr('src', 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=');
 			box.find('.fcimg_preview_msg').html(' ');
 			box.find('.fcimg_preview_box').show();
 
@@ -103,6 +106,8 @@
 		container.find('.fc_fileid').val(file.id);
 		container.find('.fc_filedata_storage_name').html(file.filename);
 		container.find('.fc_filedata_txt').val(originalname).removeClass('file_unpublished').blur();
+		container.find('.fc_filedata_txt').removeAttr('data-filename');
+		container.find('.fc_filedata_txt').data('filename', file.filename);
 		container.find('.fc_filedata_txt_nowrap').html(text_nowrap).show();
 		container.find('.fc_filedata_title').html(displaytitle);
 
