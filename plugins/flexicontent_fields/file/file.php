@@ -35,7 +35,7 @@ class plgFlexicontent_fieldsFile extends FCField
 	// ***
 
 	// Method to create field's HTML display for item form
-	function onDisplayField(&$field, &$item)
+	public function onDisplayField(&$field, &$item)
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 
@@ -63,11 +63,11 @@ class plgFlexicontent_fieldsFile extends FCField
 		$u_item_id = $item->id ? $item->id : substr(JFactory::getApplication()->input->get('unique_tmp_itemid', '', 'string'), 0, 1000);
 
 
-		// ***
-		// *** Number of values
-		// ***
+		/**
+		 * Number of values
+		 */
 
-		$multiple     = $use_ingroup || (int) $field->parameters->get( 'allow_multiple', 1 ) ;
+		$multiple     = $use_ingroup || (int) $field->parameters->get('allow_multiple', 1);
 		$max_values   = $use_ingroup ? 0 : (int) $field->parameters->get('max_values', 0);
 		$required     = (int) $field->parameters->get('required', 0);
 		$add_position = (int) $field->parameters->get('add_position', 3);
@@ -97,6 +97,75 @@ class plgFlexicontent_fieldsFile extends FCField
 		$mediapath   = $cparams->get('media_path', 'components/com_flexicontent/medias');
 		$docspath    = $cparams->get('file_path', 'components/com_flexicontent/uploads');
 		$imageexts   = array('jpg','gif','png','bmp','jpeg');
+
+		$thumb_size_resizer = 2; //$field->parameters->get('thumb_size_resizer', 2);
+		$thumb_size_default = 120; //$field->parameters->get('thumb_size_default', 120);
+		$preview_thumb_w = $preview_thumb_h = 600;
+
+		// Inline uploaders flags
+		$use_inline_uploaders = 1;
+		$usemediaurl = 0; //(int) $field->parameters->get('use_mediaurl', 0);
+		$file_btns_position = 0; //(int) $field->parameters->get('file_btns_position', 0);
+
+
+		/**
+		 * Slider for files grid view
+		 */
+
+		if ($use_inline_uploaders && $thumb_size_resizer)
+		{
+			flexicontent_html::loadFramework('nouislider');
+
+			$resize_cfg = new stdClass();
+			$resize_cfg->slider_name = 'fcfield-'.$field->id.'-uploader-thumb-size';
+			$resize_cfg->element_selector = 'div.fcfield-'.$field->id.'-uploader-thumb-box';
+
+			$resize_cfg->elem_container_selector = '.fcfieldval_container_'.$field->id.' div.fc-box';
+			$resize_cfg->element_selector = '.fcfieldval_container_'.$field->id.' div.fc_file_uploader ul.plupload_filelist > li';
+
+			$resize_cfg->element_class_prefix = 'thumb_';
+			$resize_cfg->values = array(90, 120, 150, 200, 250);
+			$resize_cfg->labels = array();
+
+			$thumb_size_default = $app->input->cookie->get($resize_cfg->slider_name . '-val', $thumb_size_default, 'int');
+			$resize_cfg->initial_pos = (int) array_search($thumb_size_default, $resize_cfg->values);
+			if ($resize_cfg->initial_pos === false)
+			{
+				$resize_cfg->initial_pos = 1;
+			}
+			$thumb_size_default = $resize_cfg->values[$resize_cfg->initial_pos];
+			$app->input->cookie->set($resize_cfg->slider_name . '-val', $thumb_size_default);
+
+			foreach($resize_cfg->values as $value) $resize_cfg->labels[] = $value .'x'. $value;
+
+			$element_classes = array();
+			foreach($resize_cfg->values as $value) $element_classes[] = $resize_cfg->element_class_prefix . $value;
+
+			$element_class_list = implode(' ', $element_classes);
+			$step_values = '[' . implode(', ', $resize_cfg->values) . ']';
+			$step_labels = '["' . implode('", "', $resize_cfg->labels) . '"]';
+
+			$thumb_size_slider_cfg = "{
+					name: '".$resize_cfg->slider_name."',
+					step_values: ".$step_values.",
+					step_labels: ".$step_labels.",
+					initial_pos: ".$resize_cfg->initial_pos.",
+					start_hidden: false,
+					element_selector: '".$resize_cfg->element_selector."',
+					element_class_list: '',
+					element_class_prefix: '',
+					elem_container_selector: '".$resize_cfg->elem_container_selector."',
+					elem_container_class: '".$element_class_list."',
+					elem_container_prefix: '".$resize_cfg->element_class_prefix."'
+				}";
+
+			$document->addScriptDeclaration("
+			jQuery(document).ready(function()
+			{
+				fc_attachSingleSlider(".$thumb_size_slider_cfg.", ".$thumb_size_resizer.");
+			});
+			");
+		}
 
 		// Empty field value
 		if (!$field->value)
@@ -169,7 +238,7 @@ class plgFlexicontent_fieldsFile extends FCField
 
 		// Button for popup file selection
 		$autoassign = (int) $field->parameters->get( 'autoassign', 1 ) ;
-		$addExistingURL = JUri::base(true)
+		$filesElementURL = JUri::base(true)
 			.'/index.php?option=com_flexicontent&amp;view=fileselement&amp;tmpl=component'
 			.'&amp;index=%s'
 			.'&amp;field='.$field->id.'&amp;u_item_id='.$u_item_id.'&amp;autoassign='.$autoassign
@@ -177,6 +246,9 @@ class plgFlexicontent_fieldsFile extends FCField
 			.'&amp;targetid=%s'
 			.'&amp;existing_class=fc_filedata_storage_name'
 			.'&amp;' . JSession::getFormToken() . '=1';
+
+		// URL for modal fileselement view
+		$addExistingURL = sprintf($filesElementURL, '__rowno__', '__thisid__');
 
 		$_prompt_txt = JText::_( 'FLEXI_FIELD_FILE_SELECT_FILE' );  //JText::_( 'FLEXI_ADD_FILE' );
 
@@ -187,6 +259,9 @@ class plgFlexicontent_fieldsFile extends FCField
 		// Field name and HTML TAG id
 		$fieldname = 'custom['.$field->name.']';
 		$elementid = 'custom_'.$field->name;
+
+		// JS safe Field name
+		$field_name_js = str_replace('-', '_', $field->name);
 
 		$js = "
 			var fc_field_dialog_handle_".$field->id.";
@@ -206,70 +281,20 @@ class plgFlexicontent_fieldsFile extends FCField
 			}
 
 
-			function fc_openFileSelection_".$field->id."(event)
+			function fc_openFileSelection_".$field->id."(element)
 			{
-				var obj = jQuery(event.data.obj);
-				var url = obj.attr('href');
+				var obj = jQuery(element);
+				var url = obj.attr('data-href');
 
 				url = url.replace( '__rowno__',  obj.attr('data-rowno') ? obj.attr('data-rowno') : '' );
 				url = url.replace( '__thisid__', obj.attr('id') ? obj.attr('id') : '' );
 
-				fc_field_dialog_handle_".$field->id." = fc_showDialog(url, 'fc_modal_popup_container', 0, 0, 0, 0, {title: '".JText::_('FLEXI_FIELD_FILE_SELECT_FILE', true)."'});
+				//window.console.log(obj.attr('data-rowno'));
+				//window.console.log(url);
+
+				fcfield_file.dialog_handle['".$field_name_js."'] = fc_field_dialog_handle_".$field->id." = fc_showDialog(url, 'fc_modal_popup_container', 0, 0, 0, 0, {title: '".JText::_('FLEXI_FIELD_FILE_SELECT_FILE', true)."', paddingW: 10, paddingH: 16});
 				return false;
 			}
-
-
-			function fcfield_assignFile".$field->id."(value_container_id, file, keep_modal)
-			{
-				// We use altname (aka title) that is by default (unless modified) same as 'filename_original'
-				var originalname = file.filename_original ? file.filename_original : file.filename;
-				var displaytitle = file.altname && (file.altname!=file.filename) ? file.altname : '-';
-				var text_nowrap  = file.altname && (file.altname!=file.filename) ? file.filename+'<br/>'+file.altname : '';
-
-				var container = jQuery('#'+value_container_id).closest('.fcfieldval_container');
-
-				container.find('.fc_fileid').val(file.id);
-				container.find('.fc_filedata_storage_name').html(file.filename);
-				container.find('.fc_filedata_txt').val(originalname).removeClass('file_unpublished').blur();
-				container.find('.fc_filedata_txt_nowrap').html(text_nowrap).show();
-				container.find('.fc_filedata_title').html(displaytitle);
-
-				container.find('.fc_preview_thumb').attr('src', file.preview ? file.preview : 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=');
-
-				".($form_file_preview == 2 ? "
-				file.preview ? container.find('.fc_preview_thumb').show() : container.find('.fc_preview_thumb').hide();
-				" : "")."
-
-				container.find('.fc_filetitle').val(file.altname).blur();
-				container.find('.fc_filelang').val(file.language).trigger('change');
-				container.find('.fc_filedesc').val(file.description);
-
-				// Increment value counter (which is optionally used as 'required' form element)
-				var valcounter = document.getElementById('".$elementid."');
-				if (valcounter)
-				{
-					valcounter.value = valcounter.value=='' ? '1' : parseInt(valcounter.value) + 1;
-				}
-
-				var remove_obj = container.find('.inlinefile-del');
-				remove_obj.removeAttr('checked').trigger('change');
-
-				if (!keep_modal && fc_field_dialog_handle_".$field->id.")
-				{
-					fc_field_dialog_handle_".$field->id.".dialog('close');
-				}
-
-				// Re-validate
-				jQuery(valcounter).trigger('blur');
-				return true;
-			}
-
-
-			jQuery(document).ready(function() {
-				jQuery('a.addfile_".$field->id."').each(function(index, value) {
-					jQuery(this).on( 'click',  {obj:this},  fc_openFileSelection_".$field->id." );
-				});
-			});
 		";
 		$css = '';
 
@@ -342,7 +367,7 @@ class plgFlexicontent_fieldsFile extends FCField
 				theInput.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][file-data-txt]');
 				theInput.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_file-data-txt');
 
-				var imgPreview = newField.find('.fc_preview_thumb').first();
+				var imgPreview = newField.find('.fcimg_preview_box').first();
 				imgPreview.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_img_preview');
 				imgPreview.attr('src', 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=');
 				".($form_file_preview != 1 ? '
@@ -422,12 +447,31 @@ class plgFlexicontent_fieldsFile extends FCField
 				}
 
 				// Update button for modal file selection
-				var theBTN = newField.find('a.addfile_".$field->id."');
+				var theBTN = newField.find('span.addfile');
 				theBTN.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_addfile');
 				theBTN.attr('data-rowno',uniqueRowNum".$field->id.");
-				theBTN.each(function(index, value) {
-					jQuery(this).on( 'click',  {obj:this},  fc_openFileSelection_".$field->id." );
-				});
+
+				// Update uploader related data
+				var fcUploader = newField.find('.fc_file_uploader');
+				var upBTN, mulupBTN, mulselBTN;
+				if (fcUploader.length)
+				{
+					// Update uploader attributes
+					fcUploader.empty().hide();
+					fcUploader.attr('id', fcUploader.attr('data-tagid-prefix') + uniqueRowNum".$field->id.");
+
+					// Update button for toggling uploader
+					upBTN = newField.find('.fc_files_uploader_toggle_btn');
+					upBTN.attr('data-rowno',uniqueRowNum".$field->id.");
+
+					mulupBTN = newField.find('.fc-files-modal-link.fc-up');
+					mulupBTN.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_mul_uploadvalue');
+					mulupBTN.attr('data-rowno',uniqueRowNum".$field->id.");
+
+					mulselBTN = newField.find('.fc-files-modal-link.fc-sel');
+					mulselBTN.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_selectvalue');
+					mulselBTN.attr('data-rowno',uniqueRowNum".$field->id.");
+				}
 				";
 
 			// Add new field to DOM
@@ -481,7 +525,7 @@ class plgFlexicontent_fieldsFile extends FCField
 
 				if ( 1 ) // A deleted container always has a value, thus decrement (or empty) the counter value in the 'required' form element
 				{
-					var valcounter = document.getElementById('".$elementid."');
+					var valcounter = document.getElementById('custom_".$field_name_js."');
 					if (valcounter) {
 						valcounter.value = ( !valcounter.value || valcounter.value=='1' )  ?  ''  :  parseInt(valcounter.value) - 1;
 					}
@@ -526,13 +570,44 @@ class plgFlexicontent_fieldsFile extends FCField
 			$css .= '';
 		}
 
+		$js .= "
+			/**
+			 * Method Wrappers to class methods (used for compatibility)
+			 */
 
+			function fcfield_assignFile".$field->id."(value_container_id, file, keep_modal)
+			{
+				fcfield_file.assignFile(value_container_id, file, keep_modal, '".$field_name_js."');
+			}
+
+			/* Method used as callbacks of AJAX uploader */
+
+			function fcfield_FileFiltered_".$field->id."(uploader, file)
+			{
+				fcfield_file.fileFiltered(uploader, file, '".$field_name_js."');
+			}
+			function fcfield_FileUploaded_".$field->id."(uploader, file, result)
+			{
+				fcfield_file.fileUploaded(uploader, file, result, '".$field_name_js."');
+			}
+		";
+
+		/**
+	   * Load form JS
+		 */
+
+		// Add needed JS/CSS
 		static $js_added = null;
 		if ( $js_added === null )
 		{
 			$js_added = true;
+
+			JText::script('PLG_FLEXICONTENT_FIELDS_FILE_RESPONSE_PARSING_FAILED', false);
+			JText::script('PLG_FLEXICONTENT_FIELDS_FILE_FILE_NOT_FOUND', false);
+
 			flexicontent_html::loadFramework('flexi-lib');
 			JHtml::addIncludePath(JPATH_SITE . '/components/com_flexicontent/helpers/html');
+			$document->addScriptVersion(JUri::root(true) . '/plugins/flexicontent_fields/file/js/form.js', FLEXI_VHASH);
 		}
 
 
@@ -546,11 +621,13 @@ class plgFlexicontent_fieldsFile extends FCField
 		if ($css) $document->addStyleDeclaration($css);
 
 
-		// *****************************************
-		// Create field's HTML display for item form
-		// *****************************************
 
-		$field->html = array();  // Make sure this is an array
+		/**
+		 * Create field's HTML display for item form
+		 */
+
+		$field->html = array();
+		$uploader_html_arr = array();
 
 		$formlayout = $field->parameters->get('formlayout', '');
 		$formlayout = $formlayout ? 'field_'.$formlayout : 'field_InlineBoxes';
@@ -561,14 +638,29 @@ class plgFlexicontent_fieldsFile extends FCField
 
 		include(self::getFormPath($this->fieldtypes[0], $formlayout));
 
-		foreach($field->html as &$_html)
+		foreach($field->html as $n => &$_html)
 		{
+			$uploader_html = $uploader_html_arr[$n];
 			$_html = '
 				'.(!$add_ctrl_btns ? '' : '
 				<div class="'.$input_grp_class.' fc-xpended-btns">
 					'.$move2.'
 					'.$remove_button.'
-					'.(!$add_position ? '' : $add_here).'
+					'.(!$add_position ? '' : $add_here)
+					.($use_inline_uploaders && !$file_btns_position ?'
+					<div class="buttons btn-group fc-iblock">
+						<span role="button" class="' . $drop_btn_class . ' fcfield-addvalue ' . $font_icon_class . '" data-toggle="dropdown">
+							<span class="caret"></span>
+						</span>
+						<ul class="dropdown-menu" role="menu">
+							<li>'.$uploader_html->toggleBtn.'</li>
+							<li>'.$uploader_html->multiUploadBtn.'</li>
+							<li>'.$uploader_html->myFilesBtn.'</li>
+							<li>'.$uploader_html->mediaUrlBtn.'</li>
+						</ul>
+					</div>
+					'.$uploader_html->clearBtn.'
+					' : '') . '
 				</div>
 				'.($fields_box_placing ? '<div class="fcclear"></div>' : '').'
 				').'
@@ -602,6 +694,28 @@ class plgFlexicontent_fieldsFile extends FCField
 		else
 		{
 			$field->html = '<div class="fcfieldval_container valuebox fcfieldval_container_'.$field->id.'">' . $field->html[0] .'</div>';
+		}
+
+
+		// This is field HTML that is created regardless of values
+		$non_value_html = '';//'<input id="custom_'.$field_name_js.'" class="fc_hidden_value '.($use_ingroup ? '' : $required_class).'" type="text" name="__fcfld_valcnt__['.$field->name.']" value="'.($count_vals ? $count_vals : '').'" />';
+		if ($use_ingroup)
+		{
+			$uploader_html = reset($uploader_html_arr);
+
+			$field->html[-1] = $non_value_html;
+			if ($use_inline_uploaders && $uploader_html->thumbResizer)
+			{
+				$field->html[-1] = '<div class="label" style="float: left">' . $field->label . '</div>' . $uploader_html->thumbResizer . ' ' . $field->html[-1] . '<div class="clear"></div>';
+			}
+		}
+		else
+		{
+			$field->html .= $non_value_html;
+			if ($use_inline_uploaders && $uploader_html->thumbResizer)
+			{
+				$field->html = $uploader_html->thumbResizer . ' ' . $field->html;
+			}
 		}
 
 		// Add toggle button for: Compact values view (= multiple values per row)
