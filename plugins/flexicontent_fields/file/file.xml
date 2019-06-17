@@ -15,6 +15,7 @@
 		<filename>index.html</filename>
 		<folder>file</folder>
 		<folder>tmpl</folder>
+		<folder>js</folder>
 	</files>
 
 	<config>
