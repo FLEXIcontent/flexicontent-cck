@@ -294,8 +294,8 @@ class plgFlexicontent_fieldsMediafile extends FCField
 				url = url.replace( '__rowno__',  obj.attr('data-rowno') ? obj.attr('data-rowno') : '' );
 				url = url.replace( '__thisid__', obj.attr('id') ? obj.attr('id') : '' );
 
-				window.console.log(obj.attr('data-rowno'));
-				window.console.log(url);
+				//window.console.log(obj.attr('data-rowno'));
+				//window.console.log(url);
 
 				fcfield_mediafile.dialog_handle['".$field_name_js."'] = fc_field_dialog_handle_".$field->id." = fc_showDialog(url, 'fc_modal_popup_container', 0, 0, 0, 0, {title: '".JText::_('FLEXI_SELECT', true)."', paddingW: 10, paddingH: 16});
 				return false;
@@ -368,7 +368,9 @@ class plgFlexicontent_fieldsMediafile extends FCField
 				newField.find('.fc_filedata_title').html('-');
 
 				var theInput = newField.find('input.fc_filedata_txt').first();
-				theInput.val('');
+				theInput.attr('value', '');
+				theInput.removeAttr('data-filename');
+				theInput.data('filename', null);
 				theInput.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][file-data-txt]');
 				theInput.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_file-data-txt');
 
@@ -412,8 +414,16 @@ class plgFlexicontent_fieldsMediafile extends FCField
 					elem.removeAttr('disabled');
 					elem.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][secure]');
 					elem.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_secure_'+nr);
-					elem.next().removeClass('active');
-					elem.prop('checked', false);
+					if (elem.val() == " . (int) $secure_default .")
+					{
+						elem.next().addClass('active');
+						elem.prop('checked', true);
+					}
+					else
+					{
+						elem.next().removeClass('active');
+						elem.prop('checked', false);
+					}
 					elem.next().attr('for', '".$elementid."_'+uniqueRowNum".$field->id."+'_secure_'+nr).attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_file-secure'+nr+'-lbl');
 					nr++;
 				});
@@ -428,8 +438,16 @@ class plgFlexicontent_fieldsMediafile extends FCField
 					elem.removeAttr('disabled');
 					elem.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][stamp]');
 					elem.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_stamp_'+nr);
-					elem.next().removeClass('active');
-					elem.prop('checked', false);
+					if (elem.val() == " . (int) $stamp_default .")
+					{
+						elem.next().addClass('active');
+						elem.prop('checked', true);
+					}
+					else
+					{
+						elem.next().removeClass('active');
+						elem.prop('checked', false);
+					}
 					elem.next().attr('for', '".$elementid."_'+uniqueRowNum".$field->id."+'_stamp_'+nr).attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_file-stamp'+nr+'-lbl');
 					nr++;
 				});
@@ -1170,7 +1188,7 @@ class plgFlexicontent_fieldsMediafile extends FCField
 
 					// Get fist element
 					$v = !empty($file_ids) ? reset($file_ids) : ($use_ingroup ? null : false);
-		    	$v = $v ?: ($use_ingroup ? null : false);
+					$v = $v ?: ($use_ingroup ? null : false);
 					//$_filetitle = key($file_ids);  // This is the cleaned up filename, currently not needed
 				}
 			}
@@ -1178,14 +1196,14 @@ class plgFlexicontent_fieldsMediafile extends FCField
 			// we were given a file ID
 			elseif (!is_array($v))
 			{
-	    	$file_id = (int) $v;
-	    	$v = $v ?: ($use_ingroup ? null : false);
+				$file_id = (int) $v;
+				$v = $v ?: ($use_ingroup ? null : false);
 			}
 
 			// Using inline property editing
 			else
 			{
-	    	$file_id = (int) $v['file-id'];
+				$file_id = (int) $v['file-id'];
 
 				$err_code = isset($_FILES['custom']['error'][$field->name][$n]['file-data'])
 					? $_FILES['custom']['error'][$field->name][$n]['file-data']
@@ -1215,6 +1233,7 @@ class plgFlexicontent_fieldsMediafile extends FCField
 				$v['file-lang']  = !$iform_lang   ? '' : flexicontent_html::dataFilter($v['file-lang'],   9,     'STRING', 0);
 				$v['file-access']= !$iform_access ? '' : flexicontent_html::dataFilter($v['file-access'], 9,     'ACCESSLEVEL', 0);
 				$v['stamp']      = !$iform_stamp  ? 1 : ((int) $v['stamp'] ? 1 : 0);
+
 				if( $new_file )
 				{
 					$v['secure']   = 0; //!$iform_dir    ? 1 : ((int) $v['secure'] ? 1 : 0);

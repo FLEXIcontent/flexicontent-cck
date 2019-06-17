@@ -11,7 +11,6 @@
 		//window.console.log(field_name_n);
 		var fnn  = field_name_n.replace(/-/g, '_');
 		var file = jQuery('#custom_' + field_name_n + '_file-data-txt');
-		var file_val = file.val();
 
 
 		// Create WaveSurfer object
@@ -34,6 +33,8 @@
 				]
 			}
 		});
+
+		jQuery('#fc_mediafile_audio_spectrum_' + fnn).data('audio_spectrum', audio_spectrum);
 
 
 		// Get control buttons
@@ -92,15 +93,13 @@
 					if (frame >= steps) clearInterval(loading_timer);
 				}, 20);
 			}
-			window.console.log('loading');
-			window.console.log(percents);
-			window.console.log(eventTarget);
+			//window.console.log('loading');  window.console.log(percents);  window.console.log(eventTarget);
 		});
 
 
 		audio_spectrum.on('ready', function()
 		{
-			window.console.log('is ready');
+			//window.console.log('is ready');
 			clearInterval(loading_timer);
 
 			var box = jQuery('#fc_mediafile_audio_spectrum_box_' + fnn)
@@ -142,22 +141,22 @@
 		// Add event of load button to allow loading new files
 		buttons.load.addEventListener('click', function()
 		{
-			if (!!file_val)
+			if (!!file.data('filename'))
 			{
 				buttons.pause.disabled = true;
 				buttons.stop.disabled = true;
 				buttons.play.disabled = true;
 
-				var isURL = /^(f|ht)tps?:\/\//i.test(file_val);
-				isURL ? audio_spectrum.load(file_val) : audio_spectrum.load(fcfield_mediafile_base_url[config_name] + '/' + file_val);
+				var isURL = /^(f|ht)tps?:\/\//i.test(file.data('filename'));
+				isURL ? audio_spectrum.load(file.data('filename')) : audio_spectrum.load(fcfield_mediafile_base_url[config_name] + '/' + file.data('filename'));
 			}
 		}, false);
 
 		// Load the audio file
-		if (!!file_val)
+		if (!!file.data('filename'))
 		{
-			var isURL = /^(f|ht)tps?:\/\//i.test(file_val);
-			isURL ? audio_spectrum.load(file_val) : audio_spectrum.load(fcfield_mediafile_base_url[config_name] + '/' + file_val);
+			var isURL = /^(f|ht)tps?:\/\//i.test(file.data('filename'));
+			isURL ? audio_spectrum.load(file.data('filename')) : audio_spectrum.load(fcfield_mediafile_base_url[config_name] + '/' + file.data('filename'));
 		}
 	}
 
@@ -185,9 +184,9 @@
 
 		//window.console.log(response.data);
 		var file = response.data;
-		file.targetid    = jQuery(uploader.settings.container).closest('.fcfieldval_container').find('.existingname').attr('id');
+		file.targetid    = jQuery(uploader.settings.container).closest('.fcfieldval_container').find('.fc_filedata_txt').attr('id');
 		file.preview_url = jQuery(uploader.settings.container).find('.plupload_img_preview > img').attr('src');
-		fcfield_mediafile.assignFile(file.targetid, file.filename, file.preview_url, 0, config_name);
+		fcfield_mediafile.assignFile(file.targetid, file, 0, config_name);
 	}
 
 
@@ -224,11 +223,14 @@
 		else
 		{
 			fcfield_mediafile.clearFieldUploader(box, config_name);
+			box.find('.fc_mediafile_audio_spectrum').data('audio_spectrum').empty();
 
-			box.find('.originalname').val('');
-			box.find('.existingname').val('');
+			box.find('.fc_filedata_txt').val('');
+			box.find('.fc_filedata_txt_nowrap').html('');
+			box.find('.fc_filedata_txt').removeAttr('data-filename');
+			box.find('.fc_filedata_txt').data('filename', null);
 			box.find('.hasvalue').val('');
-			box.find('.preview_image').attr('src', 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=');
+			box.find('.fc_preview_thumb').attr('src', 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=');
 			box.find('.fcimg_preview_msg').html(' ');
 			box.find('.fcimg_preview_box').show();
 
@@ -249,14 +251,13 @@
 		var displaytitle = file.altname && (file.altname!=file.filename) ? file.altname : '-';
 		var text_nowrap  = file.altname && (file.altname!=file.filename) ? file.filename+'<br/>'+file.altname : '';
 
-		window.console.log(value_container_id);
-		window.console.log(jQuery('#'+value_container_id).length);
-
 		var container = jQuery('#'+value_container_id).closest('.fcfieldval_container');
 
 		container.find('.fc_fileid').val(file.id);
 		container.find('.fc_filedata_storage_name').html(file.filename);
 		container.find('.fc_filedata_txt').val(originalname).removeClass('file_unpublished').blur();
+		container.find('.fc_filedata_txt').removeAttr('data-filename');
+		container.find('.fc_filedata_txt').data('filename', file.filename);
 		container.find('.fc_filedata_txt_nowrap').html(text_nowrap).show();
 		container.find('.fc_filedata_title').html(displaytitle);
 
@@ -267,13 +268,24 @@
 			if (keep_modal != 2)
 			{
 				container.find('.fcimg_preview_box').show();
-				fcfield_file.clearFieldUploader(container, config_name);
+				fcfield_mediafile.clearFieldUploader(container, config_name);
 			}
 		}
 
+		container.find('.fc_mediafile_audio_spectrum').data('audio_spectrum').empty();
 		container.find('.fc_filetitle').val(file.altname).blur();
 		container.find('.fc_filelang').val(file.language).trigger('change');
 		container.find('.fc_filedesc').val(file.description);
+
+		// Load the audio file
+		if (!!file.filename)
+		{
+			var audio_spectrum = container.find('.fc_mediafile_audio_spectrum').data('audio_spectrum');
+			window.console.log(config_name);
+			window.console.log(fcfield_mediafile_base_url[config_name]);
+			var isURL = /^(f|ht)tps?:\/\//i.test(file.filename);
+			isURL ? audio_spectrum.load(file.filename) : audio_spectrum.load(fcfield_mediafile_base_url[config_name] + '/' + file.filename);
+		}
 
 		// Increment value counter (which is optionally used as 'required' form element)
 		var valcounter = document.getElementById('custom_' + config_name);
