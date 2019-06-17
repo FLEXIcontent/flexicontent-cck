@@ -478,7 +478,7 @@ foreach($values as $file_id)
 
 	$html .= '<div class="fcclear"></div>'
 	. '
-		<span id="fcview_' . $field->name . '_' . $n . '_file-data-txt" data-value="' . htmlspecialchars($filename_original, ENT_COMPAT, 'UTF-8') . '"></span>
+		<span id="fcview_' . $field->name . '_' . $n . '_file-data-txt" data-filename="' . htmlspecialchars($file_data->filename, ENT_COMPAT, 'UTF-8') . '"></span>
 		<div>
 			<div id="fc_mediafile_controls_' . $FN_n . '" class="fc_mediafile_controls">
 				<input type="button" class="btn btn-success playBtn" value="Play" style="color: black;"/>

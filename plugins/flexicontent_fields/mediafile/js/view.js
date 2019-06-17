@@ -8,10 +8,10 @@
 
 	fcview_mediafile.initValue = function(field_name_n, config_name)
 	{
-		window.console.log(field_name_n);
+		//window.console.log(field_name_n);
 		var fnn  = field_name_n.replace(/-/g, '_');
 		var file = jQuery('#fcview_' + field_name_n + '_file-data-txt');
-		var file_val = file.data('value');
+
 
 		// Create WaveSurfer object
 		var audio_spectrum = WaveSurfer.create({
@@ -34,6 +34,7 @@
 			}
 		});
 
+		jQuery('#fc_mediafile_audio_spectrum_' + fnn).data('audio_spectrum', audio_spectrum);
 
 		// Get control buttons
 		var controls = jQuery('#fc_mediafile_controls_' + fnn);
@@ -91,15 +92,14 @@
 					if (frame >= steps) clearInterval(loading_timer);
 				}, 20);
 			}
-			window.console.log('loading');
-			window.console.log(percents);
+			window.console.log('Loading file (Wavesurfer JS): ' + percents + ' %');
 			window.console.log(eventTarget);
 		});
 
 
 		audio_spectrum.on('ready', function()
 		{
-			window.console.log('is ready');
+			window.console.log('Loading is DONE');
 			clearInterval(loading_timer);
 
 			var box = jQuery('#fc_mediafile_audio_spectrum_box_' + fnn)
@@ -141,22 +141,28 @@
 		// Add event of load button to allow loading new files
 		buttons.load.addEventListener('click', function()
 		{
-			if (!!file_val)
+			if (!!file.data('filename'))
 			{
 				buttons.pause.disabled = true;
 				buttons.stop.disabled = true;
 				buttons.play.disabled = true;
 
-				var isURL = /^(f|ht)tps?:\/\//i.test(file_val);
-				isURL ? audio_spectrum.load(file_val) : audio_spectrum.load(fcview_mediafile_base_url[config_name] + '/' + file_val);
+				var isURL = /^(f|ht)tps?:\/\//i.test(file.data('filename'));
+				window.console.log('isURL: ' + isURL);
+				window.console.log('filename: ' + file.data('filename'));
+				window.console.log('Base URL: ' + fcview_mediafile_base_url[config_name]);
+				isURL ? audio_spectrum.load(file.data('filename')) : audio_spectrum.load(fcview_mediafile_base_url[config_name] + '/' + file.data('filename'));
 			}
 		}, false);
 
 		// Load the audio file
-		if (!!file_val)
+		if (!!file.data('filename'))
 		{
-			var isURL = /^(f|ht)tps?:\/\//i.test(file_val);
-			isURL ? audio_spectrum.load(file_val) : audio_spectrum.load(fcview_mediafile_base_url[config_name] + '/' + file_val);
+			var isURL = /^(f|ht)tps?:\/\//i.test(file.data('filename'));
+			window.console.log('isURL: ' + isURL);
+			window.console.log('filename: ' + file.data('filename'));
+			window.console.log('Base URL: ' + fcview_mediafile_base_url[config_name]);
+			isURL ? audio_spectrum.load(file.data('filename')) : audio_spectrum.load(fcview_mediafile_base_url[config_name] + '/' + file.data('filename'));
 		}
 	}
 

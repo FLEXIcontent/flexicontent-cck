@@ -36,7 +36,6 @@
 
 		jQuery('#fc_mediafile_audio_spectrum_' + fnn).data('audio_spectrum', audio_spectrum);
 
-
 		// Get control buttons
 		var controls = jQuery('#fc_mediafile_controls_' + fnn);
 		var buttons = {
@@ -93,13 +92,14 @@
 					if (frame >= steps) clearInterval(loading_timer);
 				}, 20);
 			}
-			//window.console.log('loading');  window.console.log(percents);  window.console.log(eventTarget);
+			//window.console.log('Loading file (Wavesurfer JS): ' + percents + ' %');
+			//window.console.log(eventTarget);
 		});
 
 
 		audio_spectrum.on('ready', function()
 		{
-			//window.console.log('is ready');
+			//window.console.log('Loading is DONE');
 			clearInterval(loading_timer);
 
 			var box = jQuery('#fc_mediafile_audio_spectrum_box_' + fnn)
@@ -148,6 +148,9 @@
 				buttons.play.disabled = true;
 
 				var isURL = /^(f|ht)tps?:\/\//i.test(file.data('filename'));
+				//window.console.log('isURL: ' + isURL);
+				//window.console.log('filename: ' + file.data('filename'));
+				//window.console.log('Base URL: ' + fcfield_mediafile_base_url[config_name]);
 				isURL ? audio_spectrum.load(file.data('filename')) : audio_spectrum.load(fcfield_mediafile_base_url[config_name] + '/' + file.data('filename'));
 			}
 		}, false);
@@ -156,6 +159,9 @@
 		if (!!file.data('filename'))
 		{
 			var isURL = /^(f|ht)tps?:\/\//i.test(file.data('filename'));
+			//window.console.log('isURL: ' + isURL);
+			//window.console.log('filename: ' + file.data('filename'));
+			//window.console.log('Base URL: ' + fcfield_mediafile_base_url[config_name]);
 			isURL ? audio_spectrum.load(file.data('filename')) : audio_spectrum.load(fcfield_mediafile_base_url[config_name] + '/' + file.data('filename'));
 		}
 	}
