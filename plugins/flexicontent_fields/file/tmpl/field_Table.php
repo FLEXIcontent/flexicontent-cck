@@ -34,16 +34,40 @@ foreach ($field->value as $file_id)
 	$cols2_exist = $iform_title || $iform_lang || $iform_access || $iform_desc || $iform_dir;
 
 	$field->html[] = '
-	<div class="fcclear"></div>
-	<div style="display:inline-block;">
-		<span class="fc_filedata_storage_name" style="display:none;">'.$file_data->filename.'</span>
-		<div class="fc_filedata_txt_nowrap nowrap_hidden">'.$file_data->filename.'<br/>'.$file_data->altname.'</div>
-		<input class="fc_filedata_txt inlinefile-data-txt '. $info_txt_classes . $required_class .'" readonly="readonly" name="'.$fieldname_n.'[file-data-txt]" id="'.$elementid_n.'_file-data-txt" '.$info_txt_tooltip.' value="'.htmlspecialchars($filename_original, ENT_COMPAT, 'UTF-8').'" />
-		'.(!$iform_title ? '<br/><div class="'.$input_grp_class.'"><span class="' . $add_on_class . ' fc-lbl fc_filedata_title-lbl">'.JText::_( 'FLEXI_FILE_DISPLAY_TITLE' ).'</span><span class="' . $add_on_class . ' fc_filedata_title">'. ($file_data->altname && $filename_original!=$file_data->altname ? $file_data->altname : '-').'</span></div>' : '').'
-		<br/>
-		'.($form_file_preview ? '<img id="'.$elementid_n.'_img_preview" src="'.$preview_src.'" class="fc_preview_thumb" style="'.$preview_css.'" alt="Preview image placeholder"/>' : '').'
-	</div>
-	<table class="fc-form-tbl fcinner inlinefile-tbl">
+		<div class="inlinefile-data-box">
+
+			<div style="display:inline-block;">
+				<span class="fc_filedata_storage_name" style="display:none;">'.$file_data->filename.'</span>
+				<div class="fc_filedata_txt_nowrap nowrap_hidden">'.$file_data->filename.'<br/>'.$file_data->altname.'</div>
+				<input class="fc_filedata_txt inlinefile-data-txt '. $info_txt_classes . $required_class .'" readonly="readonly" name="'.$fieldname_n.'[file-data-txt]" id="'.$elementid_n.'_file-data-txt" '.$info_txt_tooltip.' value="'.htmlspecialchars($filename_original, ENT_COMPAT, 'UTF-8').'" />
+				'.(!$iform_title ? '
+				<div class="'.$input_grp_class.'">
+					<label class="' . $add_on_class . ' fc-lbl fc_filedata_title-lbl">'.JText::_( 'FLEXI_FILE_DISPLAY_TITLE' ).'</label>
+					<span class="' . $add_on_class . ' fc_filedata_title">'. ($file_data->altname && $filename_original!=$file_data->altname ? $file_data->altname : '-').'</span>
+				</div>' : '').'
+				<br/>
+				'.($form_file_preview ? '<div class="fc-iblock fcimg_preview_box" style="'.$preview_css.'"><img id="'.$elementid_n.'_img_preview" src="'.$preview_src.'" class="fc_preview_thumb" alt="Preview image placeholder"/></div>' : '').'
+				'.(!empty($uploader_html) ? $uploader_html->container : '').'
+			</div>
+
+		</div>
+
+<table class="fc-form-tbl fcinner inlinefile-tbl">
+
+	<tr class="inlinefile-data-row">
+		<td class="inlinefile-remove-cell" colspan="2">
+			'.( (!$multiple || $is_ingroup) && !$required_class ? '
+			<br/>
+			<fieldset class="group-fcset">
+				<input type="checkbox" id="'.$elementid_n.'_file-del" class="inlinefile-del" name="'.$fieldname_n.'[file-del]" value="1" onchange="file_fcfield_del_existing_value'.$field->id.'(this);" />
+				<label class="fc-prop-lbl inlinefile-del-lbl '.$tooltip_class.'" title="'.flexicontent_html::getToolTip('FLEXI_FIELD_'.$FT.'_ABOUT_REMOVE_FILE', 'FLEXI_FIELD_'.$FT.'_ABOUT_REMOVE_FILE_DESC', 1, 1).'" id="'.$elementid_n.'_file-del-lbl" for="'.$elementid_n.'_file-del" >
+					'.JText::_( 'Remove file' ).'
+				</label>
+			</fieldset>
+			' : ( (!$multiple || $is_ingroup) && $required_class ? '<br/><div class="alert alert-info fc-small fc-iblock">'.JText::_('FLEXI_FIELD_'.$FT.'_REQUIRED_UPLOAD_NEW_TO_REPLACE').'</div>' : '')).'
+		</td>
+
+	</tr>
 	<tr class="inlinefile-data-row">
 		'.($fields_box_placing==1 ? '' : '
 		<td class="key inlinefile-data-lbl-cell">
