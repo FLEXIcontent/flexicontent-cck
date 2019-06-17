@@ -281,8 +281,6 @@
 		if (!!file.filename)
 		{
 			var audio_spectrum = container.find('.fc_mediafile_audio_spectrum').data('audio_spectrum');
-			window.console.log(config_name);
-			window.console.log(fcfield_mediafile_base_url[config_name]);
 			var isURL = /^(f|ht)tps?:\/\//i.test(file.filename);
 			isURL ? audio_spectrum.load(file.filename) : audio_spectrum.load(fcfield_mediafile_base_url[config_name] + '/' + file.filename);
 		}

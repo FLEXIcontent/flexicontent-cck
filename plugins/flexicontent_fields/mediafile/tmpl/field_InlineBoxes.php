@@ -219,7 +219,7 @@ foreach ($field->value as $file_id)
 		</div>
 		';
 
-	if ($filename_original) $per_value_js .= "
+	$per_value_js .= "
 		fcfield_mediafile.initValue('" . $field->name . '_' . $n . "', '".$field_name_js."');
 	";
 
