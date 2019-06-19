@@ -270,7 +270,9 @@ class FlexicontentViewItem extends JViewLegacy
 		if (($_mp=$app_params->get('robots')))    $document->setMetadata('robots', $_mp);
 
 		// Set item's META data: desc, keyword, title, author
-		if ($item->metadesc)		$document->setDescription( $item->metadesc );
+		$item->metadesc
+			? $document->setDescription( $item->metadesc )
+			: $document->setDescription( flexicontent_html::striptagsandcut($item->text, 160) );
 		if ($item->metakey)			$document->setMetadata('keywords', $item->metakey);
 
 		// This has been deprecated, the <title> tag is used instead by search engines
