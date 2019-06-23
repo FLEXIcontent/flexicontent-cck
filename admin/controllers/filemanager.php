@@ -504,7 +504,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 			{
 				$default_dir = 1;  // 'secure' folder
 			}
-			elseif (in_array($field->field_type, array('minigallery')))
+			elseif (in_array($field->field_type, array('minigallery', 'mediafile')))
 			{
 				$default_dir = 0;  // 'media' folder
 			}
@@ -719,6 +719,12 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 
 			return $this->terminate($file_id, $exitMessages);
 		}
+		else
+		{
+			// Create audio preview file
+			$this->createAudioPreview($field, $filepath);
+		}
+
 
 		// *****************
 		// Upload Successful
@@ -902,7 +908,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 			{
 				$default_dir = 1;  // 'secure' folder
 			}
-			elseif (in_array($field->field_type, array('minigallery')))
+			elseif (in_array($field->field_type, array('minigallery', 'mediafile')))
 			{
 				$default_dir = 0;  // 'media' folder
 			}
@@ -1694,6 +1700,47 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 		}
 	}
 
+	/**
+	 * Set credentials for using FTP layer for file handling
+	 */
+	function createAudioPreview($field, $filepath)
+	{
+		// Get the extension to record it in the DB
+		$ext = strtolower(flexicontent_upload::getExt($filepath));
+
+		$create_preview     = $field->parameters->get('mm_create_preview', 1);
+		$ffmpeg_path        = $field->parameters->get('mm_ffmpeg_path', '');
+		$audiowaveform_path = $field->parameters->get('mm_audiowaveform_path', '');
+		$preview_bitrate    = $field->parameters->get('mm_preview_bitrate', '96');
+
+		$app   = JFactory::getApplication();
+
+		if ($create_preview && $ffmpeg_path && in_array($ext, array('wav', 'mp3', 'mp4', 'mpg', 'mpeg', 'avi')))
+		{
+			$prv_path = str_replace('\\', '/', dirname($filepath)) . '/audio_preview';
+			$filename = str_ireplace('.' . $ext, '', basename($filepath));
+
+			// Check preview folder
+			if ( !JFolder::exists($prv_path) && !JFolder::create($prv_path))
+			{
+				die('{"jsonrpc" : "2.0", "error" : {"code": 1103, "message": "Failed to create preview folder."}, "data" : null}');
+			}
+
+			// Create audio preview file
+			//ffmpeg -i input.mp3 -codec:a libmp3lame -qscale:a 5 output.mp3
+			//ffmpeg -i input.mp3 -codec:a libmp3lame -b:a 96k output.mp3
+			exec($ffmpeg_path . " -i \"" . $filepath . "\" -codec:a libmp3lame -b:a " . $preview_bitrate . "k \"" . $prv_path . '/' . $filename . ".mp3\"");
+
+			// Create waveform peaks of audio preview file
+			exec($audiowaveform_path . " -i \"" . $prv_path . '/' . $filename . ".mp3\" -o \"" . $prv_path . '/' . $filename . ".json\" -b 8");
+			//$app->enqueueMessage($audiowaveform_path . " -i \"" . $prv_path . '/' . $filename . ".mp3\" -o \"" . $prv_path . '/' . $filename . ".json\" --pixels-per-second 1 -b 8", 'error');
+			//die('{"jsonrpc" : "2.0", "error" : {"code": 1103, "message": ' . $audiowaveform_path . " -i \"" . $prv_path . '/' . $filename . ".mp3\" -o \"" . '}, "data" : null}');
+			//exec($ffmpeg_path . " -i \"" . $prv_path . '/' . $filename . '.mp3' + "\" -filter_complex showwavespic -frames:v 1 " . $prv_path . '/' . $filename . '.png');
+			//exec($ffmpeg_path . " -i \"" . $prv_path . '/' . $filename . '.mp3' + "\" -vn -ar 44100 -ac 1 -f f32le -");
+			//exec($ffmpeg_path . " -i \"" . $prv_path . '/' . $filename . '.mp3' + "\" -vn -ac 1 -filter:a aresample=1000 -map 0:a -c:a pcm_s16le -f data " . $prv_path . '/' . $filename . '.json');
+			//exec($ffmpeg_path . " -i \"" . $prv_path . '/' . $filename . '.mp3' + "\" -f s16le  -ac channels -acodec pcm_s16le -ar 44100 -y pipe:1 " . $prv_path . '/' . $filename . '.json');
+		}
+	}
 
 	/**
 	 * Set credentials for using FTP layer for file handling

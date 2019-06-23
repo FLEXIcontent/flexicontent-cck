@@ -56,6 +56,15 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 
+			<field name="" type="separator" default="Create preview files (downsize)" description="" level="level2" class=""/>
+			<field name="mm_create_preview" type="radio" default="1" label="Create a preview file" description="" class="btn-group">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="mm_preview_bitrate" type="text" default="96" size="5" label="Bit rate (kbps)" description="..." />
+			<field name="mm_ffmpeg_path" type="text" default="" label="Path to ffmpeg binary" description="..." />
+			<field name="mm_audiowaveform_path" type="text" default="" label="Path to audiowaveform binary" description="..." />
+
 			<field name="" type="separator" default="FLEXI_FORM_FIELD_CONF" description="FLEXI_FORM_FIELD_CONF_DESC" icon_class="icon-checkbox" level="tab_open" box_type="1" />
 
 			<field name="show_values_expand_btn" type="radio" default="1" label="FLEXI_FIELD_EDIT_EXPAND_VALUES" description="FLEXI_FIELD_EDIT_EXPAND_VALUES_DESC" class="btn-group btn-group-yesno" depend_class="fieldgroupoff">

@@ -13,14 +13,31 @@
 		var file = jQuery('#custom_' + field_name_n + '_file-data-txt');
 
 
+		// Imitate SoundCloud's mirror effect on the waveform. Only works on iOS. (Adapted from the wavesurfer.js demo.) 
+		//var ctx = document.createElement('canvas').getContext('2d');
+		//var linGrad = ctx.createLinearGradient(0, 56, 0, 200);
+		//linGrad.addColorStop(0.5, 'rgba(255, 255, 255, 0.88)');
+		//linGrad.addColorStop(0.5, 'rgba(183, 183, 183, 0.88)');
+
+
 		// Create WaveSurfer object
 		var audio_spectrum = WaveSurfer.create({
 			container: '#fc_mediafile_audio_spectrum_' + fnn,
-			waveColor: 'violet',
-			progressColor: 'purple',
+
+		    scrollParent: false,
+		    //waveColor: linGrad, 
+		    progressColor: 'darkcyan',
+		    cursorColor: '#ddd',
+		    cursorWidth: 2,
+		    height: 128,
+		    //barWidth: 0.5,
+			//barHeight: 1.1,
+		    backend: 'MediaElement',
+		    normalize: true,
+
 			//backend: 'MediaElement',
 			//backend: 'WebAudio',
-			mediaControls: true,
+			//mediaControls: true,
 			xhr: {
 				format: 'jsonp',
 				requestHeaders: [
@@ -33,6 +50,10 @@
 				]
 			}
 		});
+
+
+		// Variable to check if song is loaded
+		audio_spectrum.loaded = false;
 
 		jQuery('#fc_mediafile_audio_spectrum_' + fnn).data('audio_spectrum', audio_spectrum);
 
@@ -47,14 +68,22 @@
 
 		buttons.pause.disabled = true;
 		buttons.stop.disabled = true;
-		buttons.play.disabled = true;
+		//buttons.play.disabled = true;
+
+
+		// Redraw the waveform when resizing or changing orientation. Enton Biba http://codepen.io/entonbiba/pen/VPqvME
+		var responsiveWave = audio_spectrum.util.debounce(function()
+		{
+			audio_spectrum.drawBuffer();
+		}, 150);
+		window.addEventListener('resize', responsiveWave);
 
 
 		// When window is resized update the player
-		window.addEventListener('resize', function()
+		/*window.addEventListener('resize', function()
 		{
 			// Get the current progress according to the cursor position
-			/*var currentProgress = audio_spectrum.getCurrentTime() / audio_spectrum.getDuration();
+			var currentProgress = audio_spectrum.getCurrentTime() / audio_spectrum.getDuration();
 
 			// Reset graph
 			audio_spectrum.empty();
@@ -66,13 +95,13 @@
 			// Enable/Disable respectively buttons
 			buttons.pause.disabled = true;
 			buttons.play.disabled = false;
-			buttons.stop.disabled = false;*/
-		}, false);
+			buttons.stop.disabled = false;
+		}, false);*/
 
 
 		var loading_timer;
 
-		audio_spectrum.on('loading', function (percents, eventTarget)
+		/*audio_spectrum.on('loading', function (percents, eventTarget)
 		{
 			var box = jQuery('#fc_mediafile_audio_spectrum_box_' + fnn)
 			box.show();
@@ -96,8 +125,7 @@
 			//window.console.log(eventTarget);
 		});
 
-
-		audio_spectrum.on('ready', function()
+		audio_spectrum.on('waveform-ready', function()
 		{
 			//window.console.log('Loading is DONE');
 			clearInterval(loading_timer);
@@ -105,19 +133,61 @@
 			var box = jQuery('#fc_mediafile_audio_spectrum_box_' + fnn)
 			box.show();
 
+			// Hide and reset progress bar
+			var progressBar = box.find('.progress');
+			progressBar.get(0).style.visibility = 'hidden';
+			progressBar.find('.bar').get(0).style.width = 0;
+		});*/
+
+		audio_spectrum.on('ready', function()
+		{
+			var box = jQuery('#fc_mediafile_audio_spectrum_box_' + fnn)
+			box.show();
+
+			// Hide and reset progress bar
 			var progressBar = box.find('.progress');
 			progressBar.get(0).style.visibility = 'hidden';
 			progressBar.find('.bar').get(0).style.width = 0;
 
-			buttons.pause.disabled = true;
-			buttons.stop.disabled = true;
+			// Enable buttons
+			buttons.pause.disabled = false;
+			buttons.stop.disabled = false;
 			buttons.play.disabled = false;
+
+			// Start playing after song is loaded
+			if (!audio_spectrum.loaded)
+			{
+				audio_spectrum.loaded = true;
+			}
+
+			// Start playing after song is loaded
+			if (!!audio_spectrum.start_on_ready)
+			{
+				audio_spectrum.start_on_ready = false;
+				audio_spectrum.play();
+			}
 		});
 
 		// Add events of playback buttons
 		buttons.play.addEventListener('click', function()
 		{
-			audio_spectrum.play();
+			// Load song when play is pressed
+			if (!audio_spectrum.loaded)
+			{
+				audio_spectrum.start_on_ready = true;
+				var isURL = /^(f|ht)tps?:\/\//i.test(file.data('wfpreview'));
+				window.console.log('isURL: ' + isURL);
+				window.console.log('filename: ' + file.data('wfpreview'));
+				window.console.log('Base URL: ' + fcfield_mediafile_base_url[config_name]);
+				var peaks = audio_spectrum.backend.peaks || null;
+				isURL ? audio_spectrum.load(file.data('wfpreview'), peaks) : audio_spectrum.load(fcfield_mediafile_base_url[config_name] + '/' + file.data('wfpreview'), peaks);
+				audio_spectrum.drawBuffer();
+			}
+			else
+			{
+				audio_spectrum.play();
+			}
+
 			buttons.pause.disabled = false;
 			buttons.stop.disabled = false;
 			buttons.play.disabled = true;
@@ -141,28 +211,52 @@
 		// Add event of load button to allow loading new files
 		buttons.load.addEventListener('click', function()
 		{
-			if (!!file.data('filename'))
+			if (!!file.data('wfpreview'))
 			{
 				buttons.pause.disabled = true;
 				buttons.stop.disabled = true;
 				buttons.play.disabled = true;
 
-				var isURL = /^(f|ht)tps?:\/\//i.test(file.data('filename'));
+				var isURL = /^(f|ht)tps?:\/\//i.test(file.data('wfpreview'));
 				//window.console.log('isURL: ' + isURL);
-				//window.console.log('filename: ' + file.data('filename'));
+				//window.console.log('filename: ' + file.data('wfpreview'));
 				//window.console.log('Base URL: ' + fcfield_mediafile_base_url[config_name]);
-				isURL ? audio_spectrum.load(file.data('filename')) : audio_spectrum.load(fcfield_mediafile_base_url[config_name] + '/' + file.data('filename'));
+				var peaks = audio_spectrum.backend.peaks || null;
+				isURL ? audio_spectrum.load(file.data('wfpreview'), peaks) : audio_spectrum.load(fcfield_mediafile_base_url[config_name] + '/' + file.data('wfpreview'), peaks);
 			}
 		}, false);
 
+
 		// Load the audio file
-		if (!!file.data('filename'))
+		if (!!file.data('wfpreview'))
 		{
-			var isURL = /^(f|ht)tps?:\/\//i.test(file.data('filename'));
+			var isURL = /^(f|ht)tps?:\/\//i.test(file.data('wfpreview'));
 			//window.console.log('isURL: ' + isURL);
-			//window.console.log('filename: ' + file.data('filename'));
+			//window.console.log('filename: ' + file.data('wfpreview'));
 			//window.console.log('Base URL: ' + fcfield_mediafile_base_url[config_name]);
-			isURL ? audio_spectrum.load(file.data('filename')) : audio_spectrum.load(fcfield_mediafile_base_url[config_name] + '/' + file.data('filename'));
+
+
+			// Set peaks
+			var mp3Url = isURL ? file.data('wfpreview') : fcfield_mediafile_base_url[config_name] + '/' + file.data('wfpreview');
+			var jsonUrl = isURL ? file.data('wfpeaks') : fcfield_mediafile_base_url[config_name] + '/' + file.data('wfpeaks');
+
+			audio_spectrum.util.ajax({
+				responseType: 'json',
+				url: jsonUrl
+			}).on('success', function (response) {
+				var data = response.data;
+				data.unshift(data[1]);
+
+				// Scale peaks
+				audio_spectrum.backend.peaks = data; //.map(p => p/128);
+
+				// Draw peaks
+				setTimeout(function () {
+					audio_spectrum.drawBuffer();
+				}, 100);
+
+				//audio_spectrum.load(mp3Url, data);
+			});
 		}
 	}
 
@@ -233,8 +327,8 @@
 
 			box.find('.fc_filedata_txt').val('');
 			box.find('.fc_filedata_txt_nowrap').html('');
-			box.find('.fc_filedata_txt').removeAttr('data-filename');
-			box.find('.fc_filedata_txt').data('filename', null);
+			box.find('.fc_filedata_txt').removeAttr('data-filename').removeAttr('data-wfpreview').removeAttr('data-wfpeaks');
+			box.find('.fc_filedata_txt').data('filename', null).data('wfpreview', null).data('wfpeaks', null);
 			box.find('.hasvalue').val('');
 			box.find('.fc_preview_thumb').attr('src', 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=');
 			box.find('.fcimg_preview_msg').html(' ');

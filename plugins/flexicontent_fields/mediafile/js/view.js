@@ -13,14 +13,31 @@
 		var file = jQuery('#fcview_' + field_name_n + '_file-data-txt');
 
 
+		// Imitate SoundCloud's mirror effect on the waveform. Only works on iOS. (Adapted from the wavesurfer.js demo.) 
+		//var ctx = document.createElement('canvas').getContext('2d');
+		//var linGrad = ctx.createLinearGradient(0, 56, 0, 200);
+		//linGrad.addColorStop(0.5, 'rgba(255, 255, 255, 0.88)');
+		//linGrad.addColorStop(0.5, 'rgba(183, 183, 183, 0.88)');
+
+
 		// Create WaveSurfer object
 		var audio_spectrum = WaveSurfer.create({
 			container: '#fc_mediafile_audio_spectrum_' + fnn,
-			waveColor: 'violet',
-			progressColor: 'purple',
+
+		    scrollParent: false,
+		    //waveColor: linGrad, 
+		    progressColor: 'darkcyan',
+		    cursorColor: '#ddd',
+		    cursorWidth: 2,
+		    height: 128,
+		    //barWidth: 0.5,
+			//barHeight: 1.1,
+		    backend: 'MediaElement',
+		    normalize: true,
+
 			//backend: 'MediaElement',
 			//backend: 'WebAudio',
-			mediaControls: true,
+			//mediaControls: true,
 			xhr: {
 				format: 'jsonp',
 				requestHeaders: [
@@ -33,6 +50,10 @@
 				]
 			}
 		});
+
+
+		// Variable to check if song is loaded
+		audio_spectrum.loaded = false;
 
 		jQuery('#fc_mediafile_audio_spectrum_' + fnn).data('audio_spectrum', audio_spectrum);
 
@@ -47,14 +68,22 @@
 
 		buttons.pause.disabled = true;
 		buttons.stop.disabled = true;
-		buttons.play.disabled = true;
+		//buttons.play.disabled = true;
+
+
+		// Redraw the waveform when resizing or changing orientation. Enton Biba http://codepen.io/entonbiba/pen/VPqvME
+		var responsiveWave = audio_spectrum.util.debounce(function()
+		{
+			audio_spectrum.drawBuffer();
+		}, 150);
+		window.addEventListener('resize', responsiveWave);
 
 
 		// When window is resized update the player
-		window.addEventListener('resize', function()
+		/*window.addEventListener('resize', function()
 		{
 			// Get the current progress according to the cursor position
-			/*var currentProgress = audio_spectrum.getCurrentTime() / audio_spectrum.getDuration();
+			var currentProgress = audio_spectrum.getCurrentTime() / audio_spectrum.getDuration();
 
 			// Reset graph
 			audio_spectrum.empty();
@@ -66,13 +95,13 @@
 			// Enable/Disable respectively buttons
 			buttons.pause.disabled = true;
 			buttons.play.disabled = false;
-			buttons.stop.disabled = false;*/
-		}, false);
+			buttons.stop.disabled = false;
+		}, false);*/
 
 
 		var loading_timer;
 
-		audio_spectrum.on('loading', function (percents, eventTarget)
+		/*audio_spectrum.on('loading', function (percents, eventTarget)
 		{
 			var box = jQuery('#fc_mediafile_audio_spectrum_box_' + fnn)
 			box.show();
@@ -92,32 +121,73 @@
 					if (frame >= steps) clearInterval(loading_timer);
 				}, 20);
 			}
-			window.console.log('Loading file (Wavesurfer JS): ' + percents + ' %');
-			window.console.log(eventTarget);
+			//window.console.log('Loading file (Wavesurfer JS): ' + percents + ' %');
+			//window.console.log(eventTarget);
 		});
 
-
-		audio_spectrum.on('ready', function()
+		audio_spectrum.on('waveform-ready', function()
 		{
-			window.console.log('Loading is DONE');
+			//window.console.log('Loading is DONE');
 			clearInterval(loading_timer);
 
 			var box = jQuery('#fc_mediafile_audio_spectrum_box_' + fnn)
 			box.show();
 
+			// Hide and reset progress bar
+			var progressBar = box.find('.progress');
+			progressBar.get(0).style.visibility = 'hidden';
+			progressBar.find('.bar').get(0).style.width = 0;
+		});*/
+
+		audio_spectrum.on('ready', function()
+		{
+			var box = jQuery('#fc_mediafile_audio_spectrum_box_' + fnn)
+			box.show();
+
+			// Hide and reset progress bar
 			var progressBar = box.find('.progress');
 			progressBar.get(0).style.visibility = 'hidden';
 			progressBar.find('.bar').get(0).style.width = 0;
 
-			buttons.pause.disabled = true;
-			buttons.stop.disabled = true;
+			// Enable buttons
+			buttons.pause.disabled = false;
+			buttons.stop.disabled = false;
 			buttons.play.disabled = false;
+
+			// Start playing after song is loaded
+			if (!audio_spectrum.loaded)
+			{
+				audio_spectrum.loaded = true;
+			}
+
+			// Start playing after song is loaded
+			if (!!audio_spectrum.start_on_ready)
+			{
+				audio_spectrum.start_on_ready = false;
+				audio_spectrum.play();
+			}
 		});
 
 		// Add events of playback buttons
 		buttons.play.addEventListener('click', function()
 		{
-			audio_spectrum.play();
+			// Load song when play is pressed
+			if (!audio_spectrum.loaded)
+			{
+				audio_spectrum.start_on_ready = true;
+				var isURL = /^(f|ht)tps?:\/\//i.test(file.data('wfpreview'));
+				window.console.log('isURL: ' + isURL);
+				window.console.log('filename: ' + file.data('wfpreview'));
+				window.console.log('Base URL: ' + fcview_mediafile_base_url[config_name]);
+				var peaks = audio_spectrum.backend.peaks || null;
+				isURL ? audio_spectrum.load(file.data('wfpreview'), peaks) : audio_spectrum.load(fcview_mediafile_base_url[config_name] + '/' + file.data('wfpreview'), peaks);
+				audio_spectrum.drawBuffer();
+			}
+			else
+			{
+				audio_spectrum.play();
+			}
+
 			buttons.pause.disabled = false;
 			buttons.stop.disabled = false;
 			buttons.play.disabled = true;
@@ -141,162 +211,52 @@
 		// Add event of load button to allow loading new files
 		buttons.load.addEventListener('click', function()
 		{
-			if (!!file.data('filename'))
+			if (!!file.data('wfpreview'))
 			{
 				buttons.pause.disabled = true;
 				buttons.stop.disabled = true;
 				buttons.play.disabled = true;
 
-				var isURL = /^(f|ht)tps?:\/\//i.test(file.data('filename'));
-				window.console.log('isURL: ' + isURL);
-				window.console.log('filename: ' + file.data('filename'));
-				window.console.log('Base URL: ' + fcview_mediafile_base_url[config_name]);
-				isURL ? audio_spectrum.load(file.data('filename')) : audio_spectrum.load(fcview_mediafile_base_url[config_name] + '/' + file.data('filename'));
+				var isURL = /^(f|ht)tps?:\/\//i.test(file.data('wfpreview'));
+				//window.console.log('isURL: ' + isURL);
+				//window.console.log('filename: ' + file.data('wfpreview'));
+				//window.console.log('Base URL: ' + fcview_mediafile_base_url[config_name]);
+				var peaks = audio_spectrum.backend.peaks || null;
+				isURL ? audio_spectrum.load(file.data('wfpreview'), peaks) : audio_spectrum.load(fcview_mediafile_base_url[config_name] + '/' + file.data('wfpreview'), peaks);
 			}
 		}, false);
 
+
 		// Load the audio file
-		if (!!file.data('filename'))
+		if (!!file.data('wfpreview'))
 		{
-			var isURL = /^(f|ht)tps?:\/\//i.test(file.data('filename'));
-			window.console.log('isURL: ' + isURL);
-			window.console.log('filename: ' + file.data('filename'));
-			window.console.log('Base URL: ' + fcview_mediafile_base_url[config_name]);
-			isURL ? audio_spectrum.load(file.data('filename')) : audio_spectrum.load(fcview_mediafile_base_url[config_name] + '/' + file.data('filename'));
+			var isURL = /^(f|ht)tps?:\/\//i.test(file.data('wfpreview'));
+			//window.console.log('isURL: ' + isURL);
+			//window.console.log('filename: ' + file.data('wfpreview'));
+			//window.console.log('Base URL: ' + fcview_mediafile_base_url[config_name]);
+
+
+			// Set peaks
+			var mp3Url = isURL ? file.data('wfpreview') : fcview_mediafile_base_url[config_name] + '/' + file.data('wfpreview');
+			var jsonUrl = isURL ? file.data('wfpeaks') : fcview_mediafile_base_url[config_name] + '/' + file.data('wfpeaks');
+
+			audio_spectrum.util.ajax({
+				responseType: 'json',
+				url: jsonUrl
+			}).on('success', function (response) {
+				var data = response.data;
+				data.unshift(data[1]);
+
+				// Scale peaks
+				audio_spectrum.backend.peaks = data; //.map(p => p/128);
+
+				// Draw peaks
+				setTimeout(function () {
+					audio_spectrum.drawBuffer();
+				}, 100);
+
+				//audio_spectrum.load(mp3Url, data);
+			});
 		}
 	}
 
-
-	fcview_mediafile.fileFiltered = function(uploader, file, config_name)
-	{
-	}
-
-
-	fcview_mediafile.fileUploaded = function(uploader, file, result, config_name)
-	{
-		// Get 'fc_plupload' class instance from uploader
-		var _this = jQuery(uploader).data('fc_plupload_instance');
-		try {
-			var response = eval(result.response);
-		} catch(err) {
-			var response = eval('(' + result.response + ')');
-		}
-
-		if (!!response.error)
-		{
-			alert(response.error.message);
-			return;
-		}
-
-		//window.console.log(response.data);
-		var file = response.data;
-		file.targetid    = jQuery(uploader.settings.container).closest('.fcfieldval_container').find('.existingname').attr('id');
-		file.preview_url = jQuery(uploader.settings.container).find('.plupload_img_preview > img').attr('src');
-		fcview_mediafile.assignFile(file.targetid, file.filename, file.preview_url, 0, config_name);
-	}
-
-
-	fcview_mediafile.clearFieldUploader = function(box, config_name)
-	{
-		var upload_container = box.find('.fc_file_uploader');
-		var upload_instance = upload_container.data('plupload_instance');
-
-		var upBTN = box.find('.fc_files_uploader_toggle_btn');
-		if (upload_instance)
-		{
-			jQuery(upload_instance).data('fc_plupload_instance').clearUploader(upBTN.data('rowno'));
-		}
-		upBTN.removeClass('active');
-		upload_container.hide();
-	}
-
-
-	fcview_mediafile.clearField = function(el, options, config_name)
-	{
-		var box = jQuery(el).closest('.fcfieldval_container');
-		var hasValue = box.find('.hasvalue').val();
-		var valcounter = document.getElementById('custom_' + config_name);
-		//if (window.console) window.console.log('valcounter: ' + valcounter.value);
-
-		options = options || {};
-		options.hide_image = options.hide_image || false;
-		options.keep_props = options.keep_props || false;
-
-		if (options.hide_image)
-		{
-			box.find('.fcimg_preview_box').hide();
-		}
-		else
-		{
-			fcview_mediafile.clearFieldUploader(box, config_name);
-
-			box.find('.originalname').val('');
-			box.find('.existingname').val('');
-			box.find('.hasvalue').val('');
-			box.find('.preview_image').attr('src', 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=');
-			box.find('.fcimg_preview_msg').html(' ');
-			box.find('.fcimg_preview_box').show();
-
-			if (hasValue) valcounter.value = ( valcounter.value=='' || valcounter.value=='1' )  ?  ''  :  parseInt(valcounter.value) - 1;
-			//if (window.console) window.console.log('valcounter: ' + valcounter.value);
-		}
-		if (options.keep_props)
-		{
-			box.find('input, textarea').val('');
-		}
-	}
-
-
-	fcview_mediafile.assignFile = function(value_container_id, file, keep_modal, config_name)
-	{
-		// We use altname (aka title) that is by default (unless modified) same as 'filename_original'
-		var originalname = file.filename_original ? file.filename_original : file.filename;
-		var displaytitle = file.altname && (file.altname!=file.filename) ? file.altname : '-';
-		var text_nowrap  = file.altname && (file.altname!=file.filename) ? file.filename+'<br/>'+file.altname : '';
-
-		window.console.log(value_container_id);
-		window.console.log(jQuery('#'+value_container_id).length);
-
-		var container = jQuery('#'+value_container_id).closest('.fcfieldval_container');
-
-		container.find('.fc_fileid').val(file.id);
-		container.find('.fc_filedata_storage_name').html(file.filename);
-		container.find('.fc_filedata_txt').val(originalname).removeClass('file_unpublished').blur();
-		container.find('.fc_filedata_txt_nowrap').html(text_nowrap).show();
-		container.find('.fc_filedata_title').html(displaytitle);
-
-		container.find('.fc_preview_thumb').attr('src', file.preview ? file.preview : 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=');
-
-		if (file.preview)
-		{
-			if (keep_modal != 2)
-			{
-				container.find('.fcimg_preview_box').show();
-				fcfield_file.clearFieldUploader(container, config_name);
-			}
-		}
-
-		container.find('.fc_filetitle').val(file.altname).blur();
-		container.find('.fc_filelang').val(file.language).trigger('change');
-		container.find('.fc_filedesc').val(file.description);
-
-		// Increment value counter (which is optionally used as 'required' form element)
-		var valcounter = document.getElementById('custom_' + config_name);
-		if (valcounter)
-		{
-			valcounter.value = valcounter.value=='' ? '1' : parseInt(valcounter.value) + 1;
-		}
-
-		var remove_obj = container.find('.inlinefile-del');
-		remove_obj.removeAttr('checked').trigger('change');
-
-		// Close file select modal dialog
-		if (!keep_modal && !!fcview_mediafile.dialog_handle[config_name])
-		{
-			fcview_mediafile.dialog_handle[config_name].dialog('close');
-		}
-
-		// Re-validate
-		jQuery(valcounter).trigger('blur');
-		return true;
-	}

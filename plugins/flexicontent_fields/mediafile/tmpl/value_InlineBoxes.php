@@ -476,9 +476,30 @@ foreach($values as $file_id)
 		</div>' .
 		(!$buttonsposition ? $html : '');
 
+	$create_preview = $field->parameters->get('mm_create_preview', 1);
+
+	if ($create_preview)
+	{
+		$ext         = strtolower(flexicontent_upload::getExt($file_data->filename));
+		$previewname = str_replace($ext, '', basename($file_data->filename)) . 'mp3';
+		$peaksname   = str_replace($ext, '', basename($file_data->filename)) . 'json';
+		$previewpath = 'audio_preview/' . $previewname;
+		$peakspath   = 'audio_preview/' . $peaksname;
+	}
+	else
+	{
+		$previewpath = $file_data->filename;
+		$peakspath   = null;
+	}
+
 	$html .= '<div class="fcclear"></div>'
 	. '
-		<span id="fcview_' . $field->name . '_' . $n . '_file-data-txt" data-filename="' . htmlspecialchars($file_data->filename, ENT_COMPAT, 'UTF-8') . '"></span>
+		<span id="fcview_' . $field->name . '_' . $n . '_file-data-txt"
+			data-filename="' . htmlspecialchars($previewpath, ENT_COMPAT, 'UTF-8') . '"
+			data-wfpreview="' . htmlspecialchars($previewpath, ENT_COMPAT, 'UTF-8') . '"
+			data-wfpeaks="' . htmlspecialchars($peakspath, ENT_COMPAT, 'UTF-8') . '"
+			peakspath
+		></span>
 		<div>
 			<div id="fc_mediafile_controls_' . $FN_n . '" class="fc_mediafile_controls">
 				<input type="button" class="btn btn-success playBtn" value="Play" style="color: black;"/>
@@ -487,7 +508,7 @@ foreach($values as $file_id)
 				<input type="button" class="btn btn-primary loadBtn" value="Load" style="color: black;"/>
 			</div>
 		</div>
-		<div id="fc_mediafile_audio_spectrum_box_' . $FN_n . '" class="fc_mediafile_audio_spectrum_box" style="display: none; margin-top: 8px; position: relative; border: 1px dashed;">
+		<div id="fc_mediafile_audio_spectrum_box_' . $FN_n . '" class="fc_mediafile_audio_spectrum_box" style="display: block; margin-top: 8px; position: relative; border: 1px dashed;">
 			<div class="progress progress-striped active" style="visibility: hidden; position: absolute; width: 70%; top: 40%; left: 15%;">
 				<div class="bar" style="width: 0%;"></div>
 			</div>

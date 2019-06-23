@@ -15,6 +15,10 @@ foreach ($field->value as $file_id)
 	$file_data         = $files_data[$file_id];
 	$filename_original = $file_data->filename_original ? $file_data->filename_original : $file_data->filename;
 
+	$ext = strtolower(flexicontent_upload::getExt($file_data->filename));
+	$file_data->waveform_preview = 'audio_preview/' . str_ireplace('.'.$ext, '', $file_data->filename) . '.mp3';
+	$file_data->waveform_peaks   = 'audio_preview/' . str_ireplace('.'.$ext, '', $file_data->filename) . '.json';
+
 	$preview_css = 'width:100px; height:100px;';
 
 	if (!in_array(strtolower($file_data->ext), $imageexts))
@@ -109,7 +113,11 @@ foreach ($field->value as $file_id)
 				<div class="fc_filedata_txt_nowrap nowrap_hidden">'.$file_data->filename.'<br/>'.$file_data->altname.'</div>
 				<input class="fc_filedata_txt inlinefile-data-txt '. $info_txt_classes . $required_class .'"
 					readonly="readonly" name="'.$fieldname_n.'[file-data-txt]" id="'.$elementid_n.'_file-data-txt" '.$info_txt_tooltip.'
-					value="'.htmlspecialchars($filename_original, ENT_COMPAT, 'UTF-8').'" data-filename="'.htmlspecialchars($file_data->filename, ENT_COMPAT, 'UTF-8').'" />
+					value="'.htmlspecialchars($filename_original, ENT_COMPAT, 'UTF-8').'"
+					data-filename="'.htmlspecialchars($file_data->filename, ENT_COMPAT, 'UTF-8').'"
+					data-wfpreview="'.htmlspecialchars($file_data->waveform_preview, ENT_COMPAT, 'UTF-8').'"
+					data-wfpeaks="'.htmlspecialchars($file_data->waveform_peaks, ENT_COMPAT, 'UTF-8').'"
+				/>
 				'.(!$iform_title ? '
 				<div class="'.$input_grp_class.'">
 					<label class="' . $add_on_class . ' fc-lbl fc_filedata_title-lbl">'.JText::_( 'FLEXI_FILE_DISPLAY_TITLE' ).'</label>
@@ -265,7 +273,7 @@ foreach ($field->value as $file_id)
 				<input type="button" class="btn btn-primary loadBtn" value="Load" style="color: black;"/>
 			</div>
 		</div>
-		<div id="fc_mediafile_audio_spectrum_box_' . $FN_n . '" class="fc_mediafile_audio_spectrum_box" style="display: none; margin-top: 8px; position: relative; border: 1px dashed;">
+		<div id="fc_mediafile_audio_spectrum_box_' . $FN_n . '" class="fc_mediafile_audio_spectrum_box" style="display: block; margin-top: 8px; position: relative; border: 1px dashed;">
 			<div class="progress progress-striped active" style="visibility: hidden; position: absolute; width: 70%; top: 40%; left: 15%;">
 				<div class="bar" style="width: 0%;"></div>
 			</div>
