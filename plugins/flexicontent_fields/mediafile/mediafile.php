@@ -369,8 +369,7 @@ class plgFlexicontent_fieldsMediafile extends FCField
 
 				var theInput = newField.find('input.fc_filedata_txt').first();
 				theInput.attr('value', '');
-				theInput.removeAttr('data-filename');
-				theInput.data('filename', null);
+				theInput.removeAttr('data-filename').removeAttr('data-wfpreview').removeAttr('data-wfpeaks');
 				theInput.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][file-data-txt]');
 				theInput.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_file-data-txt');
 
