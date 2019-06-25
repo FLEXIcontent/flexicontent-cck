@@ -28,6 +28,8 @@ foreach ($values as $value)
 	$value['zip']  = @ $value['zip'];
 	$value['lat'] = @ $value['lat'];
 	$value['lon'] = @ $value['lon'];
+	$value['custom_marker'] = @ $value['custom_marker'];
+
 
 	$coords_are_empty = !$value['lat'] && !$value['lon'];
 	$value_is_empty   =
@@ -142,7 +144,14 @@ foreach ($values as $value)
 			<td><input type="text" class="fcfield_textval addrint_lon ' . (in_array('longitude', $required_props) ? ' required' : '') . $disabled_class . '" ' . $disabled_attr . ' id="'.$elementid_n.'_lon" name="'.$fieldname_n.'[lon]" value="'.htmlspecialchars($value['lon'], ENT_COMPAT, 'UTF-8').'" size="50" maxlength="10" /></td>
 		</tr>
 	') .
-
+	(!$use_custom_marker ? '' : '
+		<tr class="fc_gm_custom_marker_row">
+		<td class="key"><label class="fc-prop-lbl fc_gm_custom_marker-lbl" for="'.$elementid_n.'_custom_marker">'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_CUSTOM_MARKER').'</label></td>
+			<td>
+			'.JHtml::_('select.genericlist', $custom_markers, $fieldname_n.'[custom_marker]',' class="use_select2_lib fc_gm_custom_marker" ', 'value', 'text', ($value['custom_marker'] ? $value['custom_marker'] : $custom_marker_default), $elementid_n.'_custom_marker').'
+			</td>
+		</tr>
+	') .
 
 	'
 	</tbody></table>
@@ -170,7 +179,7 @@ foreach ($values as $value)
 
 	<input type="hidden" id="'.$elementid_n.'_addr_formatted" name="'.$fieldname_n.'[addr_formatted]" value="'.htmlspecialchars($value['addr_formatted'], ENT_COMPAT, 'UTF-8').'" />
 	<input type="hidden" id="'.$elementid_n.'_url" name="'.$fieldname_n.'[url]" value="'.htmlspecialchars($value['url'], ENT_COMPAT, 'UTF-8').'" />
-	<input type="hidden" id="'.$elementid_n.'_zoom" name="'.$fieldname_n.'[zoom]" value="'.htmlspecialchars($value['zoom'], ENT_COMPAT, 'UTF-8').'" />
+
 	';
 
 	if($addr_edit_mode == 'plaintext')
@@ -225,9 +234,16 @@ if ($dom_ready_js)
 {
 	$js .= '
 	// load autocomplete on page ready
-	jQuery(document).ready(function() {'
-		.$dom_ready_js.
-	'});
+	jQuery(document).ready(function() {
+		'.$dom_ready_js.'
+
+		// load image in select
+		function format(state) {
+		if (!state.id) return state.text; // optgroup
+		return "<img class=\'fla`\' src=\'images/icons/" + state.id.toLowerCase() + ".png\'/>" + state.text;
+		}
+	
+	});
 	';
 }
 

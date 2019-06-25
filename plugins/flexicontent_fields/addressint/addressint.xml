@@ -143,6 +143,11 @@
 				<option value="0" show_list="country-selection-off" hide_list="">FLEXI_HIDE</option>
 				<option value="1" show_list="" hide_list="country-selection-off">FLEXI_SHOW</option>
 			</field>
+			<field name="use_custom_marker" type="multilist" subtype="radio" default="0" toggle_related="1" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_USE_CUSTOM_MARKER" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_USE_CUSTOM__MARKER_DESC" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="use_custom_marker">FLEXI_HIDE</option>
+				<option value="1" show_list="use_custom_marker" hide_list="">FLEXI_SHOW</option>
+			</field>
+			<field name="folder_custom_marker" type="folderlist" default="/custom_marker" label="Select a folder" directory="images" filter="" exclude="" stripext="" depend_class="use_custom_marker"/>
 
 			<field name="" type="separator" default="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MAP_CONFIGURATION" description="" level="level3" />
 			<field name="map_width_form" type="text" default="350" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MAP_WIDTH" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MAP_WIDTH_DESC" />
@@ -324,6 +329,7 @@
 			<field name="field_country" type="fields" default="" custom_prompt="FLEXI_SELECT" custom_value="" field_type="text" label="Country" description="" class="use_select2_lib"/>
 			<field name="field_lon" type="fields" default="" custom_prompt="FLEXI_SELECT" custom_value="" field_type="text" label="Longitude" description="" class="use_select2_lib"/>
 			<field name="field_lat" type="fields" default="" custom_prompt="FLEXI_SELECT" custom_value="" field_type="text" label="Latitude" description="" class="use_select2_lib"/>
+			<field name="field_marker" type="fields" default="" custom_prompt="FLEXI_SELECT" custom_value="" field_type="image" label="Marker" description="" class="use_select2_lib"/>
 
 		</fieldset>
 

@@ -2,7 +2,7 @@
 /**
  * @package         FLEXIcontent
  * @subpackage      mod_flexigooglemap
- * 
+ *
  * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
  * @link            https://flexicontent.org
  * @copyright       Copyright © 2017, FLEXIcontent team, All Rights Reserved

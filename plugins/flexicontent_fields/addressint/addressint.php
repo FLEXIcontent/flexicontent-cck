@@ -94,6 +94,7 @@ class plgFlexicontent_fieldsAddressint extends FCField
 			$field->value[0]['lon'] = '';
 			$field->value[0]['url'] = '';
 			$field->value[0]['zoom'] = '';
+			$field->value[0]['custom_marker'] = '';
 			$values = $field->value;
 		}
 		$this->values = & $values;
@@ -109,6 +110,8 @@ class plgFlexicontent_fieldsAddressint extends FCField
 		$use_province = (int) $field->parameters->get('use_province', 1);
 		$use_zip_suffix = (int) $field->parameters->get('use_zip_suffix', 1);
 		$use_country  = (int) $field->parameters->get('use_country',  1);
+		$use_custom_marker    = (int) $field->parameters->get('use_custom_marker',    1);
+		$folder_custom_marker =  $field->parameters->get('folder_custom_marker', '');
 
 		// Map configuration
 		$map_type = $field->parameters->get('map_type', 'roadmap');
@@ -172,6 +175,18 @@ class plgFlexicontent_fieldsAddressint extends FCField
 			. ($single_country ? ' disabled="disabled" readonly="readonly"' : '')
 			. ' onchange="fcfield_addrint.toggle_USA_state(this);" ';
 
+
+		// Create Image marker list
+		$folderMarkerUrl = JPATH_SITE. DS ."images". DS . $folder_custom_marker. DS;
+		$custom_marker_default = ""; //TODO use a defaut marker
+		$imgs = JFolder::files($folderMarkerUrl);
+		$custom_markers = array(''=>JText::_('FLEXI_SELECT'));
+		foreach ($imgs as $custom_marker) {
+			$custom_markers_op = new stdClass;
+			$custom_markers[] = $custom_markers_op;
+			$custom_markers_op->value = JURI::root(). DS ."images". DS . $folder_custom_marker. DS . $custom_marker;
+			$custom_markers_op->text = str_replace($folderMarkerUrl, "" ,$custom_marker);
+		}
 
 		// CREATE AC SEARCH TYPE OPTIONS
 		$ac_type_options = '';
@@ -357,7 +372,24 @@ class plgFlexicontent_fieldsAddressint extends FCField
 				theInput.val('');
 				theInput.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][zip_suffix]');
 				theInput.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_zip_suffix');
-				" : "");
+				" : "")
+
+				.($use_custom_marker ? "
+				theSelect = newField.find('select.fc_gm_custom_marker').first();
+				theSelect.val('');
+				theSelect.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][custom_marker]');
+				theSelect.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_custom_marker');
+				newField.find('.fc_gm_custom_marker-lbl').first().attr('for','".$elementid."_'+uniqueRowNum".$field->id."+'_custom_marker');
+
+				// Re-init any select2 element
+				var has_select2 = theSelect.hasClass('use_select2_lib');
+				if (has_select2) {
+					theSelect.prev().remove();
+					theSelect.select2('destroy').show();
+					fc_attachSelect2(theSelect.parent());
+				}
+				" : "")
+				;
 
 			// Update map header information
 			$js .= "
@@ -535,6 +567,7 @@ class plgFlexicontent_fieldsAddressint extends FCField
 			JText::script('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_COUNTRY_NOT_ALLOWED_WARNING', false);
 			JText::script('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_PLEASE_USE_COUNTRIES', false);
 			$document->addScript(JUri::root(true) . '/plugins/flexicontent_fields/addressint/js/form.js', array('version' => FLEXI_VHASH));
+			//$document->addScript(JUri::root(true) . '/plugins/flexicontent_fields/addressint/js/jquery.ddslick.min.js', array('version' => FLEXI_VHASH));
 
 			// Load google maps library
 			flexicontent_html::loadFramework('google-maps', 'form', $field->parameters);
@@ -658,6 +691,7 @@ class plgFlexicontent_fieldsAddressint extends FCField
 		$use_country  = $field->parameters->get('use_country', 1);
 		$use_zip_suffix = $field->parameters->get('use_zip_suffix', 1);
 		$map_zoom = $field->parameters->get('map_zoom', 16);
+		$use_custom_marker    = $field->parameters->get('use_custom_marker', 1);
 
 		// Get allowed countries
 		$ac_country_default = $field->parameters->get('ac_country_default', '');
@@ -706,13 +740,14 @@ class plgFlexicontent_fieldsAddressint extends FCField
 			$newpost[$new]['country']    = /*!$use_country    ||*/ !isset($v['country'])    ? '' : flexicontent_html::dataFilter($v['country'],     2,  'STRING', 0);
 			$newpost[$new]['province']   = /*!$use_province   ||*/ !isset($v['province'])   ? '' : flexicontent_html::dataFilter($v['province'],  200,  'STRING', 0);
 			$newpost[$new]['zip_suffix'] = /*!$use_zip_suffix ||*/ !isset($v['zip_suffix']) ? '' : flexicontent_html::dataFilter($v['zip_suffix'], 10,  'STRING', 0);
+			$newpost[$new]['custom_marker']    = /*!$custom_marker    ||*/ !isset($v['custom_marker'])    ? '' : flexicontent_html::dataFilter($v['custom_marker'],     4000,  'STRING', 0);
 
 			$new++;
 		}
 		$post = $newpost;
 
 		// Serialize multi-property data before storing them into the DB, also map some properties as fields
-		$props_to_fields = array('name', 'addr1', 'addr2', 'addr3', 'city', 'zip', 'country', 'lon', 'lat');
+		$props_to_fields = array('name', 'addr1', 'addr2', 'addr3', 'city', 'zip', 'country', 'lon', 'lat', 'custom_marker');
 		$_fields = array();
 		$byIds = FlexicontentFields::indexFieldsByIds($item->fields, $item);
 		foreach($post as $i => $v)
@@ -785,7 +820,6 @@ class plgFlexicontent_fieldsAddressint extends FCField
 		// Get layout name
 		$viewlayout = $field->parameters->get('viewlayout', '');
 		$viewlayout = $viewlayout && $viewlayout != 'value' ? 'value_'.$viewlayout : 'value';
-
 		// Create field's display
 		$this->displayFieldValue($prop, $viewlayout);
 	}
