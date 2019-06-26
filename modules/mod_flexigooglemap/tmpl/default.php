@@ -34,6 +34,12 @@ $mapcenter = $params->get('mapcenter', '48.8566667, 2.3509871');
 $apikey    = $params->get('apikey', '');
 $maptype   = $params->get('maptype', '');
 $maxzoommarker = $params->get('maxzoommarker', '');
+$markermode = $params->get('markermode', $params->get('lettermarkermode', 0));
+$markerimage = $params->get('markerimage');
+
+dump($markerdisplay, 'markerdisp');
+
+
 
 $mapstyle  = $params->get('mapstyle', '');
 $mapstyle  = substr($mapstyle,1,-1); // Remove[] at end and start
@@ -166,8 +172,8 @@ switch ($mapapi)
 				var marker = new google.maps.Marker({
 					position: new google.maps.LatLng(locations[i][1], locations[i][2]),
 					map: map
-					<?php	echo ($params->get('animationmarker', 1) ? ',animation: google.maps.Animation.DROP' : '')."\n"; ?>
-					<?php	echo ($markerdisplay ? ',icon: customMarkerIcons[iconCounter]' : '')."\n"; ?>
+					<?php	echo ($params->get('animationmarker', 1) ? ',animation: google.maps.Animation.DROP' : '')."\n"; ?>,
+					icon : <?php	if ($markermode == 2){echo 'locations[i][3]';}else {echo $markerdisplay;} ?>
 				});
 
 				markers.push(marker);
@@ -262,7 +268,7 @@ switch ($mapapi)
 				marker = new L.marker(
 					[locations[i][1],
 					locations[i][2]]
-					<?php echo $markerdisplay ? ',{ icon: customMarkerIcons[iconCounter] }' : ''; ?>
+					iconUrl:<?php	if ($markermode == 2){echo 'locations[i][3]';}else {echo $markerdisplay;} ?>
 				)
 					.bindPopup(locations[i][0])
 					<?php /* Add single location marker */

@@ -184,7 +184,7 @@ class plgFlexicontent_fieldsAddressint extends FCField
 		foreach ($imgs as $custom_marker) {
 			$custom_markers_op = new stdClass;
 			$custom_markers[] = $custom_markers_op;
-			$custom_markers_op->value = JURI::root(). DS ."images". DS . $folder_custom_marker. DS . $custom_marker;
+			$custom_markers_op->value = JURI::root(). DS ."images/". $folder_custom_marker."/". $custom_marker;
 			$custom_markers_op->text = str_replace($folderMarkerUrl, "" ,$custom_marker);
 		}
 
@@ -567,7 +567,6 @@ class plgFlexicontent_fieldsAddressint extends FCField
 			JText::script('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_COUNTRY_NOT_ALLOWED_WARNING', false);
 			JText::script('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_PLEASE_USE_COUNTRIES', false);
 			$document->addScript(JUri::root(true) . '/plugins/flexicontent_fields/addressint/js/form.js', array('version' => FLEXI_VHASH));
-			//$document->addScript(JUri::root(true) . '/plugins/flexicontent_fields/addressint/js/jquery.ddslick.min.js', array('version' => FLEXI_VHASH));
 
 			// Load google maps library
 			flexicontent_html::loadFramework('google-maps', 'form', $field->parameters);

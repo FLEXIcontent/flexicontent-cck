@@ -141,8 +141,10 @@
 				description="MOD_FLEXIGOOGLEMAP_MARKERMODE_DESC"
 				class="btn-group group-fcinfo"
 				>
+				<option value="-1">MOD_FLEXIGOOGLEMAP_MARKERSIMAGE_DEFAUT</option>
 				<option value="0">MOD_FLEXIGOOGLEMAP_MARKERSIMAGE_SPECIFIC</option>
 				<option value="1">MOD_FLEXIGOOGLEMAP_LETTERMARKERMODE</option>
+				<option value="2">MOD_FLEXIGOOGLEMAP_CUSTOMMARKERMODE</option>
 			</field>
 
 			<field name="markerimage" type="fcmedia" directory="mod_flexigooglemap/marker" label="MOD_FLEXIGOOGLEMAP_MARKERSIMAGE_SPECIFIC"

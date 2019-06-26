@@ -154,7 +154,7 @@ class modFlexigooglemapHelper
 						}
 						else
 						{
-							$map_link .= urlencode($coord['lat'] . "," . $coord['lon']); 
+							$map_link .= urlencode($coord['lat'] . "," . $coord['lon']);
 						}
 					}
 
@@ -166,7 +166,8 @@ class modFlexigooglemapHelper
 					: $addr . ' ' . $link;
 
 				$coordinates = $coord['lat'] .','. $coord['lon'];
-				$mapLocations[] = "['<h4 class=\"fleximaptitle\">$title</h4>$contentwindows $linkdirection'," . $coordinates . "]\r\n";
+				$custom_icon = $coord['custom_marker'];
+				$mapLocations[] = "['<h4 class=\"fleximaptitle\">$title</h4>$contentwindows $linkdirection'," . $coordinates . ",'".$custom_icon."']\r\n";
 			}
 		}
 
@@ -249,7 +250,7 @@ class modFlexigooglemapHelper
 							}
 							else
 							{
-								$map_link .= urlencode($coord['lat'] . "," . $coord['lon']); 
+								$map_link .= urlencode($coord['lat'] . "," . $coord['lon']);
 							}
 						}
 
@@ -275,10 +276,19 @@ class modFlexigooglemapHelper
 		// Get marker mode, 'lettermarkermode' was old parameter name, (in future wew may more more modes, so the old parameter name was renamed)
 		$markermode  = (int) $params->get('markermode', $params->get('lettermarkermode', 0));
 		$markerimage = $params->get('markerimage', '');
+		$mapapi = $params->get('mapapi', 'googlemap');
+		//add defaut icon
+		$defautmarker='';
+		if ($mapapi === 'googlemap'){
+			$defautmarker = 'https://maps.gstatic.com/mapfiles/api-3/images/spotlight-poi2.png';
+		}else{
+			$defautmarker = "https://unpkg.com/leaflet@1.5.1/dist/images/marker-icon.png";
+		}
 
+dump ($markermode,'modemarker');
 		if ($markermode !== 1 && !$markerimage)
 		{
-			$markermode = 1;
+			$markermode = -1;
 		}
 
 		switch ($markermode)
@@ -296,11 +306,12 @@ class modFlexigooglemapHelper
 					. "?text=" . $params->get('lettermarker')
 					. "&psize=16&font=fonts/arialuni_t.ttf&color=ff330000&scale=1&ax=44&ay=48"
 					. "'";
-
-			// 'Local image file' mode or empty
+			// 'Local image file' mode
 			case 0:
-			default:
 				return "'" . JUri::root(true) . '/' . $markerimage . "'";
+			case -1:
+			default:
+			return "'" .$defautmarker. "'";
 		}
 	}
 }
