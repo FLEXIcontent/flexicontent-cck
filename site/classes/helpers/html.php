@@ -1538,7 +1538,6 @@ class flexicontent_html
 						Inputmask.extendAliases({
 							decimal: {
 								alias: 'numeric',
-								placeholder: '_',
 								autoGroup: true,
 								radixPoint: '.',
 								groupSeparator: ',',
@@ -1548,7 +1547,6 @@ class flexicontent_html
 							},
 							decimal_comma: {
 								alias: 'numeric',
-								placeholder: '_',
 								autoGroup: true,
 								radixPoint: ',',
 								groupSeparator: '.',
@@ -1558,7 +1556,6 @@ class flexicontent_html
 							},
 							currency: {
 								alias: 'numeric',
-								placeholder: '_',
 								prefix: '$ ',
 								groupSeparator: ',',
 								autoGroup: true,
@@ -1570,7 +1567,6 @@ class flexicontent_html
 							},
 							currency_euro: {
 								alias: 'currency',
-								placeholder: '_',
 								prefix: '\u20ac ',
 								groupSeparator: ',',
 								autoGroup: true,
@@ -1582,7 +1578,6 @@ class flexicontent_html
 							},
 							percentage_zero_nolimit: {
 								alias: 'percentage',
-								placeholder: '_',
 								digits: 2,
 								radixPoint: '.',
 								autoGroup: true,
@@ -1597,7 +1592,6 @@ class flexicontent_html
 							},
 							percentage_nolimit_nolimit: {
 								alias: 'percentage',
-								placeholder: '_',
 								digits: 2,
 								radixPoint: '.',
 								autoGroup: true,
@@ -1612,7 +1606,6 @@ class flexicontent_html
 							},
 							integer: {
 								alias: 'numeric',
-								placeholder: '_',
 								digits: 0,
 								radixPoint: '',
 								clearMaskOnLostFocus: true,
@@ -1621,7 +1614,6 @@ class flexicontent_html
 							},
 							unsigned: {
 								alias: 'numeric',
-								placeholder: '_',
 								digits: 0,
 								radixPoint: '',
 								allowPlus: false,
@@ -1634,7 +1626,6 @@ class flexicontent_html
 								'mask': '9999 999 999',
 								'autounmask': true,
 								'insertMode': true,
-								placeholder: '_',
 								clearMaskOnLostFocus: true,
 								removeMaskOnSubmit: true,
 								unmaskAsNumber: false
