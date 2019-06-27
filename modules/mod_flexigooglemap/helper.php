@@ -285,7 +285,6 @@ class modFlexigooglemapHelper
 			$defautmarker = "https://unpkg.com/leaflet@1.5.1/dist/images/marker-icon.png";
 		}
 
-dump ($markermode,'modemarker');
 		if ($markermode !== 1 && !$markerimage)
 		{
 			$markermode = -1;

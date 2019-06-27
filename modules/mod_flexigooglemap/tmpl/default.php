@@ -37,7 +37,7 @@ $maxzoommarker = $params->get('maxzoommarker', '');
 $markermode = $params->get('markermode', $params->get('lettermarkermode', 0));
 $markerimage = $params->get('markerimage');
 
-dump($markerdisplay, 'markerdisp');
+//dump($markerdisplay, 'markerdisp');
 
 
 
@@ -255,7 +255,7 @@ switch ($mapapi)
 			var iconCounter = 0;
 
 			customMarkerIcons[0] = L.icon({
-				iconUrl: <?php echo $markerdisplay ?: 'null'; ?>,
+				iconUrl: <?php	if ($markermode == 2){echo 'locations[i][3]';}else {echo $markerdisplay;} ?>,
 				iconSize: [40, 67],
 				iconAnchor: [25, 67],
 				popupAnchor: [-3, -67]
@@ -268,7 +268,7 @@ switch ($mapapi)
 				marker = new L.marker(
 					[locations[i][1],
 					locations[i][2]]
-					iconUrl:<?php	if ($markermode == 2){echo 'locations[i][3]';}else {echo $markerdisplay;} ?>
+					iconUrl:{icon: customMarkerIcon}
 				)
 					.bindPopup(locations[i][0])
 					<?php /* Add single location marker */
