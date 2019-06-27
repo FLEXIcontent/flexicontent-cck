@@ -262,7 +262,8 @@ class modFlexigooglemapHelper
 						: $addr . ' ' . $link;
 
 					$coordinates = $coord['lat'] .','. $coord['lon'];
-					$mapLocations[] = "['<h4 class=\"fleximaptitle\">$title</h4>$contentwindows $linkdirection'," . $coordinates . "]\r\n";
+                  $custom_icon = $coord['custom_marker'];
+					$mapLocations[] = "['<h4 class=\"fleximaptitle\">$title</h4>$contentwindows $linkdirection'," . $coordinates . ",'".$custom_icon."']\r\n";
 				}
 			}
 		}
