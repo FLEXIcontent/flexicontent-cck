@@ -254,21 +254,19 @@ switch ($mapapi)
 			var customMarkerIcons = [];
 			var iconCounter = 0;
 
-			customMarkerIcons[0] = L.icon({
-				iconUrl: <?php	if ($markermode == 2){echo 'locations[i][3]';}else {echo $markerdisplay;} ?>,
-				iconSize: [40, 67],
-				iconAnchor: [25, 67],
-				popupAnchor: [-3, -67]
-			});
+			
 
 			for (var i = 0; i < locations.length; i++)
 			{
 				<?php /* TODO Add Mapbox key and title loading for custom display */ ?>
+                  customMarkerIcon = L.icon({
+				iconUrl: <?php	if ($markermode == 2){echo 'locations[i][3]';}else {echo $markerdisplay;} ?>,
+			});
 
 				marker = new L.marker(
 					[locations[i][1],
-					locations[i][2]]
-					iconUrl:{icon: customMarkerIcon}
+					locations[i][2]],
+					{icon: customMarkerIcon}
 				)
 					.bindPopup(locations[i][0])
 					<?php /* Add single location marker */
