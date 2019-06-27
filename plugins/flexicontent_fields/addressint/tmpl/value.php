@@ -615,12 +615,13 @@ foreach ($this->values as $n => $value)
 
 
         var mapIcon = new LeafIcon({iconUrl: \''.$value['custom_marker'].'\'});
+		var contentPopup ="'.str_replace('"', "'", $addr.$map_directions).'";
 
 
 
 				theMarker = L.marker(['.($value['lat'] ? $value['lat'] : '0').','.($value['lon'] ? $value['lon'] : '0').'], {icon: mapIcon}).addTo(theMap);
 
-				theMarker.bindPopup(\''.htmlspecialchars(json_encode($addr.$map_directions), ENT_COMPAT, 'UTF-8').'\');
+				theMarker.bindPopup(contentPopup);
 
 			';
 
