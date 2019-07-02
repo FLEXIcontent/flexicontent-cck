@@ -242,7 +242,13 @@ if ($dom_ready_js)
 		if (!state.id) return state.text; // optgroup
 		return "<img class=\'fla`\' src=\'images/icons/" + state.id.toLowerCase() + ".png\'/>" + state.text;
 		}
-	
+	$("#'.$elementid_n.'_custom_marker").select2({
+        formatResult: format,
+        formatSelection: format,
+        escapeMarkup: function(m) {
+          return m;
+        }
+      });
 	});
 	';
 }
