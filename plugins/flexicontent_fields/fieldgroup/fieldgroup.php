@@ -615,11 +615,9 @@ class plgFlexicontent_fieldsFieldgroup extends FCField
 	// Helper method to create HTML display of an item list according to replacements
 	private function _createDisplayHTML(&$field, &$item, &$grouped_fields, $custom_html, $max_count, $pretext, $posttext)
 	{
-		//return array('"<b>Custom HTML</b>" display for fieldgroup field, is not implemented yet, please use default HTML');
-
 		if (!$custom_html)
 		{
-			return "Empty custom HTML variable for group field: ". $field->label;
+			return array('<div class="alert alert-warning">Custom HTML display for group field: ' . $field->label . ' is enabled, but configuration parameter "custom HTML" is empty. Please fill-in or switch to default layout</div>');
 		}
 
 
