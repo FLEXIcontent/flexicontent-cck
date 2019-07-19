@@ -232,6 +232,12 @@ class FlexicontentModelFile extends FCModelAdmin
 		$user    = JFactory::getUser();
 		$isOwner = $record && $user->id && $record->uploaded_by == $user->id;
 
+		if ($record->id && $record->estorage_fieldid < 0)
+		{
+			$app->enqueueMessage(JText::_( 'File is being moved to external storage, please edit later' ), 'warning');
+			return false;
+		}
+
 		$canupload = $user->authorise('flexicontent.uploadfiles', 'com_flexicontent');
 		$canedit = $user->authorise('flexicontent.editfile', 'com_flexicontent');
 		$caneditown = $user->authorise('flexicontent.editownfile', 'com_flexicontent') && $isOwner;

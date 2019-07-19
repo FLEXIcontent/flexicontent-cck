@@ -208,6 +208,9 @@ class plgSystemFlexisystem extends JPlugin
 		// (a.2) (Auto) Change item state, e.g. archive expired items (publish_down date exceeded)
 		$this->handleExpiredItems();
 
+		// (a.3) (Auto) Transfer files to external servers
+		$this->handleFileTranfers();
+
 		if ($print_logging_info) $fc_run_times['auto_checkin_auto_state'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 
 		// (b) Autologin for frontend preview
@@ -1386,7 +1389,7 @@ class plgSystemFlexisystem extends JPlugin
 		}
 		// echo "Logged users:<br>"; print_r($logged); echo "<br><br>";
 
-		$tablenames = array('content', 'categories', 'modules', 'menu');
+		$tablenames = array('content', 'categories', 'modules', 'menu', 'flexicontent_files', 'flexicontent_fields', 'flexicontent_types');
 		foreach ( $tablenames as $tablename )
 		{
 			//echo $tablename.":<br>";
@@ -1495,6 +1498,45 @@ class plgSystemFlexisystem extends JPlugin
 		//echo $query;
 		$db->setQuery($query);
 		$db->execute();
+	}
+
+
+
+	/**
+	 * Utility function:
+	 * (Auto) Transfer files to external servers
+	 *
+	 * @return 	void
+	 * @since 1.5
+	 */
+	function handleFileTranfers()
+	{
+		// EFS Configuration : (External File Server)
+		$cparams = JComponentHelper::getParams('com_flexicontent');
+
+		// Get last execution time from cache
+		$cache = JFactory::getCache('plg_'.$this->_name.'_'.__FUNCTION__);
+		$cache->setCaching(1);      // Force cache ON
+		$cache->setLifeTime(3600);  // Set expire time (default is 1 hour)
+		$last_check_time = $cache->get(array($this, '_getLastCheckTime'), array(__FUNCTION__) );
+
+		// Execute every 15 minutes
+		$elapsed_time = time() - $last_check_time;
+		//JFactory::getApplication()->enqueueMessage('plg_'.$this->_name.'::'.__FUNCTION__.'() elapsed_time: ' . $elapsed_time . '<br/>');
+		
+		if ($elapsed_time < 5*60) return;
+		//JFactory::getApplication()->enqueueMessage('EXECUTING: '.'plg_'.$this->_name.'::'.__FUNCTION__.'()<br/>');
+
+		// Clear cache and call method again to restart the counter
+		$cache->clean('plg_'.$this->_name.'_'.__FUNCTION__);
+		$last_check_time = $cache->get(array($this, '_getLastCheckTime'), array(__FUNCTION__) );
+
+
+		// Try to allow using longer execution time and more memory
+		//$this->_setExecConfig();
+
+		//echo $output = shell_exec('php ' . JPATH_ROOT . DS . 'components' . DS . 'com_flexicontent' . DS . 'tasks'  . DS .  'estorage.php > /dev/null 2>/dev/null &');
+		echo $output = shell_exec('php ' . JPATH_ROOT . DS . 'components' . DS . 'com_flexicontent' . DS . 'tasks'  . DS .  'estorage.php');
 	}
 
 
@@ -2707,5 +2749,43 @@ class plgSystemFlexisystem extends JPlugin
 		 * null is no work done
 		 */
 		return null;
+	}
+
+
+	private function _setExecConfig()
+	{
+		// Display fatal errors, warnings, notices
+		error_reporting(E_ERROR || E_WARNING || E_NOTICE);
+		ini_set('display_errors',1);
+
+		// Try to increment some limits
+		@ set_time_limit( 3600 );   // try to set execution time 60 minutes
+		ignore_user_abort( true ); // continue execution if client disconnects
+
+		// Try to increment memory limits
+		$memory_limit	= trim( @ ini_get( 'memory_limit' ) );
+		if ( $memory_limit )
+		{
+			switch (strtolower(substr($memory_limit, -1)))
+			{
+				case 'm': $memory_limit = (int)substr($memory_limit, 0, -1) * 1048576; break;
+				case 'k': $memory_limit = (int)substr($memory_limit, 0, -1) * 1024; break;
+				case 'g': $memory_limit = (int)substr($memory_limit, 0, -1) * 1073741824; break;
+				case 'b':
+				switch (strtolower(substr($memory_limit, -2, 1)))
+				{
+					case 'm': $memory_limit = (int)substr($memory_limit, 0, -2) * 1048576; break;
+					case 'k': $memory_limit = (int)substr($memory_limit, 0, -2) * 1024; break;
+					case 'g': $memory_limit = (int)substr($memory_limit, 0, -2) * 1073741824; break;
+					default : break;
+				} break;
+				default: break;
+			}
+			if ( $memory_limit < 16 * 1024 * 1024 ) @ ini_set( 'memory_limit', '16M' );
+			if ( $memory_limit < 32 * 1024 * 1024 ) @ ini_set( 'memory_limit', '32M' );
+			if ( $memory_limit < 64 * 1024 * 1024 ) @ ini_set( 'memory_limit', '64M' );
+			if ( $memory_limit < 128 * 1024 * 1024 ) @ ini_set( 'memory_limit', '128M' );
+			if ( $memory_limit < 256 * 1024 * 1024 ) @ ini_set( 'memory_limit', '256M' );
+		}
 	}
 }

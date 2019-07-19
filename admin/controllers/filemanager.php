@@ -548,12 +548,19 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 			}
 		}
 
-		$file_mode = 'db_mode';
-
 		if ($field && $field->field_type == 'image' && $field->parameters->get('image_source') == 1)
 		{
 			$file_mode = 'folder_mode';
 		}
+		else
+		{
+			$file_mode = 'db_mode';
+		}
+
+		$estorage_mode = $field
+			? $field->parameters->get('estorage_mode', '0')
+			: '0';
+
 
 		// *****************************************
 		// Check that a file was provided / uploaded
@@ -764,9 +771,10 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 		$obj = new stdClass;
 		$obj->id = $file_id = 0;
 
-		$obj->filename    = $filename;
+		$obj->filename          = $filename;
 		$obj->filename_original = $filename_original;
-		$obj->altname     = $filetitle ? $filetitle : $filename_original;
+		$obj->altname           = $filetitle ? $filetitle : $filename_original;
+		$obj->estorage_fieldid  = $estorage_mode === 'FTP' ? $fieldid : 0;
 
 		$obj->url         = 0;
 		$obj->secure      = $secure;

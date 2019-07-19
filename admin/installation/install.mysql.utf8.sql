@@ -118,6 +118,7 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_files` (
   `altname` varchar(255) NOT NULL,
   `description` text NOT NULL,
   `url` tinyint(3) unsigned NOT NULL default '0',
+  `estorage_fieldid` int(11) NOT NULL default '0',
   `secure` tinyint(3) unsigned NOT NULL default '1',
   `ext` varchar(10) NOT NULL,
   `published` tinyint(1) NOT NULL default '1',
@@ -132,7 +133,8 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_files` (
   `checked_out_time` datetime NOT NULL default '0000-00-00 00:00:00',
   `access` int(11) unsigned NOT NULL default '1',
   `attribs` mediumtext NOT NULL,
-  PRIMARY KEY  (`id`)
+  PRIMARY KEY  (`id`),
+  KEY `estorage_fieldid` (`estorage_fieldid`)
 ) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`;
 
 CREATE TABLE IF NOT EXISTS `#__flexicontent_items_ext` (

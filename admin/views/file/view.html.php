@@ -87,6 +87,13 @@ class FlexicontentViewFile extends FlexicontentViewBaseRecord
 			$app->redirect( 'index.php?option=com_flexicontent&view=' . $manager_view );
 		}
 
+		// Fail if an existing record is file being moved to external storage
+		if ($row->id && $row->estorage_fieldid < 0)
+		{
+			$app->enqueueMessage(JText::_( 'File is being moved to external storage, please edit later' ), 'warning');
+			$app->redirect( 'index.php?option=com_flexicontent&view=' . $manager_view );
+		}
+
 
 		/**
 		 * Include needed files and add needed js / css files
