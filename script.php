@@ -68,6 +68,7 @@ class com_flexicontentInstallerScript
 			if ( $memory_limit < 16000000 ) @ ini_set( 'memory_limit', '16M' );
 			if ( $memory_limit < 32000000 ) @ ini_set( 'memory_limit', '32M' );
 			if ( $memory_limit < 64000000 ) @ ini_set( 'memory_limit', '64M' );
+			if ( $memory_limit < 12800000 ) @ ini_set( 'memory_limit', '128M' );
 		}
 
 		// First check PHP minimum version is running
@@ -782,65 +783,92 @@ class com_flexicontentInstallerScript
 
 					// Files TABLE
 					$tbl_name = 'flexicontent_files';
+					$changes = array();
+
 					if ( $files_tbl_exists && !array_key_exists('filename_original', $tbl_fields['#__'.$tbl_name])) {
-						$queries[] = "ALTER TABLE `#__".$tbl_name."` ADD `filename_original` VARCHAR(255) NOT NULL DEFAULT '' AFTER `filename`";
+						$changes[] = "ADD `filename_original` VARCHAR(255) NOT NULL DEFAULT '' AFTER `filename`";
 					}
 					if ( $files_tbl_exists && !array_key_exists('description', $tbl_fields['#__'.$tbl_name])) {
-						$queries[] = "ALTER TABLE `#__".$tbl_name."` ADD `description` TEXT NOT NULL AFTER `altname`";
+						$changes[] = "ADD `description` TEXT NOT NULL AFTER `altname`";
 					}
 					if ( $files_tbl_exists && !array_key_exists('language', $tbl_fields['#__'.$tbl_name])) {
-						$queries[] = "ALTER TABLE `#__".$tbl_name."` ADD `language` CHAR(7) NOT NULL DEFAULT '*' AFTER `published`";
+						$changes[] = "ADD `language` CHAR(7) NOT NULL DEFAULT '*' AFTER `published`";
 					}
 					if ( $files_tbl_exists && !array_key_exists('size', $tbl_fields['#__'.$tbl_name])) {
-						$queries[] = "ALTER TABLE `#__".$tbl_name."` ADD `size` INT(11) unsigned NOT NULL default '0' AFTER `hits`";
+						$changes[] = "ADD `size` INT(11) unsigned NOT NULL default '0' AFTER `hits`";
 					}
+					if ( $files_tbl_exists && !array_key_exists('estorage_fieldid', $tbl_fields['#__'.$tbl_name])) {
+						$changes[] = "ADD `estorage_fieldid` INT(11) NOT NULL default '0' AFTER `url`";
+						$changes[] = "ADD KEY `estorage_fieldid` (`estorage_fieldid`)";
+					}					
 					if ( $files_tbl_exists && !array_key_exists('assignments', $tbl_fields['#__'.$tbl_name])) {
-						$queries[] = "ALTER TABLE `#__".$tbl_name."` ADD `assignments` INT(11) unsigned NOT NULL default '0' AFTER `size`";
+						$changes[] = "ADD `assignments` INT(11) unsigned NOT NULL default '0' AFTER `size`";
 					}
 					if ( $files_tbl_exists && !array_key_exists('stamp', $tbl_fields['#__'.$tbl_name])) {
-						$queries[] = "ALTER TABLE `#__".$tbl_name."` ADD `stamp` tinyint(3) unsigned NOT NULL default '1' AFTER `assignments`";
+						$changes[] = "ADD `stamp` tinyint(3) unsigned NOT NULL default '1' AFTER `assignments`";
 					}
 					if ( isset($tbl_datatypes[$tbl_name]) && strtolower($tbl_datatypes[$tbl_name]['attribs']['DATA_TYPE']) != 'mediumtext' ) {
-						$queries[] = "ALTER TABLE `#__".$tbl_name."` CHANGE `attribs` `attribs` MEDIUMTEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL";
+						$changes[] = "CHANGE `attribs` `attribs` MEDIUMTEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL";
+					}
+
+					if ($changes)
+					{
+						$queries[] = "ALTER TABLE `#__".$tbl_name."` "
+							. ' CHANGE `uploaded` `uploaded` DATETIME NULL DEFAULT NULL, CHANGE `checked_out_time` `checked_out_time` DATETIME NULL DEFAULT NULL'
+							. implode($changes, ' ');
 					}
 
 					// Fields TABLE
 					$tbl_name = 'flexicontent_fields';
+					$changes = array();
+
 					if ( $fields_tbl_exists && !array_key_exists('untranslatable', $tbl_fields['#__'.$tbl_name])) {
-						$queries[] = "ALTER TABLE `#__".$tbl_name."` ADD `untranslatable` TINYINT(1) NOT NULL DEFAULT '0' AFTER `isadvsearch`";
+						$changes[] = "ALTER TABLE `#__".$tbl_name."` ADD `untranslatable` TINYINT(1) NOT NULL DEFAULT '0' AFTER `isadvsearch`";
 					}
 					if ( $fields_tbl_exists && !array_key_exists('isadvfilter', $tbl_fields['#__'.$tbl_name])) {
-						$queries[] = "ALTER TABLE `#__".$tbl_name."` ADD `isadvfilter` TINYINT(1) NOT NULL DEFAULT '0' AFTER `isfilter`";
+						$changes[] = "ALTER TABLE `#__".$tbl_name."` ADD `isadvfilter` TINYINT(1) NOT NULL DEFAULT '0' AFTER `isfilter`";
 					}
 					if ( $fields_tbl_exists && !array_key_exists('formhidden', $tbl_fields['#__'.$tbl_name])) {
-						$queries[] = "ALTER TABLE `#__".$tbl_name."` ADD `formhidden` SMALLINT(8) NOT NULL DEFAULT '0' AFTER `untranslatable`";
+						$changes[] = "ALTER TABLE `#__".$tbl_name."` ADD `formhidden` SMALLINT(8) NOT NULL DEFAULT '0' AFTER `untranslatable`";
 					}
 					if ( $fields_tbl_exists && !array_key_exists('valueseditable', $tbl_fields['#__'.$tbl_name])) {
-						$queries[] = "ALTER TABLE `#__".$tbl_name."` ADD `valueseditable` SMALLINT(8) NOT NULL DEFAULT '0' AFTER `formhidden`";
+						$changes[] = "ALTER TABLE `#__".$tbl_name."` ADD `valueseditable` SMALLINT(8) NOT NULL DEFAULT '0' AFTER `formhidden`";
 					}
 					if ( $fields_tbl_exists && !array_key_exists('edithelp', $tbl_fields['#__'.$tbl_name])) {
-						$queries[] = "ALTER TABLE `#__".$tbl_name."` ADD `edithelp` SMALLINT(8) NOT NULL DEFAULT '2' AFTER `formhidden`";
+						$changes[] = "ALTER TABLE `#__".$tbl_name."` ADD `edithelp` SMALLINT(8) NOT NULL DEFAULT '2' AFTER `formhidden`";
 					}
 					if ( $fields_tbl_exists && !array_key_exists('asset_id', $tbl_fields['#__'.$tbl_name]) ) {
-						$queries[] = "ALTER TABLE `#__".$tbl_name."` ADD `asset_id` INT(10) UNSIGNED NOT NULL DEFAULT '0' AFTER `id`";
+						$changes[] = "ALTER TABLE `#__".$tbl_name."` ADD `asset_id` INT(10) UNSIGNED NOT NULL DEFAULT '0' AFTER `id`";
 					}
 					if ( isset($tbl_datatypes[$tbl_name]) && strtolower($tbl_datatypes[$tbl_name]['attribs']['DATA_TYPE']) != 'mediumtext' ) {
-						$queries[] = "ALTER TABLE `#__".$tbl_name."` CHANGE `attribs` `attribs` MEDIUMTEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL";
+						$changes[] = "ALTER TABLE `#__".$tbl_name."` CHANGE `attribs` `attribs` MEDIUMTEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL";
+					}
+
+					if ($changes)
+					{
+						$queries[] = "ALTER TABLE `#__".$tbl_name."` " . implode($changes, ' ');
 					}
 
 					// Types TABLE
 					$tbl_name = 'flexicontent_types';
+					$changes = array();
+
 					if ( $types_tbl_exists && !array_key_exists('asset_id', $tbl_fields['#__'.$tbl_name]) ) {
-						$queries[] = "ALTER TABLE `#__".$tbl_name."` ADD `asset_id` INT(10) UNSIGNED NOT NULL DEFAULT '0' AFTER `id`";
+						$changes[] = "ALTER TABLE `#__".$tbl_name."` ADD `asset_id` INT(10) UNSIGNED NOT NULL DEFAULT '0' AFTER `id`";
 					}
 					if ( $types_tbl_exists && !array_key_exists('itemscreatable', $tbl_fields['#__'.$tbl_name])) {
-						$queries[] = "ALTER TABLE `#__".$tbl_name."` ADD `itemscreatable` SMALLINT(8) NOT NULL DEFAULT '0' AFTER `published`";
+						$changes[] = "ALTER TABLE `#__".$tbl_name."` ADD `itemscreatable` SMALLINT(8) NOT NULL DEFAULT '0' AFTER `published`";
 					}
 					if ( isset($tbl_datatypes[$tbl_name]) && strtolower($tbl_datatypes[$tbl_name]['attribs']['DATA_TYPE']) != 'mediumtext' ) {
-						$queries[] = "ALTER TABLE `#__".$tbl_name."` CHANGE `attribs` `attribs` MEDIUMTEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL";
+						$changes[] = "ALTER TABLE `#__".$tbl_name."` CHANGE `attribs` `attribs` MEDIUMTEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL";
 					}
 					if ( $types_tbl_exists && !array_key_exists('description', $tbl_fields['#__'.$tbl_name])) {
-						$queries[] = "ALTER TABLE `#__".$tbl_name."` ADD `description` TEXT NULL AFTER `alias`";
+						$changes[] = "ALTER TABLE `#__".$tbl_name."` ADD `description` TEXT NULL AFTER `alias`";
+					}
+
+					if ($changes)
+					{
+						$queries[] = "ALTER TABLE `#__".$tbl_name."` " . implode($changes, ' ');
 					}
 
 					// Tags TABLE

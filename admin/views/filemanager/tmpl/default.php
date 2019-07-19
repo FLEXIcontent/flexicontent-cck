@@ -871,6 +871,10 @@ if ($js)
 					<th class="center hideOnDemandClass hidden-phone hidden-tablet"><?php echo JHtml::_('grid.sort', 'FLEXI_UPLOAD_TIME', 'a.uploaded', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 				<?php endif; ?>
 
+				<?php if (!$isFilesElement) : ?>
+					<th class="center hideOnDemandClass hidden-phone"><?php echo JHtml::_('grid.sort', 'E-storage', 'estorage', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+				<?php endif; ?>
+
 				<?php if (!empty($this->cols['file_id'])) : ?>
 					<th class="center hideOnDemandClass col_id hidden-phone hidden-tablet">
 						<?php echo JHtml::_('grid.sort', 'FLEXI_ID', 'a.id', $this->lists['order_Dir'], $this->lists['order']); ?>
@@ -1191,6 +1195,11 @@ if ($js)
 					</td>
 				<?php endif; ?>
 
+				<?php if (!$isFilesElement) : ?>
+					<td class="center col_estorage hidden-phone hidden-tablet">
+						<?php echo !$row->estorage_fieldid ? JText::_('FLEXI_NO') : ($row->estorage_fieldid > 0 ? JText::_('Pending') :  JText::_('Uploading')); ?>
+					</td>
+				<?php endif; ?>
 
 				<?php if (!empty($this->cols['file_id'])) : ?>
 					<td class="center col_id hidden-phone hidden-tablet">

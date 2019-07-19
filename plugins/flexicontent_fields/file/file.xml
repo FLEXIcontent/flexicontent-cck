@@ -56,6 +56,21 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 
+			<field name="estorage_mode" type="multilist" subtype="radio" default="0" label="Remote Storage" description="FLEXI_FIELD_ALLOW_MULTIPLE_DESC" toggle_related="1" depend_class="fieldgroupoff" class="btn-group group-fcmethod fcoffactive">
+				<option value="0" show_list="" hide_list="estorage-ftp">FLEXI_NO</option>
+				<option value="FTP" show_list="estorage-ftp" hide_list="">FTP</option>
+			</field>
+
+			<field name="" type="separator" default="Remote Storage (FTP)" description="" depend_class="estorage-ftp" level="level2" />
+			<field name="efs_ftp_host" type="text" default="" size="80" label="Hostname" description="" depend_class="estorage-ftp" />
+			<field name="efs_ftp_port" type="text" default="" size="80" label="Port" description="" depend_class="estorage-ftp" />
+			<field name="efs_ftp_user" type="text" default="" size="80" label="FLEXI_USER" description="" depend_class="estorage-ftp" />
+			<field name="efs_ftp_pass" type="text" default="" size="80" label="FLEXI_PASSWORD" description="" depend_class="estorage-ftp" />
+			<field name="efs_ftp_path" type="text" default="" size="80" label="FLEXI_FOLDER" description="" depend_class="estorage-ftp" />
+
+			<field name="efs_www_url" type="text" default="https://some_external_servername.com/somefolder/" size="80" label="URL" description="" depend_class="estorage-ftp" />
+
+
 			<field name="" type="separator" default="FLEXI_FORM_FIELD_CONF" description="FLEXI_FORM_FIELD_CONF_DESC" icon_class="icon-checkbox" level="tab_open" box_type="1" />
 
 			<field name="show_values_expand_btn" type="radio" default="1" label="FLEXI_FIELD_EDIT_EXPAND_VALUES" description="FLEXI_FIELD_EDIT_EXPAND_VALUES_DESC" class="btn-group btn-group-yesno" depend_class="fieldgroupoff">

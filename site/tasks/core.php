@@ -20,7 +20,20 @@ class FlexicontentTasksCore
 		define('_JEXEC', 1);
 		define('DS', DIRECTORY_SEPARATOR);
 
-		file_exists('defines.php')  ?  require_once 'defines.php'  :   define('JPATH_BASE', realpath(__DIR__.'/../../..'));
+
+		if (file_exists('defines.php'))
+		{
+			require_once 'defines.php';
+		}
+		elseif (file_exists(realpath(__DIR__) . '/' . 'defines.php'))
+		{
+			require_once realpath(__DIR__) . '/' . 'defines.php';
+		}
+		else
+		{
+			define('JPATH_BASE', realpath(__DIR__.'/../../..'));
+		}
+
 		require_once JPATH_BASE . '/includes/defines.php';
 		require_once JPATH_BASE . '/includes/framework.php';
 
@@ -46,7 +59,7 @@ class FlexicontentTasksCore
 	 * @return void
 	 * @since 3.1.2
 	 */
-	function txtautocomplete()
+	public function txtautocomplete()
 	{
 		// Call plugin, (e.g. to load category data)
 		$this->_callPlugins();
@@ -407,7 +420,9 @@ class FlexicontentTasksCore
 	 */
 	private function _getTags($text = '', $limit = 500)
 	{
-		if (JFactory::getApplication()->input->get('task', '', 'cmd') == __FUNCTION__) die(__FUNCTION__ . ' : direct call not allowed');
+		$app     = JFactory::getApplication();
+		$jinput  = $app->input;
+		if ($jinput->get('task', '', 'cmd') == __FUNCTION__) die(__FUNCTION__ . ' : direct call not allowed');
 
 		$db = JFactory::getDbo();
 
