@@ -47,6 +47,9 @@ class FlexicontentCronTasks
 			die('Direct call not allowed');
 		}
 
+		// Get Flexicontent constants
+		require_once JPATH_BASE . '/components/com_flexicontent/defineconstants.php';
+
 		$this->_setExecConfig();
 
 		$log_filename = 'cron_estorage.php';
@@ -201,7 +204,7 @@ class FlexicontentCronTasks
 
 			if ($ftp_result === FTP_FAILED)
 			{
-				$msg = 'FTP upload failed: ' . $dest_file;
+				$msg = 'FTP upload failed for file : ' . $source_file . ' to ' . $dest_file;
 				JLog::add($msg, JLog::ERROR, 'com_flexicontent.estorage');
 
 				if ($file->id > 0) $query = 'UPDATE #__flexicontent_files '
@@ -211,11 +214,13 @@ class FlexicontentCronTasks
 			}
 			elseif ($ftp_result === FTP_FINISHED)
 			{
-				$msg = 'FTP upload succeeded: ' . $dest_file;
+				$msg = 'FTP upload succeeded for file : ' . $source_file . ' to ' . $dest_file;
 				JLog::add($msg, JLog::INFO, 'com_flexicontent.estorage');
 
 				if ($file->id > 0) $query = 'UPDATE #__flexicontent_files '
-					. ' SET url = 1, checked_out = 0, estorage_fieldid = 0, filename = ' . $db->Quote($efs_www_url . $dest_file)
+					. ' SET url = 1, checked_out = 0, estorage_fieldid = 0'
+					. ' , filename = ' . $db->Quote($efs_www_url . $dest_file)
+					. ' , filename_original = ' . $db->Quote($efs_www_url . $dest_file)
 					. ' WHERE id = ' . (int) $file->id;
 				$db->setQuery($query)->execute();
 
@@ -223,7 +228,7 @@ class FlexicontentCronTasks
 			}
 			else
 			{
-				$msg = 'FTP upload could not be started';
+				$msg = 'FTP upload could not be started for uploading file : ' . $source_file . ' to ' . $dest_file;
 				JLog::add($msg, JLog::ERROR, 'com_flexicontent.estorage');
 
 				if ($file->id > 0) $query = 'UPDATE #__flexicontent_files '
