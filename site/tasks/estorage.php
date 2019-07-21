@@ -132,6 +132,17 @@ class FlexicontentCronTasks
 				$ftpConnID[$field_id] = 0;
 				continue;
 			}
+			
+			// Turn passive mode on
+			$pasv_result = ftp_pasv($ftpConnID[$field_id], true);
+
+			if (!$pasv_result)
+			{
+				$msg = 'FAILED TO TURN ON PASSIVE MODE FOR FTP CONNECTION FOR FTP SERVER: (user@host:port) :' . $efs_ftp_user . '@' . $efs_ftp_host . ':' . $efs_ftp_port;
+				JLog::add($msg, JLog::ERROR, 'com_flexicontent.estorage');
+				$ftpConnID[$field_id] = 0;
+				continue;
+			}
 
 			if ($efs_ftp_path)
 			{
@@ -139,7 +150,7 @@ class FlexicontentCronTasks
 
 				if (!$cwd_result)
 				{
-					$msg = 'FAILED TO CHANGE (REMOTE) FTP DIRECTORY TO : ' . $efs_ftp_path;
+					$msg = 'FAILED TO CHANGE (REMOTE) FTP DIRECTORY TO : ' . $efs_ftp_path . ' FOR FTP SERVER: (user@host:port) :' . $efs_ftp_user . '@' . $efs_ftp_host . ':' . $efs_ftp_port;
 					JLog::add($msg, JLog::ERROR, 'com_flexicontent.estorage');
 					$ftpConnID[$field_id] = 0;
 					continue;
@@ -249,6 +260,11 @@ class FlexicontentCronTasks
 					. ' WHERE id = ' . (int) $file->id;
 				$db->setQuery($query)->execute();
 			}
+		}
+
+		foreach ($ftpConnID as $ftp_conn)
+		{
+			ftp_close($ftp_conn);
 		}
 
 		//echo $this->_get_system_messages_html();
