@@ -6,11 +6,11 @@
 	fcview_mediafile.dialog_handle = [];
 	fcview_mediafile.base_url = [];
 
-	fcview_mediafile.initValue = function(field_name_n, config_name)
+	fcview_mediafile.initValue = function(tagid, config_name)
 	{
-		//window.console.log(field_name_n);
-		var fnn  = field_name_n.replace(/-/g, '_');
-		var file = jQuery('#fcview_' + field_name_n + '_file-data-txt');
+		//window.console.log(tagid);
+		var fnn  = tagid.replace(/-/g, '_');
+		var file = jQuery('#fcview_' + tagid + '_file-data-txt');
 
 
 		// Imitate SoundCloud's mirror effect on the waveform. Only works on iOS. (Adapted from the wavesurfer.js demo.) 

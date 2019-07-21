@@ -1522,7 +1522,7 @@ class plgSystemFlexisystem extends JPlugin
 		$elapsed_time = time() - $last_check_time;
 		//JFactory::getApplication()->enqueueMessage('plg_'.$this->_name.'::'.__FUNCTION__.'() elapsed_time: ' . $elapsed_time . '<br/>');
 		
-		if ($elapsed_time < 5*60) return;
+		if ($elapsed_time < 1*60) return;
 		//JFactory::getApplication()->enqueueMessage('EXECUTING: '.'plg_'.$this->_name.'::'.__FUNCTION__.'()<br/>');
 
 		// Clear cache and call method again to restart the counter
