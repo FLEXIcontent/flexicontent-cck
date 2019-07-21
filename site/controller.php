@@ -2232,7 +2232,7 @@ class FlexicontentController extends JControllerLegacy
 			}
 			$field_type = $fields_props[$field_id]->field_type;
 
-			$query  = 'SELECT f.id, f.filename, f.filename_original, f.altname, f.secure, f.url, f.hits, f.stamp'
+			$query  = 'SELECT f.id, f.filename, f.filename_original, f.altname, f.secure, f.url, f.hits, f.stamp, f.size'
 					. ', i.title as item_title, i.introtext as item_introtext, i.fulltext as item_fulltext, u.email as item_owner_email'
 					. ', i.access as item_access, i.language as item_language, ie.type_id as item_type_id'
 
@@ -2714,7 +2714,7 @@ class FlexicontentController extends JControllerLegacy
 		}
 
 		// Get file filesize and extension
-		$dlfile->size = filesize($dlfile->abspath);
+		$dlfile->size = !$dlfile->url ? filesize($dlfile->abspath) : $dlfile->size;
 		$dlfile->ext  = strtolower(flexicontent_upload::getExt($dlfile->filename));
 
 		// Set content type of file (that is an archive for multi-download)
@@ -2809,6 +2809,7 @@ class FlexicontentController extends JControllerLegacy
 
 			//die('is PDF: ' . $dlfile->abspath);
 		}
+
 
 		// *****************************************
 		// Output an appropriate Content-Type header
