@@ -108,6 +108,7 @@ class FlexicontentCronTasks
 			$efs_ftp_port = (int) $field->parameters->get('efs_ftp_port', '21');
 			$efs_ftp_user = $field->parameters->get('efs_ftp_user', 'testuser');
 			$efs_ftp_pass = $field->parameters->get('efs_ftp_pass', '1234@@test');
+			$efs_ftp_path = $field->parameters->get('efs_ftp_path', '');
 
 			$ftpConnID[$field_id] = ftp_connect($efs_ftp_host, $efs_ftp_port, $_timeout = 10);
 
@@ -127,6 +128,19 @@ class FlexicontentCronTasks
 				JLog::add($msg, JLog::ERROR, 'com_flexicontent.estorage');
 				$ftpConnID[$field_id] = 0;
 				continue;
+			}
+
+			if ($efs_ftp_path)
+			{
+				$cwd_result = ftp_chdir($ftpConnID[$field_id], $efs_ftp_path);
+
+				if (!$cwd_result)
+				{
+					$msg = 'FAILED TO CHANGE (REMOTE) FTP DIRECTORY TO : ' . $efs_ftp_path;
+					JLog::add($msg, JLog::ERROR, 'com_flexicontent.estorage');
+					$ftpConnID[$field_id] = 0;
+					continue;
+				}
 			}
 		}
 
@@ -172,7 +186,6 @@ class FlexicontentCronTasks
 			$db->setQuery($query)->execute();
 
 			$field        = $fields[$field_id];
-			$efs_ftp_path = $field->parameters->get('efs_ftp_path', '');
 			$efs_www_url  = $field->parameters->get('efs_www_url', 'https://some_external_servername.com/somefolder/');
 
 			$file->source_path  = isset($file->source_path)
@@ -192,7 +205,7 @@ class FlexicontentCronTasks
 				continue;
 			}*/
 
-			$ftp_result = ftp_nb_put($ftpConnID[$field_id], $efs_ftp_path . $dest_file, $source_file, FTP_BINARY, FTP_AUTORESUME);
+			$ftp_result = ftp_nb_put($ftpConnID[$field_id], $dest_file, $source_file, FTP_BINARY, FTP_AUTORESUME);
 
 			while ($ftp_result === FTP_MOREDATA)
 			{
