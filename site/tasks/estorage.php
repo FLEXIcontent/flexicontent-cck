@@ -104,12 +104,12 @@ class FlexicontentCronTasks
 				continue;
 			}
 
-			$ftpConnID[$field_id] = ftp_connect($efs_ftp_host, $efs_ftp_port = 21, $_timeout = 10);
-
 			$efs_ftp_host = $field->parameters->get('efs_ftp_host', 'localhost');
 			$efs_ftp_port = (int) $field->parameters->get('efs_ftp_port', '21');
 			$efs_ftp_user = $field->parameters->get('efs_ftp_user', 'testuser');
 			$efs_ftp_pass = $field->parameters->get('efs_ftp_pass', '1234@@test');
+
+			$ftpConnID[$field_id] = ftp_connect($efs_ftp_host, $efs_ftp_port, $_timeout = 10);
 
 			if (!$ftpConnID[$field_id])
 			{
