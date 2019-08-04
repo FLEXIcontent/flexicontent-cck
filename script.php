@@ -112,6 +112,7 @@ class com_flexicontentInstallerScript
 	      	<font class="small">by <a href="http://www.flexicontent.org" target="_blank">Emmanuel Danan</a>,
 	      	<font class="small">by <a href="http://www.flexicontent.org" target="_blank">Georgios Papadakis</a>,
 	      	<font class="small">by <a href="http://www.flexicontent.org" target="_blank">Berges Yannick</a>,
+	      	<font class="small">by <a href="http://www.flexicontent.org" target="_blank">Suriya Kaewmungmuang</a>,
 					<br/>
 	      	<font class="small">and <a href="http://www.marvelic.co.th" target="_blank">Marvelic Engine Co.,Ltd.</a><br/>
 				</td>
