@@ -289,8 +289,8 @@
 			<field name="map_style" type="textarea" filter="RAW" cols="38" rows="5" default="" hint="[custom style code]" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_FIELD_STYLE" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_FIELD_STYLE_DESC"/>
 
 			<field name="" type="separator" default="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL" description="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL_DESC_FIELD" level="level2" />
-			<field name="field_prefix" type="text" default="" size="10" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_FIELD_PREFIX" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_FIELD_PREFIX_DESC" />
-			<field name="field_suffix" type="text" default="" size="10" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_FIELD_SUFFIX" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_FIELD_SUFFIX_DESC" />
+			<field name="field_prefix" type="text" default="" filter="JComponentHelper::filterText" size="10" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_FIELD_PREFIX" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_FIELD_PREFIX_DESC" />
+			<field name="field_suffix" type="text" default="" filter="JComponentHelper::filterText" size="10" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_FIELD_SUFFIX" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_FIELD_SUFFIX_DESC" />
 		</fieldset>
 
 		<fieldset name="group-addressint-config" hidden="true" icon_class="icon-key" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MAP_PROVIDER" addfieldpath="/administrator/components/com_flexicontent/elements">
