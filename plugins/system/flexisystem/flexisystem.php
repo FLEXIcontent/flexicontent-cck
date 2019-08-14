@@ -2067,6 +2067,13 @@ class plgSystemFlexisystem extends JPlugin
 			$data = (object) $data;
 		}
 
+		if (JFactory::getApplication()->input->getInt('a_id', 0))
+		{
+			$_id = JFactory::getApplication()->input->getInt('a_id', 0);
+			$data->id = $_id;
+			JFactory::getApplication()->input->set('id', $_id);
+		}
+
 		$this->_loadFcHelpersAndLanguage();
 
 
@@ -2445,6 +2452,22 @@ class plgSystemFlexisystem extends JPlugin
 		if (($context !== 'com_content.article' && $context !== 'com_content.form') || JFactory::getApplication()->input->get('isflexicontent', false, 'CMD'))
 		{
 			return true;
+		}
+
+		if (JFactory::getApplication()->input->getInt('a_id', 0))
+		{
+			$_id = JFactory::getApplication()->input->getInt('a_id', 0);
+			JFactory::getApplication()->input->set('id', $_id);
+			$item->id = $_id;
+
+			if (is_object($data))
+			{
+				$data->id = $_id;
+			}
+			elseif (is_array($data))
+			{
+				$data['id'] = $_id;
+			}
 		}
 
 		//***
