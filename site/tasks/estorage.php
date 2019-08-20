@@ -103,7 +103,7 @@ class FlexicontentCronTasks
 			
 			if (!$estorage_mode || $estorage_mode !== 'FTP')
 			{
-				$ftpConnID[$field_id] = 0;;
+				$ftpConnID[$field_id] = 0;
 				continue;
 			}
 
@@ -111,7 +111,7 @@ class FlexicontentCronTasks
 			$efs_ftp_port = (int) $field->parameters->get('efs_ftp_port', '21');
 			$efs_ftp_user = $field->parameters->get('efs_ftp_user', 'testuser');
 			$efs_ftp_pass = $field->parameters->get('efs_ftp_pass', '1234@@test');
-			$efs_ftp_path = $field->parameters->get('efs_ftp_path', '');
+			$efs_ftp_path = $field->parameters->get('efs_ftp_path', '/');
 
 			$ftpConnID[$field_id] = ftp_connect($efs_ftp_host, $efs_ftp_port, $_timeout = 10);
 
@@ -192,6 +192,28 @@ class FlexicontentCronTasks
 			{
 				continue;
 			}
+			
+			$field        = $fields[$field_id];
+			$efs_ftp_path = $field->parameters->get('efs_ftp_path', '/');
+			$efs_www_url  = $field->parameters->get('efs_www_url', 'https://some_external_servername.com/somefolder/');
+			$efs_www_url = rtrim($efs_www_url, '/') . '/';
+
+			$assigned_item = false;
+
+			if ($file->id > 0)
+			{
+				$query = 'SELECT c.id, c.created_by FROM #__flexicontent_fields_item_relations AS v'
+					. ' JOIN #__content AS c ON c.id = v.item_id '
+					. ' WHERE v.value = ' . (int) $file->id . ' AND v.field_id = ' . (int) $field_id
+					. ' LIMIT 1 ';
+				$assigned_item = $db->setQuery($query)->loadObject();
+			}
+
+			// Skip file that are not yet assigned
+			if (!$assigned_item)
+			{
+				continue;
+			}
 
 			// Prevent editing of file record until file uploads
 			if ($file->id > 0) $query = 'UPDATE #__flexicontent_files '
@@ -199,8 +221,61 @@ class FlexicontentCronTasks
 				. ' WHERE id = ' . (int) $file->id;
 			$db->setQuery($query)->execute();
 
-			$field        = $fields[$field_id];
-			$efs_www_url  = $field->parameters->get('efs_www_url', 'https://some_external_servername.com/somefolder/');
+
+			if ($assigned_item)
+			{
+				$cwd_result = ftp_chdir($ftpConnID[$field_id], $efs_ftp_path . '/o_' . $assigned_item->created_by);
+
+				if (!$cwd_result)
+				{
+					ftp_mkdir($ftpConnID[$field_id], $efs_ftp_path . '/o_' . $assigned_item->created_by);
+					$cwd_result = ftp_chdir($ftpConnID[$field_id], $efs_ftp_path . '/o_' . $assigned_item->created_by);
+				}
+
+				if ($cwd_result)
+				{
+					$cwd_result = ftp_chdir($ftpConnID[$field_id], $efs_ftp_path . '/o_' . $assigned_item->created_by . '/i_' . $assigned_item->id);
+
+					if (!$cwd_result)
+					{
+						ftp_mkdir($ftpConnID[$field_id], $efs_ftp_path . '/o_' . $assigned_item->created_by . '/i_' . $assigned_item->id);
+						$cwd_result = ftp_chdir($ftpConnID[$field_id], $efs_ftp_path . '/o_' . $assigned_item->created_by . '/i_' . $assigned_item->id);
+					}
+
+					if (!$cwd_result)
+					{
+						$msg = 'FAILED TO CHANGE (REMOTE) FTP DIRECTORY TO : ' . $efs_ftp_path . '/o_' . $assigned_item->created_by . '/i_' . $assigned_item->id . ' FOR FTP SERVER: (user@host:port) :' . $efs_ftp_user . '@' . $efs_ftp_host . ':' . $efs_ftp_port;
+						JLog::add($msg, JLog::ERROR, 'com_flexicontent.estorage');
+						$ftpConnID[$field_id] = 0;
+						continue;
+					}
+				}
+				else
+				{
+					$msg = 'FAILED TO CHANGE (REMOTE) FTP DIRECTORY TO : ' . $efs_ftp_path . '/o_' . $assigned_item->created_by . ' FOR FTP SERVER: (user@host:port) :' . $efs_ftp_user . '@' . $efs_ftp_host . ':' . $efs_ftp_port;
+					JLog::add($msg, JLog::ERROR, 'com_flexicontent.estorage');
+					$ftpConnID[$field_id] = 0;
+					continue;
+				}
+			}
+			else
+			{
+				$cwd_result = ftp_chdir($ftpConnID[$field_id], $efs_ftp_path);
+
+				if (!$cwd_result)
+				{
+					$msg = 'FAILED TO CHANGE (REMOTE) FTP DIRECTORY TO : ' . $efs_ftp_path . ' FOR FTP SERVER: (user@host:port) :' . $efs_ftp_user . '@' . $efs_ftp_host . ':' . $efs_ftp_port;
+					JLog::add($msg, JLog::ERROR, 'com_flexicontent.estorage');
+					$ftpConnID[$field_id] = 0;
+					continue;
+				}
+			}
+
+			// Add subfolders OWNER ID and ITEM ID to the new URL
+			if ($assigned_item)
+			{
+				$efs_www_url .= 'o_' . $assigned_item->created_by . '/i_' . $assigned_item->id . '/';
+			}
 
 			$file->source_path  = isset($file->source_path)
 				? $file->source_path
