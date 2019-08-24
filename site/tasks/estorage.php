@@ -195,8 +195,9 @@ class FlexicontentCronTasks
 			
 			$field        = $fields[$field_id];
 			$efs_ftp_path = $field->parameters->get('efs_ftp_path', '/');
+			$efs_ftp_path = rtrim($efs_ftp_path, '/');
 			$efs_www_url  = $field->parameters->get('efs_www_url', 'https://some_external_servername.com/somefolder/');
-			$efs_www_url = rtrim($efs_www_url, '/') . '/';
+			$efs_www_url  = rtrim($efs_www_url, '/') . '/';
 
 			$assigned_item = false;
 
@@ -228,7 +229,12 @@ class FlexicontentCronTasks
 
 				if (!$cwd_result)
 				{
-					ftp_mkdir($ftpConnID[$field_id], $efs_ftp_path . '/o_' . $assigned_item->created_by);
+					$mkd_result = ftp_mkdir($ftpConnID[$field_id], $efs_ftp_path . '/o_' . $assigned_item->created_by);
+					if (!$mkd_result)
+					{
+						$msg = 'FAILED TO CREATE (REMOTE) FTP DIRECTORY TO : ' . $efs_ftp_path . '/o_' . $assigned_item->created_by . ' FOR FTP SERVER: (user@host:port) :' . $efs_ftp_user . '@' . $efs_ftp_host . ':' . $efs_ftp_port;
+						JLog::add($msg, JLog::ERROR, 'com_flexicontent.estorage');
+					}
 					$cwd_result = ftp_chdir($ftpConnID[$field_id], $efs_ftp_path . '/o_' . $assigned_item->created_by);
 				}
 
@@ -238,7 +244,12 @@ class FlexicontentCronTasks
 
 					if (!$cwd_result)
 					{
-						ftp_mkdir($ftpConnID[$field_id], $efs_ftp_path . '/o_' . $assigned_item->created_by . '/i_' . $assigned_item->id);
+						$mkd_result = ftp_mkdir($ftpConnID[$field_id], $efs_ftp_path . '/o_' . $assigned_item->created_by . '/i_' . $assigned_item->id);
+						if (!$mkd_result)
+						{
+							$msg = 'FAILED TO CREATE (REMOTE) FTP DIRECTORY TO : ' . $efs_ftp_path . '/o_' . $assigned_item->created_by . '/i_' . $assigned_item->id . ' FOR FTP SERVER: (user@host:port) :' . $efs_ftp_user . '@' . $efs_ftp_host . ':' . $efs_ftp_port;
+							JLog::add($msg, JLog::ERROR, 'com_flexicontent.estorage');
+						}
 						$cwd_result = ftp_chdir($ftpConnID[$field_id], $efs_ftp_path . '/o_' . $assigned_item->created_by . '/i_' . $assigned_item->id);
 					}
 
@@ -246,7 +257,6 @@ class FlexicontentCronTasks
 					{
 						$msg = 'FAILED TO CHANGE (REMOTE) FTP DIRECTORY TO : ' . $efs_ftp_path . '/o_' . $assigned_item->created_by . '/i_' . $assigned_item->id . ' FOR FTP SERVER: (user@host:port) :' . $efs_ftp_user . '@' . $efs_ftp_host . ':' . $efs_ftp_port;
 						JLog::add($msg, JLog::ERROR, 'com_flexicontent.estorage');
-						$ftpConnID[$field_id] = 0;
 						continue;
 					}
 				}
@@ -254,7 +264,6 @@ class FlexicontentCronTasks
 				{
 					$msg = 'FAILED TO CHANGE (REMOTE) FTP DIRECTORY TO : ' . $efs_ftp_path . '/o_' . $assigned_item->created_by . ' FOR FTP SERVER: (user@host:port) :' . $efs_ftp_user . '@' . $efs_ftp_host . ':' . $efs_ftp_port;
 					JLog::add($msg, JLog::ERROR, 'com_flexicontent.estorage');
-					$ftpConnID[$field_id] = 0;
 					continue;
 				}
 			}
@@ -266,7 +275,6 @@ class FlexicontentCronTasks
 				{
 					$msg = 'FAILED TO CHANGE (REMOTE) FTP DIRECTORY TO : ' . $efs_ftp_path . ' FOR FTP SERVER: (user@host:port) :' . $efs_ftp_user . '@' . $efs_ftp_host . ':' . $efs_ftp_port;
 					JLog::add($msg, JLog::ERROR, 'com_flexicontent.estorage');
-					$ftpConnID[$field_id] = 0;
 					continue;
 				}
 			}
