@@ -11,6 +11,7 @@
 
 defined('_JEXEC') or die('Restricted access');
 use Joomla\String\StringHelper;
+use Joomla\Utilities\ArrayHelper;
 
 trait flexicontent_basetable_trait
 {
@@ -333,13 +334,29 @@ trait flexicontent_basetable_trait
 		while ($n < $max_retries)
 		{
 			$query = $this->_db->getQuery(true)
-				->select('id')
+				->select('COUNT(id)')
 				->from('#__' . $this->_records_dbtbl)
 				->where($this->_db->quoteName($alias) . ' = ' . $this->_db->Quote($possible_alias))
+				->where($this->_db->quoteName('id') . ' <> ' . (int) $this->id)
 			;
-			$xid = (int) $this->_db->setQuery($query)->loadResult();
 
-			if ($xid && $xid !== (int) $this->id)
+			if (!empty($this->categories))
+			{
+				$query->where($this->_db->quoteName('catid') . ' IN (' . implode(', ', ArrayHelper::toInteger($this->categories)) . ')');
+			}
+			elseif (!empty($this->catid))
+			{
+				$query->where($this->_db->quoteName('catid') . ' = ' . (int) $this->catid);
+			}
+
+			if (!empty($this->language))
+			{
+				$query->where($this->_db->quoteName('language') . ' = ' . $this->_db->Quote($this->language));
+			}
+			
+			$duplicate_alias = (boolean) $this->_db->setQuery($query)->loadResult();
+
+			if ($duplicate_alias)
 			{
 				$non_unique_alias = $original_alias;
 				$possible_alias = $this->$alias . '-' . (++$n);
