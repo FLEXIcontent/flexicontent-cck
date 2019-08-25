@@ -195,7 +195,7 @@ class FlexicontentCronTasks
 			
 			$field        = $fields[$field_id];
 			$efs_ftp_path = $field->parameters->get('efs_ftp_path', '/');
-			$efs_ftp_path = rtrim($efs_ftp_path, '/');
+			$efs_ftp_path = '/' . trim($efs_ftp_path, '/');
 			$efs_www_url  = $field->parameters->get('efs_www_url', 'https://some_external_servername.com/somefolder/');
 			$efs_www_url  = rtrim($efs_www_url, '/') . '/';
 
