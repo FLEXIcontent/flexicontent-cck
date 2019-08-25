@@ -5284,11 +5284,13 @@ class ParentClassItem extends FCModelAdmin
 			.' JOIN #__flexicontent_items_ext AS e ON i.id = e.item_id '
 			.' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON i.id = rel.itemid '
 			.' WHERE i.alias=' . $this->_db->Quote($alias)
-			.'  AND (i.catid=' . (int)$item->id . ' OR rel.catid IN (' . $sub_q .') )'
+			.'  AND (i.catid=' . (int) $this->catid . ' OR rel.catid IN (' . implode(', ', ArrayHelper::toInteger($this->categories)) . ') )'
+			.'  AND i.language = ' . $this->_db->Quote($item->language)
 			.'  AND i.id <> ' . (int) $item->id
 			;
-		$this->_db->setQuery($query);
-		$duplicates_found = (boolean) $this->_db->loadResult();
+
+		$count = $this->_db->setQuery($query)->loadResult();
+		$duplicates_found = (boolean) $count;
 
 		return !$duplicates_found
 			? $alias
