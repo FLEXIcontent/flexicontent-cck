@@ -12,6 +12,7 @@
 defined('_JEXEC') or die('Restricted access');
 
 use Joomla\String\StringHelper;
+use Joomla\Utilities\ArrayHelper;
 use Joomla\CMS\Event\AbstractEvent;
 use Joomla\Database\DatabaseDriver;
 use Joomla\Database\DatabaseQuery;
@@ -795,26 +796,6 @@ class flexicontent_items extends _flexicontent_items
 				// Insert without using autoincrement
 				$record_tmp->$fk_tmp = $this->$tk_tmp;
 				$ret = $this->_db->insertObject($this->_tbl_tmp, $record_tmp, $fk_tmp);
-			}
-
-			// Check for unique Alias
-			$sub_q = 'SELECT catid FROM #__flexicontent_cats_item_relations WHERE itemid=' . (int) $this->id;
-			$query = 'SELECT COUNT(*) FROM #__flexicontent_items_tmp AS i '
-				. ' JOIN #__flexicontent_items_ext AS e ON i.id = e.item_id '
-				. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON i.id = rel.itemid '
-				. ' WHERE i.alias=' . $this->_db->Quote($this->alias)
-				. '  AND (i.catid=' . (int) $this->id . ' OR rel.catid IN (' . $sub_q . ') )'
-				. '  AND e.language = ' . $this->_db->Quote($record_ext->language)
-				. '  AND i.id <> ' . (int) $this->id
-				//. '  AND e.lang_parent_id <> ' . (int) $record_ext->lang_parent_id
-				;
-
-			$duplicate_aliases = (boolean) $this->_db->setQuery($query)->loadResult();
-
-			if ($duplicate_aliases)
-			{
-				$query 	= 'UPDATE #__content SET alias=' . $this->_db->Quote($this->alias . '_' . $this->id) . ' WHERE id=' . (int) $this->id;
-				$this->_db->setQuery($query)->execute();
 			}
 		}
 
