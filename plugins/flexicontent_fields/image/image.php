@@ -2938,12 +2938,18 @@ class plgFlexicontent_fieldsImage extends FCField
 			$copyorg = $field->parameters->get('copy_original_' . $size, 1);
 			$copy_original = ($copyorg==2) || ($origsize_w == $param_w && $origsize_h == $param_h && !$usewm && $copyorg==1);
 
+			if (!$crop)
+			{
+				$check_w = $param_w > $origsize_w ? $origsize_w : $param_w;
+				$check_h = $param_h > $origsize_h ? $origsize_h : $param_h;
+			}
+
 			// Check if size of file is not same as parameters and recreate the thumbnail
 			if (
 					!$thumbnail_exists ||
 					( $crop==0 && (
-													($origsize_w >= $param_w && abs($filesize_w - $param_w)>1 ) &&  // scale width can be larger than it is currently
-													($origsize_h >= $param_h && abs($filesize_h - $param_h)>1 )     // scale height can be larger than it is currently
+													(abs($filesize_w - $check_w)>1 ) &&  // scale width can be larger than it is currently
+													(abs($filesize_h - $check_h)>1 )     // scale height can be larger than it is currently
 												)
 					) ||
 					( $crop==1 && (
@@ -2951,9 +2957,15 @@ class plgFlexicontent_fieldsImage extends FCField
 													($param_h <= $origsize_h && abs($filesize_h - $param_h)>1 )     // crop height can be smaller than it is currently
 												)
 					)
-				 )
-			 {
-				//echo "FILENAME: ".$thumbname.", ".($crop ? "CROP" : "SCALE").", ".($thumbnail_exists ? "OLDSIZE(w,h): $filesize_w,$filesize_h" : "")."  NEWSIZE(w,h): $param_w,$param_h <br />";
+			)
+			{
+				/*if (JFactory::getUser()->authorise('core.admin', 'root.1'))
+				{
+					echo "FILENAME: ".$thumbname.", ".($crop ? "CROP" : "SCALE").", ".($thumbnail_exists ? "OLDSIZE(w,h): $filesize_w,$filesize_h" : "")
+						."  NEWSIZE(w,h): $param_w,$param_h <br />"
+						."  ORIGSIZE(w,h): $origsize_w,$origsize_h <br />"
+						;
+				}*/
 				$was_thumbed = $this->create_thumb( $field, $filename, $size, $src_path, $dest_path, $copy_original, ($check_small ? '' : $extra_prefix) );
 				$thumbres = $thumbres && $was_thumbed;
 			}
