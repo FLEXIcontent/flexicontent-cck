@@ -238,17 +238,17 @@ if ($dom_ready_js)
 		'.$dom_ready_js.'
 
 		// load image in select
-		function format(state) {
-		if (!state.id) return state.text; // optgroup
-		return "<img class=\'fla`\' src=\'images/icons/" + state.id.toLowerCase() + ".png\'/>" + state.text;
+		//function format(state) {
+		//if (!state.id) return state.text; // optgroup
+		//return "<img class=\'fla`\' src=\'images/icons/" + state.id.toLowerCase() + ".png\'/>" + state.text;
 		}
-	$("#'.$elementid_n.'_custom_marker").select2({
-        formatResult: format,
-        formatSelection: format,
-        escapeMarkup: function(m) {
-          return m;
-        }
-      });
+	//$("#'.$elementid_n.'_custom_marker").select2({
+        //formatResult: format,
+        //formatSelection: format,
+        //escapeMarkup: function(m) {
+          //return m;
+        //}
+     // });
 	});
 	';
 }
