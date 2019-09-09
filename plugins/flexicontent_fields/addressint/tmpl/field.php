@@ -236,19 +236,6 @@ if ($dom_ready_js)
 	// load autocomplete on page ready
 	jQuery(document).ready(function() {
 		'.$dom_ready_js.'
-
-		// load image in select
-		//function format(state) {
-		//if (!state.id) return state.text; // optgroup
-		//return "<img class=\'fla`\' src=\'images/icons/" + state.id.toLowerCase() + ".png\'/>" + state.text;
-		}
-	//$("#'.$elementid_n.'_custom_marker").select2({
-        //formatResult: format,
-        //formatSelection: format,
-        //escapeMarkup: function(m) {
-          //return m;
-        //}
-     // });
 	});
 	';
 }
