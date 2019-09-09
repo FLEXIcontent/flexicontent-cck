@@ -92,7 +92,11 @@ $map_width  = (int) $field->parameters->get('map_width', 200);
 
 $map_height = (int) $field->parameters->get('map_height', 150);
 
-
+if ($map_api === 'googlemap'){
+  $defaut_icon_url = 'https://maps.gstatic.com/mapfiles/api-3/images/spotlight-poi2.png';
+}else {
+  $defaut_icon_url = 'https://unpkg.com/leaflet@1.5.1/dist/images/marker-icon.png';
+}
 
 $field_prefix = $field->parameters->get('field_prefix', '');
 
@@ -279,6 +283,13 @@ foreach ($this->values as $n => $value)
 	$value['lat'] = isset($value['lat']) ? $value['lat'] : '';
 
 	$value['lon'] = isset($value['lon']) ? $value['lon'] : '';
+	
+	if (!empty($value['custom_marker'])){
+		$value['custom_marker'] = $value['custom_marker'];
+	}else{
+		$value['custom_marker'] = $defaut_icon_url;
+	}
+
 
 
 
