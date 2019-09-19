@@ -879,6 +879,25 @@
 		var trgEL = jQuery('#'+trgID);
 		//window.console.log ('ATTACHING fcCascadedField() FOR source SELECTOR: ' + srcSelector + ' to UPDATE element with ID: ' + trgID + ' , valindex: ' + valindex);
 
+		var elementClear = (typeof data!== 'undefined' && typeof data.elementClear !== 'undefined') ? data.elementClear : 0;  // workaround for radio, checkbox causing unneeded server call
+		var elType = srcEL.attr('type');
+		if (elType=='radio' || elType=='checkbox') {
+			var elVal = Array();
+			srcEL.parent().parent().find('input:checked').each(function( index ) {
+				elVal[elVal.length] = jQuery(this).val();
+			});
+			elVal = elVal.join(',');
+		} else {
+			var elVal = srcEL.val();
+		}
+
+		if ( !elementClear && !! elVal )
+		{
+			trgEL.closest('.fcfieldval_container_outer, .control-group').show();
+		} else {
+			trgEL.closest('.fcfieldval_container_outer, .control-group').hide();
+		}
+
 		srcEL.on('change', function(e, data){
 			var elementClear = (typeof data!== 'undefined' && typeof data.elementClear !== 'undefined') ? data.elementClear : 0;  // workaround for radio, checkbox causing unneeded server call
 			var elType = srcEL.attr('type');
@@ -896,9 +915,11 @@
 			if ( !elementClear && !! elVal )
 			{
 				//window.console.log ('CHANGED element ID: ' + srcEL.attr('id') + ' --> Updating:' + trgEL.attr('id') + ' for VALGRP: -' + elVal + '-  value of 1st element: ' + srcEL.val() + ' type: '+srcEL.attr('type'));
+				trgEL.closest('.fcfieldval_container_outer, .control-group').show();
 				fcCascadedField_update(elVal, trgID, field_id, item_id, field_type, cascade_prompt, prompt_enabled, valindex);
 			} else {
 				//window.console.log ('CHANGED element ID: ' + srcEL.attr('id') + ' --> Clearing:' + trgEL.attr('id') + ' TAG type: ' + trgEL.prop("tagName"));
+				trgEL.closest('.fcfieldval_container_outer, .control-group').hide();
 				fcCascadedField_clear(trgEL, cascade_prompt, prompt_enabled);
 			}
 		});
