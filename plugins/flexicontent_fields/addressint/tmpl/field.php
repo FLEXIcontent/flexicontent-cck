@@ -148,7 +148,7 @@ foreach ($values as $value)
 		<tr class="fc_gm_custom_marker_row">
 		<td class="key"><label class="fc-prop-lbl fc_gm_custom_marker-lbl" for="'.$elementid_n.'_custom_marker">'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_CUSTOM_MARKER').'</label></td>
 			<td>
-			'.JHtml::_('select.genericlist', $custom_markers, $fieldname_n.'[custom_marker]',' class="use_select2_lib fc_gm_custom_marker" ', 'value', 'text', ($value['custom_marker'] ? $value['custom_marker'] : $custom_marker_default), $elementid_n.'_custom_marker').'
+			'.JHtmlSelect::genericlist($custom_markers, $fieldname_n.'[custom_marker]',' class=" fc_gm_custom_marker" ', 'value', 'text', ($value['custom_marker'] ? $value['custom_marker'] : $custom_marker_default), $elementid_n.'_custom_marker', array('class'=>'$imgs','option.attr'=>'data-imagesrc')).'
 			</td>
 		</tr>
 	') .
@@ -236,8 +236,19 @@ if ($dom_ready_js)
 	// load autocomplete on page ready
 	jQuery(document).ready(function() {
 		'.$dom_ready_js.'
+
+		jQuery("#'.$elementid_n.'_custom_marker").ddslick({
+    data: ddData,
+    width: 300,
+    imagePosition: "left",
+    selectText: "Select your favorite social network",
+    onSelected: function (data) {
+        console.log(data);
+    }
+});
 	});
 	';
 }
 
 $document->addScriptDeclaration($js);
+$document->addScript('../plugins/flexicontent_fields/addressint/js/jquery.ddslick.min.js');

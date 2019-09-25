@@ -186,6 +186,7 @@ class plgFlexicontent_fieldsAddressint extends FCField
 			$custom_markers[] = $custom_markers_op;
 			$custom_markers_op->value = JURI::root(). DS ."images/". $folder_custom_marker."/". $custom_marker;
 			$custom_markers_op->text = str_replace($folderMarkerUrl, "" ,$custom_marker);
+			$custom_markers_op->attr = array('data-imagesrc' => $custom_markers_op->value);
 		}
 
 		// CREATE AC SEARCH TYPE OPTIONS
