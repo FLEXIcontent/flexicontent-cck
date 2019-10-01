@@ -531,18 +531,6 @@
 				<option value="4">FLEXI_ORIGINAL</option>
 			</field>
 			
-			<field name="" type="separator" default="FLEXI_IMGFIELD_SRCSET_SETTINGS" level="level2" />
-			<field name="showsrcset" type="multilist" subtype="radio" default="1" label="FLEXI_IMGFIELD_SHOW_SRCSET" description="FLEXI_IMGFIELD_SHOW_SRCSET_DESC" class="btn-group btn-group-yesno" toggle_related="1">
-				<option value="0" show_list="" hide_list="showsrcset">FLEXI_NO</option>
-				<option value="1" show_list="showsrcset" hide_list="">FLEXI_YES</option>
-			</field>
-			<field name="srcsetimgres" type="radio" default="1" label="FLEXI_IMGFIELD_SRCSET_IMG_RES" description="FLEXI_IMGFIELD_SRCSET_IMG_RES_DESC" class="btn-group group-fcinfo" depend_class="showsrcset">
-				<option value="1">FLEXI_IMGFIELD_SRCSET_IMG_RES_DEFAULT</option>
-				<option value="2">FLEXI_IMGFIELD_SRCSET_IMG_RES_2X</option>
-			</field>
-			<field name="srcsetcustom_m" type="text" default="" label="FLEXI_IMGFIELD_SRCSET_CUSTOM_M" description="FLEXI_IMGFIELD_SRCSET_CUSTOM_M_DESC" class="btn-group btn-group-yesno" depend_class="showsrcset" />
-			<field name="srcsetcustom_l" type="text" default="" label="FLEXI_IMGFIELD_SRCSET_CUSTOM_L" description="FLEXI_IMGFIELD_SRCSET_CUSTOM_L_DESC" class="btn-group btn-group-yesno" depend_class="showsrcset" />
-			
 			<field name="" type="separator" default="FLEXI_IMGFIELD_INFORMATION" level="level2" />
 			<field name="showtitle" type="radio" default="0" label="FLEXI_FIELD_SHOW_TITLE" description="FLEXI_FIELD_SHOW_TITLE_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
