@@ -301,11 +301,22 @@
 		<fieldset name="group-addressint-config" hidden="true" icon_class="icon-key" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MAP_PROVIDER" addfieldpath="/administrator/components/com_flexicontent/elements">
 
 			<field name="" type="separator" default="FLEXI_FIELD_EDITING" level="level2" />
-			<field name="google_maps_js_api_key" type="text" default="" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_GOOGLE_MAPS_API_KEY_EDITING" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_GOOGLE_MAPS_API_KEY_EDITING_DESC" />
-			<field name="" type="separator" default="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_GOOGLE_MAPS_GET_API_KEY_INFO" level="level3" class="alert alert-success"/>
 
+			<field name="mapapi_edit" type="multilist" subtype="radio" toggle_related="1" default="googlemap" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MAP_ENGINE" description="" class="btn-group group-fcinfo">
+				<option value="googlemap" show_list="google-maps-edit-api" hide_list="algolia-edit-api">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MAP_ENGINE_GOOGLEMAP</option>
+				<option value="algolia" show_list="algolia-edit-api" hide_list="google-maps-edit-api">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MAP_ENGINE_ALGOLIA</option>
+			</field>
+
+			<field name="google_maps_js_api_key" type="text" default="" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_GOOGLE_MAPS_API_KEY_EDITING" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_GOOGLE_MAPS_API_KEY_EDITING_DESC" depend_class="google-maps-edit-api"/>
+			<field name="" type="separator" default="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_GOOGLE_MAPS_GET_API_KEY_INFO" level="level3" class="alert alert-success" depend_class="google-maps-edit-api"/>
+
+			<field name="algolia_edit_api_id" type="text" default="" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_ALGOLIA_API_ID_EDITING" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_ALGOLIA_API_ID_EDITING_DESC" depend_class="algolia-edit-api" />
+			<field name="algolia_edit_api_key" type="text" default="" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_ALGOLIA_API_KEY_EDITING" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_ALGOLIA_API-KEY_EDITING_DESC" depend_class="algolia-edit-api" />
+			<field name="" type="separator" default="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_ALGOLIA_GET_API_KEY_INFO" level="level3" class="alert alert-success" depend_class="algolia-edit-api" />
+			
 			<field name="" type="separator" default="FLEXI_FIELD_VIEWING" level="level2" />
-			<field name="mapapi" type="multilist" subtype="radio" toggle_related="1" default="googlemap" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MAP_ENGINE" description="" class="btn-group group-fcinfo">
+
+			<field name="mapapi_view" type="multilist" subtype="radio" toggle_related="1" default="googlemap" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MAP_ENGINE" description="" class="btn-group group-fcinfo">
 				<option value="googlemap" show_list="googlemap-api" hide_list="openstreetmap-api">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MAP_ENGINE_GOOGLEMAP</option>
 				<option value="openstreetmap" show_list="openstreetmap-api" hide_list="googlemap-api">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MAP_ENGINE_OPENSTREETMAP</option>
 			</field>

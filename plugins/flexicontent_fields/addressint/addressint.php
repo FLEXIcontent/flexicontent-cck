@@ -113,6 +113,7 @@ class plgFlexicontent_fieldsAddressint extends FCField
 		$use_custom_marker    = (int) $field->parameters->get('use_custom_marker',    1);
 		$folder_custom_marker =  $field->parameters->get('folder_custom_marker', '');
 
+
 		// Map configuration
 		$map_type = $field->parameters->get('map_type', 'roadmap');
 		$map_zoom = (int) $field->parameters->get('map_zoom', 16);
@@ -186,7 +187,6 @@ class plgFlexicontent_fieldsAddressint extends FCField
 			$custom_markers[] = $custom_markers_op;
 			$custom_markers_op->value = JURI::root(). DS ."images/". $folder_custom_marker."/". $custom_marker;
 			$custom_markers_op->text = str_replace($folderMarkerUrl, "" ,$custom_marker);
-			$custom_markers_op->attr = array('data-imagesrc' => $custom_markers_op->value);
 		}
 
 		// CREATE AC SEARCH TYPE OPTIONS

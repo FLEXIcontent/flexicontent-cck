@@ -42,8 +42,10 @@ foreach ($values as $value)
 
 	$disabled_class = $value_is_disabled ? ' fc-field-prop-disabled' : '';
 	$disabled_attr  = $value_is_disabled ? ' disabled="disabled" ' : '';
-
 	$google_maps_js_api_key = $field->parameters->get('google_maps_js_api_key', '');
+	$mapapi_edit = $field->parameters->get('mapapi_edit', '');//google or algolia
+	$algolia_api_id = $field->parameters->get('algolia_edit_api_id', 'plFM9RH0FIB7');
+	$algolia_api_key = $field->parameters->get('algolia_edit_api_key', '645ac6ac5ef0c8e5492ad9c2b7724242');
 
 	$field_html = '
 	<div class="fcfield_field_data_box fcfield_addressint_data">
@@ -95,7 +97,7 @@ foreach ($values as $value)
 	($addr_edit_mode != 'formatted' ? '' : '
 		<tr '.($use_name ? '' : 'style="display:none;"').' class="fc_gm_name_row">
 			<td class="key"><label class="fc-prop-lbl addrint_name-lbl" for="'.$elementid_n.'_name" >'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_BUSINESS_LOCATION').'</label></td>
-			<td><input type="text" class="fcfield_textval addrint_name ' . ($use_name && in_array('business_location', $required_props) ? ' required' : '') . $disabled_class . '" ' . $disabled_attr . ' id="'.$elementid_n.'_name" name="'.$fieldname_n.'[name]" value="'.htmlspecialchars($value['name'], ENT_COMPAT, 'UTF-8').'" size="50" maxlength="100" /></td>
+			<td><input type="text" class="fcfield_textval addrint_name ' . ($use_name && in_array('business_location', $required_props) ? ' required' : '') . $disabled_class . '" disabled="disable" id="'.$elementid_n.'_name" name="'.$fieldname_n.'[name]" value="'.htmlspecialchars($value['name'], ENT_COMPAT, 'UTF-8').'" size="50" maxlength="100" /></td>
 		</tr>
 		<tr class="fc_gm_addr_row">
 			<td class="key"><label class="fc-prop-lbl addrint_addr1-lbl" for="'.$elementid_n.'_addr1">'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_STREET_ADDRESS').'</label></td>
@@ -147,14 +149,146 @@ foreach ($values as $value)
 	(!$use_custom_marker ? '' : '
 		<tr class="fc_gm_custom_marker_row">
 		<td class="key"><label class="fc-prop-lbl fc_gm_custom_marker-lbl" for="'.$elementid_n.'_custom_marker">'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_CUSTOM_MARKER').'</label></td>
-			<td>
-			'.JHtmlSelect::genericlist($custom_markers, $fieldname_n.'[custom_marker]',' class=" fc_gm_custom_marker" ', 'value', 'text', ($value['custom_marker'] ? $value['custom_marker'] : $custom_marker_default), $elementid_n.'_custom_marker', array('class'=>'$imgs','option.attr'=>'data-imagesrc')).'
+			<td>'.JHtml::_('select.genericlist', $custom_markers, $fieldname_n.'[custom_marker]',' class="use_select2_lib fc_gm_custom_marker" ', 'value', 'text', ($value['custom_marker'] ? $value['custom_marker'] : $custom_marker_default), $elementid_n.'_custom_marker').'
 			</td>
 		</tr>
 	') .
 
 	'
 	</tbody></table>
+Algolia
+
+<div class="form-group">
+<label for="form-address">Address*</label>
+<input type="search" class="form-control" id="form-address" placeholder="Where do you live?" />
+</div>
+<div class="form-group">
+<label for="form-address2">Address 2</label>
+<input type="text" class="form-control" id="form-address2" placeholder="Street number and name" />
+</div>
+<div class="form-group">
+<label for="form-city">City*</label>
+<input type="text" class="form-control" id="form-city" placeholder="City">
+</div>
+<div class="form-group">
+<label for="form-zip">ZIP code*</label>
+<input type="text" class="form-control" id="form-zip" placeholder="ZIP code">
+</div>
+</form>
+
+<script src="https://cdn.jsdelivr.net/npm/places.js@1.16.4"></script>
+<div id="carte" style="float:right">
+<script src="https://cdn.jsdelivr.net/leaflet/1/leaflet.js"></script>
+<div id="map-example-container"></div>
+<script>
+(function() {
+
+	var placesAutocomplete = places({
+		appId: \''.$algolia_api_id.'\',
+		apiKey: \''.$algolia_api_key.'\',
+		container: document.querySelector(\'#form-address\'),
+		templates: {
+		  value: function(suggestion) {
+			return suggestion.name;
+		  }
+		}
+		}).configure({
+		type: \'address\'
+		});
+		placesAutocomplete.on(\'change\', function resultSelected(e) {
+		document.querySelector(\'#form-address2\').value = e.suggestion.administrative || \'\';
+		document.querySelector(\'#form-city\').value = e.suggestion.city || \'\';
+		document.querySelector(\'#form-zip\').value = e.suggestion.postcode || \'\';
+		});
+
+  var map = L.map(\'map-example-container\', {
+    scrollWheelZoom: false,
+    zoomControl: false
+  });
+
+  var osmLayer = new L.TileLayer(
+    \'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png\', {
+      minZoom: 1,
+      maxZoom: 13,
+      attribution: \'Map data © <a href="https://openstreetmap.org">OpenStreetMap</a> contributors\'
+    }
+  );
+
+  var markers = [];
+
+  map.setView(new L.LatLng(0, 0), 1);
+  map.addLayer(osmLayer);
+
+  placesAutocomplete.on(\'suggestions\', handleOnSuggestions);
+  placesAutocomplete.on(\'cursorchanged\', handleOnCursorchanged);
+  placesAutocomplete.on(\'change\', handleOnChange);
+  placesAutocomplete.on(\'clear\', handleOnClear);
+
+  function handleOnSuggestions(e) {
+    markers.forEach(removeMarker);
+    markers = [];
+
+    if (e.suggestions.length === 0) {
+      map.setView(new L.LatLng(0, 0), 1);
+      return;
+    }
+
+    e.suggestions.forEach(addMarker);
+    findBestZoom();
+  }
+
+  function handleOnChange(e) {
+    markers
+      .forEach(function(marker, markerIndex) {
+        if (markerIndex === e.suggestionIndex) {
+          markers = [marker];
+          marker.setOpacity(1);
+          findBestZoom();
+        } else {
+          removeMarker(marker);
+        }
+      });
+  }
+
+  function handleOnClear() {
+    map.setView(new L.LatLng(0, 0), 1);
+    markers.forEach(removeMarker);
+  }
+
+  function handleOnCursorchanged(e) {
+    markers
+      .forEach(function(marker, markerIndex) {
+        if (markerIndex === e.suggestionIndex) {
+          marker.setOpacity(1);
+          marker.setZIndexOffset(1000);
+        } else {
+          marker.setZIndexOffset(0);
+          marker.setOpacity(0.5);
+        }
+      });
+  }
+
+  function addMarker(suggestion) {
+    var marker = L.marker(suggestion.latlng, {opacity: .4});
+    marker.addTo(map);
+    markers.push(marker);
+  }
+
+  function removeMarker(marker) {
+    map.removeLayer(marker);
+  }
+
+  function findBestZoom() {
+    var featureGroup = L.featureGroup(markers);
+    map.fitBounds(featureGroup.getBounds().pad(0.5), {animate: false});
+  }
+})();
+</script>
+</div>
+
+
+Fin algolia
+
 	</div>
 
 
@@ -236,19 +370,19 @@ if ($dom_ready_js)
 	// load autocomplete on page ready
 	jQuery(document).ready(function() {
 		'.$dom_ready_js.'
+		
+		function format(state) {
+			if (!state.id) return state.text; // optgroup
+			return "<img class=\'flag\' src=\'" + state.id.toLowerCase() + "\'/>" + state.text;
+		}
+		jQuery("#'.$elementid_n.'_custom_marker").select2({
+			formatResult: format,
+			formatSelection: format,
+			escapeMarkup: function(m) { return m; }
+		});
 
-		jQuery("#'.$elementid_n.'_custom_marker").ddslick({
-    data: ddData,
-    width: 300,
-    imagePosition: "left",
-    selectText: "Select your favorite social network",
-    onSelected: function (data) {
-        console.log(data);
-    }
-});
 	});
 	';
 }
 
 $document->addScriptDeclaration($js);
-$document->addScript('../plugins/flexicontent_fields/addressint/js/jquery.ddslick.min.js');

@@ -1,3 +1,5 @@
+	
+	//Google map script
 	var fcfield_addrint = {};
 	
 	fcfield_addrint.autoComplete = [];
