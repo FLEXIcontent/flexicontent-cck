@@ -28,45 +28,35 @@ foreach ($values as $n => $value)
 	$result = include( JPATH_ROOT . '/plugins/flexicontent_fields/image/tmpl_common/prepare_value_display.php' );
 	if ($result === _FC_CONTINUE_) continue;
 	if ($result === _FC_BREAK_) break;
-	
-	if($field->parameters->get('showsrcset', 1))
+
+	// Inform about smaller image sizes than the current selected
+	$srcset = array();
+	$_sizes = array();
+
+	$img_size_attrs = '';
+
+	if ($size === 'l')
 	{
-		// Inform about smaller image sizes than the current selected
-		$srcset = array();
-		$_sizes = array();
+		$w_l = $field->parameters->get('w_l', self::$default_widths['l']);
+		$srcset[] = JUri::root() . $srcl . ' ' . $w_l . 'w';
+		$_sizes[] = '(min-width: ' . $w_l . 'px) ' . $w_l . 'px';
+	}
 
-		$img_size_attrs = '';
+	if ($size === 'l' || $size === 'm')
+	{
+		$w_m = $field->parameters->get('w_m', self::$default_widths['m']);
+		$srcset[] = JUri::root() . $srcm . ' ' . $w_m . 'w';
+		$_sizes[] = '(min-width: ' . $w_m . 'px) ' . $w_m . 'px';
 
-		if ($size === 'l')
-		{
-			$w_l = $field->parameters->get('w_l', self::$default_widths['l']);
-			$b_l = $w_l;
-			if($field->parameters->get('srcsetimgres', 1) == 2) $w_l = intval($w_l / 2);
-			if($field->parameters->get('srcsetcustom_l') != '') $b_l = $field->parameters->get('srcsetcustom_l');
-			$srcset[] = JUri::root() . $srcl . ' ' . $w_l . 'w';
-			$_sizes[] = '(min-width: ' . $b_l . 'px) ' . $w_l . 'px';
-		}
+		$w_s = $field->parameters->get('w_s', self::$default_widths['s']);
+		$srcset[] = JUri::root() . $srcs . ' ' . $w_s . 'w';
+		$_sizes[] = $w_s . 'px';
+	}
 
-		if ($size === 'l' || $size === 'm')
-		{
-			$w_m = $field->parameters->get('w_m', self::$default_widths['m']);
-			$b_m = $w_m;
-			if($field->parameters->get('srcsetimgres', 1) == 2) $w_m = intval($w_m / 2);
-			if($field->parameters->get('srcsetcustom_m') != '') $b_m = $field->parameters->get('srcsetcustom_m');
-			$srcset[] = JUri::root() . $srcm . ' ' . $w_m . 'w';
-			$_sizes[] = '(min-width: ' . $b_m . 'px) ' . $w_m . 'px';
-
-			$w_s = $field->parameters->get('w_s', self::$default_widths['s']);
-			if($field->parameters->get('srcsetimgres', 1) == 2) $w_s = intval($w_s / 2);
-			$srcset[] = JUri::root() . $srcs . ' ' . $w_s . 'w';
-			$_sizes[] = $w_s . 'px';
-		}
-
-		if (count($srcset))
-		{
-			$img_size_attrs .= ' srcset="' . implode($srcset, ', ') . '"';
-			$img_size_attrs .= ' sizes="' . implode($_sizes, ', ') . '"';
-		}
+	if (count($srcset))
+	{
+		$img_size_attrs .= ' srcset="' . implode($srcset, ', ') . '"';
+		$img_size_attrs .= ' sizes="' . implode($_sizes, ', ') . '"';
 	}
 
 	// Inform browser of real images sizes and of desired image size
