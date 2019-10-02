@@ -43,9 +43,9 @@ foreach ($values as $value)
 	$disabled_class = $value_is_disabled ? ' fc-field-prop-disabled' : '';
 	$disabled_attr  = $value_is_disabled ? ' disabled="disabled" ' : '';
 	$google_maps_js_api_key = $field->parameters->get('google_maps_js_api_key', '');
-	$mapapi_edit = $field->parameters->get('mapapi_edit', '');//google or algolia
+	$mapapi_edit = $field->parameters->get('mapapi_edit', '');//googlemap or algolia
 	$algolia_api_id = $field->parameters->get('algolia_edit_api_id', 'plFM9RH0FIB7');
-	$algolia_api_key = $field->parameters->get('algolia_edit_api_key', '645ac6ac5ef0c8e5492ad9c2b7724242');
+	$algolia_api_key = $field->parameters->get('algolia_edit_api_key', '0a6d21566fa86ff8a65e6935bdfc08e5');
 
 	$field_html = '
 	<div class="fcfield_field_data_box fcfield_addressint_data">
@@ -56,6 +56,7 @@ foreach ($values as $value)
 		<tr>
 			<td colspan="2" class="fc-nopad-h-cell">
 				' . ($google_maps_js_api_key ? '' : '<span class="alert alert-warning fc-iblock">' . JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_GOOGLE_MAPS_EMPTY_API_KEY_WARNING') . '</span>') . '
+				' . ($algolia_api_key && $algolia_api_id ? '' : '<span class="alert alert-warning fc-iblock">' . JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_ALGOLIA_EMPTY_API_KEY_WARNING') . '</span>') . '
 				<div class="'.$input_grp_class . ' fc-xpended-row">
 					<label class="' . $add_on_class . ' fc-lbl-short addrint_autocomplete-lbl" for="'.$elementid_n.'_autocomplete" style="float: none;"><span class="icon-search"></span></label>
 					<input id="'.$elementid_n.'_autocomplete" class="addrint_autocomplete" name="'.$fieldname_n.'[autocomplete]" type="text" autocomplete="off" />
@@ -156,141 +157,8 @@ foreach ($values as $value)
 
 	'
 	</tbody></table>
-Algolia
-
-<div class="form-group">
-<label for="form-address">Address*</label>
-<input type="search" class="form-control" id="form-address" placeholder="Where do you live?" />
-</div>
-<div class="form-group">
-<label for="form-address2">Address 2</label>
-<input type="text" class="form-control" id="form-address2" placeholder="Street number and name" />
-</div>
-<div class="form-group">
-<label for="form-city">City*</label>
-<input type="text" class="form-control" id="form-city" placeholder="City">
-</div>
-<div class="form-group">
-<label for="form-zip">ZIP code*</label>
-<input type="text" class="form-control" id="form-zip" placeholder="ZIP code">
-</div>
-</form>
-
-<script src="https://cdn.jsdelivr.net/npm/places.js@1.16.4"></script>
-<div id="carte" style="float:right">
-<script src="https://cdn.jsdelivr.net/leaflet/1/leaflet.js"></script>
-<div id="map-example-container"></div>
-<script>
-(function() {
-
-	var placesAutocomplete = places({
-		appId: \''.$algolia_api_id.'\',
-		apiKey: \''.$algolia_api_key.'\',
-		container: document.querySelector(\'#form-address\'),
-		templates: {
-		  value: function(suggestion) {
-			return suggestion.name;
-		  }
-		}
-		}).configure({
-		type: \'address\'
-		});
-		placesAutocomplete.on(\'change\', function resultSelected(e) {
-		document.querySelector(\'#form-address2\').value = e.suggestion.administrative || \'\';
-		document.querySelector(\'#form-city\').value = e.suggestion.city || \'\';
-		document.querySelector(\'#form-zip\').value = e.suggestion.postcode || \'\';
-		});
-
-  var map = L.map(\'map-example-container\', {
-    scrollWheelZoom: false,
-    zoomControl: false
-  });
-
-  var osmLayer = new L.TileLayer(
-    \'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png\', {
-      minZoom: 1,
-      maxZoom: 13,
-      attribution: \'Map data © <a href="https://openstreetmap.org">OpenStreetMap</a> contributors\'
-    }
-  );
-
-  var markers = [];
-
-  map.setView(new L.LatLng(0, 0), 1);
-  map.addLayer(osmLayer);
-
-  placesAutocomplete.on(\'suggestions\', handleOnSuggestions);
-  placesAutocomplete.on(\'cursorchanged\', handleOnCursorchanged);
-  placesAutocomplete.on(\'change\', handleOnChange);
-  placesAutocomplete.on(\'clear\', handleOnClear);
-
-  function handleOnSuggestions(e) {
-    markers.forEach(removeMarker);
-    markers = [];
-
-    if (e.suggestions.length === 0) {
-      map.setView(new L.LatLng(0, 0), 1);
-      return;
-    }
-
-    e.suggestions.forEach(addMarker);
-    findBestZoom();
-  }
-
-  function handleOnChange(e) {
-    markers
-      .forEach(function(marker, markerIndex) {
-        if (markerIndex === e.suggestionIndex) {
-          markers = [marker];
-          marker.setOpacity(1);
-          findBestZoom();
-        } else {
-          removeMarker(marker);
-        }
-      });
-  }
-
-  function handleOnClear() {
-    map.setView(new L.LatLng(0, 0), 1);
-    markers.forEach(removeMarker);
-  }
-
-  function handleOnCursorchanged(e) {
-    markers
-      .forEach(function(marker, markerIndex) {
-        if (markerIndex === e.suggestionIndex) {
-          marker.setOpacity(1);
-          marker.setZIndexOffset(1000);
-        } else {
-          marker.setZIndexOffset(0);
-          marker.setOpacity(0.5);
-        }
-      });
-  }
-
-  function addMarker(suggestion) {
-    var marker = L.marker(suggestion.latlng, {opacity: .4});
-    marker.addTo(map);
-    markers.push(marker);
-  }
-
-  function removeMarker(marker) {
-    map.removeLayer(marker);
-  }
-
-  function findBestZoom() {
-    var featureGroup = L.featureGroup(markers);
-    map.fitBounds(featureGroup.getBounds().pad(0.5), {animate: false});
-  }
-})();
-</script>
-</div>
-
-
-Fin algolia
 
 	</div>
-
 
 	<div id="'.$elementid_n.'_addressint_map" class="fcfield_field_preview_box fcfield_addressint_map" style="display: none;">
 		<div>
@@ -315,6 +183,46 @@ Fin algolia
 	<input type="hidden" id="'.$elementid_n.'_url" name="'.$fieldname_n.'[url]" value="'.htmlspecialchars($value['url'], ENT_COMPAT, 'UTF-8').'" />
 
 	';
+
+	if ( $mapapi_edit == 'algolia')
+	{
+		$field_html .= '
+		Algolia // TODO MIX value value with googlemap form + add long and lat
+	<div id="algolia-form">
+		<div class="form-group">
+		<label for="form-address">Address*</label>
+		<input type="search" class="form-control" id="form-address" placeholder="Where do you live?" />
+		</div>
+		<div class="form-group">
+		<label for="form-address2">Address 2</label>
+		<input type="text" class="form-control" id="form-address2" placeholder="Street number and name" />
+		</div>
+		<div class="form-group">
+		<label for="form-city">City*</label>
+		<input type="text" class="form-control" id="form-city" placeholder="City">
+		</div>
+		<div class="form-group">
+		<label for="form-zip">ZIP code*</label>
+		<input type="text" class="form-control" id="form-zip" placeholder="ZIP code">
+		</div>
+		<div class="form-group">
+		<label for="form-lon">Longitude*</label>
+		<input type="text" class="form-control" id="form-lon" placeholder="Long">
+		</div>
+		<div class="form-group">
+		<label for="form-lat">Latitude*</label>
+		<input type="text" class="form-control" id="form-lat" placeholder="Latitude">
+		</div>
+		Fin algolia
+	</div>
+		
+			TODO FIX POSITION map
+			<div id="carte" class="map-preview" >
+		<div id="map-example-container" class="addrint_algolia_canvas" '.($map_width || $map_height  ?  'style=";width:'.$map_width.'px; height:'.$map_height.'px;"' : '').'></div>
+	</div>
+		';
+
+	}
 
 	if($addr_edit_mode == 'plaintext')
 	{
@@ -380,6 +288,111 @@ if ($dom_ready_js)
 			formatSelection: format,
 			escapeMarkup: function(m) { return m; }
 		});
+
+		(function() {
+			var placesAutocomplete = places({
+				appId: \''.$algolia_api_id.'\',
+				apiKey: \''.$algolia_api_key.'\',
+				container: document.querySelector(\'#form-address\'),
+				templates: {
+				  value: function(suggestion) {
+					return suggestion.name;
+				  }
+				}
+				}).configure({
+				type: \'address\'
+				});
+				placesAutocomplete.on(\'change\', function resultSelected(e) {
+				document.querySelector(\'#form-address2\').value = e.suggestion.administrative || \'\';
+				document.querySelector(\'#form-city\').value = e.suggestion.city || \'\';
+				document.querySelector(\'#form-zip\').value = e.suggestion.postcode || \'\';
+				document.querySelector(\'#form-lat\').value = e.suggestion.latlng[\'lat\'] || \'\';
+				document.querySelector(\'#form-lon\').value = e.suggestion.latlng[\'lng\'] || \'\';
+				});
+		
+		  var map = L.map(\'map-example-container\', {
+			scrollWheelZoom: false,
+			zoomControl: false
+		  });
+		
+		  var osmLayer = new L.TileLayer(
+			\'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png\', {
+			  minZoom: 1,
+			  maxZoom: 13,
+			  attribution: \'Map data © <a href="https://openstreetmap.org">OpenStreetMap</a> contributors\'
+			}
+		  );
+		
+		  var markers = [];
+		
+		  map.setView(new L.LatLng(0, 0), 1);
+		  map.addLayer(osmLayer);
+		
+		  placesAutocomplete.on(\'suggestions\', handleOnSuggestions);
+		  placesAutocomplete.on(\'cursorchanged\', handleOnCursorchanged);
+		  placesAutocomplete.on(\'change\', handleOnChange);
+		  placesAutocomplete.on(\'clear\', handleOnClear);
+		
+		  function handleOnSuggestions(e) {
+			markers.forEach(removeMarker);
+			markers = [];
+		
+			if (e.suggestions.length === 0) {
+			  map.setView(new L.LatLng(0, 0), 1);
+			  return;
+			}
+		
+			e.suggestions.forEach(addMarker);
+			findBestZoom();
+		  }
+		
+		  function handleOnChange(e) {
+			markers
+			  .forEach(function(marker, markerIndex) {
+				if (markerIndex === e.suggestionIndex) {
+				  markers = [marker];
+				  marker.setOpacity(1);
+				  findBestZoom();
+				} else {
+				  removeMarker(marker);
+				}
+			  });
+		  }
+		
+		  function handleOnClear() {
+			map.setView(new L.LatLng(0, 0), 1);
+			markers.forEach(removeMarker);
+		  }
+		
+		  function handleOnCursorchanged(e) {
+			markers
+			  .forEach(function(marker, markerIndex) {
+				if (markerIndex === e.suggestionIndex) {
+				  marker.setOpacity(1);
+				  marker.setZIndexOffset(1000);
+				} else {
+				  marker.setZIndexOffset(0);
+				  marker.setOpacity(0.5);
+				}
+			  });
+		  }
+		
+		  function addMarker(suggestion) {
+			var marker = L.marker(suggestion.latlng, {opacity: .4});
+			marker.addTo(map);
+			markers.push(marker);
+		  }
+		
+		  function removeMarker(marker) {
+			map.removeLayer(marker);
+		  }
+		
+		  function findBestZoom() {
+			var featureGroup = L.featureGroup(markers);
+			map.fitBounds(featureGroup.getBounds().pad(0.5), {animate: false});
+		  }
+			
+		})();
 
 	});
 	';

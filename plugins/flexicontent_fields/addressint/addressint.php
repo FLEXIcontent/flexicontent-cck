@@ -112,6 +112,7 @@ class plgFlexicontent_fieldsAddressint extends FCField
 		$use_country  = (int) $field->parameters->get('use_country',  1);
 		$use_custom_marker    = (int) $field->parameters->get('use_custom_marker',    1);
 		$folder_custom_marker =  $field->parameters->get('folder_custom_marker', '');
+		$mapapi_edit = $field->parameters->get('mapapi_edit', '');
 
 
 		// Map configuration
@@ -567,10 +568,19 @@ class plgFlexicontent_fieldsAddressint extends FCField
 			JText::script('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MARKER_ADDRESS_ONLY_LONG_LAT', false);
 			JText::script('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_COUNTRY_NOT_ALLOWED_WARNING', false);
 			JText::script('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_PLEASE_USE_COUNTRIES', false);
-			$document->addScript(JUri::root(true) . '/plugins/flexicontent_fields/addressint/js/form.js', array('version' => FLEXI_VHASH));
 
+		//if ($mapapi_edit == 'googlemap') TODO correct script on field.php
+		//{
+			$document->addScript(JUri::root(true) . '/plugins/flexicontent_fields/addressint/js/form.js', array('version' => FLEXI_VHASH));
 			// Load google maps library
 			flexicontent_html::loadFramework('google-maps', 'form', $field->parameters);
+			
+		//}
+		}
+		if ( $mapapi_edit == 'algolia'){
+			$document->addStyleSheet('https://cdn.jsdelivr.net/leaflet/1/leaflet.css');
+			$document->addScript('https://cdn.jsdelivr.net/npm/places.js@1.16.4');
+			$document->addScript('https://cdn.jsdelivr.net/leaflet/1/leaflet.js');
 		}
 
 
