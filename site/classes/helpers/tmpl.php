@@ -72,7 +72,7 @@ class flexicontent_tmpl
 			if ( JFile::exists($tmplxml) && empty($themes->$layout_type->$tmplname) )
 			{
 				// Parse the XML file
-				$doc = @simplexml_load_file($tmplxml);
+				$doc = @simplexml_load_file($tmplxml, null, LIBXML_NOENT);
 				if (!$doc)
 				{
 					if (JFactory::getApplication()->isClient('administrator')) JFactory::getApplication()->enqueueMessage('Syntax error(s) in template XML file: '. $tmplxml, 'notice');
