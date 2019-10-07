@@ -6528,6 +6528,7 @@ class ParentClassItem extends FCModelAdmin
 				$skip = ($fsname === 'params-basic' && $this->_record->parameters->get('usedisplaydetails_fe', 0) < 1)
 					|| ($fsname === 'params-advanced' && $this->_record->parameters->get('usedisplaydetails_fe', 0) < 2)
 					|| ($fsname === 'params-seoconf' && $this->_record->parameters->get('useseoconf_fe', 0) < 1)
+					|| ($fsname === 'themes' && $this->_record->parameters->get('selecttheme_fe', 0) < 1)
 					;
 
 				if ($skip)
