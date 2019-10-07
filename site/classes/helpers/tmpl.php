@@ -72,6 +72,7 @@ class flexicontent_tmpl
 			if ( JFile::exists($tmplxml) && empty($themes->$layout_type->$tmplname) )
 			{
 				// Parse the XML file
+				// About load addition XML file, please see: https://github.com/FLEXIcontent/flexicontent-cck/pull/961
 				$doc = @simplexml_load_file($tmplxml, null, LIBXML_NOENT);
 				if (!$doc)
 				{
