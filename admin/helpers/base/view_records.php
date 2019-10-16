@@ -356,8 +356,8 @@ class FlexicontentViewBaseRecords extends JViewLegacy
 		if ($colsvisible === false)
 		{
 			$visibleColumns = flexicontent_html::getVisibleColumns($this->data_tbl_id);
-			$colsvisible = array_flip(is_array($visibleColumns)?$visibleColumns:array());
-			$colsvisible = array_flip(flexicontent_html::getVisibleColumns($this->data_tbl_id));
+			$colsvisible = @array_flip(is_array($visibleColumns)?$visibleColumns:array());
+			$colsvisible = @array_flip(flexicontent_html::getVisibleColumns($this->data_tbl_id));
 		}
 
 		return !empty($colsvisible) && !isset($colsvisible[$colposition]) ? 'display: none;' : '';
