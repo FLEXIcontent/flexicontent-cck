@@ -25,8 +25,8 @@
 		<field name="fps" type="int" default="" label="FPS" description="Frames per second" labelclass="fc-prop-lbl">
 			<option value="">NA</option>
 		</field-->
-		<field name="bitrate" type="list" default="0" label="Bit Rate (kbps)" description="In Kilobits per second" labelclass="fc-prop-lbl">
-			<option value="64">64</option>
+		<field name="bitrate" type="int" default="0" label="Bit Rate (kbps)" description="In Kilobits per second" labelclass="fc-prop-lbl" />
+		<!--	<option value="64">64</option>
 			<option value="96">96</option>
 			<option value="128">128</option>
 			<option value="160">160</option>
@@ -34,24 +34,24 @@
 			<option value="320">320</option>
 			<option value="394">394</option>
 			<option value="512">512</option>
-		</field>
+		</field-->
 		<field name="bitdepth" type="list" default="0" label="Bit Depth" description="Number of bits" labelclass="fc-prop-lbl">
 			<option value="16">16</option>
 			<option value="24">24</option>
 			<option value="32">32</option>
 		</field>
-		<field name="samplerate" type="list" default="0" label="Sample rate (Hz)" description="In Hz" labelclass="fc-prop-lbl">
-			<option value="22050">22050</option>
+		<field name="samplerate" type="int" default="0" label="Sample rate (Hz)" description="In Hz" labelclass="fc-prop-lbl" />
+		<!--	<option value="22050">22050</option>
 			<option value="44100">44100</option>
-		</field>
+		</field-->
 		<field name="audiotype" type="list" default="0" label="Audio Type" description="Stereo, Mono, ..." labelclass="fc-prop-lbl">
 			<option value="stereo">Stereo</option>
 			<option value="mono">Mono</option>
 		</field>
 		<field name="duration" type="int" default="" label="Duration (s)" description="In second" class="btn-group btn-group-yesno" labelclass="fc-prop-lbl" />
-		<field name="format" type="list" default="" label="Format" description="e.g audio/wav" labelclass="fc-prop-lbl">
-			<option value="audio/wav">audio/wav</option>
-		</field>
+		<field name="format" type="text" default="" label="Format" description="e.g audio/wav" labelclass="fc-prop-lbl" />
+		<!--	<option value="audio/wav">audio/wav</option>
+		</field-->
 	</fieldset>
 
 </form>

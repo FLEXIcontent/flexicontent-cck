@@ -77,6 +77,7 @@
 			</field>
 			<field name="mm_preview_bitrate" type="text" default="96" size="5" label="Bit rate (kbps)" description="..." />
 			<field name="mm_ffmpeg_path" type="text" default="" label="Path to ffmpeg binary" description="..." />
+			<field name="mm_ffprobe_path" type="text" default="" label="Path to ffprobe binary" description="..." />
 			<field name="mm_audiowaveform_path" type="text" default="" label="Path to audiowaveform binary" description="..." />
 
 			<field name="" type="separator" default="FLEXI_FORM_FIELD_CONF" description="FLEXI_FORM_FIELD_CONF_DESC" icon_class="icon-checkbox" level="tab_open" box_type="1" />

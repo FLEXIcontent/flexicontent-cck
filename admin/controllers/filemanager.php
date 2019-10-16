@@ -726,11 +726,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 
 			return $this->terminate($file_id, $exitMessages);
 		}
-		else
-		{
-			// Create audio preview file
-			$this->createAudioPreview($field, $filepath);
-		}
+
 
 
 		// *****************
@@ -767,6 +763,10 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 
 			// Get id of new file record
 			$obj->id = $file_id = (int) $db->insertid();
+
+			// Create audio preview file, if file is a media file
+			$this->createAudioPreview($field, $filepath);
+			$this->createMediaData($field, $filepath, $obj);
 		}
 
 		// B. Custom Folder mode
@@ -789,7 +789,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 
 		// Terminate with proper messaging
 		$this->exitHttpHead = array( 0 => array('status' => '201 Created') );
-		$this->exitMessages = array( 0 => array('message' => 'FLEXI_UPLOAD_COMPLETE') );
+		$this->exitMessages[] = array('message' => 'FLEXI_UPLOAD_COMPLETE');
 		$this->exitLogTexts = array();
 		$this->exitSuccess  = true;
 
@@ -1708,8 +1708,10 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 		}
 	}
 
+
 	/**
-	 * Set credentials for using FTP layer for file handling
+	 * 1. Create a smaller audio file for preview playback
+	 * 2. Precalculate the audio waveform peaks to avoid download the full file before preview playback starts
 	 */
 	function createAudioPreview($field, $filepath)
 	{
@@ -1729,7 +1731,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 			$filename = str_ireplace('.' . $ext, '', basename($filepath));
 
 			// Check preview folder
-			if ( !JFolder::exists($prv_path) && !JFolder::create($prv_path))
+			if (!JFolder::exists($prv_path) && !JFolder::create($prv_path))
 			{
 				die('{"jsonrpc" : "2.0", "error" : {"code": 1103, "message": "Failed to create preview folder."}, "data" : null}');
 			}
@@ -1740,8 +1742,11 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 			exec($ffmpeg_path . " -i \"" . $filepath . "\" -codec:a libmp3lame -b:a " . $preview_bitrate . "k \"" . $prv_path . '/' . $filename . ".mp3\"");
 
 			// Create waveform peaks of audio preview file
-			exec($audiowaveform_path . " -i \"" . $prv_path . '/' . $filename . ".mp3\" -o \"" . $prv_path . '/' . $filename . ".json\" -b 8");
-			//$app->enqueueMessage($audiowaveform_path . " -i \"" . $prv_path . '/' . $filename . ".mp3\" -o \"" . $prv_path . '/' . $filename . ".json\" --pixels-per-second 1 -b 8", 'error');
+			if ($audiowaveform_path)
+			{
+				exec($audiowaveform_path . " -i \"" . $prv_path . '/' . $filename . ".mp3\" -o \"" . $prv_path . '/' . $filename . ".json\" -b 8");
+				//$this->exitMessages[] = array('message' => $audiowaveform_path . " -i \"" . $prv_path . '/' . $filename . ".mp3\" -o \"" . $prv_path . '/' . $filename . ".json\" -b 8");
+			}
 			//die('{"jsonrpc" : "2.0", "error" : {"code": 1103, "message": ' . $audiowaveform_path . " -i \"" . $prv_path . '/' . $filename . ".mp3\" -o \"" . '}, "data" : null}');
 			//exec($ffmpeg_path . " -i \"" . $prv_path . '/' . $filename . '.mp3' + "\" -filter_complex showwavespic -frames:v 1 " . $prv_path . '/' . $filename . '.png');
 			//exec($ffmpeg_path . " -i \"" . $prv_path . '/' . $filename . '.mp3' + "\" -vn -ar 44100 -ac 1 -f f32le -");
@@ -1749,6 +1754,92 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 			//exec($ffmpeg_path . " -i \"" . $prv_path . '/' . $filename . '.mp3' + "\" -f s16le  -ac channels -acodec pcm_s16le -ar 44100 -y pipe:1 " . $prv_path . '/' . $filename . '.json');
 		}
 	}
+
+
+	/**
+	 * 1. Create a smaller audio file for preview playback
+	 * 2. Precalculate the audio waveform peaks to avoid download the full file before preview playback starts
+	 */
+	function createMediaData($field, $filepath, $file)
+	{
+		$db = JFactory::getDbo();
+
+		$log_filename = 'mediadata_log.php';
+		jimport('joomla.log.log');
+		JLog::addLogger(
+			array(
+				'text_file' => $log_filename,  // Sets the target log file
+				'text_entry_format' => '{DATE} {TIME} {PRIORITY} {MESSAGE}'  // Sets the format of each line
+			),
+			JLog::ALL,  // Sets messages of all log levels to be sent to the file
+			array('com_flexicontent.filemanager.uploader')  // category of logged messages
+		);
+
+		// Get the extension to record it in the DB
+		$ext = strtolower(flexicontent_upload::getExt($filepath));
+
+		$ffprobe_path       = $field->parameters->get('mm_ffprobe_path', '');
+
+		// Create audio preview file
+		if ($ffprobe_path && in_array($ext, array('wav', 'mp3', 'mp4', 'mpg', 'mpeg', 'avi')))
+		{
+			// Default options
+			$options = '-loglevel quiet -show_format -show_streams -print_format json';
+			//$options .= ' -pretty';
+
+			// Avoid escapeshellarg() issues with UTF-8 filenames
+			setlocale(LC_CTYPE, 'en_US.UTF-8');
+
+			// Run the ffprobe, save the JSON output then decode
+			//ffprobe -v error -show_format -show_streams input.mp4
+			$json = json_decode(shell_exec(sprintf($ffprobe_path.' %s %s', $options, escapeshellarg($filepath))));
+
+			if (!isset($json->format))
+			{
+				$this->exitMessages[] = array('warning' => 'Unsupported file type. Cannot detect audio properties.');
+				JLog::add('Unsupported file type. Cannot detect audio properties.', JLog::ERROR, 'com_flexicontent.filemanager.uploader');
+			}
+			else
+			{
+				// `media_type` int(11) NOT NULL default 0, /* 0: audio , 1: video */
+				// `resolution` varchar(255) NULL, /* e.g. 1280x720, 1920x1080 */
+				// `fps` int(11) NULL, /* e.g. 50 (frames per second) */
+				// `bitrate` int(11) NULL, /* e.g. 256 , 320 (kbps) */
+				// `bitdepth` int(11) NULL, /* e.g. 16, 24, 32 (# bits) */
+				// `samplerate` int(11) NULL, /* e.g. 44100 (HZ) */
+				// `audiotype` varchar(255) NULL, /* e.g. 'stereo', 'mono' */
+				// `duration` int(11) NOT NULL, /* e.g. 410 (seconds) */
+				// `format` varchar(255) NULL, /* e.g 'audio/wav'*/
+				// `checked_out` int(11) unsigned NOT NULL default '0',
+				// `checked_out_time` datetime NOT NULL default '1000-01-01 00:00:00',
+				// `attribs` mediumtext NULL,
+
+				$md_obj = new stdClass;
+				$md_obj->id         = 0;
+				$md_obj->file_id    = $file->id;
+				$md_obj->state      = 1;
+				$md_obj->media_type = $json->streams[0]->codec_type === 'video' ? 1 : 0; //media_type, 0: audio , 1: video
+				$md_obj->resolution = 0;
+				$md_obj->fps        = 0;
+				$md_obj->bitrate    = (int) $json->streams[0]->bit_rate / 1000;
+				$md_obj->bitdepth   = 0;
+				$md_obj->samplerate = $json->streams[0]->sample_rate;
+				$md_obj->audiotype  = $json->streams[0]->channel_layout;
+				$md_obj->duration   = (int) $json->streams[0]->duration;
+				$md_obj->format     = $json->streams[0]->codec_name;
+
+				// Insert file record in DB
+				$db->insertObject('#__flexicontent_mediadatas', $md_obj);
+
+				// Get id of new file record
+				$md_obj->id = (int) $db->insertid();
+				
+				$this->exitMessages[] = array('message' => print_r($json, true));
+				JLog::add(print_r($json->streams[0], true), JLog::INFO, 'com_flexicontent.filemanager.uploader');
+			}
+		}
+	}
+
 
 	/**
 	 * Set credentials for using FTP layer for file handling
