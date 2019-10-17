@@ -222,27 +222,27 @@ div.comments {
 	margin-left: 1%;
 }
 @media only screen and (min-width: 1024px) and (max-width: 1151px) {
-	#flexicontent ul.introblock.four  > li {
+	body #flexicontent ul.introblock.four  > li {
 		width: 31.6%;
 		margin-left: 1%;
 	}
 }
 @media only screen and (min-width: 768px) and (max-width: 1023px) {
-	#flexicontent ul.leadingblock.three > li,
-	#flexicontent ul.leadingblock.four > li,
-	#flexicontent ul.introblock.three > li,
-	#flexicontent ul.introblock.four  > li {
+	body #flexicontent ul.leadingblock.three > li,
+	body #flexicontent ul.leadingblock.four > li,
+	body #flexicontent ul.introblock.three > li,
+	body #flexicontent ul.introblock.four  > li {
 		width: 48.2%;
 		margin-left: 1%;
 	}
 }
 @media only screen and (max-width: 767px) {
-	#flexicontent ul.leadingblock.two   > li,
-	#flexicontent ul.leadingblock.three > li,
-	#flexicontent ul.leadingblock.four  > li,
-	#flexicontent ul.introblock.two   > li,
-	#flexicontent ul.introblock.three > li,
-	#flexicontent ul.introblock.four  > li {
+	body #flexicontent ul.leadingblock.two   > li,
+	body #flexicontent ul.leadingblock.three > li,
+	body #flexicontent ul.leadingblock.four  > li,
+	body #flexicontent ul.introblock.two   > li,
+	body #flexicontent ul.introblock.three > li,
+	body #flexicontent ul.introblock.four  > li {
 		width: 100%;
 		margin-left: 0%;
 	}
