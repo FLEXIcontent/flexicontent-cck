@@ -1815,18 +1815,27 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 				// `attribs` mediumtext NULL,
 
 				$md_obj = new stdClass;
-				$md_obj->id         = 0;
-				$md_obj->file_id    = $file->id;
-				$md_obj->state      = 1;
-				$md_obj->media_type = $json->streams[0]->codec_type === 'video' ? 1 : 0; //media_type, 0: audio , 1: video
-				$md_obj->resolution = 0;
-				$md_obj->fps        = 0;
-				$md_obj->bitrate    = (int) $json->streams[0]->bit_rate / 1000;
-				$md_obj->bitdepth   = 0;
-				$md_obj->samplerate = $json->streams[0]->sample_rate;
-				$md_obj->audiotype  = $json->streams[0]->channel_layout;
-				$md_obj->duration   = (int) $json->streams[0]->duration;
-				$md_obj->format     = $json->streams[0]->codec_name;
+				$md_obj->id              = 0;
+				$md_obj->file_id         = $file->id;
+				$md_obj->state           = 1;
+
+				$md_obj->media_type      = $json->streams[0]->codec_type === 'video' ? 1 : 0; //media_type, 0: audio , 1: video
+				$md_obj->media_format    = $json->streams[0]->codec_type === 'video' ? 'video' : ($json->streams[0]->bits_per_sample ? 'wav' : 'mp3');
+
+				$md_obj->codec_type      = $json->streams[0]->codec_type;
+				$md_obj->codec_name      = $json->streams[0]->codec_name;
+				$md_obj->codec_long_name = $json->streams[0]->codec_long_name;
+
+				$md_obj->resolution      = 0;    // TODO
+				$md_obj->fps             = 0;    // TODO
+
+				$md_obj->bit_rate        = isset($json->streams[0]->bit_rate)        ? $json->streams[0]->bit_rate : 0;
+				$md_obj->bits_per_sample = isset($json->streams[0]->bits_per_sample) ? $json->streams[0]->bits_per_sample : 0;
+				$md_obj->sample_rate     = isset($json->streams[0]->sample_rate)     ? $json->streams[0]->sample_rate : 0;
+				$md_obj->duration        = isset($json->streams[0]->duration)        ? ceil($json->streams[0]->duration) : 0;
+
+				$md_obj->channels        = isset($json->streams[0]->channels)        ? $json->streams[0]->channels : 0;
+				$md_obj->channel_layout  = isset($json->streams[0]->channel_layout)  ? $json->streams[0]->channel_layout : '';
 
 				// Insert file record in DB
 				$db->insertObject('#__flexicontent_mediadatas', $md_obj);

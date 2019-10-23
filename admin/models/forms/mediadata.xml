@@ -9,10 +9,22 @@
 			<option value="0">JDISABLED</option>
 			<option value="-2">JTRASHED</option>
 		</field>
-		<!--field name="media_type" type="fcradio" default="1" label="Media Type" description="Audio or Video" class="btn-group btn-group-yesno" labelclass="fc-prop-lbl">
-			<option value="1">Audio</option>
-			<option value="2">Video</option>
+
+		<field name="media_type" type="fcradio" default="1" label="Media Type" description="Audio or Video" class="btn-group group-fcinfo" labelclass="fc-prop-lbl">
+			<option value="0">Audio</option>
+			<option value="1">Video</option>
 		</field>
+
+		<field name="media_format" type="fcradio" default="1" label="Format" description="e.g wav, mp3" class="btn-group group-fcinfo" labelclass="fc-prop-lbl">
+			<option value="wav">Audio/Wav</option>
+			<option value="mp3">Audio/Mp3</option>
+			<option value="video">Video/*</option>
+		</field>
+
+		<field name="codec_type" type="text" default="" class="readonly" readonly="true" label="codec Type" description="codec Type" labelclass="fc-prop-lbl" />
+		<field name="codec_name" type="text" default="" class="readonly" readonly="true" label="codec Name" description="codec Name" labelclass="fc-prop-lbl" />
+		<field name="codec_long_name" type="text" default="" class="readonly" readonly="true" label="codec Long Name" description="codec Long Name" labelclass="fc-prop-lbl" />
+
 		<field name="resolution" type="list" default="" label="Resolution" description="Video resolution" labelclass="fc-prop-lbl">
 			<option value="">NA</option>
 			<option value="720p">1280x720</option>
@@ -22,11 +34,11 @@
 			<option value="4K (2160p)">3840x2160</option>
 			<option value="8K (4320p)">7680x4320</option>
 		</field>
-		<field name="fps" type="int" default="" label="FPS" description="Frames per second" labelclass="fc-prop-lbl">
-			<option value="">NA</option>
-		</field-->
-		<field name="bitrate" type="int" default="0" label="Bit Rate (kbps)" description="In Kilobits per second" labelclass="fc-prop-lbl" />
-		<!--	<option value="64">64</option>
+		<field name="fps" type="number" default="" label="FPS" description="Frames per second" labelclass="fc-prop-lbl" />
+
+		<field name="bit_rate" type="int" default="0" label="Bit Rate (bits per second)" description="In Kilobits per second" labelclass="fc-prop-lbl" />
+		<!--
+			<option value="64">64</option>
 			<option value="96">96</option>
 			<option value="128">128</option>
 			<option value="160">160</option>
@@ -35,38 +47,25 @@
 			<option value="394">394</option>
 			<option value="512">512</option>
 		</field-->
-		<field name="bitdepth" type="list" default="0" label="Bit Depth" description="Number of bits" labelclass="fc-prop-lbl">
+		<field name="bits_per_sample" type="int" default="0" label="Bit Depth" description="Number of bits per sample" labelclass="fc-prop-lbl" />
+		<!--
 			<option value="16">16</option>
 			<option value="24">24</option>
 			<option value="32">32</option>
-		</field>
-		<field name="samplerate" type="int" default="0" label="Sample rate (Hz)" description="In Hz" labelclass="fc-prop-lbl" />
-		<!--	<option value="22050">22050</option>
+		</field-->
+		<field name="sample_rate" type="int" default="0" label="Sample rate (Hz)" description="In Hz" labelclass="fc-prop-lbl" />
+		<!--
+			<option value="22050">22050</option>
 			<option value="44100">44100</option>
 		</field-->
-		<field name="audiotype" type="list" default="0" label="Audio Type" description="Stereo, Mono, ..." labelclass="fc-prop-lbl">
+		<field name="duration" type="int" default="0" label="Duration (s)" description="In second" labelclass="fc-prop-lbl" />
+
+		<field name="channels" type="int" default="1" label="# Channels" description="Number of channels" labelclass="fc-prop-lbl" />
+		<field name="channel_layout" type="text" default="" label="Channel Layout" description="Stereo, Mono, ..." labelclass="fc-prop-lbl" />
+		<!--
 			<option value="stereo">Stereo</option>
 			<option value="mono">Mono</option>
-		</field>
-		<field name="duration" type="int" default="" label="Duration (s)" description="In second" class="btn-group btn-group-yesno" labelclass="fc-prop-lbl" />
-		<field name="format" type="text" default="" label="Format" description="e.g audio/wav" labelclass="fc-prop-lbl" />
-		<!--	<option value="audio/wav">audio/wav</option>
 		</field-->
 	</fieldset>
 
 </form>
-
-<!--
-  `id` int(11) NOT NULL auto_increment,
-  `file_id` int(11) NOT NULL,
-  `media_type` varchar(255) NOT NULL default 0, /* 0: audio , 1: video */
-  `resolution` varchar(255) NULL, /* e.g. 1280x720, 1920x1080 */
-  `fps` int(11) NULL, /* e.g. 50 (frames per second) */
-  `bitrate` int(11) NULL, /* e.g. 256 , 320 (kbps) */
-  `samplerate` int(11) NULL, /* e.g. 44100 (HZ) */
-	`audiotype` varchar(255) NULL, /* e.g. 'stereo', 'mono' */
-  `duration` int(11) NOT NULL, /* e.g. 410 (seconds) */
-  `format` varchar(255) NULL, /* e.g 'audio/wav'*/
-  PRIMARY KEY  (`id`),
-  KEY `duration` (`duration`)
--->
