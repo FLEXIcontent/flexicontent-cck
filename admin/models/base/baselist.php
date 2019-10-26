@@ -435,6 +435,7 @@ abstract class FCModelAdminList extends JModelList
 	protected function _buildContentWhere($q = false)
 	{
 		$table = $this->getTable($this->records_jtable, '');
+		$user  = JFactory::getUser();
 
 		// Various filters
 		$filter_state  = $this->getState('filter_state');
