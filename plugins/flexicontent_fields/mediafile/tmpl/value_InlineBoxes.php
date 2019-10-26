@@ -516,6 +516,25 @@ foreach($values as $file_id)
 		</div>
 		';
 
+
+	/**
+	 * Basic display of audio / video media data
+	 */
+	if (isset($file_data->media_type))
+	{
+		$mediadata = array('state', 'media_type', 'media_format', 'codec_type', 'codec_name', 'codec_long_name',
+			'resolution', 'fps', 'bit_rate', 'bits_per_sample', 'sample_rate', 'duration',
+			'channels', 'channel_layout', 'checked_out', 'checked_out_time');
+
+		$html .= '<table class="table"><tr><td colspan="2"><b>Audio properties</b></td><tr>';
+		foreach($mediadata as $md_name)
+		{
+			$html .=  '<tr><td class="key">' . $md_name . '</td><td>' . $file_data->$md_name . '</td></tr>';
+		}
+		$html .= '</table>';
+	}
+
+
 	// Values Prefix and Suffix Texts
 	$field->{$prop}[$n]	=  $pretext . $html . $posttext;
 

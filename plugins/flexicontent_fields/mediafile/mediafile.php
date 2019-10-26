@@ -1434,7 +1434,7 @@ class plgFlexicontent_fieldsMediafile extends FCField
 			$field->field_valuesjoin   = ' JOIN #__flexicontent_files AS file ON file.id = fi.value';
 			$field->field_groupby      = null;
 		} else {
-			$_files_data = $this->getFileData( $post, $published=true, $extra_select =', id AS value_id' );
+			$_files_data = $this->getFileData( $post, $published=true, $extra_select =', f.id AS value_id' );
 			$values = array();
 			if ($_files_data) foreach($_files_data as $_file_id => $_file_data) $values[$_file_id] = (array)$_file_data;
 		}
@@ -1461,7 +1461,7 @@ class plgFlexicontent_fieldsMediafile extends FCField
 			$field->field_valuesjoin   = ' JOIN #__flexicontent_files AS file ON file.id = fi.value';
 			$field->field_groupby      = null;
 		} else {
-			$_files_data = $this->getFileData( $post, $published=true, $extra_select =', id AS value_id' );
+			$_files_data = $this->getFileData( $post, $published=true, $extra_select =', f.id AS value_id' );
 			$values = array();
 			if ($_files_data) foreach($_files_data as $_file_id => $_file_data) $values[$_file_id] = (array)$_file_data;
 		}
@@ -1500,15 +1500,20 @@ class plgFlexicontent_fieldsMediafile extends FCField
 				$new_ids[] = $f;
 			}
 		}
+		
+		$md_select = 'md.state, md.media_type, md.media_format, md.codec_type, md.codec_name, md.codec_long_name, ' .
+			'md.resolution, md.fps, md.bit_rate, md.bits_per_sample, md.sample_rate, md.duration, ' .
+			'md.channels, md.channel_layout, md.checked_out, md.checked_out_time';
 
 		// Get file data not retrieved already
 		if (count($new_ids))
 		{
 			// Only query files that are not already cached
 			$db = JFactory::getDbo();
-			$query = 'SELECT * '. $extra_select //filename, filename_original, altname, description, ext, id'
-				. ' FROM #__flexicontent_files'
-				. ' WHERE id IN ('. implode(',', $new_ids) . ')'
+			$query = 'SELECT ' . $md_select . ' , f.* '. $extra_select //filename, filename_original, altname, description, ext, id'
+				. ' FROM #__flexicontent_files f'
+				. ' LEFT JOIN #__flexicontent_mediadatas AS md ON f.id = md.file_id'
+				. ' WHERE f.id IN ('. implode(',', $new_ids) . ')'
 				. ($published ? '  AND published = 1' : '')
 			;
 			$new_data = $db->setQuery($query)->loadObjectList('id');
