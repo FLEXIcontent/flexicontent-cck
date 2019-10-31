@@ -35,20 +35,27 @@ foreach ($values as $n => $value)
 
 	$img_size_attrs = '';
 
+	$size_w_s = isset($value['size_w_s']) ? $value['size_w_s'] : 0;
+	$size_h_s = isset($value['size_h_s']) ? $value['size_h_s'] : 0;
+	$size_w_m = isset($value['size_w_m']) ? $value['size_w_m'] : 0;
+	$size_h_m = isset($value['size_h_m']) ? $value['size_h_m'] : 0;
+	$size_w_l = isset($value['size_w_l']) ? $value['size_w_l'] : 0;
+	$size_h_l = isset($value['size_h_l']) ? $value['size_h_l'] : 0;
+
 	if ($size === 'l')
 	{
-		$w_l = $field->parameters->get('w_l', self::$default_widths['l']);
+		$w_l = $size_w_l ?: $field->parameters->get('w_l', self::$default_widths['l']);
 		$srcset[] = JUri::root() . $srcl . ' ' . $w_l . 'w';
 		$_sizes[] = '(min-width: ' . $w_l . 'px) ' . $w_l . 'px';
 	}
 
 	if ($size === 'l' || $size === 'm')
 	{
-		$w_m = $field->parameters->get('w_m', self::$default_widths['m']);
+		$w_m = $size_w_m ?: $field->parameters->get('w_m', self::$default_widths['m']);
 		$srcset[] = JUri::root() . $srcm . ' ' . $w_m . 'w';
 		$_sizes[] = '(min-width: ' . $w_m . 'px) ' . $w_m . 'px';
 
-		$w_s = $field->parameters->get('w_s', self::$default_widths['s']);
+		$w_s = $size_w_s ?: $field->parameters->get('w_s', self::$default_widths['s']);
 		$srcset[] = JUri::root() . $srcs . ' ' . $w_s . 'w';
 		$_sizes[] = $w_s . 'px';
 	}
