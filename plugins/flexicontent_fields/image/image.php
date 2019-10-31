@@ -2968,6 +2968,13 @@ class plgFlexicontent_fieldsImage extends FCField
 				$filesize_w = $filesize[0];
 				$filesize_h = $filesize[1];
 				$thumbnail_exists = true;
+
+				// Set real sizes for using the with SRCSET
+				if (!$check_small)
+				{
+					$value['size_w_' . $size] = $filesize_w;
+					$value['size_h_' . $size] = $filesize_h;
+				}
 			}
 			else
 			{

@@ -226,54 +226,50 @@
 
 	if ($size !== 'o')
 	{
-		if($field->parameters->get('showsrcset', 1))
+		$w = isset($value['size_w_' . $size]) ? $value['size_w_' . $size] : $field->parameters->get('w_' . $size, self::$default_widths[$size]);
+		$h = isset($value['size_h_' . $size]) ? $value['size_h_' . $size] : $field->parameters->get('h_' . $size, self::$default_heights[$size]);
+
+		$size_w_s = isset($value['size_w_s']) ? $value['size_w_s'] : 0;
+		$size_h_s = isset($value['size_h_s']) ? $value['size_h_s'] : 0;
+		$size_w_m = isset($value['size_w_m']) ? $value['size_w_m'] : 0;
+		$size_h_m = isset($value['size_h_m']) ? $value['size_h_m'] : 0;
+		$size_w_l = isset($value['size_w_l']) ? $value['size_w_l'] : 0;
+		$size_h_l = isset($value['size_h_l']) ? $value['size_h_l'] : 0;
+
+		// Inform about smaller image sizes than the current selected
+		$srcset = array();
+		$_sizes = array();
+
+		if ($size === 'l')
 		{
-			$w = $field->parameters->get('w_' . $size, self::$default_widths[$size]);
-			$h = $field->parameters->get('h_' . $size, self::$default_heights[$size]);
-
-			// Inform about smaller image sizes than the current selected
-			$srcset = array();
-			$_sizes = array();
-
-			if ($size === 'l')
+			if ($srcl)
 			{
-				if ($srcl)
-				{
-					$w_l = $field->parameters->get('w_l', self::$default_widths['l']);
-					$b_l = $w_l;
-					if($field->parameters->get('srcsetimgres', 1) == 2) $w_l = intval($w_l / 2);
-					if($field->parameters->get('srcsetcustom_l') != '') $b_l = $field->parameters->get('srcsetcustom_l');
-					$srcset[] = (!$isURL ? JUri::root() : '') . $srcl . ' ' . $w_l . 'w';
-					$_sizes[] = '(min-width: ' . $b_l . 'px) ' . $w_l . 'px';
-				}
+				$w_l = $size_w_l ?: $field->parameters->get('w_l', self::$default_widths['l']);
+				$srcset[] = (!$isURL ? JUri::root() : '') . $srcl . ' ' . $w_l . 'w';
+				$_sizes[] = '(min-width: ' . $w_l . 'px) ' . $w_l . 'px';
 			}
+		}
 
-			if ($size === 'l' || $size === 'm')
+		if ($size === 'l' || $size === 'm')
+		{
+			if ($srcm)
 			{
-				if ($srcm)
-				{
-					$w_m = $field->parameters->get('w_m', self::$default_widths['m']);
-					$b_m = $w_m;
-					if($field->parameters->get('srcsetimgres', 1) == 2) $w_m = intval($w_m / 2);
-					if($field->parameters->get('srcsetcustom_m') != '') $b_m = $field->parameters->get('srcsetcustom_m');
-					$srcset[] = (!$isURL ? JUri::root() : '') . $srcm . ' ' . $w_m . 'w';
-					$_sizes[] = '(min-width: ' . $b_m . 'px) ' . $w_m . 'px';
-				}
-
-				if ($srcs)
-				{
-					$w_s = $field->parameters->get('w_s', self::$default_widths['s']);
-					if($field->parameters->get('srcsetimgres', 1) == 2) $w_s = intval($w_s / 2);
-					$srcset[] = (!$isURL ? JUri::root() : '') . $srcs . ' ' . $w_s . 'w';
-					$_sizes[] = $w_s . 'px';
-				}
+				$w_m = $size_w_m ?: $field->parameters->get('w_m', self::$default_widths['m']);
+				$srcset[] = (!$isURL ? JUri::root() : '') . $srcm . ' ' . $w_m . 'w';
+				$_sizes[] = '(min-width: ' . $w_m . 'px) ' . $w_m . 'px';
 			}
-
-			if (count($srcset))
+			if ($srcs)
 			{
-				$img_size_attrs .= ' srcset="' . implode($srcset, ', ') . '"';
-				$img_size_attrs .= ' sizes="' . implode($_sizes, ', ') . '"';
+				$w_s = $size_w_s ?: $field->parameters->get('w_s', self::$default_widths['s']);
+				$srcset[] = (!$isURL ? JUri::root() : '') . $srcs . ' ' . $w_s . 'w';
+				$_sizes[] = $w_s . 'px';
 			}
+		}
+
+		if (count($srcset))
+		{
+			$img_size_attrs .= ' srcset="' . implode($srcset, ', ') . '"';
+			$img_size_attrs .= ' sizes="' . implode($_sizes, ', ') . '"';
 		}
 
 		// Inform browser of real images sizes and of desired image size
