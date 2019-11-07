@@ -101,8 +101,8 @@ class plgFlexicontent_fieldsFile extends FCField
 		$docspath    = $cparams->get('file_path', 'components/com_flexicontent/uploads');
 		$imageexts   = array('jpg','gif','png','bmp','jpeg');
 
-		$thumb_size_resizer = 2; //$field->parameters->get('thumb_size_resizer', 2);
-		$thumb_size_default = 120; //$field->parameters->get('thumb_size_default', 120);
+		$thumb_size_resizer = $field->parameters->get('thumb_size_resizer', 2);
+		$thumb_size_default = $field->parameters->get('thumb_size_default', 120);
 		$preview_thumb_w = $preview_thumb_h = 600;
 
 		// Inline uploaders flags
