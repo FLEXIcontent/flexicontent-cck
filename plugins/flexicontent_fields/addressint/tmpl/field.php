@@ -272,24 +272,8 @@ foreach ($values as $value)
 	$n++;
 }
 
-if ($dom_ready_js)
-{
-	$js .= '
-	// load autocomplete on page ready
-	jQuery(document).ready(function() {
-		'.$dom_ready_js.'
-		
-		function format(state) {
-			if (!state.id) return state.text; // optgroup
-			return "<img class=\'flag\' src=\'" + state.id.toLowerCase() + "\'/>" + state.text;
-		}
-		jQuery("#'.$elementid_n.'_custom_marker").select2({
-			formatResult: format,
-			formatSelection: format,
-			escapeMarkup: function(m) { return m; }
-		});
-
-		(function() {
+if ( $mapapi_edit == 'algolia'){
+  $algoliaJS='(function() {
 			var placesAutocomplete = places({
 				appId: \''.$algolia_api_id.'\',
 				apiKey: \''.$algolia_api_key.'\',
@@ -392,7 +376,25 @@ if ($dom_ready_js)
 			map.fitBounds(featureGroup.getBounds().pad(0.5), {animate: false});
 		  }
 			
-		})();
+		})();';
+}
+
+if ($dom_ready_js)
+{
+	$js .= '
+	// load autocomplete on page ready
+	jQuery(document).ready(function() {
+		'.$dom_ready_js.'
+		
+		function format(state) {
+			if (!state.id) return state.text; // optgroup
+			return "<img class=\'flag\' src=\'" + state.id.toLowerCase() + "\'/>" + state.text;
+		}
+		jQuery("#'.$elementid_n.'_custom_marker").select2({
+			formatResult: format,
+			formatSelection: format,
+			escapeMarkup: function(m) { return m; }
+		});
 
 	});
 	';
