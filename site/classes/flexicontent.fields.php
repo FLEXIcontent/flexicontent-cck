@@ -3195,6 +3195,8 @@ class FlexicontentFields
 		if ($search_prefix === null) $search_prefix = JComponentHelper::getParams( 'com_flexicontent' )->get('add_search_prefix') ? 'vvv' : '';   // SEARCH WORD Prefix
 		$_search_prefix = $colname=='fs.search_index' ? $search_prefix : '';
 
+		//echo 'filter_id: ' . $filter->id . '<br>';
+		//echo '<pre>'; print_r($value); echo '</pre>';
 
 		// ***
 		// *** Filter out zero-length values
@@ -3213,7 +3215,11 @@ class FlexicontentFields
 			if (is_array($v))
 			{
 				// Indirect fitering ... for filtering on values of fields of related items
-				if ($i < 0)
+				if (!is_integer($i))
+				{
+					$_value[$i] = $v;
+				}
+				elseif ($i < 0)
 				{
 					$_value = $v;
 				}
@@ -3325,7 +3331,7 @@ class FlexicontentFields
 				}
 			}
 
-			foreach($value as $i => $val)
+			foreach ($value as $i => $val)
 			{
 				$typecasted_val = !$filter_compare_type
 					? $db->Quote($value[$i] . $value_suffix)
@@ -3348,7 +3354,7 @@ class FlexicontentFields
 			// RANGE cases: 2, 3, 8
 			if ( empty($quoted) )
 			{
-				foreach($value as $i => $v)
+				foreach ($value as $i => $v)
 				{
 					$value[$i] = !$filter_compare_type
 						? $db->Quote( preg_replace('(\w+)', $_search_prefix.'$0', $v) )
@@ -3372,21 +3378,53 @@ class FlexicontentFields
 			{
 				foreach ($value as $val)
 				{
-					$value_clauses[] = $quoted
-						? '_v_=' . $val
-						: '_v_=' . $db->Quote( preg_replace('(\w+)', $_search_prefix.'$0', $val) );
+					if (!is_array($val))
+					{
+						$value_clauses[] = $quoted
+							? '_v_=' . $val
+							: '_v_=' . $db->Quote( preg_replace('(\w+)', $_search_prefix.'$0', $val) );
+					}
+					else
+					{
+						foreach ($val as $vv)
+						{
+							$value_clauses[] = $quoted
+								? '_v_=' . $vv
+								: '_v_=' . $db->Quote( preg_replace('(\w+)', $_search_prefix.'$0', $vv) );
+						}
+					}
 				}
-				$valueswhere .= ' AND ('.implode(' OR ', $value_clauses).') ';
+
+				if ($value_clauses)
+				{
+					$valueswhere .= ' AND ('.implode(' OR ', $value_clauses).') ';
+				}
 			}
 			else
 			{
 				foreach ($value as $val)
 				{
-					$value_clauses[] = $quoted
-						? $val
-						: $db->Quote( preg_replace('(\w+)', $_search_prefix.'$0', $val) );
+					if (!is_array($val))
+					{
+						$value_clauses[] = $quoted
+							? $val
+							: $db->Quote( preg_replace('(\w+)', $_search_prefix.'$0', $val) );
+					}
+					else
+					{
+						foreach ($val as $vv)
+						{
+							$value_clauses[] = $quoted
+								? $vv
+								: $db->Quote( preg_replace('(\w+)', $_search_prefix.'$0', $vv) );
+						}
+					}
 				}
-				$valueswhere = ' AND _v_ IN ('. implode(',', $value_clauses) .')';
+
+				if ($value_clauses)
+				{
+					$valueswhere = ' AND _v_ IN ('. implode(',', $value_clauses) .')';
+				}
 			}
 		}
 
@@ -3712,12 +3750,12 @@ class FlexicontentFields
 		$opentag_filter  = $filter->parameters->get( 'opentag_filter'.$_s, '' );
 		$closetag_filter = $filter->parameters->get( 'closetag_filter'.$_s, '' );
 
-		$filter_ffname = 'filter_'.$filter->id;
-		$filter_ffid   = $formName.'_'.$filter->id.'_val';
+		$filter_ffname = 'filter_'.$filter->id . (isset($filter->filt_prop_name) ? '[' . $filter->filt_prop_name . ']': '');
+		$filter_ffid   = $formName . '_' . $filter->id . (isset($filter->filt_prop_name) ? '_' . $filter->filt_prop_name: '') . '_val';
 
 		// Escape values for output, moved to HTML code, because it causes problem with value matching (==)
 		//if (!is_array($value)) $value = htmlspecialchars($value, ENT_COMPAT, 'UTF-8');
-		//else foreach($value as $i => $v) $value[$i] = htmlspecialchars($value[$i], ENT_COMPAT, 'UTF-8');
+		//else foreach ($value as $i => $v) $value[$i] = htmlspecialchars($value[$i], ENT_COMPAT, 'UTF-8');
 
 		// Alter search property name (indexed fields only), remove underscore _ at start & end of it
 		if ($indexed_elements && $search_prop)
@@ -4047,6 +4085,7 @@ class FlexicontentFields
 		{
 			$_results = FlexicontentFields::getFilterValues($filter, $view_join, $view_where, $filters_where, $lang_code);
 			//if ($filter->id==NN) echo "<pre>". $filter->label.": ". print_r($_results, true) ."\n\n</pre>";
+			//echo "<pre>". $filter->label.": ". print_r($_results, true) ."\n\n</pre>";
 		}
 
 

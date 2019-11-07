@@ -1391,6 +1391,61 @@ class plgFlexicontent_fieldsMediafile extends FCField
 	// *** CATEGORY/SEARCH FILTERING METHODS
 	// ***
 
+
+	// Method to display a category filter for the category view
+	function onDisplayFilter(&$filter, $value='', $formName='adminForm', $isSearchView=0)
+	{
+		if ( !in_array($filter->field_type, static::$field_types) ) return;
+
+		$mediadata = array('state', 'media_type', 'media_format', 'codec_type', 'codec_name', 'codec_long_name',
+			'resolution', 'fps', 'bit_rate', 'bits_per_sample', 'sample_rate', 'duration',
+			'channels', 'channel_layout', 'checked_out', 'checked_out_time');
+		$media_property_filters = $filter->parameters->set('media_property_filters', $mediadata);
+
+		$html = array();
+		$label = $filter->label;
+
+		foreach($media_property_filters as $prop_name)
+		{
+			// WARNING: we can not use column alias in from, join, where, group by, can use in having (some DB e.g. mysql) and in order-by
+			// partial SQL clauses
+			$filter->filter_valuesselect = ' md.' . $prop_name . ' AS value, md.' . $prop_name . ' AS text';
+			$filter->filter_valuesjoin   = ' JOIN #__flexicontent_files AS f ON f.id = fi.value '
+				. ' JOIN #__flexicontent_mediadatas AS md ON f.id = md.file_id';
+			//$filter->filter_valueswhere  = ' AND f.id NOT NULL)';
+			// full SQL clauses
+			$filter->filter_groupby = ' GROUP BY md.' . $prop_name;
+			$filter->filter_having  = null;   // this indicates to use default, space is use empty
+			//$filter->filter_orderby = ' ORDER by text';   // default will order by value and not by label
+
+			$prop_value = isset($value[$prop_name]) ? $value[$prop_name] : null;  // TODO GET FROM URI
+			//echo 'filter_id: ' . $filter->id . '<br>';
+			//echo '<pre>'; print_r($prop_value); echo '</pre>';
+
+
+			unset($filter->html);
+			unset($filter->filt_prop_name);
+			$filter->label = $prop_name;
+			$filter->filt_prop_name = $prop_name;
+
+			FlexicontentFields::createFilter($filter, $prop_value, $formName);
+			$html[$prop_name] = $filter->html;
+		}
+		
+
+		unset($filter->filt_prop_name);
+
+		$filter->label = $label;
+		$filter->html = array();
+		foreach($media_property_filters as $prop_name)
+		{
+			$filter->html[] = '<div class="row-fluid"><div class="span4" style="text-align: right;"><b class="badge">'. $prop_name . '</b></div><div class="span8">' . $html[$prop_name] . '</div></div>';
+		}
+
+		$filter->html =  '<div class="container" style="display: initial;">' . implode('', $filter->html) . '</div>';
+	}
+
+
 	// Method to display a search filter for the advanced search view
 	function onAdvSearchDisplayFilter(&$filter, $value='', $formName='searchForm')
 	{
@@ -1400,6 +1455,46 @@ class plgFlexicontent_fieldsMediafile extends FCField
 		FlexicontentFields::createFilter($filter, $value, $formName);
 	}
 
+
+ 	// Method to get the active filter result (an array of item ids matching field filter, or subquery returning item ids)
+	// This is for category view
+	function getFiltered(&$filter, $value, $return_sql=true)
+	{
+		$mediadata = array('state', 'media_type', 'media_format', 'codec_type', 'codec_name', 'codec_long_name',
+			'resolution', 'fps', 'bit_rate', 'bits_per_sample', 'sample_rate', 'duration',
+			'channels', 'channel_layout', 'checked_out', 'checked_out_time');
+		$media_property_filters = $filter->parameters->set('media_property_filters', $mediadata);
+
+		$results = array();
+		$label = $filter->label;
+
+		foreach($media_property_filters as $prop_name)
+		{
+			$filter->filter_valuesjoin   = ' JOIN #__flexicontent_fields_item_relations as rel ON rel.item_id = c.id '
+				. ' JOIN #__flexicontent_files AS f ON f.id = rel.value '
+				. ' JOIN #__flexicontent_mediadatas AS md ON f.id = md.file_id';
+
+			$prop_value = isset($value[$prop_name]) ? $value[$prop_name] : null;  // TODO GET FROM URI
+			//echo 'filter_id: ' . $filter->id . '<br>';
+			//echo '<pre>'; print_r($prop_value); echo '</pre>';
+
+			unset($filter->filt_prop_name);
+			$filter->label = $prop_name;
+			$filter->filt_prop_name = $prop_name;
+			$filter->filter_colname = 'md.' . $prop_name;
+
+			$res = FlexicontentFields::getFiltered($filter, $prop_value, $return_sql);
+			if ($res)
+			{
+				$results[] = $res;
+			}
+		}
+
+		unset($filter->filt_prop_name);
+
+		$filter->label = $label;
+		return implode(' ', $results);
+	}
 
  	// Method to get the active filter result (an array of item ids matching field filter, or subquery returning item ids)
 	// This is for search view
