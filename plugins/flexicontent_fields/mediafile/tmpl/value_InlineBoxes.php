@@ -481,8 +481,8 @@ foreach($values as $file_id)
 	if ($create_preview)
 	{
 		$ext         = strtolower(flexicontent_upload::getExt($file_data->filename));
-		$previewname = str_replace($ext, '', basename($file_data->filename)) . 'mp3';
-		$peaksname   = str_replace($ext, '', basename($file_data->filename)) . 'json';
+		$previewname = preg_replace('/\.' . $ext . '$/i', '', basename($file_data->filename)) . '.mp3';
+		$peaksname   = preg_replace('/\.' . $ext . '$/i', '', basename($file_data->filename)) . '.json';
 		$previewpath = 'audio_preview/' . $previewname;
 		$peakspath   = 'audio_preview/' . $peaksname;
 	}
