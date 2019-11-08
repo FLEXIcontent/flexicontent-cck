@@ -330,6 +330,27 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 				FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-search', JText::_( 'FLEXI_SEARCH_INDEXES' ) );
 				$add_sep = true;
 			}
+
+			$CanSeeSearchLogs = JFactory::getUser()->authorise('core.manage', 'com_search');
+
+			if ($CanSeeSearchLogs)
+			{
+				$params = JComponentHelper::getParams('com_search');
+				$enable_log_searches = $params->get('enabled');
+				if ($enable_log_searches)
+				{
+					$link = 'index.php?option=com_search&tmpl=component';
+					FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-book', JText::_( 'FLEXI_NAV_SD_SEARCH_LOGS' ), $modal = 1 );
+					$add_sep = true;
+				}
+				else
+				{
+					$link = 'index.php?option=com_config&view=component&component=com_search&path=';
+					FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-book', JText::_( 'FLEXI_NAV_SD_SEARCH_LOGS' ), $modal = 1, $close_function = 'function(){window.location.reload(false)}' );
+					$add_sep = true;
+				}
+			}
+
 			if ($this->perms->CanStats && !isset($sbtns['stats']))
 			{
 				if ($add_sep)
