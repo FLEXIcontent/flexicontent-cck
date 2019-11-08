@@ -844,7 +844,7 @@ class FLEXIUtilities
 				if ($enable_log_searches)
 				{
 					call_user_func($addEntry,
-					'<a href="index.php?option=com_search' . ($enable_log_searches ? '&tmpl=component' : '') . '" onclick="var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\'); return false;" >'.
+					'<a href="index.php?option=com_search&tmpl=component" onclick="var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\'); return false;" >'.
 						'<span class="fcsb-icon-book icon-book"></span>'.JText::_( 'FLEXI_NAV_SD_SEARCH_LOGS' ).
 					'</a>', '', false);
 				}
