@@ -91,6 +91,7 @@ class modFlexigooglemapHelper
 
 		$fieldaddressid = $params->get('fieldaddressid');
 		$forced_itemid = $params->get('forced_itemid', 0);
+		
 
 		$mapLocations = array();
 
@@ -262,7 +263,7 @@ class modFlexigooglemapHelper
 						: $addr . ' ' . $link;
 
 					$coordinates = $coord['lat'] .','. $coord['lon'];
-                  $custom_icon = $coord['custom_marker'];
+                    $custom_icon = $coord['custom_marker'];
 					$mapLocations[] = "['<h4 class=\"fleximaptitle\">$title</h4>$contentwindows $linkdirection'," . $coordinates . ",'".$custom_icon."']\r\n";
 				}
 			}
