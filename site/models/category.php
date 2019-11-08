@@ -2737,6 +2737,38 @@ class FlexicontentModelCategory extends JModelLegacy {
 	}
 
 
+	public function logSearch($search_term)
+	{
+		$db = JFactory::getDbo();
+		$params = JComponentHelper::getParams('com_search');
+		$enable_log_searches = $params->get('enabled');
+
+		$search_term_quoted = $db->Quote(trim($search_term));
+
+		if ($enable_log_searches)
+		{
+			$query = 'SELECT hits'
+				. ' FROM #__core_log_searches'
+				. ' WHERE LOWER( search_term ) = ' . $search_term_quoted;
+
+			$hits = (int) $db->setQuery($query)->loadResult();
+
+			if ($hits)
+			{
+				$query = 'UPDATE #__core_log_searches'
+					. ' SET hits = ( hits + 1 )'
+					. ' WHERE LOWER( search_term ) = ' . $search_term_quoted;
+				$db->setQuery($query)->execute();
+			}
+			else
+			{
+				$query = 'INSERT INTO #__core_log_searches VALUES (' . $search_term_quoted . ', 1 )';
+				$db->setQuery($query)->execute();
+			}
+		}
+	}
+
+
 	/**
 	 * Method to get the nr of favourites of anitem
 	 *
