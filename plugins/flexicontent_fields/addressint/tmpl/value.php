@@ -14,7 +14,7 @@ $view = JFactory::getApplication()->input->getCmd('view', '');
 
 // Get Map Engine
 
-$map_api = $field->parameters->get('mapapi', 'googlemap');
+$map_api = $field->parameters->get('mapapi_view', 'googlemap');
 
 
 
