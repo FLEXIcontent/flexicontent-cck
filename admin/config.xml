@@ -1491,6 +1491,10 @@
 			<field name="usergrps_notify_existing_reviewal" type="flexiusergroup" multiple="true" default="" label="FLEXI_USERGROUPS" description="FLEXI_USERGROUPS_DESC" class="disp_notifications" />
 			<field name="userlist_notify_existing_reviewal" type="text" default="" label="FLEXI_USERLIST" description="FLEXI_USERLIST_DESC" class="disp_notifications input-xxlarge" />
 			<field name="text_notify_existing_reviewal" type="textarea" rows="2" cols="60" default="" label="FLEXI_CUSTOM_NOTIFY_TEXT" description="FLEXI_CUSTOM_NOTIFY_TEXT_DESC" class="disp_notifications input-xxlarge" />
+			<field name="" type="radio" default="1" label="FLEXI_OWNER_NOTIFY" description="FLEXI_OWNER_NOTIFY_DESC" class="disp_notifications btn-group">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
 
 		<field name="" type="separator" default="FLEXI_WORKFLOW_CONF" level="tabset_close" box_type="1" remove_boxes="2" />
 	</fieldset>
