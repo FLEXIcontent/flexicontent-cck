@@ -1070,6 +1070,10 @@
 			<field name="" type="separator" default="FLEXI_NOTIFY_UGRP_EXISTING_CONTENT_TOREVIEW" description="FLEXI_NOTIFY_UGRP_EXISTING_CONTENT_TOREVIEW_DESC" label="" level="level2" />
 			<field name="cats_usergrps_notify_existing_reviewal" type="flexiusergroup" multiple="true" default="" label="FLEXI_USERGROUPS" description="FLEXI_USERGROUPS_DESC" />
 			<field name="cats_userlist_notify_existing_reviewal" type="text" class="input-xxlarge" default="" label="FLEXI_USERLIST" description="FLEXI_USERLIST_DESC" />
+			<field name="cats_owner_notification" type="radio" default="1" label="FLEXI_OWNER_NOTIFY" description="FLEXI_OWNER_NOTIFY_DESC" class="disp_notifications btn-group">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
 			
 		</fieldset>
 	
