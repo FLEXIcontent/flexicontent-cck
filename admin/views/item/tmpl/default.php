@@ -688,7 +688,6 @@ if (isset($this->item->item_translations)) foreach ($this->item->item_translatio
 
 			<?php 
 			$notify_owner = JComponentHelper::getParams('com_flexicontent')->get('owner_notification', 0);
-			echo $notify_owner;
 			if ($notify_owner) : ?>
 				<div class="fcclear"></div>
 				<?php
