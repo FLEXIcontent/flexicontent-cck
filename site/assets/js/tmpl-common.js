@@ -492,15 +492,7 @@ jQuery(document).ready(function() {
 		});
 	}
 	
-	jQuery('body').prepend(
-		'<div id="fc_filter_form_blocker">' +
-			'<div class="fc_blocker_opacity"></div>' +
-			'<div class="fc_blocker_content">' +
-				Joomla.JText._('FLEXI_APPLYING_FILTERING') +
-				'<div class="fc_blocker_bar"><div></div></div>' +
-			'</div>' +
-		'</div>'
-	);
+	
 
 	fc_recalculateWindow();
 });

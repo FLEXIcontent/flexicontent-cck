@@ -1910,6 +1910,7 @@ class flexicontent_html
 				JText::script("FLEXI_TYPE_TO_LIST", true);
 				JText::script("FLEXI_TYPE_TO_FILTER", true);
 				JText::script("FLEXI_UPDATING_CONTENTS", true);
+
 				break;
 
 			case 'flexi-lib':
@@ -1931,7 +1932,59 @@ class flexicontent_html
 				JText::script('FLEXI_THUMBNAILS',true);
 				JText::script("FLEXI_NO_ITEMS_SELECTED", true);
 				JText::script("FLEXI_ARE_YOU_SURE", true);
+				JText::script("FLEXI_APPLYING_FILTERING");
+				$disp_textloading= 1;
+				 if( $disp_textloading ){
+					 $textloading = "'".JText::_('FLEXI_APPLYING_FILTERING')."'+";
+				 }else{
+					$textloading ="";
+				 }
+				$disp_progressbar = JComponentHelper::getParams('com_flexicontent')->get('disp_progressbar', 1); //here load barre params
+				 if( $disp_progressbar ){
+					 $progressbar = "'<div class=\"fc_blocker_bar\" ><div>'+";
+				 }else{
+					$progressbar = "";
+				 }
+				 $url_logo = JComponentHelper::getParams('com_flexicontent')->get('url_logo', ''); //"images/91.gif";//here load image from component
+				 if( $url_logo ){
+					 $logo = "'<div class=\"fc_logo_loading\"><img src=\".$url_logo.\"><div>'+";
+				 }else{
+					$logo = "";
+				 }
+				$background_color_loading = JComponentHelper::getParams('com_flexicontent')->get('background_color_loading', '#000'); //"images/91.gif";//here load image from component
+				$background_color_opacity = JComponentHelper::getParams('com_flexicontent')->get('background_color_opacity', 30);
+				if(!empty($background_color_loading)){
+					 $background_color_loading = "background-color:".$background_color_loading." !important;";
+				 }else{
+					$background_color_loading = "";
+				 }
+				 if(!empty($background_color_opacity)){
+					$background_color_opacity_b = $background_color_opacity / 100;
+					 $background_color_opacity = "opacity:".$background_color_opacity_b." !important;filter: alpha(opacity=".$background_color_opacity.") !important;";
+				 }else{
+					$background_color_opacity = "";
+				 }
+				 
+
+				$js .= '
+					jQuery( document ).ready(function() {
+    					jQuery(\'body\').prepend(
+						\'<div id="fc_filter_form_blocker">\' +
+						\'<div class="fc_blocker_opacity" style="'.$background_color_loading.''.$background_color_opacity.'"></div>\' +
+						\'<div class="fc_blocker_content">\' +
+						'.$logo.'
+						'.$textloading.'
+						'.$progressbar.'
+						\'</div></div>\' +
+						\'</div>\' +
+						\'</div>\'
+						);
+					});
+				';
 				break;
+
+				
+
 
 			// Used only by content / configuration forms, that have form elements needing this
 			case 'flexi-lib-form':
