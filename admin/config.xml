@@ -1374,10 +1374,7 @@
 			<field name="logo_alt" type="text" label="FLEXI_ALTERNATIVE_TEXT" description="" size="20" />
 			<field name="background_color_loading" type="color" label="FLEXI_BACKGROUND_COLOR" description="FLEXI_BACKGROUND_COLOR_DESC" default="#000000" />
 			<field name="background_color_opacity" type="number" label="FLEXI_BACKGROUND_OPACITY" description="FLEXI_BACKGROUND_OPACITY_DESC" default="30" />
-			<field name="background_color_content" type="color" label="FLEXI_CONTENT_BACKGROUND_COLOR" description="FLEXI_CONTENT BACKGROUND_COLOR_DESC" default="#ffffff" format="rgba" keywords="transparent,initial,inherit" />
-			
-			
-			
+			<field name="background_color_content" type="color" label="FLEXI_CONTENT_BACKGROUND_COLOR" description="FLEXI_CONTENT_BACKGROUND_COLOR_DESC" default="#ffffff" format="rgba" keywords="transparent,initial,inherit" />
 
 		<field name="" type="separator" default="FLEXI_LOADING_BACK" label="" level="level0" />
 
