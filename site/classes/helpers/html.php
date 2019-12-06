@@ -1948,12 +1948,12 @@ class flexicontent_html
 					$progressbar = "";
 				 }
 				 $url_logo = JComponentHelper::getParams('com_flexicontent')->get('url_logo', '');
+				 $logo_alt = JComponentHelper::getParams('com_flexicontent')->get('logo_alt', '');
 				 if( $url_logo ){
-					 $logo = "'<div class=\"fc_logo_loading\"><img src=\".$url_logo.\"><div>'+";
+					 $logo = "'<div class=\"fc_logo_loading\"><img src=\"$url_logo\" alt=".$logo_alt."><div>'+";
 				 }else{
 					$logo = "";
 				 }
-				 //TODO style of div content
 				$background_color_loading = JComponentHelper::getParams('com_flexicontent')->get('background_color_loading', '#000');
 				$background_color_opacity = JComponentHelper::getParams('com_flexicontent')->get('background_color_opacity', 30);
 				if(!empty($background_color_loading)){
@@ -1967,13 +1967,16 @@ class flexicontent_html
 				 }else{
 					$background_color_opacity = "";
 				 }
+				 $background_color_content = JComponentHelper::getParams('com_flexicontent')->get('background_color_content', '#fff');
+				 $background_color_content = "background:".$background_color_content." !important;";
+
 				 
 				$js .= '
 					jQuery( document ).ready(function() {
     					jQuery(\'body\').prepend(
 						\'<div id="fc_filter_form_blocker">\' +
 						\'<div class="fc_blocker_opacity" style="'.$background_color_loading.''.$background_color_opacity.'"></div>\' +
-						\'<div class="fc_blocker_content">\' +
+						\'<div class="fc_blocker_content" style="'.$background_color_content.'">\' +
 						'.$logo.'
 						'.$textloading.'
 						'.$progressbar.'
