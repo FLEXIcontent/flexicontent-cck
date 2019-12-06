@@ -1676,9 +1676,6 @@ select[multiple].use_select2_lib:focus {
 	width: 0;
 	background-color: #0099ff;
 }
-.fc_logo_loading img {
-	margin: auto;
-}
 .tooltip .tooltip-inner {
 	white-space: normal !important;
 	word-wrap: break-word !important;
@@ -1783,7 +1780,7 @@ div.current ul.config-option-list li fieldset {
 }
 .select2-container .select2-choice {
 	padding: 0 0 0 8px !important;
-	margin: 0 4px 0 0 !important;
+	margin: 0 !important;
 	font-weight: normal !important;
 	min-height: 26px;
 	height: auto !important;
@@ -1995,6 +1992,9 @@ div#permissions .tab-content {
 img.fc_field_image {
 	display: inline-block;
 	margin: 0px 4px 6px 0px;
+	padding: 1px;
+	border: 1px solid lightgray;
+	border-radius: 5px;
 }
 div .fc_image_thumb {
 	display: inline-block;
