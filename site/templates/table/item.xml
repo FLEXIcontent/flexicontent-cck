@@ -31,8 +31,8 @@
 			<field name="params_tab_item_container_info" type="separator" cssprep="1" default="FLEXI_STYLING" description="" level="level2" class="alert alert-info" />
 
 			<field name="item_colors_styling_grp" type="separator" cssprep="1" default="FLEXI_TMPL_COLORS" description="" level="level3" />
-			<field name="item_bg_color" type="color" cssprep="less" default="inherit" label="FLEXI_TMPL_BACKGROUND" description="FLEXI_TMPL_BACKGROUND_DESC" />
-			<field name="item_text_color" type="color" cssprep="less" default="inherit" label="FLEXI_TMPL_COLOR" description="FLEXI_TMPL_COLOR_DESC" />
+			<field name="item_bg_color" type="color" cssprep="less" default="inherit" label="FLEXI_TMPL_BACKGROUND" description="FLEXI_TMPL_BACKGROUND_DESC" format="rgba" keywords="transparent,initial,inherit"/>
+			<field name="item_text_color" type="color" cssprep="less" default="inherit" label="FLEXI_TMPL_COLOR" description="FLEXI_TMPL_COLOR_DESC" format="rgba" keywords="transparent,initial,inherit"/>
 
 			<field name="item_pad_styling_grp" type="separator" cssprep="1" default="FLEXI_TMPL_PADDING" description="" level="level3" />
 			<field name="item_pad_top" type="number" cssprep="less" hint="0" default="0" required="true" label="FLEXI_TMPL_PADDING_TOP" description="FLEXI_TMPL_ITEM_PADDINGTOP_DESC" min="0" max="80" step="1" />
@@ -42,7 +42,7 @@
 
 			<field name="item_border_styling_grp" type="separator" cssprep="1" default="FLEXI_TMPL_BORDER" description="" level="level3" />
 			<field name="item_border_radius" type="number" cssprep="less" hint="0" default="0" required="true" label="FLEXI_TMPL_BORDER_RADIUS" description="FLEXI_TMPL_BORDER_RADIUS_DESC" min="0" max="80" step="1" />
-			<field name="item_border_color" type="color" cssprep="less" default="inherit" label="FLEXI_TMPL_BORDER_COLOR" description="FLEXI_TMPL_BORDER_COLOR_DESC" />
+			<field name="item_border_color" type="color" cssprep="less" default="inherit" label="FLEXI_TMPL_BORDER_COLOR" description="FLEXI_TMPL_BORDER_COLOR_DESC" format="rgba" keywords="transparent,initial,inherit"/>
 			<field name="item_border_size" type="number" cssprep="less" hint="0" default="0" required="true" label="FLEXI_TMPL_BORDER_WIDTH" description="FLEXI_TMPL_BORDER_WIDTH_DESC" min="0" max="80" step="1" />
 			<field name="item_border_type" type="list" cssprep="less" hint="solid" default="solid" required="true" label="FLEXI_TMPL_BORDER_TYPE" description="FLEXI_TMPL_BORDER_TYPE_DESC" >
 				<option value="solid">FLEXI_SOLID</option>
@@ -60,8 +60,8 @@
 
 			<field name="title_cut_text" type="text" size="3" default="" label="FLEXI_TITLE_MAXLEN" description="FLEXI_TITLE_MAXLEN_DESC" />
 			<field name="item_title_colors_styling_grp" type="separator" cssprep="1" default="FLEXI_TMPL_COLORS" description="" level="level3" />
-			<field name="title_color" type="color" cssprep="less" default="inherit" label="FLEXI_TMPL_COLOR" description="FLEXI_TMPL_COLOR_DESC" />
-			<field name="title_bg_color" type="color" cssprep="less" default="inherit" label="FLEXI_TMPL_BACKGROUND" description="FLEXI_TMPL_BACKGROUND_DESC" />
+			<field name="title_color" type="color" cssprep="less" default="inherit" label="FLEXI_TMPL_COLOR" description="FLEXI_TMPL_COLOR_DESC" format="rgba" keywords="transparent,initial,inherit"/>
+			<field name="title_bg_color" type="color" cssprep="less" default="inherit" label="FLEXI_TMPL_BACKGROUND" description="FLEXI_TMPL_BACKGROUND_DESC" format="rgba" keywords="transparent,initial,inherit"/>
 
 			<field name="item_title_pad_styling_grp" type="separator" cssprep="1" default="FLEXI_TMPL_PADDING" description="" level="level3" />
 			<field name="title_pad_top" type="number" cssprep="less" hint="0" default="0" required="true" label="FLEXI_TMPL_PADDING_TOP" description="FLEXI_TMPL_PADDING_TOP_DESC" min="0" max="80" step="1" />
@@ -76,8 +76,8 @@
 			<field name="params_tab_labels_info" type="separator" cssprep="1" default="FLEXI_STYLING" description="" level="level2" class="alert alert-info" />
 
 			<field name="label_colors_styling_grp" type="separator" cssprep="1" default="FLEXI_TMPL_COLORS" description="" level="level3" />
-			<field name="label_txt_color" type="color" cssprep="less" hint="#ffffff" default="#ffffff" required="true" label="FLEXI_TMPL_COLOR" description="FLEXI_TMPL_COLOR_DESC" />
-			<field name="label_bg_color" type="color" cssprep="less" hint="#999999" default="#999999" required="true" label="FLEXI_TMPL_BACKGROUND" description="FLEXI_TMPL_BACKGROUND_DESC" />
+			<field name="label_txt_color" type="color" cssprep="less" hint="#ffffff" default="#ffffff" required="true" label="FLEXI_TMPL_COLOR" description="FLEXI_TMPL_COLOR_DESC" format="rgba" keywords="transparent,initial,inherit"/>
+			<field name="label_bg_color" type="color" cssprep="less" hint="#999999" default="#999999" required="true" label="FLEXI_TMPL_BACKGROUND" description="FLEXI_TMPL_BACKGROUND_DESC" format="rgba" keywords="transparent,initial,inherit"/>
 
 			<field name="label_pad_styling_grp" type="separator" cssprep="1" default="FLEXI_TMPL_PADDING" description="" level="level3" />
 			<field name="label_pad_top" type="number" cssprep="less" hint="2" default="2" required="true" label="FLEXI_TMPL_PADDING_TOP" description="FLEXI_TMPL_PADDING_TOP_DESC" min="0" max="80" step="1" />
@@ -97,15 +97,15 @@
 
 			<field name="tab_styling_grp" type="separator" cssprep="1" default="FLEXI_TMPL_TABS_STYLING" description="" level="level2" />
 			<field name="tab_handles_grp" type="separator" cssprep="1" default="FLEXI_TMPL_TABS_HANDLES" description="" level="level3" />
-			<field name="tab_bg_color_start" type="color" cssprep="less" hint="#3093c7" default="#3093c7" required="true" label="FLEXI_TMPL_TAB_BG_START" description="FLEXI_TMPL_TAB_BG_START_DESC" />
-			<field name="tab_bg_color_end" type="color" cssprep="less" hint="#1c5a85" default="#1c5a85" required="true" label="FLEXI_TMPL_TAB_BG_END" description="FLEXI_TMPL_TAB_BG_END_DESC" />
-			<field name="tab_title_color" type="color" cssprep="less" hint="#ffffff" default="#ffffff" required="true" label="FLEXI_TMPL_TAB_TITLE_COLOR" description="FLEXI_TMPL_TAB_TITLE_COLOR_DESC" />
+			<field name="tab_bg_color_start" type="color" cssprep="less" hint="#3093c7" default="#3093c7" required="true" label="FLEXI_TMPL_TAB_BG_START" description="FLEXI_TMPL_TAB_BG_START_DESC" format="rgba" keywords="transparent,initial,inherit"/>
+			<field name="tab_bg_color_end" type="color" cssprep="less" hint="#1c5a85" default="#1c5a85" required="true" label="FLEXI_TMPL_TAB_BG_END" description="FLEXI_TMPL_TAB_BG_END_DESC" format="rgba" keywords="transparent,initial,inherit"/>
+			<field name="tab_title_color" type="color" cssprep="less" hint="#ffffff" default="#ffffff" required="true" label="FLEXI_TMPL_TAB_TITLE_COLOR" description="FLEXI_TMPL_TAB_TITLE_COLOR_DESC" format="rgba" keywords="transparent,initial,inherit"/>
 
 			<field name="tab_content_grp" type="separator" cssprep="1" default="FLEXI_TMPL_TABS_CONTENT_BOX" description="" level="level3" />
-			<field name="tab_content_bg_color" type="color" cssprep="less" hint="#ffffff" default="#ffffff" required="true" label="FLEXI_TMPL_COLOR" description="FLEXI_TMPL_COLOR_DESC" />
+			<field name="tab_content_bg_color" type="color" cssprep="less" hint="#ffffff" default="#ffffff" required="true" label="FLEXI_TMPL_COLOR" description="FLEXI_TMPL_COLOR_DESC" format="rgba" keywords="transparent,initial,inherit"/>
 			<field name="tab_content_border_radius" type="number" cssprep="less" hint="0" default="0" required="true" label="FLEXI_TMPL_BORDER_RADIUS" description="FLEXI_TMPL_BORDER_RADIUS_DESC" />
 			<field name="tab_content_border_size_top" type="number" cssprep="less" hint="1" default="1" required="true" label="FLEXI_TMPL_TAB_CONTENT_TOP_SIZE" description="FLEXI_TMPL_TAB_CONTENT_TOP_SIZE_DESC" />
-			<field name="tab_content_border_color_top" type="color" cssprep="less" default="inherit" label="FLEXI_TMPL_TAB_CONTENT_TOP_COLOR" description="FLEXI_TMPL_TAB_CONTENT_TOP_COLOR_DESC" />
+			<field name="tab_content_border_color_top" type="color" cssprep="less" default="inherit" label="FLEXI_TMPL_TAB_CONTENT_TOP_COLOR" description="FLEXI_TMPL_TAB_CONTENT_TOP_COLOR_DESC" format="rgba" keywords="transparent,initial,inherit" />
 
 			<field name="tabs_labels_grp" type="separator" default="FLEXI_TMPL_TAB_TITLES" description="" level="level2" />
 
@@ -153,8 +153,8 @@
 			</field>
 
 			<field name="column_colors_styling_grp" type="separator" cssprep="1" default="FLEXI_TMPL_COLORS" description="" level="level3" />
-			<field name="column_color" type="color" cssprep="less" default="inherit" label="FLEXI_TMPL_COLOR" description="FLEXI_TMPL_COLOR_DESC" />
-			<field name="column_bg_color" type="color" cssprep="less" default="inherit" label="FLEXI_TMPL_BACKGROUND" description="FLEXI_TMPL_BACKGROUND_DESC" />
+			<field name="column_color" type="color" cssprep="less" default="inherit" label="FLEXI_TMPL_COLOR" description="FLEXI_TMPL_COLOR_DESC" format="rgba" keywords="transparent,initial,inherit"/>
+			<field name="column_bg_color" type="color" cssprep="less" default="inherit" label="FLEXI_TMPL_BACKGROUND" description="FLEXI_TMPL_BACKGROUND_DESC" format="rgba" keywords="transparent,initial,inherit"/>
 
 			<field name="column_padding_styling_grp" type="separator" cssprep="1" default="FLEXI_TMPL_BORDER" description="" level="level3" />
 			<field name="column_pad_top" type="number" cssprep="less" hint="10" default="10" required="true" label="FLEXI_TMPL_PADDING_TOP" description="FLEXI_TMPL_PADDING_TOP_DESC" min="0" max="80" step="1" />
@@ -165,7 +165,7 @@
 			<field name="column_border_styling_grp" type="separator" cssprep="1" default="FLEXI_TMPL_BORDER" description="" level="level3" />
 			<field name="column_border_radius" type="number" cssprep="less" hint="0" default="0" required="true" label="FLEXI_TMPL_BORDER_RADIUS" description="FLEXI_TMPL_BORDER_RADIUS_DESC" min="0" max="80" step="1" />
 			<field name="column_border_size" type="number" cssprep="less" hint="1" default="1" required="true" label="FLEXI_TMPL_BORDER_WIDTH" description="FLEXI_TMPL_BORDER_WIDTH_DESC" />
-			<field name="column_border_color" type="color" cssprep="less" default="inherit" label="FLEXI_TMPL_BORDER_COLOR" description="FLEXI_TMPL_BORDER_COLOR_DESC" />
+			<field name="column_border_color" type="color" cssprep="less" default="inherit" label="FLEXI_TMPL_BORDER_COLOR" description="FLEXI_TMPL_BORDER_COLOR_DESC" format="rgba" keywords="transparent,initial,inherit"/>
 			<field name="column_border_type" type="list" cssprep="less" hint="solid" default="solid" required="true" label="FLEXI_TMPL_BORDER_TYPE" description="FLEXI_TMPL_BORDER_TYPE_DESC" >
 				<option value="solid">FLEXI_SOLID</option>
 				<option value="dotted">FLEXI_DOTTED</option>

@@ -17,7 +17,7 @@
 			<field name="custom_layout_title" type="text" size="3" not_inherited="1" default="" label="FLEXI_LAYOUT_CUSTOM_DISPLAY_TITLE" description="FLEXI_LAYOUT_CUSTOM_DISPLAY_TITLE_DESC" />
 			
 			<field name="title_grp" type="separator" cssprep="1" default="FLEXI_TMPL_ITEM_TITLE" description="" level="level2" />
-			<field name="title_color" type="color" cssprep="less" default="inherit" label="Title color" description="Color of title" />
+			<field name="title_color" type="color" cssprep="less" default="inherit" label="Title color" description="Color of title" format="rgba" keywords="transparent,initial,inherit"/>
 			<field name="title_cut_text" type="text" size="3" default="" label="FLEXI_TITLE_MAXLEN" description="FLEXI_TITLE_MAXLEN_DESC" />
 			
 			<field name="field_cols_grp" type="separator" cssprep="1" default="Field columns" description="" level="level2" />
@@ -34,9 +34,9 @@
 			
 			<field name="tab_styling_grp" type="separator" cssprep="1" default="FLEXI_TMPL_TABS_STYLING" description="" level="level2" />
 			<field name="tab_handles_grp" type="separator" cssprep="1" default="FLEXI_TMPL_TABS_HANDLES" description="" level="level3" />
-			<field name="tab_bg_color_start" type="color" cssprep="less" hint="#3093c7" default="#3093c7" required="true" label="FLEXI_TMPL_TAB_BG_START" description="FLEXI_TMPL_TAB_BG_START_DESC" />
-			<field name="tab_bg_color_end" type="color" cssprep="less" hint="#1c5a85" default="#1c5a85" required="true" label="FLEXI_TMPL_TAB_BG_END" description="FLEXI_TMPL_TAB_BG_END_DESC" />
-			<field name="tab_title_color" type="color" cssprep="less" hint="#ffffff" default="#ffffff" required="true" label="FLEXI_TMPL_TAB_TITLE_COLOR" description="FLEXI_TMPL_TAB_TITLE_COLOR_DESC" />
+			<field name="tab_bg_color_start" type="color" cssprep="less" hint="#3093c7" default="#3093c7" required="true" label="FLEXI_TMPL_TAB_BG_START" description="FLEXI_TMPL_TAB_BG_START_DESC" format="rgba" keywords="transparent,initial,inherit"/>
+			<field name="tab_bg_color_end" type="color" cssprep="less" hint="#1c5a85" default="#1c5a85" required="true" label="FLEXI_TMPL_TAB_BG_END" description="FLEXI_TMPL_TAB_BG_END_DESC" format="rgba" keywords="transparent,initial,inherit"/>
+			<field name="tab_title_color" type="color" cssprep="less" hint="#ffffff" default="#ffffff" required="true" label="FLEXI_TMPL_TAB_TITLE_COLOR" description="FLEXI_TMPL_TAB_TITLE_COLOR_DESC" format="rgba" keywords="transparent,initial,inherit"/>
 			
 			<field name="subtitle_tabs_grp" type="separator" default="SubTitle Tabs" description="" level="level2" />
 			<field name="subtitle_tab1_label" type="text" default="" label="Label for Tab 1" description="The text for this label is filter via JText (you can add to your ini language files)" />
