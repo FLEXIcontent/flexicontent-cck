@@ -1630,11 +1630,11 @@ select[multiple].use_select2_lib:focus {
 	opacity: 1;
 	filter: alpha(opacity=100);
 	width: auto;
-	padding: 20px 0px 26px 30px;
+	padding: 26px 31px 26px 31px;
 	margin: 0px;
 	font-size: 12px;
 	font-weight: bold;
-	border: 1px solid lightgray;
+	border: 0px solid lightgray;
 	border-radius: 8px;
 	text-align: right;
 	width: 300px;
@@ -1643,7 +1643,7 @@ select[multiple].use_select2_lib:focus {
 }
 #fc_filter_form_blocker .fc_blocker_bar {
 	display: block;
-	width: 300px;
+	width: 265px;
 	height: 22px;
 	border-radius: 4px;
 	background-color: #f5f5f5;
@@ -1661,6 +1661,9 @@ select[multiple].use_select2_lib:focus {
 	line-height: 22px;
 	width: 0;
 	background-color: #0099ff;
+}
+.fc_logo_loading img {
+	margin: auto;
 }
 .tooltip .tooltip-inner {
 	white-space: normal !important;
