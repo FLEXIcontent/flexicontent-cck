@@ -1676,6 +1676,9 @@ select[multiple].use_select2_lib:focus {
 	width: 0;
 	background-color: #0099ff;
 }
+.fc_logo_loading img {
+	margin: auto;
+}
 .tooltip .tooltip-inner {
 	white-space: normal !important;
 	word-wrap: break-word !important;
