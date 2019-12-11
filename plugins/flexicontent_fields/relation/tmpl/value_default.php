@@ -1,12 +1,8 @@
 <?php
 foreach ($related_items_sets as $n => $related_items)
 {
-	// Skip empty if not in field group
-	if (empty($related_items) && !$is_ingroup)
-	{
-		continue;
-	}
-
+	// Do not skip loop, if empty($related_items)
+	// because we display other info, like submit related button
 	$HTML = new stdClass();
 
 
@@ -72,7 +68,7 @@ foreach ($related_items_sets as $n => $related_items)
 
 	$HTML->total_info = '';
 
-	if ($disp->total_info)
+	if ($disp->total_info && !empty($related_items))
 	{
 		$total_count = isset($options->total) ? $options->total : count($related_items);
 		$total_append_text = JText::_($field->parameters->get('total_append_text', ''));
