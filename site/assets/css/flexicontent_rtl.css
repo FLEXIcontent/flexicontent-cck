@@ -3436,7 +3436,7 @@ select[multiple].use_select2_lib:focus {
 	height: 100%;
 }
 #fc_filter_form_blocker .fc_blocker_content {
-	display: block;
+	display: table;
 	z-index: 2001;
 	position: fixed;
 	top: 35%;
