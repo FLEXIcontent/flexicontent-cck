@@ -334,10 +334,15 @@ foreach($values as $file_id)
 			}
 
 			// The download button in a mini form ...
-			$actions_arr[] = '
-				<a href="' . $dl_link . '" class="' . $file_classes . ' btn-success fcfile_downloadFile" title="'.htmlspecialchars($downloadsinfo, ENT_COMPAT, 'UTF-8').'" ' . ($non_file_url ? 'target="_blank"' : '') . '>
+			// Download 
+			$_download_btn_html = '
+				<a href="' . $dl_link . '" class="' . $file_classes . ' btn-dwn-controls fcfile_downloadFile" title="'.htmlspecialchars($downloadsinfo, ENT_COMPAT, 'UTF-8').'" ' . ($non_file_url ? 'target="_blank"' : '') . '>
+					<span class="icon-chevron-down large-icon"> </span>
 					' . $downloadstext . '
-				</a>';
+				</a>
+			';
+			// Do not add it here ... we will add it inline with player
+			//$actions_arr[] = $_download_btn_html;
 		}
 
 		if ($authorized && $allowview && !$file_data->url)
@@ -500,19 +505,21 @@ foreach($values as $file_id)
 			data-wfpeaks="' . htmlspecialchars($peakspath, ENT_COMPAT, 'UTF-8') . '"
 			peakspath
 		></span>
-		<div>
-			<div id="fc_mediafile_controls_' . $item->id . '_' . $FN_n . '" class="fc_mediafile_controls">
-				<input type="button" class="btn btn-success playBtn" value="Play" style="color: black;"/>
-				<input type="button" class="btn btn pauseBtn" value="Pause" style="color: black;"/>
-				<input type="button" class="btn btn stopBtn" value="Stop" style="color: black;"/>
-				<input type="button" class="btn btn-primary loadBtn" value="Load" style="color: black;"/>
-			</div>
-		</div>
-		<div id="fc_mediafile_audio_spectrum_box_' . $item->id . '_' . $FN_n . '" class="fc_mediafile_audio_spectrum_box" style="display: block; margin-top: 8px; position: relative; border: 1px dashed;">
+		<div id="fc_mediafile_audio_spectrum_box_' . $item->id . '_' . $FN_n . '" class="fc_mediafile_audio_spectrum_box" style="display: block; margin-top: 8px; position: relative;">
 			<div class="progress progress-striped active" style="visibility: hidden; position: absolute; width: 70%; top: 40%; left: 15%;">
 				<div class="bar" style="width: 0%;"></div>
 			</div>
 			<div id="fc_mediafile_audio_spectrum_' . $item->id . '_' . $FN_n . '" class="fc_mediafile_audio_spectrum"></div>
+		</div>
+		<div>
+			<div id="fc_mediafile_controls_' . $item->id . '_' . $FN_n . '" class="fc_mediafile_controls">
+				<button type="button" class="playBtn icon-play-circle controls" title="Play"></button>
+				<button type="button" class="pauseBtn icon-pause-circle controls" title="Pause"></button>
+				<button type="button" class="stopBtn icon-stop-circle controls" title="Stop"></button>
+				<button type="button" class="loadBtn icon-loop controls" title="Load"></button>
+
+				<?php if ($allowdownloads) { echo $_download_btn_html; } ?>
+			</div>
 		</div>
 		';
 
@@ -522,8 +529,9 @@ foreach($values as $file_id)
 	 */
 	if (isset($file_data->media_type))
 	{
-		$mediadata = array('state', 'media_type', 'media_format', 'codec_type', 'codec_name', 'codec_long_name',
-			'resolution', 'fps', 'bit_rate', 'bits_per_sample', 'sample_rate', 'duration',
+		$mediadata = array(
+			//'state', 'media_type', 'codec_type', 'codec_name', 'codec_long_name', 'resolution', 'fps',
+			'media_format', 'bit_rate', 'bits_per_sample', 'sample_rate', 'duration',
 			'channels', 'channel_layout', 'checked_out', 'checked_out_time');
 
 		$html .= '<table class="table"><tr><td colspan="2"><b>Audio properties</b></td><tr>';

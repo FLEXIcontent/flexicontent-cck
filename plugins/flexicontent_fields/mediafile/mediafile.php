@@ -644,6 +644,7 @@ class plgFlexicontent_fieldsMediafile extends FCField
 			flexicontent_html::loadFramework('flexi-lib');
 			JHtml::addIncludePath(JPATH_SITE . '/components/com_flexicontent/helpers/html');
 			$document->addScript('https://unpkg.com/wavesurfer.js/dist/wavesurfer.min.js');
+			$document->addScript('https://unpkg.com/wavesurfer.js/dist/plugin/wavesurfer.cursor.js');
 			$document->addScript(JUri::root(true) . '/plugins/flexicontent_fields/mediafile/js/form.js', array('version' => FLEXI_VHASH));
 		}
 
