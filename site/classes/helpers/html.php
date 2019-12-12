@@ -1961,12 +1961,6 @@ class flexicontent_html
 				 }else{
 					$background_color_loading = "";
 				 }
-				 if(!empty($background_color_opacity)){
-					$background_color_opacity_b = $background_color_opacity / 100;
-					 $background_color_opacity = "opacity:".$background_color_opacity_b." !important;filter: alpha(opacity=".$background_color_opacity.") !important;";
-				 }else{
-					$background_color_opacity = "";
-				 }
 				 $background_color_content = JComponentHelper::getParams('com_flexicontent')->get('background_color_content', '#fff');
 				 $background_color_content = "background:".$background_color_content." !important;";
 
@@ -1975,7 +1969,7 @@ class flexicontent_html
 					jQuery( document ).ready(function() {
     					jQuery(\'body\').prepend(
 						\'<div id="fc_filter_form_blocker">\' +
-						\'<div class="fc_blocker_opacity" style="'.$background_color_loading.''.$background_color_opacity.'"></div>\' +
+						\'<div class="fc_blocker_opacity" style="'.$background_color_loading.'"></div>\' +
 						\'<div class="fc_blocker_content" style="'.$background_color_content.'">\' +
 						'.$logo.'
 						'.$textloading.'
