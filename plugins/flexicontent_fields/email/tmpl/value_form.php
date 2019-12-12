@@ -77,15 +77,22 @@ foreach ($values as $value)
 	}
 
 	//Captcha
-		$captcha_display = $field->parameters->get('display_captcha', 0);
-		if($captcha_display){
-			JPluginHelper::importPlugin('captcha');
-			$dispatcher = JEventDispatcher::getInstance();
-			$dispatcher->trigger('onInit','captcha_div');
-			$captcha_div = '<div id="captcha_div"></div>';
-		}else {
-			$captcha_div='';
-		}
+	$captcha_display = $field->parameters->get('display_captcha', 0);
+    $joomla_captcha = JFactory::getConfig()->get('captcha');
+if ( $joomla_captcha != '0' && $captcha_display) {
+    JPluginHelper::importPlugin('captcha');
+    $dispatcher = JDispatcher::getInstance();
+    // This will put the code to load reCAPTCHA's JavaScript file into your <head>
+    $dispatcher->trigger('onInit', 'dynamic_recaptcha_1');
+    // This will return the array of HTML code.
+    $recaptcha = $dispatcher->trigger('onDisplay', array(null, 'dynamic_recaptcha_1', 'class="required"'));
+}
+  if (isset($recaptcha[0]) && $joomla_captcha != "0" && $captcha_display != "0") {
+        $captcha_display= $recaptcha[0];
+}else{
+    $captcha_display="";
+  }
+  
 		// TODO add position for label
 
 	//Fake id form, cutt email on @ and set startemail
@@ -188,7 +195,7 @@ foreach ($values as $value)
 			'.$titleformD.'
 			'.$fields_display.'
 			'.$consent_field.'
-			'.$captcha_div.'
+			'.$captcha_display.'
 		<input type="submit" name="submit" value="'.JText::_('FLEXI_FIELD_EMAIL_SUBMIT_LABEL_VALUE').'" class="'.$submit_class.'">
 		<input type="hidden" name="emailtask" value="plg.email.submit" />
 		<input type="hidden" name="formid" value="'.$formid.'" />
