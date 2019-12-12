@@ -62,6 +62,21 @@
 			<field name="lowres_minwidth" type="text" size="8" default="800" label="FLEXI_MOBILE_RES_MINWIDTH" description="FLEXI_MOBILE_RES_MINWIDTH_DESC"/>
 			<field name="lowres_minheight" type="text" size="8" default="480" label="FLEXI_MOBILE_RES_MINHEIGHT" description="FLEXI_MOBILE_RES_MINHEIGHT_DESC"/-->
 
+		<field name="" type="separator" default="FLEXI_LOADING_OPTION" label="" level="level0" />
+
+			<field name="disp_textloading" type="radio" default="1" label="FLEXI_LOADING_DISP_TEXT" description="FLEXI_LOADING_DISP_TEXT_DESC" class="btn-group group-fcinfo" >
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="disp_progressbar" type="radio" default="1" label="FLEXI_LOADING_DISP_PROGBAR" description="FLEXI_LOADING_DISP_PROGBAR_DESC" class="btn-group group-fcinfo" >
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="url_logo" type="fcmedia" label="FLEXI_IMAGE" description="FLEXI_CHOOSE_IMAGE_FOR_LOADING" />
+			<field name="logo_alt" type="text" label="FLEXI_ALTERNATIVE_TEXT" description="" size="20" />
+			<field name="background_color_loading" type="color" label="FLEXI_BACKGROUND_COLOR" description="FLEXI_BACKGROUND_COLOR_DESC" default="#000000" />
+			<field name="background_color_opacity" type="number" label="FLEXI_BACKGROUND_OPACITY" description="FLEXI_BACKGROUND_OPACITY_DESC" default="30" />
+			<field name="background_color_content" type="color" label="FLEXI_CONTENT_BACKGROUND_COLOR" description="FLEXI_CONTENT BACKGROUND_COLOR_DESC" default="#ffffff" format="rgba" keywords="transparent,initial,inherit" />
 
 	</fieldset>
 
@@ -1376,30 +1391,6 @@
 
 
 		<field name="" type="separator" default="FLEXI_ITEM_FORM" level="tabset_close" box_type="1" remove_boxes="2" />
-	</fieldset>
-
-	<fieldset name="loading" label="FLEXI_LOADING_OPTION" description="" >
-		
-		<field name="" type="separator" default="FLEXI_LOADING_FRONT" label="" level="level0" />
-			<field name="disp_textloading" type="radio" default="1" label="FLEXI_LOADING_DISP_TEXT" description="FLEXI_LOADING_DISP_TEXT_DESC" class="btn-group group-fcinfo" >
-					<option value="0">FLEXI_NO</option>
-					<option value="1">FLEXI_YES</option>
-				</field>
-			<field name="disp_progressbar" type="radio" default="1" label="FLEXI_LOADING_DISP_PROGBAR" description="FLEXI_LOADING_DISP_PROGBAR_DESC" class="btn-group group-fcinfo" >
-					<option value="0">FLEXI_NO</option>
-					<option value="1">FLEXI_YES</option>
-				</field>
-			<field name="url_logo" type="fcmedia" label="FLEXI_IMAGE" description="FLEXI_CHOOSE_IMAGE_FOR_LOADING" />
-			<field name="logo_alt" type="text" label="FLEXI_ALTERNATIVE_TEXT" description="" size="20" />
-			<field name="background_color_loading" type="color" label="FLEXI_BACKGROUND_COLOR" description="FLEXI_BACKGROUND_COLOR_DESC" default="#000000" />
-			<field name="background_color_opacity" type="number" label="FLEXI_BACKGROUND_OPACITY" description="FLEXI_BACKGROUND_OPACITY_DESC" default="30" />
-			<field name="background_color_content" type="color" label="FLEXI_CONTENT_BACKGROUND_COLOR" description="FLEXI_CONTENT BACKGROUND_COLOR_DESC" default="#ffffff" format="rgba" keywords="transparent,initial,inherit" />
-			
-			
-			
-
-		<field name="" type="separator" default="FLEXI_LOADING_BACK" label="" level="level0" />
-
 	</fieldset>
 
 	<fieldset name="workflow_fset" label="FLEXI_WORKFLOW_CONF" description="" >
