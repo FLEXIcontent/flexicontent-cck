@@ -785,7 +785,7 @@ class FCIndexedField extends FCField
 					$mvno = $single_master ? '0' : $n;
 					$per_val_js .= "
 						fc_cascade_field_funcs['".$srcELid.'_'.$n."'] = function(){
-							fcCascadedField(".$field->id.", '".$item->id."', '".$field->field_type."', 'select#".$srcELid.'_'.$mvno.", input.".$srcELid.'_'.$mvno."', '".$trgELid.'_'.$n."', '".$cascade_prompt."', ".static::$promptEnabled.", ".$n.");
+							fcCascadedField(".$field->id.", '".$item->id."', '".$field->field_type."', 'select#".$srcELid.'_'.$mvno.", input.".$srcELid.'_'.$mvno."', '".$trgELid.'_'.$n."', '".htmlspecialchars( $cascade_prompt, ENT_COMPAT, 'UTF-8' )."', ".static::$promptEnabled.", ".$n.");
 						}
 						fc_cascade_field_funcs['".$srcELid.'_'.$n."']();
 					";
