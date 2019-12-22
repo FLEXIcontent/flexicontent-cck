@@ -441,20 +441,26 @@ if ($filter_autosubmit) {
 	$js = '
 		jQuery(document).ready(function() {
 			var form=document.getElementById("'.$form_id.'");
-			jQuery(form.elements).filter("input:not(.fc_autosubmit_exclude):not(.select2-input), select:not(.fc_autosubmit_exclude)").on("change", function() {
-				adminFormPrepare(form, 2);
-			});
-			jQuery(form).attr("data-fc-autosubmit", "2");
+			if (!!form)
+			{
+				jQuery(form.elements).filter("input:not(.fc_autosubmit_exclude):not(.select2-input), select:not(.fc_autosubmit_exclude)").on("change", function() {
+					adminFormPrepare(form, 2);
+				});
+				jQuery(form).attr("data-fc-autosubmit", "2");
+			}
 		});
 	';
 } else {
 	$js = '
 		jQuery(document).ready(function() {
 			var form=document.getElementById("'.$form_id.'");
-			jQuery(form.elements).filter("input:not(.fc_autosubmit_exclude):not(.select2-input), select:not(.fc_autosubmit_exclude)").on("change", function() {
-				adminFormPrepare(form, 1);
-			});
-			jQuery(form).attr("data-fc-autosubmit", "1");
+			if (!!form)
+			{
+				jQuery(form.elements).filter("input:not(.fc_autosubmit_exclude):not(.select2-input), select:not(.fc_autosubmit_exclude)").on("change", function() {
+					adminFormPrepare(form, 1);
+				});
+				jQuery(form).attr("data-fc-autosubmit", "1");
+			}
 		});
 	';
 }

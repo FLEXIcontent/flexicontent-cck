@@ -329,37 +329,46 @@ if ( $use_search || $use_filters ) : /* BOF search and filters block */
 
 </div>
 
-<?php endif; /* EOF search and filter block */
+<?php
 
-// Automatic submission
-if ($filter_autosubmit) {
-	$js = '
-		jQuery(document).ready(function() {
-			var form=document.getElementById("'.$form_id.'");
-			jQuery(form.elements).filter("input:not(.fc_autosubmit_exclude):not(.select2-input), select:not(.fc_autosubmit_exclude)").on("change", function() {
-				adminFormPrepare(form, 2);
+	// Automatic submission
+	if ($filter_autosubmit) {
+		$js = '
+			jQuery(document).ready(function() {
+				var form=document.getElementById("'.$form_id.'");
+				if (!!form)
+				{
+					jQuery(form.elements).filter("input:not(.fc_autosubmit_exclude):not(.select2-input), select:not(.fc_autosubmit_exclude)").on("change", function() {
+						adminFormPrepare(form, 2);
+					});
+					jQuery(form).attr("data-fc-autosubmit", "2");
+				}
 			});
-			jQuery(form).attr("data-fc-autosubmit", "2");
-		});
-	';
-} else {
-	$js = '
-		jQuery(document).ready(function() {
-			var form=document.getElementById("'.$form_id.'");
-			jQuery(form.elements).filter("input:not(.fc_autosubmit_exclude):not(.select2-input), select:not(.fc_autosubmit_exclude)").on("change", function() {
-				adminFormPrepare(form, 1);
+		';
+	} else {
+		$js = '
+			jQuery(document).ready(function() {
+				var form=document.getElementById("'.$form_id.'");
+				if (!!form)
+				{
+					jQuery(form.elements).filter("input:not(.fc_autosubmit_exclude):not(.select2-input), select:not(.fc_autosubmit_exclude)").on("change", function() {
+						adminFormPrepare(form, 1);
+					});
+					jQuery(form).attr("data-fc-autosubmit", "1");
+				}
 			});
-			jQuery(form).attr("data-fc-autosubmit", "1");
-		});
-	';
-}
+		';
+	}
 
-// Notify select2 fields to clear their values when reseting the form
-$js .= '
-		jQuery(document).ready(function() {
-			jQuery("#'.$form_id.' .fc_button.button_reset").on("click", function() {
-				jQuery("#'.$form_id.'_filter_box .use_select2_lib").select2("val", "");
+	// Notify select2 fields to clear their values when reseting the form
+	$js .= '
+			jQuery(document).ready(function() {
+				jQuery("#'.$form_id.' .fc_button.button_reset").on("click", function() {
+					jQuery("#'.$form_id.'_filter_box .use_select2_lib").select2("val", "");
+				});
 			});
-		});
-	';
-$document->addScriptDeclaration($js);
+		';
+	$document->addScriptDeclaration($js);
+
+endif; /* EOF search and filter block */
+?>
