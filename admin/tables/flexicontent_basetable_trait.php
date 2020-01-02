@@ -351,7 +351,7 @@ trait flexicontent_basetable_trait
 				$query->where($this->_db->quoteName('catid') . ' = ' . (int) $this->catid);
 			}
 
-			if (!empty($this->language))
+			if (!empty($this->language) && $this->_record_name !== 'tag')  // Do not use language FOR TAGS yet ...
 			{
 				$query->where($this->_db->quoteName('language') . ' = ' . $this->_db->Quote($this->language));
 			}
