@@ -1,0 +1,362 @@
+<?xml version="1.0" encoding="utf-8"?>
+<form>
+	<author>FLEXIcontent Team</author>
+	<website>www.flexicontent.org</website>
+	<email>info@flexicontent.org</email>
+	<license>GPLv3</license>
+	<version>1.0</version>
+	<release>15 November 2017</release>
+	<microdata_support>1</microdata_support>
+	
+	<defaulttitle>FLEXI_TMPL_CORE-NEWS_CATEGORY_DEFAULT_TITLE</defaulttitle>
+	<description>FLEXI_TMPL_CORE-NEWS_CATEGORY_SHORT_DESC</description>
+
+	<fields name="attribs">
+		<fieldset name="attribs" addfieldpath="/administrator/components/com_flexicontent/elements">
+
+			<field name="items_sets_head_break" type="separator" level="level_br" />
+
+			<field name="lead_num" type="text" size="3" default="" label="# Featured" description="Number of featured items. Note effects items until featured number of items is reached, then all remains items in current and in next pages will be shown with 'standard' configuration" class="input-small" />
+
+			<!--field name="templatehtmlmode" type="separator" default="FLEXI_TEMPLATE_HTML_MODE" level="level2" /-->
+			<field name="htmlmode" type="radio" default="" label="FLEXI_HTML_MODE" description="FLEXI_HTML_MODE_DESC" filter="int" class="btn-group">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_XHTML</option>
+				<option value="1">FLEXI_HTML5</option>
+			</field>
+	
+			<field name="items_sets_head_break2" type="separator" level="level_br" />
+			<field name="content_display_options_head_break" type="separator" level="level_br" />
+
+			<field name="items_tabset_start" type="separator" default="ITEM_TABSET" level="tabset_start" />
+
+
+				<field name="items_tab_content_display_options" type="separator" default="FLEXI_COMMON" icon_class="icon-screen" level="tab_open" box_type="1" />
+
+					<field name="custom_layout_title" type="text" size="3" not_inherited="1" default="" label="FLEXI_LAYOUT_CUSTOM_DISPLAY_TITLE" description="FLEXI_LAYOUT_CUSTOM_DISPLAY_TITLE_DESC" />
+
+					<field name="title_grp" type="separator" cssprep="1" default="FLEXI_TMPL_ITEM_TITLE" description="" level="level2" />
+					<field name="title_color" type="color" cssprep="less" default="inherit" label="Title text color" description="Color of title text" />
+					<field name="title_background" type="color" cssprep="less" default="inherit" label="Title background" description="Color of title background" />
+					<field name="title_font_size" type="text" cssprep="less" default="inherit" label="Title font size" description="Size of title text" />
+
+					<field name="label_styling_grp" type="separator" cssprep="1" default="FLEXI_TMPL_LABEL_STYLING" description="" level="level2" />
+					<field name="label_bg_color" type="color" cssprep="less" default="inherit" label="FLEXI_TMPL_LABEL_BG" description="FLEXI_TMPL_LABEL_BG_DESC" />
+					<field name="label_txt_color" type="color" cssprep="less" default="inherit" label="FLEXI_TMPL_LABEL_TXT_COLOR" description="FLEXI_TMPL_LABEL_TXT_COLOR_DESC" />
+					<field name="label_radius" type="number" cssprep="less" default="3" label="FLEXI_TMPL_LABEL_RADIUS" description="FLEXI_TMPL_LABEL_RADIUS_DESC" min="0" max="80" step="1" />
+
+					<field name="readon_styling_grp" type="separator" default="Readon styling" description="" level="level2" />
+					<field name="readon_bg_color" type="color" cssprep="less" default="inherit" label="FLEXI_TMPL_LABEL_BG" description="FLEXI_TMPL_LABEL_BG_DESC" />
+					<field name="readon_txt_color" type="color" cssprep="less" default="inherit" label="FLEXI_TMPL_LABEL_TXT_COLOR" description="FLEXI_TMPL_LABEL_TXT_COLOR_DESC" />
+					<field name="readon_font_size" type="text" cssprep="less" default="inherit" label="Title font size" description="Size of title text" />
+					<field name="readon_type" type="radio" default="" label="Readon type" description="FLEXI_MAX_ITEM_COLS_RESPONSIVE_DESC">
+						<option value="">FLEXI_USE_GLOBAL</option>
+						<option value="0">FLEXI_TEXT</option>
+						<option value="1">FLEXI_IMAGE</option>
+					</field>
+					<field name="readon_image" type="media" default="" label="Read more image" description="Select image to use instead of read more, this is maybe useful if your website is not multilingual" />
+	
+				<field name="items_tab_featured" type="separator" default="Featured items" icon_class="icon-list" level="tab_open" box_type="1" />
+				<field name="items_tabset_featured_start" type="separator" default="ITEMS_FEATURED_TABSET" level="tabset_start" />
+
+					<field name="items_tab_featured_placement" type="separator" default="FLEXI_PLACEMENT" icon_class="icon-grid" level="tab_open" box_type="1" />
+
+						<field name="items_featured_basic" type="separator" default="FLEXI_BASIC" icon_class="icon-cog" level="level2" />
+						<field name="item_columns_feat" type="list" default="" hint="1" label="FLEXI_MAX_ITEM_COLS_RESPONSIVE" description="FLEXI_MAX_ITEM_COLS_RESPONSIVE_DESC">
+							<option value="">FLEXI_USE_GLOBAL</option>
+							<option value="1">1</option>
+							<option value="2">2</option>
+							<option value="3">3</option>
+							<option value="4">4</option>
+							<option value="5">5</option>
+							<option value="6">6</option>
+							<option value="7">7</option>
+							<option value="8">8</option>
+						</field>
+						<field name="item_placement_feat" type="radio" default="" hint="0" label="FLEXI_ITEMS_PLACEMENT" description="FLEXI_ITEMS_PLACEMENT_DESC" class="btn-group group-fcinfo">
+							<option value="">FLEXI_USE_GLOBAL</option>
+							<option value="0">FLEXI_CLEARED</option>
+							<option value="1">FLEXI_AS_MASONRY_TILES</option>
+						</field>
+						<field name="lead_link_to_popup" type="radio" default="" hint="0" label="Open items in popup" description="Items will be opened in a modal popup window" class="btn-group">
+							<option value="">FLEXI_USE_GLOBAL</option>
+							<option value="0">FLEXI_NO</option>
+							<option value="1">FLEXI_YES</option>
+						</field>
+						<field name="hl_items_onnav_feat" type="radio" default="" hint="0" label="Highlight items" description="Highlight currently 'active' and 'hovered' items by adding CSS classes" class="btn-group">
+							<option value="">FLEXI_USE_GLOBAL</option>
+							<option value="0">FLEXI_NO</option>
+							<option value="2">On Hover</option>
+						</field>
+			
+						<field name="featured_content_image_placement" type="separator" default="Content / image placement" level="level2" />
+						<field name="content_layout_feat" type="list" default="" hint="3" label="Content Placement &lt;br/&gt; &lt;small&gt; in regards to image &lt;/small&gt;" description="Select to placement content next, or above/below (cleared) or over (ovelayed) the item image. Note: overlayed will crop content that does not fit from the bottom part" class="">
+							<option value="">FLEXI_USE_GLOBAL</option>
+							<option value="0">Floated (Right)</option>
+							<option value="1">Floated (Left)</option>
+							<option value="2">Cleared (Above)</option>
+							<option value="3">Cleared (Below)</option>
+							<option value="4">Overlayed (Top)</option>
+							<option value="5">Overlayed (Bottom)</option>
+							<option value="6">Overlayed (Full)</option>
+						</field>
+						<field name="content_display_feat" type="radio" default="" hint="0" label="Content visible &lt;br/&gt; &lt;small&gt; for overlayed &lt;/small&gt;" description="Select how image is fitted into the container" class="btn-group group-fcinfo">
+							<option value="">FLEXI_USE_GLOBAL</option>
+							<option value="0">Always visible</option>
+							<!--option value="1">On mouse over / item active</option-->
+							<option value="2">On mouse over</option>
+						</field>
+						<field name="img_fit_feat" type="radio" default="" hint="1" label="Image fit &lt;br/&gt; &lt;small&gt; for cleared / overlayed &lt;/small&gt;" description="Select how image is fitted into the container" class="btn-group group-fcinfo">
+							<option value="">FLEXI_USE_GLOBAL</option>
+							<option value="0">Auto-Fit</option>
+							<option value="1">Auto-Fit and Stretch</option>
+						</field>
+	
+					<field name="items_tab_featured_styling" type="separator" default="FLEXI_STYLING" icon_class="icon-palette" level="tab_open" box_type="1" />
+			
+						<field name="featured_items_box_css" type="separator" cssprep="1" default="Items list box" level="level2" />
+						<field name="box_background_color_feat" type="color" cssprep="less" default="inherit" label="background color" description="Items container's background color" class="input-small" />
+						<field name="box_padding_top_bottom_feat" type="text" cssprep="less" default="8px" label="padding top/bottom" description="Items container's padding applied at top and bottom of the items" class="input-small" />
+						<field name="box_padding_left_right_feat" type="text" cssprep="less" default="12px" label="padding left/right" description="Items container's padding applied at left and right of the items" class="input-small" />
+						<field name="box_margin_top_bottom_feat" type="text" cssprep="less" default="4px" label="margin top/bottom" description="Items container's margin applied at top and bottom of the items" class="input-small" />
+						<field name="box_margin_left_right_feat" type="text" cssprep="less" default="4px" label="margin left/right" description="Items container's margin applied at left and right of the items" class="input-small" />
+			
+						<field name="featured_item_box_css" type="separator" cssprep="1" default="Item box" level="level2" />
+						<field name="ibox_background_color_feat" type="color" cssprep="less" default="inherit" label="background color" description="This is the background color applied at each item" class="input-small" />
+						<field name="ibox_padding_top_bottom_feat" type="text" cssprep="less" default="8px" label="padding top/bottom" description="This is the padding applied at top and bottom of the items" class="input-small" />
+						<field name="ibox_padding_left_right_feat" type="text" cssprep="less" default="12px" label="padding left/right" description="This is the padding applied at left and right of the items" class="input-small" />
+						<field name="ibox_border_width_feat" type="text" cssprep="less" default="1px" label="border width" description="This is the border width applied around the items" class="input-small" />
+						<field name="ibox_margin_top_bottom_feat" type="text" cssprep="less" default="4px" label="margin top/bottom" description="This is the margin applied at top and bottom of the items" class="input-small" />
+						<field name="ibox_margin_left_right_feat" type="text" cssprep="less" default="4px" label="margin left/right" description="This is the margin applied at left and right of the items" class="input-small" />
+			
+					<field name="items_tab_featured_fields" type="separator" default="FLEXI_FIELDS" icon_class="icon-list" level="tab_open" box_type="1" />
+			
+						<field name="lead_catblock_sep" type="separator" default="(sub) Category block, at (sub-)category start" description="Enable to show (sub-)category information when next (sub-)category starts" level="level2" />
+						<field name="lead_catblock_sep_msg" type="separator" default="Warning: this makes sense, if you order your items by their category (1st level order), (2nd level order can be anything e.g. title)" description="" level="level3" class="alert alert-info fcpadded" />
+						<field name="lead_catblock" type="radio" default="" label="FLEXI_ENABLE" description=" " class="btn-group">
+							<option value="">FLEXI_USE_GLOBAL</option>
+							<option value="0">FLEXI_NO</option>
+							<option value="1">FLEXI_YES</option>
+						</field>
+						<field name="lead_catblock_title" type="radio" default="" label="FLEXI_SHOW_CAT_TITLE" description="FLEXI_SHOW_CAT_TITLE_DESC" class="btn-group">
+							<option value="">FLEXI_USE_GLOBAL</option>
+							<option value="1">FLEXI_YES</option>
+						</field>
+						
+						<field name="leadingitems_text_sep" type="separator" default="FLEXI_TEXT" description="FLEXI_TEXT_DESC" level="level2" />
+						<field name="lead_use_description" type="radio" default="" label="FLEXI_DISPLAY_DESCRIPTION" description="FLEXI_DISPLAY_DESCRIPTION_DESC" class="btn-group">
+							<option value="">FLEXI_USE_GLOBAL</option>
+							<option value="0">FLEXI_NO</option>
+							<option value="1">FLEXI_YES</option>
+						</field>
+						<field name="lead_strip_html" type="radio" default="" label="FLEXI_STRIP_N_CUT" description="FLEXI_STRIP_N_CUT_DESC" class="btn-group">
+							<option value="">FLEXI_USE_GLOBAL</option>
+							<option value="0">FLEXI_NO</option>
+							<option value="1">FLEXI_YES_FORCE_READ_MORE</option>
+							<option value="2">FLEXI_YES_IF_NEEDED</option>
+						</field>
+						<field name="lead_cut_text" type="text" size="4" default="" label="FLEXI_CUT_INTRO" description="FLEXI_CUT_INTRO_DESC" />
+						<field name="leadingitems_img_sep" type="separator" default="FLEXI_IMAGE" description="FLEXI_IMAGE_DESC" level="level2" />
+						<field name="lead_use_image" type="radio" default="" label="FLEXI_USE_IMAGE" description="FLEXI_USE_IMAGE_DESC" class="btn-group">
+							<option value="">FLEXI_USE_GLOBAL</option>
+							<option value="0">FLEXI_NO</option>
+							<option value="1">FLEXI_YES</option>
+						</field>
+						<field name="lead_image" type="fcimage" default="" label="FLEXI_IMAGE_SOURCE" description="FLEXI_IMAGE_SOURCE_DESC" />
+						<field name="lead_position" type="radio" default="" label="FLEXI_IMAGE_POSITION" description="FLEXI_IMAGE_POSITION_DESC" class="btn-group group-fcinfo">
+							<option value="">FLEXI_USE_GLOBAL</option>
+							<option value="0">FLEXI_IMAGE_LEFT</option>
+							<option value="1">FLEXI_IMAGE_RIGHT</option>
+						</field>		
+						<field name="lead_link_image" type="radio" default="" label="FLEXI_LINK_IMAGE" description="FLEXI_LINK_IMAGE_DESC" class="btn-group">
+							<option value="">FLEXI_USE_GLOBAL</option>
+							<option value="0">FLEXI_NO</option>
+							<option value="1">FLEXI_YES</option>
+						</field>
+						<field name="lead_link_image_to" type="radio" default="" label="Link to" description="If you are using an image field then you may use the custom link add to the image" class="btn-group group-fcinfo">
+							<option value="">FLEXI_USE_GLOBAL</option>
+							<option value="0">FLEXI_ITEM</option>
+							<option value="1">Custom link (image field)</option>
+						</field>
+						<field name="lead_image_size" type="radio" default="" label="FLEXI_INTRO_IMAGE_SIZE" description="FLEXI_INTRO_IMAGE_SIZE_DESC" class="btn-group group-fcinfo">
+							<option value="">FLEXI_USE_PARAMS</option>
+							<option value="s">FLEXI_SMALL</option>
+							<option value="m">FLEXI_MEDIUM</option>
+							<option value="l">FLEXI_LARGE</option>
+							<option value="o">FLEXI_ORIGINAL</option>
+						</field>
+						<field name="lead_width" type="text" size="4" default="" label="FLEXI_IMAGE_WIDTH" description="FLEXI_IMAGE_WIDTH" />
+						<field name="lead_height" type="text" size="4" default="" label="FLEXI_IMAGE_HEIGHT" description="FLEXI_IMAGE_HEIGHT" />
+						<field name="lead_method" type="radio" default="" label="FLEXI_PROCESSING_METHOD" description="FLEXI_PROCESSING_METHOD" class="btn-group group-fcinfo">
+							<option value="">FLEXI_USE_GLOBAL</option>
+							<option value="0">FLEXI_SCALE</option>
+							<option value="1">FLEXI_CROP</option>
+						</field>
+						<field name="lead_default_images" type="textarea" default="" label="FLEXI_TMPL_CORE-NEWS_DEFAULT_IMAGES" description="FLEXI_TMPL_CORE-NEWS_DEFAULT_IMAGES_DESC" />
+
+				<field name="items_tabset_featured_end" type="separator" default="ITEMS_FEATURED_TABSET" level="tabset_close" />
+
+
+				<field name="items_tab_standard" type="separator" default="Standard items" icon_class="icon-list" level="tab_open" box_type="1" />	
+				<field name="items_tabset_standard_start" type="separator" default="ITEMS_STANDARD_TABSET" level="tabset_start" />
+
+					<field name="items_tab_standard_placement" type="separator" default="FLEXI_PLACEMENT" icon_class="icon-grid" level="tab_open" box_type="1" />
+		
+						<field name="items_standard_basic" type="separator" default="FLEXI_BASIC" icon_class="icon-cog" level="level2" />
+						<field name="item_columns" type="list" default="" hint="2" label="FLEXI_MAX_ITEM_COLS_RESPONSIVE" description="FLEXI_MAX_ITEM_COLS_RESPONSIVE_DESC">
+							<option value="">FLEXI_USE_GLOBAL</option>
+							<option value="1">1</option>
+							<option value="2">2</option>
+							<option value="3">3</option>
+							<option value="4">4</option>
+							<option value="5">5</option>
+							<option value="6">6</option>
+							<option value="7">7</option>
+							<option value="8">8</option>
+						</field>
+						<field name="item_placement" type="radio" default="" hint="1" label="FLEXI_ITEMS_PLACEMENT" description="FLEXI_ITEMS_PLACEMENT_DESC" class="btn-group group-fcinfo">
+							<option value="">FLEXI_USE_GLOBAL</option>
+							<option value="0">FLEXI_CLEARED</option>
+							<option value="1">FLEXI_AS_MASONRY_TILES</option>
+						</field>
+						<field name="intro_link_to_popup" type="radio" default="" hint="0" label="Open items in popup" description="Items will be opened in a modal popup window" class="btn-group">
+							<option value="">FLEXI_USE_GLOBAL</option>
+							<option value="0">FLEXI_NO</option>
+							<option value="1">FLEXI_YES</option>
+						</field>
+						<field name="hl_items_onnav" type="radio" default="" hint="0" label="Highlight items" description="Highlight currently 'active' and 'hovered' items by adding CSS classes" class="btn-group">
+							<option value="">FLEXI_USE_GLOBAL</option>
+							<option value="0">FLEXI_NO</option>
+							<option value="2">On Hover</option>
+						</field>
+			
+						<field name="standard_content_image_placement" type="separator" default="Content / image placement" level="level2" />
+						<field name="content_layout" type="list" default="" hint="3" label="Content Placement &lt;br/&gt; &lt;small&gt; in regards to image &lt;/small&gt;" description="Select to placement content next, or above/below (cleared) or over (ovelayed) the item image. Note: overlayed will crop content that does not fit from the bottom part" class="">
+							<option value="">FLEXI_USE_GLOBAL</option>
+							<option value="0">Floated (Right)</option>
+							<option value="1">Floated (Left)</option>
+							<option value="2">Cleared (Above)</option>
+							<option value="3">Cleared (Below)</option>
+							<option value="4">Overlayed (Top)</option>
+							<option value="5">Overlayed (Bottom)</option>
+							<option value="6">Overlayed (Full)</option>
+						</field>
+						<field name="content_display" type="radio" default="" hint="0" label="Content visible &lt;br/&gt; &lt;small&gt; for overlayed &lt;/small&gt;" description="Select how image is fitted into the container" class="btn-group group-fcinfo">
+							<option value="">FLEXI_USE_GLOBAL</option>
+							<option value="0">Always visible</option>
+							<!--option value="1">On mouse over / item active</option-->
+							<option value="2">On mouse over</option>
+						</field>
+						<field name="img_fit" type="radio" default="" hint="1" label="Image fit &lt;br/&gt; &lt;small&gt; for cleared / overlayed &lt;/small&gt;" description="Select how image is fitted into the container" class="btn-group group-fcinfo">
+							<option value="">FLEXI_USE_GLOBAL</option>
+							<option value="0">Auto-Fit</option>
+							<option value="1">Auto-Fit and Stretch</option>
+						</field>
+
+					<field name="items_tab_standard_styling" type="separator" default="FLEXI_STYLING" icon_class="icon-palette" level="tab_open" box_type="1" />
+
+						<field name="standard_items_box_css" type="separator" cssprep="1" default="Items list box" level="level2" />
+						<field name="box_background_color" type="color" cssprep="less" default="inherit" label="background color" description="Items container's background color" class="input-small" />
+						<field name="box_padding_top_bottom" type="text" cssprep="less" default="8px" label="padding top/bottom" description="Items container's padding applied at top and bottom of the items" class="input-small" />
+						<field name="box_padding_left_right" type="text" cssprep="less" default="12px" label="padding left/right" description="Items container's padding applied at left and right of the items" class="input-small" />
+						<field name="box_margin_top_bottom" type="text" cssprep="less" default="4px" label="margin top/bottom" description="Items container's margin applied at top and bottom of the items" class="input-small" />
+						<field name="box_margin_left_right" type="text" cssprep="less" default="4px" label="margin left/right" description="Items container's margin applied at left and right of the items" class="input-small" />
+			
+						<field name="standard_item_box_css" type="separator" cssprep="1" default="Item box" level="level2" />
+						<field name="ibox_background_color" type="color" cssprep="less" default="inherit" label="background color" description="This is the background color applied at each item" class="input-small" />
+						<field name="ibox_padding_top_bottom" type="text" cssprep="less" default="8px" label="padding top/bottom" description="This is the padding applied at top and bottom of the items" class="input-small" />
+						<field name="ibox_padding_left_right" type="text" cssprep="less" default="12px" label="padding left/right" description="This is the padding applied at left and right of the items" class="input-small" />
+						<field name="ibox_border_width" type="text" cssprep="less" default="1px" label="border width" description="This is the border width applied around the items" class="input-small" />
+						<field name="ibox_margin_top_bottom" type="text" cssprep="less" default="4px" label="margin top/bottom" description="This is the margin applied at top and bottom of the items" class="input-small" />
+						<field name="ibox_margin_left_right" type="text" cssprep="less" default="4px" label="margin left/right" description="This is the margin applied at left and right of the items" class="input-small" />
+			
+					<field name="items_tab_standard_fields" type="separator" default="FLEXI_FIELDS" icon_class="icon-list" level="tab_open" box_type="1" />
+						
+						<field name="intro_catblock_sep" type="separator" default="(sub) Category block, at (sub-)category start" description="Enable to show (sub-)category information when next (sub-)category starts" level="level2" />
+						<field name="intro_catblock_sep_msg" type="separator" default="Warning: this makes sense, if you order your items by their category (1st level order), (2nd level order can be anything e.g. title)" description="" level="level3" class="alert alert-info fcpadded" />
+						<field name="intro_catblock" type="radio" default="" label="FLEXI_ENABLE" description=" " class="btn-group">
+							<option value="">FLEXI_USE_GLOBAL</option>
+							<option value="0">FLEXI_NO</option>
+							<option value="1">FLEXI_YES</option>
+						</field>
+						<field name="intro_catblock_title" type="radio" default="" label="FLEXI_SHOW_CAT_TITLE" description="FLEXI_SHOW_CAT_TITLE_DESC" class="btn-group">
+							<option value="">FLEXI_USE_GLOBAL</option>
+							<option value="1">FLEXI_YES</option>
+						</field>
+						
+						<field name="introitems_text_sep" type="separator" default="FLEXI_TEXT" description="FLEXI_TEXT_DESC" level="level2" />
+						<field name="intro_use_description" type="radio" default="" label="FLEXI_DISPLAY_DESCRIPTION" description="FLEXI_DISPLAY_DESCRIPTION_DESC" class="btn-group">
+							<option value="">FLEXI_USE_GLOBAL</option>
+							<option value="0">FLEXI_NO</option>
+							<option value="1">FLEXI_YES</option>
+						</field>
+						<field name="intro_strip_html" type="radio" default="" label="FLEXI_STRIP_N_CUT" description="FLEXI_STRIP_N_CUT_DESC" class="btn-group">
+							<option value="">FLEXI_USE_GLOBAL</option>
+							<option value="0">FLEXI_NO</option>
+							<option value="1">FLEXI_YES_FORCE_READ_MORE</option>
+							<option value="2">FLEXI_YES_IF_NEEDED</option>
+						</field>
+						<field name="intro_cut_text" type="text" size="4" default="" label="FLEXI_CUT_INTRO" description="FLEXI_CUT_INTRO_DESC" />
+						<field name="introitems_img_sep" type="separator" default="FLEXI_IMAGE" description="FLEXI_IMAGE_DESC" level="level2" />
+						<field name="intro_use_image" type="radio" default="" label="FLEXI_USE_IMAGE" description="FLEXI_USE_IMAGE_DESC" class="btn-group">
+							<option value="">FLEXI_USE_GLOBAL</option>
+							<option value="0">FLEXI_NO</option>
+							<option value="1">FLEXI_YES</option>
+						</field>
+						<field name="intro_image" type="fcimage" default="" label="FLEXI_IMAGE_SOURCE" description="FLEXI_IMAGE_SOURCE_DESC" />
+						<field name="intro_position" type="radio" default="" label="FLEXI_IMAGE_POSITION" description="FLEXI_IMAGE_POSITION_DESC" class="btn-group group-fcinfo">
+							<option value="">FLEXI_USE_GLOBAL</option>
+							<option value="0">FLEXI_IMAGE_LEFT</option>
+							<option value="1">FLEXI_IMAGE_RIGHT</option>
+						</field>		
+						<field name="intro_link_image" type="radio" default="" label="FLEXI_LINK_IMAGE" description="FLEXI_LINK_IMAGE_DESC" class="btn-group">
+							<option value="">FLEXI_USE_GLOBAL</option>
+							<option value="0">FLEXI_NO</option>
+							<option value="1">FLEXI_YES</option>
+						</field>
+						<field name="intro_link_image_to" type="radio" default="" label="Link to" description="If you are using an image field then you may use the custom link add to the image" class="btn-group group-fcinfo">
+							<option value="">FLEXI_USE_GLOBAL</option>
+							<option value="0">FLEXI_ITEM</option>
+							<option value="1">Custom link (image field)</option>
+						</field>
+						<field name="intro_image_size" type="radio" default="" label="FLEXI_INTRO_IMAGE_SIZE" description="FLEXI_INTRO_IMAGE_SIZE_DESC" class="btn-group group-fcinfo">
+							<option value="">FLEXI_USE_PARAMS</option>
+							<option value="s">FLEXI_SMALL</option>
+							<option value="m">FLEXI_MEDIUM</option>
+							<option value="l">FLEXI_LARGE</option>
+							<option value="o">FLEXI_ORIGINAL</option>
+						</field>
+						<field name="intro_width" type="text" size="4" default="" label="FLEXI_IMAGE_WIDTH" description="FLEXI_IMAGE_WIDTH" />
+						<field name="intro_height" type="text" size="4" default="" label="FLEXI_IMAGE_HEIGHT" description="FLEXI_IMAGE_HEIGHT" />
+						<field name="intro_method" type="radio" default="" label="FLEXI_PROCESSING_METHOD" description="FLEXI_PROCESSING_METHOD" class="btn-group group-fcinfo">
+							<option value="">FLEXI_USE_GLOBAL</option>
+							<option value="0">FLEXI_SCALE</option>
+							<option value="1">FLEXI_CROP</option>
+						</field>
+						<field name="intro_default_images" type="textarea" default="" label="FLEXI_TMPL_CORE-NEWS_DEFAULT_IMAGES" description="FLEXI_TMPL_CORE-NEWS_DEFAULT_IMAGES_DESC" />
+
+				<field name="items_tabset_standard_end" type="separator" default="ITEMS_FEATURED_TABSET" level="tabset_close" />
+
+
+			<field name="items_tabset_end" type="separator" default="ITEM_TABSET" level="tabset_close" box_type="1" />
+
+		</fieldset>
+	</fields>
+
+	<fieldgroups>
+		<group>above-description-line1</group>
+		<group>above-description-line1-nolabel</group>
+		<group>above-description-line2</group>
+		<group>above-description-line2-nolabel</group>
+		<group>under-description-line1</group>
+		<group>under-description-line1-nolabel</group>
+		<group>under-description-line2</group>
+		<group>under-description-line2-nolabel</group>
+		<group>renderonly</group>
+	</fieldgroups>
+	<csscategory>
+		<file>css/category.css</file>
+	</csscategory>
+	<jscategory>
+	</jscategory>	
+</form>

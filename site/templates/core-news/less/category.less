@@ -1,0 +1,871 @@
+@import 'include/config.less';
+
+/* Blog Theme : category template CSS file */
+
+
+/* CSS rules for fields display via Template parameters */
+/* LESS EXAMPLE variable name: 'FCI_' + parameter name */
+
+/* Label styling */
+
+body #flexicontent .flexi.label,
+body #flexicontent .desc-title.label {
+	background-color: @FCC_label_bg_color;
+	color: @FCC_label_txt_color;
+	border-radius: @FCC_label_radius*1px;
+}
+
+/**
+ * @section buttons
+ *
+ * print, pdf, ...
+ */
+#flexicontent .buttons {
+	float: right;
+}
+
+#flexicontent .buttons > a > img {}
+
+#flexicontent .buttons > a {}
+
+
+/**
+ * @section headlines
+ *
+ */
+#flexicontent h2 {}
+
+#flexicontent h2 img {
+	border: none;
+}
+
+
+/**
+ * @section Categoryview
+ *
+ */
+#flexicontent .catimg {
+	margin: 0 0.5em 0.5em 0;
+	float: left;
+	position: relative;
+}
+
+#flexicontent .catimg p {
+	font-size: 0.9em;
+	line-height: 180%;
+	margin: 0 0 0.5em 0;
+}
+
+#flexicontent .catdescription {
+	margin: 0 0 0.5em 0;
+}
+
+#flexicontent .subcategories {
+	border-bottom: 2px solid #ddd;
+	padding: 0.5em 0.3em;
+	margin: 0.8em 0;
+}
+
+/**
+ * @section FLEXIcontent Item
+ *
+ */
+#flexicontent .taglist {
+	margin: 5px 0 10px;
+	padding: 0 5px;
+}
+
+
+/**
+ * @section flexicontent Table Filter Form
+ *
+ */
+div.subcategorieslist {
+	margin: 0 0 1em 0;
+}
+
+#flexicontent #fc_filter {
+	margin: 0 0 1em 0;
+	padding: 0.5em;
+	border: solid 1px #ddd;
+}
+
+#flexicontent .fc_fleft {
+	float: left;
+}
+
+#flexicontent .fc_fright {
+	float: right;
+}
+#flexicontent .fc_fright .filter {
+	margin-left: 10px;
+}
+
+
+/**
+ * Comments for JComments only ;-)
+ */
+div.comments {
+	margin-top: 15px;
+}
+.comments #jc h4 {
+	font-weight: normal;
+	color: inherit;
+	margin-top: 0px;
+}
+.comments #comments a {
+	color: inherit;
+}
+.comments #comments a:hover {
+	color: #578E13;
+}
+.comments #comments div.comments-list {
+	margin-left: 0;
+}
+.comments .rbox_tr,
+.comments .rbox_tl,
+.comments .rbox_t,
+.comments .rbox_br,
+.comments .rbox_bl,
+.comments .rbox_b,
+.comments .rbox_m {
+	background: none;
+	border: none;
+}
+
+.comments .rbox {
+	border: 1px #ccc solid;
+}
+.comments .even .rbox {
+	background: #fff;
+}
+.comments .odd .rbox {
+	background: #f0f0f0;
+}
+.comments #comments-list-footer {
+	margin: 0 0 10px 0;
+}
+#comments-form p,
+#comments-form #comments-form-buttons,
+#comments-form #comments-form-error {
+	margin-left: 0px !important;
+}
+#comments-form #comments-form-message,
+#comments-inline-edit #comments-form-message {
+	padding: 5px 5px 5px 25px;
+	display: block;
+}
+.comments-form-message-error {
+	background: #FFD86F url(../images/error.png) no-repeat 4px 50%;
+}
+.comments-form-message-info {
+	background: #DFEEFF url(../images/information.png) no-repeat 4px 50%;
+}
+
+/**
+ * blog block
+ */
+
+#flexicontent figure.image.right,
+#flexicontent div.image.right {
+	float: right !important;
+	margin: 8px 2px 0px 10px !important;
+	width: auto !important;
+}
+
+#flexicontent figure.image.left,
+#flexicontent div.image.left {
+	float: left !important;
+	margin: 8px 10px 0px 2px !important;
+	width: auto !important;
+}
+
+#flexicontent figure.image.right img,
+#flexicontent figure.image.left img,
+#flexicontent div.image.right img,
+#flexicontent div.image.left img {
+	padding: 1px;
+	border: 1px solid lightgray;
+}
+
+/* lines */
+#flexicontent .lineinfo {
+	display: block;
+	clear: both;
+	margin: 0;
+	vertical-align: middle;
+	text-align: center;
+}
+#flexicontent .lineinfo .element {
+	display: inline-block;
+	/*float: left;*/
+	/*width: 100%;*/
+	margin: 0;
+	padding: 6px;
+	box-sizing: border-box;
+}
+#flexicontent .lineinfo .element .label {
+	display: inline-block;
+	font-size: 90%;
+	margin-left: 8px;
+	margin-right: 8px;
+	/*min-width: 120px;*/
+	padding: 6px 12px;
+	box-sizing: border-box;
+}
+#flexicontent .lineinfo .element .value {
+	display: inline-block;
+}
+
+#flexicontent .readmore {
+	display: inline-block;
+	float: left;
+	clear: both;
+}
+
+/* =============================================
+   Bootstrap adjustments
+============================================= */
+#fc_alpha .btn.fc_alpha_index,
+#fc_alpha .btn.fc_alpha_index_sep {
+	margin-top: 0;
+	margin-bottom: 0;
+}
+
+#flexicontent .news.fc-items-block .fc_mublock {
+	clear: both;
+	margin-top: 0;
+	margin-bottom: 0;
+}
+
+
+/****************************/
+/* BOF themes, TODO MORE !! */
+/****************************/
+
+/* Suffix -green : green borders and links */
+.news.fc-items-block-green .fc-item-block-featured-wrapper-innerbox,
+.news.fc-items-block-green .fc-item-block-standard-wrapper-innerbox {
+	border-color: darkgreen!important;
+}
+.news.fc-items-block-green a {
+	color: darkgreen!important;
+}
+
+/* Suffix -red : red borders and links */
+.news.fc-items-block-red .fc-item-block-featured-wrapper-innerbox,
+.news.fc-items-block-red .fc-item-block-standard-wrapper-innerbox {
+	border-color: darkred!important;
+}
+.news.fc-items-block-red a {
+	color: darkred!important;
+}
+
+/* Suffix -orange : orange borders and links */
+.news.fc-items-block-orange .fc-item-block-featured-wrapper-innerbox,
+.news.fc-items-block-orange .fc-item-block-standard-wrapper-innerbox {
+	border-color: darkorange!important;
+}
+.news.fc-items-block-orange a {
+	color: darkorange!important;
+}
+
+/**************/
+/* EOF themes */
+/**************/
+
+
+
+
+/* CONTAINER OF EACH ORDERING GROUP */
+.news.fc-items-block {
+	width: 100%;
+	margin: 0;
+	padding: 0;
+	border-width: 0;
+	float: left;
+	clear: both;
+}
+
+
+/* EXTERNAL ITEM CONTAINER inner container for border, padding etc */
+.news.fc-items-block .fc-item-block-featured-wrapper-innerbox,
+.news.fc-items-block .fc-item-block-standard-wrapper-innerbox {
+	position: relative;
+	display: block;
+	float: none;
+	width: auto;
+	height: auto;
+	overflow: hidden;
+	
+	/* can be overriden via user 's CSS */
+	margin: 0px;
+	padding: 0px;
+	border-width: 0px;
+	border-style: solid;
+	border-color: #dfdfdf #9f9f9f #9f9f9f #dfdfdf;
+	border-radius: 0px;
+	background-color: unset;
+	/*box-shadow: 1px 1px 1px darkgray;*/
+}
+
+.news.fc-items-block .fc-item-block-featured-wrapper-innerbox {
+	padding: @FCC_ibox_padding_top_bottom_feat @FCC_ibox_padding_left_right_feat;
+	border-width: @FCC_ibox_border_width_feat;
+	margin: @FCC_ibox_margin_top_bottom_feat @FCC_ibox_margin_left_right_feat;
+	background-color: @FCC_ibox_background_color_feat;
+}
+
+.news.fc-items-block .fc-item-block-standard-wrapper-innerbox {
+	padding: @FCC_ibox_padding_top_bottom @FCC_ibox_padding_left_right;
+	border-width: @FCC_ibox_border_width;
+	margin: @FCC_ibox_margin_top_bottom @FCC_ibox_margin_left_right;
+	background-color: @FCC_ibox_background_color;
+}
+
+
+/* EXTERNAL ITEM CONTAINER (ONE COLUMNS) */
+.news.fc-items-block .fc-item-block-standard-wrapper,
+.news.fc-items-block .fc-item-block-featured-wrapper {
+	/* DO NOT OVERRIDE THESE !!! this is the placement container, override margin,padding,border of inner container only */
+	display: block;
+	float: left;
+	margin: 0;
+	padding: 0;
+	border-width: 0;
+	border-style: solid;
+	width: 100%;
+	/*height: 100%;*/ /* problematic with masonry */
+}
+
+/* EXTERNAL ITEM CONTAINER (2-COLUMNS) */
+.news.fc-items-block .fc-item-block-standard-wrapper.cols_2,
+.news.fc-items-block .fc-item-block-featured-wrapper.cols_2 {
+	width: 50% !important;
+	margin-left: 0% !important;
+	margin-right: 0% !important;
+	padding: 0% !important;
+	border-width: 0px !important;
+}
+
+/* EXTERNAL ITEM CONTAINER (3-COLUMNS) */
+.news.fc-items-block .fc-item-block-standard-wrapper.cols_3,
+.news.fc-items-block .fc-item-block-featured-wrapper.cols_3 {
+	width: 33.33% !important;
+	margin-left: 0% !important;
+	margin-right: 0% !important;
+	padding: 0% !important;
+	border-width: 0px !important;
+}
+
+/* EXTERNAL ITEM CONTAINER (4-COLUMNS) */
+.news.fc-items-block .fc-item-block-standard-wrapper.cols_4,
+.news.fc-items-block .fc-item-block-featured-wrapper.cols_4 {
+	width: 25% !important;
+	margin-left: 0% !important;
+	margin-right: 0% !important;
+	padding: 0% !important;
+	border-width: 0px !important;
+}
+
+/* EXTERNAL ITEM CONTAINER (5-COLUMNS) */
+.news.fc-items-block .fc-item-block-standard-wrapper.cols_5,
+.news.fc-items-block .fc-item-block-featured-wrapper.cols_5 {
+	width: 20% !important;
+	margin-left: 0% !important;
+	margin-right: 0% !important;
+	padding: 0% !important;
+	border-width: 0px !important;
+}
+
+/* EXTERNAL ITEM CONTAINER (6-COLUMNS) */
+.news.fc-items-block .fc-item-block-standard-wrapper.cols_6,
+.news.fc-items-block .fc-item-block-featured-wrapper.cols_6 {
+	width: 16.66% !important;
+	margin-left: 0% !important;
+	margin-right: 0% !important;
+	padding: 0% !important;
+	border-width: 0px !important;
+}
+
+/* EXTERNAL ITEM CONTAINER (7-COLUMNS) */
+.news.fc-items-block .fc-item-block-standard-wrapper.cols_7,
+.news.fc-items-block .fc-item-block-featured-wrapper.cols_7 {
+	width: 14.28% !important;
+	margin-left: 0% !important;
+	margin-right: 0% !important;
+	padding: 0% !important;
+	border-width: 0px !important;
+}
+
+/* EXTERNAL ITEM CONTAINER (8-COLUMNS) */
+.news.fc-items-block .fc-item-block-standard-wrapper.cols_8,
+.news.fc-items-block .fc-item-block-featured-wrapper.cols_8 {
+	width: 12.5% !important;
+	margin-left: 0% !important;
+	margin-right: 0% !important;
+	padding: 0% !important;
+	border-width: 0px !important;
+}
+
+@media only screen and (min-width: 1280px) and (max-width: 1399px) {
+	/* medium-sized desktops */
+	.news.fc-items-block .fc-item-block-standard-wrapper.cols_6,
+	.news.fc-items-block .fc-item-block-standard-wrapper.cols_7,
+	.news.fc-items-block .fc-item-block-standard-wrapper.cols_8,
+	.news.fc-items-block .fc-item-block-featured-wrapper.cols_6,
+	.news.fc-items-block .fc-item-block-featured-wrapper.cols_7,
+	.news.fc-items-block .fc-item-block-featured-wrapper.cols_8 {
+		width: 20% !important;
+	}
+}
+
+@media only screen and (min-width: 1152px) and (max-width: 1279px) {
+	/* small-sized desktops */
+	.news.fc-items-block .fc-item-block-standard-wrapper.cols_5,
+	.news.fc-items-block .fc-item-block-standard-wrapper.cols_6,
+	.news.fc-items-block .fc-item-block-standard-wrapper.cols_7,
+	.news.fc-items-block .fc-item-block-standard-wrapper.cols_8,
+	.news.fc-items-block .fc-item-block-featured-wrapper.cols_5,
+	.news.fc-items-block .fc-item-block-featured-wrapper.cols_6,
+	.news.fc-items-block .fc-item-block-featured-wrapper.cols_7,
+	.news.fc-items-block .fc-item-block-featured-wrapper.cols_8 {
+		width: 25% !important;
+	}
+}
+
+@media only screen and (min-width: 1024px) and (max-width: 1151px) {
+	/* large-sized tablets, very small-sized desktops */
+	.news.fc-items-block .fc-item-block-standard-wrapper.cols_4,
+	.news.fc-items-block .fc-item-block-standard-wrapper.cols_5,
+	.news.fc-items-block .fc-item-block-standard-wrapper.cols_6,
+	.news.fc-items-block .fc-item-block-standard-wrapper.cols_7,
+	.news.fc-items-block .fc-item-block-standard-wrapper.cols_8,
+	.news.fc-items-block .fc-item-block-featured-wrapper.cols_4,
+	.news.fc-items-block .fc-item-block-featured-wrapper.cols_5,
+	.news.fc-items-block .fc-item-block-featured-wrapper.cols_6,
+	.news.fc-items-block .fc-item-block-featured-wrapper.cols_7,
+	.news.fc-items-block .fc-item-block-featured-wrapper.cols_8 {
+		width: 33.33% !important;
+	}
+}
+
+@media only screen and (min-width: 768px) and (max-width: 1023px) {
+	/* medium-sized tablets */
+	.news.fc-items-block .fc-item-block-standard-wrapper.cols_3,
+	.news.fc-items-block .fc-item-block-standard-wrapper.cols_4,
+	.news.fc-items-block .fc-item-block-standard-wrapper.cols_5,
+	.news.fc-items-block .fc-item-block-standard-wrapper.cols_6,
+	.news.fc-items-block .fc-item-block-standard-wrapper.cols_7,
+	.news.fc-items-block .fc-item-block-standard-wrapper.cols_8,
+	.news.fc-items-block .fc-item-block-featured-wrapper.cols_3,
+	.news.fc-items-block .fc-item-block-featured-wrapper.cols_4,
+	.news.fc-items-block .fc-item-block-featured-wrapper.cols_5,
+	.news.fc-items-block .fc-item-block-featured-wrapper.cols_6,
+	.news.fc-items-block .fc-item-block-featured-wrapper.cols_7,
+	.news.fc-items-block .fc-item-block-featured-wrapper.cols_8 {
+		width: 50% !important;
+	}
+}
+
+@media only screen and (max-width: 767px) {
+	/* phones and small-sized tablets */
+	.news.fc-items-block .fc-item-block-standard-wrapper.cols_2,
+	.news.fc-items-block .fc-item-block-standard-wrapper.cols_3,
+	.news.fc-items-block .fc-item-block-standard-wrapper.cols_4,
+	.news.fc-items-block .fc-item-block-standard-wrapper.cols_5,
+	.news.fc-items-block .fc-item-block-standard-wrapper.cols_6,
+	.news.fc-items-block .fc-item-block-standard-wrapper.cols_7,
+	.news.fc-items-block .fc-item-block-standard-wrapper.cols_8,
+	.news.fc-items-block .fc-item-block-featured-wrapper.cols_2,
+	.news.fc-items-block .fc-item-block-featured-wrapper.cols_3,
+	.news.fc-items-block .fc-item-block-featured-wrapper.cols_4,
+	.news.fc-items-block .fc-item-block-featured-wrapper.cols_5,
+	.news.fc-items-block .fc-item-block-featured-wrapper.cols_6,
+	.news.fc-items-block .fc-item-block-featured-wrapper.cols_7,
+	.news.fc-items-block .fc-item-block-featured-wrapper.cols_8 {
+		width: 100% !important;
+	}
+}
+
+/* EXTERNAL CONTAINER STYLING ODD EVEN (COUNTING) */
+.news.fc-items-block .fc-item-block-featured-wrapper.odd,
+.news.fc-items-block .fc-item-block-standard-wrapper.odd {
+}
+.news.fc-items-block .fc-item-block-featured-wrapper.even,
+.news.fc-items-block .fc-item-block-standard-wrapper.even {
+}
+
+.news.fc-items-block .fc-item-block-featured-wrapper.mod_fc_activeitem:hover .fc-item-block-featured-wrapper-innerbox,
+.news.fc-items-block .fc-item-block-featured-wrapper:hover .fc-item-block-featured-wrapper-innerbox,
+.news.fc-items-block .fc-item-block-standard-wrapper.mod_hl_hover.mod_fc_activeitem:hover .fc-item-block-standard-wrapper-innerbox,
+.news.fc-items-block .fc-item-block-standard-wrapper.mod_hl_hover:hover .fc-item-block-standard-wrapper-innerbox {
+	background-color: #D0D0D0;
+	border-color: #888 #555 #555 #888;
+	box-shadow: 0px 0px 4px 4px black;
+	z-index: 2;
+}
+
+
+/* INTERNAL ITEM-LIST CONTAINER (ONE COLUMN MODE) */
+.news.fc-items-block.featured-block,
+.news.fc-items-block.introblock {
+	margin-top: 0px;
+	margin-bottom: 0px;
+	margin-left: 0%;
+	margin-right: 0%;
+	
+	padding-top: 0px;
+	padding-bottom: 0px;
+	padding-left: 0%;
+	padding-right: 0%;
+	
+	float: left;
+	width: 100%;
+	display: block;
+	position: relative;
+	top: 0px;
+	left: 0px;
+}
+
+.news.fc-items-block.featured-block {
+	background-color: @FCC_box_background_color_feat;
+	padding: @FCC_box_padding_top_bottom_feat @FCC_box_padding_left_right_feat;
+	margin: @FCC_box_margin_top_bottom_feat @FCC_box_margin_left_right_feat;
+}
+
+.news.fc-items-block.standard-block {
+	background-color: @FCC_box_background_color;
+	padding: @FCC_box_padding_top_bottom @FCC_box_padding_left_right;
+	margin: @FCC_box_margin_top_bottom @FCC_box_margin_left_right;
+}
+
+
+
+/*
+ * ITEM BASIC FIELDS STYLES (FOR CUSTOM FIELDS see below, FOR IMAGE AND DATE see more below)
+ */
+
+/*.news.fc-items-block .content_standard {padding: 12px 12px 0 12px;}*/  /* container of basic elements of standard items excluding title & image */
+/*.news.fc-items-block .content_featured {padding: 12px 12px 0 12px;}*/  /* container of basic elements of featured items excluding title & image */
+
+
+/* CONTAINER of item title */
+.news.fc-items-block .fcitem_title_box {
+	display: block;
+	background: @FCC_title_background;
+	font-size: @FCC_title_font_size;
+	margin: 0;
+	padding: 6px;
+}
+
+/* e.g. 'FCI_' + 'title_color' =>  'FCI_title_color' */
+.news.fc-items-block .fcitem_title,
+.news.fc-items-block .fcitem_title a {
+	color: @FCC_title_color;
+	background-color: transparent;
+	line-height: 1.2em;
+	width: 100%;
+	display: inline-block;
+}
+
+.news.fc-items-block .fcitem_title {
+	text-shadow: 1px 1px 1px #000000;
+	height: 2.4em;
+	display: table-cell;
+	vertical-align: middle;
+	padding: 1px 4px;
+	margin: 2px 0px;
+	/*border: 1px dashed #bbbbbb;*/
+}
+.news.fc-items-block .fcitem_title:hover {
+	/*border: 1px dashed black;*/
+}
+
+/* item title styling (link, etc) */
+.news.fc-items-block .fcitem_title a {
+	text-decoration: none;
+	-webkit-transition: all 0.4s; transition: all 0.4s;
+}
+.news.fc-items-block .fcitem_title:hover a,
+.news.fc-items-block .fcitem_title a:hover {
+	cursor: pointer;
+	text-shadow: 1px 1px 3px #000000;
+}
+.news.fc-items-block .fc_overlayed .fcitem_title a {
+	/*text-shadow: 1px 1px 2px #000000, -1px -1px #000, 1px 1px #000000;*/
+	text-shadow: 1px 1px 1px #000000;
+}
+
+
+/* CONTAINER of item date */
+.news.fc-items-block .fcitem_date { /* for label and value (contained inside) see more below */
+	background: url("images/date.png") no-repeat scroll 0px 1px;
+	padding:2px 6px 2px 20px;
+}
+
+/* item date styling (label, value, etc) */
+.news.fc-items-block .date_label,
+.news.fc-items-block .date_label_feat {
+	display:inline;
+	font-weight: bold;
+	margin: 0;
+	padding: 0;
+	white-space: nowrap;
+}
+.news.fc-items-block .date_value,
+.news.fc-items-block .date_value_feat {
+	display:inline-block;
+	font-weight: normal;
+	margin: 0;
+	padding: 0;
+	white-space: nowrap;
+}
+
+
+/* CONTAINER of item description */
+.news.fc-items-block .fcitem_text { /* for image (not contained inside) see more below */
+	/*text-align:justify;*/
+	margin: 0px;
+	padding: 0 12px;
+	line-height: 160%;
+}
+
+
+/* CONTAINER of item image (featured and standard) */
+.news.fc-items-block .image_featured,
+.news.fc-items-block .image_standard {
+	float: left;
+	margin: 0;
+}
+
+/* item image styling (link, image, etc) */
+.news.fc-items-block .image_featured a:hover,
+.news.fc-items-block .image_standard a:hover {
+  text-decoration: none;
+}
+.news.fc-items-block .image_featured img,
+.news.fc-items-block .image_standard img {
+  padding: 0px; /* disabled item border thus padding too */
+	border-width: 0px; /* disabled item border */
+	border-style: solid;
+	border-color: #cccccc #cccccc #cccccc #cccccc;
+	border-radius: 0px;
+}
+.news.fc-items-block .image_standard a:hover img,
+.news.fc-items-block .image_featured a:hover img {
+  border:1px solid #444444;
+}
+
+
+/* CONTAINER of item hits, voting, comments */
+.news.fc-items-block .fcitem_hits { padding: 2px 0px 1px 0px; display: inline-block; }
+.news.fc-items-block .fcitem_voting { padding: 0px 0px 2px 0px; display: inline-block; }
+.news.fc-items-block .fcitem_comments{ padding: 2px 0px 1px 0px; display: inline-block; }
+
+.news.fc-items-block .fcitem_hits img,
+.news.fc-items-block .fcitem_comments img {
+	vertical-align: middle;
+}
+
+.news.fc-items-block .hits_label,
+.news.fc-items-block .voting_label, 
+.news.fc-items-block .comments_label {
+	display:inline;
+	color: black;
+	font-weight: bold;
+	margin: 0;
+	padding: 0;
+	white-space: nowrap;
+	vertical-align:top;
+}
+
+/* force voting to display in same row as label */
+.news.fc-items-block .voting_value_feat,
+.news.fc-items-block .voting_value,
+.news.fc-items-block .voting_value_feat .voting,
+.news.fc-items-block .voting_value .voting {
+	display: block;
+}
+.news.fc-items-block div.fcvote > ul.fcvote_list {
+	clear: none !important;
+}
+.news.fc-items-block div.fcvote-label-outer {
+	clear: none !important;
+	display: inline-block !important;
+	float: none !important;
+}
+
+
+/* CONTAINER of other item fields */
+.news.fc-items-block .fcitem_fields {
+	display: inline-block !important;
+	line-height: 140%;
+}
+
+/* other item fields styling (label, value, etc) */
+.news.fc-items-block .field_label {
+	font-weight: bold;
+	display:block;
+	float:left;
+	clear:left;
+	margin-right:8px;
+	border-bottom: 1px dashed silver;
+	text-align: left;
+}
+.news.fc-items-block .field_value {
+	font-weight: normal;
+	display:block;
+	float:left;
+	text-align: left;
+}
+
+
+/* CONTAINER of item read more */
+.news.fc-items-block .fcitem_readon {
+	text-align: center;
+	width: 96%;
+	background: url("images/readmore.png") transparent no-repeat scroll 0px 5px;
+	border: solid transparent;
+	border-width: 1px 0px;
+	/*padding: 1px 6px 1px 20px;*/
+	margin: 8px 2%;
+	display: inline-block;
+	-webkit-transition: all 0.4s; transition: all 0.4s;
+
+	background-color: @FCC_readon_bg_color;
+	color: @FCC_readon_txt_color;
+	font-size: @FCC_readon_font_size;
+}
+.news.fc-items-block .fcitem_readon:hover {
+	background-color: rgba(255, 255, 255, 0.2);
+	border-color: gray;
+	border-width: 1px 0px;
+	border-radius: 0px;
+}
+
+/* item read more styling (link, etc) */
+.news.fc-items-block .fcitem_readon a.readon,
+.news.fc-items-block .fcitem_readon a.readon span {
+	font-weight: bold;
+	line-height: 160%;
+	padding: 0px;
+	background: transparent;
+	text-decoration: none !important;
+	cursor: pointer;
+	-webkit-transition: all 0.4s; transition: all 0.4s;
+	vertical-align: top;
+	color: inherit;
+	font-size: inherit;
+}
+.news.fc-items-block .fcitem_readon:hover a.readon,
+.news.fc-items-block .fcitem_readon:hover a.readon span {
+	padding: 0px;
+	background: none;
+	text-decoration: none !important;
+	color: gray;
+}
+
+
+
+/*****************************/
+/* Content PLACEMENT methods */
+/*****************************/
+.news.fc-items-block .fc_block {
+	line-height: 160%;
+}
+.news.fc-items-block .fc_overlayed {
+	/* Fallback for web browsers that don't support RGBa */
+	background-color: rgb(0, 0, 0);
+	/* RGBa with 0.4 opacity */
+	background-color: rgba(0, 0, 0, 0.4);
+	/* For IE 5.5 - 7 */
+	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=#4C000000, endColorstr=#4C000000);
+	/* For IE 8+ */
+	-ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#4C000000, endColorstr=#4C000000)";
+	width: 96%;
+	height: auto;
+	padding: 2%;
+	margin: 0%;
+	position: absolute;
+	left: 0px;
+	box-shadow: 1px 1px 8px black;
+}
+.news.fc-items-block .fc_overlayed .fc_block {
+	/*font-family: Raleway;
+	font-weight:900;*/
+	line-height: 160%;
+	color: white;
+	/*text-shadow: 1px 1px 2px #000000, -1px -1px #000000, 1px 1px #000;*/
+	text-shadow: 1px 1px 1px #000000;
+}
+
+.news.fc-items-block .fc_bottom {	bottom: 0px; }
+.news.fc-items-block .fc_top { top: 0px; }
+.news.fc-items-block .fc_full { top: 0px; height:100%; }
+
+.news.fc-items-block .fc_stretch {
+	width:100% !important;
+	border: 0 !important;
+	margin: 0 !important;
+	padding: 0 !important;
+	float: none !important;
+	display: block;
+}
+.news.fc-items-block .fc_float_left {
+	float: left !important;
+	margin: 0px 12px 8px 0;
+	display: block;
+}
+.news.fc-items-block .fc_float_right {
+	float: right !important;
+	margin: 0px 0 8px 12px;
+	display: block;
+}
+.news.fc-items-block .fc_floated {}
+
+.news.fc-items-block .image_featured.fc_float_left img,
+.news.fc-items-block .image_featured.fc_float_right img,
+.news.fc-items-block .image_standard.fc_float_left img,
+.news.fc-items-block .image_standard.fc_float_right img { }
+.news.fc-items-block .image_featured.fc_float_left img,
+.news.fc-items-block .image_featured.fc_float_right img,
+.news.fc-items-block .image_standard.fc_float_left img,
+.news.fc-items-block .image_standard.fc_float_right img { }
+
+.news.fc-items-block .fc_clear { clear: both !important; }
+
+.news.fc-items-block .fc-item-block-featured-wrapper .fc_auto_show,
+.news.fc-items-block .fc-item-block-standard-wrapper .fc_auto_show {
+	-webkit-transition: max-height 0.3s linear, opacity 0.3s linear, padding 0.3s linear, background-color 0.3s linear;
+	transition: max-height 0.3s linear, opacity 0.3s linear, padding 0.3s linear, background-color 0.3s linear;
+	
+	opacity: 0.0;
+	filter:alpha(opacity=0);
+	
+	max-height: 0;
+	padding-top: 0px;
+	padding-bottom: 0px;
+	overflow-y: hidden;
+}
+
+
+
+/* CURRENTLY ACTIVATED item container or HOVERED container */
+
+
+.news.fc-items-block .fc-item-block-featured-wrapper.mod_fc_activeitem .fc_auto_show.fc_show_active,  /* force showing content of active item */
+.news.fc-items-block .fc-item-block-standard-wrapper.mod_fc_activeitem .fc_auto_show.fc_show_active { /* force showing content of active item */
+	opacity:1;
+	filter:alpha(opacity=100);
+	max-height: 100%; /* can be approximate, percentage works well if parent height is specific */
+}
+.news.fc-items-block .fc-item-block-featured-wrapper.mod_fc_activeitem:hover .fc_auto_show.fc_show_active,  /* show & highlight content of active item */
+.news.fc-items-block .fc-item-block-standard-wrapper.mod_fc_activeitem:hover .fc_auto_show.fc_show_active,  /* show & highlight content of active item */
+.news.fc-items-block .fc-item-block-featured-wrapper:hover .fc_auto_show,  /* show content if item under mouse */
+.news.fc-items-block .fc-item-block-standard-wrapper:hover .fc_auto_show {   /* show content if item under mouse */
+	opacity:1;
+	filter:alpha(opacity=100);
+	background-color: rgba(0, 0, 0, 0.75);
+	max-height: 100%; /* can be approximate, percentage works well if parent height is specific */
+}
