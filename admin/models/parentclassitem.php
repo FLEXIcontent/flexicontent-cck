@@ -5284,7 +5284,11 @@ class ParentClassItem extends FCModelAdmin
 			.' JOIN #__flexicontent_items_ext AS e ON i.id = e.item_id '
 			.' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON i.id = rel.itemid '
 			.' WHERE i.alias=' . $this->_db->Quote($alias)
-			.'  AND (i.catid=' . (int) $this->catid . ' OR rel.catid IN (' . implode(', ', ArrayHelper::toInteger($this->categories)) . ') )'
+			.'  AND (i.catid=' . (int) $item->catid
+			// CURRENTLY for unique alias check only main category,
+			// as checking all categories (should we choose to do it), should be done in a different way, checking every category with individual SQL query in a loop
+			//. (!empty($item->categories) ? ' OR rel.catid IN (' . implode(', ', ArrayHelper::toInteger($item->categories)) . ')' : '')
+			. ' )'
 			.'  AND i.language = ' . $this->_db->Quote($item->language)
 			.'  AND i.id <> ' . (int) $item->id
 			;
