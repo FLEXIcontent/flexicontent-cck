@@ -340,11 +340,13 @@ trait flexicontent_basetable_trait
 				->where($this->_db->quoteName('id') . ' <> ' . (int) $this->id)
 			;
 
-			if (!empty($this->categories))
+			// CURRENTLY for unique alias check only main category,
+			// as checking all categories (should we choose to do it), should be done in a different way, checking every category with individual SQL query in a loop
+			/*if (!empty($this->categories))
 			{
 				$query->where($this->_db->quoteName('catid') . ' IN (' . implode(', ', ArrayHelper::toInteger($this->categories)) . ')');
 			}
-			elseif (!empty($this->catid))
+			else*/if (!empty($this->catid))
 			{
 				$query->where($this->_db->quoteName('catid') . ' = ' . (int) $this->catid);
 			}
