@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<form>
+	<author>FLEXIcontent Team</author>
+	<website>www.flexicontent.org</website>
+	<email>info@flexicontent.org</email>
+	<license>GPLv3</license>
+	<version>1.0</version>
+	<release>15 November 2017</release>
+	<microdata_support>1</microdata_support>
+
+	<defaulttitle>FLEXI_TMPL_CORE-NEWS_ITEM_DEFAULT_TITLE</defaulttitle>
+	<description>FLEXI_TMPL_CORE-NEWS_ITEM_SHORT_DESC</description>
+
+	<fields name="attribs">
+		<fieldset name="attribs" addfieldpath="/administrator/components/com_flexicontent/elements">
+
+			<field name="item_head_break" type="separator" level="level_br" />
+
+			<!--field name="templatehtmlmode" type="separator" default="FLEXI_TEMPLATE_HTML_MODE" level="level2" /-->
+			<field name="htmlmode" type="radio" default="" label="FLEXI_HTML_MODE" description="FLEXI_HTML_MODE_DESC" filter="int" class="btn-group">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_XHTML</option>
+				<option value="1">FLEXI_HTML5</option>
+			</field>
+	
+			<field name="item_head_break2" type="separator" level="level_br" />
+
+				<field name="item_tabset_start" type="separator" default="ITEM_TABSET" level="tabset_start" />
+
+					<field name="item_tab_styling" type="separator" default="FLEXI_STYLING" icon_class="icon-palette" level="tab_open" box_type="1" />
+
+					<field name="custom_layout_title" type="text" size="3" not_inherited="1" default="" label="FLEXI_LAYOUT_CUSTOM_DISPLAY_TITLE" description="FLEXI_LAYOUT_CUSTOM_DISPLAY_TITLE_DESC" />
+
+					<field name="title_grp" type="separator" cssprep="1" default="FLEXI_TMPL_ITEM_TITLE" description="" level="level2" />
+					<field name="title_color" type="color" cssprep="less" default="inherit" label="Title text color" description="Color of title text" />
+					<field name="title_background" type="color" cssprep="less" default="inherit" label="Title background" description="Color of title background" />
+					<field name="title_font_size" type="text" cssprep="less" default="inherit" label="Title font size" description="Size of title text" />
+					<field name="title_cut_text" type="text" size="3" default="" label="FLEXI_TITLE_MAXLEN" description="FLEXI_TITLE_MAXLEN_DESC" />
+
+					<field name="label_styling_grp" type="separator" cssprep="1" default="FLEXI_TMPL_LABEL_STYLING" description="" level="level2" />
+					<field name="label_bg_color" type="color" cssprep="less" default="#999999" label="FLEXI_TMPL_LABEL_BG" description="FLEXI_TMPL_LABEL_BG_DESC" />
+					<field name="label_txt_color" type="color" cssprep="less" default="#ffffff" label="FLEXI_TMPL_LABEL_TXT_COLOR" description="FLEXI_TMPL_LABEL_TXT_COLOR_DESC" />
+					<field name="label_radius" type="number" cssprep="less" default="3" label="FLEXI_TMPL_LABEL_RADIUS" description="FLEXI_TMPL_LABEL_RADIUS_DESC" min="0" max="80" step="1" />
+			
+					<field name="tab_styling_grp" type="separator" cssprep="1" default="FLEXI_TMPL_TABS_STYLING" description="" level="level2" />
+					<field name="tab_handles_grp" type="separator" cssprep="1" default="FLEXI_TMPL_TABS_HANDLES" description="" level="level3" />
+					<field name="tab_bg_color_start" type="color" cssprep="less" default="#3093c7" label="FLEXI_TMPL_TAB_BG_START" description="FLEXI_TMPL_TAB_BG_START_DESC" />
+					<field name="tab_bg_color_end" type="color" cssprep="less" default="#1c5a85" label="FLEXI_TMPL_TAB_BG_END" description="FLEXI_TMPL_TAB_BG_END_DESC" />
+					<field name="tab_title_color" type="color" cssprep="less" default="#ffffff" label="FLEXI_TMPL_TAB_TITLE_COLOR" description="FLEXI_TMPL_TAB_TITLE_COLOR_DESC" />
+			
+					<field name="item_tab_placement" type="separator" default="FLEXI_PLACEMENT" icon_class="icon-grid" level="tab_open" box_type="1" />
+
+
+					<field name="column_display_grp" type="separator" cssprep="1" default="FLEXI_TMPL_COLUMNS_DISPLAY" description="" level="level2" />
+					<field name="top_cols" type="radio" default="" label="FLEXI_ITEM_TOP_COLS" description="FLEXI_ITEM_TOP_COLS_DESC" class="btn-group">
+						<option value="">FLEXI_USE_GLOBAL</option>
+						<option value="one">FLEXI_1_COL</option>
+						<option value="two">FLEXI_2_COLS</option>
+					</field>
+					<field name="bottom_cols" type="radio" default="" label="FLEXI_ITEM_BOTTOM_COLS" description="FLEXI_ITEM_BOTTOM_COLS_DESC" class="btn-group">
+						<option value="">FLEXI_USE_GLOBAL</option>
+						<option value="one">FLEXI_1_COL</option>
+						<option value="two">FLEXI_2_COLS</option>
+					</field>
+
+					<field name="featured_row_grp" type="separator" default="Featured row" description="" level="level2" />
+					<field name="featured_row_title" type="text" default="" hint="JFeatured" filter="raw" label="Row title" description="Title will be displayed (typically) at the start of the row. This can be a language string" />
+
+					<field name="featured_row_grp_styles" type="separator" cssprep="1" default="Styles" description="" level="level3" />
+					<field name="featured_row_text_color" type="color" cssprep="less" default="#ffffff" label="Text Color" description="..." />
+					<field name="featured_row_bgcolor" type="color" cssprep="less" default="#B46410" label="Background color" description="..." />
+					<field name="featured_row_font_size" type="text" cssprep="less" default="12px" label="Font size" description="..." class="input-xsmall" />
+
+					<field name="subtitle_tabs_grp" type="separator" default="SubTitle Tabs" description="" level="level2" />
+					<field name="subtitle_tab_titles" type="textarea" default="" hint="Tab1 ,, Tab2 ,, Tab3 ,, Tab4 ,, Tab5 ,, Tab6 ,, Tab7 ,, Tab8 ,, Tab9 ,, Tab10 ,, Tab11 ,, Tab12" label="Tab titles  (language strings)" description="Tab titles seperated via ,, (double comma)" />
+
+					<field name="bottom_tabs_grp" type="separator" default="Bottom Tabs" description="" level="level2" />
+					<field name="bottom_tab_titles" type="textarea" default="" hint="Tab1 ,, Tab2 ,, Tab3 ,, Tab4 ,, Tab5 ,, Tab6 ,, Tab7 ,, Tab8 ,, Tab9 ,, Tab10 ,, Tab11 ,, Tab12" label="Tab titles  (language strings)" description="Tab titles seperated via ,, (double comma)" />
+
+				<field name="item_tabset_end" type="separator" default="ITEM_TABSET" level="tabset_close" />
+
+		</fieldset>
+	</fields>
+
+	<fieldgroups>
+
+		<group posrow="slideshow" tcolor="#3A2459" title="Slideshow top" >slideshow_top</group>
+
+		<group tcolor="darkcyan" title="After Title row 1">aftertitle1</group>
+		<group tcolor="darkcyan" title="After Title row 2">aftertitle2</group>
+		<group tcolor="darkcyan" title="After Title row 3">aftertitle3</group>
+
+		<group posrow="aftertitle" tcolor="darkgreen" title="After Title Tab1">aftertitle_tab1</group>
+		<group posrow="aftertitle" tcolor="darkgreen" title="After Title Tab2">aftertitle_tab2</group>
+		<group posrow="aftertitle" tcolor="darkgreen" title="After Title Tab3">aftertitle_tab3</group>
+		<group posrow="aftertitle" tcolor="darkgreen" title="After Title Tab4">aftertitle_tab4</group>
+		<group posrow="aftertitle" tcolor="darkgreen" title="After Title Tab5">aftertitle_tab5</group>
+		<group posrow="aftertitle" tcolor="darkgreen" title="After Title Tab6">aftertitle_tab6</group>
+		<group posrow="aftertitle_wrap2" tcolor="darkgreen" title="After Title Tab7">aftertitle_tab7</group>
+		<group posrow="aftertitle_wrap2" tcolor="darkgreen" title="After Title Tab8">aftertitle_tab8</group>
+		<group posrow="aftertitle_wrap2" tcolor="darkgreen" title="After Title Tab9">aftertitle_tab9</group>
+		<group posrow="aftertitle_wrap2" tcolor="darkgreen" title="After Title Tab10">aftertitle_tab10</group>
+		<group posrow="aftertitle_wrap2" tcolor="darkgreen" title="After Title Tab11">aftertitle_tab11</group>
+		<group posrow="aftertitle_wrap2" tcolor="darkgreen" title="After Title Tab12">aftertitle_tab12</group>
+
+		<group posrow="img_top" tcolor="#3A2459" title="Image" >image</group>
+		<group posrow="img_top" tcolor="#3A2459" title="Top">top</group>
+		<group posrow="description" tcolor="black" title="Description">description</group>
+
+		<group posrow="featured_row" tcolor="#B46410" title="Featured row info">featured_row_info</group>
+		<group posrow="featured_row" tcolor="#B46410" title="Featured row logo">featured_row_logo</group>
+
+		<group posrow="bottom" tcolor="darkgreen" title="Bottom Tab1">bottom_tab1</group>
+		<group posrow="bottom" tcolor="darkgreen" title="Bottom Tab2">bottom_tab2</group>
+		<group posrow="bottom" tcolor="darkgreen" title="Bottom Tab3">bottom_tab3</group>
+		<group posrow="bottom" tcolor="darkgreen" title="Bottom Tab4">bottom_tab4</group>
+		<group posrow="bottom" tcolor="darkgreen" title="Bottom Tab5">bottom_tab5</group>
+		<group posrow="bottom" tcolor="darkgreen" title="Bottom Tab6">bottom_tab6</group>
+		<group posrow="bottom_wrap2" tcolor="darkgreen" title="Bottom Tab7">bottom_tab7</group>
+		<group posrow="bottom_wrap2" tcolor="darkgreen" title="Bottom Tab8">bottom_tab8</group>
+		<group posrow="bottom_wrap2" tcolor="darkgreen" title="Bottom Tab9">bottom_tab9</group>
+		<group posrow="bottom_wrap2" tcolor="darkgreen" title="Bottom Tab10">bottom_tab10</group>
+		<group posrow="bottom_wrap2" tcolor="darkgreen" title="Bottom Tab11">bottom_tab11</group>
+		<group posrow="bottom_wrap2" tcolor="darkgreen" title="Bottom Tab12">bottom_tab12</group>
+
+		<group tcolor="#6C1A10">bottom</group>
+
+		<group tcolor="black">renderonly</group>
+
+	</fieldgroups>
+
+	<cssitem>
+		<file>css/item.css</file>
+	</cssitem>
+	<jsitem>
+	</jsitem>	
+</form>
