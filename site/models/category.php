@@ -1204,7 +1204,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		$lang_handler = FlexicontentFields::getLangHandler(JFactory::getLanguage()->getTag());
 		if ($lang_handler)
 		{
-			$text = $lang_handler->get_segment_array($clear_previous = true, trim($text));
+			$text = implode(' ', $lang_handler->get_segment_array($clear_previous = true, trim($text)));
 		}
 
 		// Prefix the words for short word / stop words matching
