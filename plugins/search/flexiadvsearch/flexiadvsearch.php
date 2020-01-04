@@ -930,6 +930,13 @@ class plgSearchFlexiadvsearch extends JPlugin
 			? 'flexicontent_items_ext'
 			: 'flexicontent_advsearch_index';
 
+		// Try to add space between words for current language using a dictionary
+		$lang_handler = FlexicontentFields::getLangHandler(JFactory::getLanguage()->getTag());
+		if ($lang_handler)
+		{
+			$text = implode(' ', $lang_handler->get_segment_array($clear_previous = true, trim($text)));
+		}
+
 		// Prefix the words for short word / stop words matching
 		$search_prefix = $this->_params->get('add_search_prefix') ? 'vvv' : '';
 		$text_np = trim($text);
