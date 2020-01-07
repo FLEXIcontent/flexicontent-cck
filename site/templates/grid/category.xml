@@ -8,8 +8,8 @@
 	<release>15 November 2017</release>
 	<microdata_support>1</microdata_support>
 	
-	<defaulttitle>FLEXI_TMPL_CORE-NEWS_CATEGORY_DEFAULT_TITLE</defaulttitle>
-	<description>FLEXI_TMPL_CORE-NEWS_CATEGORY_SHORT_DESC</description>
+	<defaulttitle>FLEXI_TMPL_GRID_CATEGORY_TITLE</defaulttitle>
+	<description>FLEXI_TMPL_GRID_CATEGORY_SHORT_DESC</description>
 
 	<fields name="attribs">
 		<fieldset name="attribs" addfieldpath="/administrator/components/com_flexicontent/elements">

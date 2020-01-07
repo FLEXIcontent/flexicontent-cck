@@ -8,8 +8,8 @@
 	<release>20 May 2014</release>
 	<microdata_support>1</microdata_support>
 
-	<defaulttitle>FLEXI_TMPL_DEFAULT_CATEGORY_DEFAULT_TITLE</defaulttitle>
-	<description>FLEXI_TMPL_DEFAULT_CATEGORY_SHORT_DESC</description>
+	<defaulttitle>FLEXI_TMPL_TABLE_CATEGORY_TITLE</defaulttitle>FLEXI_TMPL_DEFAULT_CATEGORY_DEFAULT_TITLE
+	<description>FLEXI_TMPL_TABLE_CATEGORY_SHORT_DESC</description>
 
 	<fields name="attribs">
 		<fieldset name="attribs" addfieldpath="/administrator/components/com_flexicontent/elements">
