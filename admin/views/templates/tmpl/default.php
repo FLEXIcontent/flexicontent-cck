@@ -32,7 +32,7 @@ JFactory::getDocument()->addScriptDeclaration('
 	}
 ');
 
-$basetemplates = array('default', 'blog', 'faq', 'items-tabbed', 'presentation');
+$basetemplates = array('table', 'grid', 'faq', 'items-tabbed');
 $ctrl_task = FLEXI_J16GE ? 'task=templates.' : 'controller=templates&task=';
 $form_token = JSession::getFormToken();
 $js = "
