@@ -5,7 +5,7 @@
  *
  * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
  * @link            https://flexicontent.org
- * @copyright       Copyright © 2017, FLEXIcontent team, All Rights Reserved
+ * @copyright       Copyright ï¿½ 2017, FLEXIcontent team, All Rights Reserved
  * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
@@ -604,7 +604,7 @@ class plgFlexicontent_fieldsFieldgroup extends FCField
 
 		if (count($field->{$prop})) {
 			$field->{$prop}  = implode($separatorf, $field->{$prop});
-			$field->{$prop}  = $opentag . $field->{$prop} . $closetag;
+			$field->{$prop}  = JText::_($opentag) . $field->{$prop} . JText::_($closetag);
 		} else {
 			$field->{$prop} = '';
 		}
