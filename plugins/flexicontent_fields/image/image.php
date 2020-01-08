@@ -1055,7 +1055,6 @@ class plgFlexicontent_fieldsImage extends FCField
 				' : '
 					<div class="fcimg_preview_box fc-box thumb_'.$thumb_size_default.'">
 						'.$imgpreview.'
-						'.$fcimg_preview_msg.'
 						<div class="fcclear"></div>
 					'.$select_existing.'
 					</div>
@@ -1067,6 +1066,7 @@ class plgFlexicontent_fieldsImage extends FCField
 				'
 				<div class="fcimg_value_props">
 					<table class="fc-form-tbl fcinner fccompact">
+					'.$fcimg_preview_msg.'
 						' . @ $urllink . '
 						' . @ $mediaurl . '
 						' . @ $alt . '

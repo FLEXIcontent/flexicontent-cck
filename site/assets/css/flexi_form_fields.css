@@ -1824,3 +1824,14 @@ iframe.sharedmedia {
 .fc-field-value-properties-box.fc-field-value-disabled {
 	display: none;
 }
+.fcimg_preview_msg {
+	border: 1px solid #ccc;
+	padding: 5px;
+	margin: 0px 2px 6px 2px;
+	border-radius: 5px;
+	display: block;
+	color: #999;
+	font-style: italic;
+	min-height: 20px;
+	overflow-y: auto !important;
+}
