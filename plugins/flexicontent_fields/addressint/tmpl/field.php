@@ -44,8 +44,8 @@ foreach ($values as $value)
 	$disabled_attr  = $value_is_disabled ? ' disabled="disabled" ' : '';
 	$google_maps_js_api_key = $field->parameters->get('google_maps_js_api_key', '');
 	$mapapi_edit = $field->parameters->get('mapapi_edit', '');//googlemap or algolia
-	$algolia_api_id = $field->parameters->get('algolia_edit_api_id', 'plFM9RH0FIB7');
-	$algolia_api_key = $field->parameters->get('algolia_edit_api_key', '0a6d21566fa86ff8a65e6935bdfc08e5');
+	$algolia_api_id = $field->parameters->get('algolia_edit_api_id', '');
+	$algolia_api_key = $field->parameters->get('algolia_edit_api_key', '');
 
 	$field_html = '
 	<div class="fcfield_field_data_box fcfield_addressint_data">
