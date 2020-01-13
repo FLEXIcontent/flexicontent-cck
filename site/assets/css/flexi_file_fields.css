@@ -965,11 +965,6 @@ table.fc_uploader_header_tbl td:last-child {
 		min-height: 28px;
 	}
 }
-.controls {
-	font-size: 30px;
-	color: #b7b7b7;
-	margin: 0 0 10px 0;
-}
 .playBtn,
 .pauseBtn,
 .stopBtn,
