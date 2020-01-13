@@ -38,7 +38,7 @@ class plgFlexicontent_fieldsLinkslist extends FCField
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 
-		$field->label = JText::_($field->label);
+		$field->label = $field->parameters->get('label_form') ? JText::_($field->parameters->get('label_form')) : JText::_($field->label);
 
 		// some parameter shortcuts
 		$field_elements	= $field->parameters->get( 'field_elements' ) ;
