@@ -38,7 +38,7 @@ class plgFlexicontent_fieldsAccount_via_submit extends FCField
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 
-		$field->label = JText::_($field->label);
+		$field->label = $field->parameters->get('label_form') ? JText::_($field->parameters->get('label_form')) : JText::_($field->label);
 
 		// initialize framework objects and other variables
 		$document = JFactory::getDocument();

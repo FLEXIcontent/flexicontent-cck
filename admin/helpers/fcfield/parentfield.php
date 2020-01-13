@@ -123,7 +123,8 @@ class FCField extends JPlugin
 	public function onDisplayField(&$field, &$item)
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
-		$field->label = JText::_($field->label);
+
+		$field->label = $field->parameters->get('label_form') ? JText::_($field->parameters->get('label_form')) : JText::_($field->label);
 
 		// Set field and item objects
 		$this->setField($field);

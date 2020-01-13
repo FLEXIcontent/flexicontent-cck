@@ -62,6 +62,7 @@
 				<option value="1">FLEXI_FLOATED_LEFT</option>
 				<option value="2">FLEXI_CLEARED</option>
 			</field>
+			<field name="label_form" type="text" default="" label="FLEXI_LABEL" description="Enter a label to use for item form that is different than field label for viewing" depend_class=""/>
 			<field name="no_acc_msg_form" type="text" default="" label="FLEXI_FIELD_NOACCESS_MSG" description="FLEXI_FIELD_NOACCESS_MSG_DESC" depend_class=""/>
 			<field name="size" type="text" default="12" size="2" label="FLEXI_RIFLD_SELECTBOX_LINES" description="FLEXI_RIFLD_SELECTBOX_LINES_DESC" />
 

@@ -451,7 +451,8 @@ class plgFlexicontent_fieldsCore extends FCField
 	// Method to create field's HTML display for item form
 	function onDisplayField(&$field, &$item)
 	{
-		$field->label = JText::_($field->label);
+		$field->label = $field->parameters->get('label_form') ? JText::_($field->parameters->get('label_form')) : JText::_($field->label);
+
 		$use_ingroup = $field->parameters->get('use_ingroup', 0);
 		if (!isset($field->formhidden_grp)) $field->formhidden_grp = $field->formhidden;
 		if ($use_ingroup) $field->formhidden = 3;

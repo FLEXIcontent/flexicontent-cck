@@ -47,7 +47,8 @@ class FCIndexedField extends FCField
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 
-		$field->label = JText::_($field->label);
+		$field->label = $field->parameters->get('label_form') ? JText::_($field->parameters->get('label_form')) : JText::_($field->label);
+
 		$use_ingroup = $field->parameters->get('use_ingroup', 0);
 		$ajax = !empty($field->isAjax);
 		if (!isset($field->formhidden_grp)) $field->formhidden_grp = $field->formhidden;

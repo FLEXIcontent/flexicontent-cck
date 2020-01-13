@@ -36,6 +36,7 @@
 				<option value="1">FLEXI_FLOATED_LEFT</option>
 				<option value="2">FLEXI_CLEARED</option>
 			</field>
+			<field name="label_form" type="text" default="" label="FLEXI_LABEL" description="Enter a label to use for item form that is different than field label for viewing" depend_class=""/>
 			<field name="no_acc_msg_form" type="text" default="" label="FLEXI_FIELD_NOACCESS_MSG" description="FLEXI_FIELD_NOACCESS_MSG_DESC" depend_class=""/>
 			<field name="use_ingroup" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_USE_IN_FIELD_GROUP" description="FLEXI_USE_IN_FIELD_GROUP_DESC" inline_tip="FLEXI_USE_IN_FIELD_GROUP_INSTRUCTIONS" tip_class="fieldgroupon" tip_img="comments.png" preview_img="insert_merge_field.png" class="btn-group group-fcinfo">
 				<option value="0" show_list="fieldgroupoff" hide_list="fieldgroupon">FLEXI_NO</option>

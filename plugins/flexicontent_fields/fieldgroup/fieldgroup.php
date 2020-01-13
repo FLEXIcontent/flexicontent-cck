@@ -37,7 +37,8 @@ class plgFlexicontent_fieldsFieldgroup extends FCField
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 
-		$field->label = JText::_($field->label);
+		$field->label = $field->parameters->get('label_form') ? JText::_($field->parameters->get('label_form')) : JText::_($field->label);
+
 		$use_ingroup = 0; // Field grouped should not be recursively grouped
 
 		if (!isset($field->formhidden_grp)) $field->formhidden_grp = $field->formhidden;
