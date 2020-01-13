@@ -1963,39 +1963,60 @@ class FlexicontentModelCategory extends JModelLegacy {
 		{
 			$err_mssg = $err_type = false;
 
-			if (!in_array($this->_layout, array('favs','tags','mcats','myitems','author')))
+			switch($this->_layout)
 			{
-				$err_mssg = JText::sprintf( 'FLEXI_CONTENT_LIST_LAYOUT_IS_NOT_SUPPORTED', $this->_layout );
-				$err_type = 404;
-			}
-			elseif ($this->_layout=='author' && !$this->_authorid)
-			{
-				$err_mssg = JText::_( 'FLEXI_CANNOT_LIST_CONTENT_AUTHORID_NOT_SET');
-				$err_type = 404;
-			}
-			elseif ($this->_layout=='tags' && !$this->_tagid)
-			{
-				$err_mssg = JText::_( 'FLEXI_CANNOT_LIST_CONTENT_TAGID_NOT_SET');
-				$err_type = 404;
-			}
-			elseif ($this->_layout=='myitems' && !$this->_authorid)
-			{
-				$err_mssg = JText::_( 'FLEXI_LOGIN_TO_DISPLAY_YOUR_CONTENT');
-				$err_type = 403;
-				$login_redirect = true;
-			}
-			elseif ($this->_layout=='favs' && !$this->_uid)
-			{
-				// Get Favourites field configuration
-				$favs_field = reset(FlexicontentFields::getFieldsByIds(array(12)));
-				$favs_field->parameters = new JRegistry($favs_field->attribs);
-				$allow_guests_favs = $favs_field->parameters->get('allow_guests_favs', 1);
-				if (!$allow_guests_favs)
-				{
-					$err_mssg = JText::_( 'FLEXI_LOGIN_TO_DISPLAY_YOUR_FAVOURED_CONTENT');
-					$err_type = 403;
-					$login_redirect = true;
-				}
+				case 'author':
+					if (!$this->_authorid)
+					{
+						$err_mssg = JText::_( 'FLEXI_CANNOT_LIST_CONTENT_AUTHORID_NOT_SET');
+						$err_type = 404;
+					}
+					break;
+
+				case 'tags':
+					if (!$this->_tagid)
+					{
+						$err_mssg = JText::_( 'FLEXI_CANNOT_LIST_CONTENT_TAGID_NOT_SET');
+						$err_type = 404;
+					} elseif (!$this->getTag())
+					{
+						$err_mssg = JText::_( 'JERROR_LAYOUT_PAGE_NOT_FOUND');
+						$err_type = 404;
+					}
+					break;
+
+				case 'myitems':
+					if (!$this->_authorid)
+					{
+						$err_mssg = JText::_( 'FLEXI_LOGIN_TO_DISPLAY_YOUR_CONTENT');
+						$err_type = 403;
+						$login_redirect = true;
+					}
+					break;
+
+				case 'favs':
+					if (!$this->_uid)
+					{
+						// Get Favourites field configuration
+						$favs_field = reset(FlexicontentFields::getFieldsByIds(array(12)));
+						$favs_field->parameters = new JRegistry($favs_field->attribs);
+						$allow_guests_favs = $favs_field->parameters->get('allow_guests_favs', 1);
+						if (!$allow_guests_favs)
+						{
+							$err_mssg = JText::_( 'FLEXI_LOGIN_TO_DISPLAY_YOUR_FAVOURED_CONTENT');
+							$err_type = 403;
+							$login_redirect = true;
+						}
+					}
+					break;
+
+				default:
+					if (!in_array($this->_layout, array('favs','tags','mcats','myitems','author')))
+					{
+						$err_mssg = JText::sprintf( 'FLEXI_CONTENT_LIST_LAYOUT_IS_NOT_SUPPORTED', $this->_layout );
+						$err_type = 404;
+					}
+					break;
 			}
 
 			// Raise a notice and redirect
