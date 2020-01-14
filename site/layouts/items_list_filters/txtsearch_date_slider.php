@@ -196,10 +196,17 @@ else
 				}
 				else
 				{
-					if (i > 0)
+					if (nodeHandles.length == 2 && i == 0)
 					{
 						var sep = document.createElement('span');
-						sep.innerHTML = ' &nbsp; <span class=\"icon-arrow-left-4\"></span><span class=\"icon-arrow-right-4\"></span>&nbsp;';
+						sep.innerHTML = '<b>" . JText::_('FLEXI_FROM') . "</b>:&nbsp;';
+						mssgHandle.appendChild(sep);
+					}
+
+					if (nodeHandles.length == 2 && i == 1)
+					{
+						var sep = document.createElement('span');
+						sep.innerHTML = ' &nbsp; <b>" . JText::_('FLEXI_TO') . "</b>:&nbsp;';
 						mssgHandle.appendChild(sep);
 					}
 
