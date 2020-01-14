@@ -216,6 +216,9 @@ form > .fc_filter_line {
 .fc_filter_html > .noUi-target {
 	margin: 24px 24px 6px 24px;
 }
+.fc_filter_html > .noUi-target.noToolTipSlider {
+	margin: 8px 16px 6px 16px;
+}
 .fc_filter_html .calendar {
 	vertical-align: bottom;
 	margin: 0px 6px 9px 2px;

@@ -7,6 +7,9 @@
 extract($displayData);
 $_s = $isSearchView ? '_s' : '';
 
+$anyAsFirstLastValues = false;
+$showAsTooltips = false;
+
 // Component's parameters
 $cparams = JComponentHelper::getParams('com_flexicontent');  // createFilter maybe called in backend too ...
 $use_font_icons = $cparams->get('use_font_icons', 1);
@@ -42,11 +45,18 @@ else
 	{
 		$start = $min = 0;
 		$end = $max = -1;
-		$step=1;
+		$step = 1;
+		
+		$step_values = array();
+		$step_labels = array();
+		$i = 0;
 
-		$step_values = array(0=>"''");
-		$step_labels = array(0=>JText::_('FLEXI_ANY'));
-		$i = 1;
+		if ($anyAsFirstLastValues)
+		{
+			$step_values[] = "''";
+			$step_labels[] = JText::_('FLEXI_ANY');
+			$i++;
+		}
 
 		foreach ($results as $result)
 		{
@@ -71,13 +81,13 @@ else
 		}
 
 		// Set max according considering the skipped empty values
-		$max = ($i-1) + ($display_filter_as == 7 ? 0 : 1);  //count($results)-1;
+		$max = ($i - 1) + ($display_filter_as == 7 ? 0 : ($anyAsFirstLastValues ? 1 : 0));  //count($results)-1;
 		if ($end == -1) $end = $max;  // Set end to last element if it was not set
 
 		if ($display_filter_as == 8)
 		{
-			$step_values[] = "''";
-			$step_labels[] = JText::_('FLEXI_ANY');
+			//$step_values[] = "''";
+			//$step_labels[] = JText::_('FLEXI_ANY');
 		}
 
 		$step_range = 
@@ -166,18 +176,40 @@ else
 					".$step_range."
 			});
 
-			var tipHandles = slider.getElementsByClassName('noUi-handle'),
-			tooltips = [];
+			var showAsTooltips = " . ($showAsTooltips ? 1 : 0) . ";
+			var nodeHandles = slider.getElementsByClassName('noUi-handle'),
+				tooltips = [];
+			var mssgHandle = jQuery(slider).parent().find('.fcfilter_nouislider_txtbox').get(0),
+				txtBoxes = [];
 
 			// Add divs to the slider handles.
-			for ( var i = 0; i < tipHandles.length; i++ )
+			for ( var i = 0; i < nodeHandles.length; i++ )
 			{
-				tooltips[i] = document.createElement('span');
-				tipHandles[i].appendChild(tooltips[i]);
+				if (showAsTooltips)
+				{
+					tooltips[i] = document.createElement('span');
+					nodeHandles[i].appendChild(tooltips[i]);
 
-				tooltips[i].className += 'fc-sliderTooltip'; // Add a class for styling
-				tooltips[i].innerHTML = '<span></span>'; // Add additional markup
-				tooltips[i] = tooltips[i].getElementsByTagName('span')[0];  // Replace the tooltip reference with the span we just added
+					tooltips[i].className += 'fc-sliderTooltip'; // Add a class for styling
+					tooltips[i].innerHTML = '<span></span>'; // Add additional markup
+					tooltips[i] = tooltips[i].getElementsByTagName('span')[0];  // Replace the tooltip reference with the span we just added
+				}
+				else
+				{
+					if (i > 0)
+					{
+						var sep = document.createElement('span');
+						sep.innerHTML = ' &nbsp; <span class=\"icon-arrow-left-4\"></span><span class=\"icon-arrow-right-4\"></span>&nbsp;';
+						mssgHandle.appendChild(sep);
+					}
+
+					txtBoxes[i] = document.createElement('span');
+					mssgHandle.appendChild(txtBoxes[i]);
+
+					txtBoxes[i].className += ''; // Add a class for styling
+					txtBoxes[i].innerHTML = '<span></span>'; // Add additional markup
+					txtBoxes[i] = txtBoxes[i].getElementsByTagName('span')[0];  // Replace reference with the span we just added
+				}
 			}
 
 			// When the slider changes, display the value in the tooltips and set it into the input form elements
@@ -195,40 +227,51 @@ else
 				{
 					input1.value = typeof step_values[value] !== 'undefined' ? step_values[value] : value;
 				}
-
-				var tooltip_text = typeof step_labels[value] !== 'undefined' ? step_labels[value] : value;
-				var max_len = 36;
-				tooltips[handle].innerHTML = tooltip_text.length > max_len+4 ? tooltip_text.substring(0, max_len)+' ...' : tooltip_text;
-				var left  = jQuery(tooltips[handle]).closest('.noUi-origin').position().left;
-				var width = jQuery(tooltips[handle]).closest('.noUi-base').width();
 				
-				//window.console.log ('handle: ' + handle + ', left : ' + left + ', width : ' + width);
-				if (isSingle)
-				{
-					left<(50/100)*width ?
-						jQuery(tooltips[handle]).parent().removeClass('fc-left').addClass('fc-right') :
-						jQuery(tooltips[handle]).parent().removeClass('fc-right').addClass('fc-left');
-				}
+				var tooltip_text = typeof step_labels[value] !== 'undefined' ? step_labels[value] : value;
 
-				else if (handle)
+				if (showAsTooltips)
 				{
-					left<=(76/100)*width ?
-						jQuery(tooltips[handle]).parent().removeClass('fc-left').addClass('fc-right') :
-						jQuery(tooltips[handle]).parent().removeClass('fc-right').addClass('fc-left');
-					left<=(49/100)*width ?
-						jQuery(tooltips[handle]).parent().addClass('fc-bottom') :
-						jQuery(tooltips[handle]).parent().removeClass('fc-bottom');
-				}
+					var max_len = 36;
+					tooltips[handle].innerHTML = tooltip_text.length > max_len+4 ? tooltip_text.substring(0, max_len)+' ...' : tooltip_text;
 
+					var left  = jQuery(tooltips[handle]).closest('.noUi-origin').position().left;
+					var width = jQuery(tooltips[handle]).closest('.noUi-base').width();
+					
+					//window.console.log ('handle: ' + handle + ', left : ' + left + ', width : ' + width);
+					if (isSingle)
+					{
+						left<(50/100)*width ?
+							jQuery(tooltips[handle]).parent().removeClass('fc-left').addClass('fc-right') :
+							jQuery(tooltips[handle]).parent().removeClass('fc-right').addClass('fc-left');
+					}
+
+					else if (handle)
+					{
+						left<=(76/100)*width ?
+							jQuery(tooltips[handle]).parent().removeClass('fc-left').addClass('fc-right') :
+							jQuery(tooltips[handle]).parent().removeClass('fc-right').addClass('fc-left');
+						left<=(49/100)*width ?
+							jQuery(tooltips[handle]).parent().addClass('fc-bottom') :
+							jQuery(tooltips[handle]).parent().removeClass('fc-bottom');
+					}
+
+					else
+					{
+						left>=(24/100)*width ?
+							jQuery(tooltips[handle]).parent().removeClass('fc-right').addClass('fc-left') :
+							jQuery(tooltips[handle]).parent().removeClass('fc-left').addClass('fc-right');
+						left>=(51/100)*width ?
+							jQuery(tooltips[handle]).parent().addClass('fc-bottom') :
+							jQuery(tooltips[handle]).parent().removeClass('fc-bottom');
+					}
+				}
 				else
 				{
-					left>=(24/100)*width ?
-						jQuery(tooltips[handle]).parent().removeClass('fc-right').addClass('fc-left') :
-						jQuery(tooltips[handle]).parent().removeClass('fc-left').addClass('fc-right');
-					left>=(51/100)*width ?
-						jQuery(tooltips[handle]).parent().addClass('fc-bottom') :
-						jQuery(tooltips[handle]).parent().removeClass('fc-bottom');
+					var max_len = 56;
+					txtBoxes[handle].innerHTML = tooltip_text.length > max_len+4 ? tooltip_text.substring(0, max_len)+' ...' : tooltip_text;
 				}
+
 			});
 			
 			// Handle form autosubmit
@@ -278,11 +321,11 @@ if ($display_filter_as==1 || $display_filter_as==7)
 	else
 	{
 		$filter->html	.=
-		($isSlider ? '<div id="'.$filter_ffid.'_nouislider" class="fcfilter_with_nouislider"></div><div class="fc_slider_input_box">' : '').'
+		($isSlider ? '<div id="'.$filter_ffid.'_nouislider" class="fcfilter_with_nouislider ' . ($showAsTooltips ? '' : 'noToolTipSlider') . '"></div><div class="fc_slider_input_box">' : '').'
 			<div class="fc_filter_element">
 				<input id="'.$filter_ffid.'" name="'.$filter_ffname.'" '.$attribs_str.' type="text" size="'.$size.'" value="'.htmlspecialchars(@ $value, ENT_COMPAT, 'UTF-8').'" />
 			</div>
-		'.($isSlider ? '</div>' : '');
+		'.($isSlider ? '</div><div class="fcfilter_nouislider_txtbox">' . ($label_filter==2 ? '<span class="fc_slider_inner_label">' . $field->label . ': </span>' : '') . '</div>' : '');
 	}
 }
 
@@ -303,7 +346,7 @@ else
 	{
 		$size = (int) ($size / 2);
 		$filter->html	.=
-		($isSlider ? '<div id="'.$filter_ffid.'_nouislider" class="fcfilter_with_nouislider"></div><div class="fc_slider_input_box">' : '').'
+		($isSlider ? '<div id="'.$filter_ffid.'_nouislider" class="fcfilter_with_nouislider ' . ($showAsTooltips ? '' : 'noToolTipSlider') . '"></div><div class="fc_slider_input_box">' : '').'
 			<div class="fc_filter_element">
 				<input name="'.$filter_ffname.'[1]" '.$attribs_str.' id="'.$filter_ffid.'1" type="text" size="'.$size.'" value="'.htmlspecialchars(@ $value[1], ENT_COMPAT, 'UTF-8').'" />
 			</div>
@@ -311,6 +354,6 @@ else
 			<div class="fc_filter_element">
 				<input name="'.$filter_ffname.'[2]" '.$attribs_str.' id="'.$filter_ffid.'2" type="text" size="'.$size.'" value="'.htmlspecialchars(@ $value[2], ENT_COMPAT, 'UTF-8').'" />
 			</div>
-		'.($isSlider ? '</div>' : '');
+		'.($isSlider ? '</div><div class="fcfilter_nouislider_txtbox">' . ($label_filter==2 ? '<span class="fc_slider_inner_label">' . $field->label . ': </span>' : '') . '</div>' : '');
 	}
 }
