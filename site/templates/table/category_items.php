@@ -71,7 +71,7 @@ $count = count($items);
 // routine to determine all used columns for this table
 $show_title  = $this->params->get('show_title', 1);
 $link_titles = $this->params->get('link_titles', 0);
-$table_class = $this->params->set('table_class', 'adminlist');
+$table_class = $this->params->get('table_class', 'adminlist');
 
 $layout = $this->params->get('clayout');
 $fbypos = flexicontent_tmpl::getFieldsByPositions($layout, 'category');
