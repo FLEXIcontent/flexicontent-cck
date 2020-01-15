@@ -69,6 +69,7 @@ $count = count($items);
 // routine to determine all used columns for this table
 $show_title  = $this->params->get('show_title', 1);
 $link_titles = $this->params->get('link_titles', 0);
+$table_class = $this->params->set('table_class', 'adminlist');
 
 $layout = $this->params->get('clayout', 'default');
 $fbypos = flexicontent_tmpl::getFieldsByPositions($layout, 'category');
@@ -158,7 +159,7 @@ endif;
 	<div id="mainChooseColBox" class="well well-small" style="display:none;"></div>
 <?php endif; ?>
 
-<table id="adminListTableFCcategory" class="adminlist">
+<table id="adminListTableFCcategory" class="<?php echo $table_class; ?> ">
 	
 	<?php if ($this->params->get('show_field_labels_row', 1) || $this->params->get('togglable_table_cols', 1)) : ?>
 	<thead style="<?php echo $this->params->get('show_field_labels_row', 1) ? '' : 'display:none;' ?>">
