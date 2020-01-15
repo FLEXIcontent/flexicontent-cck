@@ -27,7 +27,7 @@
 			<field name="item_tabset_start" type="separator" default="ITEM_TABSET" level="tabset_start" />
 
 			<field name="item_tab_standard" type="separator" default="FLEXI_TMPL_BASIC_TAB" description="" icon_class="icon-list" level="tab_open" box_type="1" />
-
+			<field name="table_class" type="text" default="adminlist" label="FLEXI_TMPL_TABLE_CLASS" description="FLEXI_TMPL_TABLE_CLASS_DESC" />
 			<field name="disp_params" type="separator" default="FLEXI_DISPLAY" level="level1" />
 			<field name="show_field_labels_row" type="radio" default="" label="FLEXI_SHOW_LABELS_ROW" description="FLEXI_SHOW_LABELS_ROW_DESC" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>
