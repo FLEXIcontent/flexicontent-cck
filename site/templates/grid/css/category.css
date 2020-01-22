@@ -1,7 +1,7 @@
 body #flexicontent .flexi.label,
 body #flexicontent .desc-title.label {
-	background-color: #999999;
-	color: #ffffff;
+	background-color: inherit;
+	color: inherit;
 	border-radius: 3px;
 }
 #flexicontent .buttons {
@@ -204,20 +204,25 @@ div.comments {
 	border-width: 0px;
 	border-style: solid;
 	border-color: #dfdfdf #9f9f9f #9f9f9f #dfdfdf;
-	border-radius: 0px;
+	border-radius: 20px;
 	background-color: unset;
+	box-shadow: 0px 0px 40px 0px rgba(0,0,0,0.5);
+	-webkit-transition: all 0.4s;
+	transition: all 0.4s;
 }
 .news.fc-items-block .fc-item-block-featured-wrapper-innerbox {
-	padding: 8px 12px;
-	border-width: 1px;
-	margin: 4px 4px;
-	background-color: inherit;
+	padding: 0px 0px;
+	border-width: 0px;
+	margin: 20px 20px;
+	background-color: #52ad4c;
+	border-color: #e6a1a1;
 }
 .news.fc-items-block .fc-item-block-standard-wrapper-innerbox {
 	padding: 8px 12px;
-	border-width: 1px;
-	margin: 4px 4px;
-	background-color: inherit;
+	border-width: 0px;
+	margin: 4px 20px;
+	background-color: #292626;
+	border-color: #c72222;
 }
 .news.fc-items-block .fc-item-block-standard-wrapper,
 .news.fc-items-block .fc-item-block-featured-wrapper {
@@ -359,10 +364,10 @@ div.comments {
 .news.fc-items-block .fc-item-block-featured-wrapper:hover .fc-item-block-featured-wrapper-innerbox,
 .news.fc-items-block .fc-item-block-standard-wrapper.mod_hl_hover.mod_fc_activeitem:hover .fc-item-block-standard-wrapper-innerbox,
 .news.fc-items-block .fc-item-block-standard-wrapper.mod_hl_hover:hover .fc-item-block-standard-wrapper-innerbox {
-	background-color: #D0D0D0;
-	border-color: #888 #555 #555 #888;
-	box-shadow: 0px 0px 4px 4px black;
+	box-shadow: 0px 0px 40px 0px #000000;
 	z-index: 2;
+	-webkit-transition: all 0.4s;
+	transition: all 0.4s;
 }
 .news.fc-items-block.featured-block,
 .news.fc-items-block.introblock {
@@ -382,32 +387,31 @@ div.comments {
 	left: 0px;
 }
 .news.fc-items-block.featured-block {
-	background-color: inherit;
-	padding: 8px 12px;
-	margin: 4px 4px;
+	background-color: #ffffff;
+	padding: 8 12;
+	margin: 4 4;
 }
 .news.fc-items-block.standard-block {
-	background-color: inherit;
-	padding: 8px 12px;
-	margin: 4px 4px;
+	background-color: #732f2f;
+	padding: 8 12;
+	margin: 4 4;
 }
 .news.fc-items-block .fcitem_title_box {
 	display: block;
-	background: inherit;
-	font-size: inherit;
+	background: #b39a9a;
+	font-size: 50;
 	margin: 0;
 	padding: 6px;
 }
 .news.fc-items-block .fcitem_title,
 .news.fc-items-block .fcitem_title a {
-	color: inherit;
+	color: #e60505;
 	background-color: transparent;
 	line-height: 1.2em;
 	width: 100%;
 	display: inline-block;
 }
 .news.fc-items-block .fcitem_title {
-	text-shadow: 1px 1px 1px #000000;
 	height: 2.4em;
 	display: table-cell;
 	vertical-align: middle;
@@ -422,10 +426,6 @@ div.comments {
 .news.fc-items-block .fcitem_title:hover a,
 .news.fc-items-block .fcitem_title a:hover {
 	cursor: pointer;
-	text-shadow: 1px 1px 3px #000000;
-}
-.news.fc-items-block .fc_overlayed .fcitem_title a {
-	text-shadow: 1px 1px 1px #000000;
 }
 .news.fc-items-block .fcitem_date {
 	background: url("images/date.png") no-repeat scroll 0px 1px;
@@ -451,6 +451,12 @@ div.comments {
 	margin: 0px;
 	padding: 0 12px;
 	line-height: 160%;
+}
+.content_featured .fc_block.fcitem_text {
+	color: #1c1818;
+}
+.content_standard  .fc_block.fcitem_text {
+	color: #ffffff;
 }
 .news.fc-items-block .image_featured,
 .news.fc-items-block .image_standard {
@@ -524,7 +530,6 @@ div.comments {
 	float: left;
 	clear: left;
 	margin-right: 8px;
-	border-bottom: 1px dashed silver;
 	text-align: left;
 }
 .news.fc-items-block .field_value {
@@ -537,15 +542,13 @@ div.comments {
 	text-align: center;
 	width: 96%;
 	background: url("images/readmore.png") transparent no-repeat scroll 0px 5px;
-	border: solid transparent;
-	border-width: 1px 0px;
 	margin: 8px 2%;
 	display: inline-block;
 	-webkit-transition: all 0.4s;
 	transition: all 0.4s;
-	background-color: inherit;
-	color: inherit;
-	font-size: inherit;
+	background-color: #16e338;
+	color: #9e5151;
+	font-size: 20;
 }
 .news.fc-items-block .fcitem_readon:hover {
 	background-color: rgba(255,255,255,0.2);
