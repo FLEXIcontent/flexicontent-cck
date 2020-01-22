@@ -334,7 +334,6 @@ if ($leadnum) :
 			$fc_item_classes = 'fc_newslist_item';
 			if ($doing_cat_order)
      		$fc_item_classes .= ($i==0 || ($items[$i-1]->rel_catid != $items[$i]->rel_catid) ? ' fc_cat_item_1st' : '');
-			$fc_item_classes .= $i%2 ? ' fceven' : ' fcodd';
 			$fc_item_classes .= ' fccol'.($i%$lead_cols + 1);
 
 			$markup_tags = '<span class="fc_mublock">';
@@ -772,7 +771,6 @@ if ($count > $leadnum) :
 			$fc_item_classes = 'fc_newslist_item';
 			if ($doing_cat_order)
      		$fc_item_classes .= ($i==0 || ($items[$i-1]->rel_catid != $items[$i]->rel_catid) ? ' fc_cat_item_1st' : '');
-			$fc_item_classes .= ($i-$leadnum)%2 ? ' fceven' : ' fcodd';
 			$fc_item_classes .= ' fccol'.($i%$intro_cols + 1);
 
 			$markup_tags = '<span class="fc_mublock">';

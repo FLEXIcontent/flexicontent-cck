@@ -334,7 +334,6 @@ if ($leadnum) :
 			$fc_item_classes = 'fc_newslist_item';
 			if ($doing_cat_order)
      		$fc_item_classes .= ($i==0 || ($items[$i-1]->rel_catid != $items[$i]->rel_catid) ? ' fc_cat_item_1st' : '');
-			$fc_item_classes .= $i%2 ? ' fceven' : ' fcodd';
 			$fc_item_classes .= ' fccol'.($i%$lead_cols + 1);
 
 			$markup_tags = '<span class="fc_mublock">';
@@ -795,7 +794,6 @@ if ($count > $leadnum) :
 			if ($doing_cat_order)
      		$fc_item_classes .= ($i==0 || ($items[$i-1]->rel_catid != $items[$i]->rel_catid) ? ' fc_cat_item_1st' : '');
 			$fc_item_classes .= ' '.$classspan;
-			$fc_item_classes .= ($i-$leadnum)%2 ? ' fceven' : ' fcodd';
 			$fc_item_classes .= ' fccol'.($i%$intro_cols + 1);
 
 			$markup_tags = '<span class="fc_mublock">';
@@ -1158,8 +1156,8 @@ if ($count > $leadnum) :
 					<?php endif; ?>
 
 					<?php if ($readmore_shown) : ?>
-						<div class="fcitem_readon">
-							<a href="<?php echo $link_url; ?>" class="readon" itemprop="url" <?php echo ($intro_link_to_popup ? 'onclick="var url = jQuery(this).attr(\'href\')+\''.$_tmpl_.'\'; fc_showDialog(url, \'fc_modal_popup_container\', 0, 0, 0, 0, {title: \'\'}); return false;"' : '');?> >
+						<div class="fcitem_readon readmore">
+							<a href="<?php echo $link_url; ?>" class="readon btn btn-primary readmore-btn" itemprop="url" <?php echo ($intro_link_to_popup ? 'onclick="var url = jQuery(this).attr(\'href\')+\''.$_tmpl_.'\'; fc_showDialog(url, \'fc_modal_popup_container\', 0, 0, 0, 0, {title: \'\'}); return false;"' : '');?> >
 								<?php
 								$read_more_text = $item->params->get('readmore')  ?  $item->params->get('readmore') : JText::sprintf('FLEXI_READ_MORE', $item->title);
 								echo $readon_type === 1
