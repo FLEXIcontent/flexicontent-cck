@@ -731,7 +731,7 @@ div.comments {
 /* CONTAINER of item read more */
 .news.fc-items-block .fcitem_readon {
 	text-align: center;
-	width: 96%;
+	/*width: 96%;*/
 	background: url("images/readmore.png") transparent no-repeat scroll 0px 5px;
 	/*padding: 1px 6px 1px 20px;*/
 	margin: 8px 2%;
@@ -747,6 +747,9 @@ div.comments {
 	border-color: gray;
 	border-width: 1px 0px;
 	border-radius: 0px;
+}
+.news.fc-items-block .fc_floated .fcitem_readon {
+	text-align: right;
 }
 
 /* item read more styling (link, etc) */
@@ -781,28 +784,24 @@ div.comments {
 }
 .news.fc-items-block .fc_overlayed {
 	/* Fallback for web browsers that don't support RGBa */
-	background-color: rgb(0, 0, 0);
-	/* RGBa with 0.4 opacity */
-	background-color: rgba(0, 0, 0, 0.4);
-	/* For IE 5.5 - 7 */
+	background-color: @FCC_overlay_background !important;
+	/* For IE 5.5 - 7 
 	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=#4C000000, endColorstr=#4C000000);
-	/* For IE 8+ */
-	-ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#4C000000, endColorstr=#4C000000)";
-	width: 96%;
+	/* For IE 8+
+	-ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#4C000000, endColorstr=#4C000000)";*/
 	height: auto;
 	padding: 2%;
 	margin: 0%;
 	position: absolute;
 	left: 0px;
-	box-shadow: 1px 1px 8px black;
 }
 .news.fc-items-block .fc_overlayed .fc_block {
 	/*font-family: Raleway;
 	font-weight:900;*/
 	line-height: 160%;
-	color: white;
-	/*text-shadow: 1px 1px 2px #000000, -1px -1px #000000, 1px 1px #000;*/
-	text-shadow: 1px 1px 1px #000000;
+	/*color: white;
+	text-shadow: 1px 1px 2px #000000, -1px -1px #000000, 1px 1px #000;
+	text-shadow: 1px 1px 1px #000000;*/
 }
 
 .news.fc-items-block .fc_bottom {	bottom: 0px; }

@@ -19,6 +19,7 @@ $user = JFactory::getUser();
 
 $readon_type  = (int) $this->params->get('readon_type', 0);
 $readon_image = $this->params->get('readon_image', '');
+$readon_class = $this->params->get('readon_class', 'btn btn-default');
 
 if ($readon_type && $readon_image && file_exists(JPath::clean(JPATH_SITE . DS . $readon_image)))
 {
@@ -204,7 +205,7 @@ if (!empty($this->items) && ($load_masonry_feat || $load_masonry_std))
 	$js = "
 		jQuery(document).ready(function(){
 	";
-	if ($this->params->get('lead_placement', 0)==1) {
+	if ($load_masonry_feat) {
 		$js .= "
 			var container_lead = document.querySelector('div.featured-block.fc-items-block');
 			var msnry_lead;
@@ -216,7 +217,7 @@ if (!empty($this->items) && ($load_masonry_feat || $load_masonry_std))
 			}
 		";
 	}
-	if ($this->params->get('intro_placement', 0)==1) {
+	if ($load_masonry_std) {
 		$js .= "
 			var container_intro = document.querySelector('div.standard-block.fc-items-block');
 			var msnry_intro;
@@ -545,13 +546,13 @@ if ($leadnum) :
 
 					<?php if ($this->params->get('show_title', 1)) : ?>
 						<span class="fcitem_title_box">
-							<span class="fcitem_title" itemprop="name">
+							<h2 class="fcitem_title" itemprop="name">
 							<?php if ($this->params->get('link_titles', 0)) : ?>
 								<a href="<?php echo $link_url; ?>"><?php echo $item->title; ?></a>
 							<?php else : ?>
 								<?php echo $item->title; ?>
 							<?php endif; ?>
-							</span>
+							</h2>
 						</span>
 					<?php endif; ?>
 
@@ -730,7 +731,7 @@ if ($leadnum) :
 
 					<?php if ($readmore_shown) : ?>
 						<div class="fcitem_readon">
-							<a href="<?php echo $link_url; ?>" class="readon" itemprop="url" <?php echo ($lead_link_to_popup ? 'onclick="var url = jQuery(this).attr(\'href\')+\''.$_tmpl_.'\'; fc_showDialog(url, \'fc_modal_popup_container\', 0, 0, 0, 0, {title: \'\'}); return false;"' : '');?> >
+							<a href="<?php echo $link_url; ?>" class="<?php echo $readon_class; ?>" itemprop="url" <?php echo ($lead_link_to_popup ? 'onclick="var url = jQuery(this).attr(\'href\')+\''.$_tmpl_.'\'; fc_showDialog(url, \'fc_modal_popup_container\', 0, 0, 0, 0, {title: \'\'}); return false;"' : '');?> >
 								<?php
 								$read_more_text = $item->params->get('readmore')  ?  $item->params->get('readmore') : JText::sprintf('FLEXI_READ_MORE', $item->title);
 								echo $readon_type === 1
@@ -1022,13 +1023,13 @@ if ($count > $leadnum) :
 
 					<?php if ($this->params->get('show_title', 1)) : ?>
 						<span class="fcitem_title_box">
-							<span class="fcitem_title" itemprop="name">
+							<h2 class="fcitem_title" itemprop="name">
 							<?php if ($this->params->get('link_titles', 0)) : ?>
 								<a href="<?php echo $link_url; ?>"><?php echo $item->title; ?></a>
 							<?php else : ?>
 								<?php echo $item->title; ?>
 							<?php endif; ?>
-							</span>
+							</h2>
 						</span>
 					<?php endif; ?>
 
@@ -1205,7 +1206,7 @@ if ($count > $leadnum) :
 
 					<?php if ($readmore_shown) : ?>
 						<div class="fcitem_readon">
-							<a href="<?php echo $link_url; ?>" class="readon" itemprop="url" <?php echo ($intro_link_to_popup ? 'onclick="var url = jQuery(this).attr(\'href\')+\''.$_tmpl_.'\'; fc_showDialog(url, \'fc_modal_popup_container\', 0, 0, 0, 0, {title: \'\'}); return false;"' : '');?> >
+							<a href="<?php echo $link_url; ?>" class="<?php echo $readon_class; ?>" itemprop="url" <?php echo ($intro_link_to_popup ? 'onclick="var url = jQuery(this).attr(\'href\')+\''.$_tmpl_.'\'; fc_showDialog(url, \'fc_modal_popup_container\', 0, 0, 0, 0, {title: \'\'}); return false;"' : '');?> >
 								<?php
 								$read_more_text = $item->params->get('readmore')  ?  $item->params->get('readmore') : JText::sprintf('FLEXI_READ_MORE', $item->title);
 								echo $readon_type === 1
