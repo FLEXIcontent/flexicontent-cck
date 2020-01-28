@@ -1,7 +1,7 @@
 body #flexicontent .flexi.label,
 body #flexicontent .desc-title.label {
-	background-color: inherit;
-	color: inherit;
+	background-color: none;
+	color: none;
 	border-radius: 3px;
 }
 #flexicontent .buttons {
@@ -128,7 +128,7 @@ div.comments {
 	clear: both;
 	margin: 0;
 	vertical-align: middle;
-	text-align: center;
+	text-align: left;
 }
 #flexicontent .lineinfo .element {
 	display: inline-block;
@@ -214,15 +214,15 @@ div.comments {
 	padding: 8px 12px;
 	border-width: 0px;
 	margin: 15px 15px;
-	background-color: inherit;
-	border-color: transparent;
+	background-color: none;
+	border-color: none;
 }
 .news.fc-items-block .fc-item-block-standard-wrapper-innerbox {
 	padding: 8px 12px;
 	border-width: 0px;
 	margin: 15px 15px;
-	background-color: inherit;
-	border-color: transparent;
+	background-color: none;
+	border-color: none;
 }
 .news.fc-items-block .fc-item-block-standard-wrapper,
 .news.fc-items-block .fc-item-block-featured-wrapper {
@@ -387,25 +387,25 @@ div.comments {
 	left: 0px;
 }
 .news.fc-items-block.featured-block {
-	background-color: inherit;
+	background-color: none;
 	padding: 8 12;
 	margin: 15 15;
 }
 .news.fc-items-block.standard-block {
-	background-color: inherit;
+	background-color: none;
 	padding: 8 12;
 	margin: 15 15;
 }
 .news.fc-items-block .fcitem_title_box {
 	display: block;
-	background: inherit;
-	font-size: inherit;
+	background: none;
+	font-size: none;
 	margin: 0;
 	padding: 6px;
 }
 .news.fc-items-block .fcitem_title,
 .news.fc-items-block .fcitem_title a {
-	color: inherit;
+	color: none;
 	background-color: transparent;
 	line-height: 1.2em;
 	width: 100%;
@@ -453,10 +453,10 @@ div.comments {
 	line-height: 160%;
 }
 .content_featured .fc_block.fcitem_text {
-	color: inherit;
+	color: none;
 }
 .content_standard  .fc_block.fcitem_text {
-	color: inherit;
+	color: none;
 }
 .news.fc-items-block .image_featured,
 .news.fc-items-block .image_standard {
@@ -545,9 +545,9 @@ div.comments {
 	display: inline-block;
 	-webkit-transition: all 0.4s;
 	transition: all 0.4s;
-	background-color: inherit;
-	color: inherit;
-	font-size: inherit;
+	background-color: none;
+	color: none;
+	font-size: none;
 }
 .news.fc-items-block .fcitem_readon:hover {
 	background-color: rgba(255,255,255,0.2);
