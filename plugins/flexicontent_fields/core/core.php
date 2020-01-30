@@ -842,7 +842,7 @@ class plgFlexicontent_fieldsCore extends FCField
 
 				if (in_array($display_filter_as, array(1, 3)))
 				{
-					$date_valformat = '%Y-%m-%d';
+					$date_valformat = $filter->parameters->get('date_filter_label_format'.$_s, '%Y-%m-%d');
 				}
 
 				// Display date 'label' can be different than the (aggregated) date value
@@ -1003,39 +1003,17 @@ class plgFlexicontent_fieldsCore extends FCField
 
 			if (in_array($display_filter_as, array(1, 3)))
 			{
-				$date_valformat = '%Y-%m-%d';
+				$date_valformat = $filter->parameters->get('date_filter_label_format', '%Y-%m-%d');
 			}
-
-			// Display date 'label' can be different than the (aggregated) date value
-			$date_filter_label_format = $filter->parameters->get('date_filter_label_format', '');
-			$date_txtformat   = $date_filter_label_format ?: $date_valformat;  // If empty then same as value
-			$date_parseformat = in_array($display_filter_as, array(1, 3)) && $date_filter_label_format
-				? $date_filter_label_format
-				: '%Y-%m-%d';  // Otherwise FULL date, PARSING MAY BE SKIPPED later by checking if equal to this
 
 			$filter->filter_colname = in_array($display_filter_as, array(1, 3))
 				? sprintf(' c.%s ', $filter->field_type)
 				: sprintf(' DATE_FORMAT(c.%s, "%s") ', $filter->field_type, $date_valformat);
 			$filter->filter_valuesjoin = ' ';   // ... a space, (indicates not needed)
 
-
-			// Format of given values must be same as format of the value-column, for filter as age  posted filter value is already a number
-			if (in_array($display_filter_as, array(1, 3)))
-			{
-					// DO NOT do any date aggregation (as year or as month) for date picker
-					// Only parse custom date format
-				$filter->filter_valueformat = sprintf(' STR_TO_DATE(__filtervalue__, "%s") ', $date_parseformat);
-			}
-			else
-			{
-				/**
-				 * Typically the date values are full date because to only-year dates we have appended '-1-1'
-				 * and to only-year-month dates we have appended '-1', so $date_parseformat ... must be '%Y-%m-%d'  (a FULL date)
-				 */
-				$filter->filter_valueformat = $date_parseformat !=  '%Y-%m-%d'
-					? sprintf(' DATE_FORMAT(STR_TO_DATE(__filtervalue__, "%s"), "%s") ', $date_parseformat, $date_valformat)
-					: sprintf(' DATE_FORMAT(__filtervalue__, "%s") ', $date_valformat);
-			}
+			$filter->filter_valueformat = in_array($display_filter_as, array(1, 3))
+				? sprintf(' STR_TO_DATE(__filtervalue__, "%s") ', $date_valformat)
+				: sprintf(' DATE_FORMAT(__filtervalue__, "%s") ', $date_valformat);   // format of given values must be same as format of the value-column
 
 			// 'isindexed' is not applicable for basic index and CORE fields
 			$filter->isindexed = 0; //in_array($filter->field_type, array('type','state','tags','categories','created','createdby','modified','modifiedby'));
@@ -1187,7 +1165,7 @@ class plgFlexicontent_fieldsCore extends FCField
 
 			if (in_array($display_filter_as, array(1, 3)))
 			{
-				$date_valformat = '%Y-%m-%d';
+				$date_valformat = $field->parameters->get('date_filter_label_format'.$_s, '%Y-%m-%d');
 			}
 
 			// Display date 'label' can be different than the (aggregated) date value

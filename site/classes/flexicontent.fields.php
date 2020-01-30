@@ -3098,7 +3098,7 @@ class FlexicontentFields
 
 				if (in_array($display_filter_as, array(1, 3)))
 				{
-					$date_valformat  = '%Y-%m-%d';
+					$date_valformat  = $field->parameters->get('date_filter_label_format'.$_s, '%Y-%m-%d');
 					$filter_age_type = 'DAY';
 				}
 
