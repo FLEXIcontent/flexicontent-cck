@@ -1,4 +1,3 @@
-
 /****************************/
 /* BOF themes, TODO MORE !! */
 /****************************/
@@ -58,14 +57,14 @@
 	height: auto;
 	overflow: hidden;
 	
-	/* can be overriden via user 's CSS */
+	/* can be overriden via user 's CSS 
 	margin: 0px;
 	padding: 0px;
 	border-width: 0px;
 	border-style: solid;
 	border-color: #dfdfdf #9f9f9f #9f9f9f #dfdfdf;
 	border-radius: 0px;
-	background-color: unset;
+	background-color: unset;*/
 }
 
 
@@ -288,8 +287,8 @@
  * ITEM BASIC FIELDS STYLES (FOR CUSTOM FIELDS see below, FOR IMAGE AND DATE see more below)
  */
 
-.news.mod_flexicontent_wrapper .content_standard {padding: 12px 12px 0 12px;}  /* container of basic elements of standard items excluding title & image */
-.news.mod_flexicontent_wrapper .content_featured {padding: 12px 12px 0 12px;}  /* container of basic elements of featured items excluding title & image */
+.news.mod_flexicontent_wrapper .content_standard {padding: 12px 0px 0 0px;}  /* container of basic elements of standard items excluding title & image */
+.news.mod_flexicontent_wrapper .content_featured {padding: 12px 0px 0 0px;}  /* container of basic elements of featured items excluding title & image */
 
 
 /* CONTAINER of item title */
@@ -297,27 +296,27 @@
 	display: block;
 	background: transparent;
 	margin: 0;
-	padding: 6px;
+	padding: 6px 0px;
 }
 
 .news.mod_flexicontent_wrapper .fcitem_title,
 .news.mod_flexicontent_wrapper .fcitem_title a {
-	color: #08c;
+	/*color: #08c;
 	font-size: 120%;
-	background-color: transparent;
+	background-color: transparent;*/
 	line-height: 1.2em;
 	width: 100%;
 	display: inline-block;
 }
 
 .news.mod_flexicontent_wrapper .fcitem_title {
-	text-shadow: 1px 1px 1px #000000;
-	height: 2.4em;
+	/*text-shadow: 1px 1px 1px #000000;
+	height: 2.4em;*/
 	display: table-cell;
 	vertical-align: middle;
-	padding: 1px 4px;
+	/*padding: 1px 4px;
 	margin: 2px 0px;
-	/*border: 1px dashed #bbbbbb;*/
+	border: 1px dashed #bbbbbb;*/
 }
 .news.mod_flexicontent_wrapper .fcitem_title:hover {
 	/*border: 1px dashed black;*/
@@ -331,11 +330,11 @@
 .news.mod_flexicontent_wrapper .fcitem_title:hover a,
 .news.mod_flexicontent_wrapper .fcitem_title a:hover {
 	cursor: pointer;
-	text-shadow: 1px 1px 3px #000000;
+	/*text-shadow: 1px 1px 3px #000000;*/
 }
 .news.mod_flexicontent_wrapper .fc_overlayed .fcitem_title a {
-	/*text-shadow: 1px 1px 2px #000000, -1px -1px #000, 1px 1px #000000;*/
-	text-shadow: 1px 1px 1px #000000;
+	/*text-shadow: 1px 1px 2px #000000, -1px -1px #000, 1px 1px #000000;
+	text-shadow: 1px 1px 1px #000000;*/
 }
 
 
@@ -395,7 +394,7 @@
 }
 .news.mod_flexicontent_wrapper .image_standard a:hover img,
 .news.mod_flexicontent_wrapper .image_featured a:hover img {
-  border:1px solid #444444;
+  /*border:1px solid #444444;*/
 }
 
 
@@ -451,7 +450,7 @@
 	float:left;
 	clear:left;
 	margin-right:8px;
-	border-bottom: 1px dashed silver;
+	/*border-bottom: 1px dashed silver;*/
 	text-align: left;
 }
 .news.mod_flexicontent_wrapper .field_value {
@@ -465,17 +464,16 @@
 /* CONTAINER of item read more */
 .news.mod_flexicontent_wrapper .fcitem_readon {
 	float:left;
-	background: url("images/readmore.png") transparent no-repeat scroll 0px 5px;
+	/*background: url("images/readmore.png") transparent no-repeat scroll 0px 5px;
 	border:solid transparent;
 	border-width:1px 0px;
 	padding: 1px 6px 1px 20px;
 	margin: 3px 3px 3px 4px;
-	display: inline-block;
+	display: inline-block;*/
 	-webkit-transition: all 0.4s; transition: all 0.4s;
-
 	background-color: transparent;
-	color: #08c;
-	font-size: inherit;
+	/*color: #08c;
+	font-size: inherit;*/
 }
 .news.mod_flexicontent_wrapper .fcitem_readon:hover {
 	background-color: rgba(255, 255, 255, 0.2);
@@ -501,9 +499,9 @@
 .news.mod_flexicontent_wrapper .fcitem_readon:hover a.readon,
 .news.mod_flexicontent_wrapper .fcitem_readon:hover a.readon span {
 	padding: 0px;
-	background: none;
+	/*background: none;*/
 	text-decoration: none !important;
-	color: gray;
+	/*color: gray;*/
 }
 
 
@@ -523,7 +521,7 @@
 	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=#4C000000, endColorstr=#4C000000);
 	/* For IE 8+ */
 	-ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#4C000000, endColorstr=#4C000000)";
-	width: 96%;
+	width: 100%;
 	height: auto;
 	padding: 2%;
 	margin: 0%;
@@ -535,8 +533,8 @@
 	font-weight:900;*/
 	line-height: 160%;
 	color: white;
-	/*text-shadow: 1px 1px 2px #000, -1px -1px #000, 1px 1px #000;*/
-	text-shadow: 1px 1px 1px #000;
+	/*text-shadow: 1px 1px 2px #000, -1px -1px #000, 1px 1px #000;
+	text-shadow: 1px 1px 1px #000;*/
 }
 
 .news.mod_flexicontent_wrapper .fc_bottom {	bottom: 0px; }
@@ -586,6 +584,7 @@
 	padding-top: 0px;
 	padding-bottom: 0px;
 	overflow-y: hidden;
+  width:100%;
 }
 
 
