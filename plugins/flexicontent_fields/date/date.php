@@ -948,7 +948,7 @@ class plgFlexicontent_fieldsDate extends FCField
 
 		if (in_array($display_filter_as, array(1, 3)))
 		{
-			$date_valformat = $filter->parameters->get('date_filter_label_format'.$_s, '%Y-%m-%d');
+			$date_valformat = '%Y-%m-%d';
 			$filter_age_type = 'DAY';
 		}
 
@@ -1043,6 +1043,8 @@ class plgFlexicontent_fieldsDate extends FCField
 		$date_filter_group = $filter->parameters->get('date_filter_group', 'month');
 		$filter_as_age     = $filter->parameters->get('filter_as_age', 0);
 
+		$date_parseformat  = '%Y-%m-%d';
+
 		if ($date_filter_group === 'year')
 		{
 			$date_valformat  = '%Y';
@@ -1061,25 +1063,49 @@ class plgFlexicontent_fieldsDate extends FCField
 
 		if (in_array($display_filter_as, array(1, 3)))
 		{
-			$date_valformat = $filter->parameters->get('date_filter_label_format', '%Y-%m-%d');
-			$filter_age_type = 'DAY';
+			$date_valformat   = '%Y-%m-%d';
+			$filter_age_type  = 'DAY';
 		}
+
+		// Display date 'label' can be different than the (aggregated) date value
+		$date_filter_label_format = $filter->parameters->get('date_filter_label_format', '');
+		$date_txtformat   = $date_filter_label_format ?: $date_valformat;  // If empty then same as value
+		$date_parseformat = in_array($display_filter_as, array(1, 3)) && $date_filter_label_format
+			? $date_filter_label_format
+			: '%Y-%m-%d';  // Otherwise FULL date, PARSING MAY BE SKIPPED later by checking if equal to this
 
 		$date_source = (int) $filter->parameters->get('date_source', 0);
 
 		if ($date_source === 0 || $date_source === 3)
 		{
-			$filter->filter_colname = !$filter_as_age || in_array($display_filter_as, array(1, 3))
-				? sprintf(' rel.value ')
-				: ' TIMESTAMPDIFF(' . $filter_age_type . ', rel.value, CURDATE())';
+			if (in_array($display_filter_as, array(1, 3)))
+			{
+				// DO NOT do any date aggregation (as year or as month) for date picker
+				$filter->filter_colname = sprintf(' rel.value ');
+			}
+			else
+			{
+				$filter->filter_colname = !$filter_as_age
+					? sprintf(' DATE_FORMAT(rel.value, "%s") ', $date_valformat)
+					: ' TIMESTAMPDIFF(' . $filter_age_type . ', rel.value, CURDATE())';
+			}
 			$filter->filter_valuesjoin = null;   // use default query
 		}
 		elseif ($date_source === 1 || $date_source === 2)
 		{
 			$_value_col = ($date_source == 1) ? 'c.publish_up' : 'c.publish_down';
-			$filter->filter_colname = !$filter_as_age || in_array($display_filter_as, array(1, 3))
-				? sprintf(' %s ', $_value_col)
-				: ' TIMESTAMPDIFF(' . $filter_age_type . ', ' . $_value_col . ', CURDATE())';
+
+			if (in_array($display_filter_as, array(1, 3)))
+			{
+				// DO NOT do any date aggregation (as year or as month) for date picker
+				$filter->filter_colname = sprintf(' %s ', $_value_col);
+			}
+			else
+			{
+				$filter->filter_colname = !$filter_as_age
+					? sprintf(' DATE_FORMAT(%s, "%s") ', $_value_col, $date_valformat)
+					: ' TIMESTAMPDIFF(' . $filter_age_type . ', ' . $_value_col . ', CURDATE())';
+			}
 
 			$filter->filter_valuesjoin = ' '; // a space to prevent using default query and instead use content table
 		}
@@ -1089,9 +1115,29 @@ class plgFlexicontent_fieldsDate extends FCField
 		}
 
 		// Format of given values must be same as format of the value-column, for filter as age  posted filter value is already a number
-		$filter->filter_valueformat = !$filter_as_age || in_array($display_filter_as, array(1, 3))
-			? sprintf(' STR_TO_DATE(__filtervalue__, "%s") ', $date_valformat)
-			: null;
+		if (in_array($display_filter_as, array(1, 3)))
+		{
+				// DO NOT do any date aggregation (as year or as month) for date picker
+				// Only parse custom date format
+			$filter->filter_valueformat = sprintf(' STR_TO_DATE(__filtervalue__, "%s") ', $date_parseformat);
+		}
+		else
+		{
+			/**
+			 * Typically the date values are full date because to only-year dates we have appended '-1-1'
+			 * and to only-year-month dates we have appended '-1', so $date_parseformat ... must be '%Y-%m-%d'  (a FULL date)
+			 */
+			if ($filter_as_age)
+			{
+				$filter->filter_valueformat = null;
+			}
+			else
+			{
+				$filter->filter_valueformat = $date_parseformat != '%Y-%m-%d'
+					? sprintf(' DATE_FORMAT(STR_TO_DATE(__filtervalue__, "%s"), "%s") ', $date_parseformat, $date_valformat)
+					: sprintf(' DATE_FORMAT(__filtervalue__, "%s") ', $date_valformat);
+			}
+		}
 
 		return FlexicontentFields::getFiltered($filter, $value, $return_sql);
 	}
@@ -1187,7 +1233,7 @@ class plgFlexicontent_fieldsDate extends FCField
 
 		if (in_array($display_filter_as, array(1, 3)))
 		{
-			$date_valformat = $field->parameters->get('date_filter_label_format'.$_s, '%Y-%m-%d');
+			$date_valformat = '%Y-%m-%d';
 			$filter_age_type = 'DAY';
 		}
 
