@@ -821,6 +821,10 @@ class plgFlexicontent_fieldsMediafile extends FCField
 			$tooltips_added[$field->id] = true;
 		}
 
+		// Current view variable
+		$app       = JFactory::getApplication();
+		$realview  = $app->input->get('view', '', 'cmd');
+		$view      = $app->input->get('flexi_callview', ($realview ?: 'item'), 'cmd');
 
 		// Prefix - Suffix - Separator parameters, replacing other field values if found
 		$remove_space = $field->parameters->get( 'remove_space', 0 ) ;
@@ -903,14 +907,17 @@ class plgFlexicontent_fieldsMediafile extends FCField
 		if ( $js_added === null )
 		{
 			$js_added = true;
+			$document = JFactory::getDocument();
 
 			JText::script('PLG_FLEXICONTENT_FIELDS_MEDIAFILE_RESPONSE_PARSING_FAILED', false);
 			JText::script('PLG_FLEXICONTENT_FIELDS_MEDIAFILE_FILE_NOT_FOUND', false);
 
 			//flexicontent_html::loadFramework('wavesurfer');
 			flexicontent_html::loadFramework('flexi-lib');
-			JFactory::getDocument()->addScript('https://unpkg.com/wavesurfer.js/dist/wavesurfer.min.js');
-			JFactory::getDocument()->addScript(JUri::root(true) . '/plugins/flexicontent_fields/mediafile/js/view.js', array('version' => FLEXI_VHASH));
+			JHtml::addIncludePath(JPATH_SITE . '/components/com_flexicontent/helpers/html');
+			$document->addScript('https://unpkg.com/wavesurfer.js/dist/wavesurfer.min.js');
+			$document->addScript('https://unpkg.com/wavesurfer.js/dist/plugin/wavesurfer.cursor.js');
+			$document->addScript(JUri::root(true) . '/plugins/flexicontent_fields/mediafile/js/view.js', array('version' => FLEXI_VHASH));
 		}
 
 		$allowshare = $field->parameters->get( 'allowshare', 0 ) ;
@@ -1399,9 +1406,13 @@ class plgFlexicontent_fieldsMediafile extends FCField
 	{
 		if ( !in_array($filter->field_type, static::$field_types) ) return;
 
+		// Available properties
+		/*
 		$mediadata = array('state', 'media_type', 'media_format', 'codec_type', 'codec_name', 'codec_long_name',
 			'resolution', 'fps', 'bit_rate', 'bits_per_sample', 'sample_rate', 'duration',
 			'channels', 'channel_layout', 'checked_out', 'checked_out_time');
+			*/
+		$mediadata = array('media_format', 'sample_rate');
 		$media_property_filters = $filter->parameters->set('media_property_filters', $mediadata);
 
 		$html = array();
@@ -1441,7 +1452,20 @@ class plgFlexicontent_fieldsMediafile extends FCField
 		$filter->html = array();
 		foreach($media_property_filters as $prop_name)
 		{
-			$filter->html[] = '<div class="row-fluid"><div class="span4" style="text-align: right;"><b class="badge">'. $prop_name . '</b></div><div class="span8">' . $html[$prop_name] . '</div></div>';
+			$filtername = $prop_name;
+
+			if ($prop_name == 'media_format')
+			{
+				// Change 'channels' to '# Channels' you can also you language   JText::_('SOMENAME');
+				$filtername = 'Media Type';	
+			}
+			elseif ($prop_name == 'sample_rate')
+			{
+				// Change 'channels' to '# Channels' you can also you language   JText::_('SOMENAME');
+				$filtername = 'Sample Rate';	
+			}
+			
+			$filter->html[] = '<div class="row-fluid"><div class="span4" style="text-align: right;"><b class="badge">'. $filtername . '</b></div><div class="span8">' . $html[$prop_name] . '</div></div>';
 		}
 
 		$filter->html =  '<div class="container" style="display: initial;">' . implode('', $filter->html) . '</div>';
@@ -1462,9 +1486,13 @@ class plgFlexicontent_fieldsMediafile extends FCField
 	// This is for category view
 	function getFiltered(&$filter, $value, $return_sql=true)
 	{
+		// Available properties
+		/*
 		$mediadata = array('state', 'media_type', 'media_format', 'codec_type', 'codec_name', 'codec_long_name',
 			'resolution', 'fps', 'bit_rate', 'bits_per_sample', 'sample_rate', 'duration',
 			'channels', 'channel_layout', 'checked_out', 'checked_out_time');
+		*/
+		$mediadata = array('media_format', 'sample_rate');
 		$media_property_filters = $filter->parameters->set('media_property_filters', $mediadata);
 
 		$results = array();
