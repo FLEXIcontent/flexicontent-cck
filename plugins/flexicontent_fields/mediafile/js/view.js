@@ -12,6 +12,24 @@
 		var fnn  = tagid.replace(/-/g, '_');
 		var file = jQuery('#fcview_' + tagid + '_file-data-txt');
 
+		var updateTimer = function updateTimer()
+		{
+			var formattedTime = secondsToTimestamp(audio_spectrum.getCurrentTime());
+			jQuery('#fc_mediafile_current_time_' + fnn).text(formattedTime);
+		}
+
+		var secondsToTimestamp = function(seconds)
+		{
+			seconds = Math.floor(seconds);
+			var h = Math.floor(seconds / 3600);
+			var m = Math.floor((seconds - (h * 3600)) / 60);
+			var s = seconds - (h * 3600) - (m * 60);
+
+			h = h < 10 ? '0' + h : h;
+			m = m < 10 ? '0' + m : m;
+			s = s < 10 ? '0' + s : s;
+			return h + ':' + m + ':' + s;
+		}
 
 		// Imitate SoundCloud's mirror effect on the waveform. Only works on iOS. (Adapted from the wavesurfer.js demo.) 
 		//var ctx = document.createElement('canvas').getContext('2d');
@@ -180,6 +198,16 @@
 				audio_spectrum.play();
 			}
 		});
+
+		/*
+		 * Add display of current time
+		 */
+		audio_spectrum.on('ready', updateTimer);
+		audio_spectrum.on('audioprocess', updateTimer);
+
+		// Need to watch for seek in addition to audioprocess as audioprocess doesn't fire (if the audio is paused)
+		audio_spectrum.on('seek', updateTimer);
+
 
 		// Add events of playback buttons
 		buttons.play.addEventListener('click', function()

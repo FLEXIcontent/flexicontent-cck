@@ -263,6 +263,10 @@ foreach($values as $file_id)
 	$filename_shown_as_link = $filename_shown && $link_filename && !$usebutton;
 
 
+?>
+<?php if ($prop !== 'display_properties_only') :?>
+<?php
+
 	// [0]: filename (if visible)
 	if (($filename_shown && !$filename_shown_as_link) || $not_downloadable)
 	{
@@ -336,7 +340,7 @@ foreach($values as $file_id)
 			// The download button in a mini form ...
 			// Download 
 			$_download_btn_html = '
-				<a href="' . $dl_link . '" class="' . $file_classes . ' btn-dwn-controls fcfile_downloadFile" title="'.htmlspecialchars($downloadsinfo, ENT_COMPAT, 'UTF-8').'" ' . ($non_file_url ? 'target="_blank"' : '') . '>
+				<a href="' . $dl_link . '" class="btn-dwn-controls fcfile_downloadFile" title="'.htmlspecialchars($downloadsinfo, ENT_COMPAT, 'UTF-8').'" ' . ($non_file_url ? 'target="_blank"' : '') . '>
 					<span class="icon-chevron-down large-icon"> </span>
 					' . $downloadstext . '
 				</a>
@@ -513,31 +517,103 @@ foreach($values as $file_id)
 		</div>
 		<div>
 			<div id="fc_mediafile_controls_' . $item->id . '_' . $FN_n . '" class="fc_mediafile_controls">
+
+				<span id="fc_mediafile_current_time_' . $item->id . '_' . $FN_n . '" class="">00:00:00</span>
 				<button type="button" class="playBtn icon-play-circle controls" title="Play"></button>
 				<button type="button" class="pauseBtn icon-pause-circle controls" title="Pause"></button>
 				<button type="button" class="stopBtn icon-stop-circle controls" title="Stop"></button>
 				<button type="button" class="loadBtn icon-loop controls" title="Load"></button>
 
-				<?php if ($allowdownloads) { echo $_download_btn_html; } ?>
+				' . ($allowdownloads ? $_download_btn_html : '') . '
 			</div>
 		</div>
 		';
 
 
+endif;   // END OF   $prop !== 'display_properties_only'
+
+
 	/**
 	 * Basic display of audio / video media data
 	 */
-	if (isset($file_data->media_type))
+	if (isset($file_data->media_type) && $prop === 'display_properties_only' && $view === 'item')
 	{
+		/*
 		$mediadata = array(
 			//'state', 'media_type', 'codec_type', 'codec_name', 'codec_long_name', 'resolution', 'fps',
 			'media_format', 'bit_rate', 'bits_per_sample', 'sample_rate', 'duration',
 			'channels', 'channel_layout', 'checked_out', 'checked_out_time');
+		*/
+		$mediadata = array('media_format','bit_rate', 'bits_per_sample', 'sample_rate', 'duration', 'channels');
 
-		$html .= '<table class="table"><tr><td colspan="2"><b>Audio properties</b></td><tr>';
+		$html .= '<table class="table audiotable">';
 		foreach($mediadata as $md_name)
 		{
-			$html .=  '<tr><td class="key">' . $md_name . '</td><td>' . $file_data->$md_name . '</td></tr>';
+			$PROP_NAME = $md_name;
+			$PROP_VALUE = $file_data->$md_name;
+			
+				if ($md_name == 'channels')
+			{
+				// Change 'channels' to '# Channels' you can also you language   JText::_('SOMENAME');
+				$PROP_NAME = '<span class="icon-play-circle large-icon"> </span> Channels';
+				
+				// Only change value if it is 2 or 1
+				if ($PROP_VALUE == 2 || $PROP_VALUE == 1)
+				{
+					$PROP_VALUE = $PROP_VALUE == 2 ? 'Stereo' : 'Mono';
+				}
+			
+			}
+			
+				if ($md_name == 'media_format')
+			{
+				// Change 'channels' to '# Channels' you can also you language   JText::_('SOMENAME');
+				$PROP_NAME = '<span class="icon-music large-icon"> </span> Media Type';	
+			}
+			
+				if ($md_name == 'bit_rate')
+			{
+				// Change 'channels' to '# Channels' you can also you language   JText::_('SOMENAME');
+				$PROP_NAME = '<span class="icon-options large-icon"> </span> Bitrate';
+				$PROP_VALUE = ($PROP_VALUE / 1000).' Kbps';
+			}
+				if ($md_name == 'bits_per_sample')
+			{
+				// Change 'channels' to '# Channels' you can also you language   JText::_('SOMENAME');
+				$PROP_NAME = '<span class="icon-options large-icon"> </span> Bit depth';
+				$PROP_VALUE = $PROP_VALUE.' Bit';	
+			}
+				if ($md_name == 'sample_rate')
+			{
+				// Change 'channels' to '# Channels' you can also you language   JText::_('SOMENAME');
+				$PROP_NAME = '<span class="icon-health large-icon"> </span> Sample Rate';	
+				$PROP_VALUE = $PROP_VALUE.' Hz';
+			}
+				if ($md_name == 'duration')
+			{
+				// Change 'channels' to '# Channels' you can also you language   JText::_('SOMENAME');
+				$PROP_NAME = '<span class="icon-clock large-icon"> </span> Duration';
+				$PROP_VALUE = gmdate("H:i:s", $PROP_VALUE);	
+			}
+				if ($PROP_VALUE == "wav") {
+					$media_format = "wav";
+				}
+				if ($PROP_VALUE == "aiff") {
+					$media_format = "aiff";
+				}
+				if ($PROP_VALUE == "mp3") {
+					$media_format = "mp3";
+				}
+						
+			if ($md_name == 'bit_rate' && ($media_format == 'wav' || $media_format == 'aiff'))  continue;
+			if ($md_name == 'bits_per_sample' && $media_format == 'mp3')  continue;
+			
+			
+			$html .=  '
+				<tr>
+					<td class="key"> ' . $PROP_NAME . '</td>
+					<td>' . $PROP_VALUE . '</td>
+				</tr>';
 		}
 		$html .= '</table>';
 	}
@@ -551,7 +627,7 @@ foreach($values as $file_id)
 	$field->abspath[$use_ingroup ? $n : $i] = $abspath;
 	$field->file_data[$use_ingroup ? $n : $i] = $file_data;
 
-	if ($filename_original) $per_value_js .= "
+	if ($filename_original && $prop !== 'display_properties_only') $per_value_js .= "
 		fcview_mediafile.initValue('" . $item->id . '_' . $field->name . '_' . $n . "', '".$field_name_js."');
 	";
 
@@ -563,7 +639,7 @@ foreach($values as $file_id)
 	if (!$multiple) break;  // multiple values disabled, break out of the loop, not adding further values even if the exist
 }
 
-JFactory::getDocument()->addScriptDeclaration("
+if ($per_value_js) JFactory::getDocument()->addScriptDeclaration("
 	fcview_mediafile_base_url['".$field_name_js."'] = '".$base_url."';
 
 	//document.addEventListener('DOMContentLoaded', function()
@@ -581,7 +657,7 @@ JFactory::getDocument()->addScriptDeclaration("
 $file_totals = '';
 
 // Total number of files
-if ($display_total_count)
+if ($display_total_count && $prop !== 'display_properties_only')
 {
 	$file_totals .= '
 		<div class="fcfile_total_count">
@@ -592,7 +668,7 @@ if ($display_total_count)
 }
 
 // Total download hits (of all files)
-if ($display_total_hits && $field->hits_total)
+if ($display_total_hits && $field->hits_total && $prop !== 'display_properties_only')
 {
 	$file_totals .='
 		<div class="fcfile_total_hits">
@@ -603,7 +679,7 @@ if ($display_total_hits && $field->hits_total)
 }
 
 // Add -1 position (display at top of field or at top of field, or at top/bottom of field group)
-if ($file_totals)
+if ($file_totals && $prop !== 'display_properties_only')
 {
 	$field->{$prop}[-1] = '
 		<div class="alert alert-success fcfile_total">
