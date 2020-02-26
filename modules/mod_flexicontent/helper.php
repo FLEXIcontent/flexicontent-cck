@@ -5,7 +5,7 @@
  *
  * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
  * @link            https://flexicontent.org
- * @copyright       Copyright © 2017, FLEXIcontent team, All Rights Reserved
+ * @copyright       Copyright ï¿½ 2017, FLEXIcontent team, All Rights Reserved
  * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
@@ -1267,7 +1267,7 @@ class modFlexicontentHelper
 				{
 					echo '
 						<div class="alert alert-notice">
-							' . JText::_("No viewable content in Current View for your Access Level") . '
+							' . JText::_("MOD_FLEXI_NO_CONTENT_CURRENTVIEW_ACCESS_LEVEL") . '
 						</div>';
 				}
 				return;
@@ -1280,9 +1280,7 @@ class modFlexicontentHelper
 				{
 					echo '
 						<div class="alert alert-warning">
-							<b>WARNING:</b> Misconfiguration warning, APPLY CONFIGURATION PER CATEGORY is possible only if CATEGORY SCOPE is set to
-								either (a) INCLUDE(static selection of categories)
-								or (b) items in same category as current item / or current category of category view
+						' . JText::_("MOD_FLEXI_WARNING_MESSAGE_CAT_SCOPE") . '
 						</div>';
 					return;
 				}
@@ -1327,7 +1325,7 @@ class modFlexicontentHelper
 		else
 		{
 			if (($behaviour_cat == 2 || $behaviour_cat == 4) && $apply_config_per_category) {
-				echo "<b>WARNING:</b> Misconfiguration warning, APPLY CONFIGURATION PER CATEGORY is possible only if CATEGORY SCOPE is set to either (a) INCLUDE(static selection of categories) or (b) items in same category as current item / or current category of category view<br/>";
+				echo  JText::_("MOD_FLEXI_WARNING_MESSAGE_CAT_SCOPE");
 				return;
 			}
 
@@ -1380,7 +1378,7 @@ class modFlexicontentHelper
 				{
 					echo '
 						<div class="alert alert-notice">
-							' . JText::_("No viewable content in Current View for your Access Level") . '
+							' . JText::_("MOD_FLEXI_NO_CONTENT_CURRENTVIEW_ACCESS_LEVEL") . '
 						</div>';
 				}
 				return;
@@ -1431,7 +1429,7 @@ class modFlexicontentHelper
 			{
 				echo '
 				<div class="alert alert-warning">
-					<b>WARNING:</b> Misconfigured types scope, select at least one item type or set types scope to ALL
+				' . JText::_("MOD_FLEXI_WARNING_TYPE_SCOPE") . '
 				</div>';
 				return;
 			}
@@ -1489,7 +1487,7 @@ class modFlexicontentHelper
 			{
 				echo '
 					<div class="alert alert-warning">
-						<b>WARNING:</b> Misconfigured author scope, select at least one author or set author scope to ALL
+						' . JText::_("MOD_FLEXI_WARNING_AUTHOR_SCOPE") . '
 					</div>';
 				return;
 			}
@@ -1548,7 +1546,7 @@ class modFlexicontentHelper
 			{
 				echo '
 					<div class="alert alert-warning">
-						<b>WARNING:</b> Misconfigured items scope, select at least one item or set items scope to ALL
+						' . JText::_("MOD_FLEXI_WARNING_ITEMS_SCOPE") . '
 					</div>';
 				return;
 			}
@@ -1651,7 +1649,7 @@ class modFlexicontentHelper
 			{
 				echo '
 					<div class="alert alert-warning">
-						<b>WARNING:</b> Misconfigured tags scope, select at least one tag or set tags scope to ALL
+					' . JText::_("MOD_FLEXI_WARNING_TAGS_SCOPE") . '
 					</div>';
 				return;
 			}
@@ -1704,7 +1702,7 @@ class modFlexicontentHelper
 			{
 				echo '
 					<div class="alert alert-warning">
-						<b>WARNING:</b> Misconfigured date scope, you have entered invalid -END- date:<br>(a) Enter a valid date via callendar OR <br>(b) leave blank OR <br>(c) choose (non-static behavior \'custom offset\') and enter custom offset e.g. five days ago (be careful with space character): -5 d
+					' . JText::_("MOD_FLEXI_WARNING_DATES_SCOPE") . '
 					</div>';
 				return;
 			}
@@ -1720,7 +1718,7 @@ class modFlexicontentHelper
 			{
 				echo '
 					<div class="alert alert-warning">
-						<b>WARNING:</b> Misconfigured date scope, you have entered invalid -BEGIN- date:<br>(a) Enter a valid date via callendar OR <br>(b) leave blank OR <br>(c) choose (non-static behavior \'custom offset\') and enter custom offset e.g. five days ago (be careful with space character): -5 d
+						' . JText::_("MOD_FLEXI_WARNING_DATES_SCOPE") . '
 					</div>';
 				return;
 			}
@@ -1755,7 +1753,7 @@ class modFlexicontentHelper
 						);
 						if (empty($edate[1]))
 						{
-							echo "<b>WARNING:</b> Misconfigured date scope, you have entered invalid -END- date:Custom offset is invalid e.g. in order to enter five days ago (be careful with space character) use: -5 d (DO NOT FORGET the space between e.g. '-5 d')<br/>";
+							echo JText::_("MOD_FLEXI_WARNING_DATES_SCOPE");
 							return;
 						}
 						else
@@ -1774,7 +1772,7 @@ class modFlexicontentHelper
 						);
 						if (empty($bdate[1]))
 						{
-							echo "<b>WARNING:</b> Misconfigured date scope, you have entered invalid -BEGIN- date: Custom offset is invalid e.g. in order to enter five days ago (be careful with space character) use: -5 d (DO NOT FORGET the space between e.g. '-5 d')<br/>";
+							echo JText::_("MOD_FLEXI_WARNING_DATES_SCOPE_BEGIN");
 							return;
 						}
 						else
@@ -1929,7 +1927,7 @@ class modFlexicontentHelper
 				{
 					echo '
 						<div class="alert alert-warning">
-							<b>WARNING:</b> Misconfigured date scope, you have set DATE TYPE as CUSTOM DATE Field, but have not select any specific DATE Field to be used
+							' . JText::_("MOD_FLEXI_WARNING_DATES_SCOPE_INI") . '
 						</div>';
 					return;
 				}
