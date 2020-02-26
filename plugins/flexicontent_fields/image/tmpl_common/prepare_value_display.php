@@ -66,10 +66,6 @@
 	$alt_encoded   = htmlspecialchars($alt, ENT_COMPAT, 'UTF-8');
 	$desc_encoded  = htmlspecialchars($desc, ENT_COMPAT, 'UTF-8');
 
-  	//Declare incase not using srcset
-  	$w = '';
- 	$h = '';
-
 	if (!$isURL)
 	{
 		$srcb = $thumb_urlpath . '/b_' .$extra_prefix. $image_name;  // backend
