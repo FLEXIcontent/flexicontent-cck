@@ -834,6 +834,29 @@ class FLEXIUtilities
 				? call_user_func($addEntry, '<span class="fcsb-icon-templates icon-eye"></span>'.JText::_( 'FLEXI_TEMPLATES' ), 'index.php?option=com_flexicontent&view=templates', $view=='templates') : null;
 			$perms->CanIndex
 				? call_user_func($addEntry, '<span class="fcsb-icon-search icon-search"></span>'.JText::_( 'FLEXI_SEARCH_INDEXES' ), 'index.php?option=com_flexicontent&view=search', $view=='search') : null;
+
+			$CanSeeSearchLogs = JFactory::getUser()->authorise('core.manage', 'com_search');
+
+			if ($CanSeeSearchLogs)
+			{
+				$params = JComponentHelper::getParams('com_search');
+				$enable_log_searches = $params->get('enabled');
+				if ($enable_log_searches)
+				{
+					call_user_func($addEntry,
+					'<a href="index.php?option=com_search&tmpl=component" onclick="var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\'); return false;" >'.
+						'<span class="fcsb-icon-book icon-book"></span>'.JText::_( 'FLEXI_NAV_SD_SEARCH_LOGS' ).
+					'</a>', '', false);
+				}
+				else
+				{
+					call_user_func($addEntry,
+					'<a href="index.php?option=com_config&view=component&component=com_search&path=" onclick="var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 0, 0, function(){window.location.reload(false)}); return false;" >'.
+						'<span class="fcsb-icon-book icon-book"></span>'.JText::_( 'FLEXI_NAV_SD_SEARCH_LOGS' ).
+					'</a>', '', false);
+				}
+			}
+
 			$perms->CanStats
 				? call_user_func($addEntry, '<span class="fcsb-icon-stats icon-chart"></span>'.JText::_( 'FLEXI_STATISTICS' ), 'index.php?option=com_flexicontent&view=stats', $view=='stats') : null;
 
@@ -869,7 +892,7 @@ class FLEXIUtilities
 					'<span class="fcsb-icon-plugins icon-power-cord"></span>'.JText::_( 'FLEXI_PLUGINS' ).
 				'</a>', '', false);
 			}
-
+			
 			if ($perms->CanConfig && empty($_SERVER['HTTPS']))
 			{
 				call_user_func($addEntry,

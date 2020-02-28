@@ -302,12 +302,12 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 	 * @param string $text image description
 	 * @param boolean $modal 1 for loading in modal
 	 */
-	function quickiconButton( $link, $image, $iconfont, $text, $modal = 0, $modal_create_iframe = 1, $modal_width=0, $modal_height=0)
+	function quickiconButton( $link, $image, $iconfont, $text, $modal = 0, $modal_create_iframe = 1, $modal_width=0, $modal_height=0, $close_function = 'false')
 	{
-		//initialise variables
+		// Initialise variables
 		$lang = JFactory::getLanguage();
 		$link_attribs = $modal
-			? ' onclick="var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', '.((int)(!$modal_create_iframe)).', '.$modal_width.', '.$modal_height.', false, {\'title\': \''.flexicontent_html::encodeHTML(JText::_($text), 2).'\'}); return false;"'
+			? ' onclick="var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', '.((int)(!$modal_create_iframe)).', '.$modal_width.', '.$modal_height.', ' . $close_function . ', {\'title\': \''.flexicontent_html::encodeHTML(JText::_($text), 2).'\'}); return false;"'
 			: '';
 		$img_attribs  = ' class="fc-board-btn-img"';
   	?>

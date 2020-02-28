@@ -1021,6 +1021,12 @@ class FlexicontentViewCategory extends JViewLegacy
 			FlexicontentFields::renderFilters( $params, $filters, $form_name );
 		}
 
+		// Log the word the searched word
+		if (trim($lists['filter']))
+		{
+			$model->logSearch($lists['filter']);
+		}
+
 
 		// ***
 		// *** Create the pagination object
