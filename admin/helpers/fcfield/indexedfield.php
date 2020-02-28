@@ -657,7 +657,42 @@ class FCIndexedField extends FCField
 
 			if ($display_as_select)
 			{
-				$options = & $elements;
+				// If values have been set and field is sortable
+				if ($value[0] !== '' && $sortable)
+				{
+					// Iterate through the values, find the element with the cooresponding key, add that element to the options
+					$i = 0;
+
+					// Before running the loops, check to see if the first child of elements is the placeholder so that it can be added before anything else
+					$keys = array_keys($elements);
+					if ($keys[0] == '_field_selection_prompt_')
+					{
+						$elements_new[0] = $elements['_field_selection_prompt_'];
+						$i++;
+						unset($elements['_field_selection_prompt_']);
+					}
+
+					// Iterate through selected values, figure out their index, and add these first. Unset any active ones
+					foreach ($value as $v)
+					{
+						$elements_new[$v] = $elements[$v];
+						unset($elements[$v]);
+						$i++;
+					}
+
+					// Go through the elements array now and add any non-selected elements as options.
+					foreach ($elements as $e)
+					{
+						$elements_new[$e->value] = $e;
+					}
+
+					// Append the new array to the options
+					$options = $elements_new;
+				}
+				else
+				{
+					$options = & $elements;
+				}
 			}
 			else
 			{
