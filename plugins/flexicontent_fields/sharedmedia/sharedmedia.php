@@ -785,7 +785,7 @@ class plgFlexicontent_fieldsSharedmedia extends FCField
 			// Apply separator and open/close tags
 			$field->{$prop} = implode($separatorf, $field->{$prop});
 			if ( $field->{$prop}!=='' ) {
-				$field->{$prop} = $opentag . $field->{$prop} . $closetag;
+				$field->{$prop} = JText::_($opentag) . $field->{$prop} . JText::_($closetag);
 			} else {
 				$field->{$prop} = '';
 			}

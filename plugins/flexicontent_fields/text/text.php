@@ -637,7 +637,7 @@ class plgFlexicontent_fieldsText extends FCField
 			if ( $field->{$prop}!=='' )
 			{
 				// Apply field 's opening / closing texts
-				$field->{$prop} = $opentag . $field->{$prop} . $closetag;
+				$field->{$prop} = JText::_($opentag) . $field->{$prop} . JText::_($closetag);
 
 				// Add microdata once for all values, if field -- is NOT -- in a field group
 				if ( $itemprop )
