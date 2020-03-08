@@ -1346,7 +1346,7 @@ class flexicontent_html
 				$framework_path = JUri::root(true).$lib_path.'/grapesjs';
 
 				$document->addStyleSheet($framework_path.'/stylesheets/toastr.min.css');
-				$document->addStyleSheet('https://unpkg.com/grapesjs@0.14.50/dist/css/grapes.min.css'); //stylesheets/grapes.min.css?v0.14.49
+				$document->addStyleSheet('https://unpkg.com/grapesjs@0.15.10/dist/css/grapes.min.css'); //stylesheets/grapes.min.css?v0.14.49
 				$document->addStyleSheet($framework_path.'/stylesheets/grapesjs-preset-webpage.min.css?0.1.10');
 				$document->addStyleSheet($framework_path.'/stylesheets/tooltip.css');
 				$document->addStyleSheet($framework_path.'/stylesheets/grapesjs-plugin-filestack.css');
@@ -1354,7 +1354,7 @@ class flexicontent_html
 
 				$document->addScript('https://static.filestackapi.com/v3/filestack.js');
 				$document->addScript($framework_path.'/js/toastr.min.js');
-				$document->addScript('https://unpkg.com/grapesjs@0.14.50/dist/grapes.js');  //js/grapes.min.js?v0.14.49
+				$document->addScript('https://unpkg.com/grapesjs@0.15.10/dist/grapes.js');  //js/grapes.min.js?v0.14.49
 
 				// GrapesJS Plugins
 				//$document->addScript('https://unpkg.com/grapesjs-blocks-basic');
