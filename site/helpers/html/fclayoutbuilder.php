@@ -324,6 +324,7 @@ abstract class JHtmlFclayoutbuilder
 
 			var editor = grapesjs.init({
 				avoidInlineStyle: false,
+				 dragMode: \'absolute\',
 
 				// Indicate where to init the editor. You can also pass an HTMLElement
 				// Size of the editor
