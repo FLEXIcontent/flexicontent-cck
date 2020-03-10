@@ -197,6 +197,36 @@ abstract class JHtmlFclayoutbuilder
 			flexicontent_html::loadframework('grapejs');
 
 			$document->addStyleDeclaration('
+
+			/* We can remove the border weve set at the beginnig */
+#gjs {
+  border: none;
+}
+/* Theming */
+
+/* Primary color for the background */
+.gjs-one-bg {
+  background-color: #444444;
+}
+
+/* Secondary color for the text color */
+.gjs-two-color {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* Tertiary color for the background */
+.gjs-three-bg {
+  background-color: #ec5896;
+  color: white;
+}
+
+/* Quaternary color for the text color */
+.gjs-four-color,
+.gjs-four-color-h:hover {
+  color: #6EA22B;
+}
+
+
 		/**
 		 * Top Panels container and top panels
 		 */
@@ -300,6 +330,7 @@ abstract class JHtmlFclayoutbuilder
 		');
 		
 		//JFactory::getDocument()->addScriptDeclaration(
+			//TODO add template.css file in editor for better display
 		$html .= '
 		<script>
 		function fclayout_init_builder(editor_sfx, element_id)
@@ -309,10 +340,10 @@ abstract class JHtmlFclayoutbuilder
 			 * and you\'d like to import it on fly for the user
 			 */
 			var LandingPage = {
-				html: \'<h2>This is the layout area, you may drag and drop to add your blocks here</h2>\',
+				html: \'<h2>This is the layout area, you may drag and drop to add your blocks here, to load flexicontent field use data panel to insert flexicontent block</h2>\',
 				css: null,
 				components: null,
-				style: null,
+				styles: [\'http://localhost/flexidev/templates/shaper_helix3/css/template.css\'],
 			};
 
 			var lp = \'./img/\';
@@ -324,7 +355,7 @@ abstract class JHtmlFclayoutbuilder
 
 			var editor = grapesjs.init({
 				avoidInlineStyle: false,
-				 dragMode: \'absolute\',
+				// dragMode: \'absolute\',
 
 				// Indicate where to init the editor. You can also pass an HTMLElement
 				// Size of the editor
@@ -801,7 +832,7 @@ abstract class JHtmlFclayoutbuilder
 
 
 			// Add info command
-			var cmdm = editor.Commands;
+			/*var cmdm = editor.Commands;
 			var mdlClass = \'gjs-mdl-dialog-sm\';
 			var infoContainer = document.getElementById(\'info-panel\');
 			cmdm.add(\'open-info\', function() {
@@ -823,7 +854,7 @@ abstract class JHtmlFclayoutbuilder
 					\'title\': \'About\',
 					\'data-tooltip-pos\': \'bottom\',
 				},
-			});
+			});*/
 
 
 			// Simple warn notifier
@@ -1065,9 +1096,8 @@ abstract class JHtmlFclayoutbuilder
 			});
 
 
-			// Set initial device as Mobile
-			// Also use \'active: true,\' property in the panels manager for the any Mobile button
-			editor.setDevice(\'Mobile Portrait\');
+			// Set initial device as Desktop
+			editor.setDevice(\'Desktop\');
 
 
 			/*editor.BlockManager.add(\'example-block-1-id\', {
@@ -1129,7 +1159,7 @@ abstract class JHtmlFclayoutbuilder
 			editor.BlockManager.add(\'fcfield\', {
 				label: \'Flexicontent Field\',
 				category: \'Data\',
-				content: \'<div style="display: inline-block">{flexi_field:FIELDNAME  item:{{fc-item-id}}  method:display}</div>\',
+				content: \'<div style="display: inline-block" data-gjs-resizable="true" data-gjs-dragMode="absolute">{flexi_field:FIELDNAME  item:{{fc-item-id}}  method:display}</div>\',
 				select: true,
 				activate: true,
 				attributes: { class:\'fc-iblock fa fa-database\' },
@@ -1149,11 +1179,11 @@ abstract class JHtmlFclayoutbuilder
 				id: \'panel-devices\',
 				appendTo: \'#gjs_\' + editor_sfx + \' .gjs-pn-panels\',
 				buttons: [
-					{
+					/*{
 						id: \'devices-label\',
 						label: \'Device\',
-						attributes: { style: \'pointer-events: none; font-family: Times;\'},
-					}, {
+						attributes: { style: \'pointer-events: none; font-family: Arial;\'},
+					},*/ {
 						id: \'device-desktop\',
 						//label: \'Desktop\',
 						className: \'fa fa-desktop\',
@@ -1403,19 +1433,6 @@ abstract class JHtmlFclayoutbuilder
 			</div>
 
 			<!--div id="blocks"></div-->
-		</div>
-
-		<div id="info-panel" style="display:none">
-			<br/>
-			<svg class="info-panel-logo" xmlns="//www.w3.org/2000/svg" version="1"><g id="gjs-logo">
-				<path d="M40 5l-12.9 7.4 -12.9 7.4c-1.4 0.8-2.7 2.3-3.7 3.9 -0.9 1.6-1.5 3.5-1.5 5.1v14.9 14.9c0 1.7 0.6 3.5 1.5 5.1 0.9 1.6 2.2 3.1 3.7 3.9l12.9 7.4 12.9 7.4c1.4 0.8 3.3 1.2 5.2 1.2 1.9 0 3.8-0.4 5.2-1.2l12.9-7.4 12.9-7.4c1.4-0.8 2.7-2.2 3.7-3.9 0.9-1.6 1.5-3.5 1.5-5.1v-14.9 -12.7c0-4.6-3.8-6-6.8-4.2l-28 16.2" style="fill:none;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;stroke-width:10;stroke:#fff"/>
-			</g></svg>
-			<br/>
-			<div class="info-panel-label">
-				<b>GrapesJS Webpage Builder</b> is a simple showcase of what is possible to achieve with the
-				<a class="info-panel-link gjs-four-color" target="_blank" href="https://github.com/artf/grapesjs">GrapesJS</a>
-				core library
-			</div>
 		</div>
 		';
 
