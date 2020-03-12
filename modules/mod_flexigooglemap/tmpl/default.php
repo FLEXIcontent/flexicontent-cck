@@ -36,6 +36,7 @@ $maptype   = $params->get('maptype', '');
 $maxzoommarker = $params->get('maxzoommarker', '');
 $markermode = $params->get('markermode', $params->get('lettermarkermode', 0));
 $markerimage = $params->get('markerimage');
+$disp_infowindow = $params->get('disp_infowindow', 1);
 
 //dump($markerdisplay, 'markerdisp');
 
@@ -181,12 +182,19 @@ switch ($mapapi)
 				// We only have a limited number of possible icon colors, so rewind icon index when icons finish
 				iconCounter = iconCounter >= customMarkerIcons.length ? 0 : iconCounter + 1;
 
+				
+				<?php if ($disp_infowindow)
+				{
+					echo "
 				google.maps.event.addListener(marker, 'click', (function(marker, i) {
 					return function() {
 						infowindow.setContent(locations[i][0]);
 						infowindow.open(map, marker);
 					}
-				})(marker, i));
+				})(marker, i));";
+			}
+			?>
+
 
 				google.maps.event.addDomListener(window, "resize", function() {
 					var center = map.getCenter();
@@ -268,7 +276,11 @@ switch ($mapapi)
 					locations[i][2]],
 					{icon: customMarkerIcon}
 				)
-					.bindPopup(locations[i][0])
+				<?php if ($disp_infowindow)
+				{
+					echo".bindPopup(locations[i][0])";
+				}
+				?>
 					<?php /* Add single location marker */
 					echo !$clustermode ?
 					'.addTo(theMap_' . $module->id . ');' : ''; ?>

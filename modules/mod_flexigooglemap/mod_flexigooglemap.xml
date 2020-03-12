@@ -209,6 +209,15 @@
 
 
 			<field name="" type="separator" default="MOD_FLEXIGOOGLEMAP_INFOWINDOWS" level="level1" />
+				<field
+				name="disp_infowindow" type="radio"
+				default="1" label="MOD_FLEXIGOOGLEMAP_DISPLAY_INFOWINDOW"
+				description="MOD_FLEXIGOOGLEMAP_DISPLAY_INFOWINDOW_DESC"
+				class="btn-group"
+				>
+				<option value="0">MOD_FLEXIGOOGLEMAP_NO</option>
+				<option value="1">MOD_FLEXIGOOGLEMAP_YES</option>
+			</field>
 			<field
 				name="uselink" type="radio"
 				default="1" label="MOD_FLEXIGOOGLEMAP_USELINK"
