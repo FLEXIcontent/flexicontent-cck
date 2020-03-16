@@ -340,10 +340,10 @@ abstract class JHtmlFclayoutbuilder
 			 * and you\'d like to import it on fly for the user
 			 */
 			var LandingPage = {
-				html: \'<h2>This is the layout area, you may drag and drop to add your blocks here, to load flexicontent field use data panel to insert flexicontent block</h2>\',
+				html: \'<div style="display: inline-block" data-gjs-resizable="true" data-gjs-dragMode="absolute"><h2>This is the layout area, you may drag and drop to add your blocks here, to load flexicontent field use data panel to insert flexicontent block</h2></div>\',
 				css: null,
 				components: null,
-				styles: [\'http://localhost/flexidev/templates/shaper_helix3/css/template.css\'],
+				style: null,
 			};
 
 			var lp = \'./img/\';
@@ -354,6 +354,14 @@ abstract class JHtmlFclayoutbuilder
 			];
 
 			var editor = grapesjs.init({
+
+				//TODO need to find solution for add current template.css inside canvas for now this code is regular but kill the js
+				//canvas: {
+				//scripts: null,
+				//styles: [\'urlsofactivetemmplate/css/template.css\'],
+				//},
+
+
 				avoidInlineStyle: false,
 				// dragMode: \'absolute\',
 
@@ -802,6 +810,7 @@ abstract class JHtmlFclayoutbuilder
 						widthMedia: \'\',
 					}]
 				},
+
 			});
 
 
