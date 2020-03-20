@@ -91,7 +91,8 @@ class modFlexigooglemapHelper
 
 		$fieldaddressid = $params->get('fieldaddressid');
 		$forced_itemid = $params->get('forced_itemid', 0);
-		
+		$markermode  = (int) $params->get('markermode', $params->get('lettermarkermode', 0));
+		$markerimage = $params->get('markerimage', '');
 
 		$mapLocations = array();
 
@@ -167,6 +168,9 @@ class modFlexigooglemapHelper
 					: $addr . ' ' . $link;
 
 				$coordinates = $coord['lat'] .','. $coord['lon'];
+				if ($markermode == 0){
+						$coord['custom_marker'] = JUri::root(true) . '/' . $markerimage ;
+					}
 				$custom_icon = $coord['custom_marker'];
 				$mapLocations[] = "['<h4 class=\"fleximaptitle\">$title</h4>$contentwindows $linkdirection'," . $coordinates . ",'".$custom_icon."']\r\n";
 			}
@@ -263,6 +267,9 @@ class modFlexigooglemapHelper
 						: $addr . ' ' . $link;
 
 					$coordinates = $coord['lat'] .','. $coord['lon'];
+					if ($markermode == 0){
+						$coord['custom_marker'] = JUri::root(true) . '/' . $markerimage ;
+					}
                     $custom_icon = $coord['custom_marker'];
 					$mapLocations[] = "['<h4 class=\"fleximaptitle\">$title</h4>$contentwindows $linkdirection'," . $coordinates . ",'".$custom_icon."']\r\n";
 				}
