@@ -105,6 +105,14 @@ foreach ($field->value as $file_id)
 
 	$field->html[] = '
 		<div class="inlinefile-data-box">
+			'.( (!$multiple || $is_ingroup) && !$required_class ? '
+			<fieldset class="group-fcset">
+				<input type="checkbox" id="'.$elementid_n.'_file-del" class="inlinefile-del" name="'.$fieldname_n.'[file-del]" value="1" onchange="file_fcfield_del_existing_value'.$field->id.'(this);" />
+				<label class="label inlinefile-del-lbl '.$tooltip_class.'" title="'.flexicontent_html::getToolTip('FLEXI_FIELD_'.$FT.'_ABOUT_REMOVE_FILE', 'FLEXI_FIELD_'.$FT.'_ABOUT_REMOVE_FILE_DESC', 1, 1).'" id="'.$elementid_n.'_file-del-lbl" for="'.$elementid_n.'_file-del" >
+					'.JText::_( 'Delete from server storage' ).'
+				</label>
+			</fieldset>
+			' : ( (!$multiple || $is_ingroup) && $required_class ? '<br/><div class="alert alert-info fc-small fc-iblock">'.JText::_('FLEXI_FIELD_'.$FT.'_REQUIRED_UPLOAD_NEW_TO_REPLACE').'</div>' : '')).'
 
 			<div style="display:inline-block;">
 				<span class="fc_filedata_storage_name" style="display:none;">'.$file_data->filename.'</span>
@@ -126,31 +134,27 @@ foreach ($field->value as $file_id)
 				'.(!empty($uploader_html) ? $uploader_html->container : '').'
 			</div>
 
-			'.( (!$multiple || $is_ingroup) && !$required_class ? '
-			<br/>
-			<fieldset class="group-fcset">
-				<input type="checkbox" id="'.$elementid_n.'_file-del" class="inlinefile-del" name="'.$fieldname_n.'[file-del]" value="1" onchange="file_fcfield_del_existing_value'.$field->id.'(this);" />
-				<label class="label inlinefile-del-lbl '.$tooltip_class.'" title="'.flexicontent_html::getToolTip('FLEXI_FIELD_'.$FT.'_ABOUT_REMOVE_FILE', 'FLEXI_FIELD_'.$FT.'_ABOUT_REMOVE_FILE_DESC', 1, 1).'" id="'.$elementid_n.'_file-del-lbl" for="'.$elementid_n.'_file-del" >
-					'.JText::_( 'Remove file' ).'
-				</label>
-			</fieldset>
-			' : ( (!$multiple || $is_ingroup) && $required_class ? '<br/><div class="alert alert-info fc-small fc-iblock">'.JText::_('FLEXI_FIELD_'.$FT.'_REQUIRED_UPLOAD_NEW_TO_REPLACE').'</div>' : '')).'
-
 			<div class="fcclear"></div>
 
 			<div class="'.$input_grp_class.' fc-xpended-row inlinefile-data-actions">
-				' . $_select_file_lbl . '
 				<input type="hidden" id="'.$elementid_n.'_file-id" name="'.$fieldname_n.'[file-id]" value="'.htmlspecialchars($file_id, ENT_COMPAT, 'UTF-8').'" class="fc_fileid" />'.'
 				'.(! $field->parameters->get('use_myfiles', '1') ? '
+				' . $_select_file_lbl . '
 				<span class="btn fc_fileupload_box">
 					<span>'.JText::_('FLEXI_FIELD_'.$FT.'_UPLOAD_NEW').'</span>
 					<input type="file" id="'.$elementid_n.'_file-data" name="'.$fieldname_n.'[file-data]" class="fc_filedata" data-rowno="'.$n.'" onchange="var file_box = jQuery(this).parent().parent().parent(); fc_loadImagePreview(this.id,\''.$elementid.'_\'+jQuery(this).attr(\'data-rowno\')+\'_img_preview\', \''.$elementid.'_\'+jQuery(this).attr(\'data-rowno\')+\'_file-data-txt\', 100, 0, \''.$PRV_TYPE.'\'); file_box.find(\'.inlinefile-secure-data\').show(400);  file_box.find(\'.inlinefile-secure-info\').hide(400); file_box.find(\'.inlinefile-del\').removeAttr(\'checked\').trigger(\'change\'); " />
 				</span>
-				' : '
+				' : ($field->parameters->get('use_myfiles', '1') > 0 ? '
+				' . $_select_file_lbl . '
 				<span class="btn btn-info addfile hasTooltip" id="'.$elementid_n.'_addfile" title="'.$_prompt_txt.'" data-href="'.$addExistingURL.'" onclick="'.$addExistingURL_onclick.'" data-rowno="'.$n.'">
 					'.JText::_('FLEXI_FIELD_'.$FT.'_MY_FILES').'
-				</span>
-				').'
+				</span>' : '
+				' /*. $_select_file_lbl*/ . '
+					<!--span class="btn btn-info addfile hasTooltip" id="'.$elementid_n.'_addfile" title="'.$_prompt_txt.'" data-href="'.$addExistingURL.'" onclick="fcfield_mediafile.showUploader(\''.$field->name . '_' . $n . '\', \''.$field_name_js.'\');" data-rowno="'.$n.'">
+						'.JText::_('FLEXI_UPLOAD').'
+					</span-->'
+				 )
+				).'
 			</div>
 
 		</div>'.
@@ -230,8 +234,15 @@ foreach ($field->value as $file_id)
 	$per_value_js .= "
 		fcfield_mediafile.initValue('" . $field->name . '_' . $n . "', '".$field_name_js."');
 	";
+	if (!$filename_original)
+	{
+		$per_value_js .= "
+			fcfield_mediafile.showUploader('" . $field->name . '_' . $n . "', '".$field_name_js."');
+		";
+	}
 
 	$n++;
+	if (!$multiple) break;
 }
 
 

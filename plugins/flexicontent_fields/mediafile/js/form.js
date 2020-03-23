@@ -6,6 +6,13 @@
 	fcfield_mediafile.dialog_handle = [];
 	fcfield_mediafile.base_url = [];
 
+	fcfield_mediafile.showUploader = function(field_name_n, config_name)
+	{
+		var fnn  = field_name_n.replace(/-/g, '_');
+		var box = jQuery('#custom_' + field_name_n + '_file-data-txt').closest('.fcfieldval_container');
+		box.find('.fc_files_uploader_toggle_btn').click();
+	}
+
 	fcfield_mediafile.initValue = function(field_name_n, config_name)
 	{
 		//window.console.log(field_name_n);
@@ -50,7 +57,7 @@
 				]
 			},
 	    plugins: [
-	        WaveSurfer.cursor.create({
+	        /*WaveSurfer.cursor.create({
 	            showTime: true,
 	            opacity: 1,
 	            customShowTimeStyle: {
@@ -59,7 +66,7 @@
 	                padding: '2px',
 	                'font-size': '10px'
 	            }
-	        })
+	        })*/
 	    ]
 		});
 

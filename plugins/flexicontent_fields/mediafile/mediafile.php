@@ -72,12 +72,13 @@ class plgFlexicontent_fieldsMediafile extends FCField
 		$max_values   = $use_ingroup ? 0 : (int) $field->parameters->get('max_values', 0);
 		$required     = (int) $field->parameters->get('required', 0);
 		$add_position = (int) $field->parameters->get('add_position', 3);
+		$use_myfiles  = (int) $field->parameters->get('use_myfiles', '1');
 
 		// Classes for marking field required
 		$required_class = $required ? ' required' : '';
 
 		// If we are multi-value and not inside fieldgroup then add the control buttons (move, delete, add before/after)
-		$add_ctrl_btns = !$use_ingroup && $multiple;
+		$add_ctrl_btns = !$use_ingroup;
 
 		// Inline file property editing
 		$inputmode = (int)$field->parameters->get( 'inputmode', 1 ) ;  // 1: file selection only,  0: inline file properties editing
@@ -645,7 +646,7 @@ class plgFlexicontent_fieldsMediafile extends FCField
 			flexicontent_html::loadFramework('flexi-lib');
 			JHtml::addIncludePath(JPATH_SITE . '/components/com_flexicontent/helpers/html');
 			$document->addScript('https://unpkg.com/wavesurfer.js/dist/wavesurfer.min.js');
-			$document->addScript('https://unpkg.com/wavesurfer.js/dist/plugin/wavesurfer.cursor.js');
+			//$document->addScript('https://unpkg.com/wavesurfer.js/dist/plugin/wavesurfer.cursor.js');
 			$document->addScript(JUri::root(true) . '/plugins/flexicontent_fields/mediafile/js/form.js', array('version' => FLEXI_VHASH));
 		}
 
@@ -694,7 +695,7 @@ class plgFlexicontent_fieldsMediafile extends FCField
 						<ul class="dropdown-menu" role="menu">
 							<li>'.$uploader_html->toggleBtn.'</li>
 							<li>'.$uploader_html->multiUploadBtn.'</li>
-							<li>'.$uploader_html->myFilesBtn.'</li>
+							' . ($use_myfiles > 0 ? '<li>'.$uploader_html->myFilesBtn.'</li>' : '') . '
 							<li>'.$uploader_html->mediaUrlBtn.'</li>
 						</ul>
 					</div>
@@ -916,7 +917,7 @@ class plgFlexicontent_fieldsMediafile extends FCField
 			flexicontent_html::loadFramework('flexi-lib');
 			JHtml::addIncludePath(JPATH_SITE . '/components/com_flexicontent/helpers/html');
 			$document->addScript('https://unpkg.com/wavesurfer.js/dist/wavesurfer.min.js');
-			$document->addScript('https://unpkg.com/wavesurfer.js/dist/plugin/wavesurfer.cursor.js');
+			//$document->addScript('https://unpkg.com/wavesurfer.js/dist/plugin/wavesurfer.cursor.js');
 			$document->addScript(JUri::root(true) . '/plugins/flexicontent_fields/mediafile/js/view.js', array('version' => FLEXI_VHASH));
 		}
 

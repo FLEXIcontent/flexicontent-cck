@@ -20,7 +20,7 @@
 			var wave = jQuery('#fc_mediafile_audio_spectrum_' + fnn + ' wave wave');
 			if (!wave.find('.fccurrentTimeBox').length)
 			{
-				wave.append(jQuery('<div class="fccurrentTimeBox" style="position:absolute; right:0; top: 38%; background: #777; color: white; padding: 4px; opacity: 70%;"></div>'));
+				wave.append(jQuery('<div class="fccurrentTimeBox" style="position:absolute; z-index: 11; right:0; top: 38%; background: #777; color: white; padding: 4px; opacity: 70%;"></div>'));
 			}
 			wave.find('.fccurrentTimeBox').html(formattedTime);
 		}
@@ -80,7 +80,7 @@
 			},
 
 			plugins: [
-				WaveSurfer.cursor.create({
+				/*WaveSurfer.cursor.create({
 						showTime: true,
 						opacity: 1,
 						customShowTimeStyle: {
@@ -89,7 +89,7 @@
 								padding: '2px',
 								'font-size': '10px'
 						}
-				})
+				})*/
 		]
 		});
 
