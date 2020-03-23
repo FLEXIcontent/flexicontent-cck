@@ -1464,11 +1464,16 @@ class plgFlexicontent_fieldsMediafile extends FCField
 				// Change 'channels' to '# Channels' you can also you language   JText::_('SOMENAME');
 				$filtername = 'Sample Rate';	
 			}
-			
-			$filter->html[] = '<div class="row-fluid"><div class="span4" style="text-align: right;"><b class="badge">'. $filtername . '</b></div><div class="span8">' . $html[$prop_name] . '</div></div>';
+
+			$filter->html[] = '
+			<div class="fc_filter_media_property_'.$prop_name.'">
+				<div class="fc_filter_label fc_label_field_'.$filter->id.'_'.$prop_name.'">'. $filtername . '</div>
+				<div class="fc_filter_html">' . $html[$prop_name] . '</div>
+			</div>
+			';
 		}
 
-		$filter->html =  '<div class="container" style="display: initial;">' . implode('', $filter->html) . '</div>';
+		$filter->html =  '<div class="fc_filter_media_properties_box" style="float:left; width: 100%;">' . implode('', $filter->html) . '</div>';
 	}
 
 

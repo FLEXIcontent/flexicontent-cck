@@ -1725,7 +1725,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 
 		$app   = JFactory::getApplication();
 
-		if ($create_preview && $ffmpeg_path && in_array($ext, array('wav', 'mp3', 'mp4', 'mpg', 'mpeg', 'avi')))
+		if ($create_preview && $ffmpeg_path && in_array($ext, array('wav', 'mp3', 'aiff', 'mp4', 'mpg', 'mpeg', 'avi')))
 		{
 			$prv_path = str_replace('\\', '/', dirname($filepath)) . '/audio_preview';
 			$filename = str_ireplace('.' . $ext, '', basename($filepath));
@@ -1781,7 +1781,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 		$ffprobe_path       = $field->parameters->get('mm_ffprobe_path', '');
 
 		// Create audio preview file
-		if ($ffprobe_path && in_array($ext, array('wav', 'mp3', 'mp4', 'mpg', 'mpeg', 'avi')))
+		if ($ffprobe_path && in_array($ext, array('wav', 'mp3', 'aiff', 'mp4', 'mpg', 'mpeg', 'avi')))
 		{
 			// Default options
 			$options = '-loglevel quiet -show_format -show_streams -print_format json';
@@ -1821,6 +1821,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 
 				$md_obj->media_type      = $json->streams[0]->codec_type === 'video' ? 1 : 0; //media_type, 0: audio , 1: video
 				$md_obj->media_format    = $json->streams[0]->codec_type === 'video' ? 'video' : ($json->streams[0]->bits_per_sample ? 'wav' : 'mp3');
+				$md_obj->media_format    = in_array($json->streams[0]->codec_name, array('pcm_s16be', 'pcm_s24be')) ? 'aiff' : $md_obj->media_format;
 
 				$md_obj->codec_type      = $json->streams[0]->codec_type;
 				$md_obj->codec_name      = $json->streams[0]->codec_name;

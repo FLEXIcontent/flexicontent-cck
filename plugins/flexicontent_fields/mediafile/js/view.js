@@ -15,7 +15,14 @@
 		var updateTimer = function updateTimer()
 		{
 			var formattedTime = secondsToTimestamp(audio_spectrum.getCurrentTime());
-			jQuery('#fc_mediafile_current_time_' + fnn).text(formattedTime);
+			//jQuery('#fc_mediafile_current_time_' + fnn).text(formattedTime);
+
+			var wave = jQuery('#fc_mediafile_audio_spectrum_' + fnn + ' wave wave');
+			if (!wave.find('.fccurrentTimeBox').length)
+			{
+				wave.append(jQuery('<div class="fccurrentTimeBox" style="position:absolute; right:0; top: 38%; background: #777; color: white; padding: 4px; opacity: 70%;"></div>'));
+			}
+			wave.find('.fccurrentTimeBox').html(formattedTime);
 		}
 
 		var secondsToTimestamp = function(seconds)
@@ -28,7 +35,11 @@
 			h = h < 10 ? '0' + h : h;
 			m = m < 10 ? '0' + m : m;
 			s = s < 10 ? '0' + s : s;
-			return h + ':' + m + ':' + s;
+
+			if (h > 0)
+			 return h + ':' + m + ':' + s;
+			else
+			 return m + ':' + s;
 		}
 
 		// Imitate SoundCloud's mirror effect on the waveform. Only works on iOS. (Adapted from the wavesurfer.js demo.) 

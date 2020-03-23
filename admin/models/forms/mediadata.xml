@@ -18,6 +18,7 @@
 		<field name="media_format" type="fcradio" default="1" label="Format" description="e.g wav, mp3" class="btn-group group-fcinfo" labelclass="fc-prop-lbl">
 			<option value="wav">Audio/Wav</option>
 			<option value="mp3">Audio/Mp3</option>
+			<option value="aiff">Audio/Aiff</option>
 			<option value="video">Video/*</option>
 		</field>
 

@@ -516,9 +516,9 @@ foreach($values as $file_id)
 			<div id="fc_mediafile_audio_spectrum_' . $item->id . '_' . $FN_n . '" class="fc_mediafile_audio_spectrum"></div>
 		</div>
 		<div>
+			<!--div id="fc_mediafile_current_time_' . $item->id . '_' . $FN_n . '" class="media_time">00:00:00</div-->
 			<div id="fc_mediafile_controls_' . $item->id . '_' . $FN_n . '" class="fc_mediafile_controls">
 
-				<span id="fc_mediafile_current_time_' . $item->id . '_' . $FN_n . '" class="">00:00:00</span>
 				<button type="button" class="playBtn icon-play-circle controls" title="Play"></button>
 				<button type="button" class="pauseBtn icon-pause-circle controls" title="Pause"></button>
 				<button type="button" class="stopBtn icon-stop-circle controls" title="Stop"></button>
