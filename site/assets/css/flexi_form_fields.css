@@ -1790,7 +1790,8 @@ div.fcimg_value_props {
 	margin: 8px 0 0 0;
 }
 #flexicontent input.addrint_autocomplete {
-	width: 318px;
+	width: 97%;
+	height: 23px;
 }
 #flexicontent select.addrint_ac_type {
 	width: 160px;
@@ -1832,6 +1833,7 @@ iframe.sharedmedia {
 	display: block;
 	color: #999;
 	font-style: italic;
-	min-height: 20px;
+	height: 20px;
+	width: 209px;
 	overflow-y: auto !important;
 }
