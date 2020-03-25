@@ -4001,6 +4001,7 @@ class FlexicontentFields
 		} catch ( Exception $e ) {
 			if ($skip_on_invalid) return '';
 			else $date = '';
+			JFactory::getApplication()->enqueueMessage('Calendar date <i><b>' . $value . '</b></i> was invalid format. Value cleared', 'warning');
 		}
 
 		// Create JS calendar
