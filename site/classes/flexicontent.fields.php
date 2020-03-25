@@ -3973,7 +3973,7 @@ class FlexicontentFields
 				$date = JHtml::_('date',  $value, 'Y-m-d H:i', $timezone, $gregorian = true);
 			}
 		} catch ( Exception $e ) {
-			if (!$skip_on_invalid) return '';
+			if ($skip_on_invalid) return '';
 			else $date = '';
 		}
 
