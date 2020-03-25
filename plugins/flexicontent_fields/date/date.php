@@ -439,7 +439,7 @@ class plgFlexicontent_fieldsDate extends FCField
 					$attribs_arr['maxYear'] = $maxyear;
 				}
 
-				$html = FlexicontentFields::createCalendarField($value, $date_allowtime, $fieldname_n, $elementid_n, $attribs_arr, $skip_on_invalid=true, $timezone, $dateformat);
+				$html = FlexicontentFields::createCalendarField($value, $date_allowtime, $fieldname_n, $elementid_n, $attribs_arr, $skip_on_invalid=false, $timezone, $dateformat);
 
 				if (!$html)
 				{
@@ -448,7 +448,7 @@ class plgFlexicontent_fieldsDate extends FCField
 					{
 						continue;
 					}
-					$html = FlexicontentFields::createCalendarField('', $date_allowtime, $fieldname_n, $elementid_n, $attribs_arr, $skip_on_invalid=true, $timezone, $dateformat);
+					$html = FlexicontentFields::createCalendarField('', $date_allowtime, $fieldname_n, $elementid_n, $attribs_arr, $skip_on_invalid=false, $timezone, $dateformat);
 				}
 			}
 
