@@ -113,9 +113,20 @@ class plgFlexicontent_fieldsTextarea extends FCField
 
 		// *** HTML Editor configuration  ***
 		$width = $field->parameters->get( 'width', '98%') ;
-		if ( is_numeric($width) ) $width .= 'px';
-		$height = $field->parameters->get( 'height', ($field->field_type == 'maintext') ? '400px' : '250px' ) ;
-		if ( is_numeric($height) ) $height .= 'px';
+		$height = $field->parameters->get( 'height', ($field->field_type == 'maintext') ? '400' : '250' ) ;
+
+		if (!$use_html)
+		{
+			if ( is_numeric($width) ) $width .= 'px';
+			if ( is_numeric($height) ) $height .= 'px';
+		}
+		else
+		{
+			$width = (int) $width;
+			$height = (int) $height;
+			if ( $width < 100 ) $width = 100;
+			if ( $height < 100 ) $height = 100;
+		}
 
 		// Decide editor plugin buttons to SKIP
 		$show_buttons = $field->parameters->get( 'show_buttons', 1 ) ;
