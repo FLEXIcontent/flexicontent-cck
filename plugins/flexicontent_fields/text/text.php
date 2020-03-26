@@ -795,7 +795,7 @@ class plgFlexicontent_fieldsText extends FCField
 		$plg = new $className($dispatcher, array('type'=>$extfolder, 'name'=>$extname, 'params'=>$plg_db_data->params));
 
 		// Create automatic value
-		$plg->onAllFieldsPostDataValidated($field, $item);
+		return $plg->onAllFieldsPostDataValidated($field, $item);
 	}
 
 

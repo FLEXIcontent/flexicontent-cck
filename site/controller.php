@@ -696,11 +696,14 @@ class FlexicontentController extends JControllerLegacy
 		// If saving fails, do any needed cleanup, and then redirect back to record form
 		if (!$model->store($validated_data))
 		{
-			// Set the POSTed form data into the session, so that they get reloaded
-			$app->setUserState($form->option . '.edit.' . $form->context . '.data', $data);      // Save the jform data in the session
-			$app->setUserState($form->option . '.edit.' . $form->context . '.custom', $custom);  // Save the custom fields data in the session
-			$app->setUserState($form->option . '.edit.' . $form->context . '.jfdata', $jfdata);  // Save the falang translations into the session
-			$app->setUserState($form->option . '.edit.' . $form->context . '.unique_tmp_itemid', $unique_tmp_itemid);  // Save temporary unique item id into the session
+			if (empty($model->abort_redirect_url))
+			{
+				// Set the POSTed form data into the session, so that they get reloaded
+				$app->setUserState($form->option . '.edit.' . $form->context . '.data', $data);      // Save the jform data in the session
+				$app->setUserState($form->option . '.edit.' . $form->context . '.custom', $custom);  // Save the custom fields data in the session
+				$app->setUserState($form->option . '.edit.' . $form->context . '.jfdata', $jfdata);  // Save the falang translations into the session
+				$app->setUserState($form->option . '.edit.' . $form->context . '.unique_tmp_itemid', $unique_tmp_itemid);  // Save temporary unique item id into the session
+			}
 
 			// Set error message and the redirect URL (back to the record form)
 			$app->setHeader('status', '500 Internal Server Error', true);
@@ -710,7 +713,7 @@ class FlexicontentController extends JControllerLegacy
 			// Skip redirection back to return url if inside a component-area-only view, showing error using current page, since usually we are inside a iframe modal
 			if ($this->input->getCmd('tmpl') !== 'component')
 			{
-				$this->setRedirect($this->returnURL);
+				$this->setRedirect(!empty($model->abort_redirect_url) ? $model->abort_redirect_url: $this->returnURL);
 			}
 
 			// Try to check-in the record, but ignore any new errors
