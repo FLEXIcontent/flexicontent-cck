@@ -2436,6 +2436,19 @@ class ParentClassItem extends FCModelAdmin
 			$core_data_via_events = null;
 			$result = $this->saveFields($isNew, $item, $data, $files, $old_item, $core_data_via_events, $checkACL);
 
+			// Allow custom redirection on failure
+			if (!empty($item->abort_save))
+			{
+				$result = 'abort';
+				unset($item->abort_save);
+
+				if (!empty($item->abort_redirect_url))
+				{
+					$this->abort_redirect_url = $item->abort_redirect_url;
+					unset($item->abort_redirect_url);
+				}
+			}
+
 			if ( $print_logging_info ) $fc_run_times['item_store_custom'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 
 			// Re-bind (possibly modified data) to the item
@@ -2856,6 +2869,11 @@ class ParentClassItem extends FCModelAdmin
 		{
 			$field_type = $field->iscore ? 'core' : $field->field_type;
 			$result = FLEXIUtilities::call_FC_Field_Func($field_type, 'onAllFieldsPostDataValidated', array( &$field, &$item ));
+
+			if ($result === 'abort')
+			{
+				return $result;
+			}
 
 			// For CORE field get the modified data, which will be used for storing in DB (these will be re-bind later)
 			if ( isset($core_via_post[$field->name]) )
