@@ -214,7 +214,7 @@ form > .fc_filter_line {
 	width: 100%;
 }
 .fc_filter_html > .noUi-target {
-	margin: 24px 24px 6px 24px;
+	margin: 6px 24px 6px 24px;
 }
 .fc_filter_html > .noUi-target.noToolTipSlider {
 	margin: 8px 16px 6px 16px;
