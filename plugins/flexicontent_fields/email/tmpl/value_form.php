@@ -51,8 +51,11 @@ foreach ($values as $value)
 
 	// Add styles for label position
 	$document = JFactory::getDocument();
-	$style = '.placeholder{position: absolute;left: -99999px;}.label-top{display:block;}';
-	$document->addStyleDeclaration($style);
+	$styleurl = JUri::root(true) . '/plugins/flexicontent_fields/email/css/style.css';
+	$jsurl = JUri::root(true) . '/plugins/flexicontent_fields/email/js/upload.js';
+	$document->addStyleSheet($styleurl);
+	$document->addScript($jsurl);
+
 
 
 	// Use paremeters to decide if email should be cloaked and if we need a mailto: link
@@ -70,7 +73,7 @@ foreach ($values as $value)
 	$consent_field_text = $field->parameters->get('text_consent', 'FLEXI_FIELD_EMAIL_CONSENT_LABEL_VALUE');
 	$consent_field_link = $field->parameters->get('link_consent', '');
 	if($consent_field_display){
-		$consent_field = '<div class="field"><input type="checkbox" id="consent" name="consent" value="consent" class="required">
+		$consent_field = '<div class="field form-group control-group"><input type="checkbox" id="consent" name="consent" value="consent" class="required">
 		<label for="consent">
 		<a href="'.$consent_field_link.'" target="_blank">'.Jtext::_($consent_field_text).'</a>
 		</label></div>';
@@ -88,12 +91,10 @@ if ( $joomla_captcha != '0' && $captcha_display) {
     $recaptcha = $dispatcher->trigger('onDisplay', array(null, 'dynamic_recaptcha_1', 'class="required"'));
 }
   if (isset($recaptcha[0]) && $joomla_captcha != "0" && $captcha_display != "0") {
-        $captcha_display= $recaptcha[0];
+		$captcha_display= '<div class="captcha form-group control-group">'.$recaptcha[0].'</div>';
 }else{
     $captcha_display="";
   }
-  
-		// TODO add position for label
 
 	//Fake id form, cutt email on @ and set startemail
 	$formid =  explode("@", $addr);
@@ -124,24 +125,24 @@ if ( $joomla_captcha != '0' && $captcha_display) {
 									$placeholder = ($label_position === 'placeholder') ? 'placeholder="'.$list_field->field_label.'"': '';
 
 									if($list_field->field_type === 'text') {
-										$fields_display .= '<div class="field field_text form-group"><label for="'.$field_id.'" class="'.$class.'">'.$field_label.'</label><input type="text" name="'.$field_name.'" id="'.$field_id.'" '.$placeholder.' aria-label="'.$field_label.'" class="form-control '.$required.'" style="margin:0"></div>';
+										$fields_display .= '<div class="'.$field_id.' field field_text form-group control-group"><label for="'.$field_id.'" class="'.$class.'">'.$field_label.'</label><input type="text" name="'.$field_name.'" id="'.$field_id.'" '.$placeholder.' aria-label="'.$field_label.'" class="form-control '.$required.'" style="margin:0"></div>';
 										}
 									if($list_field->field_type === 'email') {
-										$fields_display .= '<div class="field field_email form-group"><label for="'.$field_id.'" class="'.$class.'">'.$field_label.'</label><input type="email" name="'.$field_name.'" id="'.$field_id.'" '.$placeholder.' aria-label="'.$field_label.'" class="form-control '.$required.' validate-email" style="margin:0"></div>';
+										$fields_display .= '<div class="'.$field_id.' field field_email form-group control-group"><label for="'.$field_id.'" class="'.$class.'">'.$field_label.'</label><input type="email" name="'.$field_name.'" id="'.$field_id.'" '.$placeholder.' aria-label="'.$field_label.'" class="form-control '.$required.' validate-email" style="margin:0"></div>';
 										}
 									if($list_field->field_type === 'date') {
-											$fields_display .= '<div class="field field_date form-group"><label for="'.$field_id.'" class="'.$class.'">'.$field_label.'</label><input type="date" name="'.$field_name.'" id="'.$field_id.'" '.$placeholder.' aria-label="'.$field_label.'" class="form-control '.$required.'" style="margin:0"></div>';
+											$fields_display .= '<div class="'.$field_id.' field field_date form-group control-group"><label for="'.$field_id.'" class="'.$class.'">'.$field_label.'</label><input type="date" name="'.$field_name.'" id="'.$field_id.'" '.$placeholder.' aria-label="'.$field_label.'" class="form-control '.$required.'" style="margin:0"></div>';
 											}
 									if($list_field->field_type === 'datetime-local') {
-											$fields_display .= '<div class="field field_datetime form-group"><label for="'.$field_id.'" class="'.$class.'">'.$field_label.'</label><input type="datetime-local" name="'.$field_name.'" id="'.$field_id.'" '.$placeholder.' aria-label="'.$field_label.'" class="form-control '.$required.'" style="margin:0"></div>';
+											$fields_display .= '<div class="'.$field_id.' field field_datetime form-group control-group"><label for="'.$field_id.'" class="'.$class.'">'.$field_label.'</label><input type="datetime-local" name="'.$field_name.'" id="'.$field_id.'" '.$placeholder.' aria-label="'.$field_label.'" class="form-control '.$required.'" style="margin:0"></div>';
 											}
 									if($list_field->field_type === 'textarea') {
-										$fields_display .= '<div class="field field_textarea form-group"><label for="'.$field_id.'" class="'.$class.'">'.$field_label.'</label><textarea rows="4" cols="50" name="'.$field_name.'" '.$placeholder.' aria-label="'.$field_label.'" id="'.$field_id.'" class="form-control '.$required.'" style="width: 100%;
+										$fields_display .= '<div class="'.$field_id.' field field_textarea form-group control-group"><label for="'.$field_id.'" class="'.$class.'">'.$field_label.'</label><textarea rows="4" cols="50" name="'.$field_name.'" '.$placeholder.' aria-label="'.$field_label.'" id="'.$field_id.'" class="form-control '.$required.'" style="width: 100%;
     margin: 0;"></textarea></div>';
 										}
 									if($list_field->field_type === 'radio') {
 										$values_field = explode(";;",$list_field->field_value);
-										$fields_display .= '<div class="field field_radio form-group"><label for="'.$field_id.'" class="'.$class.'-radio">'.$list_field->field_label.'</label>';
+										$fields_display .= '<div class="'.$field_id.' field field_radio form-group control-group"><label for="'.$field_id.'" class="'.$class.'-radio">'.$list_field->field_label.'</label>';
 											foreach( $values_field as $value_field ) {
 												$value =  JText::_($value_field);
 												$fields_display .= '<input type="radio" value="'.$value.'" name="'.$formid.'['.$value.']'.'" aria-label="'.$value.'" style="margin:0" class="form-control"><label for="'.$field_id.'">'.$value.'</label>';
@@ -150,7 +151,7 @@ if ( $joomla_captcha != '0' && $captcha_display) {
 									}
 									if($list_field->field_type === 'checkbox') {
 										$values_field = explode(";;",$list_field->field_value);
-										$fields_display .= '<div class="field field_checkbox form-group"><label for="'.$field_id.'" class="'.$class.'-checkbox">'.$list_field->field_label.'</label>';
+										$fields_display .= '<div class="'.$field_id.' field field_checkbox form-group control-group"><label for="'.$field_id.'" class="'.$class.'-checkbox">'.$list_field->field_label.'</label>';
 											foreach( $values_field as $value_field ) {
 												$value = JText::_($value_field);
 												$fields_display .= '<input type="checkbox" value="'.$value.'" name="'.$value.'" class="form-control" aria-label="'.$value.'" style="margin:0" ><label for="'.$field_id.'">'.$value.'</label>'; //TODO add required system
@@ -160,7 +161,7 @@ if ( $joomla_captcha != '0' && $captcha_display) {
 									if($list_field->field_type === 'select') {
 										$values_field = explode(";;",$list_field->field_value);
 										$select_label = ($class == 'placeholder') ? $field_label : JText::_('FLEXI_SELECT');
-										$fields_display .= '<div class="field field_select"><label for="'.$field_id.'" class="'.$class.'" style="margin:0">'.$field_label.'</label><select id="'.$field_name.'" name="'.$field_name.'" aria-label="'.$field_label.'" class="form-control"><option value="">'.$select_label.'</option>';//TODO add required system
+										$fields_display .= '<div class="'.$field_id.' field field_select form-group control-group" ><label for="'.$field_id.'" class="'.$class.'" style="margin:0">'.$field_label.'</label><select id="'.$field_name.'" name="'.$field_name.'" aria-label="'.$field_label.'" class="form-control"><option value="">'.$select_label.'</option>';//TODO add required system
 											foreach( $values_field as $value_field ) {
 												$value = JText::_($value_field);
 												$fields_display .='<option value="'.$value.'">'.JText::_($value_field).'</option>';
@@ -168,23 +169,29 @@ if ( $joomla_captcha != '0' && $captcha_display) {
 										$fields_display .='</select></div>';
 									}
 									if($list_field->field_type === 'file') {
-										$fields_display .= '<h3>NOT COMPLETE FUNCTION</h3><div class="field field_file form-group"><label for="'.$field_id.'" class="'.$class.'">'.$field_label.'</label><input type="file" name="'.$field_name.'" accept="'.$value.'" id="'.$field_id.'" '.$placeholder.' aria-label="'.$field_label.'" class="form-control '.$required.'" multiple style="margin:0"></div>';//TODO add upload system
+										$values_field = explode(";;",$list_field->field_value);
+										if (!empty($values_field[1]) && $values_field[1] === 'multiple'){
+											$uploadmode='multiple';
+										}else{
+											$uploadmode='';
+										}
+										$fields_display .= '<div class="'.$field_id.' field field_file form-group control-group"><label for="'.$field_id.'" class="'.$class.'">'.$field_label.'</label><input type="file" name="'.$field_name.'[]" accept="'.$values_field[0].'" id="'.$field_id.'" '.$placeholder.' aria-label="'.$field_label.'" class="inputfile '.$required.'" '.$uploadmode.' style="margin:0"  maxuploads = 2 ></div>';
 									}
 									if($list_field->field_type === 'phone') {
-										$fields_display .= '<div class="field field_phone form-group"><label for="'.$field_id.'" class="'.$class.'">'.$field_label.'</label><input type="phone" name="'.$field_name.'" pattern="'.$value.'" id="'.$field_id.'" '.$placeholder.' aria-label="'.$field_label.'" class="form-control '.$required.'" style="margin:0"></div>';
+										$fields_display .= '<div class="'.$field_id.' field field_phone form-group control-group"><label for="'.$field_id.'" class="'.$class.'">'.$field_label.'</label><input type="phone" name="'.$field_name.'" pattern="'.$value.'" id="'.$field_id.'" '.$placeholder.' aria-label="'.$field_label.'" class="form-control '.$required.'" style="margin:0"></div>';
 									}
 									if($list_field->field_type === 'hidden') {
 										$fields_display .= '<input type="hidden" name="'.$field_name.'" id="'.$field_id.'" value="'.$field_value.'">';
 									}
 									if($list_field->field_type === 'freehtml') {
-										$fields_display .= '<div class="field field_html form-group"><p>'.$field_label.'</p><p>'.JText::_($list_field->field_value).'</p></div>';
+										$fields_display .= '<div class="'.$field_id.' field field_html form-group control-group"><p>'.$field_label.'</p><p>'.JText::_($list_field->field_value).'</p></div>';
 									}
 									if($list_field->field_type === 'url') {
-										$fields_display .= '<div class="field field_url form-group"><label for="'.$field_id.'" class="'.$class.'">'.$field_label.'</label><input type="url" name="'.$field_name.'" pattern="'.$list_field->field_value.'" id="'.$field_id.'" '.$placeholder.' aria-label="'.$field_label.'" class="form-control '.$required.'" style="margin:0"></div>';
+										$fields_display .= '<div class="'.$field_id.' field field_url form-group control-group"><label for="'.$field_id.'" class="'.$class.'">'.$field_label.'</label><input type="url" name="'.$field_name.'" pattern="'.$list_field->field_value.'" id="'.$field_id.'" '.$placeholder.' aria-label="'.$field_label.'" class="form-control '.$required.'" style="margin:0"></div>';
 									}
 									if($list_field->field_type === 'range') {
 										$values_field = explode(";;",$list_field->field_value);
-										$fields_display .= '<div class="field field_range form-group"><label for="'.$field_id.'" class="'.$class.'">'.$field_label.'</label><input type="range" name="'.$field_name.'" min="'.$values_field[0].'" max="'.$values_field[1].'" id="'.$field_id.'" '.$placeholder.' aria-label="'.$field_label.'" class="form-control '.$required.'" style="margin:0"></div>';
+										$fields_display .= '<div class="'.$field_id.' field field_range form-group control-group"><label for="'.$field_id.'" class="'.$class.'">'.$field_label.'</label><input type="range" name="'.$field_name.'" min="'.$values_field[0].'" max="'.$values_field[1].'" step="'.$values_field[2].'" id="'.$field_id.'" '.$placeholder.' aria-label="'.$field_label.'" class="form-control '.$required.'" style="margin:0"></div>';
 									}
 							}
 						}
@@ -196,7 +203,9 @@ if ( $joomla_captcha != '0' && $captcha_display) {
 			'.$fields_display.'
 			'.$consent_field.'
 			'.$captcha_display.'
+		<div class="form-group control-group submit-button">
 		<input type="submit" name="submit" value="'.JText::_('FLEXI_FIELD_EMAIL_SUBMIT_LABEL_VALUE').'" class="'.$submit_class.'">
+		</div>
 		<input type="hidden" name="emailtask" value="plg.email.submit" />
 		<input type="hidden" name="formid" value="'.$formid.'" />
 		<input type="hidden" name="emailauthor" value="'.$addr.'" />
@@ -208,7 +217,19 @@ if ( $joomla_captcha != '0' && $captcha_display) {
 		<input type="hidden" name="return" value="" />
 		'.JHtml::_("form.token").'
 		</fieldset>
-		</form>';
+		</form>
+		<script>
+		jQuery(document).ready(function ($) {
+			var number_of_uploads;
+			$("#fileupload2").change(function () {
+				if ($("#fileupload2").files.length > $(this).attr(maxuploads)) {
+				alert(\'Your Message\');
+					}else {
+					number_of_uploads = number_of_uploads + 1;
+						}
+					});
+			}); 
+		</script>';
 
 
 

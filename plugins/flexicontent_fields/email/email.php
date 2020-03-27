@@ -709,8 +709,7 @@ class plgFlexicontent_fieldsEmail extends FCField
 
 		//get input form
 		$jinput = JFactory::getApplication()->input;
-		//dump ($jinput, 'formulaire');
-
+		
 		// create variable for email
 		global $globalcats;
 		$config = JFactory::getConfig();
@@ -722,6 +721,7 @@ class plgFlexicontent_fieldsEmail extends FCField
 		$alias    = $jinput->post->get('itemalias', '');
 		$maincat  = $jinput->post->get('catid', '', 'int');
 		$itemauthor  = $jinput->post->get('itemauthor', '', '');
+		$formid = $jinput->post->get('formid', '', '');
 
 		// Create the non-SEF URL
 		$item_url = FlexicontentHelperRoute::getItemRoute($itemid.':'.$alias, $maincat);
@@ -776,7 +776,6 @@ class plgFlexicontent_fieldsEmail extends FCField
 			$body = "\n\r\n\r\n" . stripslashes($body);
 			$message 	= JText::sprintf('FLEXI_FIELD_EMAIL_MESSAGE_DEFAULT', $title, $body, '<a href="'.$item_url.'">'.$item_url.'</a>', $sitename);
 
-
 		// Check whether email copy function activated
 		$copy_email_user = $pluginParams->get( 'email_user_copy','' );
 			if ($copy_email_user == true)
@@ -806,6 +805,7 @@ class plgFlexicontent_fieldsEmail extends FCField
 					$send = $mailer->Send();
 				}
 
+
 			//Prepare contact email
 			$mailer = JFactory::getMailer();
 			$mailer->isHTML(true);
@@ -813,7 +813,35 @@ class plgFlexicontent_fieldsEmail extends FCField
 			$mailer->addRecipient($emailauthor);
 			$mailer->setSubject($subjectemail);
 			$mailer->setBody($message);
-		//TODO	$mailer->addAttachment(JURI::base().'/tmp/document.pdf');
+
+		//upload attachement
+		$files = $jinput->files->get($formid);
+		if (isset($files))
+		{
+			foreach($files as $attachements) {
+				foreach ($attachements as $file){
+				// Import filesystem libraries. Perhaps not necessary, but does not hurt.
+				jimport('joomla.filesystem.file');
+
+				// Clean up filename to get rid of strange characters like spaces etc.
+				$filename = JFile::makeSafe($file['name']);
+
+				// Set up the source and destination of the file
+				$src = $file['tmp_name'];
+				$dest = JPATH_SITE . DS . "tmp" . DS . $filename;
+					// TODO: Add security checks. FIle extension and size maybe using flexicontent helper
+
+					if (JFile::upload($src, $dest))
+						{
+        			$mailer->addAttachment($dest);
+						} 
+					else
+						{
+						$app->enqueueMessage(JText::_('FLEXI_FIELD_EMAIL_MESSAGE_SEND_ERROR'), 'error');
+						}
+				}
+			}
+		}
 
 		//Sendemail
 		$send = $mailer->Send();
@@ -821,9 +849,18 @@ class plgFlexicontent_fieldsEmail extends FCField
 		//Message in front-end
 		if ( $send !== true )
 			{
-			    $app->enqueueMessage(JText::_('FLEXI_FIELD_EMAIL_MESSAGE_SEND_ERROR'), 'error');
+				$app->enqueueMessage(JText::_('FLEXI_FIELD_EMAIL_MESSAGE_SEND_ERROR'), 'error');
+				//Deleting file
+				if (is_file($dest)) {
+ 				JFile::delete($dest);
+				} 
 			} else {
-			    $app->enqueueMessage(JText::_('FLEXI_FIELD_EMAIL_MESSAGE_SEND_SUCCESS'), 'message');
+				// Message sending
+				$app->enqueueMessage(JText::_('FLEXI_FIELD_EMAIL_MESSAGE_SEND_SUCCESS'), 'message');
+				//Deleting file
+				if (is_file($dest)) {
+ 				JFile::delete($dest);
+				} 
 			}
 	}
 }
