@@ -747,7 +747,7 @@ class plgFlexicontent_fieldsEmail extends FCField
 		}
 		// Create header email
 		if (!empty($name)){ // check if user use 1 name field or 2 separeate field
-			$fromname = $jinput->post->get('name', '', '');
+			$fromname = $datas['name'];
 		} elseif (!empty($firstname) && !empty($lastname)){
 			$firstname = $datas['firstname'];
 			$lastname = $datas['lastname'];
