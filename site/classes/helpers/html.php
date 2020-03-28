@@ -3439,9 +3439,28 @@ class flexicontent_html
 		// Add Itemid (if given) and do SEF URL routing it --before-- appending more variables, so that
 		// ... menu item URL variables from given menu item ID will be appended if SEF URLs are OFF
 		$menu_itemid = $menu_itemid ? $menu_itemid : (int)$params->get('addbutton_menu_itemid', 0);
-		$link  = 'index.php?option=com_flexicontent';
-		$link .= $menu_itemid  ? '&amp;Itemid='.$menu_itemid  :  '&amp;view='.FLEXI_ITEMVIEW.'&amp;task=add';
-		$link  = JRoute::_($link);
+		$menu_typeid = 0;
+		
+		if ($menu_itemid)
+		{
+			$menu = $app->getMenu()->getItem($menu_itemid);
+			$menu_typeid = isset($menu->query['typeid']) ? (int) $menu->query['typeid'] : 0;
+		}
+
+		if ($menu_typeid)
+		{
+			$link  = 'index.php?option=com_flexicontent' . ($menu_itemid
+				? '&amp;Itemid='.$menu_itemid
+				: '&amp;view='.FLEXI_ITEMVIEW.'&amp;task=add'
+			);			
+			$link  = JRoute::_( $link);
+		}
+		else
+		{
+			$link  = 'index.php?option=com_flexicontent' . ($menu_itemid ? '&amp;menu_id='.$menu_itemid : '')
+				. '&view=types&tmpl=component&layout=typeslist&action=new';
+			$link  = JUri::base() . $link;
+		}
 
 		// Add main category ID (if given)
 		if ($submit_cat && $submit_cat->id)
@@ -3502,7 +3521,11 @@ class flexicontent_html
 		$button_classes .= ' hasTooltip';
 		$tooltip_title = flexicontent_html::getToolTip($btn_title, $btn_desc, 0);
 
-		$output = ' <a href="' . $link . '" class="' . $button_classes . '" data-placement="' . $tooltip_placement . '" title="' . $tooltip_title . '">' . $image.$caption . '</a>';
+		$output = ' <a href="' . $link . '" class="' . $button_classes . '" data-placement="' . $tooltip_placement . '" title="' . $tooltip_title . '"
+		' . (!$menu_typeid
+			? 'onclick="var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 1200, 0, false, {\'title\': \''.flexicontent_html::encodeHTML(JText::_('FLEXI_TYPE'), 2).'\'}); return false;" '
+			: '') . '
+		>' . $image.$caption . '</a>';
 
 		if (!$auto_relations)
 		{
