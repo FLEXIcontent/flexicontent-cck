@@ -72,12 +72,13 @@ class plgFlexicontent_fieldsFile extends FCField
 		$max_values   = $use_ingroup ? 0 : (int) $field->parameters->get('max_values', 0);
 		$required     = (int) $field->parameters->get('required', 0);
 		$add_position = (int) $field->parameters->get('add_position', 3);
+		$use_myfiles  = (int) $field->parameters->get('use_myfiles', '1');
 
 		// Classes for marking field required
 		$required_class = $required ? ' required' : '';
 
 		// If we are multi-value and not inside fieldgroup then add the control buttons (move, delete, add before/after)
-		$add_ctrl_btns = !$use_ingroup && $multiple;
+		$add_ctrl_btns = !$use_ingroup;
 
 		// Inline file property editing
 		$inputmode = (int)$field->parameters->get( 'inputmode', 1 ) ;  // 1: file selection only,  0: inline file properties editing
@@ -101,6 +102,75 @@ class plgFlexicontent_fieldsFile extends FCField
 		$mediapath   = $cparams->get('media_path', 'components/com_flexicontent/medias');
 		$docspath    = $cparams->get('file_path', 'components/com_flexicontent/uploads');
 		$imageexts   = array('jpg','gif','png','bmp','jpeg');
+
+		$thumb_size_resizer = (int) $field->parameters->get('thumb_size_resizer', 0);
+		$thumb_size_default = (int) $field->parameters->get('thumb_size_default', 120);
+		$preview_thumb_w = $preview_thumb_h = 600;
+
+		// Inline uploaders flags
+		$use_inline_uploaders = 1;
+		$usemediaurl = 0; //(int) $field->parameters->get('use_mediaurl', 0);
+		$file_btns_position = 0; //(int) $field->parameters->get('file_btns_position', 0);
+
+
+		/**
+		 * Slider for files grid view
+		 */
+
+		if ($use_inline_uploaders && $thumb_size_resizer)
+		{
+			flexicontent_html::loadFramework('nouislider');
+
+			$resize_cfg = new stdClass();
+			$resize_cfg->slider_name = 'fcfield-'.$field->id.'-uploader-thumb-size';
+			$resize_cfg->element_selector = 'div.fcfield-'.$field->id.'-uploader-thumb-box';
+
+			$resize_cfg->elem_container_selector = '.fcfieldval_container_'.$field->id.' div.fc-box';
+			$resize_cfg->element_selector = '.fcfieldval_container_'.$field->id.' div.fc_file_uploader ul.plupload_filelist > li';
+
+			$resize_cfg->element_class_prefix = 'thumb_';
+			$resize_cfg->values = array(90, 120, 150, 200, 250);
+			$resize_cfg->labels = array();
+
+			$thumb_size_default = $app->input->cookie->get($resize_cfg->slider_name . '-val', $thumb_size_default, 'int');
+			$resize_cfg->initial_pos = (int) array_search($thumb_size_default, $resize_cfg->values);
+			if ($resize_cfg->initial_pos === false)
+			{
+				$resize_cfg->initial_pos = 1;
+			}
+			$thumb_size_default = $resize_cfg->values[$resize_cfg->initial_pos];
+			$app->input->cookie->set($resize_cfg->slider_name . '-val', $thumb_size_default);
+
+			foreach($resize_cfg->values as $value) $resize_cfg->labels[] = $value .'x'. $value;
+
+			$element_classes = array();
+			foreach($resize_cfg->values as $value) $element_classes[] = $resize_cfg->element_class_prefix . $value;
+
+			$element_class_list = implode(' ', $element_classes);
+			$step_values = '[' . implode(', ', $resize_cfg->values) . ']';
+			$step_labels = '["' . implode('", "', $resize_cfg->labels) . '"]';
+
+			$thumb_size_slider_cfg = "{
+					name: '".$resize_cfg->slider_name."',
+					step_values: ".$step_values.",
+					step_labels: ".$step_labels.",
+					initial_pos: ".$resize_cfg->initial_pos.",
+					start_hidden: false,
+					element_selector: '".$resize_cfg->element_selector."',
+					element_class_list: '',
+					element_class_prefix: '',
+					elem_container_selector: '".$resize_cfg->elem_container_selector."',
+					elem_container_class: '".$element_class_list."',
+					elem_container_prefix: '".$resize_cfg->element_class_prefix."'
+				}";
+
+			$document->addScriptDeclaration("
+			jQuery(document).ready(function()
+			{
+				fc_attachSingleSlider(".$thumb_size_slider_cfg.", ".$thumb_size_resizer.");
+			});
+			");
+		}
 
 		// Empty field value
 		if (!$field->value)
@@ -343,7 +413,8 @@ class plgFlexicontent_fieldsFile extends FCField
 
 				var theInput = newField.find('input.fc_filedata_txt').first();
 				theInput.attr('value', '');
-				theInput.removeAttr('data-filename');
+				theInput.removeAttr('data-filename')
+					;
 				theInput.data('filename', null);
 				theInput.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][file-data-txt]');
 				theInput.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_file-data-txt');
@@ -606,7 +677,21 @@ class plgFlexicontent_fieldsFile extends FCField
 				<div class="'.$input_grp_class.' fc-xpended-btns">
 					'.$move2.'
 					'.$remove_button.'
-					'.(!$add_position ? '' : $add_here).'
+					'.(!$add_position ? '' : $add_here)
+					.($use_inline_uploaders && !$file_btns_position ?'
+					<div class="buttons btn-group fc-iblock">
+						<span role="button" class="' . $drop_btn_class . ' fcfield-addvalue ' . $font_icon_class . '" data-toggle="dropdown">
+							<span class="caret"></span>
+						</span>
+						<ul class="dropdown-menu" role="menu">
+							<li>'.$uploader_html->toggleBtn.'</li>
+							<li>'.$uploader_html->multiUploadBtn.'</li>
+							' . ($use_myfiles > 0 ? '<li>'.$uploader_html->myFilesBtn.'</li>' : '') . '
+							<li>'.$uploader_html->mediaUrlBtn.'</li>
+						</ul>
+					</div>
+					'.$uploader_html->clearBtn.'
+					' : '') . '
 				</div>
 				'.($fields_box_placing ? '<div class="fcclear"></div>' : '').'
 				').'
@@ -706,6 +791,10 @@ class plgFlexicontent_fieldsFile extends FCField
 			$tooltips_added[$field->id] = true;
 		}
 
+		// Current view variable
+		$app       = JFactory::getApplication();
+		$realview  = $app->input->get('view', '', 'cmd');
+		$view      = $app->input->get('flexi_callview', ($realview ?: 'item'), 'cmd');
 
 		// Prefix - Suffix - Separator parameters, replacing other field values if found
 		$remove_space = $field->parameters->get( 'remove_space', 0 ) ;
@@ -763,12 +852,24 @@ class plgFlexicontent_fieldsFile extends FCField
 		$viewinfo  = JText::_('FLEXI_FIELD_FILE_VIEW_INFO', true);
 		$viewinside= $field->parameters->get( 'viewinside', 1 ) ;
 
+		$cparams  = JComponentHelper::getParams( 'com_flexicontent' );
+		$mediapath   = $cparams->get('media_path', 'components/com_flexicontent/medias');
+		$docspath    = $cparams->get('file_path', 'components/com_flexicontent/uploads');
+
+		$target_dir = $field->parameters->get('target_dir', 0);
+		$base_url   = JUri::root(true) . '/' . (!$target_dir ? $mediapath : $docspath);
+		$base_url   = str_replace(DS, '/', $base_url);
+
+		// JS safe Field name
+		$field_name_js = str_replace('-', '_', $field->name);
+
 		static $fc_lib_added = false;
 		if ($viewinside==1 && !$fc_lib_added)
 		{
 			$fc_lib_added = true;
 
 			flexicontent_html::loadFramework('flexi-lib');
+			JHtml::addIncludePath(JPATH_SITE . '/components/com_flexicontent/helpers/html');
 		}
 
 		$allowshare = $field->parameters->get( 'allowshare', 0 ) ;
@@ -1294,7 +1395,7 @@ class plgFlexicontent_fieldsFile extends FCField
 			$field->field_valuesjoin   = ' JOIN #__flexicontent_files AS file ON file.id = fi.value';
 			$field->field_groupby      = null;
 		} else {
-			$_files_data = $this->getFileData( $post, $published=true, $extra_select =', id AS value_id' );
+			$_files_data = $this->getFileData( $post, $published=true, $extra_select =', f.id AS value_id' );
 			$values = array();
 			if ($_files_data) foreach($_files_data as $_file_id => $_file_data) $values[$_file_id] = (array)$_file_data;
 		}
@@ -1321,7 +1422,7 @@ class plgFlexicontent_fieldsFile extends FCField
 			$field->field_valuesjoin   = ' JOIN #__flexicontent_files AS file ON file.id = fi.value';
 			$field->field_groupby      = null;
 		} else {
-			$_files_data = $this->getFileData( $post, $published=true, $extra_select =', id AS value_id' );
+			$_files_data = $this->getFileData( $post, $published=true, $extra_select =', f.id AS value_id' );
 			$values = array();
 			if ($_files_data) foreach($_files_data as $_file_id => $_file_data) $values[$_file_id] = (array)$_file_data;
 		}
@@ -1360,15 +1461,17 @@ class plgFlexicontent_fieldsFile extends FCField
 				$new_ids[] = $f;
 			}
 		}
+		
+		$md_select = '';
 
 		// Get file data not retrieved already
 		if (count($new_ids))
 		{
 			// Only query files that are not already cached
 			$db = JFactory::getDbo();
-			$query = 'SELECT * '. $extra_select //filename, filename_original, altname, description, ext, id'
-				. ' FROM #__flexicontent_files'
-				. ' WHERE id IN ('. implode(',', $new_ids) . ')'
+			$query = 'SELECT ' . $md_select . ' f.* '. $extra_select //filename, filename_original, altname, description, ext, id'
+				. ' FROM #__flexicontent_files AS f'
+				. ' WHERE f.id IN ('. implode(',', $new_ids) . ')'
 				. ($published ? '  AND published = 1' : '')
 			;
 			$new_data = $db->setQuery($query)->loadObjectList('id');
