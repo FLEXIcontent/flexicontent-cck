@@ -36,6 +36,7 @@
 			</field>
 
 			<field name="" type="separator" default="FLEXI_FIELD_NUMBER_OF_VALUES" description="" depend_class="fieldgroupoff" level="level2" />
+
 			<field name="allow_multiple" type="multilist" subtype="radio" default="1" label="FLEXI_FIELD_ALLOW_MULTIPLE" description="FLEXI_FIELD_ALLOW_MULTIPLE_DESC" toggle_related="1" depend_class="fieldgroupoff" class="btn-group btn-group-yesno">
 				<option value="0" show_list="" hide_list="multivalue-mode">FLEXI_NO</option>
 				<option value="1" show_list="multivalue-mode" hide_list="">FLEXI_YES</option>
@@ -44,16 +45,38 @@
 				<option value="0">1</option>
 				<option value="1">FLEXI_MULTIPLE</option>
 			</field>
+			<field name="max_values" type="text" default="0" size="2" label="FLEXI_FIELD_MAX_VALUES" description="FLEXI_FIELD_MAX_VALUES_DESC" depend_class="fieldgroupoff multivalue-mode" />
+			<field name="required" type="radio" default="0" label="FLEXI_FIELD_REQUIRED" description="FLEXI_FIELD_REQUIRED_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+
+			<field name="" type="separator" default="FLEXI_BUTTONS" description="" depend_class="fieldgroupoff multivalue-mode" level="level2" />
 			<field name="add_position" type="multilist" subtype="radio" default="3" label="FLEXI_FIELD_ADD_POSITION" description="FLEXI_FIELD_ADD_POSITION_DESC" depend_class="fieldgroupoff multivalue-mode" class="btn-group group-fcinfo">
 				<option value="0">FLEXI_FIELD_APPEND_BTN</option>
 				<option value="1">FLEXI_FIELD_INLINE_APPEND_BTN</option>
 				<option value="2">FLEXI_FIELD_INLINE_PREPEND_BTN</option>
 				<option value="3">FLEXI_FIELD_INLINE_BOTH_BTN</option>
 			</field>
-			<field name="max_values" type="text" default="0" size="2" label="FLEXI_FIELD_MAX_VALUES" description="FLEXI_FIELD_MAX_VALUES_DESC" depend_class="fieldgroupoff multivalue-mode" />
-			<field name="required" type="radio" default="0" label="FLEXI_FIELD_REQUIRED" description="FLEXI_FIELD_REQUIRED_DESC" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
+			<!--field name="file_btns_position" type="multilist" subtype="radio" default="0" label="FLEXI_FIELD_FILE_BTNS_POSITION" description="FLEXI_FIELD_FILE_BTNS_POSITION_DESC" depend_class="fieldgroupoff multivalue-mode" class="btn-group group-fcinfo">
+				<option value="0">FLEXI_FIELD_INTEGRATED_ICONS</option>
+				<option value="1">FLEXI_FIELD_SEPARATE_ROW_ICONS</option>
+				<option value="2">FLEXI_FIELD_SEPARATE_ROW_ICONS_TEXT</option>
+			</field-->
+			<field name="file_btns_position" type="hidden" default="0" label="FLEXI_FIELD_FILE_BTNS_POSITION" description="FLEXI_FIELD_FILE_BTNS_POSITION_DESC" depend_class="fieldgroupoff multivalue-mode" />
+
+			<field name="" type="separator" default="FLEXI_PREVIEW_THUMBNAILS" description="" level="level2" />
+			<field name="thumb_size_resizer" type="radio" default="0" label="FLEXI_FIELD_THUMB_RESIZER" description="FLEXI_FIELD_THUMB_RESIZER_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_DISABLE</option>
+				<option value="1">FLEXI_DISPLAY_AS_DROP_DOWN</option>
+				<option value="2">FLEXI_DISPLAY_AS_SLIDER</option>
+			</field>
+			<field name="thumb_size_default" type="radio" default="120" label="FLEXI_FIELD_THUMB_SIZE_DEFAULT" description="FLEXI_FIELD_THUMB_SIZE_DEFAULT_DESC" class="btn-group group-fcinfo">
+				<option value="90">90</option>
+				<option value="120">120</option>
+				<option value="150">150</option>
+				<option value="200">200</option>
+				<option value="250">250</option>
 			</field>
 
 			<field name="estorage_mode" type="multilist" subtype="radio" default="0" label="Remote Storage" description="FLEXI_FIELD_ALLOW_MULTIPLE_DESC" toggle_related="1" depend_class="fieldgroupoff" class="btn-group group-fcmethod fcoffactive">
@@ -198,7 +221,8 @@
 		<fieldset name="group-file-viewing" hidden="true" icon_class="icon-screen" label="FLEXI_FIELD_VIEWING" addfieldpath="/administrator/components/com_flexicontent/elements">
 
 			<field name="" type="separator" default="FLEXI_FIELD_VIEWING" level="tabset_start" box_type="1" />
-			<field name="" type="separator" default="FLEXI_FIELD_LABEL_AND_ACCESS" description="" icon_class="icon-lock" level="tab_open" box_type="1" />
+
+			<field name="" type="separator" default="FLEXI_FIELD_LABEL_AND_ACCESS" icon_class="icon-lock" level="tab_open" box_type="1" />
 
 			<field name="display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>

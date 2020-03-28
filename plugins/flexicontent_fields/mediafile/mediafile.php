@@ -104,8 +104,8 @@ class plgFlexicontent_fieldsMediafile extends FCField
 		$base_url   = JUri::root(true) . '/' . (!$target_dir ? $mediapath : $docspath);
 		$base_url   = str_replace(DS, '/', $base_url);
 
-		$thumb_size_resizer = 2; //$field->parameters->get('thumb_size_resizer', 2);
-		$thumb_size_default = 120; //$field->parameters->get('thumb_size_default', 120);
+		$thumb_size_resizer = (int) $field->parameters->get('thumb_size_resizer', 0);
+		$thumb_size_default = (int) $field->parameters->get('thumb_size_default', 120);
 		$preview_thumb_w = $preview_thumb_h = 600;
 
 		// Inline uploaders flags
@@ -371,7 +371,9 @@ class plgFlexicontent_fieldsMediafile extends FCField
 
 				var theInput = newField.find('input.fc_filedata_txt').first();
 				theInput.attr('value', '');
-				theInput.removeAttr('data-filename').removeAttr('data-wfpreview').removeAttr('data-wfpeaks');
+				theInput.removeAttr('data-filename')
+					.removeAttr('data-wfpreview').removeAttr('data-wfpeaks');
+				theInput.data('filename', null);
 				theInput.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][file-data-txt]');
 				theInput.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_file-data-txt');
 
@@ -1634,15 +1636,15 @@ class plgFlexicontent_fieldsMediafile extends FCField
 		
 		$md_select = 'md.state, md.media_type, md.media_format, md.codec_type, md.codec_name, md.codec_long_name, ' .
 			'md.resolution, md.fps, md.bit_rate, md.bits_per_sample, md.sample_rate, md.duration, ' .
-			'md.channels, md.channel_layout, md.checked_out, md.checked_out_time';
+			'md.channels, md.channel_layout, md.checked_out, md.checked_out_time, ';
 
 		// Get file data not retrieved already
 		if (count($new_ids))
 		{
 			// Only query files that are not already cached
 			$db = JFactory::getDbo();
-			$query = 'SELECT ' . $md_select . ' , f.* '. $extra_select //filename, filename_original, altname, description, ext, id'
-				. ' FROM #__flexicontent_files f'
+			$query = 'SELECT ' . $md_select . ' f.* '. $extra_select //filename, filename_original, altname, description, ext, id'
+				. ' FROM #__flexicontent_files AS f'
 				. ' LEFT JOIN #__flexicontent_mediadatas AS md ON f.id = md.file_id'
 				. ' WHERE f.id IN ('. implode(',', $new_ids) . ')'
 				. ($published ? '  AND published = 1' : '')

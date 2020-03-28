@@ -72,12 +72,13 @@ class plgFlexicontent_fieldsFile extends FCField
 		$max_values   = $use_ingroup ? 0 : (int) $field->parameters->get('max_values', 0);
 		$required     = (int) $field->parameters->get('required', 0);
 		$add_position = (int) $field->parameters->get('add_position', 3);
+		$use_myfiles  = (int) $field->parameters->get('use_myfiles', '1');
 
 		// Classes for marking field required
 		$required_class = $required ? ' required' : '';
 
 		// If we are multi-value and not inside fieldgroup then add the control buttons (move, delete, add before/after)
-		$add_ctrl_btns = !$use_ingroup && $multiple;
+		$add_ctrl_btns = !$use_ingroup;
 
 		// Inline file property editing
 		$inputmode = (int)$field->parameters->get( 'inputmode', 1 ) ;  // 1: file selection only,  0: inline file properties editing
@@ -102,8 +103,8 @@ class plgFlexicontent_fieldsFile extends FCField
 		$docspath    = $cparams->get('file_path', 'components/com_flexicontent/uploads');
 		$imageexts   = array('jpg','gif','png','bmp','jpeg');
 
-		$thumb_size_resizer = 2; //$field->parameters->get('thumb_size_resizer', 2);
-		$thumb_size_default = 120; //$field->parameters->get('thumb_size_default', 120);
+		$thumb_size_resizer = (int) $field->parameters->get('thumb_size_resizer', 0);
+		$thumb_size_default = (int) $field->parameters->get('thumb_size_default', 120);
 		$preview_thumb_w = $preview_thumb_h = 600;
 
 		// Inline uploaders flags
@@ -368,7 +369,8 @@ class plgFlexicontent_fieldsFile extends FCField
 
 				var theInput = newField.find('input.fc_filedata_txt').first();
 				theInput.attr('value', '');
-				theInput.removeAttr('data-filename');
+				theInput.removeAttr('data-filename')
+					;
 				theInput.data('filename', null);
 				theInput.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][file-data-txt]');
 				theInput.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_file-data-txt');
@@ -677,7 +679,7 @@ class plgFlexicontent_fieldsFile extends FCField
 						<ul class="dropdown-menu" role="menu">
 							<li>'.$uploader_html->toggleBtn.'</li>
 							<li>'.$uploader_html->multiUploadBtn.'</li>
-							<li>'.$uploader_html->myFilesBtn.'</li>
+							' . ($use_myfiles > 0 ? '<li>'.$uploader_html->myFilesBtn.'</li>' : '') . '
 							<li>'.$uploader_html->mediaUrlBtn.'</li>
 						</ul>
 					</div>
@@ -804,6 +806,10 @@ class plgFlexicontent_fieldsFile extends FCField
 			$tooltips_added[$field->id] = true;
 		}
 
+		// Current view variable
+		$app       = JFactory::getApplication();
+		$realview  = $app->input->get('view', '', 'cmd');
+		$view      = $app->input->get('flexi_callview', ($realview ?: 'item'), 'cmd');
 
 		// Prefix - Suffix - Separator parameters, replacing other field values if found
 		$remove_space = $field->parameters->get( 'remove_space', 0 ) ;
@@ -861,12 +867,24 @@ class plgFlexicontent_fieldsFile extends FCField
 		$viewinfo  = JText::_('FLEXI_FIELD_FILE_VIEW_INFO', true);
 		$viewinside= $field->parameters->get( 'viewinside', 1 ) ;
 
+		$cparams  = JComponentHelper::getParams( 'com_flexicontent' );
+		$mediapath   = $cparams->get('media_path', 'components/com_flexicontent/medias');
+		$docspath    = $cparams->get('file_path', 'components/com_flexicontent/uploads');
+
+		$target_dir = $field->parameters->get('target_dir', 0);
+		$base_url   = JUri::root(true) . '/' . (!$target_dir ? $mediapath : $docspath);
+		$base_url   = str_replace(DS, '/', $base_url);
+
+		// JS safe Field name
+		$field_name_js = str_replace('-', '_', $field->name);
+
 		static $fc_lib_added = false;
 		if ($viewinside==1 && !$fc_lib_added)
 		{
 			$fc_lib_added = true;
 
 			flexicontent_html::loadFramework('flexi-lib');
+			JHtml::addIncludePath(JPATH_SITE . '/components/com_flexicontent/helpers/html');
 		}
 
 		$allowshare = $field->parameters->get( 'allowshare', 0 ) ;
@@ -1392,7 +1410,7 @@ class plgFlexicontent_fieldsFile extends FCField
 			$field->field_valuesjoin   = ' JOIN #__flexicontent_files AS file ON file.id = fi.value';
 			$field->field_groupby      = null;
 		} else {
-			$_files_data = $this->getFileData( $post, $published=true, $extra_select =', id AS value_id' );
+			$_files_data = $this->getFileData( $post, $published=true, $extra_select =', f.id AS value_id' );
 			$values = array();
 			if ($_files_data) foreach($_files_data as $_file_id => $_file_data) $values[$_file_id] = (array)$_file_data;
 		}
@@ -1419,7 +1437,7 @@ class plgFlexicontent_fieldsFile extends FCField
 			$field->field_valuesjoin   = ' JOIN #__flexicontent_files AS file ON file.id = fi.value';
 			$field->field_groupby      = null;
 		} else {
-			$_files_data = $this->getFileData( $post, $published=true, $extra_select =', id AS value_id' );
+			$_files_data = $this->getFileData( $post, $published=true, $extra_select =', f.id AS value_id' );
 			$values = array();
 			if ($_files_data) foreach($_files_data as $_file_id => $_file_data) $values[$_file_id] = (array)$_file_data;
 		}
@@ -1458,15 +1476,17 @@ class plgFlexicontent_fieldsFile extends FCField
 				$new_ids[] = $f;
 			}
 		}
+		
+		$md_select = '';
 
 		// Get file data not retrieved already
 		if (count($new_ids))
 		{
 			// Only query files that are not already cached
 			$db = JFactory::getDbo();
-			$query = 'SELECT * '. $extra_select //filename, filename_original, altname, description, ext, id'
-				. ' FROM #__flexicontent_files'
-				. ' WHERE id IN ('. implode(',', $new_ids) . ')'
+			$query = 'SELECT ' . $md_select . ' f.* '. $extra_select //filename, filename_original, altname, description, ext, id'
+				. ' FROM #__flexicontent_files AS f'
+				. ' WHERE f.id IN ('. implode(',', $new_ids) . ')'
 				. ($published ? '  AND published = 1' : '')
 			;
 			$new_data = $db->setQuery($query)->loadObjectList('id');
