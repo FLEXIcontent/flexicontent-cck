@@ -2,13 +2,12 @@
 $user = JFactory::getUser();
 $app  = JFactory::getApplication();
 $action = $app->input->getCmd('action', '');
-$menu_id = $app->input->getInt('menu_id', '');
 
 // Get types
 $types = flexicontent_html::getTypesList( $_type_ids=false, $_check_perms = false, $_published=true);
 $types = is_array($types) ? $types : array();
 
-$ctrl_task = $app->isAdmin() ? 'items.add' : 'add';
+$ctrl_task = 'items.add';
 $icon = "components/com_flexicontent/assets/images/layout_add.png";
 $btn_class = 'choose_type';
 
@@ -16,9 +15,7 @@ echo '
 <div id="flexicontent" style="margin:32px;" >
 	<ul class="nav nav-tabs nav-stacked">
 		';
-		$link = $app->isAdmin()
-			? "index.php?option=com_flexicontent&amp;controller=items&amp;task=".$ctrl_task."&amp;". JSession::getFormToken() ."=1"
-			: "index.php?option=com_flexicontent&amp;task=".$ctrl_task."&amp;". JSession::getFormToken() ."=1";
+		$link = "index.php?option=com_flexicontent&amp;controller=items&amp;task=".$ctrl_task."&amp;". JSession::getFormToken() ."=1";
 		$_name = '- ' . JText::_("FLEXI_NO_TYPE") . ' -';
 		?>
 			<li>
@@ -78,16 +75,9 @@ echo '
 			 */
 			else
 			{
-				if ($action !== 'new')
-				{
-					$link = 'alert(\'No action\');';
-				}
-				else
-				{
-					$link = $app->isAdmin()
-						? "index.php?option=com_flexicontent&amp;controller=items&amp;task=".$ctrl_task."&amp;typeid=".$type->id."&amp;". JSession::getFormToken() ."=1"
-						: "index.php?option=com_flexicontent&amp;task=".$ctrl_task."&amp;typeid=".$type->id.($menu_itemid ? '&amp;menu_id='.$menu_itemid : '')."&amp;". JSession::getFormToken() ."=1";
-				}
+				$link = $action === 'new'
+					? "index.php?option=com_flexicontent&amp;controller=items&amp;task=".$ctrl_task."&amp;typeid=".$type->id."&amp;". JSession::getFormToken() ."=1"
+					: 'alert(\'No action\');';
 				?>
 			<li>
 				<a class="<?php echo $btn_class; ?>" href="<?php echo $link; ?>" target="_parent">
