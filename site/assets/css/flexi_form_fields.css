@@ -1790,8 +1790,8 @@ div.fcimg_value_props {
 	margin: 8px 0 0 0;
 }
 #flexicontent input.addrint_autocomplete {
-	width: 97%;
-	height: 23px;
+	width: 100%;
+	height: 30px;
 }
 #flexicontent select.addrint_ac_type {
 	width: 160px;

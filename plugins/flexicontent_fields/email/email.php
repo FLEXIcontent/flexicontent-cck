@@ -818,6 +818,8 @@ class plgFlexicontent_fieldsEmail extends FCField
 		$files = $jinput->files->get($formid);
 		if (isset($files))
 		{
+			JFolder::create(JPATH_SITE . DS . "tmp" . DS . "upload_flexi_form". $formid);
+
 			foreach($files as $attachements) {
 				foreach ($attachements as $file){
 				// Import filesystem libraries. Perhaps not necessary, but does not hurt.
@@ -828,7 +830,7 @@ class plgFlexicontent_fieldsEmail extends FCField
 
 				// Set up the source and destination of the file
 				$src = $file['tmp_name'];
-				$dest = JPATH_SITE . DS . "tmp" . DS . $filename;
+				$dest = JPATH_SITE . DS . "tmp" . DS . "upload_flexi_form". $formid . DS . $filename;
 					// TODO: Add security checks. FIle extension and size maybe using flexicontent helper
 
 					if (JFile::upload($src, $dest))
@@ -850,16 +852,17 @@ class plgFlexicontent_fieldsEmail extends FCField
 		if ( $send !== true )
 			{
 				$app->enqueueMessage(JText::_('FLEXI_FIELD_EMAIL_MESSAGE_SEND_ERROR'), 'error');
+				$destFolder= JPATH_SITE . DS . "tmp" . DS . "upload_flexi_form". $formid;
 				//Deleting file
-				if (is_file($dest)) {
- 				JFile::delete($dest);
+				if (is_dir($destFolder)) {
+ 				JFolder::delete($destFolder);
 				} 
 			} else {
 				// Message sending
 				$app->enqueueMessage(JText::_('FLEXI_FIELD_EMAIL_MESSAGE_SEND_SUCCESS'), 'message');
 				//Deleting file
-				if (is_file($dest)) {
- 				JFile::delete($dest);
+				if (is_dir($$destFolder)) {
+ 				JFolder::delete($destFolder);
 				} 
 			}
 	}
