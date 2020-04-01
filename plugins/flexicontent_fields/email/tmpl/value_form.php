@@ -52,9 +52,7 @@ foreach ($values as $value)
 	// Add styles for label position
 	$document = JFactory::getDocument();
 	$styleurl = JUri::root(true) . '/plugins/flexicontent_fields/email/css/style.css';
-	$jsurl = JUri::root(true) . '/plugins/flexicontent_fields/email/js/upload.js';
-	$document->addStyleSheet($styleurl);
-	$document->addScript($jsurl);
+	$document->addStyleSheet($styleurl);;
 
 
 
@@ -171,11 +169,14 @@ if ( $joomla_captcha != '0' && $captcha_display) {
 									if($list_field->field_type === 'file') {
 										$values_field = explode(";;",$list_field->field_value);
 										if (!empty($values_field[1]) && $values_field[1] === 'multiple'){
-											$uploadmode='multiple';
+											$uploadmode = 'multiple';
+											$maxupload  = 'data-max="'.$values_field[2].'"';
 										}else{
 											$uploadmode='';
+											$maxupload  ='';
 										}
-										$fields_display .= '<div class="'.$field_id.' field field_file form-group control-group"><label for="'.$field_id.'" class="'.$class.'">'.$field_label.'</label><input type="file" name="'.$field_name.'[]" accept="'.$values_field[0].'" id="'.$field_id.'" '.$placeholder.' aria-label="'.$field_label.'" class="inputfile '.$required.'" '.$uploadmode.' style="margin:0"  maxuploads = 2 ></div>';
+										//placehoder is already printed because needed for js alert
+										$fields_display .= '<div class="'.$field_id.' field field_file form-group control-group"><label for="'.$field_id.'" class="'.$class.'">'.$field_label.'</label><input type="file" name="'.$field_name.'[]" accept="'.$values_field[0].'" id="'.$field_id.'" placeholder="'.$list_field->field_label.'" aria-label="'.$field_label.'" class="inputfile '.$required.'" '.$uploadmode.' style="margin:0"  '.$maxupload.' ></div>';
 									}
 									if($list_field->field_type === 'phone') {
 										$fields_display .= '<div class="'.$field_id.' field field_phone form-group control-group"><label for="'.$field_id.'" class="'.$class.'">'.$field_label.'</label><input type="phone" name="'.$field_name.'" pattern="'.$value.'" id="'.$field_id.'" '.$placeholder.' aria-label="'.$field_label.'" class="form-control '.$required.'" style="margin:0"></div>';
@@ -219,16 +220,16 @@ if ( $joomla_captcha != '0' && $captcha_display) {
 		</fieldset>
 		</form>
 		<script>
-		jQuery(document).ready(function ($) {
-			var number_of_uploads;
-			$("#fileupload2").change(function () {
-				if ($("#fileupload2").files.length > $(this).attr(maxuploads)) {
-				alert(\'Your Message\');
-					}else {
-					number_of_uploads = number_of_uploads + 1;
-						}
-					});
-			}); 
+			const qsa=(s,o)=>[...(o||document).querySelectorAll(s)],
+      		qs=(s,o)=>qsa(s,o)[0];
+			qs("input[type=submit]").addEventListener(\'click\',function(e){
+ 			qsa("input[type=\'file\']").forEach(inp=>{
+    			if (inp.files.length > inp.dataset.max){
+    			alert(`'.JText::_("FLEXI_ALLOWED_NUM_FILES").' ${inp.dataset.max} '.JText::_("FLEXI_FILES_FOR").' ${inp.placeholder}`);
+    		e.preventDefault();
+  				}
+ 				})
+			});
 		</script>';
 
 
