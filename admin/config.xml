@@ -74,9 +74,10 @@
 			</field>
 			<field name="url_logo" type="fcmedia" label="FLEXI_IMAGE" description="FLEXI_CHOOSE_IMAGE_FOR_LOADING" />
 			<field name="logo_alt" type="text" label="FLEXI_ALTERNATIVE_TEXT" description="" size="20" />
-			<field name="background_color_loading" type="color" label="FLEXI_BACKGROUND_COLOR" description="FLEXI_BACKGROUND_COLOR_DESC" default="#000000" />
+			<field name="background_color_loading" type="color" cssprep="less" label="FLEXI_BACKGROUND_COLOR" description="FLEXI_BACKGROUND_COLOR_DESC" default="#000000" format="rgba" keywords="transparent,initial,inherit" />
 			<field name="background_color_opacity" type="number" label="FLEXI_BACKGROUND_OPACITY" description="FLEXI_BACKGROUND_OPACITY_DESC" default="30" />
-			<field name="background_color_content" type="color" label="FLEXI_CONTENT_BACKGROUND_COLOR" description="FLEXI_CONTENT BACKGROUND_COLOR_DESC" default="#ffffff" format="rgba" keywords="transparent,initial,inherit" />
+			<field name="background_color_content" type="color" cssprep="less" label="FLEXI_CONTENT_BACKGROUND_COLOR" description="FLEXI_CONTENT_BACKGROUND_COLOR_DESC" default="#ffffff" format="rgba" keywords="transparent,initial,inherit" />
+			<field name="background_color_bar" type="color" cssprep="less" label="FLEXI_BAR_BACKGROUND_COLOR" description="FLEXI_BAR_BACKGROUND_COLOR_DESC" default="#0099ff" format="rgba" keywords="transparent,initial,inherit" />
 
 	</fieldset>
 
