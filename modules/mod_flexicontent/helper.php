@@ -459,6 +459,25 @@ class modFlexicontentHelper
 							if ((!$src && $mod_image_fallback_img==1) || ($src && $mod_image_fallback_img==2 && $img_field->using_default_value))
 							{
 								$src = flexicontent_html::extractimagesrc($row);
+							}elseif(!$src && $fallback_field && $mod_image_fallback_img==3) {
+								$image_url2 = FlexicontentFields::getFieldDisplay($row, $fallback_field, null, 'display_large_src', 'module');
+								$src2 = '';
+								$thumb2 = '';
+								if ($image_url2)
+								{
+									$img_field2 = $row->fields[$fallback_field];
+
+									if ($mod_use_image==1)
+									{
+										$src = str_replace(JUri::root(), '', @ $img_field2->thumbs_src['large'][0] );
+									}
+									else
+									{
+										$thumb = @ $img_field2->thumbs_src[ $mod_use_image ][0];
+										$_thumb_w = $thumb ? $img_field2->parameters->get('w_'.$mod_use_image[0], 120) : 0;
+										$_thumb_h = $thumb ? $img_field2->parameters->get('h_'.$mod_use_image[0], 90) : 0;
+									}
+								}
 							}
 						}
 						else
@@ -629,6 +648,25 @@ class modFlexicontentHelper
 							if ((!$src && $mod_image_fallback_img==1) || ($src && $mod_image_fallback_img==2 && $img_field->using_default_value))
 							{
 								$src = flexicontent_html::extractimagesrc($row);
+							}elseif(!$src && $fallback_field && $mod_image_fallback_img==3) {
+								$image_url2 = FlexicontentFields::getFieldDisplay($row, $fallback_field, null, 'display_large_src', 'module');
+								$src2 = '';
+								$thumb2 = '';
+								if ($image_url2)
+								{
+									$img_field2 = $row->fields[$fallback_field];
+
+									if ($mod_use_image==1)
+									{
+										$src = str_replace(JUri::root(), '', @ $img_field2->thumbs_src['large'][0] );
+									}
+									else
+									{
+										$thumb = @ $img_field2->thumbs_src[ $mod_use_image ][0];
+										$_thumb_w = $thumb ? $img_field2->parameters->get('w_'.$mod_use_image[0], 120) : 0;
+										$_thumb_h = $thumb ? $img_field2->parameters->get('h_'.$mod_use_image[0], 90) : 0;
+									}
+								}
 							}
 						}
 						else
