@@ -1949,7 +1949,6 @@ class flexicontent_html
 					$progressbar = "";
 				 }
 				 $url_logo = JUri::root(true). '/' .JComponentHelper::getParams('com_flexicontent')->get('url_logo', '');
-				 print_r ($url_logo);
 				 $logo_alt = JComponentHelper::getParams('com_flexicontent')->get('logo_alt', '');
 				 if( $url_logo ){
 					 $logo = "'<div class=\"fc_logo_loading\"><img src=\"$url_logo\" alt=".$logo_alt."><div>'+";
