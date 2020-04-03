@@ -703,7 +703,7 @@
 			</field>
 			<field
 				name="fallback_field"
-				type="sql"
+				type="fcimage"
 				default="0"
 				label="Select a custom field Fallback"
 				key_field="name"
