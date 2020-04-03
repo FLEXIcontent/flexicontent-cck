@@ -1942,12 +1942,14 @@ class flexicontent_html
 					$textloading ="";
 				 }
 				$disp_progressbar = JComponentHelper::getParams('com_flexicontent')->get('disp_progressbar', 1);
+				$color_progressbar = JComponentHelper::getParams('com_flexicontent')->get('background_color_bar', '#0099ff');
 				 if( $disp_progressbar ){
-					 $progressbar = "'<div class=\"fc_blocker_bar\" ><div>'+";
+					 $progressbar = "'<div class=\"fc_blocker_bar\"><div style=\"background-color:".$color_progressbar."\">'+";
 				 }else{
 					$progressbar = "";
 				 }
-				 $url_logo = JComponentHelper::getParams('com_flexicontent')->get('url_logo', '');
+				 $url_logo = JUri::root(true). '/' .JComponentHelper::getParams('com_flexicontent')->get('url_logo', '');
+				 print_r ($url_logo);
 				 $logo_alt = JComponentHelper::getParams('com_flexicontent')->get('logo_alt', '');
 				 if( $url_logo ){
 					 $logo = "'<div class=\"fc_logo_loading\"><img src=\"$url_logo\" alt=".$logo_alt."><div>'+";
