@@ -699,7 +699,17 @@
 				<option value="0">FLEXI_NO_FALLBACK</option>
 				<option value="1">FLEXI_USE_INTROTEXT_FALLBACK</option>
 				<option value="2">FLEXI_USE_INTROTEXT_FALLBACK_IGNORE_DEFAULTIMG</option>
+				<option value="3">FLEXI_USE_CUSTOM_FIELD</option>
 			</field>
+			<field
+				name="fallback_field"
+				type="sql"
+				default="0"
+				label="Select a custom field Fallback"
+				key_field="name"
+				value_field="label"
+				query="SELECT name, label FROM `#__flexicontent_fields` WHERE published='1'"
+			/>
 
 			<field name="" type="separator" default="FLEXI_UMOD_STD" level="level3" />
 			<field name="mod_use_image" type="multilist" subtype="list" toggle_related="1" default="medium" label="FLEXI_USE_IMAGE" description="FLEXI_USE_IMAGE_DESC">
