@@ -3932,9 +3932,12 @@ class flexicontent_html
 		static $star_tooltips = null;
 		static $star_classes  = null;
 
-		$user = JFactory::getUser();
-		$db   = JFactory::getDbo();
+		$user    = JFactory::getUser();
+		$db      = JFactory::getDbo();
 		$cparams = JComponentHelper::getParams('com_flexicontent');
+		$app     = JFactory::getApplication();
+		$view    = $app->input->get('flexi_callview', '', 'cmd');
+		echo '<label class="label">'. $view . '</label>';
 
 		// Only label given
 		if (!is_object($xiddata))
@@ -4252,7 +4255,7 @@ class flexicontent_html
 							($counter_show_label ? ' '.JText::_( $rating_count!=1 ? 'FLEXI_VOTES' : 'FLEXI_VOTE' ) : '')
 						).'
 					</div>'.
-					(!(int)$percent || $int_xid ? '' : '
+					(!(int)$percent || $int_xid || $view !== 'item' ? '' : '
 					<span itemprop="aggregateRating" itemscope itemtype="http://schema.org/AggregateRating">
 						<meta itemprop="itemReviewed" content="'.htmlspecialchars($field->item_title, ENT_QUOTES, 'UTF-8').'" />
 						<meta itemprop="ratingValue" content="'.round($percent).'" />
