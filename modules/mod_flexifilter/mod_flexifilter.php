@@ -146,7 +146,7 @@ $empty_current_cid  = !$current_cid;
 $catid = $force_specific_cid || $empty_current_cid ? $config_catid : $current_cid;
 
 // TARGET VIEW / Get target menu item for multi-category view case
-$mcats_selection = $display_cat_list ? $params->get('mcats_selection', 0) : 0;
+$mcats_selection = $params->get('mcats_selection', 0);
 
 // Set category id / ids for TEXT autocomplete
 if ($mcats_selection)

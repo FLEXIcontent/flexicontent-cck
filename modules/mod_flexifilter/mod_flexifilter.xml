@@ -58,15 +58,15 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 
-			<field name="" type="separator" default="FLEXI_FILTER_TARGET_VIEW" level="level3" class="disp_catselector" />
-			<field name="" type="separator" default="This effects if category selector will allow selecting multiple categories" level="level4" class="alert alert-info fcpadded disp_catselector" />
-			<field name="mcats_selection" type="multilist" subtype="list" toggle_related="1" default="0" label="FLEXI_FILTER_FORM_TARGET" description="FLEXI_FILTER_FORM_TARGET_DESC" class="disp_catselector" >
+			<field name="" type="separator" default="FLEXI_FILTER_TARGET_VIEW" level="level3" class="" />
+			<field name="" type="separator" default="This effects if category selector will allow selecting multiple categories" level="level4" class="alert alert-info fcpadded" />
+			<field name="mcats_selection" type="multilist" subtype="list" toggle_related="1" default="0" label="FLEXI_FILTER_FORM_TARGET" description="FLEXI_FILTER_FORM_TARGET_DESC" class="" >
 				<option value="0" show_list="" hide_list="mcats_menuid">FLEXI_FILTER_TARGET_CAT_VIEW</option>
 				<option value="1" show_list="mcats_menuid" hide_list="">FLEXI_FILTER_TARGET_MCATS_VIEW</option>
 			</field>
 
 			<!-- TODO allow selecting layouts: myitems / favs / tags as a target -->
-			<field name="mcats_itemid" type="fcmenuitem" component="com_flexicontent" link_filters="view=category%%layout=mcats%%!cids=" default="" disable="separator" state="1" published="1" label="FLEXI_FILTER_MCATS_VIEW_ITEM" description="FLEXI_FILTER_MCATS_VIEW_ITEM_DESC" class="mcats_menuid disp_catselector">
+			<field name="mcats_itemid" type="fcmenuitem" component="com_flexicontent" link_filters="view=category%%layout=mcats%%!cids=" default="" disable="separator" state="1" published="1" label="FLEXI_FILTER_MCATS_VIEW_ITEM" description="FLEXI_FILTER_MCATS_VIEW_ITEM_DESC" class="mcats_menuid">
 				<option value="">FLEXI_SELECT</option>
 			</field>
 
