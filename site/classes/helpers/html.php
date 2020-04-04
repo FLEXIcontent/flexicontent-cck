@@ -4012,7 +4012,6 @@ class flexicontent_html
 		$cparams = JComponentHelper::getParams('com_flexicontent');
 		$app     = JFactory::getApplication();
 		$view    = $app->input->get('flexi_callview', '', 'cmd');
-		echo '<label class="label">'. $view . '</label>';
 
 		// Only label given
 		if (!is_object($xiddata))
