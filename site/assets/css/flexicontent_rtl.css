@@ -1814,6 +1814,47 @@ span.fc-centered-icon-box {
 	opacity: 0.9;
 	display: block;
 }
+.fc_mediafile_controls {
+	text-align: center;
+	margin: 0 0 10px 0;
+}
+.fc_mediafile_controls .playBtn,
+.fc_mediafile_controls .pauseBtn,
+.fc_mediafile_controls .stopBtn,
+.fc_mediafile_controls .loadBtn {
+	margin-right: 25px;
+	outline: none;
+	background: none;
+	display: inline-block;
+}
+.fc_mediafile_controls .pauseBtn,
+.fc_mediafile_controls .stopBtn,
+.fc_mediafile_controls .loadBtn {
+	display: none;
+}
+.fc_mediafile_controls > span {
+	color: #333;
+	font-size: 16px;
+	vertical-align: bottom;
+}
+.fc_mediafile_controls span.controls {
+	font-size: 24px;
+	color: #b7b7b7;
+	margin: 4px 24px 4px 0;
+	vertical-align: middle;
+}
+.btn-dwn-controls {
+	line-height: 1 !important;
+	background: #b7b7b7 !important;
+	color: white !important;
+	font-family: "Roboto Condensed" !important;
+	font-weight: 600 !important;
+	font-size: 19px !important;
+	padding: 5px 11px !important;
+	margin-left: 10px !important;
+	position: relative;
+	bottom: 4px;
+}
 input.fc-inherited-value + label {
 	font-weight: bold !important;
 	text-decoration: underline !important;

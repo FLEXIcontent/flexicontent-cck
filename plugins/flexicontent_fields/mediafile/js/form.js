@@ -6,19 +6,55 @@
 	fcfield_mediafile.dialog_handle = [];
 	fcfield_mediafile.base_url = [];
 
-	fcfield_mediafile.showUploader = function(field_name_n, config_name)
+	fcfield_mediafile.initValue = function(tagid, config_name)
 	{
-		var fnn  = field_name_n.replace(/-/g, '_');
-		var box = jQuery('#custom_' + field_name_n + '_file-data-txt').closest('.fcfieldval_container');
-		box.find('.fc_files_uploader_toggle_btn').click();
-	}
+		//window.console.log(tagid);
+		var fnn  = tagid.replace(/-/g, '_');
+		var file = jQuery('#custom_' + tagid + '_file-data-txt');
 
-	fcfield_mediafile.initValue = function(field_name_n, config_name)
-	{
-		//window.console.log(field_name_n);
-		var fnn  = field_name_n.replace(/-/g, '_');
-		var file = jQuery('#custom_' + field_name_n + '_file-data-txt');
+		var updateTimer = function updateTimer()
+		{
+			var formattedTime = secondsToTimestamp(audio_spectrum.getCurrentTime());
+			//jQuery('#fc_mediafile_current_time_' + fnn).text(formattedTime);
 
+			var wave = jQuery('#fc_mediafile_audio_spectrum_' + fnn + ' wave wave');
+			if (!wave.find('.fccurrentTimeBox').length)
+			{
+				wave.append(jQuery('<div class="fccurrentTimeBox" style="position:absolute; z-index: 11; right:0; top: 38%; background: #777; color: white; padding: 4px; opacity: 70%;"></div>'));
+			}
+			wave.find('.fccurrentTimeBox').html(formattedTime);
+		}
+
+		var seekHandler = function seekHandler(position)
+		{
+			audio_spectrum._position = position;
+
+			// Auto start playback if not already started once
+			if (audio_spectrum.backend.isPaused())
+			{
+				var event = document.createEvent("HTMLEvents");
+				event.initEvent("click", true, true);
+				event.eventName = "click";
+				buttons.play.dispatchEvent(event);
+			}
+		}
+
+		var secondsToTimestamp = function(seconds)
+		{
+			seconds = Math.floor(seconds);
+			var h = Math.floor(seconds / 3600);
+			var m = Math.floor((seconds - (h * 3600)) / 60);
+			var s = seconds - (h * 3600) - (m * 60);
+
+			h = h < 10 ? '0' + h : h;
+			m = m < 10 ? '0' + m : m;
+			s = s < 10 ? '0' + s : s;
+
+			if (h > 0)
+			 return h + ':' + m + ':' + s;
+			else
+			 return m + ':' + s;
+		}
 
 		// Imitate SoundCloud's mirror effect on the waveform. Only works on iOS. (Adapted from the wavesurfer.js demo.) 
 		//var ctx = document.createElement('canvas').getContext('2d');
@@ -33,7 +69,7 @@
 
 		    scrollParent: false,
 		    //waveColor: linGrad, 
-		    progressColor: 'darkcyan',
+		    progressColor: '#bbbaba',
 		    cursorColor: '#ddd',
 		    cursorWidth: 2,
 		    height: 128,
@@ -56,18 +92,19 @@
 					}
 				]
 			},
-	    plugins: [
-	        /*WaveSurfer.cursor.create({
-	            showTime: true,
-	            opacity: 1,
-	            customShowTimeStyle: {
-	                'background-color': '#000',
-	                color: '#fff',
-	                padding: '2px',
-	                'font-size': '10px'
-	            }
-	        })*/
-	    ]
+
+			plugins: [
+				/*WaveSurfer.cursor.create({
+						showTime: true,
+						opacity: 1,
+						customShowTimeStyle: {
+								'background-color': '#000',
+								color: '#fff',
+								padding: '2px',
+								'font-size': '10px'
+						}
+				})*/
+		]
 		});
 
 
@@ -169,9 +206,9 @@
 			progressBar.find('.bar').get(0).style.width = 0;
 
 			// Enable buttons
+			buttons.play.disabled = false;
 			buttons.pause.disabled = false;
 			buttons.stop.disabled = false;
-			buttons.play.disabled = false;
 
 			// Start playing after song is loaded
 			if (!audio_spectrum.loaded)
@@ -183,9 +220,29 @@
 			if (!!audio_spectrum.start_on_ready)
 			{
 				audio_spectrum.start_on_ready = false;
-				audio_spectrum.play();
+				!!audio_spectrum._position ? audio_spectrum.play(audio_spectrum._position * audio_spectrum.getDuration()) : audio_spectrum.play();
+				audio_spectrum._position = null; 
+
+				buttons.play.disabled = false;
+				buttons.pause.disabled = true;
+				buttons.stop.disabled = true;
+
+				buttons.play.style.display = 'none';
+				buttons.pause.style.display = 'inline-block';
+				buttons.stop.style.display = 'none';
+				buttons.load.style.display = 'none';
 			}
 		});
+
+		/*
+		 * Add display of current time
+		 */
+		audio_spectrum.on('ready', updateTimer);
+		audio_spectrum.on('audioprocess', updateTimer);
+
+		// Need to watch for seek in addition to audioprocess as audioprocess doesn't fire (if the audio is paused)
+		audio_spectrum.on('seek', seekHandler);
+
 
 		// Add events of playback buttons
 		buttons.play.addEventListener('click', function()
@@ -204,12 +261,18 @@
 			}
 			else
 			{
-				audio_spectrum.play();
+				!!audio_spectrum._position ? audio_spectrum.play(audio_spectrum._position * audio_spectrum.getDuration()) : audio_spectrum.play();
+				audio_spectrum._position = null; 
 			}
 
+			buttons.play.disabled = true;
 			buttons.pause.disabled = false;
 			buttons.stop.disabled = false;
-			buttons.play.disabled = true;
+
+			buttons.play.style.display = 'none';
+			buttons.pause.style.display = 'inline-block';
+			buttons.stop.style.display = 'none';
+			buttons.load.style.display = 'none';
 		}, false);
 
 		buttons.pause.addEventListener('click', function()
@@ -217,6 +280,11 @@
 			audio_spectrum.pause();
 			buttons.pause.disabled = true;
 			buttons.play.disabled = false;
+
+			buttons.play.style.display = 'inline-block';
+			buttons.pause.style.display = 'none';
+			buttons.stop.style.display = 'none';
+			buttons.load.style.display = 'none';
 		}, false);
 
 		buttons.stop.addEventListener('click', function()
@@ -225,6 +293,11 @@
 			buttons.pause.disabled = true;
 			buttons.stop.disabled = true;
 			buttons.play.disabled = false;
+
+			buttons.play.style.display = 'inline-block';
+			buttons.pause.style.display = 'none';
+			buttons.stop.style.display = 'none';
+			buttons.load.style.display = 'none';
 		}, false);
 
 		// Add event of load button to allow loading new files
@@ -279,6 +352,12 @@
 		}
 	}
 
+	fcfield_mediafile.showUploader = function(field_name_n, config_name)
+	{
+		var fnn  = field_name_n.replace(/-/g, '_');
+		var box = jQuery('#custom_' + field_name_n + '_file-data-txt').closest('.fcfieldval_container');
+		box.find('.fc_files_uploader_toggle_btn').click();
+	}
 
 	fcfield_mediafile.fileFiltered = function(uploader, file, config_name)
 	{

@@ -25,6 +25,20 @@
 			wave.find('.fccurrentTimeBox').html(formattedTime);
 		}
 
+		var seekHandler = function seekHandler(position)
+		{
+			audio_spectrum._position = position;
+
+			// Auto start playback if not already started once
+			if (audio_spectrum.backend.isPaused())
+			{
+				var event = document.createEvent("HTMLEvents");
+				event.initEvent("click", true, true);
+				event.eventName = "click";
+				buttons.play.dispatchEvent(event);
+			}
+		}
+
 		var secondsToTimestamp = function(seconds)
 		{
 			seconds = Math.floor(seconds);
@@ -192,9 +206,9 @@
 			progressBar.find('.bar').get(0).style.width = 0;
 
 			// Enable buttons
+			buttons.play.disabled = false;
 			buttons.pause.disabled = false;
 			buttons.stop.disabled = false;
-			buttons.play.disabled = false;
 
 			// Start playing after song is loaded
 			if (!audio_spectrum.loaded)
@@ -206,7 +220,17 @@
 			if (!!audio_spectrum.start_on_ready)
 			{
 				audio_spectrum.start_on_ready = false;
-				audio_spectrum.play();
+				!!audio_spectrum._position ? audio_spectrum.play(audio_spectrum._position * audio_spectrum.getDuration()) : audio_spectrum.play();
+				audio_spectrum._position = null; 
+
+				buttons.play.disabled = false;
+				buttons.pause.disabled = true;
+				buttons.stop.disabled = true;
+
+				buttons.play.style.display = 'none';
+				buttons.pause.style.display = 'inline-block';
+				buttons.stop.style.display = 'none';
+				buttons.load.style.display = 'none';
 			}
 		});
 
@@ -217,7 +241,7 @@
 		audio_spectrum.on('audioprocess', updateTimer);
 
 		// Need to watch for seek in addition to audioprocess as audioprocess doesn't fire (if the audio is paused)
-		audio_spectrum.on('seek', updateTimer);
+		audio_spectrum.on('seek', seekHandler);
 
 
 		// Add events of playback buttons
@@ -237,12 +261,18 @@
 			}
 			else
 			{
-				audio_spectrum.play();
+				!!audio_spectrum._position ? audio_spectrum.play(audio_spectrum._position * audio_spectrum.getDuration()) : audio_spectrum.play();
+				audio_spectrum._position = null; 
 			}
 
+			buttons.play.disabled = true;
 			buttons.pause.disabled = false;
 			buttons.stop.disabled = false;
-			buttons.play.disabled = true;
+
+			buttons.play.style.display = 'none';
+			buttons.pause.style.display = 'inline-block';
+			buttons.stop.style.display = 'none';
+			buttons.load.style.display = 'none';
 		}, false);
 
 		buttons.pause.addEventListener('click', function()
@@ -250,6 +280,11 @@
 			audio_spectrum.pause();
 			buttons.pause.disabled = true;
 			buttons.play.disabled = false;
+
+			buttons.play.style.display = 'inline-block';
+			buttons.pause.style.display = 'none';
+			buttons.stop.style.display = 'none';
+			buttons.load.style.display = 'none';
 		}, false);
 
 		buttons.stop.addEventListener('click', function()
@@ -258,6 +293,11 @@
 			buttons.pause.disabled = true;
 			buttons.stop.disabled = true;
 			buttons.play.disabled = false;
+
+			buttons.play.style.display = 'inline-block';
+			buttons.pause.style.display = 'none';
+			buttons.stop.style.display = 'none';
+			buttons.load.style.display = 'none';
 		}, false);
 
 		// Add event of load button to allow loading new files

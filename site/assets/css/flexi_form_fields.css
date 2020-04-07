@@ -965,33 +965,6 @@ table.fc_uploader_header_tbl td:last-child {
 		min-height: 28px;
 	}
 }
-.playBtn,
-.pauseBtn,
-.stopBtn,
-.loadBtn {
-	margin-right: 25px;
-	outline: none;
-	background: none;
-}
-.loadBtn {
-	display: none;
-}
-.fc_mediafile_controls {
-	text-align: center;
-	margin: 0 0 10px 0;
-}
-.btn-dwn-controls {
-	line-height: 1 !important;
-	background: #b7b7b7 !important;
-	color: white !important;
-	font-family: "Roboto Condensed" !important;
-	font-weight: 600 !important;
-	font-size: 19px !important;
-	padding: 5px 11px !important;
-	margin-left: 10px !important;
-	position: relative;
-	bottom: 4px;
-}
 #flexicontent ul.fcfield-sortables {
 	display: inline-block;
 	list-style: none !important;

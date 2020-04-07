@@ -518,12 +518,10 @@ foreach($values as $file_id)
 		<div>
 			<!--div id="fc_mediafile_current_time_' . $item->id . '_' . $FN_n . '" class="media_time">00:00:00</div-->
 			<div id="fc_mediafile_controls_' . $item->id . '_' . $FN_n . '" class="fc_mediafile_controls">
-
-				<button type="button" class="playBtn icon-play-circle controls" title="Play"></button>
-				<button type="button" class="pauseBtn icon-pause-circle controls" title="Pause"></button>
-				<button type="button" class="stopBtn icon-stop-circle controls" title="Stop"></button>
-				<button type="button" class="loadBtn icon-loop controls" title="Load"></button>
-
+				<span class="btn playBtn"><span class="icon-play-circle controls"></span>' . JText::_('FLEXI_FIELD_MEDIAFILE_PLAY') . '</span>
+				<span class="btn pauseBtn" style="display: none;"><span class="icon-pause-circle controls"></span>' . JText::_('FLEXI_FIELD_MEDIAFILE_PAUSE') . '</span>
+				<span class="btn stopBtn" style="display: none;"><span class="icon-stop-circle controls"></span>' . JText::_('FLEXI_FIELD_MEDIAFILE_STOP') . '</span>
+				<span class="btn loadBtn" style="display: none;"><span class="icon-loop controls"></span>' . JText::_('FLEXI_FIELD_MEDIAFILE_LOAD') . '</span>
 				' . ($allowdownloads ? $_download_btn_html : '') . '
 			</div>
 		</div>
