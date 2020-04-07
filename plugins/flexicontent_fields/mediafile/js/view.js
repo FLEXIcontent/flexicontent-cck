@@ -1,5 +1,6 @@
 	var fcview_mediafile = {};
 	var fcview_mediafile_base_url = [];
+	var audio_spectrum_arr = [];
 
 	fcview_mediafile.debugToConsole = [];
 	fcview_mediafile.use_native_apis = [];
@@ -12,6 +13,22 @@
 		var fnn  = tagid.replace(/-/g, '_');
 		var file = jQuery('#fcview_' + tagid + '_file-data-txt');
 
+		var keyPlayPause = function keyPlayPause(key_event) {
+			if (key_event.keyCode == 32 || key_event.keyCode == 13 /*/*&& key_event.target.nodeName !== "WAVE"*/)
+			{
+				key_event.preventDefault();
+				window.console.log(key_event.target.nodeName);
+
+				// Toggle playing state
+				var event = document.createEvent("HTMLEvents");
+				event.initEvent("click", true, true);
+				event.eventName = "click";
+				audio_spectrum.backend.isPaused() ? buttons.play.dispatchEvent(event) :  buttons.pause.dispatchEvent(event);
+
+				return false;
+			}
+		}
+
 		var updateTimer = function updateTimer()
 		{
 			var formattedTime = secondsToTimestamp(audio_spectrum.getCurrentTime());
@@ -20,14 +37,14 @@
 			var wave = jQuery('#fc_mediafile_audio_spectrum_' + fnn + ' wave wave');
 			if (!wave.find('.fccurrentTimeBox').length)
 			{
-				wave.append(jQuery('<div class="fccurrentTimeBox" style="position:absolute; z-index: 11; right:0; top: 38%; background: #777; color: white; padding: 4px; opacity: 70%;"></div>'));
+				wave.append(jQuery('<div class="fccurrentTimeBox" style="position:absolute; z-index: 11; right:0; top: 38%; background: #777; color: white; padding: 4px 4px 4px 8px; opacity: 70%;"></div>'));
 			}
 			wave.find('.fccurrentTimeBox').html(formattedTime);
 		}
 
 		var seekHandler = function seekHandler(position)
 		{
-			audio_spectrum._position = position;
+			audio_spectrum._position_ = position;
 
 			// Auto start playback if not already started once
 			if (audio_spectrum.backend.isPaused())
@@ -68,7 +85,7 @@
 			container: '#fc_mediafile_audio_spectrum_' + fnn,
 
 		    scrollParent: false,
-		    //waveColor: linGrad, 
+		    waveColor: '#81bff7', 
 		    progressColor: '#bbbaba',
 		    cursorColor: '#ddd',
 		    cursorWidth: 2,
@@ -107,6 +124,8 @@
 		]
 		});
 
+		// Register new player to known players array
+		audio_spectrum_arr[audio_spectrum_arr.length] = audio_spectrum;
 
 		// Variable to check if song is loaded
 		audio_spectrum.loaded = false;
@@ -121,6 +140,9 @@
 			pause: controls.find('.pauseBtn').get(0),
 			stop:  controls.find('.stopBtn').get(0)
 		}
+
+		// Create a reference of the buttons inside the player instance
+		audio_spectrum._buttons_ = buttons;
 
 		buttons.pause.disabled = true;
 		buttons.stop.disabled = true;
@@ -220,8 +242,8 @@
 			if (!!audio_spectrum.start_on_ready)
 			{
 				audio_spectrum.start_on_ready = false;
-				!!audio_spectrum._position ? audio_spectrum.play(audio_spectrum._position * audio_spectrum.getDuration()) : audio_spectrum.play();
-				audio_spectrum._position = null; 
+				!!audio_spectrum._position_ ? audio_spectrum.play(audio_spectrum._position_ * audio_spectrum.getDuration()) : audio_spectrum.play();
+				audio_spectrum._position_ = null; 
 
 				buttons.play.disabled = false;
 				buttons.pause.disabled = true;
@@ -244,9 +266,33 @@
 		audio_spectrum.on('seek', seekHandler);
 
 
+		buttons.play.addEventListener("keydown", function (event) {
+			return keyPlayPause(event);
+		}, false);
+		buttons.pause.addEventListener("keydown", function (event) {
+			return keyPlayPause(event);
+		}, false);
+
 		// Add events of playback buttons
 		buttons.play.addEventListener('click', function()
 		{
+			// Stop all other known players
+			var i;
+			for (i = 0; i < audio_spectrum_arr.length; i++)
+			{
+				if (!audio_spectrum_arr[i].backend.isPaused())
+				{
+					// Toggle playing state
+					var event = document.createEvent("HTMLEvents");
+					event.initEvent("click", true, true);
+					event.eventName = "click";
+
+					audio_spectrum_arr[i]._noBtnFocus_ = 1;
+					audio_spectrum_arr[i]._buttons_.pause.dispatchEvent(event);
+					audio_spectrum_arr[i]._noBtnFocus_ = null;
+				}
+			}
+
 			// Load song when play is pressed
 			if (!audio_spectrum.loaded)
 			{
@@ -261,8 +307,8 @@
 			}
 			else
 			{
-				!!audio_spectrum._position ? audio_spectrum.play(audio_spectrum._position * audio_spectrum.getDuration()) : audio_spectrum.play();
-				audio_spectrum._position = null; 
+				!!audio_spectrum._position_ ? audio_spectrum.play(audio_spectrum._position_ * audio_spectrum.getDuration()) : audio_spectrum.play();
+				audio_spectrum._position_ = null; 
 			}
 
 			buttons.play.disabled = true;
@@ -273,6 +319,8 @@
 			buttons.pause.style.display = 'inline-block';
 			buttons.stop.style.display = 'none';
 			buttons.load.style.display = 'none';
+
+			buttons.pause.focus();
 		}, false);
 
 		buttons.pause.addEventListener('click', function()
@@ -285,6 +333,9 @@
 			buttons.pause.style.display = 'none';
 			buttons.stop.style.display = 'none';
 			buttons.load.style.display = 'none';
+
+			// Do not focus when pausing due to starting another player
+			if (!!!audio_spectrum._noBtnFocus_) buttons.play.focus();
 		}, false);
 
 		buttons.stop.addEventListener('click', function()
@@ -298,6 +349,8 @@
 			buttons.pause.style.display = 'none';
 			buttons.stop.style.display = 'none';
 			buttons.load.style.display = 'none';
+
+			buttons.play.focus();
 		}, false);
 
 		// Add event of load button to allow loading new files
@@ -316,6 +369,8 @@
 				var peaks = audio_spectrum.backend.peaks || null;
 				isURL ? audio_spectrum.load(file.data('wfpreview'), peaks) : audio_spectrum.load(fcview_mediafile_base_url[config_name] + '/' + file.data('wfpreview'), peaks);
 			}
+
+			buttons.play.focus();
 		}, false);
 
 

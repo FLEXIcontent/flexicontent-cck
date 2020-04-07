@@ -1826,7 +1826,7 @@ span.fc-centered-icon-box {
 .fc_mediafile_controls .loadBtn {
 	display: none;
 }
-.fc_mediafile_controls > span {
+.fc_mediafile_controls > a {
 	color: #333;
 	font-size: 16px;
 	vertical-align: bottom;

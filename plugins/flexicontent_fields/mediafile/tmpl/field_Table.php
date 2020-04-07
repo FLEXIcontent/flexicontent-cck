@@ -268,10 +268,10 @@ foreach ($field->value as $file_id)
 		<div>
 			<!--div id="fc_mediafile_current_time_' . $item->id . '_' . $FN_n . '" class="media_time">00:00:00</div-->
 			<div id="fc_mediafile_controls_' . $FN_n . '" class="fc_mediafile_controls">
-				<span class="btn playBtn"><span class="icon-play-circle controls"></span>' . JText::_('FLEXI_FIELD_MEDIAFILE_PLAY') . '</span>
-				<span class="btn pauseBtn" style="display: none;"><span class="icon-pause-circle controls"></span>' . JText::_('FLEXI_FIELD_MEDIAFILE_PAUSE') . '</span>
-				<span class="btn stopBtn" style="display: none;"><span class="icon-stop-circle controls"></span>' . JText::_('FLEXI_FIELD_MEDIAFILE_STOP') . '</span>
-				<span class="btn loadBtn" style="display: none;"><span class="icon-loop controls"></span>' . JText::_('FLEXI_FIELD_MEDIAFILE_LOAD') . '</span>
+				<a href="javascript:;" class="btn playBtn"><span class="icon-play-circle controls"></span>' . JText::_('FLEXI_FIELD_MEDIAFILE_PLAY') . '</a>
+				<a href="javascript:;" class="btn pauseBtn" style="display: none;"><span class="icon-pause-circle controls"></span>' . JText::_('FLEXI_FIELD_MEDIAFILE_PAUSE') . '</a>
+				<a href="javascript:;" class="btn stopBtn" style="display: none;"><span class="icon-stop-circle controls"></span>' . JText::_('FLEXI_FIELD_MEDIAFILE_STOP') . '</a>
+				<a href="javascript:;" class="btn loadBtn" style="display: none;"><span class="icon-loop controls"></span>' . JText::_('FLEXI_FIELD_MEDIAFILE_LOAD') . '</a>
 			</div>
 		</div>
 		<div id="fc_mediafile_audio_spectrum_box_' . $FN_n . '" class="fc_mediafile_audio_spectrum_box" style="display: block; margin-top: 8px; position: relative; border: 1px dashed;">

@@ -1819,13 +1819,14 @@ span.fc-centered-icon-box {
 	margin-right: 25px;
 	outline: none;
 	background: none;
+	display: inline-block;
 }
 .fc_mediafile_controls .pauseBtn,
 .fc_mediafile_controls .stopBtn,
 .fc_mediafile_controls .loadBtn {
 	display: none;
 }
-.fc_mediafile_controls > span {
+.fc_mediafile_controls > a {
 	color: #333;
 	font-size: 16px;
 	vertical-align: bottom;
