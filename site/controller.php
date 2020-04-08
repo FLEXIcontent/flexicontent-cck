@@ -2341,6 +2341,10 @@ class FlexicontentController extends JControllerLegacy
 					}
 				}
 			}
+			else
+			{
+				$file->abspath = $file->filename_original ? $file->filename_original : $file->filename;
+			}
 
 
 			/**
@@ -2449,15 +2453,18 @@ class FlexicontentController extends JControllerLegacy
 				}
 
 				// skip url-based file if downloading multiple files
-				if ($task=='download_tree') {
+				if ($task == 'download_tree')
+				{
 					$msg = "Skipped URL based file: ".$url;
 					$app->enqueueMessage($msg, 'notice');
 					continue;
 				}
-
-				// redirect to the file download link
-				@header("Location: ".$url."");
-				$app->close();
+				else
+				{
+					// redirect to the file download link
+					//@header("Location: ".$url."");
+					//$app->close();
+				}
 			}
 
 
@@ -2626,11 +2633,14 @@ class FlexicontentController extends JControllerLegacy
 			$dlfile = reset($valid_files);
 		}
 
-		// *** Multi-file download, create a compressed archive (e.g. ZIP) to contain them, also adding a text file with name and descriptions
+		/* Multi-file download, create a compressed archive (e.g. ZIP) to contain them,
+		 * also adding a text file with name and descriptions
+		 * URLs for download-tree should have been skipped above */
 		else
 		{
 			// Create target (top level) folder
 			JFolder::create($targetpath, 0755);
+
 			// Copy Files
 			foreach ($valid_files as $file) JFile::copy($file->abspath, $file->node->targetpath);
 
@@ -2727,7 +2737,16 @@ class FlexicontentController extends JControllerLegacy
 			"gif" => "image/gif", "png" => "image/png", "jpeg" => "image/jpg", "jpg" => "image/jpg", "mp3" => "audio/mpeg"
 		);
 		$dlfile->ctype = isset($ctypes[$dlfile->ext]) ? $ctypes[$dlfile->ext] : "application/force-download";
-		$dlfile->download_filename = strlen($dlfile->filename_original) ? $dlfile->filename_original : $dlfile->filename;
+
+		if (!$dlfile->url)
+		{
+			$dlfile->download_filename = strlen($dlfile->filename_original) ? $dlfile->filename_original : $dlfile->filename;
+		}
+		else
+		{
+			$_url = strlen($dlfile->filename_original) ? $dlfile->filename_original : $dlfile->filename;
+			$dlfile->download_filename = substr($_url, strrpos($_url,"/") + 1);
+		}
 
 
 		/**
@@ -2737,8 +2756,9 @@ class FlexicontentController extends JControllerLegacy
 		$pdf = false;
 		$dlfile->abspath_tmp = false;
 		$dlfile->size_tmp = false;
-
-		if ($dlfile->ext == 'pdf' && $cparams->get('stamp_pdfs', 1) && $dlfile->stamp)
+		
+		// Do not try to stamp URLs
+		if (!$dlfile->url && $dlfile->ext == 'pdf' && $cparams->get('stamp_pdfs', 1) && $dlfile->stamp)
 		{
 			// Create new PDF document (initiate FPDI)
 			$TCPDF_path = JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'TCPDF'.DS.'vendor'.DS.'autoload.php';
@@ -2779,7 +2799,8 @@ class FlexicontentController extends JControllerLegacy
 				}
 			}
 		}
-
+		
+		// IF $pdf is non-empty, then it was created above
 		if ($pdf)
 		{
 			// Loop through all pages
@@ -2812,12 +2833,14 @@ class FlexicontentController extends JControllerLegacy
 
 			//die('is PDF: ' . $dlfile->abspath);
 		}
+		//echo '<pre>'; print_r($dlfile); exit;
 
 		// *****************************************
 		// Output an appropriate Content-Type header
 		// *****************************************
 		header("Pragma: public"); // required
 		header("Expires: 0");
+		//header("HTTP/1.1 200 OK");
 		header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
 		header("Cache-Control: private", false); // required for certain browsers
 		header("Content-Type: ".$dlfile->ctype);
@@ -2838,7 +2861,9 @@ class FlexicontentController extends JControllerLegacy
 		if ( !FLEXIUtilities::funcIsDisabled('set_time_limit') ) @set_time_limit(0);
 
 		$chunksize = 1 * (1024 * 1024); // 1MB, highest possible for fread should be 8MB
-		if (1 || $dlfile->size > $chunksize)
+		$filesize  = $dlfile->size_tmp ?: $dlfile->size;
+
+		if ($filesize > $chunksize)
 		{
 			$handle = @fopen($dlfile->abspath_tmp ?: $dlfile->abspath, 'rb');
 			while(!feof($handle))
