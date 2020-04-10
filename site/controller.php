@@ -1063,12 +1063,16 @@ class FlexicontentController extends JControllerLegacy
 				}
 				else
 				{
-					$link = JRoute::_(
-						'index.php?option=com_flexicontent&view=item&task=add&id=0' .
+					// Create the URL, maintain current menu item if this was given
+					$Itemid = $this->input->get('Itemid', 0, 'int');
+					$item_url = 'index.php?option=com_flexicontent&view=item&task=add' .
 						'&typeid=' . $model->get('type_id') .
-						'&cid=' . $model->get('catid')
-						, false
-					);
+						'&maincat=' . $model->get('catid') .
+						'&Itemid=' . $Itemid .
+						'&return='.base64_encode($this->returnURL);
+
+					// Set task to 'edit', and pass original referer back to avoid making the form itself the referer, but also check that it is safe enough
+					$link = JRoute::_($item_url, false);
 				}
 				break;
 
