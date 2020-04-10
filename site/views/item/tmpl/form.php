@@ -383,12 +383,12 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 				<?php endif; ?>
 
 				<button class="<?php echo $btn_class;?> btn-success" type="button" onclick="return flexi_submit('save', 'flexi_form_submit_btns', 'flexi_form_submit_msg');">
-					<span class="fcbutton_save"><?php echo JText::_( !$isnew ? 'FLEXI_SAVE_A_RETURN' : 'FLEXI_ADD_A_RETURN' ) ?></span>
+					<span class="fcbutton_save"><?php echo JText::_( !$isnew ? 'FLEXI_SAVE_A_CLOSE' : 'FLEXI_ADD_A_CLOSE' ) ?></span>
 				</button>
 
-				<?php if ( in_array( 'save2new', $allowbuttons_fe) && !$isnew ) : ?>
+				<?php if ( in_array( 'save2new', $allowbuttons_fe) ) : ?>
 					<button class="<?php echo $btn_class;?> btn-success" type="button" onclick="return flexi_submit('save2new', 'flexi_form_submit_btns', 'flexi_form_submit_msg');">
-						<span class="fcbutton_save2new"><?php echo JText::_( 'FLEXI_SAVE_AND_NEW' ) ?></span>
+						<span class="fcbutton_save2new"><?php echo JText::_( $isnew ? 'FLEXI_ADD_AND_NEW' : 'FLEXI_SAVE_AND_NEW' ) ?></span>
 					</button>
 				<?php endif; ?>
 

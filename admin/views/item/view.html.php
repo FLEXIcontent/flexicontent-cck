@@ -1158,6 +1158,16 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 				$btn_class= (FLEXI_J40GE ? ' btn-success ' : '') . ' ' . $this->tooltip_class, $btn_icon="icon-save-copy",
 				'data-placement="right" title="'.JText::_('FLEXI_SAVE_AS_COPY_INFO', true).'"', $auto_add = 0);
 		}
+		else
+		{
+			$btn_name = 'save2new';
+			$btn_arr[$btn_name] = flexicontent_html::addToolBarButton(
+				'FLEXI_ADD_AND_NEW', $btn_name, $full_js="Joomla.submitbutton('".$ctrl.".save2new')", $msg_alert='', $msg_confirm='',
+				$btn_task=$ctrl.'.save2new', $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false,
+				$btn_class= (FLEXI_J40GE ? ' btn-success ' : '') . ' ' . $this->tooltip_class, $btn_icon="icon-save-new",
+				'data-placement="right" title="'.JText::_('FLEXI_SAVE_AND_NEW_INFO', true).'"', $auto_add = 1);
+		}
+
 		flexicontent_html::addToolBarDropMenu(
 			$btn_arr,
 			'save_btns_group',
