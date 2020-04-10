@@ -22,6 +22,7 @@
 				'addr' => $value, 'text' => ''
 			);
 		}
+
 		if ( empty($value['addr']) && !$use_ingroup && $n) continue;  // If at least one added, skip empty if not in field group
 
 		$fieldname_n = $fieldname.'['.$n.']';
