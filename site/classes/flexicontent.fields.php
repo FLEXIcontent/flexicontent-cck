@@ -3905,7 +3905,15 @@ class FlexicontentFields
 			'isSearchView' => $isSearchView,
 		);
 
-		$layouts_path = $app->isClient('site') ? null : JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'layouts';
+		static $template;
+
+		if ($template === null)
+		{
+			$template = JFactory::getApplication('site')->getTemplate();
+		}
+
+		$layouts_path_1 = JPATH_ROOT . '/templates/' . $template . '/html/layouts/com_flexicontent/items_list_filters/select_selectmul.php';
+		$layouts_path_2 = JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'layouts';
 
 		// *** Do not create any HTML just return empty string to indicate a filter that should be skipped
 		if ($hide_disabled_values && empty($results))
@@ -3925,23 +3933,29 @@ class FlexicontentFields
 			{
 				// 0: Select (single value selectable), 2: Dual select (value range), 6: Multi Select (multiple values selectable)
 				case 0: case 2: case 6:
-					echo JLayoutHelper::render('items_list_filters.select_selectmul', $displayData, $layouts_path);
+					$layout_name = 'select_selectmul';
 					break;
 
 				// (TODO: autocomplete) ... 1: Text input, 3: Dual text input (value range), both of these can be JS date calendars, 7: Slider, 8: Slider range
 				case 1: case 3: case 7: case 8:
-					echo JLayoutHelper::render('items_list_filters.txtsearch_date_slider', $displayData, $layouts_path);
+					$layout_name = 'txtsearch_date_slider';
 					break;
 
 				case 4: case 5:  // 4: radio (single value selectable), 5: checkbox (multiple values selectable)
-
-					echo JLayoutHelper::render('items_list_filters.radio_checkbox', $displayData, $layouts_path);
+					$layout_name = 'radio_checkbox';
 					break;
 
 				default:
+					$layout_name = false;
 					$filter->html = 'Case ' . $display_filter_as . ' not implemented';
 					break;
 			}
+
+			echo JLayoutHelper::render(
+				'items_list_filters.'.$layout_name,
+				$displayData,
+				file_exists($layouts_path_1 . '/' . $layout_name . '.php') ? $layouts_path_1 : $layouts_path_2
+			);
 		}
 		//$last_error = error_get_last();
 		//echo '<pre>'; print_r($last_error); exit;
