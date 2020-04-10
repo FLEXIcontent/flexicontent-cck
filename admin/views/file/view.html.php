@@ -260,7 +260,7 @@ class FlexicontentViewFile extends FlexicontentViewBaseRecord
 				break;
 
 			case 1:
-				$url = $row->filename_original ?: $row->filename;
+				$url = $row->filename;
 				$rowdata->calculated_size = $model->get_file_size_from_url($url);
 
 				if ($rowdata->calculated_size === -999)

@@ -50,13 +50,16 @@ $disabled = $this->row->url ? '' : ' disabled="disabled"';
 	<table class="fc-form-tbl">
 
 		<tr>
-			<td class="key hasTooltip" title="<?php echo flexicontent_html::getToolTip('FLEXI_FILE_FILENAME', 'FLEXI_FILE_FILENAME_DESC', 1, 1); ?>">
-				<label class="fc-prop-lbl" for="filename_original">
+			<td class="key hasTooltip" title="<?php echo ((int) $this->row->url === 0)
+				? flexicontent_html::getToolTip('FLEXI_FILE_STORAGE_FILENAME', 'FLEXI_FILE_STORAGE_FILENAME_DESC', 1, 1)
+				: flexicontent_html::getToolTip('FLEXI_URL_LINK', 'FLEXI_URL_LINK_DESC', 1, 1)
+				; ?>">
+				<label class="fc-prop-lbl" for="filename">
 					<?php
 					switch ((int) $this->row->url)
 					{
 						case 0:
-							echo JText::_('FLEXI_FILENAME');
+							echo JText::_('FLEXI_FILE_STORAGE_FILENAME');
 							break;
 						case 1:
 							echo JText::_('FLEXI_URL_LINK');
@@ -69,13 +72,7 @@ $disabled = $this->row->url ? '' : ' disabled="disabled"';
 				</label>
 			</td>
 			<td>
-				<?php if ((int) $this->row->url !== 2) :
-
-					echo '
-					<input type="text" id="filename_original" name="filename_original" value="' . (strlen($this->row->filename_original) ? $this->row->filename_original : $this->row->filename) . '" class="input-xxlarge required" maxlength="4000" />
-					';
-
-				else :
+				<?php if ((int) $this->row->url === 2) :
 
 					$jMedia_file_displayData = array(
 						'disabled' => false,
@@ -87,15 +84,41 @@ $disabled = $this->row->url ? '' : ' disabled="disabled"';
 						'authorId' => '',
 						'previewWidth' => 480,
 						'previewHeight' => 360,
-						'name' => 'filename_original',
-						'id' => 'filename_original',
-						'value' => strlen($this->row->filename_original) ? $this->row->filename_original : $this->row->filename,
+						'name' => 'filename',
+						'id' => 'filename',
+						'value' => $this->row->filename,
 						'folder' => '',
 					);
 					echo JLayoutHelper::render($media_field_layout = 'joomla.form.field.media', $jMedia_file_displayData, $layouts_path = null);
 
+				else :
+
+					echo '
+					<input type="text" id="filename" name="filename" value="' . $this->row->filename . '" class="input-xxlarge required" maxlength="4000"
+					' . ((int)$this->row->url === 0 ? ' readonly="readonly" ' : '') . '
+					/>
+					';
+
 				endif; ?>
 
+			</td>
+		</tr>
+
+
+		<tr>
+			<td class="key hasTooltip" title="<?php echo flexicontent_html::getToolTip('FLEXI_DOWNLOAD_FILENAME', 'FLEXI_FILE_DOWNLOAD_FILENAME_DESC', 1, 1); ?>">
+				<label class="fc-prop-lbl" for="filename_original">
+					<?php
+						echo JText::_('FLEXI_DOWNLOAD_FILENAME');
+					?>
+				</label>
+			</td>
+			<td>
+				<?php
+					echo '
+					<input type="text" id="filename_original" name="filename_original" value="' . (strlen($this->row->filename_original) ? $this->row->filename_original : $this->row->filename) . '" class="input-xxlarge required" maxlength="4000" />
+					';
+				?>
 			</td>
 		</tr>
 
@@ -878,7 +901,6 @@ $disabled = $this->row->url ? '' : ' disabled="disabled"';
 <?php echo JHtml::_( 'form.token' ); ?>
 <input type="hidden" name="option" value="com_flexicontent" />
 <?php if (!$this->row->url) : ?>
-<input type="hidden" name="filename" value="<?php echo $this->row->filename; ?>" />
 <input type="hidden" name="ext" value="<?php echo $this->row->ext; ?>" />
 <?php endif; ?>
 <input type="hidden" name="url" value="<?php echo $this->row->url; ?>" />

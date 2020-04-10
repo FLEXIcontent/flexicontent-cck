@@ -90,6 +90,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 		// Initialize variables
 		$app     = JFactory::getApplication();
 		$user    = JFactory::getUser();
+		$params  = JComponentHelper::getParams('com_flexicontent');
 
 		$original_task = $this->task;
 
@@ -192,6 +193,34 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 		$data['stamp']  = $data['stamp'] ? 1 : 0;   // only allow 1 or 0
 		$data['url']    = in_array((int) $data['url'], array(0, 1, 2)) ? (int) $data['url'] : 0;   // only allow 2 or 1 or 0
 
+		// Get extensions allowed by configuration, and intersect them with desired extensions
+		$allowed_exts = preg_split("/[\s]*,[\s]*/", strtolower($params->get('upload_extensions', 'bmp,csv,doc,docx,gif,ico,jpg,jpeg,odg,odp,ods,odt,pdf,png,ppt,pptx,txt,xcf,xls,xlsx,zip,ics')));
+		$allowed_exts = array_flip($allowed_exts);
+
+		// Get the extension to record it in the DB
+		$ext = strtolower(flexicontent_upload::getExt($data['filename']));
+
+		if (!isset($allowed_exts[$ext]))
+		{
+			$app->setHeader('status', '403 Forbidden', true);
+			$app->enqueueMessage(JText::_('File extension not allowed'), 'error');
+
+			// Skip redirection back to return url if inside a component-area-only view, showing error using current page, since usually we are inside a iframe modal
+			if ($this->input->getCmd('tmpl') !== 'component')
+			{
+				$this->setRedirect($this->returnURL);
+			}
+
+			if ($this->input->get('fc_doajax_submit'))
+			{
+				jexit(flexicontent_html::get_system_messages_html());
+			}
+			else
+			{
+				return false;
+			}
+		}
+
 		switch ($data['url'])
 		{
 			// CASE local file
@@ -207,8 +236,8 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 			case 1:
 
 				// Validate file URL
-				$url = flexicontent_html::dataFilter($data['filename_original'], 4000, 'URL', 0);  // Clean bad text/html
-				$data['filename'] = $data['filename_original'] = $url;
+				$data['filename_original'] = flexicontent_html::dataFilter($data['filename_original'], 4000, 'STRING', 0);  // Clean bad text/html
+				$data['filename'] = $url = flexicontent_html::dataFilter($data['filename'], 4000, 'URL', 0);  // Clean bad text/html
 
 				// Get file size from submitted field (file URL), set to zero if no size unit specified
 				if (!empty($data['size']))
@@ -234,9 +263,10 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 			// CASE JMedia file PATH
 			case 2:
 
-				// Validate file URL
-				$url = flexicontent_html::dataFilter($data['filename_original'], 4000, 'PATH', 0);  // Clean bad text/html
-				$data['filename'] = $data['filename_original'] = $url;
+				// Validate file PATH
+				$data['filename_original'] = flexicontent_html::dataFilter($data['filename_original'], 4000, 'STRING', 0);  // Clean bad text/html
+				$data['filename'] = flexicontent_html::dataFilter($data['filename'], 4000, 'PATH', 0);  // Clean bad text/html
+
 				$file_path = JPath::clean(JPATH_ROOT . DS . $data['filename']);
 
 				// Get file size from filesystem (local file)
