@@ -1522,7 +1522,7 @@ if ($js)
 							<table class="fc-form-tbl fcinner fcfullwidth" id="file-props-form-container">
 
 								<tr>
-									<td id="file-props-name-lbl-container" class="key <?php echo $this->tooltip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_FILE_FILENAME', 'FLEXI_FILE_FILENAME_DESC', 1, 1); ?>">
+									<td id="file-props-name-lbl-container" class="key <?php echo $this->tooltip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_FILE_FILENAME', 'FLEXI_FILE_DOWNLOAD_FILENAME_DESC', 1, 1); ?>">
 										<label class="fc-prop-lbl" id="file-props-name-lbl" for="file-props-name">
 										<?php echo JText::_( 'FLEXI_FILE_FILENAME' ); ?>
 										</label>
