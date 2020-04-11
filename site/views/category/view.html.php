@@ -233,6 +233,11 @@ class FlexicontentViewCategory extends JViewLegacy
 		// Bind Fields to items and RENDER their display HTML, but check for document type, due to Joomla issue with system
 		// plugins creating JDocument in early events forcing it to be wrong type, when format as url suffix is enabled
 		// *******************************************************************************************************************
+		
+		foreach($items as $item)
+		{
+			$item->force_full = (int) $params->get('force_full', 0);
+		}
 
 		if ($format != 'feed')
 		{
