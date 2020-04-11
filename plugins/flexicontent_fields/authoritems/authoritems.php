@@ -10,6 +10,9 @@
  */
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
+
+use Joomla\String\StringHelper;
+
 JLoader::register('FCField', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/fcfield/parentfield.php');
 
 class plgFlexicontent_fieldsAuthoritems extends FCField
@@ -51,10 +54,12 @@ class plgFlexicontent_fieldsAuthoritems extends FCField
 		{
 			try
 			{
+				// Get user
 				$author = JFactory::getUser($item->created_by);
+
+				// Make sure unicode username can be used in the URL
 				$created_by_username = JFilterOutput::stringURLUnicodeSlug($author->username);
-				
-				$authorslug = $created_by_username !== $author->username
+				$authorslug = StringHelper::strtolower($created_by_username) !== StringHelper::strtolower($author->username)
 					? $item->created_by
 					: $item->created_by . ':' . $created_by_username;
 			}
