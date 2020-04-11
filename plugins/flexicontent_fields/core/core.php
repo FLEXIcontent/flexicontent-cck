@@ -408,7 +408,7 @@ class plgFlexicontent_fieldsCore extends FCField
 					 */
 					elseif ($view !== 'item')
 					{
-						$field->{$prop} = $item->parameters->get('force_full', 0)
+						$field->{$prop} = !empty($item->force_full)
 							? $item->introtext . chr(13) . chr(13) . $item->fulltext
 							: $item->introtext;
 					}
