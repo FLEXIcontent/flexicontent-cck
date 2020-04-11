@@ -1,5 +1,25 @@
 <?php
 use Joomla\String\StringHelper;
+
+if (!defined('JPATH_BASE'))
+{
+	define('_JEXEC', 1);
+	define('DS', DIRECTORY_SEPARATOR);
+
+	if (file_exists('defines.php'))
+	{
+		require_once 'defines.php';
+	}
+	elseif (file_exists(realpath(__DIR__) . '/' . 'defines.php'))
+	{
+		require_once realpath(__DIR__) . '/' . 'defines.php';
+	}
+	else
+	{
+		define('JPATH_BASE', realpath(__DIR__.'/../../..'));
+	}
+}
+
 $task = new FlexicontentTasksCore();
 
 class FlexicontentTasksCore
@@ -14,32 +34,14 @@ class FlexicontentTasksCore
 	function __construct()
 	{
 		// Saves the start time and memory usage.
-		$start_time = microtime(true);
-		$start_mem  = memory_get_usage();
-
-		define('_JEXEC', 1);
-		define('DS', DIRECTORY_SEPARATOR);
-
-
-		if (file_exists('defines.php'))
-		{
-			require_once 'defines.php';
-		}
-		elseif (file_exists(realpath(__DIR__) . '/' . 'defines.php'))
-		{
-			require_once realpath(__DIR__) . '/' . 'defines.php';
-		}
-		else
-		{
-			define('JPATH_BASE', realpath(__DIR__.'/../../..'));
-		}
+		//$start_time = microtime(true);
+		//$start_mem  = memory_get_usage();
 
 		require_once JPATH_BASE . '/includes/defines.php';
 		require_once JPATH_BASE . '/includes/framework.php';
 
-		$is_admin = preg_match('/\/administrator\//', $_SERVER['HTTP_REFERER']);
-
 		// Instantiate the application.
+		$is_admin = preg_match('/\/administrator\//', isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : '');
 		$app = JFactory::getApplication($is_admin ? 'administrator' : 'site');
 		$app->initialise();
 
@@ -295,7 +297,7 @@ class FlexicontentTasksCore
 		// Check for request forgeries
 		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 
-		require_once JPath::clean(JPATH_BASE . '/../components/com_flexicontent/helpers/permission.php');
+		require_once JPath::clean(JPATH_SITE . '/components/com_flexicontent/helpers/permission.php');
 
 		$app    = JFactory::getApplication();
 		$perms  = FlexicontentHelperPerm::getPerm();
