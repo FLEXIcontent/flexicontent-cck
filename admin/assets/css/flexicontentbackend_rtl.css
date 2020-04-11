@@ -3429,7 +3429,6 @@ select[multiple].use_select2_lib:focus {
 	position: absolute;
 	top: 0;
 	right: 0;
-	background-color: #00000087;
 	width: 100%;
 	height: 100%;
 }
