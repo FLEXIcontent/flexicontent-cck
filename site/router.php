@@ -1211,6 +1211,12 @@ class _FlexicontentSiteRouter
 		$tbl = '#__categories', $alias_col = 'alias'
 	)
 	{
+		// Segment missing
+		if (!isset($segments[$start]))
+		{
+			return null;
+		}
+
 		for ($i = $start; $i < count($segments); $i++)
 		{
 			$record_id = $this->_fc_route_getRecordIdByAlias(str_replace(':', '-', $segments[$i]), $parent_id, $language = null, $tbl, $alias_col);
