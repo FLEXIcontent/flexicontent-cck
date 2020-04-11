@@ -1,5 +1,25 @@
 <?php
 use Joomla\String\StringHelper;
+
+if (!defined('JPATH_BASE'))
+{
+	define('_JEXEC', 1);
+	define('DS', DIRECTORY_SEPARATOR);
+
+	if (file_exists('defines.php'))
+	{
+		require_once 'defines.php';
+	}
+	elseif (file_exists(realpath(__DIR__) . '/' . 'defines.php'))
+	{
+		require_once realpath(__DIR__) . '/' . 'defines.php';
+	}
+	else
+	{
+		define('JPATH_BASE', realpath(__DIR__.'/../../..'));
+	}
+}
+
 $task = new FlexicontentCronTasks();
 
 class FlexicontentCronTasks
@@ -14,24 +34,8 @@ class FlexicontentCronTasks
 	function __construct()
 	{
 		// Saves the start time and memory usage.
-		$start_time = microtime(true);
-		$start_mem  = memory_get_usage();
-
-		define('_JEXEC', 1);
-		define('DS', DIRECTORY_SEPARATOR);
-		
-		if (file_exists('defines.php'))
-		{
-			require_once 'defines.php';
-		}
-		elseif (file_exists(realpath(__DIR__) . '/' . 'defines.php'))
-		{
-			require_once realpath(__DIR__) . '/' . 'defines.php';
-		}
-		else
-		{
-			define('JPATH_BASE', realpath(__DIR__.'/../../..'));
-		}
+		//$start_time = microtime(true);
+		//$start_mem  = memory_get_usage();
 
 		require_once JPATH_BASE . '/includes/defines.php';
 		require_once JPATH_BASE . '/includes/framework.php';
@@ -48,7 +52,7 @@ class FlexicontentCronTasks
 		}
 
 		// Get Flexicontent constants
-		require_once JPATH_BASE . '/components/com_flexicontent/defineconstants.php';
+		require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/defineconstants.php';
 
 		$this->_setExecConfig();
 
