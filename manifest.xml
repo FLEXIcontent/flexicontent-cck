@@ -50,12 +50,12 @@
 		<folder>assets</folder>
 		<folder>classes</folder>
 		<folder>controllers</folder>
-		<folder>tasks</folder>
 		<folder>helpers</folder>
 		<folder>layouts</folder>
 		<folder>librairies</folder>
 		<folder>models</folder>
 		<folder>sef_ext</folder>
+		<folder>tasks</folder>
 		<folder>templates</folder>
 		<folder>tmpl_common</folder>
 		<folder>views</folder>
@@ -98,14 +98,15 @@
 			<filename>controller.php</filename>
 			<filename>config.xml</filename>
 			<filename>access.xml</filename>
-			<folder>installation</folder>
 			<folder>assets</folder>
-			<folder>helpers</folder>
-			<folder>views</folder>
-			<folder>models</folder>
 			<folder>controllers</folder>
-			<folder>tables</folder>
 			<folder>elements</folder>
+			<folder>helpers</folder>
+			<folder>installation</folder>
+			<folder>models</folder>
+			<folder>tables</folder>
+			<folder>tasks</folder>
+			<folder>views</folder>
 		</files>
 		
 		<!-- Admin Language files Copy Section -->
@@ -189,7 +190,7 @@
 		<plugin name="file"               folder="plugins/flexicontent_fields/file"               instfolder="flexicontent_fields">FLEXIcontent - File (Download/View/Share/Download cart)</plugin>
 		<plugin name="groupmarker"        folder="plugins/flexicontent_fields/groupmarker"        instfolder="flexicontent_fields">FLEXIcontent - Item Form Tab / Fieldset / Custom HTML</plugin>
 		<plugin name="image"              folder="plugins/flexicontent_fields/image"              instfolder="flexicontent_fields">FLEXIcontent - Image or Gallery (image + details)</plugin>
-		<plugin name="jprofile"           folder="plugins/flexicontent_fields/jprofile"           instfolder="flexicontent_fields">FLEXIcontent - User profile</plugin>
+		<plugin name="jprofile"           folder="plugins/flexicontent_fields/jprofile"           instfolder="flexicontent_fields">FLEXIcontent - User (Contact, Community Builder, Jomsocial, etc)</plugin>
 		<plugin name="linkslist"          folder="plugins/flexicontent_fields/linkslist"          instfolder="flexicontent_fields">FLEXIcontent - HTML list of URLs/Anchors/JS links</plugin>
 		<plugin name="minigallery"        folder="plugins/flexicontent_fields/minigallery"        instfolder="flexicontent_fields">FLEXIcontent - Mini-Gallery (image-only slideshow)</plugin>
 		<plugin name="phonenumbers"       folder="plugins/flexicontent_fields/phonenumbers"       instfolder="flexicontent_fields">FLEXIcontent - International Phone Numbers</plugin>

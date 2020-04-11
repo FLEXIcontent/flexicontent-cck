@@ -163,7 +163,7 @@ if ( $this->perms['cantags'] && $this->params->get('usetags_fe', 1)==1 )
 
 					//window.console.log( 'Getting tags for \"' + term + '\" ...');
 					jQuery.ajax({
-						url: '".JUri::root(true)."/components/com_flexicontent/tasks/core.php?". JSession::getFormToken() ."=1',
+						url: '".JUri::base(true)."/components/com_flexicontent/tasks/core.php?". JSession::getFormToken() ."=1',
 						dataType: 'json',
 						data: {
 							q: term,
