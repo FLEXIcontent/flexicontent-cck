@@ -50,12 +50,12 @@
 		<folder>assets</folder>
 		<folder>classes</folder>
 		<folder>controllers</folder>
-		<folder>tasks</folder>
 		<folder>helpers</folder>
 		<folder>layouts</folder>
 		<folder>librairies</folder>
 		<folder>models</folder>
 		<folder>sef_ext</folder>
+		<folder>tasks</folder>
 		<folder>templates</folder>
 		<folder>tmpl_common</folder>
 		<folder>views</folder>
@@ -98,14 +98,15 @@
 			<filename>controller.php</filename>
 			<filename>config.xml</filename>
 			<filename>access.xml</filename>
-			<folder>installation</folder>
 			<folder>assets</folder>
-			<folder>helpers</folder>
-			<folder>views</folder>
-			<folder>models</folder>
 			<folder>controllers</folder>
-			<folder>tables</folder>
 			<folder>elements</folder>
+			<folder>helpers</folder>
+			<folder>installation</folder>
+			<folder>models</folder>
+			<folder>tables</folder>
+			<folder>tasks</folder>
+			<folder>views</folder>
 		</files>
 		
 		<!-- Admin Language files Copy Section -->
