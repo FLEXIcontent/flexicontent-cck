@@ -215,6 +215,7 @@ class _FlexicontentSiteRouter
 						 * Create segment defining the item, this only ALIAS and not SLUG (id:alias)
 						 */
 						$alias = $id !== null ? substr($query['id'], strlen($id) + 1) : null;
+						$alias = $id !== null && !strlen($alias) ? $query['id'] : $alias;
 						$segments[] = $alias;
 					}
 				}
@@ -293,6 +294,7 @@ class _FlexicontentSiteRouter
 				{
 					// Most URLs will not use this and instead will use the full path by calling _fc_route_buildCatPath()
 					$catalias = $cid !== null ? substr($query['cid'], strlen($cid . '-')) : null;
+					$catalias = $cid !== null && !strlen($catalias) ? $query['cid'] : $catalias;
 				}
 				else
 				{
@@ -315,6 +317,11 @@ class _FlexicontentSiteRouter
 							// TODO: Use alias path from TAGs Tree, create new method for tis: _fc_route_buildTagPath()
 							? ($tagalias = $tagid !== null ? substr($query['tagid'], strlen($tagid) + 1) : null)
 							: ($tagslug = $tagid !== null ? $query['tagid'] : null);
+
+						if (0 /*$remove_ids*/ && $tagid !== null && !strlen($tagalias))
+						{
+							$tagalias = $query['tagid'];
+						}
 
 						if ($mview !== $view || $mlayout !== $layout)
 						{
@@ -346,6 +353,11 @@ class _FlexicontentSiteRouter
 						$remove_ids
 							? ($authoralias = $authorid !== null ? substr($query['authorid'], strlen($authorid) + 1) : null)
 							: ($authorslug = $authorid !== null ? $query['authorid'] : null);
+
+						if ($remove_ids && $authorid !== null && !strlen($authoralias))
+						{
+							$authoralias = $query['authorid'];
+						}
 
 						if ($mview !== $view || $mlayout !== $layout)
 						{
