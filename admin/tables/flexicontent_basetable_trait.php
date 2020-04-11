@@ -199,6 +199,8 @@ trait flexicontent_basetable_trait
 		$language = !empty($language) && $language !== '*'
 			? $language
 			: JComponentHelper::getParams('com_languages')->get('site', '*');
+		$title = $this->_title;
+		$alias = $this->_alias;
 
 		if ($language !== '*')
 		{
@@ -263,11 +265,18 @@ trait flexicontent_basetable_trait
 	 */
 	protected function _check_record($config = null)
 	{
+		// Use record's language or use SITE's default language in case of record's language is ALL (or empty)
+		$language = !empty($this->language) && $this->language !== '*'
+			? $this->language
+			: JComponentHelper::getParams('com_languages')->get('site', '*');
 		$title = $this->_title;
 		$alias = $this->_alias;
 		$original_alias = $this->$alias;
 
-		// Check if 'title' was not given
+
+		/**
+		 * Check if 'title' was not given
+		 */
 		if (trim($this->$title) == '')
 		{
 			$msg = JText::_('FLEXI_ADD_' . strtoupper($title));
@@ -307,7 +316,7 @@ trait flexicontent_basetable_trait
 		if (!$alias_is_valid)
 		{
 			// Make alias safe, also transliterating it - EITHER - if unicode aliases are not enabled - OR - if force ascii alias for current record type is true
-			$this->$alias = $this->stringURLSafe($this->$alias, $this->language, $this->_force_ascii_alias);
+			$this->$alias = $this->stringURLSafe($this->$alias, $language, $this->_force_ascii_alias);
 
 			// Check for empty alias and fallback to using current date
 			if (trim(str_replace('-', '', $this->$alias)) == '')
