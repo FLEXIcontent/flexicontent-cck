@@ -1226,16 +1226,33 @@
 			<field name="" type="separator" default="FLEXI_FIELD_VALUE" level="level1" />
 			<field name="viewlayout" type="fcfilelist" default="" label="FLEXI_FIELD_SELECT_VIEW_LAYOUT_CORE" description="FLEXI_FIELD_SELECT_VIEW_LAYOUT_CORE_DESC" directory="plugins/flexicontent_fields/core/tmpl/favourites/" filter="value*" exclude="" stripext="1" stripprefix="value_" hide_none="1" hide_default="1" />
 
+			<field name="toggle_style" type="multilist" subtype="radio" toggle_related="1" default="0" label="Toggle Style" description="" class="btn-group group-fcinfo">
+				<option value="0" show_list="" hide_list="">BootStrap Toggle</option>
+				<option value="1" show_list="" hide_list="">Image Icons</option>
+				<option value="2" show_list="" hide_list="">CSS Icons</option>
+			</field>
+
+			<field name="" type="separator" default="Access" level="level3" />
 			<field name="allow_guests_favs" type="radio" default="1" label="FLEXI_FAVOURED_ALLOW_GUESTS" description="FLEXI_FAVOURED_ALLOW_GUESTS_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
 
-			<field name="display_favoured_usercount" type="radio" default="0" label="FLEXI_FAVOURED_USERS_COUNTER" description="FLEXI_FAVOURED_USERS_COUNTER_DESC" class="btn-group group-fcmethod">
+			<field name="" type="separator" default="Info" level="level3" />
+
+			<field name="status_info" type="multilist" subtype="radio" toggle_related="1" default="0" label="Status info" description="Whether to show extra text about current subscription status" class="btn-group group-fcmethod fcoffactive">
+				<option value="0">Icon</option>
+				<option value="1">Icon + Text</option>
+			</field>
+			<field name="toggle_info" type="multilist" subtype="radio" toggle_related="1" default="0" label="Toggle info" description="Whether to display a short time displayed text when user toggles subscription status" class="btn-group group-fcmethod fcoffactive">
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
 			</field>
-			<field name="display_favoured_userlist" type="multilist" subtype="radio" default="0" toggle_related="1" label="FLEXI_FAVOURED_USERS_LIST" description="FLEXI_FAVOURED_USERS_LIST_DESC" class="btn-group group-fcmethod">
+			<field name="display_favoured_usercount" type="radio" default="0" label="FLEXI_FAVOURED_USERS_COUNTER" description="FLEXI_FAVOURED_USERS_COUNTER_DESC" class="btn-group group-fcmethod fcoffactive">
+				<option value="0">FLEXI_HIDE</option>
+				<option value="1">FLEXI_SHOW</option>
+			</field>
+			<field name="display_favoured_userlist" type="multilist" subtype="radio" default="0" toggle_related="1" label="FLEXI_FAVOURED_USERS_LIST" description="FLEXI_FAVOURED_USERS_LIST_DESC" class="btn-group group-fcmethod fcoffactive">
 				<option value="0" show_list="" hide_list="disp_userlist">FLEXI_HIDE</option>
 				<option value="1" show_list="disp_userlist" hide_list="">FLEXI_FAVOURED_YES_USERNAMES</option>
 				<option value="2" show_list="disp_userlist" hide_list="">FLEXI_FAVOURED_YES_FULLNAMES</option>

@@ -1467,26 +1467,30 @@ class FlexicontentController extends JControllerLegacy
 		}
 
 		// Guest user does not have DB data, instead use Cookie data
-		elseif (!$user->id)
-		{
-			// Output simple response without counter
-			echo flexicontent_favs::getInstance()->toggleIsFavoured($type, $id, true) < 1
-				? 'removed'
-				: 'added';
-			flexicontent_favs::getInstance()->saveState();
-		}
-
-		// Logged user, update DB, adding / removing given id as favoured
 		else
 		{
 			// Get model of the give type
 			$model = $this->getModel($type);
 
-			// Toggle favourite
-			$isfav = $model->getFavoured();
-			$isfav
-				? $model->removefav()
-				: $model->addfav();
+			if (!$user->id)
+			{
+				// Output simple response without counter
+				/*echo flexicontent_favs::getInstance()->toggleIsFavoured($type, $id, true) < 1
+					? 'removed'
+					: 'added';*/
+				$isfav = flexicontent_favs::getInstance()->toggleIsFavoured($type, $id, true) < 1;
+				flexicontent_favs::getInstance()->saveState();
+			}
+
+			// Logged user, update DB, adding / removing given id as favoured
+			else
+			{
+				// Toggle favourite
+				$isfav = $model->getFavoured();
+				$isfav
+					? $model->removefav()
+					: $model->addfav();
+			}
 
 			// Output response for counter (if this has been enabled)
 			$favs = $model->getFavourites();
@@ -2239,7 +2243,7 @@ class FlexicontentController extends JControllerLegacy
 			}
 			$field_type = $fields_props[$field_id]->field_type;
 
-			$query  = 'SELECT f.id, f.filename, f.filename_original, f.altname, f.secure, f.url, f.hits, f.stamp'
+			$query  = 'SELECT f.id, f.filename, f.filename_original, f.altname, f.secure, f.url, f.hits, f.stamp, f.size'
 					. ', i.title as item_title, i.introtext as item_introtext, i.fulltext as item_fulltext, u.email as item_owner_email'
 					. ', i.access as item_access, i.language as item_language, ie.type_id as item_type_id'
 
@@ -2731,7 +2735,7 @@ class FlexicontentController extends JControllerLegacy
 		}
 
 		// Get file filesize and extension
-		$dlfile->size = filesize($dlfile->abspath);
+		$dlfile->size = !$dlfile->url ? filesize($dlfile->abspath) : $dlfile->size;
 		$dlfile->ext  = strtolower(flexicontent_upload::getExt($dlfile->filename));
 
 		// Set content type of file (that is an archive for multi-download)
@@ -2838,6 +2842,7 @@ class FlexicontentController extends JControllerLegacy
 			//die('is PDF: ' . $dlfile->abspath);
 		}
 		//echo '<pre>'; print_r($dlfile); exit;
+
 
 		// *****************************************
 		// Output an appropriate Content-Type header
