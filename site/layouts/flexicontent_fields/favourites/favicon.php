@@ -15,24 +15,43 @@ if (!$js_and_css_added)
 	$cparams  = JComponentHelper::getParams('com_flexicontent');
 	$use_font = $cparams->get('use_font_icons', 1);
 
-	$icon_del_fav = !$use_font
-		? JHtml::image('components/com_flexicontent/assets/images/'.'cancel.png', JText::_('FLEXI_REMOVE_FAVOURITE'), NULL)
-		: '<span class="icon-remove fcfav_icon_delete"></span>';
-	$icon_is_fav = !$use_font
-		? JHtml::image('components/com_flexicontent/assets/images/'.'heart_delete.png', JText::_('FLEXI_REMOVE_FAVOURITE'), NULL)
-		: '<input data-on="&lt;i class=\'icon-heart fcfav_icon_on\'&gt;&lt;/i&gt;" data-off="&lt;i class=\'icon-heart fcfav_icon_off\'&gt;&lt;/i&gt;" data-toggle="toggle" type="checkbox" value="1" checked="checked" />';
-	$icon_not_fav = !$use_font
-		? JHtml::image('components/com_flexicontent/assets/images/'.'heart_add.png', JText::_('FLEXI_FAVOURE'), NULL)
-		: '<input data-on="&lt;i class=\'icon-heart fcfav_icon_on\'&gt;&lt;/i&gt;" data-off="&lt;i class=\'icon-heart fcfav_icon_off\'&gt;&lt;/i&gt;" data-toggle="toggle" type="checkbox" value="1" />';
-
-	$_attribs = 'class="btn '.$tooltip_class.'" title="'.$tooltip_title.'" onclick="alert(\''.JText::_( 'FLEXI_FAVOURE_LOGIN_TIP', true ).'\')" ';
-	$icon_disabled_fav = !$use_font
-		? JHtml::image('components/com_flexicontent/assets/images/'.'heart_login.png', JText::_( 'FLEXI_FAVOURE' ), $_attribs)
-		: '<span class="icon-heart fcfav_icon_disabled"></span>';
-
 	// Get Favourites field configuration (if FIELD is empty then retrieve it)
 	$favs_field = $field ?: reset(FlexicontentFields::getFieldsByIds(array(12)));
 	$favs_field->parameters = new JRegistry($favs_field->attribs);
+
+	$toggle_style = (int) $favs_field->parameters->get('toggle_style', $use_font ? 2 : 1);
+	$status_info  = (int) $favs_field->parameters->get('status_info', 0);
+	$toggle_info  = (int) $favs_field->parameters->get('toggle_info', 1);
+
+	switch ($toggle_style)
+	{
+		case 0: 
+			$icon_del_fav = '<span class="icon-remove fcfav_icon_delete"></span>';
+			$icon_is_fav  = '<input data-on="&lt;i class=\'icon-heart fcfav_icon_on\'&gt;&lt;/i&gt;" data-off="&lt;i class=\'icon-heart fcfav_icon_off\'&gt;&lt;/i&gt;" data-toggle="toggle" type="checkbox" value="1" checked="checked" />';
+			$icon_not_fav = '<input data-on="&lt;i class=\'icon-heart fcfav_icon_on\'&gt;&lt;/i&gt;" data-off="&lt;i class=\'icon-heart fcfav_icon_off\'&gt;&lt;/i&gt;" data-toggle="toggle" type="checkbox" value="1" />';
+
+			$_attribs = 'class="btn '.$tooltip_class.'" title="'.$tooltip_title.'" onclick="alert(\''.JText::_( 'FLEXI_FAVOURE_LOGIN_TIP', true ).'\')" ';
+			$icon_disabled_fav = '<span class="icon-heart fcfav_icon_disabled"></span>';
+			break;
+
+		case 1: 
+			$icon_del_fav = JHtml::image('components/com_flexicontent/assets/images/'.'cancel.png', JText::_('FLEXI_REMOVE_FAVOURITE'), 'class="fcfav_img_icon"');
+			$icon_is_fav  = JHtml::image('components/com_flexicontent/assets/images/'.'heart_full.png', JText::_('FLEXI_REMOVE_FAVOURITE'), 'class="fcfav_img_icon"');
+			$icon_not_fav = JHtml::image('components/com_flexicontent/assets/images/'.'heart_empty.png', JText::_('FLEXI_FAVOURE'), 'class="fcfav_img_icon"');
+
+			$_attribs = 'class="'.$tooltip_class.' fcfav_img_icon" title="'.$tooltip_title.'" onclick="alert(\''.JText::_( 'FLEXI_FAVOURE_LOGIN_TIP', true ).'\')"';
+			$icon_disabled_fav = JHtml::image('components/com_flexicontent/assets/images/'.'heart_disabled.png', JText::_( 'FLEXI_FAVOURE' ), $_attribs);
+			break;
+
+		case 2: 
+			$icon_del_fav = '<span class="btn btn-small">Cancel</span>';
+			$icon_is_fav  = '<span class="btn btn-small">Favoured</span>';
+			$icon_not_fav = '<span class="btn btn-small">Not Favoured</span>';
+
+			$_attribs = 'class="btn '.$tooltip_class.'" title="'.$tooltip_title.'" onclick="alert(\''.JText::_( 'FLEXI_FAVOURE_LOGIN_TIP', true ).'\')" ';
+			$icon_disabled_fav = '<span class="btn btn-small">Disabled</span>';
+			break;
+	}
 
 	$allow_guests_favs = (int) $favs_field->parameters->get('allow_guests_favs', 1);
 	$users_counter     = (int) $favs_field->parameters->get('display_favoured_usercount', 0);
@@ -51,6 +70,12 @@ if (!$js_and_css_added)
 	flexicontent_html::loadFramework('flexi_tmpl_common');
 	flexicontent_html::loadFramework('flexi-lib');
 	flexicontent_html::loadFramework('bootstrap-toggle');
+
+	$document->addScriptDeclaration("
+		var fcfav_toggle_style = " . $toggle_style . ";
+		var fcfav_status_info = " . $status_info . ";
+		var fcfav_toggle_info = " . $toggle_info . ";
+	");
 
 	$document->addScript(JUri::root(true).'/components/com_flexicontent/assets/js/fcfav.js', array('version' => FLEXI_VHASH));
 
