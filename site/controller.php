@@ -1467,26 +1467,30 @@ class FlexicontentController extends JControllerLegacy
 		}
 
 		// Guest user does not have DB data, instead use Cookie data
-		elseif (!$user->id)
-		{
-			// Output simple response without counter
-			echo flexicontent_favs::getInstance()->toggleIsFavoured($type, $id, true) < 1
-				? 'removed'
-				: 'added';
-			flexicontent_favs::getInstance()->saveState();
-		}
-
-		// Logged user, update DB, adding / removing given id as favoured
 		else
 		{
 			// Get model of the give type
 			$model = $this->getModel($type);
 
-			// Toggle favourite
-			$isfav = $model->getFavoured();
-			$isfav
-				? $model->removefav()
-				: $model->addfav();
+			if (!$user->id)
+			{
+				// Output simple response without counter
+				/*echo flexicontent_favs::getInstance()->toggleIsFavoured($type, $id, true) < 1
+					? 'removed'
+					: 'added';*/
+				$isfav = flexicontent_favs::getInstance()->toggleIsFavoured($type, $id, true) < 1;
+				flexicontent_favs::getInstance()->saveState();
+			}
+
+			// Logged user, update DB, adding / removing given id as favoured
+			else
+			{
+				// Toggle favourite
+				$isfav = $model->getFavoured();
+				$isfav
+					? $model->removefav()
+					: $model->addfav();
+			}
 
 			// Output response for counter (if this has been enabled)
 			$favs = $model->getFavourites();

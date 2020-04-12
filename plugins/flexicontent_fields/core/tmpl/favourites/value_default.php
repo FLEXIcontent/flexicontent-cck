@@ -17,12 +17,16 @@ $displayData = array(
 $field->{$prop} =
 	$pretext . '
 		<div class="fav-block">
-			' . JLayoutHelper::render('flexicontent_fields.favourites.favicon', $displayData, $layouts_path) .'
+			' .
+			JLayoutHelper::render('flexicontent_fields.favourites.favicon', $displayData, $layouts_path) .
+			JLayoutHelper::render('flexicontent_fields.favourites.userlist', $displayData, $layouts_path)
+			. '
 			<div class="fcfav-reponse_item_' . $item->id . ' fcfav-reponse-tip">
+				' . ($field->parameters->get('status_info', 0) ? '
 				<div class="fc-mssg fc-info fc-iblock fc-nobgimage '.($favoured ? 'fcfavs-is-subscriber' : 'fcfavs-isnot-subscriber').'">
 					' . JText::_($favoured ? 'FLEXI_FAVS_YOU_HAVE_SUBSCRIBED' : 'FLEXI_FAVS_CLICK_TO_SUBSCRIBE') . '
 				</div>
-				' . JLayoutHelper::render('flexicontent_fields.favourites.userlist', $displayData, $layouts_path) . '
+				' : '') . '
 			</div>
 		</div>
 	' . $posttext;

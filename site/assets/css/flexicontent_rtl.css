@@ -4350,6 +4350,13 @@ div table.adminform td {
 }
 .fav-block {
 	display: inline-block;
+	min-height: 40px;
+	position: relative;
+	padding-top: 2px;
+}
+.fav-block .fcfav_img_icon {
+	max-width: 28px;
+	max-height: 28px;
 }
 .fav-block .fcfav-delete-btn {
 	padding: 5px 4px 3px 4px;
@@ -4365,6 +4372,14 @@ div table.adminform td {
 }
 .fav-block .fcfav-reponse-tip {
 	display: inline-block;
+	position: relative;
+}
+.fav-block .fcfav-loading,
+.fav-block .fcfavs-result-mssg {
+	position: absolute;
+	min-width: 220px;
+	top: 0;
+	left: 0;
 }
 .fav-block img {
 	vertical-align: middle;
