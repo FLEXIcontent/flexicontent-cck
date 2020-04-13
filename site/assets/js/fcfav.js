@@ -67,6 +67,7 @@ function FCFav(id, type, add_counter)
 	}
 
 	jQuery.ajax({
+		cache: false,
 		url: favurl,
 		dataType: "text",
 		data: {
@@ -108,7 +109,7 @@ function FCFav(id, type, add_counter)
 				}
 				else  // Icon CSS
 				{
-					link = '<span class="btn btn-small">Favoured</span>';
+					link = '<span class="favorite-button"><span class="fcfav-btn-inner heart-fill"></span>';
 				}
 
 				div_status_info = _box_start + ' fcfavs-is-subscriber">' + Joomla.JText._('FLEXI_FAVS_YOU_HAVE_SUBSCRIBED') + '</div>';
@@ -125,7 +126,7 @@ function FCFav(id, type, add_counter)
 				}
 				else  // Icon CSS
 				{
-					link = '<span class="btn btn-small">Not Favoured</span>';
+					link = '<span class="favorite-button"><span class="fcfav-btn-inner heart-border"></span>';
 				}
 
 				div_status_info = _box_start + ' fcfavs-isnot-subscriber">' + Joomla.JText._('FLEXI_FAVS_CLICK_TO_SUBSCRIBE') + '</div>';
@@ -145,7 +146,7 @@ function FCFav(id, type, add_counter)
 				}
 				else  // Icon CSS
 				{
-					link = '<span class="btn btn-small">Favoured</span>';
+					link = '<span class="favorite-button"><span class="fcfav-btn-inner heart-fill"></span>';
 				}
 
 				div_status_info = _box_start + ' fcfavs-is-subscriber">' + Joomla.JText._('FLEXI_FAVS_YOU_HAVE_SUBSCRIBED') + '</div>';
@@ -167,7 +168,7 @@ function FCFav(id, type, add_counter)
 				}
 				else  // Icon CSS
 				{
-					link = '<span class="btn btn-small">Not Favoured</span>';
+					link = '<span class="favorite-button"><span class="fcfav-btn-inner heart-border"></span>';
 				}
 
 				div_status_info = _box_start + ' fcfavs-isnot-subscriber">' + Joomla.JText._('FLEXI_FAVS_CLICK_TO_SUBSCRIBE') + '</div>';
