@@ -14,7 +14,7 @@ $users_list_limit = (int) $favs_field->parameters->get('display_favoured_max', 1
 // No user favouring the item yet
 if (!$favourites)
 {
-	echo '<div class="fc-iblock fcfavs-subscribers-count" style="display: none;">[<span class="fcfav-counter-num"></span>]</div>';
+	echo '<div class="fc-iblock fcfavs-subscribers-count" style="display: none;"><span class="fcfavs-counter-num"></span></div>';
 	return;
 }
 
@@ -48,13 +48,13 @@ if ( $users_list_type )
 
 if (!$userlist)
 {
-	echo '<div class="fc-iblock fcfavs-subscribers-count favorite-count"><span class="fcfav-counter-num">' . ($users_counter ? $favourites : '') . '</span></div>';
+	echo '<div class="fc-iblock fcfavs-subscribers-count"><span class="fcfavs-counter-num">' . ($users_counter ? $favourites : '') . '</span></div>';
 }
 else
 {
 	echo '
   <div class="fc-mssg fc-info fc-iblock fc-nobgimage fcfavs-subscribers-count">
-    ' . ($users_counter ? JText::_('FLEXI_TOTAL').': <span class="fcfav-counter-num">' . $favourites . '</span> '.JText::_('FLEXI_USERS') : '') . '
+    ' . ($users_counter ? JText::_('FLEXI_TOTAL').': <span class="fcfavs-counter-num">' . $favourites . '</span> '.JText::_('FLEXI_USERS') : '') . '
     ' . $userlist . '
   </div>';
 }
