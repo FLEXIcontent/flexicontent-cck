@@ -26,30 +26,30 @@ if (!$js_and_css_added)
 	switch ($toggle_style)
 	{
 		case 0: 
-			$icon_del_fav = '<span class="icon-remove fcfav_icon_delete"></span>';
-			$icon_is_fav  = '<input data-on="&lt;i class=\'icon-heart fcfav_icon_on\'&gt;&lt;/i&gt;" data-off="&lt;i class=\'icon-heart fcfav_icon_off\'&gt;&lt;/i&gt;" data-toggle="toggle" type="checkbox" value="1" checked="checked" />';
-			$icon_not_fav = '<input data-on="&lt;i class=\'icon-heart fcfav_icon_on\'&gt;&lt;/i&gt;" data-off="&lt;i class=\'icon-heart fcfav_icon_off\'&gt;&lt;/i&gt;" data-toggle="toggle" type="checkbox" value="1" />';
+			$icon_del_fav = '<span class="icon-remove fcfavs-icon_delete"></span>';
+			$icon_is_fav  = '<input data-on="&lt;i class=\'icon-heart fcfavs-icon_on\'&gt;&lt;/i&gt;" data-off="&lt;i class=\'icon-heart fcfavs-icon_off\'&gt;&lt;/i&gt;" data-toggle="toggle" type="checkbox" value="1" checked="checked" />';
+			$icon_not_fav = '<input data-on="&lt;i class=\'icon-heart fcfavs-icon_on\'&gt;&lt;/i&gt;" data-off="&lt;i class=\'icon-heart fcfavs-icon_off\'&gt;&lt;/i&gt;" data-toggle="toggle" type="checkbox" value="1" />';
 
-			$_attribs = 'class="icon-heart fcfav_icon_login '.$tooltip_class.'" title="'.$tooltip_title.'" onclick="alert(\''.JText::_( 'FLEXI_FAVOURE_LOGIN_TIP', true ).'\')" ';
-			$icon_login_fav = '<span class="favorite-button"><span ' . $_attribs . '></span>';
+			$_attribs = 'class="icon-heart fcfavs-icon_login '.$tooltip_class.'" title="'.$tooltip_title.'" onclick="alert(\''.JText::_( 'FLEXI_FAVOURE_LOGIN_TIP', true ).'\')" ';
+			$icon_login_fav = '<span class="fcfavs-btn"><span ' . $_attribs . '></span>';
 			break;
 
 		case 1: 
-			$icon_del_fav = JHtml::image('components/com_flexicontent/assets/images/'.'cancel.png', JText::_('FLEXI_REMOVE_FAVOURITE'), 'class="fcfav_img_icon"');
-			$icon_is_fav  = JHtml::image('components/com_flexicontent/assets/images/'.'heart_full.png', JText::_('FLEXI_REMOVE_FAVOURITE'), 'class="fcfav_img_icon"');
-			$icon_not_fav = JHtml::image('components/com_flexicontent/assets/images/'.'heart_empty.png', JText::_('FLEXI_FAVOURE'), 'class="fcfav_img_icon"');
+			$icon_del_fav = JHtml::image('components/com_flexicontent/assets/images/'.'cancel.png', JText::_('FLEXI_REMOVE_FAVOURITE'), 'class="fcfavs-img_icon"');
+			$icon_is_fav  = JHtml::image('components/com_flexicontent/assets/images/'.'heart_full.png', JText::_('FLEXI_REMOVE_FAVOURITE'), 'class="fcfavs-img_icon"');
+			$icon_not_fav = JHtml::image('components/com_flexicontent/assets/images/'.'heart_empty.png', JText::_('FLEXI_FAVOURE'), 'class="fcfavs-img_icon"');
 
-			$_attribs = 'class="'.$tooltip_class.'" title="'.$tooltip_title.'" onclick="alert(\''.JText::_( 'FLEXI_FAVOURE_LOGIN_TIP', true ).'\')"';
-			$icon_login_fav = '<span class="fcfav_icon_login">' . JHtml::image('components/com_flexicontent/assets/images/'.'heart_disabled.png', JText::_( 'FLEXI_FAVOURE' ), $_attribs) . '</span>';
+			$_attribs = 'class="fcfavs-icon_login '.$tooltip_class.'" title="'.$tooltip_title.'" onclick="alert(\''.JText::_( 'FLEXI_FAVOURE_LOGIN_TIP', true ).'\')"';
+			$icon_login_fav = '<span class="fcfavs-btn"><span ' . $_attribs . '>' . JHtml::image('components/com_flexicontent/assets/images/'.'heart_disabled.png', JText::_( 'FLEXI_FAVOURE' ), '') . '</span></span>';
 			break;
 
 		case 2: 
-			$icon_del_fav = '<span class="favorite-button"><span class="fcfav-btn-inner heart-fill heart-delete"></span>';
-			$icon_is_fav  = '<span class="favorite-button"><span class="fcfav-btn-inner heart-fill"></span>';
-			$icon_not_fav = '<span class="favorite-button"><span class="fcfav-btn-inner heart-border"></span>';
+			$icon_del_fav = '<span class="fcfavs-btn"><span class="fcfavs-btn-inner fcfavs-heart-fill fcfavs-heart-delete"></span>';
+			$icon_is_fav  = '<span class="fcfavs-btn"><span class="fcfavs-btn-inner fcfavs-heart-fill"></span>';
+			$icon_not_fav = '<span class="fcfavs-btn"><span class="fcfavs-btn-inner fcfavs-heart-border"></span>';
 
-			$_attribs = 'class="fcfav-btn-inner heart-fill heart-login '.$tooltip_class.'" title="'.$tooltip_title.'" onclick="alert(\''.JText::_( 'FLEXI_FAVOURE_LOGIN_TIP', true ).'\')" ';
-			$icon_login_fav = '<span class="favorite-button"><span ' . $_attribs . '></span>';
+			$_attribs = 'class="fcfavs-btn-inner fcfavs-heart-fill fcfavs-heart-login '.$tooltip_class.'" title="'.$tooltip_title.'" onclick="alert(\''.JText::_( 'FLEXI_FAVOURE_LOGIN_TIP', true ).'\')" ';
+			$icon_login_fav = '<span class="fcfavs-btn"><span ' . $_attribs . '></span></span>';
 			break;
 	}
 
@@ -94,7 +94,7 @@ if (!$js_and_css_added)
 	$js_and_css_added = true;
 }
 
-$icon_class = 'fcfav_icon_box';
+$icon_class = 'fcfavs-icon_box';
 
 // Favs for guests disabled
 if (!JFactory::getUser()->id && !$allow_guests_favs)
@@ -108,7 +108,7 @@ if (!JFactory::getUser()->id && !$allow_guests_favs)
 // Favs for logged user via DB, or guest user via COOKIE
 else
 {
-	$btn_class  = $favoured === -1 ? 'fcfav-delete-btn' : 'fcfav-toggle-btn ' . $tooltip_class;
+	$btn_class  = $favoured === -1 ? 'fcfavs-delete-btn' : 'fcfavs-toggle-btn ' . $tooltip_class;
 	$btn_text   = ($favoured === -1
 		? $icon_del_fav
 		: ($favoured ? $icon_is_fav : $icon_not_fav)

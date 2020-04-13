@@ -540,57 +540,56 @@ div table.adminform td {
 }
 
 .fav-block {
-	--fcfav-color-primary: #005AF0;
-	--fcfav-color-text-light: #fff;
-	--fcfav-color-bg-light: #FAFAFC;
-	--fcfav-space-1: .5rem;
-	--fcfav-space-2: 1rem;
+	--fcfavs-color-primary: #005AF0;
+	--fcfavs-color-text-light: #fff;
+	--fcfavs-color-bg-light: #FAFAFC;
+	--fcfavs-space-1: .5rem;
+	--fcfavs-space-2: 1rem;
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
 	min-height: 40px;
 	position: relative;
 	padding-top: 2px;
+	line-height: 100%;
 
-	.fcfav-loading,
+	.fcfavs-loading,
 	.fcfavs-result-mssg,
-	.fcfav-reponse-tip,
+	.fcfavs-responce-tip,
 	.fcfavs-is-subscriber,
 	.fcfavs-isnot-subscriber {
 		display: inline-flex;
 		margin: 0 4px;
+		height: auto;
 	}
 
-	.fcfav-reponse-tip {
-		position: relative;
-	}
-	.fcfav-loading,
+	.fcfavs-loading,
 	.fcfavs-result-mssg {
-		position: absolute;
+		position: relative;
 		min-width: 220px;
 		top:0;
 		left:0;
 	}
 
-	.fcfav_icon_box {
+	.fcfavs-icon_box {
 		display: inline-flex;
 
 		img {
 			vertical-align: middle;
 		}
 
-		.fcfav_img_icon {
+		.fcfavs-img_icon {
 			max-width: 28px;
 			max-height: 28px;
 		}
 
-		.fcfav-delete-btn {
+		.fcfavs-delete-btn {
 			padding: 5px 4px 3px 4px;
 			vertical-align: top;
 			cursor: pointer;
 		}
 
-		.fcfav-toggle-btn {
+		.fcfavs-toggle-btn {
 			padding: 0;
 			margin: 0;
 			vertical-align: middle;
@@ -602,7 +601,7 @@ div table.adminform td {
 		[class^="fcfavs"], [class*=" fcfavs"] {
 			font-size: 14px;
 		}
-		[class^="fcfav_icon_"], [class*=" fcfav_icon_"] {
+		[class^="fcfavs-icon_"], [class*=" fcfavs-icon_"] {
 			font-size: 1.4em;
 			margin: 0;
 			display: inline-block;
@@ -612,34 +611,35 @@ div table.adminform td {
 			line-height: 1em;
 			vertical-align: middle;
 		}
-		[class^="fcfav_icon_"]:before, [class*=" fcfav_icon_"]:before {
+		[class^="fcfavs-icon_"]:before, [class*=" fcfavs-icon_"]:before {
 		}
 
-		.fcfav_icon_delete:before {
+		.fcfavs-icon_delete:before {
 			color: black;
 			font-size: 14px;
 		}
-		.fcfav_icon_on:before {
+		.fcfavs-icon_on:before {
 			color: #e0e0e0;
 		}
-		.fcfav_icon_off:before {
+		.fcfavs-icon_off:before {
 			color: darkgray;
 		}
-		.fcfav_icon_login {
+		.fcfavs-icon_login {
 			display: inline-flex;
 			width: 32px;
 			heigth: 32px;
 			padding: 0;
 			margin: 0;
+			cursor: pointer;
 		}
-		.fcfav_icon_login:before {
+		.fcfavs-icon_login:before {
 			opacity: 0.4;
 			filter: alpha(opacity=40);
 			color: darkgray;
 			font-size: 32px;
 			line-height: 32px;
 		}
-		.fcfav_icon_login:after {
+		.fcfavs-icon_login:after {
 			content: "LOGIN";
 			margin: 4px 0 0 -1px;
 			font-size: 9px;
@@ -661,7 +661,7 @@ div table.adminform td {
 		}
 	}
 
-	.favorite-count {
+	.fcfavs-subscribers-count {
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -670,24 +670,15 @@ div table.adminform td {
 		background: #005AF0;
 		color: #FFFFFF;
 
-		padding: var(--fcfav-space-1);
-		margin-left: var(--fcfav-space-1);
+		padding: var(--fcfavs-space-1);
+		margin-left: var(--fcfavs-space-1);
 		position: relative;
 		width: auto;
-		background: var(--fcfav-color-primary);
+		background: var(--fcfavs-color-primary);
 		border-radius: .4em;
-		color: var(--fcfav-color-text-light);
+		color: var(--fcfavs-color-text-light);
 	}
-	.favorite-count.loading {
-		color: #ccc;
-		background: #FAFAFC;
-		background: var(--fcfav-color-bg-light);
-	}
-	.favorite-count.loading:after {
-		border-right-color: #FAFAFC;
-		border-right-color: var(--fcfav-color-bg-light);
-	}
-	.favorite-count:after {
+	.fcfavs-subscribers-count:after {
 		content: '';
 		position: absolute;
 		left: 0;
@@ -700,18 +691,20 @@ div table.adminform td {
 		margin-top: -.5rem;
 		margin-left: -.5rem;
 
-		border: var(--fcfav-space-1) solid transparent;
-		border-right-color: var(--fcfav-color-primary);
+		border: var(--fcfavs-space-1) solid transparent;
+		border-right-color: var(--fcfavs-color-primary);
 		border-left: 0;
-		margin-top: calc(-1 * var(--fcfav-space-1));
-		margin-left: calc(-1 * var(--fcfav-space-1));
+		margin-top: calc(-1 * var(--fcfavs-space-1));
+		margin-left: calc(-1 * var(--fcfavs-space-1));
 	}
 
-	.favorite-button {
+	.fcfavs-btn {
+		display: inline-flex;
+
 		/* some basic button styling */
-		.fcfav-btn-inner {
-			width: 48px;
-			height: 48px;
+		.fcfavs-btn-inner {
+			width: 32px;
+			height: 32px;
 			cursor: pointer;
 			border: none;
 			margin: 0px;
@@ -719,19 +712,16 @@ div table.adminform td {
 			transition: background 300ms ease-in-out;
 			box-sizing: border-box;
 		}
-		amp-list {
-			margin: var(--fcfav-space-2);
-		}
 
-		.heart-fill {
-			/*background: url('data:image/svg+xml;utf8,<svg fill="%23000000" height="48" viewBox="0 0 24 24" width="48" xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none"/><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>');*/
-			background: url('data:image/svg+xml;base64,PHN2ZyBmaWxsPSIlMjMwMDAwMDAiIGhlaWdodD0iNDgiIHZpZXdCb3g9IjAgMCAyNCAyNCIgd2lkdGg9IjQ4IiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik0wIDBoMjR2MjRIMHoiIGZpbGw9Im5vbmUiLz48cGF0aCBkPSJNMTIgMjEuMzVsLTEuNDUtMS4zMkM1LjQgMTUuMzYgMiAxMi4yOCAyIDguNSAyIDUuNDIgNC40MiAzIDcuNSAzYzEuNzQgMCAzLjQxLjgxIDQuNSAyLjA5QzEzLjA5IDMuODEgMTQuNzYgMyAxNi41IDMgMTkuNTggMyAyMiA1LjQyIDIyIDguNWMwIDMuNzgtMy40IDYuODYtOC41NSAxMS41NEwxMiAyMS4zNXoiLz48L3N2Zz4=');
+		.fcfavs-heart-fill {
+			background: url('data:image/svg+xml;base64,PHN2ZyBmaWxsPSIlMjMwMDAwMDAiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAyNCAyNCIgd2lkdGg9IjMyIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik0wIDBoMjR2MjRIMHoiIGZpbGw9Im5vbmUiLz48cGF0aCBkPSJNMTIgMjEuMzVsLTEuNDUtMS4zMkM1LjQgMTUuMzYgMiAxMi4yOCAyIDguNSAyIDUuNDIgNC40MiAzIDcuNSAzYzEuNzQgMCAzLjQxLjgxIDQuNSAyLjA5QzEzLjA5IDMuODEgMTQuNzYgMyAxNi41IDMgMTkuNTggMyAyMiA1LjQyIDIyIDguNWMwIDMuNzgtMy40IDYuODYtOC41NSAxMS41NEwxMiAyMS4zNXoiLz48L3N2Zz4=');
+			/*background: url('data:image/svg+xml;utf8,<svg fill="%23000000" height="32" viewBox="0 0 24 24" width="32" xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none"/><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>');*/
 		}
-		.heart-border {
-			/*background: url('data:image/svg+xml;utf8,<svg fill="%23000000" height="48" viewBox="0 0 24 24" width="48" xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none"/><path d="M16.5 3c-1.74 0-3.41.81-4.5 2.09C10.91 3.81 9.24 3 7.5 3 4.42 3 2 5.42 2 8.5c0 3.78 3.4 6.86 8.55 11.54L12 21.35l1.45-1.32C18.6 15.36 22 12.28 22 8.5 22 5.42 19.58 3 16.5 3zm-4.4 15.55l-.1.1-.1-.1C7.14 14.24 4 11.39 4 8.5 4 6.5 5.5 5 7.5 5c1.54 0 3.04.99 3.57 2.36h1.87C13.46 5.99 14.96 5 16.5 5c2 0 3.5 1.5 3.5 3.5 0 2.89-3.14 5.74-7.9 10.05z"/></svg>');*/
-			background: url('data:image/svg+xml;base64,PHN2ZyBmaWxsPSIlMjMwMDAwMDAiIGhlaWdodD0iNDgiIHZpZXdCb3g9IjAgMCAyNCAyNCIgd2lkdGg9IjQ4IiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik0wIDBoMjR2MjRIMHoiIGZpbGw9Im5vbmUiLz48cGF0aCBkPSJNMTYuNSAzYy0xLjc0IDAtMy40MS44MS00LjUgMi4wOUMxMC45MSAzLjgxIDkuMjQgMyA3LjUgMyA0LjQyIDMgMiA1LjQyIDIgOC41YzAgMy43OCAzLjQgNi44NiA4LjU1IDExLjU0TDEyIDIxLjM1bDEuNDUtMS4zMkMxOC42IDE1LjM2IDIyIDEyLjI4IDIyIDguNSAyMiA1LjQyIDE5LjU4IDMgMTYuNSAzem0tNC40IDE1LjU1bC0uMS4xLS4xLS4xQzcuMTQgMTQuMjQgNCAxMS4zOSA0IDguNSA0IDYuNSA1LjUgNSA3LjUgNWMxLjU0IDAgMy4wNC45OSAzLjU3IDIuMzZoMS44N0MxMy40NiA1Ljk5IDE0Ljk2IDUgMTYuNSA1YzIgMCAzLjUgMS41IDMuNSAzLjUgMCAyLjg5LTMuMTQgNS43NC03LjkgMTAuMDV6Ii8+PC9zdmc+');
+		.fcfavs-heart-border {
+			background: url('data:image/svg+xml;base64,PHN2ZyBmaWxsPSIlMjMwMDAwMDAiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAyNCAyNCIgd2lkdGg9IjMyIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik0wIDBoMjR2MjRIMHoiIGZpbGw9Im5vbmUiLz48cGF0aCBkPSJNMTYuNSAzYy0xLjc0IDAtMy40MS44MS00LjUgMi4wOUMxMC45MSAzLjgxIDkuMjQgMyA3LjUgMyA0LjQyIDMgMiA1LjQyIDIgOC41YzAgMy43OCAzLjQgNi44NiA4LjU1IDExLjU0TDEyIDIxLjM1bDEuNDUtMS4zMkMxOC42IDE1LjM2IDIyIDEyLjI4IDIyIDguNSAyMiA1LjQyIDE5LjU4IDMgMTYuNSAzem0tNC40IDE1LjU1bC0uMS4xLS4xLS4xQzcuMTQgMTQuMjQgNCAxMS4zOSA0IDguNSA0IDYuNSA1LjUgNSA3LjUgNWMxLjU0IDAgMy4wNC45OSAzLjU3IDIuMzZoMS44N0MxMy40NiA1Ljk5IDE0Ljk2IDUgMTYuNSA1YzIgMCAzLjUgMS41IDMuNSAzLjUgMCAyLjg5LTMuMTQgNS43NC03LjkgMTAuMDV6Ii8+PC9zdmc+');
+			/*background: url('data:image/svg+xml;utf8,<svg fill="%23000000" height="32" viewBox="0 0 24 24" width="32" xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none"/><path d="M16.5 3c-1.74 0-3.41.81-4.5 2.09C10.91 3.81 9.24 3 7.5 3 4.42 3 2 5.42 2 8.5c0 3.78 3.4 6.86 8.55 11.54L12 21.35l1.45-1.32C18.6 15.36 22 12.28 22 8.5 22 5.42 19.58 3 16.5 3zm-4.4 15.55l-.1.1-.1-.1C7.14 14.24 4 11.39 4 8.5 4 6.5 5.5 5 7.5 5c1.54 0 3.04.99 3.57 2.36h1.87C13.46 5.99 14.96 5 16.5 5c2 0 3.5 1.5 3.5 3.5 0 2.89-3.14 5.74-7.9 10.05z"/></svg>');*/
 		}
-		.heart-login:after {
+		.fcfavs-heart-login:after {
 			content: "LOGIN";
 			margin: 12px 0 0 6px;
 			font-size: 9px;
@@ -743,7 +733,7 @@ div table.adminform td {
 			color: #bbbbbb;
 			position: absolute;
 		}
-		.heart-delete:hover:after {
+		.fcfavs-heart-delete:hover:after {
 			content: "x";
 			margin: 0 0 0 40px;
 			font-size: 16px;
@@ -754,11 +744,6 @@ div table.adminform td {
 			border-radius: 4px;
 			color: #880000;
 			position: absolute;
-		}
-		/* While the page loads we show a grey heart icon to indicate that the functionality is not yet available. */
-		.heart-loading,
-		.heart-loading[placeholder] {
-			background: url('data:image/svg+xml;utf8,<svg fill="%23cccccc" height="48" viewBox="0 0 24 24" width="48" xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none"/><path d="M16.5 3c-1.74 0-3.41.81-4.5 2.09C10.91 3.81 9.24 3 7.5 3 4.42 3 2 5.42 2 8.5c0 3.78 3.4 6.86 8.55 11.54L12 21.35l1.45-1.32C18.6 15.36 22 12.28 22 8.5 22 5.42 19.58 3 16.5 3zm-4.4 15.55l-.1.1-.1-.1C7.14 14.24 4 11.39 4 8.5 4 6.5 5.5 5 7.5 5c1.54 0 3.04.99 3.57 2.36h1.87C13.46 5.99 14.96 5 16.5 5c2 0 3.5 1.5 3.5 3.5 0 2.89-3.14 5.74-7.9 10.05z"/></svg>');
 		}
 	}
 }

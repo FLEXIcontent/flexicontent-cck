@@ -58,8 +58,7 @@ function FCFav(id, type, add_counter)
 	var osucc_msg_box_start = '<div class="fc-mssg fc-success fc-iblock fc-nobgimage fcfavs-result-mssg" style="z-index:1000; position: relative;">';
 	var _box_start = '<div class="fc-mssg fc-info fc-iblock fc-nobgimage';
 	
-	
-	var divs = jQuery('.fcfav-reponse_'+type+'_'+id);
+	var divs = jQuery('.fcfavs-responce_'+type+'_'+id);
 	if (divs.length)
 	{
 		//divs.html(_box_start + ' fcfavs-loading">' + '<img src="'+live_site+'/components/com_flexicontent/assets/images/ajax-loader.gif" border="0" align="absmiddle" /> ' + Joomla.JText._('FLEXI_LOADING') + '</div>');
@@ -74,7 +73,7 @@ function FCFav(id, type, add_counter)
 			lang: (typeof fc_sef_lang != 'undefined' ? fc_sef_lang : '')
 		},
 		success: function( response ) {
-			var links = jQuery('.favlink_' + type + '_' + id + '.fcfav-toggle-btn');
+			var links = jQuery('.favlink_' + type + '_' + id + '.fcfavs-toggle-btn');
 			if (!divs) return;
 
 			response = response.trim();
@@ -101,15 +100,15 @@ function FCFav(id, type, add_counter)
 			{
 				if (!!!fcfav_toggle_style)  // Bootstrap Toggle
 				{
-					link = '<input data-on="&lt;i class=\'icon-heart fcfav_icon_on\'&gt;&lt;/i&gt;" data-off="&lt;i class=\'icon-heart fcfav_icon_off\'&gt;&lt;/i&gt;" data-toggle="toggle" type="checkbox" value="1" checked="checked" />';
+					link = '<input data-on="&lt;i class=\'icon-heart fcfavs-icon_on\'&gt;&lt;/i&gt;" data-off="&lt;i class=\'icon-heart fcfavs-icon_off\'&gt;&lt;/i&gt;" data-toggle="toggle" type="checkbox" value="1" checked="checked" />';
 				}
 				else if (fcfav_toggle_style == 1)  // Icon Image
 				{
-					link = '<img alt="'+Joomla.JText._('FLEXI_REMOVE_FAVOURITE')+'" src="'+live_site+'/components/com_flexicontent/assets/images/heart_full.png" border="0" class="fcfav_img_icon" />';
+					link = '<img alt="'+Joomla.JText._('FLEXI_REMOVE_FAVOURITE')+'" src="'+live_site+'/components/com_flexicontent/assets/images/heart_full.png" border="0" class="fcfavs-img_icon" />';
 				}
 				else  // Icon CSS
 				{
-					link = '<span class="favorite-button"><span class="fcfav-btn-inner heart-fill"></span>';
+					link = '<span class="fcfavs-btn"><span class="fcfavs-btn-inner fcfavs-heart-fill"></span>';
 				}
 
 				div_status_info = _box_start + ' fcfavs-is-subscriber">' + Joomla.JText._('FLEXI_FAVS_YOU_HAVE_SUBSCRIBED') + '</div>';
@@ -118,15 +117,15 @@ function FCFav(id, type, add_counter)
 			{
 				if (!!!fcfav_toggle_style)  // Bootstrap Toggle
 				{
-					link = '<input data-on="&lt;i class=\'icon-heart fcfav_icon_on\'&gt;&lt;/i&gt;" data-off="&lt;i class=\'icon-heart fcfav_icon_off\'&gt;&lt;/i&gt;" data-toggle="toggle" type="checkbox" value="1" />';
+					link = '<input data-on="&lt;i class=\'icon-heart fcfavs-icon_on\'&gt;&lt;/i&gt;" data-off="&lt;i class=\'icon-heart fcfavs-icon_off\'&gt;&lt;/i&gt;" data-toggle="toggle" type="checkbox" value="1" />';
 				}
 				else if (fcfav_toggle_style == 1)  // Icon Image
 				{
-					link='<img alt="'+Joomla.JText._('FLEXI_FAVOURE')+'" src="'+live_site+'/components/com_flexicontent/assets/images/heart_empty.png" border="0" class="fcfav_img_icon" />';
+					link='<img alt="'+Joomla.JText._('FLEXI_FAVOURE')+'" src="'+live_site+'/components/com_flexicontent/assets/images/heart_empty.png" border="0" class="fcfavs-img_icon" />';
 				}
 				else  // Icon CSS
 				{
-					link = '<span class="favorite-button"><span class="fcfav-btn-inner heart-border"></span>';
+					link = '<span class="fcfavs-btn"><span class="fcfavs-btn-inner fcfavs-heart-border"></span>';
 				}
 
 				div_status_info = _box_start + ' fcfavs-isnot-subscriber">' + Joomla.JText._('FLEXI_FAVS_CLICK_TO_SUBSCRIBE') + '</div>';
@@ -138,15 +137,15 @@ function FCFav(id, type, add_counter)
 
 				if (!!!fcfav_toggle_style)  // Bootstrap Toggle
 				{
-					link = '<input data-on="&lt;i class=\'icon-heart fcfav_icon_on\'&gt;&lt;/i&gt;" data-off="&lt;i class=\'icon-heart fcfav_icon_off\'&gt;&lt;/i&gt;" data-toggle="toggle" type="checkbox" value="1" checked="checked" />';
+					link = '<input data-on="&lt;i class=\'icon-heart fcfavs-icon_on\'&gt;&lt;/i&gt;" data-off="&lt;i class=\'icon-heart fcfavs-icon_off\'&gt;&lt;/i&gt;" data-toggle="toggle" type="checkbox" value="1" checked="checked" />';
 				}
 				else if (fcfav_toggle_style == 1)  // Icon Image
 				{
-					link = '<img alt="'+Joomla.JText._('FLEXI_REMOVE_FAVOURITE')+'" src="'+live_site+'/components/com_flexicontent/assets/images/heart_full.png" border="0" class="fcfav_img_icon" />';
+					link = '<img alt="'+Joomla.JText._('FLEXI_REMOVE_FAVOURITE')+'" src="'+live_site+'/components/com_flexicontent/assets/images/heart_full.png" border="0" class="fcfavs-img_icon" />';
 				}
 				else  // Icon CSS
 				{
-					link = '<span class="favorite-button"><span class="fcfav-btn-inner heart-fill"></span>';
+					link = '<span class="fcfavs-btn"><span class="fcfavs-btn-inner fcfavs-heart-fill"></span>';
 				}
 
 				div_status_info = _box_start + ' fcfavs-is-subscriber">' + Joomla.JText._('FLEXI_FAVS_YOU_HAVE_SUBSCRIBED') + '</div>';
@@ -160,15 +159,15 @@ function FCFav(id, type, add_counter)
 
 				if (!!!fcfav_toggle_style)  // Bootstrap Toggle
 				{
-					link = '<input data-on="&lt;i class=\'icon-heart fcfav_icon_on\'&gt;&lt;/i&gt;" data-off="&lt;i class=\'icon-heart fcfav_icon_off\'&gt;&lt;/i&gt;" data-toggle="toggle" type="checkbox" value="1" />';
+					link = '<input data-on="&lt;i class=\'icon-heart fcfavs-icon_on\'&gt;&lt;/i&gt;" data-off="&lt;i class=\'icon-heart fcfavs-icon_off\'&gt;&lt;/i&gt;" data-toggle="toggle" type="checkbox" value="1" />';
 				}
 				else if (fcfav_toggle_style == 1)  // Icon Image
 				{
-					link = '<img alt="'+Joomla.JText._('FLEXI_FAVOURE')+'" src="'+live_site+'/components/com_flexicontent/assets/images/heart_empty.png" border="0" class="fcfav_img_icon" />';
+					link = '<img alt="'+Joomla.JText._('FLEXI_FAVOURE')+'" src="'+live_site+'/components/com_flexicontent/assets/images/heart_empty.png" border="0" class="fcfavs-img_icon" />';
 				}
 				else  // Icon CSS
 				{
-					link = '<span class="favorite-button"><span class="fcfav-btn-inner heart-border"></span>';
+					link = '<span class="fcfavs-btn"><span class="fcfavs-btn-inner fcfavs-heart-border"></span>';
 				}
 
 				div_status_info = _box_start + ' fcfavs-isnot-subscriber">' + Joomla.JText._('FLEXI_FAVS_CLICK_TO_SUBSCRIBE') + '</div>';
@@ -189,7 +188,7 @@ function FCFav(id, type, add_counter)
 					jQuery(box).fadeOut( fcfav_status_info ? 1800 : 1, function() {
 						jQuery(box).html((fcfav_status_info ? div_status_info : '')).show();
 						if (add_counter && newfavs)
-							jQuery(box).parent().find('.fcfavs-subscribers-count').show().find('.fcfav-counter-num').html(div_user_counter);
+							jQuery(box).parent().find('.fcfavs-subscribers-count').show().find('.fcfavs-counter-num').html(div_user_counter);
 						else
 							jQuery(box).parent().find('.fcfavs-subscribers-count').hide();
 					});
