@@ -48,7 +48,7 @@ if ( $users_list_type )
 
 if (!$userlist)
 {
-	echo '<div class="fc-iblock fcfavs-subscribers-count">[<span class="fcfav-counter-num">' . ($users_counter ? $favourites : '') . '</span>]</div>';
+	echo '<div class="fc-iblock fcfavs-subscribers-count favorite-count"><span class="fcfav-counter-num">' . ($users_counter ? $favourites : '') . '</span></div>';
 }
 else
 {
