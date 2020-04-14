@@ -186,11 +186,11 @@ function FCFav(id, type, add_counter)
 				jQuery.each( divs, function( i, box )
 				{
 					jQuery(box).fadeOut( fcfav_status_info ? 1800 : 1, function() {
-						jQuery(box).html((fcfav_status_info ? div_status_info : '')).show();
+						jQuery(box).html((fcfav_status_info ? div_status_info : '')).css('display', '');
 						if (add_counter && newfavs)
-							jQuery(box).parent().find('.fcfavs-subscribers-count').show().find('.fcfavs-counter-num').html(div_user_counter);
+							jQuery(box).parent().find('.fcfavs-subscribers-count').css('display', '').find('.fcfavs-counter-num').html(div_user_counter);
 						else
-							jQuery(box).parent().find('.fcfavs-subscribers-count').hide();
+							jQuery(box).parent().find('.fcfavs-subscribers-count').css('display', 'none');
 					});
 				});
 			}, fcfav_status_info ? 200 : 1);
