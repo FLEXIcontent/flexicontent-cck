@@ -426,24 +426,33 @@ div table.adminform td {
 	padding-top: 2px;
 	line-height: 100%;
 }
+.fav-block * {
+	line-height: 100%;
+}
 .fav-block .fcfavs-loading,
 .fav-block .fcfavs-result-mssg,
 .fav-block .fcfavs-responce-tip,
 .fav-block .fcfavs-is-subscriber,
 .fav-block .fcfavs-isnot-subscriber {
 	display: inline-flex;
-	margin: 0 4px;
+	margin-left: 4px;
 	height: auto;
 }
 .fav-block .fcfavs-loading,
 .fav-block .fcfavs-result-mssg {
 	position: relative;
-	min-width: 220px;
 	top: 0;
 	left: 0;
 }
+.fav-block .fcfavs-result-mssg {
+	min-width: 220px;
+}
 .fav-block .fcfavs-icon_box {
 	display: inline-flex;
+	line-height: 100%;
+}
+.fav-block .fcfavs-icon_box * {
+	line-height: 100%;
 }
 .fav-block .fcfavs-icon_box img {
 	vertical-align: middle;
@@ -451,6 +460,7 @@ div table.adminform td {
 .fav-block .fcfavs-icon_box .fcfavs-img_icon {
 	max-width: 28px;
 	max-height: 28px;
+	margin: -2px 0 2px 0;
 }
 .fav-block .fcfavs-icon_box .fcfavs-delete-btn {
 	padding: 5px 4px 3px 4px;
@@ -468,6 +478,7 @@ div table.adminform td {
 .fav-block .fcfavs-icon_box [class^="fcfavs"],
 .fav-block .fcfavs-icon_box [class*=" fcfavs"] {
 	font-size: 14px;
+	line-height: 100%;
 }
 .fav-block .fcfavs-icon_box [class^="fcfavs-icon_"],
 .fav-block .fcfavs-icon_box [class*=" fcfavs-icon_"] {
@@ -477,18 +488,21 @@ div table.adminform td {
 	width: 1.4em;
 	height: unset;
 	padding: 0;
-	line-height: 1em;
 	vertical-align: middle;
+	line-height: 100%;
 }
 .fav-block .fcfavs-icon_box .fcfavs-icon_delete:before {
 	color: black;
 	font-size: 14px;
+	line-height: 100%;
 }
 .fav-block .fcfavs-icon_box .fcfavs-icon_on:before {
 	color: #e0e0e0;
+	line-height: 100%;
 }
 .fav-block .fcfavs-icon_box .fcfavs-icon_off:before {
 	color: darkgray;
+	line-height: 100%;
 }
 .fav-block .fcfavs-icon_box .fcfavs-icon_login {
 	display: inline-flex;
@@ -497,17 +511,18 @@ div table.adminform td {
 	padding: 0;
 	margin: 0;
 	cursor: pointer;
+	line-height: 100%;
 }
 .fav-block .fcfavs-icon_box .fcfavs-icon_login:before {
 	opacity: 0.4;
 	filter: alpha(opacity=40);
 	color: darkgray;
 	font-size: 32px;
-	line-height: 32px;
+	line-height: 100%;
 }
 .fav-block .fcfavs-icon_box .fcfavs-icon_login:after {
 	content: "LOGIN";
-	margin: 4px 0 0 -1px;
+	margin: 8px 0 0 -1px;
 	font-size: 9px;
 	display: inline-block;
 	font-weight: bold;
@@ -516,6 +531,7 @@ div table.adminform td {
 	border-radius: 4px;
 	color: #bbbbbb;
 	position: absolute;
+	line-height: 100%;
 }
 .fav-block .fcfavs-icon_box .toggle {
 	box-sizing: content-box;
@@ -559,10 +575,14 @@ div table.adminform td {
 }
 .fav-block .fcfavs-btn {
 	display: inline-flex;
+	line-height: 100%;
+}
+.fav-block .fcfavs-btn * {
+	line-height: 100%;
 }
 .fav-block .fcfavs-btn .fcfavs-btn-inner {
-	width: 32px;
-	height: 32px;
+	width: 38px;
+	height: 38px;
 	cursor: pointer;
 	border: none;
 	margin: 0px;
@@ -571,14 +591,22 @@ div table.adminform td {
 	box-sizing: border-box;
 }
 .fav-block .fcfavs-btn .fcfavs-heart-fill {
-	background: url('data:image/svg+xml;base64,PHN2ZyBmaWxsPSIlMjMwMDAwMDAiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAyNCAyNCIgd2lkdGg9IjMyIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik0wIDBoMjR2MjRIMHoiIGZpbGw9Im5vbmUiLz48cGF0aCBkPSJNMTIgMjEuMzVsLTEuNDUtMS4zMkM1LjQgMTUuMzYgMiAxMi4yOCAyIDguNSAyIDUuNDIgNC40MiAzIDcuNSAzYzEuNzQgMCAzLjQxLjgxIDQuNSAyLjA5QzEzLjA5IDMuODEgMTQuNzYgMyAxNi41IDMgMTkuNTggMyAyMiA1LjQyIDIyIDguNWMwIDMuNzgtMy40IDYuODYtOC41NSAxMS41NEwxMiAyMS4zNXoiLz48L3N2Zz4=');
+	background: url('data:image/svg+xml;base64,PHN2ZyBmaWxsPSIlMjMwMDAwMDAiIGhlaWdodD0iMzgiIHZpZXdCb3g9IjAgMCAyNCAyNCIgd2lkdGg9IjM4IiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik0wIDBoMjR2MjRIMHoiIGZpbGw9Im5vbmUiLz48cGF0aCBkPSJNMTIgMjEuMzVsLTEuNDUtMS4zMkM1LjQgMTUuMzYgMiAxMi4yOCAyIDguNSAyIDUuNDIgNC40MiAzIDcuNSAzYzEuNzQgMCAzLjQxLjgxIDQuNSAyLjA5QzEzLjA5IDMuODEgMTQuNzYgMyAxNi41IDMgMTkuNTggMyAyMiA1LjQyIDIyIDguNWMwIDMuNzgtMy40IDYuODYtOC41NSAxMS41NEwxMiAyMS4zNXoiLz48L3N2Zz4=');
 }
 .fav-block .fcfavs-btn .fcfavs-heart-border {
-	background: url('data:image/svg+xml;base64,PHN2ZyBmaWxsPSIlMjMwMDAwMDAiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAyNCAyNCIgd2lkdGg9IjMyIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik0wIDBoMjR2MjRIMHoiIGZpbGw9Im5vbmUiLz48cGF0aCBkPSJNMTYuNSAzYy0xLjc0IDAtMy40MS44MS00LjUgMi4wOUMxMC45MSAzLjgxIDkuMjQgMyA3LjUgMyA0LjQyIDMgMiA1LjQyIDIgOC41YzAgMy43OCAzLjQgNi44NiA4LjU1IDExLjU0TDEyIDIxLjM1bDEuNDUtMS4zMkMxOC42IDE1LjM2IDIyIDEyLjI4IDIyIDguNSAyMiA1LjQyIDE5LjU4IDMgMTYuNSAzem0tNC40IDE1LjU1bC0uMS4xLS4xLS4xQzcuMTQgMTQuMjQgNCAxMS4zOSA0IDguNSA0IDYuNSA1LjUgNSA3LjUgNWMxLjU0IDAgMy4wNC45OSAzLjU3IDIuMzZoMS44N0MxMy40NiA1Ljk5IDE0Ljk2IDUgMTYuNSA1YzIgMCAzLjUgMS41IDMuNSAzLjUgMCAyLjg5LTMuMTQgNS43NC03LjkgMTAuMDV6Ii8+PC9zdmc+');
+	background: url('data:image/svg+xml;base64,PHN2ZyBmaWxsPSIlMjMwMDAwMDAiIGhlaWdodD0iMzgiIHZpZXdCb3g9IjAgMCAyNCAyNCIgd2lkdGg9IjM4IiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik0wIDBoMjR2MjRIMHoiIGZpbGw9Im5vbmUiLz48cGF0aCBkPSJNMTYuNSAzYy0xLjc0IDAtMy40MS44MS00LjUgMi4wOUMxMC45MSAzLjgxIDkuMjQgMyA3LjUgMyA0LjQyIDMgMiA1LjQyIDIgOC41YzAgMy43OCAzLjQgNi44NiA4LjU1IDExLjU0TDEyIDIxLjM1bDEuNDUtMS4zMkMxOC42IDE1LjM2IDIyIDEyLjI4IDIyIDguNSAyMiA1LjQyIDE5LjU4IDMgMTYuNSAzem0tNC40IDE1LjU1bC0uMS4xLS4xLS4xQzcuMTQgMTQuMjQgNCAxMS4zOSA0IDguNSA0IDYuNSA1LjUgNSA3LjUgNWMxLjU0IDAgMy4wNC45OSAzLjU3IDIuMzZoMS44N0MxMy40NiA1Ljk5IDE0Ljk2IDUgMTYuNSA1YzIgMCAzLjUgMS41IDMuNSAzLjUgMCAyLjg5LTMuMTQgNS43NC03LjkgMTAuMDV6Ii8+PC9zdmc+');
+}
+.fav-block .fcfavs-btn .fcfavs-heart-fill,
+.fav-block .fcfavs-btn .fcfavs-heart-border,
+.fav-block .fcfavs-btn .fcfavs-heart-fill:before,
+.fav-block .fcfavs-btn .fcfavs-heart-border:before,
+.fav-block .fcfavs-btn .fcfavs-heart-login,
+.fav-block .fcfavs-btn .fcfavs-heart-delete {
+	line-height: 100%;
 }
 .fav-block .fcfavs-btn .fcfavs-heart-login:after {
 	content: "LOGIN";
-	margin: 12px 0 0 6px;
+	margin: 12px 0 0 2px;
 	font-size: 9px;
 	display: inline-block;
 	font-weight: bold;
@@ -587,6 +615,7 @@ div table.adminform td {
 	border-radius: 4px;
 	color: #bbbbbb;
 	position: absolute;
+	line-height: 100%;
 }
 .fav-block .fcfavs-btn .fcfavs-heart-delete:hover:after {
 	content: "x";
@@ -599,6 +628,7 @@ div table.adminform td {
 	border-radius: 4px;
 	color: #880000;
 	position: absolute;
+	line-height: 100%;
 }
 div.comments {
 	margin-top: 15px;

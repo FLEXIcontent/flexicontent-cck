@@ -552,6 +552,10 @@ div table.adminform td {
 	position: relative;
 	padding-top: 2px;
 	line-height: 100%;
+	
+	* {
+		line-height: 100%;
+	}
 
 	.fcfavs-loading,
 	.fcfavs-result-mssg,
@@ -559,20 +563,27 @@ div table.adminform td {
 	.fcfavs-is-subscriber,
 	.fcfavs-isnot-subscriber {
 		display: inline-flex;
-		margin: 0 4px;
+		margin-left: 4px;
 		height: auto;
 	}
 
 	.fcfavs-loading,
 	.fcfavs-result-mssg {
 		position: relative;
-		min-width: 220px;
 		top:0;
 		left:0;
+	}
+	.fcfavs-result-mssg {
+		min-width: 220px;
 	}
 
 	.fcfavs-icon_box {
 		display: inline-flex;
+		line-height: 100%;
+
+		* {
+			line-height: 100%;
+		}
 
 		img {
 			vertical-align: middle;
@@ -581,6 +592,7 @@ div table.adminform td {
 		.fcfavs-img_icon {
 			max-width: 28px;
 			max-height: 28px;
+			margin: -2px 0 2px 0;
 		}
 
 		.fcfavs-delete-btn {
@@ -600,6 +612,7 @@ div table.adminform td {
 
 		[class^="fcfavs"], [class*=" fcfavs"] {
 			font-size: 14px;
+			line-height: 100%;
 		}
 		[class^="fcfavs-icon_"], [class*=" fcfavs-icon_"] {
 			font-size: 1.4em;
@@ -608,8 +621,8 @@ div table.adminform td {
 			width: 1.4em;
 			height: unset;
 			padding: 0;
-			line-height: 1em;
 			vertical-align: middle;
+			line-height: 100%;
 		}
 		[class^="fcfavs-icon_"]:before, [class*=" fcfavs-icon_"]:before {
 		}
@@ -617,12 +630,15 @@ div table.adminform td {
 		.fcfavs-icon_delete:before {
 			color: black;
 			font-size: 14px;
+			line-height: 100%;
 		}
 		.fcfavs-icon_on:before {
 			color: #e0e0e0;
+			line-height: 100%;
 		}
 		.fcfavs-icon_off:before {
 			color: darkgray;
+			line-height: 100%;
 		}
 		.fcfavs-icon_login {
 			display: inline-flex;
@@ -631,17 +647,18 @@ div table.adminform td {
 			padding: 0;
 			margin: 0;
 			cursor: pointer;
+			line-height: 100%;
 		}
 		.fcfavs-icon_login:before {
 			opacity: 0.4;
 			filter: alpha(opacity=40);
 			color: darkgray;
 			font-size: 32px;
-			line-height: 32px;
+			line-height: 100%;
 		}
 		.fcfavs-icon_login:after {
 			content: "LOGIN";
-			margin: 4px 0 0 -1px;
+			margin: 8px 0 0 -1px;
 			font-size: 9px;
 			display: inline-block;
 			font-weight: bold;
@@ -650,6 +667,7 @@ div table.adminform td {
 			border-radius: 4px;
 			color: #bbbbbb;
 			position: absolute;
+			line-height: 100%;
 		}
 
 		.toggle {
@@ -700,11 +718,16 @@ div table.adminform td {
 
 	.fcfavs-btn {
 		display: inline-flex;
+		line-height: 100%;
+
+		* {
+			line-height: 100%;
+		}
 
 		/* some basic button styling */
 		.fcfavs-btn-inner {
-			width: 32px;
-			height: 32px;
+			width: 38px;
+			height: 38px;
 			cursor: pointer;
 			border: none;
 			margin: 0px;
@@ -714,16 +737,25 @@ div table.adminform td {
 		}
 
 		.fcfavs-heart-fill {
-			background: url('data:image/svg+xml;base64,PHN2ZyBmaWxsPSIlMjMwMDAwMDAiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAyNCAyNCIgd2lkdGg9IjMyIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik0wIDBoMjR2MjRIMHoiIGZpbGw9Im5vbmUiLz48cGF0aCBkPSJNMTIgMjEuMzVsLTEuNDUtMS4zMkM1LjQgMTUuMzYgMiAxMi4yOCAyIDguNSAyIDUuNDIgNC40MiAzIDcuNSAzYzEuNzQgMCAzLjQxLjgxIDQuNSAyLjA5QzEzLjA5IDMuODEgMTQuNzYgMyAxNi41IDMgMTkuNTggMyAyMiA1LjQyIDIyIDguNWMwIDMuNzgtMy40IDYuODYtOC41NSAxMS41NEwxMiAyMS4zNXoiLz48L3N2Zz4=');
-			/*background: url('data:image/svg+xml;utf8,<svg fill="%23000000" height="32" viewBox="0 0 24 24" width="32" xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none"/><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>');*/
+			background: url('data:image/svg+xml;base64,PHN2ZyBmaWxsPSIlMjMwMDAwMDAiIGhlaWdodD0iMzgiIHZpZXdCb3g9IjAgMCAyNCAyNCIgd2lkdGg9IjM4IiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik0wIDBoMjR2MjRIMHoiIGZpbGw9Im5vbmUiLz48cGF0aCBkPSJNMTIgMjEuMzVsLTEuNDUtMS4zMkM1LjQgMTUuMzYgMiAxMi4yOCAyIDguNSAyIDUuNDIgNC40MiAzIDcuNSAzYzEuNzQgMCAzLjQxLjgxIDQuNSAyLjA5QzEzLjA5IDMuODEgMTQuNzYgMyAxNi41IDMgMTkuNTggMyAyMiA1LjQyIDIyIDguNWMwIDMuNzgtMy40IDYuODYtOC41NSAxMS41NEwxMiAyMS4zNXoiLz48L3N2Zz4=');
+			/*background: url('data:image/svg+xml;utf8,<svg fill="%23000000" height="38" viewBox="0 0 24 24" width="38" xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none"/><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>');*/
 		}
 		.fcfavs-heart-border {
-			background: url('data:image/svg+xml;base64,PHN2ZyBmaWxsPSIlMjMwMDAwMDAiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAyNCAyNCIgd2lkdGg9IjMyIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik0wIDBoMjR2MjRIMHoiIGZpbGw9Im5vbmUiLz48cGF0aCBkPSJNMTYuNSAzYy0xLjc0IDAtMy40MS44MS00LjUgMi4wOUMxMC45MSAzLjgxIDkuMjQgMyA3LjUgMyA0LjQyIDMgMiA1LjQyIDIgOC41YzAgMy43OCAzLjQgNi44NiA4LjU1IDExLjU0TDEyIDIxLjM1bDEuNDUtMS4zMkMxOC42IDE1LjM2IDIyIDEyLjI4IDIyIDguNSAyMiA1LjQyIDE5LjU4IDMgMTYuNSAzem0tNC40IDE1LjU1bC0uMS4xLS4xLS4xQzcuMTQgMTQuMjQgNCAxMS4zOSA0IDguNSA0IDYuNSA1LjUgNSA3LjUgNWMxLjU0IDAgMy4wNC45OSAzLjU3IDIuMzZoMS44N0MxMy40NiA1Ljk5IDE0Ljk2IDUgMTYuNSA1YzIgMCAzLjUgMS41IDMuNSAzLjUgMCAyLjg5LTMuMTQgNS43NC03LjkgMTAuMDV6Ii8+PC9zdmc+');
-			/*background: url('data:image/svg+xml;utf8,<svg fill="%23000000" height="32" viewBox="0 0 24 24" width="32" xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none"/><path d="M16.5 3c-1.74 0-3.41.81-4.5 2.09C10.91 3.81 9.24 3 7.5 3 4.42 3 2 5.42 2 8.5c0 3.78 3.4 6.86 8.55 11.54L12 21.35l1.45-1.32C18.6 15.36 22 12.28 22 8.5 22 5.42 19.58 3 16.5 3zm-4.4 15.55l-.1.1-.1-.1C7.14 14.24 4 11.39 4 8.5 4 6.5 5.5 5 7.5 5c1.54 0 3.04.99 3.57 2.36h1.87C13.46 5.99 14.96 5 16.5 5c2 0 3.5 1.5 3.5 3.5 0 2.89-3.14 5.74-7.9 10.05z"/></svg>');*/
+			background: url('data:image/svg+xml;base64,PHN2ZyBmaWxsPSIlMjMwMDAwMDAiIGhlaWdodD0iMzgiIHZpZXdCb3g9IjAgMCAyNCAyNCIgd2lkdGg9IjM4IiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik0wIDBoMjR2MjRIMHoiIGZpbGw9Im5vbmUiLz48cGF0aCBkPSJNMTYuNSAzYy0xLjc0IDAtMy40MS44MS00LjUgMi4wOUMxMC45MSAzLjgxIDkuMjQgMyA3LjUgMyA0LjQyIDMgMiA1LjQyIDIgOC41YzAgMy43OCAzLjQgNi44NiA4LjU1IDExLjU0TDEyIDIxLjM1bDEuNDUtMS4zMkMxOC42IDE1LjM2IDIyIDEyLjI4IDIyIDguNSAyMiA1LjQyIDE5LjU4IDMgMTYuNSAzem0tNC40IDE1LjU1bC0uMS4xLS4xLS4xQzcuMTQgMTQuMjQgNCAxMS4zOSA0IDguNSA0IDYuNSA1LjUgNSA3LjUgNWMxLjU0IDAgMy4wNC45OSAzLjU3IDIuMzZoMS44N0MxMy40NiA1Ljk5IDE0Ljk2IDUgMTYuNSA1YzIgMCAzLjUgMS41IDMuNSAzLjUgMCAyLjg5LTMuMTQgNS43NC03LjkgMTAuMDV6Ii8+PC9zdmc+');
+			/*background: url('data:image/svg+xml;utf8,<svg fill="%23000000" height="38" viewBox="0 0 24 24" width="38" xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none"/><path d="M16.5 3c-1.74 0-3.41.81-4.5 2.09C10.91 3.81 9.24 3 7.5 3 4.42 3 2 5.42 2 8.5c0 3.78 3.4 6.86 8.55 11.54L12 21.35l1.45-1.32C18.6 15.36 22 12.28 22 8.5 22 5.42 19.58 3 16.5 3zm-4.4 15.55l-.1.1-.1-.1C7.14 14.24 4 11.39 4 8.5 4 6.5 5.5 5 7.5 5c1.54 0 3.04.99 3.57 2.36h1.87C13.46 5.99 14.96 5 16.5 5c2 0 3.5 1.5 3.5 3.5 0 2.89-3.14 5.74-7.9 10.05z"/></svg>');*/
+		}
+
+		.fcfavs-heart-fill,
+		.fcfavs-heart-border,
+		.fcfavs-heart-fill:before,
+		.fcfavs-heart-border:before,
+		.fcfavs-heart-login,
+		.fcfavs-heart-delete {
+			line-height: 100%;
 		}
 		.fcfavs-heart-login:after {
 			content: "LOGIN";
-			margin: 12px 0 0 6px;
+			margin: 12px 0 0 2px;
 			font-size: 9px;
 			display: inline-block;
 			font-weight: bold;
@@ -732,6 +764,7 @@ div table.adminform td {
 			border-radius: 4px;
 			color: #bbbbbb;
 			position: absolute;
+			line-height: 100%;
 		}
 		.fcfavs-heart-delete:hover:after {
 			content: "x";
@@ -744,6 +777,7 @@ div table.adminform td {
 			border-radius: 4px;
 			color: #880000;
 			position: absolute;
+			line-height: 100%;
 		}
 	}
 }

@@ -42,7 +42,7 @@ if ( $users_list_type )
       $_list[] = $favuser;
       if ($count++ >= $users_list_limit) break;
     }
-    $userlist = ($users_counter ? ': ' : '') . implode(', ', $_list) . (count($favusers) > $users_list_limit ? ' ...' : '');
+    $userlist = implode(', ', $_list) . (count($favusers) > $users_list_limit ? ' ...' : '');
   }
 }
 
@@ -53,8 +53,7 @@ if (!$userlist)
 else
 {
 	echo '
-  <div class="fc-mssg fc-info fc-iblock fc-nobgimage fcfavs-subscribers-count">
-    ' . ($users_counter ? JText::_('FLEXI_TOTAL').': <span class="fcfavs-counter-num">' . $favourites . '</span> '.JText::_('FLEXI_USERS') : '') . '
-    ' . $userlist . '
+  <div class="fc-iblock fcfavs-subscribers-count">
+    ' . ($users_counter ? '<span class="fcfavs-counter-num">' . $favourites . '</span> &nbsp;' : '') . '[' . $userlist . ']
   </div>';
 }
