@@ -98,6 +98,8 @@ class modFlexigooglemapHelper
 		if ($params->get('catidmode') == 0)
 		{
 			$itemsLocations = modFlexigooglemapHelper::getItemsLocations($params);
+			$itemsLocations = $itemsLocations ?: array();
+
 			foreach ($itemsLocations as $itemLoc)
 			{
 				// Skip empty value
