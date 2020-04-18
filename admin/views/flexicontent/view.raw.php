@@ -65,7 +65,7 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 		$com_xml = JInstaller::parseXMLInstallFile( $manifest_path );
 		
 		// Version checking URL
-		$url = 'http://www.flexicontent.org/flexicontent_update.xml';
+		$url = 'https://www.flexicontent.org/flexicontent_update.xml';
 		$data = '';
 		$check = array();
 		$check['connect'] = 0;
