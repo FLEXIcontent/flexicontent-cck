@@ -3258,9 +3258,9 @@ class FlexicontentFields
 			$isRange = true;
 		}
 
-		$require_all_param = $filter->parameters->get( 'filter_values_require_all', 0 );
-		$require_all_values = is_array($value) && count($value) > 1 && !$isRange   // prevent require_all for known ranges
-			? $require_all_param
+		$require_all_values = $filter->parameters->get( 'filter_values_require_all', 0 );
+		$require_all_in_SQL = is_array($value) && count($value) > 1 && !$isRange   // prevent require_all for known ranges
+			? $require_all_values
 			: 0;
 		//echo "createFilterValueMatchSQL : filter name: ".$filter->name." Filter Type: ".$display_filter_as." Values: "; print_r($value); echo "<br>";
 
@@ -3374,7 +3374,7 @@ class FlexicontentFields
 		{
 			$value_clauses = array();
 
-			if (!$require_all_values)
+			if (!$require_all_in_SQL)
 			{
 				foreach ($value as $val)
 				{
@@ -3493,12 +3493,12 @@ class FlexicontentFields
 		// Decide to require all values
 
 		$isRange = in_array( $display_filter_as, array(2,3,8) );
-		$require_all_param = $filter->parameters->get( 'filter_values_require_all', 0 );
-		$require_all_values = is_array($value) && count($value) > 1 && !$isRange   // prevent require_all for known ranges
-			? $require_all_param
+		$require_all_values = $filter->parameters->get( 'filter_values_require_all', 0 );
+		$require_all_in_SQL = is_array($value) && count($value) > 1 && !$isRange   // prevent require_all for known ranges
+			? $require_all_values
 			: 0;
 
-		$query = 'SELECT '.($require_all_values ? $idname : 'DISTINCT ' . $idname);
+		$query = 'SELECT '.($require_all_in_SQL ? $idname : 'DISTINCT ' . $idname);
 
 		// We have a special values join, by default, select from the content table
 		if ($valuesjoin)
@@ -3520,13 +3520,15 @@ class FlexicontentFields
 		// TEST FILTER VALUE MATCH SQL
 		//echo $filter->label . '<pre>' . $query . '</pre>';
 
-		if ($require_all_values && count($value) > 1)
+		if ($require_all_in_SQL)
 		{
-			// Do not use distinct on column, it makes it is very slow, despite column having an index !!
-			// e.g. HAVING COUNT(DISTINCT colname) = ...
-			// Instead the field code should make sure that no duplicate values are saved in the DB !!
+			/*
+			 * Faceted filter calculation when all values required
+			 * Use HAVING COUNT(DISTINCT value), only if require all is enabled
+			 * this because the query is slower
+			 */
 			$query .= ''
-				. ' GROUP BY ' . $idname . ' HAVING COUNT(*) >= ' . count($value)
+				. ' GROUP BY ' . $idname . ' HAVING COUNT(DISTINCT value) >= ' . count($value)
 				. ' ORDER BY NULL';  // THIS should remove filesort in MySQL, and improve performance issue of REQUIRE ALL
 		}
 
@@ -3597,9 +3599,9 @@ class FlexicontentFields
 		$isRange = in_array( $display_filter_as, array(2,3,8) );
 		$isTextInput = $display_filter_as==1 || $display_filter_as==3;
 
-		$require_all_param = $filter->parameters->get( 'filter_values_require_all', 0 );
-		$require_all_values = is_array($value) && count($value) > 1 && !$isRange   // prevent require_all for known ranges
-			? $require_all_param
+		$require_all_values = $filter->parameters->get( 'filter_values_require_all', 0 );
+		$require_all_in_SQL = is_array($value) && count($value) > 1 && !$isRange   // prevent require_all for known ranges
+			? $require_all_values
 			: 0;
 
 		$colname = (!empty($filter->isindexed) && !$isTextInput) || $isDate
@@ -3618,17 +3620,19 @@ class FlexicontentFields
 		$field_tbl = $tbl_exists ? $field_tbl : 'flexicontent_advsearch_index';
 
 		// Get ALL items that have such values for the given field
-		$query = 'SELECT '.($require_all_values ? 'fs.item_id' : 'DISTINCT fs.item_id')
+		$query = 'SELECT '.($require_all_in_SQL ? 'fs.item_id' : 'DISTINCT fs.item_id')
 			.' FROM #__'.$field_tbl.' AS fs'
 			.' WHERE fs.field_id=' . $filter->id
 			. $valueswhere ;
-		if ($require_all_values && count($value) > 1)
+		if ($require_all_in_SQL)
 		{
-			// Do not use distinct on column, it makes it is very slow, despite column having an index !!
-			// e.g. HAVING COUNT(DISTINCT colname) = ...
-			// Instead the field code should make sure that no duplicate values are saved in the DB !!
+			/*
+			 * Faceted filter calculation when all values required
+			 * Use HAVING COUNT(DISTINCT value), only if require all is enabled
+			 * this because the query is slower
+			 */
 			$query .= ''
-				. ' GROUP BY fs.item_id ' . ' HAVING COUNT(*) >= ' . count($value)
+				. ' GROUP BY fs.item_id ' . ' HAVING COUNT(DISTINCT value) >= ' . count($value)
 				. ' ORDER BY NULL';  // THIS should remove filesort in MySQL, and improve performance issue of REQUIRE ALL
 		}
 		//echo 'Filter ['. $filter->label .']: '. $query."<br/><br/>\n";
@@ -3735,9 +3739,9 @@ class FlexicontentFields
 		}
 
 		$isRange = in_array( $display_filter_as, array(2,3,8) );
-		$require_all_param = $filter->parameters->get( 'filter_values_require_all', 0 );
-		$require_all_values = is_array($value) && count($value) > 1 && !$isRange   // prevent require_all for known ranges
-			? $require_all_param
+		$require_all_values = $filter->parameters->get( 'filter_values_require_all', 0 );
+		$require_all_in_SQL = is_array($value) && count($value) > 1 && !$isRange   // prevent require_all for known ranges
+			? $require_all_values
 			: 0;
 
 		$show_matching_items = $filter->parameters->get( 'show_matching_items'.$_s, 1 );
@@ -3859,14 +3863,24 @@ class FlexicontentFields
 
 				elseif ($view_total <= $faceted_max_item_limit)
 				{
-					// DO NOT cache at this point the filter combinations are endless, so they will produce big amounts of cached data, that will be rarely used ...
-					// but if only a single filter is active we can get the cached result of it ... because its own filter_where is not used for the filter itself
-					if ( !$text_search && (count($filters_where)==0 || (count($filters_where)==1 && isset($filters_where[$filter->id]))) )
+					/**
+					 * DO NOT cache at this point the filter combinations are endless,
+					 * so they will produce big amounts of cached data, that will be rarely used ...
+					 * but if only a single filter is active we can get the cached result of it ...
+					 * because its own filter_where is not used for the filter itself
+					 */
+					if (!$text_search && (count($filters_where)==0 || (count($filters_where)==1 && isset($filters_where[$filter->id] )&& !$require_all_values)))
+					{
 						$results_active = $results_page;
-					else if (!$isSearchView)
+					}
+					elseif (!$isSearchView)
+					{
 						$results_active = FlexicontentFields::createFilterValues($filter, $view_join_n_text, $view_where, $filters_where, $indexed_elements, $search_prop, $lang_code);
+					}
 					else
+					{
 						$results_active = FlexicontentFields::createFilterValuesSearch($filter, $view_join_n_text, $view_where, $filters_where, $indexed_elements, $search_prop, $lang_code);
+					}
 				}
 
 				elseif ($faceted_overlimit_msg === null)
@@ -4318,12 +4332,16 @@ class FlexicontentFields
 		//echo "<pre>"; debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS); echo "</pre>";
 		$db = JFactory::getDbo();
 
+		$require_all_values = (int) $filter->parameters->get('filter_values_require_all', 0);
 		$filter_where_curr = '';
 		foreach ($filters_where as $filter_id => $filter_where)
 		{
-			if ($filter_id != $filter->id)  $filter_where_curr .= ' ' . $filter_where;
+			if ($require_all_values || $filter_id != $filter->id)
+			{
+				$filter_where_curr .= ' ' . $filter_where;
+			}
 		}
-		//echo "filter_where_curr : ". $filter_where_curr ."<br/>";
+		//echo $filter->name . ' - require_all_values'  . (int)$require_all_values . " - filter_where_curr : ". $filter_where_curr ."<br/>";
 
 		// partial SQL clauses
 		$valuesselect = !empty($filter->filter_valuesselect)
@@ -4508,10 +4526,14 @@ class FlexicontentFields
 		$app = JFactory::getApplication();
 		$db  = JFactory::getDbo();
 
+		$require_all_values = (int) $filter->parameters->get('filter_values_require_all', 0);
 		$filter_where_curr = '';
 		foreach ($filters_where as $filter_id => $filter_where)
 		{
-			if ($filter_id != $filter->id)  $filter_where_curr .= ' ' . $filter_where;
+			if ($require_all_values || $filter_id != $filter->id)
+			{
+				$filter_where_curr .= ' ' . $filter_where;
+			}
 		}
 
 		$isDate = in_array($filter->field_type, array('date','created','modified')) || $filter->parameters->get('isdate',0);
