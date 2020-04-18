@@ -2565,6 +2565,18 @@ class FlexicontentModelCategory extends JModelLegacy {
 						. ' FROM #__flexicontent_tags_item_relations'
 						. ' WHERE tid IN ('. implode(",", $values) .')';  // no db quoting needed since these were typecasted to ints
 						;
+					$require_all_values = $filter->parameters->get('filter_values_require_all', 0);
+
+					if ($require_all_values && count($values) > 1)
+					{
+						// Do not use distinct on column, it makes it is very slow, despite column having an index !!
+						// e.g. HAVING COUNT(DISTINCT colname) = ...
+						// Instead the field code should make sure that no duplicate values are saved in the DB !!
+						$query .= ''
+							. ' GROUP BY itemid HAVING COUNT(*) >= ' . count($values)
+							. ' ORDER BY NULL';  // THIS should remove filesort in MySQL, and improve performance issue of REQUIRE ALL
+					}
+
 				//$filter_query = ' AND tag.tid IN ('. implode(",", $values) .')';
 				break;
 
