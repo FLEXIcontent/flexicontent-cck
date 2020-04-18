@@ -715,6 +715,11 @@ class plgFlexicontent_fieldsCore extends FCField
 				$cids   = $app->input->get('cids', array(), 'array');
 				$cids   = ArrayHelper::toInteger($cids);
 
+				if (count($cids) === 1 && reset($cids) == 0)
+				{
+					$cids = array();
+				}
+
 				$cats = array();
 
 				if ($option=='com_flexicontent' && $view=='category' && (count($cids) || $cid))
@@ -742,35 +747,22 @@ class plgFlexicontent_fieldsCore extends FCField
 						$display_filter_as = 0;
 					}
 
+					$filter_depth = (int) $filter->parameters->get('filter_depth' . $_s, 1);
+					
+					$start_depth = 10000;
+					foreach($cids as $_cid)
+					{
+						$start_depth = $globalcats[$_cid]->level < $start_depth ? $globalcats[$_cid]->level : $start_depth;
+					}
+
+					// Do not add root category of single category sub-tree to the filter
+					$add_root = count($cids) > 1;
+					$start_depth = count($cids) === 1 && $filter_depth === 1 ? 10000 : $start_depth;
+
 					// Loop through given categories, adding them and their immediate sub-categories
 					foreach($cids as $_cid)
 					{
-						if (!isset($globalcats[$_cid]))
-						{
-							continue;
-						}
-
-						// Do not add root category of single category sub-tree to the filter
-						if ( count($cids) > 1 )
-						{
-							$cat_obj = new stdClass();
-							$cat_obj->id = $globalcats[$_cid]->id;
-							$cat_obj->treename = $globalcats[$_cid]->title;  // Make first-level categories look as if at first level, thus do not use: $globalcats[$_cid]->treename;
-							$cat_obj->totalitems = $globalcats[$_cid]->totalitems;
-							$cats[] = $cat_obj;
-						}
-
-						if ( empty($globalcats[$_cid]->childrenarray))
-						{
-							continue;
-						}
-
-						foreach($globalcats[$_cid]->childrenarray as $child)
-						{
-							$_child = clone($child);
-							$_child->treename = ($display_filter_as === 0 ? ' . ' : '') . $_child->title;
-							$cats[] = $_child;
-						}
+						$this->_catTreeRecurse($_cid, $cats, $display_filter_as, $add_root, $start_depth, $filter_depth);
 					}
 				}
 
@@ -1225,4 +1217,59 @@ class plgFlexicontent_fieldsCore extends FCField
 		return $values;
 	}
 
+	private function _catTreeRecurse($_cid, &$cats, $display_filter_as, $add_root, $start_depth, $filter_depth)
+	{
+		global $globalcats;
+
+		if (!isset($globalcats[$_cid]))
+		{
+			return;
+		}
+
+		// Add root category
+		if ($add_root)
+		{
+			$cat = clone($globalcats[$_cid]);
+
+			// Trim paddings as much as possible !
+			if ($start_depth > 0)
+			{
+				$cat->treename = preg_replace('/ \. /', '', $cat->treename, $start_depth);
+			}
+			$cat->treename = str_replace('<sup>|_</sup> ', '', $cat->treename);
+
+			$cats[] = $cat;
+		}
+
+		if ($filter_depth <= 0 || empty($globalcats[$_cid]->childrenarray))
+		{
+			return;
+		}
+
+		--$filter_depth;
+
+		foreach($globalcats[$_cid]->childrenarray as $child)
+		{
+			// Root category is included in childrenarray, skip it !!
+			if ($child->id == $_cid)
+			{
+				continue;
+			}
+
+			$cat = clone($child);
+
+			// Trim paddings as much as possible !
+			if ($start_depth > 0)
+			{
+				$cat->treename = preg_replace('/ \. /', '', $cat->treename, $start_depth);
+			}
+			$cat->treename = str_replace('<sup>|_</sup> ', '', $cat->treename);
+
+			$cats[] = $cat;
+			if (!empty($cat->childrenarray))
+			{
+				$this->_catTreeRecurse($cat->id, $cats, $display_filter_as, 0, $start_depth, $filter_depth);
+			}
+		}
+	}
 }
