@@ -64,9 +64,12 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_reviews` (
   `user_id` int(11) NOT NULL DEFAULT '0',
   `email` varchar(255) NOT NULL DEFAULT '',
   `title` varchar(255) NULL,
+  `title_old` varchar(255) NULL,
   `text` mediumtext NULL,
+  `text_old` mediumtext NULL,
   `state` tinyint(3) NOT NULL DEFAULT '0',
   `approved` tinyint(3) NOT NULL DEFAULT '0',
+  `verified` tinyint(3) NOT NULL DEFAULT '0',
   `useful_yes` int(11) NOT NULL DEFAULT '0',
   `useful_no` int(11) NOT NULL DEFAULT '0',
   `submit_date` datetime NOT NULL,
@@ -77,7 +80,14 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_reviews` (
   PRIMARY KEY  (`id`),
   KEY (`content_id`, `user_id`, `type`),
   KEY (`content_id`, `type`),
-  KEY `user_id` (`user_id`)
+  KEY `user_id` (`user_id`),
+  FULLTEXT KEY `title` (`title`),
+  FULLTEXT KEY `text` (`text`),
+  KEY `state` (`state`),
+  KEY `approved` (`approved`),
+  KEY `verified` (`verified`),
+  KEY `useful_yes` (`useful_yes`),
+  KEY `useful_no` (`useful_no`)
 ) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`;
 
 CREATE TABLE IF NOT EXISTS `#__flexicontent_fields` (

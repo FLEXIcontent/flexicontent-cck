@@ -78,7 +78,7 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 
 		// Warning messages
 		$this->warn_locked_recs_skipped    = 'FLEXI_SKIPPED_N_ROWS_WITH_ASSOCIATIONS';
-		$this->warn_noauth_recs_skipped    = 'FLEXI_SKIPPED_N_ROWS_UNAUTHORISED';		
+		$this->warn_noauth_recs_skipped    = 'FLEXI_SKIPPED_N_ROWS_UNAUTHORISED';
 	}
 
 
@@ -115,6 +115,7 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 	 */
 	public function cancel()
 	{
+		JFactory::getApplication()->enqueueMessage(JText::_('Closed'), 'success');
 		return parent::cancel();
 	}
 
@@ -243,12 +244,62 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 		$content_id  = $this->input->get('content_id', 0, 'int');
 		$review_type = $this->input->get('review_type', 'item', 'cmd');
 
+		// Try to load review by attributes in HTTP Request
+		if ($content_id && $review_type && $user->id)
+		{
+			// First try to match review of the item submitted by current user id regardless of email
+			$record = $model->getRecord(array(
+				'content_id' => $content_id,
+				'type' => $review_type,
+				'user_id' => $user->id,
+			));
+			if ($record->id)
+			{
+				$app->enqueueMessage('Loaded your review for your account', '');
+			}
+			
+			// Second try to user email with zero user id, for the case that 
+			// the review was originally submitted as guest user, but user is now registered
+			if (!$record->id && $user->email)
+			{
+				// First try to match user id
+				$record = $model->getRecord(array(
+					'content_id' => $content_id,
+					'type' => $review_type,
+					'user_id' => 0,
+					'email' => $user->email,
+				));
+
+				if ($record->id)
+				{
+					$app->enqueueMessage('A review was found via your email', '');
+				}
+			}
+			//echo '<pre>'; print_r($record); echo '</pre>';
+		}
+
+		// Initialize a record if not done already
+		if (empty($record))
+		{
+			$record = $model->getItem();
+		}
+
+		$model->setState($this->getName() . '.id', $record->id);
+
+		if (!$record->id)
+		{
+			$model->setState('content_id', $content_id);
+			$model->setState('review_type', $review_type);
+			$model->setState('user_id', $user->id);
+			$model->setState('email', $user->email);
+		}
+
+
 		// Sanity checks before reviewing, content item exists, and reviewing are enabled
 		$item = null;
-		$field = null;
 		$errors = null;
 
-		$this->_preReviewingChecks($content_id, $item, $field, $errors);
+		$this->_preChecks($content_id, $item, $model, $errors);
 
 		if ($errors)
 		{
@@ -263,21 +314,6 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 			return;
 		}
 
-		// Try to load review by attributes in HTTP Request
-		if ($content_id && $review_type)
-		{
-			$record = $model->getRecord(array(
-				'content_id' => $content_id,
-				'type' => $review_type,
-				'user_id' => $user->id,
-			));
-		}
-
-		// Try to load by unique ID or NAME
-		else
-		{
-			$record = $model->getItem();
-		}
 
 		// Push the model into the view (as default), later we will call the view display method instead of calling parent's display task, because it will create a 2nd model instance !!
 		$view->setModel($model, true);
@@ -289,12 +325,26 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 		// Check access
 		if (!$is_authorised)
 		{
-			$app->setHeader('status', '403 Forbidden', true);
-			$app->enqueueMessage(JText::_('FLEXI_ALERTNOTAUTH_TASK'), 'error');
-
-			if ($this->input->getCmd('tmpl') !== 'component')
+			if (!$user->id && $app->isClient('site'))
 			{
-				$this->setRedirect($this->returnURL);
+				$cparams   = JComponentHelper::getParams('com_flexicontent');
+				$uri       = JUri::getInstance();
+				$return    = strtr(base64_encode($uri->toString()), '+/=', '-_,');           // Current URL as return URL (but we will for id / cid)
+				$login_url = $cparams->get('login_page', 'index.php?option=com_users&view=login');
+				$login_url .= (strstr($login_url, '?') ? '&'  : '?') . 'tmpl=component&return='.$return;
+
+				$app->enqueueMessage(JText::_('Please register or login before you can post a review'), 'warning');
+				$this->setRedirect($login_url);
+			}
+			else
+			{
+				$app->setHeader('status', '403 Forbidden', true);
+				$app->enqueueMessage(JText::_('FLEXI_ALERTNOTAUTH_TASK'), 'error');
+
+				if ($this->input->getCmd('tmpl') !== 'component')
+				{
+					$this->setRedirect($this->returnURL);
+				}
 			}
 
 			return;
@@ -406,6 +456,62 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 	{
 		$this->input->get('task', '', 'cmd') !== __FUNCTION__ or die(__FUNCTION__ . ' : direct call not allowed');
 
+		$cparams = JComponentHelper::getParams('com_flexicontent');
+		$user    = JFactory::getUser();
+		$user_id = (int) $user->id;
+		$isNew   = !$model->get('id');
+		$item  = (object) array('type_id' => empty($record->item_type_id) ? 0 : $record->item_type_id);
+		$field = $model->getVotingReviewsField($item);
+
+		/**
+		 * Handling of new reviews
+		 */
+		if ($isNew)
+		{
+			// Set owner ID
+			$validated_data['user_id'] = $user_id;
+			
+			// Unlogged submission, require email verification
+			if (!$user_id)
+			{
+				$verify_email_ownership = (int) $field->parameters->get('verify_email_ownership', 1);
+				$validated_data['verified'] = $this->canManage || !$verify_email_ownership ? 1 : 0;
+			}
+		}
+
+		/**
+		 * Consistency checks
+		 */
+
+		// Update review's email if current editor is also review owner and editor's email has changed
+		if ($user_id && $model->get('user_id') ==  $user_id)
+		{
+			$validated_data['email'] = $user->email;
+		}
+
+		// Update review's user_id if current editor's email match user's email
+		if ($user_id && $model->get('email') ==  $user->email)
+		{
+			$validated_data['user_id'] = $user_id;
+		}
+
+		/**
+		 * New submission or modification of existing review via non-admin
+		 */
+		if (!$this->canManage)
+		{
+			// Clear "approved" status
+			$do_approval = (int) $field->parameters->get('do_approval', 1);
+			$validated_data['approved'] = !$do_approval ? 1 : 0;
+
+			// Modification of existing review (via non-admin), save old data if review is currently in "approved" status
+			if (!$isNew && $model->get('approved'))
+			{
+				$validated_data['title_old']       = $model->get('title');
+				$validated_data['description_old'] = $model->get('description');
+			}
+		}
+		
 		return true;
 	}
 
@@ -416,24 +522,38 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 
 
 	/**
-	 * Method to do prechecks for loading / saving review forms
+	 * Method to do prechecks for loading / saving review forms, like 
+	 * - if reviews are enabled
+	 * - if content item exists
 	 *
 	 * @param   object    $content_id  The id of the content
 	 * @param   object    $item        by reference variable to return the reviewed item
-	 * @param   object    $field       by reference variable to return the voting (reviews) field
-	 * @param   array     $errors      The array of error messages that have occured
+	 * @param   object    $model       The record model (review)
+	 * @param   array     $errors      by reference the array of error messages that have occured
 	 *
 	 * @return  void
 	 *
 	 * @since   3.3.0
 	 */
-	private function _preReviewingChecks($content_id, & $item = null, & $field = null, $errors = null)
+	private function _preChecks($content_id, & $item, $model, & $errors)
 	{
 		$this->input->get('task', '', 'cmd') !== __FUNCTION__ or die(__FUNCTION__ . ' : direct call not allowed');
 
-		$app  = JFactory::getApplication();
-		$user = JFactory::getUser();
-		$db   = JFactory::getDbo();
+		$app   = JFactory::getApplication();
+		$user  = JFactory::getUser();
+		$field = $model->getVotingReviewsField($item);
+
+		/**
+		 * Check reviews are enabled
+		 */
+
+		$allow_reviews = (int) $field->parameters->get('allow_reviews', 0);
+
+		if (!$allow_reviews)
+		{
+			$errors[] = 'Reviews are disabled';
+			return;
+		}
 
 
 		/**
@@ -446,31 +566,6 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 		{
 			$errors[] = 'ID: ' . $pk . ': ' . $item->getError();
 			return;
-		}
-
-
-		/**
-		 * Do voting / reviewing permissions check
-		 */
-
-		// Get voting field
-		$query = 'SELECT * FROM #__flexicontent_fields WHERE field_type = ' . $db->Quote('voting');
-		$field = $db->setQuery($query)->loadObject();
-
-		// Load field's configuration together with type-specific field customization
-		FlexicontentFields::loadFieldConfig($field, $item);
-
-		// Load field's language files
-		JFactory::getLanguage()->load('plg_flexicontent_fields_core', JPATH_ADMINISTRATOR, 'en-GB', true);
-		JFactory::getLanguage()->load('plg_flexicontent_fields_core', JPATH_ADMINISTRATOR, null, true);
-
-		// Get needed parameters
-		$allow_reviews = (int) $field->parameters->get('allow_reviews', 0);
-
-		// Check reviews are allowed
-		if (!$allow_reviews)
-		{
-			$errors[] = 'Reviews are disabled';
 		}
 	}
 

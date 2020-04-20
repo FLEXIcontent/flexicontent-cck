@@ -461,15 +461,17 @@ class FlexicontentControllerBaseAdmin extends FlexicontentController
 		 * Saving is done, decide where to redirect
 		 */
 
-		$msg = JText::_('FLEXI_' . $this->_NAME . '_SAVED');
+		$msg  = JText::_('FLEXI_' . $this->_NAME . '_SAVED');
+		$tmpl = $this->input->getCmd('tmpl');
 
 		switch ($this->task)
 		{
 			// REDIRECT CASE FOR APPLY / SAVE AS COPY: Save and reload the edit form
 			case 'apply':
-				if ($app->isClient('administrator'))
+				if ($app->isClient('administrator') || in_array($this->record_name, array('review')))
 				{
-					$link = 'index.php?option=com_flexicontent&' . $ctrl_task . 'edit&view=' . $this->record_name . '&id=' . (int) $model->get('id');
+					$link = 'index.php?option=com_flexicontent&' . $ctrl_task . 'edit&view=' . $this->record_name
+						. '&id=' . (int) $model->get('id') . ($tmpl ? '&tmpl=' . $tmpl : '');
 				}
 				// REDIRECT CASE: Return to the form 's original referer after item saving
 				else
@@ -482,8 +484,7 @@ class FlexicontentControllerBaseAdmin extends FlexicontentController
 			case 'save2new':
 				if ($app->isClient('administrator'))
 				{
-					$link = 'index.php?option=com_flexicontent&view=' . $this->record_name
-						. '';
+					$link = 'index.php?option=com_flexicontent&view=' . $this->record_name . ($tmpl ? '&tmpl=' . $tmpl : '');
 				}
 
 				// REDIRECT CASE: Return to the form 's original referer after item saving

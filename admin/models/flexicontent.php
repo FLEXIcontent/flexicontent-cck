@@ -951,6 +951,20 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 				'created_by'=>0, 'access'=>0, 'featured'=>0,
 				'language'=>0, 'type_id'=>0, 'lang_parent_id'=>0
 			),
+
+			'flexicontent_reviews'=>array(
+				'title'=>array(
+					'custom_add'=>'ADD FULLTEXT KEY',
+					'cols'=>array('title'=>0)
+				),
+				'text'=>array(
+					'custom_add'=>'ADD FULLTEXT KEY',
+					'cols'=>array('text'=>0)
+				),
+				'state'=>0, 'approved'=>0, 'verified'=>0,
+				'useful_yes'=>0, 'useful_no'=>0,
+			),
+
 			'flexicontent_fields_item_relations'=>array(
 				'value'=>32,
 				'value_integer'=>array('update'=>'CAST(value AS SIGNED)'),

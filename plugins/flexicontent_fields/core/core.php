@@ -296,6 +296,11 @@ class plgFlexicontent_fieldsCore extends FCField
 					{
 						$field->parameters->set('enable_extra_votes', 0);
 					}
+					$db = JFactory::getDbo();
+					$query = 'SELECT * FROM #__flexicontent_reviews WHERE content_id = ' . (int) $item->id;
+					$reviews = $db->setQuery($query)->loadObjectList();
+
+					$reviews_placement = (int) $field->parameters->get('reviews_placement', 0);
 
 					$field->value[] = 'button';  // A dummy value to force display
 

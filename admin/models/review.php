@@ -104,7 +104,12 @@ class FlexicontentModelReview extends FCModelAdmin
 	 * Various record specific properties
 	 *
 	 */
-	// ...
+
+	// Voting - reviews fields per item type
+	var $fields = array();
+
+	// Voting - reviews field for item type 0 (No per type configuration)
+	var $field  = null;
 
 	/**
 	 * Constructor
@@ -117,6 +122,13 @@ class FlexicontentModelReview extends FCModelAdmin
 
 		$this->canManage = FlexicontentHelperPerm::getPerm()->CanReviews;
 		$this->canCreate = FlexicontentHelperPerm::getPerm()->CanCreateReviews;
+
+		// Get voting field for type 0 (No per type configuration)
+		$this->field = $this->getVotingReviewsField();
+
+		// Load field's language files
+		JFactory::getLanguage()->load('plg_flexicontent_fields_core', JPATH_ADMINISTRATOR, 'en-GB', true);
+		JFactory::getLanguage()->load('plg_flexicontent_fields_core', JPATH_ADMINISTRATOR, null, true);
 	}
 
 
@@ -150,6 +162,9 @@ class FlexicontentModelReview extends FCModelAdmin
 		// Set some new record specific properties, note most properties already have proper values
 		// Either the DB default values (set by getTable() method) or the values set by _afterLoad() method
 		$record->id							= 0;
+		$record->content_id			= $this->getState('content_id');
+		$record->type						= $this->getState('review_type');
+		$record->email					= $this->getState('email');
 		$record->title					= '';
 		$record->text						= '';
 		$record->state					= 0;
@@ -192,6 +207,59 @@ class FlexicontentModelReview extends FCModelAdmin
 	 */
 	protected function preprocessForm(JForm $form, $data, $plugins_group = null)
 	{
+		$data_obj = $data && is_array($data) ? (object) $data : $data;
+
+		/**
+		 * Do not allow changing some properties
+		 */
+
+		$isNew    = empty($this->_record->id);
+		$isLogged = (boolean) JFactory::getUser()->id;
+		
+		$readonlyFields = array();
+		$hiddenFields   = array();
+		
+		// Only allow email to guests to admins
+		if ((!$isNew || $isLogged) && !$this->canManage)
+		{
+			$readonlyFields[]= 'email';
+			$hiddenFields[]  = 'email';
+		}
+
+		if (!$this->canManage)
+		{
+			// Clear "approved" status
+			$do_approval = (int) $this->field->parameters->get('do_approval', 1);
+			if ($do_approval)
+			{
+				$data->approved = 0;
+				if ($isNew && !$isLogged)
+				{
+					$data->verified = 0;
+				}
+			}
+
+			$readonlyFields = array_merge($readonlyFields,
+				array('state', 'approved', 'verified', 'useful_yes', 'useful_no', 'id', 'content_id', 'type', 'average_rating', 'custom_ratings', 'user_id', 'submit_date', 'update_date')
+			);
+			$hiddenFields   = array_merge($hiddenFields,
+				array('state', 'approved', 'verified', 'useful_yes', 'useful_no', 'id', 'content_id', 'type', 'average_rating', 'custom_ratings', 'user_id', 'submit_date', 'update_date')
+			);
+		}
+
+		foreach($readonlyFields as $fieldname)
+		{
+			$form->setFieldAttribute($fieldname, 'readonly', 'true');
+			$form->setFieldAttribute($fieldname, 'filter', 'unset');
+		}
+
+		foreach($hiddenFields as $fieldname)
+		{
+			$form->setFieldAttribute($fieldname, 'hidden', 'true');
+		}
+
+		// Trigger the default form events.
+		$plugins_group = $plugins_group ?: $this->plugins_group;
 		parent::preprocessForm($form, $data, $plugins_group);
 	}
 
@@ -231,9 +299,62 @@ class FlexicontentModelReview extends FCModelAdmin
 	public function canEdit($record = null)
 	{
 		$record  = $record ?: $this->_record;
+
 		$user    = JFactory::getUser();
+		$app     = JFactory::getApplication();
 
 		$isOwner = $record && $record->user_id == $user->id;
+		$isSite  = $app->isClient('site');
+
+		// Get per field's per type configuration if possible
+		$item  = (object) array('type_id' => empty($record->item_type_id) ? 0 : $record->item_type_id);
+		$field = $this->getVotingReviewsField($item);
+
+		$allow_submit_review_by = (int) $field->parameters->get('allow_submit_review_by', 0);
+
+		if ($isSite && !$record->id)
+		{
+			switch ($allow_submit_review_by)
+			{
+				case 0:
+					// No new submissions are allowed
+					$app->enqueueMessage('New review submission has been disabled', 'warning');
+					return false;
+
+				case 1:
+					// Anyone (guest or logged) is allowed to submit
+					return true;
+
+				case 2:
+					// Only Logged users are allowed to submit
+					if (!$user->id)
+					{
+						$app->enqueueMessage('Please login / register before you can submit a new review', 'warning');
+						return false;
+					}
+
+					return true;
+
+				case 3:
+					$aid_arr = $user->getAuthorisedViewLevels();
+					$acclvl = (int) $field->parameters->get('review_submit_access', 1);
+					$has_acclvl = in_array($acclvl, $aid_arr);
+
+					if (!$has_acclvl)
+					{
+						$app->enqueueMessage('You do not have access level to submit a new review', 'warning');
+						return false;
+					}
+
+					return true;
+
+				default:
+					$app->enqueueMessage('Unhandled parameter value for "allow_submit_review_by parameter" ' . $allow_submit_review_by, 'warning');
+					return false;
+			}
+		}
+
+
 
 		return !$record || !$record->id
 			? $this->canCreate
@@ -441,5 +562,29 @@ class FlexicontentModelReview extends FCModelAdmin
 		}
 
 		return $affected;
+	}
+
+	/**
+	 * Method to get the voting - reviews field
+	 *
+	 * @return	Object	The voting - reviews field
+	 *
+	 * @since	3.4
+	 */
+	public function getVotingReviewsField($item = null)
+	{
+		if (empty($this->fields[$item ? $item->type_id : 0]))
+		{
+			$db    = JFactory::getDbo();
+			$query = 'SELECT * FROM #__flexicontent_fields WHERE field_type = ' . $db->Quote('voting');
+			$field = $db->setQuery($query)->loadObject();
+
+			// Load field's configuration together with type-specific field customization
+			FlexicontentFields::loadFieldConfig($field, $item);
+
+			$this->fields[$item ? $item->type_id : 0] = $field;
+		}
+
+		return $this->fields[$item ? $item->type_id : 0];
 	}
 }

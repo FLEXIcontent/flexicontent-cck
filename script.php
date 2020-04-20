@@ -1045,21 +1045,39 @@ class com_flexicontentInstallerScript
 							`user_id` int(11) NOT NULL DEFAULT '0',
 							`email` varchar(255) NOT NULL DEFAULT '',
 							`title` varchar(255) NULL,
+							`title_old` varchar(255) NULL,
 							`text` mediumtext NULL,
+							`text_old` mediumtext NULL,
 							`state` tinyint(3) NOT NULL DEFAULT '0',
 							`approved` tinyint(3) NOT NULL DEFAULT '0',
+							`verified` tinyint(3) NOT NULL DEFAULT '0',
 							`useful_yes` int(11) NOT NULL DEFAULT '0',
 							`useful_no` int(11) NOT NULL DEFAULT '0',
 							`submit_date` datetime NOT NULL,
-							`update_date` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+							`update_date` datetime NOT NULL DEFAULT '1000-01-01 00:00:00',
 							`checked_out` int(11) unsigned NOT NULL default '0',
-							`checked_out_time` datetime NOT NULL default '0000-00-00 00:00:00',
+							`checked_out_time` datetime NOT NULL default '1000-01-01 00:00:00',
 							`attribs` mediumtext NULL,
 							PRIMARY KEY  (`id`),
 							KEY (`content_id`, `user_id`, `type`),
 							KEY (`content_id`, `type`),
 							KEY `user_id` (`user_id`)
+							KEY `state` (`state`)
+							KEY `approved` (`approved`)
+							KEY `verified` (`verified`)
+							KEY `useful_yes` (`useful_yes`)
+							KEY `useful_no` (`useful_no`)
 						) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`;";
+					}
+
+					if ( $reviews_tbl_exists && !array_key_exists('title_old', $tbl_fields['#__flexicontent_reviews']) ) {
+						$queries[] = "ALTER TABLE `#__flexicontent_reviews` ADD `title_old` tinyint(3) NOT NULL DEFAULT '0' AFTER `title`";
+					}
+					if ( $reviews_tbl_exists && !array_key_exists('text_old', $tbl_fields['#__flexicontent_reviews']) ) {
+						$queries[] = "ALTER TABLE `#__flexicontent_reviews` ADD `text_old` tinyint(3) NOT NULL DEFAULT '0' AFTER `text`";
+					}
+					if ( $reviews_tbl_exists && !array_key_exists('verified', $tbl_fields['#__flexicontent_reviews']) ) {
+						$queries[] = "ALTER TABLE `#__flexicontent_reviews` ADD `verified` tinyint(3) NOT NULL DEFAULT '0' AFTER `approved`";
 					}
 
 					$upgrade_count = 0;

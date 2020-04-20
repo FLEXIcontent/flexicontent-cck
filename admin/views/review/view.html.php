@@ -47,7 +47,8 @@ class FlexicontentViewReview extends FlexicontentViewBaseRecord
 		$controller = $jinput->get('controller', '', 'cmd');
 
 		$isAdmin  = $app->isClient('administrator');
-		$isCtmpl  = $jinput->getCmd('tmpl') === 'component';
+		$tmpl     =  $jinput->getCmd('tmpl');
+		$isCtmpl  = $tmpl === 'component';
 
 		$tip_class = ' hasTooltip';
 		$manager_view = 'reviews';
@@ -76,14 +77,24 @@ class FlexicontentViewReview extends FlexicontentViewBaseRecord
 		if (!$form)
 		{
 			$app->enqueueMessage($model->getError(), 'warning');
-			$app->redirect( 'index.php?option=com_flexicontent&view=' . $manager_view );
+
+			if ($jinput->getCmd('tmpl') !== 'component')
+			{
+				$app->redirect( 'index.php?option=com_flexicontent&view=' . $manager_view );
+			}
+			return;
 		}
 
 		// Fail if an existing record is checked out by someone else
 		if ($row->id && $model->isCheckedOut($user->get('id')))
 		{
 			$app->enqueueMessage(JText::_( 'FLEXI_EDITED_BY_ANOTHER_ADMIN' ), 'warning');
-			$app->redirect( 'index.php?option=com_flexicontent&view=' . $manager_view );
+
+			if ($jinput->getCmd('tmpl') !== 'component')
+			{
+				$app->redirect( 'index.php?option=com_flexicontent&view=' . $manager_view );
+			}
+				return;
 		}
 
 
@@ -145,7 +156,7 @@ class FlexicontentViewReview extends FlexicontentViewBaseRecord
 		$btn_arr = array();
 
 		// Add ajax apply only for existing records
-		if (!$isnew)
+		if (!$isnew && $isAdmin)
 		{
 			$btn_name = 'apply_ajax';
 			$btn_task = $ctrl.'.apply_ajax';
@@ -223,12 +234,12 @@ class FlexicontentViewReview extends FlexicontentViewBaseRecord
 
 
 		// Cancel button, TODO frontend modal close
-		if ($isAdmin && !$isCtmpl)
-		{
+		//if ($isAdmin && !$isCtmpl)
+		//{
 			$isnew
 				? JToolbarHelper::cancel($ctrl.'.cancel', $isAdmin ? 'JTOOLBAR_CANCEL' : 'FLEXI_CANCEL')
 				: JToolbarHelper::cancel($ctrl.'.cancel', $isAdmin ? 'JTOOLBAR_CLOSE' : 'FLEXI_CLOSE_FORM');
-		}
+		//}
 
 
 		// Preview button
@@ -279,6 +290,7 @@ class FlexicontentViewReview extends FlexicontentViewBaseRecord
 		$this->cparams  = $cparams;
 		$this->view     = $view;
 		$this->controller = $controller;
+		$this->_tmpl    = $tmpl;
 
 		parent::display($tpl);
 	}
