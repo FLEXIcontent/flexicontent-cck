@@ -1586,8 +1586,8 @@
 			
 			<field name="" type="separator" default="FLEXI_HTML_EDITOR" description="FLEXI_HTML_EDITOR_DESC" level="level2" depend_class="using-html-editor" />
 			<field name="" type="separator" default="Note some of these settings also exist in type configuration form !" description="..." level="level4" class="alert alert-warning" depend_class="using-html-editor" />
-			<field name="width" type="text" default="98%" size="6" label="FLEXI_FIELD_WIDTH" description="FLEXI_FIELD_WIDTH_DESC" depend_class="using-html-editor" />
-			<field name="height" type="text" default="400px" size="6" label="FLEXI_FIELD_HEIGHT" description="FLEXI_FIELD_HEIGHT_DESC" depend_class="using-html-editor" />
+			<field name="width" type="text" default="" size="6" label="FLEXI_FIELD_WIDTH" description="FLEXI_FIELD_WIDTH_DESC" depend_class="using-html-editor" />
+			<field name="height" type="text" default="" size="6" label="FLEXI_FIELD_HEIGHT" description="FLEXI_FIELD_HEIGHT_DESC" depend_class="using-html-editor" />
 			<field name="editor" type="plugins" folder="editors" label="FLEXI_HTML_EDITOR" description="FLEXI_HTML_EDITOR_DESC" depend_class="using-html-editor">
 				<option value="">FLEXI_JOOMLA_DEFAULT</option>
 			</field>
