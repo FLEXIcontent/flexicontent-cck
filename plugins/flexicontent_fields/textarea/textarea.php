@@ -112,7 +112,7 @@ class plgFlexicontent_fieldsTextarea extends FCField
 		$placeholder= $display_label_form==-1 ? $field->label : JText::_($field->parameters->get( 'placeholder', '' )) ;
 
 		// *** HTML Editor configuration  ***
-		$width = $field->parameters->get( 'width', '98%') ;
+		$width = $field->parameters->get( 'width', '') ;
 		$height = $field->parameters->get( 'height', ($field->field_type == 'maintext') ? '400' : '250' ) ;
 
 		if (!$use_html)
@@ -122,10 +122,25 @@ class plgFlexicontent_fieldsTextarea extends FCField
 		}
 		else
 		{
-			$width = (int) $width;
-			$height = (int) $height;
-			if ( $width < 100 ) $width = 100;
-			if ( $height < 100 ) $height = 100;
+			if (is_numeric($width) || substr($width, -2) == 'px')
+			{
+				$width = (int) $width;
+				if ( $width < 250 ) $width = 250;
+			}
+			elseif(substr($width, -1) == '%')
+			{
+				$width = '';
+			}
+
+			if (is_numeric($height) || substr($height, -2) == 'px')
+			{
+				$height = (int) $height;
+				if ( $height < 200 ) $height = 200;
+			}
+			elseif(substr($height, -1) == '%')
+			{
+				$height = $field->field_type == 'maintext' ? 400 : 250;
+			}
 		}
 
 		// Decide editor plugin buttons to SKIP
