@@ -2351,7 +2351,7 @@ class FlexicontentController extends JControllerLegacy
 			}
 			else
 			{
-				$file->abspath = $file->filename_original ? $file->filename_original : $file->filename;
+				$file->abspath = $file->filename;
 			}
 
 
@@ -2453,7 +2453,7 @@ class FlexicontentController extends JControllerLegacy
 			if ($file->url)
 			{
 				// Check for empty URL
-				$url = $file->filename_original ? $file->filename_original : $file->filename;
+				$url = $file->filename;
 				if (empty($url)) {
 					$msg = "File URL is empty: ".$file->url;
 					$app->enqueueMessage($msg, 'error');
@@ -2467,11 +2467,13 @@ class FlexicontentController extends JControllerLegacy
 					$app->enqueueMessage($msg, 'notice');
 					continue;
 				}
-				else
+
+				// File of URL is suspiciously small, propably it was calculated correctly !! just redirect to the file URL !!
+				elseif ($file->size < 2048)
 				{
-					// redirect to the file download link
-					//@header("Location: ".$url."");
-					//$app->close();
+					// Redirect to the file download link
+					@header("Location: ".$url."","target=blank");
+					$app->close();
 				}
 			}
 
@@ -2872,9 +2874,23 @@ class FlexicontentController extends JControllerLegacy
 		$chunksize = 1 * (1024 * 1024); // 1MB, highest possible for fread should be 8MB
 		$filesize  = $dlfile->size_tmp ?: $dlfile->size;
 
-		if ($filesize > $chunksize)
+		// Do not try to read too big file URL files
+		if ($dlfile->url && $filesize > 100 * (1024 * 1024))
+		{
+			@header("Location: ".$url."","target=blank");
+			$app->close();
+		}
+		elseif ($filesize > $chunksize)
 		{
 			$handle = @fopen($dlfile->abspath_tmp ?: $dlfile->abspath, 'rb');
+
+			// Redirect to the exteral file download link if we failed to open the URL
+			if (!$handle && $dlfile->url)
+			{
+				@header("Location: ".$url."","target=blank");
+				$app->close();
+			}
+
 			while(!feof($handle))
 			{
 				print(@fread($handle, $chunksize));
