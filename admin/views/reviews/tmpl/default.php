@@ -124,6 +124,7 @@ function delAllFilters()
 	delFilter('search');
 	delFilter('filter_state');
 	delFilter('filter_approved');
+	delFilter('filter_verified');
 	delFilter('filter_order');
 	delFilter('filter_order_Dir');
 }
@@ -184,6 +185,7 @@ if ($js)
 					<?php
 					echo $this->lists['filter_state'];
 					echo $this->lists['filter_approved'];
+					echo $this->lists['filter_verified'];
 					?>
 
 					<div id="fc-filters-slide-btn" class="icon-arrow-up-2 btn btn-outline-secondary" title="<?php echo JText::_('FLEXI_HIDE'); ?>" style="cursor: pointer;" onclick="fc_toggle_box_via_btn('fc-filters-box', document.getElementById('fc_filters_box_btn'), 'btn-primary');"></div>
@@ -262,6 +264,10 @@ if ($js)
 
 			<th class="hideOnDemandClass center">
 				<?php echo JHtml::_('grid.sort', 'FLEXI_REVIEW_APPROVED', 'a.approved', $this->lists['order_Dir'], $this->lists['order'] ); ?>
+			</th>
+
+			<th class="hideOnDemandClass center">
+				<?php echo JHtml::_('grid.sort', 'FLEXI_REVIEW_VERIFIED', 'a.verified', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
 
 			<th class="hideOnDemandClass center hidden-phone hidden-tablet">
@@ -363,6 +369,21 @@ if ($js)
 				 * Display review approved toggler
 				 */
 				echo JHtml::_($hlpname . '.approved', $row, $i);
+				?>
+			</td>
+
+			<td class="center">
+				<?php
+				/**
+				 * Display review approved toggler
+				 */
+				switch ($row->verified)
+				{
+					case 0: echo JText::_('FLEXI_NA'); break;
+					case 1: echo JText::_('FLEXI_YES'); break;
+					case 2: echo JText::_('FLEXI_NA'); break;
+					default: echo $row->verified; break;
+				}
 				?>
 			</td>
 

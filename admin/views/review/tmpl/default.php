@@ -58,6 +58,7 @@ $form = $this->form;
 	<input type="hidden" name="controller" value="reviews" />
 	<input type="hidden" name="view" value="review" />
 	<input type="hidden" name="task" value="" />
+	<input type="hidden" name="tmpl" value="<?php echo $this->_tmpl; ?>" />
 
 </form>
 </div>
