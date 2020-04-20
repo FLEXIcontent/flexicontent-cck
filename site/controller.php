@@ -2467,11 +2467,13 @@ class FlexicontentController extends JControllerLegacy
 					$app->enqueueMessage($msg, 'notice');
 					continue;
 				}
-				else
+
+				// File of URL is suspiciously small, propably it was calculated correctly !! just redirect to the file URL !!
+				elseif ($file->size < 1000)
 				{
-					// redirect to the file download link
-					//@header("Location: ".$url."");
-					//$app->close();
+					// Redirect to the file download link
+					@header("Location: ".$url."","target=blank");
+					$app->close();
 				}
 			}
 
