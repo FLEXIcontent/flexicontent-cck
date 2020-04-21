@@ -2452,9 +2452,12 @@ class FlexicontentController extends JControllerLegacy
 
 			if ($file->url)
 			{
-				// Check for empty URL
 				$url = $file->filename;
-				if (empty($url)) {
+				$ext = strtolower(flexicontent_upload::getExt($url));
+
+				// Check for empty URL
+				if (empty($url))
+				{
 					$msg = "File URL is empty: ".$file->url;
 					$app->enqueueMessage($msg, 'error');
 					return false;
@@ -2467,13 +2470,33 @@ class FlexicontentController extends JControllerLegacy
 					$app->enqueueMessage($msg, 'notice');
 					continue;
 				}
-
-				// File of URL is suspiciously small, propably it was calculated correctly !! just redirect to the file URL !!
-				elseif ($file->size < 2048)
+				else
 				{
-					// Redirect to the file download link
-					@header("Location: ".$url."","target=blank");
-					$app->close();
+					$force_url_download         = (int) $fields_conf[$field_id]->get('force_url_download', 0);
+					$force_url_download_exts    = preg_split("/[\s]*,[\s]*/", strtolower($fields_conf[$field_id]->get('force_url_download_exts', 'bmp,gif,jpg,png,wav,mp3,aiff')));
+					$force_url_download_exts    = array_flip($force_url_download_exts);
+					$force_url_download_max_kbs = (int) $fields_conf[$field_id]->get('force_url_download_max_kbs', 100000);
+
+					if ($force_url_download && isset($force_url_download_exts[$ext]))
+					{
+						$size = $this->_get_file_size_from_url($url, $retry = true);
+
+						if ($size != $file->size)
+						{
+							$file->size = $size;
+						}
+					}
+
+					/**
+					 * Just redirect to the file URL. If force URL download is disabled, or does not match criteria.
+					 * Also do not force is file size is suspiciously small, propably it was calculated correctly !! 
+					 */
+					if (!$force_url_download || !isset($force_url_download_exts[$ext]) || $file->size < 2048 || $file->size > ($force_url_download_max_kbs * 1024))
+					{
+						// Redirect to the file download link
+						@header("Location: ".$url."","target=blank");
+						$app->close();
+					}
 				}
 			}
 
@@ -3437,4 +3460,79 @@ class FlexicontentController extends JControllerLegacy
 	 * START OF CONTROLLER SPECIFIC METHODS
 	 */
 
+	/**
+	 * Returns the size of a file without downloading it, or -1 if the file size could not be determined.
+	 *
+	 * @param $url - The location of the remote file to download. Cannot be null or empty.
+	 *
+	 * @return The size of the file referenced by $url,
+	 * or -1 if the size could not be determined
+	 * or -999 if there was an error
+	 */
+	private function _get_file_size_from_url($url, $retry = true)
+	{
+		$original_url = $url;
+		$retry = $retry === true ? 6 : 0;
+
+		// clear last error
+		$ignore_last_error = error_get_last();
+
+		try {
+			$headers = array('Location' => $url);
+
+			// Follow the Location headers until the actual file URL is known
+			while (isset($headers['Location']))
+			{
+				$url = is_array($headers['Location'])
+					? end($headers['Location'])
+					: $headers['Location'];
+
+				$headers = @ get_headers($url, 1);
+
+				// Check for get headers failing to execute
+				if ($headers === false)
+				{
+					$error = error_get_last();
+
+					$error_message = is_array($error) && isset($error['message'])
+						? $error['message']
+						: 'Error retrieving headers of URL';
+					$this->setError($error_message);
+
+					return -999;
+				}
+
+				// Check for bad response from server, e.g. not found 404 , or 403 no access
+				$n = 0;
+				while(isset($headers[$n]))
+				{
+					$code = (int) substr($headers[$n], 9, 3);
+					if ($code < 200 || $code >= 400 )
+					{
+						$this->setError($headers[$n]);
+						return -999;
+					}
+					$n++;
+				}
+			}
+		}
+
+		catch (RuntimeException $e) {
+			$this->setError($e->getMessage());
+			return -999;  // indicate a fatal error
+		}
+
+		// Work-around with content length missing during 1st try, just retry once more
+		if (!isset($headers["Content-Length"]) && $retry)
+		{
+			return $this->get_file_size_from_url($original_url, --$retry);
+		}
+
+		$headers["Content-Length"] = is_array($headers["Content-Length"]) ? end($headers["Content-Length"]) : $headers["Content-Length"];
+
+		// Get file size, -1 indicates that the size could not be determined
+		return isset($headers["Content-Length"])
+			? $headers["Content-Length"]
+			: -1;
+	}
 }
