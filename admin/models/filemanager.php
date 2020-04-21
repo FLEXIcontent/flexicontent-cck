@@ -265,8 +265,8 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 		$s_assigned_fields = array('file', 'minigallery', 'mediafile');
 		$m_assigned_fields = array('image');
 
-		$m_assigned_props = array('image'=>'originalname');
-		$m_assigned_vals = array('image'=>'filename');
+		$m_assigned_props = array('image'=>array('originalname', 'existingname'));
+		$m_assigned_vals = array('image'=>array('filename', 'filename'));
 
 		// Lets load the files if it doesn't already exist
 		if ($this->_data === null)
@@ -307,9 +307,9 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 			{
 				foreach ($m_assigned_fields as $field_type)
 				{
-					$field_prop = $m_assigned_props[$field_type];
-					$value_prop = $m_assigned_vals[$field_type];
-					$this->countFieldRelationsMultiProp($this->_data, $value_prop, $field_prop, $field_type);
+					$field_prop_arr = $m_assigned_props[$field_type];
+					$value_prop_arr = $m_assigned_vals[$field_type];
+					$this->countFieldRelationsMultiProp($this->_data, $value_prop_arr, $field_prop_arr, $field_type);
 				}
 			}
 
@@ -1241,11 +1241,25 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 		$filenames = array();
 		foreach ( $values as $value )
 		{
-			if ( empty($value) ) continue;
+			if (empty($value))
+			{
+				continue;
+			}
+
 			$value = @ unserialize($value);
 
-			if ( empty($value['originalname']) ) continue;
-			$filenames[$value['originalname']] = 1;
+			if (!empty($value['originalname']))
+			{
+				$filenames[$value['originalname']] = 1;
+			}
+			elseif (!empty($value['existingname']))
+			{
+				$filenames[$value['existingname']] = 1;
+			}
+			else
+			{
+				continue;
+			}
 		}
 		$filenames = array_keys($filenames);
 
@@ -1428,7 +1442,7 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 	 * @access public
 	 * @return object
 	 */
-	function getItemsMultiprop( $field_props=array('image'=>'originalname'), $value_props=array('image'=>'filename') , $file_ids=array(), $count_items=false, $ignored=false )
+	function getItemsMultiprop( $field_props=array('image'=>array('originalname', 'existingname')), $value_props=array('image'=>array('filename', 'filename')) , $file_ids=array(), $count_items=false, $ignored=false )
 	{
 		$app    = JFactory::getApplication();
 		$user   = JFactory::getUser();
@@ -1478,41 +1492,54 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 		$items = array();
 		$files = array();
 
-		foreach ($field_props as $field_type => $field_prop)
+		foreach ($field_props as $field_type => $field_prop_arr)
 		{
-			// Some fields may not be using DB, create a limitation for them
-			$field_ids = $this->getFieldsUsingDBmode($field_type);
-			$field_ids_list = !$field_ids  ?  ""  :  " AND fi.id IN ('". implode("','", $field_ids) ."')";
-
-			// Create a matching condition for the value depending on given configuration (property name of the field, and value property of file: either id or filename or ...)
-			$value_prop = $value_props[$field_type];
-			$like_str = $this->_db->escape( 'a.'.$value_prop, false );
-			$like_str = sprintf( $format_str, $field_prop, $like_str );
-
-			// File field relation sub query
-			$query = 'SELECT '. ($count_items  ?  'a.id as file_id, COUNT(i.id) as item_count'  :  'i.id as id, i.title')
-				. ' FROM #__content AS i'
-				. ' JOIN #__flexicontent_fields_item_relations AS rel ON rel.item_id = i.id'
-				. ' JOIN #__flexicontent_fields AS fi ON fi.id = rel.field_id AND fi.field_type IN ('. $this->_db->Quote( $field_type ) .')' . $field_ids_list
-				. ' JOIN #__flexicontent_files AS a ON rel.value LIKE ' . $like_str . ' AND a.'.$value_prop.'<>""' . $file_ids_list
-				//. ' JOIN #__users AS ua ON ua.id = a.uploaded_by'
-				. $where
-				. $groupby
-				. $orderby
-				;
-			//echo nl2br( "\n".$query."\n");
-			$this->_db->setQuery( $query );
-			$_item_data = $this->_db->loadObjectList($count_items ? 'file_id' : 'id');
-
-			if ($_item_data) foreach ($_item_data as $item)
+			if (!is_array($field_prop_arr))
 			{
-				if ($count_items) {
-					$items[$item->file_id] = ((int) @ $items[$item->file_id]) + $item->item_count;
-				} else {
-					$items[$item->title] = $item;
-				}
+				$field_prop_arr  = array($field_prop_arr);
 			}
-			//echo "<pre>"; print_r($_item_data); exit;
+
+			if (!is_array($value_props[$field_type]))
+			{
+				$value_props[$field_type] = array($value_props[$field_type]);
+			}
+
+			foreach($field_prop_arr as $i => $field_prop)
+			{
+				// Some fields may not be using DB, create a limitation for them
+				$field_ids = $this->getFieldsUsingDBmode($field_type);
+				$field_ids_list = !$field_ids  ?  ""  :  " AND fi.id IN ('". implode("','", $field_ids) ."')";
+
+				// Create a matching condition for the value depending on given configuration (property name of the field, and value property of file: either id or filename or ...)
+				$value_prop = $value_props[$field_type][$i];
+				$like_str = $this->_db->escape( 'a.'.$value_prop, false );
+				$like_str = sprintf( $format_str, $field_prop, $like_str );
+
+				// File field relation sub query
+				$query = 'SELECT '. ($count_items  ?  'a.id as file_id, COUNT(i.id) as item_count'  :  'i.id as id, i.title')
+					. ' FROM #__content AS i'
+					. ' JOIN #__flexicontent_fields_item_relations AS rel ON rel.item_id = i.id'
+					. ' JOIN #__flexicontent_fields AS fi ON fi.id = rel.field_id AND fi.field_type IN ('. $this->_db->Quote( $field_type ) .')' . $field_ids_list
+					. ' JOIN #__flexicontent_files AS a ON rel.value LIKE ' . $like_str . ' AND a.'.$value_prop.'<>""' . $file_ids_list
+					//. ' JOIN #__users AS ua ON ua.id = a.uploaded_by'
+					. $where
+					. $groupby
+					. $orderby
+					;
+				//echo nl2br( "\n".$query."\n");
+				$this->_db->setQuery( $query );
+				$_item_data = $this->_db->loadObjectList($count_items ? 'file_id' : 'id');
+
+				if ($_item_data) foreach ($_item_data as $item)
+				{
+					if ($count_items) {
+						$items[$item->file_id] = ((int) @ $items[$item->file_id]) + $item->item_count;
+					} else {
+						$items[$item->title] = $item;
+					}
+				}
+				//echo "<pre>"; print_r($_item_data); exit;
+			}
 		}
 
 		//echo "<pre>"; print_r($items); exit;
@@ -1545,8 +1572,8 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 		}
 
 		$s_field_types = array('file', 'minigallery', 'mediafile');
-		$m_field_props = array('image' => 'originalname');
-		$m_value_props = array('image' => 'filename');
+		$m_field_props = array('image' => array('originalname', 'existingname'));
+		$m_value_props = array('image' => array('filename', 'filename'));
 
 		$allowed_cid = $this->getDeletable($cid, $authorizing_ignored, $s_field_types, $m_field_props, $m_value_props);
 
@@ -1606,8 +1633,8 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 	 */
 	function getDeletable($cid = array(), $ignored = false,
 		$s_field_types = array('file', 'minigallery', 'mediafile'),
-		$m_field_props = array('image' => 'originalname'),
-		$m_value_props = array('image' => 'filename')
+		$m_field_props = array('image' => array('originalname', 'existingname')),
+		$m_value_props = array('image' => array('filename', 'filename'))
 	) {
 
 		if (!count($cid))
@@ -1686,7 +1713,7 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 	 * @return	string $msg
 	 * @since	1.
 	 */
-	function countFieldRelationsMultiProp(&$rows, $value_prop, $field_prop, $field_type)
+	function countFieldRelationsMultiProp(&$rows, $value_prop_arr, $field_prop_arr, $field_type)
 	{
 		if (!$rows || !count($rows)) return array();  // No file records to check
 
@@ -1703,30 +1730,38 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 		// Serialized values are like : "__field_propname__";s:33:"__value__"
 		$format_str = 'CONCAT("%%","\"%s\";s:%%:%%\"",%s,"\"%%")';
 
-		// Create a matching condition for the value depending on given configuration (property name of the field, and value property of file: either id or filename or ...)
-		$like_str = $this->_db->escape( 'a.'.$value_prop, false );
-		$like_str = sprintf( $format_str, $field_prop, $like_str );
+		if (!is_array($field_prop_arr)) $field_prop_arr = array($field_prop_arr);
+		if (!is_array($value_prop_arr)) $value_prop_arr = array($value_prop_arr);
 
-		$query	= 'SELECT a.id as id, COUNT(rel.item_id) as count, GROUP_CONCAT(DISTINCT rel.item_id SEPARATOR  ",") AS item_list'
-				. ' FROM #__flexicontent_fields_item_relations AS rel'
-				. ' JOIN #__flexicontent_fields AS fi ON fi.id = rel.field_id AND fi.field_type = ' . $this->_db->Quote($field_type) . $field_ids_list
-				. ' JOIN #__flexicontent_files AS a ON rel.value LIKE ' . $like_str . ' AND a.'.$value_prop.'<>""'
-				. ' WHERE a.id IN(' . $file_ids_list . ')'
-				. ' GROUP BY a.id'
-				;
-		$this->_db->setQuery($query);
-		$assigned_data = $this->_db->loadObjectList('id');
-
-		foreach($rows as $row)
+		foreach($field_prop_arr as $i => $field_prop)
 		{
-			$row->{'assigned_'.$field_type} = isset($assigned_data[$row->id]) ? (int) $assigned_data[$row->id]->count : 0;
-			if (isset($assigned_data[$row->id]) && $assigned_data[$row->id]->item_list)
+			$value_prop = $value_prop_arr[$i];
+
+			// Create a matching condition for the value depending on given configuration (property name of the field, and value property of file: either id or filename or ...)
+			$like_str = $this->_db->escape( 'a.'.$value_prop, false );
+			$like_str = sprintf( $format_str, $field_prop, $like_str );
+			
+			$query	= 'SELECT a.id as id, COUNT(rel.item_id) as count, GROUP_CONCAT(DISTINCT rel.item_id SEPARATOR  ",") AS item_list'
+					. ' FROM #__flexicontent_fields_item_relations AS rel'
+					. ' JOIN #__flexicontent_fields AS fi ON fi.id = rel.field_id AND fi.field_type = ' . $this->_db->Quote($field_type) . $field_ids_list
+					. ' JOIN #__flexicontent_files AS a ON rel.value LIKE ' . $like_str . ' AND a.'.$value_prop.'<>""'
+					. ' WHERE a.id IN(' . $file_ids_list . ')'
+					. ' GROUP BY a.id'
+					;
+			$this->_db->setQuery($query);
+			$assigned_data = $this->_db->loadObjectList('id');
+
+			foreach($rows as $row)
 			{
-				$row->item_list[$field_type] = $assigned_data[$row->id]->item_list;
-				if (isset($row->total_usage))
+				$row->{'assigned_'.$field_type} = isset($assigned_data[$row->id]) ? (int) $assigned_data[$row->id]->count : 0;
+				if (isset($assigned_data[$row->id]) && $assigned_data[$row->id]->item_list)
 				{
-					$item_ids = explode(',', $assigned_data[$row->id]->item_list);
-					$row->total_usage += count($item_ids);
+					$row->item_list[$field_type] = $assigned_data[$row->id]->item_list;
+					if (isset($row->total_usage))
+					{
+						$item_ids = explode(',', $assigned_data[$row->id]->item_list);
+						$row->total_usage += count($item_ids);
+					}
 				}
 			}
 		}
