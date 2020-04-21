@@ -308,6 +308,7 @@
 			<field name="" type="separator" default="FLEXI_FIELD_FILE_PDF_STAMPING" description="" icon_class="icon-file" level="tab_open" box_type="1" />
 
 			<field name="" type="separator" default="FLEXI_FIELD_FILE_PDF_ADD_TEXT_ALL_PAGES" level="level1" />
+			<field name="" type="separator" default="Requires manual installation of 2 libraries: tcpdf and fpdi into folder &lt;br&gt; &lt;b&gt;/components/com_flexicontent/librairies/TCPDF&lt;/b&gt;" level="level4" class="alert alert-warning fcpadded" />
 			<field name="stamp_pdfs" type="multilist" subtype="radio" default="0" label="Add stamp texts" toggle_related="1" description="Modify PDF files on download to add a stamping text" class="btn-group group-fcmethod fcoffactive">
 				<option value="0" show_list="" hide_list="stamp_pdfs_mode">FLEXI_NO</option>
 				<option value="1" show_list="stamp_pdfs_mode" hide_list="">FLEXI_YES</option>

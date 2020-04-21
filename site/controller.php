@@ -1440,10 +1440,10 @@ class FlexicontentController extends JControllerLegacy
 	 */
 	function ajaxfav()
 	{
-		$app  = JFactory::getApplication();
-		$user = JFactory::getUser();
-		$db   = JFactory::getDbo();
-		$cparams = JComponentHelper::getParams( 'com_flexicontent' );
+		$app     = JFactory::getApplication();
+		$user    = JFactory::getUser();
+		//$db      = JFactory::getDbo();
+		//$cparams = JComponentHelper::getParams( 'com_flexicontent' );
 
 		$id   = $this->input->get('id', 0, 'int');
 		$type = $this->input->get('type', 'item', 'cmd');
@@ -2768,7 +2768,7 @@ class FlexicontentController extends JControllerLegacy
 		$dlfile->size_tmp = false;
 		
 		// Do not try to stamp URLs
-		if (!$dlfile->url && $dlfile->ext == 'pdf' && $cparams->get('stamp_pdfs', 1) && $dlfile->stamp)
+		if (!$dlfile->url && $dlfile->ext == 'pdf' && $fields_conf[$field_id]->get('stamp_pdfs', 0) && $dlfile->stamp)
 		{
 			// Create new PDF document (initiate FPDI)
 			$TCPDF_path = JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'TCPDF'.DS.'vendor'.DS.'autoload.php';
