@@ -1074,6 +1074,8 @@ class com_flexicontentInstallerScript
 							KEY (`content_id`, `user_id`, `type`),
 							KEY (`content_id`, `type`),
 							KEY `user_id` (`user_id`)
+							FULLTEXT KEY `title` (`title`),
+							FULLTEXT KEY `text` (`text`),
 							KEY `state` (`state`)
 							KEY `approved` (`approved`)
 							KEY `verified` (`verified`)
@@ -1083,10 +1085,10 @@ class com_flexicontentInstallerScript
 					}
 
 					if ( $reviews_tbl_exists && !array_key_exists('title_old', $tbl_fields['#__flexicontent_reviews']) ) {
-						$queries[] = "ALTER TABLE `#__flexicontent_reviews` ADD `title_old` tinyint(3) NOT NULL DEFAULT '0' AFTER `title`";
+						$queries[] = "ALTER TABLE `#__flexicontent_reviews` ADD `title_old` varchar(255) NULL AFTER `title`";
 					}
 					if ( $reviews_tbl_exists && !array_key_exists('text_old', $tbl_fields['#__flexicontent_reviews']) ) {
-						$queries[] = "ALTER TABLE `#__flexicontent_reviews` ADD `text_old` tinyint(3) NOT NULL DEFAULT '0' AFTER `text`";
+						$queries[] = "ALTER TABLE `#__flexicontent_reviews` ADD `text_old` mediumtext NULL AFTER `text`";
 					}
 					if ( $reviews_tbl_exists && !array_key_exists('verified', $tbl_fields['#__flexicontent_reviews']) ) {
 						$queries[] = "ALTER TABLE `#__flexicontent_reviews` ADD `verified` tinyint(3) NOT NULL DEFAULT '0' AFTER `approved`";
