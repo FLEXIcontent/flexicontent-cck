@@ -91,7 +91,19 @@ class FlexicontentControllerMediadatas extends FlexicontentControllerBaseAdmin
 	 */
 	public function save()
 	{
-		parent::save();
+		$result = parent::save();
+
+		if ($result !== false && $this->task === 'save' && $this->input->getCmd('tmpl') === 'component')
+		{
+			JFactory::getApplication()->enqueueMessage(
+				"<script>
+					setTimeout(function(){
+						window.parent.fc_closeDialog('fc_modal_popup_container');
+					}, 2000);
+				</script>"
+				, 'success'
+			);
+		}
 	}
 
 
