@@ -78,7 +78,7 @@ class FlexicontentControllerMediadatas extends FlexicontentControllerBaseAdmin
 
 		// Warning messages
 		$this->warn_locked_recs_skipped    = 'FLEXI_SKIPPED_N_ROWS_WITH_ASSOCIATIONS';
-		$this->warn_noauth_recs_skipped    = 'FLEXI_SKIPPED_N_ROWS_UNAUTHORISED';		
+		$this->warn_noauth_recs_skipped    = 'FLEXI_SKIPPED_N_ROWS_UNAUTHORISED';
 	}
 
 
@@ -115,6 +115,16 @@ class FlexicontentControllerMediadatas extends FlexicontentControllerBaseAdmin
 	 */
 	public function cancel()
 	{
+		if ($this->input->getCmd('tmpl') === 'component')
+		{
+			JFactory::getApplication()->enqueueMessage(
+				"<script>
+					window.parent.fc_closeDialog('fc_modal_popup_container');
+				</script>"
+				, 'success'
+			);
+		}
+
 		return parent::cancel();
 	}
 
@@ -240,15 +250,17 @@ class FlexicontentControllerMediadatas extends FlexicontentControllerBaseAdmin
 		// Get/Create the model
 		$model = $this->getModel($this->record_name);
 
-		$content_id  = $this->input->get('content_id', 0, 'int');
-		$mediadata_type = $this->input->get('mediadata_type', 'item', 'cmd');
+		// Initialize a record if not done already
+		if (empty($record))
+		{
+			$record = $model->getItem();
+		}
 
-		// Sanity checks before mediadataing, content item exists, and mediadataing are enabled
+		// Sanity checks
 		$item = null;
-		$field = null;
 		$errors = null;
 
-		$this->_preMediadataingChecks($content_id, $item, $field, $errors);
+		$this->_preChecks(0, $item, $model, $errors);
 
 		if ($errors)
 		{
@@ -263,21 +275,6 @@ class FlexicontentControllerMediadatas extends FlexicontentControllerBaseAdmin
 			return;
 		}
 
-		// Try to load mediadata by attributes in HTTP Request
-		if ($content_id && $mediadata_type)
-		{
-			$record = $model->getRecord(array(
-				'content_id' => $content_id,
-				'type' => $mediadata_type,
-				'user_id' => $user->id,
-			));
-		}
-
-		// Try to load by unique ID or NAME
-		else
-		{
-			$record = $model->getItem();
-		}
 
 		// Push the model into the view (as default), later we will call the view display method instead of calling parent's display task, because it will create a 2nd model instance !!
 		$view->setModel($model, true);
@@ -289,12 +286,26 @@ class FlexicontentControllerMediadatas extends FlexicontentControllerBaseAdmin
 		// Check access
 		if (!$is_authorised)
 		{
-			$app->setHeader('status', '403 Forbidden', true);
-			$app->enqueueMessage(JText::_('FLEXI_ALERTNOTAUTH_TASK'), 'error');
-
-			if ($this->input->getCmd('tmpl') !== 'component')
+			if (!$user->id && $app->isClient('site'))
 			{
-				$this->setRedirect($this->returnURL);
+				$cparams   = JComponentHelper::getParams('com_flexicontent');
+				$uri       = JUri::getInstance();
+				$return    = strtr(base64_encode($uri->toString()), '+/=', '-_,');           // Current URL as return URL (but we will for id / cid)
+				$login_url = $cparams->get('login_page', 'index.php?option=com_users&view=login');
+				$login_url .= (strstr($login_url, '?') ? '&'  : '?') . 'tmpl=component&return='.$return;
+
+				$app->enqueueMessage(JText::_('Please register or login before you can edit this record'), 'warning');
+				$this->setRedirect($login_url);
+			}
+			else
+			{
+				$app->setHeader('status', '403 Forbidden', true);
+				$app->enqueueMessage(JText::_('FLEXI_ALERTNOTAUTH_TASK'), 'error');
+
+				if ($this->input->getCmd('tmpl') !== 'component')
+				{
+					$this->setRedirect($this->returnURL);
+				}
 			}
 
 			return;
@@ -419,59 +430,17 @@ class FlexicontentControllerMediadatas extends FlexicontentControllerBaseAdmin
 	 * Method to do prechecks for loading / saving mediadata forms
 	 *
 	 * @param   object    $content_id  The id of the content
-	 * @param   object    $item        by reference variable to return the mediadataed item
-	 * @param   object    $field       by reference variable to return the voting (mediadatas) field
-	 * @param   array     $errors      The array of error messages that have occured
+	 * @param   object    $item        by reference variable to return the mediadata containing item
+	 * @param   object    $model       The record model (mediadata)
+	 * @param   array     $errors      by reference the array of error messages that have occured
 	 *
 	 * @return  void
 	 *
 	 * @since   3.3.0
 	 */
-	private function _preMediadataingChecks($content_id, & $item = null, & $field = null, $errors = null)
+	private function _preChecks($content_id, & $item, $model, & $errors)
 	{
 		$this->input->get('task', '', 'cmd') !== __FUNCTION__ or die(__FUNCTION__ . ' : direct call not allowed');
-
-		$app  = JFactory::getApplication();
-		$user = JFactory::getUser();
-		$db   = JFactory::getDbo();
-
-
-		/**
-		 * Load content item related to the mediadata
-		 */
-
-		$item = JTable::getInstance($type = 'flexicontent_items', $prefix = '', $config = array());
-
-		if ($content_id && !$item->load($content_id))
-		{
-			$errors[] = 'ID: ' . $pk . ': ' . $item->getError();
-			return;
-		}
-
-
-		/**
-		 * Do voting / mediadataing permissions check
-		 */
-
-		// Get voting field
-		$query = 'SELECT * FROM #__flexicontent_fields WHERE field_type = ' . $db->Quote('voting');
-		$field = $db->setQuery($query)->loadObject();
-
-		// Load field's configuration together with type-specific field customization
-		FlexicontentFields::loadFieldConfig($field, $item);
-
-		// Load field's language files
-		JFactory::getLanguage()->load('plg_flexicontent_fields_core', JPATH_ADMINISTRATOR, 'en-GB', true);
-		JFactory::getLanguage()->load('plg_flexicontent_fields_core', JPATH_ADMINISTRATOR, null, true);
-
-		// Get needed parameters
-		$allow_mediadatas = (int) $field->parameters->get('allow_mediadatas', 0);
-
-		// Check mediadatas are allowed
-		if (!$allow_mediadatas)
-		{
-			$errors[] = 'Mediadatas are disabled';
-		}
 	}
 
 
@@ -965,31 +934,5 @@ class FlexicontentControllerMediadatas extends FlexicontentControllerBaseAdmin
 				: $result->message_main = $mssg;
 			jexit(json_encode($result));
 		}
-	}
-
-
-	/**
-	 * Returns the content model of the item associated with the given mediadata
-	 *
-	 * @param $mediadata_id - The ID of the mediadata
-	 *
-	 * @return An item model instance
-	 */
-	private function _getContentModel($mediadata_id)
-	{
-		$this->input->get('task', '', 'cmd') !== __FUNCTION__ or die(__FUNCTION__ . ' : direct call not allowed');
-
-		// Get mediadata model and from it get the associated content ID and content Type
-		$mediadata_model = $this->getModel($this->record_name);
-		$mediadata_model->setId($mediadata_id);
-
-		$content_id   = $mediadata_model->get('content_id');
-		$content_type = $mediadata_model->get('type');
-
-		// Get the related content model and set the desired content ID into the content item model
-		$content_model = $this->getModel($content_type);
-		$content_model->setId($content_id);
-
-		return $content_model;
 	}
 }

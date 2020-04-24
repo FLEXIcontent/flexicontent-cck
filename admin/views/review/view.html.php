@@ -234,13 +234,9 @@ class FlexicontentViewReview extends FlexicontentViewBaseRecord
 
 
 		// Cancel button, TODO frontend modal close
-		//if ($isAdmin && !$isCtmpl)
-		//{
-			$isnew
-				? JToolbarHelper::cancel($ctrl.'.cancel', $isAdmin ? 'JTOOLBAR_CANCEL' : 'FLEXI_CANCEL')
-				: JToolbarHelper::cancel($ctrl.'.cancel', $isAdmin ? 'JTOOLBAR_CLOSE' : 'FLEXI_CLOSE_FORM');
-		//}
-
+		$isnew
+			? JToolbarHelper::cancel($ctrl.'.cancel', $isAdmin ? 'JTOOLBAR_CANCEL' : 'FLEXI_CANCEL')
+			: JToolbarHelper::cancel($ctrl.'.cancel', $isAdmin ? 'JTOOLBAR_CLOSE' : 'FLEXI_CLOSE_FORM');
 
 		// Preview button
 		if (!$isnew)

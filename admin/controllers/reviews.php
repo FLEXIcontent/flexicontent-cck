@@ -115,7 +115,16 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 	 */
 	public function cancel()
 	{
-		JFactory::getApplication()->enqueueMessage(JText::_('Closed'), 'success');
+		if ($this->input->getCmd('tmpl') === 'component')
+		{
+			JFactory::getApplication()->enqueueMessage(
+				"<script>
+					window.parent.fc_closeDialog('fc_modal_popup_container');
+				</script>"
+				, 'success'
+			);
+		}
+
 		return parent::cancel();
 	}
 
@@ -244,7 +253,7 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 		$content_id  = $this->input->get('content_id', 0, 'int');
 		$review_type = $this->input->get('review_type', 'item', 'cmd');
 
-		// Try to load review by attributes in HTTP Request
+		// Try to load record by attributes in HTTP Request
 		if ($content_id && $review_type && $user->id)
 		{
 			// First try to match review of the item submitted by current user id regardless of email
