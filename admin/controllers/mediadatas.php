@@ -17,25 +17,25 @@ use Joomla\Utilities\ArrayHelper;
 JLoader::register('FlexicontentControllerBaseAdmin', JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'controllers' . DS . 'base' . DS . 'baseadmin.php');
 
 // Manually import models in case used by frontend, then models will not be autoloaded correctly via getModel('name')
-require_once JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'models' . DS . 'review.php';
-require_once JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'models' . DS . 'reviews.php';
+require_once JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'models' . DS . 'mediadata.php';
+require_once JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'models' . DS . 'mediadatas.php';
 
 /**
- * FLEXIcontent Reviews Controller
+ * FLEXIcontent Mediadatas Controller
  *
  * NOTE: -Only- if this controller is needed by frontend URLs, then create a derived controller in frontend 'controllers' folder
  *
  * @since 3.3
  */
-class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
+class FlexicontentControllerMediadatas extends FlexicontentControllerBaseAdmin
 {
-	var $records_dbtbl = 'flexicontent_reviews';
-	var $records_jtable = 'flexicontent_reviews';
+	var $records_dbtbl = 'flexicontent_mediadatas';
+	var $records_jtable = 'flexicontent_mediadatas';
 
-	var $record_name = 'review';
-	var $record_name_pl = 'reviews';
+	var $record_name = 'mediadata';
+	var $record_name_pl = 'mediadatas';
 
-	var $_NAME = 'REVIEW';
+	var $_NAME = 'MEDIADATA';
 	var $record_alias = 'not_applicable';
 
 	var $runMode = 'standalone';
@@ -70,7 +70,7 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 		$this->registerTask('unapproved', 'approved');
 
 		// Can manage ACL
-		$this->canManage = FlexicontentHelperPerm::getPerm()->CanReviews;
+		$this->canManage = FlexicontentHelperPerm::getPerm()->CanMediadatas;
 
 		// Error messages
 		$this->err_locked_recs_changestate = 'FLEXI_ROW_STATE_NOT_MODIFIED_DUE_ASSOCIATED_DATA';
@@ -218,8 +218,8 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 		}
 
 		$message = $value == 1
-			? JText::plural('FLEXI_N_REVIEWS_APPROVED', count($cid))
-			: JText::plural('FLEXI_N_REVIEWS_UNAPPROVED', count($cid));
+			? JText::plural('FLEXI_N_MEDIADATAS_APPROVED', count($cid))
+			: JText::plural('FLEXI_N_MEDIADATAS_UNAPPROVED', count($cid));
 		$this->setRedirect($this->returnURL, $message);
 	}
 
@@ -250,65 +250,17 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 		// Get/Create the model
 		$model = $this->getModel($this->record_name);
 
-		$content_id  = $this->input->get('content_id', 0, 'int');
-		$review_type = $this->input->get('review_type', 'item', 'cmd');
-
-		// Try to load record by attributes in HTTP Request
-		if ($content_id && $review_type && $user->id)
-		{
-			// First try to match review of the item submitted by current user id regardless of email
-			$record = $model->getRecord(array(
-				'content_id' => $content_id,
-				'type' => $review_type,
-				'user_id' => $user->id,
-			));
-			if ($record->id)
-			{
-				$app->enqueueMessage('Loaded your review for your account', '');
-			}
-			
-			// Second try to user email with zero user id, for the case that 
-			// the review was originally submitted as guest user, but user is now registered
-			if (!$record->id && $user->email)
-			{
-				// First try to match user id
-				$record = $model->getRecord(array(
-					'content_id' => $content_id,
-					'type' => $review_type,
-					'user_id' => 0,
-					'email' => $user->email,
-				));
-
-				if ($record->id)
-				{
-					$app->enqueueMessage('A review was found via your email', '');
-				}
-			}
-			//echo '<pre>'; print_r($record); echo '</pre>';
-		}
-
 		// Initialize a record if not done already
 		if (empty($record))
 		{
 			$record = $model->getItem();
 		}
 
-		$model->setState($this->getName() . '.id', $record->id);
-
-		if (!$record->id)
-		{
-			$model->setState('content_id', $content_id);
-			$model->setState('review_type', $review_type);
-			$model->setState('user_id', $user->id);
-			$model->setState('email', $user->email);
-		}
-
-
-		// Sanity checks before reviewing, content item exists, and reviewing are enabled
+		// Sanity checks
 		$item = null;
 		$errors = null;
 
-		$this->_preChecks($content_id, $item, $model, $errors);
+		$this->_preChecks(0, $item, $model, $errors);
 
 		if ($errors)
 		{
@@ -342,7 +294,7 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 				$login_url = $cparams->get('login_page', 'index.php?option=com_users&view=login');
 				$login_url .= (strstr($login_url, '?') ? '&'  : '?') . 'tmpl=component&return='.$return;
 
-				$app->enqueueMessage(JText::_('Please register or login before you can post a review'), 'warning');
+				$app->enqueueMessage(JText::_('Please register or login before you can edit this record'), 'warning');
 				$this->setRedirect($login_url);
 			}
 			else
@@ -437,12 +389,12 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 		}
 
 		/**
-		 * If user can not manage reviews then do "Review validation on the posted data"
+		 * If user can not manage mediadatas then do "Mediadata validation on the posted data"
 		 */
 
 		if (!$this->canManage)
 		{
-			$validated_data = $model->reviewerValidation($validated_data);
+			$validated_data = $model->submitterValidation($validated_data);
 
 			if (!$validated_data)
 			{
@@ -465,62 +417,6 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 	{
 		$this->input->get('task', '', 'cmd') !== __FUNCTION__ or die(__FUNCTION__ . ' : direct call not allowed');
 
-		$cparams = JComponentHelper::getParams('com_flexicontent');
-		$user    = JFactory::getUser();
-		$user_id = (int) $user->id;
-		$isNew   = !$model->get('id');
-		$item  = (object) array('type_id' => empty($record->item_type_id) ? 0 : $record->item_type_id);
-		$field = $model->getVotingReviewsField($item);
-
-		/**
-		 * Handling of new reviews
-		 */
-		if ($isNew)
-		{
-			// Set owner ID
-			$validated_data['user_id'] = $user_id;
-			
-			// Unlogged submission, require email verification
-			if (!$user_id)
-			{
-				$verify_email_ownership = (int) $field->parameters->get('verify_email_ownership', 1);
-				$validated_data['verified'] = $this->canManage || !$verify_email_ownership ? 1 : 0;
-			}
-		}
-
-		/**
-		 * Consistency checks
-		 */
-
-		// Update review's email if current editor is also review owner and editor's email has changed
-		if ($user_id && $model->get('user_id') ==  $user_id)
-		{
-			$validated_data['email'] = $user->email;
-		}
-
-		// Update review's user_id if current editor's email match user's email
-		if ($user_id && $model->get('email') ==  $user->email)
-		{
-			$validated_data['user_id'] = $user_id;
-		}
-
-		/**
-		 * New submission or modification of existing review via non-admin
-		 */
-		if (!$this->canManage)
-		{
-			// Clear "approved" status
-			$do_approval = (int) $field->parameters->get('do_approval', 1);
-			$validated_data['approved'] = !$do_approval ? 1 : 0;
-
-			// Modification of existing review (via non-admin), save old data if review is currently in "approved" status
-			if (!$isNew && $model->get('approved'))
-			{
-				$validated_data['title_old']       = $model->get('title');
-				$validated_data['description_old'] = $model->get('description');
-			}
-		}
-		
 		return true;
 	}
 
@@ -531,13 +427,11 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 
 
 	/**
-	 * Method to do prechecks for loading / saving review forms, like 
-	 * - if reviews are enabled
-	 * - if content item exists
+	 * Method to do prechecks for loading / saving mediadata forms
 	 *
 	 * @param   object    $content_id  The id of the content
-	 * @param   object    $item        by reference variable to return the reviewed item
-	 * @param   object    $model       The record model (review)
+	 * @param   object    $item        by reference variable to return the mediadata containing item
+	 * @param   object    $model       The record model (mediadata)
 	 * @param   array     $errors      by reference the array of error messages that have occured
 	 *
 	 * @return  void
@@ -547,35 +441,6 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 	private function _preChecks($content_id, & $item, $model, & $errors)
 	{
 		$this->input->get('task', '', 'cmd') !== __FUNCTION__ or die(__FUNCTION__ . ' : direct call not allowed');
-
-		$app   = JFactory::getApplication();
-		$user  = JFactory::getUser();
-		$field = $model->getVotingReviewsField($item);
-
-		/**
-		 * Check reviews are enabled
-		 */
-
-		$allow_reviews = (int) $field->parameters->get('allow_reviews', 0);
-
-		if (!$allow_reviews)
-		{
-			$errors[] = 'Reviews are disabled';
-			return;
-		}
-
-
-		/**
-		 * Load content item related to the review
-		 */
-
-		$item = JTable::getInstance($type = 'flexicontent_items', $prefix = '', $config = array());
-
-		if ($content_id && !$item->load($content_id))
-		{
-			$errors[] = 'ID: ' . $pk . ': ' . $item->getError();
-			return;
-		}
 	}
 
 
@@ -1069,31 +934,5 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 				: $result->message_main = $mssg;
 			jexit(json_encode($result));
 		}
-	}
-
-
-	/**
-	 * Returns the content model of the item associated with the given review
-	 *
-	 * @param $review_id - The ID of the review
-	 *
-	 * @return An item model instance
-	 */
-	private function _getContentModel($review_id)
-	{
-		$this->input->get('task', '', 'cmd') !== __FUNCTION__ or die(__FUNCTION__ . ' : direct call not allowed');
-
-		// Get review model and from it get the associated content ID and content Type
-		$review_model = $this->getModel($this->record_name);
-		$review_model->setId($review_id);
-
-		$content_id   = $review_model->get('content_id');
-		$content_type = $review_model->get('type');
-
-		// Get the related content model and set the desired content ID into the content item model
-		$content_model = $this->getModel($content_type);
-		$content_model->setId($content_id);
-
-		return $content_model;
 	}
 }

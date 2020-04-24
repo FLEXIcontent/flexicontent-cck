@@ -3,7 +3,7 @@
 	window.fc_refreshing_dependent = 0;
 	window.fc_dependent_params = {};
 	window.fc_cascade_field_funcs = {};
-
+	window.fc_Dialogs = {};
 
 	function fc_getAutoSizePos(winwidth, winheight, params)
 	{
@@ -296,6 +296,7 @@
 
 		// Open the dialog manually
 		var theDialog = container.dialog('open');
+		fc_Dialogs[tagid] = theDialog;
 
 		// Add modal's data to the data of the parent of the HTML container: max-width, max-height, params, dialog reference
 		theDialog.data('fc_dialog_params', params);
@@ -320,6 +321,18 @@
 		// Return a reference of the dialog to the caller
 		return theDialog;
 	}
+
+
+	// Close given dialog
+	function fc_closeDialog(name)
+	{
+		if (!!fc_Dialogs[name])
+		{
+			fc_Dialogs[name].dialog('close');
+		}
+		return false;
+	}
+
 
 	// Scroll into view
 	function fc_scrollIntoView (elem, smooth)

@@ -17,9 +17,9 @@ use Joomla\Utilities\ArrayHelper;
 JLoader::register('FlexicontentViewBaseRecord', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/base/view_record.php');
 
 /**
- * HTML View class for the Review screen
+ * HTML View class for the Mediadata screen
  */
-class FlexicontentViewReview extends FlexicontentViewBaseRecord
+class FlexicontentViewMediadata extends FlexicontentViewBaseRecord
 {
 	var $proxy_option = null;
 
@@ -51,8 +51,8 @@ class FlexicontentViewReview extends FlexicontentViewBaseRecord
 		$isCtmpl  = $tmpl === 'component';
 
 		$tip_class = ' hasTooltip';
-		$manager_view = 'reviews';
-		$ctrl = 'reviews';
+		$manager_view = 'mediadatas';
+		$ctrl = 'mediadatas';
 		$js = '';
 
 
@@ -109,8 +109,8 @@ class FlexicontentViewReview extends FlexicontentViewBaseRecord
 				? $document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', array('version' => FLEXI_VHASH))
 				: $document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', array('version' => FLEXI_VHASH));
 			!JFactory::getLanguage()->isRtl()
-				? $document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x.css' : 'j3x.css'), array('version' => FLEXI_VHASH))
-				: $document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x_rtl.css' : 'j3x_rtl.css'), array('version' => FLEXI_VHASH));
+				? $document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/j3x.css', array('version' => FLEXI_VHASH))
+				: $document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/j3x_rtl.css', array('version' => FLEXI_VHASH));
 		}
 		else
 		{
@@ -125,7 +125,7 @@ class FlexicontentViewReview extends FlexicontentViewBaseRecord
 		flexicontent_html::loadFramework('flexi-lib-form');
 
 		// Load custom behaviours: form validation, popup tooltips
-		JHtml::_('behavior.formvalidator');
+		JHtml::_('behavior.formvalidation');
 		JHtml::_('bootstrap.tooltip');
 
 		// Add js function to overload the joomla submitform validation
@@ -144,8 +144,8 @@ class FlexicontentViewReview extends FlexicontentViewBaseRecord
 
 		// SET toolbar title
 		!$isnew
-			? JToolbarHelper::title(JText::_('FLEXI_EDIT_REVIEW'), 'reviewedit')
-			: JToolbarHelper::title(JText::_('FLEXI_NEW_REVIEW'), 'reviewadd');
+			? JToolbarHelper::title(JText::_('FLEXI_EDIT_MEDIADATA'), 'mediadataedit')
+			: JToolbarHelper::title(JText::_('FLEXI_NEW_MEDIADATA'), 'mediadataadd');
 
 
 		/**
@@ -237,22 +237,6 @@ class FlexicontentViewReview extends FlexicontentViewBaseRecord
 		$isnew
 			? JToolbarHelper::cancel($ctrl.'.cancel', $isAdmin ? 'JTOOLBAR_CANCEL' : 'FLEXI_CANCEL')
 			: JToolbarHelper::cancel($ctrl.'.cancel', $isAdmin ? 'JTOOLBAR_CLOSE' : 'FLEXI_CLOSE_FORM');
-
-		// Preview button
-		if (!$isnew)
-		{
-			// Create preview link (with xhtml to false ... we will do it manually) (at least for the ampersand)
-			$record_link = str_replace('&', '&amp;', FlexicontentHelperRoute::getItemRoute($row->content_id));
-			$previewlink = JRoute::_(JUri::root() . $record_link, $xhtml=false)
-				. "#review_id_".$row->id
-				;
-			$toolbar->appendButton( 'Custom', '
-				<button class="preview btn btn-small btn-fcaction btn-info spaced-btn" onclick="window.open(\''.$previewlink.'\'); return false;">
-					<span title="'.JText::_('FLEXI_PREVIEW').'" class="icon-screen"></span>
-					'.JText::_('FLEXI_PREVIEW').'
-				</button>', 'preview'
-			);
-		}
 
 
 		/**
