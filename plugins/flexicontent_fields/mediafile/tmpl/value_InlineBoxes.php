@@ -503,13 +503,17 @@ foreach($values as $file_id)
 
 	$html .= '<div class="fcclear"></div>'
 	. '
-		<span id="fcview_' . $item->id . '_' . $field->name . '_' . $n . '_file-data-txt"
+		<div id="fcview_' . $item->id . '_' . $field->name . '_' . $n . '_file-data-txt"
 			data-filename="' . htmlspecialchars($previewpath, ENT_COMPAT, 'UTF-8') . '"
 			data-wfpreview="' . htmlspecialchars($previewpath, ENT_COMPAT, 'UTF-8') . '"
 			data-wfpeaks="' . htmlspecialchars($peakspath, ENT_COMPAT, 'UTF-8') . '"
-			peakspath
-		></span>
-		<div id="fc_mediafile_audio_spectrum_box_' . $item->id . '_' . $FN_n . '" class="fc_mediafile_audio_spectrum_box" style="display: block; margin-top: 8px; position: relative;">
+			class="fc-wf-filedata"
+		></div>
+		<div id="fc_mediafile_audio_spectrum_box_' . $item->id . '_' . $FN_n . '" class="fc_mediafile_audio_spectrum_box"
+			data-fc_tagid="' . $item->id . '_' . $field->name . '_' . $n . '"
+			data-fc_fname="' .$field_name_js . '"
+			style="display: block; margin-top: 8px; position: relative; min-height: 128px; min-width: 100%;"
+		>
 			<div class="progress progress-striped active" style="visibility: hidden; position: absolute; width: 70%; top: 40%; left: 15%;">
 				<div class="bar" style="width: 0%;"></div>
 			</div>
@@ -625,9 +629,12 @@ endif;   // END OF   $prop !== 'display_properties_only'
 	$field->abspath[$use_ingroup ? $n : $i] = $abspath;
 	$field->file_data[$use_ingroup ? $n : $i] = $file_data;
 
-	if ($filename_original && $prop !== 'display_properties_only') $per_value_js .= "
-		fcview_mediafile.initValue('" . $item->id . '_' . $field->name . '_' . $n . "', '".$field_name_js."');
-	";
+	/*if ($filename_original && $prop !== 'display_properties_only')
+	{
+		$per_value_js .= "
+			fcview_mediafile.initValue('" . $item->id . '_' . $field->name . '_' . $n . "', '".$field_name_js."');
+		";
+	}*/
 
 	// Add microdata to every value if field -- is -- in a field group
 	if ($is_ingroup && $itemprop) $field->{$prop}[$n] = '<div style="display:inline" itemprop="'.$itemprop.'" >' .$field->{$prop}[$n]. '</div>';

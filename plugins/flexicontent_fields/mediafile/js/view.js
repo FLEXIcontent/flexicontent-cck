@@ -1,3 +1,45 @@
+class fc_Waveform_LazyLoad
+{
+	constructor(element, options)
+	{
+		this.options = {
+			root: null,
+			rootMargin: '0px 0px',
+			threshold: 0.25,
+			...options,
+		};
+		this.element = element;
+		this.resources = this.element.querySelectorAll('.fc_mediafile_audio_spectrum_box');
+		window.console.log(this.resources.length);
+
+		this.bindEvents();
+		this.init();
+	}
+
+	bindEvents() {
+		//this._lazyLoadAsset = this._lazyLoadAsset.bind(this, add extra vars here);
+	}
+
+	init() {
+		const assetsObserver = new IntersectionObserver((entries, assetsObserver) =>
+		{
+			entries.filter(entry => entry.isIntersecting).forEach(entry =>
+			{
+				this._lazyLoadAsset(entry.target);
+				assetsObserver.unobserve(entry.target);
+			});
+		}, this.options);
+		this.resources.forEach(resource =>
+		{
+			assetsObserver.observe(resource);
+		});
+	}
+
+	_lazyLoadAsset(asset) {
+		fcview_mediafile.initValue(asset.getAttribute('data-fc_tagid'), asset.getAttribute('data-fc_fname'));
+	}
+}
+
 	var fcview_mediafile = {};
 	var fcview_mediafile_base_url = [];
 	var audio_spectrum_arr = [];

@@ -921,6 +921,17 @@ class plgFlexicontent_fieldsMediafile extends FCField
 			$document->addScript('https://unpkg.com/wavesurfer.js/dist/wavesurfer.min.js');
 			//$document->addScript('https://unpkg.com/wavesurfer.js/dist/plugin/wavesurfer.cursor.js');
 			$document->addScript(JUri::root(true) . '/plugins/flexicontent_fields/mediafile/js/view.js', array('version' => FLEXI_VHASH));
+
+			$document->addScriptDeclaration("
+			jQuery(document).ready(function()
+			{
+				new fc_Waveform_LazyLoad(
+					document.getElementsByTagName('body')[0], {
+						rootMargin: '0px 0px',
+						threshold: 0.25
+					});
+			});
+			");
 		}
 
 		$allowshare = $field->parameters->get( 'allowshare', 0 ) ;
