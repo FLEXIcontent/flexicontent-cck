@@ -123,9 +123,6 @@ class FlexicontentModelReview extends FCModelAdmin
 		$this->canManage = FlexicontentHelperPerm::getPerm()->CanReviews;
 		$this->canCreate = FlexicontentHelperPerm::getPerm()->CanCreateReviews;
 
-		// Get voting field for type 0 (No per type configuration)
-		$this->field = $this->getVotingReviewsField();
-
 		// Load field's language files
 		JFactory::getLanguage()->load('plg_flexicontent_fields_core', JPATH_ADMINISTRATOR, 'en-GB', true);
 		JFactory::getLanguage()->load('plg_flexicontent_fields_core', JPATH_ADMINISTRATOR, null, true);
@@ -207,7 +204,7 @@ class FlexicontentModelReview extends FCModelAdmin
 	 */
 	protected function preprocessForm(JForm $form, $data, $plugins_group = null)
 	{
-		$data_obj = $data && is_array($data) ? (object) $data : $data;
+		$data = $data && is_array($data) ? (object) $data : $data;
 
 		/**
 		 * Do not allow changing some properties
@@ -228,22 +225,20 @@ class FlexicontentModelReview extends FCModelAdmin
 
 		if (!$this->canManage)
 		{
-			// Clear "approved" status
-			$do_approval = (int) $this->field->parameters->get('do_approval', 1);
-			if ($do_approval)
-			{
-				$data->approved = 0;
-				if ($isNew && !$isLogged)
-				{
-					$data->verified = 0;
-				}
-			}
-
 			$readonlyFields = array_merge($readonlyFields,
-				array('state', 'approved', 'verified', 'useful_yes', 'useful_no', 'id', 'content_id', 'type', 'average_rating', 'custom_ratings', 'user_id', 'submit_date', 'update_date')
+				array(
+					'state', 'approved', 'verified', 'useful_yes', 'useful_no',
+					'id', 'type', 'average_rating', 'custom_ratings', 'user_id',
+					'submit_date', 'update_date',
+				)
 			);
 			$hiddenFields   = array_merge($hiddenFields,
-				array('state', 'approved', 'verified', 'useful_yes', 'useful_no', 'id', 'content_id', 'type', 'average_rating', 'custom_ratings', 'user_id', 'submit_date', 'update_date')
+				array(
+					'state', 'approved', 'verified', 'useful_yes', 'useful_no',
+					'id', 'type', 'average_rating', 'custom_ratings', 'user_id',
+					'submit_date', 'update_date',
+					'content_id',  // Form submitted but hidden
+				)
 			);
 		}
 
@@ -308,7 +303,7 @@ class FlexicontentModelReview extends FCModelAdmin
 
 		// Get per field's per type configuration if possible
 		$item  = (object) array('type_id' => empty($record->item_type_id) ? 0 : $record->item_type_id);
-		$field = $this->getVotingReviewsField($item);
+		$field = $this->getVotingReviewsField($item, $setAsDefault = true);
 
 		$allow_submit_review_by = (int) $field->parameters->get('allow_submit_review_by', 0);
 
@@ -448,7 +443,7 @@ class FlexicontentModelReview extends FCModelAdmin
 
 
 	/**
-	 * Method to validate the data posted by the reviewer
+	 * Method to do extra validation on the data posted by a reviewer
 	 *
 	 * @param   array     $data  The (already JForm validated) record data
 	 *
@@ -468,13 +463,13 @@ class FlexicontentModelReview extends FCModelAdmin
 		$errors = array();
 
 		// Validate title, decode entities, and strip HTML
-		$title = flexicontent_html::dataFilter($data['title'], $maxlength=255, 'STRING', 0);
+		$data['title'] = flexicontent_html::dataFilter($data['title'], $maxlength=255, 'STRING', 0);
 
 		// Validate email
-		$email = $user->id ? $user->email : flexicontent_html::dataFilter($data['email'], $maxlength=255, 'EMAIL', 0);
+		$data['email'] = $user->id ? $user->email : flexicontent_html::dataFilter($data['email'], $maxlength=255, 'EMAIL', 0);
 
 		// Validate text, decode entities and strip HTML
-		$text = flexicontent_html::dataFilter($data['text'], $maxlength=10000, 'STRING', 0);
+		$data['text'] = flexicontent_html::dataFilter($data['text'], $maxlength=10000, 'STRING', 0);
 
 
 		/**
@@ -487,7 +482,7 @@ class FlexicontentModelReview extends FCModelAdmin
 			return false;
 		}
 
-		if (!$email)
+		if (!$data['email'])
 		{
 			$this->setError('Email is invalid or empty');
 			return false;
@@ -571,7 +566,7 @@ class FlexicontentModelReview extends FCModelAdmin
 	 *
 	 * @since	3.4
 	 */
-	public function getVotingReviewsField($item = null)
+	public function getVotingReviewsField($item = null, $setAsDefault = false)
 	{
 		if (empty($this->fields[$item ? $item->type_id : 0]))
 		{
@@ -583,6 +578,11 @@ class FlexicontentModelReview extends FCModelAdmin
 			FlexicontentFields::loadFieldConfig($field, $item);
 
 			$this->fields[$item ? $item->type_id : 0] = $field;
+
+			if ($setAsDefault)
+			{
+				$this->fields[0] = $field;
+			}
 		}
 
 		return $this->fields[$item ? $item->type_id : 0];

@@ -91,7 +91,19 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 	 */
 	public function save()
 	{
-		parent::save();
+		$result = parent::save();
+
+		if ($result !== false && $this->task === 'save' && $this->input->getCmd('tmpl') === 'component')
+		{
+			JFactory::getApplication()->enqueueMessage(
+				"<script>
+					setTimeout(function(){
+						window.parent.fc_closeDialog('fc_modal_popup_container');
+					}, 2000);
+				</script>"
+				, 'success'
+			);
+		}
 	}
 
 
@@ -470,7 +482,7 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 		$user_id = (int) $user->id;
 		$isNew   = !$model->get('id');
 		$item  = (object) array('type_id' => empty($record->item_type_id) ? 0 : $record->item_type_id);
-		$field = $model->getVotingReviewsField($item);
+		$field = $model->getVotingReviewsField($item, $setAsDefault = true);
 
 		/**
 		 * Handling of new reviews
@@ -550,7 +562,7 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 
 		$app   = JFactory::getApplication();
 		$user  = JFactory::getUser();
-		$field = $model->getVotingReviewsField($item);
+		$field = $model->getVotingReviewsField($item, $setAsDefault = true);
 
 		/**
 		 * Check reviews are enabled
