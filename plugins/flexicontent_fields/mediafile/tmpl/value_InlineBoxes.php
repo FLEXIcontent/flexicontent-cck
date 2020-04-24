@@ -644,15 +644,16 @@ endif;   // END OF   $prop !== 'display_properties_only'
 	if (!$multiple) break;  // multiple values disabled, break out of the loop, not adding further values even if the exist
 }
 
-if ($per_value_js) JFactory::getDocument()->addScriptDeclaration("
+JFactory::getDocument()->addScriptDeclaration("
 	fcview_mediafile_base_url['".$field_name_js."'] = '".$base_url."';
-
+	
+	" . (!$per_value_js ? "" : "
 	//document.addEventListener('DOMContentLoaded', function()
 	jQuery(document).ready(function()
 	{
 		" . $per_value_js . "
 	});
-");
+"));
 
 
 // ***
