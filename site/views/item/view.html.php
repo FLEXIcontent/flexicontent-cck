@@ -405,13 +405,14 @@ class FlexicontentViewItem extends JViewLegacy
     $print_link = $curr_url .(strstr($curr_url, '?') ? '&amp;'  : '?').'pop=1&amp;tmpl=component&amp;print=1';
 		$pageclass_sfx = htmlspecialchars($params->get('pageclass_sfx'));
 
-		$this->item = $item;
-		$this->user = $user;
-		$this->params = $params;
-		$this->print_link = $print_link;
+		$this->item    = $item;
+		$this->user    = $user;
+		$this->params  = $params;
+		$this->parents = $parents;
+		$this->print_link    = $print_link;
 		$this->pageclass_sfx = $pageclass_sfx;
-		$this->fields = $item->fields;
-		$this->tmpl   = $tmpl;
+		$this->fields        = $item->fields;
+		$this->tmpl          = $tmpl;
 
 
 		// NOTE: Moved decision of layout into the model, function decideLayout() layout variable should never be empty
