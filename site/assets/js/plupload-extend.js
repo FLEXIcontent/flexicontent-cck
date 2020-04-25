@@ -154,7 +154,7 @@ fc_plupload = function(options)
 
 				BeforeUpload: function (up, file)
 				{
-					var validationBox = $(up.settings.container).next('input.validate-fcuploader');
+					var validationBox = $(up.settings.container).parent().find('input.validate-fcuploader');
 					validationBox.val('Upload in progress').data('error-mssg', Joomla.JText._('FLEXI_UPLOADING') + ' ... ' + Joomla.JText._('FLEXI_PLEASE_WAIT'));
 
 					// Called right before the upload for a given file starts, can be used to cancel it if required
@@ -177,9 +177,11 @@ fc_plupload = function(options)
 
 				UploadComplete: function (up, files)
 				{
-					var validationBox = $(up.settings.container).next('input.validate-fcuploader');
+					// This is not strictly necessary but it will clear 'Uploading' validation message immediately ...
+					var validationBox = $(up.settings.container).parent().find('input.validate-fcuploader');
 					validationBox.val('').removeClass('invalid').attr('aria-invalid', 'false').data('error-mssg', '');
 					validationBox.next('.fc-field-invalid').remove();
+					validationBox.parent().children(':first-child.fc-field-invalid').remove();
 
 					if (up.getOption('refresh_on_complete'))
 					{

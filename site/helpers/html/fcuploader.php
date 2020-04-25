@@ -62,9 +62,9 @@ abstract class JHtmlFcuploader
 				<div id="'. $up_tag_id . $n .'" data-tagid-prefix="'. $up_tag_id .'" class="fc_file_uploader '.$up_css_class.' '.$up_tag_id.'" style="display:none;">
 					<span class="alert alert-warning">File uploader script failed to start</span>
 				</div>
-				<input type="hidden" value=""
-					class="validate-fcuploader"
-					data-error-mssg="" data-error-css="vertical-align: top;"
+				<input type="text" value=""
+					class="validate-fcuploader fc_hidden_value"
+					data-error-mssg="" data-error-css=""
 				/>
 			'
 		);
