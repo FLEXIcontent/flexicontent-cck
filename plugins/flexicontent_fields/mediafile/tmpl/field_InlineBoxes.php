@@ -16,8 +16,8 @@ foreach ($field->value as $file_id)
 	$filename_original = $file_data->filename_original ? $file_data->filename_original : $file_data->filename;
 
 	$ext = strtolower(flexicontent_upload::getExt($file_data->filename));
-	$file_data->waveform_preview = 'audio_preview/' . str_ireplace('.'.$ext, '', basename($file_data->filename)) . '.mp3';
-	$file_data->waveform_peaks   = 'audio_preview/' . str_ireplace('.'.$ext, '', basename($file_data->filename)) . '.json';
+	$file_data->waveform_preview = !$file_data->filename ? '' : 'audio_preview/' . str_ireplace('.'.$ext, '', basename($file_data->filename)) . '.mp3';
+	$file_data->waveform_peaks   = !$file_data->filename ? '' : 'audio_preview/' . str_ireplace('.'.$ext, '', basename($file_data->filename)) . '.json';
 
 	$preview_css = 'width:100px; height:100px;';
 
