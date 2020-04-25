@@ -738,19 +738,18 @@ var JFormValidator = function()
 		// Do scrolling here if not an FC form
 		if (!valid && !isFCvalidation)
 		{
-			window.console.log('scrolling');
 			// Form is not invalid, focus the first invalid element, or focus the all errors container
-			var invalid = jQuery('.invalid').first();  // Get single element so that hidden check will work
+			var invalid = jQuery('.fc-field-invalid:visible, .invalid:visible').first();
 
 			setTimeout(function()   // This works without the timeout too ...
 			{
-				if (invalid.is(':hidden'))
+				if (!invalid.length)
 				{
 					invalid = jQuery('#system-message-container');
 				}
 				if (invalid.length)
 				{
-					var pos = invalid.offset().top - 80;
+					var pos = invalid.offset().top - 120;
 					jQuery('html, body').animate({
 						scrollTop: pos
 					}, 400);
@@ -853,9 +852,13 @@ var JFormValidator = function()
 
 			else if ($el.hasClass('fc_hidden_value'))
 			{
+				var error_mssg = $el.data('error-mssg');
+				var error_css  = $el.data('error-css');
+				error_mssg = error_mssg ? error_mssg : Joomla.JText._($el.val() ? 'FLEXI_INVALID' : 'FLEXI_REQUIRED')
+
 				if (!$el.parent().children(':first-child').hasClass('fc-field-invalid'))
 				{
-					jQuery('<span class="fc-field-invalid alert alert-error">' + Joomla.JText._($el.val() ? 'FLEXI_INVALID' : 'FLEXI_REQUIRED') + '</span>').prependTo( $el.parent() );
+					jQuery('<span class="fc-field-invalid alert alert-error" style="' + error_css +'">' + error_mssg + '</span>').prependTo( $el.parent() );
 				}
 			}
 
