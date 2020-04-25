@@ -62,6 +62,10 @@ abstract class JHtmlFcuploader
 				<div id="'. $up_tag_id . $n .'" data-tagid-prefix="'. $up_tag_id .'" class="fc_file_uploader '.$up_css_class.' '.$up_tag_id.'" style="display:none;">
 					<span class="alert alert-warning">File uploader script failed to start</span>
 				</div>
+				<input type="hidden" value=""
+					class="validate-fcuploader"
+					data-error-mssg="" data-error-css="vertical-align: top;"
+				/>
 			'
 		);
 	}
@@ -120,6 +124,10 @@ abstract class JHtmlFcuploader
 		flexicontent_html::loadFramework('plupload', $plupload_mode);
 		flexicontent_html::loadFramework('flexi-lib');
 
+		JText::script("FLEXI_LOADING_IMAGES", true);
+		JText::script("FLEXI_THUMBNAILS", true);
+		JText::script("FLEXI_UPLOADING", true);
+		JText::script("FLEXI_PLEASE_WAIT", true);
 		JText::script("FLEXI_FILE_PROPERTIES", true);
 		JText::script("FLEXI_APPLYING_DOT", true);
 		JFactory::getDocument()->addScript(JUri::root(true).'/components/com_flexicontent/assets/js/plupload-extend.js', array('version' => FLEXI_VHASH));
