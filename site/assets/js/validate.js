@@ -100,6 +100,19 @@ var JFormValidator = function()
 			return false;
 		});
 
+		setHandler('fcuploader', function (el) {
+			var $el = jQuery(el);
+			var value = $el.val();
+
+			// We check for empty value, but this is redudant as this handler is never called if value is empty string
+			if (!!value && value != 'done')
+			{
+				return true;
+			}
+
+			return false;
+		});
+
 		setHandler('catid', function (el) {
 			// Check for value if primary category is set
 			var $el = jQuery(el);
@@ -849,10 +862,14 @@ var JFormValidator = function()
 			// Do not add for radio-buttons / checkoxes, since these have custom code
 			else if (!is_radio_check)
 			{
+				var error_mssg = $el.data('error-mssg');
+				var error_css  = $el.data('error-css');
+				error_mssg = error_mssg ? error_mssg : Joomla.JText._($el.val() ? 'FLEXI_INVALID' : 'FLEXI_REQUIRED')
+
 				if (!$el.next().hasClass('fc-field-invalid'))
 				{
 					$el.css({'width': 'auto'});
-					jQuery('<span class="fc-field-invalid alert alert-error">' + Joomla.JText._($el.val() ? 'FLEXI_INVALID' : 'FLEXI_REQUIRED') + '</span>').insertAfter( $el );
+					jQuery('<span class="fc-field-invalid alert alert-error" style="' + error_css +'">' + error_mssg + '</span>').insertAfter( $el );
 				}
 			}
 			
