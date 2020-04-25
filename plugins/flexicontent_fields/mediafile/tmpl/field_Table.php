@@ -142,7 +142,7 @@ foreach ($field->value as $file_id)
 					'.JText::_( 'Remove file' ).'
 				</label>
 			</fieldset>
-			' : ( (!$multiple || $is_ingroup) && $required_class ? '<br/><div class="alert alert-info fc-small fc-iblock">'.JText::_('FLEXI_FIELD_'.$FT.'_REQUIRED_UPLOAD_NEW_TO_REPLACE').'</div>' : '')).'
+			' : ( (!$multiple || $is_ingroup) && $required_class && $file_data->filename ? '<div class="alert alert-info fc-small fc-iblock">'.JText::_('FLEXI_FIELD_'.$FT.'_REQUIRED_UPLOAD_NEW_TO_REPLACE').'</div>' : '')).'
 		</td>
 
 	</tr>

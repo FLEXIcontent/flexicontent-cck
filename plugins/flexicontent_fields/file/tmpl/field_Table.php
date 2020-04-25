@@ -109,7 +109,9 @@ foreach ($field->value as $file_id)
 				<div class="fc_filedata_txt_nowrap nowrap_hidden">'.$file_data->filename.'<br/>'.$file_data->altname.'</div>
 				<input class="fc_filedata_txt inlinefile-data-txt '. $info_txt_classes . $required_class .'"
 					readonly="readonly" name="'.$fieldname_n.'[file-data-txt]" id="'.$elementid_n.'_file-data-txt" '.$info_txt_tooltip.'
-					value="'.htmlspecialchars($filename_original, ENT_COMPAT, 'UTF-8').'" data-filename="'.htmlspecialchars($file_data->filename, ENT_COMPAT, 'UTF-8').'" />
+					value="'.htmlspecialchars($filename_original, ENT_COMPAT, 'UTF-8').'"
+					data-filename="'.htmlspecialchars($file_data->filename, ENT_COMPAT, 'UTF-8').'"
+				/>
 				'.(!$iform_title ? '
 				<div class="'.$input_grp_class.'">
 					<label class="' . $add_on_class . ' fc-lbl fc_filedata_title-lbl">'.JText::_( 'FLEXI_FILE_DISPLAY_TITLE' ).'</label>
@@ -134,7 +136,7 @@ foreach ($field->value as $file_id)
 					'.JText::_( 'Remove file' ).'
 				</label>
 			</fieldset>
-			' : ( (!$multiple || $is_ingroup) && $required_class ? '<br/><div class="alert alert-info fc-small fc-iblock">'.JText::_('FLEXI_FIELD_'.$FT.'_REQUIRED_UPLOAD_NEW_TO_REPLACE').'</div>' : '')).'
+			' : ( (!$multiple || $is_ingroup) && $required_class && $file_data->filename ? '<div class="alert alert-info fc-small fc-iblock">'.JText::_('FLEXI_FIELD_'.$FT.'_REQUIRED_UPLOAD_NEW_TO_REPLACE').'</div>' : '')).'
 		</td>
 
 	</tr>

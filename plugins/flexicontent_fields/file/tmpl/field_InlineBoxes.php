@@ -107,7 +107,9 @@ foreach ($field->value as $file_id)
 				<div class="fc_filedata_txt_nowrap nowrap_hidden">'.$file_data->filename.'<br/>'.$file_data->altname.'</div>
 				<input class="fc_filedata_txt inlinefile-data-txt '. $info_txt_classes . $required_class .'"
 					readonly="readonly" name="'.$fieldname_n.'[file-data-txt]" id="'.$elementid_n.'_file-data-txt" '.$info_txt_tooltip.'
-					value="'.htmlspecialchars($filename_original, ENT_COMPAT, 'UTF-8').'" data-filename="'.htmlspecialchars($file_data->filename, ENT_COMPAT, 'UTF-8').'" />
+					value="'.htmlspecialchars($filename_original, ENT_COMPAT, 'UTF-8').'"
+					data-filename="'.htmlspecialchars($file_data->filename, ENT_COMPAT, 'UTF-8').'"
+				/>
 				'.(!$iform_title ? '
 				<div class="'.$input_grp_class.' fc-xpended-row">
 					<label class="' . $add_on_class . ' fc-lbl fc_filedata_title-lbl">'.JText::_( 'FLEXI_FILE_DISPLAY_TITLE' ).'</label>
@@ -123,26 +125,27 @@ foreach ($field->value as $file_id)
 			<fieldset class="group-fcset">
 				<input type="checkbox" id="'.$elementid_n.'_file-del" class="inlinefile-del" name="'.$fieldname_n.'[file-del]" value="1" onchange="file_fcfield_del_existing_value'.$field->id.'(this);" />
 				<label class="label inlinefile-del-lbl '.$tooltip_class.'" title="'.flexicontent_html::getToolTip('FLEXI_FIELD_'.$FT.'_ABOUT_REMOVE_FILE', 'FLEXI_FIELD_'.$FT.'_ABOUT_REMOVE_FILE_DESC', 1, 1).'" id="'.$elementid_n.'_file-del-lbl" for="'.$elementid_n.'_file-del" >
-					'.JText::_( 'Remove file' ).'
+					'.JText::_( 'Delete from server storage' ).'
 				</label>
 			</fieldset>
-			' : ( (!$multiple || $is_ingroup) && $required_class ? '<br/><div class="alert alert-info fc-small fc-iblock">'.JText::_('FLEXI_FIELD_'.$FT.'_REQUIRED_UPLOAD_NEW_TO_REPLACE').'</div>' : '')).'
+			' : ( (!$multiple || $is_ingroup) && $required_class && $file_data->filename ? '<div class="alert alert-info fc-small fc-iblock">'.JText::_('FLEXI_FIELD_'.$FT.'_REQUIRED_UPLOAD_NEW_TO_REPLACE').'</div>' : '')).'
 
 			<div class="fcclear"></div>
 
 			<div class="'.$input_grp_class.' fc-xpended-row inlinefile-data-actions">
-				' . $_select_file_lbl . '
 				<input type="hidden" id="'.$elementid_n.'_file-id" name="'.$fieldname_n.'[file-id]" value="'.htmlspecialchars($file_id, ENT_COMPAT, 'UTF-8').'" class="fc_fileid" />'.'
 				'.(! $field->parameters->get('use_myfiles', '1') ? '
+				' . $_select_file_lbl . '
 				<span class="btn btn-info fc_fileupload_box">
 					<span>'.JText::_('FLEXI_FIELD_'.$FT.'_UPLOAD_NEW').'</span>
 					<input type="file" id="'.$elementid_n.'_file-data" name="'.$fieldname_n.'[file-data]" class="fc_filedata" data-rowno="'.$n.'" onchange="var file_box = jQuery(this).parent().parent().parent(); fc_loadImagePreview(this.id,\''.$elementid.'_\'+jQuery(this).attr(\'data-rowno\')+\'_img_preview\', \''.$elementid.'_\'+jQuery(this).attr(\'data-rowno\')+\'_file-data-txt\', 100, 0, \''.$PRV_TYPE.'\'); file_box.find(\'.inlinefile-secure-data\').show(400);  file_box.find(\'.inlinefile-secure-info\').hide(400); file_box.find(\'.inlinefile-del\').removeAttr(\'checked\').trigger(\'change\'); " />
 				</span>
-				' : '
+				' : ($field->parameters->get('use_myfiles', '1') > 0 ? '
+				' . $_select_file_lbl . '
 				<span class="btn btn-info addfile hasTooltip" id="'.$elementid_n.'_addfile" title="'.$_prompt_txt.'" data-href="'.$addExistingURL.'" onclick="'.$addExistingURL_onclick.'" data-rowno="'.$n.'">
 					'.JText::_('FLEXI_FIELD_'.$FT.'_MY_FILES').'
-				</span>
-				').'
+				</span>' : '')
+				).'
 			</div>
 
 		</div>'.
