@@ -62,6 +62,7 @@ abstract class JHtmlFcuploader
 				<div id="'. $up_tag_id . $n .'" data-tagid-prefix="'. $up_tag_id .'" class="fc_file_uploader '.$up_css_class.' '.$up_tag_id.'" style="display:none;">
 					<span class="alert alert-warning">File uploader script failed to start</span>
 				</div>
+				<div class="fc_uploader_mssg_box" style="display: inline-block; padding: 4px 12px; vertical-align: top;"></div>
 				<input type="text" value=""
 					class="validate-fcuploader fc_hidden_value"
 					data-error-mssg="" data-error-css=""
@@ -124,6 +125,8 @@ abstract class JHtmlFcuploader
 		flexicontent_html::loadFramework('plupload', $plupload_mode);
 		flexicontent_html::loadFramework('flexi-lib');
 
+		JText::script("FLEXI_PREPARING_FILE_DATA", true);
+		JText::script("FLEXI_UPLOAD_FINISHED", true);
 		JText::script("FLEXI_LOADING_IMAGES", true);
 		JText::script("FLEXI_THUMBNAILS", true);
 		JText::script("FLEXI_UPLOADING", true);

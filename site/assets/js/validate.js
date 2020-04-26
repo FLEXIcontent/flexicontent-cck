@@ -859,6 +859,9 @@ var JFormValidator = function()
 				if (!$el.parent().children(':first-child').hasClass('fc-field-invalid'))
 				{
 					jQuery('<span class="fc-field-invalid alert alert-error" style="' + error_css +'">' + error_mssg + '</span>').prependTo( $el.parent() );
+
+					// Prevent showing required error until the other error is cleared
+					$el.parent().find('.invalid.required').removeClass('invalid');
 				}
 			}
 
