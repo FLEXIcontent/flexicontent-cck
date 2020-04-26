@@ -1808,53 +1808,90 @@ span.fc-centered-icon-box {
 	opacity: 0.9;
 	display: block;
 }
-.fc_mediafile_controls_iformbox {
+div.fc_mediafile_audio_spectrum_box_outer {
+	position: relative;
+}
+div.fc_mediafile_audio_spectrum_box_outer div.fc_mediafile_controls_iformbox {
 	float: right;
 	position: absolute;
 	top: -32px;
 	right: 0;
 }
-.fc_mediafile_controls {
+div.fc_mediafile_audio_spectrum_box_outer div.fc_mediafile_audio_spectrum_box {
+	display: block;
+	margin-top: 8px;
+	position: relative;
+	border: 1px dashed;
+	min-height: 128px;
+	min-width: 100%;
+	box-sizing: border-box;
+}
+div.fc_mediafile_audio_spectrum_box_outer div.fc_mediafile_audio_spectrum_progressbar {
+	visibility: hidden;
+	position: absolute !important;
+	width: 70% !important;
+	top: 0% !important;
+	left: 15% !important;
+	z-index: 10000 !important;
+	text-align: center !important;
+	height: 32px;
+	font-size: 24px;
+	line-height: 100%;
+}
+div.fc_mediafile_audio_spectrum_box_outer div.fc_mediafile_audio_spectrum_progressbar div.barText {
+	height: 32px;
+	font-size: 24px;
+	line-height: 100%;
+}
+div.fc_mediafile_audio_spectrum_box_outer div.fc_mediafile_audio_spectrum_progressbar div.bar {
+	z-index: -1;
+	position: absolute;
+	top: 0;
+}
+div.fc_mediafile_audio_spectrum_box_outer div.fc_mediafile_controls {
 	text-align: center;
 	margin: 0 0 10px 0;
 }
-.fc_mediafile_controls .playBtn,
-.fc_mediafile_controls .pauseBtn,
-.fc_mediafile_controls .stopBtn,
-.fc_mediafile_controls .loadBtn,
-.fc_mediafile_controls .downloadBtn {
+div.fc_mediafile_audio_spectrum_box_outer div.fc_mediafile_controls .playBtn,
+div.fc_mediafile_audio_spectrum_box_outer div.fc_mediafile_controls .pauseBtn,
+div.fc_mediafile_audio_spectrum_box_outer div.fc_mediafile_controls .stopBtn,
+div.fc_mediafile_audio_spectrum_box_outer div.fc_mediafile_controls .loadBtn,
+div.fc_mediafile_audio_spectrum_box_outer div.fc_mediafile_controls .downloadBtn {
 	margin-left: 25px;
 	outline: none;
 	background: none;
 	display: inline-block;
 }
-.fc_mediafile_controls .pauseBtn,
-.fc_mediafile_controls .stopBtn,
-.fc_mediafile_controls .loadBtn {
+div.fc_mediafile_audio_spectrum_box_outer div.fc_mediafile_controls .pauseBtn,
+div.fc_mediafile_audio_spectrum_box_outer div.fc_mediafile_controls .stopBtn,
+div.fc_mediafile_audio_spectrum_box_outer div.fc_mediafile_controls .loadBtn {
 	display: none;
 }
-.fc_mediafile_controls > a {
+div.fc_mediafile_audio_spectrum_box_outer div.fc_mediafile_controls > a {
 	color: #333;
 	font-size: 16px;
 	vertical-align: bottom;
 }
-.fc_mediafile_controls span.controls {
+div.fc_mediafile_audio_spectrum_box_outer div.fc_mediafile_controls span.controls {
 	font-size: 24px;
 	color: #b7b7b7;
 	margin: 4px 24px 4px 0;
 	vertical-align: middle;
 }
-.btn-dwn-controls {
+div.fc_mediafile_audio_spectrum_box_outer .btn-dwn-controls {
 	line-height: 1 !important;
-	background: #b7b7b7 !important;
-	color: white !important;
+	background: #909090 !important;
+	color: #f0f0f0 !important;
 	font-family: "Roboto Condensed" !important;
-	font-weight: 600 !important;
+	font-weight: normal !important;
 	font-size: 19px !important;
 	padding: 5px 11px !important;
 	margin-left: 10px !important;
 	position: relative;
 	bottom: 4px;
+}
+div.fc_mediafile_audio_spectrum_box_outer .btn-dwn-controls span:before {
+	color: #f0f0f0 !important;
 }
 input.fc-inherited-value + label {
 	font-weight: bold !important;

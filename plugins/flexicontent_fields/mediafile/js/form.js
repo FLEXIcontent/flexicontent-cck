@@ -53,7 +53,14 @@ class fc_Waveform_LazyLoad
 		//window.console.log(tagid);
 		var fnn  = tagid.replace(/-/g, '_');
 		var file = jQuery('#custom_' + tagid + '_file-data-txt');
-		var loading_timer, progress_timer;
+		var loading_timer = null, progress_timer = null;
+
+		var box = jQuery('#fc_mediafile_audio_spectrum_box_' + fnn);
+		var _progressBar = box.find('.fc_mediafile_audio_spectrum_progressbar');
+		var bar = _progressBar.find('.bar').get(0);
+		var barText = _progressBar.find('.barText').get(0);
+		var progressBar = box.find('.fc_mediafile_audio_spectrum_progressbar').get(0);
+		var mediaPlayer = jQuery('#fc_mediafile_audio_spectrum_box_' + fnn).find('.fc_mediafile_audio_spectrum').get(0);
 
 		var keyPlayPause = function keyPlayPause(key_event) {
 			if (key_event.keyCode == 32 || key_event.keyCode == 13 /*/*&& key_event.target.nodeName !== "WAVE"*/)
@@ -115,43 +122,67 @@ class fc_Waveform_LazyLoad
 			 return m + ':' + s;
 		}
 
-		var updateProgressBar = function (percents, eventTarget)
+		var updateProgressBar = function (percent, eventTarget)
 		{
-			var box = jQuery('#fc_mediafile_audio_spectrum_box_' + fnn);
-			box.show();
-			var factor = 75;
+			var factor = 100;
+			
+			barText.innerHTML = 'Loading : ' + percent + ' %';
+			//bar.style.width = (percent * factor / 100.0) + '%';
+			progressBar.style.opacity = '1';
+			progressBar.style.visibility = 'visible';
 
-			var progressBar = box.find('.progress');
-			progressBar.get(0).style.visibility = 'visible';
-			progressBar.find('.bar').get(0).style.width = (percents * factor / 100.0) + '%';
-
-			if (percents >= 100)
+			if (percent >= 100 && factor < 100)
 			{
 				var steps = 40;
 				var frame = 0;
 				loading_timer = setInterval(function ()
 				{
-					progressBar.find('.bar').get(0).style.width = factor + (frame * (factor / steps)) + '%';
+					barText.innerHTML = 'Loading : ' + percent + ' %';
+					//bar.style.width = factor + (frame * (factor / steps)) + '%';
 					frame += 1;
-					if (frame >= steps) clearInterval(loading_timer);
+					if (frame >= steps)
+					{
+						clearInterval(loading_timer);
+						loading_timer = 0;
+					}
 				}, 50);
 			}
-			//window.console.log('Loading file (Wavesurfer JS): ' + percents + ' %');
 			//window.console.log(eventTarget);
 		}
 
-		var stopProgressBar = function ()
+		var stopProgressBar = function (percent)
 		{
-			clearInterval(loading_timer);
-			clearInterval(progress_timer);
+			if (loading_timer) clearInterval(loading_timer);
+			if (progress_timer) clearInterval(progress_timer);
 
-			var box = jQuery('#fc_mediafile_audio_spectrum_box_' + fnn);
-			box.show();
+			loading_timer = null;
+			progress_timer = null;
+
+			if (!!stopProgressBar.stopping) return;
+			stopProgressBar.stopping = 1;
 
 			// Hide and reset progress bar
-			var progressBar = box.find('.progress');
-			progressBar.get(0).style.visibility = 'hidden';
-			progressBar.find('.bar').get(0).style.width = 0;
+
+			if (!!percent)
+			{
+				barText.innerHTML = 'Loading : ' + percent + ' %';
+				progressBar.style.opacity = '0.75';
+				//bar.style.width = percent + '%';
+
+				setTimeout(function () {
+					stopProgressBar.stopping = 0;
+					progressBar.style.visibility = 'hidden';
+					barText.innerHTML = '';
+					//bar.style.width = 0;
+				}, 750);
+			}
+			else
+			{
+				stopProgressBar.stopping = 0;
+				progressBar.style.visibility = 'hidden';
+				bar.style.width = 0;
+				barText.innerHTML = '';
+			}
 		}
 
 		var dummyProgress = function ()
@@ -164,9 +195,10 @@ class fc_Waveform_LazyLoad
 					percent = percent + 2;
 					updateProgressBar(percent);
 
-					if (progress_timer == 100)
+					if (percent == 100)
 					{
 						clearInterval(progress_timer);
+						progress_timer = 0;
 					}
 				}, 50);
 			}
@@ -175,19 +207,15 @@ class fc_Waveform_LazyLoad
 		var loadFile = function ()
 		{
 			var isURL = /^(f|ht)tps?:\/\//i.test(file.data('wfpreview'));
+			var peaks = audio_spectrum.backend.peaks || null;
+
+			//window.console.log('Loading');
 			//window.console.log('isURL: ' + isURL);
 			//window.console.log('filename: ' + file.data('wfpreview'));
 			//window.console.log('Base URL: ' + fcfield_mediafile_base_url[config_name]);
-			var peaks = audio_spectrum.backend.peaks || null;
-
-			// Loading from peaks file, then show an estimated progress bar, since loading event is not triggered in current version of wavesurfer
-			if (peaks)
-			{
-				dummyProgress();
-			}
-			//window.console.log('Playing');
 
 			isURL ? audio_spectrum.load(file.data('wfpreview'), peaks) : audio_spectrum.load(fcfield_mediafile_base_url[config_name] + '/' + file.data('wfpreview'), peaks);
+			audio_spectrum.drawBuffer();
 		}
 
 		// Imitate SoundCloud's mirror effect on the waveform. Only works on iOS. (Adapted from the wavesurfer.js demo.) 
@@ -299,22 +327,22 @@ class fc_Waveform_LazyLoad
 		}, false);*/
 
 
-		audio_spectrum.on('loading', function (percents, eventTarget)
+		audio_spectrum.on('loading', function (percent, eventTarget)
 		{
 			//window.console.log('loading: (waveform is loading / calculating peaks)');
-			updateProgressBar(percents, eventTarget);
+			//updateProgressBar(percent, eventTarget);
 		});
 
 		audio_spectrum.on('waveform-ready', function()
 		{
 			//window.console.log('waveform-ready: (Peaks loading is DONE)');
-			stopProgressBar();
+			//stopProgressBar(100);
 		});
 
 		audio_spectrum.on('ready', function()
 		{
 			//window.console.log('ready: (Player ready to play)');
-			stopProgressBar();
+			//stopProgressBar(100);
 
 			// Enable buttons
 			buttons.play.disabled = false;
@@ -471,12 +499,24 @@ class fc_Waveform_LazyLoad
 			var mp3Url = isURL ? file.data('wfpreview') : fcfield_mediafile_base_url[config_name] + '/' + file.data('wfpreview');
 			var jsonUrl = isURL ? file.data('wfpeaks') : fcfield_mediafile_base_url[config_name] + '/' + file.data('wfpeaks');
 
-			dummyProgress();
+			//dummyProgress();
+			updateProgressBar(0);
 
-			audio_spectrum.util.ajax({
+			var r = audio_spectrum.util.ajax({
 				responseType: 'json',
 				url: jsonUrl
-			}).on('success', function (response)
+			});
+			
+			r.on('progress', function(t)
+			{
+				var e;
+        if (t.lengthComputable) e = t.loaded / t.total;
+        else e = t.loaded / (t.loaded + 1e6);
+				//window.console.log(t + ' - ' + e);
+        updateProgressBar(Math.round(100 * e), null);
+			});
+
+			r.on('success', function (response)
 			{
 				var data = response.data;
 				data.unshift(data[1]);
@@ -484,16 +524,17 @@ class fc_Waveform_LazyLoad
 				// Scale peaks
 				audio_spectrum.backend.peaks = data; //.map(p => p/128);
 
-				// Draw peaks
-				setTimeout(function () {
-					stopProgressBar();
-
-					audio_spectrum.drawBuffer();
-				}, 10);
-
+				// Alternative we can load the file now ... using the peaks to avoid full download
 				//audio_spectrum.load(mp3Url, data);
+
+				// Do a waveform reDraw without any delay !!
+				audio_spectrum.drawBuffer();
+				
+				// Stop progressBar but first move it to 100%
+				stopProgressBar(100);
 			});
 		}
+
 	}
 
 	fcfield_mediafile.showUploader = function(field_name_n, config_name)

@@ -265,7 +265,8 @@ foreach ($field->value as $file_id)
 
 	<div class="fcclear"></div>'
 	. '
-	<div style="position: relative;">
+	<div class="fc_mediafile_audio_spectrum_box_outer">
+
 		<div class="fc_mediafile_controls_iformbox">
 			<!--div id="fc_mediafile_current_time_' . $FN_n . '" class="media_time">00:00:00</div-->
 			<div id="fc_mediafile_controls_' . $FN_n . '" class="fc_mediafile_controls">
@@ -286,15 +287,15 @@ foreach ($field->value as $file_id)
 		<div id="fc_mediafile_audio_spectrum_box_' . $FN_n . '" class="fc_mediafile_audio_spectrum_box"
 			data-fc_tagid="' . $field->name . '_' . $n . '"
 			data-fc_fname="' .$field_name_js . '"
-			style="display: block; margin-top: 8px; position: relative; border: 1px dashed;"
 		>
-			<div class="progress progress-striped active" style="visibility: visible; position: absolute; width: 70%; top: 40%; left: 15%;">
-				<div class="bar" style="width: 0%;"></div>
+			<div class="progress progress-striped active fc_mediafile_audio_spectrum_progressbar">
+				<div class="barText"></div>
+				<div class="bar" style="width: 100%;"></div>
 			</div>
 			<div id="fc_mediafile_audio_spectrum_' . $FN_n . '" class="fc_mediafile_audio_spectrum"></div>
 		</div>
+
 	</div>
-		';
 		';
 
 

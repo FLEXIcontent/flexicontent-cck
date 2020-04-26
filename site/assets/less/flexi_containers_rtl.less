@@ -764,50 +764,93 @@ span.fc-centered-icon-box {
 }
 
 
-.fc_mediafile_controls_iformbox {
-	float: left;
-	position: absolute;
-	top: -32px;
-	left: 0;
-}
-.fc_mediafile_controls {
-	text-align: center;
-	margin: 0 0 10px 0;
+div.fc_mediafile_audio_spectrum_box_outer {
+	position: relative;
 
-	.playBtn, .pauseBtn, .stopBtn, .loadBtn, .downloadBtn {
-		margin-right: 25px;
-		outline: none;
-		background: none;
-		display: inline-block;
+	div.fc_mediafile_controls_iformbox {
+		float: left;
+		position: absolute;
+		top: -32px;
+		left: 0;
 	}
 
-	.pauseBtn, .stopBtn, .loadBtn {
-		display: none;
+	div.fc_mediafile_audio_spectrum_box {
+		display: block;
+		margin-top: 8px;
+		position: relative;
+		border: 1px dashed;
+		min-height: 128px;
+		min-width: 100%;
+		box-sizing: border-box;
 	}
 
-	> a {
-		color: #333;
-		font-size: 16px;
-		vertical-align: bottom;
-	}
-
-	span.controls {
+	div.fc_mediafile_audio_spectrum_progressbar {
+		visibility: hidden;
+		position: absolute !important;
+		width: 70% !important;
+		top: 0% !important;
+		right: 15% !important;
+		z-index: 10000 !important;
+		text-align: center !important;
+		height: 32px;
 		font-size: 24px;
-		color: #b7b7b7;
-		margin: 4px 24px 4px 0;
-		vertical-align: middle;
+		line-height: 100%;
+
+		div.barText {
+			height: 32px;
+			font-size: 24px;
+			line-height: 100%;
+		}
+		div.bar {
+			z-index: -1;
+			position: absolute;
+			top: 0;
+		}
 	}
-}
-.btn-dwn-controls {
-	line-height: 1 !important;
-	background: #b7b7b7 !important;
-	color: white !important;
-	font-family: "Roboto Condensed" !important;
-	font-weight: 600 !important;
-	font-size: 19px !important;
-    padding: 5px 11px !important;
-    margin-left: 10px !important;
-    position: relative;
-    bottom: 4px;
+
+	div.fc_mediafile_controls {
+		text-align: center;
+		margin: 0 0 10px 0;
+
+		.playBtn, .pauseBtn, .stopBtn, .loadBtn, .downloadBtn {
+			margin-right: 25px;
+			outline: none;
+			background: none;
+			display: inline-block;
+		}
+
+		.pauseBtn, .stopBtn, .loadBtn {
+			display: none;
+		}
+
+		> a {
+			color: #333;
+			font-size: 16px;
+			vertical-align: bottom;
+		}
+
+		span.controls {
+			font-size: 24px;
+			color: #b7b7b7;
+			margin: 4px 24px 4px 0;
+			vertical-align: middle;
+		}
+	}
+	.btn-dwn-controls {
+		line-height: 1 !important;
+		background: #909090 !important;
+		color: #f0f0f0 !important;
+		font-family: "Roboto Condensed" !important;
+		font-weight: normal !important;
+		font-size: 19px !important;
+		padding: 5px 11px !important;
+		margin-left: 10px !important;
+		position: relative;
+		bottom: 4px;
+
+		span:before {
+			color: #f0f0f0 !important;
+		}
+	}
 }
 //End of fc_audio_field_only contro
