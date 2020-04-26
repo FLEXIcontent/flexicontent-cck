@@ -145,7 +145,9 @@ class FlexicontentControllerBaseAdmin extends FlexicontentController
 		}
 
 		// Standalone modes, set HTTP headers, also get value of 'status' header
-		$app = JFactory::getApplication();
+		$app  = JFactory::getApplication();
+		$user = JFactory::getUser();
+
 		$httpStatus = $this->exitSuccess ? '200 OK' : '400 Bad Request';
 
 		foreach	($this->exitHttpHead as $header)
