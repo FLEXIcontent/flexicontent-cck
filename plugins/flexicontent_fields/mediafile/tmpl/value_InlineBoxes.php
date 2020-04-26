@@ -340,9 +340,8 @@ foreach($values as $file_id)
 			// The download button in a mini form ...
 			// Download 
 			$_download_btn_html = '
-				<a href="' . $dl_link . '" class="btn-dwn-controls fcfile_downloadFile" title="'.htmlspecialchars($downloadsinfo, ENT_COMPAT, 'UTF-8').'" ' . ($non_file_url ? 'target="_blank"' : '') . '>
-					<span class="icon-chevron-down large-icon"> </span>
-					' . $downloadstext . '
+				<a href="' . $dl_link . '" class="btn downloadBtn fcfile_downloadFile" title="'.htmlspecialchars($downloadsinfo, ENT_COMPAT, 'UTF-8').'" ' . ($non_file_url ? 'target="_blank"' : '') . '>
+					<span class="icon-chevron-down controls"></span><span class="btnControlsText">' . $downloadstext . '</span>
 				</a>
 			';
 			// Do not add it here ... we will add it inline with player
@@ -514,7 +513,7 @@ foreach($values as $file_id)
 			data-fc_fname="' .$field_name_js . '"
 			style="display: block; margin-top: 8px; position: relative; min-height: 128px; min-width: 100%;"
 		>
-			<div class="progress progress-striped active" style="visibility: hidden; position: absolute; width: 70%; top: 40%; left: 15%;">
+			<div class="progress progress-striped active" style="visibility: visible; position: absolute; width: 70%; top: 20%; left: 15%;">
 				<div class="bar" style="width: 0%;"></div>
 			</div>
 			<div id="fc_mediafile_audio_spectrum_' . $item->id . '_' . $FN_n . '" class="fc_mediafile_audio_spectrum"></div>
@@ -522,10 +521,18 @@ foreach($values as $file_id)
 		<div>
 			<!--div id="fc_mediafile_current_time_' . $item->id . '_' . $FN_n . '" class="media_time">00:00:00</div-->
 			<div id="fc_mediafile_controls_' . $item->id . '_' . $FN_n . '" class="fc_mediafile_controls">
-				<a href="javascript:;" class="btn playBtn"><span class="icon-play-circle controls"></span>' . JText::_('FLEXI_FIELD_MEDIAFILE_PLAY') . '</a>
-				<a href="javascript:;" class="btn pauseBtn" style="display: none;"><span class="icon-pause-circle controls"></span>' . JText::_('FLEXI_FIELD_MEDIAFILE_PAUSE') . '</a>
-				<a href="javascript:;" class="btn stopBtn" style="display: none;"><span class="icon-stop-circle controls"></span>' . JText::_('FLEXI_FIELD_MEDIAFILE_STOP') . '</a>
-				<a href="javascript:;" class="btn loadBtn" style="display: none;"><span class="icon-loop controls"></span>' . JText::_('FLEXI_FIELD_MEDIAFILE_LOAD') . '</a>
+				<a href="javascript:;" class="btn playBtn">
+					<span class="icon-play-circle controls"></span><span class="btnControlsText">' . JText::_('FLEXI_FIELD_MEDIAFILE_PLAY') . '</span>
+				</a>
+				<a href="javascript:;" class="btn pauseBtn" style="display: none;">
+					<span class="icon-pause-circle controls"></span><span class="btnControlsText">' . JText::_('FLEXI_FIELD_MEDIAFILE_PAUSE') . '</span>
+				</a>
+				<a href="javascript:;" class="btn stopBtn" style="display: none;">
+					<span class="icon-stop-circle controls"></span><span class="btnControlsText">' . JText::_('FLEXI_FIELD_MEDIAFILE_STOP') . '</span>
+				</a>
+				<a href="javascript:;" class="btn loadBtn" style="display: none;">
+					<span class="icon-loop controls"></span><span class="btnControlsText">' . JText::_('FLEXI_FIELD_MEDIAFILE_LOAD') . '</span>
+				</a>
 				' . ($allowdownloads ? $_download_btn_html : '') . '
 			</div>
 		</div>

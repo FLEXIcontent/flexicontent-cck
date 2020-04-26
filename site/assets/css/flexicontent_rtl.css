@@ -1814,6 +1814,12 @@ span.fc-centered-icon-box {
 	opacity: 0.9;
 	display: block;
 }
+.fc_mediafile_controls_iformbox {
+	float: left;
+	position: absolute;
+	top: -32px;
+	left: 0;
+}
 .fc_mediafile_controls {
 	text-align: center;
 	margin: 0 0 10px 0;
@@ -1821,7 +1827,8 @@ span.fc-centered-icon-box {
 .fc_mediafile_controls .playBtn,
 .fc_mediafile_controls .pauseBtn,
 .fc_mediafile_controls .stopBtn,
-.fc_mediafile_controls .loadBtn {
+.fc_mediafile_controls .loadBtn,
+.fc_mediafile_controls .downloadBtn {
 	margin-right: 25px;
 	outline: none;
 	background: none;

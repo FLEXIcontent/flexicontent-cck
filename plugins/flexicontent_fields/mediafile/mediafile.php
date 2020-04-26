@@ -641,8 +641,9 @@ class plgFlexicontent_fieldsMediafile extends FCField
 		{
 			$js_added = true;
 
-			JText::script('PLG_FLEXICONTENT_FIELDS_MEDIAFILE_RESPONSE_PARSING_FAILED', false);
-			JText::script('PLG_FLEXICONTENT_FIELDS_MEDIAFILE_FILE_NOT_FOUND', false);
+			JText::script('PLG_FLEXICONTENT_FIELDS_MEDIAFILE_RESPONSE_PARSING_FAILED', true);
+			JText::script('PLG_FLEXICONTENT_FIELDS_MEDIAFILE_FILE_NOT_FOUND', true);
+			JText::script('FLEXI_PLEASE_UPLOAD_A_FILE', true);
 
 			//flexicontent_html::loadFramework('wavesurfer');
 			flexicontent_html::loadFramework('flexi-lib');
@@ -650,8 +651,18 @@ class plgFlexicontent_fieldsMediafile extends FCField
 			$document->addScript('https://unpkg.com/wavesurfer.js/dist/wavesurfer.min.js');
 			//$document->addScript('https://unpkg.com/wavesurfer.js/dist/plugin/wavesurfer.cursor.js');
 			$document->addScript(JUri::root(true) . '/plugins/flexicontent_fields/mediafile/js/form.js', array('version' => FLEXI_VHASH));
-		}
 
+			$js .= "
+			jQuery(document).ready(function()
+			{
+				new fc_Waveform_LazyLoad(
+					document.getElementsByTagName('body')[0], {
+						rootMargin: '0px 0px',
+						threshold: 0.25
+					});
+			});
+			";
+		}
 
 		// Added field's custom CSS / JS
 		if ($multiple) $js .= "

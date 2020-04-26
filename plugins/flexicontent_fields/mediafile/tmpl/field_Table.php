@@ -265,26 +265,46 @@ foreach ($field->value as $file_id)
 
 	<div class="fcclear"></div>'
 	. '
-		<div>
-			<!--div id="fc_mediafile_current_time_' . $item->id . '_' . $FN_n . '" class="media_time">00:00:00</div-->
+	<div style="position: relative;">
+		<div class="fc_mediafile_controls_iformbox">
+			<!--div id="fc_mediafile_current_time_' . $FN_n . '" class="media_time">00:00:00</div-->
 			<div id="fc_mediafile_controls_' . $FN_n . '" class="fc_mediafile_controls">
-				<a href="javascript:;" class="btn playBtn"><span class="icon-play-circle controls"></span>' . JText::_('FLEXI_FIELD_MEDIAFILE_PLAY') . '</a>
-				<a href="javascript:;" class="btn pauseBtn" style="display: none;"><span class="icon-pause-circle controls"></span>' . JText::_('FLEXI_FIELD_MEDIAFILE_PAUSE') . '</a>
-				<a href="javascript:;" class="btn stopBtn" style="display: none;"><span class="icon-stop-circle controls"></span>' . JText::_('FLEXI_FIELD_MEDIAFILE_STOP') . '</a>
-				<a href="javascript:;" class="btn loadBtn" style="display: none;"><span class="icon-loop controls"></span>' . JText::_('FLEXI_FIELD_MEDIAFILE_LOAD') . '</a>
+				<a href="javascript:;" class="btn playBtn">
+					<span class="icon-play-circle controls"></span><span class="btnControlsText">' . JText::_('FLEXI_FIELD_MEDIAFILE_PLAY') . '</span>
+				</a>
+				<a href="javascript:;" class="btn pauseBtn" style="display: none;">
+					<span class="icon-pause-circle controls"></span><span class="btnControlsText">' . JText::_('FLEXI_FIELD_MEDIAFILE_PAUSE') . '</span>
+				</a>
+				<a href="javascript:;" class="btn stopBtn" style="display: none;">
+					<span class="icon-stop-circle controls"></span><span class="btnControlsText">' . JText::_('FLEXI_FIELD_MEDIAFILE_STOP') . '</span>
+				</a>
+				<a href="javascript:;" class="btn loadBtn" style="display: none;">
+					<span class="icon-loop controls"></span><span class="btnControlsText">' . JText::_('FLEXI_FIELD_MEDIAFILE_LOAD') . '</span>
+				</a>
 			</div>
 		</div>
-		<div id="fc_mediafile_audio_spectrum_box_' . $FN_n . '" class="fc_mediafile_audio_spectrum_box" style="display: block; margin-top: 8px; position: relative; border: 1px dashed;">
-			<div class="progress progress-striped active" style="visibility: hidden; position: absolute; width: 70%; top: 40%; left: 15%;">
+		<div id="fc_mediafile_audio_spectrum_box_' . $FN_n . '" class="fc_mediafile_audio_spectrum_box"
+			data-fc_tagid="' . $field->name . '_' . $n . '"
+			data-fc_fname="' .$field_name_js . '"
+			style="display: block; margin-top: 8px; position: relative; border: 1px dashed;"
+		>
+			<div class="progress progress-striped active" style="visibility: visible; position: absolute; width: 70%; top: 40%; left: 15%;">
 				<div class="bar" style="width: 0%;"></div>
 			</div>
 			<div id="fc_mediafile_audio_spectrum_' . $FN_n . '" class="fc_mediafile_audio_spectrum"></div>
 		</div>
+	</div>
+		';
 		';
 
-	$per_value_js .= "
-		fcfield_mediafile.initValue('" . $field->name . '_' . $n . "', '".$field_name_js."');
-	";
+
+	/*if ($filename_original)
+	{
+		$per_value_js .= "
+			fcfield_mediafile.initValue('" . $field->name . '_' . $n . "', '".$field_name_js."');
+		";
+	}*/
+
 	if (!$filename_original)
 	{
 		$per_value_js .= "

@@ -65,6 +65,7 @@ fc_plupload = function(options)
 		var IEversion = fc_isIE();
 		var is_IE8_IE9 = IEversion && IEversion < 10;
 		var runtimes = !is_IE8_IE9  ?  'html5,flash,silverlight,html4'  : 'flash,html4';  //,silverlight,html5
+		var upProgress_IntervalHandle = 0;
 
 		if (!this.uploader_instances[sfx] && is_IE8_IE9 && !fc_has_flash_addon())
 		{
@@ -155,7 +156,7 @@ fc_plupload = function(options)
 				BeforeUpload: function (up, file)
 				{
 					var validationBox = $(up.settings.container).parent().find('input.validate-fcuploader');
-					validationBox.val('Upload in progress').data('error-mssg', Joomla.JText._('FLEXI_UPLOADING') + ' ... ' + Joomla.JText._('FLEXI_PLEASE_WAIT'));
+					validationBox.val('Upload-In-Progress').data('error-mssg', Joomla.JText._('FLEXI_UPLOADING') + ' ... ' + Joomla.JText._('FLEXI_PLEASE_WAIT'));
 
 					// Called right before the upload for a given file starts, can be used to cancel it if required
 					up.settings.multipart_params = {
@@ -175,13 +176,54 @@ fc_plupload = function(options)
 					}
 				},
 
+				UploadProgress: function(up, file)
+				{
+					// Show final message immediately
+					if (up.total.loaded >= up.total.size)
+					{
+						clearInterval(upProgress_IntervalHandle);
+						upProgress_IntervalHandle = 0;
+					}
+
+					if (!!upProgress_IntervalHandle) return;					
+
+					// Wait some time before allowing an update
+					var delay = upProgress_IntervalHandle === 0 ? 100 : 1000;
+					upProgress_IntervalHandle = setInterval(function ()
+					{
+						clearInterval(upProgress_IntervalHandle);
+						upProgress_IntervalHandle = null;
+					}, 500);
+
+					var validationBox = $(up.settings.container).parent().find('input.validate-fcuploader');
+					var mssgBox = $(up.settings.container).parent().find('.fc_uploader_mssg_box');
+
+					if (up.total.loaded < up.total.size)
+					{
+						//mssgBox.html((Math.round(1000 * up.total.loaded/up.total.size) / 10) + '% ... ' + Joomla.JText._('FLEXI_UPLOADING'));
+						//mssgBox.html(Joomla.JText._('FLEXI_UPLOADING') + ' ... ' + (Math.round(10 * up.total.bytesPerSec / (1024 * 1024)) / 10) + ' MB/s' );
+						mssgBox.html(Joomla.JText._('FLEXI_UPLOADING') + ' ... ' + Math.round((up.total.size-up.total.loaded)/up.total.bytesPerSec) + ' seconds' );
+					}
+					else
+					{
+						var msg = Joomla.JText._('FLEXI_PREPARING_FILE_DATA') + ' ... ' + Joomla.JText._('FLEXI_PLEASE_WAIT');
+						validationBox.val('Preparing-File-Data').data('error-mssg', msg);
+						$(up.settings.container).parent().find('.fc-field-invalid').html(msg);
+						mssgBox.html(Joomla.JText._('FLEXI_UPLOAD_FINISHED') + ' ... <br>' + msg + '<span class="fc_loading_msg" style="vertical-align: top;"></span>');
+					}
+					//window.console.log((up.total.size-up.total.loaded)/up.total.bytesPerSec)
+				},
+
 				UploadComplete: function (up, files)
 				{
 					// This is not strictly necessary but it will clear 'Uploading' validation message immediately ...
 					var validationBox = $(up.settings.container).parent().find('input.validate-fcuploader');
+					var mssgBox = $(up.settings.container).parent().find('.fc_uploader_mssg_box');
+
 					validationBox.val('').removeClass('invalid').attr('aria-invalid', 'false').data('error-mssg', '');
 					validationBox.next('.fc-field-invalid').remove();
 					validationBox.parent().children(':first-child.fc-field-invalid').remove();
+					mssgBox.html('');
 
 					if (up.getOption('refresh_on_complete'))
 					{

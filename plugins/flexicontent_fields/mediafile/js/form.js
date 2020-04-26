@@ -1,3 +1,44 @@
+class fc_Waveform_LazyLoad
+{
+	constructor(element, options)
+	{
+		this.options = {
+			root: null,
+			rootMargin: '0px 0px',
+			threshold: 0.25,
+			...options,
+		};
+		this.element = element;
+		this.resources = this.element.querySelectorAll('.fc_mediafile_audio_spectrum_box');
+
+		this.bindEvents();
+		this.init();
+	}
+
+	bindEvents() {
+		//this._lazyLoadAsset = this._lazyLoadAsset.bind(this, add extra vars here);
+	}
+
+	init() {
+		const assetsObserver = new IntersectionObserver((entries, assetsObserver) =>
+		{
+			entries.filter(entry => entry.isIntersecting).forEach(entry =>
+			{
+				this._lazyLoadAsset(entry.target);
+				assetsObserver.unobserve(entry.target);
+			});
+		}, this.options);
+		this.resources.forEach(resource =>
+		{
+			assetsObserver.observe(resource);
+		});
+	}
+
+	_lazyLoadAsset(asset) {
+		fcfield_mediafile.initValue(asset.getAttribute('data-fc_tagid'), asset.getAttribute('data-fc_fname'));
+	}
+}
+
 	var fcfield_mediafile = {};
 	var fcfield_mediafile_base_url = [];
 	var audio_spectrum_arr = [];
@@ -12,12 +53,13 @@
 		//window.console.log(tagid);
 		var fnn  = tagid.replace(/-/g, '_');
 		var file = jQuery('#custom_' + tagid + '_file-data-txt');
+		var loading_timer, progress_timer;
 
 		var keyPlayPause = function keyPlayPause(key_event) {
 			if (key_event.keyCode == 32 || key_event.keyCode == 13 /*/*&& key_event.target.nodeName !== "WAVE"*/)
 			{
 				key_event.preventDefault();
-				window.console.log(key_event.target.nodeName);
+				//window.console.log(key_event.target.nodeName);
 
 				// Toggle playing state
 				var event = document.createEvent("HTMLEvents");
@@ -71,6 +113,81 @@
 			 return h + ':' + m + ':' + s;
 			else
 			 return m + ':' + s;
+		}
+
+		var updateProgressBar = function (percents, eventTarget)
+		{
+			var box = jQuery('#fc_mediafile_audio_spectrum_box_' + fnn);
+			box.show();
+			var factor = 75;
+
+			var progressBar = box.find('.progress');
+			progressBar.get(0).style.visibility = 'visible';
+			progressBar.find('.bar').get(0).style.width = (percents * factor / 100.0) + '%';
+
+			if (percents >= 100)
+			{
+				var steps = 40;
+				var frame = 0;
+				loading_timer = setInterval(function ()
+				{
+					progressBar.find('.bar').get(0).style.width = factor + (frame * (factor / steps)) + '%';
+					frame += 1;
+					if (frame >= steps) clearInterval(loading_timer);
+				}, 50);
+			}
+			//window.console.log('Loading file (Wavesurfer JS): ' + percents + ' %');
+			//window.console.log(eventTarget);
+		}
+
+		var stopProgressBar = function ()
+		{
+			clearInterval(loading_timer);
+			clearInterval(progress_timer);
+
+			var box = jQuery('#fc_mediafile_audio_spectrum_box_' + fnn);
+			box.show();
+
+			// Hide and reset progress bar
+			var progressBar = box.find('.progress');
+			progressBar.get(0).style.visibility = 'hidden';
+			progressBar.find('.bar').get(0).style.width = 0;
+		}
+
+		var dummyProgress = function ()
+		{
+			var percent = 0;
+			if (!!!audio_spectrum.loaded)
+			{
+				progress_timer = setInterval(function ()
+				{
+					percent = percent + 2;
+					updateProgressBar(percent);
+
+					if (progress_timer == 100)
+					{
+						clearInterval(progress_timer);
+					}
+				}, 50);
+			}
+		}
+
+		var loadFile = function ()
+		{
+			var isURL = /^(f|ht)tps?:\/\//i.test(file.data('wfpreview'));
+			//window.console.log('isURL: ' + isURL);
+			//window.console.log('filename: ' + file.data('wfpreview'));
+			//window.console.log('Base URL: ' + fcfield_mediafile_base_url[config_name]);
+			var peaks = audio_spectrum.backend.peaks || null;
+
+			// Loading from peaks file, then show an estimated progress bar, since loading event is not triggered in current version of wavesurfer
+			if (peaks)
+			{
+				dummyProgress();
+			}
+			//window.console.log('Playing');
+
+			isURL ? audio_spectrum.load(file.data('wfpreview'), peaks) : audio_spectrum.load(fcfield_mediafile_base_url[config_name] + '/' + file.data('wfpreview'), peaks);
 		}
 
 		// Imitate SoundCloud's mirror effect on the waveform. Only works on iOS. (Adapted from the wavesurfer.js demo.) 
@@ -130,6 +247,11 @@
 		// Variable to check if song is loaded
 		audio_spectrum.loaded = false;
 
+		// Some references to methods so that the can be used externally
+		audio_spectrum._dummyProgress     = dummyProgress;
+		audio_spectrum._stopProgressBar   = stopProgressBar;
+		audio_spectrum._updateProgressBar = updateProgressBar;
+
 		jQuery('#fc_mediafile_audio_spectrum_' + fnn).data('audio_spectrum', audio_spectrum);
 
 		// Get control buttons
@@ -177,55 +299,22 @@
 		}, false);*/
 
 
-		var loading_timer;
-
-		/*audio_spectrum.on('loading', function (percents, eventTarget)
+		audio_spectrum.on('loading', function (percents, eventTarget)
 		{
-			var box = jQuery('#fc_mediafile_audio_spectrum_box_' + fnn)
-			box.show();
-
-			var progressBar = box.find('.progress');
-			progressBar.get(0).style.visibility = 'visible';
-			progressBar.find('.bar').get(0).style.width = (percents / 2) + '%';
-
-			if (percents >= 100)
-			{
-				var steps = 200;
-				var frame = 0;
-				loading_timer = setInterval(function ()
-				{
-					progressBar.find('.bar').get(0).style.width = 50 + (frame * (50 / steps)) + '%';
-					frame += 1;
-					if (frame >= steps) clearInterval(loading_timer);
-				}, 20);
-			}
-			//window.console.log('Loading file (Wavesurfer JS): ' + percents + ' %');
-			//window.console.log(eventTarget);
+			//window.console.log('loading: (waveform is loading / calculating peaks)');
+			updateProgressBar(percents, eventTarget);
 		});
 
 		audio_spectrum.on('waveform-ready', function()
 		{
-			//window.console.log('Loading is DONE');
-			clearInterval(loading_timer);
-
-			var box = jQuery('#fc_mediafile_audio_spectrum_box_' + fnn)
-			box.show();
-
-			// Hide and reset progress bar
-			var progressBar = box.find('.progress');
-			progressBar.get(0).style.visibility = 'hidden';
-			progressBar.find('.bar').get(0).style.width = 0;
-		});*/
+			//window.console.log('waveform-ready: (Peaks loading is DONE)');
+			stopProgressBar();
+		});
 
 		audio_spectrum.on('ready', function()
 		{
-			var box = jQuery('#fc_mediafile_audio_spectrum_box_' + fnn)
-			box.show();
-
-			// Hide and reset progress bar
-			var progressBar = box.find('.progress');
-			progressBar.get(0).style.visibility = 'hidden';
-			progressBar.find('.bar').get(0).style.width = 0;
+			//window.console.log('ready: (Player ready to play)');
+			stopProgressBar();
 
 			// Enable buttons
 			buttons.play.disabled = false;
@@ -276,6 +365,12 @@
 		// Add events of playback buttons
 		buttons.play.addEventListener('click', function()
 		{
+			if (!!!file.data('wfpreview'))
+			{
+				alert(Joomla.JText._('FLEXI_PLEASE_UPLOAD_A_FILE'));
+				return;
+			}
+
 			// Stop all other known players
 			var i;
 			for (i = 0; i < audio_spectrum_arr.length; i++)
@@ -297,13 +392,7 @@
 			if (!audio_spectrum.loaded)
 			{
 				audio_spectrum.start_on_ready = true;
-				var isURL = /^(f|ht)tps?:\/\//i.test(file.data('wfpreview'));
-				window.console.log('isURL: ' + isURL);
-				window.console.log('filename: ' + file.data('wfpreview'));
-				window.console.log('Base URL: ' + fcfield_mediafile_base_url[config_name]);
-				var peaks = audio_spectrum.backend.peaks || null;
-				isURL ? audio_spectrum.load(file.data('wfpreview'), peaks) : audio_spectrum.load(fcfield_mediafile_base_url[config_name] + '/' + file.data('wfpreview'), peaks);
-				audio_spectrum.drawBuffer();
+				loadFile();
 			}
 			else
 			{
@@ -362,12 +451,7 @@
 				buttons.stop.disabled = true;
 				buttons.play.disabled = true;
 
-				var isURL = /^(f|ht)tps?:\/\//i.test(file.data('wfpreview'));
-				//window.console.log('isURL: ' + isURL);
-				//window.console.log('filename: ' + file.data('wfpreview'));
-				//window.console.log('Base URL: ' + fcfield_mediafile_base_url[config_name]);
-				var peaks = audio_spectrum.backend.peaks || null;
-				isURL ? audio_spectrum.load(file.data('wfpreview'), peaks) : audio_spectrum.load(fcfield_mediafile_base_url[config_name] + '/' + file.data('wfpreview'), peaks);
+				loadFile();
 			}
 
 			buttons.play.focus();
@@ -387,10 +471,13 @@
 			var mp3Url = isURL ? file.data('wfpreview') : fcfield_mediafile_base_url[config_name] + '/' + file.data('wfpreview');
 			var jsonUrl = isURL ? file.data('wfpeaks') : fcfield_mediafile_base_url[config_name] + '/' + file.data('wfpeaks');
 
+			dummyProgress();
+
 			audio_spectrum.util.ajax({
 				responseType: 'json',
 				url: jsonUrl
-			}).on('success', function (response) {
+			}).on('success', function (response)
+			{
 				var data = response.data;
 				data.unshift(data[1]);
 
@@ -399,8 +486,10 @@
 
 				// Draw peaks
 				setTimeout(function () {
+					stopProgressBar();
+
 					audio_spectrum.drawBuffer();
-				}, 100);
+				}, 10);
 
 				//audio_spectrum.load(mp3Url, data);
 			});
@@ -497,20 +586,56 @@
 	}
 
 
+	fcfield_mediafile.getFileBasename = function(str) 
+	{
+		var base = new String(str).substring(str.lastIndexOf('/') + 1); 
+		if (base.lastIndexOf(".") != -1)
+		{
+			base = base.substring(0, base.lastIndexOf("."));
+		}
+		return base;
+	}
+
+
 	fcfield_mediafile.assignFile = function(value_container_id, file, keep_modal, config_name)
 	{
+		//window.console.log(file);
+		//window.console.log(config_name);
+		//window.console.log(fcfield_mediafile_base_url[config_name] + '/' + file.filename);
+
 		// We use altname (aka title) that is by default (unless modified) same as 'filename_original'
 		var originalname = file.filename_original ? file.filename_original : file.filename;
 		var displaytitle = file.altname && (file.altname!=file.filename) ? file.altname : '-';
 		var text_nowrap  = file.altname && (file.altname!=file.filename) ? file.filename+'<br/>'+file.altname : '';
 
 		var container = jQuery('#'+value_container_id).closest('.fcfieldval_container');
+		
+		var ext      = file.filename ? file.filename.split('.').pop() : '';
+		var baseName = fcfield_mediafile.getFileBasename(file.filename);
+
+		var waveform_preview = !file.filename ? '' : file.filename.substr(0, file.filename.lastIndexOf(".")) + '.mp3';
+		var waveform_peaks   = !file.filename ? '' : file.filename.substr(0, file.filename.lastIndexOf(".")) + '.json';
+
+		waveform_preview = !file.filename ? '' : waveform_preview.replace(baseName, '/audio_preview/' + baseName);
+		waveform_peaks   = !file.filename ? '' : waveform_peaks.replace(baseName, '/audio_preview/' + baseName);
+
+		var _name = file.filename;
+		var _url = fcfield_mediafile_base_url[config_name] + '/' + file.filename;
+		var isURL = /^(f|ht)tps?:\/\//i.test(_name);
+
+		var mp3Preview = isURL ? waveform_preview : fcfield_mediafile_base_url[config_name] + waveform_preview;
+		var jsonPeaks  = isURL ? waveform_peaks : fcfield_mediafile_base_url[config_name] + waveform_peaks;
+
+		//window.console.log(mp3Preview);
+		//window.console.log(jsonPeaks);
 
 		container.find('.fc_fileid').val(file.id);
 		container.find('.fc_filedata_storage_name').html(file.filename);
 		container.find('.fc_filedata_txt').val(originalname).removeClass('file_unpublished').blur();
 		container.find('.fc_filedata_txt').removeAttr('data-filename');
 		container.find('.fc_filedata_txt').data('filename', file.filename);
+		container.find('.fc_filedata_txt').data('wfpreview', waveform_preview);
+		container.find('.fc_filedata_txt').data('wfpeaks', waveform_peaks);
 		container.find('.fc_filedata_txt_nowrap').html(text_nowrap).show();
 		container.find('.fc_filedata_title').html(displaytitle);
 
@@ -525,7 +650,7 @@
 			}
 		}
 
-		container.find('.fc_mediafile_audio_spectrum').data('audio_spectrum').empty();
+		var audio_spectrum = container.find('.fc_mediafile_audio_spectrum').data('audio_spectrum');
 		container.find('.fc_filetitle').val(file.altname).blur();
 		container.find('.fc_filelang').val(file.language).trigger('change');
 		container.find('.fc_filedesc').val(file.description);
@@ -533,9 +658,26 @@
 		// Load the audio file
 		if (!!file.filename)
 		{
-			var audio_spectrum = container.find('.fc_mediafile_audio_spectrum').data('audio_spectrum');
-			var isURL = /^(f|ht)tps?:\/\//i.test(file.filename);
-			isURL ? audio_spectrum.load(file.filename) : audio_spectrum.load(fcfield_mediafile_base_url[config_name] + '/' + file.filename);
+			audio_spectrum._dummyProgress();
+
+			audio_spectrum.util.ajax({
+				responseType: 'json',
+				url: jsonPeaks
+			}).on('success', function (response)
+			{
+				var data = response.data;
+				data.unshift(data[1]);
+
+				// Scale peaks
+				audio_spectrum.backend.peaks = data; //.map(p => p/128);
+
+				// Draw peaks
+				setTimeout(function () {
+					audio_spectrum._stopProgressBar();
+					//audio_spectrum.load(mp3Preview, data);
+					audio_spectrum.drawBuffer();
+				}, 10);
+			});
 		}
 
 		// Increment value counter (which is optionally used as 'required' form element)
