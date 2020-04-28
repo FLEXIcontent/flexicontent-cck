@@ -328,10 +328,10 @@ class FlexicontentCronTasks
 				$msg = 'FTP upload succeeded for file : ' . $source_file . ' to ' . $dest_file;
 				JLog::add($msg, JLog::INFO, 'com_flexicontent.estorage');
 
+				// Do not modify original name 'filename_original' which is used during download to set appropriate HTTP header
 				if ($file->id > 0) $query = 'UPDATE #__flexicontent_files '
 					. ' SET url = 1, checked_out = 0, estorage_fieldid = 0'
 					. ' , filename = ' . $db->Quote($efs_www_url . $dest_file)
-					. ' , filename_original = ' . $db->Quote($efs_www_url . $dest_file)
 					. ' WHERE id = ' . (int) $file->id;
 				$db->setQuery($query)->execute();
 
