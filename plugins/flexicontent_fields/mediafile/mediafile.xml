@@ -103,6 +103,9 @@
 			<field name="mm_ffprobe_path" type="text" default="" label="Path to ffprobe binary" description="..." />
 			<field name="mm_audiowaveform_path" type="text" default="" label="Path to audiowaveform binary" description="..." />
 
+			<field name="" type="separator" default="Samples per peak. &lt;br&gt; &amp;nbsp;&amp;nbsp; E.g. Enter 256, to use 256 input samples to create 1 waveform peak. &lt;br&gt;&lt;br&gt; Note: this is for sounds up to 30 seconds. &lt;br&gt; For longer files we will increase this proportionally. &lt;br&gt; &amp;nbsp;&amp;nbsp; E.g. for 60 seconds we will use 512 samples to create 1 waveform peak." description="" level="level3" class="alert alert-info fcpadded" />
+			<field name="mm_wf_zoom" type="text" default="" label="Samples per peak" description="..." />
+
 			<field name="" type="separator" default="FLEXI_FORM_FIELD_CONF" description="FLEXI_FORM_FIELD_CONF_DESC" icon_class="icon-checkbox" level="tab_open" box_type="1" />
 
 			<field name="label_form" type="text" default="" label="FLEXI_LABEL" description="Enter a label to use for item form that is different than field label for viewing" depend_class=""/>

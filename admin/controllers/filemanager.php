@@ -794,9 +794,14 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 			// Get id of new file record
 			$obj->id = $file_id = (int) $db->insertid();
 
-			// Create audio preview file, if file is a media file
-			$this->createAudioPreview($field, $filepath);
+			// Probe file to find if it is a supported media (audio or video) file
 			$this->createMediaData($field, $filepath, $obj);
+
+			// Create audio preview file, if file is a media file
+			if (!empty($obj->mediaData))
+			{
+				$this->createAudioPreview($field, $filepath, $obj);
+			}
 		}
 
 		// B. Custom Folder mode
@@ -1743,15 +1748,22 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 	 * 1. Create a smaller audio file for preview playback
 	 * 2. Precalculate the audio waveform peaks to avoid download the full file before preview playback starts
 	 */
-	function createAudioPreview($field, $filepath)
+	function createAudioPreview($field, $filepath, $file)
 	{
 		// Get the extension to record it in the DB
 		$ext = strtolower(flexicontent_upload::getExt($filepath));
 
-		$create_preview     = $field->parameters->get('mm_create_preview', 1);
+		$create_preview     = (int) $field->parameters->get('mm_create_preview', 1);
 		$ffmpeg_path        = $field->parameters->get('mm_ffmpeg_path', '');
 		$audiowaveform_path = $field->parameters->get('mm_audiowaveform_path', '');
-		$preview_bitrate    = $field->parameters->get('mm_preview_bitrate', '96');
+		$preview_bitrate    = (int) $field->parameters->get('mm_preview_bitrate', 96);
+		//$wf_pixels_per_sec  = $field->parameters->get('mm_wf_pixels_per_sec', '');
+		$wf_zoom            = (int) $field->parameters->get('mm_wf_zoom', 256);
+
+		if ($file->mediaData->duration > 30)
+		{
+			$wf_zoom = (int) ($wf_zoom * ($file->mediaData->duration / 30));
+		}
 
 		$app   = JFactory::getApplication();
 
@@ -1774,7 +1786,12 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 			// Create waveform peaks of audio preview file
 			if ($audiowaveform_path)
 			{
-				exec($audiowaveform_path . " -i \"" . $prv_path . '/' . $filename . ".mp3\" -o \"" . $prv_path . '/' . $filename . ".json\" -b 8");
+				exec($audiowaveform_path . " -b 8 " .
+					" -i \"" . $prv_path . '/' . $filename . ".mp3\"" .
+					" -o \"" . $prv_path . '/' . $filename . ".json\"" .
+					//($pixels_per_second ? ' --pixels-per-second ' . $wf_pixels_per_sec : '') .
+					($wf_zoom ? ' --zoom ' . $wf_zoom : '')
+				);
 				//$this->exitMessages[] = array('message' => $audiowaveform_path . " -i \"" . $prv_path . '/' . $filename . ".mp3\" -o \"" . $prv_path . '/' . $filename . ".json\" -b 8");
 			}
 			//die('{"jsonrpc" : "2.0", "error" : {"code": 1103, "message": ' . $audiowaveform_path . " -i \"" . $prv_path . '/' . $filename . ".mp3\" -o \"" . '}, "data" : null}');
@@ -1873,7 +1890,10 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 
 				// Get id of new file record
 				$md_obj->id = (int) $db->insertid();
-				
+
+				// Reference the media data object, maybe useful during preview file creation
+				$file->mediaData = $md_obj;
+
 				$this->exitMessages[] = array('message' => print_r($json, true));
 				JLog::add(print_r($json->streams[0], true), JLog::INFO, 'com_flexicontent.filemanager.uploader');
 			}

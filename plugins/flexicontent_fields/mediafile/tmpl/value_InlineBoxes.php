@@ -499,6 +499,8 @@ foreach($values as $file_id)
 		$previewpath = $file_data->filename;
 		$peakspath   = null;
 	}
+	
+	$fnn = $item->id . '_' . $FN_n;
 
 	$html .= '<div class="fcclear"></div>'
 	. '
@@ -510,7 +512,7 @@ foreach($values as $file_id)
 			data-wfpeaks="' . htmlspecialchars($peakspath, ENT_COMPAT, 'UTF-8') . '"
 			class="fc-wf-filedata"
 		></div>
-		<div id="fc_mediafile_audio_spectrum_box_' . $item->id . '_' . $FN_n . '" class="fc_mediafile_audio_spectrum_box"
+		<div id="fc_mediafile_audio_spectrum_box_' . $fnn. '" class="fc_mediafile_audio_spectrum_box"
 			data-fc_tagid="' . $item->id . '_' . $field->name . '_' . $n . '"
 			data-fc_fname="' .$field_name_js . '"
 		>
@@ -518,11 +520,11 @@ foreach($values as $file_id)
 				<div class="barText"></div>
 				<div class="bar" style="width: 100%;"></div>
 			</div>
-			<div id="fc_mediafile_audio_spectrum_' . $item->id . '_' . $FN_n . '" class="fc_mediafile_audio_spectrum"></div>
+			<div id="fc_mediafile_audio_spectrum_' . $fnn. '" class="fc_mediafile_audio_spectrum"></div>
 		</div>
 		<div>
-			<!--div id="fc_mediafile_current_time_' . $item->id . '_' . $FN_n . '" class="media_time">00:00:00</div-->
-			<div id="fc_mediafile_controls_' . $item->id . '_' . $FN_n . '" class="fc_mediafile_controls">
+			<!--div id="fc_mediafile_current_time_' . $fnn. '" class="media_time">00:00:00</div-->
+			<div id="fc_mediafile_controls_' . $fnn. '" class="fc_mediafile_controls">
 				<a href="javascript:;" class="btn playBtn btn-dwn-controls">
 					<span class="icon-play-circle controls"></span><span class="btnControlsText">' . JText::_('FLEXI_FIELD_MEDIAFILE_PLAY') . '</span>
 				</a>
@@ -536,6 +538,9 @@ foreach($values as $file_id)
 					<span class="icon-loop controls"></span><span class="btnControlsText">' . JText::_('FLEXI_FIELD_MEDIAFILE_LOAD') . '</span>
 				</a>
 				' . ($allowdownloads ? $_download_btn_html : '') . '
+				<div class="fc_mediafile_wf_zoom_box">
+					- <input id="fc_mediafile_slider_' . $fnn. '" type="range" min="0.5" max="200" value="0.5" class="fc_mediafile_wf_zoom" /> +
+				</div>
 			</div>
 		</div>
 

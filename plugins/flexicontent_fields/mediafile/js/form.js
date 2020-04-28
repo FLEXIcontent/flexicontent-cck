@@ -55,12 +55,14 @@ class fc_Waveform_LazyLoad
 		var file = jQuery('#custom_' + tagid + '_file-data-txt');
 		var loading_timer = null, progress_timer = null;
 
-		var box = jQuery('#fc_mediafile_audio_spectrum_box_' + fnn);
+		var box    = jQuery('#fc_mediafile_audio_spectrum_box_' + fnn);
+		var slider = document.querySelector('#fc_mediafile_slider_' + fnn);
+
 		var _progressBar = box.find('.fc_mediafile_audio_spectrum_progressbar');
-		var bar = _progressBar.find('.bar').get(0);
-		var barText = _progressBar.find('.barText').get(0);
-		var progressBar = box.find('.fc_mediafile_audio_spectrum_progressbar').get(0);
-		var mediaPlayer = jQuery('#fc_mediafile_audio_spectrum_box_' + fnn).find('.fc_mediafile_audio_spectrum').get(0);
+		var bar          = _progressBar.find('.bar').get(0);
+		var barText      = _progressBar.find('.barText').get(0);
+		var progressBar  = box.find('.fc_mediafile_audio_spectrum_progressbar').get(0);
+	//var mediaPlayer  = jQuery('#fc_mediafile_audio_spectrum_box_' + fnn).find('.fc_mediafile_audio_spectrum').get(0);
 
 		var keyPlayPause = function keyPlayPause(key_event) {
 			if (key_event.keyCode == 32 || key_event.keyCode == 13 /*/*&& key_event.target.nodeName !== "WAVE"*/)
@@ -228,21 +230,26 @@ class fc_Waveform_LazyLoad
 		// Create WaveSurfer object
 		var audio_spectrum = WaveSurfer.create({
 			container: '#fc_mediafile_audio_spectrum_' + fnn,
+			//minPxPerSec:   50,
+			//reflection: true,
+			barWidth: 0.01,
+			//barHeight: 0.02,
+			normalize: true,
+			fillParent:    true,
+			scrollParent:  false,
+			autoCenter:    true,
+			hideScrollbar: false,
 
-		    scrollParent: false,
-		    waveColor: '#81bff7', 
-		    progressColor: '#bbbaba',
-		    cursorColor: '#ddd',
-		    cursorWidth: 2,
-		    height: 128,
-		    //barWidth: 0.5,
-			//barHeight: 1.1,
-		    backend: 'MediaElement',
-		    normalize: true,
+			//pixelRatio:  1,
+			//timeInterval: 30,
 
-			//backend: 'MediaElement',
-			//backend: 'WebAudio',
-			//mediaControls: true,
+			waveColor: '#619fc7', 
+			progressColor: '#bbbaba',
+			cursorColor: '#ddd',
+			cursorWidth: 2,
+			height: 128,
+			backend: 'MediaElement',  //'WebAudio',
+			mediaControls: false,
 			xhr: {
 				format: 'jsonp',
 				requestHeaders: [
@@ -266,8 +273,18 @@ class fc_Waveform_LazyLoad
 								'font-size': '10px'
 						}
 				})*/
-		]
+			]
 		});
+
+
+		slider.oninput = audio_spectrum.util.debounce(function()
+		{
+			window.console.log(slider.value);
+			var zoomLevel = parseInt(slider.value);
+			window.console.log('Zooming to: ' + zoomLevel);
+			audio_spectrum.zoom(zoomLevel);
+		}, 200);
+
 
 		// Register new player to known players array
 		audio_spectrum_arr[audio_spectrum_arr.length] = audio_spectrum;
@@ -428,6 +445,7 @@ class fc_Waveform_LazyLoad
 				audio_spectrum._position_ = null; 
 			}
 
+			slider.parentNode.style.visibility = 'visible';
 			buttons.play.disabled = true;
 			buttons.pause.disabled = false;
 			buttons.stop.disabled = false;

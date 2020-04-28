@@ -103,6 +103,8 @@ foreach ($field->value as $file_id)
 			: 'btn btn-small toolbar dropdown-toggle'
 		);
 
+	$fnn = $FN_n;
+
 	$field->html[] = '
 		<div class="inlinefile-data-box">
 
@@ -215,8 +217,11 @@ foreach ($field->value as $file_id)
 	<div class="fc_mediafile_audio_spectrum_box_outer">
 
 		<div class="fc_mediafile_controls_iformbox">
-			<!--div id="fc_mediafile_current_time_' . $FN_n . '" class="media_time">00:00:00</div-->
-			<div id="fc_mediafile_controls_' . $FN_n . '" class="fc_mediafile_controls">
+			<!--div id="fc_mediafile_current_time_' . $fnn . '" class="media_time">00:00:00</div-->
+			<div id="fc_mediafile_controls_' . $fnn . '" class="fc_mediafile_controls">
+				<div class="fc_mediafile_wf_zoom_box">
+					- <input id="fc_mediafile_slider_' . $fnn. '" type="range" min="0.5" max="200" value="0.5" class="fc_mediafile_wf_zoom" /> +
+				</div>
 				<a href="javascript:;" class="btn playBtn">
 					<span class="icon-play-circle controls"></span><span class="btnControlsText">' . JText::_('FLEXI_FIELD_MEDIAFILE_PLAY') . '</span>
 				</a>
@@ -231,15 +236,15 @@ foreach ($field->value as $file_id)
 				</a>
 			</div>
 		</div>
-		<div id="fc_mediafile_audio_spectrum_box_' . $FN_n . '" class="fc_mediafile_audio_spectrum_box"
+		<div id="fc_mediafile_audio_spectrum_box_' . $fnn . '" class="fc_mediafile_audio_spectrum_box"
 			data-fc_tagid="' . $field->name . '_' . $n . '"
 			data-fc_fname="' .$field_name_js . '"
 		>
-			<div class="progress progress-striped active fc_mediafile_audio_spectrum_progressbar">
+			<div class="fc_mediafile_audio_spectrum_progressbar">
 				<div class="barText"></div>
 				<div class="bar" style="width: 100%;"></div>
 			</div>
-			<div id="fc_mediafile_audio_spectrum_' . $FN_n . '" class="fc_mediafile_audio_spectrum"></div>
+			<div id="fc_mediafile_audio_spectrum_' . $fnn . '" class="fc_mediafile_audio_spectrum"></div>
 		</div>
 
 	</div>
