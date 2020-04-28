@@ -5,14 +5,20 @@ class flexicontent_upload
 {
 	static function makeSafe($file, $language = null)
 	{
-		// Replace spaces with dash after removing any leading / trailing spaces
-		$file = str_replace(" ", "-", trim($file));
+		// Replace [] with () and multiple space with single, but firest remove any leading / trailing spaces
+		$file = trim($file);
+		$file = str_replace('[', '(', $file);
+		$file = str_replace(']', ')', $file);
+		$file = preg_replace('![\s]+!', ' ', $file);
+
+		// Replace $*"[]:;|/ with dash after removing any leading / trailing spaces
+		$file = preg_replace('![\$\*\"\[\]\:\;\|\/]]+!', '_', $file);
 
 		// Remove any trailing dots, as those aren't ever valid file names
 		$file = rtrim($file, '.');
 
 		// Regex for replacing non safe characters
-		$regex = array('#(\.){2,}#', '#[^A-Za-z0-9\.\_\- ]#', '#^\.#');
+		$regex = array('#(\.){2,}#', '#[^A-Za-z0-9\(\)\.\_\- ]#', '#^\.#');
 
 		// Language transliteration should include given language, and also site + admin defaults (most useful is site default)
 		$lang_params = JComponentHelper::getParams('com_languages');
@@ -25,6 +31,8 @@ class flexicontent_upload
 
 		// Try to transliterate according to given language and site + admin default languages
 		$file_safe = false;
+		$transformed = '';
+
 		foreach($langs as $language => $do)
 		{
 			if ($do)
@@ -41,11 +49,20 @@ class flexicontent_upload
 			}
 		}
 
-		// Finally if none of transliterations did a complete job, e.g. because wrong language(s) tried, then avoid bad looking filenames by using current time
+		// Finally if none of transliterations did a good enough job (if less than 50% of file remained)
+		// (It could be because of wrong language(s) tried)
+		// then avoid bad looking filenames by using current time
 		if ( !$file_safe )
 		{
-			$ext = self::getExt($file);
-			$file_safe = date('Y-m-d_H.i.s') .'.'. $ext;
+			if (strlen($transformed) < 0.5 * strlen($file))
+			{
+				$ext = self::getExt($file);
+				$file_safe = date('Y-m-d_H.i.s') .'.'. $ext;
+			}
+			else
+			{
+				$file_safe = $transformed;
+			}
 		}
 
 		// Return filename that is filesystem safe
