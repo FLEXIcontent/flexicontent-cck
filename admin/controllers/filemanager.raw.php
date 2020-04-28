@@ -306,15 +306,13 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 
 				elseif ($index_urls)
 				{
-					$url = $file->filename_original ?: $file->filename;
-
-					if ($url)
+					if ($file->filename)
 					{
-						$filesize = $record_model->get_file_size_from_url($url);
+						$filesize = $record_model->get_file_size_from_url($file->filename);
 
 						if ($filesize === -999)
 						{
-							$errors[] = $url . ' -- ' . $record_model->getError();
+							$errors[] = $file->filename . ' -- ' . $record_model->getError();
 						}
 
 						$file->size = $filesize < 0 ? 0 : $filesize;
