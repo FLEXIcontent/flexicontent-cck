@@ -340,7 +340,7 @@ class FlexicontentViewItems extends JViewLegacy
 	}
 
 
-	protected function _getSafeReferer($string)
+	protected function _getSafeReferer()
 	{
 		// Get safe referer in case we abort
 		$referer = !empty($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : null;
