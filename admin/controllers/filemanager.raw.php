@@ -296,12 +296,28 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 			foreach ($record_data as $file_id => $file)
 			{
 				$file->total_usage = 0;
-				$path = $file->secure ? COM_FLEXICONTENT_FILEPATH : COM_FLEXICONTENT_MEDIAPATH;  // JPATH_ROOT . DS . <media_path | file_path>
-				$file_path = $path . DS . $file->filename;
 
-				if (!$file->url)
+				if ((int) $file->url === 0)
 				{
+					$path       = $file->secure ? COM_FLEXICONTENT_FILEPATH : COM_FLEXICONTENT_MEDIAPATH;  // JPATH_ROOT . DS . <media_path | file_path>
+					$file_path  = $path . DS . $file->filename;
 					$file->size = file_exists($file_path) ? filesize($file_path) : 0;
+
+					if (!file_exists($file_path))
+					{
+							$errors[] = $file->filename . ' -- NOT FOUND';
+					}
+				}
+
+				elseif ((int) $file->url === 2)
+				{
+					$file_path  = JPATH_ROOT . DS . $file->filename;
+					$file->size = file_exists($file_path) ? filesize($file_path) : 0;
+
+					if (!file_exists($file_path))
+					{
+							$errors[] = $file->filename . ' -- NOT FOUND (Joomla media file)';
+					}
 				}
 
 				elseif ($index_urls)
