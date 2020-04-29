@@ -1142,6 +1142,7 @@ class com_flexicontentInstallerScript
 							`checked_out_time` datetime NOT NULL default '1000-01-01 00:00:00',
 							`attribs` mediumtext NULL,
 							PRIMARY KEY  (`id`),
+							UNIQUE `file_id` (`file_id`),
 							KEY `state` (`state`),
 							KEY `media_type` (`media_type`),
 							KEY `media_format` (`media_format`),

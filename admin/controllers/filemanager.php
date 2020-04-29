@@ -763,44 +763,45 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 		// Upload Successful
 		// *****************
 
-		$obj = new stdClass;
-		$obj->id = $file_id = 0;
+		$fileObj = new stdClass;
+		$fileObj->id = $file_id = 0;
 
-		$obj->filename          = $filename;
-		$obj->filename_original = $filename_original;
-		$obj->altname           = $filetitle ? $filetitle : $filename_original;
-		$obj->estorage_fieldid  = $estorage_mode === 'FTP' ? $fieldid : 0;
+		$fileObj->filename          = $filename;
+		$fileObj->filename_original = $filename_original;
+		$fileObj->altname           = $filetitle ? $filetitle : $filename_original;
+		$fileObj->estorage_fieldid  = $estorage_mode === 'FTP' ? $fieldid : 0;
 
-		$obj->url         = 0;
-		$obj->secure      = $secure;
-		$obj->stamp       = $stamp;
-		$obj->ext         = $ext;
+		$fileObj->url         = 0;
+		$fileObj->secure      = $secure;
+		$fileObj->stamp       = $stamp;
+		$fileObj->ext         = $ext;
 
-		$obj->description = $filedesc;
-		$obj->language    = strlen($filelang) ? $filelang : '*';
-		$obj->access      = strlen($fileaccess) ? $fileaccess : 1;
+		$fileObj->description = $filedesc;
+		$fileObj->language    = strlen($filelang) ? $filelang : '*';
+		$fileObj->access      = strlen($fileaccess) ? $fileaccess : 1;
 
-		$obj->hits        = 0;
-		$obj->size        = $filesize;
-		$obj->uploaded    = JFactory::getDate('now')->toSql();
-		$obj->uploaded_by = $user->get('id');
+		$fileObj->hits        = 0;
+		$fileObj->size        = $filesize;
+		$fileObj->uploaded    = JFactory::getDate('now')->toSql();
+		$fileObj->uploaded_by = $user->get('id');
 
 		// A. Database mode
 		if ($file_mode == 'db_mode')
 		{
 			// Insert file record in DB
-			$db->insertObject('#__' . $this->records_dbtbl, $obj);
+			$db->insertObject('#__' . $this->records_dbtbl, $fileObj);
 
 			// Get id of new file record
-			$obj->id = $file_id = (int) $db->insertid();
+			$fileObj->id = $file_id = (int) $db->insertid();
 
 			// Probe file to find if it is a supported media (audio or video) file
-			$model->createMediaData($field, $filepath, $obj);
+			$fileObj->full_path = $filepath;
+			$model->createMediaData($field, $fileObj);
 
 			// Create audio preview file, if file is a media file
-			if (!empty($obj->mediaData))
+			if (!empty($fileObj->mediaData))
 			{
-				$model->createAudioPreview($field, $filepath, $obj);
+				$model->createAudioPreview($field, $fileObj);
 			}
 		}
 
@@ -828,7 +829,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 		$this->exitLogTexts = array();
 		$this->exitSuccess  = true;
 
-		return $this->terminate($file_id, $exitMessages, $obj);
+		return $this->terminate($file_id, $exitMessages, $fileObj);
 	}
 
 
@@ -965,26 +966,26 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 			}
 		}
 
-		$obj = new stdClass;
-		$obj->filename    = $url;
-		$obj->filename_original = $url;
-		$obj->altname     = $altname;
+		$fileObj = new stdClass;
+		$fileObj->filename    = $url;
+		$fileObj->filename_original = $url;
+		$fileObj->altname     = $altname;
 
-		$obj->url         = $linktype;
-		$obj->secure      = $secure;
-		$obj->stamp       = 0;
-		$obj->ext         = $ext;
+		$fileObj->url         = $linktype;
+		$fileObj->secure      = $secure;
+		$fileObj->stamp       = 0;
+		$fileObj->ext         = $ext;
 
-		$obj->description = $filedesc;
-		$obj->language    = strlen($filelang) ? $filelang : '*';
-		$obj->access      = strlen($fileaccess) ? $fileaccess : 1;
+		$fileObj->description = $filedesc;
+		$fileObj->language    = strlen($filelang) ? $filelang : '*';
+		$fileObj->access      = strlen($fileaccess) ? $fileaccess : 1;
 
-		$obj->hits        = 0;
-		$obj->size        = $filesize;
-		$obj->uploaded    = JFactory::getDate('now')->toSql();
-		$obj->uploaded_by = $user->get('id');
+		$fileObj->hits        = 0;
+		$fileObj->size        = $filesize;
+		$fileObj->uploaded    = JFactory::getDate('now')->toSql();
+		$fileObj->uploaded_by = $user->get('id');
 
-		$db->insertObject('#__' . $this->records_dbtbl, $obj);
+		$db->insertObject('#__' . $this->records_dbtbl, $fileObj);
 
 		// Get id of new file record
 		$file_id = (int) $db->insertid();
@@ -1432,26 +1433,26 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 				{
 					$filesize = filesize($destination);
 
-					$obj = new stdClass;
-					$obj->filename    = $filename;
-					$obj->altname     = $filename;
+					$fileObj = new stdClass;
+					$fileObj->filename    = $filename;
+					$fileObj->altname     = $filename;
 
-					$obj->url         = 0;
-					$obj->secure      = $secure;
-					$obj->stamp       = $stamp;
-					$obj->ext         = $ext;
+					$fileObj->url         = 0;
+					$fileObj->secure      = $secure;
+					$fileObj->stamp       = $stamp;
+					$fileObj->ext         = $ext;
 
-					$obj->description = $filedesc;
-					$obj->language    = strlen($filelang) ? $filelang : '*';
-					$obj->access      = strlen($fileaccess) ? $fileaccess : 1;
+					$fileObj->description = $filedesc;
+					$fileObj->language    = strlen($filelang) ? $filelang : '*';
+					$fileObj->access      = strlen($fileaccess) ? $fileaccess : 1;
 
-					$obj->hits        = 0;
-					$obj->size        = $filesize;
-					$obj->uploaded    = JFactory::getDate('now')->toSql();
-					$obj->uploaded_by = $user->get('id');
+					$fileObj->hits        = 0;
+					$fileObj->size        = $filesize;
+					$fileObj->uploaded    = JFactory::getDate('now')->toSql();
+					$fileObj->uploaded_by = $user->get('id');
 
 					// Add the record to the DB
-					$db->insertObject('#__' . $this->records_dbtbl, $obj);
+					$db->insertObject('#__' . $this->records_dbtbl, $fileObj);
 					$file_ids[$filename] = $db->insertid();
 
 					// Add file ID to files imported by import task

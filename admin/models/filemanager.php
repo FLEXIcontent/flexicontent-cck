@@ -1868,13 +1868,11 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 	 */
 	public function areAssignedToField($file_ids, $field_id)
 	{
-		$db = JFactory::getDbo();
-
 		$query = 'SELECT DISTINCT value '
 			. ' FROM #__flexicontent_fields_item_relations '
 			. ' WHERE field_id =' . (int) $field_id . ' AND value IN (' . implode(',', ArrayHelper::toInteger($file_ids)) . ')'
 			;
-		$values = $db->setQuery($query)->loadColumn();
+		$values = $this->_db->setQuery($query)->loadColumn();
 
 		return array_flip($values);
 	}
@@ -1884,16 +1882,28 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 	 * 1. Create a smaller audio file for preview playback
 	 * 2. Precalculate the audio waveform peaks to avoid download the full file before preview playback starts
 	 */
-	public function createAudioPreview($field, $filepath, $file, $existing_preview_path = false)
+	public function createAudioPreview($field, $file, $logger = null)
 	{
+		// Setup Logger if not registered already done
+		if (!$logger)
+		{
+			$this->_setUpLogger($logger);
+		}
+
+		// Absolute file paths (or URLs ?)
+		$full_path     = $file->full_path;
+		$full_path_prw = isset($file->full_path_prw) ? $file->full_path_prw : '';
+
+		$full_path     = str_replace('\\', '/', $full_path);
+		$full_path_prw = str_replace('\\', '/', $full_path_prw);
+
 		// Get the extension to record it in the DB
-		$ext = strtolower(flexicontent_upload::getExt($filepath));
+		$ext = strtolower(flexicontent_upload::getExt($full_path));
 
 		$create_preview     = (int) $field->parameters->get('mm_create_preview', 1);
 		$ffmpeg_path        = $field->parameters->get('mm_ffmpeg_path', '');
 		$audiowaveform_path = $field->parameters->get('mm_audiowaveform_path', '');
 		$preview_bitrate    = (int) $field->parameters->get('mm_preview_bitrate', 96);
-		//$wf_pixels_per_sec  = $field->parameters->get('mm_wf_pixels_per_sec', '');
 		$wf_zoom            = (int) $field->parameters->get('mm_wf_zoom', 256);
 
 		if ($file->mediaData->duration > 30)
@@ -1901,72 +1911,75 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 			$wf_zoom = (int) ($wf_zoom * ($file->mediaData->duration / 30));
 		}
 
-		$app   = JFactory::getApplication();
-
 		if ($create_preview && $ffmpeg_path && in_array($ext, array('wav', 'mp3', 'aiff', 'mp4', 'mpg', 'mpeg', 'avi')))
 		{
-			$prv_path = $existing_preview_path
-				? str_replace('\\', '/', dirname($filepath))
-				: str_replace('\\', '/', dirname($filepath)) . '/audio_preview';
-			$filename = str_ireplace('.' . $ext, '', basename($filepath));
+			$prv_path = $full_path_prw ? dirname($full_path_prw) : dirname($full_path) . '/audio_preview';
+			$filename = str_ireplace('.' . $ext, '', basename($full_path));
 
 			// Check preview folder
 			if (!JFolder::exists($prv_path) && !JFolder::create($prv_path))
 			{
-				die('{"jsonrpc" : "2.0", "error" : {"code": 1103, "message": "Failed to create preview folder."}, "data" : null}');
+				$error_mssg = $file->filename . ' : Failed to create preview folder: ' . $prv_path;
+
+				$this->exitMessages[] = array('error' => $error_mssg);
+				JLog::add($error_mssg, JLog::ERROR, $logger->namespace);
+				return false;
 			}
 
 			// Create audio preview file
-			if (!$existing_preview_path)
+			if (!$full_path_prw)
 			{
-				//ffmpeg -i input.mp3 -codec:a libmp3lame -qscale:a 5 output.mp3
-				//ffmpeg -i input.mp3 -codec:a libmp3lame -b:a 96k output.mp3
-				exec($ffmpeg_path . " -i \"" . $filepath . "\" -codec:a libmp3lame -b:a " . $preview_bitrate . "k \"" . $prv_path . '/' . $filename . ".mp3\"");
+				exec($ffmpeg_path . " -i \"" . $full_path . "\" -codec:a libmp3lame -b:a " . $preview_bitrate . "k \"" . $prv_path . '/' . $filename . ".mp3\"");
 			}
 
 			// Create waveform peaks of audio preview file
 			if ($audiowaveform_path)
 			{
-				exec($audiowaveform_path . " -b 8 " .
+				$cmd = $audiowaveform_path . " -b 8 " .
 					" -i \"" . $prv_path . '/' . $filename . ".mp3\"" .
 					" -o \"" . $prv_path . '/' . $filename . ".json\"" .
-					//($pixels_per_second ? ' --pixels-per-second ' . $wf_pixels_per_sec : '') .
 					($wf_zoom ? ' --zoom ' . $wf_zoom : '')
-				);
-				//$this->exitMessages[] = array('message' => $audiowaveform_path . " -i \"" . $prv_path . '/' . $filename . ".mp3\" -o \"" . $prv_path . '/' . $filename . ".json\" -b 8");
+					;
+				exec($cmd);
+
+				JLog::add($file->filename . "\nCreating waveform peaks (JSON file):\n" . str_replace(JPATH_ROOT, '', $cmd) . "\n", JLog::INFO, $logger->namespace);
 			}
-			//die('{"jsonrpc" : "2.0", "error" : {"code": 1103, "message": ' . $audiowaveform_path . " -i \"" . $prv_path . '/' . $filename . ".mp3\" -o \"" . '}, "data" : null}');
-			//exec($ffmpeg_path . " -i \"" . $prv_path . '/' . $filename . '.mp3' + "\" -filter_complex showwavespic -frames:v 1 " . $prv_path . '/' . $filename . '.png');
-			//exec($ffmpeg_path . " -i \"" . $prv_path . '/' . $filename . '.mp3' + "\" -vn -ar 44100 -ac 1 -f f32le -");
-			//exec($ffmpeg_path . " -i \"" . $prv_path . '/' . $filename . '.mp3' + "\" -vn -ac 1 -filter:a aresample=1000 -map 0:a -c:a pcm_s16le -f data " . $prv_path . '/' . $filename . '.json');
-			//exec($ffmpeg_path . " -i \"" . $prv_path . '/' . $filename . '.mp3' + "\" -f s16le  -ac channels -acodec pcm_s16le -ar 44100 -y pipe:1 " . $prv_path . '/' . $filename . '.json');
 		}
+
+		return true;
 	}
 
+	/**
+	 * Proobe using ffprobe the media data properties (duration, codec, etc) of the media file and store it in the database
+	 */
+	public function getDbMediaData($file)
+	{
+		$query = $this->_db->getQuery(true)
+			->select('*')
+			->from('#__flexicontent_mediadatas')
+			->where('file_id = ' . (int) $file->id)
+			;
+		return $this->_db->setQuery($query)->loadOBject();
+	}
 
 	/**
-	 * 1. Create a smaller audio file for preview playback
-	 * 2. Precalculate the audio waveform peaks to avoid download the full file before preview playback starts
+	 * Proobe using ffprobe the media data properties (duration, codec, etc) of the media file and store it in the database
 	 */
-	public function createMediaData($field, $filepath, $file)
+	public function createMediaData($field, $file, $logger = null)
 	{
-		$db = JFactory::getDbo();
+		// Setup Logger if not registered already done
+		if (!$logger)
+		{
+			$this->_setUpLogger($logger);
+		}
 
-		$log_filename = 'mediadata_log.php';
-		jimport('joomla.log.log');
-		JLog::addLogger(
-			array(
-				'text_file' => $log_filename,  // Sets the target log file
-				'text_entry_format' => '{DATE} {TIME} {PRIORITY} {MESSAGE}'  // Sets the format of each line
-			),
-			JLog::ALL,  // Sets messages of all log levels to be sent to the file
-			array('com_flexicontent.filemanager.uploader')  // category of logged messages
-		);
+		// Absolute file path (or URL ?)
+		$full_path = $file->full_path;
 
 		// Get the extension to record it in the DB
-		$ext = strtolower(flexicontent_upload::getExt($filepath));
+		$ext = strtolower(flexicontent_upload::getExt($full_path));
 
-		$ffprobe_path       = $field->parameters->get('mm_ffprobe_path', '');
+		$ffprobe_path = $field->parameters->get('mm_ffprobe_path', '');
 
 		// Create audio preview file
 		if ($ffprobe_path && in_array($ext, array('wav', 'mp3', 'aiff', 'mp4', 'mpg', 'mpeg', 'avi')))
@@ -1980,27 +1993,29 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 
 			// Run the ffprobe, save the JSON output then decode
 			//ffprobe -v error -show_format -show_streams input.mp4
-			$json = json_decode(shell_exec(sprintf($ffprobe_path.' %s %s', $options, escapeshellarg($filepath))));
+			$json = json_decode(shell_exec(sprintf($ffprobe_path.' %s %s', $options, escapeshellarg($full_path))));
 
 			if (!isset($json->format))
 			{
 				$this->exitMessages[] = array('warning' => 'Unsupported file type. Cannot detect audio properties.');
-				JLog::add('Unsupported file type. Cannot detect audio properties.', JLog::ERROR, 'com_flexicontent.filemanager.uploader');
+				JLog::add('Unsupported file type. Cannot detect audio properties.', JLog::ERROR, $logger->namespace);
+				return false;
 			}
 			else
 			{
-				// `media_type` int(11) NOT NULL default 0, /* 0: audio , 1: video */
-				// `resolution` varchar(255) NULL, /* e.g. 1280x720, 1920x1080 */
-				// `fps` int(11) NULL, /* e.g. 50 (frames per second) */
-				// `bitrate` int(11) NULL, /* e.g. 256 , 320 (kbps) */
-				// `bitdepth` int(11) NULL, /* e.g. 16, 24, 32 (# bits) */
-				// `samplerate` int(11) NULL, /* e.g. 44100 (HZ) */
-				// `audiotype` varchar(255) NULL, /* e.g. 'stereo', 'mono' */
-				// `duration` int(11) NOT NULL, /* e.g. 410 (seconds) */
-				// `format` varchar(255) NULL, /* e.g 'audio/wav'*/
-				// `checked_out` int(11) unsigned NOT NULL default '0',
-				// `checked_out_time` datetime NOT NULL default '1000-01-01 00:00:00',
-				// `attribs` mediumtext NULL,
+				//  `media_type` int(11) NOT NULL default 0, /* 0: audio , 1: video */
+				//  `media_format` varchar(255) NULL, /* e.g 'video', 'wav', 'audio' */
+				//  `codec_type` varchar(255) NULL, /* e.g 'audio' */
+				//  `codec_name` varchar(255) NULL, /* e.g 'mp3', 'pcm_s24le' */
+				//  `codec_long_name` varchar(255) NULL, /* e.g 'PCM signed 24-bit little-endian' , 'MP3 (MPEG audio layer 3)' */
+				//  `resolution` varchar(255) NULL, /* e.g. 1280x720, 1920x1080 */
+				//  `fps` double NULL, /* e.g. 50 (frames per second) */
+				//  `bit_rate` int(11) NULL, /* e.g. 256000 , 320000 (bps) */
+				//  `bits_per_sample` int(11) NULL, /* e.g. 16, 24, 32 (# bits) */
+				//  `sample_rate` int(11) NULL, /* e.g. 44100 (HZ) */
+				//  `duration` int(11) NOT NULL, /* e.g. 410 (seconds) */
+				//  `channels` varchar(255) NULL, /* e.g. 1, 2, 4 (number of channels) */
+				//  `channel_layout` varchar(255) NULL, /* e.g. 'stereo', 'mono' */
 
 				$md_obj = new stdClass;
 				$md_obj->id              = 0;
@@ -2015,29 +2030,75 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 				$md_obj->codec_name      = $json->streams[0]->codec_name;
 				$md_obj->codec_long_name = $json->streams[0]->codec_long_name;
 
+				$md_obj->duration        = isset($json->streams[0]->duration)        ? ceil($json->streams[0]->duration) : 0;
 				$md_obj->resolution      = 0;    // TODO
 				$md_obj->fps             = 0;    // TODO
 
 				$md_obj->bit_rate        = isset($json->streams[0]->bit_rate)        ? $json->streams[0]->bit_rate : 0;
 				$md_obj->bits_per_sample = isset($json->streams[0]->bits_per_sample) ? $json->streams[0]->bits_per_sample : 0;
 				$md_obj->sample_rate     = isset($json->streams[0]->sample_rate)     ? $json->streams[0]->sample_rate : 0;
-				$md_obj->duration        = isset($json->streams[0]->duration)        ? ceil($json->streams[0]->duration) : 0;
 
 				$md_obj->channels        = isset($json->streams[0]->channels)        ? $json->streams[0]->channels : 0;
 				$md_obj->channel_layout  = isset($json->streams[0]->channel_layout)  ? $json->streams[0]->channel_layout : '';
 
 				// Insert file record in DB
-				$db->insertObject('#__flexicontent_mediadatas', $md_obj);
+				$this->_db->insertObject('#__flexicontent_mediadatas', $md_obj);
 
 				// Get id of new file record
-				$md_obj->id = (int) $db->insertid();
+				$md_obj->id = (int) $this->_db->insertid();
 
 				// Reference the media data object, maybe useful during preview file creation
 				$file->mediaData = $md_obj;
 
-				$this->exitMessages[] = array('message' => print_r($json, true));
-				JLog::add(print_r($json->streams[0], true), JLog::INFO, 'com_flexicontent.filemanager.uploader');
+				//$this->exitMessages[] = array('message' => print_r($json, true));
+				$logger->detailed_log
+					? JLog::add($full_path . "\n" . print_r($json->streams[0], true), JLog::INFO, $logger->namespace)
+					: JLog::add($full_path . "\n" .
+						'media_type: ' . $md_obj->media_type . ', media_format: ' . $md_obj->media_format . ', channels: ' . $md_obj->channels . ', channel_layout: ' . $md_obj->channel_layout . "\n" .
+						'codec_name: ' . $md_obj->codec_name . ', codec_name: ' . $md_obj->codec_name . ', codec_long_name: ' . $md_obj->codec_long_name . "\n" .
+						'duration: ' . $md_obj->duration . ', resolution: ' . $md_obj->resolution . ', fps: ' . $md_obj->fps . "\n" .
+						'bit_rate: ' . $md_obj->bit_rate . ', bits_per_sample: ' . $md_obj->bits_per_sample . ', sample_rate: ' . $md_obj->sample_rate  . "\n"
+					, JLog::INFO, $logger->namespace);
 			}
 		}
+
+		return true;
+	}
+
+
+	/**
+	 * Register a Logger [filename, namespace, format]
+	 */
+	private function _setUpLogger(&$logger = null)
+	{
+		static $_names = array();
+
+		if (!$logger)
+		{
+			$logger = (object) array(
+				'namespace' => 'com_flexicontent.filemanager.uploader',
+				'filename' => 'mediadata_log.php',
+				'detailed_log' => false,
+			);
+		}
+
+		if (!isset($_names[$logger->namespace]))
+		{
+			$_names[$logger->namespace] = 1;
+		}
+		else
+		{
+			return;
+		}
+
+		jimport('joomla.log.log');
+		JLog::addLogger(
+			array(
+				'text_file' => $logger->filename,  // Sets the target log file
+				'text_entry_format' => '{DATE} {TIME} {PRIORITY} {MESSAGE}'  // Sets the format of each line
+			),
+			JLog::ALL,  // Sets messages of all log levels to be sent to the file
+			array($logger->namespace)  // category of logged messages
+		);
 	}
 }
