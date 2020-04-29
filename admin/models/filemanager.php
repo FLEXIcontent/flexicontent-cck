@@ -1929,17 +1929,40 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 			// Create audio preview file
 			if (!$full_path_prw)
 			{
-				exec($ffmpeg_path . " -i \"" . $full_path . "\" -codec:a libmp3lame -b:a " . $preview_bitrate . "k \"" . $prv_path . '/' . $filename . ".mp3\"");
+				if ($file->url == 1)
+				{
+					return false;
+					$cmd = 'wget -O - ' . escapeshellarg($file->filename) . ' | ' .
+						$ffmpeg_path . " -codec:a libmp3lame -b:a " . $preview_bitrate . "k \"" . $prv_path . '/' . $filename . ".mp3\"";
+
+					$full_path_prw =  $prv_path . '/' . $filename . ".mp3";
+				}
+				else
+				{
+					$cmd = $ffmpeg_path . " -i \"" . $full_path . "\" -codec:a libmp3lame -b:a " . $preview_bitrate . "k \"" . $prv_path . '/' . $filename . ".mp3\"";
+				}
+				exec($cmd);
 			}
 
 			// Create waveform peaks of audio preview file
 			if ($audiowaveform_path)
 			{
-				$cmd = $audiowaveform_path . " -b 8 " .
-					" -i \"" . $prv_path . '/' . $filename . ".mp3\"" .
-					" -o \"" . $prv_path . '/' . $filename . ".json\"" .
-					($wf_zoom ? ' --zoom ' . $wf_zoom : '')
-					;
+				/*if (!$full_path_prw && $file->url == 1)
+				{
+					$cmd = 'wget -O - ' . escapeshellarg($file->filename) . ' | ' .
+						$audiowaveform_path . ' -b 8 -input-format ' . $ext .
+						" -o \"" . $prv_path . '/' . $filename . ".json\"" .
+						($wf_zoom ? ' --zoom ' . $wf_zoom : '')
+						;
+				}
+				else
+				{*/
+					$cmd = $audiowaveform_path . " -b 8 " .
+						" -i \"" . $prv_path . '/' . $filename . ".mp3\"" .
+						" -o \"" . $prv_path . '/' . $filename . ".json\"" .
+						($wf_zoom ? ' --zoom ' . $wf_zoom : '')
+						;
+				//}
 				exec($cmd);
 
 				JLog::add($file->filename . "\nCreating waveform peaks (JSON file):\n" . str_replace(JPATH_ROOT, '', $cmd) . "\n", JLog::INFO, $logger->namespace);

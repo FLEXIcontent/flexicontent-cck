@@ -254,7 +254,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 		}
 
 		// Find usage in fields
-		$s_assigned_fields = array('file', 'minigallery');
+		$s_assigned_fields = array('file', 'minigallery', 'mediafile');
 		$m_assigned_fields = array('image');
 		$m_assigned_props  = array('image' => array('originalname', 'existingname'));
 		$m_assigned_vals   = array('image' => array('filename', 'filename'));

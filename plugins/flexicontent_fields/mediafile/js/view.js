@@ -232,7 +232,7 @@ class fc_Waveform_LazyLoad
 			container: '#fc_mediafile_audio_spectrum_' + fnn,
 			//minPxPerSec:   50,
 			//reflection: true,
-			barWidth: 0.01,
+			//barWidth: 0.01,
 			//barHeight: 0.02,
 			normalize: true,
 			fillParent:    true,
