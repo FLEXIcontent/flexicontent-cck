@@ -204,7 +204,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 		$rebuildmode = $this->input->getCmd('rebuildmode', '');
 		$index_urls  = $this->input->getInt('index_urls', 0);
 
-		$records_per_call = $this->input->getInt('records_per_call', 20);  // Number of item to index per HTTP request
+		$records_per_call = $this->input->getInt('records_per_call', 15);  // Number of item to index per HTTP request
 		$records_cnt      = $this->input->getInt('records_cnt', 0);        // Counter of items indexed so far, this is given via HTTP request
 
 		$log_filename = $session->get($indexer . '_log_filename', null, 'flexicontent');
@@ -245,6 +245,15 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 		// Get models
 		$model        = $this->getModel('filemanager');
 		$record_model = $this->getModel('file');
+		
+		// Get mediafile fields
+		$media_fields = FlexicontentFields::getFieldsByType(array('mediafile'));
+		$_item = null;
+
+		foreach($media_fields as $media_field)
+		{
+			FlexicontentFields::loadFieldConfig($media_field, $_item);
+		}
 
 		// Find usage in fields
 		$s_assigned_fields = array('file', 'minigallery');
@@ -253,7 +262,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 		$m_assigned_vals   = array('image' => array('filename', 'filename'));
 
 		$query_count         = 0;
-		$max_items_per_query = 100;
+		$max_items_per_query = 30;
 		$max_items_per_query = $max_items_per_query > $records_per_call ? $records_per_call : $max_items_per_query;
 
 		// Start item counter at given index position
@@ -285,6 +294,14 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 			$db->setQuery($data_query);
 			$record_data = $db->loadObjectList('id');
 
+			// Check if current set of files are assigned to any mediafields
+			$media_fields_assignments = array();
+
+			foreach($media_fields as $media_field)
+			{
+				$media_fields_assignments[$media_field->id] = $model->areAssignedToField($query_itemids, $media_field->id);
+			}
+
 			$size_index  = array();
 			$usage_index = array();
 			$errors = array();
@@ -297,31 +314,33 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 			{
 				$file->total_usage = 0;
 
-				if ((int) $file->url === 0)
+				$_ext  = strtolower(flexicontent_upload::getExt($file->filename));
+				$_name = str_ireplace('.' . $_ext, '', basename($file->filename));
+
+				// Local files: 0: FC file management Folders or 1: Joomla Media Folder
+				if ($file->url == 0 || $file->url == 2)
 				{
-					$path       = $file->secure ? COM_FLEXICONTENT_FILEPATH : COM_FLEXICONTENT_MEDIAPATH;  // JPATH_ROOT . DS . <media_path | file_path>
-					$file_path  = $path . DS . $file->filename;
-					$file->size = file_exists($file_path) ? filesize($file_path) : 0;
+					$path = $file->url == 0
+						? ($file->secure ? COM_FLEXICONTENT_FILEPATH : COM_FLEXICONTENT_MEDIAPATH)  // JPATH_ROOT . DS . <media_path | file_path>
+						: $path = JPATH_ROOT;
+
+					$file_path     = $path . DS . $file->filename;
+					$file_path_prw = $path . DS . 'audio_preview' . DS . $_name . '.mp3';
+					$file->size    = file_exists($file_path) ? filesize($file_path) : 0;
 
 					if (!file_exists($file_path))
 					{
-							$errors[] = $file->filename . ' -- NOT FOUND';
+						$errors[] = $file->filename . ($file->url == 2 ? ' -- NOT FOUND (Joomla media file)' : '');
+						continue;
 					}
 				}
 
-				elseif ((int) $file->url === 2)
-				{
-					$file_path  = JPATH_ROOT . DS . $file->filename;
-					$file->size = file_exists($file_path) ? filesize($file_path) : 0;
-
-					if (!file_exists($file_path))
-					{
-							$errors[] = $file->filename . ' -- NOT FOUND (Joomla media file)';
-					}
-				}
-
+				// File URLs
 				elseif ($index_urls)
 				{
+					$file_path     = $file->filename;   // URL
+					$file_path_prw = ($file->secure ? COM_FLEXICONTENT_FILEPATH : COM_FLEXICONTENT_MEDIAPATH) . DS . 'audio_preview' . DS . $_name . '.mp3';
+
 					if ($file->filename)
 					{
 						$filesize = $record_model->get_file_size_from_url($file->filename);
@@ -336,6 +355,27 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 				}
 
 				$size_index[] = ' WHEN ' . $file->id . ' THEN ' . $file->size;
+
+				// Recalculate JSON peaks files
+				if ($file->url != 1 || file_exists($file_path_prw))
+				{
+					foreach($media_fields as $media_field)
+					{
+						if (isset($media_fields_assignments[$media_field->id][$file_id]))
+						{
+							$existing_preview_mp3_path = file_exists($file_path_prw) ? $file_path_prw : false;
+
+							// Probe file to find if it is a supported media (audio or video) file
+							$model->createMediaData($media_field, $file_path, $file, $existing_preview_mp3_path);
+
+							// Create audio preview file, if file is a media file
+							if (!empty($file->mediaData))
+							{
+								$model->createAudioPreview($media_field, $file_path, $file, $existing_preview_mp3_path);
+							}
+						}
+					}
+				}
 			}
 
 			// Increment error count in session, and log errors into the log file
