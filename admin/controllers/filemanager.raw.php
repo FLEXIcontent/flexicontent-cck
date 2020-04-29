@@ -133,7 +133,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 		}
 
 		// Clear previous log file
-		$log_filename = 'filemanager_stats_indexer_' . \JFactory::getUser()->id . '.php';
+		$log_filename      = 'filemanager_stats_indexer_' . \JFactory::getUser()->id . '.php';
 		$log_filename_full = JPATH::clean(\JFactory::getConfig()->get('log_path') . DS . $log_filename);
 
 		if (file_exists($log_filename_full))
@@ -141,6 +141,11 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 			@ unlink($log_filename_full);
 		}
 
+		// Clear previous mediadata log file
+		if (file_exists(str_replace('filemanager', 'mediadata', $log_filename_full)))
+		{
+			@ unlink(str_replace('filemanager', 'mediadata', $log_filename_full));
+		}
 
 		// Get records model to call needed methods
 		$records_model = $this->getModel('filemanager');
@@ -204,19 +209,12 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 		$rebuildmode = $this->input->getCmd('rebuildmode', '');
 		$index_urls  = $this->input->getInt('index_urls', 0);
 
-		$records_per_call = $this->input->getInt('records_per_call', 15);  // Number of item to index per HTTP request
+		$records_per_call = $this->input->getInt('records_per_call', 100);  // Number of item to index per HTTP request
 		$records_cnt      = $this->input->getInt('records_cnt', 0);        // Counter of items indexed so far, this is given via HTTP request
 
-		$log_filename = $session->get($indexer . '_log_filename', null, 'flexicontent');
-		jimport('joomla.log.log');
-		JLog::addLogger(
-			array(
-				'text_file' => $log_filename,  // Sets the target log file
-				'text_entry_format' => '{DATETIME} {PRIORITY} {MESSAGE}'  // Sets the format of each line
-			),
-			JLog::ALL,  // Sets messages of all log levels to be sent to the file
-			array('com_flexicontent.filemanager.stats_indexer')  // category of logged messages
-		);
+		$log_filename  = $session->get($indexer . '_log_filename', null, 'flexicontent');
+		$log_namespace = 'com_flexicontent.filemanager.stats_indexer';
+		$loggers       = $this->_setUpLoggers($log_filename, $log_namespace);
 
 		// Get record ids to process, but use session to avoid recalculation
 		$record_ids = $session->get($indexer . '_records_to_index', array(), 'flexicontent');
@@ -261,9 +259,12 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 		$m_assigned_props  = array('image' => array('originalname', 'existingname'));
 		$m_assigned_vals   = array('image' => array('filename', 'filename'));
 
-		$query_count         = 0;
-		$max_items_per_query = 30;
-		$max_items_per_query = $max_items_per_query > $records_per_call ? $records_per_call : $max_items_per_query;
+		// A lower value for this will allow safe checking if were getting near the (max_execution_time / 3) limit
+		$max_items_per_query  = count($media_fields) ? 5 : 30;
+		$max_items_per_query  = $max_items_per_query > $records_per_call ? $records_per_call : $max_items_per_query;
+		$query_count          = 0;
+		$mediadata_err_count  = 0;
+		$mediadata_file_count = 0;
 
 		// Start item counter at given index position
 		$cnt = $records_cnt;
@@ -322,13 +323,13 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 				{
 					$path = $file->url == 0
 						? ($file->secure ? COM_FLEXICONTENT_FILEPATH : COM_FLEXICONTENT_MEDIAPATH)  // JPATH_ROOT . DS . <media_path | file_path>
-						: $path = JPATH_ROOT;
+						: JPATH_ROOT;
 
-					$file_path     = $path . DS . $file->filename;
-					$file_path_prw = $path . DS . 'audio_preview' . DS . $_name . '.mp3';
-					$file->size    = file_exists($file_path) ? filesize($file_path) : 0;
+					$full_path     = $path . DS . $file->filename;
+					$full_path_prw = $path . DS . 'audio_preview' . DS . $_name . '.mp3';
+					$file->size    = file_exists($full_path) ? filesize($full_path) : 0;
 
-					if (!file_exists($file_path))
+					if (!file_exists($full_path))
 					{
 						$errors[] = $file->filename . ($file->url == 2 ? ' -- NOT FOUND (Joomla media file)' : '');
 						continue;
@@ -338,8 +339,8 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 				// File URLs
 				elseif ($index_urls)
 				{
-					$file_path     = $file->filename;   // URL
-					$file_path_prw = ($file->secure ? COM_FLEXICONTENT_FILEPATH : COM_FLEXICONTENT_MEDIAPATH) . DS . 'audio_preview' . DS . $_name . '.mp3';
+					$full_path     = $file->filename;   // URL
+					$full_path_prw = ($file->secure ? COM_FLEXICONTENT_FILEPATH : COM_FLEXICONTENT_MEDIAPATH) . DS . 'audio_preview' . DS . $_name . '.mp3';
 
 					if ($file->filename)
 					{
@@ -357,21 +358,26 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 				$size_index[] = ' WHEN ' . $file->id . ' THEN ' . $file->size;
 
 				// Recalculate JSON peaks files
-				if ($file->url != 1 || file_exists($file_path_prw))
+				if ($file->url != 1 || file_exists($full_path_prw))
 				{
 					foreach($media_fields as $media_field)
 					{
 						if (isset($media_fields_assignments[$media_field->id][$file_id]))
 						{
-							$existing_preview_mp3_path = file_exists($file_path_prw) ? $file_path_prw : false;
-
-							// Probe file to find if it is a supported media (audio or video) file
-							$model->createMediaData($media_field, $file_path, $file, $existing_preview_mp3_path);
+							// Try to get mediadata of the file from the DB
+							$file->mediaData = $model->getDbMediaData($file);
 
 							// Create audio preview file, if file is a media file
 							if (!empty($file->mediaData))
 							{
-								$model->createAudioPreview($media_field, $file_path, $file, $existing_preview_mp3_path);
+								$file->full_path = $full_path;
+								$file->full_path_prw = file_exists($full_path_prw) ? $full_path_prw : false;
+
+								if (!$model->createAudioPreview($media_field, $file, $loggers['mediadata']))
+								{
+									$mediadata_err_count++; 
+								}
+								$mediadata_file_count++;
 							}
 						}
 					}
@@ -386,8 +392,24 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 
 				foreach ($errors as $error_message)
 				{
-					JLog::add($error_message, JLog::WARNING, 'com_flexicontent.filemanager.stats_indexer');
+					JLog::add($error_message, JLog::WARNING, $log_namespace);
 				}
+			}
+
+			// Increment error count in session, and log errors into the log file
+			if ($mediadata_err_count)
+			{
+				$error_count = $session->get('mediadata.stats_indexer.error_count', 0, 'flexicontent');
+				$session->set('mediadata.stats_indexer.error_count', $error_count + $mediadata_err_count, 'flexicontent');
+			}
+			if ($mediadata_file_count)
+			{
+				$file_count = $session->get('mediadata.stats_indexer.file_count', 0, 'flexicontent');
+				$session->set('mediadata.stats_indexer.file_count', $file_count + $mediadata_file_count, 'flexicontent');
+			}
+			if ($mediadata_err_count || $mediadata_file_count)
+			{
+				$session->set('mediadata_stats_log_filename', 'mediadata_stats_indexer_' . \JFactory::getUser()->id . '.php', 'flexicontent');
 			}
 
 			// Single property fields, get file usage (# assignments)
@@ -486,5 +508,42 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 		$session->set($indexer . '_total_queries', $_total_queries, 'flexicontent');
 
 		jexit(sprintf('success | ' . $cnt . ' | Server execution time: %.2f secs ', $_total_runtime / 1000000) . ' | Total DB updates: ' . $_total_queries);
+	}
+
+
+	/**
+	 * Register Loggers for all distinct tasks
+	 */
+	private function _setUpLoggers($log_filename, $log_namespace)
+	{
+		jimport('joomla.log.log');
+
+		// Currently default logger plus only 1 custom logger, we may add more custom logger if doing more distinct tasks
+		$custom_loggers = array(
+			'filemanager' => (object) array(
+				'namespace' => $log_namespace,
+				'filename' => $log_filename,
+				'detailed_log' => true,
+			),
+			'mediadata' => (object) array(
+				'namespace' => str_replace('filemanager', 'mediadata', $log_namespace),
+				'filename' => str_replace('filemanager', 'mediadata', $log_filename),
+				'detailed_log' => true,
+			),
+		);
+
+		foreach($custom_loggers as $logger)
+		{
+			JLog::addLogger(
+				array(
+					'text_file' => $logger->filename,  // Sets the target log file
+					'text_entry_format' => '{DATETIME} {PRIORITY} {MESSAGE}'  // Sets the format of each line
+				),
+				JLog::ALL,  // Sets messages of all log levels to be sent to the file
+				array($logger->namespace)  // category of logged messages
+			);
+		}
+
+		return $custom_loggers;
 	}
 }

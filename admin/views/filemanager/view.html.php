@@ -791,6 +791,7 @@ class FlexicontentViewFilemanager extends FlexicontentViewBaseRecords
 			flexicontent_html::addToolBarDropMenu($btn_arr, 'maintenance-btns-group', ' ');
 		}
 
+
 		/*$stats_indexer_errors = $session->get('filemanager.stats_indexer_errors', null, 'flexicontent');
 		if ($stats_indexer_errors !== null)
 		{
@@ -813,6 +814,31 @@ class FlexicontentViewFilemanager extends FlexicontentViewBaseRecords
 			}
 		}
 		$session->set('filemanager_stats_log_filename', null, 'flexicontent');
+
+
+		$error_count = $session->get('mediadata.stats_indexer.error_count', 0, 'flexicontent');
+		$file_count = $session->get('mediadata.stats_indexer.file_count', 0, 'flexicontent');
+		if ($error_count || $file_count)
+		{
+			if ($error_count)
+			{
+				JFactory::getApplication()->enqueueMessage('Please see mediadata logfile. Could not reprocess all preview files. Processed : ' . $error_count . ' / ' . $file_count .' files', 'warning');
+			}
+			$session->set('mediadata.stats_indexer.error_count', null, 'flexicontent');
+			$session->set('mediadata.stats_indexer.file_count', null, 'flexicontent');
+
+			if ($log_filename = $session->get('mediadata_stats_log_filename', null, 'flexicontent'))
+			{
+				JFactory::getApplication()->enqueueMessage(
+					($error_count ? '' : 'Please see mediadata logfile. Processed all ' . $file_count . '  preview files') .
+					' You may see log file : <b>' . JPATH::clean(\JFactory::getConfig()->get('log_path') . DS . $log_filename) . '</b>' .
+					($error_count ? ' for messages and errors' : ' for more information'),
+					$error_count ? 'warning' : 'message'
+				);
+			}
+		}
+		$session->set('mediadata_stats_log_filename', null, 'flexicontent');
+
 
 		if ($perms->CanConfig)
 		{
