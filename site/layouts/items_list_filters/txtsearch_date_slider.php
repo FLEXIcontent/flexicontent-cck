@@ -7,7 +7,7 @@
 extract($displayData);
 $_s = $isSearchView ? '_s' : '';
 
-$anyAsFirstLastValues = false;
+$anyAsFirstLastValues = true;
 $showAsTooltips = false;
 
 // Component's parameters
@@ -84,10 +84,10 @@ else
 		$max = ($i - 1) + ($display_filter_as == 7 ? 0 : ($anyAsFirstLastValues ? 1 : 0));  //count($results)-1;
 		if ($end == -1) $end = $max;  // Set end to last element if it was not set
 
-		if ($display_filter_as == 8)
+		if ($display_filter_as == 8 && $anyAsFirstLastValues)
 		{
-			//$step_values[] = "''";
-			//$step_labels[] = JText::_('FLEXI_ANY');
+			$step_values[] = "''";
+			$step_labels[] = JText::_('FLEXI_ANY');
 		}
 
 		$step_range = 
