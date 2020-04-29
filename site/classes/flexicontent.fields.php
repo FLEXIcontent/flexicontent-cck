@@ -186,6 +186,52 @@ class FlexicontentFields
 
 
 	/**
+	 * Method to get fields data by field type
+	 *
+	 * @access public
+	 * @return object
+	 * @since 3
+	 */
+	static function getFieldsByType($field_types, $check_access=true, $index_col = 'id')
+	{
+		if (!count($field_types))
+		{
+			return array();
+		}
+
+		$db   = JFactory::getDbo();
+		$user = JFactory::getUser();
+
+		$field_types_quoted = array();
+
+		foreach ($field_types as $field_type)
+		{
+			$field_types_quoted[] = $db->Quote($field_type);
+		}
+
+		// Field's has_access flag
+		if ($check_access)
+		{
+			$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
+			$aid_list = implode(",", $aid_arr);
+			$select_access = ', CASE WHEN fi.access IN (0,'.$aid_list.') THEN 1 ELSE 0 END AS has_access';
+		}
+		else
+			$select_access = '';
+
+		$query 	= 'SELECT fi.*'
+			. $select_access
+			. ' FROM #__flexicontent_fields AS fi'
+			. ' WHERE fi.field_type IN ('.implode(",", $field_types_quoted).') '
+			;
+		$db->setQuery($query);
+		$fields = $db->loadObjectList($index_col);
+
+		return $fields;
+	}
+
+
+	/**
 	 * Method to get fields configuration data by field ids
 	 *
 	 * @access private

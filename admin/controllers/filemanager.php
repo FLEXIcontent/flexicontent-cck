@@ -798,6 +798,15 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 
 			// Get id of new file record
 			$obj->id = $file_id = (int) $db->insertid();
+
+			// Probe file to find if it is a supported media (audio or video) file
+			$model->createMediaData($field, $filepath, $obj);
+
+			// Create audio preview file, if file is a media file
+			if (!empty($obj->mediaData))
+			{
+				$model->createAudioPreview($field, $filepath, $obj);
+			}
 		}
 
 		// B. Custom Folder mode
