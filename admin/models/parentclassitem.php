@@ -2434,7 +2434,10 @@ class ParentClassItem extends FCModelAdmin
 			// null indicates to retrieve it inside saveFields
 			$files = null;  // $_FILES;  //$app->input->files->get('files');
 			$core_data_via_events = null;
+
+			$catid_saved = $item->catid;
 			$result = $this->saveFields($isNew, $item, $data, $files, $old_item, $core_data_via_events, $checkACL);
+			$item->catid = (int) $item->catid;
 
 			// Allow custom redirection on failure
 			if (!empty($item->abort_save))
@@ -2451,9 +2454,21 @@ class ParentClassItem extends FCModelAdmin
 
 			if ( $print_logging_info ) $fc_run_times['item_store_custom'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 
+
+			// Re-split possibly modified text to introtext, fulltext
+			$this->splitText($core_data_via_events);
+
+			// Re-add possibly modified main category
+			if ($catid_saved != $item->catid)
+			{
+				$cats_indexed = array_flip($data['categories']);
+				unset($cats_indexed[$catid_saved]);
+				$cats_indexed[$item->catid] = 1;
+				$data['categories'] = array_keys($cats_indexed);;
+			}
+
 			// Re-bind (possibly modified data) to the item
-			$this->splitText($core_data_via_events); // split text to introtext, fulltext
-			if ( !$item->bind($core_data_via_events) )
+			if (!$item->bind($core_data_via_events))
 			{
 				$this->setError($this->_db->getErrorMsg());
 				return false;
