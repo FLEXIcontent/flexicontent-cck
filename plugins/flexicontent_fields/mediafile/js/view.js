@@ -64,36 +64,59 @@ class fc_Waveform_LazyLoad
 		var progressBar  = box.find('.fc_mediafile_audio_spectrum_progressbar').get(0);
 	//var mediaPlayer  = jQuery('#fc_mediafile_audio_spectrum_box_' + fnn).find('.fc_mediafile_audio_spectrum').get(0);
 
-		var keyPlayPause = function keyPlayPause(key_event) {
-			if (key_event.keyCode == 32 || key_event.keyCode == 13 /*/*&& key_event.target.nodeName !== "WAVE"*/)
+		var keyPressedDown = function(key_event)
+		{
+			var k = key_event.keyCode;
+
+			//space = 32, enter = 13, left = 37, up = 38, right = 39, down = 40
+			if (k == 32 || k == 13 || k == 37 || k == 38 || k == 39 || k == 40)  /*&& key_event.target.nodeName !== "WAVE"*/
 			{
-				key_event.preventDefault();
-				//window.console.log(key_event.target.nodeName);
+				key_event.preventDefault();  //window.console.log(key_event.target.nodeName);
 
 				// Toggle playing state
-				var event = document.createEvent("HTMLEvents");
-				event.initEvent("click", true, true);
-				event.eventName = "click";
-				audio_spectrum.backend.isPaused() ? buttons.play.dispatchEvent(event) :  buttons.pause.dispatchEvent(event);
+				if (k == 32 || k == 13)
+				{
+					var event = document.createEvent("HTMLEvents");
+					event.initEvent("click", true, true);
+					event.eventName = "click";
+					audio_spectrum.backend.isPaused() ? buttons.play.dispatchEvent(event) :  buttons.pause.dispatchEvent(event);
+				}
+				else if (k == 37 || k == 39)
+				{
+					audio_spectrum.skip(k == 37 ? -10 : 10);
+				}
+				else if (k == 38 || k == 40)
+				{
+					var vol  = audio_spectrum.getVolume()
+					audio_spectrum.setVolume(k == 38 ?  (vol < 0.9 ? vol + 0.1 : 1)  : (vol > 0.1 ? vol - 0.1 : 0));
+				}
 
 				return false;
 			}
 		}
 
-		var updateTimer = function updateTimer()
+		var updateTimer = function()
 		{
 			var formattedTime = secondsToTimestamp(audio_spectrum.getCurrentTime());
 			//jQuery('#fc_mediafile_current_time_' + fnn).text(formattedTime);
 
 			var wave = jQuery('#fc_mediafile_audio_spectrum_' + fnn + ' wave wave');
-			if (!wave.find('.fccurrentTimeBox').length)
+			var wave_parent = wave.parent();
+
+			if (!wave_parent.find('.fccurrentTimeBox').length)
 			{
-				wave.append(jQuery('<div class="fccurrentTimeBox" style="position:absolute; z-index: 11; right:0; top: 38%; background: #777; color: white; padding: 4px 4px 4px 8px; opacity: 70%;"></div>'));
+				wave.after(jQuery('<div class="fccurrentTimeBox"></div>'));
 			}
-			wave.find('.fccurrentTimeBox').html(formattedTime);
+
+			var timer = wave_parent.find('.fccurrentTimeBox').get(0);
+			var width = wave.get(0).offsetWidth;
+
+			timer.innerHTML = formattedTime;
+			timer.style.left = width < timer.offsetWidth ? (width + 'px') : ((width - timer.offsetWidth - 2) + 'px');
+			timer.style.borderRadius  = width < timer.offsetWidth ? '0 8px 8px 0' : '8px 0 0 8px';
 		}
 
-		var seekHandler = function seekHandler(position)
+		var seekHandler = function(position)
 		{
 			audio_spectrum._position_ = position;
 
@@ -243,9 +266,9 @@ class fc_Waveform_LazyLoad
 			//pixelRatio:  1,
 			//timeInterval: 30,
 
-			waveColor: '#619fc7', 
-			progressColor: '#bbbaba',
-			cursorColor: '#ddd',
+			waveColor: '#d0d0d0', 
+			progressColor: '#619fc7',
+			cursorColor: '#619fc7',
 			cursorWidth: 2,
 			height: 128,
 			backend: 'MediaElement',  //'WebAudio',
@@ -277,12 +300,13 @@ class fc_Waveform_LazyLoad
 		});
 
 
-		slider.oninput = audio_spectrum.util.debounce(function()
+		if (!!slider) slider.oninput = audio_spectrum.util.debounce(function()
 		{
 			window.console.log(slider.value);
 			var zoomLevel = parseInt(slider.value);
 			window.console.log('Zooming to: ' + zoomLevel);
 			audio_spectrum.zoom(zoomLevel);
+			updateTimer();
 		}, 200);
 
 
@@ -356,6 +380,22 @@ class fc_Waveform_LazyLoad
 			//stopProgressBar(100);
 		});
 
+		audio_spectrum.on('finish', function()
+		{
+			audio_spectrum.seekTo(0);
+			audio_spectrum.pause();
+			buttons.pause.classList.remove('is_active');
+			buttons.play.focus();
+
+			buttons.pause.disabled = true;
+			buttons.play.disabled = false;
+
+			buttons.play.style.display = 'inline-block';
+			buttons.pause.style.display = 'none';
+			buttons.stop.style.display = 'none';
+			buttons.load.style.display = 'none';
+		});
+
 		audio_spectrum.on('ready', function()
 		{
 			//window.console.log('ready: (Player ready to play)');
@@ -379,9 +419,11 @@ class fc_Waveform_LazyLoad
 				!!audio_spectrum._position_ ? audio_spectrum.play(audio_spectrum._position_ * audio_spectrum.getDuration()) : audio_spectrum.play();
 				audio_spectrum._position_ = null; 
 
-				buttons.play.disabled = false;
-				buttons.pause.disabled = true;
-				buttons.stop.disabled = true;
+				buttons.play.disabled = true;
+				buttons.pause.disabled = false;
+				buttons.stop.disabled = false;
+
+				buttons.pause.classList.add('is_active');
 
 				buttons.play.style.display = 'none';
 				buttons.pause.style.display = 'inline-block';
@@ -400,11 +442,18 @@ class fc_Waveform_LazyLoad
 		audio_spectrum.on('seek', seekHandler);
 
 
+		box.get(0).addEventListener("keydown", function (event) {
+			return keyPressedDown(event);
+		}, false);
+		box.get(0).addEventListener("keydown", function (event) {
+			return keyPressedDown(event);
+		}, false);
+
 		buttons.play.addEventListener("keydown", function (event) {
-			return keyPlayPause(event);
+			return keyPressedDown(event);
 		}, false);
 		buttons.pause.addEventListener("keydown", function (event) {
-			return keyPlayPause(event);
+			return keyPressedDown(event);
 		}, false);
 
 		// Add events of playback buttons
@@ -445,10 +494,13 @@ class fc_Waveform_LazyLoad
 				audio_spectrum._position_ = null; 
 			}
 
-			slider.parentNode.style.visibility = 'visible';
+			if (!!slider) slider.parentNode.style.display = 'inline-block';
+			if (!!slider) slider.parentNode.style.visibility = 'visible';
 			buttons.play.disabled = true;
 			buttons.pause.disabled = false;
 			buttons.stop.disabled = false;
+
+			buttons.pause.classList.add('is_active');
 
 			buttons.play.style.display = 'none';
 			buttons.pause.style.display = 'inline-block';
@@ -463,6 +515,8 @@ class fc_Waveform_LazyLoad
 			audio_spectrum.pause();
 			buttons.pause.disabled = true;
 			buttons.play.disabled = false;
+
+			buttons.pause.classList.remove('is_active');
 
 			buttons.play.style.display = 'inline-block';
 			buttons.pause.style.display = 'none';
@@ -479,6 +533,8 @@ class fc_Waveform_LazyLoad
 			buttons.pause.disabled = true;
 			buttons.stop.disabled = true;
 			buttons.play.disabled = false;
+
+			buttons.pause.classList.remove('is_active');
 
 			buttons.play.style.display = 'inline-block';
 			buttons.pause.style.display = 'none';

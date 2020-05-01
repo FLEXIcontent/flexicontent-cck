@@ -763,38 +763,96 @@ span.fc-centered-icon-box {
 	display: block;
 }
 
+div.fc_mediafile_player_box.fc_compact {
+	display: flex;
+	flex-flow: row wrap;
+	justify-content: center;
+	align-items: center;
 
-div.fc_mediafile_audio_spectrum_box_outer {
-	position: relative;
+	div.fc_mediafile_controls_outer {
+		flex-basis: 80px;
+		flex-grow: 1;
+		/*border: 1px solid;*/
+	}
 
-	div.fc_mediafile_controls_iformbox {
-		float: left;
-		position: absolute;
-		top: -32px;
-		left: 0;
+	div.fc_mediafile_audio_spectrum_box_outer {
+		flex-grow: 50;
+		/*border: 1px solid;*/
+	}
+	.btnControlsText {
+		display: none;
+	}
+
+
+	div.fc_mediafile_controls {
+		margin: 0;
+		display: flex;
+		flex-flow: column wrap;
 
 		div.fc_mediafile_wf_zoom_box {
-			margin: 0 32px 4px 32px;
+			display: none;
+			margin: 6px 0;
+			input {
+				width: 75%;
+			}
+		}
+		> a, > * {
+			margin: 4px !important;
+		}
+
+		span.controls {
+			font-size: 20px;
+			color: #b7b7b7;
+			margin: 4px 8px 4px 0;
 		}
 	}
+}
+
+div.fc_mediafile_player_box {
+	position: relative;
+	/*border: 1px solid;*/
 
 	div.fc_mediafile_wf_zoom_box {
 		position: relative;
-		width: 25%;
 		visibility: hidden;
-		margin: 12px;
+		margin: 6px 8px 14px 8px;
 		display: inline-block;
 		white-space: nowrap;
+
+		input {
+			width: 120px;
+			padding: 0;
+			margin: 0;
+			box-sizing: border-box;
+		}
 	}
 
 	div.fc_mediafile_audio_spectrum_box {
 		display: block;
-		margin-top: 8px;
 		position: relative;
-		border: 1px dashed;
-		min-height: 128px;
-		min-width: 100%;
+		/*border: 1px dashed;*/
 		box-sizing: border-box;
+		
+		div.fc_mediafile_audio_spectrum {
+			wave {
+				div.fccurrentTimeBox {
+					/* THESE ARE PLACEMENT !!! */
+					position: absolute !important;
+					z-index: 11 !important;
+					/*right: 0 !important;*/
+					top: 38% !important;
+					/* CUSTOMIZE THIS */
+					background: lightseagreen;
+					color: white;
+					padding: 4px 4px 4px 8px;
+					box-sizing: border-box;
+					opacity: 70%;
+					border-radius: 0;
+					width: 50px;
+					margin-right: -80px;
+				}
+			}
+		}
 	}
 
 	div.fc_mediafile_audio_spectrum_progressbar {
@@ -826,7 +884,7 @@ div.fc_mediafile_audio_spectrum_box_outer {
 		margin: 0 0 10px 0;
 
 		.playBtn, .pauseBtn, .stopBtn, .loadBtn, .downloadBtn {
-			margin-right: 25px;
+			margin: 6px 0;
 			outline: none;
 			background: none;
 			display: inline-block;
@@ -834,6 +892,9 @@ div.fc_mediafile_audio_spectrum_box_outer {
 
 		.pauseBtn, .stopBtn, .loadBtn {
 			display: none;
+		}
+		> a.is_active {
+			background: darkcyan !important;
 		}
 
 		> a {

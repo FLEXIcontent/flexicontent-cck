@@ -688,36 +688,78 @@ span.fc-centered-icon-box {
 	opacity: 0.9;
 	display: block;
 }
-div.fc_mediafile_audio_spectrum_box_outer {
+div.fc_mediafile_player_box.fc_compact {
+	display: flex;
+	flex-flow: row wrap;
+	justify-content: center;
+	align-items: center;
+}
+div.fc_mediafile_player_box.fc_compact div.fc_mediafile_controls_outer {
+	flex-basis: 80px;
+	flex-grow: 1;
+}
+div.fc_mediafile_player_box.fc_compact div.fc_mediafile_audio_spectrum_box_outer {
+	flex-grow: 50;
+}
+div.fc_mediafile_player_box.fc_compact .btnControlsText {
+	display: none;
+}
+div.fc_mediafile_player_box.fc_compact div.fc_mediafile_controls {
+	margin: 0;
+	display: flex;
+	flex-flow: column wrap;
+}
+div.fc_mediafile_player_box.fc_compact div.fc_mediafile_controls div.fc_mediafile_wf_zoom_box {
+	display: none;
+	margin: 6px 0;
+}
+div.fc_mediafile_player_box.fc_compact div.fc_mediafile_controls div.fc_mediafile_wf_zoom_box input {
+	width: 75%;
+}
+div.fc_mediafile_player_box.fc_compact div.fc_mediafile_controls > a,
+div.fc_mediafile_player_box.fc_compact div.fc_mediafile_controls > * {
+	margin: 4px !important;
+}
+div.fc_mediafile_player_box.fc_compact div.fc_mediafile_controls span.controls {
+	font-size: 20px;
+	color: #b7b7b7;
+	margin: 4px 8px 4px 0;
+}
+div.fc_mediafile_player_box {
 	position: relative;
 }
-div.fc_mediafile_audio_spectrum_box_outer div.fc_mediafile_controls_iformbox {
-	float: left;
-	position: absolute;
-	top: -32px;
-	left: 0;
-}
-div.fc_mediafile_audio_spectrum_box_outer div.fc_mediafile_controls_iformbox div.fc_mediafile_wf_zoom_box {
-	margin: 0 32px 4px 32px;
-}
-div.fc_mediafile_audio_spectrum_box_outer div.fc_mediafile_wf_zoom_box {
+div.fc_mediafile_player_box div.fc_mediafile_wf_zoom_box {
 	position: relative;
-	width: 25%;
 	visibility: hidden;
-	margin: 12px;
+	margin: 6px 8px 14px 8px;
 	display: inline-block;
 	white-space: nowrap;
 }
-div.fc_mediafile_audio_spectrum_box_outer div.fc_mediafile_audio_spectrum_box {
-	display: block;
-	margin-top: 8px;
-	position: relative;
-	border: 1px dashed;
-	min-height: 128px;
-	min-width: 100%;
+div.fc_mediafile_player_box div.fc_mediafile_wf_zoom_box input {
+	width: 120px;
+	padding: 0;
+	margin: 0;
 	box-sizing: border-box;
 }
-div.fc_mediafile_audio_spectrum_box_outer div.fc_mediafile_audio_spectrum_progressbar {
+div.fc_mediafile_player_box div.fc_mediafile_audio_spectrum_box {
+	display: block;
+	position: relative;
+	box-sizing: border-box;
+}
+div.fc_mediafile_player_box div.fc_mediafile_audio_spectrum_box div.fc_mediafile_audio_spectrum wave div.fccurrentTimeBox {
+	position: absolute !important;
+	z-index: 11 !important;
+	top: 38% !important;
+	background: lightseagreen;
+	color: white;
+	padding: 4px 4px 4px 8px;
+	box-sizing: border-box;
+	opacity: 70%;
+	border-radius: 0;
+	width: 50px;
+	margin-right: -80px;
+}
+div.fc_mediafile_player_box div.fc_mediafile_audio_spectrum_progressbar {
 	visibility: hidden;
 	position: absolute !important;
 	width: 70% !important;
@@ -729,47 +771,50 @@ div.fc_mediafile_audio_spectrum_box_outer div.fc_mediafile_audio_spectrum_progre
 	font-size: 24px;
 	line-height: 100%;
 }
-div.fc_mediafile_audio_spectrum_box_outer div.fc_mediafile_audio_spectrum_progressbar div.barText {
+div.fc_mediafile_player_box div.fc_mediafile_audio_spectrum_progressbar div.barText {
 	height: 32px;
 	font-size: 24px;
 	line-height: 100%;
 }
-div.fc_mediafile_audio_spectrum_box_outer div.fc_mediafile_audio_spectrum_progressbar div.bar {
+div.fc_mediafile_player_box div.fc_mediafile_audio_spectrum_progressbar div.bar {
 	z-index: -1;
 	position: absolute;
 	top: 0;
 }
-div.fc_mediafile_audio_spectrum_box_outer div.fc_mediafile_controls {
+div.fc_mediafile_player_box div.fc_mediafile_controls {
 	text-align: center;
 	margin: 0 0 10px 0;
 }
-div.fc_mediafile_audio_spectrum_box_outer div.fc_mediafile_controls .playBtn,
-div.fc_mediafile_audio_spectrum_box_outer div.fc_mediafile_controls .pauseBtn,
-div.fc_mediafile_audio_spectrum_box_outer div.fc_mediafile_controls .stopBtn,
-div.fc_mediafile_audio_spectrum_box_outer div.fc_mediafile_controls .loadBtn,
-div.fc_mediafile_audio_spectrum_box_outer div.fc_mediafile_controls .downloadBtn {
-	margin-right: 25px;
+div.fc_mediafile_player_box div.fc_mediafile_controls .playBtn,
+div.fc_mediafile_player_box div.fc_mediafile_controls .pauseBtn,
+div.fc_mediafile_player_box div.fc_mediafile_controls .stopBtn,
+div.fc_mediafile_player_box div.fc_mediafile_controls .loadBtn,
+div.fc_mediafile_player_box div.fc_mediafile_controls .downloadBtn {
+	margin: 6px 0;
 	outline: none;
 	background: none;
 	display: inline-block;
 }
-div.fc_mediafile_audio_spectrum_box_outer div.fc_mediafile_controls .pauseBtn,
-div.fc_mediafile_audio_spectrum_box_outer div.fc_mediafile_controls .stopBtn,
-div.fc_mediafile_audio_spectrum_box_outer div.fc_mediafile_controls .loadBtn {
+div.fc_mediafile_player_box div.fc_mediafile_controls .pauseBtn,
+div.fc_mediafile_player_box div.fc_mediafile_controls .stopBtn,
+div.fc_mediafile_player_box div.fc_mediafile_controls .loadBtn {
 	display: none;
 }
-div.fc_mediafile_audio_spectrum_box_outer div.fc_mediafile_controls > a {
+div.fc_mediafile_player_box div.fc_mediafile_controls > a.is_active {
+	background: darkcyan !important;
+}
+div.fc_mediafile_player_box div.fc_mediafile_controls > a {
 	color: #333;
 	font-size: 16px;
 	vertical-align: bottom;
 }
-div.fc_mediafile_audio_spectrum_box_outer div.fc_mediafile_controls span.controls {
+div.fc_mediafile_player_box div.fc_mediafile_controls span.controls {
 	font-size: 24px;
 	color: #b7b7b7;
 	margin: 4px 24px 4px 0;
 	vertical-align: middle;
 }
-div.fc_mediafile_audio_spectrum_box_outer .btn-dwn-controls {
+div.fc_mediafile_player_box .btn-dwn-controls {
 	line-height: 1 !important;
 	background: #909090 !important;
 	color: #f0f0f0 !important;
@@ -781,6 +826,6 @@ div.fc_mediafile_audio_spectrum_box_outer .btn-dwn-controls {
 	position: relative;
 	bottom: 4px;
 }
-div.fc_mediafile_audio_spectrum_box_outer .btn-dwn-controls span:before {
+div.fc_mediafile_player_box .btn-dwn-controls span:before {
 	color: #f0f0f0 !important;
 }

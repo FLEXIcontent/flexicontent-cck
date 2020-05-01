@@ -272,6 +272,12 @@
 			<field name="noaccess_msg_logged" type="text" default="" size="40" label="FLEXI_FIELD_FILE_INACCESSIBLE_FILE_MSG" description="FLEXI_FIELD_FILE_INACCESSIBLE_FILE_MSG_LOGGED_DESC" />
 
 
+			<field name="" type="separator" default="Playback" description="" icon_class="icon-play" level="tab_open" box_type="1" />
+			<field name="wf_zoom_slider" type="radio" default="1" label="Waveform zoom slider" description="A slider to zoom in / out of waveform" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_HIDE</option>
+				<option value="1">FLEXI_SHOW</option>
+			</field>
+
 			<field name="" type="separator" default="FLEXI_FIELD_FILE_FILE_ACTIONS" description="" icon_class="icon-menu-3" level="tab_open" box_type="1" />
 
 			<field name="" type="separator" default="Button configuration for actions such as: download, view, share, add-to-cart" level="level3" class="alert alert-info fcpadded" />

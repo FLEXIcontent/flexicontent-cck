@@ -10,6 +10,10 @@ $field->abspath = array();
 $field->file_data = array();
 $field->hits_total = 0;
 
+$compactDisp    = true;
+$create_preview = $field->parameters->get('mm_create_preview', 1);
+$wf_zoom_slider = $field->parameters->get('wf_zoom_slider', 1);
+
 $per_value_js = "";
 $n = 0;
 $i = 0;
@@ -341,7 +345,7 @@ foreach($values as $file_id)
 			// Download 
 			$_download_btn_html = '
 				<a href="' . $dl_link . '" class="btn downloadBtn btn-dwn-controls fcfile_downloadFile" title="'.htmlspecialchars($downloadsinfo, ENT_COMPAT, 'UTF-8').'" ' . ($non_file_url ? 'target="_blank"' : '') . '>
-					<span class="icon-chevron-down controls"></span><span class="btnControlsText">' . $downloadstext . '</span>
+					<span class="icon-download controls"></span><span class="btnControlsText">' . $downloadstext . '</span>
 				</a>
 			';
 			// Do not add it here ... we will add it inline with player
@@ -484,8 +488,6 @@ foreach($values as $file_id)
 		</div>' .
 		(!$buttonsposition ? $html : '');
 
-	$create_preview = $field->parameters->get('mm_create_preview', 1);
-
 	if ($create_preview)
 	{
 		$ext         = strtolower(flexicontent_upload::getExt($file_data->filename));
@@ -504,27 +506,12 @@ foreach($values as $file_id)
 
 	$html .= '<div class="fcclear"></div>'
 	. '
-	<div class="fc_mediafile_audio_spectrum_box_outer">
+	<div class="fc_mediafile_player_box' . ($compactDisp ? ' fc_compact' : '') . '">
 
-		<div id="fcview_' . $item->id . '_' . $field->name . '_' . $n . '_file-data-txt"
-			data-filename="' . htmlspecialchars($previewpath, ENT_COMPAT, 'UTF-8') . '"
-			data-wfpreview="' . htmlspecialchars($previewpath, ENT_COMPAT, 'UTF-8') . '"
-			data-wfpeaks="' . htmlspecialchars($peakspath, ENT_COMPAT, 'UTF-8') . '"
-			class="fc-wf-filedata"
-		></div>
-		<div id="fc_mediafile_audio_spectrum_box_' . $fnn. '" class="fc_mediafile_audio_spectrum_box"
-			data-fc_tagid="' . $item->id . '_' . $field->name . '_' . $n . '"
-			data-fc_fname="' .$field_name_js . '"
-		>
-			<div class="fc_mediafile_audio_spectrum_progressbar">
-				<div class="barText"></div>
-				<div class="bar" style="width: 100%;"></div>
-			</div>
-			<div id="fc_mediafile_audio_spectrum_' . $fnn. '" class="fc_mediafile_audio_spectrum"></div>
-		</div>
-		<div>
-			<!--div id="fc_mediafile_current_time_' . $fnn. '" class="media_time">00:00:00</div-->
-			<div id="fc_mediafile_controls_' . $fnn. '" class="fc_mediafile_controls">
+		<div class="fc_mediafile_controls_outer">
+
+			<!--div id="fc_mediafile_current_time_' . $fnn . '" class="media_time">00:00:00</div-->
+			<div id="fc_mediafile_controls_' . $fnn . '" class="fc_mediafile_controls">
 				<a href="javascript:;" class="btn playBtn btn-dwn-controls">
 					<span class="icon-play-circle controls"></span><span class="btnControlsText">' . JText::_('FLEXI_FIELD_MEDIAFILE_PLAY') . '</span>
 				</a>
@@ -538,10 +525,35 @@ foreach($values as $file_id)
 					<span class="icon-loop controls"></span><span class="btnControlsText">' . JText::_('FLEXI_FIELD_MEDIAFILE_LOAD') . '</span>
 				</a>
 				' . ($allowdownloads ? $_download_btn_html : '') . '
+				' . (!$wf_zoom_slider ? '' : '
 				<div class="fc_mediafile_wf_zoom_box">
 					- <input id="fc_mediafile_slider_' . $fnn. '" type="range" min="0.5" max="200" value="0.5" class="fc_mediafile_wf_zoom" /> +
 				</div>
+				') . '
 			</div>
+
+		</div>
+
+		<div class="fc_mediafile_audio_spectrum_box_outer" >
+
+			<div id="fc_mediafile_audio_spectrum_box_' . $fnn . '" class="fc_mediafile_audio_spectrum_box"
+				data-fc_tagid="' . $item->id . '_' . $field->name . '_' . $n . '"
+				data-fc_fname="' .$field_name_js . '"
+			>
+				<div id="fcview_' . $item->id . '_' . $field->name . '_' . $n . '_file-data-txt"
+					data-filename="' . htmlspecialchars($previewpath, ENT_COMPAT, 'UTF-8') . '"
+					data-wfpreview="' . htmlspecialchars($previewpath, ENT_COMPAT, 'UTF-8') . '"
+					data-wfpeaks="' . htmlspecialchars($peakspath, ENT_COMPAT, 'UTF-8') . '"
+					class="fc-wf-filedata"
+				></div>
+
+				<div class="fc_mediafile_audio_spectrum_progressbar">
+					<div class="barText"></div>
+					<div class="bar" style="width: 100%;"></div>
+				</div>
+				<div id="fc_mediafile_audio_spectrum_' . $fnn . '" class="fc_mediafile_audio_spectrum"></div>
+			</div>
+
 		</div>
 
 	</div>
