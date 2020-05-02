@@ -3,9 +3,10 @@ $FT = 'FILE';
 $PRV_TYPE='-2';
 $image_placeholder = 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=';
 
-$allowdownloads = false;
-$compactDisp    = true;
-$wf_zoom_slider = $field->parameters->get('wf_zoom_slider', 1);
+$allowdownloads   = false;
+$compactDisp      = true;
+$wf_zoom_slider   = $field->parameters->get('wf_zoom_slider', 1);
+$wf_load_progress = $field->parameters->get('wf_load_progress', 1);
 
 $per_value_js = "";
 $n = 0;
@@ -305,10 +306,12 @@ foreach ($field->value as $file_id)
 				data-fc_tagid="' . $field->name . '_' . $n . '"
 				data-fc_fname="' .$field_name_js . '"
 			>
+				' . (!$wf_load_progress ? '' : '
 				<div class="fc_mediafile_audio_spectrum_progressbar">
 					<div class="barText"></div>
 					<div class="bar" style="width: 100%;"></div>
 				</div>
+				') . '
 				<div id="fc_mediafile_audio_spectrum_' . $fnn . '" class="fc_mediafile_audio_spectrum"></div>
 			</div>
 

@@ -273,10 +273,22 @@
 
 
 			<field name="" type="separator" default="Playback" description="" icon_class="icon-play" level="tab_open" box_type="1" />
+
+			<field name="" type="separator" default="Waveform options" level="level2" />
 			<field name="wf_zoom_slider" type="radio" default="1" label="Waveform zoom slider" description="A slider to zoom in / out of waveform" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
 			</field>
+			<field name="wf_load_progress" type="radio" default="1" label="Waveform loading progress" description="Display a loading messages (percent) while waveform is being downloaded" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_HIDE</option>
+				<option value="1">FLEXI_SHOW</option>
+			</field>
+
+			<field name="" type="separator" default="Wavesurfer JS options" level="level3" />
+			<field name="ws_wavecolor" type="text" default="#619fc7" size="8" label="waveColor" description="" />
+			<field name="ws_progress_color" type="text" default="#d0d0d0" size="8" label="progressColor" description="" />
+			<field name="ws_cursor_color" type="text" default="#619fc7" size="8" label="cursorColor" description="" />
+			<field name="ws_cursor_width" type="text" default="2" filter="Integer" size="4" label="cursorWidth" description="" />
 
 			<field name="" type="separator" default="FLEXI_FIELD_FILE_FILE_ACTIONS" description="" icon_class="icon-menu-3" level="tab_open" box_type="1" />
 

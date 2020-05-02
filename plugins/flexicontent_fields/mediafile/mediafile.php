@@ -655,6 +655,12 @@ class plgFlexicontent_fieldsMediafile extends FCField
 			$js .= "
 			jQuery(document).ready(function()
 			{
+				audio_spectrum_conf['" . $field_name_js . "'] = [];
+				audio_spectrum_conf['" . $field_name_js . "']['waveColor'] = '" . $field->parameters->get( 'ws_wave_color', '#619fc7' ) . "';
+				audio_spectrum_conf['" . $field_name_js . "']['progressColor'] = '" .$field->parameters->get( 'ws_progress_color', '#d0d0d0' ) . "';
+				audio_spectrum_conf['" . $field_name_js . "']['cursorColor'] = '" .  $field->parameters->get( 'ws_cursor_color', '#619fc7' ) . "';
+				audio_spectrum_conf['" . $field_name_js . "']['cursorWidth'] = '" . (int) $field->parameters->get( 'ws_cursor_width', 2 ) . "';
+
 				new fc_Waveform_LazyLoad(
 					document.getElementsByTagName('body')[0], {
 						rootMargin: '0px 0px',
@@ -939,6 +945,12 @@ class plgFlexicontent_fieldsMediafile extends FCField
 			$document->addScriptDeclaration("
 			jQuery(document).ready(function()
 			{
+				audio_spectrum_conf['" . $field_name_js . "'] = [];
+				audio_spectrum_conf['" . $field_name_js . "']['waveColor'] = '" . $field->parameters->get( 'ws_wave_color', '#619fc7' ) . "';
+				audio_spectrum_conf['" . $field_name_js . "']['progressColor'] = '" .$field->parameters->get( 'ws_progress_color', '#d0d0d0' ) . "';
+				audio_spectrum_conf['" . $field_name_js . "']['cursorColor'] = '" .  $field->parameters->get( 'ws_cursor_color', '#619fc7' ) . "';
+				audio_spectrum_conf['" . $field_name_js . "']['cursorWidth'] = '" . (int) $field->parameters->get( 'ws_cursor_width', 2 ) . "';
+
 				new fc_Waveform_LazyLoad(
 					document.getElementsByTagName('body')[0], {
 						rootMargin: '0px 0px',

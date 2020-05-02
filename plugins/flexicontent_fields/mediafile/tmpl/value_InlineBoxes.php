@@ -10,9 +10,10 @@ $field->abspath = array();
 $field->file_data = array();
 $field->hits_total = 0;
 
-$compactDisp    = true;
-$create_preview = $field->parameters->get('mm_create_preview', 1);
-$wf_zoom_slider = $field->parameters->get('wf_zoom_slider', 1);
+$compactDisp      = true;
+$create_preview   = $field->parameters->get('mm_create_preview', 1);
+$wf_zoom_slider   = $field->parameters->get('wf_zoom_slider', 1);
+$wf_load_progress = $field->parameters->get('wf_load_progress', 1);
 
 $per_value_js = "";
 $n = 0;
@@ -546,11 +547,12 @@ foreach($values as $file_id)
 					data-wfpeaks="' . htmlspecialchars($peakspath, ENT_COMPAT, 'UTF-8') . '"
 					class="fc-wf-filedata"
 				></div>
-
+				' . (!$wf_load_progress ? '' : '
 				<div class="fc_mediafile_audio_spectrum_progressbar">
 					<div class="barText"></div>
 					<div class="bar" style="width: 100%;"></div>
 				</div>
+				') . '
 				<div id="fc_mediafile_audio_spectrum_' . $fnn . '" class="fc_mediafile_audio_spectrum"></div>
 			</div>
 

@@ -42,6 +42,7 @@ class fc_Waveform_LazyLoad
 	var fcfield_mediafile = {};
 	var fcfield_mediafile_base_url = [];
 	var audio_spectrum_arr = [];
+	var audio_spectrum_conf = [];
 
 	fcfield_mediafile.debugToConsole = [];
 	fcfield_mediafile.use_native_apis = [];
@@ -59,9 +60,16 @@ class fc_Waveform_LazyLoad
 		var slider = document.querySelector('#fc_mediafile_slider_' + fnn);
 
 		var _progressBar = box.find('.fc_mediafile_audio_spectrum_progressbar');
-		var bar          = _progressBar.find('.bar').get(0);
-		var barText      = _progressBar.find('.barText').get(0);
-		var progressBar  = box.find('.fc_mediafile_audio_spectrum_progressbar').get(0);
+		if (_progressBar.length)
+		{
+			var bar          = _progressBar.find('.bar').get(0);
+			var barText      = _progressBar.find('.barText').get(0);
+			var progressBar  = box.find('.fc_mediafile_audio_spectrum_progressbar').get(0);
+		}
+		else
+		{
+			progressBar = false;
+		}
 	//var mediaPlayer  = jQuery('#fc_mediafile_audio_spectrum_box_' + fnn).find('.fc_mediafile_audio_spectrum').get(0);
 
 		var keyPressedDown = function(key_event)
@@ -149,6 +157,8 @@ class fc_Waveform_LazyLoad
 
 		var updateProgressBar = function (percent, eventTarget)
 		{
+			if (!progressBar) return;
+
 			var factor = 100;
 			
 			barText.innerHTML = 'Loading : ' + percent + ' %';
@@ -177,6 +187,8 @@ class fc_Waveform_LazyLoad
 
 		var stopProgressBar = function (percent)
 		{
+			if (!progressBar) return;
+
 			if (loading_timer) clearInterval(loading_timer);
 			if (progress_timer) clearInterval(progress_timer);
 
@@ -212,6 +224,8 @@ class fc_Waveform_LazyLoad
 
 		var dummyProgress = function ()
 		{
+			if (!progressBar) return;
+
 			var percent = 0;
 			if (!!!audio_spectrum.loaded)
 			{
@@ -266,10 +280,10 @@ class fc_Waveform_LazyLoad
 			//pixelRatio:  1,
 			//timeInterval: 30,
 
-			waveColor: '#d0d0d0', 
-			progressColor: '#619fc7',
-			cursorColor: '#619fc7',
-			cursorWidth: 2,
+			waveColor: audio_spectrum_conf[config_name]['waveColor'], 
+			progressColor: audio_spectrum_conf[config_name]['progressColor'],
+			cursorColor: audio_spectrum_conf[config_name]['cursorColor'],
+			cursorWidth: audio_spectrum_conf[config_name]['cursorWidth'],
 			height: 128,
 			backend: 'MediaElement',  //'WebAudio',
 			mediaControls: false,
