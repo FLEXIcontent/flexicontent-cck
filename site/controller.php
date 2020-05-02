@@ -2778,7 +2778,9 @@ class FlexicontentController extends JControllerLegacy
 		else
 		{
 			$_url = strlen($dlfile->filename_original) ? $dlfile->filename_original : $dlfile->filename;
-			$dlfile->download_filename = substr($_url, strrpos($_url,"/") + 1);
+			$dlfile->download_filename = strrpos($_url, '/') !== false
+				? substr($_url, strrpos($_url, '/') + 1)
+				: $_url;
 		}
 
 
