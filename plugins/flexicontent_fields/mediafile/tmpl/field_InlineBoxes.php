@@ -65,7 +65,7 @@ foreach ($field->value as $file_id)
 	{
 		$uploader_html = $uploader_html_arr[$n] = JHtml::_('fcuploader.getUploader', $field, $u_item_id, null, $n,
 			array(
-			'container_class' => 'fc_inline_uploader fc_uploader_thumbs_view fc_compact_uploader fc_auto_uploader fc-box thumb_'.$thumb_size_default,
+			'container_class' => ($multiple ? 'fc_inline_uploader fc_uploader_thumbs_view fc-box' : '') . ' fc_compact_uploader fc_auto_uploader thumb_'.$thumb_size_default,
 			'upload_maxcount' => 1,
 			'autostart_on_select' => true,
 			'refresh_on_complete' => false,
@@ -113,7 +113,7 @@ foreach ($field->value as $file_id)
 	$field->html[] = '
 		<div class="inlinefile-data-box">
 
-			<div style="display:inline-block;">
+			<div style="' . (!$multiple ? '' : 'display:inline-block;') . '">
 				<span class="fc_filedata_storage_name" style="display:none;">'.$file_data->filename.'</span>
 				<div class="fc_filedata_txt_nowrap nowrap_hidden">'.$file_data->filename.'<br/>'.$file_data->altname.'</div>
 				<input class="fc_filedata_txt inlinefile-data-txt '. $info_txt_classes . $required_class .'"
@@ -128,13 +128,13 @@ foreach ($field->value as $file_id)
 					<label class="' . $add_on_class . ' fc-lbl fc_filedata_title-lbl">'.JText::_( 'FLEXI_FILE_DISPLAY_TITLE' ).'</label>
 					<span class="' . $add_on_class . ' fc_filedata_title">'. ($file_data->altname && $filename_original!=$file_data->altname ? $file_data->altname : '-').'</span>
 				</div>' : '').'
-				<br/>
+				<div class="fcclear"></div>
 				'.($form_file_preview ? '<div class="fc-iblock fcimg_preview_box" style="'.$preview_css.'"><img id="'.$elementid_n.'_img_preview" src="'.$preview_src.'" class="fc_preview_thumb" alt="Preview image placeholder"/></div>' : '').'
 				'.(!empty($uploader_html) ? $uploader_html->container : '').'
 			</div>
 
 			'.( (!$multiple || $is_ingroup) && !$required_class ? '
-			<br/>
+			<div class="fcclear"></div>
 			<fieldset class="group-fcset">
 				<input type="checkbox" id="'.$elementid_n.'_file-del" class="inlinefile-del" name="'.$fieldname_n.'[file-del]" value="1" onchange="file_fcfield_del_existing_value'.$field->id.'(this);" />
 				<label class="label inlinefile-del-lbl '.$tooltip_class.'" title="'.flexicontent_html::getToolTip('FLEXI_FIELD_'.$FT.'_ABOUT_REMOVE_FILE', 'FLEXI_FIELD_'.$FT.'_ABOUT_REMOVE_FILE_DESC', 1, 1).'" id="'.$elementid_n.'_file-del-lbl" for="'.$elementid_n.'_file-del" >

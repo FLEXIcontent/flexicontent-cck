@@ -59,14 +59,15 @@ abstract class JHtmlFcuploader
 				</div>
 			' : ''),
 			'container' => '
-				<div id="'. $up_tag_id . $n .'" data-tagid-prefix="'. $up_tag_id .'" class="fc_file_uploader '.$up_css_class.' '.$up_tag_id.'" style="display:none;">
-					<span class="alert alert-warning">File uploader script failed to start</span>
+				<div style="display: inline-block; width: 100%; box-sizing: border-box; position: relative;">
+					<div class="fc_uploader_status_box" style="display: flex; flex-flow: column-reverse wrap; justify-content: center; align-items: center; position: absolute; z-index: 100; top:40%; right: 10%; opacity: 60%;">
+						<div class="fc_uploader_mssg_box" style="display: none;"></div>
+						<input type="text" value="" class="validate-fcuploader fc_hidden_value" data-error-mssg="" data-error-css="" />
+					</div>
+					<div id="'. $up_tag_id . $n .'" data-tagid-prefix="'. $up_tag_id .'" class="fc_file_uploader '.$up_css_class.' '.$up_tag_id.'" style="display: none;">
+						<span class="alert alert-warning">File uploader script failed to start</span>
+					</div>
 				</div>
-				<div class="fc_uploader_mssg_box" style="display: inline-block; padding: 4px 12px; vertical-align: top;"></div>
-				<input type="text" value=""
-					class="validate-fcuploader fc_hidden_value"
-					data-error-mssg="" data-error-css=""
-				/>
 			'
 		);
 	}

@@ -315,11 +315,17 @@ body {
 
 
 /* Filemanager's plupload (multi-upload script) CSS, special cases */
-body .fc_file_uploader.fc_uploader_thumbs_view.fc_auto_uploader {
+body .fc_file_uploader.fc_auto_uploader {
 	.plupload_start {
 		display: none !important;
 	}
 }
+body .fc_file_uploader.fc_compact_uploader {
+	.plupload_header {
+		display: none !important;
+	}
+}
+
 body .fc_file_uploader.fc_uploader_thumbs_view.fc_compact_uploader {
 	display: inline-block;
 
@@ -686,8 +692,8 @@ body .fc_file_uploader {
 		padding: 0;
 		min-width: 530px;
 		width: unset;
-		margin-left: -12px;
-		margin-right: -12px;
+		/*margin-left: -12px;
+		margin-right: -12px;*/
 
 		input {
 			height: 2.4em;
