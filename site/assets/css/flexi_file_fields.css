@@ -307,7 +307,10 @@ body div .container_fcfield select.fc_uploader_size_select {
 	max-width: 150px;
 	max-height: 150px;
 }
-body .fc_file_uploader.fc_uploader_thumbs_view.fc_auto_uploader .plupload_start {
+body .fc_file_uploader.fc_auto_uploader .plupload_start {
+	display: none !important;
+}
+body .fc_file_uploader.fc_compact_uploader .plupload_header {
 	display: none !important;
 }
 body .fc_file_uploader.fc_uploader_thumbs_view.fc_compact_uploader {
@@ -635,8 +638,6 @@ body .fc_file_uploader .plupload_container {
 	padding: 0;
 	min-width: 530px;
 	width: unset;
-	margin-left: -12px;
-	margin-right: -12px;
 }
 body .fc_file_uploader .plupload_container input {
 	height: 2.4em;

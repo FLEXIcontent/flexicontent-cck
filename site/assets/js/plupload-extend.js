@@ -155,8 +155,13 @@ fc_plupload = function(options)
 
 				BeforeUpload: function (up, file)
 				{
-					var validationBox = $(up.settings.container).parent().find('input.validate-fcuploader');
-					validationBox.val('Upload-In-Progress').data('error-mssg', Joomla.JText._('FLEXI_UPLOADING') + ' ... ' + Joomla.JText._('FLEXI_PLEASE_WAIT'));
+					if ($(up.settings.container).hasClass('fc_auto_uploader'))
+					{
+						var validationBox = $(up.settings.container).parent().find('input.validate-fcuploader');
+						var wait_mssg = Joomla.JText._('FLEXI_PLEASE_WAIT');
+						wait_mssg = wait_mssg.charAt(0).toUpperCase() + wait_mssg.slice(1);
+						validationBox.val('Upload-In-Progress').data('error-mssg', /*Joomla.JText._('FLEXI_UPLOADING') + ' ... ' +*/ wait_mssg);
+					}
 
 					// Called right before the upload for a given file starts, can be used to cancel it if required
 					up.settings.multipart_params = {
@@ -178,6 +183,8 @@ fc_plupload = function(options)
 
 				UploadProgress: function(up, file)
 				{
+					if (!$(up.settings.container).hasClass('fc_auto_uploader')) return;
+
 					// Show final message immediately
 					if (up.total.loaded >= up.total.size)
 					{
@@ -200,30 +207,51 @@ fc_plupload = function(options)
 
 					if (up.total.loaded < up.total.size)
 					{
+						var wait_mssg = Joomla.JText._('FLEXI_PLEASE_WAIT');
+						wait_mssg = wait_mssg.charAt(0).toUpperCase() + wait_mssg.slice(1);
 						//mssgBox.html((Math.round(1000 * up.total.loaded/up.total.size) / 10) + '% ... ' + Joomla.JText._('FLEXI_UPLOADING'));
 						//mssgBox.html(Joomla.JText._('FLEXI_UPLOADING') + ' ... ' + (Math.round(10 * up.total.bytesPerSec / (1024 * 1024)) / 10) + ' MB/s' );
 						mssgBox.html(Joomla.JText._('FLEXI_UPLOADING') + ' ... ' + Math.round((up.total.size-up.total.loaded)/up.total.bytesPerSec) + ' seconds' );
+						$(up.settings.container).parent().find('.fc-field-invalid').html(wait_mssg);
 					}
 					else
 					{
-						var msg = Joomla.JText._('FLEXI_PREPARING_FILE_DATA') + ' ... ' + Joomla.JText._('FLEXI_PLEASE_WAIT');
+						var wait_mssg = Joomla.JText._('FLEXI_PLEASE_WAIT');
+						wait_mssg = wait_mssg.charAt(0).toUpperCase() + wait_mssg.slice(1);
+
+						var invalid_mssg_box = $(up.settings.container).parent().find('.fc-field-invalid');
+						if (invalid_mssg_box.length)
+						{
+							invalid_mssg_box.html(wait_mssg);
+							var msg = Joomla.JText._('FLEXI_PREPARING_FILE_DATA');
+						}
+						else
+						{
+							var msg = Joomla.JText._('FLEXI_PREPARING_FILE_DATA') + ' ... ' + wait_mssg;
+						}
+
 						validationBox.val('Preparing-File-Data').data('error-mssg', msg);
-						$(up.settings.container).parent().find('.fc-field-invalid').html(msg);
-						mssgBox.html(Joomla.JText._('FLEXI_UPLOAD_FINISHED') + ' ... <br>' + msg + '<span class="fc_loading_msg" style="vertical-align: top;"></span>');
+						mssgBox.html(/*Joomla.JText._('FLEXI_UPLOAD_FINISHED') + ' ...  ' +*/ msg + '<br><div class="ajax-loader_bar" style="margin-top: 16px;"></div>');
 					}
+					mssgBox.parent().show();
+					mssgBox.show();
 					//window.console.log((up.total.size-up.total.loaded)/up.total.bytesPerSec)
 				},
 
 				UploadComplete: function (up, files)
 				{
-					// This is not strictly necessary but it will clear 'Uploading' validation message immediately ...
-					var validationBox = $(up.settings.container).parent().find('input.validate-fcuploader');
-					var mssgBox = $(up.settings.container).parent().find('.fc_uploader_mssg_box');
+					if ($(up.settings.container).hasClass('fc_auto_uploader'))
+					{
+						// This is not strictly necessary but it will clear 'Uploading' validation message immediately ...
+						var validationBox = $(up.settings.container).parent().find('input.validate-fcuploader');
+						var mssgBox = $(up.settings.container).parent().find('.fc_uploader_mssg_box');
 
-					validationBox.val('').removeClass('invalid').attr('aria-invalid', 'false').data('error-mssg', '');
-					validationBox.next('.fc-field-invalid').remove();
-					validationBox.parent().children(':first-child.fc-field-invalid').remove();
-					mssgBox.html('');
+						validationBox.val('').removeClass('invalid').attr('aria-invalid', 'false').data('error-mssg', '');
+						validationBox.next('.fc-field-invalid').remove();
+						validationBox.parent().children(':first-child.fc-field-invalid').remove();
+						mssgBox.html('');
+						mssgBox.hide();
+					}
 
 					if (up.getOption('refresh_on_complete'))
 					{
@@ -455,7 +483,10 @@ fc_plupload = function(options)
 		// Autostart uploading
 		if (uploader.getOption('autostart_on_select'))
 		{
-			$(uploader.settings.container).find('.plupload_filelist_footer').hide();
+			if ($(uploader.settings.container).hasClass('fc_uploader_thumbs_view'))
+			{
+				$(uploader.settings.container).find('.plupload_filelist_footer').hide();
+			}
 			//setTimeout(function(){ uploader.start(); }, 5000);
 			uploader.start();
 		}

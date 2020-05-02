@@ -861,7 +861,8 @@ var JFormValidator = function()
 					jQuery('<span class="fc-field-invalid alert alert-error" style="' + error_css +'">' + error_mssg + '</span>').prependTo( $el.parent() );
 
 					// Prevent showing required error until the other error is cleared
-					$el.parent().find('.invalid.required').removeClass('invalid');
+					var fcfied_parent_box = $el.closest('.valuebox');
+					if (fcfied_parent_box.length) fcfied_parent_box.find('.invalid').removeClass('invalid');
 				}
 			}
 

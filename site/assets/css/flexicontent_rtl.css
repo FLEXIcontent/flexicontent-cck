@@ -387,6 +387,20 @@ div .flexi_buttons button:not(.btn):hover {
 	padding: 0 0 0 20px;
 	display: inline-block;
 }
+.ajax-loader_bar {
+	background: url("../images/ajax-loader_bar.gif") no-repeat scroll right center transparent;
+	height: 15px;
+	padding: 0 0 0 128px;
+	display: inline-block;
+	margin: 4px;
+}
+.ajax-loader_bar2 {
+	background: url("../images/ajax-loader_bar2.gif") no-repeat scroll right center transparent;
+	height: 21px;
+	padding: 0 0 0 140px;
+	display: inline-block;
+	margin: 4px;
+}
 .fcsep_level_h,
 .fcsep_level0,
 .fcsep_level1,
@@ -1159,6 +1173,17 @@ body .fc-mssg-inline {
 body .fc-mssg-inline {
 	display: inline-block;
 	margin: 1px 0 2px 12px;
+}
+body .fc_uploader_status_box .fc_uploader_mssg_box,
+body .fc_uploader_status_box .fc-field-invalid {
+	font-size: 20px;
+	min-height: 1em;
+	background: white;
+	padding: 8px 16px;
+	border-radius: 8px;
+	box-shadow: 2px 4px 4px gray;
+	border: 1px solid lightgray;
+	text-align: center;
 }
 body .fc-field-invalid {
 	padding: 4px 8px;
