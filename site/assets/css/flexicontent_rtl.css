@@ -1423,20 +1423,20 @@ div.statetoggler > div.statetoggler_inner > .options > span > img {
 .fc_slider_input_box {
 	display: none;
 }
-.noUi-base .noUi-handle .fc-sliderTooltip.fc-right {
+.noUi-base .noUi-handle .fc-sliderTooltip.fc-left {
 	left: 18px;
 	right: unset;
 }
-.noUi-base .noUi-handle .fc-sliderTooltip.fc-right.fc-bottom {
+.noUi-base .noUi-handle .fc-sliderTooltip.fc-left.fc-bottom {
 	left: 33px;
 	right: unset;
 }
-.noUi-base .noUi-handle .fc-sliderTooltip.fc-left {
+.noUi-base .noUi-handle .fc-sliderTooltip.fc-right {
 	left: unset;
 	right: 18px;
 }
-.noUi-base .noUi-handle .fc-sliderTooltip.fc-left.fc-bottom {
-	left: unset;
+.noUi-base .noUi-handle .fc-sliderTooltip.fc-right.fc-bottom {
+	right: unset;
 	right: 33px;
 }
 .noUi-base .noUi-handle .fc-sliderTooltip.fc-bottom {
@@ -1876,14 +1876,13 @@ div.fc_mediafile_player_box div.fc_mediafile_audio_spectrum_box div.fc_mediafile
 	position: absolute !important;
 	z-index: 11 !important;
 	top: 38% !important;
-	background: lightseagreen;
+	background: #2db383;
 	color: white;
 	padding: 4px 4px 4px 8px;
 	box-sizing: border-box;
 	opacity: 70%;
 	border-radius: 0;
-	width: 50px;
-	margin-right: -80px;
+	width: 55px;
 }
 div.fc_mediafile_player_box div.fc_mediafile_audio_spectrum_progressbar {
 	visibility: hidden;
@@ -1918,19 +1917,39 @@ div.fc_mediafile_player_box div.fc_mediafile_controls .loadBtn,
 div.fc_mediafile_player_box div.fc_mediafile_controls .downloadBtn {
 	margin: 6px 0;
 	outline: none;
-	background: none;
 	display: inline-block;
+	border-radius: 16px;
+}
+div.fc_mediafile_player_box div.fc_mediafile_controls .playBtn:hover,
+div.fc_mediafile_player_box div.fc_mediafile_controls .pauseBtn:hover,
+div.fc_mediafile_player_box div.fc_mediafile_controls .stopBtn:hover,
+div.fc_mediafile_player_box div.fc_mediafile_controls .loadBtn:hover,
+div.fc_mediafile_player_box div.fc_mediafile_controls .downloadBtn:hover {
+	box-shadow: 0 0 7px 2px rgba(119,119,119,0.5);
+}
+div.fc_mediafile_player_box div.fc_mediafile_controls .playBtn.btn {
+	background: #609fc7;
+	border: #70afd7;
+	color: white;
+}
+div.fc_mediafile_player_box div.fc_mediafile_controls .playBtn.btn span:before {
+	color: white;
 }
 div.fc_mediafile_player_box div.fc_mediafile_controls .pauseBtn,
 div.fc_mediafile_player_box div.fc_mediafile_controls .stopBtn,
 div.fc_mediafile_player_box div.fc_mediafile_controls .loadBtn {
 	display: none;
 }
-div.fc_mediafile_player_box div.fc_mediafile_controls > a.is_active {
-	background: darkcyan !important;
+div.fc_mediafile_player_box div.fc_mediafile_controls .btn.is_active {
+	background: #2db383;
+	border: #3dc393;
+	color: white;
 }
-div.fc_mediafile_player_box div.fc_mediafile_controls > a {
-	color: #333;
+div.fc_mediafile_player_box div.fc_mediafile_controls .btn.is_active span:before {
+	color: white;
+}
+div.fc_mediafile_player_box div.fc_mediafile_controls .btn {
+	color: #777;
 	font-size: 16px;
 	vertical-align: bottom;
 }
@@ -1940,20 +1959,19 @@ div.fc_mediafile_player_box div.fc_mediafile_controls span.controls {
 	margin: 4px 24px 4px 0;
 	vertical-align: middle;
 }
-div.fc_mediafile_player_box .btn-dwn-controls {
-	line-height: 1 !important;
-	background: #909090 !important;
-	color: #f0f0f0 !important;
-	font-family: "Roboto Condensed" !important;
-	font-weight: normal !important;
-	font-size: 19px !important;
-	padding: 5px 11px !important;
-	margin-left: 10px !important;
+div.fc_mediafile_player_box div.fc_mediafile_controls .btn {
+	line-height: 1em;
+	background: #afafaf;
+	font-family: "Roboto Condensed";
+	font-weight: normal;
+	font-size: 19px;
+	padding: 5px 11px;
+	margin-left: 10px;
 	position: relative;
 	bottom: 4px;
 }
-div.fc_mediafile_player_box .btn-dwn-controls span:before {
-	color: #f0f0f0 !important;
+div.fc_mediafile_player_box div.fc_mediafile_controls .btn span:before {
+	color: #777;
 }
 input.fc-inherited-value + label {
 	font-weight: bold !important;

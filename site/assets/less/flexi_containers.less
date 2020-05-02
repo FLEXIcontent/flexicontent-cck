@@ -14,14 +14,15 @@ body .fc-close {
 	filter: alpha(opacity=20);
 	text-shadow: 0 1px 0 #FFFFFF;
 	margin-top: -2px;
-}
-body .fc-close:hover {
-	color: #000000;
-	cursor: pointer;
-	opacity: 0.4;
-	filter: alpha(opacity=40);
-	text-decoration: none;
-	background: none;
+
+	&:hover {
+		color: #000000;
+		cursor: pointer;
+		opacity: 0.4;
+		filter: alpha(opacity=40);
+		text-decoration: none;
+		background: none;
+	}
 }
 
 body .fc-mssg,
@@ -333,10 +334,10 @@ div.statetoggler {
 	border: 1px solid #ddd;
 	list-style: none;
 	text-decoration: none;
-}
 
-#flexicontent #fc_pager ul.pages li:hover {
-	border: 1px solid #aaa;
+	&:hover {
+		border: 1px solid #aaa;
+	}
 }
 
 #flexicontent #fc_pager ul.pages li.pgEmpty {
@@ -370,7 +371,7 @@ div.statetoggler {
 		right: 33px;
 		left: unset;
 	}
-	
+
 	.fc-sliderTooltip.fc-right {
 		right: unset;
 		left: 18px;
@@ -836,14 +837,13 @@ div.fc_mediafile_player_box {
 					/*right: 0 !important;*/
 					top: 38% !important;
 					/* CUSTOMIZE THIS */
-					background: lightseagreen;
+					background: #2db383;
 					color: white;
 					padding: 4px 4px 4px 8px;
 					box-sizing: border-box;
 					opacity: 70%;
 					border-radius: 0;
-					width: 50px;
-					margin-right: -80px;
+					width: 55px;
 				}
 			}
 		}
@@ -880,19 +880,37 @@ div.fc_mediafile_player_box {
 		.playBtn, .pauseBtn, .stopBtn, .loadBtn, .downloadBtn {
 			margin: 6px 0;
 			outline: none;
-			background: none;
 			display: inline-block;
+			border-radius: 16px;
+			
+			&:hover {
+				box-shadow: 0 0 7px 2px rgba(119,119,119,0.5);
+			}
 		}
+		.playBtn.btn {
+			background: #609fc7;
+			border: #70afd7;
+			color: white;
 
+			span:before {
+				color: white;
+			}
+		}
 		.pauseBtn, .stopBtn, .loadBtn {
 			display: none;
 		}
-		> a.is_active {
-			background: darkcyan !important;
+		.btn.is_active {
+			background: #2db383;
+			border: #3dc393;
+			color: white;
+
+			span:before {
+				color: white;
+			}
 		}
 
-		> a {
-			color: #333;
+		.btn {
+			color: #777;
 			font-size: 16px;
 			vertical-align: bottom;
 		}
@@ -903,21 +921,21 @@ div.fc_mediafile_player_box {
 			margin: 4px 24px 4px 0;
 			vertical-align: middle;
 		}
-	}
-	.btn-dwn-controls {
-		line-height: 1 !important;
-		background: #909090 !important;
-		color: #f0f0f0 !important;
-		font-family: "Roboto Condensed" !important;
-		font-weight: normal !important;
-		font-size: 19px !important;
-		padding: 5px 11px !important;
-		margin-left: 10px !important;
-		position: relative;
-		bottom: 4px;
 
-		span:before {
-			color: #f0f0f0 !important;
+		.btn {
+			line-height: 1em;
+			background: #afafaf;
+			font-family: "Roboto Condensed";
+			font-weight: normal;
+			font-size: 19px;
+			padding: 5px 11px;
+			margin-left: 10px;
+			position: relative;
+			bottom: 4px;
+
+			span:before {
+				color: #777;
+			}
 		}
 	}
 }

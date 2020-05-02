@@ -344,7 +344,7 @@ foreach($values as $file_id)
 			// The download button in a mini form ...
 			// Download 
 			$_download_btn_html = '
-				<a href="' . $dl_link . '" class="btn downloadBtn btn-dwn-controls fcfile_downloadFile" title="'.htmlspecialchars($downloadsinfo, ENT_COMPAT, 'UTF-8').'" ' . ($non_file_url ? 'target="_blank"' : '') . '>
+				<a href="' . $dl_link . '" class="btn downloadBtn fcfile_downloadFile" title="'.htmlspecialchars($downloadsinfo, ENT_COMPAT, 'UTF-8').'" ' . ($non_file_url ? 'target="_blank"' : '') . '>
 					<span class="icon-download controls"></span><span class="btnControlsText">' . $downloadstext . '</span>
 				</a>
 			';
@@ -512,16 +512,16 @@ foreach($values as $file_id)
 
 			<!--div id="fc_mediafile_current_time_' . $fnn . '" class="media_time">00:00:00</div-->
 			<div id="fc_mediafile_controls_' . $fnn . '" class="fc_mediafile_controls">
-				<a href="javascript:;" class="btn playBtn btn-dwn-controls">
+				<a href="javascript:;" class="btn playBtn">
 					<span class="icon-play-circle controls"></span><span class="btnControlsText">' . JText::_('FLEXI_FIELD_MEDIAFILE_PLAY') . '</span>
 				</a>
-				<a href="javascript:;" class="btn pauseBtn btn-dwn-controls" style="display: none;">
+				<a href="javascript:;" class="btn pauseBtn" style="display: none;">
 					<span class="icon-pause-circle controls"></span><span class="btnControlsText">' . JText::_('FLEXI_FIELD_MEDIAFILE_PAUSE') . '</span>
 				</a>
-				<a href="javascript:;" class="btn stopBtn btn-dwn-controls" style="display: none;">
+				<a href="javascript:;" class="btn stopBtn" style="display: none;">
 					<span class="icon-stop-circle controls"></span><span class="btnControlsText">' . JText::_('FLEXI_FIELD_MEDIAFILE_STOP') . '</span>
 				</a>
-				<a href="javascript:;" class="btn loadBtn btn-dwn-controls" style="display: none;">
+				<a href="javascript:;" class="btn loadBtn" style="display: none;">
 					<span class="icon-loop controls"></span><span class="btnControlsText">' . JText::_('FLEXI_FIELD_MEDIAFILE_LOAD') . '</span>
 				</a>
 				' . ($allowdownloads ? $_download_btn_html : '') . '
