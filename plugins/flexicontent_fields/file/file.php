@@ -258,8 +258,9 @@ class plgFlexicontent_fieldsFile extends FCField
 		$_prompt_txt = JText::_( 'FLEXI_FIELD_FILE_SELECT_FILE' );  //JText::_( 'FLEXI_ADD_FILE' );
 
 		// CSS classes of value container
-		$value_classes  = 'fcfieldval_container valuebox fcfieldval_container_'.$field->id;
-		$value_classes .= $fields_box_placing ? ' floated' : '';
+		$value_classes_base     = 'fcfieldval_container valuebox fcfieldval_container_'.$field->id;
+		$value_classes_single   = $value_classes_base . ' fc-expanded' ;
+		$value_classes_multiple = $value_classes_base . $fields_box_placing ? ' floated' : '';
 
 		// Field name and HTML TAG id
 		$fieldname = 'custom['.$field->name.']';
@@ -688,7 +689,7 @@ class plgFlexicontent_fieldsFile extends FCField
 				</div>
 				'.($fields_box_placing ? '<div class="fcclear"></div>' : '').'
 				').'
-				<div class="fc-field-props-box">
+				<div class="fc-field-props-box" ' . (!$multiple ? 'style="width: 80%; max-width: 1000px;"' : ''). '>
 				'.$_html.'
 				</div>
 				';
@@ -702,8 +703,8 @@ class plgFlexicontent_fieldsFile extends FCField
 		elseif ($multiple)
 		{
 			$field->html = !count($field->html) ? '' :
-				'<li class="'.$value_classes.'">'.
-					implode('</li><li class="'.$value_classes.'">', $field->html).
+				'<li class="'.$value_classes_multiple.'">'.
+					implode('</li><li class="'.$value_classes_multiple.'">', $field->html).
 				'</li>';
 			$field->html = '<ul class="fcfield-sortables" id="sortables_'.$field->id.'">' .$field->html. '</ul>';
 			if (!$add_position) $field->html .= '
@@ -717,7 +718,7 @@ class plgFlexicontent_fieldsFile extends FCField
 		// Handle single values
 		else
 		{
-			$field->html = '<div class="fcfieldval_container valuebox fcfieldval_container_'.$field->id.'">' . $field->html[0] .'</div>';
+			$field->html = '<div class="'.$value_classes_single.'">' . $field->html[0] .'</div>';
 		}
 
 
