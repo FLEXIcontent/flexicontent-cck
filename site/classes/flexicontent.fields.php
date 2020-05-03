@@ -989,6 +989,7 @@ class FlexicontentFields
 				: require_once (JPATH_SITE.DS.'components'.DS.'com_content'.DS.'helpers'.DS.'query.php');
 
 			// some request and other variables
+			$_layout = $jinput->get('layout', '', 'cmd');
 			$_view   = $jinput->get('view', '', 'cmd');
 			$_option = $jinput->get('option', '', 'cmd');
 			$_initialize = true;
@@ -1022,6 +1023,7 @@ class FlexicontentFields
 		// Set triggering 'context' to 'com_content.category', (and also set the 'view' request variable)
 		else
 		{
+			$jinput->set('layout', 'blog');
 			$jinput->set('view', 'category');
 		  $context = 'com_content.category';
 
@@ -1032,6 +1034,7 @@ class FlexicontentFields
 		// Set the 'option' to 'com_content' but set a flag 'isflexicontent' to indicate triggering from inside FLEXIcontent ... code
 		$jinput->set('option', 'com_content');
 		$jinput->set('isflexicontent', 'yes');
+		$jinput->set('layout_fc', $_layout);
 
 		// Needed by legacy non-updated plugins
 		!FLEXI_J40GE ? JRequest::setVar('option', 'com_content') : null;
@@ -1151,11 +1154,13 @@ class FlexicontentFields
 		 * Restore state
 		 */
 
-		// Restore 'view' and 'option' request variables
+		// Restore 'layout', 'view' and 'option' request variables
+		$jinput->set('layout', $_layout);
 		$jinput->set('view', $_view);
 		$jinput->set('option', $_option);
 
 		// Needed by legacy non-updated plugins
+		!FLEXI_J40GE ? JRequest::setVar('layout', $_layout) : null;
 		!FLEXI_J40GE ? JRequest::setVar('view', $_view) : null;
 		!FLEXI_J40GE ? JRequest::setVar('option', $_option) : null;
 	}
