@@ -79,6 +79,7 @@ class plgFlexicontent_fieldsImage extends FCField
 			jimport('joomla.filesystem.file');
 			jimport('joomla.filesystem.folder');
 			jimport('joomla.filesystem.path');
+			$this->_load_phpthumb();
 		}
 
 		$tooltip_class = 'hasTooltip';
@@ -859,9 +860,16 @@ class plgFlexicontent_fieldsImage extends FCField
 				if (isset($value['existingname']))
 				{
 					$ext = strtolower(flexicontent_upload::getExt($image_subpath));
-					$f = in_array( $ext, array('png', 'ico', 'gif', 'jpg', 'jpeg') ) ? '&amp;f='.$ext : '';
+					$f = in_array( $ext, array('png', 'ico', 'gif', 'jpg', 'jpeg') ) ? '&f='.$ext : '';
 					$img_link = str_replace('\\', '/', $img_link);
-					$img_link = JUri::root().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$img_link.'&amp;w='.$preview_thumb_w.'&amp;h='.$preview_thumb_h.'&amp;zc=1&amp;q=95&amp;ar=x'.$f;
+
+					/*$img_link = JUri::root().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' . 
+						htmlspecialchars($img_link . '&w='.$preview_thumb_w . '&h=' . $preview_thumb_h . '&zc=1&q=95&ar=x' . $f);*/
+
+					$img_link = htmlspecialchars(phpThumbURL(
+						'src=' . $img_link . '&w=' . $preview_thumb_w . '&h=' . $preview_thumb_h . '&zc=1&q=95&ar=x' . $f,
+						'/j3/components/com_flexicontent/librairies/phpthumb/phpThumb.php'
+					));
 				}
 			}
 
@@ -2683,7 +2691,21 @@ class plgFlexicontent_fieldsImage extends FCField
 
 		return $result;
 	}
+	
+	
+	private function _load_phpthumb()
+	{
+		static $loaded = null;
 
+		if ($loaded === null)
+		{
+			$loaded = 1;
+			require_once ( JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'phpthumb'.DS.'phpthumb.class.php' );
+			// WE DO INCLUDE TO FORCE LOADING OF configuration AFTER the class
+			// WE HAVE PATCHED configuration not to double define CONSTANTS and FUNCTIONS
+			include ( JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'phpthumb'.DS.'phpThumb.config.php' );
+		}
+	}
 
 
 	/**
@@ -2697,10 +2719,7 @@ class plgFlexicontent_fieldsImage extends FCField
 		if ($initialized === null)
 		{
 			$initialized = 1;
-			require_once ( JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'phpthumb'.DS.'phpthumb.class.php' );
-			// WE DO INCLUDE TO FORCE LOADING OF configuration AFTER the class
-			// WE HAVE PATCHED configuration not to double define CONSTANTS and FUNCTIONS
-			include ( JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'phpthumb'.DS.'phpThumb.config.php' );
+			$this->_load_phpthumb();
 		}
 
 		unset ($phpThumb);
