@@ -308,21 +308,21 @@ div.statetoggler > div.statetoggler_inner > .options > span > img {
 .fc_slider_input_box {
 	display: none;
 }
-.noUi-base .noUi-handle .fc-sliderTooltip.fc-right {
-	left: 18px;
-	right: unset;
-}
-.noUi-base .noUi-handle .fc-sliderTooltip.fc-right.fc-bottom {
-	left: 33px;
-	right: unset;
-}
 .noUi-base .noUi-handle .fc-sliderTooltip.fc-left {
-	left: unset;
 	right: 18px;
+	left: unset;
 }
 .noUi-base .noUi-handle .fc-sliderTooltip.fc-left.fc-bottom {
-	left: unset;
 	right: 33px;
+	left: unset;
+}
+.noUi-base .noUi-handle .fc-sliderTooltip.fc-right {
+	right: unset;
+	left: 18px;
+}
+.noUi-base .noUi-handle .fc-sliderTooltip.fc-right.fc-bottom {
+	right: unset;
+	left: 33px;
 }
 .noUi-base .noUi-handle .fc-sliderTooltip.fc-bottom {
 	top: 10px;
@@ -395,10 +395,8 @@ body .fc-nowrap-box .nowrap_box .label,
 	font-size: 100%;
 }
 #flexicontent .fc-field-props-box {
-	display: inline-block;
 	float: right;
 	margin-left: 4px;
-	position: relative;
 }
 #flexicontent .fc-xpended {
 	margin: 0 4px 4px 0 !important;

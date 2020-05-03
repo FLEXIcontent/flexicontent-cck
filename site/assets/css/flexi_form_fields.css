@@ -999,6 +999,8 @@ table.fc_uploader_header_tbl td:last-child {
 #flexicontent div.fcfieldval_container.valuebox.fc-expanded .fc-xpended-btns,
 #flexicontent ul.fcfield-sortables > li.fcfieldval_container.valuebox.fc-expanded .fc-field-props-box,
 #flexicontent ul.fcfield-sortables > li.fcfieldval_container.valuebox.fc-expanded .fc-xpended-btns {
+	display: block;
+	position: relative;
 	float: left;
 	clear: both;
 }
@@ -1528,6 +1530,7 @@ div.container_fcfield div.toggle_all_values_buttons_box {
 }
 #flexicontent .fcfield-uploadvalue.active.fcfont-icon {
 	background-color: #2f96b4;
+	color: white !important;
 }
 #flexicontent span.fcfield-uploadvalue.fcfont-icon:before {
 	content: "\e022";

@@ -14,14 +14,15 @@ body .fc-close {
 	filter: alpha(opacity=20);
 	text-shadow: 0 1px 0 #FFFFFF;
 	margin-top: -2px;
-}
-body .fc-close:hover {
-	color: #000000;
-	cursor: pointer;
-	opacity: 0.4;
-	filter: alpha(opacity=40);
-	text-decoration: none;
-	background: none;
+
+	&:hover {
+		color: #000000;
+		cursor: pointer;
+		opacity: 0.4;
+		filter: alpha(opacity=40);
+		text-decoration: none;
+		background: none;
+	}
 }
 
 body .fc-mssg,
@@ -353,10 +354,10 @@ div.statetoggler {
 	border: 1px solid #ddd;
 	list-style: none;
 	text-decoration: none;
-}
 
-#flexicontent #fc_pager ul.pages li:hover {
-	border: 1px solid #aaa;
+	&:hover {
+		border: 1px solid #aaa;
+	}
 }
 
 #flexicontent #fc_pager ul.pages li.pgEmpty {
@@ -390,7 +391,7 @@ div.statetoggler {
 		right: 33px;
 		left: unset;
 	}
-	
+
 	.fc-sliderTooltip.fc-right {
 		right: unset;
 		left: 18px;
@@ -482,10 +483,8 @@ body .fc-nowrap-box,
  * Properties box of multi-property fields
  *****************************************/
 #flexicontent .fc-field-props-box {
-	display: inline-block;
 	float: left;
 	margin-right: 4px;
-	position: relative;
 }
 
 

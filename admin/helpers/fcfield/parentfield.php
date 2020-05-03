@@ -519,9 +519,10 @@ class FCField extends JPlugin
 		}
 		else
 		{
+			$default_label = $default_option->label;
+
 			foreach ($elements as $element)
 			{
-				$default_label = $default_option->label;
 				if ($element->value === $default_option->value)
 				{
 					$default_label .= ' - (' . JText::_($element->text) . ')';

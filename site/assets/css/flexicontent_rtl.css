@@ -646,32 +646,37 @@ body .nowrap_hidden {
 	width: 200px;
 	height: 16px;
 	line-height: 16px;
-	padding: 16px 0px 4px 0px;
-	border-radius: 0;
-	border: 1px solid transparent;
-	border-bottom: 1px solid gray;
+	padding: 16px 0px 4px 8px;
+	border: 1px solid gray;
+	border-radius: 4px;
 }
 #flexicontent .fc-floated-labels-box > label.fc-floated-lbl {
 	font-family: "Trebuchet MS", Verdana, Helvetica, Arial;
+	font-size: 14px;
 	position: absolute;
 	pointer-events: none;
-	top: 10px;
-	right: 2px;
+	top: 8px;
+	left: 8px;
 	transition: 0.2s ease all;
 	z-index: 1;
 	color: gray;
 	opacity: 0.7;
+	padding: 0 4px 0 4px;
+}
+#flexicontent .fc-floated-labels-box > label.fc-floated-lbl.media-preview {
+	top: 0px;
 }
 #flexicontent .fc-floated-labels-box > label.fc-floated-lbl.fc-has-value {
-	top: -6px;
-	right: 2px;
-	font-size: 11px;
+	background: white;
+	top: -9px;
+	right: 8px;
+	font-size: 12px;
 	opacity: 1;
 }
 #flexicontent .fc-floated-labels-box > label.fc-floated-lbl.fc-lbl-external {
-	top: -4px;
+	top: -2px;
 	right: 2px;
-	font-size: 11px;
+	font-size: 12px;
 	opacity: 1;
 }
 #flexicontent .fc-floated-labels-box > label.fc-floated-lbl.fc-has-value.invalid {
@@ -1448,21 +1453,21 @@ div.statetoggler > div.statetoggler_inner > .options > span > img {
 .fc_slider_input_box {
 	display: none;
 }
-.noUi-base .noUi-handle .fc-sliderTooltip.fc-right {
-	left: 18px;
-	right: unset;
-}
-.noUi-base .noUi-handle .fc-sliderTooltip.fc-right.fc-bottom {
-	left: 33px;
-	right: unset;
-}
 .noUi-base .noUi-handle .fc-sliderTooltip.fc-left {
-	left: unset;
 	right: 18px;
+	left: unset;
 }
 .noUi-base .noUi-handle .fc-sliderTooltip.fc-left.fc-bottom {
-	left: unset;
 	right: 33px;
+	left: unset;
+}
+.noUi-base .noUi-handle .fc-sliderTooltip.fc-right {
+	right: unset;
+	left: 18px;
+}
+.noUi-base .noUi-handle .fc-sliderTooltip.fc-right.fc-bottom {
+	right: unset;
+	left: 33px;
 }
 .noUi-base .noUi-handle .fc-sliderTooltip.fc-bottom {
 	top: 10px;
@@ -1535,10 +1540,8 @@ body .fc-nowrap-box .nowrap_box .label,
 	font-size: 100%;
 }
 #flexicontent .fc-field-props-box {
-	display: inline-block;
 	float: right;
 	margin-left: 4px;
-	position: relative;
 }
 #flexicontent .fc-xpended {
 	margin: 0 4px 4px 0 !important;
