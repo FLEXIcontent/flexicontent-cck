@@ -266,6 +266,7 @@ include_once('phpThumb.config_OVERRIDE.php');
 //   require_once('phpThumb/phpThumb.config.php');
 //   echo '<img src="'.htmlspecialchars(phpThumbURL('src=/images/pic.jpg&w=50', '/phpThumb/phpThumb.php')).'">';
 
+$GLOBALS['PHPTHUMB_CONFIG'] = $PHPTHUMB_CONFIG;
 if (!function_exists('phpThumbURL'))
 {
 	function phpThumbURL($ParameterString, $path_to_phpThumb='phpThumb.php') {
