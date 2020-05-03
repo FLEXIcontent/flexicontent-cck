@@ -970,7 +970,7 @@ class FlexicontentFields
 		static $_fields_plgs = array();
 
 		static $_initialize = false;
-		static $_view, $_option;
+		static $_layout, $_view, $_option;
 		static $dispatcher, $fcdispatcher;
 
 		$jinput = JFactory::getApplication()->input;
