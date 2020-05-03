@@ -282,8 +282,9 @@ class plgFlexicontent_fieldsImage extends FCField
 		}
 
 		// CSS classes of value container
-		$value_classes  = 'fcfieldval_container valuebox fcfieldval_container_'.$field->id;
-		$value_classes .= $fields_box_placing ? ' floated' : '';
+		$value_classes_base     = 'fcfieldval_container valuebox fcfieldval_container_'.$field->id;
+		$value_classes_single   = $value_classes_base . ' fc-expanded' ;
+		$value_classes_multiple = $value_classes_base . ($fields_box_placing ? ' floated' : '');
 
 		// Field name and HTML TAG id
 		$fieldname = 'custom['.$field->name.']';
@@ -975,7 +976,7 @@ class plgFlexicontent_fieldsImage extends FCField
 			{
 				$uploader_html = JHtml::_('fcuploader.getUploader', $field, $u_item_id, null, $n,
 					array(
-					'container_class' => 'fc_inline_uploader fc_uploader_thumbs_view fc_compact_uploader fc_auto_uploader fc-box thumb_'.$thumb_size_default,
+					'container_class' => (1 || $multiple ? 'fc_inline_uploader fc_uploader_thumbs_view fc-box' : '') . ' fc_compact_uploader fc_auto_uploader thumb_'.$thumb_size_default,
 					'upload_maxcount' => 1,
 					'autostart_on_select' => true,
 					'refresh_on_complete' => false,
@@ -1040,52 +1041,60 @@ class plgFlexicontent_fieldsImage extends FCField
 					'.$uploader_html->clearBtn.'
 					' : '') . '
 				</div>
+				<div class="fcclear"></div>
 				').'
-				'.($use_inline_uploaders && ($file_btns_position || !$add_ctrl_btns) ? '
-				<div class="fcclear"></div>
-				<div class="btn-group" style="margin: 4px 0 16px 0; display: inline-block;">
-					<div class="'.$input_grp_class.' fc-xpended-btns">
-						'.$uploader_html->toggleBtn.'
-						'.$uploader_html->multiUploadBtn.'
-						'.$uploader_html->myFilesBtn.'
-						'.$uploader_html->mediaUrlBtn.'
-						'.$uploader_html->clearBtn.'
-					</div>
-				</div>
-				' : '') . '
-				'.$originalname.'
-				<div class="fcclear"></div>
-				'.$existingname.'
-				<div class="fcclear"></div>
 
-				'.($image_source === -2 || $image_source === -1  ?  // Do not add image preview box if using Joomla Media Manager (or intro/full mode)
-					$select_existing.'
+				<div class="fc-field-props-box" ' . (!$multiple ? 'style="width: 80%; max-width: 1000px; position: relative;"' : ''). '>
+					'.($use_inline_uploaders && ($file_btns_position || !$add_ctrl_btns) ? '
 					<div class="fcclear"></div>
-				' : '
-					<div class="fcimg_preview_box fc-box thumb_'.$thumb_size_default.'">
-						'.$imgpreview.'
-						<div class="fcclear"></div>
-					'.$select_existing.'
+					<div class="btn-group" style="margin: 4px 0 16px 0; display: inline-block;">
+						<div class="'.$input_grp_class.' fc-xpended-btns">
+							'.$uploader_html->toggleBtn.'
+							'.$uploader_html->multiUploadBtn.'
+							'.$uploader_html->myFilesBtn.'
+							'.$uploader_html->mediaUrlBtn.'
+							'.$uploader_html->clearBtn.'
+						</div>
 					</div>
-					'.(!empty($uploader_html) ? $uploader_html->container : '').'
-				').'
-				'
+					' : '') . '
+					'.$originalname.'
+					<div class="fcclear"></div>
+					'.$existingname.'
+					<div class="fcclear"></div>
 
-				.(($linkto_url || $usemediaurl || $usealt || $usetitle || $usedesc || $usecust1 || $usecust2) ?
-				'
-				<div class="fcimg_value_props">
-					<table class="fc-form-tbl fcinner fccompact">
-					'.$fcimg_preview_msg.'
-						' . @ $urllink . '
-						' . @ $mediaurl . '
-						' . @ $alt . '
-						' . @ $title . '
-						' . @ $desc . '
-						' . @ $cust1 . '
-						' . @ $cust2 . '
-					</table>
-				</div>'
-				: '');
+					'.($image_source === -2 || $image_source === -1  ?  // Do not add image preview box if using Joomla Media Manager (or intro/full mode)
+						$select_existing.'
+						<div class="fcclear"></div>
+					' : '
+						'.(empty($uploader_html) ? '' : '
+							<div style="display: inline-block; vertical-align: top;">
+								' . $uploader_html->container . '
+							</div>
+						').'
+						<div class="fcimg_preview_box fc-box thumb_'.$thumb_size_default.'">
+							'.$imgpreview.'
+							'.$fcimg_preview_msg.'
+							<div class="fcclear"></div>
+						'.$select_existing.'
+						</div>
+					').'
+					'
+
+					.(($linkto_url || $usemediaurl || $usealt || $usetitle || $usedesc || $usecust1 || $usecust2) ?
+					'
+					<div class="fcimg_value_props">
+						<table class="fc-form-tbl fcinner fccompact">
+							' . @ $urllink . '
+							' . @ $mediaurl . '
+							' . @ $alt . '
+							' . @ $title . '
+							' . @ $desc . '
+							' . @ $cust1 . '
+							' . @ $cust2 . '
+						</table>
+					</div>'
+					: '') .'
+				</div>';
 
 			$n++;
 			$image_added = true;
@@ -1107,12 +1116,11 @@ class plgFlexicontent_fieldsImage extends FCField
 		if ($use_ingroup);
 
 		// Handle multiple records
-		//elseif ($multiple)
-		elseif(1)  // because of JS seeking the parent containers, use UL/LI instead of DIV
+		elseif ($multiple)
 		{
 			$field->html = !count($field->html) ? '' :
-				'<li class="'.$value_classes.'">'.
-					implode('</li><li class="'.$value_classes.'">', $field->html).
+				'<li class="' . $value_classes_multiple . '">'.
+					implode('</li><li class="' . $value_classes_multiple . '">', $field->html).
 				'</li>';
 			$field->html = '<ul class="fcfield-sortables" id="sortables_'.$field->id.'">' .$field->html. '</ul>';
 			if (!$add_position) $field->html .= '
@@ -1126,7 +1134,12 @@ class plgFlexicontent_fieldsImage extends FCField
 		// Handle single values
 		else
 		{
-			$field->html = '<div class="fcfieldval_container valuebox fcfieldval_container_'.$field->id.'">' . $field->html[0] .'</div>';
+			// Because of JS seeking the parent containers, use UL/LI instead of DIV
+			$field->html = !count($field->html) ? '' :
+				'<li class="' . $value_classes_single . '">'.
+					implode('</li><li class="' . $value_classes_single . '">', $field->html).
+				'</li>';
+			$field->html = '<ul class="fcfield-sortables" id="sortables_'.$field->id.'">' .$field->html. '</ul>';
 		}
 
 		// This is field HTML that is created regardless of values
