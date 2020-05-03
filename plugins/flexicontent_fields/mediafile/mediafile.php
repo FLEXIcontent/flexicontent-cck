@@ -262,7 +262,7 @@ class plgFlexicontent_fieldsMediafile extends FCField
 		// CSS classes of value container
 		$value_classes_base     = 'fcfieldval_container valuebox fcfieldval_container_'.$field->id;
 		$value_classes_single   = $value_classes_base . ' fc-expanded' ;
-		$value_classes_multiple = $value_classes_base . $fields_box_placing ? ' floated' : '';
+		$value_classes_multiple = $value_classes_base . ($fields_box_placing ? ' floated' : '');
 
 		// Field name and HTML TAG id
 		$fieldname = 'custom['.$field->name.']';
