@@ -455,7 +455,7 @@ class com_flexicontentInstallerScript
 			$params['my_param3'] = 'Star';
 		}
 
-		$this->setParams( $params );*/
+		$this->_setComponentParams( $params );*/
 
 		/*JFactory::getApplication()->enqueueMessage('
 			Please clear your frontend / backend Joomla cache once, <br/>
@@ -506,7 +506,8 @@ class com_flexicontentInstallerScript
 			'relateditems_backlinks'=>'relation_reverse',
 			'sharedaudio'=>'sharedmedia',
 			'sharedvideo'=>'sharedmedia',
-			'extendedweblink'=>'weblink'
+			'extendedweblink'=>'weblink',
+			'minigallery'=>'image',
 		);
 
 		// Get DB table information
@@ -661,39 +662,18 @@ class com_flexicontentInstallerScript
 					//echo '<br/><span class="label">' . implode('</span><span class="label">', array_keys($deprecated_fields)) . '</span>';
 					$msg = array();
 					$n = 0;
-					if ($fields_tbl_exists) foreach ($deprecated_fields as $old_type => $new_type)
+					if ($fields_tbl_exists)
 					{
-						$query = 'UPDATE #__flexicontent_fields'
-							.' SET field_type = ' .$db->Quote($new_type)
-							.' WHERE field_type = ' .$db->Quote($old_type);
-						$db->setQuery($query);
-						try {
-							$db->execute();
-						}
-						catch (Exception $e) {
-							$msg[$n++] = '<span class="badge badge-error">SQL Error</span> '. $e->getMessage() . '<br/>';
-							continue;
-						}
+						foreach ($deprecated_fields as $old_type => $new_type)
+						{
+							$deprecate_custom = '_deprecate_field_' . $old_type;
+							method_exists(get_class($this), $deprecate_custom)
+								//? call_user_func_array(array($this, $deprecate_custom), array($old_type, $new_type, & $msg, & $n))
+								? $this->$deprecate_custom($old_type, $new_type, $msg, $n)
+								: $this->_deprecate_field($old_type, $new_type, $msg, $n);
 
-						$count_rows = $db->getAffectedRows();
-						$msg[$n] = '<span class="label label-'.($count_rows ? 'warning' : 'info').'">'.$count_rows.'</span><span class="label">'.$old_type.'</span> &nbsp; ';
-
-						$query = 'SELECT *, extension_id AS id '
-							.' FROM #__extensions'
-							.' WHERE type="plugin"'
-							.'  AND element='.$db->Quote( $old_type )
-							.'  AND folder='.$db->Quote( 'flexicontent_fields' );
-						$db->setQuery($query);
-						$ext = $db->loadAssoc();
-
-						if ($ext && $ext['id'] > 0) {
-							$installer = new JInstaller();
-							if ( $installer->uninstall($ext['type'], $ext['id'], (int)$ext['client_id']) )
-								$msg[$n] = '<br/>'.$msg[$n].', uninstalling plugin: <span class="badge badge-success">success</span> <br/>';
-							else
-								$msg[$n] = '<br/>'.$msg[$n].', uninstalling plugin: <span class="badge badge-error">failed</span> <br/>';
+							$n++;
 						}
-						$n++;
 					}
 					?>
 					</td>
@@ -1654,7 +1634,7 @@ class com_flexicontentInstallerScript
 	/*
 	* get a variable from the manifest file (actually, from the manifest cache).
 	*/
-	function getExistingManifest( $name='com_flexicontent', $type='component' )
+	public function getExistingManifest( $name='com_flexicontent', $type='component' )
 	{
 		static $paramsArr = null;
 		if ($paramsArr !== null) return $paramsArr;
@@ -1670,7 +1650,7 @@ class com_flexicontentInstallerScript
 	/*
 	* sets parameter values in the component's row of the extension table
 	*/
-	function setParams($param_array)
+	private function _setComponentParams($param_array)
 	{
 		if ( count($param_array) > 0 )
 		{
@@ -1692,8 +1672,10 @@ class com_flexicontentInstallerScript
 	}
 
 
-	// Get existing field values
-	function renameLegacyRecordParameters($map, $dbtbl_name, $dbcol_name, $record_id)
+	/*
+	 * Rename Extension's Legacy Parameters to new names
+	 */
+	private function _renameExtensionLegacyParameters($map, $dbtbl_name, $dbcol_name, $record_id)
 	{
 		// Load parameters directly from DB
 		$db = JFactory::getDbo();
@@ -1702,8 +1684,7 @@ class com_flexicontentInstallerScript
 			. ' WHERE '
 			. '  id='. $db->Quote($record_id)
 			;
-		$db->setQuery($query);
-		$attribs = $db->loadResult();
+		$attribs = $db->setQuery($query)->loadResult();
 
 		// Decode parameters
 		$_attribs = json_decode($attribs);
@@ -1725,8 +1706,111 @@ class com_flexicontentInstallerScript
 		// Store field parameter back to the DB
 		$query = 'UPDATE #__' . $dbtbl_name . ''
 			.' SET ' . $dbcol_name . '=' . $db->Quote($attribs)
-			.' WHERE id = ' . $record_id;
-		$db->setQuery($query);
-		$db->execute();
+			.' WHERE id = ' . $record_id
+			;
+		$db->setQuery($query)->execute();
+	}
+
+
+	/*
+	 * Set extension parameters of matching extension records to specific values
+	 */
+	private function _setExtensionParameters(
+			$tbl = '#__flexicontent_fields',
+			$match_cols = array('field_type' => 'minigallery'),
+			$id_col = 'id',
+			$attr_col = 'attribs',
+			$attr_vals = array('allow_multiple' => 1, 'image_source' => 0, 'target_dir' => 0, 'popuptype' => 7)
+	)
+	{
+		$db = JFactory::getDbo();
+		
+		$where = array();
+		foreach($match_cols as $col => $val)
+		{
+			$where[]= $db->QuoteName($col) . ' = ' . $db->Quote($val);
+		}
+
+		$query = 'SELECT ' . $id_col . ', ' . $attr_col .
+			' FROM ' . $tbl .
+			' WHERE ' . implode($where, ' AND ')
+			;
+		$records = $db->setQuery($query)->loadObjectList();
+
+		foreach($records as $r)
+		{
+			$r->$attr_col = json_decode($r->$attr_col);
+
+			foreach($attr_vals as $i => $v)
+			{
+				$r->$attr_col->$i = $v;
+			}
+
+			$r->$attr_col = json_encode($r->$attr_col);
+
+			$query = 'UPDATE ' . $tbl .
+				' SET ' . $attr_col . '=' . $db->Quote($r->$attr_col) .
+				' WHERE ' . $id_col . ' = ' . $r->$id_col
+				;
+			$result = $db->setQuery($query)->execute();
+		}
+	}
+
+
+	/*
+	 * Deprecate 'minigallery' field type as 'image' field type
+	 */
+	private function _deprecate_field_minigallery($old_type, $new_type, & $msg, & $n)
+	{
+		$msg[$n++] = $this->_setExtensionParameters(
+			$tbl = '#__flexicontent_fields',
+			$match_cols = array('field_type' => 'minigallery'),
+			$id_col = 'id',
+			$attr_col = 'attribs',
+			$attr_vals = array('allow_multiple' => 1, 'image_source' => 0, 'target_dir' => 0, 'popuptype' => 7)
+		);
+
+		$this->_deprecate_field($old_type, $new_type, $msg, $n);
+	}
+
+
+	/*
+	 * Deprecate '$old_type' field type as '$new_type' field type
+	 */
+	private function _deprecate_field($old_type, $new_type, & $msg, & $n)
+	{
+		$db = JFactory::getDbo();
+
+		$query = 'UPDATE #__flexicontent_fields'
+			.' SET field_type = ' .$db->Quote($new_type)
+			.' WHERE field_type = ' .$db->Quote($old_type);
+
+		try {
+			$db->setQuery($query)->execute();
+		}
+		catch (Exception $e) {
+			$msg[$n] = '<span class="badge badge-error">SQL Error</span> '. $e->getMessage() . '<br/>';
+			return;
+		}
+
+		$count_rows = $db->getAffectedRows();
+		$msg[$n] = '<span class="label label-'.($count_rows ? 'warning' : 'info').'">'.$count_rows.'</span><span class="label">'.$old_type.'</span> &nbsp; ';
+
+		$query = 'SELECT *, extension_id AS id '
+			.' FROM #__extensions'
+			.' WHERE type="plugin"'
+			.'  AND element='.$db->Quote( $old_type )
+			.'  AND folder='.$db->Quote( 'flexicontent_fields' );
+
+		$ext = $db->setQuery($query)->loadAssoc();
+
+		if ($ext && $ext['id'] > 0)
+		{
+			$installer = new JInstaller();
+
+			$msg[$n] = $installer->uninstall($ext['type'], $ext['id'], (int)$ext['client_id'])
+				? '<br/>'.$msg[$n].', uninstalling plugin: <span class="badge badge-success">success</span> <br/>'
+				: '<br/>'.$msg[$n].', uninstalling plugin: <span class="badge badge-error">failed</span> <br/>';
+		}
 	}
 }
