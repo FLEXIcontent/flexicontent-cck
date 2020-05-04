@@ -193,7 +193,6 @@
 		<plugin name="jprofile"           folder="plugins/flexicontent_fields/jprofile"           instfolder="flexicontent_fields">FLEXIcontent - User (Contact, Community Builder, Jomsocial, etc)</plugin>
 		<plugin name="linkslist"          folder="plugins/flexicontent_fields/linkslist"          instfolder="flexicontent_fields">FLEXIcontent - HTML list of URLs/Anchors/JS links</plugin>
 		<plugin name="mediafile"          folder="plugins/flexicontent_fields/mediafile"          instfolder="flexicontent_fields">FLEXIcontent - Media file player</plugin>
-		<plugin name="minigallery"        folder="plugins/flexicontent_fields/minigallery"        instfolder="flexicontent_fields">FLEXIcontent - Mini-Gallery (image-only slideshow)</plugin>
 		<plugin name="phonenumbers"       folder="plugins/flexicontent_fields/phonenumbers"       instfolder="flexicontent_fields">FLEXIcontent - International Phone Numbers</plugin>
 		<plugin name="radio"              folder="plugins/flexicontent_fields/radio"              instfolder="flexicontent_fields">FLEXIcontent - Radio</plugin>
 		<plugin name="radioimage"         folder="plugins/flexicontent_fields/radioimage"         instfolder="flexicontent_fields">FLEXIcontent - Radio Image</plugin>
