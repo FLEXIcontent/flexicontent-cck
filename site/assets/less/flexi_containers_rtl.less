@@ -44,10 +44,35 @@ body .fc-mssg-inline {
 	/*max-width: 62%;*/
 }
 
+
+body .fc_uploader_n_props_box {
+	display: flex;
+	flex-direction: column-reverse;
+	flex-wrap: wrap;
+	justify-content: start;
+	align-items: start;
+	
+	> * {
+		margin-left: 24px;
+	}
+}
+
 body .fc_uploader_status_box {
+	display: flex;
+	flex-flow: column-reverse wrap;
+	justify-content: center;
+	align-items: center;
+	position: absolute;
+	z-index: 100;
+	top: 0%;
+	right: 10%;
+	opacity: 60%;
+	font-size: 12px;
+	border: none;
+
 	.fc_uploader_mssg_box,
 	.fc-field-invalid {
-		font-size: 20px;
+		font-size: inherit;
 		min-height: 1em;
 		background: white;
 		padding: 8px 16px;
@@ -55,6 +80,7 @@ body .fc_uploader_status_box {
 		box-shadow: 2px 4px 4px gray;
 		border: 1px solid lightgray;
 		text-align: center;
+		white-space: nowrap;
 	}
 	.fc_uploader_mssg_box {
 	}

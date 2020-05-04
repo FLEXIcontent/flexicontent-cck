@@ -60,7 +60,7 @@ abstract class JHtmlFcuploader
 			' : ''),
 			'container' => '
 				<div style="display: inline-block; width: 100%; box-sizing: border-box; position: relative;">
-					<div class="fc_uploader_status_box" style="display: flex; flex-flow: column-reverse wrap; justify-content: center; align-items: center; position: absolute; z-index: 100; top:40%; right: 10%; opacity: 60%;">
+					<div class="fc_uploader_status_box">
 						<div class="fc_uploader_mssg_box" style="display: none;"></div>
 						<input type="text" value="" class="validate-fcuploader fc_hidden_value" data-error-mssg="" data-error-css="" />
 					</div>
