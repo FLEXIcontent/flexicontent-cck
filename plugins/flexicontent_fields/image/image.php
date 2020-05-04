@@ -692,13 +692,16 @@ class plgFlexicontent_fieldsImage extends FCField
 						$_filename = $files_data[$value]->filename_original ? $files_data[$value]->filename_original : $files_data[$value]->filename;
 						$value = array('originalname' => $_filename);
 					}
-					else $value = array('originalname' => null);
+					else
+					{
+						$value = array('originalname' => null);
+					}
 				}
 				else
 				{
 					$array = $this->unserialize_array($value, $force_array=false, $force_value=false);
 					$value = $array ?: array(
-						'originalname' => $value
+						'originalname' => $value,
 					);
 				}
 				$field->value[$index] = $value;
@@ -713,6 +716,8 @@ class plgFlexicontent_fieldsImage extends FCField
 			 * 'existingname' should be present only via form reloading
 			 */
 			$value['originalname'] = isset($value['originalname']) ? trim($value['originalname']) : '';
+			$value['existingname'] = isset($value['existingname']) ? trim($value['existingname']) : '';
+
 			$image_subpath = !empty($value['existingname'])
 				? $value['existingname']
 				: $value['originalname'];
@@ -1183,6 +1188,9 @@ class plgFlexicontent_fieldsImage extends FCField
 		$image_source = (int) $field->parameters->get('image_source', 0);
 		$image_source = $image_source > 1 ? $this->nonImplementedMode($image_source, $field) : $image_source;
 		$target_dir   = (int) $field->parameters->get('target_dir', 1);
+
+		// JS safe Field name
+		$field_name_js = str_replace('-', '_', $field->name);
 
 
 		// ***
