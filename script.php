@@ -703,7 +703,8 @@ class com_flexicontentInstallerScript
 					if ($templates_tbl_exists)        $tbls[] = "#__flexicontent_templates";
 					if ($content_cache_tbl_exists)    $tbls[] = "#__flexicontent_items_tmp";
 					if ($advsearch_index_tbl_exists)  $tbls[] = "#__flexicontent_advsearch_index";
-					if ($mediadatas_tbl_exists)  $tbls[] = "#__flexicontent_mediadatas";
+					if ($reviews_tbl_exists)          $tbls[] = "#__flexicontent_reviews";
+					if ($mediadatas_tbl_exists)       $tbls[] = "#__flexicontent_mediadatas";
 					foreach ($tbls as $tbl) $tbl_fields[$tbl] = $db->getTableColumns($tbl);
 
 					$queries = array();
