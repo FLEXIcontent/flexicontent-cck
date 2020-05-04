@@ -1404,6 +1404,7 @@ ul.thumbnails.image_picker_selector li div.thumbnail p {
 	.full_body_box .container_fcfield.fcfield_row0,
 	.full_body_box .container_fcfield.fcfield_row1 {
 		width: 100% !important;
+		margin-left: 0;
 	}
 }
 .fcclear,
