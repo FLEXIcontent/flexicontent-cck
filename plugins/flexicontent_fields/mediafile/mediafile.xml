@@ -180,11 +180,10 @@
 
 			<field name="" type="separator" default="FLEXI_MY_FILES_INFO" description="" level="level3" class="alert alert-info fcpadded"/>
 
-			<field name="use_myfiles" type="multilist" subtype="list" toggle_related="1" default="1" label="FLEXI_ENABLE" description="Enable to allow selecting an existing file that was previously uploaded" class="">
-				<option value="-1" show_list="use-myfiles-off" hide_list="use-myfiles-jmedia,use-myfiles-on">Uploader (hide file manager)</option>
-				<option value="0" show_list="use-myfiles-off" hide_list="use-myfiles-jmedia,use-myfiles-on">No</option>
-				<option value="1" show_list="use-myfiles-on" hide_list="use-myfiles-off,use-myfiles-jmedia">Uploader + URL links</option>
-				<option value="2" show_list="use-myfiles-on,use-myfiles-jmedia" hide_list="use-myfiles-off">Uploader + URL links + Media links</option>
+			<field name="use_myfiles" type="multilist" subtype="list" toggle_related="1" default="1" label="My files repository" description="Enable to allow selecting an existing file that was previously uploaded" class="">
+				<option value="0" show_list="use-myfiles-off" hide_list="use-myfiles-jmedia,use-myfiles-on">FLEXI_NO</option>
+				<option value="1" show_list="use-myfiles-on" hide_list="use-myfiles-off,use-myfiles-jmedia">Yes (existing files + URL links)</option>
+				<option value="2" show_list="use-myfiles-on,use-myfiles-jmedia" hide_list="use-myfiles-off">Yes (existing files + URL links + Joomla Media manager links)</option>
 			</field>
 
 			<field name="jmedia_filetypes" type="fccheckbox" default="" display_useglobal="0"
@@ -344,87 +343,6 @@
 				<option value="1">jQuery modal (responsive + fullscreen)</option>
 				<option value="2">New window</option>
 				<option value="3">Same window</option>
-			</field>
-
-			<field name="" type="separator" default="FLEXI_FIELD_FILE_PDF_STAMPING" description="" icon_class="icon-file" level="tab_open" box_type="1" />
-
-			<field name="" type="separator" default="FLEXI_FIELD_FILE_PDF_ADD_TEXT_ALL_PAGES" level="level1" />
-			<field name="stamp_pdfs" type="multilist" subtype="radio" default="0" label="Add stamp texts" toggle_related="1" description="Modify PDF files on download to add a stamping text" class="btn-group group-fcmethod fcoffactive">
-				<option value="0" show_list="" hide_list="stamp_pdfs_mode">FLEXI_NO</option>
-				<option value="1" show_list="stamp_pdfs_mode" hide_list="">FLEXI_YES</option>
-			</field>
-
-			<field name="" type="separator" default="FLEXI_CUSTOMIZE" level="level2" depend_class="stamp_pdfs_mode" />
-
-			<field name="pdf_header_text" type="textarea" filter="RAW" cols="50" rows="2" default="" label="FLEXI_HEADER" description="FLEXI_FIELD_FILE_PDF_THIS_TEXT_ADDED_ALL_PAGES" depend_class="stamp_pdfs_mode" />
-			<field name="pdf_footer_text" type="textarea" filter="RAW" cols="50" rows="2" default="" label="FLEXI_FOOTER" description="FLEXI_FIELD_FILE_PDF_THIS_TEXT_ADDED_ALL_PAGES" depend_class="stamp_pdfs_mode" />
-
-			<field name="" type="separator" default="FLEXI_HEADER" level="level3" depend_class="stamp_pdfs_mode" />
-			<field name="pdf_header_ffamily" type="list" default="Helvetica" label="Font family" depend_class="stamp_pdfs_mode" description="Select a font-family to for the header text">
-				<option value="Courier">Courier</option>
-				<option value="Helvetica">Helvetica</option>
-				<option value="Arial">Arial</option>
-				<option value="Times">Times</option>
-				<option value="Symbol">Symbol</option>
-				<option value="ZapfDingbats">ZapfDingbats</option>
-			</field>
-			<field name="pdf_header_fstyle" type="text" default="" label="Font style" depend_class="stamp_pdfs_mode" description="Either leave this empty, which means regular font, &lt;br/&gt; Or enter a combination of &lt;br/&gt; b i u (b:bold, i:italic, u:underline). &lt;br/&gt;&lt;br/&gt; Example for bold and italic: &lt;br/&gt; bi"/>
-			<field name="pdf_header_fsize" type="number" size="40" default="11" label="Font size" depend_class="stamp_pdfs_mode" description="Size is in points. Enter only integers without any suffix"/>
-			<field name="pdf_header_align" type="list" default="C" label="Align" depend_class="stamp_pdfs_mode" description="Left, right, center alignment of text">
-				<option value="C">Center</option>
-				<option value="L">Left</option>
-				<option value="R">Right</option>
-			</field>
-			<field name="pdf_header_border_type" type="text" default="0" label="Border type" depend_class="stamp_pdfs_mode" description="Indicates if borders must be drawn around the cell.&lt;br/&gt; The value can be either a number: &lt;br/&gt; 0: no border (default), 1: frame &lt;br/&gt; or a string containing some or all of the following characters (in any order): &lt;br/&gt; L: left, T: top, R: right, B: bottom" />
-
-			<field name="" type="separator" default="FLEXI_FOOTER" level="level3" depend_class="stamp_pdfs_mode" />
-			<field name="pdf_footer_ffamily" type="list" default="Helvetica" label="Font family" depend_class="stamp_pdfs_mode" description="Select a font-family to for the header text">
-				<option value="Courier">Courier</option>
-				<option value="Helvetica">Helvetica</option>
-				<option value="Arial">Arial</option>
-				<option value="Times">Times</option>
-				<option value="Symbol">Symbol</option>
-				<option value="ZapfDingbats">ZapfDingbats</option>
-			</field>
-			<field name="pdf_footer_fstyle" type="text" default="" label="Font style" depend_class="stamp_pdfs_mode" description="Either leave this empty, which means regular font, &lt;br/&gt; Or enter a combination of &lt;br/&gt; b i u (b:bold, i:italic, u:underline). &lt;br/&gt;&lt;br/&gt; Example for bold and italic: &lt;br/&gt; bi"/>
-			<field name="pdf_footer_fsize" type="number" size="40" default="11" label="Font size" depend_class="stamp_pdfs_mode" description="Size is in points. Enter only integers without any suffix"/>
-			<field name="pdf_footer_align" type="list" default="C" label="Align" depend_class="stamp_pdfs_mode" description="Left, right, center alignment of text">
-				<option value="C">Center</option>
-				<option value="L">Left</option>
-				<option value="R">Right</option>
-			</field>
-			<field name="pdf_footer_border_type" type="text" default="0" label="Border type" depend_class="stamp_pdfs_mode" description="Indicates if borders must be drawn around the cell.&lt;br/&gt; The value can be either a number: &lt;br/&gt; 0: no border (default), 1: frame &lt;br/&gt; or a string containing some or all of the following characters (in any order): &lt;br/&gt; L: left, T: top, R: right, B: bottom" />
-
-			<field name="" type="separator" default="FLEXI_DATES" level="level2" />
-			<field name="" type="separator" default="FLEXI_DATE_PART" level="level4" />
-			<field name="stamp_date_format" type="multilist" subtype="list" toggle_related="1" default="DATE_FORMAT_LC2" label="FLEXI_FIELD_DATE_FORMAT" description="FLEXI_FIELD_CUSTOM_FORMAT_J16GE_DESC">
-				<option value="DATE_FORMAT_LC1" show_list="" hide_list="custom-date-mode">DATE_FORMAT_LC1</option>
-				<option value="DATE_FORMAT_LC2" show_list="" hide_list="custom-date-mode">DATE_FORMAT_LC2</option>
-				<option value="DATE_FORMAT_LC3" show_list="" hide_list="custom-date-mode">DATE_FORMAT_LC3</option>
-				<option value="DATE_FORMAT_LC4" show_list="" hide_list="custom-date-mode">DATE_FORMAT_LC4</option>
-				<option value="_custom_" show_list="custom-date-mode" hide_list="">FLEXI_FIELD_CUSTOM_FORMAT</option>
-			</field>
-			<field name="stamp_custom_date" type="text" default="" label="FLEXI_FIELD_CUSTOM_FORMAT" description="FLEXI_FIELD_CUSTOM_FORMAT_DESC" depend_class="custom-date-mode" />
-			<field name="stamp_lang_filter_format" type="radio" default="0" label="FLEXI_LANG_FILTER_FORMAT" description="FLEXI_LANG_FILTER_FORMAT_DESC" depend_class="custom-date-mode" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-
-			<field name="" type="separator" default="FLEXI_TIMEZONE_PART" level="level4" />
-			<field name="stamp_display_tz_suffix" type="multilist" subtype="list" toggle_related="1" default="1" label="FLEXI_DATE_APPEND_TIMEZONE_SUFFIX" description="FLEXI_DATE_APPEND_TIMEZONE_SUFFIX_DESC">
-				<option value="0" show_list="" hide_list="stamp_timezone_on">FLEXI_FIELD_NO_I_WILL_DO_MANUALLY</option>
-				<option value="1" show_list="stamp_timezone_on" hide_list="">FLEXI_YES</option>
-			</field>
-			<field name="stamp_display_tz_logged" type="list" default="0" label="FLEXI_DATE_TIMEZONE_LOGGED" description="FLEXI_DATE_TIMEZONE_LOGGED_DESC" depend_class="stamp_timezone_on" >
-				<option value="0">FLEXI_DATE_IGNORE_TIMEZONE</option>
-				<option value="1">FLEXI_DATE_UTC0</option>
-				<option value="2">FLEXI_DATE_SITE_TIMEZONE</option>
-				<option value="3">FLEXI_DATE_USER_LOCALTIME</option>
-			</field>
-			<field name="stamp_display_tz_guests" type="list" default="0" label="FLEXI_DATE_TIMEZONE_GUESTS" description="FLEXI_DATE_TIMEZONE_GUESTS_DESC" depend_class="stamp_timezone_on" >
-				<option value="0">FLEXI_DATE_IGNORE_TIMEZONE</option>
-				<option value="1">FLEXI_DATE_UTC0</option>
-				<option value="2">FLEXI_DATE_SITE_TIMEZONE</option>
 			</field>
 
 

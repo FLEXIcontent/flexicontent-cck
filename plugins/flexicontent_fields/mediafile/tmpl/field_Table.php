@@ -110,214 +110,199 @@ foreach ($field->value as $file_id)
 			: 'btn btn-small toolbar dropdown-toggle'
 		);
 
-	$fnn = $FN_n;
+	$fnn = $FN_n;   // Alias ...
 
 	$field->html[] = '
-		<div class="inlinefile-data-box">
 
-			<div style="' . (!$multiple ? '' : 'display:inline-block;') . '">
-				<span class="fc_filedata_storage_name" style="display:none;">'.$file_data->filename.'</span>
-				<div class="fc_filedata_txt_nowrap nowrap_hidden">'.$file_data->filename.'<br/>'.$file_data->altname.'</div>
-				<input class="fc_filedata_txt inlinefile-data-txt '. $info_txt_classes . $required_class .'"
-					readonly="readonly" name="'.$fieldname_n.'[file-data-txt]" id="'.$elementid_n.'_file-data-txt" '.$info_txt_tooltip.'
-					value="'.htmlspecialchars($filename_original, ENT_COMPAT, 'UTF-8').'"
-					data-filename="'.htmlspecialchars($file_data->filename, ENT_COMPAT, 'UTF-8').'"
-					data-wfpreview="'.htmlspecialchars($file_data->waveform_preview, ENT_COMPAT, 'UTF-8').'"
-					data-wfpeaks="'.htmlspecialchars($file_data->waveform_peaks, ENT_COMPAT, 'UTF-8').'"
-				/>
-				'.(!$iform_title ? '
-				<div class="'.$input_grp_class.'">
-					<label class="' . $add_on_class . ' fc-lbl fc_filedata_title-lbl">'.JText::_( 'FLEXI_FILE_DISPLAY_TITLE' ).'</label>
-					<span class="' . $add_on_class . ' fc_filedata_title">'. ($file_data->altname && $filename_original!=$file_data->altname ? $file_data->altname : '-').'</span>
-				</div>' : '').'
-				<div class="fcclear"></div>
+		<span class="fc_filedata_storage_name" style="display:none;">'.$file_data->filename.'</span>
+		<div class="fc_filedata_txt_nowrap nowrap_hidden">'.$file_data->filename.'<br/>'.$file_data->altname.'</div>
+		<input class="fc_filedata_txt inlinefile-data-txt '. $info_txt_classes . $required_class .'"
+			readonly="readonly" name="'.$fieldname_n.'[file-data-txt]" id="'.$elementid_n.'_file-data-txt" '.$info_txt_tooltip.'
+			value="'.htmlspecialchars($filename_original, ENT_COMPAT, 'UTF-8').'"
+			data-filename="'.htmlspecialchars($file_data->filename, ENT_COMPAT, 'UTF-8').'"
+			data-wfpreview="'.htmlspecialchars($file_data->waveform_preview, ENT_COMPAT, 'UTF-8').'"
+			data-wfpeaks="'.htmlspecialchars($file_data->waveform_peaks, ENT_COMPAT, 'UTF-8').'"
+		/>
+		<input type="hidden" id="'.$elementid_n.'_file-id" name="'.$fieldname_n.'[file-id]" value="'.htmlspecialchars($file_id, ENT_COMPAT, 'UTF-8').'" class="fc_fileid" />'.'
+
+		'.( (!$multiple || $is_ingroup) && !$required_class ? '
+		<div class="fcclear"></div>
+		<fieldset class="group-fcset">
+			<input type="checkbox" id="'.$elementid_n.'_file-del" class="inlinefile-del" name="'.$fieldname_n.'[file-del]" value="1" onchange="file_fcfield_del_existing_value'.$field->id.'(this);" />
+			<label class="fc-prop-lbl inlinefile-del-lbl '.$tooltip_class.'" title="'.flexicontent_html::getToolTip('FLEXI_FIELD_'.$FT.'_ABOUT_REMOVE_FILE', 'FLEXI_FIELD_'.$FT.'_ABOUT_REMOVE_FILE_DESC', 1, 1).'" id="'.$elementid_n.'_file-del-lbl" for="'.$elementid_n.'_file-del" >
+				'.JText::_( 'FLEXI_FIELD_FILE_DELETE_FROM_SERVER_STORAGE' ).'
+			</label>
+		</fieldset>
+		<div class="fcclear"></div>
+
+		' : ( (!$multiple || $is_ingroup) && $required_class && $file_data->filename ? '
+			<div class="fcclear"></div>
+			<div class="alert alert-info fc-small fc-iblock" style="margin: 8px 0;">'.JText::_('FLEXI_FIELD_'.$FT.'_REQUIRED_UPLOAD_NEW_TO_REPLACE').'</div>
+			<div class="fcclear"></div>
+		' : '')).'
+
+		'.(!$iform_title ? '
+		<div class="fcclear"></div>
+		<div class="'.$input_grp_class.'">
+			<label class="' . $add_on_class . ' fc-lbl fc_filedata_title-lbl">'.JText::_( 'FLEXI_FILE_DISPLAY_TITLE' ).'</label>
+			<span class="' . $add_on_class . ' fc_filedata_title">'. ($file_data->altname && $filename_original!=$file_data->altname ? $file_data->altname : '-').'</span>
+		</div>' : '').'
+
+		<div class="fcclear"></div>
+
+		<div class="fc_uploader_n_props_box">
+
+			<div style="flex-basis: auto; flex-grow: 50;">
 				'.($form_file_preview ? '<div class="fc-iblock fcimg_preview_box" style="'.$preview_css.'"><img id="'.$elementid_n.'_img_preview" src="'.$preview_src.'" class="fc_preview_thumb" alt="Preview image placeholder"/></div>' : '').'
 				'.(!empty($uploader_html) ? $uploader_html->container : '').'
 			</div>
 
-		</div>
 
-<table class="fc-form-tbl fcinner inlinefile-tbl">
+			<div class="inlinefile-data-box" style="flex-basis: auto; flex-shrink: 50;">
+			<table class="fc-form-tbl fcinner inlinefile-tbl">
+				'.
 
-	<tr class="inlinefile-data-row">
-		<td class="inlinefile-remove-cell" colspan="2">
-			'.( (!$multiple || $is_ingroup) && !$required_class ? '
-			<div class="fcclear"></div>
-			<fieldset class="group-fcset">
-				<input type="checkbox" id="'.$elementid_n.'_file-del" class="inlinefile-del" name="'.$fieldname_n.'[file-del]" value="1" onchange="file_fcfield_del_existing_value'.$field->id.'(this);" />
-				<label class="fc-prop-lbl inlinefile-del-lbl '.$tooltip_class.'" title="'.flexicontent_html::getToolTip('FLEXI_FIELD_'.$FT.'_ABOUT_REMOVE_FILE', 'FLEXI_FIELD_'.$FT.'_ABOUT_REMOVE_FILE_DESC', 1, 1).'" id="'.$elementid_n.'_file-del-lbl" for="'.$elementid_n.'_file-del" >
-					'.JText::_( 'Remove file' ).'
-				</label>
-			</fieldset>
-			' : ( (!$multiple || $is_ingroup) && $required_class && $file_data->filename ? '<div class="alert alert-info fc-small fc-iblock">'.JText::_('FLEXI_FIELD_'.$FT.'_REQUIRED_UPLOAD_NEW_TO_REPLACE').'</div>' : '')).'
-		</td>
-
-	</tr>
-	<tr class="inlinefile-data-row">
-
-		'.($fields_box_placing==1 ? '' : '
-		<td class="key inlinefile-data-lbl-cell">
-			'.$_select_file_lbl.'
-		</td>').'
-		<td class="inlinefile-data-cell" '.($fields_box_placing==1 && $cols2_exist ? 'colspan="2"' : '').'>
-			<div class="inlinefile-data">
-				'.($fields_box_placing==1 ? '<span style="visibility:hidden; z-index:-1; position:absolute;">'.$_select_file_lbl.'</span>' : '').'
-				<input type="hidden" id="'.$elementid_n.'_file-id" name="'.$fieldname_n.'[file-id]" value="'.htmlspecialchars($file_id, ENT_COMPAT, 'UTF-8').'" class="fc_fileid" />'.'
-				<span class="'./*$input_grp_class.*/'">
-					'.(! $field->parameters->get('use_myfiles', '1') ? '
-					<span class="btn btn-info fc_fileupload_box">
-						<span>'.JText::_('FLEXI_FIELD_'.$FT.'_UPLOAD_NEW').'</span>
-						<input type="file" id="'.$elementid_n.'_file-data" name="'.$fieldname_n.'[file-data]" class="fc_filedata" data-rowno="'.$n.'" onchange="var file_box = jQuery(this).parent().parent().parent(); fc_loadImagePreview(this.id,\''.$elementid.'_\'+jQuery(this).attr(\'data-rowno\')+\'_img_preview\', \''.$elementid.'_\'+jQuery(this).attr(\'data-rowno\')+\'_file-data-txt\', 100, 0, \''.$PRV_TYPE.'\'); file_box.find(\'.inlinefile-secure-data\').show(400);  file_box.find(\'.inlinefile-secure-info\').hide(400); file_box.find(\'.inlinefile-del\').removeAttr(\'checked\').trigger(\'change\'); " />
+			( $iform_title ? '
+			<tr class="inlinefile-title-row">
+				<td class="key inlinefile-title-lbl-cell">
+					<label class="fc-prop-lbl inlinefile-title-lbl '.$tooltip_class.'" title="'.flexicontent_html::getToolTip('FLEXI_FILE_DISPLAY_TITLE', 'FLEXI_FILE_DISPLAY_TITLE_DESC', 1, 1).'" id="'.$elementid_n.'_file-title-lbl" for="'.$elementid_n.'_file-title">
+						'.JText::_( 'FLEXI_FILE_DISPLAY_TITLE' ).'
+					</label>
+				</td>
+				<td class="inlinefile-title-data-cell">
+					<span class="inlinefile-title-data">
+					<input type="text" id="'.$elementid_n.'_file-title" size="44" name="'.$fieldname_n.'[file-title]" value="'.htmlspecialchars(!isset($form_data[$file_id]) ? $file_data->altname : $form_data[$file_id]['file-title'], ENT_COMPAT, 'UTF-8').'" class="fc_filetitle '.$required_class.' fcfield_textval" />
 					</span>
-					' : '
-					<span class="btn btn-info addfile hasTooltip" id="'.$elementid_n.'_addfile" title="'.$_prompt_txt.'" data-href="'.$addExistingURL.'" onclick="'.$addExistingURL_onclick.'" data-rowno="'.$n.'">
-						'.JText::_('FLEXI_FIELD_'.$FT.'_MY_FILES').'
+				</td>
+			</tr>' : '').
+
+			( $iform_lang ? '
+			<tr class="inlinefile-lang-row">
+				<td class="key inlinefile-lang-lbl-cell">
+					<label class="fc-prop-lbl inlinefile-lang-lbl '.$tooltip_class.'" title="'.flexicontent_html::getToolTip('FLEXI_LANGUAGE', 'FLEXI_FILE_LANGUAGE_DESC', 1, 1).'" id="'.$elementid_n.'_file-lang-lbl" for="'.$elementid_n.'_file-lang">
+						'.JText::_( 'FLEXI_LANGUAGE' ).'
+					</label>
+				</td>
+				<td class="inlinefile-lang-data-cell">
+					<span class="inlinefile-lang-data">
+					'.flexicontent_html::buildlanguageslist($fieldname_n.'[file-lang]', 'class="fc_filelang use_select2_lib"', (!isset($form_data[$file_id]) ? $file_data->language : $form_data[$file_id]['file-lang']), 1).'
 					</span>
-					').'
-				</span>
+				</td>
+			</tr>' : '').
+
+			( $iform_access ? '
+			<tr class="inlinefile-access-row">
+				<td class="key inlinefile-access-lbl-cell">
+					<label class="fc-prop-lbl inlinefile-access-lbl '.$tooltip_class.'" title="'.flexicontent_html::getToolTip('FLEXI_ACCESS', 'FLEXI_FILE_ACCESS_DESC', 1, 1).'" id="'.$elementid_n.'_file-access-lbl" for="'.$elementid_n.'_file-access">
+						'.JText::_( 'FLEXI_ACCESS' ).'
+					</label>
+				</td>
+				<td class="inlinefile-access-data-cell">
+					<span class="inlinefile-access-data">
+					'.JHtml::_('access.assetgrouplist', $fieldname_n.'[file-access]', (!isset($form_data[$file_id]) ? $file_data->access : $form_data[$file_id]['file-access']), $attribs=' class="fc_fileaccess use_select2_lib" ', $config=array(/*'title' => JText::_('FLEXI_SELECT'), */'id' => $elementid_n.'_file-access')).'
+					</span>
+				</td>
+			</tr>' : '').
+
+			( $iform_desc ? '
+			<tr class="inlinefile-desc-row">
+				<td class="key inlinefile-desc-lbl-cell">
+					<label class="fc-prop-lbl inlinefile-desc-lbl '.$tooltip_class.'" title="'.flexicontent_html::getToolTip('FLEXI_DESCRIPTION', 'FLEXI_FILE_DESCRIPTION_DESC', 1, 1).'" id="'.$elementid_n.'_file-desc-lbl" for="'.$elementid_n.'_file-desc">
+						'.JText::_( 'FLEXI_DESCRIPTION' ).'
+					</label>
+				</td>
+				<td class="inlinefile-desc-data-cell">
+					<span class="inlinefile-desc-data">
+						<textarea id="'.$elementid_n.'_file-desc" cols="24" rows="3" name="'.$fieldname_n.'[file-desc]" class="fc_filedesc">'.(!isset($form_data[$file_id]) ? $file_data->description : $form_data[$file_id]['file-desc']).'</textarea>
+					</span>
+				</td>
+			</tr>' : '').
+
+			( $iform_dir ? '
+			<tr class="inlinefile-secure-row">
+				<td class="key inlinefile-secure-lbl-cell">
+					<label class="fc-prop-lbl inlinefile-secure-lbl '.$tooltip_class.'" data-placement="top" title="'.flexicontent_html::getToolTip('FLEXI_URL_SECURE', 'FLEXI_URL_SECURE_DESC', 1, 1).'" id="'.$elementid_n.'_secure-lbl">
+						'.JText::_( 'FLEXI_URL_SECURE' ).'
+					</label>
+				</td>
+				<td class="inlinefile-secure-data-cell">
+					'.($has_values ? '
+					<span class="inlinefile-secure-info" style="'.(!$has_values ? 'display:none;' : '').'">
+						<span class="badge badge-info">'.JText::_($file_data->secure ?  'FLEXI_YES' : 'FLEXI_NO').'</span>
+					</span>' : '').'
+					<span class="inlinefile-secure-data" style="'.($has_values ? 'display:none;' : '').'">
+						'.flexicontent_html::buildradiochecklist( array(1=> JText::_( 'FLEXI_YES' ), 0=> JText::_( 'FLEXI_NO' )) , $fieldname_n.'[secure]', (!isset($form_data[$file_id]) ? $file_data->secure : (int)$form_data[$file_id]['secure']), 1, ' class="fc_filedir" ', $elementid_n.'_secure').'
+					</span>
+				</td>
+			</tr>' : '').
+
+			( $iform_stamp ? '
+			<tr class="inlinefile-stamp-row">
+				<td class="key inlinefile-stamp-lbl-cell">
+					<label class="fc-prop-lbl inlinefile-stamp-lbl '.$tooltip_class.'" data-placement="top" title="'.flexicontent_html::getToolTip('FLEXI_DOWNLOAD_STAMPING', 'FLEXI_FILE_DOWNLOAD_STAMPING_DESC', 1, 1).'" id="'.$elementid_n.'_stamp-lbl">
+						'.JText::_( 'FLEXI_DOWNLOAD_STAMPING' ).'
+					</label>
+				</td>
+				<td class="inlinefile-stamp-data-cell">
+					<span class="inlinefile-stamp-data">
+					'.flexicontent_html::buildradiochecklist( array(1=> JText::_( 'FLEXI_YES' ), 0=> JText::_( 'FLEXI_NO' )) , $fieldname_n.'[stamp]', (!isset($form_data[$file_id]) ? $file_data->stamp : (int)$form_data[$file_id]['stamp']), 1, ' class="fc_filestamp" ', $elementid_n.'_stamp').'
+					</span>
+				</td>
+			</tr>' : '').
+			'
+			</table>
+
+			</div>
+		</div>
+
+		<div class="fcclear"></div>
+
+		<div class="fc_mediafile_player_box' . ($compactDisp ? ' fc_compact' : '') . '">
+
+			<div class="fc_mediafile_controls_outer">
+
+				<!--div id="fc_mediafile_current_time_' . $fnn . '" class="media_time">00:00:00</div-->
+				<div id="fc_mediafile_controls_' . $fnn . '" class="fc_mediafile_controls">
+					<a href="javascript:;" class="btn playBtn">
+						<span class="icon-play-circle controls"></span><span class="btnControlsText">' . JText::_('FLEXI_FIELD_MEDIAFILE_PLAY') . '</span>
+					</a>
+					<a href="javascript:;" class="btn pauseBtn" style="display: none;">
+						<span class="icon-pause-circle controls"></span><span class="btnControlsText">' . JText::_('FLEXI_FIELD_MEDIAFILE_PAUSE') . '</span>
+					</a>
+					<a href="javascript:;" class="btn stopBtn" style="display: none;">
+						<span class="icon-stop-circle controls"></span><span class="btnControlsText">' . JText::_('FLEXI_FIELD_MEDIAFILE_STOP') . '</span>
+					</a>
+					<a href="javascript:;" class="btn loadBtn" style="display: none;">
+						<span class="icon-loop controls"></span><span class="btnControlsText">' . JText::_('FLEXI_FIELD_MEDIAFILE_LOAD') . '</span>
+					</a>
+					' . ($allowdownloads ? $_download_btn_html : '') . '
+					' . (!$wf_zoom_slider ? '' : '
+					<div class="fc_mediafile_wf_zoom_box">
+						- <input id="fc_mediafile_slider_' . $fnn. '" type="range" min="0.5" max="200" value="0.5" class="fc_mediafile_wf_zoom" /> +
+					</div>
+					') . '
+				</div>
+
 			</div>
 
-		</td>
-	</tr>'.
+			<div class="fc_mediafile_audio_spectrum_box_outer" >
 
-	( $iform_title ? '
-	<tr class="inlinefile-title-row">
-		<td class="key inlinefile-title-lbl-cell">
-			<label class="fc-prop-lbl inlinefile-title-lbl '.$tooltip_class.'" title="'.flexicontent_html::getToolTip('FLEXI_FILE_DISPLAY_TITLE', 'FLEXI_FILE_DISPLAY_TITLE_DESC', 1, 1).'" id="'.$elementid_n.'_file-title-lbl" for="'.$elementid_n.'_file-title">
-				'.JText::_( 'FLEXI_FILE_DISPLAY_TITLE' ).'
-			</label>
-		</td>
-		<td class="inlinefile-title-data-cell">
-			<span class="inlinefile-title-data">
-				<input type="text" id="'.$elementid_n.'_file-title" size="44" name="'.$fieldname_n.'[file-title]" value="'.htmlspecialchars(!isset($form_data[$file_id]) ? $file_data->altname : $form_data[$file_id]['file-title'], ENT_COMPAT, 'UTF-8').'" class="fc_filetitle '.$required_class.'" />
-			</span>
-		</td>
-	</tr>' : '').
-
-	( $iform_lang ? '
-	<tr class="inlinefile-lang-row">
-		<td class="key inlinefile-lang-lbl-cell">
-			<label class="fc-prop-lbl inlinefile-lang-lbl '.$tooltip_class.'" title="'.flexicontent_html::getToolTip('FLEXI_LANGUAGE', 'FLEXI_FILE_LANGUAGE_DESC', 1, 1).'" id="'.$elementid_n.'_file-lang-lbl" for="'.$elementid_n.'_file-lang">
-				'.JText::_( 'FLEXI_LANGUAGE' ).'
-			</label>
-		</td>
-		<td class="inlinefile-lang-data-cell">
-			<span class="inlinefile-lang-data">
-				'.flexicontent_html::buildlanguageslist($fieldname_n.'[file-lang]', 'class="fc_filelang use_select2_lib"', (!isset($form_data[$file_id]) ? $file_data->language : $form_data[$file_id]['file-lang']), 1).'
-			</span>
-		</td>
-	</tr>' : '').
-
-	( $iform_access ? '
-	<tr class="inlinefile-access-row">
-		<td class="key inlinefile-access-lbl-cell">
-			<label class="fc-prop-lbl inlinefile-access-lbl '.$tooltip_class.'" title="'.flexicontent_html::getToolTip('FLEXI_ACCESS', 'FLEXI_FILE_ACCESS_DESC', 1, 1).'" id="'.$elementid_n.'_file-access-lbl" for="'.$elementid_n.'_file-access">
-				'.JText::_( 'FLEXI_ACCESS' ).'
-			</label>
-		</td>
-		<td class="inlinefile-access-data-cell">
-			<span class="inlinefile-access-data">
-				'.JHtml::_('access.assetgrouplist', $fieldname_n.'[file-access]', (!isset($form_data[$file_id]) ? $file_data->access : $form_data[$file_id]['file-access']), $attribs=' class="fc_fileaccess use_select2_lib" ', $config=array(/*'title' => JText::_('FLEXI_SELECT'), */'id' => $elementid_n.'_file-access')).'
-			</span>
-		</td>
-	</tr>' : '').
-
-	( $iform_desc ? '
-	<tr class="inlinefile-desc-row">
-		<td class="key inlinefile-desc-lbl-cell">
-			<label class="fc-prop-lbl inlinefile-desc-lbl '.$tooltip_class.'" title="'.flexicontent_html::getToolTip('FLEXI_DESCRIPTION', 'FLEXI_FILE_DESCRIPTION_DESC', 1, 1).'" id="'.$elementid_n.'_file-desc-lbl" for="'.$elementid_n.'_file-desc">
-				'.JText::_( 'FLEXI_DESCRIPTION' ).'
-			</label>
-		</td>
-		<td class="inlinefile-desc-data-cell">
-			<span class="inlinefile-desc-data">
-				<textarea id="'.$elementid_n.'_file-desc" cols="24" rows="3" name="'.$fieldname_n.'[file-desc]" class="fc_filedesc">'.(!isset($form_data[$file_id]) ? $file_data->description : $form_data[$file_id]['file-desc']).'</textarea>
-			</span>
-		</td>
-	</tr>' : '').
-
-	( $iform_dir ? '
-	<tr class="inlinefile-secure-row">
-		<td class="key inlinefile-secure-lbl-cell">
-			<label class="fc-prop-lbl inlinefile-secure-lbl '.$tooltip_class.'" data-placement="top" title="'.flexicontent_html::getToolTip('FLEXI_URL_SECURE', 'FLEXI_URL_SECURE_DESC', 1, 1).'" id="'.$elementid_n.'_secure-lbl">
-				'.JText::_( 'FLEXI_URL_SECURE' ).'
-			</label>
-		</td>
-		<td class="inlinefile-secure-data-cell">
-			'.($has_values ? '
-			<span class="inlinefile-secure-info" style="'.(!$has_values ? 'display:none;' : '').'">
-				<span class="badge badge-info">'.JText::_($file_data->secure ?  'FLEXI_YES' : 'FLEXI_NO').'</span>
-			</span>' : '').'
-			<span class="inlinefile-secure-data" style="'.($has_values ? 'display:none;' : '').'">
-				'.flexicontent_html::buildradiochecklist( array(1=> JText::_( 'FLEXI_YES' ), 0=> JText::_( 'FLEXI_NO' )) , $fieldname_n.'[secure]', (!isset($form_data[$file_id]) ? $file_data->secure : (int)$form_data[$file_id]['secure']), 1, ' class="fc_filedir" ', $elementid_n.'_secure').'
-			</span>
-		</td>
-	</tr>' : '').
-
-	( $iform_stamp ? '
-	<tr class="inlinefile-stamp-row">
-		<td class="key inlinefile-stamp-lbl-cell">
-			<label class="fc-prop-lbl inlinefile-stamp-lbl '.$tooltip_class.'" data-placement="top" title="'.flexicontent_html::getToolTip('FLEXI_DOWNLOAD_STAMPING', 'FLEXI_FILE_DOWNLOAD_STAMPING_DESC', 1, 1).'" id="'.$elementid_n.'_stamp-lbl">
-				'.JText::_( 'FLEXI_DOWNLOAD_STAMPING' ).'
-			</label>
-		</td>
-		<td class="inlinefile-stamp-data-cell">
-			<span class="inlinefile-stamp-data">
-				'.flexicontent_html::buildradiochecklist( array(1=> JText::_( 'FLEXI_YES' ), 0=> JText::_( 'FLEXI_NO' )) , $fieldname_n.'[stamp]', (!isset($form_data[$file_id]) ? $file_data->stamp : (int)$form_data[$file_id]['stamp']), 1, ' class="fc_filestamp" ', $elementid_n.'_stamp').'
-			</span>
-		</td>
-	</tr>' : '').
-	'
-</table>
-
-	<div class="fcclear"></div>'
-	. '
-	<div class="fc_mediafile_audio_spectrum_box_outer' . ($compactDisp ? ' fc_compact' : '') . '">
-
-		<div class="fc_mediafile_controls_outer">
-
-			<!--div id="fc_mediafile_current_time_' . $fnn . '" class="media_time">00:00:00</div-->
-			<div id="fc_mediafile_controls_' . $fnn . '" class="fc_mediafile_controls">
-				<a href="javascript:;" class="btn playBtn">
-					<span class="icon-play-circle controls"></span><span class="btnControlsText">' . JText::_('FLEXI_FIELD_MEDIAFILE_PLAY') . '</span>
-				</a>
-				<a href="javascript:;" class="btn pauseBtn" style="display: none;">
-					<span class="icon-pause-circle controls"></span><span class="btnControlsText">' . JText::_('FLEXI_FIELD_MEDIAFILE_PAUSE') . '</span>
-				</a>
-				<a href="javascript:;" class="btn stopBtn" style="display: none;">
-					<span class="icon-stop-circle controls"></span><span class="btnControlsText">' . JText::_('FLEXI_FIELD_MEDIAFILE_STOP') . '</span>
-				</a>
-				<a href="javascript:;" class="btn loadBtn" style="display: none;">
-					<span class="icon-loop controls"></span><span class="btnControlsText">' . JText::_('FLEXI_FIELD_MEDIAFILE_LOAD') . '</span>
-				</a>
-				' . ($allowdownloads ? $_download_btn_html : '') . '
-				' . (!$wf_zoom_slider ? '' : '
-				<div class="fc_mediafile_wf_zoom_box">
-					- <input id="fc_mediafile_slider_' . $fnn. '" type="range" min="0.5" max="200" value="0.5" class="fc_mediafile_wf_zoom" /> +
+				<div id="fc_mediafile_audio_spectrum_box_' . $fnn . '" class="fc_mediafile_audio_spectrum_box"
+					data-fc_tagid="' . $field->name . '_' . $n . '"
+					data-fc_fname="' .$field_name_js . '"
+				>
+					' . (!$wf_load_progress ? '' : '
+					<div class="fc_mediafile_audio_spectrum_progressbar">
+						<div class="barText"></div>
+						<div class="bar" style="width: 100%;"></div>
+					</div>
+					') . '
+					<div id="fc_mediafile_audio_spectrum_' . $fnn . '" class="fc_mediafile_audio_spectrum"></div>
 				</div>
-				') . '
+
 			</div>
 
 		</div>
-
-		<div class="fc_mediafile_audio_spectrum_box_outer" >
-
-			<div id="fc_mediafile_audio_spectrum_box_' . $fnn . '" class="fc_mediafile_audio_spectrum_box"
-				data-fc_tagid="' . $field->name . '_' . $n . '"
-				data-fc_fname="' .$field_name_js . '"
-			>
-				' . (!$wf_load_progress ? '' : '
-				<div class="fc_mediafile_audio_spectrum_progressbar">
-					<div class="barText"></div>
-					<div class="bar" style="width: 100%;"></div>
-				</div>
-				') . '
-				<div id="fc_mediafile_audio_spectrum_' . $fnn . '" class="fc_mediafile_audio_spectrum"></div>
-			</div>
-
-		</div>
-
-	</div>
 		';
 
 

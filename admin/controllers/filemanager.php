@@ -796,12 +796,16 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 
 			// Probe file to find if it is a supported media (audio or video) file
 			$fileObj->full_path = $filepath;
-			$model->createMediaData($field, $fileObj);
 
-			// Create audio preview file, if file is a media file
-			if (!empty($fileObj->mediaData))
+			if ($field)
 			{
-				$model->createAudioPreview($field, $fileObj);
+				$model->createMediaData($field, $fileObj);
+
+				// Create audio preview file, if file is a media file
+				if (!empty($fileObj->mediaData))
+				{
+					$model->createAudioPreview($field, $fileObj);
+				}
 			}
 		}
 

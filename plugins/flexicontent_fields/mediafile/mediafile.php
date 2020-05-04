@@ -261,7 +261,7 @@ class plgFlexicontent_fieldsMediafile extends FCField
 
 		// CSS classes of value container
 		$value_classes_base     = 'fcfieldval_container valuebox fcfieldval_container_'.$field->id;
-		$value_classes_single   = $value_classes_base . ' fc-expanded' ;
+		$value_classes_single   = $value_classes_base;// . ' fc-expanded' ;
 		$value_classes_multiple = $value_classes_base . ($fields_box_placing ? ' floated' : '');
 
 		// Field name and HTML TAG id
@@ -724,7 +724,7 @@ class plgFlexicontent_fieldsMediafile extends FCField
 				</div>
 				'.($fields_box_placing ? '<div class="fcclear"></div>' : '').'
 				').'
-				<div class="fc-field-props-box" ' . (!$multiple ? 'style="width: 80%; max-width: 1000px;"' : ''). '>
+				<div class="fc-field-props-box" ' . (!$multiple ? 'style="width: 96%; max-width: 1400px;"' : ''). '>
 				'.$_html.'
 				</div>
 				';

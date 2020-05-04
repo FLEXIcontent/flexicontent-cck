@@ -268,9 +268,13 @@ foreach($values as $file_id)
 	$filename_shown_as_link = $filename_shown && $link_filename && !$usebutton;
 
 
-?>
-<?php if ($prop !== 'display_properties_only') :?>
-<?php
+
+/**
+ * ****** SKIP THIS PART IF display_properties_only
+ */
+if ($prop !== 'display_properties_only') :
+
+
 
 	// [0]: filename (if visible)
 	if (($filename_shown && !$filename_shown_as_link) || $not_downloadable)
@@ -342,8 +346,7 @@ foreach($values as $file_id)
 				$dl_link .= implode('&amp;', $vars);
 			}
 
-			// The download button in a mini form ...
-			// Download 
+			// The Download Button
 			$_download_btn_html = '
 				<a href="' . $dl_link . '" class="btn downloadBtn fcfile_downloadFile" title="'.htmlspecialchars($downloadsinfo, ENT_COMPAT, 'UTF-8').'" ' . ($non_file_url ? 'target="_blank"' : '') . '>
 					<span class="icon-download controls"></span><span class="btnControlsText">' . $downloadstext . '</span>
@@ -562,7 +565,9 @@ foreach($values as $file_id)
 		';
 
 
+
 endif;   // END OF   $prop !== 'display_properties_only'
+
 
 
 	/**

@@ -632,6 +632,7 @@ class fc_Waveform_LazyLoad
 		box.find('.fc_files_uploader_toggle_btn').click();
 	}
 
+
 	fcfield_mediafile.fileFiltered = function(uploader, file, config_name)
 	{
 	}
