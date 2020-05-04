@@ -103,7 +103,7 @@ if (!isset(static::$js_added[$field->id][__FILE__]))
 
 if (!isset(static::$js_added[$field->id][__FILE__][$item->id]))
 {
-	$uid = 'es_'.$field->name."_fcitem".$item->id;
+	$uid = 'es_'.$field_name_js."_fcitem".$item->id;
 	$js = file_get_contents(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'elastislide'.DS.'js'.DS.'gallery_tmpl.js');
 	$js = str_replace('unique_gal_id', $uid, $js);
 
@@ -188,7 +188,7 @@ if ($result !== _FC_RETURN_)
 
 	// Add container HTML
 	// (note: we will use large image thumbnail as preview, JS will size them done)
-	$uid = 'es_'.$field->name."_fcitem".$item->id;
+	$uid = 'es_'.$field_name_js."_fcitem".$item->id;
 	$field->{$prop} = '
 	<div id="rg-gallery_'.$uid.'" class="rg-gallery" >
 		<div class="rg-thumbs">
