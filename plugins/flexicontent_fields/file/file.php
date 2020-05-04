@@ -259,7 +259,7 @@ class plgFlexicontent_fieldsFile extends FCField
 
 		// CSS classes of value container
 		$value_classes_base     = 'fcfieldval_container valuebox fcfieldval_container_'.$field->id;
-		$value_classes_single   = $value_classes_base . ' fc-expanded' ;
+		$value_classes_single   = $value_classes_base;// . ' fc-expanded' ;
 		$value_classes_multiple = $value_classes_base . ($fields_box_placing ? ' floated' : '');
 
 		// Field name and HTML TAG id
@@ -629,12 +629,12 @@ class plgFlexicontent_fieldsFile extends FCField
 
 			JText::script('PLG_FLEXICONTENT_FIELDS_FILE_RESPONSE_PARSING_FAILED', false);
 			JText::script('PLG_FLEXICONTENT_FIELDS_FILE_FILE_NOT_FOUND', false);
+			JText::script('FLEXI_PLEASE_UPLOAD_A_FILE', true);
 
 			flexicontent_html::loadFramework('flexi-lib');
 			JHtml::addIncludePath(JPATH_SITE . '/components/com_flexicontent/helpers/html');
 			$document->addScript(JUri::root(true) . '/plugins/flexicontent_fields/file/js/form.js', array('version' => FLEXI_VHASH));
 		}
-
 
 		// Added field's custom CSS / JS
 		if ($multiple) $js .= "
@@ -689,7 +689,7 @@ class plgFlexicontent_fieldsFile extends FCField
 				</div>
 				'.($fields_box_placing ? '<div class="fcclear"></div>' : '').'
 				').'
-				<div class="fc-field-props-box" ' . (!$multiple ? 'style="width: 80%; max-width: 1000px;"' : ''). '>
+				<div class="fc-field-props-box" ' . (!$multiple ? 'style="width: 96%; max-width: 1400px;"' : ''). '>
 				'.$_html.'
 				</div>
 				';

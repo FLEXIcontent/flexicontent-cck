@@ -4,11 +4,19 @@
 	fcfield_file.use_native_apis = [];
 	fcfield_file.dialog_handle = [];
 
-	fcfield_file.initValue = function(field_name_n)
+	fcfield_file.initValue = function(field_name_n, config_name)
 	{
 		//window.console.log(field_name_n);
 		var fnn  = field_name_n.replace(/-/g, '_');
 		var file = jQuery('#custom_' + field_name_n + '_file-data-txt');
+	}
+
+
+	fcfield_file.showUploader = function(field_name_n, config_name)
+	{
+		var fnn  = field_name_n.replace(/-/g, '_');
+		var box = jQuery('#custom_' + field_name_n + '_file-data-txt').closest('.fcfieldval_container');
+		box.find('.fc_files_uploader_toggle_btn').click();
 	}
 
 

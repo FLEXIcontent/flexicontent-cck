@@ -1179,9 +1179,32 @@ body .fc-mssg-inline {
 	display: inline-block;
 	margin: 1px 0 2px 12px;
 }
+body .fc_uploader_n_props_box {
+	display: flex;
+	flex-direction: column-reverse;
+	flex-wrap: wrap;
+	justify-content: start;
+	align-items: start;
+}
+body .fc_uploader_n_props_box > * {
+	margin-right: 24px;
+}
+body .fc_uploader_status_box {
+	display: flex;
+	flex-flow: column-reverse wrap;
+	justify-content: center;
+	align-items: center;
+	position: absolute;
+	z-index: 100;
+	top: 0%;
+	right: 10%;
+	opacity: 60%;
+	font-size: 12px;
+	border: none;
+}
 body .fc_uploader_status_box .fc_uploader_mssg_box,
 body .fc_uploader_status_box .fc-field-invalid {
-	font-size: 20px;
+	font-size: inherit;
 	min-height: 1em;
 	background: white;
 	padding: 8px 16px;
@@ -1189,6 +1212,7 @@ body .fc_uploader_status_box .fc-field-invalid {
 	box-shadow: 2px 4px 4px gray;
 	border: 1px solid lightgray;
 	text-align: center;
+	white-space: nowrap;
 }
 body .fc-field-invalid {
 	padding: 4px 8px;
@@ -3242,6 +3266,7 @@ ul.thumbnails.image_picker_selector li div.thumbnail p {
 	.full_body_box .container_fcfield.fcfield_row0,
 	.full_body_box .container_fcfield.fcfield_row1 {
 		width: 100% !important;
+		margin-left: 0;
 	}
 }
 .fcclear,

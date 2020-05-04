@@ -10,8 +10,12 @@ $field->abspath = array();
 $field->file_data = array();
 $field->hits_total = 0;
 
+$compactDisp      = true;
+
+$per_value_js = "";
 $n = 0;
 $i = 0;
+
 foreach($values as $file_id)
 {
 	// Skip empty value but add empty placeholder if inside fieldgroup
@@ -24,6 +28,7 @@ foreach($values as $file_id)
 		continue;
 	}
 	$file_data = $files_data[$file_id];
+	$FN_n      = $field_name_js.'_'.$n;
 
 
 	// ***
@@ -260,6 +265,14 @@ foreach($values as $file_id)
 	$filename_shown_as_link = $filename_shown && $link_filename && !$usebutton;
 
 
+
+/**
+ * ****** SKIP THIS PART IF display_properties_only
+ */
+if ($prop !== 'display_properties_only') :
+
+
+
 	// [0]: filename (if visible)
 	if (($filename_shown && !$filename_shown_as_link) || $not_downloadable)
 	{
@@ -330,7 +343,7 @@ foreach($values as $file_id)
 				$dl_link .= implode('&amp;', $vars);
 			}
 
-			// The download button in a mini form ...
+			// The Download Button
 			$actions_arr[] = '
 				<a href="' . $dl_link . '" class="' . $file_classes . ' btn-success fcfile_downloadFile" title="'.htmlspecialchars($downloadsinfo, ENT_COMPAT, 'UTF-8').'" ' . ($non_file_url ? 'target="_blank"' : '') . '>
 					' . $downloadstext . '
@@ -474,6 +487,10 @@ foreach($values as $file_id)
 		(!$buttonsposition ? $html : '');
 
 
+
+endif;   // END OF   $prop !== 'display_properties_only'
+
+
 	// Values Prefix and Suffix Texts
 	$field->{$prop}[$n]	=  $pretext . $html . $posttext;
 
@@ -498,7 +515,7 @@ foreach($values as $file_id)
 $file_totals = '';
 
 // Total number of files
-if ($display_total_count)
+if ($display_total_count && $prop !== 'display_properties_only')
 {
 	$file_totals .= '
 		<div class="fcfile_total_count">
@@ -509,7 +526,7 @@ if ($display_total_count)
 }
 
 // Total download hits (of all files)
-if ($display_total_hits && $field->hits_total)
+if ($display_total_hits && $field->hits_total && $prop !== 'display_properties_only')
 {
 	$file_totals .='
 		<div class="fcfile_total_hits">
@@ -520,7 +537,7 @@ if ($display_total_hits && $field->hits_total)
 }
 
 // Add -1 position (display at top of field or at top of field, or at top/bottom of field group)
-if ($file_totals)
+if ($file_totals && $prop !== 'display_properties_only')
 {
 	$field->{$prop}[-1] = '
 		<div class="alert alert-success fcfile_total">

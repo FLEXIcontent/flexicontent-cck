@@ -66,6 +66,10 @@ fc_plupload = function(options)
 		var is_IE8_IE9 = IEversion && IEversion < 10;
 		var runtimes = !is_IE8_IE9  ?  'html5,flash,silverlight,html4'  : 'flash,html4';  //,silverlight,html5
 		var upProgress_IntervalHandle = 0;
+		
+		var box = uploader_container.closest('.fcfieldval_container');
+		var flexbox = box.length ? box.get(0).querySelector('.fc_uploader_n_props_box') : null;
+		if (!!flexbox) flexbox.style.flexDirection = 'row';
 
 		if (!this.uploader_instances[sfx] && is_IE8_IE9 && !fc_has_flash_addon())
 		{
@@ -205,12 +209,15 @@ fc_plupload = function(options)
 					var validationBox = $(up.settings.container).parent().find('input.validate-fcuploader');
 					var mssgBox = $(up.settings.container).parent().find('.fc_uploader_mssg_box');
 
+					var pNode = mssgBox.get(0).parentNode;
+					var box_w = pNode.parentNode.offsetWidth;
+					var box_h = pNode.parentNode.offsetHeight;
+
 					if (up.total.loaded < up.total.size)
 					{
 						var wait_mssg = Joomla.JText._('FLEXI_PLEASE_WAIT');
 						wait_mssg = wait_mssg.charAt(0).toUpperCase() + wait_mssg.slice(1);
-						//mssgBox.html((Math.round(1000 * up.total.loaded/up.total.size) / 10) + '% ... ' + Joomla.JText._('FLEXI_UPLOADING'));
-						//mssgBox.html(Joomla.JText._('FLEXI_UPLOADING') + ' ... ' + (Math.round(10 * up.total.bytesPerSec / (1024 * 1024)) / 10) + ' MB/s' );
+
 						mssgBox.html(Joomla.JText._('FLEXI_UPLOADING') + ' ... ' + Math.round((up.total.size-up.total.loaded)/up.total.bytesPerSec) + ' seconds' );
 						$(up.settings.container).parent().find('.fc-field-invalid').html(wait_mssg);
 					}
@@ -231,10 +238,17 @@ fc_plupload = function(options)
 						}
 
 						validationBox.val('Preparing-File-Data').data('error-mssg', msg);
-						mssgBox.html(/*Joomla.JText._('FLEXI_UPLOAD_FINISHED') + ' ...  ' +*/ msg + '<br><div class="ajax-loader_bar" style="margin-top: 16px;"></div>');
+						mssgBox.html(msg + '<br><div class="ajax-loader_bar" style="margin-top: 16px;"></div>');
 					}
+
 					mssgBox.parent().show();
 					mssgBox.show();
+
+					pNode.style.fontSize = ((box_w / 12) > 24 ? 24 : ((box_w / 14) > 12 ? parseInt(box_w / 14) : 12) ) + 'px';
+					pNode.style.top = (40 - parseInt(box_h > 250 ? 0 : (250 - box_h) / 5)) + '%';
+					mssg_w = pNode.offsetWidth;
+					pNode.style.right = ((box_w - mssg_w) / 2 - 5) + 'px';
+
 					//window.console.log((up.total.size-up.total.loaded)/up.total.bytesPerSec)
 				},
 
