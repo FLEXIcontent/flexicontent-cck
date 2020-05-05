@@ -26,9 +26,6 @@
 	font-weight: normal;
 	color: #aaa;
 }
-.icon-flexicontent:before {
-	content: "\e250";
-}
 .icon-items:before {
 	content: "\e242";
 }
