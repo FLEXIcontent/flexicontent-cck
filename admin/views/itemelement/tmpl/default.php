@@ -27,7 +27,17 @@ $hlpname  = 'fcitemelement';
 $isAdmin  = $app->isClient('administrator');
 $useAssocs= flexicontent_db::useAssociations();
 
+$editor   = $jinput->getCmd('editor', '');
+$isXtdBtn = $jinput->getCmd('isxtdbtn');
+$function = $jinput->getCmd('function', 'jSelectFcitem');
+$onclick  = $this->escape($function);
 
+if (!empty($editor))
+{
+	// This view is used also in com_menus. Load the xtd script only if the editor is set!
+	JFactory::getDocument()->addScriptOptions('xtd-fcitems', array('editor' => $editor));
+	$onclick = "jSelectFcitem";
+}
 
 /**
  * COMMON CSS classes and COMMON repeated texts
@@ -109,7 +119,68 @@ $list_total_cols = 9
 
 $js = '';
 
-$js .= "
+$js .= (!$isXtdBtn ? "" : "
+(function() {
+	\"use strict\";
+	/**
+	 * Javascript to insert the link
+	 * View element calls jSelectFcitem when a fcitem is clicked
+	 * jSelectFcitem creates the link tag, sends it to the editor,
+	 * and closes the select frame.
+	 **/
+	window.jSelectFcitem = function(id, title, catid, object, link, lang)
+	{
+		var hreflang = '', editor, tag;
+
+		if (!Joomla.getOptions('xtd-fcitems')) {
+			// Something went wrong!
+			window.parent.jModalClose();
+			return false;
+		}
+
+		editor = Joomla.getOptions('xtd-fcitems').editor;
+
+		if (lang !== '')
+		{
+			hreflang = ' hreflang=\"' + lang + '\"';
+		}
+
+		tag = '<a' + hreflang + ' href=\"' + link + '\">' + title + '</a>';
+
+		/** Use the API, if editor supports it **/
+		if (window.parent.Joomla && window.parent.Joomla.editors && window.parent.Joomla.editors.instances && window.parent.Joomla.editors.instances.hasOwnProperty(editor)) {
+			window.parent.Joomla.editors.instances[editor].replaceSelection(tag)
+		} else {
+			window.parent.jInsertEditorText(tag, editor);
+		}
+
+		window.parent.jModalClose();
+	};
+
+	document.addEventListener('DOMContentLoaded', function(){
+		// Get the elements
+		var elements = document.querySelectorAll('.select-link');
+
+		for(var i = 0, l = elements.length; l>i; i++) {
+			// Listen for click event
+			elements[i].addEventListener('click', function (event) {
+				event.preventDefault();
+				var functionName = event.target.getAttribute('data-function');
+
+				if (functionName === 'jSelectFcitem') {
+					// Used in xtd_fcitems
+					window[functionName](event.target.getAttribute('data-id'), event.target.getAttribute('data-title'), event.target.getAttribute('data-cat-id'), null, event.target.getAttribute('data-uri'), event.target.getAttribute('data-language'));
+				} else {
+					// Used in com_menus
+					window.parent[functionName](event.target.getAttribute('data-id'), event.target.getAttribute('data-title'), event.target.getAttribute('data-cat-id'), null, event.target.getAttribute('data-uri'), event.target.getAttribute('data-language'));
+				}
+			})
+		}
+	});
+})();
+
+") . "
+
 
 // Delete a specific list filter
 function delFilter(name)
@@ -309,6 +380,7 @@ if ($js)
 
 		foreach ($this->rows as $i => $row)
 		{
+			$lang = JHtml::_($hlpname . '.lang_display', $row, $i, $this->langs, $use_icon = false);
 			?>
 
 		<tr class="<?php echo 'row' . ($k % 2); ?>">
@@ -334,11 +406,28 @@ if ($js)
 					$pcpath = implode($pcpath, ' / ');
 				?>
 				<span class="<?php echo $this->tooltip_class; ?>" title="<?php echo JHtml::tooltipText(JText::_('FLEXI_SELECT'), $row->title . '<br/><br/>' . $pcpath, 0, 1); ?>">
-					<?php if ($activate_row): ?>
+
+					<?php if ($isXtdBtn): ?>
+
+						<?php $attribs = 'data-function="' . $this->escape($onclick) . '"'
+							. ' data-id="' . $row->id . '"'
+							. ' data-title="' . $this->escape($row->title) . '"'
+							. ' data-cat-id="' . $this->escape($row->catid) . '"'
+							. ' data-uri="' . $this->escape(FlexicontentHelperRoute::getItemRoute($row->id, $row->catid, $_Itemid = 0, $row)) . '"'
+							. ' data-language="' . $this->escape($lang) . '"';
+						?>
+						<a class="select-link" href="javascript:void(0)" <?php echo $attribs; ?>>
+
+					<?php elseif ($activate_row): ?>
+
 						<a style="cursor: pointer;" href="javascript:;" onclick="window.parent.fcSelectItem('<?php echo $row->id; ?>', '<?php echo $this->filter_cats ?: $row->catid; ?>', '<?php echo str_replace( array("'", "\""), array("\\'", ""), $row->title ); ?>');">
+
 					<?php else: ?>
+
 						<a style="cursor: default;" href="javascript:;" onclick="var box = jQuery('#assoc_not_allowed_msg'); fc_itemelement_view_handle = fc_showAsDialog(box, 300, 200, null, { title: '<?php echo JText::_('FLEXI_ABOUT', true); ?>'}); return false;">
+
 					<?php endif; ?>
+
 							<?php echo htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8'); ?>
 						</a>
 				</span>
@@ -358,7 +447,7 @@ if ($js)
 					/**
 					 * Display language
 					 */
-					echo JHtml::_($hlpname . '.lang_display', $row, $i, $this->langs, $use_icon = false); ?>
+					echo $lang; ?>
 			</td>
 
 
