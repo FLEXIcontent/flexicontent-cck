@@ -440,13 +440,21 @@ body .fc-nowrap-box .nowrap_box .label,
 #flexicontent .fc-xpended-row .input-group-text:first-child,
 #flexicontent .fc-xpended .add-on:first-child,
 #flexicontent .fc-xpended-row .add-on:first-child {
-	min-width: 150px;
+	min-width: 140px;
 	float: left;
 	text-align: right;
 	margin: 0 0 0 0;
 	padding-left: 4px;
 	padding-right: 4px;
 	display: inline-block;
+}
+@media (max-width: 800px) {
+	#flexicontent .fc-xpended .input-group-text:first-child,
+	#flexicontent .fc-xpended-row .input-group-text:first-child,
+	#flexicontent .fc-xpended .add-on:first-child,
+	#flexicontent .fc-xpended-row .add-on:first-child {
+		min-width: 90px;
+	}
 }
 #flexicontent .fc-xpended .input-group-text.fc-lbl-short,
 #flexicontent .fc-xpended-row .input-group-text.fc-lbl-short,
