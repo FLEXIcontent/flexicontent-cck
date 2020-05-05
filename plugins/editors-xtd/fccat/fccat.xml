@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<extension version="3.1" type="plugin" group="editors-xtd" method="upgrade">
+	<name>PLG_EDITORS-XTD_FCCAT</name>
+	<author>Flexicontent Project</author>
+	<creationDate>May 2020</creationDate>
+	<copyright>Copyright (C) 2005 - 2020 Open Source Matters. All rights reserved.</copyright>
+	<license>GNU General Public License version 2 or later; see LICENSE.txt</license>
+	<authorEmail>admin@joomla.org</authorEmail>
+	<authorUrl>www.joomla.org</authorUrl>
+	<version>3.4.0</version>
+	<description>PLG_EDITORS-XTD_FCCAT_XML_DESCRIPTION</description>
+	<files>
+		<filename plugin="fccat">fccat.php</filename>
+	</files>
+	<languages>
+		<language tag="en-GB">en-GB.plg_editors-xtd_fccat.ini</language>
+		<language tag="en-GB">en-GB.plg_editors-xtd_fccat.sys.ini</language>
+	</languages>
+</extension>

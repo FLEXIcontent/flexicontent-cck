@@ -1924,6 +1924,14 @@ body.fc-no-scroll {
 	clear: both !important;
 	float: left !important;
 }
+body .icon-flexicontent:before {
+	background: url(../images/logo_flexi.svg) 50% 50% no-repeat transparent;
+	height: 1.2em;
+	width: 1.2em;
+	display: block;
+	line-height: 100%;
+	content: "";
+}
 #fc_perf_box {
 	margin: 12px 1% 48px;
 	text-align: left;
@@ -3967,9 +3975,6 @@ div.fc-fieldgrp-value-box {
 .disabled[class*=" fcsb-icon-"] {
 	font-weight: normal;
 	color: #aaa;
-}
-.icon-flexicontent:before {
-	content: "\e250";
 }
 .icon-items:before {
 	content: "\e242";

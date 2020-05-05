@@ -187,7 +187,7 @@ FOR /D %%G in ("*") DO (
 
 :: PLUGINS  -- ALL TYPES
 
-SET PLG_TYPES=(flexicontent_fields, flexicontent, search, system, content, finder)
+SET PLG_TYPES=(flexicontent_fields, flexicontent, search, system, content, finder, editors-xtd)
 
 FOR  %%i  IN  %PLG_TYPES%  DO (
 	CD /d %repository_path%\plugins\%%i
