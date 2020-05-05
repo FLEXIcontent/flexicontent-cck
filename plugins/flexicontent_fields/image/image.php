@@ -1062,11 +1062,10 @@ class plgFlexicontent_fieldsImage extends FCField
 						</div>
 					</div>
 					' : '') . '
+					'.$fcimg_preview_msg.'
 					'.$originalname.'
-					<div class="fcclear"></div>
 					'.$existingname.'
 					<div class="fcclear"></div>
-
 					'.($image_source === -2 || $image_source === -1  ?  // Do not add image preview box if using Joomla Media Manager (or intro/full mode)
 						$select_existing.'
 						<div class="fcclear"></div>
@@ -1078,7 +1077,6 @@ class plgFlexicontent_fieldsImage extends FCField
 						').'
 						<div class="fcimg_preview_box fc-box thumb_'.$thumb_size_default.'">
 							'.$imgpreview.'
-							'.$fcimg_preview_msg.'
 							<div class="fcclear"></div>
 						'.$select_existing.'
 						</div>

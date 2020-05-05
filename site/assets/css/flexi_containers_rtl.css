@@ -445,13 +445,21 @@ body .fc-nowrap-box .nowrap_box .label,
 #flexicontent .fc-xpended-row .input-group-text:first-child,
 #flexicontent .fc-xpended .add-on:first-child,
 #flexicontent .fc-xpended-row .add-on:first-child {
-	min-width: 150px;
+	min-width: 140px;
 	float: right;
 	text-align: left;
 	margin: 0 0 0 0;
 	padding-right: 4px;
 	padding-left: 4px;
 	display: inline-block;
+}
+@media (max-width: 800px) {
+	#flexicontent .fc-xpended .input-group-text:first-child,
+	#flexicontent .fc-xpended-row .input-group-text:first-child,
+	#flexicontent .fc-xpended .add-on:first-child,
+	#flexicontent .fc-xpended-row .add-on:first-child {
+		min-width: 90px;
+	}
 }
 #flexicontent .fc-xpended .input-group-text.fc-lbl-short,
 #flexicontent .fc-xpended-row .input-group-text.fc-lbl-short,
@@ -753,10 +761,22 @@ div.fc_mediafile_player_box.fc_compact div.fc_mediafile_controls > a,
 div.fc_mediafile_player_box.fc_compact div.fc_mediafile_controls > * {
 	margin: 4px !important;
 }
+div.fc_mediafile_player_box.fc_compact div.fc_mediafile_controls .btn {
+	color: white;
+	border-radius: 2em !important;
+	width: 2em !important;
+	line-height: 1.5em;
+	height: 2em;
+	padding: 0;
+}
+div.fc_mediafile_player_box.fc_compact div.fc_mediafile_controls .btn span:before {
+	color: white;
+}
 div.fc_mediafile_player_box.fc_compact div.fc_mediafile_controls span.controls {
-	font-size: 20px;
+	font-size: 100%;
 	color: #b7b7b7;
-	margin: 4px 8px 4px 0;
+	margin-top: 0.45em !important;
+	margin-left: 0.2em !important;
 }
 div.fc_mediafile_player_box {
 	position: relative;
@@ -855,24 +875,22 @@ div.fc_mediafile_player_box div.fc_mediafile_controls .btn.is_active {
 div.fc_mediafile_player_box div.fc_mediafile_controls .btn.is_active span:before {
 	color: white;
 }
+div.fc_mediafile_player_box div.fc_mediafile_controls span.controls {
+	font-size: 80%;
+	line-height: 1em;
+	color: #b7b7b7;
+	margin: 0em 0em 0 0.8em;
+	vertical-align: baseline;
+	line-height: 100%;
+}
 div.fc_mediafile_player_box div.fc_mediafile_controls .btn {
 	color: #777;
-	font-size: 16px;
+	font-size: 18px;
 	vertical-align: bottom;
-}
-div.fc_mediafile_player_box div.fc_mediafile_controls span.controls {
-	font-size: 24px;
-	color: #b7b7b7;
-	margin: 4px 24px 4px 0;
-	vertical-align: middle;
-}
-div.fc_mediafile_player_box div.fc_mediafile_controls .btn {
 	line-height: 1em;
 	background: #afafaf;
 	font-family: "Roboto Condensed";
 	font-weight: normal;
-	font-size: 19px;
-	padding: 5px 11px;
 	margin-left: 10px;
 	position: relative;
 	bottom: 4px;

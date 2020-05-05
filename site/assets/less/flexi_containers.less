@@ -542,13 +542,22 @@ body .fc-nowrap-box,
 #flexicontent .fc-xpended-row .input-group-text:first-child,
 #flexicontent .fc-xpended .add-on:first-child,
 #flexicontent .fc-xpended-row .add-on:first-child {
-	min-width: 150px;
+	min-width: 140px;
 	float: left;
 	text-align: right;
 	margin: 0 0 0 0;
 	padding-left: 4px;
 	padding-right: 4px;
 	display: inline-block;
+}
+
+@media (max-width: 800px) {
+	#flexicontent .fc-xpended .input-group-text:first-child,
+	#flexicontent .fc-xpended-row .input-group-text:first-child,
+	#flexicontent .fc-xpended .add-on:first-child,
+	#flexicontent .fc-xpended-row .add-on:first-child {
+		min-width: 90px;
+	}
 }
 
 #flexicontent .fc-xpended .input-group-text.fc-lbl-short,
@@ -839,10 +848,24 @@ div.fc_mediafile_player_box.fc_compact {
 			margin: 4px !important;
 		}
 
+		.btn {
+			color: white;
+			border-radius: 2em !important;
+			width: 2em !important;
+			line-height: 1.5em;
+			height: 2em;
+			padding: 0;
+
+			span:before {
+				color: white;
+			}
+		}
+
 		span.controls {
-			font-size: 20px;
+			font-size: 100%;
 			color: #b7b7b7;
-			margin: 4px 8px 4px 0;
+			margin-top: 0.45em !important;
+			margin-right: 0.2em !important;
 		}
 	}
 }
@@ -953,26 +976,24 @@ div.fc_mediafile_player_box {
 			}
 		}
 
+		span.controls {
+			font-size: 80%;
+			line-height: 1em;
+			color: #b7b7b7;
+			margin: 0em 0.8em 0 0em;
+			vertical-align: baseline;
+			line-height: 100%;
+		}
+
 		.btn {
 			color: #777;
-			font-size: 16px;
+			font-size: 18px;
 			vertical-align: bottom;
-		}
 
-		span.controls {
-			font-size: 24px;
-			color: #b7b7b7;
-			margin: 4px 24px 4px 0;
-			vertical-align: middle;
-		}
-
-		.btn {
 			line-height: 1em;
 			background: #afafaf;
 			font-family: "Roboto Condensed";
 			font-weight: normal;
-			font-size: 19px;
-			padding: 5px 11px;
 			margin-left: 10px;
 			position: relative;
 			bottom: 4px;
