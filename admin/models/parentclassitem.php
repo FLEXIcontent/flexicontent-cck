@@ -2176,9 +2176,9 @@ class ParentClassItem extends FCModelAdmin
 
 			if ($app->isClient('site') && !in_array($cparams->get('uselang_fe', 1), array(1,3)) && isset($data['language']))
 			{
-				$app->enqueueMessage('You are not allowed to set language to this content items', 'warning');
+				$app->enqueueMessage('Language was set automatically to default value', 'info');
 				unset($data['language']);
-				if ($isNew) return false;
+				//if ($isNew) return false;
 			}
 		}
 
@@ -2337,9 +2337,13 @@ class ParentClassItem extends FCModelAdmin
 
 		if ( $print_logging_info ) $start_microtime = microtime(true);
 
+		$this->_update_mcats($data, $item, true);
+
 		$results = FLEXI_J40GE
 			? $app->triggerEvent('onBeforeSaveItem', array(&$item, $isNew))
 			: $dispatcher->trigger('onBeforeSaveItem', array(&$item, $isNew));
+
+		$this->_update_mcats($data, $item);
 
 		// Abort item save if any plugin returns a result === false
 		if (is_array($results) && in_array(false, $results, true))
@@ -2367,9 +2371,13 @@ class ParentClassItem extends FCModelAdmin
 
 			if ( $print_logging_info ) $start_microtime = microtime(true);
 
+			$this->_update_mcats($data, $item, true);
+
 			$results = FLEXI_J40GE
 				? $app->triggerEvent($this->event_before_save, array('com_content.article', &$item, $isNew, $data))
 				: $dispatcher->trigger($this->event_before_save, array('com_content.article', &$item, $isNew, $data));
+
+			$this->_update_mcats($data, $item);
 
 			if ( $print_logging_info ) $fc_run_times['onContentBeforeSave_event'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 
@@ -2435,9 +2443,7 @@ class ParentClassItem extends FCModelAdmin
 			$files = null;  // $_FILES;  //$app->input->files->get('files');
 			$core_data_via_events = null;
 
-			$catid_saved = $item->catid;
 			$result = $this->saveFields($isNew, $item, $data, $files, $old_item, $core_data_via_events, $checkACL);
-			$item->catid = (int) $item->catid;
 
 			// Allow custom redirection on failure
 			if (!empty($item->abort_save))
@@ -2457,15 +2463,6 @@ class ParentClassItem extends FCModelAdmin
 
 			// Re-split possibly modified text to introtext, fulltext
 			$this->splitText($core_data_via_events);
-
-			// Re-add possibly modified main category
-			if ($catid_saved != $item->catid)
-			{
-				$cats_indexed = array_flip($data['categories']);
-				unset($cats_indexed[$catid_saved]);
-				$cats_indexed[$item->catid] = 1;
-				$data['categories'] = array_keys($cats_indexed);;
-			}
 
 			// Re-bind (possibly modified data) to the item
 			if (!$item->bind($core_data_via_events))
@@ -2759,10 +2756,15 @@ class ParentClassItem extends FCModelAdmin
 
 		$searchindex = array();
 		//$qindex = array();
+
 		$core_data_via_events = array();  // Extra validation for some core fields via onBeforeSaveField
+		$core_via_post = array('title'=>1, 'text'=>1);
+
 		$postdata = array();
 
-		$core_via_post = array('title'=>1, 'text'=>1);
+		// Save main category id of the item
+		$this->_update_mcats($data, $item, true);
+
 		foreach($fields as $field)
 		{
 			// Set vstate property into the field object to allow this to be changed be the before saving  field event handler
@@ -2848,6 +2850,9 @@ class ParentClassItem extends FCModelAdmin
 			$data['vstate'] = $field->item_vstate;
 		}
 
+		// Update multi-category data, in case category was modified
+		$this->_update_mcats($data, $item);
+
 
 
 		// ***
@@ -2880,6 +2885,9 @@ class ParentClassItem extends FCModelAdmin
 		// *** Trigger plugin Event 'onAllFieldsPostDataValidated'
 		// ***
 
+		// Save main category id of the item
+		$this->_update_mcats($data, $item, true);
+
 		foreach($fields as $field)
 		{
 			$field_type = $field->iscore ? 'core' : $field->field_type;
@@ -2900,6 +2908,8 @@ class ParentClassItem extends FCModelAdmin
 			$field->postdata = $this->formatToArray( $field->postdata );
 		}
 
+		// Update multi-category data, in case category was modified
+		$this->_update_mcats($data, $item);
 
 
 		if ( $print_logging_info ) @$fc_run_times['fields_value_preparation'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
@@ -6609,5 +6619,44 @@ class ParentClassItem extends FCModelAdmin
 		}
 
 		return $params;
+	}
+
+
+	/**
+	 * Re-add possibly modified main category to the multi-categories after events like:
+	 *   onContentBeforeSave, onBeforeSaveField, onAllFieldsPostDataValidated, etc
+	 *
+	 * @param   array     $data         The form data by reference
+	 * @param   object    $item         The item record
+	 * @param   boolean   $save_catid   Indicates to save (remember) the current catid till next method call
+	 *
+	 * @return  void
+	 *
+	 * @since   3.4.0
+	 */
+	private function _update_mcats(&$data, $item, $save_catid = false)
+	{
+		static $main_catids = array();
+
+		// Store current main category
+		if ($save_catid)
+		{
+			$main_catids[$item->id] = $item->catid;
+		}
+
+		// Store update categories array
+		else
+		{
+			$catid_before_events = $main_catids[$item->id];
+
+			$item->catid   = (int) $item->catid;
+			$data['catid'] = $item->catid;
+
+			$cats_indexed = array_flip($data['categories']);
+			unset($cats_indexed[$catid_before_events]);
+			$cats_indexed[$item->catid] = 1;
+
+			$data['categories'] = array_keys($cats_indexed);
+		}
 	}
 }
