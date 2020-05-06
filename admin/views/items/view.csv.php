@@ -34,6 +34,19 @@ class FlexicontentViewItems extends JViewLegacy
 	 */
 	public function display($tpl = null)
 	{
+		/**
+		 * Try to set no limit to PHP executon
+		 */
+		if (!FLEXIUtilities::funcIsDisabled('set_time_limit'))
+		{
+			@set_time_limit(0);
+		}
+
+		$max_execution_time = ini_get("max_execution_time");
+		$_total_runtime     = 0;
+		$start_microtime    = microtime(true);
+		$item_count         = 0;
+
 		// Initialize framework variables
 		$user    = JFactory::getUser();
 		$aid     = JAccess::getAuthorisedViewLevels($user->id);
@@ -65,6 +78,15 @@ class FlexicontentViewItems extends JViewLegacy
 		if (!$show_csvbutton)
 		{
 			die('CSV export not enabled for this view');
+		}
+
+		// Check if current view is filtered by item type
+		$filter_type = $model->getState('filter_type');
+
+		if (!$filter_type && $app->isClient('administrator'))
+		{
+			$app->enqueueMessage(JText::_('FLEXI_CSV_EXPORT_PLEASE_FILTER_BY_TYPE'), 'warning');
+			$app->redirect($this->_getSafeReferer());
 		}
 
 
@@ -108,11 +130,15 @@ class FlexicontentViewItems extends JViewLegacy
 
 			if (!method_exists($plg, 'getItemsSet'))
 			{
-				$app->enqueueMessage('FLEXI_PRO_VERSION_OUTDATED', 'warning');
+				$app->enqueueMessage(JText::_('FLEXI_PRO_VERSION_OUTDATED'), 'warning');
 				$app->redirect($this->_getSafeReferer());
 			}
 		}
-
+		
+		
+		/**
+		 * Get first set of items
+		 */
 		if ($export_all)
 		{
 			$items = $plg->getItemsSet($model, $_init = true);
@@ -124,23 +150,9 @@ class FlexicontentViewItems extends JViewLegacy
 			$items = $model->getData();
 		}
 
-		$item0 = reset($items);
-
-		// Use &test=1 to test / preview item data of first item
-		/*if ($jinput->getInt('test', 0))
-		{
-			echo "<pre>"; print_r($item0); exit;
-		}*/
-
-		// Get field values
+		// Get custom fields and load their values
 		$_vars = null;
 		FlexicontentFields::getItemFields($items, $_vars, $_view = 'category', $aid);
-
-		// Zero unneeded search index text
-		foreach ($items as $item)
-		{
-			$item->search_index = '';
-		}
 
 
 		/**
@@ -148,6 +160,7 @@ class FlexicontentViewItems extends JViewLegacy
 		 */
 
 		$total_fields = 0;
+		$item0        = reset($items);
 		
 		foreach($item0->fields as $field)
 		{
@@ -161,30 +174,15 @@ class FlexicontentViewItems extends JViewLegacy
 			}
 
 			$total_fields++;
-
-			// Render field's CSV display
-			if ($include_in_csv_export === 2)
-			{
-				FlexicontentFields::getFieldDisplay($items, $field->name, $values = null, $method = 'csv_export');
-			}
 		}
-
 
 		// Abort if no fields were configured for CSV export
 		if ($total_fields === 0)
 		{
-			$app->enqueueMessage('FLEXI_CSV_EXPORT_NO_ITEMS_MARKED_FOR_CSV_EXPORT', 'warning');
+			$app->enqueueMessage(JText::_('FLEXI_CSV_EXPORT_ZERO_FIELDS_CONFIGURED_FOR_CSV_EXPORT'), 'warning');
 			$app->redirect($this->_getSafeReferer());
 		}
 
-
-		/**
-		 * 0. Try to set no limit to PHP executon
-		 */
-		if (!FLEXIUtilities::funcIsDisabled('set_time_limit'))
-		{
-			@set_time_limit(0);
-		}
 
 
 		/**
@@ -235,8 +233,13 @@ class FlexicontentViewItems extends JViewLegacy
 		 */
 		while (!empty($items))
 		{
+			$item_count += count($items);
+
 			foreach($items as $item)
 			{
+				// Zero unneeded search index text
+				$item->search_index = '';
+
 				$delim = '';
 
 				foreach($item0->fields as $field_name => $field)
@@ -247,6 +250,12 @@ class FlexicontentViewItems extends JViewLegacy
 					if (!$include_in_csv_export)
 					{
 						continue;
+					}
+
+					// Render field's CSV display
+					elseif ($include_in_csv_export === 2)
+					{
+						FlexicontentFields::getFieldDisplay($items, $field->name, $values = null, $method = 'csv_export');
 					}
 
 					echo $delim;
@@ -307,20 +316,36 @@ class FlexicontentViewItems extends JViewLegacy
 				echo "\n";
 			}
 
-			// Get data from the model
+			/**
+			 * Get time spent so far and break if near max_executime time
+			 */
+			$elapsed_microseconds = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+			$_total_runtime      += $elapsed_microseconds;
+			$start_microtime      = microtime(true);
+
+			if ($max_execution_time && $_total_runtime > 3 * $max_execution_time / 4)
+			{
+				// Message cannot be set when using jexit() ...
+				//$app->enqueueMessage('Exported ' . $item_count . ' items. <br> 3/4 of max execution time ' . $max_execution_time . ' reached before exporting all items.', 'warning');
+				break;
+			}
+
+			/**
+			 * Get next set of items from the model
+			 */
 			$items = $export_all
 				? $plg->getItemsSet($model)
 				: array();
 
-			// Get field values
+			// Get custom fields and load their values
 			$_vars = null;
 			FlexicontentFields::getItemFields($items, $_vars, $_view = 'category', $aid);
-
-			// Zero unneeded search index text
-			foreach ($items as $item)
-			{
-				$item->search_index = '';
-			}
+		}
+		
+		if (!count($items))
+		{
+			// Message cannot be set when using jexit() ...
+			//$app->enqueueMessage('Exported all items' ), 'warning');
 		}
 
 		// Need to exist here !! to avoid any other output
