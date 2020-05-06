@@ -28,7 +28,7 @@ $isAdmin  = $app->isClient('administrator');
 $useAssocs= flexicontent_db::useAssociations();
 
 $editor   = $jinput->getCmd('editor', '');
-$isXtdBtn = $jinput->getCmd('isxtdbtn');
+$isXtdBtn = $jinput->getCmd('isxtdbtn', '');
 $function = $jinput->getCmd('function', 'jSelectFcitem');
 $onclick  = $this->escape($function);
 
@@ -238,7 +238,7 @@ if ($js)
 <div id="flexicontent" class="flexicontent">
 
 
-<form action="index.php?option=<?php echo $this->option; ?>&amp;view=<?php echo $this->view; ?>" method="post" name="adminForm" id="adminForm">
+<form action="index.php" method="post" name="adminForm" id="adminForm">
 
 	<div id="fc-managers-header">
 
@@ -523,6 +523,8 @@ if ($js)
 	<input type="hidden" name="task" value="" />
 	<input type="hidden" id="filter_order" name="filter_order" value="<?php echo $this->lists['order']; ?>" />
 	<input type="hidden" id="filter_order_Dir" name="filter_order_Dir" value="<?php echo $this->lists['order_Dir']; ?>" />
+	<input type="hidden" name="editor" value="<?php echo $editor; ?>" />
+	<input type="hidden" name="isxtdbtn" value="<?php echo $isXtdBtn; ?>" />
 	<input type="hidden" name="fcform" value="1" />
 	<?php echo JHtml::_('form.token'); ?>
 
