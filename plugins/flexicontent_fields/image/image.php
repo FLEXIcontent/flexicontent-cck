@@ -869,12 +869,12 @@ class plgFlexicontent_fieldsImage extends FCField
 					$f = in_array( $ext, array('png', 'ico', 'gif', 'jpg', 'jpeg') ) ? '&f='.$ext : '';
 					$img_link = str_replace('\\', '/', $img_link);
 
-					/*$img_link = JUri::root().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' . 
-						htmlspecialchars($img_link . '&w='.$preview_thumb_w . '&h=' . $preview_thumb_h . '&zc=1&q=95&ar=x' . $f);*/
+//					$img_link = JUri::root().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' . 
+//						htmlspecialchars($img_link . '&w='.$preview_thumb_w . '&h=' . $preview_thumb_h . '&zc=1&q=95&ar=x' . $f);
 
 					$img_link = htmlspecialchars(phpThumbURL(
 						'src=' . $img_link . '&w=' . $preview_thumb_w . '&h=' . $preview_thumb_h . '&zc=1&q=95&ar=x' . $f,
-						'/j3/components/com_flexicontent/librairies/phpthumb/phpThumb.php'
+						''.JUri::root().'components/com_flexicontent/librairies/phpthumb/phpThumb.php'
 					));
 				}
 			}
@@ -2961,6 +2961,13 @@ class plgFlexicontent_fieldsImage extends FCField
 				$filesize_w = $filesize[0];
 				$filesize_h = $filesize[1];
 				$thumbnail_exists = true;
+
+				// Set real sizes for using the with SRCSET
+				if (!$check_small)
+				{
+					$value['size_w_' . $size] = $filesize_w;
+					$value['size_h_' . $size] = $filesize_h;
+				}
 			}
 			else
 			{
