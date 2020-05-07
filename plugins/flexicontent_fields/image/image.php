@@ -874,7 +874,7 @@ class plgFlexicontent_fieldsImage extends FCField
 
 					$img_link = htmlspecialchars(phpThumbURL(
 						'src=' . $img_link . '&w=' . $preview_thumb_w . '&h=' . $preview_thumb_h . '&zc=1&q=95&ar=x' . $f,
-						'/j3/components/com_flexicontent/librairies/phpthumb/phpThumb.php'
+						JUri::root(true) . '/components/com_flexicontent/librairies/phpthumb/phpThumb.php'
 					));
 				}
 			}
