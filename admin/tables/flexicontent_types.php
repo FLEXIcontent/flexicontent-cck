@@ -161,18 +161,6 @@ class flexicontent_types extends _flexicontent_types
 		return 'com_flexicontent.' . $this->_record_name . '.' . (int) $this->$k;
 	}
 
-	/**
-	 * Method to return the title to use for the asset table.
-	 *
-	 * @return  string
-	 *
-	 * @since   11.1
-	 */
-	protected function _getAssetTitle()
-	{
-		return $this->_title;
-	}
-
 
 	/**
 	 * Overloaded bind function.
