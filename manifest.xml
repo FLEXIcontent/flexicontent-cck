@@ -213,8 +213,8 @@
 		<plugin name="flexibreak"         folder="plugins/content/flexibreak"       instfolder="content">Content - Flexibreak, pagination for multi-paged articles</plugin>
 
 		<!-- Plugins: fincontent/editors-xtd -->
-		<plugin name="fcitem"            folder="plugins/editors-xtd/fcitem"        instfolder="editors-xtd">Button - Flexicontent item</plugin>
-		<plugin name="fccat"             folder="plugins/editors-xtd/fccat"         instfolder="editors-xtd">Button - Flexicontent category</plugin>
+		<plugin name="fcitem"            folder="plugins/editors-xtd/fcitem"        instfolder="editors-xtd" enabled="1">Button - Flexicontent item</plugin>
+		<plugin name="fccat"             folder="plugins/editors-xtd/fccat"         instfolder="editors-xtd" enabled="1">Button - Flexicontent category</plugin>
 		
 		<!-- Plugins: finder/search -->
 		<plugin name="flexicontent"       folder="plugins/finder/flexicontent"      instfolder="finder">Finder - Flexicontent, indexer for Smart Search view</plugin>
