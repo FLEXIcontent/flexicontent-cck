@@ -280,8 +280,9 @@ class com_flexicontentInstallerScript
 					'folder' => $source.'/' . $ext->attributes()->folder,
 					'ext_name' => ((string) $ext->attributes()->name),  // needs to be converted to string
 					'ext_folder' => ((string) $ext->attributes()->instfolder),  // needs to be converted to string
+					'enabled' => ((string) $ext->attributes()->enabled),
 					'installer' => new JInstaller(),
-					'status' => null
+					'status' => null,
 				);
 	    }
 			//echo "<pre>"; print_r($extensions); echo "</pre>"; exit;
@@ -311,12 +312,12 @@ class com_flexicontentInstallerScript
 					$query = 'UPDATE '.$ext_tbl
 						//.' SET name = '.$db->Quote($extensions[$i]['name'])
 						.' SET name = '.$db->Quote($ext_manifest_name)
+						.($extensions[$i]['enabled'] ? ', enabled = ' . (int) $extensions[$i]['enabled'] : '')
 						.' WHERE element = '.$db->Quote($extensions[$i]['ext_name'])
 						.'  AND folder = '.$db->Quote($extensions[$i]['ext_folder'])
 						.'  AND type = '.$db->Quote($extensions[$i]['type'])
 						;
-					$db->setQuery($query);
-					$db->execute();
+					$db->setQuery($query)->execute();
 				}
 			}
 			else
