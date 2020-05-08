@@ -132,8 +132,8 @@ else
 
 		$step_labels = & $custom_labels;
 		$i = 0;
-		$set_start = strlen($value1)>0;
-		$set_end   = strlen($value1)>0;
+		$set_start = strlen($value1) > 0;
+		$set_end   = strlen($value2) > 0;
 
 		foreach ($custom_vals as $n => $custom_val)
 		{
