@@ -224,7 +224,7 @@ class modFlexiTagCloudHelper
 			$lists[$i]->screenreader = JText::sprintf('FLEXI_NR_ITEMS_TAGGED', $row->no);
 
 			$lists[$i]->link = $use_catlinks
-				? FlexicontentHelperRoute::getCategoryRoute(0, $tagitemid, array('layout'=>'tags','tagid'=>$row->slug)) . ($typeid ? '&filter_14=' . $typeid : '')
+				? FlexicontentHelperRoute::getCategoryRoute(0, $tagitemid, array('layout'=>'tags','tagid'=>$row->slug)) . ($typeid ? '&filter_8=' . $typeid : '')
 				: FlexicontentHelperRoute::getTagRoute($row->slug, $tagitemid) . '&module='.$module->id;
 			$lists[$i]->link = JRoute::_( $lists[$i]->link );
 
