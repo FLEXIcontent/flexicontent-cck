@@ -189,19 +189,6 @@ class flexicontent_categories extends _flexicontent_categories
 
 
 	/**
-	 * Method to return the title to use for the asset table.
-	 *
-	 * @return  string
-	 *
-	 * @since   3.3
-	 */
-	protected function _getAssetTitle()
-	{
-		return $this->title;
-	}
-
-
-	/**
 	 * Get the parent asset id for the record
 	 *
 	 * @param   JTable   $table  A JTable object for the asset parent.
