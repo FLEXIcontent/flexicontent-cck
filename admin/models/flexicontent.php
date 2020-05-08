@@ -2192,7 +2192,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 
 		// Get a list flexicontent fields that do not have assets
 		$query = $db->getQuery(true)
-			->select('ff.id, ff.name, ff.asset_id')
+			->select('ff.id, ff.name, ff.label, ff.asset_id')
 			->from('#__assets AS se')->join('RIGHT', '#__flexicontent_fields AS ff ON se.id=ff.asset_id AND se.name=concat("com_flexicontent.field.",ff.id)')
 			->where('se.id is NULL');
 		$db->setQuery($query);
@@ -2217,7 +2217,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 					// Initialize field asset
 					$asset->id = null;
 					$asset->name		= $name;
-					$asset->title		= $field->name;
+					$asset->title		= $field->label;
 					$asset->setLocation($component_asset->id, 'last-child');     // Permissions of fields are directly inheritted by component
 
 					// Set asset rules to empty, (DO NOT set any ACTIONS, just let them inherit ... from parent)
@@ -2258,7 +2258,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 
 		// Get a list flexicontent types that do not have assets
 		$query = $db->getQuery(true)
-			->select('ff.id, ff.name, ff.asset_id')
+			->select('ff.id, ff.alias, ff.name, ff.asset_id')
 			->from('#__assets AS se')->join('RIGHT', '#__flexicontent_types AS ff ON se.id=ff.asset_id AND se.name=concat("com_flexicontent.type.",ff.id)')
 			->where('se.id is NULL');
 		$db->setQuery($query);

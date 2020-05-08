@@ -483,6 +483,49 @@ trait flexicontent_basetable_trait
 
 
 	/**
+	 * Get asset title
+	 *
+	 * @return  string   The asset title of the currently loaded record
+	 *
+	 * @since   3.3.0
+	 */
+	public function getAssetTitle()
+	{
+		return $this->_getAssetTitle();
+	}
+
+
+	/**
+	 * Method to return the title to use for the asset table
+	 *
+	 * @return  string   The asset title of the currently loaded record, this should be title of the record !
+	 *
+	 * @since   3.4.0
+	 */
+	protected function _getAssetTitle()
+	{
+		if (!empty($this->{$this->_title}))
+		{
+			return $this->{$this->_title};
+		}
+		elseif (!empty($this->title))
+		{
+			return $this->title;
+		}
+		elseif (!empty($this->label))
+		{
+			return $this->label;
+		}
+		elseif (!empty($this->name))
+		{
+			return $this->name;
+		}
+
+		return $this->_getAssetName();
+	}
+
+
+	/**
 	 * Get asset prefix of this record type (this the asset name excluding the .id)
 	 *
 	 * @return  string   The asset prefix
