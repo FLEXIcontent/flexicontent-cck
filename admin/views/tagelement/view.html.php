@@ -21,10 +21,11 @@ JLoader::register('FlexicontentViewBaseRecords', JPATH_ADMINISTRATOR . '/compone
  */
 class FlexicontentViewTagelement extends FlexicontentViewBaseRecords
 {
-	var $proxy_option   = null;
-	var $title_propname = null;
-	var $state_propname = null;
-	var $db_tbl         = null;
+	var $proxy_option   = 'com_tags';
+	var $title_propname = 'name';
+	var $state_propname = 'published';
+	var $db_tbl         = 'flexicontent_tags';
+	var $name_singular  = 'tag';
 
 	public function display($tpl = null)
 	{
@@ -40,7 +41,6 @@ class FlexicontentViewTagelement extends FlexicontentViewBaseRecords
 		$cparams  = JComponentHelper::getParams('com_flexicontent');
 		$session  = JFactory::getSession();
 		$db       = JFactory::getDbo();
-		$template = $app->getTemplate();
 
 		$option   = $jinput->getCmd('option', '');
 		$view     = $jinput->getCmd('view', '');
@@ -51,7 +51,7 @@ class FlexicontentViewTagelement extends FlexicontentViewBaseRecords
 		$isCtmpl  = $jinput->getCmd('tmpl') === 'component';
 
 		// Some flags & constants
-		;
+		$useAssocs = flexicontent_db::useAssociations();
 
 		// Load Joomla language files of other extension
 		if (!empty($this->proxy_option))
@@ -60,11 +60,38 @@ class FlexicontentViewTagelement extends FlexicontentViewBaseRecords
 			JFactory::getLanguage()->load($this->proxy_option, JPATH_ADMINISTRATOR, null, true);
 		}
 
-		// get filter values
-		$filter_order     = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_order', 		'filter_order', 	't.name', 'cmd' );
-		$filter_order_Dir = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_order_Dir',	'filter_order_Dir',	'', 'word' );
-		$search = $app->getUserStateFromRequest( $option.'.tags.search', 			'search', 			'', 'string' );
-		$search = $db->escape( StringHelper::trim(StringHelper::strtolower( $search ) ) );
+		// Get model
+		$model   = $this->getModel();
+		$model_s = $this->getModel($this->name_singular);
+
+		// Performance statistics
+		if ($print_logging_info = $cparams->get('print_logging_info'))
+		{
+			global $fc_run_times;
+		}
+
+
+		/**
+		 * Get filters and ordering
+		 */
+
+		$count_filters = 0;
+
+		// Order and order direction
+		$filter_order      = $model->getState('filter_order');
+		$filter_order_Dir  = $model->getState('filter_order_Dir');
+
+		// Various filters
+		$filter_state     = $model->getState('filter_state');
+		$filter_assigned  = $model->getState('filter_assigned');
+
+		if (strlen($filter_state)) $count_filters++;
+		if (strlen($filter_assigned)) $count_filters++;
+
+		// Text search
+		$scope  = $model->getState('scope');
+		$search = $model->getState('search');
+		$search = StringHelper::trim(StringHelper::strtolower($search));
 
 
 		/**
@@ -96,7 +123,6 @@ class FlexicontentViewTagelement extends FlexicontentViewBaseRecords
 			// Load custom behaviours: form validation, popup tooltips
 			JHtml::_('behavior.formvalidation');
 			JHtml::_('bootstrap.tooltip');
-			JHtml::_('behavior.modal');
 
 			// Add js function to overload the joomla submitform validation
 			$document->addScript(JUri::root(true).'/components/com_flexicontent/assets/js/admin.js', array('version' => FLEXI_VHASH));
@@ -128,17 +154,114 @@ class FlexicontentViewTagelement extends FlexicontentViewBaseRecords
 
 		$rows = $this->get('Data');
 
-
 		if ( $print_logging_info ) @$fc_run_times['execute_main_query'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 
 		// Create pagination object
 		$pagination = $this->get('Pagination');
 
 
+		/**
+		 * Get assigned items (via separate query), do this is if not already retrieved
+		 * when we order by assigned items, then this is already done via main DB query
+		 */
+
+		if ($filter_order !== 'nrassigned')
+		{
+			$rowids = array();
+
+			foreach ($rows as $row)
+			{
+				$rowids[] = $row->id;
+			}
+
+			if ( $print_logging_info )  $start_microtime = microtime(true);
+			$rowtotals = $model->getAssignedItems($rowids);
+			if ( $print_logging_info ) @$fc_run_times['execute_sec_queries'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+
+			foreach ($rows as $row)
+			{
+				$row->nrassigned = isset($rowtotals[$row->id]) ? $rowtotals[$row->id]->nrassigned : 0;
+			}
+		}
+
+
 
 		/**
 		 * Create List Filters
 		 */
+
+		$lists = array();
+
+
+		// Build publication state filter
+		$fieldname = 'filter_state';
+		$elementid = 'filter_state';
+		$value     = $filter_state;
+
+		//$options = JHtml::_('jgrid.publishedOptions');
+		$options = array();
+
+		foreach ($model_s->supported_conditions as $condition_value => $condition_name)
+		{
+			$options[] = JHtml::_('select.option', $condition_value, JText::_($condition_name));
+		}
+		array_unshift($options, JHtml::_('select.option', '', '-'/*'FLEXI_STATE'*/));
+
+		$lists[$elementid] = $this->getFilterDisplay(array(
+			'label' => JText::_('FLEXI_STATE'),
+			'html' => JHtml::_('select.genericlist',
+				$options,
+				$fieldname,
+				array(
+					'class' => $this->select_class,
+					'size' => '1',
+					'onchange' => 'document.adminForm.limitstart.value=0; Joomla.submitform();',
+				),
+				'value',
+				'text',
+				$value,
+				$elementid,
+				$translate = true
+			),
+		));
+
+
+		// Build orphaned/assigned filter
+		$options = array(
+			JHtml::_('select.option',  '', '-'/*'FLEXI_ALL_TAGS'*/),
+			JHtml::_('select.option',  'O', 'FLEXI_ORPHANED'),
+			JHtml::_('select.option',  'A', 'FLEXI_ASSIGNED'),
+		);
+
+		$fieldname = 'filter_assigned';
+		$elementid = 'filter_assigned';
+		$value     = $filter_assigned;
+
+		$lists[$elementid] = $this->getFilterDisplay(array(
+			'label' => JText::_('FLEXI_ASSIGNED'),
+			'html' => JHtml::_('select.genericlist',
+				$options,
+				$fieldname,
+				array(
+					'class' => $this->select_class,
+					'size' => '1',
+					'onchange' => 'document.adminForm.limitstart.value=0; Joomla.submitform();',
+				),
+				'value',
+				'text',
+				$value,
+				$elementid,
+				$translate = true
+			),
+		));
+
+
+		// Build text search scope
+		$scopes = null;
+
+		$lists['scope_tip'] = '';
+		$lists['scope'] = $this->getScopeSelectorDisplay($scopes, $scope);
+		$this->scope_title = isset($scopes[$scope]) ? $scopes[$scope] : reset($scopes);
 
 
 		// Text search filter value
@@ -150,17 +273,20 @@ class FlexicontentViewTagelement extends FlexicontentViewBaseRecords
 		$lists['order']     = $filter_order;
 
 
-
-
 		/**
 		 * Assign data to template
 		 */
 
+		$this->count_filters = $count_filters;
 
 		$this->lists       = $lists;
 		$this->rows        = $rows;
 		$this->pagination  = $pagination;
 
+		$this->perms  = FlexicontentHelperPerm::getPerm();
+		$this->option = $option;
+		$this->view   = $view;
+		$this->state  = $this->get('State');
 
 		/**
 		 * Render view's template
