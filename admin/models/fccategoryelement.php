@@ -172,10 +172,11 @@ class FlexicontentModelFccategoryelement extends FCModelAdminList
 
 
 	/**
-	 * Method to get item data
+	 * Method to get records data
 	 *
-	 * @access public
-	 * @return object
+	 * @return array
+	 *
+	 * @since	3.3.0
 	 */
 	function getData()
 	{
@@ -283,8 +284,6 @@ class FlexicontentModelFccategoryelement extends FCModelAdminList
 
 		return $this->_total;
 	}
-
-
 
 
 	/**

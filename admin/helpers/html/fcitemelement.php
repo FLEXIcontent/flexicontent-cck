@@ -15,7 +15,7 @@ require_once('fcbase.php');
 
 
 /**
- * Fccats HTML helper
+ * Fcitemelement HTML helper
  *
  * @since  3.3
  */

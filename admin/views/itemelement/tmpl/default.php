@@ -78,6 +78,7 @@ $tools_state = isset($FcMansConf->$fc_man_name)
 	);
 
 
+
 /**
  * ICONS and reusable variables
  */
@@ -319,6 +320,9 @@ if ($js)
 	</div>
 
 
+	<div class="fcclear"></div>
+
+
 	<table id="adminListTableFC<?php echo $this->view; ?>" class="adminlist table fcmanlist" itemscope itemtype="http://schema.org/WebPage">
 	<thead>
 		<tr>
@@ -370,13 +374,15 @@ if ($js)
 
 	<tbody>
 		<?php
-		$k = 0;
 
 		// Add 1 collapsed row to the empty table to allow border styling to apply
 		if (!count($this->rows))
 		{
 			echo '<tr class="collapsed_row"><td colspan="'.$list_total_cols.'"></td></tr>';
 		}
+
+		// In the case we skip rows, we need a reliable incrementing counter with no holes, used for e.g. even / odd row class
+		$k = 0;
 
 		foreach ($this->rows as $i => $row)
 		{
@@ -510,6 +516,7 @@ if ($js)
 	</tbody>
 
 	</table>
+
 
 	<div>
 		<?php echo $pagination_footer; ?>
