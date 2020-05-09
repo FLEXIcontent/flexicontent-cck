@@ -1124,7 +1124,7 @@ jQuery(document).ready(function(){
 				<?php echo '<span class="badge badge-warning"> ' .sprintf('%.0f', (float) $row->rating) .'%</span>'; ?>
 			</td>
 
-			<td class="col_id center center hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<td class="col_id center hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo $row->id; ?>
 			</td>
 

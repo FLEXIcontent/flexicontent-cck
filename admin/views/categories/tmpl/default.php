@@ -625,7 +625,7 @@ if ($js)
 				?>
 			</td>
 
-			<td class="col_id small center hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<td class="col_id center hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo $row->id; ?>
 			</td>
 
@@ -651,7 +651,6 @@ if ($js)
 	<input type="hidden" name="newstate" id="newstate" value="" />
 	<input type="hidden" name="boxchecked" value="0" />
 	<input type="hidden" name="option" value="<?php echo $this->option; ?>" />
-	<!--input type="hidden" name="controller" value="<?php echo $this->view; ?>" /-->
 	<input type="hidden" name="view" value="<?php echo $this->view; ?>" />
 	<input type="hidden" name="task" value="" />
 	<input type="hidden" id="filter_order" name="filter_order" value="<?php echo $this->lists['order']; ?>" />
