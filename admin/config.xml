@@ -74,7 +74,7 @@
 
 		<field name="" type="separator" default="FLEXI_SEO_SEF_URLS" label="" level="level0" />
 
-			<field name="" type="separator" default="FLEXI_URL_SEGMENTS_CREATION" label="" level="level3" />
+			<field name="" type="separator" default="FLEXI_URL_SEGMENTS_CREATION" label="" level="level2" />
 
 			<field name="sef_ids" type="radio" default="0" label="JGLOBAL_SEF_NOIDS_LABEL" description="JGLOBAL_SEF_NOIDS_DESC" class="btn-group group-fcmethod" filter="integer" >
 				<option value="0">JNO</option>
@@ -92,7 +92,13 @@
 				<option value="2">FLEXI_DMI_ID_YES</option>
 			</field>
 
-			<field name="" type="separator" default="FLEXI_PATHWAY_BREADCRUMBS_MODULE" label="" level="level3" />
+			<field name="" type="separator" default="FLEXI_URLS_CONTENT_ALL_LANG" label="" level="level3" />
+			<field name="route_active_lang" type="fcradio" default="1" label="FLEXI_URLS_CONTENT_ALL_LANG_MENU_USAGE" description="FLEXI_URLS_CONTENT_ALL_LANG_MENU_USAGE_DESC" class="group-fcset fc-cleared">
+				<option value="0">FLEXI_MENUS_WITH_LANG_ALL</option>
+				<option value="1">FLEXI_MENUS_WITH_LANG_ALL_OR_CURRENT_UI_LANG</option>
+			</field>
+
+			<field name="" type="separator" default="FLEXI_PATHWAY_BREADCRUMBS_MODULE" label="" level="level2" />
 			<field name="default_menuitem_nopathway" type="fcradio" default="1" label="FLEXI_REMOVE_DEFAULT_MENU_ITEM_FROM_PATHWAY" description="FLEXI_REMOVE_DEFAULT_MENU_ITEM_FROM_PATHWAY_DESC" class="btn-group">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -102,7 +108,7 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 
-			<field name="" type="separator" default="FLEXI_SEARCH_ENGINE_INDEXING" label="" level="level3" />
+			<field name="" type="separator" default="FLEXI_SEARCH_ENGINE_INDEXING" label="" level="level2" />
 			<field name="add_canonical" type="fcradio" default="1" label="FLEXI_ADD_REL_CANONICAL" description="FLEXI_ADD_REL_CANONICAL_DESC" class="btn-group">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
