@@ -342,89 +342,28 @@ class FlexicontentViewCategory extends JViewLegacy
 		/**
 		 * Create the document title, by from page title and other data
 		 */
-
-		// Use the page heading as document title, (already calculated above via 'appropriate' logic ...)
-		// or the overriden custom <title> ... set via parameter
-		$doc_title = empty($meta_params)
-			? $params->get('page_title')
-			: $meta_params->get('page_title', $params->get('page_title'));
-
-		// Check and prepend or append site name to page title
-		if ($doc_title != $app->getCfg('sitename'))
+		if (file_exists(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'templates'.DS.$clayout.DS.'seo'.DS.'category'.DS.'layouts'.DS.'title.php'))
 		{
-			if ($app->getCfg('sitename_pagetitles', 0) == 1)
-			{
-				$doc_title = JText::sprintf('JPAGETITLE', $app->getCfg('sitename'), $doc_title);
-			}
-			elseif ($app->getCfg('sitename_pagetitles', 0) == 2)
-			{
-				$doc_title = JText::sprintf('JPAGETITLE', $doc_title, $app->getCfg('sitename'));
-			}
+			include(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'templates'.DS.$clayout.DS.'seo'.DS.'category'.DS.'layouts'.DS.'title.php');
 		}
-
-		// Finally, set document title
-		$document->setTitle($doc_title);
+		else
+		{
+			include(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'tmpl_common'.DS.'seo'.DS.'category'.DS.'layouts'.DS.'title.php');
+		}
 
 
 		/**
 		 * Set document's META tags
 		 */
-
-		// Workaround for Joomla not setting the default value for 'robots', so component must do it
-		$app_params = $app->getParams();
-		if (($_mp=$app_params->get('robots')))
+		if (file_exists(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'templates'.DS.$clayout.DS.'seo'.DS.'category'.DS.'layouts'.DS.'meta.php'))
 		{
-			$document->setMetadata('robots', $_mp);
+			include(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'templates'.DS.$clayout.DS.'seo'.DS.'category'.DS.'layouts'.DS.'meta.php');
+		}
+		else
+		{
+			include(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'tmpl_common'.DS.'seo'.DS.'category'.DS.'layouts'.DS.'meta.php');
 		}
 
-
-		/**
-		 * TAG + CATEGORY meta-description and meta-keywords
-		 * Possibly not set metadesc, metakey for authored items OR my items
-		 */
-		if ($metadesc)
-		{
-			$document->setDescription($metadesc);
-		}
-		if ($metakey)
-		{
-			$document->setMetadata('keywords', $metakey);
-		}
-
-
-		/**
-		 * Set metadata according to metadata parameters
-		 */
-		if ($meta_params && $meta_params->get('robots'))
-		{
-			$document->setMetadata('robots', $meta_params->get('robots'));
-		}
-
-		// This has been deprecated, the <title> tag is used instead by search engines
-		/*if ($app->getCfg('MetaTitle') == '1')
-		{
-			if ($meta_params && $meta_params->get('page_title'))
-			{
-				$document->setMetaData('title', $meta_params->get('page_title'));
-			}
-		}*/
-
-		if ($app->getCfg('MetaAuthor') == '1')
-		{
-			if ($meta_params && $meta_params->get('author'))
-			{
-				$document->setMetaData('author', $meta_params->get('author'));
-			}
-		}
-
-		// Overwrite with menu META data if menu matched
-		if ($menu_matches)
-		{
-			if (($_mp=$menu->params->get('menu-meta_description')))  $document->setDescription( $_mp );
-			if (($_mp=$menu->params->get('menu-meta_keywords')))     $document->setMetadata('keywords', $_mp);
-			if (($_mp=$menu->params->get('robots')))                 $document->setMetadata('robots', $_mp);
-			if (($_mp=$menu->params->get('secure')))                 $document->setMetadata('secure', $_mp);
-		}
 
 
 		/**
