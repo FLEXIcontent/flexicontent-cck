@@ -132,171 +132,25 @@ $db->setQuery($query);
 $use_editor = (boolean)$db->loadResult();
 if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please enable, simple textarea will be used for editting files'), 'warning');
 
+JText::script('FLEXI_TMPLS_LOAD_FILE_BEFORE_SAVING', true);
+JText::script('FLEXI_TMPLS_SAVE_BUILT_IN_TEMPLATE_FILE_WARNING', true);
+JText::script('FLEXI_SAVING', true);
+JText::script('FLEXI_LOADING', true);
 ?>
 
 <script>
-	function tmpls_fcfield_init_ordering() {
-	<?php echo $this->jssort . ';' ; ?>
-	}
-
-	var code_box_cnt = 0;
-	function toggle_code_inputbox(btn)
+	function tmpls_fcfield_init_ordering()
 	{
-		var _btn = jQuery(btn);
-		var el=jQuery(btn).next().next();
-
-		var becomes_visible = ! el.is(':visible');
-		el.toggle();
-		becomes_visible ? code_box_cnt++ : code_box_cnt--;
-		if (code_box_cnt<0) code_box_cnt = 0;
-
-		if (becomes_visible) {
-			_btn.addClass('btn-info').find('span').removeClass('icon-eye').addClass('icon-eye-close');
-			el.get(0).select();
-			el.prev().show(400);
-		} else {
-			_btn.removeClass('btn-info').find('span').removeClass('icon-eye-close').addClass('icon-eye');
-			el.prev().hide(400);
-		}
+		<?php echo $this->jssort . ';' ; ?>
 	}
 
-	function set_editor_contents(txtarea, theData, extension)
-	{
-		var CM = txtarea.next();//.get(0).CodeMirror;
-		if (CM.hasClass('CodeMirror'))
-		{
-			CM.get(0).CodeMirror.toTextArea();
-			txtarea.val(theData.content);
-			txtarea.attr('form', 'layout_file_editor_form');
-			txtarea.show();
-			CM = CodeMirror.fromTextArea(txtarea.get(0),
-			{
-				mode: extension,
-				indentUnit: 2,
-				lineNumbers: true,
-				matchBrackets: true,
-				lineWrapping: true,
-				onCursorActivity: function()
-				{
-					CM.setLineClass(hlLine, null);
-					hlLine = CM.setLineClass(CM.getCursor().line, "activeline");
-				}
-			});
-		}
-		else
-		{
-			txtarea.val(theData.content);
-			txtarea.show();
-		}
-
-		CM.getWrapperElement().style['font-size'] = 14 + 'px';
-		CM.getWrapperElement().style['font-weight'] = 'bold';
-		CM.getWrapperElement().style['font-family'] = 'Courier New';
-		CM.refresh();
-	}
-
-	function save_layout_file(formid)
-	{
-		var form = jQuery('#'+formid);
-		var layout_name  = jQuery('#editor__layout_name').val();
-		var file_subpath = jQuery('#editor__file_subpath').val();
-		if (file_subpath=='') {
-			alert(<?php echo "'".JText::_('FLEXI_TMPLS_LOAD_FILE_BEFORE_SAVING', true)."'"; ?>);
-			return;
-		}
-
-		<?php
-		if (in_array($this->layout->name, array('grid','table','faq','items-tabbed'))) {
-			echo 'if (!confirm("'.JText::_('FLEXI_TMPLS_SAVE_BUILT_IN_TEMPLATE_FILE_WARNING', true).'")) return false;';
-		}
-		?>
-
-		txtarea = jQuery('#editor__file_contents');
-		txtarea.before('<span id="fc_doajax_loading"><img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center" /> ... <?php echo JText::_("FLEXI_SAVING");?><br/></span>');
-
-		// Set the current codemirror data into the textarea before serializing and submit the form via AJAX
-		var CM = txtarea.next();//.get(0).CodeMirror;
-		if (CM.hasClass('CodeMirror')) {
-			var file_contents = CM.get(0).CodeMirror.getValue();
-			txtarea.val(file_contents);
-		}
-
-		jQuery.ajax({
-			type: "POST",
-			url: "index.php?option=com_flexicontent&task=templates.savelayoutfile&format=raw",
-			data: form.serialize(),
-			success: function (data) {
-				jQuery('#fc_doajax_loading').remove();
-				var theData = jQuery.parseJSON(data);
-				jQuery('#ajax-system-message-container').html(theData.sysmssg);
-				if (!theData.content) return;  // Saving task may return modified data, if so set them into the editor
-
-				var extension = jQuery('#editor__file_subpath').val().split('.').pop().toLowerCase();
-				set_editor_contents(txtarea, theData, extension);
-			}
-		});
-	}
-
-	function load_layout_file(layout_name, file_subpath, load_mode, btn_classes)
-	{
-		var layout_name  = (typeof layout_name != "undefined"  && layout_name!='')  ? layout_name  : jQuery('#editor__layout_name').val();
-		var file_subpath = (typeof file_subpath != "undefined" && file_subpath!='') ? file_subpath : jQuery('#editor__file_subpath').val();
-		var btn_classes = (typeof btn_classes != "undefined") ? btn_classes : '';
-		if (btn_classes=='-1') btn_classes = jQuery('#editor__btn_classes').val();
-
-		var load_mode = (typeof load_mode != "undefined") ? load_mode : 0;
-		var form = jQuery('#layout_file_editor_form');
-
-		jQuery('#editor__layout_name').val(layout_name);
-		jQuery('#editor__file_subpath').val(file_subpath);
-		jQuery('#editor__load_mode').val(load_mode);
-		jQuery('#editor__btn_classes').val(btn_classes);
-
-		jQuery('.code_box').hide();
-		btn_classes = btn_classes!='' ? btn_classes.split(" ") : Array();
-		jQuery.each( btn_classes, function( cname, val ) {
-			jQuery('.'+val).show();
-		});
-		if (btn_classes.length)
-			jQuery('#code_box_header').css('display', '');
-		else
-			jQuery('#code_box_header').css('display', 'none');
-
-		if (load_mode == '2') {
-			form.submit();
-			return;
-		}
-
-		txtarea = jQuery('#editor__file_contents');
-		txtarea.before('<span id="fc_doajax_loading"><img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center" /> ... <?php echo JText::_("FLEXI_LOADING");?><br/></span>');
-		txtarea.hide();
-		jQuery('#layout_edit_name_container').html(file_subpath);
-
-		jQuery.ajax({
-			type: form.attr('method'),
-			url: form.attr('action'),
-			data: { layout_name: layout_name, file_subpath: file_subpath, load_mode: load_mode, '<?php echo JSession::getFormToken();?>': 1 },
-			success: function (data) {
-				jQuery('#fc_doajax_loading').remove();
-				var theData = jQuery.parseJSON(data);
-				jQuery('#ajax-system-message-container').html(theData.sysmssg);
-
-				var extension = file_subpath.split('.').pop().toLowerCase();
-				extension == 'css' ?
-					jQuery('#edit-css-files-warning').show() :
-					jQuery('#edit-css-files-warning').hide() ;
-
-				// Loading task always return data, even empty data, set them into the editor
-				set_editor_contents(txtarea, theData, extension);
-
-				// Display the buttons
-				jQuery('#editor__save_file_btn').css('display', '');
-				jQuery('#editor__download_file_btn').css('display', '');
-				jQuery('#editor__load_common_file_btn').css('display', parseInt(theData.default_exists) ? '' : 'none');
-			}
-		});
-	}
+	var jformToken   = '<?php echo JSession::getFormToken();?>';
+	var isCoreLayout = <?php echo in_array($this->layout->name, array('blog','default','faq','items-tabbed','presentation')) ? 1: 0;?>
 </script>
+
+<?php
+$this->document->addScript(JUri::base(true).'/components/com_flexicontent/assets/js/layout_editor.js', array('version' => FLEXI_VHASH));
+?>
 
 <div id="flexicontent" class="flexicontent">
 
