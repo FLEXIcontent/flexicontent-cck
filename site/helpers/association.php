@@ -51,16 +51,9 @@ abstract class FlexicontentHelperAssociation extends CategoryHelperAssociation
 				return self::_getMenuAssociations($view, $id);
 			}
 
-			$category = JTable::getInstance('flexicontent_categories', '');
-
 			foreach ($associations as $tag => $assoc)
 			{
-				$category->load(array('id' => $assoc->catid));
-
-				$title_slug = $assoc->id . ':' . $assoc->alias;
-				$cat_slug   = $category->id . ':' . $category->alias;
-
-				$return[$tag] = FlexicontentHelperRoute::getItemRoute($title_slug, $cat_slug, 0, $assoc);
+				$return[$tag] = FlexicontentHelperRoute::getItemRoute($assoc->title_slug, $assoc->cat_slug, 0, $assoc);
 			}
 			return $return;
 		}
@@ -76,15 +69,11 @@ abstract class FlexicontentHelperAssociation extends CategoryHelperAssociation
 				return self::_getMenuAssociations($view, $cid);
 			}
 
-			$category = JTable::getInstance('flexicontent_categories', '');
-			$urlvars  = flexicontent_html::getCatViewLayoutVars($catmodel = null, $use_slug = true);
+			$urlvars = flexicontent_html::getCatViewLayoutVars($catmodel = null, $use_slug = true);
 
 			foreach ($associations as $tag => $assoc)
 			{
-				$category->load(array('id' => $assoc->id));
-				$title_slug = $category->id . ':' . $category->alias;
-
-				$return[$tag] = FlexicontentHelperRoute::getCategoryRoute($title_slug, 0, $urlvars, $assoc);
+				$return[$tag] = FlexicontentHelperRoute::getCategoryRoute($assoc->title_slug, 0, $urlvars, $assoc);
 			}
 
 			return $return;
@@ -106,9 +95,9 @@ abstract class FlexicontentHelperAssociation extends CategoryHelperAssociation
 		}
 
 		$db = JFactory::getDbo();
-		$query = 'SELECT i.language, ie.type_id, '
-			. '  CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(":", i.id, i.alias) ELSE i.id END as id, '
-			. '  CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(":", c.id, c.alias) ELSE c.id END as catid '
+		$query = 'SELECT i.language, ie.type_id, i.id, i.catid, '
+			. '  CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(":", i.id, i.alias) ELSE i.id END as title_slug, '
+			. '  CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(":", c.id, c.alias) ELSE c.id END as cat_slug '
 			. ' FROM #__associations AS a'
 			. ' JOIN #__associations AS k ON a.`key`=k.`key`'
 			. ' JOIN #__content AS i ON i.id = k.id'
@@ -130,8 +119,8 @@ abstract class FlexicontentHelperAssociation extends CategoryHelperAssociation
 		}
 
 		$db = JFactory::getDbo();
-		$query = 'SELECT c.language, '
-			. '  CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(":", c.id, c.alias) ELSE c.id END as catid '
+		$query = 'SELECT c.language, c.id, '
+			. '  CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(":", c.id, c.alias) ELSE c.id END as title_slug '
 			. ' FROM #__associations AS a'
 			. ' JOIN #__associations AS k ON a.`key`=k.`key`'
 			. ' JOIN #__categories AS c ON c.id = k.id '
@@ -240,7 +229,7 @@ abstract class FlexicontentHelperAssociation extends CategoryHelperAssociation
 		$cat = JTable::getInstance('flexicontent_categories', '');
 		$cat->load(array('id' => $matched_cid));
 
-		return $matched_cid . ':' . ($cat ? $cat->alias : '');
+		return $matched_cid . ($cat ? ':' . $cat->alias : '');
 	}
 }
 
