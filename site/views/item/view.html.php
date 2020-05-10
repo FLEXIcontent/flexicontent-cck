@@ -220,83 +220,31 @@ class FlexicontentViewItem extends JViewLegacy
 		// This was done inside model, because we have set the merge parameters flag
 
 
-
-		// ***
-		// *** Create the document title, by from page title and other data
-		// ***
-
-		// Use the page heading as document title, (already calculated above via 'appropriate' logic ...)
-		// or the overriden custom <title> ... set via parameter
-		$doc_title = !$params->get('override_title', 0)  ?  $params->get( 'page_title' )  :  $params->get( 'custom_ititle', $item->title);
-
-		// Check and prepend category title
-		if ( $params->get('addcat_title', 1) && count($parents) )
+		/**
+		 * Create the document title, using page title and other data
+		 */
+		if (file_exists(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'templates'.DS.$ilayout.DS.'seo'.DS.'item'.DS.'layouts'.DS.'title.php'))
 		{
-			if ( isset($item->category_title) )
-			{
-				if ( $params->get('addcat_title', 1) == 1) { // On Left
-					$doc_title = JText::sprintf('FLEXI_PAGETITLE_SEPARATOR', $item->category_title, $doc_title);
-				}
-				else { // On Right
-					$doc_title = JText::sprintf('FLEXI_PAGETITLE_SEPARATOR', $doc_title, $item->category_title);
-				}
-			}
+			include(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'templates'.DS.$ilayout.DS.'seo'.DS.'item'.DS.'layouts'.DS.'title.php');
 		}
-
-		// Check and prepend or append site name to page title
-		if ( $doc_title != $app->getCfg('sitename') )
+		else
 		{
-			if ($app->getCfg('sitename_pagetitles', 0) == 1)
-			{
-				$doc_title = JText::sprintf('JPAGETITLE', $app->getCfg('sitename'), $doc_title);
-			}
-			elseif ($app->getCfg('sitename_pagetitles', 0) == 2)
-			{
-				$doc_title = JText::sprintf('JPAGETITLE', $doc_title, $app->getCfg('sitename'));
-			}
+			include(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'tmpl_common'.DS.'seo'.DS.'item'.DS.'layouts'.DS.'title.php');
 		}
 
-		// Finally, set document title
-		$document->setTitle($doc_title);
 
-
-
-		// ***
-		// *** Set document's META tags
-		// ***
-
-		// Workaround for Joomla not setting the default value for 'robots', so component must do it
-		$app_params = $app->getParams();
-		if (($_mp=$app_params->get('robots')))    $document->setMetadata('robots', $_mp);
-
-		// Set item's META data: desc, keyword, title, author
-		if ($item->metadesc)		$document->setDescription( $item->metadesc );
-		if ($item->metakey)			$document->setMetadata('keywords', $item->metakey);
-
-		// This has been deprecated, the <title> tag is used instead by search engines
-		if (0 && $app->getCfg('MetaTitle') == '1')
+		/**
+		 * Set document's META tags
+		 */
+		if (file_exists(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'templates'.DS.$ilayout.DS.'seo'.DS.'item'.DS.'layouts'.DS.'meta.php'))
 		{
-			$document->setMetaData('title', $item->title);
+			include(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'templates'.DS.$ilayout.DS.'seo'.DS.'item'.DS.'layouts'.DS.'meta.php');
 		}
-		if ($app->getCfg('MetaAuthor') == '1')
+		else
 		{
-			$document->setMetaData('author', $item->author);
+			include(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'tmpl_common'.DS.'seo'.DS.'item'.DS.'layouts'.DS.'meta.php');
 		}
 
-		// Set remaining META keys
-		$mdata = $item->metadata->toArray();
-		foreach ($mdata as $k => $v)
-		{
-			if ($v)  $document->setMetadata($k, $v);
-		}
-
-		// Overwrite with menu META data if menu matched
-		if ($model->menu_matches) {
-			if (($_mp=$menu->params->get('menu-meta_description')))  $document->setDescription( $_mp );
-			if (($_mp=$menu->params->get('menu-meta_keywords')))     $document->setMetadata('keywords', $_mp);
-			if (($_mp=$menu->params->get('robots')))                 $document->setMetadata('robots', $_mp);
-			if (($_mp=$menu->params->get('secure')))                 $document->setMetadata('secure', $_mp);
-		}
 
 
 
