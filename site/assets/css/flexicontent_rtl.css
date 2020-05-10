@@ -3720,36 +3720,21 @@ select[multiple].use_select2_lib:focus {
 	color: #555;
 	background: white 30px 40px no-repeat;
 	width: auto;
-<<<<<<< HEAD
 	padding: 2em 2em 3em 2em;
 	margin: 0px;
 	border-radius: 0.5em;
 	text-align: center;
 	width: 280px;
-=======
-	padding: 26px 31px 26px 31px;
-	margin: 0px;
-	font-size: 12px;
-	font-weight: bold;
-	border: 0px solid lightgray;
-	border-radius: 8px;
-	text-align: right;
-	width: 300px;
->>>>>>> 472c6475b (Adding RGBA in all color fields for template)
 	-webkit-transform: translate(-50%,0);
 	transform: translate(-50%,0);
 }
 #fc_filter_form_blocker .fc_blocker_bar {
 	display: block;
-<<<<<<< HEAD
 	box-sizing: content-box !important;
 	position: relative !important;
 	right: 0;
 	top: 1.5em;
 	width: 100%;
-=======
-	width: 265px;
->>>>>>> 472c6475b (Adding RGBA in all color fields for template)
 	height: 22px;
 	border-radius: 4px;
 	background-color: #f5f5f5;
