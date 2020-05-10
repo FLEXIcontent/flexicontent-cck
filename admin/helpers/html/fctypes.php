@@ -30,4 +30,5 @@ abstract class JHtmlFctypes extends JHtmlFcbase
 	static $title_propname = 'name';
 	static $state_propname = 'published';
 	static $layout_type = 'items';
+	static $translateable_props = array('name');
 }

@@ -228,6 +228,7 @@ abstract class JHtmlFcbase
 		$title = in_array(static::$title_propname, static::$translateable_props)
 			? JText::_($row->{static::$title_propname})
 			: $row->{static::$title_propname};
+		$title_original = $title;
 
 		// Limit title length
 		$row->title_cut = StringHelper::strlen($title) > 100
@@ -237,7 +238,9 @@ abstract class JHtmlFcbase
 
 		// Escape & translate
 		$title_escaped = htmlspecialchars($row->title_cut, ENT_QUOTES, 'UTF-8');
-		$title_untranslated = $title !== $row->{static::$title_propname} ? '<br/><small>[ ' . $title_cut . ' ]</small>' : '';
+		$title_untranslated = $title !== $row->{static::$title_propname}
+			? '<span class="icon-flag" title="' . htmlspecialchars($row->{static::$title_propname}, ENT_QUOTES, 'UTF-8') . '"></span>'
+			: '';
 
 		// Display title with no edit link ... if row is not-editable for any reason (no ACL or checked-out by other user)
 		if (!$canEdit || ($row->checked_out && (int) $row->checked_out !== (int) JFactory::getUser()->id))
@@ -478,6 +481,10 @@ abstract class JHtmlFcbase
 	{
 		$uncut_length = 0;
 
+		$title = in_array(static::$title_propname, static::$translateable_props)
+			? JText::_($row->{static::$title_propname})
+			: $row->{static::$title_propname};
+
 		$text = !$row->$propname ? '' : flexicontent_html::striptagsandcut(
 			$row->$propname,
 			$cut_text_length = 50,
@@ -487,7 +494,7 @@ abstract class JHtmlFcbase
 				'more_toggler' => false,//true,
 				'more_icon' => 'icon-paragraph-center',
 				'more_txt' => 2,
-				'modal_title' => $row->{static::$title_propname}
+				'modal_title' => $title
 			)
 		);
 
