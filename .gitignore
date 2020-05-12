@@ -64,6 +64,7 @@ site/librairies/cropper/
 site/librairies/phpthumb/phpThumb.config_OVERRIDE.php
 site/tasks/defines.php
 admin/tasks/defines.php
+admin/flexicontent.xml
 
 plugins/flexicontent_fields/currency/
 plugins/flexicontent_fields/mediaplayer/
