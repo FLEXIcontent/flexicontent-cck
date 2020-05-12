@@ -152,7 +152,7 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 		// Create document/toolbar titles
 		$doc_title = JText::_( 'FLEXI_DASHBOARD' );
 		$site_title = $document->getTitle();
-		JToolbarHelper::title( $doc_title, 'flexicontent' );
+		JToolbarHelper::title( $doc_title, 'home' );
 		$document->setTitle($doc_title .' - '. $site_title);
 
 		$js = "jQuery(document).ready(function(){";
