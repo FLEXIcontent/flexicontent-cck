@@ -340,6 +340,12 @@ class FlexicontentViewCategory extends JViewLegacy
 
 
 		/**
+		 * Render a basic display for filter value data 
+		 */
+		FlexicontentFields::getBasicFilterData($category, $filters);
+
+
+		/**
 		 * Create the document title, by from page title and other data
 		 */
 		if (file_exists(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'templates'.DS.$clayout.DS.'seo'.DS.'category'.DS.'layouts'.DS.'title.php'))

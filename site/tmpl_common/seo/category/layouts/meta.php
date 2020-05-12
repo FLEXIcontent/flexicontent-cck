@@ -1,20 +1,28 @@
 <?php
-
 /**
- * Set document's META tags
+ * Set document's META tags, using things like
+ *
+ * - category META
+ * - menu META
+ * - CATEGORY FILTER VALUES 
  * 
  * Please notice that at the END of this code, we check if active
  * menu is an exact match of the view, then we overwrite meta tags
  *
- * If you do a more detailed setting of META then comment out the code that set's META tags using MENU Meta
+ * WARNING !! : If you do a more detailed setting of META then remember to comment out
+ *              the code that set's META tags using MENU Meta, at the end of this code
  *
- * These replacements can be used
- *   {{fieldname}}
- *   {{fieldname:displayname}}
- *   {{fieldname:label}}
+ * Example of useful field data (following code is testing code to prints them)
  *
- * for language string use
- *   JText::_('LANG_STRING_NAME')
+
+	echo '<pre>';
+	$filter_A = $filters['some_fieldname'];   // One of the category view's filters
+	$filter_A->raw_values;                    // Array of raw uncompressed field VALUEs, to test use:    // echo '<pre>'; print_r($field_A->raw_values); echo '</pre>';
+	$filter_A->basic_texts;                   // Array of basic textual display of VALUEs, to test use:  // echo '<pre>'; print_r($field_A->basic_texts); echo '</pre>';
+	echo JText::_('LANG_STRING_NAME');        // A Joomla language string
+	echo '<pre>';
+
+ *
  */
 
 
