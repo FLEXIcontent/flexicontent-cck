@@ -3564,11 +3564,15 @@ class FlexicontentFields
 		else if ($return_sql===2)
 		{
 			static $iids_tblname  = array();
-			if ( !isset($iids_tblname[$filter->id]) )
+
+			$tbl_id = $filter->id . (isset($filter->filt_prop_name) ? '_' . $filter->filt_prop_name : '');
+
+			if (!isset($iids_tblname[$tbl_id]))
 			{
-				$iids_tblname[$filter->id] = 'fc_filter_iids_'.$filter->id;
+				$iids_tblname[$tbl_id] = 'fc_filter_iids_' . $tbl_id;
 			}
-			$tmp_tbl = $iids_tblname[$filter->id];
+
+			$tmp_tbl = $iids_tblname[$tbl_id];
 
 			try {
 				// Use sub-query on temporary table
@@ -3665,11 +3669,15 @@ class FlexicontentFields
 		else if ($return_sql===2)
 		{
 			static $iids_tblname  = array();
-			if ( !isset($iids_tblname[$filter->id]) )
+
+			$tbl_id = $filter->id . (isset($filter->filt_prop_name) ? '_' . $filter->filt_prop_name : '');
+
+			if (!isset($iids_tblname[$tbl_id]))
 			{
-				$iids_tblname[$filter->id] = 'fc_filter_iids_'.$filter->id;
+				$iids_tblname[$tbl_id] = 'fc_filter_iids_' . $tbl_id;
 			}
-			$tmp_tbl = $iids_tblname[$filter->id];
+
+			$tmp_tbl = $iids_tblname[$tbl_id];
 
 			try {
 				// Use sub-query on temporary table
