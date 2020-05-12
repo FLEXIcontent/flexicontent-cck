@@ -717,7 +717,6 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 
 		<div class="tabbertab" id="tabset_layout_edit_files_tab" data-icon-class="icon-signup" >
 			<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_EDIT_LAYOUT_FILES' ); ?></h3>
-
 			<div id="layout-filelist-container" class="span4" style="margin:0.5%;">
 				<span class="fcsep_level0" style="margin:0 0 12px 0; background-color:#333; ">
 					<span class="badge"><?php echo JText::_( 'FLEXI_LAYOUT_FILES' ); ?></span>
@@ -726,7 +725,7 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 				<?php
 				$tmpldir = JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'templates'.DS.$this->layout->name;
 
-				$it = new RegexIterator(new RecursiveIteratorIterator(new RecursiveDirectoryIterator($tmpldir)), '#('.$this->layout->view.'(_.*\.|\.)(php|xml|less|css|js)|include.*less)#i');
+				$it = new RegexIterator(new RecursiveIteratorIterator(new RecursiveDirectoryIterator($tmpldir)), '#('.$this->layout->view.'(_.*\.|\.)(php|xml|less|css|js)|include.*less|seo.{1}'.$this->layout->view.'.*php)#i');
 				//$it = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($tmpldir));
 				$it->rewind();
 				$ext_badge = array('php'=>'success', 'xml'=>'info', 'css'=>'warning', 'js'=>'important', 'ini'=>'info', 'less'=>'inverse');
@@ -748,6 +747,8 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 					'category_alpha.php'=>'Displays the alphanumerical index of the item list',
 					'category_peercategories.php'=>'Displays the peer categories list',
 					'category_subcategories.php'=>'Display the sub-categories list',
+					'title.php'=>'Create an appropriate document title &lt;title&gt; and page title &lt;h1&gt;',
+					'meta.php'=>'Set document\'s META tags',
 				);
 				$file_tip['item_html5.php'] = $file_tip['item.php'].' (HTML5 version)';
 				$file_tip['category_items_html5.php'] = $file_tip['category_items.php'].' (HTML5 version)';
@@ -815,7 +816,7 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 							'<img src="components/com_flexicontent/assets/images/comments.png" data-placement="bottom" class="'.$tip_class.'" title="'.$file_tip_extra[$filename].'" alt="Edit file"/>'
 						).'
 						<a href="javascript:;" class="'.$tip_class.'" data-placement="right" onclick="load_layout_file(\''.addslashes($this->layout->name).'\', \''.addslashes($it->getSubPathName()).'\', \'0\', \''.implode(' ', $btn_allowed).'\'); return false;"
-						title="'.(isset($file_tip[$filename]) ? $file_tip[$filename] : $ext.' file').'">'
+						title="'.htmlspecialchars(isset($file_tip[$filename]) ? $file_tip[$filename] : $ext.' file', ENT_COMPAT, 'UTF-8').'">'
 							.$subpath_highlighted.'&nbsp;'.$filename.
 						'</a>'
 						;
@@ -895,6 +896,7 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 				<?php endforeach; ?>
 
 			</div>
+			<div class="fcclear"></div>
 
 		</div>
 
