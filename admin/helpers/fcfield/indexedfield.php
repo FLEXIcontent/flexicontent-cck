@@ -1196,16 +1196,8 @@ class FCIndexedField extends FCField
 
 		if (empty($values) && !$display_all)
 		{
-			if (!$is_ingroup)
-			{
-				$field->{$prop} = '';
-				$field->display_index = '';
-			}
-			else
-			{
-				$field->{$prop} = array();
-				$field->display_index = array();
-			}
+			$field->{$prop}       = $is_ingroup ? array() : '';
+			$field->display_index = $is_ingroup ? array() : '';
 
 			return;
 		}
@@ -1282,28 +1274,45 @@ class FCIndexedField extends FCField
 
 		// Get indexed element values
 		$elements = FlexicontentFields::indexedField_getElements($field, $item, static::$extra_props);
-		if ( !$elements ) {
-			if ($sql_mode)
-				$field->{$prop} = JText::_('FLEXI_FIELD_INVALID_QUERY');
-			else
-				$field->{$prop} = JText::_('FLEXI_FIELD_INVALID_ELEMENTS');
+
+		// Allow access to elements into layouts
+		$field->elements = & $elements;
+
+		// Check for no elements found
+		if (!$elements)
+		{
+			$error_text = $sql_mode
+				? JText::_('FLEXI_FIELD_INVALID_QUERY')
+				: JText::_('FLEXI_FIELD_INVALID_ELEMENTS');
+
+			$field->{$prop}       = $is_ingroup ? array($error_text) : $error_text;
+			$field->display_index = $is_ingroup ? array() : '';
+
 			return;
 		}
-		// Check for no elements found
-		if ( empty($elements) )  { $field->{$prop} = ''; $field->display_index = ''; return; }
 
 
-		// Handle case of FORM fields that each value is an array of values
-		// (e.g. selectmultiple, checkbox), and that multi-value input is also enabled
-		// we make sure that values should be an array of arrays
+		/**
+		 * Handle case of FORM fields that each value is an array of values
+		 * (e.g. selectmultiple, checkbox), and that multi-value input is also enabled
+		 * we make sure that values should be an array of arrays
+		 */
 		$is_2lvl_arr = false;
+
 		if (is_array($values))
 		{
 			$v = reset($values);
 			$is_2lvl_arr = is_array($v);
 		}
-		$values = ($multiple && static::$valueIsArr) || $is_2lvl_arr ? $values : array($values);
-		if ( !$values ) $values = array();
+
+		$values = ($multiple && static::$valueIsArr) || $is_2lvl_arr
+			? $values
+			: array($values);
+
+		if (!$values)
+		{
+			$values = array();
+		}
 
 
 		// Get layout name
@@ -1312,7 +1321,7 @@ class FCIndexedField extends FCField
 
 		// Create field's HTML, using layout file
 		$field->{$prop} = array();
-		$display_index = array();
+		$display_index  = array();
 
 		// Create field's HTML, using layout file
 		include(self::getViewPath($field->field_type, $viewlayout));
@@ -1334,7 +1343,7 @@ class FCIndexedField extends FCField
 			{
 				$sep = $prop !== 'csv_export' ? '' : ' -- ';
 
-				$field->{$prop} = implode($sep, $field->{$prop});
+				$field->{$prop}       = implode($sep, $field->{$prop});
 				$field->display_index = implode($sep, $display_index);
 			}
 
