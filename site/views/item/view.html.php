@@ -201,21 +201,35 @@ class FlexicontentViewItem extends JViewLegacy
 		$item->readmore_link = JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, 0, $item));
 
 
-		// ***
-		// *** Get Item's Fields
-		// ***
+		/**
+		 * Get Item's Fields
+		 */
 
 		$_items = array(&$item);
+
 		FlexicontentFields::getFields($_items, FLEXI_ITEMVIEW, $params, $aid);
+
 		if (isset($item->fields))
+		{
 			$fields = & $item->fields;
+		}
 		else
+		{
 			$fields = array();
+		}
 
 
-		// ***
-		// *** Calculate a (browser window) page title and a page heading
-		// ***
+
+		/**
+		 * Render a basic display for field value data 
+		 */
+		FlexicontentFields::getBasicFieldData($item, $item->fields);
+
+
+
+		/**
+		 * Calculate a (browser window) page title and a page heading
+		 */
 
 		// This was done inside model, because we have set the merge parameters flag
 
@@ -248,9 +262,9 @@ class FlexicontentViewItem extends JViewLegacy
 
 
 
-		// ***
-		// *** Increment the hit counter
-		// ***
+		/**
+		 * Increment the hit counter
+		 */
 
 		// MOVED to flexisystem plugin to avoid view caching preventing its updating
 		/*if (FLEXIUtilities::count_new_hit($item->id) )
@@ -260,28 +274,38 @@ class FlexicontentViewItem extends JViewLegacy
 
 
 
-		// ***
-		// *** Load template css/js and set template data variable
-		// ***
+		/**
+		 * Load template css/js and set template data variable
+		 */
 
-		$tmplvar	= $themes->items->{$ilayout}->tmplvar;
-		if ($ilayout) {
+		$tmplvar = $themes->items->{$ilayout}->tmplvar;
+
+		if (!$ilayout)
+		{
+			$tmpl = '.items.default';
+		}
+		else
+		{
 			// Add the templates css files if availables
-			if (isset($themes->items->{$ilayout}->css)) {
-				foreach ($themes->items->{$ilayout}->css as $css) {
+			if (isset($themes->items->{$ilayout}->css))
+			{
+				foreach ($themes->items->{$ilayout}->css as $css)
+				{
 					$document->addStyleSheet($this->baseurl.'/'.$css);
 				}
 			}
+
 			// Add the templates js files if availables
-			if (isset($themes->items->{$ilayout}->js)) {
-				foreach ($themes->items->{$ilayout}->js as $js) {
+			if (isset($themes->items->{$ilayout}->js))
+			{
+				foreach ($themes->items->{$ilayout}->js as $js)
+				{
 					$document->addScript($this->baseurl.'/'.$js);
 				}
 			}
+
 			// Set the template var
 			$tmpl = $themes->items->{$ilayout}->tmplvar;
-		} else {
-			$tmpl = '.items.default';
 		}
 
 		// Just put item's text (description field) inside property 'text' in case the events modify the given text,

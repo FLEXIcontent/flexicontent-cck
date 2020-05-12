@@ -1,20 +1,28 @@
 <?php
-
 /**
- * Create the document title, using page title and other data
- * 
- * Setting
- * - a proper HTML DOCUMENT TITLE <title>  --  $document->setTitle(...);
- * - a PAGE TITLE <h1>                     --  $category->title =  ' ... ' . $category->title . ' ... ';
- * improves SEO of your content
+ * Create an appropriate document title, using things like
  *
- * These replacements can be used
- *   {{fieldname}}
- *   {{fieldname:displayname}}
- *   {{fieldname:label}}
+ * - category title
+ * - site name
+ * - CATEGORY FILTER VALUES 
  *
- * for language string use
- *   JText::_('LANG_STRING_NAME')
+ * This improves SEO of your content
+ *
+ * And then set them using the following commands
+ * - HTML DOCUMENT TITLE <title>     --    $document->setTitle(...);
+ * - PAGE TITLE <h1>                 --    $item->title =  ' ... ' . $item->title . ' ... ';
+ *
+ * Example of useful field data (following code is testing code to prints them)
+ *
+
+	echo '<pre>';
+	$filter_A = $filters['some_fieldname'];   // One of the category view's filters
+	$filter_A->raw_values;                    // Array of raw uncompressed field VALUEs, to test use:    // echo '<pre>'; print_r($field_A->raw_values); echo '</pre>';
+	$filter_A->basic_texts;                   // Array of basic textual display of VALUEs, to test use:  // echo '<pre>'; print_r($field_A->basic_texts); echo '</pre>';
+	echo JText::_('LANG_STRING_NAME');        // A Joomla language string
+	echo '<pre>';
+
+ *
  */
 
 

@@ -1,27 +1,40 @@
 <?php
-
 /**
- * Create the document title, using page title and other data
- * 
- * Setting
- * - a proper HTML DOCUMENT TITLE <title>  --  $document->setTitle(...);
- * - a PAGE TITLE <h1>                     --  $item->title =  ' ... ' . $item->title . ' ... ';
- * improves SEO of your content
+ * Create an appropriate document title, using things like
  *
- * These replacements can be used
- *   {{fieldname}}
- *   {{fieldname:displayname}}
- *   {{fieldname:label}}
+ * - item title
+ * - category title
+ * - site name
+ * - ITEM FIELDS VALUES
  *
- * for language string use
- *   JText::_('LANG_STRING_NAME')
+ * This improves SEO of your content
+ *
+ * And then set them using the following commands
+ * - HTML DOCUMENT TITLE <title>     --    $document->setTitle(...);
+ * - PAGE TITLE <h1>                 --    $item->title =  ' ... ' . $item->title . ' ... ';
+ *
+ * Example of useful field data (following code is testing code to prints them)
+ *
+
+	echo '<pre>';
+	$field_A = $item->fields['some_fieldname'];   // One of the fields
+	$field_A->raw_values;                         // Array of raw uncompressed field VALUEs, to test use:    // echo '<pre>'; print_r($field_A->raw_values); echo '</pre>';
+	$field_A->basic_texts;                        // Array of basic textual display of VALUEs, to test use:  // echo '<pre>'; print_r($field_A->basic_texts); echo '</pre>';
+	echo JText::_('LANG_STRING_NAME');            // A Joomla language string
+	echo '<pre>';
+
+ *
  */
 
 
 
-// Use the page heading as document title, (already calculated above via 'appropriate' logic ...)
-// or the overriden custom <title> ... set via parameter
-$doc_title = !$params->get('override_title', 0)  ?  $params->get( 'page_title' )  :  $params->get( 'custom_ititle', $item->title);
+/**
+ * Use the page heading as document title, (already calculated above via 'appropriate' logic ...)
+ * or the overriden custom <title> ... set via parameter
+ */
+$doc_title = !$params->get('override_title', 0)
+	? $params->get('page_title')
+	: $params->get('custom_ititle', $item->title);
 
 
 // Check and prepend category title
@@ -39,8 +52,10 @@ if ( $params->get('addcat_title', 1) && count($parents) )
 }
 
 
-// Check and prepend or append site name to page title
-if ( $doc_title != $app->getCfg('sitename') )
+/**
+ * Check and prepend or append site name to page title
+ */
+if ($doc_title != $app->getCfg('sitename'))
 {
 	if ($app->getCfg('sitename_pagetitles', 0) == 1)
 	{
