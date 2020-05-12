@@ -1,14 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<extension type="module" version="3.4" client="site" method="upgrade">
+<extension type="module" version="3.7.0" client="site" method="upgrade">
 	<name>mod_flexigooglemap</name>
-	<author>Berges Yannick</author>
-	<creationDate>Janvier 2016</creationDate>
-	<authorEmail>yannick@com3elles.com</authorEmail>
-	<authorUrl>www.com3elles.com</authorUrl>
-
-	<version>0.9.2</version>
-	<copyright>Copyright (C) 2005 - 2015 Open Source Matters. All rights reserved.</copyright>
-	<license>GNU General Public License version 2 or later; see LICENSE.txt</license>
+	<author>Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page</author>
+	<creationDate>12/05/2020</creationDate>
+	<copyright>(C) 2020 flexicontent.org</copyright>
+	<license>http://www.gnu.org/licenses/gpl-3.0.html GNU/GPL</license>
+	<authorEmail>info@flexicontent.org</authorEmail>
+	<authorUrl>http://www.flexicontent.org</authorUrl>
+	<version>3.4.0</version>
 	<description>MOD_FLEXIGOOGLEMAP_INTRO</description>
 
 	<scriptfile>install.php</scriptfile>

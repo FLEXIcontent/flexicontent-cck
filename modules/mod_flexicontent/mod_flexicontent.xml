@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<extension type="module" version="3.4" client="site" method="upgrade">
+<extension type="module" version="3.7.0" client="site" method="upgrade">
 	<name>mod_flexicontent</name>
 	<author>Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page</author>
-	<creationDate>12/04/2011</creationDate>
-	<copyright>(C) 2017 flexicontent.org</copyright>
+	<creationDate>12/05/2020</creationDate>
+	<copyright>(C) 2020 flexicontent.org</copyright>
 	<license>http://www.gnu.org/licenses/gpl-3.0.html GNU/GPL</license>
 	<authorEmail>info@flexicontent.org</authorEmail>
 	<authorUrl>http://www.flexicontent.org</authorUrl>
-	<version>3.2</version>
+	<version>3.4.0</version>
 	<description>MOD_FLEXICONTENT_XML_DESCRIPTION</description>
 
 	<files>
