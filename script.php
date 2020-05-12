@@ -305,7 +305,7 @@ class com_flexicontentInstallerScript
 				$ext_manifest_name = $ext_manifest->name;
 				//if ($ext_manifest_name!=$extensions[$i]['name'])  echo $ext_manifest_name." - ".$extensions[$i]['name'] . "<br/>";
 
-				// Force existing plugins/modules to use name found in each extension's manifest.xml file
+				// Force existing plugins/modules to use name found in each extension's manifest file
 				if (1) //if ( in_array($extensions[$i]['ext_folder'], array('flexicontent_fields', 'flexicontent', 'search', 'content', 'system')) || $extensions[$i]['type']=='module' )
 				{
 					$ext_tbl = '#__extensions';

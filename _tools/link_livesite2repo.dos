@@ -105,8 +105,8 @@ mklink  /J %joomlasite_path%\administrator\components\com_flexicontent  %reposit
 
 : Component manifest.xml file
 
-IF EXIST  %joomlasite_path%\administrator\components\com_flexicontent\manifest.xml  (del %joomlasite_path%\administrator\components\com_flexicontent\manifest.xml)
-mklink %joomlasite_path%\administrator\components\com_flexicontent\manifest.xml  %repository_path%\manifest.xml
+IF EXIST  %joomlasite_path%\administrator\components\com_flexicontent\flexicontent.xml  (del %joomlasite_path%\administrator\components\com_flexicontent\flexicontent.xml)
+mklink %joomlasite_path%\administrator\components\com_flexicontent\flexicontent.xml  %repository_path%\flexicontent.xml
 
 
 

@@ -61,7 +61,7 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 	static function getUpdateComponent()
 	{
 		// Read installation file
-		$manifest_path = JPATH_ADMINISTRATOR .DS. 'components' .DS. 'com_flexicontent' .DS. 'manifest.xml';
+		$manifest_path = JPATH_ADMINISTRATOR .DS. 'components' .DS. 'com_flexicontent' .DS. 'flexicontent.xml';
 		$com_xml = JInstaller::parseXMLInstallFile( $manifest_path );
 		
 		// Version checking URL

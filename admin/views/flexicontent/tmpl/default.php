@@ -448,7 +448,7 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 			FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-help', JText::_( 'FLEXI_SUPPORT' ), 1 );
 
 			// Read installation file
-			/*$manifest_path = JPATH_ADMINISTRATOR .DS. 'components' .DS. 'com_flexicontent' .DS. 'manifest.xml';
+			/*$manifest_path = JPATH_ADMINISTRATOR .DS. 'components' .DS. 'com_flexicontent' .DS. 'flexicontent.xml';
 			$com_xml = JInstaller::parseXMLInstallFile( $manifest_path );
 			if (!empty($com_xml['authorUrl']))
 			{
