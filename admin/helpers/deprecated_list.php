@@ -1,6 +1,7 @@
 <?php
 
 $files = array(
+	JPATH_ADMINISTRATOR . '/components/com_flexicontent/manifest.xml',
 	JPATH_ADMINISTRATOR . '/components/com_flexicontent/views/items/tmpl/copy.php',
 	JPATH_ADMINISTRATOR . '/components/com_flexicontent/views/types/view.raw.php',
 	JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/html/users.php',
