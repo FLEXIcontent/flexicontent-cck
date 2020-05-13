@@ -6207,6 +6207,7 @@ class ParentClassItem extends FCModelAdmin
 					$tagTable->access = 1;
 
 					// Make this item a child of the root tag
+					$tagTable->parent_id = $tagTable->getRootId();
 					$tagTable->setLocation($tagTable->getRootId(), 'last-child');
 
 					// Try to store tag

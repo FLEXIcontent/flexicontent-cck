@@ -252,7 +252,7 @@ class FlexicontentViewTag extends FlexicontentViewBaseRecord
 		if (!$isnew && !$jtag_id)
 		{
 			$tagsHelper = new \JHelperTags;
-			$jtag_id_arr = $tagsHelper->createTagsFromField(array('#new#' . $row->name));
+			$jtag_id_arr = $tagsHelper->createTagsFromText(array('#new#' . $row->name));
 			if (!empty($jtag_id_arr))
 			{
 				$jtag_id = reset($jtag_id_arr);
