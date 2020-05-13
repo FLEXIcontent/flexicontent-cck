@@ -463,8 +463,8 @@ class FlexicontentModelTags extends FCModelAdminList
 		}
 
 		// We will use the tags table to store them
-		JTable::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tags/tables');
-		$tagTable  = JTable::getInstance('Tag', 'TagsTable');
+		Table::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tags/tables');
+		$tagTable  = Table::getInstance('Tag', 'TagsTable');
 		$newTags   = array();
 		$canCreate = \JFactory::getUser()->authorise('core.create', 'com_tags');
 
@@ -523,6 +523,7 @@ class FlexicontentModelTags extends FCModelAdminList
 					$tagTable->access   = 1;
 
 					// Make this item a child of the root tag
+					$tagTable->parent_id = $tagTable->getRootId();
 					$tagTable->setLocation($tagTable->getRootId(), 'last-child');
 
 					// Try to store tag
@@ -575,7 +576,7 @@ class FlexicontentModelTags extends FCModelAdminList
 		// Insert the new tag maps
 		if (strpos('#', implode(',', $tags)) === false)
 		{
-			$tags = $this->tagsHelper->createTagsFromField($tags);
+			$tags = $this->tagsHelper->createTagsFromText($tags);
 		}
 
 		// Prevent saving duplicate tags
