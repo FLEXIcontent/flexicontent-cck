@@ -1703,6 +1703,19 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 			// Force model to load versioned data (URL specified version or latest version (last saved))
 			$version = $this->input->get('version', 0, 'int');   // Load specific item version (non-zero), 0 version: is unversioned data, -1 version: is latest version (=default for edit form)
 			$item = $model->getItem(null, $check_view_access = false, $no_cache = true, $force_version = ($version != 0 ? $version : -1));  // -1 version means latest
+
+			if (!$item)
+			{
+				$app->setHeader('status', '404', true);
+				$app->enqueueMessage(JText::_('FLEXI_OPERATION_FAILED') . ' : ' . $model->getError(), 'error');
+
+				if ($this->input->getCmd('tmpl') !== 'component')
+				{
+					$this->setRedirect($this->returnURL);
+				}
+
+				return;
+			}
 		}
 
 		// Push the model into the view (as default), later we will call the view display method instead of calling parent's display task, because it will create a 2nd model instance !!

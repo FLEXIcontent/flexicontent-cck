@@ -410,9 +410,16 @@ class ParentClassItem extends FCModelAdmin
 		// --. Failed to load existing item, or check_view_access indicates not to create a new item object
 		elseif ($pk || $check_view_access === 2)
 		{
-			$msg = $pk ?
-				JText::sprintf('FLEXI_CONTENT_UNAVAILABLE_ITEM_NOT_FOUND', $pk) :   // ID is set, indicate that it was not found
-				JText::_( 'FLEXI_REQUESTED_PAGE_COULD_NOT_BE_FOUND' );  // ID is not set propably some bad URL so give a more general message
+			if ($app->isClient('site'))
+			{
+				$msg = $pk ?
+					JText::sprintf('FLEXI_CONTENT_UNAVAILABLE_ITEM_NOT_FOUND', $pk) :   // ID is set, indicate that it was not found
+					JText::_( 'FLEXI_REQUESTED_PAGE_COULD_NOT_BE_FOUND' );  // ID is not set propably some bad URL so give a more general message
+			}
+			else
+			{
+				$msg = JText::_('Item not found') . ': ' . ($pk ?: '');
+			}
 
 			// In case of checking view access ONLY THEN throw a non found exception
 			if ($check_view_access)
@@ -420,7 +427,7 @@ class ParentClassItem extends FCModelAdmin
 				throw new Exception($msg, 404);
 			}
 
-			// Return to caller indication that loading failed
+			// Return to caller indication that loading failed, set Error Message if not already set
 			else
 			{
 				if (!$this->getError())

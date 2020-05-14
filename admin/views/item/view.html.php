@@ -101,10 +101,18 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 
 
 		// FORCE model to load versioned data (URL specified version or latest version (last saved))
-		$version = $jinput->get('version', 0, 'int');   // Load specific item version (non-zero), 0 version: is unversioned data, -1 version: is latest version (=default for edit form)
+		$version = $jinput->getInt('version', 0);   // Load specific item version (non-zero), 0 version: is unversioned data, -1 version: is latest version (=default for edit form)
 
-		// Get the item, loading item data and doing parameters merging
+		// Get the item, loading item data and doing parameters merging,
+		// check_view_access: false, will return false if item is not found
 		$item = $model->getItem(null, $check_view_access=false, $no_cache=false, $force_version=($version!=0 ? $version : -1));  // -1 version means latest
+
+		if (!$item)
+		{
+			$app->enqueueMessage($model->getError(), 'warning');
+			$returnURL = isset($_SERVER['HTTP_REFERER']) && flexicontent_html::is_safe_url($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : JUri::base();
+			$app->redirect( $returnURL );
+		}
 
 		if ( $print_logging_info ) $fc_run_times['get_item_data'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 
@@ -135,6 +143,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 
 		// Most core field are created via calling methods of the form (J2.5)
 		$form = $this->get('Form');
+
 		if (!$form)
 		{
 			$app->enqueueMessage($model->getError(), 'warning');
@@ -142,29 +151,30 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 			$app->redirect( $returnURL );
 		}
 
-		$cid = $model->getId();
-		$isnew = ! $cid;
+		// IS new FLAG
+		$isnew   = ! $item->id;
 		$manager_view = $ctrl = 'items';
 
 
-
-
-
-		// ***
-		// *** Get Associated Translations
-		// ***
+		/**
+		 * Get Associated Translations
+		 */
 
 		if ($useAssocs)  $langAssocs = $this->get( 'LangAssocs' );
 		$langs = FLEXIUtilities::getLanguages('code');
 
 
-		// Create and set a unique item id for plugins that needed it
-		if ($cid) {
-			$unique_tmp_itemid = $cid;
-		} else {
+		// Create and set (into HTTP request) a unique item id for plugins that needed it
+		if ($item->id)
+		{
+			$unique_tmp_itemid = $item->id;
+		}
+		else
+		{
 			$unique_tmp_itemid = $app->getUserState($form->option.'.edit.item.unique_tmp_itemid');
 			$unique_tmp_itemid = $unique_tmp_itemid ? $unique_tmp_itemid : date('_Y_m_d_h_i_s_', time()) . uniqid(true);
 		}
+
 		//print_r($unique_tmp_itemid);
 		$jinput->set('unique_tmp_itemid', $unique_tmp_itemid);
 
@@ -201,15 +211,15 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 
 
 
-		// ***
-		// *** Type related data
-		// ***
+		/**
+		 * Type related data
+		 */
 
 		// Get available types and the currently selected/requested type
 		$types         = $model->getTypeslist();
 		$typesselected = $model->getItemType();
 
-		// Get and merge type parameters
+		// Get type parameters, these are needed besides the 'merged' item parameters, e.g. to get Type's default layout
 		$tparams = $model->getTypeparams();
 		$tparams = new JRegistry($tparams);
 		$page_params->merge($tparams);       // Apply type configuration if it type is set
@@ -270,7 +280,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		 */
 
 		// SET toolbar title
-		$cid
+		$item->id
 			? JToolbarHelper::title( JText::_( 'FLEXI_EDIT_ITEM' ), 'itemedit' )   // Editing existing item
 			: JToolbarHelper::title( JText::_( 'FLEXI_NEW_ITEM' ), 'itemadd' );    // Creating new item
 
