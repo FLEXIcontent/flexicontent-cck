@@ -2494,6 +2494,19 @@ class ParentClassItem extends FCModelAdmin
 				$db->setQuery('DELETE FROM #__flexicontent_items_tmp WHERE id='.$item->id);
 				$db->execute();
 
+				$db->setQuery('DELETE FROM #__flexicontent_tags_item_relations WHERE itemid='.$item->id);
+				$db->execute();
+				$db->setQuery('DELETE FROM #__flexicontent_fields_item_relations WHERE item_id='.$item->id);
+				$db->execute();
+				$db->setQuery('DELETE FROM #__flexicontent_items_versions WHERE item_id='.$item->id);
+				$db->execute();
+
+				// Delete data that were bogusly in the past
+				$db->setQuery('DELETE FROM #__flexicontent_fields_item_relations WHERE item_id NOT IN (SELECT id FROM #__content)');
+				$db->execute();
+				$db->setQuery('DELETE FROM #__flexicontent_items_versions WHERE item_id NOT IN (SELECT id FROM #__content)');
+				$db->execute();
+
 				$this->setId(0);
 				$this->setError( $this->getError().' '.JText::_('FLEXI_NEW_ITEM_NOT_CREATED') );
 			}
