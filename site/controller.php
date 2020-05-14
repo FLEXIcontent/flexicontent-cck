@@ -1372,12 +1372,26 @@ class FlexicontentController extends JControllerLegacy
 		// Get/Create the model
 		$model = $this->getModel($this->record_name);
 
-		// Try to load review by attributes in HTTP Request
+		// Try to load record by attributes in HTTP Request
 		if (0)
 		{
 			$record = $model->getRecord(array(
 				'alias' => '',
 			));
+
+			// Set error message for models that do not throw exception
+			if (!$record)
+			{
+				$app->setHeader('status', '404', true);
+				$app->enqueueMessage(JText::_('FLEXI_OPERATION_FAILED') . ' : ' . $model->getError(), 'error');
+
+				if ($this->input->getCmd('tmpl') !== 'component')
+				{
+					$this->setRedirect($this->returnURL);
+				}
+
+				return;
+			}
 		}
 
 		// Try to load by unique ID or NAME

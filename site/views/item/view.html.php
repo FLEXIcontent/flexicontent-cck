@@ -583,8 +583,16 @@ class FlexicontentViewItem extends JViewLegacy
 		// FORCE model to load versioned data (URL specified version or latest version (last saved))
 		$version = $jinput->getInt('version', 0);   // Load specific item version (non-zero), 0 version: is unversioned data, -1 version: is latest version (=default for edit form)
 
-		// Get the item, loading item data and doing parameters merging
-		$item = $model->getItem(null, $check_view_access=false, $no_cache=true, $force_version=($version!=0 ? $version : -1));  // -1 version means latest
+		// Get the item, loading item data and doing parameters merging,
+		// check_view_access: false, will return false if item is not found
+		$item = $model->getItem(null, $check_view_access=false, $no_cache=false, $force_version=($version!=0 ? $version : -1));  // -1 version means latest
+
+		if (!$item)
+		{
+			$app->enqueueMessage($model->getError(), 'warning');
+			$returnURL = isset($_SERVER['HTTP_REFERER']) && flexicontent_html::is_safe_url($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : JUri::base();
+			$app->redirect( $returnURL );
+		}
 
 		if ( $print_logging_info ) $fc_run_times['get_item_data'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 
@@ -615,6 +623,7 @@ class FlexicontentViewItem extends JViewLegacy
 
 		// Most core field are created via calling methods of the form (J2.5)
 		$form = $this->get('Form');
+
 		if (!$form)
 		{
 			$app->enqueueMessage($model->getError(), 'warning');
@@ -622,14 +631,27 @@ class FlexicontentViewItem extends JViewLegacy
 			$app->redirect( $returnURL );
 		}
 
-		// is new item and ownership Flags
-		$isnew = !$item->id;
-		$isOwner = ( $item->created_by == $user->get('id') );
+		// IS new FLAG
+		$isnew   = ! $item->id;
+
+		// Create and set (into HTTP request) a unique item id for plugins that needed it
+		if ($item->id)
+		{
+			$unique_tmp_itemid = $item->id;
+		}
+		else
+		{
+			$unique_tmp_itemid = $app->getUserState($form->option.'.edit.item.unique_tmp_itemid');
+			$unique_tmp_itemid = $unique_tmp_itemid ? $unique_tmp_itemid : date('_Y_m_d_h_i_s_', time()) . uniqid(true);
+		}
+
+		//print_r($unique_tmp_itemid);
+		$jinput->set('unique_tmp_itemid', $unique_tmp_itemid);
 
 
-		// ***
-		// *** Type related data
-		// ***
+		/**
+		 * Type related data
+		 */
 
 		// Get available types and the currently selected/requested type
 		$types         = $model->getTypeslist();
@@ -694,23 +716,15 @@ class FlexicontentViewItem extends JViewLegacy
 		FLEXIUtilities::loadTemplateLanguageFile($page_params->get('ilayout') ?: 'default');
 
 
-		// ***
-		// *** Create captcha field via custom logic
-		// ***
-
-		// create and set (into HTTP request) a unique item id for plugins that needed it
-		if ($item->id) {
-			$unique_tmp_itemid = $item->id;
-		} else {
-			$unique_tmp_itemid = $app->getUserState($form->option.'.edit.item.unique_tmp_itemid');
-			$unique_tmp_itemid = $unique_tmp_itemid ? $unique_tmp_itemid : date('_Y_m_d_h_i_s_', time()) . uniqid(true);
-		}
-		$jinput->set('unique_tmp_itemid', $unique_tmp_itemid);
-
 		// Component / Menu Item parameters
 		$allowunauthorize   = $page_params->get('allowunauthorize', 0);     // allow unauthorised user to submit new content
 		$unauthorized_page  = $page_params->get('unauthorized_page', '');   // page URL for unauthorized users (via global configuration)
 		$notauth_itemid     = $page_params->get('notauthurl', '');          // menu itemid (to redirect) when user is not authorized to create content
+
+
+		/**
+		 * Create captcha field via custom logic
+		 */
 
 		// Create captcha field or messages
 		// Maybe some code can be removed by using Joomla's built-in form element (in XML file), instead of calling the captcha plugin ourselves
