@@ -109,7 +109,7 @@ class JFormFieldItemlayout extends JFormFieldList
 			if (!empty($type_attribs))
 			{
 				$tparams = new JRegistry($type_attribs);
-				$type_default_layout = $tparams->get('ilayout', 'default');
+				$type_default_layout = $tparams->get('ilayout', 'grid');
 				$type_default_layout_mobile = $tparams->get('ilayout_mobile', JText::_('FLEXI_USE_DESKTOP'));
 				$allowed_tmpls = $tparams->get('allowed_ilayouts');
 

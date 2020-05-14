@@ -380,7 +380,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 
 		// (a) Get Content Type allowed templates
 		$allowed_tmpls = $tparams->get('allowed_ilayouts');
-		$type_default_layout = $tparams->get('ilayout', 'default');
+		$type_default_layout = $tparams->get('ilayout', 'grid');
 
 		// (b) Load language file of currently selected template
 		$_ilayout = $item->itemparams->get('ilayout', $type_default_layout);
