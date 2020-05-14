@@ -244,7 +244,7 @@ class FlexicontentModelAppsman extends JModelList
 			$type->id = $type_id;
 			$type->load();
 			$type->params = new JRegistry($type->attribs);
-			$ilayout = $type->params->get('ilayout', 'default');   // template folder name
+			$ilayout = $type->params->get('ilayout', 'grid');   // template folder name
 			$related_ids['flexicontent_templates'][$ilayout] = $ilayout;
 		}
 
