@@ -377,7 +377,7 @@ class FlexicontentModelItem extends ParentClassItem
 	 */
 	function decideLayout($compParams, $typeParams, $itemParams, $catParams)
 	{
-		$fallback = 'default';
+		$fallback = 'grid';
 		$app      = JFactory::getApplication();
 
 		// Decide to use MOBILE or DESKTOP item template layout
