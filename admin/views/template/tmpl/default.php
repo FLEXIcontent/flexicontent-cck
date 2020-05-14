@@ -206,7 +206,7 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 		}
 
 		<?php
-		if (in_array($this->layout->name, array('blog','default','faq','items-tabbed','presentation'))) {
+		if (in_array($this->layout->name, array('grid','table','faq','items-tabbed'))) {
 			echo 'if (!confirm("'.JText::_('FLEXI_TMPLS_SAVE_BUILT_IN_TEMPLATE_FILE_WARNING', true).'")) return false;';
 		}
 		?>
