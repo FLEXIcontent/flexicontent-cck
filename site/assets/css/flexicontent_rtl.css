@@ -1186,7 +1186,7 @@ body .fc_uploader_n_props_box {
 	justify-content: start;
 	align-items: start;
 }
-body .fc_uploader_n_props_box > * {
+body .fc_uploader_n_props_box > *:not(:last-child) {
 	margin-left: 24px;
 }
 body .fc_uploader_status_box {
@@ -1583,7 +1583,7 @@ body .fc-nowrap-box .nowrap_box .label,
 	box-sizing: border-box;
 	clear: both;
 	float: right;
-	margin: 0 4px 4px 0 !important;
+	margin: 0 0 1% 0 !important;
 	width: 100%;
 }
 #flexicontent .fc-xpended .input-group-text:first-child,
@@ -3325,7 +3325,7 @@ ul.thumbnails.image_picker_selector li div.thumbnail p {
 	white-space: pre-wrap;
 	word-wrap: break-word;
 	min-width: 220px;
-	width: 50%;
+	width: auto;
 	max-width: 600px;
 }
 #flexicontent form select.fcfield_selectval,
@@ -3335,7 +3335,7 @@ ul.thumbnails.image_picker_selector li div.thumbnail p {
 	overflow: auto;
 	vertical-align: top;
 	min-width: 220px;
-	width: 50%;
+	width: auto;
 	max-width: 600px;
 }
 #flexicontent form select.fcfield_selectval {
@@ -3346,7 +3346,7 @@ ul.thumbnails.image_picker_selector li div.thumbnail p {
 	line-height: 1em;
 	overflow: auto;
 	padding: 4px 0 2px 4px;
-	min-width: 228px;
+	min-width: 248x;
 }
 #flexicontent form select.fcfield_selectval.inlineval,
 #flexicontent form select.fcfield_selectmulval.inlineval,
@@ -3486,7 +3486,7 @@ select[multiple].use_select2_lib:focus {
 #fc_filter_form_blocker {
 	display: none;
 	z-index: 2000;
-	position: fixed;
+	position: fixed !important;
 	top: 0;
 	right: 0;
 	width: 100%;
@@ -3495,54 +3495,56 @@ select[multiple].use_select2_lib:focus {
 #fc_filter_form_blocker .fc_blocker_opacity {
 	display: block;
 	z-index: 2000;
-	position: absolute;
+	position: absolute !important;
 	top: 0;
 	right: 0;
-	opacity: 0.3;
-	filter: alpha(opacity=30);
+	opacity: 0.1;
+	filter: alpha(opacity=10);
 	background-color: #000;
 	width: 100%;
 	height: 100%;
 }
 #fc_filter_form_blocker .fc_blocker_content {
-	display: table;
+	display: block;
 	z-index: 2001;
-	position: fixed;
+	box-sizing: content-box !important;
+	position: relative !important;
 	top: 35%;
 	right: 50%;
-	color: black;
+	font-size: 18px;
+	font-weight: bold;
+	color: #555;
 	background: white 30px 40px no-repeat;
 	opacity: 1;
 	filter: alpha(opacity=100);
 	width: auto;
-	padding: 20px 0px 26px 30px;
+	padding: 2em 2em 3em 2em;
 	margin: 0px;
-	font-size: 12px;
-	font-weight: bold;
 	border: 1px solid lightgray;
-	border-radius: 8px;
-	text-align: right;
-	width: 300px;
+	border-radius: 0.5em;
+	text-align: center;
+	width: 280px;
 	-webkit-transform: translate(-50%,0);
 	transform: translate(-50%,0);
 }
 #fc_filter_form_blocker .fc_blocker_bar {
 	display: block;
-	width: 300px;
+	box-sizing: content-box !important;
+	position: relative !important;
+	right: 0;
+	top: 1.5em;
+	width: 100%;
 	height: 22px;
 	border-radius: 4px;
 	background-color: #f5f5f5;
 	box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
-	position: relative;
-	right: -15px;
-	top: 6px;
 }
 #fc_filter_form_blocker .fc_blocker_bar div {
 	border-radius: 4px;
 	display: block;
 	height: 100%;
 	color: #fff;
-	text-align: left;
+	text-align: right;
 	line-height: 22px;
 	width: 0;
 	background-color: #0099ff;
