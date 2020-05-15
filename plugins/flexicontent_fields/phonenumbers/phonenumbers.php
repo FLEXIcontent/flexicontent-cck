@@ -410,8 +410,8 @@ class plgFlexicontent_fieldsPhonenumbers extends FCField
 		$separator_phone2_phone3 = $field->parameters->get( 'separator_phone2_phone3', '' ) ;
 
 		// Open/close tags (every value)
-		$opentag		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'opentag', '' ), 'opentag' );
-		$closetag		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'closetag', '' ), 'closetag' );
+		$opentag		= JText::_(FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'opentag', '' ), 'opentag' ));
+		$closetag		= JText::_(FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'closetag', '' ), 'closetag' ));
 		// Prefix/suffix (value list)
 		$field_prefix		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'field_prefix', '' ), 'field_prefix' );
 		$field_suffix		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'field_suffix', '' ), 'field_suffix' );
