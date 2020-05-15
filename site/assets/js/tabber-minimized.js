@@ -45,20 +45,30 @@ Element.prototype.tabber_hasClass = function(className)
 
 Element.prototype.tabber_addClass = function(className)
 {
-  if (!this.tabber_hasClass(className))
+	var css_classes = className.split(/[\s]+/);
+
+	for (i=0; i < css_classes.length; i++)
 	{
-		this.className += ' ' + className;
+	  if (!this.tabber_hasClass(css_classes[i]))
+		{
+			this.className += ' ' + css_classes[i];
+		}
 	}
 }
 
 
 Element.prototype.tabber_removeClass = function(className)
 {
-  if (this.tabber_hasClass(className))
+	var css_classes = className.split(/[\s]+/);
+
+	for (i=0; i < css_classes.length; i++)
 	{
-    var reg = new RegExp('(\\s|^)' + className + '(\\s|$)');
-    this.className = this.className.replace(reg, ' ');
-  }
+	  if (this.tabber_hasClass(css_classes[i]))
+		{
+	    var reg = new RegExp('(\\s|^)' + css_classes[i] + '(\\s|$)');
+	    this.className = this.className.replace(reg, ' ');
+	  }
+	}
 }
 
 

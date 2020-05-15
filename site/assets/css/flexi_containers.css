@@ -41,7 +41,7 @@ body .fc_uploader_n_props_box {
 	justify-content: start;
 	align-items: start;
 }
-body .fc_uploader_n_props_box > * {
+body .fc_uploader_n_props_box > *:not(:last-child) {
 	margin-right: 24px;
 }
 body .fc_uploader_status_box {
@@ -433,7 +433,7 @@ body .fc-nowrap-box .nowrap_box .label,
 	box-sizing: border-box;
 	clear: both;
 	float: left;
-	margin: 0 4px 4px 0 !important;
+	margin: 0 0 1% 0 !important;
 	width: 100%;
 }
 #flexicontent .fc-xpended .input-group-text:first-child,
