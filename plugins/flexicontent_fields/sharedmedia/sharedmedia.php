@@ -641,8 +641,8 @@ class plgFlexicontent_fieldsSharedmedia extends FCField
 		$pretext		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'pretext', '' ), 'pretext' );
 		$posttext		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'posttext', '' ), 'posttext' );
 		$separatorf	= $field->parameters->get( 'separatorf', 1 ) ;
-		$opentag		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'opentag', '' ), 'opentag' );
-		$closetag		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'closetag', '' ), 'closetag' );
+		$opentag		= JText::_(FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'opentag', '' ), 'opentag' ));
+		$closetag		= JText::_(FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'closetag', '' ), 'closetag' ));
 
 		if($pretext)  { $pretext  = $remove_space ? $pretext : $pretext . ' '; }
 		if($posttext) { $posttext = $remove_space ? $posttext : ' ' . $posttext; }
@@ -785,7 +785,7 @@ class plgFlexicontent_fieldsSharedmedia extends FCField
 			// Apply separator and open/close tags
 			$field->{$prop} = implode($separatorf, $field->{$prop});
 			if ( $field->{$prop}!=='' ) {
-				$field->{$prop} = JText::_($opentag) . $field->{$prop} . JText::_($closetag);
+				$field->{$prop} = $opentag . $field->{$prop} . $closetag;
 			} else {
 				$field->{$prop} = '';
 			}

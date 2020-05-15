@@ -5,7 +5,7 @@
  *
  * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
  * @link            https://flexicontent.org
- * @copyright       Copyright ï¿½ 2017, FLEXIcontent team, All Rights Reserved
+ * @copyright       Copyright © 2017, FLEXIcontent team, All Rights Reserved
  * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
@@ -824,8 +824,8 @@ class plgFlexicontent_fieldsWeblink extends FCField
 		$pretext		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'pretext', '' ), 'pretext' );
 		$posttext		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'posttext', '' ), 'posttext' );
 		$separatorf	= $field->parameters->get( 'separatorf', 1 ) ;
-		$opentag		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'opentag', '' ), 'opentag' );
-		$closetag		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'closetag', '' ), 'closetag' );
+		$opentag		= JText::_(FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'opentag', '' ), 'opentag' ));
+		$closetag		= JText::_(FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'closetag', '' ), 'closetag' ));
 
 		if($pretext)  { $pretext  = $remove_space ? $pretext : $pretext . ' '; }
 		if($posttext) { $posttext = $remove_space ? $posttext : ' ' . $posttext; }
@@ -911,7 +911,7 @@ class plgFlexicontent_fieldsWeblink extends FCField
 			if ( $field->{$prop}!=='' )
 			{
 				// Apply field 's opening / closing texts
-				$field->{$prop} = JText::_($opentag) . $field->{$prop} . JText::_($closetag);
+				$field->{$prop} = $opentag . $field->{$prop} . $closetag;
 			}
 		}
 	}

@@ -5,7 +5,7 @@
  *
  * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
  * @link            https://flexicontent.org
- * @copyright       Copyright � 2017, FLEXIcontent team, All Rights Reserved
+ * @copyright       Copyright © 2017, FLEXIcontent team, All Rights Reserved
  * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
@@ -374,8 +374,8 @@ class FCField extends JPlugin
 		$field  = $this->getField();
 		$item   = $this->getItem();
 
-		$opentag   = FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'opentag', '' ), 'opentag' );
-		$closetag  = FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'closetag', '' ), 'closetag' );
+		$opentag   = JText::_(FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'opentag', '' ), 'opentag' ));
+		$closetag  = JText::_(FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'closetag', '' ), 'closetag' ));
 		$separatorf	= $this->getSeparatorF($opentag, $closetag, 1);
 
 		$field->{$prop} = array();
@@ -389,7 +389,7 @@ class FCField extends JPlugin
 			// Apply separator and open/close tags
 			$field->{$prop} = implode($separatorf, $field->{$prop});
 			if ( $field->{$prop}!=='' ) {
-				$field->{$prop} = JText::_($opentag) . $field->{$prop} . JText::_($closetag);
+				$field->{$prop} = $opentag . $field->{$prop} . $closetag;
 			} else {
 				$field->{$prop} = '';
 			}
