@@ -679,7 +679,11 @@ class plgFlexicontent_fieldsImage extends FCField
 
 		$field->html = array();  // Make sure this is an array
 
-		foreach ($field->value as $index => $value)
+
+		/**
+		 * Iterate passing A REFERENCE of THE VALUE to rebuildThumbs() and other methods so that value can be modifled, and data like real image width, height can be added
+		 */
+		foreach ($field->value as $index => & $value)
 		{
 			// Compatibility for non-serialized values, e.g. Reload user input after form validation error
 			// or for NULL values in a field group or file ids as values (minigallery legacy field)
@@ -1398,7 +1402,10 @@ class plgFlexicontent_fieldsImage extends FCField
 				$files_data = $this->getFileData( $values, $published=false );
 			}
 
-			foreach ($values as $index => $value)
+			/**
+			 * Iterate passing A REFERENCE of THE VALUE to rebuildThumbs() and other methods so that value can be modifled, and data like real image width, height can be added
+			 */
+			foreach ($values as $index => & $value)
 			{
 				// Non-serialized values, e.g file ids as values (minigallery legacy field)
 				if ((string)(int)$value == $value)
