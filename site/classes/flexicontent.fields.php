@@ -5,7 +5,7 @@
  *
  * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
  * @link            https://flexicontent.org
- * @copyright       Copyright © 2017, FLEXIcontent team, All Rights Reserved
+ * @copyright       Copyright Â© 2018, FLEXIcontent team, All Rights Reserved
  * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
@@ -5735,19 +5735,19 @@ class FlexicontentFields
 			{
 				$v = $item->$fn;
 
-				$field->raw_values[$fn] = $v;
+				$field->raw_values = $v;
 
 				if ($field->field_type === 'type')
 				{
 					$v = $item->type_id;
 
-					$field->raw_values[$fn]  = $v;
-					$field->basic_texts[$fn] = JText::_($item->$fn);
+					$field->raw_values  = $v;
+					$field->basic_texts = JText::_($item->$fn);
 				}
 				elseif ($field->field_type === 'createdby' || $field->field_type === 'modifiedby')
 				{
-					$field->raw_values[$fn]  = $v;
-					$field->basic_texts[$fn] = $field->field_type === 'createdby' ? $item->author : $item->modifier;
+					$field->raw_values  = $v;
+					$field->basic_texts = $field->field_type === 'createdby' ? $item->author : $item->modifier;
 				}
 				elseif ($field->field_type === 'state')
 				{
@@ -5759,28 +5759,28 @@ class FlexicontentFields
 						2=>JText::_('FLEXI_ARCHIVED'), -2=>JText::_('FLEXI_TRASHED'),
 					);
 
-					$field->raw_values[$fn]  = $v;
-					$field->basic_texts[$fn] = isset($state_names[$v]) ? $state_names[$v] : JText::_('FLEXI_UNKNOWN');
+					$field->raw_values  = $v;
+					$field->basic_texts = isset($state_names[$v]) ? $state_names[$v] : JText::_('FLEXI_UNKNOWN');
 				}
 				else
 				{
 					$v = $item->$fn;
 
-					$field->raw_values[$fn] = $v;
+					$field->raw_values = $v;
 				}
 			}
 
 			else
 			{
-				$field->raw_values[$fn] = isset($item->fieldvalues[$field->id]) ? $item->fieldvalues[$field->id] : array();
+				$field->raw_values = isset($item->fieldvalues[$field->id]) ? $item->fieldvalues[$field->id] : array();
 
 				// Safely unserialize
-				foreach ($field->raw_values[$fn] as $i => $v)
+				foreach ($field->raw_values as $i => $v)
 				{
 					$_v = flexicontent_db::unserialize_array($v, $force_array = true, $force_value = false);
 					if ($_v !== false)
 					{
-						$field->raw_values[$fn][$i] = $_v;
+						$field->raw_values[$i] = $_v;
 					}
 				}
 
@@ -5794,17 +5794,17 @@ class FlexicontentFields
 					$field->elements = isset($field->elements)
 						? $field->elements
 						: FlexicontentFields::indexedField_getElements($field, $item);
-					$field->basic_texts[$fn] = array();
+					$field->basic_texts = array();
 
-					foreach ($field->raw_values[$fn] as $i => $v)
+					foreach ($field->raw_values as $i => $v)
 					{
-						$field->basic_texts[$fn][$v] = $field->elements[$v]->text;
+						$field->basic_texts[$v] = $field->elements[$v]->text;
 					}
 				}
 			}
 
 			/*echo '<pre> <h2>' . $fn . '</h2> <h4>' . $field->field_type . '</h4>';
-			print_r(!empty($field->basic_texts[$fn]) ? $field->basic_texts[$fn] : $field->raw_values[$fn]);
+			print_r(!empty($field->basic_texts) ? $field->basic_texts : $field->raw_values);
 			echo '</pre>';*/
 		}
 	}
@@ -5852,7 +5852,7 @@ class FlexicontentFields
 				continue;
 			}
 
-			$filter->raw_values[$fn] = $safe_vals;
+			$filter->raw_values = $safe_vals;
 
 			if ($filter->field_type === 'state')
 			{
@@ -5865,7 +5865,7 @@ class FlexicontentFields
 
 				foreach($safe_vals as $v)
 				{
-					$filter->basic_texts[$fn] = array($v => (isset($state_names[$v]) ? $state_names[$v] : JText::_('FLEXI_UNKNOWN')));
+					$filter->basic_texts = array($v => (isset($state_names[$v]) ? $state_names[$v] : JText::_('FLEXI_UNKNOWN')));
 				}
 			}
 
@@ -5876,16 +5876,16 @@ class FlexicontentFields
 				$filter->elements = isset($filter->elements)
 					? $filter->elements
 					: FlexicontentFields::indexedField_getElements($filter, $_item);
-				$filter->basic_texts[$fn] = array();
+				$filter->basic_texts = array();
 
 				foreach ($safe_vals as $i => $v)
 				{
-					$filter->basic_texts[$fn][$v] = $filter->elements[$v]->text;
+					$filter->basic_texts[$v] = $filter->elements[$v]->text;
 				}
 			}
 
 			/*echo '<pre> <h2>' . $fn . '</h2> <h4>' . $filter->field_type . '</h4>';
-			print_r(!empty($filter->basic_texts[$fn]) ? $filter->basic_texts[$fn] : $filter->raw_values[$fn]);
+			print_r(!empty($filter->basic_texts) ? $filter->basic_texts : $filter->raw_values);
 			echo '</pre>';*/
 		}
 	}
