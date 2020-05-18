@@ -214,51 +214,72 @@ class FlexicontentViewFavourites extends JViewLegacy
 		// *** Create the pagination object
 		// ***
 
-		$pageNav = $this->get('pagination');
-
-		$_revert = array('%21'=>'!', '%2A'=>'*', '%27'=>"'", '%28'=>'(', '%29'=>')');
-		foreach($_GET as $i => $v)
+		if (1)
 		{
+			$pageNav  = $this->get('pagination');
+
 			// URL-encode filter values
-			if (substr($i, 0, 6) === "filter")
+			$_revert = array('%21'=>'!', '%2A'=>'*', '%27'=>"'", '%28'=>'(', '%29'=>')');
+
+			foreach($jinput->get->get->getArray() as $i => $v)
 			{
+				if (isset($menu->query[$i]) && $menu->query[$i] === $v)
+				{
+					continue;
+				}
+
+				if (in_array($i, array('start', 'limitstart', 'limit')))
+				{
+					continue;
+				}
+
+				$is_fcfilter = substr($i, 0, 6) === 'filter';
+
 				if (is_array($v))
 				{
-					foreach($v as $ii => &$vv)
+					foreach($v as $ii => $vv)
 					{
-						$vv = str_replace('&', '__amp__', $vv);
-						$vv = strtr(rawurlencode($vv), $_revert);
-						$pageNav->setAdditionalUrlParam($i.'['.$ii.']', $vv);
+						if (is_array($vv))
+						{
+							foreach($vv as $iii => $vvv)
+							{
+								if ($is_fcfilter)
+								{
+									$vvv = str_replace('&', '__amp__', $vvv);
+									$vvv = strtr(rawurlencode($vvv), $_revert);
+								}
+								$pageNav->setAdditionalUrlParam($i.'['.$ii.']'.'['.$iii.']', $vvv);
+							}
+						}
+						else
+						{
+							if ($is_fcfilter)
+							{
+								$vv = str_replace('&', '__amp__', $vv);
+								$vv = strtr(rawurlencode($vv), $_revert);
+							}
+							$pageNav->setAdditionalUrlParam($i.'['.$ii.']', $vv);
+						}
 					}
-					unset($vv);
 				}
 				else
 				{
-					$v = str_replace('&', '__amp__', $v);
-					$v = strtr(rawurlencode($v), $_revert);
+					if ($is_fcfilter)
+					{
+						$v = str_replace('&', '__amp__', $v);
+						$v = strtr(rawurlencode($v), $_revert);
+					}
 					$pageNav->setAdditionalUrlParam($i, $v);
 				}
 			}
 
-			// Make sure all URL variables are added to the pagination URLs
-			else
+
+			$_sh404sef = defined('SH404SEF_IS_RUNNING') && JFactory::getConfig()->get('sef');
+			if ($_sh404sef)
 			{
-				if (is_array($v))
-				{
-					foreach($v as $ii => &$vv)
-					{
-						$pageNav->setAdditionalUrlParam($i.'['.$ii.']', $vv);
-					}
-				}
-				else
-				{
-					$pageNav->setAdditionalUrlParam($i, $v);
-				}
+				$pageNav->setAdditionalUrlParam('limit', $model->getState('limit'));
 			}
 		}
-
-		$_sh404sef = defined('SH404SEF_IS_RUNNING') && JFactory::getConfig()->get('sef');
-		if ($_sh404sef) $pageNav->setAdditionalUrlParam('limit', $model->getState('limit'));
 
 		// Create links, etc
 		$link = JRoute::_(FlexicontentHelperRoute::getFavsRoute(0, $menu_matches ? $menu->id : 0));
@@ -266,7 +287,6 @@ class FlexicontentViewFavourites extends JViewLegacy
 		//$print_link = JRoute::_('index.php?view=favourites&pop=1&tmpl=component');
 		$curr_url   = str_replace('&', '&amp;', $_SERVER['REQUEST_URI']);
 		$print_link = $curr_url .(strstr($curr_url, '?') ? '&amp;'  : '?').'pop=1&amp;tmpl=component&amp;print=1';
-
 		$pageclass_sfx = htmlspecialchars($params->get('pageclass_sfx'));
 
 		$this->action = $link;  // $uri->toString()

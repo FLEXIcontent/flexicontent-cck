@@ -750,48 +750,61 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		}
 		else
 		{
-			$results	= $this->get('data' );
-			$total		= $this->get('total');
+			$results	= $this->get('Data' );
+			$total		= $this->get('Total');
 			$pageNav  = $this->get('pagination');
 
 			// URL-encode filter values
 			$_revert = array('%21'=>'!', '%2A'=>'*', '%27'=>"'", '%28'=>'(', '%29'=>')');
-			foreach($_GET as $i => $v)
+			foreach($jinput->get->get->getArray() as $i => $v)
 			{
-				if (substr($i, 0, 6) === "filter")
+				if (isset($menu->query[$i]) && $menu->query[$i] === $v)
 				{
-					if (is_array($v))
+					continue;
+				}
+
+				if (in_array($i, array('start', 'limitstart', 'limit')))
+				{
+					continue;
+				}
+
+				$is_fcfilter = substr($i, 0, 6) === 'filter';
+
+				if (is_array($v))
+				{
+					foreach($v as $ii => $vv)
 					{
-						foreach($v as $ii => &$vv)
+						if (is_array($vv))
 						{
-							$vv = str_replace('&', '__amp__', $vv);
-							$vv = strtr(rawurlencode($vv), $_revert);
+							foreach($vv as $iii => $vvv)
+							{
+								if ($is_fcfilter)
+								{
+									$vvv = str_replace('&', '__amp__', $vvv);
+									$vvv = strtr(rawurlencode($vvv), $_revert);
+								}
+								$pageNav->setAdditionalUrlParam($i.'['.$ii.']'.'['.$iii.']', $vvv);
+							}
+						}
+						else
+						{
+							if ($is_fcfilter)
+							{
+								$vv = str_replace('&', '__amp__', $vv);
+								$vv = strtr(rawurlencode($vv), $_revert);
+							}
 							$pageNav->setAdditionalUrlParam($i.'['.$ii.']', $vv);
 						}
-						unset($vv);
 					}
-					else
+				}
+				else
+				{
+					if ($is_fcfilter)
 					{
 						$v = str_replace('&', '__amp__', $v);
 						$v = strtr(rawurlencode($v), $_revert);
-						$pageNav->setAdditionalUrlParam($i, $v);
 					}
-				}
-
-				// Make sure all URL variables are added to the pagination URLs
-				else
-				{
-					if (is_array($v))
-					{
-						foreach($v as $ii => &$vv)
-						{
-							$pageNav->setAdditionalUrlParam($i.'['.$ii.']', $vv);
-						}
-					}
-					else
-					{
-						$pageNav->setAdditionalUrlParam($i, $v);
-					}
+					$pageNav->setAdditionalUrlParam($i, $v);
 				}
 			}
 

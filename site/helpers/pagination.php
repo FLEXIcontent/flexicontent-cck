@@ -35,6 +35,8 @@ if ( !class_exists('JPagination') )
  */
 class FCPagination extends JPagination
 {
+	public $hideEmptyLimitstart = true;
+
 	/**
 	 * Create and return the pagination result set counter string, ie. Results 1-10 of 42
 	 *
