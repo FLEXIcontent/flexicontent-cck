@@ -1006,6 +1006,11 @@ class FlexicontentViewCategory extends JViewLegacy
 					continue;
 				}
 
+				if (in_array($i, array('start', 'limitstart', 'limit')))
+				{
+					continue;
+				}
+
 				$is_fcfilter = substr($i, 0, 6) === 'filter';
 
 				if (is_array($v))
