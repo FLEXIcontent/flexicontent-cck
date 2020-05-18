@@ -408,7 +408,17 @@ class FlexicontentViewCategory extends JViewLegacy
 				{
 					foreach($v as $ii => &$vv)
 					{
-						$canonical_filters .= '&' . $i . '[' . $ii . ']=' . $vv;
+						if (is_array($vv))
+						{
+							foreach($vv as $iii => &$vvv)
+							{
+								$canonical_filters .= '&' . $i . '[' . $ii . '][' . $iii . ']=' . $vvv;
+							}
+						}
+						else
+						{
+							$canonical_filters .= '&' . $i . '[' . $ii . ']=' . $vv;
+						}
 					}
 				}
 				else
@@ -982,46 +992,73 @@ class FlexicontentViewCategory extends JViewLegacy
 		// *** Create the pagination object
 		// ***
 
-		$pageNav = $this->get('pagination');
-
-		$_revert = array('%21'=>'!', '%2A'=>'*', '%27'=>"'", '%28'=>'(', '%29'=>')');
-		foreach($jinput->get->get->getArray() as $i => $v)
+		if (1)
 		{
-			if (isset($menu->query[$i]) && $menu->query[$i] === $v)
-			{
-				continue;
-			}
+			$pageNav  = $this->get('pagination');
 
 			// URL-encode filter values
-			$is_fcfilter = substr($i, 0, 6) === 'filter';
+			$_revert = array('%21'=>'!', '%2A'=>'*', '%27'=>"'", '%28'=>'(', '%29'=>')');
 
-			if (is_array($v))
+			foreach($jinput->get->get->getArray() as $i => $v)
 			{
-				foreach($v as $ii => $vv)
+				if (isset($menu->query[$i]) && $menu->query[$i] === $v)
+				{
+					continue;
+				}
+
+				if (in_array($i, array('start', 'limitstart', 'limit')))
+				{
+					continue;
+				}
+
+				$is_fcfilter = substr($i, 0, 6) === 'filter';
+
+				if (is_array($v))
+				{
+					foreach($v as $ii => $vv)
+					{
+						if (is_array($vv))
+						{
+							foreach($vv as $iii => $vvv)
+							{
+								if ($is_fcfilter)
+								{
+									$vvv = str_replace('&', '__amp__', $vvv);
+									$vvv = strtr(rawurlencode($vvv), $_revert);
+								}
+								$pageNav->setAdditionalUrlParam($i.'['.$ii.']'.'['.$iii.']', $vvv);
+							}
+						}
+						else
+						{
+							if ($is_fcfilter)
+							{
+								$vv = str_replace('&', '__amp__', $vv);
+								$vv = strtr(rawurlencode($vv), $_revert);
+							}
+							$pageNav->setAdditionalUrlParam($i.'['.$ii.']', $vv);
+						}
+					}
+				}
+				else
 				{
 					if ($is_fcfilter)
 					{
-						$vv = str_replace('&', '__amp__', $vv);
-						$vv = strtr(rawurlencode($vv), $_revert);
+						$v = str_replace('&', '__amp__', $v);
+						$v = strtr(rawurlencode($v), $_revert);
 					}
-					$pageNav->setAdditionalUrlParam($i.'['.$ii.']', $vv);
+					$pageNav->setAdditionalUrlParam($i, $v);
 				}
 			}
-			else
+
+			$resultsCounter = $pageNav->getResultsCounter();  // for overriding model's result counter
+
+			$_sh404sef = defined('SH404SEF_IS_RUNNING') && JFactory::getConfig()->get('sef');
+			if ($_sh404sef)
 			{
-				if ($is_fcfilter)
-				{
-					$v = str_replace('&', '__amp__', $v);
-					$v = strtr(rawurlencode($v), $_revert);
-				}
-				$pageNav->setAdditionalUrlParam($i, $v);
+				$pageNav->setAdditionalUrlParam('limit', $model->getState('limit'));
 			}
 		}
-		$resultsCounter = $pageNav->getResultsCounter();  // for overriding model's result counter
-
-		$_sh404sef = defined('SH404SEF_IS_RUNNING') && JFactory::getConfig()->get('sef');
-		if ($_sh404sef) $pageNav->setAdditionalUrlParam('limit', $model->getState('limit'));
-
 
 		// **********************************************************************
 		// Print link ... must include layout and current filtering url vars, etc
