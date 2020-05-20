@@ -14,25 +14,49 @@
 	<fields name="attribs">
 
 		<fieldset name="layout" addfieldpath="/administrator/components/com_flexicontent/elements">
-			<field name="" type="separator" level="level3" default="" class="alert alert-info fcpadded" />
 
-			<field name="PPFX_auto_start" type="radio" default="false" abel="Auto start" description="Delay for auto transitioning to next image" class="btn-group btn-group-yesno" depend_class="slideshow_ops">
-				<option value="true">FLEXI_YES</option>
-				<option value="false">FLEXI_NO</option>
+			<field name="" type="separator" default="Slideshow options" level="level2" />
+
+			<field name="PPFX_auto_start" type="radio" default="0" label="Auto start" description="Delay for auto transitioning to next image" class="btn-group btn-group-yesno" depend_class="slideshow_ops">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="PPFX-transition_duration" type="number" default="900" label="Transition duration" description="Delay for auto transitioning to next image" depend_class="slideshow_ops" />
-			<field name="PPFX_slideshow_delay" type="text" default="2500" label="Autoplay delay" description="Delay for auto transitioning to next image" depend_class="slideshow_ops" />
-			<field name="PPFX_number_thumbs" type="number" default="4" label="Number of thumbs" description="Delay for auto transitioning to next image" depend_class="slideshow_ops" />
-			<field name="PPFX_preload_image" type="number" default="10" label="Number of preload image" description="Delay for auto transitioning to next image" depend_class="slideshow_ops" />
-			<field name="PPFX_enable_top_pager" type="radio" default="true" label="Enable top pager" description="Delay for auto transitioning to next image" class="btn-group btn-group-yesno" depend_class="slideshow_ops">
-				<option value="true">FLEXI_YES</option>
-				<option value="false">FLEXI_NO</option>
+			<field name="PPFX_transition_duration" type="number" default="600" label="Transition duration" description="Delay for auto transitioning to next image" depend_class="slideshow_ops" />
+			<field name="PPFX_slideshow_delay" type="number" default="2500" label="Autoplay delay" description="Delay for starting initial auto play" depend_class="slideshow_ops" />
+			<field name="PPFX_preload_image" type="number" default="4" label="# of images to preload" description="Number of Images to preload. Set to -1 to preload all images" depend_class="slideshow_ops" />
+
+			<field name="PPFX_enable_popup" type="radio" default="1" label="Slideshow image click" description="Click on the image currently active will open image in full screen" class="btn-group btn-group-yesno" depend_class="slideshow_ops">
+				<option value="0">Show next Image</option>
+				<option value="1">Full screen zoom</option>
 			</field>
-			<field name="PPFX_enable_bottom_pager" type="radio" default="true" label="Enable bottom pager" description="Delay for auto transitioning to next image" class="btn-group btn-group-yesno" depend_class="slideshow_ops">
-				<option value="true">FLEXI_YES</option>
-				<option value="false">FLEXI_NO</option>
+
+
+			<field name="" type="separator" default="Image Sizes" level="level2" />
+
+			<field name="" type="separator" default="&lt;b&gt;NOTE:&lt;/b&gt; For better visible quality, these thumbnail height is best to be smaller &lt;br&gt; than the configured thumbnail for current (item/category) view." level="level3 alert-info fcpadded" />
+
+			<field name="PPFX_thumb_height" type="number" default="100" label="Thumbnail Height" description="Height of every thumbnail" depend_class="" />
+			<field name="PPFX_slide_height" type="number" default="400" label="Slideshow Height" description="Height of image slideshow area" depend_class="" />
+
+			<field name="" type="separator" default="Thumbnails and Pages" level="level2" />
+
+			<field name="PPFX_use_pages" type="multilist" subtype="radio" default="0" toggle_related="1" label="Thumbnail list" description="Enable to show a thumbnail carousel below or above the slideshow" class="btn-group group-fcmethod" >
+				<option value="0" show_list="no_pages" hide_list="use_pages">Scroll</option>
+				<option value="1" show_list="use_pages" hide_list="no_pages">Use Pages</option>
 			</field>
-			<field name="PPFX_number_pages" type="number" default="7" label="Number of page" description="Delay for auto transitioning to next image" depend_class="slideshow_ops" />
+
+
+			<field name="PPFX_number_thumbs" type="number" default="6" label="# of thumbs per page" description="Number of thumbnails per page" depend_class="use_pages" />
+			<field name="PPFX_number_pages" type="number" default="10" label="Max # of pages" description="Maximum number of pages to display" depend_class="use_pages" />
+			<field name="PPFX_enable_top_pager" type="fcradio" default="2" label="Thumbnail navigation" description="Thumbnail next / previous navigation arrows, or a separate row of navigation buttons" class="group-fcset fc-cleared" depend_class="use_pages">
+				<!--option value="0">FLEXI_DISABLE</option-->
+				<option value="2">As arrows, inside thumbnail row</option>
+				<option value="1">As separate buttons row</option>
+			</field>
+			<!--field name="PPFX_enable_bottom_pager" type="radio" default="0" label="Bottom pager" description="Bottom Pagination" class="btn-group btn-group-yesno" depend_class="use_pages">
+				<option value="0">FLEXI_DISABLE</option>
+				<option value="1">FLEXI_ENABLE</option>
+			</field-->
 
 		</fieldset>
 

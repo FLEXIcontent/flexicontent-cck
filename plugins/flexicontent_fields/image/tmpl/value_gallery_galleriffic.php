@@ -28,98 +28,474 @@ foreach ($values as $n => $value)
 
 	$group_str = '';   // image grouping: not needed / not applicatble
 	$field->{$prop}[] =
-		'<a href="'.JUri::root(true).'/'.$srcl.'" class="fc_image_thumb thumb" name="drop">
+		'<a class="fc_image_thumb thumb" name="drop" href="'.JUri::root(true).'/'.$srcl.'" data-width="' . $value['size_w_l'] . '" data-height="' . $value['size_h_l'] . '" title="' . $title_encoded . '">
 			'.$img_legend.'
 		</a>
+		<a class="fancy" href="'.JUri::root(true).'/'.$srcl.'" title="' . $title_encoded . '">
+		</a>
 		<div class="caption">
-			<b>'.$title.'</b>
-			<br/>'.$desc.'
+			<div class="image-title">'.$title.'</div>
+			<div class="image-desc">'.flexicontent_html::striptagsandcut($desc, 80).'</div>
 		</div>';
 }
 
 
+// Gallery options
 
-// ***
-// *** Add per field custom JS
-// ***
+$auto_start          = (int) $field->parameters->get( $PPFX_ . 'auto_start', 1 );
+$transition_duration = (int) $field->parameters->get( $PPFX_ . 'transition_duration', 600 );
+$slideshow_delay     = (int) $field->parameters->get( $PPFX_ . 'slideshow_delay', 2500 );
+$preload_image       = (int) $field->parameters->get( $PPFX_ . 'preload_image', 10 );
+$enable_popup        = (int) $field->parameters->get( $PPFX_ . 'enable_popup', 1 );
 
-if ( !isset(static::$js_added[$field->id][__FILE__]) )
+$thumb_height        = (int) $field->parameters->get( $PPFX_ . 'thumb_height', 100 );
+$slide_height        = (int) $field->parameters->get( $PPFX_ . 'slide_height', 400 );
+
+$use_pages           = (int) $field->parameters->get( $PPFX_ . 'use_pages', 0 );
+$number_thumbs       = !$use_pages ? 9999 : (int) $field->parameters->get( $PPFX_ . 'number_thumbs', 6 );
+$number_pages        = (int) $field->parameters->get( $PPFX_ . 'number_pages', 10 );
+
+$enable_top_pager    = (int) $field->parameters->get( $PPFX_ . 'enable_top_pager', 2 );
+$enable_bottom_pager = 0; //(int) $field->parameters->get( $PPFX_ . 'enable_bottom_pager', 0 );
+
+$over_image_btns     = 1;
+
+
+$uid = 'es_'.$field_name_js."_fcitem".$item->id;
+
+$thumb_container_height = $thumb_height + (!$use_pages ? 32 : 0) + ($use_pages && $enable_top_pager === 1 ? 40 : 0) + ($use_pages && $enable_bottom_pager === 1 ? 40 : 0);
+
+$js = "
+
+(function($) {
+$(document).ready(function()
 {
-	flexicontent_html::loadFramework('galleriffic');
+	var use_pages = " . $use_pages . ";
 
-	//load options
-	$slideshow_delay = $field->parameters->get( $PPFX_ . 'slideshow_delay', '2500' );
-	$number_thumbs = $field->parameters->get( $PPFX_ . 'number_thumbs', '4' );
-	$preload_image = $field->parameters->get( $PPFX_ . 'preload_image', '10' );
-	$enable_top_pager = $field->parameters->get( $PPFX_ . 'emable_top_pager', 'true' );
-	$enable_bottom_pager = $field->parameters->get( $PPFX_ . 'emable_bottom_pager', 'true' );
-	$number_pages = $field->parameters->get( $PPFX_ . 'number_pages', '7' );
-	$auto_start = $field->parameters->get( $PPFX_ . 'auto_start', 'true' );
-	$transition_duration = $field->parameters->get( $PPFX_ . 'transition_duration', '900' );
+	// Opacity for over-image captions
+	var captionOpacity = 0.67;
 
-	$js = "
-	//document.write('<style>.noscript { display: none; }</style>');
-	jQuery(document).ready(function() {
-		// We only want these styles applied when javascript is enabled
-		jQuery('div.navigation').css({'width' : '150px', 'float' : 'left'});
-		jQuery('div.content').css({'display' : 'inline-block', 'float' : 'none'});
+	// Opacity for non-active, non-hovered thumbnails.
+	// Active or Hovered thumbnails have opacity: 1
+	var onMouseOutOpacity = 0.67;
+	
+	var sliderBox  = $('#gf_thumbs_" . $uid . "');
 
-		// Initially set opacity on thumbs and add
-		// additional styling for hover effect on thumbs
-		var onMouseOutOpacity = 0.67;
-		jQuery('#gf_thumbs ul.thumbs li').opacityrollover({
+	// Initialize Advanced Galleriffic Gallery
+	var gallery = sliderBox.galleriffic({
+		enableHistory:             false,
+		enableFancybox:            ".($enable_popup ? 'true' : 'false').",
+		syncTransitions:           true,
+		delay:                     ".$slideshow_delay.",
+		slideHeight:               ".$slide_height.",
+		numThumbs:                 ".$number_thumbs.",
+		preloadAhead:              ".$preload_image.",
+		enableTopPager:            ".($enable_top_pager === 2 ? 2 : ($enable_top_pager ? 'true' : 'false')).",
+		enableBottomPager:         ".($enable_bottom_pager ? 'true' : 'false').",
+		maxPagesToShow:            ".$number_pages.",
+		imageContainerSel:         '#gf_slideshow_" . $uid . "',
+		ssControlsContainerSel:    '#gf_sscontrols_" . $uid . "',
+		navControlsContainerSel:   '#gf_navcontrols_" . $uid . "',
+		captionContainerSel:       '#gf_caption_" . $uid . "',
+		loadingContainerSel:       '#gf_loading_" . $uid . "',
+		playLinkText:              '". '<span class="icon-play-circle" style="color: white"></span> ' . JText::_('FLEXI_FIELD_IMAGE_PLAY_SLIDESHOW') ."',
+		pauseLinkText:             '". '<span class="icon-pause-circle" style="color: white"></span> ' . JText::_('FLEXI_FIELD_IMAGE_PAUSE_SLIDESHOW') ."',
+		prevLinkText:              '". ($over_image_btns ? '&lt;' : JText::_('FLEXI_FIELD_IMAGE_PREV_LINK')) ."',
+		nextLinkText:              '". ($over_image_btns ? '&gt;' : JText::_('FLEXI_FIELD_IMAGE_NEXT_LINK')) ."',
+		prevPageLinkText:          '". ($enable_top_pager === 2 ? '&lt;' : JText::_('FLEXI_FIELD_IMAGE_PREV_PAGE_LINK')) ."',
+		nextPageLinkText:          '". ($enable_top_pager === 2 ? '&gt;' : JText::_('FLEXI_FIELD_IMAGE_NEXT_PAGE_LINK')) ."',
+		enableHistory:             false,
+		autoStart:                 ".($auto_start ? 'true' : 'false').",
+		syncTransitions:           true,
+		defaultTransitionDuration: ".$transition_duration.",
+		onSlideChange:             function(prevIndex, nextIndex)
+		{
+			// 'this' refers to the gallery, which is an extension of $('#gf_thumbs_" . $uid . "')
+			this.find('ul.thumbs').children()
+				.eq(prevIndex).fadeTo('fast', onMouseOutOpacity).end()
+				.eq(nextIndex).fadeTo('fast', 1.0);
+		},
+		onTransitionOut:           function(slide, caption, isSync, callback)
+		{
+			slide.fadeTo(this.getDefaultTransitionDuration(isSync), 0.0, callback);
+			caption.fadeTo(this.getDefaultTransitionDuration(isSync), 0.0);
+		},
+		onTransitionIn:            function(slide, caption, isSync)
+		{
+			var duration = this.getDefaultTransitionDuration(isSync);
+			slide.fadeTo(duration, 1.0);
+			
+			// Position the caption at the bottom of the image and set its opacity
+			var slideImage = slide.find('img');
+
+			var height = Math.floor( slideImage.outerHeight() );
+			var bottom = Math.ceil(slide.height() - slideImage.outerHeight());
+			var left   = Math.ceil((slide.width() - slideImage.width()) / 2); //  + slideImage.outerWidth() - slideImage.width();
+			var width  = slideImage.width() < slide.width() ? slideImage.width() : slide.width();
+
+			slide.closest('.slideshow-container').find('.nav-controls-box').find('a').css({'height': height});
+			slide.closest('.slideshow-container').find('.loader').css({'height': height});
+
+			caption.width(width)
+				.css({
+					'display': 'block',
+					'bottom' : bottom,
+					'left' : left > 0 ? left : 0
+				})
+				.fadeTo(duration, captionOpacity);
+		},
+		onPageTransitionOut:       function(callback)
+		{
+			this.fadeTo('fast', 0.0, callback);
+		},
+		onPageTransitionIn:        function()
+		{
+			this.fadeTo('fast', 1.0);
+		}
+	});
+
+	// Avoid Flashing the thumbs
+	/*setTimeout(function()
+	{
+		$('#gf_thumbs_" . $uid . " ul.thumbs li').fc_opacityrollover({
 			mouseOutOpacity:   onMouseOutOpacity,
 			mouseOverOpacity:  1.0,
 			fadeSpeed:         'fast',
 			exemptionSelector: '.selected'
 		});
 
-		// Initialize Advanced Galleriffic Gallery
-		jQuery('#gf_thumbs').galleriffic({
-			/*enableFancybox: true,*/
-			delay:                     ".$slideshow_delay.",
-			numThumbs:                 ".$number_thumbs.",
-			preloadAhead:              ".$preload_image.",
-			enableTopPager:            ".$enable_top_pager.",
-			enableBottomPager:         ".$enable_bottom_pager.",
-			maxPagesToShow:            ".$number_pages.",
-			imageContainerSel:         '#gf_slideshow',
-			controlsContainerSel:      '#gf_controls',
-			captionContainerSel:       '#gf_caption',
-			loadingContainerSel:       '#gf_loading',
-			renderSSControls:          true,
-			renderNavControls:         true,
-			playLinkText:              '". JText::_('FLEXI_FIELD_IMAGE_PLAY_SLIDESHOW') ."',
-			pauseLinkText:             '". JText::_('FLEXI_FIELD_IMAGE_PAUSE_SLIDESHOW') ."',
-			prevLinkText:              '". JText::_('FLEXI_FIELD_IMAGE_PREV_LINK') ."',
-			nextLinkText:              '". JText::_('FLEXI_FIELD_IMAGE_NEXT_LINK') ."',
-			nextPageLinkText:          '". JText::_('FLEXI_FIELD_IMAGE_NEXT_PAGE_LINK') ."',
-			prevPageLinkText:          '". JText::_('FLEXI_FIELD_IMAGE_PREV_PAGE_LINK') ."',
-			enableHistory:             false,
-			autoStart:                 ".$auto_start.",
-			syncTransitions:           true,
-			defaultTransitionDuration: ".$transition_duration.",
-			onSlideChange:             function(prevIndex, nextIndex) {
-				// 'this' refers to the gallery, which is an extension of jQuery('#gf_thumbs')
-				this.find('ul.thumbs').children()
-					.eq(prevIndex).fadeTo('fast', onMouseOutOpacity).end()
-					.eq(nextIndex).fadeTo('fast', 1.0);
-			},
-			onPageTransitionOut:       function(callback) {
-				this.fadeTo('fast', 0.0, callback);
-			},
-			onPageTransitionIn:        function() {
-				this.fadeTo('fast', 1.0);
+		$('div#gf_thumbs_" . $uid . "').css({'display' : ''});
+	}, 50);*/
+
+
+	var slider = {
+		mode: 'horizontal',
+		dragstart_margin: 20,
+		dragwalk_margin: (use_pages ? 100 : 20),
+		isDragging: false,
+		items_box: $('#gf_thumbs_" . $uid . " ul.thumbs')
+	};
+
+	var boxPos = 0;
+	var startPos = 0;
+	var travelDist = 0;
+	var prop = slider.mode=='horizontal' ? 'left' : 'top';
+
+
+	// Prevent click if a drag was started (minor drags are not considered, see dragstart_margin parameter)
+	$(sliderBox).find('ul.thumbs li a img').on('click', function(ev)
+	{
+		// Click event is scheduled/queued after mouseup event, isDragging FLAG is cleared via setTimeout, thus we can use it here to prevent clicks
+		if (slider.isDragging)
+		{
+			var e = ev.originalEvent;
+			e.preventDefault();
+			e.stopPropagation();
+		}
+	});
+
+	var startEvents = 'mousedown touchstart';
+	$(sliderBox).on(startEvents, function(ev)
+	{
+		var e = ev.originalEvent;  // Get original event
+		if (ev.type=='mousedown')
+		{
+			// In the case of using mouse events, we need to prevent events for 'mousedown'
+			e.preventDefault(); e.stopPropagation();  // this may create undesired effects in some cases
+		}
+
+		var obj = ev.type!='touchstart' ? e : e.changedTouches[0]; // reference first touch point for this event
+
+		// Indicate draging by changing mouse cursor
+		//$(slider.items_box).css('cursor', (slider.mode=='horizontal' ? (travelDist<0 ? 'w-resize' : 'e-resize') : (travelDist<0 ? 'n-resize' : 's-resize')) );
+		$(slider.items_box).css('cursor', 'pointer' );
+
+		// Stop all animations and force them to complete, to get proper current position of the slider
+		$(slider.items_box).finish();
+		boxPos = parseInt($(slider.items_box).css(slider.mode=='horizontal' ? 'left' : 'top'));
+		startPos = parseInt(slider.mode=='horizontal' ? obj.clientX : obj.clientY);
+		//window.console.log ('Status: mousedown -- Start coordinate: ' + startPos + 'px');
+	});
+
+
+	var moveEvents = 'mousemove touchmove';
+	$(sliderBox).on(moveEvents, function(ev)
+	{
+		var e = ev.originalEvent;  // Get original event
+		//e.preventDefault();	//e.stopPropagation();
+
+		var obj = ev.type!='touchmove' ? e : e.changedTouches[0]; // reference first touch point for this event
+		var moveStarted = (startPos!=0);
+		if (!moveStarted) return;
+
+		var travelDist = parseInt(slider.mode=='horizontal' ? obj.clientX : obj.clientY) - startPos;
+		//window.console.log ('Status: mousemove -- Distance traveled: ' + travelDist + 'px');
+
+		// Check if drap distance is over the drag start threshold
+		if (!slider.isDragging && Math.abs(travelDist) < slider.dragstart_margin) return;
+		slider.isDragging = true;
+
+		// Touch/Mouse Drag is at new point, retarget to new point,
+		// Cancel all animations without completing them, to allow continuing from current position, thus avoiding position jump to previous touch position
+		$(slider.items_box).stop(true, false);
+
+		(slider.mode=='horizontal')
+			? $(slider.items_box).animate({ left: boxPos+travelDist }, 'fast')
+			: $(slider.items_box).animate({ top: boxPos+travelDist }, 'fast');
+	});
+
+
+	var endEvents = 'mouseleave mouseup touchend';
+	$(sliderBox).on(endEvents, function(ev)
+	{
+		var e = ev.originalEvent;  // Get original event
+		//e.preventDefault(); //e.stopPropagation();
+
+		var obj = ev.type!='touchend' ? e : e.changedTouches[0]; // reference first touch point for this event
+
+		var moveStarted = (startPos!=0);
+		if (!moveStarted) return;  // check if initial click was not inside the slider
+		var travelDist = parseInt(slider.mode=='horizontal' ? obj.clientX : obj.clientY) - startPos;
+		//window.console.log ('Status: mouseup -- End coordinate: ' + (slider.mode=='horizontal' ? obj.clientX : obj.clientY) + 'px');
+
+		$(slider.items_box).css('cursor', 'auto');  // restore mouse pointer
+
+		// Check if drag distance is over the drag walk threshold, and walk the slider to proper direction,
+		if (Math.abs(travelDist) > slider.dragwalk_margin)
+		{
+			//window.console.log('DO MOVE: ' + travelDist + ' ' + gallery.currentImage.index + ' ' + gallery.numThumbs);
+
+			// Cancel all animations without completing them, to allow walking from current position, thus avoiding position jump to last touch position
+			$(slider.items_box).stop(true, false);
+
+			// Cancel autoplay, to avoid confusion to the user
+			gallery.pause();
+
+			if (use_pages)
+			{
+				var page = gallery.getCurrentPage();
+				var do_move_next = ((travelDist < 0) && page < gallery.getNumPages() - 1);
+				var do_move_prev = ((travelDist > 0) && page > 0);
+				//window.console.log(page + ' ' + (gallery.getNumPages() - 1) + travelDist + ' ' + do_move_next + ' ' + do_move_prev);
+
+				// Walk the slider
+				if (do_move_next || do_move_prev)
+				{
+					// Goto next page but first hide items box to avoid potential ``flashing``
+					$(slider.items_box).hide();
+					(travelDist < 0) ? gallery.nextPage(true, true) : gallery.previousPage(true, true);
+
+					$(slider.items_box).css(prop, travelDist < 0 ? '50%' : '-50%');
+
+					// Consider delay in hiding currently selected item
+					$(sliderBox).find('ul.thumbs li.selected').hide();
+				}
+
+				// If having pagination then move back to start
+				setTimeout(function()
+				{
+					$(slider.items_box).show();
+					var css = {};
+					css[prop] = 0;
+					$(slider.items_box).animate(css, 'fast');
+				}, 200);
+			}
+			else
+			{
+				// Move thumbs container to start (we scrolled the parent of the thumbs container, not the thumbs container itself)
+				$(slider.items_box).css(prop, 0);
+
+				// We scrolled the parent of the thumbs container, not the thumbs container itself
+				var node = $(slider.items_box).get(0).parentNode;
+
+				//window.console.log ('scrollLeft (before): ' + $(node).scrollLeft() + ' scrollLeft New: ' + ($(node).scrollLeft() - travelDist));
+				(slider.mode=='horizontal') ? (node.scrollLeft -= travelDist) : (node.scrollTop += travelDist);
+				//window.console.log ('scrollLeft (after): ' + $(node).scrollLeft());
+			}
+		}
+
+		else
+		{
+			//window.console.log('CANCEL MOVE: ' + travelDist);
+
+			// Drag is under threshold, return slider to original position before dragging was stated,
+			// But first cancel all animations without completing, to allow returning from current position, thus avoiding position jump to last touch position
+			$(slider.items_box).stop(true, false);
+			var css = {};
+			css[prop] = boxPos;
+			$(slider.items_box).animate(css, 'fast');
+		}
+			
+		startPos = 0;
+		setTimeout(function(){ slider.isDragging = false; }, 100);
+	});
+
+
+
+
+
+	/**
+	 * MAIN AREA IMAGE
+	 */
+	var mSlider = {
+		mode: 'horizontal',
+		dragstart_margin: 20,
+		dragwalk_margin: (use_pages ? 100 : 20),
+		isDragging: false,
+		items_box: $('#gf_slideshow_" . $uid . "')
+	};
+
+	var mBoxPos = 0;
+	var mStartPos = 0;
+	var mTravelDist = 0;
+	var mProp = mSlider.mode=='horizontal' ? 'left' : 'top';
+
+
+	var startEvents = 'mousedown touchstart';
+	$(mSlider.items_box).on(startEvents, function(ev)
+	{
+		// Prevent click if a drag was started (minor drags are not considered, see dragstart_margin parameter)
+		$(mSlider.items_box).find('a:not(.gf_scrollable), a img:not(.gf_scrollable)').addClass('gf_scrollable').on('click', function(ev)
+		{
+			//window.console.log('ADDING EVENT');
+			
+			// Click event is scheduled/queued after mouseup event, isDragging FLAG is cleared via setTimeout, thus we can use it here to prevent clicks
+			if (mSlider.isDragging)
+			{
+				//window.console.log ('DRAGGING');
+				var e = ev.originalEvent;
+				e.preventDefault();
+				e.stopPropagation();
+			}
+			else
+			{
+				//window.console.log ('NOT DRAGGING');
 			}
 		});
+
+		var e = ev.originalEvent;  // Get original event
+		if (ev.type=='mousedown')
+		{
+			// In the case of using mouse events, we need to prevent events for 'mousedown'
+			e.preventDefault(); e.stopPropagation();  // this may create undesired effects in some cases
+		}
+
+		var obj = ev.type!='touchstart' ? e : e.changedTouches[0]; // reference first touch point for this event
+
+		// Indicate draging by changing mouse cursor
+		//$(mSlider.items_box).css('cursor', (mSlider.mode=='horizontal' ? (mTravelDist<0 ? 'w-resize' : 'e-resize') : (mTravelDist<0 ? 'n-resize' : 's-resize')) );
+		$(mSlider.items_box).css('cursor', 'pointer' );
+
+		// Stop all animations and force them to complete, to get proper current position of the slider
+		$(mSlider.items_box).finish();
+		mBoxPos = parseInt($(mSlider.items_box).css(mSlider.mode=='horizontal' ? 'left' : 'top'));
+		mStartPos = parseInt(mSlider.mode=='horizontal' ? obj.clientX : obj.clientY);
+		//window.console.log ('Status: mousedown -- Start coordinate: ' + mStartPos + 'px');
 	});
-	";
 
-	if ($js) JFactory::getDocument()->addScriptDeclaration($js);
 
-	static::$js_added[$field->id][__FILE__] = true;
+	var moveEvents = 'mousemove touchmove';
+	$(mSlider.items_box).on(moveEvents, function(ev)
+	{
+		var e = ev.originalEvent;  // Get original event
+		//e.preventDefault();	//e.stopPropagation();
+
+		var obj = ev.type!='touchmove' ? e : e.changedTouches[0]; // reference first touch point for this event
+		var moveStarted = (mStartPos!=0);
+		if (!moveStarted) return;
+
+		var mTravelDist = parseInt(mSlider.mode=='horizontal' ? obj.clientX : obj.clientY) - mStartPos;
+		//window.console.log ('Status: mousemove -- Distance traveled: ' + mTravelDist + 'px');
+
+		// Check if drap distance is over the drag start threshold
+		if (!mSlider.isDragging && Math.abs(mTravelDist) < mSlider.dragstart_margin) return;
+		mSlider.isDragging = true;
+		//window.console.log ('Dragging');
+
+		// Touch/Mouse Drag is at new point, retarget to new point,
+		// Cancel all animations without completing them, to allow continuing from current position, thus avoiding position jump to previous touch position
+		$(mSlider.items_box).stop(true, false);
+
+		(mSlider.mode=='horizontal')
+			? $(mSlider.items_box).animate({ left: mBoxPos+mTravelDist }, 'fast')
+			: $(mSlider.items_box).animate({ top: mBoxPos+mTravelDist }, 'fast');
+	});
+
+
+	var endEvents = 'mouseleave mouseup touchend';
+	$(mSlider.items_box).on(endEvents, function(ev)
+	{
+		var e = ev.originalEvent;  // Get original event
+		//e.preventDefault(); //e.stopPropagation();
+
+		var obj = ev.type!='touchend' ? e : e.changedTouches[0]; // reference first touch point for this event
+
+		var moveStarted = (mStartPos!=0);
+		if (!moveStarted) return;  // check if initial click was not inside the slider
+		var mTravelDist = parseInt(mSlider.mode=='horizontal' ? obj.clientX : obj.clientY) - mStartPos;
+		//window.console.log ('Status: mouseup -- End coordinate: ' + (mSlider.mode=='horizontal' ? obj.clientX : obj.clientY) + 'px');
+
+		$(mSlider.items_box).css('cursor', 'auto');  // restore mouse pointer
+
+		// Check if drag distance is over the drag walk threshold, and walk the slider to proper direction,
+		if (Math.abs(mTravelDist) > mSlider.dragwalk_margin)
+		{
+			//window.console.log('DO main MOVE: ' + mTravelDist + ' ' + gallery.currentImage.index + ' ' + gallery.numThumbs);
+
+			// Cancel all animations without completing them, to allow walking from current position, thus avoiding position jump to last touch position
+			$(mSlider.items_box).stop(true, false);
+
+			// Cancel autoplay, to avoid confusion to the user
+			gallery.pause();
+
+			if (1)
+			{
+				// Move container to start (we scrolled it but now need it back to proper position for moving to next image)
+				$(mSlider.items_box).css(mProp, 0);
+
+				// Go to next / previous image
+				(travelDist < 0) ? gallery.next() : gallery.previous();
+			}
+		}
+
+		else
+		{
+			//window.console.log('CANCEL main MOVE: ' + mTravelDist);
+
+			// Drag is under threshold, return slider to original position before dragging was stated,
+			// But first cancel all animations without completing, to allow returning from current position, thus avoiding position jump to last touch position
+			$(mSlider.items_box).stop(true, false);
+			var css = {};
+			css[mProp] = mBoxPos;
+			$(mSlider.items_box).animate(css, 'fast');
+		}
+			
+		mStartPos = 0;
+		setTimeout(function(){ mSlider.isDragging = false; }, 100);
+	});
+});
+})(jQuery);
+";
+
+if ($js) JFactory::getDocument()->addScriptDeclaration($js);
+
+
+/**
+ * Add per field custom JS
+ */
+
+if ( !isset(static::$js_added[$field->id][__FILE__]) )
+{
+	flexicontent_html::loadFramework('galleriffic');
+
+	// Load Fancybox if needed
+	if ( $enable_popup )
+	{
+		flexicontent_html::loadFramework('fancybox');
+	}
+
+	static::$js_added[$field->id][__FILE__] = array();
 }
-
 
 
 /**
@@ -135,24 +511,45 @@ if ($result !== _FC_RETURN_)
 
 	// Add container HTML
 	$field->{$prop} = '
-	<div id="gf_container">
-		<div id="gallery" class="content">
-			<div id="gf_controls" class="controls"></div>
-			<div class="slideshow-container">
-				<div id="gf_loading" class="loader"></div>
-				<div id="gf_slideshow" class="slideshow"></div>
-			</div>
-			<div id="gf_caption" class="caption-container"></div>
-		</div>
-		<div id="gf_thumbs" class="navigation">
+
+	<style>
+		div#gf_thumbs_' . $uid . '{' . ($use_pages ? 'min-height: ' : 'height: ') . $thumb_container_height . 'px; }
+		div#gf_thumbs_' . $uid . ' ul.thumbs {' . ($use_pages ? 'min-height: ' : 'height: ') . $thumb_height . 'px; }
+		div#gf_thumbs_' . $uid . ' ul.thumbs li a img {
+			height:' . $thumb_height . 'px !important;
+			max-width:' . $thumb_height . 'px !important;
+		}
+		div#gf_container_' . $uid . ' div.slideshow-container { height: ' . $slide_height . 'px; }
+	</style>
+
+	<div id="gf_container_' . $uid . '" class="gf_container">
+		<div id="gf_thumbs_' . $uid . '" class="navigation' . (!$use_pages ? ' no_pagination' : '') . '" style="display: none;">
 			<ul class="thumbs noscript">
 				<li>
 				'. implode("</li>\n<li>", $field->{$prop}) .'
 				</li>
 			</ul>
 		</div>
-		<div style="clear: both;"></div>
+
+		<div class="gf_controls_box">
+			<div id="gf_sscontrols_' . $uid . '" class="controls ss-controls-box hasTooltip" title="' . JText::_('FLEXI_FIELD_IMAGE_ABOUT_LEFT_RIGHT_KEYS_NAV') . '"></div>
+			' . (!$over_image_btns ? '
+			<div id="gf_navcontrols_' . $uid . '" class="controls nav-controls-box"></div>
+			' : '') . '
+		</div>
+
+		<div id="gf_content_' . $uid . '" class="content">
+			<div class="slideshow-container">
+				' . ($over_image_btns ? '
+				<div id="gf_navcontrols_' . $uid . '" class="controls nav-controls-box"></div>
+				' : '') . '
+				<div id="gf_loading_' . $uid . '" class="loader"></div>
+				<div id="gf_slideshow_' . $uid . '" class="slideshow"></div>
+				<div id="gf_caption_' . $uid . '" class="caption-container"></div>
+			</div>
+		</div>
 	</div>
+	<div class="fcclear"></div>
 	';
 
 	// Apply open/close tags
