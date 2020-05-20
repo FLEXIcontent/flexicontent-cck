@@ -18,6 +18,13 @@
 	$.galleriffic = {
 		version: '2.1.0',
 
+		// Strips HTML tags
+		stripHtml: function(html) {
+			var tmp = document.createElement("DIV");
+			tmp.innerHTML = html;
+			return tmp.textContent || tmp.innerText || "";
+		},
+
 		// Strips invalid characters and any leading # characters
 		normalizeHash: function(hash) {
 			return hash.replace(/^.*#/, '').replace(/\?.*$/, '');
@@ -68,6 +75,7 @@
 	var defaults = {
 		delay:                     3000,
 		numThumbs:                 20,
+		slideHeight:               0,
 		preloadAhead:              40, // Set to -1 to preload all images
 		enableTopPager:            false,
 		enableBottomPager:         true,
@@ -147,6 +155,8 @@
 				var $aThumb = $li.find('a.thumb');
 				var slideUrl = $aThumb.attr('href');
 				var title = $aThumb.attr('title');
+				var width = $aThumb.attr('data-width');
+				var height = $aThumb.attr('data-height');
 				var $caption = $li.find('.caption').remove();
 				var $fancy = $li.find('a.fancy').remove();
 				var hash = $aThumb.attr('name');
@@ -165,6 +175,8 @@
 				
 				var imageData = {
 					title:title,
+					width:width,
+					height:height,
 					slideUrl:slideUrl,
 					caption:$caption,
 					fancy:$fancy,
@@ -342,6 +354,10 @@
 				image.alt = imageData.title;
 				image.src = imageData.slideUrl;
 
+				image.width  = imageData.width;
+				image.height = imageData.height;
+				image.style.maxWidth  = imageData.width + 'px';
+				image.style.maxHeight = (this.slideHeight > imageData.height ? imageData.height + 'px' : '');
 				return this;
 			},
 			
@@ -390,7 +406,8 @@
 				if (this.$ssControlsContainer) {
 					this.$ssControlsContainer
 						.find('div.ss-controls a').removeClass().addClass('play')
-						.attr('title', this.playLinkText)
+						.attr('title', '')
+					//.attr('title', $.galleriffic.stripHtml(this.playLinkText))
 						.attr('href', '#play')
 						.html(this.playLinkText);
 				}
@@ -405,7 +422,8 @@
 				if (this.$ssControlsContainer) {
 					this.$ssControlsContainer
 						.find('div.ss-controls a').removeClass().addClass('pause')
-						.attr('title', this.pauseLinkText)
+						.attr('title', '')
+					//.attr('title', $.galleriffic.stripHtml(this.pauseLinkText))
 						.attr('href', '#pause')
 						.html(this.pauseLinkText);
 				}
@@ -618,6 +636,11 @@
 					// set alt and src
 					image.alt = imageData.title;
 					image.src = imageData.slideUrl;
+
+					image.width  = imageData.width;
+					image.height = imageData.height;
+					image.style.maxWidth  = imageData.width + 'px';
+					image.style.maxHeight = (this.slideHeight > imageData.height ? imageData.height + 'px' : '');
 				}
 
 				// This causes the preloader (if still running) to relocate out from the currentIndex
@@ -744,7 +767,7 @@
 				if (this.enableTopPager) {
 					var $topPager = this.find('div.top');
 					if ($topPager.length == 0)
-						$topPager = this.prepend('<div class="top pagination"></div>').find('div.top');
+						$topPager = this.prepend('<div class="top pagination' + (this.enableTopPager == 2 ? ' gf_inline_nav' : '') + '"></div>').find('div.top');
 					else
 						$topPager.empty();
 
@@ -818,38 +841,52 @@
 				// Prev Page Link
 				if (page > 0) {
 					var prevPage = startIndex - this.numThumbs;
-					pager.append('<a rel="history" href="#'+this.data[prevPage].hash+'" title="'+this.prevPageLinkText+'">'+this.prevPageLinkText+'</a>');
+					pager.append('<a rel="history" class="prev_page_btn" href="#'+this.data[prevPage].hash+'" title="'+(this.enableTopPager != 2 ? this.prevPageLinkText : (page > 0 ? page : '-'))+'">'+this.prevPageLinkText+'</a>');
+				}
+				else {
+					pager.append('<span class="ellipsis prev_page_btn">'+this.prevPageLinkText+'</span>');
 				}
 
-				// Create First Page link if needed
-				if (pageNum > 0) {
-					this.buildPageLink(pager, 0, numPages);
-					if (pageNum > 1)
-						pager.append('<span class="ellipsis">&hellip;</span>');
+				if (this.enableTopPager != 2)
+				{
+					// Create First Page link if needed
+					if (pageNum > 0) {
+						this.buildPageLink(pager, 0, numPages);
+						if (pageNum > 1)
+							pager.append('<span class="ellipsis">&hellip;</span>');
+						
+						pagesRemaining--;
+					}
+
+					// Page Index Links
+					while (pagesRemaining > 0) {
+						this.buildPageLink(pager, pageNum, numPages);
+						pagesRemaining--;
+						pageNum++;
+					}
+
+					// Create Last Page link if needed
+					if (pageNum < numPages) {
+						var lastPageNum = numPages - 1;
+						if (pageNum < lastPageNum)
+							pager.append('<span class="ellipsis">&hellip;</span>');
+
+						this.buildPageLink(pager, lastPageNum, numPages);
+					}
+				}
+				else
+				{
+					pager.append('<span class="gf_pagination_info">' + (page + 1) + ' / ' + numPages + '</span>');
+				}
 					
-					pagesRemaining--;
-				}
-
-				// Page Index Links
-				while (pagesRemaining > 0) {
-					this.buildPageLink(pager, pageNum, numPages);
-					pagesRemaining--;
-					pageNum++;
-				}
-
-				// Create Last Page link if needed
-				if (pageNum < numPages) {
-					var lastPageNum = numPages - 1;
-					if (pageNum < lastPageNum)
-						pager.append('<span class="ellipsis">&hellip;</span>');
-
-					this.buildPageLink(pager, lastPageNum, numPages);
-				}
 
 				// Next Page Link
 				var nextPage = startIndex + this.numThumbs;
 				if (nextPage < this.data.length) {
-					pager.append('<a rel="history" href="#'+this.data[nextPage].hash+'" title="'+this.nextPageLinkText+'">'+this.nextPageLinkText+'</a>');
+					pager.append('<a rel="history" class="next_page_btn" href="#'+this.data[nextPage].hash+'" title="'+(this.enableTopPager != 2 ? this.nextPageLinkText : (page < numPages ? page+2 : '-'))+'">'+this.nextPageLinkText+'</a>');
+				}
+				else {
+					pager.append('<span class="ellipsis next_page_btn">'+this.nextPageLinkText+'</span>');
 				}
 
 				pager.find('a').click(function(e) {
@@ -928,7 +965,7 @@
 		if (this.navControlsContainerSel) {
 			this.$navControlsContainer = $(this.navControlsContainerSel).empty();
 			this.$navControlsContainer
-				.append('<div class="nav-controls"><a class="prev" rel="history" title="'+this.prevLinkText+'">'+this.prevLinkText+'</a><a class="next" rel="history" title="'+this.nextLinkText+'">'+this.nextLinkText+'</a></div>')
+				.append('<div class="nav-controls"><a class="prev" rel="history" data-title="'+this.prevLinkText+'"><div>'+this.prevLinkText+'</div></a><a class="next" rel="history" data-title="'+this.nextLinkText+'"><div>'+this.nextLinkText+'</div></a></div>')
 				.find('div.nav-controls a')
 				.click(function(e) {
 					gallery.clickHandler(e, this);
