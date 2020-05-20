@@ -1714,13 +1714,10 @@ class flexicontent_html
 
 			case 'galleriffic':
 				if ($load_jquery) flexicontent_html::loadJQuery();
-				//flexicontent_html::loadFramework('fancybox');
 
 				$framework_path = JUri::root(true).$lib_path.'/galleriffic';
-				//$document->addStyleSheet($framework_path.'/css/basic.css');  // This is too generic and should not be loaded
-				$document->addStyleSheet($framework_path.'/css/galleriffic-3.css');
+				$document->addStyleSheet($framework_path.'/css/basic.css');
 				$document->addScript($framework_path.'/js/jquery.galleriffic.js');
-				$document->addScript($framework_path.'/js/jquery.opacityrollover.js');
 
 				break;
 
