@@ -314,6 +314,9 @@ if ($leadnum) :
 			$img_field_size = $img_size_map[ $this->params->get('lead_image_size' , 'l') ];
 			$img_field_name = $this->params->get('lead_image');
 		}
+		
+		$lead_fallback_field = $params->get('lead_fallback_field', 0);
+		$lead_image_fallback_img = $params->get('lead_image_fallback_img');
 
 		$lead_dimgs = $this->params->get('lead_default_images');
 		if ($lead_use_image && $lead_dimgs)
@@ -353,30 +356,69 @@ if ($leadnum) :
 
 			$custom_link = null;
 			if ($lead_use_image) :
-
-				// Render method 'display_NNNN_src' to avoid CSS/JS being added to the page
-				$img_field = false;
-				if (!empty($img_field_name))
+				if ($lead_image_custom_display)
 				{
-					FlexicontentFields::getFieldDisplay($item, $img_field_name, $values=null, $method='display_'.$img_field_size.'_src', 'category');
-					$img_field = isset($item->fields[$img_field_name]) ? $item->fields[$img_field_name] : false;
+					@list($fieldname, $varname) = preg_split('/##/',$lead_image_custom_display);
+					$fieldname = trim($fieldname); $varname = trim($varname);
+					$varname = $varname ? $varname : 'display';
+					$thumb_rendered = FlexicontentFields::getFieldDisplay($item, $fieldname, null, $varname, 'category');
+					$src = '';  // Clear src no rendering needed
+					$_thumb_w = $_thumb_h = 0;
 				}
-				$item->image_w = $item->image_h = 0;
-
-				if ($img_field)
+				elseif ($lead_image_custom_url)
 				{
-					$src = str_replace(JUri::root(), '', @ $img_field->thumbs_src[$img_field_size][0] );
-					if ( $lead_link_image_to && isset($img_field->value[0]) )
+					@list($fieldname, $varname) = preg_split('/##/',$lead_image_custom_url);
+					$fieldname = trim($fieldname); $varname = trim($varname);
+					$varname = $varname ? $varname : 'display';
+					$src =  FlexicontentFields::getFieldDisplay($item, $fieldname, null, $varname, 'category');
+				}
+				elseif ($img_field_name)
+				{
+					// Render method 'display_NNNN_src' to avoid CSS/JS being added to the page
+					$img_field = false;
+					if (!empty($img_field_name))
 					{
-						$custom_link = ($v = unserialize($img_field->value[0])) !== false ? @ $v['link'] : @ $img_field->value[0]['link'];
+						FlexicontentFields::getFieldDisplay($item, $img_field_name, $values=null, $method='display_'.$img_field_size.'_src', 'category');
+						$img_field = isset($item->fields[$img_field_name]) ? $item->fields[$img_field_name] : false;
+					}
+					$item->image_w = $item->image_h = 0;
+
+					if ($img_field)
+					{
+						$src = str_replace(JUri::root(), '', @ $img_field->thumbs_src[$img_field_size][0] );
+						if ( $lead_link_image_to && isset($img_field->value[0]) )
+						{
+							$custom_link = ($v = unserialize($img_field->value[0])) !== false ? @ $v['link'] : @ $img_field->value[0]['link'];
+						}
+
+						$item->image_w = $src ? $img_field->parameters->get('w_'.$img_field_size[0], 120) : 0;
+						$item->image_h = $src ? $img_field->parameters->get('h_'.$img_field_size[0], 90) : 0;
+					}
+					else
+					{
+						$src = flexicontent_html::extractimagesrc($item);
 					}
 
-					$item->image_w = $src ? $img_field->parameters->get('w_'.$img_field_size[0], 120) : 0;
-					$item->image_h = $src ? $img_field->parameters->get('h_'.$img_field_size[0], 90) : 0;
-				}
-				else
-				{
-					$src = flexicontent_html::extractimagesrc($item);
+					if(!$src && $lead_fallback_field && $lead_image_fallback_img==3) {
+						$image_url2 = FlexicontentFields::getFieldDisplay($item, $lead_fallback_field, $values=null, $method='display_'.$img_field_size.'_src', 'category');
+						$src2 = '';
+						$thumb2 = '';
+						if ($image_url2)
+						{
+							$img_field2 = $item->fields[$lead_fallback_field];
+
+							if ($lead_use_image==1)
+							{
+								$src = str_replace(JUri::root(), '', @ $img_field2->thumbs_src[$img_field_size][0] );
+							}
+							else
+							{
+								$thumb = @ $img_field2->thumbs_src[ $lead_use_image ][0];
+								$_thumb_w = $thumb ? $img_field2->parameters->get('w_'.$lead_use_image[0], 120) : 0;
+								$_thumb_h = $thumb ? $img_field2->parameters->get('h_'.$lead_use_image[0], 90) : 0;
+							}
+						}
+					}
 				}
 
 				// Use default image form layout parameters
@@ -751,7 +793,10 @@ if ($count > $leadnum) :
 			$img_field_size = $img_size_map[ $this->params->get('intro_image_size' , 'l') ];
 			$img_field_name = $this->params->get('intro_image');
 		}
-
+		
+		$intro_fallback_field = $params->get('intro_fallback_field', 0);
+		$intro_image_fallback_img = $params->get('intro_image_fallback_img');
+		
 		$intro_dimgs = $this->params->get('intro_default_images');
 		if ($intro_use_image && $intro_dimgs) {
 			$intro_dimgs = preg_split("/[\s]*,[\s]*/", $intro_dimgs);
@@ -788,30 +833,69 @@ if ($count > $leadnum) :
 
 			$custom_link = null;
 			if ($intro_use_image) :
-
-				// Render method 'display_NNNN_src' to avoid CSS/JS being added to the page
-				$img_field = false;
-				if (!empty($img_field_name))
+				if ($intro_image_custom_display)
 				{
-					FlexicontentFields::getFieldDisplay($item, $img_field_name, $values=null, $method='display_'.$img_field_size.'_src', 'category');
-					$img_field = isset($item->fields[$img_field_name]) ? $item->fields[$img_field_name] : false;
+					@list($fieldname, $varname) = preg_split('/##/',$intro_image_custom_display);
+					$fieldname = trim($fieldname); $varname = trim($varname);
+					$varname = $varname ? $varname : 'display';
+					$thumb_rendered = FlexicontentFields::getFieldDisplay($item, $fieldname, null, $varname, 'category');
+					$src = '';  // Clear src no rendering needed
+					$_thumb_w = $_thumb_h = 0;
 				}
-				$item->image_w = $item->image_h = 0;
-
-				if ($img_field)
+				elseif ($intro_image_custom_url)
 				{
-					$src = str_replace(JUri::root(), '', @ $img_field->thumbs_src[$img_field_size][0] );
-					if ( $intro_link_image_to && isset($img_field->value[0]) )
+					@list($fieldname, $varname) = preg_split('/##/',$intro_image_custom_url);
+					$fieldname = trim($fieldname); $varname = trim($varname);
+					$varname = $varname ? $varname : 'display';
+					$src =  FlexicontentFields::getFieldDisplay($item, $fieldname, null, $varname, 'category');
+				}
+				elseif ($img_field_name)
+				{
+					// Render method 'display_NNNN_src' to avoid CSS/JS being added to the page
+					$img_field = false;
+					if (!empty($img_field_name))
 					{
-						$custom_link = ($v = unserialize($img_field->value[0])) !== false ? @ $v['link'] : @ $img_field->value[0]['link'];
+						FlexicontentFields::getFieldDisplay($item, $img_field_name, $values=null, $method='display_'.$img_field_size.'_src', 'category');
+						$img_field = isset($item->fields[$img_field_name]) ? $item->fields[$img_field_name] : false;
+					}
+					$item->image_w = $item->image_h = 0;
+
+					if ($img_field)
+					{
+						$src = str_replace(JUri::root(), '', @ $img_field->thumbs_src[$img_field_size][0] );
+						if ( $intro_link_image_to && isset($img_field->value[0]) )
+						{
+							$custom_link = ($v = unserialize($img_field->value[0])) !== false ? @ $v['link'] : @ $img_field->value[0]['link'];
+						}
+
+						$item->image_w = $src ? $img_field->parameters->get('w_'.$img_field_size[0], 120) : 0;
+						$item->image_h = $src ? $img_field->parameters->get('h_'.$img_field_size[0], 90) : 0;
+					}
+					else
+					{
+						$src = flexicontent_html::extractimagesrc($item);
 					}
 
-					$item->image_w = $src ? $img_field->parameters->get('w_'.$img_field_size[0], 120) : 0;
-					$item->image_h = $src ? $img_field->parameters->get('h_'.$img_field_size[0], 90) : 0;
-				}
-				else
-				{
-					$src = flexicontent_html::extractimagesrc($item);
+					if(!$src && $intro_fallback_field && $intro_image_fallback_img==3) {
+						$image_url2 = FlexicontentFields::getFieldDisplay($item, $intro_fallback_field, $values=null, $method='display_'.$img_field_size.'_src', 'category');
+						$src2 = '';
+						$thumb2 = '';
+						if ($image_url2)
+						{
+							$img_field2 = $item->fields[$intro_fallback_field];
+
+							if ($intro_use_image==1)
+							{
+								$src = str_replace(JUri::root(), '', @ $img_field2->thumbs_src[$img_field_size][0] );
+							}
+							else
+							{
+								$thumb = @ $img_field2->thumbs_src[ $intro_use_image ][0];
+								$_thumb_w = $thumb ? $img_field2->parameters->get('w_'.$intro_use_image[0], 120) : 0;
+								$_thumb_h = $thumb ? $img_field2->parameters->get('h_'.$intro_use_image[0], 90) : 0;
+							}
+						}
+					}
 				}
 
 				// Use default image form layout parameters
