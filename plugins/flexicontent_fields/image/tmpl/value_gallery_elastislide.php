@@ -69,17 +69,17 @@ foreach ($values as $n => $value)
 	// Inform browser of real images sizes and of desired image size
 	$img_size_attrs .= ' width="' . $w . '" height="' . $h . '" style="height: auto; max-width: 100%;" ';
 
-	$title_attr = $desc_encoded ? $desc_encoded : $title_encoded;
 	$img_legend_custom ='
 		<img src="'.JUri::root(true).'/'.$src.'" alt="' . $alt_encoded . '"' . $legend . ' class="' . $class . '"
 			' . $img_size_attrs . '
 			data-medium="' . JUri::root(true).'/'.$srcm . '"
 			data-large="' . JUri::root(true).'/'.$srcl . '"
-			data-description="' . $title_attr . '" itemprop="image"/>
+			data-title="' . $title_encoded . '"
+			data-description="' . $desc_encoded . '" itemprop="image"/>
 	';
 	$group_str = $group_name ? 'rel="['.$group_name.']"' : '';
-	$field->{$prop}[] = '
-		<li><a href="javascript:;" class="fc_image_thumb">
+	$field->{$prop}[] =
+		'<li><a href="javascript:;" class="fc_image_thumb">
 			'.$img_legend_custom.'
 		</a></li>';
 }
@@ -104,51 +104,68 @@ if (!isset(static::$js_added[$field->id][__FILE__]))
 if (!isset(static::$js_added[$field->id][__FILE__][$item->id]))
 {
 	$uid = 'es_'.$field_name_js."_fcitem".$item->id;
-	$js = file_get_contents(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'elastislide'.DS.'js'.DS.'gallery_tmpl.js');
-	$js = str_replace('unique_gal_id', $uid, $js);
+	
+	/**
+	 * Slideshow configuration
+	 */
 
-	$slideshow_thumb_size = $field->parameters->get( $PPFX_ . 'slideshow_thumb_size', 'large' );
-	$slideshow_auto_play = (int) $field->parameters->get( $PPFX_ . 'slideshow_auto_play', 1 );
-	$slideshow_auto_delay = (int) $field->parameters->get( $PPFX_ . 'slideshow_auto_delay', 4000 );
-	$slideshow_transition = $field->parameters->get( $PPFX_ . 'slideshow_transition', 'cross-fade' );
-	$slideshow_easing   = $field->parameters->get( $PPFX_ . 'slideshow_easing', 'swing');
+	$slideshow_thumb_size   = $field->parameters->get( $PPFX_ . 'slideshow_thumb_size', 'large' );
+	$slideshow_thumb_height = (int) $field->parameters->get( $PPFX_ . 'slideshow_thumb_height', 400 );
+	$slideshow_auto_play    = (int) $field->parameters->get( $PPFX_ . 'slideshow_auto_play', 0 );
+	$slideshow_auto_delay   = (int) $field->parameters->get( $PPFX_ . 'slideshow_auto_delay', 4000 );
+	$slideshow_transition   = $field->parameters->get( $PPFX_ . 'slideshow_transition', 'cross-fade' );
+	$slideshow_easing       = $field->parameters->get( $PPFX_ . 'slideshow_easing', 'swing');
 	$slideshow_easing_inout = $field->parameters->get( $PPFX_ . 'slideshow_easing_inout', 'easeOut' );
-	$slideshow_speed = (int) $field->parameters->get( $PPFX_ . 'slideshow_speed', 600 );
+	$slideshow_speed        = (int) $field->parameters->get( $PPFX_ . 'slideshow_speed', 600 );  // Transition Duration
 
-	$carousel_position = (int) $field->parameters->get( $PPFX_ . 'carousel_position', 1 );
-	$carousel_visible = (int) $field->parameters->get( $PPFX_ . 'carousel_visible', 2 );
 
-	$carousel_thumb_size = $field->parameters->get( $PPFX_ . 'carousel_thumb_size', 's' );
-	$carousel_thumb_width = (int) $field->parameters->get( 'w_'.$carousel_thumb_size, 120 );
-	$carousel_transition = $field->parameters->get( $PPFX_ . 'carousel_transition', 'scroll' );
-	$carousel_easing   = $field->parameters->get( $PPFX_ . 'carousel_easing', 'swing');
+	/**
+	 * Carousel configuration
+	 */
+
+	// Carousel Buttons (Togglers)
+	$carousel_position     = (int) $field->parameters->get( $PPFX_ . 'carousel_position', 1 );
+	$carousel_visible      = (int) $field->parameters->get( $PPFX_ . 'carousel_visible', 2 );
+	// Carousel Thumbnails
+	$carousel_thumb_size   = $field->parameters->get( $PPFX_ . 'carousel_thumb_size', 's' );
+	$carousel_thumb_width  = (int) $field->parameters->get( $PPFX_ . 'carousel_thumb_width', 90 );
+	$carousel_thumb_height = (int) $field->parameters->get( $PPFX_ . 'carousel_thumb_height', 90 );
+	$carousel_thumb_border = (int) $field->parameters->get( $PPFX_ . 'carousel_thumb_border', 2 );
+	$carousel_thumb_margin = (int) $field->parameters->get( $PPFX_ . 'carousel_thumb_margin', 3 );
+	// Carousel Transition
+	$carousel_transition   = $field->parameters->get( $PPFX_ . 'carousel_transition', 'scroll' );
+	$carousel_easing       = $field->parameters->get( $PPFX_ . 'carousel_easing', 'swing');
 	$carousel_easing_inout = $field->parameters->get( $PPFX_ . 'carousel_easing_inout', 'easeOut' );
-	$carousel_speed = $field->parameters->get( $PPFX_ . 'carousel_speed', 600 );
+	$carousel_speed        = (int) $field->parameters->get( $PPFX_ . 'carousel_speed', 600 );
 
-	if ($js)
+
+	JFactory::getDocument()->addScriptDeclaration('
+	jQuery(document).ready(function()
 	{
-		JFactory::getDocument()->addScriptDeclaration(
-			'var elastislide_options_'.$uid.' = {
-				slideshow_thumb_size: \'' . $slideshow_thumb_size . '\',
-				slideshow_auto_play: ' . $slideshow_auto_play . ',
-				slideshow_auto_delay: ' . $slideshow_auto_delay . ',
-				slideshow_transition: \'' . $slideshow_transition . '\',
-				slideshow_easing: \'' . $slideshow_easing . '\',
-				slideshow_easing_inout: \'' . $slideshow_easing_inout . '\',
-				slideshow_speed: ' . $slideshow_speed . ',
+		var elastislide_options_'.$uid.' = {
+			slideshow_thumb_size: \'' . $slideshow_thumb_size . '\',
+			slideshow_auto_play: ' . $slideshow_auto_play . ',
+			slideshow_auto_delay: ' . $slideshow_auto_delay . ',
+			slideshow_transition: \'' . $slideshow_transition . '\',
+			slideshow_easing: \'' . $slideshow_easing . '\',
+			slideshow_easing_inout: \'' . $slideshow_easing_inout . '\',
+			slideshow_speed: ' . $slideshow_speed . ',
 
-				carousel_position: ' . $carousel_position . ',
-				carousel_visible: ' . $carousel_visible . ',
+			carousel_position: ' . $carousel_position . ',
+			carousel_visible: ' . $carousel_visible . ',
 
-				carousel_thumb_width: ' . $carousel_thumb_width . ',
-				carousel_transition: \'' . $carousel_transition . '\',
-				carousel_easing: \'' . $carousel_easing . '\',
-				carousel_easing_inout: \'' . $carousel_easing_inout . '\',
-				carousel_speed: ' . $carousel_speed . '
-			};
-			' . $js
-		);
-	}
+			carousel_thumb_width: ' . $carousel_thumb_width . ',
+			carousel_thumb_border: ' . $carousel_thumb_border . ',
+			carousel_thumb_margin: ' . $carousel_thumb_margin . ',
+			carousel_transition: \'' . $carousel_transition . '\',
+			carousel_easing: \'' . $carousel_easing . '\',
+			carousel_easing_inout: \'' . $carousel_easing_inout . '\',
+			carousel_speed: ' . $carousel_speed . '
+		};
+
+		fc_elastislide_gallery.init(elastislide_options_'.$uid.', "'.$uid.'");
+	});
+	');
 
 	JFactory::getDocument()->addCustomTag('
 	<script id="img-wrapper-tmpl_'.$uid.'" type="text/x-jquery-tmpl">
@@ -162,7 +179,7 @@ if (!isset(static::$js_added[$field->id][__FILE__][$item->id]))
 			<div class="rg-image"></div>
 			<div class="rg-loading"></div>
 			<div class="rg-caption-wrapper">
-				<div class="rg-caption" style="display:none;">
+				<div class="rg-caption" style="display:none;" ontouchstart="e.preventDefault();">
 					<p></p>
 				</div>
 			</div>
@@ -190,6 +207,20 @@ if ($result !== _FC_RETURN_)
 	// (note: we will use large image thumbnail as preview, JS will size them done)
 	$uid = 'es_'.$field_name_js."_fcitem".$item->id;
 	$field->{$prop} = '
+	<style>
+		div#rg-gallery_'.$uid.'.rg-gallery > .rg-image-wrapper { height: ' . $slideshow_thumb_height . 'px; }
+		div#rg-gallery_'.$uid.'.rg-gallery > .rg-image-wrapper > .rg-image > img { height: ' . $slideshow_thumb_height . 'px; }
+
+		div#rg-gallery_' . $uid . ' .es-carousel ul li,
+		div#rg-gallery_' . $uid . ' .es-carousel ul li a {
+			width:' . ($carousel_thumb_width + 2 * $carousel_thumb_border ). 'px !important;
+			height:' . ($carousel_thumb_height + 2 * $carousel_thumb_border ). 'px !important;
+		}
+		div#rg-gallery_' . $uid . ' .es-carousel ul li a img {
+			width:' . $carousel_thumb_width . 'px !important;
+		}
+	</style>
+
 	<div id="rg-gallery_'.$uid.'" class="rg-gallery" >
 		<div class="rg-thumbs">
 			<!-- Elastislide Carousel Thumbnail Viewer -->

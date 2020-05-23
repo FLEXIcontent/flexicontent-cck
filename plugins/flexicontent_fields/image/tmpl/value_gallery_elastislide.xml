@@ -15,23 +15,30 @@
 		
 		<fieldset name="layout" addfieldpath="/administrator/components/com_flexicontent/elements">
 
-			<field name="" type="separator" default="Slideshow options &lt;small&gt;(Main image) &lt;/small&gt;" level="level1" />
+			<field name="" type="separator" default="Slideshow options - ( &lt;b&gt;Main image&lt;/b&gt; )" level="level1" />
 
-			<field name="PPFX_slideshow_thumb_size" type="radio" default="large" label="Thumbnail size" description="This does not effect the width of display but it effects image quality and loading speed"  depend_class="slideshow_ops" class="btn-group">
+			<field name="PPFX_slideshow_auto_play" type="multilist" subtype="radio" default="0" toggle_related="1" label="Autoplay" description="Auto start slideshow" depend_class="" class="btn-group">
+				<option value="0" show_list="" hide_list="auto_play">FLEXI_NO</option>
+				<option value="1" show_list="auto_play" hide_list="">FLEXI_YES</option>
+			</field>
+			<field name="PPFX_slideshow_auto_delay" type="text" default="4000" label="Autoplay Delay" description="Delay for auto transitioning to next image" depend_class="auto_play" />
+
+			<field name="" type="separator" default="Image" level="level3" depend_class="" />
+			<field name="PPFX_slideshow_thumb_size" type="radio" default="large" label="FLEXI_PRE_CREATED_IMAGE" description="This effects image quality and loading speed. Use a thumbnail with height larger than then height of the slideshow area to avoid decreased quality"  depend_class="" class="btn-group group-fcinfo">
 				<option value="medium">FLEXI_MEDIUM</option>
 				<option value="large">FLEXI_LARGE</option>
 			</field>
-
-			<field name="PPFX_slideshow_auto_play" type="radio" default="1" label="Autoplay" description="Auto start slideshow" depend_class="slideshow_ops" class="btn-group">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
+			<field name="PPFX_slideshow_aspect_ratio" type="list" default="1" label="FLEXI_WIDTH" description="The slideshow container will be 100% and every image width will keep image aspect ratio"  depend_class="" class="">
+				<option value="1">FLEXI_KEEP_ASPECT_RATIO</option>
+				<option value="0" disabled="disabled">FLEXI_STRETCH</option>
 			</field>
+			<field name="PPFX_slideshow_thumb_height" type="int" default="400" label="FLEXI_HEIGHT_PX" description="FLEXI_IMAGE_HEIGHT" class="" depend_class="carousel_ops"/>
 
-			<field name="PPFX_slideshow_auto_delay" type="text" default="4000" label="Autoplay delay" description="Delay for auto transitioning to next image" depend_class="slideshow_ops" />
+			<field name="" type="separator" default="FLEXI_TRANSITION" level="level3" depend_class="" />
 
-			<field name="" type="separator" default="Transition" level="level3" depend_class="slideshow_ops" />
+			<field name="PPFX_slideshow_speed" type="text" default="600" label="FLEXI_DURATION" description="Select the duration of the change action in milli-seconds" class="" depend_class="" />
 
-			<field name="PPFX_slideshow_transition" type="groupedlist" default="scroll" label="Effect" description="The transition effect for moving between images" class="" depend_class="slideshow_ops">
+			<field name="PPFX_slideshow_transition" type="groupedlist" default="scroll" label="FLEXI_EFFECT" description="The transition effect for moving between images" class="" depend_class="">
 				<option value="cross-fade">Cross Fade</option>
 				<!--option value="scroll">Scroll</option>
 				<option value="fade">Fade</option>
@@ -52,35 +59,33 @@
 				</group-->
 			</field>
 
-			<field name="PPFX_slideshow_easing" type="groupedlist" default="swing" label="Smoothing" description="The method for easing the transition between images" class="slideshow_ops">
-				<group label="Basic">
-					<option value="linear" show_list="" hide_list="slideshow_easing_func">Linear</option>
+			<field name="PPFX_slideshow_easing" type="groupedlist" default="swing" label="FLEXI_SMOOTHING" description="The method for easing the transition between images" class="">
+				<!--group label="Basic"-->
 					<option value="swing" show_list="" hide_list="slideshow_easing_func">Swing</option>
-				</group>
-				<group label="Advanced (use smoothing function)">
-					<option value="quad" show_list="slideshow_easing_func" hide_list="">Quadratic</option>
-					<option value="cubic" show_list="slideshow_easing_func" hide_list="">Cubic</option>
-					<option value="quart" show_list="slideshow_easing_func" hide_list="">Quartic</option>
-					<option value="quint" show_list="slideshow_easing_func" hide_list="">Quintic</option>
+					<option value="linear" show_list="" hide_list="slideshow_easing_func">Linear</option>
+				<!--/group-->
+				<!--group label="Advanced [use smoothing function]">
+					<option value="quad" show_list="slideshow_easing_func" hide_list="">[^2] Quadratic</option>
+					<option value="cubic" show_list="slideshow_easing_func" hide_list="">[^3] Cubic</option>
+					<option value="quart" show_list="slideshow_easing_func" hide_list="">[^4] Quartic</option>
+					<option value="quint" show_list="slideshow_easing_func" hide_list="">[^5] Quintic</option>
 					<option value="expo" show_list="slideshow_easing_func" hide_list="">Exponential</option>
 					<option value="circ" show_list="slideshow_easing_func" hide_list="">Circular</option>
 					<option value="sine" show_list="slideshow_easing_func" hide_list="">Sinusoidal</option>
 					<option value="back" show_list="slideshow_easing_func" hide_list="">Back</option>
 					<option value="bounce" show_list="slideshow_easing_func" hide_list="">Bounce</option>
-					<option value="elastic" show_list="slideshow_easing_func" hide_list="">Elastic</option>
-				</group>
+					<option value="elastic" show_list="slideshow_easing_func" hide_list="">Elastic</option-->
+				<!--/group-->
 			</field>
 
-			<field name="PPFX_slideshow_easing_inout" type="radio" default="easeOut" label="Smoothing at" description="Select to use a slow transition start (easeIn) or slow transition ending (easeOut) or both of them (easeInOut)" class="btn-group group-fcinfo" depend_class="slideshow_ops slideshow_easing_func" >
-				<option value="easeIn">Start</option>
-				<option value="easeOut">End</option>
-				<option value="easeInOut">Both</option>
+			<field name="PPFX_slideshow_easing_inout" type="radio" default="easeOut" label="FLEXI_SMOOTHING_AT" description="Select to use a slow transition start (easeIn) or slow transition ending (easeOut) or both of them (easeInOut)" class="btn-group group-fcinfo" depend_class="slideshow_easing_func" >
+				<option value="easeIn">FLEXI_START</option>
+				<option value="easeOut">FLEXI_END</option>
+				<option value="easeInOut">FLEXI_BOTH</option>
 			</field>
 
-			<field name="PPFX_slideshow_speed" type="text" default="600" label="Speed" description="Select the duration of the movement in ms (milli-seconds)" class="" depend_class="slideshow_ops" />
 
-
-			<field name="" type="separator" default="Carousel options &lt;small&gt; (Thumbnail navigation) &lt;/small&gt;" level="level1" />
+			<field name="" type="separator" default="Carousel options - ( &lt;b&gt;Thumbnail navigation&lt;/b&gt; )" level="level1" />
 
 			<field name="PPFX_carousel_position" type="multilist" subtype="radio" default="1" toggle_related="1" label="Add carousel" description="Enable to show a thumbnail carousel below or above the slideshow" class="btn-group" >
 				<option value="0" show_list="" hide_list="carousel_ops">FLEXI_NO</option>
@@ -88,20 +93,27 @@
 				<option value="2" show_list="carousel_ops" hide_list="">Above slideshow</option>
 			</field>
 
-			<field name="PPFX_carousel_visible" type="radio" default="2" label="Carousel state" description="Select what happens on page load, the carousel can start hidden (aka 'closed') with / without its toggler button" class="btn-group group-fcinfo"  depend_class="carousel_ops" >
-				<option value="0">Toggler button only</option>
-				<option value="1">Carousel only</option>
-				<option value="2">FLEXI_BOTH</option>
+			<field name="PPFX_carousel_visible" type="radio" default="2" label="Initial carousel state" description="Select what happens on page load, the carousel can start hidden (aka 'closed') with / without its toggler button" class="btn-group group-fcinfo"  depend_class="carousel_ops" >
+				<option value="0">Closed</option>
+				<option value="1">Open</option>
+				<option value="2">Open with toggler button</option>
 			</field>
 
-			<field name="PPFX_carousel_thumb_size" type="radio" default="s" label="Thumbnail size" description="..." class="btn-group group-fcinfo"  depend_class="carousel_ops" >
+			<field name="" type="separator" default="FLEXI_THUMBNAILS" level="level3" depend_class="carousel_ops" />
+			<field name="PPFX_carousel_thumb_size" type="radio" default="s" label="FLEXI_PRE_CREATED_IMAGE" description="These are pre-created thumbnails. Usually you would use small here" class="btn-group group-fcinfo"  depend_class="carousel_ops" >
 				<option value="s">FLEXI_SMALL</option>
 				<option value="m">FLEXI_MEDIUM</option>
 			</field>
+			<field name="PPFX_carousel_thumb_width" type="int" default="90" label="FLEXI_WIDTH_PX" description="Thumbnail Width" class="" depend_class="carousel_ops"/>
+			<field name="PPFX_carousel_thumb_height" type="int" default="90" label="FLEXI_HEIGHT_PX" description="Thumbnail Height" class="" depend_class="carousel_ops"/>
+			<field name="PPFX_carousel_thumb_border" type="int" default="2" label="FLEXI_BORDER_PX" description="..." class="" depend_class="carousel_ops"/>
+			<field name="PPFX_carousel_thumb_margin" type="int" default="3" label="Margin Right (px)" description="..." class="" depend_class="carousel_ops"/>
 
-			<field name="" type="separator" default="Transition" level="level3" class="carousel_ops" />
+			<field name="" type="separator" default="FLEXI_TRANSITION" level="level3" class="carousel_ops" />
 
-			<field name="PPFX_carousel_transition" type="groupedlist" default="scroll" label="Effect" description="The transition effect for moving between images" class="" depend_class="carousel_ops">
+			<field name="PPFX_carousel_speed" type="int" default="600" label="FLEXI_DURATION" description="Select the duration of the movement in ms (milli-seconds)" class="" depend_class="carousel_ops"/>
+
+			<field name="PPFX_carousel_transition" type="groupedlist" default="scroll" label="FLEXI_EFFECT" description="The transition effect for moving between images" class="" depend_class="carousel_ops">
 				<option value="scroll">Scroll</option>
 				<!--option value="fade">Fade</option>
 				<option value="slide">Slide</option>
@@ -121,17 +133,17 @@
 				</group-->
 			</field>
 
-			<field name="PPFX_carousel_easing" type="groupedlist" default="swing" label="Smoothing" description="The method for easing the transition between images" class="" depend_class="carousel_ops">
+			<field name="PPFX_carousel_easing" type="groupedlist" default="swing" label="FLEXI_SMOOTHING" description="The method for easing the transition between images" class="" depend_class="carousel_ops">
 				<group label="Basic">
-					<option value="linear" show_list="" hide_list="carousel_easing_func">Linear</option>
 					<option value="swing" show_list="" hide_list="carousel_easing_func">Swing</option>
+					<option value="linear" show_list="" hide_list="carousel_easing_func">Linear</option>
 				</group>
 				<group label="Advanced (use smoothing function)">
-					<option value="quad" show_list="carousel_easing_func" hide_list="">Quadratic</option>
-					<option value="cubic" show_list="carousel_easing_func" hide_list="">Cubic</option>
-					<option value="quart" show_list="carousel_easing_func" hide_list="">Quartic</option>
-					<option value="quint" show_list="carousel_easing_func" hide_list="">Quintic</option>
-					<option value="expo" show_list="carousel_easing_func" hide_list="">Exponential</option>
+					<option value="quad" show_list="carousel_easing_func" hide_list="">[^2] Quadratic</option>
+					<option value="cubic" show_list="carousel_easing_func" hide_list="">[^3] Cubic</option>
+					<!--option value="quart" show_list="carousel_easing_func" hide_list="">[^4] Quartic</option>
+					<option value="quint" show_list="carousel_easing_func" hide_list="">[^5] Quintic</option>
+					<option value="expo" show_list="carousel_easing_func" hide_list="">Exponential</option-->
 					<option value="circ" show_list="carousel_easing_func" hide_list="">Circular</option>
 					<option value="sine" show_list="carousel_easing_func" hide_list="">Sinusoidal</option>
 					<option value="back" show_list="carousel_easing_func" hide_list="">Back</option>
@@ -140,13 +152,11 @@
 				</group>
 			</field>
 
-			<field name="PPFX_carousel_easing_inout" type="radio" default="easeOut" label="Smoothing at" description="Select to use a slow transition start (easeIn) or slow transition ending (easeOut) or both of them (easeInOut)" class="btn-group group-fcinfo" depend_class="carousel_ops carousel_easing_func">
-				<option value="easeIn">Start</option>
-				<option value="easeOut">End</option>
-				<option value="easeInOut">Both</option>
+			<field name="PPFX_carousel_easing_inout" type="radio" default="easeOut" label="FLEXI_SMOOTHING_AT" description="Select to use a slow transition start (easeIn) or slow transition ending (easeOut) or both of them (easeInOut)" class="btn-group group-fcinfo" depend_class="carousel_ops carousel_easing_func">
+				<option value="easeIn">FLEXI_START</option>
+				<option value="easeOut">FLEXI_END</option>
+				<option value="easeInOut">FLEXI_BOTH</option>
 			</field>
-
-			<field name="PPFX_carousel_speed" type="text" default="600" label="Speed" description="Select the duration of the movement in ms (milli-seconds)" class="" depend_class="carousel_ops"/>
 
 		</fieldset>
 

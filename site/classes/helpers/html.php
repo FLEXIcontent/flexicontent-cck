@@ -1725,15 +1725,13 @@ class flexicontent_html
 				if ($load_jquery) flexicontent_html::loadJQuery();
 
 				$framework_path = JUri::root(true).$lib_path.'/elastislide';
-				$document->addStyleSheet($framework_path.'/css/style.css');
-				$document->addStyleSheet($framework_path.'/css/elastislide.css');
+				$document->addStyleSheet($framework_path.'/css/gallery.css');
 
 				$document->addScript($framework_path.'/js/jquery.tmpl.min.js');
-				//$document->addScript($framework_path.'/js/jquery.easing.1.3.js');
 				$document->addScript(JUri::root(true).'/components/com_flexicontent/assets/js/jquery-easing.js', array('version' => FLEXI_VHASH));
 
 				$document->addScript($framework_path.'/js/jquery.elastislide.js');
-				//$document->addScript($framework_path.'/js/gallery.js'); // replace with field specific: gallery_tmpl.js
+				$document->addScript($framework_path.'/js/gallery.js');
 				break;
 
 			case 'photoswipe':
