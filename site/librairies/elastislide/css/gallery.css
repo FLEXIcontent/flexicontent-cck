@@ -1,0 +1,299 @@
+
+/**
+ * SLIDESHOW
+ */
+
+.rg-gallery > .rg-image-wrapper {
+	/*background:transparent url(../images/black.png) repeat top left;*/
+	background: white;
+	/*border-radius: 10px;*/
+
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	flex-wrap: nowrap;
+	align-items: normal;
+	justify-content: flex-start;
+
+	max-width: 100%;
+	max-height: 96vh;
+	width: 5000px;
+
+	overflow: hidden;
+	padding: 0;
+	margin: 0;
+}
+.rg-gallery > .rg-image-wrapper > .rg-image {
+	position: relative;
+	display: flex;
+	justify-content: center;
+	text-align: center;
+	max-height: 96vh;
+}
+.rg-gallery > .rg-image-wrapper > .rg-image > img {
+	position: absolute;
+	display: block;
+	z-index: 1;
+
+	max-width: 100%;
+	max-height: 96vh;
+	width: auto;
+	border-radius: 0px;
+
+	left: 0;
+	right: 0;
+	margin-left: auto;
+	margin-right: auto;
+}
+.rg-gallery > .rg-image-wrapper > .rg-image > img.active {
+	z-index: 3;
+}
+
+.rg-gallery > .rg-image-wrapper > .rg-image-nav {
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	width: 100%;
+	height: 100%;
+}
+.rg-gallery > .rg-image-wrapper > .rg-image-nav a {
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	background: rgba(0, 0, 0, 0.3) url(../images/nav.png) no-repeat -20% 50%;
+	width: 28px;
+	height: 100%;
+	text-indent: -9000px;
+	cursor: pointer;
+	opacity: 0.3;
+	filter: alpha(opacity=30);
+	outline: none;
+	/*border-radius: 10px 0px 0px 10px;*/
+	z-index: 4;
+}
+.rg-gallery > .rg-image-wrapper > .rg-image-nav a.rg-image-nav-next {
+	right:0px;
+	left:auto;
+	background-position:115% 50%;
+	/*border-radius: 0px 10px 10px 0px;*/
+}
+.rg-gallery > .rg-image-wrapper > .rg-image-nav a:hover {
+	opacity: 0.8;
+	filter: alpha(opacity=80);
+}
+.rg-gallery > .rg-image-wrapper > .rg-caption-wrapper {
+	display: flex;
+	justify-content: center;
+}
+.rg-gallery > .rg-image-wrapper > .rg-caption-wrapper .rg-caption {
+	display: flex;
+	justify-content: center;
+	text-align: initial;
+
+	position: absolute;
+	z-index: 3;
+	bottom: 0;
+
+	margin: 0;
+	left: 0;
+	right: 0;
+	margin-left: auto;
+	margin-right: auto;
+
+	pointer-events: none;
+}
+.rg-gallery > .rg-image-wrapper > .rg-caption-wrapper .rg-caption > p {
+	display: inline-block;
+	max-height: 8em;
+	overflow: hidden;
+
+	margin: 0 29px; /* match side arrows width */
+	font-size: 14px;
+	line-height: 1em;
+	padding: 12px;
+  color: white;
+	text-shadow: 1px 1px 0px #000, -1px -1px 0px #000;
+	letter-spacing: 2px;
+	font-family: 'Trebuchet MS', 'Myriad Pro', Arial, sans-serif;
+	background: rgba(0,0,0, 0.3);
+	transition: background-color 0.4s ease-in-out;
+}
+.rg-gallery > .rg-image-wrapper > .rg-caption-wrapper:hover .rg-caption > p {
+	background: rgba(0,0,0, 0.6);
+}
+.rg-gallery > .rg-view {
+	height: 32px;
+	display: flex;
+	flex-direction: row;
+	justify-content: flex-end;
+	align-items: center;
+}
+
+.rg-gallery > .rg-view > a {
+	display:block;
+	float:right;
+	width: 16px;
+	height: 16px;
+	margin: 0 8px;
+	transform: scale(1.6);
+	background: #464646 url(../images/views.png) no-repeat top left;
+	border: 3px solid #464646;
+	opacity: 0.8;
+	filter: alpha(opacity=80);
+}
+.rg-gallery > .rg-view > a:hover {
+	opacity: 1.0;
+	filter: alpha(opacity=100);
+}
+.rg-gallery > .rg-view > a.rg-view-full {
+	background-position:0px 0px;
+}
+.rg-gallery > .rg-view > a.rg-view-selected {
+	background-color:#6f6f6f;
+	border-color:#6f6f6f;
+}
+.rg-gallery > .rg-view > a.rg-view-thumbs {
+	background-position:0px -16px;
+}
+.rg-gallery > .rg-image-wrapper > .rg-loading {
+	width:46px;
+	height:46px;
+	position:absolute;
+	top:50%;
+	left:50%;
+	background:#000 url(../images/ajax-loader.gif) no-repeat center center;
+	margin:-23px 0px 0px -23px;
+	z-index:100;
+	opacity: 0.7;
+	filter: alpha(opacity=70);
+}
+
+
+/**
+ * CAROUSEL
+ */
+
+
+.rg-gallery > .rg-thumbs > .es-carousel-wrapper {
+	background: #101010;
+	padding: 0px 30px;
+	border-radius: 0px;
+	position:relative;
+	box-shadow:0px 1px 3px rgba(0, 0, 0, 0.9);
+	position:relative;
+	margin-bottom: 4px;
+}
+.rg-gallery > .rg-thumbs > .es-carousel-wrapper .es-carousel {
+	overflow:hidden;
+	background:#000;
+}
+
+.rg-gallery > .rg-thumbs > .es-carousel-wrapper > .es-carousel > ul {
+	/*
+	display: flex;
+	flex-direction: row;
+	flex-wrap: none;
+	justify-content: flex-start;
+	width: auto !important;
+	*/
+
+	margin-top: 0 !important;
+	margin-bottom: 0 !important;
+	padding: 0;
+	line-height: 0;
+
+	display: block;
+	white-space: nowrap;
+}
+.rg-gallery > .rg-thumbs > .es-carousel-wrapper > .es-carousel > ul li {
+	/*
+	display: flex;
+	flex-basis: 50px;
+	flex-grow: 1;
+	align-self: center;
+	justify-content: center;
+	max-width: auto;
+	width: auto !important;
+	*/
+
+	display: inline-block;
+	list-style: none;
+	height: 100%;
+
+	margin: 2px 0px; /* margin-right will be set via config */
+	border-radius: 0;
+}
+
+/* Elastislide Style */
+
+.rg-gallery > .rg-thumbs > .es-carousel-wrapper > .es-carousel ul li a {
+	/* CROP contained image after centering */
+	display: flex;
+	overflow: hidden;
+	justify-content: center;
+	align-items: center;
+
+	/* Border: border-width will be via config */
+	border-radius: 0;
+	border-style: solid;
+	border-color: #333;
+
+	opacity: 0.7;
+	-webkit-touch-callout:none;
+	/* option */
+	transition: all 0.2s ease-in-out;
+	padding: 0;
+	margin: 0;
+}
+.rg-gallery > .rg-thumbs > .es-carousel-wrapper > .es-carousel ul li.selected a {
+	border-color: #fff;
+	opacity: 1.0;
+}
+.rg-gallery > .rg-thumbs > .es-carousel-wrapper > .es-carousel ul li a img {
+	/* Overflow image so that it will be cropped */
+	display: flex;
+	border: none;
+	border-radius: 0;
+
+	max-height: unset !important;
+	max-width: unset !important;
+	min-height: 100%;
+	width: auto;
+
+	padding: 0;
+	margin: 0;
+}
+
+
+/**
+ * CAROUSEL Handles
+ */
+
+.rg-gallery > .rg-thumbs > .es-carousel-wrapper > .es-nav > span {
+	position: absolute;
+	display: block;
+	top: 0;
+	height: 100%;
+	margin-top: 0;
+	padding: 0;
+	width: 28px;
+	background: rgba(155, 155, 155, 0.5)  url(../images/nav.png) no-repeat -15% 50%;
+	opacity: 0.5;
+	cursor: pointer;
+	transition: all 0.4s;
+}
+.rg-gallery > .rg-thumbs > .es-carousel-wrapper > .es-nav > span.es-nav-prev {
+	/*border-radius: 10px 0px 0px 10px;*/
+	background-position: -15% 50%;
+	left: 0;
+}
+.rg-gallery > .rg-thumbs > .es-carousel-wrapper > .es-nav > span.es-nav-next {
+	/*border-radius: 0 10px 10px 0;*/
+	background-position: 115% 50%;
+	right: 0;
+	left: auto;
+}
+.rg-gallery > .rg-thumbs > .es-carousel-wrapper > .es-nav > span.es-nav-prev:hover,
+.rg-gallery > .rg-thumbs > .es-carousel-wrapper > .es-nav > span.es-nav-next:hover {
+	opacity: 1;
+}

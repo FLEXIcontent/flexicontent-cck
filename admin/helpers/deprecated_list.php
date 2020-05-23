@@ -35,6 +35,10 @@ $files = array(
 	JPATH_SITE . '/components/com_flexicontent/librairies/galleriffic/css/jush.css',
 	JPATH_SITE . '/components/com_flexicontent/librairies/galleriffic/js/jquery.opacityrollover.js',
 	JPATH_SITE . '/components/com_flexicontent/librairies/galleriffic/js/jush.js',
+	JPATH_SITE . '/components/com_flexicontent/librairies/elastislide/css/style.css',
+	JPATH_SITE . '/components/com_flexicontent/librairies/elastislide/css/elastislide.css',
+	JPATH_SITE . '/components/com_flexicontent/librairies/elastislide/js/jquery.easing.1.3.js',
+	JPATH_SITE . '/components/com_flexicontent/librairies/elastislide/js/gallery_tmpl.js',
 );
 
 $folders = array(

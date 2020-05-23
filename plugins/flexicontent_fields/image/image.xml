@@ -477,8 +477,9 @@
 				</group>
 
 				<group label="Inline layouts">
-					<option filename="value_gallery_galleriffic" value="5">FLEXI_FIELD_IMAGE_GALLERIFFIC_BUILTIN</option>
+					<!--option filename="value_gallery_galleriffic" value="5">FLEXI_FIELD_IMAGE_GALLERIFFIC_BUILTIN</option-->
 					<!--option filename="value_gallery_elastislide" value="7">FLEXI_FIELD_IMAGE_ELASTISLIDE</option-->
+					<option filename="value_gallery_galleriffic" value="5">Galleriffic (Slideshow + carousel) (Built-in)</option>
 					<option filename="value_gallery_elastislide" value="7">Elastislide (Slideshow + carousel) (Built-in)</option>
 				</group>
 

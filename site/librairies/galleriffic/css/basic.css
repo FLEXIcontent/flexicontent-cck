@@ -51,7 +51,7 @@ div.gf_container > div.navigation:not(.no_pagination) {
 	align-items: center;
 	justify-content: start;
 	box-sizing: content-box;
-	padding: 6px;
+	padding: 0;
 }
 
 div.gf_container > div.navigation.no_pagination {
@@ -61,7 +61,7 @@ div.gf_container > div.navigation.no_pagination {
 	overflow-y: hidden;
 	white-space: nowrap;
 	box-sizing: border-box;
-	padding: 6px;
+	padding: 2px;
 }
 
 
@@ -104,6 +104,11 @@ div.gf_container div.navigation div.pagination.top.gf_inline_nav .prev_page_btn 
 	box-sizing: border-box;
 	padding: 0 0.25em;
 	border: none;
+	background: transparent;
+  color: white;
+	text-decoration: none;
+	white-space: nowrap;
+	text-shadow: 0px 1px 3px #555, 0px -1px 3px #555;
 
 	display: flex;
 	align-content: center;
@@ -111,11 +116,21 @@ div.gf_container div.navigation div.pagination.top.gf_inline_nav .prev_page_btn 
 
 	pointer-events: all;
 }
+div.gf_container div.navigation div.pagination.top.gf_inline_nav a.next_page_btn:hover,
+div.gf_container div.navigation div.pagination.top.gf_inline_nav a.prev_page_btn:hover {
+	background: black;
+	color: white;
+	text-shadow: 0px 1px 1px white, 0px -1px 1px white;
+}
 div.gf_container div.navigation div.pagination.top.gf_inline_nav .next_page_btn {
 	right: 0;
 }
 div.gf_container div.navigation div.pagination.top.gf_inline_nav .prev_page_btn {
 	left: 0;
+}
+div.gf_container > div.navigation > div.pagination.top.gf_inline_nav span.ellipsis {
+	color: #d0d0d0;
+	text-shadow: none;
 }
 div.gf_container div.navigation div.pagination.top.gf_inline_nav .gf_pagination_info {
 	display: flex;
@@ -168,6 +183,10 @@ div.gf_container div.controls div.nav-controls {
 	float: right;
 }
 
+div.gf_container div.slideshow-container {
+	/* Limit to viewport */
+	max-height: 96vh;
+}
 
 /* If placed inside slideshow then do different display */
 div.gf_container div.slideshow-container div.controls.nav-controls-box {
@@ -192,16 +211,23 @@ div.gf_container div.slideshow-container div.controls div.nav-controls a {
 	flex-direction: column;
 	justify-content: space-around;
 	box-sizing: border-box;
-	text-shadow: 0px 0px 0px 4px rgba(0,0,0,0.75);
+	background: none;
+	color: white;
+	text-shadow: 0px 1px 3px #555, 0px -1px 3px #555;
 	border: none;
 	pointer-events: all;
 	font-size: 32px;
 	font-weight: 900;
 }
 div.gf_container div.slideshow-container div.controls div.nav-controls a:hover {
-	color: white;
 	background: black;
+	color: white;
+	text-shadow: 0px 1px 1px white, 0px -1px 1px white;
 	opacity: 0.5;
+}
+div.gf_container div.slideshow-container div.controls div.nav-controls a > *,
+div.gf_container div.slideshow-container div.controls div.nav-controls a:hover > * {
+	color: white;
 }
 
 
@@ -278,6 +304,7 @@ div.gf_container > div.navigation:not(.no_pagination) > ul.thumbs {
 	flex-direction: row;
 	flex-wrap: wrap;
 	justify-content: center;
+	padding: 0 30px;
 }
 /*:-ms-fullscreen, :root div.gf_container > div.navigation:not(.no_pagination) > ul.thumbs {
 	margin-bottom: 12px !important;
@@ -292,55 +319,68 @@ div.gf_container > div.navigation.no_pagination > ul.thumbs {
 
 div.gf_container > div.navigation > ul.thumbs > li {
 	display: flex;
-	margin: 0 8px 0 0;
+	margin: 0 2px 0 0;
 	list-style: none;
-	/*flex-basis: 50px;
-	flex-grow: 1;
-	max-width: auto;*/
+
 	align-self: center;
 	justify-content: center;
+	border: 1px solid #555;
 }
-div.gf_container > div.navigation > ul.thumbs > li:not(.selected) {
-	opacity: 0.67;
+div.gf_container > div.navigation > ul.thumbs > li.selected {
+	box-shadow: 1px 1px 1px black, -1px -1px 0px black;
+	border: 1px solid black;
 }
 
-div.gf_container > div.navigation.no_pagination > ul.thumbs > li,
-div.gf_container > div.navigation.no_pagination > ul.thumbs > li a.thumb {
+div.gf_container > div.navigation.no_pagination > ul.thumbs > li {
 	display: inline-block;
 	line-height: 0.5em;
 	float: none;
+	vertical-align: top;
+}
+div.gf_container > div.navigation > ul.thumbs > li a.thumb {
+	display: flex;
+	overflow: hidden;
+	justify-content: center;
+	align-items: center;
+	vertical-align: top;
+	overflow: hidden;
+	line-height: 0.5em;
+	background: black;  /* make opaque thumbnails clearer */
 }
 
-div.gf_container > div.navigation > ul.thumbs > li,
+div.gf_container > div.navigation.no_pagination > ul.thumbs > li,
+div.gf_container > div.navigation.no_pagination > ul.thumbs > li a.thumb
+div.gf_container > div.navigation.no_pagination > ul.thumbs > li img {
+	line-height: 0;
+}
+
 div.gf_container > div.navigation > ul.thumbs > li a.thumb,
 div.gf_container > div.navigation > ul.thumbs > li img {
 	border: none;
-	border-radius: 0.5em;
+	border-radius: 0;
 	padding: 0px;
 	max-width: 100%;
 	width: auto;
 	/*height: 100% !important;*/
 	box-sizing: border-box;
 }
-div.gf_container > div.navigation > ul.thumbs > li a.thumb {
-	display: block;
-	width: auto;
-}
 div.gf_container > div.navigation > ul.thumbs > li img {
 	display: flex;
 	width: auto;
-	/*height: auto !important;*/
-	/*max-height: 100% !important;*/
+	height: auto !important;
+	min-height: 100% !important;
+	transition: opacity 0.4s ease-in-out;
+	opacity: 0.7;
+}
+div.gf_container > div.navigation > ul.thumbs > li img:hover,
+div.gf_container > div.navigation > ul.thumbs > li.selected img {
+	opacity: 1;
 }
 
 div.gf_container > div.navigation > ul.thumbs > li img {
-	border: 1px solid transparent;
+	border: none;
 }
 
-div.gf_container > div.navigation > ul.thumbs > li.selected img {
-	box-shadow: 2px 4px 4px gray;
-	border: 1px solid gray;
-}
 
 div.gf_container > div.navigation > ul.thumbs > li.selected a.thumb:focus {
 	outline: none;
@@ -361,7 +401,7 @@ div.gf_container > .content > div.slideshow-container > div.loader {
 	position: absolute;
 	top: 0;
 	left: 0;
-	background: url("loader.gif") no-repeat scroll center transparent;	
+	background: url("loader.gif") no-repeat scroll center transparent;
 	width: 100%;
 	height: 100%;
 }
@@ -433,32 +473,45 @@ div.gf_container div.caption-container {
 	position: absolute;
 	bottom: 0;
 	clear: left;
-	min-height: 5em;
 }
 div.gf_container div.caption-container span.image-caption {
 	display: none;  /* hide until this is positioned via JS*/
 	position: absolute;
 	width: 100%;
+	background-color: rgba(0,0,0, 0);
 }
+div.gf_container div.caption-container span.image-caption.current {
+	background-color: rgba(0,0,0, 0.3);
+	transition: background-color 0.4s ease-in-out;
+}
+div.gf_container div.caption-container span.image-caption.current:not(.transitioning):hover {
+	background-color: rgba(0,0,0, 0.6);
+}
+
 div.gf_container div.caption-container div.caption {
 	/*text-align: center;*/
 	padding: 0.5em;
-	background-color: #000;
+	background: none;
 	height: 100%;
 	line-height: 100%;
 }
 div.gf_container div.caption-container div.caption a {
 	text-decoration: underline;
 }
-div.gf_container div.caption-container div.image-title {
+div.gf_container div.caption-container div.caption > div.image-title {
 	font-size: 1.2em;
 	font-weight: bold;
-	color: #f0f0f0;
 }
-div.gf_container div.caption-container div.image-desc {
+div.gf_container div.caption-container div.caption > div.image-desc {
 	font-size: 1em;
 	padding-top: 0.4em;
-	color: #f0f0f0;
+}
+
+div.gf_container div.caption-container div.caption > * {
+  color: white;
+	text-shadow: 1px 1px 0px #000, -1px -1px 0px #000;
+	letter-spacing: 2px;
+	font-family: 'Trebuchet MS', 'Myriad Pro', Arial, sans-serif;
 }
 
 
