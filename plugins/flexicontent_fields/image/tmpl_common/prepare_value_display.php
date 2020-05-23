@@ -57,14 +57,15 @@
 
 	// Optional custom properties
 	$cust1  = $usecust1 && isset($value['cust1']) ? $value['cust1'] : '';
-	$desc  .= $cust1 ? $cust1_label.': '.$cust1 : '';  // ... Append custom properties to description
+	$desc  .= $cust1 ? $cust1_label.': '.$cust1."\n" : '';  // ... Append custom properties to description
 	$cust2  = $usecust2 && isset($value['cust2']) ? $value['cust2'] : '';
-	$desc  .= $cust2 ? $cust2_label.': '.$cust2 : '';  // ... Append custom properties to description
-
+	$desc  .= $cust2 ? $cust2_label.': '.$cust2."\n" : '';  // ... Append custom properties to description
+	
 	// HTML encode output
 	$title_encoded = htmlspecialchars($title, ENT_COMPAT, 'UTF-8');
 	$alt_encoded   = htmlspecialchars($alt, ENT_COMPAT, 'UTF-8');
 	$desc_encoded  = htmlspecialchars($desc, ENT_COMPAT, 'UTF-8');
+	$desc_encoded  = nl2br(preg_replace("/(\r\n|\r|\n){3,}/", "\n\n", $desc_encoded));
 
 	if (!$isURL)
 	{

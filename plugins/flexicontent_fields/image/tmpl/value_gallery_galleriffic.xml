@@ -25,7 +25,7 @@
 			<field name="PPFX_slideshow_delay" type="number" default="2500" label="Autoplay delay" description="Delay for starting initial auto play" depend_class="slideshow_ops" />
 			<field name="PPFX_preload_image" type="number" default="4" label="# of images to preload" description="Number of Images to preload. Set to -1 to preload all images" depend_class="slideshow_ops" />
 
-			<field name="PPFX_enable_popup" type="radio" default="1" label="Slideshow image click" description="Click on the image currently active will open image in full screen" class="btn-group btn-group-yesno" depend_class="slideshow_ops">
+			<field name="PPFX_enable_popup" type="fcradio" default="1" label="Slideshow image click" description="Click on the image currently active will open image in full screen" class="group-fcset fc-cleared" depend_class="slideshow_ops">
 				<option value="0">Show next Image</option>
 				<option value="1">Full screen zoom</option>
 			</field>

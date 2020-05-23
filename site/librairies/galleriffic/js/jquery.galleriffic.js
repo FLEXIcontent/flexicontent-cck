@@ -1,13 +1,14 @@
 /**
  * jQuery Galleriffic plugin
  *
- * Copyright (c) 2008 Trent Foley (http://trentacular.com)
+ * Copyright (c) 2008 Trent Foley (https://trentacular.com)
  * Licensed under the MIT License:
- *   http://www.opensource.org/licenses/mit-license.php
+ *   https://www.opensource.org/licenses/mit-license.php
  *
- * Much thanks to primary contributer Ponticlaro (http://www.ponticlaro.com)
+ * Much thanks to primary contributer Ponticlaro (https://www.ponticlaro.com)
  *
- * Modifed by Jay Hayes (http://iamvery.com)
+ * Modified by Jay Hayes (https://iamvery.com)
+ * Modified by ggppdk (https:://flexicontent.org)
  */
 ;(function($) {
 	// Globally keep track of all images by their unique hash.  Each item is an image data object.
@@ -73,6 +74,7 @@
 	};
 
 	var defaults = {
+		use_pages:                 true,
 		delay:                     3000,
 		numThumbs:                 20,
 		slideHeight:               0,
@@ -96,13 +98,56 @@
 		fancyOptions:              {}, 
 		enableKeyboardNavigation:  true,
 		autoStart:                 false,
-		syncTransitions:           false,
+		syncTransitions:           true,
 		defaultTransitionDuration: 1000,
-		onSlideChange:             undefined, // accepts a delegate like such: function(prevIndex, nextIndex) { ... }
-		onTransitionOut:           undefined, // accepts a delegate like such: function(slide, caption, isSync, callback) { ... }
-		onTransitionIn:            undefined, // accepts a delegate like such: function(slide, caption, isSync) { ... }
-		onPageTransitionOut:       undefined, // accepts a delegate like such: function(callback) { ... }
-		onPageTransitionIn:        undefined, // accepts a delegate like such: function() { ... }
+
+		// accepts a delegate like such: function(prevIndex, nextIndex) { ... }
+		onSlideChange:             undefined,
+
+		// accepts a delegate like such: function(slide, caption, isSync, callback) { ... }
+		onTransitionOut:           function(slide, caption, isSync, callback)
+		{
+			slide.fadeTo(this.getDefaultTransitionDuration(isSync), 0.0, callback);
+			caption.fadeTo(this.getDefaultTransitionDuration(isSync), 0.0);
+		},
+
+		// accepts a delegate like such: function(slide, caption, isSync) { ... }
+		onTransitionIn:            function(slide, caption, isSync)
+		{
+			var duration = this.getDefaultTransitionDuration(isSync);
+			slide.fadeTo(duration, 1.0);
+			
+			// Position the caption at the bottom of the image and set its opacity
+			var slideImage = slide.find('img');
+
+			var height = Math.floor( slideImage.outerHeight() );
+			var bottom = Math.ceil(slide.height() - slideImage.outerHeight());
+			var left   = Math.ceil((slide.width() - slideImage.width()) / 2); //  + slideImage.outerWidth() - slideImage.width();
+			var width  = slideImage.width() < slide.width() ? slideImage.width() : slide.width();
+
+			slide.closest('.slideshow-container').find('.nav-controls-box').find('a').css({'height': height});
+			slide.closest('.slideshow-container').find('.loader').css({'height': height});
+
+			caption.width(width)
+				.css({
+					'display': 'block',
+					'bottom' : bottom,
+					'left' : left > 0 ? left : 0
+				});
+		},
+
+		// accepts a delegate like such: function(callback) { ... }
+		onPageTransitionOut:       function(callback)
+		{
+			this.fadeTo('fast', 0.0, callback);
+		},
+ 
+		// accepts a delegate like such: function() { ... }
+		onPageTransitionIn:        function()
+		{
+			this.fadeTo('fast', 1.0);
+		},
+
 		onImageAdded:              undefined, // accepts a delegate like such: function(imageData, $li) { ... }
 		onImageRemoved:            undefined  // accepts a delegate like such: function(imageData, $li) { ... }
 	};
@@ -566,11 +611,11 @@
 						.find('div.nav-controls a.next').attr('href', '#'+this.data[this.getNextIndex(index)].hash);
 				}
 
-				var previousSlide = this.$imageContainer.find('span.current').addClass('previous').removeClass('current');
+				var previousSlide = this.$imageContainer.find('span.image-wrapper').addClass('previous').removeClass('current');
 				var previousCaption = 0;
 
 				if (this.$captionContainer) {
-					previousCaption = this.$captionContainer.find('span.current').addClass('previous').removeClass('current');
+					previousCaption = this.$captionContainer.find('span.image-caption').addClass('previous').removeClass('current');
 				}
 
 				// Perform transitions simultaneously if syncTransitions is true and the next image is already preloaded
@@ -660,13 +705,16 @@
 				// Construct new hidden span for the image
 				var newSlide = this.$imageContainer
 					.append('<span class="image-wrapper current"></span>')
-					.find('span.current').css('opacity', '0');
+					.find('span.image-wrapper.current').css('opacity', '0');
+
+				// Prevent click if a drag was started (minor drags are not considered, see dragstart_margin parameter)
+				var onClick = 'if (gf_gallery_' + this.unique_id + '.mSlider.isDragging) {event.preventDefault(); event.stopPropagation(); return false; }';
 
 				if (this.enableFancybox && imageData.fancy.attr('href')) {
-					newSlide.append('<a class="fancy-link" href="' + imageData.fancy.attr('href') + '" title="' + imageData.title + '"> </a>');
+					newSlide.append('<a class="fancy-link" href="' + imageData.fancy.attr('href') + '" title="' + imageData.title + '" onclick="' + onClick + '"> </a>');
 					newSlide.find('a').fancybox(this.fancyOptions);
 				} else {
-					newSlide.append('<a class="advance-link" rel="history" href="#'+this.data[nextIndex].hash+'" title="'+imageData.title+'"> </a>');
+					newSlide.append('<a class="advance-link" rel="history" href="#'+this.data[nextIndex].hash+'" title="'+imageData.title+'" onclick="' + onClick + '"> </a>');
 					newSlide.find('a').click(function(e) {
 						gallery.clickHandler(e, this);
 					});
@@ -680,8 +728,11 @@
 					// Construct new hidden caption for the image
 					newCaption = this.$captionContainer
 						.append('<span class="image-caption current"></span>')
-						.find('span.current').css('opacity', '0')
-						.append(imageData.caption);
+						.find('span.image-caption.current').css('opacity', '0')
+						.append(imageData.caption)
+						.fadeTo(this.getDefaultTransitionDuration(isSync), 1.0)
+						;
+					setTimeout(function() { newCaption.removeClass('transitioning'); }, this.getDefaultTransitionDuration(isSync));
 				}
 
 				// Hide the loading conatiner
@@ -1020,6 +1071,300 @@
 				}
 			});
 		}
+
+
+
+		/**
+		 * TOUCH events for CAROUSEL area
+		 */
+
+		var slider = {
+			mode: 'horizontal',
+			dragstart_margin: 20,
+			dragwalk_margin: (this.use_pages ? 100 : 20),
+			isDragging: false,
+			items_box: this.find('ul.thumbs')
+		};
+
+		var boxPos = 0;
+		var startPos = 0;
+		var prop = slider.mode=='horizontal' ? 'left' : 'top';
+
+
+		// Prevent click if a drag was started (minor drags are not considered, see dragstart_margin parameter)
+		this.find('ul.thumbs li a img').on('click', function(ev)
+		{
+			// Click event is scheduled/queued after mouseup event, isDragging FLAG is cleared via setTimeout, thus we can use it here to prevent clicks
+			if (slider.isDragging)
+			{
+				var e = ev.originalEvent;
+				e.preventDefault();
+				e.stopPropagation();
+			}
+		});
+
+		var startEvents = 'mousedown touchstart';
+		this.on(startEvents, function(ev)
+		{
+			var e = ev.originalEvent;  // Get original event
+			if (ev.type=='mousedown')
+			{
+				// In the case of using mouse events, we need to prevent events for 'mousedown'
+				e.preventDefault(); e.stopPropagation();  // this may create undesired effects in some cases
+			}
+
+			var obj = ev.type!='touchstart' ? e : e.changedTouches[0]; // reference first touch point for this event
+
+			// Indicate draging by changing mouse cursor
+			$(slider.items_box).css('cursor', 'pointer' );
+
+			// Stop all animations and force them to complete, to get proper current position of the slider
+			$(slider.items_box).finish();
+			boxPos = parseInt($(slider.items_box).css(slider.mode=='horizontal' ? 'left' : 'top'));
+			startPos = parseInt(slider.mode=='horizontal' ? obj.clientX : obj.clientY);
+			//window.console.log ('Status: mousedown -- Start coordinate: ' + startPos + 'px');
+		});
+
+
+		var moveEvents = 'mousemove touchmove';
+		this.on(moveEvents, function(ev)
+		{
+			var e = ev.originalEvent;  // Get original event
+			//e.preventDefault();	//e.stopPropagation();
+
+			var obj = ev.type!='touchmove' ? e : e.changedTouches[0]; // reference first touch point for this event
+			var moveStarted = (startPos!=0);
+			if (!moveStarted) return;
+
+			var travelDist = parseInt(slider.mode=='horizontal' ? obj.clientX : obj.clientY) - startPos;
+			//window.console.log ('Status: mousemove -- Distance traveled: ' + travelDist + 'px');
+
+			// Check if drap distance is over the drag start threshold
+			if (!slider.isDragging && Math.abs(travelDist) < slider.dragstart_margin) return;
+			slider.isDragging = true;
+
+			// Touch/Mouse Drag is at new point, retarget to new point,
+			// Cancel all animations without completing them, to allow continuing from current position, thus avoiding position jump to previous touch position
+			$(slider.items_box).stop(true, false);
+
+			(slider.mode=='horizontal')
+				? $(slider.items_box).animate({ left: boxPos+travelDist }, 'fast')
+				: $(slider.items_box).animate({ top: boxPos+travelDist }, 'fast');
+		});
+
+
+		var endEvents = 'mouseleave mouseup touchend';
+		this.on(endEvents, function(ev)
+		{
+			var e = ev.originalEvent;  // Get original event
+			//e.preventDefault(); //e.stopPropagation();
+
+			var obj = ev.type!='touchend' ? e : e.changedTouches[0]; // reference first touch point for this event
+
+			var moveStarted = (startPos!=0);
+			if (!moveStarted) return;  // check if initial click was not inside the slider
+			var travelDist = parseInt(slider.mode=='horizontal' ? obj.clientX : obj.clientY) - startPos;
+			//window.console.log ('Status: mouseup -- End coordinate: ' + (slider.mode=='horizontal' ? obj.clientX : obj.clientY) + 'px');
+
+			$(slider.items_box).css('cursor', 'auto');  // restore mouse pointer
+
+			// Check if drag distance is over the drag walk threshold, and walk the slider to proper direction,
+			if (Math.abs(travelDist) > slider.dragwalk_margin)
+			{
+				//window.console.log('DO MOVE: ' + travelDist + ' ' + gallery.currentImage.index + ' ' + gallery.numThumbs);
+
+				// Cancel all animations without completing them, to allow walking from current position, thus avoiding position jump to last touch position
+				$(slider.items_box).stop(true, false);
+
+				// Cancel autoplay, to avoid confusion to the user
+				gallery.pause();
+
+				if (this.use_pages)
+				{
+					var page = gallery.getCurrentPage();
+					var do_move_next = ((travelDist < 0) && page < gallery.getNumPages() - 1);
+					var do_move_prev = ((travelDist > 0) && page > 0);
+					//window.console.log(page + ' ' + (gallery.getNumPages() - 1) + travelDist + ' ' + do_move_next + ' ' + do_move_prev);
+
+					// Walk the slider
+					if (do_move_next || do_move_prev)
+					{
+						// Goto next page but first hide items box to avoid potential ``flashing``
+						$(slider.items_box).hide();
+						(travelDist < 0) ? gallery.nextPage(true, true) : gallery.previousPage(true, true);
+
+						$(slider.items_box).css(prop, travelDist < 0 ? '50%' : '-50%');
+
+						// Consider delay in hiding currently selected item
+						this.find('ul.thumbs li.selected').hide();
+					}
+
+					// If having pagination then move back to start
+					setTimeout(function()
+					{
+						$(slider.items_box).show();
+						var css = {};
+						css[prop] = 0;
+						$(slider.items_box).animate(css, 'fast');
+					}, 200);
+				}
+				else
+				{
+					// Move thumbs container to start (we scrolled the parent of the thumbs container, not the thumbs container itself)
+					$(slider.items_box).css(prop, 0);
+
+					// We scrolled the parent of the thumbs container, not the thumbs container itself
+					var node = $(slider.items_box).get(0).parentNode;
+
+					//window.console.log ('scrollLeft (before): ' + $(node).scrollLeft() + ' scrollLeft New: ' + ($(node).scrollLeft() - travelDist));
+					(slider.mode=='horizontal') ? (node.scrollLeft -= travelDist) : (node.scrollTop += travelDist);
+					//window.console.log ('scrollLeft (after): ' + $(node).scrollLeft());
+				}
+			}
+
+			else
+			{
+				//window.console.log('CANCEL MOVE: ' + travelDist);
+
+				// Drag is under threshold, return slider to original position before dragging was stated,
+				// But first cancel all animations without completing, to allow returning from current position, thus avoiding position jump to last touch position
+				$(slider.items_box).stop(true, false);
+				var css = {};
+				css[prop] = boxPos;
+				$(slider.items_box).animate(css, 'fast');
+			}
+				
+			startPos = 0;
+			setTimeout(function(){ slider.isDragging = false; }, 100);
+		});
+
+
+
+		/**
+		 * MAIN AREA IMAGE
+		 */
+		var mSlider = {
+			mode: 'horizontal',
+			dragstart_margin: 20,
+			dragwalk_margin: (this.use_pages ? 100 : 20),
+			isDragging: false,
+			items_box: $(this.imageContainerSel)
+		};
+
+		this.mSlider = mSlider;
+
+		var mBoxPos = 0;
+		var mStartPos = 0;
+		var mProp = this.mSlider.mode=='horizontal' ? 'left' : 'top';
+
+
+		var startEvents = 'mousedown touchstart';
+		mSlider.items_box.on(startEvents, function(ev)
+		{
+			var e = ev.originalEvent;  // Get original event
+			if (ev.type=='mousedown')
+			{
+				// In the case of using mouse events, we need to prevent events for 'mousedown'
+				e.preventDefault(); e.stopPropagation();  // this may create undesired effects in some cases
+			}
+
+			var obj = ev.type!='touchstart' ? e : e.changedTouches[0]; // reference first touch point for this event
+
+			// Indicate draging by changing mouse cursor
+			//mSlider.items_box.css('cursor', (mSlider.mode=='horizontal' ? (mTravelDist<0 ? 'w-resize' : 'e-resize') : (mTravelDist<0 ? 'n-resize' : 's-resize')) );
+			mSlider.items_box.css('cursor', 'pointer' );
+
+			// Stop all animations and force them to complete, to get proper current position of the slider
+			mSlider.items_box.finish();
+			mBoxPos = parseInt(mSlider.items_box.css(mSlider.mode=='horizontal' ? 'left' : 'top'));
+			mStartPos = parseInt(mSlider.mode=='horizontal' ? obj.clientX : obj.clientY);
+			//window.console.log ('Status: mousedown -- Start coordinate: ' + mStartPos + 'px');
+		});
+
+
+		var moveEvents = 'mousemove touchmove';
+		mSlider.items_box.on(moveEvents, function(ev)
+		{
+			var e = ev.originalEvent;  // Get original event
+			//e.preventDefault();	//e.stopPropagation();
+
+			var obj = ev.type!='touchmove' ? e : e.changedTouches[0]; // reference first touch point for this event
+			var moveStarted = (mStartPos!=0);
+			if (!moveStarted) return;
+
+			var mTravelDist = parseInt(mSlider.mode=='horizontal' ? obj.clientX : obj.clientY) - mStartPos;
+			//window.console.log ('Status: mousemove -- Distance traveled: ' + mTravelDist + 'px');
+
+			// Check if drap distance is over the drag start threshold
+			if (!mSlider.isDragging && Math.abs(mTravelDist) < mSlider.dragstart_margin) return;
+			mSlider.isDragging = true;
+			//window.console.log ('Dragging');
+
+			// Touch/Mouse Drag is at new point, retarget to new point,
+			// Cancel all animations without completing them, to allow continuing from current position, thus avoiding position jump to previous touch position
+			mSlider.items_box.stop(true, false);
+
+			(mSlider.mode=='horizontal')
+				? mSlider.items_box.animate({ left: mBoxPos+mTravelDist }, 'fast')
+				: mSlider.items_box.animate({ top: mBoxPos+mTravelDist }, 'fast');
+		});
+
+
+		var endEvents = 'mouseleave mouseup touchend';
+		mSlider.items_box.on(endEvents, function(ev)
+		{
+			var e = ev.originalEvent;  // Get original event
+			//e.preventDefault(); //e.stopPropagation();
+
+			var obj = ev.type!='touchend' ? e : e.changedTouches[0]; // reference first touch point for this event
+
+			var moveStarted = (mStartPos!=0);
+			if (!moveStarted) return;  // check if initial click was not inside the slider
+			var mTravelDist = parseInt(mSlider.mode=='horizontal' ? obj.clientX : obj.clientY) - mStartPos;
+			//window.console.log ('Status: mouseup -- End coordinate: ' + (mSlider.mode=='horizontal' ? obj.clientX : obj.clientY) + 'px');
+
+			mSlider.items_box.css('cursor', 'auto');  // restore mouse pointer
+
+			// Check if drag distance is over the drag walk threshold, and walk the slider to proper direction,
+			if (Math.abs(mTravelDist) > mSlider.dragwalk_margin)
+			{
+				//window.console.log('DO main MOVE: ' + mTravelDist + ' ' + gallery.currentImage.index + ' ' + gallery.numThumbs);
+
+				// Cancel all animations without completing them, to allow walking from current position, thus avoiding position jump to last touch position
+				mSlider.items_box.stop(true, false);
+
+				// Cancel autoplay, to avoid confusion to the user
+				gallery.pause();
+
+				if (1)
+				{
+					// Move container to start (we scrolled it but now need it back to proper position for moving to next image)
+					var css = {};
+					css[mProp] = 0;
+					mSlider.items_box.animate(css, 'slow');
+
+					// Go to next / previous image
+					(mTravelDist < 0) ? gallery.next() : gallery.previous();
+				}
+			}
+
+			else
+			{
+				//window.console.log('CANCEL main MOVE: ' + mTravelDist);
+
+				// Drag is under threshold, return slider to original position before dragging was stated,
+				// But first cancel all animations without completing, to allow returning from current position, thus avoiding position jump to last touch position
+				mSlider.items_box.stop(true, false);
+				var css = {};
+				css[mProp] = mBoxPos;
+				mSlider.items_box.animate(css, 'fast');
+			}
+			
+			mStartPos = 0;
+			setTimeout(function(){ mSlider.isDragging = false; }, 100);
+		});
+
+
 
 		// Auto start the slideshow
 		if (this.autoStart)
