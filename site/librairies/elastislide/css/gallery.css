@@ -219,6 +219,7 @@
 	display: inline-block;
 	list-style: none;
 	height: 100%;
+	box-sizing: content-box;
 
 	margin: 2px 0px; /* margin-right will be set via config */
 	border-radius: 0;
@@ -232,6 +233,7 @@
 	overflow: hidden;
 	justify-content: center;
 	align-items: center;
+	box-sizing: border-box;
 
 	/* Border: border-width will be via config */
 	border-radius: 0;

@@ -18,7 +18,9 @@ if ($is_ingroup)
 // *** Values loop
 // ***
 
-$i = -1;
+$uid = 'es_'.$field_name_js."_fcitem".$item->id;
+$i   = -1;
+
 foreach ($values as $n => $value)
 {
 	// Include common layout code for preparing values, but you may copy here to customize
@@ -26,12 +28,14 @@ foreach ($values as $n => $value)
 	if ($result === _FC_CONTINUE_) continue;
 	if ($result === _FC_BREAK_) break;
 
-	$group_str = '';   // image grouping: not needed / not applicatble
+	$group_str = $group_name ? 'data-fancybox="' . $group_name . '"' : '';
+
 	$field->{$prop}[] =
-		'<a class="fc_image_thumb thumb" name="drop" href="'.JUri::root(true).'/'.$srcl.'" data-width="' . $value['size_w_l'] . '" data-height="' . $value['size_h_l'] . '" title="' . $title_encoded . '">
+		'<a class="thumb" name="drop" href="'.JUri::root(true).'/'.$srcl.'" data-width="' . $value['size_w_l'] . '" data-height="' . $value['size_h_l'] . '" title="' . $title_encoded . '">
 			'.$img_legend.'
 		</a>
-		<a class="fancy" href="'.JUri::root(true).'/'.$srcl.'" title="' . $title_encoded . '">
+		<a class="gf_fancybox" href="'.JUri::root(true).'/'.$srcl.'" data-title="' . $title_encoded . '" data-caption="' . $desc_encoded . '"' . $group_str . ' style="display: none;">
+			' . str_replace('style="', 'style="display: none;', $img_legend) . '
 		</a>
 		' . ($title || $desc ? '
 		<div class="caption">
@@ -63,8 +67,6 @@ $enable_bottom_pager = 0; //(int) $field->parameters->get( $PPFX_ . 'enable_bott
 $over_image_btns     = 1;
 
 
-$uid = 'es_'.$field_name_js."_fcitem".$item->id;
-
 $thumb_container_height = $thumb_height + (!$use_pages ? 32 : 0) + ($use_pages && $enable_top_pager === 1 ? 40 : 0) + ($use_pages && $enable_bottom_pager === 1 ? 40 : 0);
 
 $js = "
@@ -78,8 +80,20 @@ $(document).ready(function()
 	// Opacity for non-active, non-hovered thumbnails.
 	// Active or Hovered thumbnails have opacity: 1
 	var onMouseOutOpacity = 0.8;
-	
+
 	var sliderBox  = $('#gf_thumbs_" . $uid . "');
+
+	sliderBox.find('.gf_fancybox').fancybox({
+		'openEffect'	: 'elastic',
+		'closeEffect'	: 'elastic',
+		'openEasing'  : 'easeOutCubic',
+		'closeEasing' : 'easeInCubic',
+		'idleTime'    : 0,
+		afterLoad: function(data)
+		{
+			gf_gallery_" . $uid . ".gotoIndex(data.currIndex, false, true);
+		}
+	});
 
 	// Initialize Advanced Galleriffic Gallery
 	var gallery = sliderBox.galleriffic({
@@ -106,7 +120,7 @@ $(document).ready(function()
 
 		enableHistory:             false,
 		enableFancybox:            ".($enable_popup ? 'true' : 'false').",
-		fancyOptions:              {}, 
+		fancyOptions:              {},
 		enableKeyboardNavigation:  true,
 		autoStart:                 ".($auto_start ? 'true' : 'false').",
 		syncTransitions:           true,
