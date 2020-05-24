@@ -130,12 +130,11 @@
 			//slide.closest('.slideshow-container').find('.nav-controls-box').find('a').css({'height': height});
 			//slide.closest('.slideshow-container').find('.loader').css({'height': height});
 
-			caption.width(width)
-				.css({
-					'display': 'block',
-					'bottom' : bottom - offTop,
-					'left' : left > 0 ? left : 0
-				});
+			var caption_el = caption.get(0);
+			caption_el.style.width = width + 'px';
+			caption_el.style.display = 'block';
+			caption_el.style.bottom = (bottom - offTop) + 'px';
+			caption_el.style.left = left + 'px';
 		},
 
 		// accepts a delegate like such: function(callback) { ... }

@@ -83,10 +83,10 @@ jQuery(function() {
 		slideshow_speed = 600,
 
 		// Default carousel options (Navigation thubmnails)
-		carousel_position = 1,  // Display Position -- 0: disable, 1: below, 2: above
+		carousel_position = 2,  // Display Position -- 0: disable, 1: below, 2: above
 		carousel_visible = 2,   // Initially state  -- 0: closed, 1: open, 2: open with toggler button
 		carousel_thumb_width = 90,
-		carousel_thumb_margin = 3,
+		carousel_thumb_margin = 2,
 		carousel_thumb_border = 2,
 		carousel_transition = 'scroll',
 		carousel_easing = 'swing',
@@ -110,11 +110,11 @@ jQuery(function() {
 			slideshow_easing_inout = !!ops && typeof ops.slideshow_easing_inout != 'undefined' ? ops.slideshow_easing_inout : 'easeOut';
 			slideshow_speed        = !!ops && typeof ops.slideshow_speed        != 'undefined' ? ops.slideshow_speed        : 600;
 
-			carousel_position     = !!ops && typeof ops.carousel_position     != 'undefined' ? ops.carousel_position     : 1;
+			carousel_position     = !!ops && typeof ops.carousel_position     != 'undefined' ? ops.carousel_position     : 2;
 			carousel_visible      = !!ops && typeof ops.carousel_visible      != 'undefined' ? ops.carousel_visible      : 2;
 
 			carousel_thumb_width  = !!ops && typeof ops.carousel_thumb_width  != 'undefined' ? ops.carousel_thumb_width  : 90;
-			carousel_thumb_margin = !!ops && typeof ops.carousel_thumb_margin != 'undefined' ? ops.carousel_thumb_margin : 3;
+			carousel_thumb_margin = !!ops && typeof ops.carousel_thumb_margin != 'undefined' ? ops.carousel_thumb_margin : 2;
 			carousel_thumb_border = !!ops && typeof ops.carousel_thumb_border != 'undefined' ? ops.carousel_thumb_border : 2;
 			carousel_transition   = !!ops && typeof ops.carousel_transition   != 'undefined' ? ops.carousel_transition   : 'scroll';
 			carousel_easing       = !!ops && typeof ops.carousel_easing       != 'undefined' ? ops.carousel_easing       : 'swing';
@@ -170,6 +170,7 @@ jQuery(function() {
 			// we are using the elastislide plugin:
 			// http://tympanus.net/codrops/2011/09/12/elastislide-responsive-carousel/
 			$esCarousel.show().elastislide({
+				unique_id: uid_sfx,
 				imageW 	 : carousel_thumb_width,
 				margin 	 : carousel_thumb_margin,
 				border 	 : carousel_thumb_border,
@@ -205,7 +206,10 @@ jQuery(function() {
 			var $viewfull	= jQuery('<a href="#" class="rg-view-full"></a>'),
 				$viewthumbs	= jQuery('<a href="#" class="rg-view-thumbs rg-view-selected"></a>');
 
-			$rgGallery.prepend( jQuery('<div class="rg-view"/>').append( $viewthumbs ).append( $viewfull ) );
+			if ($rgGallery.hasClass('rg-bottom'))
+				$rgGallery.append( jQuery('<div class="rg-view"/>').append( $viewthumbs ).append( $viewfull ) );
+			else
+				$rgGallery.prepend( jQuery('<div class="rg-view"/>').append( $viewthumbs ).append( $viewfull ) );
 
 			$viewfull.on('click.rgGallery', function( event )
 			{
@@ -364,18 +368,17 @@ jQuery(function() {
 				}
 			}
 
+			$rgGallery.find('div.rg-caption').hide().children('p').empty();
+			if ($image.get(0).complete)
+				setCaption($image, title, desc);
+			else
+				$image.load(function() { setCaption($image, title, desc); });
+
 			// Execute after DOM element ready aka image has finished loading (or already loaded)
 			$image.ready( function()
 			{
 				// Hide loader animation
 				$loader.hide();
-
-				// Force height to fit images
-				var height = 0;
-				$rgGallery.find('div.rg-image img').each(function() {
-					height = jQuery(this).height() > height ? jQuery(this).height() : height;
-				});
-				$rgGallery.find('div.rg-image').css('height', height);
 
 				if ($active.length)
 				{
@@ -411,15 +414,44 @@ jQuery(function() {
 					}
 				}
 
-				// Show caption
-				var caption = (title ? '<b>' + title + '</b>' : '') + (title && desc ? '<br>' : '') + desc;
-				caption
-					? $rgGallery.find('div.rg-caption').show().children('p').empty().html(caption)
-					: $rgGallery.find('div.rg-caption').hide().children('p').empty();
-
 				// Image loaded and carousel item selected, turn off flag
 				doing_anim = false;
 			});
+		},
+
+		setCaption = function($image, title, desc)
+		{
+			// Show caption
+			var captionHtml = (title ? '<span class="rg-caption-title">' + title + '</span>' : '') + (desc ? '<span class="rg-caption-desc">' + desc + '</span>' : '');
+
+			captionHtml
+				? $rgGallery.find('div.rg-caption').hide().children('p').empty().html(captionHtml)
+				: $rgGallery.find('div.rg-caption').hide().children('p').empty();
+				
+				if (captionHtml)
+				{
+					var caption = $rgGallery.find('div.rg-caption').show().children('p'),
+						caption_el = caption.get(0),
+						slide = $image.parent(),
+						slideImage = $image
+						slidesBox = slide.closest('.rg-gallery')
+						hasBottomCarousel = slidesBox.hasClass('rg-bottom') ;
+
+					var left = Math.ceil((slide.width() - slideImage.width()) / 2),
+						offTop = slideImage.get(0).offsetTop,
+						height = Math.floor( slideImage.outerHeight(true) ),
+						bottom = hasBottomCarousel ? 0: (Math.ceil(slide.height() - slideImage.outerHeight(true))),
+						left   = Math.ceil((slide.width() - slideImage.width()) / 2),
+						width  = slideImage.width() < slide.width() ? slideImage.width() : slide.width()
+						cMarg  = parseInt(caption.css('marginLeft')) + parseInt(caption.css('marginRight'));
+
+					caption_el.style.width = (width - cMarg) + 'px';
+					caption_el.style.display = 'block';
+					caption_el.style.bottom = (bottom - (hasBottomCarousel ? 0 : offTop)) + 'px';
+					caption_el.style.left = left + 'px';
+
+					$rgGallery.find('div.rg-caption').show();
+				}
 		},
 
 
