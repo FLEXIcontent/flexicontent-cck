@@ -126,14 +126,14 @@ jQuery(function() {
 			// Schedule this to execute when all thumbnails of carousel have been loaded
 			$items.add('<span class="rg-loading"></span>').imagesLoaded( function()
 			{
+				// Add slideshow image wrapper (large image wrapper)
+				_addImageWrapper();
+
 				// Add toggler buttons that hide / show the carousel container
 				if (carousel_position && carousel_visible != 1)
 				{
 					_addViewModes();
 				}
-
-				// Add slideshow image wrapper (large image wrapper)
-				_addImageWrapper();
 
 				// Show first image
 				doing_anim = true;
@@ -205,7 +205,7 @@ jQuery(function() {
 			var $viewfull	= jQuery('<a href="#" class="rg-view-full"></a>'),
 				$viewthumbs	= jQuery('<a href="#" class="rg-view-thumbs rg-view-selected"></a>');
 
-			$rgGallery.prepend( jQuery('<div class="rg-view"/>').append( $viewfull ).append( $viewthumbs ) );
+			$rgGallery.prepend( jQuery('<div class="rg-view"/>').append( $viewthumbs ).append( $viewfull ) );
 
 			$viewfull.on('click.rgGallery', function( event )
 			{

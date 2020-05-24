@@ -34,7 +34,8 @@ foreach ($values as $n => $value)
 		'<a class="thumb" name="drop" href="'.JUri::root(true).'/'.$srcl.'" data-width="' . $value['size_w_l'] . '" data-height="' . $value['size_h_l'] . '" title="' . $title_encoded . '">
 			'.$img_legend.'
 		</a>
-		<a class="gf_fancybox" href="'.JUri::root(true).'/'.$srcl.'" data-title="' . $title_encoded . '" data-caption="' . $desc_encoded . '"' . $group_str . ' style="display: none;">
+		<a class="gf_fancybox" href="'.JUri::root(true).'/'.$srcl.'" data-title="' . $title_encoded . '" data-caption="' . $desc_encoded . '"' . $group_str . '
+			onclick="if (gf_gallery_' . $uid . '.mSlider.isDragging) {event.preventDefault(); event.stopPropagation(); return false; }"; style="display: none;">
 			' . str_replace('style="', 'style="display: none;', $img_legend) . '
 		</a>
 		' . ($title || $desc ? '
@@ -54,18 +55,17 @@ $slideshow_delay     = (int) $field->parameters->get( $PPFX_ . 'slideshow_delay'
 $preload_image       = (int) $field->parameters->get( $PPFX_ . 'preload_image', 10 );
 $enable_popup        = (int) $field->parameters->get( $PPFX_ . 'enable_popup', 1 );
 
-$thumb_height        = (int) $field->parameters->get( $PPFX_ . 'thumb_height', 100 );
-$slide_height        = (int) $field->parameters->get( $PPFX_ . 'slide_height', 400 );
+$thumb_height        = (int) $field->parameters->get( $PPFX_ . 'thumb_height', 86 );
+$slide_height        = (int) $field->parameters->get( $PPFX_ . 'slide_height', 600 );
 
 $use_pages           = (int) $field->parameters->get( $PPFX_ . 'use_pages', 0 );
-$number_thumbs       = !$use_pages ? 9999 : (int) $field->parameters->get( $PPFX_ . 'number_thumbs', 6 );
+$number_thumbs       = !$use_pages ? 9999 : (int) $field->parameters->get( $PPFX_ . 'number_thumbs', 5 );
 $number_pages        = (int) $field->parameters->get( $PPFX_ . 'number_pages', 10 );
 
 $enable_top_pager    = (int) $field->parameters->get( $PPFX_ . 'enable_top_pager', 2 );
 $enable_bottom_pager = 0; //(int) $field->parameters->get( $PPFX_ . 'enable_bottom_pager', 0 );
 
 $over_image_btns     = 1;
-
 
 $thumb_container_height = $thumb_height + (!$use_pages ? 32 : 0) + ($use_pages && $enable_top_pager === 1 ? 40 : 0) + ($use_pages && $enable_bottom_pager === 1 ? 40 : 0);
 
@@ -129,6 +129,15 @@ $(document).ready(function()
 	});
 
 	gf_gallery_" . $uid . " = gallery;
+
+	gf_gallery_" . $uid . ".find('ul.thumbs').on('mouseenter', function(ev)
+	{
+		$('body').addClass('gf_clear_tips');
+	});
+	gf_gallery_" . $uid . ".find('ul.thumbs').on('mouseleave', function(ev)
+	{
+		$('body').removeClass('gf_clear_tips');
+	});
 });
 })(jQuery);
 ";
@@ -170,7 +179,6 @@ if ($result !== _FC_RETURN_)
 
 	<style>
 		div#gf_thumbs_' . $uid . '{' . ($use_pages ? 'min-height: ' : 'height: ') . $thumb_container_height . 'px; }
-		div#gf_thumbs_' . $uid . ' ul.thumbs {' . ($use_pages ? 'min-height: ' : 'height: ') . $thumb_height . 'px; }
 		div#gf_thumbs_' . $uid . ' ul.thumbs li a {
 			height:' . $thumb_height . 'px !important;
 			max-width:' . $thumb_height . 'px !important;
@@ -178,10 +186,14 @@ if ($result !== _FC_RETURN_)
 		div#gf_thumbs_' . $uid . ' ul.thumbs li a img {
 			width:' . $thumb_height . 'px !important;
 		}
-		div#gf_container_' . $uid . ' div.slideshow-container { height: ' . $slide_height . 'px; }
+		div#gf_container_' . $uid . ' div.slideshow-container .image-wrapper a,
+		div#gf_container_' . $uid . ' div.slideshow-container {
+			height: ' . $slide_height . 'px;
+		}
 	</style>
 
 	<div id="gf_container_' . $uid . '" class="gf_container">
+
 		<div id="gf_thumbs_' . $uid . '" class="navigation' . (!$use_pages ? ' no_pagination' : '') . '" style="display: none;">
 			<ul class="thumbs noscript">
 				<li>
@@ -190,8 +202,8 @@ if ($result !== _FC_RETURN_)
 			</ul>
 		</div>
 
-		<div class="gf_controls_box">
-			<div id="gf_sscontrols_' . $uid . '" class="controls ss-controls-box hasTooltip" title="' . JText::_('FLEXI_FIELD_IMAGE_ABOUT_LEFT_RIGHT_KEYS_NAV') . '"></div>
+		<div class="gf_controls_box" ' . ($over_image_btns ? 'style="height: 0;"' : '') . '>
+			<div id="gf_sscontrols_' . $uid . '" class="controls ss-controls-box"></div>
 			' . (!$over_image_btns ? '
 			<div id="gf_navcontrols_' . $uid . '" class="controls nav-controls-box"></div>
 			' : '') . '
@@ -207,6 +219,7 @@ if ($result !== _FC_RETURN_)
 				<div id="gf_caption_' . $uid . '" class="caption-container"></div>
 			</div>
 		</div>
+
 	</div>
 	<div class="fcclear"></div>
 	';

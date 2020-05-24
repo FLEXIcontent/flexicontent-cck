@@ -120,18 +120,20 @@
 			// Position the caption at the bottom of the image and set its opacity
 			var slideImage = slide.find('img');
 
-			var height = Math.floor( slideImage.outerHeight() );
-			var bottom = Math.ceil(slide.height() - slideImage.outerHeight());
-			var left   = Math.ceil((slide.width() - slideImage.width()) / 2); //  + slideImage.outerWidth() - slideImage.width();
-			var width  = slideImage.width() < slide.width() ? slideImage.width() : slide.width();
+			var left = Math.ceil((slide.width() - slideImage.width()) / 2),
+				offTop = slideImage.get(0).offsetTop,
+				height = Math.floor( slideImage.outerHeight(true) ),
+				bottom = Math.ceil(slide.height() - slideImage.outerHeight(true)),
+				left   = Math.ceil((slide.width() - slideImage.width()) / 2),
+				width  = slideImage.width() < slide.width() ? slideImage.width() : slide.width();
 
-			slide.closest('.slideshow-container').find('.nav-controls-box').find('a').css({'height': height});
-			slide.closest('.slideshow-container').find('.loader').css({'height': height});
+			//slide.closest('.slideshow-container').find('.nav-controls-box').find('a').css({'height': height});
+			//slide.closest('.slideshow-container').find('.loader').css({'height': height});
 
 			caption.width(width)
 				.css({
 					'display': 'block',
-					'bottom' : bottom,
+					'bottom' : bottom - offTop,
 					'left' : left > 0 ? left : 0
 				});
 		},
@@ -598,6 +600,26 @@
 
 			// Rebuilds the slideshow image and controls and performs transitions
 			refresh: function() {
+
+				var touchDevice = ('ontouchstart' in document.documentElement);
+				if (touchDevice && typeof window.orientation !== 'undefined')
+				{
+					if (typeof this.custom_styles === 'undefined' || !!!this.custom_styles)
+					{
+						this.custom_styles = document.createElement('style');
+						document.head.appendChild(this.custom_styles);
+					}
+
+					if (window.orientation == 0)
+					{
+						this.custom_styles.innerHTML = '#gf_container_' + this.unique_id + ' div.slideshow-container, #gf_container_' + this.unique_id + ' span.image-wrapper a {max-height: 50vh; }';
+					}
+					else
+					{
+						this.custom_styles.innerHTML = '#gf_container_' + this.unique_id + ' div.slideshow-container, #gf_container_' + this.unique_id + ' span.image-wrapper a {max-height: 96vh; }';
+					}
+				}
+
 				var imageData = this.currentImage;
 				if (!imageData)
 					return this;
@@ -782,15 +804,50 @@
 
 			// Applies the selected class to the current image's corresponding thumbnail.
 			// Also checks if the current page has changed and updates the displayed page of thumbnails if necessary.
-			syncThumbs: function() {
-				var page = this.getCurrentPage();
+			syncThumbs: function()
+			{
+				var $thumbsUl = this.find('ul.thumbs'),
+					$thumbs     = $thumbsUl.children(),
+					$thumbOld   = $thumbs.filter('.selected'),
+					$thumbNew   = $thumbs.eq(this.currentImage.index),
+					page        = this.getCurrentPage(),
+					pBox        = $thumbsUl.parent().get(0);
+					
+				// Go to correct page
 				if (page != this.displayedPage)
+				{
 					this.updateThumbs();
+				}
+
+				// Scroll to new image
+				if (pBox.scrollWidth > pBox.clientWidth)
+				{
+					var elem_oLeft = $thumbNew.get(0).offsetLeft;
+					var elem_width = $thumbNew.outerWidth(true);
+
+					var elem_rightEdge = elem_oLeft + elem_width;
+					var pBox_rightEdge = pBox.scrollLeft + pBox.clientWidth;
+
+					//window.console.log('elem_oLeft: ' + elem_oLeft + ' - elem_width: ' + elem_width + ' - elem_rightEdge: ' + elem_rightEdge);
+					//window.console.log('pBox.scrollLeft: ' + pBox.scrollLeft + ' - pBox.clientWidth: ' + pBox.clientWidth + ' - pBox_rightEdge: ' + pBox_rightEdge);
+
+					var extra = 3 * elem_width / 4;
+					if (pBox_rightEdge < elem_rightEdge + extra)
+					{
+						//pBox.scrollLeft = elem_rightEdge - pBox.clientWidth + extra;
+						$(pBox).animate({ scrollLeft: (elem_rightEdge - pBox.clientWidth + extra) }, $thumbOld.length ? 600 : 0);
+					}
+
+					if (elem_oLeft < pBox.scrollLeft + extra)
+					{
+						//pBox.scrollLeft = elem_oLeft - extra;
+						$(pBox).animate({ scrollLeft: (elem_oLeft - extra) }, $thumbOld.length ? 600 : 0);
+					}
+				}
 
 				// Remove existing selected class and add selected class to new thumb
-				var $thumbs = this.find('ul.thumbs').children();
-				$thumbs.filter('.selected').removeClass('selected');
-				$thumbs.eq(this.currentImage.index).addClass('selected');
+				$thumbOld.removeClass('selected');
+				$thumbNew.addClass('selected');
 
 				return this;
 			},
@@ -887,9 +944,20 @@
 			// Rebuilds the pager control in the specified matched element.
 			// @param {jQuery} pager A jQuery element set matching the particular pager to be rebuilt.
 			buildPager: function(pager) {
-				var gallery = this;
-				var numPages = this.getNumPages();
-				var page = this.getCurrentPage();
+				var gallery    = this;
+
+				var $thumbsUl  = gallery.find('ul.thumbs');
+				var $thumbs    = gallery.find('ul.thumbs li');
+
+				// Find thumbs per page
+				this.numThumbs = Math.floor( ($thumbsUl.width() - 1) / $thumbs.first().outerWidth(true) );
+				// Balance thumbs in last page
+				this.numThumbs = Math.ceil($thumbs.length / Math.ceil($thumbs.length / this.numThumbs));
+				
+				//window.console.log( ($thumbsUl.width() - 1) + ' - ' + $thumbs.first().outerWidth(true) + ' - ' + ( ($thumbsUl.width() - 1) / $thumbs.first().outerWidth(true) ) );
+
+				var numPages   = this.getNumPages();
+				var page       = this.getCurrentPage();
 				var startIndex = page * this.numThumbs;
 				var pagesRemaining = this.maxPagesToShow - 1;
 
@@ -943,7 +1011,7 @@
 				}
 				else
 				{
-					pager.append('<span class="gf_pagination_info">' + (page + 1) + ' / ' + numPages + '</span>');
+					pager.append('<span class="gf_pagination_info">' + (page + 1) + '/' + numPages + '</span>');
 				}
 
 
@@ -1088,6 +1156,11 @@
 			});
 		}
 
+		// Resize thumbnails container
+		$(window).resize(function()
+		{
+			gallery.rebuildThumbs();
+		});
 
 
 		/**
