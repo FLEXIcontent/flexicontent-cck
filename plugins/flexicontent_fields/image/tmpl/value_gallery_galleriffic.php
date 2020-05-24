@@ -40,8 +40,8 @@ foreach ($values as $n => $value)
 		</a>
 		' . ($title || $desc ? '
 		<div class="caption">
-			' . ($title ? '<div class="image-title">'.$title.'</div>' : '') . '
-			' . ($desc ?  '<div class="image-desc">'.flexicontent_html::striptagsandcut($desc, 80).'</div>' : '') . '
+			' . ($title ? '<div class="image-title">' . $title . '</div>' : '') . '
+			' . ($desc ?  '<div class="image-desc">' . nl2br(preg_replace("/(\r\n|\r|\n){3,}/", "\n\n", $desc)) . '</div>' : '') . '
 		</div>
 		' : '');
 }

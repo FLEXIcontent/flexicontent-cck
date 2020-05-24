@@ -338,6 +338,7 @@ div.gf_container > div.navigation > ul.thumbs > li {
 	transition: border-color 0.4s ease-in-out;
 	/*box-shadow: 1px 1px 1px #555, -1px -1px 0px #555;*/
 }
+
 div.gf_container > div.navigation > ul.thumbs > li.selected {
 	/*box-shadow: 1px 1px 1px black, -1px -1px 0px black;*/
 	border-color: #4ea7f9;
@@ -463,30 +464,6 @@ div.gf_container div.slideshow img {
 div.gf_container > .content > div.slideshow-container > div.slideshow span.image-wrapper img {
 }
 
-div.gf_container div#page {
-	width: 900px;
-	background-color: #fff;
-	margin: 0 auto;
-	text-align: left;
-	border-color: #ddd;
-	border-style: none solid solid;
-	border-width: medium 1px 1px;
-}
-
-div.gf_container div#ads {
-	clear: both;
-	padding: 12px 0 12px 66px;
-}
-
-div.gf_container div#footer {
-	color: #777;
-	clear: both;
-	margin: 0 auto;
-	padding: 20px 0 40px;
-	text-align: center;
-}
-
-
 /* Styling for captions */
 
 div.gf_container div.caption-container {
@@ -514,6 +491,8 @@ div.gf_container div.caption-container div.caption {
 	background: none;
 	height: 100%;
 	line-height: 100%;
+	max-height: 9em;
+	overflow: hidden;
 }
 div.gf_container div.caption-container div.caption a {
 	text-decoration: underline;
@@ -532,6 +511,7 @@ div.gf_container div.caption-container div.caption > * {
 	text-shadow: 1px 1px 0px #000, -1px -1px 0px #000;
 	letter-spacing: 2px;
 	font-family: 'Trebuchet MS', 'Myriad Pro', Arial, sans-serif;
+	padding: 0 24px;
 }
 
 
