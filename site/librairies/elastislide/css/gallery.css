@@ -5,7 +5,7 @@
 
 .rg-gallery > .rg-image-wrapper {
 	/*background:transparent url(../images/black.png) repeat top left;*/
-	background: #f0f0f0;
+	background: none;
 	/*border-radius: 10px;*/
 
 	position: relative;
@@ -16,27 +16,39 @@
 	justify-content: flex-start;
 
 	max-width: 100%;
-	max-height: 96vh;
+	/*max-height: 96vh;*/ /* Limit height set inline to viewport, moved this to JS */
 	width: 5000px;
 
 	overflow: hidden;
 	padding: 0;
 	margin: 0;
 }
+.rg-gallery.rg-bottom > .rg-image-wrapper {
+	justify-content: flex-end;
+}
+
 .rg-gallery > .rg-image-wrapper > .rg-image {
 	position: relative;
 	display: flex;
 	justify-content: center;
 	text-align: center;
-	max-height: 96vh;
+	height: 100%;
+	/*max-height: 96vh;*/ /* Limit height set inline to viewport, moved this to JS */
 }
+.rg-gallery.rg-bottom > .rg-image-wrapper  > .rg-image {
+	align-items: flex-end;
+}
+.rg-gallery.rg-bottom > .rg-image-wrapper  > .rg-image > img {
+	bottom: 0;
+}
+
 .rg-gallery > .rg-image-wrapper > .rg-image > img {
 	position: absolute;
 	display: block;
 	z-index: 1;
 
 	max-width: 100%;
-	max-height: 96vh;
+	max-height: 100%;
 	width: auto;
 	border-radius: 0px;
 
@@ -56,40 +68,49 @@
 	width: 100%;
 	height: 100%;
 }
-.rg-gallery > .rg-image-wrapper > .rg-image-nav a {
+.rg-gallery > .rg-image-wrapper > .rg-image-nav a,
+.rg-gallery > .rg-image-wrapper > .rg-image-nav a > div {
+	display: block;
 	position: absolute;
-	top: 0px;
-	left: 0px;
-	background: rgba(0, 0, 0, 0.3) url(../images/nav.png) no-repeat -20% 50%;
-	width: 28px;
+	top: 0;
+	left: 0;
 	height: 100%;
-	text-indent: -9000px;
+	width: 28px;
+	z-index: 4;
 	cursor: pointer;
 	outline: none;
-	/*border-radius: 10px 0px 0px 10px;*/
-	z-index: 4;
+	pointer-events: all;
+	transition: all 0.4s ease-in-out;
+}
+.rg-gallery > .rg-image-wrapper > .rg-image-nav a > div {
+	top: 45%;
+	background: rgba(0, 0, 0, 0.3) url(../images/nav.png) no-repeat -20% 50%;
+	height: auto;
+	width: 100%;
+	padding: 12px 0;
+	text-indent: -9000px;
 }
 .rg-gallery > .rg-image-wrapper > .rg-image-nav a.rg-image-nav-next {
-	right:0px;
-	left:auto;
-	background-position:115% 50%;
-	/*border-radius: 0px 10px 10px 0px;*/
+	right: 0px;
+	left: auto;
 }
-.rg-gallery > .rg-image-wrapper > .rg-image-nav a:hover {
-	background-color: rgba(0, 0, 0, 0.5);
+.rg-gallery > .rg-image-wrapper > .rg-image-nav a.rg-image-nav-next > div {
+	background-position: 115% 50%;
+}
+.rg-gallery > .rg-image-wrapper > .rg-image-nav a:hover > div {
+	background-color: rgba(0, 0, 0, 0.6);
 }
 .rg-gallery > .rg-image-wrapper > .rg-caption-wrapper {
 	display: flex;
 	justify-content: center;
+	position: absolute;
+	bottom: 0;
+	z-index: 3;
 }
 .rg-gallery > .rg-image-wrapper > .rg-caption-wrapper .rg-caption {
 	display: flex;
 	justify-content: center;
 	text-align: initial;
-
-	position: absolute;
-	z-index: 3;
-	bottom: 0;
 
 	margin: 0;
 	left: 0;
@@ -103,11 +124,15 @@
 	display: inline-block;
 	max-height: 8em;
 	overflow: hidden;
+	position: absolute;
+	bottom: auto;
 
-	margin: 0 29px; /* match side arrows width */
 	font-size: 14px;
 	line-height: 1em;
-	padding: 12px;
+	margin: 0;
+	padding: 0;
+	margin: 0 32px;
+	box-sizing: border-box;
   color: white;
 	text-shadow: 1px 1px 0px #000, -1px -1px 0px #000;
 	letter-spacing: 2px;
@@ -118,6 +143,17 @@
 .rg-gallery > .rg-image-wrapper > .rg-caption-wrapper:hover .rg-caption > p {
 	background: rgba(0,0,0, 0.6);
 }
+.rg-gallery > .rg-image-wrapper > .rg-caption-wrapper .rg-caption > p .rg-caption-title {
+	display: block;
+	font-weight: bold;
+	margin: 0.5em;
+}
+.rg-gallery > .rg-image-wrapper > .rg-caption-wrapper .rg-caption > p .rg-caption-desc {
+	display: block;
+	font-weight: normal;
+	margin: 0.5em;
+}
+
 .rg-gallery > .rg-view {
 	height: 32px;
 	display: flex;
@@ -170,7 +206,9 @@
  * CAROUSEL
  */
 
-
+.rg-gallery > .rg-thumbs {
+	margin: 2px 0;
+}
 .rg-gallery > .rg-thumbs > .es-carousel-wrapper {
 	background: #101010;
 	padding: 0px 30px;
@@ -186,14 +224,6 @@
 }
 
 .rg-gallery > .rg-thumbs > .es-carousel-wrapper > .es-carousel > ul {
-	/*
-	display: flex;
-	flex-direction: row;
-	flex-wrap: none;
-	justify-content: flex-start;
-	width: auto !important;
-	*/
-
 	margin-top: 0 !important;
 	margin-bottom: 0 !important;
 	padding: 0;
@@ -203,16 +233,6 @@
 	white-space: nowrap;
 }
 .rg-gallery > .rg-thumbs > .es-carousel-wrapper > .es-carousel > ul li {
-	/*
-	display: flex;
-	flex-basis: 50px;
-	flex-grow: 1;
-	align-self: center;
-	justify-content: center;
-	max-width: auto;
-	width: auto !important;
-	*/
-
 	display: inline-block;
 	list-style: none;
 	height: 100%;
@@ -240,14 +260,24 @@
 	opacity: 0.7;
 	-webkit-touch-callout:none;
 	/* option */
-	transition: all 0.2s ease-in-out;
+	transition: all 0.4s ease-in-out;
 	padding: 0;
 	margin: 0;
+	outline: none;
 }
-.rg-gallery > .rg-thumbs > .es-carousel-wrapper > .es-carousel ul li.selected a {
-	border-color: #fff;
+
+.rg-gallery > .rg-thumbs > .es-carousel-wrapper > .es-carousel ul li:hover a {
+	border-color: white;
 	opacity: 1.0;
 }
+.rg-gallery > .rg-thumbs > .es-carousel-wrapper > .es-carousel ul li.selected:hover a {
+	border-color: #3e87d9;
+}
+.rg-gallery > .rg-thumbs > .es-carousel-wrapper > .es-carousel ul li.selected a {
+	border-color: #4ea7f9;
+	opacity: 1.0;
+}
+
 .rg-gallery > .rg-thumbs > .es-carousel-wrapper > .es-carousel ul li a img {
 	/* Overflow image so that it will be cropped */
 	display: flex;

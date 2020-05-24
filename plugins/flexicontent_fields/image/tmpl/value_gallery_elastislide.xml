@@ -23,6 +23,11 @@
 			</field>
 			<field name="PPFX_slideshow_auto_delay" type="text" default="4000" label="Autoplay Delay" description="Delay for auto transitioning to next image" depend_class="auto_play" />
 
+			<!--field name="PPFX_slideshow_popup" type="fcradio" default="1" label="Slideshow image click" description="Click on the image currently active will open image in full screen" class="group-fcset fc-cleared" depend_class="slideshow_ops">
+				<option value="0">Show next Image</option>
+				<option value="1">Full screen zoom</option>
+			</field-->
+
 			<field name="" type="separator" default="Image" level="level3" depend_class="" />
 			<field name="PPFX_slideshow_thumb_size" type="radio" default="large" label="FLEXI_PRE_CREATED_IMAGE" description="This effects image quality and loading speed. Use a thumbnail with height larger than then height of the slideshow area to avoid decreased quality"  depend_class="" class="btn-group group-fcinfo">
 				<option value="medium">FLEXI_MEDIUM</option>
@@ -32,7 +37,7 @@
 				<option value="1">FLEXI_KEEP_ASPECT_RATIO</option>
 				<option value="0" disabled="disabled">FLEXI_STRETCH</option>
 			</field>
-			<field name="PPFX_slideshow_thumb_height" type="int" default="400" label="FLEXI_HEIGHT_PX" description="FLEXI_IMAGE_HEIGHT" class="" depend_class="carousel_ops"/>
+			<field name="PPFX_slideshow_thumb_height" type="int" default="600" label="FLEXI_HEIGHT_PX" description="FLEXI_IMAGE_HEIGHT" class="" depend_class="carousel_ops"/>
 
 			<field name="" type="separator" default="FLEXI_TRANSITION" level="level3" depend_class="" />
 
@@ -87,7 +92,7 @@
 
 			<field name="" type="separator" default="Carousel options - ( &lt;b&gt;Thumbnail navigation&lt;/b&gt; )" level="level1" />
 
-			<field name="PPFX_carousel_position" type="multilist" subtype="radio" default="1" toggle_related="1" label="Add carousel" description="Enable to show a thumbnail carousel below or above the slideshow" class="btn-group" >
+			<field name="PPFX_carousel_position" type="multilist" subtype="radio" default="2" toggle_related="1" label="Add carousel" description="Enable to show a thumbnail carousel below or above the slideshow" class="btn-group" >
 				<option value="0" show_list="" hide_list="carousel_ops">FLEXI_NO</option>
 				<option value="1" show_list="carousel_ops" hide_list="">Below slideshow</option>
 				<option value="2" show_list="carousel_ops" hide_list="">Above slideshow</option>
@@ -107,7 +112,7 @@
 			<field name="PPFX_carousel_thumb_width" type="int" default="90" label="FLEXI_WIDTH_PX" description="Thumbnail Width" class="" depend_class="carousel_ops"/>
 			<field name="PPFX_carousel_thumb_height" type="int" default="90" label="FLEXI_HEIGHT_PX" description="Thumbnail Height" class="" depend_class="carousel_ops"/>
 			<field name="PPFX_carousel_thumb_border" type="int" default="2" label="FLEXI_BORDER_PX" description="..." class="" depend_class="carousel_ops"/>
-			<field name="PPFX_carousel_thumb_margin" type="int" default="3" label="Margin Right (px)" description="..." class="" depend_class="carousel_ops"/>
+			<field name="PPFX_carousel_thumb_margin" type="int" default="2" label="Margin Right (px)" description="..." class="" depend_class="carousel_ops"/>
 
 			<field name="" type="separator" default="FLEXI_TRANSITION" level="level3" class="carousel_ops" />
 

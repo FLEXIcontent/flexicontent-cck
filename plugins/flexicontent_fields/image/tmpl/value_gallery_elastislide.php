@@ -110,13 +110,14 @@ if (!isset(static::$js_added[$field->id][__FILE__][$item->id]))
 	 */
 
 	$slideshow_thumb_size   = $field->parameters->get( $PPFX_ . 'slideshow_thumb_size', 'large' );
-	$slideshow_thumb_height = (int) $field->parameters->get( $PPFX_ . 'slideshow_thumb_height', 400 );
+	$slideshow_thumb_height = (int) $field->parameters->get( $PPFX_ . 'slideshow_thumb_height', 600 );
 	$slideshow_auto_play    = (int) $field->parameters->get( $PPFX_ . 'slideshow_auto_play', 0 );
 	$slideshow_auto_delay   = (int) $field->parameters->get( $PPFX_ . 'slideshow_auto_delay', 4000 );
 	$slideshow_transition   = $field->parameters->get( $PPFX_ . 'slideshow_transition', 'cross-fade' );
 	$slideshow_easing       = $field->parameters->get( $PPFX_ . 'slideshow_easing', 'swing');
 	$slideshow_easing_inout = $field->parameters->get( $PPFX_ . 'slideshow_easing_inout', 'easeOut' );
 	$slideshow_speed        = (int) $field->parameters->get( $PPFX_ . 'slideshow_speed', 600 );  // Transition Duration
+	$slideshow_popup        = (int) $field->parameters->get( $PPFX_ . 'slideshow_popup', 1 );
 
 
 	/**
@@ -124,14 +125,14 @@ if (!isset(static::$js_added[$field->id][__FILE__][$item->id]))
 	 */
 
 	// Carousel Buttons (Togglers)
-	$carousel_position     = (int) $field->parameters->get( $PPFX_ . 'carousel_position', 1 );
+	$carousel_position     = (int) $field->parameters->get( $PPFX_ . 'carousel_position', 2 );
 	$carousel_visible      = (int) $field->parameters->get( $PPFX_ . 'carousel_visible', 2 );
 	// Carousel Thumbnails
 	$carousel_thumb_size   = $field->parameters->get( $PPFX_ . 'carousel_thumb_size', 's' );
 	$carousel_thumb_width  = (int) $field->parameters->get( $PPFX_ . 'carousel_thumb_width', 90 );
 	$carousel_thumb_height = (int) $field->parameters->get( $PPFX_ . 'carousel_thumb_height', 90 );
 	$carousel_thumb_border = (int) $field->parameters->get( $PPFX_ . 'carousel_thumb_border', 2 );
-	$carousel_thumb_margin = (int) $field->parameters->get( $PPFX_ . 'carousel_thumb_margin', 3 );
+	$carousel_thumb_margin = (int) $field->parameters->get( $PPFX_ . 'carousel_thumb_margin', 2 );
 	// Carousel Transition
 	$carousel_transition   = $field->parameters->get( $PPFX_ . 'carousel_transition', 'scroll' );
 	$carousel_easing       = $field->parameters->get( $PPFX_ . 'carousel_easing', 'swing');
@@ -172,8 +173,8 @@ if (!isset(static::$js_added[$field->id][__FILE__][$item->id]))
 		<div class="rg-image-wrapper">
 			{{if itemsCount > 1}}
 				<div class="rg-image-nav">
-					<a href="javascript:;" class="rg-image-nav-prev">'.JText::_('FLEXI_PREVIOUS').'</a>
-					<a href="javascript:;" class="rg-image-nav-next">'.JText::_('FLEXI_NEXT').'</a>
+					<a href="javascript:;" class="rg-image-nav-prev"><div>'.JText::_('FLEXI_PREVIOUS').'</div></a>
+					<a href="javascript:;" class="rg-image-nav-next"><div>'.JText::_('FLEXI_NEXT').'</div></a>
 				</div>
 			{{/if}}
 			<div class="rg-image"></div>
@@ -209,7 +210,6 @@ if ($result !== _FC_RETURN_)
 	$field->{$prop} = '
 	<style>
 		div#rg-gallery_'.$uid.'.rg-gallery > .rg-image-wrapper { height: ' . $slideshow_thumb_height . 'px; }
-		div#rg-gallery_'.$uid.'.rg-gallery > .rg-image-wrapper > .rg-image > img { height: ' . $slideshow_thumb_height . 'px; }
 
 		div#rg-gallery_' . $uid . ' .es-carousel ul li,
 		div#rg-gallery_' . $uid . ' .es-carousel ul li a {
@@ -221,7 +221,7 @@ if ($result !== _FC_RETURN_)
 		}
 	</style>
 
-	<div id="rg-gallery_'.$uid.'" class="rg-gallery" >
+	<div id="rg-gallery_'.$uid.'" class="rg-gallery' . ($carousel_position === 1 ? ' rg-bottom' : '') . '" >
 		<div class="rg-thumbs">
 			<!-- Elastislide Carousel Thumbnail Viewer -->
 			<div class="es-carousel-wrapper">

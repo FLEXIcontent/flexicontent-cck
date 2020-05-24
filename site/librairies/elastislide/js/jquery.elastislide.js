@@ -79,6 +79,7 @@
 	};
 
 	jQuery.elastislide.defaults 		= {
+		unique_id : '',
 		speed			: 450,	// animation speed
 		easing		: 'swing',	// animation transition easing method
 		easing_inout	: 'easeOut',
@@ -182,7 +183,27 @@
 			});
 
 		},
+
 		_setCurrentValues	: function() {
+
+			var touchDevice = ('ontouchstart' in document.documentElement);
+			if (touchDevice && typeof window.orientation !== 'undefined')
+			{
+				if (typeof this.custom_styles === 'undefined' || !!!this.custom_styles)
+				{
+					this.custom_styles = document.createElement('style');
+					document.head.appendChild(this.custom_styles);
+				}
+
+				if (window.orientation == 0)
+				{
+					this.custom_styles.innerHTML = '#rg-gallery_' + this.options.unique_id + '.rg-gallery > .rg-image-wrapper, #gf_container_' + this.unique_id + ' .rg-gallery > .rg-image-wrapper > .rg-image {max-height: 50vh; }';
+				}
+				else
+				{
+					this.custom_styles.innerHTML = '#rg-gallery_' + this.options.unique_id + '.rg-gallery > .rg-image-wrapper, #gf_container_' + this.unique_id + ' .rg-gallery > .rg-image-wrapper > .rg-image {max-height: 96vh; }';
+				}
+			}
 
 			// the total space occupied by one item
 			this.itemW			= this.$items.outerWidth(true);
@@ -305,7 +326,7 @@
 			var ml		= parseFloat( this.$slider.css('margin-left') );
 
 			// val is just passed when we want an exact value for the margin left (used in the _slideToCurrent function)
-			if( val === undefined ) {
+			if( typeof val === 'undefined' ) {
 
 				// how much to slide?
 				var amount	= this.fitCount * this.itemW, val;
@@ -359,6 +380,9 @@
 					this._toggleControls( 'right', -1 );
 					fml	= Math.abs( val );
 				}
+				
+				// Prevent past left side
+				if (val > 0) val = 0;
 
 				// show / hide navigation buttons
 				if( fml > 0 )
@@ -399,13 +423,24 @@
 				fml		= Math.abs( this.current * this.itemW );
 
 			// How much to slide ?
-			var amount	= fml + this.itemW > posR
-			 ? (fml + (- this.visibleWidth + 1.96 * this.itemW))
-			 : (this.current == 0 ? fml : fml - 0.96 * this.itemW);
+			if (fml - this.itemW / 2 < ml)
+			{
+				//window.console.log('LEFT POS');
+				var amount = this.current == 0 ? 0 : fml - this.itemW;
+			}
+			else if (fml + 2 * this.itemW > posR)
+			{
+				//window.console.log('RIGHT POS');
+				var amount = fml + (- this.visibleWidth + 2 * this.itemW);
+			}
+			else {
+				//window.console.log('STAY POS: ' + ml);
+				var amount = ml;
+			};
 
-			//window.console.log('_slideToCurrent: ' + amount + ' item_ml: ' + fml);
+			//window.console.log('_slideToCurrent: ' + amount + ' fml: ' + fml + ' ml: ' + ml);
 
-			this._slide('', -amount, anim );
+			this._slide('', -amount, anim);
 
 		},
 		add					: function( $newelems, callback ) {
@@ -432,9 +467,7 @@
 				fml		= Math.abs( this.current * this.itemW );
 
 			//window.console.log('idx: ' + idx + ' visibleWidth: ' + this.visibleWidth + ' ml: ' + ml + ' posR: ' + posR + ' fml: ' + fml);
-			if( fml + this.itemW > posR || fml < ml ) {
-				this._slideToCurrent();
-			}
+			this._slideToCurrent();
 
 			if ( callback ) callback.call();
 
