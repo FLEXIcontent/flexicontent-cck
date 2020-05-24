@@ -5,7 +5,7 @@
 
 .rg-gallery > .rg-image-wrapper {
 	/*background:transparent url(../images/black.png) repeat top left;*/
-	background: white;
+	background: #f0f0f0;
 	/*border-radius: 10px;*/
 
 	position: relative;
@@ -65,8 +65,6 @@
 	height: 100%;
 	text-indent: -9000px;
 	cursor: pointer;
-	opacity: 0.3;
-	filter: alpha(opacity=30);
 	outline: none;
 	/*border-radius: 10px 0px 0px 10px;*/
 	z-index: 4;
@@ -78,8 +76,7 @@
 	/*border-radius: 0px 10px 10px 0px;*/
 }
 .rg-gallery > .rg-image-wrapper > .rg-image-nav a:hover {
-	opacity: 0.8;
-	filter: alpha(opacity=80);
+	background-color: rgba(0, 0, 0, 0.5);
 }
 .rg-gallery > .rg-image-wrapper > .rg-caption-wrapper {
 	display: flex;
