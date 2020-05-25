@@ -68,10 +68,68 @@ if ( !isset(static::$js_added[$field->id][__FILE__]) )
 
 	if ($js) JFactory::getDocument()->addScriptDeclaration($js);
 
-	static::$js_added[$field->id][__FILE__] = true;
+	static::$js_added[$field->id][__FILE__] = array();
 }
 
+// ***
+// *** Add - per (field, item) pair - custom JS
+// ***
 
+if (!isset(static::$js_added[$field->id][__FILE__][$item->id]))
+{
+	$uid = 'fc_'.$field_name_js."_fcitem".$item->id;
+	//$js = file_get_contents(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'fancybox'.DS.'dist'.DS.'jquery.fancybox.js');
+	//$js = str_replace('unique_gal_id', $uid, $js);
+
+
+
+		//TODO render json format for button buttons: ["zoom","share","slideShow","fullScreen","download","thumbs","close"],
+
+	$display_infobar      = $field->parameters->get( $PPFX_ . 'diplay_infobar', 'true' );
+	$display_toolbar      = $field->parameters->get( $PPFX_ . 'diplay_toolbar', 'auto' );
+	$display_thumbs       = $field->parameters->get( $PPFX_ . 'diplay_thumbs_autostart', 'false' );
+	$animation_effect     = $field->parameters->get( $PPFX_ . 'animation_effect', 'zoom' );
+	$animation_duration   = $field->parameters->get( $PPFX_ . 'animation_duration', 366 );
+	$transition_effect    = $field->parameters->get( $PPFX_ . 'transition_effect', 'fade' );
+	$transition_duration  = $field->parameters->get( $PPFX_ . 'transition_duration', 366 );
+	$loop                 = $field->parameters->get( $PPFX_ . 'loop_mode', 'false' );
+	$keyboard             = $field->parameters->get( $PPFX_ . 'keyboard_mode', 'true' );
+	$image_protect        = $field->parameters->get( $PPFX_ . 'protect_image', 'true' );
+	$slideshow_autostart  = $field->parameters->get( $PPFX_ . 'slideshow_autostart', 'false' );
+	$slideshow_speed      = $field->parameters->get( $PPFX_ . 'slideshow_speed', 3000 );
+	$button               = $field->parameters->get( $PPFX_ . 'diplay_button', '["zoom","share","slideShow","fullScreen","download","thumbs","close"]' ); //TODO render json format for button buttons: ["zoom","share","slideShow","fullScreen","download","thumbs","close"],
+
+
+$js = "
+
+(function($) {
+$(document).ready(function()
+{
+			
+			$('." . $uid . "').fancybox({
+				loop:  $loop ,
+				keyboard: $keyboard,
+				infobar: $display_infobar,
+				toolbar:  '$display_toolbar',
+				button : $button,
+				protect:  $image_protect,
+				animationEffect: '$animation_effect',
+				animationDuration: $animation_duration,
+				transitionEffect: '$transition_effect',
+				transitionDuration: $transition_duration,
+				slideShow: {autoStart: $slideshow_autostart,speed:$slideshow_speed}
+			});
+		}
+		);
+
+});
+})(jQuery);
+";
+}
+
+if ($js) JFactory::getDocument()->addScriptDeclaration($js);
+
+	static::$js_added[$field->id][__FILE__][$item->id] = true;
 
 /**
  * Include common layout code before finalize values
