@@ -76,10 +76,10 @@ class FCField extends JPlugin
 	public function &getItem()  { return $this->item; }
 
 
-	protected function getSeparatorF($opentag, $closetag, $sep_default = 1)
+	protected function getSeparatorF($opentag, $closetag, $default = 1)
 	{
-		if(!$this->field) return false;
-		$separatorf = $this->field->parameters->get('separatorf', $sep_default);
+		$separatorf = $this->field->parameters->get('separatorf', $default);
+
 		switch($separatorf)
 		{
 			case 0:
@@ -110,6 +110,7 @@ class FCField extends JPlugin
 			$separatorf = '&nbsp;';
 			break;
 		}
+
 		return $separatorf;
 	}
 
@@ -134,7 +135,7 @@ class FCField extends JPlugin
 		$this->values = $this->parseValues($this->field->value);
 
 		// Optionally, get default field values array is empty
-		$this->values = count($this->values) ? $this->values : $this->getDefaultValues();
+		$this->values = count($this->values) ? $this->values : $this->getDefaultValues($isform = true);
 
 		// Call before display method, for optionally work
 		$this->beforeDisplayField();
@@ -162,6 +163,9 @@ class FCField extends JPlugin
 
 		// Parse field values
 		$this->values = $this->parseValues($values);
+
+		// Get default values if field current values are empty
+		$this->values = count($this->values) ? $this->values : $this->getDefaultValues($isform = false);
 
 		// Get choosen display layout
 		$viewlayout = $field->parameters->get('viewlayout', '');
@@ -376,7 +380,7 @@ class FCField extends JPlugin
 
 		$opentag   = JText::_(FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'opentag', '' ), 'opentag' ));
 		$closetag  = JText::_(FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'closetag', '' ), 'closetag' ));
-		$separatorf	= $this->getSeparatorF($opentag, $closetag, 1);
+		$separatorf	= $this->getSeparatorF($opentag, $closetag);
 
 		$field->{$prop} = array();
 
@@ -409,9 +413,24 @@ class FCField extends JPlugin
 	protected function afterDisplayField() {}
 
 	// Create and returns a default value
-	protected function getDefaultValues()
+	protected function getDefaultValues($isform = true)
 	{
-		return array('');
+		$value_usage = (int) $this->field->parameters->get('default_value_use', 0);
+
+		$default_value = $isform
+			? (($this->item->version == 0 || $value_usage > 0) ? $this->field->parameters->get( 'default_value', '' ) : '')
+			: (($value_usage === 2) ? $this->field->parameters->get( 'default_value', '' ) : '');
+
+		$default_value  = strlen($default_value) ? JText::_($default_value) : '';
+
+		/**
+		 * Return default value. Note: If no default value then return:
+		 *  array('') for item form
+		 *  array() for item viewing
+		 */
+		return strlen($default_value) || $isform
+			? array($default_value)
+			: array();
 	}
 
 	// Parses and returns fields values, unserializing them if serialized

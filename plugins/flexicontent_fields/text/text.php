@@ -39,6 +39,10 @@ class plgFlexicontent_fieldsText extends FCField
 
 		$field->label = $field->parameters->get('label_form') ? JText::_($field->parameters->get('label_form')) : JText::_($field->label);
 
+		// Set field and item objects
+		$this->setField($field);
+		$this->setItem($item);
+
 		$use_ingroup = $field->parameters->get('use_ingroup', 0);
 		if (!isset($field->formhidden_grp)) $field->formhidden_grp = $field->formhidden;
 		if ($use_ingroup) $field->formhidden = 3;
@@ -86,11 +90,8 @@ class plgFlexicontent_fieldsText extends FCField
 		// *** Value handling
 		// ***
 
-		// Default value
-		$value_usage   = $field->parameters->get( 'default_value_use', 0 ) ;
-		$default_value = ($item->version == 0 || $value_usage > 0) ? $field->parameters->get( 'default_value', '' ) : '';
-		$default_value = strlen($default_value) ? JText::_($default_value) : '';
-		$default_values= array($default_value);
+		// Default value(s)
+		$default_values = $this->getDefaultValues($isform = true);
 
 		// Input field display size & max characters
 		$size       = (int) $field->parameters->get( 'size', 30 ) ;
@@ -449,6 +450,10 @@ class plgFlexicontent_fieldsText extends FCField
 
 		$field->label = JText::_($field->label);
 
+		// Set field and item objects
+		$this->setField($field);
+		$this->setItem($item);
+
 		// Some variables
 		$is_ingroup  = !empty($field->ingroup);
 		$use_ingroup = $field->parameters->get('use_ingroup', 0);
@@ -506,26 +511,22 @@ class plgFlexicontent_fieldsText extends FCField
 		}
 
 
-		// ***
-		// *** Default value
-		// ***
+		/**
+		 * Get field values
+		 */
 
-		$value_usage   = $field->parameters->get( 'default_value_use', 0 ) ;
-		$default_value = ($value_usage == 2) ? $field->parameters->get( 'default_value', '' ) : '';
-		$default_value = strlen($default_value) ? JText::_($default_value) : '';
-
-		// Get field values
 		$values = $values ? $values : $field->value;
 
 		// Check for no values and no default value, and return empty display
 		if ( empty($values) )
 		{
-			if (!strlen($default_value))
+			$values = $this->getDefaultValues($isform = false);
+
+			if (!count($values))
 			{
 				$field->{$prop} = $is_ingroup ? array() : '';
 				return;
 			}
-			$values = array($default_value);
 		}
 
 
