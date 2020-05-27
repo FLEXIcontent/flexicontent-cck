@@ -272,7 +272,13 @@ $this->document->addScriptDeclaration($js);
 								<?php echo $form->getLabel('isfilter'); ?>
 							</td>
 							<td>
-								<?php echo $form->getInput('isfilter'); ?>
+								<?php echo
+									in_array($form->getValue('isfilter'),array(-1,2)) ?
+										JText::_($form->getValue('isfilter')==-1 ? 'FLEXI_NO' : 'FLEXI_YES') .' -- 
+										<a href="index.php?option=com_flexicontent&view=search&layout=indexer&tmpl=component&indexer=basic" class="btn btn-warning" onclick="var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 550, 350, function(){window.location.reload(false)}); return false;">'
+											.JText::_('FLEXI_FIELD_DIRTY_REBUILD_SEARCH_INDEX').'
+										</a>' :
+										$form->getInput('isfilter'); ?>
 							</td>
 						</tr>
 						<?php endif; ?>
