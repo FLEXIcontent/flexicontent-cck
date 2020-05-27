@@ -116,28 +116,17 @@ class plgFlexicontent_fieldsDate extends FCField
 		// both according to given configuration
 		// *******************************************
 
-		$show_usage     = $field->parameters->get( 'show_usage', 0 ) ;
-		$date_allowtime = $field->parameters->get( 'date_allowtime', 1 ) ;
+		$show_usage     = (int) $field->parameters->get( 'show_usage', 0 ) ;
+		$date_allowtime = (int) $field->parameters->get( 'date_allowtime', 1 ) ;
 
-		$time_formats_map = array('0'=>'', '1'=>' %H:%M', '2'=>' 00:00');
-		$_time_format = $time_formats_map[$date_allowtime];
+		$timeFormatsMap = array('0'=>'', '1'=>' %H:%M', '2'=>' 00:00');
+		$timeformat     = $timeFormatsMap[$date_allowtime];
 
-		$use_editor_tz  = $field->parameters->get( 'use_editor_tz', 0 ) ;
+		$use_editor_tz  = (int) $field->parameters->get( 'use_editor_tz', 0 ) ;
 		$use_editor_tz  = $date_allowtime ? $use_editor_tz : 0;  // Timezone IS disabled, if time usage is disabled
 
 		$dateformat = $field->parameters->get('date_format_form', '%Y-%m-%d');
-
-		if ($dateformat === '_custom_')
-		{
-			$customdate = $field->parameters->get('custom_date', $date_source !== 3 ? 'DATE_FORMAT_LC2' : 'Y-M-d, H:i:s');
-			$dateformat = (int) $field->parameters->get('lang_filter_format', 0)
-				? JText::_($customdate)
-				: $customdate;
-		}
-		else
-		{
-			$dateformat = JText::_($dateformat);
-		}
+		$dateformat = JText::_($dateformat);
 
 		$timezone = 'UTC'; // Default is not to use TIMEZONE
 		$tz_info  = '';    // Default is not to show TIMEZONE info
@@ -297,7 +286,7 @@ class plgFlexicontent_fieldsDate extends FCField
 				{
 					Calendar.setup({
 						inputField:	theInput.attr('id'),
-						ifFormat:		'" . $dateformat . $_time_format . "',
+						ifFormat:		'" . $dateformat . $timeformat . "',
 						button:			thePicker.attr('id'),
 						align:			'Tl',
 						singleClick:	true
@@ -609,8 +598,8 @@ class plgFlexicontent_fieldsDate extends FCField
 		$sfx = $view === 'item' ? '' : '_cat';
 
 		// Timezone configuration
-		$date_allowtime = $field->parameters->get( 'date_allowtime', 1 ) ;
-		$use_editor_tz  = $field->parameters->get( 'use_editor_tz', 0 ) ;
+		$date_allowtime = (int) $field->parameters->get( 'date_allowtime', 1 ) ;
+		$use_editor_tz  = (int) $field->parameters->get( 'use_editor_tz', 0 ) ;
 		$use_editor_tz  = $date_allowtime ? $use_editor_tz : 0;  // Timezone IS disabled, if time usage is disabled
 
 		// Get date format for single or for multi-item views
@@ -755,17 +744,19 @@ class plgFlexicontent_fieldsDate extends FCField
 		$config = JFactory::getConfig();
 		$user = JFactory::getUser();
 
-		$date_allowtime = $field->parameters->get( 'date_allowtime', 1 ) ;
-		$use_editor_tz  = $field->parameters->get( 'use_editor_tz', 0 ) ;
+		$date_allowtime = (int) $field->parameters->get( 'date_allowtime', 1 ) ;
+		$use_editor_tz  = (int) $field->parameters->get( 'use_editor_tz', 0 ) ;
 		$use_editor_tz  = $date_allowtime ? $use_editor_tz : 0;  // Timezone IS disabled, if time usage is disabled
 
-		if ($use_editor_tz == 0) {
-			// Raw date input, ignore timezone, NOTE: this is OLD BEHAVIOUR of this field
-			$timezone = 'UTC';
-		} else {
-			// For logged users the date values are in user's time zone, (unlogged users will submit in site default timezone)
-			$timezone = $user->getParam('timezone', $config->get('offset'));  // this is numeric offset in J1.5 and timezone STRING in J2.5
-		}
+		/**
+		 * Optionally for logged users the date values CAN BE in user's time zone, (unlogged users will submit in site default timezone)
+		 * Otherwise use raw date input, ignoring timezone (assume UTC), NOTE: this is OLD BEHAVIOUR of this field
+		 *
+		 *  - NOTE: For values that do not provide time we will fallback to using UTC
+		 */
+		$timezone = $use_editor_tz
+			? $user->getParam('timezone', $config->get('offset'))  // Note: timezone is a STRING in J2.5 +
+			: 'UTC';
 
 
 		// ***
@@ -827,18 +818,27 @@ class plgFlexicontent_fieldsDate extends FCField
 				$post[$n] = $date.' '.$time;
 			}
 
-			if (!$use_editor_tz || !$time)
-			{
-				// Dates have no timezone information, because either :
-				// (a) ignoring timezone OR (b) no time given
-				$newpost[$new] = $post[$n];
+			/**
+			 * Try to parse the date according to custom date format (for item form). Do not change if no match
+			 */
+			$post[$n] = $this->_customFormat_to_sqlFormat($field, $post[$n]);
+
+			/**
+			 * Verify that we have a valid date !! Try to parse the date, while considering timezone
+			 */
+			try {
+				$dateObj  = new JDate($post[$n], ($time ? $timezone : 'UTC'));
+				$post[$n] = $dateObj->toSql();
 			}
-			else
-			{
-				// Dates are in user's timezone, convert to UTC+0
-				$date = new JDate($post[$n], $timezone);
-				$newpost[$new] = $date->toSql();
+			catch ( Exception $e ) {
+				JFactory::getApplication()->enqueueMessage(
+					'<b>' . $field->label . ' ' . JText::_('FLEXI_FIELD') . '</b>: ' .
+					JText::sprintf('FLEXI_CLEARING_INVALID_CALENDAR_DATE', $post[$n])
+				, 'warning');
 			}
+
+			$newpost[$new] = $post[$n];
+
 			$new++;
 		}
 		$post = $newpost;
@@ -1199,13 +1199,94 @@ class plgFlexicontent_fieldsDate extends FCField
 	}
 
 
+	/**
+	 * Method to verify current value(s) according to field configuration, and return fixed values
+	 */
+	function onVerifyValues($field, $values)
+	{
+		// Indicate to caller that verification is supported by this field
+		if (!$field)
+		{
+			return true;
+		}
+
+		$db = JFactory::getDbo();
+
+		foreach ($values as $v)
+		{
+			/**
+			 * Try to parse the date according to custom date format (for item form). Do not change if no match
+			 */
+			$date_string = $this->_customFormat_to_sqlFormat($field, $v->value);
+
+			/**
+			 * Verify that we have a valid date !! Try to parse the date.
+			 * But use 'UTC' timezone !! we are not in item form. We should not shift the dates !!
+			 */
+			try {
+				/**
+				 * Use UTC timezone, aka do not do any shifting of dates during fixing !!
+				 * This is not an edit or an import operation
+				 */
+				$dateObj = new JDate($date_string, 'UTC');
+				$date_string = $dateObj->toSql();
+
+				// We produced a different date string, update the database !!
+				if ($date_string != $v->value)
+				{
+					$query = $db->getQuery(true)
+						->update('#__flexicontent_fields_item_relations')
+						->set($db->qn('value') . ' = ' . $db->Quote($date_string))
+						->set($db->qn('value_datetime') . ' = CAST(' . $db->Quote($date_string) . ' AS DATETIME)')
+						->where('item_id = ' . (int) $v->item_id .
+							' AND field_id = ' . (int) $v->field_id .
+							' AND valueorder = ' . (int) $v->valueorder .
+							' AND suborder = ' . (int) $v->suborder
+						);
+					$db->setQuery($query)->execute();
+				}
+			}
+			catch ( Exception $e ) {
+			}
+		}
+	}
+
+
 
 	// ***
 	// *** VARIOUS HELPER METHODS
 	// ***
 
+	// Method to convert date to SQL format for storing in DB
+	private function _customFormat_to_sqlFormat(&$field, $value)
+	{
+		// Get date format
+		$dateformat = $field->parameters->get('date_format_form', '%Y-%m-%d');
+		$dateformat = str_replace('%', '', JText::_($dateformat));
+
+		// Get timeformat
+		$date_allowtime = (int) $field->parameters->get( 'date_allowtime', 1 ) ;
+		$timeFormatsMap = array('0'=>'', '1'=>' H:i', '2'=>'');
+		$timeformat     = $timeFormatsMap[$date_allowtime];
+
+		$dt =        DateTime::createFromFormat($dt_format = $dateformat . $timeformat, $value);
+		$dt = $dt ?: DateTime::createFromFormat($dt_format = $dateformat, $value);
+		$dt = $dt ?: DateTime::createFromFormat($dt_format = $dateformat . ' H:i', $value);
+		$dt = $dt ?: DateTime::createFromFormat($dt_format = 'Y-m-d H:i', $value);
+		$dt = $dt ?: DateTime::createFromFormat($dt_format = 'Y-m-d', $value);
+
+		if ($dt)
+		{
+			$value = $dt->format('Y-m-d' . $timeformat);
+		}
+
+		//JFactory::getApplication()->enqueueMessage('dt_format: ' . $dt_format . ' - input: ' . $value . ' - toSql(): ' .  $v, 'notice');
+
+		return $value;
+	}
+
 	// Method to prepare for indexing, either preparing SQL query (if post is null) or formating/preparing given $post data for usage bu index
-	function _prepareForSearchIndexing(&$field, &$item, &$post, $for_advsearch=0)
+	private function _prepareForSearchIndexing(&$field, &$item, &$post, $for_advsearch=0)
 	{
 		$_s = $for_advsearch ? '_s' : '';
 
