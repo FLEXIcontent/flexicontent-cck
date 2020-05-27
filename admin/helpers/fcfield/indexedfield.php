@@ -49,6 +49,10 @@ class FCIndexedField extends FCField
 
 		$field->label = $field->parameters->get('label_form') ? JText::_($field->parameters->get('label_form')) : JText::_($field->label);
 
+		// Set field and item objects
+		$this->setField($field);
+		$this->setItem($item);
+
 		$use_ingroup = $field->parameters->get('use_ingroup', 0);
 		$ajax = !empty($field->isAjax);
 		if (!isset($field->formhidden_grp)) $field->formhidden_grp = $field->formhidden;
@@ -107,7 +111,7 @@ class FCIndexedField extends FCField
 		// ***
 
 		// Default value
-		$default_values = !$ajax ? $this->getFormDefaultValues($field, $item) : array('');
+		$default_values = !$ajax ? $this->getDefaultValues($isform = true) : array('');
 
 
 		// ***
@@ -345,8 +349,7 @@ class FCIndexedField extends FCField
 				// Get values of cascade (on) source field
 				$field->valgrps = $master_field->value ?:
 					(isset(static::$cascaded_values[$master_field->id]) ? static::$cascaded_values[$master_field->id] : array());
-					// array();
-					// $this->getFormDefaultValues($master_field, $item);
+
 				//echo ' SLAVE: ' . $field->label . ' with master values : ' . print_r($field->valgrps, true) . '<br/>';
 				foreach($field->valgrps as & $vg)
 				{
@@ -1182,24 +1185,38 @@ class FCIndexedField extends FCField
 
 		$field->label = JText::_($field->label);
 
+		// Set field and item objects
+		$this->setField($field);
+		$this->setItem($item);
+
 		// Some variables
 		$is_ingroup  = !empty($field->ingroup);
 		$use_ingroup = $field->parameters->get('use_ingroup', 0);
 		$multiple    = $use_ingroup || (int) $field->parameters->get( 'allow_multiple', 0 ) ;
 
-		// Get field values
-		$values = $values ? $values : $field->value;
-
 		// Check for no values and not displaying ALL elements
     $display_all = $field->parameters->get( 'display_all', 0 ) && !$is_ingroup;  // NOT supported inside fielgroup yet
     $display_all = $prop === 'csv_export' ? 0 : $display_all;
 
+
+		/**
+		 * Get field values
+		 */
+
+		$values = $values ? $values : $field->value;
+
 		if (empty($values) && !$display_all)
 		{
-			$field->{$prop}       = $is_ingroup ? array() : '';
-			$field->display_index = $is_ingroup ? array() : '';
+			// Default value
+			$values = $this->getDefaultValues($isform = false);
 
-			return;
+			if (!count($values))
+			{
+				$field->{$prop}       = $is_ingroup ? array() : '';
+				$field->display_index = $is_ingroup ? array() : '';
+
+				return;
+			}
 		}
 
 
@@ -1649,24 +1666,34 @@ class FCIndexedField extends FCField
 	// ***
 
 	// Method to get default values of an indexed field
-	function getFormDefaultValues($field, $item)
+	public function getDefaultValues($isform = true)
 	{
-		$class_name = 'plgflexicontent_fields' . ucfirst($field->field_type);
+		$class_name = 'plgflexicontent_fields' . ucfirst($this->field->field_type);
+
 		if (!class_exists($class_name))
 		{
-			JPluginHelper::getPlugin('flexicontent_fields', $field->field_type);
+			JPluginHelper::getPlugin('flexicontent_fields', $this->field->field_type);
 		}
 
-		$value_usage = $field->parameters->get( 'default_value_use', 0 ) ;
+		$value_usage = (int) $this->field->parameters->get( 'default_value_use', 0 ) ;
+
 		if ($class_name::$valueIsArr)
 		{
-			$default_values = ($item->version == 0 || $value_usage > 0) ? trim($field->parameters->get( 'default_values', '' )) : '';
+			$default_values = $isform
+				? (($this->item->version == 0 || $value_usage > 0) ? trim($this->field->parameters->get( 'default_values', '' )) : '')
+				: ($value_usage === 2 ? trim($this->field->parameters->get( 'default_values', '' )) : '');
+
 			$default_values = preg_split("/\s*,\s*/u", $default_values);
 		}
 		else
 		{
-			$default_value = ($item->version == 0 || $value_usage > 0) ? trim($field->parameters->get( 'default_value', '' )) : '';
-			$default_values= array($default_value);
+			$default_value = $isform
+				? (($this->item->version == 0 || $value_usage > 0) ? trim($this->field->parameters->get( 'default_value', '' )) : '')
+				: ($value_usage === 2 ? trim($this->field->parameters->get( 'default_value', '' )) : '');
+
+			$default_values = strlen($default_value) || $isform
+				? array($default_value)
+				: array();
 		}
 
 		return $default_values;
