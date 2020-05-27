@@ -1240,20 +1240,43 @@ class com_flexicontentInstallerScript
 					<td class="key" style="font-size:11px;">Set re-index needed flag to fields</td>
 					<td>
 					<?php
+			    $queries = array();
+
 					// Check if there is need to update the search-index
 			    $version_needs_search_reindex = version_compare($this->release_existing, '3.0.10', '<');
 
-			    $queries = array();
-					if ( $fields_tbl_exists && $version_needs_search_reindex ) {
+					if ($fields_tbl_exists && $version_needs_search_reindex)
+					{
 						$db->setQuery('SELECT COUNT(*) FROM #__flexicontent_items_ext LIMIT 1');
 						$has_items = $db->loadResult();
-						if ($has_items) {
+						if ($has_items)
+						{
 							// Set dirty SEARCH properties of published fields to be ON
 							$set_clause = ' SET'.
 								' issearch = CASE issearch WHEN 1 THEN 2   ELSE issearch   END,'.
+								' isfilter = CASE isfilter WHEN 1 THEN 2   ELSE isfilter   END,'.
 								' isadvsearch = CASE isadvsearch WHEN 1 THEN 2   ELSE isadvsearch   END,'.
 								' isadvfilter = CASE isadvfilter WHEN 1 THEN 2   ELSE isadvfilter   END';
 							$queries[] = 'UPDATE #__flexicontent_fields'. $set_clause	." WHERE published=1";
+						}
+					}
+
+			    $version_needs_values_fix = version_compare($this->release_existing, '3.3.6', '<');
+
+					if ($fields_tbl_exists && $version_needs_values_fix)
+					{
+						$db->setQuery('SELECT COUNT(*) FROM #__flexicontent_items_ext LIMIT 1');
+						$has_items = $db->loadResult();
+
+						if ($has_items)
+						{
+							// Set dirty Flag to force fixing values via re-indexing
+							$set_clause = ' SET'.
+								' issearch = CASE issearch WHEN 1 THEN 2   ELSE issearch   END,'.
+								' isfilter = CASE isfilter WHEN 1 THEN 2   ELSE isfilter   END,'.
+								' isadvsearch = CASE isadvsearch WHEN 1 THEN 2   ELSE isadvsearch   END,'.
+								' isadvfilter = CASE isadvfilter WHEN 1 THEN 2   ELSE isadvfilter   END';
+							$queries[] = 'UPDATE #__flexicontent_fields ' . $set_clause	. ' WHERE field_type=' . $db->Quote('date');
 						}
 					}
 
