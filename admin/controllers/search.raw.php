@@ -41,14 +41,15 @@ class FlexicontentControllerSearch extends FlexicontentControllerBaseAdmin
 	}
 
 
+
 	/**
-	 * count the rows
+	 * Method called before updating indexes to discover and count the rows that will be indexed
 	 *
-	 * @access public
-	 * @return void
-	 * @since 1.0
+	 * @access   public
+	 * @return   void
+	 * @since    1.0
 	 */
-	function countrows()
+	public function countrows()
 	{
 		@ob_end_clean();
 		header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
@@ -207,7 +208,15 @@ class FlexicontentControllerSearch extends FlexicontentControllerBaseAdmin
 	}
 
 
-	function index()
+
+	/**
+	 * Method to update the Basic or Advanced search index
+	 *
+	 * @access public
+	 * @return void
+	 * @since 1.0
+	 */
+	public function index()
 	{
 		@ob_end_clean();
 		header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
@@ -369,17 +378,44 @@ class FlexicontentControllerSearch extends FlexicontentControllerBaseAdmin
 			$item = null;
 
 			// Items language is needed to do (if needed) special per language handling
-			$lang_query = "SELECT id, language"
-				. " FROM #__content AS i "
-				. " WHERE id IN (" . implode(', ', $query_itemids) . ")";
-			$db->setQuery($lang_query);
-			$items_data = $db->loadObjectList('id');
+			$lang_query = $db->getQuery(true)
+				->select('id, language')
+				->from('#__content AS i')
+				->where('id IN (' . implode(', ', $query_itemids) . ')')
+				;
+			$items_data = $db->setQuery($lang_query)->loadObjectList('id');
 
 			if ($indexer === 'basic')
 			{
-				$searchindex = array();
+				$supports_verify = array();
+
+				foreach ($field_ids as $field_id)
+				{
+					$field = $fields[$field_id];
+
+					if (!isset($supports_verify[$field->field_type]))
+					{
+						$supports_verify[$field->field_type] = FLEXIUtilities::call_FC_Field_Func($field->field_type, 'onVerifyValues', array( null, null ))
+						 ? true
+						 : false;
+					}
+
+					if ($supports_verify[$field->field_type])
+					{
+						// Load field values for the purpose of verifying them
+						$f_values_query = $db->getQuery(true)
+							->select('*')
+							->from('#__flexicontent_fields_item_relations AS r')
+							->where('item_id IN (' . implode(', ', $query_itemids) . ')')
+							->where('field_id = ' . $field->id)
+							;
+						$field_value_rows[$field->id] = $db->setQuery($f_values_query)->loadObjectList();
+					}
+				}
 
 				// Add all query itemids to searchindex array so that it will be cleared even if zero fields are indexed
+				$searchindex = array();
+
 				foreach ($query_itemids as $query_itemid)
 				{
 					$searchindex[$query_itemid] = array();
@@ -434,6 +470,7 @@ class FlexicontentControllerSearch extends FlexicontentControllerBaseAdmin
 				}
 				elseif ($indexer === 'basic')
 				{
+					// Create search index record for this set of items
 					FLEXIUtilities::call_FC_Field_Func($fieldname, 'onIndexSearch', array( &$field, &$values, &$item ));
 
 					foreach ($query_itemids as $query_itemid)
@@ -442,6 +479,12 @@ class FlexicontentControllerSearch extends FlexicontentControllerBaseAdmin
 						{
 							$searchindex[$query_itemid][] = $field->search[$query_itemid];
 						}
+					}
+
+					// Verify field values validity according to field configuraton
+					if (!empty($supports_verify[$field->field_type]) && count($field_value_rows[$field->id]))
+					{
+						FLEXIUtilities::call_FC_Field_Func($fieldname, 'onVerifyValues', array( $field, $field_value_rows[$field_id] ));
 					}
 				}
 			}
@@ -671,7 +714,15 @@ class FlexicontentControllerSearch extends FlexicontentControllerBaseAdmin
 	}
 
 
-	function purge()
+
+	/**
+	 * Method to purge the Advanced search index
+	 *
+	 * @access   public
+	 * @return   void
+	 * @since    1.0
+	 */
+	public function purge()
 	{
 		$model = $this->getModel('search');
 		$model->purge();
