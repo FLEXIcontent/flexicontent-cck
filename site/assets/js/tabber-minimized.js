@@ -32,13 +32,13 @@
 
 Element.prototype.tabber_hasClass = function(className)
 {
-  if (!!this.classList)
+	if (!!this.classList)
 	{
-    return this.classList.contains(className);
+		return this.classList.contains(className);
 	}
-  else
+	else
 	{
-    return !!this.className.match(new RegExp('(\\s|^)' + className + '(\\s|$)'));
+		return !!this.className.match(new RegExp('(\\s|^)' + className + '(\\s|$)'));
 	}
 }
 
@@ -221,10 +221,10 @@ tabberObj.prototype.init = function(e)
 		{
 			/* Create a new object to save info about this tab */
 			t = new Object();
-			
+
 			/* Save a pointer to the div for this tab */
 			t.div = childNodes[i];
-			
+
 			/* Add the new object to the array of tabs */
 			this.tabs[this.tabs.length] = t;
 
@@ -243,7 +243,7 @@ tabberObj.prototype.init = function(e)
 	DOM_ul.className = this.classNav;
 
 	var decode_entities = document.createElement("textarea");  // used to decode html entities
-	
+
 	/* Loop through each tab we found */
 	for (i=0; i < this.tabs.length; i++)
 	{
@@ -259,7 +259,7 @@ tabberObj.prototype.init = function(e)
 		t.headingIconClass  = t.div.getAttribute('data-icon-class');
 		t.headingIcon2Class = t.div.getAttribute('data-icon2-class');
 		t.headingPrefixTxt  = t.div.getAttribute('data-prefix-text');
-		
+
 		/* Remove the title attribute to prevent a tooltip from appearing */
 		if (this.removeTitle)
 		{
@@ -528,15 +528,13 @@ tabberObj.prototype.tabShow = function(tabberIndex)
 	div = this.tabs[tabberIndex].div;
 
 	/* Remove classTabHide from the div */
-	div.className = div.className.replace(this.REclassTabHide, '');
-	
+	//div.className = div.className.replace(this.REclassTabHide, '');
+
 	/* Use a CSS transition for making tab contents visible */
-	/*
-	div.className = div.className.replace(this.REclassTabHide, ' tabbertablow');
+	div.className = div.className.replace(this.REclassTabHide, '  tabbertablow');
 	setTimeout(function(){
 		div.className = div.className.replace(' tabbertablow', '');
 	}, 10);
-	*/
 
 	/* Mark this tab navigation link as "active" */
 	this.navSetActive(tabberIndex);
@@ -545,7 +543,7 @@ tabberObj.prototype.tabShow = function(tabberIndex)
 	if (typeof this.onTabDisplay == 'function') {
 		this.onTabDisplay({'tabber':this, 'index':tabberIndex});
 	}
-	
+
 	// Force redraw of any google maps inside TAB
 	var elArr = document.querySelectorAll('#' + div.id + ' .has_fc_google_maps_map');
 	for (var n = 0, len = elArr.length; n < len; n++)
@@ -726,7 +724,7 @@ function tabberDeleteCookie(name, path, domain)
 /*==================================================
 	Set the tabber options (must do this before including tabber.js)
 	==================================================*/
-	
+
 var fctabber = new Object();
 
 var tabberOptions =
@@ -737,7 +735,7 @@ var tabberOptions =
 	{
 		var t = argsObj.tabber;
 		var i;
-		
+
 		/* Create a reference to the every tabber object that has an HTML tag id */
 		if (t.id)
 		{
