@@ -239,44 +239,46 @@ abstract class JHtmlFcfields extends JHtmlFcbase
 		
 		if ($row->issearch==0 || $row->issearch==1 || !$supportsearch)
 		{
-			$search_dirty = 0;
 			$issearch = ($row->issearch && $supportsearch) ? "icon-search" : "icon-cancel";
 			$issearch_tip = ($row->issearch && $supportsearch) ? $flexi_yes.", ".$flexi_toggle : ($supportsearch ? $flexi_no.", ".$flexi_toggle : $flexi_nosupport);
 		}
 		else
 		{
-			$search_dirty = 1;
 			$issearch = $row->issearch==-1 ? "icon-power-cord fc-icon-red" : "icon-power-cord fc-icon-green";
 			$issearch_tip = ($row->issearch==2 ? $flexi_yes : $flexi_no) .", ".$flexi_toggle.", ". $flexi_rebuild;
 		}
 
-		$isfilter = ($row->isfilter && $supportfilter) ? "icon-filter" : "icon-cancel";
-		$isfilter_tip = ($row->isfilter && $supportfilter) ? $flexi_yes.", ".$flexi_toggle : ($supportsearch ? $flexi_no.", ".$flexi_toggle : $flexi_nosupport);
+		if ($row->isfilter==0 || $row->isfilter==1 || !$supportfilter)
+		{
+			$isfilter = ($row->isfilter && $supportfilter) ? "icon-filter" : "icon-cancel";
+			$isfilter_tip = ($row->isfilter && $supportfilter) ? $flexi_yes.", ".$flexi_toggle : ($supportfilter ? $flexi_no.", ".$flexi_toggle : $flexi_nosupport);
+		}
+		else
+		{
+			$isfilter = $row->isfilter==-1 ? "icon-power-cord fc-icon-red" : "icon-power-cord fc-icon-green";
+			$isfilter_tip = ($row->isfilter==2 ? $flexi_yes : $flexi_no) .", ".$flexi_toggle.", ". $flexi_rebuild;
+		}
 
 		if ($row->isadvsearch==0 || $row->isadvsearch==1 || !$supportadvsearch)
 		{
-			$advsearch_dirty = 0;
 			$isadvsearch = ($row->isadvsearch && $supportadvsearch) ? "icon-search" : "icon-cancel";
 			$isadvsearch_tip = ($row->isadvsearch && $supportadvsearch) ? $flexi_yes.", ".$flexi_toggle : ($supportadvsearch ? $flexi_no.", ".$flexi_toggle : $flexi_nosupport);
 		}
 		else
 		{
-			$advsearch_dirty = 1;
 			$isadvsearch = $row->isadvsearch==-1 ? "icon-power-cord fc-icon-red" : "icon-power-cord fc-icon-green";
 			$isadvsearch_tip = ($row->isadvsearch==2 ? $flexi_yes : $flexi_no) .", ".$flexi_toggle.", ". $flexi_rebuild;
 		}
 
 		if ($row->isadvfilter==0 || $row->isadvfilter==1 || !$supportadvfilter)
 		{
-			$advfilter_dirty = 0;
 			$isadvfilter = ($row->isadvfilter && $supportadvfilter) ? "icon-filter" : "icon-cancel";
-			$isadvfilter_tip = ($row->isadvfilter && $supportadvfilter) ? $flexi_yes : ($supportadvfilter ? $flexi_no : $flexi_nosupport);
+			$isadvfilter_tip = ($row->isadvfilter && $supportadvfilter) ? $flexi_yes : ($supportadvfilter ? $flexi_no.", ".$flexi_toggle : $flexi_nosupport);
 		}
 		else
 		{
-			$advfilter_dirty = 1;
 			$isadvfilter = $row->isadvfilter==-1 ? "icon-power-cord fc-icon-red" : "icon-power-cord fc-icon-green";
-			$isadvfilter_tip = ($row->isadvfilter==2 ? $flexi_yes : $flexi_no) .", ". $flexi_rebuild;
+			$isadvfilter_tip = ($row->isadvfilter==2 ? $flexi_yes : $flexi_no) .", ".$flexi_toggle.", ". $flexi_rebuild;
 		}
 
 		$html = array();

@@ -2341,35 +2341,52 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 	*/
 	function checkDirtyFields()
 	{
-		$perms = FlexicontentHelperPerm::getPerm();
-		if ( !$perms->CanFields ) return;
+		if ( !FlexicontentHelperPerm::getPerm()->CanFields ) return;
 
-		$db = JFactory::getDbo();
+		$db  = JFactory::getDbo();
+		$app = JFactory::getApplication();
 
-		// GET fields having dirty field properties, NOTE: a dirty field property means that search index must be updated,
-		// even if the field was unpublished, because the field values may still exists in the search index for some items
+		/**
+		 * GET fields having dirty field properties,
+		 * NOTE: a dirty field property means that search index must be updated,
+		 *   even if the field was unpublished,
+		 *   because the field values may still exists in the search index for some items,
+		 */
 
-		$query = 'SELECT COUNT(*) '
-			. ' FROM #__flexicontent_fields'
-			. ' WHERE (issearch=-1 || issearch=2)'  // Regardless publication state
+		// Regardless publication state
+		$query = $db->getQuery(true)
+			->select('COUNT(*)')
+			->from('#__flexicontent_fields')
+			->where('issearch=-1 OR issearch=2 OR isfilter=-1 OR isfilter=2')
 			;
-		$db->setQuery($query);
-		$dirty_basic = $db->loadResult();
+		$dirty_basic = $db->setQuery($query)->loadResult();
 
-		$query = 'SELECT COUNT(*) '
-			. ' FROM #__flexicontent_fields'
-			. ' WHERE (isadvsearch=-1 OR isadvsearch=2 OR isadvfilter=-1 OR isadvfilter=2)'  // Regardless publication state
+		$query = $db->getQuery(true)
+			->select('COUNT(*)')
+			->from('#__flexicontent_fields')
+			->where('isadvsearch=-1 OR isadvsearch=2 OR isadvfilter=-1 OR isadvfilter=2')
 			;
-		$db->setQuery($query);
-		$dirty_advanced = $db->loadResult();
+		$dirty_advanced = $db->setQuery($query)->loadResult();
 
 		if ($dirty_basic)
 		{
-			JFactory::getApplication()->enqueueMessage( JText::sprintf( 'FLEXI_ALERT_UPDATE_SINDEX_BASIC', $dirty_basic, ' href="index.php?option=com_flexicontent&view=search&layout=indexer&tmpl=component&indexer=basic" class="btn" onclick="var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 550, 350, function(){window.location.reload(false)}); return false;" '), 'notice' );
+			$app->enqueueMessage(
+				JText::sprintf('FLEXI_ALERT_UPDATE_SINDEX_BASIC',
+					$dirty_basic,
+					' href="index.php?option=com_flexicontent&view=search&layout=indexer&tmpl=component&indexer=basic" '.
+					' class="btn" onclick="var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 550, 350, function(){window.location.reload(false)}); return false;" '
+				)
+			, 'notice');
 		}
 		if ($dirty_advanced)
 		{
-			JFactory::getApplication()->enqueueMessage( JText::sprintf( 'FLEXI_ALERT_UPDATE_SINDEX_ADVANCED', $dirty_advanced, ' href="index.php?option=com_flexicontent&view=search&layout=indexer&tmpl=component&indexer=advanced" class="btn" onclick="var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 550, 350, function(){window.location.reload(false)}); return false;" '), 'notice' );
+			$app->enqueueMessage(
+				JText::sprintf('FLEXI_ALERT_UPDATE_SINDEX_ADVANCED',
+				$dirty_advanced,
+				' href="index.php?option=com_flexicontent&view=search&layout=indexer&tmpl=component&indexer=advanced" ' .
+				' class="btn" onclick="var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 550, 350, function(){window.location.reload(false)}); return false;" '
+				)
+			, 'notice');
 		}
 	}
 

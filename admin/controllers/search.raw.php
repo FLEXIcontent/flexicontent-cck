@@ -620,8 +620,11 @@ class FlexicontentControllerSearch extends FlexicontentControllerBaseAdmin
 		if ($cnt >= $records_total)
 		{
 			// Reset dirty SEARCH properties of published fields to be: normal ON/OFF
-			$set_clause = ' SET' . ($indexer == 'basic' ?
-				' issearch = CASE issearch WHEN 2 THEN 1   WHEN -1 THEN 0   ELSE issearch   END' :
+			$set_clause = ' SET' . ($indexer == 'basic'
+				?
+				' issearch = CASE issearch WHEN 2 THEN 1   WHEN -1 THEN 0   ELSE issearch   END,' .
+				' isfilter = CASE isfilter WHEN 2 THEN 1   WHEN -1 THEN 0   ELSE isfilter   END'
+				:
 				' isadvsearch = CASE isadvsearch WHEN 2 THEN 1   WHEN -1 THEN 0   ELSE isadvsearch   END,' .
 				' isadvfilter = CASE isadvfilter WHEN 2 THEN 1   WHEN -1 THEN 0   ELSE isadvfilter   END');
 			$query = 'UPDATE #__flexicontent_fields' . $set_clause . " WHERE published=1";
