@@ -66,7 +66,7 @@ foreach ($field->value as $file_id)
 			'toggle_btn' => array(
 				'class' => ($file_btns_position ? $add_on_class : '') . ' fcfield-uploadvalue' . $font_icon_class,
 				'text' => (!$file_btns_position ? '&nbsp; ' . JText::_('FLEXI_UPLOAD') : ''),
-				'onclick' => 'var box = jQuery(this).closest(\'.fcfieldval_container\').find(\'.fcimg_preview_box\'); box.parent().find(\'.fc_file_uploader\').is(\':visible\') ? box.show() : box.hide(); box.is(\':visible\') ? jQuery(this).removeClass(\'active\') : jQuery(this).addClass(\'active\'); ',
+				'onclick' => 'var box = jQuery(this).closest(\'.fcfieldval_container\'); box.find(\'.fc_file_uploader\').is(\':visible\') ? jQuery(this).removeClass(\'active\') : jQuery(this).addClass(\'active\'); box.find(\'.fc_file_uploader\').is(\':visible\') ? box.find(\'.fcimg_preview_box\').show() :  box.find(\'.fcimg_preview_box\').hide();',
 				'action' => null
 			),
 			'thumb_size_slider_cfg' => ($thumb_size_resizer ? $thumb_size_slider_cfg : 0),
@@ -140,7 +140,7 @@ foreach ($field->value as $file_id)
 
 		<div class="fc_uploader_n_props_box">
 
-			<div style="flex-basis: auto; flex-grow: 50;">
+			<div style="flex-basis: auto;">
 				'.($form_file_preview ? '<div class="fc-iblock fcimg_preview_box" style="'.$preview_css.'"><img id="'.$elementid_n.'_img_preview" src="'.$preview_src.'" class="fc_preview_thumb" alt="Preview image placeholder"/></div>' : '').'
 				'.(!empty($uploader_html) ? $uploader_html->container : '').'
 			</div>

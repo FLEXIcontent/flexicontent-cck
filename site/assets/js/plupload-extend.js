@@ -68,8 +68,6 @@ fc_plupload = function(options)
 		var upProgress_IntervalHandle = 0;
 		
 		var box = uploader_container.closest('.fcfieldval_container');
-		var flexbox = box.length ? box.get(0).querySelector('.fc_uploader_n_props_box') : null;
-		if (!!flexbox) flexbox.style.flexDirection = 'row';
 
 		if (!this.uploader_instances[sfx] && is_IE8_IE9 && !fc_has_flash_addon())
 		{
@@ -82,6 +80,7 @@ fc_plupload = function(options)
 			//this.uploader_instances[sfx].refresh();  // refresh it
 			//this.uploader_instances[sfx].splice();   // empty it, ... not needed and problematic ... commented out
 			toggle_action == 'hide' ? uploader_container.hide() : uploader_container.show();
+
 			return this.uploader_instances[sfx];
 		}
 		//window.console.log(this.options.mode=='ui' ? 'Creating plupload UI' : 'Creating pluploadQueue');
@@ -341,6 +340,7 @@ fc_plupload = function(options)
 
 		// Toggle the uploader container
 		toggle_action == 'hide' ? uploader_container.hide() : uploader_container.show();
+
 		return this.uploader_instances[sfx];
 	};
 
