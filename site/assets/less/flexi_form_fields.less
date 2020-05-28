@@ -280,7 +280,17 @@ div.container_fcfield div.toggle_all_values_buttons_box {
 	ul.fcfield-sortables > li span[class^="fcfield-"].fcfont-icon,
 	ul.fcfield-sortables > li span[class*=" fcfield-"].fcfont-icon {
 		margin: 0px 0px 2px 0px;
+		color: #555;
+		transition: all 0.3s ease-in;
 	}
+
+	span[class^="fcfield-"].fcfont-icon:hover,
+	span[class*=" fcfield-"].fcfont-icon:hover,
+	ul.fcfield-sortables > li span[class^="fcfield-"].fcfont-icon:hover,
+	ul.fcfield-sortables > li span[class*=" fcfield-"].fcfont-icon:hover {
+		color: black;
+	}
+
 	span[class^="fcfield-"].fcfont-icon:before,
 	span[class*=" fcfield-"].fcfont-icon:before,
 	span[class^="fcfield-"].fcfont-icon:after,
@@ -295,6 +305,7 @@ div.container_fcfield div.toggle_all_values_buttons_box {
 		font-style: normal;
 		font-size: 14px;
 		vertical-align: top;
+		color: #555;
 	}
 
 	.fc-xpended-btns.fc-bottom-btns
@@ -354,7 +365,6 @@ div.container_fcfield div.toggle_all_values_buttons_box {
 			display: inline-block;
 
 			/* style these */
-			color: #777;
 			border-radius: 4px;
 			border: 1px solid #d0d0d0;
 			vertical-align: top;
@@ -674,10 +684,16 @@ div.container_fcfield div.toggle_all_values_buttons_box {
 	.fcfield-uploadvalue.active {
 		background-color: #efefef;
 	}
-	.fcfield-uploadvalue.active.fcfont-icon {
+
+	.fc-xpended-btns .fcfield-uploadvalue.active.fcfont-icon,
+	.fc-xpended-btns .fcfield-uploadvalue.active.fcfont-icon:hover,
+	.fcfield-uploadvalue.active.fcfont-icon,
+	.fcfield-uploadvalue.active.fcfont-icon:hover, {
 		background-color: #2f96b4;
-		color: white !important; /* override */
+		background-image: none;
+		color: white;
 	}
+
 	span.fcfield-uploadvalue.fcfont-icon:before {
 		content: "\e022";
 	}
