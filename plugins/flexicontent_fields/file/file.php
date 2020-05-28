@@ -78,7 +78,7 @@ class plgFlexicontent_fieldsFile extends FCField
 		$required_class = $required ? ' required' : '';
 
 		// If we are multi-value and not inside fieldgroup then add the control buttons (move, delete, add before/after)
-		$add_ctrl_btns = !$use_ingroup;
+		$add_ctrl_btns = !$use_ingroup && $multiple;
 
 		// Inline file property editing
 		$inputmode = (int)$field->parameters->get( 'inputmode', 1 ) ;  // 1: file selection only,  0: inline file properties editing
@@ -689,8 +689,24 @@ class plgFlexicontent_fieldsFile extends FCField
 				</div>
 				'.($fields_box_placing ? '<div class="fcclear"></div>' : '').'
 				').'
+
 				<div class="fc-field-props-box" ' . (!$multiple ? 'style="width: 96%; max-width: 1400px;"' : ''). '>
+
+					'.($use_inline_uploaders && ($file_btns_position || !$add_ctrl_btns) ? '
+					<div class="fcclear"></div>
+					<div class="btn-group" style="margin: 4px 0 16px 0; display: inline-block;">
+						<div class="'.$input_grp_class.' fc-xpended-btns">
+							'.$uploader_html->toggleBtn.'
+							'.$uploader_html->multiUploadBtn.'
+							' . ($use_myfiles > 0 ? $uploader_html->myFilesBtn : '') . '
+							'.$uploader_html->mediaUrlBtn.'
+							'.$uploader_html->clearBtn.'
+						</div>
+					</div>
+					' : '') . '
+
 				'.$_html.'
+
 				</div>
 				';
 		}

@@ -269,11 +269,11 @@
 			<field name="" type="separator" default="FLEXI_DOWNLOADS" description="" icon_class="icon-download" level="tab_open" box_type="1" />
 
 			<field name="allowdownloads" type="multilist" subtype="radio" default="1" label="FLEXI_FIELD_FILE_ALLOW_DOWNLOAD" toggle_related="1" description="FLEXI_FIELD_FILE_ALLOW_DOWNLOAD_DESC" class="btn-group btn-group-yesno">
-				<option value="0" show_list="" hide_list="multivalue-mode7">FLEXI_NO</option>
-				<option value="1" show_list="" hide_list="multivalue-mode7">FLEXI_YES</option>
-				<option value="2" show_list="multivalue-mode7" hide_list="">FLEXI_YES_CUSTOM_TEXT</option>
+				<option value="0" show_list="" hide_list="allow-download-custom">FLEXI_NO</option>
+				<option value="1" show_list="" hide_list="allow-download-custom">FLEXI_YES</option>
+				<option value="2" show_list="allow-download-custom" hide_list="">FLEXI_YES_CUSTOM_TEXT</option>
 			</field>
-			<field name="downloadstext" type="text" size="40" default="FLEXI_DOWNLOAD" label="FLEXI_FIELD_FILE_CUSTOM_DOWNLOAD_TEXT" depend_class="multivalue-mode7" description="FLEXI_FIELD_FILE_CUSTOM_DOWNLOAD_TEXT_DESC"/>
+			<field name="downloadstext" type="text" size="40" default="FLEXI_DOWNLOAD" label="FLEXI_FIELD_FILE_CUSTOM_DOWNLOAD_TEXT" depend_class="allow-download-custom" description="FLEXI_FIELD_FILE_CUSTOM_DOWNLOAD_TEXT_DESC"/>
 
 			<field name="" type="separator" default="FLEXI_FILE_FORCE_URL_DOWNLOADS" level="level2" />
 			<field name="" type="separator" default="FLEXI_FILE_FORCE_URL_DOWNLOADS_INFO" level="level3" class="alert alert-info fcpadded" />
@@ -287,12 +287,13 @@
 			<field name="" type="separator" default="FLEXI_BROWSER_VIEWING" description="" icon_class="icon-eye" level="tab_open" box_type="1" />
 
 			<field name="allowview" type="multilist" subtype="radio" default="0" label="FLEXI_FIELD_FILE_ALLOW_VIEW" toggle_related="1" description="FLEXI_FIELD_FILE_ALLOW_VIEW_DESC" class="btn-group btn-group-yesno">
-				<option value="0" show_list="" hide_list="multivalue-mode8">FLEXI_NO</option>
-				<option value="1" show_list="" hide_list="multivalue-mode8">FLEXI_YES</option>
-				<option value="2" show_list="multivalue-mode8" hide_list="">FLEXI_YES_CUSTOM_TEXT</option>
+				<option value="0" show_list="" hide_list="allow-viewing, allow-viewing-custom">FLEXI_NO</option>
+				<option value="1" show_list="allow-viewing" hide_list="allow-viewing-custom">FLEXI_YES</option>
+				<option value="2" show_list="allow-viewing, allow-viewing-custom" hide_list="">FLEXI_YES_CUSTOM_TEXT</option>
 			</field>
-			<field name="viewtext" type="text" size="40" default="" label="FLEXI_FIELD_FILE_CUSTOM_VIEW_TEXT" depend_class="multivalue-mode8" description="FLEXI_FIELD_FILE_CUSTOM_VIEW_TEXT_DESC"/>
-			<field name="viewinside" type="radio" default="1" label="View inside" description="Select to view file in same / new window" depend_class="multivalue-mode8" class="btn-group group-fcinfo">
+
+			<field name="viewtext" type="text" size="40" default="" label="FLEXI_FIELD_FILE_CUSTOM_VIEW_TEXT" depend_class="allow-viewing-custom" description="FLEXI_FIELD_FILE_CUSTOM_VIEW_TEXT_DESC"/>
+			<field name="viewinside" type="radio" default="1" label="View inside" description="Select to view file in same / new window" depend_class="allow-viewing" class="btn-group group-fcinfo">
 				<option value="0">Fancybox modal</option>
 				<option value="1">jQuery modal (responsive + fullscreen)</option>
 				<option value="2">New window</option>
