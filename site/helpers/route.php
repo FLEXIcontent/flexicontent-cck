@@ -162,7 +162,7 @@ class FlexicontentHelperRoute
 	{
 		// Cache the result on multiple calls
 		static $_layouts_default_menuitem_id = null;
-		if ( $_layouts_default_menuitem_id!==null ) return $_layouts_default_menuitem_id[$layout];
+		if ( $_layouts_default_menuitem_id!==null ) return $_layouts_default_menuitem_id;
 
 		// Default item not found (yet) ... set it to empty array to indicate that we tried
 		$_layouts_default_menuitem_id = array();
@@ -622,12 +622,14 @@ class FlexicontentHelperRoute
 
 
 		// USE the itemid provided, if we were given one it means it is "appropriate and relevant"
-		if ($Itemid) {
+		if ($Itemid)
+		{
 			$link .= '&Itemid='.$Itemid;
 		}
 
 		// Try to find the most appropriate/relevant menu item, using the priority set via needles array
-		else if ($menuitem = FlexicontentHelperRoute::_findCategory($needles, $data)) {
+		elseif ($menuitem = FlexicontentHelperRoute::_findCategory($needles, $data))
+		{
 			$Itemid = $menuitem->id;
 			$link .= '&Itemid='.$Itemid;
 			// Special handly if directory view was matched
@@ -640,18 +642,25 @@ class FlexicontentHelperRoute
 
 		// Try to use component's default menu item, this is according to COMPONENT CONFIGURATION and includes ACTIVE menu item if appropriate
 		// but try layout specific first
-		else {
+		else
+		{
 			$layout = !empty($urlvars['layout']) ? $urlvars['layout'] : false;
 
 			if ($layout && $layout_default_menuitem_ids === null)
+			{
 				$layout_default_menuitem_ids = FlexicontentHelperRoute::_setLayoutDefaultMenuitemIds();
+			}
 
-			if ( $layout && !empty($layout_default_menuitem_ids[$layout]) ) {
+			if ($layout && !empty($layout_default_menuitem_ids[$layout]))
+			{
 				$Itemid = $layout_default_menuitem_ids[$layout];
 			}
-			else {
+			else
+			{
 				if ($component_default_menuitem_id === null)
+				{
 					$component_default_menuitem_id = FlexicontentHelperRoute::_setDefaultMenuitemId();
+				}
 
 				$Itemid = (int) $component_default_menuitem_id;  // if false (aka not set) then it will be typecasted to ZERO
 			}
@@ -957,6 +966,7 @@ class FlexicontentHelperRoute
 			'author'=>'authorid',
 			'mcats'=>'cids',
 		);
+		static $layout_default_menuitem_ids;
 
 		// Get language, url variables
 		$language = $data['language'];
@@ -968,6 +978,12 @@ class FlexicontentHelperRoute
 		{
 			$i_name = @ $layout_idvars[$layout];
 			$i_val = $i_name && !empty($urlvars[$i_name])  ?  ((int)$urlvars[$i_name]).'_'  :  '0_';
+
+			// Get default menu items per layout
+			if ($layout_default_menuitem_ids === null)
+			{
+				$layout_default_menuitem_ids = FlexicontentHelperRoute::_setLayoutDefaultMenuitemIds();
+			}
 		}
 
 		// Set language menu items if not already done
@@ -1003,6 +1019,7 @@ class FlexicontentHelperRoute
 		// Now find menu item for given needles
 		$matched_menu = false;
 
+		//echo '<pre>'; print_r($needles); echo '</pre>';
 		foreach ($needles as $view => $ids)
 		{
 			// Check if this an already appropriate menu item object
@@ -1030,9 +1047,13 @@ class FlexicontentHelperRoute
 
 				if ($layout)
 				{
-					$i_id = $i_id === -1
-						? '0_0'
-						: $i_val . $i_id;
+					// Do not try to match a non-specific "layout" menu item if default menu item for this layout has been configured
+					if ($i_id === -1 && !empty($layout_default_menuitem_ids[$layout]))
+					{
+						continue;
+					}
+
+					$i_id = $i_id === -1 ? '0_0' : $i_val . $i_id;
 				}
 				//echo "i_id: ". $i_id ."<br/>";
 

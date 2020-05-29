@@ -2251,6 +2251,36 @@ class FlexicontentModelCategory extends JModelLegacy {
 	}
 
 
+
+	/**
+	 * Function to check if current menu is a good match of current view,
+	 * This is useful for deciding to use its parameters for current view
+	 *
+	 * @access	private
+	 * @return	void
+	 * @since	1.5
+	 */
+	public function menuMatches($menu)
+	{
+		if (!$menu)
+		{
+			return false;
+		}
+
+		$view_ok      = @$menu->query['view']    == 'category';
+		$cid_ok       = @$menu->query['cid']     == $this->_id || ( $this->_layout && empty($menu->query['cid']) );
+		$layout_ok    = @$menu->query['layout']  == $this->_layout;
+
+		// Examine author only for author layout, !! thus ignoring empty author_id when layout is 'myitems' or 'favs', for them this is set explicitely (* see populateRecordState() function)
+		$authorid_ok  = $this->_layout !== 'author' || empty($menu->query['authorid']) || $menu->query['authorid'] == $this->_authorid;
+
+		// Examine tagid only for tags layout
+		$tagid_ok     = $this->_layout !== 'tags'   || empty($menu->query['tagid'])    || $menu->query['tagid'] == $this->_tagid;
+
+		return $view_ok && $cid_ok & $layout_ok && $authorid_ok;
+	}
+
+
 	/**
 	 * Method to load content article parameters
 	 *
@@ -2258,7 +2288,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 	 * @return	void
 	 * @since	1.5
 	 */
-	function _loadCategoryParams($force=false)
+	private function _loadCategoryParams($force=false)
 	{
 		if ( $this->_params !== NULL && !$force ) return;
 		$id = (int)$this->_id;
@@ -2391,18 +2421,10 @@ class FlexicontentModelCategory extends JModelLegacy {
 		{
 			$this->_menu_itemid = $menu->id;
 
-			$view_ok      = @$menu->query['view']     == 'category';
-			$cid_ok       = @$menu->query['cid']      == $this->_id;
-			$layout_ok    = @$menu->query['layout']   == $this->_layout;
-			// Examine author only for author layout, !! thus ignoring empty author_id when layout is 'myitems' or 'favs', for them this is set explicitely (* see populateRecordState() function)
-			$authorid_ok  = ($this->_layout!='author') || (@$menu->query['authorid'] == $this->_authorid);
-			// Examine tagid only for tags layout
-			$tagid_ok     = ($this->_layout!='tags')   || (@$menu->query['tagid'] == $this->_tagid);
-
 			// We will merge menu parameters last, thus overriding the default categories parameters if either
 			// (a) override is enabled in the menu or (b) category Layout is 'myitems' or 'favs' or 'tags' or 'mcats' which has no default parameters
+			$menu_matches = $this->menuMatches($menu);
 			$overrideconf = $menu_params->get('override_defaultconf',0) || $this->_layout=='myitems' || $this->_layout=='favs' || $this->_layout=='mcats' || $this->_layout=='tags';
-			$menu_matches = $view_ok && $cid_ok & $layout_ok && $authorid_ok;
 
 			if ( $menu_matches && $overrideconf ) {
 				// Add - all - menu parameters related or not related to category parameters override
