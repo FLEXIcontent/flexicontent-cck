@@ -26,13 +26,27 @@ foreach ($field->value as $file_id)
 		{
 			$preview_css .= 'display:none;';
 		}
+		$preview_text = mb_strtoupper($file_data->ext);
+		$has_preview = false;
 	}
 	else
 	{
-		$img_path = (substr($file_data->filename, 0,7)!='http://' || substr($file_data->filename, 0,8)!='https://')
-			? JUri::root(true) . '/' . (empty($file_data->secure) ? $mediapath : $docspath) . '/' . $file_data->filename
-			: $file_data->filename;
+		switch((int) $file_data->url)
+		{
+			case 0:
+				$img_path = JUri::root(true) . '/' . (empty($file_data->secure) ? $mediapath : $docspath) . '/' . $file_data->filename;
+				break;
+			case 1:
+				$img_path = $file_data->filename;
+				break;
+			case 2:
+			default:
+				$img_path = JUri::root(true) . '/' . $file_data->filename;
+				break;
+		}
 		$preview_src = JUri::root() . 'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' . $img_path . '&amp;w=100&amp;h=100&amp;zc=1&amp;q=95&amp;ar=x';
+		$preview_text = '';
+		$has_preview = true;
 	}
 
 	$info_txt_classes = $file_data->published ? '' : 'file_unpublished '.$tooltip_class;
@@ -51,8 +65,12 @@ foreach ($field->value as $file_id)
 	$default_stamp_val = isset($form_data[$file_id])  ?  (int)$form_data[$file_id]['stamp']  :  1;
 
 	$addExistingURL_onclick = "fc_openFileSelection_".$field->id."(this);";
-
-	$cols2_exist = $iform_title || $iform_lang || $iform_access || $iform_desc || $iform_dir;
+	$toggleUploader_onclick = 'var box = jQuery(this).closest(\'.fcfieldval_container\'); ' .
+		'var isVisible = box.find(\'.fc_file_uploader\').is(\':visible\'); ' .
+		'isVisible ? jQuery(this).removeClass(\'active\') : jQuery(this).addClass(\'active\'); ' .
+		'isVisible ? box.find(\'.fcfield_preview_box\').show() :  box.find(\'.fcfield_preview_box\').hide(); ' .
+		'isVisible ? box.find(\'.inlinefile-prv-box\').addClass(\'empty\') : box.find(\'.inlinefile-prv-box\').removeClass(\'empty\');';
+		
 
 	if ($use_inline_uploaders)
 	{
@@ -66,7 +84,7 @@ foreach ($field->value as $file_id)
 			'toggle_btn' => array(
 				'class' => ($file_btns_position ? $add_on_class : '') . ' fcfield-uploadvalue' . $font_icon_class,
 				'text' => (!$file_btns_position ? '&nbsp; ' . JText::_('FLEXI_UPLOAD') : ''),
-				'onclick' => 'var box = jQuery(this).closest(\'.fcfieldval_container\'); box.find(\'.fc_file_uploader\').is(\':visible\') ? jQuery(this).removeClass(\'active\') : jQuery(this).addClass(\'active\'); box.find(\'.fc_file_uploader\').is(\':visible\') ? box.find(\'.fcimg_preview_box\').show() :  box.find(\'.fcimg_preview_box\').hide();',
+				'onclick' => $toggleUploader_onclick ,
 				'action' => null
 			),
 			'thumb_size_slider_cfg' => ($thumb_size_resizer ? $thumb_size_slider_cfg : 0),
@@ -140,8 +158,10 @@ foreach ($field->value as $file_id)
 
 		<div class="fc_uploader_n_props_box">
 
-			<div style="flex-basis: auto;">
-				'.($form_file_preview ? '<div class="fc-iblock fcimg_preview_box" style="'.$preview_css.'"><img id="'.$elementid_n.'_img_preview" src="'.$preview_src.'" class="fc_preview_thumb" alt="Preview image placeholder"/></div>' : '').'
+			<div class="inlinefile-prv-box" style="flex-basis: auto;">
+				'.($form_file_preview ? '<div class="fcfield_preview_box' . ($form_file_preview === 2 ? ' auto' : '') . '" style="'.$preview_css.'">
+					<div class="fc_preview_text">' . $preview_text . '</div>
+					<img id="'.$elementid_n.'_image_preview" src="'.$preview_src.'" class="fc_preview_thumb" alt="Preview image placeholder"/></div>' : '').'
 				'.(!empty($uploader_html) ? $uploader_html->container : '').'
 			</div>
 
@@ -266,10 +286,14 @@ foreach ($field->value as $file_id)
 }
 
 
-$document->addScriptDeclaration("
-	//document.addEventListener('DOMContentLoaded', function()
+//document.addEventListener('DOMContentLoaded', function()
+$js = ""
+. (!$per_value_js ? "" : "
 	jQuery(document).ready(function()
 	{
 		" . $per_value_js . "
 	});
 ");
+
+if ($js) $document->addScriptDeclaration($js);
+

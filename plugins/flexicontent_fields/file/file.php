@@ -221,9 +221,10 @@ class plgFlexicontent_fieldsFile extends FCField
 			}
 		}
 
-		// Inline mode needs an default value, TODO add for popup too ?
-		$has_values = count($field->value);
+		// Flag that indicates if field has values
+		$has_values = !empty($field->value);
 
+		// Inline mode needs an default value, TODO add for popup too ?
 		if (empty($field->value) || $use_ingroup)
 		{
 			// Create an empty file properties value, used by code that creates empty inline file editing form fields
@@ -376,11 +377,13 @@ class plgFlexicontent_fieldsFile extends FCField
 				theInput.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][file-data-txt]');
 				theInput.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_file-data-txt');
 
-				var imgPreview = newField.find('.fcimg_preview_box').first();
-				imgPreview.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_img_preview');
+				var imgPreview = newField.find('.fc_preview_thumb').first();
+				imgPreview.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_image_preview');
 				imgPreview.attr('src', 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=');
+				imgPreview.parent().find('.fc_preview_msg').html('');
+				imgPreview.parent().find('.fc_preview_text').html('');
 				".($form_file_preview != 1 ? '
-				imgPreview.hide();' : '')."
+				imgPreview.parent().hide();' : '')."
 
 				".($iform_title ? "
 				var theInput = newField.find('input.fc_filetitle').first();

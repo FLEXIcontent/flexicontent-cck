@@ -77,7 +77,7 @@
 
 		if (options.hide_image)
 		{
-			box.find('.fcimg_preview_box').hide();
+			box.find('.fcfield_preview_box').hide();
 		}
 		else
 		{
@@ -89,8 +89,9 @@
 			box.find('.fc_filedata_txt').data('filename', null);
 			box.find('.hasvalue').val('');
 			box.find('.fc_preview_thumb').attr('src', 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=');
-			box.find('.fcimg_preview_msg').html(' ');
-			box.find('.fcimg_preview_box').show();
+			box.find('.fc_preview_text').html('');
+			box.find('.fc_preview_msg').html('');
+			box.find('.fcfield_preview_box').hide();
 
 			if (hasValue) valcounter.value = ( valcounter.value=='' || valcounter.value=='1' )  ?  ''  :  parseInt(valcounter.value) - 1;
 			//if (window.console) window.console.log('valcounter: ' + valcounter.value);
@@ -123,10 +124,20 @@
 
 		if (file.preview)
 		{
+			container.find('.fc_preview_text').html('');
 			if (keep_modal != 2)
 			{
-				container.find('.fcimg_preview_box').show();
+				container.find('.fcfield_preview_box').show();
 				fcfield_file.clearFieldUploader(container, config_name);
+			}
+		}
+		else
+		{
+			container.find('.fc_preview_text').html(file.ext.toUpperCase());
+
+			if (container.find('.fcfield_preview_box').hasClass('auto'))
+			{
+				container.find('.fcfield_preview_box').hide();
 			}
 		}
 

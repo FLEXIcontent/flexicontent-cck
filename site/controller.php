@@ -2365,7 +2365,13 @@ class FlexicontentController extends JControllerLegacy
 			}
 			else
 			{
-				$file->abspath = $file->filename;
+				/**
+				 * We may need absolute URL path later use JUri::root() !! for media manager Links
+				 * we may use readfile(Absolute URL) to force download of a URL link !!
+				 */
+				$file->abspath = $file->url == 2
+					? JUri::root() . $file->filename
+					: $file->filename;
 			}
 
 
@@ -2466,7 +2472,10 @@ class FlexicontentController extends JControllerLegacy
 
 			if ($file->url)
 			{
-				$url = $file->filename;
+				// Check and prefix URL Media manager links too
+				$url = $file->url == 2
+					? JUri::root(true) . '/' . $file->filename
+					: $file->filename;
 				$ext = strtolower(flexicontent_upload::getExt($url));
 
 				// Check for empty URL

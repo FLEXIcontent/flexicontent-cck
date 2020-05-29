@@ -4,12 +4,17 @@
   REQUIRED to hide the non-active tab content.
   But do not hide them in the print stylesheet!
   --------------------------------------------------*/
+.tabberlive .tabbertab {
+	transition: opacity 0.2s ease-in-out;
+	opacity: 1;
+}
+
 .tabberlive .tabbertab.tabbertabhide {
 	display: none;
+	opacity: 0;
 }
 .tabberlive .tabbertab.tabbertablow {
-	opacity: 0.1;
-	filter: alpha(opacity=10);
+	opacity: 1; /*0.5*/
 }
 
 
