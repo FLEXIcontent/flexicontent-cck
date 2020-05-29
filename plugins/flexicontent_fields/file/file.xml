@@ -65,19 +65,20 @@
 			</field-->
 			<field name="file_btns_position" type="hidden" default="0" label="FLEXI_FIELD_FILE_BTNS_POSITION" description="FLEXI_FIELD_FILE_BTNS_POSITION_DESC" depend_class="fieldgroupoff multivalue-mode" />
 
-			<field name="" type="separator" default="FLEXI_PREVIEW_THUMBNAILS" description="" level="level2" />
-			<field name="thumb_size_resizer" type="radio" default="0" label="FLEXI_FIELD_THUMB_RESIZER" description="FLEXI_FIELD_THUMB_RESIZER_DESC" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_DISABLE</option>
-				<option value="1">FLEXI_DISPLAY_AS_DROP_DOWN</option>
-				<option value="2">FLEXI_DISPLAY_AS_SLIDER</option>
+			<field name="estorage_mode" type="multilist" subtype="radio" default="0" label="Remote Storage" description="FLEXI_FIELD_ALLOW_MULTIPLE_DESC" toggle_related="1" depend_class="" class="btn-group group-fcmethod fcoffactive">
+				<option value="0" show_list="" hide_list="estorage-ftp">FLEXI_NO</option>
+				<option value="FTP" show_list="estorage-ftp" hide_list="">FTP</option>
 			</field>
-			<field name="thumb_size_default" type="radio" default="120" label="FLEXI_FIELD_THUMB_SIZE_DEFAULT" description="FLEXI_FIELD_THUMB_SIZE_DEFAULT_DESC" class="btn-group group-fcinfo">
-				<option value="90">90</option>
-				<option value="120">120</option>
-				<option value="150">150</option>
-				<option value="200">200</option>
-				<option value="250">250</option>
-			</field>
+
+			<field name="" type="separator" default="Remote Storage (FTP)" description="" depend_class="estorage-ftp" level="level2" />
+			<field name="efs_ftp_host" type="text" default="" size="80" label="Hostname" description="" depend_class="estorage-ftp" />
+			<field name="efs_ftp_port" type="text" default="" size="80" label="Port" description="" depend_class="estorage-ftp" />
+			<field name="efs_ftp_user" type="text" default="" size="80" label="FLEXI_USER" description="" depend_class="estorage-ftp" />
+			<field name="efs_ftp_pass" type="text" default="" size="80" label="FLEXI_PASSWORD" description="" depend_class="estorage-ftp" />
+			<field name="efs_ftp_path" type="text" default="" size="80" label="FLEXI_FOLDER" description="" depend_class="estorage-ftp" />
+
+			<field name="efs_www_url" type="text" default="https://some_external_servername.com/somefolder/" size="80" label="URL" description="" depend_class="estorage-ftp" />
+
 
 			<field name="" type="separator" default="FLEXI_FORM_FIELD_CONF" description="FLEXI_FORM_FIELD_CONF_DESC" icon_class="icon-checkbox" level="tab_open" box_type="1" />
 
@@ -90,11 +91,26 @@
 			<field name="" type="separator" default="FLEXI_LAYOUT" description="" level="level2" />
 			<field name="formlayout" type="fcfilelist" default="" label="FLEXI_FIELD_SELECT_FORM_LAYOUT" description="FLEXI_FIELD_SELECT_FORM_LAYOUT_DESC" directory="plugins/flexicontent_fields/file/tmpl/" filter="field*" exclude="" stripext="1" stripprefix="field_" hide_none="1" hide_default="1" labelclass="label label-warning" />
 
-			<field name="form_file_preview" type="radio" default="0" label="File preview" description="You can enable file preview box, e.g. it will show image thumbnail if selected file is an image" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_DISABLE</option>
-				<option value="1">FLEXI_ENABLE</option>
-				<option value="2">FLEXI_AUTO</option>
+			<field name="form_file_preview" type="multilist" subtype="radio" default="0" toggle_related="1" label="File preview" description="You can enable file preview box, e.g. it will show image thumbnail if selected file is an image" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="file-preview">FLEXI_DISABLE</option>
+				<option value="1" show_list="file-preview " hide_list="">FLEXI_ENABLE</option>
+				<!--option value="2" show_list="file-preview" hide_list="">FLEXI_AUTO</option-->
 			</field>
+
+			<!--field name="" type="separator" default="FLEXI_PREVIEW_THUMBNAILS" description="" level="level3" depend_class="file-preview" />
+			<field name="thumb_size_resizer" type="radio" default="0" label="FLEXI_FIELD_THUMB_RESIZER" description="FLEXI_FIELD_THUMB_RESIZER_DESC" depend_class="file-preview" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_DISABLE</option>
+				<option value="1">FLEXI_DISPLAY_AS_DROP_DOWN</option>
+				<option value="2">FLEXI_DISPLAY_AS_SLIDER</option>
+			</field>
+			<field name="thumb_size_default" type="radio" default="120" label="FLEXI_FIELD_THUMB_SIZE_DEFAULT" description="FLEXI_FIELD_THUMB_SIZE_DEFAULT_DESC" depend_class="file-preview" class="btn-group group-fcinfo">
+				<option value="90">90</option>
+				<option value="120">120</option>
+				<option value="150">150</option>
+				<option value="200">200</option>
+				<option value="250">250</option>
+			</field-->
+
 			<!--field name="iform_allowdel" type="radio" default="1" label="FLEXI_FIELD_FILE_ALLOW_FILE_REMOVAL" description="FLEXI_FIELD_FILE_ALLOW_FILE_REMOVAL_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>

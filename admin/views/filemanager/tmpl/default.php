@@ -955,7 +955,12 @@ if ($js)
 
 					$file_path = JPath::clean($file_path);
 
-					$file_url = rawurlencode(str_replace('\\', '/', $file_path));
+					// URL or media manager link
+					$file_url = $row->url == 2
+						? JUri::root(true) . '/' . $file_path
+						: $file_path;
+
+					$file_url = rawurlencode(str_replace('\\', '/', $file_url));
 
 					// Use same format for output if possible
 					$output_formats = array('png', 'ico', 'gif', 'bmp', 'jpg', 'jpeg');

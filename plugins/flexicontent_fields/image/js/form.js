@@ -19,6 +19,15 @@
 		jQuery("#"+element_id_n+"_mediaurl").closest('.fcfield-image-mediaurl-box').slideToggle();
 	}
 
+
+	fcfield_image.showUploader = function(field_name_n, config_name)
+	{
+		var fnn  = field_name_n.replace(/-/g, '_');
+		var box = jQuery('#custom_' + field_name_n + '_fc_preview_msg').closest('.fcfieldval_container');
+		box.find('.fc_files_uploader_toggle_btn').click();
+	}
+
+
 	fcfield_image.clearData = function(element_id_n, config_name)
 	{
 		var mediaurl = jQuery("#"+element_id_n+"_mediaurl").val('');
@@ -186,7 +195,7 @@
 
 		if (options.hide_image)
 		{
-			box.find('.fcimg_preview_box').hide();
+			box.find('.fcfield_preview_box').hide();
 		}
 		else
 		{
@@ -195,9 +204,9 @@
 			box.find('.originalname').val('');
 			box.find('.existingname').val('');
 			box.find('.hasvalue').val('');
-			box.find('.preview_image').attr('src', 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=');
-			box.find('.fcimg_preview_msg').html(' ');
-			box.find('.fcimg_preview_box').show();
+			box.find('.fc_preview_thumb').attr('src', 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=');
+			box.find('.fc_preview_msg').html(' ');
+			box.find('.fcfield_preview_box').show();
 
 			if (hasValue) valcounter.value = ( valcounter.value=='' || valcounter.value=='1' )  ?  ''  :  parseInt(valcounter.value) - 1;
 			//if (window.console) window.console.log('valcounter: ' + valcounter.value);
@@ -244,8 +253,8 @@
 		{
 			var box = preview_img_OLD.closest('.fcfieldval_container');
 			var preview_img_NEW = preview_url != ''
-				? '<img class=\"preview_image\" id=\"' + elementid_n + '_preview_image\" src=\"'+preview_url+'\" alt=\"Preview image\" />'
-				: '<img class=\"preview_image\" id=\"' + elementid_n + '_preview_image\" src=\"data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=\" alt=\"Preview image\" />';
+				? '<img class=\"fc_preview_thumb\" id=\"' + elementid_n + '_preview_image\" src=\"'+preview_url+'\" alt=\"Preview image\" />'
+				: '<img class=\"fc_preview_thumb\" id=\"' + elementid_n + '_preview_image\" src=\"data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=\" alt=\"Preview image\" />';
 
 			preview_img_NEW = jQuery(preview_img_NEW);
 			preview_img_NEW.insertAfter( preview_img_OLD );
@@ -253,15 +262,15 @@
 
 			if (keep_modal != 2)
 			{
-				preview_img_NEW.closest('.fcimg_preview_box').show();
+				preview_img_NEW.closest('.fcfield_preview_box').show();
 				fcfield_image.clearFieldUploader(box, config_name);
 			}
 
 			// Set new preview text too (a 'title')
 			if (file)
 			{
-				jQuery('#' + elementid_n + '_fcimg_preview_msg' ).html(!!preview_caption ? preview_caption : file);
-				jQuery('#' + elementid_n + '_fcimg_preview_msg' ).attr('title', !!preview_caption ? file : '')
+				jQuery('#' + elementid_n + '_fc_preview_msg' ).html(!!preview_caption ? preview_caption : file);
+				jQuery('#' + elementid_n + '_fc_preview_msg' ).attr('title', !!preview_caption ? file : '')
 			}
 
 			jQuery('#' + elementid_n + '_remove').removeAttr('checked').trigger('change');

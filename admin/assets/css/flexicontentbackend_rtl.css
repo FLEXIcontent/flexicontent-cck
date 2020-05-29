@@ -1179,15 +1179,22 @@ body .fc-mssg-inline {
 	display: inline-block;
 	margin: 1px 0 2px 12px;
 }
+body #flexicontent .fc-field-props-box .fcfield_preview_box,
+body #flexicontent .fc-field-props-box .fc_file_uploader,
+body #flexicontent .fc-field-props-box .fc_file_uploader.fc_inline_uploader,
+body #flexicontent .fc-field-props-box > *:not(:first-child):not(:last-child),
+body #flexicontent .fc_uploader_n_props_box .fcfield_preview_box,
+body #flexicontent .fc_uploader_n_props_box .fc_file_uploader,
+body #flexicontent .fc_uploader_n_props_box .fc_file_uploader.fc_inline_uploader,
+body #flexicontent .fc_uploader_n_props_box > *:not(:first-child):not(:last-child) {
+	margin-left: 12px;
+}
 body .fc_uploader_n_props_box {
 	display: flex;
 	flex-direction: row;
 	flex-wrap: wrap;
 	justify-content: start;
 	align-items: start;
-}
-body .fc_uploader_n_props_box > *:not(:last-child) {
-	margin-left: 24px;
 }
 body .fc_uploader_status_box {
 	display: flex;
