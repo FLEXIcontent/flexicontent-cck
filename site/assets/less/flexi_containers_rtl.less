@@ -45,16 +45,22 @@ body .fc-mssg-inline {
 }
 
 
+body #flexicontent .fc-field-props-box,
+body #flexicontent .fc_uploader_n_props_box {
+	.fcfield_preview_box,
+	.fc_file_uploader,
+	.fc_file_uploader.fc_inline_uploader,
+	> *:not(:first-child):not(:last-child) {
+		margin-left: 12px;
+	}
+}
+
 body .fc_uploader_n_props_box {
 	display: flex;
 	flex-direction: row;
 	flex-wrap: wrap;
 	justify-content: start;
 	align-items: start;
-	
-	> *:not(:last-child) {
-		margin-left: 24px;
-	}
 }
 
 body .fc_uploader_status_box {

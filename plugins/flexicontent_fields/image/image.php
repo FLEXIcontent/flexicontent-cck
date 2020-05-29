@@ -272,9 +272,11 @@ class plgFlexicontent_fieldsImage extends FCField
 			");
 		}
 
+		// Flag that indicates if field has values
+		$has_values = count($field->value);
 
 		// Initialise property with default value
-		if (!$field->value)
+		if (empty($field->value))
 		{
 			$field->value = array();
 			$field->value[0]['originalname'] = '';
@@ -411,9 +413,9 @@ class plgFlexicontent_fieldsImage extends FCField
 				newField.find('.existingname').attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][existingname]');
 				newField.find('.existingname').attr('id', element_id + '_existingname');
 
-				newField.find('.fcimg_preview_msg').html('');
-				newField.find('.fcimg_preview_msg').attr('name', element_id + '_fcimg_preview_msg');
-				newField.find('.fcimg_preview_msg').attr('id', element_id + '_fcimg_preview_msg');
+				newField.find('.fc_preview_msg').html('');
+				newField.find('.fc_preview_msg').attr('name', element_id + '_fc_preview_msg');
+				newField.find('.fc_preview_msg').attr('id', element_id + '_fc_preview_msg');
 
 				// Update uploader related data
 				var fcUploader = newField.find('.fc_file_uploader');
@@ -436,10 +438,10 @@ class plgFlexicontent_fieldsImage extends FCField
 				}
 
 				// COPY an preview box
-				var img_preview = newField.find('img.preview_image');
+				var img_preview = newField.find('img.fc_preview_thumb');
 				if (img_preview.length)
 				{
-					var emptyImg = jQuery('<img class=\"preview_image\" id=\"\" src=\"data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=\" alt=\"Preview image\" />');
+					var emptyImg = jQuery('<img class=\"fc_preview_thumb\" id=\"\" src=\"data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=\" alt=\"Preview image\" />');
 					emptyImg.attr('id', element_id + '_preview_image');
 					emptyImg.insertAfter( img_preview );
 					img_preview.remove();
@@ -663,6 +665,7 @@ class plgFlexicontent_fieldsImage extends FCField
 		flexicontent_html::loadFramework('flexi-lib');
 		JHtml::addIncludePath(JPATH_SITE . '/components/com_flexicontent/helpers/html');
 
+		$per_value_js = "";
 		$i = -1;  // Count DB values (may contain invalid entries)
 		$n = 0;   // Count sortable records added (the verified values or a single empty record if no good values)
 		$count_vals = 0;  // Count non-empty sortable records added
@@ -767,12 +770,12 @@ class plgFlexicontent_fieldsImage extends FCField
 
 			if ($image_source === -2 || $image_source === -1)
 			{
-				$fcimg_preview_msg = '';  // Joomla Media Manager / and Intro/Full use their own path preview
+				$fc_preview_msg = '';  // Joomla Media Manager / and Intro/Full use their own path preview
 			}
 			else
 			{
-				$fcimg_preview_msg = '
-					<span class="fcimg_preview_msg" id="'.$elementid_n.'_fcimg_preview_msg" name="'.$elementid_n.'_fcimg_preview_msg" title="'.htmlspecialchars(($value['isURL'] ? $image_subpath : ''), ENT_COMPAT, 'UTF-8').'">' . (
+				$fc_preview_msg = '
+					<span class="fc_preview_msg" id="'.$elementid_n.'_fc_preview_msg" name="'.$elementid_n.'_fc_preview_msg" title="'.htmlspecialchars(($value['isURL'] ? $image_subpath : ''), ENT_COMPAT, 'UTF-8').'">' . (
 						$value['isURL'] ? JText::_('FLEXI_FIELD_MEDIA_URL') : $image_subpath
 					) . '</span>
 				';
@@ -895,11 +898,11 @@ class plgFlexicontent_fieldsImage extends FCField
 
 			if ($img_link)
 			{
-				$imgpreview = '<img class="preview_image" id="'.$elementid_n.'_preview_image" src="'.$img_link.'" alt="Preview image" />';
+				$imgpreview = '<img class="fc_preview_thumb" id="'.$elementid_n.'_preview_image" src="'.$img_link.'" alt="Preview image" />';
 			}
 			elseif ($img_link !== false)
 			{
-				$imgpreview = '<img class="preview_image" id="'.$elementid_n.'_preview_image" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" alt="Preview image" />';
+				$imgpreview = '<img class="fc_preview_thumb" id="'.$elementid_n.'_preview_image" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" alt="Preview image" />';
 			}
 			else
 			{
@@ -993,7 +996,7 @@ class plgFlexicontent_fieldsImage extends FCField
 					'toggle_btn' => array(
 						'class' => ($file_btns_position ? $add_on_class : '') . ' fcfield-uploadvalue' . $font_icon_class,
 						'text' => (!$file_btns_position ? '&nbsp; ' . JText::_('FLEXI_UPLOAD') : ''),
-						'onclick' => 'var box = jQuery(this).closest(\'.fcfieldval_container\').find(\'.fcimg_preview_box\'); box.parent().find(\'.fc_file_uploader\').is(\':visible\') ? box.show() : box.hide(); box.is(\':visible\') ? jQuery(this).removeClass(\'active\') : jQuery(this).addClass(\'active\'); ',
+						'onclick' => 'var box = jQuery(this).closest(\'.fcfieldval_container\').find(\'.fcfield_preview_box\'); box.parent().find(\'.fc_file_uploader\').is(\':visible\') ? box.show() : box.hide(); box.is(\':visible\') ? jQuery(this).removeClass(\'active\') : jQuery(this).addClass(\'active\'); ',
 						'action' => null
 					),
 					'thumb_size_slider_cfg' => ($thumb_size_resizer ? $thumb_size_slider_cfg : 0),
@@ -1066,7 +1069,7 @@ class plgFlexicontent_fieldsImage extends FCField
 						</div>
 					</div>
 					' : '') . '
-					'.$fcimg_preview_msg.'
+					'.$fc_preview_msg.'
 					'.$originalname.'
 					'.$existingname.'
 					<div class="fcclear"></div>
@@ -1079,7 +1082,7 @@ class plgFlexicontent_fieldsImage extends FCField
 								' . $uploader_html->container . '
 							</div>
 						').'
-						<div class="fcimg_preview_box fc-box thumb_'.$thumb_size_default.'">
+						<div class="fcfield_preview_box fc-box thumb_'.$thumb_size_default.'">
 							'.$imgpreview.'
 							<div class="fcclear"></div>
 						'.$select_existing.'
@@ -1103,6 +1106,13 @@ class plgFlexicontent_fieldsImage extends FCField
 					: '') .'
 				</div>';
 
+			if (!$image_subpath)
+			{
+				$per_value_js .= "
+					fcfield_image.showUploader('" . $field->name . '_' . $n . "', '".$field_name_js."');
+				";
+			}
+
 			$n++;
 			$image_added = true;
 			if (!$multiple) break;  // multiple values disabled, break out of the loop, not adding further values even if the exist
@@ -1118,6 +1128,13 @@ class plgFlexicontent_fieldsImage extends FCField
 		if ($js)  $document->addScriptDeclaration($js);
 		if ($css) $document->addStyleDeclaration($css);
 
+		$js = !$per_value_js ? "" : "
+			jQuery(document).ready(function()
+			{
+				" . $per_value_js . "
+			});
+		";
+		if ($js)  $document->addScriptDeclaration($js);
 
 		// Do not convert the array to string if field is in a group
 		if ($use_ingroup);
