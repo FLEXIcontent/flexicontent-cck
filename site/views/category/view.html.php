@@ -257,22 +257,7 @@ class FlexicontentViewCategory extends JViewLegacy
 		// **********************************************************
 
 		// Verify menu item points to correct view, and any others (significant) URL variables must match or be empty
-		if ( $menu )
-		{
-			$view_ok     = 'category' == @$menu->query['view'];
-
-			// These URL variables must match or be empty:
-			$cid_ok      = (int) $cid == (int) @ $menu->query['cid'];
-			$layout_ok   = $layout    == @ $menu->query['layout'];
-			$authorid_ok = ($layout !== 'author') || ((int) $authorid  === (int) @ $menu->query['authorid']);
-			$tagid_ok    = ($layout !== 'tags')   || ((int) $tagid     === (int) @ $menu->query['tagid']);
-
-			$menu_matches = $view_ok && $cid_ok && $layout_ok && $authorid_ok && $tagid_ok;
-		}
-		else
-		{
-			$menu_matches = false;
-		}
+		$menu_matches = $model->menuMatches($menu);
 
 		// MENU ITEM matched, use its page heading (but use menu title if the former is not set)
 		if ( $menu_matches )

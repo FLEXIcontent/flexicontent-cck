@@ -427,10 +427,10 @@ switch ($view)
 		{
 			// null is equal to zero and to zero length string, we use == comparison
 			$view_ok     = 'category' == (isset($menu->query['view']) ? $menu->query['view'] : '');
-			$cid_ok      = (int) $cid == (int) (isset($menu->query['cid']) ? $menu->query['cid'] : 0);
+			$cid_ok      = ((int) $cid == (int) (isset($menu->query['cid']) ? $menu->query['cid'] : 0)) || ( $layout && empty($menu->query['cid']) );
 			$layout_ok   = $layout    == (isset($menu->query['layout']) ? $menu->query['layout'] : '');
-			$authorid_ok = ($layout !== 'author') || ((int) $authorid  == (int) (isset($menu->query['authorid']) ? $menu->query['authorid'] : 0));
-			$tagid_ok    = ($layout !== 'tags')   || ((int) $tagid     == (int) (isset($menu->query['tagid']) ? $menu->query['tagid'] : 0));
+			$authorid_ok = $layout !== 'author' || empty($menu->query['authorid']) || ((int) $authorid  == (int) (isset($menu->query['authorid']) ? $menu->query['authorid'] : 0));
+			$tagid_ok    = $layout !== 'tags'   || empty($menu->query['tagid'])    || ((int) $tagid     == (int) (isset($menu->query['tagid']) ? $menu->query['tagid'] : 0));
 
 			// (a) override is enabled in the menu or (b) category Layout is 'myitems' or 'favs' or 'tags' or 'mcats' which has no default parameters
 			$overrideconf = $menu->params->get('override_defaultconf', 0) || in_array($layout, array('myitems', 'favs', 'mcats', 'tags'));
