@@ -1237,6 +1237,8 @@ class plgFlexicontent_fieldsDate extends FCField
 					$query = $db->getQuery(true)
 						->update('#__flexicontent_fields_item_relations')
 						->set($db->qn('value') . ' = ' . $db->Quote($date_string))
+						->set($db->qn('value_integer') . ' = CAST(' . $db->Quote($date_string) . ' AS SIGNED)')
+						->set($db->qn('value_decimal') . ' = CAST(' . $db->Quote($date_string) . ' AS DECIMAL(65,15))')
 						->set($db->qn('value_datetime') . ' = CAST(' . $db->Quote($date_string) . ' AS DATETIME)')
 						->where('item_id = ' . (int) $v->item_id .
 							' AND field_id = ' . (int) $v->field_id .
