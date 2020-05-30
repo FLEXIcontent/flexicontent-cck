@@ -138,7 +138,7 @@ class FlexicontentViewFavourites extends JViewLegacy
 
 			// Calculate default page heading (=called page title in J1.5), which in turn will be document title below !! ...
 			// meta_params->get('page_title') is meant for <title> but let's use as ... default page heading
-			$default_heading = JText::_('FLEXI_YOUR_FAVOURED_ITEMS');
+			$default_heading = JText::_('FLEXI_MY_FAVOURITES');
 
 			// Decide to show page heading (=J1.5 page title), this is always yes
 			$show_default_heading = 1;

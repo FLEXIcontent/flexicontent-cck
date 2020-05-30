@@ -2276,8 +2276,29 @@ class FlexicontentModelCategory extends JModelLegacy {
 
 		// Examine tagid only for tags layout
 		$tagid_ok     = $this->_layout !== 'tags'   || empty($menu->query['tagid'])    || $menu->query['tagid'] == $this->_tagid;
+		
+		// Examine cids only for mcats layout
+		if ($this->_layout !== 'mcats')
+		{
+			$cids_ok = true;
+		}
+		else
+		{
+			$_cids = @$menu->query['cids'];
 
-		return $view_ok && $cid_ok & $layout_ok && $authorid_ok;
+			if (!is_array($_cids))
+			{
+				$_cids = preg_replace('/[^0-9,]/i', '', (string) $_cids);
+				$_cids = explode(',', $_cids);
+			}
+
+			$_cids = ArrayHelper::toInteger($_cids);
+			$diff = array_diff($this->_ids, $_cids);
+			$cids_ok = count($diff) === 0;
+		}
+
+		$matched = $view_ok && $cid_ok & $layout_ok && $authorid_ok && $cids_ok;
+		return $matched;
 	}
 
 
