@@ -11,30 +11,42 @@ class fc_Waveform_LazyLoad
 		this.element = element;
 		this.resources = this.element.querySelectorAll('.fc_mediafile_audio_spectrum_box');
 
-		this.bindEvents();
 		this.init();
 	}
 
-	bindEvents() {
-		//this._lazyLoadAsset = this._lazyLoadAsset.bind(this, add extra vars here);
-	}
-
 	init() {
-		const assetsObserver = new IntersectionObserver((entries, assetsObserver) =>
-		{
-			entries.filter(entry => entry.isIntersecting).forEach(entry =>
-			{
-				this._lazyLoadAsset(entry.target);
-				assetsObserver.unobserve(entry.target);
-			});
-		}, this.options);
+		const assetsObserver = new IntersectionObserver(
+			this._loadCallback,
+			this.options
+		);
+
+		this._bindEvents(assetsObserver);
+
 		this.resources.forEach(resource =>
 		{
+			window.console.log('Observing: ' + resource.id);  //window.console.log(resource);
 			assetsObserver.observe(resource);
 		});
 	}
 
-	_lazyLoadAsset(asset) {
+	_loadCallback(entries, assetsObserver)
+	{
+		entries.filter(entry => entry.isIntersecting).forEach(entry =>
+		{
+			window.console.log('Loading: ' + entry.target.id);  //window.console.log(entry.target);
+			this._lazyLoadAsset(entry.target);
+			assetsObserver.unobserve(entry.target);
+		});
+	}
+
+	_bindEvents(obj)
+	{
+		obj._lazyLoadAsset = this._lazyLoadAsset.bind(this);
+	}
+
+	_lazyLoadAsset(asset)
+	{
+		//window.console.log(this);
 		fcfield_mediafile.initValue(asset.getAttribute('data-fc_tagid'), asset.getAttribute('data-fc_fname'));
 	}
 }

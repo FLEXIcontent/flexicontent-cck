@@ -671,7 +671,8 @@ class plgFlexicontent_fieldsMediafile extends FCField
 					document.getElementsByTagName('body')[0], {
 						rootMargin: '0px 0px',
 						threshold: 0.25
-					});
+					}
+				);
 			});
 			";
 		}
