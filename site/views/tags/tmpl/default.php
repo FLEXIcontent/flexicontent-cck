@@ -97,7 +97,7 @@ if (JFactory::getApplication()->input->getInt('print', 0)) {
 	</h1>
 <?php else : ?>
 	<h2 class="contentheading">
-		<?php echo JText::_( 'FLEXI_ITEMS_WITH_TAG' ).' : '.$this->tag->name; ?>
+		<?php echo JText::_( 'FLEXI_TAG' ).' : '.$this->tag->name; ?>
 	</h2>
 <?php endif; ?>
 
