@@ -97,7 +97,7 @@ if (JFactory::getApplication()->input->getInt('print', 0)) {
 	</h1>
 <?php else : ?>
 	<h2 class="contentheading">
-		<?php echo JText::_( 'FLEXI_YOUR_FAVOURED_ITEMS' ).' '; ?>
+		<?php echo JText::_( 'FLEXI_MY_FAVOURITES' ).' '; ?>
 	</h2>
 <?php endif; ?>
 

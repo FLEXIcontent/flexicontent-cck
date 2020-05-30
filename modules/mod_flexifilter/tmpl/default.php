@@ -91,7 +91,7 @@ if ($ff_placement)
 
 				active_slides['" . $ff_slider_tagid ."'] = $('#" . $ff_slider_tagid ." .in').attr('id');
 				fclib_setCookie('" . $cookie_name ."', JSON.stringify(active_slides), 7);
-				window.console.log(JSON.stringify(active_slides));
+				//window.console.log(JSON.stringify(active_slides));
 			});
 
 			$('#" . $ff_slider_tagid ."').on('hidden', function ()
@@ -101,7 +101,7 @@ if ($ff_placement)
 
 				active_slides['" . $ff_slider_tagid ."'] = null;
 				fclib_setCookie('" . $cookie_name ."', JSON.stringify(active_slides), 7);
-				window.console.log(JSON.stringify(active_slides));
+				//window.console.log(JSON.stringify(active_slides));
 			});
 
 			var active_slides = fclib_getCookie('" . $cookie_name ."');

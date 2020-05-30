@@ -259,8 +259,18 @@ class FlexicontentViewCategory extends JViewLegacy
 		// Verify menu item points to correct view, and any others (significant) URL variables must match or be empty
 		$menu_matches = $model->menuMatches($menu);
 
+		/**
+		 * For "Authored" and "Tagged" items view do not use Menu item headings,
+		 * if not a author id or tag id do not match the menu item !
+		 */
+		$menu_is_specific = $menu_matches && (
+			($layout !== 'author' && $layout !== 'tags') ||
+			($layout === 'author' && $authorid == @$menu->query['authorid']) ||
+			($layout === 'tags' && $tagid == @$menu->query['tagid'])
+		);
+
 		// MENU ITEM matched, use its page heading (but use menu title if the former is not set)
-		if ( $menu_matches )
+		if ( $menu_is_specific )
 		{
 			$default_heading = $menu->title;
 
@@ -274,20 +284,19 @@ class FlexicontentViewCategory extends JViewLegacy
 		// MENU ITEM did not match, clear page title (=browser window title) and page heading so that they are calculated below
 		else
 		{
-			// Also clear some other menu options
-			//$params->set('pageclass_sfx',	'');  // CSS class SUFFIX is behavior, so do not clear it ?
-
 			// Calculate default page heading (=called page title in J1.5), which in turn will be document title below !! ...
 			switch($layout)
 			{
 				case ''        :  $default_heading = $category->title;  break;
 				case 'myitems' :  $default_heading = JText::_('FLEXI_MY_CONTENT');  break;
-				case 'author'  :  $default_heading = JText::_('FLEXI_CONTENT_BY_AUTHOR')  .': '. JFactory::getUser((int) $authorid)->get('name');  break;
-				case 'tags'    :  $default_heading = JText::_('FLEXI_TAG' /*'FLEXI_ITEMS_WITH_TAG'*/) .': '. $tag->name;  break;
-				case 'favs'    :  $default_heading = JText::_('FLEXI_YOUR_FAVOURED_ITEMS');  break;
+				case 'author'  :  $default_heading = JText::sprintf('FLEXI_ITEMS_OF_USER', JFactory::getUser((int) $authorid)->get('name'));  break;
+				case 'tags'    :  $default_heading = JText::_('FLEXI_TAG') .': '. $tag->name;  break;
+				case 'favs'    :  $default_heading = JText::_('FLEXI_MY_FAVOURITES');  break;
 				default        :  $default_heading = JText::_('FLEXI_CONTENT_IN_CATEGORY');
 			}
-			if ($layout && $category->id)  // Category-based view that is limited to a specific category
+
+			// Category-based view that is limited to a specific category
+			if ($layout && $category->id)
 			{
 				$default_heading .= ', '.JText::_('FLEXI_IN_CATEGORY').': '.$category->title;
 			}
@@ -315,10 +324,10 @@ class FlexicontentViewCategory extends JViewLegacy
 			case 'myitems' : break;
 			case 'author'  : break;
 			case 'tags'    :
-				$pathway->addItem( JText::_('FLEXI_TAG' /*'FLEXI_ITEMS_WITH_TAG'*/) . ' : ' . $this->escape($tag->name), '' );
+				$pathway->addItem( JText::_('FLEXI_TAG') . ' : ' . $this->escape($tag->name), '' );
 				break;
 			case 'favs'    :
-				$pathway->addItem( JText::_('FLEXI_YOUR_FAVOURED_ITEMS'), '' );
+				$pathway->addItem( JText::_('FLEXI_MY_FAVOURITES'), '' );
 				break;
 			default        : ;
 		}
