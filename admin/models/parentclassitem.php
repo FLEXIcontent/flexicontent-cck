@@ -1800,6 +1800,7 @@ class ParentClassItem extends FCModelAdmin
 		// Sanitize id and approval flag as integers
 		$data['vstate'] = (int)$data['vstate'];
 		$data['id']     = (int)$data['id'];
+		$data['tag']	= isset($data['tag'])?$data['tag']:array();
 		$isNew = ! $data['id'];
 
 
@@ -1891,6 +1892,10 @@ class ParentClassItem extends FCModelAdmin
 		// ***
 
 		$this->_prepareTags($item, $data);
+		
+		/*$intersect_tags = array_intersect($data['tags'], $item->tags);
+		$deleted_tags = array_diff($item->tags, $intersect_tags);
+		$new_insert_tags = array_diff($data['tags'], $item->tags);*/
 
 
 		// ***
@@ -3462,10 +3467,10 @@ class ParentClassItem extends FCModelAdmin
 		// *** Delete old tag relations and store the new ones
 		// ***
 
-		if (isset($data['tags']))
-		{
+		//if (isset($data['tags']))
+		//{
 			$this->saveFcTagsAssignments($data['tags'], $item->id, $_replace = true);
-		}
+		//}
 
 
 		// ***
@@ -5476,7 +5481,8 @@ class ParentClassItem extends FCModelAdmin
 
 		// Make tags unique
 		$tags = ArrayHelper::toInteger($tags);
-		$tags = array_keys(array_flip($tags));
+		//$tags = array_keys(array_flip($tags));
+		$tags = array_unique($tags);
 
 		// Set tags back using itsreal name of field: 'tags'       INSTEAD OF 'tag'
 		$data['tags'] = $tags;
@@ -6448,7 +6454,7 @@ class ParentClassItem extends FCModelAdmin
 		// Only update FC tag relations in DB if we have new tags
 		if (count($new_tags) || $replaceTags)
 		{
-			$tags = array_flip($new_tags);
+			//$tags = array_flip($new_tags);
 			$this->saveFcTagsAssignments($new_tags, $item->id, $replaceTags);
 
 			// Add the new assignment to the already loaded FC item
@@ -6518,8 +6524,26 @@ class ParentClassItem extends FCModelAdmin
 		// Delete old tag relations
 		if ($replaceTags)
 		{
+			/*$query = 'DELETE FROM #__flexicontent_tags_item_relations'
+				. " WHERE tid IN ('".implode("','", $deleted_tags)."') AND itemid = " . (int) $id
+				;
+			$db->setQuery($query)->execute();
+
+			$query = "SELECT ft.jtag_id FROM #__flexicontent_tags as ft WHERE ft.id IN ('".implode("','", $deleted_tags)."') AND !ISNULL(ft.jtag_id)";
+			$deleted_jtags = $db->setQuery($query)->loadColumn();
+
+			$query = 'DELETE FROM #__contentitem_tag_map'
+				. " WHERE tag_id IN ('".implode("','", $deleted_jtags)."') AND content_item_id = " . (int) $id
+				;
+			$db->setQuery($query)->execute();*/
+
 			$query = 'DELETE FROM #__flexicontent_tags_item_relations'
 				. ' WHERE itemid = ' . (int) $id
+				;
+			$db->setQuery($query)->execute();
+
+			$query = 'DELETE FROM #__contentitem_tag_map'
+				. " WHERE content_item_id = " . (int) $id
 				;
 			$db->setQuery($query)->execute();
 		}
