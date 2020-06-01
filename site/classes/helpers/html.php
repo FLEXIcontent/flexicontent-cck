@@ -4905,7 +4905,7 @@ class flexicontent_html
 
 			$img_path = JUri::root(true)."/components/com_flexicontent/assets/images/";
 
-			$list = '';
+			$list = '<div class="group-fcset fc_input_set">';
 
 			$checked = $selected == '-99' ? ' checked="checked"' : '';
 			$list .= '<input id="state-99" type="radio" name="state" class="state" value="-99" '.$checked.'/>';
@@ -4925,6 +4925,7 @@ class flexicontent_html
 				//$list .= '<img src="'.$img_path.$state_imgs[$state_id].'" width="16" height="16" style="border-width:0;" alt="'.$state_names[$state_id].'" />';
 				$list .= '</label>';
 			}
+			$list .= '</div>';
 		}
 
 		else

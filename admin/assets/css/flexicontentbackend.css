@@ -1187,7 +1187,7 @@ body #flexicontent .fc_uploader_n_props_box .fcfield_preview_box,
 body #flexicontent .fc_uploader_n_props_box .fc_file_uploader,
 body #flexicontent .fc_uploader_n_props_box .fc_file_uploader.fc_inline_uploader,
 body #flexicontent .fc_uploader_n_props_box > *:not(:first-child):not(:last-child) {
-	margin-right: 12px;
+	margin-left: 12px;
 }
 body .fc_uploader_n_props_box {
 	display: flex;
@@ -2685,17 +2685,20 @@ body .group-fcset.fc-cleared.fc_input_set {
 	margin: 0 0 5px 0;
 }
 body .group-fcset.radio > label,
-body .group-fcset.fc_input_set > div {
+body .group-fcset.fc_input_set > div,
+body .group-fcset.fc_input_set > label {
 	float: left;
 	display: inline-block;
 	white-space: nowrap;
 }
 body .group-fcset.radio.fc-cleared > label,
-body .group-fcset.fc_input_set.fc-cleared > div {
+body .group-fcset.fc_input_set.fc-cleared > div,
+body .group-fcset.fc_input_set.fc-cleared > label {
 	clear: both;
 	margin: 0 0 2px 0;
 }
-body .group-fcset.fc_input_set.fc-columned > div {
+body .group-fcset.fc_input_set.fc-columned > div,
+body .group-fcset.fc_input_set.fc-columned > label {
 	float: left;
 	box-sizing: border-box;
 	margin: 0;
@@ -2703,17 +2706,21 @@ body .group-fcset.fc_input_set.fc-columned > div {
 	padding: 0 12px 0 0;
 	min-width: 120px !important;
 }
-body .group-fcset.fc_input_set.fc-aligned-250 > div {
+body .group-fcset.fc_input_set.fc-aligned-250 > div,
+body .group-fcset.fc_input_set.fc-aligned-250 > label {
 	min-width: 250px !important;
 }
-body .group-fcset.fc_input_set.fc-aligned-200 > div {
+body .group-fcset.fc_input_set.fc-aligned-200 > div,
+body .group-fcset.fc_input_set.fc-aligned-200 > label {
 	min-width: 200px !important;
 }
-body .group-fcset.fc_input_set.fc-aligned-150 > div {
+body .group-fcset.fc_input_set.fc-aligned-150 > div,
+body .group-fcset.fc_input_set.fc-aligned-150 > label {
 	min-width: 150px !important;
 }
-body .group-fcset.fc_input_set.fc-aligned-100 > div {
-	min-width: 150px !important;
+body .group-fcset.fc_input_set.fc-aligned-100 > div,
+body .group-fcset.fc_input_set.fc-aligned-100 > label {
+	min-width: 100px !important;
 }
 body input.fc_hidden_value {
 	width: 0 !important;
