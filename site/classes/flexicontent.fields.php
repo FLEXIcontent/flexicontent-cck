@@ -5,7 +5,7 @@
  *
  * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
  * @link            https://flexicontent.org
- * @copyright       Copyright Â© 2018, FLEXIcontent team, All Rights Reserved
+ * @copyright       Copyright © 2017, FLEXIcontent team, All Rights Reserved
  * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
@@ -4023,7 +4023,7 @@ class FlexicontentFields
 			$template = JFactory::getApplication('site')->getTemplate();
 		}
 
-		$layouts_path_1 = JPATH_ROOT . '/templates/' . $template . '/html/layouts/com_flexicontent/items_list_filters/select_selectmul.php';
+		$layouts_path_1 = JPATH_ROOT . '/templates/' . $template . '/html/layouts/com_flexicontent/items_list_filters';
 		$layouts_path_2 = JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'layouts';
 
 		// *** Do not create any HTML just return empty string to indicate a filter that should be skipped
@@ -5798,7 +5798,17 @@ class FlexicontentFields
 
 					foreach ($field->raw_values as $i => $v)
 					{
-						$field->basic_texts[$v] = $field->elements[$v]->text;
+						if (is_array($v))
+						{
+							foreach($v as $ii => $vv)
+							{
+								$field->basic_texts[$fn][$vv] = $field->elements[$vv]->text;
+							}
+						}
+						else
+						{
+							$field->basic_texts[$fn][$v] = $field->elements[$v]->text;
+						}
 					}
 				}
 			}
