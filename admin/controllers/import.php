@@ -664,6 +664,10 @@ class FlexicontentControllerImport extends FlexicontentControllerBaseAdmin
 				$conf['media_folder'] = $jinput->get('media_folder', '', 'string');
 				$conf['docs_folder']  = $jinput->get('docs_folder', '', 'string');
 
+				/**
+				 * All parameters are passed by reference so that they are modified in case of
+				 * parse errors or missing file errors and the $task will be set to 'testcsv'
+				 */
 				$this->checkfiles($conf, $parse_log, $task);
 				$this->parsevalues($conf, $parse_log, $task);
 
@@ -1106,8 +1110,8 @@ class FlexicontentControllerImport extends FlexicontentControllerBaseAdmin
 		$mfolder  = JPath::clean(JPATH_SITE . DS . $conf['media_folder'] . DS);
 		$dfolder  = JPath::clean(JPATH_SITE . DS . $conf['docs_folder'] . DS);
 
-		$ff_types_to_props = array('image' => 'originalname', 'file' => '_value_');
-		$ff_types_to_paths = array('image' => $mfolder, 'file' => $dfolder);
+		$ff_types_to_props = array('image' => 'originalname', 'file' => '_value_', 'mediafile' => '_value_');
+		$ff_types_to_paths = array('image' => $mfolder, 'file' => $dfolder, 'mediafile' => $mfolder);
 		$ff_names_to_types = array();
 
 		foreach ($conf['custom_fields'] as $_fld)
@@ -1150,13 +1154,13 @@ class FlexicontentControllerImport extends FlexicontentControllerBaseAdmin
 		{
 			$filenames_missing = array();
 
-			foreach ($filedata_arr as $fld_name => $filedata_arr)
+			foreach ($filedata_arr as $fld_name => $filedata)
 			{
 				$field_type = $ff_names_to_types[$fld_name];
 				$prop_name = $ff_types_to_props[$field_type];
 				$srcpath_original = $ff_types_to_paths[$field_type];
 
-				foreach ($filedata_arr as $lineno => $field_data)
+				foreach ($filedata as $lineno => $field_data)
 				{
 					// Split multi-value field
 					$vals = strlen($field_data) ? preg_split("/[\s]*" . $conf['mval_separator'] . "[\s]*/", $field_data) : array();
@@ -1195,10 +1199,28 @@ class FlexicontentControllerImport extends FlexicontentControllerBaseAdmin
 
 						if ($filename)
 						{
-							// echo "<pre>"; print_r(JPath::clean( $srcpath_original  . $filename)); jexit();
-							$srcfilepath = JPath::clean($srcpath_original . $filename);
+							$path_parts = pathinfo($filename);
+							$fext  = $path_parts['extension'];
+							$fname = $path_parts['filename'];
 
-							if (!JFile::exists($srcfilepath))
+							//echo "<pre>"; print_r(JPath::clean( $srcpath_original . $filename)); echo '</pre>';
+							//echo "<pre>"; print_r(JPath::clean( $srcpath_original . ($filename_LE = $fname . '.' . strtolower($fext)))); echo '</pre>';
+							//echo "<pre>"; print_r(JPath::clean( $srcpath_original . ($filename_UE = $fname . '.' . strtoupper($fext)))); echo '</pre>';
+
+							$_filename = JFile::exists( JPath::clean($srcpath_original . $filename) ) ? $filename : false;
+							$_filename = $_filename ?:
+								(JFile::exists( JPath::clean($srcpath_original . ($filename_LE = $fname . '.' . strtolower($fext))) ) ? $filename_LE : false);
+							$_filename = $_filename ?:
+								(JFile::exists( JPath::clean($srcpath_original . ($filename_UE = $fname . '.' . strtoupper($fext))) ) ? $filename_UE : false);
+
+							if ($_filename)
+							{
+								$col_no = array_search($fld_name, $ff_fields);
+								$conf['contents'][$lineno][$col_no] = $_filename;
+								//print_r($conf['contents'][$lineno][$col_no]); echo '<br>';
+							}
+
+							if (!$_filename)
 							{
 								$filenames_missing[$fld_name][$filename][] = $lineno;
 							}
@@ -1206,6 +1228,7 @@ class FlexicontentControllerImport extends FlexicontentControllerBaseAdmin
 					}
 				}
 			}
+			//echo '<pre>'; print_r($conf['contents']); echo '</pre>'; exit;
 
 			// Cross check them if they already exist in the DB
 			$non_skipped_files_found = false;

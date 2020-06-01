@@ -225,7 +225,7 @@ class FlexicontentViewImport extends FlexicontentViewBaseRecords
 		$formvals = array();
 
 		// Retrieve Basic configuration
-		$formvals['id_col']             = $model->getState('id_col');
+		$formvals['id_col']   = $model->getState('id_col');
 		$formvals['type_id']  = $model->getState('type_id');
 		$formvals['language'] = $model->getState('language');
 		$formvals['state']    = $model->getState('state');
@@ -345,7 +345,7 @@ class FlexicontentViewImport extends FlexicontentViewBaseRecords
 		 * Get field names (from the header line (row 0), and remove it form the data array
 		 */
 
-		$file_field_types_list = '"image","file"';
+		$file_field_types_list = '"image","file","mediafile"';
 		$q = 'SELECT id, name, label, field_type FROM #__flexicontent_fields AS fi'
 			//.' JOIN #__flexicontent_fields_type_relations AS ftrel ON ftrel.field_id = fi.id AND ftrel.type_id='.$type_id;
 			.' WHERE fi.field_type IN ('. $file_field_types_list .')'
