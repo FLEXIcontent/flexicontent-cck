@@ -502,12 +502,21 @@ if (isset($this->item->item_translations)) foreach ($this->item->item_translatio
 			<?php endif; ?>
 
 				<div class="fc_tagbox" id="fc_tagbox">
+
+					<?php
+					// Tags both shown and editable
+					$tags_included = $this->perms['cantags'];
+
+					if ($tags_included) echo '<input type="hidden" name="jform[tag][]" value="" />';
+					?>
+
 					<ul id="ultagbox">
 					<?php
 						$common_tags_selected = array();
+
 						foreach($this->usedtagsdata as $tag)
 						{
-							if ( $this->perms['cantags'] )
+							if ($this->perms['cantags'])
 							{
 								if ( isset($this->quicktagsdata[$tag->id]) )
 								{
@@ -520,7 +529,9 @@ if (isset($this->item->item_translations)) foreach ($this->item->item_translatio
 									<input type="hidden" name="jform[tag][]" value="'.$tag->id.'" />
 									<a href="javascript:;" class="deletetag" onclick="javascript:deleteTag(this);" title="'.JText::_('FLEXI_DELETE_TAG').'"></a>
 								</li>';
-							} else {
+							}
+							else
+							{
 								echo '
 								<li class="tagitem plain">
 									<span>'.$tag->name.'</span>

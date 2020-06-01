@@ -843,6 +843,14 @@ if ($tags_displayed) : ob_start();  // tags ?>
 			<?php endif; ?>
 
 				<div class="fc_tagbox" id="fc_tagbox">
+
+					<?php
+					// Tags both shown and editable
+					$tags_included = $this->perms['cantags'] && $this->params->get('usetags_fe', 1) == 1;
+
+					if ($tags_included) echo '<input type="hidden" name="jform[tag][]" value="" />';
+					?>
+
 					<ul id="ultagbox">
 					<?php
 						$common_tags_selected = array();
