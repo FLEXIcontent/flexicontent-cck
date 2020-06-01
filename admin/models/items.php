@@ -2777,6 +2777,16 @@ class FlexicontentModelItems extends FCModelAdminList
 
 
 		// ***
+		// *** Remove Joomla Tag assignments
+		// ***
+		$query = 'DELETE FROM #__contentitem_tag_map'
+				. ' WHERE content_item_id IN ('. $cid_list .')'
+				. '	  AND type_alias = ' . $this->_db->Quote('com_content.article')
+				;
+		$this->_db->setQuery($query)->execute();
+
+
+		// ***
 		// *** Remove assigned category references
 		// ***
 		$query = 'DELETE FROM #__flexicontent_cats_item_relations'
