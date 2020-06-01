@@ -3905,7 +3905,7 @@ class FlexicontentFields
 			$template = JFactory::getApplication('site')->getTemplate();
 		}
 
-		$layouts_path_1 = JPATH_ROOT . '/templates/' . $template . '/html/layouts/com_flexicontent/items_list_filters/select_selectmul.php';
+		$layouts_path_1 = JPATH_ROOT . '/templates/' . $template . '/html/layouts/com_flexicontent/items_list_filters';
 		$layouts_path_2 = JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'layouts';
 
 		// *** Do not create any HTML just return empty string to indicate a filter that should be skipped
