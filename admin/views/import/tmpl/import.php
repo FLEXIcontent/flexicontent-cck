@@ -76,19 +76,21 @@ $tabCnt[$tabSetCnt] = 0;
 					<?php
 						$dv = $this->model->getState('id_col');
 					?>
-					<input type="radio" id="id_col0" name="id_col" value="0" <?php echo $dv==0 ? 'checked="checked"' : ''; ?> />
-					<label for="id_col0"><?php echo JText::_("FLEXI_IMPORT_AUTO_NEW_ID");?> - <?php echo JText::_("FLEXI_IMPORT_CREATE_ITEMS");?></label> <br/>
+					<div class="group-fcset fc_input_set fc-cleared">
+						<input type="radio" id="id_col0" name="id_col" value="0" <?php echo $dv==0 ? 'checked="checked"' : ''; ?> />
+						<label for="id_col0"><?php echo JText::_("FLEXI_IMPORT_AUTO_NEW_ID");?> - <?php echo JText::_("FLEXI_IMPORT_CREATE_ITEMS");?></label> <br/>
 
-					<div style="border: 1px dashed; padding: 12px">
-						<b><?php echo JText::_("FLEXI_IMPORT_USE_ID_COL");?></b><br/>
-						<input type="radio" id="id_col1" name="id_col" value="1" <?php echo $dv==1 ? 'checked="checked"' : ''; ?> />
-						<label for="id_col1"><?php echo JText::_("FLEXI_IMPORT_CREATE_ITEMS");?></label> <br/>
-	
-						<input type="radio" id="id_col2" name="id_col" value="2" <?php echo $dv==2 ? 'checked="checked"' : ''; ?> />
-						<label for="id_col2"><?php echo JText::_("FLEXI_IMPORT_CREATE_UPDATE_ITEMS");?></label> <br/>
-	
-						<input type="radio" id="id_col3" name="id_col" value="3" <?php echo $dv==3 ? 'checked="checked"' : ''; ?> />
-						<label for="id_col3"><?php echo JText::_("FLEXI_IMPORT_UPDATE_ITEMS");?></label>
+						<div style="border: 1px dashed; padding: 12px">
+							<b><?php echo JText::_("FLEXI_IMPORT_USE_ID_COL");?></b><br/>
+							<input type="radio" id="id_col1" name="id_col" value="1" <?php echo $dv==1 ? 'checked="checked"' : ''; ?> />
+							<label for="id_col1"><?php echo JText::_("FLEXI_IMPORT_CREATE_ITEMS");?></label> <br/>
+		
+							<input type="radio" id="id_col2" name="id_col" value="2" <?php echo $dv==2 ? 'checked="checked"' : ''; ?> />
+							<label for="id_col2"><?php echo JText::_("FLEXI_IMPORT_CREATE_UPDATE_ITEMS");?></label> <br/>
+		
+							<input type="radio" id="id_col3" name="id_col" value="3" <?php echo $dv==3 ? 'checked="checked"' : ''; ?> />
+							<label for="id_col3"><?php echo JText::_("FLEXI_IMPORT_UPDATE_ITEMS");?></label>
+						</div>
 					</div>
 				</td>
 				<td class="data">
@@ -159,10 +161,12 @@ $tabCnt[$tabSetCnt] = 0;
 						$checked0 = $dv==0 ? 'checked="checked"' : '';
 						$checked1 = $dv==1 ? 'checked="checked"' : '';
 					?>
-					<input type="radio" id="created_by_col0" name="created_by_col" value="0" <?php echo $checked0; ?> />
-					<label for="created_by_col0">a. <?php echo JText::_("FLEXI_IMPORT_CREATOR_CURR_USER");?></label>
-					<input type="radio" id="created_by_col1" name="created_by_col" value="1" <?php echo $checked1; ?> />
-					<label for="created_by_col1">b. <?php echo JText::_("FLEXI_IMPORT_CREATOR_USE_COL");?></label>
+					<div class="group-fcset fc_input_set fc-cleared">
+						<input type="radio" id="created_by_col0" name="created_by_col" value="0" <?php echo $checked0; ?> />
+						<label for="created_by_col0"><?php echo JText::_("FLEXI_IMPORT_CREATOR_CURR_USER");?></label>
+						<input type="radio" id="created_by_col1" name="created_by_col" value="1" <?php echo $checked1; ?> />
+						<label for="created_by_col1"><?php echo JText::_("FLEXI_IMPORT_CREATOR_USE_COL");?></label>
+					</div>
 				</td>
 			</tr>
 			
@@ -174,10 +178,12 @@ $tabCnt[$tabSetCnt] = 0;
 						$checked0 = $dv==0 ? 'checked="checked"' : '';
 						$checked1 = $dv==1 ? 'checked="checked"' : '';
 					?>
-					<input type="radio" id="modified_by_col0" name="modified_by_col" value="0" <?php echo $checked0; ?> />
-					<label for="modified_by_col0">a. <?php echo JText::_("FLEXI_IMPORT_MODIFIER_NONE_USER");?></label>
-					<input type="radio" id="modified_by_col1" name="modified_by_col" value="1" <?php echo $checked1; ?> />
-					<label for="modified_by_col1">b. <?php echo JText::_("FLEXI_IMPORT_MODIFIER_USE_COL");?></label>
+					<div class="group-fcset fc_input_set fc-cleared">
+						<input type="radio" id="modified_by_col0" name="modified_by_col" value="0" <?php echo $checked0; ?> />
+						<label for="modified_by_col0"><?php echo JText::_("FLEXI_IMPORT_MODIFIER_NONE_USER");?></label>
+						<input type="radio" id="modified_by_col1" name="modified_by_col" value="1" <?php echo $checked1; ?> />
+						<label for="modified_by_col1"><?php echo JText::_("FLEXI_IMPORT_MODIFIER_USE_COL");?></label>
+					</div>
 				</td>
 			</tr>
 			
@@ -188,10 +194,12 @@ $tabCnt[$tabSetCnt] = 0;
 						$_desc_checked = $this->model->getState('metadesc_col') == 1 ? 'checked="checked"' : '';
 						$_key_checked  = $this->model->getState('metakey_col') == 1 ? 'checked="checked"' : '';
 					?>
-					<input type="checkbox" id="metadesc_col" name="metadesc_col" value="1" <?php echo $_desc_checked; ?> />
-					<label for="metadesc_col"><?php echo JText::_("FLEXI_IMPORT_USE_METADESC_COL");?></label>
-					<input type="checkbox" id="metakey_col" name="metakey_col" value="1" <?php echo $_key_checked; ?> />
-					<label for="metakey_col"><?php echo JText::_("FLEXI_IMPORT_USE_METAKEY_COL");?></label>
+					<div class="group-fcset fc_input_set fc-cleared">
+						<input type="checkbox" id="metadesc_col" name="metadesc_col" value="1" <?php echo $_desc_checked; ?> />
+						<label for="metadesc_col"><?php echo JText::_("FLEXI_IMPORT_USE_METADESC_COL");?></label>
+						<input type="checkbox" id="metakey_col" name="metakey_col" value="1" <?php echo $_key_checked; ?> />
+						<label for="metakey_col"><?php echo JText::_("FLEXI_IMPORT_USE_METAKEY_COL");?></label>
+					</div>
 				</td>
 			</tr>
 			
@@ -201,9 +209,11 @@ $tabCnt[$tabSetCnt] = 0;
 					<?php
 						$_desc_checked = $this->model->getState('custom_ititle_col') == 1 ? 'checked="checked"' : '';
 					?>
-					<input type="checkbox" id="custom_ititle_col" name="custom_ititle_col" value="1" <?php echo $_desc_checked; ?> />
-					<label for="custom_ititle_col"><?php echo JText::_("FLEXI_IMPORT_USE_CUSTOM_TITLE_COL");?></label>
-					<span class="icon-info hasTooltip" style="font-size: 18px;" title="<?php echo htmlspecialchars(JText::_('FLEXI_CUSTOM_TITLE_DESC'), ENT_COMPAT, 'UTF-8'); ?>"></span>
+					<div class="group-fcset fc_input_set fc-cleared">
+						<input type="checkbox" id="custom_ititle_col" name="custom_ititle_col" value="1" <?php echo $_desc_checked; ?> />
+						<label for="custom_ititle_col"><?php echo JText::_("FLEXI_IMPORT_USE_CUSTOM_TITLE_COL");?></label>
+						<span class="icon-info hasTooltip" style="font-size: 18px;" title="<?php echo htmlspecialchars(JText::_('FLEXI_CUSTOM_TITLE_DESC'), ENT_COMPAT, 'UTF-8'); ?>"></span>
+					</div>
 				</td>
 			</tr>
 			
@@ -222,10 +232,12 @@ $tabCnt[$tabSetCnt] = 0;
 						$checked0 = $dv==0 ? 'checked="checked"' : '';
 						$checked1 = $dv==1 ? 'checked="checked"' : '';
 					?>
-					<input type="radio" id="created_col0" name="created_col" value="0" <?php echo $checked0; ?> />
-					<label for="created_col0">a. <?php echo JText::_("FLEXI_IMPORT_CREATION_CURR_DATE");?></label>
-					<input type="radio" id="created_col1" name="created_col" value="1" <?php echo $checked1; ?> />
-					<label for="created_col1">b. <?php echo JText::_("FLEXI_IMPORT_CREATION_USE_COL");?></label>
+					<div class="group-fcset fc_input_set fc-cleared">
+						<input type="radio" id="created_col0" name="created_col" value="0" <?php echo $checked0; ?> />
+						<label for="created_col0"><?php echo JText::_("FLEXI_IMPORT_CREATION_CURR_DATE");?></label>
+						<input type="radio" id="created_col1" name="created_col" value="1" <?php echo $checked1; ?> />
+						<label for="created_col1"><?php echo JText::_("FLEXI_IMPORT_CREATION_USE_COL");?></label>
+					</div>
 				</td>
 			</tr>
 			
@@ -237,10 +249,12 @@ $tabCnt[$tabSetCnt] = 0;
 						$checked0 = $dv==0 ? 'checked="checked"' : '';
 						$checked1 = $dv==1 ? 'checked="checked"' : '';
 					?>
-					<input type="radio" id="modified_col0" name="modified_col" value="0" <?php echo $checked0; ?> />
-					<label for="modified_col0">a. <?php echo JText::_("FLEXI_IMPORT_MODIFICATION_NEVER_DATE");?></label>
-					<input type="radio" id="modified_col1" name="modified_col" value="1" <?php echo $checked1; ?> />
-					<label for="modified_col1">b. <?php echo JText::_("FLEXI_IMPORT_MODIFICATION_USE_COL");?></label>
+					<div class="group-fcset fc_input_set fc-cleared">
+						<input type="radio" id="modified_col0" name="modified_col" value="0" <?php echo $checked0; ?> />
+						<label for="modified_col0"><?php echo JText::_("FLEXI_IMPORT_MODIFICATION_NEVER_DATE");?></label>
+						<input type="radio" id="modified_col1" name="modified_col" value="1" <?php echo $checked1; ?> />
+						<label for="modified_col1"><?php echo JText::_("FLEXI_IMPORT_MODIFICATION_USE_COL");?></label>
+					</div>
 				</td>
 			</tr>
 			
@@ -251,10 +265,12 @@ $tabCnt[$tabSetCnt] = 0;
 						$_up_checked   = $this->model->getState('publish_up_col') == 1 ? 'checked="checked"' : '';
 						$_down_checked = $this->model->getState('publish_down_col') == 1 ? 'checked="checked"' : '';
 					?>
-					<input type="checkbox" id="publish_up_col" name="publish_up_col" value="1" <?php echo $_up_checked; ?> />
-					<label for="publish_up_col"><?php echo JText::_("FLEXI_IMPORT_USE_PUBLISH_UP_COL");?></label>
-					<input type="checkbox" id="publish_down_col" name="publish_down_col" value="1" <?php echo $_down_checked; ?> />
-					<label for="publish_down_col"><?php echo JText::_("FLEXI_IMPORT_USE_PUBLISH_DOWN_COL");?></label>
+					<div class="group-fcset fc_input_set fc-cleared">
+						<input type="checkbox" id="publish_up_col" name="publish_up_col" value="1" <?php echo $_up_checked; ?> />
+						<label for="publish_up_col"><?php echo JText::_("FLEXI_IMPORT_USE_PUBLISH_UP_COL");?></label>
+						<input type="checkbox" id="publish_down_col" name="publish_down_col" value="1" <?php echo $_down_checked; ?> />
+						<label for="publish_down_col"><?php echo JText::_("FLEXI_IMPORT_USE_PUBLISH_DOWN_COL");?></label>
+					</div>
 				</td>
 			</tr>
 			
@@ -300,7 +316,9 @@ $tabCnt[$tabSetCnt] = 0;
 					<?php
 						$checked = $this->model->getState('maincat_col') == 1 ? 'checked="checked"' : '';
 					?>
-					<input type="checkbox" id="maincat_col" name="maincat_col" value="1" <?php echo $checked; ?> /> <label for="maincat_col">(Use 'catid' column, e.g. 54)</label>
+					<div class="group-fcset fc_input_set fc-cleared">
+						<input type="checkbox" id="maincat_col" name="maincat_col" value="1" <?php echo $checked; ?> /> <label for="maincat_col">(Use 'catid' column, e.g. 54)</label>
+					</div>
 				</td>
 			</tr>
 			
@@ -312,7 +330,9 @@ $tabCnt[$tabSetCnt] = 0;
 					<?php
 						$checked = $this->model->getState('seccats_col') == 1 ? 'checked="checked"' : '';
 					?>
-					<input type="checkbox" id="seccats_col" name="seccats_col" value="1" <?php echo $checked; ?> /> <label for="seccats_col">(Use 'cid' column, e.g. 54,14,51)</label>
+					<div class="group-fcset fc_input_set fc-cleared">
+						<input type="checkbox" id="seccats_col" name="seccats_col" value="1" <?php echo $checked; ?> /> <label for="seccats_col">(Use 'cid' column, e.g. 54,14,51)</label>
+					</div>
 				</td>
 			</tr>
 			
@@ -338,14 +358,16 @@ $tabCnt[$tabSetCnt] = 0;
 						$checked1 = $dv==1 ? 'checked="checked"' : '';
 						$checked2 = $dv==2 ? 'checked="checked"' : '';
 					?>
-					<input type="radio" id="tags_col0" name="tags_col" value="0" <?php echo $checked0; ?> />
-					<label for="tags_col0">a. <?php echo JText::_("FLEXI_IMPORT_DO_NOT_IMPORT_TAGS");?></label>
-					<div class="fcclear"></div>
-					<input type="radio" id="tags_col1" name="tags_col" value="1" <?php echo $checked1; ?> />
-					<label for="tags_col1">b. <?php echo JText::_("FLEXI_IMPORT_USE_TAG_NAMES_COL");?></label>
-					<div class="fcclear"></div>
-					<input type="radio" id="tags_col2" name="tags_col" value="2" <?php echo $checked2; ?> />
-					<label for="tags_col2">c. <?php echo JText::_("FLEXI_IMPORT_USE_TAG_IDS_COL");?></label>
+					<div class="group-fcset fc_input_set fc-cleared">
+						<input type="radio" id="tags_col0" name="tags_col" value="0" <?php echo $checked0; ?> />
+						<label for="tags_col0">a. <?php echo JText::_("FLEXI_IMPORT_DO_NOT_IMPORT_TAGS");?></label>
+						<div class="fcclear"></div>
+						<input type="radio" id="tags_col1" name="tags_col" value="1" <?php echo $checked1; ?> />
+						<label for="tags_col1">b. <?php echo JText::_("FLEXI_IMPORT_USE_TAG_NAMES_COL");?></label>
+						<div class="fcclear"></div>
+						<input type="radio" id="tags_col2" name="tags_col" value="2" <?php echo $checked2; ?> />
+						<label for="tags_col2">c. <?php echo JText::_("FLEXI_IMPORT_USE_TAG_IDS_COL");?></label>
+					</div>
 				</td>
 			</tr>
 		</table>
@@ -401,11 +423,12 @@ $tabCnt[$tabSetCnt] = 0;
 					<label class="label" for="docs_folder"><?php echo JText::_( 'FLEXI_IMPORT_SKIP_FILE_CHECK' ); ?></label>
 				</td>
 				<td class="data" style="max-width:40%; white-space: unset;">
-					<?php foreach ($this->file_fields as $i=> $file_fieid) : ?>
-						<input type="checkbox" id="skip_file_field_<?php echo $i; ?>" name="skip_file_field[]" value="<?php echo $file_fieid->name; ?>" />
-						<label for="skip_file_field_<?php echo $i; ?>" class=""><?php echo $file_fieid->label." <small>[".$file_fieid->name."]</small>"; ?></label>
-						<br/>
-					<?php endforeach; ?>
+					<div class="group-fcset fc_input_set fc-cleared">
+						<?php foreach ($this->file_fields as $i=> $file_fieid) : ?>
+							<input type="checkbox" id="skip_file_field_<?php echo $i; ?>" name="skip_file_field[]" value="<?php echo $file_fieid->name; ?>" />
+							<label for="skip_file_field_<?php echo $i; ?>" class=""><?php echo $file_fieid->label." <small>[".$file_fieid->name."]</small>"; ?></label>
+						<?php endforeach; ?>
+					</div>
 				</td>
 				<td class="data">
 				</td>
@@ -531,8 +554,10 @@ $tabCnt[$tabSetCnt] = 0;
 					<?php
 						$_ignore_unused_cols_checked = $this->model->getState('ignore_unused_cols') ? 'checked="checked"' : '';
 					?>
-					<input type="checkbox" id="ignore_unused_cols" name="ignore_unused_cols" value="1" <?php echo $_ignore_unused_cols_checked; ?> />
-					<label for="ignore_unused_cols"><?php echo JText::_( 'FLEXI_IMPORT_IGNORE_REDUDANT_COLS' ); ?></label>
+					<div class="group-fcset fc_input_set fc-cleared">
+						<input type="checkbox" id="ignore_unused_cols" name="ignore_unused_cols" value="1" <?php echo $_ignore_unused_cols_checked; ?> />
+						<label for="ignore_unused_cols"><?php echo JText::_( 'FLEXI_IMPORT_IGNORE_REDUDANT_COLS' ); ?></label>
+					</div>
 				</td>
 				<td class="data">
 					<span class="fc-mssg fc-info fc-nobgimage"><?php echo JText::_("FLEXI_IMPORT_IGNORE_REDUDANT_COLS_DESC");?></span>
