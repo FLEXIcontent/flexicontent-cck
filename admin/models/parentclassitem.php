@@ -953,15 +953,17 @@ class ParentClassItem extends FCModelAdmin
 				$item->tags = array_reverse($item->tags);
 			}
 
-			echo empty($this->debug_tags) ? null : '<pre>' . __FUNCTION__ . '(): item->tags: ' . print_r($item->tags, true) . '</pre>';
+			echo empty($this->debug_tags) ? null : '<b>' . __FUNCTION__ . '()</b><blockquote> DB fctag_ids: ' . print_r($item->tags, true) . '</blockquote>';
 
 			if ($task === 'edit' && $option === 'com_flexicontent')
 			{
-				// Merge (if needed) Joomla tags assignment into FC tags assignments
-				$this->mergeJTagsAssignments($item, $_jtags = null, $_replaceTags = false);
+				// 1. Merge ($_replaceTags = false) Joomla tags assignment into FC tags assignments
+				// 2. Find if we needed to add FC Tag assignments to Joomla tags assignments
+				$new_fctags_ids = $this->mergeJTagsAssignments($item, $_jtags = null, $_replaceTags = false);
 
-				// Merge (if needed) FC tags assignment into Joomla tags assignments ... do this if we are executing FLEXIcontent component
-				$this->saveJTagsAssignments($item->tags, $item->id);
+				// 3. Add (if needed) extra Joomla tags assignments so that they match FC Tag assignment
+				//    ... since we overwrite, we do this only if we are executing FLEXIcontent component
+				if ($new_fctags_ids) $this->saveJTagsAssignments($item->tags, $item->id);
 			}
 
 			// -- Retrieve categories field value (if not using versioning)
@@ -2563,9 +2565,6 @@ class ParentClassItem extends FCModelAdmin
 				$jinput->set('view', $view);
 				$jinput->set('option', $option);
 
-				$fctag_ids = isset($data['tags']) ? $data['tags'] : array();
-				$this->saveJTagsAssignments($fctag_ids, $item->id);
-
 				if ( $print_logging_info ) @$fc_run_times['onContentAfterSave_event'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 			}
 		}
@@ -3464,7 +3463,9 @@ class ParentClassItem extends FCModelAdmin
 
 		if (isset($data['tags']))
 		{
+			echo empty($this->debug_tags) ? null : '<b>' . __FUNCTION__ . '()</b><blockquote> Replacing Tags with: ' . print_r($data['tags'], true) . '</blockquote>';
 			$this->saveFcTagsAssignments($data['tags'], $item->id, $_replace = true);
+			$this->saveJTagsAssignments($data['tags'], $item->id);
 		}
 
 
@@ -5469,18 +5470,26 @@ class ParentClassItem extends FCModelAdmin
 			// Do not set $data['tags'] thus item will maintain its current tag assignments
 			return;
 		}
+
 		$tags = isset($data['tags'])
 			? $data['tags']
 			: $data['tag'];
-
 
 		// Make tags unique
 		$tags = ArrayHelper::toInteger($tags);
 		$tags = array_keys(array_flip($tags));
 
+		// Remove Empty Tags
+		foreach($tags as $i => $tag)
+		{
+			if (!$tag) unset($tags[$i]);
+		}
+
 		// Set tags back using itsreal name of field: 'tags'       INSTEAD OF 'tag'
 		$data['tags'] = $tags;
 		unset($data['tag']);
+
+		echo empty($this->debug_tags) ? null : '<b>' . __FUNCTION__ . '()</b><blockquote> Prepared tags: ' . print_r($tags, true) . '</blockquote>';
 	}
 
 
@@ -5984,25 +5993,29 @@ class ParentClassItem extends FCModelAdmin
 
 		$jtag_ids = array();
 		$jtags = $this->createFindJoomlaTags($fctags, true, $indexCol = 'id');
-		echo empty($this->debug_tags) ? null : '<pre>' . __FUNCTION__ . '(): createFindJoomlaTags(): (objs) ' . print_r($jtags, true) . '</pre>';
 
 		foreach($jtags as $fctag_id => $jtag)
 		{
+			$fctags[$fctag_id]->jtag_id_new = $jtag ? $jtag->id : 0;
+
+			/**
+			 * Warning ... the TagsHelper method expects that Tag Ids are 'STRING' type ! or if we want to pass tag
+			 * titles of existing tags, ... we need to prefix them with '#new#' to avoid being interpreted as Tag Ids
+			 */
 			if ($jtag)
 			{
-				/**
-				 * Warning ... the TagsHelper method expects that Tag Ids are 'STRING' type ! or if we want to pass tag
-				 * titles of existing tags, ... we need to prefix them with '#new#' to avoid being interpreted as Tag Ids
-				 */
 				$jtag_ids[] = (string) $jtag->id;
-				$fctags[$fctag_id]->jtag_id_new = $jtag->id;
 			}
-			else
-			{
-				$fctags[$fctag_id]->jtag_id_new = 0;
-			}
+
+			$DEBUG_fctag_TO_jtag[$fctag_id] = $jtag ? $jtag->id : 0;
 		}
-		echo empty($this->debug_tags) ? null : '<pre>' . __FUNCTION__ . '(): createFindJoomlaTags(): (ids) ' . print_r($jtag_ids, true) . '</pre>';
+
+		echo empty($this->debug_tags) ? null : '<b>' . __FUNCTION__ . '()</b><blockquote>'
+			. (count($jtags) ?
+				' FCTAG to JTAG ids: ' . print_r($DEBUG_fctag_TO_jtag, true) . '<br>'
+					. ' Assigning Joomla Tags to item ' . reset($pks)
+				: ' Deleting Joomla Tags assignments of item ' . reset($pks)
+			) . '</blockquote>';
 
 		foreach ($pks as $pk)
 		{
@@ -6036,7 +6049,7 @@ class ParentClassItem extends FCModelAdmin
 				}
 				else
 				{
-					if (!FLEXI_J38GE && !$jtag_ids)
+					if (!$jtag_ids)
 					{
 						$this->table->tagsHelper->deleteTagData($this->table, $this->table->id);
 					}
@@ -6085,19 +6098,29 @@ class ParentClassItem extends FCModelAdmin
 			if ($fctag->jtag_id_new != $fctag->jtag_id)
 			{
 				$fctag->jtag_id = $fctag->jtag_id_new;
+
 				$query_vals[$fctag->id] = ' WHEN ' . $fctag->id . ' THEN ' . $this->_db->Quote((int) $fctag->jtag_id);
+
+				$DEBUG_fctag_TO_jtag[$fctag->id] = $fctag->jtag_id;
 			}
 			unset($fctag->jtag_id_new);
 			$i++;
 		}
+
+		echo empty($this->debug_tags) ? null : '<b>' . __FUNCTION__ . '()</b><blockquote> '
+			. (count($query_vals)
+				? ' FCTAG to JTAG ids: ' . print_r($DEBUG_fctag_TO_jtag, true) . '<br>'
+					. ' -- Setting jtag_id column OF __flexicontent_tags TABLE'
+				: ' no need to update <b>jtag_id</b> column OF __flexicontent_tags TABLE '
+			)  . '</blockquote>';
 
 		if (count($query_vals))
 		{
 			$query 	= 'UPDATE #__flexicontent_tags SET jtag_id = CASE id '
 				. implode(' ', $query_vals)
 				. ' END '
-				. ' WHERE id IN (' . implode(',', array_keys($query_vals)) . ')';
-			//echo $query . '<br/>';
+				. ' WHERE id IN (' . implode(',', array_keys($query_vals)) . ')'
+				;
 			$this->_db->setQuery($query)->execute();
 		}
 	}
@@ -6443,7 +6466,12 @@ class ParentClassItem extends FCModelAdmin
 				$new_tags[] = $fctag->id;
 			}
 		}
-		echo empty($this->debug_tags) ? null : '<pre>' . __FUNCTION__ . '(): new_tags = ' . print_r($new_tags, true) . '</pre>';
+
+		echo empty($this->debug_tags) ? null : '<b>' . __FUNCTION__ . '()</b><blockquote>'
+			. ' EXISTING fctag_ids  = ' . print_r($old_tags, true) . '<br>'
+			. ' EXTRA fctag_ids due to JTags = ' . print_r($new_tags, true)
+			. '</blockquote>';
+
 
 		// Only update FC tag relations in DB if we have new tags
 		if (count($new_tags) || $replaceTags)
@@ -6457,6 +6485,8 @@ class ParentClassItem extends FCModelAdmin
 				$item->tags[] = $fctag_id;
 			}
 		}
+
+		return $new_tags;
 	}
 
 
@@ -6475,7 +6505,6 @@ class ParentClassItem extends FCModelAdmin
 	public function saveJTagsAssignments($fctag_ids, $id = null)
 	{
 		$id = (int) ($id ?: $this->_id);
-		echo empty($this->debug_tags) ? null : '<pre>' . __FUNCTION__ . '(): fctag_ids = ' . print_r($fctag_ids, true) . '</pre>';
 
 		// Make sure re-usable member properties have been initialized
 		$this->initBatch();
@@ -6489,7 +6518,11 @@ class ParentClassItem extends FCModelAdmin
 
 		// Load data of FLEXIcontent tags
 		$fctags = $this->getTagsByIds($fctag_ids);
-		echo empty($this->debug_tags) ? null : '<pre>' . __FUNCTION__ . '(): getTagsByIds(): ' . print_r($fctags, true) . '</pre>';
+		echo empty($this->debug_tags) ? null : '<b>' . __FUNCTION__ . '()</b><blockquote> '
+			. ' -- fctag_ids: ' . print_r($fctag_ids, true) . '<br>'
+			. ' -- CALLING -- <u>syncJTagAssignments</u>(fctags) -- TO save <b>JTAG assignments</b> for item ' . $id . '<br>'
+			. ' -- CALLING -- <u>updateJTagMappings</u>(fctags) -- TO update <b>jtag_id</b> column of TBL \'flexicontent_tags\'<br>'
+			. '</blockquote>';
 
 		// Sync the tags assignments
 		$this->syncJTagAssignments($fctags, array($id), array($id => $asset),  true);
@@ -6523,6 +6556,8 @@ class ParentClassItem extends FCModelAdmin
 				;
 			$db->setQuery($query)->execute();
 		}
+
+		echo empty($this->debug_tags) ? null : '<b>' . __FUNCTION__ . '()</b><blockquote> tags: ' . print_r($tags, true) . '</blockquote>';
 
 		$tag_vals = array();
 		foreach($tags as $tagid)
