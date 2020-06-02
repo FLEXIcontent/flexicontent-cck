@@ -5594,4 +5594,244 @@ class FlexicontentFields
 		return $ginfo;
 	}
 
+<<<<<<< HEAD
+=======
+
+
+	/**
+	 * Method to get a basic display for fields value data of an item view
+	 *
+	 * $field->raw_values    (Array of raw unserialized values)
+	 * $field->basic_texts   (Array of basic textual display of values)
+	 *
+	 * @param 	object    $item      the item object of the item component view
+	 * @param 	array     $fields    the fields of the item
+	 */
+	public static function getBasicFieldData($item, $fields)
+	{
+		foreach ($fields as $fn => $field)
+		{
+			$field->raw_values  = array();
+			$field->basic_texts = array();
+
+			if ($field->iscore)
+			{
+				$v = $item->$fn;
+
+				$field->raw_values = $v;
+
+				if ($field->field_type === 'type')
+				{
+					$v = $item->type_id;
+
+					$field->raw_values  = $v;
+					$field->basic_texts = JText::_($item->$fn);
+				}
+				elseif ($field->field_type === 'createdby' || $field->field_type === 'modifiedby')
+				{
+					$field->raw_values  = $v;
+					$field->basic_texts = $field->field_type === 'createdby' ? $item->author : $item->modifier;
+				}
+				elseif ($field->field_type === 'state')
+				{
+					$v = $item->$fn;
+
+					$state_names = array(
+						1=>JText::_('FLEXI_PUBLISHED'), -5=>JText::_('FLEXI_IN_PROGRESS'), 0=>JText::_('FLEXI_UNPUBLISHED'),
+						-3=>JText::_('FLEXI_PENDING'), -4=>JText::_('FLEXI_TO_WRITE'),
+						2=>JText::_('FLEXI_ARCHIVED'), -2=>JText::_('FLEXI_TRASHED'),
+					);
+
+					$field->raw_values  = $v;
+					$field->basic_texts = isset($state_names[$v]) ? $state_names[$v] : JText::_('FLEXI_UNKNOWN');
+				}
+				else
+				{
+					$v = $item->$fn;
+
+					$field->raw_values = $v;
+				}
+			}
+
+			else
+			{
+				$field->raw_values = isset($item->fieldvalues[$field->id]) ? $item->fieldvalues[$field->id] : array();
+
+				// Safely unserialize
+				foreach ($field->raw_values as $i => $v)
+				{
+					$_v = flexicontent_db::unserialize_array($v, $force_array = true, $force_value = false);
+					if ($_v !== false)
+					{
+						$field->raw_values[$i] = $_v;
+					}
+				}
+
+				if (in_array($field->field_type, array('select', 'selectmultiple', 'radio', 'radioimage', 'checkbox', 'checkboximage')))
+				{
+					if (empty($field->parameters))
+					{
+						FlexicontentFields::loadFieldConfig($field, $item);
+					}
+
+					$field->elements = isset($field->elements)
+						? $field->elements
+						: FlexicontentFields::indexedField_getElements($field, $item);
+					$field->basic_texts = array();
+
+					foreach ($field->raw_values as $i => $v)
+					{
+						if (is_array($v))
+						{
+							foreach($v as $ii => $vv)
+							{
+								$field->basic_texts[$fn][$vv] = $field->elements[$vv]->text;
+							}
+						}
+						else
+						{
+							$field->basic_texts[$fn][$v] = $field->elements[$v]->text;
+						}
+					}
+				}
+			}
+
+			/*echo '<pre> <h2>' . $fn . '</h2> <h4>' . $field->field_type . '</h4>';
+			print_r(!empty($field->basic_texts) ? $field->basic_texts : $field->raw_values);
+			echo '</pre>';*/
+		}
+	}
+
+
+	/**
+	 * Method to get a basic display for filters value data of a category view
+	 *
+	 * $filter->raw_values    (Array of filter values filtered via STRING)
+	 * $filter->basic_texts   (Array of basic textual display of values)
+	 *
+	 * @param 	object    $category   the category object of the category component view
+	 * @param 	array     $filters    the filters of the category-based view
+	 */
+	public static function getBasicFilterData($category, $filters)
+	{
+		$jinput = JFactory::getApplication()->input;
+
+		foreach ($filters as $fn => $filter)
+		{
+			$fn = $filter->name;
+
+			$filter->raw_values  = array();
+			$filter->basic_texts = array();
+
+			$vals = $jinput->get('filter_' . $filter->id, null, 'raw');
+
+			if (!is_array($vals))
+			{
+				if (strlen($vals))
+				{
+					$vals = array($vals);
+				}
+				else
+				{
+					continue;
+				}
+			}
+
+			// Sanitize user submitted input ... and ... remove empty zero length values and empty arrays
+			$safe_vals = self::cleanArray($vals, 'STRING', 3);
+
+			if (!is_array($safe_vals) && !strlen($safe_vals))
+			{
+				continue;
+			}
+
+			$filter->raw_values = $safe_vals;
+
+			if ($filter->field_type === 'state')
+			{
+				$state_names = array(
+					1=>JText::_('FLEXI_PUBLISHED'), -5=>JText::_('FLEXI_IN_PROGRESS'), 0=>JText::_('FLEXI_UNPUBLISHED'),
+					-3=>JText::_('FLEXI_PENDING'), -4=>JText::_('FLEXI_TO_WRITE'),
+					2=>JText::_('FLEXI_ARCHIVED'), -2=>JText::_('FLEXI_TRASHED'),
+				);
+
+
+				foreach($safe_vals as $v)
+				{
+					$filter->basic_texts = array($v => (isset($state_names[$v]) ? $state_names[$v] : JText::_('FLEXI_UNKNOWN')));
+				}
+			}
+
+			elseif (in_array($filter->field_type, array('select', 'selectmultiple', 'radio', 'radioimage', 'checkbox', 'checkboximage')))
+			{
+				$_item = null;
+
+				$filter->elements = isset($filter->elements)
+					? $filter->elements
+					: FlexicontentFields::indexedField_getElements($filter, $_item);
+				$filter->basic_texts = array();
+
+				foreach ($safe_vals as $i => $v)
+				{
+					$filter->basic_texts[$v] = $filter->elements[$v]->text;
+				}
+			}
+
+			/*echo '<pre> <h2>' . $fn . '</h2> <h4>' . $filter->field_type . '</h4>';
+			print_r(!empty($filter->basic_texts) ? $filter->basic_texts : $filter->raw_values);
+			echo '</pre>';*/
+		}
+	}
+	
+	static function cleanArray($value, $validation = 'STRING', $max_depth = 10)
+	{
+		static $depth = 0;
+		static $noHtmlFilter = null;
+
+		/*
+		 * Do not allow = , just for beging safer, in case someone output this as HTML tag property without encoding it,
+		 * a combination of = and quotes is unsafe ...
+		 */
+
+		if ($noHtmlFilter === null)
+		{
+			$noHtmlFilter = JFilterInput::getInstance();
+		}
+
+		if (!is_array($value))
+		{
+			$value = $noHtmlFilter->clean($value, $validation);
+			$value = str_replace('=', '', $value);
+
+			return strlen($value) ? $value : '';
+		}
+		elseif ($depth <= $max_depth)
+		{
+			++$depth;
+
+			foreach ($value as $i => $v)
+			{
+			  $v = self::cleanArray($v, $validation, $max_depth);
+
+				if (is_array($v) || strlen($v))
+				{
+					$value[$i] = $v;
+				}
+				else
+				{
+					unset($value[$i]);
+				}
+					
+			}
+
+			--$depth;
+
+			return count($value) ? $value : '';
+		}
+		else
+		{
+			return '';
+		}
+	}
+>>>>>>> 94ba32d3a... A correction for basic field data available for custom layouts
 }
