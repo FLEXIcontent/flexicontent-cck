@@ -1629,7 +1629,6 @@ select[multiple].use_select2_lib:focus {
 	position: absolute !important;
 	top: 0;
 	left: 0;
-	opacity: 0.5;
 	background-color: #000;
 	width: 100%;
 	height: 100%;
@@ -1645,11 +1644,9 @@ select[multiple].use_select2_lib:focus {
 	font-weight: bold;
 	color: #555;
 	background: white 30px 40px no-repeat;
-	opacity: 1;
 	width: auto;
 	padding: 2em 2em 3em 2em;
 	margin: 0px;
-	border: 1px solid lightgray;
 	border-radius: 0.5em;
 	text-align: center;
 	width: 280px;
