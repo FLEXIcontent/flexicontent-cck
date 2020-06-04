@@ -2917,11 +2917,34 @@ class FlexicontentModelItems extends FCModelAdminList
 	 * @return	boolean	integer array on success
 	 * @since	1.0
 	 */
-	function getItemsWithTags(&$total=null, $start=0, $limit=5000)
+	function getItemsWithTags(&$total=null, $start=0, $limit=20000)
 	{
 		$query = 'SELECT SQL_CALC_FOUND_ROWS DISTINCT a.id '
 			. ' FROM #__content AS a'
 			. ' JOIN #__flexicontent_tags_item_relations AS tg ON a.id = tg.itemid'
+			. ($limit ? ' LIMIT ' . (int) $start . ', ' . (int) $limit : '')
+			;
+		$item_ids = $this->_db->setQuery($query)->loadColumn();
+
+		// Get items total
+		$total = $this->_db->setQuery('SELECT FOUND_ROWS()')->loadResult();
+
+		return $item_ids;
+	}
+
+
+
+	/**
+	 * Method to get ids of all files
+	 *
+	 * @access	public
+	 * @return	boolean	integer array on success
+	 * @since	1.0
+	 */
+	function getAllItems(&$total=null, $start=0, $limit=20000)
+	{
+		$query = 'SELECT SQL_CALC_FOUND_ROWS DISTINCT a.id '
+			. ' FROM #__content AS a'
 			. ($limit ? ' LIMIT ' . (int) $start . ', ' . (int) $limit : '')
 			;
 		$item_ids = $this->_db->setQuery($query)->loadColumn();
@@ -3175,7 +3198,7 @@ class FlexicontentModelItems extends FCModelAdminList
 	 *
 	 * @since 1.5
 	 */
-	function getFieldsItems($fields=null, &$total=null, $start=0, $limit=5000)
+	function getFieldsItems($fields=null, &$total=null, $start=0, $limit=20000)
 	{
 		if ($fields === null)
 		{

@@ -26,7 +26,7 @@ class FlexicontentControllerBaseAdmin extends FlexicontentController
 {
 	use FCControllerTraitBase;
 
-	static $record_limit = 5000;
+	static $record_limit = 20000;
 
 	var $records_dbtbl = 'flexicontent_records';
 	var $records_jtable = 'flexicontent_records';

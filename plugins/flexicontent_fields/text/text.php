@@ -92,6 +92,7 @@ class plgFlexicontent_fieldsText extends FCField
 
 		// Default value(s)
 		$default_values = $this->getDefaultValues($isform = true);
+		$default_value  = reset($default_values);
 
 		// Input field display size & max characters
 		$size       = (int) $field->parameters->get( 'size', 30 ) ;
