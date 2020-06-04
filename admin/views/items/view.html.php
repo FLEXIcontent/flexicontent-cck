@@ -1260,6 +1260,21 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 			);
 		}
 
+		if ($perms->CanConfig)
+		{
+			$popup_load_url = JUri::base(true) . '/index.php?option=com_flexicontent&amp;view=items&amp;layout=indexer&amp;tmpl=component&amp;indexer=resave';
+			$btn_name = 'recalculate_alias';
+			$full_js="if (!confirm('" . str_replace('<br>', '\n', flexicontent_html::encodeHTML(JText::_('Recalculate item aliases'), 2)) . "')) return false; var url = jQuery(this).data('taskurl'); fc_showDialog(url, 'fc_modal_popup_container', 0, 550, 350, function(){document.body.innerHTML='<span class=\"fc_loading_msg\">"
+						.$loading_msg."<\/span>'; window.location.reload(false)}, {'title': '".flexicontent_html::encodeHTML(JText::_('Recalculate item aliases'), 2)."'}); return false;";
+			$btn_arr[] = flexicontent_html::addToolBarButton(
+				'Recalculate item aliases', $btn_name, $full_js,
+				$msg_alert = JText::_('FLEXI_NO_ITEMS_SELECTED'), $msg_confirm = '',
+				$btn_task='', $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false,
+				$this->btn_sm_class . ' btn-fcaction ' . (FLEXI_J40GE ? $this->btn_iv_class : '') . ' ' . $this->tooltip_class, 'icon-loop',
+				'data-placement="right" data-taskurl="' . $popup_load_url .'" data-title="' . flexicontent_html::encodeHTML(JText::_('Clear the aliases of items and recalculates them according to current Joomla settings'), 2) . '"', $auto_add = 0, $tag_type='button'
+			);
+		}
+
 		if (count($btn_arr))
 		{
 			$drop_btn = '

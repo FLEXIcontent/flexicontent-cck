@@ -486,30 +486,49 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		$db      = JFactory::getDbo();
 		$app     = JFactory::getApplication();
 
-		// Check indexer type
-		if ($indexer !== 'tag_assignments')
+		// Get records model to call needed methods
+		$records_model = $this->getModel('items');
+
+		/**
+		 * Check indexer type
+		 */
+
+		if ($indexer === 'tag_assignments')
+		{
+			$log_filename = 'tag_assignments_' . \JFactory::getUser()->id . '.php';
+			$log_category = 'com_flexicontent.items.tag_assignments_indexer';
+
+			// Get ids of records to process
+			$records_total = 0;
+			$record_ids = $records_model->getItemsWithTags(
+				$records_total, 0, self::$record_limit
+			);
+		}
+
+		elseif ($indexer === 'resave')
+		{
+			$log_filename = 'resave_' . \JFactory::getUser()->id . '.php';
+			$log_category = 'com_flexicontent.items.resave_indexer';
+
+			// Get ids of records to process
+			$records_total = 0;
+			$record_ids = $records_model->getAllItems(
+				$records_total, 0, self::$record_limit
+			);
+		}
+		else
 		{
 			jexit('fail | indexer: ' . $indexer . ' not supported');
 		}
 
-		// Clear previous log file
-		$log_filename = 'tag_assignments_checker_' . \JFactory::getUser()->id . '.php';
+		// Get full logfile path
 		$log_filename_full = JPATH::clean(\JFactory::getConfig()->get('log_path') . DS . $log_filename);
 
+		// Clear previous log file
 		if (file_exists($log_filename_full))
 		{
 			@ unlink($log_filename_full);
 		}
-
-
-		// Get records model to call needed methods
-		$records_model = $this->getModel('items');
-
-		// Get ids of records to process
-		$records_total = 0;
-		$record_ids = $records_model->getItemsWithTags(
-			$records_total, 0, self::$record_limit
-		);
 
 		// Set record ids into session to avoid recalculation ...
 		$_sz_encoded = base64_encode($has_zlib ? zlib_encode(serialize($record_ids), -15) : serialize($record_ids));
@@ -529,6 +548,8 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		$session->set($indexer . '_records_total', $records_total, 'flexicontent');
 		$session->set($indexer . '_records_start', 0, 'flexicontent');
 		$session->set($indexer . '_log_filename', $log_filename, 'flexicontent');
+		$session->set($indexer . '_log_category', $log_filename, 'flexicontent');
+		
 		jexit();
 	}
 
@@ -567,6 +588,8 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		$records_cnt      = $this->input->getInt('records_cnt', 0);        // Counter of items indexed so far, this is given via HTTP request
 
 		$log_filename = $session->get($indexer . '_log_filename', null, 'flexicontent');
+		$log_category = $session->get($indexer . '_log_category', null, 'flexicontent');
+
 		jimport('joomla.log.log');
 		JLog::addLogger(
 			array(
@@ -574,7 +597,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 				'text_entry_format' => '{DATETIME} {PRIORITY} {MESSAGE}'  // Sets the format of each line
 			),
 			JLog::ALL,  // Sets messages of all log levels to be sent to the file
-			array('com_flexicontent.items.tags_assignments_indexer')  // category of logged messages
+			array($log_category)  // category of logged messages
 		);
 
 		// Get record ids to process, but use session to avoid recalculation
@@ -661,16 +684,41 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 					$query_count += 2;
 				}
 			}
+			elseif ($indexer === 'resave')
+			{
+				foreach ($query_itemids as $itemid)
+				{
+					$item = $record_model->getTable();
+
+					// Load table record
+					$item->load($itemid);
+
+					// Clear alias
+					$item->alias = '';
+
+					if (!$item->check())
+					{
+						$errors[] = $item->getError();
+						continue;
+					}
+
+					if (!$item->store())
+					{
+						$errors[] = $item->getError();
+						continue;
+					}
+				}
+			}
 
 			// Increment error count in session, and log errors into the log file
 			if (count($errors))
 			{
-				$error_count = $session->get('tags.assignments_indexer.error_count', 0, 'flexicontent');
-				$session->set('tags.assignments_indexer.error_count', $error_count + count($errors), 'flexicontent');
+				$error_count = $session->get('items.indexer.error_count', 0, 'flexicontent');
+				$session->set('items.indexer.error_count', $error_count + count($errors), 'flexicontent');
 
 				foreach ($errors as $error_message)
 				{
-					JLog::add($error_message, JLog::WARNING, 'com_flexicontent.tags.assignments_indexer');
+					JLog::add($error_message, JLog::WARNING, $log_category);
 				}
 			}
 
