@@ -360,9 +360,14 @@ trait flexicontent_basetable_trait
 				$query->where($this->_db->quoteName('catid') . ' = ' . (int) $this->catid);
 			}
 
-			if (!empty($this->language) && $this->_record_name !== 'tag')  // Do not use language FOR TAGS yet ...
+			if (!empty($this->language) && $this->language !== '*' && $this->_record_name !== 'tag')  // Do not use language FOR TAGS yet ...
 			{
-				$query->where($this->_db->quoteName('language') . ' = ' . $this->_db->Quote($this->language));
+				$query->where(
+					'(' .
+					$this->_db->quoteName('language') . ' = ' . $this->_db->Quote($this->language) . ' OR ' .
+					$this->_db->quoteName('language') . ' = ' . $this->_db->Quote('*') .
+					')'
+				);
 			}
 			
 			$duplicate_alias = (boolean) $this->_db->setQuery($query)->loadResult();
