@@ -496,7 +496,7 @@ class FlexicontentViewCategory extends JViewLegacy
 		}
 		else
 		{
-			$tmpl = '.category.default';
+			$tmpl = '.category.grid';
 		}
 
 		// @TODO (possible improvement) trigger the plugin selectively, and delete the plugins tags if not active
