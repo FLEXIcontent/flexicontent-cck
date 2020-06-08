@@ -2532,7 +2532,7 @@ class FlexicontentController extends JControllerLegacy
 			$valid_files[$file_id] = $file;
 
 			$file->hits++;
-			$per_downloads = $fields_conf[$field_id]->get('notifications_hits_step', 20);
+			$per_downloads = $fields_conf[$field_id]->get('notifications_step', 20);
 
 			// Create current date string according to configuration
 			$current_date = flexicontent_html::getDateFieldDisplay($fields_conf[$field_id], $_date_ = '', 'stamp_');
@@ -2589,12 +2589,15 @@ class FlexicontentController extends JControllerLegacy
 				$send_all_to_email = $fields_conf[$field_id]->get('send_all_to_email');
 				if ($send_all_to_email)
 				{
-					$emails = preg_split("/[\s]*;[\s]*/", $send_all_to_email);
-					foreach($emails as $email) $email_recipients[$email][] = $file;
+					$emails = preg_split("/[\s]*[;,][\s]*/", $send_all_to_email);
+					foreach($emails as $email)
+					{
+						$email_recipients[trim($email)][] = $file;
+					}
 				}
 
 				// Send to item owner
-				$send_to_current_item_owner = $fields_conf[$field_id]->get('send_to_current_item_owner');
+				$send_to_current_item_owner = (int) $fields_conf[$field_id]->get('send_to_current_item_owner');
 				if ($send_to_current_item_owner)
 				{
 					$email_recipients[$file->item_owner_email][] = $file;
@@ -2626,7 +2629,7 @@ class FlexicontentController extends JControllerLegacy
 		}
 		//echo "<pre>". print_r($valid_files, true) ."</pre>";
 		//echo "<pre>". print_r($email_recipients, true) ."</pre>";
-		//sjexit();
+		//jexit();
 
 
 		if (!empty($email_recipients))
