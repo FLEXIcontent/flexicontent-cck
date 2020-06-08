@@ -280,11 +280,7 @@ class FlexicontentViewItem extends JViewLegacy
 
 		$tmplvar = $themes->items->{$ilayout}->tmplvar;
 
-		if (!$ilayout)
-		{
-			$tmpl = '.items.default';
-		}
-		else
+		if ($ilayout)
 		{
 			// Add the templates css files if availables
 			if (isset($themes->items->{$ilayout}->css))
@@ -306,6 +302,10 @@ class FlexicontentViewItem extends JViewLegacy
 
 			// Set the template var
 			$tmpl = $themes->items->{$ilayout}->tmplvar;
+		}
+		else
+		{
+			$tmpl = '.items.grid';
 		}
 
 		// Just put item's text (description field) inside property 'text' in case the events modify the given text,

@@ -2203,54 +2203,67 @@ class FlexicontentModelCategory extends JModelLegacy {
 	 */
 	function decideLayout(&$params)
 	{
-		// *********************************************************************************
-		// Get category layout from configuration if not already set (e.g. via HTTP Request)
-		// *********************************************************************************
+		$fallback = 'grid';
+		$app      = JFactory::getApplication();
 
-		$app = JFactory::getApplication();
+		// Decide to use MOBILE or DESKTOP category template layout
+		$useMobile = (int) $params->get('use_mobile_layouts', 0 );
 
-		// Decide to use mobile or normal category template layout
-		$useMobile = $params->get('use_mobile_layouts', 0 );
 		if ($useMobile)
 		{
 			$force_desktop_layout = $params->get('force_desktop_layout', 0 );
-			$mobileDetector = flexicontent_html::getMobileDetector();
-			$isMobile = $mobileDetector->isMobile();
-			$isTablet = $mobileDetector->isTablet();
+			$mobileDetector       = flexicontent_html::getMobileDetector();
+
+			$isMobile  = $mobileDetector->isMobile();
+			$isTablet  = $mobileDetector->isTablet();
 			$useMobile = $force_desktop_layout  ?  $isMobile && !$isTablet  :  $isMobile;
 		}
 
-		// Get category layout (... if not already set), from the configuration parameter (that was decided above)
-		$desktop_clayout = $params->get('clayout', 'blog');
-		$clayout_default = !$useMobile ? $desktop_clayout : $params->get('clayout_mobile', $desktop_clayout);
-		$params->set('clayout_default', $clayout_default);
+		$_clayout = $useMobile ? 'clayout_mobile' : 'clayout';
 
-		$clayout = $this->_clayout=='__request__' ?
-			$app->input->get('clayout', $clayout_default, 'cmd') :
-			$clayout_default ;
-		if ( empty($clayout) )  $clayout = $clayout_default;
+		// A. Get category layout from HTTP request
+		$clayout = $this->_clayout === '__request__'
+			? $app->input->getCmd('clayout', false)
+			: false;
+
+		// B. Get category layout from the -- configuration parameter name -- (that was decided above)
+		if (!$clayout)
+		{
+			$clayout = $params->get($_clayout, $fallback);
+		}
 
 		// Get all templates from cache, (without loading any language file this will be done at the view)
 		$themes = flexicontent_tmpl::getTemplates();
 
 		// Verify the category layout exists
-		if ( !isset($themes->category->{$clayout}) )
+		if (!isset($themes->category->{$clayout}))
 		{
-			$cat_default_layout = 'blog';  // Layout default
-			$fixed_clayout = isset($themes->category->{$cat_default_layout}) ? $cat_default_layout : 'default';
-			JFactory::getApplication()->enqueueMessage("<small>Current category Layout (template) is '$clayout' does not exist<br/>- Please correct this in the URL or in Content Type configuration.<br/>- Using Template Layout: '$fixed_clayout'</small>", 'notice');
+			$component_default_layout = JComponentHelper::getParams('com_flexicontent')->get('clayout');
+
+			$fixed_clayout = isset($themes->category->{$component_default_layout})
+				? $component_default_layout
+				: $fallback;
+
+			//echo "<pre>"; debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS); echo "</pre>";
+			JFactory::getApplication()->enqueueMessage('
+				Current category Layout (template) is \'' . $clayout . '\' does not exist<br/>
+				- Please correct this in the URL or in Content Type configuration.<br/>
+				- Using Template Layout: \'' . $fixed_clayout . '\'
+			', 'notice');
 			$clayout = $fixed_clayout;
-			FLEXIUtilities::loadTemplateLanguageFile( $clayout );  // Manually load Template-Specific language file of back fall clayout
+
+			// Manually load Template-Specific language file of back fall clayout
+			FLEXIUtilities::loadTemplateLanguageFile($clayout);
 		}
 
 
-		// *****************************************************************************************
-		// Finally set the clayout (template name) into model / category's parameters / HTTP Request
-		// *****************************************************************************************
+		/**
+		 * Finally set the clayout (template name) into model / category's parameters / HTTP Request
+		 */
 
 		$this->setCatLayout($clayout);
 
-		// Maybe these should not be changed ... and instead the view will get correct value from state !!
+		// Set possibly modified clayout (a) into category parameters and (b) into HTTP request
 		$params->set('clayout', $clayout);
 		$app->input->set('clayout', $clayout);
 	}
