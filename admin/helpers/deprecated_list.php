@@ -14,6 +14,7 @@ $files = array(
 	JPATH_SITE . '/components/com_flexicontent/classes/flexicontent.iptc.php',
 	JPATH_SITE . '/plugins/flexicontent_fields/minigallery/css/minigallery.php',
 	JPATH_SITE . '/plugins/flexicontent_fields/image/media/tmpl/default_fc.php',
+	JPATH_SITE . '/librairies/fancybox/CHANGELOG.md',
 	JPATH_SITE . '/components/com_flexicontent/librairies/fancybox/CHANGELOG.md',
 	JPATH_ADMINISTRATOR . '/components/com_flexicontent/elements/qfcategory.php',
 	JPATH_ADMINISTRATOR . '/components/com_flexicontent/models/qfcategoryelement.php',

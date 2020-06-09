@@ -263,7 +263,8 @@ abstract class JHtmlFcbase
 		// The edit link
 		$edit_task = 'task=' . $ctrl . '.edit';
 		$edit_link = 'index.php?option=' . $option . '&amp;' . $edit_task . '&amp;view=' . $view . '&amp;'
-			. 'id=' . $row->{$keyname};
+			. 'id=' . $row->{$keyname}
+			. (isset($config['url_data']) ? $config['url_data'] : '');
 
 		if (!empty($config['attribs']))
 		{
