@@ -34,9 +34,17 @@
 			</field>
 
 			<field name="" type="separator" default="FLEXI_FIELD_NUMBER_OF_VALUES" description="" depend_class="fieldgroupoff" level="level2" />
+			<field name="required" type="radio" default="0" label="FLEXI_FIELD_REQUIRED" description="FLEXI_FIELD_REQUIRED_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
 			<field name="allow_multiple" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_FIELD_ALLOW_MULTIPLE" description="FLEXI_FIELD_ALLOW_MULTIPLE_DESC" inline_tip="FLEXI_PREFER_CHECKBOX_TO_MULVAL_RADIO" tip_class="multivalue-mode" tip_img="warning.png" depend_class="fieldgroupoff" class="btn-group btn-group-yesno">
 				<option value="0" show_list="" hide_list="multivalue-mode">FLEXI_NO</option>
 				<option value="1" show_list="multivalue-mode" hide_list="">FLEXI_YES</option>
+			</field>
+			<field name="fields_box_placing" type="radio" default="0" label="FLEXI_FIELD_VALUES_PER_ROW" description="FLEXI_FIELD_VALUES_PER_ROW_DESC" depend_class="fieldgroupoff multivalue-mode" class="btn-group group-fcinfo">
+				<option value="0">1</option>
+				<option value="1">FLEXI_MULTIPLE</option>
 			</field>
 			<field name="add_position" type="multilist" subtype="radio" default="3" label="FLEXI_FIELD_ADD_POSITION" description="FLEXI_FIELD_ADD_POSITION_DESC" depend_class="fieldgroupoff multivalue-mode" class="btn-group group-fcinfo">
 				<option value="0">FLEXI_FIELD_APPEND_BTN</option>
@@ -44,10 +52,7 @@
 				<option value="2">FLEXI_FIELD_INLINE_PREPEND_BTN</option>
 				<option value="3">FLEXI_FIELD_INLINE_BOTH_BTN</option>
 			</field>
-			<field name="required" type="radio" default="0" label="FLEXI_FIELD_REQUIRED" description="FLEXI_FIELD_REQUIRED_DESC" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
+
 			<field name="max_values" type="text" default="0" size="2" label="FLEXI_FIELD_MAX_VALUES" description="FLEXI_FIELD_MAX_VALUES_DESC" depend_class="fieldgroupoff multivalue-mode" />
 			<field name="min_values" type="hidden" default="0" size="2" label="FLEXI_FIELD_MIN_OPTIONS" description="FLEXI_FIELD_MIN_OPTIONS_DESC" />
 			<field name="exact_values" type="hidden" default="0" size="2" label="FLEXI_FIELD_EXACT_OPTIONS" description="FLEXI_FIELD_EXACT_OPTIONS_DESC" />
@@ -104,7 +109,7 @@
 				default="&lt;?php&#13;&#10;$F = &amp; $item-&gt;fields;&#13;&#10;if ( !isset($F['fieldname01']) ) return array('fieldname01 field not found');&#13;&#10;&#13;&#10;$vals = array();&#13;&#10;foreach($F['fieldname01']-&gt;postdata as $i =&gt; $v)&#13;&#10;{&#13;&#10;  $vals[$i] = 'Auto : ' . $v;&#13;&#10;}&#13;&#10;&#13;&#10;return $vals;"
 				label="FLEXI_CREATE_VIA_CUSTOM_CODE" description="FLEXI_CREATE_VIA_CUSTOM_CODE_DESC" depend_class="auto-value-code"/>
 
-			<field name="" type="separator" default="FLEXI_FORM_FIELD_CONF" description="FLEXI_FORM_FIELD_CONF_DESC" icon_class="icon-radio-checked" level="tab_open" box_type="1" />
+			<field name="" type="separator" default="FLEXI_FORM_FIELD_CONF" _description="FLEXI_FORM_FIELD_CONF_DESC" icon_class="icon-radio-checked" level="tab_open" box_type="1" />
 
 			<field name="display_label_form" type="multilist" subtype="radio" toggle_related="1" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC" class="btn-group btn-group-yesno">
 				<option value="0" show_list="custom_placeholder" hide_list="">FLEXI_NO</option>
@@ -121,15 +126,16 @@
 				<option value="3" show_list="not_using_jslib" hide_list="">FLEXI_CSS_STYLING</option>
 			</field>
 			<field name="form_vals_display" type="hidden" default="" label="FLEXI_FIELD_VALS_DISPLAY" description="FLEXI_FIELD_VALS_DISPLAY_DESC" />
-			<field name="size" type="hidden" default="" size="" label="FLEXI_FIELD_SIZE" description="FLEXI_FIELD_SIZE_DESC" />
-			<field name="sortable" type="hidden" default="" label="FLEXI_FIELD_ALLOW_SORTABLE" description="FLEXI_FIELD_ALLOW_SORTABLE_DESC" />
 
 			<field name="" type="separator" default="FLEXI_FIELD_PROMPT" description="" depend_class="custom_placeholder" level="level3" />
-			<field name="usefirstoption" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_FIELD_ADD_PROMPT" description="FLEXI_FIELD_ADD_PROMPT_DESC" class="btn-group btn-group-yesno">
+			<field name="usefirstoption" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_FIELD_ADD_PROMPT" description="FLEXI_FIELD_ADD_PROMPT_DESC" depend_class="custom_placeholder" class="btn-group btn-group-yesno">
 				<option value="0" show_list="" hide_list="use_prompt">FLEXI_NO</option>
 				<option value="1" show_list="use_prompt" hide_list="">FLEXI_YES</option>
 			</field>
-			<field name="firstoptiontext" type="text" default="FLEXI_PLEASE_SELECT" label="FLEXI_FIELD_PROMPT_TEXT" depend_class="use_prompt" description="FLEXI_FIELD_PROMPT_TEXT_DESC" />
+			<field name="firstoptiontext" type="text" default="FLEXI_PLEASE_SELECT" label="FLEXI_FIELD_PROMPT_TEXT" depend_class="custom_placeholder use_prompt" description="FLEXI_FIELD_PROMPT_TEXT_DESC" />
+
+			<field name="size" type="hidden" default="" size="" label="FLEXI_FIELD_SIZE" description="FLEXI_FIELD_SIZE_DESC" />
+			<field name="sortable" type="hidden" default="" label="FLEXI_FIELD_ALLOW_SORTABLE" description="FLEXI_FIELD_ALLOW_SORTABLE_DESC" />
 
 			<field name="" type="separator" default="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL" level="level2" />
 			<field name="pretext_form" type="text" default="" filter="JComponentHelper::filterText" label="FLEXI_FIELD_VALUE_PREFIX_TEXT" description="FLEXI_FIELD_VALUE_PREFIX_TEXT_DESC" />
@@ -171,6 +177,14 @@
 			<field name="" type="separator" default="FLEXI_FIELD_VIEWING" level="tabset_start" box_type="1" />
 			<field name="" type="separator" default="FLEXI_BASIC" icon_class="icon-vcard" level="tab_open" box_type="1" />
 
+			<field name="" type="separator" default="FLEXI_DISPLAY" level="level2" />
+			<field name="show_in_clients" type="fccheckbox" default=""
+				checkoptions="FLEXI_DESKTOP,FLEXI_TABLET,FLEXI_MOBILE" checkvals="desktop,tablet,mobile" defaultvals="desktop,tablet,mobile"
+				label="FLEXI_FIELD_SHOW_IN_CLIENTS" description="FLEXI_FIELD_SHOW_IN_CLIENTS_DESC" depend_class="use_js_lib" />
+			<field name="show_in_views" type="fccheckbox" default=""
+				checkoptions="FLEXI_ITEM,FLEXI_ITEM_LISTS,FLEXI_MODULE,FLEXI_BACKEND" checkvals="item,category,module,backend" defaultvals="item,category,module,backend"
+				label="FLEXI_FIELD_SHOW_IN_VIEWS" description="FLEXI_FIELD_SHOW_IN_VIEWS_DESC" />
+
 			<field name="" type="separator" default="FLEXI_FIELD_LABEL_AND_ACCESS" level="level2" />
 			<field name="display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
@@ -190,7 +204,6 @@
 			</field>
 
 			<field name="" type="separator" default="FLEXI_LAYOUT" description="" icon_class="icon-file-2" level="tab_open" box_type="1" />
-
 			<field name="viewlayout" type="fcfilelist" default="" label="FLEXI_FIELD_SELECT_VIEW_LAYOUT" description="FLEXI_FIELD_SELECT_VIEW_LAYOUT_DESC" directory="plugins/flexicontent_fields/radio/tmpl/" filter="value*" exclude="" stripext="1" stripprefix="value_" hide_none="1" hide_default="1" />
 
 			<field name="" type="separator" default="FLEXI_FIELD_VALUE_DISPLAY" level="level2" />
