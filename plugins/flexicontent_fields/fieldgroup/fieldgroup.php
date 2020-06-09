@@ -1,11 +1,11 @@
 <?php
 /**
  * @package         FLEXIcontent
- * @version         3.2
+ * @version         3.4
  *
  * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
  * @link            https://flexicontent.org
- * @copyright       Copyright © 2017, FLEXIcontent team, All Rights Reserved
+ * @copyright       Copyright © 2020, FLEXIcontent team, All Rights Reserved
  * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
@@ -21,7 +21,7 @@ class plgFlexicontent_fieldsFieldgroup extends FCField
 	// *** CONSTRUCTOR
 	// ***
 
-	function __construct( &$subject, $params )
+	public function __construct( &$subject, $params )
 	{
 		parent::__construct( $subject, $params );
 	}
@@ -33,7 +33,7 @@ class plgFlexicontent_fieldsFieldgroup extends FCField
 	// ***
 
 	// Method to create field's HTML display for item form
-	function onDisplayField(&$field, &$item)
+	public function onDisplayField(&$field, &$item)
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 
@@ -450,20 +450,22 @@ class plgFlexicontent_fieldsFieldgroup extends FCField
 
 
 	// Method to create field's HTML display for frontend views
-	function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')
+	public function onDisplayFieldValue(&$field, $item, $values = null, $prop = 'display')
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
+
+		$field->label = JText::_($field->label);
 
 		// Use custom HTML display parameter
 		$display_mode = (int) $field->parameters->get( 'display_mode', 0 ) ;
 
 		// Prefix - Suffix - Separator parameters, replacing other field values if found
 		$remove_space = $field->parameters->get( 'remove_space', 0 ) ;
-		$pretext		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'pretext', '' ), 'pretext' );
-		$posttext		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'posttext', '' ), 'posttext' );
+		$pretext		= FlexicontentFields::replaceFieldValue( $field, $item, JText::_($field->parameters->get( 'pretext', '' )), 'pretext' );
+		$posttext		= FlexicontentFields::replaceFieldValue( $field, $item, JText::_($field->parameters->get( 'posttext', '' )), 'posttext' );
 		$separatorf	= $field->parameters->get( 'separatorf', 1 ) ;
-		$opentag		= JText::_(FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'opentag', '' ), 'opentag' ));
-		$closetag		= JText::_(FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'closetag', '' ), 'closetag' ));
+		$opentag		= FlexicontentFields::replaceFieldValue( $field, $item, JText::_($field->parameters->get( 'opentag', '' )), 'opentag' );
+		$closetag		= FlexicontentFields::replaceFieldValue( $field, $item, JText::_($field->parameters->get( 'closetag', '' )), 'closetag' );
 
 		// Microdata (classify the field group values for search engines)
 		// we use itemtype and not itemprop as it is more appropriate for the a grouping field
@@ -598,7 +600,7 @@ class plgFlexicontent_fieldsFieldgroup extends FCField
 			$viewlayout = $field->parameters->get('viewlayout', '');
 			$viewlayout = $viewlayout ? 'value_'.$viewlayout : 'value_default';
 
-			// Create field's HTML, using layout file
+			// Create field's viewing HTML, using layout file
 			$field->{$prop} = array();
 			include(self::getViewPath($field->field_type, $viewlayout));
 		}
@@ -802,7 +804,7 @@ class plgFlexicontent_fieldsFieldgroup extends FCField
 	// ***
 
 	// Method to handle field's values before they are saved into the DB
-	function onBeforeSaveField( &$field, &$post, &$file, &$item )
+	public function onBeforeSaveField( &$field, &$post, &$file, &$item )
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 
@@ -812,7 +814,7 @@ class plgFlexicontent_fieldsFieldgroup extends FCField
 
 
 	// Method to take any actions/cleanups needed after field's values are saved into the DB
-	function onAfterSaveField( &$field, &$post, &$file, &$item ) {
+	public function onAfterSaveField( &$field, &$post, &$file, &$item ) {
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 
 		// field_type is not changed text field can handle this field type
@@ -821,7 +823,7 @@ class plgFlexicontent_fieldsFieldgroup extends FCField
 
 
 	// Method called just before the item is deleted to remove custom item data related to the field
-	function onBeforeDeleteField(&$field, &$item) {
+	public function onBeforeDeleteField(&$field, &$item) {
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 
 		// field_type is not changed text field can handle this field type

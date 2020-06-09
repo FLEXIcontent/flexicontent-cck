@@ -1,4 +1,14 @@
 <?php
+/**
+ * @package         FLEXIcontent
+ * @version         3.4
+ *
+ * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
+ * @link            https://flexicontent.org
+ * @copyright       Copyright © 2020, FLEXIcontent team, All Rights Reserved
+ * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
+ */
+
 defined( '_JEXEC' ) or die( 'Restricted access' );
 JLoader::register('FCField', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/fcfield/parentfield.php');
 
@@ -11,7 +21,7 @@ class plgFlexicontent_fieldsPhonenumbers extends FCField
 	// *** CONSTRUCTOR
 	// ***
 
-	function __construct( &$subject, $params )
+	public function __construct( &$subject, $params )
 	{
 		parent::__construct( $subject, $params );
 	}
@@ -23,18 +33,22 @@ class plgFlexicontent_fieldsPhonenumbers extends FCField
 	// ***
 
 	// Method to create field's HTML display for item form
-	function onDisplayField(&$field, &$item)
+	public function onDisplayField(&$field, &$item)
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 
 		$field->label = $field->parameters->get('label_form') ? JText::_($field->parameters->get('label_form')) : JText::_($field->label);
+
+		// Set field and item objects
+		$this->setField($field);
+		$this->setItem($item);
 
 		$use_ingroup = $field->parameters->get('use_ingroup', 0);
 		if (!isset($field->formhidden_grp)) $field->formhidden_grp = $field->formhidden;
 		if ($use_ingroup) $field->formhidden = 3;
 		if ($use_ingroup && empty($field->ingroup)) return;
 
-		// initialize framework objects and other variables
+		// Initialize framework objects and other variables
 		$document = JFactory::getDocument();
 		$cparams  = JComponentHelper::getParams( 'com_flexicontent' );
 
@@ -45,22 +59,26 @@ class plgFlexicontent_fieldsPhonenumbers extends FCField
 		$font_icon_class = $form_font_icons ? ' fcfont-icon' : '';
 
 
-		// ****************
-		// Number of values
-		// ****************
-		$multiple   = $use_ingroup || (int) $field->parameters->get('allow_multiple', 0);
-		$max_values = $use_ingroup ? 0 : (int) $field->parameters->get('max_values', 0);
-		$required   = (int) $field->parameters->get('required', 0);
-		$required   = $required ? ' required' : '';
+		/**
+		 * Number of values
+		 */
+
+		$multiple     = $use_ingroup || (int) $field->parameters->get('allow_multiple', 0);
+		$max_values   = $use_ingroup ? 0 : (int) $field->parameters->get('max_values', 0);
+		$required     = (int) $field->parameters->get('required', 0);
 		$add_position = (int) $field->parameters->get('add_position', 3);
+
+		// Classes for marking field required
+		$required_class = $required ? ' required' : '';
 
 		// If we are multi-value and not inside fieldgroup then add the control buttons (move, delete, add before/after)
 		$add_ctrl_btns = !$use_ingroup && $multiple;
+		$fields_box_placing = (int) $field->parameters->get('fields_box_placing', 0);
 
 
-		// **************
-		// Value handling
-		// **************
+		/**
+		 * Value handling
+		 */
 
 		// Optional form elements
 		$use_label = (int) $field->parameters->get( 'use_label', 1 ) ;
@@ -94,19 +112,61 @@ class plgFlexicontent_fieldsPhonenumbers extends FCField
 
 
 		// Initialise property with default value
-		if (!$field->value) {
+		if (!$field->value || (count($field->value) === 1 && $field->value[0] === null))
+		{
 			$field->value = array();
 			$field->value[0] = array('label'=>'', 'cc'=>'', 'phone1'=>'', 'phone2'=>'', 'phone3'=>'');
 			$field->value[0] = serialize($field->value[0]);
 		}
 
+
+
+		// CET ALLOWED countries, with special check for single country
+		$ac_country_default      = $field->parameters->get('ac_country_default', '');
+		$ac_country_allowed_list = $field->parameters->get('ac_country_allowed_list', '');
+		$ac_country_allowed_list = $ac_country_default . ',' . $ac_country_allowed_list;
+		$ac_country_allowed_list = array_unique(FLEXIUtilities::paramToArray($ac_country_allowed_list, "/[\s]*,[\s]*/", false, true));
+		$single_country          = count($ac_country_allowed_list)==1 && $ac_country_default ? $ac_country_default : false;
+
+
+		// CREATE COUNTRY OPTIONS
+		$_list = count($ac_country_allowed_list) ? array_flip($ac_country_allowed_list) : array();
+
+		$allowed_country_names = array();
+		$allowed_countries     = array('' => JText::_('FLEXI_SELECT'));
+
+		foreach($_list as $country_code => $k)
+		{
+			$country_op          = new stdClass;
+			$allowed_countries[] = $country_op;
+			$country_op->value   = $country_code;
+			$country_op->text    = JText::_('PLG_FC_PHONENUMBERS_CC_' . $country_code);
+
+			if (count($ac_country_allowed_list))
+			{
+				$allowed_country_names[] = $country_op->text;
+			}
+		}
+		//echo print_r($allowed_country_names, true);
+
+		$countries_attribs = ''
+			. ($single_country ? ' disabled="disabled" readonly="readonly"' : '')
+			. ' onchange="fcfield_addrint.toggle_USA_state(this);" ';
+
+
+
 		// CSS classes of value container
 		$value_classes  = 'fcfieldval_container valuebox fcfieldval_container_'.$field->id;
+		$value_classes .= $fields_box_placing ? ' floated' : '';
 
 		// Field name and HTML TAG id
 		$fieldname = 'custom['.$field->name.']';
 		$elementid = 'custom_'.$field->name;
 
+		// JS safe Field name
+		$field_name_js = str_replace('-', '_', $field->name);
+
+		// JS & CSS of current field
 		$js = '';
 		$css = '';
 
@@ -120,7 +180,7 @@ class plgFlexicontent_fieldsPhonenumbers extends FCField
 					handle: '.fcfield-drag-handle',
 					/*containment: 'parent',*/
 					tolerance: 'pointer'
-					".($field->parameters->get('fields_box_placing', 1) ? "
+					".($fields_box_placing ? "
 					,start: function(e) {
 						//jQuery(e.target).children().css('float', 'left');
 						//fc_setEqualHeights(jQuery(e.target), 0);
@@ -147,39 +207,48 @@ class plgFlexicontent_fieldsPhonenumbers extends FCField
 					return 'cancel';
 				}
 
+				// Find last container of fields and clone it to create a new container of fields
 				var lastField = fieldval_box ? fieldval_box : jQuery(el).prev().children().last();
 				var newField  = lastField.clone();
 				newField.find('.fc-has-value').removeClass('fc-has-value');
 
+				// New element's field name and id
+				var uniqueRowN = uniqueRowNum" . $field->id . ";
+				var element_id = '" . $elementid . "_' + uniqueRowN;
+				var fname_pfx  = '" . $fieldname . "[' + uniqueRowN + ']';
+				";
+
+			// NOTE: HTML tag id of this form element needs to match the -for- attribute of label HTML tag of this FLEXIcontent field, so that label will be marked invalid when needed
+			$js .= "
 				theInput = newField.find('input.phonelabel').first();
 				theInput.val('');
-				theInput.attr('name','custom[".$field->name."]['+uniqueRowNum".$field->id."+'][label]');
-				theInput.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_label');
-				newField.find('.phonelabel-lbl').first().attr('for','".$elementid."_'+uniqueRowNum".$field->id."+'_label');
+				theInput.attr('name', fname_pfx + '[label]');
+				theInput.attr('id', element_id + '_label');
+				newField.find('.phonelabel-lbl').first().attr('for', element_id + '_label');
 
-				theInput = newField.find('input.phonecc').first();
-				theInput.val('');
-				theInput.attr('name','custom[".$field->name."]['+uniqueRowNum".$field->id."+'][cc]');
-				theInput.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_cc');
-				newField.find('.phonecc-lbl').first().attr('for','".$elementid."_'+uniqueRowNum".$field->id."+'_cc');
+				theSelect = newField.find('select.phonecc').first();
+				theSelect.val('');
+				theSelect.attr('name', fname_pfx + '[cc]');
+				theSelect.attr('id', element_id + '_cc');
+				//newField.find('.phonecc-lbl').first().attr('for', element_id + '_cc');
 
 				theInput = newField.find('input.phonenum1').first();
 				theInput.val('');
-				theInput.attr('name','custom[".$field->name."]['+uniqueRowNum".$field->id."+'][phone1]');
-				theInput.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_phone1');
-				newField.find('.phonenum1-lbl').first().attr('for','".$elementid."_'+uniqueRowNum".$field->id."+'_phone1');
+				theInput.attr('name', fname_pfx + '[phone1]');
+				theInput.attr('id', element_id + '_phone1');
+				newField.find('.phonenum1-lbl').first().attr('for', element_id + '_phone1');
 
 				theInput = newField.find('input.phonenum2').first();
 				theInput.val('');
-				theInput.attr('name','custom[".$field->name."]['+uniqueRowNum".$field->id."+'][phone2]');
-				theInput.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_phone2');
-				newField.find('.phonenum2-lbl').first().attr('for','".$elementid."_'+uniqueRowNum".$field->id."+'_phone2');
+				theInput.attr('name', fname_pfx + '[phone2]');
+				theInput.attr('id', element_id + '_phone2');
+				newField.find('.phonenum2-lbl').first().attr('for', element_id + '_phone2');
 
 				theInput = newField.find('input.phonenum3').first();
 				theInput.val('');
-				theInput.attr('name','custom[".$field->name."]['+uniqueRowNum".$field->id."+'][phone3]');
-				theInput.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_phone3');
-				newField.find('.phonenum3-lbl').first().attr('for','".$elementid."_'+uniqueRowNum".$field->id."+'_phone3');
+				theInput.attr('name', fname_pfx + '[phone3]');
+				theInput.attr('id', element_id + '_phone3');
+				newField.find('.phonenum3-lbl').first().attr('for', element_id + '_phone3');
 				";
 
 			// Add new field to DOM
@@ -211,6 +280,7 @@ class plgFlexicontent_fieldsPhonenumbers extends FCField
 				rowCount".$field->id."++;       // incremented / decremented
 				uniqueRowNum".$field->id."++;   // incremented only
 			}
+
 
 			function deleteField".$field->id."(el, groupval_box, fieldval_box)
 			{
@@ -269,15 +339,16 @@ class plgFlexicontent_fieldsPhonenumbers extends FCField
 		if ($js)  $document->addScriptDeclaration($js);
 		if ($css) $document->addStyleDeclaration($css);
 
-		if ($show_part_labels) {
+		if ($show_part_labels)
+		{
 			$part1_lbl = $use_phone > 1 ? 'PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_PHONE_AREA_CODE' : '';
 			$part2_lbl = $use_phone == 2 ? 'PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_PHONE_LOCAL_NUM' : ($use_phone == 3 ? 'PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_PHONE_PART_2' : '' );
 			$part3_lbl = $use_phone >  2 ? 'PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_PHONE_PART_3' : '';
 		}
 
-		// *****************************************
-		// Create field's HTML display for item form
-		// *****************************************
+		/**
+		 * Create field's HTML display for item form
+		 */
 
 		$field->html = array();
 		$n = 0;
@@ -304,28 +375,28 @@ class plgFlexicontent_fieldsPhonenumbers extends FCField
 
 			$phonecc = (!$use_cc ? '' : '
 				<tr><td class="key">' .JText::_( 'PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_COUNTRY_CODE' ). '</td><td>
-					<input class="phonecc fcfield_textval inlineval" name="'.$fieldname_n.'[cc]" id="'.$elementid_n.'_cc" type="text" value="'.@$value['cc'].'" '.$cc_attribs.' />
+					' . JHtml::_('select.genericlist', $allowed_countries, $fieldname_n.'[cc]', $countries_attribs . ' class="use_select2_lib phonecc"', 'value', 'text', ($value['cc'] ? $value['cc'] : $ac_country_default), $elementid_n.'_cc') . '
 				</td></tr>');
 
 			$phone = '
 				<tr><td class="key">' .JText::_( 'PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_PHONE_NUMBER' ). '</td><td>
 					<div class="nowrap_box">
 						'.($show_part_labels && $part1_lbl ? '<label class="label phonenum1-lbl" for="'.$elementid_n.'_phone1" >'.JText::_($part1_lbl).'</label><br/>' : '').'
-						<input class="phonenum1 fcfield_textval inlineval'.$allow_letters.$required.'" name="'.$fieldname_n.'[phone1]" id="'.$elementid_n.'_phone1" type="text" value="'.htmlspecialchars($value['phone1'], ENT_COMPAT, 'UTF-8').'" '.$phone1_attribs.' />
+						<input class="phonenum1 fcfield_textval inlineval' . $allow_letters . $required_class . '" name="'.$fieldname_n.'[phone1]" id="'.$elementid_n.'_phone1" type="text" value="'.htmlspecialchars($value['phone1'], ENT_COMPAT, 'UTF-8').'" '.$phone1_attribs.' />
 						'.($use_phone > 1 ? '-' : '').'
 					</div>
 
 					'.($use_phone >= 2 ? '
 					<div class="nowrap_box">
 						'.($show_part_labels && $part2_lbl ? '<label class="label phonenum2-lbl" for="'.$elementid_n.'_phone2" >'.JText::_($part2_lbl).'</label><br/>' : '').'
-						<input class="phonenum2 fcfield_textval inlineval'.$allow_letters.$required.'" name="'.$fieldname_n.'[phone2]" id="'.$elementid_n.'_phone2" type="text" value="'.htmlspecialchars($value['phone2'], ENT_COMPAT, 'UTF-8').'" '.$phone2_attribs.' />
+						<input class="phonenum2 fcfield_textval inlineval' . $allow_letters . $required_class . '" name="'.$fieldname_n.'[phone2]" id="'.$elementid_n.'_phone2" type="text" value="'.htmlspecialchars($value['phone2'], ENT_COMPAT, 'UTF-8').'" '.$phone2_attribs.' />
 						'.($use_phone > 2 ? '-' : '').'
 					</div>' : '').'
 
 					'.($use_phone > 2 ? '
 					<div class="nowrap_box">
 						'.($show_part_labels && $part3_lbl ? '<label class="label phonenum3-lbl" for="'.$elementid_n.'_phone3" >'.JText::_($part3_lbl).'</label><br/>' : '').'
-						<input class="phonenum3 fcfield_textval inlineval'.$allow_letters.$required.'" name="'.$fieldname_n.'[phone3]" id="'.$elementid_n.'_phone3" type="text" value="'.htmlspecialchars($value['phone3'], ENT_COMPAT, 'UTF-8').'" '.$phone3_attribs.' />
+						<input class="phonenum3 fcfield_textval inlineval' . $allow_letters . $required_class . '" name="'.$fieldname_n.'[phone3]" id="'.$elementid_n.'_phone3" type="text" value="'.htmlspecialchars($value['phone3'], ENT_COMPAT, 'UTF-8').'" '.$phone3_attribs.' />
 					</div>' : '').'
 				</td></tr>';
 
@@ -338,7 +409,7 @@ class plgFlexicontent_fieldsPhonenumbers extends FCField
 				</div>
 				').'
 				'.($use_ingroup ? '' : '<div class="fcclear"></div>').'
-				<table class="admintable"><tbody>
+				<table class="fc-form-tbl fcfullwidth fcinner fc-phonenumbers-field-tbl"><tbody>
 				'.$phonelabel.'
 				'.$phonecc.'
 				'.$phone.'
@@ -371,24 +442,66 @@ class plgFlexicontent_fieldsPhonenumbers extends FCField
 		// Handle single values
 		else
 		{
-			$field->html = '<div class="fcfieldval_container valuebox fcfieldval_container_'.$field->id.'">' . $field->html[0] .'</div>';
+			$field->html = '<div class="fcfieldval_container valuebox fcfieldval_container_'.$field->id.'">
+				' . (isset($field->html[-1]) ? $field->html[-1] : '') . $field->html[0] . '
+			</div>';
 		}
 	}
 
 
 	// Method to create field's HTML display for frontend views
-	function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')
+	public function onDisplayFieldValue(&$field, $item, $values = null, $prop = 'display')
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 
 		$field->label = JText::_($field->label);
+
+		// Set field and item objects
+		$this->setField($field);
+		$this->setItem($item);
+
+
+		/**
+		 * One time initialization
+		 */
+
+		static $initialized = null;
+		static $app, $document, $option, $format, $realview;
+
+		if ($initialized === null)
+		{
+			$initialized = 1;
+
+			$app       = JFactory::getApplication();
+			$document  = JFactory::getDocument();
+			$option    = $app->input->getCmd('option', '');
+			$format    = $app->input->getCmd('format', 'html');
+			$realview  = $app->input->getCmd('view', '');
+		}
+
+		// Current view variable
+		$view = $app->input->getCmd('flexi_callview', ($realview ?: 'item'));
+		$sfx = $view === 'item' ? '' : '_cat';
+
+		// Check if field should be rendered according to configuration
+		if (!$this->checkRenderConds($prop, $view))
+		{
+			return;
+		}
+
+		// The current view is a full item view of the item
+		$isMatchedItemView = static::$itemViewId === (int) $item->id;
 
 		// Some variables
 		$is_ingroup  = !empty($field->ingroup);
 		$use_ingroup = $field->parameters->get('use_ingroup', 0);
 		$multiple    = $use_ingroup || (int) $field->parameters->get( 'allow_multiple', 0 ) ;
 
-		// Get field values
+
+		/**
+		 * Get field values
+		 */
+
 		$values = $values ? $values : $field->value;
 		$values = !is_array($values) ? array($values) : $values;     // make sure values is an array
 		$isempty = !count($values) || !strlen($values[0]);           // detect empty value
@@ -410,11 +523,11 @@ class plgFlexicontent_fieldsPhonenumbers extends FCField
 		$separator_phone2_phone3 = $field->parameters->get( 'separator_phone2_phone3', '' ) ;
 
 		// Open/close tags (every value)
-		$opentag		= JText::_(FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'opentag', '' ), 'opentag' ));
-		$closetag		= JText::_(FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'closetag', '' ), 'closetag' ));
+		$opentag		= FlexicontentFields::replaceFieldValue( $field, $item, JText::_($field->parameters->get( 'opentag', '' )), 'opentag' );
+		$closetag		= FlexicontentFields::replaceFieldValue( $field, $item, JText::_($field->parameters->get( 'closetag', '' )), 'closetag' );
 		// Prefix/suffix (value list)
-		$field_prefix		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'field_prefix', '' ), 'field_prefix' );
-		$field_suffix		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'field_suffix', '' ), 'field_suffix' );
+		$field_prefix		= FlexicontentFields::replaceFieldValue( $field, $item, JText::_($field->parameters->get( 'field_prefix', '' )), 'field_prefix' );
+		$field_suffix		= FlexicontentFields::replaceFieldValue( $field, $item, JText::_($field->parameters->get( 'field_suffix', '' )), 'field_suffix' );
 
 
 		// initialise property
@@ -482,7 +595,7 @@ class plgFlexicontent_fieldsPhonenumbers extends FCField
 	// ***
 
 	// Method to handle field's values before they are saved into the DB
-	function onBeforeSaveField( &$field, &$post, &$file, &$item )
+	public function onBeforeSaveField( &$field, &$post, &$file, &$item )
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 
@@ -549,12 +662,16 @@ class plgFlexicontent_fieldsPhonenumbers extends FCField
 
 
 	// Method to take any actions/cleanups needed after field's values are saved into the DB
-	function onAfterSaveField( &$field, &$post, &$file, &$item ) {
+	public function onAfterSaveField( &$field, &$post, &$file, &$item )
+	{
+		if ( !in_array($field->field_type, static::$field_types) ) return;
 	}
 
 
 	// Method called just before the item is deleted to remove custom item data related to the field
-	function onBeforeDeleteField(&$field, &$item) {
+	public function onBeforeDeleteField(&$field, &$item)
+	{
+		if ( !in_array($field->field_type, static::$field_types) ) return;
 	}
 
 
@@ -564,7 +681,7 @@ class plgFlexicontent_fieldsPhonenumbers extends FCField
 	// ***
 
 	// Method to display a search filter for the advanced search view
-	/*function onAdvSearchDisplayFilter(&$filter, $value='', $formName='searchForm')
+	/*function onAdvSearchDisplayFilter(&$filter, $value = '', $formName = 'searchForm')
 	{
 		if ( !in_array($filter->field_type, static::$field_types) ) return;
 
@@ -583,7 +700,7 @@ class plgFlexicontent_fieldsPhonenumbers extends FCField
 
 
 	// ***
-	// *** SEARCH / INDEXING METHODS
+	// *** SEARCH INDEX METHODS
 	// ***
 
 	// Method to create (insert) advanced search index DB records for the field values

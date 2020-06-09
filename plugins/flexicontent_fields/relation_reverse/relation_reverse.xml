@@ -39,6 +39,15 @@
 
 			<field name="" type="separator" default="FLEXI_FIELD_EDITING" level="tabset_start" box_type="1" />
 
+			<field name="display_label_form" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC" class="btn-group btn-group-yesno">
+				<option value="1">FLEXI_FLOATED_LEFT</option>
+				<option value="2">FLEXI_CLEARED</option>
+			</field>
+			<field name="label_form" type="text" default="" label="FLEXI_LABEL" description="Enter a label to use for item form that is different than field label for viewing" depend_class=""/>
+			<field name="no_acc_msg_form" type="text" default="" label="FLEXI_FIELD_NOACCESS_MSG" description="FLEXI_FIELD_NOACCESS_MSG_DESC" depend_class=""/>
+			<field name="size" type="text" default="12" size="2" label="FLEXI_RIFLD_SELECTBOX_LINES" description="FLEXI_RIFLD_SELECTBOX_LINES_DESC" />
+
+
 			<field name="" type="separator" default="FLEXI_ITEMS_ORDER" icon_class="icon-refresh" level="tab_open" box_type="1" />
 			<field name="" type="separator" default="FLEXI_ITEMS_ORDER_DESC" level="level3" class="alert alert-info fcpadded" />
 
@@ -65,6 +74,7 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
+
 			<field name="orderbycustomfieldid_form" type="fields" exclude_field_type="toolbar,file,image" isnotcore="1" default="0" label="FLEXI_ORDER_CUSTOM_FIELD_ID" description="FLEXI_ORDER_CUSTOM_FIELD_ID_DESC" />
 			<field name="orderbycustomfielddir_form" type="list" default="ASC" label="FLEXI_ORDER_CUSTOM_FIELD_DIR" description="FLEXI_ORDER_CUSTOM_FIELD_DIR_DESC" >
 				<option value="ASC">FLEXI_ASC</option>
@@ -283,7 +293,7 @@
 				<option value="2" show_list="viewing-total-mode" hide_list="">FLEXI_YES_HIDE_ZERO</option>
 			</field>
 			<field name="total_in_view" type="fccheckbox" default=""
-				checkoptions="FLEXI_ITEMS,FLEXI_CATEGORY,FLEXI_MODULE,FLEXI_BACKEND" checkvals="item,category,module,backend" defaultvals="backend"
+				checkoptions="FLEXI_ITEM,FLEXI_ITEM_LISTS,FLEXI_MODULE,FLEXI_BACKEND" checkvals="item,category,module,backend" defaultvals="backend"
 				label="FLEXI_FIELD_ENABLE_IN_VIEWS" description="FLEXI_FIELD_ENABLE_IN_VIEWS_DESC" depend_class="viewing-total-mode" />
 			<field name="total_append_text" type="text" label="FLEXI_RIFLD_TOTAL_APPEND_TEXT" description="FLEXI_RIFLD_TOTAL_APPEND_TEXT_DESC" depend_class="viewing-total-mode" />
 

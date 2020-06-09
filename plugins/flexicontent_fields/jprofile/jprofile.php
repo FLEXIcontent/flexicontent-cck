@@ -1,11 +1,11 @@
 <?php
 /**
  * @package         FLEXIcontent
- * @version         3.2
+ * @version         3.4
  *
  * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
  * @link            https://flexicontent.org
- * @copyright       Copyright © 2017, FLEXIcontent team, All Rights Reserved
+ * @copyright       Copyright © 2020, FLEXIcontent team, All Rights Reserved
  * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
@@ -23,7 +23,7 @@ class plgFlexicontent_fieldsJProfile extends FCField
 	// *** CONSTRUCTOR
 	// ***
 
-	function __construct( &$subject, $params )
+	public function __construct( &$subject, $params )
 	{
 		parent::__construct( $subject, $params );
 	}
@@ -35,9 +35,11 @@ class plgFlexicontent_fieldsJProfile extends FCField
 	// ***
 
 	// Method to create field's HTML display for item form
-	function onDisplayField(&$field, &$item)
+	public function onDisplayField(&$field, &$item)
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
+
+		$field->label = $field->parameters->get('label_form') ? JText::_($field->parameters->get('label_form')) : JText::_($field->label);
 
 		$displayed_user = (int) $field->parameters->get('displayed_user', 1);
 
@@ -47,7 +49,6 @@ class plgFlexicontent_fieldsJProfile extends FCField
 			return;
 		}
 
-		$field->label = JText::_($field->label);
 		$use_ingroup = $field->parameters->get('use_ingroup', 0);
 		if (!isset($field->formhidden_grp)) $field->formhidden_grp = $field->formhidden;
 		if ($use_ingroup) $field->formhidden = 3;
@@ -167,7 +168,7 @@ class plgFlexicontent_fieldsJProfile extends FCField
 				newField.find('.fc-has-value').removeClass('fc-has-value');
 
 				// New element's field name and id
-				var element_id = '".$elementid . "_' + uniqueRowNum".$field->id.";
+				var element_id = '" . $elementid . "_' + uniqueRowNum" . $field->id . ";
 				";
 
 			// NOTE: HTML tag id of this form element needs to match the -for- attribute of label HTML tag of this FLEXIcontent field, so that label will be marked invalid when needed
@@ -384,13 +385,15 @@ class plgFlexicontent_fieldsJProfile extends FCField
 		// Handle single values
 		else
 		{
-			$field->html = '<div class="fcfieldval_container valuebox fcfieldval_container_'.$field->id.'">' . $field->html[0] .'</div>';
+			$field->html = '<div class="fcfieldval_container valuebox fcfieldval_container_'.$field->id.'">
+				' . (isset($field->html[-1]) ? $field->html[-1] : '') . $field->html[0] . '
+			</div>';
 		}
 	}
 
 
 	// Method to create field's HTML display for frontend views
-	function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')
+	public function onDisplayFieldValue(&$field, $item, $values = null, $prop = 'display')
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 
@@ -442,11 +445,11 @@ class plgFlexicontent_fieldsJProfile extends FCField
 
 		// Prefix - Suffix - Separator parameters, replacing other field values if found
 		$remove_space = $field->parameters->get( 'remove_space', 0 ) ;
-		$pretext		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'pretext', '' ), 'pretext' );
-		$posttext		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'posttext', '' ), 'posttext' );
+		$pretext		= FlexicontentFields::replaceFieldValue( $field, $item, JText::_($field->parameters->get( 'pretext', '' )), 'pretext' );
+		$posttext		= FlexicontentFields::replaceFieldValue( $field, $item, JText::_($field->parameters->get( 'posttext', '' )), 'posttext' );
 		$separatorf	= $field->parameters->get( 'separatorf', 1 ) ;
-		$opentag		= JText::_(FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'opentag', '' ), 'opentag' ));
-		$closetag		= JText::_(FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'closetag', '' ), 'closetag' ));
+		$opentag		= FlexicontentFields::replaceFieldValue( $field, $item, JText::_($field->parameters->get( 'opentag', '' )), 'opentag' );
+		$closetag		= FlexicontentFields::replaceFieldValue( $field, $item, JText::_($field->parameters->get( 'closetag', '' )), 'closetag' );
 
 		// Microdata (classify the field values for search engines)
 		$itemprop    = $field->parameters->get('microdata_itemprop');
@@ -496,7 +499,7 @@ class plgFlexicontent_fieldsJProfile extends FCField
 		$viewlayout = $field->parameters->get('viewlayout', '');
 		$viewlayout = $viewlayout ? 'value_'.$viewlayout : 'value_default';
 
-		// Create field's HTML, using layout file
+		// Create field's viewing HTML, using layout file
 		$field->{$prop} = array();
 		include(self::getViewPath($field->field_type, $viewlayout));
 
@@ -505,13 +508,13 @@ class plgFlexicontent_fieldsJProfile extends FCField
 		{
 			// Apply values separator
 			$field->{$prop} = implode($separatorf, $field->{$prop});
-			if ( $field->{$prop}!=='' )
+			if ($field->{$prop} !== '')
 			{
 				// Apply field 's opening / closing texts
 				$field->{$prop} = $opentag . $field->{$prop} . $closetag;
 
 				// Add microdata once for all values, if field -- is NOT -- in a field group
-				if ( $itemprop )
+				if ($itemprop)
 				{
 					$field->{$prop} = '<div style="display:inline" itemprop="'.$itemprop.'" >' .$field->{$prop}. '</div>';
 				}
@@ -550,13 +553,13 @@ class plgFlexicontent_fieldsJProfile extends FCField
 	// ***
 
 	// Method to display a search filter for the advanced search view
-	/*function onAdvSearchDisplayFilter(&$filter, $value='', $formName='searchForm')
+	/*function onAdvSearchDisplayFilter(&$filter, $value = '', $formName = 'searchForm')
 	{
 		if ( !in_array($filter->field_type, static::$field_types) ) return;
 	}*/
 
 
- 	// Method to get the active filter result (an array of item ids matching field filter, or subquery returning item ids)
+	// Method to get the active filter result (an array of item ids matching field filter, or subquery returning item ids)
 	// This is for search view
 	/*function getFilteredSearch(&$filter, $value, $return_sql=true)
 	{
@@ -566,7 +569,7 @@ class plgFlexicontent_fieldsJProfile extends FCField
 
 
 	// ***
-	// *** SEARCH / INDEXING METHODS
+	// *** SEARCH INDEX METHODS
 	// ***
 
 	// Method to create (insert) advanced search index DB records for the field values

@@ -551,6 +551,13 @@ tabberObj.prototype.tabShow = function(tabberIndex)
 		google.maps.event.trigger(elArr[n].dataset.google_maps_ref, 'resize');
 	}
 
+	// Force redraw of any openstreet maps inside TAB
+	var osArr = document.querySelectorAll('#' + div.id + ' .has_fc_openstreet_map');
+	for (var n = 0, len = osArr.length; n < len; n++)
+	{
+		osArr[n].os_maps_ref.invalidateSize();
+	}
+
 	return this;
 };
 

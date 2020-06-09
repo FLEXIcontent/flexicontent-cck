@@ -1,11 +1,11 @@
 <?php
 /**
  * @package         FLEXIcontent
- * @version         3.2
+ * @version         3.4
  *
  * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
  * @link            https://flexicontent.org
- * @copyright       Copyright © 2017, FLEXIcontent team, All Rights Reserved
+ * @copyright       Copyright © 2020, FLEXIcontent team, All Rights Reserved
  * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
@@ -25,7 +25,7 @@ class plgFlexicontent_fieldsCoreprops extends FCField
 	// *** CONSTRUCTOR
 	// ***
 
-	function __construct( &$subject, $params )
+	public function __construct( &$subject, $params )
 	{
 		parent::__construct( $subject, $params );
 	}
@@ -37,70 +37,75 @@ class plgFlexicontent_fieldsCoreprops extends FCField
 	// ***
 
 	// Method to create field's HTML display for item form
-	function onDisplayField(&$field, &$item)
+	public function onDisplayField(&$field, &$item)
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 
-		$props_type = $field->parameters->get( 'props_type' ) ;
+		$props_type = $field->parameters->get('props_type');
 
 		$field->html = '';
 	}
 
 
 	// Method to create field's HTML display for frontend views
-	public function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')
+	public function onDisplayFieldValue(&$field, $item, $values = null, $prop = 'display')
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 
+		$field->label = JText::_($field->label);
+
+		// Set field and item objects
+		$this->setField($field);
+		$this->setItem($item);
+
+
+		/**
+		 * One time initialization
+		 */
+
+		static $initialized = null;
+		static $app, $document, $option, $format, $realview;
+
+		if ($initialized === null)
+		{
+			$initialized = 1;
+
+			$app       = JFactory::getApplication();
+			$document  = JFactory::getDocument();
+			$option    = $app->input->getCmd('option', '');
+			$format    = $app->input->getCmd('format', 'html');
+			$realview  = $app->input->getCmd('view', '');
+		}
+
+		// Current view variable
+		$view = $app->input->getCmd('flexi_callview', ($realview ?: 'item'));
+		$sfx = $view === 'item' ? '' : '_cat';
+
+		// Check if field should be rendered according to configuration
+		if (!$this->checkRenderConds($prop, $view))
+		{
+			return;
+		}
+
+		// The current view is a full item view of the item
+		$isMatchedItemView = static::$itemViewId === (int) $item->id;
+
+
+		// Static variables, calculate once
 		static $all_langs = null;
 		static $cat_links = array();
 		static $acclvl_names = null;
 
-		$remove_space = $field->parameters->get( 'remove_space', 0 ) ;
-		$pretext		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'pretext', '' ), 'pretext' );
-		$posttext		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'posttext', '' ), 'posttext' );
-		$separatorf	= $field->parameters->get( 'separatorf', 1 ) ;
-		$opentag		= JText::_(FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'opentag', '' ), 'opentag' ));
-		$closetag		= JText::_(FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'closetag', '' ), 'closetag' ));
 
-		// Microdata (classify the field values for search engines)
-		$itemprop    = $field->parameters->get('microdata_itemprop');
+		/**
+		 * Get common parameters like: itemprop, value's prefix (pretext), suffix (posttext), separator, value list open/close text (opentag, closetag)
+		 * This will replace other field values and item properties, if such are found inside the parameter texts
+		 */
+		$common_params_array = $this->getCommonParams();
+		extract($common_params_array);
 
-		if($pretext)  { $pretext  = $remove_space ? $pretext : $pretext . ' '; }
-		if($posttext) { $posttext = $remove_space ? $posttext : ' ' . $posttext; }
 
-		switch($separatorf)
-		{
-			case 0:
-			$separatorf = '&nbsp;';
-			break;
-
-			case 1:
-			$separatorf = '<br class="fcclear" />';
-			break;
-
-			case 2:
-			$separatorf = '&nbsp;|&nbsp;';
-			break;
-
-			case 3:
-			$separatorf = ',&nbsp;';
-			break;
-
-			case 4:
-			$separatorf = $closetag . $opentag;
-			break;
-
-			case 5:
-			$separatorf = '';
-			break;
-
-			default:
-			$separatorf = '&nbsp;';
-			break;
-		}
-
-		// Cleaner output for CSV export
+		// CSV export: Create a simpler output
 		if ($prop === 'csv_export')
 		{
 			$separatorf = ', ';
@@ -157,8 +162,9 @@ class plgFlexicontent_fieldsCoreprops extends FCField
 				break;
 		}
 
-		if (strlen($field->{$prop})) {
-			$field->{$prop} = $opentag.$pretext. $field->{$prop} .$posttext.$closetag;
+		if (strlen($field->{$prop}))
+		{
+			$field->{$prop} = $opentag . $pretext . $field->{$prop} . $posttext . $closetag;
 		}
 	}
 
@@ -169,7 +175,7 @@ class plgFlexicontent_fieldsCoreprops extends FCField
 	// ***
 
 	// Method to display a search filter for the advanced search view
-	function onAdvSearchDisplayFilter(&$filter, $value='', $formName='searchForm')
+	public function onAdvSearchDisplayFilter(&$filter, $value = '', $formName = 'searchForm')
 	{
 		if ( !in_array($filter->field_type, static::$field_types) ) return;
 
@@ -189,10 +195,8 @@ class plgFlexicontent_fieldsCoreprops extends FCField
 	}
 
 
-
-
 	// Method to display a category filter for the category view
-	function onDisplayFilter(&$filter, $value='', $formName='adminForm', $isSearchView=0)
+	public function onDisplayFilter(&$filter, $value = '', $formName = 'adminForm', $isSearchView = 0)
 	{
 		if ( !in_array($filter->field_type, static::$field_types) ) return;
 
@@ -327,9 +331,9 @@ class plgFlexicontent_fieldsCoreprops extends FCField
 	}
 
 
- 	// Method to get the active filter result (an array of item ids matching field filter, or subquery returning item ids)
+	// Method to get the active filter result (an array of item ids matching field filter, or subquery returning item ids)
 	// This is for content lists e.g. category view, and not for search view
-	function getFiltered(&$filter, $value, $return_sql=true)
+	public function getFiltered(&$filter, $value, $return_sql = true)
 	{
 		if ( !in_array($filter->field_type, static::$field_types) ) return;
 
@@ -377,7 +381,7 @@ class plgFlexicontent_fieldsCoreprops extends FCField
 
 	// Method to get the active filter result (an array of item ids matching field filter, or subquery returning item ids)
 	// This is for search view
-	function getFilteredSearch(&$filter, $value, $return_sql=true)
+	public function getFilteredSearch(&$filter, $value, $return_sql = true)
 	{
 		if ( !in_array($filter->field_type, static::$field_types) ) return;
 
@@ -414,4 +418,3 @@ class plgFlexicontent_fieldsCoreprops extends FCField
 		return $filtered;
 	}
 }
-?>

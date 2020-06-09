@@ -1,6 +1,4 @@
 <?php
-	$n = 0;
-
 	$box_classes = empty($simple_form_layout)
 		? $input_grp_class . ' fc-xpended-row'
 		: 'fc-floated-labels-box';
@@ -11,6 +9,8 @@
 		? 'fcfield_textval'
 		: 'fcfield_textval fc-floated-lbl-input';
 	$ff_events = 'onfocus="jQuery(this).prev().addClass(\'fc-has-value\');" onblur="if (this.value===\'\') jQuery(this).prev().removeClass(\'fc-has-value\');"';
+
+	$n = 0;
 
 	foreach ($field->value as $value)
 	{
@@ -112,7 +112,7 @@
 					'onchange' => 'jQuery(this).closest(\'.fc-field-props-box\').find(\'.fcfield_message_box\').html(\'\'); if (this.selectedIndex > 0) { var mm_id=jQuery(this).parent().parent().find(\'.urlimage\').attr(\'id\'); jQuery(\'#\' + mm_id).data(\'basepath\', \'' . JUri::root() .'\'); jInsertFieldValue(this.value, mm_id); this.selectedIndex = 0; }',
 					'style' => 'width: auto; margin: 0;',
 				);
-				$imagelist = '<div style="width: 36px; overflow: hidden; display: inline-block; margin-' . (!JFactory::getLanguage()->isRtl() ? 'left' : 'right') .': -36px">'.
+				$imagelist = '<div style="width: 36px; overflow: hidden; display: flex; border: 0; border-radius: 0; margin-bottom: 1px; margin-' . (!JFactory::getLanguage()->isRtl() ? 'left' : 'right') .': -36px">'.
 					JHtml::_('select.genericlist',
 						$image_options,
 						$fieldname_n.'[imagelist]',
@@ -126,7 +126,7 @@
 			}
 
 			$image = '
-			<div class="' . $box_classes . '">
+			<div class="' . $box_classes . ' input-append">
 				<label class="media-preview ' . $lbl_classes . $has_value_class . ' fc-lbl urlimage-lbl" for="'.$elementid_n.'_image">'
 					.'<span class="icon-image" aria-hidden="true"></span>' . JText::_('FLEXI_FIELD_WEBLINK_URLIMAGE') . '</span>'
 					//.JHtml::tooltip($tooltip, $tooltip_options)
