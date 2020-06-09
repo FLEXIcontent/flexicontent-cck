@@ -186,7 +186,7 @@
 	 */
 	if ($useogp && ($ogplimit === 0 || $i < $ogplimit))
 	{
-		if ($isHtmlViewFE && $isMatchedItemView)
+		if (static::$isHtmlViewFE && $isMatchedItemView)
 		{
 			switch ($ogpthumbsize)
 			{

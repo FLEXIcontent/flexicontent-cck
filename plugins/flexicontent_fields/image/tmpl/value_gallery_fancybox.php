@@ -46,7 +46,7 @@ foreach ($values as $n => $value)
 	}
 
 	$field->{$prop}[] = $pretext.
-		'<a style="' . $style . '" ' . $attribs . ' class="fc_image_thumb fancybox" ' . $group_str . ' data-title="' . $title_attr . '" data-caption="' . $title_attr . '">
+		'<a style="' . $style . '" ' . $attribs . ' class="fc_image_thumb fb_gallery" ' . $group_str . ' data-title="' . $title_attr . '" data-caption="' . $title_attr . '">
 			' . $img_legend . '
 			' . $legend_icon . '
 		</a>'
@@ -89,47 +89,41 @@ if (!isset(static::$js_added[$field->id][__FILE__][$item->id]))
 	$display_toolbar      = $field->parameters->get( $PPFX_ . 'diplay_toolbar', 'auto' );
 	$display_thumbs       = $field->parameters->get( $PPFX_ . 'diplay_thumbs_autostart', 'false' );
 	$animation_effect     = $field->parameters->get( $PPFX_ . 'animation_effect', 'zoom' );
-	$animation_duration   = $field->parameters->get( $PPFX_ . 'animation_duration', 366 );
+	$animation_duration   = (int) $field->parameters->get( $PPFX_ . 'animation_duration', 400 );
 	$transition_effect    = $field->parameters->get( $PPFX_ . 'transition_effect', 'fade' );
-	$transition_duration  = $field->parameters->get( $PPFX_ . 'transition_duration', 366 );
+	$transition_duration  = (int) $field->parameters->get( $PPFX_ . 'transition_duration', 400 );
 	$loop                 = $field->parameters->get( $PPFX_ . 'loop_mode', 'false' );
 	$keyboard             = $field->parameters->get( $PPFX_ . 'keyboard_mode', 'true' );
 	$image_protect        = $field->parameters->get( $PPFX_ . 'protect_image', 'true' );
 	$slideshow_autostart  = $field->parameters->get( $PPFX_ . 'slideshow_autostart', 'false' );
-	$slideshow_speed      = $field->parameters->get( $PPFX_ . 'slideshow_speed', 3000 );
-	$button               = $field->parameters->get( $PPFX_ . 'diplay_button', '["zoom","share","slideShow","fullScreen","download","thumbs","close"]' ); //TODO render json format for button buttons: ["zoom","share","slideShow","fullScreen","download","thumbs","close"],
+	$slideshow_speed      = (int) $field->parameters->get( $PPFX_ . 'slideshow_speed', 3000 );
+	$buttons_shown        = $field->parameters->get( $PPFX_ . 'buttons_shown', array('zoom','share','slideShow','fullScreen','download','thumbs','close') );
 
-
-$js = "
-
-(function($) {
-$(document).ready(function()
-{
-			
-			$('." . $uid . "').fancybox({
-				loop:  $loop ,
+	$js = "
+	(function($)
+	{
+		$(document).ready(function()
+		{
+			$('#fb_gallery_" . $uid . " a.fb_gallery').fancybox({
+				loop: $loop,
 				keyboard: $keyboard,
 				infobar: $display_infobar,
-				toolbar:  '$display_toolbar',
-				button : $button,
-				protect:  $image_protect,
+				toolbar: '$display_toolbar',
+				button : " . '["' . implode('","', $buttons_shown ) . '"]' . ",
+				protect: $image_protect,
 				animationEffect: '$animation_effect',
 				animationDuration: $animation_duration,
 				transitionEffect: '$transition_effect',
 				transitionDuration: $transition_duration,
-				slideShow: {autoStart: $slideshow_autostart,speed:$slideshow_speed}
+				slideShow: {autoStart: $slideshow_autostart,speed: $slideshow_speed}
 			});
-		}
-		);
+		});
+	})(jQuery);
+	";
 
-});
-})(jQuery);
-";
-}
-
-if ($js) JFactory::getDocument()->addScriptDeclaration($js);
-
+	if ($js) JFactory::getDocument()->addScriptDeclaration($js);
 	static::$js_added[$field->id][__FILE__][$item->id] = true;
+}
 
 /**
  * Include common layout code before finalize values
@@ -144,6 +138,14 @@ if ($result !== _FC_RETURN_)
 
 	// Add value separator
 	$field->{$prop} = implode($separatorf, $field->{$prop});
+
+	$field->{$prop} = '
+		<div id="fb_gallery_' . $uid . '">
+			<ul>
+				' . $field->{$prop} . '
+			</ul>
+		</div>
+	';
 
 	// Apply open/close tags
 	$field->{$prop}  = $opentag . $field->{$prop} . $closetag;

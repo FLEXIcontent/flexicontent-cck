@@ -48,8 +48,8 @@ if ( !isset(static::$js_added[$field->id][__FILE__]) )
 			initialHeight: 250, //(number) the width of the box when it first opens while loading the item. Default: 250
 			container: document.body, //(element) the element that the box will take it coordinates from. Default: document.body
 			contentColor: '#000', //(string) the color of the content area inside the box. Default: #000
-			showNumbers: ".($isItemsManager ? 'false' : 'true').",    //(boolean) show the number of the item e.g. 2/10. Default: true
-			showControls: ".($isItemsManager ? 'false' : 'true').",   //(boolean) show the navigation controls. Default: true
+			showNumbers: ".(static::$isItemsManager ? 'false' : 'true').",    //(boolean) show the number of the item e.g. 2/10. Default: true
+			showControls: ".(static::$isItemsManager ? 'false' : 'true').",   //(boolean) show the navigation controls. Default: true
 			descClassName: 'multiBoxDesc',  //(string) the classname of the divs that contain the description for the item. Default: false
 			descMinWidth: 400,     //(number) the min width of the description text, useful when the item is small. Default: 400
 			descMaxWidth: 600,     //(number) the max width of the description text, so it can wrap to multiple lines instead of being on a long single line. Useful when the item is large. Default: 600

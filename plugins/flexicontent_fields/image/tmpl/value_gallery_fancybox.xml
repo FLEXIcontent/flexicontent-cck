@@ -14,23 +14,22 @@
 	<fields name="attribs">
 		
 		<fieldset name="layout" addfieldpath="/administrator/components/com_flexicontent/elements">
-			<field name="" type="separator" level="level3" default="" class="level1" />
 
-		<field name="" type="separator" default="FLEXI_FIELD_IMAGE_FANCYBOX_OPTIONS" level="level2" depend_class="fancybox_ops" />
+		<field name="" type="separator" default="FLEXI_DISPLAY" level="level2" />
 
 			<field name="PPFX_diplay_infobar" type="radio" default="true" label="FLEXI_FIELD_IMAGE_DISP_INFOBAR" description="FLEXI_FIELD_IMAGE_DISP_INFOBAR_DESC" class="btn-group">
 				<option value="false">FLEXI_NO</option>
 				<option value="true">FLEXI_YES</option>
 			</field>
-			<field name="PPFX_diplay_toolbar" type="radio" default="auto" label="FLEXI_FIELD_IMAGE_DISP_TOOLBARToolbar" description="FLEXI_FIELD_IMAGE_FIELD_IMAGE_DISP_TOOLBAR_DESC" class="btn-group">
+			<field name="PPFX_diplay_toolbar" type="radio" default="auto" label="FLEXI_FIELD_IMAGE_DISP_TOOLBAR" description="FLEXI_FIELD_IMAGE_FIELD_IMAGE_DISP_TOOLBAR_DESC" class="btn-group">
 				<option value="false">FLEXI_NO</option>
 				<option value="true">FLEXI_YES</option>
 				<option value="auto">Auto</option>
 			</field>
 
-			<field name="PPFX_diplay_button" type="checkboxes" default="['zoom','share','slideShow','fullScreen','download','thumbs','close']" label="FLEXI_FIELD_IMAGE_DISP_BUTTONS" description="FLEXI_FIELD_IMAGE_DISP_BUTTONS" class="btn-group">
+			<field name="PPFX_buttons_shown" type="checkboxes" default="" label="FLEXI_FIELD_IMAGE_DISP_BUTTONS" description="FLEXI_FIELD_IMAGE_DISP_BUTTONS" class="btn-group">
 				<option value="zoom">FLEXI_FIELD_IMAGE_BTN_ZOOM</option>
-				<option value="share">FLEXI_FIELD_IMAGE_FIELD_IMAGE_BTN_ZOOM</option>
+				<option value="share">FLEXI_FIELD_IMAGE_BTN_SHARE</option>
 				<option value="slideShow">FLEXI_FIELD_IMAGE_BTN_SLIDESHOW</option>
 				<option value="fullScreen">FLEXI_FIELD_IMAGE_BTN_FULLSCREEN</option>
 				<option value="download">FLEXI_FIELD_IMAGE_BTN_DOWNLOAD</option>
@@ -44,7 +43,7 @@
 			</field>
 
 
-		<field name="" type="separator" default="FLEXI_FIELD_IMAGE_TRANISITION_EFFECT" level="level2" depend_class="fancybox_ops" />
+		<field name="" type="separator" default="FLEXI_FIELD_IMAGE_TRANISITION_EFFECT" level="level2" />
 
 			<field name="PPFX_animation_effect" type="list" default="zoom" label="FLEXI_FIELD_IMAGE_OPENCLOSE_ANIM" description="FLEXI_FIELD_IMAGE_OPENCLOSE_ANIM_DESC" class="use_select2_lib">
 				<option value="false">FLEXI_NO</option>
@@ -52,7 +51,7 @@
 				<option value="fade">Fade</option>
 				<option value="zoom-in-out">Zoom-in-out</option>
 			</field>
-			<field name="PPFX_animation_duration" type="text" default="366" label="FLEXI_FIELD_IMAGE_OPENCLOSE_DURATION" description="FLEXI_FIELD_IMAGE_OPENCLOSE_DURATION_DESC" />
+			<field name="PPFX_animation_duration" type="text" default="400" label="FLEXI_FIELD_IMAGE_OPENCLOSE_DURATION" description="FLEXI_FIELD_IMAGE_OPENCLOSE_DURATION_DESC" />
 
 			<field name="PPFX_tansition_effect" type="list"  default="zoom" label="FLEXI_FIELD_IMAGE_TRANISITION_EFFECT" description="FLEXI_FIELD_IMAGE_TRANISITION_EFFECT_DESC" class="use_select2_lib">
 				<option value="false">FLEXI_NO</option>
@@ -62,7 +61,7 @@
 				<option value="zoom-in-out">Zoom-in-out</option>
 				<option value="rotate">Rotate</option>
 			</field>
-			<field name="PPFX_transition_duration" type="text" default="366" label="FLEXI_FIELD_IMAGE_TRANSITION_DURATION" description="FLEXI_FIELD_IMAGE_TRANSITION_DURATION_DESC" />
+			<field name="PPFX_transition_duration" type="text" default="400" label="FLEXI_FIELD_IMAGE_TRANSITION_DURATION" description="FLEXI_FIELD_IMAGE_TRANSITION_DURATION_DESC" />
 		
 		<field name="" type="separator" default="FLEXI_FIELD_IMAGE_BEHAVIORS" level="level2" />
 

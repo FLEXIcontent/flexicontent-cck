@@ -29,21 +29,21 @@
 			</field-->
 
 			<field name="" type="separator" default="FLEXI_FIELD_IMAGE_IMG" level="level3" depend_class="" />
-			<field name="PPFX_slideshow_thumb_size" type="radio" default="large" label="FLEXI_PRE_CREATED_IMAGE" description="FLEXI_FIELD_IMAGE_PRE_CREATED_IMAGE_DESC"  depend_class="" class="btn-group group-fcinfo">
+			<field name="PPFX_slideshow_thumb_size" type="radio" default="large" label="FLEXI_PRE_CREATED_IMAGE" description="FLEXI_FIELD_IMAGE_SLIDESHOW_PRE_CREATED_IMAGE_DESC"  depend_class="" class="btn-group group-fcinfo">
 				<option value="medium">FLEXI_MEDIUM</option>
 				<option value="large">FLEXI_LARGE</option>
 			</field>
-			<field name="PPFX_slideshow_aspect_ratio" type="list" default="1" label="FLEXI_FIELD_IMAGE_WIDTH" description="FLEXI_FIELD_IMAGE_WIDTH_DESC"  depend_class="" class="">
+			<field name="PPFX_slideshow_aspect_ratio" type="list" default="1" label="FLEXI_WIDTH" description="FLEXI_FIELD_IMAGE_SLIDESHOW_WIDTH_DESC"  depend_class="" class="">
 				<option value="1">FLEXI_KEEP_ASPECT_RATIO</option>
 				<option value="0" disabled="disabled">FLEXI_STRETCH</option>
 			</field>
-			<field name="PPFX_slideshow_thumb_height" type="int" default="600" label="FLEXI_FIELD_IMAGE_THUMBS_HEIGHT" description="FLEXI_FIELD_IMAGE_THUMBS_HEIGHT_DESC" class="" depend_class="carousel_ops"/>
+			<field name="PPFX_slideshow_thumb_height" type="int" default="600" label="FLEXI_FIELD_IMAGE_SLIDESHOW_HEIGHT_PX" description="FLEXI_FIELD_IMAGE_SLIDESHOW_HEIGHT_PX_DESC" class="" depend_class="carousel_ops"/>
 
 			<field name="" type="separator" default="FLEXI_FIELD_IMAGE_TRANSITION" level="level3" depend_class="" />
 
-			<field name="PPFX_slideshow_speed" type="text" default="600" label="FLEXI_FIELD_IMAGE_DURATION" description="FLEXI_FIELD_IMAGE_TRANSITION_DURATION_DESC" class="" depend_class="" />
+			<field name="PPFX_slideshow_speed" type="text" default="600" label="FLEXI_FIELD_IMAGE_TRANSITION_DURATION" description="FLEXI_FIELD_IMAGE_TRANSITION_DURATION_DESC" class="" depend_class="" />
 
-			<field name="PPFX_slideshow_transition" type="groupedlist" default="scroll" label="FLEXI_FIELD_IMAGE_TRANISITION_EFFECT" description="" class="" depend_class="">
+			<field name="PPFX_slideshow_transition" type="groupedlist" default="scroll" label="FLEXI_FIELD_IMAGE_TRANISITION_EFFECT" description="FLEXI_FIELD_IMAGE_TRANISITION_EFFECT_DESC" class="" depend_class="">
 				<option value="cross-fade">Cross Fade</option>
 				<!--option value="scroll">Scroll</option>
 				<option value="fade">Fade</option>
@@ -98,21 +98,21 @@
 				<option value="2" show_list="carousel_ops" hide_list="">FLEXI_FIELD_IMAGE_ABOVE_SLIDESHOW</option>
 			</field>
 
-			<field name="PPFX_carousel_visible" type="radio" default="2" label="FLEXI_FIELD_IMAGE_INIT_CAROUSEL" description="FLEXI_FIELD_IMAGE_INIT_CAROUSEL_DESC" class="btn-group group-fcinfo"  depend_class="carousel_ops" >
-				<option value="0">FLEXI_CLOSED</option>
-				<option value="1">FLEXI_OPEN</option>
-				<option value="2">FLEXI_OPEN_TOGGLE</option>
+			<field name="PPFX_carousel_visible" type="radio" default="2" label="FLEXI_FIELD_IMAGE_INITIAL_CAROUSEL_STATE" description="FLEXI_FIELD_IMAGE_INITIAL_CAROUSEL_STATE_DESC" class="btn-group group-fcinfo"  depend_class="carousel_ops" >
+				<option value="0">FLEXI_FIELD_IMAGE_CLOSED</option>
+				<option value="1">FLEXI_FIELD_IMAGE_OPEN</option>
+				<option value="2">FLEXI_FIELD_IMAGE_OPEN_TOGGLE</option>
 			</field>
 
-			<field name="" type="separator" default="FLEXI_FIELD_IMAGE_THUMBNAILS" level="level3" depend_class="carousel_ops" />
-			<field name="PPFX_carousel_thumb_size" type="radio" default="s" label="FLEXI_FIELD_IMAGE_PRE_CREATED_IMAGE" description="FLEXI_FIELD_IMAGE_PRE_CREATED_IMAGE_DESC" class="btn-group group-fcinfo"  depend_class="carousel_ops" >
+			<field name="" type="separator" default="FLEXI_THUMBNAILS" level="level3" depend_class="carousel_ops" />
+			<field name="PPFX_carousel_thumb_size" type="radio" default="s" label="FLEXI_PRE_CREATED_IMAGE" description="FLEXI_FIELD_IMAGE_THUMBNAIL_PRE_CREATED_IMAGE_DESC" class="btn-group group-fcinfo"  depend_class="carousel_ops" >
 				<option value="s">FLEXI_SMALL</option>
 				<option value="m">FLEXI_MEDIUM</option>
 			</field>
-			<field name="PPFX_carousel_thumb_width" type="int" default="90" label="FLEXI_WIDTH_PX" description="FLEXI_FIELD_IMAGE_WIDTH_PX_DESC" class="" depend_class="carousel_ops"/>
-			<field name="PPFX_carousel_thumb_height" type="int" default="90" label="FLEXI_HEIGHT_PX" description="FLEXI_FIELD_IMAGE_HEIGHT_PX_DESC" class="" depend_class="carousel_ops"/>
-			<field name="PPFX_carousel_thumb_border" type="int" default="2" label="FLEXI_BORDER_PX" description="FLEXI_FIELD_IMAGE_BORDER_PX_DESC" class="" depend_class="carousel_ops"/>
-			<field name="PPFX_carousel_thumb_margin" type="int" default="2" label="FLEXI_MARGIN_RIGHT" description="FLEXI_FIELD_IMAGE_MARGIN_RIGHT_DESC" class="" depend_class="carousel_ops"/>
+			<field name="PPFX_carousel_thumb_width" type="int" default="90" label="FLEXI_WIDTH_PX" description="" class="" depend_class="carousel_ops"/>
+			<field name="PPFX_carousel_thumb_height" type="int" default="90" label="FLEXI_HEIGHT_PX" description="" class="" depend_class="carousel_ops"/>
+			<field name="PPFX_carousel_thumb_border" type="int" default="2" label="FLEXI_BORDER_PX" description="" class="" depend_class="carousel_ops"/>
+			<field name="PPFX_carousel_thumb_margin" type="int" default="2" label="FLEXI_MARGIN_RIGHT_PX" description="" class="" depend_class="carousel_ops"/>
 
 			<field name="" type="separator" default="FLEXI_TRANSITION" level="level3" class="carousel_ops" />
 
