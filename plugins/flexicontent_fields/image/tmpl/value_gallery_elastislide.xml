@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <form>
 
-	<name>Image field layout -- Fancybox</name>
+	<name>Image field layout -- Elasticslide</name>
 	<author>ggppdk</author>
 	<creationDate>September 2017</creationDate>
 	<copyright>Copyright (C) 2017 ggppdk</copyright>
@@ -9,41 +9,41 @@
 	<authorEmail>flexicontentck@gmail.com</authorEmail>
 	<authorUrl>www.flexicontent.org</authorUrl>
 	<version>1.0</version>
-	<description>Flexicontent fields - Image field layout - Fancybox parameters</description>
+	<description>Flexicontent fields - Image field layout - Elasticslide parameters</description>
 	
 	<fields name="attribs">
 		
 		<fieldset name="layout" addfieldpath="/administrator/components/com_flexicontent/elements">
 
-			<field name="" type="separator" default="Slideshow options - ( &lt;b&gt;Main image&lt;/b&gt; )" level="level1" />
+			<field name="" type="separator" default="FLEXI_FIELD_IMAGE_SLIDESHOW_OPTIONS" level="level1" />
 
-			<field name="PPFX_slideshow_auto_play" type="multilist" subtype="radio" default="0" toggle_related="1" label="Autoplay" description="Auto start slideshow" depend_class="" class="btn-group">
+			<field name="PPFX_slideshow_auto_play" type="multilist" subtype="radio" default="0" toggle_related="1" label="FLEXI_FIELD_IMAGE_AUTOPLAY" description="FLEXI_FIELD_IMAGE_AUTOPLAY_DESC" depend_class="" class="btn-group">
 				<option value="0" show_list="" hide_list="auto_play">FLEXI_NO</option>
 				<option value="1" show_list="auto_play" hide_list="">FLEXI_YES</option>
 			</field>
-			<field name="PPFX_slideshow_auto_delay" type="text" default="4000" label="Autoplay Delay" description="Delay for auto transitioning to next image" depend_class="auto_play" />
+			<field name="PPFX_slideshow_auto_delay" type="text" default="4000" label="FLEXI_FIELD_IMAGE_AUTOPLAY_DELAY" description="FLEXI_FIELD_IMAGE_AUTOPLAY_DELAY_DESC" depend_class="auto_play" />
 
 			<!--field name="PPFX_slideshow_popup" type="fcradio" default="1" label="Slideshow image click" description="Click on the image currently active will open image in full screen" class="group-fcset fc-cleared" depend_class="slideshow_ops">
 				<option value="0">Show next Image</option>
 				<option value="1">Full screen zoom</option>
 			</field-->
 
-			<field name="" type="separator" default="Image" level="level3" depend_class="" />
-			<field name="PPFX_slideshow_thumb_size" type="radio" default="large" label="FLEXI_PRE_CREATED_IMAGE" description="This effects image quality and loading speed. Use a thumbnail with height larger than then height of the slideshow area to avoid decreased quality"  depend_class="" class="btn-group group-fcinfo">
+			<field name="" type="separator" default="FLEXI_FIELD_IMAGE_IMG" level="level3" depend_class="" />
+			<field name="PPFX_slideshow_thumb_size" type="radio" default="large" label="FLEXI_PRE_CREATED_IMAGE" description="FLEXI_FIELD_IMAGE_SLIDESHOW_PRE_CREATED_IMAGE_DESC"  depend_class="" class="btn-group group-fcinfo">
 				<option value="medium">FLEXI_MEDIUM</option>
 				<option value="large">FLEXI_LARGE</option>
 			</field>
-			<field name="PPFX_slideshow_aspect_ratio" type="list" default="1" label="FLEXI_WIDTH" description="The slideshow container will be 100% and every image width will keep image aspect ratio"  depend_class="" class="">
+			<field name="PPFX_slideshow_aspect_ratio" type="list" default="1" label="FLEXI_WIDTH" description="FLEXI_FIELD_IMAGE_SLIDESHOW_WIDTH_DESC"  depend_class="" class="">
 				<option value="1">FLEXI_KEEP_ASPECT_RATIO</option>
 				<option value="0" disabled="disabled">FLEXI_STRETCH</option>
 			</field>
-			<field name="PPFX_slideshow_thumb_height" type="int" default="600" label="FLEXI_HEIGHT_PX" description="FLEXI_IMAGE_HEIGHT" class="" depend_class="carousel_ops"/>
+			<field name="PPFX_slideshow_thumb_height" type="int" default="600" label="FLEXI_FIELD_IMAGE_SLIDESHOW_HEIGHT_PX" description="FLEXI_FIELD_IMAGE_SLIDESHOW_HEIGHT_PX_DESC" class="" depend_class="carousel_ops"/>
 
-			<field name="" type="separator" default="FLEXI_TRANSITION" level="level3" depend_class="" />
+			<field name="" type="separator" default="FLEXI_FIELD_IMAGE_TRANSITION" level="level3" depend_class="" />
 
-			<field name="PPFX_slideshow_speed" type="text" default="600" label="FLEXI_DURATION" description="Select the duration of the change action in milli-seconds" class="" depend_class="" />
+			<field name="PPFX_slideshow_speed" type="text" default="600" label="FLEXI_FIELD_IMAGE_TRANSITION_DURATION" description="FLEXI_FIELD_IMAGE_TRANSITION_DURATION_DESC" class="" depend_class="" />
 
-			<field name="PPFX_slideshow_transition" type="groupedlist" default="scroll" label="FLEXI_EFFECT" description="The transition effect for moving between images" class="" depend_class="">
+			<field name="PPFX_slideshow_transition" type="groupedlist" default="scroll" label="FLEXI_FIELD_IMAGE_TRANISITION_EFFECT" description="FLEXI_FIELD_IMAGE_TRANISITION_EFFECT_DESC" class="" depend_class="">
 				<option value="cross-fade">Cross Fade</option>
 				<!--option value="scroll">Scroll</option>
 				<option value="fade">Fade</option>
@@ -64,7 +64,7 @@
 				</group-->
 			</field>
 
-			<field name="PPFX_slideshow_easing" type="groupedlist" default="swing" label="FLEXI_SMOOTHING" description="The method for easing the transition between images" class="">
+			<field name="PPFX_slideshow_easing" type="groupedlist" default="swing" label="FLEXI_FIELD_IMAGE_SMOOTHING" description="FLEXI_FIELD_IMAGE_SMOOTHING_DESC" class="">
 				<!--group label="Basic"-->
 					<option value="swing" show_list="" hide_list="slideshow_easing_func">Swing</option>
 					<option value="linear" show_list="" hide_list="slideshow_easing_func">Linear</option>
@@ -83,42 +83,42 @@
 				<!--/group-->
 			</field>
 
-			<field name="PPFX_slideshow_easing_inout" type="radio" default="easeOut" label="FLEXI_SMOOTHING_AT" description="Select to use a slow transition start (easeIn) or slow transition ending (easeOut) or both of them (easeInOut)" class="btn-group group-fcinfo" depend_class="slideshow_easing_func" >
+			<field name="PPFX_slideshow_easing_inout" type="radio" default="easeOut" label="FLEXI_FIELD_IMAGE_SMOOTHING_AT" description="FLEXI_FIELD_IMAGE_SMOOTHING_AT_DESC" class="btn-group group-fcinfo" depend_class="slideshow_easing_func" >
 				<option value="easeIn">FLEXI_START</option>
 				<option value="easeOut">FLEXI_END</option>
 				<option value="easeInOut">FLEXI_BOTH</option>
 			</field>
 
 
-			<field name="" type="separator" default="Carousel options - ( &lt;b&gt;Thumbnail navigation&lt;/b&gt; )" level="level1" />
+			<field name="" type="separator" default="FLEXI_FIELD_IMAGE_CAROUSEL_OPTIONS" level="level1" />
 
-			<field name="PPFX_carousel_position" type="multilist" subtype="radio" default="2" toggle_related="1" label="Add carousel" description="Enable to show a thumbnail carousel below or above the slideshow" class="btn-group" >
+			<field name="PPFX_carousel_position" type="multilist" subtype="radio" default="2" toggle_related="1" label="FLEXI_FIELD_IMAGE_ADD_CAROUSEL" description="FLEXI_FIELD_IMAGE_ADD_CAROUSEL_DESC" class="btn-group" >
 				<option value="0" show_list="" hide_list="carousel_ops">FLEXI_NO</option>
-				<option value="1" show_list="carousel_ops" hide_list="">Below slideshow</option>
-				<option value="2" show_list="carousel_ops" hide_list="">Above slideshow</option>
+				<option value="1" show_list="carousel_ops" hide_list="">FLEXI_FIELD_IMAGE_BELLOW_SLIDESHOW</option>
+				<option value="2" show_list="carousel_ops" hide_list="">FLEXI_FIELD_IMAGE_ABOVE_SLIDESHOW</option>
 			</field>
 
-			<field name="PPFX_carousel_visible" type="radio" default="2" label="Initial carousel state" description="Select what happens on page load, the carousel can start hidden (aka 'closed') with / without its toggler button" class="btn-group group-fcinfo"  depend_class="carousel_ops" >
-				<option value="0">Closed</option>
-				<option value="1">Open</option>
-				<option value="2">Open with toggler button</option>
+			<field name="PPFX_carousel_visible" type="radio" default="2" label="FLEXI_FIELD_IMAGE_INITIAL_CAROUSEL_STATE" description="FLEXI_FIELD_IMAGE_INITIAL_CAROUSEL_STATE_DESC" class="btn-group group-fcinfo"  depend_class="carousel_ops" >
+				<option value="0">FLEXI_FIELD_IMAGE_CLOSED</option>
+				<option value="1">FLEXI_FIELD_IMAGE_OPEN</option>
+				<option value="2">FLEXI_FIELD_IMAGE_OPEN_TOGGLE</option>
 			</field>
 
 			<field name="" type="separator" default="FLEXI_THUMBNAILS" level="level3" depend_class="carousel_ops" />
-			<field name="PPFX_carousel_thumb_size" type="radio" default="s" label="FLEXI_PRE_CREATED_IMAGE" description="These are pre-created thumbnails. Usually you would use small here" class="btn-group group-fcinfo"  depend_class="carousel_ops" >
+			<field name="PPFX_carousel_thumb_size" type="radio" default="s" label="FLEXI_PRE_CREATED_IMAGE" description="FLEXI_FIELD_IMAGE_THUMBNAIL_PRE_CREATED_IMAGE_DESC" class="btn-group group-fcinfo"  depend_class="carousel_ops" >
 				<option value="s">FLEXI_SMALL</option>
 				<option value="m">FLEXI_MEDIUM</option>
 			</field>
-			<field name="PPFX_carousel_thumb_width" type="int" default="90" label="FLEXI_WIDTH_PX" description="Thumbnail Width" class="" depend_class="carousel_ops"/>
-			<field name="PPFX_carousel_thumb_height" type="int" default="90" label="FLEXI_HEIGHT_PX" description="Thumbnail Height" class="" depend_class="carousel_ops"/>
-			<field name="PPFX_carousel_thumb_border" type="int" default="2" label="FLEXI_BORDER_PX" description="..." class="" depend_class="carousel_ops"/>
-			<field name="PPFX_carousel_thumb_margin" type="int" default="2" label="Margin Right (px)" description="..." class="" depend_class="carousel_ops"/>
+			<field name="PPFX_carousel_thumb_width" type="int" default="90" label="FLEXI_WIDTH_PX" description="" class="" depend_class="carousel_ops"/>
+			<field name="PPFX_carousel_thumb_height" type="int" default="90" label="FLEXI_HEIGHT_PX" description="" class="" depend_class="carousel_ops"/>
+			<field name="PPFX_carousel_thumb_border" type="int" default="2" label="FLEXI_BORDER_PX" description="" class="" depend_class="carousel_ops"/>
+			<field name="PPFX_carousel_thumb_margin" type="int" default="2" label="FLEXI_MARGIN_RIGHT_PX" description="" class="" depend_class="carousel_ops"/>
 
 			<field name="" type="separator" default="FLEXI_TRANSITION" level="level3" class="carousel_ops" />
 
-			<field name="PPFX_carousel_speed" type="int" default="600" label="FLEXI_DURATION" description="Select the duration of the movement in ms (milli-seconds)" class="" depend_class="carousel_ops"/>
+			<field name="PPFX_carousel_speed" type="int" default="600" label="FLEXI_FIELD_IMAGE_TRANSITION_DURATION" description="FLEXI_FIELD_IMAGE_TRANSITION_DURATION_DESC" class="" depend_class="carousel_ops"/>
 
-			<field name="PPFX_carousel_transition" type="groupedlist" default="scroll" label="FLEXI_EFFECT" description="The transition effect for moving between images" class="" depend_class="carousel_ops">
+			<field name="PPFX_carousel_transition" type="groupedlist" default="scroll" label="FLEXI_FIELD_IMAGE_TRANISITION_EFFECT" description="FLEXI_FIELD_IMAGE_TRANISITION_EFFECT_DESC" class="" depend_class="carousel_ops">
 				<option value="scroll">Scroll</option>
 				<!--option value="fade">Fade</option>
 				<option value="slide">Slide</option>
@@ -138,7 +138,7 @@
 				</group-->
 			</field>
 
-			<field name="PPFX_carousel_easing" type="groupedlist" default="swing" label="FLEXI_SMOOTHING" description="The method for easing the transition between images" class="" depend_class="carousel_ops">
+			<field name="PPFX_carousel_easing" type="groupedlist" default="swing" label="FLEXI_FIELD_IMAGE_SMOOTHING" description="FLEXI_FIELD_IMAGE_SMOOTHING_DESC" class="" depend_class="carousel_ops">
 				<group label="Basic">
 					<option value="swing" show_list="" hide_list="carousel_easing_func">Swing</option>
 					<option value="linear" show_list="" hide_list="carousel_easing_func">Linear</option>
@@ -157,7 +157,7 @@
 				</group>
 			</field>
 
-			<field name="PPFX_carousel_easing_inout" type="radio" default="easeOut" label="FLEXI_SMOOTHING_AT" description="Select to use a slow transition start (easeIn) or slow transition ending (easeOut) or both of them (easeInOut)" class="btn-group group-fcinfo" depend_class="carousel_ops carousel_easing_func">
+			<field name="PPFX_carousel_easing_inout" type="radio" default="easeOut" label="FLEXI_FIELD_IMAGE_SMOOTHING_AT" description="FLEXI_FIELD_IMAGE_SMOOTHING_AT_DESC" class="btn-group group-fcinfo" depend_class="carousel_ops carousel_easing_func">
 				<option value="easeIn">FLEXI_START</option>
 				<option value="easeOut">FLEXI_END</option>
 				<option value="easeInOut">FLEXI_BOTH</option>

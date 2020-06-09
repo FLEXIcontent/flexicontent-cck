@@ -14,7 +14,79 @@
 	<fields name="attribs">
 		
 		<fieldset name="layout" addfieldpath="/administrator/components/com_flexicontent/elements">
-			<field name="" type="separator" level="level3" default="This layout does not have any layout-specific parameters (yet)" class="alert alert-info fcpadded" />
+
+		<field name="" type="separator" default="FLEXI_DISPLAY" level="level2" />
+
+			<field name="PPFX_diplay_infobar" type="radio" default="true" label="FLEXI_FIELD_IMAGE_DISP_INFOBAR" description="FLEXI_FIELD_IMAGE_DISP_INFOBAR_DESC" class="btn-group">
+				<option value="false">FLEXI_NO</option>
+				<option value="true">FLEXI_YES</option>
+			</field>
+			<field name="PPFX_diplay_toolbar" type="radio" default="auto" label="FLEXI_FIELD_IMAGE_DISP_TOOLBAR" description="FLEXI_FIELD_IMAGE_FIELD_IMAGE_DISP_TOOLBAR_DESC" class="btn-group">
+				<option value="false">FLEXI_NO</option>
+				<option value="true">FLEXI_YES</option>
+				<option value="auto">Auto</option>
+			</field>
+
+			<field name="PPFX_buttons_shown" type="checkboxes" default="" label="FLEXI_FIELD_IMAGE_DISP_BUTTONS" description="FLEXI_FIELD_IMAGE_DISP_BUTTONS" class="btn-group">
+				<option value="zoom">FLEXI_FIELD_IMAGE_BTN_ZOOM</option>
+				<option value="share">FLEXI_FIELD_IMAGE_BTN_SHARE</option>
+				<option value="slideShow">FLEXI_FIELD_IMAGE_BTN_SLIDESHOW</option>
+				<option value="fullScreen">FLEXI_FIELD_IMAGE_BTN_FULLSCREEN</option>
+				<option value="download">FLEXI_FIELD_IMAGE_BTN_DOWNLOAD</option>
+				<option value="thumbs">FLEXI_FIELD_IMAGE_BTN_THUMBS</option>
+				<option value="close">FLEXI_FIELD_IMAGE_BTN_CLOSE</option>
+			</field>
+
+			<field name="PPFX_diplay_thumbs_autostart" type="radio" default="false" label="FLEXI_FIELD_IMAGE_DISP_THUMBS" description="FLEXI_FIELD_IMAGE_DISP_THUMBS_DESC" class="btn-group">
+				<option value="false">FLEXI_NO</option>
+				<option value="true">FLEXI_YES</option>
+			</field>
+
+
+		<field name="" type="separator" default="FLEXI_FIELD_IMAGE_TRANISITION_EFFECT" level="level2" />
+
+			<field name="PPFX_animation_effect" type="list" default="zoom" label="FLEXI_FIELD_IMAGE_OPENCLOSE_ANIM" description="FLEXI_FIELD_IMAGE_OPENCLOSE_ANIM_DESC" class="use_select2_lib">
+				<option value="false">FLEXI_NO</option>
+				<option value="zoom">Zoom</option>
+				<option value="fade">Fade</option>
+				<option value="zoom-in-out">Zoom-in-out</option>
+			</field>
+			<field name="PPFX_animation_duration" type="text" default="400" label="FLEXI_FIELD_IMAGE_OPENCLOSE_DURATION" description="FLEXI_FIELD_IMAGE_OPENCLOSE_DURATION_DESC" />
+
+			<field name="PPFX_tansition_effect" type="list"  default="zoom" label="FLEXI_FIELD_IMAGE_TRANISITION_EFFECT" description="FLEXI_FIELD_IMAGE_TRANISITION_EFFECT_DESC" class="use_select2_lib">
+				<option value="false">FLEXI_NO</option>
+				<option value="fade">Fade</option>
+				<option value="slide">Slide</option>
+				<option value="circular">Circular</option>
+				<option value="zoom-in-out">Zoom-in-out</option>
+				<option value="rotate">Rotate</option>
+			</field>
+			<field name="PPFX_transition_duration" type="text" default="400" label="FLEXI_FIELD_IMAGE_TRANSITION_DURATION" description="FLEXI_FIELD_IMAGE_TRANSITION_DURATION_DESC" />
+		
+		<field name="" type="separator" default="FLEXI_FIELD_IMAGE_BEHAVIORS" level="level2" />
+
+			<field name="PPFX_loop_mode" type="radio" default="false" label="FLEXI_FIELD_IMAGE_LOOP" description="FLEXI_FIELD_IMAGE_LOOP_DESC" class="btn-group">
+				<option value="false">FLEXI_NO</option>
+				<option value="true">FLEXI_YES</option>
+			</field>
+			<field name="PPFX_keyboard_mode" type="radio" default="true" label="FLEXI_FIELD_IMAGE_KEYBOARD_NAV" description="FLEXI_FIELD_IMAGE_KEYBOARD_NAV_DESC" class="btn-group">
+				<option value="false">FLEXI_NO</option>
+				<option value="true">FLEXI_YES</option>
+			</field>
+
+			<field name="PPFX_protect_image" type="radio" default="true" label="FLEXI_FIELD_IMAGE_PROTECT_IMG" description="FLEXI_FIELD_IMAGE_PROTECT_IMG_DESC" class="btn-group">
+				<option value="false">FLEXI_NO</option>
+				<option value="true">FLEXI_YES</option>
+			</field>
+
+		<field name="" type="separator" default="FLEXI_FIELD_IMAGE_SLIDESHOW_OPTIONS" level="level2" />
+
+			<field name="PPFX_slideshow_autostart" type="radio" default="false" label="FLEXI_FIELD_IMAGE_AUTOPLAY" description="_FIELD_IMAGEFLEXI_AUTOSTART_SLIDESHOW_DESC" class="btn-group">
+				<option value="false">FLEXI_NO</option>
+				<option value="true">FLEXI_YES</option>
+			</field>
+			<field name="PPFX_slideshow_speed" type="text" default="3000" label="FLEXI_FIELD_IMAGE_SLIDESHOWSPEED" description="FLEXI__FIELD_IMAGESLIDESHOWSPEED_DESC" />
+  		
 		</fieldset>
 
 	</fields>
