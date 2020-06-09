@@ -1006,6 +1006,7 @@ table.fc_uploader_header_tbl td:last-child {
 }
 #flexicontent div.fcfieldval_container.valuebox.fc-expanded .fc-field-props-box,
 #flexicontent ul.fcfield-sortables > li.fcfieldval_container.valuebox.fc-expanded .fc-field-props-box {
+	display: flex;
 	width: auto;
 }
 #flexicontent div.fcfieldval_container.valuebox.fc-expanded .fc-field-props-box textarea.fcfield_textareaval,
@@ -1046,6 +1047,7 @@ div.container_fcfield div.toggle_all_values_buttons_box {
 }
 #flexicontent .fcfieldval_container.valuebox .input-append:not(.fc-xpended):not(.fc-xpended-btns),
 #flexicontent .fcfieldval_container.valuebox .input-prepend:not(.fc-xpended):not(.fc-xpended-btns) {
+	display: flex;
 	float: left;
 	margin-bottom: 0px;
 	margin-right: 10px;
@@ -1592,6 +1594,10 @@ div.empty_image {
 	width: 50%;
 	box-sizing: border-box;
 }
+.fc-field-props-box {
+	display: flex;
+	flex-direction: column;
+}
 .fc-field-props-box .fc_preview_msg {
 	margin: 0 1.2%;
 	padding: 0.5em 1%;
@@ -1758,8 +1764,6 @@ div.fcimg_value_props {
 }
 .fcfield_field_preview_box {
 	float: left;
-	min-width: 50%;
-	max-width: 800px;
 	width: unset;
 	padding: 0;
 	margin: 0;
@@ -1771,58 +1775,30 @@ div.fcimg_value_props {
 	padding: 0;
 	margin: 0;
 }
-@media only screen and (min-width: 1400px) {
-	.fcfield_field_data_dox {
-		min-width: 580px;
-	}
-	.fcfield_field_preview_box {
-		min-width: 52%;
-		max-width: 52%;
-	}
-}
-@media only screen and (min-width: 1320px) and (max-width: 1400px) {
-	.fcfield_field_data_dox {
-		min-width: 480px;
-	}
-	.fcfield_field_preview_box {
-		min-width: 48%;
-		max-width: 48%;
-	}
-}
-@media only screen and (min-width: 1220px) and (max-width: 1320px) {
-	.fcfield_field_data_dox {
-		min-width: 480px;
-	}
-	.fcfield_field_preview_box {
-		min-width: 42%;
-		max-width: 42%;
-	}
-}
-@media only screen and (max-width: 1220px) {
-	.fcfield_field_data_dox {
-		min-width: 100%;
-	}
-	.fcfield_field_preview_box {
-		min-width: 100%;
-		max-width: 100%;
-	}
-}
 [class^="fcfield_timestamp_value"],
 [class*="fcfield_timestamp_value"] {
 	display: inline-block;
 	min-width: 240px;
 }
 .fcfield_addressint_canvas_outer {
-	width: 100%;
-	min-width: 400px;
-	max-width: 600px;
+	display: inline-block;
+	width: auto;
 }
 #flexicontent .has_fc_google_maps_map {
 	margin: 8px 0 0 0;
 }
-#flexicontent input.addrint_autocomplete {
-	width: 100%;
+#flexicontent .algolia-places {
+	display: flex !important;
 	line-height: 1em;
+	flex-direction: column;
+	flex-grow: 1;
+	flex-shrink: 1;
+	flex-basis: auto;
+}
+#flexicontent input.addrint_autocomplete {
+	flex-grow: 1;
+	line-height: 1em;
+	margin: 0 !important;
 }
 #flexicontent select.addrint_ac_type {
 	width: 160px;
@@ -1852,6 +1828,11 @@ iframe.sharedmedia {
 }
 .fc_select2_sortable.select2-container-multi .select2-choices .select2-search-choice > div {
 	white-space: nowrap !important;
+}
+.fc-field-value-properties-box {
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
 }
 .fc-field-value-properties-box.fc-field-value-disabled {
 	display: none;

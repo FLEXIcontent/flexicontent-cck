@@ -51,6 +51,7 @@
 		clear: both;
 	}
 	.fc-field-props-box {
+		display: flex;
 		width: auto;
 		.add-on.fc-lbl {
 		}
@@ -111,6 +112,7 @@ div.container_fcfield div.toggle_all_values_buttons_box {
 /* FIELD: styling for input groups inside fields code */
 #flexicontent .fcfieldval_container.valuebox .input-append:not(.fc-xpended):not(.fc-xpended-btns),
 #flexicontent .fcfieldval_container.valuebox .input-prepend:not(.fc-xpended):not(.fc-xpended-btns) {
+	display: flex;
 	float: left;
 	margin-bottom: 0px;
 	margin-right: 10px;
@@ -765,6 +767,8 @@ table.fcimg_dbfile_tbl {
 }
 
 .fc-field-props-box {
+	display: flex;
+	flex-direction: column;
 
 	/* FIELDs: (image field) filename text */
 	.fc_preview_msg {
@@ -973,14 +977,14 @@ div.fcimg_value_props {
 		margin: 0;
 	}
 	float: left;
-	min-width: 50%;
-	max-width: 800px;
+	/*min-width: 50%;
+	max-width: 800px;*/
 	width: unset;
 	padding: 0;
 	margin: 0;
 	box-sizing: border-box;
 }
-@media only screen and (min-width: 1400px) {
+/*@media only screen and (min-width: 1400px) {
 	.fcfield_field_data_dox {
 		min-width: 580px;
 	}
@@ -1015,7 +1019,7 @@ div.fcimg_value_props {
 		min-width: 100%;
 		max-width: 100%;
 	}
-}
+}*/
 
 /* SPECCIFIC FIELDs CSS */
 
@@ -1027,9 +1031,10 @@ div.fcimg_value_props {
 }
 /* FIELDs: (addressint field), limit height of preview */
 .fcfield_addressint_canvas_outer {
-	width: 100%;
-	min-width: 400px;
-	max-width: 600px;
+	display: inline-block;
+	width: auto;
+	/*min-width: 400px;
+	max-width: 600px;*/
 }
 #flexicontent .has_fc_google_maps_map {
 	/*width: 100%;
@@ -1037,9 +1042,18 @@ div.fcimg_value_props {
 	padding-bottom: 40%;*/
 	margin: 8px 0 0 0;
 }
-#flexicontent input.addrint_autocomplete {
-	width: 100%;
+#flexicontent .algolia-places {
+	display: flex !important;
 	line-height: 1em;
+	flex-direction: column;
+	flex-grow: 1;
+	flex-shrink: 1;
+	flex-basis: auto;
+}
+#flexicontent input.addrint_autocomplete {
+	flex-grow: 1;
+	line-height: 1em;
+	margin: 0 !important;
 }
 #flexicontent select.addrint_ac_type {
 	width: 160px;
@@ -1101,6 +1115,11 @@ iframe.sharedmedia {
 	padding-right: 6px !important;
 }*/
 
+.fc-field-value-properties-box {
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+}
 .fc-field-value-properties-box.fc-field-value-disabled {
 	display: none;
 }

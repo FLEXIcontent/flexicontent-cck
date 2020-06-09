@@ -37,11 +37,13 @@ body .fc-mssg-inline {
 body #flexicontent .fc-field-props-box .fcfield_preview_box,
 body #flexicontent .fc-field-props-box .fc_file_uploader,
 body #flexicontent .fc-field-props-box .fc_file_uploader.fc_inline_uploader,
-body #flexicontent .fc-field-props-box > *:not(:first-child):not(:last-child),
+body #flexicontent .fc-field-props-box .inlinefile-prv-box:not(:last-child),
+body #flexicontent .fc-field-props-box .inlinefile-data-box:not(:last-child),
 body #flexicontent .fc_uploader_n_props_box .fcfield_preview_box,
 body #flexicontent .fc_uploader_n_props_box .fc_file_uploader,
 body #flexicontent .fc_uploader_n_props_box .fc_file_uploader.fc_inline_uploader,
-body #flexicontent .fc_uploader_n_props_box > *:not(:first-child):not(:last-child) {
+body #flexicontent .fc_uploader_n_props_box .inlinefile-prv-box:not(:last-child),
+body #flexicontent .fc_uploader_n_props_box .inlinefile-data-box:not(:last-child) {
 	margin-left: 12px;
 }
 body .fc_uploader_n_props_box {

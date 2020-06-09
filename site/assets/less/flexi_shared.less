@@ -1101,16 +1101,16 @@ form div.container_fcfield > select {
 #flexicontent div fieldset.panelform .input-prepend > button {
 	margin-left: 0px;
 }
-#flexicontent div .btn-group > *:not(:last-child),
-#flexicontent div .input-append > *:not(:last-child) {
+#flexicontent div .btn-group > *:not(:first-child):not(:last-child),
+#flexicontent div .input-append > *:not(:first-child):not(:last-child) {
 	border-top-right-radius: 0px;
 	border-bottom-right-radius: 0px;
 	vertical-align: middle;
 }
-#flexicontent div .btn-group > *:not(:first-of-type),
-#flexicontent div .input-prepend > *:not(:first-child),
-#flexicontent div .btn-group > *:not(:first-child):not(label),
-#flexicontent div .input-prepend > *:not(:first-child):not(label) {
+#flexicontent div .btn-group > *:not(:first-of-type):not(:last-of-type),
+#flexicontent div .input-prepend > *:not(:first-child):not(:last-child),
+#flexicontent div .btn-group > *:not(:first-child):not(:last-child):not(label),
+#flexicontent div .input-prepend > *:not(:first-child):not(:last-child):not(label) {
 	border-top-left-radius: 0px;
 	border-bottom-left-radius: 0px;
 	vertical-align: middle;
@@ -1710,7 +1710,7 @@ ul.thumbnails.image_picker_selector li div.thumbnail p {
 	background-clip: padding-box;
 	color: #444;
 	border: 1px solid #AAAAAA;
-	border-radius: 4px;
+	/*border-radius: 4px;*/
 	display: inline-block;
 	padding: 0 6px 0px 6px;
 	margin: 0px 6px 2px 2px;

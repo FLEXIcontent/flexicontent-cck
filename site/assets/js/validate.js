@@ -328,6 +328,9 @@ var JFormValidator = function()
 			if (typeof tinyMCE !== 'undefined' && tinyMCE && $el.hasClass('mce_editable'))
 			{
 				var editor = tinyMCE.get( $el.attr('id') );
+
+				if (!!!editor) return;
+
 				if (tinyMCE.majorVersion >= 4)
 				{
 					editor.on('change', function (e)
@@ -504,8 +507,10 @@ var JFormValidator = function()
 		
 		if (id && !!!$elem.get(0).form)
 		{
-			window.console.log('No form for object: ' + $elem);
-			window.console.log('No form for DOM element: ' +$elem.get(0));
+			window.console.log('No form for object: ');
+			window.console.log($elem);
+			window.console.log('No form for DOM element: ');
+			window.console.log($elem.get(0));
 		}
 		!id ?
 			$elem.data('label', false) :
