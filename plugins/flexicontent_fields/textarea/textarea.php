@@ -1,11 +1,11 @@
 <?php
 /**
  * @package         FLEXIcontent
- * @version         3.2
+ * @version         3.4
  *
  * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
  * @link            https://flexicontent.org
- * @copyright       Copyright © 2017, FLEXIcontent team, All Rights Reserved
+ * @copyright       Copyright © 2020, FLEXIcontent team, All Rights Reserved
  * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
@@ -24,7 +24,7 @@ class plgFlexicontent_fieldsTextarea extends FCField
 	// *** CONSTRUCTOR
 	// ***
 
-	function __construct( &$subject, $params )
+	public function __construct( &$subject, $params )
 	{
 		parent::__construct( $subject, $params );
 	}
@@ -36,11 +36,15 @@ class plgFlexicontent_fieldsTextarea extends FCField
 	// ***
 
 	// Method to create field's HTML display for item form
-	function onDisplayField(&$field, &$item)
+	public function onDisplayField(&$field, &$item)
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 
 		$field->label = $field->parameters->get('label_form') ? JText::_($field->parameters->get('label_form')) : JText::_($field->label);
+
+		// Set field and item objects
+		$this->setField($field);
+		$this->setItem($item);
 
 		$use_ingroup = $field->parameters->get('use_ingroup', 0);
 		if (!isset($field->formhidden_grp)) $field->formhidden_grp = $field->formhidden;
@@ -78,38 +82,48 @@ class plgFlexicontent_fieldsTextarea extends FCField
 		$editor_plg_params = array();  // Override parameters of the editor plugin, ignored by most editors !!
 
 
-		// ***
-		// *** Number of values
-		// ***
+		/**
+		 * Number of values
+		 */
 
-		$multiple   = $use_ingroup || (int) $field->parameters->get('allow_multiple', 0);
-		$max_values = $use_ingroup ? 0 : (int) $field->parameters->get('max_values', 0);
-		$required   = (int) $field->parameters->get('required', 0);
+		$multiple     = $use_ingroup || (int) $field->parameters->get('allow_multiple', 0);
+		$max_values   = $use_ingroup ? 0 : (int) $field->parameters->get('max_values', 0);
+		$required     = (int) $field->parameters->get('required', 0);
 		$add_position = (int) $field->parameters->get('add_position', 3);
+
+		// Classes for marking field required
+		$required_class = $required ? ' required' : '';
 
 		// If we are multi-value and not inside fieldgroup then add the control buttons (move, delete, add before/after)
 		$add_ctrl_btns = !$use_ingroup && $multiple;
+		$fields_box_placing = (int) $field->parameters->get('fields_box_placing', 0);
 
 
-		// ***
-		// *** Value handling
-		// ***
+		/**
+		 * Value handling
+		 */
 
-		// Default value
-		$value_usage   = $field->parameters->get( 'default_value_use', 0 ) ;
-		$default_value = ($item->version == 0 || $value_usage > 0) ? $field->parameters->get( 'default_value', '' ) : '';
-		$default_value = strlen($default_value) ? JText::_($default_value) : '';
+		// Default value(s)
+		$default_values = $this->getDefaultValues($isform = true);
+		$default_value  = reset($default_values);
 
+
+		/**
+		 * Form field display parameters
+		 */
 		// Editing method, text editor or HTML editor
 		$use_html = (int) ($field->field_type == 'maintext' ? !$field->parameters->get( 'hide_html', 0 ) : $field->parameters->get( 'use_html', 0 ));
 
 		// *** Simple Textarea ***
-		$rows  = $field->parameters->get( 'rows', ($field->field_type == 'maintext') ? 6 : 3 ) ;
+		$rows  = $field->parameters->get( 'rows', ($field->field_type === 'maintext' ? 6 : 3) ) ;
 		$cols  = $field->parameters->get( 'cols', 80 ) ;
-		$maxlength = (int) $field->parameters->get( 'maxlength', 0 ) ;   // client/server side enforced when using textarea, when using HTML editor this will be client size only (and only if editor supports it)
+
+		// Max Length is enforced in both client & server sides when using textarea,
+		// when using HTML editor, this will be client size only (and only if editor supports it)
+		$maxlength = (int) $field->parameters->get( 'maxlength', 0 ) ;
 
 		$display_label_form = (int) $field->parameters->get( 'display_label_form', 1 ) ;
-		$placeholder= $display_label_form==-1 ? $field->label : JText::_($field->parameters->get( 'placeholder', '' )) ;
+		$placeholder        = $display_label_form==-1 ? $field->label : JText::_($field->parameters->get( 'placeholder', '' )) ;
 
 		// *** HTML Editor configuration  ***
 		$width = $field->parameters->get( 'width', '') ;
@@ -149,20 +163,29 @@ class plgFlexicontent_fieldsTextarea extends FCField
 		$skip_buttons = is_array($skip_buttons) ? $skip_buttons : explode('|',$skip_buttons);
 
 		// Clear empty value
-		if (empty($skip_buttons[0]))  unset($skip_buttons[0]);
+		if (empty($skip_buttons[0]))
+		{
+			unset($skip_buttons[0]);
+		}
 
 		// Force skipping pagebreak and readmore for CUSTOM textarea fields
-		if ($field->field_type == 'textarea') {
-			if ( !in_array('pagebreak', $skip_buttons) ) $skip_buttons[] = 'pagebreak';
-			if ( !in_array('readmore',  $skip_buttons) )  $skip_buttons[] = 'readmore';
+		if ($field->field_type === 'textarea')
+		{
+			if (!in_array('pagebreak', $skip_buttons))
+			{
+				$skip_buttons[] = 'pagebreak';
+			}
+			if (!in_array('readmore', $skip_buttons))
+			{
+				$skip_buttons[] = 'readmore';
+			}
 		}
 		$skip_buttons_arr = ($show_buttons && ($editor_name=='jce' || $editor_name=='tinymce') && count($skip_buttons)) ? $skip_buttons : (boolean) $show_buttons;   // JCE supports skipping buttons
 
 		// Initialise property with default value
-		if (!$field->value)
+		if (!$field->value || (count($field->value) === 1 && $field->value[0] === null))
 		{
-			$field->value = array();
-			$field->value[0] = $default_value;
+			$field->value = $default_values;
 		}
 
 		// CSS classes of value container
@@ -214,6 +237,7 @@ class plgFlexicontent_fieldsTextarea extends FCField
 			$use_ingroup = 0;
 		}
 
+		// JS & CSS of current field
 		$js = '';
 		$css = '';
 
@@ -227,7 +251,7 @@ class plgFlexicontent_fieldsTextarea extends FCField
 					handle: '.fcfield-drag-handle',
 					/*containment: 'parent',*/
 					tolerance: 'pointer'
-					".($field->parameters->get('fields_box_placing', 1) ? "
+					".($fields_box_placing ? "
 					,start: function(e) {
 						//jQuery(e.target).children().css('float', 'left');
 						//fc_setEqualHeights(jQuery(e.target), 0);
@@ -258,6 +282,11 @@ class plgFlexicontent_fieldsTextarea extends FCField
 				var lastField = fieldval_box ? fieldval_box : jQuery(el).prev().children().last();
 				var newField  = lastField.clone();
 				newField.find('.fc-has-value').removeClass('fc-has-value');
+
+				// New element's field name and id
+				var uniqueRowN = uniqueRowNum" . $field->id . ";
+				var element_id = '" . $elementid . "_' + uniqueRowN;
+				var fname_pfx  = '" . $fieldname . "[' + uniqueRowN + ']';
 				";
 
 			// NOTE: HTML tag id of this form element needs to match the -for- attribute of label HTML tag of this FLEXIcontent field, so that label will be marked invalid when needed
@@ -269,7 +298,7 @@ class plgFlexicontent_fieldsTextarea extends FCField
 
 				var txtArea   = container.find('textarea').first();
 				var oldAreaID = txtArea.attr('id');
-				var newAreaID = '".$elementid."_'+uniqueRowNum".$field->id.";
+				var newAreaID = element_id;
 				var regex_oldAreaID = new RegExp(oldAreaID, 'g');
 
 				// ID of originally cloned textarea 
@@ -341,7 +370,7 @@ class plgFlexicontent_fieldsTextarea extends FCField
 								return (className.match(/(^|\s)fc_xtd_btns_-\S+/g) || []).join(' ');
 							});
 							editor_xtd_buttons.html(editor_xtd_buttons.html().replace(regex_oldAreaID, newAreaID));
-							editor_xtd_buttons.addClass('fc_xtd_btns_".$elementid."_'+uniqueRowNum".$field->id.");
+							editor_xtd_buttons.addClass('fc_xtd_btns_' + element_id);
 							editor_xtd_buttons.appendTo(target.parent());
 						}
 					}
@@ -356,8 +385,8 @@ class plgFlexicontent_fieldsTextarea extends FCField
 				var mce_fieldname_sfx = mce_fieldname ? '[' + mce_fieldname + ']' : '';
 				var theArea = newField.find('.fc_'+boxClass).find('textarea');
 				theArea.val('');
-				theArea.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+']' + mce_fieldname_sfx);
-				theArea.attr('id','".$elementid."_'+uniqueRowNum".$field->id.");
+				theArea.attr('name', fname_pfx + mce_fieldname_sfx);
+				theArea.attr('id', element_id);
 				";
 
 			// Add new field to DOM
@@ -391,7 +420,7 @@ class plgFlexicontent_fieldsTextarea extends FCField
 					// Add click event to Legacy (external) editor XTD-buttons, e.g. JCE, tinyMCE of < J3.7.0
 					if (!(tinyMCE.majorVersion >= 4) && editor_xtd_buttons && editor_xtd_buttons.length)
 					{
-						SqueezeBox.assign(jQuery('#editor-xtd-buttons.fc_xtd_btns_".$elementid."_'+uniqueRowNum".$field->id." + ' a.modal-button').get(), { parse: 'rel' });
+						SqueezeBox.assign(jQuery('#editor-xtd-buttons.fc_xtd_btns_' + element_id + ' a.modal-button').get(), { parse: 'rel' });
 					}
 				}
 				";
@@ -414,6 +443,7 @@ class plgFlexicontent_fieldsTextarea extends FCField
 				rowCount".$field->id."++;       // incremented / decremented
 				uniqueRowNum".$field->id."++;   // incremented only
 			}
+
 
 			function deleteField".$field->id."(el, groupval_box, fieldval_box)
 			{
@@ -479,10 +509,18 @@ class plgFlexicontent_fieldsTextarea extends FCField
 		if ($js)  $document->addScriptDeclaration($js);
 		if ($css) $document->addStyleDeclaration($css);
 
+		$classes  = ' fcfield_textval' . $required_class;
 
-		// ***
-		// *** Create field's HTML display for item form
-		// ***
+		// Set field to 'Automatic' on successful validation'
+		if ($auto_value)
+		{
+			$classes = ' fcfield_auto_value ';
+		}
+
+
+		/**
+		 * Create field's HTML display for item form
+		 */
 
 		$field->html = array();
 		$n = 0;
@@ -518,7 +556,7 @@ class plgFlexicontent_fieldsTextarea extends FCField
 			//display($name, $html, $width, $height, $col, $row, $buttons = true, $id = null, $asset = null, $author = null, $params = array())
 			$mce_fieldname_sfx = $mce_fieldname ? '[' . $mce_fieldname . ']' : '';
 			$txtarea = !$use_html ? '
-				<textarea class="fcfield_textval txtarea' . ($required ? ' required' : '') . ($auto_value ? ' fcfield_auto_value' : '') . '"
+				<textarea class="txtarea ' . $classes . '"
 					id="'.$elementid_n.'" name="'.$fieldname_n.'"
 					cols="'.$cols.'" rows="'.$rows.'"
 					' . ($maxlength ? 'maxlength="'.$maxlength.'"' : '') . '
@@ -541,8 +579,8 @@ class plgFlexicontent_fieldsTextarea extends FCField
 				</div>';
 
 			$field->html[] = '
-				'.($auto_value ? '<span class="fc-mssg-inline fc-info fc-nobgimage">' . JText::_('FLEXI_AUTO') . '</span>' : '').'
-				'.($use_ingroup || !$multiple || $auto_value ? '' : '
+				' . ($auto_value ? '<span class="fc-mssg-inline fc-info fc-nobgimage">' . JText::_('FLEXI_AUTO') . '</span>' : '') . '
+				' . (!$add_ctrl_btns || $auto_value ? '' : '
 				<div class="'.$input_grp_class.' fc-xpended-btns">
 					'.$move2.'
 					'.$remove_button.'
@@ -579,31 +617,31 @@ class plgFlexicontent_fieldsTextarea extends FCField
 		// Handle single values
 		else
 		{
-			$field->html = '<div class="fcfieldval_container valuebox fcfieldval_container_'.$field->id.'">' . $field->html[0] .'</div>';
+			$field->html = '<div class="fcfieldval_container valuebox fcfieldval_container_'.$field->id.'">
+				' . (isset($field->html[-1]) ? $field->html[-1] : '') . $field->html[0] . '
+			</div>';
 		}
 	}
 
 
 	// Method to create field's HTML display for frontend views
-	function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')
+	public function onDisplayFieldValue(&$field, $item, $values = null, $prop = 'display')
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 
 		$field->label = JText::_($field->label);
 
-		// Some variables
-		$is_ingroup  = !empty($field->ingroup);
-		$use_ingroup = $field->parameters->get('use_ingroup', 0);
-		$multiple    = $use_ingroup || (int) $field->parameters->get( 'allow_multiple', 0 ) ;
+		// Set field and item objects
+		$this->setField($field);
+		$this->setItem($item);
 
 
-		// ***
-		// *** One time initialization
-		// ***
+		/**
+		 * One time initialization
+		 */
 
 		static $initialized = null;
 		static $app, $document, $option, $format, $realview;
-		static $itemViewId, $isItemsManager, $isHtmlViewFE;
 
 		if ($initialized === null)
 		{
@@ -611,27 +649,35 @@ class plgFlexicontent_fieldsTextarea extends FCField
 
 			$app       = JFactory::getApplication();
 			$document  = JFactory::getDocument();
-			$option    = $app->input->get('option', '', 'cmd');
-			$format    = $app->input->get('format', 'html', 'cmd');
-			$realview  = $app->input->get('view', '', 'cmd');
-
-			$itemViewId     = $realview === 'item' && $option === 'com_flexicontent' ? $app->input->get('id', 0, 'int') : 0;
-			$isItemsManager = $app->isClient('administrator') && $realview === 'items' && $option === 'com_flexicontent';
-			$isHtmlViewFE   = $format === 'html' && $app->isClient('site');
-
+			$option    = $app->input->getCmd('option', '');
+			$format    = $app->input->getCmd('format', 'html');
+			$realview  = $app->input->getCmd('view', '');
 		}
 
 		// Current view variable
-		$view = $app->input->get('flexi_callview', ($realview ?: 'item'), 'cmd');
+		$view = $app->input->getCmd('flexi_callview', ($realview ?: 'item'));
+		$sfx = $view === 'item' ? '' : '_cat';
+
+		// Check if field should be rendered according to configuration
+		if (!$this->checkRenderConds($prop, $view))
+		{
+			return;
+		}
 
 		// The current view is a full item view of the item
-		$isMatchedItemView = $itemViewId === (int) $item->id;
+		$isMatchedItemView = static::$itemViewId === (int) $item->id;
+
+		// Some variables
+		$is_ingroup  = !empty($field->ingroup);
+		$use_ingroup = $field->parameters->get('use_ingroup', 0);
+		$multiple    = $use_ingroup || (int) $field->parameters->get( 'allow_multiple', 0 ) ;
+
 
 		// Value handling parameters
-		$lang_filter_values = $field->parameters->get( 'lang_filter_values', 1);
-		$clean_output = $field->parameters->get('clean_output', 0);
-		$encode_output = $field->parameters->get('encode_output', 0);
-		$use_html = (int) ($field->field_type == 'maintext' ? !$field->parameters->get( 'hide_html', 0 ) : $field->parameters->get( 'use_html', 0 ));
+		$lang_filter_values = $field->parameters->get('lang_filter_values', 0);
+		$clean_output       = $field->parameters->get('clean_output', 0);
+		$encode_output      = $field->parameters->get('encode_output', 0);
+		$use_html           = (int) ($field->field_type == 'maintext' ? !$field->parameters->get( 'hide_html', 0 ) : $field->parameters->get( 'use_html', 0 ));
 
 		// Optionally limit and cut text, and also optionally display in modal popup window
 		$cut_text        = $view=='item' ? 0 : $field->parameters->get('cut_text_catview', 0);
@@ -641,32 +687,28 @@ class plgFlexicontent_fieldsTextarea extends FCField
 		$cut_text_display_btn_text = JText::_($field->parameters->get('cut_text_display_btn_text_catview', '...'));
 
 
-		// ***
-		// *** Default value
-		// ***
+		/**
+		 * Get field values
+		 */
 
-		$value_usage   = $field->parameters->get( 'default_value_use', 0 ) ;
-		$default_value = ($value_usage == 2) ? $field->parameters->get( 'default_value', '' ) : '';
-		$default_value = strlen($default_value) ? JText::_($default_value) : '';
-
-		// Get field values
 		$values = $values ? $values : $field->value;
 
 		// Check for no values and no default value, and return empty display
-		if ( empty($values) )
+		if (empty($values))
 		{
-			if (!strlen($default_value))
+			$values = $this->getDefaultValues($isform = false);
+
+			if (!count($values))
 			{
 				$field->{$prop} = $is_ingroup ? array() : '';
 				return;
 			}
-			$values = array($default_value);
 		}
 
 
-		// ******************************************
-		// Language filter, clean output, encode HTML
-		// ******************************************
+		/**
+		 * Language filter, clean output, encode HTML
+		 */
 
 		if ($clean_output)
 		{
@@ -696,50 +738,12 @@ class plgFlexicontent_fieldsTextarea extends FCField
 		}
 
 
-		// Prefix - Suffix - Separator parameters, replacing other field values if found
-		$remove_space = $field->parameters->get( 'remove_space', 0 ) ;
-		$pretext		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'pretext', '' ), 'pretext' );
-		$posttext		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'posttext', '' ), 'posttext' );
-		$separatorf	= $field->parameters->get( 'separatorf', 1 ) ;
-		$opentag		= JText::_(FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'opentag', '' ), 'opentag' ));
-		$closetag		= JText::_(FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'closetag', '' ), 'closetag' ));
-
-		// Microdata (classify the field values for search engines)
-		$itemprop    = $field->parameters->get('microdata_itemprop');
-
-		if($pretext)  { $pretext  = $remove_space ? $pretext : $pretext . ' '; }
-		if($posttext) { $posttext = $remove_space ? $posttext : ' ' . $posttext; }
-
-		switch($separatorf)
-		{
-			case 0:
-			$separatorf = '&nbsp;';
-			break;
-
-			case 1:
-			$separatorf = '<br class="fcclear" />';
-			break;
-
-			case 2:
-			$separatorf = '&nbsp;|&nbsp;';
-			break;
-
-			case 3:
-			$separatorf = ',&nbsp;';
-			break;
-
-			case 4:
-			$separatorf = $closetag . $opentag;
-			break;
-
-			case 5:
-			$separatorf = '';
-			break;
-
-			default:
-			$separatorf = '&nbsp;';
-			break;
-		}
+		/**
+		 * Get common parameters like: itemprop, value's prefix (pretext), suffix (posttext), separator, value list open/close text (opentag, closetag)
+		 * This will replace other field values and item properties, if such are found inside the parameter texts
+		 */
+		$common_params_array = $this->getCommonParams();
+		extract($common_params_array);
 
 
 		// CSV export: Create customized output and return
@@ -765,7 +769,7 @@ class plgFlexicontent_fieldsTextarea extends FCField
 		$viewlayout = $field->parameters->get('viewlayout', '');
 		$viewlayout = $viewlayout ? 'value_'.$viewlayout : 'value_default';
 
-		// Create field's HTML, using layout file
+		// Create field's viewing HTML, using layout file
 		$field->{$prop} = array();
 		include(self::getViewPath($field->field_type, $viewlayout));
 
@@ -774,16 +778,21 @@ class plgFlexicontent_fieldsTextarea extends FCField
 		{
 			// Apply values separator
 			$field->{$prop} = implode($separatorf, $field->{$prop});
-			if ( $field->{$prop}!=='' )
+
+			if ($field->{$prop} !== '')
 			{
 				// Apply field 's opening / closing texts
 				$field->{$prop} = $opentag . $field->{$prop} . $closetag;
 
 				// Add microdata once for all values, if field -- is NOT -- in a field group
-				if ( $itemprop )
+				if ($itemprop)
 				{
 					$field->{$prop} = '<div style="display:inline" itemprop="'.$itemprop.'" >' .$field->{$prop}. '</div>';
 				}
+			}
+			elseif ($no_value_msg !== '')
+			{
+				$field->{$prop} = $no_value_msg;
 			}
 		}
 
@@ -794,7 +803,7 @@ class plgFlexicontent_fieldsTextarea extends FCField
 		if ($field->parameters->get('useogp', 0) && !empty($field->{$prop}))
 		{
 			// The current view is frontend view with HTML format and is a full item view of current item
-			if ($isHtmlViewFE && $isMatchedItemView)
+			if (static::$isHtmlViewFE && $isMatchedItemView)
 			{
 				$ogpmaxlen = $field->parameters->get('ogpmaxlen', 300);
 				$ogpusage  = $field->parameters->get('ogpusage', 0);
@@ -823,7 +832,7 @@ class plgFlexicontent_fieldsTextarea extends FCField
 	// ***
 
 	// Method to handle field's values before they are saved into the DB
-	function onBeforeSaveField( &$field, &$post, &$file, &$item )
+	public function onBeforeSaveField( &$field, &$post, &$file, &$item )
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 
@@ -857,11 +866,15 @@ class plgFlexicontent_fieldsTextarea extends FCField
 				$v = $v[$mce_fieldname];
 			}
 
+			$v = trim($v);
+
 			// ***
 			// *** Validate data, skipping values that are empty after validation
 			// ***
 
-			$post[$n] = flexicontent_html::dataFilter($v, $maxlength, $validation, 0);
+			$post[$n] = strlen($v)
+				? flexicontent_html::dataFilter($v, $maxlength, $validation, 0)
+				: '';
 
 			// Skip empty value, but if in group increment the value position
 			if (!strlen($post[$n]))
@@ -881,65 +894,19 @@ class plgFlexicontent_fieldsTextarea extends FCField
 		{
 			$post = array(implode(' ', $post)) ;
 		}
-
-		//if ($use_ingroup) JFactory::getApplication()->enqueueMessage( print_r($post, true), 'warning');
-	}
-
-
-	// Method to do extra handling of field's values after all fields have validated their posted data, and are ready to be saved
-	// $item->fields['fieldname']->postdata contains values of other fields
-	// $item->fields['fieldname']->filedata contains files of other fields (normally this is empty due to using AJAX for file uploading)
-	function onAllFieldsPostDataValidated( &$field, &$item )
-	{
-		if ( !in_array($field->field_type, static::$field_types) ) return;
-
-		/**
-		 * Check if using 'auto_value_code', clear 'auto_value', if function not set
-		 */
-		$auto_value = (int) $field->parameters->get('auto_value', 0);
-		if ($auto_value === 2)
-		{
-			$auto_value_code = $field->parameters->get('auto_value_code', '');
-			$auto_value_code = preg_replace('/^<\?php(.*)(\?>)?$/s', '$1', $auto_value_code);
-		}
-		$auto_value = $auto_value === 2 && !$auto_value_code ? 0 : $auto_value;
-
-		if (!$auto_value)
-		{
-			return;
-		}
-
-		// Check for system plugin
-		$extfolder = 'system';
-		$extname   = 'flexisyspro';
-		$className = 'plg'. ucfirst($extfolder).$extname;
-		$plgPath = JPATH_SITE . '/plugins/'.$extfolder.'/'.$extname.'/'.$extname.'.php';
-
-		if (!file_exists($plgPath))
-		{
-			JFactory::getApplication()->enqueueMessage('Automatic field value for field  \'' . $field->label . '\' is only supported by FLEXIcontent PRO version, please disable this feature in field configuration', 'notice');
-			return;
-		}
-		//require_once $plgPath;
-
-		// Create plugin instance
-		$dispatcher   = JEventDispatcher::getInstance();
-		$plg_db_data  = JPluginHelper::getPlugin($extfolder, $extname);
-		$plg = new $className($dispatcher, array('type'=>$extfolder, 'name'=>$extname, 'params'=>$plg_db_data->params));
-
-		// Create automatic value
-		return $plg->onAllFieldsPostDataValidated($field, $item);
 	}
 
 
 	// Method to take any actions/cleanups needed after field's values are saved into the DB
-	function onAfterSaveField( &$field, &$post, &$file, &$item ) {
+	public function onAfterSaveField( &$field, &$post, &$file, &$item )
+	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 	}
 
 
 	// Method called just before the item is deleted to remove custom item data related to the field
-	function onBeforeDeleteField(&$field, &$item) {
+	public function onBeforeDeleteField(&$field, &$item)
+	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 	}
 
@@ -950,7 +917,7 @@ class plgFlexicontent_fieldsTextarea extends FCField
 	// ***
 
 	// Method to display a search filter for the advanced search view
-	function onAdvSearchDisplayFilter(&$filter, $value='', $formName='searchForm')
+	public function onAdvSearchDisplayFilter(&$filter, $value = '', $formName = 'searchForm')
 	{
 		if ( !in_array($filter->field_type, static::$field_types) ) return;
 
@@ -959,7 +926,7 @@ class plgFlexicontent_fieldsTextarea extends FCField
 
 
 	// Method to display a category filter for the category view
-	function onDisplayFilter(&$filter, $value='', $formName='adminForm', $isSearchView=0)
+	public function onDisplayFilter(&$filter, $value = '', $formName = 'adminForm', $isSearchView = 0)
 	{
 		if ( !in_array($filter->field_type, static::$field_types) ) return;
 
@@ -967,9 +934,9 @@ class plgFlexicontent_fieldsTextarea extends FCField
 	}
 
 
- 	// Method to get the active filter result (an array of item ids matching field filter, or subquery returning item ids)
+	// Method to get the active filter result (an array of item ids matching field filter, or subquery returning item ids)
 	// This is for content lists e.g. category view, and not for search view
-	function getFiltered(&$filter, $value, $return_sql=true)
+	public function getFiltered(&$filter, $value, $return_sql = true)
 	{
 		if ( !in_array($filter->field_type, static::$field_types) ) return;
 
@@ -977,9 +944,9 @@ class plgFlexicontent_fieldsTextarea extends FCField
 	}
 
 
- 	// Method to get the active filter result (an array of item ids matching field filter, or subquery returning item ids)
+	// Method to get the active filter result (an array of item ids matching field filter, or subquery returning item ids)
 	// This is for search view
-	function getFilteredSearch(&$filter, $value, $return_sql=true)
+	public function getFilteredSearch(&$filter, $value, $return_sql = true)
 	{
 		if ( !in_array($filter->field_type, static::$field_types) ) return;
 
@@ -989,11 +956,11 @@ class plgFlexicontent_fieldsTextarea extends FCField
 
 
 	// ***
-	// *** SEARCH / INDEXING METHODS
+	// *** SEARCH INDEX METHODS
 	// ***
 
 	// Method to create (insert) advanced search index DB records for the field values
-	function onIndexAdvSearch(&$field, &$post, &$item)
+	public function onIndexAdvSearch(&$field, &$post, &$item)
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 		if ( !$field->isadvsearch && !$field->isadvfilter ) return;
@@ -1013,7 +980,7 @@ class plgFlexicontent_fieldsTextarea extends FCField
 
 
 	// Method to create basic search index (added as the property field->search)
-	function onIndexSearch(&$field, &$post, &$item)
+	public function onIndexSearch(&$field, &$post, &$item)
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 		if ( !$field->issearch ) return;
@@ -1125,7 +1092,7 @@ class plgFlexicontent_fieldsTextarea extends FCField
 		// Value handling
 		// **************
 
-		// Input field display size & max characters
+		// Form field display parameters
 		$maxlength = (int) $field->parameters->get( 'maxlength', 0 ) ;   // client/server side enforced when using textarea, otherwise this will depend on the HTML editor (TODO try to apply it at client-side)
 		$use_html  = (int) ($field->field_type == 'maintext' ? !$field->parameters->get( 'hide_html', 0 ) : $field->parameters->get( 'use_html', 0 ));
 

@@ -40,7 +40,7 @@
 			</field>
 			<field name="field_elements" type="textarea" filter="RAW" default="" class="required" rows="5" label="FLEXI_FIELD_LINKSLIST_LIST_ELEMENTS" description="FLEXI_FIELD_LINKSLIST_LIST_ELEMENTS_DESC" />
 			
-			<field name="" type="separator" default="FLEXI_FORM_FIELD_CONF" description="FLEXI_FORM_FIELD_CONF_DESC" level="level1" />
+			<field name="" type="separator" default="FLEXI_FORM_FIELD_CONF" _description="FLEXI_FORM_FIELD_CONF_DESC" level="level1" />
 			
 			<!--field name="" type="separator" default="FLEXI_FIELD_ALTERNATIVE_DISPLAY" description="" level="level2" /-->
 			<field name="editform_field_type" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_AS" description="FLEXI_FIELD_DISPLAY_AS_DESC" class="btn-group group-fcinfo">

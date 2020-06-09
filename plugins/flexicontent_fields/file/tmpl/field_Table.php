@@ -131,7 +131,7 @@ foreach ($field->value as $file_id)
 		/>
 		<input type="hidden" id="'.$elementid_n.'_file-id" name="'.$fieldname_n.'[file-id]" value="'.htmlspecialchars($file_id, ENT_COMPAT, 'UTF-8').'" class="fc_fileid" />'.'
 
-		'.( (!$multiple || $is_ingroup) && !$required_class ? '
+		'.( (!$multiple || $use_ingroup) && !$required_class ? '
 		<div class="fcclear"></div>
 		<fieldset class="group-fcset">
 			<input type="checkbox" id="'.$elementid_n.'_file-del" class="inlinefile-del" name="'.$fieldname_n.'[file-del]" value="1" onchange="file_fcfield_del_existing_value'.$field->id.'(this);" />
@@ -141,7 +141,7 @@ foreach ($field->value as $file_id)
 		</fieldset>
 		<div class="fcclear"></div>
 
-		' : ( (!$multiple || $is_ingroup) && $required_class && $file_data->filename ? '
+		' : ( (!$multiple || $use_ingroup) && $required_class && $file_data->filename ? '
 			<div class="fcclear"></div>
 			<div class="alert alert-info fc-small fc-iblock" style="margin: 8px 0;">'.JText::_('FLEXI_FIELD_'.$FT.'_REQUIRED_UPLOAD_NEW_TO_REPLACE').'</div>
 			<div class="fcclear"></div>

@@ -14,7 +14,7 @@ $field->{$prop} =
 if ($field->parameters->get('useogp', 1) && $field->{$prop})
 {
 	// The current view is frontend view with HTML format and is a full item view of current item
-	if ($isHtmlViewFE && $isMatchedItemView)
+	if (static::$isHtmlViewFE && $isMatchedItemView)
 	{
 		$ogpmaxlen = $field->parameters->get('ogpmaxlen', 300);
 		$content_val = flexicontent_html::striptagsandcut($field->{$prop}, $ogpmaxlen);

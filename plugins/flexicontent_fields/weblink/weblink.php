@@ -1,11 +1,11 @@
 <?php
 /**
  * @package         FLEXIcontent
- * @version         3.2
+ * @version         3.4
  *
  * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
  * @link            https://flexicontent.org
- * @copyright       Copyright © 2017, FLEXIcontent team, All Rights Reserved
+ * @copyright       Copyright Â© 2020, FLEXIcontent team, All Rights Reserved
  * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
@@ -21,7 +21,7 @@ class plgFlexicontent_fieldsWeblink extends FCField
 	// *** CONSTRUCTOR
 	// ***
 
-	function __construct( &$subject, $params )
+	public function __construct( &$subject, $params )
 	{
 		parent::__construct( $subject, $params );
 	}
@@ -33,11 +33,15 @@ class plgFlexicontent_fieldsWeblink extends FCField
 	// ***
 
 	// Method to create field's HTML display for item form
-	function onDisplayField(&$field, &$item)
+	public function onDisplayField(&$field, &$item)
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 
 		$field->label = $field->parameters->get('label_form') ? JText::_($field->parameters->get('label_form')) : JText::_($field->label);
+
+		// Set field and item objects
+		$this->setField($field);
+		$this->setItem($item);
 
 		$use_ingroup = $field->parameters->get('use_ingroup', 0);
 		if (!isset($field->formhidden_grp)) $field->formhidden_grp = $field->formhidden;
@@ -55,9 +59,9 @@ class plgFlexicontent_fieldsWeblink extends FCField
 		$font_icon_class = $form_font_icons ? ' fcfont-icon' : '';
 
 
-		// ***
-		// *** Number of values
-		// ***
+		/**
+		 * Number of values
+		 */
 
 		$multiple     = $use_ingroup || (int) $field->parameters->get('allow_multiple', 0);
 		$max_values   = $use_ingroup ? 0 : (int) $field->parameters->get('max_values', 0);
@@ -76,18 +80,26 @@ class plgFlexicontent_fieldsWeblink extends FCField
 		$link_source = (int) $field->parameters->get('link_source', 0);
 		$show_values_expand_btn = $link_source === 0 ? $show_values_expand_btn : 0;
 
-		// Form fields display parameters
+
+		/**
+		 * Form field display parameters
+		 */
+
 		$size       = (int) $field->parameters->get( 'size', 30 ) ;
 		$maxlength  = (int) $field->parameters->get( 'maxlength', 4000 ) ;   // client/server side enforced
 		$allow_relative_addrs = (int) $field->parameters->get( 'allow_relative_addrs', 0 ) ;
 		$inputmask	= $allow_relative_addrs ? '' : $field->parameters->get( 'inputmask', '' ) ;
 
-		// create extra HTML TAG parameters for the form field
+		// Create extra HTML TAG parameters for the form field
 		$link_attribs = $field->parameters->get( 'extra_attributes', '' )
 			. ($maxlength ? ' maxlength="' . $maxlength . '" ' : '')
 			. ($size ? ' size="' . $size . '" ' : '')
 			;
 
+
+		/**
+	   * Create validation mask
+		 */
 		static $inputmask_added = false;
 	  if ($inputmask && !$inputmask_added)
 		{
@@ -103,10 +115,6 @@ class plgFlexicontent_fieldsWeblink extends FCField
 		}
 		$link_classes .= ' validate-url';
 
-
-		// ***
-		// *** Default values
-		// ***
 
 		// Legacy parameter names, weblink and extendended weblink were merged
 		$this->checkLegacyParameters($field);
@@ -180,7 +188,7 @@ class plgFlexicontent_fieldsWeblink extends FCField
 		}
 
 		// Initialise property with default value
-		if (!$field->value)
+		if (!$field->value || (count($field->value) === 1 && $field->value[0] === null))
 		{
 			$field->value = array();
 			$field->value[0]['link']  = $default_link;
@@ -257,7 +265,7 @@ class plgFlexicontent_fieldsWeblink extends FCField
 			$document->addScript(JUri::root(true) . '/plugins/flexicontent_fields/weblink/js/form.js', array('version' => FLEXI_VHASH));
 		}
 
-
+		// JS & CSS of current field
 		$js = '';
 		$css = '';
 
@@ -271,7 +279,7 @@ class plgFlexicontent_fieldsWeblink extends FCField
 					handle: '.fcfield-drag-handle',
 					/*containment: 'parent',*/
 					tolerance: 'pointer'
-					".($field->parameters->get('fields_box_placing', 1) ? "
+					".($fields_box_placing ? "
 					,start: function(e) {
 						//jQuery(e.target).children().css('float', 'left');
 						//fc_setEqualHeights(jQuery(e.target), 0);
@@ -304,15 +312,17 @@ class plgFlexicontent_fieldsWeblink extends FCField
 				newField.find('.fc-has-value').removeClass('fc-has-value');
 
 				// New element's field name and id
-				var element_id = '".$elementid . "_' + uniqueRowNum".$field->id.";
+				var uniqueRowN = uniqueRowNum" . $field->id . ";
+				var element_id = '" . $elementid . "_' + uniqueRowN;
+				var fname_pfx  = '" . $fieldname . "[' + uniqueRowN + ']';
 				";
 
 			// NOTE: HTML tag id of this form element needs to match the -for- attribute of label HTML tag of this FLEXIcontent field, so that label will be marked invalid when needed
-			// Update new URL's address
 			$js .= "
+				// Update new URL's address
 				theInput = newField.find('input.urllink').first();
 				theInput.attr('value', ".json_encode($default_link).");
-				theInput.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][link]');
+				theInput.attr('name', fname_pfx + '[link]');
 				theInput.attr('id', element_id + '_link');
 				newField.find('.urllink-lbl').first().attr('for', element_id + '_link');
 
@@ -325,7 +335,7 @@ class plgFlexicontent_fieldsWeblink extends FCField
 				var nr = 0;
 				newField.find('input.autoprefix').each(function() {
 					var elem = jQuery(this);
-					elem.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][autoprefix]');
+					elem.attr('name', fname_pfx + '[autoprefix]');
 					elem.attr('id', element_id + '_autoprefix_'+nr);
 					elem.next().removeClass('active');
 					elem.prop('checked', false);
@@ -340,10 +350,10 @@ class plgFlexicontent_fieldsWeblink extends FCField
 				$js .= "
 				theInput = newField.find('input.urlimage').first();
 				theInput.attr('value', ".json_encode($default_image).");
-				theInput.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][image]');
+				theInput.attr('name', fname_pfx + '[image]');
 				theInput.attr('id', element_id + '_image');
 				newField.find('.urlimage-lbl').first().attr('for', element_id + '_image');
-				
+
 				theInput = newField.find('img.media-preview').first();
 				theInput.attr('id', element_id + '_image_preview');
 				theInput.attr('src', '');
@@ -359,7 +369,7 @@ class plgFlexicontent_fieldsWeblink extends FCField
 				{
 					theInput = newField.find('.' + elements[i]).first();
 					var el_name = elements[i].replace(/^img_/, '');
-					theInput.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+']['+el_name+']');
+					theInput.attr('name', fname_pfx + '['+el_name+']');
 					theInput.attr('id', element_id + '_' + el_name);
 				}
 
@@ -375,7 +385,7 @@ class plgFlexicontent_fieldsWeblink extends FCField
 			if ($usetitle) $js .= "
 				theInput = newField.find('input.urltitle').first();
 				theInput.attr('value', ".json_encode($default_title).");
-				theInput.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][title]');
+				theInput.attr('name', fname_pfx + '[title]');
 				theInput.attr('id', element_id + '_title');
 				newField.find('.urltitle-lbl').first().attr('for', element_id + '_title');
 				";
@@ -383,7 +393,7 @@ class plgFlexicontent_fieldsWeblink extends FCField
 			if ($usetext) $js .= "
 				theInput = newField.find('input.urllinktext').first();
 				theInput.attr('value', ".json_encode($default_text).");
-				theInput.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][linktext]');
+				theInput.attr('name', fname_pfx + '[linktext]');
 				theInput.attr('id', element_id + '_linktext');
 				newField.find('.urllinktext-lbl').first().attr('for', element_id + '_linktext');
 				";
@@ -391,7 +401,7 @@ class plgFlexicontent_fieldsWeblink extends FCField
 			if ($useaddrtype) $js .= "
 				theField = newField.find('".($useaddrtype==1 ? 'input' : 'select').".urladdrtype').first();
 				theField.attr('value', '');
-				theField.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][addrtype]');
+				theField.attr('name', fname_pfx + '[addrtype]');
 				theField.attr('id', element_id + '_addrtype');
 				theField.attr('onchange', 'document.getElementById(\'' + element_id + '_link\').value = this.value');
 				newField.find('.urladdrtype-lbl').first().attr('for', element_id + '_addrtype');
@@ -401,7 +411,7 @@ class plgFlexicontent_fieldsWeblink extends FCField
 			if ($useclass) $js .= "
 				theField = newField.find('".($useclass==1 ? 'input' : 'select').".urlclass').first();
 				theField.attr('value', '');
-				theField.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][class]');
+				theField.attr('name', fname_pfx + '[class]');
 				theField.attr('id', element_id + '_class');
 				newField.find('.urlclass-lbl').first().attr('for', element_id + '_class');
 				";
@@ -409,7 +419,7 @@ class plgFlexicontent_fieldsWeblink extends FCField
 			if ($useid) $js .= "
 				theInput = newField.find('input.urlid').first();
 				theInput.attr('value', ".json_encode($default_id).");
-				theInput.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][id]');
+				theInput.attr('name', fname_pfx + '[id]');
 				theInput.attr('id', element_id + '_id');
 				newField.find('.urlid-lbl').first().attr('for', element_id + '_id');
 				";
@@ -418,7 +428,7 @@ class plgFlexicontent_fieldsWeblink extends FCField
 			if ($usetarget) $js .= "
 				theInput = newField.find('select.urltarget').first();
 				theInput.val('');
-				theInput.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][target]');
+				theInput.attr('name', fname_pfx + '[target]');
 				theInput.attr('target', element_id + '_target');
 				newField.find('.urltarget-lbl').first().attr('for', element_id + '_target');
 				";
@@ -426,7 +436,7 @@ class plgFlexicontent_fieldsWeblink extends FCField
 			if ($usehits) $js .="
 				theInput = newField.find('input.urlhits').first();
 				theInput.val('0');
-				theInput.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][hits]');
+				theInput.attr('name', fname_pfx + '[hits]');
 				theInput.attr('id', element_id + '_hits');
 				newField.find('.urlhits-lbl').first().attr('for', element_id + '_hits');
 
@@ -568,9 +578,9 @@ class plgFlexicontent_fieldsWeblink extends FCField
 
 
 
-		// ***
-		// *** Create field's HTML display for item form
-		// ***
+		/**
+		 * Create field's HTML display for item form
+		 */
 
 		$field->html = array();
 
@@ -606,7 +616,9 @@ class plgFlexicontent_fieldsWeblink extends FCField
 		// Handle single values
 		else
 		{
-			$field->html = '<div class="fcfieldval_container valuebox fcfieldval_container_'.$field->id.'">' . $field->html[0] .'</div>';
+			$field->html = '<div class="fcfieldval_container valuebox fcfieldval_container_'.$field->id.'">
+				' . (isset($field->html[-1]) ? $field->html[-1] : '') . $field->html[0] . '
+			</div>';
 		}
 
 		// Add toggle button for: Compact values view (= multiple values per row)
@@ -623,25 +635,47 @@ class plgFlexicontent_fieldsWeblink extends FCField
 
 
 	// Method to create field's HTML display for frontend views
-	public function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')
+	public function onDisplayFieldValue(&$field, $item, $values = null, $prop = 'display')
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 
-		// Get isMobile / isTablet Flags
-		static $isMobile = null;
-		static $isTablet = null;
-		static $useMobile = null;
-		if ($useMobile===null)
-		{
-			$force_desktop_layout = JComponentHelper::getParams( 'com_flexicontent' )->get('force_desktop_layout', 0 );
+		$field->label = JText::_($field->label);
 
-			$mobileDetector = flexicontent_html::getMobileDetector();
-			$isMobile = $mobileDetector->isMobile();
-			$isTablet = $mobileDetector->isTablet();
-			$useMobile = $force_desktop_layout  ?  $isMobile && !$isTablet  :  $isMobile;
+		// Set field and item objects
+		$this->setField($field);
+		$this->setItem($item);
+
+
+		/**
+		 * One time initialization
+		 */
+
+		static $initialized = null;
+		static $app, $document, $option, $format, $realview;
+
+		if ($initialized === null)
+		{
+			$initialized = 1;
+
+			$app       = JFactory::getApplication();
+			$document  = JFactory::getDocument();
+			$option    = $app->input->getCmd('option', '');
+			$format    = $app->input->getCmd('format', 'html');
+			$realview  = $app->input->getCmd('view', '');
 		}
 
-		$field->label = JText::_($field->label);
+		// Current view variable
+		$view = $app->input->getCmd('flexi_callview', ($realview ?: 'item'));
+		$sfx = $view === 'item' ? '' : '_cat';
+
+		// Check if field should be rendered according to configuration
+		if (!$this->checkRenderConds($prop, $view))
+		{
+			return;
+		}
+
+		// The current view is a full item view of the item
+		$isMatchedItemView = static::$itemViewId === (int) $item->id;
 
 		// Some variables
 		$is_ingroup  = !empty($field->ingroup);
@@ -653,15 +687,15 @@ class plgFlexicontent_fieldsWeblink extends FCField
 		$multiple = $link_source==-1 ? 1 : $multiple;
 
 		// Value handling parameters
-		$lang_filter_values = 0;//$field->parameters->get( 'lang_filter_values', 1);
+		$lang_filter_values = 0;
 
 		// some parameter shortcuts
 		$tooltip_class = 'hasTooltip';
 
 
-		// ***
-		// *** Default values
-		// ***
+		/**
+		 * Get field values
+		 */
 
 		// Legacy parameter names, weblink and extendended weblink were merged
 		$this->checkLegacyParameters($field);
@@ -711,7 +745,7 @@ class plgFlexicontent_fieldsWeblink extends FCField
 		// URL Hits
 		$display_hits = $field->parameters->get( 'display_hits', 0 ) ;
 		$add_hits_img = $display_hits == 1 || $display_hits == 3;
-		$add_hits_txt = $display_hits == 2 || $display_hits == 3 || $isMobile;
+		$add_hits_txt = $display_hits == 2 || $display_hits == 3 || static::$isMobile;
 
 		// URL image
 		$display_image = $field->parameters->get( 'display_image', 1 ) ;
@@ -720,7 +754,6 @@ class plgFlexicontent_fieldsWeblink extends FCField
 
 		// Playback videos
 		$playback_videos = $field->parameters->get( 'playback_videos', 1 ) ;
-	
 
 		// Compatibility with old layouts
 		$target_param = $default_target ? ' target="'.$default_target.'" ' : '';
@@ -781,22 +814,23 @@ class plgFlexicontent_fieldsWeblink extends FCField
 
 
 		// Check for no values and no default value, and return empty display
-		if ( empty($values) )
+		if (empty($values))
 		{
 			if (!strlen($default_link))
 			{
 				$field->{$prop} = $is_ingroup ? array() : '';
 				return;
 			}
-			$values = array();
-			$values[0]['link']     = $default_link;
-			$values[0]['title']    = $default_title;
-			$values[0]['linktext'] = $default_text;
-			$values[0]['class']    = $default_class;
-			$values[0]['id']       = $default_id;
-			$values[0]['target']   = '';  // do not set viewing default !, this will allow re-configuring default in viewing at any time ...
-			$values[0]['image']    = '';
-			$values[0]['hits']     = 0;
+			$values = array(0 => array(
+				'link'     => $default_link,
+				'title'    => $default_title,
+				'linktext' => $default_text,
+				'class'    => $default_class,
+				'id'       => $default_id,
+				'target'   => '',  // do not set viewing default !, this will allow re-configuring default in viewing at any time ...
+				'image'    => '',
+				'hits'     => 0,
+			));
 			$values[0] = serialize($values[0]);
 		}
 
@@ -819,47 +853,12 @@ class plgFlexicontent_fieldsWeblink extends FCField
 		}
 
 
-		// Prefix - Suffix - Separator parameters, replacing other field values if found
-		$remove_space = $field->parameters->get( 'remove_space', 0 ) ;
-		$pretext		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'pretext', '' ), 'pretext' );
-		$posttext		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'posttext', '' ), 'posttext' );
-		$separatorf	= $field->parameters->get( 'separatorf', 1 ) ;
-		$opentag		= JText::_(FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'opentag', '' ), 'opentag' ));
-		$closetag		= JText::_(FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'closetag', '' ), 'closetag' ));
-
-		if($pretext)  { $pretext  = $remove_space ? $pretext : $pretext . ' '; }
-		if($posttext) { $posttext = $remove_space ? $posttext : ' ' . $posttext; }
-
-		switch($separatorf)
-		{
-			case 0:
-			$separatorf = '&nbsp;';
-			break;
-
-			case 1:
-			$separatorf = '<br class="fcclear" />';
-			break;
-
-			case 2:
-			$separatorf = '&nbsp;|&nbsp;';
-			break;
-
-			case 3:
-			$separatorf = ',&nbsp;';
-			break;
-
-			case 4:
-			$separatorf = $closetag . $opentag;
-			break;
-
-			case 5:
-			$separatorf = '';
-			break;
-
-			default:
-			$separatorf = '&nbsp;';
-			break;
-		}
+		/**
+		 * Get common parameters like: itemprop, value's prefix (pretext), suffix (posttext), separator, value list open/close text (opentag, closetag)
+		 * This will replace other field values and item properties, if such are found inside the parameter texts
+		 */
+		$common_params_array = $this->getCommonParams();
+		extract($common_params_array);
 
 
 		// CSV export: Create customized output and return
@@ -899,7 +898,7 @@ class plgFlexicontent_fieldsWeblink extends FCField
 		$viewlayout = $field->parameters->get('viewlayout', '');
 		$viewlayout = $viewlayout ? 'value_'.$viewlayout : 'value_default';
 
-		// Create field's HTML, using layout file
+		// Create field's viewing HTML, using layout file
 		$field->{$prop} = array();
 		include(self::getViewPath($field->field_type, $viewlayout));
 
@@ -908,10 +907,21 @@ class plgFlexicontent_fieldsWeblink extends FCField
 		{
 			// Apply values separator
 			$field->{$prop} = implode($separatorf, $field->{$prop});
-			if ( $field->{$prop}!=='' )
+
+			if ($field->{$prop} !== '')
 			{
 				// Apply field 's opening / closing texts
 				$field->{$prop} = $opentag . $field->{$prop} . $closetag;
+
+				// Add microdata once for all values, if field -- is NOT -- in a field group
+				if ($itemprop)
+				{
+					$field->{$prop} = '<div style="display:inline" itemprop="'.$itemprop.'" >' .$field->{$prop}. '</div>';
+				}
+			}
+			elseif ($no_value_msg !== '')
+			{
+				$field->{$prop} = $no_value_msg;
 			}
 		}
 	}
@@ -962,7 +972,7 @@ class plgFlexicontent_fieldsWeblink extends FCField
 	// ***
 
 	// Method to handle field's values before they are saved into the DB
-	function onBeforeSaveField( &$field, &$post, &$file, &$item )
+	public function onBeforeSaveField( &$field, &$post, &$file, &$item )
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 
@@ -993,6 +1003,7 @@ class plgFlexicontent_fieldsWeblink extends FCField
 
 		$db_values_arr = $this->getExistingFieldValues();
 		$db_values = array();
+
 		foreach($db_values_arr as $db_value)
 		{
 				$array = $this->unserialize_array($db_value, $force_array=false, $force_value=false);
@@ -1138,12 +1149,16 @@ class plgFlexicontent_fieldsWeblink extends FCField
 
 
 	// Method to take any actions/cleanups needed after field's values are saved into the DB
-	function onAfterSaveField( &$field, &$post, &$file, &$item ) {
+	public function onAfterSaveField( &$field, &$post, &$file, &$item )
+	{
+		if ( !in_array($field->field_type, static::$field_types) ) return;
 	}
 
 
 	// Method called just before the item is deleted to remove custom item data related to the field
-	function onBeforeDeleteField(&$field, &$item) {
+	public function onBeforeDeleteField(&$field, &$item)
+	{
+		if ( !in_array($field->field_type, static::$field_types) ) return;
 	}
 
 
@@ -1153,7 +1168,7 @@ class plgFlexicontent_fieldsWeblink extends FCField
 	// ***
 
 	// Method to display a search filter for the advanced search view
-	function onAdvSearchDisplayFilter(&$filter, $value='', $formName='searchForm')
+	public function onAdvSearchDisplayFilter(&$filter, $value = '', $formName = 'searchForm')
 	{
 		if ( !in_array($filter->field_type, static::$field_types) ) return;
 
@@ -1162,9 +1177,9 @@ class plgFlexicontent_fieldsWeblink extends FCField
 	}
 
 
- 	// Method to get the active filter result (an array of item ids matching field filter, or subquery returning item ids)
+	// Method to get the active filter result (an array of item ids matching field filter, or subquery returning item ids)
 	// This is for search view
-	function getFilteredSearch(&$filter, $value, $return_sql=true)
+	public function getFilteredSearch(&$filter, $value, $return_sql = true)
 	{
 		if ( !in_array($filter->field_type, static::$field_types) ) return;
 
@@ -1175,11 +1190,11 @@ class plgFlexicontent_fieldsWeblink extends FCField
 
 
 	// ***
-	// *** SEARCH / INDEXING METHODS
+	// *** SEARCH INDEX METHODS
 	// ***
 
 	// Method to create (insert) advanced search index DB records for the field values
-	function onIndexAdvSearch(&$field, &$post, &$item)
+	public function onIndexAdvSearch(&$field, &$post, &$item)
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 		if ( !$field->isadvsearch && !$field->isadvfilter ) return;
@@ -1199,7 +1214,7 @@ class plgFlexicontent_fieldsWeblink extends FCField
 
 
 	// Method to create basic search index (added as the property field->search)
-	function onIndexSearch(&$field, &$post, &$item)
+	public function onIndexSearch(&$field, &$post, &$item)
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 		if ( !$field->issearch ) return;

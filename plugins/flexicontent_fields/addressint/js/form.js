@@ -1,22 +1,39 @@
-	
-	//Google map script
+	/**
+	 * Global variables
+	 */
+
 	var fcfield_addrint = {};
-	
-	fcfield_addrint.autoComplete = [];
-	fcfield_addrint.gmapslistener = [];
-	fcfield_addrint.google_maps = [];
-	
+
+	fcfield_addrint.autoComplete    = [];
+	fcfield_addrint.gmapslistener   = [];
+	fcfield_addrint.google_maps     = [];
+	fcfield_addrint.openstreet_maps = [];
+	fcfield_addrint.map_data        = [];
+
 	fcfield_addrint.allowed_countries = [];
-	fcfield_addrint.single_country = [];
+	fcfield_addrint.single_country    = [];
 	fcfield_addrint.map_zoom = [];
 	fcfield_addrint.map_type = [];
-	fcfield_addrint.LatLon = [];
+
+	fcfield_addrint.LatLon    = [];
+	fcfield_addrint.posMarker = [];
+
+	fcfield_addrint.algolia_api_id    = [];
+	fcfield_addrint.algolia_api_key   = [];
+	fcfield_addrint.algolia_configure = [];
+
+
+
+
+	/**
+	 *  Google Maps Engine
+	 */
 
 
 	// initialize autocomplete
 	fcfield_addrint.initAutoComplete = function(elementid_n, config_name)
 	{
-		var ac_input = document.getElementById(elementid_n + '_autocomplete');
+		var ac_input   = document.getElementById(elementid_n + '_autocomplete');
 		var ac_type    = jQuery('#' + elementid_n + '_ac_type').val();
 		var ac_country = fcfield_addrint.single_country[config_name];
 
@@ -31,7 +48,32 @@
 			jQuery('#' + elementid_n + '_messages').html('').hide();
 			fcfield_addrint.fillInAddress(elementid_n, false, config_name);
 		});
+
 		return true;
+	}
+
+
+	// Initialize marker selector
+	fcfield_addrint.initMarkerSelector = function(elementid_n, config_name)
+	{
+		var theSelect = jQuery('#' + elementid_n + '_custom_marker');
+
+		theSelect.select2(
+		{
+			formatResult: fcfield_addrint.format_marker_image,
+			formatSelection: fcfield_addrint.format_marker_image,
+			escapeMarkup: function(m) { return m; }
+		});
+
+		fc_attachSelect2(theSelect.parent());
+	}
+
+
+	// Update marker on map
+	fcfield_addrint.updateMarkerIcon = function(elementid_n, config_name)
+	{
+		var icon = jQuery('#' + elementid_n + '_custom_marker').val();
+		fcfield_addrint.posMarker[elementid_n].setIcon(icon);
 	}
 
 
@@ -40,11 +82,11 @@
 	{
 		// Remove listener that update the google map on autocomplete selection
 		google.maps.event.removeListener( fcfield_addrint.gmapslistener[elementid_n] );
-		
+
 		// Clone replace input to remove the currently configured autocomplete search
 		var el = document.getElementById(elementid_n + '_autocomplete');
 		el.parentNode.replaceChild(el.cloneNode(true), el);
-		
+
 		// Attach new autocomplete search
 		return fcfield_addrint.initAutoComplete(elementid_n, config_name);
 	}
@@ -53,14 +95,19 @@
 	fcfield_addrint.initMap = function(elementid_n, config_name)
 	{
 		var el = document.getElementById('map_canvas_' + elementid_n);
-		
+
 		jQuery(el).addClass('has_fc_google_maps_map');
-		jQuery('#' + elementid_n + '_addressint_map').show();  // Show map container
-		
+
+		// Show map container
+		jQuery('#' + elementid_n + '_addressint_map').css('display', '');
+
+		var zoom = parseInt(jQuery('#' + elementid_n + '_zoom').val());
+		zoom = !isNaN(zoom) ? zoom : fcfield_addrint.map_zoom[config_name];
+
 		fcfield_addrint.google_maps[elementid_n] = new google.maps.Map(el, {
 			center: fcfield_addrint.LatLon[elementid_n],
 			scrollwheel: false,
-			zoom: fcfield_addrint.map_zoom[config_name],
+			zoom: zoom,
 			mapTypeId: google.maps.MapTypeId[ fcfield_addrint.map_type[config_name] ],
 			zoomControl: true,
 			mapTypeControl: false,
@@ -68,26 +115,29 @@
 			streetViewControl: false,
 			rotateControl: false,
 		});
-		
+
 		el.dataset = !!el.dataset ? el.dataset : {};
 		el.dataset.google_maps_ref = fcfield_addrint.google_maps[elementid_n];
-		
-		myMarker = new google.maps.Marker({
+
+		var icon = jQuery('#' + elementid_n + '_custom_marker').val();
+
+		var posMarker = new google.maps.Marker({
 			map: fcfield_addrint.google_maps[elementid_n],
 			draggable:true,
 			animation: google.maps.Animation.DROP,
-			position: fcfield_addrint.LatLon[elementid_n]
+			position: fcfield_addrint.LatLon[elementid_n],
+			icon: icon
 		});
-		
+		fcfield_addrint.posMarker[elementid_n] = posMarker;
+
 		google.maps.event.addListener(fcfield_addrint.google_maps[elementid_n], "zoom_changed", function()
 		{
 			jQuery('#' + elementid_n + '_zoom').val(fcfield_addrint.google_maps[elementid_n].getZoom());
-			jQuery('#' + elementid_n + '_zoom_label').text(fcfield_addrint.google_maps[elementid_n].getZoom());
 		});
-		
-		google.maps.event.addListener(myMarker, "dragend", function (event)
+
+		google.maps.event.addListener(posMarker, "dragend", function (event)
 		{
-			fcfield_addrint.geocodePosition(elementid_n, this.getPosition(), myMarker, config_name);
+			fcfield_addrint.geocodePosition(elementid_n, this.getPosition(), posMarker, config_name);
 		});
 	}
 
@@ -110,7 +160,7 @@
 						tolerance = 50;
 						jQuery('#' + elementid_n + '_marker_tolerance').val(tolerance);
 					}
-					
+
 					var distance = Math.round( parseInt( google.maps.geometry.spherical.computeDistanceBetween(results[0].geometry.location, pos) ) );
 					if (distance > tolerance)
 					{
@@ -154,9 +204,9 @@
 			redrawMap = true;
 		}
 		//window.console.log(place);
-		
+
 		if (typeof place.address_components == 'undefined') return;
-		
+
 		// Check allowed country, (zero length means all allowed)
 		var country_valid = fcfield_addrint.allowed_countries[config_name].length == 0;
 		var selected_country = '';
@@ -195,8 +245,8 @@
 		{
 			jQuery('#' + elementid_n + '_messages').html('').hide();
 		}
-		
-		
+
+
 		// Empty all fields in case they are not set to a new value
 		jQuery('' +
 			'#' + elementid_n + '_autocomplete, #' + elementid_n + '_name, #' + elementid_n + '_url,' +
@@ -205,7 +255,7 @@
 			'#' + elementid_n + '_city, #' + elementid_n + '_state, #' + elementid_n + '_province, #' + elementid_n + '_country,' +
 			'#' + elementid_n + '_zip, #' + elementid_n + '_zip_suffix, #' + elementid_n + '_lat, #' + elementid_n + '_lon'
 		).val('');
-		
+
 		// load city, country code, postal code
 		var country_long_name = "";
 		place.address_components.forEach(function(o)
@@ -216,23 +266,23 @@
 				case "locality":
 				jQuery('#' + elementid_n + '_city').val(o.long_name);
 				break;
-				
+
 				// load country code
 				case "country":
 				jQuery('#' + elementid_n + '_country').val(o.short_name).trigger('change');
 				country_long_name = o.long_name;
 				break;
-				
+
 				// load postal code
 				case "postal_code":
 				jQuery('#' + elementid_n + '_zip').val(o.long_name);
 				break;
-				
+
 				// load postal code suffix
 				case "postal_code_suffix":
 				jQuery('#' + elementid_n + '_zip_suffix').val(o.long_name);
 				break;
-				
+
 				// province
 				case "administrative_area_level_1":
 				jQuery('#' + elementid_n + '_province').val(o.long_name);
@@ -266,16 +316,16 @@
 		if (index != -1)  street_address = street_address.substring(0, index);
 
 		index = jQuery('#' + elementid_n + '_province').val() ? street_address.lastIndexOf( jQuery('#' + elementid_n + '_province').val() ) : -1;
-		if (index != -1)  street_address = street_address.substring(0, index);		
+		if (index != -1)  street_address = street_address.substring(0, index);
 
 		if (country_long_name)  street_address = street_address.split(country_long_name)[0];
 
 		// Get the street address trimming any spaces, commas
 		street_address = street_address.replace(/(^\s*,)|(,\s*$)/g, '')
 		jQuery('#' + elementid_n + '_addr1').val(street_address);
-		
+
 		if(jQuery('#' + elementid_n + '_country').val() == 'US')
-		{	
+		{
 			// load state
 			place.address_components.forEach(function(o){
 				if(o.types[0] == 'administrative_area_level_1')
@@ -284,32 +334,32 @@
 				}
 			});
 		}
-		
+
 		// load suggested display address
 		jQuery('#' + elementid_n + '_addr_display, #' + elementid_n + '_addr_formatted').val(place.formatted_address);
-		
+
 		// name to google maps
 		if ( place.formatted_address.indexOf(place.name) == -1 )
 		{
 			jQuery('#' + elementid_n + '_name').val(place.name);
 		}
-		
+
 		// url to google maps
 		jQuery('#' + elementid_n + '_url').val(place.url);
-		
+
 		// default zoom level
 		jQuery('#' + elementid_n + '_zoom').val(fcfield_addrint.map_zoom[config_name]);
 		jQuery('#' + elementid_n + '_zoom_label').text(fcfield_addrint.map_zoom[config_name]);
-		
+
 		// latitude
 		jQuery('#' + elementid_n + '_lat').val(place.geometry.location.lat);
-		
+
 		// longitude
 		jQuery('#' + elementid_n + '_lon').val(place.geometry.location.lng);
-		
+
 		// reset map lat/lon
 		fcfield_addrint.LatLon[elementid_n] = place.geometry.location;
-		
+
 		// redraw map
 		if (redrawMap)
 		{
@@ -343,4 +393,254 @@
 			usstate_row.find('.fc_gm_usstate').attr('disabled', 'disabled');
 			usstate_row.find('.invalid').removeClass('invalid').removeAttr('aria-invalid');
 		}
+	}
+
+
+	fcfield_addrint.format_marker_image = function (state)
+	{
+		if (!state.id)
+		{
+			return state.text;
+		}
+
+		return '<img class="flag" src="' + state.id.toLowerCase() + '"/> ' + state.text;
+	}
+
+
+
+
+	/**
+	 *  Algolia search Engine with OpenStreetMaps
+	 */
+
+
+	// Update marker icon on map, on marker selector change
+	fcfield_addrint.updateMarkerIcon_OS = function(elementid_n, config_name)
+	{
+		var icon = jQuery('#' + elementid_n + '_custom_marker').val();
+		var map = fcfield_addrint.map_data[elementid_n].theMap;
+		var markers = fcfield_addrint.map_data[elementid_n].theMarkers;
+
+		markers.forEach(function (marker) {
+			marker.setIcon( L.icon({ iconUrl: icon }) );
+		});
+	}
+
+
+	// Handle changes in search autocomplete text, adding (temporarily) multiple markers that match current search text
+	fcfield_addrint.handleOnSuggestions_OS = function (e, d)
+	{
+		d.theMarkers.forEach(function (item) { fcfield_addrint.removeMarker_OS(item, d); });
+		d.theMarkers = [];
+
+		if (e.suggestions.length === 0)
+		{
+			d.theMap.setView(new L.LatLng(45, 0), 11);
+			return;
+		}
+
+		e.suggestions.forEach(function (item) { fcfield_addrint.addMarker_OS(item, d); });
+		fcfield_addrint.findBestZoom_OS(d);
+	}
+
+	// Handle highlighting (opacity 100%) the marker of the search result row that is currently active (e.g. mouse hovered by the or touched)
+	fcfield_addrint.handleOnCursorchanged_OS = function (e, d)
+	{
+		d.theMarkers.forEach(function(marker, markerIndex)
+		{
+			if (markerIndex === e.suggestionIndex) {
+				marker.setOpacity(1);
+				marker.setZIndexOffset(1000);
+			} else {
+				marker.setZIndexOffset(0);
+				marker.setOpacity(0.5);
+			}
+		});
+	}
+
+
+	// Handle selecting a specific search result by keeping the specific marker, and removing all other search result markers
+	fcfield_addrint.handleOnChange_OS = function (e, d)
+	{
+		d.theMarkers.forEach(function(marker, markerIndex)
+		{
+			if (markerIndex === e.suggestionIndex) {
+				d.theMarkers = [marker];
+				marker.setOpacity(1);
+				fcfield_addrint.findBestZoom_OS(d);
+			} else {
+				fcfield_addrint.removeMarker_OS(marker, d);
+			}
+		});
+	}
+
+
+	// Handle removing all markers from map
+	fcfield_addrint.handleOnClear_OS = function (e, d)
+	{
+		d.theMap.setView(new L.LatLng(45, 0), 11);
+		d.theMarkers.forEach(function (item) { fcfield_addrint.removeMarker_OS(item, d); });
+	}
+
+
+	// Handle adding a marker into the map (e.g. search result markers, or a marker for an already selectd location)
+	fcfield_addrint.addMarker_OS = function (suggestion, d, icon, opacity)
+	{
+		var opacity = !!opacity ? opacity : .4
+		var marker  = L.marker(suggestion.latlng, {opacity: opacity});
+
+		if (!!icon)
+		{
+			marker.setIcon(L.icon({ iconUrl: icon }));
+		}
+
+		marker.addTo(d.theMap);
+		d.theMarkers.push(marker);
+
+		return marker;
+	}
+
+
+	// Handle removing a marker from the map
+	fcfield_addrint.removeMarker_OS = function (marker, d)
+	{
+		d.theMap.removeLayer(marker);
+	}
+
+
+	// Handle moving map's view port and also setting an appropriate map zoom so that all markers in the map are visible
+	fcfield_addrint.findBestZoom_OS = function (d)
+	{
+		var featureGroup = L.featureGroup(d.theMarkers);
+		d.theMap.fitBounds(featureGroup.getBounds().pad(0.5), {animate: false, maxZoom: 10});
+	}
+
+
+	// Handle moving map's view port and also setting an appropriate map zoom so that all markers in the map are visible
+	fcfield_addrint.changeAutoCompleteType_OS = function (elementid_n, config_name)
+	{
+		var ac_type = jQuery('#' + elementid_n + '_ac_type').val();
+		fcfield_addrint.map_data[elementid_n].thePlacesAutocomplete.configure({type: ac_type});
+	}
+
+
+	// Initaliaze Algolia search Engine (uses OpenStreetMap)
+	fcfield_addrint.initAutoComplete_OS = function(elementid_n, config_name)
+	{
+		var el = document.getElementById(elementid_n + '_addressint_map');
+
+		jQuery("#" + elementid_n + "_addressint_map").css('display', '');
+		jQuery(el).addClass('has_fc_openstreet_map');
+
+
+		/**
+	   * Create Open Street Map
+		 */
+		var map = L.map('map_canvas_' + elementid_n, {
+			scrollWheelZoom: true,
+			zoomControl: true
+		});
+
+		// Store a reference to the map, e.g. to redraw it on TAB focus
+		el.os_maps_ref = map;
+
+		// Catch zoom change
+    map.on('zoomend',function(e){
+			jQuery('#' + elementid_n + '_zoom').val(map.getZoom());
+    });
+
+		// Redraw map after delay (catch case of parent container resizing)
+		setTimeout(function() {
+			map.invalidateSize();
+		}, 10);
+
+
+		/**
+		 * Initialize autocomplete search box
+		 */
+		var placesAutocomplete = places({
+			appId: fcfield_addrint.algolia_api_id,
+			apiKey: fcfield_addrint.algolia_api_key,
+			container: document.querySelector('#' + elementid_n + '_autocomplete'),
+			templates: {
+				value: function(suggestion) {
+					return suggestion.name;
+				}
+			}
+		});
+
+		// Apply field's configuration
+		fcfield_addrint.algolia_configure[config_name] (placesAutocomplete);
+
+
+		/**
+		 * Store a references to map, markers, placesAutocomplete
+		 * e.g. to update marker icon, re-configure autocomplete on search type selector change
+		 */
+		var d = {theMap: map, theMarkers: [], thePlacesAutocomplete: placesAutocomplete};
+		fcfield_addrint.map_data[elementid_n] = d;
+		fcfield_addrint.openstreet_maps[elementid_n + '_addressint_map'] = map;
+
+
+		/**
+		 * Add current value as marker on the map
+		 */
+		var lat_lon = [jQuery('#' + elementid_n + '_lat').val(), jQuery('#' + elementid_n + '_lon').val()];
+		var icon = jQuery('#' + elementid_n + '_custom_marker').val();
+
+		map.setView(lat_lon, jQuery('#' + elementid_n + '_zoom').val());
+		fcfield_addrint.addMarker_OS({latlng: lat_lon}, d, icon, 1);
+
+
+		/**
+		 * Actions to take when an autocomplete is done
+		 */
+		placesAutocomplete.on('change', function resultSelected(e)
+		{
+			//window.console.log(e.suggestion);
+			var t = e.suggestion.type;
+
+			!!!document.querySelector('#' + elementid_n + '_name') ? false : document.querySelector('#' + elementid_n + '_name').value =
+				(t === 'busStop' || t === 'trainStation' || t === 'townhall' || t === 'airport') && !!e.suggestion.value ? e.suggestion.value : '';
+
+			!!!document.querySelector('#' + elementid_n + '_addr1') ? false : document.querySelector('#' + elementid_n + '_addr1').value =
+				t === 'address' && !!e.suggestion.value ? e.suggestion.value : '';
+
+			!!!document.querySelector('#' + elementid_n + '_city') ? false : document.querySelector('#' + elementid_n + '_city').value =
+				(!!e.suggestion.city ? e.suggestion.city : (t === 'city' && !!e.suggestion.value ? e.suggestion.value : ''));
+
+			!!!document.querySelector('#' + elementid_n + '_province') ? false : document.querySelector('#' + elementid_n + '_province').value =
+				e.suggestion.administrative || '';
+
+			!!!document.querySelector('#' + elementid_n + '_zip') ? false : document.querySelector('#' + elementid_n + '_zip').value = e.suggestion.postcode || '';
+
+			var country = !!!document.querySelector('#' + elementid_n + '_country') ? false : e.suggestion.countryCode.toUpperCase() || '';
+			jQuery('#' + elementid_n + '_country').val(country).trigger('change');
+
+			!!!document.querySelector('#' + elementid_n + '_lat') ? false : document.querySelector('#' + elementid_n + '_lat').value = e.suggestion.latlng['lat'] || '';
+			!!!document.querySelector('#' + elementid_n + '_lon') ? false : document.querySelector('#' + elementid_n + '_lon').value = e.suggestion.latlng['lng'] || '';
+
+			// Not applicable fields, clear them after an autocomplete operation
+			!!!document.querySelector('#' + elementid_n + '_addr_formatted') ? false : document.querySelector('#' + elementid_n + '_addr_formatted').value = '';
+			!!!document.querySelector('#' + elementid_n + '_url') ? false : document.querySelector('#' + elementid_n + '_url').value = '';
+
+			!!!document.querySelector('#' + elementid_n + '_zip_suffix') ? false : document.querySelector('#' + elementid_n + '_zip_suffix').value = '';
+			!!!document.querySelector('#' + elementid_n + '_addr2') ? false : document.querySelector('#' + elementid_n + '_addr2').value = '';
+			!!!document.querySelector('#' + elementid_n + '_addr3') ? false : document.querySelector('#' + elementid_n + '_addr3').value = '';
+		});
+
+		var osmLayer = new L.TileLayer(
+			'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+				minZoom: 1,
+				maxZoom: 19,
+				attribution: 'Map data © <a href="https://openstreetmap.org">OpenStreetMap</a> contributors'
+			}
+		);
+
+		map.addLayer(osmLayer);
+
+		placesAutocomplete.on('suggestions', function (e) { fcfield_addrint.handleOnSuggestions_OS(e, d); });
+		placesAutocomplete.on('cursorchanged', function (e) { fcfield_addrint.handleOnCursorchanged_OS(e, d); });
+		placesAutocomplete.on('change', function (e) { fcfield_addrint.handleOnChange_OS(e, d); });
+		placesAutocomplete.on('clear', function (e) { fcfield_addrint.handleOnClear_OS(e, d); });
 	}

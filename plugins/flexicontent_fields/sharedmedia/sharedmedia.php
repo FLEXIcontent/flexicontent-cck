@@ -1,4 +1,14 @@
 <?php
+/**
+ * @package         FLEXIcontent
+ * @version         3.4
+ *
+ * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
+ * @link            https://flexicontent.org
+ * @copyright       Copyright © 2020, FLEXIcontent team, All Rights Reserved
+ * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
+ */
+
 defined( '_JEXEC' ) or die( 'Restricted access' );
 JLoader::register('FCField', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/fcfield/parentfield.php');
 
@@ -11,7 +21,7 @@ class plgFlexicontent_fieldsSharedmedia extends FCField
 	// *** CONSTRUCTOR
 	// ***
 
-	function __construct( &$subject, $params )
+	public function __construct( &$subject, $params )
 	{
 		parent::__construct( $subject, $params );
 	}
@@ -23,7 +33,7 @@ class plgFlexicontent_fieldsSharedmedia extends FCField
 	// ***
 
 	// Method to create field's HTML display for item form
-	function onDisplayField(&$field, &$item)
+	public function onDisplayField(&$field, &$item)
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 
@@ -96,7 +106,7 @@ class plgFlexicontent_fieldsSharedmedia extends FCField
 
 
 		// Initialise value property
-		if (empty($field->value))
+		if (!$field->value || (count($field->value) === 1 && $field->value[0] === null))
 		{
 			$field->value = array();
 			$field->value[0]['url'] = '';         // Actual media URL (enter by user)
@@ -169,7 +179,7 @@ class plgFlexicontent_fieldsSharedmedia extends FCField
 				newField.find('.fc-has-value').removeClass('fc-has-value');
 
 				// New element's field name and id
-				var element_id = '".$elementid . "_' + uniqueRowNum".$field->id.";
+				var element_id = '" . $elementid . "_' + uniqueRowNum" . $field->id . ";
 
 				// First, generate new field as HTML
 				//var newField_HTML = lastField.prop('outerHTML');
@@ -515,7 +525,9 @@ class plgFlexicontent_fieldsSharedmedia extends FCField
 		// Handle single values
 		else
 		{
-			$field->html = '<div class="fcfieldval_container valuebox fcfieldval_container_'.$field->id.'">' . (isset($field->html[-1]) ? $field->html[-1] : '') . $field->html[0] .'</div>';
+			$field->html = '<div class="fcfieldval_container valuebox fcfieldval_container_'.$field->id.'">
+				' . (isset($field->html[-1]) ? $field->html[-1] : '') . $field->html[0] . '
+			</div>';
 		}
 
 		// Add Error message
@@ -533,7 +545,7 @@ class plgFlexicontent_fieldsSharedmedia extends FCField
 
 
 	// Method to create field's HTML display for frontend views
-	function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')
+	public function onDisplayFieldValue(&$field, $item, $values = null, $prop = 'display')
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 		$field->label = JText::_($field->label);
@@ -547,65 +559,77 @@ class plgFlexicontent_fieldsSharedmedia extends FCField
 		$multiple    = $use_ingroup || (int) $field->parameters->get( 'allow_multiple', 0 ) ;
 
 		// Meta DATA that will be displayed
-		$display_title    = $field->parameters->get('display_title', 1);
-		$display_author   = $field->parameters->get('display_author', 0);
-		$display_duration = $field->parameters->get('display_duration',0) ;
-		$display_description = $field->parameters->get('display_description', 0);
-		$privacy_embeed = $field->parameters->get('privacy_embeed', 0);
+		$display_title       = (int) $field->parameters->get('display_title', 1);
+		$display_author      = (int) $field->parameters->get('display_author', 0);
+		$display_duration    = (int) $field->parameters->get('display_duration',0) ;
+		$display_description = (int) $field->parameters->get('display_description', 0);
+		$privacy_embeed      = (int) $field->parameters->get('privacy_embeed', 0);
 
-		$headinglevel = $field->parameters->get('headinglevel', 3);
-		$width        = (int)$field->parameters->get('width', 960);
-		$height       = (int)$field->parameters->get('height', 540);
-		$autostart    = $field->parameters->get('autostart', 0);
-		$player_position = $field->parameters->get('player_position', 0);
-		$display_edit_size_form = $field->parameters->get('display_edit_size_form', 1);
-		$sticky_video = $field->parameters->get('sticky_video', 0);
-		$sticky_video_width = $field->parameters->get('sticky_video_width', '300px');
-		$sticky_video_position = $field->parameters->get('sticky_video_position', 'bottomright');
-		switch ($sticky_video_position) { //TODO add offset option fot top fixe navigation
-    case 'bottomright':
-        $sticky_video_position = "bottom: 0;right: 0;";
-        break;
-    case 'topright':
-        $sticky_video_position = "top: 0;right: 0;";
-        break;
-    case 'middleright':
-        $sticky_video_position = "top: 38%;right: 0;";
-        break;
-		case 'bottomleft':
-		    $sticky_video_position = "bottom: 0;left: 0;";
-		    break;
-		case 'topleft':
-		    $sticky_video_position = "top: 0;left: 0;";
-		    break;
-		case 'middleleft':
-		   $sticky_video_position = "top: 38%;left: 0;";
-		   break;
-		case 'topcenter':
+		$headinglevel = (int)  $field->parameters->get('headinglevel', 3);
+		$width        = (int) $field->parameters->get('width', 960);
+		$height       = (int) $field->parameters->get('height', 540);
+		$autostart    = (int) $field->parameters->get('autostart', 0);
+
+		$player_position        = (int) $field->parameters->get('player_position', 0);
+		$display_edit_size_form = (int) $field->parameters->get('display_edit_size_form', 1);
+
+		$sticky_video           = (int) $field->parameters->get('sticky_video', 0);
+		$sticky_video_width     = $field->parameters->get('sticky_video_width', '300px');
+		$sticky_video_position  = $field->parameters->get('sticky_video_position', 'bottomright');
+
+		// TODO: add offset option for top, to fix navigation
+		switch ($sticky_video_position)
+		{
+			case 'bottomright':
+			$sticky_video_position = "bottom: 0;right: 0;";
+			break;
+			case 'topright':
+			$sticky_video_position = "top: 0;right: 0;";
+			break;
+			case 'middleright':
+			$sticky_video_position = "top: 38%;right: 0;";
+			break;
+			case 'bottomleft':
+			$sticky_video_position = "bottom: 0;left: 0;";
+			break;
+			case 'topleft':
+			$sticky_video_position = "top: 0;left: 0;";
+			break;
+			case 'middleleft':
+			$sticky_video_position = "top: 38%;left: 0;";
+			break;
+			case 'topcenter':
 			$sticky_video_position = "top: 0;left: 38%;";
 			break;
-		case 'bottomcenter':
+			case 'bottomcenter':
 			$sticky_video_position = "bottom: 0;left: 38%;";
 			break;
-			}
-		if ($sticky_video){
-			$document = JFactory::getDocument();//TODO check code to add auto calcul between video width and height and js position line 594+ 596
+		}
+
+		if ($sticky_video)
+		{
+			// TODO: check code to add auto calculation of video width and height and js position line 594+ 596
+			$document = JFactory::getDocument();
 			$js ="
-			jQuery(document).ready(function () {
-			var ha = (jQuery('.fc_sharedmedia_player_outer').offset().top + jQuery('.fc_sharedmedia_player_outer').height());
-			jQuery(window).scroll(function(){
-				if (jQuery(window).scrollTop() > ha + 500 ) {
-    			jQuery('.fc_sharedmedia_player_outer').css('bottom','0');
-				} else if ( jQuery(window).scrollTop() < ha + 200) {
-    			jQuery('.fc_sharedmedia_player_outer').removeClass('out').addClass('in');
-				} else {
-  				jQuery('.fc_sharedmedia_player_outer').removeClass('in').addClass('out');
-    			jQuery('.fc_sharedmedia_player_outer').css('bottom','-500px');
-  			};
+			jQuery(document).ready(function ()
+			{
+				var ha = (jQuery('.fc_sharedmedia_player_outer').offset().top + jQuery('.fc_sharedmedia_player_outer').height());
+				jQuery(window).scroll(function(
+				{
+					if (jQuery(window).scrollTop() > ha + 500 ) {
+	    			jQuery('.fc_sharedmedia_player_outer').css('bottom','0');
+					} else if ( jQuery(window).scrollTop() < ha + 200) {
+	    			jQuery('.fc_sharedmedia_player_outer').removeClass('out').addClass('in');
+					} else {
+	  				jQuery('.fc_sharedmedia_player_outer').removeClass('in').addClass('out');
+	    			jQuery('.fc_sharedmedia_player_outer').css('bottom','-500px');
+	  			};
+				});
 			});
-			});
-			"; //TODO add in js select play video in scrolldown for now only last video is scroll down
-			$css ="
+			";
+
+			// TODO: add in js select play video in scrolldown for now only last video is scroll down
+			$css = "
 			.fc_sharedmedia_player_outer.out {
   			position: fixed;
 				$sticky_video_position;
@@ -614,7 +638,8 @@ class plgFlexicontent_fieldsSharedmedia extends FCField
   			animation: an 0.5s;
 				}
 				.fc_sharedmedia_player_outer.in { animation: ac 1s; }
-				";
+			";
+
 			$document->addStyleDeclaration($css);
 			$document->addScriptDeclaration($js);
 		}
@@ -636,47 +661,13 @@ class plgFlexicontent_fieldsSharedmedia extends FCField
 		}
 
 
-		// Prefix - Suffix - Separator parameters, replacing other field values if found
-		$remove_space = $field->parameters->get( 'remove_space', 0 ) ;
-		$pretext		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'pretext', '' ), 'pretext' );
-		$posttext		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'posttext', '' ), 'posttext' );
-		$separatorf	= $field->parameters->get( 'separatorf', 1 ) ;
-		$opentag		= JText::_(FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'opentag', '' ), 'opentag' ));
-		$closetag		= JText::_(FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'closetag', '' ), 'closetag' ));
+		/**
+		 * Get common parameters like: itemprop, value's prefix (pretext), suffix (posttext), separator, value list open/close text (opentag, closetag)
+		 * This will replace other field values and item properties, if such are found inside the parameter texts
+		 */
+		$common_params_array = $this->getCommonParams();
+		extract($common_params_array);
 
-		if($pretext)  { $pretext  = $remove_space ? $pretext : $pretext . ' '; }
-		if($posttext) { $posttext = $remove_space ? $posttext : ' ' . $posttext; }
-
-		switch($separatorf)
-		{
-			case 0:
-			$separatorf = '&nbsp;';
-			break;
-
-			case 1:
-			$separatorf = '<br class="fcclear" />';
-			break;
-
-			case 2:
-			$separatorf = '&nbsp;|&nbsp;';
-			break;
-
-			case 3:
-			$separatorf = ',&nbsp;';
-			break;
-
-			case 4:
-			$separatorf = $closetag . $opentag;
-			break;
-
-			case 5:
-			$separatorf = '';
-			break;
-
-			default:
-			$separatorf = '&nbsp;';
-			break;
-		}
 
 		// Create field's HTML
 		$field->{$prop} = array();
@@ -784,10 +775,11 @@ class plgFlexicontent_fieldsSharedmedia extends FCField
 		{
 			// Apply separator and open/close tags
 			$field->{$prop} = implode($separatorf, $field->{$prop});
-			if ( $field->{$prop}!=='' ) {
+
+			// Apply field 's opening / closing texts
+			if ($field->{$prop} !== '')
+			{
 				$field->{$prop} = $opentag . $field->{$prop} . $closetag;
-			} else {
-				$field->{$prop} = '';
 			}
 		}
 	}
@@ -799,7 +791,7 @@ class plgFlexicontent_fieldsSharedmedia extends FCField
 	// **************************************************************
 
 	// Method to handle field's values before they are saved into the DB
-	function onBeforeSaveField( &$field, &$post, &$file, &$item )
+	public function onBeforeSaveField( &$field, &$post, &$file, &$item )
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 
@@ -874,12 +866,12 @@ class plgFlexicontent_fieldsSharedmedia extends FCField
 
 
 
-	// *************************
-	// SEARCH / INDEXING METHODS
-	// *************************
+	// ***
+	// *** SEARCH INDEX METHODS
+	// ***
 
 	// Method to create (insert) advanced search index DB records for the field values
-	function onIndexAdvSearch(&$field, &$post, &$item)
+	public function onIndexAdvSearch(&$field, &$post, &$item)
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 		if ( !$field->isadvsearch && !$field->isadvfilter ) return;
@@ -899,7 +891,7 @@ class plgFlexicontent_fieldsSharedmedia extends FCField
 
 
 	// Method to create basic search index (added as the property field->search)
-	function onIndexSearch(&$field, &$post, &$item)
+	public function onIndexSearch(&$field, &$post, &$item)
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 		if ( !$field->issearch ) return;

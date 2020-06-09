@@ -1,11 +1,11 @@
 <?php
 /**
  * @package         FLEXIcontent
- * @version         3.2
+ * @version         3.4
  *
  * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
  * @link            https://flexicontent.org
- * @copyright       Copyright © 2017, FLEXIcontent team, All Rights Reserved
+ * @copyright       Copyright © 2020, FLEXIcontent team, All Rights Reserved
  * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
@@ -21,7 +21,7 @@ class plgFlexicontent_fieldsTermlist extends FCField
 	// *** CONSTRUCTOR
 	// ***
 
-	function __construct( &$subject, $params )
+	public function __construct( &$subject, $params )
 	{
 		parent::__construct( $subject, $params );
 	}
@@ -33,11 +33,15 @@ class plgFlexicontent_fieldsTermlist extends FCField
 	// ***
 
 	// Method to create field's HTML display for item form
-	function onDisplayField(&$field, &$item)
+	public function onDisplayField(&$field, &$item)
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 
 		$field->label = $field->parameters->get('label_form') ? JText::_($field->parameters->get('label_form')) : JText::_($field->label);
+
+		// Set field and item objects
+		$this->setField($field);
+		$this->setItem($item);
 
 		$use_ingroup = $field->parameters->get('use_ingroup', 0);
 		if (!isset($field->formhidden_grp)) $field->formhidden_grp = $field->formhidden;
@@ -64,22 +68,26 @@ class plgFlexicontent_fieldsTermlist extends FCField
 		$editor_plg_params = array();  // Override parameters of the editor plugin, ignored by most editors !!
 
 
-		// ***
-		// *** Number of values
-		// ***
+		/**
+		 * Number of values
+		 */
 
-		$multiple   = $use_ingroup || (int) $field->parameters->get('allow_multiple', 0);
-		$max_values = $use_ingroup ? 0 : (int) $field->parameters->get('max_values', 0);
-		$required   = (int) $field->parameters->get('required', 0);
+		$multiple     = $use_ingroup || (int) $field->parameters->get('allow_multiple', 0);
+		$max_values   = $use_ingroup ? 0 : (int) $field->parameters->get('max_values', 0);
+		$required     = (int) $field->parameters->get('required', 0);
 		$add_position = (int) $field->parameters->get('add_position', 3);
+
+		// Classes for marking field required
+		$required_class = $required ? ' required' : '';
 
 		// If we are multi-value and not inside fieldgroup then add the control buttons (move, delete, add before/after)
 		$add_ctrl_btns = !$use_ingroup && $multiple;
+		$fields_box_placing = (int) $field->parameters->get('fields_box_placing', 0);
 
 
-		// ***
-		// *** Term title (value handling)
-		// ***
+		/**
+		 * Value handling
+		 */
 
 		// Label
 		$title_label = JText::_($field->parameters->get('title_label', 'FLEXI_FIELD_TERMTITLE'));
@@ -94,9 +102,9 @@ class plgFlexicontent_fieldsTermlist extends FCField
 		$title_maxlength = $field->parameters->get( 'title_maxlength', 0 ) ;
 
 
-		// ***
-		// *** Term text (description) (value handling)
-		// ***
+		/**
+		 * Term text (description) (value handling)
+		 */
 
 		// Label
 		$value_label = JText::_($field->parameters->get('value_label', 'FLEXI_FIELD_TERMTEXT'));
@@ -136,7 +144,7 @@ class plgFlexicontent_fieldsTermlist extends FCField
 		$skip_buttons_arr = ($show_buttons && ($editor_name=='jce' || $editor_name=='tinymce') && count($skip_buttons)) ? $skip_buttons : (boolean) $show_buttons;   // JCE supports skipping buttons
 
 		// Initialise property with default value
-		if (!$field->value)
+		if (!$field->value || (count($field->value) === 1 && $field->value[0] === null))
 		{
 			$field->value = array();
 			$field->value[0]['title'] = $default_title;
@@ -146,6 +154,7 @@ class plgFlexicontent_fieldsTermlist extends FCField
 
 		// CSS classes of value container
 		$value_classes  = 'fcfieldval_container valuebox fcfieldval_container_'.$field->id;
+		$value_classes .= $fields_box_placing ? ' floated' : '';
 
 		// Field name and HTML TAG id
 		$fieldname = 'custom['.$field->name.']';
@@ -157,6 +166,7 @@ class plgFlexicontent_fieldsTermlist extends FCField
 		// Workaround Joomla multi-editor issues
 		$mce_fieldname = '_FC_FIELD_' . $field->name;
 
+		// JS & CSS of current field
 		$js = '';
 		$css = '';
 
@@ -170,7 +180,7 @@ class plgFlexicontent_fieldsTermlist extends FCField
 					handle: '.fcfield-drag-handle',
 					/*containment: 'parent',*/
 					tolerance: 'pointer'
-					".($field->parameters->get('fields_box_placing', 1) ? "
+					".($fields_box_placing ? "
 					,start: function(e) {
 						//jQuery(e.target).children().css('float', 'left');
 						//fc_setEqualHeights(jQuery(e.target), 0);
@@ -201,6 +211,9 @@ class plgFlexicontent_fieldsTermlist extends FCField
 				var lastField = fieldval_box ? fieldval_box : jQuery(el).prev().children().last();
 				var newField  = lastField.clone();
 				newField.find('.fc-has-value').removeClass('fc-has-value');
+
+				// New element's field name and id
+				var element_id = '" . $elementid . "_' + uniqueRowNum" . $field->id . ";
 				";
 
 			// NOTE: HTML tag id of this form element needs to match the -for- attribute of label HTML tag of this FLEXIcontent field, so that label will be marked invalid when needed
@@ -212,7 +225,7 @@ class plgFlexicontent_fieldsTermlist extends FCField
 					termtitle.val(termtitle_dv) :
 					termtitle.val('') ;
 				termtitle.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][title]');
-				termtitle.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_title');
+				termtitle.attr('id', element_id + '_title');
 
 				// Update the new term description
 				var boxClass = 'termtext';
@@ -221,7 +234,7 @@ class plgFlexicontent_fieldsTermlist extends FCField
 
 				var txtArea   = container.find('textarea').first();
 				var oldAreaID = txtArea.attr('id');
-				var newAreaID = '".$elementid."_'+uniqueRowNum".$field->id.";
+				var newAreaID = element_id;
 				var regex_oldAreaID = new RegExp(oldAreaID, 'g');
 
 				// ID of originally cloned textarea 
@@ -296,7 +309,7 @@ class plgFlexicontent_fieldsTermlist extends FCField
 								return (className.match(/(^|\s)fc_xtd_btns_-\S+/g) || []).join(' ');
 							});
 							editor_xtd_buttons.html(editor_xtd_buttons.html().replace(regex_oldAreaID, newAreaID));
-							editor_xtd_buttons.addClass('fc_xtd_btns_".$elementid."_'+uniqueRowNum".$field->id.");
+							editor_xtd_buttons.addClass('fc_xtd_btns_' + element_id);
 							editor_xtd_buttons.appendTo(target.parent());
 						}
 					}
@@ -312,13 +325,13 @@ class plgFlexicontent_fieldsTermlist extends FCField
 				var theArea = newField.find('.fc_'+boxClass).find('textarea');
 				theArea.val('');
 				theArea.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][text]' + mce_fieldname_text_sfx);
-				theArea.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_text');
+				theArea.attr('id', element_id + '_text');
 
 				// Update the labels
-				newField.find('label.labeltitle').attr('for', '".$elementid."_'+uniqueRowNum".$field->id."+'_title');
-				newField.find('label.labeltitle').attr('id', '".$elementid."_'+uniqueRowNum".$field->id."+'_title-lbl');
-				newField.find('label.labeltext').attr('for', '".$elementid."_'+uniqueRowNum".$field->id."+'_text');
-				newField.find('label.labeltext').attr('id', '".$elementid."_'+uniqueRowNum".$field->id."+'_text-lbl');
+				newField.find('label.labeltitle').attr('for', element_id + '_title');
+				newField.find('label.labeltitle').attr('id', element_id + '_title-lbl');
+				newField.find('label.labeltext').attr('for', element_id + '_text');
+				newField.find('label.labeltext').attr('id', element_id + '_text-lbl');
 				";
 
 			// Add new field to DOM
@@ -352,7 +365,7 @@ class plgFlexicontent_fieldsTermlist extends FCField
 					// Add click event to Legacy (external) editor XTD-buttons, e.g. JCE, tinyMCE of < J3.7.0
 					if (!(tinyMCE.majorVersion >= 4) && editor_xtd_buttons && editor_xtd_buttons.length)
 					{
-						SqueezeBox.assign(jQuery('#editor-xtd-buttons.fc_xtd_btns_".$elementid."_'+uniqueRowNum".$field->id." + ' a.modal-button').get(), { parse: 'rel' });
+						SqueezeBox.assign(jQuery('#editor-xtd-buttons.fc_xtd_btns_' + element_id + ' a.modal-button').get(), { parse: 'rel' });
 					}
 				}
 				";
@@ -375,6 +388,7 @@ class plgFlexicontent_fieldsTermlist extends FCField
 				rowCount".$field->id."++;       // incremented / decremented
 				uniqueRowNum".$field->id."++;   // incremented only
 			}
+
 
 			function deleteField".$field->id."(el, groupval_box, fieldval_box)
 			{
@@ -441,13 +455,13 @@ class plgFlexicontent_fieldsTermlist extends FCField
 		if ($css) $document->addStyleDeclaration($css);
 
 
-		// ***
-		// *** Create field's HTML display for item form
-		// ***
+		/**
+		 * Create field's HTML display for item form
+		 */
 
 		$field->html = array();
 		$n = 0;
-		//if ($use_ingroup) {print_r($field->value);}
+
 		foreach ($field->value as $value)
 		{
 			// Compatibility for non-serialized values (e.g. reload user input after form validation error) or for NULL values in a field group
@@ -473,7 +487,7 @@ class plgFlexicontent_fieldsTermlist extends FCField
 			$title = '
 				<div class="fc_termtitle">
 					<label id="'.$elementid_n.'_title-lbl" class="label label-info labeltitle" for="'.$elementid_n.'_title">'.$title_label.'</label>
-					<input class="fcfield_textval termtitle '.($required ? ' required' : '').'" id="'.$elementid_n.'_title" name="'.$fieldname_n.'[title]" type="text" size="'.$title_size.'" '.($title_maxlength ? 'maxlength="'.$title_maxlength.'"' : '').'
+					<input class="fcfield_textval termtitle' . $required_class . '" id="'.$elementid_n.'_title" name="'.$fieldname_n.'[title]" type="text" size="'.$title_size.'" '.($title_maxlength ? 'maxlength="'.$title_maxlength.'"' : '').'
 						value="'.htmlspecialchars( @$value['title'], ENT_COMPAT, 'UTF-8' ).'" data-defvals="'.htmlspecialchars( $default_title, ENT_COMPAT, 'UTF-8' ).'"/>
 				</div>';
 
@@ -481,7 +495,7 @@ class plgFlexicontent_fieldsTermlist extends FCField
 			//display($name, $html, $width, $height, $col, $row, $buttons = true, $id = null, $asset = null, $author = null, $params = array())
 			$mce_fieldname_sfx_text = $mce_fieldname ? '[' . $mce_fieldname . '_text]' : '';
 			$text = !$use_html ? '
-				<textarea class="fcfield_textval termtext' .($required ? ' required' : ''). '" id="'.$elementid_n.'_text" name="'.$fieldname_n.'[text]" cols="'.$cols.'" rows="'.$rows.'" '.($maxlength ? 'maxlength="'.$maxlength.'"' : '').'>'
+				<textarea class="fcfield_textval termtext' . $required_class . '" id="'.$elementid_n.'_text" name="'.$fieldname_n.'[text]" cols="'.$cols.'" rows="'.$rows.'" '.($maxlength ? 'maxlength="'.$maxlength.'"' : '').'>'
 					.htmlspecialchars( $value['text'], ENT_COMPAT, 'UTF-8' ).
 				'</textarea>
 				' : $editor->display(
@@ -492,7 +506,7 @@ class plgFlexicontent_fieldsTermlist extends FCField
 			$text = '
 				<div class="fc_termtext">
 					<label id="'.$elementid_n.'_text-lbl" class="label label-info labeltext" for="'.$elementid_n.'_text">'.$value_label.'</label>
-					<div class="fcfield_box' .($required ? ' required_box' : ''). '" data-label_text="'.$field->label.'">
+					<div class="fcfield_box' . ($required ? ' required_box' : '') . '" data-label_text="'.$field->label.'">
 						'.$text.'
 					</div>
 				</div>';
@@ -536,16 +550,55 @@ class plgFlexicontent_fieldsTermlist extends FCField
 		// Handle single values
 		else
 		{
-			$field->html = '<div class="fcfieldval_container valuebox fcfieldval_container_'.$field->id.'">' . $field->html[0] .'</div>';
+			$field->html = '<div class="fcfieldval_container valuebox fcfieldval_container_'.$field->id.'">
+				' . (isset($field->html[-1]) ? $field->html[-1] : '') . $field->html[0] . '
+			</div>';
 		}
 	}
 
 
 	// Method to create field's HTML display for frontend views
-	function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')
+	public function onDisplayFieldValue(&$field, $item, $values = null, $prop = 'display')
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
+
 		$field->label = JText::_($field->label);
+
+		// Set field and item objects
+		$this->setField($field);
+		$this->setItem($item);
+
+
+		/**
+		 * One time initialization
+		 */
+
+		static $initialized = null;
+		static $app, $document, $option, $format, $realview;
+
+		if ($initialized === null)
+		{
+			$initialized = 1;
+
+			$app       = JFactory::getApplication();
+			$document  = JFactory::getDocument();
+			$option    = $app->input->getCmd('option', '');
+			$format    = $app->input->getCmd('format', 'html');
+			$realview  = $app->input->getCmd('view', '');
+		}
+
+		// Current view variable
+		$view = $app->input->getCmd('flexi_callview', ($realview ?: 'item'));
+		$sfx = $view === 'item' ? '' : '_cat';
+
+		// Check if field should be rendered according to configuration
+		if (!$this->checkRenderConds($prop, $view))
+		{
+			return;
+		}
+
+		// The current view is a full item view of the item
+		$isMatchedItemView = static::$itemViewId === (int) $item->id;
 
 		// Some variables
 		$is_ingroup  = !empty($field->ingroup);
@@ -556,10 +609,10 @@ class plgFlexicontent_fieldsTermlist extends FCField
 		$view = $app->input->get('flexi_callview', $app->input->get('view', 'item', 'cmd'), 'cmd');
 
 		// Value handling parameters
-		$lang_filter_values = $field->parameters->get( 'lang_filter_values', 1);
-		$clean_output = $field->parameters->get('clean_output', 0);
-		$encode_output = $field->parameters->get('encode_output', 0);
-		$use_html = (int) $field->parameters->get( 'use_html', 0 );
+		$lang_filter_values = $field->parameters->get('lang_filter_values', 0);
+		$clean_output       = $field->parameters->get('clean_output', 0);
+		$encode_output      = $field->parameters->get('encode_output', 0);
+		$use_html           = (int) $field->parameters->get( 'use_html', 0 );
 
 		// Optionally limit and cut term (description) text, and also optionally display in modal popup window
 		$cut_text        = $view=='item' ? 0 : $field->parameters->get('cut_text_catview', 0);
@@ -569,9 +622,9 @@ class plgFlexicontent_fieldsTermlist extends FCField
 		$cut_text_display_btn_text = JText::_($field->parameters->get('cut_text_display_btn_text_catview', '...'));
 
 
-		// ***
-		// *** Default value
-		// ***
+		/**
+		 * Default value
+		 */
 
 		// Term Title
 		$title_label = JText::_($field->parameters->get('title_label', 'FLEXI_FIELD_TERMTITLE'));
@@ -589,7 +642,7 @@ class plgFlexicontent_fieldsTermlist extends FCField
 		$values = $values ? $values : $field->value;
 
 		// Check for no values and no default value, and return empty display
-		if ( empty($values) )
+		if (empty($values))
 		{
 			if (!strlen($default_value))
 			{
@@ -603,9 +656,9 @@ class plgFlexicontent_fieldsTermlist extends FCField
 		}
 
 
-		// ******************************************
-		// Language filter, clean output, encode HTML
-		// ******************************************
+		/**
+		 * Language filter, clean output, encode HTML
+		 */
 
 		if ($clean_output)
 		{
@@ -625,19 +678,23 @@ class plgFlexicontent_fieldsTermlist extends FCField
 					);
 				}
 
-				if ($lang_filter_values) {
+				if ($lang_filter_values)
+				{
 					$value['title'] = JText::_($value['title']);
 					$value['text']  = JText::_($value['text']);
 				}
-				if ($clean_output) {
+				if ($clean_output)
+				{
 					$value['title'] = $ifilter->clean($value['title'], 'string');
 					$value['text']  = $ifilter->clean($value['text'], 'string');
 				}
-				if ($encode_output) {
+				if ($encode_output)
+				{
 					$value['title'] = htmlspecialchars( $value['title'], ENT_QUOTES, 'UTF-8' );
 					$value['text']  = htmlspecialchars( $value['text'], ENT_QUOTES, 'UTF-8' );
 				}
-				if (!$use_html) {
+				if (!$use_html)
+				{
 					$value['text'] = nl2br(preg_replace("/(\r\n|\r|\n){3,}/", "\n\n", $value['text']));
 				}
 			}
@@ -645,56 +702,27 @@ class plgFlexicontent_fieldsTermlist extends FCField
 		}
 
 
-		// Prefix - Suffix - Separator parameters, replacing other field values if found
-		$remove_space = $field->parameters->get( 'remove_space', 0 ) ;
-		$pretext		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'pretext', '' ), 'pretext' );
-		$posttext		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'posttext', '' ), 'posttext' );
-		$separatorf	= $field->parameters->get( 'separatorf', 1 ) ;
-		$opentag		= JText::_(FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'opentag', '' ), 'opentag' ));
-		$closetag		= JText::_(FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'closetag', '' ), 'closetag' ));
+		/**
+		 * Get common parameters like: itemprop, value's prefix (pretext), suffix (posttext), separator, value list open/close text (opentag, closetag)
+		 * This will replace other field values and item properties, if such are found inside the parameter texts
+		 */
+		$common_params_array = $this->getCommonParams();
+		extract($common_params_array);
 
-		// Microdata (classify the field values for search engines)
-		$itemprop    = $field->parameters->get('microdata_itemprop');
 
-		if($pretext)  { $pretext  = $remove_space ? $pretext : $pretext . ' '; }
-		if($posttext) { $posttext = $remove_space ? $posttext : ' ' . $posttext; }
-
-		switch($separatorf)
+		// CSV export: Create a simpler output
+		if ($prop === 'csv_export')
 		{
-			case 0:
-			$separatorf = '&nbsp;';
-			break;
-
-			case 1:
-			$separatorf = '<br class="fcclear" />';
-			break;
-
-			case 2:
-			$separatorf = '&nbsp;|&nbsp;';
-			break;
-
-			case 3:
-			$separatorf = ',&nbsp;';
-			break;
-
-			case 4:
-			$separatorf = $closetag . $opentag;
-			break;
-
-			case 5:
-			$separatorf = '';
-			break;
-
-			default:
-			$separatorf = '&nbsp;';
-			break;
+			$separatorf = ', ';
+			$itemprop = false;
 		}
+
 
 		// Get layout name
 		$viewlayout = $field->parameters->get('viewlayout', '');
 		$viewlayout = $viewlayout ? 'value_'.$viewlayout : 'value_default';
 
-		// Create field's HTML, using layout file
+		// Create field's viewing HTML, using layout file
 		$field->{$prop} = array();
 		include(self::getViewPath($field->field_type, $viewlayout));
 
@@ -703,13 +731,14 @@ class plgFlexicontent_fieldsTermlist extends FCField
 		{
 			// Apply values separator
 			$field->{$prop} = implode($separatorf, $field->{$prop});
-			if ( $field->{$prop}!=='' )
+
+			if ($field->{$prop} !== '')
 			{
 				// Apply field 's opening / closing texts
 				$field->{$prop} = $opentag . $field->{$prop} . $closetag;
 
 				// Add microdata once for all values, if field -- is NOT -- in a field group
-				if ( $itemprop )
+				if ($itemprop)
 				{
 					$field->{$prop} = '<div style="display:inline" itemprop="'.$itemprop.'" >' .$field->{$prop}. '</div>';
 				}
@@ -724,7 +753,7 @@ class plgFlexicontent_fieldsTermlist extends FCField
 	// ***
 
 	// Method to handle field's values before they are saved into the DB
-	function onBeforeSaveField( &$field, &$post, &$file, &$item )
+	public function onBeforeSaveField( &$field, &$post, &$file, &$item )
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 
@@ -806,13 +835,15 @@ class plgFlexicontent_fieldsTermlist extends FCField
 
 
 	// Method to take any actions/cleanups needed after field's values are saved into the DB
-	function onAfterSaveField( &$field, &$post, &$file, &$item ) {
+	public function onAfterSaveField( &$field, &$post, &$file, &$item )
+	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 	}
 
 
 	// Method called just before the item is deleted to remove custom item data related to the field
-	function onBeforeDeleteField(&$field, &$item) {
+	public function onBeforeDeleteField(&$field, &$item)
+	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 	}
 
@@ -823,7 +854,7 @@ class plgFlexicontent_fieldsTermlist extends FCField
 	// ***
 
 	// Method to display a search filter for the advanced search view
-	function onAdvSearchDisplayFilter(&$filter, $value='', $formName='searchForm')
+	public function onAdvSearchDisplayFilter(&$filter, $value = '', $formName = 'searchForm')
 	{
 		if ( !in_array($filter->field_type, static::$field_types) ) return;
 
@@ -832,9 +863,9 @@ class plgFlexicontent_fieldsTermlist extends FCField
 	}
 
 
- 	// Method to get the active filter result (an array of item ids matching field filter, or subquery returning item ids)
+	// Method to get the active filter result (an array of item ids matching field filter, or subquery returning item ids)
 	// This is for search view
-	function getFilteredSearch(&$filter, $value, $return_sql=true)
+	public function getFilteredSearch(&$filter, $value, $return_sql = true)
 	{
 		if ( !in_array($filter->field_type, static::$field_types) ) return;
 
@@ -845,11 +876,11 @@ class plgFlexicontent_fieldsTermlist extends FCField
 
 
 	// ***
-	// *** SEARCH / INDEXING METHODS
+	// *** SEARCH INDEX METHODS
 	// ***
 
 	// Method to create (insert) advanced search index DB records for the field values
-	function onIndexAdvSearch(&$field, &$post, &$item)
+	public function onIndexAdvSearch(&$field, &$post, &$item)
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 		if ( !$field->isadvsearch && !$field->isadvfilter ) return;
@@ -869,7 +900,7 @@ class plgFlexicontent_fieldsTermlist extends FCField
 
 
 	// Method to create basic search index (added as the property field->search)
-	function onIndexSearch(&$field, &$post, &$item)
+	public function onIndexSearch(&$field, &$post, &$item)
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 		if ( !$field->issearch ) return;

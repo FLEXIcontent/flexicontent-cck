@@ -1,11 +1,11 @@
 <?php
 /**
  * @package         FLEXIcontent
- * @version         3.2
+ * @version         3.4
  *
  * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
  * @link            https://flexicontent.org
- * @copyright       Copyright © 2017, FLEXIcontent team, All Rights Reserved
+ * @copyright       Copyright © 2020, FLEXIcontent team, All Rights Reserved
  * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
@@ -18,8 +18,6 @@ JLoader::register('FCField', JPATH_ADMINISTRATOR . '/components/com_flexicontent
 
 class plgFlexicontent_fieldsCore extends FCField
 {
-	static $cparams = null;
-
 	static $field_types = null;
 	var $task_callable = null;
 
@@ -27,16 +25,11 @@ class plgFlexicontent_fieldsCore extends FCField
 	// *** CONSTRUCTOR
 	// ***
 
-	function __construct( &$subject, $params )
+	public function __construct( &$subject, $params )
 	{
 		parent::__construct( $subject, $params );
 		JPlugin::loadLanguage('plg_flexicontent_fields_core', JPATH_ADMINISTRATOR);
 		JPlugin::loadLanguage('plg_flexicontent_fields_textarea', JPATH_ADMINISTRATOR);
-
-		if (self::$cparams===null)
-		{
-			self::$cparams = JComponentHelper::getParams( 'com_flexicontent' );
-		}
 	}
 
 
@@ -46,7 +39,7 @@ class plgFlexicontent_fieldsCore extends FCField
 	// ***
 
 	// Method to create field's HTML display for item form
-	function onDisplayCoreFieldValue( &$_field, & $_item, &$params, $_tags=null, $_categories=null, $_favourites=null, $_favoured=null, $_vote=null, $raw_values=null, $prop='display' )
+	public function onDisplayCoreFieldValue( &$_field, & $_item, &$params, $_tags=null, $_categories=null, $_favourites=null, $_favoured=null, $_vote=null, $raw_values=null, $prop='display' )
 	{
 		static $cat_links = array();
 		static $tag_links = array();
@@ -63,14 +56,22 @@ class plgFlexicontent_fieldsCore extends FCField
 			return;
 		}
 
+		// $_field can be field name !!
+		$field = is_object($_field)
+			? $_field
+			: $item->fields[$_field];
 
-		// ***
-		// *** One time initialization
-		// ***
+		// Set field and item objects
+		$this->setField($field);
+		$this->setItem($item);
+
+
+		/**
+		 * One time initialization
+		 */
 
 		static $initialized = null;
 		static $app, $document, $option, $format, $realview;
-		static $itemViewId, $isItemsManager, $isHtmlViewFE;
 		static $cut_options;
 
 		if ($initialized === null)
@@ -79,15 +80,9 @@ class plgFlexicontent_fieldsCore extends FCField
 
 			$app       = JFactory::getApplication();
 			$document  = JFactory::getDocument();
-			$option    = $app->input->get('option', '', 'cmd');
-			$format    = $app->input->get('format', 'html', 'cmd');
-			$realview  = $app->input->get('view', '', 'cmd');
-
-			$itemViewId     = $realview === 'item' && $option === 'com_flexicontent' ? $app->input->get('id', 0, 'int') : 0;
-			$isItemsManager = $app->isClient('administrator') && $realview === 'items' && $option === 'com_flexicontent';
-			$isHtmlViewFE   = $format === 'html' && $app->isClient('site');
-
-			$cparams   = JComponentHelper::getParams( 'com_flexicontent' );
+			$option    = $app->input->getCmd('option', '');
+			$format    = $app->input->getCmd('format', 'html');
+			$realview  = $app->input->getCmd('view', '');
 
 			$cut_options = array(
 				'cut_at_word' => true,
@@ -99,16 +94,18 @@ class plgFlexicontent_fieldsCore extends FCField
 			);
 		}
 
-		// Current view variable
-		$view = $app->input->get('flexi_callview', ($realview ?: 'item'), 'cmd');
-
 		// The current view is a full item view of the item
-		$isMatchedItemView = $itemViewId === (int) $item->id;
+		$isMatchedItemView = static::$itemViewId === (int) $item->id;
 
+		// Current view variable
+		$view = $app->input->getCmd('flexi_callview', ($realview ?: 'item'));
+		$sfx = $view === 'item' ? '' : '_cat';
 
-		$field = is_object($_field)
-			? $_field
-			: $item->fields[$_field];
+		// Check if field should be rendered according to configuration
+		if (!$this->checkRenderConds($prop, $view))
+		{
+			return;
+		}
 
 		// Prefix - Suffix - Separator parameters
 		// These parameters should be common so we will retrieve them from the first item instead of inside the loop
@@ -276,13 +273,15 @@ class plgFlexicontent_fieldsCore extends FCField
 						: $_vote;
 
 
-					// Enable/disable according to current view
+					/**
+					 * Get Voting configuration
+					 */
 					$vote_submit_inview = FLEXIUtilities::paramToArray($field->parameters->get('vote_submit_inview', array('item')));
 					$composite_inview   = FLEXIUtilities::paramToArray($field->parameters->get('composite_inview', array('item')));
 					$enable_extra_votes = $field->parameters->get('enable_extra_votes', 0);
 
-					$allow_vote = in_array($view, $vote_submit_inview) || ($isItemsManager && in_array('backend', $vote_submit_inview));
-					$show_composite = in_array($view, $composite_inview) || ($isItemsManager && in_array('backend', $composite_inview));
+					$allow_vote     = in_array($view, $vote_submit_inview) || (static::$isItemsManager && in_array('backend', $vote_submit_inview));
+					$show_composite = in_array($view, $composite_inview) || (static::$isItemsManager && in_array('backend', $composite_inview));
 
 					// Disable vote submit if voting disabled or if extra voting characteristics are not visible
 					if (!$allow_vote || ($enable_extra_votes && !$show_composite))
@@ -295,6 +294,20 @@ class plgFlexicontent_fieldsCore extends FCField
 					if (!$show_composite)
 					{
 						$field->parameters->set('enable_extra_votes', 0);
+					}
+
+					/**
+					 * Get reviews configuration
+					 */
+					$allow_reviews = (int) $field->parameters->get('allow_reviews', 0);
+
+					if ($allow_reviews)
+					{
+						$db = JFactory::getDbo();
+						$query = 'SELECT * FROM #__flexicontent_reviews WHERE content_id = ' . (int) $item->id;
+						$reviews = $db->setQuery($query)->loadObjectList();
+
+						$reviews_placement = (int) $field->parameters->get('reviews_placement', 0);
 					}
 
 					$field->value[] = 'button';  // A dummy value to force display
@@ -347,7 +360,7 @@ class plgFlexicontent_fieldsCore extends FCField
 					break;
 
 				case 'tags': // assigned tags
-					$use_catlinks = self::$cparams->get('tags_using_catview', 0);
+					$use_catlinks = static::$cparams->get('tags_using_catview', 0);
 					$field->{$prop} = '';
 
 					/*if ($raw_values!==null) $tags = convert ... $raw_values;
@@ -370,7 +383,7 @@ class plgFlexicontent_fieldsCore extends FCField
 					break;
 
 				case 'maintext': // main text
-				
+
 					// If doing CSV export then do output all text and skip further handling
 					if ($prop === 'csv_export')
 					{
@@ -421,7 +434,7 @@ class plgFlexicontent_fieldsCore extends FCField
 							: $item->fulltext;
 					}
 
-					if ($isItemsManager)
+					if (static::$isItemsManager)
 					{
 						$uncut_length = 0;
 						$field->{$prop} = flexicontent_html::striptagsandcut($field->{$prop}, 200, $uncut_length, $cut_options);
@@ -433,7 +446,7 @@ class plgFlexicontent_fieldsCore extends FCField
 					if ($field->parameters->get('useogp', 1) && $field->{$prop})
 					{
 						// The current view is frontend view with HTML format and is a full item view of current item
-						if ($isHtmlViewFE && $isMatchedItemView)
+						if (static::$isHtmlViewFE && $isMatchedItemView)
 						{
 							$ogpmaxlen = $field->parameters->get('ogpmaxlen', 300);
 
@@ -449,7 +462,7 @@ class plgFlexicontent_fieldsCore extends FCField
 
 
 	// Method to create field's HTML display for item form
-	function onDisplayField(&$field, &$item)
+	public function onDisplayField(&$field, &$item)
 	{
 		$field->label = $field->parameters->get('label_form') ? JText::_($field->parameters->get('label_form')) : JText::_($field->label);
 
@@ -488,12 +501,13 @@ class plgFlexicontent_fieldsCore extends FCField
 	}
 
 
+
 	// ***
 	// *** METHODS HANDLING before & after saving / deleting field events
 	// ***
 
 	// Method to handle field's values before they are saved into the DB
-	function onBeforeSaveField( &$field, &$post, &$file, &$item )
+	public function onBeforeSaveField( &$field, &$post, &$file, &$item )
 	{
 		if($field->iscore != 1) return;
 		if(!is_array($post) && !strlen($post)) return;
@@ -506,9 +520,13 @@ class plgFlexicontent_fieldsCore extends FCField
 	}
 
 
-	// Method to do extra handling of field's values after all fields have validated their posted data, and are ready to be saved
-	// $item->fields['fieldname']->postdata contains values of other fields
-	// $item->fields['fieldname']->filedata contains files of other fields (normally this is empty due to using AJAX for file uploading)
+	/**
+	 * Method to do extra handling of field's values after all fields have validated their posted data, and are ready to be saved
+	 * OVERRIDE Default implementation
+	 *
+	 * $item->fields['fieldname']->postdata contains values of other fields
+	 * $item->fields['fieldname']->filedata contains files of other fields (normally this is empty due to using AJAX for file uploading)
+	 */
 	function onAllFieldsPostDataValidated( &$field, &$item )
 	{
 		if($field->iscore != 1) return;
@@ -549,13 +567,13 @@ class plgFlexicontent_fieldsCore extends FCField
 
 
 	// Method to take any actions/cleanups needed after field's values are saved into the DB
-	function onAfterSaveField( &$field, &$post, &$file, &$item )
+	public function onAfterSaveField( &$field, &$post, &$file, &$item )
 	{
 	}
 
 
 	// Method called just before the item is deleted to remove custom item data related to the field
-	function onBeforeDeleteField(&$field, &$item)
+	public function onBeforeDeleteField(&$field, &$item)
 	{
 	}
 
@@ -566,7 +584,7 @@ class plgFlexicontent_fieldsCore extends FCField
 	// ***
 
 	// Method to display a search filter for the advanced search view
-	function onAdvSearchDisplayFilter(&$filter, $value='', $formName='searchForm')
+	public function onAdvSearchDisplayFilter(&$filter, $value = '', $formName = 'searchForm')
 	{
 		if ($filter->iscore != 1)
 		{
@@ -595,7 +613,7 @@ class plgFlexicontent_fieldsCore extends FCField
 
 
 	// Method to display a category filter for the category view
-	function onDisplayFilter(&$filter, $value='', $formName='adminForm', $isSearchView=0)
+	public function onDisplayFilter(&$filter, $value = '', $formName = 'adminForm', $isSearchView = 0)
 	{
 		if ($filter->iscore != 1)
 		{
@@ -976,9 +994,9 @@ class plgFlexicontent_fieldsCore extends FCField
 	}
 
 
- 	// Method to get the active filter result (an array of item ids matching field filter, or subquery returning item ids)
+	// Method to get the active filter result (an array of item ids matching field filter, or subquery returning item ids)
 	// This is for content lists e.g. category view, and not for search view
-	function getFiltered(&$filter, $value, $return_sql=true)
+	public function getFiltered(&$filter, $value, $return_sql = true)
 	{
 		if ( !$filter->iscore ) return;
 		//echo __FUNCTION__ ." of CORE field type: ".$filter->field_type;
@@ -1040,17 +1058,17 @@ class plgFlexicontent_fieldsCore extends FCField
 	}
 
 
- 	// Method to get the active filter result (an array of item ids matching field filter, or subquery returning item ids)
+	// Method to get the active filter result (an array of item ids matching field filter, or subquery returning item ids)
 	// This is for search view
-	function getFilteredSearch(&$filter, $value, $return_sql=true)
+	public function getFilteredSearch(&$filter, $value, $return_sql = true)
 	{
 		if ($filter->iscore != 1)
 		{
 			return;
 		}
 
-		// Only supports a basic filter of single text search input
-		if ($filter->field_type == 'maintext' || $filter->field_type == 'title')
+		// For fields: title, description, only supports a basic filter of single text search input
+		if ($filter->field_type === 'maintext' || $filter->field_type === 'title')
 		{
 			$filter->parameters->set( 'display_filter_as_s', 1 );
 		}
@@ -1062,11 +1080,11 @@ class plgFlexicontent_fieldsCore extends FCField
 
 
 	// ***
-	// *** SEARCH / INDEXING METHODS
+	// *** SEARCH INDEX METHODS
 	// ***
 
 	// Method to create (insert) advanced search index DB records for the field values
-	function onIndexAdvSearch(&$field, &$post, &$item)
+	public function onIndexAdvSearch(&$field, &$post, &$item)
 	{
 		if ( !$field->iscore ) return;
 		if ( !$field->isadvsearch && !$field->isadvfilter ) return;
@@ -1081,7 +1099,7 @@ class plgFlexicontent_fieldsCore extends FCField
 
 
 	// Method to create basic search index (added as the property field->search)
-	function onIndexSearch(&$field, &$post, &$item)
+	public function onIndexSearch(&$field, &$post, &$item)
 	{
 		if ( !$field->iscore ) return;
 		if ( !$field->issearch ) return;
@@ -1217,6 +1235,12 @@ class plgFlexicontent_fieldsCore extends FCField
 		return $values;
 	}
 
+
+	/**
+	 * Function to return a category subtree 
+	 * - starting at a specific parent category parent
+	 * - while having a depth limit
+	 */
 	private function _catTreeRecurse($_cid, &$cats, $display_filter_as, $add_root, $start_depth, $filter_depth)
 	{
 		global $globalcats;

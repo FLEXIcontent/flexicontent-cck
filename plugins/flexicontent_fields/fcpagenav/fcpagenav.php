@@ -1,11 +1,11 @@
 <?php
 /**
  * @package         FLEXIcontent
- * @version         3.2
+ * @version         3.4
  *
  * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
  * @link            https://flexicontent.org
- * @copyright       Copyright © 2017, FLEXIcontent team, All Rights Reserved
+ * @copyright       Copyright © 2020, FLEXIcontent team, All Rights Reserved
  * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
@@ -21,7 +21,7 @@ class plgFlexicontent_fieldsFcpagenav extends FCField
 	// *** CONSTRUCTOR
 	// ***
 
-	function __construct( &$subject, $params )
+	public function __construct( &$subject, $params )
 	{
 		parent::__construct( $subject, $params );
 	}
@@ -33,18 +33,23 @@ class plgFlexicontent_fieldsFcpagenav extends FCField
 	// ***
 
 	// Method to create field's HTML display for item form
-	function onDisplayField(&$field, &$item)
+	public function onDisplayField(&$field, &$item)
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
-		$field->html = '';
 	}
 
 
 	// Method to create field's HTML display for frontend views
-	function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')
+	public function onDisplayFieldValue(&$field, $item, $values = null, $prop = 'display')
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
-		$field->{$prop} = '';
+
+		$field->label = JText::_($field->label);
+
+		// Set field and item objects
+		$this->setField($field);
+		$this->setItem($item);
+
 
 		global $globalcats;
 		$app  = JFactory::getApplication();
@@ -58,13 +63,14 @@ class plgFlexicontent_fieldsFcpagenav extends FCField
 		// No output if it is not FLEXIcontent item view or view is "print"
 		if ($view != FLEXI_ITEMVIEW || $option != 'com_flexicontent' || $print)
 		{
+			$field->{$prop} = '';
 			return;
 		}
 
 
-		// ***
-		// *** Parameters shortcuts
-		// ***
+		/**
+		 * Parameters shortcuts
+		 */
 
 		$tooltip_class = 'hasTooltip';
 		$load_css 			= $field->parameters->get('load_css', 1);
@@ -79,8 +85,7 @@ class plgFlexicontent_fieldsFcpagenav extends FCField
 		$category_label	= JText::_($field->parameters->get('category_label', 'FLEXI_FIELDS_PAGENAV_CATEGORY'));
 		$loop_prevnext = (int) $field->parameters->get('loop_prevnext', 1);
 
-		$field->{$prop} = null;
-		$cid = $app->input->get('cid', 0 , 'int');
+		$cid = $app->input->getInt('cid', 0);
 		$cid = !$cid || !isset($globalcats[$cid])
 			? (int) $item->catid
 			: $cid;
@@ -90,19 +95,22 @@ class plgFlexicontent_fieldsFcpagenav extends FCField
 		$ids_to_loc = array_flip($loc_to_ids);
 
 
-		// ***
-		// *** Get category parameters
-		// ***
+		/**
+		 * Get category parameters
+		 */
 
-		$query 	= 'SELECT * FROM #__categories WHERE id = ' . $cid;
-		$db->setQuery($query);
-		$category = $db->loadObject();
+		$query 	= $db->getQuery(true)
+			->select('*')
+			->from('#__categories')
+			->where('id = ' . (int) $cid)
+			;
+		$category = $db->setQuery($query)->loadObject();
 		$category->parameters = new JRegistry($category->params);
 
 
-		// ***
-		// *** First check if location-IDs map has been already populated for this category id (for current user)
-		// ***
+		/**
+		 * First check if location-IDs map has been already populated for this category id (for current user)
+		 */
 
 		if ( isset($ids_to_loc[$item->id]) )
 		{
@@ -110,10 +118,10 @@ class plgFlexicontent_fieldsFcpagenav extends FCField
 		}
 
 
-		// ***
-		// *** Get location-IDs map, we pass [ids = null] to indicate to return an item ids array. TODO retrieve item ids from view:
-		// *** this will allow special navigating layouts "mcats,author,myitems,tags,favs" and also utilize current filtering
-		// ***
+		/**
+		 * Get location-IDs map, we pass [ids = null] to indicate to return an item ids array. TODO retrieve item ids from view:
+		 * this will allow special navigating layouts "mcats,author,myitems,tags,favs" and also utilize current filtering
+		 */
 
 		else
 		{
@@ -146,9 +154,9 @@ class plgFlexicontent_fieldsFcpagenav extends FCField
 		}
 
 
-		// ***
-		// *** Initialize to empty before getting data of: previous item / next item / category
-		// ***
+		/**
+		 * Initialize to empty before getting data of: previous item / next item / category
+		 */
 
 		$field->prev = null;
 		$field->prevtitle = null;
@@ -161,13 +169,14 @@ class plgFlexicontent_fieldsFcpagenav extends FCField
 		$field->categoryurl = null;
 
 
-		// ***
-		// *** Get item data
-		// ***
+		/**
+		 * Get item data
+		 */
 
 		$rows = false;
 		$prev_id = null;
 		$next_id = null;
+
 		if ($location !== false)
 		{
 			$prev_id = ($location - 1) >= 0
@@ -210,19 +219,20 @@ class plgFlexicontent_fieldsFcpagenav extends FCField
 		}
 
 
-		// ***
-		// *** Check if displaying nothing and stop
-		// ***
+		/**
+		 * Check if displaying nothing and stop
+		 */
 
 		if (!$field->prev && !$field->next && (!$use_category_link || empty($rows[$item->id]->categoryslug)))
 		{
+			$field->{$prop} = '';
 			return;
 		}
 
 
-		// ***
-		// *** Get images
-		// ***
+		/**
+		 * Get images
+		 */
 
 		$items_arr = array();
 		if ($field->prev) $items_arr[$field->prev->id] = $field->prev;
@@ -235,19 +245,18 @@ class plgFlexicontent_fieldsFcpagenav extends FCField
 		$field->nextThumb = $field->next && isset($thumbs[$field->next->id]) ? $thumbs[$field->next->id] : '';
 
 
-		// ***
-		// *** Load view layout
-		// ***
-
+		// Get layout name
 		$viewlayout = $field->parameters->get('viewlayout', '');
 		$viewlayout = $viewlayout ? 'value_'.$viewlayout : 'value_default';
 
+		// Create field's viewing HTML, using layout file
+		$field->{$prop} = array();
 		include(self::getViewPath($field->field_type, $viewlayout));
 
 
-		// ***
-		// *** Load needed JS/CSS
-		// ***
+		/**
+		 * Load needed JS/CSS
+		 */
 
 		if ($add_tooltips && $use_tooltip)
 		{
@@ -258,7 +267,27 @@ class plgFlexicontent_fieldsFcpagenav extends FCField
 			JFactory::getDocument()->addStyleSheet(JUri::root(true).'/plugins/flexicontent_fields/fcpagenav/'.(FLEXI_J16GE ? 'fcpagenav/' : '').'fcpagenav.css');
 		}
 
-		$field->{$prop} = $html;
+		// $html variable , should be set by the layout file
+		$field->{$prop} = isset($html) ? $html : $field->{$prop};
+
+		// Do not convert the array to string if field is in a group, and do not add: FIELD's opentag, closetag, value separator
+		if (!$is_ingroup)
+		{
+			// Apply values separator
+			$field->{$prop} = implode($separatorf, $field->{$prop});
+
+			if ($field->{$prop} !== '')
+			{
+				// Apply field 's opening / closing texts
+				$field->{$prop} = $opentag . $field->{$prop} . $closetag;
+
+				// Add microdata once for all values, if field -- is NOT -- in a field group
+				if ($itemprop)
+				{
+					$field->{$prop} = '<div style="display:inline" itemprop="'.$itemprop.'" >' .$field->{$prop}. '</div>';
+				}
+			}
+		}
 	}
 
 
@@ -373,8 +402,8 @@ class plgFlexicontent_fieldsFcpagenav extends FCField
 
 	function getItemList(&$ids=null, $cid=null, &$userid=0)
 	{
-		$app  = JFactory::getApplication();
-		$db = JFactory::getDbo();
+		$app = JFactory::getApplication();
+		$db  = JFactory::getDbo();
 
 		if ($ids===null)
 		{

@@ -1,11 +1,11 @@
 <?php
 /**
  * @package         FLEXIcontent
- * @version         3.2
+ * @version         3.4
  *
  * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
  * @link            https://flexicontent.org
- * @copyright       Copyright © 2017, FLEXIcontent team, All Rights Reserved
+ * @copyright       Copyright © 2020, FLEXIcontent team, All Rights Reserved
  * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
@@ -41,7 +41,7 @@ class plgFlexicontent_fieldsImage extends FCField
 	// *** CONSTRUCTOR
 	// ***
 
-	function __construct( &$subject, $params )
+	public function __construct( &$subject, $params )
 	{
 		parent::__construct( $subject, $params );
 	}
@@ -53,7 +53,7 @@ class plgFlexicontent_fieldsImage extends FCField
 	// ***
 
 	// Method to create field's HTML display for item form
-	function onDisplayField(&$field, &$item)
+	public function onDisplayField(&$field, &$item)
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 
@@ -97,9 +97,9 @@ class plgFlexicontent_fieldsImage extends FCField
 
 
 
-		// ***
-		// *** Number of values
-		// ***
+		/**
+		 * Number of values
+		 */
 
 		$multiple     = $use_ingroup || (int) $field->parameters->get('allow_multiple', 0);
 		$max_values   = $use_ingroup ? 0 : !$multiple ? 1 : (int) $field->parameters->get( 'max_values', 0 ) ;
@@ -276,7 +276,7 @@ class plgFlexicontent_fieldsImage extends FCField
 		$has_values = count($field->value);
 
 		// Initialise property with default value
-		if (empty($field->value))
+		if (!$field->value || (count($field->value) === 1 && $field->value[0] === null))
 		{
 			$field->value = array();
 			$field->value[0]['originalname'] = '';
@@ -391,7 +391,7 @@ class plgFlexicontent_fieldsImage extends FCField
 				newField.find('.fc-has-value').removeClass('fc-has-value');
 
 				// New element's field name and id
-				var element_id = '".$elementid . "_' + uniqueRowNum".$field->id.";
+				var element_id = '" . $elementid . "_' + uniqueRowNum" . $field->id . ";
 
 				// Destroy any select2 elements
 				var sel2_elements = newField.find('div.select2-container');
@@ -876,7 +876,7 @@ class plgFlexicontent_fieldsImage extends FCField
 					$f = in_array( $ext, array('png', 'ico', 'gif', 'jpg', 'jpeg') ) ? '&f='.$ext : '';
 					$img_link = str_replace('\\', '/', $img_link);
 
-					/*$img_link = JUri::root().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' . 
+					/*$img_link = JUri::root().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' .
 						htmlspecialchars($img_link . '&w='.$preview_thumb_w . '&h=' . $preview_thumb_h . '&zc=1&q=95&ar=x' . $f);*/
 
 					$img_link = htmlspecialchars(phpThumbURL(
@@ -1193,11 +1193,54 @@ class plgFlexicontent_fieldsImage extends FCField
 
 
 	// Method to create field's HTML display for frontend views
-	function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')
+	public function onDisplayFieldValue(&$field, $item, $values = null, $prop = 'display')
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 
 		$field->label = JText::_($field->label);
+
+		// Set field and item objects
+		$this->setField($field);
+		$this->setItem($item);
+
+
+		/**
+		 * One time initialization
+		 */
+
+		static $initialized = null;
+		static $app, $document, $option, $format, $realview;
+		static $configured_file_path;
+
+		if ($initialized === null)
+		{
+			$initialized = 1;
+
+			$app       = JFactory::getApplication();
+			$document  = JFactory::getDocument();
+			$option    = $app->input->getCmd('option', '');
+			$format    = $app->input->getCmd('format', 'html');
+			$realview  = $app->input->getCmd('view', '');
+
+			$configured_file_path = static::$cparams->get('file_path', 'components/com_flexicontent/uploads');
+		}
+
+		// For legacy layouts
+		$isItemsManager = static::$isItemsManager;
+		$isHtmlViewFE   = static::$isHtmlViewFE;
+
+		// Current view variable
+		$view = $app->input->getCmd('flexi_callview', ($realview ?: 'item'));
+		$sfx = $view === 'item' ? '' : '_cat';
+
+		// Check if field should be rendered according to configuration
+		if (!$this->checkRenderConds($prop, $view))
+		{
+			return;
+		}
+
+		// The current view is a full item view of the item
+		$isMatchedItemView = static::$itemViewId === (int) $item->id;
 
 		// Some variables
 		$is_ingroup  = !empty($field->ingroup);
@@ -1211,48 +1254,6 @@ class plgFlexicontent_fieldsImage extends FCField
 		// JS safe Field name
 		$field_name_js = str_replace('-', '_', $field->name);
 
-
-		// ***
-		// *** One time initialization
-		// ***
-
-		static $initialized = null;
-		static $app, $document, $option, $format, $realview;
-		static $itemViewId, $isItemsManager, $isHtmlViewFE;
-		static $isMobile, $isTablet, $useMobile;
-		static $configured_file_path;
-
-		if ($initialized === null)
-		{
-			$initialized = 1;
-
-			$app       = JFactory::getApplication();
-			$document  = JFactory::getDocument();
-			$option    = $app->input->get('option', '', 'cmd');
-			$format    = $app->input->get('format', 'html', 'cmd');
-			$realview  = $app->input->get('view', '', 'cmd');
-
-			$itemViewId     = $realview === 'item' && $option === 'com_flexicontent' ? $app->input->get('id', 0, 'int') : 0;
-			$isItemsManager = $app->isClient('administrator') && $realview === 'items' && $option === 'com_flexicontent';
-			$isHtmlViewFE   = $format === 'html' && $app->isClient('site');
-
-			$cparams   = JComponentHelper::getParams( 'com_flexicontent' );
-
-			// Get isMobile / isTablet Flags
-			$force_desktop_layout = $cparams->get('force_desktop_layout', 0 );
-			$mobileDetector = flexicontent_html::getMobileDetector();
-			$isMobile = $mobileDetector->isMobile();
-			$isTablet = $mobileDetector->isTablet();
-			$useMobile = $force_desktop_layout  ?  $isMobile && !$isTablet  :  $isMobile;
-
-			$configured_file_path = $cparams->get('file_path', 'components/com_flexicontent/uploads');
-		}
-
-		// Current view variable
-		$view = $app->input->get('flexi_callview', ($realview ?: 'item'), 'cmd');
-
-		// The current view is a full item view of the item
-		$isMatchedItemView = $itemViewId === (int) $item->id;
 
 		$all_media    = $field->parameters->get('list_all_media_files', 0);
 		$unique_thumb_method = $field->parameters->get('unique_thumb_method', 0);
@@ -1291,47 +1292,13 @@ class plgFlexicontent_fieldsImage extends FCField
 		$cust2_usage   = (int) $field->parameters->get('cust2_usage', 0);
 		$default_cust2 = ($cust2_usage == 2) ? JText::_($field->parameters->get('default_cust2', '')) : '';
 
-		// Separators / enclosing characters
-		$remove_space = $field->parameters->get( 'remove_space', 0 ) ;
-		$pretext		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'pretext', '' ), 'pretext' );
-		$posttext		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'posttext', '' ), 'posttext' );
-		$separatorf	= $field->parameters->get( 'separatorf', 0 ) ;
-		$opentag		= JText::_(FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'opentag', '' ), 'opentag' ));
-		$closetag		= JText::_(FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'closetag', '' ), 'closetag' ));
 
-		if($pretext)  { $pretext  = $remove_space ? $pretext : $pretext . ' '; }
-		if($posttext) { $posttext = $remove_space ? $posttext : ' ' . $posttext; }
-
-		switch($separatorf)
-		{
-			case 0:
-			$separatorf = '&nbsp;';
-			break;
-
-			case 1:
-			$separatorf = '<br class="fcclear" />';
-			break;
-
-			case 2:
-			$separatorf = '&nbsp;|&nbsp;';
-			break;
-
-			case 3:
-			$separatorf = ',&nbsp;';
-			break;
-
-			case 4:
-			$separatorf = $closetag . $opentag;
-			break;
-
-			case 5:
-			$separatorf = '';
-			break;
-
-			default:
-			$separatorf = '&nbsp;';
-			break;
-		}
+		/**
+		 * Get common parameters like: itemprop, value's prefix (pretext), suffix (posttext), separator, value list open/close text (opentag, closetag)
+		 * This will replace other field values and item properties, if such are found inside the parameter texts
+		 */
+		$common_params_array = $this->getCommonParams();
+		extract($common_params_array);
 
 
 		// ***
@@ -1554,19 +1521,19 @@ class plgFlexicontent_fieldsImage extends FCField
 			$popuptype_mobile = (int) $popuptype_mobile;
 		}
 
-		$PPFX_ = $useMobile ? 'popuptype_mobile_' : 'popuptype_';
-		$popuptype = $useMobile
+		$PPFX_ = static::$useMobile ? 'popuptype_mobile_' : 'popuptype_';
+		$popuptype = static::$useMobile
 			? $popuptype_mobile
 			: $popuptype;
 
 		// Enable/Disable GALLERY JS according to current view and according to other parameters
-		$popupinview = FLEXIUtilities::paramToArray($field->parameters->get('popupinview', array('item', 'category', 'backend')));
+		$popupinview = FLEXIUtilities::paramToArray($field->parameters->get('popupinview', array('item', 'category',  'module', 'backend')));
 
 		if (
 			($view=='item' && !in_array('item', $popupinview)) ||
 			($view=='category' && !in_array('category', $popupinview)) ||
 			($view=='module' && !in_array('module', $popupinview)) ||
-			($isItemsManager && !in_array('backend', $popupinview)) ||
+			(static::$isItemsManager && !in_array('backend', $popupinview)) ||
 			$linkto_item ||
 			$prop=='display_large' ||
 			$prop=='display_original' ||
@@ -1588,7 +1555,7 @@ class plgFlexicontent_fieldsImage extends FCField
 		$no_container_needed = array(1,2,3,4,6);
 
 		if (
-			($isItemsManager && !in_array($popuptype, $iManager_containers)) ||
+			(static::$isItemsManager && !in_array($popuptype, $iManager_containers)) ||
 			($is_ingroup && is_numeric($popuptype) && !in_array($popuptype, $no_container_needed))
 		)
 		{
@@ -1619,7 +1586,7 @@ class plgFlexicontent_fieldsImage extends FCField
 		if (
 			($view=='item' && !in_array('item', $legendinview)) ||
 			($view=='category' && !in_array('category', $legendinview)) ||
-			($isItemsManager && !in_array('backend', $legendinview))
+			(static::$isItemsManager && !in_array('backend', $legendinview))
 		)
 		{
 			$uselegend = 0;
@@ -1663,7 +1630,7 @@ class plgFlexicontent_fieldsImage extends FCField
 			$isLinkToPopup = $format === 'html' && ($url_target=='multibox' || $url_target=='fancybox');
 
 			// Force opening in new window in backend, if URL target is _self
-			if ($isItemsManager && $url_target=='_self')
+			if (static::$isItemsManager && $url_target=='_self')
 			{
 				$url_target = "_blank";
 			}
@@ -1791,7 +1758,7 @@ class plgFlexicontent_fieldsImage extends FCField
 		// Decide thumbnail to use
 		$thumb_size = 0;
 
-		if ($isItemsManager)
+		if (static::$isItemsManager)
 		{
 			$thumb_size = -1;
 		}
@@ -1859,11 +1826,7 @@ class plgFlexicontent_fieldsImage extends FCField
 			$viewlayout = 'value_' . $popuptype;
 		}
 
-
-		// ***
-		// *** Create field's HTML, using layout file, note full display code is included into each layout (not just the values loop)
-		// ***
-
+		// Create field's viewing HTML, using layout file
 		$field->{$prop} = array();
 		include(self::getViewPath($field->field_type, $viewlayout));
 	}
@@ -1875,7 +1838,7 @@ class plgFlexicontent_fieldsImage extends FCField
 	// ***
 
 	// Method to handle field's values before they are saved into the DB
-	function onBeforeSaveField( &$field, &$post, &$file, &$item )
+	public function onBeforeSaveField( &$field, &$post, &$file, &$item )
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 
@@ -2251,7 +2214,7 @@ class plgFlexicontent_fieldsImage extends FCField
 
 
 	// Method to take any actions/cleanups needed after field's values are saved into the DB
-	function onAfterSaveField( &$field, &$post, &$file, &$item )
+	public function onAfterSaveField( &$field, &$post, &$file, &$item )
 	{
 		if ( empty($post) ) return;
 
@@ -2279,7 +2242,7 @@ class plgFlexicontent_fieldsImage extends FCField
 
 
 	// Method called just before the item is deleted to remove custom item data related to the field
-	function onBeforeDeleteField(&$field, &$item)
+	public function onBeforeDeleteField(&$field, &$item)
 	{
 		$app = JFactory::getApplication();
 		$dir = $field->parameters->get('dir');
@@ -2307,9 +2270,13 @@ class plgFlexicontent_fieldsImage extends FCField
 	}
 
 
-	// Method to do extra handling of field's values after all fields have validated their posted data, and are ready to be saved
-	// $item->fields['fieldname']->postdata contains values of other fields
-	// $item->fields['fieldname']->filedata contains files of other fields (normally this is empty due to using AJAX for file uploading)
+	/**
+	 * Method to do extra handling of field's values after all fields have validated their posted data, and are ready to be saved
+	 * OVERRIDE Default implementation
+	 *
+	 * $item->fields['fieldname']->postdata contains values of other fields
+	 * $item->fields['fieldname']->filedata contains files of other fields (normally this is empty due to using AJAX for file uploading)
+	 */
 	function onAllFieldsPostDataValidated( &$field, &$item )
 	{
 		$auto_intro_full = (int) $field->parameters->get('auto_intro_full', 0);
@@ -2362,7 +2329,7 @@ class plgFlexicontent_fieldsImage extends FCField
 	// ***
 
 	// Method to display a search filter for the advanced search view
-	function onAdvSearchDisplayFilter(&$filter, $value='', $formName='searchForm')
+	public function onAdvSearchDisplayFilter(&$filter, $value = '', $formName = 'searchForm')
 	{
 		if ( !in_array($filter->field_type, static::$field_types) ) return;
 
@@ -2371,9 +2338,9 @@ class plgFlexicontent_fieldsImage extends FCField
 	}
 
 
- 	// Method to get the active filter result (an array of item ids matching field filter, or subquery returning item ids)
+	// Method to get the active filter result (an array of item ids matching field filter, or subquery returning item ids)
 	// This is for search view
-	function getFilteredSearch(&$filter, $value, $return_sql=true)
+	public function getFilteredSearch(&$filter, $value, $return_sql = true)
 	{
 		if ( !in_array($filter->field_type, static::$field_types) ) return;
 
@@ -2384,11 +2351,11 @@ class plgFlexicontent_fieldsImage extends FCField
 
 
 	// ***
-	// *** SEARCH / INDEXING METHODS
+	// *** SEARCH INDEX METHODS
 	// ***
 
 	// Method to create (insert) advanced search index DB records for the field values
-	function onIndexAdvSearch(&$field, &$post, &$item)
+	public function onIndexAdvSearch(&$field, &$post, &$item)
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 		if ( !$field->isadvsearch && !$field->isadvfilter ) return;
@@ -2439,7 +2406,7 @@ class plgFlexicontent_fieldsImage extends FCField
 
 
 	// Method to create basic search index (added as the property field->search)
-	function onIndexSearch(&$field, &$post, &$item)
+	public function onIndexSearch(&$field, &$post, &$item)
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 		if ( !$field->issearch ) return;
@@ -2657,7 +2624,7 @@ class plgFlexicontent_fieldsImage extends FCField
 
 		// Execute once
 		static $initialized = null;
-		
+
 		if (!$initialized)
 		{
 			$initialized = 1;
@@ -2734,8 +2701,11 @@ class plgFlexicontent_fieldsImage extends FCField
 
 		return $result;
 	}
-	
-	
+
+
+	/**
+	 * Load phpThumb if not already loaded
+	 */
 	private function _load_phpthumb()
 	{
 		static $loaded = null;
@@ -2754,7 +2724,6 @@ class plgFlexicontent_fieldsImage extends FCField
 	/**
 	 * Call phpThumb library to create a thumbnail according to configuration
 	 */
-
 	function imagePhpThumb( $src_path, $dest_path, $prefix, $filename, $ext, $width, $height, $quality, $size, $crop, $usewm, $wmfile, $wmop, $wmpos )
 	{
 		static $initialized = null;

@@ -29,10 +29,15 @@
 			<field name="fields" type="fields" multiple="false" groupables="1" issortable="1" default="" label="Fields" description="Select fields that will be show shown as a group" />
 
 			<field name="" type="separator" default="FLEXI_FIELD_NUMBER_OF_VALUES" description="" depend_class="fieldgroupoff" level="level2" />
+			<field name="required" type="radio" default="0" label="FLEXI_FIELD_REQUIRED" description="FLEXI_FIELD_REQUIRED_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
 			<field name="allow_multiple" type="multilist" subtype="radio" default="0" label="FLEXI_FIELD_ALLOW_MULTIPLE" description="FLEXI_FIELD_ALLOW_MULTIPLE_DESC" tip_class="multivalue-mode" tip_img="warning.png" toggle_related="1" depend_class="fieldgroupoff" class="btn-group btn-group-yesno">
 				<option value="0" show_list="" hide_list="multivalue-mode">FLEXI_NO</option>
 				<option value="1" show_list="multivalue-mode" hide_list="">FLEXI_YES</option>
 			</field>
+			<field name="max_values" type="text" default="0" size="2" label="FLEXI_FIELD_MAX_VALUES" description="FLEXI_FIELD_MAX_VALUES_DESC" depend_class="fieldgroupoff multivalue-mode" />
 			<field name="add_position" type="multilist" subtype="radio" default="3" label="FLEXI_FIELD_ADD_POSITION" description="FLEXI_FIELD_ADD_POSITION_DESC" depend_class="fieldgroupoff multivalue-mode" class="btn-group group-fcinfo">
 				<option value="0">FLEXI_FIELD_APPEND_BTN</option>
 				<option value="1">FLEXI_FIELD_INLINE_APPEND_BTN</option>
@@ -40,11 +45,6 @@
 				<option value="3">FLEXI_FIELD_INLINE_BOTH_BTN</option>
 			</field>
 
-			<field name="max_values" type="text" default="0" size="2" label="FLEXI_FIELD_MAX_VALUES" description="FLEXI_FIELD_MAX_VALUES_DESC" depend_class="fieldgroupoff multivalue-mode" />
-			<field name="required" type="radio" default="0" label="FLEXI_FIELD_REQUIRED" description="FLEXI_FIELD_REQUIRED_DESC" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
 
 			<field name="" type="separator" default="FLEXI_FIELD_GROUP_EMPTY_NON_ASSIGNED_FIELDS" description="" depend_class="" level="level2" />
 			<field name="form_empty_fields" type="multilist" subtype="radio" default="1" toggle_related="1" label="FLEXI_FIELD_GROUP_EMPTY_NON_ASSIGNED_FIELDS_DISPLAY" description="FLEXI_FIELD_GROUP_EMPTY_NON_ASSIGNED_FIELDS_DISPLAY_DESC" class="btn-group btn-group-yesno">
@@ -89,12 +89,12 @@
 			</field>
 
 			<field name="" type="separator" default="FLEXI_LAYOUT" description="" icon_class="icon-file-2" level="tab_open" box_type="1" />
+			<field name="viewlayout" type="fcfilelist" default="" label="FLEXI_FIELD_SELECT_VIEW_LAYOUT" description="FLEXI_FIELD_SELECT_VIEW_LAYOUT_DESC" directory="plugins/flexicontent_fields/fieldgroup/tmpl/" filter="value*" exclude="" stripext="1" stripprefix="value_" hide_none="1" hide_default="1" depend_class="layout-field-disp" />
 
 			<field name="display_mode" type="multilist" subtype="radio" default="0" label="FLEXI_USE_CUSTOMIZED_HTML" description="FLEXI_USE_CUSTOMIZED_HTML_DESC" toggle_related="1" class="btn-group group-fcmethod">
 				<option value="0" show_list="layout-field-disp" hide_list="custom-field-disp">FLEXI_LAYOUT</option>
 				<option value="1" show_list="custom-field-disp" hide_list="layout-field-disp">FLEXI_FIELD_GROUP_CUSTOM_HTML</option>
 			</field>
-			<field name="viewlayout" type="fcfilelist" default="" label="FLEXI_FIELD_SELECT_VIEW_LAYOUT" description="FLEXI_FIELD_SELECT_VIEW_LAYOUT_DESC" directory="plugins/flexicontent_fields/fieldgroup/tmpl/" filter="value*" exclude="" stripext="1" stripprefix="value_" hide_none="1" hide_default="1" depend_class="layout-field-disp" />
 			<field name="custom_html" type="editor" editor="codemirror" syntax="html" filter="RAW" cols="40" rows="4" height="60px" class="fc-unset-width" default="" label="FLEXI_FIELD_GROUP_CUSTOM_HTML" depend_class="custom-field-disp" description="FLEXI_FIELD_GROUP_CUSTOM_HTML_DESC" />
 
 			<field name="" type="separator" default="Fields WITHOUT value" level="level2" />

@@ -20,7 +20,8 @@
 	
 	<fields name="attribs">
 		
-		<fieldset name="group-fcloadmodule-config" hidden="true" icon_class="icon-cog" label="Configuration" addfieldpath="/administrator/components/com_flexicontent/elements">
+		<fieldset name="group-fcloadmodule-config" hidden="true" icon_class="icon-cog" label="Select Module" addfieldpath="/administrator/components/com_flexicontent/elements">
+
 			<field name="module_method" type="multilist" subtype="radio" default="1" label="FLEXI_FIELD_MODULE_METHOD" description="FLEXI_FIELD_MODULE_METHOD_DESC" toggle_related="1" class="btn-group btn-group-yesno">
 				<option value="1" show_list="module-mode" hide_list="position-mode">FLEXI_FIELD_MODULE_UNIQUE</option>
 				<option value="2" show_list="position-mode" hide_list="module-mode">FLEXI_FIELD_MODULE_POSITION</option>
@@ -28,7 +29,28 @@
 			<field name="modules" type="fcmodules" default="" label="FLEXI_FIELD_MODULE_MODULES_LIST" depend_class="module-mode" description="FLEXI_FIELD_MODULE_MODULES_LIST_DESC" />
 			<field name="position" type="fcpositions" default="" label="FLEXI_FIELD_MODULE_POSITIONS_LIST" depend_class="position-mode" description="FLEXI_FIELD_MODULE_POSITIONS_LIST_DESC" />
 			<field name="style" type="text" default="" label="FLEXI_FIELD_MODULE_STYLE" description="FLEXI_FIELD_MODULE_STYLE_DESC" />
+
+		</fieldset>
+
+
+		<fieldset name="group-fcloadmodule-editing" hidden="true" icon_class="icon-pencil" label="FLEXI_FIELD_EDITING" addfieldpath="/administrator/components/com_flexicontent/elements">
+
+			<field name="" type="separator" default="FLEXI_FIELD_EDITING" level="tabset_start" box_type="1" />
+			<field name="" type="separator" default="FLEXI_FIELD_VALUES" icon_class="icon-database" level="tab_open" box_type="1" />
 			<field name="mod_params" type="textarea" filter="RAW" rows="8" cols="50" default="" label="FLEXI_CUSTOM_MODULE_PER_ITEM" depend_class="module-mode" description="FLEXI_CUSTOM_MODULE_PER_ITEM_DESC" />
+
+			<field name="" type="separator" default="FLEXI_FORM_FIELD_CONF" _description="FLEXI_FORM_FIELD_CONF_DESC" icon_class="icon-checkbox-unchecked" level="tab_open" box_type="1" />
+
+			<field name="display_label_form" type="multilist" subtype="radio" toggle_related="1" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC" class="btn-group btn-group-yesno">
+				<option value="0" show_list="custom_placeholder" hide_list="">FLEXI_NO</option>
+				<option value="1" show_list="custom_placeholder" hide_list="">FLEXI_FLOATED_LEFT</option>
+				<option value="2" show_list="custom_placeholder" hide_list="">FLEXI_CLEARED</option>
+				<option value="-1" show_list="" hide_list="custom_placeholder">FLEXI_AS_PLACEHOLDER</option>
+			</field>
+			<field name="label_form" type="text" default="" label="FLEXI_LABEL" description="Enter a label to use for item form that is different than field label for viewing" depend_class=""/>
+			<field name="no_acc_msg_form" type="text" default="" label="FLEXI_FIELD_NOACCESS_MSG" description="FLEXI_FIELD_NOACCESS_MSG_DESC" depend_class=""/>
+
+			<field name="" type="separator" default="FLEXI_FIELD_EDITING" level="tabset_close" box_type="1" />
 		</fieldset>
 
 

@@ -1,11 +1,11 @@
 <?php
 /**
  * @package         FLEXIcontent
- * @version         3.2
+ * @version         3.4
  *
  * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
  * @link            https://flexicontent.org
- * @copyright       Copyright © 2017, FLEXIcontent team, All Rights Reserved
+ * @copyright       Copyright © 2020, FLEXIcontent team, All Rights Reserved
  * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
@@ -21,7 +21,7 @@ class plgFlexicontent_fieldsColor extends FCField
 	// *** CONSTRUCTOR
 	// ***
 
-	function __construct( &$subject, $params )
+	public function __construct( &$subject, $params )
 	{
 		parent::__construct( $subject, $params );
 	}
@@ -33,16 +33,31 @@ class plgFlexicontent_fieldsColor extends FCField
 	// ***
 
 	// Method to create field's HTML display for item form
-	function onDisplayField(&$field, &$item)
+	public function onDisplayField(&$field, &$item)
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 
 		$field->label = $field->parameters->get('label_form') ? JText::_($field->parameters->get('label_form')) : JText::_($field->label);
 
+		// Set field and item objects
+		$this->setField($field);
+		$this->setItem($item);
+
 		$use_ingroup = $field->parameters->get('use_ingroup', 0);
 		if (!isset($field->formhidden_grp)) $field->formhidden_grp = $field->formhidden;
 		if ($use_ingroup) $field->formhidden = 3;
 		if ($use_ingroup && empty($field->ingroup)) return;
+
+		/**
+		 * Check if using 'auto_value_code', clear 'auto_value', if function not set
+		 */
+		$auto_value = (int) $field->parameters->get('auto_value', 0);
+		if ($auto_value === 2)
+		{
+			$auto_value_code = $field->parameters->get('auto_value_code', '');
+			$auto_value_code = preg_replace('/^<\?php(.*)(\?>)?$/s', '$1', $auto_value_code);
+		}
+		$auto_value = $auto_value === 2 && !$auto_value_code ? 0 : $auto_value;
 
 		// Initialize framework objects and other variables
 		$document = JFactory::getDocument();
@@ -55,34 +70,39 @@ class plgFlexicontent_fieldsColor extends FCField
 		$font_icon_class = $form_font_icons ? ' fcfont-icon' : '';
 
 
-		// ***
-		// *** Number of values
-		// ***
+		/**
+		 * Number of values
+		 */
 
-		$multiple   = $use_ingroup || (int) $field->parameters->get('allow_multiple', 0);
-		$max_values = $use_ingroup ? 0 : (int) $field->parameters->get('max_values', 0);
-		$required   = (int) $field->parameters->get('required', 0);
+		$multiple     = $use_ingroup || (int) $field->parameters->get('allow_multiple', 0);
+		$max_values   = $use_ingroup ? 0 : (int) $field->parameters->get('max_values', 0);
+		$required     = (int) $field->parameters->get('required', 0);
 		$add_position = (int) $field->parameters->get('add_position', 3);
+
+		// Classes for marking field required
+		$required_class = $required ? ' required' : '';
 
 		// If we are multi-value and not inside fieldgroup then add the control buttons (move, delete, add before/after)
 		$add_ctrl_btns = !$use_ingroup && $multiple;
 		$fields_box_placing = (int) $field->parameters->get('fields_box_placing', 1);
 
 
-		// ***
-		// *** Value handling
-		// ***
+		/**
+		 * Value handling
+		 */
 
-		// Default value
-		$value_usage   = $field->parameters->get( 'default_value_use', 0 ) ;
-		$default_value = ($item->version == 0 || $value_usage > 0) ? $field->parameters->get( 'default_value', '' ) : '';
-		$default_value = strlen($default_value) ? JText::_($default_value) : '';
-		$default_values= array($default_value);
+		// Default value(s)
+		$default_values = $this->getDefaultValues($isform = true);
+		$default_value  = reset($default_values);
 
-		// Input field display
+
+		/**
+		 * Form field display parameters
+		 */
+
 		$display_label_form = (int) $field->parameters->get( 'display_label_form', 1 ) ;
-		$colors_by = (int) $field->parameters->get('colors_by', 1);
-		$color_control = $colors_by ? 'simple' : 'advanced';
+		$colors_by          = (int) $field->parameters->get('colors_by', 1);
+		$color_control      = $colors_by ? 'simple' : 'advanced';
 
 		if ($colors_by === 1)
 		{
@@ -105,8 +125,9 @@ class plgFlexicontent_fieldsColor extends FCField
 			$specific_colors = '';
 		}
 
-		// create extra HTML TAG parameters for the form field
+		// Create extra HTML TAG parameters for the form field
 		$attribs = $field->parameters->get( 'extra_attributes', '' ) ;
+		if ($auto_value) $attribs .= ' readonly="readonly" ';
 
 		// Attribute for default value(s)
 		if (!empty($default_values))
@@ -135,6 +156,7 @@ class plgFlexicontent_fieldsColor extends FCField
 		// JS safe Field name
 		$field_name_js = str_replace('-', '_', $field->name);
 
+		// JS & CSS of current field
 		$js = '';
 		$css = '';
 
@@ -148,7 +170,7 @@ class plgFlexicontent_fieldsColor extends FCField
 					handle: '.fcfield-drag-handle',
 					/*containment: 'parent',*/
 					tolerance: 'pointer'
-					".($field->parameters->get('fields_box_placing', 1) ? "
+					".($fields_box_placing ? "
 					,start: function(e) {
 						//jQuery(e.target).children().css('float', 'left');
 						//fc_setEqualHeights(jQuery(e.target), 0);
@@ -179,6 +201,11 @@ class plgFlexicontent_fieldsColor extends FCField
 				var lastField = fieldval_box ? fieldval_box : jQuery(el).prev().children().last();
 				var newField  = lastField.clone();
 				newField.find('.fc-has-value').removeClass('fc-has-value');
+
+				// New element's field name and id
+				var uniqueRowN = uniqueRowNum" . $field->id . ";
+				var element_id = '" . $elementid . "_' + uniqueRowN;
+				var fname_pfx  = '" . $fieldname . "[' + uniqueRowN + ']';
 				";
 
 			// NOTE: HTML tag id of this form element needs to match the -for- attribute of label HTML tag of this FLEXIcontent field, so that label will be marked invalid when needed
@@ -187,10 +214,10 @@ class plgFlexicontent_fieldsColor extends FCField
 				var theInput = newField.find('input, select').first();
 				var theInput_dv = theInput.attr('data-defvals');
 				(theInput_dv && theInput_dv.length) ?
-					theInput.val( theInput.attr('data-defvals') ) :
-					theInput.val(".json_encode($default_value).") ;
-				theInput.attr('name', '".$fieldname."['+uniqueRowNum".$field->id."+']');
-				theInput.attr('id', '".$elementid."_'+uniqueRowNum".$field->id.");
+					theInput.attr('value', theInput.attr('data-defvals')) :
+					theInput.attr('value', ".json_encode($default_value).") ;
+				theInput.attr('name', fname_pfx);
+				theInput.attr('id', element_id);
 
 				// Destroy any select2 elements
 				var sel2_elements = newField.find('div.select2-container');
@@ -280,6 +307,7 @@ class plgFlexicontent_fieldsColor extends FCField
 					rowCount".$field->id."--;
 				}
 			}
+
 			function fcfield_color_initMinicolors(event, container)
 			{
 				container = container || document;
@@ -329,24 +357,32 @@ class plgFlexicontent_fieldsColor extends FCField
 		if ($js)  $document->addScriptDeclaration($js);
 		if ($css) $document->addStyleDeclaration($css);
 
-		$classes  = 'fcfield_textval' . ($required ? ' required' : '');
+		$classes  = ' fcfield_textval' . $required_class;
+
+		// Set field to 'Automatic' on successful validation'
+		if ($auto_value)
+		{
+			$classes = ' fcfield_auto_value ';
+		}
 
 		jimport('joomla.form.helper'); // JFormHelper
 		JFormHelper::loadFieldClass('color');   // JFormFieldColor
 
-		// ***
-		// *** Create field's HTML display for item form
-		// ***
+
+		/**
+		 * Create field's HTML display for item form
+		 */
 
 		$field->html = array();
 		$n = 0;
-		//if ($use_ingroup) {print_r($field->value);}
+
 		foreach ($field->value as $value)
 		{
 			if ( !strlen($value) && !$use_ingroup && $n) continue;  // If at least one added, skip empty if not in field group
 
 			$fieldname_n = $fieldname.'['.$n.']';
 			$elementid_n = $elementid.'_'.$n;
+
 			$elementid_jf_n = $elementid.'__'.$n.'_';
 
 			$xml_field = '<field name="'.$fieldname_n.'" type="color" control="' . $color_control . '" colors="' . $specific_colors . '"/>';
@@ -358,12 +394,13 @@ class plgFlexicontent_fieldsColor extends FCField
 
 			$jfield->setup(new SimpleXMLElement($xml_field), $value, '');
 
-			$jfield_html = str_replace($elementid.'__'.$n.'_"', $elementid_n . '"', $jfield->input);
+			$jfield_html = str_replace($elementid_jf_n . '"', $elementid_n . '"', $jfield->input);
 
 			$field->html[] = $pretext . '
 				' . $jfield_html . '
 				' . $posttext . '
-				'.(!$add_ctrl_btns ? '' : '
+				' . ($auto_value ? '<span class="fc-mssg-inline fc-info fc-nobgimage">' . JText::_('FLEXI_AUTO') . '</span>' : '') . '
+				' . (!$add_ctrl_btns || $auto_value ? '' : '
 				<div class="'.$input_grp_class.' fc-xpended-btns">
 					'.$move2.'
 					'.$remove_button.'
@@ -397,31 +434,31 @@ class plgFlexicontent_fieldsColor extends FCField
 		// Handle single values
 		else
 		{
-			$field->html = '<div class="fcfieldval_container valuebox fcfieldval_container_'.$field->id.'">' . $field->html[0] .'</div>';
+			$field->html = '<div class="fcfieldval_container valuebox fcfieldval_container_'.$field->id.'">
+				' . (isset($field->html[-1]) ? $field->html[-1] : '') . $field->html[0] . '
+			</div>';
 		}
 	}
 
 
 	// Method to create field's HTML display for frontend views
-	function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')
+	public function onDisplayFieldValue(&$field, $item, $values = null, $prop = 'display')
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 
 		$field->label = JText::_($field->label);
 
-		// Some variables
-		$is_ingroup  = !empty($field->ingroup);
-		$use_ingroup = $field->parameters->get('use_ingroup', 0);
-		$multiple    = $use_ingroup || (int) $field->parameters->get( 'allow_multiple', 0 ) ;
+		// Set field and item objects
+		$this->setField($field);
+		$this->setItem($item);
 
 
-		// ***
-		// *** One time initialization
-		// ***
+		/**
+		 * One time initialization
+		 */
 
 		static $initialized = null;
 		static $app, $document, $option, $format, $realview;
-		static $itemViewId, $isItemsManager, $isHtmlViewFE;
 
 		if ($initialized === null)
 		{
@@ -429,102 +466,70 @@ class plgFlexicontent_fieldsColor extends FCField
 
 			$app       = JFactory::getApplication();
 			$document  = JFactory::getDocument();
-			$option    = $app->input->get('option', '', 'cmd');
-			$format    = $app->input->get('format', 'html', 'cmd');
-			$realview  = $app->input->get('view', '', 'cmd');
-
-			$itemViewId     = $realview === 'item' && $option === 'com_flexicontent' ? $app->input->get('id', 0, 'int') : 0;
-			$isItemsManager = $app->isClient('administrator') && $realview === 'items' && $option === 'com_flexicontent';
-			$isHtmlViewFE   = $format === 'html' && $app->isClient('site');
-
+			$option    = $app->input->getCmd('option', '');
+			$format    = $app->input->getCmd('format', 'html');
+			$realview  = $app->input->getCmd('view', '');
 		}
 
 		// Current view variable
-		$view = $app->input->get('flexi_callview', ($realview ?: 'item'), 'cmd');
+		$view = $app->input->getCmd('flexi_callview', ($realview ?: 'item'));
+		$sfx = $view === 'item' ? '' : '_cat';
+
+		// Check if field should be rendered according to configuration
+		if (!$this->checkRenderConds($prop, $view))
+		{
+			return;
+		}
 
 		// The current view is a full item view of the item
-		$isMatchedItemView = $itemViewId === (int) $item->id;
+		$isMatchedItemView = static::$itemViewId === (int) $item->id;
+
+		// Some variables
+		$is_ingroup  = !empty($field->ingroup);
+		$use_ingroup = $field->parameters->get('use_ingroup', 0);
+		$multiple    = $use_ingroup || (int) $field->parameters->get( 'allow_multiple', 0 ) ;
 
 
-		// ***
-		// *** Default value
-		// ***
+		/**
+		 * Get field values
+		 */
 
-		$value_usage   = $field->parameters->get( 'default_value_use', 0 ) ;
-		$default_value = ($value_usage == 2) ? $field->parameters->get( 'default_value', '' ) : '';
-		$default_value = strlen($default_value) ? JText::_($default_value) : '';
-
-		// Get field values
 		$values = $values ? $values : $field->value;
 
 		// Check for no values and no default value, and return empty display
-		if ( empty($values) )
+		if (empty($values))
 		{
-			if (!strlen($default_value))
+			$values = $this->getDefaultValues($isform = false);
+
+			if (!count($values))
 			{
 				$field->{$prop} = $is_ingroup ? array() : '';
 				return;
 			}
-			$values = array($default_value);
 		}
 
-		// Prefix - Suffix - Separator parameters, replacing other field values if found
-		$remove_space = $field->parameters->get( 'remove_space', 0 ) ;
-		$pretext		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'pretext', '' ), 'pretext' );
-		$posttext		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'posttext', '' ), 'posttext' );
-		$separatorf	= $field->parameters->get( 'separatorf', 1 ) ;
-		$opentag		= JText::_(FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'opentag', '' ), 'opentag' ));
-		$closetag		= JText::_(FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'closetag', '' ), 'closetag' ));
 
-		// Microdata (classify the field values for search engines)
-		$itemprop    = $field->parameters->get('microdata_itemprop');
+		/**
+		 * Get common parameters like: itemprop, value's prefix (pretext), suffix (posttext), separator, value list open/close text (opentag, closetag)
+		 * This will replace other field values and item properties, if such are found inside the parameter texts
+		 */
+		$common_params_array = $this->getCommonParams();
+		extract($common_params_array);
 
-		if($pretext)  { $pretext  = $remove_space ? $pretext : $pretext . ' '; }
-		if($posttext) { $posttext = $remove_space ? $posttext : ' ' . $posttext; }
 
-		switch($separatorf)
-		{
-			case 0:
-			$separatorf = '&nbsp;';
-			break;
-
-			case 1:
-			$separatorf = '<br class="fcclear" />';
-			break;
-
-			case 2:
-			$separatorf = '&nbsp;|&nbsp;';
-			break;
-
-			case 3:
-			$separatorf = ',&nbsp;';
-			break;
-
-			case 4:
-			$separatorf = $closetag . $opentag;
-			break;
-
-			case 5:
-			$separatorf = '';
-			break;
-
-			default:
-			$separatorf = '&nbsp;';
-			break;
-		}
-
-		// Cleaner output for CSV export
+		// CSV export: Create a simpler output
 		if ($prop === 'csv_export')
 		{
 			$separatorf = ', ';
 			$itemprop = false;
 		}
 
+
 		// Get layout name
 		$viewlayout = $field->parameters->get('viewlayout', '');
 		$viewlayout = $viewlayout ? 'value_'.$viewlayout : 'value_default';
 
-		// Create field's HTML, using layout file
+		// Create field's viewing HTML, using layout file
 		$field->{$prop} = array();
 		include(self::getViewPath($field->field_type, $viewlayout));
 
@@ -533,13 +538,14 @@ class plgFlexicontent_fieldsColor extends FCField
 		{
 			// Apply values separator
 			$field->{$prop} = implode($separatorf, $field->{$prop});
-			if ( $field->{$prop}!=='' )
+
+			if ($field->{$prop} !== '')
 			{
 				// Apply field 's opening / closing texts
 				$field->{$prop} = $opentag . $field->{$prop} . $closetag;
 
 				// Add microdata once for all values, if field -- is NOT -- in a field group
-				if ( $itemprop )
+				if ($itemprop)
 				{
 					$field->{$prop} = '<div style="display:inline" itemprop="'.$itemprop.'" >' .$field->{$prop}. '</div>';
 				}
@@ -554,7 +560,7 @@ class plgFlexicontent_fieldsColor extends FCField
 	// ***
 
 	// Method to handle field's values before they are saved into the DB
-	function onBeforeSaveField( &$field, &$post, &$file, &$item )
+	public function onBeforeSaveField( &$field, &$post, &$file, &$item )
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 
@@ -578,13 +584,13 @@ class plgFlexicontent_fieldsColor extends FCField
 		$new = 0;
 		foreach ($post as $n => $v)
 		{
-			$v = trim($post[$n]);
+			$v = trim($v);
 
 			// ***
 			// *** Validate data, skipping values that are empty after validation
 			// ***
 
-			$post[$n] = $required || strlen($v)
+			$post[$n] = strlen($v)
 				? flexicontent_html::dataFilter($v, $maxlength, $validation, 0)
 				: '';
 
@@ -598,20 +604,21 @@ class plgFlexicontent_fieldsColor extends FCField
 			$newpost[$new] = $post[$n];
 			$new++;
 		}
-		$post = $newpost;
 
-		//if ($use_ingroup) JFactory::getApplication()->enqueueMessage( print_r($post, true), 'warning');
+		$post = $newpost;
 	}
 
 
 	// Method to take any actions/cleanups needed after field's values are saved into the DB
-	function onAfterSaveField( &$field, &$post, &$file, &$item ) {
+	public function onAfterSaveField( &$field, &$post, &$file, &$item )
+	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 	}
 
 
 	// Method called just before the item is deleted to remove custom item data related to the field
-	function onBeforeDeleteField(&$field, &$item) {
+	public function onBeforeDeleteField(&$field, &$item)
+	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 	}
 
@@ -622,7 +629,7 @@ class plgFlexicontent_fieldsColor extends FCField
 	// ***
 
 	// Method to display a search filter for the advanced search view
-	function onAdvSearchDisplayFilter(&$filter, $value='', $formName='searchForm')
+	public function onAdvSearchDisplayFilter(&$filter, $value = '', $formName = 'searchForm')
 	{
 		if ( !in_array($filter->field_type, static::$field_types) ) return;
 
@@ -631,7 +638,7 @@ class plgFlexicontent_fieldsColor extends FCField
 
 
 	// Method to display a category filter for the category view
-	function onDisplayFilter(&$filter, $value='', $formName='adminForm', $isSearchView=0)
+	public function onDisplayFilter(&$filter, $value = '', $formName = 'adminForm', $isSearchView = 0)
 	{
 		if ( !in_array($filter->field_type, static::$field_types) ) return;
 
@@ -639,9 +646,9 @@ class plgFlexicontent_fieldsColor extends FCField
 	}
 
 
- 	// Method to get the active filter result (an array of item ids matching field filter, or subquery returning item ids)
+	// Method to get the active filter result (an array of item ids matching field filter, or subquery returning item ids)
 	// This is for content lists e.g. category view, and not for search view
-	function getFiltered(&$filter, $value, $return_sql=true)
+	public function getFiltered(&$filter, $value, $return_sql = true)
 	{
 		if ( !in_array($filter->field_type, static::$field_types) ) return;
 
@@ -649,9 +656,9 @@ class plgFlexicontent_fieldsColor extends FCField
 	}
 
 
- 	// Method to get the active filter result (an array of item ids matching field filter, or subquery returning item ids)
+	// Method to get the active filter result (an array of item ids matching field filter, or subquery returning item ids)
 	// This is for search view
-	function getFilteredSearch(&$filter, $value, $return_sql=true)
+	public function getFilteredSearch(&$filter, $value, $return_sql = true)
 	{
 		if ( !in_array($filter->field_type, static::$field_types) ) return;
 
@@ -661,11 +668,11 @@ class plgFlexicontent_fieldsColor extends FCField
 
 
 	// ***
-	// *** SEARCH / INDEXING METHODS
+	// *** SEARCH INDEX METHODS
 	// ***
 
 	// Method to create (insert) advanced search index DB records for the field values
-	function onIndexAdvSearch(&$field, &$post, &$item)
+	public function onIndexAdvSearch(&$field, &$post, &$item)
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 		if ( !$field->isadvsearch && !$field->isadvfilter ) return;
@@ -685,7 +692,7 @@ class plgFlexicontent_fieldsColor extends FCField
 
 
 	// Method to create basic search index (added as the property field->search)
-	function onIndexSearch(&$field, &$post, &$item)
+	public function onIndexSearch(&$field, &$post, &$item)
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 		if ( !$field->issearch ) return;
