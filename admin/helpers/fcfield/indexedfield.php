@@ -1,11 +1,11 @@
 <?php
 /**
  * @package         FLEXIcontent
- * @version         3.2
+ * @version         3.4
  *
  * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
  * @link            https://flexicontent.org
- * @copyright       Copyright Â© 2017, FLEXIcontent team, All Rights Reserved
+ * @copyright       Copyright © 2020, FLEXIcontent team, All Rights Reserved
  * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
@@ -24,16 +24,16 @@ class FCIndexedField extends FCField
 
 	static $cascaded_values = array();
 
-	// ***
-	// *** CONSTRUCTOR
-	// ***
+	/**
+	 * CONSTRUCTOR
+	 */
 
-	function __construct( &$subject, $params )
+	public function __construct(&$subject, $params)
 	{
 		$fieldtype = str_replace('plgflexicontent_fields', '', strtolower(get_class($this)));
 		static::$field_types = array($fieldtype);
 
-		parent::__construct( $subject, $params );
+		parent::__construct($subject, $params);
 	}
 
 
@@ -43,7 +43,7 @@ class FCIndexedField extends FCField
 	// ***
 
 	// Method to create field's HTML display for item form
-	function onDisplayField(&$field, &$item)
+	public function onDisplayField(&$field, &$item)
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 
@@ -87,9 +87,9 @@ class FCIndexedField extends FCField
 		$sortable       = static::$valueIsArr && (int) $field->parameters->get('sortable', 0);
 
 
-		// ***
-		// *** Number of values
-		// ***
+		/**
+		 * Number of values
+		 */
 
 		$multiple     = $use_ingroup || (int) $field->parameters->get('allow_multiple', 0);
 		$min_values   = $use_ingroup || !static::$valueIsArr ? 0 : (int) $field->parameters->get( 'min_values', 0 ) ;
@@ -104,11 +104,12 @@ class FCIndexedField extends FCField
 
 		// If we are multi-value and not inside fieldgroup then add the control buttons (move, delete, add before/after)
 		$add_ctrl_btns = !$use_ingroup && $multiple;
+		$fields_box_placing = (int) $field->parameters->get('fields_box_placing', 0);
 
 
-		// ***
-		// *** Value handling
-		// ***
+		/**
+		 * Value handling
+		 */
 
 		// Default value
 		$default_values = !$ajax ? $this->getDefaultValues($isform = true) : array('');
@@ -121,9 +122,9 @@ class FCIndexedField extends FCField
 		$display_label_form = (int) $field->parameters->get( 'display_label_form', 1 ) ;
 		$display_as_select = static::$isDropDown || (int) $field->parameters->get( 'display_as_select', 0 );
 
+		// DISPLAY using select2 JS
 		if ($display_as_select)
 		{
-			// DISPLAY using select2 JS
 			$use_jslib = (int) $field->parameters->get('use_jslib', 1);
 			$use_select2 = $use_jslib === 1 || $use_jslib === 2;
 
@@ -147,9 +148,10 @@ class FCIndexedField extends FCField
 			// Useful when displaying as multi-select without select2 JS
 			$size = (int) $field->parameters->get('size', 6);
 		}
+
+		// DISPLAY using prettyCheckable JS
 		else
 		{
-			// DISPLAY using prettyCheckable JS
 			$use_jslib = (int) $field->parameters->get('use_jslib', 2);
 			$use_prettycheckable = $use_jslib === 2;
 
@@ -219,6 +221,7 @@ class FCIndexedField extends FCField
 
 		// CSS classes of value container
 		$value_classes  = 'fcfieldval_container valuebox fcfieldval_container_'.$field->id;
+		$value_classes .= $fields_box_placing ? ' floated' : '';
 
 		// Field name and HTML TAG id
 		$valueholder_nm = 'custom[_fcfield_valueholder_]['.$field->name.']';
@@ -388,7 +391,7 @@ class FCIndexedField extends FCField
 					handle: '.fcfield-drag-handle',
 					/*containment: 'parent',*/
 					tolerance: 'pointer'
-					".($field->parameters->get('fields_box_placing', 1) ? "
+					".($fields_box_placing ? "
 					,start: function(e) {
 						//jQuery(e.target).children().css('float', 'left');
 						//fc_setEqualHeights(jQuery(e.target), 0);
@@ -1179,7 +1182,7 @@ class FCIndexedField extends FCField
 
 
 	// Method to create field's HTML display for frontend views
-	function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')
+	public function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 
@@ -1188,6 +1191,38 @@ class FCIndexedField extends FCField
 		// Set field and item objects
 		$this->setField($field);
 		$this->setItem($item);
+
+
+		/**
+		 * One time initialization
+		 */
+
+		static $initialized = null;
+		static $app, $document, $option, $format, $realview;
+
+		if ($initialized === null)
+		{
+			$initialized = 1;
+
+			$app       = JFactory::getApplication();
+			$document  = JFactory::getDocument();
+			$option    = $app->input->getCmd('option', '');
+			$format    = $app->input->getCmd('format', 'html');
+			$realview  = $app->input->getCmd('view', '');
+		}
+
+		// The current view is a full item view of the item
+		$isMatchedItemView = static::$itemViewId === (int) $item->id;
+
+		// Current view variable
+		$view = $app->input->getCmd('flexi_callview', ($realview ?: 'item'));
+		$sfx = $view === 'item' ? '' : '_cat';
+
+		// Check if field should be rendered according to configuration
+		if (!$this->checkRenderConds($prop, $view))
+		{
+			return;
+		}
 
 		// Some variables
 		$is_ingroup  = !empty($field->ingroup);
@@ -1219,21 +1254,6 @@ class FCIndexedField extends FCField
 			}
 		}
 
-
-		// Prefix - Suffix - Separator parameters, replacing other field values if found
-		$remove_space = $field->parameters->get( 'remove_space', 0 ) ;
-		$pretext		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'pretext', '' ), 'pretext' );
-		$posttext		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'posttext', '' ), 'posttext' );
-		$separatorf	= $field->parameters->get( 'separatorf', 1 ) ;
-		$opentag		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'opentag', '' ), 'opentag' );
-		$closetag		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'closetag', '' ), 'closetag' );
-
-		// Microdata (classify the field values for search engines)
-		$itemprop    = $field->parameters->get('microdata_itemprop');
-
-		if($pretext)  { $pretext  = $remove_space ? $pretext : $pretext . ' '; }
-		if($posttext) { $posttext = $remove_space ? $posttext : ' ' . $posttext; }
-
 		// Value creation
 		$sql_mode = $field->parameters->get( 'sql_mode', 0 ) ;
 		$field_elements = $field->parameters->get( 'field_elements', '' ) ;
@@ -1251,36 +1271,6 @@ class FCIndexedField extends FCField
 			$icon_color = $field->parameters->get( 'icon_color', $field->parameters->get( 'icon_color_form') ) ;
 		}
 
-		switch($separatorf)
-		{
-			case 0:
-			$separatorf = '&nbsp;';
-			break;
-
-			case 1:
-			$separatorf = '<br class="fcclear" />';
-			break;
-
-			case 2:
-			$separatorf = '&nbsp;|&nbsp;';
-			break;
-
-			case 3:
-			$separatorf = ',&nbsp;';
-			break;
-
-			case 4:
-			$separatorf = $closetag . $opentag;
-			break;
-
-			case 5:
-			$separatorf = '';
-			break;
-
-			default:
-			$separatorf = '&nbsp;';
-			break;
-		}
 
 		// Cleaner output for CSV export
 		if ($prop === 'csv_export')
@@ -1332,15 +1322,20 @@ class FCIndexedField extends FCField
 		}
 
 
+		/**
+		 * Get common parameters like: itemprop, value's prefix (pretext), suffix (posttext), separator, value list open/close text (opentag, closetag)
+		 * This will also replacing other field values if such replacing text for field values is found
+		 */
+		$common_params_array = $this->getCommonParams();
+		extract($common_params_array);
+
 		// Get layout name
 		$viewlayout = $field->parameters->get('viewlayout', '');
 		$viewlayout = $viewlayout ? 'value_'.$viewlayout : 'value_default';
 
-		// Create field's HTML, using layout file
+		// Create field's viewing HTML, using layout file
 		$field->{$prop} = array();
 		$display_index  = array();
-
-		// Create field's HTML, using layout file
 		include(self::getViewPath($field->field_type, $viewlayout));
 
 		// Add microdata to every group of values if field -- is -- in a field group
@@ -1386,7 +1381,7 @@ class FCIndexedField extends FCField
 	// ***
 
 	// Method to handle field's values before they are saved into the DB
-	function onBeforeSaveField( &$field, &$post, &$file, &$item )
+	public function onBeforeSaveField( &$field, &$post, &$file, &$item )
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 
@@ -1490,10 +1485,13 @@ class FCIndexedField extends FCField
 	}
 
 
-	// Method to do extra handling of field's values after all fields have validated their posted data, and are ready to be saved
-	// $item->fields['fieldname']->postdata contains values of other fields
-	// $item->fields['fieldname']->filedata contains files of other fields (normally this is empty due to using AJAX for file uploading)
-	function onAllFieldsPostDataValidated( &$field, &$item )
+	/**
+	 * Method to do extra handling of field's values after all fields have validated their posted data, and are ready to be saved
+	 *
+	 * $item->fields['fieldname']->postdata contains values of other fields
+	 * $item->fields['fieldname']->filedata contains files of other fields (normally this is empty due to using AJAX for file uploading)
+	 */
+	public function onAllFieldsPostDataValidated(&$field, &$item)
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 
@@ -1513,36 +1511,28 @@ class FCIndexedField extends FCField
 			return;
 		}
 
-		// Check for system plugin
-		$extfolder = 'system';
-		$extname   = 'flexisyspro';
-		$className = 'plg'. ucfirst($extfolder).$extname;
-		$plgPath = JPATH_SITE . '/plugins/'.$extfolder.'/'.$extname.'/'.$extname.'.php';
-
-		if (!file_exists($plgPath))
+		if (!self::$fcProPlg)
 		{
 			JFactory::getApplication()->enqueueMessage('Automatic field value for field  \'' . $field->label . '\' is only supported by FLEXIcontent PRO version, please disable this feature in field configuration', 'notice');
 			return;
 		}
-		//require_once $plgPath;
-
-		// Create plugin instance
-		$dispatcher   = JEventDispatcher::getInstance();
-		$plg_db_data  = JPluginHelper::getPlugin($extfolder, $extname);
-		$plg = new $className($dispatcher, array('type'=>$extfolder, 'name'=>$extname, 'params'=>$plg_db_data->params));
 
 		// Create automatic value
-		$plg->onAllFieldsPostDataValidated($field, $item);
+		return self::$fcProPlg->onAllFieldsPostDataValidated($field, $item);
 	}
 
 
 	// Method to take any actions/cleanups needed after field's values are saved into the DB
-	function onAfterSaveField( &$field, &$post, &$file, &$item ) {
+	public function onAfterSaveField( &$field, &$post, &$file, &$item )
+	{
+		if ( !in_array($field->field_type, static::$field_types) ) return;
 	}
 
 
 	// Method called just before the item is deleted to remove custom item data related to the field
-	function onBeforeDeleteField(&$field, &$item) {
+	public function onBeforeDeleteField(&$field, &$item)
+	{
+		if ( !in_array($field->field_type, static::$field_types) ) return;
 	}
 
 
@@ -1552,7 +1542,7 @@ class FCIndexedField extends FCField
 	// ***
 
 	// Method to display a search filter for the advanced search view
-	function onAdvSearchDisplayFilter(&$filter, $value='', $formName='searchForm')
+	public function onAdvSearchDisplayFilter(&$filter, $value='', $formName='searchForm')
 	{
 		if ( !in_array($filter->field_type, static::$field_types) ) return;
 
@@ -1608,9 +1598,9 @@ class FCIndexedField extends FCField
 	}
 
 
- 	// Method to get the active filter result (an array of item ids matching field filter, or subquery returning item ids)
+	// Method to get the active filter result (an array of item ids matching field filter, or subquery returning item ids)
 	// This is for content lists e.g. category view, and not for search view
-	function getFiltered(&$filter, $value, $return_sql=true)
+	public function getFiltered(&$filter, $value, $return_sql = true)
 	{
 		if ( !in_array($filter->field_type, static::$field_types) ) return;
 
@@ -1618,9 +1608,9 @@ class FCIndexedField extends FCField
 	}
 
 
- 	// Method to get the active filter result (an array of item ids matching field filter, or subquery returning item ids)
+	// Method to get the active filter result (an array of item ids matching field filter, or subquery returning item ids)
 	// This is for search view
-	function getFilteredSearch(&$filter, $value, $return_sql=true)
+	public function getFilteredSearch(&$filter, $value, $return_sql = true)
 	{
 		if ( !in_array($filter->field_type, static::$field_types) ) return;
 
@@ -1635,7 +1625,7 @@ class FCIndexedField extends FCField
 	// ***
 
 	// Method to create (insert) advanced search index DB records for the field values
-	function onIndexAdvSearch(&$field, &$post, &$item)
+	public function onIndexAdvSearch(&$field, &$post, &$item)
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 		if ( !$field->isadvsearch && !$field->isadvfilter ) return;
@@ -1648,7 +1638,7 @@ class FCIndexedField extends FCField
 
 
 	// Method to create basic search index (added as the property field->search)
-	function onIndexSearch(&$field, &$post, &$item)
+	public function onIndexSearch(&$field, &$post, &$item)
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 		if ( !$field->issearch ) return;
