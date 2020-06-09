@@ -658,7 +658,8 @@ class com_flexicontentInstallerScript
 		// Update DB table flexicontent_fields: Convert deprecated fields types to 'text' field type
 		?>
 				<tr class="row0">
-					<td class="key" style="font-size:11px;">Converting deprecated fields types:
+					<td class="key" style="font-size:11px;">Converting deprecated fields types:</td>
+					<td>
 					<?php
 					//echo '<br/><span class="label">' . implode('</span><span class="label">', array_keys($deprecated_fields)) . '</span>';
 					$msg = array();
@@ -675,6 +676,35 @@ class com_flexicontentInstallerScript
 
 							$n++;
 						}
+					}
+					?>
+					</td>
+					<td> <?php echo implode("\n", $msg); ?> </td>
+				</tr>
+
+		<?php
+		// Rename OLD parameter names to new names
+		?>
+				<tr class="row0">
+					<td class="key" style="font-size:11px;">Converting old field parameter names to new names</td>
+					<td>
+					<?php
+					$msg = array();
+					$n = 0;
+					$field_ids = $db->setQuery('SELECT id FROM #__flexicontent_fields WHERE field_type = ' . $db->Quote('addressint'))->loadColumn();
+
+					foreach($field_ids as $field_id)
+					{
+						$_updated = $this->_renameExtensionLegacyParameters(
+							$_map = array('field_prefix' => 'opentag', 'field_suffix' => 'closetag'),
+							$_dbtbl_name = 'flexicontent_fields',
+							$_dbcol_name = 'attribs',
+							$_record_id = $field_id 
+						);
+
+						if ($_updated) $msg[] = 'Update field: ' . $field_id . '<br>';
+
+						$n++;
 					}
 					?>
 					</td>
@@ -1706,12 +1736,14 @@ class com_flexicontentInstallerScript
 		$query = 'SELECT ' . $dbcol_name
 			. ' FROM #__' . $dbtbl_name . ' '
 			. ' WHERE '
-			. '  id='. $db->Quote($record_id)
+			. '  id = ' . (int) $record_id
 			;
 		$attribs = $db->setQuery($query)->loadResult();
 
 		// Decode parameters
 		$_attribs = json_decode($attribs);
+
+		$update_needed = false;
 
 		// Set old parameter values into new parameters, removing the old parameter values
 		foreach($map as $old => $new)
@@ -1721,18 +1753,25 @@ class com_flexicontentInstallerScript
 				// Set new parameter value and remove legacy parameter value
 				$_attribs->$new = $_attribs->$old;
 				unset($_attribs->$old);
+
+				$update_needed = true;
 			}
 		}
 
-		// Re-encode parameters
-		$attribs = json_encode($_attribs);
+		if ($update_needed)
+		{
+			// Re-encode parameters
+			$attribs = json_encode($_attribs);
 
-		// Store field parameter back to the DB
-		$query = 'UPDATE #__' . $dbtbl_name . ''
-			.' SET ' . $dbcol_name . '=' . $db->Quote($attribs)
-			.' WHERE id = ' . $record_id
-			;
-		$db->setQuery($query)->execute();
+			// Store field parameter back to the DB
+			$query = 'UPDATE #__' . $dbtbl_name . ''
+				.' SET ' . $dbcol_name . '=' . $db->Quote($attribs)
+				.' WHERE id = ' . (int) $record_id
+				;
+			$db->setQuery($query)->execute();
+		}
+
+		return $update_needed;
 	}
 
 
