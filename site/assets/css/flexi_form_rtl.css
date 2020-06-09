@@ -552,17 +552,17 @@ body .nowrap_hidden {
 	margin: -1px 0 0 0;
 	white-space: nowrap;
 }
-#flexicontent div.input-group-addon > *:not(:last-child):not(.select2-container),
-#flexicontent div.input-append > *:not(:last-child):not(.select2-container),
-#flexicontent div.input-group-addon > *:not(:last-child) > *,
-#flexicontent div.input-append > *:not(:last-child) > * {
+#flexicontent div.input-group-addon > *:not(:first-child):not(:last-child):not(.select2-container),
+#flexicontent div.input-append > *:not(:first-child):not(:last-child):not(.select2-container),
+#flexicontent div.input-group-addon > *:not(:first-child):not(:last-child) > *,
+#flexicontent div.input-append > *:not(:first-child):not(:last-child) > * {
 	border-top-left-radius: 0px !important;
 	border-bottom-left-radius: 0px !important;
 }
-#flexicontent div.input-group-addon > *:not(:first-child),
-#flexicontent div.input-prepend > *:not(:first-child),
-#flexicontent div.input-group-addon > *:not(:first-child) > *,
-#flexicontent div.input-prepend > *:not(:first-child) > * {
+#flexicontent div.input-group-addon > *:not(:first-child):not(:last-child),
+#flexicontent div.input-prepend > *:not(:first-child):not(:last-child),
+#flexicontent div.input-group-addon > *:not(:first-child):not(:last-child) > *,
+#flexicontent div.input-prepend > *:not(:first-child):not(:last-child) > * {
 	border-top-right-radius: 0px !important;
 	border-bottom-right-radius: 0px !important;
 	margin-left: 0 !important;
@@ -615,6 +615,7 @@ body .nowrap_hidden {
 	padding-top: 18px;
 }
 #flexicontent .fc-floated-labels-box {
+	display: inline-block;
 	position: relative;
 	margin: 0px 0px 20px 4px;
 }
@@ -658,7 +659,7 @@ body .nowrap_hidden {
 	top: 8px;
 	left: 8px;
 	transition: 0.2s ease all;
-	z-index: 1;
+	z-index: 10;
 	color: gray;
 	opacity: 0.7;
 	padding: 0 4px 0 4px;

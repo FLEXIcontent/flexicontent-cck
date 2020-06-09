@@ -552,18 +552,18 @@ body .nowrap_hidden {
 	margin: -1px 0 0 0;
 	white-space: nowrap;
 }
-#flexicontent div.input-group-addon > *:not(:last-child):not(.select2-container),
-#flexicontent div.input-append > *:not(:last-child):not(.select2-container),
-#flexicontent div.input-group-addon > *:not(:last-child) > *,
-#flexicontent div.input-append > *:not(:last-child) > * {
+#flexicontent div.input-group-addon > *:not(:first-child):not(:last-child):not(.select2-container),
+#flexicontent div.input-append > *:not(:first-child):not(:last-child):not(.select2-container),
+#flexicontent div.input-group-addon > *:not(:first-child):not(:last-child) > *,
+#flexicontent div.input-append > *:not(:first-child):not(:last-child) > * {
 	border-top-right-radius: 0px !important;
 	border-bottom-right-radius: 0px !important;
 	margin-right: 0 !important;
 }
-#flexicontent div.input-group-addon > *:not(:first-child),
-#flexicontent div.input-prepend > *:not(:first-child),
-#flexicontent div.input-group-addon > *:not(:first-child) > *,
-#flexicontent div.input-prepend > *:not(:first-child) > * {
+#flexicontent div.input-group-addon > *:not(:first-child):not(:last-child),
+#flexicontent div.input-prepend > *:not(:first-child):not(:last-child),
+#flexicontent div.input-group-addon > *:not(:first-child):not(:last-child) > *,
+#flexicontent div.input-prepend > *:not(:first-child):not(:last-child) > * {
 	border-top-left-radius: 0px !important;
 	border-bottom-left-radius: 0px !important;
 }
@@ -615,6 +615,7 @@ body .nowrap_hidden {
 	padding-top: 18px;
 }
 #flexicontent .fc-floated-labels-box {
+	display: inline-block;
 	position: relative;
 	margin: 0px 4px 20px 0px;
 }
@@ -658,7 +659,7 @@ body .nowrap_hidden {
 	top: 8px;
 	left: 8px;
 	transition: 0.2s ease all;
-	z-index: 1;
+	z-index: 10;
 	color: gray;
 	opacity: 0.7;
 	padding: 0 4px 0 4px;
@@ -1182,12 +1183,14 @@ body .fc-mssg-inline {
 body #flexicontent .fc-field-props-box .fcfield_preview_box,
 body #flexicontent .fc-field-props-box .fc_file_uploader,
 body #flexicontent .fc-field-props-box .fc_file_uploader.fc_inline_uploader,
-body #flexicontent .fc-field-props-box > *:not(:first-child):not(:last-child),
+body #flexicontent .fc-field-props-box .inlinefile-prv-box:not(:last-child),
+body #flexicontent .fc-field-props-box .inlinefile-data-box:not(:last-child),
 body #flexicontent .fc_uploader_n_props_box .fcfield_preview_box,
 body #flexicontent .fc_uploader_n_props_box .fc_file_uploader,
 body #flexicontent .fc_uploader_n_props_box .fc_file_uploader.fc_inline_uploader,
-body #flexicontent .fc_uploader_n_props_box > *:not(:first-child):not(:last-child) {
-	margin-left: 12px;
+body #flexicontent .fc_uploader_n_props_box .inlinefile-prv-box:not(:last-child),
+body #flexicontent .fc_uploader_n_props_box .inlinefile-data-box:not(:last-child) {
+	margin-right: 12px;
 }
 body .fc_uploader_n_props_box {
 	display: flex;
@@ -2784,16 +2787,16 @@ form div.container_fcfield > select {
 #flexicontent div fieldset.panelform .input-prepend > button {
 	margin-left: 0px;
 }
-#flexicontent div .btn-group > *:not(:last-child),
-#flexicontent div .input-append > *:not(:last-child) {
+#flexicontent div .btn-group > *:not(:first-child):not(:last-child),
+#flexicontent div .input-append > *:not(:first-child):not(:last-child) {
 	border-top-right-radius: 0px;
 	border-bottom-right-radius: 0px;
 	vertical-align: middle;
 }
-#flexicontent div .btn-group > *:not(:first-of-type),
-#flexicontent div .input-prepend > *:not(:first-child),
-#flexicontent div .btn-group > *:not(:first-child):not(label),
-#flexicontent div .input-prepend > *:not(:first-child):not(label) {
+#flexicontent div .btn-group > *:not(:first-of-type):not(:last-of-type),
+#flexicontent div .input-prepend > *:not(:first-child):not(:last-child),
+#flexicontent div .btn-group > *:not(:first-child):not(:last-child):not(label),
+#flexicontent div .input-prepend > *:not(:first-child):not(:last-child):not(label) {
 	border-top-left-radius: 0px;
 	border-bottom-left-radius: 0px;
 	vertical-align: middle;
@@ -3319,7 +3322,6 @@ ul.thumbnails.image_picker_selector li div.thumbnail p {
 	background-clip: padding-box;
 	color: #444;
 	border: 1px solid #AAAAAA;
-	border-radius: 4px;
 	display: inline-block;
 	padding: 0 6px 0px 6px;
 	margin: 0px 6px 2px 2px;
@@ -3506,7 +3508,6 @@ select[multiple].use_select2_lib:focus {
 	position: absolute !important;
 	top: 0;
 	left: 0;
-	opacity: 0.5;
 	background-color: #000;
 	width: 100%;
 	height: 100%;
@@ -3522,11 +3523,9 @@ select[multiple].use_select2_lib:focus {
 	font-weight: bold;
 	color: #555;
 	background: white 30px 40px no-repeat;
-	opacity: 1;
 	width: auto;
 	padding: 2em 2em 3em 2em;
 	margin: 0px;
-	border: 1px solid lightgray;
 	border-radius: 0.5em;
 	text-align: center;
 	width: 280px;
