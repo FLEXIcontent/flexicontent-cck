@@ -63,9 +63,14 @@ $map_position = (int) $field->parameters->get('map_position', 0);
 $map_width  = (int) $field->parameters->get('map_width', 200);
 $map_height = (int) $field->parameters->get('map_height', 150);
 
-$use_custom_marker = (int) $field->parameters->get('use_custom_marker', 1);
-$defaut_icon_url   = $map_api === 'googlemap'
-	? 'https://maps.gstatic.com/mapfiles/api-3/images/spotlight-poi2.png'
+$use_custom_marker      = (int) $field->parameters->get('use_custom_marker', 1);
+$custom_marker_path     = $field->parameters->get('custom_marker_path', 'mod_flexigooglemap/marker');
+
+$custom_marker_path_abs = JPATH::clean(JPATH_SITE . DS . 'images' . DS . $custom_marker_path. DS);
+$custom_marker_url_base = str_replace('\\', '/', JURI::root() . 'images/' . $custom_marker_path . '/');
+
+$defaut_icon_url = $map_api === 'googlemap'
+	? '' //'https://maps.gstatic.com/mapfiles/api-3/images/spotlight-poi2.png'
 	: 'https://unpkg.com/leaflet@1.5.1/dist/images/marker-icon.png';
 
 
@@ -141,16 +146,50 @@ foreach ($this->values as $n => $value)
 	$value['lat'] = isset($value['lat']) ? $value['lat'] : '';
 	$value['lon'] = isset($value['lon']) ? $value['lon'] : '';
 
-	$value['custom_marker'] = $use_custom_marker && !empty($value['custom_marker'])
-		? $value['custom_marker']
-		: $defaut_icon_url;
-
 	// Skip value if both address and formated address are empty
 	if (
-		!isset($value['addr_display']) && !isset($value['addr_formatted']) && !isset($value['addr1']) &&
-		!isset($value['city']) && !isset($value['state']) && !isset($value['province'])  &&
-		(!strlen($value['lat']) || !strlen($value['lon'])) && !isset($value['url'])
+		empty($value['addr_display']) && empty($value['addr_formatted']) && empty($value['addr1']) &&
+		empty($value['city']) && empty($value['state']) && empty($value['province'])  &&
+		(!strlen($value['lat']) || !strlen($value['lon'])) && empty($value['url'])
 	) continue;
+
+	// Clear custom marker if feature is disabled. This will force using default markers
+	$value['custom_marker'] = $use_custom_marker && !empty($value['custom_marker'])
+		? $value['custom_marker']
+		: '';
+	$value['marker_anchor'] = $value['custom_marker'] && !empty($value['marker_anchor'])
+		? $value['marker_anchor']
+		: 'BotC';
+	
+	$marker_path = !empty($value['custom_marker'])
+		? $custom_marker_path_abs . $value['custom_marker']
+		: '';
+	$marker_url  = !empty($value['custom_marker'])
+		? $custom_marker_url_base . $value['custom_marker']
+		: $defaut_icon_url;
+
+	
+	if ($marker_path || $marker_url)
+	{
+		// Marker Size
+		list($wS, $hS) = getimagesize($marker_path ?: $marker_url);
+
+		// Marker Anchor
+		switch($value['marker_anchor'])
+		{
+			case 'TopL' : $wA = 0;     $hA = 0; break;
+			case 'TopC' : $wA = $wS/2; $hA = 0; break;
+			case 'TopR' : $wA = $wS;   $hA = 0; break;
+
+			case 'MidL' : $wA = 0;     $hA = $hS/2; break;
+			case 'MidC' : $wA = $wS/2; $hA = $hS/2; break;
+			case 'MidR' : $wA = $wS;   $hA = $hS/2; break;
+
+			case 'BotL' : $wA = 0;     $hA = $hS; break;
+			case 'BotC' : $wA = $wS/2; $hA = $hS; break;
+			case 'BotR' : $wA = $wS;   $hA = $hS; break;
+		}
+	}
 
 	// generate address html
 	$addr = '';
@@ -251,7 +290,13 @@ foreach ($this->values as $n => $value)
 						data-mapaddr="' . htmlspecialchars(json_encode($value['addr1']), ENT_COMPAT, 'UTF-8') . '"
 						data-maptype="google.maps.MapTypeId.'.strtoupper($map_type).'"
 						data-mapcontent="' . htmlspecialchars(json_encode($addr . $map_directions), ENT_COMPAT, 'UTF-8') . '"
-            data-mapicon="' . htmlspecialchars(json_encode($value['custom_marker']), ENT_COMPAT, 'UTF-8') . '"
+            ' . ($value['custom_marker'] ? '
+							data-mapicon="' . htmlspecialchars(json_encode($marker_url), ENT_COMPAT, 'UTF-8') . '" 
+							data-mapicon_ws="' . $wS . '" 
+							data-mapicon_hs="' . $hS . '" 
+							data-mapicon_wa="' . $wA . '" 
+							data-mapicon_ha="' . $hA . '" 
+						' : '') . '
 						id="' . $map_tagid . '"' .
 						($map_width || $map_height ? 'style="min-width: ' . $map_width . 'px; min-height: ' . $map_height . 'px;"' : '') . '
 					>
@@ -312,7 +357,11 @@ foreach ($this->values as $n => $value)
 					options: {}
 				});
 
-				var mapIcon = new LeafIcon({iconUrl: \''.$value['custom_marker'].'\'});
+				var mapIcon = new LeafIcon({
+					iconUrl: \''.$marker_url.'\',
+					iconSize: [' . $wS . ', ' . $hS . '],
+					iconAnchor: [' . $wA . ', ' . $hA . ']
+				});
 				var contentPopup = ' . json_encode($addr . $map_directions) . ';
 
 				theMarker = L.marker(['.($value['lat'] ? $value['lat'] : '0').','.($value['lon'] ? $value['lon'] : '0').'], {icon: mapIcon}).addTo(theMap);
@@ -320,7 +369,7 @@ foreach ($this->values as $n => $value)
 			';
 		}
 	}
-	
+
 	$map = $map ? '
 		<div class="fc_addressint_container_' . $field->id . '">' . $map . '</div>
 	' : '';
@@ -366,12 +415,15 @@ if (!isset($addressint_view_js_added[$field->id]) && $map_api === 'googlemap' &&
 	$js = '
 	function fc_addressint_initMap_' . $field->id . '(mapBox)
 	{
-		var mapLatLon = eval("(" + mapBox.attr("data-maplatlon") + ")");
-		var mapZoom   = parseInt(mapBox.attr("data-mapzoom"));
-		var mapAddr   = eval("(" + mapBox.attr("data-mapaddr") + ")");
-		var mapType   = eval("(" + mapBox.attr("data-maptype") + ")");
-		var mapContent= eval("(" + mapBox.attr("data-mapcontent") + ")");
-    var mapIcon   = eval("(" + mapBox.attr("data-mapicon") + ")");
+		var mapLatLon  = eval("(" + mapBox.attr("data-maplatlon") + ")");
+		var mapZoom    = parseInt(mapBox.attr("data-mapzoom"));
+		var mapAddr    = eval("(" + mapBox.attr("data-mapaddr") + ")");
+		var mapType    = eval("(" + mapBox.attr("data-maptype") + ")");
+		var mapContent = eval("(" + mapBox.attr("data-mapcontent") + ")");
+		var mapIcon    = eval("(" + mapBox.attr("data-mapicon") + ")");
+
+		var wS = mapBox.attr("data-mapicon_ws"), hS = mapBox.attr("data-mapicon_hs"),
+				wA = mapBox.attr("data-mapicon_wa"), hA = mapBox.attr("data-mapicon_ha");
 
 		var theMap = new google.maps.Map(document.getElementById(mapBox.attr("id")), {
 			center: mapLatLon,
@@ -392,11 +444,23 @@ if (!isset($addressint_view_js_added[$field->id]) && $map_api === 'googlemap' &&
 		var myInfoWindow = new google.maps.InfoWindow({
 			content: mapContent
 		});
+		
+		var theIcon = "";
+
+		if (mapIcon)
+		{
+			theIcon = {
+				url: mapIcon,
+				size: new google.maps.Size(wS, hS),
+				origin: new google.maps.Point(0, 0),
+				anchor: new google.maps.Point(wA, hA)
+			};
+		}
 
 		var theMarker = new google.maps.Marker({
 			title: mapAddr,
 			position: mapLatLon,
-      icon: mapIcon,
+      icon: theIcon,
 			map: theMap
 		});
 

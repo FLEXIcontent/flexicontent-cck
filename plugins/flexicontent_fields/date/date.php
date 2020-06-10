@@ -187,7 +187,10 @@ class plgFlexicontent_fieldsDate extends FCField
 			$tz = new DateTimeZone($timezone);
 			$date_now = JFactory::getDate('now');
 			$date_now->setTimezone($tz);
-			$date_now_str = $date_now->format($dateformat, $local = true);
+			$date_now_str = $date_now->format(
+				str_replace('%', '', JText::_($dateformat)),
+				$local = true
+			);
 		}
 
 		$field_notes = $field_notes ? '<b>'.JText::_('FLEXI_NOTES').'</b>: '.$field_notes : '';

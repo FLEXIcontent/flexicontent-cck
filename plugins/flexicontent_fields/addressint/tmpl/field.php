@@ -15,6 +15,7 @@ foreach ($values as $value)
 	$value['addr_formatted'] = isset($value['addr_formatted']) ? $value['addr_formatted'] : '';
 	$value['zip_suffix']     = isset($value['zip_suffix'])     ? $value['zip_suffix'] : '';
 	$value['custom_marker']  = isset($value['custom_marker'])  ? $value['custom_marker'] : '';
+	$value['marker_anchor']  = !empty($value['marker_anchor'])  ? $value['marker_anchor'] : 'BotC';
 
 	$value['url']      = isset($value['url'])   ? $value['url'] : '';
 	$value['zoom']     = isset($value['zoom'])  ? $value['zoom'] : '';
@@ -37,6 +38,12 @@ foreach ($values as $value)
 		empty($value['addr_display']) && empty($value['addr_formatted']) && empty($value['addr1']) &&
 		empty($value['city']) && empty($value['state']) && empty($value['province']) &&
 		(empty($value['lat']) || empty($value['lon'])) && empty($value['url']);
+
+	// Use default marker icon only for new values
+	if ($value_is_empty)
+	{
+		$value['custom_marker'] = $default_marker_file;
+	}
 
 	$value_is_disabled       = $enable_disable_btns && $value_is_empty;
 	$field->fc_form_data[$n] = (object) array(
@@ -187,10 +194,21 @@ foreach ($values as $value)
 			<td class="key"><label class="fc-prop-lbl fc_gm_custom_marker-lbl" for="'.$elementid_n.'_custom_marker">'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_CUSTOM_MARKER').'</label></td>
 				<td>' .
 					JHtml::_('select.genericlist', $custom_markers, $fieldname_n.'[custom_marker]',
-						' class="fc_gm_custom_marker has_select2_lib" onchange="fcfield_addrint.updateMarkerIcon' . ($mapapi_edit === 'googlemap' ? '' : '_OS') . '(this.id.replace(\'_custom_marker\', \'\'), \''.$field_name_js.'\');" ',
-						'value', 'text', $value['custom_marker'], $elementid_n.'_custom_marker').'
+						' class="fc_gm_custom_marker has_select2_lib" data-marker-base-url = "' . $custom_marker_url_base . '" ' .
+						' onchange="fcfield_addrint.updateMarkerIcon' . ($mapapi_edit === 'googlemap' ? '' : '_OS') . '(this.id.replace(\'_custom_marker\', \'\'), \''.$field_name_js.'\');" ',
+						'value', 'text', $value['custom_marker'], $elementid_n.'_custom_marker') . '
 				</td>
 			</tr>
+			<tr class="fc_gm_marker_anchor_row">
+			<td class="key"><label class="fc-prop-lbl fc_gm_marker_anchor-lbl" for="'.$elementid_n.'_marker_anchor">'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MARKER_ANCHOR').'</label></td>
+				<td style="position: relative;">' .
+					JHtml::_('select.genericlist', $marker_anchors, $fieldname_n.'[marker_anchor]',
+						' class="fc_gm_marker_anchor use_select2_lib" onchange="fcfield_addrint.updateMarkerIcon' . ($mapapi_edit === 'googlemap' ? '' : '_OS') . '(this.id.replace(\'_marker_anchor\', \'\'), \''.$field_name_js.'\');" ',
+						'value', 'text', $value['marker_anchor'], $elementid_n.'_marker_anchor') . '
+						<button type="button" class="btn btn-small btn-sm hasPopover" data-toggle="popover" title="' .  JText::_('FLEXI_EXAMPLES', true) . '" data-content="' .  JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MARKER_ANCHOR_INFO', true) . '"><span class="icon-info"></span>' .  JText::_('FLEXI_ABOUT', true) . '</button>
+				</td>
+			</tr>
+
 		' : '') . '
 
 		</tbody></table>
@@ -219,26 +237,26 @@ foreach ($values as $value)
 	</div>
 
 
-	<input type="hidden" id="'.$elementid_n.'_addr_formatted" name="'.$fieldname_n.'[addr_formatted]" value="'.htmlspecialchars($value['addr_formatted'], ENT_COMPAT, 'UTF-8').'" />
-	<input type="hidden" id="'.$elementid_n.'_url" name="'.$fieldname_n.'[url]" value="'.htmlspecialchars($value['url'], ENT_COMPAT, 'UTF-8').'" />
+	<input type="hidden" id="'.$elementid_n.'_addr_formatted" name="'.$fieldname_n.'[addr_formatted]" class="addrint_addr_formatted" value="'.htmlspecialchars($value['addr_formatted'], ENT_COMPAT, 'UTF-8').'" />
+	<input type="hidden" id="'.$elementid_n.'_url" name="'.$fieldname_n.'[url]" class="addrint_url" value="'.htmlspecialchars($value['url'], ENT_COMPAT, 'UTF-8').'" />
 	';
 
 	if ($addr_edit_mode === 'plaintext')
 	{
 		$field_html .= '
-		<input type="hidden" id="'.$elementid_n.'_name" name="'.$fieldname_n.'[name]" value="'.htmlspecialchars($value['name'], ENT_COMPAT, 'UTF-8').'" />
-		<input type="hidden" id="'.$elementid_n.'_addr1" name="'.$fieldname_n.'[addr1]" value="'.htmlspecialchars($value['addr1'], ENT_COMPAT, 'UTF-8').'" />
-		<input type="hidden" id="'.$elementid_n.'_city" name="'.$fieldname_n.'[city]" value="'.htmlspecialchars($value['city'], ENT_COMPAT, 'UTF-8').'" />
-		<input type="hidden" id="'.$elementid_n.'_state" name="'.$fieldname_n.'[state]" value="'.htmlspecialchars($value['state'], ENT_COMPAT, 'UTF-8').'" />
-		<input type="hidden" id="'.$elementid_n.'_province" name="'.$fieldname_n.'[province]" value="'.htmlspecialchars($value['province'], ENT_COMPAT, 'UTF-8').'" />
-		<input type="hidden" id="'.$elementid_n.'_zip" name="'.$fieldname_n.'[zip]" value="'.htmlspecialchars($value['zip'], ENT_COMPAT, 'UTF-8').'" />
-		<input type="hidden" id="'.$elementid_n.'_country" name="'.$fieldname_n.'[country]" value="'.htmlspecialchars($value['country'], ENT_COMPAT, 'UTF-8').'" />
+		<input type="hidden" id="'.$elementid_n.'_name" name="'.$fieldname_n.'[name]" class="addrint_name" value="'.htmlspecialchars($value['name'], ENT_COMPAT, 'UTF-8').'" />
+		<input type="hidden" id="'.$elementid_n.'_addr1" name="'.$fieldname_n.'[addr1]" class="addrint_addr1" value="'.htmlspecialchars($value['addr1'], ENT_COMPAT, 'UTF-8').'" />
+		<input type="hidden" id="'.$elementid_n.'_city" name="'.$fieldname_n.'[city]" class="addrint_city" value="'.htmlspecialchars($value['city'], ENT_COMPAT, 'UTF-8').'" />
+		<input type="hidden" id="'.$elementid_n.'_state" name="'.$fieldname_n.'[state]" class="addrint_state" value="'.htmlspecialchars($value['state'], ENT_COMPAT, 'UTF-8').'" />
+		<input type="hidden" id="'.$elementid_n.'_province" name="'.$fieldname_n.'[province]" class="addrint_province" value="'.htmlspecialchars($value['province'], ENT_COMPAT, 'UTF-8').'" />
+		<input type="hidden" id="'.$elementid_n.'_zip" name="'.$fieldname_n.'[zip]" class="addrint_zip" value="'.htmlspecialchars($value['zip'], ENT_COMPAT, 'UTF-8').'" />
+		<input type="hidden" id="'.$elementid_n.'_country" name="'.$fieldname_n.'[country]" class="addrint_country" value="'.htmlspecialchars($value['country'], ENT_COMPAT, 'UTF-8').'" />
 		'
 		// DO NOT STORE manually enter properties: ADDR2, ADDR3, ZIP_SUFFIX in plaintext mode !!
 		/* '
-		<input type="hidden" id="'.$elementid_n.'_addr2" name="'.$fieldname_n.'[addr2]" value="'.htmlspecialchars($value['addr2'], ENT_COMPAT, 'UTF-8').'" />
-		<input type="hidden" id="'.$elementid_n.'_addr3" name="'.$fieldname_n.'[addr3]" value="'.htmlspecialchars($value['addr3'], ENT_COMPAT, 'UTF-8').'" />
-		<input type="hidden" id="'.$elementid_n.'_zip_suffix" name="'.$fieldname_n.'[zip_suffix]" value="'.htmlspecialchars($value['zip_suffix'], ENT_COMPAT, 'UTF-8').'" />
+		<input type="hidden" id="'.$elementid_n.'_addr2" name="'.$fieldname_n.'[addr2]" class="addrint_addr2" value="'.htmlspecialchars($value['addr2'], ENT_COMPAT, 'UTF-8').'" />
+		<input type="hidden" id="'.$elementid_n.'_addr3" name="'.$fieldname_n.'[addr3]" class="addrint_addr3" value="'.htmlspecialchars($value['addr3'], ENT_COMPAT, 'UTF-8').'" />
+		<input type="hidden" id="'.$elementid_n.'_zip_suffix" name="'.$fieldname_n.'[zip_suffix]" class="addrint_zip_suffix" value="'.htmlspecialchars($value['zip_suffix'], ENT_COMPAT, 'UTF-8').'" />
 		'*/
 		;
 	}
@@ -247,7 +265,7 @@ foreach ($values as $value)
 	else
 	{
 		$field_html .= '
-			<input type="hidden" id="'.$elementid_n.'_addr_display" name="'.$fieldname_n.'[addr_display]" value="'.htmlspecialchars($value['addr_display'], ENT_COMPAT, 'UTF-8').'" />
+			<input type="hidden" id="'.$elementid_n.'_addr_display" name="'.$fieldname_n.'[addr_display]" class="addrint_addr_display" value="'.htmlspecialchars($value['addr_display'], ENT_COMPAT, 'UTF-8').'" />
 		';
 	}
 

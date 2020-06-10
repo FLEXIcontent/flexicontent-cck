@@ -127,6 +127,36 @@
 				<option value="formatted" show_list="addr-formatted-mode" hide_list="addr-plaintext-mode">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_FORMATTED_MODE</option>
 			</field>
 
+			<field name="map_type" type="radio" default="roadmap" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MAP_TYPE" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MAP_TYPE_DESC" depend_class="map-settings" class="btn-group group-fcinfo">
+				<option value="roadmap">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_ROADMAP</option>
+				<option value="satellite">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_SATELLITE</option>
+				<option value="hybrid">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_HYBRID</option>
+				<option value="terrain">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_TERRAIN</option>
+			</field>
+			<field name="map_zoom" type="list" default="16" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MAP_ZOOM" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MAP_ZOOM_DESC" depend_class="map-settings">
+				<option value="1">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MAP_ZOOM_WORLD</option>
+				<option value="2">2</option>
+				<option value="3">3</option>
+				<option value="4">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MAP_ZOOM_CONTINENT</option>
+				<option value="5">5</option>
+				<option value="6">6</option>
+				<option value="7">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MAP_ZOOM_COUNTRY</option>
+				<option value="8">8</option>
+				<option value="9">9</option>
+				<option value="10">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MAP_ZOOM_REGION</option>
+				<option value="11">11</option>
+				<option value="12">12</option>
+				<option value="13">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MAP_ZOOM_CITY</option>
+				<option value="14">14</option>
+				<option value="15">15</option>
+				<option value="16">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MAP_ZOOM_NEIGHBORHOOD</option>
+				<option value="17">17</option>
+				<option value="18">18</option>
+				<option value="19">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MAP_ZOOM_STREET</option>
+				<option value="20">20</option>
+				<option value="21">21</option>
+			</field>
+
 			<field name="" type="separator" default="FLEXI_ENABLE_SKIP_VALUE_INFO" description="" level="level2" class="alert alert-info fcpadded" />
 			<field name="required_props_plaintext" type="list" multiple="multiple" default="" label="FLEXI_FIELD_REQUIRED_PROPERTIES" description="FLEXI_FIELD_REQUIRED_PROPERTIES_DESC" class="use_select2_lib" depend_class="addr-plaintext-mode" >
 				<option value="address">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_ADDRESS</option>
@@ -174,6 +204,7 @@
 				label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MARKERS_FOLDER" directory="images"
 				recursive="true"
 				filter="" exclude="" stripext="" depend_class="use_custom_marker"/>
+			<field name="default_marker_file" type="text" default="" hint="e.g. icon-blue.png" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_DEFAULT_MARKER_ICON" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_DEFAULT_MARKER_ICON_DESC" />
 
 			<field name="" type="separator" default="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MANUAL_DATA" class="" level="level3" depend_class="addr-formatted-mode" />
 			<field name="use_zip_suffix" type="radio" default="0" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_USE_ZIP_SUFFIX" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_USE_ZIP_SUFFIX_DESC" class="btn-group group-fcmethod fcoffactive" depend_class="addr-formatted-mode">
@@ -268,34 +299,11 @@
 				<option value="int" show_list="map-settings-int" hide_list="map-settings-img">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_INTERACTIVE_MAP</option>
 				<option value="img" show_list="map-settings-img" hide_list="map-settings-int">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_STATIC_MAP_IMAGE</option>
 			</field>
-			<field name="map_type" type="radio" default="roadmap" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MAP_TYPE" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MAP_TYPE_DESC" depend_class="map-settings" class="btn-group group-fcinfo">
-				<option value="roadmap">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_ROADMAP</option>
-				<option value="satellite">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_SATELLITE</option>
-				<option value="hybrid">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_HYBRID</option>
-				<option value="terrain">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_TERRAIN</option>
+			<field name="map_type_view" type="radio" default="" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MAP_TYPE" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MAP_TYPE_DESC" depend_class="map-settings" class="btn-group group-fcinfo">
+				<option value="">Same as edit configuration</option>
 			</field>
-			<field name="map_zoom" type="list" default="16" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MAP_ZOOM" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MAP_ZOOM_DESC" depend_class="map-settings">
-				<option value="1">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MAP_ZOOM_WORLD</option>
-				<option value="2">2</option>
-				<option value="3">3</option>
-				<option value="4">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MAP_ZOOM_CONTINENT</option>
-				<option value="5">5</option>
-				<option value="6">6</option>
-				<option value="7">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MAP_ZOOM_COUNTRY</option>
-				<option value="8">8</option>
-				<option value="9">9</option>
-				<option value="10">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MAP_ZOOM_REGION</option>
-				<option value="11">11</option>
-				<option value="12">12</option>
-				<option value="13">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MAP_ZOOM_CITY</option>
-				<option value="14">14</option>
-				<option value="15">15</option>
-				<option value="16">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MAP_ZOOM_NEIGHBORHOOD</option>
-				<option value="17">17</option>
-				<option value="18">18</option>
-				<option value="19">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MAP_ZOOM_STREET</option>
-				<option value="20">20</option>
-				<option value="21">21</option>
+			<field name="map_zoom_view" type="list" default="" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MAP_ZOOM_LEVEL_VIEW" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MAP_ZOOM_LEVEL_VIEW_DESC" depend_class="map-settings">
+				<option value="">Set per value in edit form</option>
 			</field>
 
 			<field name="" type="separator" default="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_STATIC_MAP_IMAGE" description="" level="level3" class="" depend_class="map-settings map-settings-img" />

@@ -4,6 +4,8 @@
 
 	var fcfield_addrint = {};
 
+	fcfield_addrint.configure = [];
+
 	fcfield_addrint.autoComplete    = [];
 	fcfield_addrint.gmapslistener   = [];
 	fcfield_addrint.google_maps     = [];
@@ -20,7 +22,6 @@
 
 	fcfield_addrint.algolia_api_id    = [];
 	fcfield_addrint.algolia_api_key   = [];
-	fcfield_addrint.algolia_configure = [];
 
 
 
@@ -41,7 +42,13 @@
 		if (ac_type)    ac_options.types = [ ac_type ];
 		if (ac_country) ac_options.componentRestrictions = {country: ac_country};
 
-		fcfield_addrint.autoComplete[elementid_n] = new google.maps.places.Autocomplete( ac_input, ac_options );
+		var placesAutocomplete = new google.maps.places.Autocomplete( ac_input, ac_options );
+
+		// Create a reference
+		fcfield_addrint.autoComplete[elementid_n] = placesAutocomplete;
+
+		// Apply field's configuration
+		fcfield_addrint.configure[config_name] (placesAutocomplete);
 
 		fcfield_addrint.gmapslistener[elementid_n] = google.maps.event.addListener(fcfield_addrint.autoComplete[elementid_n], 'place_changed', function()
 		{
@@ -60,8 +67,8 @@
 
 		theSelect.select2(
 		{
-			formatResult: fcfield_addrint.format_marker_image,
-			formatSelection: fcfield_addrint.format_marker_image,
+			formatResult: function(state) { return fcfield_addrint.format_marker_image(state, theSelect) },
+			formatSelection: function(state) { return fcfield_addrint.format_marker_image(state, theSelect) },
 			escapeMarkup: function(m) { return m; }
 		});
 
@@ -69,17 +76,65 @@
 	}
 
 
+	// Calculate marker anchor values
+	fcfield_addrint.getCustomMarkerAnchor = function(anc, a, w, h)
+	{
+		switch(anc)
+		{
+			case 'TopL' : a.wA = 0;   a.hA = 0; break;
+			case 'TopC' : a.wA = w/2; a.hA = 0; break;
+			case 'TopR' : a.wA = w;   a.hA = 0; break;
+
+			case 'MidL' : a.wA = 0;   a.hA = h/2; break;
+			case 'MidC' : a.wA = w/2; a.hA = h/2; break;
+			case 'MidR' : a.wA = w;   a.hA = h/2; break;
+
+			case 'BotL' : a.wA = 0;   a.hA = h; break;
+			case 'BotC' : a.wA = w/2; a.hA = h; break;
+			case 'BotR' : a.wA = w;   a.hA = h; break;
+		}
+	}
+
+
+	// Get custom marker image Url
+	fcfield_addrint.getCustomMarkerUrl = function(elementid_n)
+	{
+		var theSelect = jQuery('#' + elementid_n + '_custom_marker');
+
+		return url = theSelect.length ? theSelect.data('marker-base-url') + theSelect.val() : '';
+	}
+
+
 	// Update marker on map
 	fcfield_addrint.updateMarkerIcon = function(elementid_n, config_name)
 	{
-		var icon = jQuery('#' + elementid_n + '_custom_marker').val();
-		fcfield_addrint.posMarker[elementid_n].setIcon(icon);
+		var img = new Image();
+		var url = fcfield_addrint.getCustomMarkerUrl(elementid_n);
+		var anc = jQuery('#' + elementid_n + '_marker_anchor').val();
+
+		img.addEventListener("load", function()
+		{
+			var w = this.naturalWidth, h = this.naturalHeight, a = {};
+
+			fcfield_addrint.getCustomMarkerAnchor(anc, a, w, h);
+
+			var icon = {
+				url: url,
+				size: new google.maps.Size(w, h),
+				origin: new google.maps.Point(0, 0),
+				anchor: new google.maps.Point(a.wA, a.hA)
+			};
+			fcfield_addrint.posMarker[elementid_n].setIcon(icon);
+		});
+
+		img.src = url;
 	}
 
 
 	// re-initialize autocomplete
 	fcfield_addrint.changeAutoCompleteType = function(elementid_n, config_name)
 	{
+		/*
 		// Remove listener that update the google map on autocomplete selection
 		google.maps.event.removeListener( fcfield_addrint.gmapslistener[elementid_n] );
 
@@ -89,6 +144,10 @@
 
 		// Attach new autocomplete search
 		return fcfield_addrint.initAutoComplete(elementid_n, config_name);
+		*/
+		jQuery('#' + elementid_n + '_ac_type').val()
+			? fcfield_addrint.autoComplete[elementid_n].setTypes([jQuery('#' + elementid_n + '_ac_type').val()])
+			: fcfield_addrint.autoComplete[elementid_n].setTypes([]);
 	}
 
 
@@ -119,14 +178,12 @@
 		el.dataset = !!el.dataset ? el.dataset : {};
 		el.dataset.google_maps_ref = fcfield_addrint.google_maps[elementid_n];
 
-		var icon = jQuery('#' + elementid_n + '_custom_marker').val();
-
 		var posMarker = new google.maps.Marker({
 			map: fcfield_addrint.google_maps[elementid_n],
 			draggable:true,
 			animation: google.maps.Animation.DROP,
 			position: fcfield_addrint.LatLon[elementid_n],
-			icon: icon
+			icon: fcfield_addrint.getCustomMarkerUrl(elementid_n)
 		});
 		fcfield_addrint.posMarker[elementid_n] = posMarker;
 
@@ -396,14 +453,14 @@
 	}
 
 
-	fcfield_addrint.format_marker_image = function (state)
+	fcfield_addrint.format_marker_image = function (state, theSelect)
 	{
 		if (!state.id)
 		{
 			return state.text;
 		}
 
-		return '<img class="flag" src="' + state.id.toLowerCase() + '"/> ' + state.text;
+		return '<img class="flag" src="' + theSelect.data('marker-base-url') + state.id + '"/> ' + state.text;
 	}
 
 
@@ -417,13 +474,29 @@
 	// Update marker icon on map, on marker selector change
 	fcfield_addrint.updateMarkerIcon_OS = function(elementid_n, config_name)
 	{
-		var icon = jQuery('#' + elementid_n + '_custom_marker').val();
-		var map = fcfield_addrint.map_data[elementid_n].theMap;
+		var img = new Image();
+		var url = fcfield_addrint.getCustomMarkerUrl(elementid_n);
+		var anc = jQuery('#' + elementid_n + '_marker_anchor').val();
+
+		var map     = fcfield_addrint.map_data[elementid_n].theMap;
 		var markers = fcfield_addrint.map_data[elementid_n].theMarkers;
 
-		markers.forEach(function (marker) {
-			marker.setIcon( L.icon({ iconUrl: icon }) );
+		img.addEventListener("load", function()
+		{
+			var w = this.naturalWidth, h = this.naturalHeight, a = {};
+
+			fcfield_addrint.getCustomMarkerAnchor(anc, a, w, h);
+
+			markers.forEach(function (marker) {
+				marker.setIcon(L.icon({
+					iconUrl: url,
+					iconSize: [w, h],
+					iconAnchor: [a.wA, a.hA]
+				}));
+			});
 		});
+
+		img.src = url;
 	}
 
 
@@ -570,7 +643,7 @@
 		});
 
 		// Apply field's configuration
-		fcfield_addrint.algolia_configure[config_name] (placesAutocomplete);
+		fcfield_addrint.configure[config_name] (placesAutocomplete);
 
 
 		/**

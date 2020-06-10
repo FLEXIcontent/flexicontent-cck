@@ -875,6 +875,7 @@ class plgFlexicontent_fieldsText extends FCField
 			$field_elements = 'SELECT DISTINCT value, value as text '
 				. ' FROM #__flexicontent_fields_item_relations '
 				. ' WHERE field_id={field->id} AND value != ""'
+				. ' ORDER BY value '
 			;
 
 			// Call function that parses or retrieves element via sql

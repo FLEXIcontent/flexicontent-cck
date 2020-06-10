@@ -104,6 +104,7 @@ class plgFlexicontent_fieldsAddressint extends FCField
 				'url' => '',
 				'zoom' => '',
 				'custom_marker' => '',
+				'marker_anchor' => ''
 			));
 			$values = $field->value;
 		}
@@ -124,8 +125,9 @@ class plgFlexicontent_fieldsAddressint extends FCField
 		$use_zip_suffix = (int) $field->parameters->get('use_zip_suffix', 1);
 		$use_country    = (int) $field->parameters->get('use_country',  1);
 
-		$use_custom_marker  = (int) $field->parameters->get('use_custom_marker', 1);
-		$custom_marker_path = $field->parameters->get('custom_marker_path', 'mod_flexigooglemap/marker');
+		$use_custom_marker   = (int) $field->parameters->get('use_custom_marker', 1);
+		$default_marker_file = $field->parameters->get('default_marker_file', '');
+		$custom_marker_path  = $field->parameters->get('custom_marker_path', 'mod_flexigooglemap/marker');
 
 		// Map configuration
 		$map_type   = $field->parameters->get('map_type', 'roadmap');
@@ -229,6 +231,7 @@ class plgFlexicontent_fieldsAddressint extends FCField
 		if ($use_custom_marker)
 		{
 			$custom_marker_path_abs = JPATH::clean(JPATH_SITE . DS . 'images' . DS . $custom_marker_path. DS);
+			$custom_marker_url_base = str_replace('\\', '/', JURI::root() . 'images/' . $custom_marker_path . '/');
 
 			// Default marker
 			if ($mapapi_edit === 'googlemap')
@@ -249,10 +252,23 @@ class plgFlexicontent_fieldsAddressint extends FCField
 				{
 					$custom_markers_op = new stdClass;
 					$custom_markers[] = $custom_markers_op;
-					$custom_markers_op->value = str_replace('\\', '/', JURI::root() . 'images/' . $custom_marker_path . '/' . $custom_marker);
-					$custom_markers_op->text  = str_replace($custom_marker_path_abs, '', $custom_marker);
+
+					// Use full path, this way we can change in the future to other folder ??
+					$custom_markers_op->value = $custom_marker;
+					$custom_markers_op->text  = $custom_marker;
 				}
 			}
+			$marker_anchors = array(
+				(object) array('value'=>'TopL', 'text'=>JText::_('FLEXI_TOP') . ' ' . JText::_('FLEXI_LEFT')),
+				(object) array('value'=>'TopC', 'text'=>JText::_('FLEXI_TOP') . ' ' . JText::_('FLEXI_CENTER')),
+				(object) array('value'=>'TopR', 'text'=>JText::_('FLEXI_TOP') . ' ' . JText::_('FLEXI_RIGHT')),
+				(object) array('value'=>'MidL', 'text'=>JText::_('FLEXI_MIDDLE') . ' ' . JText::_('FLEXI_LEFT')),
+				(object) array('value'=>'MidC', 'text'=>JText::_('FLEXI_MIDDLE') . ' ' . JText::_('FLEXI_CENTER')),
+				(object) array('value'=>'MidR', 'text'=>JText::_('FLEXI_MIDDLE') . ' ' . JText::_('FLEXI_RIGHT')),
+				(object) array('value'=>'BotL', 'text'=>JText::_('FLEXI_BOTTOM') . ' ' . JText::_('FLEXI_LEFT')),
+				(object) array('value'=>'BotC', 'text'=>JText::_('FLEXI_BOTTOM') . ' ' . JText::_('FLEXI_CENTER')),
+				(object) array('value'=>'BotR', 'text'=>JText::_('FLEXI_BOTTOM') . ' ' . JText::_('FLEXI_RIGHT')),
+			);
 		}
 
 		// CREATE AC SEARCH TYPE OPTIONS
@@ -276,12 +292,24 @@ class plgFlexicontent_fieldsAddressint extends FCField
 		// JS & CSS of current field
 		if ($mapapi_edit === 'googlemap')
 		{
+			$conf_ops = array();
+
+			if (count($ac_country_allowed_list))
+			{
+				$conf_ops[] = 'country:[\'' . implode($ac_country_allowed_list, "', '") . '\']';
+			}
+
 			$js = '
 				fcfield_addrint.allowed_countries["'.$field_name_js.'"] = new Array('.(count($ac_country_allowed_list) ? '"' . implode('", "', $ac_country_allowed_list) . '"' : '').');
 				fcfield_addrint.single_country["'.$field_name_js.'"] = "' . $single_country . '";
 
 				fcfield_addrint.map_zoom["'.$field_name_js.'"] = ' . $map_zoom . ';
 				fcfield_addrint.map_type["'.$field_name_js.'"] = "' . strtoupper($map_type) . '";
+
+				fcfield_addrint.configure["' . $field_name_js . '"] = function(placesAutocomplete)
+				{
+					placesAutocomplete.setComponentRestrictions({' . implode($conf_ops, ', ') . '});
+				}
 			';
 			$css = '';
 		}
@@ -312,12 +340,12 @@ class plgFlexicontent_fieldsAddressint extends FCField
 				$conf_ops[] = 'type:\'' . $ac_types_default . '\'';
 			}
 
-		$js .= '
-			fcfield_addrint.algolia_configure["' . $field_name_js . '"] = function(placesAutocomplete)
-			{
-				placesAutocomplete.configure({' . implode($conf_ops, ', ') . '});
-			}
-		';
+			$js .= '
+				fcfield_addrint.configure["' . $field_name_js . '"] = function(placesAutocomplete)
+				{
+					placesAutocomplete.configure({' . implode($conf_ops, ', ') . '});
+				}
+			';
 
 			$css = '
 			body .ap-suggestion {
@@ -385,8 +413,13 @@ class plgFlexicontent_fieldsAddressint extends FCField
 				";
 
 			// NOTE: HTML tag id of this form element needs to match the -for- attribute of label HTML tag of this FLEXIcontent field, so that label will be marked invalid when needed
-			// Update non-optional properties
-			$js .= "
+			$js .=
+
+			/**
+			 * Update non-optional properties
+			 * Latitude, Longtitude, Directions URL
+			 */
+				"
 				theInput = newField.find('input.addrint_lat').first();
 				theInput.val('');
 				theInput.attr('name', fname_pfx + '[lat]');
@@ -398,100 +431,118 @@ class plgFlexicontent_fieldsAddressint extends FCField
 				theInput.attr('name', fname_pfx + '[lon]');
 				theInput.attr('id', element_id + '_lon');
 				newField.find('.addrint_lon-lbl').first().attr('for', element_id + '_lon');
-			";
 
-			// Address format: 'plaintext'
-			if ($addr_edit_mode == 'plaintext') $js .= "
-				theInput = newField.find('.addrint_addr_display').first();
+				theInput = newField.find('input.addrint_url').first();
 				theInput.val('');
-				theInput.attr('name', fname_pfx + '[addr_display]');
-				theInput.attr('id', element_id + '_addr_display');
-				newField.find('.addrint_addr_display-lbl').first().attr('for', element_id + '_addr_display');
-				";
+				theInput.attr('name', fname_pfx + '[url]');
+				theInput.attr('id', element_id + '_url');
+				newField.find('.addrint_url-lbl').first().attr('for', element_id + '_url');
+				" .
 
-			// Address format: 'formatted'
-			if ($addr_edit_mode == 'formatted') $js .= "
-				theInput = newField.find('.addrint_name').first();
-				theInput.val('');
-				theInput.attr('name', fname_pfx + '[name]');
-				theInput.attr('id', element_id + '_name');
-				newField.find('.addrint_name-lbl').first().attr('for', element_id + '_name');
+			/**
+			 * Address format: 'plaintext'
+			 */
 				"
+				theArea = newField.find('.addrint_addr_display').first();
+				theArea.val('');
+				theArea.attr('name', fname_pfx + '[addr_display]');
+				theArea.attr('id', element_id + '_addr_display');
+				newField.find('.addrint_addr_display-lbl').first().attr('for', element_id + '_addr_display');
+				" .
 
-			// Update optional properties of 'formatted' format
-			.($use_name ? "
+			/**
+			 * Address format: 'formatted'
+			 */
+				"
+				theInput = newField.find('.addrint_addr_formatted').first();
+				theInput.val('');
+				theInput.attr('name', fname_pfx + '[addr_formatted]');
+				theInput.attr('id', element_id + '_addr_formatted');
+				newField.find('.addrint_addr_formatted-lbl').first().attr('for', element_id + '_addr_formatted');
+
 				theInput = newField.find('.addrint_addr1').first();
 				theInput.val('');
 				theInput.attr('name', fname_pfx + '[addr1]');
 				theInput.attr('id', element_id + '_addr1');
 				newField.find('.addrint_addr1-lbl').first().attr('for', element_id + '_addr1');
-				" : "")
-			.($use_addr2 ? "
+				" .
+
+			/**
+			 * Update optional properties of 'formatted' format
+			 */
+				"
+				theInput = newField.find('.addrint_name').first();
+				theInput.val('');
+				theInput.attr('name', fname_pfx + '[name]');
+				theInput.attr('id', element_id + '_name');
+				newField.find('.addrint_name-lbl').first().attr('for', element_id + '_name');
+
 				theInput = newField.find('.addrint_addr2').first();
 				theInput.val('');
 				theInput.attr('name', fname_pfx + '[addr2]');
 				theInput.attr('id', element_id + '_addr2');
-				" : "")
-			.($use_addr3 ? "
+
 				theInput = newField.find('.addrint_addr3').first();
 				theInput.val('');
 				theInput.attr('name', fname_pfx + '[addr3]');
 				theInput.attr('id', element_id + '_addr3');
-				" : "")."
 
 				theInput = newField.find('.fc_gm_city').first();
 				theInput.val('');
 				theInput.attr('name', fname_pfx + '[city]');
 				theInput.attr('id', element_id + '_city');
 				newField.find('.fc_gm_city-lbl').first().attr('for', element_id + '_city');
-				"
-			.($use_usstate ? "
+
 				theSelect = newField.find('select.fc_gm_usstate').first();
 				theSelect.val('');
 				theSelect.attr('name', fname_pfx + '[state]');
 				theSelect.attr('id', element_id + '_state');
 				newField.find('.fc_gm_usstate-lbl').first().attr('for', element_id + '_state');
-				" : "")
 
-			.($use_province ? "
 				theInput = newField.find('.fc_gm_province').first();
 				theInput.val('');
 				theInput.attr('name', fname_pfx + '[province]');
 				theInput.attr('id', element_id + '_province');
 				newField.find('.fc_gm_province-lbl').first().attr('for', element_id + '_province');
-				" : "")
 
-			.($use_country ? "
 				theSelect = newField.find('select.fc_gm_country').first();
 				theSelect.val('');
 				theSelect.attr('name', fname_pfx + '[country]');
 				theSelect.attr('id', element_id + '_country');
 				newField.find('.fc_gm_country-lbl').first().attr('for', element_id + '_country');
-				" : "")."
 
 				theInput = newField.find('.addrint_zip').first();
 				theInput.val('');
 				theInput.attr('name', fname_pfx + '[zip]');
 				theInput.attr('id', element_id + '_zip');
 				newField.find('.addrint_zip-lbl').first().attr('for', element_id + '_zip');
-				"
-				.($use_zip_suffix ? "
+
 				theInput = newField.find('.addrint_zip_suffix').first();
 				theInput.val('');
 				theInput.attr('name', fname_pfx + '[zip_suffix]');
 				theInput.attr('id', element_id + '_zip_suffix');
-				" : "")
+				";
 
-				.($use_custom_marker ? "
+			/**
+			 * Update custom marker
+			 */
+			if ($use_custom_marker) $js .= "
 				theSelect = newField.find('select.fc_gm_custom_marker').first();
-				theSelect.val('');
+				theSelect.val('" . $default_marker_file ."');
 				theSelect.attr('name', fname_pfx + '[custom_marker]');
 				theSelect.attr('id', element_id + '_custom_marker');
 				newField.find('.fc_gm_custom_marker-lbl').first().attr('for', element_id + '_custom_marker');
-				" : "")
-				;
 
-			// Update map header information
+				theSelect = newField.find('select.fc_gm_marker_anchor').first();
+				theSelect.val('BotC');
+				theSelect.attr('name', fname_pfx + '[marker_anchor]');
+				theSelect.attr('id', element_id + '_marker_anchor');
+				newField.find('.fc_gm_marker_anchor-lbl').first().attr('for', element_id + '_marker_anchor');
+				";
+
+			/**
+			 * Update map header information
+			 */
 			$js .= "
 				theInput = newField.find('.addrint_marker_tolerance').first();
 				theInput.attr('name', fname_pfx + '[marker_tolerance]');
@@ -870,13 +921,14 @@ class plgFlexicontent_fieldsAddressint extends FCField
 			$newpost[$new]['province']      = /*!$use_province   ||*/ !isset($v['province'])      ? '' : flexicontent_html::dataFilter($v['province'],       200,  'STRING', 0);
 			$newpost[$new]['zip_suffix']    = /*!$use_zip_suffix ||*/ !isset($v['zip_suffix'])    ? '' : flexicontent_html::dataFilter($v['zip_suffix'],      10,  'STRING', 0);
 			$newpost[$new]['custom_marker'] = /*!$custom_marker  ||*/ !isset($v['custom_marker']) ? '' : flexicontent_html::dataFilter($v['custom_marker'], 4000,  'STRING', 0);
+			$newpost[$new]['marker_anchor'] = /*!$marker_anchor  ||*/ !isset($v['marker_anchor']) ? '' : flexicontent_html::dataFilter($v['marker_anchor'], 4000,  'CMD', 0);
 
 			$new++;
 		}
 		$post = $newpost;
 
 		// Serialize multi-property data before storing them into the DB, also map some properties as fields
-		$props_to_fields = array('name', 'addr1', 'addr2', 'addr3', 'city', 'zip', 'country', 'lon', 'lat', 'custom_marker');
+		$props_to_fields = array('name', 'addr1', 'addr2', 'addr3', 'city', 'zip', 'country', 'lon', 'lat', 'custom_marker', 'marker_anchor');
 		$_fields = array();
 		$byIds = FlexicontentFields::indexFieldsByIds($item->fields, $item);
 		foreach($post as $i => $v)
