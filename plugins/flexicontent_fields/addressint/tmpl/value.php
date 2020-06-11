@@ -56,9 +56,9 @@ $directions_link_label = $field->parameters->get('directions_link_label', JText:
 $show_map = $field->parameters->get('show_map','');
 $show_map = $show_map === 'both' || ($view !== 'item' && $show_map === 'category') || ($view === 'item' && $show_map === 'item');
 
-$map_type     = $field->parameters->get('map_type','roadmap');
-$map_zoom     = (int) $field->parameters->get('map_zoom', 16);
-$map_position = (int) $field->parameters->get('map_position', 0);
+$map_type_view = $field->parameters->get('map_type_view', $field->parameters->get('map_type', 'roadmap'));
+$map_zoom      = (int) $field->parameters->get('map_zoom', 16);
+$map_position  = (int) $field->parameters->get('map_position', 0);
 
 $map_width  = (int) $field->parameters->get('map_width', 200);
 $map_height = (int) $field->parameters->get('map_height', 150);

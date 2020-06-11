@@ -3415,7 +3415,7 @@ class ParentClassItem extends FCModelAdmin
 
 		if (!$item->store())
 		{
-			$this->setError($this->_db->getErrorMsg());
+			$this->setError($item->getError());
 			return false;
 		}
 

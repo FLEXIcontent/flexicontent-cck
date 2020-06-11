@@ -300,10 +300,14 @@
 				<option value="img" show_list="map-settings-img" hide_list="map-settings-int">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_STATIC_MAP_IMAGE</option>
 			</field>
 			<field name="map_type_view" type="radio" default="" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MAP_TYPE" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MAP_TYPE_DESC" depend_class="map-settings" class="btn-group group-fcinfo">
-				<option value="">Same as edit configuration</option>
+				<option value="">FLEXI_SAME_AS_EDIT</option>
+				<option value="roadmap">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_ROADMAP</option>
+				<option value="satellite">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_SATELLITE</option>
+				<option value="hybrid">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_HYBRID</option>
+				<option value="terrain">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_TERRAIN</option>
 			</field>
-			<field name="map_zoom_view" type="list" default="" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MAP_ZOOM_LEVEL_VIEW" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MAP_ZOOM_LEVEL_VIEW_DESC" depend_class="map-settings">
-				<option value="">Set per value in edit form</option>
+			<field name="map_zoom_view" type="radio" default="" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MAP_ZOOM_LEVEL_VIEW" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MAP_ZOOM_LEVEL_VIEW_DESC" class="btn-group group-fcinfo" depend_class="map-settings">
+				<option value="">FLEXI_PER_VALUE</option>
 			</field>
 
 			<field name="" type="separator" default="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_STATIC_MAP_IMAGE" description="" level="level3" class="" depend_class="map-settings map-settings-img" />
