@@ -375,40 +375,43 @@ class FlexicontentModelItem extends ParentClassItem
 	 * @access	public
 	 * @param	int item identifier
 	 */
-	function decideLayout(&$compParams, &$typeParams, &$itemParams)
+	function decideLayout($compParams, $typeParams, $itemParams, $catParams)
 	{
-		$app = JFactory::getApplication();
+		$fallback = 'default';
+		$app      = JFactory::getApplication();
 
-		// Decide to use mobile or normal item template layout
+		// Decide to use MOBILE or DESKTOP item template layout
 		$useMobile = (int) $compParams->get('use_mobile_layouts', 0);
 
 		if ($useMobile)
 		{
 			$force_desktop_layout = (int) $compParams->get('force_desktop_layout', 0);
-			$mobileDetector = flexicontent_html::getMobileDetector();
-			$isMobile = $mobileDetector->isMobile();
-			$isTablet = $mobileDetector->isTablet();
+			$mobileDetector       = flexicontent_html::getMobileDetector();
+
+			$isMobile  = $mobileDetector->isMobile();
+			$isTablet  = $mobileDetector->isTablet();
 			$useMobile = $force_desktop_layout  ?  $isMobile && !$isTablet  :  $isMobile;
 		}
 
 		$_ilayout = $useMobile ? 'ilayout_mobile' : 'ilayout';
 
-		// Get item layout (... if not already set), from the configuration parameter (that was decided above)
+		// A. Get item layout from HTTP request
 		$ilayout = $this->_ilayout === '__request__'
-			? $app->input->get($_ilayout, false, 'STRING')
+			? $app->input->getCmd($_ilayout, false)
 			: false;
 
+		// B. Get item layout from the -- configuration parameter name -- (that was decided above)
 		if (!$ilayout)
 		{
-			$desktop_ilayout = $itemParams->get('ilayout') ?: ($typeParams->get('ilayout') ?: 'default');
-			$mobile_ilayout  = $itemParams->get('ilayout_mobile') ?: ($typeParams->get('ilayout_mobile') ?: $desktop_ilayout);
+			$desktop_ilayout = $itemParams->get('ilayout') ?: ($catParams->get('ilayout') ?: ($typeParams->get('ilayout') ?: $fallback));
+			$mobile_ilayout  = $itemParams->get('ilayout_mobile') ?:  ($catParams->get('ilayout_mobile') ?: ($typeParams->get('ilayout_mobile') ?: $desktop_ilayout));
 
 			$ilayout = !$useMobile ? $desktop_ilayout : $mobile_ilayout;
 		}
 
 		// Verify the layout is within allowed templates, that is Content Type 's default template OR Content Type allowed templates
 		$allowed_tmpls = $typeParams->get('allowed_ilayouts');
-		$type_default_layout = $typeParams->get('ilayout') ?: 'default';
+		$type_default_layout = $typeParams->get('ilayout') ?: $fallback;
 
 		$allowed_tmpls = empty($allowed_tmpls)
 			? array()
@@ -420,6 +423,7 @@ class FlexicontentModelItem extends ParentClassItem
 		// Verify the item layout is within templates: Content Type default template OR Content Type allowed templates
 		if ($ilayout != $type_default_layout && count($allowed_tmpls) && !in_array($ilayout, $allowed_tmpls))
 		{
+			//echo "<pre>"; debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS); echo "</pre>";
 			$app->enqueueMessage('
 				Current item Layout (template) is \'' . $ilayout . '\'<br/>
 				- This is neither the Content Type Default Template, nor does it belong to the Content Type allowed templates.<br/>
@@ -435,7 +439,8 @@ class FlexicontentModelItem extends ParentClassItem
 		// Verify the item layout exists
 		if (!isset($themes->items->{$ilayout}))
 		{
-			$fixed_ilayout = isset($themes->items->{$type_default_layout}) ? $type_default_layout : 'default';
+			//echo "<pre>"; debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS); echo "</pre>";
+			$fixed_ilayout = isset($themes->items->{$type_default_layout}) ? $type_default_layout : $fallback;
 			$app->enqueueMessage('
 				Current Item Layout Template is \'' . $ilayout . '\' does not exist<br/>
 				- Please correct this in the URL or in Content Type configuration.<br/>

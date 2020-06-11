@@ -3714,7 +3714,7 @@ class ParentClassItem extends FCModelAdmin
 		}
 		else
 		{
-			$this->decideLayout($compParams, $typeParams, $itemParams);
+			$this->decideLayout($compParams, $typeParams, $itemParams, $catParams);
 		}
 
 		$layoutParams = $this->getLayoutparams();
