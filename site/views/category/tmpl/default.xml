@@ -605,6 +605,15 @@
 
 			<field name="" type="separator" default="FLEXI_ITEMS_BASIC_N_ORDERING" icon_class="icon-file-2" level="tab_open" box_type="1"/>
 
+			<field name="" type="separator" default="FLEXI_OVERRIDE_TYPE_SETTINGS" description="" level="level2" />
+			<field name="" type="separator" default="FLEXI_AVOID_ENABLING_FORCE_ITEM_LAYOUT_INFO" description="" level="level3" class="alert alert-info fcpadded" />
+
+			<field name="ilayout" type="itemlayout" default="" label="FLEXI_RECOMMEND_ITEM_LAYOUT_CAT_OVERRIDE"
+				description="FLEXI_RECOMMEND_ITEM_LAYOUT_CAT_OVERRIDE_DESC" firstoption="FLEXI_TYPE_DEFAULT" class="use_select2_lib" />
+
+			<field name="" type="separator" default="FLEXI_BASIC_DISPLAY" description="" level="level1" />
+			<field name="" type="separator" default="FLEXI_ABOUT_PER_ITEM_LISTS_SETTINGS_INFO" description="" level="level3" class="alert alert-info fcpadded" />
+
 			<field name="" type="separator" default="FLEXI_BASIC_DISPLAY" description="" level="level1" />
 			<field name="" type="separator" default="FLEXI_ABOUT_PER_ITEM_LISTS_SETTINGS_INFO" description="" level="level3" class="alert alert-info fcpadded" />
 

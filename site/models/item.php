@@ -375,7 +375,7 @@ class FlexicontentModelItem extends ParentClassItem
 	 * @access	public
 	 * @param	int item identifier
 	 */
-	function decideLayout(&$compParams, &$typeParams, &$itemParams)
+	function decideLayout($compParams, $typeParams, $itemParams, $catParams)
 	{
 		$fallback = 'grid';
 		$app      = JFactory::getApplication();
@@ -403,8 +403,8 @@ class FlexicontentModelItem extends ParentClassItem
 		// B. Get item layout from the -- configuration parameter name -- (that was decided above)
 		if (!$ilayout)
 		{
-			$desktop_ilayout = $itemParams->get('ilayout') ?: ($typeParams->get('ilayout') ?: $fallback);
-			$mobile_ilayout  = $itemParams->get('ilayout_mobile') ?: ($typeParams->get('ilayout_mobile') ?: $desktop_ilayout);
+			$desktop_ilayout = $itemParams->get('ilayout') ?: ($catParams->get('ilayout') ?: ($typeParams->get('ilayout') ?: $fallback));
+			$mobile_ilayout  = $itemParams->get('ilayout_mobile') ?:  ($catParams->get('ilayout_mobile') ?: ($typeParams->get('ilayout_mobile') ?: $desktop_ilayout));
 
 			$ilayout = !$useMobile ? $desktop_ilayout : $mobile_ilayout;
 		}
