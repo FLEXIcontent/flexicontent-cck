@@ -1551,7 +1551,7 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="items_session_editable" type="fcradio" default="0" label="FLEXI_ITEMS_EDITABLE_TILL_LOGOFF" description="FLEXI_ITEMS_EDITABLE_TILL_LOGOFF_DESC" class="btn-group">
+			<field name="items_session_editable" type="fcradio" default="1" label="FLEXI_ITEMS_EDITABLE_TILL_LOGOFF" description="FLEXI_ITEMS_EDITABLE_TILL_LOGOFF_DESC" class="btn-group">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
