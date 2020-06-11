@@ -2689,7 +2689,7 @@ class FlexicontentFields
 
 	// Get a language specific handler for parsing the text to be added to the search index
 	// e.g. doing word segmentation for a language that does not space-separate the words
-	static function getLangHandler($language)
+	static function getLangHandler($language, $hasHandlerOnly = false)
 	{
 		// Currently we have dictionary only for Thai
 		$language = $language === '*'
@@ -2698,17 +2698,31 @@ class FlexicontentFields
 
 		if ($language != 'th-TH') return false;
 
-		$cparams = JComponentHelper::getParams('com_flexicontent');
-		$filter_word_like_any = $cparams->get('filter_word_like_any', 0);
-
-		if ($filter_word_like_any != 0) return false;
+		/**
+		 * We will always try to split languages if handler exists, meaning that we will
+		 * use "filter_word_like_any" only for languages that do not have dictionary splitting
+		 */
+		/*if ((int) JComponentHelper::getParams('com_flexicontent')->get('filter_word_like_any', 0) !== 0)
+		{
+			return false;
+		}*/
 
 		jimport('joomla.filesystem.file');
 		$segmenter_path = JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'THSplitLib'.DS.'segment.php';
 
-		if (! JFile::exists($segmenter_path)) return false;
+		if (!JFile::exists($segmenter_path))
+		{
+			return false;
+		}
+
+		// Terminate here, if only checking that language splitter handler exists
+		if ($hasHandlerOnly)
+		{
+			return true;
+		}
 
 		require_once ($segmenter_path);
+
 		// Apply caching to dictionary parsing regardless of cache setting ...
 		$handlercache = JFactory::getCache('com_flexicontent_lang_handlers');  // Get Joomla Cache of '... lang_handlers' Caching Group
 		$handlercache->setCaching(1);         // Force cache ON
@@ -2963,17 +2977,29 @@ class FlexicontentFields
 				}
 			}
 
+			/**
+			 * Note for basic index, the search prefix will be added by the indexer of the controller
+			 */
 			if ( !$for_advsearch )
 			{
+				// Do not add (yet) search prefix to the words, it will be added by controller
 				$field->search[$itemid] = implode(' | ', $searchindex);
 			}
 
-			else {
+			/**
+			 * Note for advanced index, we will add the search prefix here because we are creating SQL clauses
+			 */
+			else
+			{
 				$n = 0;
 				foreach ($searchindex as $vi => $search_text)
 				{
+					// Add search prefix to the words
 					if ($search_prefix)
+					{
 						$search_text = preg_replace('/(\b[^\s,\.]+\b)/u', $search_prefix.'$0', $search_text);
+					}
+
 					// Add new search value into the DB
 					$query_val = "( "
 						.$field->id. "," .$itemid. "," .($n++). "," .$db->Quote($search_text). "," .$db->Quote($vi).
@@ -5594,8 +5620,6 @@ class FlexicontentFields
 		return $ginfo;
 	}
 
-<<<<<<< HEAD
-=======
 
 
 	/**
@@ -5833,5 +5857,4 @@ class FlexicontentFields
 			return '';
 		}
 	}
->>>>>>> 94ba32d3a... A correction for basic field data available for custom layouts
 }
