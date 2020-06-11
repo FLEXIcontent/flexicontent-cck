@@ -808,6 +808,13 @@ jQuery(document).ready(function(){
 			$row->canEditState = $user->authorise('core.edit.state', $assetName) || ($isAuthor && $user->authorise('core.edit.state.own', $assetName));
 			$row->canDelete    = $user->authorise('core.delete', $assetName) || ($isAuthor && $user->authorise('core.delete.own', $assetName));
 
+			// No edit privilege, check if item is editable till logoff
+			if (!$row->canEdit && $session->has('rendered_uneditable', 'flexicontent'))
+			{
+				$rendered_uneditable = $session->get('rendered_uneditable', array(), 'flexicontent');
+				$row->canEdit = isset($rendered_uneditable[$row->id]) && $rendered_uneditable[$row->id];
+			}
+
 			$stateIsChangeable = $row->canCheckin && $row->canEditState;
 			$needsApproval     = $needsApproval || ($row->state == -3 && !$stateIsChangeable);
 			$row_ilayout       = $row->config->get('ilayout') ?  $row->config->get('ilayout') : $row->tconfig->get('ilayout');
