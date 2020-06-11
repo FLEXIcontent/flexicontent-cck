@@ -907,7 +907,11 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		 * and thus being able to set this category as item's main category, but then have no edit/editown permission for this category
 		 */
 
-		$asset = 'com_content.article.' . $model->get('id');
+		// This will clear JAcesse cache by calling: Access::clearStatics(), but it will also clear caches inside relevant inside JUser
+		$user->clearAccessRights(); 
+
+		// Now we can recalculate
+		$asset   = 'com_content.article.' . $model->get('id');
 		$canEdit = $user->authorise('core.edit', $asset) || ($user->authorise('core.edit.own', $asset) && $isOwner);
 
 
@@ -919,7 +923,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		{
 			// APPLY TASK: Temporarily set item to be editable till closing it and not through all session
 			// (we will/should clear this flag when item is closed, since we have another flag to indicate new items
-			if ($this->task === 'apply' || $this->task === 'apply_type')
+			if (in_array($this->task, array('apply', 'apply_type')))
 			{
 				$rendered_uneditable = $session->get('rendered_uneditable', array(), 'flexicontent');
 				$rendered_uneditable[$model->get('id')] = -1;
@@ -931,7 +935,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 			// ALSO: Clear editable FLAG set in the case that 'apply' button was used during new item creation
 			elseif ($newly_submitted_item)
 			{
-				if (!$params->get('items_session_editable', 0))
+				if (!$params->get('items_session_editable', 1))
 				{
 					$rendered_uneditable = $session->get('rendered_uneditable', array(), 'flexicontent');
 
@@ -946,7 +950,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 			// EXISTING ITEM: (if enabled) Use the editable till logoff behaviour
 			else
 			{
-				if ($params->get('items_session_editable', 0))
+				if ($params->get('items_session_editable', 1))
 				{
 					// Set notice for existing item being editable till logoff
 					$app->enqueueMessage(JText::_('FLEXI_CANNOT_EDIT_AFTER_LOGOFF'), 'notice');
@@ -971,7 +975,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		 * Check for new Content Item is being closed, and clear some flags
 		 */
 
-		if ($this->task != 'apply' && $this->task != 'apply_type' && $newly_submitted_item)
+		if (!in_array($this->task, array('apply', 'apply_type')) && $newly_submitted_item)
 		{
 			// Clear item from being marked as newly submitted
 			unset($newly_submitted[$model->get('id')]);
@@ -979,7 +983,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 
 			// The 'apply' task may set 'editable till logoff' FLAG ...
 			// CLEAR IT, since NEW content this is meant to be used temporarily
-			if (!$params->get('items_session_editable', 0))
+			if (!$params->get('items_session_editable', 1))
 			{
 				$rendered_uneditable = $session->get('rendered_uneditable', array(), 'flexicontent');
 
