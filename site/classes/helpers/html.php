@@ -1978,9 +1978,6 @@ class flexicontent_html
 				';
 				break;
 
-				
-
-
 			// Used only by content / configuration forms, that have form elements needing this
 			case 'flexi-lib-form':
 				if ($load_jquery) flexicontent_html::loadJQuery();

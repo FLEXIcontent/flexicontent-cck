@@ -218,15 +218,18 @@ class flexicontent_tmpl
 				// Unset modified templates
 				if (!empty($modified))
 				{
-					foreach($tmpls as $layout_type => $_tmpls) foreach($_tmpls as $tmpl)
+					foreach($tmpls as $layout_type => $_tmpls)
 					{
-						if (!isset($modified[$tmpl->name][$layout_type]))
+						foreach($_tmpls as $tmpl)
 						{
-							continue;
-						}
+							if (!isset($modified[$tmpl->name][$layout_type]))
+							{
+								continue;
+							}
 
-						unset($tmpls->$layout_type->{$tmpl->name});
-						$modified_file_list .= '<br/>' . $modified[$tmpl->name][$layout_type];
+							unset($tmpls->$layout_type->{$tmpl->name});
+							$modified_file_list .= '<br/>' . $modified[$tmpl->name][$layout_type];
+						}
 					}
 				}
 			}
