@@ -10,13 +10,13 @@ class flexicontent_tmpl
 	 * @return 	object	object of templates
 	 * @since 1.5
 	 */
-	static function parseTemplates_checked($tmpldir='', $unchanged_tmpls = null)
+	static function parseTemplates_checked($tmpldir = '', $unchanged_tmpls = null)
 	{
 		// Return cached data
 		static $tmpls = null;
 		
 		// Set 'unchanged' layouts and return (this avoid reparsing on subsequent call)
-		if ( !empty($unchanged_tmpls) )
+		if (!empty($unchanged_tmpls))
 		{
 			$tmpls = $unchanged_tmpls;
 			return true;
@@ -72,7 +72,8 @@ class flexicontent_tmpl
 			if ( JFile::exists($tmplxml) && empty($themes->$layout_type->$tmplname) )
 			{
 				// Parse the XML file
-				$doc = @simplexml_load_file($tmplxml);
+				// About load addition XML file, please see: https://github.com/FLEXIcontent/flexicontent-cck/pull/961
+				$doc = @simplexml_load_file($tmplxml, null, LIBXML_NOENT);
 				if (!$doc)
 				{
 					if (JFactory::getApplication()->isClient('administrator')) JFactory::getApplication()->enqueueMessage('Syntax error(s) in template XML file: '. $tmplxml, 'notice');
@@ -185,34 +186,58 @@ class flexicontent_tmpl
 			foreach($tmpls->items as $tmpl) $tmpl_names[$tmpl->name] = 1;
 			
 			$new_layouts = array();
-			foreach($folder_names as $folder_name => $i) if ( !isset($tmpl_names[$folder_name]) )  $new_layouts[] = $folder_name;
+			foreach($folder_names as $folder_name => $i)
+			{
+				if (!isset($tmpl_names[$folder_name]))
+				{
+					$new_layouts[] = $folder_name;
+				}
+			}
 			//print_r($new_layouts);
 			
 			$deleted_layouts = array();
-			foreach($tmpl_names as $tmpl_name => $i) if ( !isset($folder_names[$tmpl_name]) ) {
-				unset( $tmpls->items->{$tmpl_name} );
-				unset( $tmpls->category->{$tmpl_name} );
-				$deleted_layouts[] = $tmpl_name;
+			foreach($tmpl_names as $tmpl_name => $i)
+			{
+				if (!isset($folder_names[$tmpl_name]))
+				{
+					unset( $tmpls->items->{$tmpl_name} );
+					unset( $tmpls->category->{$tmpl_name} );
+					$deleted_layouts[] = $tmpl_name;
+				}
 			}
 			//print_r($deleted_layouts);
 			
 			// Check for modified XML files, cleaning and updating cache only for modified templates
 			$modified = array();
-			if ( !empty($checked_layouts) || $force )
+
+			if (!empty($checked_layouts) || $force)
 			{
 				$modified = flexicontent_tmpl::checkXmlModified($tmpls, $checked_layouts);
 				$modified_file_list = '';
+
 				// Unset modified templates
-				if ( !empty($modified) ) foreach($tmpls as $layout_type => $_tmpls) foreach($_tmpls as $tmpl) {
-					if ( !isset($modified[$tmpl->name][$layout_type]) )  continue;
-					unset( $tmpls->$layout_type->{$tmpl->name} );
-					$modified_file_list .= '<br/>'.$modified[$tmpl->name][$layout_type];
+				if (!empty($modified))
+				{
+					foreach($tmpls as $layout_type => $_tmpls)
+					{
+						foreach($_tmpls as $tmpl)
+						{
+							if (!isset($modified[$tmpl->name][$layout_type]))
+							{
+								continue;
+							}
+
+							unset($tmpls->$layout_type->{$tmpl->name});
+							$modified_file_list .= '<br/>' . $modified[$tmpl->name][$layout_type];
+						}
+					}
 				}
 			}
 			
-			if ( !empty($modified) || !empty($new_layouts) || !empty($deleted_layouts) )
+			if (!empty($modified) || !empty($new_layouts) || !empty($deleted_layouts))
 			{
-				flexicontent_tmpl::parseTemplates_checked($tmpldir, $tmpls);   // This call only set unchanged templates so that they are not reparsed
+				// This call only sets non-changed templates so that they are not reparsed
+				flexicontent_tmpl::parseTemplates_checked($tmpldir, $tmpls);
 				
 				if ($debug && !empty($modified) )        JFactory::getApplication()->enqueueMessage("Re-parsing XMLs, XML file modified: ".$modified_file_list, 'message');
 				if ($debug && !empty($new_layouts) )     JFactory::getApplication()->enqueueMessage("Parsing new templates: ".implode(', ', $new_layouts), 'message');
