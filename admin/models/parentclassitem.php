@@ -271,6 +271,15 @@ class ParentClassItem extends FCModelAdmin
 			}
 		}
 
+		// Get main category as current category fallback
+		if (!$this->_cid)
+		{
+			$query = 'SELECT catid '
+				. ' FROM #__content'
+				. ' WHERE id = ' . (int) $this->_id;
+			$this->_cid = $this->_db->setQuery($query)->loadResult();
+		}
+
 		// Set item layout
 		$this->_ilayout = $ilayout;
 
