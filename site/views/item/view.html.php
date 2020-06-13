@@ -1484,11 +1484,28 @@ class FlexicontentViewItem extends JViewLegacy
 		// Creating categorories tree for item assignment, we use the 'create' privelege
 		$actions_allowed = array('core.create');
 
-		// Featured categories form field
+
+		/**
+		 * Featured categories form field
+		 */
+
 		$featured_cats_parent = $page_params->get('featured_cats_parent', 0);
 		$featured_cats = array();
-		$enable_featured_cid_selector = $perms['multicat'] && $perms['canchange_featcat'];
-		if ( $featured_cats_parent )
+
+		// ACL Permissions
+		$enable_feat_selector = $perms['multicat'] && $perms['canchange_featcat'];
+
+		// SHOW/HIDE Configuration -- 0: hide, 1: hide if no ACL, 2: show
+		$show_featcats_fe = (int) $page_params->get('show_featcats_fe', 2);
+
+		// Do not display if feature disabled or if selector is configured to be hidden
+		if (!$featured_cats_parent || $show_featcats_fe === 0 || ($show_featcats_fe === 1 && !$enable_feat_selector))
+		{
+			$lists['featured_cid'] = false;
+		}
+
+		// Display selector
+		else
 		{
 			$featured_tree = flexicontent_cats::getCategoriesTree($published_only=1, $parent_id=$featured_cats_parent, $depth_limit=0);
 			$disabled_cats = $page_params->get('featured_cats_parent_disable', 1) ? array($featured_cats_parent) : array();
@@ -1501,7 +1518,7 @@ class FlexicontentViewItem extends JViewLegacy
 
 			$class  = "use_select2_lib";
 			$attribs  = 'class="'.$class.'" multiple="multiple" size="8"';
-			$attribs .= $enable_featured_cid_selector ? '' : ' disabled="disabled"';
+			$attribs .= $enable_feat_selector ? '' : ' disabled="disabled"';
 			$fieldname = 'jform[featured_cid][]';
 
 			// Skip main category from the selected cats to allow easy change of it
@@ -1514,21 +1531,31 @@ class FlexicontentViewItem extends JViewLegacy
 				}
 			}
 
-			$lists['featured_cid'] = ($enable_featured_cid_selector ? '' : '<label class="label" style="float:none; margin:0 6px 0 0 !important;">locked</label>').
+			$lists['featured_cid'] = ($enable_feat_selector ? '' : '<label class="label" style="float:none; margin:0 6px 0 0 !important;">locked</label>').
 				flexicontent_cats::buildcatselect($featured_tree, $fieldname, $featured_sel_nomain, 3, $attribs, true, ($item->id ? 'edit' : 'create'),	$actions_allowed,
 					$require_all=true, $skip_subtrees=array(), $disable_subtrees=array(), $custom_options=array(), $disabled_cats
 				);
 		}
-		else{
-			// Do not display, if not configured or not allowed to the user
-			$lists['featured_cid'] = false;
+
+
+		/**
+		 * Multi-category form field, for user allowed to use multiple categories
+		 */
+
+		// ACL Permissions
+		$enable_cid_selector = $perms['multicat'] && $perms['canchange_seccat'];
+
+		// SHOW/HIDE Configuration -- 0: hide, 1: hide if no ACL, 2: show
+		$show_seccats_fe = (int) $page_params->get('show_seccats_fe', 2);
+
+		// Do not display if selector is configured to be hidden
+		if ($show_seccats_fe === 0 || ($show_seccats_fe === 1 && !$enable_cid_selector))
+		{
+			$lists['cid'] = false;
 		}
 
-
-		// Multi-category form field, for user allowed to use multiple categories
-		$lists['cid'] = '';
-		$enable_cid_selector = $perms['multicat'] && $perms['canchange_seccat'];
-		if ( 1 )
+		// Display selector
+		else
 		{
 			if ($page_params->get('cid_allowed_parent'))
 			{
@@ -1568,22 +1595,6 @@ class FlexicontentViewItem extends JViewLegacy
 				flexicontent_cats::buildcatselect($cid_tree, $fieldname, $form_cid_nomain, false, $attribs, true, ($item->id ? 'edit' : 'create'), $actions_allowed,
 					$require_all=true, $skip_subtrees, $disable_subtrees=array(), $custom_options=array(), $disabled_cats
 				);
-		}
-
-		else
-		{
-			if ( count($form_cid) > 1 )
-			{
-				foreach ($form_cid as $catid)
-				{
-					$cat_titles[$catid] = $globalcats[$catid]->title;
-				}
-				$lists['cid'] .= implode(', ', $cat_titles);
-			}
-			else
-			{
-				$lists['cid'] = false;
-			}
 		}
 
 
