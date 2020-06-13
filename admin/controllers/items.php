@@ -328,9 +328,10 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 				$featured_cid_arr = array_flip($featured_cid);
 				$sec_cid = array();
 
+				// User cannot change secondary categories, reset them, excluding featured cats and existing (possibly changed) main category
 				foreach ($model->get('cats') as $item_cat)
 				{
-					if (!isset($featured_cid_arr[$item_cat]))
+					if (!isset($featured_cid_arr[$item_cat]) && $item_cat != $model->get('catid'))
 					{
 						$sec_cid[] = $item_cat;
 					}

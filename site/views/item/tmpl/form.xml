@@ -1,25 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <metadata>
-	
+
 	<layout title="FLEXICONTENT_ITEM_SUBMISSION">
 		<message>
 			<![CDATA[FLEXICONTENT_ITEM_SUBMISSION_TIP]]>
 		</message>
 	</layout>
-	
+
 	<fields name="request">
 		<fieldset name="request" addfieldpath="/administrator/components/com_flexicontent/elements">
-			<field name="typeid" type="types" default="" label="FLEXI_MENU_FORM_TYPE" description="FLEXI_MENU_FORM_TYPE_DESC" user_selection="1" /> 
+			<field name="typeid" type="types" default="" label="FLEXI_MENU_FORM_TYPE" description="FLEXI_MENU_FORM_TYPE_DESC" user_selection="1" />
 			<field name="" type="separator" default="FLEXI_MENU_OVERRIDE_FORM_CONFIG_ACL_DESC" level="" class="fc-mssg-inline fc-info" />
 		</fieldset>
 	</fields>
-		
+
 	<fields name="params">
-		
+
 		<fieldset name="generalform" label="FLEXI_GENERAL_FORM_BEHAVIOR" description="FLEXI_MENU_ITEM_FORM_OVERRIDES_DESC" addfieldpath="/administrator/components/com_flexicontent/elements">
 
 			<field name="" label="" type="separator" default="FLEXI_GENERAL_FORM_BEHAVIOR" level="level1" />
-			
+
 			<field name="allowbuttons_fe" type="fccheckbox" default="" display_useglobal="1"
 				checkoptions="FLEXI_APPLY_N_RELOAD,FLEXI_APPLY,FLEXI_SAVE_AND_NEW,FLEXI_SAVE_AS_COPY,FLEXI_SAVE_A_PREVIEW,FLEXI_PREVIEW_LATEST"
 				checkvals="apply,apply_ajax,save2new,save2copy,save_preview,preview_latest" defaultvals=""
@@ -29,7 +29,7 @@
 				<option value="0">FLEXI_TOP</option>
 				<option value="1">FLEXI_BOTTOM</option>
 			</field>
-			
+
 			<field name="" label="" type="separator" default="FLEXI_APPROVAL_NEEDED_WARNINGS" level="level2" />
 			<field name="approval_warning_inform_fe" type="radio" default="" label="FLEXI_INFORM_APPROVAL_NEEDED_WARNING" description="FLEXI_INFORM_APPROVAL_NEEDED_WARNING_DESC" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>
@@ -41,12 +41,12 @@
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
 			</field>
-			
+
 			<field name="" label="" type="separator" default="FLEXI_INSTRUCTIONS_REDIRECTIONS_ETC" level="level2" />
 			<field name="submit_message" type="textarea" default="" rows="3" cols="30" label="FLEXI_MENU_SUBMIT_INSTRUCTIONS" description="FLEXI_MENU_SUBMIT_INSTRUCTIONS_DESC" />
 			<field name="submit_redirect_url_fe" type="text" default="" size="46" label="FLEXI_FORM_SUBMIT_REDIRECT_URL" description="FLEXI_FORM_SUBMIT_REDIRECT_URL_DESC" />
 			<field name="notauthurl" type="menuitem" default="" disable="separator" state="1" published="1" label="FLEXI_CANNOTAUTHOR_URL" description="FLEXI_CANNOTAUTHOR_URL_DESC" />
-			
+
 			<field name="" type="separator" default="FLEXI_SHOW_CAPTCHA_CRITERIA" label="" level="level2" />
 			<field name="use_captcha" type="multilist" subtype="radio" default="" label="FLEXI_USE_CAPTCHA" description="FLEXI_USE_CAPTCHA_DESC" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>
@@ -58,13 +58,13 @@
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_DISABLE</option>
 			</field>
-			
+
 		</fieldset>
-		
+
 		<fieldset name="simplifyform" label="FLEXI_OPTIONAL_FORM_DISPLAY" description="FLEXI_MENU_ITEM_FORM_OVERRIDES_DESC" addfieldpath="/administrator/components/com_flexicontent/elements">
-			
+
 			<field name="" type="separator" default="FLEXI_BASIC_EDITING" label="" level="level1" />
-			
+
 			<field name="usetitle_fe" type="radio" default="" label="FLEXI_USE_TITLE_EDIT_FIELD" description="FLEXI_USE_TITLE_EDIT_FIELD_DESC" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_HIDE_IF_AUTO</option>
@@ -86,7 +86,20 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			
+
+			<field name="" type="separator" default="FLEXI_CATEGORIES" label="" level="level3" />
+			<field name="" type="separator" default="FLEXI_MENU_ABOUT_HIDE_SEC_FEAT_CATS_INFO" class="alert alert-warning fcpadded" level="level4" />
+			<field name="show_seccats_fe" type="fcradio" default="" label="FLEXI_SECONDARY_CATEGORIES" description="" class="btn-group group-fcmethod fcoffactive">
+				<option value="0">FLEXI_HIDE</option>
+				<option value="1">FLEXI_HIDE_IF_NOEDIT_PERMS</option>
+				<option value="2">FLEXI_SHOW</option>
+			</field>
+			<field name="show_featcats_fe" type="fcradio" default="" label="FLEXI_FEATURED_CATEGORIES" description="" class="btn-group group-fcmethod fcoffactive">
+				<option value="0">FLEXI_HIDE</option>
+				<option value="1">FLEXI_HIDE_IF_NOEDIT_PERMS</option>
+				<option value="2">FLEXI_SHOW</option>
+			</field>
+
 			<field name="" type="separator" default="FLEXI_LANGUAGE" label="" level="level3" />
 			<field name="uselang_fe" type="radio" default="" label="FLEXI_MENU_USE_LANGUAGE" description="FLEXI_MENU_USE_LANGUAGE_DESC" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>
@@ -99,7 +112,7 @@
 				<option value="_author_lang_">FLEXI_USE_AUTHOR_LANGUAGE</option>
 			</field>
 			<field name="disable_languages_fe" type="fclanguage" default="" use_global="1" multiple="multiple" class="use_select2_lib" label="FLEXI_MENU_DISABLE_LANGUAGES" description="FLEXI_MENU_DISABLE_LANGUAGES_DESC" />
-			
+
 			<field name="" type="separator" default="FLEXI_MENU_LANG_SELECTOR" label="" level="level3" />
 			<field name="langdisplay_fe" type="radio" default="" label="FLEXI_MENU_LANG_SELECTOR_DISPLAY_AS" description="FLEXI_MENU_LANG_SELECTOR_DISPLAY_AS_DESC" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>
@@ -119,16 +132,16 @@
 				<option value="3">FLEXI_LANG_TITLE_NATIVE</option>
 				<option value="4">FLEXI_LANG_FULL_NAME</option>
 			</field>
-			
+
 			<field name="" type="separator" default="FLEXI_ADVANCED_EDITING" label="" level="level1" />
-			
+
 			<field name="usepublicationdetails_fe" type="radio" default="" label="FLEXI_MENU_USE_PUBL_DETAILS" description="FLEXI_MENU_USE_PUBL_DETAILS_DESC" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_MENU_YES_BASIC_RECOMMENDED</option>
 				<option value="2">FLEXI_MENU_YES_ALL_STAR</option>
 			</field>
-			
+
 			<field name="usemetadata_fe" type="radio" default="" label="FLEXI_MENU_USE_METADATA" description="FLEXI_MENU_USE_METADATA_DESC" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_NO</option>
@@ -140,7 +153,7 @@
 				<option value="0">FLEXI_NO_RECOMMENDED</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			
+
 			<field name="usedisplaydetails_fe" type="radio" default="" label="FLEXI_MENU_USE_DISPLAY_DETAILS" description="FLEXI_MENU_USE_DISPLAY_DETAILS_DESC" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_NO_RECOMMENDED</option>
@@ -153,11 +166,11 @@
 				<option value="1">FLEXI_MENU_YES_SELECT_TEMPLATE</option>
 				<option value="2">FLEXI_MENU_YES_SELECT_CONFIGURE_TEMPLATE</option>
 			</field>
-			
+
 		</fieldset>
-		
+
 		<fieldset name="acloverrides" label="FLEXI_MENU_OVERRIDE_SUBMIT_PUBLISH_ACL" description="FLEXI_MENU_ITEM_FORM_OVERRIDES_DESC" addfieldpath="/administrator/components/com_flexicontent/elements">
-			
+
 			<field name="" label="" type="separator" default="FLEXI_MENU_UNAUTHORIZED_USERS" level="level1" />
 			<field name="" type="separator" default="- Override 'create' permission (ACL) of TYPES. &lt;br/&gt; - CATEGORIES 'create' permission (ACL) is still enforced" level="" class="fc-mssg-inline fc-info" />
 			<field name="allowunauthorize" type="radio" default="0" label="FLEXI_MENU_UNAUTHORIZED_SUBMIT" description="FLEXI_MENU_UNAUTHORIZED_SUBMIT_DESC" class="btn-group group-fcmethod">
@@ -165,7 +178,7 @@
 				<option value="1">FLEXI_YES</option>
 				<option value="2">FLEXI_MENU_YES_EXCLUDE_GUESTS</option>
 			</field>
-			
+
 			<field name="" label="" type="separator" default="FLEXI_MENU_AUTOPUBLISH_OVERRIDE" level="level1" />
 			<field name="autopublished" type="multilist" subtype="radio" default="0" toggle_related="1" label="FLEXI_MENU_AUTOPUBLISH" description="FLEXI_MENU_AUTOPUBLISH_DESC" class="btn-group group-fcmethod">
 				<option value="0" show_list="" hide_list="autopublished_on">FLEXI_MENU_AUTOPUBLISH_NO_SHOW_STATE</option>
@@ -174,9 +187,9 @@
 			<field name="autopublished_message" type="textarea" default="" rows="3" cols="30" label="FLEXI_AUTOPUBLISH_MESSAGE" description="FLEXI_AUTOPUBLISH_MESSAGE_DESC" class="autopublished_on" />
 			<field name="autopublished_up_interval" type="text" default="0" label="FLEXI_AUTOPUBLISH_UP_INTERVAL" description="FLEXI_AUTOPUBLISH_UP_INTERVAL_DESC" class="autopublished_on" />
 			<field name="autopublished_down_interval" type="text" default="0" label="FLEXI_AUTOPUBLISH_DOWN_INTERVAL" description="FLEXI_AUTOPUBLISH_DOWN_INTERVAL_DESC" class="autopublished_on" />
-			
+
 		</fieldset>
-		
+
 		<fieldset name="catpermsoverride" label="FLEXI_MENU_OVERRIDE_CATEGORY_ACL" description="FLEXI_MENU_ITEM_FORM_OVERRIDES_DESC" addfieldpath="/administrator/components/com_flexicontent/elements" >
 
 			<field name="" label="" type="separator" default="FLEXI_CATEGORIES" level="level1"/>
@@ -186,21 +199,21 @@
 				<option value="1" show_list="overridecatperms_on" hide_list="">FLEXI_YES</option>
 			</field>
 			<field name="cid" type="flexicategories" multiple="true" size="12" required="false" default="" label="FLEXI_MENU_ALLOWED_CATS" description="FLEXI_MENU_ALLOWED_CATS_DESC" class="overridecatperms_on" />
-			
+
 			<field name="" label="" type="separator" default="FLEXI_MENU_MAIN_CAT" description="FLEXI_MENU_MAIN_CAT_DESC" level="level2" class="overridecatperms_on" />
 			<field name="maincatid" type="flexicategories" top="2" multiple="false" required="false" size="1" default="" label="FLEXI_MENU_DEFAULT_MAIN_CATEGORY" description="FLEXI_MENU_DEFAULT_MAIN_CATEGORY_DESC" class="overridecatperms_on" />
 			<field name="maincat_show" type="radio" default="2" label="FLEXI_MENU_DISPLAY_MAIN_CAT_SELECTOR" description="FLEXI_MENU_DISPLAY_MAIN_CAT_SELECTOR_DESC" class="overridecatperms_on btn-group group-fcinfo" >
 				<option value="1">FLEXI_HIDE</option>
 				<option value="2">FLEXI_SHOW</option>
 			</field>
-			
+
 			<field name="" label="" type="separator" default="FLEXI_MENU_MCATS_SUBMIT" description="FLEXI_MENU_MCATS_SUBMIT_DESC" level="level2" class="overridecatperms_on" />
 			<field name="postcats" type="multilist" subtype="radio" toggle_related="1" default="2" label="FLEXI_MENU_SEC_CATS_SELECTOR_ENABLE" description="FLEXI_MENU_SEC_CATS_SELECTOR_ENABLE_DESC" tip_img="note.gif" inline_tip="'Locked' will also lock main category too !!" class="overridecatperms_on btn-group group-fcinfo" >
 				<option value="1" show_list="" hide_list="using_mul_cats,using_fixed_cats">FLEXI_HIDE</option>
 				<option value="2" show_list="using_mul_cats" hide_list="using_fixed_cats" >FLEXI_SHOW</option>
 				<option value="0" show_list="using_fixed_cats" hide_list="using_mul_cats">FLEXI_MENU_LOCKED_SUBMIT_IN_ALL_CATS</option>
 			</field>
-			
+
 			<field name="" label="" type="separator" default="Note: Users are not allowed to submit into multiple categories, unless they have ACL (COMPONENT) permission &lt;b&gt;'Assign multiple categories to items'&lt;/b&gt;" level="level3" class="overridecatperms_on using_mul_cats fc-mssg-inline fc-info" />
 			<field name="override_mulcatsperms" type="radio" default="1" label="Allow to ALL users" description="Select to ignore user's privilege of assigning an item to multiple categories" class="overridecatperms_on using_mul_cats btn-group group-fcinfo" >
 				<option value="0">FLEXI_MENU_NO_OVERRIDE_USE_ACL</option>
@@ -210,8 +223,8 @@
 				<option value="1">FLEXI_HIDE</option>
 				<option value="2">FLEXI_SHOW</option>
 			</field>
-			
+
 		</fieldset>
 	</fields>
-		
+
 </metadata>
