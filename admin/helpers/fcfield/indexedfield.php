@@ -666,7 +666,7 @@ class FCIndexedField extends FCField
 				 * then re-order elements list so that elements (select-options) for these values
 				 * are to placed (in correct order) at the beggining options list
 				 */
-				if ($sortable && strlen($value[0]))
+				if ($sortable && !empty($value))
 				{
 					// The re-ordered elements array
 					$elements_new = array();
