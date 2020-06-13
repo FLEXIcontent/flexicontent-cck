@@ -47,8 +47,10 @@ $secondary_displayed =
 $cats_canselect_sec =
 	($this->menuCats && $this->menuCats->cancid) ||
 	(!$this->menuCats && $this->perms['multicat'] && $this->perms['canchange_seccat']) ;
-$usetags_fe = $this->params->get('usetags_fe', 1);
-$tags_displayed = $typeid && ( ($this->perms['cantags'] && $usetags_fe) || (count(@$this->usedtagsdata) && $usetags_fe==2) ) ;
+
+$usetags_fe     = (int) $this->params->get('usetags_fe', 1);
+$tags_editable  = $this->perms['cantags'] && $usetags_fe === 1;
+$tags_displayed = $typeid && ( ($this->perms['cantags'] && $usetags_fe) || (count(@$this->usedtagsdata) && $usetags_fe === 2) ) ;
 
 // Create reusable html code
 $infoimage = $this->params->get('use_font_icons', 1) ? '<i class="icon-comment" style="color:darkgray"></i>' : JHtml::image ( 'administrator/components/com_flexicontent/assets/images/comments.png', JText::_( 'FLEXI_NOTES' ) );
@@ -93,7 +95,7 @@ $this->document->addScript(JUri::root(true).'/components/com_flexicontent/assets
 $this->document->addStyleSheet(JUri::root(true).'/components/com_flexicontent/assets/css/tabber.css', array('version' => FLEXI_VHASH));
 $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">.fctabber{display:none;}<\/style>\'); ');  // temporarily hide the tabbers until javascript runs
 
-if ( $this->perms['cantags'] && $this->params->get('usetags_fe', 1)==1 )
+if ($tags_editable)
 {
 	//$this->document->addScript(JUri::root(true).'/components/com_flexicontent/librairies/jquery-autocomplete/jquery.bgiframe.min.js', array('version' => FLEXI_VHASH));
 	//$this->document->addScript(JUri::root(true).'/components/com_flexicontent/librairies/jquery-autocomplete/jquery.ajaxQueue.js', array('version' => FLEXI_VHASH));
@@ -831,7 +833,7 @@ if ($tags_displayed) : ob_start();  // tags ?>
 		</span>
 		<div class="container_fcfield container_fcfield_name_tags">
 
-			<?php if ( $this->perms['cantags'] && $this->params->get('usetags_fe', 1)==1 ) : ?>
+			<?php if ($tags_editable) : ?>
 				<div class="fcclear"></div>
 				<div id="tags">
 					<input type="text" id="input-tags" name="tagname" class="<?php echo $tip_class; ?>"
@@ -846,9 +848,7 @@ if ($tags_displayed) : ob_start();  // tags ?>
 
 					<?php
 					// Tags both shown and editable
-					$tags_included = $this->perms['cantags'] && $this->params->get('usetags_fe', 1) == 1;
-
-					if ($tags_included) echo '<input type="hidden" name="jform[tag][]" value="" />';
+					if ($tags_editable) echo '<input type="hidden" name="jform[tag][]" value="" />';
 					?>
 
 					<ul id="ultagbox">
@@ -856,7 +856,7 @@ if ($tags_displayed) : ob_start();  // tags ?>
 						$common_tags_selected = array();
 						foreach($this->usedtagsdata as $tag)
 						{
-							if ( $this->perms['cantags'] && $this->params->get('usetags_fe', 1)==1 )
+							if ($tags_editable)
 							{
 								if ( isset($this->quicktagsdata[$tag->id]) )
 								{
@@ -883,7 +883,7 @@ if ($tags_displayed) : ob_start();  // tags ?>
 					<div class="fcclear"></div>
 
 					<?php
-					if ( $this->perms['cantags'] && $this->params->get('usetags_fe', 1)==1 && count($this->quicktagsdata) )
+					if ($tags_editable && count($this->quicktagsdata))
 					{
 						echo '<span class="tagicon '.$tip_class.'" title="'.JText::_('FLEXI_COMMON_TAGS').'"></span>';
 						foreach ($this->quicktagsdata as $tag)
