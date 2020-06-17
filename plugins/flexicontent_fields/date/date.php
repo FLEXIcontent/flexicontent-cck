@@ -118,6 +118,13 @@ class plgFlexicontent_fieldsDate extends FCField
 		 * Form field display parameters
 		 */
 
+		// Usage information
+		$show_usage  = (int) $field->parameters->get( 'show_usage', 0 ) ;
+		$field_notes = '';
+
+		// Input field display size & max characters
+		$size = (int) $field->parameters->get( 'size', 30 ) ;
+
 		// Input field display limitations
 		$minyear = $field->parameters->get('minyear', '');
 		$maxyear = $field->parameters->get('maxyear', '');
@@ -125,18 +132,15 @@ class plgFlexicontent_fieldsDate extends FCField
 		$minyear = strlen($minyear) ? (int) $minyear : '';
 		$maxyear = strlen($maxyear) ? (int) $maxyear : '';
 
-		// Input field display size & max characters
-		$size       = (int) $field->parameters->get( 'size', 30 ) ;
 		$disable_keyboardinput = (int) $field->parameters->get('disable_keyboardinput', 0);
 		$onChange = $field->parameters->get('onchange', '');
 
 
-		// *******************************************
-		// Find timezone and create user instructions,
-		// both according to given configuration
-		// *******************************************
+		/**
+		 * Find timezone and create user instructions,
+		 * both according to given configuration
+		 */
 
-		$show_usage     = (int) $field->parameters->get( 'show_usage', 0 ) ;
 		$date_allowtime = (int) $field->parameters->get( 'date_allowtime', 1 ) ;
 
 		$timeFormatsMap = array('0'=>'', '1'=>' %H:%M', '2'=>' 00:00');
@@ -150,7 +154,6 @@ class plgFlexicontent_fieldsDate extends FCField
 
 		$timezone = 'UTC'; // Default is not to use TIMEZONE
 		$tz_info  = '';    // Default is not to show TIMEZONE info
-		$field_notes = '';
 
 
 		// Time is allowed
@@ -196,7 +199,7 @@ class plgFlexicontent_fieldsDate extends FCField
 		$field_notes = $field_notes ? '<b>'.JText::_('FLEXI_NOTES').'</b>: '.$field_notes : '';
 
 		// Initialise property with default value
-		if (!$field->value || (count($field->value) === 1 && $field->value[0] === null))
+		if (!$field->value || (count($field->value) === 1 && reset($field->value) === null))
 		{
 			$field->value = $default_values;
 		}
@@ -224,6 +227,7 @@ class plgFlexicontent_fieldsDate extends FCField
 			jQuery(document).ready(function(){
 				jQuery('#sortables_".$field->id."').sortable({
 					handle: '.fcfield-drag-handle',
+					cancel: false,
 					/*containment: 'parent',*/
 					tolerance: 'pointer'
 					".($fields_box_placing ? "
@@ -406,8 +410,9 @@ class plgFlexicontent_fieldsDate extends FCField
 
 		$field->html = array();
 		$n = 0;
+
 		$skipped_vals = array();
-		$per_val_js = '';
+		$per_val_js   = '';
 
 		foreach ($field->value as $value)
 		{
@@ -503,6 +508,7 @@ class plgFlexicontent_fieldsDate extends FCField
 			if (!$multiple) break;  // multiple values disabled, break out of the loop, not adding further values even if the exist
 		}
 
+		// Add per value JS
 		if ($per_val_js)
 		{
 			$js .= "
@@ -513,7 +519,7 @@ class plgFlexicontent_fieldsDate extends FCField
 			";
 		}
 
-		// Added field's custom CSS / JS
+		// Add field's custom CSS / JS
 		if ($multiple) $js .= "
 			var uniqueRowNum".$field->id."	= ".count($field->value).";  // Unique row number incremented only
 			var rowCount".$field->id."	= ".count($field->value).";      // Counts existing rows to be able to limit a max number of values
@@ -521,6 +527,7 @@ class plgFlexicontent_fieldsDate extends FCField
 		";
 		if ($js)  $document->addScriptDeclaration($js);
 		if ($css) $document->addStyleDeclaration($css);
+
 
 		// Do not convert the array to string if field is in a group
 		if ($use_ingroup);
@@ -910,52 +917,6 @@ class plgFlexicontent_fieldsDate extends FCField
 		}
 
 		$post = $newpost;
-	}
-
-
-	// Method to do extra handling of field's values after all fields have validated their posted data, and are ready to be saved
-	// $item->fields['fieldname']->postdata contains values of other fields
-	// $item->fields['fieldname']->filedata contains files of other fields (normally this is empty due to using AJAX for file uploading)
-	function onAllFieldsPostDataValidated( &$field, &$item )
-	{
-		if ( !in_array($field->field_type, static::$field_types) ) return;
-
-		/**
-		 * Check if using 'auto_value_code', clear 'auto_value', if function not set
-		 */
-		$auto_value = (int) $field->parameters->get('auto_value', 0);
-		if ($auto_value === 2)
-		{
-			$auto_value_code = $field->parameters->get('auto_value_code', '');
-			$auto_value_code = preg_replace('/^<\?php(.*)(\?>)?$/s', '$1', $auto_value_code);
-		}
-		$auto_value = $auto_value === 2 && !$auto_value_code ? 0 : $auto_value;
-
-		if (!$auto_value)
-		{
-			return;
-		}
-
-		// Check for system plugin
-		$extfolder = 'system';
-		$extname   = 'flexisyspro';
-		$className = 'plg'. ucfirst($extfolder).$extname;
-		$plgPath = JPATH_SITE . '/plugins/'.$extfolder.'/'.$extname.'/'.$extname.'.php';
-
-		if (!file_exists($plgPath))
-		{
-			JFactory::getApplication()->enqueueMessage('Automatic field value for field  \'' . $field->label . '\' is only supported by FLEXIcontent PRO version, please disable this feature in field configuration', 'notice');
-			return;
-		}
-		//require_once $plgPath;
-
-		// Create plugin instance
-		$dispatcher   = JEventDispatcher::getInstance();
-		$plg_db_data  = JPluginHelper::getPlugin($extfolder, $extname);
-		$plg = new $className($dispatcher, array('type'=>$extfolder, 'name'=>$extname, 'params'=>$plg_db_data->params));
-
-		// Create automatic value
-		return $plg->onAllFieldsPostDataValidated($field, $item);
 	}
 
 

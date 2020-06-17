@@ -11,11 +11,11 @@ if ($ext_installed === null)
 {
 	$ext_installed = array();
 
-	// Check if JComments installed and active
+	// Check if Communit Builder is installed and active
 	$destpath = JPATH_SITE.DS.'components'.DS.'com_profiler';
 	$ext_installed['com_comprofiler'] = JFolder::exists($destpath); // && JPluginHelper::isEnabled('system', 'comprofiler');
 
-	// Check if JComments installed and active
+	// Check if Jomsocial is installed and active
 	$destpath = JPATH_SITE.DS.'components'.DS.'com_community';
 	$ext_installed['com_community'] = JFolder::exists($destpath); // && JPluginHelper::isEnabled('system', 'community');
 }
@@ -78,9 +78,6 @@ foreach ($values as $value)
 		$user = static::$users[$user_id];
 	}
 
-	//$user->params = new JRegistry($user->params);
-	//$user->params = $user->params->toArray();
-	//echo "<pre>"; echo print_r($user); echo "</pre>";
 	$html = '';
 
 	/*
@@ -182,7 +179,11 @@ foreach ($values as $value)
 		}
 		else
 		{
-			$html .= '<div class="fc-iblock alert alert-info">' . JText::_('FLEXI_FIELD_JP_NO_CONTACT_PAGE_THIS_USER') . '</div>';
+			$html .= '
+			<div class="fc-iblock alert alert-info">' .
+				' (' . $user->name . ') : ' .
+				JText::_('FLEXI_FIELD_JP_NO_CONTACT_PAGE_THIS_USER') . '
+			</div>';
 		}
 	}
 

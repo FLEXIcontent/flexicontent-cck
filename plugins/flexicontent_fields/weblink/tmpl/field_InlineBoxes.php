@@ -39,10 +39,13 @@
 				</label>
 				<input ' . $ff_events . ' class="urllink ' . $input_classes . ' ' . $link_classes . '" name="'.$fieldname_n.'[link]" id="'.$elementid_n.'_link" type="text" value="'.htmlspecialchars(JStringPunycode::urlToUTF8($value['link']), ENT_COMPAT, 'UTF-8').'" ' . $link_attribs . '/>
 				'
-				. ($useimage ? '
+				. ($useimage && !$auto_value ? '
 				<a href="javascript:;" class="'. $tooltip_class .' btn btn-primary img_fetch_btn" title="'.JText::_('FLEXI_AUTO').'" onclick="fcfield_weblink.fetchData(\''.$elementid_n.'\', \''.$field_name_js.'\'); return false;">
 					<i class="icon-loop"></i> ' /*. JText::_('FLEXI_AUTO')*/ . '
-				</a>' : '') . '
+				</a>' : '')
+				. (!$auto_value ? '' : '
+				<span class="fc-mssg-inline fc-info fc-nobgimage">' . JText::_('FLEXI_AUTO') . '</span>'
+				) . '
 			</div>';
 
 		$autoprefix = '';
@@ -300,7 +303,7 @@
 		}
 
 		$field->html[] = '
-			'.(!$add_ctrl_btns ? '' : '
+			' . (!$add_ctrl_btns || $auto_value ? '' : '
 			<div class="'.$input_grp_class.' fc-xpended-btns">
 				'.$move2.'
 				'.$remove_button.'

@@ -41,6 +41,29 @@ class plgFlexicontent_fieldsJProfile extends FCField
 
 		$field->label = $field->parameters->get('label_form') ? JText::_($field->parameters->get('label_form')) : JText::_($field->label);
 
+		// Set field and item objects
+		$this->setField($field);
+		$this->setItem($item);
+
+		$use_ingroup = $field->parameters->get('use_ingroup', 0);
+		if (!isset($field->formhidden_grp)) $field->formhidden_grp = $field->formhidden;
+		if ($use_ingroup) $field->formhidden = 3;
+		if ($use_ingroup && empty($field->ingroup)) return;
+
+		/**
+		 * Check if using 'auto_value_code', clear 'auto_value', if function not set
+		 */
+		$auto_value = (int) $field->parameters->get('auto_value', 0);
+		if ($auto_value === 2)
+		{
+			$auto_value_code = $field->parameters->get('auto_value_code', '');
+			$auto_value_code = preg_replace('/^<\?php(.*)(\?>)?$/s', '$1', $auto_value_code);
+		}
+		$auto_value = $auto_value === 2 && !$auto_value_code ? 0 : $auto_value;
+
+		/**
+		 * Check if displaying a user selections otherwise nothing to show in item form
+		 */
 		$displayed_user = (int) $field->parameters->get('displayed_user', 1);
 
 		// 2: is allow user selection
@@ -49,14 +72,11 @@ class plgFlexicontent_fieldsJProfile extends FCField
 			return;
 		}
 
-		$use_ingroup = $field->parameters->get('use_ingroup', 0);
-		if (!isset($field->formhidden_grp)) $field->formhidden_grp = $field->formhidden;
-		if ($use_ingroup) $field->formhidden = 3;
-		if ($use_ingroup && empty($field->ingroup)) return;
-
 		// Initialize framework objects and other variables
 		$document = JFactory::getDocument();
 		$cparams  = JComponentHelper::getParams( 'com_flexicontent' );
+		$app      = JFactory::getApplication();
+		$isSite   = $app->isClient('site');
 
 		$tooltip_class = 'hasTooltip';
 		$add_on_class    = $cparams->get('bootstrap_ver', 2)==2  ?  'add-on' : 'input-group-addon';
@@ -65,35 +85,46 @@ class plgFlexicontent_fieldsJProfile extends FCField
 		$font_icon_class = $form_font_icons ? ' fcfont-icon' : '';
 
 
-		// ***
-		// *** Number of values
-		// ***
+		/**
+		 * Number of values
+		 */
 
-		$multiple   = $use_ingroup || (int) $field->parameters->get('allow_multiple', 0);
-		$max_values = $use_ingroup ? 0 : (int) $field->parameters->get('max_values', 0);
-		$required   = (int) $field->parameters->get('required', 0);
+		$multiple     = $use_ingroup || (int) $field->parameters->get('allow_multiple', 0);
+		$max_values   = $use_ingroup ? 0 : (int) $field->parameters->get('max_values', 0);
+		$required     = (int) $field->parameters->get('required', 0);
 		$add_position = (int) $field->parameters->get('add_position', 3);
 
+		// Classes for marking field required
+		$required_class = $required ? ' required' : '';
+
 		// If we are multi-value and not inside fieldgroup then add the control buttons (move, delete, add before/after)
-		$add_ctrl_btns = !$use_ingroup && $multiple && !JFactory::getApplication()->isClient('site');
-		$fields_box_placing = (int) $field->parameters->get('fields_box_placing', 1);
+		$add_ctrl_btns = !$use_ingroup && $multiple && !$isSite;
+		$fields_box_placing = (int) $field->parameters->get('fields_box_placing', 0);
 
 
-		// ***
-		// *** Value handling
-		// ***
+		/**
+		 * Value handling
+		 */
 
-		// Default value
-		$value_usage   = $field->parameters->get( 'default_value_use', 0 ) ;
-		$default_value = ($item->version == 0 || $value_usage > 0) ? $field->parameters->get( 'default_value', '' ) : '';
-		$default_value = strlen($default_value) ? JText::_($default_value) : '';
-		$default_values= array($default_value);
+		// Default value(s)
+		$default_values = $this->getDefaultValues($isform = true);
+		$default_value  = reset($default_values);
+
+
+		/**
+		 * Form field display parameters
+		 */
+
+		// Usage information
+		$show_usage  = (int) $field->parameters->get( 'show_usage', 0 ) ;
+		$field_notes = '';
 
 		// Input field display
 		$display_label_form = (int) $field->parameters->get( 'display_label_form', 1 ) ;
 
-		// create extra HTML TAG parameters for the form field
+		// Create extra HTML TAG parameters for the form field
 		$attribs = $field->parameters->get( 'extra_attributes', '' ) ;
+		if ($auto_value) $attribs .= ' readonly="readonly" ';
 
 		// Attribute for default value(s)
 		if (!empty($default_values))
@@ -122,6 +153,7 @@ class plgFlexicontent_fieldsJProfile extends FCField
 		// JS safe Field name
 		$field_name_js = str_replace('-', '_', $field->name);
 
+		// JS & CSS of current field
 		$js = '';
 		$css = '';
 
@@ -133,9 +165,10 @@ class plgFlexicontent_fieldsJProfile extends FCField
 			jQuery(document).ready(function(){
 				jQuery('#sortables_".$field->id."').sortable({
 					handle: '.fcfield-drag-handle',
+					cancel: false,
 					/*containment: 'parent',*/
 					tolerance: 'pointer'
-					".($field->parameters->get('fields_box_placing', 1) ? "
+					".($fields_box_placing ? "
 					,start: function(e) {
 						//jQuery(e.target).children().css('float', 'left');
 						//fc_setEqualHeights(jQuery(e.target), 0);
@@ -168,7 +201,9 @@ class plgFlexicontent_fieldsJProfile extends FCField
 				newField.find('.fc-has-value').removeClass('fc-has-value');
 
 				// New element's field name and id
-				var element_id = '" . $elementid . "_' + uniqueRowNum" . $field->id . ";
+				var uniqueRowN = uniqueRowNum" . $field->id . ";
+				var element_id = '" . $elementid . "__' + uniqueRowN;   // Use double underscore to avoid collisions ...
+				var fname_pfx  = '" . $fieldname . "[' + uniqueRowN + ']';
 				";
 
 			// NOTE: HTML tag id of this form element needs to match the -for- attribute of label HTML tag of this FLEXIcontent field, so that label will be marked invalid when needed
@@ -181,16 +216,16 @@ class plgFlexicontent_fieldsJProfile extends FCField
 					theInput.val(".json_encode($default_value).") ;*/
 
 				var theInput = newField.find('input.field-user-input-name');
-				theInput.attr('id', '".$elementid . "__' + uniqueRowNum".$field->id." + '_');
+				theInput.attr('id', element_id + '_');
 				theInput.attr('value', '');
 
 				var theDiv = newField.find('div.modal');
-				var tagid = 'userModal_".$elementid . "__' + uniqueRowNum".$field->id." + '_';
+				var tagid = 'userModal_' + element_id + '_';
 				theDiv.attr('id', tagid);
 
 				var theInput = newField.find('input.field-user-input');
-				theInput.attr('name', '".$fieldname."['+uniqueRowNum".$field->id."+']');
-				theInput.attr('id', '".$elementid . "__' + uniqueRowNum".$field->id." + '__id');
+				theInput.attr('name', fname_pfx);
+				theInput.attr('id', element_id + '__id');
 				theInput.attr('value', '');
 				";
 
@@ -205,7 +240,7 @@ class plgFlexicontent_fieldsJProfile extends FCField
 				fc_validationAttach(newField);
 
 				// Initialize user selection JS
-				" . (!JFactory::getApplication()->isClient('site') ? "
+				" . (!$isSite ? "
 				jQuery(newField).find('.field-user-wrapper').fieldUser();
 				fcfield_jprofile_initUserSelector(tagid);
 				" : "") . "
@@ -308,27 +343,32 @@ class plgFlexicontent_fieldsJProfile extends FCField
 		}
 
 
-		// Added field's custom CSS / JS
-		if ($multiple) $js .= "
-			var uniqueRowNum".$field->id."	= ".count($field->value).";  // Unique row number incremented only
-			var rowCount".$field->id."	= ".count($field->value).";      // Counts existing rows to be able to limit a max number of values
-			var maxValues".$field->id." = ".$max_values.";
-		";
-		if ($js)  $document->addScriptDeclaration($js);
-		if ($css) $document->addStyleDeclaration($css);
+		$classes  = ' fcfield_textval' . $required_class;
 
-		$classes  = 'fcfield_textval' . ($required ? ' required' : '');
+		// Set field to 'Automatic' on successful validation'
+		if ($auto_value)
+		{
+			$classes = ' fcfield_auto_value ';
+		}
 
-		jimport('joomla.form.helper'); // JFormHelper
-		JFormHelper::loadFieldClass('user');   // JFormFieldUser
+		// Load JFormHelper
+		jimport('joomla.form.helper');
 
-		// ***
-		// *** Create field's HTML display for item form
-		// ***
+		// Load JFormFieldUser
+		JFormHelper::loadFieldClass('user');
+
+
+		/**
+		 * Create field's HTML display for item form
+		 */
 
 		$field->html = array();
 		$n = 0;
-		//if ($use_ingroup) {print_r($field->value);}
+
+		// These are unused in this field
+		$skipped_vals = array();
+		$per_val_js   = '';
+
 		foreach ($field->value as $value)
 		{
 			if ( !strlen($value) && !$use_ingroup && $n) continue;  // If at least one added, skip empty if not in field group
@@ -337,7 +377,7 @@ class plgFlexicontent_fieldsJProfile extends FCField
 			$elementid_n = $elementid.'_'.$n;
 			$elementid_jf_n = $elementid.'__'.$n.'_';
 
-			$xml_field = '<field name="'.$fieldname_n.'" type="user" ' . (JFactory::getApplication()->isClient('site') ? ' readonly="true" ' : '') . '/>';
+			$xml_field = '<field name="'.$fieldname_n.'" type="user" ' . ($isSite ? ' readonly="true" ' : '') . '/>';
 			$xml_form = '<form><fields name="attribs"><fieldset name="attribs">'.$xml_field.'</fieldset></fields></form>';
 
 			$jform = new JForm('flexicontent_field.jprofile', array('control' => '', 'load_data' => true));
@@ -351,7 +391,8 @@ class plgFlexicontent_fieldsJProfile extends FCField
 
 			$field->html[] = '
 				'.$jfield_html.'
-				'.(!$add_ctrl_btns ? '' : '
+				' . ($auto_value ? '<span class="fc-mssg-inline fc-info fc-nobgimage">' . JText::_('FLEXI_AUTO') . '</span>' : '') . '
+				' . (!$add_ctrl_btns || $auto_value ? '' : '
 				<div class="'.$input_grp_class.' fc-xpended-btns">
 					'.$move2.'
 					'.$remove_button.'
@@ -362,6 +403,27 @@ class plgFlexicontent_fieldsJProfile extends FCField
 			$n++;
 			if (!$multiple) break;  // multiple values disabled, break out of the loop, not adding further values even if the exist
 		}
+
+		// Add per value JS
+		if ($per_val_js)
+		{
+			$js .= "
+			jQuery(document).ready(function()
+			{
+				" . $per_val_js . "
+			});
+			";
+		}
+
+		// Add field's custom CSS / JS
+		if ($multiple) $js .= "
+			var uniqueRowNum".$field->id."	= ".count($field->value).";  // Unique row number incremented only
+			var rowCount".$field->id."	= ".count($field->value).";      // Counts existing rows to be able to limit a max number of values
+			var maxValues".$field->id." = ".$max_values.";
+		";
+		if ($js)  $document->addScriptDeclaration($js);
+		if ($css) $document->addStyleDeclaration($css);
+
 
 		// Do not convert the array to string if field is in a group
 		if ($use_ingroup);
@@ -389,6 +451,19 @@ class plgFlexicontent_fieldsJProfile extends FCField
 				' . (isset($field->html[-1]) ? $field->html[-1] : '') . $field->html[0] . '
 			</div>';
 		}
+
+		if (!$use_ingroup)
+		{
+			$field->html = ($show_usage && $field_notes
+				? ' <div class="alert alert-info fc-small fc-iblock">'.$field_notes.'</div><div class="fcclear"></div>'
+				: ''
+			) . $field->html;
+		}
+
+		if (count($skipped_vals))
+		{
+			$app->enqueueMessage( JText::sprintf('FLEXI_FIELD_DATE_EDIT_VALUES_SKIPPED', $field->label, implode(',',$skipped_vals)), 'notice' );
+		}
 	}
 
 
@@ -399,15 +474,39 @@ class plgFlexicontent_fieldsJProfile extends FCField
 
 		$field->label = JText::_($field->label);
 
-		// Some variables
-		$is_ingroup  = !empty($field->ingroup);
-		$use_ingroup = $field->parameters->get('use_ingroup', 0);
-		$multiple    = $use_ingroup || (int) $field->parameters->get( 'allow_multiple', 0 ) ;
+		// Set field and item objects
+		$this->setField($field);
+		$this->setItem($item);
 
 
-		// ***
-		// *** One time initialization
-		// ***
+		/**
+		 * One time initialization
+		 */
+
+		static $initialized = null;
+		static $app, $document, $option, $format, $realview;
+
+		if ($initialized === null)
+		{
+			$initialized = 1;
+
+			$app       = JFactory::getApplication();
+			$document  = JFactory::getDocument();
+			$option    = $app->input->getCmd('option', '');
+			$format    = $app->input->getCmd('format', 'html');
+			$realview  = $app->input->getCmd('view', '');
+		}
+
+		// Current view variable
+		$view = $app->input->getCmd('flexi_callview', ($realview ?: 'item'));
+		$sfx = $view === 'item' ? '' : '_cat';
+
+		// Check if field should be rendered according to configuration
+		if (!$this->checkRenderConds($prop, $view))
+		{
+			return;
+		}
+
 
 		if (empty(static::$users))
 		{
@@ -417,12 +516,21 @@ class plgFlexicontent_fieldsJProfile extends FCField
 			JFactory::getLanguage()->load('com_users', JPATH_SITE, null, $force_reload = false);
 		}
 
+
+		// Some variables
+		$is_ingroup  = !empty($field->ingroup);
+		$use_ingroup = $field->parameters->get('use_ingroup', 0);
+		$multiple    = $use_ingroup || (int) $field->parameters->get( 'allow_multiple', 0 ) ;
+
 		// Display parameters
 		$displayed_user = $field->parameters->get('displayed_user', 1);
 
+
 		/**
-		 * Get field values, overriding field values if showing SELF (user) or AUTHOR of item
+		 * Get field values
+		 * But override field values if showing SELF (user) or AUTHOR of item
 		 */
+
 		$values = $values ? $values : $field->value;
 
 		switch($displayed_user)
@@ -443,57 +551,22 @@ class plgFlexicontent_fieldsJProfile extends FCField
 				break;
 		}
 
-		// Prefix - Suffix - Separator parameters, replacing other field values if found
-		$remove_space = $field->parameters->get( 'remove_space', 0 ) ;
-		$pretext		= FlexicontentFields::replaceFieldValue( $field, $item, JText::_($field->parameters->get( 'pretext', '' )), 'pretext' );
-		$posttext		= FlexicontentFields::replaceFieldValue( $field, $item, JText::_($field->parameters->get( 'posttext', '' )), 'posttext' );
-		$separatorf	= $field->parameters->get( 'separatorf', 1 ) ;
-		$opentag		= FlexicontentFields::replaceFieldValue( $field, $item, JText::_($field->parameters->get( 'opentag', '' )), 'opentag' );
-		$closetag		= FlexicontentFields::replaceFieldValue( $field, $item, JText::_($field->parameters->get( 'closetag', '' )), 'closetag' );
 
-		// Microdata (classify the field values for search engines)
-		$itemprop    = $field->parameters->get('microdata_itemprop');
+		/**
+		 * Get common parameters like: itemprop, value's prefix (pretext), suffix (posttext), separator, value list open/close text (opentag, closetag)
+		 * This will replace other field values and item properties, if such are found inside the parameter texts
+		 */
+		$common_params_array = $this->getCommonParams();
+		extract($common_params_array);
 
-		if($pretext)  { $pretext  = $remove_space ? $pretext : $pretext . ' '; }
-		if($posttext) { $posttext = $remove_space ? $posttext : ' ' . $posttext; }
 
-		switch($separatorf)
-		{
-			case 0:
-			$separatorf = '&nbsp;';
-			break;
-
-			case 1:
-			$separatorf = '<br class="fcclear" />';
-			break;
-
-			case 2:
-			$separatorf = '&nbsp;|&nbsp;';
-			break;
-
-			case 3:
-			$separatorf = ',&nbsp;';
-			break;
-
-			case 4:
-			$separatorf = $closetag . $opentag;
-			break;
-
-			case 5:
-			$separatorf = '';
-			break;
-
-			default:
-			$separatorf = '&nbsp;';
-			break;
-		}
-
-		// Cleaner output for CSV export
+		// CSV export: Create a simpler output
 		if ($prop === 'csv_export')
 		{
 			$separatorf = ', ';
 			$itemprop = false;
 		}
+
 
 		// Get layout name
 		$viewlayout = $field->parameters->get('viewlayout', '');
@@ -508,6 +581,7 @@ class plgFlexicontent_fieldsJProfile extends FCField
 		{
 			// Apply values separator
 			$field->{$prop} = implode($separatorf, $field->{$prop});
+
 			if ($field->{$prop} !== '')
 			{
 				// Apply field 's opening / closing texts
@@ -518,6 +592,10 @@ class plgFlexicontent_fieldsJProfile extends FCField
 				{
 					$field->{$prop} = '<div style="display:inline" itemprop="'.$itemprop.'" >' .$field->{$prop}. '</div>';
 				}
+			}
+			elseif ($no_value_msg !== '')
+			{
+				$field->{$prop} = $no_value_msg;
 			}
 		}
 	}

@@ -100,7 +100,12 @@ class plgFlexicontent_fieldsText extends FCField
 		 * Form field display parameters
 		 */
 
-		$size       = (int) $field->parameters->get( 'size', 30 ) ;
+		// Usage information
+		$show_usage  = (int) $field->parameters->get( 'show_usage', 0 ) ;
+		$field_notes = '';
+
+		// Input field display size & max characters
+		$size = (int) $field->parameters->get( 'size', 30 ) ;
 
 		// Max Length is enforced in both client & server sides
 		$maxlength = (int) $field->parameters->get( 'maxlength', 0 ) ;
@@ -109,9 +114,12 @@ class plgFlexicontent_fieldsText extends FCField
 		$placeholder        = $display_label_form==-1 ? $field->label : JText::_($field->parameters->get( 'placeholder', '' )) ;
 
 		// Create extra HTML TAG parameters for the form field
-		$attribs = $field->parameters->get( 'extra_attributes', '' ) ;
-		if ($maxlength) $attribs .= ' maxlength="'.$maxlength.'" ';
-		if ($auto_value) $attribs .= ' readonly="readonly" ';
+		$classes = '';
+		$attribs = $field->parameters->get( 'extra_attributes', '' )
+			. ($maxlength ? ' maxlength="' . $maxlength . '" ' : '')
+			. ($auto_value ? ' readonly="readonly" ' : '')
+			. ($size ? ' size="' . $size . '" ' : '')
+			;
 
 		// Attribute for default value(s)
 		if (!empty($default_values))
@@ -119,7 +127,6 @@ class plgFlexicontent_fieldsText extends FCField
 			$attribs .= ' data-defvals="'.htmlspecialchars( implode('|||', $default_values), ENT_COMPAT, 'UTF-8' ).'" ';
 		}
 
-		$attribs .= ' size="'.$size.'" ';
 
 		// Custom HTML placed before / after form fields
 		$pretext  = $field->parameters->get( 'pretext_form', '' ) ;
@@ -142,7 +149,7 @@ class plgFlexicontent_fieldsText extends FCField
 		}
 
 		// Initialise property with default value
-		if (!$field->value || (count($field->value) === 1 && $field->value[0] === null))
+		if (!$field->value || (count($field->value) === 1 && reset($field->value) === null))
 		{
 			$field->value = $default_values;
 		}
@@ -170,6 +177,7 @@ class plgFlexicontent_fieldsText extends FCField
 			jQuery(document).ready(function(){
 				jQuery('#sortables_".$field->id."').sortable({
 					handle: '.fcfield-drag-handle',
+					cancel: false,
 					/*containment: 'parent',*/
 					tolerance: 'pointer'
 					".($fields_box_placing ? "
@@ -348,17 +356,8 @@ class plgFlexicontent_fieldsText extends FCField
 			$select_field_placement = -1;
 		}
 
-
-		// Added field's custom CSS / JS
-		if ($multiple) $js .= "
-			var uniqueRowNum".$field->id."	= ".count($field->value).";  // Unique row number incremented only
-			var rowCount".$field->id."	= ".count($field->value).";      // Counts existing rows to be able to limit a max number of values
-			var maxValues".$field->id." = ".$max_values.";
-		";
-		if ($js)  $document->addScriptDeclaration($js);
-		if ($css) $document->addStyleDeclaration($css);
-
-		$classes  = ' fcfield_textval' . $required_class;
+		// We may comment out some classes so that layout decides these
+		$classes .= ' fcfield_textval' . $required_class;
 
 		// Set field to 'Automatic' on successful validation'
 		if ($auto_value)
@@ -368,24 +367,29 @@ class plgFlexicontent_fieldsText extends FCField
 
 		// Create attributes for JS inputmask validation
 		$validate_mask = '';
-		switch ($inputmask) {
-		case '__regex__':
-			if ($regexmask) {
-				$validate_mask = " data-inputmask-regex=\"".$regexmask."\" ";
-				$classes .= ' inputmask-regex';
-			}
-			break;
-		case '__custom__':
-			if ($custommask) {
-				$validate_mask = " data-inputmask=\"".$custommask."\" ";
-				$classes .= ' has_inputmask';
-			}
-			break;
-		default:
-			if ($inputmask){
-				$validate_mask = " data-inputmask=\" 'alias': '".$inputmask."' \" ";
-				$classes .= ' has_inputmask';
-			}
+
+		switch ($inputmask)
+		{
+			case '__regex__':
+				if ($regexmask)
+				{
+					$validate_mask = " data-inputmask-regex=\"" . $regexmask . "\" ";
+					$classes .= ' inputmask-regex';
+				}
+				break;
+			case '__custom__':
+				if ($custommask)
+				{
+					$validate_mask = " data-inputmask=\"" . $custommask . "\" ";
+					$classes .= ' has_inputmask';
+				}
+				break;
+			default:
+				if ($inputmask)
+				{
+					$validate_mask = " data-inputmask=\" 'alias': '" . $inputmask . "' \" ";
+					$classes .= ' has_inputmask';
+				}
 		}
 
 		// Add placeholder tag parameter if not using validation mask, (if using vaildation mask then placeholder should be added a validation mask property)
@@ -398,6 +402,10 @@ class plgFlexicontent_fieldsText extends FCField
 
 		$field->html = array();
 		$n = 0;
+
+		// These are unused in this field
+		$skipped_vals = array();
+		$per_val_js   = '';
 
 		foreach ($field->value as $value)
 		{
@@ -432,6 +440,27 @@ class plgFlexicontent_fieldsText extends FCField
 			if (!$multiple) break;  // multiple values disabled, break out of the loop, not adding further values even if the exist
 		}
 
+		// Add per value JS
+		if ($per_val_js)
+		{
+			$js .= "
+			jQuery(document).ready(function()
+			{
+				" . $per_val_js . "
+			});
+			";
+		}
+
+		// Add field's custom CSS / JS
+		if ($multiple) $js .= "
+			var uniqueRowNum".$field->id."	= ".count($field->value).";  // Unique row number incremented only
+			var rowCount".$field->id."	= ".count($field->value).";      // Counts existing rows to be able to limit a max number of values
+			var maxValues".$field->id." = ".$max_values.";
+		";
+		if ($js)  $document->addScriptDeclaration($js);
+		if ($css) $document->addStyleDeclaration($css);
+
+
 		// Do not convert the array to string if field is in a group
 		if ($use_ingroup);
 
@@ -457,6 +486,19 @@ class plgFlexicontent_fieldsText extends FCField
 			$field->html = '<div class="fcfieldval_container valuebox fcfieldval_container_'.$field->id.'">
 				' . (isset($field->html[-1]) ? $field->html[-1] : '') . $field->html[0] . '
 			</div>';
+		}
+
+		if (!$use_ingroup)
+		{
+			$field->html = ($show_usage && $field_notes
+				? ' <div class="alert alert-info fc-small fc-iblock">'.$field_notes.'</div><div class="fcclear"></div>'
+				: ''
+			) . $field->html;
+		}
+
+		if (count($skipped_vals))
+		{
+			$app->enqueueMessage( JText::sprintf('FLEXI_FIELD_DATE_EDIT_VALUES_SKIPPED', $field->label, implode(',',$skipped_vals)), 'notice' );
 		}
 	}
 
@@ -875,6 +917,7 @@ class plgFlexicontent_fieldsText extends FCField
 			$field_elements = 'SELECT DISTINCT value, value as text '
 				. ' FROM #__flexicontent_fields_item_relations '
 				. ' WHERE field_id={field->id} AND value != ""'
+				. ' ORDER BY value '
 			;
 
 			// Call function that parses or retrieves element via sql

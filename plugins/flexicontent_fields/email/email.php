@@ -48,6 +48,17 @@ class plgFlexicontent_fieldsEmail extends FCField
 		if ($use_ingroup) $field->formhidden = 3;
 		if ($use_ingroup && empty($field->ingroup)) return;
 
+		/**
+		 * Check if using 'auto_value_code', clear 'auto_value', if function not set
+		 */
+		$auto_value = (int) $field->parameters->get('auto_value', 0);
+		if ($auto_value === 2)
+		{
+			$auto_value_code = $field->parameters->get('auto_value_code', '');
+			$auto_value_code = preg_replace('/^<\?php(.*)(\?>)?$/s', '$1', $auto_value_code);
+		}
+		$auto_value = $auto_value === 2 && !$auto_value_code ? 0 : $auto_value;
+
 		// Initialize framework objects and other variables
 		$document = JFactory::getDocument();
 		$cparams  = JComponentHelper::getParams( 'com_flexicontent' );
@@ -78,22 +89,24 @@ class plgFlexicontent_fieldsEmail extends FCField
 
 
 		/**
-		 * Email address
+		 * Form field display parameters
 		 */
 
-		// Default value
-		$addr_usage   = $field->parameters->get( 'default_value_use', 0 ) ;
-		$default_addr = ($item->version == 0 || $addr_usage > 0) ? $field->parameters->get( 'default_value', '' ) : '';
-		$default_addr = $default_addr ? JText::_($default_addr) : '';
+		// Usage information
+		$show_usage  = (int) $field->parameters->get( 'show_usage', 0 ) ;
+		$field_notes = '';
 
-		// Form fields display parameters
-		$size       = (int) $field->parameters->get( 'size', 30 ) ;
+		// Input field display size & max characters
+		$size = (int) $field->parameters->get( 'size', 30 ) ;
+
+		// Max Length is enforced in both client & server sides
 		$maxlength  = (int) $field->parameters->get( 'maxlength', 4000 ) ;   // client/server side enforced
-		$inputmask	= $field->parameters->get( 'inputmask', '' ) ;
 
 		// Create extra HTML TAG parameters for the form field
-		$addr_attribs = $field->parameters->get( 'extra_attributes', '' )
+		$classes = '';
+		$attribs = $field->parameters->get( 'extra_attributes', '' )
 			. ($maxlength ? ' maxlength="' . $maxlength . '" ' : '')
+			. ($auto_value ? ' readonly="readonly" ' : '')
 			. ($size ? ' size="' . $size . '" ' : '')
 			;
 
@@ -101,6 +114,9 @@ class plgFlexicontent_fieldsEmail extends FCField
 		/**
 	   * Create validation mask
 		 */
+
+		$inputmask	= $field->parameters->get( 'inputmask', '' ) ;
+
 		static $inputmask_added = false;
 	  if ($inputmask && !$inputmask_added)
 		{
@@ -108,20 +124,13 @@ class plgFlexicontent_fieldsEmail extends FCField
 			flexicontent_html::loadFramework('inputmask');
 		}
 
-		$addr_classes = $required_class;
-		if ($inputmask)
-		{
-			$addr_attribs .= " data-inputmask=\" 'alias': '" . $inputmask . "' \" ";
-			$addr_classes .= ' has_inputmask';
-		}
-		$addr_classes .= ' validate-email';
 
+		// Email address
+		$addr_usage   = $field->parameters->get( 'default_value_use', 0 ) ;
+		$default_addr = ($item->version == 0 || $addr_usage > 0) ? $field->parameters->get( 'default_value', '' ) : '';
+		$default_addr = $default_addr ? JText::_($default_addr) : '';
 
-		/**
-		 * Email title & linking text (optional)
-		 */
-
-		// Default value
+		// Email title & linking text (optional)
 		$usetitle      = $field->parameters->get( 'use_title', 0 ) ;
 		$title_usage   = $field->parameters->get( 'title_usage', 0 ) ;
 		$default_title = ($item->version == 0 || $title_usage > 0) ? JText::_($field->parameters->get( 'default_value_title', '' )) : '';
@@ -129,7 +138,7 @@ class plgFlexicontent_fieldsEmail extends FCField
 
 
 		// Initialise property with default value
-		if (!$field->value || (count($field->value) === 1 && $field->value[0] === null))
+		if (!$field->value || (count($field->value) === 1 && reset($field->value) === null))
 		{
 			$field->value = array();
 			$field->value[0]['addr'] = $default_addr;
@@ -160,6 +169,7 @@ class plgFlexicontent_fieldsEmail extends FCField
 			jQuery(document).ready(function(){
 				jQuery('#sortables_".$field->id."').sortable({
 					handle: '.fcfield-drag-handle',
+					cancel: false,
 					/*containment: 'parent',*/
 					tolerance: 'pointer'
 					".($fields_box_placing ? "
@@ -315,16 +325,33 @@ class plgFlexicontent_fieldsEmail extends FCField
 			$css .= '';
 		}
 
+		// We may comment out some classes so that layout decides these
+		$classes .= /*' fcfield_textval' .*/ $required_class;
 
-		// Added field's custom CSS / JS
-		if ($multiple) $js .= "
-			var uniqueRowNum".$field->id."	= ".count($field->value).";  // Unique row number incremented only
-			var rowCount".$field->id."	= ".count($field->value).";      // Counts existing rows to be able to limit a max number of values
-			var maxValues".$field->id." = ".$max_values.";
-		";
-		if ($js)  $document->addScriptDeclaration($js);
-		if ($css) $document->addStyleDeclaration($css);
+		// Set field to 'Automatic' on successful validation'
+		if ($auto_value)
+		{
+			$classes = ' fcfield_auto_value ';
+		}
 
+		// Create attributes for JS inputmask validation
+		$validate_mask = '';
+
+		switch ($inputmask)
+		{
+			default:
+				if ($inputmask)
+				{
+					$validate_mask = " data-inputmask=\" 'alias': '" . $inputmask . "' \" ";
+					$classes .= ' has_inputmask';
+				}
+		}
+
+		$classes .= ' validate-email';
+
+		// Classes and attributes for the input of the input field
+		$addr_classes = $classes;
+		$addr_attribs = $attribs . $validate_mask ;
 
 
 		/**
@@ -333,15 +360,36 @@ class plgFlexicontent_fieldsEmail extends FCField
 
 		$field->html = array();
 
+		// These are unused in this field
+		$skipped_vals = array();
+		$per_val_js   = '';
+
 		$formlayout = $field->parameters->get('formlayout', '');
 		$formlayout = $formlayout ? 'field_'.$formlayout : 'field_InlineBoxes';
 		$simple_form_layout = $field->parameters->get('simple_form_layout', 0);
 
-		//$this->setField($field);
-		//$this->setItem($item);
-		//$this->displayField( $formlayout );
-
 		include(self::getFormPath($this->fieldtypes[0], $formlayout));
+
+		// Add per value JS
+		if ($per_val_js)
+		{
+			$js .= "
+			jQuery(document).ready(function()
+			{
+				" . $per_val_js . "
+			});
+			";
+		}
+
+		// Add field's custom CSS / JS
+		if ($multiple) $js .= "
+			var uniqueRowNum".$field->id."	= ".count($field->value).";  // Unique row number incremented only
+			var rowCount".$field->id."	= ".count($field->value).";      // Counts existing rows to be able to limit a max number of values
+			var maxValues".$field->id." = ".$max_values.";
+		";
+		if ($js)  $document->addScriptDeclaration($js);
+		if ($css) $document->addStyleDeclaration($css);
+
 
 		// Do not convert the array to string if field is in a group
 		if ($use_ingroup);
@@ -370,14 +418,29 @@ class plgFlexicontent_fieldsEmail extends FCField
 			</div>';
 		}
 
+		if (!$use_ingroup)
+		{
+			$field->html = ($show_usage && $field_notes
+				? ' <div class="alert alert-info fc-small fc-iblock">'.$field_notes.'</div><div class="fcclear"></div>'
+				: ''
+			) . $field->html;
+		}
+
+		if (count($skipped_vals))
+		{
+			$app->enqueueMessage( JText::sprintf('FLEXI_FIELD_DATE_EDIT_VALUES_SKIPPED', $field->label, implode(',',$skipped_vals)), 'notice' );
+		}
+
 		// Add toggle button for: Compact values view (= multiple values per row)
 		$show_values_expand_btn = $formlayout === 'field_InlineBoxes' ? $show_values_expand_btn : 0;
 		if (!$use_ingroup && $show_values_expand_btn)
 		{
 			$field->html = '
-			<span class="fcfield-expand-view-btn btn btn-small" onclick="fc_toggleCompactValuesView(this, jQuery(this).closest(\'.container_fcfield\'));" data-expandedFieldState="0">
-				<span class="fcfield-expand-view ' . $font_icon_class . '" title="'.JText::_( 'FLEXI_EXPAND_VALUES', true ).'"></span> &nbsp;'.JText::_( 'FLEXI_EXPAND_VALUES', true ).'
-			</span>
+			<button type="button" class="fcfield-expand-view-btn btn btn-small" data-expandedFieldState="0" aria-label="' . JText::_('FLEXI_EXPAND_VALUES') . '"
+				onclick="fc_toggleCompactValuesView(this, jQuery(this).closest(\'.container_fcfield\'));"
+			>
+				<span class="fcfield-expand-view ' . $font_icon_class . '" aria-hidden="true"></span>&nbsp; ' . JText::_( 'FLEXI_EXPAND_VALUES', true ) . '
+			</button>
 			' . $field->html;
 		}
 	}

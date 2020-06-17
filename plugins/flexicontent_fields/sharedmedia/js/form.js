@@ -145,8 +145,12 @@
 					{
 						fcfield_sharemedia.noembedCallback(element_id_n, response, config_name);
 					}
-				} catch(err) {
-					msg_box.html("<span class=\"alert alert-warning fc-iblock\">" + Joomla.JText._('PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_RESPONSE_PARSING_FAILED') + ": " + err.message + "</span>");
+				}
+				catch(err) {
+					msg_box.html("<span class=\"alert alert-warning fc-iblock\">"
+						+ Joomla.JText._('PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_RESPONSE_PARSING_FAILED')
+						+ ": " + err.message +
+					"</span>");
 				}
 			},
 			error: function(jqXHR, textStatus, errorThrown) {
@@ -158,8 +162,15 @@
 				} catch(err) {
 					response = jqXHR.responseText;
 				}
-				var errorText = typeof response !== "object" ? response : (mediaID && (apiType=="dailymotion" || apiType=="youtube")  ? response.error.message : response.error_message);
-				if (apiType=="youtube" && typeof response == "object") errorText += " Reason: "  +response.error.errors[0].reason;
+				var errorText = typeof response !== "object"
+					? response : (mediaID && (apiType=="dailymotion" || apiType=="youtube")
+						? response.error.message
+						: response.error_message
+					);
+				if (apiType=="youtube" && typeof response == "object")
+				{
+					errorText += '<br>' + Joomla.JText._('PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_REASON') + ': ' + response.error.errors[0].reason;
+				}
 				msg_box.html("<span class=\"alert alert-warning fc-iblock\"><i>" + Joomla.JText._('PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_SERVER_RESPONDED_WITH_ERROR') + "</i><br/><br/>" + errorText + "</span>");
 			}
 		});
@@ -191,7 +202,9 @@
 		}
 		else
 		{
-			var errorText = typeof data === "object" ? data.error.message : data;
+			var errorText = typeof data === "object"
+				? data.error.message + '<br>' + Joomla.JText._('PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_REASON') + ": " + data.error.errors[0].reason
+				: data;
 			jQuery("#fcfield_message_box_" + element_id_n).html("<span class=\"alert alert-warning fc-iblock\"><i>" + Joomla.JText._('PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_SERVER_RESPONDED_WITH_ERROR') + "</i><br/><br/>" + errorText + "</span>");
 		}
 	}
@@ -340,12 +353,16 @@
 	fcfield_sharemedia.toggleMETArows = function(element_id_n, action)
 	{
 		action = typeof action === "undefined" ? 0 : action;
-		if (action==1)
-			jQuery("#" + element_id_n + "_title, " + "#" + element_id_n + "_author, " + "#" + element_id_n + "_description, " + "#" + element_id_n + "_api_type, " + "#" + element_id_n + "_media_id, " + "#" + element_id_n + "_preview, " + "#" + element_id_n + "_width, " + "#" + element_id_n + "_height").closest("tr").fadeIn(4000);  // compatibility ?: show with fade so that the elements size are proper in case some JS code needs them ?
-		else if (action==-1)
-			jQuery("#" + element_id_n + "_title, " + "#" + element_id_n + "_author, " + "#" + element_id_n + "_description, " + "#" + element_id_n + "_api_type, " + "#" + element_id_n + "_media_id, " + "#" + element_id_n + "_preview, " + "#" + element_id_n + "_width, " + "#" + element_id_n + "_height").closest("tr").hide("fast");
-		else if (action==0)
-			jQuery("#" + element_id_n + "_title, " + "#" + element_id_n + "_author, " + "#" + element_id_n + "_description, " + "#" + element_id_n + "_api_type, " + "#" + element_id_n + "_media_id, " + "#" + element_id_n + "_preview, " + "#" + element_id_n + "_width, " + "#" + element_id_n + "_height").closest("tr").toggle(0);  // compatibility ?: toggle instantly
+
+		var fields = ['title', 'author', 'duration', 'description', 'api_type', 'embed_url', 'media_id', 'preview', 'width', 'height'];
+		var fields_selector = "#" + element_id_n + "_" + fields.join(", " + "#" + element_id_n + "_");
+
+		switch (action)
+		{
+			case 1: jQuery(fields_selector).closest("tr").fadeIn(2000); break;
+			case -1: jQuery(fields_selector).closest("tr").hide(); break;
+			case 0: jQuery(fields_selector).closest("tr").toggle(0); break;
+		}
 	}
 
 

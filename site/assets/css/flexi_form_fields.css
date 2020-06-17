@@ -1063,11 +1063,11 @@ div.container_fcfield div.toggle_all_values_buttons_box {
 	text-align: left;
 	width: 100%;
 }
-#flexicontent ul.fcfield-sortables > li:only-child span.fcfield-drag-handle:not(.fcfont-icon) {
+#flexicontent ul.fcfield-sortables > li:only-child .fcfield-drag-handle:not(.fcfont-icon) {
 	background: url(../images/move3.png) 50% 50% no-repeat;
 	cursor: default !important;
 }
-#flexicontent ul.fcfield-sortables > li:only-child span.fcfield-drag-handle.fcfont-icon {
+#flexicontent ul.fcfield-sortables > li:only-child .fcfield-drag-handle.fcfont-icon {
 	background: none;
 	color: #aaa;
 	cursor: default;
@@ -1184,28 +1184,36 @@ div.container_fcfield div.toggle_all_values_buttons_box {
 		width: 100% !important;
 	}
 }
-#flexicontent span[class^="fcfield-"].fcfont-icon,
-#flexicontent span[class*=" fcfield-"].fcfont-icon,
-#flexicontent ul.fcfield-sortables > li span[class^="fcfield-"].fcfont-icon,
-#flexicontent ul.fcfield-sortables > li span[class*=" fcfield-"].fcfont-icon {
+#flexicontent div [class^="fcfield-"].fcfont-icon,
+#flexicontent div [class*=" fcfield-"].fcfont-icon,
+#flexicontent ul.fcfield-sortables > li [class^="fcfield-"].fcfont-icon,
+#flexicontent ul.fcfield-sortables > li [class*=" fcfield-"].fcfont-icon {
+	background: none;
 	margin: 0px 0px 2px 0px;
 	color: #555;
 	transition: all 0.3s ease-in;
 }
-#flexicontent span[class^="fcfield-"].fcfont-icon:hover,
-#flexicontent span[class*=" fcfield-"].fcfont-icon:hover,
-#flexicontent ul.fcfield-sortables > li span[class^="fcfield-"].fcfont-icon:hover,
-#flexicontent ul.fcfield-sortables > li span[class*=" fcfield-"].fcfont-icon:hover {
+#flexicontent div [class^="fcfield-"].fcfont-icon:hover,
+#flexicontent div [class*=" fcfield-"].fcfont-icon:hover,
+#flexicontent ul.fcfield-sortables > li [class^="fcfield-"].fcfont-icon:hover,
+#flexicontent ul.fcfield-sortables > li [class*=" fcfield-"].fcfont-icon:hover {
 	color: black;
 }
-#flexicontent span[class^="fcfield-"].fcfont-icon:before,
-#flexicontent span[class*=" fcfield-"].fcfont-icon:before,
-#flexicontent span[class^="fcfield-"].fcfont-icon:after,
-#flexicontent span[class*=" fcfield-"].fcfont-icon:after,
-#flexicontent ul.fcfield-sortables > li span[class^="fcfield-"].fcfont-icon:before,
-#flexicontent ul.fcfield-sortables > li span[class*=" fcfield-"].fcfont-icon:before,
-#flexicontent ul.fcfield-sortables > li span[class^="fcfield-"].fcfont-icon:after,
-#flexicontent ul.fcfield-sortables > li span[class*=" fcfield-"].fcfont-icon:after {
+#flexicontent div [class^="fcfield-"].fcfont-icon:focus,
+#flexicontent div [class*=" fcfield-"].fcfont-icon:focus,
+#flexicontent ul.fcfield-sortables > li [class^="fcfield-"].fcfont-icon:focus,
+#flexicontent ul.fcfield-sortables > li [class*=" fcfield-"].fcfont-icon:focus {
+	outline: black;
+	border-color: black;
+}
+#flexicontent div [class^="fcfield-"].fcfont-icon:before,
+#flexicontent div [class*=" fcfield-"].fcfont-icon:before,
+#flexicontent div [class^="fcfield-"].fcfont-icon:after,
+#flexicontent div [class*=" fcfield-"].fcfont-icon:after,
+#flexicontent ul.fcfield-sortables > li [class^="fcfield-"].fcfont-icon:before,
+#flexicontent ul.fcfield-sortables > li [class*=" fcfield-"].fcfont-icon:before,
+#flexicontent ul.fcfield-sortables > li [class^="fcfield-"].fcfont-icon:after,
+#flexicontent ul.fcfield-sortables > li [class*=" fcfield-"].fcfont-icon:after {
 	margin: 0px 0px 2px 0px;
 	background: none;
 	font-family: "IcoMoon";
@@ -1213,27 +1221,14 @@ div.container_fcfield div.toggle_all_values_buttons_box {
 	font-size: 14px;
 	vertical-align: top;
 	color: #555;
+	speak: never;
+	pointer-events: none;
 }
 #flexicontent .fc-xpended-btns.fc-bottom-btns {
 	margin: 8px 0 0 0;
 }
-#flexicontent .fc-xpended-btns > .fcfield-expand-view,
-#flexicontent .fc-xpended-btns > .fcfield-drag-handle,
-#flexicontent .fc-xpended-btns > .fcfield-list-add,
-#flexicontent .fc-xpended-btns > .fcfield-list-del,
-#flexicontent .fc-xpended-btns > .fcfield-placement-h,
-#flexicontent .fc-xpended-btns > .fcfield-placement-v,
-#flexicontent .fc-xpended-btns > .fcfield-addvalue,
-#flexicontent .fc-xpended-btns > .fcfield-insertvalue.fc_after,
-#flexicontent .fc-xpended-btns > .fcfield-insertvalue.fc_before,
-#flexicontent .fc-xpended-btns > .fcfield-delvalue,
-#flexicontent .fc-xpended-btns > .fcfield-enablevalue,
-#flexicontent .fc-xpended-btns > .fcfield-disablevalue,
-#flexicontent .fc-xpended-btns > .fcfield-clearvalue,
-#flexicontent .fc-xpended-btns > .fcfield-medialurlvalue,
-#flexicontent .fc-xpended-btns > .fcfield-selectvalue,
-#flexicontent .fc-xpended-btns > .fcfield-uploadvalue,
-#flexicontent .fc-xpended-btns > .fcfield-button,
+#flexicontent .fc-xpended-btns > [class^="fcfield-"],
+#flexicontent .fc-xpended-btns > [class*=" fcfield-"],
 #flexicontent .fc-xpended-btns > .fcfield-button-add a {
 	font-size: 12px;
 	text-shadow: unset;
@@ -1242,24 +1237,10 @@ div.container_fcfield div.toggle_all_values_buttons_box {
 	min-height: 18px;
 	cursor: pointer;
 	background-color: white;
+	box-sizing: content-box;
 }
-#flexicontent .fc-xpended-btns > .fcfield-expand-view:not(.add-on):not(.input-group-addon):not(.btn),
-#flexicontent .fc-xpended-btns > .fcfield-drag-handle:not(.add-on):not(.input-group-addon):not(.btn),
-#flexicontent .fc-xpended-btns > .fcfield-list-add:not(.add-on):not(.input-group-addon):not(.btn),
-#flexicontent .fc-xpended-btns > .fcfield-list-del:not(.add-on):not(.input-group-addon):not(.btn),
-#flexicontent .fc-xpended-btns > .fcfield-placement-h:not(.add-on):not(.input-group-addon):not(.btn),
-#flexicontent .fc-xpended-btns > .fcfield-placement-v:not(.add-on):not(.input-group-addon):not(.btn),
-#flexicontent .fc-xpended-btns > .fcfield-addvalue:not(.add-on):not(.input-group-addon):not(.btn),
-#flexicontent .fc-xpended-btns > .fcfield-insertvalue.fc_after:not(.add-on):not(.input-group-addon):not(.btn),
-#flexicontent .fc-xpended-btns > .fcfield-insertvalue.fc_before:not(.add-on):not(.input-group-addon):not(.btn),
-#flexicontent .fc-xpended-btns > .fcfield-delvalue:not(.add-on):not(.input-group-addon):not(.btn),
-#flexicontent .fc-xpended-btns > .fcfield-enablevalue:not(.add-on):not(.input-group-addon):not(.btn),
-#flexicontent .fc-xpended-btns > .fcfield-disablevalue:not(.add-on):not(.input-group-addon):not(.btn),
-#flexicontent .fc-xpended-btns > .fcfield-clearvalue:not(.add-on):not(.input-group-addon):not(.btn),
-#flexicontent .fc-xpended-btns > .fcfield-medialurlvalue:not(.add-on):not(.input-group-addon):not(.btn),
-#flexicontent .fc-xpended-btns > .fcfield-selectvalue:not(.add-on):not(.input-group-addon):not(.btn),
-#flexicontent .fc-xpended-btns > .fcfield-uploadvalue:not(.add-on):not(.input-group-addon):not(.btn),
-#flexicontent .fc-xpended-btns > .fcfield-button:not(.add-on):not(.input-group-addon):not(.btn),
+#flexicontent .fc-xpended-btns > [class^="fcfield-"]:not(.add-on):not(.input-group-addon):not(.btn),
+#flexicontent .fc-xpended-btns > [class*=" fcfield-"]:not(.add-on):not(.input-group-addon):not(.btn),
 #flexicontent .fc-xpended-btns > .fcfield-button-add:not(.add-on):not(.input-group-addon) a {
 	float: none;
 	clear: none;
@@ -1272,74 +1253,27 @@ div.container_fcfield div.toggle_all_values_buttons_box {
 #flexicontent .fc-xpended-btns > .fcfield-addvalue:not(.add-on):not(.input-group-addon):not(.btn):only-child {
 	margin: 0;
 }
-#flexicontent .fc-xpended-btns .fcfield-expand-view:not(.fcfont-icon):hover,
-#flexicontent .fc-xpended-btns .fcfield-drag-handle:not(.fcfont-icon):hover,
-#flexicontent .fc-xpended-btns .fcfield-list-add:not(.fcfont-icon):hover,
-#flexicontent .fc-xpended-btns .fcfield-list-del:not(.fcfont-icon):hover,
-#flexicontent .fc-xpended-btns .fcfield-placement-h:not(.fcfont-icon):hover,
-#flexicontent .fc-xpended-btns .fcfield-placement-v:not(.fcfont-icon):hover,
-#flexicontent .fc-xpended-btns .fcfield-addvalue:not(.fcfont-icon):hover,
-#flexicontent .fc-xpended-btns .fcfield-insertvalue.fc_after:not(.fcfont-icon):hover,
-#flexicontent .fc-xpended-btns .fcfield-insertvalue.fc_before:not(.fcfont-icon):hover,
-#flexicontent .fc-xpended-btns .fcfield-delvalue:not(.fcfont-icon):hover,
-#flexicontent .fc-xpended-btns .fcfield-enablevalue:not(.fcfont-icon):hover,
-#flexicontent .fc-xpended-btns .fcfield-disablevalue:not(.fcfont-icon):hover,
-#flexicontent .fc-xpended-btns .fcfield-clearvalue:not(.fcfont-icon):hover,
-#flexicontent .fc-xpended-btns .fcfield-medialurlvalue:not(.fcfont-icon):hover,
-#flexicontent .fc-xpended-btns .fcfield-selectvalue:not(.fcfont-icon):hover,
-#flexicontent .fc-xpended-btns .fcfield-uploadvalue:not(.fcfont-icon):hover,
-#flexicontent .fc-xpended-btns .fcfield-button:not(.fcfont-icon):hover,
+#flexicontent .fc-xpended-btns [class^="fcfield-"]:not(.fcfont-icon):hover,
+#flexicontent .fc-xpended-btns [class*=" fcfield-"]:not(.fcfont-icon):hover,
 #flexicontent .fc-xpended-btns .fcfield-button-add:not(.fcfont-icon):hover a {
 	background-color: #e0e0e0;
 }
-#flexicontent .fc-xpended-btns .fcfield-expand-view.fcfont-icon:hover,
-#flexicontent .fc-xpended-btns .fcfield-drag-handle.fcfont-icon:hover,
-#flexicontent .fc-xpended-btns .fcfield-list-add.fcfont-icon:hover,
-#flexicontent .fc-xpended-btns .fcfield-list-del.fcfont-icon:hover,
-#flexicontent .fc-xpended-btns .fcfield-placement-h.fcfont-icon:hover,
-#flexicontent .fc-xpended-btns .fcfield-placement-v.fcfont-icon:hover,
-#flexicontent .fc-xpended-btns .fcfield-addvalue.fcfont-icon:hover,
-#flexicontent .fc-xpended-btns .fcfield-insertvalue.fc_after.fcfont-icon:hover,
-#flexicontent .fc-xpended-btns .fcfield-insertvalue.fc_before.fcfont-icon:hover,
-#flexicontent .fc-xpended-btns .fcfield-delvalue.fcfont-icon:hover,
-#flexicontent .fc-xpended-btns .fcfield-enablevalue.fcfont-icon:hover,
-#flexicontent .fc-xpended-btns .fcfield-disablevalue.fcfont-icon:hover,
-#flexicontent .fc-xpended-btns .fcfield-clearvalue.fcfont-icon:hover,
-#flexicontent .fc-xpended-btns .fcfield-medialurlvalue.fcfont-icon:hover,
-#flexicontent .fc-xpended-btns .fcfield-selectvalue.fcfont-icon:hover,
-#flexicontent .fc-xpended-btns .fcfield-uploadvalue.fcfont-icon:hover,
-#flexicontent .fc-xpended-btns .fcfield-button.fcfont-icon:hover,
+#flexicontent .fc-xpended-btns [class^="fcfield-"].fcfont-icon:hover,
+#flexicontent .fc-xpended-btns [class*=" fcfield-"].fcfont-icon:hover,
 #flexicontent .fc-xpended-btns .fcfield-button-add.fcfont-icon:hover a {
 	background-color: #f0f0f0;
 	background-image: -webkit-linear-gradient(top,#f0f0f0,#c0c0c0);
 	background-image: linear-gradient(to bottom,#f0f0f0,#c0c0c0);
 }
-#flexicontent span.fcfield-expand-view.fcfont-icon,
-#flexicontent span.fcfield-drag-handle.fcfont-icon,
-#flexicontent span.fcfield-list-add.fcfont-icon,
-#flexicontent span.fcfield-list-del.fcfont-icon,
-#flexicontent span.fcfield-placement-h.fcfont-icon,
-#flexicontent span.fcfield-placement-v.fcfont-icon,
-#flexicontent span.fcfield-addvalue.fcfont-icon,
-#flexicontent span.fcfield-insertvalue.fc_after.fcfont-icon,
-#flexicontent span.fcfield-insertvalue.fc_before.fcfont-icon,
-#flexicontent span.fcfield-delvalue.fcfont-icon,
-#flexicontent span.fcfield-enablevalue.fcfont-icon,
-#flexicontent span.fcfield-disablevalue.fcfont-icon,
-#flexicontent span.fcfield-clearvalue.fcfont-icon,
-#flexicontent span.fcfield-medialurlvalue.fcfont-icon,
-#flexicontent span.fcfield-selectvalue.fcfont-icon,
-#flexicontent span.fcfield-uploadvalue.fcfont-icon,
-#flexicontent span.fcfield-button.fcfont-icon,
-#flexicontent span.fcfield-button-add.fcfont-icon a {
+#flexicontent div [class^="fcfield-"].fcfont-icon,
+#flexicontent div [class*=" fcfield-"].fcfont-icon,
+#flexicontent .fcfield-button-add.fcfont-icon a {
 	padding: 4px 12px;
 	background-image: none;
 }
-#flexicontent span.fcfield-expand-view.fcfont-icon {
+#flexicontent div .fcfield-expand-view.fcfont-icon {
 	padding: 0px;
-}
-#flexicontent span.fcfield-expand-view.fcfont-icon {
-	padding: 0px;
+	margin: 0px;
 }
 #flexicontent .buttons.btn-group .btn {
 	padding: 4px 6px;
@@ -1375,19 +1309,19 @@ div.container_fcfield div.toggle_all_values_buttons_box {
 	padding: 5px 12px 6px;
 	margin: 4px 2px 0px 6px;
 }
-#flexicontent span.fcfield-addvalue {
+#flexicontent .fcfield-addvalue {
 	margin: 0px 2px 6px 6px;
 	padding: 6px 28px;
 	background: url(../images/plus-button.png) 8% 50% no-repeat;
 }
-#flexicontent span.fcfield-addvalue:not(.fcfont-icon) {
+#flexicontent .fcfield-addvalue:not(.fcfont-icon) {
 	padding: 6px 12px 6px 32px !important;
 }
-#flexicontent span.fcfield-addvalue.fcfont-icon:before {
+#flexicontent .fcfield-addvalue.fcfont-icon:before {
 	padding: 0 6px 0 0;
 	content: "*";
 }
-#flexicontent span.fcfield-addvalue:before {
+#flexicontent .fcfield-addvalue:before {
 	color: LimeGreen;
 }
 #flexicontent .fcfield-addvalue.fccleared {
@@ -1427,28 +1361,28 @@ div.container_fcfield div.toggle_all_values_buttons_box {
 	margin: 0px 0px 2px 0px;
 	background: url(../images/plus-button.png) 50% 50% no-repeat;
 }
-#flexicontent span.fcfield-insertvalue.fc_after {
+#flexicontent .fcfield-insertvalue.fc_after {
 	background: url(../images/insert_after_180.png) 50% 50% no-repeat;
 }
-#flexicontent span.fcfield-insertvalue.fc_before {
+#flexicontent .fcfield-insertvalue.fc_before {
 	background: url(../images/insert_before_180.png) 50% 50% no-repeat;
 }
-#flexicontent span.fcfield-insertvalue.fc_after.fcfont-icon:before {
+#flexicontent .fcfield-insertvalue.fc_after.fcfont-icon:before {
 	content: "]";
 	font-size: 8px !important;
 }
-#flexicontent span.fcfield-insertvalue.fc_before.fcfont-icon:before {
+#flexicontent .fcfield-insertvalue.fc_before.fcfont-icon:before {
 	content: "\e207";
 }
-#flexicontent span.fcfield-insertvalue.fc_after.fcfont-icon:after {
+#flexicontent .fcfield-insertvalue.fc_after.fcfont-icon:after {
 	content: " \6c";
 }
-#flexicontent span.fcfield-insertvalue.fc_before.fcfont-icon:after {
+#flexicontent .fcfield-insertvalue.fc_before.fcfont-icon:after {
 	content: " ]";
 	font-size: 8px !important;
 }
-#flexicontent span.fcfield-insertvalue:before,
-#flexicontent span.fcfield-insertvalue:after {
+#flexicontent .fcfield-insertvalue:before,
+#flexicontent .fcfield-insertvalue:after {
 	color: #555;
 }
 #flexicontent .fcfield-expand-view {
@@ -1458,7 +1392,7 @@ div.container_fcfield div.toggle_all_values_buttons_box {
 	min-width: 16px;
 	vertical-align: middle;
 }
-#flexicontent span.fcfield-expand-view.fcfont-icon:before {
+#flexicontent .fcfield-expand-view.fcfont-icon:before {
 	content: "\68";
 	vertical-align: middle;
 	font-size: 100%;
@@ -1467,10 +1401,10 @@ div.container_fcfield div.toggle_all_values_buttons_box {
 	margin: 0px 0px 2px 0px;
 	background: url(../images/delete.png) 50% 50% no-repeat;
 }
-#flexicontent span.fcfield-delvalue.fcfont-icon:before {
+#flexicontent .fcfield-delvalue.fcfont-icon:before {
 	content: "I";
 }
-#flexicontent span.fcfield-delvalue:before {
+#flexicontent .fcfield-delvalue:before {
 	color: FireBrick;
 }
 #flexicontent .fcfield-enablevalue {
@@ -1480,11 +1414,11 @@ div.container_fcfield div.toggle_all_values_buttons_box {
 #flexicontent .fcfield-enablevalue:not(.fcfont-icon) {
 	padding: 4px 4px 4px 32px !important;
 }
-#flexicontent span.fcfield-enablevalue.fcfont-icon:before {
+#flexicontent .fcfield-enablevalue.fcfont-icon:before {
 	padding: 0 6px 0 0;
 	content: "\2b";
 }
-#flexicontent span.fcfield-enablevalue:before {
+#flexicontent .fcfield-enablevalue:before {
 	color: darkgreen;
 }
 #flexicontent .fcfield-disablevalue {
@@ -1494,41 +1428,41 @@ div.container_fcfield div.toggle_all_values_buttons_box {
 #flexicontent .fcfield-disablevalue:not(.fcfont-icon) {
 	padding: 4px 4px 4px 32px !important;
 }
-#flexicontent span.fcfield-disablevalue.fcfont-icon:before {
+#flexicontent .fcfield-disablevalue.fcfont-icon:before {
 	padding: 0 6px 0 0;
 	content: "\49";
 }
-#flexicontent span.fcfield-disablevalue:before {
+#flexicontent .fcfield-disablevalue:before {
 	color: darkorange;
 }
 #flexicontent .fcfield-clearvalue {
 	margin: 0px 0px 2px 0px;
 	background: url(../images/layout_delete.png) 50% 50% no-repeat;
 }
-#flexicontent span.fcfield-clearvalue.fcfont-icon:before {
+#flexicontent .fcfield-clearvalue.fcfont-icon:before {
 	content: "\e217";
 }
-#flexicontent span.fcfield-clearvalue:before {
+#flexicontent .fcfield-clearvalue:before {
 	color: #555;
 }
 #flexicontent .fcfield-medialurlvalue {
 	margin: 0px 0px 2px 0px;
 	background: url(../images/layout.png) 50% 50% no-repeat;
 }
-#flexicontent span.fcfield-medialurlvalue.fcfont-icon:before {
+#flexicontent .fcfield-medialurlvalue.fcfont-icon:before {
 	content: "\e015";
 }
-#flexicontent span.fcfield-medialurlvalue:before {
+#flexicontent .fcfield-medialurlvalue:before {
 	color: #555;
 }
 #flexicontent .fcfield-selectvalue {
 	margin: 0px 0px 2px 0px;
 	background: url(../images/magnifier.png) 50% 50% no-repeat;
 }
-#flexicontent span.fcfield-selectvalue.fcfont-icon:before {
+#flexicontent .fcfield-selectvalue.fcfont-icon:before {
 	content: "\53";
 }
-#flexicontent span.fcfield-selectvalue:before {
+#flexicontent .fcfield-selectvalue:before {
 	color: black;
 }
 #flexicontent .fcfield-uploadvalue {
@@ -1546,13 +1480,13 @@ div.container_fcfield div.toggle_all_values_buttons_box {
 	background-image: none;
 	color: white;
 }
-#flexicontent span.fcfield-uploadvalue.fcfont-icon:before {
+#flexicontent .fcfield-uploadvalue.fcfont-icon:before {
 	content: "\e022";
 }
-#flexicontent span.fcfield-uploadvalue.active.fcfont-icon:before {
+#flexicontent .fcfield-uploadvalue.active.fcfont-icon:before {
 	color: white;
 }
-#flexicontent span.fcfield-uploadvalue:before {
+#flexicontent .fcfield-uploadvalue:before {
 	color: black;
 }
 #flexicontent .fcfield-selectvalue.multi,
@@ -1575,7 +1509,7 @@ div.container_fcfield div.toggle_all_values_buttons_box {
 	cursor: move;
 	background: url(../images/move2.png) 50% 50% no-repeat;
 }
-#flexicontent span.fcfield-drag-handle.fcfont-icon:before {
+#flexicontent .fcfield-drag-handle.fcfont-icon:before {
 	content: "z";
 }
 div.empty_image {

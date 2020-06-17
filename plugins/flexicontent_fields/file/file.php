@@ -176,7 +176,7 @@ class plgFlexicontent_fieldsFile extends FCField
 		}
 
 		// Empty field value
-		if (!$field->value || (count($field->value) === 1 && $field->value[0] === null))
+		if (!$field->value || (count($field->value) === 1 && reset($field->value) === null))
 		{
 			$files_data = array();
 			$form_data = array();
@@ -319,6 +319,7 @@ class plgFlexicontent_fieldsFile extends FCField
 			jQuery(document).ready(function(){
 				jQuery('#sortables_".$field->id."').sortable({
 					handle: '.fcfield-drag-handle',
+					cancel: false,
 					/*containment: 'parent',*/
 					tolerance: 'pointer'
 					".($fields_box_placing ? "
@@ -650,7 +651,7 @@ class plgFlexicontent_fieldsFile extends FCField
 			$document->addScript(JUri::root(true) . '/plugins/flexicontent_fields/file/js/form.js', array('version' => FLEXI_VHASH));
 		}
 
-		// Added field's custom CSS / JS
+		// Add field's custom CSS / JS
 		if ($multiple) $js .= "
 			var uniqueRowNum".$field->id."	= ".count($field->value).";  // Unique row number incremented only
 			var rowCount".$field->id."	= ".count($field->value).";      // Counts existing rows to be able to limit a max number of values
@@ -778,9 +779,11 @@ class plgFlexicontent_fieldsFile extends FCField
 		if (!$use_ingroup && $show_values_expand_btn)
 		{
 			$field->html = '
-			<span class="fcfield-expand-view-btn btn btn-small" onclick="fc_toggleCompactValuesView(this, jQuery(this).closest(\'.container_fcfield\'));" data-expandedFieldState="0">
-				<span class="fcfield-expand-view ' . $font_icon_class . '" title="'.JText::_( 'FLEXI_EXPAND_VALUES', true ).'"></span> &nbsp;'.JText::_( 'FLEXI_EXPAND_VALUES', true ).'
-			</span>
+			<button type="button" class="fcfield-expand-view-btn btn btn-small" data-expandedFieldState="0" aria-label="' . JText::_('FLEXI_EXPAND_VALUES') . '"
+				onclick="fc_toggleCompactValuesView(this, jQuery(this).closest(\'.container_fcfield\'));"
+			>
+				<span class="fcfield-expand-view ' . $font_icon_class . '" aria-hidden="true"></span>&nbsp; ' . JText::_( 'FLEXI_EXPAND_VALUES', true ) . '
+			</button>
 			' . $field->html;
 		}
 

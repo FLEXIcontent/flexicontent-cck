@@ -34,10 +34,15 @@
 			</field>
 
 			<field name="" type="separator" default="FLEXI_FIELD_NUMBER_OF_VALUES" description="" depend_class="fieldgroupoff" level="level2" />
+			<field name="required" type="radio" default="0" label="FLEXI_FIELD_REQUIRED" description="FLEXI_FIELD_REQUIRED_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
 			<field name="allow_multiple" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_FIELD_ALLOW_MULTIPLE" description="FLEXI_FIELD_ALLOW_MULTIPLE_DESC" depend_class="fieldgroupoff" class="btn-group btn-group-yesno">
 				<option value="0" show_list="" hide_list="multivalue-mode">FLEXI_NO</option>
 				<option value="1" show_list="multivalue-mode" hide_list="">FLEXI_YES</option>
 			</field>
+			<field name="max_values" type="text" default="0" size="2" label="FLEXI_FIELD_MAX_VALUES" description="FLEXI_FIELD_MAX_VALUES_DESC" depend_class="fieldgroupoff multivalue-mode" />
 			<field name="fields_box_placing" type="radio" default="0" label="FLEXI_FIELD_VALUES_PER_ROW" description="FLEXI_FIELD_VALUES_PER_ROW_DESC" depend_class="fieldgroupoff multivalue-mode" class="btn-group group-fcinfo">
 				<option value="0">1</option>
 				<option value="1">FLEXI_MULTIPLE</option>
@@ -48,16 +53,21 @@
 				<option value="2">FLEXI_FIELD_INLINE_PREPEND_BTN</option>
 				<option value="3">FLEXI_FIELD_INLINE_BOTH_BTN</option>
 			</field>
-			<field name="max_values" type="text" default="0" size="2" label="FLEXI_FIELD_MAX_VALUES" description="FLEXI_FIELD_MAX_VALUES_DESC" depend_class="fieldgroupoff multivalue-mode" />
-			<field name="required" type="radio" default="0" label="FLEXI_FIELD_REQUIRED" description="FLEXI_FIELD_REQUIRED_DESC" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
 			<field name="displayed_user" type="multilist" subtype="radio" default="1" label="FLEXI_FIELD_JP_DISPLAYED_USER" description="FLEXI_FIELD_JP_DISPLAYED_USER_DESC" toggle_related="0" class="btn-group group-fcinfo">
 				<option value="1" show_list="" hide_list="">FLEXI_FIELD_JP_ITEM_AUTHOR</option>
 				<option value="2" show_list="" hide_list="">FLEXI_FIELD_JP_ALLOW_SELECTION</option>
 				<option value="3" show_list="" hide_list="">FLEXI_FIELD_JP_CURRENT_USER</option>
 			</field>
+
+			<field name="" type="separator" default="FLEXI_FIELD_VALUE_AUTO_VALUE_CREATION" level="level2" />
+			<field name="" type="separator" default="FLEXI_FC_PRO_ONLY_INFO" level="level4" class="alert alert-warning fcpadded" />
+			<field name="auto_value" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_FIELD_VALUE_AUTO_VALUE" description="FLEXI_FIELD_VALUE_AUTO_VALUE_DESC" class="btn-group group-fcmethod">
+				<option value="0" hide_list="auto-value-code">FLEXI_NO</option>
+				<option value="2" show_list="auto-value-code">FLEXI_USE_CUSTOM_CODE</option>
+			</field>
+			<field name="auto_value_code" type="editor" editor="codemirror" syntax="php" rows="4" cols="80" height="100px" class="fc-unset-width" filter="RAW"
+				default="&lt;?php&#13;&#10;$F = &amp; $item-&gt;fields;&#13;&#10;if ( !isset($F['fieldname01']) ) return array('fieldname01 field not found');&#13;&#10;&#13;&#10;$vals = array();&#13;&#10;foreach($F['fieldname01']-&gt;postdata as $i =&gt; $v)&#13;&#10;{&#13;&#10;  $vals[$i] = 'Auto : ' . $v;&#13;&#10;}&#13;&#10;&#13;&#10;return $vals;"
+				label="FLEXI_CREATE_VIA_CUSTOM_CODE" description="FLEXI_CREATE_VIA_CUSTOM_CODE_DESC" depend_class="auto-value-code"/>
 
 			<field name="" type="separator" default="FLEXI_FORM_FIELD_CONF" _description="FLEXI_FORM_FIELD_CONF_DESC" icon_class="icon-calendar" level="tab_open" box_type="1" />
 
@@ -72,11 +82,18 @@
 
 			<field name="" type="separator" default="FLEXI_FIELD_EDITING" level="tabset_close" box_type="1" />
 		</fieldset>
-
 		<fieldset name="group-jprofile-viewing" hidden="true" icon_class="icon-screen" label="FLEXI_FIELD_VIEWING" addfieldpath="/administrator/components/com_flexicontent/elements">
 
 			<field name="" type="separator" default="FLEXI_FIELD_VIEWING" level="tabset_start" box_type="1" />
 			<field name="" type="separator" default="FLEXI_BASIC" icon_class="icon-vcard" level="tab_open" box_type="1" />
+
+			<field name="" type="separator" default="FLEXI_DISPLAY" level="level2" />
+			<field name="show_in_clients" type="fccheckbox" default=""
+				checkoptions="FLEXI_DESKTOP,FLEXI_TABLET,FLEXI_MOBILE" checkvals="desktop,tablet,mobile" defaultvals="desktop,tablet,mobile"
+				label="FLEXI_FIELD_SHOW_IN_CLIENTS" description="FLEXI_FIELD_SHOW_IN_CLIENTS_DESC" depend_class="use_js_lib" />
+			<field name="show_in_views" type="fccheckbox" default=""
+				checkoptions="FLEXI_ITEM,FLEXI_ITEM_LISTS,FLEXI_MODULE,FLEXI_BACKEND" checkvals="item,category,module,backend" defaultvals="item,category,module,backend"
+				label="FLEXI_FIELD_SHOW_IN_VIEWS" description="FLEXI_FIELD_SHOW_IN_VIEWS_DESC" />
 
 			<field name="" type="separator" default="FLEXI_FIELD_LABEL_AND_ACCESS" level="level2" />
 			<field name="display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC" class="btn-group btn-group-yesno">
@@ -90,15 +107,21 @@
 			<field name="no_acc_msg" type="text" default="" label="FLEXI_FIELD_NOACCESS_MSG" description="FLEXI_FIELD_NOACCESS_MSG_DESC" depend_class="field-acc-msg"/>
 
 			<field name="" type="separator" default="FLEXI_EXPORT" level="level2" />
-			<field name="include_in_csv_export" type="radio" default="0" label="FLEXI_FIELD_INCLUDE_IN_CSV_EXPORT" description="FLEXI_FIELD_INCLUDE_IN_CSV_EXPORT_DESC" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
+			<field name="include_in_csv_export" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_FIELD_INCLUDE_IN_CSV_EXPORT" description="FLEXI_FIELD_INCLUDE_IN_CSV_EXPORT_DESC" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="csv_rendered_display">FLEXI_NO</option>
+				<option value="1" show_list="" hide_list="csv_rendered_display">FLEXI_FIELD_RAW_VALUES</option>
+				<option value="2" show_list="csv_rendered_display" hide_list="">FLEXI_FIELD_RENDERED_VALUES</option>
 			</field>
 
 			<field name="" type="separator" default="FLEXI_LAYOUT" description="" icon_class="icon-file-2" level="tab_open" box_type="1" />
 			<field name="viewlayout" type="fcfilelist" default="" label="FLEXI_FIELD_SELECT_VIEW_LAYOUT" description="FLEXI_FIELD_SELECT_VIEW_LAYOUT_DESC" directory="plugins/flexicontent_fields/jprofile/tmpl/" filter="value*" exclude="" stripext="1" stripprefix="value_" hide_none="1" hide_default="1" />
 
 			<field name="" type="separator" default="FLEXI_FIELD_VALUE_DISPLAY" level="level2" />
+			<field name="show_no_value" type="multilist" subtype="radio" default="0" label="FLEXI_FIELD_SHOW_NO_VALUE" toggle_related="1" description="FLEXI_FIELD_SHOW_NO_VALUE_DESC" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="multivalue-mode">FLEXI_NO</option>
+				<option value="1" show_list="multivalue-mode" hide_list="">FLEXI_YES</option>
+			</field>
+			<field name="no_value_msg" type="text" default="" size="42" label="FLEXI_FIELD_NO_VALUE_MSG" depend_class="multivalue-mode" description="FLEXI_FIELD_NO_VALUE_MSG_DESC" />
 
 			<field name="link_to_profile" type="radio" default="1" label="Profile link" description="Profile Link using specific extension" class="btn-group btn-group-yesno">
 				<option value="1">Joomla Contact</option>
@@ -110,11 +133,6 @@
 				description="Replacements: &lt;br&gt; Profile url: __profile_url__ &lt;br&gt; Language strings: %%string%% &lt;br&gt; Item properties: {{item->prop}} &lt;br&gt; User properties {{user->prop}}"
 			/>
 
-			<!--field name="" type="separator" default="Profile data" level="level3" />
-			<field name="display_jprofile_data" type="radio" default="0" label="Display profile data" description="Display Joomla profile data" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">Joomla profile</option>
-			</field-->
 
 			<field name="" type="separator" default="FLEXI_FIELD_VALUE_LIST" description="" icon_class="icon-stack" level="tab_open" box_type="1" />
 

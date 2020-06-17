@@ -72,6 +72,15 @@
 				<option value="2">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_AND_ON_EMPTY</option>
 			</field>
 
+			<field name="" type="separator" default="FLEXI_FIELD_VALUE_AUTO_VALUE_CREATION" level="level2" />
+			<field name="" type="separator" default="FLEXI_FC_PRO_ONLY_INFO" level="level4" class="alert alert-warning fcpadded" />
+			<field name="auto_value" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_FIELD_VALUE_AUTO_VALUE" description="FLEXI_FIELD_VALUE_AUTO_VALUE_DESC" class="btn-group group-fcmethod">
+				<option value="0" hide_list="auto-value-code">FLEXI_NO</option>
+				<option value="2" show_list="auto-value-code">FLEXI_USE_CUSTOM_CODE</option>
+			</field>
+			<field name="auto_value_code" type="editor" editor="codemirror" syntax="php" rows="4" cols="80" height="100px" class="fc-unset-width" filter="RAW"
+				default="&lt;?php&#13;&#10;$F = &amp; $item-&gt;fields;&#13;&#10;if ( !isset($F['fieldname01']) ) return array('fieldname01 field not found');&#13;&#10;&#13;&#10;$vals = array();&#13;&#10;foreach($F['fieldname01']-&gt;postdata as $i =&gt; $v)&#13;&#10;{&#13;&#10;  $vals[$i] = 'Auto : ' . $v;&#13;&#10;}&#13;&#10;&#13;&#10;return $vals;"
+				label="FLEXI_CREATE_VIA_CUSTOM_CODE" description="FLEXI_CREATE_VIA_CUSTOM_CODE_DESC" depend_class="auto-value-code"/>
 
 			<field name="" type="separator" default="FLEXI_FORM_FIELD_CONF" _description="FLEXI_FORM_FIELD_CONF_DESC" icon_class="icon-checkbox" level="tab_open" box_type="1" />
 

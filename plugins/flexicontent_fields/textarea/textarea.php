@@ -65,8 +65,8 @@ class plgFlexicontent_fieldsTextarea extends FCField
 		// Initialize framework objects and other variables
 		$document = JFactory::getDocument();
 		$cparams  = JComponentHelper::getParams( 'com_flexicontent' );
-		$app  = JFactory::getApplication();
-		$user = JFactory::getUser();
+		$app      = JFactory::getApplication();
+		$user     = JFactory::getUser();
 
 		$tooltip_class = 'hasTooltip';
 		$add_on_class    = $cparams->get('bootstrap_ver', 2)==2  ?  'add-on' : 'input-group-addon';
@@ -111,6 +111,11 @@ class plgFlexicontent_fieldsTextarea extends FCField
 		/**
 		 * Form field display parameters
 		 */
+
+		// Usage information
+		$show_usage  = (int) $field->parameters->get( 'show_usage', 0 ) ;
+		$field_notes = '';
+
 		// Editing method, text editor or HTML editor
 		$use_html = (int) ($field->field_type == 'maintext' ? !$field->parameters->get( 'hide_html', 0 ) : $field->parameters->get( 'use_html', 0 ));
 
@@ -183,13 +188,14 @@ class plgFlexicontent_fieldsTextarea extends FCField
 		$skip_buttons_arr = ($show_buttons && ($editor_name=='jce' || $editor_name=='tinymce') && count($skip_buttons)) ? $skip_buttons : (boolean) $show_buttons;   // JCE supports skipping buttons
 
 		// Initialise property with default value
-		if (!$field->value || (count($field->value) === 1 && $field->value[0] === null))
+		if (!$field->value || (count($field->value) === 1 && reset($field->value) === null))
 		{
 			$field->value = $default_values;
 		}
 
 		// CSS classes of value container
 		$value_classes  = 'fcfieldval_container valuebox fcfieldval_container_'.$field->id;
+		$value_classes .= $fields_box_placing ? ' floated' : '';
 
 		// Field name and HTML TAG id
 		if ($field->field_type != 'maintext')
@@ -249,6 +255,7 @@ class plgFlexicontent_fieldsTextarea extends FCField
 			jQuery(document).ready(function(){
 				jQuery('#sortables_".$field->id."').sortable({
 					handle: '.fcfield-drag-handle',
+					cancel: false,
 					/*containment: 'parent',*/
 					tolerance: 'pointer'
 					".($fields_box_placing ? "
@@ -499,16 +506,6 @@ class plgFlexicontent_fieldsTextarea extends FCField
 		}
 
 
-
-		// Added field's custom CSS / JS
-		if ($multiple) $js .= "
-			var uniqueRowNum".$field->id."	= ".count($field->value).";  // Unique row number incremented only
-			var rowCount".$field->id."	= ".count($field->value).";      // Counts existing rows to be able to limit a max number of values
-			var maxValues".$field->id." = ".$max_values.";
-		";
-		if ($js)  $document->addScriptDeclaration($js);
-		if ($css) $document->addStyleDeclaration($css);
-
 		$classes  = ' fcfield_textval' . $required_class;
 
 		// Set field to 'Automatic' on successful validation'
@@ -524,7 +521,11 @@ class plgFlexicontent_fieldsTextarea extends FCField
 
 		$field->html = array();
 		$n = 0;
-		//if ($use_ingroup) {print_r($field->value);}
+
+		// These are unused in this field
+		$skipped_vals = array();
+		$per_val_js   = '';
+
 		foreach ($field->value as $i => $value)
 		{
 			// Joomla tinyMCE custom config bug workaround, (form reload, data from SESSION)
@@ -595,6 +596,27 @@ class plgFlexicontent_fieldsTextarea extends FCField
 			if (!$multiple) break;  // multiple values disabled, break out of the loop, not adding further values even if the exist
 		}
 
+		// Add per value JS
+		if ($per_val_js)
+		{
+			$js .= "
+			jQuery(document).ready(function()
+			{
+				" . $per_val_js . "
+			});
+			";
+		}
+
+		// Add field's custom CSS / JS
+		if ($multiple) $js .= "
+			var uniqueRowNum".$field->id."	= ".count($field->value).";  // Unique row number incremented only
+			var rowCount".$field->id."	= ".count($field->value).";      // Counts existing rows to be able to limit a max number of values
+			var maxValues".$field->id." = ".$max_values.";
+		";
+		if ($js)  $document->addScriptDeclaration($js);
+		if ($css) $document->addStyleDeclaration($css);
+
+
 		// Do not convert the array to string if field is in a group
 		if ($use_ingroup);
 
@@ -620,6 +642,19 @@ class plgFlexicontent_fieldsTextarea extends FCField
 			$field->html = '<div class="fcfieldval_container valuebox fcfieldval_container_'.$field->id.'">
 				' . (isset($field->html[-1]) ? $field->html[-1] : '') . $field->html[0] . '
 			</div>';
+		}
+
+		if (!$use_ingroup)
+		{
+			$field->html = ($show_usage && $field_notes
+				? ' <div class="alert alert-info fc-small fc-iblock">'.$field_notes.'</div><div class="fcclear"></div>'
+				: ''
+			) . $field->html;
+		}
+
+		if (count($skipped_vals))
+		{
+			$app->enqueueMessage( JText::sprintf('FLEXI_FIELD_DATE_EDIT_VALUES_SKIPPED', $field->label, implode(',',$skipped_vals)), 'notice' );
 		}
 	}
 
@@ -721,16 +756,20 @@ class plgFlexicontent_fieldsTextarea extends FCField
 			{
 				if ( !strlen($value) ) continue;  // skip further actions
 
-				if ($lang_filter_values) {
+				if ($lang_filter_values)
+				{
 					$value = JText::_($value);
 				}
-				if ($clean_output) {
+				if ($clean_output)
+				{
 					$value = $ifilter->clean($value, 'string');
 				}
-				if ($encode_output) {
+				if ($encode_output)
+				{
 					$value = htmlspecialchars( $value, ENT_QUOTES, 'UTF-8' );
 				}
-				if (!$use_html) {
+				if (!$use_html)
+				{
 					$value = nl2br(preg_replace("/(\r\n|\r|\n){3,}/", "\n\n", $value));
 				}
 			}
@@ -886,6 +925,7 @@ class plgFlexicontent_fieldsTextarea extends FCField
 			$newpost[$new] = $post[$n];
 			$new++;
 		}
+
 		$post = $newpost;
 
 		// Reconstruct value if it has splitted up e.g. to tabs or if given field is the description field,

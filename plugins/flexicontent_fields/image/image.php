@@ -276,7 +276,7 @@ class plgFlexicontent_fieldsImage extends FCField
 		$has_values = count($field->value);
 
 		// Initialise property with default value
-		if (!$field->value || (count($field->value) === 1 && $field->value[0] === null))
+		if (!$field->value || (count($field->value) === 1 && reset($field->value) === null))
 		{
 			$field->value = array();
 			$field->value[0]['originalname'] = '';
@@ -354,6 +354,7 @@ class plgFlexicontent_fieldsImage extends FCField
 			jQuery(document).ready(function(){
 				jQuery('#sortables_".$field->id."').sortable({
 					handle: '.fcfield-drag-handle',
+					cancel: false,
 					/*containment: 'parent',*/
 					tolerance: 'pointer'
 					".($field->parameters->get('fields_box_placing', 1) ? "
@@ -637,7 +638,7 @@ class plgFlexicontent_fieldsImage extends FCField
 		}
 
 
-		// Added field's custom CSS / JS
+		// Add field's custom CSS / JS
 		$image_folder = JUri::root(true).'/'.$dir_url;
 		$js .= "
 			/**
@@ -1119,7 +1120,7 @@ class plgFlexicontent_fieldsImage extends FCField
 		}
 
 
-		// Added field's custom CSS / JS
+		// Add field's custom CSS / JS
 		if ($multiple) $js .= "
 			var uniqueRowNum".$field->id."	= ".count($field->value).";  // Unique row number incremented only
 			var rowCount".$field->id."	= ".count($field->value).";      // Counts existing rows to be able to limit a max number of values

@@ -749,6 +749,8 @@ class FCField extends JPlugin
 			return;
 		}
 
+		//JFactory::getApplication()->enqueueMessage('Automatic field value for field  \'' . $field->label, 'notice');
+
 		if (!self::$fcProPlg)
 		{
 			JFactory::getApplication()->enqueueMessage('Automatic field value for field  \'' . $field->label . '\' is only supported by FLEXIcontent PRO version, please disable this feature in field configuration', 'notice');

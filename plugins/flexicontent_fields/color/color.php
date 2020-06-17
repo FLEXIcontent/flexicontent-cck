@@ -140,7 +140,7 @@ class plgFlexicontent_fieldsColor extends FCField
 		$posttext = $field->parameters->get( 'posttext_form', '' ) ;
 
 		// Initialise property with default value
-		if (!$field->value || (count($field->value) === 1 && $field->value[0] === null))
+		if (!$field->value || (count($field->value) === 1 && reset($field->value) === null))
 		{
 			$field->value = $default_values;
 		}
@@ -168,6 +168,7 @@ class plgFlexicontent_fieldsColor extends FCField
 			jQuery(document).ready(function(){
 				jQuery('#sortables_".$field->id."').sortable({
 					handle: '.fcfield-drag-handle',
+					cancel: false,
 					/*containment: 'parent',*/
 					tolerance: 'pointer'
 					".($fields_box_placing ? "
@@ -348,7 +349,7 @@ class plgFlexicontent_fieldsColor extends FCField
 		}
 
 
-		// Added field's custom CSS / JS
+		// Add field's custom CSS / JS
 		if ($multiple) $js .= "
 			var uniqueRowNum".$field->id."	= ".count($field->value).";  // Unique row number incremented only
 			var rowCount".$field->id."	= ".count($field->value).";      // Counts existing rows to be able to limit a max number of values

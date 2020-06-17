@@ -13,6 +13,7 @@
 	<files>
 		<filename plugin="sharedmedia">sharedmedia.php</filename>
 		<filename>index.html</filename>
+		<folder>tmpl</folder>
 		<folder>js</folder>
 	</files>
 
@@ -91,6 +92,10 @@
 				<option value="0">FLEXI_HIDE</option>
 				<option value="2">FLEXI_SHOW</option>
 			</field>
+			<field name="display_embed_url_form" type="radio" default="0" label="PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_DISPLAY_EMBED_URL_FORM" description="PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_DISPLAY_MEDIAID_FORM_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_HIDE</option>
+				<option value="2">FLEXI_SHOW</option>
+			</field>
 			<field name="display_media_id_form" type="radio" default="0" label="PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_DISPLAY_MEDIAID_FORM" description="PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_DISPLAY_MEDIAID_FORM_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_HIDE</option>
 				<option value="2">FLEXI_SHOW</option>
@@ -132,6 +137,15 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 
+			<field name="" type="separator" default="FLEXI_LAYOUT" description="" icon_class="icon-file-2" level="tab_open" box_type="1" />
+			<field name="viewlayout" type="fcfilelist" default="" label="FLEXI_FIELD_SELECT_VIEW_LAYOUT" description="FLEXI_FIELD_SELECT_VIEW_LAYOUT_DESC" directory="plugins/flexicontent_fields/sharedmedia/tmpl/" filter="value*" exclude="" stripext="1" stripprefix="value_" hide_none="1" hide_default="1" />
+
+			<field name="" type="separator" default="FLEXI_FIELD_VALUE_DISPLAY" level="level2" />
+			<field name="show_no_value" type="multilist" subtype="radio" default="0" label="FLEXI_FIELD_SHOW_NO_VALUE" toggle_related="1" description="FLEXI_FIELD_SHOW_NO_VALUE_DESC" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="multivalue-mode">FLEXI_NO</option>
+				<option value="1" show_list="multivalue-mode" hide_list="">FLEXI_YES</option>
+			</field>
+			<field name="no_value_msg" type="text" default="" size="42" label="FLEXI_FIELD_NO_VALUE_MSG" depend_class="multivalue-mode" description="FLEXI_FIELD_NO_VALUE_MSG_DESC" />
 
 			<field name="" type="separator" default="FLEXI_FIELD_VALUE_LIST" description="" icon_class="icon-stack" level="tab_open" box_type="1" />
 
@@ -237,8 +251,7 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="autostart" type="radio" default="0" label="PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_AUTOSTART" description="PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_AUTOSTART_DESC" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
+				<option value="0">Browser disabled (security concerns)</option>
 			</field>
 
 			<field name="" type="separator" default="PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_EMBEDLY_CONFIG" level="level2" />

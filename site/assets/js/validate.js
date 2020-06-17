@@ -329,7 +329,11 @@ var JFormValidator = function()
 			{
 				var editor = tinyMCE.get( $el.attr('id') );
 
-				if (!!!editor) return;
+				if (!!!editor)
+				{
+				 	window.console.log('tinyMCE editor not found via ID tag parameter. attachTinyMceValidation() aborted');
+					return;
+				}
 
 				if (tinyMCE.majorVersion >= 4)
 				{
