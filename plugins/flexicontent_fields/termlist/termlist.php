@@ -97,9 +97,18 @@ class plgFlexicontent_fieldsTermlist extends FCField
 		$default_title = ($item->version == 0 || $title_usage > 0) ? JText::_($field->parameters->get( 'default_value_title', '' )) : '';
 		$default_title = strlen($default_title) ? JText::_($default_title) : '';
 
+
+		/**
+		 * Form field display parameters
+		 */
+
+		// Usage information
+		$show_usage  = (int) $field->parameters->get( 'show_usage', 0 ) ;
+		$field_notes = '';
+
 		// Input field display size & max characters
-		$title_size      = $field->parameters->get( 'title_size', 80 ) ;
-		$title_maxlength = $field->parameters->get( 'title_maxlength', 0 ) ;
+		$title_size      = (int) $field->parameters->get( 'title_size', 80 ) ;
+		$title_maxlength = (int) $field->parameters->get( 'title_maxlength', 0 ) ;
 
 
 		/**
@@ -144,7 +153,7 @@ class plgFlexicontent_fieldsTermlist extends FCField
 		$skip_buttons_arr = ($show_buttons && ($editor_name=='jce' || $editor_name=='tinymce') && count($skip_buttons)) ? $skip_buttons : (boolean) $show_buttons;   // JCE supports skipping buttons
 
 		// Initialise property with default value
-		if (!$field->value || (count($field->value) === 1 && $field->value[0] === null))
+		if (!$field->value || (count($field->value) === 1 && reset($field->value) === null))
 		{
 			$field->value = array();
 			$field->value[0]['title'] = $default_title;
@@ -178,6 +187,7 @@ class plgFlexicontent_fieldsTermlist extends FCField
 			jQuery(document).ready(function(){
 				jQuery('#sortables_".$field->id."').sortable({
 					handle: '.fcfield-drag-handle',
+					cancel: false,
 					/*containment: 'parent',*/
 					tolerance: 'pointer'
 					".($fields_box_placing ? "
@@ -213,7 +223,9 @@ class plgFlexicontent_fieldsTermlist extends FCField
 				newField.find('.fc-has-value').removeClass('fc-has-value');
 
 				// New element's field name and id
-				var element_id = '" . $elementid . "_' + uniqueRowNum" . $field->id . ";
+				var uniqueRowN = uniqueRowNum" . $field->id . ";
+				var element_id = '" . $elementid . "_' + uniqueRowN;
+				var fname_pfx  = '" . $fieldname . "[' + uniqueRowN + ']';
 				";
 
 			// NOTE: HTML tag id of this form element needs to match the -for- attribute of label HTML tag of this FLEXIcontent field, so that label will be marked invalid when needed
@@ -224,7 +236,7 @@ class plgFlexicontent_fieldsTermlist extends FCField
 				termtitle_dv && termtitle_dv.length ?
 					termtitle.val(termtitle_dv) :
 					termtitle.val('') ;
-				termtitle.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][title]');
+				termtitle.attr('name', fname_pfx + '[title]');
 				termtitle.attr('id', element_id + '_title');
 
 				// Update the new term description
@@ -324,7 +336,7 @@ class plgFlexicontent_fieldsTermlist extends FCField
 				var mce_fieldname_text_sfx = mce_fieldname_text ? '[' + mce_fieldname_text + ']' : '';
 				var theArea = newField.find('.fc_'+boxClass).find('textarea');
 				theArea.val('');
-				theArea.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][text]' + mce_fieldname_text_sfx);
+				theArea.attr('name', fname_pfx + '[text]' + mce_fieldname_text_sfx);
 				theArea.attr('id', element_id + '_text');
 
 				// Update the labels
@@ -444,23 +456,16 @@ class plgFlexicontent_fieldsTermlist extends FCField
 		}
 
 
-
-		// Added field's custom CSS / JS
-		if ($multiple) $js .= "
-			var uniqueRowNum".$field->id."	= ".count($field->value).";  // Unique row number incremented only
-			var rowCount".$field->id."	= ".count($field->value).";      // Counts existing rows to be able to limit a max number of values
-			var maxValues".$field->id." = ".$max_values.";
-		";
-		if ($js)  $document->addScriptDeclaration($js);
-		if ($css) $document->addStyleDeclaration($css);
-
-
 		/**
 		 * Create field's HTML display for item form
 		 */
 
 		$field->html = array();
 		$n = 0;
+
+		// These are unused in this field
+		$skipped_vals = array();
+		$per_val_js   = '';
 
 		foreach ($field->value as $value)
 		{
@@ -512,7 +517,7 @@ class plgFlexicontent_fieldsTermlist extends FCField
 				</div>';
 
 			$field->html[] = '
-				'.(!$add_ctrl_btns ? '' : '
+				' . (!$add_ctrl_btns ? '' : '
 				<div class="'.$input_grp_class.' fc-xpended-btns">
 					'.$move2.'
 					'.$remove_button.'
@@ -527,6 +532,27 @@ class plgFlexicontent_fieldsTermlist extends FCField
 			$n++;
 			if (!$multiple) break;  // multiple values disabled, break out of the loop, not adding further values even if the exist
 		}
+
+		// Add per value JS
+		if ($per_val_js)
+		{
+			$js .= "
+			jQuery(document).ready(function()
+			{
+				" . $per_val_js . "
+			});
+			";
+		}
+
+		// Add field's custom CSS / JS
+		if ($multiple) $js .= "
+			var uniqueRowNum".$field->id."	= ".count($field->value).";  // Unique row number incremented only
+			var rowCount".$field->id."	= ".count($field->value).";      // Counts existing rows to be able to limit a max number of values
+			var maxValues".$field->id." = ".$max_values.";
+		";
+		if ($js)  $document->addScriptDeclaration($js);
+		if ($css) $document->addStyleDeclaration($css);
+
 
 		// Do not convert the array to string if field is in a group
 		if ($use_ingroup);
@@ -553,6 +579,19 @@ class plgFlexicontent_fieldsTermlist extends FCField
 			$field->html = '<div class="fcfieldval_container valuebox fcfieldval_container_'.$field->id.'">
 				' . (isset($field->html[-1]) ? $field->html[-1] : '') . $field->html[0] . '
 			</div>';
+		}
+
+		if (!$use_ingroup)
+		{
+			$field->html = ($show_usage && $field_notes
+				? ' <div class="alert alert-info fc-small fc-iblock">'.$field_notes.'</div><div class="fcclear"></div>'
+				: ''
+			) . $field->html;
+		}
+
+		if (count($skipped_vals))
+		{
+			$app->enqueueMessage( JText::sprintf('FLEXI_FIELD_DATE_EDIT_VALUES_SKIPPED', $field->label, implode(',',$skipped_vals)), 'notice' );
 		}
 	}
 

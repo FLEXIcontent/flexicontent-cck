@@ -86,7 +86,7 @@ class plgFlexicontent_fieldsLinkslist extends FCField
 		{
 			$field->value = explode(',', $default_values);
 		}
-		elseif (!$field->value || (count($field->value) === 1 && $field->value[0] === null))
+		elseif (!$field->value || (count($field->value) === 1 && reset($field->value) === null))
 		{
 			$field->value = array();
 			$field->value[0] = '';

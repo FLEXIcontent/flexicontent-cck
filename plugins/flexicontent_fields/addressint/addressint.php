@@ -364,6 +364,7 @@ class plgFlexicontent_fieldsAddressint extends FCField
 			jQuery(document).ready(function(){
 				jQuery('#sortables_".$field->id."').sortable({
 					handle: '.fcfield-drag-handle',
+					cancel: false,
 					/*containment: 'parent',*/
 					tolerance: 'pointer'
 					".($field->parameters->get('fields_box_placing', 1) ? "
@@ -695,7 +696,7 @@ class plgFlexicontent_fieldsAddressint extends FCField
 		}
 
 
-		// Added field's custom CSS / JS
+		// Add field's custom CSS / JS
 		$js .= "
 			function enableField".$field->id."(el, groupval_box, fieldval_box)
 			{
@@ -768,7 +769,7 @@ class plgFlexicontent_fieldsAddressint extends FCField
 		}
 
 
-		// Added field's custom CSS / JS
+		// Add field's custom CSS / JS
 		if ($multiple) $js .= "
 			var uniqueRowNum".$field->id."	= ".count($field->value).";  // Unique row number incremented only
 			var rowCount".$field->id."	= ".count($field->value).";      // Counts existing rows to be able to limit a max number of values

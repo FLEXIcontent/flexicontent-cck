@@ -110,6 +110,7 @@ class plgFlexicontent_fieldsFieldgroup extends FCField
 			jQuery(document).ready(function(){
 				jQuery('#sortables_".$field->id."').sortable({
 					handle: '.fcfield-drag-handle',
+					cancel: false,
 					/*containment: 'parent',*/
 					tolerance: 'pointer'
 					".($field->parameters->get('fields_box_placing', 1) ? "

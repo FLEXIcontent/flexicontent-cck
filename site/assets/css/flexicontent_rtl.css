@@ -645,9 +645,9 @@ body .nowrap_hidden {
 #flexicontent .fc-floated-labels-box > input.fc-floated-lbl-input {
 	font-size: 14px;
 	width: 200px;
-	height: 16px;
-	line-height: 16px;
-	padding: 16px 0px 4px 8px;
+	height: auto;
+	line-height: 1em;
+	padding: 0.5em 0.5em 0.25em 0.5em;
 	border: 1px solid gray;
 	border-radius: 4px;
 }
@@ -668,11 +668,14 @@ body .nowrap_hidden {
 	top: 0px;
 }
 #flexicontent .fc-floated-labels-box > label.fc-floated-lbl.fc-has-value {
-	background: white;
-	top: -9px;
-	right: 8px;
+	background: #f0f0f0;
+	color: black;
+	top: -0.8em;
+	left: 0.5em;
 	font-size: 12px;
+	line-height: 1em;
 	opacity: 1;
+	padding: 0.15em 0.25em 0.15em 0.25em;
 }
 #flexicontent .fc-floated-labels-box > label.fc-floated-lbl.fc-lbl-external {
 	top: -2px;
@@ -2063,7 +2066,6 @@ h3.themes-title small {
 }
 .pane-disabled {
 	opacity: 0.4;
-	filter: alpha(opacity=40);
 	font-style: oblique;
 }
 div.records_container,
@@ -2133,7 +2135,6 @@ ul.fcrecords {
 .records_container > ul > li.fcrecord > .fcrecord_prop.fcrec_unused {
 	width: 100px;
 	opacity: 0.65;
-	filter: alpha(opacity=65);
 }
 .records_container > ul > li.fcrecord,
 .positions_container > ul > li.fields {
@@ -2186,7 +2187,6 @@ ul.fcrecords {
 	cursor: move;
 	border: 0;
 	opacity: 0.8;
-	filter: alpha(opacity=80);
 }
 .records_container > ul > li.fcrecord .addfield_handle.fc_after {
 	background: url("../images/insert_after_180.png") no-repeat scroll 50% 50% #f0f0f0;
@@ -3666,7 +3666,6 @@ div.current ul.config-option-list li fieldset {
 .prettycheckbox > a.disabled + label {
 	font-style: italic;
 	opacity: 0.4;
-	filter: alpha(opacity=40);
 }
 .select2-container .select2-choice {
 	padding: 0 0 0 8px !important;
@@ -3941,7 +3940,6 @@ div .fc_field_unsused_val .fc_ifield_val_txt {
 }
 div .fc_field_unsused_val .fc_ifield_val_txt {
 	opacity: 0.7;
-	filter: alpha(opacity=70);
 }
 div .fc_field_unsused_val [class^="fc-icon-"],
 div .fc_field_unsused_val [class*=" fc-icon-"],

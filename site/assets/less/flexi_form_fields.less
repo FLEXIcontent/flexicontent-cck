@@ -139,11 +139,11 @@ div.container_fcfield div.toggle_all_values_buttons_box {
 
 /* FIELD: (sortable) currently having single value, disable drag handle */
 #flexicontent ul.fcfield-sortables > li:only-child {
-	span.fcfield-drag-handle:not(.fcfont-icon) {
+	.fcfield-drag-handle:not(.fcfont-icon) {
 		background: url(../images/move3.png) 50% 50% no-repeat;
 		cursor: default !important;
 	}
-	span.fcfield-drag-handle.fcfont-icon {
+	.fcfield-drag-handle.fcfont-icon {
 		background: none;
 		color: #aaa;
 		cursor: default;
@@ -275,32 +275,58 @@ div.container_fcfield div.toggle_all_values_buttons_box {
 }
 
 
+/*
+// This is not needed :before and :after are decorative only and are ignored by screen readers, etc
+@media reader, speech, aural {
+	body [class^="fcfield-"].fcfont-icon:before,
+	body [class*=" fcfield-"].fcfont-icon:before,
+	body [class^="fcfield-"].fcfont-icon:after,
+	body [class*=" fcfield-"].fcfont-icon:after,
+	ul.fcfield-sortables > li [class^="fcfield-"].fcfont-icon:before,
+	ul.fcfield-sortables > li [class*=" fcfield-"].fcfont-icon:before,
+	ul.fcfield-sortables > li [class^="fcfield-"].fcfont-icon:after,
+	ul.fcfield-sortables > li [class*=" fcfield-"].fcfont-icon:after {
+		speak: never;
+		pointer-events: none;
+		visibility: hidden;
+	}
+}*/
+
 #flexicontent {
 	/* FIELDs: various buttons */
-	span[class^="fcfield-"].fcfont-icon,
-	span[class*=" fcfield-"].fcfont-icon,
-	ul.fcfield-sortables > li span[class^="fcfield-"].fcfont-icon,
-	ul.fcfield-sortables > li span[class*=" fcfield-"].fcfont-icon {
+	div [class^="fcfield-"].fcfont-icon,
+	div [class*=" fcfield-"].fcfont-icon,
+	ul.fcfield-sortables > li [class^="fcfield-"].fcfont-icon,
+	ul.fcfield-sortables > li [class*=" fcfield-"].fcfont-icon {
+		background: none;
 		margin: 0px 0px 2px 0px;
 		color: #555;
 		transition: all 0.3s ease-in;
 	}
 
-	span[class^="fcfield-"].fcfont-icon:hover,
-	span[class*=" fcfield-"].fcfont-icon:hover,
-	ul.fcfield-sortables > li span[class^="fcfield-"].fcfont-icon:hover,
-	ul.fcfield-sortables > li span[class*=" fcfield-"].fcfont-icon:hover {
+	div [class^="fcfield-"].fcfont-icon:hover,
+	div [class*=" fcfield-"].fcfont-icon:hover,
+	ul.fcfield-sortables > li [class^="fcfield-"].fcfont-icon:hover,
+	ul.fcfield-sortables > li [class*=" fcfield-"].fcfont-icon:hover {
 		color: black;
 	}
 
-	span[class^="fcfield-"].fcfont-icon:before,
-	span[class*=" fcfield-"].fcfont-icon:before,
-	span[class^="fcfield-"].fcfont-icon:after,
-	span[class*=" fcfield-"].fcfont-icon:after,
-	ul.fcfield-sortables > li span[class^="fcfield-"].fcfont-icon:before,
-	ul.fcfield-sortables > li span[class*=" fcfield-"].fcfont-icon:before,
-	ul.fcfield-sortables > li span[class^="fcfield-"].fcfont-icon:after,
-	ul.fcfield-sortables > li span[class*=" fcfield-"].fcfont-icon:after {
+	div [class^="fcfield-"].fcfont-icon:focus,
+	div [class*=" fcfield-"].fcfont-icon:focus,
+	ul.fcfield-sortables > li [class^="fcfield-"].fcfont-icon:focus,
+	ul.fcfield-sortables > li [class*=" fcfield-"].fcfont-icon:focus {
+		outline: black;
+		border-color: black;
+	}
+
+	div [class^="fcfield-"].fcfont-icon:before,
+	div [class*=" fcfield-"].fcfont-icon:before,
+	div [class^="fcfield-"].fcfont-icon:after,
+	div [class*=" fcfield-"].fcfont-icon:after,
+	ul.fcfield-sortables > li [class^="fcfield-"].fcfont-icon:before,
+	ul.fcfield-sortables > li [class*=" fcfield-"].fcfont-icon:before,
+	ul.fcfield-sortables > li [class^="fcfield-"].fcfont-icon:after,
+	ul.fcfield-sortables > li [class*=" fcfield-"].fcfont-icon:after {
 		margin: 0px 0px 2px 0px;
 		background: none;
 		font-family: "IcoMoon";
@@ -308,6 +334,8 @@ div.container_fcfield div.toggle_all_values_buttons_box {
 		font-size: 14px;
 		vertical-align: top;
 		color: #555;
+		speak: never;
+		pointer-events: none;
 	}
 
 	.fc-xpended-btns.fc-bottom-btns
@@ -316,23 +344,8 @@ div.container_fcfield div.toggle_all_values_buttons_box {
 	}
 	.fc-xpended-btns {
 
-		> .fcfield-expand-view,
-		> .fcfield-drag-handle,
-		> .fcfield-list-add,
-		> .fcfield-list-del,
-		> .fcfield-placement-h,
-		> .fcfield-placement-v,
-		> .fcfield-addvalue,
-		> .fcfield-insertvalue.fc_after,
-		> .fcfield-insertvalue.fc_before,
-		> .fcfield-delvalue,
-		> .fcfield-enablevalue,
-		> .fcfield-disablevalue,
-		> .fcfield-clearvalue,
-		> .fcfield-medialurlvalue,
-		> .fcfield-selectvalue,
-		> .fcfield-uploadvalue,
-		> .fcfield-button,
+		> [class^="fcfield-"],
+		> [class*=" fcfield-"],
 		> .fcfield-button-add a {
 			font-size: 12px;
 			text-shadow: unset;
@@ -341,25 +354,11 @@ div.container_fcfield div.toggle_all_values_buttons_box {
 			min-height: 18px;
 			cursor: pointer;
 			background-color: white;
+			box-sizing: content-box;
 		}
 
-		> .fcfield-expand-view:not(.add-on):not(.input-group-addon):not(.btn),
-		> .fcfield-drag-handle:not(.add-on):not(.input-group-addon):not(.btn),
-		> .fcfield-list-add:not(.add-on):not(.input-group-addon):not(.btn),
-		> .fcfield-list-del:not(.add-on):not(.input-group-addon):not(.btn),
-		> .fcfield-placement-h:not(.add-on):not(.input-group-addon):not(.btn),
-		> .fcfield-placement-v:not(.add-on):not(.input-group-addon):not(.btn),
-		> .fcfield-addvalue:not(.add-on):not(.input-group-addon):not(.btn),
-		> .fcfield-insertvalue.fc_after:not(.add-on):not(.input-group-addon):not(.btn),
-		> .fcfield-insertvalue.fc_before:not(.add-on):not(.input-group-addon):not(.btn),
-		> .fcfield-delvalue:not(.add-on):not(.input-group-addon):not(.btn),
-		> .fcfield-enablevalue:not(.add-on):not(.input-group-addon):not(.btn),
-		> .fcfield-disablevalue:not(.add-on):not(.input-group-addon):not(.btn),
-		> .fcfield-clearvalue:not(.add-on):not(.input-group-addon):not(.btn),
-		> .fcfield-medialurlvalue:not(.add-on):not(.input-group-addon):not(.btn),
-		> .fcfield-selectvalue:not(.add-on):not(.input-group-addon):not(.btn),
-		> .fcfield-uploadvalue:not(.add-on):not(.input-group-addon):not(.btn),
-		> .fcfield-button:not(.add-on):not(.input-group-addon):not(.btn),
+		> [class^="fcfield-"]:not(.add-on):not(.input-group-addon):not(.btn),
+		> [class*=" fcfield-"]:not(.add-on):not(.input-group-addon):not(.btn),
 		> .fcfield-button-add:not(.add-on):not(.input-group-addon) a {
 			/* avoid overriding these */
 			float: none;
@@ -378,45 +377,15 @@ div.container_fcfield div.toggle_all_values_buttons_box {
 		}
 
 		/* Default hover background color if not using font icons */
-		.fcfield-expand-view:not(.fcfont-icon):hover,
-		.fcfield-drag-handle:not(.fcfont-icon):hover,
-		.fcfield-list-add:not(.fcfont-icon):hover,
-		.fcfield-list-del:not(.fcfont-icon):hover,
-		.fcfield-placement-h:not(.fcfont-icon):hover,
-		.fcfield-placement-v:not(.fcfont-icon):hover,
-		.fcfield-addvalue:not(.fcfont-icon):hover,
-		.fcfield-insertvalue.fc_after:not(.fcfont-icon):hover,
-		.fcfield-insertvalue.fc_before:not(.fcfont-icon):hover,
-		.fcfield-delvalue:not(.fcfont-icon):hover,
-		.fcfield-enablevalue:not(.fcfont-icon):hover,
-		.fcfield-disablevalue:not(.fcfont-icon):hover,
-		.fcfield-clearvalue:not(.fcfont-icon):hover,
-		.fcfield-medialurlvalue:not(.fcfont-icon):hover,
-		.fcfield-selectvalue:not(.fcfont-icon):hover,
-		.fcfield-uploadvalue:not(.fcfont-icon):hover,
-		.fcfield-button:not(.fcfont-icon):hover,
+		[class^="fcfield-"]:not(.fcfont-icon):hover,
+		[class*=" fcfield-"]:not(.fcfont-icon):hover,
 		.fcfield-button-add:not(.fcfont-icon):hover a {
 			background-color: #e0e0e0;
 		}
 
 		/* default hover styling when using font icons */
-		.fcfield-expand-view.fcfont-icon:hover,
-		.fcfield-drag-handle.fcfont-icon:hover,
-		.fcfield-list-add.fcfont-icon:hover,
-		.fcfield-list-del.fcfont-icon:hover,
-		.fcfield-placement-h.fcfont-icon:hover,
-		.fcfield-placement-v.fcfont-icon:hover,
-		.fcfield-addvalue.fcfont-icon:hover,
-		.fcfield-insertvalue.fc_after.fcfont-icon:hover,
-		.fcfield-insertvalue.fc_before.fcfont-icon:hover,
-		.fcfield-delvalue.fcfont-icon:hover,
-		.fcfield-enablevalue.fcfont-icon:hover,
-		.fcfield-disablevalue.fcfont-icon:hover,
-		.fcfield-clearvalue.fcfont-icon:hover,
-		.fcfield-medialurlvalue.fcfont-icon:hover,
-		.fcfield-selectvalue.fcfont-icon:hover,
-		.fcfield-uploadvalue.fcfont-icon:hover,
-		.fcfield-button.fcfont-icon:hover,
+		[class^="fcfield-"].fcfont-icon:hover,
+		[class*=" fcfield-"].fcfont-icon:hover,
 		.fcfield-button-add.fcfont-icon:hover a {
 			background-color: #f0f0f0;
 			background-image: -webkit-linear-gradient(top,#f0f0f0,#c0c0c0);
@@ -425,34 +394,15 @@ div.container_fcfield div.toggle_all_values_buttons_box {
 		}
 	}
 
-
-	span.fcfield-expand-view.fcfont-icon,
-	span.fcfield-drag-handle.fcfont-icon,
-	span.fcfield-list-add.fcfont-icon,
-	span.fcfield-list-del.fcfont-icon,
-	span.fcfield-placement-h.fcfont-icon,
-	span.fcfield-placement-v.fcfont-icon,
-	span.fcfield-addvalue.fcfont-icon,
-	span.fcfield-insertvalue.fc_after.fcfont-icon,
-	span.fcfield-insertvalue.fc_before.fcfont-icon,
-	span.fcfield-delvalue.fcfont-icon,
-	span.fcfield-enablevalue.fcfont-icon,
-	span.fcfield-disablevalue.fcfont-icon,
-	span.fcfield-clearvalue.fcfont-icon,
-	span.fcfield-medialurlvalue.fcfont-icon,
-	span.fcfield-selectvalue.fcfont-icon,
-	span.fcfield-uploadvalue.fcfont-icon,
-	span.fcfield-button.fcfont-icon,
-	span.fcfield-button-add.fcfont-icon a {
+	div [class^="fcfield-"].fcfont-icon,
+	div [class*=" fcfield-"].fcfont-icon,
+	.fcfield-button-add.fcfont-icon a {
 		padding: 4px 12px;
 		background-image: none;
 	}
-	span.fcfield-expand-view.fcfont-icon {
+	div .fcfield-expand-view.fcfont-icon {
 		padding: 0px;
-	}
-
-	span.fcfield-expand-view.fcfont-icon {
-		padding: 0px;
+		margin: 0px;
 	}
 
 	.buttons.btn-group {
@@ -500,19 +450,19 @@ div.container_fcfield div.toggle_all_values_buttons_box {
 		padding: 5px 12px 6px;
 		margin: 4px 2px 0px 6px;
 	}
-	span.fcfield-addvalue {
+	.fcfield-addvalue {
 		margin: 0px 2px 6px 6px;
 		padding: 6px 28px;
 		background: url(../images/plus-button.png) 8% 50% no-repeat;
 	}
-	span.fcfield-addvalue:not(.fcfont-icon) {
+	.fcfield-addvalue:not(.fcfont-icon) {
 		padding: 6px 12px 6px 32px !important;
 	}
-	span.fcfield-addvalue.fcfont-icon:before {
+	.fcfield-addvalue.fcfont-icon:before {
 		padding: 0 6px 0 0;
 		content: "*";
 	}
-	span.fcfield-addvalue:before {
+	.fcfield-addvalue:before {
 		color: LimeGreen;
 	}
 	.fcfield-addvalue.fccleared {
@@ -558,28 +508,28 @@ div.container_fcfield div.toggle_all_values_buttons_box {
 		margin: 0px 0px 2px 0px;
 		background: url(../images/plus-button.png) 50% 50% no-repeat;
 	}
-	span.fcfield-insertvalue.fc_after {
+	.fcfield-insertvalue.fc_after {
 		background: url(../images/insert_after_180.png) 50% 50% no-repeat;
 	}
-	span.fcfield-insertvalue.fc_before {
+	.fcfield-insertvalue.fc_before {
 		background: url(../images/insert_before_180.png) 50% 50% no-repeat;
 	}
-	span.fcfield-insertvalue.fc_after.fcfont-icon:before {
+	.fcfield-insertvalue.fc_after.fcfont-icon:before {
 		content: "]";
 		font-size: 8px !important;
 	}
-	span.fcfield-insertvalue.fc_before.fcfont-icon:before {
+	.fcfield-insertvalue.fc_before.fcfont-icon:before {
 		content: "\e207";
 	}
-	span.fcfield-insertvalue.fc_after.fcfont-icon:after {
+	.fcfield-insertvalue.fc_after.fcfont-icon:after {
 		content: " \6c";
 	}
-	span.fcfield-insertvalue.fc_before.fcfont-icon:after {
+	.fcfield-insertvalue.fc_before.fcfont-icon:after {
 		content: " ]";
 		font-size: 8px !important;
 	}
-	span.fcfield-insertvalue:before,
-	span.fcfield-insertvalue:after {
+	.fcfield-insertvalue:before,
+	.fcfield-insertvalue:after {
 		color: #555;
 	}
 
@@ -591,7 +541,7 @@ div.container_fcfield div.toggle_all_values_buttons_box {
 		min-width: 16px;
 		vertical-align: middle;
 	}
-	span.fcfield-expand-view.fcfont-icon:before {
+	.fcfield-expand-view.fcfont-icon:before {
 		content: "\68";
 		vertical-align: middle;
 		font-size: 100%;
@@ -602,10 +552,10 @@ div.container_fcfield div.toggle_all_values_buttons_box {
 		margin: 0px 0px 2px 0px;
 		background: url(../images/delete.png) 50% 50% no-repeat;
 	}
-	span.fcfield-delvalue.fcfont-icon:before {
+	.fcfield-delvalue.fcfont-icon:before {
 		content: "I";
 	}
-	span.fcfield-delvalue:before {
+	.fcfield-delvalue:before {
 		color: FireBrick;
 	}
 
@@ -617,11 +567,11 @@ div.container_fcfield div.toggle_all_values_buttons_box {
 	.fcfield-enablevalue:not(.fcfont-icon) {
 		padding: 4px 4px 4px 32px !important;
 	}
-	span.fcfield-enablevalue.fcfont-icon:before {
+	.fcfield-enablevalue.fcfont-icon:before {
 		padding: 0 6px 0 0;
 		content: "\2b";
 	}
-	span.fcfield-enablevalue:before {
+	.fcfield-enablevalue:before {
 		color: darkgreen;
 	}
 
@@ -633,11 +583,11 @@ div.container_fcfield div.toggle_all_values_buttons_box {
 	.fcfield-disablevalue:not(.fcfont-icon) {
 		padding: 4px 4px 4px 32px !important;
 	}
-	span.fcfield-disablevalue.fcfont-icon:before {
+	.fcfield-disablevalue.fcfont-icon:before {
 		padding: 0 6px 0 0;
 		content: "\49";
 	}
-	span.fcfield-disablevalue:before {
+	.fcfield-disablevalue:before {
 		color: darkorange;
 	}
 
@@ -646,10 +596,10 @@ div.container_fcfield div.toggle_all_values_buttons_box {
 		margin: 0px 0px 2px 0px;
 		background: url(../images/layout_delete.png) 50% 50% no-repeat;
 	}
-	span.fcfield-clearvalue.fcfont-icon:before {
+	.fcfield-clearvalue.fcfont-icon:before {
 		content: "\e217";
 	}
-	span.fcfield-clearvalue:before {
+	.fcfield-clearvalue:before {
 		color: #555;
 	}
 
@@ -658,10 +608,10 @@ div.container_fcfield div.toggle_all_values_buttons_box {
 		margin: 0px 0px 2px 0px;
 		background: url(../images/layout.png) 50% 50% no-repeat;
 	}
-	span.fcfield-medialurlvalue.fcfont-icon:before {
+	.fcfield-medialurlvalue.fcfont-icon:before {
 		content: "\e015";
 	}
-	span.fcfield-medialurlvalue:before {
+	.fcfield-medialurlvalue:before {
 		color: #555;
 	}
 
@@ -670,10 +620,10 @@ div.container_fcfield div.toggle_all_values_buttons_box {
 		margin: 0px 0px 2px 0px;
 		background: url(../images/magnifier.png) 50% 50% no-repeat;
 	}
-	span.fcfield-selectvalue.fcfont-icon:before {
+	.fcfield-selectvalue.fcfont-icon:before {
 		content: "\53";
 	}
-	span.fcfield-selectvalue:before {
+	.fcfield-selectvalue:before {
 		color: black;
 	}
 
@@ -696,13 +646,13 @@ div.container_fcfield div.toggle_all_values_buttons_box {
 		color: white;
 	}
 
-	span.fcfield-uploadvalue.fcfont-icon:before {
+	.fcfield-uploadvalue.fcfont-icon:before {
 		content: "\e022";
 	}
-	span.fcfield-uploadvalue.active.fcfont-icon:before {
+	.fcfield-uploadvalue.active.fcfont-icon:before {
 		color: white;
 	}
-	span.fcfield-uploadvalue:before {
+	.fcfield-uploadvalue:before {
 		color: black;
 	}
 
@@ -729,7 +679,7 @@ div.container_fcfield div.toggle_all_values_buttons_box {
 		cursor: move;
 		background: url(../images/move2.png) 50% 50% no-repeat;
 	}
-	span.fcfield-drag-handle.fcfont-icon:before {
+	.fcfield-drag-handle.fcfont-icon:before {
 		content: "z";
 	}
 }
