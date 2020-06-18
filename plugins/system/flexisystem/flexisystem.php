@@ -2664,7 +2664,7 @@ class plgSystemFlexisystem extends JPlugin
 				. ((int)$type)
 				. ')';
 			$query = 'INSERT INTO #__flexicontent_favourites'
-				. ' (itemid, userid, type) VALUES ' . implode($vals, ',');
+				. ' (itemid, userid, type) VALUES ' . implode(',', $vals);
 			$db->setQuery($query);
 			try {
 				$db->execute();

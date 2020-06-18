@@ -496,20 +496,20 @@ class FLEXIUtilities
 	 * @return utf8 ord
 	 */
 	static function uniord($c) {
-		$h = ord($c{0});
+		$h = ord($c[0]);
 		if ($h <= 0x7F) {
 			return $h;
 		} else if ($h < 0xC2) {
 			return false;
 		} else if ($h <= 0xDF) {
-			return ($h & 0x1F) << 6 | (ord($c{1}) & 0x3F);
+			return ($h & 0x1F) << 6 | (ord($c[1]) & 0x3F);
 		} else if ($h <= 0xEF) {
-			return ($h & 0x0F) << 12 | (ord($c{1}) & 0x3F) << 6
-			| (ord($c{2}) & 0x3F);
+			return ($h & 0x0F) << 12 | (ord($c[1]) & 0x3F) << 6
+			| (ord($c[2]) & 0x3F);
 		} else if ($h <= 0xF4) {
-			return ($h & 0x0F) << 18 | (ord($c{1}) & 0x3F) << 12
-			| (ord($c{2}) & 0x3F) << 6
-			| (ord($c{3}) & 0x3F);
+			return ($h & 0x0F) << 18 | (ord($c[1]) & 0x3F) << 12
+			| (ord($c[2]) & 0x3F) << 6
+			| (ord($c[3]) & 0x3F);
 		} else {
 			return false;
 		}
@@ -599,20 +599,20 @@ class FLEXIUtilities
 		$fieldValue="";
 		$isEnclosured = false;
 		// Field separator
-		$fld_sep_start = $field_separator{0};
+		$fld_sep_start = $field_separator[0];
 		$fld_sep_size  = strlen( $field_separator );
 		// Record (item) separator
-		$rec_sep_start = $record_separator{0};
+		$rec_sep_start = $record_separator[0];
 		$rec_sep_size  = strlen( $record_separator );
 
 		for($i=0; $i<$size;$i++)
 		{
-			$char = $string{$i};
+			$char = $string[$i];
 			$addChar = "";
 
 			if($isEnclosured) {
 				if($char==$enclosure_char) {
-					if($i+1<$size && $string{$i+1}==$enclosure_char) {
+					if($i+1<$size && $string[$i+1]==$enclosure_char) {
 						// escaped char
 						$addChar=$char;
 						$i++; // dont check next char

@@ -322,14 +322,16 @@ class plgFlexicontent_fieldsToolbar extends FCField
 			// AddThis social SHARE buttons
 			// ****************************
 
-			$addthis_custom_code     = $field->parameters->get('addthis_custom_code'   .$_sfx, '');
-			$addthis_code_predefined = $field->parameters->get('addthis_code_predefined'.$_sfx, 3);
+			$addthis_custom_code     = $field->parameters->get('addthis_custom_code' . $_sfx, '');
+			$addthis_code_predefined = $field->parameters->get('addthis_code_predefined' . $_sfx, 3);
 
-			$addthis_size    = $field->parameters->get('addthis_size' .$_sfx, 20);
-			$addthis_style   = $field->parameters->get('addthis_style'.$_sfx,  1);
+			$addthis_size    = (int) $field->parameters->get('addthis_size' . $_sfx, 20);
+			$addthis_style   = (int) $field->parameters->get('addthis_style' . $_sfx, 1);
 
-			$addthis_fb_like = $field->parameters->get('addthis_fb_like'.$_sfx, 1);
-			$fb_like_resize  = $addthis_style==2 ? 0 : $field->parameters->get('addthis_fb_like_resize'.$_sfx, 1) ? 'fc_resize' : '';
+			$addthis_fb_like = (int) $field->parameters->get('addthis_fb_like' . $_sfx, 1);
+			$fb_like_resize  = $addthis_style == 2
+				? ''
+				: ($field->parameters->get('addthis_fb_like_resize' . $_sfx, 1) ? ' fc_resize' : '');
 
 			$addthis_box_style = $field->parameters->get('addthis_box_style'.$_sfx, 0);
 			$addthis_box_pos   = $field->parameters->get('addthis_box_pos'.$_sfx, 0);
@@ -352,7 +354,7 @@ class plgFlexicontent_fieldsToolbar extends FCField
 			if ($addthis_fb_like == 6)
 				$fb_like = '<a class="addthis_button_facebook"></a>';
 			else
-				$fb_like = !$addthis_fb_like ? '' : '<a class="addthis_button_facebook_like '.$fb_like_resize.'" '.$fb_like_layouts[$addthis_fb_like].' ></a>';
+				$fb_like = !$addthis_fb_like ? '' : '<a class="addthis_button_facebook_like' . $fb_like_resize . '" '.$fb_like_layouts[$addthis_fb_like].' ></a>';
 
 			if (!$addthis_custom_code)
 			{
@@ -561,9 +563,12 @@ class plgFlexicontent_fieldsToolbar extends FCField
 	{
 		$matches = NULL;
 		preg_match_all('/<img.+src=[\'"]([^\'"]+)[\'"].*>/i', $item->text, $matches);
-		$imageurl = @$matches[1][0];
-		if($imageurl) {
-			if($imageurl{0} == '/') {
+		$imageurl = isset($matches[1][0]) ? $matches[1][0] : '';
+
+		if ($imageurl)
+		{
+			if ($imageurl[0] == '/')
+			{
 				$imageurls = explode('/', $imageurl);
 				$paths = array();
 				$found = false;
