@@ -409,7 +409,7 @@ if (!empty($js_perValue))
 	$js = '
 	jQuery(document).ready(function()
 	{
-		' . implode($js_perValue, "\n") . '
+		' . implode("\n", $js_perValue) . '
 	});
 	';
 	JFactory::getDocument()->addScriptDeclaration($js);

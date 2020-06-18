@@ -62,8 +62,8 @@ foreach ($values as $n => $value)
 
 	if (count($srcset))
 	{
-		$img_size_attrs .= ' srcset="' . implode($srcset, ', ') . '"';
-		$img_size_attrs .= ' sizes="' . implode($_sizes, ', ') . '"';
+		$img_size_attrs .= ' srcset="' . implode(', ', $srcset) . '"';
+		$img_size_attrs .= ' sizes="' . implode(', ', $_sizes) . '"';
 	}
 
 	// Inform browser of real images sizes and of desired image size
