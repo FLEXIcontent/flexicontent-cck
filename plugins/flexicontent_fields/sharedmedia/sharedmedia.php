@@ -761,7 +761,7 @@ class plgFlexicontent_fieldsSharedmedia extends FCField
 		";*/
 
 		static $js_added = null;
-		if ($js_added[$field->id] === null)
+		if ($js_added === null)
 		{
 			$js_added = true;
 			//$document->addScript('https://www.youtube.com/iframe_api');

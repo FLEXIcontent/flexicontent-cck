@@ -296,7 +296,7 @@ class plgFlexicontent_fieldsAddressint extends FCField
 
 			if (count($ac_country_allowed_list))
 			{
-				$conf_ops[] = 'country:[\'' . implode($ac_country_allowed_list, "', '") . '\']';
+				$conf_ops[] = 'country:[\'' . implode("', '", $ac_country_allowed_list) . '\']';
 			}
 
 			$js = '
@@ -308,7 +308,7 @@ class plgFlexicontent_fieldsAddressint extends FCField
 
 				fcfield_addrint.configure["' . $field_name_js . '"] = function(placesAutocomplete)
 				{
-					placesAutocomplete.setComponentRestrictions({' . implode($conf_ops, ', ') . '});
+					placesAutocomplete.setComponentRestrictions({' . implode(', ', $conf_ops) . '});
 				}
 			';
 			$css = '';
@@ -328,7 +328,7 @@ class plgFlexicontent_fieldsAddressint extends FCField
 
 			if (count($ac_country_allowed_list))
 			{
-				$conf_ops[] = 'countries:[\'' . implode($ac_country_allowed_list, "', '") . '\']';
+				$conf_ops[] = 'countries:[\'' . implode("', '", $ac_country_allowed_list) . '\']';
 			}
 
 			if (!$ac_types_default)
@@ -343,7 +343,7 @@ class plgFlexicontent_fieldsAddressint extends FCField
 			$js .= '
 				fcfield_addrint.configure["' . $field_name_js . '"] = function(placesAutocomplete)
 				{
-					placesAutocomplete.configure({' . implode($conf_ops, ', ') . '});
+					placesAutocomplete.configure({' . implode(', ', $conf_ops) . '});
 				}
 			';
 

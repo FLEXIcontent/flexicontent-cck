@@ -398,7 +398,7 @@ if ($js)
 						$pcpath[] = $globalcats[$pcid]->title;
 					}
 
-					$pcpath = implode($pcpath, ' / ');
+					$pcpath = implode(' / ', $pcpath);
 				?>
 				<?php if ($row->level > 1) echo str_repeat('.&nbsp;&nbsp;&nbsp;', $row->level - 1) . '<sup>|_</sup>'; ?>
 

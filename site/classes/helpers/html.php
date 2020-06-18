@@ -258,7 +258,7 @@ class flexicontent_html
 		foreach($inc_paths as $k => $v)
 		{
 			$v = JPath::clean($v);
-			$v .= $v{strlen($v) - 1} == DS ? '' : DS;
+			$v .= $v[strlen($v) - 1] == DS ? '' : DS;
 			$inc_paths[$k] = $v;
 		}
 

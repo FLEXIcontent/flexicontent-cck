@@ -409,7 +409,7 @@ if ($js)
 						$pcpath[] = $globalcats[$pcid]->title;
 					}
 
-					$pcpath = implode($pcpath, ' / ');
+					$pcpath = implode(' / ', $pcpath);
 				?>
 				<span class="<?php echo $this->tooltip_class; ?>" title="<?php echo JHtml::tooltipText(JText::_('FLEXI_SELECT'), $row->title . '<br/><br/>' . $pcpath, 0, 1); ?>">
 
