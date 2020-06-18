@@ -335,6 +335,7 @@ if ($leadnum) :
 		$rowcount = 0;
 		for ($i=0; $i < $leadnum; $i++) :
 			$item = $items[$i];
+			$src = '';
 			$fc_item_classes = 'fc_newslist_item';
 			if ($doing_cat_order)
      		$fc_item_classes .= ($i==0 || ($items[$i-1]->rel_catid != $items[$i]->rel_catid) ? ' fc_cat_item_1st' : '');
@@ -366,14 +367,14 @@ if ($leadnum) :
 					$src = '';  // Clear src no rendering needed
 					$_thumb_w = $_thumb_h = 0;
 				}
-				elseif ($lead_image_custom_url)
+				if (!$src && $lead_image_custom_url)
 				{
 					@list($fieldname, $varname) = preg_split('/##/',$lead_image_custom_url);
 					$fieldname = trim($fieldname); $varname = trim($varname);
 					$varname = $varname ? $varname : 'display';
 					$src =  FlexicontentFields::getFieldDisplay($item, $fieldname, null, $varname, 'category');
 				}
-				elseif ($img_field_name)
+				if (!$src && $lead_image_fallback_img)
 				{
 					// Render method 'display_NNNN_src' to avoid CSS/JS being added to the page
 					$img_field = false;
@@ -400,7 +401,7 @@ if ($leadnum) :
 						$src = flexicontent_html::extractimagesrc($item);
 					}
 
-					if(!$src && $lead_fallback_field && $lead_image_fallback_img==3) {
+					if(!$src && $lead_fallback_field) {
 						$image_url2 = FlexicontentFields::getFieldDisplay($item, $lead_fallback_field, $values=null, $method='display_'.$img_field_size.'_src', 'category');
 						$src2 = '';
 						$thumb2 = '';
@@ -421,11 +422,11 @@ if ($leadnum) :
 						}
 					}
 				}
-
-				// Use default image form layout parameters
-				if (!$src && isset($lead_type_default_imgs[$item->typealias]))  $src = $lead_type_default_imgs[$item->typealias];
-				if (!$src && isset($lead_type_default_imgs['_OTHER_']))         $src = $lead_type_default_imgs['_OTHER_'];
-
+				if(!$src && ($lead_image_fallback_img!=2)) {
+					// Use default image form layout parameters
+					if (!$src && isset($lead_type_default_imgs[$item->typealias]))  $src = $lead_type_default_imgs[$item->typealias];
+					if (!$src && isset($lead_type_default_imgs['_OTHER_']))         $src = $lead_type_default_imgs['_OTHER_'];
+				}
 				$RESIZE_FLAG = !$this->params->get('lead_image') || !$this->params->get('lead_image_size');
 				if ( $src && $RESIZE_FLAG ) {
 					// Resize image when src path is set and RESIZE_FLAG: (a) using image extracted from item main text OR (b) not using image field's already created thumbnails
@@ -814,6 +815,7 @@ if ($count > $leadnum) :
 		$rowcount = 0;
 		for ($i = $leadnum; $i < $count; $i++) :
 			$item = $items[$i];
+			$src = '';
 			$fc_item_classes = 'fc_newslist_item';
 			if ($doing_cat_order)
      		$fc_item_classes .= ($i==0 || ($items[$i-1]->rel_catid != $items[$i]->rel_catid) ? ' fc_cat_item_1st' : '');
@@ -843,14 +845,14 @@ if ($count > $leadnum) :
 					$src = '';  // Clear src no rendering needed
 					$_thumb_w = $_thumb_h = 0;
 				}
-				elseif ($intro_image_custom_url)
+				if (!$src && $intro_image_custom_url)
 				{
 					@list($fieldname, $varname) = preg_split('/##/',$intro_image_custom_url);
 					$fieldname = trim($fieldname); $varname = trim($varname);
 					$varname = $varname ? $varname : 'display';
 					$src =  FlexicontentFields::getFieldDisplay($item, $fieldname, null, $varname, 'category');
 				}
-				elseif ($img_field_name)
+				if (!$src && $intro_image_fallback_img)
 				{
 					// Render method 'display_NNNN_src' to avoid CSS/JS being added to the page
 					$img_field = false;
@@ -877,7 +879,7 @@ if ($count > $leadnum) :
 						$src = flexicontent_html::extractimagesrc($item);
 					}
 
-					if(!$src && $intro_fallback_field && $intro_image_fallback_img==3) {
+					if(!$src && $intro_fallback_field) {
 						$image_url2 = FlexicontentFields::getFieldDisplay($item, $intro_fallback_field, $values=null, $method='display_'.$img_field_size.'_src', 'category');
 						$src2 = '';
 						$thumb2 = '';
@@ -898,11 +900,11 @@ if ($count > $leadnum) :
 						}
 					}
 				}
-
-				// Use default image form layout parameters
-				if (!$src && isset($intro_type_default_imgs[$item->typealias]))  $src = $intro_type_default_imgs[$item->typealias];
-				if (!$src && isset($intro_type_default_imgs['_OTHER_']))         $src = $intro_type_default_imgs['_OTHER_'];
-
+				if(!$src && ($intro_image_fallback_img!=2)) {
+					// Use default image form layout parameters
+					if (!$src && isset($intro_type_default_imgs[$item->typealias]))  $src = $intro_type_default_imgs[$item->typealias];
+					if (!$src && isset($intro_type_default_imgs['_OTHER_']))         $src = $intro_type_default_imgs['_OTHER_'];
+				}
 				$RESIZE_FLAG = !$this->params->get('intro_image') || !$this->params->get('intro_image_size');
 				if ( $src && $RESIZE_FLAG ) {
 					// Resize image when src path is set and RESIZE_FLAG: (a) using image extracted from item main text OR (b) not using image field's already created thumbnails
