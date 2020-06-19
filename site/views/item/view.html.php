@@ -474,6 +474,7 @@ class FlexicontentViewItem extends JViewLegacy
 		$user       = JFactory::getUser();
 		$db         = JFactory::getDbo();
 		$uri        = JUri::getInstance();
+		$task       = $jinput->getCmd('task');
 		$cparams    = JComponentHelper::getParams('com_flexicontent');
 
 		// Get url vars and some constants
@@ -592,6 +593,11 @@ class FlexicontentViewItem extends JViewLegacy
 			$app->enqueueMessage($model->getError(), 'warning');
 			$returnURL = isset($_SERVER['HTTP_REFERER']) && flexicontent_html::is_safe_url($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : JUri::base();
 			$app->redirect( $returnURL );
+		}
+
+		if ($task === 'edit' && !$item->id)
+		{
+			throw new Exception(JText::sprintf('FLEXI_REQUESTED_CONTENT_OR_VIEW_NOT_FOUND', 'item'), 404);
 		}
 
 		if ( $print_logging_info ) $fc_run_times['get_item_data'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;

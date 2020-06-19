@@ -157,6 +157,28 @@ class FlexicontentController extends JControllerLegacy
 			? $model->get('type_id')
 			: (int) $data['type_id'];
 
+
+		/**
+		 * Always Set frontend record form as default return URL
+		 */
+		/*
+		if ($app->isClient('site'))
+		{
+			$Itemid = $this->input->get('Itemid', 0, 'int');  // Maintain current menu item if this was given
+
+			if (!$isnew)
+			{
+				$item_url = JRoute::_(FlexicontentHelperRoute::getItemRoute($record->slug, $record->categoryslug, $Itemid));
+				$this->returnURL = $item_url . ( strstr($item_url, '?') ? '&' : '?' ) . 'task=edit';
+			}
+			elseif ($Itemid)
+			{
+				$this->returnURL = JRoute::_('index.php?Itemid=' . $Itemid);
+			}
+		}
+		*/
+
+
 		// The save2copy task needs to be handled slightly differently.
 		if ($this->task === 'save2copy')
 		{
@@ -807,6 +829,20 @@ class FlexicontentController extends JControllerLegacy
 			$after_maincat = $model->get('catid');
 		}
 
+		/**
+		 * Track category changes and nullify return URL
+		 */
+		if ($app->isClient('site'))
+		{
+			$cats_changed = $session->get('cats_changed', array(), 'flexicontent');
+
+			if (!empty($cats_altered))
+			{
+				$cats_changed[$this->record_name][$model->get('id')] = -1;
+				$session->set('cats_changed', $cats_changed, 'flexicontent');
+			}
+		}
+
 
 		/**
 		 * We need to get emails to notify, from Global/item's Content Type parameters -AND- from item's categories parameters
@@ -942,7 +978,7 @@ class FlexicontentController extends JControllerLegacy
 		 */
 
 		// This will clear JAcesse cache by calling: Access::clearStatics(), but it will also clear caches inside relevant inside JUser
-		$user->clearAccessRights(); 
+		$user->clearAccessRights();
 
 		// Now we can recalculate
 		$asset   = 'com_content.article.' . $model->get('id');
@@ -1031,6 +1067,27 @@ class FlexicontentController extends JControllerLegacy
 
 
 		/**
+		 * Check if Content Item is being closed, and clear some flags, like cats_changed
+		 */
+		if ($app->isClient('site'))
+		{
+			if (!in_array($this->task, array('apply', 'apply_type')))
+			{
+				$cats_changed = $session->get('cats_changed', array(), 'flexicontent');
+				//echo '<pre>'; print_r($cats_changed); exit;
+
+				if (!empty($cats_changed[$this->record_name][$model->get('id')]))
+				{
+					unset($cats_changed[$this->record_name][$model->get('id')]);
+					$session->set('cats_changed', $cats_changed, 'flexicontent');
+
+					$this->returnURL = null;
+				}
+			}
+		}
+
+
+		/**
 		 * Saving is done, decide where to redirect
 		 */
 
@@ -1054,7 +1111,7 @@ class FlexicontentController extends JControllerLegacy
 					// Set task to 'edit', and pass original referer back to avoid making the form itself the referer, but also check that it is safe enough
 					$link = $item_url
 						. ( strstr($item_url, '?') ? '&' : '?' ) . 'task=edit'
-						. '&return='.base64_encode($this->returnURL);
+						. '&return='.base64_encode($this->returnURL ?: $item_url);
 				}
 				break;
 
@@ -1070,11 +1127,11 @@ class FlexicontentController extends JControllerLegacy
 				{
 					// Create the URL, maintain current menu item if this was given
 					$Itemid = $this->input->get('Itemid', 0, 'int');
-					$item_url = 'index.php?option=com_flexicontent&view=item&task=add' .
-						'&typeid=' . $model->get('type_id') .
-						'&maincat=' . $model->get('catid') .
-						'&Itemid=' . $Itemid .
-						'&return='.base64_encode($this->returnURL);
+					$item_url = 'index.php?option=com_flexicontent&view=item&task=add'
+						. '&typeid=' . $model->get('type_id')
+						. '&maincat=' . $model->get('catid')
+						. '&Itemid=' . $Itemid
+						. '&return='.base64_encode($this->returnURL ?: $item_url);
 
 					// Set task to 'edit', and pass original referer back to avoid making the form itself the referer, but also check that it is safe enough
 					$link = JRoute::_($item_url, false);
@@ -1097,7 +1154,8 @@ class FlexicontentController extends JControllerLegacy
 				// REDIRECT CASE: Save and preview the latest version
 				elseif ($this->task === 'save_a_preview')
 				{
-					$link = JRoute::_(FlexicontentHelperRoute::getItemRoute($model->get('id') . ':' . $model->get('alias'), $model->get('catid'), 0, $model->_item) . '&amp;preview=1', false);
+					// Do not use SLUG !!! since we maybe previewing a non-current version !!
+					$link = JRoute::_(FlexicontentHelperRoute::getItemRoute($model->get('id') . ':' . $model->get('alias'), $model->get('catid'), 0, $item) . '&amp;preview=1', false);
 				}
 
 				// REDIRECT CASE: Return to the form 's original referer after item saving
@@ -1106,7 +1164,9 @@ class FlexicontentController extends JControllerLegacy
 					$msg = $newly_submitted_item
 						? JText::_('FLEXI_THANKS_SUBMISSION')
 						: JText::_('FLEXI_ITEM_SAVED');
-					$link = $this->returnURL;
+
+					$link = $this->returnURL ?:
+						JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, 0, $item), false);
 				}
 				break;
 		}
@@ -1401,7 +1461,7 @@ class FlexicontentController extends JControllerLegacy
 
 		// Try to load by unique ID or NAME
 		else
-		{	
+		{
 		}
 
 		$model->isForm = true;
@@ -2517,7 +2577,7 @@ class FlexicontentController extends JControllerLegacy
 
 					/**
 					 * Just redirect to the file URL. If force URL download is disabled, or does not match criteria.
-					 * Also do not force is file size is suspiciously small, propably it was calculated correctly !! 
+					 * Also do not force is file size is suspiciously small, propably it was calculated correctly !!
 					 */
 					if (!$force_url_download || !isset($force_url_download_exts[$ext]) || $file->size < 2048 || $file->size > ($force_url_download_max_kbs * 1024))
 					{
@@ -2822,7 +2882,7 @@ class FlexicontentController extends JControllerLegacy
 		$pdf = false;
 		$dlfile->abspath_tmp = false;
 		$dlfile->size_tmp = false;
-		
+
 		// Do not try to stamp URLs
 		if (!$dlfile->url && $dlfile->ext == 'pdf' && $fields_conf[$field_id]->get('stamp_pdfs', 0) && $dlfile->stamp)
 		{
@@ -2865,7 +2925,7 @@ class FlexicontentController extends JControllerLegacy
 				}
 			}
 		}
-		
+
 		// IF $pdf is non-empty, then it was created above
 		if ($pdf)
 		{
@@ -3424,28 +3484,31 @@ class FlexicontentController extends JControllerLegacy
 	 *
 	 * @since 3.3
 	 */
-	protected function _getReturnUrl()
+	protected function _getReturnUrl($default = false)
 	{
 		$this->input->get('task', '', 'cmd') !== __FUNCTION__ or die(__FUNCTION__ . ' : direct call not allowed');
 
-		// Get HTTP request variable 'return' (base64 encoded)
-		$return = $this->input->get('return', null, 'base64');
-
-		// Base64 decode the return URL
-		if ($return)
+		if (!$default)
 		{
-			$return = base64_decode($return);
-		}
+			// Get HTTP request variable 'return' (base64 encoded)
+			$return = $this->input->get('return', null, 'base64');
 
-		// Also try 'referer' (form posted, encode with htmlspecialchars)
-		else
-		{
-			$referer = $this->input->getString('referer', null);
-			$return = $referer ? htmlspecialchars_decode($referer) : null;
+			// Base64 decode the return URL
+			if ($return)
+			{
+				$return = base64_decode($return);
+			}
+
+			// Also try 'referer' (form posted, encode with htmlspecialchars)
+			else
+			{
+				$referer = $this->input->getString('referer', null);
+				$return = $referer ? htmlspecialchars_decode($referer) : null;
+			}
 		}
 
 		// Check return URL if empty or not safe and set a default one
-		if (!$return || !flexicontent_html::is_safe_url($return))
+		if (empty($return) || !flexicontent_html::is_safe_url($return))
 		{
 			$app = JFactory::getApplication();
 
@@ -3455,7 +3518,7 @@ class FlexicontentController extends JControllerLegacy
 			}
 			else
 			{
-				$return = null; //$app->isClient('administrator') ? 'index.php?option=com_flexicontent' : JUri::base();
+				$return = $app->isClient('administrator') ? 'index.php?option=com_flexicontent' : JUri::base();
 			}
 		}
 
