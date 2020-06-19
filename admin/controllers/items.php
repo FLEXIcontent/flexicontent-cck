@@ -124,6 +124,28 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 			? $model->get('type_id')
 			: (int) $data['type_id'];
 
+
+		/**
+		 * Always Set frontend record form as default return URL
+		 */
+		/*
+		if ($app->isClient('site'))
+		{
+			$Itemid = $this->input->get('Itemid', 0, 'int');  // Maintain current menu item if this was given
+
+			if (!$isnew)
+			{
+				$item_url = JRoute::_(FlexicontentHelperRoute::getItemRoute($record->slug, $record->categoryslug, $Itemid));
+				$this->returnURL = $item_url . ( strstr($item_url, '?') ? '&' : '?' ) . 'task=edit';
+			}
+			elseif ($Itemid)
+			{
+				$this->returnURL = JRoute::_('index.php?Itemid=' . $Itemid);
+			}
+		}
+		*/
+
+
 		// The save2copy task needs to be handled slightly differently.
 		if ($this->task === 'save2copy')
 		{
@@ -774,6 +796,20 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 			$after_maincat = $model->get('catid');
 		}
 
+		/**
+		 * Track category changes and nullify return URL
+		 */
+		if ($app->isClient('site'))
+		{
+			$cats_changed = $session->get('cats_changed', array(), 'flexicontent');
+
+			if (!empty($cats_altered))
+			{
+				$cats_changed[$this->record_name][$model->get('id')] = -1;
+				$session->set('cats_changed', $cats_changed, 'flexicontent');
+			}
+		}
+
 
 		/**
 		 * We need to get emails to notify, from Global/item's Content Type parameters -AND- from item's categories parameters
@@ -909,7 +945,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		 */
 
 		// This will clear JAcesse cache by calling: Access::clearStatics(), but it will also clear caches inside relevant inside JUser
-		$user->clearAccessRights(); 
+		$user->clearAccessRights();
 
 		// Now we can recalculate
 		$asset   = 'com_content.article.' . $model->get('id');
@@ -998,6 +1034,27 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 
 
 		/**
+		 * Check if Content Item is being closed, and clear some flags, like cats_changed
+		 */
+		if ($app->isClient('site'))
+		{
+			if (!in_array($this->task, array('apply', 'apply_type')))
+			{
+				$cats_changed = $session->get('cats_changed', array(), 'flexicontent');
+				//echo '<pre>'; print_r($cats_changed); exit;
+
+				if (!empty($cats_changed[$this->record_name][$model->get('id')]))
+				{
+					unset($cats_changed[$this->record_name][$model->get('id')]);
+					$session->set('cats_changed', $cats_changed, 'flexicontent');
+
+					$this->returnURL = null;
+				}
+			}
+		}
+
+
+		/**
 		 * Saving is done, decide where to redirect
 		 */
 
@@ -1021,7 +1078,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 					// Set task to 'edit', and pass original referer back to avoid making the form itself the referer, but also check that it is safe enough
 					$link = $item_url
 						. ( strstr($item_url, '?') ? '&' : '?' ) . 'task=edit'
-						. '&return='.base64_encode($this->returnURL);
+						. '&return='.base64_encode($this->returnURL ?: $item_url);
 				}
 				break;
 
@@ -1037,11 +1094,11 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 				{
 					// Create the URL, maintain current menu item if this was given
 					$Itemid = $this->input->get('Itemid', 0, 'int');
-					$item_url = 'index.php?option=com_flexicontent&view=item&task=add' .
-						'&typeid=' . $model->get('type_id') .
-						'&maincat=' . $model->get('catid') .
-						'&Itemid=' . $Itemid .
-						'&return='.base64_encode($this->returnURL);
+					$item_url = 'index.php?option=com_flexicontent&view=item&task=add'
+						. '&typeid=' . $model->get('type_id')
+						. '&maincat=' . $model->get('catid')
+						. '&Itemid=' . $Itemid
+						. '&return='.base64_encode($this->returnURL ?: $item_url);
 
 					// Set task to 'edit', and pass original referer back to avoid making the form itself the referer, but also check that it is safe enough
 					$link = JRoute::_($item_url, false);
@@ -1064,7 +1121,8 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 				// REDIRECT CASE: Save and preview the latest version
 				elseif ($this->task === 'save_a_preview')
 				{
-					$link = JRoute::_(FlexicontentHelperRoute::getItemRoute($model->get('id') . ':' . $model->get('alias'), $model->get('catid'), 0, $model->_item) . '&amp;preview=1', false);
+					// Do not use SLUG !!! since we maybe previewing a non-current version !!
+					$link = JRoute::_(FlexicontentHelperRoute::getItemRoute($model->get('id') . ':' . $model->get('alias'), $model->get('catid'), 0, $item) . '&amp;preview=1', false);
 				}
 
 				// REDIRECT CASE: Return to the form 's original referer after item saving
@@ -1073,7 +1131,9 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 					$msg = $newly_submitted_item
 						? JText::_('FLEXI_THANKS_SUBMISSION')
 						: JText::_('FLEXI_ITEM_SAVED');
-					$link = $this->returnURL;
+
+					$link = $this->returnURL ?:
+						JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, 0, $item), false);
 				}
 				break;
 		}

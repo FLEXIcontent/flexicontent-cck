@@ -394,9 +394,9 @@ class ParentClassItem extends FCModelAdmin
 		$pk = !empty($pk) ? $pk : (int) $this->getState($this->getName().'.id');
 
 		// Set new item id, clearing item data, ONLY IF DIFFERENT than existing primary key
-		if ($pk != $this->_id)
+		if ($pk != $this->_id || $no_cache)
 		{
-			$this->setId($pk);
+			$this->setId($pk, 0, 0, null);
 		}
 
 		// --. Try to load existing item ... ZERO $force_version means unversioned data or maintain currently loaded version
@@ -608,7 +608,7 @@ class ParentClassItem extends FCModelAdmin
 
 
 		// Only unversioned items are cached, use cache if no specific version was requested
-		if ( !$version && isset($items[$pk]) )
+		if ( !$version && isset($items[$pk]) && !$no_cache)
 		{
 			//echo "********************************<br/>\n RETURNING CACHED item: {$pk}<br/> ********************************<br/><br/><br/>";
 			$this->_record = $items[$pk];
@@ -735,6 +735,12 @@ class ParentClassItem extends FCModelAdmin
 				}
 
 				$item = & $data;
+			}
+
+			// Catch case that current category ID has been changed since last checked !!
+			if (!$item->catid)
+			{
+				$item->catid = $item->maincatid;
 			}
 
 			// Retrieve voting information
@@ -995,7 +1001,7 @@ class ParentClassItem extends FCModelAdmin
 			}
 
 			// Make sure catid is in categories array
-			if (!in_array($item->catid, $item->categories))
+			if ($item->catid && !in_array($item->catid, $item->categories))
 			{
 				$item->categories[] = $item->catid;
 			}
@@ -3424,7 +3430,7 @@ class ParentClassItem extends FCModelAdmin
 
 		if (!$item->store())
 		{
-			$this->setError($this->_db->getErrorMsg());
+			$this->setError($item->getError());
 			return false;
 		}
 

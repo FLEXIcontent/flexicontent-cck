@@ -1056,6 +1056,7 @@ class _FlexicontentSiteRouter
 			$query->where('(i.language = ' . $db->Quote($language) . ' OR i.language = ' . $db->Quote('*') . ')');
 		}
 
+		//echo $alias . ' -- ' . $query . '<br>';
 		$records = $db->setQuery($query)->loadObjectList();
 
 		if (count($records) === 1 || (count($records) && $tbl === '#__content'))
@@ -1072,6 +1073,15 @@ class _FlexicontentSiteRouter
 					return (int) $record->id;
 				}
 			}
+		}
+
+		if (count($records) > 1)
+		{
+			// Make sure our language file has been loaded
+			JFactory::getLanguage()->load('com_flexicontent', JPATH_SITE, 'en-GB', true);
+			JFactory::getLanguage()->load('com_flexicontent', JPATH_SITE, null, true);
+
+			throw new Exception(JText::sprintf('FLEXI_DUPLICATE_ALIAS_FAILED_TO_FIND_UNIQUE_PAGE', ($tbl === '#__categories' ? 'category' : 'item'), $alias), 404);
 		}
 
 		return 0;
