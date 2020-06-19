@@ -377,10 +377,10 @@ class FlexicontentController extends JControllerLegacy
 				$data['cid'] = $params->get('cid_default');
 			}
 
-			// Use featured cats if these are set
-			elseif (isset($featured_cid))
+			// Use already assigned categories (existing item)
+			else
 			{
-				$featured_cid_arr = array_flip($featured_cid);
+				$featured_cid_arr = isset($data['featured_cid']) ? array_flip($data['featured_cid']) : array();
 				$sec_cid = array();
 
 				// User cannot change secondary categories, reset them, excluding featured cats and existing (possibly changed) main category
@@ -393,12 +393,6 @@ class FlexicontentController extends JControllerLegacy
 				}
 
 				$data['cid'] = $sec_cid;
-			}
-
-			// Use already assigned categories (existing item)
-			else
-			{
-				$data['cid'] = $model->get('cats');
 			}
 		}
 
