@@ -712,7 +712,7 @@
 
 		<field name="" type="separator" default="FLEXI_LAYOUT" label="" level="level1" />
 
-			<field name="clayout" type="categorylayout" default="blog" label="FLEXI_DEFAULT_CATEGORY_LAYOUT" description="FLEXI_DEFAULT_CATEGORY_LAYOUT_DESC"
+			<field name="clayout" type="categorylayout" default="blog" skipparams="1" label="FLEXI_DEFAULT_CATEGORY_LAYOUT" description="FLEXI_DEFAULT_CATEGORY_LAYOUT_DESC"
 				inline_tip="FLEXI_HOW_TO_CUSTOMIZE_LAYOUT_CONF" tip_class="" tip_img="comments.png" class="use_select2_lib" />
 			<field name="clayout_mobile" type="categorylayout" skipparams="1" enableparam="use_mobile_layouts" firstoption="FLEXI_USE_DESKTOP" default="" label="FLEXI_CHOOSE_SPECIFIC_MOBILE_LAYOUT" description="FLEXI_CHOOSE_SPECIFIC_MOBILE_LAYOUT_DESC" />
 
