@@ -39,6 +39,10 @@ class plgFlexicontent_fieldsFieldgroup extends FCField
 
 		$field->label = $field->parameters->get('label_form') ? JText::_($field->parameters->get('label_form')) : JText::_($field->label);
 
+		// Set field and item objects
+		$this->setField($field);
+		$this->setItem($item);
+
 		$use_ingroup = 0; // Field grouped should not be recursively grouped
 
 		if (!isset($field->formhidden_grp)) $field->formhidden_grp = $field->formhidden;
@@ -48,7 +52,7 @@ class plgFlexicontent_fieldsFieldgroup extends FCField
 		$form_empty_fields = $field->parameters->get('form_empty_fields', 1);
 		$form_empty_fields_text = JText::_($field->parameters->get('form_empty_fields_text', 'FLEXI_NA'));
 
-		// initialize framework objects and other variables
+		// Initialize framework objects and other variables
 		$document = JFactory::getDocument();
 		$cparams  = JComponentHelper::getParams( 'com_flexicontent' );
 		$db   = JFactory::getDbo();
@@ -63,22 +67,26 @@ class plgFlexicontent_fieldsFieldgroup extends FCField
 		$font_icon_class = $form_font_icons ? ' fcfont-icon' : '';
 
 
-		// ****************
-		// Number of values
-		// ****************
-		$multiple   = $use_ingroup || (int) $field->parameters->get('allow_multiple', 0);
-		$max_values = $use_ingroup ? 0 : (int) $field->parameters->get('max_values', 0);
-		$required   = (int) $field->parameters->get('required', 0);
-		$required   = $required ? ' required' : '';
+		/**
+		 * Number of values
+		 */
+
+		$multiple     = $use_ingroup || (int) $field->parameters->get('allow_multiple', 0);
+		$max_values   = $use_ingroup ? 0 : (int) $field->parameters->get('max_values', 0);
+		$required     = (int) $field->parameters->get('required', 0);
 		$add_position = (int) $field->parameters->get('add_position', 3);
+
+		// Classes for marking field required
+		$required_class = $required ? ' required' : '';
 
 		// If we are multi-value and not inside fieldgroup then add the control buttons (move, delete, add before/after)
 		$add_ctrl_btns = !$use_ingroup && $multiple;
+		$fields_box_placing = (int) $field->parameters->get('fields_box_placing', 1);
 
 
-		// **************
-		// Value handling
-		// **************
+		/**
+		 * Value handling
+		 */
 
 		// Get fields belonging to this field group
 		$grouped_fields = $this->getGroupFields($field);
@@ -113,7 +121,7 @@ class plgFlexicontent_fieldsFieldgroup extends FCField
 					cancel: false,
 					/*containment: 'parent',*/
 					tolerance: 'pointer'
-					".($field->parameters->get('fields_box_placing', 1) ? "
+					".($fields_box_placing ? "
 					,start: function(e) {
 						//jQuery(e.target).children().css('float', 'left');
 						//fc_setEqualHeights(jQuery(e.target), 0);
@@ -256,6 +264,7 @@ class plgFlexicontent_fieldsFieldgroup extends FCField
 				uniqueRowNum".$field->id."++;   // incremented only
 			}
 
+
 			function deleteField".$field->id."(el)
 			{
 				// Disable clicks on remove button, so that it is not reclicked, while we do the field value hide effect (before DOM removal of field value)
@@ -306,7 +315,11 @@ class plgFlexicontent_fieldsFieldgroup extends FCField
 				</span>
 			';
 			$togglers = $compact_edit==1 ? $_opener . $_closer : $_closer . $_opener;
-		} else {
+		}
+
+		// Field not multi-value
+		else
+		{
 			$remove_button = '';
 			$move2 = '';
 			$togglers = '';
@@ -408,7 +421,9 @@ class plgFlexicontent_fieldsFieldgroup extends FCField
 		// Implode form HTML as a list
 		$list_classes  = "fcfield-sortables";
 		$list_classes .= " fcfield-group";
-		if (count($field->html)) {
+
+		if (count($field->html))
+		{
 			$field->html = '<li class="fcfieldval_container valuebox fcfieldval_container_'.$field->id.'">'.
 				implode(
 				'</li><li class="fcfieldval_container valuebox fcfieldval_container_'.$field->id.'">',
@@ -416,7 +431,9 @@ class plgFlexicontent_fieldsFieldgroup extends FCField
 				).
 				'</li>';
 			$field->html = '<div id="sortables_outer_'.$field->id.'"><ul class="'.$list_classes.'" id="sortables_'.$field->id.'">' .$field->html. '</ul></div>';
-		} else {
+		}
+		else
+		{
 			$field->html = '';
 		}
 		if (!$add_position) $field->html .= '
@@ -446,7 +463,7 @@ class plgFlexicontent_fieldsFieldgroup extends FCField
 				</span>
 			</div>
 				' : '').'
-			'.$field->html;
+			' . $field->html;
 	}
 
 
@@ -457,30 +474,59 @@ class plgFlexicontent_fieldsFieldgroup extends FCField
 
 		$field->label = JText::_($field->label);
 
+		// Set field and item objects
+		$this->setField($field);
+		$this->setItem($item);
+
+
+		/**
+		 * One time initialization
+		 */
+
+		static $initialized = null;
+		static $app, $document, $option, $format, $realview;
+
+		if ($initialized === null)
+		{
+			$initialized = 1;
+
+			$app       = JFactory::getApplication();
+			$document  = JFactory::getDocument();
+			$option    = $app->input->getCmd('option', '');
+			$format    = $app->input->getCmd('format', 'html');
+			$realview  = $app->input->getCmd('view', '');
+		}
+
+		// Current view variable
+		$view = $app->input->getCmd('flexi_callview', ($realview ?: 'item'));
+		$sfx = $view === 'item' ? '' : '_cat';
+
+		// Check if field should be rendered according to configuration
+		if (!$this->checkRenderConds($prop, $view))
+		{
+			return;
+		}
+
+		// The current view is a full item view of the item
+		$isMatchedItemView = static::$itemViewId === (int) $item->id;
+
+
+		/**
+		 * Get common parameters like: itemprop, value's prefix (pretext), suffix (posttext), separator, value list open/close text (opentag, closetag)
+		 * This will replace other field values and item properties, if such are found inside the parameter texts
+		 */
+		$common_params_array = $this->getCommonParams();
+		extract($common_params_array);
+
 		// Use custom HTML display parameter
 		$display_mode = (int) $field->parameters->get( 'display_mode', 0 ) ;
 
-		// Prefix - Suffix - Separator parameters, replacing other field values if found
-		$remove_space = $field->parameters->get( 'remove_space', 0 ) ;
-		$pretext		= FlexicontentFields::replaceFieldValue( $field, $item, JText::_($field->parameters->get( 'pretext', '' )), 'pretext' );
-		$posttext		= FlexicontentFields::replaceFieldValue( $field, $item, JText::_($field->parameters->get( 'posttext', '' )), 'posttext' );
-		$separatorf	= $field->parameters->get( 'separatorf', 1 ) ;
-		$opentag		= FlexicontentFields::replaceFieldValue( $field, $item, JText::_($field->parameters->get( 'opentag', '' )), 'opentag' );
-		$closetag		= FlexicontentFields::replaceFieldValue( $field, $item, JText::_($field->parameters->get( 'closetag', '' )), 'closetag' );
-
-		// Microdata (classify the field group values for search engines)
-		// we use itemtype and not itemprop as it is more appropriate for the a grouping field
+		/**
+		 * Microdata (classify the field group values for search engines)
+		 * we use itemtype and not itemprop as it is more appropriate for the a grouping field
+		 */
 		$fieldgroup_itemtype      = $field->parameters->get('fieldgroup_itemtype');
 		$fieldgroup_itemtype_code = $fieldgroup_itemtype ? 'itemscope itemtype="http://schema.org/'.$fieldgroup_itemtype.'"' : '';
-
-		if ($pretext)
-		{
-			$pretext = $remove_space ? $pretext : $pretext . ' ';
-		}
-		if ($posttext)
-		{
-			$posttext = $remove_space ? $posttext : ' ' . $posttext;
-		}
 
 		if (!$pretext && !$posttext && !$display_mode)
 		{
@@ -492,37 +538,6 @@ class plgFlexicontent_fieldsFieldgroup extends FCField
 		{
 			$pretext = '<div '.$fieldgroup_itemtype_code.' style="display:inline-block;">'.$pretext;
 			$posttext = $posttext.'</div>';
-		}
-
-		switch($separatorf)
-		{
-			case 0:
-			$separatorf = '&nbsp;';
-			break;
-
-			case 1:
-			$separatorf = '<br class="fcclear" />';
-			break;
-
-			case 2:
-			$separatorf = '&nbsp;|&nbsp;';
-			break;
-
-			case 3:
-			$separatorf = ',&nbsp;';
-			break;
-
-			case 4:
-			$separatorf = $closetag . $opentag;
-			break;
-
-			case 5:
-			$separatorf = '';
-			break;
-
-			default:
-			$separatorf = '&nbsp;';
-			break;
 		}
 
 
@@ -808,27 +823,20 @@ class plgFlexicontent_fieldsFieldgroup extends FCField
 	public function onBeforeSaveField( &$field, &$post, &$file, &$item )
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
-
-		// field_type is not changed text field can handle this field type
-		//FLEXIUtilities::call_FC_Field_Func('text', 'onBeforeSaveField', array(&$field, &$post, &$file, &$item));
 	}
 
 
 	// Method to take any actions/cleanups needed after field's values are saved into the DB
-	public function onAfterSaveField( &$field, &$post, &$file, &$item ) {
+	public function onAfterSaveField( &$field, &$post, &$file, &$item )
+	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
-
-		// field_type is not changed text field can handle this field type
-		//FLEXIUtilities::call_FC_Field_Func('text', 'onAfterSaveField', array(&$field, &$post, &$file, &$item));
 	}
 
 
 	// Method called just before the item is deleted to remove custom item data related to the field
-	public function onBeforeDeleteField(&$field, &$item) {
+	public function onBeforeDeleteField(&$field, &$item)
+	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
-
-		// field_type is not changed text field can handle this field type
-		//FLEXIUtilities::call_FC_Field_Func('text', 'onBeforeDeleteField', array(&$field, &$item));
 	}
 
 

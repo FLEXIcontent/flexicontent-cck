@@ -41,7 +41,7 @@ class plgFlexicontent_fieldsTextselect extends FCField
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 
-		// field_type is not changed text field can handle this field type
+		// Call respective method of 'text' field, field_type is not changed since 'text' field can handle current field type
 		FLEXIUtilities::call_FC_Field_Func('text', 'onDisplayField', array(&$field, &$item));
 	}
 
@@ -51,7 +51,7 @@ class plgFlexicontent_fieldsTextselect extends FCField
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 
-		// field_type is not changed text field can handle this field type
+		// Call respective method of 'text' field, field_type is not changed since 'text' field can handle current field type
 		FLEXIUtilities::call_FC_Field_Func('text', 'onDisplayFieldValue', array(&$field, $item, $values, $prop));
 	}
 
@@ -66,7 +66,7 @@ class plgFlexicontent_fieldsTextselect extends FCField
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 
-		// field_type is not changed text field can handle this field type
+		// Call respective method of 'text' field, field_type is not changed since 'text' field can handle current field type
 		FLEXIUtilities::call_FC_Field_Func('text', 'onBeforeSaveField', array(&$field, &$post, &$file, &$item));
 	}
 
@@ -76,7 +76,7 @@ class plgFlexicontent_fieldsTextselect extends FCField
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 
-		// field_type is not changed text field can handle this field type
+		// Call respective method of 'text' field, field_type is not changed since 'text' field can handle current field type
 		FLEXIUtilities::call_FC_Field_Func('text', 'onAfterSaveField', array(&$field, &$post, &$file, &$item));
 	}
 
@@ -86,7 +86,7 @@ class plgFlexicontent_fieldsTextselect extends FCField
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 
-		// field_type is not changed text field can handle this field type
+		// Call respective method of 'text' field, field_type is not changed since 'text' field can handle current field type
 		FLEXIUtilities::call_FC_Field_Func('text', 'onBeforeDeleteField', array(&$field, &$item));
 	}
 

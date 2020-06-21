@@ -206,8 +206,14 @@ class JFormFieldSeparator extends JFormFieldSpacer
 			$this->add_tab_css_js();
 		}
 
-		$is_level = substr($level, 0, 5)=='level';
-		$classes .= $is_level ? ' fcsep_'.$level : '';
+		$is_level = substr($level, 0, 5) == 'level';
+		$levelNum = '';
+
+		if ($is_level)
+		{
+			$levelNum = (int) str_replace('level', '', $level);
+			$classes .= ' fcsep_' . $level;
+		}
 
 		$tip = '';
 
@@ -295,11 +301,23 @@ class JFormFieldSeparator extends JFormFieldSpacer
 			break;
 		}
 
-		return $_bof . '
-			<div style="'.$style.'" class="'.$classes.'" '.$tip.' >
-				' . $title . '
-			</div>
-			<div class="fcclear"></div>
-			' . $_eof;
+		if (strlen($levelNum))
+		{
+			return $_bof . '
+				<h' . ($levelNum + 2) . ' style="'.$style.'" class="'.$classes.'" '.$tip.' >
+					' . $title . '
+				</h' . ($levelNum + 2) . '>
+				<div class="fcclear"></div>
+				' . $_eof;
+		}
+		else
+		{
+			return $_bof . '
+				<div style="'.$style.'" class="'.$classes.'" '.$tip.' >
+					' . $title . '
+				</div>
+				<div class="fcclear"></div>
+				' . $_eof;
+		}
 	}
 }

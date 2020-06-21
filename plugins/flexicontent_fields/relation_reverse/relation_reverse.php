@@ -75,13 +75,14 @@ class plgFlexicontent_fieldsRelation_reverse extends FCField
 		FlexicontentFields::loadFieldConfig($reversed_field, $item);
 
 
+		// Field name and HTML TAG id
 		$fieldname = 'custom['.$field->name.']';
 		$elementid = 'custom_'.$field->name;
 
 
-		// ***
-		// *** Case of autorelated item
-		// ***
+		/**
+		 * Case of autorelated item
+		 */
 
 		$autorelation_itemid = JFactory::getApplication()->input->get('autorelation_'.$reverse_field_id, 0, 'int');
 
@@ -131,7 +132,42 @@ class plgFlexicontent_fieldsRelation_reverse extends FCField
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 
-		// field_type is not changed text field can handle this field type
+		$field->label = JText::_($field->label);
+
+		// Set field and item objects
+		$this->setField($field);
+		$this->setItem($item);
+
+
+		/**
+		 * One time initialization
+		 */
+
+		static $initialized = null;
+		static $app, $document, $option, $format, $realview;
+
+		if ($initialized === null)
+		{
+			$initialized = 1;
+
+			$app       = JFactory::getApplication();
+			$document  = JFactory::getDocument();
+			$option    = $app->input->getCmd('option', '');
+			$format    = $app->input->getCmd('format', 'html');
+			$realview  = $app->input->getCmd('view', '');
+		}
+
+		// Current view variable
+		$view = $app->input->getCmd('flexi_callview', ($realview ?: 'item'));
+		$sfx = $view === 'item' ? '' : '_cat';
+
+		// Check if field should be rendered according to configuration
+		if (!$this->checkRenderConds($prop, $view))
+		{
+			return;
+		}
+
+		// Call respective method of 'relation' field, field_type is not changed since 'relation' field can handle current field type
 		FLEXIUtilities::call_FC_Field_Func('relation', 'onDisplayFieldValue', array(&$field, $item, $values, $prop));
 	}
 
@@ -188,12 +224,16 @@ class plgFlexicontent_fieldsRelation_reverse extends FCField
 
 
 	// Method to take any actions/cleanups needed after field's values are saved into the DB
-	public function onAfterSaveField( &$field, &$post, &$file, &$item ) {
+	public function onAfterSaveField( &$field, &$post, &$file, &$item )
+	{
+		if ( !in_array($field->field_type, static::$field_types) ) return;
 	}
 
 
 	// Method called just before the item is deleted to remove custom item data related to the field
-	public function onBeforeDeleteField(&$field, &$item) {
+	public function onBeforeDeleteField(&$field, &$item)
+	{
+		if ( !in_array($field->field_type, static::$field_types) ) return;
 	}
 
 
@@ -220,10 +260,9 @@ class plgFlexicontent_fieldsRelation_reverse extends FCField
 	// This is for content lists e.g. category view, and not for search view
 	public function getFiltered(&$filter, $value, $return_sql = true)
 	{
-		// execute the code only if the field type match the plugin type
 		if ( !in_array($filter->field_type, static::$field_types) ) return;
 
-		// field_type is not changed text field can handle this field type
+		// Call respective method of 'relation' field, field_type is not changed since 'relation' field can handle current field type
 		return FLEXIUtilities::call_FC_Field_Func('relation', 'getFiltered', array(&$filter, $value, $return_sql));
 	}
 }

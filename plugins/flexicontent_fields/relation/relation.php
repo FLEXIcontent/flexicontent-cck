@@ -74,9 +74,9 @@ class plgFlexicontent_fieldsRelation extends FCField
 		$font_icon_class = $form_font_icons ? ' fcfont-icon' : '';
 
 
-		// ***
-		// *** Number of values
-		// ***
+		/**
+		 * Number of values
+		 */
 
 		$multiple   = $use_ingroup || (int) $field->parameters->get('allow_multiple', 0);
 		$max_values = $use_ingroup ? 0 : (int) $field->parameters->get('max_values', 0);
@@ -85,6 +85,7 @@ class plgFlexicontent_fieldsRelation extends FCField
 
 		// If we are multi-value and not inside fieldgroup then add the control buttons (move, delete, add before/after)
 		$add_ctrl_btns = !$use_ingroup && $multiple;
+		$fields_box_placing = (int) $field->parameters->get('fields_box_placing', 0);
 
 
 		// ***
@@ -102,6 +103,7 @@ class plgFlexicontent_fieldsRelation extends FCField
 
 		// CSS classes of value container
 		$value_classes  = 'fcfieldval_container valuebox fcfieldval_container_'.$field->id;
+		$value_classes .= $fields_box_placing ? ' floated' : '';
 
 		// Field name and HTML TAG id
 		$valueholder_nm = 'custom[_fcfield_valueholder_]['.$field->name.']';
@@ -151,7 +153,7 @@ class plgFlexicontent_fieldsRelation extends FCField
 					cancel: false,
 					/*containment: 'parent',*/
 					tolerance: 'pointer'
-					".($field->parameters->get('fields_box_placing', 1) ? "
+					".($fields_box_placing ? "
 					,start: function(e) {
 						//jQuery(e.target).children().css('float', 'left');
 						//fc_setEqualHeights(jQuery(e.target), 0);
@@ -182,13 +184,18 @@ class plgFlexicontent_fieldsRelation extends FCField
 				var lastField = fieldval_box ? fieldval_box : jQuery(el).prev().children().last();
 				var newField  = lastField.clone();
 				newField.find('.fc-has-value').removeClass('fc-has-value');
+
+				// New element's field name and id
+				var uniqueRowN = uniqueRowNum" . $field->id . ";
+				var element_id = '" . $elementid . "_' + uniqueRowN;
+				var fname_pfx  = '" . $fieldname . "[' + uniqueRowN + ']';
 				";
 
 			// NOTE: HTML tag id of this form element needs to match the -for- attribute of label HTML tag of this FLEXIcontent field, so that label will be marked invalid when needed
 			$js .= "
 				// Update container
 				var elem= newField.find('div.fcfield-relation-value_box').first();
-				elem.attr('data-elementid', '".$elementid."_'+uniqueRowNum".$field->id.");
+				elem.attr('data-elementid', element_id);
 
 				// Update the category selector field
 				var elem= newField.find('select.fcfield-relation-cat_selector').first();
@@ -200,28 +207,28 @@ class plgFlexicontent_fieldsRelation extends FCField
 					});
 				}
 				else elem.val('');
-				elem.attr('name', '".$elementid."_'+uniqueRowNum".$field->id."+'_cat_selector');
-				elem.attr('id', '".$elementid."_'+uniqueRowNum".$field->id."+'_cat_selector');
+				elem.attr('name', element_id + '_cat_selector');
+				elem.attr('id', element_id + '_cat_selector');
 
 				// Update the items selector field
 				var elem= newField.find('select.fcfield-relation-item_selector').first();
 				elem.empty();
-				elem.attr('name', '".$elementid."_'+uniqueRowNum".$field->id."+'_item_selector');
-				elem.attr('id', '".$elementid."_'+uniqueRowNum".$field->id."+'_item_selector');
+				elem.attr('name', element_id + '_item_selector');
+				elem.attr('id', element_id + '_item_selector');
 
 				// Update the value field
 				var elem= newField.find('select.fcfield-relation-selected_items').first();
 				elem.empty();
-				elem.attr('name', '".$fieldname."['+uniqueRowNum".$field->id."+'][]');
-				elem.attr('id', '".$elementid."_'+uniqueRowNum".$field->id.");
+				elem.attr('name', fname_pfx + '[]');
+				elem.attr('id', element_id);
 
-				newField.find('label.cat_selector-lbl').attr('for', '".$elementid."_'+uniqueRowNum".$field->id."+'_cat_selector');
-				newField.find('label.item_selector-lbl').attr('for', '".$elementid."_'+uniqueRowNum".$field->id."+'_item_selector');
-				newField.find('label.selected_items-lbl').attr('for', '".$elementid."_'+uniqueRowNum".$field->id.");
+				newField.find('label.cat_selector-lbl').attr('for', element_id + '_cat_selector');
+				newField.find('label.item_selector-lbl').attr('for', element_id + '_item_selector');
+				newField.find('label.selected_items-lbl').attr('for', element_id);
 
-				newField.find('label.cat_selector-lbl').attr('id', '".$elementid."_'+uniqueRowNum".$field->id."+'_cat_selector-lbl');
-				newField.find('label.item_selector-lbl').attr('id', '".$elementid."_'+uniqueRowNum".$field->id."+'_item_selector-lbl');
-				newField.find('label.selected_items-lbl').attr('id', '".$elementid."_'+uniqueRowNum".$field->id."+'-lbl');
+				newField.find('label.cat_selector-lbl').attr('id', element_id + '_cat_selector-lbl');
+				newField.find('label.item_selector-lbl').attr('id', element_id + '_item_selector-lbl');
+				newField.find('label.selected_items-lbl').attr('id', element_id + '-lbl');
 
 				// Destroy any select2 elements
 				var sel2_elements = newField.find('div.select2-container');
@@ -251,7 +258,7 @@ class plgFlexicontent_fieldsRelation extends FCField
 				fc_attachSelect2(newField);
 
 				" . (count($allowedtree) === 1 ? "
-				var cat_selector = jQuery('#" . $elementid."_'+uniqueRowNum".$field->id . "+'_cat_selector');
+				var cat_selector = jQuery('#' + element_id + '_cat_selector');
 				if (cat_selector.length)
 				{
 					cat_selector[0].selectedIndex = 1;
@@ -434,9 +441,10 @@ class plgFlexicontent_fieldsRelation extends FCField
 		$_classes = 'use_select2_lib fc_select2_no_check fc_select2_noselect' . ($required ? ' required' : '') . ($selected_items_sortable ? ' fc_select2_sortable' : '');
 		$per_val_js = '';
 
-		// ***
-		// *** Create field's HTML display for item form
-		// ***
+
+		/**
+		 * Create field's HTML display for item form
+		 */
 
 		$field->html = array();
 		$n = 0;
@@ -493,6 +501,7 @@ class plgFlexicontent_fieldsRelation extends FCField
 				" : '';
 		}
 
+		// Add per value JS
 		if ($per_val_js)
 		{
 			$js .= "
@@ -511,6 +520,7 @@ class plgFlexicontent_fieldsRelation extends FCField
 		";
 		if ($js)  $document->addScriptDeclaration($js);
 		if ($css) $document->addStyleDeclaration($css);
+
 
 		// Do not convert the array to string if field is in a group
 		if ($use_ingroup);
@@ -548,21 +558,58 @@ class plgFlexicontent_fieldsRelation extends FCField
 
 		$field->label = JText::_($field->label);
 
+		// Set field and item objects
+		$this->setField($field);
+		$this->setItem($item);
+
+
+		/**
+		 * One time initialization
+		 */
+
+		static $initialized = null;
+		static $app, $document, $option, $format, $realview;
+
+		if ($initialized === null)
+		{
+			$initialized = 1;
+
+			$app       = JFactory::getApplication();
+			$document  = JFactory::getDocument();
+			$option    = $app->input->getCmd('option', '');
+			$format    = $app->input->getCmd('format', 'html');
+			$realview  = $app->input->getCmd('view', '');
+		}
+
+		// Current view variable
+		$view = $app->input->getCmd('flexi_callview', ($realview ?: 'item'));
+		$sfx = $view === 'item' ? '' : '_cat';
+
+		// Check if field should be rendered according to configuration
+		if (!$this->checkRenderConds($prop, $view))
+		{
+			return;
+		}
+
+		// The current view is a full item view of the item
+		$isMatchedItemView = static::$itemViewId === (int) $item->id;
+
 		// Some variables
 		$is_ingroup  = !empty($field->ingroup);
 		$use_ingroup = $field->parameters->get('use_ingroup', 0);
 		$multiple    = $use_ingroup || (int) $field->parameters->get( 'allow_multiple', 0 ) ;
 
-		// Set field and item objects
-		$this->setField($field);
-		$this->setItem($item);
+
+		/**
+		 * Get field values
+		 */
 
 		$values = $values ? $values : $field->value;
 
 
-		// ***
-		// *** Calculate access for item list and auto relation button
-		// ***
+		/**
+		 * Calculate access for item list and auto relation button
+		 */
 
 		static $has_itemslist_access = array();
 		if ( !isset($has_itemslist_access[$field->id]) )
@@ -581,12 +628,12 @@ class plgFlexicontent_fieldsRelation extends FCField
 		}
 
 
-		// ***
-		// *** Decide what to display
-		// ***  - total information
-		// ***  - item list
-		// ***  - auto relation button
-		// ***
+		/**
+		 * Decide what to display
+		 *  - total information
+		 *  - item list
+		 *  - auto relation button
+		 */
 
 		$disp = new stdClass();
 		$HTML = new stdClass();
@@ -606,11 +653,10 @@ class plgFlexicontent_fieldsRelation extends FCField
 			$option = $app->input->get('option', '', 'cmd');
 			$realview = $app->input->get('view', 'item', 'cmd');
 			$view = $app->input->get('flexi_callview', $realview, 'cmd');
-			$isItemsManager = $app->isClient('administrator') && $realview=='items' && $option=='com_flexicontent';
 
 			$total_in_view = $field->parameters->get('total_in_view', array('backend'));
 			$total_in_view = FLEXIUtilities::paramToArray($total_in_view);
-			$disp->total_info = ($isItemsManager && in_array('backend', $total_in_view)) || in_array($view, $total_in_view);
+			$disp->total_info = (static::$isItemsManager && in_array('backend', $total_in_view)) || in_array($view, $total_in_view);
 		}
 		else
 		{
@@ -697,11 +743,11 @@ class plgFlexicontent_fieldsRelation extends FCField
 		$related_items = count($related_items_sets) ? reset($related_items_sets) : null;
 
 
-		// ***
-		// *** Create output
-		// ***
 
-		// Prefix - Suffix - Separator parameters - Other common parameters
+		/**
+		 * Get common parameters like: itemprop, value's prefix (pretext), suffix (posttext), separator, value list open/close text (opentag, closetag)
+		 * This will replace other field values and item properties, if such are found inside the parameter texts
+		 */
 		$common_params_array = $this->getCommonParams();
 		extract($common_params_array);
 
@@ -713,13 +759,27 @@ class plgFlexicontent_fieldsRelation extends FCField
 		$field->{$prop} = array();
 		include(self::getViewPath($field->field_type, $viewlayout));
 
-		//echo '<div class="well"><h2>HTML display: ' . $this->field->label . '</h2>'; print_r($field->{$prop}); echo '</div>';
-
-		// Normally field is a single set of multiple items (aka non-multi-value),
-		// thus we added no special separator when being used as multiple-value (multiple sets)
+		// Do not convert the array to string if field is in a group, and do not add: FIELD's opentag, closetag, value separator
 		if (!$is_ingroup)
 		{
-			$field->{$prop} = implode('<br>', $field->{$prop});
+			// Apply values separator
+			$field->{$prop} = implode($separatorf, $field->{$prop});
+
+			if ($field->{$prop} !== '')
+			{
+				// Apply field 's opening / closing texts
+				$field->{$prop} = $opentag . $field->{$prop} . $closetag;
+
+				// Add microdata once for all values, if field -- is NOT -- in a field group
+				if ($itemprop)
+				{
+					$field->{$prop} = '<div style="display:inline" itemprop="'.$itemprop.'" >' .$field->{$prop}. '</div>';
+				}
+			}
+			elseif ($no_value_msg !== '')
+			{
+				$field->{$prop} = $no_value_msg;
+			}
 		}
 	}
 
@@ -837,7 +897,6 @@ class plgFlexicontent_fieldsRelation extends FCField
 	// This is for content lists e.g. category view, and not for search view
 	public function getFiltered(&$filter, $value, $return_sql = true)
 	{
-		// execute the code only if the field type match the plugin type
 		if ( !in_array($filter->field_type, static::$field_types) ) return;
 
 		// If we are filtering via a relation-reverse field, then get the ID of relation field

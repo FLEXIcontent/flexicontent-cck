@@ -51,12 +51,40 @@ class plgFlexicontent_fieldsFcpagenav extends FCField
 		$this->setItem($item);
 
 
+		/**
+		 * One time initialization
+		 */
+
+		static $initialized = null;
+		static $app, $document, $option, $format, $realview;
+
+		if ($initialized === null)
+		{
+			$initialized = 1;
+
+			$app       = JFactory::getApplication();
+			$document  = JFactory::getDocument();
+			$option    = $app->input->getCmd('option', '');
+			$format    = $app->input->getCmd('format', 'html');
+			$realview  = $app->input->getCmd('view', '');
+		}
+
+		// Current view variable
+		$view = $app->input->getCmd('flexi_callview', ($realview ?: 'item'));
+		$sfx = $view === 'item' ? '' : '_cat';
+
+		// Check if field should be rendered according to configuration
+		if (!$this->checkRenderConds($prop, $view))
+		{
+			return;
+		}
+
+		// The current view is a full item view of the item
+		$isMatchedItemView = static::$itemViewId === (int) $item->id;
+
 		global $globalcats;
-		$app  = JFactory::getApplication();
 		$db   = JFactory::getDbo();
 		$user = JFactory::getUser();
-		$option = $app->input->get('option', '', 'cmd');
-		$view   = $app->input->get('view', 'item', 'cmd');
 		$print  = $app->input->get('print', '', 'cmd');
 		$add_tooltips = JComponentHelper::getParams('com_flexicontent')->get('add_tooltips', 1);
 
@@ -67,10 +95,11 @@ class plgFlexicontent_fieldsFcpagenav extends FCField
 			return;
 		}
 
+		// Some variables
+		$is_ingroup  = 0; //!empty($field->ingroup);
+		$use_ingroup = 0; //$field->parameters->get('use_ingroup', 0);
+		$multiple    = 0; //$use_ingroup || (int) $field->parameters->get( 'allow_multiple', 0 ) ;
 
-		/**
-		 * Parameters shortcuts
-		 */
 
 		$tooltip_class = 'hasTooltip';
 		$load_css 			= $field->parameters->get('load_css', 1);
