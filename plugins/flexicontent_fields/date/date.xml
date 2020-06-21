@@ -102,15 +102,17 @@
 
 			<field name="" type="separator" default="FLEXI_FORM_FIELD_CONF" _description="FLEXI_FORM_FIELD_CONF_DESC" icon_class="icon-calendar" level="tab_open" box_type="1" />
 
-			<field name="display_label_form" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_FLOATED_LEFT</option>
-				<option value="2">FLEXI_CLEARED</option>
+			<field name="display_label_form" type="multilist" subtype="radio" toggle_related="1" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC" class="btn-group btn-group-yesno">
+				<option value="0" show_list="custom_placeholder" hide_list="">FLEXI_NO</option>
+				<option value="1" show_list="custom_placeholder" hide_list="">FLEXI_FLOATED_LEFT</option>
+				<option value="2" show_list="custom_placeholder" hide_list="">FLEXI_CLEARED</option>
+				<option value="-1" show_list="" hide_list="custom_placeholder">FLEXI_AS_PLACEHOLDER</option>
 			</field>
 			<field name="label_form" type="text" default="" label="FLEXI_LABEL" description="Enter a label to use for item form that is different than field label for viewing" depend_class=""/>
 			<field name="no_acc_msg_form" type="text" default="" label="FLEXI_FIELD_NOACCESS_MSG" description="FLEXI_FIELD_NOACCESS_MSG_DESC" depend_class=""/>
 
 			<field name="" type="separator" default="FLEXI_FIELD_INPUT_FIELD" level="level2" />
+			<field name="placeholder" type="text" default="" label="FLEXI_FIELD_PLACEHOLDER" description="FLEXI_FIELD_PLACEHOLDER_DESC" depend_class="custom_placeholder" />
 			<field name="size" type="text" default="30" size="2" label="FLEXI_FIELD_SIZE" description="FLEXI_FIELD_SIZE_DESC" />
 			<field name="disable_keyboardinput" type="radio" default="0" label="FLEXI_FIELD_DISABLE_KEYBOARD_INPUT" description="FLEXI_FIELD_DISABLE_KEYBOARD_INPUT_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
@@ -249,6 +251,7 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="plugins" type="pluginlist" label="FLEXI_FIELD_CHOOSE_SPECIFIC_PLUGINS" description="FLEXI_FIELD_CHOOSE_SPECIFIC_PLUGINS_DESC" depend_class="plg-trigger-mode" />
+
 
 			<field name="" type="separator" default="FLEXI_FIELD_VIEWING" level="tabset_close" box_type="1" />
 		</fieldset>

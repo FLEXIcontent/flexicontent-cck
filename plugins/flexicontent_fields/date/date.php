@@ -125,6 +125,9 @@ class plgFlexicontent_fieldsDate extends FCField
 		// Input field display size & max characters
 		$size = (int) $field->parameters->get( 'size', 30 ) ;
 
+		$display_label_form = (int) $field->parameters->get( 'display_label_form', 1 ) ;
+		$placeholder        = $display_label_form==-1 ? $field->label : JText::_($field->parameters->get( 'placeholder', '' )) ;
+
 		// Input field display limitations
 		$minyear = $field->parameters->get('minyear', '');
 		$maxyear = $field->parameters->get('maxyear', '');
@@ -450,6 +453,11 @@ class plgFlexicontent_fieldsDate extends FCField
 				$attribs_arr = array(
 					'class' => 'fcfield_date use_fcfield_box input-medium ' . $classes,
 				);
+
+				if ($placeholder)
+				{
+					$attribs_arr['hint'] = $placeholder;
+				}
 
 				if ($auto_value)
 				{

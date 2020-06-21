@@ -24,6 +24,14 @@
 		
 		<fieldset name="group-fcpagenav-viewing" hidden="true" icon_class="icon-screen" label="FLEXI_FIELD_VIEWING" addfieldpath="/administrator/components/com_flexicontent/elements">
 			
+			<field name="" type="separator" default="FLEXI_DISPLAY" level="level1" />
+			<field name="show_in_clients" type="fccheckbox" default=""
+				checkoptions="FLEXI_DESKTOP,FLEXI_TABLET,FLEXI_MOBILE" checkvals="desktop,tablet,mobile" defaultvals="desktop,tablet,mobile"
+				label="FLEXI_FIELD_SHOW_IN_CLIENTS" description="FLEXI_FIELD_SHOW_IN_CLIENTS_DESC" depend_class="use_js_lib" />
+			<field name="show_in_views" type="fccheckbox" default=""
+				checkoptions="FLEXI_ITEM,FLEXI_ITEM_LISTS,FLEXI_MODULE,FLEXI_BACKEND" checkvals="item,category,module,backend" defaultvals="item,category,module,backend"
+				label="FLEXI_FIELD_SHOW_IN_VIEWS" description="FLEXI_FIELD_SHOW_IN_VIEWS_DESC" />
+
 			<field name="" type="separator" default="FLEXI_FIELD_LABEL_AND_ACCESS" level="level1" />
 			<field name="display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
@@ -34,10 +42,6 @@
 				<option value="1" show_list="field-acc-msg" hide_list="">FLEXI_YES</option>
 			</field>
 			<field name="no_acc_msg" type="text" default="" label="FLEXI_FIELD_NOACCESS_MSG" description="FLEXI_FIELD_NOACCESS_MSG_DESC" depend_class="field-acc-msg"/>
-			<field name="include_in_csv_export" type="radio" default="0" label="FLEXI_FIELD_INCLUDE_IN_CSV_EXPORT" description="FLEXI_FIELD_INCLUDE_IN_CSV_EXPORT_DESC" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
 
 			<field name="" type="separator" default="FLEXI_FIELD_VALUES" level="level1" />
 			<field name="viewlayout" type="fcfilelist" default="" label="FLEXI_FIELD_SELECT_VIEW_LAYOUT" description="FLEXI_FIELD_SELECT_VIEW_LAYOUT_DESC" directory="plugins/flexicontent_fields/fcpagenav/tmpl/" filter="value*" exclude="" stripext="1" stripprefix="value_" hide_none="1" hide_default="1" labelclass="label label-warning" />
@@ -46,6 +50,11 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
+
+			<field name="show_prevnext_count" type="radio" default="1" label="FLEXI_FIELD_PAGENAV_CURR_NAV_INFO" description="FLEXI_FIELD_PAGENAV_CURR_NAV_INFO_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_HIDE</option>
+				<option value="1">FLEXI_SHOW</option>
+			</field>
 			
 			<field name="frontend_hidden" type="hidden" default="1" />
 			<field name="backend_hidden" type="hidden" default="1" />
@@ -53,16 +62,11 @@
 		</fieldset>	
 		<fieldset name="group-fcpagenav-viewing-links" hidden="true" icon_class="icon-link" label_prefix="FLEXI_FIELD_VIEWING" label="Links" addfieldpath="/administrator/components/com_flexicontent/elements">
 
-			<field name="information_sep" type="separator" default="FLEXI_INFORMATION" description="" level="level1" />
+			<!--field name="information_sep" type="separator" default="FLEXI_INFORMATION" description="" level="level1" /-->
 
-			<field name="show_prevnext_count" type="radio" default="1" label="FLEXI_FIELD_PAGENAV_CURR_NAV_INFO" description="FLEXI_FIELD_PAGENAV_CURR_NAV_INFO_DESC" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_HIDE</option>
-				<option value="1">FLEXI_SHOW</option>
-			</field>
+			<!--field name="links_sep" type="separator" default="Links" description="" level="level1" /-->
 
-			<field name="links_sep" type="separator" default="Links" description="" level="level1" />
-
-			<field name="item_sep" type="separator" default="Previous / Next items" description="" level="level2" />
+			<field name="item_sep" type="separator" default="Previous / Next items" description="" level="level1" />
 			<field name="loop_prevnext" type="radio" default="1" label="FLEXI_FIELD_PAGENAV_LOOP_PREVIOUS_NEXT" description="FLEXI_FIELD_PAGENAV_LOOP_PREVIOUS_NEXT_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -84,7 +88,7 @@
 			<field name="prev_label" type="text" default="" depend_class="title-mode" label="FLEXI_FIELD_PAGENAV_PREV" description="" />
 			<field name="next_label" type="text" default="" depend_class="title-mode" label="FLEXI_FIELD_PAGENAV_NEXT" description="" />
 			
-			<field name="cat_sep" type="separator" default="FLEXI_CATEGORY" description="" level="level2" />
+			<field name="cat_sep" type="separator" default="FLEXI_CATEGORY" description="" level="level1" />
 			<field name="use_category_link" type="multilist" subtype="radio" default="0" label="FLEXI_FIELD_PAGENAV_USECATEGORY" toggle_related="1" description="FLEXI_FIELD_PAGENAV_USECATEGORY_DESC" class="btn-group btn-group-yesno">
 				<option value="0" show_list="" hide_list="cat-mode">FLEXI_NO</option>
 				<option value="1" show_list="cat-mode" hide_list="">FLEXI_YES</option>
@@ -104,7 +108,7 @@
 				<option value="1">FLEXI_CROP</option>
 			</field>
 			
-			<field name="item_image_sep" type="separator" default="Item images" description="" level="level2" />
+			<field name="item_image_sep" type="separator" default="Item images" description="" level="level1" />
 			<field name="item_use_image" type="multilist" subtype="radio" default="0" label="FLEXI_USE_IMAGE" toggle_related="1" description="FLEXI_USE_IMAGE_DESC" class="btn-group btn-group-yesno">
 				<option value="0" show_list="" hide_list="image-mode">FLEXI_HIDE</option>
 				<option value="1" show_list="image-mode" hide_list="">FLEXI_SHOW</option>
@@ -118,7 +122,7 @@
 				<option value="o">FLEXI_ORIGINAL</option>
 			</field>
 			
-			<field name="cat_image_sep" type="separator" default="Category image" description="" level="level2" />
+			<field name="cat_image_sep" type="separator" default="Category image" description="" level="level1" />
 			<field name="cat_use_image" type="multilist" subtype="radio" default="0" label="FLEXI_CAT_IMAGE" toggle_related="1" description="FLEXI_CAT_IMAGE_DESC" class="btn-group btn-group-yesno">
 				<option value="0" show_list="" hide_list="catimage-mode">FLEXI_HIDE</option>
 				<option value="1" show_list="catimage-mode" hide_list="">FLEXI_SHOW</option>

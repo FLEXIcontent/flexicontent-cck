@@ -14,24 +14,30 @@
 		<filename plugin="linkslist">linkslist.php</filename>
 		<filename>index.html</filename>
 	</files>
-	
+
 	<config>
-	
 	<fields name="attribs">
-		
+
 		<!--fieldset name="standard" hidden="true">
 		</fieldset-->
-		
+
 		<fieldset name="group-linkslist-editing" hidden="true" icon_class="icon-pencil" label="FLEXI_FIELD_EDITING" addfieldpath="/administrator/components/com_flexicontent/elements">
-			
-			<field name="" type="separator" default="FLEXI_FIELD_VALUES" level="level1" />
-			
-			<field name="" type="separator" default="FLEXI_FIELD_NUMBER_OF_VALUES" description="" level="level2" />
+
+			<field name="" type="separator" default="FLEXI_FIELD_EDITING" level="tabset_start" box_type="1" />
+
+			<field name="" type="separator" default="FLEXI_FIELD_VALUES" icon_class="icon-database" level="tab_open" box_type="1" />
+
+			<field name="use_ingroup" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_USE_IN_FIELD_GROUP" description="FLEXI_USE_IN_FIELD_GROUP_DESC" inline_tip="FLEXI_USE_IN_FIELD_GROUP_INSTRUCTIONS" tip_class="fieldgroupon" tip_img="comments.png" preview_img="insert_merge_field.png" class="btn-group group-fcinfo">
+				<option value="0" show_list="fieldgroupoff" hide_list="fieldgroupon">FLEXI_NO</option>
+				<!--option value="1" show_list="fieldgroupon" hide_list="fieldgroupoff">FLEXI_YES</option-->
+			</field>
+
+			<field name="" type="separator" default="FLEXI_FIELD_NUMBER_OF_VALUES" description="" depend_class="fieldgroupoff" level="level2" />
 			<field name="required" type="radio" default="0" label="FLEXI_FIELD_REQUIRED" description="FLEXI_FIELD_REQUIRED_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			
+
 			<field name="" type="separator" default="FLEXI_VALUE_CREATION_LABEL" level="level2" />
 			<field name="default_values" type="text" default="" label="FLEXI_FIELD_DEFAULT_VALUES" description="FLEXI_FIELD_DEFAULT_VALUES_DESC" />
 			<field name="extra_votes_configs" type="multilist" subtype="radio" default="" label="FLEXI_PRESET_CONFIGURATIONS" description="FLEXI_PRESET_CONFIGURATIONS_DESC" toggle_related="1" fccustom_revert="1" class="btn-group group-fcmethod">
@@ -39,15 +45,15 @@
 				<option value="1" fcconfigs="{'list_class': 'list-group', 'field_elements':'Title1[id=\&amp;quot;tagid1\&amp;quot; class=\&amp;quot;list-group-item\&amp;quot; link=\&amp;quot;#link1\&amp;quot;] :: \nTitle2[id=\&amp;quot;tagid2\&amp;quot; class=\&amp;quot;list-group-item\&amp;quot; link=\&amp;quot;#link2\&amp;quot;] :: \nTitle3[id=\&amp;quot;tagid3\&amp;quot; class=\&amp;quot;list-group-item\&amp;quot; link=\&amp;quot;#link3\&amp;quot;]'}">FLEXI_LOAD_EXAMPLE</option>
 			</field>
 			<field name="field_elements" type="textarea" filter="RAW" default="" class="required" rows="5" label="FLEXI_FIELD_LINKSLIST_LIST_ELEMENTS" description="FLEXI_FIELD_LINKSLIST_LIST_ELEMENTS_DESC" />
-			
-			<field name="" type="separator" default="FLEXI_FORM_FIELD_CONF" _description="FLEXI_FORM_FIELD_CONF_DESC" level="level1" />
-			
+
+			<field name="" type="separator" default="FLEXI_FORM_FIELD_CONF" _description="FLEXI_FORM_FIELD_CONF_DESC" icon_class="icon-checkbox-unchecked" level="tab_open" box_type="1" />
+
 			<!--field name="" type="separator" default="FLEXI_FIELD_ALTERNATIVE_DISPLAY" description="" level="level2" /-->
 			<field name="editform_field_type" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_AS" description="FLEXI_FIELD_DISPLAY_AS_DESC" class="btn-group group-fcinfo">
 				<option value="1">FLEXI_DISPLAY_AS_CHECKBOXES</option>
 				<option value="2">FLEXI_DISPLAY_AS_TAG_LIKE</option>
 			</field>
-			
+
 			<field name="" type="separator" default="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL" level="level2" />
 			<field name="pretext_form" type="text" default="" filter="JComponentHelper::filterText" label="FLEXI_FIELD_VALUE_PREFIX_TEXT" description="FLEXI_FIELD_VALUE_PREFIX_TEXT_DESC" />
 			<field name="posttext_form" type="text" default="" filter="JComponentHelper::filterText" label="FLEXI_FIELD_VALUE_SUFFIX_TEXT" description="FLEXI_FIELD_VALUE_SUFFIX_TEXT_DESC" />
@@ -61,12 +67,23 @@
 			</field>
 			<field name="opentag_form" type="text" default="" label="FLEXI_FIELD_OPENING_TEXT" description="FLEXI_FIELD_OPENING_TEXT_DESC" />
 			<field name="closetag_form" type="text" default="" label="FLEXI_FIELD_CLOSING_TEXT" description="FLEXI_FIELD_CLOSING_TEXT_DESC" />
-			
+
+			<field name="" type="separator" default="FLEXI_FIELD_EDITING" level="tabset_close" box_type="1" />
 		</fieldset>
 		<fieldset name="group-linkslist-viewing" hidden="true" icon_class="icon-screen" label="FLEXI_FIELD_VIEWING" addfieldpath="/administrator/components/com_flexicontent/elements">
-			
-			<field name="" type="separator" default="FLEXI_FIELD_LABEL_AND_ACCESS" level="level1" />
-			
+
+			<field name="" type="separator" default="FLEXI_FIELD_VIEWING" level="tabset_start" box_type="1" />
+			<field name="" type="separator" default="FLEXI_BASIC" icon_class="icon-vcard" level="tab_open" box_type="1" />
+
+			<field name="" type="separator" default="FLEXI_DISPLAY" level="level2" />
+			<field name="show_in_clients" type="fccheckbox" default=""
+				checkoptions="FLEXI_DESKTOP,FLEXI_TABLET,FLEXI_MOBILE" checkvals="desktop,tablet,mobile" defaultvals="desktop,tablet,mobile"
+				label="FLEXI_FIELD_SHOW_IN_CLIENTS" description="FLEXI_FIELD_SHOW_IN_CLIENTS_DESC" depend_class="use_js_lib" />
+			<field name="show_in_views" type="fccheckbox" default=""
+				checkoptions="FLEXI_ITEM,FLEXI_ITEM_LISTS,FLEXI_MODULE,FLEXI_BACKEND" checkvals="item,category,module,backend" defaultvals="item,category,module,backend"
+				label="FLEXI_FIELD_SHOW_IN_VIEWS" description="FLEXI_FIELD_SHOW_IN_VIEWS_DESC" />
+
+			<field name="" type="separator" default="FLEXI_FIELD_LABEL_AND_ACCESS" level="level2" />
 			<field name="display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -76,13 +93,21 @@
 				<option value="1" show_list="field-acc-msg" hide_list="">FLEXI_YES</option>
 			</field>
 			<field name="no_acc_msg" type="text" default="" label="FLEXI_FIELD_NOACCESS_MSG" description="FLEXI_FIELD_NOACCESS_MSG_DESC" depend_class="field-acc-msg"/>
-			<field name="include_in_csv_export" type="radio" default="0" label="FLEXI_FIELD_INCLUDE_IN_CSV_EXPORT" description="FLEXI_FIELD_INCLUDE_IN_CSV_EXPORT_DESC" class="btn-group btn-group-yesno">
+
+			<field name="" type="separator" default="FLEXI_EXPORT" level="level2" />
+			<field name="include_in_csv_export" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_FIELD_INCLUDE_IN_CSV_EXPORT" description="FLEXI_FIELD_INCLUDE_IN_CSV_EXPORT_DESC" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="csv_rendered_display">FLEXI_NO</option>
+				<option value="1" show_list="" hide_list="csv_rendered_display">FLEXI_FIELD_RAW_VALUES</option>
+				<option value="2" show_list="csv_rendered_display" hide_list="">FLEXI_FIELD_RENDERED_VALUES</option>
+			</field>
+			<field name="csv_strip_html" type="radio" default="0" label="FLEXI_STRIP_HTML" description="" class="btn-group btn-group-yesno" depend_class="csv_rendered_display">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			
-			<field name="" type="separator" default="FLEXI_FIELD_VALUES" level="level1" />
-			
+
+			<field name="" type="separator" default="FLEXI_LAYOUT" description="" icon_class="icon-file-2" level="tab_open" box_type="1" />
+			<field name="" type="separator" default="FLEXI_FIELD_VALUE_DISPLAY" level="level2" />
+
 			<field name="add_non_selected" type="radio" default="0" label="FLEXI_FIELD_LIST_ADD_NON_SELECTED" description="FLEXI_FIELD_LIST_ADD_NON_SELECTED_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -94,17 +119,33 @@
 			</field>
 			<field name="list_class" type="text" default="" label="FLEXI_FIELD_LIST_CLASS" description="FLEXI_FIELD_LIST_CLASS_DESC" />
 			<field name="list_id" type="text" default="" label="FLEXI_FIELD_LIST_ID" description="FLEXI_FIELD_LIST_ID_DESC" />
-			
-			<field name="" type="separator" default="FLEXI_FIELD_LINKSLIST_CUSTOM_CSS_JS" level="level1" />
-			<field name="js_code" type="textarea" filter="RAW" default="" class="" rows="3" cols="21" label="FLEXI_FIELD_LINKSLIST_JS_CODE" description="FLEXI_FIELD_LINKSLIST_JS_CODE_DESC" />			
-			<field name="css_code" type="textarea" filter="RAW" default="" class="" rows="3" cols="21" label="FLEXI_FIELD_LINKSLIST_CSS_CODE" description="FLEXI_FIELD_LINKSLIST_CSS_CODE_DESC" />			
 
+			<field name="" type="separator" default="FLEXI_FIELD_LINKSLIST_CUSTOM_CSS_JS" level="level2" />
+			<field name="js_code" type="textarea" filter="RAW" default="" class="" rows="3" cols="21" label="FLEXI_FIELD_LINKSLIST_JS_CODE" description="FLEXI_FIELD_LINKSLIST_JS_CODE_DESC" />
+			<field name="css_code" type="textarea" filter="RAW" default="" class="" rows="3" cols="21" label="FLEXI_FIELD_LINKSLIST_CSS_CODE" description="FLEXI_FIELD_LINKSLIST_CSS_CODE_DESC" />
+
+			<field name="" type="separator" default="FLEXI_CONTENT_PLUGINS" description="" icon_class="icon-power-cord" level="tab_open" box_type="1" />
+
+			<field name="" type="separator" default="FLEXI_FIELD_CONTENT_PLUGINS" description="FLEXI_FIELD_CONTENT_PLUGINS_DESC" class="fc-mssg-inline fc-info fc-nobgimage" level="level3"/>
+			<field name="trigger_onprepare_content" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT" description="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT_DESC" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="plg-trigger-mode">FLEXI_NO</option>
+				<option value="1" show_list="plg-trigger-mode" hide_list="">FLEXI_YES</option>
+			</field>
+			<field name="trigger_plgs_incatview" type="radio" default="0" label="FLEXI_TRIGGER_ONPREPARECONTENT_EVENT_INCATVIEW" description="FLEXI_TRIGGER_ONPREPARECONTENT_EVENT_INCATVIEW_DESC" depend_class="plg-trigger-mode" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="plugins" type="pluginlist" label="FLEXI_FIELD_CHOOSE_SPECIFIC_PLUGINS" description="FLEXI_FIELD_CHOOSE_SPECIFIC_PLUGINS_DESC" depend_class="plg-trigger-mode" />
+
+
+			<field name="" type="separator" default="FLEXI_FIELD_VIEWING" level="tabset_close" box_type="1" />
 		</fieldset>
-		
+
 	</fields>
 	</config>
-	
+
 	<languages>
 		<language tag="en-GB">en-GB.plg_flexicontent_fields_linkslist.ini</language>
 	</languages>
+
 </extension>
