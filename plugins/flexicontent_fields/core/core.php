@@ -1325,7 +1325,7 @@ class plgFlexicontent_fieldsCore extends FCField
 			$query = $db->getQuery(true)
 				->select('*')
 				->from('#__flexicontent_reviews')
-				->where('content_id IN ' . implode(',', $item_ids))
+				->where('content_id IN (' . implode(',', $item_ids) . ')')
 				->where('type = ' . $db->Quote('item'));
 
 			$rvdata = $db->setQuery($query)->loadObjectList();
