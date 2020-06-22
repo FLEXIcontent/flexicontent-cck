@@ -15,11 +15,11 @@
 		<filename>index.html</filename>
 		<folder>fcloadmodule</folder>
 	</files>
-	
+
 	<config>
-	
+
 	<fields name="attribs">
-		
+
 		<fieldset name="group-fcloadmodule-config" hidden="true" icon_class="icon-cog" label="Select Module" addfieldpath="/administrator/components/com_flexicontent/elements">
 
 			<field name="module_method" type="multilist" subtype="radio" default="1" label="FLEXI_FIELD_MODULE_METHOD" description="FLEXI_FIELD_MODULE_METHOD_DESC" toggle_related="1" class="btn-group btn-group-yesno">
@@ -31,8 +31,6 @@
 			<field name="style" type="text" default="" label="FLEXI_FIELD_MODULE_STYLE" description="FLEXI_FIELD_MODULE_STYLE_DESC" />
 
 		</fieldset>
-
-
 		<fieldset name="group-fcloadmodule-editing" hidden="true" icon_class="icon-pencil" label="FLEXI_FIELD_EDITING" addfieldpath="/administrator/components/com_flexicontent/elements">
 
 			<field name="" type="separator" default="FLEXI_FIELD_EDITING" level="tabset_start" box_type="1" />
@@ -50,11 +48,19 @@
 			<field name="no_acc_msg_form" type="text" default="" label="FLEXI_FIELD_NOACCESS_MSG" description="FLEXI_FIELD_NOACCESS_MSG_DESC" depend_class=""/>
 
 			<field name="" type="separator" default="FLEXI_FIELD_EDITING" level="tabset_close" box_type="1" />
+
 		</fieldset>
-
-
 		<fieldset name="group-fcloadmodule-viewing" hidden="true" icon_class="icon-eye" label="FLEXI_FIELD_VIEWING" addfieldpath="/administrator/components/com_flexicontent/elements">
-			<field name="" type="separator" default="FLEXI_FIELD_LABEL_AND_ACCESS" level="level1" />
+
+			<field name="" type="separator" default="FLEXI_DISPLAY" level="level2" />
+			<field name="show_in_clients" type="fccheckbox" default=""
+				checkoptions="FLEXI_DESKTOP,FLEXI_TABLET,FLEXI_MOBILE" checkvals="desktop,tablet,mobile" defaultvals="desktop,tablet,mobile"
+				label="FLEXI_FIELD_SHOW_IN_CLIENTS" description="FLEXI_FIELD_SHOW_IN_CLIENTS_DESC" depend_class="use_js_lib" />
+			<field name="show_in_views" type="fccheckbox" default=""
+				checkoptions="FLEXI_ITEM,FLEXI_ITEM_LISTS,FLEXI_MODULE,FLEXI_BACKEND" checkvals="item,category,module,backend" defaultvals="item,category,module,backend"
+				label="FLEXI_FIELD_SHOW_IN_VIEWS" description="FLEXI_FIELD_SHOW_IN_VIEWS_DESC" />
+
+			<field name="" type="separator" default="FLEXI_FIELD_LABEL_AND_ACCESS" level="level2" />
 			<field name="display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -64,18 +70,16 @@
 				<option value="1" show_list="field-acc-msg" hide_list="">FLEXI_YES</option>
 			</field>
 			<field name="no_acc_msg" type="text" default="" label="FLEXI_FIELD_NOACCESS_MSG" description="FLEXI_FIELD_NOACCESS_MSG_DESC" depend_class="field-acc-msg"/>
-			<field name="include_in_csv_export" type="radio" default="0" label="FLEXI_FIELD_INCLUDE_IN_CSV_EXPORT" description="FLEXI_FIELD_INCLUDE_IN_CSV_EXPORT_DESC" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
 			<!--field name="frontend_hidden" type="hidden" default="1" /-->
 			<!--field name="backend_hidden" type="hidden" default="1" /-->
+
 		</fieldset>
-		
+
 	</fields>
 	</config>
-	
+
 	<languages>
 		<language tag="en-GB">en-GB.plg_flexicontent_fields_fcloadmodule.ini</language>
 	</languages>
+
 </extension>
