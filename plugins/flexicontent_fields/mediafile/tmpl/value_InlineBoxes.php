@@ -505,7 +505,7 @@ if ($prop !== 'display_properties_only') :
 		$previewpath = $file_data->filename;
 		$peakspath   = null;
 	}
-	
+
 	$fnn = $item->id . '_' . $FN_n;
 
 	$html .= '<div class="fcclear"></div>'
@@ -588,70 +588,73 @@ endif;   // END OF   $prop !== 'display_properties_only'
 		{
 			$PROP_NAME = $md_name;
 			$PROP_VALUE = $file_data->$md_name;
-			
-				if ($md_name == 'channels')
+
+			if ($md_name == 'channels')
 			{
-				// Change 'channels' to '# Channels' you can also you language   JText::_('SOMENAME');
-				$PROP_NAME = '<span class="icon-play-circle large-icon"> </span> Channels';
-				
+				$PROP_NAME = '<span class="icon-play-circle large-icon"> </span> ' . JText::_('FLEXI_FIELD_MEDIADATA_CHANNELS');
+
 				// Only change value if it is 2 or 1
 				if ($PROP_VALUE == 2 || $PROP_VALUE == 1)
 				{
 					$PROP_VALUE = $PROP_VALUE == 2 ? 'Stereo' : 'Mono';
 				}
-			
+
 			}
-			
-				if ($md_name == 'media_format')
+
+			if ($md_name == 'media_format')
 			{
-				// Change 'channels' to '# Channels' you can also you language   JText::_('SOMENAME');
-				$PROP_NAME = '<span class="icon-music large-icon"> </span> Media Type';	
+				$PROP_NAME = '<span class="icon-music large-icon"> </span> ' . JText::_('FLEXI_FIELD_MEDIADATA_CHANNELS');
 			}
-			
-				if ($md_name == 'bit_rate')
+
+			if ($md_name == 'bit_rate')
 			{
-				// Change 'channels' to '# Channels' you can also you language   JText::_('SOMENAME');
-				$PROP_NAME = '<span class="icon-options large-icon"> </span> Bitrate';
+				$PROP_NAME = '<span class="icon-options large-icon"> </span> ' . JText::_('FLEXI_FIELD_MEDIADATA_BIT_RATE');
 				$PROP_VALUE = ($PROP_VALUE / 1000).' Kbps';
 			}
-				if ($md_name == 'bits_per_sample')
+
+			if ($md_name == 'bits_per_sample')
 			{
-				// Change 'channels' to '# Channels' you can also you language   JText::_('SOMENAME');
-				$PROP_NAME = '<span class="icon-options large-icon"> </span> Bit depth';
-				$PROP_VALUE = $PROP_VALUE.' Bit';	
+				$PROP_NAME = '<span class="icon-options large-icon"> </span> ' . JText::_('FLEXI_FIELD_MEDIADATA_BIT_DEPTH');
+				$PROP_VALUE = $PROP_VALUE.' Bit';
 			}
-				if ($md_name == 'sample_rate')
+
+			if ($md_name == 'sample_rate')
 			{
-				// Change 'channels' to '# Channels' you can also you language   JText::_('SOMENAME');
-				$PROP_NAME = '<span class="icon-health large-icon"> </span> Sample Rate';	
+				$PROP_NAME = '<span class="icon-health large-icon"> </span> ' . JText::_('FLEXI_FIELD_MEDIADATA_SAMPLE_RATE');
 				$PROP_VALUE = $PROP_VALUE.' Hz';
 			}
-				if ($md_name == 'duration')
+
+			if ($md_name == 'duration')
 			{
-				// Change 'channels' to '# Channels' you can also you language   JText::_('SOMENAME');
-				$PROP_NAME = '<span class="icon-clock large-icon"> </span> Duration';
-				$PROP_VALUE = gmdate("H:i:s", $PROP_VALUE);	
+				$PROP_NAME = '<span class="icon-clock large-icon"> </span> ' . JText::_('FLEXI_FIELD_MEDIADATA_DURATION');
+				$PROP_VALUE = gmdate("H:i:s", $PROP_VALUE);
 			}
-				if ($PROP_VALUE == "wav") {
-					$media_format = "wav";
-				}
-				if ($PROP_VALUE == "aiff") {
-					$media_format = "aiff";
-				}
-				if ($PROP_VALUE == "mp3") {
-					$media_format = "mp3";
-				}
-						
+
+			if ($PROP_VALUE == "wav")
+			{
+				$media_format = "wav";
+			}
+
+			if ($PROP_VALUE == "aiff")
+			{
+				$media_format = "aiff";
+			}
+
+			if ($PROP_VALUE == "mp3")
+			{
+				$media_format = "mp3";
+			}
+
 			if ($md_name == 'bit_rate' && ($media_format == 'wav' || $media_format == 'aiff'))  continue;
 			if ($md_name == 'bits_per_sample' && $media_format == 'mp3')  continue;
-			
-			
+
 			$html .=  '
 				<tr>
 					<td class="key"> ' . $PROP_NAME . '</td>
 					<td>' . $PROP_VALUE . '</td>
 				</tr>';
 		}
+
 		$html .= '</table>';
 	}
 
@@ -681,7 +684,7 @@ endif;   // END OF   $prop !== 'display_properties_only'
 
 JFactory::getDocument()->addScriptDeclaration("
 	fcview_mediafile_base_url['".$field_name_js."'] = '".$base_url."';
-	
+
 	" . (!$per_value_js ? "" : "
 	//document.addEventListener('DOMContentLoaded', function()
 	jQuery(document).ready(function()
