@@ -34,21 +34,25 @@ class fc_Waveform_LazyLoad
 		entries.filter(entry => entry.isIntersecting).forEach(entry =>
 		{
 			//window.console.log('Loading: ' + entry.target.id);  //window.console.log(entry.target);
-			this._lazyLoadAsset(entry.target);
+			//this._lazyLoadAsset(entry.target);
+			fcview_mediafile.lazyLoadAsset(entry.target);
 			assetsObserver.unobserve(entry.target);
 		});
 	}
 
 	_bindEvents(obj)
 	{
-		obj._lazyLoadAsset = this._lazyLoadAsset.bind(this);
+		// Not working in SAFARI !!!
+		//obj._lazyLoadAsset = this._lazyLoadAsset.bind(this);
 	}
 
+	/*
+	// Not working in SAFARI !!!
 	_lazyLoadAsset(asset)
 	{
-		//window.console.log(this);
-		fcview_mediafile.initValue(asset.getAttribute('data-fc_tagid'), asset.getAttribute('data-fc_fname'));
+		fcview_mediafile.lazyLoadAsset = function(asset);
 	}
+	*/
 }
 
 	var fcview_mediafile = {};
@@ -60,6 +64,11 @@ class fc_Waveform_LazyLoad
 	fcview_mediafile.use_native_apis = [];
 	fcview_mediafile.dialog_handle = [];
 	fcview_mediafile.base_url = [];
+
+	fcview_mediafile.lazyLoadAsset = function(asset)
+	{
+		fcview_mediafile.initValue(asset.getAttribute('data-fc_tagid'), asset.getAttribute('data-fc_fname'));
+	}
 
 	fcview_mediafile.initValue = function(tagid, config_name)
 	{
