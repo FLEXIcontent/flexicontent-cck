@@ -393,10 +393,15 @@ class ParentClassItem extends FCModelAdmin
 		$pk = !empty($pk) ? $pk : $this->_id;
 		$pk = !empty($pk) ? $pk : (int) $this->getState($this->getName().'.id');
 
-		// Set new item id, clearing item data, ONLY IF DIFFERENT than existing primary key
+		/**
+		 * Set new item id, clearing item data, ONLY IF DIFFERENT than existing primary key
+		 * But do not reset typeid, etc for new item creation
+		 */
 		if ($pk != $this->_id || $no_cache)
 		{
-			$this->setId($pk, 0, 0, null);
+			$pk
+				? $this->setId($pk, 0, 0, null)
+				: $this->setId($pk);
 		}
 
 		// --. Try to load existing item ... ZERO $force_version means unversioned data or maintain currently loaded version
