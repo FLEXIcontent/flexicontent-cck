@@ -698,7 +698,7 @@ if (isset($this->item->item_translations)) foreach ($this->item->item_translatio
 			<?php endif; ?>
 
 			<?php 
-			$notify_owner = JComponentHelper::getParams('com_flexicontent')->get('owner_notification', 0);
+			/*$notify_owner = JComponentHelper::getParams('com_flexicontent')->get('owner_notification', 0);
 			if ($notify_owner) : ?>
 				<div class="fcclear"></div>
 				<?php
@@ -706,14 +706,14 @@ if (isset($this->item->item_translations)) foreach ($this->item->item_translatio
 				?>
 				<span class="label-fcouter" id="jform_notify-msg-outer">
 				<label id="jform_notify-msg" <?php echo $label_attrs; ?> >
-					<?php echo JText::_( 'FLEXI_PUBLISH_CHANGE' ); ?>
+					<?php echo JText::_( 'FLEXI_NOTIFY_OWNER' ); ?>
 				</label>
 				</span>
 				<div class="container_fcfield container_fcfield_name_notify">
 				<div> <input type="radio" id="notifiy_owner_no" name="drone" value="0" checked><label for="notifiy_owner_no"><?php echo JText::_('FLEXI_NO'); ?></label>
 				<input type="radio" id="notifiy_owner_yes" name="drone" value="1"><label for="notifiy_owner_yes"><?php echo JText::_('FLEXI_YES'); ?></label></div>
 				</div>
-			<?php endif; ?>
+			<?php endif; */?>
 
 		</div>
 
