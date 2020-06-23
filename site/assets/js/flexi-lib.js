@@ -965,6 +965,15 @@
 				hidecol_box.innerHTML = parseInt(hidecol_box.innerHTML) - 1;
 			}
 		}
+		
+		
+		if (firstrun)
+		{
+			if (action_func === 'hide' && !document.getElementById('fc_' + container_div_id + '_btn').hasClass('btn-inverse'))
+			{
+				document.getElementById('fc_' + container_div_id + '_btn').classList += ' btn-dark btn-inverse';
+			}
+		}
 
 		//var ffieldname_label = 'columnchoose_' + data_tbl_id + '_' + col_no + '_label';
 		//var ffieldname_label = document.getElementById(ffieldname_label);
@@ -1067,7 +1076,10 @@
 		}
 
 		// Update cookie data and display data
-		if (!firstrun && container_div_id) column_toggles_update_data(container_div_id, data_tbl_id);
+		if (!firstrun && container_div_id)
+		{
+			column_toggles_update_data(container_div_id, data_tbl_id);
+		}
 	}
 
 
@@ -1135,7 +1147,7 @@
 
 				// *** It has value of 0 or not set, set it to 1 for fc_tbl_toggle_column() function to hide it
 				show_col[col] = 1;
-				if (toggle_on_init) fc_tbl_toggle_column('', data_tbl_id, col, 1);
+				if (toggle_on_init) fc_tbl_toggle_column(container_div_id, data_tbl_id, col, 1);
 			}
 			else
 			{
@@ -1144,7 +1156,7 @@
 
 				// *** It has value of 1 or not set, set it to 0 for fc_tbl_toggle_column() function to show it
 				show_col[col] = 0;
-				if (toggle_on_init) fc_tbl_toggle_column('', data_tbl_id, col, 1);
+				if (toggle_on_init) fc_tbl_toggle_column(container_div_id, data_tbl_id, col, 1);
 			}
 
 			// 7. Create column checkbox and append it to str
