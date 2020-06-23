@@ -503,7 +503,7 @@ jQuery(document).ready(function(){
 			<div class="btn-group">
 				<div id="fc-toggle-cats_btn" class="<?php echo $out_class . ' ' . $this->tooltip_class; ?>  hidden-phone" title="<?php echo JText::_('FLEXI_SECONDARY_CATEGORIES'); ?>" onclick="jQuery(this).data('box_showing', !jQuery(this).data('box_showing')); jQuery(this).data('box_showing') ? jQuery('.fc_assignments_box.fc_cats').show(400) : jQuery('.fc_assignments_box.fc_cats').hide(400);" ><span class="icon-tree-2"></span></div>
 				<div id="fc-toggle-tags_btn" class="<?php echo $out_class . ' ' . $this->tooltip_class; ?>  hidden-phone hidden-tablet" title="<?php echo JText::_('FLEXI_TAGS'); ?>" onclick="jQuery(this).data('box_showing', !jQuery(this).data('box_showing')); jQuery(this).data('box_showing') ? jQuery('.fc_assignments_box.fc_tags').show(400) : jQuery('.fc_assignments_box.fc_tags').hide(400);" ><span class="icon-tags"></span></div>
-				<div id="fc_mainChooseColBox_btn" class="<?php echo $out_class . ' ' . $this->tooltip_class; ?> hidden-phone" onclick="fc_toggle_box_via_btn('mainChooseColBox', this, 'btn-primary');" title="<?php echo flexicontent_html::getToolTip('FLEXI_COLUMNS', 'FLEXI_ABOUT_AUTO_HIDDEN_COLUMNS', 1, 1); ?>">
+				<div id="fc_mainChooseColBox_btn" class="<?php echo $this->tooltip_class . ' ' . $out_class; ?> hidden-phone" onclick="fc_toggle_box_via_btn('mainChooseColBox', this, 'btn-primary');" title="<?php echo flexicontent_html::getToolTip('FLEXI_COLUMNS', 'FLEXI_ABOUT_AUTO_HIDDEN_COLUMNS', 1, 1); ?>">
 					<span class="icon-contract"></span><sup id="columnchoose_totals"></sup>
 				</div>
 
