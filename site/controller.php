@@ -3478,27 +3478,24 @@ class FlexicontentController extends JControllerLegacy
 	 *
 	 * @since 3.3
 	 */
-	protected function _getReturnUrl($default = false)
+	protected function _getReturnUrl()
 	{
 		$this->input->get('task', '', 'cmd') !== __FUNCTION__ or die(__FUNCTION__ . ' : direct call not allowed');
 
-		if (!$default)
+		// Get HTTP request variable 'return' (base64 encoded)
+		$return = $this->input->get('return', null, 'base64');
+
+		// Base64 decode the return URL
+		if ($return)
 		{
-			// Get HTTP request variable 'return' (base64 encoded)
-			$return = $this->input->get('return', null, 'base64');
+			$return = base64_decode($return);
+		}
 
-			// Base64 decode the return URL
-			if ($return)
-			{
-				$return = base64_decode($return);
-			}
-
-			// Also try 'referer' (form posted, encode with htmlspecialchars)
-			else
-			{
-				$referer = $this->input->getString('referer', null);
-				$return = $referer ? htmlspecialchars_decode($referer) : null;
-			}
+		// Also try 'referer' (form posted, encode with htmlspecialchars)
+		else
+		{
+			$referer = $this->input->getString('referer', null);
+			$return = $referer ? htmlspecialchars_decode($referer) : null;
 		}
 
 		// Check return URL if empty or not safe and set a default one
