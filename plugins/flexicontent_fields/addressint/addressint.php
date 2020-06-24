@@ -127,7 +127,7 @@ class plgFlexicontent_fieldsAddressint extends FCField
 
 		$use_custom_marker   = (int) $field->parameters->get('use_custom_marker', 1);
 		$default_marker_file = $field->parameters->get('default_marker_file', '');
-		$custom_marker_path  = $field->parameters->get('custom_marker_path', 'mod_flexigooglemap/marker');
+		$custom_marker_path  = $field->parameters->get('custom_marker_path', 'modules/mod_flexigooglemap/assets/marker');
 
 		// Map configuration
 		$map_type   = $field->parameters->get('map_type', 'roadmap');
@@ -230,8 +230,8 @@ class plgFlexicontent_fieldsAddressint extends FCField
 		 */
 		if ($use_custom_marker)
 		{
-			$custom_marker_path_abs = JPATH::clean(JPATH_SITE . DS . 'images' . DS . $custom_marker_path. DS);
-			$custom_marker_url_base = str_replace('\\', '/', JURI::root() . 'images/' . $custom_marker_path . '/');
+			$custom_marker_path_abs = JPATH::clean(JPATH_SITE . DS . $custom_marker_path. DS);
+			$custom_marker_url_base = str_replace('\\', '/', JURI::root() . $custom_marker_path . '/');
 
 			// Default marker
 			if ($mapapi_edit === 'googlemap')

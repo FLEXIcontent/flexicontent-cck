@@ -64,10 +64,10 @@ $map_width  = (int) $field->parameters->get('map_width', 200);
 $map_height = (int) $field->parameters->get('map_height', 150);
 
 $use_custom_marker      = (int) $field->parameters->get('use_custom_marker', 1);
-$custom_marker_path     = $field->parameters->get('custom_marker_path', 'mod_flexigooglemap/marker');
+$custom_marker_path     = $field->parameters->get('custom_marker_path', 'modules/mod_flexigooglemap/assets/marker');
 
-$custom_marker_path_abs = JPATH::clean(JPATH_SITE . DS . 'images' . DS . $custom_marker_path. DS);
-$custom_marker_url_base = str_replace('\\', '/', JURI::root() . 'images/' . $custom_marker_path . '/');
+$custom_marker_path_abs = JPATH::clean(JPATH_SITE . DS . $custom_marker_path. DS);
+$custom_marker_url_base = str_replace('\\', '/', JURI::root() . $custom_marker_path . '/');
 
 $defaut_icon_url = $map_api === 'googlemap'
 	? '' //'https://maps.gstatic.com/mapfiles/api-3/images/spotlight-poi2.png'
@@ -288,7 +288,7 @@ foreach ($this->values as $n => $value)
 						data-maplatlon="{lat: ' . ($value['lat'] ? $value['lat'] : '0') . ', lng: ' . ($value['lon'] ? $value['lon'] : '0') . '}"
 						data-mapzoom="' . ($value['zoom'] ? $value['zoom'] : $map_zoom) . '"
 						data-mapaddr="' . htmlspecialchars(json_encode($value['addr1']), ENT_COMPAT, 'UTF-8') . '"
-						data-maptype="google.maps.MapTypeId.'.strtoupper($map_type).'"
+						data-maptype="google.maps.MapTypeId.'.strtoupper($map_type_view).'"
 						data-mapcontent="' . htmlspecialchars(json_encode($addr . $map_directions), ENT_COMPAT, 'UTF-8') . '"
             ' . ($value['custom_marker'] ? '
 							data-mapicon="' . htmlspecialchars(json_encode($marker_url), ENT_COMPAT, 'UTF-8') . '" 
@@ -311,7 +311,7 @@ foreach ($this->values as $n => $value)
 				$imageMap_URL = "https://maps.google.com/maps/api/staticmap?center=".$value['lat'].",".$value['lon']
 					."&amp;zoom=".($value['zoom'] ? $value['zoom'] : $map_zoom)
 					."&amp;size=".$map_width."x".$map_height
-					."&amp;maptype=".$map_type
+					."&amp;maptype=".$map_type_view
 					."&amp;markers=size:".$marker_size."%7Ccolor:".$marker_color."%7C|".$value['lat'].",".$value['lon']
 					."&amp;sensor=false"
 					.($google_maps_static_api_key ? '&amp;key=' . $google_maps_static_api_key : '')

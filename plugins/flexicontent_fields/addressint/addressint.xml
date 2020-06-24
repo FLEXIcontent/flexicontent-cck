@@ -199,11 +199,12 @@
 				<option value="0" show_list="" hide_list="use_custom_marker">FLEXI_DISABLE</option>
 				<option value="1" show_list="use_custom_marker" hide_list="">FLEXI_ENABLE</option>
 			</field>
-			<field name="custom_marker_path" type="folderlist"
-				default="mod_flexigooglemap/marker" hide_default="false" hide_none="true"
+			<!--field name="custom_marker_path" type="folderlist"
+				default="mod_flexigooglemap/assets/marker" hide_default="false" hide_none="true"
 				label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MARKERS_FOLDER" directory="images"
 				recursive="true"
-				filter="" exclude="" stripext="" depend_class="use_custom_marker"/>
+				filter="" exclude="" stripext="" depend_class="use_custom_marker"/-->
+			<field name="custom_marker_path" type="text" default="modules/mod_flexigooglemap/assets/marker" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MARKERS_FOLDER" depend_class="use_custom_marker"/>
 			<field name="default_marker_file" type="text" default="" hint="e.g. icon-blue.png" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_DEFAULT_MARKER_ICON" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_DEFAULT_MARKER_ICON_DESC" />
 
 			<field name="" type="separator" default="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MANUAL_DATA" class="" level="level3" depend_class="addr-formatted-mode" />
