@@ -41,7 +41,7 @@ class plgFlexicontent_fieldsImage extends FCField
 	// *** CONSTRUCTOR
 	// ***
 
-	function __construct( &$subject, $params )
+	public function __construct( &$subject, $params )
 	{
 		parent::__construct( $subject, $params );
 	}
@@ -53,7 +53,7 @@ class plgFlexicontent_fieldsImage extends FCField
 	// ***
 
 	// Method to create field's HTML display for item form
-	function onDisplayField(&$field, &$item)
+	public function onDisplayField(&$field, &$item)
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 
@@ -97,9 +97,9 @@ class plgFlexicontent_fieldsImage extends FCField
 
 
 
-		// ***
-		// *** Number of values
-		// ***
+		/**
+		 * Number of values
+		 */
 
 		$multiple     = $use_ingroup || (int) $field->parameters->get('allow_multiple', 0);
 		$max_values   = $use_ingroup ? 0 : (int) $field->parameters->get('max_values', 0);
@@ -391,7 +391,7 @@ class plgFlexicontent_fieldsImage extends FCField
 				newField.find('.fc-has-value').removeClass('fc-has-value');
 
 				// New element's field name and id
-				var element_id = '".$elementid . "_' + uniqueRowNum".$field->id.";
+				var element_id = '" . $elementid . "_' + uniqueRowNum" . $field->id . ";
 
 				// Destroy any select2 elements
 				var sel2_elements = newField.find('div.select2-container');
@@ -637,7 +637,7 @@ class plgFlexicontent_fieldsImage extends FCField
 		}
 
 
-		// Added field's custom CSS / JS
+		// Add field's custom CSS / JS
 		$image_folder = JUri::root(true).'/'.$dir_url;
 		$js .= "
 			/**
@@ -876,7 +876,7 @@ class plgFlexicontent_fieldsImage extends FCField
 					$f = in_array( $ext, array('png', 'ico', 'gif', 'jpg', 'jpeg') ) ? '&f='.$ext : '';
 					$img_link = str_replace('\\', '/', $img_link);
 
-					/*$img_link = JUri::root().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' . 
+					/*$img_link = JUri::root().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' .
 						htmlspecialchars($img_link . '&w='.$preview_thumb_w . '&h=' . $preview_thumb_h . '&zc=1&q=95&ar=x' . $f);*/
 
 					$img_link = htmlspecialchars(phpThumbURL(
@@ -1119,7 +1119,7 @@ class plgFlexicontent_fieldsImage extends FCField
 		}
 
 
-		// Added field's custom CSS / JS
+		// Add field's custom CSS / JS
 		if ($multiple) $js .= "
 			var uniqueRowNum".$field->id."	= ".count($field->value).";  // Unique row number incremented only
 			var rowCount".$field->id."	= ".count($field->value).";      // Counts existing rows to be able to limit a max number of values
@@ -1193,28 +1193,17 @@ class plgFlexicontent_fieldsImage extends FCField
 
 
 	// Method to create field's HTML display for frontend views
-	function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')
+	public function onDisplayFieldValue(&$field, $item, $values = null, $prop = 'display')
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 
 		$field->label = JText::_($field->label);
 
-		// Some variables
-		$is_ingroup  = !empty($field->ingroup);
-		$use_ingroup = $field->parameters->get('use_ingroup', 0);
-		$multiple    = $use_ingroup || (int) $field->parameters->get( 'allow_multiple', 0 ) ;
-
-		$image_source = (int) $field->parameters->get('image_source', 0);
-		$image_source = $image_source > 1 ? $this->nonImplementedMode($image_source, $field) : $image_source;
-		$target_dir   = (int) $field->parameters->get('target_dir', 1);
-
-		// JS safe Field name
-		$field_name_js = str_replace('-', '_', $field->name);
 
 
-		// ***
-		// *** One time initialization
-		// ***
+		/**
+		 * One time initialization
+		 */
 
 		static $initialized = null;
 		static $app, $document, $option, $format, $realview;
@@ -1228,9 +1217,9 @@ class plgFlexicontent_fieldsImage extends FCField
 
 			$app       = JFactory::getApplication();
 			$document  = JFactory::getDocument();
-			$option    = $app->input->get('option', '', 'cmd');
-			$format    = $app->input->get('format', 'html', 'cmd');
-			$realview  = $app->input->get('view', '', 'cmd');
+			$option    = $app->input->getCmd('option', '');
+			$format    = $app->input->getCmd('format', 'html');
+			$realview  = $app->input->getCmd('view', '');
 
 			$itemViewId     = $realview === 'item' && $option === 'com_flexicontent' ? $app->input->get('id', 0, 'int') : 0;
 			$isItemsManager = $app->isClient('administrator') && $realview === 'items' && $option === 'com_flexicontent';
@@ -1249,10 +1238,23 @@ class plgFlexicontent_fieldsImage extends FCField
 		}
 
 		// Current view variable
-		$view = $app->input->get('flexi_callview', ($realview ?: 'item'), 'cmd');
+		$view = $app->input->getCmd('flexi_callview', ($realview ?: 'item'));
 
 		// The current view is a full item view of the item
 		$isMatchedItemView = $itemViewId === (int) $item->id;
+
+		// Some variables
+		$is_ingroup  = !empty($field->ingroup);
+		$use_ingroup = $field->parameters->get('use_ingroup', 0);
+		$multiple    = $use_ingroup || (int) $field->parameters->get( 'allow_multiple', 0 ) ;
+
+		$image_source = (int) $field->parameters->get('image_source', 0);
+		$image_source = $image_source > 1 ? $this->nonImplementedMode($image_source, $field) : $image_source;
+		$target_dir   = (int) $field->parameters->get('target_dir', 1);
+
+		// JS safe Field name
+		$field_name_js = str_replace('-', '_', $field->name);
+
 
 		$all_media    = $field->parameters->get('list_all_media_files', 0);
 		$unique_thumb_method = $field->parameters->get('unique_thumb_method', 0);
@@ -1859,11 +1861,7 @@ class plgFlexicontent_fieldsImage extends FCField
 			$viewlayout = 'value_' . $popuptype;
 		}
 
-
-		// ***
-		// *** Create field's HTML, using layout file, note full display code is included into each layout (not just the values loop)
-		// ***
-
+		// Create field's viewing HTML, using layout file
 		$field->{$prop} = array();
 		include(self::getViewPath($field->field_type, $viewlayout));
 	}
@@ -1875,7 +1873,7 @@ class plgFlexicontent_fieldsImage extends FCField
 	// ***
 
 	// Method to handle field's values before they are saved into the DB
-	function onBeforeSaveField( &$field, &$post, &$file, &$item )
+	public function onBeforeSaveField( &$field, &$post, &$file, &$item )
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 
@@ -2251,7 +2249,7 @@ class plgFlexicontent_fieldsImage extends FCField
 
 
 	// Method to take any actions/cleanups needed after field's values are saved into the DB
-	function onAfterSaveField( &$field, &$post, &$file, &$item )
+	public function onAfterSaveField( &$field, &$post, &$file, &$item )
 	{
 		if ( empty($post) ) return;
 
@@ -2279,7 +2277,7 @@ class plgFlexicontent_fieldsImage extends FCField
 
 
 	// Method called just before the item is deleted to remove custom item data related to the field
-	function onBeforeDeleteField(&$field, &$item)
+	public function onBeforeDeleteField(&$field, &$item)
 	{
 		$app = JFactory::getApplication();
 		$dir = $field->parameters->get('dir');
@@ -2307,9 +2305,13 @@ class plgFlexicontent_fieldsImage extends FCField
 	}
 
 
-	// Method to do extra handling of field's values after all fields have validated their posted data, and are ready to be saved
-	// $item->fields['fieldname']->postdata contains values of other fields
-	// $item->fields['fieldname']->filedata contains files of other fields (normally this is empty due to using AJAX for file uploading)
+	/**
+	 * Method to do extra handling of field's values after all fields have validated their posted data, and are ready to be saved
+	 * OVERRIDE Default implementation
+	 *
+	 * $item->fields['fieldname']->postdata contains values of other fields
+	 * $item->fields['fieldname']->filedata contains files of other fields (normally this is empty due to using AJAX for file uploading)
+	 */
 	function onAllFieldsPostDataValidated( &$field, &$item )
 	{
 		$auto_intro_full = (int) $field->parameters->get('auto_intro_full', 0);
@@ -2362,7 +2364,7 @@ class plgFlexicontent_fieldsImage extends FCField
 	// ***
 
 	// Method to display a search filter for the advanced search view
-	function onAdvSearchDisplayFilter(&$filter, $value='', $formName='searchForm')
+	public function onAdvSearchDisplayFilter(&$filter, $value = '', $formName = 'searchForm')
 	{
 		if ( !in_array($filter->field_type, static::$field_types) ) return;
 
@@ -2371,9 +2373,9 @@ class plgFlexicontent_fieldsImage extends FCField
 	}
 
 
- 	// Method to get the active filter result (an array of item ids matching field filter, or subquery returning item ids)
+	// Method to get the active filter result (an array of item ids matching field filter, or subquery returning item ids)
 	// This is for search view
-	function getFilteredSearch(&$filter, $value, $return_sql=true)
+	public function getFilteredSearch(&$filter, $value, $return_sql = true)
 	{
 		if ( !in_array($filter->field_type, static::$field_types) ) return;
 
@@ -2384,11 +2386,11 @@ class plgFlexicontent_fieldsImage extends FCField
 
 
 	// ***
-	// *** SEARCH / INDEXING METHODS
+	// *** SEARCH INDEX METHODS
 	// ***
 
 	// Method to create (insert) advanced search index DB records for the field values
-	function onIndexAdvSearch(&$field, &$post, &$item)
+	public function onIndexAdvSearch(&$field, &$post, &$item)
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 		if ( !$field->isadvsearch && !$field->isadvfilter ) return;
@@ -2439,7 +2441,7 @@ class plgFlexicontent_fieldsImage extends FCField
 
 
 	// Method to create basic search index (added as the property field->search)
-	function onIndexSearch(&$field, &$post, &$item)
+	public function onIndexSearch(&$field, &$post, &$item)
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 		if ( !$field->issearch ) return;
@@ -2657,7 +2659,7 @@ class plgFlexicontent_fieldsImage extends FCField
 
 		// Execute once
 		static $initialized = null;
-		
+
 		if (!$initialized)
 		{
 			$initialized = 1;
@@ -2734,8 +2736,11 @@ class plgFlexicontent_fieldsImage extends FCField
 
 		return $result;
 	}
-	
-	
+
+
+	/**
+	 * Load phpThumb if not already loaded
+	 */
 	private function _load_phpthumb()
 	{
 		static $loaded = null;
@@ -2754,7 +2759,6 @@ class plgFlexicontent_fieldsImage extends FCField
 	/**
 	 * Call phpThumb library to create a thumbnail according to configuration
 	 */
-
 	function imagePhpThumb( $src_path, $dest_path, $prefix, $filename, $ext, $width, $height, $quality, $size, $crop, $usewm, $wmfile, $wmop, $wmpos )
 	{
 		static $initialized = null;
