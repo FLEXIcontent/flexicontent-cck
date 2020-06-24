@@ -1048,7 +1048,7 @@ class phpthumb {
 	public function setCacheDirectory() {
 		// resolve cache directory to absolute pathname
 		$this->DebugMessage('setCacheDirectory() starting with config_cache_directory = "'.$this->config_cache_directory.'"', __FILE__, __LINE__);
-		if ($this->config_cache_directory[ 0 ] == '.') {
+		if ($this->config_cache_directory && $this->config_cache_directory[ 0 ] == '.') {
 			if (preg_match('#^(f|ht)tps?\://#i', $this->src)) {
 				if (!$this->config_cache_disable_warning) {
 					$this->ErrorImage('$this->config_cache_directory ('.$this->config_cache_directory.') cannot be used for remote images. Adjust "cache_directory" or "cache_disable_warning" in phpThumb.config.php');
