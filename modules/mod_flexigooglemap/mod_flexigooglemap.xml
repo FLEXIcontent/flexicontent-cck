@@ -35,7 +35,7 @@
 			<field name="" type="separator" default="FLEXI_TEMPLATE_LAYOUT" description="" level="level1" class="fc-ngmargin" />
 			<field name="" type="separator" default="Please set layout parameters in &lt;b&gt;Layout: ... TAB&lt;/b&gt;. CSS/HTML developers please read: &lt;u&gt;&lt;b&gt; &lt;a href='http://www.flexicontent.org/documentation/faq/69-templating-module-plugin-content/274-how-to-create-a-custom-layout-for-universal-content-module-and-other-flexicontent-modules.html' target='_blank'&gt;Custom templates HOW-TO&lt;/a&gt; &lt;/b&gt; &lt;/u&gt;" level="level3" class="alert alert-info fcpadded" />
 			<field name="layout" type="fclayout" default="news" label="FLEXI_CHOOSE_TMPL"
-				description="FLEXI_CHOOSE_TMPL_DESC" directory="/modules/mod_flexiadvsearch/tmpl" ext_name="mod_flexiadvsearch"
+				description="FLEXI_CHOOSE_TMPL_DESC" directory="/modules/mod_flexigooglemap/tmpl" ext_name="mod_flexigooglemap"
 				hide_default="1" hide_none="1" stripext="1" filter="\.php$" exclude="^_"
 				tmpl_container="mod_tmpl_layout" params_source="file"
 				/> <!-- params_source="inline" -->
@@ -106,7 +106,7 @@
 			/>
 			<field
 				name="maxzoommarker" type="text"
-				default="15" label="MOD_FLEXIGOOGLEMAP_MAXZOOMMARKER"
+				default="18" label="MOD_FLEXIGOOGLEMAP_MAXZOOMMARKER"
 				description="MOD_FLEXIGOOGLEMAP_MAXZOOMMARKER_DESC"
 			/>
 
@@ -131,17 +131,30 @@
 
 			<field name="" type="separator" default="MOD_FLEXIGOOGLEMAP_MARKERSDISPLAY" level="level2" />
 
-
-			<field name="" type="separator" default="MOD_FLEXIGOOGLEMAP_MARKERSIMAGE" level="level3" />
+			<!--field name="" type="separator" default="MOD_FLEXIGOOGLEMAP_MARKERSIMAGE" level="level3" /-->
+			<field name="" type="separator" default="MOD_FLEXIGOOGLEMAP_ABOUT_CUSTOM_LOCATION_MARKERS_INFO" level="level4" class="alert alert-info fcpadded" />
 
 			<field
-				name="markermode" type="radio"
-				default="-1" label="MOD_FLEXIGOOGLEMAP_MARKERMODE"
-				description="MOD_FLEXIGOOGLEMAP_MARKERMODE_DESC"
+				name="use_custom_marker" type="radio"
+				default="1" label="MOD_FLEXIGOOGLEMAP_PER_LOCATION_MARKERS"
+				description="MOD_FLEXIGOOGLEMAP_PER_LOCATION_MARKERS_DESC"
 				class="btn-group group-fcinfo"
 				>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+
+			<field name="" type="separator" default="MOD_FLEXIGOOGLEMAP_FALLBACK_MARKER" level="level3" />
+			<field
+				name="markermode" type="radio"
+				default="-1" label="MOD_FLEXIGOOGLEMAP_DEFAULT_MARKER"
+				description="MOD_FLEXIGOOGLEMAP_DEFAULT_MARKER_DESC"
+				class="btn-group group-fcinfo"
+				>
+				<option value="-1">MOD_FLEXIGOOGLEMAP_MARKERSIMAGE_API_DEFAULT</option>
 				<option value="0">MOD_FLEXIGOOGLEMAP_MARKERSIMAGE_SPECIFIC</option>
 				<option value="1">MOD_FLEXIGOOGLEMAP_LETTERMARKERMODE</option>
+				<!--option value="2">MOD_FLEXIGOOGLEMAP_CUSTOMMARKERMODE</option-->
 			</field>
 
 			<field name="markerimage" type="fcmedia" directory="mod_flexigooglemap/marker" label="MOD_FLEXIGOOGLEMAP_MARKERSIMAGE_SPECIFIC"
@@ -162,7 +175,8 @@
 				showon="markermode:1"
 			/>
 
-			<field name="" type="separator" default="MOD_FLEXIGOOGLEMAP_BEHAVIOUR_N_STYLE" level="level3" showon="mapapi:googlemap" />
+			<field name="" type="separator" default="MOD_FLEXIGOOGLEMAP_BEHAVIOUR_N_STYLE" level="level3" />
+			<field name="" type="separator" default="FLEXI_NA" level="level4" class="alert alert-info fcpadded" showon="mapapi:openstreetmap" />
 			<field
 				name="animationmarker" type="radio"
 				default="1" label="MOD_FLEXIGOOGLEMAP_ANIMATIONMARKER"
@@ -198,14 +212,21 @@
 			/>
 			<field
 				name="maxzoom" type="text"
-				default="15" label="MOD_FLEXIGOOGLEMAP_MAXZOOM"
+				default="18" label="MOD_FLEXIGOOGLEMAP_MAXZOOM"
 				description="MOD_FLEXIGOOGLEMAP_MAXZOOM_DESC"
 				showon="clustermode:1"
 			/>
 
-
-
 			<field name="" type="separator" default="MOD_FLEXIGOOGLEMAP_INFOWINDOWS" level="level1" />
+			<field
+				name="info_popup" type="radio"
+				default="1" label="MOD_FLEXIGOOGLEMAP_DISPLAY_INFOWINDOW"
+				description="MOD_FLEXIGOOGLEMAP_DISPLAY_INFOWINDOW_DESC"
+				class="btn-group"
+				>
+				<option value="0">MOD_FLEXIGOOGLEMAP_NO</option>
+				<option value="1">MOD_FLEXIGOOGLEMAP_YES</option>
+			</field>
 			<field
 				name="uselink" type="radio"
 				default="1" label="MOD_FLEXIGOOGLEMAP_USELINK"

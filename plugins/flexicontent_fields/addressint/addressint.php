@@ -921,8 +921,8 @@ class plgFlexicontent_fieldsAddressint extends FCField
 			$newpost[$new]['country']       = /*!$use_country    ||*/ !isset($v['country'])       ? '' : flexicontent_html::dataFilter($v['country'],          2,  'STRING', 0);
 			$newpost[$new]['province']      = /*!$use_province   ||*/ !isset($v['province'])      ? '' : flexicontent_html::dataFilter($v['province'],       200,  'STRING', 0);
 			$newpost[$new]['zip_suffix']    = /*!$use_zip_suffix ||*/ !isset($v['zip_suffix'])    ? '' : flexicontent_html::dataFilter($v['zip_suffix'],      10,  'STRING', 0);
-			$newpost[$new]['custom_marker'] = /*!$custom_marker  ||*/ !isset($v['custom_marker']) ? '' : flexicontent_html::dataFilter($v['custom_marker'], 4000,  'STRING', 0);
-			$newpost[$new]['marker_anchor'] = /*!$marker_anchor  ||*/ !isset($v['marker_anchor']) ? '' : flexicontent_html::dataFilter($v['marker_anchor'], 4000,  'CMD', 0);
+			$newpost[$new]['custom_marker'] = /*!$custom_marker  ||*/ !isset($v['custom_marker']) ? '' : flexicontent_html::dataFilter($v['custom_marker'], 4000,  'PATH', 0);
+			$newpost[$new]['marker_anchor'] = /*!$marker_anchor  ||*/ !isset($v['marker_anchor']) ? '' : flexicontent_html::dataFilter($v['marker_anchor'], 4000,  'WORD', 0);
 
 			$new++;
 		}

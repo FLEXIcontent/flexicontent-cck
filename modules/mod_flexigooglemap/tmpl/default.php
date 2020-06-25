@@ -2,7 +2,7 @@
 /**
  * @package         FLEXIcontent
  * @subpackage      mod_flexigooglemap
- * 
+ *
  * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
  * @link            https://flexicontent.org
  * @copyright       Copyright © 2017, FLEXIcontent team, All Rights Reserved
@@ -13,7 +13,7 @@
 defined('_JEXEC') or die('Restricted access');
 
 // Check if having at least 1 location, otherwise skip showing the map
-if (empty($tMapTips))
+if (empty($renderedMapLocations))
 {
 	return;
 }
@@ -26,14 +26,19 @@ $document->addStyleSheet("./modules/mod_flexigooglemap/assets/css/style.css",'te
 $itemmodel_name = 'FlexicontentModelItem';
 $itemmodel = new $itemmodel_name();
 
-//module config
-$mapapi = $params->get('mapapi', 'googlemap');
+// Module config
 $height = $params->get('height', '300px');
 $width  = $params->get('width', '200px');
+$height = is_numeric($height) ? $height . 'px' : $height;
+$width  = is_numeric($width) ? $width . 'px' : $width;
+
+$mapapi    = $params->get('mapapi', 'googlemap');
 $mapcenter = $params->get('mapcenter', '48.8566667, 2.3509871');
-$apikey    = $params->get('apikey', '');
 $maptype   = $params->get('maptype', '');
+$apikey    = $params->get('apikey', '');
+
 $maxzoommarker = $params->get('maxzoommarker', '');
+$info_popup    = (int)$params->get('info_popup', 1);
 
 $mapstyle  = $params->get('mapstyle', '');
 $mapstyle  = substr($mapstyle,1,-1); // Remove[] at end and start
@@ -53,7 +58,7 @@ if ($map_style)
 }
 
 $gridsize = $params->get('gridsize', '');
-$maxzoom = $params->get('maxzoom', '');
+$maxzoom  = $params->get('maxzoom', '');
 $ratiomap = $params->get('ratiomap','');
 
 $clustermode = $params->get('clustermode', '' );
@@ -73,17 +78,6 @@ if ($clustermode)
 		$imgcluster_url =  'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m1.png';
 	}
 }
-
-// Get image size of local marker
-$scaledSize = 'null';
-/*
-$markermode = $params->get('markermode', $params->get('lettermarkermode', 0));
-$markerimage = $params->get('markerimage');
-
-if ($markermode==0 && $markerimage && $img_info = getimagesize(JPATH::clean(JPATH_ROOT.DS.$markerimage)))
-{
-	$scaledSize = 'scaledSize: new google.maps.Size('. $img_info[0] . ', ' . $img_info[1] . ')';
-}*/
 
 // Load framework (Map API)
 switch ($mapapi)
@@ -129,7 +123,7 @@ switch ($mapapi)
 		function fc_MapMod_initialize_<?php echo $module->id;?>()
 		{
 			// Define your locations: HTML content for the info window, latitude, longitude
-			var locations = [ <?php echo implode(",",  $tMapTips); ?>  ];
+			var locations = [ <?php echo implode(",",  $renderedMapLocations); ?>  ];
 
 			var map = new google.maps.Map(document.getElementById('fc_module_map_<?php echo $module->id;?>'), {
 				maxZoom: [<?php echo $maxzoommarker; ?>],
@@ -149,38 +143,54 @@ switch ($mapapi)
 			});
 
 			var markers = new Array();
-			var customMarkerIcons = [];
-			var iconCounter = 0;
-
-			customMarkerIcons[0] = {
-				url: <?php echo $markerdisplay ?: 'null'; ?>
-				// Instead of guessing image placement we will leave this to defaults
-				//,scaledSize: <?php echo $scaledSize; ?>
-				//,origin: new google.maps.Point(0, 0)
-				//,anchor: new google.maps.Point(11, 40)
+			var defaultMarkerIcon =  <?php echo !$defaultMarkerURL ? 'null;' : '{
+				url: \'' . $defaultMarkerURL . '\'' .
+				// Unlike Openstreet Map (which position top-left) Google maps will position bottom-middle, so we may have skipped calculating these ...)
+				($wS_dMU && $hS_dMU ? ',
+					size: new google.maps.Size(' . $wS_dMU . ', ' . $hS_dMU . '),
+					origin: new google.maps.Point(0, 0),
+					anchor:  new google.maps.Point(' . $wA_dMU . ', ' . $hA_dMU . ')'
+				: '') . '
 			}
+			'; ?>
 
 			// Add the markers and infowindows to the map
 			for (var i = 0; i < locations.length; i++)
 			{
+				let customMarkerIcon = locations[i][3] == '__default__'
+					? defaultMarkerIcon
+					: {
+						url: locations[i][3],
+						size: new google.maps.Size(locations[i][4], locations[i][5]),
+						origin: new google.maps.Point(0, 0),
+						anchor: new google.maps.Point(locations[i][6], locations[i][7])
+					};
+
 				var marker = new google.maps.Marker({
 					position: new google.maps.LatLng(locations[i][1], locations[i][2]),
-					map: map
-					<?php	echo ($params->get('animationmarker', 1) ? ',animation: google.maps.Animation.DROP' : '')."\n"; ?>
-					<?php	echo ($markerdisplay ? ',icon: customMarkerIcons[iconCounter]' : '')."\n"; ?>
+					map: map,
+					icon : customMarkerIcon
+					<?php	echo ($params->get('animationmarker', 1)
+						? ',animation: google.maps.Animation.DROP'
+						: '');
+					?>
 				});
 
 				markers.push(marker);
 
-				// We only have a limited number of possible icon colors, so rewind icon index when icons finish
-				iconCounter = iconCounter >= customMarkerIcons.length ? 0 : iconCounter + 1;
-
-				google.maps.event.addListener(marker, 'click', (function(marker, i) {
-					return function() {
-						infowindow.setContent(locations[i][0]);
-						infowindow.open(map, marker);
-					}
-				})(marker, i));
+				<?php if ($info_popup)
+				{
+					echo "
+					google.maps.event.addListener(marker, 'click', (function(marker, i)
+					{
+						return function() {
+							infowindow.setContent(locations[i][0]);
+							infowindow.open(map, marker);
+						}
+					})(marker, i));
+					";
+				}
+				?>
 
 				google.maps.event.addDomListener(window, "resize", function() {
 					var center = map.getCenter();
@@ -222,7 +232,7 @@ switch ($mapapi)
 
 		function fc_MapMod_initialize_<?php echo $module->id;?>()
 		{
-			var locations = [ <?php echo implode(",",  $tMapTips); ?>  ];
+			var locations = [ <?php echo implode(",",  $renderedMapLocations); ?>  ];
 
 			var markerClusters;
 			var markers = [];
@@ -239,43 +249,55 @@ switch ($mapapi)
 			L.tileLayer('https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png',
 			{
 				// Datas sources
-				attribution: 'données © OpenStreetMap/ODbL - rendu OSM France',
+				attribution: '<?php echo JText::_('OPENSTREETMAP_ATTRIBUTION_TXT'); ?>',
 				minZoom: 1,
-				maxZoom: 20
+				maxZoom: <?php echo $maxzoom; ?>
 			})
 			.addTo(theMap_<?php echo $module->id;?>);
 
-			var customMarkerIcons = [];
-			var iconCounter = 0;
-
-			customMarkerIcons[0] = L.icon({
-				iconUrl: <?php echo $markerdisplay ?: 'null'; ?>,
-				iconSize: [40, 67],
-				iconAnchor: [25, 67],
-				popupAnchor: [-3, -67]
+			var defaultMarkerIcon = <?php echo !$defaultMarkerURL ? 'null' : 'L.icon({
+				iconUrl: \'' . $defaultMarkerURL . '\',
+				iconSize: [' . $wS_dMU . ', ' . $hS_dMU . '],
+				iconAnchor: [' . $wA_dMU . ', ' . $hA_dMU . ']
 			});
+			'; ?>
 
 			for (var i = 0; i < locations.length; i++)
 			{
 				<?php /* TODO Add Mapbox key and title loading for custom display */ ?>
+				let customMarkerIcon = locations[i][3] == '__default__'
+					? defaultMarkerIcon
+					: L.icon({
+						iconUrl: locations[i][3],
+						iconSize: [locations[i][4], locations[i][5]],
+						iconAnchor: [locations[i][6], locations[i][7]]
+					});
 
-				marker = new L.marker(
-					[locations[i][1],
-					locations[i][2]]
-					<?php echo $markerdisplay ? ',{ icon: customMarkerIcons[iconCounter] }' : ''; ?>
-				)
+				if (customMarkerIcon)
+				{
+					marker = new L.marker( [locations[i][1], locations[i][2]], {icon: customMarkerIcon} );
+				}
+				else
+				{
+					marker = new L.marker( [locations[i][1], locations[i][2]] );
+				}
+
+				marker
+					<?php /* Display information window on marker click */
+					echo $info_popup ? '
 					.bindPopup(locations[i][0])
+					' : ''; ?>
+
 					<?php /* Add single location marker */
-					echo !$clustermode ?
-					'.addTo(theMap_' . $module->id . ');' : ''; ?>
+					echo !$clustermode ? '
+					.addTo(theMap_' . $module->id . ');
+					' : ''; ?>
+				;
 
 				<?php /* Add a cluster of markers */
 				echo $clustermode ?
 				'markerClusters.addLayer(marker);' : ''; ?>
 				markers.push(marker);
-
-				// We only have a limited number of possible icon colors, so rewind icon index when icons finish
-				iconCounter = iconCounter >= customMarkerIcons.length ? 0 : iconCounter + 1;
 			}
 			var group = new L.featureGroup(markers);
 
@@ -291,4 +313,3 @@ switch ($mapapi)
 
 
 <?php endif ;?>
-

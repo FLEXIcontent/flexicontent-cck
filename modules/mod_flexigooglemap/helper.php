@@ -15,19 +15,40 @@
 * GNU General Public License for more details.
 **/
 
-// no direct access
 defined('_JEXEC') or die('Restricted access');
 
 class modFlexigooglemapHelper
 {
 	public static function getItemsLocations(&$params)
 	{
+		/**
+		 * Check field ID configured in module configuration
+		 */
 		$fieldaddressid = $params->get('fieldaddressid');
-		if ( empty($fieldaddressid) )
+
+		if (empty($fieldaddressid))
 		{
 			echo '<div class="alert alert-warning">' . JText::_('MOD_FLEXIGOOGLEMAP_ADDRESSFORGOT') .'</div>';
-			return null;
+			return array();
 		}
+
+
+		/**
+		 * Get Address (Maps) field
+		 */
+		$field = modFlexigooglemapHelper::_getField($fieldaddressid);
+
+		if (empty($field))
+		{
+			// Rare error. Do not add language string
+			echo '<div class="alert alert-warning">Address (Maps) Field with id ' . $fieldaddressid . ' or it is not an address field. Please select an appropriate field in module configuration</div>';
+			return array();
+		}
+
+
+		/**
+		 * First get the categories that have the items
+		 */
 
 		// By default include children categories
 		$treeinclude = $params->get('treeinclude', 1);
@@ -46,7 +67,6 @@ class modFlexigooglemapHelper
 		}
 
 		$count = $params->get('count');
-		$forced_itemid = $params->get('forced_itemid', 0);
 
 		// Include : 1 or Exclude : 0 categories
 		$method_category = $params->get('method_category', '1');
@@ -54,6 +74,11 @@ class modFlexigooglemapHelper
 		$catWheres = $method_category == 0
 			? ' rel.catid IN (' . implode(',', $catids_arr) . ')'
 			: ' rel.catid NOT IN (' . implode(',', $catids_arr) . ')';
+
+
+		/**
+		 * Retrieve the items having the map locations (for the given field and the given categories)
+		 */
 
 		$db = JFactory::getDbo();
 		$queryLoc = 'SELECT a.id, a.title, b.field_id, b.value , a.catid '
@@ -65,6 +90,12 @@ class modFlexigooglemapHelper
 			;
 		$db->setQuery( $queryLoc );
 		$itemsLoc = $db->loadObjectList();
+
+
+		/**
+		 * Also create the item links
+		 */
+		$forced_itemid = $params->get('forced_itemid', 0);
 
 		foreach ($itemsLoc as &$itemLoc)
 		{
@@ -91,6 +122,19 @@ class modFlexigooglemapHelper
 
 		$fieldaddressid = $params->get('fieldaddressid');
 		$forced_itemid = $params->get('forced_itemid', 0);
+
+		// Get address (maps) field
+		$field = modFlexigooglemapHelper::_getField($fieldaddressid);
+
+		// Get marker image configuratuon
+		$use_custom_marker = (int) $params->get('use_custom_marker', 1) && (int) $field->parameters->get('use_custom_marker', 1);
+
+		if ($use_custom_marker)
+		{
+			$custom_marker_path     = $field->parameters->get('custom_marker_path', 'modules/mod_flexigooglemap/assets/marker');
+			$custom_marker_path_abs = JPATH::clean(JPATH_SITE . DS . $custom_marker_path. DS);
+			$custom_marker_url_base = str_replace('\\', '/', JURI::root() . $custom_marker_path . '/');
+		}
 
 		$mapLocations = array();
 
@@ -156,7 +200,7 @@ class modFlexigooglemapHelper
 						}
 						else
 						{
-							$map_link .= urlencode($coord['lat'] . "," . $coord['lon']); 
+							$map_link .= urlencode($coord['lat'] . "," . $coord['lon']);
 						}
 					}
 
@@ -167,8 +211,55 @@ class modFlexigooglemapHelper
 					? $relitem_html
 					: $addr . ' ' . $link;
 
-				$coordinates = $coord['lat'] .','. $coord['lon'];
-				$mapLocations[] = "['<h4 class=\"fleximaptitle\">$title</h4>$contentwindows $linkdirection'," . $coordinates . "]\r\n";
+				// Get custom marker and its anchor (= marker's placement)
+				$add_custom_marker = $use_custom_marker && !empty($coord['custom_marker']);
+
+				$marker_anchor = $add_custom_marker && !empty($coord['marker_anchor'])
+					? $coord['marker_anchor']
+					: 'BotC';
+
+				$marker_path = $add_custom_marker
+					? $custom_marker_path_abs . $coord['custom_marker']
+					: '';
+				$marker_url  = $add_custom_marker
+					? $custom_marker_url_base . $coord['custom_marker']
+					: '';
+
+				if ($marker_path)
+				{
+					// Marker Size
+					list($wS, $hS) = getimagesize($marker_path);
+
+					// Marker Anchor
+					switch($marker_anchor)
+					{
+						case 'TopL' : $wA = 0;     $hA = 0; break;
+						case 'TopC' : $wA = $wS/2; $hA = 0; break;
+						case 'TopR' : $wA = $wS;   $hA = 0; break;
+
+						case 'MidL' : $wA = 0;     $hA = $hS/2; break;
+						case 'MidC' : $wA = $wS/2; $hA = $hS/2; break;
+						case 'MidR' : $wA = $wS;   $hA = $hS/2; break;
+
+						case 'BotL' : $wA = 0;     $hA = $hS; break;
+						case 'BotC' : $wA = $wS/2; $hA = $hS; break;
+						case 'BotR' : $wA = $wS;   $hA = $hS; break;
+					}
+				}
+
+				$mapLocations[] = "[
+					'<h4 class=\"fleximaptitle\">$title</h4>$contentwindows $linkdirection'," .
+					$coord['lat'] . ", " .
+					$coord['lon'] . ", " .
+					(!$marker_url ? "'__default__'" :
+						"'" . $marker_url . "', " .
+						"'" . $wS . "', " .
+						"'" . $hS . "', " .
+						"'" . $wA . "', " .
+						"'" . $hA . "'
+					") . "
+				]
+				";
 			}
 		}
 
@@ -251,7 +342,7 @@ class modFlexigooglemapHelper
 							}
 							else
 							{
-								$map_link .= urlencode($coord['lat'] . "," . $coord['lon']); 
+								$map_link .= urlencode($coord['lat'] . "," . $coord['lon']);
 							}
 						}
 
@@ -262,8 +353,55 @@ class modFlexigooglemapHelper
 						? $relitem_html
 						: $addr . ' ' . $link;
 
-					$coordinates = $coord['lat'] .','. $coord['lon'];
-					$mapLocations[] = "['<h4 class=\"fleximaptitle\">$title</h4>$contentwindows $linkdirection'," . $coordinates . "]\r\n";
+					// Get custom marker and its anchor (= marker's placement)
+					$add_custom_marker = $use_custom_marker && !empty($coord['custom_marker']);
+
+					$marker_anchor = $add_custom_marker && !empty($coord['marker_anchor'])
+						? $coord['marker_anchor']
+						: 'BotC';
+
+					$marker_path = $add_custom_marker
+						? $custom_marker_path_abs . $coord['custom_marker']
+						: '';
+					$marker_url  = $add_custom_marker
+						? $custom_marker_url_base . $coord['custom_marker']
+						: '';
+
+					if ($marker_path)
+					{
+						// Marker Size
+						list($wS, $hS) = getimagesize($marker_path);
+
+						// Marker Anchor
+						switch($marker_anchor)
+						{
+							case 'TopL' : $wA = 0;     $hA = 0; break;
+							case 'TopC' : $wA = $wS/2; $hA = 0; break;
+							case 'TopR' : $wA = $wS;   $hA = 0; break;
+
+							case 'MidL' : $wA = 0;     $hA = $hS/2; break;
+							case 'MidC' : $wA = $wS/2; $hA = $hS/2; break;
+							case 'MidR' : $wA = $wS;   $hA = $hS/2; break;
+
+							case 'BotL' : $wA = 0;     $hA = $hS; break;
+							case 'BotC' : $wA = $wS/2; $hA = $hS; break;
+							case 'BotR' : $wA = $wS;   $hA = $hS; break;
+						}
+					}
+
+					$mapLocations[] = "[
+						'<h4 class=\"fleximaptitle\">$title</h4>$contentwindows $linkdirection'," .
+						$coord['lat'] . ", " .
+						$coord['lon'] . ", " .
+						(!$marker_url ? "'__default__'" :
+							"'" . $marker_url . "', " .
+							"'" . $wS . "', " .
+							"'" . $hS . "', " .
+							"'" . $wA . "', " .
+							"'" . $hA . "'
+						") . "
+					]
+					";
 				}
 			}
 		}
@@ -272,16 +410,22 @@ class modFlexigooglemapHelper
 	}
 
 
-	public static function getMarkerURL(&$params)
+	/**
+	 * Get a default Marker icon URL for map locations that do not specify a specific marker icon
+	 */
+	public static function getDefaultMarkerURL($params, & $wS = 0, & $hS = 0, & $wA = 0, & $hA = 0)
 	{
 		// Get marker mode, 'lettermarkermode' was old parameter name, (in future wew may more more modes, so the old parameter name was renamed)
 		$markermode  = (int) $params->get('markermode', $params->get('lettermarkermode', 0));
 		$markerimage = $params->get('markerimage', '');
 
-		if ($markermode !== 1 && !$markerimage)
+		// Fall back to default marker icon if custom image not set
+		if ($markermode === 1 && !$markerimage)
 		{
-			$markermode = 1;
+			$markermode = -1;
 		}
+
+		$defautmarker_path = '';
 
 		switch ($markermode)
 		{
@@ -293,16 +437,85 @@ class modFlexigooglemapHelper
 					''      => 'spotlight-waypoint-b.png' /* '' is for not set*/
 				);
 
-				return "'https://mts.googleapis.com/vt/icon/name=icons/spotlight/"
+				$defautmarker_url = "https://mts.googleapis.com/vt/icon/name=icons/spotlight/"
 					. $color_to_file[$params->get('markercolor', '')]
 					. "?text=" . $params->get('lettermarker')
-					. "&psize=16&font=fonts/arialuni_t.ttf&color=ff330000&scale=1&ax=44&ay=48"
-					. "'";
+					. "&psize=16&font=fonts/arialuni_t.ttf&color=ff330000&scale=1&ax=44&ay=48";
+				break;
 
-			// 'Local image file' mode or empty
+			// 'Local image file' mode
 			case 0:
+				$defautmarker_path = JPATH_SITE . '/' . $markerimage;
+				$defautmarker_url  = JUri::root(true) . '/' . $markerimage;
+				break;
+
+			// Default marker icon
+			case -1:
 			default:
-				return "'" . JUri::root(true) . '/' . $markerimage . "'";
+				// AVOID changing default, getimagesize on the URL may slow down page execution, giving false sense of slower PHP execution
+				$defautmarker_url = null;
+				/*$defautmarker_url = $params->get('mapapi', 'googlemap') === 'googlemap'
+					? 'https://maps.gstatic.com/mapfiles/api-3/images/spotlight-poi2.png'
+					: 'https://unpkg.com/leaflet@1.5.1/dist/images/marker-icon.png';*/
+				break;
 		}
+
+		/**
+		 * Calculate Default Marker Size and placement ! Because this is maybe a URL we will use caching !
+		 * in order to avoid delay during PHP execution, which may falsely be considered slow ...
+		 */
+		
+		if ($defautmarker_url && $params->get('mapapi', 'googlemap') !== 'googlemap')
+		{
+			$start_microtime = microtime(true);
+			if (FLEXI_CACHE)
+			{
+				$cache = JFactory::getCache('com_flexicontent');
+				$cache->setCaching(1);                  // Force cache ON
+				$cache->setLifeTime(FLEXI_CACHE_TIME);  // Set expire time (default is 1 hour)
+				list($wS, $hS) = $cache->get('getimagesize', array($defautmarker_path ?: $defautmarker_url));
+			}
+			else
+			{
+				list($wS, $hS) = getimagesize($defautmarker_path ?: $defautmarker_url);
+			}
+
+			// Marker Anchor
+			$wA = $wS/2;
+			$hA = $hS;
+
+			//$time_passed = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+			//JFactory::getApplication()->enqueueMessage( "recalculated default marker url dimensions AND placement: ". sprintf('%.2f s', $time_passed/1000000), 'message');
+		}
+
+		return $defautmarker_url;
+	}
+
+
+	/**
+	 * Get the given field by its ID
+	 */
+	private static function _getField($fieldid)
+	{
+		static $fields = array();
+
+		// Return already loaded field
+		if (isset($fields[$fieldid]))
+		{
+			return $fields[$fieldid];
+		}
+
+		// Load field
+		$_fields = FlexicontentFields::getFieldsByIds(array($fieldid), false);
+		$field   = !empty($_fields[$fieldid]) ? $_fields[$fieldid] : false;
+
+		// Parse field parameters
+		if ($field)
+		{
+			$field->parameters = new JRegistry($field->attribs);
+		}
+
+		// Cache and return the field
+		return $fields[$fieldid] = $field;
 	}
 }

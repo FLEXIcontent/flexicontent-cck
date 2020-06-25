@@ -121,8 +121,23 @@ $add_ccs      = $params->get('add_ccs');
 $add_ccs      = is_numeric($add_ccs) ? (int) $add_ccs : ($disable_css ? 0 : 1);
 $add_tooltips = 0; //(int) $params->get('add_tooltips', 1);
 
-$tMapTips = modFlexigooglemapHelper::renderMapLocations($params);
-$markerdisplay = modFlexigooglemapHelper::getMarkerURL($params);
+/**
+ * Render the map locations
+ */
+$renderedMapLocations = modFlexigooglemapHelper::renderMapLocations($params);
+
+/**
+ * Default marker URL is used in map locations that do not include a custom marker (via item form)
+ * or if the usage of custom marker icon per location has not been enabled in module configuration
+ */
+$wS_dMU = 0; $hS_dMU = 0; $wA_dMU = 0; $hA_dMU = 0;
+$defaultMarkerURL = modFlexigooglemapHelper::getDefaultMarkerURL($params, $wS_dMU, $hS_dMU, $wA_dMU, $hA_dMU);
+
+/**
+ * Compatibility with old custom module layouts
+ */
+$tMapTips      = $renderedMapLocations;
+$markerdisplay = "'" . $defaultMarkerURL . "'";
 
 
 // Add tooltips
