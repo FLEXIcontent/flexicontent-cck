@@ -224,6 +224,7 @@
 
 	$crop = $field->parameters->get('method_'.$size);
 	$img_size_attrs = '';
+	$minmax_based = ($field->parameters->get( 'srcsetitemview') == 0) ? 'min' : 'max';
 
 	if ($size !== 'o')
 	{
@@ -247,7 +248,7 @@
 			{
 				$w_l = $size_w_l ?: $field->parameters->get('w_l', self::$default_widths['l']);
 				$srcset[] = (!$isURL ? JUri::root() : '') . $srcl . ' ' . $w_l . 'w';
-				$_sizes[] = '(min-width: ' . $w_l . 'px) ' . $w_l . 'px';
+				$_sizes[] = '('.$minmax_based.'-width: ' . $w_l . 'px) ' . $w_l . 'px';
 			}
 		}
 
@@ -257,7 +258,7 @@
 			{
 				$w_m = $size_w_m ?: $field->parameters->get('w_m', self::$default_widths['m']);
 				$srcset[] = (!$isURL ? JUri::root() : '') . $srcm . ' ' . $w_m . 'w';
-				$_sizes[] = '(min-width: ' . $w_m . 'px) ' . $w_m . 'px';
+				$_sizes[] = '('.$minmax_based.'-width: ' . $w_m . 'px) ' . $w_m . 'px';
 			}
 			if ($srcs)
 			{

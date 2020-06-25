@@ -547,6 +547,10 @@
 				<option value="3">FLEXI_LARGE</option>
 				<option value="4">FLEXI_ORIGINAL</option>
 			</field>
+			<field name="srcsetitemview" type="radio" default="0" label="FLEXI_FIELD_THUMB_SRCSET" description="FLEXI_FIELD_THUMB_SRCSER_DESC" class="btn-group group-fcinfo">
+				<option value="0">FLEXI_MIN_BASED</option>
+				<option value="1">FLEXI_MAX_BASE</option>
+			</field>
 
 			<field name="" type="separator" default="FLEXI_IMGFIELD_INFORMATION" level="level2" />
 			<field name="showtitle" type="radio" default="0" label="FLEXI_FIELD_SHOW_TITLE" description="FLEXI_FIELD_SHOW_TITLE_DESC" class="btn-group btn-group-yesno">
