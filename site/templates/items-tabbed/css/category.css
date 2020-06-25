@@ -1,32 +1,44 @@
-/* Items-Tabbed Theme : category template CSS file */
-
+body #flexicontent .fc_item_title,
+body #flexicontent .fc_item_title a {
+	color: inherit;
+}
+body #flexicontent ul.tabbernav > li a {
+	border: 1px solid #1c5a85;
+	background-color: #3093c7;
+	background-image: -webkit-linear-gradient(top,#3093c7,#1c5a85);
+	background-image: linear-gradient(to bottom,#3093c7,#1c5a85);
+	filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#3093c7,endColorstr=#1c5a85);
+	color: #ffffff;
+}
+body #flexicontent ul.tabbernav > li.tabberactive a::before {
+	border-top: 4px solid #1c5a85;
+}
+body #flexicontent ul.tabbernav > li:hover a {
+	border: 1px solid #0a2131;
+	background-color: #1c5675;
+	background-image: -webkit-linear-gradient(top,#1c5675,#0a2131);
+	background-image: linear-gradient(to bottom,#1c5675,#0a2131);
+	filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#1c5675,endColorstr=#0a2131);
+	color: #ffffff;
+}
 .flexi.lineinfo {
 	display: block;
+	padding: 0;
 	margin: 0 0 1em;
 	overflow: hidden;
 	clear: both;
 }
-
-.flexi.subtitle1 {
-}
-.flexi.subtitle2 {
-}
-.flexi.subtitle3 {
-}
-
 .tabbertab .flexi.element,
 .subtitle1 .flexi.element,
 .subtitle2 .flexi.element,
 .subtitle3 .flexi.element {
+	clear: none;
 	display: block;
 	float: left;
-	max-width: 100% !important;  /* Allow responsive width while floating */
-	padding: 0% !important;  /* Allow responsive width while floating */
-	margin: 0px 24px 12px 0px;
+	max-width: 96% !important;
+	padding: 0% !important;
+	margin: 0.5em 2% 0.5em 2% !important;
 }
-
-
-/* topblock: Field block styling */
 .flexi.topblock {
 	overflow: hidden;
 	width: 100%;
@@ -35,9 +47,10 @@
 .topblock .flexi.image {
 	display: block;
 	float: left;
-	max-width: 100% !important;  /* Allow responsive width while floating */
-	padding: 0% !important;  /* Allow responsive width while floating */
-	margin-right: 6px;
+	max-width: 99% !important;
+	padding: 0% !important;
+	margin-right: 1%;
+	margin-left: 0%;
 	line-height: 0px;
 	border: 0px solid silver;
 }
@@ -50,9 +63,6 @@
 .topblock .flexi.infoblock {
 	overflow: hidden;
 }
-
-
-/* infoblock: Field block styling */
 .flexi.infoblock {
 	border: 1px solid silver;
 	margin: 0 0 10px;
@@ -71,101 +81,41 @@
 	vertical-align: top;
 	margin: 0%;
 	zoom: 1;
-	*display: inline;
-	_height: 10px;
 }
-
-
-/* Field label & values styling */
-span.flexi.label, .flexi.label {
-	display: block;
-	float: left;
-	border-bottom: 1px solid silver;
-	font-size: 90%;
-	margin-right: 8px;
-}
-span.flexi.value, .flexi.value {
-	display: block;
-	float: left;
-	max-width: 100% !important;  /* Allow responsive width while floating */
-	padding: 0% !important;  /* Allow responsive width while floating */
-}
-
-
-/* Field values into 1 column */
 .onecols ul li.flexi {
 	width: 100%;
 }
 .onecols .flexi.label {
 	min-width: 20%;
 	margin-right: 4%;
-	margin-bottom:6px;
+	margin-bottom: 6px;
 }
 .onecols .flexi.value {
 	min-width: 74%;
 	margin-right: 1%;
 }
-
-
-/* Field values into 2 columns */
 .twocols ul li.flexi {
 	min-width: 48%;
 }
 .twocols .flexi.label {
 	min-width: 34%;
 	margin-right: 6%;
-	margin-bottom:6px;
+	margin-bottom: 6px;
 }
 .twocols .flexi.value {
 	min-width: 58%;
 	margin-right: 1%;
 }
-
 .fc_item_seperator {
-	clear:both;
+	clear: both;
 	margin-bottom: 24px;
-	width:100%;
+	width: 100%;
 }
-
-/* =============================================
-   Bootstrap adjustments
-============================================= */
 #fc_alpha .btn.fc_alpha_index,
 #fc_alpha .btn.fc_alpha_index_sep {
-	margin-top:0;
-	margin-bottom:0;
+	margin-top: 0;
+	margin-bottom: 0;
 }
-
-/* ===============================================
-   "micro" clearfix 
-   http://nicolasgallagher.com/micro-clearfix-hack/
-   =============================================== */
-
-/**
- * For modern browsers
- * 1. The space content is one way to avoid an Opera bug when the
- *    contenteditable attribute is included anywhere else in the document.
- *    Otherwise it causes space to appear at the top and bottom of elements
- *    that are clearfixed.
- * 2. The use of `table` rather than `block` is only necessary if using
- *    `:before` to contain the top-margins of child elements.
- */
-.group:before,
-.group:after {
-	content: " "; /* 1 */
-	display: table; /* 2 */
-}
-
-.group:after {
-	clear: both;
-}
-
-/**
- * Include this rule to trigger hasLayout and contain floats.
- */
 .group {
-	/* for IE 6/7 */
-	*zoom: expression(this.runtimeStyle.zoom="1", this.appendChild(document.createElement("br")).style.cssText="clear:both;font:0/0 serif");
-	/* non-JS fallback */
-	*zoom: 1;
+	overflow: auto !important;
 }

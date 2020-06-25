@@ -17,12 +17,23 @@
  */
 
 defined('_JEXEC') or die('Restricted access');
-$search_task = FLEXI_J16GE ? 'task=search.' : 'controller=search&task=';
+
+$records_name = 'items';
+$ctrl_task = 'task=search.';
+
+$app = JFactory::getApplication();
+$indexer_name = $app->input->get('indexer', 'advanced', 'cmd');
+$rebuildmode  = $app->input->get('rebuildmode', '', 'cmd');
 ?>
-<div style="heading">Indexer Running ... <br/><br/><b>NOTE:</b><br/> Only the <b>execution time</b> of indexing process is displayed below, <br/> the <b>network request / reply time</b> is NOT included</div>
-<script type="text/javascript">
+
+<div>&nbsp;</div>
+<div style="heading">
+	<?php echo JText::_('FLEXI_TASK_RUNNING'); ?> ... <?php echo FlexicontentFields::getPDFParser() ? 'Indexing PDF files enabled ...' : ''; ?> <br/>
+	
+<script>
 jQuery(document).ready(function() {
-	var items_per_call = 50;
+	var total_time = 0;
+	var records_per_call = 1000;
 	var width = 0;
 	var looper = 0;
 	var onesector = 1000;
@@ -31,35 +42,66 @@ jQuery(document).ready(function() {
 	var number = 0;
 	function updateprogress() {
 		if(looper>=number && looper) {
-			jQuery('div#statuscomment').html( jQuery('div#statuscomment').text() + ' , INDEXING FINISHED. You may close this window');
+			jQuery('div#insideprogress').css('width', '300px');
+			jQuery('div#updatepercent').text(' 100 %');
+			jQuery('div#statuscomment').html( jQuery('div#statuscomment').html() + '<br/><br/><strong>INDEXING FINISHED</strong>. You may close this window');
+			//jQuery('img#page_loading_img').hide();
 			return;
 		}
+
+		var start_time = new Date().getTime();
+
 		jQuery.ajax({
-			url: "index.php?option=com_flexicontent&<?php echo $search_task; ?>index&items_per_call="+items_per_call+"&itemcnt="+looper+"&indexer=<?php echo JRequest::getVar('indexer','advanced');?>"+"&rebuildmode=<?php echo JRequest::getVar('rebuildmode','');?>",
+			url: "index.php?option=com_flexicontent&format=raw&<?php echo $ctrl_task; ?>index&records_per_call="+records_per_call+"&records_cnt="+looper+"&indexer=<?php echo $indexer_name;?>"+"&rebuildmode=<?php echo $rebuildmode; ?>",
 			success: function(response, status2, xhr2) {
+				var request_time = new Date().getTime() - start_time;
+				total_time += request_time;
+				
 				var arr = response.split('|');
-				if(arr[0]=='fail') {
-					jQuery('div#statuscomment').html(arr[1]);
+				var result = arr[0].trim();
+				if ( result=='fail' || result!='success' )
+				{
+					jQuery('div#statuscomment').html( '<span style="font-weight:bold;">INDEXER HALTED, due to server response</span>: <br/> ' + (result=='fail'  ?  arr[1]  :  response) );
+					//jQuery('img#page_loading_img').hide();
 					looper = number;
 					return;
 				}
+				//looper=looper+records_per_call;
+				looper=parseInt(arr[1]);
+				
 				width = onesector*looper;
 				if (width>300) width = 300;
 				percent = width/3;
 				jQuery('div#insideprogress').css('width', width+'px');
-				jQuery('div#updatepercent').text(' '+percent.toFixed(2)+' %');
-				jQuery('div#statuscomment').html((looper<number?looper:number)+' / '+number+' items '+response);
+				jQuery('div#updatepercent').html(' '+percent.toFixed(2)+' %');
+				jQuery('div#statuscomment').html(
+					(looper<number?looper:number)+' / '+number+' <?php echo $records_name; ?> <br/>'
+					+ '<br/>' + arr[2]
+					+ '<br/>' + 'Total task time: '+parseFloat(total_time/1000).toFixed(2) + ' secs'
+					+ '<br/>' + arr[3]
+				);
 				setTimeout(updateprogress, 20);  // milliseconds to delay updating the HTML display
+			},
+			error: function (xhr, ajaxOptions, thrownError) {
+				alert(xhr.status);
+				alert(thrownError);
 			}
 		});
-		looper=looper+items_per_call;
 	}
+
+	var start_time = new Date().getTime();
+
 	jQuery.ajax({
-		url: "index.php?option=com_flexicontent&<?php echo $search_task; ?>countrows"+"&indexer=<?php echo JRequest::getVar('indexer','advanced');?>",
+		url: "index.php?option=com_flexicontent&format=raw&<?php echo $ctrl_task; ?>countrows&indexer=<?php echo $indexer_name;?>&<?php echo JSession::getFormToken().'=1'; ?>",
 		success: function(response, status, xhr) {
+			var request_time = new Date().getTime() - start_time;
+			total_time += request_time;
+			
 			var arr = response.split('|');
-			if(arr[0]=='fail') {
-				jQuery('div#statuscomment').html(arr[1]);
+			var result = arr[0].trim();
+			if( result=='fail' || result!='success' )
+			{
+				jQuery('div#statuscomment').html( '<span style="font-weight:bold;">INDEXER HALTED, due to server response</span>: <br/> ' + (result=='fail'  ?  arr[1]  :  response) );
 				return;
 			}
 			//items = jQuery.parseJSON(arr[1]);
@@ -70,22 +112,35 @@ jQuery(document).ready(function() {
 			fields_length = arr[2];
 			number = items_length;
 			onesector = (number==0)?300:(300/number);
-			looper = 0;
+			
+			looper=parseInt(arr[3]);
+			width = 0;
+			percent = 0;
+			jQuery('div#insideprogress').css('width', width+'px');
+			jQuery('div#updatepercent').html(' '+percent.toFixed(2)+' %');
+			jQuery('div#statuscomment').html(
+				(looper<number?looper:number)+' / '+number+' <?php echo $records_name; ?> <br/>'
+					+ '<br/>' + arr[4]
+					+ '<br/>' + 'Total task time: '+parseFloat(total_time/1000).toFixed(2) + ' secs'
+					+ '<br/>' + arr[5]
+			);
 			updateprogress();
+		},
+		error: function (xhr, ajaxOptions, thrownError) {
+			alert(xhr.status);
+			alert(thrownError);
 		}
 	});
 });
-window.parent.SqueezeBox.addEvent('onClose',function(){
-	window.parent.location.reload(true);
-});
 </script>
+
 <style>
 div#advancebar{
 	width:302px;
 	height:17px;
 	border:1px solid #000;
 	padding:0px;
-	margin:0px;
+	margin:0 10px 0 0;
 	float:left;
 	clear:left;
 }
@@ -100,16 +155,14 @@ div#updatepercent{
 	clear:right;
 }
 div#statuscomment{
-	color:red;
+	color:darkgreen;
 	margin-top:30px;
 }
 </style>
 <div class="clr"></div>
 <div>&nbsp;</div>
-<div>&nbsp;</div>
 <div id="advancebar"><div id="insideprogress"></div></div>
 <div id="updatepercent">0 %</div>
 <div class="clr"></div>
-<div id="statuscomment"></div>
+<div id="statuscomment">Initializing <img id="page_loading_img" src="components/com_flexicontent/assets/images/ajax-loader.gif"></div>
 <div class="clr"></div>
-

@@ -1,13 +1,10 @@
 /*
-Version: 3.5.2 Timestamp: Sat Nov  1 14:43:36 EDT 2014
+Version: 3.5.4 Timestamp: Sun Aug 30 13:30:32 EDT 2015
 */
 .select2-container {
     margin: 0;
     position: relative;
     display: inline-block;
-    /* inline-block for ie7 */
-    zoom: 1;
-    *display: inline;
     vertical-align: middle;
 }
 
@@ -180,10 +177,6 @@ html[dir="rtl"] .select2-container .select2-choice > .select2-chosen {
     width: auto;
 }
 
-.select2-drop-auto-width .select2-search {
-    padding-top: 4px;
-}
-
 .select2-container .select2-choice .select2-arrow {
     display: inline-block;
     width: 18px;
@@ -230,8 +223,7 @@ html[dir="rtl"] .select2-container .select2-choice .select2-arrow b {
     width: 100%;
     min-height: 26px;
     margin: 0;
-    padding-left: 4px;
-    padding-right: 4px;
+    padding: 4px 4px 0 4px;
 
     position: relative;
     z-index: 10000;
@@ -271,10 +263,6 @@ html[dir="rtl"] .select2-search input {
     background: url('select2.png') no-repeat -37px -22px, -webkit-linear-gradient(center bottom, #fff 85%, #eee 99%);
     background: url('select2.png') no-repeat -37px -22px, -moz-linear-gradient(center bottom, #fff 85%, #eee 99%);
     background: url('select2.png') no-repeat -37px -22px, linear-gradient(to bottom, #fff 85%, #eee 99%) 0 0;
-}
-
-.select2-drop.select2-drop-above .select2-search input {
-    margin-top: 4px;
 }
 
 .select2-search input.select2-active {
@@ -710,9 +698,9 @@ html[dir="rtl"] .select2-container-multi .select2-search-choice-close {
 
 /* main top-level container */
 .use_select2_lib {
-	width: auto!important;
-	margin-top: 0px!important;
-	margin-bottom: 2px!important;
+	width: auto !important;
+	margin-top: 0px;
+	margin-bottom: 2px;
 }
 /* main top-level container - multi-select */
 .use_select2_lib.select2-container-multi {
@@ -732,7 +720,7 @@ html[dir="rtl"] .select2-container-multi .select2-search-choice-close {
 }
 /* results listing box */
 .select2-drop .select2-results {
-	max-height: 240px !important;
+	max-height: 280px !important;
 	text-align: left !important;
 	float:left;
 	width: 100%;
@@ -742,7 +730,9 @@ html[dir="rtl"] .select2-container-multi .select2-search-choice-close {
     display: none;
 }
 /* style disable choise, and force showing already selected value as disabled */
-.select2-results .select2-selected,
+.select2-results .select2-selected.select2-selected-visible {
+  display: list-item !important;
+}
 .select2-results .select2-disabled {
 	max-width: 97%;
   background: #f4f4f4 !important;
@@ -755,6 +745,11 @@ html[dir="rtl"] .select2-container-multi .select2-search-choice-close {
          -moz-user-select: none !important;
           -ms-user-select: none !important;
               user-select: none !important;
+}
+
+/* Options Group Label */
+.select2-results li.select2-result-with-children > .select2-result-label {
+    background-color: #e0e0e0;
 }
 
 /* EXISTING CSS stricter: result label */
@@ -788,7 +783,7 @@ html[dir="rtl"] .select2-container-multi .select2-search-choice-close {
     display: inline-block !important;
 }
 .select2-container-multi .select2-choices .select2-search-choice {
-    padding: 3px 5px 3px 24px !important;
+    padding: 3px 24px 3px 5px !important;
     margin: 2px !important;
     position: relative !important;
 
@@ -820,85 +815,31 @@ html[dir="rtl"] .select2-container-multi .select2-search-choice-close {
     background-image: linear-gradient(to bottom, #f4f4f4 20%, #f0f0f0 50%, #e8e8e8 52%, #eee 100%)!important;
 }
 
-/************************************************
- * SINGLE  SELECT customizations and enforced CSS
- ************************************************/
- 
-/* select choice container */
-.select2-container .select2-choice {
-	padding: 0 0 0 8px !important;
-	margin: 0 6px 0 0 !important;
-	font-weight: normal !important;
-}
-html[dir="rtl"] .select2-container .select2-choice {
-	padding: 0 8px 0 0 !important;
-}
-.select2-container .select2-choice > .select2-chosen {
-	color: black !important;
+html[dir="rtl"] .select2-container-multi .select2-choices .select2-search-choice {
+    padding: 3px 5px 3px 24px !important;
 }
 
-
-/**********************************************
- * MULTI SELECT customizations and enforced CSS
- **********************************************/
-
-/* already selected choices container */
-.select2-container .select2-choices {
-	list-style-type: none !important;
-	position: relative !important;
-	top: 0 !important; left: 0 !important;
-	padding: 0px !important;
-	margin: 0 6px 0 0 !important;
-	white-space: normal !important; /* for chrome! */
-	width: auto !important;
-	min-width: 24px !important;
+.select2-search-choice-close {
+    left: auto !important;
+    right: 3px !important;
+}
+html[dir="rtl"] .select2-search-choice-close {
+    right: auto !important;
+    left: 3px !important;
 }
 
-/* search box container */
-.select2-container .select2-search-field {
-	padding: 0px !important;
-	margin: 0px 2px !important;
-	line-height: 1em !important;
-	position: relative !important;
-}
-
-/* Make search (filtering) field always visible, forcing the search icon too  */
-.select2-container-multi .select2-choices .select2-search-field input.select2-input,
-.select2-container-multi.select2-dropdown-open .select2-choices .select2-search-field input.select2-input {
-	width: auto !important;
-	min-width: 124px !important;
-	min-height: 20px !important;
-	padding: 1px 4px !important;
-	border: 1px solid lightgray !important;
-	/*background: url(../../assets/images/plus-button.png) no-repeat  50% 50% !important;*/
-
-	background: #fff url('select2.png') no-repeat 100% -22px !important;
-	background: url('select2.png') no-repeat 100% -22px, -webkit-gradient(linear, left bottom, left top, color-stop(0.85, #fff), color-stop(0.99, #eee)) !important;
-	background: url('select2.png') no-repeat 100% -22px, -webkit-linear-gradient(center bottom, #fff 85%, #eee 99%) !important;
-	background: url('select2.png') no-repeat 100% -22px, -moz-linear-gradient(center bottom, #fff 85%, #eee 99%) !important;
-	background: url('select2.png') no-repeat 100% -22px, linear-gradient(to bottom, #fff 85%, #eee 99%) 0 0 !important;
-}
-
-/* Enlarge above when focused */
-.select2-container-multi .select2-choices > li:first-child input.select2-input,
-.select2-container-multi.select2-dropdown-open .select2-choices > li:first-child input.select2-input,
-.select2-container-multi.select2-dropdown-open .select2-choices .select2-search-field input.select2-input.select2-focused {
-	width: auto !important;
-	min-width: 124px !important;
-}
-
-/* Make sure above is has clickable appearance (cursor pointer) */
-.select2-container-multi .select2-choices .select2-search-field input.select2-input:hover {
-	cursor: pointer !important;
-}
-
-/* Enlarge the removal icon padding to allow easier removal of multiple choices */
 .select2-container-multi .select2-search-choice-close {
-	left: 0px !important;
-	margin: -1px 0 0 !important;
-	padding: 0 0 0 8px !important;
+    left: auto !important;
+    right: 3px !important;
 }
-/* ?? */
-.select2-drop .select2-results .select2-result.select2-selected-highlight div {
-	font-size: 11px !important;
+
+html[dir="rtl"] .select2-container-multi .select2-search-choice-close {
+    right: auto !important;
+    left: 3px !important;
+}
+
+.select2-container .select2-choice > .select2-chosen {
+	line-height: 1.2em;
+	display: inline-block;
+	vertical-align: middle;
 }

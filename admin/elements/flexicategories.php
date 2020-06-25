@@ -18,18 +18,24 @@
 
 // Check to ensure this file is included in Joomla!
 defined('_JEXEC') or die('Restricted access');
-if (FLEXI_J16GE) {
-	jimport('joomla.html.html');
-	jimport('joomla.form.formfield');
-}
 
+jimport('cms.html.html');      // JHtml
+jimport('cms.html.select');    // JHtmlSelect
+jimport('joomla.form.field');  // JFormField
+
+//jimport('joomla.form.helper'); // JFormHelper
+//JFormHelper::loadFieldClass('...');   // JFormField...
+
+if (!defined('DS'))  define('DS',DIRECTORY_SEPARATOR);
 JTable::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'tables');
+
 // Load the category class
 require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.categories.php');
+
 // Load the helper classes
 require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.helper.php');
 		
-FLEXI_J30GE ? JHtml::_('behavior.framework', true) : JHTML::_('behavior.mootools');
+JHtml::_('behavior.framework', true);
 flexicontent_html::loadFramework('jQuery');
 flexicontent_html::loadFramework('select2');
 
@@ -53,24 +59,24 @@ class JFormFieldFlexicategories extends JFormField
 	function getInput()
 	{
 		static $function_added = false;
-		if (FLEXI_J16GE) {
-			$node = & $this->element;
-			$attributes = get_object_vars($node->attributes());
-			$attributes = $attributes['@attributes'];
-		} else {
-			$attributes = & $node->_attributes;
-		}
-		
-		$values			= FLEXI_J16GE ? $this->value : $value;
-		if ( !empty($attributes['joinwith']) ) {
+
+		$node = & $this->element;
+		$attributes = get_object_vars($node->attributes());
+		$attributes = $attributes['@attributes'];
+
+		$values = $this->value;
+
+		if (!empty($attributes['joinwith']))
+		{
 			$values = explode( $attributes['joinwith'],  $values );
 		}
+
 		if ( empty($values) )							$values = array();
 		else if ( ! is_array($values) )		$values = !FLEXI_J16GE ? array($values) : explode("|", $values);
 		
 		$fieldname	= FLEXI_J16GE ? $this->name : $control_name.'['.$name.']';
 		$element_id = FLEXI_J16GE ? $this->id : $control_name.$name;
-		$ffname = @$attributes['name'];
+		$ffname = (string) $this->element['name'];
 		
 		$published_only = (boolean) @$attributes['published_only'];
 		$parent_id   = (int) @$attributes['parent_id'];
@@ -80,66 +86,62 @@ class JFormFieldFlexicategories extends JFormField
 		$attribs = '';
 		
 		// Steps needed for multi-value select field element, e.g. code to maximize select field
-		if ( @$attributes['multiple']=='multiple' || @$attributes['multiple']=='true' ) {
+		$multiple = (string) $this->element['multiple'];
+		$size = (int) $this->element['size'];
+
+		$isMultiple = $multiple === 'multiple' ||  $multiple === 'true';
+		
+		if ($isMultiple)
+		{
 			$attribs .= ' multiple="multiple" ';
-			$attribs .= (@$attributes['size']) ? ' size="'.$attributes['size'].'" ' : ' size="8" ';
-			$fieldname .= !FLEXI_J16GE ? "[]" : "";  // NOTE: this added automatically in J2.5
-			/*$onclick = ""
-				."${element_id} = document.getElementById(\"${element_id}\");"
-				."if (${element_id}.size<40) {"
-				."	${element_id}_oldsize = ${element_id}.size;"
-				."	${element_id}.size=40;"
-				."} else {"
-				."	${element_id}.size = ${element_id}_oldsize;"
-				."}"
-				."parent = ${element_id}.getParent(); upcnt=0;"
-				."while(upcnt<10 && !parent.hasClass(\"jpane-slider\")) {"
-				."	upcnt++; parent = parent.getParent();"
-				."}"
-				."if (parent.hasClass(\"jpane-slider\")) parent.setStyle(\"height\", \"auto\");"
-			;
-			$style = 'display:inline-block;'.(FLEXI_J16GE ? 'float:left; margin: 6px 0px 0px 18px;':'margin:0px 0px 6px 12px');
-			$maximize_link = "<a style='$style' href='javascript:;' onclick='$onclick' >Maximize/Minimize</a>";*/
-		} else {
-			//$maximize_link = '';
+			$attribs .= ' size="' . ($size ?: 8). '" ';
 		}
-		$maximize_link = '';
 		
 		$top = @$attributes['top'] ? $attributes['top'] : false;
 		
 		$classes = 'use_select2_lib ';
-		$classes .= ( @$attributes['required'] && @$attributes['required']!='false' ) ? ' required' : '';
-		$classes .= $node->attributes('validation_class') ? ' '.$node->attributes('validation_class') : '';
+		$classes .= @$attributes['required'] && @$attributes['required']!='false' ? ' required' : '';
+		$classes .= @$attributes['class'] ? ' '.$attributes['class'] : '';
 		$classes = ' class="'.$classes.'"';
 		$attribs .= $classes .' style="float:left;" ';
 		
 		
-		// Add onClick functions (e.g. joining values to a string)
-		if ( !empty($attributes['joinwith']) && !$function_added) {
+		// Add onclick functions (e.g. joining values to a string)
+		if (!empty($attributes['joinwith']) && !$function_added)
+		{
 			$function_added = true;
-			$js = "
-			function FLEXIClickCategory(obj, name) {
-				values=new Array();
-				for(i=0,j=0;i<obj.options.length;i++) {
-					if(obj.options[i].selected==true)
+			$js = '
+			function FLEXIClickCategory(obj, name)
+			{
+				values = new Array();
+
+				for (i = 0, j = 0; i < obj.options.length; i++)
+				{
+					if (obj.options[i].selected == true)
+					{
 						values[j++] = obj.options[i].value;
+					}
 				}
-				value_list = values.join(',');
-				document.getElementById('a_id_'+name).value = value_list;
-				//alert(document.getElementById('a_id_'+name).value);
-			}";
-			$doc = JFactory::getDocument();
-			$doc->addScriptDeclaration($js);
+
+				value_list = values.join(\',\');
+				document.getElementById(\'a_id_\' + name).value = value_list;
+			}';
+
+			JFactory::getDocument()->addScriptDeclaration($js);
 		}
 		
 		$html = '';
-		if ( !empty($attributes['joinwith']) ) {
+
+		if (!empty($attributes['joinwith']))
+		{
 			$select_fieldname = '_'.$ffname.'_';
 			$text_fieldname = str_replace('[]', '', $fieldname);
 			
 			$attribs .= ' onclick="FLEXIClickCategory(this,\''.$ffname.'\');" ';
 			$html    .= "\n<input type=\"hidden\" id=\"a_id_{$ffname}\" name=\"$text_fieldname\" value=\"".@$values[0]."\" />";
-		} else {
+		}
+		else
+		{
 			$select_fieldname = $fieldname;
 		}
 		
@@ -149,7 +151,6 @@ class JFormFieldFlexicategories extends JFormField
 			false, true, $actions_allowed=array('core.create')
 		);
 		
-		return $html.$maximize_link;
+		return $html;
 	}
 }
-?>

@@ -1,0 +1,1420 @@
+@import 'include/config.less';
+
+/*******************************
+ * Input / select / form styling
+ *******************************/
+
+.flexicontent :not(.input-prepend):not(.input-append) > input[type="text"]:not(.minicolors) {
+	display: inline-block;
+	margin: 1px 2px 1px 2px;
+	/*padding: 4px 2px 5px;*/
+	/*border-radius: 4px;*/
+}
+.flexicontent *:not(.input-append):not(.input-prepend):not(.input-group) > div.use_select2_lib {
+	margin: 1px 2px 1px 2px;
+}
+.flexicontent *:not(.input-append):not(.input-prepend):not(.input-group) > select:not(.custom-select) {
+	display: inline-block;
+	margin: 1px 2px 1px 2px;
+	padding: 4px;
+	border-radius: 4px;
+	height: auto;
+}
+
+.controls *:not(.input-append):not(.input-prepend):not(.input-group) > input[type="text"]:not(.minicolors),
+.controls textarea,
+.controls fieldset.radio,
+.controls fieldset.checkbox,
+.flexicontent textarea,
+.flexicontent fieldset.radio,
+.flexicontent fieldset.checkbox {
+	margin: 1px 2px 1px 2px;
+}
+.flexicontent form {
+	margin: 0px;
+	padding: 0px;
+}
+
+body .fc_isselect.fc_ismobile {
+}
+
+
+// ***
+// *** Labels
+// ***
+
+body .control-label > label {
+	max-width: 160px;
+	white-space: initial;
+}
+
+body label.fc-prop-lbl,
+body span.fc-prop-lbl,
+body #flexicontent label.fc-prop-lbl,
+body #flexicontent span.fc-prop-lbl {
+	font-family: "Trebuchet MS", Verdana, Helvetica, Arial;
+	font-size: 13px;
+	color: #040507;
+}
+.fc-label-num1:after { content: " 1"; }
+.fc-label-num2:after { content: " 2"; }
+.fc-label-num3:after { content: " 3"; }
+.fc-label-num4:after { content: " 4"; }
+.fc-label-num5:after { content: " 5"; }
+.fc-label-num6:after { content: " 6"; }
+.fc-label-num7:after { content: " 7"; }
+.fc-label-num8:after { content: " 8"; }
+.fc-label-num9:after { content: " 9"; }
+.fc-label-num10:after { content: " 10"; }
+
+
+/*****************************************
+ * Checkbox / Radio styling (and hide them)
+ *****************************************/
+
+/* Labels with these classes must have input/select placed inside them */
+
+#flexicontent .fcradiocheckimage label.fccheckradio_lbl {
+	vertical-align: unset !important;
+}
+
+label.fccheckradio_lbl,
+span.fcselect_lbl {
+	display: inline-block;
+	white-space: nowrap;
+	padding-right: 8px;
+	min-width: 0px;
+	margin: 0px 0px 0px 2px;
+	float: none;
+	clear: none;
+}
+
+
+/* J3.x styles for radio button sets */
+
+.flexicontent span.radio {
+	white-space: normal !important;
+	display: inline-block !important;
+	padding: 0px !important;
+}
+
+.flexicontent label.radio {
+	white-space: nowrap !important;
+	width: auto !important;
+	display: inline-block !important;
+	padding: 0px 4px 0px 0px !important;
+	margin: 0px !important;
+}
+
+
+
+/* Hide input field, but exclude input inside labels (graceful fallback for older browsers) */
+.group-fcset input,
+input[type="checkbox"].fc_checkradio,
+input[type="radio"].fc_checkradio {
+	width: 24px !important;
+	/*width: 19px !important;*/
+	margin: 0 !important;
+	padding: 0 !important;
+	opacity: 0 !important;
+	display: none !important;
+}
+
+.group-fcset label input,
+label input[type="checkbox"].fc_checkradio,
+label input[type="radio"].fc_checkradio {
+	width: auto !important;
+	margin: 3px 3px 0px 0px !important;
+	padding: unset !important;
+	opacity: inherit !important;
+	display: inline !important;
+	vertical-align: bottom !important;
+}
+
+
+/* Style the label to also include the checkbox, radio */
+
+div.select2-drop.select2-drop-multi li.select2-result-selectable > .select2-result-label,
+.group-fcset input + label,
+input[type="checkbox"].fc_checkradio + label,
+input[type="radio"].fc_checkradio + label {
+	display: inline-block !important;
+	margin: 1px 12px 1px 0px;
+	padding: 0px 0px 0px 24px !important;
+	line-height: 22px !important;
+	height: 22px !important;
+	text-align: left !important;
+	min-width: 1px !important;
+	cursor: pointer !important;
+	color: #333;
+	/*margin-left: -19px !important;
+	padding-left: 19px !important;
+	line-height: 19px !important;
+	height: 19px !important;*/
+}
+
+div.select2-drop.select2-drop-multi li.select2-result-selectable > .select2-result-label {
+	width: 100% !important;
+	box-sizing: border-box !important;
+}
+
+div.select2-drop.select2-drop-multi li.select2-result.select2-disabled > .select2-result-label,
+.group-fcset input[type="checkbox"]:disabled + label,
+input[type="checkbox"].fc_checkradio:disabled + label {
+	background-position: 0 0 !important;
+	font-style: italic !important;
+	cursor: default !important;
+	opacity: 0.6 !important;
+}
+
+.group-fcset input[type="radio"]:disabled + label,
+input[type="radio"].fc_checkradio:disabled + label {
+	background-position: 0 -72px !important;
+	font-style: italic !important;
+	color: gray !important;
+	cursor: default !important;
+	opacity: 0.6 !important;
+}
+
+div.select2-drop.select2-drop-multi li.select2-result-selectable > .select2-result-label,
+.group-fcset input[type="checkbox"] + label,
+input[type="checkbox"].fc_checkradio + label {
+	background: url(../images/checks2.png) no-repeat 0 0 !important;
+}
+.group-fcset input[type="radio"] + label,
+input[type="radio"].fc_checkradio + label {
+	background: url(../images/checks2.png) no-repeat 0 -72px !important;
+}
+
+
+.group-fcset input[type="checkbox"] + label.green,
+input[type="checkbox"].fc_checkradio + label.green {
+	background: url(../images/checks3.png) no-repeat 0 0 !important;
+}
+.group-fcset input[type="radio"] + label.green,
+input[type="radio"].fc_checkradio + label.green {
+	background: url(../images/checks3.png) no-repeat 0 -72px !important;
+}
+.group-fcset label.green.single,
+.fc_checkradio + label.green.single {
+	padding-left: 18px !important;
+	margin: 0px !important;
+}
+
+/* Style the checked versions of checkbox,radio */
+
+div.select2-drop.select2-drop-multi li.select2-result.select2-selected-visible > .select2-result-label,
+.group-fcset input[type="checkbox"]:checked + label,
+input[type="checkbox"].fc_checkradio:checked + label {
+	background-position: 0 -24px !important;
+	/*background-position: 0 -19px !important;*/
+}
+
+.group-fcset input[type="radio"]:checked + label,
+input[type="radio"].fc_checkradio:checked + label {
+	background-position: 0 -48px !important;
+	/*background-position: 0 -57px !important;*/
+}
+
+.group-fcset input,
+input[type="checkbox"].fc_checkradio,
+input[type="checkbox"].fc_checkradio:focus,
+input[type="radio"].fc_checkradio,
+input[type="radio"].fc_checkradio:focus {
+	border: 0px !important;
+}
+
+
+/* Styling for radio/checkboxes , for browser not supporting above, e.g. ie8,ie9) */
+
+.group-fcset input,
+input.fc_checkradio {
+	margin: 0px 4px 3px 4px;
+	padding: 0px;
+	vertical-align: bottom;
+	position: relative;
+	top: -1px;
+}
+
+/* Fix CSS rule that assumes input is always inside the label */
+
+.flexicontent input[type="radio"] + label:not(.btn),
+.flexicontent input[type="checkbox"] + label:not(.btn) {
+	display: unset;
+	margin-right: 0.5em;
+}
+
+/* Styling for radio/checkboxes lists */
+
+.fc_input_set {
+	display: inline-block;
+	vertical-align: top;
+	padding: 2px;
+	border: 1px solid rgba(255, 255, 255, .01);
+	-webkit-background-clip: padding-box; /* for Safari */
+	background-clip: padding-box; /* for IE9+, Firefox 4+, Opera, Chrome */	
+}
+.fc_input_set.invalid {
+}
+.fc_input_set.fc_prompt
+{
+	float: left;
+	font-weight: normal;
+}
+
+div.fc_checkradio_group_wrapper {
+	display: inline-block;
+	float: left;
+	clear: both;
+	margin: 0px;
+	padding: 0px;
+	overflow-y: auto;
+	overflow-x: visible;
+	height: auto;
+	max-height: 220px;
+}
+ul.fc_checkradio_group,
+li.fc_checkradio_option {
+	padding: 0px;
+	margin: 0px;
+	background: none transparent;
+}
+ul.fc_checkradio_group {
+	list-style-type: none;
+	display: block;
+	clear: both;
+}
+li.fc_checkradio_option {
+	white-space: nowrap;
+	display: inline-block; /* auto-hide do not force display */
+	margin-top: 1px;
+	margin-bottom: 1px;
+	vertical-align: top;
+}
+
+
+
+/**********************************************************
+ * ALTERNATIVE display like a bar (use 'fc_checkradio_bar')
+/**********************************************************/
+
+/* Style the label to also include the checkbox, radio */
+
+input[type="checkbox"].fc_checkradio_bar + label,
+input[type="radio"].fc_checkradio_bar + label {
+	display: inline-block !important;
+	margin: -2px !important;
+	padding: 4px 12px !important;
+	margin-bottom: 0 !important;
+	font-size: 14px !important;
+	line-height: 20px !important;
+	color: #333 !important;
+	text-align: center !important;
+	text-shadow: 0 1px 1px rgba(255,255,255,0.75) !important;
+	vertical-align: middle !important;
+	cursor: pointer !important;
+	background-color: #f5f5f5 !important;
+	background-image: -webkit-linear-gradient(top,#fff,#e6e6e6) !important;
+	background-image: linear-gradient(to bottom,#fff,#e6e6e6) !important;
+	background-repeat: repeat-x !important;
+	border: 1px solid #ccc !important;
+	border-color: #e6e6e6 #e6e6e6 #bfbfbf !important;
+	border-color: rgba(0,0,0,0.1) rgba(0,0,0,0.1) rgba(0,0,0,0.25) !important;
+	border-bottom-color: #b3b3b3 !important;
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffffff',endColorstr='#ffe6e6e6',GradientType=0) !important;
+	filter: progid:DXImageTransform.Microsoft.gradient(enabled=false) !important;
+	box-shadow: inset 0 1px 0 rgba(255,255,255,0.2), 0 1px 2px rgba(0,0,0,0.05) !important;
+}
+
+
+/* Style the checked versions of checkbox,radio */
+
+input[type="checkbox"].fc_checkradio_bar:checked + label,
+input[type="radio"].fc_checkradio_bar:checked + label {
+	background-image: none !important;
+	outline: 0 !important;
+	box-shadow: inset 0 2px 4px rgba(0,0,0,0.15), 0 1px 2px rgba(0,0,0,0.05) !important;
+	background-color: #e0e0e0 !important;
+}
+
+
+
+
+/********************************
+ * Flexicontent buttons for Forms
+ *******************************/
+
+div.fc_filter_line.fc_filter_buttons_box > .fc_buttons.btn-group {
+	width: 100%;
+	max-width: 1200px;
+	box-sizing:border-box;
+	margin-left: 0;
+	margin-right: 0;
+}
+div.fc_filter_line.fc_filter_buttons_box > .fc_buttons.btn-group > button {
+	margin-left: 0;
+	margin-right: 0;
+}
+div .listall-lbl {
+	max-width: 1200px;
+	width: 100%;
+	box-sizing: border-box;
+	margin:8px 0;
+}
+
+div .flexi_buttons,
+div .fc_buttons {
+	margin: 0px;
+	padding: 0px 2px 0px 2px;
+	display: inline-block;
+}
+
+div .fc_button:not(.btn),
+div .fc_buttons button:not(.btn),
+div .flexi_buttons button:not(.btn) {
+	float: none !important;
+	height: auto !important;
+	border: 1px solid #cccccc;
+	border-radius: 4px;
+	line-height: 1.5em;
+	font-size: 12px;
+	font-family: arial, helvetica, sans-serif;
+	padding: 4px 8px;
+	margin: 2px 2px 2px 2px;
+	text-decoration: none;
+	text-transform: none;
+	display: inline-block;
+	font-weight: bold;
+	color: black;
+	background-color: #eeeeee;
+	background-image: -webkit-linear-gradient(top,#eeeeee,#dddddd);
+	background-image: linear-gradient(to bottom,#eeeeee,#dddddd);
+	filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#eeeeee,endColorstr=#dddddd);
+}
+
+div .fc_button.fcsimple:not(.btn) {
+	-moz-border-bottom-colors: none;
+	-moz-border-left-colors: none;
+	-moz-border-right-colors: none;
+	-moz-border-top-colors: none;
+	background-color: #f5f5f5;
+	background-image: linear-gradient(to bottom,#fff,#e6e6e6);
+	background-repeat: repeat-x;
+	border-color: rgba(0,0,0,0.1) rgba(0,0,0,0.1) #b3b3b3;
+	border-image: none;
+	border-radius: 4px;
+	border-style: solid;
+	border-width: 1px;
+	box-shadow: inset 0 1px 0 rgba(255,255,255,0.2), 0 1px 2px rgba(0,0,0,0.05);
+	color: #333;
+	cursor: pointer;
+	display: inline-block;
+	line-height: 20px;
+	margin: 0;
+	padding: 4px 12px;
+	text-align: center;
+	text-shadow: 0 1px 1px rgba(255,255,255,0.75);
+	vertical-align: middle;
+}
+
+div .fc_button.fcsimple:not(.btn):hover,
+div .fc_button.fcsimple:not(.btn):focus {
+	border-color: rgba(0,0,0,0.1) rgba(0,0,0,0.1) #b3b3b3;
+	color: #333333;
+	background-image: linear-gradient(to bottom,#fff,#e6e6e6);
+	background-color: #e6e6e6;
+	text-decoration: none;
+	background-position: 0 -15px;
+	-webkit-transition: background-position 0.1s linear;
+	-moz-transition: background-position 0.1s linear;
+	-o-transition: background-position 0.1s linear;
+	transition: background-position 0.1s linear;
+}
+
+div .fc_button:not(.btn):hover,
+div .fc_buttons button:not(.btn):hover,
+div .flexi_buttons button:not(.btn):hover {
+	border: 1px solid #bbbbbb;
+	background-color: #dddddd;
+	background-image: -webkit-linear-gradient(top,#dddddd,#cccccc);
+	background-image: linear-gradient(to bottom,#dddddd,#cccccc);
+	filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#dddddd,endColorstr=#cccccc);
+}
+
+/*
+.fcbutton_apply, .fcbutton_save, .fcbutton_cancel,
+.fcbutton_preview, .fcbutton_preview_save,
+.fcbutton_go, .fcbutton_reset { padding-left: 20px !important; }
+.fcbutton_apply { background: url(../images/accept.png) no-repeat !important; }
+.fcbutton_save { background: url(../images/accept.png) no-repeat !important; }
+.fcbutton_preview_save { background: url(../images/monitor_go.png) no-repeat !important; }
+.fcbutton_preview { background: url(../images/monitor.png) no-repeat !important; }
+.fcbutton_cancel { background: url(../images/cancel.png) no-repeat !important; }
+.fcbutton_go { background: url(../images/accept.png) no-repeat !important; }
+.fcbutton_reset { background: url(../images/cancel.png) no-repeat !important; }
+*/
+
+
+
+/***********************************
+ * Flexicontent form submit handling
+ ***********************************/
+ 
+/* Form submit handling */
+#flexi_form_submit_msg {
+	font-size: 11px;
+	display: none;
+	padding: 4px 0px 4px 30px;
+	background: transparent url(../images/ajax-loader.gif) 0px 3px no-repeat;
+}
+.fc_loading_msg {
+	font-size: 14px;
+	font-family: times;
+	padding: 4px 0px 4px 30px;
+	background: transparent url(../images/ajax-loader.gif) 6px 5px no-repeat;
+	
+	display: inline-block;
+	min-height: 1em;
+	line-height: 1.1em;
+	box-sizing: unset;
+	margin: 0;
+	vertical-align: top;
+}
+#flexi_form_submit_btns {
+	font-size: 11px;
+}
+.ajax-loader {
+	background: url("../images/ajax-loader.gif") no-repeat scroll left center transparent;
+	height: 16px;
+	padding: 0 0 0 20px;
+	display: inline-block;
+}
+.ajax-loader_bar {
+	background: url("../images/ajax-loader_bar.gif") no-repeat scroll right center transparent;
+	height: 15px;
+	padding: 0 0 0 128px;
+	display: inline-block;
+	margin: 4px;
+}
+.ajax-loader_bar2 {
+	background: url("../images/ajax-loader_bar2.gif") no-repeat scroll right center transparent;
+	height: 21px;
+	padding: 0 0 0 140px;
+	display: inline-block;
+	margin: 4px;
+}
+
+
+
+/**********************************************
+ * Form field separator element CSS for forms *
+ **********************************************/
+
+.fcsep_level_h,
+.fcsep_level0,
+.fcsep_level1,
+.fcsep_level2,
+.fcsep_level3 {
+	display: block;
+	position: relative;
+	border-radius: 5px;
+	clear: both;
+	float: left;
+	font-size: 12px;
+	line-height: 1.5em;
+}
+
+.fcsep_level_h {
+	margin: 0 0 12px 0;
+	width: 100%;
+	box-sizing: border-box;
+	background-color: #123973;
+	color: white;
+	font-size: 14px;
+	padding: 6px 16px;
+	font-family: Verdana, "Lucida Console";
+}
+
+.fcsep_level0 {
+	background-color: #0066AA;
+	color: white;
+	padding: 0.8em 1%;
+	margin: 48px 0% 4px 0%;
+	width: 100%;
+	box-sizing: border-box;
+	font-weight: bold;
+}
+.fcsep_level1 {
+	background-color: #2096C9;
+	color: white;
+	padding: 0.8em 1%;
+	margin: 20px 0% 4px 0%;
+	width: 100%;
+	box-sizing: border-box;
+	font-weight: bold;
+}
+.fcsep_level2 {
+	background-color: #7fc1ff;
+	color: #3a57ad;
+	padding: 0.4em 1%;
+	margin: 4px 0% 3px 0%;
+	width: 100%;
+	box-sizing: border-box;
+	font-weight: normal;
+}
+.fcsep_level3 {
+	background-color: #9fe1ff;
+	border: 1px solid #96c7ef;
+	color: #3a579d;
+	padding: 0.3em 2em;
+	margin: 4px 5% 3px;
+	width: auto;
+	font-weight: normal;
+}
+.fcsep_level4 {
+	background: #f7f7f7;
+	color: #333;
+	float: left;
+	font-weight: normal;
+	font-style: italic;
+	font-size: 12px;
+	border: 1px solid #777;
+	padding: 2px 16px 2px 16px;
+	margin: 5px 10% 2px;
+	display: block;
+	border-radius: 5px;
+	clear: both;
+	max-width: 60%;
+	font-weight: normal;
+}
+body .fcsep_level4.fc-mssg,
+body .fcsep_level4.fc-mssg-inline,
+body .fcsep_level4.alert,
+body .fcsep_level4.alert.fcpadded {
+	padding-top: 2px;
+	padding-bottom: 2px;
+	max-width: 90%;
+	margin-left: 5%;
+	margin-right: 5%;
+}
+.fcsep_level_br {
+	line-height: 16px;
+	height: 16px;
+	margin: 0;
+	padding: 0;
+	width: 100%;
+	display: block;
+}
+
+body .alert.fcpadded {
+	padding: 4px;
+	margin-top: 4px;
+	margin-bottom: 4px;
+	box-sizing: border-box;
+	float: left;
+	clear: both;
+}
+/*body .control-group .alert.fcpadded,
+.control-group .fcsep_level0,
+.control-group .fcsep_level1,
+.control-group .fcsep_level2,
+.control-group .fcsep_level3,
+.control-group .fcsep_level4 {
+	float: left;
+	margin-bottom: -3px;
+}*
+
+/* prevent margin when parameter list starts */
+table.paramlist.flexi > tbody > tr:nth-child(2) > td > .fcsep_level0,
+table.paramlist.flexi > tbody > tr:nth-child(2) > td > .fcsep_level1,
+table.paramlist.flexi > tbody > tr:nth-child(2) > td > .fcsep_level2,
+table.paramlist > tbody > tr:nth-child(1) > td > .fcsep_level0,
+table.paramlist > tbody > tr:nth-child(1) > td > .fcsep_level1,
+table.paramlist > tbody > tr:nth-child(1) > td > .fcsep_level2,
+fieldset:nth-child(1) > .fcsep_level0,
+fieldset:nth-child(1) > .fcsep_level1,
+fieldset:nth-child(1) > .fcsep_level2,
+.container_fcfield:nth-child(1) > .fcsep_level0,
+.container_fcfield:nth-child(1) > .fcsep_level1,
+.container_fcfield:nth-child(1) > .fcsep_level2,
+li:first-child .fcsep_level0,
+li:first-child .fcsep_level1,
+li:first-child .fcsep_level2,
+h3:first-child + .fcsep_level0,
+h3:first-child + .fcsep_level1,
+h3:first-child + .fcsep_level2,
+div.fc_empty_box + div.control-group:nth-of-type(2) > div > .fcsep_level0,
+div.fc_empty_box + div.control-group:nth-of-type(2) > div > .fcsep_level1,
+div.fc_empty_box + div.control-group:nth-of-type(2) > div > .fcsep_level2,
+div.tab-pane.active > .fcsep_level0:nth-of-type(1),
+div.tab-pane.active > .fcsep_level1:nth-of-type(1),
+div.tab-pane.active > .fcsep_level2:nth-of-type(1) {
+	margin-top: 4px !important;
+}
+
+.fcsep_level0.fc-nomargin,
+.fcsep_level1.fc-nomargin,
+.fcsep_level2.fc-nomargin,
+.fc-nomargin > .fcsep_level0,
+.fc-nomargin > .fcsep_level1,
+.fc-nomargin > .fcsep_level2 {
+	margin-top: 4px !important;
+}
+
+.fcsep_level0.fc-ngmargin,
+.fcsep_level1.fc-ngmargin,
+.fcsep_level2.fc-ngmargin {
+	margin-top: -12px !important;
+}
+
+div.control-group:first-of-type > div > .fcsep_level0,
+div.control-group:first-of-type > div > .fcsep_level1,
+div.control-group:first-of-type > div > .fcsep_level2 {
+	margin-top: 0px;
+}
+
+body .nowrap_hidden {
+	display: block;
+	visibility: hidden;
+	height: 1px;
+	overflow: hidden;
+	padding: 0;
+	margin: -1px 0 0 0;
+	white-space: nowrap;
+}
+
+/* bootstrap INPUT groups */
+#flexicontent div.input-group-addon > *:not(:first-child):not(:last-child):not(.select2-container),
+#flexicontent div.input-append > *:not(:first-child):not(:last-child):not(.select2-container),
+#flexicontent div.input-group-addon > *:not(:first-child):not(:last-child) > *,
+#flexicontent div.input-append > *:not(:first-child):not(:last-child) > * {
+	border-top-right-radius: 0px !important;
+	border-bottom-right-radius: 0px !important;
+	margin-right: 0 !important;
+}
+#flexicontent div.input-group-addon > *:not(:first-child):not(:last-child),
+#flexicontent div.input-prepend > *:not(:first-child):not(:last-child),
+#flexicontent div.input-group-addon > *:not(:first-child):not(:last-child) > *,
+#flexicontent div.input-prepend > *:not(:first-child):not(:last-child) > * {
+	border-top-left-radius: 0px !important;
+	border-bottom-left-radius: 0px !important;
+}
+
+.input-prepend.input-append .add-on:not(:last-child),
+.input-prepend.input-append .add-on:not(:last-child) > * {
+	border-top-right-radius: 0;
+	border-bottom-right-radius: 0;
+}
+.input-prepend.input-append .add-on:not(:first-child),
+.input-prepend.input-append .add-on:not(:first-child) > * {
+	border-top-left-radius: 0;
+	border-bottom-left-radius: 0;
+}
+
+/* media manager image field */
+.flexicontent .field-media-wrapper,
+.flexicontent .field-media-wrapper > div:not(.modal) {
+	min-width: 50%;
+	box-sizing: border-box;
+}
+.flexicontent .field-media-wrapper .field-media-input {
+	width: unset;
+	min-width: 80%;
+	max-width: unset;
+}
+
+.flexicontent iframe.seamless {
+	background-color: transparent;
+	border: 0px none transparent;
+	padding: 0px;
+	overflow: hidden;
+}
+
+.flexicontent :not(.fc_less_parameter) > .fc_less_parameter::before {
+	background-color: black;
+	color: white;
+	font-size: 12px;
+	font-weight: bold;
+	border-radius: 4px;
+	content: "css";
+	padding: 2px 4px;
+	box-sizing: content-box;
+	height: 1em;
+	line-height: 1em;
+}
+.flexicontent label.fc_less_parameter::before {
+	float: left;
+	position: relative;
+	top: -4px;
+	left: -4px;
+}
+
+
+
+// ***
+// *** Floating labels
+// ***
+
+#flexicontent .fc-floated-labels-box.fc-lbl-external-box {
+	padding-top: 18px;
+}
+
+#flexicontent .fc-floated-labels-box {
+	display: inline-block;
+  position: relative;
+	margin: 0px 4px 20px 0px;
+
+	> div.use_select2_lib {
+		width: 100% !important;
+		.select2-choice {
+			border-radius: 0 !important;
+			border: 1px solid transparent;
+			border-bottom: 1px solid gray;
+			padding: 0 0 0 0px !important;
+
+			.select2-arrow {
+				border-radius: 0 !important;
+				background: transparent !important;
+				border: 0 !important;
+			}
+		}
+	}
+
+	select,
+	> div.use_select2_lib:not(.select2-container-active) {
+		width: 100% !important;
+
+		.select2-choice {
+			background: transparent !important;
+			box-shadow: unset !important;
+		}
+	}
+
+	> input.fc-floated-lbl-input {
+		font-size: 14px;
+		width: 200px;
+		height: auto;
+		line-height: 1em;
+		padding: 0.5em 0.5em 0.25em 0.5em;
+		border: 1px solid gray;
+		border-radius: 4px;
+	}
+
+	> label.fc-floated-lbl {
+		font-family: "Trebuchet MS", Verdana, Helvetica, Arial;
+		font-size: 14px;
+		position: absolute;
+		pointer-events: none;
+		top: 8px;
+		left: 8px;
+		transition: 0.2s ease all;
+		z-index: 10;
+		color: gray;
+		opacity: 0.7;
+		padding: 0 4px 0 4px;
+	}
+
+	> label.fc-floated-lbl.media-preview {
+		top: 0px;
+	}
+
+	> label.fc-floated-lbl.fc-has-value {
+		background: #f0f0f0;
+		color: black;
+		top: -0.8em;
+		left: 0.5em;
+		font-size: 12px;
+		line-height: 1em;
+		opacity: 1;
+		padding: 0.15em 0.25em 0.15em 0.25em;
+	}
+
+	> label.fc-floated-lbl.fc-lbl-external {
+		top: -2px;
+		left: 2px;
+		font-size: 12px;
+		opacity: 1;
+	}
+
+	> label.fc-floated-lbl.fc-has-value.invalid {
+		top: -3px;
+		left: 4px;
+	}
+
+	> input.fc-floated-lbl-input.invalid {
+		border-left: 1px solid transparent !important;
+		border-right: 1px solid transparent !important;
+	}
+}
+
+body .fcsubform-compact div.container_fcfield div.row-fluid {
+	width: 300px;
+}
+
+
+// ***
+// *** TABLE .fc-table-*
+// ***
+
+div table.fc-table-list.fc-tbl-short .label {
+	min-width: 100px;
+}
+div table.fc-table-list.fc-tbl-short {
+	min-width: 400px;
+	float: left;
+}
+
+div table.fc-table-list {
+	font: 100%/30px 'Helvetica Neue', helvetica, arial, sans-serif;
+	text-shadow: 0 1px 0 #fff;
+	background: #f5f5f5;
+	border-collapse: separate;
+	box-shadow: inset 0 1px 0 #fff;
+	font-size: 12px;
+	line-height: 24px;
+	margin: 16px;
+	text-align: left;
+	min-width: 50%;
+}
+
+div table.fc-table-list th {
+	background-color: #444444;
+	background-image: url(../images/noise1.png), -webkit-linear-gradient(#777777,#444444);
+	background-image: url(../images/noise1.png), linear-gradient(#777777,#444444);
+	filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#777777,endColorstr=#444444);
+	border-left: 1px solid #555;
+	border-right: 1px solid #777;
+	border-top: 1px solid #555;
+	border-bottom: 1px solid #333;
+	box-shadow: inset 0 1px 0 #999;
+	color: #fff;
+	font-weight: bold;
+	padding: 6px 12px;
+	position: relative;
+	text-shadow: 0 1px 0 #000;
+}
+
+div table.fc-table-list th:after {
+	background: linear-gradient(rgba(255,255,255,0),rgba(255,255,255,0.08));
+	content: '';
+	display: block;
+	height: 25%;
+	left: 0;
+	margin: 1px 0 0 0;
+	position: absolute;
+	top: 25%;
+	width: 100%;
+}
+
+div table.fc-table-list th:first-child {
+	border-left: 1px solid #777;
+	box-shadow: inset 1px 1px 0 #999;
+}
+
+div table.fc-table-list th:last-child {
+	box-shadow: inset -1px 1px 0 #999;
+}
+
+div table.fc-table-list td {
+	border-right: 1px solid #fff;
+	border-left: 1px solid #e8e8e8;
+	border-top: 1px solid #fff;
+	border-bottom: 1px solid #e8e8e8;
+	padding: 10px 15px;
+	position: relative;
+	transition: all 300ms;
+}
+div table.fc-table-list.fc-tbl-short td {
+	padding: 0px 15px;
+	text-align: left;
+}
+div table.fc-table-list.fc-tbl-short td:first-child {
+	text-align: right;
+}
+
+div table.fc-table-list td a:not(.btn) {
+	text-decoration: none;
+	color: #0088cc;
+	font-weight: bold;
+}
+
+div table.fc-table-list td:first-child {
+	box-shadow: inset 1px 0 0 #fff;
+}
+
+div table.fc-table-list td:last-child {
+	border-right: 1px solid #e8e8e8;
+	box-shadow: inset -1px 0 0 #fff;
+}
+
+div table.fc-table-list tr {
+	background: url(../images/noise1.png);
+}
+
+div table.fc-table-list tr:nth-child(odd) td {
+	background: #f1f1f1 url(../images/noise1.png);
+}
+
+div table.fc-table-list tr:last-of-type td {
+	box-shadow: inset 0 -1px 0 #fff;
+}
+
+div table.fc-table-list tr:last-of-type td:first-child {
+	box-shadow: inset 1px -1px 0 #fff;
+}
+
+div table.fc-table-list tr:last-of-type td:last-child {
+	box-shadow: inset -1px -1px 0 #fff;
+}
+
+div table.fc-table-list thead tr:hover th {
+	color: white;
+	/*text-shadow: 2px 2px 3px #777 !important;*/
+	background-color: #ffffdd;
+}
+
+div table.fc-table-list tbody tr:hover td {
+	color: black;
+	/*text-shadow: 2px 2px 2px #888;*/
+	background-color: #dddddd;
+}
+
+div table.fc-table-list tbody tr:hover td a:not(.btn) {
+	color: rgb(0, 136, 204);
+	/*text-shadow: 1px 1px 2px #888;*/
+}
+
+
+// ***
+// *** FLEXIcontent backend manager views
+// ***
+
+/* rows table */
+table.adminlist.fcmanlist {
+	margin-top: 12px;
+}
+div.adminthumbs.fcmanthumbs {
+	margin-top: 12px;
+	margin-bottom: 12px;
+}
+.column_toggle_lbl { /* hidden label */
+	display: none;
+}
+
+td.col_created,
+td.col_revised {
+	white-space: nowrap;
+}
+td.col_created .input-append,
+td.col_revised .input-append {
+	margin: 0px;
+}
+td.col_title {
+	text-align: left;
+	min-width: 120px;
+}
+td.col_template {
+	text-align: left;
+}
+td.col_edit_layout {
+	text-align: right;
+}
+
+
+/* Common CSS of containers */
+.flexicontent #fc-filters-box,
+.flexicontent #mainChooseColBox,
+.flexicontent #itemusage-filters {
+	padding: 4px 8px 4px 4px;
+	margin: 4px 0px;
+	vertical-align: top;
+	min-height: 34px;
+}
+
+.flexicontent #fc-mini-help,
+.flexicontent #fc-filters-box.fcman-abs,
+.flexicontent #mainChooseColBox.fcman-abs {
+	position: absolute;
+	box-shadow: 2px 2px 6px black;
+	background: #fff;
+	z-index: 100;
+	left: 0;
+	top: 100%;
+	text-align: left;
+	padding: 6px;
+}
+.flexicontent #fc-filters-box.fcman-abs {
+	min-width: 359px;
+	max-width: 100%;
+}
+.flexicontent #fc-filters-box.fcman-abs,
+.flexicontent #mainChooseColBox.fcman-abs {
+	left: unset;
+	right: 0;
+	box-sizing: border-box;
+}
+
+.flexicontent #mainChooseColBox > #mainChooseColBox_cols {
+	display: inline-block;
+}
+.flexicontent #mainChooseColBox > #mainChooseColBox_cols > * {
+	display: inline-block;
+	float: left;
+	clear: both;
+}
+#flexicontent input.fcitem_order_no {
+	text-align: center;
+}
+
+
+// ***
+// *** Filters header  (Text search / Buttons / Pagination)
+// ***
+
+.flexicontent #fc-managers-header {
+
+	select.fc_is_selarrow {
+		max-width: 1.4em !important;
+	}
+	select.fc_is_selarrow:hover, select.fc_is_selarrow:focus {
+		max-width: unset !important;
+	}
+
+	select.fc_is_selarrow + #search {
+		margin-left: 1.3em !important;
+	}
+
+	#search {
+		margin: 0px !important;
+		padding: 4px !important;
+		vertical-align: top !important;
+		min-width: 200px;
+		border: 1px solid #aaa;
+
+		&::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
+			color: #ccc;
+			opacity: 1; /* Firefox */
+		}
+		&:-ms-input-placeholder { /* Internet Explorer 10-11 */
+			color: #ccc;
+		}
+		&::-ms-input-placeholder { /* Microsoft Edge */
+			color: #ccc;
+		}
+	}
+	#limit {
+		padding: 3px 6px !important;
+	}
+
+	.fc-filter-head-box {
+		vertical-align: middle;
+		border: 0px;
+		padding: 0px;
+		margin: 2px 24px 6px 0px;
+		width: unset;
+		position: relative;
+
+		.label {
+			font-size: 11px;
+			padding: 4px 4px;
+			margin: 0px 4px;
+		}
+
+		.input-group-append,
+		.input-group-prepend,
+		.input-append,
+		.input-prepend {
+			margin: 0px;  /* do not set font-size !*/
+
+			> * {
+				display: inline-block;
+			}
+		}
+	}
+
+	/* Manager Sliders close button (Filters, columns, other ?) */
+	#fc-columns-slide-btn,
+	#fc-filters-slide-btn {
+		width: 100%;
+		display: block;
+		box-sizing: border-box;
+		margin: 8px 0 0 0;
+		height: 24px;
+		padding: 4px;
+		float: none;
+		clear: both;
+	}
+}
+
+/* Very small screens ... (mobile phones) */
+@media only screen and (max-width: 480px) {
+	.flexicontent #fc-managers-header {
+		#search {
+			width: 112px;
+			min-width: 112px;
+		}
+	}
+}
+
+
+// ***
+// *** Filters box
+// ***
+
+.flexicontent #fc-filters-box {
+	padding-left: 0px;
+
+	/* Icons customization */
+	[class^="icon-arrow-"] {
+		vertical-align: middle;
+		font-size: 18px;
+	}
+
+
+	/* Filter container */
+	.fc-filter {
+		border: 0px solid;
+		margin: 4px 2px 4px 2px;
+		padding: 0px;
+		vertical-align: top;
+		min-width: 310px;
+		min-height: 30px;
+		float: none;
+		display: block;
+
+		/* Filter container (double size) */
+		&.fc-filter-double {
+			min-width: 628px;
+
+			.select2-container .select2-choice {
+				width: 482px !important;
+			}
+			.select2-container-multi {
+				width: 490px !important;
+			}
+		}
+
+		/* Filter labels */
+		.fc-xpended-row .input-group-text:first-child,
+		.fc-xpended-row .add-on:first-child {
+			min-width: 130px;
+			max-width: 130px;
+			white-space: normal;    /* allow wrap */
+			word-wrap: break-word;  /* allow wrap */
+			text-align: left;
+			display: inline-block;
+		}
+		.fc-xpended-row .add-on,
+		.fc-xpended .add-on {
+			color: black;  /* because we place inside a ... btn ... */
+		}
+
+
+		// ***
+		// *** Specific Filter cases
+		// ***
+
+		#s2id_date.select2-container.use_select2_lib .select2-choice {
+			width: 90px !important;
+			min-width: 90px !important;
+		}
+		#s2id_date.select2-container.use_select2_lib .select2-choice .select2-arrow {
+			border-radius: 0px !important;
+		}
+		#startdate_img,
+		#enddate_img {
+			padding-left: 2px !important;
+			padding-right: 2px !important;
+		}
+		#startdate_btn,
+		#enddate_btn {
+			font-size: 14px !important;
+			height: 28px !important;
+			padding: 2px 4px !important;
+			box-sizing: border-box;
+		}
+		#startdate_btn {
+			border-radius: 0;
+		}
+		#startdate,
+		#enddate {
+			font-size: 11px !important;
+			min-width: 99px;
+			max-width: 99px;
+			height: 16px !important;
+			padding: 13px 8px !important;
+			box-sizing: border-box;
+			border-radius: 0;
+		}
+	}
+}
+
+// *** Search Scope
+#s2id_scope.select2-container.use_select2_lib {
+	margin: 0;
+	display: inherit;
+
+	.select2-choice {
+		width: 10px !important;
+		margin: 0 !important;
+		border-top-right-radius: 0;
+		border-bottom-right-radius: 0;
+
+		.select2-chosen {
+			white-space: nowrap !important;
+		}
+
+		.select2-arrow {
+			border-radius: 0px;
+			> * {
+				background-position-y: 0.5em;
+			}
+		}
+	}
+}
+
+
+// ***
+// *** Filters
+// ***
+
+/* Increase max height of select2 drop downs */
+.admin.com_flexicontent .select2-drop .select2-results {
+	max-height: 400px !important;
+}
+
+
+
+.flexicontent #fc-filters-box .fc-filter {
+	/* First level childs */
+	> * {
+		vertical-align: middle !important;
+		float: left;
+		margin: 0 !important;
+	}
+	> *:not(.fc-xpended):not(.fc-xpended-row) {
+		margin: 0 6px 0 2px !important;
+	}
+
+	[class^="fc-xpended"] div.select2-container .select2-choice > .select2-chosen,
+	[class*="fc-xpended"] div.select2-container .select2-choice > .select2-chosen {
+		white-space: nowrap !important;
+	}
+
+	.label {
+		font-size: 11px;
+		padding: 4px 4px;
+		margin: 0px 4px;
+	}
+
+	*:not(.input-append):not(.input-prepend) > input[type="text"] {
+		padding: 2px 2px 3px !important;
+		margin: 0px !important;
+	}
+
+	.field-calendar > div > button {
+		width: 25px;
+		padding-left: 4px;
+		padding-right: 0;
+	}
+	.input-group-prepend > .input-group-text + input,
+	.input-prepend > .add-on + input {
+		width: 192px !important;
+		border-radius: 4px;
+	}
+	.input-prepend > input,
+	.input-append > input {
+		margin: 0 !important;
+	}
+
+	/* SELECT2 */
+	/* Single-choice */
+	.select2-container .select2-choice {
+		width: 196px !important;
+	}
+
+	/* Multi-choises */
+	.select2-container-multi {
+		width: 206px !important;
+
+	 .select2-choices {
+			margin: 0 !important;
+			.select2-search-field {
+				float: right !important;
+				margin: 0 !important;
+				border-left-width: 0;
+			}
+			.select2-search-field input.select2-input {
+		    min-height: 26px !important;
+		    box-sizing: border-box;
+		    margin: 0 !important;
+		    width: 22px !important;
+				cursor: pointer !important;
+				border-width: 0px !important;
+				background: transparent url(../images/select2.png) no-repeat scroll 100% -22px !important;
+				font-size: 13px;
+			}
+			.select2-search-choice {
+				color: darkorange !important;
+			}
+		}
+	}
+	.select2-container-multi.select2-dropdown-open .select2-choices {
+		.select2-search-field {
+			width: 100% !important;
+
+			input.select2-input {
+		    padding: 2px 6px 2px 26px !important;
+				background: transparent url(../images/select2.png) no-repeat scroll -32px -22px !important;
+				width: 100% !important;
+			}
+		}
+	}
+}
+
+
+// ***
+// *** Common classes according to media
+// ***
+@media (max-width: 1580px) {
+	body .fc_hidden_1580,
+	#flexicontent .fc_hidden_1580 {
+		display: none;
+	}
+}
+@media (max-width: 1360px) {
+	body .fc_hidden_1360,
+	#flexicontent .fc_hidden_1360 {
+		display: none;
+	}
+}
+@media (max-width: 1270px) {
+	body .fc_hidden_1270,
+	#flexicontent .fc_hidden_1270 {
+		display: none;
+	}
+}
+@media (max-width: 960px) {
+	body .fc_hidden_960,
+	#flexicontent .fc_hidden_960 {
+		display: none;
+	}
+}
+@media (max-width: 720px) {
+	body .fc_hidden_720,
+	#flexicontent .fc_hidden_720 {
+		display: none;
+	}
+}
+@media (max-width: 640px) {
+	body .fc_hidden_640,
+	#flexicontent .fc_hidden_640 {
+		display: none;
+	}
+}
+@media (max-width: 580px) {
+	body .fc_hidden_580,
+	#flexicontent .fc_hidden_580 {
+		display: none;
+	}
+}

@@ -15,7 +15,9 @@
 // Check to ensure this file is included in Joomla!
 defined('_JEXEC') or die( 'Restricted access' );
 
-//include constants file
+use Joomla\String\StringHelper;
+
+if (!defined('DS'))  define('DS',DIRECTORY_SEPARATOR);
 require_once (JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'defineconstants.php');
 
 /**
@@ -27,39 +29,46 @@ class FLEXIadvsearchHelper
 	static function santiseSearchWord(&$searchword, $searchphrase, $min=2)
 	{
 		$ignored = false;
-
 		$lang = JFactory::getLanguage();
+		$lang_tag = $lang->getTag();
+		$search_prefix = JComponentHelper::getParams( 'com_flexicontent' )->get('add_search_prefix') ? 'vvv' : '';   // SEARCH WORD Prefix
 
-		$search_ignore	= array();
-		$tag			= $lang->getTag();
-		$ignoreFile		= $lang->getLanguagePath().DS.$tag.DS.$tag.'.ignore.php';
-		if (file_exists($ignoreFile)) {
+		$search_ignore = array();
+		$ignoreFile = $lang->getLanguagePath().DS.$lang_tag.DS.$lang_tag.'.ignore.php';
+
+		if (file_exists($ignoreFile))
+		{
 			include $ignoreFile;
 		}
 
 	 	// check for words to ignore
-		$aterms = explode( ' ', JString::strtolower( $searchword ) );
+		$aterms = explode(' ', StringHelper::strtolower($searchword));
 
 		// first case is single ignored word
-		if ( count( $aterms ) == 1 && in_array( JString::strtolower( $searchword ), $search_ignore ) ) {
+		if (count($aterms) === 1 && in_array(StringHelper::strtolower($searchword), $search_ignore))
+		{
 			$ignored = true;
 		}
 
 		// filter out search terms that are too small
-		foreach( $aterms AS $aterm ) {
-			if (JString::strlen( $aterm ) < $min) {
+		foreach($aterms AS $aterm)
+		{
+			if (!$search_prefix && StringHelper::strlen( $aterm ) < $min)
+			{
 				$search_ignore[] = $aterm;
 			}
 		}
 
 		// next is to remove ignored words from type 'all' or 'any' (not exact) searches with multiple words
-		if ( count( $aterms ) > 1 && $searchphrase != 'exact' ) {
-			$pruned = array_diff( $aterms, $search_ignore );
-			$searchword = implode( ' ', $pruned );
+		if (count($aterms) > 1 && $searchphrase !== 'exact')
+		{
+			$pruned = array_diff($aterms, $search_ignore);
+			$searchword = implode(' ', $pruned);
 		}
+
 		// Set words that were removed due to being too short
-		JRequest::setVar('shortwords_sanitize', implode(' ', $search_ignore));
-		
+		JFactory::getApplication()->input->set('shortwords_sanitize', implode(' ', $search_ignore));
+
 		return $ignored;
 	}
 
@@ -68,13 +77,15 @@ class FLEXIadvsearchHelper
 		$restriction = false;
 
 		// maximum searchword length character limit
-		if ( JString::strlen( $searchword ) > $max ) {
-			$searchword 	= JString::substr( $searchword, 0, $max );
+		if (StringHelper::strlen($searchword) > $max)
+		{
+			$searchword 	= StringHelper::substr( $searchword, 0, $max );
 			$restriction 	= true;
 		}
 
 		// minimum searchword length character limit
-		if ( $searchword && JString::strlen( $searchword ) < $min ) {
+		if ($searchword && StringHelper::strlen($searchword) < $min)
+		{
 			$searchword 	= '';
 			$restriction 	= true;
 		}
@@ -84,35 +95,31 @@ class FLEXIadvsearchHelper
 
 	static function logSearch( $search_term )
 	{
-		$mainframe = JFactory::getApplication();
-
-		$db = JFactory::getDBO();
-
-		$params = JComponentHelper::getParams( 'com_search' );
+		$db = JFactory::getDbo();
+		$params = JComponentHelper::getParams('com_search');
 		$enable_log_searches = $params->get('enabled');
 
-		$search_term = $db->Quote( trim( $search_term) );
+		$search_term_quoted = $db->Quote(trim($search_term));
 
-		if ( @$enable_log_searches )
+		if ($enable_log_searches)
 		{
-			$db = JFactory::getDBO();
 			$query = 'SELECT hits'
-			. ' FROM #__core_log_searches'
-			. ' WHERE LOWER( search_term ) = '.$search_term
-			;
-			$db->setQuery( $query );
-			$hits = intval( $db->loadResult() );
-			if ( $hits ) {
+				. ' FROM #__core_log_searches'
+				. ' WHERE LOWER( search_term ) = ' . $search_term_quoted;
+
+			$hits = (int) $db->setQuery($query)->loadResult();
+
+			if ($hits)
+			{
 				$query = 'UPDATE #__core_log_searches'
-				. ' SET hits = ( hits + 1 )'
-				. ' WHERE LOWER( search_term ) = '.$search_term
-				;
-				$db->setQuery( $query );
-				$db->query();
-			} else {
-				$query = 'INSERT INTO #__core_log_searches VALUES ( '.$search_term.', 1 )';
-				$db->setQuery( $query );
-				$db->query();
+					. ' SET hits = ( hits + 1 )'
+					. ' WHERE LOWER( search_term ) = ' . $search_term_quoted;
+				$db->setQuery($query)->execute();
+			}
+			else
+			{
+				$query = 'INSERT INTO #__core_log_searches VALUES (' . $search_term_quoted . ', 1 )';
+				$db->setQuery($query)->execute();
 			}
 		}
 	}
@@ -133,13 +140,13 @@ class FLEXIadvsearchHelper
 		//$text = preg_replace( '/<a\s+.*?href="([^"]+)"[^>]*>([^<]+)<\/a>/is','\2', $text );
 		// replace line breaking tags with whitespace
 		$text = preg_replace( "'<(br[^/>]*?/|hr[^/>]*?/|/(div|h[1-6]|li|p|td))>'si", ' ', $text );
-		
-		if (($wordpos = @JString::strpos($text, ' ', $length)) !== false) {
-			$start_part = JString::substr($text, 0, $wordpos) . '&nbsp;...';
+
+		if (($wordpos = @StringHelper::strpos($text, ' ', $length)) !== false) {
+			$start_part = StringHelper::substr($text, 0, $wordpos) . '&nbsp;...';
 		} else {
-			$start_part = JString::substr($text, 0, $length);
+			$start_part = StringHelper::substr($text, 0, $length);
 		}
-		
+
 		$parts = array();
 		foreach ($searchword_arr as $searchword) {
 			$part = FLEXIadvsearchHelper::_smartSubstr( strip_tags( $text ), $length, $searchword, $pos);
@@ -148,7 +155,7 @@ class FLEXIadvsearchHelper
 				$positions[$pos] = $searchword;
 			}
 		}
-		
+
 		if ( count($parts) ) {
 			$oparts = array();
 			ksort($positions);
@@ -185,7 +192,7 @@ class FLEXIadvsearchHelper
 				$text = preg_replace($regex, '', $text);
 			}
 			foreach($terms AS $term) {
-				if(JString::stristr($text, $term) !== false) {
+				if(StringHelper::stristr($text, $term) !== false) {
 					return true;
 				}
 			}
@@ -203,18 +210,18 @@ class FLEXIadvsearchHelper
 	 */
 	static function _smartSubstr($text, $length = 200, $searchword, &$wordfound)
 	{
-		$textlen = JString::strlen($text);
-		$lsearchword = JString::strtolower($searchword);
+		$textlen = StringHelper::strlen($text);
+		$lsearchword = StringHelper::strtolower($searchword);
 		$wordfound = false;
 		$pos = 0;
 		while ($wordfound === false && $pos < $textlen) {
-			if (($wordpos = @JString::strpos($text, ' ', $pos + $length)) !== false) {
+			if (($wordpos = @StringHelper::strpos($text, ' ', $pos + $length)) !== false) {
 				$chunk_size = $wordpos - $pos;
 			} else {
 				$chunk_size = $length;
 			}
-			$chunk = JString::substr($text, $pos, $chunk_size);
-			$wordfound = JString::strpos(JString::strtolower($chunk), $lsearchword);
+			$chunk = StringHelper::substr($text, $pos, $chunk_size);
+			$wordfound = StringHelper::strpos(StringHelper::strtolower($chunk), $lsearchword);
 			if ($wordfound === false) {
 				$pos += $chunk_size + 1;
 			}
@@ -223,10 +230,10 @@ class FLEXIadvsearchHelper
 		if ($wordfound !== false) {
 			return (($pos > 0) ? '...&nbsp;' : '') . $chunk . '&nbsp;...';
 		} else {
-			if (($wordpos = @JString::strpos($text, ' ', $length)) !== false) {
-				return JString::substr($text, 0, $wordpos) . '&nbsp;...';
+			if (($wordpos = @StringHelper::strpos($text, ' ', $length)) !== false) {
+				return StringHelper::substr($text, 0, $wordpos) . '&nbsp;...';
 			} else {
-				return JString::substr($text, 0, $length);
+				return StringHelper::substr($text, 0, $length);
 			}
 		}
 	}

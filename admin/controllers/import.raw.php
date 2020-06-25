@@ -1,58 +1,66 @@
 <?php
 /**
- * @version 1.5 stable $Id: import.php 1650 2013-03-11 10:27:06Z ggppdk $
- * @package Joomla
- * @subpackage FLEXIcontent
- * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
- * @license GNU/GPL v2
- * 
- * FLEXIcontent is a derivative work of the excellent QuickFAQ component
- * @copyright (C) 2008 Christoph Lukes
- * see www.schlu.net for more information
+ * @package         FLEXIcontent
+ * @version         3.3
  *
- * FLEXIcontent is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
+ * @link            https://flexicontent.org
+ * @copyright       Copyright © 2018, FLEXIcontent team, All Rights Reserved
+ * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
-defined( '_JEXEC' ) or die( 'Restricted access' );
+defined('_JEXEC') or die;
 
-jimport('joomla.application.component.controller');
+use Joomla\String\StringHelper;
+use Joomla\Utilities\ArrayHelper;
+
+JLoader::register('FlexicontentControllerBaseAdmin', JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'controllers' . DS . 'base' . DS . 'baseadmin.php');
+
+// Manually import models in case used by frontend, then models will not be autoloaded correctly via getModel('name')
+require_once JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'models' . DS . 'import.php';
 
 /**
- * FLEXIcontent Component Import Controller
+ * FLEXIcontent Import Controller (RAW)
  *
- * @package Joomla
- * @subpackage FLEXIcontent
- * @since 1.0
+ * NOTE: -Only- if this controller is needed by frontend URLs, then create a derived controller in frontend 'controllers' folder
+ *
+ * @since 3.3
  */
-class FlexicontentControllerImport extends FlexicontentController
+class FlexicontentControllerImport extends FlexicontentControllerBaseAdmin
 {
 	/**
 	 * Constructor
 	 *
-	 * @since 1.0
+	 * @param   array   $config    associative array of configuration settings.
+	 *
+	 * @since 3.3
 	 */
-	function __construct()
+	public function __construct($config = array())
 	{
-		parent::__construct();
+		parent::__construct($config);
 
-		// Register Extra task
+		// Register task aliases
 	}
-	
-	
-	function getlineno() {
+
+
+	function getlineno()
+	{
 		$session = JFactory::getSession();
-		$has_zlib = version_compare(PHP_VERSION, '5.4.0', '>=');
-		
+		$has_zlib = function_exists("zlib_encode"); // Version_compare(PHP_VERSION, '5.4.0', '>=');
+
 		$conf   = $session->get('csvimport_config', "", 'flexicontent');
-		$conf		= unserialize( $conf ? ($has_zlib ? zlib_decode(base64_decode($conf)) : base64_decode($conf)) : "" );
+		$conf		= unserialize($conf ? ($has_zlib ? zlib_decode(base64_decode($conf)) : base64_decode($conf)) : "");
 		$lineno = $session->get('csvimport_lineno', 999999, 'flexicontent');
-		if ( !empty($conf) )
-			echo 'success|'.count($conf['contents_parsed']).'|'.$lineno.'|'.(FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken());
+
+		if (!empty($conf))
+		{
+			echo 'success|' . count($conf['contents_parsed']) . '|' . $lineno . '|' . JSession::getFormToken();
+		}
 		else
+		{
 			echo 'fail|0|0';
+		}
+
 		jexit();
 	}
 }

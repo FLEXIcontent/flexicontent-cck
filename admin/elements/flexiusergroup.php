@@ -18,12 +18,14 @@
 
 // Check to ensure this file is included in Joomla!
 defined('_JEXEC') or die('Restricted access');
-if (FLEXI_J16GE) {
-	jimport('joomla.html.html');
-	jimport('joomla.form.formfield');
-	jimport('joomla.form.helper');
-	//jformhelper::loadFieldClass('usergroup');
-}
+
+jimport('cms.html.html');      // JHtml
+jimport('cms.html.select');    // JHtmlSelect
+jimport('joomla.form.field');  // JFormField
+
+//jimport('joomla.form.helper'); // JFormHelper
+//JFormHelper::loadFieldClass('usergroup');   // JFormFieldUsergroup
+
 /**
  * Form Field class for the Joomla Platform.
  * Supports a nested check box field listing user groups.
@@ -51,27 +53,20 @@ class JFormFieldFLEXIUsergroup extends JFormField  // JFormFieldUsergroup
 	 */
 	protected function getInput()
 	{
-		if (FLEXI_J16GE)  $node = & $this->element;
-		
 		// Get attribute array
-		if (FLEXI_J16GE) {
-			$node = & $this->element;
-			$attributes = get_object_vars($node->attributes());
-			$attributes = $attributes['@attributes'];
-			$children = $node->children();
-		} else {
-			$attributes = & $node->_attributes;
-			$children   = & $node->_children;
-		}
+		$node = & $this->element;
+		$attributes = get_object_vars($node->attributes());
+		$attributes = $attributes['@attributes'];
+		$children = $node->children();
 		
 		// Get values array
-		$values			= FLEXI_J16GE ? $this->value : $value;
+		$values = $this->value;
 		if ( empty($values) )							$values = array();
 		else if ( ! is_array($values) )		$values = !FLEXI_J16GE ? array($values) : explode("|", $values);
 		
 		// Get field and element name
-		$fieldname	= FLEXI_J16GE ? $this->name : $control_name.'['.$name.']';
-		$element_id = FLEXI_J16GE ? $this->id : $control_name.$name;
+		$fieldname	= $this->name;
+		$element_id = $this->id;
 		
 		// Initialize variables.
 		$extra_options = array();
@@ -82,7 +77,7 @@ class JFormFieldFLEXIUsergroup extends JFormField  // JFormFieldUsergroup
 		foreach ($children as $option)
 		{
 			// Only add <option /> elements.
-			$is_option = (FLEXI_J16GE && $option->getName()=='option')   ||   (!FLEXI_J16GE && $option->_name=='option');
+			$is_option = $option->getName()=='option';
 			if ( !$is_option ) continue;
 			
 			// Get variable for creating an extra option object based on the <option /> element
@@ -102,39 +97,21 @@ class JFormFieldFLEXIUsergroup extends JFormField  // JFormFieldUsergroup
 			$extra_options[] = $tmp;
 		}
 		
-		$db = JFactory::getDBO();
-		if ( FLEXI_ACCESS && $faGrps ) {
-			$db->setQuery(
-				'SELECT a.id AS value, a.name AS text, 1 AS level' .
-				' FROM #__flexiaccess_groups AS a' .
-				' ORDER BY a.name ASC'
-			);
-			$options = $db->loadObjectList();
-			for ($i = 0, $n = count($options); $i < $n; $i++)
-			{
-				$options[$i]->text = str_replace('FLEXIACCESS_GR_REGISTERED', '** Registered **', $options[$i]->text);
-				$options[$i]->text = str_replace('FLEXIACCESS_GR_PUBLIC', '** Public **', $options[$i]->text);
-			}
-		} else if (!FLEXI_J16GE) {
-			$acl = JFactory::getACL();
-			$options = $acl->get_group_children_tree( null, 'USERS', false );
-		} else {
-			$db->setQuery(
-				'SELECT a.id AS value, a.title AS text, COUNT(DISTINCT b.id) AS level' .
-				' FROM #__usergroups AS a' .
-				' LEFT JOIN `#__usergroups` AS b ON a.lft > b.lft AND a.rgt < b.rgt' .
-				' GROUP BY a.id' .
-				' ORDER BY a.lft ASC'
-			);
-			$options = $db->loadObjectList();
-			if ($db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');
-			
-			if ( !$options )  return null;
-			
-			for ($i = 0, $n = count($options); $i < $n; $i++)
-			{
-				$options[$i]->text = str_repeat('- ', $options[$i]->level) . $options[$i]->text;
-			}
+		$db = JFactory::getDbo();
+		$db->setQuery(
+			'SELECT a.id AS value, a.title AS text, COUNT(DISTINCT b.id) AS level' .
+			' FROM #__usergroups AS a' .
+			' LEFT JOIN `#__usergroups` AS b ON a.lft > b.lft AND a.rgt < b.rgt' .
+			' GROUP BY a.id' .
+			' ORDER BY a.lft ASC'
+		);
+		$options = $db->loadObjectList();
+		
+		if ( !$options )  return null;
+		
+		for ($i = 0, $n = count($options); $i < $n; $i++)
+		{
+			$options[$i]->text = str_repeat('- ', $options[$i]->level) . $options[$i]->text;
 		}
 		
 		// If all usergroups is allowed, push it into the array.
@@ -150,12 +127,7 @@ class JFormFieldFLEXIUsergroup extends JFormField  // JFormFieldUsergroup
 		if ( @$attributes['multiple']=='multiple' || @$attributes['multiple']=='true' ) {
 			$attribs .=' multiple="multiple"';
 			$attribs .= ' size="'.$initial_size.'" ';
-			$fieldname .= !FLEXI_J16GE ? "[]" : "";  // NOTE: this added automatically in J2.5
-			$maximize_link = "<a style='display:inline-block;".(FLEXI_J16GE ? 'float:left; margin: 6px 0px 0px 18px;':'margin:0px 0px 6px 12px')."' href='javascript:;' onclick='$element_id = document.getElementById(\"$element_id\"); if ($element_id.size<".$maximize_size.") { ${element_id}_oldsize=$element_id.size; $element_id.size=".$maximize_size.";} else { $element_id.size=${element_id}_oldsize; } ' >Maximize/Minimize</a>";
-		} else {
-			$maximize_link = '';
 		}
-		if ($initial_size >= count($options) || $initial_size>= $maximize_size) $maximize_link = '';
 		
 		// Initialize some field attributes.
 		$attribs .= ((string) @$this->element['disabled'] == 'true') ? ' disabled="disabled"' : '';
@@ -163,17 +135,12 @@ class JFormFieldFLEXIUsergroup extends JFormField  // JFormFieldUsergroup
 		// Initialize JavaScript field attributes.
 		$attribs .= @$this->element['onchange'] ? ' onchange="' . (string) $this->element['onchange'] . '"' : '';		
 		
-		$classes = '';
-		if ( @$attributes['required'] && @$attributes['required']!='false' ) {
-			$classes .= ' required';
-		}
-		if ( $node->attributes('validation_class') ) {
-			$classes .= ' '.$node->attributes('validation_class');
-		}
+		$classes = 'use_select2_lib';
+		$classes .= @$attributes['required'] && @$attributes['required']!='false' ? ' required' : '';
+		$classes .= @$attributes['class'] ? ' '.$attributes['class'] : '';
 		$attribs .= ' class="'.$classes.'"';
 		
-		$html = JHTML::_('select.genericlist', $options, $fieldname, $attribs, 'value', 'text', $values, $element_id);
-		return $html.$maximize_link;
+		return JHtml::_('select.genericlist', $options, $fieldname, $attribs, 'value', 'text', $values, $element_id);
 	}
 	
 }

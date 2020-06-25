@@ -26,38 +26,58 @@
 			<fieldset name="basic" addfieldpath="/administrator/components/com_flexicontent/elements">
 			
 				<field name="" type="separator" default="Basic" level="level1" />
-				<field name="multipage_toc" type="radio" default="1" label="Show Table of Contents" description="You may select to hide the Table of Contents, (you can still show the Page Navigation)">
-					<option value="0">No</option>
-					<option value="1">Yes</option>
-				</field>
-				<field name="pagination" type="list" default="3" label="Show Page Navigation" description="Defines where navigation controls are displayed">
-					<option value="0">No</option>
-					<option value="1">Yes, below TOC</option>
-					<option value="2">Yes, at article's start</option>
-					<option value="3">Yes, at artclie's end</option>
-				</field>
-				<field name="show_prevnext_count" type="radio" default="1" label="Show Page Count" description="Show current page number out of total page number">
-					<option value="0">No</option>
-					<option value="1">Yes</option>
+				<field name="display_method" type="multilist" subtype="radio" toggle_related="1" default="1" label="Display method" description="Select display method, (a) Show all pages and scroll to the desired one, (b and c) Show active page only via Javascript or via page reload" class="btn-group group-fcmethod">
+					<option value="0" show_list="toc_usable,has_pages" hide_list="is_paginated">PLG_FLEXIBREAK_PAGINATION_NONE_SCROLL_ANCHORS</option>
+					<option value="1" show_list="toc_usable,is_paginated,has_pages" hide_list="">PLG_FLEXIBREAK_PAGINATION_NONE_SCROLL_INLINE_SWITCH</option>
+					<option value="2" show_list="toc_usable,is_paginated,has_pages" hide_list="">PLG_FLEXIBREAK_PAGINATION_NONE_SCROLL_RELOAD_PAGE</option>
+					<option value="3" show_list="" hide_list="toc_usable,is_paginated,has_pages">PLG_FLEXIBREAK_PAGINATION_NONE_SCROLL_TABS</option>
+					<option value="4" show_list="" hide_list="toc_usable,is_paginated,has_pages">PLG_FLEXIBREAK_PAGINATION_NONE_SCROLL_SLIDERS</option>
 				</field>
 				
-				<field name="display_method" type="list" default="1" label="Display method" description="It is recommended to use the instant navigation to show the selected page. Other options include: (a) showing all pages and scrolling to the desired one, (b) Show current page only and navigate via reloading">
-					<option value="0">All Pages :: Scroll</option>
-					<option value="1">Active page :: Instantly (recommended)</option>
-					<option value="2">Active page :: Reload</option>
+				<field name="" type="separator" default="Pagination" level="level2" class="is_paginated" />
+				<field name="pagination" type="radio" default="3" label="Next / Previous Links" description="Defines where navigation controls are displayed" class="is_paginated btn-group btn-group-yesno">
+					<option value="0">PLG_FLEXIBREAK_HIDE</option>
+					<option value="1">Below table of contents</option>
+					<option value="2">Before description</option>
+					<option value="3">After description</option>
+				</field>
+				<field name="show_prevnext_count" type="radio" default="1" label="Page counter" description="Show current page number out of total page number" class="is_paginated btn-group btn-group-yesno">
+					<option value="0">PLG_FLEXIBREAK_HIDE</option>
+					<option value="1">PLG_FLEXIBREAK_SHOW</option>
 				</field>
 				
-				<field name="" type="separator" default="Table of contents configuration" level="level2" />
-				<field name="toc_placement" type="radio" default="1" label="Table of Contents placement" description="You may select to prepend Table of Contents to item's description or placing via item->toc variable in the latter case, please customize item.php/item_htnl5.php of your template">
-					<option value="0">Output via item->toc variable</option>
-					<option value="1">Prepend to description</option>
+				<field name="" type="separator" default="Table of contents" level="level2" class="toc_usable" />
+				<field name="multipage_toc" type="multilist" subtype="radio" toggle_related="1" default="1" label="Table of Contents" description="You may select to hide the Table of Contents, (you can still show the Page Navigation)" class="toc_usable btn-group btn-group-yesno">
+					<option value="0" show_list="" hide_list="toc_shown">PLG_FLEXIBREAK_HIDE</option>
+					<option value="1" show_list="toc_shown" hide_list="">PLG_FLEXIBREAK_SHOW</option>
 				</field>
-				<field name="allpages_link" type="radio" default="1" label="Show all pages link" description="Display a link to allow user to display all content pages at once">
-					<option value="0">No</option>
-					<option value="1">Yes</option>
+				<field name="return_anchors" type="radio" default="1" label="Return TOC links" description="You may select to display return to table of content anchor links at the end of every page" class="toc_usable toc_shown has_pages btn-group btn-group-yesno">
+					<option value="0">PLG_FLEXIBREAK_HIDE</option>
+					<option value="1">PLG_FLEXIBREAK_SHOW</option>
+					<option value="2">PLG_FLEXIBREAK_AUTO</option>
 				</field>
-				<field name="custom_introtext" type="text" size="50" default="" label="Intro Text" description="A custom language string as title of 'Intro Text' link" />
-				<field name="custom_allpages" type="text" size="50" default="" label="All Pages Text" description="A custom language string as title of 'All Pages' link" />
+				<field name="toc_title" type="radio" default="1" label="Table title" description="You may select to hide the title 'Table of contents'" class="toc_usable toc_shown btn-group btn-group-yesno">
+					<option value="0">PLG_FLEXIBREAK_HIDE</option>
+					<option value="1">PLG_FLEXIBREAK_SHOW</option>
+				</field>
+				<field name="toc_placement" type="radio" default="1" label="Table of Contents placement" description="You may select to prepend Table of Contents to item's description or placing via item->toc variable in the latter case, please customize item.php/item_html5.php of your template" class="toc_usable toc_shown btn-group group-fcinfo">
+					<option value="0">$item->toc variable</option>
+					<option value="1">Before description</option>
+				</field>
+				
+				<field name="" type="separator" default="PLG_FLEXIBREAK_ALL_PAGES_LINK" level="level3" class="toc_usable toc_shown is_paginated" />
+				<field name="allpages_link" type="multilist" subtype="radio" toggle_related="1" default="1" label="PLG_FLEXIBREAK_ALL_PAGES_SHOW_LINK" description="PLG_FLEXIBREAK_ALL_PAGES_SHOW_LINK_DESC" class="toc_usable toc_shown is_paginated btn-group btn-group-yesno">
+					<option value="0" show_list="" hide_list="all_pages_link">FLEXI_NO</option>
+					<option value="1" show_list="all_pages_link" hide_list="">FLEXI_YES</option>
+				</field>
+				<field name="custom_allpages" type="text" size="50" default="FLEXIBREAK_ALL_PAGES" label="PLG_FLEXIBREAK_ALL_PAGES_CUSTOM" description="PLG_FLEXIBREAK_ALL_PAGES_CUSTOM_DESC" class="toc_usable toc_shown is_paginated all_pages_link input-xlarge" />
+				
+				<field name="" type="separator" default="PLG_FLEXIBREAK_INTRODUCTION_LINK" level="level3"  class="toc_usable toc_shown" />
+				<field name="introtext_title" type="multilist" subtype="radio" toggle_related="1" default="1" label="PLG_FLEXIBREAK_INTROTEXT_LINK_TEXT" description="PLG_FLEXIBREAK_INTROTEXT_LINK_TEXT_DESC" class="toc_usable toc_shown btn-group group-fcinfo">
+					<option value="0" show_list="" hide_list="introtext_title">PLG_FLEXIBREAK_INTROTEXT_LINK_ITEM_TITLE</option>
+					<option value="1" show_list="introtext_title" hide_list="">PLG_FLEXIBREAK_INTROTEXT_LINK_CUSTOM_TEXT</option>
+				</field>
+				<field name="custom_introtext" type="text" size="50" default="FLEXIBREAK_INTRODUCTION" label="PLG_FLEXIBREAK_INTROTEXT_CUSTOM" description="PLG_FLEXIBREAK_INTROTEXT_CUSTOM_DESC" class="toc_usable toc_shown introtext_title input-xlarge" />
 				
 			</fieldset>
 		</fields>

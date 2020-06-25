@@ -1,0 +1,101 @@
+@import 'include/config.less';
+
+/* Default Theme : category template CSS file */
+
+
+/* LESS EXAMPLE variable name: 'FCC_' + parameter name */
+/* e.g. 'FCC_' + 'title_color' =>  'FCC_title_color' */
+body #flexicontent .fc_item_title,
+body #flexicontent .fc_item_title a {
+	color: @FCC_title_color;
+	background-color: @FCC_title_bg_color;
+	padding-top: @FCC_title_pad_top + px ;
+	padding-right: @FCC_title_pad_right + px;
+	padding-left: @FCC_title_pad_left + px;
+	padding-bottom: @FCC_title_pad_bottom + px;
+	border-radius: @FCC_title_border_radius + px;
+}
+td.fc_title_col {
+	background-color: @FCC_title_bg_color !important;
+}
+table#adminListTableFCcategory th {
+	background: @FCC_th_bg_color !important;
+	color: @FCC_th_txt_color;
+}
+body table.adminlist tbody tr.row0:hover td, table.adminlist tbody tr.row1:hover td, table.adminlist tr:hover td.filtered_column {
+	background-color: @FCC_td_bg_hoverbgcolor !important;
+}
+body table.adminlist tbody tr {
+	border-top: @FCC_td_border_size + px solid @FCC_td_border_color !important;
+	text-align: @FCC_td_txt_align;
+}
+
+/* Label styling */
+
+body #flexicontent .flexi.label,
+body #flexicontent .desc-title.label {
+	background-color: @FCC_label_bg_color;
+	color: @FCC_label_txt_color;
+	border-radius: @FCC_label_radius*1px;
+	padding-top: @FCC_label_pad_top + px ;
+	padding-right: @FCC_label_pad_right + px;
+	padding-left: @FCC_label_pad_left + px;
+	padding-bottom: @FCC_label_pad_bottom + px;
+}
+
+table.adminlist tbody tr.row0 td {
+	background: @FCC_table_row0_bg_color;
+}
+table.adminlist tbody tr.row1 td{
+	background: @FCC_table_row1_bg_color;
+}
+table.adminlist{
+	color: @FCC_table_value_color;
+}
+
+.subcategorieslist {
+	margin: 0 0 1em;
+}
+
+/* =============================================
+   Bootstrap adjustments
+============================================= */
+#fc_alpha .btn.fc_alpha_index,
+#fc_alpha .btn.fc_alpha_index_sep {
+	margin-top: 0;
+	margin-bottom: 0;
+}
+
+
+/*
+ * clearfix, for clearing a block that contains floated elements
+ * without appending an extra HTML TAG with 'clearfix' class
+ */
+
+.group {
+	overflow: auto !important;
+}
+
+.fc_item_title a {
+	display: inline-block;
+	float: left;
+	font-size: 14px;
+	font-weight: bold;
+	margin-left: 16px;
+}
+
+
+.fc_title_row_box {
+	display: inline-block;
+	float: left;
+	max-width: 100%;
+	padding: 0%;
+	margin-left: 16px;
+}
+
+.fc_item_separator_row {
+	display: block;
+	clear: both;
+	height: 40px;
+	border: 0px solid;
+}

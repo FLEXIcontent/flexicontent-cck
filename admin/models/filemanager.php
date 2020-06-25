@@ -1,49 +1,91 @@
 <?php
 /**
- * @version 1.5 stable $Id: filemanager.php 1750 2013-09-03 20:50:59Z ggppdk $
- * @package Joomla
- * @subpackage FLEXIcontent
- * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
- * @license GNU/GPL v2
- * 
- * FLEXIcontent is a derivative work of the excellent QuickFAQ component
- * @copyright (C) 2008 Christoph Lukes
- * see www.schlu.net for more information
+ * @package         FLEXIcontent
+ * @version         3.3
  *
- * FLEXIcontent is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
+ * @link            https://flexicontent.org
+ * @copyright       Copyright © 2018, FLEXIcontent team, All Rights Reserved
+ * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
-// no direct access
 defined('_JEXEC') or die('Restricted access');
 
-jimport('joomla.application.component.model');
 jimport('joomla.filesystem.file');
+jimport('joomla.filesystem.folder');
+jimport('joomla.filesystem.path');
+use Joomla\String\StringHelper;
+use Joomla\Utilities\ArrayHelper;
+use Joomla\CMS\Table\Table;
+
+require_once('base/baselist.php');
 
 /**
  * FLEXIcontent Component Filemanager Model
  *
- * @package Joomla
- * @subpackage FLEXIcontent
- * @since		1.0
  */
-class FlexicontentModelFilemanager extends JModelLegacy
+class FlexicontentModelFilemanager extends FCModelAdminList
 {
 	/**
-	 * file data
+	 * Record database table
 	 *
-	 * @var object
+	 * @var string
 	 */
-	var $_data = null;
+	var $records_dbtbl = 'flexicontent_files';
 
 	/**
-	 * file total
+	 * Record jtable name
+	 *
+	 * @var string
+	 */
+	var $records_jtable = 'flexicontent_files';
+
+	/**
+	 * Column names
+	 */
+	var $state_col      = 'published';
+	var $name_col       = 'filename';
+	var $parent_col     = null;
+	var $created_by_col = 'uploaded_by';
+
+	/**
+	 * (Default) Behaviour Flags
+	 */
+	protected $listViaAccess = false;
+	protected $copyRelations = false;
+
+	/**
+	 * Search and ordering columns
+	 */
+	var $search_cols = array(
+		'FLEXI_FILENAME' => 'filename',
+		0 => 'filename_original',
+		'FLEXI_FILE_DISPLAY_TITLE' => 'altname',
+		'FLEXI_DESCRIPTION'=> 'description',
+	);
+	var $default_order     = 'a.uploaded';
+	var $default_order_dir = 'DESC';
+
+	/**
+	 * List filters that are always applied
+	 */
+	var $hard_filters = array();
+
+	/**
+	 * Record rows
+	 *
+	 * @var array
+	 */
+	var $_data = null;
+	var $_data_pending = null;
+
+	/**
+	 * Rows total
 	 *
 	 * @var integer
 	 */
 	var $_total = null;
+	var $_total_pending = null;
 
 	/**
 	 * Pagination object
@@ -53,46 +95,125 @@ class FlexicontentModelFilemanager extends JModelLegacy
 	var $_pagination = null;
 
 	/**
-	 * file id
+	 * flags to indicate adding file - item assignments to session
 	 *
-	 * @var int
+	 * @var bool
 	 */
-	var $_id = null;
+	var $sess_assignments = null;
+
+
+	/**
+	 * flags to indicate return only the files pending to be assingned
+	 *
+	 * @var bool
+	 */
+	var $_pending = false;
+
+	/**
+	 * uploaders
+	 *
+	 * @var object
+	 */
+	var $_users = null;
+
 
 	/**
 	 * Constructor
 	 *
-	 * @since 1.0
+	 * @since 3.3.0
 	 */
-	function __construct()
+	public function __construct($config = array())
 	{
-		parent::__construct();
-
 		$app    = JFactory::getApplication();
-		$option = JRequest::getVar('option');
+		$jinput = $app->input;
+		$option = $jinput->getCmd('option', '');
+		$view   = $jinput->getCmd('view', '');
+		$layout = $jinput->getString('layout', 'default');
+		$fcform = $jinput->getInt('fcform', 0);
 
-		$limit      = $app->getUserStateFromRequest( $option.'.filemanager.limit', 'limit', $app->getCfg('list_limit'), 'int');
-		$limitstart = $app->getUserStateFromRequest( $option.'.filemanager.limitstart', 'limitstart', 0, 'int' );
+		// Make session index more specific ... (if needed by this model)
+		$this->fieldid = $jinput->getInt('field', null);
+		$this->view_id = $view . '_' . $layout . ($this->fieldid ? '_' . $this->fieldid : '');
 
-		$this->setState('limit', $limit);
-		$this->setState('limitstart', $limitstart);
+		// Call parent after setting ... $this->view_id
+		parent::__construct($config);
 
-		$array = JRequest::getVar('cid',  0, '', 'array');
-		$this->setId((int)$array[0]);
+		$p = $this->ovid;
+
+		$this->sess_assignments = true;
+
+
+		/**
+		 * Load backend language file if model gets loaded in frontend
+		 */
+		if ($app->isClient('site'))
+		{
+			JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, 'en-GB', true);
+			JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, true);
+		}
+
+
+		/**
+		 * View's Filters
+		 * Inherited filters : filter_state, filter_access, scope, search
+		 */
+
+		// Various filters
+		$filter_lang     = $fcform ? $jinput->get('filter_lang', '', 'string') : $app->getUserStateFromRequest($p . 'filter_lang', 'filter_lang', '', 'string');
+		$filter_uploader = $fcform ? $jinput->get('filter_uploader', 0, 'int') : $app->getUserStateFromRequest($p . 'filter_uploader', 'filter_uploader', 0, 'int');
+		$filter_secure   = $fcform ? $jinput->get('filter_secure', '', 'alnum') : $app->getUserStateFromRequest($p . 'filter_secure', 'filter_secure', '', 'alnum');
+		$filter_stamp    = $fcform ? $jinput->get('filter_stamp', '', 'alnum') : $app->getUserStateFromRequest($p . 'filter_stamp', 'filter_stamp', '', 'alnum');
+		$filter_url      = $fcform ? $jinput->get('filter_url', '', 'alnum') : $app->getUserStateFromRequest($p . 'filter_url', 'filter_url', '', 'alnum');
+		$filter_ext      = $fcform ? $jinput->get('filter_ext', '', 'alnum') : $app->getUserStateFromRequest($p . 'filter_ext', 'filter_ext', '', 'alnum');
+		$filter_item     = $fcform ? $jinput->get('item_id', 0, 'int') : $app->getUserStateFromRequest($p . 'item_id', 'item_id', 0, 'int');
+
+		$this->setState('filter_lang', $filter_lang);
+		$this->setState('filter_uploader', $filter_uploader ?: '');
+		$this->setState('filter_secure', $filter_secure);
+		$this->setState('filter_stamp', $filter_stamp);
+		$this->setState('filter_url', $filter_url);
+		$this->setState('filter_ext', $filter_ext);
+		$this->setState('filter_item', $filter_item ?: '');
+
+		$app->setUserState($p . 'filter_lang', $filter_lang);
+		$app->setUserState($p . 'filter_uploader', $filter_uploader ?: '');
+		$app->setUserState($p . 'filter_secure', $filter_secure);
+		$app->setUserState($p . 'filter_stamp', $filter_stamp);
+		$app->setUserState($p . 'filter_url', $filter_url);
+		$app->setUserState($p . 'filter_ext', $filter_ext);
+		$app->setUserState($p . 'filter_item', $filter_item ?: '');
+
+		// TODO add this filter to view-template files, as it is missing
+		$filter_assigned = $fcform ? $jinput->get('filter_assigned', '', 'alnum') : $app->getUserStateFromRequest($p . 'filter_assigned', 'filter_assigned', '', 'alnum');
+		$this->setState('filter_assigned', $filter_assigned);
+		$app->setUserState($p . 'filter_assigned', $filter_assigned);
+
+		// Manage view permission
+		$this->canManage = FlexicontentHelperPerm::getPerm()->CanFiles;
 	}
+
 
 	/**
-	 * Method to set the files identifier
+	 * Method to set the record identifier (for singular operations) and clear record rows
 	 *
-	 * @access	public
-	 * @param	int file identifier
+	 * @param		int	    $id        record identifier
+	 *
+	 * @since	3.3.0
 	 */
-	function setId($id)
+	public function setId($id)
 	{
-		// Set id and wipe data
-		$this->_id	 = $id;
-		$this->_data = null;
+		// Set record id and wipe data, if setting a different ID
+		if ($this->_id != $id)
+		{
+			$this->_id    = $id;
+			$this->_data  = null;
+			$this->_total = null;
+
+			$this->_data_pending  = null;
+			$this->_total_pending = null;
+		}
 	}
+
 
 	/**
 	 * Method to get files data
@@ -100,104 +221,487 @@ class FlexicontentModelFilemanager extends JModelLegacy
 	 * @access public
 	 * @return array
 	 */
+	function getDataPending()
+	{
+		$this->_pending = true;
+
+		// Get files pending to be assigned
+		if ($this->_data_pending === null)
+		{
+			$query = $this->_buildQuery();
+
+			if ($query === false)
+			{
+				$this->_data_pending = array();
+				$this->_total_pending = 0;
+				return $this->_data_pending;
+			}
+
+			$this->_data_pending = $this->_getList($query);
+			$this->_db->setQuery('SELECT FOUND_ROWS()');
+			$this->_total_pending = $this->_db->loadResult();
+		}
+
+		return $this->_data_pending;
+	}
+
+
+	/**
+	 * Method to get files data
+	 *
+	 * @return array
+	 */
 	function getData()
 	{
+		$this->_pending = false;
+
 		// Get items using files VIA (single property) field types (that store file ids) by using main query
 		$s_assigned_via_main = false;
-		
-		// Files usage my single / multi property Fields.
-		// (a) Single property field types: store file ids
-		// (b) Multi property field types: store file id or filename via some property name
+
+		// Files usage my single / multi property Fields,
+		//  -- Single property field types: store file ids
+		//  -- Multi property field types: store file id or filename via some property name
+
 		$s_assigned_fields = array('file', 'minigallery');
 		$m_assigned_fields = array('image');
-		
-		$m_assigned_props = array('image'=>'originalname');
-		$m_assigned_vals = array('image'=>'filename');
-		
+
+		$m_assigned_props = array('image'=>array('originalname', 'existingname'));
+		$m_assigned_vals = array('image'=>array('filename', 'filename'));
+
 		// Lets load the files if it doesn't already exist
-		if (empty($this->_data))
+		if ($this->_data === null)
 		{
-			$query = $s_assigned_via_main  ?  $this->_buildQuery($s_assigned_fields)  :  $this->_buildQuery();
-			
+			$query = $s_assigned_via_main
+				? $this->_buildQuery($s_assigned_fields)
+				: $this->_buildQuery();
+
+			if ($query === false)
+			{
+				$this->_data = array();
+				$this->_total = 0;
+				return $this->_data;
+			}
+
 			$this->_data = $this->_getList($query, $this->getState('limitstart'), $this->getState('limit'));
-			if ($this->_db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($this->_db->getErrorMsg()),'error');
-			
 			$this->_db->setQuery("SELECT FOUND_ROWS()");
 			$this->_total = $this->_db->loadResult();
-			
-			$this->_data = flexicontent_images::BuildIcons($this->_data);
-			
+
+			$filter_order = $this->getState('filter_order');
+			$default_size_message = $filter_order != 'a.size' ? null : '
+				<span class="hasTooltip" title="' . JText::sprintf('FLEXI_PLEASE_REINDEX_FILE_STATISTICS', JText::_('FLEXI_INDEX_FILE_STATISTICS')) . '">
+					<span class="icon-warning"></span>
+					<span class="icon-loop"></span>
+				</span>';
+			$this->_data = flexicontent_images::BuildIcons($this->_data, $default_size_message);
+
 			// Single property fields, get file usage (# assignments), if not already done by main query
-			if ( !$s_assigned_via_main && $s_assigned_fields) {
-				foreach ($s_assigned_fields as $field_type) {
-					$this->countFieldRelationsSingleProp( $this->_data, $field_type );
+			if ( !$s_assigned_via_main && $s_assigned_fields)
+			{
+				foreach ($s_assigned_fields as $field_type)
+				{
+					$this->countFieldRelationsSingleProp($this->_data, $field_type);
 				}
 			}
 			// Multi property fields, get file usage (# assignments)
-			if ($m_assigned_fields) {
-				foreach ($m_assigned_fields as $field_type) {
-					$field_prop = $m_assigned_props[$field_type];
-					$value_prop = $m_assigned_vals[$field_type];
-					$this->countFieldRelationsMultiProp($this->_data, $value_prop, $field_prop, $field_type='image');
+			if ($m_assigned_fields)
+			{
+				foreach ($m_assigned_fields as $field_type)
+				{
+					$field_prop_arr = $m_assigned_props[$field_type];
+					$value_prop_arr = $m_assigned_vals[$field_type];
+					$this->countFieldRelationsMultiProp($this->_data, $value_prop_arr, $field_prop_arr, $field_type);
 				}
 			}
-			
-			$session = JFactory::getSession();
-			$fileid_to_itemids = $session->get('fileid_to_itemids', array(),'flexicontent');
-			foreach ($this->_data as $row) {
-				// we have multiple item list indexed by field type, concatanate these
-				$itemids_list = !empty($row->item_list)  ?  implode(',', $row->item_list)  :  '';
-				// now create a item ids array that contains duplicates
-				$itemids_dup = ($itemids_list=='') ? array() : explode(',', $itemids_list);
-				// make an array of unique item ids
-				$itemids = array();  $n = 0;
-				foreach ($itemids_dup as $itemid) $itemids[$itemid] = $n++;
-				$fileid_to_itemids[$row->id] = $row->itemids = array_flip($itemids);
+
+			// These can be used by the items manager without need to recalculate
+			if ($this->sess_assignments)
+			{
+				$session = JFactory::getSession();
+
+				$fileid_to_itemids = $session->get('fileid_to_itemids', array(),'flexicontent');
+				foreach ($this->_data as $row)
+				{
+					// we have multiple item list indexed by field type, concatanate these
+					$itemids_list = !empty($row->item_list)  ?  implode(',', $row->item_list)  :  '';
+					// now create a item ids array that contains duplicates
+					$itemids_dup = ($itemids_list=='') ? array() : explode(',', $itemids_list);
+					// make an array of unique item ids
+					$itemids = array();  $n = 0;
+					foreach ($itemids_dup as $itemid) $itemids[$itemid] = $n++;
+					$fileid_to_itemids[$row->id] = $row->itemids = array_flip($itemids);
+				}
+
+				$session->set('fileid_to_itemids', $fileid_to_itemids, 'flexicontent');
 			}
-			
-			$session->set('fileid_to_itemids', $fileid_to_itemids, 'flexicontent');
 		}
-		
+
 		return $this->_data;
 	}
 
+
 	/**
-	 * Method to get the total nr of the files
+	 * Method to get the total nr of the records
 	 *
-	 * @access public
 	 * @return integer
+	 *
+	 * @since	1.5
 	 */
-	function getTotal()
+	public function getTotal()
 	{
-		// Lets load the files if it doesn't already exist
-		if (empty($this->_total))
+		// Lets load the 'pending' records of the view instead of the existing records list
+		if ($this->_pending)
+		{
+			if ($this->_total_pending === null)
+			{
+				$query = $this->_buildQuery();
+
+				if ($query === false)
+				{
+					return $this->_total_pending = 0;
+				}
+
+				$this->_getList($query, 0, 1);
+				$this->_db->setQuery("SELECT FOUND_ROWS()");
+				$this->_total_pending = $this->_db->loadResult();
+			}
+
+			return $this->_total_pending;
+		}
+
+		// Lets load the records if it doesn't already exist
+		elseif ($this->_total === null)
 		{
 			$query = $this->_buildQuery();
-			$this->_total = $this->_getListCount($query);
+
+			if ($query === false)
+			{
+				return $this->_total = 0;
+			}
+
+			$this->_getList($query, 0, 1);
+			$this->_db->setQuery("SELECT FOUND_ROWS()");
+			$this->_total = $this->_db->loadResult();
 		}
 
 		return $this->_total;
 	}
 
+
 	/**
-	 * Method to get a pagination object for the files
+	 * Method to get a pagination object for the records
 	 *
-	 * @access public
-	 * @return integer
+	 * @return object
+	 *
+	 * @since	1.5
 	 */
-	function getPagination()
+	public function getPagination()
 	{
-		// Lets load the files if it doesn't already exist
+		// Create pagination object if it doesn't already exist
 		if (empty($this->_pagination))
 		{
-			jimport('joomla.html.pagination');
-			$this->_pagination = new JPagination( $this->getTotal(), $this->getState('limitstart'), $this->getState('limit') );
+			require_once (JPATH_COMPONENT_SITE.DS.'helpers'.DS.'pagination.php');
+			$this->_pagination = new FCPagination( $this->getTotal(), $this->getState('limitstart'), $this->getState('limit') );
 		}
 
 		return $this->_pagination;
 	}
-	
-	
+
+
+	/**
+	 * Method to get remove old temporary folders of fields in "folder mode"
+	 *
+	 * @access public
+	 * @return array
+	 * @since 3.0.0
+	 */
+	function cleanUpFolderModeFolders($path)
+	{
+		// Get file list according to filtering
+		$it = new RegexIterator(new IteratorIterator(new DirectoryIterator($path)), '#item__[0-9]{4}_[0-9]{2}_[0-9]{2}_(.*)#i');
+		$it->rewind();
+
+		$now_date = time();
+
+		while($it->valid())
+		{
+			if ($it->isDot())
+			{
+				$it->next();
+				continue;
+			}
+			$subpath = $it->getPathName();  // filename including the folder subpath
+			$dirname = basename($subpath);
+			$date_str = str_replace('_', '-', substr($dirname, 6, 10));
+
+			$directory_date = strtotime($date_str);
+			$date_diff = $now_date - $directory_date;
+			$days_diff = floor($date_diff / (60 * 60 * 24));
+			//echo $subpath . ' ---- ' . $date_str . ' ---- Days DIFF: ' . $days_diff . '<br/>';
+
+			// Remove old folders
+			if ($days_diff > 2)
+			{
+				JFolder::delete($subpath);
+			}
+
+			$it->next();
+		}
+	}
+
+
+	/**
+	 * Method to get files having the given extensions from a given folder
+	 *
+	 * @access public
+	 * @return array
+	 * @since 3.0.0
+	 */
+	function getFilesFromPath($itemid, $fieldid, $exts=null, $pending = false)
+	{
+		// Set pending FLAG
+		$this->_pending = $pending;
+
+		// Retrieving files from a folder , do not use pagination
+		$this->_total_pending = 0;
+		$this->_total = 0;
+
+		$app    = JFactory::getApplication();
+		$jinput = $app->input;
+		$option = $jinput->get('option', '', 'cmd');
+		$cparams = JComponentHelper::getParams('com_flexicontent');
+
+		$exts = $exts ?: $cparams->get('upload_extensions', 'bmp,csv,doc,docx,gif,ico,jpg,jpeg,odg,odp,ods,odt,pdf,png,ppt,pptx,txt,xcf,xls,xlsx,zip,ics');
+		$imageexts = array('jpg','gif','png','bmp','jpeg');  // Common image extensions
+		$options = array();
+		$gallery_folder = $this->getFieldFolderPath($itemid, $fieldid, $options);
+		//echo $gallery_folder ."<br />";
+
+		// Create field's folder if it does not exist already
+		if (!is_dir($gallery_folder))
+		{
+			mkdir($gallery_folder, $mode = 0755, $recursive=true);
+		}
+
+		// Get file list according to filtering
+		$exts = preg_replace("/[\s]*,[\s]*/", '|', $exts);
+		$it = new RegexIterator(new RecursiveIteratorIterator(new RecursiveDirectoryIterator($gallery_folder)), '#(.*\.)('.$exts.')#i');
+		$it->rewind();
+
+		if ($this->_pending)
+		{
+			if (!$itemid)
+			{
+				return array();
+			}
+			$upload_context = 'fc_upload_history.item_' . $itemid . '_field_' . $fieldid;
+			$session_files = JFactory::getSession()->get($upload_context, array());
+
+			$names_pending = isset($session_files['names_pending'])
+				? $session_files['names_pending']
+				: array();
+			$names_pending = array_flip($names_pending);
+		}
+
+		if ( $options['image_source'] === 1 )
+		{
+			$this->cleanUpFolderModeFolders($options['base_path']);
+		}
+
+		// Get file information
+		static $mime_icons = array();
+		$rows = array();
+		$i = 1;
+		while($it->valid())
+		{
+			if ($it->isDot())
+			{
+				$it->next();
+				continue;
+			}
+			$filesubpath = $it->getSubPathName();  // filename including the folder subpath
+			$filepath = $it->key();
+			$pinfo = pathinfo($filepath);
+			$row = new stdClass();
+			$row->ext = $pinfo['extension'];
+
+			// Convert directory separators inside the subpath
+			$row->filename = str_replace('\\', '/', $filesubpath);  //$pinfo['filename'].".".$pinfo['extension'];
+
+			// Lets load the files if it doesn't already exist
+			if ($this->_pending)
+			{
+				if ( !isset($names_pending[$row->filename]))
+				{
+					$it->next();
+					continue;
+				}
+			}
+
+			// Try to create a UTF8 filename
+			$row->filename_original = iconv(mb_detect_encoding($row->filename, mb_detect_order(), true), "UTF-8", $row->filename);
+			$row->filename_original = $row->filename_original ? $row->filename_original : $row->filename;
+			$row->size = sprintf("%.0f KB", (filesize($filepath) / 1024) );
+			$row->altname = $pinfo['filename'];
+			$row->uploader = '-';
+			$row->uploaded = date("F d Y H:i:s.", filectime($filepath) );
+			$row->id = $i;
+
+			if ( in_array(strtolower($row->ext), $imageexts))
+			{
+				$row->icon = JUri::root()."components/com_flexicontent/assets/images/mime-icon-16/image.png";
+			}
+			else
+			{
+				$exists = $row->ext && isset($mime_icons[$row->ext])
+					? $mime_icons[$row->ext]
+					: null;
+
+				// Check exists only once
+				if ($row->ext && $exists === null)
+				{
+					$exists = $mime_icons[$row->ext] = file_exists(JPATH_SITE . '/components/com_flexicontent/assets/images/mime-icon-16/' . $row->ext . '.png');
+				}
+
+				$row->icon = $exists
+					? JUri::root() . 'components/com_flexicontent/assets/images/mime-icon-16/' . $row->ext . '.png'
+					: JUri::root() . 'components/com_flexicontent/assets/images/mime-icon-16/unknown.png';
+			}
+
+			if ($this->_pending)
+			{
+				$rows[$row->filename] = $row;
+			}
+			else
+			{
+				$rows[] = $row;
+			}
+
+			$i++;
+			$it->next();
+		}
+
+		// Lets load the files if it doesn't already exist
+		if ($this->_pending)
+		{
+			$_rows = array();
+			foreach($names_pending as $filename => $file)
+			{
+				$_rows[] = $rows[$filename];
+			}
+			$rows = $_rows;
+		}
+
+		return $rows;
+	}
+
+
+	/**
+	 * Method to get the folder path defined in a field
+	 *
+	 * @access	public
+	 */
+	function getFieldFolderPath($itemid, $fieldid, & $options = array())
+	{
+		$field = $this->getField($fieldid);
+
+		if (!$field)
+		{
+			die(__FUNCTION__.'(): Field for field id:' . $fieldid . ' was not found');
+		}
+
+		// Load XML file of field
+		$plugin_path = JPATH_PLUGINS . DS . 'flexicontent_fields' . DS . $field->field_type . DS . $field->field_type . '.xml';
+		$form = new JForm('com_flexicontent.field.' . $field->field_type, array('control' => 'jform', 'load_data' => false));
+		$form->load(file_get_contents($plugin_path), false, '/extension/config');
+
+		$image_source_exists = (bool) $form->getField('image_source', 'attribs');
+		$options['image_source'] = $image_source = $image_source_exists ? (int) $field->parameters->get('image_source') : null;
+
+		// Currently we only handle image_source '1'
+		if ($image_source===1)
+		{
+			$gallery_path_arr = array(
+				'item_' . $itemid,
+				'field_' . $fieldid
+			);
+			$options['base_path'] = JPATH::clean(JPATH_SITE . DS . $field->parameters->get('dir', 'images/stories/flexicontent'));
+			$gallery_path = $options['base_path'] . DS . implode('_', $gallery_path_arr) . DS . 'original' . DS;
+		}
+		else if ($image_source===0 || $image_source===null)
+		{
+			$gallery_path = !empty($options['secure']) ? COM_FLEXICONTENT_FILEPATH.DS : COM_FLEXICONTENT_MEDIAPATH.DS;
+		}
+		else
+		{
+			die(__FUNCTION__.'(): image_source : $image_source for field id:' . $fieldid . ' is not implemented');
+		}
+
+		return JPATH::clean($gallery_path);
+	}
+
+
+	/**
+	 * Method to get field data
+	 *
+	 * @access public
+	 * @return object
+	 */
+	function getField($fieldid=0, $itemid=0)
+	{
+		static $fields = array();
+
+		// Return cached field data
+		$fieldid = (int) ($fieldid ?: $this->fieldid);
+		if (isset($fields[$fieldid]))
+		{
+			return $fields[$fieldid];
+		}
+
+		// Get field data from DB
+		$fields[$fieldid] = false;
+		if ($fieldid)
+		{
+			$this->_db->setQuery('SELECT * FROM #__flexicontent_fields WHERE id= ' . $fieldid);
+			$fields[$fieldid] = $this->_db->loadObject();
+		}
+
+		// Parse field parameters and find currently active item id and verrify item is editable by current user
+		if (!empty($fields[$fieldid]))
+		{
+			$fields[$fieldid]->parameters = new JRegistry($fields[$fieldid]->attribs);
+
+			$app    = JFactory::getApplication();
+			$jinput = $app->input;
+			$user   = JFactory::getUser();
+			$option = $jinput->get('option', '', 'cmd');
+			$view   = $jinput->get('view', '', 'cmd');
+			$p      = $this->ovid;
+
+			$u_item_id = $itemid ?: $app->getUserStateFromRequest($p . 'u_item_id', 'u_item_id', 0, 'string');
+
+			if (is_numeric($u_item_id))
+			{
+				$u_item_id = (int) $u_item_id;
+
+				JTable::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'tables');
+				$record = JTable::getInstance($type = 'flexicontent_items', $prefix = '', $config = array());
+				if ($record->load($u_item_id))
+				{
+					$asset = 'com_content.article.' . $u_item_id;
+					$has_edit = $user->authorise('core.edit', $asset) || ($user->authorise('core.edit.own', $asset) && $record->created_by == $user->get('id'));
+					$u_item_id = $has_edit ? $u_item_id : 0;
+				}
+				else
+				{
+					$u_item_id = 0;
+				}
+			}
+			$fields[$fieldid]->item_id = $u_item_id;
+		}
+		return $fields[$fieldid];
+	}
+
+
 	/**
 	 * Method to build the query for the files
 	 *
@@ -205,89 +709,111 @@ class FlexicontentModelFilemanager extends JModelLegacy
 	 * @return integer
 	 * @since 1.0
 	 */
-	function _buildQuery( $assigned_fields=array(), $item_id=0, $ids_only=false )
+	function _buildQuery($assigned_fields = array(), $ids_only = false, $u_item_id = 0)
 	{
-		$app    = JFactory::getApplication();
-		$option = JRequest::getVar('option');
-		
 		// Get the WHERE, HAVING and ORDER BY clauses for the query
-		$where = $this->_buildContentWhere();
-		if (!$ids_only) {
-			$orderby = $this->_buildContentOrderBy();
+		$join    = $this->_buildContentJoin();
+		$where   = $this->_pending
+			? $this->_buildContentWherePending()
+			: $this->_buildContentWhere();
+		if ($where === false)
+		{
+			return 'SELECT 1 FROM #__flexicontent_files WHERE 1=0';
 		}
-		//$having = $this->_buildContentHaving();
-		
-		$filter_item = $item_id  ?  $item_id  :  $app->getUserStateFromRequest( $option.'.filemanager.item_id', 'item_id', 0, 'int' );
-		
-		$extra_join = '';
-		$extra_where = '';
-		
-		if ($filter_item) {
-			$extra_join	.= ' JOIN #__flexicontent_fields_item_relations AS rel ON rel.item_id = '. $filter_item .' AND f.id = rel.value ';
-			$extra_join	.= ' JOIN #__flexicontent_fields AS fi ON fi.id = rel.field_id AND fi.field_type = ' . $this->_db->Quote('file');
+
+		if ($ids_only)
+		{
+			$orderby = '';
 		}
-		
-		if ( !$ids_only ) {
-			if (FLEXI_J16GE) {
-				$extra_join .= ' LEFT JOIN #__viewlevels AS level ON level.id=f.access';
-			} else {
-				$extra_join .= ' LEFT JOIN #__groups AS g ON g.id = f.access';
+		else
+		{
+			$orderby = $this->_pending
+				? $this->_buildContentOrderByPending()
+				: $this->_buildContentOrderBy();
+		}
+		$having  = ''; //$this->_buildContentHaving();
+
+		// If a non numeric item ID was given then we will not match any values from DB, force returning none files (set to -1)
+		$u_item_id = strlen($u_item_id) && !is_numeric($u_item_id)
+			? -1
+			: (int) $u_item_id;
+
+		$filter_item = $u_item_id ?: (int) $this->getState('filter_item');
+
+		if ($filter_item)
+		{
+			$join	.= ' JOIN #__flexicontent_fields_item_relations AS rel ON rel.item_id = ' . (int) $filter_item . ' AND a.id = rel.value ';
+			$join	.= ' JOIN #__flexicontent_fields AS fi ON fi.id = rel.field_id AND fi.field_type = ' . $this->_db->Quote('file');
+		}
+
+		if (!$ids_only)
+		{
+			$join .= ' LEFT JOIN #__viewlevels AS level ON level.id = a.access';
+		}
+
+		if ($ids_only)
+		{
+			$columns[] = 'a.id';
+		}
+		else
+		{
+			$columns[] = 'SQL_CALC_FOUND_ROWS a.*, '
+				. ' u.name AS editor, '
+				. ' ua.name AS uploader, '
+				. ' CASE WHEN a.filename_original<>"" THEN a.filename_original ELSE a.filename END AS filename_displayed ';
+
+			foreach ($assigned_fields as $field_type)
+			{
+				// Field relation sub query for counting file assignment to this field type
+				$assigned_query	= 'SELECT COUNT(value)'
+					. ' FROM #__flexicontent_fields_item_relations AS rel'
+					. ' JOIN #__flexicontent_fields AS fi ON fi.id = rel.field_id'
+					. ' WHERE fi.field_type = ' . $this->_db->Quote($field_type)
+					. ' AND value = a.id'
+					;
+				$columns[] = '('.$assigned_query.') AS assigned_'.$field_type;
 			}
+
+			$columns[] = 'CASE WHEN level.title IS NULL THEN CONCAT_WS(\'\', \'deleted:\', a.access) ELSE level.title END AS access_level';
 		}
-		
-		if ( $ids_only ) {
-			$columns[] = 'f.id';
-		} else {
-			$columns[] = 'SQL_CALC_FOUND_ROWS f.*, u.name AS uploader,'
-				.' CASE WHEN f.filename_original<>"" THEN f.filename_original ELSE f.filename END AS filename_displayed ';
-			if ( $assigned_fields && count($assigned_fields) ) {
-				foreach ($assigned_fields as $field_type) {
-					// Field relation sub query for counting file assignment to this field type
-					$assigned_query	= 'SELECT COUNT(value)'
-						. ' FROM #__flexicontent_fields_item_relations AS rel'
-						. ' JOIN #__flexicontent_fields AS fi ON fi.id = rel.field_id'
-						. ' WHERE fi.field_type = ' . $this->_db->Quote($field_type)
-						. ' AND value = f.id'
-						;
-					$columns[] = '('.$assigned_query.') AS assigned_'.$field_type;
-				}
-			}
-			$columns[] = (FLEXI_J16GE ? 'level.title AS access_level' : 'g.name AS groupname');
-		}
-		
+
 		$query = 'SELECT '. implode(', ', $columns)
-			. ' FROM #__flexicontent_files AS f'
-			. ' JOIN #__users AS u ON u.id = f.uploaded_by'
-			. $extra_join
+			. ' FROM #__flexicontent_files AS a'
+			. $join
 			. $where
-			. $extra_where
-			//. ' GROUP BY f.id'
+			//. ' GROUP BY a.id'
 			//. $having
 			. (!$ids_only ? $orderby : '')
 			;
-		
+
 		return $query;
 	}
-	
-	
+
+
 	/**
-	 * Method to build files used by a given item 
+	 * Method to build files used by a given item
 	 *
 	 * @access private
 	 * @return integer
 	 * @since 1.0
 	 */
-	function getItemFiles($item_id=0)
+	function getItemFiles($u_item_id=0)
 	{
-		$db = JFactory::getDBO();
-		$query = $this->_buildQuery( $assigned_fields=array(), $ids_only=true, $item_id );
-		$db->setQuery($query);
-		$items = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();
-		$items = $items?$items:array();
-		return $items;
+		if ($this->_pending)
+		{
+			return array();
+		}
+
+		$query = $this->_buildQuery($assigned_fields=array(), $ids_only=true, $u_item_id);
+
+		$items = $query === false
+			? array()
+			: $this->_db->setQuery($query)->loadColumn();
+
+		return $items ?: array();
 	}
-	
-	
+
+
 	/**
 	 * Method to build the orderby clause of the query for the files
 	 *
@@ -295,125 +821,371 @@ class FlexicontentModelFilemanager extends JModelLegacy
 	 * @return string
 	 * @since 1.0
 	 */
-	function _buildContentOrderBy()
+	function _buildContentOrderBy($q = false)
 	{
-		$app    = JFactory::getApplication();
-		$option = JRequest::getVar('option');
+		$filter_order     = $this->getState('filter_order');
+		$filter_order_Dir = $this->getState('filter_order_Dir');
 
-		$filter_order     = $app->getUserStateFromRequest( $option.'.filemanager.filter_order', 		'filter_order', 	'f.filename', 'cmd' );
-		$filter_order_Dir = $app->getUserStateFromRequest( $option.'.filemanager.filter_order_Dir',	'filter_order_Dir',	'', 'word' );
-		
-		if ($filter_order=='f.filename_displayed') $filter_order = ' CASE WHEN f.filename_original<>"" THEN f.filename_original ELSE f.filename END ';
-		$orderby 	= ' ORDER BY '.$filter_order.' '.$filter_order_Dir.', f.filename';
+		if ($filter_order=='a.filename_displayed') $filter_order = ' CASE WHEN a.filename_original<>"" THEN a.filename_original ELSE a.filename END ';
+		$orderby 	= ' ORDER BY '.$filter_order.' '.$filter_order_Dir.', a.filename';
 
 		return $orderby;
 	}
-	
-	
+
+
 	/**
-	 * Method to build the where clause of the query for the files
+	 * Method to build the orderby clause of the query for the files
 	 *
 	 * @access private
 	 * @return string
 	 * @since 1.0
 	 */
-	function _buildContentWhere()
+	function _buildContentOrderByPending()
 	{
+		$field = $this->getField();
+
+		if (!$field || !$field->item_id)
+		{
+			return '';
+		}
+
+		$upload_context = 'fc_upload_history.item_' . $field->item_id . '_field_' . $field->id;
+		$session_files = JFactory::getSession()->get($upload_context, array());
+
+		$file_ids = isset($session_files['ids_pending'])
+			? $session_files['ids_pending']
+			: array();
+
+		$orderby = $file_ids
+			? ' ORDER BY FIELD(a.id, ' . implode(', ', ArrayHelper::toInteger($file_ids)) . ')'
+			: '';
+		return $orderby;
+	}
+
+
+	function _buildContentJoin()
+	{
+		$join = '';
+		$join .= ' LEFT JOIN #__users AS u ON u.id = a.checked_out';
+		$join .= ' JOIN #__users AS ua ON ua.id = a.uploaded_by';
+
+		return $join;
+	}
+
+
+	/**
+	 * Method to build the where clause of the query for the records pending assignment
+	 *
+	 * @access private
+	 * @return string
+	 * @since 1.0
+	 */
+	function _buildContentWherePending()
+	{
+		$field = $this->getField();
+
+		if (!$field || !$field->item_id)
+		{
+			return false;
+		}
+
+		$upload_context = 'fc_upload_history.item_' . $field->item_id . '_field_' . $field->id;
+		$session_files = JFactory::getSession()->get($upload_context, array());
+
+		$file_ids = isset($session_files['ids_pending'])
+			? $session_files['ids_pending']
+			: array();
+
+		return $file_ids
+			? ' WHERE a.id IN (' . implode(',', ArrayHelper::toInteger($file_ids)) . ')'
+			: false;
+	}
+
+
+	/**
+	 * Method to build the where clause of the query for the records
+	 *
+	 * @param		JDatabaseQuery|bool   $q   DB Query object or bool to indicate returning an array or rendering the clause
+	 *
+	 * @return  JDatabaseQuery|array
+	 *
+	 * @since   3.3.0
+	 */
+	protected function _buildContentWhere($q = true)
+	{
+		$table = $this->getTable($this->records_jtable, '');
+
 		$app    = JFactory::getApplication();
 		$user   = JFactory::getUser();
-		$option = JRequest::getVar('option');
+		$jinput = $app->input;
+		$option = $jinput->get('option', '', 'cmd');
 
-		$scope 	= $app->getUserStateFromRequest( $option.'.filemanager.filter', 'scope', 1, 'int' );
-		$search	= $app->getUserStateFromRequest( $option.'.filemanager.search', 'search', '', 'string' );
-		$search	= trim( JString::strtolower( $search ) );
-		
-		$filter_lang		= $app->getUserStateFromRequest( $option.'.filemanager.filter_lang', 		'filter_lang', 		'', 		'string' );
-		$filter_uploader= $app->getUserStateFromRequest( $option.'.filemanager.filter_uploader','filter_uploader',0,			'int' );
-		$filter_url			= $app->getUserStateFromRequest( $option.'.filemanager.filter_url', 		'filter_url', 		'',			'word' );
-		$filter_secure	= $app->getUserStateFromRequest( $option.'.filemanager.filter_secure', 	'filter_secure', 	'', 		'word' );
-		$filter_ext			= $app->getUserStateFromRequest( $option.'.filemanager.filter_ext', 		'filter_ext', 		'', 		'alnum' );
-		
 		$where = array();
-		
+
+		$field  = $this->getField();
+		$params = $field ? $field->parameters : new JRegistry();
+
+		// Limit listed files to specific uploader,  1: current user, 0: any user, and respect 'filter_uploader' URL variable
+		$limit_by_uploader = 0;
+
+		// Calculate a default value for limiting to 'media' or 'secure' folder,  0: media folder, 1: secure folder, 2: no folder limitation AND respect 'filter_secure' URL variable
+		$default_dir = 2;
+		if ($field)
+		{
+			if (in_array($field->field_type, array('file', 'image')))
+				$default_dir = 1;  // 'secure' folder
+			else if (in_array($field->field_type, array('minigallery')))
+				$default_dir = 0;  // 'media' folder
+		}
+		$target_dir = $params->get('target_dir', $default_dir);
+
+		// Handles special cases of fields, that have special rules for listing specific files only
+		if ($field && $field->field_type =='image' && $params->get('image_source') == 0)
+		{
+			$limit_by_uploader = (int) $params->get('limit_by_uploader', 0);
+			if ($params->get('list_all_media_files', 0))
+			{
+				$where[] = ' a.ext IN ("jpg","gif","png","jpeg") ';
+			}
+			else
+			{
+				$filesUsedByImageField = $this->getFilesUsedByImageField($field, $params);
+				if ($filesUsedByImageField)
+				{
+					$where[] = $filesUsedByImageField;
+				}
+			}
+		}
+
+		// Text search and search scope
+		$scope  = $this->getState('scope');
+		$search = $this->getState('search');
+		$search = StringHelper::trim(StringHelper::strtolower($search));
+
+		$filter_state     = $this->getState('filter_state');
+		$filter_access    = $this->getState('filter_access');
+		$filter_lang			= $this->getState('filter_lang');
+		$filter_uploader  = $this->getState('filter_uploader');
+		$filter_secure    = $this->getState('filter_secure');
+		$filter_stamp     = $this->getState('filter_stamp');
+		$filter_url       = $this->getState('filter_url');
+		$filter_ext       = $this->getState('filter_ext');
+
+
 		$permission = FlexicontentHelperPerm::getPerm();
 		$CanViewAllFiles = $permission->CanViewAllFiles;
-		
-		if ( !$CanViewAllFiles ) {
-			$where[] = ' uploaded_by = ' . (int)$user->id;
-		} else if ( $filter_uploader ) {
-			$where[] = ' uploaded_by = ' . $filter_uploader;
-		}
-		
-		if ( $filter_lang ) {
-			$where[] = ' language = '. $this->_db->Quote( $filter_lang );
-		}
-		
-		if ( $filter_url ) {
-			if ( $filter_url == 'F' ) {
-				$where[] = ' url = 0';
-			} else if ($filter_url == 'U' ) {
-				$where[] = ' url = 1';
+
+		// Filter by state
+		if (property_exists($table, $this->state_col))
+		{
+			switch ($filter_state)
+			{
+				case 'P':
+					$where[] = 'a.' . $this->state_col . ' = 1';
+					break;
+
+				case 'U':
+					$where[] = 'a.' . $this->state_col . ' = 0';
+					break;
+
+				case 'A':
+					$where[] = 'a.' . $this->state_col . ' = 2';
+					break;
+
+				case 'T':
+					$where[] = 'a.' . $this->state_col . ' = -2';
+					break;
+
+				default:
+					// ALL: published & unpublished, but exclude archived, trashed
+					if (!strlen($filter_state))
+					{
+						$where[] = 'a.' . $this->state_col . ' <> -2';
+						$where[] = 'a.' . $this->state_col . ' <> 2';
+					}
+					elseif (is_numeric($filter_state))
+					{
+						$where[] = 'a.' . $this->state_col . ' = ' . (int) $filter_state;
+					}
 			}
 		}
 
-		if ( $filter_secure ) {
-			if ( $filter_secure == 'M' ) {
-				$where[] = ' secure = 0';
-			} else if ($filter_secure == 'S' ) {
-				$where[] = ' secure = 1';
+		// Filter by language
+		if (strlen($filter_lang))
+		{
+			$where[] = 'a.language = ' . $this->_db->Quote($filter_lang);
+		}
+
+		/**
+		 * Limit via parameter,
+		 * 1: limit to current user as uploader,
+		 * 0: list files from any uploader, and respect 'filter_uploader' URL variable
+		 */
+
+		// Limit to current user
+		if ($limit_by_uploader || !$CanViewAllFiles)
+		{
+			$where[] = 'a.' . $this->created_by_col . ' = ' . (int) $user->id;
+		}
+
+		// Filter by uploader
+		elseif (strlen($filter_uploader))
+		{
+			$where[] = 'a.' . $this->created_by_col . ' = ' . (int) $filter_uploader;
+		}
+
+		// Filter by access level
+		if (property_exists($table, 'access'))
+		{
+			if (strlen($filter_access))
+			{
+				$where[] = 'a.access = ' . (int) $filter_access;
+			}
+
+			// Filter via View Level Access, if user is not super-admin
+			if (!JFactory::getUser()->authorise('core.admin') && (JFactory::getApplication()->isClient('site') || $this->listViaAccess))
+			{
+				$groups  = implode(',', JAccess::getAuthorisedViewLevels($user->id));
+				$where[] = 'a.access IN (' . $groups . ')';
 			}
 		}
 
-		if ( $filter_ext ) {
-			$where[] = ' ext = ' . $this->_db->Quote( $filter_ext );
-		}
-		
-		if ($search && $scope == 1) {
-			$search_escaped = FLEXI_J16GE ? $this->_db->escape( $search, true ) : $this->_db->getEscaped( $search, true );
-			$where[] = ' (LOWER(f.filename) LIKE '.$this->_db->Quote( '%'.$search_escaped.'%', false ).
-				' OR LOWER(f.filename_original) LIKE '.$this->_db->Quote( '%'.$search_escaped.'%', false ).')'
-				;
+		// Limit via parameter, 2: List any file and respect 'filter_secure' URL variable, 1: limit to secure, 0: limit to media
+		if (strlen($target_dir) && $target_dir != 2)
+		{
+			$filter_secure = $target_dir ? 'S' : 'M';   // force secure / media
 		}
 
-		if ($search && $scope == 2) {
-			$search_escaped = FLEXI_J16GE ? $this->_db->escape( $search, true ) : $this->_db->getEscaped( $search, true );
-			$where[] = ' LOWER(f.altname) LIKE '.$this->_db->Quote( '%'.$search_escaped.'%', false );
+		if ($filter_url === 'F')
+		{
+			$where[] = ' url = 0';
+		}
+		elseif ($filter_url === 'U')
+		{
+			$where[] = ' url = 1';
 		}
 
-		$where 		= ( count( $where ) ? ' WHERE ' . implode( ' AND ', $where ) : '' );
+		if ($filter_stamp === 'Y')
+		{
+			$where[] = ' stamp = 1';
+		}
+		elseif ($filter_stamp === 'N')
+		{
+			$where[] = ' stamp = 0';
+		}
 
-		return $where;
+		if ($filter_secure === 'M')
+		{
+			$where[] = ' secure = 0';
+		}
+		elseif ($filter_secure === 'S')
+		{
+			$where[] = ' secure = 1';
+		}
+
+		if (strlen($filter_ext))
+		{
+			$where[] = ' ext = ' . $this->_db->Quote($filter_ext);
+		}
+
+		if (!empty($this->search_cols) && strlen($search))
+		{
+			if (stripos($search, 'id:') === 0)
+			{
+				$where[] = 'a.id = ' . (int) substr($search, 3);
+			}
+			elseif (stripos($search, 'author:') === 0)
+			{
+				$search_quoted = $this->_db->Quote('%' . $this->_db->escape(substr($search, 7), true) . '%');
+				$where[] = '(ua.name LIKE ' . $search_quoted . ' OR ua.username LIKE ' . $search_quoted . ')';
+			}
+			else
+			{
+				$escaped_search = str_replace(' ', '%', $this->_db->escape(trim($search), true));
+				$search_quoted  = $this->_db->Quote('%' . $escaped_search . '%', false);
+
+				$table     = $this->getTable($this->records_jtable, '');
+				$textwhere = array();
+				$col_name  = str_replace('a.', '', $scope);
+
+				if ($scope === '-1')
+				{
+					foreach ($this->search_cols as $search_col)
+					{
+						if (property_exists($table, $search_col))
+						{
+							$textwhere[] = 'LOWER(a.' . $search_col . ') LIKE ' . $search_quoted;
+						}
+					}
+				}
+				elseif ($scope === 'a.filename')
+				{
+					$textwhere[] = ' LOWER(a.filename) LIKE ' . $search_quoted;
+					$textwhere[] = ' LOWER(a.filename_original) LIKE ' . $search_quoted;
+				}
+				elseif (in_array($col_name, $this->search_cols) && property_exists($table, $col_name))
+				{
+					// Scope is user input, was filtered as CMD but also use quoteName() on the column
+					$textwhere[] = 'LOWER(' . $this->_db->quoteName($scope) . ') LIKE ' . $search_quoted;
+				}
+				else
+				{
+					JFactory::getApplication()->enqueueMessage('Text search scope ' . $scope . ' is unknown, search failed', 'warning');
+				}
+
+				if ($textwhere)
+				{
+					$where[] = '(' . implode(' OR ', $textwhere) . ')';
+				}
+			}
+		}
+
+		if ($q instanceof \JDatabaseQuery)
+		{
+			return $where ? $q->where($where) : $q;
+		}
+
+		return $q
+			? ' WHERE ' . (count($where) ? implode(' AND ', $where) : ' 1 ')
+			: $where;
 	}
-	
-	
+
+
 	/**
 	 * Method to build the having clause of the query for the files
 	 *
-	 * @access private
-	 * @return string
+	 * @param		JDatabaseQuery|bool   $q   DB Query object or bool to indicate returning an array or rendering the clause
+	 *
+	 * @return  JDatabaseQuery|array
+	 *
 	 * @since 1.0
 	 */
-	function _buildContentHaving()
+	protected function _buildContentHaving($q = true)
 	{
-		$app    = JFactory::getApplication();
-		$option = JRequest::getVar('option');
-		
-		$filter_assigned	= $app->getUserStateFromRequest( $option.'.filemanager.filter_assigned', 'filter_assigned', '', 'word' );
-		
-		$having = '';
-		
-		if ( $filter_assigned ) {
-			if ( $filter_assigned == 'O' ) {
-				$having = ' HAVING COUNT(rel.fileid) = 0';
-			} else if ($filter_assigned == 'A' ) {
-				$having = ' HAVING COUNT(rel.fileid) > 0';
-			}
+		$filter_assigned = $this->getState('filter_assigned');
+
+		$having = array();
+
+		if ($filter_assigned === 'O')
+		{
+			$having[] = 'COUNT(rel.fileid) = 0';
 		}
-		
-		return $having;
+		elseif ($filter_assigned === 'A')
+		{
+			$having[] = 'COUNT(rel.fileid) > 0';
+		}
+
+		if ($q instanceof \JDatabaseQuery)
+		{
+			return $having ? $q->having($having) : $q;
+		}
+
+		return $q
+			? ' HAVING ' . (count($having) ? implode(' AND ', $having) : ' 1 ')
+			: $having;
 	}
-	
-	
+
+
 	/**
 	 * Method to build the query for file uploaders according to current filtering
 	 *
@@ -421,21 +1193,115 @@ class FlexicontentModelFilemanager extends JModelLegacy
 	 * @return integer
 	 * @since 1.0
 	 */
-	function _buildQueryUsers() {
+	function _buildQueryUsers()
+	{
 		// Get the WHERE and ORDER BY clauses for the query
-		$where = $this->_buildContentWhere();
-		
-		$query = 'SELECT u.id,u.name'
-		. ' FROM #__flexicontent_files AS f'
-		. ' LEFT JOIN #__users AS u ON u.id = f.uploaded_by'
-		. $where
-		. ' GROUP BY u.id'
-		. ' ORDER BY u.name'
-		;
+		$where = $this->_pending
+			? $this->_buildContentWherePending()
+			: $this->_buildContentWhere();
+		if ($where === false)
+		{
+			return 'SELECT 1 FROM #__users WHERE 1=0';
+		}
+
+		$query = 'SELECT ua.id, ua.name'
+			. ' FROM #__flexicontent_files AS a'
+			. ' LEFT JOIN #__users AS ua ON ua.id = a.uploaded_by'
+			. $where
+			. ' GROUP BY ua.id'
+			. ' ORDER BY ua.name'
+			;
 		return $query;
 	}
-	
-	
+
+
+	/**
+	 * Method to build find the (id of) files used by an image field
+	 *
+	 * @access public
+	 * @return integer
+	 * @since 3.2
+	 */
+	function getFilesUsedByImageField($field, $params)
+	{
+		// Get configuration parameters
+		$target_dir = (int) $params->get('target_dir', 1);
+		$securepath = JPath::clean(($target_dir ? COM_FLEXICONTENT_FILEPATH : COM_FLEXICONTENT_MEDIAPATH).DS);
+
+		// Retrieve usage of images for the given field from the DB
+		$query = 'SELECT value'
+			. ' FROM #__flexicontent_fields_item_relations'
+			. ' WHERE field_id = '. (int) $field->id .' AND value<>"" '
+		;
+		$values = $this->_db->setQuery($query)->loadColumn();
+
+		// Create original filenames array skipping any empty records
+		$filenames = array();
+		foreach ( $values as $value )
+		{
+			if (empty($value))
+			{
+				continue;
+			}
+
+			$value = @ unserialize($value);
+
+			if (!empty($value['originalname']))
+			{
+				$filenames[$value['originalname']] = 1;
+			}
+			elseif (!empty($value['existingname']))
+			{
+				$filenames[$value['existingname']] = 1;
+			}
+			else
+			{
+				continue;
+			}
+		}
+		$filenames = array_keys($filenames);
+
+		// Eliminate records that have no original files
+		$existing_files = array();
+		foreach($filenames as $filename)
+		{
+			if (!$filename) continue;  // Skip empty values
+			if (file_exists($securepath . $filename))
+			{
+				$existing_files[$this->_db->Quote($filename)] = 1;
+			}
+		}
+		$filenames = $existing_files;
+
+		if (!$filenames) return '';  // No files found
+
+		$query = 'SELECT id'
+			. ' FROM #__flexicontent_files'
+			. ' WHERE '
+			. '  filename IN (' . implode(',', array_keys($filenames)) . ')'
+			. ($target_dir != 2 ? '  AND secure = ' . (int) $target_dir : '')
+		;
+		$file_ids = $this->_db->setQuery($query)->loadColumn();
+
+		// Also include files uploaded during current session for current field / item pair
+		if ($field->item_id)
+		{
+			$upload_context = 'fc_upload_history.item_' . $field->item_id . '_field_' . $field->id;
+			$session_files = JFactory::getSession()->get($upload_context, array());
+
+			$new_file_ids = isset($session_files['ids'])
+				? $session_files['ids']
+				: array();
+
+			$file_ids = array_merge($file_ids, $new_file_ids);
+		}
+
+		return $file_ids
+			? ' a.id IN (' . implode(', ', ArrayHelper::toInteger($file_ids)) . ')'
+			: '';
+	}
+
+
 	/**
 	 * Method to get file uploaders according to current filtering (Currently not used ?)
 	 *
@@ -448,13 +1314,15 @@ class FlexicontentModelFilemanager extends JModelLegacy
 		if (empty($this->_users))
 		{
 			$query = $this->_buildQueryUsers();
-			$this->_users = $this->_getList($query);
+			$this->_users = $query === false
+				? array()
+				: $this->_getList($query);
 		}
 
 		return $this->_users;
 	}
-	
-	
+
+
 	/**
 	 * Method to find fields using DB mode when given a field type,
 	 * this is meant for field types that may or may not use files from the DB
@@ -465,23 +1333,26 @@ class FlexicontentModelFilemanager extends JModelLegacy
 	 */
 	function getFieldsUsingDBmode($field_type)
 	{
-		$db = JFactory::getDBO();
 		// Some fields may not be using DB, create a limitation for them
 		switch($field_type) {
 			case 'image':
-				$query = "SELECT id FROM #__flexicontent_fields WHERE field_type='image' AND attribs NOT LIKE '%image_source=1%'";
-				$this->_db->setQuery($query);
-				$field_ids = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();
+				$query = $this->_db->getQuery(true)
+					->select('id')
+					->from('#__flexicontent_fields')
+					->where('field_type = ' . $this->_db->Quote('image'))
+					->where('attribs LIKE ' . $this->_db->Quote('%"image_source":"0"%'))
+					;
+				$field_ids = $this->_db->setQuery($query)->loadColumn();
 				break;
-			
+
 			default:
 				$field_ids = array();
 				break;
 		}
 		return $field_ids;
 	}
-	
-	
+
+
 	/**
 	 * Method to get items using files VIA (single property) field types that store file ids !
 	 *
@@ -492,47 +1363,54 @@ class FlexicontentModelFilemanager extends JModelLegacy
 	{
 		$app    = JFactory::getApplication();
 		$user   = JFactory::getUser();
-		$option = JRequest::getVar('option');
-		
-		$filter_uploader	= $app->getUserStateFromRequest( $option.'.filemanager.filter_uploader', 'filter_uploader', 0, 'int' );
-		
+		$jinput = $app->input;
+		$option = $jinput->get('option', '', 'cmd');
+
+		$filter_uploader = $this->getState('filter_uploader');
+
 		$field_type_list = $this->_db->Quote( implode( "','", $field_types ), $escape=false );
-		
+
 		$where = array();
-		
+
 		$file_ids_list = '';
 		if ( count($file_ids) ) {
-			$file_ids_list = ' AND f.id IN (' . "'". implode("','", $file_ids)  ."')";
-		} else {
+			$file_ids_list = ' AND a.id IN (' . "'". implode("','", $file_ids)  ."')";
+		}
+		else
+		{
 			$permission = FlexicontentHelperPerm::getPerm();
 			$CanViewAllFiles = $permission->CanViewAllFiles;
-			
-			if ( !$CanViewAllFiles ) {
-				$where[] = ' f.uploaded_by = ' . (int)$user->id;
-			} else if ( $filter_uploader ) {
-				$where[] = ' f.uploaded_by = ' . $filter_uploader;
+
+			if (!$CanViewAllFiles)
+			{
+				$where[] = ' a.uploaded_by = ' . (int) $user->id;
+			}
+			elseif ($filter_uploader)
+			{
+				$where[] = ' a.uploaded_by = ' . (int) $filter_uploader;
 			}
 		}
-		
-		if ( isset($ignored['item_id']) ) {
-			$where[] = ' i.id!='. (int)$ignored['item_id'];
+
+		if (!empty($ignored))
+		{
+			$where[] = ' i.id NOT IN (' . implode(',', ArrayHelper::toInteger($ignored)) . ')';
 		}
-		if ( isset($ignored['lang_parent_id']) ) {
-			$where[] = ' ie.lang_parent_id!='. (int)$ignored['lang_parent_id'];
-		}
-		
-		$where = ( count( $where ) ? ' WHERE ' . implode( ' AND ', $where ) : '' );
-		$groupby = !$count_items  ?  ' GROUP BY i.id'  :  ' GROUP BY f.id';   // file maybe used in more than one fields or ? in more than one values for same field
-		$orderby = !$count_items  ?  ' ORDER BY i.title ASC'  :  '';
-		
+
+		$where = count($where)
+			? ' WHERE ' . implode(' AND ', $where)
+			: '';
+
+		// Group by since file maybe used in more than one fields or ? in more than one values for same field
+		$groupby = !$count_items ? ' GROUP BY i.id'  :  ' GROUP BY a.id';
+		$orderby = !$count_items ? ' ORDER BY i.title ASC'  :  '';
+
 		// File field relation sub query
-		$query = 'SELECT '. ($count_items  ?  'f.id as file_id, COUNT(i.id) as item_count'  :  'i.id as id, i.title')
+		$query = 'SELECT '. ($count_items  ?  'a.id as file_id, COUNT(i.id) as item_count'  :  'i.id as id, i.title')
 			. ' FROM #__content AS i'
-			. (isset($ignored['lang_parent_id']) ? ' JOIN #__flexicontent_items_ext as ie ON ie.item_id = i.id' : '')
 			. ' JOIN #__flexicontent_fields_item_relations AS rel ON rel.item_id = i.id'
 			. ' JOIN #__flexicontent_fields AS fi ON fi.id = rel.field_id AND fi.field_type IN ('. $field_type_list .')'
-			. ' JOIN #__flexicontent_files AS f ON f.id=rel.value '. $file_ids_list
-			//. ' JOIN #__users AS u ON u.id = f.uploaded_by'
+			. ' JOIN #__flexicontent_files AS a ON a.id=rel.value '. $file_ids_list
+			//. ' JOIN #__users AS ua ON ua.id = a.uploaded_by'
 			. $where
 			. $groupby
 			. $orderby
@@ -540,141 +1418,248 @@ class FlexicontentModelFilemanager extends JModelLegacy
 		//echo nl2br( "\n".$query."\n");
 		$this->_db->setQuery( $query );
 		$_item_data = $this->_db->loadObjectList($count_items ? 'file_id' : 'id');
-		if ($this->_db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($this->_db->getErrorMsg()),'error');
-		
+
 		$items = array();
-		if ($_item_data) foreach ($_item_data as $item) {
+		if ($_item_data) foreach ($_item_data as $item)
+		{
 			if ($count_items) {
 				$items[$item->file_id] = ((int) @ $items[$item->file_id]) + $item->item_count;
 			} else {
 				$items[$item->title] = $item;
 			}
 		}
-		
+
 		//echo "<pre>"; print_r($items); exit;
 		return $items;
 	}
-	
-	
+
+
 	/**
 	 * Method to get items using files VIA (multi property) field types that store file as as property either file id or filename!
 	 *
 	 * @access public
 	 * @return object
 	 */
-	function getItemsMultiprop( $field_props=array('image'=>'originalname'), $value_props=array('image'=>'filename') , $file_ids=array(), $count_items=false, $ignored=false )
+	function getItemsMultiprop( $field_props=array('image'=>array('originalname', 'existingname')), $value_props=array('image'=>array('filename', 'filename')) , $file_ids=array(), $count_items=false, $ignored=false )
 	{
 		$app    = JFactory::getApplication();
 		$user   = JFactory::getUser();
-		$option = JRequest::getVar('option');
-		
-		$filter_uploader	= $app->getUserStateFromRequest( $option.'.filemanager.filter_uploader', 'filter_uploader', 0, 'int' );
-		
+		$jinput = $app->input;
+		$option = $jinput->get('option', '', 'cmd');
+
+		$filter_uploader = $this->getState('filter_uploader');
+
 		$where = array();
-		
+
 		$file_ids_list = '';
-		if ( count($file_ids) ) {
-			$file_ids_list = ' AND f.id IN (' . "'". implode("','", $file_ids)  ."')";
-		} else {
+
+		if (count($file_ids))
+		{
+			$file_ids_list = ' AND a.id IN (' . implode(',', ArrayHelper::toInteger($file_ids)) . ')';
+		}
+		else
+		{
 			$permission = FlexicontentHelperPerm::getPerm();
 			$CanViewAllFiles = $permission->CanViewAllFiles;
-			
-			if ( !$CanViewAllFiles ) {
-				$where[] = ' f.uploaded_by = ' . (int)$user->id;
-			} else if ( $filter_uploader ) {
-				$where[] = ' f.uploaded_by = ' . $filter_uploader;
+
+			if (!$CanViewAllFiles)
+			{
+				$where[] = ' a.uploaded_by = ' . (int) $user->id;
+			}
+			elseif ($filter_uploader)
+			{
+				$where[] = ' a.uploaded_by = ' . (int) $filter_uploader;
 			}
 		}
-		
-		if ( isset($ignored['item_id']) ) {
-			$where[] = ' i.id!='. (int)$ignored['item_id'];
+
+		if (!empty($ignored))
+		{
+			$where[] = ' i.id NOT IN (' . implode(',', ArrayHelper::toInteger($ignored)) . ')';
 		}
-		if ( isset($ignored['lang_parent_id']) ) {
-			$where[] = ' ie.lang_parent_id!='. (int)$ignored['lang_parent_id'];
-		}
-		
-		$where 		= ( count( $where ) ? ' WHERE ' . implode( ' AND ', $where ) : '' );
-		$groupby = !$count_items  ?  ' GROUP BY i.id'  :  ' GROUP BY f.id';   // file maybe used in more than one fields or ? in more than one values for same field
-		$orderby = !$count_items  ?  ' ORDER BY i.title ASC'  :  '';
-		
+
+		$where = count($where)
+			? ' WHERE ' . implode(' AND ', $where)
+			: '';
+
+		// Group by since file maybe used in more than one fields or ? in more than one values for same field
+		$groupby = !$count_items ? ' GROUP BY i.id'  :  ' GROUP BY a.id';
+		$orderby = !$count_items ? ' ORDER BY i.title ASC'  :  '';
+
 		// Serialized values are like : "__field_propname__";s:33:"__value__"
 		$format_str = 'CONCAT("%%","\"%s\";s:%%:%%\"",%s,"\"%%")';
 		$items = array();
 		$files = array();
-		
-		foreach ($field_props as $field_type => $field_prop)
+
+		foreach ($field_props as $field_type => $field_prop_arr)
 		{
-			// Some fields may not be using DB, create a limitation for them
-			$field_ids = $this->getFieldsUsingDBmode($field_type);
-			$field_ids_list = !$field_ids  ?  ""  :  " AND fi.id IN ('". implode("','", $field_ids) ."')";
-			
-			// Create a matching condition for the value depending on given configuration (property name of the field, and value property of file: either id or filename or ...)
-			$value_prop = $value_props[$field_type];
-			$like_str = FLEXI_J16GE ? $this->_db->escape( 'f.'.$value_prop, false ) : $this->_db->getEscaped( 'f.'.$value_prop, false );
-			$like_str = sprintf( $format_str, $field_prop, $like_str );
-			
-			// File field relation sub query
-			$query = 'SELECT '. ($count_items  ?  'f.id as file_id, COUNT(i.id) as item_count'  :  'i.id as id, i.title')
-				. ' FROM #__content AS i'
-				. (isset($ignored['lang_parent_id']) ? ' JOIN #__flexicontent_items_ext as ie ON ie.item_id = i.id' : '')
-				. ' JOIN #__flexicontent_fields_item_relations AS rel ON rel.item_id = i.id'
-				. ' JOIN #__flexicontent_fields AS fi ON fi.id = rel.field_id AND fi.field_type IN ('. $this->_db->Quote( $field_type ) .')' . $field_ids_list
-				. ' JOIN #__flexicontent_files AS f ON rel.value LIKE '. $like_str . $file_ids_list
-				//. ' JOIN #__users AS u ON u.id = f.uploaded_by'
-				. $where
-				. $groupby
-				. $orderby
-				;
-			//echo nl2br( "\n".$query."\n");
-			$this->_db->setQuery( $query );
-			$_item_data = $this->_db->loadObjectList($count_items ? 'file_id' : 'id');
-			if ($this->_db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($this->_db->getErrorMsg()),'error');
-			
-			if ($_item_data) foreach ($_item_data as $item) {
-				if ($count_items) {
-					$items[$item->file_id] = ((int) @ $items[$item->file_id]) + $item->item_count;
-				} else {
-					$items[$item->title] = $item;
-				}
+			if (!is_array($field_prop_arr))
+			{
+				$field_prop_arr  = array($field_prop_arr);
 			}
-			//echo "<pre>"; print_r($_item_data); exit;
+
+			if (!is_array($value_props[$field_type]))
+			{
+				$value_props[$field_type] = array($value_props[$field_type]);
+			}
+
+			foreach($field_prop_arr as $i => $field_prop)
+			{
+				// Some fields may not be using DB, create a limitation for them
+				$field_ids = $this->getFieldsUsingDBmode($field_type);
+				$field_ids_list = !$field_ids  ?  ""  :  " AND fi.id IN ('". implode("','", $field_ids) ."')";
+
+				// Create a matching condition for the value depending on given configuration (property name of the field, and value property of file: either id or filename or ...)
+				$value_prop = $value_props[$field_type][$i];
+				$like_str = $this->_db->escape( 'a.'.$value_prop, false );
+				$like_str = sprintf( $format_str, $field_prop, $like_str );
+
+				// File field relation sub query
+				$query = 'SELECT '. ($count_items  ?  'a.id as file_id, COUNT(i.id) as item_count'  :  'i.id as id, i.title')
+					. ' FROM #__content AS i'
+					. ' JOIN #__flexicontent_fields_item_relations AS rel ON rel.item_id = i.id'
+					. ' JOIN #__flexicontent_fields AS fi ON fi.id = rel.field_id AND fi.field_type IN ('. $this->_db->Quote( $field_type ) .')' . $field_ids_list
+					. ' JOIN #__flexicontent_files AS a ON rel.value LIKE ' . $like_str . ' AND a.'.$value_prop.'<>""' . $file_ids_list
+					//. ' JOIN #__users AS ua ON ua.id = a.uploaded_by'
+					. $where
+					. $groupby
+					. $orderby
+					;
+				//echo nl2br( "\n".$query."\n");
+				$this->_db->setQuery( $query );
+				$_item_data = $this->_db->loadObjectList($count_items ? 'file_id' : 'id');
+
+				if ($_item_data) foreach ($_item_data as $item)
+				{
+					if ($count_items) {
+						$items[$item->file_id] = ((int) @ $items[$item->file_id]) + $item->item_count;
+					} else {
+						$items[$item->title] = $item;
+					}
+				}
+				//echo "<pre>"; print_r($_item_data); exit;
+			}
 		}
-		
+
 		//echo "<pre>"; print_r($items); exit;
 		return $items;
 	}
-	
-	
+
+
 	/**
-	 * Method to check if we can remove a file
-	 * return false if the files are associated fields
-	 * only check file fields
+	 * Method to check if given records can not be deleted due to assignments or due to permissions
 	 *
-	 * @access	public
-	 * @return	boolean	True on success
-	 * @since	1.5
+	 * @param   array       $cid          array of record ids to check
+	 * @param   array       $cid_noauth   (variable by reference), pass authorizing -ignored- IDs and return an array of non-authorized record ids
+	 * @param   array       $cid_wassocs  (variable by reference), pass assignments -ignored- IDs and return an array of 'locked' record ids
+	 *
+	 * @return	boolean	  True when at least 1 deleteable record found
+	 *
+	 * @since   3.3.0
 	 */
-	function candelete( $cid = array(), $ignored=false, $s_field_types=array('file', 'minigallery'),
-		$m_field_props=array('image'=>'originalname'), $m_value_props=array('image'=>'filename')
-	) {
-		$n		= count( $cid );
-		if (count( $cid ))
+	public function candelete($cid, & $cid_noauth = null, & $cid_wassocs = null)
+	{
+		$authorizing_ignored = $cid_noauth ? array_flip($cid_noauth) : array();
+		$assignments_ignored = $cid_wassocs ? array_flip($cid_wassocs) : array();
+
+		$cid_noauth  = array();
+		$cid_wassocs = array();
+
+		if (!count($cid))
 		{
-			$items_counts_s = $this->getItemsSingleprop( $s_field_types,  $cid, $count_items=true, $ignored);
-			$items_counts_m = $this->getItemsMultiprop ( $m_field_props, $m_value_props, $cid, $count_items=true, $ignored);
-			//echo "<pre>";  print_r($items_counts_s);  print_r($items_counts_m);  exit;
-			foreach ($cid as $file_id)
-			{
-				if ( @ $items_counts_s[$file_id] > 0 || @ $items_counts_m[$file_id] > 0) {
-					return false;
-				}
-			}
-			return true;
+			return false;
 		}
-		return false;
+
+		$s_field_types = array('file', 'minigallery', 'mediafile');
+		$m_field_props = array('image' => array('originalname', 'existingname'));
+		$m_value_props = array('image' => array('filename', 'filename'));
+
+		$allowed_cid = $this->getDeletable($cid, $authorizing_ignored, $s_field_types, $m_field_props, $m_value_props);
+
+		$r_allowed_cid = array_flip($allowed_cid);
+
+		foreach($cid as $id)
+		{
+			if (!isset($r_allowed_cid[$id]))
+			{
+				$cid_noauth[] = $id;
+			}
+		}
+
+		return !count($cid_noauth) && !count($cid_wassocs);
 	}
-	
-	
+
+
+	/**
+	 * Method to check if given records can not be unpublished due to assignments or due to permissions
+	 *
+	 * @param		array			$cid          array of record ids to check
+	 * @param		array			$cid_noauth   (variable by reference), pass authorizing -ignored- IDs and return an array of non-authorized record ids
+	 * @param		array			$cid_wassocs  (variable by reference), pass assignments -ignored- IDs and return an array of 'locked' record ids
+	 *
+	 * @return	boolean	  True when at least 1 publishable record found
+	 *
+	 * @since   3.3.0
+	 */
+	public function canunpublish($cid, & $cid_noauth = null, & $cid_wassocs = null)
+	{
+		if ($checkACL)
+		{
+			die(__FUNCTION__ . '() $checkACL = true is NOT supported');
+		}
+
+		if (!count($cid))
+		{
+			return false;
+		}
+
+		return true;
+	}
+
+
+	/**
+	 * Method to check if given files have assignments for the given field types
+	 *
+	 * @param		array			$cid            array of record ids to check
+	 * @param		array			$ignored        array of record ids to ignore during checks
+	 * @param		array			$s_field_types  array of single property field types that stored file IDs
+	 * @param		array			$m_field_types  array of field value properties storing file references (indexed by field types)
+	 * @param		array			$m_value_props  array of file properties to compare the given field value properties (indexed by field types)
+	 *
+	 * @return	array     An array of file IDs that can be safely deleted
+	 *
+	 * @since	2.0
+	 */
+	function getDeletable($cid = array(), $ignored = false,
+		$s_field_types = array('file', 'minigallery', 'mediafile'),
+		$m_field_props = array('image' => array('originalname', 'existingname')),
+		$m_value_props = array('image' => array('filename', 'filename'))
+	) {
+
+		if (!count($cid))
+		{
+			return array();
+		}
+
+		$items_counts_s = $this->getItemsSingleprop($s_field_types,  $cid, $count_items = true, $ignored);
+		$items_counts_m = $this->getItemsMultiprop($m_field_props, $m_value_props, $cid, $count_items = true, $ignored);
+		//echo "<pre>";  print_r($items_counts_s);  print_r($items_counts_m);  exit;
+
+		$allowed_cid = array();
+
+		foreach ($cid as $file_id)
+		{
+			if (!empty($items_counts_s[$file_id]) || !empty($items_counts_m[$file_id]))
+			{
+				continue;
+			}
+
+			$allowed_cid[] = $file_id;
+		}
+
+		return $allowed_cid;
+	}
+
+
 	/**
 	 * Method to remove a file
 	 *
@@ -684,47 +1669,41 @@ class FlexicontentModelFilemanager extends JModelLegacy
 	 */
 	function delete($cid)
 	{
-		if (count( $cid ))
+		if ( !count($cid) ) return false;
+
+		jimport('joomla.filesystem.path');
+		jimport('joomla.filesystem.file');
+
+		$cids = implode( ',', $cid );
+
+		$query = 'SELECT a.filename, a.url, a.secure'
+				. ' FROM #__flexicontent_files AS a'
+				. ' WHERE a.id IN ('. $cids .')';
+
+		$this->_db->setQuery( $query );
+		$files = $this->_db->loadObjectList();
+
+		foreach($files as $file)
 		{
-			jimport('joomla.filesystem.file');
-		
-			$cids = implode( ',', $cid );
-		
-			$query = 'SELECT f.filename, f.url, f.secure'
-					. ' FROM #__flexicontent_files AS f'
-					. ' WHERE f.id IN ('. $cids .')';
-		
-			$this->_db->setQuery( $query );
-			$files = $this->_db->loadObjectList();
-			
-			foreach($files as $file)
+			if ($file->url != 1)
 			{
-				if ($file->url != 1)
-				{
-					$basepath	= $file->secure ? COM_FLEXICONTENT_FILEPATH : COM_FLEXICONTENT_MEDIAPATH;
-					$path 		= JPath::clean($basepath.DS.DS.$file->filename);
-					if (!JFile::delete($path)) {
-						JError::raiseWarning(100, JText::_( 'FLEXI_UNABLE_TO_DELETE' ).$path);
-					}
+				$basepath	= $file->secure ? COM_FLEXICONTENT_FILEPATH : COM_FLEXICONTENT_MEDIAPATH;
+				$path 		= JPath::clean($basepath.DS.DS.$file->filename);
+				if (!JFile::delete($path)) {
+					JError::raiseWarning(100, JText::_( 'FLEXI_UNABLE_TO_DELETE' ).$path);
 				}
 			}
-		
-			$query = 'DELETE FROM #__flexicontent_files'
-			. ' WHERE id IN ('. $cids .')';
-
-			$this->_db->setQuery( $query );
-
-			if(!$this->_db->query()) {
-				$this->setError($this->_db->getErrorMsg());
-				return false;
-			}
-					
-			return true;
 		}
-		return false;
+
+		$query = 'DELETE FROM #__flexicontent_files'
+		. ' WHERE id IN ('. $cids .')';
+
+		$this->_db->setQuery($query)->execute();
+
+		return true;
 	}
-	
-	
+
+
 	/**
 	 * Method to count the field relations (assignments) of a file in a multi-property field
 	 *
@@ -732,48 +1711,61 @@ class FlexicontentModelFilemanager extends JModelLegacy
 	 * @return	string $msg
 	 * @since	1.
 	 */
-	function countFieldRelationsMultiProp(&$rows, $value_prop, $field_prop, $field_type)
+	function countFieldRelationsMultiProp(&$rows, $value_prop_arr, $field_prop_arr, $field_type)
 	{
 		if (!$rows || !count($rows)) return array();  // No file records to check
-		
+
 		// Some fields may not be using DB, create a limitation for them
 		$field_ids = $this->getFieldsUsingDBmode($field_type);
 		$field_ids_list = !$field_ids  ?  ""  :  " AND fi.id IN ('". implode("','", $field_ids) ."')";
-		
+
 		$format_str = 'CONCAT("%%","\"%s\";s:%%:%%\"",%s,"\"%%")';
 		$items = array();
-		
+
 		foreach ($rows as $row) $row_ids[] = $row->id;
-		$file_id_list = "'". implode("','", $row_ids) . "'";
-		
+		$file_ids_list = "'". implode("','", $row_ids) . "'";
+
 		// Serialized values are like : "__field_propname__";s:33:"__value__"
 		$format_str = 'CONCAT("%%","\"%s\";s:%%:%%\"",%s,"\"%%")';
-		
-		// Create a matching condition for the value depending on given configuration (property name of the field, and value property of file: either id or filename or ...)
-		$like_str = FLEXI_J16GE ? $this->_db->escape( 'f.'.$value_prop, false ) : $this->_db->getEscaped( 'f.'.$value_prop, false );
-		$like_str = sprintf( $format_str, $field_prop, $like_str );
-		
-		$query	= 'SELECT f.id as id, COUNT(rel.item_id) as count, GROUP_CONCAT(DISTINCT rel.item_id SEPARATOR  ",") AS item_list'
-				. ' FROM #__flexicontent_fields_item_relations AS rel'
-				. ' JOIN #__flexicontent_fields AS fi ON fi.id = rel.field_id AND fi.field_type = ' . $this->_db->Quote($field_type) . $field_ids_list
-				. ' JOIN #__flexicontent_files AS f ON rel.value LIKE '. $like_str
-				. ' WHERE f.id IN('. $file_id_list .')'
-				. ' GROUP BY f.id'
-				;
-		$this->_db->setQuery($query);
-		$assigned_data = $this->_db->loadObjectList('id');
-		if ($this->_db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($this->_db->getErrorMsg()),'error');
-		
-		//echo "<pre>"; print_r($assigned_data); exit;
-		
-		foreach($rows as $row) {
-			$row->{'assigned_'.$field_type} = (int) @ $assigned_data[$row->id]->count;
-			if (@ $assigned_data[$row->id]->item_list)
-				$row->item_list[$field_type] = $assigned_data[$row->id]->item_list;
+
+		if (!is_array($field_prop_arr)) $field_prop_arr = array($field_prop_arr);
+		if (!is_array($value_prop_arr)) $value_prop_arr = array($value_prop_arr);
+
+		foreach($field_prop_arr as $i => $field_prop)
+		{
+			$value_prop = $value_prop_arr[$i];
+
+			// Create a matching condition for the value depending on given configuration (property name of the field, and value property of file: either id or filename or ...)
+			$like_str = $this->_db->escape( 'a.'.$value_prop, false );
+			$like_str = sprintf( $format_str, $field_prop, $like_str );
+			
+			$query	= 'SELECT a.id as id, COUNT(rel.item_id) as count, GROUP_CONCAT(DISTINCT rel.item_id SEPARATOR  ",") AS item_list'
+					. ' FROM #__flexicontent_fields_item_relations AS rel'
+					. ' JOIN #__flexicontent_fields AS fi ON fi.id = rel.field_id AND fi.field_type = ' . $this->_db->Quote($field_type) . $field_ids_list
+					. ' JOIN #__flexicontent_files AS a ON rel.value LIKE ' . $like_str . ' AND a.'.$value_prop.'<>""'
+					. ' WHERE a.id IN(' . $file_ids_list . ')'
+					. ' GROUP BY a.id'
+					;
+			$this->_db->setQuery($query);
+			$assigned_data = $this->_db->loadObjectList('id');
+
+			foreach($rows as $row)
+			{
+				$row->{'assigned_'.$field_type} = isset($assigned_data[$row->id]) ? (int) $assigned_data[$row->id]->count : 0;
+				if (isset($assigned_data[$row->id]) && $assigned_data[$row->id]->item_list)
+				{
+					$row->item_list[$field_type] = $assigned_data[$row->id]->item_list;
+					if (isset($row->total_usage))
+					{
+						$item_ids = explode(',', $assigned_data[$row->id]->item_list);
+						$row->total_usage += count($item_ids);
+					}
+				}
+			}
 		}
 	}
-	
-	
+
+
 	/**
 	 * Method to count the field relations (assignments) of a file in a single-property field that stores file ids !
 	 *
@@ -784,31 +1776,37 @@ class FlexicontentModelFilemanager extends JModelLegacy
 	function countFieldRelationsSingleProp(&$rows, $field_type)
 	{
 		if ( !count($rows) ) return;
-		
+
 		foreach ($rows as $row)
 		{
 			$file_id_arr[] = $row->id;
 		}
-		$query	= 'SELECT f.id as file_id, COUNT(rel.item_id) as count, GROUP_CONCAT(DISTINCT rel.item_id SEPARATOR  ",") AS item_list'
-				. ' FROM #__flexicontent_files AS f'
-				. ' JOIN #__flexicontent_fields_item_relations AS rel ON f.id = rel.value'
+		$query	= 'SELECT a.id as file_id, COUNT(rel.item_id) as count, GROUP_CONCAT(DISTINCT rel.item_id SEPARATOR  ",") AS item_list'
+				. ' FROM #__flexicontent_files AS a'
+				. ' JOIN #__flexicontent_fields_item_relations AS rel ON a.id = rel.value'
 				. ' JOIN #__flexicontent_fields AS fi ON fi.id = rel.field_id AND fi.field_type = ' . $this->_db->Quote($field_type)
-				. ' WHERE f.id IN ('. implode( ',', $file_id_arr ) .')'
-				. ' GROUP BY f.id'
+				. ' WHERE a.id IN (' . implode(',', $file_id_arr) . ')'
+				. ' GROUP BY a.id'
 				;
 		$this->_db->setQuery($query);
-		
 		$assigned_data = $this->_db->loadObjectList('file_id');
-		if ($this->_db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($this->_db->getErrorMsg()),'error');
-		
-		foreach ($rows as $row) {
-			$row->{'assigned_'.$field_type} = (int) @ $assigned_data[$row->id]->count;
-			if (@ $assigned_data[$row->id]->item_list)
+
+		foreach ($rows as $row)
+		{
+			$row->{'assigned_'.$field_type} = isset($assigned_data[$row->id]) ? (int) $assigned_data[$row->id]->count : 0;
+			if (isset($assigned_data[$row->id]) && $assigned_data[$row->id]->item_list)
+			{
 				$row->item_list[$field_type] = $assigned_data[$row->id]->item_list;
+				if (isset($row->total_usage))
+				{
+					$item_ids = explode(',', $assigned_data[$row->id]->item_list);
+					$row->total_usage += count($item_ids);
+				}
+			}
 		}
 	}
-	
-	
+
+
 	/**
 	 * Method to (un)publish a file
 	 *
@@ -820,48 +1818,42 @@ class FlexicontentModelFilemanager extends JModelLegacy
 	{
 		$user = JFactory::getUser();
 
-		if (count( $cid )) {
+		if (count( $cid ))
+		{
 			$cids = implode( ',', $cid );
 
-			$query = 'UPDATE #__flexicontent_files'
+			$query = 'UPDATE #__' . $this->records_dbtbl
 				. ' SET published = ' . (int) $publish
 				. ' WHERE id IN ('. $cids .')'
 				. ' AND ( checked_out = 0 OR ( checked_out = ' . (int) $user->get('id'). ' ) )'
 			;
 			$this->_db->setQuery( $query );
-			if (!$this->_db->query()) {
-				$this->setError($this->_db->getErrorMsg());
-				return false;
-			}
+			$this->_db->execute();
 		}
 		return $cid;
 	}
+
+
+
 	/**
-	 * Method to set the access level of the Types
+	 * Method to get ids of all files
 	 *
 	 * @access	public
-	 * @param integer id of the category
-	 * @param integer access level
-	 * @return	boolean	True on success
+	 * @return	boolean	integer array on success
 	 * @since	1.0
 	 */
-	function saveaccess($id, $access)
+	function getFileIds($skip_urls=true, &$total=null, $start=0, $limit=5000)
 	{
-		$row = JTable::getInstance('flexicontent_files', '');
-		
-		$row->load( $id );
-		$row->id = $id;
-		$row->access = $access;
-		
-		if ( !$row->check() ) {
-			$this->setError($this->_db->getErrorMsg());
-			return false;
-		}
-		if ( !$row->store() ) {
-			$this->setError($this->_db->getErrorMsg());
-			return false;
-		}
-		return true;
-	}	
+		$query = 'SELECT SQL_CALC_FOUND_ROWS id '
+			. ' FROM #__flexicontent_files'
+			. ($skip_urls ? ' WHERE url = 0 ' : '')
+			. ($limit ? ' LIMIT ' . (int) $start . ', ' . (int) $limit : '')
+			;
+		$file_ids = $this->_db->setQuery($query)->loadColumn();
+
+		// Get items total
+		$total = $this->_db->setQuery('SELECT FOUND_ROWS()')->loadResult();
+
+		return $file_ids;
+	}
 }
-?>

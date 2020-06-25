@@ -19,13 +19,20 @@
 
 // Check to ensure this file is included in Joomla!
 defined('_JEXEC') or die('Restricted access');
-if (FLEXI_J16GE) {
-	jimport('joomla.html.html');
-	jimport('joomla.form.formfield');
-}
+
+// Load the helper classes
+if (!defined('DS'))  define('DS',DIRECTORY_SEPARATOR);
+require_once(JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.helper.php');
+
+jimport('cms.html.html');      // JHtml
+jimport('cms.html.select');    // JHtmlSelect
+jimport('joomla.form.field');  // JFormField
+
+//jimport('joomla.form.helper'); // JFormHelper
+//JFormHelper::loadFieldClass('...');   // JFormField...
 
 /**
- * Renders a multi element checkbox (array of checkboxes)
+ * Renders a checkbox-set element
  */
 class JFormFieldFccheckbox extends JFormField
 {
@@ -40,17 +47,13 @@ class JFormFieldFccheckbox extends JFormField
 	
 	function getInput()
 	{
-		if (FLEXI_J16GE) {
-			$node = & $this->element;
-			$attributes = get_object_vars($node->attributes());
-			$attributes = $attributes['@attributes'];
-		} else {
-			$attributes = & $node->_attributes;
-		}
-		
-		$values			= FLEXI_J16GE ? $this->value : $value;
+		$node = & $this->element;
+		$attributes = get_object_vars($node->attributes());
+		$attributes = $attributes['@attributes'];
+
+		$values = $this->value;
 		if ( empty($values) )							$values = array();
-		else if ( ! is_array($values) )		$values = !FLEXI_J16GE ? array($values) : explode("|", $values);
+		else if ( ! is_array($values) )		$values = explode("|", $values);
 		$split_char = ",";
 		
 		// Get options and values
@@ -71,64 +74,76 @@ class JFormFieldFccheckbox extends JFormField
 		// Sanity check
 		if (count($checkoptions)!=count($checkvals))
 			return "Number of check options not equal to number of check values";
-		
-		$fieldname	= FLEXI_J16GE ? $this->name : $control_name.'['.$name.']';
-		$element_id = FLEXI_J16GE ? $this->id : $control_name.$name;
-		
-		// 'multiple' attribute in XML adds '[]' automatically in J2.5 and manually in J1.5
-		// This field is always multiple, we will add '[]' WHILE checking for the attribute ...
+
+		$fieldname	= $this->name;
+		$element_id = $this->id;
+
+		// This field is always multiple, we will add '[]' WHILE checking for the attribute ... so that we do not add twice
 		$is_multiple = @$attributes['multiple']=='multiple' || @$attributes['multiple']=='true';
-		if (!FLEXI_J16GE || !$is_multiple)
+		if (!$is_multiple)
+		{
 			$fieldname .= '[]';
+		}
+
+		$class = @ $attributes['class'];
+		$classes = ($class ? $class : '') . ' group-fcset fc_input_set';
+
+		$cols = (float) @ $attributes['cols'];
+		if ($cols) $t = ceil(count($checkoptions ) / $cols);
+		if ($cols) $classes .= ' fc-columned';
 		
-		$html = '<fieldset id="'.$element_id.'" class="radio" style="border-width:0px;'.(FLEXI_J16GE ? "width:60%; " : "").'">';
-		
-		$inline_style  = "float:left; white-space:nowrap;";
+		$attribs = ' class="'.$classes.'"';
+		$html = '<fieldset id="'.$element_id.'" '.$attribs.'>';
+
 		$disable_all = '';
 		if ( @$attributes['display_useglobal'] ) {
 			$check_global='';
 			if (count($values) == 0) {
 				$check_global = ' checked="checked" ';
-				$disable_all = ' disabled="disabled" ';
+				$disable_all  = ' disabled="disabled" ';
 			}
-			$html .= '<div style="'.$inline_style.'" ><input id="'.$element_id.'_useglobal" type="checkbox" '.$check_global.' value="" onclick="toggle_options_fc_'.$element_id.'(this)" />';
-			$html .= '<label for="'.$element_id.'_useglobal" >'.JText::_('FLEXI_USE_GLOBAL').'</label></div>';
+			$useglobal_lbl = @$attributes['useglobal_lbl'] ? $attributes['useglobal_lbl'] : 'FLEXI_USE_GLOBAL';
+			$html .= '<div><input id="'.$element_id.'_useglobal" type="checkbox" '.$check_global.' value="" onclick="fc_toggle_checkbox_group(\''.$element_id.'\', this)" />';
+			$html .= '<label for="'.$element_id.'_useglobal" ><b>'.JText::_($useglobal_lbl).'</b></label></div>';
 		}
 
 		// Create checkboxes
-		foreach($checkoptions as $i => $o) {
+		
+		if ($cols) $html .= '<div style="margin-bottom: 12px;">';
+		foreach($checkoptions as $i => $o)
+		{
 			$curr_element_id = $element_id.$i;
-			$html .= '<div style="'.$inline_style.'" ><input id="'.$curr_element_id.'" type="checkbox"'.$disable_all;
-			$html .= in_array($checkvals[$i], $values) ? ' checked="checked"' : '' ;
-			$html .= ' name="'.$fieldname.'" value="'.$checkvals[$i].'" />';
-			$html .= '<label for="'.$curr_element_id.'" >'.JText::_($checkoptions[$i]).'</label></div>';
-			$html .= FLEXI_J16GE ? ' &nbsp; ' : '';
+			$html .= 
+			($cols && $i && ((($i) % $t) == 0) ? '</div><div>' : '').
+			'
+			<div>
+				<input id="'.$curr_element_id.'" type="checkbox" '.$disable_all .(in_array($checkvals[$i], $values) ? ' checked="checked"' : '').' name="'.$fieldname.'" value="'.$checkvals[$i].'" />
+				<label for="'.$curr_element_id.'" >'.JText::_($checkoptions[$i]).'</label>
+			</div>
+		';
 		}
+		if ($cols) $html .= '</div>';
 
 		$html .= '<input id="'.$element_id.'9999" type="hidden"  name="'.$fieldname.'" value="__SAVED__" '.$disable_all.'/> ';
 		$html .= '</fieldset>';
 		
-		$js 	= "
-function toggle_options_fc_".$element_id."(element) {
-	
-	var panel 	= $('".$element_id."');
-	var inputs 	= panel.getElements('input');
-	if ( $(element).checked ) {
-		inputs.each(function(el){
-			el.setProperty('disabled', 'disabled');
-		});
-	} else {
-		inputs.each(function(el){
-			el.setProperty('disabled', '');
-		});
-	}
-	element.setProperty('disabled', '');
-}";
-
-		$doc = JFactory::getDocument();
-		$doc->addScriptDeclaration($js);
+		static $js_added = false;
+		if (!$js_added) {
+			$js_added = true;
+			$doc = JFactory::getDocument();
+			flexicontent_html::loadFramework('flexi-lib');
+			//$js = "";
+			//if ($js) $doc->addScriptDeclaration($js);
+		}
 		
 		return $html;
+	}
+
+
+	function getLabel()
+	{
+		// Valid HTML ... you can not have for LABEL attribute for fieldset
+		return str_replace(' for="', ' data-for="', parent::getLabel());
 	}
 }
 

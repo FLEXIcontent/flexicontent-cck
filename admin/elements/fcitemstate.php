@@ -19,20 +19,20 @@
 // Check to ensure this file is included in Joomla!
 defined('_JEXEC') or die('Restricted access');
 
+
+jimport('cms.html.html');      // JHtml
+jimport('cms.html.select');    // JHtmlSelect
+
+jimport('joomla.form.helper'); // JFormHelper
+JFormHelper::loadFieldClass('list');   // JFormFieldList
+
 /**
- * Renders a ordering list
+ * Renders FLEXIcontent item states field
  *
  * @package 	Joomla
  * @subpackage	FLEXIcontent
  * @since		1.5
  */
-if (FLEXI_J16GE) {
-	jimport('joomla.html.html');
-	jimport('joomla.form.formfield');
-	jimport('joomla.form.helper');
-	JFormHelper::loadFieldClass('list');
-}
-
 class JFormFieldFcitemstate extends JFormFieldList
 {
 	/**
@@ -45,12 +45,12 @@ class JFormFieldFcitemstate extends JFormFieldList
 	
 	function getOptions()
 	{
-		$states[] = JHTML::_('select.option',   1, 	JText::_( 'FLEXI_PUBLISHED' ) );
-		$states[] = JHTML::_('select.option',  -5,	JText::_( 'FLEXI_IN_PROGRESS' ) );
-		$states[] = JHTML::_('select.option',   0,	JText::_( 'FLEXI_UNPUBLISHED' ) ); 
-		$states[] = JHTML::_('select.option',  -3,	JText::_( 'FLEXI_PENDING' ) );
-		$states[] = JHTML::_('select.option',  -4, 	JText::_( 'FLEXI_TO_WRITE' ) );
-		$states[] = JHTML::_('select.option',   2, 	JText::_( 'FLEXI_ARCHIVED' ) );
+		$states[] = JHtml::_('select.option',   1, 	JText::_( 'FLEXI_PUBLISHED' ) );
+		$states[] = JHtml::_('select.option',  -5,	JText::_( 'FLEXI_IN_PROGRESS' ) );
+		$states[] = JHtml::_('select.option',   0,	JText::_( 'FLEXI_UNPUBLISHED' ) ); 
+		$states[] = JHtml::_('select.option',  -3,	JText::_( 'FLEXI_PENDING' ) );
+		$states[] = JHtml::_('select.option',  -4, 	JText::_( 'FLEXI_TO_WRITE' ) );
+		$states[] = JHtml::_('select.option',   2, 	JText::_( 'FLEXI_ARCHIVED' ) );
 
 		return $states;
 	}

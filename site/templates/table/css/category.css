@@ -1,0 +1,76 @@
+body #flexicontent .fc_item_title,
+body #flexicontent .fc_item_title a {
+	color: inherit;
+	background-color: inherit;
+	padding-top: 0px;
+	padding-right: 0px;
+	padding-left: 0px;
+	padding-bottom: 0px;
+	border-radius: 0px;
+}
+td.fc_title_col {
+	background-color: inherit !important;
+}
+table#adminListTableFCcategory th {
+	background: inherit !important;
+	color: inherit;
+}
+body table.adminlist tbody tr.row0:hover td,
+table.adminlist tbody tr.row1:hover td,
+table.adminlist tr:hover td.filtered_column {
+	background-color: inherit !important;
+}
+body table.adminlist tbody tr {
+	border-top: 0px solid #dadada !important;
+	text-align: inherit;
+}
+body #flexicontent .flexi.label,
+body #flexicontent .desc-title.label {
+	background-color: #999999;
+	color: #ffffff;
+	border-radius: 3px;
+	padding-top: 2px;
+	padding-right: 4px;
+	padding-left: 4px;
+	padding-bottom: 2px;
+}
+table.adminlist tbody tr.row0 td {
+	background: #ffffff;
+}
+table.adminlist tbody tr.row1 td {
+	background: #f7f7f7;
+}
+table.adminlist {
+	color: #555555;
+}
+.subcategorieslist {
+	margin: 0 0 1em;
+}
+#fc_alpha .btn.fc_alpha_index,
+#fc_alpha .btn.fc_alpha_index_sep {
+	margin-top: 0;
+	margin-bottom: 0;
+}
+.group {
+	overflow: auto !important;
+}
+.fc_item_title a {
+	display: inline-block;
+	float: left;
+	font-size: 14px;
+	font-weight: bold;
+	margin-left: 16px;
+}
+.fc_title_row_box {
+	display: inline-block;
+	float: left;
+	max-width: 100%;
+	padding: 0%;
+	margin-left: 16px;
+}
+.fc_item_separator_row {
+	display: block;
+	clear: both;
+	height: 40px;
+	border: 0px solid;
+}

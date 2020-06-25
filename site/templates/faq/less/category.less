@@ -1,0 +1,150 @@
+@import 'include/config.less';
+
+/* Faq Theme : category template CSS file */
+
+#flexicontent .flexi.label {
+	padding: 3px 3px;
+}
+
+#flexicontent .fc_markup.mu_has_text {
+	margin: 2px 2px 0px 2px;
+}
+
+#flexicontent ul.faqblock {
+	margin: 0;
+	padding: 0;
+}
+
+#flexicontent ul.faqblock li {
+	margin: 0px 0px 16px 0px;
+	padding: 0;
+	background: none;
+	min-height: 10px;
+	display: -moz-inline-stack;
+	display: inline-block;
+	vertical-align: top;
+	zoom: 1;
+	line-height: inherit;
+}
+
+#flexicontent ul.faqblock.two   li.full,
+#flexicontent ul.faqblock.three li.full,
+#flexicontent ul.faqblock.four  li.full {
+	width: 100%;
+}
+#flexicontent ul.faqblock.one li {
+	width: 100%;
+	margin: 0;
+}
+
+#flexicontent ul.faqblock.two li {
+	width: 48%;
+	margin-left: 1%;
+	margin-right: 1%;
+}
+#flexicontent ul.faqblock.two li.even {}
+
+#flexicontent ul.faqblock.three li {
+	width: 30%;
+	margin-left: 1%;
+	margin-right: 1%;
+}
+#flexicontent ul.faqblock.three li.even {}
+
+#flexicontent ul.faqblock.four li {
+	width: 23%;
+	margin-left: 1%;
+	margin-right: 1%;
+}
+#flexicontent ul.faqblock.four li.even {}
+
+#flexicontent .flexi-cat span.fc_cat_title {
+	font-weight: bold;
+	font-size: 20px;
+}
+
+#flexicontent .flexi-cat a.fc_cat_title,
+#flexicontent .flexi-cat a.fc_cat_title:hover {
+	font-weight: bold;
+	font-size: 16px;
+	text-decoration: none;
+}
+
+#flexicontent .flexi-cat {
+	background-color: #F1F1F1;
+	border: 1px solid #CCCCCC;
+	border-radius: 6px;
+	display: block !important;
+	padding: 4px 2% 0px 2% !important;
+	float: left !important;
+	width: 96% !important;
+	margin: 8px 8px 0px 0px;
+	color: black;
+}
+
+#flexicontent .flexi-cat:hover,
+.flexi-cat:focus {
+	background-color: #D6D6D6;
+	border-color: #BBBBBB;
+	text-decoration: none;
+}
+
+#flexicontent div:not(.group) ul.flexi-fieldlist li.flexi-field.flexi-title {
+	background: url(../../../assets/images/readon.gif) no-repeat;
+}
+
+#flexicontent ul.flexi-fieldlist li.flexi-field.flexi-title {
+	margin: 16px 0 0 0;
+}
+
+#flexicontent ul.flexi-itemlist,
+#flexicontent ul.flexi-fieldlist {
+	margin: 1px;
+	padding: 0;
+	position: relative;
+}
+
+#flexicontent ul.flexi-itemlist li.flexi-item {
+	margin: 0;
+	padding: 0;
+	background: none;
+	width: 100%;
+	min-height: 10px;
+	display: -moz-inline-stack;
+	display: inline-block;
+	vertical-align: top;
+	zoom: 1;
+	line-height: inherit;
+}
+
+#flexicontent ul.flexi-fieldlist li.flexi-field {
+	margin: 0;
+	padding: 0px 0px 0px 16px;
+	background: none;
+	width: 100%;
+	min-height: 10px;
+	display: -moz-inline-stack;
+	display: inline-block;
+	vertical-align: top;
+	zoom: 1;
+	line-height: inherit;
+}
+
+/* =============================================
+   Bootstrap adjustments
+============================================= */
+#fc_alpha .btn.fc_alpha_index,
+#fc_alpha .btn.fc_alpha_index_sep {
+	margin-top: 0;
+	margin-bottom: 0;
+}
+
+
+/*
+ * clearfix, for clearing a block that contains floated elements
+ * without appending an extra HTML TAG with 'clearfix' class
+ */
+
+.group {
+	overflow: auto !important;
+}

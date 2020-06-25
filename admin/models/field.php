@@ -1,660 +1,626 @@
 <?php
 /**
- * @version 1.5 stable $Id: field.php 1640 2013-02-28 14:45:19Z ggppdk $
- * @package Joomla
- * @subpackage FLEXIcontent
- * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
- * @license GNU/GPL v2
- * 
- * FLEXIcontent is a derivative work of the excellent QuickFAQ component
- * @copyright (C) 2008 Christoph Lukes
- * see www.schlu.net for more information
+ * @package         FLEXIcontent
+ * @version         3.3
  *
- * FLEXIcontent is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
+ * @link            https://flexicontent.org
+ * @copyright       Copyright © 2018, FLEXIcontent team, All Rights Reserved
+ * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
-// no direct access
 defined('_JEXEC') or die('Restricted access');
 
-jimport('joomla.application.component.modeladmin');
+use Joomla\String\StringHelper;
+use Joomla\Utilities\ArrayHelper;
+
+require_once('base/base.php');
 
 /**
  * FLEXIcontent Component Field Model
  *
- * @package Joomla
- * @subpackage FLEXIcontent
- * @since		1.0
  */
-class FlexicontentModelField extends JModelAdmin
+class FlexicontentModelField extends FCModelAdmin
 {
 	/**
-	 * Field primary key
+	 * Record name, (parent class property), this is used for: naming session data, XML file of class, etc
+	 *
+	 * @var string
+	 */
+	protected $name = 'field';
+
+	/**
+	 * Record database table
+	 *
+	 * @var string
+	 */
+	var $records_dbtbl = 'flexicontent_fields';
+
+	/**
+	 * Record jtable name
+	 *
+	 * @var string
+	 */
+	var $records_jtable = 'flexicontent_fields';
+
+	/**
+	 * Column names
+	 */
+	var $state_col   = 'published';
+	var $name_col    = 'label';
+	var $parent_col  = null;//'parent_id';
+
+	/**
+	 * Record primary key
 	 *
 	 * @var int
 	 */
 	var $_id = null;
-	
+
 	/**
-	 * Field data
+	 * Record data
 	 *
 	 * @var object
 	 */
-	var $_field = null;
+	var $_record = null;
+
+	/**
+	 * Events context to use during model FORM events and diplay PREPARE events triggering
+	 *
+	 * @var object
+	 */
+	var $events_context = null;
+
+	/**
+	 * Flag to indicate adding new records with next available ordering (at the end),
+	 * this is ignored if this record DB model does not have 'ordering'
+	 *
+	 * @var boolean
+	 */
+	var $useLastOrdering = true;
+
+	/**
+	 * Plugin group used to trigger events
+	 *
+	 * @var boolean
+	 */
+	var $plugins_group = null;
+
+	/**
+	 * Records real extension
+	 *
+	 * @var string
+	 */
+	var $extension_proxy = null;
+
+	/**
+	 * Use language associations
+	 *
+	 * @var string
+	 */
+	var $associations_context = false;
+
+	/**
+	 * Various record specific properties
+	 *
+	 */
+	protected $forced_field_type = null;
 
 	/**
 	 * Constructor
 	 *
 	 * @since 1.0
 	 */
-	function __construct()
+	public function __construct($config = array())
 	{
-		parent::__construct();
+		parent::__construct($config);
 
-		$array = JRequest::getVar('cid',  array(0), '', 'array');
-		$array = is_array($array) ? $array : array($array);
-		$id = $array[0];
-		if(!$id) {
-			$post = JRequest::get( 'post' );
-			$data = FLEXI_J16GE ? @$post['jform'] : $post;
-			$id = @$data['id'];
-		}
-		$this->setId((int)$id);
-	}
+		$jinput = JFactory::getApplication()->input;
+		$filter = JFilterInput::getInstance();
 
-	/**
-	 * Method to set the identifier
-	 *
-	 * @access	public
-	 * @param	int field identifier
-	 */
-	function setId($id)
-	{
-		// Set field id and wipe data
-		$this->_id     = $id;
-		$this->_field  = null;
-	}
-	
+		$data = $jinput->post->get('jform', array(), 'array');
 
-	/**
-	 * Method to get the field identifier
-	 *
-	 * @access	public
-	 */
-	function getId() {
-		return $this->_id;
-	}
-	
-	/**
-	 * Overridden get method to get properties from the field
-	 *
-	 * @access	public
-	 * @param	string	$property	The name of the property
-	 * @param	mixed	$value		The value of the property to set
-	 * @return 	mixed 				The value of the property
-	 * @since	1.0
-	 */
-	function get($property, $default=null)
-	{
-		if ($this->_loadField())
+		// Force new field_type, so that type-specific parameters will be validated according to the new field type
+		if (isset($data['field_type']))
 		{
-			if(isset($this->_field->$property)) {
-				return $this->_field->$property;
-			}
+			$this->setFieldType($data['field_type']);
 		}
-		return $default;
+
+		$this->canManage    = FlexicontentHelperPerm::getPerm()->CanFields;
+		$this->canCreate    = FlexicontentHelperPerm::getPerm()->CanAddField;
 	}
 
+
 	/**
-	 * Method to get field data
+	 * Legacy method to get the record
 	 *
-	 * @access	public
-	 * @return	array
+	 * @return	object
+	 *
 	 * @since	1.0
 	 */
-	function &getField()
+	public function getField($pk = null)
 	{
-		if ($this->_loadField()) {
-			// extra steps after loading
-			$this->_field->positions = explode("\n", $this->_field->positions);
-		} else {
-			$this->_initField();
-		}
-		
-		return $this->_field;
+		return parent::getRecord($pk);
 	}
 
 
 	/**
-	 * Method to load field data
+	 * Method to initialise the record data
 	 *
-	 * @access	private
+	 * @param   object      $record    The record being initialized
+	 * @param   boolean     $initOnly  If true then only a new record will be initialized without running the _afterLoad() method
+	 *
 	 * @return	boolean	True on success
-	 * @since	1.0
+	 *
+	 * @since	1.5
 	 */
-	function _loadField()
+	protected function _initRecord(&$record = null, $initOnly = false)
 	{
-		// Lets load the field if it doesn't already exist
-		if ( $this->_field===null )
-		{
-			$query = 'SELECT *'
-					. ' FROM #__flexicontent_fields'
-					. ' WHERE id = '.$this->_id
-					;
-			$this->_db->setQuery($query);
-			$this->_field = $this->_db->loadObject();
+		parent::_initRecord($record, $initOnly);
 
-			return (boolean) $this->_field;
-		}
+		// Set some new record specific properties, note most properties already have proper values
+		// Either the DB default values (set by getTable() method) or the values set by _afterLoad() method
+		$record->id							= 0;
+		$record->field_type			= 'text';
+		$record->name						= null;  //$this->getName() . ($this->_getLastId() + 1);
+		$record->label					= null;
+		$record->description		= null;
+		$record->isfilter				= 0;
+		$record->isadvfilter   	= 0;
+		$record->iscore					= 0;
+		$record->issearch				= 1;
+		$record->isadvsearch		= 0;
+		$record->untranslatable	= 0;
+		$record->formhidden			= 0;
+		$record->valueseditable	= 0;
+		$record->edithelp				= 2;
+		$record->positions			= array();
+		$record->published			= 1;
+		$record->attribs				= null;
+		$record->access					= 1;
+		$record->checked_out		= 0;
+		$record->checked_out_time	= '';
+
+		$this->_record = $record;
+
 		return true;
 	}
 
+
 	/**
-	 * Method to get the last id
+	 * Method to set a new field type. The type will be validated if it exists during JForm preprocessing
 	 *
-	 * @access	private
-	 * @return	int
-	 * @since	1.0
+	 * @param   string  $field_type  The forced field type
+	 *
+	 * @since   3.3.0
 	 */
-	function _getLastId()
+	public function setFieldType($field_type)
 	{
-		$query  = 'SELECT MAX(id)'
-				. ' FROM #__flexicontent_fields'
-				;
-		$this->_db->setQuery($query);
-		$lastid = $this->_db->loadResult();
-		
-		return (int)$lastid;
+		$this->forced_field_type = JFilterInput::getInstance()->clean($field_type, 'CMD');
 	}
 
+
 	/**
-	 * Method to initialise the field data
+	 * Method to preprocess the form.
 	 *
-	 * @access	private
-	 * @return	boolean	True on success
-	 * @since	1.0
+	 * @param   JForm   $form   A JForm object.
+	 * @param   mixed   $data   The data expected for the form.
+	 * @param   string  $plugins_group  The name of the plugin group to import and trigger
+	 *
+	 * @return  void
+	 *
+	 * @see     JFormField
+	 * @since   1.6
+	 * @throws  Exception if there is an error in the form event.
 	 */
-	function _initField()
+	protected function preprocessForm(JForm $form, $data, $plugins_group = null)
 	{
-		// Lets load the field if it doesn't already exist
-		if ( $this->_field===null )
-		{
-			$field = new stdClass();
-			$field->id						= 0;
-			$field->field_type		= null;
-			$field->name					= 'field' . ($this->_getLastId() + 1);
-			$field->label					= null;
-			$field->description		= '';
-			$field->isfilter			= 0;
-			$field->isadvfilter   = 0;
-			$field->iscore				= 0;
-			$field->issearch			= 1;
-			$field->isadvsearch		= 0;
-			$field->untranslatable= 0;
-			$field->formhidden		= 0;
-			$field->valueseditable= 0;
-			$field->edithelp			= 2;
-			$field->positions			= array();
-			$field->published			= 1;
-			$field->attribs				= null;
-			$field->access				= 0;
-			$this->_field					= $field;
-			return (boolean) $this->_field;
-		}
-		return true;
-	}
+		$data_obj = $data && is_array($data) ? (object) $data : $data;
 
-	/**
-	 * Method to checkin/unlock the field
-	 *
-	 * @access	public
-	 * @return	boolean	True on success
-	 * @since	1.0
-	 */
-	function checkin($pk = NULL)
-	{
-		if (!$pk) $pk = $this->_id;
-		if ($pk) {
-			$item = JTable::getInstance('flexicontent_fields', '');
-			return $item->checkin($pk);
-		}
-		return false;
-	}
-	
-	
-	/**
-	 * Method to checkout/lock the field
-	 *
-	 * @access	public
-	 * @param	int	$uid	User ID of the user checking the item out
-	 * @return	boolean	True on success
-	 * @since	1.0
-	 */
-	function checkout($pk = null)   // UPDATED to match function signature of J1.6+ models
-	{
-		// Make sure we have a record id to checkout the record with
-		if ( !$pk ) $pk = $this->_id;
-		if ( !$pk ) return true;
-		
-		// Get current user
-		$user	= JFactory::getUser();
-		$uid	= $user->get('id');
-		
-		// Lets get table record and checkout the it
-		$tbl = JTable::getInstance('flexicontent_fields', '');
-		if ( $tbl->checkout($uid, $this->_id) ) return true;
-		
-		// Reaching this points means checkout failed
-		$this->setError( FLEXI_J16GE ? $tbl->getError() : JText::_("FLEXI_ALERT_CHECKOUT_FAILED") );
-		return false;
-	}
-	
-	
-	/**
-	 * Tests if the field is checked out
-	 *
-	 * @access	public
-	 * @param	int	A user id
-	 * @return	boolean	True if checked out
-	 * @since	1.0
-	 */
-	function isCheckedOut( $uid=0 )
-	{
-		if ($this->_loadField())
-		{
-			if ($uid) {
-				return ($this->_field->checked_out && $this->_field->checked_out != $uid);
-			} else {
-				return $this->_field->checked_out;
-			}
-		} elseif ($this->_id < 1) {
-			return false;
-		} else {
-			JError::raiseWarning( 0, 'UNABLE LOAD DATA');
-			return false;
-		}
-	}
-
-	/**
-	 * Method to store the field
-	 *
-	 * @access	public
-	 * @return	boolean	True on success
-	 * @since	1.0
-	 */
-	function store($data)
-	{
-		// Check for request forgeries
-		JRequest::checkToken() or jexit( 'Invalid Token' );
-
-		// NOTE: 'data' is post['jform'] for J2.5 (this is done by the controller or other caller)
-		$field  = $this->getTable('flexicontent_fields', '');
-		$types  = isset($data['tid']) ? $data['tid'] : array(); // types to which the field is being assigned
-		
-		// Support for 'dirty' field properties
-		if ($data['id']) {
-			$field->load($data['id']);
-			
-			if ($field->issearch==-1 || $field->issearch==2) unset($data['issearch']);  // Already dirty
-			else if (@ $data['issearch']==0 && $field->issearch==1) $data['issearch']=-1; // Becomes dirty OFF
-			else if (@ $data['issearch']==1 && $field->issearch==0) $data['issearch']=2;  // Becomes dirty ON
-			
-			if ($field->isadvsearch==-1 || $field->isadvsearch==2) unset($data['isadvsearch']);  // Already dirty
-			else if (@ $data['isadvsearch']==0 && $field->isadvsearch==1) $data['isadvsearch']=-1; // Becomes dirty OFF
-			else if (@ $data['isadvsearch']==1 && $field->isadvsearch==0) $data['isadvsearch']=2;  // Becomes dirty ON
-			
-			if ($field->isadvfilter==-1 || $field->isadvfilter==2) unset($data['isadvfilter']);  // Already dirty
-			else if (@ $data['isadvfilter']==0 && $field->isadvfilter==1) $data['isadvfilter']=-1; // Becomes dirty OFF
-			else if (@ $data['isadvfilter']==1 && $field->isadvfilter==0) $data['isadvfilter']=2;  // Becomes dirty ON
-			
-			// FORCE dirty OFF, if field is being unpublished -and- is not already normal OFF
-			if ( isset($data['published']) && $data['published']==0 && $field->published==1 ) {
-				if ($field->issearch!=0) $data['issearch'] = -1;
-				if ($field->isadvsearch!=0) $data['isadvsearch'] = -1;
-				if ($field->isadvfilter!=0) $data['isadvfilter'] = -1;
-			}
-		}
-		
-		// bind it to the table
-		if (!$field->bind($data)) {
-			$this->setError( $this->_db->getErrorMsg() );
-			return false;
-		}
-		
-		// Get field attibutes, for J1.5 is params for J2.5 is attribs
-		$attibutes = !FLEXI_J16GE ? $data['params'] : $data['attribs'];
-
-		// Build attibutes INI string
-		if (FLEXI_J16GE) {
-			// JSON encoding allows to use new lines etc
-			// handled by 'flexicontent_types' (extends JTable for flexicontent_types)
-			//$field->attribs = json_encode($attibutes);
-		} else {
-			if (is_array($attibutes))
-			{
-				$txt = array ();
-				foreach ($attibutes as $k => $v) {
-					if (is_array($v)) {
-						$v = implode('|', $v);
-					}
-					$txt[] = "$k=$v";
-				}
-				$field->attribs = implode("\n", $txt);
-			}
-		}
-		
-		// Put the new fields in last position
-		if (!$field->id) {
-			$field->ordering = $field->getNextOrder();
-		}
-
-		// Make sure the data is valid
-		if (!$field->check()) {
-			$this->setError($field->getError() );
-			return false;
-		}
-
-		// Store it in the db
-		if (!$field->store()) {
-			$this->setError( $this->_db->getErrorMsg() );
-			return false;
-		}
-		
-		if (FLEXI_ACCESS) {
-			FAccess::saveaccess( $field, 'field' );
-		} else if (FLEXI_J16GE) {
-			// saving asset in J2.5 is handled by the fields table class
-		}
-		
-		$this->_field = & $field;
-		$this->_id    = $field->id;
-		
-		// Assign (a) chosen types to custom field or (b) all types if field is core
-		$this->_assignTypesToField($types);
-		
-		return true;
-	}
-
-	/**
-	 * Method to assign types to a field
-	 *
-	 * @access	public
-	 * @return	boolean	True on success
-	 * @since	1.0
-	 */
-	function _assignTypesToField($types)
-	{
-		$field = & $this->_field;
-		
-		// Override 'types' for core fields, since the core field must be assigned to all types
-		if ($field->iscore == 1)
-		{
-			$query 	= 'SELECT id'
-				. ' FROM #__flexicontent_types'
-				;
-			$this->_db->setQuery($query);
-			$types = FLEXI_J16GE ? $this->_db->loadColumn() : $this->_db->loadResultArray();
-		}
-		
-		// Store field to types relations
-		// delete relations which type is not part of the types array anymore
-		$query 	= 'DELETE FROM #__flexicontent_fields_type_relations'
-			. ' WHERE field_id = '.$field->id
-			. (!empty($types) ? ' AND type_id NOT IN (' . implode(', ', $types) . ')' : '')
-			;
-		$this->_db->setQuery($query);
-		$this->_db->query();
-		
-		// draw an array of the used types
-		$query 	= 'SELECT type_id'
-			. ' FROM #__flexicontent_fields_type_relations'
-			. ' WHERE field_id = '.$field->id
-			;
-		$this->_db->setQuery($query);
-		$used = FLEXI_J16GE ? $this->_db->loadColumn() : $this->_db->loadResultArray();
-		
-		foreach($types as $type)
-		{
-			// insert only the new records
-			if (!in_array($type, $used)) {
-				//get last position of each field in each type;
-				$query 	= 'SELECT max(ordering) as ordering'
-					. ' FROM #__flexicontent_fields_type_relations'
-					. ' WHERE type_id = ' . $type
-					;
-				$this->_db->setQuery($query);
-				$ordering = $this->_db->loadResult()+1;
-
-				$query 	= 'INSERT INTO #__flexicontent_fields_type_relations (`field_id`, `type_id`, `ordering`)'
-					.' VALUES(' . $field->id . ',' . $type . ', ' . $ordering . ')'
-					;
-				$this->_db->setQuery($query);
-				$this->_db->query();
-			}
-		}
-	}
-
-	/**
-	 * Method to get types list when performing an edit action
-	 * 
-	 * @return array
-	 * @since 1.5
-	 */
-	function getTypeslist()
-	{
-		$query = 'SELECT id, name'
-			. ' FROM #__flexicontent_types'
-			. ' WHERE published = 1'
-			. ' ORDER BY name ASC'
-			;
-		$this->_db->setQuery($query);
-		$types = $this->_db->loadObjectList();
-		return $types;	
-	}
-	
-	/**
-	 * Method to get used types when performing an edit action
-	 * 
-	 * @return array
-	 * @since 1.5
-	 */
-	function getTypesselected()
-	{
-		$query = 'SELECT DISTINCT type_id FROM #__flexicontent_fields_type_relations WHERE field_id = ' . (int)$this->_id;
-		$this->_db->setQuery($query);
-		$used = FLEXI_J16GE ? $this->_db->loadColumn() : $this->_db->loadResultArray();
-		return $used;
-	}
-	
-		
-	/**
-	 * Method to get the row form.
-	 *
-	 * @param	array	$data		Data for the form.
-	 * @param	boolean	$loadData	True if the form is to load its own data (default case), false if not.
-	 * @return	mixed	A JForm object on success, false on failure
-	 * @since	1.6
-	 */
-	public function getForm($data = array(), $loadData = true) {
-		// Initialise variables.
-		$app = JFactory::getApplication();
-
-		// Get the form.
-		$form = $this->loadForm('com_flexicontent.'.$this->getName(), $this->getName(), array('control' => 'jform', 'load_data' => $loadData));
-		if (empty($form)) {
-			return false;
-		}
-
-		return $form;
-	}
-	
-	/**
-	 * Method to get the data that should be injected in the form.
-	 *
-	 * @return	mixed	The data for the form.
-	 * @since	1.6
-	 */
-	protected function loadFormData() {
-		// Check the session for previously entered form data.
-		$data = JFactory::getApplication()->getUserState('com_flexicontent.edit.'.$this->getName().'.data', array());
-
-		if (empty($data)) {
-			$data = $this->getItem($this->_id);
-		}
-
-		return $data;
-	}
-	
-	/**
-	 * Method to get a single record.
-	 *
-	 * @param	integer	$pk	The id of the primary key.
-	 *
-	 * @return	mixed	Object on success, false on failure.
-	 * @since	1.6
-	 */
-	public function getItem($pk = null) {
-		static $item;
-		if(!$item) {
-			// Initialise variables.
-			$pk		= (!empty($pk)) ? $pk : (int) $this->getState($this->getName().'.id');
-			$table	= $this->getTable('flexicontent_fields', '');
-
-			if ($pk > 0) {
-				// Attempt to load the row.
-				$return = $table->load($pk);
-
-				// Check for a table object error.
-				if ($return === false && $table->getError()) {
-					$this->setError($table->getError());
-					return false;
-				}
-			} else {
-				$table->name					= 'field' . ($this->_getLastId() + 1);
-			}
-
-			// Convert to the JObject before adding other data.
-			$_prop_arr = $table->getProperties(1);
-			$item = JArrayHelper::toObject($_prop_arr, 'JObject');
-			if ($pk > 0) {
-				$item->tid = $this->getTypesselected();
-			}
-
-			if (property_exists($item, 'attribs')) {
-				$registry = new JRegistry();
-				$registry->loadString($item->attribs, 'JSON');
-				$item->attribs = $registry->toArray();
-			}
-			$field_type = $pk ? $table->field_type : JRequest::getVar('field_type', 'text');
-			$this->setState('field.field_type', $field_type);
-		}
-		return $item;
-	}
-	
-	/**
-	 * @param	object	A form object.
-	 * @param	mixed	The data expected for the form.
-	 * @return	mixed	True if successful.
-	 * @throws	Exception if there is an error in the form event.
-	 * @since	1.6
-	 */
-	protected function preprocessForm(JForm $form, $data, $group = 'content') {
 		jimport('joomla.filesystem.file');
 		jimport('joomla.filesystem.folder');
 
 		// Initialise variables.
-		$field_type	= $this->getState('field.field_type');
-		$client		= JApplicationHelper::getClientInfo(0);
+		$client = JApplicationHelper::getClientInfo(0);
 
-		// Try 1.6 format: /plugins/folder/element/element.xml
-		$pluginpath = JPATH_PLUGINS.DS.'flexicontent_fields'.DS.$field_type.DS.$field_type.'.xml';
-		if (!JFile::exists( $pluginpath )) {
-			$pluginpath = JPATH_PLUGINS.DS.'flexicontent_fields'.DS.'core'.DS.'core.xml';
-		}
-		if (!file_exists($pluginpath)) {
-			throw new Exception(JText::sprintf('COM_PLUGINS_ERROR_FILE_NOT_FOUND', $field_type.'.xml'));
-			return false;
-		}
 
-		// Load the core and/or local language file(s).
-		/*	$lang->load('plg_'.$folder.'_'.$element, JPATH_ADMINISTRATOR, null, false, false)
-		||	$lang->load('plg_'.$folder.'_'.$element, $client->path.'/plugins/'.$folder.'/'.$element, null, false, false)
-		||	$lang->load('plg_'.$folder.'_'.$element, JPATH_ADMINISTRATOR, $lang->getDefault(), false, false)
-		||	$lang->load('plg_'.$folder.'_'.$element, $client->path.'/plugins/'.$folder.'/'.$element, $lang->getDefault(), false, false);
-		*/
-		if (file_exists($pluginpath)) {
-			// Get the plugin form.
-			if (!$form->loadFile($pluginpath, false, '//config')) {
-				throw new Exception(JText::_('JERROR_LOADFILE_FAILED'));
-			}
+		/**
+		 * Get plugin name from field type
+		 * Use overridden field type if this was set, e.g. switching current to a new field type
+		 */
+		$plugin_name = $data_obj
+			? (!empty($data_obj->iscore) ? 'core' : $data_obj->field_type)
+			: 'text';
+		$plugin_name = $this->forced_field_type ?: $plugin_name;
+
+
+		/**
+		 * Try to load plugin file: /plugins/folder/element/element.xml
+		 */
+		$plugin_path = JPath::clean(JPATH_PLUGINS . DS . 'flexicontent_fields' . DS . $plugin_name . DS . $plugin_name . '.xml');
+
+		if (!JFile::exists($plugin_path))
+		{
+			throw new Exception('Error field XML file for field type: - ' . $plugin_name . '- was not found');
 		}
 
-		// Attempt to load the xml file.
-		if (!$xml = simplexml_load_file($pluginpath)) {
+
+		/**
+		 * Set new field_type, this is needed e.g. after for form reload due to some error
+		 */
+
+		if (empty($this->_record->iscore))
+		{
+			$this->_record->field_type = $plugin_name;
+		}
+
+		if ($data_obj && empty($data_obj->iscore))
+		{
+			$data_obj->field_type = $plugin_name;
+		}
+
+
+		/**
+		 * Do not allow changing some properties
+		 */
+
+		if (!empty($this->_record->iscore))
+		{
+			$form->setFieldAttribute('name', 'readonly', 'true');
+			$form->setFieldAttribute('name', 'filter', 'unset');
+		}
+
+		$form->setFieldAttribute('iscore', 'readonly', 'true');
+		$form->setFieldAttribute('iscore', 'filter', 'unset');
+
+		if ($this->_record->id > 0 && $this->_record->id < 7)
+		{
+			$form->setFieldAttribute('published', 'readonly', 'true');
+			$form->setFieldAttribute('published', 'filter', 'unset');
+		}
+
+
+		// ***
+		// *** Load extra XML files into the JForm, these will be used e.g. during validation
+		// ***
+
+		// We will load the form's XML file into a string to be able to manipulate it, before it is loaded by the JForm
+		$xml_string = str_replace(' type="radio"', ' type="fcradio"', file_get_contents($plugin_path));
+		$xml = simplexml_load_string($xml_string);  //simplexml_load_file($plugin_path);
+		if (!$xml)
+		{
 			throw new Exception(JText::_('JERROR_LOADFILE_FAILED'));
 		}
 
-		// Get the help data from the XML file if present.
-		$help = $xml->xpath('/extension/help');
-		if (!empty($help)) {
-			$helpKey = trim((string) $help[0]['key']);
-			$helpURL = trim((string) $help[0]['url']);
+		// Load XML file into the form
+		$form->load($xml, false, '//config');
 
-			$this->helpKey = $helpKey ? $helpKey : $this->helpKey;
-			$this->helpURL = $helpURL ? $helpURL : $this->helpURL;
+
+		// ***
+		// *** Get the help data from the XML file if present.
+		// ***
+
+		$docs = $xml->xpath('/extension/documentation');
+		if (!empty($docs))
+		{
+			$this->helpTitle = trim((string) $docs[0]['title']);
+			$this->helpURL   = trim((string) $docs[0]['url']);
+			$this->helpModal = (int) $docs[0]['modal'];
 		}
 
 		// Trigger the default form events.
-		parent::preprocessForm($form, $data);
+		$plugins_group = $plugins_group ?: $this->plugins_group;
+		parent::preprocessForm($form, $data, $plugins_group);
 	}
-	
+
+
 	/**
-	 * Auto-populate the model state.
+	 * Method to change the title & alias.
 	 *
-	 * Note. Calling getState in this method will result in recursion.
+	 * @param   integer  $parent_id  If applicable, the id of the parent (e.g. assigned category)
+	 * @param   string   $alias      The alias / name.
+	 * @param   string   $title      The title / label.
 	 *
-	 * @since	1.6
+	 * @return  array    Contains the modified title and alias / name.
+	 *
+	 * @since   1.7
 	 */
-	protected function populateState() {
-		$app = JFactory::getApplication('administrator');
+	protected function generateNewTitle($parent_id, $alias, $title)
+	{
+		// Alter the title & alias
+		$table = $this->getTable();
 
-		if (!($extension = $app->getUserState('com_flexicontent.edit.'.$this->getName().'.extension'))) {
-			$extension = JRequest::getCmd('extension', 'com_flexicontent');
+		while ($table->load(array('name' => $alias, 'label' => $title)))
+		{
+			$title = StringHelper::increment($title);
+			$alias = StringHelper::increment($alias, 'dash');
 		}
-		// Load the User state.
-		if (!($pk = (int) $app->getUserState('com_flexicontent.edit.'.$this->getName().'.id'))) {
-			$cid = JRequest::getVar('cid', array(0));
-			$pk = (int)@$cid[0];
-		}
-		$this->setState($this->getName().'.id', $pk);
 
-
-		$this->setState('com_flexicontent.'.$this->getName().'.extension', $extension);
-		$parts = explode('.',$extension);
-		// extract the component name
-		$this->setState('com_flexicontent.'.$this->getName().'.component', $parts[0]);
-		// extract the optional section name
-		$this->setState('com_flexicontent.'.$this->getName().'.section', (count($parts)>1)?$parts[1]:null);
-
-		// Load the parameters.
-		//$params	= JComponentHelper::getParams('com_flexicontent');
-		//$this->setState('params', $params);
+		return array($title, $alias);
 	}
-	
+
+
 	/**
-	 * Method to get field attributes
+	 * Method to check if the user can edit the record
 	 *
-	 * Note. Calling getState in this method will result in recursion.
+	 * @return	boolean	True on success
 	 *
-	 * @since	1.6
+	 * @since	3.2.0
 	 */
-	public function getAttribs() {
-		if($this->_field) {
-			return $this->_field->attribs;
+	public function canEdit($record = null)
+	{
+		$record  = $record ?: $this->_record;
+		$user    = JFactory::getUser();
+
+		return !$record || !$record->id
+			? $this->canCreate
+			: $user->authorise('flexicontent.editfield', 'com_flexicontent.field.' . $record->id);
+	}
+
+
+	/**
+	 * Method to check if the user can edit record 's state
+	 *
+	 * @return	boolean	True on success
+	 *
+	 * @since	3.2.0
+	 */
+	public function canEditState($record = null)
+	{
+		$record  = $record ?: $this->_record;
+		$user    = JFactory::getUser();
+
+		return $record->id < 7
+			?	false
+			: $user->authorise('flexicontent.publishfield', 'com_flexicontent.field.' . $record->id);
+	}
+
+
+	/**
+	 * Method to check if the user can delete the record
+	 *
+	 * @return	boolean	True on success
+	 *
+	 * @since	3.2.0
+	 */
+	public function canDelete($record = null)
+	{
+		$record  = $record ?: $this->_record;
+		$user    = JFactory::getUser();
+
+		return $record->id < 7
+			?	false
+			: $user->authorise('flexicontent.deletefield', 'com_flexicontent.field.' . $record->id);
+	}
+
+
+	/**
+	 * Method to do some record / data preprocessing before call JTable::bind()
+	 *
+	 * Note. Typically called inside this MODEL 's store()
+	 *
+	 * @param   object     $record   The record object
+	 * @param   array      $data     The new data array
+	 *
+	 * @since	3.2.0
+	 */
+	protected function _prepareBind($record, & $data)
+	{
+		/**
+		 * Support for 'dirty' field properties
+		 */
+		if ($data['id'])
+		{
+			if ($record->issearch==-1 || $record->issearch==2) unset($data['issearch']);  // Already dirty
+			elseif (@ $data['issearch']==0 && $record->issearch==1) $data['issearch'] = -1; // Becomes dirty OFF
+			elseif (@ $data['issearch']==1 && $record->issearch==0) $data['issearch'] = 2;  // Becomes dirty ON
+
+			if ($record->isadvsearch==-1 || $record->isadvsearch==2) unset($data['isadvsearch']);  // Already dirty
+			elseif (@ $data['isadvsearch']==0 && $record->isadvsearch==1) $data['isadvsearch'] = -1; // Becomes dirty OFF
+			elseif (@ $data['isadvsearch']==1 && $record->isadvsearch==0) $data['isadvsearch'] = 2;  // Becomes dirty ON
+
+			if ($record->isadvfilter==-1 || $record->isadvfilter==2) unset($data['isadvfilter']);  // Already dirty
+			elseif (@ $data['isadvfilter']==0 && $record->isadvfilter==1) $data['isadvfilter'] = -1; // Becomes dirty OFF
+			elseif (@ $data['isadvfilter']==1 && $record->isadvfilter==0) $data['isadvfilter'] = 2;  // Becomes dirty ON
+
+			// FORCE dirty OFF, if field is being unpublished -and- is not already normal OFF
+			if (isset($data['published']) && $data['published']==0 && $record->published==1)
+			{
+				if ($record->issearch!=0) $data['issearch'] = -1;
+				if ($record->isadvsearch!=0) $data['isadvsearch'] = -1;
+				if ($record->isadvfilter!=0) $data['isadvfilter'] = -1;
+			}
 		}
-		return array();
+
+		/**
+		 * Positions are always posted, otherwise they must be cleared
+		 */
+		if (!isset($data['positions']))
+		{
+			$data['positions'] = '';
+		}
+
+		// Call parent class bind preparation
+		parent::_prepareBind($record, $data);
+	}
+
+
+	/**
+	 * Method to do some work after record has been stored
+	 *
+	 * Note. Typically called inside this MODEL 's store()
+	 *
+	 * @param   object     $record   The record object
+	 * @param   array      $data     The new data array
+	 *
+	 * @since	3.2.0
+	 */
+	protected function _afterStore($record, & $data)
+	{
+		parent::_afterStore($record, $data);
+
+		// Assign (a) chosen types to custom field or (b) all types if field is core
+		$types = ! empty($data['tid'])
+			? $data['tid']
+			: array();
+
+		$this->_assignTypesToField($types);
+	}
+
+
+	/**
+	 * Method to do some work after record has been loaded via JTable::load()
+	 *
+	 * Note. Typically called inside this MODEL 's store()
+	 *
+	 * @param	object   $record   The record object
+	 *
+	 * @since	3.2.0
+	 */
+	protected function _afterLoad($record)
+	{
+		parent::_afterLoad($record);
+
+		// Record was not found / not created, nothing to do
+		if (!$record)
+		{
+			return;
+		}
+
+		// Convert field positions to an array
+		if (!is_array($record->positions))
+		{
+			$record->positions = explode("\n", $record->positions);
+		}
+
+		// Load type assigments (an array of type IDs)
+		$record->tid = $this->getFieldType($record->id);
+	}
+
+
+	/**
+	 * START OF MODEL SPECIFIC METHODS
+	 */
+
+
+	/**
+	 * Method to assign types to a field
+	 *
+	 * @return  boolean    True on success
+	 *
+	 * @since	1.0
+	 */
+	protected function _assignTypesToField($types)
+	{
+		$field = $this->_record;
+
+		/**
+		 * Override 'types' for core fields, since the core field must be assigned to all types
+		 * but alllow core fields 'voting', 'favourites, to selectively assigned to types
+		 */
+		if ($field->iscore && !in_array($field->field_type, array('voting', 'favourites'), true))
+		{
+			$query = $this->_db->getQuery(true)
+				->select('id')
+				->from('#__flexicontent_types');
+
+			$types = $this->_db->setQuery($query)->loadColumn();
+		}
+
+		/**
+		 * Store field to types relations
+		 * Try to avoid unneeded deletion and insertions
+		 */
+
+		// First, delete existing types assignments no longer used by the field
+		$query = $this->_db->getQuery(true)
+			->delete('#__flexicontent_fields_type_relations')
+			->where('field_id = ' . (int) $field->id);
+
+		if (!empty($types))
+		{
+			$query->where('type_id NOT IN (' . implode(', ', $types) . ')');
+		}
+
+		$this->_db->setQuery($query)->execute();
+
+		// Second, find type assignments of the field that did not changed
+		$query = $this->_db->getQuery(true)
+			->select('type_id')
+			->from('#__flexicontent_fields_type_relations')
+			->where('field_id = ' . (int) $field->id);
+
+		$used = $this->_db->setQuery($query)->loadColumn();
+
+		// Third, insert only the new records
+		foreach ($types as $type)
+		{
+			if (!in_array($type, $used))
+			{
+				// Get last position of each field in each type
+				$query = $this->_db->getQuery(true)
+					->select('MAX(ordering) as ordering')
+					->from('#__flexicontent_fields_type_relations')
+					->where('type_id = ' . (int) $type);
+
+				$ordering = $this->_db->setQuery($query)->loadResult();
+
+				// Insert new type assignment using the next available ordering
+				$ordering += 1;
+
+				$query = $this->_db->getQuery(true)
+					->insert('#__flexicontent_fields_type_relations')
+					->columns(array(
+						$this->_db->quoteName('field_id'),
+						$this->_db->quoteName('type_id'),
+						$this->_db->quoteName('ordering')
+					))
+					->values(
+						(int) $field->id . ' , ' .
+						(int) $type . ' , ' .
+						(int) $ordering
+					);
+
+				$this->_db->setQuery($query)->execute();
+			}
+		}
+	}
+
+
+	/**
+	 * Method to get types list
+	 *
+	 * @return array
+	 *
+	 * @since 1.5
+	 */
+	public function getTypeslist ( $type_ids=false, $check_perms = false, $published=false )
+	{
+		return flexicontent_html::getTypesList( $type_ids, $check_perms, $published);
+	}
+
+
+	/**
+	 * Method to the Field Type for a given or for current field ID
+	 *
+	 * @return array
+	 *
+	 * @since 3.2
+	 */
+	public function getFieldType($pk = 0)
+	{
+		$pk = $pk ?: (int) $this->_id;
+
+		if (!$pk)
+		{
+			return array();
+		}
+
+		$query = $this->_db->getQuery(true)
+			->select('DISTINCT type_id')
+			->from('#__flexicontent_fields_type_relations')
+			->where('field_id = ' . (int) $pk);
+
+		return $this->_db->setQuery($query)->loadColumn();
 	}
 }
-?>

@@ -1,91 +1,99 @@
 <?php
 /**
- * @version 1.5 stable $Id: flexicontent_items.php 1832 2014-01-17 00:17:27Z ggppdk $
- * @package Joomla
- * @subpackage FLEXIcontent
- * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
- * @license GNU/GPL v2
- * 
- * FLEXIcontent is a derivative work of the excellent QuickFAQ component
- * @copyright (C) 2008 Christoph Lukes
- * see www.schlu.net for more information
+ * @package         FLEXIcontent
+ * @version         3.3
  *
- * FLEXIcontent is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
+ * @link            https://flexicontent.org
+ * @copyright       Copyright © 2018, FLEXIcontent team, All Rights Reserved
+ * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
 defined('_JEXEC') or die('Restricted access');
 
-if (FLEXI_J16GE) {
-	jimport('joomla.access.rules');
-}
+use Joomla\String\StringHelper;
+use Joomla\Utilities\ArrayHelper;
+use Joomla\CMS\Event\AbstractEvent;
+use Joomla\Database\DatabaseDriver;
+use Joomla\Database\DatabaseQuery;
+use Joomla\Event\DispatcherAwareInterface;
+use Joomla\Event\DispatcherAwareTrait;
+use Joomla\Event\DispatcherInterface;
 
-class _flexicontent_items_common extends JTable {
+jimport('joomla.access.rules');
+require_once('flexicontent_basetable.php');
+
+class _flexicontent_items_common extends flexicontent_basetable
+{
 	protected function __getAssetParentId(JTable $table = null, $id = null)
 	{
 		// Initialise variables.
 		$assetId = null;
-		$db = $this->getDbo();
-	
+
 		// This is a article under a category.
-		if ($this->catid) {
+		if ($this->catid)
+		{
 			// Build the query to get the asset id for the parent category.
-			$query	= $db->getQuery(true);
-			$query->select('asset_id');
-			$query->from('#__categories');
-			$query->where('id = '.(int) $this->catid);
+			$query = $this->_db->getQuery(true)
+				->select('asset_id')
+				->from('#__categories')
+				->where('id = '.(int) $this->catid);
 
 			// Get the asset id from the database.
-			$this->_db->setQuery($query);
-			if ($result = $this->_db->loadResult()) {
+			$result = $this->_db->setQuery($query)->loadResult();
+			if ($result)
+			{
 				$assetId = (int) $result;
 			}
 		}
-		
+
 		// Return the asset id.
-		if ($assetId) {
+		if ($assetId)
+		{
 			return $assetId;
-		} else {
+		}
+		else
+		{
 			return parent::_getAssetParentId($table, $id);
 		}
 	}
 }
 
-if (FLEXI_J30GE) {
-	class _flexicontent_items extends _flexicontent_items_common {
-		protected function _getAssetParentId(JTable $table = null, $id = null) {
-			return parent::__getAssetParentId($table, $id);
-		}
-	}
-}
-
-else {
-	class _flexicontent_items extends _flexicontent_items_common {
-		protected function _getAssetParentId($table = null, $id = null) {
-			return parent::__getAssetParentId($table, $id);
-		}
-	}
-}
-
-
-/**
- * FLEXIcontent table class
- *
- * @package Joomla
- * @subpackage FLEXIcontent
- * @since 1.0
+/* This is no longer needed but it is a good example of
+ *  how to fix STRICT warnings when a newer Joomla version adds TYPE to the parameter of a method
+ *  thus makes possible for same code to run on both old and new Joomla version without warnings
  */
-class flexicontent_items extends _flexicontent_items {
+if (FLEXI_J30GE)
+{
+	class _flexicontent_items extends _flexicontent_items_common
+	{
+		protected function _getAssetParentId(JTable $table = null, $id = null)
+		{
+			return parent::__getAssetParentId($table, $id);
+		}
+	}
+}
+
+else
+{
+	class _flexicontent_items extends _flexicontent_items_common
+	{
+		protected function _getAssetParentId($table = null, $id = null)
+		{
+			return parent::__getAssetParentId($table, $id);
+		}
+	}
+}
+
+
+class flexicontent_items extends _flexicontent_items
+{
 	/** @var int Primary key */
 	var $id					= null;
 	/** @var string */
 	var $title				= null;
 	/** @var string */
 	var $alias				= null;
-	/** @var string */
-	var $title_alias	= null;  // deprecated do not use
 	/** @var string */
 	var $introtext		= null;
 	/** @var string */
@@ -165,155 +173,445 @@ class flexicontent_items extends _flexicontent_items {
 	/** @var string */
 	var $search_index		= null;
 
-    /**
-     * Name of the the items ext table
-     *
-     * @var    string
-     * @access protected
-     */
-    var $_tbl_join_ext			= '#__flexicontent_items_ext';
-    /**
-     * Name of the foreign key in the link table
-     * $_tbl_key property maps to this property
-     *
-     * @var		string
-     * @access	protected
-     */
-    var $_frn_key_ext			= 'item_id';
-    /**
-     * Array of all properties from the join table added to this object
-     *
-     * @var    array
-     * @access protected
-     */
-    var $_join_prop_ext		= array('item_id',
-    								'type_id',
-    								'language',
-    								'lang_parent_id',
-    								'sub_items',
-    								'sub_categories',
-    								'related_items',
-    								'search_index');
+	// Non-table (private) properties
+	var $_record_name = 'item';
+	var $_title = 'title';
+	var $_alias = 'alias';
+	var $_force_ascii_alias = false;
+	var $_allow_underscore = true;
 
-    /**
-     * Name of the the items ext table
-     *
-     * @var    string
-     * @access protected
-     */
-    var $_tbl_join_tmp			= '#__flexicontent_items_tmp';
-    /**
-     * Name of the foreign key in the link table
-     * $_tbl_key property maps to this property
-     *
-     * @var		string
-     * @access	protected
-     */
-    var $_frn_key_tmp			= 'id';
-    /**
-     * Array of all properties from the join table added to this object
-     *
-     * @var    array
-     * @access protected
-     */
-    var $_join_prop_tmp		= array();
+	var $_jtbls = array(
+		'#__content' => array('Content', 'JTable', 'state'),
+		'#__flexicontent_items_ext' => array('flexicontent_items_ext', '', false),
+		'#__flexicontent_items_tmp' => array('flexicontent_items_tmp', '', 'state'),
+	);
 
 	/**
-	* @param database A database connector object
-	*/
-	function flexicontent_items(& $db) {
-		$tbls = array($this->_tbl_join_tmp);
-		if (!FLEXI_J16GE) $tbl_fields = $db->getTableFields($tbls);
-		else foreach ($tbls as $tbl) $tbl_fields[$tbl] = $db->getTableColumns($tbl);
-		
-		$this->_join_prop_tmp = array_keys($tbl_fields[$this->_tbl_join_tmp]);
-		
-		parent::__construct('#__content', 'id', $db);
+	 * Name of the data table
+	 *
+	 * @var	string
+	 * @access protected
+	 */
+	var $_tbl = null;
+
+	/**
+	 * Name of the data ext table
+	 *
+	 * @var	string
+	 * @access protected
+	 */
+	var $_tbl_ext			= '#__flexicontent_items_ext';
+
+	/**
+	 * Name of the foreign key in the link table
+	 * $_tbl_key property maps to this property
+	 *
+	 * @var		string
+	 * @access	protected
+	 */
+	var $_frn_key_ext			= 'item_id';
+	var $_tbl_key_ext			= 'id';
+
+	/**
+	 * Name of the data tmp table
+	 *
+	 * @var	string
+	 * @access protected
+	 */
+	var $_tbl_tmp			= '#__flexicontent_items_tmp';
+
+	/**
+	 * Name of the foreign key in the link table
+	 * $_tbl_key property maps to this property
+	 *
+	 * @var		string
+	 * @access	protected
+	 */
+	var $_frn_key_tmp			= 'id';
+	var $_tbl_key_tmp			= 'id';
+
+
+
+	/**
+	 * Constructor
+	 *
+	 * @param   JDatabaseDriver  $db  Database driver object.
+	 *
+	 * @since  3.3
+	 */
+	public function __construct($db)
+	{
+		$this->_records_dbtbl  = 'content';
+		$this->_NAME = strtoupper($this->_record_name);
+
+		parent::__construct('#__' . $this->_records_dbtbl, 'id', $db);
+
+		// Set the alias for 'published' column (if different than the default)
+		$this->setColumnAlias('published', 'state');
 	}
+
 
 	/**
 	 * Method to compute the default name of the asset.
-	 * The default name is in the form `table_name.id`
+	 * The default name is in the form `table_name.id` (which we will override)
 	 * where id is the value of the primary key of the table.
 	 *
 	 * @return	string
 	 * @since	1.6
 	 */
-	protected function _getAssetName() {
+	protected function _getAssetName()
+	{
+		// we use 'com_content' instead of $this->extension which contains 'com_flexicontent'
 		$k = $this->_tbl_key;
-		return 'com_content.article.'.(int) $this->$k;
+
+		return 'com_content.article.' . (int) $this->$k;
 	}
-	
-	
+
+
 	/**
-	 * Method to return the title to use for the asset table.
+	 * Get the columns from database table.
 	 *
-	 * @return  string
+	 * @param   bool  $reload  flag to reload cache
+	 *
+	 * @return  mixed  An array of the field names, or false if an error occurs.
+	 *
+	 * @since   3.3
+	 * @throws  UnexpectedValueException
+	 */
+	public function getFields($reload = false)
+	{
+		static $tbl_fields = null;
+
+		// Get the fields of the joined tables
+		if (!isset($tbl_fields))
+		{
+			$tbls = array(
+				$this->_tbl_ext,
+				$this->_tbl_tmp,
+			);
+
+			foreach ($tbls as $tbl)
+			{
+				$tbl_fields[$tbl] = $this->_db->getTableColumns($tbl, false);
+			}
+		}
+
+		$this->_tbl_fields = $tbl_fields;
+
+		// Now get and return fields of the main table
+		return parent::getFields($reload);
+	}
+
+
+	/**
+	 * Method to compact the ordering values of rows in a group of rows defined by an SQL WHERE clause.
+	 *
+	 * @param   string  $where  WHERE clause to use for limiting the selection of rows to compact the ordering values.
+	 *
+	 * @return  mixed  Boolean  True on success.
+	 *
+	 * @since   11.1
+	 * @throws  \UnexpectedValueException
+	 */
+	public function reorder($where = '')
+	{
+		parent::reorder($where);
+
+		/**
+		 * Sync reordering into temporary data DB table
+		 */
+		if (is_array($where))
+		{
+			foreach ($where as $i => $w)
+			{
+				$where[$i] = 'i.' . $where[$i];
+			}
+
+			$query = $this->_db->getQuery(true)
+				->update('#__flexicontent_items_tmp AS t')
+				->innerJoin('#__content AS i ON t.id = i.id')
+				->set('t.ordering = i.ordering')
+				->where($where);
+
+			$this->_db->setQuery($query)->execute();
+		}
+	}
+
+
+	/**
+	 * Method to move a row in the ordering sequence of a group of rows defined by an SQL WHERE clause.
+	 *
+	 * Negative numbers move the row up in the sequence and positive numbers move it down.
+	 *
+	 * @param   integer  $delta  The direction and magnitude to move the row in the ordering sequence.
+	 * @param   string   $where  WHERE clause to use for limiting the selection of rows to compact the ordering values.
+	 *
+	 * @return  boolean  True on success.
+	 *
+	 * @since   11.1
+	 * @throws  \UnexpectedValueException
+	 */
+	public function move($delta, $where = '')
+	{
+		parent::reorder($where);
+
+		/**
+		 * Sync reordering into temporary data DB table
+		 */
+		if (is_array($where))
+		{
+			foreach ($where as $i => $w)
+			{
+				$where[$i] = 'i.' . $where[$i];
+			}
+
+			$query = $this->_db->getQuery(true)
+				->update('#__flexicontent_items_tmp AS t')
+				->innerJoin('#__content AS i ON t.id = i.id')
+				->set('t.ordering = i.ordering')
+				->where($where);
+
+			$this->_db->setQuery($query)->execute();
+		}
+	}
+
+
+	/**
+	 * Method to reset class properties to the defaults set in the class
+	 * definition. It will ignore the primary key as well as any private class
+	 * properties (except $_errors).
+	 *
+	 * @return  void
 	 *
 	 * @since   11.1
 	 */
-	protected function _getAssetTitle()
+	public function reset()
 	{
-		return $this->title;
+		// Get the default values for the class from the table.
+		foreach ($this->getFields() as $k => $v)
+		{
+			// If the property is not the primary key or private, reset it.
+			if (!in_array($k, $this->_tbl_keys) && (strpos($k, '_') !== 0))
+			{
+				$this->$k = $v->Default;
+			}
+		}
+
+		// Get the default values for the class from every joined table.
+		foreach ($this->_tbl_fields as $tbl => $props_arr)
+		{
+			// Skip this table as it contains copies of the other tables , they do not have their own values
+			if ($tbl === $this->_tbl_tmp)
+			{
+				continue;
+			}
+
+			foreach ($props_arr as $k => $v)
+			{
+				// If the property is not the primary key or private, reset it.
+				if (!in_array($k, $this->_tbl_keys) && (strpos($k, '_') !== 0))
+				{
+					$this->$k = $v->Default;
+				}
+			}
+		}
+
+		// Reset table errors
+		$this->_errors = array();
 	}
 
+
 	/**
-	 * Method to get the parent asset id for the record
+	 * Method to load a row from the database by primary key and bind the fields to the Table instance properties.
 	 *
-	 * @param   JTable   $table  A JTable object for the asset parent
-	 * @param   integer  $id
+	 * @param   mixed    $keys   An optional primary key value to load the row by, or an array of fields to match. If not set the instance property value is used.
+	 * @param   boolean  $reset  True to reset the default values before loading the new row.
 	 *
-	 * @return  integer
+	 * @return  boolean  True if successful. False if row not found.
 	 *
-	 * @since   11.1
+	 * @since   3.3
+	 * @throws  \InvalidArgumentException, \RuntimeException, \UnexpectedValueException
 	 */
-	// see (above) parent class method: _getAssetParentId($table = null, $id = null)
-	
-	
-	/**
-	 * Overloaded load function
-	 *
-	 * @access public
-	 * @return boolean
-	 * @since 1.5
-	 */
-	function load( $oid=null, $reset = true )
+	public function load($keys = null, $reset = true)
 	{
-		$k = $this->_tbl_key;
-
-		if ($oid !== null) {
-			$this->$k = $oid;
+		if (FLEXI_J40GE)
+		{
+			// Pre-processing by observers
+			$event = AbstractEvent::create(
+				'onTableBeforeLoad',
+				[
+					'subject'	=> $this,
+					'keys'		=> $keys,
+					'reset'		=> $reset,
+				]
+			);
+			$this->getDispatcher()->dispatch('onTableBeforeLoad', $event);
 		}
 
-		$oid = $this->$k;
-
-		if ($oid === null) {
-			return false;
+		else
+		{
+			// Implement JObservableInterface: Pre-processing by observers
+			$this->_observers->update('onBeforeLoad', array($keys, $reset));
 		}
-		$this->reset();
 
-		$db = $this->getDBO();
+		if (empty($keys))
+		{
+			$empty = true;
+			$keys  = array();
 
-		$query = 'SELECT *'
-		. ' FROM '.$this->_tbl
-		. ' LEFT JOIN '.$this->_tbl_join_ext
-		. ' ON '.$this->_tbl_key.' = '.$this->_frn_key_ext
-		//. ' LEFT JOIN '.$this->_tbl_join_tmp                        // same name and same data columns
-		//. ' ON '.$this->_tbl_key.' = '.$this->_frn_key_tmp          // ... so do not join
-		. ' WHERE '.$this->_tbl_key.' = '.$db->Quote($oid);
-		$db->setQuery( $query );
-		
-		if ($result = $db->loadAssoc( )) {
-		//dump($result,'bind');
-			return $this->bind($result);
+			// If empty, use the value of the current key
+			foreach ($this->_tbl_keys as $key)
+			{
+				$empty      = $empty && empty($this->$key);
+				$keys[$key] = $this->$key;
+			}
+
+			// If empty primary key there's is no need to load anything
+			if ($empty)
+			{
+				return true;
+			}
+		}
+		elseif (!is_array($keys))
+		{
+			// Load by primary key.
+			$keyCount = count($this->_tbl_keys);
+
+			if ($keyCount)
+			{
+				if ($keyCount > 1)
+				{
+					throw new \InvalidArgumentException('Table has multiple primary keys specified, only one primary key value provided.');
+				}
+
+				$keys = array($this->getKeyName() => $keys);
+			}
+			else
+			{
+				throw new \RuntimeException('No table keys defined.');
+			}
+		}
+
+		if ($reset)
+		{
+			$this->reset();
+		}
+
+		// Initialise the query.
+		$query = $this->_db->getQuery(true)
+			->select('e.*, a.*')
+			->from($this->_tbl . ' AS a')
+			->join('LEFT', $this->_tbl_ext . ' AS e ON a.' . $this->_tbl_key_ext . ' = e.' . $this->_frn_key_ext);
+
+		$fields = array_keys($this->getProperties());
+
+		foreach ($keys as $field => $value)
+		{
+			// Check that $field is in the table.
+			if (!in_array($field, $fields))
+			{
+				throw new \UnexpectedValueException(sprintf('Missing field in database: %s &#160; %s.', get_class($this), $field));
+			}
+
+			// Add the search tuple to the query.
+			$query->where($this->_db->quoteName($field) . ' = ' . $this->_db->quote($value));
+		}
+
+		$row = $this->_db->setQuery($query)->loadAssoc();
+
+		// Check that we have a result.
+		if (empty($row))
+		{
+			$result = false;
 		}
 		else
 		{
-			$this->setError( $db->getErrorMsg() );
+			// Bind the object with the row and return.
+			$result = $this->bind($row);
+		}
+
+		if (FLEXI_J40GE)
+		{
+			// Post-processing by observers
+			$event = AbstractEvent::create(
+				'onTableAfterLoad',
+				[
+					'subject'		=> $this,
+					'result'		=> &$result,
+					'row'			=> $row,
+				]
+			);
+			$this->getDispatcher()->dispatch('onTableAfterLoad', $event);
+		}
+
+		else
+		{
+			// Implement JObservableInterface: Post-processing by observers
+			$this->_observers->update('onAfterLoad', array(&$result, $row));
+		}
+
+		return $result;
+	}
+
+
+	/**
+	 * Method to perform sanity checks on the Table instance properties to ensure they are safe to store in the database.
+	 *
+	 * Child classes should override this method to make sure the data they are storing in the database is safe and as expected before storage.
+	 *
+	 * @return  boolean  True if the instance is sane and able to be stored in the database.
+	 *
+	 * @since   3.3
+	 */
+	public function check()
+	{
+		$config = (object) array('automatic_alias' => true);
+
+		// Check common properties, like title and alias 
+		if (parent::_check_record($config) === false)
+		{
 			return false;
 		}
+
+		// Make fulltext empty if it only contains empty spaces
+		if (trim(str_replace('&nbsp;', '', $this->fulltext)) == '')
+		{
+			$this->fulltext = '';
+		}
+
+		// clean up keywords -- eliminate extra spaces between phrases and cr (\r) and lf (\n) characters from string
+		if (!empty($this->metakey))
+		{
+			// Remove bad characters
+			$bad_characters = array("\n", "\r", "\"", "<", ">");
+			$after_clean = StringHelper::str_ireplace($bad_characters, "", $this->metakey);
+
+			// Create array using commas as delimiter
+			$keys = explode(',', $after_clean);
+			$clean_keys = array();
+
+			foreach($keys as $key)
+			{
+				if (trim($key))
+				{
+					$clean_keys[] = trim($key);
+				}
+			}
+
+			$this->metakey = implode(", ", $clean_keys); // put array back together delimited by ", "
+		}
+
+		// clean up description -- eliminate quotes and <> brackets
+		if (!empty($this->metadesc))
+		{
+			$bad_characters = array("\"", "<", ">");
+			$this->metadesc = StringHelper::str_ireplace($bad_characters, "", $this->metadesc);
+		}
+
+		return true;
 	}
-	
+
+
 	/**
 	 * Overloaded bind function
 	 *
@@ -324,36 +622,43 @@ class flexicontent_items extends _flexicontent_items {
 	 * @return  mixed  Null if operation was satisfactory, otherwise returns an error string
 	 *
 	 * @see     JTable:bind
-	 * @since   11.1
+	 * @since   3.3
 	 */
 	public function bind($array, $ignore = '')
 	{
-		if (isset($array['images']) && is_array($array['images'])) {
+		if (isset($array['images']) && is_array($array['images']))
+		{
 			$registry = new JRegistry;
 			$registry->loadArray($array['images']);
 			$array['images'] = (string)$registry;
 		}
 
-		if (isset($array['urls']) && is_array($array['urls'])) {
+		if (isset($array['urls']) && is_array($array['urls']))
+		{
 			$registry = new JRegistry;
 			$registry->loadArray($array['urls']);
 			$array['urls'] = (string)$registry;
 		}
-		
-		if (isset($array['attribs']) && is_array($array['attribs'])) {
+
+		// Bind parameters (params or attribs)
+		if (isset($array['attribs']) && is_array($array['attribs']))
+		{
 			$registry = new JRegistry;
 			$registry->loadArray($array['attribs']);
 			$array['attribs'] = (string)$registry;
 		}
 
-		if (isset($array['metadata']) && is_array($array['metadata'])) {
+		// Bind metadata
+		if (isset($array['metadata']) && is_array($array['metadata']))
+		{
 			$registry = new JRegistry;
 			$registry->loadArray($array['metadata']);
 			$array['metadata'] = (string)$registry;
 		}
 
 		// Bind the rules.
-		if (isset($array['rules']) && is_array($array['rules'])) {
+		if (isset($array['rules']) && is_array($array['rules']))
+		{
 			$rules = new JAccessRules($array['rules']);
 			$this->setRules($rules);
 		}
@@ -361,132 +666,147 @@ class flexicontent_items extends _flexicontent_items {
 		return parent::bind($array, $ignore);
 	}
 
-	/**
-	 * Overloaded store function
-	 *
-	 * @access public
-	 * @return boolean
-	 * @since 1.5
-	 */
-	function store( $updateNulls=false )
-	{
-		$k             = $this->_tbl_key;
-		$frn_key_ext   = $this->_frn_key_ext;
-		$frn_key_tmp   = $this->_frn_key_tmp;
 
-		// Split the object for the two tables #__content and #__flexicontent_items_ext
-		//$type     = new stdClass();
-		$type = JTable::getInstance('content');
-		$type->_tbl = $this->_tbl;
-		$type->_tbl_key = $this->_tbl_key;
-		//$type_ext = new stdClass();
-		$type_ext = JTable::getInstance('flexicontent_items_ext', '');
-		$type_ext->_tbl = $this->_tbl_join_ext;
-		$type_ext->_tbl_key = $this->_frn_key_ext;
-		//$type_tmp = new stdClass();
-		$type_tmp = JTable::getInstance('flexicontent_items_tmp', '');
-		$type_tmp->_tbl = $this->_tbl_join_tmp;
-		$type_tmp->_tbl_key = $this->_frn_key_tmp;
-		
-		foreach ($this->getProperties() as $p => $v) {
-		
+	/**
+	 * Overloaded JTable::store
+	 *
+	 * @param   boolean  $updateNulls  True to update fields even if they are null.
+	 *
+	 * @return  boolean  True on success.
+	 *
+	 * @since   3.3
+	 */
+	public function store($updateNulls = false)
+	{
+		$k      = $this->_tbl_key;
+		$fk_ext = $this->_frn_key_ext;
+		$tk_ext = $this->_tbl_key_ext;
+		$fk_tmp = $this->_frn_key_tmp;
+		$tk_tmp = $this->_tbl_key_tmp;
+
+		// Split the data to their actual DB table, (#__flexicontent_items_tmp duplicates non-TEXT data of #__content)
+		$record = JTable::getInstance($this->_jtbls[$this->_tbl][0], $this->_jtbls[$this->_tbl][1]);
+		$record->_tbl = $this->_tbl;
+		$record->_tbl_key = $k;
+
+		$record_ext = JTable::getInstance($this->_jtbls[$this->_tbl_ext][0], $this->_jtbls[$this->_tbl_ext][1]);
+		$record_ext->_tbl = $this->_tbl_ext;
+		$record_ext->_tbl_key = $fk_ext;
+
+		$record_tmp = JTable::getInstance($this->_jtbls[$this->_tbl_tmp][0], $this->_jtbls[$this->_tbl_tmp][1]);
+		$record_tmp->_tbl = $this->_tbl_tmp;
+		$record_tmp->_tbl_key = $fk_tmp;
+
+		foreach ($this->getProperties() as $p => $v)
+		{
 			// If the property is in the join properties array we add it to the items_tmp object (coming either from tbl or tbl_ext or from other joined table)
-			if (in_array($p, $this->_join_prop_tmp)) {
-				$type_tmp->$p = $v;
+			if (isset($this->_tbl_fields[$this->_tbl_tmp][$p]))
+			{
+				$record_tmp->$p = $v;
 			}
-			
+
 			// If the property is in the join properties array we add it to the items_ext object
-			if (in_array($p, $this->_join_prop_ext)) {
-				$type_ext->$p = $v;
-				
-				// Catch case of new J1.6+ article language column
-				if (FLEXI_J16GE && $p == "language") {
-					//$jAp= JFactory::getApplication();
-					//$jAp->enqueueMessage('setting content language to' . $v,'message');
-					$type->$p = $v;
+			if (isset($this->_tbl_fields[$this->_tbl_ext][$p]))
+			{
+				$record_ext->$p = $v;
+
+				// Also use main table for article's language column
+				if ($p === 'language')
+				{
+					$record->$p = $v;
 				}
-			
-				// Catch case of master item for (translation groups) not being set
-				if ($p == "lang_parent_id" && $v==0) {
-					//$jAp= JFactory::getApplication();
-					//$jAp->enqueueMessage('Setting default lang_parent_id to '. $type->id,'message');
-					$type_ext->$p = $type->id;
+
+				// Master item id for (translation groups), (Deprecated, TODO remove)
+				if ($p === 'lang_parent_id')
+				{
+					$record_ext->$p = 0;//$record->id;
+					$record_tmp->$p = 0;//$record->id;
 				}
 			}
-				
-			// Else we add it to the core item properties
-			else {
-				$type->$p = $v;
+
+			// Add it to the main record properties
+			else
+			{
+				$record->$p = $v;
 			}
 		}
 
-		if( $this->$k )
+		if ($this->$k)
 		{
-			$ret = $this->_db->updateObject( $this->_tbl, $type, $this->_tbl_key, $updateNulls );
-			$type_ext->$frn_key_ext   = $this->$k;
-			$type_tmp->$frn_key_tmp = $this->$k;
+			$ret = $this->_db->updateObject($this->_tbl, $record, $k, $updateNulls);
 		}
 		else
 		{
-			$ret = $this->_db->insertObject( $this->_tbl, $type, $this->_tbl_key );
-			// set the type_id
-			$this->id = $type->id;
-			$this->id = $this->id?$this->id:$this->_db->insertid();
+			$ret = $this->_db->insertObject($this->_tbl, $record, $k);
+
+			// Get record ID, either this was given or we will get auto-increment ID of last INSERT operation
+			$this->$k = $record->$k;
 		}
 
-		if( !$ret )
+		// Set related tables IDs
+		$record_ext->$fk_ext = $this->$tk_ext;
+		$record_tmp->$fk_tmp = $this->$tk_tmp;
+
+		if (!$ret)
 		{
-			$this->setError(get_class( $this ).'::store failed - '.$this->_db->getErrorMsg());
+			$this->setError(get_class($this) . '::store failed - ' . $this->_db->getErrorMsg());
 			return false;
 		}
+
 		else
 		{
-			// check for foreign key
-			if (isset($type_ext->$frn_key_ext) && !empty($type_ext->$frn_key_ext)) {
-				// update #__flexicontent_items_ext table
-				$ret = $this->_db->updateObject( $this->_tbl_join_ext, $type_ext, $this->_frn_key_ext, $updateNulls );
-				
-				// update #__flexicontent_items_tmp table
-				$ret = $this->_db->updateObject( $this->_tbl_join_tmp, $type_tmp, $this->_frn_key_tmp, $updateNulls );
+			// Check if record at extended data DB table exists
+			$ext_exists = false;
+
+			if (!empty($record_ext->$fk_ext))
+			{
+				$ext_exists = (boolean) $this->_db->setQuery('SELECT COUNT(*) FROM ' . $this->_tbl_ext . ' WHERE ' . $fk_ext . '=' . (int) $record_ext->$fk_ext)->loadResult();
 			}
-			
-			else {
-				if ($type_ext->lang_parent_id == 0) $type_ext->lang_parent_id = $this->id;  // case of new item we need to set lang_parent_id after initial content creation
-				
-				// insert into #__flexicontent_items_ext table
-				$type_ext->$frn_key_ext = $this->id;
-				$ret = $this->_db->insertObject( $this->_tbl_join_ext, $type_ext, $this->_frn_key_ext );
-				
-				// insert into #__flexicontent_items_ext table
-				$type_tmp->$frn_key_tmp = $this->id;
-				$ret = $this->_db->insertObject( $this->_tbl_join_tmp, $type_tmp, $this->_frn_key_tmp );
+
+			// Check if record at temporary data DB table exists
+			$tmp_exists = false;
+			if (!empty($record_tmp->$fk_tmp))
+			{
+				$tmp_exists = (boolean) $this->_db->setQuery('SELECT COUNT(*) FROM ' . $this->_tbl_tmp . ' WHERE ' . $fk_tmp . '=' . (int) $record_tmp->$fk_tmp)->loadResult();
 			}
-			
-			// Check for unique Alias
-			$sub_q = 'SELECT catid FROM #__flexicontent_cats_item_relations WHERE itemid='.(int)$this->id;
-			$query = 'SELECT COUNT(*) FROM #__content AS i '
-				.' JOIN #__flexicontent_items_ext AS e ON i.id = e.item_id '
-				.' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON i.id = rel.itemid '
-				.' WHERE i.alias='.$this->_db->Quote($this->alias)
-				.'  AND (i.catid='.(int)$this->id.' OR rel.catid IN ('.$sub_q.') )'
-				.'  AND e.language = '.$this->_db->Quote($type_ext->language)
-				.'  AND i.id <> '.(int)$this->id
-				//.'  AND e.lang_parent_id <> '.(int)$type_ext->lang_parent_id
-				;
-			$this->_db->setQuery($query);
-			$duplicate_aliases = (boolean) $this->_db->loadResult();
-			if ($duplicate_aliases) {
-				$query 	= 'UPDATE #__content SET alias='.$this->_db->Quote($this->alias.'_'.$this->id).' WHERE id='.(int)$this->id;
-				$this->_db->setQuery($query);
-				$this->_db->query();
+
+			// Update extended data record
+			if ($ext_exists)
+			{
+				$ret = $this->_db->updateObject($this->_tbl_ext, $record_ext, $fk_ext, $updateNulls);
+			}
+
+			// Insert extended data record
+			else
+			{
+				// Insert without using autoincrement
+				$record_ext->$fk_ext = $this->$tk_ext;
+				$ret = $this->_db->insertObject($this->_tbl_ext, $record_ext, $fk_ext);
+			}
+
+			// Update #__flexicontent_items_tmp table
+			if ($tmp_exists)
+			{
+				$ret = $this->_db->updateObject($this->_tbl_tmp, $record_tmp, $fk_tmp, $updateNulls);
+			}
+
+			// Insert into #__flexicontent_items_tmp table
+			else
+			{
+				// Insert without using autoincrement
+				$record_tmp->$fk_tmp = $this->$tk_tmp;
+				$ret = $this->_db->insertObject($this->_tbl_tmp, $record_tmp, $fk_tmp);
 			}
 		}
+
 		// If the table is not set to track assets return true.
-		if (!$this->_trackAssets) {
+		if (!$this->_trackAssets)
+		{
 			return true;
 		}
 
-		if ($this->_locked) {
+		if ($this->_locked)
+		{
 			$this->_unlock();
 		}
 
@@ -494,155 +814,55 @@ class flexicontent_items extends _flexicontent_items {
 		// Asset Tracking
 		//
 
-		$parentId	= $this->_getAssetParentId();
-		$name		= $this->_getAssetName();
-		$title		= $this->_getAssetTitle();
+		$parentId = $this->_getAssetParentId();
+		$name  = $this->_getAssetName();
+		$title = $this->_getAssetTitle();
 
-		$asset	= JTable::getInstance('Asset');
+		$asset = JTable::getInstance('Asset');
 		$asset->loadByName($name);
 
 		// Check for an error.
-		if ($error = $asset->getError()) {
+		if ($error = $asset->getError())
+		{
 			$this->setError($error);
 			return false;
 		}
 
 		// Specify how a new or moved node asset is inserted into the tree.
-		if (empty($this->asset_id) || $asset->parent_id != $parentId) {
+		if (empty($this->asset_id) || $asset->parent_id != $parentId)
+		{
 			$asset->setLocation($parentId, 'last-child');
 		}
 
 		// Prepare the asset to be stored.
-		$asset->parent_id	= $parentId;
-		$asset->name		= $name;
-		$asset->title		= $title;
-		
-		//print_r ($this->_rules); exit();
-		if ($this->_rules instanceof JAccessRules) {
+		$asset->parent_id = $parentId;
+		$asset->name  = $name;
+		$asset->title = $title;
+
+		if ($this->_rules instanceof JAccessRules)
+		{
 			$asset->rules = (string) $this->_rules;
 		}
 
-		if (!$asset->check() || !$asset->store($updateNulls)) {
+		if (!$asset->check() || !$asset->store($updateNulls))
+		{
 			$this->setError($asset->getError());
 			return false;
 		}
 
-		if (empty($this->asset_id)) {
-			// Update the asset_id field in this table.
+		// Update the asset_id field in this table.
+		if (empty($this->asset_id))
+		{
 			$this->asset_id = (int) $asset->id;
 
-			$query = $this->_db->getQuery(true);
-			$query->update( $this->_db->quoteName( $this->_tbl ) );
-			$query->set('asset_id = '.(int) $this->asset_id);
-			$query->where( $this->_db->quoteName( $k ) .' = '.(int) $this->$k);
-			$this->_db->setQuery($query);
+			$query = $this->_db->getQuery(true)
+				->update($this->_db->quoteName($this->_tbl))
+				->set('asset_id = '.(int) $this->asset_id)
+				->where($this->_db->quoteName( $k ) . ' = ' . (int) $this->$k);
 
-			if (!$this->_db->query()) {
-				$e = new JException(JText::sprintf('JLIB_DATABASE_ERROR_STORE_FAILED_UPDATE_ASSET_ID', $this->_db->getErrorMsg()));
-				$this->setError($e);
-				return false;
-			}
-		}
-		return true;
-	}
-
-	/**
-	 * Overloaded check function
-	 *
-	 * @access public
-	 * @return boolean
-	 * @since 1.5
-	 */
-	function check()
-	{
-		/*
-		TODO: This filter is too rigorous,need to implement more configurable solution
-		// specific filters
-		$filter = JFilterInput::getInstance( null, null, 1, 1 );
-		$this->introtext = trim( $filter->clean( $this->introtext ) );
-		$this->fulltext =  trim( $filter->clean( $this->fulltext ) );
-		*/
-
-
-		if(empty($this->title)) {
-			$this->setError(JText::_( 'FLEXI_ARTICLES_MUST_HAVE_A_TITLE' ));
-			return false;
-		}
-
-		if(empty($this->alias)) {
-			$this->alias = $this->title;
-		}
-		$this->alias = FLEXI_J16GE ?
-			JApplication::stringURLSafe($this->alias) :
-			JFilterOutput::stringURLSafe($this->alias);
-		
-		if(trim(str_replace('-','',$this->alias)) == '') {
-			$datenow = JFactory::getDate();
-			$this->alias = FLEXI_J16GE ?
-				$datenow->format($format = 'Y-M-d-H-i-s', $local = true) :
-				$datenow->toFormat($format = '%Y-%m-%d-%H-%M-%S');
-		}
-
-		if (trim( str_replace( '&nbsp;', '', $this->fulltext ) ) == '') {
-			$this->fulltext = '';
-		}
-
-		// clean up keywords -- eliminate extra spaces between phrases
-		// and cr (\r) and lf (\n) characters from string
-		if(!empty($this->metakey)) { // only process if not empty
-			$bad_characters = array("\n", "\r", "\"", "<", ">"); // array of characters to remove
-			$after_clean = JString::str_ireplace($bad_characters, "", $this->metakey); // remove bad characters
-			$keys = explode(',', $after_clean); // create array using commas as delimiter
-			$clean_keys = array(); 
-			foreach($keys as $key) {
-				if(trim($key)) {  // ignore blank keywords
-					$clean_keys[] = trim($key);
-				}
-			}
-			$this->metakey = implode(", ", $clean_keys); // put array back together delimited by ", "
-		}
-		
-		// clean up description -- eliminate quotes and <> brackets
-		if(!empty($this->metadesc)) { // only process if not empty
-			$bad_characters = array("\"", "<", ">");
-			$this->metadesc = JString::str_ireplace($bad_characters, "", $this->metadesc);
+			$this->_db->setQuery($query)->execute();
 		}
 
 		return true;
 	}
-	
-	/**
-	* Converts record to XML
-	* @param boolean Map foreign keys to text values
-
-	function toXML( $mapKeysToText=false )
-	{
-		$db = JFactory::getDBO();
-
-		if ($mapKeysToText) {
-			$query = 'SELECT name'
-			. ' FROM #__sections'
-			. ' WHERE id = '. (int) $this->sectionid
-			;
-			$db->setQuery( $query );
-			$this->sectionid = $db->loadResult();
-
-			$query = 'SELECT name'
-			. ' FROM #__categories c'
-			. ' WHERE c.extension="'.FLEXI_CAT_EXTENSION.'" AND id = '. (int) $this->catid
-			;
-			$db->setQuery( $query );
-			$this->catid = $db->loadResult();
-
-			$query = 'SELECT name'
-			. ' FROM #__users'
-			. ' WHERE id = ' . (int) $this->created_by
-			;
-			$db->setQuery( $query );
-			$this->created_by = $db->loadResult();
-		}
-
-		return parent::toXML( $mapKeysToText );
-	}
-	*/
 }

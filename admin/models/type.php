@@ -1,563 +1,433 @@
 <?php
 /**
- * @version 1.5 stable $Id: type.php 1933 2014-08-06 15:24:37Z ggppdk $
- * @package Joomla
- * @subpackage FLEXIcontent
- * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
- * @license GNU/GPL v2
- * 
- * FLEXIcontent is a derivative work of the excellent QuickFAQ component
- * @copyright (C) 2008 Christoph Lukes
- * see www.schlu.net for more information
+ * @package         FLEXIcontent
+ * @version         3.3
  *
- * FLEXIcontent is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
+ * @link            https://flexicontent.org
+ * @copyright       Copyright © 2018, FLEXIcontent team, All Rights Reserved
+ * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
-// no direct access
 defined('_JEXEC') or die('Restricted access');
 
-jimport('joomla.application.component.modeladmin');
+use Joomla\String\StringHelper;
+use Joomla\Utilities\ArrayHelper;
+
+require_once('base/base.php');
 
 /**
  * FLEXIcontent Component Type Model
  *
- * @package Joomla
- * @subpackage FLEXIcontent
- * @since		1.0
  */
-class FlexicontentModelType extends JModelAdmin
+class FlexicontentModelType extends FCModelAdmin
 {
 	/**
-	 * Type primary key
+	 * Record name, (parent class property), this is used for: naming session data, XML file of class, etc
+	 *
+	 * @var string
+	 */
+	protected $name = 'type';
+
+	/**
+	 * Record database table
+	 *
+	 * @var string
+	 */
+	var $records_dbtbl = 'flexicontent_types';
+
+	/**
+	 * Record jtable name
+	 *
+	 * @var string
+	 */
+	var $records_jtable = 'flexicontent_types';
+
+	/**
+	 * Column names
+	 */
+	var $state_col   = 'published';
+	var $name_col    = 'name';
+	var $parent_col  = null;
+
+	/**
+	 * Record primary key
 	 *
 	 * @var int
 	 */
 	var $_id = null;
-	
+
 	/**
-	 * Type data
+	 * Record data
 	 *
 	 * @var object
 	 */
-	var $_type = null;
+	var $_record = null;
+
+	/**
+	 * Events context to use during model FORM events and diplay PREPARE events triggering
+	 *
+	 * @var object
+	 */
+	var $events_context = null;
+
+	/**
+	 * Flag to indicate adding new records with next available ordering (at the end),
+	 * this is ignored if this record DB model does not have 'ordering'
+	 *
+	 * @var boolean
+	 */
+	var $useLastOrdering = true;
+
+	/**
+	 * Plugin group used to trigger events
+	 *
+	 * @var boolean
+	 */
+	var $plugins_group = null;
+
+	/**
+	 * Records real extension
+	 *
+	 * @var string
+	 */
+	var $extension_proxy = null;
+
+	/**
+	 * Context to use for registering (language) associations
+	 *
+	 * @var string
+	 */
+	var $associations_context = false;
+
+	/**
+	 * A message queue when appropriate
+	 *
+	 * @var string
+	 */
+	var $_messages= array();
+
+	/**
+	 * Various record specific properties
+	 *
+	 */
+
+	/**
+	 * List filters that are always applied
+	 */
+	var $hard_filters = array();
+
+	/**
+	 * Array of supported state conditions of the record
+	 */
+	var $supported_conditions = array(
+		 1 => 'FLEXI_ENABLED',
+		 0 => 'FLEXI_DISABLED',
+		-2 => 'FLEXI_TRASHED',
+	);
+
+	/**
+	 * Groups of Fields that can be partially present in the form
+	 */
+	var $mergeableGroups = array('attribs');
+
+	/**
+	 * Various record specific properties
+	 *
+	 */
+	// ...
 
 	/**
 	 * Constructor
 	 *
-	 * @since 1.0
+	 * @since 3.3.0
 	 */
-	function __construct()
+	public function __construct($config = array())
 	{
-		parent::__construct();
+		parent::__construct($config);
 
-		$array = JRequest::getVar('cid',  array(0), '', 'array');
-		$array = is_array($array) ? $array : array($array);
-		$id = $array[0];
-		if(!$id) {
-			$post = JRequest::get( 'post' );
-			$data = FLEXI_J16GE ? @$post['jform'] : $post;
-			$id = @$data['id'];
-		}
-		$this->setId((int)$id);
+		$this->canManage = FlexicontentHelperPerm::getPerm()->CanTypes;
+		$this->canCreate = $this->canManage;
 	}
 
-	/**
-	 * Method to set the identifier
-	 *
-	 * @access	public
-	 * @param	int type identifier
-	 */
-	function setId($id)
-	{
-		// Set type id and wipe data
-		$this->_id     = $id;
-		$this->_type   = null;
-	}
-	
 
 	/**
-	 * Method to get the type identifier
+	 * Legacy method to get the record
 	 *
-	 * @access	public
-	 */
-	function getId() {
-		return $this->_id;
-	}
-	
-	/**
-	 * Overridden get method to get properties from the type
+	 * @return	object
 	 *
-	 * @access	public
-	 * @param	string	$property	The name of the property
-	 * @param	mixed	$value		The value of the property to set
-	 * @return 	mixed 				The value of the property
 	 * @since	1.0
 	 */
-	function get($property, $default=null)
+	public function getType($pk = null)
 	{
-		if ($this->_loadType())
-		{
-			if(isset($this->_type->$property)) {
-				return $this->_type->$property;
-			}
-		}
-		return $default;
-	}
-
-	/**
-	 * Method to get type data
-	 *
-	 * @access	public
-	 * @return	array
-	 * @since	1.0
-	 */
-	function &getType()
-	{
-		if ($this->_loadType()) {
-			// extra steps after loading
-			// ...
-		} else {
-			$this->_initType();
-		}
-		
-		return $this->_type;
+		return parent::getRecord($pk);
 	}
 
 
 	/**
-	 * Method to load type data
+	 * Method to initialise the record data
 	 *
-	 * @access	private
+	 * @param   object      $record    The record being initialized
+	 * @param   boolean     $initOnly  If true then only a new record will be initialized without running the _afterLoad() method
+	 *
 	 * @return	boolean	True on success
-	 * @since	1.0
+	 *
+	 * @since	1.5
 	 */
-	function _loadType()
+	protected function _initRecord(&$record = null, $initOnly = false)
 	{
-		// Lets load the type if it doesn't already exist
-		if ( $this->_type===null )
-		{
-			$query = 'SELECT *'
-					. ' FROM #__flexicontent_types'
-					. ' WHERE id = '.$this->_id
-					;
-			$this->_db->setQuery($query);
-			$this->_type = $this->_db->loadObject();
+		parent::_initRecord($record, $initOnly);
 
-			return (boolean) $this->_type;
-		}
+		// Set some new record specific properties, note most properties already have proper values
+		// Either the DB default values (set by getTable() method) or the values set by _afterLoad() method
+		$record->id							= 0;
+		$record->name						= null;  //$this->getName() . ($this->_getLastId() + 1);
+		$record->alias					= null;
+		$record->published			= 1;
+		$record->itemscreatable	= 0;
+		$record->attribs				= null;
+		$record->access					= 1;
+		$record->checked_out		= 0;
+		$record->checked_out_time	= '';
+
+		$this->_record = $record;
+
 		return true;
 	}
 
-	/**
-	 * Method to get the last id
-	 *
-	 * @access	private
-	 * @return	int
-	 * @since	1.0
-	 */
-	function _getLastId()
-	{
-		$query  = 'SELECT MAX(id)'
-				. ' FROM #__flexicontent_types'
-				;
-		$this->_db->setQuery($query);
-		$lastid = $this->_db->loadResult();
-		
-		return (int)$lastid;
-	}
 
 	/**
-	 * Method to initialise the type data
+	 * Legacy method to store the record, use save() instead
 	 *
-	 * @access	private
-	 * @return	boolean	True on success
-	 * @since	1.0
+	 * @param   array  $data  The form data.
+	 *
+	 * @return  boolean  True on success.
+	 *
+	 * @since   3.2.0
 	 */
-	function _initType()
+	public function store($data)
 	{
-		// Lets load the type if it doesn't already exist
-		if ( $this->_type===null )
+		return parent::store($data);
+	}
+
+
+	/**
+	 * Method to preprocess the form.
+	 *
+	 * @param   JForm   $form   A JForm object.
+	 * @param   mixed   $data   The data expected for the form.
+	 * @param   string  $plugins_group  The name of the plugin group to import and trigger
+	 *
+	 * @return  void
+	 *
+	 * @see     JFormField
+	 * @since   1.6
+	 * @throws  Exception if there is an error in the form event.
+	 */
+	protected function preprocessForm(JForm $form, $data, $plugins_group = null)
+	{
+		parent::preprocessForm($form, $data, $plugins_group);
+	}
+
+
+	/**
+	 * Method to change the title & alias.
+	 *
+	 * @param   integer  $parent_id  If applicable, the id of the parent (e.g. assigned category)
+	 * @param   string   $alias      The alias / name.
+	 * @param   string   $title      The title / label.
+	 *
+	 * @return  array    Contains the modified title and alias / name.
+	 *
+	 * @since   1.7
+	 */
+	protected function generateNewTitle($parent_id, $alias, $title)
+	{
+		// Alter the title & alias
+		$table = $this->getTable();
+
+		while ($table->load(array('name' => $title, 'alias' => $alias)))
 		{
-			$type = new stdClass();
-			$type->id					= 0;
-			$type->name				= null;
-			$type->alias			= null;
-			$type->published	= 1;
-			$type->itemscreatable= 0;
-			$type->attribs		= null;
-			$type->access			= 0;
-			$this->_type			= $type;
-			return (boolean) $this->_type;
+			$title = StringHelper::increment($title);
+			$alias = StringHelper::increment($alias, 'dash');
 		}
-		return true;
+
+		return array($title, $alias);
 	}
 
+
 	/**
-	 * Method to checkin/unlock the type
+	 * Method to check if the user can edit the record
 	 *
-	 * @access	public
 	 * @return	boolean	True on success
-	 * @since	1.0
-	 */
-	function checkin($pk = NULL)
-	{
-		if (!$pk) $pk = $this->_id;
-		if ($pk) {
-			$item = JTable::getInstance('flexicontent_types', '');
-			return $item->checkin($pk);
-		}
-		return false;
-	}
-	
-	
-	/**
-	 * Method to checkout/lock the type
 	 *
-	 * @access	public
-	 * @param	int	$uid	User ID of the user checking the item out
+	 * @since	3.2.0
+	 */
+	public function canEdit($record = null)
+	{
+		$record  = $record ?: $this->_record;
+		$user    = JFactory::getUser();
+
+		return !$record || !$record->id
+			? $this->canCreate
+			: $this->canManage;
+	}
+
+
+	/**
+	 * Method to check if the user can edit record 's state
+	 *
 	 * @return	boolean	True on success
-	 * @since	1.0
-	 */
-	function checkout($pk = null)   // UPDATED to match function signature of J1.6+ models
-	{
-		// Make sure we have a record id to checkout the record with
-		if ( !$pk ) $pk = $this->_id;
-		if ( !$pk ) return true;
-		
-		// Get current user
-		$user	= JFactory::getUser();
-		$uid	= $user->get('id');
-		
-		// Lets get table record and checkout the it
-		$tbl = JTable::getInstance('flexicontent_types', '');
-		if ( $tbl->checkout($uid, $this->_id) ) return true;
-		
-		// Reaching this points means checkout failed
-		$this->setError( FLEXI_J16GE ? $tbl->getError() : JText::_("FLEXI_ALERT_CHECKOUT_FAILED") );
-		return false;
-	}
-	
-	
-	/**
-	 * Tests if the type is checked out
 	 *
-	 * @access	public
-	 * @param	int	A user id
-	 * @return	boolean	True if checked out
-	 * @since	1.0
+	 * @since	3.2.0
 	 */
-	function isCheckedOut( $uid=0 )
+	public function canEditState($record = null)
 	{
-		if ($this->_loadType())
+		$record  = $record ?: $this->_record;
+		$user    = JFactory::getUser();
+
+		return $this->canManage;
+	}
+
+
+	/**
+	 * Method to check if the user can delete the record
+	 *
+	 * @return	boolean	True on success
+	 *
+	 * @since	3.2.0
+	 */
+	public function canDelete($record = null)
+	{
+		$record  = $record ?: $this->_record;
+		$user    = JFactory::getUser();
+
+		return $this->canManage;
+	}
+
+
+	/**
+	 * Method to do some record / data preprocessing before call JTable::bind()
+	 *
+	 * Note. Typically called inside this MODEL 's store()
+	 *
+	 * @param   object     $record   The record object
+	 * @param   array      $data     The new data array
+	 *
+	 * @since	3.2.0
+	 */
+	protected function _prepareBind($record, & $data)
+	{
+		/**
+		 * Special handling of some FIELDSETs: e.g. 'attribs/params' and optionally for other fieldsets too, like: 'metadata'
+		 * By doing partial merging of these arrays we support having only a sub-set of them inside the form
+		 */
+
+		// Get RAW layout field values, validation will follow ...
+		$raw_data = JFactory::getApplication()->input->post->get('jform', array(), 'array');
+		$data['attribs']['layouts'] = !empty($raw_data['layouts']) ? $raw_data['layouts'] : null;
+
+		// We will use mergeAttributes() instead of bind(), thus fields that are not set will maintain their current DB values,
+		$mergeProperties = $this->mergeableGroups;
+		$mergeOptions = array(
+			'params_fset'  => 'attribs',
+			'layout_type'  => 'item',
+			'model_names'  => array($this->option => $this->getName()),
+			'cssprep_save' => false,
+		);
+		$this->mergeAttributes($record, $data, $mergeProperties, $mergeOptions);
+
+		// Unset the above handled FIELDSETs from $data, since we selectively merged them above into the RECORD,
+		// thus they will not overwrite the respective RECORD's properties during call of JTable::bind()
+		foreach($mergeProperties as $prop)
 		{
-			if ($uid) {
-				return ($this->_type->checked_out && $this->_type->checked_out != $uid);
-			} else {
-				return $this->_type->checked_out;
-			}
-		} elseif ($this->_id < 1) {
-			return false;
-		} else {
-			JError::raiseWarning( 0, 'UNABLE LOAD DATA');
-			return false;
+			unset($data[$prop]);
 		}
+
+		// Call parent class bind preparation
+		parent::_prepareBind($record, $data);
 	}
 
+
 	/**
-	 * Method to store the type
+	 * Method to do some work after record has been stored
 	 *
-	 * @access	public
-	 * @return	boolean	True on success
-	 * @since	1.0
+	 * Note. Typically called inside this MODEL 's store()
+	 *
+	 * @param   object     $record   The record object
+	 * @param   array      $data     The new data array
+	 *
+	 * @since	3.2.0
 	 */
-	function store($data)
+	protected function _afterStore($record, & $data)
 	{
-		// Check for request forgeries
-		JRequest::checkToken() or jexit( 'Invalid Token' );
+		parent::_afterStore($record, $data);
 
-		// NOTE: 'data' is post['jform'] for J2.5 (this is done by the controller or other caller)
-		$type = $this->getTable('flexicontent_types', '');
-		
-		// Load existing data and set new record flag
-		$isnew = ! (boolean) $data['id'];
-		if ($data['id'])  $type->load($data['id']);
-		
-		// Build attibutes INI string
-		if (FLEXI_J16GE) {
-			// Retrieve form data these are subject to basic filtering
-			$jform = JRequest::getVar('jform', array(), 'post', 'array');
-			
-			$ilayout = $data['attribs']['ilayout'];
-			if( !empty($jform['layouts'][$ilayout]) ) {
-				$data['attribs'] = array_merge($data['attribs'], $jform['layouts'][$ilayout]);
-			}
-			
-			// JSON encoding allows to use new lines etc, handled by 'flexicontent_types' (extends JTable for flexicontent_types)
-			//$data['attribs'] = json_encode($data['attribs']);
-			// bind it to the table
-			if (!$type->bind($data)) {
-				$this->setError( $this->_db->getErrorMsg() );
-				return false;
-			}
-		}
-		
-		else {
-			// bind it to the table
-			if (!$type->bind($data)) {
-				$this->setError( $this->_db->getErrorMsg() );
-				return false;
-			}
-			
-			if (is_array($data['params']))
-			{
-				// Get layout parameters
-				$ilayout = $data['params']['ilayout'];
-				$tmpl_params = $data['layouts'][$ilayout];
-				
-				// Clear parameters of all layouts
-				unset($data['layouts']);
-				
-				// Merge the parameters of currently selected layout
-				$data['params'] = array_merge($data['params'], $tmpl_params);
-				
-				$txt = array ();
-				foreach ($data['params'] as $k => $v) {
-					if (is_array($v)) {
-						$v = implode('|', $v);
-					}
-					$txt[] = "$k=$v";
-				}
-				$type->attribs = implode("\n", $txt);
-			}
-		}
-		
-		// Put the new types in last position, currently this column is missing
-		/*if (!$type->id) {
-			$type->ordering = $type->getNextOrder();
-		}*/
-
-		// Make sure the data is valid
-		if (!$type->check()) {
-			$this->setError($type->getError() );
-			return false;
-		}
-
-		// Store it in the db
-		if (!$type->store()) {
-			$this->setError( $this->_db->getErrorMsg() );
-			return false;
-		}
-		
-		if (FLEXI_ACCESS) {
-			FAccess::saveaccess( $type, 'type' );
-		} else if (FLEXI_J16GE) {
-			// saving asset in J2.5 is handled by the types table class
-		}
-		
-		$this->_type = & $type;
-		$this->_id   = $type->id;
-		
 		// Only insert default relations if the type is new
-		if ( $isnew )
+		if ( ! $data['id'] )
+		{
 			$this->_addCoreFieldRelations();
-		
-		return true;
+		}
 	}
-	
+
+
+	/**
+	 * Method to do some work after record has been loaded via JTable::load()
+	 *
+	 * Note. Typically called inside this MODEL 's store()
+	 *
+	 * @param	object   $record   The record object
+	 *
+	 * @since	3.2.0
+	 */
+	protected function _afterLoad($record)
+	{
+		parent::_afterLoad($record);
+	}
+
+
+	/**
+	 * START OF MODEL SPECIFIC METHODS
+	 */
+
 	/**
 	 * Method to add core field relation to a type
 	 *
-	 * @access	private
-	 * @return	boolean	True on success
-	 * @since	1.0
+	 * @return  boolean    True on success
+	 *
+	 * @since	1.5
 	 */
-	function _addCoreFieldRelations()
+	private function _addCoreFieldRelations()
 	{
-		$type = & $this->_type;
-		
 		// Get core fields
 		$core = $this->_getCoreFields();
-		
+
 		// Insert core field relations to the DB
-		foreach ($core as $fieldid) {
+		foreach ($core as $fieldid)
+		{
 			$obj = new stdClass();
-			$obj->field_id  = (int)$fieldid;
-			$obj->type_id   = $type->id;
+			$obj->field_id  = (int) $fieldid;
+			$obj->type_id   = $this->_record->id;
 			$this->_db->insertObject('#__flexicontent_fields_type_relations', $obj);
 		}
 	}
 
-	
-	function addtype($name) {
-		
-		$obj = new stdClass();
-		$obj->name	 	= $name;
-		$obj->published	= 1;
-		
-		$this->store($obj);
-		return true;
-	}
-
-	function _getCoreFields(){
-		
-		$query = 'SELECT id'
-				. ' FROM #__flexicontent_fields'
-				. ' WHERE iscore = 1'
-				;
-		$this->_db->setQuery($query);
-		$corefields = FLEXI_J16GE ? $this->_db->loadColumn() : $this->_db->loadResultArray();
-		
-		return $corefields;
-	}
-	
-	
-	/**
-	 * Method to get the record form.
-	 *
-	 * @param   array    $data      An optional array of data for the form to interogate.
-	 * @param   boolean  $loadData  True if the form is to load its own data (default case), false if not.
-	 *
-	 * @return  mixed  A JForm object on success, false on failure
-	 *
-	 * @since   1.6
-	 */
-	public function getForm($data = array(), $loadData = true) {
-		// Initialise variables.
-		$app = JFactory::getApplication();
-
-		// Get the form.
-		$form = $this->loadForm('com_flexicontent.'.$this->getName(), $this->getName(), array('control' => 'jform', 'load_data' => $loadData));
-		if (empty($form)) {
-			return false;
-		}
-
-		return $form;
-	}
 
 	/**
-	 * Method to get the data that should be injected in the form.
+	 * Method to get core field ids
 	 *
-	 * @return  mixed  The data for the form.
+	 * @return array
 	 *
-	 * @since   1.6
+	 * @since 1.5
 	 */
-	protected function loadFormData() {
-		// Check the session for previously entered form data.
-		$data = JFactory::getApplication()->getUserState('com_flexicontent.edit.'.$this->getName().'.data', array());
-
-		if (empty($data)) {
-			$data = $this->getItem($this->_id);
-		}
-
-		return $data;
-	}
-
-	/**
-	 * Override JModelAdmin::preprocessForm to ensure the correct plugin group is loaded.
-	 *
-	 * @param   JForm   $form   A JForm object.
-	 * @param   mixed   $data   The data expected for the form.
-	 * @param   string  $group  The name of the plugin group to import (defaults to "content").
-	 *
-	 * @return  void
-	 *
-	 * @since   1.6
-	 * @throws  Exception if there is an error in the form event.
-	 */
-	protected function preprocessForm(JForm $form, $data, $group = 'content')
+	private function _getCoreFields()
 	{
-		parent::preprocessForm($form, $data);
-	}
+		$query = 'SELECT id'
+			. ' FROM #__flexicontent_fields'
+			. ' WHERE iscore = 1'
+			;
+		$this->_db->setQuery($query);
 
-
-	/**
-	 * Method to get a single record.
-	 *
-	 * @param   integer  $pk  The id of the primary key.
-	 *
-	 * @return  mixed	Object on success, false on failure.
-	 *
-	 * @since   1.6
-	 */
-	public function getItem($pk = null) {
-		static $item;
-		if(!$item) {
-			// Initialise variables.
-			$pk		= (!empty($pk)) ? $pk : (int) $this->getState($this->getName().'.id');
-			$table	= $this->getTable('flexicontent_types', '');
-
-			if ($pk > 0) {
-				// Attempt to load the row.
-				$return = $table->load($pk);
-
-				// Check for a table object error.
-				if ($return === false && $table->getError()) {
-					$this->setError($table->getError());
-					return false;
-				}
-			}
-
-			// Convert to the JObject before adding other data.
-			$_prop_arr = $table->getProperties(1);
-			$item = JArrayHelper::toObject($_prop_arr, 'JObject');
-
-			if (property_exists($item, 'attribs')) {
-				$registry = new JRegistry($item->attribs);
-				$item->attribs = $registry->toArray();
-			}
-		}
-		return $item;
-	}
-	
-
-	/**
-	 * Auto-populate the model state.
-	 *
-	 * Note. Calling getState in this method will result in recursion.
-	 *
-	 * @since	1.6
-	 */
-	protected function populateState() {
-		$app = JFactory::getApplication('administrator');
-
-		if (!($extension = $app->getUserState('com_flexicontent.edit.'.$this->getName().'.extension'))) {
-			$extension = JRequest::getCmd('extension', 'com_flexicontent');
-		}
-		// Load the User state.
-		if (!($pk = (int) $app->getUserState('com_flexicontent.edit.'.$this->getName().'.id'))) {
-			$cid = JRequest::getVar('cid', array(0));
-			$pk = (int)@$cid[0];
-		}
-		$this->setState($this->getName().'.id', $pk);
-
-
-		$this->setState('com_flexicontent.'.$this->getName().'.extension', $extension);
-		$parts = explode('.',$extension);
-		// extract the component name
-		$this->setState('com_flexicontent.'.$this->getName().'.component', $parts[0]);
-		// extract the optional section name
-		$this->setState('com_flexicontent.'.$this->getName().'.section', (count($parts)>1)?$parts[1]:null);
-
-		// Load the parameters.
-		//$params	= JComponentHelper::getParams('com_flexicontent');
-		//$this->setState('params', $params);
-	}
-	
-	/**
-	 * Method to get type attributes
-	 *
-	 * Note. Calling getState in this method will result in recursion.
-	 *
-	 * @since	1.6
-	 */
-	public function getAttribs() {
-		if($this->_type) {
-			return $this->_type->attribs;
-		}
-		return array();
+		return $this->_db->loadColumn();
 	}
 }
-?>

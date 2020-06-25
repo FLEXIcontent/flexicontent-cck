@@ -1,44 +1,84 @@
 <?php
 /**
- * @version 1.5 stable $Id: types.php 1223 2012-03-30 08:34:34Z ggppdk $
- * @package Joomla
- * @subpackage FLEXIcontent
- * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
- * @license GNU/GPL v2
- * 
- * FLEXIcontent is a derivative work of the excellent QuickFAQ component
- * @copyright (C) 2008 Christoph Lukes
- * see www.schlu.net for more information
+ * @package         FLEXIcontent
+ * @version         3.3
  *
- * FLEXIcontent is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
+ * @link            https://flexicontent.org
+ * @copyright       Copyright © 2018, FLEXIcontent team, All Rights Reserved
+ * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
-// no direct access
 defined('_JEXEC') or die('Restricted access');
 
-jimport('joomla.application.component.modellist');
+use Joomla\String\StringHelper;
+use Joomla\Utilities\ArrayHelper;
+use Joomla\CMS\Table\Table;
+
+require_once('base/baselist.php');
 
 /**
- * FLEXIcontent Component types Model
+ * FLEXIcontent Component Types Model
  *
- * @package Joomla
- * @subpackage FLEXIcontent
- * @since		1.0
  */
-class FlexicontentModelTypes extends JModelList
+class FlexicontentModelTypes extends FCModelAdminList
 {
 	/**
-	 * Type data
+	 * Record database table
 	 *
-	 * @var object
+	 * @var string
+	 */
+	var $records_dbtbl  = 'flexicontent_types';
+
+	/**
+	 * Record jtable name
+	 *
+	 * @var string
+	 */
+	var $records_jtable = 'flexicontent_types';
+
+	/**
+	 * Column names
+	 */
+	var $state_col      = 'published';
+	var $name_col       = 'name';
+	var $parent_col     = null;
+
+	/**
+	 * (Default) Behaviour Flags
+	 */
+	protected $listViaAccess = false;
+	protected $copyRelations = true;
+
+	/**
+	 * Supported Features Flags
+	 */
+	const canDelRelated = false;
+
+	/**
+	 * Search and ordering columns
+	 */
+	var $search_cols = array(
+		'FLEXI_NAME' => 'name',
+		'FLEXI_ALIAS' => 'alias',
+	);
+	var $default_order     = 'a.name';
+	var $default_order_dir = 'ASC';
+
+	/**
+	 * List filters that are always applied
+	 */
+	var $hard_filters = array();
+
+	/**
+	 * Record rows
+	 *
+	 * @var array
 	 */
 	var $_data = null;
 
 	/**
-	 * Type total
+	 * Rows total
 	 *
 	 * @var integer
 	 */
@@ -51,285 +91,237 @@ class FlexicontentModelTypes extends JModelList
 	 */
 	var $_pagination = null;
 
-	/**
-	 * Type id
-	 *
-	 * @var int
-	 */
-	var $_id = null;
 
 	/**
 	 * Constructor
 	 *
-	 * @since 1.0
+	 * @since 3.3.0
 	 */
-	function __construct()
+	public function __construct($config = array())
 	{
-		parent::__construct();
-
 		$app    = JFactory::getApplication();
-		$option = JRequest::getVar('option');
+		$jinput = $app->input;
+		$option = $jinput->getCmd('option', '');
+		$view   = $jinput->getCmd('view', '');
+		$layout = $jinput->getString('layout', 'default');
+		$fcform = $jinput->getInt('fcform', 0);
 
-		$limit      = $app->getUserStateFromRequest( $option.'.types.limit', 'limit', $app->getCfg('list_limit'), 'int');
-		$limitstart = $app->getUserStateFromRequest( $option.'.types.limitstart', 'limitstart', 0, 'int' );
+		// Make session index more specific ... (if needed by this model)
+		//$this->view_id = $view . '_' . $layout;
 
-		$this->setState('limit', $limit);
-		$this->setState('limitstart', $limitstart);
+		// Call parent after setting ... $this->view_id
+		parent::__construct($config);
+
+		$p = $this->ovid;
+
+
+		/**
+		 * View's Filters
+		 * Inherited filters : filter_state, filter_access, search
+		 */
+
+		// Manage view permission
+		$this->canManage = FlexicontentHelperPerm::getPerm()->CanTypes;
 	}
-	
-	
+
+
 	/**
-	 * Method to build the query for the types
+	 * Method to build the query for the records
 	 *
-	 * @access private
-	 * @return integer
-	 * @since 1.0
+	 * @return  JDatabaseQuery   The DB Query object
+	 *
+	 * @since   3.3.0
 	 */
-	function getListQuery()
+	protected function getListQuery()
 	{
 		// Create a query with all its clauses: WHERE, HAVING and ORDER BY, etc
-		$app  = JFactory::getApplication();
-		$db   = JFactory::getDBO();
-		$option = JRequest::getVar('option');
-		$view   = JRequest::getVar('view');
-		
-		$filter_order     = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_order', 		'filter_order',     't.name', 'cmd' );
-		$filter_order_Dir = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_order_Dir',	'filter_order_Dir', 'ASC', 'word' );
-		$filter_state     = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_state',     'filter_state',     '', 'string' );
-		$filter_access    = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_access',    'filter_access',    '', 'string' );
-		$search  = $app->getUserStateFromRequest( $option.'.'.$view.'.search', 'search', '', 'string' );
-		$search  = trim( JString::strtolower( $search ) );
-		
-		// Create a new query object.
-		$query = $db->getQuery(true);
-		// Select the required fields from the table.
-		$query->select(
-			$this->getState(
-				'list.select',
-				't.*'
-				.', u.name AS editor, level.title AS access_level'
-				.', (SELECT COUNT(*) FROM #__flexicontent_items_ext AS i WHERE i.type_id = t.id) AS iassigned '
-				.', COUNT(rel.type_id) AS fassigned, t.attribs AS config'
+		$query = parent::getListQuery()
+			->select(
+				'(SELECT COUNT(*) FROM #__flexicontent_items_ext AS i WHERE i.type_id = a.id) AS iassigned, ' .
+				'COUNT(rel.type_id) AS fassigned, a.attribs AS config'
 			)
-		);
-		
-		$query->from('#__flexicontent_types AS t');
-		$query->join('LEFT', '#__flexicontent_fields_type_relations AS rel ON t.id = rel.type_id');
-		$query->join('LEFT', '#__viewlevels AS level ON level.id=t.access');
-		$query->join('LEFT', '#__users AS u ON u.id = t.checked_out');
-		$query->group('t.id');
-		
-		// Filter by state
-		if ( $filter_state ) {
-			if ( $filter_state == 'P' ) {
-				$query->where('t.published = 1');
-			} else if ($filter_state == 'U' ) {
-				$query->where('t.published = 0');
-			}
-		}
-		
-		// Filter by access level
-		if ( $filter_access ) {
-			$query->where('t.access = '.(int) $filter_access);
-		}
-		
-		// Filter by search word
-		if (strlen($search)) {
-			$query->where('LOWER(t.name) LIKE '.$this->_db->Quote( '%'.$this->_db->escape( $search, true ).'%', false ));
-		}
-		$query->order($filter_order.' '.$filter_order_Dir);
-		//echo str_replace("#__", "jos_", $query->__toString());
+			->leftJoin('#__flexicontent_fields_type_relations AS rel ON a.id = rel.type_id')
+		;
 
 		return $query;
 	}
-	
+
+
 	/**
-	 * Method to build the having clause of the query for the files
+	 * Method to build the where clause of the query for the records
 	 *
-	 * @access private
-	 * @return string
-	 * @since 1.0
+	 * @param		JDatabaseQuery|bool   $q   DB Query object or bool to indicate returning an array or rendering the clause
+	 *
+	 * @return  JDatabaseQuery|array
+	 *
+	 * @since   3.3.0
 	 */
-	function _buildContentHaving()
+	protected function _buildContentWhere($q = false)
 	{
-		$app    = JFactory::getApplication();
-		$option = JRequest::getVar('option');
-		
-		$filter_assigned = $app->getUserStateFromRequest( $option.'.types.filter_assigned', 'filter_assigned', '', 'word' );
-		
-		$having = '';
-		
-		if ( $filter_assigned ) {
-			if ( $filter_assigned == 'O' ) {
-				$having = ' HAVING COUNT(rel.tid) = 0';
-			} else if ($filter_assigned == 'A' ) {
-				$having = ' HAVING COUNT(rel.tid) > 0';
-			}
+		// Inherited filters : filter_state, filter_access, search
+		$where = parent::_buildContentWhere(false);
+
+		if ($q instanceof \JDatabaseQuery)
+		{
+			return $where ? $q->where($where) : $q;
 		}
-		
-		return $having;
+
+		return $q
+			? ' WHERE ' . (count($where) ? implode(' AND ', $where) : ' 1 ')
+			: $where;
 	}
 
+
 	/**
-	 * Method to (un)publish a type
+	 * Method to delete records relations like record assignments
 	 *
-	 * @access	public
-	 * @return	boolean	True on success
-	 * @since	1.0
+	 * @param		array			$cid      array of record ids to delete their related data
+	 *
+	 * @return	bool      True on success
+	 *
+	 * @since		3.3.0
 	 */
-	function publish($cid = array(), $publish = 1)
+	public function delete_relations($cid)
 	{
-		$user = JFactory::getUser();
-
-		if (count( $cid ))
+		if (count($cid))
 		{
-			$cids = implode( ',', $cid );
+			$cid = ArrayHelper::toInteger($cid);
+			$cid_list = implode(',', $cid);
 
-			$query = 'UPDATE #__flexicontent_types'
-				. ' SET published = ' . (int) $publish
-				. ' WHERE id IN ('. $cids .')'
-				. ' AND ( checked_out = 0 OR ( checked_out = ' . (int) $user->get('id'). ' ) )'
+			// Delete also field - type relations
+			$query = $this->_db->getQuery(true)
+				->delete('#__flexicontent_fields_type_relations')
+				->where('type_id IN (' . $cid_list . ')')
 			;
-			$this->_db->setQuery( $query );
-			if (!$this->_db->query()) {
-				$this->setError($this->_db->getErrorMsg());
-				return false;
-			}
+			$this->_db->setQuery($query)->execute();
+
+			/**
+			 * This is incomplete as it does not delete content items,
+			 * so this should never be called if content items exist
+			 */
 		}
+
 		return true;
 	}
 
+
 	/**
-	 * Method to check if we can remove a type
-	 * return false if there are items associated
+	 * Method to copy records
 	 *
-	 * @access	public
-	 * @return	boolean	True on success
-	 * @since	1.5
+	 * @param		array			$cid          array of record ids to copy
+	 * @param		array			$copyRelations   flag to indicate copying 'related' data, like 'assignments'
+	 *
+	 * @return	array		Array of old-to new record ids of copied record IDs
+	 *
+	 * @since   3.3.0
 	 */
-	function candelete($cid = array())
+	public function copy($cid, $copyRelations = null)
 	{
-		$n		= count( $cid );
-		if (count( $cid ))
+		$copyRelations = $copyRelations === null ? $this->copyValues : $copyRelations;
+		$ids_map       = array();
+		$name          = $this->name_col;
+
+		foreach ($cid as $id)
 		{
-			for ($i = 0; $i < $n; $i++)
+			$table = $this->getTable($this->records_jtable, '');
+			$table->load($id);
+
+			$table->id    = 0;
+			$table->$name = $table->$name . ' [copy]';
+			$table->alias = JFilterOutput::stringURLSafe($table->$name);
+
+			$table->check();
+			$table->store();
+
+			// Add new record id to the old-to-new IDs map
+			$ids_map[$id] = $table->id;
+		}
+
+		// Also copy related Data, like 'assignments'
+		if ($copyRelations)
+		{
+			$this->_copyRelatedData($ids_map);
+		}
+
+		return $ids_map;
+	}
+
+
+	/**
+	 * Method to copy assignments and other related data of records
+	 *
+	 * @param   array     $ids_map     array of old to new record ids
+	 *
+	 * @return	void
+	 *
+	 * @since   3.3.0
+	 */
+	protected function _copyRelatedData($ids_map)
+	{
+		foreach ($ids_map as $id => $new_id)
+		{
+			$query = 'SELECT * FROM #__flexicontent_fields_type_relations'
+				. ' WHERE type_id = ' . (int) $id
+			;
+
+			$rels = $this->_db->setQuery($query)->loadObjectList();
+
+			foreach ($rels as $rel)
 			{
-			$query = 'SELECT COUNT( type_id )'
-			. ' FROM #__flexicontent_items_ext'
-			. ' WHERE type_id = '. (int) $cid[$i]
-			;
-			$this->_db->setQuery( $query );
-			$count = $this->_db->loadResult();
-			
-			if ($count > 0) {
-				return false;
-				}
+				$query = 'INSERT INTO #__flexicontent_fields_type_relations (`field_id`, `type_id`, `ordering`) '
+					. ' VALUES(' . (int) $rel->field_id . ',' . (int) $new_id . ',' . (int) $rel->ordering . ')'
+				;
+				$this->_db->setQuery($query)->execute();
 			}
-			return true;
 		}
 	}
 
-	/**
-	 * Method to remove a type
-	 *
-	 * @access	public
-	 * @return	boolean	True on success
-	 * @since	1.0
-	 */
-	function delete($cid = array())
-	{
-		$result = false;
 
-		if (count( $cid ))
+	/**
+	 * Method to find which records having assignments blocking a state change
+	 *
+	 * @param		array        $cid      Array of record ids to check
+	 * @param		int|string   $action   Either an ACL rule action, or a new state
+	 *
+	 * @return	array     The records having assignments
+	 *
+	 * @since   3.3.0
+	 */
+	public function filterByAssignments($cid = array(), $action = -2)
+	{
+		$cid = ArrayHelper::toInteger($cid);
+		$cid_wassocs = array();
+
+		switch ((string)$action)
 		{
-			$cids = implode( ',', $cid );
-			$query = 'DELETE FROM #__flexicontent_types'
-					. ' WHERE id IN ('. $cids .')'
-					;
-			$this->_db->setQuery( $query );
-			if(!$this->_db->query()) {
-				$this->setError($this->_db->getErrorMsg());
-				return false;
-			}
-			
-			// delete fields_type relations
-			$query = 'DELETE FROM #__flexicontent_fields_type_relations'
-					. ' WHERE type_id IN ('. $cids .')'
-					;
-			$this->_db->setQuery( $query );
-			if(!$this->_db->query()) {
-				$this->setError($this->_db->getErrorMsg());
-				return false;
-			}
+			// Delete
+			case 'core.delete':
+			// Trash (currently not allowed if item assignments exist)
+			case -2:
+				$query = 'SELECT DISTINCT type_id'
+					. ' FROM #__flexicontent_items_ext'
+					. ' WHERE type_id IN (' . implode(',', $cid) . ')'
+				;
 
+				$cid_wassocs = $this->_db->setQuery($query)->loadColumn();
+				break;
+
+			// Unpublish (=Disable)
+			case 0:
+				break;
 		}
 
-		return true;
+		return $cid_wassocs;
 	}
+
 
 	/**
-	 * Method to copy types
-	 *
-	 * @access	public
-	 * @return	boolean	True on success
-	 * @since	1.0
+	 * START OF MODEL SPECIFIC METHODS
 	 */
-	function copy($cid = array())
-	{
-		if (count( $cid ))
-		{
-			foreach ($cid as $id) {
-				$type = $this->getTable('flexicontent_types', '');
-				$type->load($id);
-				$type->id = 0;
-				$type->name = $type->name . ' [copy]';
-				$type->alias = JFilterOutput::stringURLSafe($type->name);
-				$type->check();
-				$type->store();
-				
-				$query 	= 'SELECT * FROM #__flexicontent_fields_type_relations'
-						. ' WHERE type_id = ' . (int)$id
-						;
-				$this->_db->setQuery($query);
-				$rels = $this->_db->loadObjectList();
-				
-				foreach ($rels as $rel) {
-					$query = 'INSERT INTO #__flexicontent_fields_type_relations (`field_id`, `type_id`, `ordering`) VALUES(' . (int)$rel->field_id . ',' . $type->id . ',' . (int)$rel->ordering . ')';
-					$this->_db->setQuery($query);
-					$this->_db->query();
-				}
-			}
-			return true;
-		}
-		return false;
-	}
+
 
 	/**
-	 * Method to set the access level of the Types
-	 *
-	 * @access	public
-	 * @param 	integer id of the category
-	 * @param 	integer access level
-	 * @return	boolean	True on success
-	 * @since	1.5
+	 * START OF MODEL LEGACY METHODS
 	 */
-	function saveaccess($id, $access)
-	{
-		$row = JTable::getInstance('flexicontent_types', '');
 
-		$row->load( $id );
-		$row->id = $id;
-		$row->access = $access;
-
-		if ( !$row->check() ) {
-			$this->setError($this->_db->getErrorMsg());
-			return false;
-		}
-		if ( !$row->store() ) {
-			$this->setError($this->_db->getErrorMsg());
-			return false;
-		}
-		return true;
-	}
 }
-?>

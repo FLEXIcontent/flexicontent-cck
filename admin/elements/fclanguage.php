@@ -18,13 +18,17 @@
 
 // Check to ensure this file is included in Joomla!
 defined('_JEXEC') or die('Restricted access');
-if (FLEXI_J16GE) {
-	jimport('joomla.html.html');
-	jimport('joomla.form.formfield');
-	jimport('joomla.form.helper');
-	JFormHelper::loadFieldClass('list');
-}
-require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.helper.php');
+
+// Load the helper classes
+if (!defined('DS'))  define('DS',DIRECTORY_SEPARATOR);
+require_once(JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.helper.php');
+
+jimport('cms.html.html');      // JHtml
+jimport('cms.html.select');    // JHtmlSelect
+jimport('joomla.form.field');  // JFormField
+
+//jimport('joomla.form.helper'); // JFormHelper
+//JFormHelper::loadFieldClass('...');   // JFormField...
 
 /**
  * Renders a fields element
@@ -45,61 +49,60 @@ class JFormFieldFclanguage extends JFormField
 	function getInput()
 	{
 		$doc	= JFactory::getDocument();
-		$db		= JFactory::getDBO();
+		$db		= JFactory::getDbo();
 		
 		// Get field configuration
-		if (FLEXI_J16GE) {
-			$node = & $this->element;
-			$attributes = get_object_vars($node->attributes());
-			$attributes = $attributes['@attributes'];
-		} else {
-			$attributes = & $node->_attributes;
-		}
+		$node = & $this->element;
+		$attributes = get_object_vars($node->attributes());
+		$attributes = $attributes['@attributes'];
 		
 		// Get values
-		$values			= FLEXI_J16GE ? $this->value : $value;
+		$values			= $this->value;
 		if ( empty($values) )							$values = array();
-		else if ( ! is_array($values) )		$values = !FLEXI_J16GE ? array($values) : explode("|", $values);
+		else if ( ! is_array($values) )		$values = explode("|", $values);
 		
 		// Field name and HTML tag id
-		$fieldname	= FLEXI_J16GE ? $this->name : $control_name.'['.$name.']';
-		$element_id = FLEXI_J16GE ? $this->id : $control_name.$name;
+		$fieldname	= $this->name;
+		$element_id = $this->id;
 		
 		// Create options
 		$langs = array();
 		
 		// Add 'use global' (no value option)
 		if (@$attributes['use_global']) {
-			$langs[] = JHTML::_('select.option', '', JText::_('FLEXI_USE_GLOBAL') );
+			$langs[] = JHtml::_('select.option', '', JText::_('FLEXI_USE_GLOBAL') );
 		}
 		
 		// Add 'please select' (no value option)
 		if (@$attributes['please_select']) {
-			$langs[] = JHTML::_('select.option', '', JText::_('FLEXI_PLEASE_SELECT') );
+			$langs[] = JHtml::_('select.option', '', JText::_('FLEXI_PLEASE_SELECT') );
+		}
+		
+		foreach ($node->children() as $option)
+		{
+			$val  = $option->attributes()->value;
+			$text = JText::_( FLEXI_J30GE ? $option->__toString() : $option->data() );
+			$langs[] = JHtml::_('select.option', $val, $text );
 		}
 		
 		$languages = FLEXIUtilities::getlanguageslist();
 		foreach($languages as $lang) {
-			$langs[] = JHTML::_('select.option', $lang->code, $lang->name );
+			$langs[] = JHtml::_('select.option', $lang->code, $lang->name );
 		}
 		
 		// Create HTML tag parameters
-		$attribs = ' style="float:left;" ';
+		$attribs = '';
+		$classes = 'use_select2_lib';
 		if (@$attributes['multiple']=='multiple' || @$attributes['multiple']=='true' ) {
 			$attribs .= ' multiple="multiple" ';
 			$attribs .= (@$attributes['size']) ? ' size="'.@$attributes['size'].'" ' : ' size="6" ';
-			$fieldname .= !FLEXI_J16GE ? "[]" : "";  // NOTE: this added automatically in J2.5
-			$maximize_link = "<a style='display:inline-block;".(FLEXI_J16GE ? 'float:left; margin: 6px 0px 0px 18px;':'margin:0px 0px 6px 12px')."' href='javascript:;' onclick='$element_id = document.getElementById(\"$element_id\"); if ($element_id.size<16) { ${element_id}_oldsize=$element_id.size; $element_id.size=16;} else { $element_id.size=${element_id}_oldsize; } ' >Maximize/Minimize</a>";
-		} else {
-			$attribs .= 'class="inputbox"';
-			$maximize_link = '';
 		}
 		if ($onchange = @$attributes['onchange']) {
 			$attribs .= ' onchange="'.$onchange.'"';
 		}
+		$attribs .= ' class="'.$classes.'" ';
 		
 		// Render the field's HTML
-		$html = JHTML::_('select.genericlist', $langs, $fieldname, $attribs, 'value', 'text', $values, $element_id);
-		return $html.$maximize_link;
+		return JHtml::_('select.genericlist', $langs, $fieldname, $attribs, 'value', 'text', $values, $element_id);
 	}
 }

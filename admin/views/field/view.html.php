@@ -1,92 +1,302 @@
 <?php
 /**
- * @version 1.5 stable $Id: view.html.php 1870 2014-03-13 00:22:57Z ggppdk $
- * @package Joomla
- * @subpackage FLEXIcontent
- * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
- * @license GNU/GPL v2
- * 
- * FLEXIcontent is a derivative work of the excellent QuickFAQ component
- * @copyright (C) 2008 Christoph Lukes
- * see www.schlu.net for more information
+ * @package         FLEXIcontent
+ * @version         3.3
  *
- * FLEXIcontent is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
+ * @link            https://flexicontent.org
+ * @copyright       Copyright © 2018, FLEXIcontent team, All Rights Reserved
+ * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
-defined( '_JEXEC' ) or die( 'Restricted access' );
+defined('_JEXEC') or die('Restricted access');
 
-jimport('joomla.application.component.view');
+use Joomla\String\StringHelper;
+use Joomla\Utilities\ArrayHelper;
+
+JLoader::register('FlexicontentViewBaseRecord', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/base/view_record.php');
+jimport('joomla.filesystem.file');
 
 /**
- * View class for the FLEXIcontent field screen
- *
- * @package Joomla
- * @subpackage FLEXIcontent
- * @since 1.0
+ * HTML View class for the Field screen
  */
-class FlexicontentViewField extends JViewLegacy
+class FlexicontentViewField extends FlexicontentViewBaseRecord
 {
-	function display($tpl = null)
+	var $proxy_option = null;
+
+	/**
+	 * Display the view
+	 */
+	public function display($tpl = null)
 	{
-		//initialise variables
-		$app      = JFactory::getApplication();
-		$document	= JFactory::getDocument();
-		$cparams  = JComponentHelper::getParams( 'com_flexicontent' );
-		$user     = JFactory::getUser();
-		
-		//add css to document
-		$document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/flexicontentbackend.css');
-		if      (FLEXI_J30GE) $document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/j3x.css');
-		else if (FLEXI_J16GE) $document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/j25.css');
-		else                  $document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/j15.css');
-		
+		/**
+		 * Initialize variables, flags, etc
+		 */
+
+		$app        = JFactory::getApplication();
+		$jinput     = $app->input;
+		$document   = JFactory::getDocument();
+		$user       = JFactory::getUser();
+		$db         = JFactory::getDbo();
+		$cparams    = JComponentHelper::getParams('com_flexicontent');
+		$perms      = FlexicontentHelperPerm::getPerm();
+
+		// Get url vars and some constants
+		$option     = $jinput->get('option', '', 'cmd');
+		$view       = $jinput->get('view', '', 'cmd');
+		$task       = $jinput->get('task', '', 'cmd');
+		$controller = $jinput->get('controller', '', 'cmd');
+
+		$isAdmin  = $app->isClient('administrator');
+		$isCtmpl  = $jinput->getCmd('tmpl') === 'component';
+
+		$tip_class = ' hasTooltip';
+		$manager_view = 'fields';
+		$ctrl = 'fields';
+		$js = '';
+
+
+		/**
+		 * Common view
+		 */
+
+		$this->prepare_common_fcview();
+
+
+		/**
+		 * Get record data, and check if record is already checked out
+		 */
+
+		// Get model and load the record data
+		$model = $this->getModel();
+		$row   = $this->get('Item');
+		$isnew = ! $row->id;
+
+		// Get JForm
+		$form  = $this->get('Form');
+		if (!$form)
+		{
+			$app->enqueueMessage($model->getError(), 'warning');
+			$app->redirect( 'index.php?option=com_flexicontent&view=' . $manager_view );
+		}
+
+		// Fail if an existing record is checked out by someone else
+		if ($row->id && $model->isCheckedOut($user->get('id')))
+		{
+			$app->enqueueMessage(JText::_( 'FLEXI_EDITED_BY_ANOTHER_ADMIN' ), 'warning');
+			$app->redirect( 'index.php?option=com_flexicontent&view=' . $manager_view );
+		}
+
+
+		/**
+		 * Include needed files and add needed js / css files
+		 */
+
+		// Add css to document
+		if ($isAdmin)
+		{
+			!JFactory::getLanguage()->isRtl()
+				? $document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', array('version' => FLEXI_VHASH))
+				: $document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', array('version' => FLEXI_VHASH));
+			!JFactory::getLanguage()->isRtl()
+				? $document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/j3x.css', array('version' => FLEXI_VHASH))
+				: $document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/j3x_rtl.css', array('version' => FLEXI_VHASH));
+		}
+		else
+		{
+			!JFactory::getLanguage()->isRtl()
+				? $document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontent.css', array('version' => FLEXI_VHASH))
+				: $document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontent_rtl.css', array('version' => FLEXI_VHASH));
+		}
+
 		// Add JS frameworks
 		flexicontent_html::loadFramework('select2');
-		
-		// Add js function to overload the joomla submitform validation
-		JHTML::_('behavior.formvalidation');  // load default validation JS to make sure it is overriden
-		$document->addScript(JURI::root(true).'/components/com_flexicontent/assets/js/admin.js');
-		$document->addScript(JURI::root(true).'/components/com_flexicontent/assets/js/validate.js');
-		
-		//Load pane behavior
-		jimport('joomla.html.pane');
-		//Import File system
-		jimport('joomla.filesystem.file');
+		flexicontent_html::loadFramework('touch-punch');
+		flexicontent_html::loadFramework('prettyCheckable');
+		flexicontent_html::loadFramework('flexi-lib');
+		flexicontent_html::loadFramework('flexi-lib-form');
 
-		//Get data from the model
-		$model  = $this->getModel();
-		$row    = $this->get( 'Field' );
-		if (FLEXI_J16GE) {
-			$form = $this->get('Form');
+		// Load custom behaviours: form validation, popup tooltips
+		JHtml::_('behavior.formvalidation');
+		JHtml::_('bootstrap.tooltip');
+
+		// Add js function to overload the joomla submitform validation
+		$document->addScript(JUri::root(true).'/components/com_flexicontent/assets/js/admin.js', array('version' => FLEXI_VHASH));
+		$document->addScript(JUri::root(true).'/components/com_flexicontent/assets/js/validate.js', array('version' => FLEXI_VHASH));
+
+
+		/**
+		 * Create the toolbar
+		 */
+
+		$toolbar = JToolbar::getInstance('toolbar');
+
+		// Creation flag used to decide if adding save and new / save as copy buttons are allowed
+		$cancreate = true;
+
+		// SET toolbar title
+		!$isnew
+			? JToolbarHelper::title( JText::_( 'FLEXI_EDIT_FIELD' ), 'fieldedit' )
+			: JToolbarHelper::title( JText::_( 'FLEXI_ADD_FIELD' ), 'fieldadd' );
+
+
+		/**
+		 * Apply buttons
+		 */
+
+		// Apply button
+		$btn_arr = array();
+
+		// Add ajax apply only for existing records
+		if (!$isnew)
+		{
+			$btn_name = 'apply_ajax';
+			$btn_task = $ctrl.'.apply_ajax';
+
+			$btn_arr[$btn_name] = flexicontent_html::addToolBarButton(
+				'FLEXI_APPLY', $btn_name, $full_js="Joomla.submitbutton('".$ctrl.".apply_ajax')", $msg_alert='', $msg_confirm='',
+				$btn_task, $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false, $btn_class="".$tip_class, $btn_icon="icon-loop",
+				'data-placement="bottom" title="'.JText::_('FLEXI_FAST_SAVE_INFO', true).'"', $auto_add = 0);
 		}
-		$types				= $this->get( 'Typeslist' );
-		$typesselected= $this->get( 'Typesselected' );
-		
-		//create the toolbar
-		if ( $row->id ) {
-			JToolBarHelper::title( JText::_( 'FLEXI_EDIT_FIELD' ), 'fieldedit' );
-		} else {
-			JToolBarHelper::title( JText::_( 'FLEXI_ADD_FIELD' ), 'fieldadd' );
+
+		// Apply & Reload button   ***   (Apply Type, is a special case of new that has not loaded custom fieds yet, due to type not defined on initial form load)
+		if ($isAdmin && !$isCtmpl)
+		{
+			$btn_name = 'apply';
+			$btn_task = $ctrl.'.apply';
+			$btn_title = !$isnew ? 'FLEXI_APPLY_N_RELOAD' : 'FLEXI_ADD';
+
+			//JToolbarHelper::apply($btn_task, $btn_title, false);
+
+			$btn_arr[$btn_name] = flexicontent_html::addToolBarButton(
+				$btn_title, $btn_name, $full_js="Joomla.submitbutton('".$btn_task."')", $msg_alert='', $msg_confirm='',
+				$btn_task, $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false, $btn_class="".$tip_class, $btn_icon="icon-save",
+				'data-placement="right" title=""', $auto_add = 0);
 		}
+
+		flexicontent_html::addToolBarDropMenu($btn_arr, 'apply_btns_group');
+
+
+		/**
+		 * Save buttons
+		 */
+
+		$btn_arr = array();
+
+		$btn_name = 'save';
+		$btn_task = $ctrl.'.save';
+
+		//JToolbarHelper::save($btn_task);  //JToolbarHelper::custom( $btn_task, 'save.png', 'save.png', 'JSAVE', false );
+
+		$btn_arr[$btn_name] = flexicontent_html::addToolBarButton(
+			'JSAVE', $btn_name, $full_js="Joomla.submitbutton('".$ctrl.".save')", $msg_alert='', $msg_confirm='',
+			$btn_task, $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false, $btn_class="".$tip_class, $btn_icon="icon-save",
+			'data-placement="bottom" title=""', $auto_add = 0);
+
+
+		// Add a save and new button, if user can create new records
+		if (!$isCtmpl && $cancreate)
+		{
+			$btn_name = 'save2new';
+			$btn_task = $ctrl.'.save2new';
+
+			//JToolbarHelper::save2new($btn_task);  //JToolbarHelper::custom( $btn_task, 'savenew.png', 'savenew.png', 'FLEXI_SAVE_AND_NEW', false );
+
+			$btn_arr[$btn_name] = flexicontent_html::addToolBarButton(
+				'FLEXI_SAVE_AND_NEW', $btn_name, $full_js="Joomla.submitbutton('".$ctrl.".save2new')", $msg_alert='', $msg_confirm='',
+				$btn_task, $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false, $btn_class="".$tip_class, $btn_icon="icon-save-new",
+				'data-placement="right" title="'.JText::_('FLEXI_SAVE_AND_NEW_INFO', true).'"', $auto_add = 0);
+
+			// Also if an existing item, can save to a copy
+			if (!$isnew && !$row->iscore)
+			{
+				$btn_name = 'save2copy';
+				$btn_task = $ctrl.'.save2copy';
+
+				//JToolbarHelper::save2copy($btn_task);  //JToolbarHelper::custom( $btn_task, 'save2copy.png', 'save2copy.png', 'FLEXI_SAVE_AS_COPY', false );
+
+				$btn_arr[$btn_name] = flexicontent_html::addToolBarButton(
+					'FLEXI_SAVE_AS_COPY', $btn_name, $full_js="Joomla.submitbutton('".$ctrl.".save2copy')", $msg_alert='', $msg_confirm='',
+					$btn_task, $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false, $btn_class="".$tip_class, $btn_icon="icon-save-copy",
+					'data-placement="right" title="'.JText::_('FLEXI_SAVE_AS_COPY_INFO', true).'"', $auto_add = 0);
+			}
+		}
+
+		flexicontent_html::addToolBarDropMenu($btn_arr, 'save_btns_group');
+
+
+		// Cancel button, TODO frontend modal close
+		if ($isAdmin && !$isCtmpl)
+		{
+			$isnew
+				? JToolbarHelper::cancel($ctrl.'.cancel', $isAdmin ? 'JTOOLBAR_CANCEL' : 'FLEXI_CANCEL')
+				: JToolbarHelper::cancel($ctrl.'.cancel', $isAdmin ? 'JTOOLBAR_CLOSE' : 'FLEXI_CLOSE_FORM');
+		}
+
+
+		if (!empty($model->helpURL))
+		{
+			$onclick_js = empty($_SERVER['HTTPS']) && $model->helpModal
+				? 'var url = jQuery(this).attr(\'data-href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 0, 0, false, {\'title\': \''.flexicontent_html::encodeHTML(JText::_($model->helpTitle), 2).'\'}); return false;'
+				: 'var url = jQuery(this).attr(\'data-href\'); window.open(url); return false;';
+			$js .= "
+				jQuery('#toolbar-help a.toolbar, #toolbar-help button').attr('data-href', '".$model->helpURL."').attr('onclick', \"".$onclick_js."\");
+			";
+			JToolbarHelper::custom( $btn_task='', 'help.png', 'help_f2.png', $model->helpTitle, false );
+		}
+
+
+		/**
+		 * Display appropriate messages: import and check current field
+		 */
 		
-		$ctrl = FLEXI_J16GE ? 'fields.' : '';
-		JToolBarHelper::apply( $ctrl.'apply' );
-		JToolBarHelper::save( $ctrl.'save' );
-		JToolBarHelper::custom( $ctrl.'saveandnew', 'savenew.png', 'savenew.png', 'FLEXI_SAVE_AND_NEW', false );
-		JToolBarHelper::cancel( $ctrl.'cancel' );
-		
-		// Import Joomla plugin that implements the type of current flexi field
+		// Import Joomla plugin that implements the type of current field
+		$extfolder = 'flexicontent_fields';
+		$extname = $row->iscore ? 'core' : $row->field_type;
 		JPluginHelper::importPlugin('flexicontent_fields', ($row->iscore ? 'core' : $row->field_type) );
-		
-		// load plugin's english language file then override with current language file
+
+		// Create class name of the plugin and then create a plugin instance
+		$classname = 'plg'. ucfirst($extfolder).$extname;
+
+		// Check max allowed version
+		if ( property_exists ($classname, 'prior_to_version') )
+		{
+			// Set a system message with warning of failed PHP limits
+			$prior_to_version = $app->getUserStateFromRequest( $option.'.flexicontent.prior_to_version_'.$row->field_type,	'prior_to_version_'.$row->field_type,	0, 'int' );
+			$app->setUserState( $option.'.flexicontent.prior_to_version_'.$row->field_type, $prior_to_version+1 );
+			if ($prior_to_version < 2)
+			{
+				$close_btn = FLEXI_J30GE ? '<a class="close" data-dismiss="alert">&#215;</a>' : '<a class="fc-close" onclick="this.parentNode.parentNode.removeChild(this.parentNode);">&#215;</a>';
+				
+				$manifest_path = JPATH_ADMINISTRATOR .DS. 'components' .DS. 'com_flexicontent' .DS. 'flexicontent.xml';
+				$com_xml = JInstaller::parseXMLInstallFile( $manifest_path );
+				$ver_exceeded = version_compare( str_replace(' ', '.', $com_xml['version']), str_replace(' ', '.', $classname::$prior_to_version), '>=');
+				echo $ver_exceeded ? '
+					<span class="fc-note fc-mssg-inline">
+						'.$close_btn.'
+						Warning: installed version of Field: \'<b>'.$extname.'</b>\' was given to be free for FLEXIcontent versions prior to: v'.$classname::$prior_to_version.' <br/> It may or may not work properly in later versions
+					</span>' : '
+					<span class="fc-info fc-mssg-inline">
+						'.$close_btn.'
+						Note: installed version of Field: \'<b>'.$extname.'</b>\' is given free for FLEXIcontent versions prior to: v'.$classname::$prior_to_version.', &nbsp; &nbsp; nevertheless it will continue to function after FLEXIcontent is upgraded.
+					</span>';
+			}
+		}
+
+
+
+		// Because 'site-default' language file may not have all needed language strings, or it may be syntactically broken
+		// we load the ENGLISH language file (without forcing it, to avoid overwritting site-default), and then current language file
 		$extension_name = 'plg_flexicontent_fields_'. ($row->iscore ? 'core' : $row->field_type);
-		JFactory::getLanguage()->load($extension_name, JPATH_ADMINISTRATOR, 'en-GB', true);
-		JFactory::getLanguage()->load($extension_name, JPATH_ADMINISTRATOR, null, true);
-		
-		//check which properties are supported by current field
+		JFactory::getLanguage()->load($extension_name, JPATH_ADMINISTRATOR, 'en-GB', $force_reload = false, $load_default = true);  // force_reload OFF
+		JFactory::getLanguage()->load($extension_name, JPATH_ADMINISTRATOR, null, $force_reload = true, $load_default = true);
+
+
+
+		/**
+		 * Check which properties are supported by current field
+		 */
+
 		$ft_support = FlexicontentFields::getPropertySupport($row->field_type, $row->iscore);
 		
 		$supportsearch          = $ft_support->supportsearch;
@@ -97,154 +307,137 @@ class FlexicontentViewField extends JViewLegacy
 		$supportvalueseditable  = $ft_support->supportvalueseditable;
 		$supportformhidden      = $ft_support->supportformhidden;
 		$supportedithelp        = $ft_support->supportedithelp;
-		
-		
-		//build selectlists, (for J1.6+ most of these are defined via XML file and custom form field classes)
-		$lists = array();
-		
-		//build field_type list
-		if (!$row->field_type) $row->field_type = 'text';
-		if ($row->iscore == 1) { $class = 'disabled="disabled"'; } else {
-			$class = '';
-			$_field_id = '#'.(FLEXI_J16GE ? 'jform_' : ''). 'field_type';
-			$_row_id = FLEXI_J16GE ? $form->getValue("id") : $row->id;
-			$_ctrl_task = FLEXI_J16GE ? 'task=fields.getfieldspecificproperties' : 'controller=fields&task=getfieldspecificproperties';
-			$document->addScriptDeclaration("
-				jQuery(document).ready(function() {
-					jQuery('".$_field_id."').on('change', function() {
-						jQuery('#fieldspecificproperties').html('<p class=\"centerimg\"><img src=\"components/com_flexicontent/assets/images/ajax-loader.gif\" align=\"center\"></p>');
-						jQuery.ajax({
-							type: \"GET\",
-							url: 'index.php?option=com_flexicontent&".$_ctrl_task."&cid=".$_row_id."&field_type='+this.value+'&format=raw',
-							success: function(str) {
-								jQuery('#fieldspecificproperties').html(str);
-								".( FLEXI_J30GE ? "
-									jQuery('.hasTooltip').tooltip({'html': true,'container': jQuery('#fieldspecificproperties')});
-								" : "
-								var tipped_elements = jQuery('#fieldspecificproperties .hasTip');
-								tipped_elements.each(function() {
-									var title = this.get('title');
-									if (title) {
-										var parts = title.split('::', 2);
-										this.store('tip:title', parts[0]);
-										this.store('tip:text', parts[1]);
-									}
-								});
-								var ajax_JTooltips = new Tips($('fieldspecificproperties').getElements('.hasTip'), { maxTitleChars: 50, fixed: false});
-								")."
-								tabberAutomatic(tabberOptions, 'fieldspecificproperties');
-								jQuery('#field_typename').html(jQuery('".$_field_id."').val());
-							}
-						});
+
+
+
+		// Check access level exists
+		$level_name = flexicontent_html::userlevel(null, $row->access, null, null, null, $_createlist = false);
+		if (empty($level_name))
+		{
+			JFactory::getApplication()->enqueueMessage(JText::sprintf('FLEXI_ABOUT_INVALID_ACCESS_LEVEL_PLEASE_SAVE_NEW', $row->access, 'Public'), 'warning');
+			$document->addScriptDeclaration("jQuery(document).ready(function() { jQuery('#jform_access').val(1).trigger('change'); });");
+		}
+
+
+		/**
+		 * Add JS for AJAX reloading field parameters after field type change
+		 */
+	
+		if (!$row->iscore)
+		{
+			$_field_id = 'jform_field_type';
+			$_row_id = $form->getValue("id");
+			$_ctrl_task = 'task=fields.getfieldspecificproperties';
+			$js .= "
+				jQuery('#".$_field_id."').on('change', function() {
+					jQuery('#fieldspecificproperties').html('<p class=\"centerimg\"><img src=\"components/com_flexicontent/assets/images/ajax-loader.gif\" style=\"vertical-align: middle;\"></p>');
+					jQuery.ajax({
+						type: \"GET\",
+						url: 'index.php?option=com_flexicontent&".$_ctrl_task."&cid=".$_row_id."&field_type='+this.value+'&format=raw',
+						success: function(str) {
+							jQuery('#fieldspecificproperties').html(str);
+							jQuery('#fieldspecificproperties').find('.hasTooltip').tooltip({html: true, container: jQuery('#fieldspecificproperties')});
+							jQuery('#fieldspecificproperties').find('.hasPopover').popover({html: true, container: jQuery('#fieldspecificproperties'), trigger : 'hover focus'});
+
+							tabberAutomatic(tabberOptions, 'fieldspecificproperties');
+							fc_bindFormDependencies('#fieldspecificproperties', 0, '');
+							fc_bootstrapAttach('#fieldspecificproperties');
+							if (typeof(fcrecord_attach_sortable) == 'function') fcrecord_attach_sortable('#fieldspecificproperties');
+							if (typeof(fcfield_attach_sortable) == 'function')  fcfield_attach_sortable('#fieldspecificproperties');
+							jQuery('#field_typename').html(jQuery('#".$_field_id."').val());
+						}
 					});
 				});
-			");
+			";
 		}
 		
-		//build field select list
-		$lists['field_type'] = flexicontent_html::buildfieldtypeslist('field_type', $class, $row->field_type, $group=true, ' class="use_select2_lib fc_skip_highlight" ');
-		
-		//build type select list
+		// Core field
+		else
+		{
+			// Set name property as readonly
+			// ... done by model's preprocessForm() method
+			//$form->setFieldAttribute('name', 'readonly', 'true');
+		}
+
+
+
+		// ***
+		// *** Build selectlists, (some of these are defined via XML file, but some are not, possibly we may add more re-usable form elements later)
+		// ***
+		$lists = array();
+
+		// Build field_type select list
+		$fieldTypes = flexicontent_db::getFieldTypes($_grouped=true, $_usage=false, $_published=true);
+		$fftypes = array();
+		$n = 0;
+		foreach ($fieldTypes as $field_group => $ft_types)
+		{
+			$fftypes[$field_group] = array();
+			$fftypes[$field_group]['id'] = 'field_group_' . ($n++);
+			$fftypes[$field_group]['text'] = $field_group;
+			$fftypes[$field_group]['items'] = array();
+			foreach ($ft_types as $field_type => $ftdata)
+			{
+				$fftypes[$field_group]['items'][] = array('value' => $ftdata->field_type, 'text' => $ftdata->friendly);
+			}
+		}
+		$_attribs = ' class="use_select2_lib" ' . ($row->iscore ? ' disabled="disabled" ' : '');
+		$lists['field_type'] = flexicontent_html::buildfieldtypeslist($fftypes, 'jform[field_type]', $row->field_type, ($_grouped ? 1 : 0), $_attribs);
+
+		// Build (content) type select list
+		$types = $this->get('Typeslist');
+		$typesselected = $this->get('FieldType');
 		$attribs  = 'class="use_select2_lib" multiple="multiple" size="6"';
-		$attribs .= $row->iscore ? ' disabled="disabled"' : '';
-		$types_fieldname = FLEXI_J16GE ? 'jform[tid][]' : 'tid[]';
+		$attribs .= $row->iscore && !in_array($row->field_type, array('voting', 'favourites'), true)
+			? ' disabled="disabled"'
+			: '';
+		$types_fieldname = 'jform[tid][]';
 		$lists['tid'] = flexicontent_html::buildtypesselect($types, $types_fieldname, $typesselected, false, $attribs);
-		
-		// **************************************************************************
-		// Create fields for J1.5 (J2.5+ uses JForm XML file for most of form fields)
-		// **************************************************************************
-		if (!FLEXI_J16GE)
-		{
-			//build formhidden selector
-			$formhidden[] = JHTML::_('select.option',  0, JText::_( 'FLEXI_NO' ) );
-			$formhidden[] = JHTML::_('select.option',  1, JText::_( 'FLEXI_FRONTEND' ) );
-			$formhidden[] = JHTML::_('select.option',  2, JText::_( 'FLEXI_BACKEND' ) );
-			$formhidden[] = JHTML::_('select.option',  3, JText::_( 'FLEXI_BOTH' ) );
-			$formhidden_fieldname = FLEXI_J16GE ? 'jform[formhidden]' : 'formhidden';
-			$lists['formhidden'] = JHTML::_('select.radiolist',   $formhidden, $formhidden_fieldname, '', 'value', 'text', $row->formhidden );
-		
-			if (FLEXI_ACCESS) {
-				$valueseditable[] = JHTML::_('select.option',  0, JText::_( 'FLEXI_ANY_EDITOR' ) );
-				$valueseditable[] = JHTML::_('select.option',  1, JText::_( 'FLEXI_USE_ACL_PERMISSION' ) );
-				$valueseditable_fieldname = FLEXI_J16GE ? 'jform[valueseditable]' : 'valueseditable';
-				$lists['valueseditable'] = JHTML::_('select.radiolist',   $valueseditable, $valueseditable_fieldname, '', 'value', 'text', $row->valueseditable );
-			}
-		
-			$edithelp[] = JHTML::_('select.option',  0, JText::_( 'FLEXI_EDIT_HELP_NONE' ) );
-			$edithelp[] = JHTML::_('select.option',  1, JText::_( 'FLEXI_EDIT_HELP_LABEL_TOOLTIP' ) );
-			$edithelp[] = JHTML::_('select.option',  2, JText::_( 'FLEXI_EDIT_HELP_LABEL_TOOLTIP_WICON' ) );
-			$edithelp[] = JHTML::_('select.option',  3, JText::_( 'FLEXI_EDIT_HELP_INLINE' ) );
-			$edithelp_fieldname = FLEXI_J16GE ? 'jform[edithelp]' : 'edithelp';
-			$lists['edithelp'] = JHTML::_('select.radiolist', $edithelp, $edithelp_fieldname, '', 'value', 'text', $row->edithelp );
 
-			// build the html select list for ordering
-			$query = 'SELECT ordering AS value, label AS text'
-				.' FROM #__flexicontent_fields'
-				.' WHERE published >= 0'
-				.' ORDER BY ordering'
-				;
-			$row->ordering = @$row->ordering;
-			$lists['ordering'] = $row->id ?
-				JHTML::_('list.specificordering',  $row, $row->id, $query ) :
-				JHTML::_('list.specificordering',  $row, '', $query ) ;
-			
-			//build access level list
-			if (FLEXI_ACCESS) {
-				$lang = JFactory::getLanguage();
-				$lang->_strings['FLEXIACCESS_PADD'] = 'Edit-Value';
-				$lists['access']	= FAccess::TabGmaccess( $row, 'field', 1, 1, 0, 1, 0, 1, 0, 1, 1 );
-			} else {
-				$lists['access'] 	= JHTML::_('list.accesslevel', $row );
-			}
-		}
-		
-		
-		if (!FLEXI_J16GE)
-		{
-			// Create the parameter 's form object parsing the file XML
-			$pluginpath = JPATH_PLUGINS.DS.'flexicontent_fields'.DS.$row->field_type.'.xml';
-			if (JFile::exists( $pluginpath )) {
-				$form = new JParameter('', $pluginpath);
-			} else {
-				$form = new JParameter('', JPATH_PLUGINS.DS.'flexicontent_fields'.DS.'core.xml');
-			}
-			// Special and Core Groups
-			$form->loadINI($row->attribs);
-		}
-		
 
-		// fail if checked out not by 'me'
-		if ($row->id) {
-			if ($model->isCheckedOut( $user->get('id') )) {
-				JError::raiseWarning( 'SOME_ERROR_CODE', $row->name.' '.JText::_( 'FLEXI_EDITED_BY_ANOTHER_ADMIN' ));
-				$app->redirect( 'index.php?option=com_flexicontent&view=fields' );
-			}
+		/**
+		 * Add inline js to head
+		 */
+
+		if ($js)
+		{
+			$document->addScriptDeclaration('jQuery(document).ready(function(){'
+				.$js.
+			'});');
 		}
-		
-		//clean data
-		JFilterOutput::objectHTMLSafe( $row, ENT_QUOTES );
-		
-		// assign permissions for J2.5
-		if (FLEXI_J16GE) {
-			$permission = FlexicontentHelperPerm::getPerm();
-			$this->assignRef('permission' , $permission);
-		}
-		//assign data to template
-		$this->assignRef('document'   , $document);
-		$this->assignRef('row'        , $row);
-		$this->assignRef('lists'      , $lists);
-		$this->assignRef('form'       , $form);
-		$this->assignRef('typesselected'	, $typesselected);
-		$this->assignRef('supportsearch'           , $supportsearch);
-		$this->assignRef('supportadvsearch'        , $supportadvsearch);
-		$this->assignRef('supportfilter'           , $supportfilter);
-		$this->assignRef('supportadvfilter'        , $supportadvfilter);
-		$this->assignRef('supportuntranslatable'   , $supportuntranslatable);
-		$this->assignRef('supportvalueseditable'   , $supportvalueseditable);
-		$this->assignRef('supportformhidden'       , $supportformhidden);
-		$this->assignRef('supportedithelp'         , $supportedithelp);
-		
+
+
+		/**
+		 * Encode (UTF-8 charset) HTML entities form data so that they can be set as form field values
+		 * NOTE: we will use JForm to output fields so this is redundant
+		 */
+
+		//JFilterOutput::objectHTMLSafe( $row, ENT_QUOTES, $exclude_keys = '' );
+
+
+		/**
+		 * Assign variables to view
+		 */
+
+		$this->document = $document;
+		$this->row      = $row;
+		$this->form     = $form;
+		$this->lists    = $lists;
+		$this->perms    = $perms;
+		$this->cparams  = $cparams;
+		$this->view     = $view;
+		$this->controller = $controller;
+
+		$this->typesselected            = $typesselected;
+		$this->supportsearch            = $supportsearch;
+		$this->supportadvsearch         = $supportadvsearch;
+		$this->supportfilter            = $supportfilter;
+		$this->supportadvfilter         = $supportadvfilter;
+		$this->supportuntranslatable    = $supportuntranslatable;
+		$this->supportvalueseditable    = $supportvalueseditable;
+		$this->supportformhidden        = $supportformhidden;
+		$this->supportedithelp          = $supportedithelp;
+
 		parent::display($tpl);
 	}
 }
-?>

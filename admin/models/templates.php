@@ -1,50 +1,39 @@
 <?php
 /**
- * @version 1.5 stable $Id: templates.php 1031 2011-12-07 21:57:29Z ggppdk $
- * @package Joomla
- * @subpackage FLEXIcontent
- * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
- * @license GNU/GPL v2
- * 
- * FLEXIcontent is a derivative work of the excellent QuickFAQ component
- * @copyright (C) 2008 Christoph Lukes
- * see www.schlu.net for more information
+ * @package         FLEXIcontent
+ * @version         3.3
  *
- * FLEXIcontent is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
+ * @link            https://flexicontent.org
+ * @copyright       Copyright © 2018, FLEXIcontent team, All Rights Reserved
+ * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
-// no direct access
 defined('_JEXEC') or die('Restricted access');
 
-jimport('joomla.application.component.model');
+jimport('legacy.model.legacy');
 
 /**
  * FLEXIcontent Component Templates Model
  *
- * @package Joomla
- * @subpackage FLEXIcontent
- * @since		1.0
  */
 class FlexicontentModelTemplates extends JModelLegacy
 {
 	/**
-	 * Tag data
+	 * Record rows
 	 *
-	 * @var object
+	 * @var array
 	 */
 	var $_data = null;
 
 	/**
 	 * Constructor
 	 *
-	 * @since 1.0
+	 * @since 3.3.0
 	 */
-	function __construct()
+	public function __construct($config = array())
 	{
-		parent::__construct();
+		parent::__construct($config);
 	}
 
 	/**
@@ -64,7 +53,7 @@ class FlexicontentModelTemplates extends JModelLegacy
 		return $this->_data;
 	}
 
-	
+
 	/**
 	 * Method to get the template list and their properties
 	 *
@@ -74,21 +63,22 @@ class FlexicontentModelTemplates extends JModelLegacy
 	 */
 	function _getTemplates()
 	{
-		$folders 	= flexicontent_tmpl::getThemes();
-		$tmpl		= flexicontent_tmpl::getTemplates();
+		$folders = flexicontent_tmpl::getThemes();
+		$tmpls   = flexicontent_tmpl::getTemplates();
 
 		$themes = array();
 
 		foreach ($folders as $folder) {
 			$themes[$folder] = new stdClass();
-			$themes[$folder]->name 		= $folder;
-			$themes[$folder]->items 	= isset($tmpl->items->{$folder}) ? $tmpl->items->{$folder} : '';
-			$themes[$folder]->category 	= isset($tmpl->category->{$folder}) ? $tmpl->category->{$folder} : '';
+			$themes[$folder]->name  = $folder;
+			$themes[$folder]->items    = isset($tmpls->items->{$folder})    ? $tmpls->items->{$folder}    : '';
+			$themes[$folder]->category = isset($tmpls->category->{$folder}) ? $tmpls->category->{$folder} : '';
 		}
-		
+
 		return $themes;
 	}
-	
+
+
 	/**
 	 * Method to duplicate a template folder
 	 *
@@ -100,15 +90,16 @@ class FlexicontentModelTemplates extends JModelLegacy
 	{
 		jimport('joomla.filesystem.folder');
 
-		$path 	= JPATH_COMPONENT_SITE . DS . 'templates' . DS;
+		$path 	= JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'templates'.DS;
 		$dest	= $dest ? flexicontent_upload::sanitizedir($path, $dest) : '';
-		
+
 		if (!$source || !$dest) return false;
-		
+
 		if (!JFolder::copy($source, $dest, $path)) return false;
-		
+
 		return true;
 	}
+
 
 	/**
 	 * Method to remove a template folder
@@ -121,20 +112,19 @@ class FlexicontentModelTemplates extends JModelLegacy
 	{
 		jimport('joomla.filesystem.folder');
 
-		$path 	= JPATH_COMPONENT_SITE . DS . 'templates' . DS;
-		
-		if (!$dir || ($dir == 'blog') || ($dir == 'default') || ($dir == 'faq') || ($dir == 'presentation')) return false;		
+		$path 	= JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'templates'.DS;
+
+		if (!$dir || ($dir === 'blog') || ($dir === 'default') || ($dir === 'faq') || ($dir === 'presentation')) return false;
 		if (!JFolder::delete($path.$dir)) return false;
-		
+
 		// delete old record
 		$query 	= 'DELETE FROM #__flexicontent_templates'
 				. ' WHERE template = ' . $this->_db->Quote($dir)
 				;
 		$this->_db->setQuery($query);
-		$this->_db->query();
-		
+		$this->_db->execute();
+
 		return true;
 	}
 
 }
-?>

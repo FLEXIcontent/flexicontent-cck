@@ -18,10 +18,10 @@
 
 defined('_JEXEC') or die('Restricted access');
 ?>
-<script type="text/javascript">
+<script>
 window.addEvent('domready', function(){
 	$('adminForm').addEvent('submit', function(e) {
-		$('log-bind').set('html','<p class="centerimg"><img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center"></p>');
+		$('log-bind').set('html','<p class="centerimg"><img src="components/com_flexicontent/assets/images/ajax-loader.gif" style="vertical-align: middle;"><\/p>');
 		e = new Event(e).stop();
 
 		new Request.HTML({
@@ -38,11 +38,10 @@ window.addEvent('domready', function(){
 <form action="index.php?option=com_flexicontent&task=categories.params&layout=params&format=raw" method="post" name="adminForm" id="adminForm">
 
 	<fieldset>
-		<legend><?php echo JText::_( 'FLEXI_COPY_PARAMETERS_SOURCE' ).':'; ?></legend>
+		<span class="label"><?php echo JText::_( 'FLEXI_COPY_PARAMETERS_SOURCE' ).':'; ?></span>
 		<?php echo $this->lists['copyid']; ?>
-	</fieldset>
-	<fieldset>
-		<legend><?php echo JText::_( 'FLEXI_COPY_PARAMETERS_DEST' ).':'; ?></legend>
+		<br/>
+		<span class="label"><?php echo JText::_( 'FLEXI_COPY_PARAMETERS_DEST' ).':'; ?></span>
 		<?php echo $this->lists['destid']; ?>
 	</fieldset>
 	<table width="100%" align="center">
@@ -57,7 +56,7 @@ window.addEvent('domready', function(){
 	</table>
 	<div id="log-bind"></div>
 
-<?php echo JHTML::_( 'form.token' ); ?>
+<?php echo JHtml::_( 'form.token' ); ?>
 <input type="hidden" name="option" value="com_flexicontent" />
 <input type="hidden" name="task" value="categories.params" />
 <input type="hidden" name="layout" value="categories.params" />
@@ -66,5 +65,5 @@ window.addEvent('domready', function(){
 
 <?php
 //keep session alive while editing
-JHTML::_('behavior.keepalive');
+JHtml::_('behavior.keepalive');
 ?>

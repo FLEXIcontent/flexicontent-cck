@@ -16,6 +16,7 @@ local.properties
 .settings/
 .loadpath
 
+
 # External tool builders
 .externalToolBuilders/
 
@@ -44,6 +45,41 @@ Desktop.ini
 # Mac crap
 .DS_Store
 
-#cache
+# cache
 cache
-com_flexicontent_v2.x/com_flexicontent_v2.x.zip
+
+# other
+flexicontent-cck.zip
+site/templates/blog-1/
+site/templates/default-1/
+site/templates/faq-1/
+site/templates/items-tabbed-1/
+site/templates/presentation-1/
+
+site/librairies/pdfparser/
+site/librairies/php-stemmer/
+site/librairies/TCPDF/
+site/librairies/cropper/
+
+site/librairies/phpthumb/phpThumb.config_OVERRIDE.php
+site/tasks/defines.php
+admin/tasks/defines.php
+admin/flexicontent.xml
+
+plugins/flexicontent_fields/currency/
+plugins/flexicontent_fields/mediaplayer/
+plugins/flexicontent_fields/qrcode/
+plugins/flexicontent_fields/grade/
+
+/nbproject/private/
+*.pdf
+
+admin/controllers/mediadatas.php
+admin/controllers/mediadatas.raw.php
+admin/helpers/html/fcmediadatas.php
+admin/models/mediadata.php
+admin/models/mediadatas.php
+admin/tables/flexicontent_mediadatas.php
+admin/views/mediadata/
+admin/views/mediadatas/
+plugins/flexicontent_fields/mediafile/

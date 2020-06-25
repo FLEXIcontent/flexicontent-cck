@@ -1,58 +1,62 @@
 <?php
 /**
- * HTML5 Template
- * @version 1.5 stable $Id: category_items_html5.php 0001 2012-09-23 14:00:28Z Rehne $
- * @package Joomla
- * @subpackage FLEXIcontent
- * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
+ * @package FLEXIcontent
+ * @copyright (C) 2009-2018 Emmanuel Danan, Georgios Papadakis, Yannick Berges
+ * @author Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
  * @license GNU/GPL v2
- * 
- * FLEXIcontent is a derivative work of the excellent QuickFAQ component
- * @copyright (C) 2008 Christoph Lukes
- * see www.schlu.net for more information
- *
- * FLEXIcontent is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
  */
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
+
+use Joomla\String\StringHelper;
+
 // first define the template name
 $tmpl = $this->tmpl;
 $user = JFactory::getUser();
 
-JFactory::getDocument()->addScript( JURI::base(true).'/components/com_flexicontent/assets/js/tabber-minimized.js');
-JFactory::getDocument()->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/tabber.css');
-?>
+JFactory::getDocument()->addScript(JUri::base(true).'/components/com_flexicontent/assets/js/tabber-minimized.js', array('version' => FLEXI_VHASH));
+JFactory::getDocument()->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/tabber.css', array('version' => FLEXI_VHASH));
+JFactory::getDocument()->addScriptDeclaration(' document.write(\'<style type="text/css">.fctabber{display:none;}<\/style>\'); ');  // temporarily hide the tabbers until javascript runs
 
-<?php
-	ob_start();
-	
-	// Form for (a) Text search, Field Filters, Alpha-Index, Items Total Statistics, Selectors(e.g. per page, orderby)
-	// If customizing via CSS rules or JS scripts is not enough, then please copy the following file here to customize the HTML too
-	include(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'tmpl_common'.DS.'listings_filter_form_html5.php');
-	
-	$filter_form_html = trim(ob_get_contents());
-	ob_end_clean();
-	if ( $filter_form_html ) {
-		echo '<aside class="group">'."\n".$filter_form_html."\n".'</aside>';
-	}
-?>
+// MICRODATA 'itemtype' for ALL items in the listing (this is the fallback if the 'itemtype' in content type / item configuration are not set)
+$microdata_itemtype_cat = $this->params->get( 'microdata_itemtype_cat', 'Article' );
 
-<div class="fcclear"></div>
 
-<?php
-if (!$this->items) {
+// Form for (a) Text search, Field Filters, Alpha-Index, Items Total Statistics, Selectors(e.g. per page, orderby)
+// If customizing via CSS rules or JS scripts is not enough, then please copy the following file here to customize the HTML too
+
+ob_start();
+include(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'tmpl_common'.DS.'listings_filter_form_html5.php');
+$filter_form_html = trim(ob_get_contents());
+ob_end_clean();
+
+if ( $filter_form_html )
+{
+	echo '
+	<div class="fcclear"></div>
+	<aside class="group">
+		' . $filter_form_html . '
+	</aside>';
+}
+
+// -- Check matching items found
+if (!$this->items)
+{
 	// No items exist
-	if ($this->getModel()->getState('limit')) {
+	if ($this->getModel()->getState('limit'))
+	{
 		// Not creating a category view without items
-		echo '<div class="noitems group">' . JText::_( 'FLEXI_NO_ITEMS_FOUND' ) . '</div>';
+		echo '
+		<div class="fcclear"></div>
+		<div class="noitems group">
+			' . JText::_( 'FLEXI_NO_ITEMS_FOUND' ) . '
+		</div>';
 	}
 	return;
 }
 
 $items = & $this->items;
+$count = count($items);
 
 $tooltip_class = FLEXI_J30GE ? 'hasTooltip' : 'hasTip';
 $_comments_container_params = 'class="fc_comments_count '.$tooltip_class.'" title="'.flexicontent_html::getToolTip('FLEXI_NUM_OF_COMMENTS', 'FLEXI_NUM_OF_COMMENTS_TIP', 1, 1).'"';
@@ -90,11 +94,16 @@ foreach ($items as $i => $item) :
 		}
 	}
 	$markup_tags .= '</span>';
+	
+	// MICRODATA document type (itemtype) for each item
+	// -- NOTE: category's microdata itemtype is fallback if the microdata itemtype of the CONTENT TYPE / ITEM are not set
+	$microdata_itemtype = $item->params->get( 'microdata_itemtype') ? $item->params->get( 'microdata_itemtype') : $microdata_itemtype_cat;
+	$microdata_itemtype_code = 'itemscope itemtype="http://schema.org/'.$microdata_itemtype.'"';
 ?>
 
 <!-- tab start -->
-<?php echo '<'.$mainAreaTag; ?> id="tablist_item_<?php echo $i; ?>" class="<?php echo $fc_item_classes; ?> group">
-	<h3 class="tabberheading"><?php echo mb_substr ($item->title, 0, 20, 'utf-8'); ?></h3><!-- tab title -->
+<?php echo '<'.$mainAreaTag; ?> id="tablist_item_<?php echo $i; ?>" class="<?php echo $fc_item_classes; ?> group" <?php echo $microdata_itemtype_code; ?>>
+	<h3 class="tabberheading"><?php echo StringHelper::substr($item->title, 0, 20); ?></h3><!-- tab title -->
 	
 	<?php echo ( ($mainAreaTag == 'section') ? '<header>' : ''); ?>
 	
@@ -107,25 +116,26 @@ foreach ($items as $i => $item) :
 	<?php endif; ?>
 	
 	<?php
-	$show_editbutton = $this->params->get('show_editbutton', 1);
 	$pdfbutton = flexicontent_html::pdfbutton( $item, $this->params );
 	$mailbutton = flexicontent_html::mailbutton( FLEXI_ITEMVIEW, $this->params, $item->categoryslug, $item->slug, 0, $item );
 	$printbutton = flexicontent_html::printbutton( $this->print_link, $this->params );
-	$editbutton = $show_editbutton ? flexicontent_html::editbutton( $item, $this->params ) : '';
-	$statebutton = $show_editbutton ? flexicontent_html::statebutton( $item, $this->params ) : '';
+	$editbutton = flexicontent_html::editbutton( $item, $this->params );
+	$statebutton = flexicontent_html::statebutton( $item, $this->params );
+	$deletebutton = flexicontent_html::deletebutton( $item, $this->params );
 	$approvalbutton = flexicontent_html::approvalbutton( $item, $this->params );
 	?>
 	
-	<?php if ($pdfbutton || $mailbutton || $printbutton || $editbutton || $statebutton || $approvalbutton) : ?>
+	<?php if ($pdfbutton || $mailbutton || $printbutton || $editbutton || $statebutton || $deletebutton || $approvalbutton) : ?>
 		<!-- BOF buttons -->
-		<p class="buttons">
+		<div class="buttons">
 			<?php echo $pdfbutton; ?>
 			<?php echo $mailbutton; ?>
 			<?php echo $printbutton; ?>
 			<?php echo $editbutton; ?>
 			<?php echo $statebutton; ?>
+			<?php echo $deletebutton; ?>
 			<?php echo $approvalbutton; ?>
-		</p>
+		</div>
 		<!-- EOF buttons -->
 	<?php endif; ?>
 	
@@ -156,12 +166,14 @@ foreach ($items as $i => $item) :
 	
 	<?php if ($this->params->get('show_title', 1)) : ?>
 		<!-- BOF item title -->
-		<?php echo '<h'.$itemTitleHeaderLevel; ?> class="contentheading"><span class="fc_item_title">
+		<?php echo '<h'.$itemTitleHeaderLevel; ?> class="contentheading">
+			<span class="fc_item_title" itemprop="name">
 			<?php
-				echo ( mb_strlen($item->title, 'utf-8') > $this->params->get('title_cut_text',200) ) ?
-					mb_substr ($item->title, 0, $this->params->get('title_cut_text',200), 'utf-8') . ' ...'  :  $item->title;
+				echo ( StringHelper::strlen($item->title) > (int) $this->params->get('title_cut_text',200) ) ?
+					StringHelper::substr($item->title, 0, (int) $this->params->get('title_cut_text',200)) . ' ...'  :  $item->title;
 			?>
-		</span><?php echo '</h'.$itemTitleHeaderLevel; ?>>
+			</span>
+		<?php echo '</h'.$itemTitleHeaderLevel; ?>>
 		<!-- EOF item title -->
 	<?php endif; ?>
 	
@@ -180,7 +192,7 @@ foreach ($items as $i => $item) :
 		<!-- BOF subtitle1 block -->
 		<div class="flexi lineinfo subtitle1 group">
 			<?php foreach ($item->positions['subtitle1'] as $field) : ?>
-			<div class="flexi element">
+			<div class="flexi element field_<?php echo $field->name; ?>">
 				<?php if ($field->label) : ?>
 				<span class="flexi label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></span>
 				<?php endif; ?>
@@ -196,7 +208,7 @@ foreach ($items as $i => $item) :
 		<!-- BOF subtitle2 block -->
 		<div class="flexi lineinfo subtitle2 group">
 			<?php foreach ($item->positions['subtitle2'] as $field) : ?>
-			<div class="flexi element">
+			<div class="flexi element field_<?php echo $field->name; ?>">
 				<?php if ($field->label) : ?>
 				<span class="flexi label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></span>
 				<?php endif; ?>
@@ -212,7 +224,7 @@ foreach ($items as $i => $item) :
 		<!-- BOF subtitle3 block -->
 		<div class="flexi lineinfo subtitle3 group">
 			<?php foreach ($item->positions['subtitle3'] as $field) : ?>
-			<div class="flexi element">
+			<div class="flexi element field_<?php echo $field->name; ?>">
 				<?php if ($field->label) : ?>
 				<span class="flexi label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></span>
 				<?php endif; ?>
@@ -254,7 +266,7 @@ foreach ($items as $i => $item) :
 				<div class="flexi infoblock <?php echo $top_cols; ?>cols group span8">
 					<ul class="flexi row">
 						<?php foreach ($item->positions['top'] as $field) : ?>
-						<li class="flexi <?php echo $span_class; ?>">
+						<li class="flexi lvbox <?php echo 'field_' . $field->name . ' ' . $span_class; ?>">
 							<div>
 								<?php if ($field->label) : ?>
 								<span class="flexi label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></span>
@@ -288,9 +300,9 @@ foreach ($items as $i => $item) :
 		<div class="description group">
 			<?php foreach ($item->positions['description'] as $field) : ?>
 				<?php if ($field->label) : ?>
-			<div class="desc-title flexi label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></div>
+			<div class="desc-title label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></div>
 				<?php endif; ?>
-			<div class="desc-content flexi value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></div>
+			<div class="desc-content field_<?php echo $field->name; ?>"><?php echo $field->display; ?></div>
 			<?php endforeach; ?>
 		</div>
 		<!-- EOF description -->
@@ -320,7 +332,7 @@ foreach ($items as $i => $item) :
 		<div class="flexi infoblock <?php echo $bottom_cols; ?>cols group">
 			<ul class="flexi row">
 				<?php foreach ($item->positions['bottom'] as $field) : ?>
-				<li class="flexi <?php echo $span_class; ?>">
+				<li class="flexi lvbox <?php echo 'field_' . $field->name . ' ' . $span_class; ?>">
 					<div>
 						<?php if ($field->label) : ?>
 						<span class="flexi label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></span>
@@ -336,10 +348,13 @@ foreach ($items as $i => $item) :
 	
 	
 	<?php if ( $readmore_shown ) : ?>
-	<span class="readmore group">
-		<a href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, 0, $item)); ?>" class="readon">
-			<?php echo ' ' . ($item->params->get('readmore')  ?  $item->params->get('readmore') : JText::sprintf('FLEXI_READ_MORE', $item->title)); ?>
+	<span class="readmore">
+		
+		<a href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, 0, $item)); ?>" class="btn" itemprop="url">
+			<span class="icon-chevron-right"></span>
+			<?php echo $item->params->get('readmore')  ?  $item->params->get('readmore') : JText::sprintf('FLEXI_READ_MORE', $item->title); ?>
 		</a>
+		
 	</span>
 	<?php endif; ?>
 	
@@ -358,7 +373,7 @@ foreach ($items as $i => $item) :
 	
 	<?php echo $mainAreaTag == 'section' ? '</article>' : ''; ?>
 	
-	<?php if ($this->params->get('show_comments_incat') && !JRequest::getVar('print')) : /* PARAMETER MISSING */?>
+	<?php if ($this->params->get('show_comments_incat') && !JFactory::getApplication()->input->getInt('print', 0)) : /* PARAMETER MISSING */?>
 		<!-- BOF comments -->
 		<section class="comments group">
 		<?php

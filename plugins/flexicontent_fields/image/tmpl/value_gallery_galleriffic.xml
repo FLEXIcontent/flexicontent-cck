@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<form>
+
+	<name>Image field layout -- Galleriffic</name>
+	<author>ggppdk</author>
+	<creationDate>September 2017</creationDate>
+	<copyright>Copyright (C) 2017 ggppdk</copyright>
+	<license>GNU/GPL v2</license>
+	<authorEmail>flexicontentck@gmail.com</authorEmail>
+	<authorUrl>www.flexicontent.org</authorUrl>
+	<version>1.0</version>
+	<description>Flexicontent fields - Image field layout - Galleriffic parameters</description>
+
+	<fields name="attribs">
+
+		<fieldset name="layout" addfieldpath="/administrator/components/com_flexicontent/elements">
+
+			<field name="" type="separator" default="FLEXI_FIELD_IMAGE_SLIDESHOW_OPTIONS" level="level2" />
+
+			<field name="PPFX_auto_start" type="multilist" subtype="radio" default="0" toggle_related="1" label="FLEXI_FIELD_IMAGE_AUTOPLAY" description="FLEXI_FIELD_IMAGE_AUTOPLAY_DESC" class="btn-group btn-group-yesno" depend_class="">
+				<option value="0" show_list="" hide_list="auto_play">FLEXI_NO</option>
+				<option value="1" show_list="auto_play" hide_list="">FLEXI_YES</option>
+			</field>
+			<field name="PPFX_slideshow_delay" type="number" default="2500" label="FLEXI_FIELD_IMAGE_AUTOPLAY_DELAY" description="FLEXI_FIELD_IMAGE_AUTOPLAY_DELAY_DESC" depend_class="auto_play" />
+
+			<field name="PPFX_transition_duration" type="number" default="600" label="FLEXI_FIELD_IMAGE_TRANSITION_DURATION" description="FLEXI_FIELD_IMAGE_TRANSITION_DURATION_DESC" depend_class="" />
+			<field name="PPFX_preload_image" type="number" default="4" label="FLEXI_FIELD_IMAGE_NUM_IMG_PRELOAD" description="FLEXI_FIELD_IMAGE_NUM_IMG_PRELOAD_DESC" depend_class="" />
+
+			<field name="PPFX_enable_popup" type="fcradio" default="1" label="FLEXI_FIELD_IMAGE_SLIDESHOW_CLICK_ON_IMAGE" description="FLEXI_FIELD_IMAGE_SLIDESHOW_CLICK_ON_IMAGE_DESC" class="group-fcset fc-cleared" depend_class="slideshow_ops">
+				<option value="0">FLEXI_FIELD_IMAGE_NEXT_IMAGE</option>
+				<option value="1">FLEXI_FIELD_IMAGE_FULL_SCREEN</option>
+			</field>
+
+
+			<field name="" type="separator" default="FLEXI_FIELD_IMAGE_IMG_SIZE" level="level2" />
+
+			<field name="" type="separator" default="FLEXI_FIELD_IMAGE_IMG_SIZE_NOTE" level="level3 alert-info fcpadded" />
+
+			<field name="PPFX_thumb_height" type="number" default="86" label="FLEXI_FIELD_IMAGE_THUMBNAIL_HEIGHT_PX" description="" depend_class="" />
+			<field name="PPFX_slide_height" type="number" default="600" label="FLEXI_FIELD_IMAGE_SLIDESHOW_HEIGHT_PX" description="" depend_class="" />
+
+			<field name="" type="separator" default="FLEXI_FIELD_THUMBS_PAGES" level="level2" />
+
+			<field name="PPFX_use_pages" type="multilist" subtype="radio" default="0" toggle_related="1" label="FLEXI_FIELD_IMAGE_THUMBS_LIST" description="FLEXI_FIELD_IMAGE_THUMBS_LIST_DESC" class="btn-group group-fcmethod" >
+				<option value="0" show_list="no_pages" hide_list="use_pages">FLEXI_FIELD_IMAGE_USE_SCROLL</option>
+				<option value="1" show_list="use_pages" hide_list="no_pages">FLEXI_FIELD_IMAGE_USE_PAGE</option>
+			</field>
+
+
+			<!--field name="PPFX_number_thumbs" type="number" default="5" label="Max # thumbs per page" description="Max number of thumbnails per page. Note this number is reduced to balance the number of thumbs in the last page" depend_class="use_pages" /-->
+			<field name="PPFX_number_pages" type="number" default="10" label="FLEXI_FIELD_IMAGE_MAX_THUMB" description="FLEXI_FIELD_IMAGE_MAX_THUMB_DESC" depend_class="use_pages" />
+			<field name="PPFX_enable_top_pager" type="fcradio" default="2" label="FLEXI_FIELD_IMAGE_THUMBS_NAV" description="FLEXI_FIELD_IMAGE_THUMBS_NAV_DESC" class="group-fcset fc-cleared" depend_class="use_pages">
+				<!--option value="0">FLEXI_DISABLE</option-->
+				<option value="2">FLEXI_FIELD_IMAGE_THUMBS_ARROWS</option>
+				<option value="1">FLEXI_FIELD_IMAGE_THUMBS_SEPARATE</option>
+			</field>
+			<!--field name="PPFX_enable_bottom_pager" type="radio" default="0" label="Bottom pager" description="Bottom Pagination" class="btn-group btn-group-yesno" depend_class="use_pages">
+				<option value="0">FLEXI_DISABLE</option>
+				<option value="1">FLEXI_ENABLE</option>
+			</field-->
+
+		</fieldset>
+
+	</fields>
+
+</form>

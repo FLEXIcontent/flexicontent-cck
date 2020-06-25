@@ -1,16 +1,24 @@
 <?php
 /**
- * @version		$Id: categoryparent.php 18808 2010-09-08 05:44:54Z eddieajau $
- * @copyright	Copyright (C) 2005 - 2010 Open Source Matters, Inc. All rights reserved.
- * @license		GNU General Public License version 2 or later; see LICENSE.txt
+ * @package         FLEXIcontent
+ * @version         3.3
+ *
+ * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
+ * @link            https://flexicontent.org
+ * @copyright       Copyright © 2018, FLEXIcontent team, All Rights Reserved
+ * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
-defined('JPATH_BASE') or die;
+defined('_JEXEC') or die('Restricted access');
 
-jimport('joomla.html.html');
-jimport('joomla.form.formfield');
-jimport('joomla.form.helper');
-JFormHelper::loadFieldClass('list');
+use Joomla\String\StringHelper;
+use Joomla\Utilities\ArrayHelper;
+
+jimport('cms.html.html');      // JHtml
+jimport('cms.html.select');    // JHtmlSelect
+
+jimport('joomla.form.helper'); // JFormHelper
+JFormHelper::loadFieldClass('list');   // JFormFieldList
 
 /**
  * Form Field class for the Joomla Framework.
@@ -19,14 +27,15 @@ JFormHelper::loadFieldClass('list');
  * @subpackage	com_categories
  * @since		1.6
  */
-class JFormFieldCategoryTree extends JFormFieldList{
+class JFormFieldCategorytree extends JFormFieldList
+{
 	/**
 	 * The form field type.
 	 *
 	 * @var		string
 	 * @since	1.6
 	 */
-	protected $type = 'CategoryParent';
+	protected $type = 'Categorytree';
 
 	/**
 	 * Method to get the field input markup.
@@ -34,7 +43,8 @@ class JFormFieldCategoryTree extends JFormFieldList{
 	 * @return	string	The field input markup.
 	 * @since	1.6
 	 */
-	protected function getInput() {
+	protected function getInput()
+	{
 		// Initialize variables.
 		$html = array();
 		$attr = '';
@@ -58,7 +68,7 @@ class JFormFieldCategoryTree extends JFormFieldList{
 		$options = (array) $this->getOptions();
 
 		// Create a read-only list (no name) with a hidden input to store the value.
-		if ((string) $this->element['readonly'] == 'true') {			
+		if ((string) $this->element['readonly'] == 'true') {
 			$html[] = '<select name="" '.trim($attr).'>';
 			foreach($options as $opt) {
 				$disabled = '';
@@ -75,7 +85,7 @@ class JFormFieldCategoryTree extends JFormFieldList{
 		}
 		// Create a regular list.
 		else {
-			
+
 			//$html[] = JHtml::_('select.genericlist', $options, $this->name, trim($attr), 'value', 'text', $this->value, $this->id);
 			$html[] = '<select name="'.$this->name.'" '.trim($attr).'>';
 			foreach($options as $opt) {
@@ -92,71 +102,84 @@ class JFormFieldCategoryTree extends JFormFieldList{
 
 		return implode("\n", $html);
 	}
-	
+
 	/**
 	 * Method to get the field options.
 	 *
 	 * @return	array	The field option objects.
 	 * @since	1.6
 	 */
-	protected function getOptions() {
+	protected function getOptions()
+	{
 		global $globalcats;
+		$jinput = JFactory::getApplication();
 		$user = JFactory::getUser();
-		$cid  = JRequest::getVar('cid');
-		
-		$permission = FlexicontentHelperPerm::getPerm();
+		$cid  = $jinput->get('cid', 0, 'INT');
 
-		//$usercats 		= FAccess::checkUserCats($user->gmid);
-		$usercats		= array();
-		//$viewallcats 	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'usercats', 'users', $user->gmid) : 1;
-		$viewallcats 	= $permission->ViewAllCats;
-		//$viewtree 		= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'cattree', 'users', $user->gmid) : 1;
-		$viewtree 		= $permission->ViewTree;
+		$usercats = array();
+		$viewallcats = FlexicontentHelperPerm::getPerm()->ViewAllCats;
+
+		$top = (int) $this->element['top'];
+		$published = $this->element['published'] && $this->element['published']!='false' ? true : false;
+		$filter = $this->element['filter'] && $this->element['filter']!='false' ? true : false;
 
 		$catlist 	= array();
-		$top = (int)$this->element->getAttribute('top');
-		$published = (bool)$this->element->getAttribute('published');
-		$filter = (bool)$this->element->getAttribute('filter');
-		if($top == 1) {
+		if($top == 1)
+		{
 			$obj = new stdClass;
 			$obj->value = $ROOT_CATEGORY_ID = 1;
 			$obj->level = 0;
 			$obj->text = JText::_( 'FLEXI_TOPLEVEL' );
 			$catlist[] 	= $obj;
-		} else if($top == 2) {
+		}
+		else if($top == 2)
+		{
 			$obj = new stdClass;
 			$obj->value = '';
 			$obj->level = 0;
-			$obj->text = JText::_( 'FLEXI_SELECT_CAT' );
+			$obj->text = JText::_( 'FLEXI_SELECT_CATEGORY' );
 			$catlist[] 	= $obj;
 		}
-		
+
 		foreach ($globalcats as $item) {
-			if ((!$published) || ($published && $item->published)) {
+			if ( !$published || ($published && $item->published) )
+			{
 				//if ((JRequest::getVar('controller') == 'categories') && (JRequest::getVar('task') == 'edit') && ($cid[0] == $item->id)) {
 				if ((JRequest::getVar('controller') == 'categories') && (JRequest::getVar('task') == 'edit') && ($item->lft >= @$globalcats[$cid[0]]->lft && $item->rgt <= @$globalcats[$cid[0]]->rgt)) {
-					if($top == 2) {
-						if($cid[0] != $item->id) {
+					if ($top == 2)
+					{
+						if ($cid[0] != $item->id)
+						{
 							$obj = new stdClass;
 							$obj->value = $item->id;
 							$obj->text = $item->treename;
 							$obj->level = $item->level;
 							$catlist[] = $obj;
-						}else {
+						}
+						else
+						{
 							$catlist[] = JHtml::_('select.option', $item->id, $item->treename, 'value', 'text', true);
 						}
 					}
-				} else if ($filter) {
-					if ( !in_array($item->id, $usercats) ) {
-						if ($viewallcats) { // only disable cats in the list else don't show them at all
-							$catlist[] = JHTML::_( 'select.option', $item->id, $item->treename, 'value', 'text', true );
+				}
+				else if ($filter)
+				{
+					if ( !in_array($item->id, $usercats) )
+					{
+						// Only disable cats in the list else don't show them at all
+						if ($viewallcats)
+						{
+							$catlist[] = JHtml::_( 'select.option', $item->id, $item->treename, 'value', 'text', true );
 						}
-					} else {
-						$item->treename = str_replace("&nbsp;", "_", strip_tags($item->treename));
-						// FLEXIaccess rule $viewtree enables tree view
-						$catlist[] = JHTML::_( 'select.option', $item->id, ($viewtree ? $item->treename : $item->title) );
 					}
-				} else {
+					else
+					{
+						$item->treename = str_replace("&nbsp;", "_", strip_tags($item->treename));
+						$catlist[] = JHtml::_( 'select.option', $item->id, $item->treename );
+					}
+				}
+				else
+				{
 					$obj = new stdClass;
 					$obj->value = $item->id;
 					$obj->text = $item->treename;

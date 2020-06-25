@@ -1,29 +1,50 @@
 <?php
 /**
- * @copyright	Copyright (C) 2005 - 2014 Open Source Matters, Inc. All rights reserved.
- * @license		GNU General Public License version 2 or later; see LICENSE.txt
+ * @package         FLEXIcontent
+ * @version         3.3
+ *
+ * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
+ * @link            https://flexicontent.org
+ * @copyright       Copyright © 2018, FLEXIcontent team, All Rights Reserved
+ * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
-defined('_JEXEC') or die;
+// no direct access
+defined('_JEXEC') or die('Restricted access');
 
-jimport('joomla.application.component.modellist');
 require_once JPATH_COMPONENT.'/helpers/debug.php';
 
 /**
- * Methods supporting a list of user records.
+ * FLEXIcontent Component Debug User Group Model
  *
- * @package		Joomla.Administrator
- * @subpackage	com_users
- * @since		1.6
  */
-require_once(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_users'.DS.'models'.DS.'debuggroup.php');
-
-class FlexicontentModelDebugGroup extends UsersModelDebugGroup
+if (FLEXI_J40GE)
 {
-	public function getDebugActions()
-	{
-		$component = JRequest::getVar('option');
+	require_once(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_users'.DS.'Model'.DS.'DebugGroupModel.php');
 
-		return UsersHelperDebug::getDebugActions($component);
+	class FlexicontentModelDebugGroup extends Joomla\Component\Users\Administrator\Model\DebugGroupModel
+	{
+		public function getDebugActions()
+		{
+			$app    = JFactory::getApplication();
+			$component = $app->input->getCmd('option', '');
+
+			return UsersHelperDebug::getDebugActions($component);
+		}
+	}
+}
+else
+{
+	require_once(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_users'.DS.'models'.DS.'debuggroup.php');
+
+	class FlexicontentModelDebugGroup extends UsersModelDebugGroup
+	{
+		public function getDebugActions()
+		{
+			$app    = JFactory::getApplication();
+			$component = $app->input->getCmd('option', '');
+
+			return UsersHelperDebug::getDebugActions($component);
+		}
 	}
 }

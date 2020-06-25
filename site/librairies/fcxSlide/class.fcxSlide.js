@@ -28,11 +28,9 @@ Description:
 		
 		- Walk either items OR pages or both (!)
 		
-		- Walking methods (for both items and pages) based on jQuery effects:
-			a. scroll
-			b. fade
-			c. slide
-			d. fade-slide
+		- Walking methods based on jQuery transition effects:
+			For both items and pages: scroll, fade, slide, fade-slide clip, scale, drop
+			For pages only: blind, bounce, fold, pulsate, shake
 			
 		- jQuery EASING support for all (?) WALK methods
 		
@@ -191,10 +189,9 @@ Methods:
 	addTouchDrag(): add touch/drag events to the items container
 */
 
-var fcxSlide = new Class({
-
-	initialize: function(params)
-	{
+var fcxSlide = function(params)
+{
+	this.initialize = function(params) {
 		this.mode = params.mode || 'horizontal';
 		this.transition = params.transition || 'scroll';
 		this.fxOptions = params.fxOptions || { duration: 400, easing: 'linear' };
@@ -261,9 +258,9 @@ var fcxSlide = new Class({
 		
 		// Add touch event support (mobile devices, etc), and optionally mouse drag support too
 		this.addTouchDrag();
-	},
+	};
 	
-	bindItemHandles: function(item_handles){
+	this.bindItemHandles = function(item_handles){
 		var slider = this;
 		for(var i=0;i<item_handles.length;i++){
 			jQuery(item_handles[i]).on(
@@ -274,9 +271,9 @@ var fcxSlide = new Class({
 				}
 			);
 		}
-	},
+	};
 
-	bindPageHandles: function(page_handles){
+	this.bindPageHandles = function(page_handles){
 		var slider = this;
 		for(var i=0;i<page_handles.length;i++){
 			jQuery(page_handles[i]).on(
@@ -287,9 +284,9 @@ var fcxSlide = new Class({
 				}
 			);
 		}
-	},
+	};
 
-	bindActionHandles: function(_action_handles){
+	this.bindActionHandles = function(_action_handles){
 		var slider = this;
 		for (var action in _action_handles)
 		{
@@ -315,26 +312,26 @@ var fcxSlide = new Class({
 				this.action_handles[action].push(action_set[i]);
 			}
 		}
-	},
+	};
 	
 	
-	previous_page: function(manual){
+	this.previous_page = function(manual){
 		this.walk('previous_page', manual, false);
-	},
+	};
 	
-	next_page: function(manual){
+	this.next_page = function(manual){
 		this.walk('next_page', manual, false);
-	},
+	};
 	
-	previous: function(manual){
+	this.previous = function(manual){
 		this.walk((this.currentIndex>0 ? this.currentIndex-1 : (!this.edgeWrap ? 0 : this.items.length-1)), manual, false);
-	},
+	};
 	
-	next: function(manual){
+	this.next = function(manual){
 		this.walk((this.currentIndex<this.items.length-1 ? this.currentIndex+1 : (!this.edgeWrap ? this.items.length-1 : 0)), manual, false);
-	},
+	};
 	
-	play: function(interval,direction,wait){
+	this.play = function(interval,direction,wait){
 		// Clear the current pending autoplay timer, because we want to reschedule a new one
 		this.stop();
 		
@@ -351,16 +348,31 @@ var fcxSlide = new Class({
 			interval
 		);
 		this.autoPlay = true;
-	},
+	};
 	
-	stop: function(halt){
+	this.stop = function(halt){
 		clearTimeout(this.autoPlayInterval);
 		if (halt) {
 			this.autoPlay = false;
 		}
-	},
+	};
 	
-	walk: function(item,manual,noFx,force)
+	this.debounce = function(func, wait, immediate) {
+		var timeout;
+		return function() {
+			var context = this, args = arguments;
+			var later = function() {
+				timeout = null;
+				if (!immediate) func.apply(context, args);
+			};
+			var callNow = immediate && !timeout;
+			clearTimeout(timeout);
+			timeout = setTimeout(later, wait);
+			if (callNow) func.apply(context, args);
+		};
+	};
+	
+	this.walk_now = function(item,manual,noFx,force)
 	{
 		/* Detect ITEMs per page for horizontal */
 		var items_per_page_float = this.items_per_page;
@@ -394,7 +406,8 @@ var fcxSlide = new Class({
 		if (width_changed && (this.responsive==1 || !this.item_height_px_OLD)) {
 			this.item_height_px_OLD = 0; // Force updating height
 			var maxHeight = 0;
-			this.items.each(function() { this.style.height = "auto"; });
+			jQuery(this.items).css('height', 'auto');
+			jQuery(this.items_inner).css('height', 'auto');
 			this.items.each(function() { maxHeight = Math.max(maxHeight, this.clientHeight); });
 			//alert('Setting item height to:' + maxHeight);
 			
@@ -487,7 +500,7 @@ var fcxSlide = new Class({
 		{
 			// Stop current jQuery animation on the items box, forcing it to complete
 			// NOTE: this -NOT- the stop() method of the slider (that stops the scheduled autoplay)
-			// cancel all animations without completing them, to allow continuing from current position, thus avoiding position jump
+			// Cancel all animations without completing them, to allow continuing from current position, thus avoiding position jump to previous touch position
 			jQuery(this.items_box).stop(true, false);
 			
 			
@@ -611,11 +624,13 @@ var fcxSlide = new Class({
 				// make total duration according to item show, is using pages
 				limit = noFx ? this.items.length - offSetIndex : this.items_per_page + (items_per_page_float - this.items_per_page > 0.2 ? 1 : 0);
 				
-				//alert('offSetIndex: ' + offSetIndex + ' , limit: ' + limit + ' , items_per_page: ' + items_per_page_float);
-				// Stop any running animations on the items, and complete them
+				//window.console.log('offSetIndex: ' + offSetIndex + ' , limit: ' + limit + ' , items_per_page: ' + items_per_page_float);
+				// Cancel all animations without completing them, but force current to complete, to allow new one to start from proper point
 				for(i=0; i<this.items.length; i++) {
 					jQuery(this.items[i]).stop(false, true);
 				}
+				
+				// Hide items not inside current page
 				for(i=0; i<offSetIndex; i++) {
 					if (i >= this.items.length) break;
 					jQuery(this.items[i]).hide();
@@ -625,11 +640,11 @@ var fcxSlide = new Class({
 					jQuery(this.items[i]).hide();
 				}
 				
+				jQuery(this.items).css('position', 'absolute');
 				for(i=0; i<limit; i++) {
 					if (offSetIndex+i >= this.items.length) break;
 					
-					//alert(offSetIndex+i);
-					jQuery(this.items[offSetIndex+i]).css('position', 'absolute');
+					//window.console.log((this.mode=='horizontal' ? 'left' : 'top') +': ' + (offSetIndex+i) + ' - '+(i*this.item_size) + 'px');
 					if (scrollPage) {
 						this.mode=='horizontal' ?
 							jQuery(this.items[offSetIndex+i]).css('left', '' + (i*this.item_size) + 'px') :
@@ -640,22 +655,14 @@ var fcxSlide = new Class({
 							jQuery(this.items[offSetIndex+i]).animate( {top : (i*this.item_size)}, this.transition_visible_duration );
 					}
 					
-					//alert('' + (offSetIndex+i) + ' ' + jQuery(this.items[offSetIndex+i]).css('display'));
-					if ( jQuery(this.items[offSetIndex+i]).css('display') != 'none' ) {
-						jQuery(this.items[offSetIndex+i]).stop(false, true);  // Stop current animation forcing it to complete, but do not remove pending animations
-						continue;
-					}
-					
 					if (noFx) {
 						jQuery(this.items[offSetIndex+i]).show();
 					} else if (this.transition=='fade') {
 						jQuery(this.items[offSetIndex+i]).fadeIn(this.fxOptions);
-					} else if (this.transition=='slide') {
-						jQuery(this.items[offSetIndex+i]).slideDown(this.fxOptions);
 					} else if (this.transition=='fade-slide') {
 						jQuery(this.items[offSetIndex+i]).show(this.fxOptions);
-					} else {  // unknown just show them instantly
-						jQuery(this.items[offSetIndex+i]).show();
+					} else {  // Other transition: clip, drag, explode, etc
+						jQuery(this.items[offSetIndex+i]).show(this.transition, this.fxOptions);
 					}
 				}
 				
@@ -682,17 +689,17 @@ var fcxSlide = new Class({
 				this.onWalk(currentItem, currentPageHandle, currentItemHandle);
 			}
 		}
-	},
+	};
 	
-	resize: function(event){
+	this.resize = function(event){
 		clearTimeout(this.resizeTimeout); // Clear any other pending resizing within the timeout limit e.g. 100 ms
 		var slider = event.data.slider;  // Set this in case it is destroyed by the time timeout function is executed
 		this.resizeTimeout = setTimeout(function(){
 			slider.walk(slider.currentIndex,true,false,true);
 		}, 100);
-	},
+	};
 	
-	addTouchDrag: function(){
+	this.addTouchDrag = function(){
 		if (!this.touch_walk && !this.mouse_walk) return;  // nothing to do
 		
 		var slider = this;
@@ -727,7 +734,7 @@ var fcxSlide = new Class({
 			jQuery(slider.items_box).css('cursor', "pointer" );
 			
 			// Stop all jQuery animations and force them to complete, to get proper current position of the slider
-			jQuery(slider.items_box).stop(true, true);
+			jQuery(slider.items_box).finish();
 			boxPos = parseInt(jQuery(slider.items_box).css(slider.mode=='horizontal' ? 'left' : 'top'));
 			startPos = parseInt(slider.mode=='horizontal' ? obj.clientX : obj.clientY);
 			//if ( window.console && window.console.log ) window.console.log ('Status: mousedown<br /> Start coordinate: ' + startPos + 'px');
@@ -751,7 +758,7 @@ var fcxSlide = new Class({
 			slider.isDragging = true;
 			
 			// Touch/Mouse Drag is at new point, retarget to new point,
-			// cancel all animations without completing them, to allow continuing from current position, thus avoiding position jump to previous touch position
+			// Cancel all animations without completing them, to allow continuing from current position, thus avoiding position jump to previous touch position
 			jQuery(slider.items_box).stop(true, false);
 			(slider.mode=='horizontal') ?
 				jQuery(slider.items_box).animate({ left: boxPos+travelDist }, "fast") :
@@ -777,7 +784,7 @@ var fcxSlide = new Class({
 			if (Math.abs(travelDist) > slider.dragwalk_margin)
 			{
 				// Drag is under walk threshold, walk the slider to proper direction,
-				// cancel all animations without completing them, to allow walking from current position, thus avoiding position jump to last touch position
+				// Cancel all animations without completing them, to allow walking from current position, thus avoiding position jump to last touch position
 				jQuery(slider.items_box).stop(true, false);
 				slider.stop(true);  // Cancel autoplay, to avoid confusion to the user
 			  (travelDist < 0) ?        // Walk the slider
@@ -797,178 +804,9 @@ var fcxSlide = new Class({
 			startPos = 0;
 			setTimeout(function(){ slider.isDragging = false; }, 100);
 		});
-	}
-});
-
-
-
-/* 
- * FOLLOWING part are jQuery easing functions authored by George McGinley Smith
- *
- * jQuery Easing v1.3 - http://gsgd.co.uk/sandbox/jquery/easing/
- *
- * Uses the built in easing capabilities added In jQuery 1.1 to offer multiple easing options
- *
- * TERMS OF USE - jQuery Easing
- * 
- * Open source under the BSD License. 
- * 
- * Copyright © 2008 George McGinley Smith
- * All rights reserved.
- */
-
-// t: current time, b: begInnIng value, c: change In value, d: duration
-jQuery.easing['jswing'] = jQuery.easing['swing'];
-
-jQuery.extend( jQuery.easing,
-{
-	def: 'easeOutQuad',
-	swing: function (x, t, b, c, d) {
-		//alert(jQuery.easing.default);
-		return jQuery.easing[jQuery.easing.def](x, t, b, c, d);
-	},
+	};
 	
+	this.walk = this.debounce(this.walk_now, 50, false);
 	
-	easeInQuad: function (x, t, b, c, d) {
-		return c*(t/=d)*t + b;
-	},
-	easeOutQuad: function (x, t, b, c, d) {
-		return -c *(t/=d)*(t-2) + b;
-	},
-	easeInOutQuad: function (x, t, b, c, d) {
-		if ((t/=d/2) < 1) return c/2*t*t + b;
-		return -c/2 * ((--t)*(t-2) - 1) + b;
-	},
-	
-	
-	easeInCubic: function (x, t, b, c, d) {
-		return c*(t/=d)*t*t + b;
-	},
-	easeOutCubic: function (x, t, b, c, d) {
-		return c*((t=t/d-1)*t*t + 1) + b;
-	},
-	easeInOutCubic: function (x, t, b, c, d) {
-		if ((t/=d/2) < 1) return c/2*t*t*t + b;
-		return c/2*((t-=2)*t*t + 2) + b;
-	},
-	
-	
-	easeInQuart: function (x, t, b, c, d) {
-		return c*(t/=d)*t*t*t + b;
-	},
-	easeOutQuart: function (x, t, b, c, d) {
-		return -c * ((t=t/d-1)*t*t*t - 1) + b;
-	},
-	easeInOutQuart: function (x, t, b, c, d) {
-		if ((t/=d/2) < 1) return c/2*t*t*t*t + b;
-		return -c/2 * ((t-=2)*t*t*t - 2) + b;
-	},
-	
-	
-	easeInQuint: function (x, t, b, c, d) {
-		return c*(t/=d)*t*t*t*t + b;
-	},
-	easeOutQuint: function (x, t, b, c, d) {
-		return c*((t=t/d-1)*t*t*t*t + 1) + b;
-	},
-	easeInOutQuint: function (x, t, b, c, d) {
-		if ((t/=d/2) < 1) return c/2*t*t*t*t*t + b;
-		return c/2*((t-=2)*t*t*t*t + 2) + b;
-	},
-	
-	
-	easeInSine: function (x, t, b, c, d) {
-		return -c * Math.cos(t/d * (Math.PI/2)) + c + b;
-	},
-	easeOutSine: function (x, t, b, c, d) {
-		return c * Math.sin(t/d * (Math.PI/2)) + b;
-	},
-	easeInOutSine: function (x, t, b, c, d) {
-		return -c/2 * (Math.cos(Math.PI*t/d) - 1) + b;
-	},
-	
-	
-	easeInExpo: function (x, t, b, c, d) {
-		return (t==0) ? b : c * Math.pow(2, 10 * (t/d - 1)) + b;
-	},
-	easeOutExpo: function (x, t, b, c, d) {
-		return (t==d) ? b+c : c * (-Math.pow(2, -10 * t/d) + 1) + b;
-	},
-	easeInOutExpo: function (x, t, b, c, d) {
-		if (t==0) return b;
-		if (t==d) return b+c;
-		if ((t/=d/2) < 1) return c/2 * Math.pow(2, 10 * (t - 1)) + b;
-		return c/2 * (-Math.pow(2, -10 * --t) + 2) + b;
-	},
-	
-	
-	easeInCirc: function (x, t, b, c, d) {
-		return -c * (Math.sqrt(1 - (t/=d)*t) - 1) + b;
-	},
-	easeOutCirc: function (x, t, b, c, d) {
-		return c * Math.sqrt(1 - (t=t/d-1)*t) + b;
-	},
-	easeInOutCirc: function (x, t, b, c, d) {
-		if ((t/=d/2) < 1) return -c/2 * (Math.sqrt(1 - t*t) - 1) + b;
-		return c/2 * (Math.sqrt(1 - (t-=2)*t) + 1) + b;
-	},
-	
-	
-	easeInElastic: function (x, t, b, c, d) {
-		var s=1.70158;var p=0;var a=c;
-		if (t==0) return b;  if ((t/=d)==1) return b+c;  if (!p) p=d*.3;
-		if (a < Math.abs(c)) { a=c; var s=p/4; }
-		else var s = p/(2*Math.PI) * Math.asin (c/a);
-		return -(a*Math.pow(2,10*(t-=1)) * Math.sin( (t*d-s)*(2*Math.PI)/p )) + b;
-	},
-	easeOutElastic: function (x, t, b, c, d) {
-		var s=1.70158;var p=0;var a=c;
-		if (t==0) return b;  if ((t/=d)==1) return b+c;  if (!p) p=d*.3;
-		if (a < Math.abs(c)) { a=c; var s=p/4; }
-		else var s = p/(2*Math.PI) * Math.asin (c/a);
-		return a*Math.pow(2,-10*t) * Math.sin( (t*d-s)*(2*Math.PI)/p ) + c + b;
-	},
-	easeInOutElastic: function (x, t, b, c, d) {
-		var s=1.70158;var p=0;var a=c;
-		if (t==0) return b;  if ((t/=d/2)==2) return b+c;  if (!p) p=d*(.3*1.5);
-		if (a < Math.abs(c)) { a=c; var s=p/4; }
-		else var s = p/(2*Math.PI) * Math.asin (c/a);
-		if (t < 1) return -.5*(a*Math.pow(2,10*(t-=1)) * Math.sin( (t*d-s)*(2*Math.PI)/p )) + b;
-		return a*Math.pow(2,-10*(t-=1)) * Math.sin( (t*d-s)*(2*Math.PI)/p )*.5 + c + b;
-	},
-	
-	
-	easeInBack: function (x, t, b, c, d, s) {
-		if (s == undefined) s = 1.70158;
-		return c*(t/=d)*t*((s+1)*t - s) + b;
-	},
-	easeOutBack: function (x, t, b, c, d, s) {
-		if (s == undefined) s = 1.70158;
-		return c*((t=t/d-1)*t*((s+1)*t + s) + 1) + b;
-	},
-	easeInOutBack: function (x, t, b, c, d, s) {
-		if (s == undefined) s = 1.70158; 
-		if ((t/=d/2) < 1) return c/2*(t*t*(((s*=(1.525))+1)*t - s)) + b;
-		return c/2*((t-=2)*t*(((s*=(1.525))+1)*t + s) + 2) + b;
-	},
-	
-	
-	easeInBounce: function (x, t, b, c, d) {
-		return c - jQuery.easing.easeOutBounce (x, d-t, 0, c, d) + b;
-	},
-	easeOutBounce: function (x, t, b, c, d) {
-		if ((t/=d) < (1/2.75)) {
-			return c*(7.5625*t*t) + b;
-		} else if (t < (2/2.75)) {
-			return c*(7.5625*(t-=(1.5/2.75))*t + .75) + b;
-		} else if (t < (2.5/2.75)) {
-			return c*(7.5625*(t-=(2.25/2.75))*t + .9375) + b;
-		} else {
-			return c*(7.5625*(t-=(2.625/2.75))*t + .984375) + b;
-		}
-	},
-	easeInOutBounce: function (x, t, b, c, d) {
-		if (t < d/2) return jQuery.easing.easeInBounce (x, t*2, 0, c, d) * .5 + b;
-		return jQuery.easing.easeOutBounce (x, t*2-d, 0, c, d) * .5 + c*.5 + b;
-	}
-});
+	this.initialize(params);
+};

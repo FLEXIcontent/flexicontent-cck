@@ -17,31 +17,44 @@
  */
 
 defined('_JEXEC') or die('Restricted access');
-$import_task = FLEXI_J16GE ? 'task=import.' : 'controller=import&task=';
+$import_task = 'task=import.';
 ?>
-<div style="heading">Import Running ... <br/><br/><b>NOTE:</b><br/> Only the <b>execution time</b> of import process is displayed below, <br/> the <b>network request / reply time</b> is NOT included</div>
+<div style="heading">
+	Import Running ... <br/><br/>
+	<b>NOTE:</b><br/>
+	Only the <b>execution time</b> of import process is displayed below, <br/>
+	the <b>network request / reply time</b> is NOT included
+</div>
+
 <form action="index.php" method="post" enctype="multipart/form-data" name="adminForm" id="adminForm">
 	<input type="hidden" name="option" value="com_flexicontent" />
 	<input type="hidden" name="controller" value="import" />
 	<input type="hidden" name="view" value="import" />
 	<input type="hidden" name="task" value="" />
-	<?php echo JHTML::_( 'form.token' ); ?>
+	<?php echo JHtml::_( 'form.token' ); ?>
 </form>
-<script type="text/javascript">
-jQuery(document).ready(function() {
-	var items_per_call = <?php echo (int) $this->conf['import_items_per_step']; ?>;
+
+<script>
+
+jQuery(document).ready(function()
+{
+	var items_per_call = <?php echo (int) $this->conf['items_per_step']; ?>;
 	var width = 0;
 	var looper = 0;
 	var onesector = 1000;
 	var items_length = 0;
 	var number = 0;
 	var form_token = '';
-	function updateprogress() {
+
+	function updateprogress()
+	{
 		//alert(' ' +looper + '>=' + number);
-		if(looper>=number && looper) {
+		if (looper>=number && looper)
+		{
 			jQuery('div#statuscomment').html( jQuery('div#statuscomment').text() + ' , IMPORT FINISHED. You can review AND/OR RESET import process');
 			return;
 		}
+
 		jQuery.ajax({
 			url: "index.php?option=com_flexicontent&<?php echo $import_task; ?>importcsv&items_per_call="
 				+items_per_call+"&itemcnt="+looper+'&'+form_token+'=1',
@@ -66,6 +79,7 @@ jQuery(document).ready(function() {
 		});
 		looper=looper+items_per_call;
 	}
+
 	jQuery.ajax({
 		url: "index.php?option=com_flexicontent&<?php echo $import_task; ?>getlineno&format=raw",
 		success: function(response, status, xhr) {
@@ -96,49 +110,51 @@ jQuery(document).ready(function() {
 		}
 	});
 });
-window.parent.SqueezeBox.addEvent('onClose',function(){
-	window.parent.location.reload(true);
-});
+
 </script>
+
 <style>
-div#advancebar{
-	width:302px;
-	height:17px;
-	border:1px solid #000;
-	padding:0px;
-	margin:0px;
-	float:left;
-	clear:left;
-}
-div#insideprogress{
-	width:0px;
-	height:15px;
-	background-color:#000;
-	padding:0px;
-	margin:1px;
-}
-div#updatepercent{
-	clear:right;
-}
-div#statuscomment{
-	color:red;
-	margin-top:16px;
-}
-div#statuslog{
-	color:black;
-	margin-top:16px;
-	height: 200px;
-	border: 3px inset; 
-	overflow: auto;
-}
+	div#advancebar {
+		width:302px;
+		height:17px;
+		border:1px solid #000;
+		padding:0px;
+		margin:0px;
+		float:left;
+		clear:left;
+	}
+	div#insideprogress {
+		width:0px;
+		height:15px;
+		background-color:#000;
+		padding:0px;
+		margin:1px;
+	}
+	div#updatepercent {
+		clear:right;
+	}
+	div#statuscomment {
+		color:red;
+		margin-top:16px;
+	}
+	div#statuslog {
+		color:black;
+		margin-top:16px;
+		height: 200px;
+		border: 3px inset; 
+		overflow: auto;
+	}
 </style>
+
 <div class="fcclear"></div>
-<div>&nbsp;</div>
-<div>&nbsp;</div>
-<div id="advancebar"><div id="insideprogress"></div></div>
+
+<div id="advancebar" style="margin-top: 24px;">
+	<div id="insideprogress"></div>
+</div>
+
 <div id="updatepercent">0 %</div>
+
 <div class="fcclear"></div>
 <div id="statuscomment"></div>
 <div id="statuslog"></div>
 <div class="fcclear"></div>
-

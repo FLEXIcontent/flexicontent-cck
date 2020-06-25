@@ -1,69 +1,184 @@
 <?php
 /**
- * @version 1.5 stable $Id$
- * @package Joomla
- * @subpackage FLEXIcontent
- * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
- * @license GNU/GPL v2
- * 
- * FLEXIcontent is a derivative work of the excellent QuickFAQ component
- * @copyright (C) 2008 Christoph Lukes
- * see www.schlu.net for more information
+ * @package         FLEXIcontent
+ * @version         3.4
  *
- * FLEXIcontent is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
+ * @link            https://flexicontent.org
+ * @copyright       Copyright © 2020, FLEXIcontent team, All Rights Reserved
+ * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
+jimport('cms.plugin.plugin');
 
-class FCField extends JPlugin{
-	// ***********
-	// ATTRIBUTES
-	// ***********
-	static $field_types = array('fcfield');
-	protected $fieldtypes = NULL;
-	protected $field = NULL;
-	protected $item = NULL;
-	protected $vars = NULL;
-	
-	// ***********
-	// CONSTRUCTOR
-	// ***********
-	public function __construct(&$subject, $params) {
-		parent::__construct( $subject, $params );
-		if(!$this->fieldtypes)
-			$this->fieldtypes = self::$field_types;
+class FCField extends JPlugin
+{
+	// ***
+	// *** ATTRIBUTES
+	// ***
+
+	protected $fieldtypes = null;
+	protected $field = null;
+	protected $item = null;
+	protected $vars = null;
+	protected $autoloadLanguage = false;
+
+	static $cparams;
+
+	static $mobileDetector;
+	static $isMobile;
+	static $isTablet;
+	static $useMobile;
+
+	static $itemViewId;
+	static $isItemsManager;
+	static $isHtmlViewFE;
+	static $fcProPlg;
+
+
+	/**
+	 * CONSTRUCTOR
+	 */
+
+	public function __construct(&$subject, $params)
+	{
+		parent::__construct($subject, $params);
+
 		$class = strtolower(get_class($this));
 		$fieldtype = str_replace('plgflexicontent_fields', '', $class);
-		self::$field_types = array_merge(array($fieldtype), self::$field_types);
-		$this->fieldtypes = array_merge(array($fieldtype), $this->fieldtypes);
-		foreach($this->fieldtypes as $ft) {
-			JPlugin::loadLanguage('plg_flexicontent_fields_'.$fieldtype, JPATH_ADMINISTRATOR);
+
+		static::$field_types = static::$field_types ?: array($fieldtype);
+
+		if (empty($this->fieldtypes))
+		{
+			$this->fieldtypes = static::$field_types;
+		}
+
+		// Load extra field types and their language files if these have not be loaded already
+		static $initialized = array();
+
+		foreach(static::$field_types as $ft)
+		{
+			if (isset($initialized[$ft]))
+			{
+				continue;
+			}
+
+			$initialized[$ft] = true;
+
+			/**
+			 * Because 'site-default' language file may not have all needed language strings, or it may be syntactically broken
+			 * we load the ENGLISH language file (without forcing it, to avoid overwriting site-default), and then current language file
+			 */
+			$extension_name = 'plg_flexicontent_fields_' . $ft;
+			JFactory::getLanguage()->load($extension_name, JPATH_ADMINISTRATOR, 'en-GB', $force_reload = false, $load_default = true);  // force_reload OFF
+			JFactory::getLanguage()->load($extension_name, JPATH_ADMINISTRATOR, null, $force_reload = true, $load_default = true);  // force_reload ON
+
+			// Import field type if not already imported
+			$class_name = 'plgFlexicontent_fields' . ucfirst($ft);
+
+			if (!class_exists($class_name))
+			{
+				JPluginHelper::importPlugin('flexicontent_fields', $ft);
+			}
+		}
+
+		/**
+		 * One time initialization for all fields (static variables)
+		 */
+		static $init = null;
+
+		if ($init === null)
+		{
+			$init = true;
+
+			$app       = JFactory::getApplication();
+			$document  = JFactory::getDocument();
+			$option    = $app->input->getCmd('option', '');
+			$format    = $app->input->getCmd('format', 'html');
+			$realview  = $app->input->getCmd('view', '');
+
+			static::$itemViewId     = $realview === 'item' && $option === 'com_flexicontent' ? $app->input->get('id', 0, 'int') : 0;
+			static::$isItemsManager = $app->isClient('administrator') && $realview === 'items' && $option === 'com_flexicontent';
+			static::$isHtmlViewFE   = $format === 'html' && $app->isClient('site');
+
+			static::$cparams        = JComponentHelper::getParams('com_flexicontent');
+			static::$mobileDetector = flexicontent_html::getMobileDetector();
+
+			static::$isMobile  = static::$mobileDetector->isMobile();
+			static::$isTablet  = static::$mobileDetector->isTablet();
+			static::$useMobile = static::$cparams->get('force_desktop_layout', 0)
+				? static::$isMobile && !static::$isTablet
+				: static::$isMobile;
+
+			// Check for PRO system plugin presence
+			$extfolder = 'system';
+			$extname   = 'flexisyspro';
+			$className = 'plg' . ucfirst($extfolder) . $extname;
+			$plgPath = JPATH_SITE . '/plugins/' . $extfolder . '/' . $extname . '/' . $extname . '.php';
+
+			if (file_exists($plgPath))
+			{
+				// Create plugin instance of PRO system plugin
+				$dispatcher     = JEventDispatcher::getInstance();
+				$plg_db_data    = JPluginHelper::getPlugin($extfolder, $extname);
+				self::$fcProPlg = new $className($dispatcher, array(
+					'type'   => $extfolder,
+					'name'   => $extname,
+					'params' => $plg_db_data->params
+				));
+			}
 		}
 	}
-	
-	public function setField(&$field) {
+
+
+
+	// ***
+	// *** Accessor functions
+	// ***
+
+	public function setField($field)
+	{
 		$this->field = $field;
 	}
-	
-	public function &getField() {
-		return $this->field;
-	}
-	
-	public function setItem(&$item) {
+	public function setItem($item)
+	{
 		$this->item = $item;
 	}
-	
-	public function &getItem() {
+
+
+	public function getField()
+	{
+		return $this->field;
+	}
+	public function getItem()
+	{
 		return $this->item;
 	}
-	
-	protected function getSeparatorF($opentag, $closetag)
+
+
+	/**
+	 * Check if field should be rendered for given 'display variable' ($prop) and for current page ($view) and current user's client
+	 */
+	protected function checkRenderConds($prop, $view)
 	{
-		if(!$this->field) return;
-		$separatorf = $this->field->parameters->get( 'separatorf', 1 ) ;
+		$show_in_views   = FLEXIUtilities::paramToArray($this->field->parameters->get('show_in_views', array('item', 'category', 'module', 'backend')));
+		$show_in_clients = FLEXIUtilities::paramToArray($this->field->parameters->get('show_in_clients', array('desktop', 'tablet', 'mobile')));
+
+		// Calculate if field should be shown
+		return in_array($view, $show_in_views) && (
+			(static::$isTablet && in_array('tablet', $show_in_clients)) ||
+			(!static::$isTablet && static::$isMobile && in_array('mobile', $show_in_clients)) ||
+			(!static::$isTablet && !static::$isMobile && in_array('desktop', $show_in_clients))
+		);
+	}
+
+
+	protected function getSeparatorF($opentag, $closetag, $default = 1)
+	{
+		$separatorf = $this->field->parameters->get('separatorf', $default);
+
 		switch($separatorf)
 		{
 			case 0:
@@ -71,7 +186,7 @@ class FCField extends JPlugin{
 			break;
 
 			case 1:
-			$separatorf = '<br />';
+			$separatorf = '<br class="fcclear" />';
 			break;
 
 			case 2:
@@ -94,233 +209,673 @@ class FCField extends JPlugin{
 			$separatorf = '&nbsp;';
 			break;
 		}
+
 		return $separatorf;
 	}
-	
-	
-	// *******************************************
-	// DISPLAY methods, item form & frontend views
-	// *******************************************
-	
+
+
+
+	// ***
+	// *** DISPLAY methods, item form & frontend views
+	// ***
+
 	// Method to create field's HTML display for item form
 	public function onDisplayField(&$field, &$item)
 	{
-		if ( !in_array($field->field_type, self::$field_types) ) return;
-		$field->label = JText::_($field->label);
-		
+		if ( !in_array($field->field_type, static::$field_types) ) return;
+
+		$field->label = $field->parameters->get('label_form') ? JText::_($field->parameters->get('label_form')) : JText::_($field->label);
+
+		// Set field and item objects
 		$this->setField($field);
 		$this->setItem($item);
+
+		// Parse field values
 		$this->values = $this->parseValues($this->field->value);
-		
-		$this->displayField();
+
+		// Optionally, get default field values array is empty
+		$this->values = count($this->values) ? $this->values : $this->getDefaultValues($isform = true);
+
+		// Call before display method, for optionally work
+		$this->beforeDisplayField();
+
+		$formlayout = $field->parameters->get('formlayout', '');
+		$formlayout = $formlayout && $formlayout != 'field' ? 'field_'.$formlayout : 'field';
+
+		// Display the form field
+		$this->displayField($formlayout);
 	}
-	
-	
+
+
 	// Method to create field's HTML display for frontend views
 	public function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')
 	{
-		if ( !in_array($field->field_type, self::$field_types) ) return;
+		if ( !in_array($field->field_type, static::$field_types) ) return;
+
 		$field->label = JText::_($field->label);
-		
+
+		// Set field and item objects
 		$this->setField($field);
 		$this->setItem($item);
-		$this->values = $this->parseValues($this->field->value);
-		
-		$this->display($values, $prop);
+
+		/**
+		 * One time initialization
+		 */
+
+		static $initialized = null;
+		static $app, $document, $option, $format, $realview;
+
+		if ($initialized === null)
+		{
+			$initialized = 1;
+
+			$app       = JFactory::getApplication();
+			$document  = JFactory::getDocument();
+			$option    = $app->input->getCmd('option', '');
+			$format    = $app->input->getCmd('format', 'html');
+			$realview  = $app->input->getCmd('view', '');
+		}
+
+		// Current view variable
+		$view = $app->input->getCmd('flexi_callview', ($realview ?: 'item'));
+		$sfx = $view === 'item' ? '' : '_cat';
+
+		// Check if field should be rendered according to configuration
+		if (!$this->checkRenderConds($prop, $view))
+		{
+			return;
+		}
+
+		// Use the custom field values, if these were provided
+		$values = $values !== null ? $values : $this->field->value;
+
+		// Parse field values
+		$this->values = $this->parseValues($values);
+
+		// Get default values if field current values are empty
+		$this->values = count($this->values) ? $this->values : $this->getDefaultValues($isform = false);
+
+		// Get choosen display layout
+		$viewlayout = $field->parameters->get('viewlayout', '');
+		$viewlayout = $viewlayout && $viewlayout !== 'value' ? 'value_'.$viewlayout : 'value';
+
+		// Create field's display
+		$this->displayFieldValue($prop, $viewlayout, $data);
 	}
-	
-	
+
+
+
+	// ***
+	// *** METHODS HANDLING before & after saving / deleting field events
+	// ***
+
 	// Method to handle field's values before they are saved into the DB
 	public function onBeforeSaveField( &$field, &$post, &$file, &$item )
 	{
-		if ( !in_array($field->field_type, self::$field_types) ) return;
+		if ( !in_array($field->field_type, static::$field_types) ) return;
 		if ( !is_array($post) && !strlen($post) ) return;
 	}
-	
-	
+
+
 	// Method to take any actions/cleanups needed after field's values are saved into the DB
-	public function onAfterSaveField( &$field, &$post, &$file, &$item ) {
+	public function onAfterSaveField( &$field, &$post, &$file, &$item )
+	{
+		if ( !in_array($field->field_type, static::$field_types) ) return;
+		if ( !is_array($post) && !strlen($post) ) return;
 	}
-	
-	
+
+
 	// Method called just before the item is deleted to remove custom item data related to the field
-	public function onBeforeDeleteField(&$field, &$item) {
+	public function onBeforeDeleteField(&$field, &$item)
+	{
+		if ( !in_array($field->field_type, static::$field_types) ) return;
 	}
-	
-	
-	
-	// *********************************
-	// CATEGORY/SEARCH FILTERING METHODS
-	// *********************************
-	
+
+
+
+	// ***
+	// *** CATEGORY/SEARCH FILTERING METHODS
+	// ***
+
 	// Method to display a search filter for the advanced search view
-	public function onAdvSearchDisplayFilter(&$filter, $value='', $formName='searchForm') {
-		if ( !in_array($filter->field_type, self::$field_types) ) return;
-		
-		$filter->parameters->set( 'display_filter_as_s', 1 );  // Only supports a basic filter of single text search input
+	public function onAdvSearchDisplayFilter(&$filter, $value='', $formName='searchForm')
+	{
+		if ( !in_array($filter->field_type, static::$field_types) ) return;
+
+		// As default implementation of this method, we force a basic filter of single text search input
+		$filter->parameters->set( 'display_filter_as_s', 1 );
 		FlexicontentFields::createFilter($filter, $value, $formName);
 	}
-	
+
+
+	// Method to display a category filter for the category view
+	public function onDisplayFilter(&$filter, $value='', $formName='adminForm', $isSearchView=0)
+	{
+		if ( !in_array($filter->field_type, static::$field_types) ) return;
+
+		// As default implementation of this method, we force a basic filter of single text search input
+		$filter->parameters->set( 'display_filter_as', 1 );
+		FlexicontentFields::createFilter($filter, $value, $formName);
+	}
+
+
+	// Method to get the active filter result (an array of item ids matching field filter, or subquery returning item ids)
+	// This is for content lists e.g. category view, and not for search view
+	public function getFiltered(&$filter, $value, $return_sql = true)
+	{
+		if ( !in_array($filter->field_type, static::$field_types) ) return;
+
+		// As default implementation of this method, we force a basic filter of single text search input
+		$filter->parameters->set( 'display_filter_as', 1 );
+		return FlexicontentFields::getFiltered($filter, $value, $return_sql);
+	}
+
+
 	// Method to get the active filter result (an array of item ids matching field filter, or subquery returning item ids)
 	// This is for search view
-	public function getFilteredSearch(&$field, $value) {
-		if ( !in_array($field->field_type, self::$field_types) ) return;
-		
-		$field->parameters->set( 'display_filter_as_s', 1 );  // Only supports a basic filter of single text search input
-		return FlexicontentFields::getFilteredSearch($field, $value, $return_sql=true);
+	public function getFilteredSearch(&$filter, $value, $return_sql = true)
+	{
+		if ( !in_array($filter->field_type, static::$field_types) ) return;
+
+		// As default implementation of this method, we force a basic filter of single text search input
+		$filter->parameters->set( 'display_filter_as_s', 1 );
+		return FlexicontentFields::getFilteredSearch($filter, $value, $return_sql);
 	}
-	
-	// *************************
-	// SEARCH / INDEXING METHODS
-	// *************************
-	
+
+
+
+	// ***
+	// *** SEARCH / INDEXING METHODS
+	// ***
+
 	// Method to create (insert) advanced search index DB records for the field values
-	public function onIndexAdvSearch(&$field, &$post, &$item) {
-		if ( !in_array($field->field_type, self::$field_types) ) return;
+	public function onIndexAdvSearch(&$field, &$post, &$item)
+	{
+		if ( !in_array($field->field_type, static::$field_types) ) return;
 		if ( !$field->isadvsearch && !$field->isadvfilter ) return;
-		
+
 		FlexicontentFields::onIndexAdvSearch($field, $post, $item, $required_properties=array('originalname'), $search_properties=array('title','desc'), $properties_spacer=' ', $filter_func=null);
 		return true;
 	}
-	
+
+
 	// Method to create basic search index (added as the property field->search)
-	public function onIndexSearch(&$field, &$post, &$item) {
-		if ( !in_array($field->field_type, self::$field_types) ) return;
+	public function onIndexSearch(&$field, &$post, &$item)
+	{
+		if ( !in_array($field->field_type, static::$field_types) ) return;
 		if ( !$field->issearch ) return;
-		
+
 		FlexicontentFields::onIndexSearch($field, $post, $item, $required_properties=array('originalname'), $search_properties=array('title','desc'), $properties_spacer=' ', $filter_func=null);
 		return true;
 	}
-	
-	/**
-	 * Get the path to a layout for a field
-	 *
-	 * @param   string  $plg  The name of the field
-	 * @param   string  $layout  The name of the field layout. If alternative layout, in the form template:filename.
-	 *
-	 * @return  string  The path to the field layout
-	 *
-	 * @since   1.5
-	 */
-	public static function getLayoutPath($plg, $layout = 'field')
-	{
-		$template = JFactory::getApplication('site')->getTemplate();
-		$defaultLayout = $layout;
 
-		if (strpos($layout, ':') !== false) {
-			// Get the template and file name from the string
+
+
+	/**
+	 * Function to calculate and return the layout path for a field
+	 */
+
+	public static function getLayoutPath($plg, $layout = 'field', $plg_subtype='', $default_layout='field')
+	{
+		static $paths = array();
+		static $template = null;
+
+		if ( isset($paths[$plg][$layout][$plg_subtype]) )  // return cached
+		{
+			return $paths[$plg][$layout][$plg_subtype];
+		}
+
+		if ($template === null)
+		{
+			$template = JFactory::getApplication('site')->getTemplate();
+		}
+
+		// Get the template and layout name from the string if string contains ':' (aka folder seperators)
+		if (strpos($layout, ':') !== false)
+		{
 			$temp = explode(':', $layout);
 			$template = ($temp[0] == '_') ? $template : $temp[0];
 			$layout = $temp[1];
-			$defaultLayout = ($temp[1]) ? $temp[1] : 'field';
 		}
 
-		// Build the template and base path for the layout
-		$tPath = JPATH_ROOT . '/templates/' . $template . '/html/fcfields/' . $plg . '/' . $layout . '.php';
-		$bPath = JPATH_ROOT . '/plugins/flexicontent_fields/' . $plg . '/tmpl/' . $defaultLayout . '.php';
-		$dPath = JPATH_ROOT . '/plugins/flexicontent_fields/' . $plg . '/tmpl/field.php';
+		// ***
+		// *** Build the template and base path for the layout, and check it exists, returing it, in order of priority
+		// ***
 
-		// If the template has a layout override use it
-		/*if (file_exists($tPath)) {
-			return $tPath;
-		} elseif (file_exists($bPath)) {
-			return $bPath;
-		} else {
-			return $dPath;
-		}*/
-		
-		if (file_exists($bPath)) {
-			return $bPath;
-		} else {
-			return $dPath;
+		// Layout via Joomla template override, in /templates/ folder
+		if (file_exists(($tPath = JPATH_ROOT . '/templates/' . $template . '/html/flexicontent_fields/' . $plg . '/' . ($plg_subtype ? $plg_subtype.'/' : '') . $layout . '.php')))
+			$return = $tPath;
+
+		// Layout inside field folder
+		elseif (file_exists($fPath = JPATH_ROOT . '/plugins/flexicontent_fields/' . $plg . '/tmpl/' . ($plg_subtype ? $plg_subtype.'/' : '') . $layout . '.php'))
+			$return = $fPath;
+
+		// Default fallback
+		elseif (file_exists($dPath = JPATH_ROOT . '/plugins/flexicontent_fields/' . $plg . '/tmpl/' . ($plg_subtype ? $plg_subtype.'/' : '') . $default_layout . '.php'))
+			$return = $dPath;
+
+		// Default fallback (strip '_default')
+		else
+			$return = $dPath = JPATH_ROOT . '/plugins/flexicontent_fields/' . $plg . '/tmpl/' . ($plg_subtype ? $plg_subtype.'/' : '') . str_replace('_default', '', $default_layout) . '.php';
+
+		$paths[$plg][$layout][$plg_subtype] = $return;  // Cache result
+		return $return;
+	}
+
+
+	// Get Layout paths for editing, this is a wrapper to getLayoutPath()
+	public function getFormPath($plg, $layout, $plg_subtype='')
+	{
+		return $this->getLayoutPath($plg, $layout ?: 'field', $plg_subtype, $default='field_default');
+	}
+
+	// Get Layout paths for viewing, this is a wrapper to getLayoutPath()
+	public function getViewPath($plg, $layout, $plg_subtype='')
+	{
+		return $this->getLayoutPath($plg, $layout ?: 'value', $plg_subtype, $default_layout='value_default');
+	}
+
+
+
+	/**
+	 * Include a layout file, setting some variables, for compatibility: $field, $item, $values
+	 * UNUSED, remains for B/C reasons with 3rd party fields that may use it
+	 * This is unused because we need to expose more values to the layout,
+	 * and duplicating various per field code to assign various variables, would be bug-prone
+	 */
+	protected function includePath($path, $prop = 'display', $document_type = 'html')
+	{
+		if (!file_exists($path))
+		{
+			return false;
 		}
+
+		$field  = $this->getField();
+		$item   = $this->getItem();
+		$values = $this->values;
+
+		include($path);
+
+		return true;
 	}
-	
-	public function getFormPath($plg, $layout = 'field') {
-		return $this->getLayoutPath($plg, $layout);
-	}
-	
-	public function getViewPath($plg, $layout = 'value') {
-		return $this->getLayoutPath($plg, $layout);
-	}
-	
-	protected function getOpenTag() {
-		return FlexicontentFields::replaceFieldValue( $this->field, $this->item, $this->field->parameters->get( 'opentag', '' ), 'opentag' );
-	}
-	
-	protected function getCloseTag() {
-		return FlexicontentFields::replaceFieldValue( $this->field, $this->item, $this->field->parameters->get( 'closetag', '' ), 'closetag' );
-	}
-	
-	public function displayField()
+
+
+
+	/**
+	 * Function to create field's HTML for edit form
+	 */
+	protected function displayField($layout = 'field')
 	{
 		// Prepare variables
 		$use_ingroup = 0;
 		$multiple = 0;
+
 		$field  = $this->getField();
 		$item   = $this->getItem();
-		$values = & $this->values;
-		
+		$values = $this->values;
+
 		$field->html = array();
-		
-		// Include template file: EDIT LAYOUT 
-		include(self::getLayoutPath($this->fieldtypes[0]));
-		
-		if ($use_ingroup) { // do not convert the array to string if field is in a group
-		} else if ($multiple) { // handle multiple records
-			$field->html =
+
+		// Create field's form HTML, using layout file, (editing layout)
+		include(self::getFormPath($this->fieldtypes[0], $layout));
+
+		// Do not convert the array to string if field is in a group
+		if ($use_ingroup);
+
+		// Handle multiple records
+		elseif ($multiple)
+		{
+			$field->html = !count($field->html) ? '' :
 				'<li class="'.$value_classes.'">'.
 					implode('</li><li class="'.$value_classes.'">', $field->html).
 				'</li>';
 			$field->html = '<ul class="fcfield-sortables" id="sortables_'.$field->id.'">' .$field->html. '</ul>';
-			if (!$add_position) $field->html .= '<span class="fcfield-addvalue fccleared" onclick="addField'.$field->id.'(this);" title="'.JText::_( 'FLEXI_ADD_TO_BOTTOM' ).'"></span>';
-		} else {  // handle single values
-			$field->html = '<div class="fcfieldval_container valuebox fcfieldval_container_'.$field->id.'">' . $field->html[0] .'</div>';
+			if (!$add_position) $field->html .= '
+				<div class="input-append input-prepend fc-xpended-btns">
+					<span class="fcfield-addvalue ' . $font_icon_class . ' fccleared" onclick="addField'.$field->id.'(jQuery(this).closest(\'.fc-xpended-btns\').get(0));" title="'.JText::_( 'FLEXI_ADD_TO_BOTTOM' ).'">
+						'.JText::_( 'FLEXI_ADD_VALUE' ).'
+					</span>
+				</div>';
+		}
+
+		// Handle single values
+		else
+		{
+			$field->html = '<div class="fcfieldval_container valuebox fcfieldval_container_'.$field->id.'">
+				' . (isset($field->html[-1]) ? $field->html[-1] : '') . $field->html[0] . '
+			</div>';
 		}
 	}
-	
-	public function display(&$values=null, $prop='display')
+
+
+
+	// *****************************************************
+	// Function to create field's HTML display (for viewing)
+	// *****************************************************
+
+	protected function displayFieldValue($prop = 'display', $layout = 'value')
 	{
-		// Prepare variables
-		$use_ingroup = 0;
+		// Get Field and Item objects, and values
 		$field  = $this->getField();
 		$item   = $this->getItem();
-		$values = & $this->values;
-		
-		$opentag	= $this->getOpenTag();
-		$closetag	= $this->getCloseTag();
-		$separatorf	= $this->getSeparatorF($opentag, $closetag);
-		
-		$this->field->{$prop} = array();
-		
-		// Execute template file: VALUE VIEWING
-		include(self::getViewPath($this->fieldtypes[0]));
-		
-		// Apply separator and open/close tags
-		if (!$use_ingroup)  // do not convert the array to string if field is in a group
+		$values = $this->values;
+
+		// Prepare some of the needed variables
+		$is_ingroup  = !empty($field->ingroup);
+		$use_ingroup = $field->parameters->get('use_ingroup', 0);
+
+		// Current view variable
+		$app      = JFactory::getApplication();
+		$realview = $app->input->getCmd('view', '');
+		$view     = JFactory::getApplication()->input->getCmd('flexi_callview', ($realview ?: 'item'));
+
+		/**
+		 * Get common parameters like: itemprop, value's prefix (pretext), suffix (posttext), separator, value list open/close text (opentag, closetag)
+		 * This will replace other field values and item properties, if such are found inside the parameter texts
+		 */
+		$common_params_array = $this->getCommonParams();
+		extract($common_params_array);
+
+		/**
+		 * Create field's display HTML, using layout file, (viewing layout)
+		 * NOTE: we will use $this->fieldtypes[0] to get the proper path that contains the layouts
+		 */
+
+		// Create field's viewing HTML, using layout file
+		$field->{$prop} = array();
+		include(self::getViewPath($this->fieldtypes[0], $layout));
+
+		// Do not convert the array to string if field is in a group, and do not add: FIELD's opentag, closetag, value separator
+		if (!$is_ingroup)
 		{
-			// Apply separator and open/close tags
+			// Apply values separator
 			$field->{$prop} = implode($separatorf, $field->{$prop});
-			if ( $field->{$prop}!=='' ) {
+
+			if ($field->{$prop} !== '')
+			{
+				// Apply field 's opening / closing texts
 				$field->{$prop} = $opentag . $field->{$prop} . $closetag;
-			} else {
-				$field->{$prop} = '';
+
+				// Add microdata once for all values, if field -- is NOT -- in a field group
+				if ($itemprop)
+				{
+					$field->{$prop} = '<div style="display:inline" itemprop="'.$itemprop.'" >' .$field->{$prop}. '</div>';
+				}
+			}
+			elseif ($no_value_msg !== '')
+			{
+				$field->{$prop} = $no_value_msg;
 			}
 		}
 	}
-	
-	
-	public function & parseValues(&$values)
+
+
+
+	// ***
+	// *** Functions to execute common value preparation
+	// ***
+
+	// Do something before creating field's HTML for edit form
+	protected function beforeDisplayField() {}
+
+	// do something after creating field's HTML for edit form
+	protected function afterDisplayField() {}
+
+	// Create and returns a default value
+	protected function getDefaultValues($isform = true)
+	{
+		$value_usage = (int) $this->field->parameters->get('default_value_use', 0);
+
+		$default_value = $isform
+			? (($this->item->version == 0 || $value_usage > 0) ? $this->field->parameters->get( 'default_value', '' ) : '')
+			: (($value_usage === 2) ? $this->field->parameters->get( 'default_value', '' ) : '');
+
+		$default_value  = strlen($default_value) ? JText::_($default_value) : '';
+
+		/**
+		 * Return default value. Note: If no default value then return:
+		 *  array('') for item form
+		 *  array() for item viewing
+		 */
+		return strlen($default_value) || $isform
+			? array($default_value)
+			: array();
+	}
+
+	// Parses and returns fields values, unserializing them if serialized
+	protected function parseValues($values)
 	{
 		$vals = array();
-		if (!empty($values)) foreach($values as $value) {
-			$v = !empty($value) ? @unserialize($value) : false;
-			if ( $v !== false || $v === 'b:0;' ) {
-				$vals[] = $v;
-			} else {
-				$vals[] = $value;
+
+		// Check if empty
+		if (empty($values))
+		{
+			return $vals;
+		}
+
+		// Make sure we have an array of values
+		$values = is_array($values) ? $values : array($values);
+
+		foreach($values as $value)
+		{
+			// Compatibility for non-serialized values or for NULL values in a field group
+			if (!is_array($value))
+			{
+				$array = $this->unserialize_array($value, $force_array=false, $force_value=false);
+				$vals[] = $array ?: array();
 			}
 		}
+
 		return $vals;
+	}
+
+
+	// Get Prefix - Suffix - Separator parameters and other common parameters
+	protected function & getCommonParams($sep_default = 1)
+	{
+		static $conf = array();
+
+		if (isset($conf[$this->field->id][$this->item->id]))
+		{
+			return $conf[$this->field->id][$this->item->id];
+		}
+
+		// Value Prefix - Suffix, Value List Open Text - Close Text, replacing other field values, and item properties
+		$arr = array();
+		$arr['pretext']  = FlexicontentFields::replaceFieldValue($this->field, $this->item, JText::_($this->field->parameters->get('pretext', '')), 'pretext');
+		$arr['posttext'] = FlexicontentFields::replaceFieldValue($this->field, $this->item, JText::_($this->field->parameters->get('posttext', '')), 'posttext');
+		$arr['opentag']  = FlexicontentFields::replaceFieldValue($this->field, $this->item, JText::_($this->field->parameters->get('opentag', '')), 'opentag');
+		$arr['closetag'] = FlexicontentFields::replaceFieldValue($this->field, $this->item, JText::_($this->field->parameters->get('closetag', '')), 'closetag');
+
+		// Add spaces to Value Prefix - Suffix texts
+		$arr['remove_space'] = $this->field->parameters->get('remove_space', 0);
+
+		if ($arr['pretext'])
+		{
+			$arr['pretext']  = $arr['remove_space'] ? $arr['pretext'] : $arr['pretext'] . ' ';
+		}
+		if ($arr['posttext'])
+		{
+			$arr['posttext'] = $arr['remove_space'] ? $arr['posttext'] : ' ' . $arr['posttext'];
+		}
+
+		// Get value separator text
+		$arr['separatorf'] = $this->getSeparatorF($arr['opentag'], $arr['closetag'], $sep_default);
+
+		// Microdata (classify the field values for search engines)
+		$arr['itemprop'] = $this->field->parameters->get('microdata_itemprop');
+
+		// No value text
+		$arr['no_value_msg'] = $this->field->parameters->get('show_no_value', 0)
+			? JText::_($this->field->parameters->get('no_value_msg', 'FLEXI_NO_VALUE'))
+			: '';
+
+		$conf[$this->field->id][$this->item->id] = $arr;
+
+		return $arr;
+	}
+
+
+	// Unserialize array from string but abort if objects are detected
+	function unserialize_array($v, $force_array=false, $force_value = true)
+	{
+		return flexicontent_db::unserialize_array($v, $force_array, $force_value);
+	}
+
+
+	/**
+	 * Method to do extra handling of field's values after all fields have validated their posted data, and are ready to be saved
+	 *
+	 * $item->fields['fieldname']->postdata contains values of other fields
+	 * $item->fields['fieldname']->filedata contains files of other fields (normally this is empty due to using AJAX for file uploading)
+	 */
+	public function onAllFieldsPostDataValidated(&$field, &$item)
+	{
+		if ( !in_array($field->field_type, static::$field_types) ) return;
+
+		/**
+		 * Check if using 'auto_value_code', clear 'auto_value', if function not set
+		 */
+		$auto_value = (int) $field->parameters->get('auto_value', 0);
+		if ($auto_value === 2)
+		{
+			$auto_value_code = $field->parameters->get('auto_value_code', '');
+			$auto_value_code = preg_replace('/^<\?php(.*)(\?>)?$/s', '$1', $auto_value_code);
+		}
+		$auto_value = $auto_value === 2 && !$auto_value_code ? 0 : $auto_value;
+
+		if (!$auto_value)
+		{
+			return;
+		}
+
+		//JFactory::getApplication()->enqueueMessage('Automatic field value for field  \'' . $field->label, 'notice');
+
+		if (!self::$fcProPlg)
+		{
+			JFactory::getApplication()->enqueueMessage('Automatic field value for field  \'' . $field->label . '\' is only supported by FLEXIcontent PRO version, please disable this feature in field configuration', 'notice');
+			return;
+		}
+
+		// Create automatic value
+		return self::$fcProPlg->onAllFieldsPostDataValidated($field, $item);
+	}
+
+
+	// Create once the options for every field property that has specific selection options (e.g. drop down-selection)
+	function getPropertyOptions($choices, $default_option = null)
+	{
+		// Parse the elements used by field unsetting last element if empty
+		$choices = preg_split("/[\s]*%%[\s]*/", $choices);
+		if ( empty($choices[count($choices)-1]) )
+		{
+			unset($choices[count($choices)-1]);
+		}
+
+		// Split elements into their properties: value, label, extra_prop1, extra_prop2
+		$elements = array();
+		$k = 0;
+		foreach ($choices as $choice)
+		{
+			$choice_props  = preg_split("/[\s]*::[\s]*/", $choice);
+			if (count($choice_props) < 2)
+			{
+				echo "Error in field: ".$field->label.
+					" while splitting class element: ".$choice.
+					" properties needed: ".$props_needed.
+					" properties found: ".count($choice_props);
+				continue;
+			}
+			$elements[$k] = new stdClass();
+			$elements[$k]->value = $choice_props[0];
+			$elements[$k]->text  = $choice_props[1];
+			$k++;
+		}
+
+		// Create the options for select drop down
+		$options = array();
+		if ($default_option === null)
+		{
+			$options[] = JHtml::_('select.option', '', '-');
+		}
+		else
+		{
+			$default_label = $default_option->label;
+
+			foreach ($elements as $element)
+			{
+				if ($element->value === $default_option->value)
+				{
+					$default_label .= ' - (' . JText::_($element->text) . ')';
+				}
+			}
+			$options[] = JHtml::_('select.option', '', $default_label);
+		}
+		foreach ($elements as $element)
+		{
+			$options[] = JHtml::_('select.option', $element->value, JText::_($element->text));
+		}
+
+		return $options;
+	}
+
+
+	/**
+	 *  Get existing field values
+	 */
+	public function getExistingFieldValues()
+	{
+		$db = JFactory::getDbo();
+		$query = $db->getQuery(true)
+			->select('value')
+			->from('#__flexicontent_fields_item_relations')
+			->where('field_id = ' . (int) $this->field->id)
+			->where('item_id = ' . (int) $this->item->id)
+			->order('valueorder')
+			;
+
+		return $db->setQuery($query)->loadColumn();
+	}
+
+
+	// Get existing field values
+	function renameLegacyFieldParameters($map)
+	{
+		// Load parameters directly from DB
+		$db = JFactory::getDbo();
+		$query = $db->getQuery(true)
+			->select('attribs')
+			->from('#__flexicontent_fields')
+			->where('id = ' . (int) $this->field->id)
+			;
+		$attribs = $db->setQuery($query)->loadResult();
+
+		// Decode parameters
+		$_attribs = json_decode($attribs);
+
+		// Set old parameter values into new parameters, removing the old parameter values
+		foreach($map as $old => $new)
+		{
+			if (isset($_attribs->$old))
+			{
+				// Set new parameter value and remove legacy parameter value
+				$_attribs->$new = $_attribs->$old;
+				unset($_attribs->$old);
+
+				// Update existing parameters object, to avoid reload field parameters
+				$this->field->parameters->set($new, $_attribs->$new);
+			}
+		}
+
+		// Re-encode parameters
+		$attribs = json_encode($_attribs);
+
+		// Store field parameter back to the DB
+		$query = $db->getQuery(true)
+			->update('#__flexicontent_fields')
+			->set('attribs = ' . $db->Quote($attribs))
+			->where('id = ' . (int) $this->field->id)
+			;
+		$db->setQuery($query)->execute();
 	}
 }

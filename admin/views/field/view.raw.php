@@ -16,102 +16,107 @@
  * GNU General Public License for more details.
  */
 
-defined( '_JEXEC' ) or die( 'Restricted access' );
-jimport('joomla.application.component.view');
+defined('_JEXEC') or die('Restricted access');
+
+jimport('legacy.view.legacy');
 
 /**
  * View class for the FLEXIcontent field screen
- *
- * @package Joomla
- * @subpackage FLEXIcontent
- * @since 1.0
  */
 class FlexicontentViewField extends JViewLegacy
 {
-	function display($tpl = null) {
-		$app  = JFactory::getApplication();
-		$user = JFactory::getUser();
+	function display($tpl = null)
+	{
+		// ***
+		// *** Initialise variables
+		// ***
 
-		JHTML::_('behavior.tooltip');
+		$app      = JFactory::getApplication();
+		$jinput   = $app->input;
+		$user     = JFactory::getUser();
 
-		//get vars
-		$cid 		= JRequest::getVar( 'cid' );
-		$field_type = JRequest::getVar( 'field_type', 0 );
+		// Get url vars and some constants
+		$cid = $jinput->getInt('cid', 0);
+		$field_type = $jinput->getCmd('field_type', null);
+
+
+		// ***
+		// *** Get record data, and check if record is already checked out
+		// ***
 		
-		//Get data from the model
+		// Get model and load the record data
 		$model = $this->getModel();
-		if (FLEXI_J16GE) {
-			$form = $this->get('Form');
-		} else {
-			$row = & $this->get( 'Field' );
-			
-			//Import File system
-			jimport('joomla.filesystem.file');
-			
-			// Create the form
-			$pluginpath = JPATH_PLUGINS.DS.'flexicontent_fields'.DS.$field_type.'.xml';
-			if (JFile::exists( $pluginpath )) {
-				$form = new JParameter('', $pluginpath);
-			} else {
-				$form = new JParameter('', JPATH_PLUGINS.DS.'flexicontent_fields'.DS.'core.xml');
-			}
-			$form->loadINI($row->attribs);
-		}
-		
-		$isnew = FLEXI_J16GE ? !$form->getValue('id') : !$row->id;
-		
-		// fail if checked out not by 'me'
-		if ( !$isnew ) {
-			if ($model->isCheckedOut( $user->get('id') )) {
-				JError::raiseWarning( 'SOME_ERROR_CODE', $row->name.' '.JText::_( 'FLEXI_EDITED_BY_ANOTHER_ADMIN' ));
-				$app->redirect( 'index.php?option=com_flexicontent&view=fields' );
-			}
-		}
-		
-		/*if ($field_type)
+
+		// Set requested field type into the model, so that we will display the correct type-specific parameters of the new field type
+		// Note: this needs to be done --before-- calling anything that loads JForm (aka also before loading the record)
+		if ($field_type)
 		{
-			if (!FLEXI_J16GE) {
-				echo $form->render('params', 'group-' . $field_type );
-			} else {
-				foreach ($form->getFieldset('group-' . $field_type) as $field) {
-					echo '<fieldset class="panelform">' . $field->label . $field->input . '</fieldset>' . "\n";
-				}
-			}
-		} else {
-			echo "<br /><span style=\"padding-left:25px;\"'>" . JText::_( 'FLEXI_APPLY_TO_SEE_THE_PARAMETERS' ) . "</span><br /><br />";
-		}*/
+			$model->setFieldType($field_type);
+		}
+
+		$row   = $model->getItem();
+		$isnew = ! $row->id;
+
+		// Get JForm
+		$form  = $model->getForm();
+
+		if (!$form)
+		{
+			jexit($model->getError());
+		}
+
+		// Fail if an existing record is checked out by someone else
+		if ($row->id && $model->isCheckedOut($user->get('id')))
+		{
+			$app->enqueueMessage(JText::_( 'FLEXI_EDITED_BY_ANOTHER_ADMIN' ), 'warning');
+			$app->redirect( 'index.php?option=com_flexicontent&view=' . $manager_view );
+		}
 		
 		?>
 		<div class="fctabber fields_tabset" id="field_specific_props_tabset">
-		<?php
-		$fieldSets = $form->getFieldsets('attribs');
-		$prefix_len = strlen('group-'.$field_type);
-		foreach ($fieldSets as $name => $fieldSet) :
-			if ($name!='basic' && $name!='standard' && substr($name, 0, $prefix_len)!='group-'.$field_type ) continue;
-			if ($fieldSet->label) $label = JText::_($fieldSet->label);
-			else $label = $name=='basic' || $name=='standard' ? JText::_('FLEXI_BASIC') : ucfirst(str_replace("group-", "", $name));
-			
-			if (@$fieldSet->label_prefix) $label = JText::_($fieldSet->label_prefix) .' - '. $label;
-			$icon = @$fieldSet->icon_class ? 'data-icon-class="'.$fieldSet->icon_class.'"' : '';
-			$prepend = @$fieldSet->prepend_text ? 'data-prefix-text="'.JText::_($fieldSet->prepend_text).'"' : '';
-			
-			$description = $fieldSet->description ? JText::_($fieldSet->description) : '';
-			?>
-			<div class="tabbertab" id="fcform_tabset_<?php echo $name; ?>_tab" <?php echo $icon; ?> <?php echo $prepend; ?>>
-				<h3 class="tabberheading" title="<?php echo $description; ?>"><?php echo $label; ?> </h3>
-				<?php
-				$i = 0;
-				foreach ($form->getFieldset($name) as $field) {
-					echo '<fieldset class="panelform '.($i ? '' : 'fc-nomargin').'">' . $field->label . $field->input . '</fieldset>' . "\n";
-					$i++;
-				}
+			<?php
+			// Remove hidden attribute
+			foreach ($form->getXml()->config->fields->fieldset as $fieldset)
+			{
+				$fieldset->attributes()->hidden = null;
+			}
+
+			$fieldSets = $form->getFieldsets('attribs');
+			$prefix_len = strlen('group-'.$field_type.'-');
+
+			foreach ($fieldSets as $name => $fieldSet) :
+				if ($name!='basic' && $name!='standard' && (substr($name, 0, $prefix_len)!='group-'.$field_type.'-' || $name==='group-'.$field_type) ) continue;
+				if ($fieldSet->label) $label = JText::_($fieldSet->label);
+				else $label = $name=='basic' || $name=='standard' ? JText::_('FLEXI_BASIC') : ucfirst(str_replace("group-", "", $name));
+				
+				if (@$fieldSet->label_prefix) $label = JText::_($fieldSet->label_prefix) .' - '. $label;
+				$icon = @$fieldSet->icon_class ? 'data-icon-class="'.$fieldSet->icon_class.'"' : '';
+				$prepend = @$fieldSet->prepend_text ? 'data-prefix-text="'.JText::_($fieldSet->prepend_text).'"' : '';
+				
+				$description = $fieldSet->description ? JText::_($fieldSet->description) : '';
 				?>
-			</div>
-		<?php endforeach; ?>
+				<div class="tabbertab" id="fcform_tabset_<?php echo $name; ?>_tab" <?php echo $icon; ?> <?php echo $prepend; ?>>
+					<h3 class="tabberheading hasTooltip" title="<?php echo $description; ?>"><?php echo $label; ?> </h3>
+					<?php $i = 0; ?>
+					<?php foreach ($form->getFieldset($name) as $field) {
+						$_depends = $field->getAttribute('depend_class');
+
+						if ( $field->getAttribute('box_type') )
+							echo $field->input;
+						else
+							echo '
+						<fieldset class="panelform'.($i ? '' : ' fc-nomargin').' '.($_depends ? ' '.$_depends : '').'" id="'.$field->id.'-container">
+							'.($field->label ? '
+								<span class="label-fcouter">'.str_replace('class="', 'class="label-fcinner ', $field->label).'</span>
+								<div class="container_fcfield">'.$field->input.'</div>
+							' : $field->input).'
+						</fieldset>
+						';
+						$i++;
+					} ?>
+				</div>
+			<?php endforeach; ?>
 		</div>
-		
 		<?php
-		//parent::display($tpl);
 	}
 }
-?>

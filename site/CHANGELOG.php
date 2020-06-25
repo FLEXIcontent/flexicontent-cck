@@ -285,7 +285,7 @@ $ -> Language fix or change
 
 - Removed features
 --------------------------------------------------------------------------------------------------
-- Cleanup : Remove the deprecated method setCacheThumbChmod() - thanks to Brian Teeman for reporting ;-)))
+- Cleanup : Remove the deprecated method setCacheThumbPerms() - thanks to Brian Teeman for reporting ;-)))
 
 
 

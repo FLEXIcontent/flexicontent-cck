@@ -16,7 +16,7 @@
  * GNU General Public License for more details.
  */
 
-defined( '_JEXEC' ) or die( 'Restricted access' );
+defined('_JEXEC') or die('Restricted access');
 ?>
 
 <!-- CSS fixes for J2.5.x -->
@@ -24,15 +24,15 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 	form.lang_submit select#lang {  float:none;	margin:0px;  }
 </style>
 
-<script type="text/javascript">
+<script>
 	window.addEvent('domready', function(){
 		$('lang').addEvent('change', function(e) {
 			if(MooTools.version>="1.2.4") {
 
-				$('log').set('html', '<p class="spinner"><img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center"><span><?php echo JText::_( 'FLEXI_SEND_LANGUAGE_CHECKING',true ); ?></span></p>');
+				$('log').set('html', '<p class="spinner"><img src="components/com_flexicontent/assets/images/ajax-loader.gif" style="vertical-align: middle;"><span><?php echo JText::_( 'FLEXI_SEND_LANGUAGE_CHECKING',true ); ?><\/span><\/p>');
 				e = e.stop();
 
-				var url = "index.php?option=com_flexicontent&tmpl=component&format=raw&<?php echo (FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken());?>=1&task=langfiles&code=" + lang.value;
+				var url = "index.php?option=com_flexicontent&tmpl=component&format=raw&<?php echo JSession::getFormToken();?>=1&task=flexicontent.createlanguagepack&code=" + lang.value;
 				new Request.HTML({
 					url: url,
 					method: 'get',
@@ -41,10 +41,10 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 
 			} else {
 
-				$('log').setHTML('<p class="spinner"><img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center"><span><?php echo JText::_( 'FLEXI_SEND_LANGUAGE_CHECKING',true ); ?></span></p>');
+				$('log').setHTML('<p class="spinner"><img src="components/com_flexicontent/assets/images/ajax-loader.gif" style="vertical-align: middle;"><span><?php echo JText::_( 'FLEXI_SEND_LANGUAGE_CHECKING',true ); ?><\/span><\/p>');
 				e = new Event(e).stop();
 
-				var url = "index.php?option=com_flexicontent&format=raw&<?php echo (FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken());?>=1&task=langfiles&code=" + lang.value;
+				var url = "index.php?option=com_flexicontent&format=raw&<?php echo JSession::getFormToken();?>=1&task=flexicontent.createlanguagepack&code=" + lang.value;
 				var ajax = new Ajax(url, {
 					method: 'get',
 					update: $('log')
@@ -57,10 +57,10 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 		$('missing').addEvent('click', function(e) {
 
 			if(MooTools.version>="1.2.4") {
-				$('log').set('html', '<p class="spinner"><img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center"><span><?php echo JText::_( 'FLEXI_SEND_LANGUAGE_CREATING_MISSING',true ); ?></span></p>');
+				$('log').set('html', '<p class="spinner"><img src="components/com_flexicontent/assets/images/ajax-loader.gif" style="vertical-align: middle;"><span><?php echo JText::_( 'FLEXI_SEND_LANGUAGE_CREATING_MISSING',true ); ?><\/span><\/p>');
 				e = e.stop();
 
-				var url = "index.php?option=com_flexicontent&tmpl=component&format=raw&<?php echo (FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken());?>=1&task=langfiles&method=create&code=" + lang.value;
+				var url = "index.php?option=com_flexicontent&tmpl=component&format=raw&<?php echo JSession::getFormToken();?>=1&task=flexicontent.createlanguagepack&method=create&code=" + lang.value;
 				new Request.HTML({
 					url: url,
 					method: 'get',
@@ -69,10 +69,10 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 
 			} else {
 
-				$('log').setHTML('<p class="spinner"><img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center"><span><?php echo JText::_( 'FLEXI_SEND_LANGUAGE_CREATING_MISSING',true ); ?></span></p>');
+				$('log').setHTML('<p class="spinner"><img src="components/com_flexicontent/assets/images/ajax-loader.gif" style="vertical-align: middle;"><span><?php echo JText::_( 'FLEXI_SEND_LANGUAGE_CREATING_MISSING',true ); ?><\/span><\/p>');
 				e = new Event(e).stop();
 
-				var url = "index.php?option=com_flexicontent&format=raw&<?php echo (FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken());?>=1&task=langfiles&method=create&code=" + lang.value;
+				var url = "index.php?option=com_flexicontent&format=raw&<?php echo JSession::getFormToken();?>=1&task=flexicontent.createlanguagepack&method=create&code=" + lang.value;
 				var ajax = new Ajax(url, {
 					method: 'get',
 					update: $('log')
@@ -99,10 +99,10 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 			params 		+= '&message=' + message;
 
 			if(MooTools.version>="1.2.4") {
-				$('log').set('html', '<p class="spinner"><img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center"><span><?php echo JText::_( 'FLEXI_SEND_LANGUAGE_CREATING_ARCHIVE',true ); ?></span></p>');
+				$('log').set('html', '<p class="spinner"><img src="components/com_flexicontent/assets/images/ajax-loader.gif" style="vertical-align: middle;"><span><?php echo JText::_( 'FLEXI_SEND_LANGUAGE_CREATING_ARCHIVE',true ); ?><\/span><\/p>');
 				e = e.stop();
 
-				var url = "index.php?option=com_flexicontent&tmpl=component&format=raw&<?php echo (FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken());?>=1&task=langfiles&method=zip" + params;
+				var url = "index.php?option=com_flexicontent&tmpl=component&format=raw&<?php echo JSession::getFormToken();?>=1&task=flexicontent.createlanguagepack&method=zip" + params;
 				new Request.HTML({
 					url: url,
 					method: 'get',
@@ -111,10 +111,10 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 
 			} else {
 
-				$('log').setHTML('<p class="spinner"><img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center"><span><?php echo JText::_( 'FLEXI_SEND_LANGUAGE_CREATING_ARCHIVE',true ); ?></span></p>');
+				$('log').setHTML('<p class="spinner"><img src="components/com_flexicontent/assets/images/ajax-loader.gif" style="vertical-align: middle;"><span><?php echo JText::_( 'FLEXI_SEND_LANGUAGE_CREATING_ARCHIVE',true ); ?><\/span><\/p>');
 				e = new Event(e).stop();
 
-				var url = "index.php?option=com_flexicontent&format=raw&<?php echo (FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken());?>=1&task=langfiles&method=zip" + params;
+				var url = "index.php?option=com_flexicontent&format=raw&<?php echo JSession::getFormToken();?>=1&task=flexicontent.createlanguagepack&method=zip" + params;
 				var ajax = new Ajax(url, {
 					method: 'get',
 					update: $('log')
@@ -134,7 +134,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 				<table class="admintable" cellspacing="0" cellpadding="0" border="0" width="100%">
 					<tr>
 						<th colspan="2" style="text-align:left;">
-							<label class="flexi_label" style="width: auto !important; max-width: 400px !important;">
+							<label class="label" style="width: auto !important; max-width: 400px !important;">
 								<?php echo JText::_( 'FLEXI_SEND_LANGUAGE_TITLE' ); ?>
 							</label>
 						</th>
@@ -198,7 +198,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 						</td>
 						<td>
 							<?php
-							$html = JHTML::_('select.booleanlist', 'published', 'class="inputbox"', @$this->row->published );
+							$html = JHtml::_('select.booleanlist', 'published', 'class="inputbox"', @$this->row->published );
 							echo $html;
 							?>
 						</td>
@@ -218,7 +218,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 				<table class="admintable" cellspacing="0" cellpadding="0" border="0" width="100%">
 					<tr>
 						<th style="text-align:left;" colspan="2">
-							<label class="flexi_label" style="width: auto !important; max-width:400px !important;">
+							<label class="label" style="width: auto !important; max-width:400px !important;">
 								<?php echo JText::_( 'FLEXI_SEND_LANGUAGE_MISSING_FILES_TITLE' ); ?>
 							</label>
 						</th>
@@ -237,7 +237,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 									if (@$missing['admin']) $missing_str .= '<label class="label">Missing files (Backend)</label> <br/>'. implode('<br/>', $missing['admin']);
 									echo $missing_str;
 									?>
-									<div class="clear"></div>
+									<div class="fcclear"></div>
 									<input id="missing" type="button" class="fc_button" value="<?php echo JText::_( 'FLEXI_SEND_LANGUAGE_ADD_MISSING' ); ?>" />
 								<?php endif; ?>
 							</div>
@@ -254,5 +254,5 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 
 <?php
 //keep session alive while editing
-JHTML::_('behavior.keepalive');
+JHtml::_('behavior.keepalive');
 ?>

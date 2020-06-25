@@ -5,11 +5,11 @@ $page_classes  = '';
 $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 $page_classes .= ' fcsearch';
 $menu = JFactory::getApplication()->getMenu()->getActive();
-if ($menu) $page_classes .= ' menuitem'.$menu->id; 
+if ($menu) $page_classes .= ' menuitem'.$menu->id;
 ?>
 
 <div id="flexicontent" class="flexicontent <?php echo $page_classes; ?>" >
-	
+
 <?php if ( $this->params->get( 'show_page_heading', 1 ) ) : ?>
 	<h1 class="componentheading">
 		<?php echo $this->params->get('page_heading'); ?>
@@ -22,9 +22,9 @@ if ($menu) $page_classes .= ' menuitem'.$menu->id;
 
 <!-- BOF buttons -->
 <?php
-if (JRequest::getCmd('print')) {
+if (JFactory::getApplication()->input->getInt('print', 0)) {
 	if ($this->params->get('print_behaviour', 'auto') == 'auto') : ?>
-		<script type="text/javascript">window.addEvent('domready', function() { window.print(); });</script>
+		<script>jQuery(document).ready(function(){ window.print(); });</script>
 	<?php	elseif ($this->params->get('print_behaviour') == 'button') : ?>
 		<input type='button' id='printBtn' name='printBtn' value='<?php echo JText::_('Print');?>' class='btn btn-info' onclick='this.style.display="none"; window.print(); return false;'>
 	<?php endif;
@@ -34,29 +34,40 @@ if (JRequest::getCmd('print')) {
 	$printbutton = flexicontent_html::printbutton( $this->print_link, $this->params );
 	if ($pdfbutton || $mailbutton || $printbutton) {
 	?>
-	<p class="buttons">
+	<div class="buttons">
 		<?php echo $pdfbutton; ?>
 		<?php echo $mailbutton; ?>
 		<?php echo $printbutton; ?>
-	</p>
+	</div>
 	<?php }
 }
 ?>
 <!-- EOF buttons -->
 
-<?php if (!JRequest::getVar('print',0)) echo $this->loadTemplate('form'); ?>
 <?php
-if(!$this->error && count($this->results) > 0) :
-	if (!empty($_REQUEST['direct'])) {
+
+if (!JFactory::getApplication()->input->getInt('print', 0))
+{
+	echo $this->loadTemplate('form');
+}
+
+if (!$this->error)
+{
+	if (JFactory::getApplication()->input->getInt('direct', 0) && count($this->results) > 0)
+	{
 		header('Location: '.JRoute::_($this->results[0]->href));
 	}
-	
-	else {
+
+	else
+	{
 		echo $this->loadTemplate('results');
 	}
-else :
+}
+
+else
+{
 	echo $this->loadTemplate('error');
-endif;
+}
 ?>
 
 </div>

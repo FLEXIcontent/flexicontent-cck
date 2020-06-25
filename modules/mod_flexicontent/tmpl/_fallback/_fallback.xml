@@ -15,7 +15,7 @@
 		
 		<fieldset name="layout" addfieldpath="/administrator/components/com_flexicontent/elements">
 			
-			<field name="" type="separator" default="FLEXI_CUSTOM_PARAMS" level="level1" menu="hide" />
+			<field name="" type="separator" default="FLEXI_CUSTOM_PARAMS" level="level1" />
 			<field name="custom1" type="textarea" cols="35" rows="2" default="" label="'custom1' parameter" description="FLEXI_CUSTOM_DESC" />
 			<field name="custom2" type="textarea" cols="35" rows="2" default="" label="'custom2' parameter" description="FLEXI_CUSTOM_DESC" />
 			<field name="custom3" type="textarea" cols="35" rows="2" default="" label="'custom3' parameter" description="FLEXI_CUSTOM_DESC" />

@@ -1,16 +1,25 @@
 <?php
 /**
- * @version		$Id: list.php 16210 2010-04-19 04:03:00Z infograf768 $
- * @package		Joomla.Framework
- * @subpackage	Form
- * @copyright	Copyright (C) 2005 - 2010 Open Source Matters, Inc. All rights reserved.
- * @license		GNU General Public License version 2 or later; see LICENSE.txt
+ * @package         FLEXIcontent
+ * @version         3.3
+ *
+ * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
+ * @link            https://flexicontent.org
+ * @copyright       Copyright © 2018, FLEXIcontent team, All Rights Reserved
+ * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
-defined('JPATH_BASE') or die;
+defined('_JEXEC') or die('Restricted access');
 
-jimport('joomla.html.html');
-jimport('joomla.form.formfield');
+use Joomla\String\StringHelper;
+use Joomla\Utilities\ArrayHelper;
+
+jimport('cms.html.html');      // JHtml
+jimport('cms.html.select');    // JHtmlSelect
+jimport('joomla.form.field');  // JFormField
+
+//jimport('joomla.form.helper'); // JFormHelper
+//JFormHelper::loadFieldClass('...');   // JFormField...
 
 /**
  * Form Field class for the Joomla Framework.
@@ -43,6 +52,6 @@ class JFormFieldBooleanlist extends JFormField
 		// Initialize some field attributes.
 		$attr .= $this->element['class'] ? ' class="'.(string) $this->element['class'].'"' : '';
 
-		return JHTML::_('select.booleanlist', $this->name, $attr, $this->value );
+		return JHtml::_('select.booleanlist', $this->name, $attr, $this->value );
 	}
 }

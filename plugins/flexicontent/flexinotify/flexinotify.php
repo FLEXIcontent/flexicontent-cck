@@ -19,7 +19,7 @@
 // Check to ensure this file is included in Joomla!
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-jimport( 'joomla.plugin.plugin' );
+jimport('cms.plugin.plugin');
 
 /**
  * Flexicontent Notification Plugin
@@ -42,7 +42,7 @@ class plgFlexicontentFlexinotify extends JPlugin
 	 * @param object $params  The object that holds the plugin parameters
 	 * @since 1.5
 	 */
-	function plgFlexicontentFlexinotify( &$subject, $params )
+	function __construct( &$subject, $params )
 	{
 		parent::__construct( $subject, $params );
 
@@ -152,13 +152,13 @@ class plgFlexicontentFlexinotify extends JPlugin
 	
 	function _getSubscribers($itemid)
 	{
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
 		
 		$query	= 'SELECT u.* '
 				.' FROM #__flexicontent_favourites AS f'
 				.' LEFT JOIN #__users AS u'
 				.' ON u.id = f.userid'
-				.' WHERE f.itemid = ' . (int)$itemid
+				.' WHERE f.itemid = ' . (int)$itemid . ' AND f.type = 0'
 				.'  AND u.block=0 '
 				;
 		$db->setQuery($query);
@@ -172,16 +172,16 @@ class plgFlexicontentFlexinotify extends JPlugin
 	{
 		global $globalcats;
 		$app = JFactory::getApplication();
+		$config = JFactory::getConfig();
+		$categories = & $globalcats;
 		
 		// Get the route helper
 		require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'route.php');
-		// Import utility class that contains the send mail helper function
-		if (!FLEXI_J16GE) jimport( 'joomla.utilities.utility' );
-		jimport( 'joomla.mail.helper' );
-		if (FLEXI_J16GE) {
-			$mailer = JFactory::getMailer();
-			$mailer->Encoding = 'base64';
-		}
+		
+		// Import joomla mail helper class that contains the sendMail helper function
+		jimport('joomla.mail.helper');
+		$mailer = JFactory::getMailer();
+		$mailer->Encoding = 'base64';
 		
 		// Parameters for 'message' language string
 		//
@@ -192,15 +192,15 @@ class plgFlexicontentFlexinotify extends JPlugin
 		// 5: $link			Link of the item
 		// 6: $sitename	Website
 		
-		$send_personalized  = $params->get('send_personalized', 1);
-		if ($send_personalized) {
-			// Disable personalized messages if subscriber limit for personal messages is exceeded
+		// Disable personalized messages if subscriber limit for personal messages is exceeded
+		$send_personalized = $params->get('send_personalized', 1);
+		if ($send_personalized)
+		{
 			$personalized_limit = $params->get('personalized_limit', 50);
 			$personalized_limit = $personalized_limit <= 100 ? $personalized_limit : 100;
 			$send_personalized  = count($subscribers) <= $personalized_limit ? true : false;
 		}
 		$include_fullname   = $params->get('include_fullname', 1);
-		$user_autologin     = $params->get('autologin', 1);
 		$debug_notifications= $params->get('debug_notifications', 0);
 		
 		
@@ -211,46 +211,35 @@ class plgFlexicontentFlexinotify extends JPlugin
 		$subname 	= ($send_personalized && $include_fullname) ? '__SUBSCRIBER_NAME__' : JText::_('FLEXI_SUBSCRIBER');
 		$itemid   = $item->id;
 		$title    = $item->title;
-		$maincat  = $globalcats[$item->catid]->title;
+		$maincat  = $categories[$item->catid]->title;
+
+		// Create the non-SEF URL
+		$site_languages = FLEXIUtilities::getLanguages();
+		$sef_lang = $item->language != '*' && isset($site_languages->{$item->language}) ? $site_languages->{$item->language}->sef : '';
+		$item_url =
+			FlexicontentHelperRoute::getItemRoute($item->id.':'.$item->alias, $categories[$item->catid]->slug)
+			. ($sef_lang ? '&lang=' . $sef_lang : '');
+
+		// Create the SEF URL
+		$item_url = $app->isClient('administrator')
+			? flexicontent_html::getSefUrl($item_url)   // ..., $_xhtml= true, $_ssl=-1);
+			: JRoute::_($item_url);  // ..., $_xhtml= true, $_ssl=-1);
+
+		// Make URL absolute since this URL will be emailed
+		$item_url = JUri::getInstance()->toString(array('scheme', 'host', 'port')) . $item_url;
 		
-		// Domain URL and autologin vars
-		$server = JURI::getInstance()->toString(array('scheme', 'host', 'port'));
-		$autologin= ($send_personalized && $user_autologin) ? '&fcu=__SUBSCRIBER_USERNAME__&fcp=__SUBSCRIBER_PASSWORD__' : '';
-		
-		// Check if we are in the backend, in the back end we need to set the application to the site app instead
-		$isAdmin = JFactory::getApplication()->isAdmin();
-		if ( $isAdmin && FLEXI_J16GE ) JFactory::$application = JApplication::getInstance('site');
-		
-		// Create the URL
-		$item_url = JRoute::_(FlexicontentHelperRoute::getItemRoute($item->id.':'.$item->alias, $globalcats[$item->catid]->slug) . $autologin );
-		
-		// Check if we are in the backend again
-		// In backend we need to remove administrator from URL as it is added even though we've set the application to the site app
-		if( $isAdmin) {
-			if ( FLEXI_J16GE ) {
-				$admin_folder = str_replace(JURI::root(true),'',JURI::base(true));
-				$item_url = str_replace($admin_folder, '', $item_url);
-				// Restore application
-				JFactory::$application = JApplication::getInstance('administrator');
-			} else {
-				$item_url = JURI::root(true).'/'.$item_url;
-			}
-		}
-		
-		$link     = $server . $item_url;
-		$link     = str_replace('&amp;', '&', $link);
-		$sitename = $app->getCfg('sitename') . ' - ' . JURI::root();
 		
 		
 		// ************************************************
 		// Create parameters passed to mail helper function
 		// ************************************************
 		
+		$sitename = $app->getCfg('sitename') . ' - ' . JUri::root();
 		$sendermail	= $params->get('sendermail', $app->getCfg('mailfrom'));
 		$sendermail	= JMailHelper::cleanAddress($sendermail);
 		$sendername	= $params->get('sendername', $app->getCfg('sitename'));
 		$subject	= $params->get('mailsubject', '') ? JMailHelper::cleanSubject($params->get('mailsubject')) : JText::_('FLEXI_SUBJECT_DEFAULT');
-		$message 	= JText::sprintf('FLEXI_NOTIFICATION_MESSAGE', $subname, $itemid, $title, $maincat, '<a href="'.$link.'">'.$link.'</a>', $sitename);
+		$message 	= JText::sprintf('FLEXI_NOTIFICATION_MESSAGE', $subname, $itemid, $title, $maincat, '<a href="'.$item_url.'">'.$item_url.'</a>', $sitename);
 		$message  = nl2br($message);
 		
 		
@@ -268,10 +257,6 @@ class plgFlexicontentFlexinotify extends JPlugin
 				$to_arr[] = $to;
 				$_message = $message;
 				if ($include_fullname) $_message = str_replace('__SUBSCRIBER_NAME__', $subscriber->name, $_message);
-				if ($user_autologin) {
-					$_message = str_replace('__SUBSCRIBER_USERNAME__', $subscriber->username, $_message);
-					$_message = str_replace('__SUBSCRIBER_PASSWORD__', $subscriber->password, $_message);
-				}
 				
 				$from      = $sendermail;
 				$fromname  = $sendername;
@@ -279,9 +264,7 @@ class plgFlexicontentFlexinotify extends JPlugin
 				$html_mode=true; $cc=null; $bcc=null;
 				$attachment=null; $replyto=null; $replytoname=null;
 				
-				$send_result = FLEXI_J16GE ?
-					$mailer->sendMail( $from, $fromname, $recipient, $subject, $_message, $html_mode, $cc, $bcc, $attachment, $replyto, $replytoname ) :
-					JUtility::sendMail( $from, $fromname, $recipient, $subject, $_message, $html_mode, $cc, $bcc, $attachment, $replyto, $replytoname );
+				$send_result = $mailer->sendMail( $from, $fromname, $recipient, $subject, $_message, $html_mode, $cc, $bcc, $attachment, $replyto, $replytoname );
 				if ($send_result) $count_sent++;
 			}
 			$send_result = (boolean) $count_sent;
@@ -308,9 +291,7 @@ class plgFlexicontentFlexinotify extends JPlugin
 				$html_mode=true; $cc=null; $bcc = $to_100;
 				$attachment=null; $replyto=null; $replytoname=null;
 				
-				$send_result = FLEXI_J16GE ?
-					$mailer->sendMail( $from, $fromname, $recipient, $subject, $message, $html_mode, $cc, $bcc, $attachment, $replyto, $replytoname ) :
-					JUtility::sendMail( $from, $fromname, $recipient, $subject, $message, $html_mode, $cc, $bcc, $attachment, $replyto, $replytoname );
+				$send_result = $mailer->sendMail( $from, $fromname, $recipient, $subject, $message, $html_mode, $cc, $bcc, $attachment, $replyto, $replytoname );
 				if ($send_result) $count_sent += count($to_100);
 			}
 			$send_result = (boolean) $count_sent;

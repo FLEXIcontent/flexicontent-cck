@@ -51,9 +51,9 @@ class flexicontent_cats
 	 * @param int $cid
 	 * @return flexicontent_categories
 	 */
-	public function flexicontent_cats($cid)
+	public function __construct($cid)
 	{
-		$this->id = $cid;
+		$this->id = (int) $cid;
 	}
     
 	/**
@@ -61,14 +61,17 @@ class flexicontent_cats
 	 * and sets this parent in the member variable 'parentcats_ids'
 	 *
 	 */
-	protected function getParentCats()
+	protected function getParentCats($all_cols=false)
 	{
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
 		
-		$query = 'SELECT id, title, published,'
-				.' CASE WHEN CHAR_LENGTH(alias) THEN CONCAT_WS(\':\', id, alias) ELSE id END as categoryslug'
+		$this->parentcats_data = array();
+		if (empty($this->parentcats_ids)) return;
+		
+		$query = 'SELECT ' .($all_cols ? '*,' : 'id, title, published, access,')
+				.' CASE WHEN CHAR_LENGTH(alias) THEN CONCAT_WS(\':\', id, alias) ELSE id END as slug'
 				.' FROM #__categories'
-				.' WHERE id IN ('.implode($this->parentcats_ids, ',').')'
+				.' WHERE id IN ('.implode(',', $this->parentcats_ids).')'
 				. (!FLEXI_J16GE ? ' AND section = '.FLEXI_SECTION : ' AND extension="'.FLEXI_CAT_EXTENSION.'" ' )
 				;
 		$db->setQuery($query);
@@ -85,7 +88,7 @@ class flexicontent_cats
 	 */
 	protected function buildParentCats($cid)
 	{
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
 		
 		// ALTERNATIVE 1
 		/*$currcat = JCategories::getInstance('Content')->get($cid);
@@ -102,11 +105,11 @@ class flexicontent_cats
 		 .' ORDER BY cat.level ASC';
 		
 		$db->setQuery( $query );
-		$this->parentcats_ids = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();
+		$this->parentcats_ids = $db->loadColumn();
 		if ($db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');*/
 		
 		global $globalcats;
-		$this->parentcats_ids = $globalcats[$cid]->ancestorsarray;
+		$this->parentcats_ids = isset($globalcats[$cid]) ? $globalcats[$cid]->ancestorsarray : array();
 		//echo "<pre>" . print_r($this->parentcats_ids, true) ."</pre>";
 	}
 	
@@ -144,53 +147,60 @@ class flexicontent_cats
 	public static function getCategoriesTree( $published_only = false, $parent_id = 0, $depth_limit=0 )
 	{
 		global $globalcats;
-		$db = JFactory::getDBO();
-		
-		if ($published_only) {
+		$db = JFactory::getDbo();
+
+		if ($published_only)
+		{
 			$where[] = 'published = 1';
 		}
-		
+
+		// Limit category list to those contain in the subtree of the choosen category
 		$parent_id = isset($globalcats[(int)$parent_id]) ? (int)$parent_id : 0;
-		if ( $parent_id ) {
-			// Limit category list to those contain in the subtree of the choosen category
+		if ( $parent_id )
+		{
 			$where[] = 'id IN (' . $globalcats[(int)$parent_id]->descendants . ')';
 		}
-		$where[] = !FLEXI_J16GE ? 'section = '.FLEXI_SECTION : 'extension='.$db->Quote(FLEXI_CAT_EXTENSION);
-		
-		$where = count($where) ? ' WHERE ' . implode( ' AND ', $where ) : '';
-		
-		$query = 'SELECT *, id AS value, title AS text'
-				.' FROM #__categories'
-				.$where
-				.' ORDER BY parent_id '
-				. ( !FLEXI_J16GE ? ', ordering' : ', lft' )
-				;
+
+		$where[] = !FLEXI_J16GE
+			? 'section = ' . FLEXI_SECTION
+			: 'extension = ' . $db->Quote(FLEXI_CAT_EXTENSION);
+
+		$query = 'SELECT *'
+			//. ', CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END AS slug'
+			. ', id AS value, title AS text'
+			. ' FROM #__categories AS c'
+			. (count($where) ? ' WHERE ' . implode( ' AND ', $where ) : '')
+			. ' ORDER BY parent_id, lft';
 
 		$db->setQuery($query);
 
 		$rows = $db->loadObjectList();
-		$rows = is_array($rows)?$rows:array();
-		
+		$rows = is_array($rows) ? $rows : array();
+
 		//set depth limit, no detect loop ?
 		$level_limit = $depth_limit ? $depth_limit : 99;
 		
 		//get children
 		$children = array();
-		foreach ($rows as $child) {
+		foreach ($rows as $child)
+		{
 			$parent = $child->parent_id;
-			$list = @$children[$parent] ? $children[$parent] : array();
+			$list = !empty($children[$parent])
+				? $children[$parent]
+				: array();
 			array_push($list, $child);
 			$children[$parent] = $list;
 		}
 		
 		//get list of the items
-		$ROOT_CATEGORY_ID = $parent_id ? $globalcats[$parent_id]->parent_id : (!FLEXI_J16GE ? 0 : 1);
-		$list = flexicontent_cats::treerecurse($ROOT_CATEGORY_ID, '', array(), $children, true, max(0, $level_limit-1));
+		$root_catid = $parent_id ? $globalcats[$parent_id]->parent_id : 1;
+		$list = flexicontent_cats::treerecurse($root_catid, '', array(), $children, true, max(0, $level_limit-1));
 
 		return $list;
 	}
 	
 	/**
+	 * Utility Function:
     * Sorts and pads (indents) given categories according to their parent, thus creating a category tree by using recursion.
     * The sorting of categories is done by:
     * a. looping through all categories  v  in given children array padding all of category v with same padding
@@ -201,52 +211,73 @@ class flexicontent_cats
     * @access public
     * @return array
     */
-	public static function treerecurse( $parent_id, $indent, $list, &$children, $title, $maxlevel=9999, $level=0, $type=1, $ancestors=null, $childs=null )
+	static public function treerecurse( $parent_id, $indent, $list, &$children, $title, $maxlevel=9999, $level=0, $type=1, $ancestors=null )
 	{
+		$ROOT_CATEGORY_ID = 1;
 		if (!$ancestors) $ancestors = array();
-		$ROOT_CATEGORY_ID = !FLEXI_J16GE ? 0 : 1;
 		
-		if (@$children[$parent_id] && $level <= $maxlevel) {
-			foreach ($children[$parent_id] as $v) {
+		if (!empty($children[$parent_id]) && $level <= $maxlevel)
+		{
+			foreach ($children[$parent_id] as $v)
+			{
 				$id = $v->id;
-				
-				if ((!in_array($v->parent_id, $ancestors)) && $v->parent_id != 0) {
+
+				if ((!in_array($v->parent_id, $ancestors)) && $v->parent_id != $ROOT_CATEGORY_ID)
+				{
 					$ancestors[] = $v->parent_id;
 				} 
-				
-				if ( $type ) {
-					$pre    = '<sup>|_</sup>&nbsp;';
-					$spacer = '.&nbsp;&nbsp;&nbsp;';
-				} else {
+
+				// Top level category (a child of ROOT)
+				if (0)  // NOT needed ?
+				{
+					$pre    = '';
+					$spacer = ' . ';
+				}
+				elseif ($type)
+				{
+					$pre    = '<sup>|_</sup> ';
+					$spacer = ' . ';
+				}
+				else
+				{
 					$pre    = '- ';
-					$spacer = '&nbsp;&nbsp;';
+					$spacer = ' . ';
 				}
 
-				if ($title) {
-					if ( $v->parent_id == $ROOT_CATEGORY_ID ) {
-						$txt    = ''.$v->title;
-					} else {
-						$txt    = $pre.$v->title;
-					}
-				} else {
-					if ( $v->parent_id == $ROOT_CATEGORY_ID ) {
-						$txt    = '';
-					} else {
-						$txt    = $pre;
-					}
+				if ($title)
+				{
+					$txt = $v->parent_id == $ROOT_CATEGORY_ID
+						? '' . $v->title
+						: $pre . $v->title;
 				}
+				else
+				{
+					$txt = $v->parent_id == $ROOT_CATEGORY_ID
+						? ''
+						: $pre;
+				}
+
 				$pt = $v->parent_id;
 				$list[$id] = $v;
-				$list[$id]->treename 		= "$indent$txt";
-				$list[$id]->ancestors 		= $ancestors;
-				$list[$id]->childrenarray 	= @$children[$id];
-				$list[$id]->children 		= count( @$children[$id] );
+				$list[$id]->treename  = "$indent$txt";
+				$list[$id]->title     = $v->title;
+				//$list[$id]->slug      = $v->slug;
+				//$list[$id]->access    = $v->access;
+				$list[$id]->ancestors = $ancestors;
+				//$list[$id]->level     = $level + 1;
+				$list[$id]->children  = !empty($children[$id]) ? count($children[$id]) : 0;
+				$list[$id]->childrenarray = !empty($children[$id]) ? $children[$id] : null;
 
-				$list = flexicontent_cats::treerecurse( $id, $indent . $spacer, $list, $children, $title, $maxlevel, $level+1, $type, $ancestors, $childs );
+				$parent_id = $id;
+				$list = flexicontent_cats::treerecurse(
+					$parent_id, $indent . $spacer, $list, $children, $title, $maxlevel, $level+1, $type, $ancestors
+				);
 			}
 		}
 		return $list;
 	}
+
+
 
 	/**
 	 * Build a html select form field that displays a Category Tree
@@ -274,170 +305,263 @@ class flexicontent_cats
 		$actions_allowed=array('core.create', 'core.edit', 'core.edit.own'),   // For item edit this should be array('core.create')
 		$require_all=true,   // Require (or not) all privileges present to accept a category
 		$skip_subtrees=array(), $disable_subtrees=array(), $custom_options=array(),
-		$disable_specific_cats = array()
+		$disable_specific_cats = array(), $empty_errmsg = false, $show_viewable = false
 	) {
-		
-		// ***************************
-		// Initialize needed variables
-		// ***************************
-		
+
+		// ***
+		// *** Initialize needed variables
+		// ***
+
 		global $globalcats;
 		$cparams = JComponentHelper::getParams('com_flexicontent');
 		$user = JFactory::getUser();
-		$controller = JRequest::getVar('controller');
-		$task = JRequest::getVar('task');
-		
+		$app  = JFactory::getApplication();
+		$controller = $app->input->get('controller', '', 'cmd');
+		$task = $app->input->get('task', '', 'cmd');
+
 		$print_logging_info = $cparams->get('print_logging_info');
 		if ( $print_logging_info ) { global $fc_run_times; $start_microtime = microtime(true); }
-		
-		// Privilege of (a) viewing all categories (even if disabled) and (b) viewing as a tree
+
 		require_once (JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'permission.php');
+
+		// Privilege of viewing all categories (even if not allowed to be used)
 		$viewallcats	= FlexicontentHelperPerm::getPerm()->ViewAllCats;
-		$viewtree			= FlexicontentHelperPerm::getPerm()->ViewTree;
+
+		// Privelege of Super Admin 
+		$isSuperAdmin = $user->authorise('core.admin', 'root.1');
+
+		// Access levels granted to current user
+		$user_levels = array_flip(JAccess::getAuthorisedViewLevels($user->id));
+
+
+		// ***
+		// *** Find user allowed categories to be used during Filtering below
+		// ***
 		
-		// Global parameter to force always displaying of categories as tree
-		if ($cparams->get('cats_always_astree', 1)) $viewtree = 1;
-		
-		
-		// **************************************************************
-		// Find user allowed categories to be used during Filtering below
-		// **************************************************************
-		
-		if ($check_perms) {
-			if (FLEXI_J16GE || FLEXI_ACCESS) {
-				// Get user allowed categories, NOTE: if user (a) (J2.5) has 'core.admin' or (b) (J1.5) user is super admin (gid==25) then all cats are allowed
-				$usercats 	= FlexicontentHelperPerm::getAllowedCats($user, $actions_allowed, $require_all, $check_published);
-				// NOTE: already selected categories will be allowed to the user, add them to the category list
-				$selectedcats = !is_array($selected) ? array($selected) : $selected;
-				$usercats_indexed = array_flip($usercats);
-				foreach ($selectedcats as $selectedcat) if ($selectedcat) $usercats_indexed[$selectedcat] = 1;
+		if ($check_perms)
+		{
+			// Get user allowed categories, NOTE: if user (a) (J2.5) has 'core.admin' or (b) (J1.5) user is super admin (gid==25) then all cats are allowed
+			$usercats 	= FlexicontentHelperPerm::getAllowedCats($user, $actions_allowed, $require_all, $check_published);
+
+			// NOTE: already selected categories will be allowed to the user, add them to the category list
+			$selectedcats = !is_array($selected) ? array($selected) : $selected;
+			$usercats_indexed = array_flip($usercats);
+			if ($check_perms === 'edit')
+			{
+				foreach ($selectedcats as $selectedcat)
+				{
+					if ($selectedcat)
+					{
+						$usercats_indexed[$selectedcat] = 1;
+					}
+				}
 			}
 		}
-		
-		
-		// *********************************************************************************
-		// Excluded subtrees e.g. featured categories subtree in item form
-		// Disabled subtrees e.g. existing children subtree when selecting category's parent
-		// *********************************************************************************
-		
+
+
+		// ***
+		// *** Excluded subtrees e.g. featured categories subtree in item form
+		// *** Disabled subtrees e.g. existing children subtree when selecting category's parent
+		// ***
+
 		$skip_cats_arr = array();
-		if ( !empty($skip_subtrees) ) {
-			foreach ($skip_subtrees as $subtree_rootid) {
-				if ( $subtree_rootid && isset($globalcats[$subtree_rootid]->descendantsarray) ) {
+		if ( !empty($skip_subtrees) )
+		{
+			foreach ($skip_subtrees as $subtree_rootid)
+			{
+				if ( $subtree_rootid && isset($globalcats[$subtree_rootid]->descendantsarray) )
+				{
 					foreach($globalcats[$subtree_rootid]->descendantsarray as $_excluded)  $skip_cats_arr[$_excluded] = 1;
 				}
 			}
 		}
-		
+
 		$disable_cats_arr = array();
-		if ( !empty($disable_subtrees) ) {
-			foreach ($disable_subtrees as $subtree_rootid) {
-				if ( $subtree_rootid && isset($globalcats[$subtree_rootid]->descendantsarray) ) {
+		if ( !empty($disable_subtrees) )
+		{
+			foreach ($disable_subtrees as $subtree_rootid)
+			{
+				if ( $subtree_rootid && isset($globalcats[$subtree_rootid]->descendantsarray) )
+				{
 					foreach($globalcats[$subtree_rootid]->descendantsarray as $_excluded)  $disable_cats_arr[$_excluded] = 1;
 				}
 			}
 		}
-		
+
 		// Disable specific categories
-		if ( !empty($disable_specific_cats) ) {
-			foreach ($disable_specific_cats as $_excluded) {
+		if ( !empty($disable_specific_cats) )
+		{
+			foreach ($disable_specific_cats as $_excluded)
+			{
 				$disable_cats_arr[$_excluded] = 1;
 			}
 		}
+
+
+		// ***
+		// *** TOP parameter: defines the APPROPRIATE PROMPT option at top of select list
+		// ***
 		
-		
-		// **************************************************************************
-		// TOP parameter: defines the APPROPRIATE PROMPT option at top of select list
-		// **************************************************************************
-		
+		$cats_count = 0;
 		$catlist 	= array();
+
 		// A tree to select: e.g. a parent category
-		if (!is_numeric($top) && strlen($top)) {
-			$catlist[] 	= JHTML::_( 'select.option', '', $top );
+		if (!is_numeric($top) && strlen($top))
+		{
+			$catlist[] 	= JHtml::_( 'select.option', '', $top );
 		}
 		
-		else if ($top == 1) {
-			$catlist[] 	= JHTML::_( 'select.option', FLEXI_J16GE ? 1 : 0, JText::_( 'FLEXI_TOPLEVEL' ));
+		else if ($top == 1)
+		{
+			$catlist[] 	= JHtml::_( 'select.option', 1, JText::_( 'FLEXI_TOPLEVEL' ));
 		}
 		
 		// A tree to select a category
-		else if($top == 2 || $top == -1) {
-			$catlist[] 	= JHTML::_( 'select.option', '', JText::_( $top==-1 ? '' : 'FLEXI_SELECT_CAT' ));
+		else if($top == 2 || $top == -1)
+		{
+			$catlist[] 	= JHtml::_( 'select.option', '', JText::_( $top==-1 ? '' : 'FLEXI_SELECT_CATEGORY' ));
 		}
 		
 		// A sub-tree where root category of the sub-tree should be excluded, in place of it a disabled prompt is added ... NOTE that:
 		// a subtree should be given or else the first category out of top level category will be removed, which is of little sense
-		else if($top == 3) {
+		else if($top == 3)
+		{
+			// Backup first element's modified properties, so that we restore them later
 			$first_item = reset($list); //$first_key = key($list);
 			$_first_item_treename = $first_item->treename; $_first_item_title = $first_item->title; $_first_item_id = $first_item->id;
-			$first_item->treename = $first_item->title = JText::_( 'FLEXI_SELECT_CAT' );
+			$first_item->treename = $first_item->title = JText::_( 'FLEXI_SELECT_CATEGORY' );
 			$first_item->id = "";
 		}
 		
 		// Extra custom options ... applies to all top parameters
-		foreach ($custom_options as $custom_value => $custom_option) {
-			$catlist[] 	= JHTML::_( 'select.option', $custom_value, '-- '.JText::_( $custom_option ).' --');
+		foreach ($custom_options as $custom_value => $custom_option)
+		{
+			$catlist[] 	= JHtml::_( 'select.option', $custom_value, '-- '.JText::_( $custom_option ).' --');
 		}
 		
 		
-		// ********************************************************************************************************
-		// Loop through categories to create the select option using user allowed categories (if filtering enabled)
-		// ********************************************************************************************************
+		/*
+		 * Loop through categories to create the select option using user allowed categories (if filtering enabled)
+		 */
 		
-		foreach ($list as $cat) {
-			$cat->treename = str_replace("&nbsp;", " ", strip_tags($cat->treename));
-			$cat_title = $viewtree ? $cat->treename : $cat->title;
-			if (!$check_published && $cat->published!=1) $cat_title .= ' --U--';
-			
+		$cats_allowed = array();
+		$cats_incestors_ancestors = array();
+
+		foreach ($list as $cat)
+		{
 			if ( !$check_published || $cat->published )
-			{	
-				// CASE 1: SKIPPED categories e.g. featured categories subtree in item form
-				if ( isset($skip_cats_arr[$cat->id]) ) ;
-				
-				// CASE 2: ADD only if user has permissions
-				else if ($check_perms)
+			{
+				// Check for SKIPPED categories e.g. featured categories subtree in item form
+				if ( isset($skip_cats_arr[$cat->id]) )
 				{
-					// a. Category NOT ALLOWED
-					if (	( FLEXI_J16GE || FLEXI_ACCESS) && !isset($usercats_indexed[$cat->id]) )
+					continue;
+				}
+
+				// Category is ALLOWED (a) if it is a 'placeholder' entry (has empty CAT ID) or (b) if is Super Admin or (c) if NOT checking ACL or (d) if user has ACL permission or
+				$allowed =
+					!$cat->id ||      // (a) if it is a 'placeholder' entry (has empty CAT ID)
+					$isSuperAdmin ||  // or (b) if is Super Admin
+					!$check_perms ||  // or (c) if NOT checking ACL or (d) if user has ACL permission or
+					isset( $usercats_indexed[$cat->id] );
+
+				// If not allowed then check to DISABLE OR SKIP if user not having the view access level of the category
+				$skipped = false;
+				if ( !$allowed && !$viewallcats )
+				{
+					// Skip if category not viewable -OR- not showing viewable categories either
+					if ( !isset($user_levels[$cat->access]) || !$show_viewable )
 					{
-						// Add current category to the select list as disabled if user can view all categories, OTHERWISE DO NOT ADD IT
-						if ($viewallcats)
-							$catlist[] = JHTML::_( 'select.option', $cat->id, $cat_title, 'value', 'text', $disabled = true );
-					}
-										
-					// b. Category ALLOWED, but check if adding as disabled
-					else
-					{
-						// CASE: DISABLED categories e.g. existing children subtree when selecting category's parent
-						if ( isset($disable_cats_arr[$cat->id]) )
-							$catlist[] = JHTML::_( 'select.option', $cat->id, $cat_title, 'value', 'text', $disabled = true );
-						else
-							$catlist[] = JHTML::_( 'select.option', $cat->id, $cat_title );
+						$skipped = true;
 					}
 				}
-				
-				// CASE 4: ADD REGARDLESS of user permissions
-				else
+
+				// Check for DISABLED categories e.g. existing children subtree when selecting category's parent
+				if ( isset($disable_cats_arr[$cat->id]) )
 				{
-					$catlist[] = JHTML::_( 'select.option', $cat->id, $cat_title );
+					// NOTE: we did NOT add this CHECK to the ALLOWED check above !! If had added above then VIEW LEVEL checking may have skipped this category !!
+					$allowed = false; 
 				}
-				
+
+				$cats_allowed[$cat->id] = $allowed;
+				if (!$skipped)
+				{
+					if (!empty($globalcats[$cat->id]->ancestorsarray))
+					{
+						foreach($globalcats[$cat->id]->ancestorsarray as $parent)
+						{
+							$cats_incestors_ancestors[$parent] = 1;
+						}
+					}
+					$cats_incestors_ancestors[$cat->id] = 1;
+				}
+			}
+
+			else
+			{
+				$cats_allowed[$cat->id] = false;
 			}
 		}
-		
-		
-		// ************************************
-		// Finally create the HTML form element
-		// ************************************
-		
-		$replace_char = FLEXI_J16GE ? '_' : '';
-		$idtag = preg_replace('/(\]|\[)+/', $replace_char, $name);
+
+		foreach ($list as $cat)
+		{
+			if (isset($cats_incestors_ancestors[$cat->id]))
+			{
+				$cat_treename = str_replace("&nbsp;", " ", strip_tags($cat->treename));
+				$cat_title = $cat_treename . (!$check_published && $cat->published!=1 ? ' -U-' : '');
+
+				$allowed = $cats_allowed[$cat->id];
+
+				// Finally if category was not skipped ADD it as enabled or as disabled
+				$parent_title = false;
+				if ($cat->id)
+				{
+					$arr = $globalcats[$cat->id]->ancestorsarray;
+					$parent_title = count($arr) > 1 ?  $globalcats[$arr[count($arr) - 2]]->title : '';
+					$parent_title = htmlspecialchars($parent_title, ENT_COMPAT, 'UTF-8');
+				}
+
+				//$catlist[] = JHtml::_( 'select.option', $cat->id, $cat_title, array( 'attr' => array('title' => $parent_title), 'disable' => false) );
+				$catlist[] = (object) array(
+					'value' => $cat->id,
+					'text'  => $cat_title,
+					'attr'  => ($parent_title ? array('data-title' => $parent_title) : null),
+					'disable' => !$allowed
+				);
+
+				$cats_count++;
+			}
+		}
+
+
+		/*
+		 * Finally create the HTML form element
+		 */
+
+		$idtag = preg_replace('/(\]|\[)+/', '_', $name);
 		$idtag = preg_replace('/_$/', '', $idtag);
-		$html = JHTML::_('select.genericlist', $catlist, $name, $attribs, 'value', 'text', $selected, $idtag );
-		
-		if ($top == 3) { // Restore first category element
+
+		$sg_options = array(
+			'id' => $idtag,
+			'list.attr' => $attribs,
+			'list.translate' => false,
+			'option.key' => 'value',
+			'option.text' => 'text',
+			'option.attr' => 'attr',
+			'list.select' => $selected
+		);
+
+		$html = $empty_errmsg && $cats_count==0 ? 
+			'<div class="alert alert-error">'.$empty_errmsg.'</div>' :
+			JHtml::_('select.genericlist', $catlist, $name, $sg_options )  // $catlist, $name, $attribs, 'value', 'text', $selected, $idtag )
+			;
+
+		// Restore first category element
+		if ($top == 3)
+		{
 			$first_item = reset($list); 
-			$first_item->treename = $_first_item_treename; $first_item->title = $_first_item_title; $first_item->id = $_first_item_id ;
+			$first_item->treename = $_first_item_treename;
+			$first_item->title = $_first_item_title;
+			$first_item->id = $_first_item_id ;
 		}
 		
 		if ( $print_logging_info ) @$fc_run_times['render_categories_select'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
@@ -462,7 +586,8 @@ class flexicontent_cats
 		$show_noauth = $fparams->get('show_noauth', 0);
 		
 		$all_cats = array();
-		foreach ($cids as $cid) {
+		if ($treeinclude!=5) foreach ($cids as $cid)
+		{
 			if ($cid) $all_cats[] = $cid;
 		}
 		
@@ -474,6 +599,10 @@ class flexicontent_cats
 				// current category only
 				case 0: default: 
 					$cats = array($cid);
+				break;
+				case 5: // children only
+					$cats = $globalcats[$cid]->descendantsarray;
+					array_shift($cats);  // First category is the category itself
 				break;
 				case 1: // current category + children
 					$cats = $globalcats[$cid]->descendantsarray;
@@ -491,28 +620,18 @@ class flexicontent_cats
 			$all_cats = array_merge($all_cats, $cats);
 		}
 		if ( empty($all_cats) ) return array();
-		
+
 		// Select only categories that user has view access, if listing of unauthorized content is not enabled
 		$joinaccess = '';
 		$andaccess = '';
 		if (!$show_noauth) {
-			if (FLEXI_J16GE) {
-				$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
-				$aid_list = implode(",", $aid_arr);
-				$andaccess .= ' AND c.access IN ('.$aid_list.')';
-			} else {
-				$aid = (int) $user->get('aid');
-				if (FLEXI_ACCESS) {
-					$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gc ON c.id = gc.axo AND gc.aco = "read" AND gc.axosection = "category"';
-					$andaccess  .= ' AND (gc.aro IN ( '.$user->gmid.' ) OR c.access <= '. $aid . ')';
-				} else {
-					$andaccess  .= ' AND c.access <= '.$aid;
-				}
-			}
+			$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
+			$aid_list = implode(",", $aid_arr);
+			$andaccess .= ' AND c.access IN ('.$aid_list.')';
 		}
 		
 		// Filter categories (check that are published and that have ACCESS Level that is assinged to current user)
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
 		$query = 'SELECT DISTINCT c.id'
 			.' FROM #__categories AS c'
 			.$joinaccess
@@ -520,7 +639,7 @@ class flexicontent_cats
 			.$andaccess
 			;
 		$db->setQuery($query);
-		$published_cats = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();
+		$published_cats = $db->loadColumn();
 		if ($db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');
 		
 		return array_unique($published_cats);

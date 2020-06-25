@@ -1,27 +1,8 @@
 <?php
-/**
- * @version 1.5 stable $Id: category_subcategories.php 171 2010-03-20 00:44:02Z emmanuel.danan $
- * @package Joomla
- * @subpackage FLEXIcontent
- * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
- * @license GNU/GPL v2
- * 
- * FLEXIcontent is a derivative work of the excellent QuickFAQ component
- * @copyright (C) 2008 Christoph Lukes
- * see www.schlu.net for more information
- *
- * FLEXIcontent is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- */
-
 defined( '_JEXEC' ) or die( 'Restricted access' );
-?>
 
-<?php
 $i = 0;
-$layout = JRequest::getCmd('layout', '');
+$layout = JFactory::getApplication()->input->getCmd('layout', '');
 
 // Sub-category prefix/suffix/separator parameters
 $pretext = $this->params->get( 'subcat_pretext', '' ); $posttext = $this->params->get( 'subcat_posttext', '' );
@@ -40,9 +21,9 @@ $show_itemcount   = $this->params->get('show_itemcount', 1);
 $show_subcatcount = $this->params->get('show_subcatcount', 0);
 $itemcount_label   = ($show_itemcount==2   ? ' '.JText::_('FLEXI_ITEM_S').' ' : '');
 $subcatcount_label = ($show_subcatcount==2 ? ' '.JText::_('FLEXI_CATEGORIES').' ' : '');
-$show_description_image_subcat = $this->params->get('show_description_image_subcat', 0);
-$show_description_subcat     = $this->params->get('show_description_subcat', 0);
-$description_cut_text_subcat = $this->params->get('description_cut_text_subcat', 120);
+$show_description_image_subcat = (int) $this->params->get('show_description_image_subcat', 0);
+$show_description_subcat     = (int) $this->params->get('show_description_subcat', 0);
+$description_cut_text_subcat = (int) $this->params->get('description_cut_text_subcat', 120);
 
 // Classes for sub-category containers
 $subcats_lbl_class = ($show_description_subcat || $show_description_image_subcat) ? "fc_inline_clear"  : "fc_inline";

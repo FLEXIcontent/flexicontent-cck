@@ -13,7 +13,8 @@ defined('_JEXEC') or die;
 JHtml::addIncludePath(JPATH_COMPONENT.'/helpers/html');
 
 // Load the tooltip behavior.
-JHtml::_('behavior.tooltip');
+$tip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
+//JHtml::_('behavior.tooltip');
 
 $listOrder	= $this->escape($this->state->get('list.ordering'));
 $listDirn	= $this->escape($this->state->get('list.direction'));
@@ -25,7 +26,7 @@ $listDirn	= $this->escape($this->state->get('list.direction'));
 			<label class="filter-search-lbl" for="filter_search"><?php echo JText::_('COM_USERS_SEARCH_ASSETS'); ?></label>
 			<input type="text" name="filter_search" id="filter_search" value="<?php echo $this->escape($this->state->get('filter.search')); ?>" title="<?php echo JText::_('COM_USERS_SEARCH_USERS'); ?>" />
 			<button type="submit"><?php echo JText::_('JSEARCH_FILTER_SUBMIT'); ?></button>
-			<button type="button" onclick="document.id('filter_search').value='';this.form.submit();"><?php echo JText::_('JSEARCH_RESET'); ?></button>
+			<button type="button" onclick="document.getElementById('filter_search').value='';this.form.submit();"><?php echo JText::_('JSEARCH_RESET'); ?></button>
 		</div>
 
 		<div class="filter-select fltrt">
@@ -58,7 +59,8 @@ $listDirn	= $this->escape($this->state->get('list.direction'));
 		<span class="check-d swatch"><?php echo JText::sprintf('COM_USERS_DEBUG_EXPLICIT_DENY', '&#10007;');?></span>
 	</div>
 
-	<table class="adminlist">
+
+	<table id="adminListTableFCdebuggroup class="adminlist table fcmanlist" itemscope itemtype="http://schema.org/WebPage">
 		<thead>
 			<tr>
 				<th class="left">
@@ -69,7 +71,9 @@ $listDirn	= $this->escape($this->state->get('list.direction'));
 				</th>
 				<?php foreach ($this->actions as $key => $action) : ?>
 				<th width="5%">
-					<span class="hasTip" title="<?php echo htmlspecialchars(JText::_($key).'::'.JText::_($action[1]), ENT_COMPAT, 'UTF-8'); ?>"><?php echo JText::_($key); ?></span>
+					<span class="<?php echo $tip_class; ?>" title="<?php echo flexicontent_html::getToolTip(JText::_($key), JText::_($action[1]), 0, 1); ?>">
+						<?php echo JText::_($key); ?>
+					</span>
 				</th>
 				<?php endforeach; ?>
 				<th class="nowrap" width="5%">
@@ -134,8 +138,8 @@ $listDirn	= $this->escape($this->state->get('list.direction'));
 	<div>
 		<input type="hidden" name="task" value="" />
 		<input type="hidden" name="boxchecked" value="0" />
-		<input type="hidden" name="filter_order" value="<?php echo $listOrder; ?>" />
-		<input type="hidden" name="filter_order_Dir" value="<?php echo $listDirn; ?>" />
+		<input type="hidden" id="filter_order" name="filter_order" value="<?php echo $listOrder; ?>" />
+		<input type="hidden" id="filter_order_Dir" name="filter_order_Dir" value="<?php echo $listDirn; ?>" />
 		<?php echo JHtml::_('form.token'); ?>
 	</div>
 </form>

@@ -1,13 +1,14 @@
 /**
  * jQuery Galleriffic plugin
  *
- * Copyright (c) 2008 Trent Foley (http://trentacular.com)
+ * Copyright (c) 2008 Trent Foley (https://trentacular.com)
  * Licensed under the MIT License:
- *   http://www.opensource.org/licenses/mit-license.php
+ *   https://www.opensource.org/licenses/mit-license.php
  *
- * Much thanks to primary contributer Ponticlaro (http://www.ponticlaro.com)
+ * Much thanks to primary contributer Ponticlaro (https://www.ponticlaro.com)
  *
- * Modifed by Jay Hayes (http://iamvery.com)
+ * Modified by Jay Hayes (https://iamvery.com)
+ * Modified by ggppdk (https:://flexicontent.org)
  */
 ;(function($) {
 	// Globally keep track of all images by their unique hash.  Each item is an image data object.
@@ -17,6 +18,13 @@
 	// Galleriffic static class
 	$.galleriffic = {
 		version: '2.1.0',
+
+		// Strips HTML tags
+		stripHtml: function(html) {
+			var tmp = document.createElement("DIV");
+			tmp.innerHTML = html;
+			return tmp.textContent || tmp.innerText || "";
+		},
 
 		// Strips invalid characters and any leading # characters
 		normalizeHash: function(hash) {
@@ -41,7 +49,7 @@
 
 			var gallery = imageData.gallery;
 			gallery.gotoImage(imageData);
-			
+
 			return true;
 		},
 
@@ -66,8 +74,10 @@
 	};
 
 	var defaults = {
+		use_pages:                 true,
 		delay:                     3000,
 		numThumbs:                 20,
+		slideHeight:               0,
 		preloadAhead:              40, // Set to -1 to preload all images
 		enableTopPager:            false,
 		enableBottomPager:         true,
@@ -85,16 +95,60 @@
 		prevPageLinkText:          '&lsaquo; Prev',
 		enableHistory:             false,
 		enableFancybox:            false,
-		fancyOptions:              {}, 
+		fancyOptions:              {},
 		enableKeyboardNavigation:  true,
 		autoStart:                 false,
-		syncTransitions:           false,
+		syncTransitions:           true,
 		defaultTransitionDuration: 1000,
-		onSlideChange:             undefined, // accepts a delegate like such: function(prevIndex, nextIndex) { ... }
-		onTransitionOut:           undefined, // accepts a delegate like such: function(slide, caption, isSync, callback) { ... }
-		onTransitionIn:            undefined, // accepts a delegate like such: function(slide, caption, isSync) { ... }
-		onPageTransitionOut:       undefined, // accepts a delegate like such: function(callback) { ... }
-		onPageTransitionIn:        undefined, // accepts a delegate like such: function() { ... }
+
+		// accepts a delegate like such: function(prevIndex, nextIndex) { ... }
+		onSlideChange:             undefined,
+
+		// accepts a delegate like such: function(slide, caption, isSync, callback) { ... }
+		onTransitionOut:           function(slide, caption, isSync, callback)
+		{
+			slide.fadeTo(this.getDefaultTransitionDuration(isSync), 0.0, callback);
+			caption.fadeTo(this.getDefaultTransitionDuration(isSync), 0.0);
+		},
+
+		// accepts a delegate like such: function(slide, caption, isSync) { ... }
+		onTransitionIn:            function(slide, caption, isSync)
+		{
+			var duration = this.getDefaultTransitionDuration(isSync);
+			slide.fadeTo(duration, 1.0);
+
+			// Position the caption at the bottom of the image and set its opacity
+			var slideImage = slide.find('img');
+
+			var left = Math.ceil((slide.width() - slideImage.width()) / 2),
+				offTop = slideImage.get(0).offsetTop,
+				height = Math.floor( slideImage.outerHeight(true) ),
+				bottom = Math.ceil(slide.height() - slideImage.outerHeight(true)),
+				left   = Math.ceil((slide.width() - slideImage.width()) / 2),
+				width  = slideImage.width() < slide.width() ? slideImage.width() : slide.width();
+
+			//slide.closest('.slideshow-container').find('.nav-controls-box').find('a').css({'height': height});
+			//slide.closest('.slideshow-container').find('.loader').css({'height': height});
+
+			var caption_el = caption.get(0);
+			caption_el.style.width = width + 'px';
+			caption_el.style.display = 'block';
+			caption_el.style.bottom = (bottom - offTop) + 'px';
+			caption_el.style.left = left + 'px';
+		},
+
+		// accepts a delegate like such: function(callback) { ... }
+		onPageTransitionOut:       function(callback)
+		{
+			this.fadeTo('fast', 0.0, callback);
+		},
+
+		// accepts a delegate like such: function() { ... }
+		onPageTransitionIn:        function()
+		{
+			this.fadeTo('fast', 1.0);
+		},
+
 		onImageAdded:              undefined, // accepts a delegate like such: function(imageData, $li) { ... }
 		onImageRemoved:            undefined  // accepts a delegate like such: function(imageData, $li) { ... }
 	};
@@ -143,12 +197,14 @@
 			// @param {Boolean} insert Specifies whether the the image is appended to the end or inserted into the gallery.
 			// @param {Integer} position The index within the gallery where the item shouold be added.
 			addImage: function(listItem, thumbExists, insert, position) {
-				var $li = ( typeof listItem === "string" ) ? $(listItem) : listItem;				
+				var $li = ( typeof listItem === "string" ) ? $(listItem) : listItem;
 				var $aThumb = $li.find('a.thumb');
 				var slideUrl = $aThumb.attr('href');
 				var title = $aThumb.attr('title');
+				var width = $aThumb.attr('data-width');
+				var height = $aThumb.attr('data-height');
 				var $caption = $li.find('.caption').remove();
-				var $fancy = $li.find('a.fancy').remove();
+				var $fancy = $li.find('a.gf_fancybox');//.find('a.fancy').remove();
 				var hash = $aThumb.attr('name');
 
 				// Increment the image counter
@@ -162,9 +218,11 @@
 				// Set position to end when not specified
 				if (!insert)
 					position = this.data.length;
-				
+
 				var imageData = {
 					title:title,
+					width:width,
+					height:height,
 					slideUrl:slideUrl,
 					caption:$caption,
 					fancy:$fancy,
@@ -195,7 +253,7 @@
 							$thumbsUl.children(':eq('+position+')').before($li);
 						else
 							$thumbsUl.append($li);
-						
+
 						if (gallery.onImageAdded)
 							gallery.onImageAdded(imageData, $li);
 					});
@@ -220,13 +278,13 @@
 			removeImageByIndex: function(index) {
 				if (index < 0 || index >= this.data.length)
 					return false;
-				
+
 				var imageData = this.data[index];
 				if (!imageData)
 					return false;
-				
+
 				this.removeImage(imageData);
-				
+
 				return true;
 			},
 
@@ -238,13 +296,13 @@
 			// Removes an image from the gallery.
 			removeImage: function(imageData) {
 				var index = imageData.index;
-				
+
 				// Remove the image from the gallery data array
 				this.data.splice(index, 1);
-				
+
 				// Remove the global registration
 				delete allImages[''+imageData.hash];
-				
+
 				// Remove the image's list item from the DOM
 				this.updateThumbs(function() {
 					var $li = gallery.find('ul.thumbs')
@@ -266,7 +324,7 @@
 				for (i = startIndex; i < this.data.length; i++) {
 					this.data[i].index = i;
 				}
-				
+
 				return this;
 			},
 
@@ -287,7 +345,7 @@
 			// Initalizes the image preloader
 			preloadInit: function() {
 				if (this.preloadAhead == 0) return this;
-				
+
 				this.preloadStartIndex = this.currentImage.index;
 				var nextIndex = this.getNextIndex(this.preloadStartIndex);
 				return this.preloadRecursive(this.preloadStartIndex, nextIndex);
@@ -329,11 +387,11 @@
 
 				// If already loaded, continue
 				if (imageData.image)
-					return this.preloadNext(startIndex, currentIndex); 
-				
+					return this.preloadNext(startIndex, currentIndex);
+
 				// Preload the image
 				var image = new Image();
-				
+
 				image.onload = function() {
 					imageData.image = this;
 					gallery.preloadNext(startIndex, currentIndex);
@@ -342,9 +400,13 @@
 				image.alt = imageData.title;
 				image.src = imageData.slideUrl;
 
+				image.width  = imageData.width;
+				image.height = imageData.height;
+				image.style.maxWidth  = imageData.width + 'px';
+				image.style.maxHeight = (this.slideHeight > imageData.height ? imageData.height + 'px' : '');
 				return this;
 			},
-			
+
 			// Called by preloadRecursive in order to preload the next image after the previous has loaded.
 			// @param {Integer} startIndex The index of the first image the current preloader started on.
 			// @param {Integer} currentIndex The index of the current image to preload.
@@ -390,11 +452,12 @@
 				if (this.$ssControlsContainer) {
 					this.$ssControlsContainer
 						.find('div.ss-controls a').removeClass().addClass('play')
-						.attr('title', this.playLinkText)
+						.attr('title', '')
+					//.attr('title', $.galleriffic.stripHtml(this.playLinkText))
 						.attr('href', '#play')
 						.html(this.playLinkText);
 				}
-				
+
 				return this;
 			},
 
@@ -405,7 +468,8 @@
 				if (this.$ssControlsContainer) {
 					this.$ssControlsContainer
 						.find('div.ss-controls a').removeClass().addClass('pause')
-						.attr('title', this.pauseLinkText)
+						.attr('title', '')
+					//.attr('title', $.galleriffic.stripHtml(this.pauseLinkText))
 						.attr('href', '#pause')
 						.html(this.pauseLinkText);
 				}
@@ -440,7 +504,7 @@
 
 			// Advances the gallery to the next image.
 			// @param {Boolean} dontPause Specifies whether to pause the slideshow.
-			// @param {Boolean} bypassHistory Specifies whether to delegate navigation to the history plugin when history is enabled.  
+			// @param {Boolean} bypassHistory Specifies whether to delegate navigation to the history plugin when history is enabled.
 			next: function(dontPause, bypassHistory) {
 				this.gotoIndex(this.getNextIndex(this.currentImage.index), dontPause, bypassHistory);
 				return this;
@@ -476,10 +540,10 @@
 				var page = this.getCurrentPage();
 				if (page > 0) {
 					var startIndex = page * this.numThumbs;
-					var prevPage = startIndex - this.numThumbs;				
+					var prevPage = startIndex - this.numThumbs;
 					this.gotoIndex(prevPage, dontPause, bypassHistory);
 				}
-				
+
 				return this;
 			},
 
@@ -490,12 +554,12 @@
 			gotoIndex: function(index, dontPause, bypassHistory) {
 				if (!dontPause)
 					this.pause();
-				
+
 				if (index < 0) index = 0;
 				else if (index >= this.data.length) index = this.data.length-1;
-				
+
 				var imageData = this.data[index];
-				
+
 				if (!bypassHistory && this.enableHistory)
 					$.history.load(String(imageData.hash));  // At the moment, history.load only accepts string arguments
 				else
@@ -515,12 +579,12 @@
 
 				if (this.onSlideChange && this.currentImage)
 					this.onSlideChange(this.currentImage.index, index);
-				
+
 				this.currentImage = imageData;
 				this.preloadRelocate(index);
-				
+
 				this.refresh();
-				
+
 				return this;
 			},
 
@@ -535,6 +599,26 @@
 
 			// Rebuilds the slideshow image and controls and performs transitions
 			refresh: function() {
+
+				var touchDevice = ('ontouchstart' in document.documentElement);
+				if (touchDevice && typeof window.orientation !== 'undefined')
+				{
+					if (typeof this.custom_styles === 'undefined' || !!!this.custom_styles)
+					{
+						this.custom_styles = document.createElement('style');
+						document.head.appendChild(this.custom_styles);
+					}
+
+					if (window.orientation == 0)
+					{
+						this.custom_styles.innerHTML = '#gf_container_' + this.unique_id + ' div.slideshow-container, #gf_container_' + this.unique_id + ' span.image-wrapper a {max-height: 50vh; }';
+					}
+					else
+					{
+						this.custom_styles.innerHTML = '#gf_container_' + this.unique_id + ' div.slideshow-container, #gf_container_' + this.unique_id + ' span.image-wrapper a {max-height: 96vh; }';
+					}
+				}
+
 				var imageData = this.currentImage;
 				if (!imageData)
 					return this;
@@ -548,11 +632,11 @@
 						.find('div.nav-controls a.next').attr('href', '#'+this.data[this.getNextIndex(index)].hash);
 				}
 
-				var previousSlide = this.$imageContainer.find('span.current').addClass('previous').removeClass('current');
+				var previousSlide = this.$imageContainer.find('span.image-wrapper.current').addClass('previous').removeClass('current');
 				var previousCaption = 0;
 
 				if (this.$captionContainer) {
-					previousCaption = this.$captionContainer.find('span.current').addClass('previous').removeClass('current');
+					previousCaption = this.$captionContainer.find('span.image-caption.current').addClass('previous').removeClass('current');
 				}
 
 				// Perform transitions simultaneously if syncTransitions is true and the next image is already preloaded
@@ -566,12 +650,12 @@
 					// Flag that the transition has completed
 					isTransitioning = false;
 
-					// Remove the old slide
-					previousSlide.remove();
+					// Hide the old slide
+					previousSlide.hide();//.remove();
 
-					// Remove old caption
+					// Hide old caption
 					if (previousCaption)
-						previousCaption.remove();
+						previousCaption.hide();//.remove();
 
 					if (!isSync) {
 						if (imageData.image && imageData.hash == gallery.data[gallery.currentImage.index].hash) {
@@ -604,7 +688,7 @@
 
 				if (!imageData.image) {
 					var image = new Image();
-					
+
 					// Wire up mainImage onload event
 					image.onload = function() {
 						imageData.image = this;
@@ -618,6 +702,11 @@
 					// set alt and src
 					image.alt = imageData.title;
 					image.src = imageData.slideUrl;
+
+					image.width  = imageData.width;
+					image.height = imageData.height;
+					image.style.maxWidth  = imageData.width + 'px';
+					image.style.maxHeight = (this.slideHeight > imageData.height ? imageData.height + 'px' : '');
 				}
 
 				// This causes the preloader (if still running) to relocate out from the currentIndex
@@ -634,31 +723,53 @@
 				var gallery = this;
 				var nextIndex = this.getNextIndex(imageData.index);
 
-				// Construct new hidden span for the image
-				var newSlide = this.$imageContainer
-					.append('<span class="image-wrapper current"></span>')
-					.find('span.current').css('opacity', '0');
+				// Check for already created slide
+				var newSlide = this.$imageContainer.find('.index_' + imageData.index).removeClass('previous').addClass('current').css({display: 'block', opacity: 1});
 
-				if (this.enableFancybox && imageData.fancy.attr('href')) {
-					newSlide.append('<a class="fancy-link" href="' + imageData.fancy.attr('href') + '" title="' + imageData.title + '"> </a>');
-					newSlide.find('a').fancybox(this.fancyOptions);
-				} else {
-					newSlide.append('<a class="advance-link" rel="history" href="#'+this.data[nextIndex].hash+'" title="'+imageData.title+'"> </a>');
-					newSlide.find('a').click(function(e) {
-						gallery.clickHandler(e, this);
-					});
+				// Construct new hidden span for the image
+				if (!newSlide.length)
+				{
+					newSlide = this.$imageContainer
+						.append('<span class="image-wrapper current index_' + imageData.index + '"></span>')
+						.find('span.image-wrapper.current').css('opacity', '0');
+
+					// Prevent click if a drag was started (minor drags are not considered, see dragstart_margin parameter)
+					var onClick = 'if (gf_gallery_' + this.unique_id + '.mSlider.isDragging) {event.preventDefault(); event.stopPropagation(); return false; }';
+
+					//if (this.enableFancybox && imageData.fancy.attr('href'))
+					if (this.enableFancybox && imageData.fancy)
+					{
+						imageData.fancy.detach().appendTo(newSlide).show();
+						//newSlide.append('<a class="fancy-link" href="' + imageData.fancy.attr('href') + '" title="' + imageData.title + '" onclick="' + onClick + '"> </a>');
+						//newSlide.find('a').fancybox(this.fancyOptions);
+					}
+					else
+					{
+						newSlide.append('<a class="advance-link" rel="history" href="#'+this.data[nextIndex].hash+'" title="'+imageData.title+'" onclick="' + onClick + '"> </a>');
+						newSlide.find('a').click(function(e) {
+							gallery.clickHandler(e, this);
+						});
+					}
+
+					newSlide.find('a').prepend(imageData.image);
 				}
 
-				newSlide.find('a')
-					.append(imageData.image);
-				
 				var newCaption = 0;
-				if (this.$captionContainer) {
-					// Construct new hidden caption for the image
-					newCaption = this.$captionContainer
-						.append('<span class="image-caption current"></span>')
-						.find('span.current').css('opacity', '0')
-						.append(imageData.caption);
+				if (this.$captionContainer)
+				{
+					newCaption = this.$captionContainer.find('.index_' + imageData.index).removeClass('previous').addClass('current').css({'display': 'block', 'opacity': 0});
+
+					if (!newCaption.length)
+					{
+						// Construct new hidden caption for the image
+						newCaption = this.$captionContainer
+							.append('<span class="image-caption current index_' + imageData.index + '"></span>')
+							.find('span.image-caption.current').css('opacity', '0')
+							.append(imageData.caption);
+					}
+
+					newCaption.fadeTo(this.getDefaultTransitionDuration(isSync), 1.0);
+					setTimeout(function() { newCaption.removeClass('transitioning'); }, this.getDefaultTransitionDuration(isSync));
 				}
 
 				// Hide the loading conatiner
@@ -674,7 +785,7 @@
 					if (newCaption)
 						newCaption.fadeTo(this.getDefaultTransitionDuration(isSync), 1.0);
 				}
-				
+
 				if (this.isSlideshowRunning) {
 					if (this.slideshowTimeout)
 						clearTimeout(this.slideshowTimeout);
@@ -692,15 +803,50 @@
 
 			// Applies the selected class to the current image's corresponding thumbnail.
 			// Also checks if the current page has changed and updates the displayed page of thumbnails if necessary.
-			syncThumbs: function() {
-				var page = this.getCurrentPage();
+			syncThumbs: function()
+			{
+				var $thumbsUl = this.find('ul.thumbs'),
+					$thumbs     = $thumbsUl.children(),
+					$thumbOld   = $thumbs.filter('.selected'),
+					$thumbNew   = $thumbs.eq(this.currentImage.index),
+					page        = this.getCurrentPage(),
+					pBox        = $thumbsUl.parent().get(0);
+					
+				// Go to correct page
 				if (page != this.displayedPage)
+				{
 					this.updateThumbs();
+				}
+
+				// Scroll to new image
+				if (pBox.scrollWidth > pBox.clientWidth)
+				{
+					var elem_oLeft = $thumbNew.get(0).offsetLeft;
+					var elem_width = $thumbNew.outerWidth(true);
+
+					var elem_rightEdge = elem_oLeft + elem_width;
+					var pBox_rightEdge = pBox.scrollLeft + pBox.clientWidth;
+
+					//window.console.log('elem_oLeft: ' + elem_oLeft + ' - elem_width: ' + elem_width + ' - elem_rightEdge: ' + elem_rightEdge);
+					//window.console.log('pBox.scrollLeft: ' + pBox.scrollLeft + ' - pBox.clientWidth: ' + pBox.clientWidth + ' - pBox_rightEdge: ' + pBox_rightEdge);
+
+					var extra = 3 * elem_width / 4;
+					if (pBox_rightEdge < elem_rightEdge + extra)
+					{
+						//pBox.scrollLeft = elem_rightEdge - pBox.clientWidth + extra;
+						$(pBox).animate({ scrollLeft: (elem_rightEdge - pBox.clientWidth + extra) }, $thumbOld.length ? 600 : 0);
+					}
+
+					if (elem_oLeft < pBox.scrollLeft + extra)
+					{
+						//pBox.scrollLeft = elem_oLeft - extra;
+						$(pBox).animate({ scrollLeft: (elem_oLeft - extra) }, $thumbOld.length ? 600 : 0);
+					}
+				}
 
 				// Remove existing selected class and add selected class to new thumb
-				var $thumbs = this.find('ul.thumbs').children();
-				$thumbs.filter('.selected').removeClass('selected');
-				$thumbs.eq(this.currentImage.index).addClass('selected');
+				$thumbOld.removeClass('selected');
+				$thumbNew.addClass('selected');
 
 				return this;
 			},
@@ -715,7 +861,7 @@
 					// Call the Post-transition Out Handler
 					if (postTransitionOutHandler)
 						postTransitionOutHandler();
-					
+
 					gallery.rebuildThumbs();
 
 					// Transition In the thumbsContainer
@@ -744,7 +890,7 @@
 				if (this.enableTopPager) {
 					var $topPager = this.find('div.top');
 					if ($topPager.length == 0)
-						$topPager = this.prepend('<div class="top pagination"></div>').find('div.top');
+						$topPager = this.prepend('<div class="top pagination' + (this.enableTopPager == 2 ? ' gf_inline_nav' : '') + '"></div>').find('div.top');
 					else
 						$topPager.empty();
 
@@ -785,7 +931,7 @@
 
 				// Remove the noscript class from the thumbs container ul
 				$thumbsUl.removeClass('noscript');
-				
+
 				return this;
 			},
 
@@ -797,12 +943,23 @@
 			// Rebuilds the pager control in the specified matched element.
 			// @param {jQuery} pager A jQuery element set matching the particular pager to be rebuilt.
 			buildPager: function(pager) {
-				var gallery = this;
-				var numPages = this.getNumPages();
-				var page = this.getCurrentPage();
+				var gallery    = this;
+
+				var $thumbsUl  = gallery.find('ul.thumbs');
+				var $thumbs    = gallery.find('ul.thumbs li');
+
+				// Find thumbs per page
+				this.numThumbs = Math.floor( ($thumbsUl.width() - 1) / $thumbs.first().outerWidth(true) );
+				// Balance thumbs in last page
+				this.numThumbs = Math.ceil($thumbs.length / Math.ceil($thumbs.length / this.numThumbs));
+				
+				//window.console.log( ($thumbsUl.width() - 1) + ' - ' + $thumbs.first().outerWidth(true) + ' - ' + ( ($thumbsUl.width() - 1) / $thumbs.first().outerWidth(true) ) );
+
+				var numPages   = this.getNumPages();
+				var page       = this.getCurrentPage();
 				var startIndex = page * this.numThumbs;
 				var pagesRemaining = this.maxPagesToShow - 1;
-				
+
 				var pageNum = page - Math.floor((this.maxPagesToShow - 1) / 2) + 1;
 				if (pageNum > 0) {
 					var remainingPageCount = numPages - pageNum;
@@ -818,38 +975,52 @@
 				// Prev Page Link
 				if (page > 0) {
 					var prevPage = startIndex - this.numThumbs;
-					pager.append('<a rel="history" href="#'+this.data[prevPage].hash+'" title="'+this.prevPageLinkText+'">'+this.prevPageLinkText+'</a>');
+					pager.append('<a rel="history" class="prev_page_btn" href="#'+this.data[prevPage].hash+'" title="'+(this.enableTopPager != 2 ? this.prevPageLinkText : (page > 0 ? page : '-'))+'">'+this.prevPageLinkText+'</a>');
+				}
+				else {
+					pager.append('<span class="ellipsis prev_page_btn">'+this.prevPageLinkText+'</span>');
 				}
 
-				// Create First Page link if needed
-				if (pageNum > 0) {
-					this.buildPageLink(pager, 0, numPages);
-					if (pageNum > 1)
-						pager.append('<span class="ellipsis">&hellip;</span>');
-					
-					pagesRemaining--;
+				if (this.enableTopPager != 2)
+				{
+					// Create First Page link if needed
+					if (pageNum > 0) {
+						this.buildPageLink(pager, 0, numPages);
+						if (pageNum > 1)
+							pager.append('<span class="ellipsis">&hellip;</span>');
+
+						pagesRemaining--;
+					}
+
+					// Page Index Links
+					while (pagesRemaining > 0) {
+						this.buildPageLink(pager, pageNum, numPages);
+						pagesRemaining--;
+						pageNum++;
+					}
+
+					// Create Last Page link if needed
+					if (pageNum < numPages) {
+						var lastPageNum = numPages - 1;
+						if (pageNum < lastPageNum)
+							pager.append('<span class="ellipsis">&hellip;</span>');
+
+						this.buildPageLink(pager, lastPageNum, numPages);
+					}
+				}
+				else
+				{
+					pager.append('<span class="gf_pagination_info">' + (page + 1) + '/' + numPages + '</span>');
 				}
 
-				// Page Index Links
-				while (pagesRemaining > 0) {
-					this.buildPageLink(pager, pageNum, numPages);
-					pagesRemaining--;
-					pageNum++;
-				}
-
-				// Create Last Page link if needed
-				if (pageNum < numPages) {
-					var lastPageNum = numPages - 1;
-					if (pageNum < lastPageNum)
-						pager.append('<span class="ellipsis">&hellip;</span>');
-
-					this.buildPageLink(pager, lastPageNum, numPages);
-				}
 
 				// Next Page Link
 				var nextPage = startIndex + this.numThumbs;
 				if (nextPage < this.data.length) {
-					pager.append('<a rel="history" href="#'+this.data[nextPage].hash+'" title="'+this.nextPageLinkText+'">'+this.nextPageLinkText+'</a>');
+					pager.append('<a rel="history" class="next_page_btn" href="#'+this.data[nextPage].hash+'" title="'+(this.enableTopPager != 2 ? this.nextPageLinkText : (page < numPages ? page+2 : '-'))+'">'+this.nextPageLinkText+'</a>');
+				}
+				else {
+					pager.append('<span class="ellipsis next_page_btn">'+this.nextPageLinkText+'</span>');
 				}
 
 				pager.find('a').click(function(e) {
@@ -872,22 +1043,22 @@
 					var imageIndex = pageNum*this.numThumbs;
 					pager.append('<a rel="history" href="#'+this.data[imageIndex].hash+'" title="'+pageLabel+'">'+pageLabel+'</a>');
 				}
-				
+
 				return this;
 			}
 		});
 
 		// Now initialize the gallery
 		$.extend(this, defaults, settings);
-		
+
 		// Verify the history plugin is available
 		if (this.enableHistory && !$.history)
 			this.enableHistory = false;
-		
+
 		// Verify the fancybox plugin is available
 		if (this.enableFancybox && !$.fancybox)
 			this.enableFancybox = false;
-		
+
 		// Select containers
 		if (this.imageContainerSel) this.$imageContainer = $(this.imageContainerSel);
 		if (this.captionContainerSel) this.$captionContainer = $(this.captionContainerSel);
@@ -895,7 +1066,7 @@
 
 		// Initialize the thumbails
 		this.initializeThumbs();
-		
+
 		if (this.maxPagesToShow < 3)
 			this.maxPagesToShow = 3;
 
@@ -916,7 +1087,7 @@
 				this.$ssControlsContainer
 					.append('<div class="ss-controls"><a href="#play" class="play" title="'+this.playLinkText+'">'+this.playLinkText+'</a></div>');
 			}
-        
+
 			this.$ssControlsContainer.find('div.ss-controls a')
 				.click(function(e) {
 					gallery.toggleSlideshow();
@@ -924,11 +1095,11 @@
 					return false;
 				});
 		}
-		
+
 		if (this.navControlsContainerSel) {
 			this.$navControlsContainer = $(this.navControlsContainerSel).empty();
 			this.$navControlsContainer
-				.append('<div class="nav-controls"><a class="prev" rel="history" title="'+this.prevLinkText+'">'+this.prevLinkText+'</a><a class="next" rel="history" title="'+this.nextLinkText+'">'+this.nextLinkText+'</a></div>')
+				.append('<div class="nav-controls"><a class="prev" rel="history" data-title="'+this.prevLinkText+'"><div>'+this.prevLinkText+'</div></a><a class="next" rel="history" data-title="'+this.nextLinkText+'"><div>'+this.nextLinkText+'</div></a></div>')
 				.find('div.nav-controls a')
 				.click(function(e) {
 					gallery.clickHandler(e, this);
@@ -983,6 +1154,305 @@
 				}
 			});
 		}
+
+		// Resize thumbnails container
+		$(window).resize(function()
+		{
+			gallery.rebuildThumbs();
+		});
+
+
+		/**
+		 * TOUCH events for CAROUSEL area
+		 */
+
+		var slider = {
+			mode: 'horizontal',
+			dragstart_margin: 20,
+			dragwalk_margin: (this.use_pages ? 100 : 20),
+			isDragging: false,
+			items_box: this.find('ul.thumbs')
+		};
+
+		var boxPos = 0;
+		var startPos = 0;
+		var prop = slider.mode=='horizontal' ? 'left' : 'top';
+
+
+		// Prevent click if a drag was started (minor drags are not considered, see dragstart_margin parameter)
+		this.find('ul.thumbs li a img').on('click', function(ev)
+		{
+			// Click event is scheduled/queued after mouseup event, isDragging FLAG is cleared via setTimeout, thus we can use it here to prevent clicks
+			if (slider.isDragging)
+			{
+				var e = ev.originalEvent;
+				e.preventDefault();
+				e.stopPropagation();
+			}
+		});
+
+		var startEvents = 'mousedown touchstart';
+		this.on(startEvents, function(ev)
+		{
+			var e = ev.originalEvent;  // Get original event
+			if (ev.type=='mousedown')
+			{
+				// In the case of using mouse events, we need to prevent events for 'mousedown'
+				e.preventDefault(); e.stopPropagation();  // this may create undesired effects in some cases
+			}
+
+			var obj = ev.type!='touchstart' ? e : e.changedTouches[0]; // reference first touch point for this event
+
+			// Indicate draging by changing mouse cursor
+			$(slider.items_box).css('cursor', 'pointer' );
+
+			// Stop all animations and force them to complete, to get proper current position of the slider
+			$(slider.items_box).finish();
+			boxPos = parseInt($(slider.items_box).css(slider.mode=='horizontal' ? 'left' : 'top'));
+			startPos = parseInt(slider.mode=='horizontal' ? obj.clientX : obj.clientY);
+			//window.console.log ('Status: mousedown -- Start coordinate: ' + startPos + 'px');
+		});
+
+
+		var moveEvents = 'mousemove touchmove';
+		this.on(moveEvents, function(ev)
+		{
+			var e = ev.originalEvent;  // Get original event
+			//e.preventDefault();	//e.stopPropagation();
+
+			var obj = ev.type!='touchmove' ? e : e.changedTouches[0]; // reference first touch point for this event
+			var moveStarted = (startPos!=0);
+			if (!moveStarted) return;
+
+			var travelDist = parseInt(slider.mode=='horizontal' ? obj.clientX : obj.clientY) - startPos;
+			//window.console.log ('Status: mousemove -- Distance traveled: ' + travelDist + 'px');
+
+			// Check if drap distance is over the drag start threshold
+			if (!slider.isDragging && Math.abs(travelDist) < slider.dragstart_margin) return;
+			slider.isDragging = true;
+
+			// Touch/Mouse Drag is at new point, retarget to new point,
+			// Cancel all animations without completing them, to allow continuing from current position, thus avoiding position jump to previous touch position
+			$(slider.items_box).stop(true, false);
+
+			(slider.mode=='horizontal')
+				? $(slider.items_box).animate({ left: boxPos+travelDist }, 'fast')
+				: $(slider.items_box).animate({ top: boxPos+travelDist }, 'fast');
+		});
+
+
+		var endEvents = 'mouseleave mouseup touchend';
+		this.on(endEvents, function(ev)
+		{
+			var e = ev.originalEvent;  // Get original event
+			//e.preventDefault(); //e.stopPropagation();
+
+			var obj = ev.type!='touchend' ? e : e.changedTouches[0]; // reference first touch point for this event
+
+			var moveStarted = (startPos!=0);
+			if (!moveStarted) return;  // check if initial click was not inside the slider
+			var travelDist = parseInt(slider.mode=='horizontal' ? obj.clientX : obj.clientY) - startPos;
+			//window.console.log ('Status: mouseup -- End coordinate: ' + (slider.mode=='horizontal' ? obj.clientX : obj.clientY) + 'px');
+
+			$(slider.items_box).css('cursor', 'auto');  // restore mouse pointer
+
+			// Check if drag distance is over the drag walk threshold, and walk the slider to proper direction,
+			if (Math.abs(travelDist) > slider.dragwalk_margin)
+			{
+				//window.console.log('DO MOVE: ' + travelDist + ' ' + gallery.currentImage.index + ' ' + gallery.numThumbs);
+
+				// Cancel all animations without completing them, to allow walking from current position, thus avoiding position jump to last touch position
+				$(slider.items_box).stop(true, false);
+
+				// Cancel autoplay, to avoid confusion to the user
+				gallery.pause();
+
+				if (this.use_pages)
+				{
+					var page = gallery.getCurrentPage();
+					var do_move_next = ((travelDist < 0) && page < gallery.getNumPages() - 1);
+					var do_move_prev = ((travelDist > 0) && page > 0);
+					//window.console.log(page + ' ' + (gallery.getNumPages() - 1) + travelDist + ' ' + do_move_next + ' ' + do_move_prev);
+
+					// Walk the slider
+					if (do_move_next || do_move_prev)
+					{
+						// Goto next page but first hide items box to avoid potential ``flashing``
+						$(slider.items_box).hide();
+						(travelDist < 0) ? gallery.nextPage(true, true) : gallery.previousPage(true, true);
+
+						$(slider.items_box).css(prop, travelDist < 0 ? '50%' : '-50%');
+
+						// Consider delay in hiding currently selected item
+						this.find('ul.thumbs li.selected').hide();
+					}
+
+					// If having pagination then move back to start
+					setTimeout(function()
+					{
+						$(slider.items_box).show();
+						var css = {};
+						css[prop] = 0;
+						$(slider.items_box).animate(css, 'fast');
+					}, 200);
+				}
+				else
+				{
+					// Move thumbs container to start (we scrolled the parent of the thumbs container, not the thumbs container itself)
+					$(slider.items_box).css(prop, 0);
+
+					// We scrolled the parent of the thumbs container, not the thumbs container itself
+					var node = $(slider.items_box).get(0).parentNode;
+
+					//window.console.log ('scrollLeft (before): ' + $(node).scrollLeft() + ' scrollLeft New: ' + ($(node).scrollLeft() - travelDist));
+					(slider.mode=='horizontal') ? (node.scrollLeft -= travelDist) : (node.scrollTop += travelDist);
+					//window.console.log ('scrollLeft (after): ' + $(node).scrollLeft());
+				}
+			}
+
+			else
+			{
+				//window.console.log('CANCEL MOVE: ' + travelDist);
+
+				// Drag is under threshold, return slider to original position before dragging was stated,
+				// But first cancel all animations without completing, to allow returning from current position, thus avoiding position jump to last touch position
+				$(slider.items_box).stop(true, false);
+				var css = {};
+				css[prop] = boxPos;
+				$(slider.items_box).animate(css, 'fast');
+			}
+
+			startPos = 0;
+			setTimeout(function(){ slider.isDragging = false; }, 100);
+		});
+
+
+
+		/**
+		 * MAIN AREA IMAGE
+		 */
+		var mSlider = {
+			mode: 'horizontal',
+			dragstart_margin: 20,
+			dragwalk_margin: (this.use_pages ? 100 : 20),
+			isDragging: false,
+			items_box: $(this.imageContainerSel)
+		};
+
+		this.mSlider = mSlider;
+
+		var mBoxPos = 0;
+		var mStartPos = 0;
+		var mProp = this.mSlider.mode=='horizontal' ? 'left' : 'top';
+
+
+		var startEvents = 'mousedown touchstart';
+		mSlider.items_box.on(startEvents, function(ev)
+		{
+			var e = ev.originalEvent;  // Get original event
+			if (ev.type=='mousedown')
+			{
+				// In the case of using mouse events, we need to prevent events for 'mousedown'
+				e.preventDefault(); e.stopPropagation();  // this may create undesired effects in some cases
+			}
+
+			var obj = ev.type!='touchstart' ? e : e.changedTouches[0]; // reference first touch point for this event
+
+			// Indicate draging by changing mouse cursor
+			//mSlider.items_box.css('cursor', (mSlider.mode=='horizontal' ? (mTravelDist<0 ? 'w-resize' : 'e-resize') : (mTravelDist<0 ? 'n-resize' : 's-resize')) );
+			mSlider.items_box.css('cursor', 'pointer' );
+
+			// Stop all animations and force them to complete, to get proper current position of the slider
+			mSlider.items_box.finish();
+			mBoxPos = parseInt(mSlider.items_box.css(mSlider.mode=='horizontal' ? 'left' : 'top'));
+			mStartPos = parseInt(mSlider.mode=='horizontal' ? obj.clientX : obj.clientY);
+			//window.console.log ('Status: mousedown -- Start coordinate: ' + mStartPos + 'px');
+		});
+
+
+		var moveEvents = 'mousemove touchmove';
+		mSlider.items_box.on(moveEvents, function(ev)
+		{
+			var e = ev.originalEvent;  // Get original event
+			//e.preventDefault();	//e.stopPropagation();
+
+			var obj = ev.type!='touchmove' ? e : e.changedTouches[0]; // reference first touch point for this event
+			var moveStarted = (mStartPos!=0);
+			if (!moveStarted) return;
+
+			var mTravelDist = parseInt(mSlider.mode=='horizontal' ? obj.clientX : obj.clientY) - mStartPos;
+			//window.console.log ('Status: mousemove -- Distance traveled: ' + mTravelDist + 'px');
+
+			// Check if drap distance is over the drag start threshold
+			if (!mSlider.isDragging && Math.abs(mTravelDist) < mSlider.dragstart_margin) return;
+			mSlider.isDragging = true;
+			//window.console.log ('Dragging');
+
+			// Touch/Mouse Drag is at new point, retarget to new point,
+			// Cancel all animations without completing them, to allow continuing from current position, thus avoiding position jump to previous touch position
+			mSlider.items_box.stop(true, false);
+
+			(mSlider.mode=='horizontal')
+				? mSlider.items_box.animate({ left: mBoxPos+mTravelDist }, 'fast')
+				: mSlider.items_box.animate({ top: mBoxPos+mTravelDist }, 'fast');
+		});
+
+
+		var endEvents = 'mouseleave mouseup touchend';
+		mSlider.items_box.on(endEvents, function(ev)
+		{
+			var e = ev.originalEvent;  // Get original event
+			//e.preventDefault(); //e.stopPropagation();
+
+			var obj = ev.type!='touchend' ? e : e.changedTouches[0]; // reference first touch point for this event
+
+			var moveStarted = (mStartPos!=0);
+			if (!moveStarted) return;  // check if initial click was not inside the slider
+			var mTravelDist = parseInt(mSlider.mode=='horizontal' ? obj.clientX : obj.clientY) - mStartPos;
+			//window.console.log ('Status: mouseup -- End coordinate: ' + (mSlider.mode=='horizontal' ? obj.clientX : obj.clientY) + 'px');
+
+			mSlider.items_box.css('cursor', 'auto');  // restore mouse pointer
+
+			// Check if drag distance is over the drag walk threshold, and walk the slider to proper direction,
+			if (Math.abs(mTravelDist) > mSlider.dragwalk_margin)
+			{
+				//window.console.log('DO main MOVE: ' + mTravelDist + ' ' + gallery.currentImage.index + ' ' + gallery.numThumbs);
+
+				// Cancel all animations without completing them, to allow walking from current position, thus avoiding position jump to last touch position
+				mSlider.items_box.stop(true, false);
+
+				// Cancel autoplay, to avoid confusion to the user
+				gallery.pause();
+
+				if (1)
+				{
+					// Move container to start (we scrolled it but now need it back to proper position for moving to next image)
+					var css = {};
+					css[mProp] = 0;
+					mSlider.items_box.animate(css, 'slow');
+
+					// Go to next / previous image
+					(mTravelDist < 0) ? gallery.next() : gallery.previous();
+				}
+			}
+
+			else
+			{
+				//window.console.log('CANCEL main MOVE: ' + mTravelDist);
+
+				// Drag is under threshold, return slider to original position before dragging was stated,
+				// But first cancel all animations without completing, to allow returning from current position, thus avoiding position jump to last touch position
+				mSlider.items_box.stop(true, false);
+				var css = {};
+				css[mProp] = mBoxPos;
+				mSlider.items_box.animate(css, 'fast');
+			}
+
+			mStartPos = 0;
+			setTimeout(function(){ mSlider.isDragging = false; }, 100);
+		});
+
+
 
 		// Auto start the slideshow
 		if (this.autoStart)

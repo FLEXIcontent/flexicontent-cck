@@ -1,270 +1,333 @@
 <?php
 /**
- * @version 1.5 stable $Id: tag.php 1577 2012-12-02 15:10:44Z ggppdk $
- * @package Joomla
- * @subpackage FLEXIcontent
- * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
- * @license GNU/GPL v2
- * 
- * FLEXIcontent is a derivative work of the excellent QuickFAQ component
- * @copyright (C) 2008 Christoph Lukes
- * see www.schlu.net for more information
+ * @package         FLEXIcontent
+ * @version         3.3
  *
- * FLEXIcontent is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
+ * @link            https://flexicontent.org
+ * @copyright       Copyright © 2018, FLEXIcontent team, All Rights Reserved
+ * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
-// no direct access
 defined('_JEXEC') or die('Restricted access');
 
-jimport('joomla.application.component.model');
+use Joomla\String\StringHelper;
+use Joomla\Utilities\ArrayHelper;
+
+require_once('base/base.php');
+require_once('base/traitnestable.php');
 
 /**
  * FLEXIcontent Component Tag Model
  *
- * @package Joomla
- * @subpackage FLEXIcontent
- * @since		1.0
  */
-class FlexicontentModelTag extends JModelLegacy
+class FlexicontentModelTag extends FCModelAdmin
 {
+	//use FCModelTraitNestableRecord;
+
 	/**
-	 * Tag data
+	 * Record name, (parent class property), this is used for: naming session data, XML file of class, etc
+	 *
+	 * @var string
+	 */
+	protected $name = 'tag';
+
+	/**
+	 * Record database table
+	 *
+	 * @var string
+	 */
+	var $records_dbtbl = 'flexicontent_tags';
+
+	/**
+	 * Record jtable name
+	 *
+	 * @var string
+	 */
+	var $records_jtable = 'flexicontent_tags';
+
+	/**
+	 * Column names
+	 */
+	var $state_col   = 'published';
+	var $name_col    = 'name';
+	var $parent_col  = null;//'parent_id';
+
+	/**
+	 * Record primary key
+	 *
+	 * @var int
+	 */
+	var $_id = null;
+
+	/**
+	 * Record data
 	 *
 	 * @var object
 	 */
-	var $_tag = null;
+	var $_record = null;
+
+	/**
+	 * Events context to use during model FORM events and diplay PREPARE events triggering
+	 *
+	 * @var object
+	 */
+	var $events_context = 'com_tags.tag';
+
+	/**
+	 * Flag to indicate adding new records with next available ordering (at the end),
+	 * this is ignored if this record DB model does not have 'ordering'
+	 *
+	 * @var boolean
+	 */
+	var $useLastOrdering = false;
+
+	/**
+	 * Plugin group used to trigger events
+	 *
+	 * @var boolean
+	 */
+	var $plugins_group = null;
+
+	/**
+	 * Records real extension
+	 *
+	 * @var string
+	 */
+	var $extension_proxy = null;
+	var $event_recid_col = 'jtag_id';
+
+	/**
+	 * Context to use for registering (language) associations
+	 *
+	 * @var string
+	 */
+	var $associations_context = false;
+
+	/**
+	 * Various record specific properties
+	 *
+	 */
+	// ...
 
 	/**
 	 * Constructor
 	 *
-	 * @since 1.0
+	 * @since 3.3.0
 	 */
-	function __construct()
+	public function __construct($config = array())
 	{
-		parent::__construct();
+		$this->use_jtable_publishing = true;
 
-		$array = JRequest::getVar('cid',  0, '', 'array');
-		$this->setId((int)$array[0]);
+		parent::__construct($config);
+
+		$this->canManage = FlexicontentHelperPerm::getPerm()->CanTags;
+		$this->canCreate = FlexicontentHelperPerm::getPerm()->CanCreateTags;
 	}
 
+
 	/**
-	 * Method to set the identifier
+	 * Legacy method to get the record
 	 *
-	 * @access	public
-	 * @param	int tag identifier
-	 */
-	function setId($id)
-	{
-		// Set tag id and wipe data
-		$this->_id	    = $id;
-		$this->_tag	= null;
-	}
-	
-	/**
-	 * Overridden get method to get properties from the tag
+	 * @return	object
 	 *
-	 * @access	public
-	 * @param	string	$property	The name of the property
-	 * @param	mixed	$value		The value of the property to set
-	 * @return 	mixed 				The value of the property
 	 * @since	1.0
 	 */
-	function get($property, $default=null)
+	public function getTag($pk = null)
 	{
-		if ($this->_loadTag()) {
-			if(isset($this->_tag->$property)) {
-				return $this->_tag->$property;
-			}
-		}
-		return $default;
-	}
-
-	/**
-	 * Method to get tag data
-	 *
-	 * @access	public
-	 * @return	array
-	 * @since	1.0
-	 */
-	function &getTag()
-	{
-		if ($this->_loadTag())
-		{
-
-		}
-		else  $this->_initTag();
-
-		return $this->_tag;
+		return parent::getRecord($pk);
 	}
 
 
 	/**
-	 * Method to load tag data
+	 * Method to initialise the record data
 	 *
-	 * @access	private
+	 * @param   object      $record    The record being initialized
+	 * @param   boolean     $initOnly  If true then only a new record will be initialized without running the _afterLoad() method
+	 *
 	 * @return	boolean	True on success
-	 * @since	1.0
+	 *
+	 * @since	1.5
 	 */
-	function _loadTag()
+	protected function _initRecord(&$record = null, $initOnly = false)
 	{
-		// Lets load the tag if it doesn't already exist
-		if (empty($this->_tag))
-		{
-			$query = 'SELECT *'
-					. ' FROM #__flexicontent_tags'
-					. ' WHERE id = '.$this->_id
-					;
-			$this->_db->setQuery($query);
-			$this->_tag = $this->_db->loadObject();
+		parent::_initRecord($record, $initOnly);
 
-			return (boolean) $this->_tag;
-		}
+		// Set some new record specific properties, note most properties already have proper values
+		// Either the DB default values (set by getTable() method) or the values set by _afterLoad() method
+		$record->id							= 0;
+		$record->name						= null;
+		$record->alias					= null;
+		$record->published			= 1;
+		$record->checked_out		= 0;
+		$record->checked_out_time	= '';
+
+		$this->_record = $record;
+
 		return true;
 	}
 
+
 	/**
-	 * Method to initialise the tag data
+	 * Legacy method to store the record, use save() instead
 	 *
-	 * @access	private
-	 * @return	boolean	True on success
-	 * @since	1.0
+	 * @param   array  $data  The form data.
+	 *
+	 * @return  boolean  True on success.
+	 *
+	 * @since   3.2.0
 	 */
-	function _initTag()
+	public function store($data)
 	{
-		// Lets load the tag if it doesn't already exist
-		if (empty($this->_tag))
+		return parent::store($data);
+	}
+
+
+	/**
+	 * Method to preprocess the form.
+	 *
+	 * @param   JForm   $form   A JForm object.
+	 * @param   mixed   $data   The data expected for the form.
+	 * @param   string  $plugins_group  The name of the plugin group to import and trigger
+	 *
+	 * @return  void
+	 *
+	 * @see     JFormField
+	 * @since   1.6
+	 * @throws  Exception if there is an error in the form event.
+	 */
+	protected function preprocessForm(JForm $form, $data, $plugins_group = null)
+	{
+		parent::preprocessForm($form, $data, $plugins_group);
+	}
+
+
+	/**
+	 * Method to change the title & alias.
+	 *
+	 * @param   integer  $parent_id  If applicable, the id of the parent (e.g. assigned category)
+	 * @param   string   $alias      The alias / name.
+	 * @param   string   $title      The title / label.
+	 *
+	 * @return  array    Contains the modified title and alias / name.
+	 *
+	 * @since   1.7
+	 */
+	protected function generateNewTitle($parent_id, $alias, $title)
+	{
+		// Alter the title & alias
+		$table = $this->getTable();
+
+		while ($table->load(array('alias' => $alias)))
 		{
-			$tag = new stdClass();
-			$tag->id					= 0;
-			$tag->name					= null;
-			$tag->alias					= null;
-			$tag->published				= 1;
-			$this->_tag				= $tag;
-			return (boolean) $this->_tag;
+			$title = StringHelper::increment($title);
+			$alias = StringHelper::increment($alias, 'dash');
 		}
-		return true;
+
+		return array($title, $alias);
 	}
 
+
 	/**
-	 * Method to checkin/unlock the tag
+	 * Method to check if the user can edit the record
 	 *
-	 * @access	public
 	 * @return	boolean	True on success
-	 * @since	1.0
-	 */
-	function checkin($pk = NULL)
-	{
-		if (!$pk) $pk = $this->_id;
-		if ($pk) {
-			$item = JTable::getInstance('flexicontent_tags', '');
-			return $item->checkin($pk);
-		}
-		return false;
-	}
-	
-	
-	/**
-	 * Method to checkout/lock the tag
 	 *
-	 * @access	public
-	 * @param	int	$uid	User ID of the user checking the item out
+	 * @since	3.2.0
+	 */
+	public function canEdit($record = null)
+	{
+		$record  = $record ?: $this->_record;
+		$user    = JFactory::getUser();
+
+		return !$record || !$record->id
+			? $this->canCreate
+			: $this->canManage;
+	}
+
+
+	/**
+	 * Method to check if the user can edit record 's state
+	 *
 	 * @return	boolean	True on success
-	 * @since	1.0
-	 */
-	function checkout($pk = null)   // UPDATED to match function signature of J1.6+ models
-	{
-		// Make sure we have a record id to checkout the record with
-		if ( !$pk ) $pk = $this->_id;
-		if ( !$pk ) return true;
-		
-		// Get current user
-		$user	= JFactory::getUser();
-		$uid	= $user->get('id');
-		
-		// Lets get table record and checkout the it
-		$tbl = JTable::getInstance('flexicontent_tags', '');
-		if ( $tbl->checkout($uid, $this->_id) ) return true;
-		
-		// Reaching this points means checkout failed
-		$this->setError( FLEXI_J16GE ? $tbl->getError() : JText::_("FLEXI_ALERT_CHECKOUT_FAILED") );
-		return false;
-	}
-	
-	
-	/**
-	 * Tests if the tag is checked out
 	 *
-	 * @access	public
-	 * @param	int	A user id
-	 * @return	boolean	True if checked out
-	 * @since	1.0
+	 * @since	3.2.0
 	 */
-	function isCheckedOut( $uid=0 )
+	public function canEditState($record = null)
 	{
-		if ($this->_loadTag())
-		{
-			if ($uid) {
-				return ($this->_tag->checked_out && $this->_tag->checked_out != $uid);
-			} else {
-				return $this->_tag->checked_out;
-			}
-		} elseif ($this->_id < 1) {
-			return false;
-		} else {
-			JError::raiseWarning( 0, 'UNABLE LOAD DATA');
-			return false;
-		}
+		$record  = $record ?: $this->_record;
+		$user    = JFactory::getUser();
+
+		return $this->canManage;
 	}
 
+
 	/**
-	 * Method to store the tag
+	 * Method to check if the user can delete the record
 	 *
-	 * @access	public
 	 * @return	boolean	True on success
-	 * @since	1.0
+	 *
+	 * @since	3.2.0
 	 */
-	function store($data)
+	public function canDelete($record = null)
 	{
-		$tag = $this->getTable('flexicontent_tags', '');
+		$record  = $record ?: $this->_record;
+		$user    = JFactory::getUser();
 
-		// bind it to the table
-		if (!$tag->bind($data)) {
-			$this->setError( $this->_db->getErrorMsg() );
-			return false;
-		}
-
-		// Make sure the data is valid
-		if (!$tag->check()) {
-			$this->setError($tag->getError() );
-			return false;
-		}
-
-		// Store it in the db
-		if (!$tag->store()) {
-			$this->setError( $this->_db->getErrorMsg() );
-			return false;
-		}
-		
-		$this->_tag	=& $tag;
-
-		return true;
+		return $this->canManage;
 	}
-	
-	function addtag($name){
-		
-		$obj = new stdClass();
-		$obj->name	 	= $name;
-		$obj->published	= 1;
-		
-		if($this->store($obj)) {
-			return true;
-		}
 
-		return false;
+
+	/**
+	 * Method to do some record / data preprocessing before call JTable::bind()
+	 *
+	 * Note. Typically called inside this MODEL 's store()
+	 *
+	 * @param   object     $record   The record object
+	 * @param   array      $data     The new data array
+	 *
+	 * @since	3.2.0
+	 */
+	protected function _prepareBind($record, & $data)
+	{
+		// Call parent class bind preparation
+		parent::_prepareBind($record, $data);
 	}
+
+
+	/**
+	 * Method to do some work after record has been stored
+	 *
+	 * Note. Typically called inside this MODEL 's store()
+	 *
+	 * @param   object     $record   The record object
+	 * @param   array      $data     The new data array
+	 *
+	 * @since	3.2.0
+	 */
+	protected function _afterStore($record, & $data)
+	{
+		parent::_afterStore($record, $data);
+	}
+
+
+	/**
+	 * Method to do some work after record has been loaded via JTable::load()
+	 *
+	 * Note. Typically called inside this MODEL 's store()
+	 *
+	 * @param	object   $record   The record object
+	 *
+	 * @since	3.2.0
+	 */
+	protected function _afterLoad($record)
+	{
+		parent::_afterLoad($record);
+	}
+
+
+	/**
+	 * START OF MODEL SPECIFIC METHODS
+	 */
 
 }
-?>

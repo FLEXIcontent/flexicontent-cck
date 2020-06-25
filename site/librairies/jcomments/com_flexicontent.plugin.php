@@ -21,7 +21,7 @@ class jc_com_flexicontent extends JCommentsPlugin
 		if (is_file($routerHelper)) {
 			require_once($routerHelper);
 
-			$db = JFactory::getDBO();
+			$db = JFactory::getDbo();
 			$lta = FLEXI_J16GE ? 'i' : 'ie';
 			$query = 'SELECT i.id, i.title, i.access, i.created_by, ie.type_id, '.$lta.'.language'
 				. ' , CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(\':\', i.id, i.alias) ELSE i.id END as slug'

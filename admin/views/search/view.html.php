@@ -1,140 +1,362 @@
 <?php
 /**
- * @version 1.5 stable $Id: view.html.php 1902 2014-05-10 16:06:11Z ggppdk $ 
- * @package Joomla
- * @subpackage FLEXIcontent
- * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
- * @license GNU/GPL v2
- * 
- * FLEXIcontent is a derivative work of the excellent QuickFAQ component
- * @copyright (C) 2008 Christoph Lukes
- * see www.schlu.net for more information
+ * @package         FLEXIcontent
+ * @version         3.3
  *
- * FLEXIcontent is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
+ * @link            https://flexicontent.org
+ * @copyright       Copyright © 2018, FLEXIcontent team, All Rights Reserved
+ * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
-// Check to ensure this file is included in Joomla!
-defined('_JEXEC') or die( 'Restricted access' );
+defined('_JEXEC') or die('Restricted access');
 
-jimport('joomla.application.component.view');
-class FLEXIcontentViewSearch extends JViewLegacy
+use Joomla\String\StringHelper;
+use Joomla\Utilities\ArrayHelper;
+
+JLoader::register('FlexicontentViewBaseRecords', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/base/view_records.php');
+
+/**
+ * View class for the FLEXIcontent search indexes screen
+ */
+class FLEXIcontentViewSearch extends FlexicontentViewBaseRecords
 {
-	function display($tpl = null) {
-		$layout = JRequest::getVar('layout', 'default');
-		if($layout=='indexer') {
-			$this->indexer($tpl);
-			return;
-		}
+	var $proxy_option   = null;
+	var $title_propname = null;
+	var $state_propname = null;
+	var $db_tbl         = null;
+
+	public function display($tpl = null)
+	{
+		/**
+		 * Initialise variables
+		 */
+
+		global $globalcats;
 		$app      = JFactory::getApplication();
+		$jinput   = $app->input;
 		$document = JFactory::getDocument();
-		$option   = JRequest::getCmd( 'option' );
-		$db       = JFactory::getDBO();
-		
-		$filter_order			= $app->getUserStateFromRequest( $option.'.search.filter_order', 			'filter_order', 'a.title', 'cmd' );
-		$filter_order_Dir	= $app->getUserStateFromRequest( $option.'.search.filter_order_Dir',	'filter_order_Dir',	'ASC', 'word' );
-		
-		$filter_fieldtype	= $app->getUserStateFromRequest( $option.'.fields.filter_fieldtype', 	'filter_fieldtype', 	'', 'word' );
-		$filter_itemtype	= $app->getUserStateFromRequest( $option.'.fields.filter_itemtype', 	'filter_itemtype', 		'', 'int' );
-		$filter_itemstate	= $app->getUserStateFromRequest( $option.'.fields.filter_itemstate', 'filter_itemstate', 	'', 'word' );
-		
-		$search_index			= $app->getUserStateFromRequest( $option.'.search.search_index',			'search_index', '', 'string' );
-		$search_index			= FLEXI_J16GE ? $db->escape( trim(JString::strtolower( $search_index ) ) ) : $db->getEscaped( trim(JString::strtolower( $search_index ) ) );
-		$search_itemtitle	= $app->getUserStateFromRequest( $option.'.search.search_itemtitle',	'search_itemtitle', '', 'string' );
-		$search_itemid		= $app->getUserStateFromRequest( $option.'.search.search_itemid',	'search_itemid', '', 'string' );
-		$search_itemid		= strlen($search_itemid) ? (int)$search_itemid : '';
-		$filter_indextype	= $app->getUserStateFromRequest( $option.'.search.filter_indextype',		'filter_indextype',	'advanced',		'word' );
-		
+		$user     = JFactory::getUser();
+		$cparams  = JComponentHelper::getParams('com_flexicontent');
+		$session  = JFactory::getSession();
+		$db       = JFactory::getDbo();
+
+		$option   = $jinput->getCmd('option', '');
+		$view     = $jinput->getCmd('view', '');
+		$task     = $jinput->getCmd('task', '');
+		$layout   = $jinput->getString('layout', 'default');
+
+		if ($layout === 'indexer')
+		{
+			return parent::display($tpl);
+		}
+
+		$isAdmin  = $app->isClient('administrator');
+		$isCtmpl  = $jinput->getCmd('tmpl') === 'component';
+
+		// Some flags & constants
+		$useAssocs = flexicontent_db::useAssociations();
+
+		// Load Joomla language files of other extension
+		if (!empty($this->proxy_option))
+		{
+			JFactory::getLanguage()->load($this->proxy_option, JPATH_ADMINISTRATOR, 'en-GB', true);
+			JFactory::getLanguage()->load($this->proxy_option, JPATH_ADMINISTRATOR, null, true);
+		}
+
+		// Get model
+		$model   = $this->getModel();
+		$model_s = null;
+
+		// Performance statistics
+		if ($print_logging_info = $cparams->get('print_logging_info'))
+		{
+			global $fc_run_times;
+		}
+
+
+		/**
+		 * Get filters and ordering
+		 */
+
+		$count_filters = 0;
+
+		// Order and order direction
+		$filter_order      = $model->getState('filter_order');
+		$filter_order_Dir  = $model->getState('filter_order_Dir');
+
+		// Various filters
+		$filter_indextype = $model->getState('filter_indextype');
+		$isADV = $filter_indextype === 'advanced';
+
+		$filter_fieldtype = $model->getState('filter_fieldtype');
+		$filter_type      = $model->getState('filter_type');
+		$filter_state     = $model->getState('filter_state');
+
+		if ($filter_fieldtype) $count_filters++;
+		if ($filter_type) $count_filters++;
+		if (strlen($filter_state)) $count_filters++;
+
+		// Text search
+		$scope  = $model->getState('scope');
+		$search = $model->getState('search');
+		$search = StringHelper::trim(StringHelper::strtolower($search));
+
+
+		$search_itemtitle	= $model->getState( 'search_itemtitle' );
+		$search_itemid		= $model->getState( 'search_itemid' );
+		$search_itemid		= !empty($search_itemid) ? (int)$search_itemid : '';
+		if ($search_itemtitle) $count_filters++; if ($search_itemid) $count_filters++;
+
+		$filter_indextype	= $model->getState( 'filter_indextype' );
+
 		$f_active['filter_fieldtype']	= (boolean)$filter_fieldtype;
-		$f_active['filter_itemtype']	= (boolean)$filter_itemtype;
-		$f_active['filter_itemstate']	= (boolean)$filter_itemstate;
-		
-		$f_active['search_index']			= strlen($search_index);
+		$f_active['filter_type']	= (boolean)$filter_type;
+		$f_active['filter_state']	= (boolean)$filter_state;
+
+		$f_active['search']			= strlen($search);
 		$f_active['search_itemtitle']	= strlen($search_itemtitle);
 		$f_active['search_itemid']		= (boolean)$search_itemid;
-		
-		//add css and submenu to document
-		$document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/flexicontentbackend.css');
-		if      (FLEXI_J30GE) $document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/j3x.css');
-		else if (FLEXI_J16GE) $document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/j25.css');
-		else                  $document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/j15.css');
 
-		// Create Submenu and check access
-		FLEXISubmenu('CanIndex');
-		
+
+		/**
+		 * Add css and js to document
+		 */
+
+		if ($layout !== 'indexer')
+		{
+			// Add css to document
+			if ($isAdmin)
+			{
+				!JFactory::getLanguage()->isRtl()
+					? $document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', array('version' => FLEXI_VHASH))
+					: $document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', array('version' => FLEXI_VHASH));
+				!JFactory::getLanguage()->isRtl()
+					? $document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/j3x.css', array('version' => FLEXI_VHASH))
+					: $document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/j3x_rtl.css', array('version' => FLEXI_VHASH));
+			}
+			else
+			{
+				!JFactory::getLanguage()->isRtl()
+					? $document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontent.css', array('version' => FLEXI_VHASH))
+					: $document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontent_rtl.css', array('version' => FLEXI_VHASH));
+			}
+
+			// Add JS frameworks
+			flexicontent_html::loadFramework('select2');
+
+			// Load custom behaviours: form validation, popup tooltips
+			JHtml::_('behavior.formvalidation');
+			JHtml::_('bootstrap.tooltip');
+
+			// Add js function to overload the joomla submitform validation
+			$document->addScript(JUri::root(true).'/components/com_flexicontent/assets/js/admin.js', array('version' => FLEXI_VHASH));
+			$document->addScript(JUri::root(true).'/components/com_flexicontent/assets/js/validate.js', array('version' => FLEXI_VHASH));
+		}
+
+
+		/**
+		 * Create Submenu & Toolbar
+		 */
+
+		// Create Submenu (and also check access to current view)
+		FLEXIUtilities::ManagerSideMenu('CanIndex');
+
 		// Create document/toolbar titles
 		$doc_title = JText::_( 'FLEXI_SEARCH_INDEX' );
 		$site_title = $document->getTitle();
-		JToolBarHelper::title( $doc_title, FLEXI_J16GE ? 'searchtext.png' : 'searchindex' );
+		JToolbarHelper::title( $doc_title, FLEXI_J16GE ? 'searchtext.png' : 'searchindex' );
 		$document->setTitle($doc_title .' - '. $site_title);
-		
+
 		// Create the toolbar
 		$this->setToolbar();
-		
-		$types			= $this->get( 'Typeslist' );
-		$fieldtypes	= $this->get( 'Fieldtypes' );
-		
-		// Build select lists
+
+
+		/**
+		 * Get data from the model, note data retrieval must be before 
+		 * getTotal() and getPagination() because it also calculates total rows
+		 */
+
+		if ( $print_logging_info )  $start_microtime = microtime(true);
+
+		$rows        = $model->getData();
+		$pagination  = $model->getPagination();
+
+		// Get item types
+		$types = $this->get('Typeslist');
+
+		// Get field types
+		$fieldtypes = flexicontent_db::getFieldTypes($_grouped=false, $_usage=true, $_published=false);
+
+		if ( $print_logging_info ) @$fc_run_times['execute_main_query'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+
+
+
+		/**
+		 * Create List Filters
+		 */
+
 		$lists = array();
-		
-		//build backend visible filter
-		$fftypes = array();
-		$fftypes[] = JHTML::_('select.option',  '', '- '. JText::_( 'FLEXI_ALL_FIELDS_TYPE' ) .' -' );
-		$fftypes[] = JHTML::_('select.option',  'C', JText::_( 'FLEXI_CORE_FIELDS' ) );
-		$fftypes[] = JHTML::_('select.option',  'NC', JText::_( 'FLEXI_NON_CORE_FIELDS' ) );
-		foreach ($fieldtypes as $field_type => $ftdata) {
-			$fftypes[] = JHTML::_('select.option', $field_type, '-'.$ftdata->assigned.'- '. $field_type);
+
+		$js = '';
+
+		// Build field type filter
+		if ($isADV)
+		{
+			$fftypes = array();
+			$fftypes[] = JHtml::_('select.option',  '', '-' /*JText::_( 'FLEXI_ALL_FIELDS_TYPE' )*/ );
+			$fftypes[] = JHtml::_('select.option',  'C', JText::_( 'FLEXI_CORE_FIELDS' ) );
+			$fftypes[] = JHtml::_('select.option',  'NC', JText::_( 'FLEXI_CUSTOM_NON_CORE_FIELDS' ) );
+			foreach ($fieldtypes as $field_type => $ftdata)
+			{
+				$fftypes[] = JHtml::_('select.option', $field_type, '-'.$ftdata->assigned.'- '. $field_type);
+			}
+
+			$lists['filter_fieldtype'] = $this->getFilterDisplay(array(
+				'label' => JText::_('FLEXI_FIELD_TYPE'),
+				'html' => JHtml::_('select.genericlist',
+					$fftypes,
+					'filter_fieldtype',
+					array(
+						'class' => $this->select_class,
+						'size' => '1',
+						'onchange' => 'document.adminForm.limitstart.value=0; Joomla.submitform();',
+					),
+					'value',
+					'text',
+					$filter_fieldtype
+				),
+			));
 		}
-		$lists['filter_fieldtype'] = JHTML::_('select.genericlist', $fftypes, 'filter_fieldtype', 'class="inputbox" size="1" onchange="submitform( );"', 'value', 'text', $filter_fieldtype );
-		
-		//build type select list
-		$lists['filter_itemtype'] = flexicontent_html::buildtypesselect($types, 'filter_itemtype', $filter_itemtype, true, 'class="inputbox" size="1" onchange="submitform( );"', 'filter_itemtype');
-		
-		//publish unpublished filter
-		$ffstate = array();
-		$ffstate[] = JHTML::_('select.option',  '', '- '. JText::_( 'FLEXI_SELECT_STATE' ) .' -' );
-		$ffstate[] = JHTML::_('select.option',  'P', JText::_( 'FLEXI_PUBLISHED' ) );
-		$ffstate[] = JHTML::_('select.option',  'U', JText::_( 'FLEXI_UNPUBLISHED' ) );
-		$lists['filter_itemstate'] = JHTML::_('select.genericlist', $ffstate, 'filter_itemstate', 'class="inputbox" size="1" onchange="submitform( );"', 'value', 'text', $filter_itemstate );
-		
-		// build filter index type record listing
-		//$itn['basic'] = JText::_( 'FLEXI_INDEX_BASIC' );
+
+		// Build item type filter
+		$lists['filter_type'] = $this->getFilterDisplay(array(
+			'label' => JText::_('FLEXI_TYPE'),
+			'html' => flexicontent_html::buildtypesselect(
+				$types,
+				'filter_type',
+				$filter_type,
+				'-'/*true*/,
+				array(
+					'class' => $this->select_class,
+					'size' => '1',
+					'onchange' => 'document.adminForm.limitstart.value=0; Joomla.submitform();',
+				),
+				'filter_type'
+			),
+		));
+
+		// Build state filter (grouping published and unpublished states)
+		$ffstates = array();
+		$ffstates[] = JHtml::_('select.option',  '', '-' /*JText::_( 'FLEXI_SELECT_STATE' )*/ );
+		$ffstates[] = JHtml::_('select.option',  'ALL_P', JText::_('FLEXI_GRP_PUBLISHED') . ' ' . JText::_('FLEXI_STATE_S'));
+		$ffstates[] = JHtml::_('select.option',  'ALL_U', JText::_('FLEXI_GRP_UNPUBLISHED') . ' ' . JText::_('FLEXI_STATE_S'));
+
+		$lists['filter_state'] = $this->getFilterDisplay(array(
+			'label' => JText::_('FLEXI_STATE'),
+			'html' => JHtml::_('select.genericlist',
+				$ffstates,
+				'filter_state',
+				array(
+					'class' => $this->select_class,
+					'size' => '1',
+					'onchange' => 'document.adminForm.limitstart.value=0; Joomla.submitform();',
+				),
+				'value',
+				'text',
+				$filter_state
+			),
+		));
+
+		// Build index type filter
+		$itn['basic'] = JText::_( 'FLEXI_INDEX_BASIC' );
 		$itn['advanced'] = JText::_( 'FLEXI_INDEX_ADVANCED' );
 		$indextypes = array();
-		//foreach ($itn as $i => $v) $indextypes[] = JHTML::_('select.option', $i, $v);
-		//$lists['filter_indextype'] = JHTML::_('select.radiolist', $indextypes, 'filter_indextype', 'size="1" class="inputbox" onchange="submitform();"', 'value', 'text', $filter_indextype );
-		$lists['filter_indextype'] = '';
-		foreach ($itn as $i => $v) {
+		//foreach ($itn as $i => $v) $indextypes[] = JHtml::_('select.option', $i, $v);
+		//$lists['filter_indextype'] = JHtml::_('select.radiolist', $indextypes, 'filter_indextype', 'size="1" class="inputbox" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', 'value', 'text', $filter_indextype );
+
+		$lists['filter_indextype'] = '<div class="fc-iblock group-fcset radio" style="vertical-align: middle">';
+
+		foreach ($itn as $i => $v)
+		{
 			$checked = $filter_indextype == $i ? ' checked="checked" ' : '';
-			$lists['filter_indextype'] .= '<input type="radio" onchange="submitform();" class="inputbox" size="1" '.$checked.' value="'.$i.'" id="filter_indextype'.$i.'" name="filter_indextype" />';
+			$lists['filter_indextype'] .= '<input type="radio" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()" class="inputbox" size="1" '.$checked.' value="'.$i.'" id="filter_indextype'.$i.'" name="filter_indextype" />';
 			$lists['filter_indextype'] .= '<label class="" id="filter_indextype'.$i.'-lbl" for="filter_indextype'.$i.'">'.$v.'</label>';
 		}
-		
-		// table ordering
-		$lists['order_Dir'] = $filter_order_Dir;
-		$lists['order'] = $filter_order;
-		
-		// search index & item title  filter
-		$lists['search_index']= $search_index;
-		$lists['search_itemtitle']= $search_itemtitle;
-		$lists['search_itemid']= $search_itemid;
-		
-		$data   = $this->get('Data');  // MUST BE BEFORE getCount and getPagination because it also calculates total rows
-		$total  = $this->get('Count');
-		$pagination = $this->get('Pagination');
-		$limitstart = $this->get('LimitStart');
 
-		$js = "window.addEvent('domready', function(){";
-		if ($filter_fieldtype) {
-			$js .= "$$('.col_fieldtype').each(function(el){ el.addClass('yellow'); });";
-		}		
-		if ($search_index) {
-			$js .= "$$('.col_search_index').each(function(el){ el.addClass('yellow'); });";
-		}		
-		$js .= "});";
-		$document->addScriptDeclaration($js);
+		$lists['filter_indextype'] .= '</div>';
+
+
+		// Build text search scope
+		$scopes = array(
+			'-1' => JText::_('FLEXI_INDEXED_CONTENT'),
+		);
+
+		$lists['scope_tip'] = '';
+		$lists['scope'] = $this->getScopeSelectorDisplay($scopes, $scope);
+		$this->scope_title = isset($scopes[$scope]) ? $scopes[$scope] : reset($scopes);
+
+
+		// Text search filter value
+		$lists['search'] = $search;
+
+
+		// Table ordering
+		$lists['order_Dir'] = $filter_order_Dir;
+		$lists['order']     = $filter_order;
+
+
+		// Build item title filter
+		$lists['search_itemtitle'] = $this->getFilterDisplay(array(
+			'label' => JText::_('FLEXI_TITLE'),
+			'html' => '<input type="text" name="search_itemtitle" id="search_itemtitle" value="' . htmlspecialchars($search_itemtitle, ENT_QUOTES, 'UTF-8') . '" class="text_area" onchange="document.adminForm.submit();" size="30"/>',
+		));
+
+
+		// Build item id filter
+		$lists['search_itemid'] = $this->getFilterDisplay(array(
+			'label' => JText::_('FLEXI_ID'),
+			'html' => '<input type="text" name="search_itemid" id="search_itemid" value="' . htmlspecialchars($search_itemid, ENT_QUOTES, 'UTF-8') . '" class="text_area" onchange="document.adminForm.submit();" size="6" />',
+		));
+
+		if ($filter_fieldtype)
+		{
+			$js .= "jQuery('.col_fieldtype').addClass('filtered_column');";
+		}
+
+		if ($search)
+		{
+			$js .= "jQuery('.col_search').addClass('filtered_column');";
+		}
+
+		if ($js)
+		{
+			$document->addScriptDeclaration('
+				jQuery(document).ready(function(){
+					' . $js . '
+				});
+			');
+		}
+
+		// Add modal edit code
+		if (1)
+		{
+			JText::script("FLEXI_UPDATING_CONTENTS", true);
+			$document->addScriptDeclaration('
+				function fc_edit_fcitem_modal_load( container )
+				{
+					if ( container.find("iframe").get(0).contentWindow.location.href.indexOf("view=items") != -1 )
+					{
+						container.dialog("close");
+					}
+				}
+				function fc_edit_fcitem_modal_close()
+				{
+					window.location.reload(false);
+					document.body.innerHTML = Joomla.JText._("FLEXI_UPDATING_CONTENTS") + \' <img id="page_loading_img" src="components/com_flexicontent/assets/images/ajax-loader.gif">\';
+				}
+			');
+		}
 
 		$query = "SHOW VARIABLES LIKE '%ft_min_word_len%'";
 		$db->setQuery($query);
@@ -143,103 +365,177 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		$notice_ft_min_word_len	= $app->getUserStateFromRequest( $option.'.fields.notice_ft_min_word_len',	'notice_ft_min_word_len',	0, 'int' );
 		//if ( $cparams->get('show_usability_messages', 1) )     // Important usability messages
 		//{
-			if ( $notice_ft_min_word_len < 2) {
+
+		$old_add_search_prefix = $app->getUserState('add_search_prefix', null);
+
+		$add_search_prefix = $cparams->get('add_search_prefix', 0);
+		$app->setUserState('add_search_prefix', $add_search_prefix);
+
+
+		if ($old_add_search_prefix !== null && $old_add_search_prefix != $add_search_prefix) {
+			$app->enqueueMessage('Parameter: "Searching small/common words" has changed, please recreate (just once) the search indexes, otherwise text search will not work', 'warning');
+		}
+
+		// Important usability messages
+		if (!$cparams->get('add_search_prefix', 0))
+		{
+			if ($ft_min_word_len > 1 && $notice_ft_min_word_len < 10)
+			{
 				$app->setUserState( $option.'.fields.notice_ft_min_word_len', $notice_ft_min_word_len+1 );
-				$app->enqueueMessage("NOTE : Database limits minimum search word length (ft_min_word_len) to ".$ft_min_word_len, 'notice');
-				//$app->enqueueMessage(JText::_('FLEXI_USABILITY_MESSAGES_TURN_OFF'), 'message');
+				$app->enqueueMessage("NOTE : Database limits minimum search word length (ft_min_word_len) to ".$ft_min_word_len, 'message');
+				$app->enqueueMessage('Please enable: "Searching small/common words":
+					<a class="btn" href="index.php?option=com_config&view=component&component=com_flexicontent&path=&"><span class="icon-options"></span>Configuration</a>
+					and then click to re-INDEX both search indexes', 'notice');
 			}
-		//}
-		
-		$this->assignRef('lists',	$lists);
-		$this->assignRef('pagination',	$pagination);
-		$this->assignRef('data', $data);
-		$this->assignRef('total', $total);
-		$this->assignRef('limitstart', $limitstart);
-		$this->assignRef('f_active', $f_active);
-		
-		$this->sidebar = FLEXI_J30GE ? JHtmlSidebar::render() : null;
+		}
+
+
+
+		$this->count_filters = $count_filters;
+
+		$this->lists       = $lists;
+		$this->rows        = $rows;
+		$this->pagination  = $pagination;
+		$this->f_active    = $f_active;
+
+		$this->perms  = FlexicontentHelperPerm::getPerm();
+		$this->option = $option;
+		$this->view   = $view;
+		$this->state  = $this->get('State');
+		$this->isADV = $isADV;
+
+		if (!$jinput->getCmd('nosidebar'))
+		{
+			$this->sidebar = FLEXI_J30GE ? JHtmlSidebar::render() : null;
+		}
+
+		/**
+		 * Render view's template
+		 */
+
+		if ( $print_logging_info ) { global $fc_run_times; $start_microtime = microtime(true); }
+
 		parent::display($tpl);
+
+		if ( $print_logging_info ) @$fc_run_times['template_render'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 	}
-	
-	
+
+
+
 	/**
 	 * Method to configure the toolbar for this view.
 	 *
 	 * @access	public
 	 * @return	void
 	 */
-	function setToolbar() {
+	function setToolbar()
+	{
+		$user     = JFactory::getUser();
 		$document = JFactory::getDocument();
-		$js = "window.addEvent('domready', function(){";
-		$toolbar = JToolBar::getInstance('toolbar');
+		$toolbar  = JToolbar::getInstance('toolbar');
+		$perms    = FlexicontentHelperPerm::getPerm();
+		$session  = JFactory::getSession();
 
-		$btn_task = '';
-		$popup_load_url = JURI::base().'index.php?option=com_flexicontent&view=search&layout=indexer&tmpl=component&indexer=basic';
-		if (FLEXI_J30GE || !FLEXI_J16GE) {  // Layout of Popup button broken in J3.1, add in J1.5 it generates duplicate HTML tag id (... just for validation), so add manually
-			$js .= "
-				jQuery('#toolbar-basicindex a.toolbar, #toolbar-basicindex button')
-					.attr('onclick', 'javascript:;')
-					.attr('href', '".$popup_load_url."')
-					.attr('rel', '{handler: \'iframe\', size: {x: 500, y: 240}, onClose: function() {}}');
-			";
-			JToolBarHelper::custom( $btn_task, 'basicindex.png', 'basicindex_f2.png', 'FLEXI_INDEX_BASIC_CONTENT_LISTS', false );
-			JHtml::_('behavior.modal', '#toolbar-basicindex a.toolbar, #toolbar-basicindex button');
-		} else {
-			$toolbar->appendButton('Popup', 'basicindex', 'FLEXI_INDEX_BASIC_CONTENT_LISTS', str_replace('&', '&amp;', $popup_load_url), 500, 240);
+		$js = '';
+
+		$contrl = "search.";
+		$contrl_s = null;
+
+		$loading_msg = flexicontent_html::encodeHTML(JText::_('FLEXI_LOADING') .' ... '. JText::_('FLEXI_PLEASE_WAIT'), 2);
+
+		$btn_arr = array();
+
+		if ($perms->CanIndex)
+		{
+			$popup_load_url = JUri::base(true) . '/index.php?option=com_flexicontent&amp;view=search&amp;layout=indexer&amp;tmpl=component&amp;indexer=basic';
+			$btn_text = JText::_('FLEXI_REINDEX_BASIC_CONTENT_LISTS');
+			$btn_name = 'search_adv_index_dirty_only';
+			$full_js="if (!confirm('" . str_replace('<br>', '\n', flexicontent_html::encodeHTML(JText::_('FLEXI_MAY_TAKE_TIME_IN_LARGE_WEBSITES'), 'd')) . "')) return false; var url = jQuery(this).data('taskurl'); fc_showDialog(url, 'fc_modal_popup_container', 0, 550, 350, function(){document.body.innerHTML='<span class=\"fc_loading_msg\">"
+						.$loading_msg."<\/span>'; window.location.reload(false)}, {'title': '".flexicontent_html::encodeHTML(JText::_('FLEXI_REINDEX_BASIC_CONTENT_LISTS'), 'd')."'}); return false;";
+			$btn_arr[] = flexicontent_html::addToolBarButton(
+				$btn_text, $btn_name, $full_js,
+				$msg_alert = JText::_('FLEXI_NO_ITEMS_SELECTED'), $msg_confirm = '',
+				$btn_task='', $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false,
+				'btn btn-fcaction ' . $this->tooltip_class, 'icon-loop',
+				'data-placement="right" data-taskurl="' . $popup_load_url .'" title=""', $auto_add = 0, $tag_type='button')
+				;
+
+			$popup_load_url = JUri::base(true) . '/index.php?option=com_flexicontent&amp;view=search&amp;layout=indexer&amp;tmpl=component&amp;indexer=advanced';
+			$btn_text = JText::_('FLEXI_REINDEX_ADVANCED_SEARCH_VIEW');
+			$btn_name = 'search_adv_index_dirty_only';
+			$full_js="if (!confirm('" . str_replace('<br>', '\n', flexicontent_html::encodeHTML(JText::_('FLEXI_MAY_TAKE_TIME_IN_LARGE_WEBSITES'), 'd')) . "')) return false; var url = jQuery(this).data('taskurl'); fc_showDialog(url, 'fc_modal_popup_container', 0, 550, 350, function(){document.body.innerHTML='<span class=\"fc_loading_msg\">"
+						.$loading_msg."<\/span>'; window.location.reload(false)}, {'title': '".flexicontent_html::encodeHTML(JText::_('FLEXI_REINDEX_ADVANCED_SEARCH_VIEW'), 'd')."'}); return false;";
+			$btn_arr[] = flexicontent_html::addToolBarButton(
+				$btn_text, $btn_name, $full_js,
+				$msg_alert = JText::_('FLEXI_NO_ITEMS_SELECTED'), $msg_confirm = '',
+				$btn_task='', $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false,
+				'btn btn-fcaction ' . $this->tooltip_class, 'icon-loop',
+				'data-placement="right" data-taskurl="' . $popup_load_url .'" title=""', $auto_add = 0, $tag_type='button')
+				;
+
+			$popup_load_url = JUri::base(true) . '/index.php?option=com_flexicontent&amp;view=search&amp;layout=indexer&amp;tmpl=component&amp;indexer=advanced&amp;rebuildmode=quick';
+			$btn_text = JText::_('FLEXI_REINDEX_ADVANCED_SEARCH_VIEW_DIRTY_ONLY');
+			$btn_name = 'search_adv_index_dirty_only';
+			$full_js="if (!confirm('" . str_replace('<br>', '\n', flexicontent_html::encodeHTML(JText::_('FLEXI_MAY_TAKE_TIME_IN_LARGE_WEBSITES'), 'd')) . "')) return false; var url = jQuery(this).data('taskurl'); fc_showDialog(url, 'fc_modal_popup_container', 0, 550, 350, function(){document.body.innerHTML='<span class=\"fc_loading_msg\">"
+						.$loading_msg."<\/span>'; window.location.reload(false)}, {'title': '".flexicontent_html::encodeHTML(JText::_('FLEXI_REINDEX_ADVANCED_SEARCH_VIEW_DIRTY_ONLY'), 'd')."'}); return false;";
+			$btn_arr[] = flexicontent_html::addToolBarButton(
+				$btn_text, $btn_name, $full_js,
+				$msg_alert = JText::_('FLEXI_NO_ITEMS_SELECTED'), $msg_confirm = '',
+				$btn_task='', $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false,
+				'btn btn-fcaction ' . $this->tooltip_class, 'icon-loop',
+				'data-placement="right" data-taskurl="' . $popup_load_url .'" title=""', $auto_add = 0, $tag_type='button')
+				;
 		}
-		
-		JToolBarHelper::divider();  JToolBarHelper::spacer();
-		
-		$btn_task = '';
-		$popup_load_url = JURI::base().'index.php?option=com_flexicontent&view=search&layout=indexer&tmpl=component&indexer=advanced';
-		if (FLEXI_J30GE || !FLEXI_J16GE) {  // Layout of Popup button broken in J3.1, add in J1.5 it generates duplicate HTML tag id (... just for validation), so add manually
-			$js .= "
-				jQuery('#toolbar-advindex a.toolbar, #toolbar-advindex button')
-					.attr('onclick', 'javascript:;')
-					.attr('href', '".$popup_load_url."')
-					.attr('rel', '{handler: \'iframe\', size: {x: 500, y: 240}, onClose: function() {}}');
-			";
-			JToolBarHelper::custom( $btn_task, 'advindex.png', 'advindex_f2.png', 'FLEXI_INDEX_ADVANCED_SEARCH_VIEW', false );
-			JHtml::_('behavior.modal', '#toolbar-advindex a.toolbar, #toolbar-advindex button');
-		} else {
-			$toolbar->appendButton('Popup', 'advindex', 'FLEXI_INDEX_ADVANCED_SEARCH_VIEW', str_replace('&', '&amp;', $popup_load_url), 500, 240);
+
+		if (count($btn_arr))
+		{
+			$drop_btn = '
+				<button type="button" class="' . $this->btn_sm_class . ' btn-primary dropdown-toggle" data-toggle="dropdown">
+					<span title="'.JText::_('FLEXI_SEARCH_INDEXES').'" class="icon-menu"></span>
+					'.JText::_('FLEXI_SEARCH_INDEXES').'
+					<span class="caret"></span>
+				</button>';
+			array_unshift($btn_arr, $drop_btn);
+			flexicontent_html::addToolBarDropMenu($btn_arr, 'search-index-btns-group', ' ');
 		}
-		
-		$btn_task = '';
-		$popup_load_url = JURI::base().'index.php?option=com_flexicontent&view=search&layout=indexer&tmpl=component&indexer=advanced&rebuildmode=quick';
-		if (FLEXI_J30GE || !FLEXI_J16GE) {  // Layout of Popup button broken in J3.1, add in J1.5 it generates duplicate HTML tag id (... just for validation), so add manually
-			$js .= "
-				jQuery('#toolbar-advindexdirty a.toolbar, #toolbar-advindexdirty button')
-					.attr('onclick', 'javascript:;')
-					.attr('href', '".$popup_load_url."')
-					.attr('rel', '{handler: \'iframe\', size: {x: 500, y: 240}, onClose: function() {}}');
-			";
-			JToolBarHelper::custom( $btn_task, 'advindexdirty.png', 'advindexdirty_f2.png', 'FLEXI_INDEX_ADVANCED_SEARCH_VIEW_DIRTY_ONLY', false );
-			JHtml::_('behavior.modal', '#toolbar-advindexdirty a.toolbar, #toolbar-advindexdirty button');
-		} else {
-			$toolbar->appendButton('Popup', 'advindexdirty', 'FLEXI_INDEX_ADVANCED_SEARCH_VIEW_DIRTY_ONLY', str_replace('&', '&amp;', $popup_load_url), 500, 240);
-		}
-		
-		$toolbar->appendButton('Confirm', 'FLEXI_DELETE_INDEX_CONFIRM', 'trash', 'FLEXI_INDEX_ADVANCED_PURGE', FLEXI_J16GE ? 'search.purge' : 'purge', false);
-		
-		$user  = JFactory::getUser();
-		$perms = FlexicontentHelperPerm::getPerm();
-		if ($perms->CanConfig) {
-			JToolBarHelper::divider(); JToolBarHelper::spacer();
-			$session = JFactory::getSession();
+
+		//$toolbar->appendButton('Confirm', 'FLEXI_DELETE_INDEX_CONFIRM', 'trash', 'FLEXI_INDEX_ADVANCED_PURGE', $contrl . 'purge', false);
+		$btn_icon = 'icon-trash';
+		$btn_name = 'purge';
+		$btn_task = $contrl . 'purge';
+		$extra_js = "";
+		flexicontent_html::addToolBarButton(
+			'FLEXI_INDEX_ADVANCED_PURGE',
+			$btn_name, $full_js='', $msg_alert='', $msg_confirm=JText::_('FLEXI_PURGE_INDEX_CONFIRM'),
+			$btn_task, $extra_js, $btn_list=false, $btn_menu=true, $btn_confirm=true, $btn_class="", $btn_icon);
+
+		//$toolbar->appendButton('Confirm', 'Update ?', 'shuffle', 'FLEXI_UPDATE_CUSTOM_ORDER_INDEXES', $contrl . 'custom_order', false);
+		$btn_icon = 'icon-shuffle';
+		$btn_name = 'custom_order';
+		$btn_task = $contrl . 'custom_order';
+		$extra_js = "";
+		flexicontent_html::addToolBarButton(
+			'FLEXI_UPDATE_CUSTOM_ORDER_INDEXES',
+			$btn_name, $full_js='', $msg_alert='', $msg_confirm=JText::_('FLEXI_UPDATE_CUSTOM_ORDER_INDEXES'),
+			$btn_task, $extra_js, $btn_list=false, $btn_menu=true, $btn_confirm=true, $btn_class="", $btn_icon);
+
+		// Configuration button
+		if ($perms->CanConfig)
+		{
 			$fc_screen_width = (int) $session->get('fc_screen_width', 0, 'flexicontent');
 			$_width  = ($fc_screen_width && $fc_screen_width-84 > 940 ) ? ($fc_screen_width-84 > 1400 ? 1400 : $fc_screen_width-84 ) : 940;
 			$fc_screen_height = (int) $session->get('fc_screen_height', 0, 'flexicontent');
 			$_height = ($fc_screen_height && $fc_screen_height-128 > 550 ) ? ($fc_screen_height-128 > 1000 ? 1000 : $fc_screen_height-128 ) : 550;
-			JToolBarHelper::preferences('com_flexicontent', $_height, $_width, 'Configuration');
+			JToolbarHelper::preferences('com_flexicontent', $_height, $_width, 'Configuration');
 		}
-		
-		$js .= "});";
-		$document->addScriptDeclaration($js);
-	}
-	
-	function indexer($tpl)
-	{		
-		parent::display($tpl);
+
+		if ($js)
+		{
+			$document->addScriptDeclaration('
+				jQuery(document).ready(function(){
+					' . $js . '
+				});
+			');
+		}
 	}
 }

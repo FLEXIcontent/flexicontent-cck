@@ -19,18 +19,19 @@
 // Check to ensure this file is included in Joomla!
 defined('_JEXEC') or die('Restricted access');
 
+jimport('cms.html.html');      // JHtml
+jimport('cms.html.select');    // JHtmlSelect
+
+jimport('joomla.form.helper'); // JFormHelper
+JFormHelper::loadFieldClass('radio');   // JFormFieldRadio
+
 /**
- * Renders a selcet method radio element
+ * Renders the FC-method radio element
  *
  * @package 	Joomla
  * @subpackage	FLEXIcontent
  * @since		1.5
  */
-if (FLEXI_J16GE) {
-	jimport('joomla.form.helper');
-	JFormHelper::loadFieldClass('radio');
-}
-
 class JFormFieldFcmethod extends JFormFieldRadio
 {
 	/**
@@ -44,22 +45,17 @@ class JFormFieldFcmethod extends JFormFieldRadio
 	function getInput()
 	{
 		$doc = JFactory::getDocument();
-		
-		if (FLEXI_J16GE) {
-			$node = & $this->element;
-			$attributes = get_object_vars($node->attributes());
-			$attributes = $attributes['@attributes'];
-		} else {
-			$attributes = & $node->_attributes;
-		}
-		$split_char = ",";
-		
+
+		$node = & $this->element;
+		$attributes = get_object_vars($node->attributes());
+		$attributes = $attributes['@attributes'];
+
 		$value = FLEXI_J16GE ? $this->value : $value;
 		
 		$fieldname	= FLEXI_J16GE ? $this->name : $control_name.'['.$name.']';
 		$element_id = FLEXI_J16GE ? $this->id : $control_name.$name;
 		
-		//$disabled_ff = explode($split_char, @$attributes['disabled_ff']);
+		//$disabled_ff = explode(',', @$attributes['disabled_ff']);
 		$disabled_ff = @$attributes['disabled_ff'];
 		
 		if ($disabled_ff) {
@@ -90,14 +86,13 @@ window.addEvent('domready', function(){
 		
 		// prepare the options 
 		$options = array(); 
-		$options[] = JHTML::_('select.option', '1', JText::_('FLEXI_ALL')); 
-		$options[] = JHTML::_('select.option', '2', JText::_('FLEXI_EXCLUDE')); 
-		$options[] = JHTML::_('select.option', '3', JText::_('FLEXI_INCLUDE')); 
+		$options[] = JHtml::_('select.option', '1', JText::_('FLEXI_ALL')); 
+		$options[] = JHtml::_('select.option', '2', JText::_('FLEXI_EXCLUDE')); 
+		$options[] = JHtml::_('select.option', '3', JText::_('FLEXI_INCLUDE')); 
 		
-		$html = JHTML::_('select.radiolist', $options, $fieldname, $class, 'value', 'text', $value, $element_id);
-		if (FLEXI_J16GE) {
-			$html = '<fieldset id="'.$element_id.'" class="radio">'.$html.'</fieldset>';
-		}
+		$html = JHtml::_('select.radiolist', $options, $fieldname, $class, 'value', 'text', $value, $element_id);
+		$html = '<fieldset id="'.$element_id.'" class="radio">'.$html.'</fieldset>';
+		
 		return $html;
 	}
 }

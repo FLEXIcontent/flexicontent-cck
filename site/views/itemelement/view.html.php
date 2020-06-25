@@ -22,14 +22,13 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, 'en-GB', true);
 JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, true);
 
-$document	= JFactory::getDocument();
-$document->addStyleSheet(JURI::root().'administrator/templates/system/css/system.css');
-if (FLEXI_J16GE) {
-	$document->addStyleSheet(JURI::root().'administrator/templates/bluestork/css/general.css');
-	$document->addStyleSheet(JURI::root().'administrator/templates/bluestork/css/template.css');
-} else {
-	$document->addStyleSheet(JURI::root().'administrator/templates/khepri/css/general.css');
-	$document->addStyleSheet(JURI::root().'administrator/templates/khepri/css/component.css');
+$app = JFactory::getApplication();
+$document = JFactory::getDocument();
+$this->baseurl = isset($this->baseurl) ? $this->baseurl : JUri::base(true);
+
+// Allow css override
+if (file_exists(JPATH_SITE.DS.'templates'.DS.$app->getTemplate().DS.'css'.DS.'flexicontent.css')) {
+	$document->addStyleSheet($this->baseurl.'/templates/'.$app->getTemplate().'/css/flexicontent.css', array('version' => FLEXI_VHASH));
 }
+
 require_once(JPATH_BASE.DS."administrator".DS."components".DS."com_flexicontent".DS."views".DS."itemelement".DS."view.html.php");
-?>

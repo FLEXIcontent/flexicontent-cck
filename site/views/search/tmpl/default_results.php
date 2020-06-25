@@ -1,6 +1,18 @@
-<?php defined('_JEXEC') or die('Restricted access'); ?>
-
 <?php
+defined('_JEXEC') or die('Restricted access');
+
+if (!count($this->results))
+{
+	if ($this->searchword || count($this->filter_values)) :	
+	?>
+		<div class="fcclear"></div>
+		<div class="alert alert-warning noitems_search"> <?php echo JText::_( 'FLEXI_SEARCH_NO_ITEMS_FOUND' ); ?> </div>
+		<div class="fcclear"></div>
+	<?php
+	endif;
+	
+	return;
+}
 
 
 // **************************************************
@@ -23,6 +35,13 @@ foreach ($this->results as $i => $result)
 // Calculate CSS classes needed to add special styling markups to the items
 // ************************************************************************
 flexicontent_html::calculateItemMarkups($fcitems, $this->params);
+
+
+// *********************************************************
+// Get Original content ids for creating some untranslatable
+// fields that have share data (like shared folders)
+// *********************************************************
+flexicontent_db::getOriginalContentItemids($fcitems);
 
 
 // *****************************************************
@@ -56,10 +75,11 @@ if ( $use_infoflds && count($infoflds) ) {
 ?>
 
 
-<table class="contentpaneopen<?php echo $this->escape($this->params->get('pageclass_sfx')); ?>" width="100%"><tr><td>
+<div class="fc_search_results_list page<?php echo $this->escape($this->params->get('pageclass_sfx')); ?>">
 
 <?php $count = -1; ?>
 <?php foreach($this->results as $i => $result) : ?>
+	<div class="fcclear"></div>
 	<?php
 		$count++;
 		$fc_item_classes = 'fc_search_result '.($count%2 ? 'fcodd' : 'fceven');
@@ -89,7 +109,7 @@ if ( $use_infoflds && count($infoflds) ) {
 	<fieldset id="searchlist_item_<?php echo $i; ?>" class="<?php echo $fc_item_classes; ?>">
 	 <div class="search-results<?php echo $this->pageclass_sfx; ?>">
 	 	
-		<div class="fc_search_result_title">
+		<h2 class="fc_search_result_title">
 			<?php echo $this->pageNav->limitstart + $result->count.'. ';?>
 			<?php if ($result->href) :?>
 				<a href="<?php echo $item_link; ?>"<?php if ($result->browsernav == 1) :?> target="_blank"<?php endif;?>>
@@ -98,7 +118,7 @@ if ( $use_infoflds && count($infoflds) ) {
 			<?php else:?>
 				<?php echo $this->escape($result->title);?>
 			<?php endif; ?>
-		</div>
+		</h2>
 		
 		
 		<?php if ( @ $result->fc_item_id ) echo $markup_tags; ?>
@@ -106,21 +126,21 @@ if ( $use_infoflds && count($infoflds) ) {
 		
 		
 		<?php if ($this->params->get('show_date', 1)) : ?>
-		<div class="fc_search_result_date">
-			<span class="small<?php echo $this->escape($this->params->get('pageclass_sfx')); ?>">
-			<?php echo JText::sprintf('FLEXI_CREATED_ON', $result->created); ?>
+		<span class="fc_search_result_date">
+			<span class="fc-mssg-inline fc-success fc-nobgimage">
+				<?php echo $result->created; ?>
 			</span>
-		</div>
+		</span>
 		<?php endif; ?>
 		
 		
 		
 		<?php if ( $this->params->get( 'show_section', 1 ) && $result->section ) : ?>
-		<div class="fc_search_result_category">
-			<span class="small<?php echo $this->pageclass_sfx; ?>">
-				(<?php echo $this->escape($result->section); ?>)
+		<span class="fc_search_result_category">
+			<span class="fc-mssg-inline fc-info fc-nobgimage">
+				<?php echo $this->escape($result->section); ?>
 			</span>
-		</div>
+		</span>
 		<?php endif; ?>
 		
 		
@@ -132,7 +152,7 @@ if ( $use_infoflds && count($infoflds) ) {
 			if (!empty($img_field_name)) :
 				FlexicontentFields::getFieldDisplay($fcitems[$i], $img_field_name, $values=null, $method='display');
 				$img_field = & $fcitems[$i]->fields[$img_field_name];
-				$src = str_replace(JURI::root(), '', @ $img_field->thumbs_src[$img_field_size][0] );
+				$src = str_replace(JUri::root(), '', @ $img_field->thumbs_src[$img_field_size][0] );
 			else :
 				$src = flexicontent_html::extractimagesrc($fcitems[$i]);
 			endif;
@@ -144,13 +164,14 @@ if ( $use_infoflds && count($infoflds) ) {
 				$h		= '&amp;h=' . $this->params->get('fcr_height', 200);
 				$aoe	= '&amp;aoe=1';
 				$q		= '&amp;q=95';
+				$ar 	= '&amp;ar=x';
 				$zc		= $this->params->get('fcr_method') ? '&amp;zc=' . $this->params->get('fcr_method') : '';
-				$ext = pathinfo($src, PATHINFO_EXTENSION);
-				$f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
-				$conf	= $w . $h . $aoe . $q . $zc . $f;
+				$ext = strtolower(pathinfo($src, PATHINFO_EXTENSION));
+				$f = in_array( $ext, array('png', 'ico', 'gif', 'jpg', 'jpeg') ) ? '&amp;f='.$ext : '';
+				$conf	= $w . $h . $aoe . $q . $ar . $zc . $f;
 				
-				$base_url = (!preg_match("#^http|^https|^ftp|^/#i", $src)) ?  JURI::base(true).'/' : '';
-				$thumb = JURI::base(true).'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$base_url.$src.$conf;
+				$base_url = (!preg_match("#^http|^https|^ftp|^/#i", $src)) ?  JUri::base(true).'/' : '';
+				$thumb = JUri::base(true).'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$base_url.$src.$conf;
 			} else {
 				// Do not resize image when (a) image src path not set or (b) using image field's already created thumbnails
 				$thumb = $src;
@@ -189,9 +210,13 @@ if ( $use_infoflds && count($infoflds) ) {
 	
 		<?php foreach ($infoflds as $fieldname) : ?>
 			<?php if ( @$fcitems[$i]->fields[$fieldname]->display ) : ?>
-			<span class="fc_field_container">
-				<span class="fc_field_label"><?php echo $fcitems[$i]->fields[$fieldname]->label; ?></span>
-				<span class="fc_field_value"><?php echo $fcitems[$i]->fields[$fieldname]->display; ?></span>
+			<span class="fc_search_field_container">
+				<span class="fc_search_field_label label">
+					<?php echo $fcitems[$i]->fields[$fieldname]->label; ?>
+				</span>
+				<span class="fc_search_field_value">
+					<?php echo $fcitems[$i]->fields[$fieldname]->display; ?>
+				</span>
 			</span>
 			<?php endif; ?>
 		<?php endforeach; ?>
@@ -203,9 +228,11 @@ if ( $use_infoflds && count($infoflds) ) {
 		
 	 </div>
 	</fieldset>
+	
 	<?php endforeach; ?>
 
-</td></tr></table>
+</div>
+<div class="fcclear"></div>
 
 
 <!-- BOF pagination (After Results) -->

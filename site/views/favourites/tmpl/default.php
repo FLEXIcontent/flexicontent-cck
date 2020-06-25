@@ -17,10 +17,9 @@
  */
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
-jimport( 'joomla.html.parameter' );
 
 $params =  $this->params;
-$db     =  JFactory::getDBO();
+$db     =  JFactory::getDbo();
 
 // Date configuration
 $use_date   = $params->get( 'show_modify_date', 1 ) ;
@@ -37,11 +36,11 @@ $image_method = (int)$params->get('image_method', 1);
 $image_size		= $params->get('image_size', '');
 
 // Retrieve default image for the image field
-if ($use_image && $image_source) {
-	$query = 'SELECT attribs, name FROM #__flexicontent_fields WHERE id = '.(int) $image_source;
-	$db->setQuery($query);
-	$image_dbdata = $db->loadObject();
-	//$image_dbdata->params = FLEXI_J16GE ? new JRegistry($image_dbdata->params) : new JParameter($image_dbdata->params);
+if ($use_image && $image_source)
+{
+	$query = 'SELECT attribs, name FROM #__flexicontent_fields WHERE id = ' . (int) $image_source;
+	$image_dbdata = $db->setQuery($query)->loadObject();
+	//$image_dbdata->params = new JRegistry($image_dbdata->params);
 	
 	$img_size_map   = array('l'=>'large', 'm'=>'medium', 's'=>'small', '' => '');
 	$img_field_size = $img_size_map[ $image_size ];
@@ -70,9 +69,9 @@ if ($menu) $page_classes .= ' menuitem'.$menu->id;
 
 <!-- BOF buttons -->
 <?php
-if (JRequest::getCmd('print')) {
+if (JFactory::getApplication()->input->getInt('print', 0)) {
 	if ($this->params->get('print_behaviour', 'auto') == 'auto') : ?>
-		<script type="text/javascript">window.addEvent('domready', function() { window.print(); });</script>
+		<script>jQuery(document).ready(function(){ window.print(); });</script>
 	<?php	elseif ($this->params->get('print_behaviour') == 'button') : ?>
 		<input type='button' id='printBtn' name='printBtn' value='<?php echo JText::_('Print');?>' class='btn btn-info' onclick='this.style.display="none"; window.print(); return false;'>
 	<?php endif;
@@ -82,11 +81,11 @@ if (JRequest::getCmd('print')) {
 	$printbutton = flexicontent_html::printbutton( $this->print_link, $this->params );
 	if ($pdfbutton || $mailbutton || $printbutton) {
 	?>
-	<p class="buttons">
+	<div class="buttons">
 		<?php echo $pdfbutton; ?>
 		<?php echo $mailbutton; ?>
 		<?php echo $printbutton; ?>
-	</p>
+	</div>
 	<?php }
 }
 ?>
@@ -98,7 +97,7 @@ if (JRequest::getCmd('print')) {
 	</h1>
 <?php else : ?>
 	<h2 class="contentheading">
-		<?php echo JText::_( 'FLEXI_YOUR_FAVOURED_ITEMS' ).' '; ?>
+		<?php echo JText::_( 'FLEXI_MY_FAVOURITES' ).' '; ?>
 	</h2>
 <?php endif; ?>
 
@@ -119,6 +118,7 @@ $items	= & $this->items;
 	$_read_more_about = JText::_( 'FLEXI_READ_MORE_ABOUT' );
 	$tooltip_class = FLEXI_J30GE ? 'hasTooltip' : 'hasTip';
 	
+	unset($item);  // just in case there is reference
 	if ($use_fields && count($fields)) {
 		foreach ($items as $i => $item) {
 			foreach ($fields as $fieldname) {
@@ -130,31 +130,32 @@ $items	= & $this->items;
 	}
 ?>
 
-<form action="<?php echo $this->action; ?>" method="POST" id="adminForm" name="adminForm" onsubmit="">
+<form action="<?php echo $this->action; ?>" method="post" name="adminForm" id="adminForm">
 
 <?php
-	$this->params->set('use_filters',0);  // Currently not supported by the view, disable it
-	$this->params->set('show_alpha',0);   // Currently not supported by the view, disable it
+	// Filtering form features not supported, will have been disabled in the view.htmnl.php
+	// this is needed since some of these, when parameter is not set, are defaulting to 'yes'
 	
 	// Body of form for (a) Text search, Field Filters, Alpha-Index, Items Total Statistics, Selectors(e.g. per page, orderby)
 	// If customizing via CSS rules or JS scripts is not enough, then please copy the following file here to customize the HTML too
 	include(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'tmpl_common'.DS.'listings_filter_form_body.php');
 ?>
 
+<input type="hidden" id="filter_order" name="filter_order" value="<?php echo $this->lists['filter_order']; ?>" />
+<input type="hidden" id="filter_order_Dir" name="filter_order_Dir" value="" />
+
 <input type="hidden" name="option" value="com_flexicontent" />
-<input type="hidden" name="filter_order" value="<?php echo $this->lists['filter_order']; ?>" />
-<input type="hidden" name="filter_order_Dir" value="" />
 <input type="hidden" name="view" value="favourites" />
 <input type="hidden" name="task" value="" />
 </form>
 
-<table class="flexitable" width="100%" border="0" cellspacing="0" cellpadding="0" summary="<?php echo JText::_( 'FLEXI_YOUR_FAVOURED_ITEMS' ).' '; ?>">
+<table id="flexitable" class="flexitable">
 	<thead>
 		<tr>
 			<?php if ($use_image) : ?>
 			<th id="fc_image"><?php echo JText::_( 'FLEXI_IMAGE' ); ?></th>
 			<?php endif; ?>
-			<th id="fc_title"><?php echo JText::_( 'FLEXI_ITEMS' ); ?></th>
+			<th id="fc_title"><?php echo JText::_( 'FLEXI_TITLE' ); ?></th>
 			<th id="fc_desc"><?php echo JText::_( 'FLEXI_DESCRIPTION' ); ?></th>
 			<?php if ($use_date) : ?>
 			<th id="fc_modified"><?php echo JText::_( 'FLEXI_LAST_UPDATED' ); ?></th>
@@ -170,19 +171,24 @@ $items	= & $this->items;
 	<tbody>	
 	<?php
 	foreach ($items as $i => $item) :
-		if ($use_image) {
+		if ($use_image)
+		{
 			$src = '';
 			$thumb = '';
 			if ($image_source)
 			{
-				FlexicontentFields::getFieldDisplay($item, $img_field_name, null, 'display', 'module');
-				$img_field = $item->fields[$img_field_name];
-				if ( !$img_field_size ) {
-					$src = str_replace(JURI::root(), '',  $img_field->thumbs_src['large'][0] );
-				} else {
-					$thumb = $img_field->thumbs_src[ $img_field_size ][0];
+				$imageurl = FlexicontentFields::getFieldDisplay($item, $img_field_name, null, 'display_' . ($img_field_size ?: 'large') . '_src', 'module');
+
+				if ($imageurl)
+				{
+					$img_field = $item->fields[$img_field_name];
+					!$img_field_size
+						? $src = str_replace(JUri::root(), '',  $img_field->thumbs_src['large'][0])
+						: $thumb = $img_field->thumbs_src[ $img_field_size ][0];
 				}
-			} else {
+			}
+			else
+			{
 				$src = flexicontent_html::extractimagesrc($item);
 			}
 			
@@ -193,13 +199,14 @@ $items	= & $this->items;
 				$w		= '&amp;w=' . $image_width;
 				$aoe	= '&amp;aoe=1';
 				$q		= '&amp;q=95';
+				$ar 	= '&amp;ar=x';
 				$zc		= $image_method ? '&amp;zc=' . $image_method : '';
-				$ext = pathinfo($src, PATHINFO_EXTENSION);
-				$f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
-				$conf	= $w . $h . $aoe . $q . $zc . $f;
+				$ext = strtolower(pathinfo($src, PATHINFO_EXTENSION));
+				$f = in_array( $ext, array('png', 'ico', 'gif', 'jpg', 'jpeg') ) ? '&amp;f='.$ext : '';
+				$conf	= $w . $h . $aoe . $q . $ar . $zc . $f;
 				
-				$base_url = (!preg_match("#^http|^https|^ftp|^/#i", $src)) ?  JURI::base(true).'/' : '';
-				$thumb = JURI::base(true).'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$base_url.$src.$conf;
+				$base_url = (!preg_match("#^http|^https|^ftp|^/#i", $src)) ?  JUri::base(true).'/' : '';
+				$thumb = JUri::base(true).'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$base_url.$src.$conf;
 			} else {
 				// Do not resize image when (a) image src path not set or (b) using image field's already created thumbnails
 			}
@@ -227,7 +234,7 @@ $items	= & $this->items;
 	?>
 		<tr id="tablelist_item_<?php echo $i; ?>" class="<?php echo $fc_item_classes; ?>">
 		<?php if ($use_image) : ?>
-			<td headers="fc_image" align="center">
+			<td headers="fc_image">
 				<?php if (!empty($thumb)) : ?>
 				
 					<?php $title_encoded = htmlspecialchars($item->title, ENT_COMPAT, 'UTF-8'); ?>
@@ -250,19 +257,19 @@ $items	= & $this->items;
 				</a>
 				<?php echo $markup_tags; ?>
 			</td>
-			<td headers="fc_intro">
+			<td headers="fc_desc">
 				<?php echo flexicontent_html::striptagsandcut( $item->introtext, 150 ); ?>
 			</td>
 		<?php if ($use_date) : ?>
 			<td headers="fc_modified">
-				<?php echo JHTML::_( 'date', ($item->modified ? $item->modified : $item->created), JText::_($dateformat) ); ?>		
+				<?php echo JHtml::_( 'date', ($item->modified ? $item->modified : $item->created), JText::_($dateformat) ); ?>		
 			</td>
 		<?php endif; ?>
 		
 		<?php if ($use_fields && count($fields)) : ?>
 			<?php foreach ($fields as $fieldname) : ?>
 				<?php	if ( empty($found_fields[$fieldname]) ) continue; ?>
-				<td headers="fc_<?php echo $item->fields[$fieldname]->name; ?>" ><?php echo $item->fields[$fieldname]->display; ?></th>
+				<td headers="fc_<?php echo $item->fields[$fieldname]->name; ?>" ><?php echo $item->fields[$fieldname]->display; ?></td>
 			<?php endforeach; ?>
 		<?php endif; ?>
 		

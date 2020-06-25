@@ -18,24 +18,19 @@
 
 // Check to ensure this file is included in Joomla!
 defined('_JEXEC') or die('Restricted access');
-if (FLEXI_J16GE) {
-	jimport('joomla.html.html');
-	jimport('joomla.form.formfield');
-	jimport('joomla.form.helper');
-	JFormHelper::loadFieldClass('list');
-} else {
-	require_once(JPATH_ROOT.DS.'libraries'.DS.'joomla'.DS.'html'.DS.'html'.DS.'select.php');
-}
 
 // Load the helper classes
+if (!defined('DS'))  define('DS',DIRECTORY_SEPARATOR);
 require_once(JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.helper.php');
 
-FLEXI_J30GE ? JHtml::_('behavior.framework', true) : JHTML::_('behavior.mootools');
-flexicontent_html::loadFramework('jQuery');
-flexicontent_html::loadFramework('select2');
+jimport('cms.html.html');      // JHtml
+jimport('cms.html.select');    // JHtmlSelect
+
+jimport('joomla.form.helper'); // JFormHelper
+JFormHelper::loadFieldClass('list');   // JFormFieldList
 
 /**
- * Renders a author element
+ * Renders an ilayoutlist element
  *
  * @package 	Joomla
  * @subpackage	FLEXIcontent
@@ -53,48 +48,40 @@ class JFormFieldIlayoutlist extends JFormFieldList
 
 	protected function getInput()
 	{
-		if (FLEXI_J16GE) {
-			$node = & $this->element;
-			$attributes = get_object_vars($node->attributes());
-			$attributes = $attributes['@attributes'];
-		} else {
-			$attributes = & $node->_attributes;
-		}
+		$node = & $this->element;
+		$attributes = get_object_vars($node->attributes());
+		$attributes = $attributes['@attributes'];
 		
 		$themes	= flexicontent_tmpl::getTemplates();
-		$tmpls	= $themes->items;
+		$tmpls	= $themes->items ? $themes->items : array();
 		
-		$values			= FLEXI_J16GE ? $this->value : $value;
-		if ( empty($values) )							$values = array();
-		else if ( ! is_array($values) )		$values = !FLEXI_J16GE ? array($values) : explode("|", $values);
+		$values = $this->value;
+		if ( empty($values) ) {
+			$values = array();
+		}
+		if ( !is_array($values) ) {
+			$values = preg_split("/[\|,]/", $values);
+		}
 		
-		$fieldname	= FLEXI_J16GE ? $this->name : $control_name.'['.$name.']';
-		$element_id = FLEXI_J16GE ? $this->id : $control_name.$name;
+		$fieldname	= $this->name;
+		$element_id = $this->id;
 
 		// Field parameter (attributes)
 		$attribs = '';
 		
 		$classes = 'use_select2_lib ';
-		if ( $node->attributes('required') && $node->attributes('required')=='true' ) {
-			$classes .= 'required ';
-		}
-		if ( $node->attributes('validation_class') ) {
-			$classes .= $node->attributes('validation_class');
-		}
+		$classes .= @$attributes['required'] && @$attributes['required']!='false' ? ' required' : '';
+		$classes .= @$attributes['class'] ? ' '.$attributes['class'] : '';
 		$attribs = ' class="'.$classes.'" '.$attribs;
 		
 		$attribs .= ' style="float:left;" ';
 		if (@$attributes['multiple']=='multiple' || @$attributes['multiple']=='true' ) {
 			$attribs .= ' multiple="multiple" ';
 			$attribs .= (@$attributes['size']) ? ' size="'.$attributes['size'].'" ' : ' size="6" ';
-			$fieldname .= !FLEXI_J16GE ? "[]" : "";  // NOTE: this added automatically in J2.5
-			//$maximize_link = "<a style='display:inline-block;".(FLEXI_J16GE ? 'float:left; margin: 6px 0px 0px 18px;':'margin:0px 0px 6px 12px')."' href='javascript:;' onclick='$element_id = document.getElementById(\"$element_id\"); if ($element_id.size<16) { ${element_id}_oldsize=$element_id.size; $element_id.size=16;} else { $element_id.size=${element_id}_oldsize; } ' >Maximize/Minimize</a>";
 		} else {
-			array_unshift($types, JHTML::_('select.option', '', JText::_('FLEXI_PLEASE_SELECT')));
+			array_unshift($types, JHtml::_('select.option', '', JText::_('FLEXI_PLEASE_SELECT')));
 			$attribs .= 'class="inputbox"';
-			//$maximize_link = '';
 		}
-		$maximize_link = '';
 		
 		if ($onchange = @$attributes['onchange']) {
 			$attribs .= ' onchange="'.$onchange.'"';
@@ -109,12 +96,11 @@ class JFormFieldIlayoutlist extends JFormFieldList
 		
 		if ($tmpls !== false) {
 			foreach ($tmpls as $tmpl) {
-				$layouts[] = JHTMLSelect::option($tmpl->name, $tmpl->name); 
+				$layouts[] = JHtmlSelect::option($tmpl->name, $tmpl->name); 
 			}
 		}
 		
-		$html = JHTML::_('select.genericlist', $layouts, $fieldname, $attribs, 'value', 'text', $values, $element_id);
-		return $html.$maximize_link;
+		return JHtml::_('select.genericlist', $layouts, $fieldname, $attribs, 'value', 'text', $values, $element_id);
 	}
 }
 ?>

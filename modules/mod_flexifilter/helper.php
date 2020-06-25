@@ -18,65 +18,72 @@
 
 // no direct access
 defined('_JEXEC') or die('Restricted access');
-jimport('joomla.html.parameter');
-
-require_once (JPATH_SITE.DS.'administrator'.DS.'components'.DS.'com_flexicontent'.DS.'defineconstants.php');
-//require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'route.php');
-//JTable::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'tables');
-//require_once (JPATH_SITE.DS.'modules'.DS.'mod_flexicontent'.DS.'classes'.DS.'datetime.php');
-require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.helper.php');
-require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.fields.php');
-require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.categories.php');
-require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'models'.DS.'category.php');
-
 
 class modFlexifilterHelper
 {
 
-	public static function decideCats( &$params )
+	public static function decideCats(& $params)
 	{
 		global $globalcats;
 		
-		$display_cat_list = $params->get('display_cat_list', 0);
+		$display_cat_list = (int) $params->get('display_cat_list', 0);
 		$catids = $params->get('catids', array());
-		$usesubcats = $params->get('usesubcats', 0 );
-		
-		// FIND categories to display
-		$allowed_cats = $disallowed_cats = false;
-		
-		if ($usesubcats) {
-			// Find descendants of the categories
-			$subcats = array();
-			foreach ($catids as $catid) {
-				$subcats = array_merge($subcats, array_map('trim',explode(",",$globalcats[$catid]->descendants)) );
+		$usesubcats = (int) $params->get('usesubcats', 0);
+
+		// Get user's allowed categories
+		if ($display_cat_list)
+		{
+			$tree = flexicontent_cats::getCategoriesTree();
+
+			// (only) For include mode, use all categories if no cats were selected via configuration
+			if ($display_cat_list === 1 && empty($catids))
+			{
+				global $globalcats;
+				$catids = array_keys($globalcats);
 			}
+		}
+
+		// Find descendants of the categories
+		if ($usesubcats)
+		{
+			$subcats = array();
+
+			foreach ($catids as $catid)
+			{
+				$subcats = array_merge($subcats, array_map('trim', explode(',', $globalcats[$catid]->descendants)) );
+			}
+
 			$catids = array_unique($subcats);
 		}
 		
-    if ( $display_cat_list == 1 ) {  // include method
-    	$allowed_cats = $catids;
-    } else if ( $display_cat_list == 2 ) {  // exclude method
-    	$disallowed_cats = $catids;
-    }
-    
-		$tree = flexicontent_cats::getCategoriesTree();
-		if ($allowed_cats) {
-			foreach ($allowed_cats as $catid) {
-				$allowedtree[$catid] = $tree[$catid];
-			}
+		switch ($display_cat_list)
+		{
+			// Include method
+			case 1:
+				$allowedtree = array();
+
+				foreach ($catids as $catid)
+				{
+					$allowedtree[$catid] = $tree[$catid];
+				}
+				break;
+
+			// Exclude method
+			case 2:
+				foreach ($catids as $catid)
+				{
+					unset($tree[$catid]);
+				}
+				$allowedtree = & $tree;
+				break;
+
+			// Not using category selector
+			case 0:
+			default:
+				$allowedtree = array();
+				break;
 		}
-		if ($disallowed_cats) {
-			foreach ($disallowed_cats as $catid) {
-				unset($tree[$catid]);
-			}
-			$allowedtree = & $tree;
-		}
-		if (!$allowed_cats && !$disallowed_cats) {
-			$allowedtree = & $tree;
-		}
-		
+
 		return $allowedtree;
 	}
-	
 }
-?>

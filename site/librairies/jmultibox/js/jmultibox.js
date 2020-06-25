@@ -80,11 +80,15 @@ Base script. Great!!
 			}
 		}
 
-		var setContentType = function(link) {
+		var setContentType = function(link)
+		{
 			var str = link.href.substr(link.href.lastIndexOf('.') + 1).toLowerCase();
 			var contentOptions = {};
-			if (!!((link.rel) || (link.rel) === 0)) {
-				var optArr = link.rel.split(',');
+			var rel = link.getAttribute('data-rel') ? link.getAttribute('data-rel') : link.getAttribute('rel');
+
+			if (rel)
+			{
+				var optArr = rel.split(',');
 				$(optArr).each(function(i, el) {
 					if(el.indexOf(':') > 0){
 						var ta = el.split(':');
@@ -607,7 +611,6 @@ Base script. Great!!
 			}
 		};
 
-		//Ref mootools Asset
 		var createImage = function(source, properties){
 			if (!properties) properties = {};
 

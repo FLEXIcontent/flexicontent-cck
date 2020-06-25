@@ -19,22 +19,8 @@
 // no direct access
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-// Do nothing if site is offline
-if ( !FLEXI_J16GE && JFactory::getApplication()->getCfg('offline') ) {
-	$user = JFactory::getUser();
-	if (!$user->id) {
-		return;
-	} else {
-		if (!defined('FLEXI_J16GE')) {
-			jimport( 'joomla.version' );  $jversion = new JVersion;
-			define('FLEXI_J16GE', version_compare( $jversion->getShortVersion(), '1.6.0', 'ge' ) );
-			define('FLEXI_J30GE', version_compare( $jversion->getShortVersion(), '3.0.0', 'ge' ) );
-		}
-		$isAdmin = FLEXI_J16GE ? JAccess::check($user->id, 'core.admin', 'root.1') : $user->gid >= 24;
-		if (!$isAdmin) return;
-	}
-}
-
+jimport('cms.component.helper');
+jimport('cms.plugin.helper');
 
 // *************************
 // Initialize some variables
@@ -43,18 +29,34 @@ if ( !FLEXI_J16GE && JFactory::getApplication()->getCfg('offline') ) {
 global $is_fc_component;
 $is_fc_component = 1;
 
-// Get component parameters and add tooltips css and js code
 $cparams = JComponentHelper::getParams('com_flexicontent');
-if (FLEXI_J30GE && $cparams->get('loadfw_bootstrap_css', 2)==1 ) JHtml::_('bootstrap.loadCss', true);
+$app     = JFactory::getApplication();
+$document= JFactory::getDocument();
+$jinput  = $app->input;
+$format  = $jinput->getCmd('format', 'html');
 
+// No PDF support in J2.5, but too late to do this here, it must be done before JDocument instatiation
+// Furthermore, user may have installed 3rd party extension to handle PDF format
+/*if ( $format == 'pdf' )
+{
+	$jinput->set('format', $format='html');  
+}*/
+
+// Logging
+global $fc_run_times;
+$fc_run_times['render_field'] = array();
+$fc_run_times['render_subfields'] = array();
+$fc_run_times['create_filter'] = array();
+
+$force_print = false || JDEBUG;
+if ($force_print) $cparams->set('print_logging_info', 2);
 $print_logging_info = $cparams->get('print_logging_info');
-if ( $print_logging_info ) {
-	global $fc_run_times;
-	$fc_run_times['render_field'] = array(); $fc_run_times['render_subfields'] = array();
-	$fc_run_times['create_filter'] = array();
+
+if ( $print_logging_info && $format=='html')
+{
 	$start_microtime = microtime(true);
 	global $fc_jprof;
-	jimport( 'joomla.error.profiler' );
+	jimport('joomla.profiler.profiler');
 	$fc_jprof = new JProfiler();
 	$fc_jprof->mark('START: FLEXIcontent component');
 }
@@ -66,117 +68,192 @@ if ( $print_logging_info ) {
 // ********************************
 
 //include constants file
-require_once (JPATH_COMPONENT_ADMINISTRATOR.DS.'defineconstants.php');
-
-// Enable printing of notices,etc, except strict if error_reporting is enabled
-if( !FLEXI_J16GE && error_reporting() && ini_get('display_errors') /*&& in_array($_SERVER['HTTP_HOST'], array('localhost', '127.0.0.1'))*/ ) { 
-	error_reporting(E_ALL & ~E_STRICT);
-	//ini_set('display_errors',1);  // ... check above that this is enabled already
-}
+require_once (JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'defineconstants.php');
 
 //include the needed classes and helpers
-require_once (JPATH_COMPONENT_SITE.DS.'classes'.DS.'flexicontent.helper.php');
-require_once (JPATH_COMPONENT_SITE.DS.'classes'.DS.'flexicontent.categories.php');
-require_once (JPATH_COMPONENT_SITE.DS.'classes'.DS.'flexicontent.fields.php');
-require_once (JPATH_COMPONENT_SITE.DS.'classes'.DS.'flexicontent.acl.php');
-require_once (JPATH_COMPONENT_SITE.DS.'helpers'.DS.'permission.php');
-require_once (JPATH_COMPONENT_SITE.DS.'helpers'.DS.'route.php');
+require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.helper.php');
+require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.categories.php');
+require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.fields.php');
+require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'permission.php');
+require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'route.php');
 
 // Add component's table directory to the include path
-JTable::addIncludePath(JPATH_COMPONENT_ADMINISTRATOR.DS.'tables');
+JTable::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'tables');
 
 // Import the flexicontent_fields plugins and flexicontent plugins
 if (!FLEXI_ONDEMAND)
 	JPluginHelper::importPlugin('flexicontent_fields');
 JPluginHelper::importPlugin('flexicontent');
 
-// No PDF support in J2.5
-if ( FLEXI_J16GE && JRequest::getVar('format') == 'pdf' ) JRequest::setVar('format', 'html');
 
 
 // *****************
 // Language handling
 // *****************
 
-// Load english language file for 'com_flexicontent' component then override with current language file
-JFactory::getLanguage()->load('com_flexicontent', JPATH_SITE, 'en-GB', true);
-JFactory::getLanguage()->load('com_flexicontent', JPATH_SITE, null, true);
+if ( JFactory::getLanguage()->getDefault() != 'en-GB' )
+{
+	// If site default language is not english then load english language file for 'com_flexicontent' component, and the override (forcing a reload) with current language file
+	// We make sure that 'english' file has been loaded, because we need it as fallback for language strings that do not exist in current language
+	JFactory::getLanguage()->load('com_flexicontent', JPATH_SITE, 'en-GB', $force_reload = false, $load_default = true);
+	JFactory::getLanguage()->load('com_flexicontent', JPATH_SITE, null, $force_reload = true, $load_default = true);
+}
+
+else
+	// No force loading needed, save some time, and do not force language file reload
+	JFactory::getLanguage()->load('com_flexicontent', JPATH_SITE);
 
 // Load language overrides, just before executing the component (DONE manually for J1.5)
-$overrideDir = JPATH_SITE .DS. 'languages' .DS. 'overrides' .DS;
-if (!FLEXI_J16GE) {
-	JFactory::getLanguage()->load('override', $overrideDir, 'en-GB', true);
-	JFactory::getLanguage()->load('override', $overrideDir, null, true);
-}
-
-
-// ********************************
-// Load common js libs / frameworks
-// ********************************
-
-if ( JRequest::getWord('format')!='raw')
+/*if (!FLEXI_J16GE)
 {
-	// Load mootools
-	FLEXI_J30GE ? JHtml::_('behavior.framework', true) : JHTML::_('behavior.mootools');
-	
-	// Load jquery Framework
-	flexicontent_html::loadFramework('jQuery');
-	
-	if ($cparams->get('add_tooltips', 1))
-	{
-		// Load J2.5 (non-bootstrap tooltips) tooltips, we still need regardless of using J3.x, since some code may still use them
-		JHTML::_('behavior.tooltip');
-		
-		// J3.0+ tooltips (bootstrap based)
-		if (FLEXI_J30GE) JHtml::_('bootstrap.tooltip');
-	}
-}
+	$overrideDir = JPATH_SITE .DS. 'languages' .DS. 'overrides' .DS;
+	JFactory::getLanguage()->load('override', $overrideDir, 'en-GB', $force_reload = true, $load_default = true);
+	JFactory::getLanguage()->load('override', $overrideDir, null, $force_reload = true, $load_default = true);
+}*/
+
 
 
 // ***********************************
 // PREPARE Calling the controller task
 // ***********************************
 
-$view = JRequest::getCmd('view');
-$task = JRequest::getCmd('task');
-$tasks = explode(".", $task);
-if(count($tasks)>=2) {
-	$controller = @$controller ? $controller : $tasks[0];
-	$task = $tasks[1];
-	JRequest::setVar('task', $tasks[1]);
-} else {
-	$controller = JRequest::getWord('controller');
+// a. Get view, task, controller REQUEST variables
+$view = $jinput->get('view', '', 'cmd');
+$task = $jinput->get('task', '', 'cmd');
+$controller = $jinput->get('controller', '', 'cmd');
+
+// b. In J1.6+ controller can be set via task variable ... split task from controller name
+$_ct = explode('.', $task);
+$task = $_ct[ count($_ct) - 1];
+if (count($_ct) > 1) $controller = $_ct[0];
+
+
+// c. Force variables: controller AND/OR task
+$forced_views = array();  // *** Cases that view variable must be ignored
+if ( isset($forced_views[$controller]) )
+{
+	$view = $controller;
+	$jinput->set('view', $view);
 }
-$ctrlname = $controller;
 
+// FORCE (if it exists) using controller named as current view name (thus ignoring controller set in HTTP REQUEST)
+if ( file_exists( JPATH_COMPONENT.DS.'controllers'.DS.$view.'.php' ) )
+{
+	$controller = $view;
+}
 
-// **************************************************************************************************************
-// Include the component base AND FOR J1.5 ONLY: the view-specific controller (in J1.6+ is included automatically)
-// **************************************************************************************************************
-
-require_once (JPATH_COMPONENT.DS.'controller.php');
-if ($controller) {
-	$path = JPATH_COMPONENT.DS.'controllers'.DS.$controller.'.php';
-	
-	// Views allowed to have a controller
-	if ( file_exists($path) ) {
-		require_once $path;
-	} else {
-		JRequest::setVar('controller', $controller = '');
+// Singular views do not (usually) have a controller, instead the 'Plural' controller is used
+else
+{
+	// Going through the controller makes sure that appropriate code is always executed
+	// Views/Layouts that can be called without a forced controller task (and without redirect to them, these must contain permission checking)
+	$view_to_ctrl = array(
+	);
+	if ( isset($view_to_ctrl[$view]) ) {
+		$controller = $view_to_ctrl[$view];
 	}
 }
+//echo "$controller -- $task <br/>\n";
 
 
-// ****************************
-// Create a controller instance
-// ****************************
+// d. Set changes to controller/task variables back to HTTP REQUEST
+$controller_task = $controller && $task  ?  $controller.'.'.$task  :  $task;
+$controller_name = $controller;
 
-$classname	= 'FlexicontentController'.ucfirst($controller);
-$controller = new $classname();
+$jinput->set('controller', $controller_name);
+$jinput->set('task', $controller_task);
+
+
+
+// **************************************************************************
+// The view-specific controller is included automatically JControllerLegacy,
+// also base controller should be auto-loaded by the view controller itself !
+// **************************************************************************
+
+// Base controller
+/*require_once (JPATH_COMPONENT.DS.'controller.php');
+
+// View specific controller
+if ($controller) {
+	$base_controller = JPATH_COMPONENT.DS.'controllers'.DS.$controller.'.php';
+	
+	if ( file_exists($base_controller) ) {
+		require_once $base_controller;
+	} else {
+		$jinput->set('controller', $controller = '');
+	}
+}*/
 
 
 // initialization done ... log stats for initialization
-if ( $print_logging_info ) @$fc_run_times['initialize_component'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+if ( $print_logging_info && $format=='html')
+	@$fc_run_times['initialize_component'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+
+
+
+// ******************************************************************
+// (If needed) Compile LESS files as CSS (call the less proprocessor)
+// ******************************************************************
+if ( $cparams->get('recompile_core_less', 0) && $format == 'html' )
+{
+	$start_microtime = microtime(true);
+	
+	// Files in frontend assets folder
+	$path = JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'assets'.DS;
+	$inc_path = $path.'less/include/';
+	
+	$less_files = array(
+		'less/flexi_file_fields.less'
+	);
+	$force = $stale_fields = flexicontent_html::checkedLessCompile($less_files, $path, $inc_path, $force=false);
+
+	$less_files = array('less/flexi_form_fields.less');
+	flexicontent_html::checkedLessCompile($less_files, $path, $inc_path, $force);
+
+	$less_files = array(
+		'less/flexi_filters.less',
+		'less/j3x.less',
+		'less/fcvote.less',
+		'less/tabber.less'
+	);
+	flexicontent_html::checkedLessCompile($less_files, $path, $inc_path, $force=false);
+	
+	$less_files = array(
+		'less/flexi_form.less',
+		'less/flexi_containers.less',
+		'less/flexi_shared.less',
+		'less/flexi_frontend.less'
+	);
+	
+	$stale_frontend = flexicontent_html::checkedLessCompile($less_files, $path, $inc_path, $force=false);
+	$force = $stale_frontend && count($stale_frontend);
+	$less_files = array('less/flexicontent.less');
+	flexicontent_html::checkedLessCompile($less_files, $path, $inc_path, $force);
+
+
+	/* RTL BOF */
+
+	$path = JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'assets'.DS;
+	$inc_path = $path.'less/include/';
+
+	$less_files = array(
+		'less/flexi_form_rtl.less',
+		'less/flexi_containers_rtl.less',
+		'less/flexi_shared_rtl.less',
+		'less/flexi_frontend_rtl.less'
+	);
+	
+	$stale_frontend = flexicontent_html::checkedLessCompile($less_files, $path, $inc_path, $force=false);
+	$force = $stale_frontend && count($stale_frontend);
+	$less_files = array('less/flexicontent_rtl.less');
+	flexicontent_html::checkedLessCompile($less_files, $path, $inc_path, $force);
+
+	/* RTL EOF */
+
+
+	if ( $print_logging_info)
+		@$fc_run_times['core_less_recompile'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+}
 
 
 
@@ -184,43 +261,86 @@ if ( $print_logging_info ) @$fc_run_times['initialize_component'] += round(10000
 // Perform the requested task
 // **************************
 
-$controller->execute($task);
+$controller	= JControllerLegacy::getInstance('Flexicontent');
+$controller->execute( $task );
 
 // Redirect if set by the controller
 $controller->redirect();
 
-// TO BE MOVED TO HELPER FILE ...
-// Remove (thus prevent) the default menu item from showing in the pathway
-if ( $cparams->get('default_menuitem_nopathway',1) ) {
-	$pathway =  JFactory::getApplication()->getPathWay();
+// Remove (thus prevent) the default menu item from showing in the pathway, TODO: MOVE this TO HELPER FILE ...
+if ( $cparams->get('default_menuitem_nopathway',1) )
+{
+	$pathway =  $app->getPathWay();
 	$default_menu_itemid = $cparams->get('default_menu_itemid', 0);
 	$pathway_arr = $pathway->getPathway();
-	if ( count($pathway_arr) && preg_match("/Itemid=([0-9]+)/",$pathway_arr[0]->link, $matches) ) {
-		if ($matches[1] == $default_menu_itemid) {
+	if ( count($pathway_arr) && preg_match("/Itemid=([0-9]+)/",$pathway_arr[0]->link, $matches) )
+	{
+		if ($matches[1] == $default_menu_itemid)
+		{
 			array_shift ($pathway_arr);
 			$pathway->setPathway($pathway_arr);
-			//$pathway->set('_count',count($pathway_arr));  // not needed ??
+			//$pathway->set('_count', count($pathway_arr));  // not needed ??
 		}
 	}
 }
+
+
+
+/**
+ * Load common js libs / frameworks
+ */
+
+// Re-get view it may have changed
+$view   = $jinput->getCmd('view', '');
+$layout = $jinput->getString('layout', '');
+
+if ($format === 'html')
+{
+	// Load mootools
+	//JHtml::_('behavior.framework', true);
+	
+	// Load jquery Framework, but let some views decide for themselves, so that they can choose not to load some parts of jQuery.ui JS
+	if ($view != 'item') flexicontent_html::loadFramework('jQuery');
+	
+	if ( $cparams->get('add_tooltips', 1) )
+	{
+		// J3.0+ tooltips (bootstrap based)
+		JHtml::_('bootstrap.tooltip');
+	}
+	
+	// Add flexi-lib JS
+	//JFactory::getDocument()->addScript( JUri::root(true).'/components/com_flexicontent/assets/js/flexi-lib.js', array('version' => FLEXI_VHASH));  // Frontend/backend script
+	
+	// Validate when Joomla.submitForm() is called, NOTE: for non-FC views this is done before the method is called
+	$js = '
+		var fc_validateOnSubmitForm = 1;
+	';
+	$document->addScriptDeclaration( $js );
+	
+	// Load bootstrap CSS
+	if ( $cparams->get('loadfw_bootstrap_css', 2)==1 )
+		JHtml::_('bootstrap.loadCss', true);
+
+	// Load icomoon CSS
+	if ( $cparams->get('loadfw_icomoon_css', 2)==1 )
+		JFactory::getDocument()->addStyleSheet(JUri::root(true).'/media/jui/css/icomoon.css');
+}
+
 
 
 // *********************************************************************************************
 // Enqueue PERFORMANCE statistics as a message BUT  NOT if in RAW FORMAT or COMPONENT only views
 // *********************************************************************************************
 
-if ( $print_logging_info && JRequest::getWord('tmpl')!='component' && JRequest::getWord('format')!='raw')
+if ( $print_logging_info && $jinput->get('tmpl', '', 'cmd')!='component' && $format=='html' )
 {
 	
 	// ***************************************
 	// Total performance stats of current view
 	// ***************************************
 	
-	$app = JFactory::getApplication();
-	$_view = JRequest::getWord('view','flexicontent');
-	$_layout = JRequest::getWord('layout','');
-	if ($task) $_msg = ' (TASK: '.(!FLEXI_J16GE ? $ctrlname.'.' : '').$task.')';
-	else       $_msg = ' (VIEW: ' .$_view. ($_layout ? ' -- LAYOUT: '.$_layout : '') .')';
+	if ($task) $_msg = ' (TASK: '.$controller_name.'.'.$task.')';
+	else       $_msg = ' (VIEW: ' .$view. ($layout ? ' -- LAYOUT: '.$layout : '') .')';
 	
 	
 	// **************************************
@@ -232,9 +352,9 @@ if ( $print_logging_info && JRequest::getWord('tmpl')!='component' && JRequest::
 	$filters_creation_times = FlexicontentFields::getFilterCreationTimes($filters_creation_total);
 	
 	$fc_jprof->mark('END: FLEXIcontent component: '.$_msg);
-	$msg = '<span style="font-family:tahoma!important; font-size:11px!important;">'. implode('<br/>', $fc_jprof->getbuffer()) .'</span>';
+	$msg = '<div style="font-family:tahoma!important; font-size:11px!important;">'. implode('<br/>', $fc_jprof->getbuffer()) .'</div>';
 	
-	$msg .= '<span style="font-family:tahoma!important; font-size:11px!important;">';
+	$msg .= '<div style="font-family:tahoma!important; font-size:11px!important;">';
 		
 	if (isset($fc_run_times['initialize_component']))
 		$msg .= sprintf('<br/>-- [Initialize component: %.2f s] ', $fc_run_times['initialize_component']/1000000);
@@ -253,7 +373,9 @@ if ( $print_logging_info && JRequest::getWord('tmpl')!='component' && JRequest::
 	
 	if (isset($fc_run_times['item_store_core']))
 		$msg .= sprintf('<br/>-- [Store item core data: %.2f s] ', $fc_run_times['item_store_core']/1000000);
-
+	
+	if (isset($fc_run_times['item_store_custom']))
+		$msg .= sprintf('<br/>-- [Store item custom fields data: %.2f s] ', $fc_run_times['item_store_custom']/1000000);
 	
 	if (isset($fc_run_times['execute_main_query']))
 		$msg .= sprintf('<br/>-- [Query: item LISTING: %.2f s] ', $fc_run_times['execute_main_query']/1000000);
@@ -295,11 +417,17 @@ if ( $print_logging_info && JRequest::getWord('tmpl')!='component' && JRequest::
 		$msg .= sprintf('<br/>-- [Fields value saving: %.2f s] ', $fc_run_times['fields_value_saving']/1000000);
 	// **** EOF: ITEM FORM SAVING
 	
-	if (isset($fc_run_times['templates_parsing_cached']))
-		$msg .= sprintf('<br/>-- [FC Templates XML Parsing (cacheable): %.2f s] ', $fc_run_times['templates_parsing_cached']/1000000);
+	if (isset($fc_run_times['templates_parsing_xml']))
+		$msg .= sprintf('<br/>-- [FC Templates: XML files parsing: %.2f s] ', $fc_run_times['templates_parsing_xml']/1000000);
 	
-	if (isset($fc_run_times['templates_parsing_noncached']))
-		$msg .= sprintf('<br/>-- [FC Templates XML Parsing (not cacheable) : %.2f s] ', $fc_run_times['templates_parsing_noncached']/1000000);
+	if (isset($fc_run_times['templates_parsing_less']))
+		$msg .= sprintf('<br/>-- [FC Templates: LESS files parsing: %.2f s] ', $fc_run_times['templates_parsing_less']/1000000);
+	
+	if (isset($fc_run_times['templates_parsing_ini']))
+		$msg .= sprintf('<br/>-- [FC Templates: INI files parsing: %.2f s] ', $fc_run_times['templates_parsing_ini']/1000000);
+	
+	if (isset($fc_run_times['core_less_recompile']))
+		$msg .= sprintf('<br/>-- [FC core LESS checked re-compile: %.2f s] ', $fc_run_times['core_less_recompile']/1000000);
 	
 	// **** BOF: FRONTEND SPECIFIC
 	if (isset($fc_run_times['search_query_runtime']))
@@ -353,6 +481,7 @@ if ( $print_logging_info && JRequest::getWord('tmpl')!='component' && JRequest::
 	
 	if (count($filters_creation_times)) {
 		$msg .= sprintf('<br/>-- [FC Filters Creation: %.2f s] ', $filters_creation_total/1000000);
+		if (isset($fc_run_times['create_filter_init'])) $msg .= sprintf('<br/> &nbsp; Filters Init: %.2f s ', $fc_run_times['create_filter_init']/1000000);
 		
 		$msg .= '<br/>';
 		foreach($filters_creation_times as $i => $_time) {
@@ -363,7 +492,7 @@ if ( $print_logging_info && JRequest::getWord('tmpl')!='component' && JRequest::
 		}
 	}
 	
-	$msg .= '</span>';
+	$msg .= '</div>';
 	
 	
 	// SYSTEM PLGs
@@ -371,11 +500,9 @@ if ( $print_logging_info && JRequest::getWord('tmpl')!='component' && JRequest::
 		$msg = sprintf('** [Flexisystem PLG: Auto Checkin/Auto state(e.g. archive): %.2f s] ', $fc_run_times['auto_checkin_auto_state']/1000000) .'<br/>'.$msg.'<br/>';
 	
 	if (isset($fc_run_times['global_replacements']))
-		$msg = sprintf('** [Flexisystem PLG: Replace Field/Items/etc Times Times: %.2f s] ', $fc_run_times['global_replacements']/1000000) .'<br/>'.$msg.'<br/>';
+		$msg = sprintf('** [Flexisystem PLG: Replace Field/Items/etc Times: %.2f s] ', $fc_run_times['global_replacements']/1000000) .'<br/>'.$msg.'<br/>';
 	
 	global $fc_performance_msg;
 	$fc_performance_msg .= $msg . '<div class="fcclear"></div>';
 }
 unset ($is_fc_component);
-
-?>

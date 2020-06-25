@@ -6,26 +6,48 @@
 	<license>GPLv3</license>
 	<version>1.2</version>
 	<release>20 May 2014</release>
-	<description>This HTML5 layout presents category items in a modular layout AND placing them (the category items) inside tabs.</description>
+	<microdata_support>1</microdata_support>
+
+	<defaulttitle>FLEXI_TMPL_ITEMSTABBED_CATEGORY_DEFAULT_TITLE</defaulttitle>
+	<description>FLEXI_TMPL_ITEMSTABBED_CATEGORY_SHORT_DESC</description>
+
 	<fields name="attribs">
 		<fieldset name="attribs" addfieldpath="/administrator/components/com_flexicontent/elements">
-		<field name="title_cut_text" type="text" size="3" default="200" label="FLEXI_TITLE_MAXLEN" description="FLEXI_TITLE_MAXLEN_DESC" />
-		<field name="top_cols" type="radio" default="two" label="FLEXI_ITEM_TOP_COLS" description="FLEXI_ITEM_TOP_COLS_DESC" class="btn-group btn-group-yesno">
-			<option value="one">FLEXI_1_COL</option>
-			<option value="two">FLEXI_2_COLS</option>
-		</field>
-		<field name="bottom_cols" type="radio" default="two" label="FLEXI_ITEM_BOTTOM_COLS" description="FLEXI_ITEM_BOTTOM_COLS_DESC" class="btn-group btn-group-yesno">
-			<option value="one">FLEXI_1_COL</option>
-			<option value="two">FLEXI_2_COLS</option>
-		</field>
-		
-		<field name="templatehtmlmode" type="separator" hr="false" default="FLEXI_TEMPLATE_HTML_MODE" level="level2" menu="hide" />
-		<field name="htmlmode" type="radio" default="0" label="FLEXI_HTML_MODE" description="FLEXI_HTML_MODE_DESC" filter="int" class="btn-group btn-group-yesno">
-			<option value="0">FLEXI_XHTML</option>
-			<option value="1">FLEXI_HTML5</option>
-		</field>
+
+			<field name="custom_layout_title" type="text" size="3" not_inherited="1" default="" label="FLEXI_LAYOUT_CUSTOM_DISPLAY_TITLE" description="FLEXI_LAYOUT_CUSTOM_DISPLAY_TITLE_DESC" />
+			
+			<field name="title_grp" type="separator" cssprep="1" default="FLEXI_TMPL_ITEM_TITLE" description="" level="level2" />
+			<field name="title_color" type="color" cssprep="less" default="inherit" label="Title color" description="Color of title" format="rgba" keywords="transparent,initial,inherit"/>
+			<field name="title_cut_text" type="text" size="3" default="" label="FLEXI_TITLE_MAXLEN" description="FLEXI_TITLE_MAXLEN_DESC" />
+			
+			<field name="field_cols_grp" type="separator" cssprep="1" default="Field columns" description="" level="level2" />
+			<field name="top_cols" type="radio" default="" label="FLEXI_ITEM_TOP_COLS" description="FLEXI_ITEM_TOP_COLS_DESC" class="btn-group btn-group-yesno">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="one">FLEXI_1_COL</option>
+				<option value="two">FLEXI_2_COLS</option>
+			</field>
+			<field name="bottom_cols" type="radio" default="" label="FLEXI_ITEM_BOTTOM_COLS" description="FLEXI_ITEM_BOTTOM_COLS_DESC" class="btn-group btn-group-yesno">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="one">FLEXI_1_COL</option>
+				<option value="two">FLEXI_2_COLS</option>
+			</field>
+			
+			<field name="tab_styling_grp" type="separator" cssprep="1" default="FLEXI_TMPL_TABS_STYLING" description="" level="level2" />
+			<field name="tab_handles_grp" type="separator" cssprep="1" default="FLEXI_TMPL_TABS_HANDLES" description="" level="level3" />
+			<field name="tab_bg_color_start" type="color" cssprep="less" hint="#3093c7" default="#3093c7" required="true" label="FLEXI_TMPL_TAB_BG_START" description="FLEXI_TMPL_TAB_BG_START_DESC" format="rgba" keywords="transparent,initial,inherit"/>
+			<field name="tab_bg_color_end" type="color" cssprep="less" hint="#1c5a85" default="#1c5a85" required="true" label="FLEXI_TMPL_TAB_BG_END" description="FLEXI_TMPL_TAB_BG_END_DESC" format="rgba" keywords="transparent,initial,inherit" />
+			<field name="tab_title_color" type="color" cssprep="less" hint="#ffffff" default="#ffffff" required="true" label="FLEXI_TMPL_TAB_TITLE_COLOR" description="FLEXI_TMPL_TAB_TITLE_COLOR_DESC" format="rgba" keywords="transparent,initial,inherit"/>
+			
+			<field name="templatehtmlmode" type="separator" default="FLEXI_TEMPLATE_HTML_MODE" level="level2" />
+			<field name="htmlmode" type="multilist" subtype="radio" default="" label="FLEXI_HTML_MODE" description="FLEXI_HTML_MODE_DESC" filter="int" class="btn-group group-fcinfo">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_XHTML</option>
+				<option value="1">FLEXI_HTML5</option>
+			</field>
+			
 		</fieldset>
 	</fields>
+	
 	<fieldgroups>
 		<group>subtitle1</group>
 		<group>subtitle2</group>

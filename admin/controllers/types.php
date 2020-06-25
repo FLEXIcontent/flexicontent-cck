@@ -1,354 +1,394 @@
 <?php
 /**
- * @version 1.5 stable $Id: types.php 1655 2013-03-16 17:55:25Z ggppdk $
- * @package Joomla
- * @subpackage FLEXIcontent
- * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
- * @license GNU/GPL v2
- * 
- * FLEXIcontent is a derivative work of the excellent QuickFAQ component
- * @copyright (C) 2008 Christoph Lukes
- * see www.schlu.net for more information
+ * @package         FLEXIcontent
+ * @version         3.3
  *
- * FLEXIcontent is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
+ * @link            https://flexicontent.org
+ * @copyright       Copyright © 2018, FLEXIcontent team, All Rights Reserved
+ * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
-defined( '_JEXEC' ) or die( 'Restricted access' );
+defined('_JEXEC') or die;
 
-jimport('joomla.application.component.controller');
+use Joomla\String\StringHelper;
+use Joomla\Utilities\ArrayHelper;
+
+JLoader::register('FlexicontentControllerBaseAdmin', JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'controllers' . DS . 'base' . DS . 'baseadmin.php');
+
+// Manually import models in case used by frontend, then models will not be autoloaded correctly via getModel('name')
+require_once JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'models' . DS . 'type.php';
+require_once JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'models' . DS . 'types.php';
 
 /**
- * FLEXIcontent Component Types Controller
+ * FLEXIcontent Types Controller
  *
- * @package Joomla
- * @subpackage FLEXIcontent
- * @since 1.0
+ * NOTE: -Only- if this controller is needed by frontend URLs, then create a derived controller in frontend 'controllers' folder
+ *
+ * @since 3.3
  */
-class FlexicontentControllerTypes extends FlexicontentController
+class FlexicontentControllerTypes extends FlexicontentControllerBaseAdmin
 {
+	var $records_dbtbl = 'flexicontent_types';
+	var $records_jtable = 'flexicontent_types';
+
+	var $record_name = 'type';
+	var $record_name_pl = 'types';
+
+	var $_NAME = 'TYPE';
+	var $record_alias = 'alias';
+
+	var $runMode = 'standalone';
+
+	var $exitHttpHead = null;
+	var $exitMessages = array();
+	var $exitLogTexts = array();
+	var $exitSuccess  = true;
+
 	/**
 	 * Constructor
 	 *
-	 * @since 1.0
+	 * @param   array   $config    associative array of configuration settings.
+	 *
+	 * @since 3.3
 	 */
-	function __construct()
+	public function __construct($config = array())
 	{
-		parent::__construct();
-		
-		// Register Extra task
-		$this->registerTask( 'add',          'edit' );
-		$this->registerTask( 'apply',        'save' );
-		$this->registerTask( 'saveandnew',   'save' );
-		if (!FLEXI_J16GE) {
-			$this->registerTask( 'accesspublic',     'access' );
-			$this->registerTask( 'accessregistered', 'access' );
-			$this->registerTask( 'accessspecial',    'access' );
-		}
-		$this->registerTask( 'copy',         'copy' );
+		parent::__construct($config);
+
+		// Register task aliases
+		$this->registerTask('add',          'edit');
+		$this->registerTask('apply',        'save');
+		$this->registerTask('apply_ajax',   'save');
+		$this->registerTask('save2new',     'save');
+		$this->registerTask('save2copy',    'save');
+
+		$this->registerTask('exportxml', 'export');
+		$this->registerTask('exportsql', 'export');
+		$this->registerTask('exportcsv', 'export');
+
+		// Can manage ACL
+		$this->canManage = FlexicontentHelperPerm::getPerm()->CanTypes;
+
+		// Error messages
+		$this->err_locked_recs_changestate = 'FLEXI_YOU_CANNOT_CHANGE_STATE_OF_THIS_TYPE_THERE_ARE_STILL_ITEMS_ASSOCIATED';
+		$this->err_locked_recs_delete      = 'FLEXI_YOU_CANNOT_REMOVE_THIS_TYPE_THERE_ARE_STILL_ITEMS_ASSOCIATED';
+
+		// Warning messages
+		$this->warn_locked_recs_skipped    = 'FLEXI_SKIPPED_N_ROWS_WITH_ASSOCIATIONS';
+		$this->warn_noauth_recs_skipped    = 'FLEXI_SKIPPED_N_ROWS_UNAUTHORISED';		
+
+		// Messages about related data
+		$this->msg_relations_deleted = 'FLEXI_ASSIGNMENTS_DELETED';
 	}
+
 
 	/**
 	 * Logic to save a record
 	 *
-	 * @access public
 	 * @return void
-	 * @since 1.5
+	 *
+	 * @since 3.3
 	 */
-	function save()
+	public function save()
 	{
-		// Check for request forgeries
-		JRequest::checkToken() or jexit( 'Invalid Token' );
-
-		$task  = JRequest::getVar('task');
-		$model = $this->getModel('type');
-		
-		// Get data from request and validate them
-		if (FLEXI_J16GE) {
-			// Retrieve form data these are subject to basic filtering
-			$data   = JRequest::getVar('jform', array(), 'post', 'array');    // Core Fields and and item Parameters
-			
-			// Validate Form data for core fields and for parameters
-			$form = $model->getForm($data, false);
-			$post = $model->validate($form, $data);
-			if (!$post) JError::raiseWarning( 500, "Error while validating data: " . $model->getError() );
-			
-			// Some values need to be assigned after validation
-			$post['attribs'] = @ $data['attribs'];   // Workaround for item's template parameters being clear by validation since they are not present in item.xml
-		} else {
-			// Retrieve form data these are subject to basic filtering
-			$post = JRequest::get( 'post' );  // Core & Custom Fields and item Parameters
-		}
-		
-		if ( $model->store($post) )
-		{
-			switch ($task)
-			{
-				case 'apply' :
-					$link = 'index.php?option=com_flexicontent&view=type&cid[]='.(int) $model->get('id');
-					break;
-
-				case 'saveandnew' :
-					$link = 'index.php?option=com_flexicontent&view=type';
-					break;
-
-				default :
-					$link = 'index.php?option=com_flexicontent&view=types';
-					break;
-			}
-			$msg = JText::_( 'FLEXI_TYPE_SAVED' );
-
-			$cache = JFactory::getCache('com_flexicontent');
-			$cache->clean();
-			$itemcache = JFactory::getCache('com_flexicontent_items');
-			$itemcache->clean();
-			$filtercache = JFactory::getCache('com_flexicontent_filters');
-			$filtercache->clean();
-
-		} else {
-
-			$msg = JText::_( 'FLEXI_ERROR_SAVING_TYPE' );
-			JError::raiseWarning( 500, $model->getError() );
-			$link 	= 'index.php?option=com_flexicontent&view=type';
-		}
-
-		$model->checkin();
-		$this->setRedirect($link, $msg);
+		parent::save();
 	}
-	
-	
+
+
 	/**
 	 * Check in a record
 	 *
-	 * @since	1.5
+	 * @since	3.3
 	 */
-	function checkin()
+	public function checkin()
 	{
-		$tbl = 'flexicontent_types';
-		$redirect_url = 'index.php?option=com_flexicontent&view=types';
-		flexicontent_db::checkin($tbl, $redirect_url, $this);
-		return;// true;
+		parent::checkin();
 	}
-	
-	
+
+
+	/**
+	 * Cancel the edit, check in the record and return to the records manager
+	 *
+	 * @return bool
+	 *
+	 * @since 3.3
+	 */
+	public function cancel()
+	{
+		return parent::cancel();
+	}
+
+
 	/**
 	 * Logic to publish records
 	 *
-	 * @access public
 	 * @return void
-	 * @since 1.5
+	 *
+	 * @since 3.3
 	 */
-	function publish()
+	public function publish()
 	{
-		$cid  = JRequest::getVar( 'cid', array(0), 'default', 'array' );
-
-		$msg = '';
-		if (!is_array( $cid ) || count( $cid ) < 1) {
-			JError::raiseWarning(500, JText::_( 'FLEXI_SELECT_ITEM_PUBLISH' ) );
-		} else {
-			$model = $this->getModel('types');
-
-			if(!$model->publish($cid, 1)) {
-				$msg = JText::_( 'FLEXI_OPERATION_FAILED' ).' : '.$model->getError();
-				if (FLEXI_J16GE) throw new Exception($msg, 500); else JError::raiseError(500, $msg);
-			}
-			$total = count( $cid );
-			$msg 	= $total.' '.JText::_( 'FLEXI_TYPE_PUBLISHED' );
-		}
-		
-		$this->setRedirect( 'index.php?option=com_flexicontent&view=types', $msg );
+		parent::publish();
 	}
-	
-	
+
+
 	/**
 	 * Logic to unpublish records
 	 *
-	 * @access public
 	 * @return void
-	 * @since 1.5
+	 *
+	 * @since 3.3
 	 */
-	function unpublish()
+	public function unpublish()
 	{
-		$cid   = JRequest::getVar( 'cid', array(0), 'default', 'array' );
-		$model = $this->getModel('types');
-
-		$msg = '';
-		if (!is_array( $cid ) || count( $cid ) < 1) {
-			JError::raiseWarning(500, JText::_( 'FLEXI_SELECT_ITEM_UNPUBLISH' ) );
-		} else if (!$model->candelete($cid)) {
-			JError::raiseWarning(500, JText::_( 'FLEXI_YOU_CANNOT_UNPUBLISH_THIS_TYPE_THERE_ARE_STILL_ITEMS_ASSOCIATED' ));
-		} else {
-
-			if (!$model->publish($cid, 0)) {
-				$msg = JText::_( 'FLEXI_OPERATION_FAILED' ).' : '.$model->getError();
-				if (FLEXI_J16GE) throw new Exception($msg, 500); else JError::raiseError(500, $msg);
-			}
-			
-			$msg = count($cid).' '.JText::_( 'FLEXI_TYPE_UNPUBLISHED' );
-			$cache = JFactory::getCache('com_flexicontent');
-			$cache->clean();
-		}
-		
-		$this->setRedirect( 'index.php?option=com_flexicontent&view=types', $msg );
+		parent::unpublish();
 	}
 
-	
+
 	/**
 	 * Logic to delete records
 	 *
-	 * @access public
 	 * @return void
-	 * @since 1.5
-	 */
-	function remove()
-	{
-		$cid   = JRequest::getVar( 'cid', array(0), 'default', 'array' );
-		$model = $this->getModel('types');
-
-		if (!is_array( $cid ) || count( $cid ) < 1) {
-			$msg = '';
-			JError::raiseWarning(500, JText::_( 'FLEXI_SELECT_ITEM_DELETE' ) );
-		} else if (!$model->candelete($cid)) {
-			JError::raiseWarning(500, JText::_( 'FLEXI_YOU_CANNOT_REMOVE_THIS_TYPE_THERE_ARE_STILL_ITEMS_ASSOCIATED' ));
-		} else {
-			
-			if (!$model->delete($cid)) {
-				$msg = JText::_( 'FLEXI_OPERATION_FAILED' ).' : '.$model->getError();
-				if (FLEXI_J16GE) throw new Exception($msg, 500); else JError::raiseError(500, $msg);
-			}
-			
-			$msg = count($cid).' '.JText::_( 'FLEXI_TYPES_DELETED' );
-			$cache = JFactory::getCache('com_flexicontent');
-			$cache->clean();
-		}
-		
-		$this->setRedirect( 'index.php?option=com_flexicontent&view=types', $msg );
-	}
-	
-	
-	/**
-	 * logic for cancel an action
 	 *
-	 * @access public
-	 * @return void
-	 * @since 1.5
+	 * @since 3.3
 	 */
-	function cancel()
+	public function remove()
+	{
+		parent::remove();
+	}
+
+
+	/**
+	 * Logic to create the view for record editing
+	 *
+	 * @return void
+	 *
+	 * @since 3.3
+	 */
+	public function edit()
+	{
+		parent::edit();
+	}
+
+
+	/**
+	 * Logic to set the access level of the records
+	 *
+	 * @return void
+	 *
+	 * @since 3.3
+	 */
+	public function access()
+	{
+		parent::access();
+	}
+
+
+	/**
+	 * Method for clearing cache of data depending on records type
+	 *
+	 * @return void
+	 *
+	 * @since 3.2.0
+	 */
+	protected function _cleanCache()
+	{
+		$this->input->get('task', '', 'cmd') !== __FUNCTION__ or die(__FUNCTION__ . ' : direct call not allowed');
+
+		parent::_cleanCache();
+
+		$cache_site = FLEXIUtilities::getCache($group = '', $client = 0);
+		$cache_site->clean('com_flexicontent_items');
+		$cache_site->clean('com_flexicontent_filters');
+
+		$cache_admin = FLEXIUtilities::getCache($group = '', $client = 1);
+		$cache_admin->clean('com_flexicontent_items');
+		$cache_admin->clean('com_flexicontent_filters');
+
+		// Also clean this as it contains Joomla frontend view cache of the component)
+		$cache_site->clean('com_flexicontent');
+	}
+
+
+	/**
+	 * Method for extra form validation after JForm validation is executed
+	 *
+	 * @param   array     $validated_data  The already jform-validated data of the record
+	 * @param   object    $model            The Model object of current controller instance
+	 * @param   array     $data            The original posted data of the record
+	 *
+	 * @return  boolean   true on success, false on failure
+	 *
+	 * @since 3.3
+	 */
+	protected function _afterModelValidation(& $validated_data, & $data, $model)
+	{
+		$this->input->get('task', '', 'cmd') !== __FUNCTION__ or die(__FUNCTION__ . ' : direct call not allowed');
+
+		if (!parent::_afterModelValidation($validated_data, $data, $model))
+		{
+			return false;
+		}
+
+		return true;
+	}
+
+
+	/**
+	 * Method for doing some record type specific work before calling model store
+	 *
+	 * @return  boolean   true on success, false on failure
+	 *
+	 * @since 3.3
+	 */
+	protected function _beforeModelStore(& $validated_data, & $data, $model)
+	{
+		$this->input->get('task', '', 'cmd') !== __FUNCTION__ or die(__FUNCTION__ . ' : direct call not allowed');
+
+		return true;
+	}
+
+
+	/**
+	 * Logic to copy the records
+	 *
+	 * @return void
+	 *
+	 * @since 3.3
+	 */
+	public function copy()
 	{
 		// Check for request forgeries
-		JRequest::checkToken() or jexit( 'Invalid Token' );
-		
-		$post = JRequest::get('post');
-		$post = FLEXI_J16GE ? $post['jform'] : $post;
-		JRequest::setVar('cid', $post['id']);
-		$this->checkin();
-	}
-	
-	
-	/**
-	 * Logic to create the view for the record editing
-	 *
-	 * @access public
-	 * @return void
-	 * @since 1.5
-	 */
-	function edit()
-	{
-		JRequest::setVar( 'view', 'type' );
-		JRequest::setVar( 'hidemainmenu', 1 );
+		JSession::checkToken('request') or die(JText::_('JINVALID_TOKEN'));
 
-		$model = $this->getModel('type');
+		// Initialize variables
+		$app   = JFactory::getApplication();
 		$user  = JFactory::getUser();
-		
-		// Check if record is checked out by other editor
-		if ( $model->isCheckedOut( $user->get('id') ) ) {
-			JError::raiseNotice( 500, JText::_( 'FLEXI_EDITED_BY_ANOTHER_ADMIN' ));
-			$this->setRedirect( 'index.php?option=com_flexicontent&view=types', '');
+		$task   = $this->input->get('task', 'copy', 'cmd');
+		$option = $this->input->get('option', '', 'cmd');
+
+		// Get model
+		$model = $this->getModel($this->record_name_pl);
+
+		// Get and santize records ids
+		$cid = $this->input->get('cid', array(), 'array');
+		$cid = ArrayHelper::toInteger($cid);
+
+		// Check at least one item was selected
+		if (!count($cid))
+		{
+			$app->enqueueMessage(JText::_('FLEXI_SELECT_ITEMS'), 'error');
+			$app->setHeader('status', 500, true);
+			$this->setRedirect($this->returnURL);
+
 			return;
 		}
-		
-		// Checkout the record and proceed to edit form
-		if ( !$model->checkout() ) {
-			JError::raiseWarning( 500, $model->getError() );
-			$this->setRedirect( 'index.php?option=com_flexicontent&view=types', '');
+
+		// Calculate access
+		$is_authorised = $this->canManage;
+
+		// Check access
+		if (!$is_authorised)
+		{
+			$app->enqueueMessage(JText::_('FLEXI_ALERTNOTAUTH_TASK'), 'error');
+			$app->setHeader('status', 403, true);
+			$this->setRedirect($this->returnURL);
+
 			return;
 		}
-		
-		parent::display();
+
+		if ($model->copy($cid, $copyRelations = true) === false)
+		{
+			$msg = JText::_('FLEXI_TYPES_COPY_FAILED') . ' : ' . $model->getError();
+			throw new Exception($msg, 500);
+		}
+
+		$msg = JText::_('FLEXI_TYPES_COPY_SUCCESS');
+
+		// Clear dependent cache data
+		$this->_cleanCache();
+
+		$this->setRedirect($this->returnURL, $msg);
 	}
-	
+
+
 	/**
-	 * Logic to set the access level of the Types
-	 *
-	 * @access public
-	 * @return void
-	 * @since 1.5
+	 * START OF CONTROLLER SPECIFIC METHODS
 	 */
-	function access()
+
+
+	/**
+	 * Logic to set property defining how joomla native article view is handled
+	 *
+	 * @return void
+	 *
+	 * @since 3.3
+	 */
+	function toggle_jview()
 	{
 		// Check for request forgeries
-		JRequest::checkToken() or jexit( 'Invalid Token' );
-		
-		$task  = JRequest::getVar( 'task' );
-		$model = $this->getModel('types');
-		$cid   = JRequest::getVar( 'cid', array(0), 'post', 'array' );
-		$id    = (int)$cid[0];
-		if (FLEXI_J16GE) {
-			$accesses	= JRequest::getVar( 'access', array(0), 'post', 'array' );
-			$access = $accesses[$id];
-		} else {
-			if ($task == 'accesspublic') {
-				$access = 0;
-			} elseif ($task == 'accessregistered') {
-				$access = 1;
-			} else {
-				$access = 2;
+		JSession::checkToken('request') or die(JText::_('JINVALID_TOKEN'));
+
+		$app   = JFactory::getApplication();
+		$user  = JFactory::getUser();
+
+		// Get model (NOTE: For this task we will use singular model)
+		$model = $this->getModel($this->record_name);
+
+		// Get and santize records ids
+		$cid = $this->input->get('cid', array(), 'array');
+		$cid = ArrayHelper::toInteger($cid);
+
+		// Check at least one item was selected
+		if (!count($cid))
+		{
+			$app->enqueueMessage(JText::_('FLEXI_SELECT_ITEMS'), 'error');
+			$app->setHeader('status', 500, true);
+			$this->setRedirect($this->returnURL);
+
+			return;
+		}
+
+		// Calculate access
+		$is_authorised = $this->canManage;
+
+		// Check access
+		if (!$is_authorised)
+		{
+			$app->enqueueMessage(JText::_('FLEXI_ALERTNOTAUTH_TASK'), 'error');
+			$app->setHeader('status', 403, true);
+			$this->setRedirect($this->returnURL);
+
+			return;
+		}
+
+		// Get new value(s) for 'allow_jview'
+		$allow_jview_arr = $this->input->get('allow_jview', array(0), 'array');
+
+		$toggle_count = 0;
+
+		foreach ($cid as $id)
+		{
+			if (!$id)
+			{
+				continue;
 			}
+			
+			// Attempt to modify attributes
+			if (!$model->setAttributeValues($id, array('allow_jview' => $allow_jview_arr[$id]), 'attribs'))
+			{
+				$app->enqueueMessage($model->getError(), 'error');
+				$app->setHeader('status', 500, true);
+				$this->setRedirect($this->returnURL);
+
+				return;
+			}
+
+			$toggle_count++;
 		}
 
-		
-		if(!$model->saveaccess( $id, $access )) {
-			$msg = JText::_( 'FLEXI_OPERATION_FAILED' ).' : '.$model->getError();
-			if (FLEXI_J16GE) throw new Exception($msg, 500); else JError::raiseError(500, $msg);
-		} else {
-			$cache = JFactory::getCache('com_flexicontent');
-			$cache->clean();
-			$filtercache = JFactory::getCache('com_flexicontent_filters');
-			$filtercache->clean();
-		}
-		
-		$this->setRedirect('index.php?option=com_flexicontent&view=types' );
+		$msg = $toggle_count ? 'Toggle view method for ' . $toggle_count . ' types' : '';
+		$this->setRedirect($this->returnURL, $msg);
 	}
-	
-	
-	/**
-	 * Logic to set the access level of the Types
-	 *
-	 * @access public
-	 * @return void
-	 * @since 1.5
-	 */
-	function copy()
-	{
-		// Check for request forgeries
-		JRequest::checkToken() or jexit( 'Invalid Token' );
-		
-		$cid		= JRequest::getVar( 'cid', array(0), 'post', 'array' );
-
-		$model = $this->getModel('types');
-		
-		if(!$model->copy( $cid )) {
-			$msg = JText::_('FLEXI_TYPES_COPY_SUCCESS');
-			JError::raiseWarning(500, JText::_( 'FLEXI_TYPES_COPY_FAILED' ));
-		} else {
-			$msg = JText::_('FLEXI_TYPES_COPY_SUCCESS');
-			$cache = JFactory::getCache('com_flexicontent');
-			$cache->clean();
-		}
-		
-		$this->setRedirect('index.php?option=com_flexicontent&view=types', $msg );
-	}
-
 }

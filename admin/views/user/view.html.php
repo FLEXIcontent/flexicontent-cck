@@ -1,379 +1,359 @@
 <?php
 /**
-* @version		$Id: view.html.php 1901 2014-05-07 02:37:25Z ggppdk $
-* @package		Joomla
-* @subpackage	Users
-* @copyright	Copyright (C) 2005 - 2010 Open Source Matters. All rights reserved.
-* @license		GNU/GPL, see LICENSE.php
-* Joomla! is free software. This version may have been modified pursuant
-* to the GNU General Public License, and as distributed it includes or
-* is derivative of works licensed under the GNU General Public License or
-* other free or open source software licenses.
-* See COPYRIGHT.php for copyright notices and details.
-*/
+ * @package         FLEXIcontent
+ * @version         3.3
+ *
+ * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
+ * @link            https://flexicontent.org
+ * @copyright       Copyright © 2018, FLEXIcontent team, All Rights Reserved
+ * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
+ */
 
-// Check to ensure this file is included in Joomla!
-defined('_JEXEC') or die( 'Restricted access' );
+defined('_JEXEC') or die('Restricted access');
 
-jimport('joomla.application.component.view');
+use Joomla\String\StringHelper;
+use Joomla\Utilities\ArrayHelper;
+
+JLoader::register('FlexicontentViewBaseRecord', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/base/view_record.php');
 
 /**
- * HTML View class for the Users component
- *
- * @static
- * @package		Joomla
- * @subpackage	Users
- * @since 1.0
+ * HTML View class for the User screen
  */
-class FlexicontentViewUser extends JViewLegacy
+class FlexicontentViewUser extends FlexicontentViewBaseRecord
 {
-	function display($tpl = null)
+	var $proxy_option = 'com_users';
+
+	/**
+	 * Display the view
+	 */
+	public function display($tpl = null)
 	{
-		global $mainframe;
+		/**
+		 * Initialize variables, flags, etc
+		 */
 
-		//initialise variables
-		$document = JFactory::getDocument();
-		$db       = JFactory::getDBO();
-		$me       = JFactory::getUser();
-		
-		$cid = JRequest::getVar( 'cid', array(0), '', 'array' );
-		JArrayHelper::toInteger($cid, array(0));
-		$edit = JRequest::getVar('edit',true);
-		if (!$cid) $edit = false;
-		
-		if (FLEXI_J16GE) {
-			$form = $this->get('Form');
-			$form->setValue('password',		null);
-			$form->setValue('password2',	null);
+		$app        = JFactory::getApplication();
+		$jinput     = $app->input;
+		$document   = JFactory::getDocument();
+		$user       = JFactory::getUser();
+		$db         = JFactory::getDbo();
+		$cparams    = JComponentHelper::getParams('com_flexicontent');
+		$perms      = FlexicontentHelperPerm::getPerm();
+
+		// Get url vars and some constants
+		$option     = $jinput->get('option', '', 'cmd');
+		$view       = $jinput->get('view', '', 'cmd');
+		$task       = $jinput->get('task', '', 'cmd');
+		$controller = $jinput->get('controller', '', 'cmd');
+
+		$isAdmin  = $app->isClient('administrator');
+		$isCtmpl  = $jinput->getCmd('tmpl') === 'component';
+
+		$tip_class = ' hasTooltip';
+		$manager_view = 'users';
+		$ctrl = 'users';
+		$js = '';
+
+
+		/**
+		 * Common view
+		 */
+
+		$this->prepare_common_fcview();
+
+
+		/**
+		 * Get record data, and check if record is already checked out
+		 */
+
+		// Get model and load the record data
+		$model = $this->getModel();
+		$row   = $this->get('Item');
+		$isnew = ! $row->id;
+
+		// Get JForm
+		$form  = $this->get('Form');
+		if (!$form)
+		{
+			$app->enqueueMessage($model->getError(), 'warning');
+			$app->redirect( 'index.php?option=com_flexicontent&view=' . $manager_view );
 		}
-		$form_folder = FLEXI_J16GE ? 'forms'.DS : '';
-		
-		JHTML::_('behavior.tooltip');
 
-		//add css to document
-		$document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/flexicontentbackend.css');
-		if      (FLEXI_J30GE) $document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/j3x.css');
-		else if (FLEXI_J16GE) $document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/j25.css');
-		else                  $document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/j15.css');
-		
+
+
+		/**
+		 * Include needed files and add needed js / css files
+		 */
+
+		// Add css to document
+		if ($isAdmin)
+		{
+			!JFactory::getLanguage()->isRtl()
+				? $document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', array('version' => FLEXI_VHASH))
+				: $document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', array('version' => FLEXI_VHASH));
+			!JFactory::getLanguage()->isRtl()
+				? $document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/j3x.css', array('version' => FLEXI_VHASH))
+				: $document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/j3x_rtl.css', array('version' => FLEXI_VHASH));
+		}
+		else
+		{
+			!JFactory::getLanguage()->isRtl()
+				? $document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontent.css', array('version' => FLEXI_VHASH))
+				: $document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontent_rtl.css', array('version' => FLEXI_VHASH));
+		}
+
 		// Add JS frameworks
 		flexicontent_html::loadFramework('select2');
-		
+		flexicontent_html::loadFramework('touch-punch');
+		flexicontent_html::loadFramework('prettyCheckable');
+		flexicontent_html::loadFramework('flexi-lib');
+		flexicontent_html::loadFramework('flexi-lib-form');
+
+		// Load custom behaviours: form validation, popup tooltips
+		JHtml::_('behavior.formvalidation');
+		JHtml::_('bootstrap.tooltip');
+
 		// Add js function to overload the joomla submitform validation
-		JHTML::_('behavior.formvalidation');  // load default validation JS to make sure it is overriden
-		$document->addScript(JURI::root(true).'/components/com_flexicontent/assets/js/admin.js');
-		$document->addScript(JURI::root(true).'/components/com_flexicontent/assets/js/validate.js');
-		
-		// load language file for com_users component
-		JFactory::getLanguage()->load('com_users', JPATH_ADMINISTRATOR, 'en-GB', true);
-		JFactory::getLanguage()->load('com_users', JPATH_ADMINISTRATOR, null, true);
+		$document->addScript(JUri::root(true).'/components/com_flexicontent/assets/js/admin.js', array('version' => FLEXI_VHASH));
+		$document->addScript(JUri::root(true).'/components/com_flexicontent/assets/js/validate.js', array('version' => FLEXI_VHASH));
 
-		//create the toolbar
-		if ( $edit ) {
-			JToolBarHelper::title( JText::_( 'FLEXI_EDIT_USER' ), 'authoredit' );
-		} else {
-			JToolBarHelper::title( JText::_( 'FLEXI_ADD_USER' ), 'authoradd' );
-		}
-		
-		$ctrl = FLEXI_J16GE ? 'users.' : '';
-		JToolBarHelper::apply( $ctrl.'apply' );
-		JToolBarHelper::save( $ctrl.'save' );
-		JToolBarHelper::custom( $ctrl.'saveandnew', 'savenew.png', 'savenew.png', 'FLEXI_SAVE_AND_NEW', false );
-		JToolBarHelper::cancel( $ctrl.'cancel' );
-		JToolBarHelper::help( 'screen.users.edit' );
 
-		$user   = $edit  ?  JUser::getInstance($cid[0])  :  JUser::getInstance();
-		$myuser = JFactory::getUser();
-		$acl    = JFactory::getACL();
+		/**
+		 * Create the toolbar
+		 */
 
-		// Check for post data in the event that we are returning
-		// from a unsuccessful attempt to save data
-		$post = JRequest::get('post');
-		if ( $post ) {
-			$user->bind($post);
-		}
+		$toolbar = JToolbar::getInstance('toolbar');
 
-		if ( $user->get('id'))
+		// Creation flag used to decide if adding save and new / save as copy buttons are allowed
+		$cancreate = false;  // We will not create new users in our backend
+
+		// SET toolbar title
+		!$isnew
+			? JToolbarHelper::title(JText::_( 'FLEXI_EDIT_USER'), 'authoredit')
+			: JToolbarHelper::title(JText::_( 'FLEXI_ADD_USER'), 'authoradd');
+
+		$ctrl = 'users.';
+		JToolbarHelper::apply( $ctrl.'apply' );
+		JToolbarHelper::save( $ctrl.'save' );
+		JToolbarHelper::custom( $ctrl.'save2new', 'savenew.png', 'savenew.png', 'FLEXI_SAVE_AND_NEW', false );
+		JToolbarHelper::cancel( $ctrl.'cancel' );
+		JToolbarHelper::help( 'screen.users.edit' );
+
+		JText::script("FLEXI_UPDATING_CONTENTS", true);
+		$document->addScriptDeclaration('
+			function fc_edit_juser_modal_load( container )
+			{
+				if ( container.find("iframe").get(0).contentWindow.location.href.indexOf("view=users") != -1 )
+				{
+					container.dialog("close");
+				}
+			}
+			function fc_edit_juser_modal_close()
+			{
+				window.location.reload(false);
+				document.body.innerHTML = Joomla.JText._("FLEXI_UPDATING_CONTENTS") + \' <img id="page_loading_img" src="components/com_flexicontent/assets/images/ajax-loader.gif">\';
+			}
+		');
+
+		$modal_title = JText::_('FLEXI_EDIT_JUSER', true);
+		$tip_class = ' hasTooltip';
+		JToolbarHelper::divider();
+		flexicontent_html::addToolBarButton(
+			'FLEXI_EDIT_JUSER', $btn_name='edit_juser',
+			$full_js="var url = jQuery(this).attr('data-href'); var the_dialog = fc_showDialog(url, 'fc_modal_popup_container', 0, 0, 0, fc_edit_juser_modal_close, {title:'".$modal_title."', loadFunc: fc_edit_juser_modal_load}); return false;",
+			$msg_alert='', $msg_confirm='',
+			$btn_task='', $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false, $btn_class="spaced-btn btn-info".$tip_class, $btn_icon="icon-pencil",
+			'data-placement="bottom" data-href="index.php?option=com_users&task=user.edit&id='.$row->get('id').'" title="Edit all details of joomla user"'
+		);
+
+
+		// Get contact data
+		if ($row->get('id'))
 		{
 			$query = 'SELECT *'
-			. ' FROM #__contact_details'
-			. ' WHERE user_id = '.(int) $cid[0]
-			;
-			$db->setQuery( $query );
-			$contact = $db->loadObjectList();
+				. ' FROM #__contact_details'
+				. ' WHERE user_id = ' . (int) $row->get('id');
+			$contact = $db->setQuery($query)->loadObjectList();
 		}
+
 		else
 		{
 			$contact = NULL;
 			// Get the default group id for a new user
-			$config = JComponentHelper::getParams( 'com_users' );
-			$newGrp = $config->get( 'new_usertype' );
-			if (!FLEXI_J16GE)
-				$user->set( 'gid', $acl->get_group_id( $newGrp, null, 'ARO' ) );
-			else
-				$user->set( 'gid', $newGrp );
+			$config = JComponentHelper::getParams('com_users');
 		}
-		
-		// **************************************************
-		// Include needed files and add needed js / css files
-		// **************************************************
-		
-		// Load pane behavior
-		jimport('joomla.html.pane');
-		
-		// Add css to document
-		$document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/flexicontentbackend.css');
-		if      (FLEXI_J30GE) $document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/j3x.css');
-		else if (FLEXI_J16GE) $document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/j25.css');
-		else                  $document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/j15.css');
-		
-		// Add js function to overload the joomla submitform
-		$document->addScript('components/com_flexicontent/assets/js/admin.js');
-		$document->addScript('components/com_flexicontent/assets/js/validate.js');
-		
-		
+
+
+
 		// ********************
 		// Initialise variables
 		// ********************
-		
+
 		$cparams = JComponentHelper::getParams('com_flexicontent');
-		if (!FLEXI_J16GE) {
-			$pane  = JPane::getInstance('sliders');
-			$tpane = JPane::getInstance('tabs', array('startOffset'=>2, 'allowAllClose'=>true, 'opacityTransition'=>true, 'duration'=>600));
-		}
-		
+
+
 		// *************************************************************************************************
 		// Get author extended data, basic (described in author.xml) and category (described incategory.xml)
 		// *************************************************************************************************
-		
+
 		JTable::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'tables');
-		$author_user_id = (int) $cid[0];
 		$flexiauthor_extdata = JTable::getInstance('flexicontent_authors_ext', '');
-		$flexiauthor_extdata->load( $author_user_id );
+		$flexiauthor_extdata->load($row->get('id'));
 		//echo "<pre>"; print_r($flexiauthor_extdata); echo "</pre>"; exit;
-		
+
+
 		// ***********************
 		// AUTHOR basic parameters
 		// ***********************
-		
+
 		// Load the DB parameter values and the XML description from file,
 		// NOTE: this is one step for J1.5 via a JParameter object, but in J1.6+ the use of XML file
 		// in JParameter is deprecated, instead we will JForm to load XML description and thus be able to render it
-		
-		$auth_xml = JPATH_COMPONENT.DS.'models'.DS.$form_folder.'author.xml';
-		if (FLEXI_J16GE)
-			$params_authorbasic = new JRegistry($flexiauthor_extdata->author_basicparams);
-		else
-			$params_authorbasic = new JParameter($flexiauthor_extdata->author_basicparams, $auth_xml);
+
+		$auth_xml = JPATH_COMPONENT.DS.'models'.DS.'forms'.DS.'author.xml';
+		$params_authorbasic = new JRegistry($flexiauthor_extdata->author_basicparams);
 		//echo "<pre>"; print_r($params_authorbasic); echo "</pre>"; exit;
-		
-		if (FLEXI_J16GE)
+
+		// Read XML file
+		//$xml_string = str_replace('name="params"', 'name="authorbasicparams"', file_get_contents($auth_xml));
+		$xml_string = file_get_contents($auth_xml);
+
+		// Load the form description from the XML string
+		$jform_authorbasic = new JForm('com_flexicontent.author', array('control' => 'jform', 'load_data' => true));
+		$jform_authorbasic->load($xml_string, $isFile=false);
+
+		// Set DB parameter values into the JForm object
+		foreach ($jform_authorbasic->getFieldset() as $fsetname => $field)
 		{
-			// Read XML file
-			$xml_string = str_replace('name="params"', 'name="authorbasicparams"', file_get_contents($auth_xml));
-			
-			// Load the form description from the XML string
-			$jform_authorbasic = new JForm('com_flexicontent.author', array('control' => 'jform', 'load_data' => true));
-			$jform_authorbasic->load($xml_string, $isFile=false);
-			
-			// Set DB parameter values into the JForm object
-			foreach ($jform_authorbasic->getFieldset() as $fsetname =>  $field) {
-				$jform_authorbasic->setValue($field->fieldname, $group = 'authorbasicparams', $value = $params_authorbasic->get($field->fieldname) );
-			}
+			$jform_authorbasic->setValue($field->fieldname, $group = 'authorbasicparams', $value = $params_authorbasic->get($field->fieldname) );
 		}
-		
+
+
 		// **************************
 		// AUTHOR category parameters
 		// **************************
-		
+
 		// Load the DB parameter values and the XML description from file,
 		// NOTE: this is one step for J1.5 via a JParameter object, but in J1.6+ the use of XML file
 		// in JParameter is deprecated, instead we will JForm to load XML description and thus be able to render it
-		
-		$cat_xml = JPATH_COMPONENT.DS.'models'.DS.$form_folder.'category.xml';
-		if (FLEXI_J16GE)
-			$params_authorcat = new JRegistry($flexiauthor_extdata->author_catparams);
-		else
-			$params_authorcat = new JParameter($flexiauthor_extdata->author_catparams, $cat_xml);
+
+		$cat_xml = JPATH_COMPONENT.DS.'models'.DS.'forms'.DS.'category.xml';
+		$params_authorcat = new JRegistry($flexiauthor_extdata->author_catparams);
 		//echo "<pre>"; print_r($params_authorcat); echo "</pre>"; exit;
-			
-		if (FLEXI_J16GE)
-		{
-			// Read XML file
-			$xml_string = str_replace('name="params"', 'name="authorcatparams"', file_get_contents($cat_xml));
-			
-			// Load the form description from the XML string
-			$jform_authorcat = new JForm('com_flexicontent.category', array('control' => 'jform', 'load_data' => true));
-			$jform_authorcat->load($xml_string, $isFile=false);
-			
-			// Set DB parameter values into the JForm object
-			foreach ($jform_authorcat->getFieldset() as $fsetname => $field) {
-				$jform_authorcat->setValue($field->fieldname, $group = 'authorcatparams', $value = $params_authorcat->get($field->fieldname) );
-			}
-		}
-		
-		
-		// **********************************************************************************
-		// Get Templates and apply Template Parameters values into the form fields structures 
-		// **********************************************************************************
-		
-		$themes		= flexicontent_tmpl::getTemplates();
-		$tmpls		= $themes->category;
-		
-		if (FLEXI_J16GE) {
-			$params_author = new JRegistry($user->params);
-		}
-		foreach ($tmpls as $tmpl) {
-			if (FLEXI_J16GE) {
-				$jform = new JForm('com_flexicontent.template.category', array('control' => 'jform', 'load_data' => true));
-				$jform->load($tmpl->params);
-				$tmpl->params = $jform;
-				// ... values applied at the template form file
-			} else {
-				$tmpl->params->loadINI($flexiauthor_extdata->author_catparams);
-			}
-		}
-		
-		//$lists = array();
-		//$javascript = "onchange=\"javascript:if (document.forms[0].image.options[selectedIndex].value!='') {document.imagelib.src='../images/stories/' + document.forms[0].image.options[selectedIndex].value} else {document.imagelib.src='../images/blank.png'}\"";
-		//$lists['imagelist'] 		= JHTML::_('list.images', 'image', $flexiauthor_extdata->image, $javascript, '/images/stories/' );
 
-		
-		if (!FLEXI_J16GE) {
-			$userObjectID 	= $acl->get_object_id( 'users', $user->get('id'), 'ARO' );
-			$userGroups 	= $acl->get_object_groups( $userObjectID, 'ARO' );
-			$userGroupName 	= strtolower( $acl->get_group_name( $userGroups[0], 'ARO' ) );
-			$userIsAdmin = ($userGroupName == 'administrator');
-	
-			$myObjectID 	= $acl->get_object_id( 'users', $myuser->get('id'), 'ARO' );
-			$myGroups 		= $acl->get_object_groups( $myObjectID, 'ARO' );
-			$myGroupName 	= strtolower( $acl->get_group_name( $myGroups[0], 'ARO' ) );;
-			$myIsAdmin = ($myGroupName == 'administrator');
-		} else {
-		}
-		
-		// ensure user can't add/edit group higher than themselves
-		/* NOTE : This check doesn't work commented out for the time being
-		if ( is_array( $myGroups ) && count( $myGroups ) > 0 )
+		// Read XML file
+		$xml_string = str_replace('name="params"', 'name="authorcatparams"', file_get_contents($cat_xml));
+
+		// Load the form description from the XML string
+		$jform_authorcat = new JForm('com_flexicontent.category', array('control' => 'jform', 'load_data' => true));
+		$jform_authorcat->load($xml_string, $isFile=false);
+
+		// Set DB parameter values into the JForm object
+		foreach ($jform_authorcat->getFieldset() as $fsetname => $field)
 		{
-			$excludeGroups = (array) $acl->get_group_children( $myGroups[0], 'ARO', 'RECURSE' );
+			$jform_authorcat->setValue($field->fieldname, $group = 'authorcatparams', $value = $params_authorcat->get($field->fieldname) );
+		}
+
+
+		/**
+		 * Get Layouts, load language of current selected template and apply Layout parameters values into the fields
+		 */
+
+		// Load language file of currently selected template
+		$_clayout = $params_authorcat->get('clayout');
+		if ($_clayout)
+		{
+			FLEXIUtilities::loadTemplateLanguageFile($_clayout);
+		}
+
+		// Get the category layouts, checking template of current layout for modifications
+		$themes		= flexicontent_tmpl::getTemplates($_clayout);
+		$tmpls		= $themes->category;
+
+		// Create JForm for the layout and apply Layout parameters values into the fields
+		foreach ($tmpls as $tmpl)
+		{
+			if ($tmpl->name != $_clayout) continue;
+
+			$jform = new JForm('com_flexicontent.template.category', array('control' => 'jform', 'load_data' => false));
+			$jform->load($tmpl->params);
+			$tmpl->params = $jform;
+			foreach ($tmpl->params->getGroup('attribs') as $field)
+			{
+				$fieldname = $field->fieldname;
+				$value = $params_authorcat->get($fieldname);
+
+				if (strlen($value))
+				{
+					$tmpl->params->setValue($fieldname, 'attribs', $value);
+				}
+			}
+		}
+
+		if (!$row->get('id'))
+		{
+			$new_usertype = JComponentHelper::getParams('com_users')->get('new_usertype');
+			$usergroups = $new_usertype ? array($new_usertype) : array();
 		}
 		else
 		{
-			$excludeGroups = array();
-		}
+			$ugrps_qtmpl = 'SELECT group_id FROM #__user_usergroup_map AS ug WHERE ug.user_id = %d';
+			$query = sprintf($ugrps_qtmpl, (int) $row->get('id'));
 
-		if ( in_array( $userGroups[0], $excludeGroups ) )
-		{
-			echo 'not auth';
-			$mainframe->redirect( 'index.php?option=com_flexicontent&amp;controller=users&amp;view=users', JText::_('NOT_AUTH') );
-		}
-		*/
-
-		/*
-		if ( $userGroupName == 'super administrator' )
-		{
-			// super administrators can't change
-	 		$lists['gid'] = '<input type="hidden" name="gid" value="'. $currentUser->gid .'" /><strong>'. JText::_( 'Super Administrator' ) .'</strong>';
-		}
-		else if ( $userGroupName == $myGroupName && $myGroupName == 'administrator' ) {
-		*/
-		if (FLEXI_ACCESS) 
-		{
-			// Create the list of all groups except public and registered
-			$query	= 'SELECT id AS value, name AS text, level, ordering'
-					. ' FROM #__flexiaccess_groups'
-					. ' WHERE level > 1'
-					. ' ORDER BY ordering ASC'
-					;
-			$db->setQuery( $query );
-			$allgroups = $db->loadObjectList();
-
-			if ( $user->get('id') )
-			{
-				// get all the groups from the user
-				$query 	= 'SELECT group_id'
-				. ' FROM #__flexiaccess_members'
-				. ' WHERE member_id = '.(int) $cid[0]
-				;
-				$db->setQuery( $query );
-				$usergroups = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();
-			}
-			else
-			{
-				$usergroups = array();
-			}
-			$lists['access'] 	= JHTML::_('select.genericlist',   $allgroups, 'groups[]', 'size="10" multiple="multiple"', 'value', 'text', $usergroups );		
-		}
-		
-		if (!FLEXI_J16GE) {
-			if ( $userIsAdmin && $myIsAdmin )
-			{
-				// administrators can't change each other
-				$lists['gid'] = '<input type="hidden" name="gid" value="'. $user->get('gid') .'" /><strong>'. JText::_( 'Administrator' ) .'</strong>';
-			}
-			else
-			{
-				$gtree = $acl->get_group_children_tree( null, 'USERS', false );
-
-				// remove users 'above' me
-				//$i = 0;
-				//while ($i < count( $gtree )) {
-				//	if ( in_array( $gtree[$i]->value, (array)$excludeGroups ) ) {
-				//		array_splice( $gtree, $i, 1 );
-				//	} else {
-				//		$i++;
-				//	}
-				//}
-
-				$lists['gid'] 	= JHTML::_('select.genericlist',   $gtree, 'gid', 'size="10"', 'value', 'text', $user->get('gid') );
-			}
-		} else {
-			if ( !$user->get('id') ) {
-				$new_usertype = JComponentHelper::getParams('com_users')->get('new_usertype');
-				$usergroups = $new_usertype ? array($new_usertype) : array();
-			} else {
-				$ugrps_qtmpl = 'SELECT group_id FROM #__user_usergroup_map AS ug WHERE ug.user_id = %d';
-				$query = sprintf( $ugrps_qtmpl, intval( $user->get('id') ) );
-				$db->setQuery( $query );
-				$usergroups = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();
-				if ($db->getErrorMsg())	echo $db->getErrorMsg();
-			}
+			$usergroups = $db->setQuery($query)->loadColumn();
 		}
 
 		// build the html select list
-		$lists['block'] 	= JHTML::_('select.booleanlist',  'block', 'class="inputbox" size="1"', $user->get('block') );
+		$lists['block'] 	= JHtml::_('select.booleanlist',  'block', 'class="inputbox" size="1"', $row->get('block') );
 
 		// build the html select list
-		$lists['sendEmail'] = JHTML::_('select.booleanlist',  'sendEmail', 'class="inputbox" size="1"', $user->get('sendEmail') );
+		$lists['sendEmail'] = JHtml::_('select.booleanlist',  'sendEmail', 'class="inputbox" size="1"', $row->get('sendEmail') );
 
-		$this->assignRef('me'				, $me);
-		$this->assignRef('document'	, $document);
-		$this->assignRef('lists'		, $lists);
-		if (!FLEXI_J16GE) {
-			$this->assignRef('pane'		, $pane);
-			$this->assignRef('tpane'	, $tpane);
+
+		/**
+		 * Add inline js to head
+		 */
+
+		if ($js)
+		{
+			$document->addScriptDeclaration('jQuery(document).ready(function(){'
+				.$js.
+			'});');
 		}
-		
-		$this->assignRef('user'				, $user);
-		$this->assignRef('usergroups'	, $usergroups);
-		$this->assignRef('contact'		, $contact);
-		
-		$this->assignRef('cparams',	$cparams);
-		
-		$this->assignRef('params_authorbasic'	, $params_authorbasic);
-		$this->assignRef('params_authorcat'		, $params_authorcat);
-		if (FLEXI_J16GE) {
-			$this->assignRef('jform_authorbasic'	, $jform_authorbasic);
-			$this->assignRef('jform_authorcat'		, $jform_authorcat);
-		}
-		
-		$this->assignRef('tmpls'		, $tmpls);
-		if (FLEXI_J16GE) {
-			$this->assignRef('form'		, $form);
-			$this->assignRef('params_author'		, $params_author);
-		}
-		
+
+
+		/**
+		 * Encode (UTF-8 charset) HTML entities form data so that they can be set as form field values
+		 * NOTE: We do NOT yet use JForm thus this is needed
+		 */
+
+		JFilterOutput::objectHTMLSafe( $row, ENT_QUOTES, $exclude_keys = '' );
+
+
+		/**
+		 * Assign variables to view
+		 */
+
+		$this->document = $document;
+		$this->lists = $lists;
+
+		$this->row      = $row;
+		$this->form     = $form;
+		$this->perms    = $perms;
+		$this->tmpls    = $tmpls;
+
+		$this->usergroups = $usergroups;
+		$this->contact    = $contact;
+
+		$this->cparams  = $cparams;
+		$this->iparams  = $cparams;
+
+		$this->params_authorbasic = $params_authorbasic;
+		$this->params_authorcat   = $params_authorcat;
+
+		$this->jform_authorbasic = $jform_authorbasic;
+		$this->jform_authorcat   = $jform_authorcat;
+
 		parent::display($tpl);
 	}
 }

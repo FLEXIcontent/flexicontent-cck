@@ -1,57 +1,59 @@
 <?php
 /**
- * HTML5 Template
- * @version 1.5 stable $Id: category_items_html5.php 0001 2012-09-23 14:00:28Z Rehne $
- * @package Joomla
- * @subpackage FLEXIcontent
- * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
+ * @package FLEXIcontent
+ * @copyright (C) 2009-2018 Emmanuel Danan, Georgios Papadakis, Yannick Berges
+ * @author Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
  * @license GNU/GPL v2
- * 
- * FLEXIcontent is a derivative work of the excellent QuickFAQ component
- * @copyright (C) 2008 Christoph Lukes
- * see www.schlu.net for more information
- *
- * FLEXIcontent is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
  */
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
+
 // first define the template name
 $tmpl = $this->tmpl;
 $user = JFactory::getUser();
-?>
 
-<?php
-	ob_start();
-	
-	// Form for (a) Text search, Field Filters, Alpha-Index, Items Total Statistics, Selectors(e.g. per page, orderby)
-	// If customizing via CSS rules or JS scripts is not enough, then please copy the following file here to customize the HTML too
-	include(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'tmpl_common'.DS.'listings_filter_form_html5.php');
-	
-	$filter_form_html = trim(ob_get_contents());
-	ob_end_clean();
-	if ( $filter_form_html ) {
-		echo '<aside class="group">'."\n".$filter_form_html."\n".'</aside>';
-	}
-?>
+$btn_class = 'btn';
+$tooltip_class = 'hasTooltip';
 
-<div class="clear"></div>
+// MICRODATA 'itemtype' for ALL items in the listing (this is the fallback if the 'itemtype' in content type / item configuration are not set)
+$microdata_itemtype_cat = $this->params->get( 'microdata_itemtype_cat', 'Article' );
 
-<?php
-$items = & $this->items;
+
+// Form for (a) Text search, Field Filters, Alpha-Index, Items Total Statistics, Selectors(e.g. per page, orderby)
+// If customizing via CSS rules or JS scripts is not enough, then please copy the following file here to customize the HTML too
+
+ob_start();
+include(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'tmpl_common'.DS.'listings_filter_form_html5.php');
+$filter_form_html = trim(ob_get_contents());
+ob_end_clean();
+
+if ( $filter_form_html )
+{
+	echo '
+	<div class="fcclear"></div>
+	<aside class="group">
+		' . $filter_form_html . '
+	</aside>';
+}
 
 // -- Check matching items found
-if (!$items) {
+if (!$this->items)
+{
 	// No items exist
-	if ($this->getModel()->getState('limit')) {
+	if ($this->getModel()->getState('limit'))
+	{
 		// Not creating a category view without items
-		echo '<div class="noitems group">' . JText::_( 'FLEXI_NO_ITEMS_FOUND' ) . '</div>';
+		echo '
+		<div class="fcclear"></div>
+		<div class="noitems group">
+			' . JText::_( 'FLEXI_NO_ITEMS_FOUND' ) . '
+		</div>';
 	}
 	return;
 }
 
+$items = & $this->items;
+$count = count($items);
 
 // -- Decide whether to show the item edit options
 if ( $user->id ) :
@@ -66,6 +68,11 @@ if ( $user->id ) :
 			if ($item->statebutton = flexicontent_html::statebutton( $item, $this->params )) :
 				$item->statebutton = '<div class="fc_state_toggle_link_nopad">'.$item->statebutton.'</div>';
 			endif;
+		endif;
+		
+		if ($item->deletebutton = flexicontent_html::deletebutton( $item, $this->params )) :
+			$buttons_exists = true;
+			$item->deletebutton = '<div class="fc_delete_link">'.$item->deletebutton.'</div>';
 		endif;
 		
 		if ($item->approvalbutton = flexicontent_html::approvalbutton( $item, $this->params )) :
@@ -102,9 +109,37 @@ $classnum = $tmpl_cols_classes[$tmpl_cols];
 // bootstrap span
 $tmpl_cols_spanclasses = array(1=>'span12',2=>'span6',3=>'span4',4=>'span3');
 $classspan = $tmpl_cols_spanclasses[$tmpl_cols];
+
+
+// ITEMS as MASONRY tiles
+if (!empty($this->items) && ($this->params->get('cols_placement', 1)==1))
+{
+	flexicontent_html::loadFramework('masonry');
+	flexicontent_html::loadFramework('imagesLoaded');
+	
+	$js = "
+		jQuery(document).ready(function(){
+	";
+	if ($this->params->get('cols_placement', 1)==1) {
+		$js .= "
+			var container_intro = document.querySelector('ul.faqblock.masonryblock');
+			var msnry_intro;
+			// initialize Masonry after all images have loaded
+			if (container_intro) {
+				imagesLoaded( container_intro, function() {
+					msnry_intro = new Masonry( container_intro );
+				});
+			}
+		";
+	}
+	$js .= "	
+		});
+	";
+	JFactory::getDocument()->addScriptDeclaration($js);
+}
 ?>
 
-<ul class="faqblock <?php echo $classnum; ?> group row">	
+<ul class="faqblock group row">	
 
 <?php
 $show_itemcount   = $this->params->get('show_itemcount', 1);
@@ -123,6 +158,11 @@ foreach ($cat_items as $catid => $items) :
 	if ($catid!=$currcatid) $count_cat++;
 ?>
 
+<?php if ($count_cat==0): ?>
+</ul>
+<ul class="faqblock <?php echo $classnum; ?> masonryblock group">
+<?php endif; ?>
+
 <li class="<?php echo $catid==$currcatid ? 'full' : ($count_cat%2 ? 'even' : 'odd'); ?> <?php echo $classspan; ?>">
 	
 	<section class="group">	
@@ -137,7 +177,7 @@ foreach ($cat_items as $catid => $items) :
 				<!-- EOF subcategory image -->
 			<?php endif; ?>
 
-			<?php if ($catid!=$currcatid) { ?> <a class='fc_cat_title' href="<?php echo JRoute::_( FlexicontentHelperRoute::getCategoryRoute($sub->slug) ); ?>"> <?php } else { echo "<span class='fc_cat_title'>"; } ?>
+			<?php if ($catid!=$currcatid) { ?> <a class='fc_cat_title' href="<?php echo JRoute::_( FlexicontentHelperRoute::getCategoryRoute($sub->slug) ); ?>" itemprop="url"> <?php } else { echo "<span class='fc_cat_title'>"; } ?>
 				<!-- BOF subcategory title -->
 				<?php echo $sub->title; ?>
 				<!-- EOF subcategory title -->
@@ -157,7 +197,7 @@ foreach ($cat_items as $catid => $items) :
 			<?php if ($this->params->get(($catid!=$currcatid? 'show_description_subcat' : 'show_description'), 1)) : ?>
 				<!-- BOF subcategory description  -->
 				<div class="catdescription group">
-					<?php	echo flexicontent_html::striptagsandcut( $sub->description, $this->params->get(($catid!=$currcatid? 'description_cut_text_subcat' : 'description_cut_text'), 120) ); ?>
+					<?php	echo flexicontent_html::striptagsandcut( $sub->description, (int) $this->params->get(($catid!=$currcatid? 'descr_cut_text_subcat' : 'descr_cut_text'), 120) ); ?>
 				</div>
 				<!-- EOF subcategory description -->
 			<?php endif; ?>
@@ -186,8 +226,13 @@ foreach ($cat_items as $catid => $items) :
 						}
 					}
 					$markup_tags .= '</span>';
+					
+					// MICRODATA document type (itemtype) for each item
+					// -- NOTE: category's microdata itemtype is fallback if the microdata itemtype of the CONTENT TYPE / ITEM are not set
+					$microdata_itemtype = $item->params->get( 'microdata_itemtype') ? $item->params->get( 'microdata_itemtype') : $microdata_itemtype_cat;
+					$microdata_itemtype_code = 'itemscope itemtype="http://schema.org/'.$microdata_itemtype.'"';
 					?>
-					<li id="faqlist_cat_<?php echo $catid; ?>item_<?php echo $i; ?>" class="<?php echo $fc_item_classes; ?>">
+					<li id="faqlist_cat_<?php echo $catid; ?>item_<?php echo $i; ?>" class="<?php echo $fc_item_classes; ?>" <?php echo $microdata_itemtype_code; ?> >
 						
 					  <?php if ($item->event->beforeDisplayContent) : ?>
 					  <!-- BOF beforeDisplayContent -->
@@ -200,11 +245,12 @@ foreach ($cat_items as $catid => $items) :
 					
 						<ul class="flexi-fieldlist">
 				   		<li class="flexi-field flexi-title">
-								<i class="icon-arrow-right"></i>
+								<i class="icon-arrow-right" style="position:absolute; left:0; padding:2px;"></i>
 
-				   			<?php echo @ $item->editbutton; ?>
-				   			<?php echo @ $item->statebutton; ?>
-				   			<?php echo @ $item->approvalbutton; ?>
+								<?php echo @ $item->editbutton; ?>
+								<?php echo @ $item->statebutton; ?>
+								<?php echo @ $item->deletebutton; ?>
+								<?php echo @ $item->approvalbutton; ?>
 								
 								<?php if ($this->params->get('show_comments_count')) : ?>
 									<?php if ( isset($this->comments[ $item->id ]->total) ) : ?>
@@ -216,17 +262,19 @@ foreach ($cat_items as $catid => $items) :
 						
 								<?php if ($this->params->get('show_title', 1)) : ?>
 									<!-- BOF item title -->
+									<span class="fc_item_title" itemprop="name">
 									<?php if ($this->params->get('link_titles', 0)) : ?>
-						   			<a class="fc_item_title" href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, 0, $item)); ?>">
+						   			<a href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, 0, $item)); ?>" itemprop="url">
 											<?php echo $item->title; ?>
 										</a>
 					   			<?php else : ?>
 										<?php echo $item->title; ?>
 									<?php endif; ?>
-									<!-- BOF item title -->
+									</span>
+									<!-- EOF item title -->
 								<?php endif; ?>
 								
-								<div class="clear"></div>
+								<div class="fcclear"></div>
 								<?php echo $markup_tags; ?>
 						
 								<?php if ($item->event->afterDisplayTitle) : ?>

@@ -8,267 +8,311 @@
 	<authorEmail>emmanuel@vistamedia.fr</authorEmail>
 	<authorUrl>www.vistamedia.fr</authorUrl>
 	<version>1.0</version>
+	<documentation url="http://www.flexicontent.org/documentation/faq.html" title="FLEXI_ABOUT" modal="1" icon="info" />
 	<description>FLEXI_FIELD_IMAGE</description>
 	<files>
 		<filename plugin="image">image.php</filename>
 		<filename>index.html</filename>
 		<folder>image</folder>
+		<folder>js</folder>
+		<folder>tmpl</folder>
+		<folder>tmpl_common</folder>
 	</files>
-	
+
 	<config>
 	<fields name="attribs">
-		
-		<fieldset name="standard" repeat="1">
-			<field name="display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
+
+		<!--fieldset name="standard" hidden="true">
+		</fieldset-->
+
+		<fieldset name="group-image-editing" hidden="true" icon_class="icon-pencil" label="FLEXI_FIELD_EDITING" addfieldpath="/administrator/components/com_flexicontent/elements">
+
+			<field name="" type="separator" default="FLEXI_FIELD_EDITING" level="tabset_start" box_type="1" />
+
+			<field name="" type="separator" default="FLEXI_FIELD_VALUES" icon_class="icon-database" level="tab_open" box_type="1" />
+			<field name="" type="separator" default="FLEXI_IMG_JOOMLA_MODE_VALUES_TAB_NOTES" level="level3" depend_class="img-joomla-mode" class="alert alert-warning fcpadded" />
+
+			<field name="use_ingroup" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_USE_IN_FIELD_GROUP" description="FLEXI_USE_IN_FIELD_GROUP_DESC" inline_tip="FLEXI_USE_IN_FIELD_GROUP_INSTRUCTIONS" tip_class="fieldgroupon" tip_img="comments.png" preview_img="insert_merge_field.png" class="btn-group group-fcinfo">
+				<option value="0" show_list="fieldgroupoff" hide_list="fieldgroupon">FLEXI_NO</option>
+				<option value="1" show_list="fieldgroupon" hide_list="fieldgroupoff">FLEXI_YES</option>
 			</field>
-			<field name="show_acc_msg" type="radio" default="0" label="FLEXI_FIELD_SHOW_NOACCESS" description="FLEXI_FIELD_SHOW_NOACCESS_DESC">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
+
+			<field name="" type="separator" default="FLEXI_FIELD_NUMBER_OF_VALUES" description="" depend_class="fieldgroupoff" level="level2" />
+			<field name="" type="separator" default="FLEXI_FIELD_GALLERY_MODE_DESC" depend_class="fieldgroupoff" level="level3" class="alert alert-info fcpadded" />
+
+			<field name="allow_multiple" type="multilist" subtype="radio" default="1" label="FLEXI_FIELD_ALLOW_MULTIPLE" description="FLEXI_FIELD_ALLOW_MULTIPLE_DESC" toggle_related="1" depend_class="fieldgroupoff" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="multivalue-mode">FLEXI_NO</option>
+				<option value="1" show_list="multivalue-mode" hide_list="">FLEXI_YES</option>
 			</field>
-			<field name="no_acc_msg" type="text" default="" label="FLEXI_FIELD_NOACCESS_MSG" description="FLEXI_FIELD_NOACCESS_MSG_DESC"/>
-			<field name="" type="separator" default="The following requires the groupfield and v2.3.0+, do not enable if you do not have this field" level="level2" />
-			<field name="use_ingroup" type="radio" default="0" label="FLEXI_USE_IN_FIELD_GROUP" description="FLEXI_USE_IN_FIELD_GROUP_DESC">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
+			<field name="fields_box_placing" type="radio" default="1" label="FLEXI_FIELD_VALUES_PER_ROW" description="FLEXI_FIELD_VALUES_PER_ROW_DESC" depend_class="fieldgroupoff multivalue-mode" class="btn-group group-fcinfo">
+				<option value="0">1</option>
+				<option value="1">FLEXI_MULTIPLE</option>
 			</field>
-		</fieldset>
-		
-		<fieldset name="group-image-editing" repeat="1" icon_class="icon-pencil" addfieldpath="/administrator/components/com_flexicontent/elements">
-			
-			<field name="" type="separator" default="FLEXI_FIELD_EDITING" level="level0" />
-			
-			<field name="" type="separator" default="FLEXI_FIELD_NUMBER_OF_VALUES" description="" level="level1" />
-			<field name="allow_multiple" type="radio" default="0" label="FLEXI_FIELD_GALLERY_MODE" description="FLEXI_FIELD_GALLERY_MODE_DESC" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			<field name="add_position" type="radio" default="3" label="FLEXI_FIELD_ADD_POSITION" description="FLEXI_FIELD_ADD_POSITION_DESC">
+			<field name="add_position" type="multilist" subtype="radio" default="3" label="FLEXI_FIELD_ADD_POSITION" description="FLEXI_FIELD_ADD_POSITION_DESC" depend_class="fieldgroupoff multivalue-mode" class="btn-group group-fcinfo">
 				<option value="0">FLEXI_FIELD_APPEND_BTN</option>
 				<option value="1">FLEXI_FIELD_INLINE_APPEND_BTN</option>
 				<option value="2">FLEXI_FIELD_INLINE_PREPEND_BTN</option>
 				<option value="3">FLEXI_FIELD_INLINE_BOTH_BTN</option>
 			</field>
-			<field name="max_values" type="text" default="0" size="2" label="FLEXI_FIELD_MAX_VALUES" description="FLEXI_FIELD_MAX_VALUES_DESC" />
+			<field name="max_values" type="text" default="0" size="2" label="FLEXI_FIELD_MAX_VALUES" description="FLEXI_FIELD_MAX_VALUES_DESC" depend_class="fieldgroupoff multivalue-mode" />
 			<field name="required" type="radio" default="0" label="FLEXI_FIELD_REQUIRED" description="FLEXI_FIELD_REQUIRED_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			
-			
-			<field name="" type="separator" default="FLEXI_BASIC_PARAMS_IMAGE_HANDLING_LABEL" description="" level="level1" />
-			<field name="upload_extensions" type="text" default="bmp,gif,jpg,jpeg,png,BMP,GIF,JPG,JPEG,PNG" size="60" label="FLEXI_LEGAL_EXTENSIONS_LABEL" description="FLEXI_LEGAL_EXTENSIONS_DESC" />
+
+
+			<field name="" type="separator" default="FLEXI_BASIC_PARAMS_IMAGE_HANDLING_LABEL" description="" level="level2" />
+			<field name="upload_extensions" type="text" default="bmp,gif,jpg,jpeg,png" size="60" label="FLEXI_ALLOWED_EXTENSIONS" description="FLEXI_ALLOWED_EXTENSIONS_DESC" />
 			<field name="upload_maxsize" type="text" default="10000000" label="FLEXI_MAXIMUM_SIZE_LABEL" description="FLEXI_MAXIMUM_SIZE_DESC" />
 
-
-			<field name="" type="separator" default="FLEXI_VALUE_CREATION_LABEL" level="level1" />
-			<field name="image_source" type="list" default="1" label="FLEXI_FIELD_IMAGE_SOURCE_MODE" description="FLEXI_FIELD_IMAGE_SOURCE_MODE_DESC" >
-				<!--option value="-1">Joomla article images: (intro + full)</option-->
-				<option value="0">FLEXI_FIELD_REUSABLE_DB_MODE</option>
-				<option value="1">FLEXI_FIELD_ITEM_SPECIFIC_FOLDER_MODE</option>
+			<field name="" type="separator" default="FLEXI_FIELD_LINKTO_URL" description="" level="level2" />
+			<field name="" type="separator" default="FLEXI_FIELD_LINKTO_URL_DESC" depend_class="" level="level3" class="alert alert-info fcpadded" />
+			<field name="linkto_url" type="multilist" subtype="radio" default="0" label="FLEXI_ENABLE_PROPERTY" description="" toggle_related="1" class="btn-group group-fcmethod">
+				<option value="0" show_list="img-link-nourl-mode" hide_list="img-link-url-mode">FLEXI_NO</option>
+				<option value="1" show_list="img-link-url-mode" hide_list="img-link-nourl-mode">FLEXI_YES</option>
+			</field>
+			<field name="url_target" type="groupedlist" default="_self" label="FLEXI_FIELD_URL_TARGET" description="FLEXI_FIELD_URL_TARGET_DESC" depend_class="img-link-url-mode" >
+				<option value="_self">FLEXI_FIELD_LINK_SAME_FRM_WIN_TAB</option>
+				<option value="_blank">FLEXI_FIELD_LINK_NEW_WIN_TAB</option>
+				<group label="FLEXI_FIELD_LINK_MODAL_POPUP_WIN">
+					<option value="multibox">FLEXI_FIELD_IMAGE_MULTIBOX_BUILTIN</option>
+					<option value="fancybox">FLEXI_FIELD_IMAGE_FANCYBOX_BUILTIN</option>
+				</group>
 			</field>
 
-			<field name="" type="separator" default="FLEXI_PARAMETERS_BEHAVIOR_FOLDER_MODE" description="FLEXI_PARAMETERS_BEHAVIOR_FOLDER_MODE_DESC" level="level2" />
-			<field name="autoassign" type="radio" default="0" label="FLEXI_FIELD_AUTO_ASSIGN_UPLOADED_IMAGE" description="FLEXI_FIELD_AUTO_ASSIGN_UPLOADED_IMAGE_DESC" class="btn-group btn-group-yesno">
+			<field name="" type="separator" default="FLEXI_FORM_FIELD_CONF" _description="FLEXI_FORM_FIELD_CONF_DESC" icon_class="icon-checkbox-unchecked" level="tab_open" box_type="1" />
+
+			<field name="display_label_form" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_FLOATED_LEFT</option>
+				<option value="2">FLEXI_CLEARED</option>
+			</field>
+			<field name="label_form" type="text" default="" label="FLEXI_LABEL" description="Enter a label to use for item form that is different than field label for viewing" depend_class=""/>
+			<field name="no_acc_msg_form" type="text" default="" label="FLEXI_FIELD_NOACCESS_MSG" description="FLEXI_FIELD_NOACCESS_MSG_DESC" depend_class=""/>
+
+			<field name="" type="separator" default="FLEXI_BUTTONS" description="" level="level2" />
+			<field name="file_btns_position" type="multilist" subtype="radio" default="0" label="FLEXI_FIELD_FILE_BTNS_POSITION" description="FLEXI_FIELD_FILE_BTNS_POSITION_DESC" class="btn-group group-fcinfo">
+				<option value="0">FLEXI_FIELD_INTEGRATED_ICONS</option>
+				<option value="1">FLEXI_FIELD_SEPARATE_ROW_ICONS</option>
+				<option value="2">FLEXI_FIELD_SEPARATE_ROW_ICONS_TEXT</option>
+			</field>
+
+			<field name="" type="separator" default="FLEXI_PREVIEW_THUMBNAILS" description="" level="level2" />
+			<field name="thumb_size_resizer" type="radio" default="2" label="FLEXI_FIELD_THUMB_RESIZER" description="FLEXI_FIELD_THUMB_RESIZER_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_DISABLE</option>
+				<option value="1">FLEXI_DISPLAY_AS_DROP_DOWN</option>
+				<option value="2">FLEXI_DISPLAY_AS_SLIDER</option>
+			</field>
+			<field name="thumb_size_default" type="radio" default="120" label="FLEXI_FIELD_THUMB_SIZE_DEFAULT" description="FLEXI_FIELD_THUMB_SIZE_DEFAULT_DESC" class="btn-group group-fcinfo">
+				<option value="90">90</option>
+				<option value="120">120</option>
+				<option value="150">150</option>
+				<option value="200">200</option>
+				<option value="250">250</option>
+			</field>
+
+			<field name="" type="separator" default="FLEXI_FIELD_IMAGE_SOURCE_MODE" _description="FLEXI_FIELD_IMAGE_SOURCE_MODE_DESC" icon_class="icon-wrench" level="tab_open" box_type="1" />
+
+			<field name="image_source" type="multilist" subtype="list" default="1" toggle_related="1" label="FLEXI_FIELD_IMAGE_SRC_MODE" description="FLEXI_FIELD_IMAGE_SRC_MODE_DESC">
+				<option value="-2" show_list="img-joomla-mode" hide_list="img-joomla-if-mode,img-db-mode,img-fld-mode,img-common-conf,client-resize">Joomla media manager</option>
+				<option value="-1" show_list="img-joomla-mode,img-joomla-if-mode" hide_list="img-db-mode,img-fld-mode,img-common-conf,client-resize">Joomla article images: (intro + full)</option>
+				<option value="0"  show_list="img-db-mode,img-common-conf,client-resize"  hide_list="img-joomla-if-mode,img-fld-mode,img-joomla-mode">FLEXI_FIELD_REUSABLE_DB_MODE</option>
+				<option value="1"  show_list="img-fld-mode,img-common-conf,client-resize" hide_list="img-joomla-if-mode,img-db-mode,img-joomla-mode">FLEXI_FIELD_ITEM_SPECIFIC_FOLDER_MODE</option>
+			</field>
+			<field name="autoassign" type="radio" default="1" label="FLEXI_FIELD_AUTO_INSERT_UPLOADED_IMAGES" description="FLEXI_FIELD_AUTO_INSERT_UPLOADED_IMAGES_DESC" depend_class="img-common-conf" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_UPLOADED_FILE_SELECT_N_ASSIGN</option>
+				<option value="2">FLEXI_UPLOADED_FILE_SELECT_ONLY</option>
+			</field>
+
+			<field name="auto_intro_full" type="radio" default="0" label="FLEXI_IMG_AUTO_IF_SUPPORT" description="FLEXI_IMG_AUTO_IF_SUPPORT_DESC" depend_class="img-common-conf" class="btn-group group-fcmethod fcoffactive" labelclass="">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">Use first image thumbnails</option>
+			</field>
+
+			<field name="" type="separator" default="FLEXI_IMG_JOOMLA_MODE_NOTES" level="level3" depend_class="img-joomla-mode" class="alert alert-info fcpadded" />
+
+			<field name="" type="separator" default="FLEXI_FIELD_IMAGE_THUMBNAIL_IN_VIEWS" level="level3" depend_class="img-joomla-if-mode" class="" />
+			<field name="img-if-for-itemlist" type="radio" default="2" label="FLEXI_ITEM" description="" depend_class="img-joomla-if-mode" class="btn-group group-fcinfo">
+				<option value="1">Intro</option>
+				<option value="2">Full</option>
+			</field>
+			<field name="img-if-for-catlist" type="radio" default="1" label="FLEXI_CATEGORY" description="" depend_class="img-joomla-if-mode" class="btn-group group-fcinfo">
+				<option value="1">Intro</option>
+				<option value="fulltext">Full</option>
+			</field>
+			<field name="img-if-for-modlist" type="radio" default="1" label="FLEXI_MODULE" description="" depend_class="img-joomla-if-mode" class="btn-group group-fcinfo">
+				<option value="1">Intro</option>
+				<option value="2">Full</option>
+			</field>
+
+
+			<field name="" type="separator" default="FLEXI_PARAMETERS_BEHAVIOR_FOLDER_MODE" description="FLEXI_PARAMETERS_BEHAVIOR_FOLDER_MODE_DESC" level="level1" depend_class="img-fld-mode" />
+			<field name="of_usage" type="radio" default="0" label="FLEXI_FIELD_IMAGE_ASSOC_ITEMS_SAME_IMAGES" description="FLEXI_FIELD_IMAGE_ASSOC_ITEMS_SAME_IMAGES_DESC" depend_class="img-fld-mode" class="btn-group group-fcinfo">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="of_usage" type="radio" default="0" label="FLEXI_IMAGE_FOLDER_LOCATION" description="FLEXI_IMAGE_FOLDER_LOCATION_DESC" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_ONE_PER_ITEM</option>
-				<option value="1">FLEXI_USE_ORIGINAL_FOLDER</option>
-			</field>
-			<field name="protect_original" type="radio" default="1" label="FLEXI_FIELD_PROTECT_ORIGINAL" description="FLEXI_FIELD_PROTECT_ORIGINAL_DESC" class="btn-group btn-group-yesno">
+			<field name="protect_original" type="radio" default="1" label="FLEXI_FIELD_PROTECT_ORIGINAL" description="FLEXI_FIELD_PROTECT_ORIGINAL_DESC" depend_class="img-fld-mode" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			
-			<field name="" type="separator" default="FLEXI_PARAMETERS_BEHAVIOR_DB_MODE" description="FLEXI_PARAMETERS_BEHAVIOR_DB_MODE_DESC" level="level2" />
-			<field name="autoupload" type="radio" default="0" label="FLEXI_FIELD_IMAGE_AUTOUPLOAD" description="FLEXI_FIELD_IMAGE_AUTOUPLOAD_DESC" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
+
+			<field name="" type="separator" default="FLEXI_PARAMETERS_BEHAVIOR_DB_MODE" description="FLEXI_PARAMETERS_BEHAVIOR_DB_MODE_DESC" level="level1" depend_class="img-db-mode" />
+			<field name="target_dir" type="multilist" subtype="radio" default="1" toggle_related="1" label="FLEXI_TARGET_DIRECTORY" description="FLEXI_CHOOSE_DIRECTORY_DESC" depend_class="img-db-mode" class="btn-group group-fcinfo"
+				inline_tip="Chaging this, will render previous values not useable" tip_class="about-target-dir-mode" tip_img="warning.png"
+				>
+				<option value="0" show_list="about-target-dir-mode" hide_list="">FLEXI_MEDIA</option>
+				<option value="1" show_list="about-target-dir-mode" hide_list="">FLEXI_SECURE</option>
+			</field>
+			<field name="auto_delete_unused" type="radio" default="1" label="FLEXI_AUTO_DELETE_UNUSED" description="FLEXI_AUTO_DELETE_UNUSED_DESC" depend_class="img-db-mode" class="btn-group group-fcinfo">
+				<option value="0">FLEXI_AUTO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="always_allow_removal" type="radio" default="0" label="FLEXI_ALWAYS_ALLOW_IMAGE_VALUE_REMOVAL" description="FLEXI_ALWAYS_ALLOW_IMAGE_VALUE_REMOVAL_DESC" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
+
+			<field name="" type="separator" default="FLEXI_FIELD_EXISTING_IMAGE_LIST" description="FLEXI_FIELD_EXISTING_IMAGE_LIST_DESC" level="level3" depend_class="img-db-mode" />
+			<field name="list_all_media_files" type="multilist" subtype="radio" default="0" toggle_related="1" label="FLEXI_FIELD_INCLUDE_IMAGES_UPLOADED_FIELD" description="FLEXI_FIELD_INCLUDE_IMAGES_UPLOADED_FIELD_DESC" depend_class="img-db-mode" class="btn-group group-fcinfo">
+				<option value="0" show_list="" hide_list="limit-by-uploader">FLEXI_FIELD_THIS_FIELD</option>
+				<option value="1" show_list="limit-by-uploader" hide_list="">FLEXI_FIELD_ANY_FIELD_OR_FM</option>
 			</field>
-			<field name="" type="separator" default="FLEXI_FIELD_EXISTING_IMAGE_LIST" description="FLEXI_FIELD_EXISTING_IMAGE_LIST_DESC" level="level3" />
-			<field name="imagepickerlimit" type="text" default="200" label="FLEXI_FIELD_IMAGE_GRAPHICAL_PICKER_LIMITATION" description="FLEXI_FIELD_IMAGE_GRAPHICAL_PICKER_LIMITATION_DESC" />
-			<field name="list_all_media_files" type="radio" default="0" label="FLEXI_FIELD_INCLUDE_IMAGES_UPLOADED_FIELD" description="FLEXI_FIELD_INCLUDE_IMAGES_UPLOADED_FIELD_DESC" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_FIELD_THIS_FIELD</option>
-				<option value="1">FLEXI_FIELD_ANY_FIELD_OR_FM</option>
-			</field>
-			<field name="limit_by_uploader" type="radio" default="0" label="FLEXI_FIELD_LIMIT_TO_USER_UPLOADED" description="FLEXI_FIELD_LIMIT_TO_USER_UPLOADED_DESC" class="btn-group btn-group-yesno">
+			<field name="limit_by_uploader" type="radio" default="0" label="FLEXI_FIELD_LIMIT_TO_USER_UPLOADED" description="FLEXI_FIELD_LIMIT_TO_USER_UPLOADED_DESC" depend_class="img-db-mode limit-by-uploader" class="btn-group group-fcinfo">
 				<option value="1">FLEXI_FIELD_CURRENT_USER</option>
 				<option value="0">FLEXI_FIELD_ANY_USER</option>
 			</field>
-			<field name="unique_thumb_method" type="radio" default="0" label="FLEXI_FIELD_UNIQUE_THUMB_METHOD" description="FLEXI_FIELD_UNIQUE_THUMB_METHOD_DESC" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_FIELD_UNIQUE_THUMB_FIELD_ID</option>
-				<option value="1">FLEXI_FIELD_UNIQUE_THUMB_FOLDER</option>
-			</field>
-			
 
-			<field name="" type="separator" default="FLEXI_OPTIONAL_PROPERTIES" description="FLEXI_OPTIONAL_PROPERTIES_DESC" level="level1" />
-			
-			<field name="" type="separator" default="FLEXI_FIELD_LINKTO_URL" description="FLEXI_FIELD_LINKTO_URL_DESC" level="level3" />
-			<field name="linkto_url" type="radio" default="0" label="FLEXI_ENABLE_PROPERTY" description="FLEXI_ENABLE_PROPERTY_DESC" class="btn-group btn-group-yesno">
+			<field name="" type="separator" default="FLEXI_AUTO_RESIZE_ORIGINAL_IMAGES" description="" level="level1" depend_class="client-resize"  />
+			<field name="" type="separator" default="FLEXI_AUTO_RESIZE_ORIGINAL_IMAGES_INFO" description="" level="level3" depend_class="client-resize"  class="alert alert-info fcpadded"/>
+			<field name="resize_on_upload" type="multilist" subtype="radio" default="" label="FLEXI_RESIZE_ON_UPLOADED_IMAGE" description="FLEXI_RESIZE_ON_UPLOADED_IMAGE_DESC" depend_class="client-resize"  class="btn-group btn-group-yesno">
+				<option value="">FLEXI_USE_COMPONENT_SETTING</option>
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="url_target" type="list" default="_self" label="FLEXI_FIELD_URL_TARGET" description="FLEXI_FIELD_URL_TARGET_DESC">
-				<option value="_self">FLEXI_FIELD_SAME_FRM_WIN_TAB</option>
-				<option value="_blank">FLEXI_FIELD_NEW_WIN_TAB</option>
-				<option value="multibox">FLEXI_FIELD_MODAL_POPUP_WIN</option>
+			<field name="upload_max_w" type="text" default="" size="5" label="FLEXI_IMAGE_WIDTH" description="..." depend_class="client-resize"  />
+			<field name="upload_max_h" type="text" default="" size="5" label="FLEXI_IMAGE_HEIGHT" description=".." depend_class="client-resize"  />
+			<field name="upload_method" type="radio" default="" label="FLEXI_PROCESSING_METHOD" description="FLEXI_PROCESSING_METHOD_DESC" depend_class="client-resize" class="btn-group group-fcinfo">
+				<option value="">FLEXI_USE_COMPONENT_SETTING</option>
+				<option value="0">FLEXI_SCALE</option>
+				<option value="1">FLEXI_CROP</option>
 			</field>
-			
+
+			<field name="" type="separator" default="FLEXI_FIELD_MEDIA_URL" _description="..." icon_class="icon-video" level="tab_open" box_type="1" />
+			<field name="use_mediaurl" type="multilist" subtype="radio" default="0" label="FLEXI_ENABLE_PROPERTY" description="FLEXI_ENABLE_PROPERTY_DESC" toggle_related="1" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="img-mediaurl-mode">FLEXI_NO</option>
+				<option value="1" show_list="img-mediaurl-mode" hide_list="">Video URLs (Youtube, Vimeo)</option>
+				<option value="2" show_list="img-mediaurl-mode" hide_list="">Any URL</option>
+			</field>
+			<field name="default_mediaurl" type="text" default="" label="FLEXI_PROPERTY_DEFAULT" description="FLEXI_PROPERTY_DEFAULT_DESC" depend_class="img-mediaurl-mode" />
+			<field name="mediaurl_usage" type="list" default="0" label="FLEXI_OPTIONAL_PROPERTIES_DEFAULT_USAGE" description="FLEXI_OPTIONAL_PROPERTIES_DEFAULT_USAGE_DESC" depend_class="img-mediaurl-mode" >
+				<option value="0">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_NEW</option>
+				<option value="1">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_ALL</option>
+				<option value="2">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_AND_ON_EMPTY</option>
+			</field>
+
+			<field name="" type="separator" default="FLEXI_OPTIONAL_PROPERTIES" _description="FLEXI_OPTIONAL_PROPERTIES_DESC" icon_class="icon-checkmark-circle" level="tab_open" box_type="1" />
+			<field name="" type="separator" default="FLEXI_IMG_JOOMLA_MODE_SETTINGS_NOT_USED_NOTES" level="level3" depend_class="img-joomla-mode" class="alert alert-warning fcpadded" />
+
 			<field name="" type="separator" default="FLEXI_ALTERN_TEXT" level="level3" />
-			<field name="use_alt" type="radio" default="1" label="FLEXI_ENABLE_PROPERTY" description="FLEXI_ENABLE_PROPERTY_DESC" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
+			<field name="use_alt" type="multilist" subtype="radio" default="0" label="FLEXI_ENABLE_PROPERTY" description="FLEXI_ENABLE_PROPERTY_DESC" toggle_related="1" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="img-alt-text-mode">FLEXI_NO</option>
+				<option value="1" show_list="img-alt-text-mode" hide_list="">FLEXI_YES</option>
 			</field>
-			<field name="default_alt" type="text" default="" label="FLEXI_PROPERTY_DEFAULT" description="FLEXI_PROPERTY_DEFAULT_DESC" />
-			<field name="alt_usage" type="list" default="0" label="FLEXI_OPTIONAL_PROPERTIES_DEFAULT_USAGE" description="FLEXI_OPTIONAL_PROPERTIES_DEFAULT_USAGE_DESC">
+			<field name="default_alt" type="text" default="" label="FLEXI_PROPERTY_DEFAULT" description="FLEXI_PROPERTY_DEFAULT_DESC" depend_class="img-alt-text-mode" />
+			<field name="alt_usage" type="list" default="0" label="FLEXI_OPTIONAL_PROPERTIES_DEFAULT_USAGE" description="FLEXI_OPTIONAL_PROPERTIES_DEFAULT_USAGE_DESC" depend_class="img-alt-text-mode" >
 				<option value="0">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_NEW</option>
 				<option value="1">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_ALL</option>
 				<option value="2">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_AND_ON_EMPTY</option>
 			</field>
 
 			<field name="" type="separator" default="FLEXI_TOOLTIP_TITLE" level="level3" />
-			<field name="use_title" type="radio" default="1" label="FLEXI_ENABLE_PROPERTY" description="FLEXI_ENABLE_PROPERTY_DESC" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
+			<field name="use_title" type="multilist" subtype="radio" default="0" label="FLEXI_ENABLE_PROPERTY" description="FLEXI_ENABLE_PROPERTY_DESC" toggle_related="1" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="img-tooltip-title-mode">FLEXI_NO</option>
+				<option value="1" show_list="img-tooltip-title-mode" hide_list="">FLEXI_YES</option>
 			</field>
-			<field name="default_title" type="text" default="" label="FLEXI_PROPERTY_DEFAULT" description="FLEXI_PROPERTY_DEFAULT_DESC" />
-			<field name="title_usage" type="list" default="0" label="FLEXI_OPTIONAL_PROPERTIES_DEFAULT_USAGE" description="FLEXI_OPTIONAL_PROPERTIES_DEFAULT_USAGE_DESC">
+			<field name="default_title" type="text" default="" label="FLEXI_PROPERTY_DEFAULT" description="FLEXI_PROPERTY_DEFAULT_DESC" depend_class="img-tooltip-title-mode" />
+			<field name="title_usage" type="list" default="0" label="FLEXI_OPTIONAL_PROPERTIES_DEFAULT_USAGE" description="FLEXI_OPTIONAL_PROPERTIES_DEFAULT_USAGE_DESC" depend_class="img-tooltip-title-mode">
 				<option value="0">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_NEW</option>
 				<option value="1">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_ALL</option>
 				<option value="2">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_AND_ON_EMPTY</option>
 			</field>
-			
+
 			<field name="" type="separator" default="FLEXI_TOOLTIP_DESCRIPTION" level="level3" />
-			<field name="use_desc" type="radio" default="1" label="FLEXI_ENABLE_PROPERTY" description="FLEXI_ENABLE_PROPERTY_DESC" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
+			<field name="use_desc" type="multilist" subtype="radio" default="1" label="FLEXI_ENABLE_PROPERTY" description="FLEXI_ENABLE_PROPERTY_DESC" toggle_related="1" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="img-tooltip-desc-mode">FLEXI_NO</option>
+				<option value="1" show_list="img-tooltip-desc-mode" hide_list="">FLEXI_YES</option>
 			</field>
-			<field name="default_desc" type="text" default="" label="FLEXI_PROPERTY_DEFAULT" description="FLEXI_PROPERTY_DEFAULT_DESC" />
-			<field name="text_desc" type="list" default="0" label="FLEXI_OPTIONAL_PROPERTIES_DEFAULT_USAGE" description="FLEXI_OPTIONAL_PROPERTIES_DEFAULT_USAGE_DESC">
+			<field name="default_desc" type="text" default="" label="FLEXI_PROPERTY_DEFAULT" description="FLEXI_PROPERTY_DEFAULT_DESC" depend_class="img-tooltip-desc-mode" />
+			<field name="text_desc" type="list" default="0" label="FLEXI_OPTIONAL_PROPERTIES_DEFAULT_USAGE" description="FLEXI_OPTIONAL_PROPERTIES_DEFAULT_USAGE_DESC" depend_class="img-tooltip-desc-mode">
 				<option value="0">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_NEW</option>
 				<option value="1">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_ALL</option>
 				<option value="2">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_AND_ON_EMPTY</option>
 			</field>
-			
+
 			<field name="" type="separator" default="CUSTOM 1" description="Custom value. NOTE, that you need to add a language string for 'FLEXI_FIELD_IMG_CUSTOM...'" level="level3" />
-			<field name="use_cust1" type="radio" default="0" label="FLEXI_ENABLE_PROPERTY" description="FLEXI_ENABLE_PROPERTY_DESC" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
+			<field name="use_cust1" type="multilist" subtype="radio" default="0" label="FLEXI_ENABLE_PROPERTY" description="FLEXI_ENABLE_PROPERTY_DESC" toggle_related="1" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="img-custom1-mode">FLEXI_NO</option>
+				<option value="1" show_list="img-custom1-mode" hide_list="">FLEXI_YES</option>
 			</field>
-			<field name="default_cust1" type="text" default="" label="FLEXI_PROPERTY_DEFAULT" description="FLEXI_PROPERTY_DEFAULT_DESC" />
-			<field name="cust1_usage" type="list" default="0" label="FLEXI_OPTIONAL_PROPERTIES_DEFAULT_USAGE" description="FLEXI_OPTIONAL_PROPERTIES_DEFAULT_USAGE_DESC">
+			<field name="default_cust1" type="text" default="" label="FLEXI_PROPERTY_DEFAULT" description="FLEXI_PROPERTY_DEFAULT_DESC" depend_class="img-custom1-mode" />
+			<field name="cust1_usage" type="list" default="0" label="FLEXI_OPTIONAL_PROPERTIES_DEFAULT_USAGE" description="FLEXI_OPTIONAL_PROPERTIES_DEFAULT_USAGE_DESC" depend_class="img-custom1-mode">
 				<option value="0">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_NEW</option>
 				<option value="1">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_ALL</option>
 				<option value="2">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_AND_ON_EMPTY</option>
 			</field>
-			
+
 			<field name="" type="separator" default="CUSTOM 2" description="Custom value. NOTE, that you need to add a language string for 'FLEXI_FIELD_IMG_CUSTOM...'" level="level3" />
-			<field name="use_cust2" type="radio" default="0" label="FLEXI_ENABLE_PROPERTY" description="FLEXI_ENABLE_PROPERTY_DESC" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
+			<field name="use_cust2" type="multilist" subtype="radio" default="0" label="FLEXI_ENABLE_PROPERTY" description="FLEXI_ENABLE_PROPERTY_DESC" toggle_related="1" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="img-custom2-mode">FLEXI_NO</option>
+				<option value="1" show_list="img-custom2-mode" hide_list="">FLEXI_YES</option>
 			</field>
-			<field name="default_cust2" type="text" default="" label="FLEXI_PROPERTY_DEFAULT" description="FLEXI_PROPERTY_DEFAULT_DESC" />
-			<field name="cust2_usage" type="list" default="0" label="FLEXI_OPTIONAL_PROPERTIES_DEFAULT_USAGE" description="FLEXI_OPTIONAL_PROPERTIES_DEFAULT_USAGE_DESC">
+			<field name="default_cust2" type="text" default="" label="FLEXI_PROPERTY_DEFAULT" description="FLEXI_PROPERTY_DEFAULT_DESC" depend_class="img-custom2-mode"/>
+			<field name="cust2_usage" type="list" default="0" label="FLEXI_OPTIONAL_PROPERTIES_DEFAULT_USAGE" description="FLEXI_OPTIONAL_PROPERTIES_DEFAULT_USAGE_DESC" depend_class="img-custom2-mode">
 				<option value="0">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_NEW</option>
 				<option value="1">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_ALL</option>
 				<option value="2">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_AND_ON_EMPTY</option>
 			</field>
 
+			<field name="" type="separator" default="FLEXI_FIELD_EDITING" level="tabset_close" box_type="1" />
+		</fieldset>
+		<fieldset name="group-image-viewing" hidden="true" icon_class="icon-screen" label="FLEXI_FIELD_VIEWING" addfieldpath="/administrator/components/com_flexicontent/elements">
 
-			<field name="" type="separator" default="FLEXI_FIELD_VIEWING" level="level0" />
-			
-			<field name="" type="separator" default="FLEXI_DISPLAY_PARAMETERS" level="level1" />
-			<field name="default_method_cat" type="list" default="display_single_total" label="Category view &lt;br/&gt; (item listings)" description="Default display method for the view" class="btn-group btn-group-yesno">
-				<option value="display">All thumbs</option>
-				<option value="display_single">Single image</option>
-				<option value="display_single_total">Single image + total count</option>
-			</field>
-			<field name="default_method_item" type="list" default="display" label="Item view" description="Default display method for the view" class="btn-group btn-group-yesno">
-				<option value="display">All thumbs</option>
-				<option value="display_single">Single image</option>
-				<option value="display_single_total">Single image + total count</option>
-			</field>
-			
-			<field name="" type="separator" default="FLEXI_IMGFIELD_THUMBNAILS_LIST" level="level3" />
-			<field name="usepopup" type="radio" default="1" label="FLEXI_FIELD_IMAGE_THUBMNAILS_ADD_JS_GALLERY" description="FLEXI_FIELD_IMAGE_THUBMNAILS_ADD_JS_GALLERY_DESC" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			<field name="popupinview" type="fccheckbox" default=""
-				checkoptions="FLEXI_ITEMS,FLEXI_CATEGORY,FLEXI_MODULE,FLEXI_BACKEND" checkvals="item,category,module,backend" defaultvals="item,category,module,backend"
-				label="FLEXI_FIELD_ENABLE_IN_VIEWS" description="FLEXI_FIELD_ENABLE_IN_VIEWS_DESC" />
-			<field name="popuptype" type="list" default="4" label="FLEXI_FIELD_IMAGE_GALLERY_LAYOUT" description="FLEXI_FIELD_IMAGE_GALLERY_LAYOUT_DESC">
-				<option value="1">FLEXI_FIELD_IMAGE_MULTIBOX_BUILTIN</option>
-				<option value="2">FLEXI_FIELD_IMAGE_ROKBOX_NEEDS_ROCKETTHEME</option>
-				<option value="3">FLEXI_FIELD_IMAGE_JCEMEDIABOX_NEEDS_JCE</option>
-				<option value="4">FLEXI_FIELD_IMAGE_FANCYBOX_BUILTIN</option>
-				<option value="5">FLEXI_FIELD_IMAGE_GALLERIFFIC_BUILTIN</option>
-				<option value="6">FLEXI_FIELD_IMAGE_WIDGETKIT</option>
-				<option value="7">FLEXI_FIELD_IMAGE_ELASTISLIDE</option>
-				<option value="8">FLEXI_FIELD_IMAGE_PHOTOSWIPE</option>
-			</field>
-			<field name="popuptype_mobile" type="list" default="" label="FLEXI_FIELD_IMAGE_GALLERY_LAYOUT_MOBILE" description="FLEXI_FIELD_IMAGE_GALLERY_LAYOUT_MOBILE_DESC">
-				<option value="">FLEXI_FIELD_IMAGE_SAME_AS_DESKTOP</option>
-				<option value="1">FLEXI_FIELD_IMAGE_MULTIBOX_BUILTIN</option>
-				<option value="2">FLEXI_FIELD_IMAGE_ROKBOX_NEEDS_ROCKETTHEME</option>
-				<option value="3">FLEXI_FIELD_IMAGE_JCEMEDIABOX_NEEDS_JCE</option>
-				<option value="4">FLEXI_FIELD_IMAGE_FANCYBOX_BUILTIN</option>
-				<option value="5">FLEXI_FIELD_IMAGE_GALLERIFFIC_BUILTIN</option>
-				<option value="6">FLEXI_FIELD_IMAGE_WIDGETKIT</option>
-				<option value="7">FLEXI_FIELD_IMAGE_ELASTISLIDE</option>
-				<option value="8">FLEXI_FIELD_IMAGE_PHOTOSWIPE</option>
-			</field>
-			<field name="grouptype" type="list" default="1" label="FLEXI_FIELD_GROUP_WITH_OTHER_IMAGE_FIELDS" description="FLEXI_FIELD_GROUP_WITH_OTHER_IMAGE_FIELDS_DESC">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_FIELD_GROUP_PER_ITEM</option>
-				<option value="2">FLEXI_FIELD_GROUP_PER_VIEW</option>
-			</field>
-			
-			<field name="" type="separator" default="FLEXI_IMGFIELD_THUMBNAILS" level="level3" />
-			<field name="thumbincatview" type="list" default="1" label="FLEXI_FIELD_THUMB_IN_CAT" description="FLEXI_FIELD_THUMB_IN_CAT_DESC">
-				<option value="1">FLEXI_SMALL</option>
-				<option value="2">FLEXI_MEDIUM</option>
-				<option value="3">FLEXI_LARGE</option>
-				<option value="4">FLEXI_ORIGINAL</option>
-			</field>
-			<field name="thumbinitemview" type="list" default="2" label="FLEXI_FIELD_THUMB_IN_ITEM" description="FLEXI_FIELD_THUMB_IN_ITEM_DESC">
-				<option value="1">FLEXI_SMALL</option>
-				<option value="2">FLEXI_MEDIUM</option>
-				<option value="3">FLEXI_LARGE</option>
-				<option value="4">FLEXI_ORIGINAL</option>
-			</field>
-			
-			<field name="" type="separator" default="FLEXI_IMGFIELD_INFORMATION" level="level3" />
-			<field name="showtitle" type="radio" default="0" label="FLEXI_FIELD_SHOW_TITLE" description="FLEXI_FIELD_SHOW_TITLE_DESC" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			<field name="showdesc" type="radio" default="0" label="FLEXI_FIELD_SHOW_LONGDESC" description="FLEXI_FIELD_SHOW_LONGDESC_DESC" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			
-			<field name="" type="separator" default="FLEXI_IMGFIELD_HOVERING_LEGEND" level="level3" />
-			<field name="uselegend" type="radio" default="1" label="FLEXI_FIELD_IMAGE_USE_LEGEND" description="FLEXI_FIELD_IMAGE_USE_LEGEND_DESC" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			<field name="legendinview" type="fccheckbox" default=""
-				checkoptions="FLEXI_ITEMS,FLEXI_CATEGORY,FLEXI_MODULE,FLEXI_BACKEND" checkvals="item,category,module,backend" defaultvals="item,category,module,backend"
-				label="FLEXI_FIELD_ENABLE_IN_VIEWS" description="FLEXI_FIELD_ENABLE_IN_VIEWS_DESC" />
+			<field name="" type="separator" default="FLEXI_FIELD_VIEWING" level="tabset_start" box_type="1" />
+			<field name="" type="separator" default="FLEXI_BASIC" icon_class="icon-vcard" level="tab_open" box_type="1" />
 
+			<field name="" type="separator" default="FLEXI_DISPLAY" level="level2" />
+			<field name="show_in_clients" type="fccheckbox" default=""
+				checkoptions="FLEXI_DESKTOP,FLEXI_TABLET,FLEXI_MOBILE" checkvals="desktop,tablet,mobile" defaultvals="desktop,tablet,mobile"
+				label="FLEXI_FIELD_SHOW_IN_CLIENTS" description="FLEXI_FIELD_SHOW_IN_CLIENTS_DESC" depend_class="use_js_lib" />
+			<field name="show_in_views" type="fccheckbox" default=""
+				checkoptions="FLEXI_ITEM,FLEXI_ITEM_LISTS,FLEXI_MODULE,FLEXI_BACKEND" checkvals="item,category,module,backend" defaultvals="item,category,module,backend"
+				label="FLEXI_FIELD_SHOW_IN_VIEWS" description="FLEXI_FIELD_SHOW_IN_VIEWS_DESC" />
+
+			<field name="" type="separator" default="FLEXI_FIELD_LABEL_AND_ACCESS" level="level2" />
+
+			<field name="display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="show_acc_msg" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_FIELD_SHOW_NOACCESS" description="FLEXI_FIELD_SHOW_NOACCESS_DESC" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="field-acc-msg">FLEXI_NO</option>
+				<option value="1" show_list="field-acc-msg" hide_list="">FLEXI_YES</option>
+			</field>
+			<field name="no_acc_msg" type="text" default="" label="FLEXI_FIELD_NOACCESS_MSG" description="FLEXI_FIELD_NOACCESS_MSG_DESC" depend_class="field-acc-msg"/>
+
+			<field name="" type="separator" default="FLEXI_EXPORT" level="level2" />
+			<field name="include_in_csv_export" type="radio" default="0" label="FLEXI_FIELD_INCLUDE_IN_CSV_EXPORT" description="FLEXI_FIELD_INCLUDE_IN_CSV_EXPORT_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+
+			<field name="" type="separator" default="FLEXI_THUMBNAILS" icon_class="icon-image" level="tab_open" box_type="1" />
 
 			<field name="" type="separator" default="FLEXI_IMGFIELD_THUMBNAIL_CREATION" description="FLEXI_IMGFIELD_THUMBNAIL_CREATION_DESC" level="level1" />
-			
+
 			<field name="default_image" type="media" default="" size="60" label="FLEXI_FIELD_DEFAULT_IMAGE" description="FLEXI_FIELD_DEFAULT_IMAGE_DESC" />
 			<field name="dir" type="text" default="images/stories/flexicontent" size="60" label="FLEXI_FIELD_IMAGE_FOLDER" description="FLEXI_FIELD_IMAGE_FOLDER_DESC" />
+			<field name="unique_thumb_method" type="radio" default="0" label="FLEXI_FIELD_UNIQUE_THUMB_METHOD" description="FLEXI_FIELD_UNIQUE_THUMB_METHOD_DESC" depend_class="img-db-mode" class="btn-group group-fcinfo">
+				<option value="0">FLEXI_FIELD_UNIQUE_THUMB_FIELD_ID</option>
+				<option value="1">FLEXI_FIELD_UNIQUE_THUMB_FOLDER_SET_ABOVE</option>
+			</field>
 			<field name="quality" type="text" default="90" size="4" label="FLEXI_FIELD_IMAGE_QUALITY" description="FLEXI_FIELD_IMAGE_QUALITY_DESC" />
 			<field name="wm_opacity" type="text" default="100" size="4" label="FLEXI_FIELD_IMAGE_WM_TRANS" description="FLEXI_FIELD_IMAGE_WM_TRANS_DESC" />
 			<field name="wm_position" type="list" default="BR" label="FLEXI_FIELD_IMAGE_WM_POS" description="FLEXI_FIELD_IMAGE_WM_POS_DESC">
@@ -281,19 +325,19 @@
 				<option value="B">FLEXI_FIELD_BOTTOM_CENTER</option>
 				<option value="BR">FLEXI_FIELD_BOTTOM_RIGHT</option>
 			</field>
-			
+
 			<field name="" type="separator" default="FLEXI_LARGE_IMAGES" description="FLEXI_LARGE_IMAGES_DESC" level="level2" />
 			<field name="w_l" type="text" default="800" size="4" label="FLEXI_FIELD_IMAGE_WIDTH" description="FLEXI_FIELD_IMAGE_WIDTH_DESC" />
 			<field name="h_l" type="text" default="600" size="4" label="FLEXI_FIELD_IMAGE_HEIGHT" description="FLEXI_FIELD_IMAGE_HEIGHT_DESC" />
-			<field name="method_l" type="radio" default="0" label="FLEXI_FIELD_IMAGE_METHOD" description="FLEXI_FIELD_IMAGE_METHOD_DESC" class="btn-group btn-group-yesno">
+			<field name="method_l" type="radio" default="0" label="FLEXI_PROCESSING_METHOD" description="FLEXI_PROCESSING_METHOD_DESC" class="btn-group group-fcinfo">
 				<option value="0">FLEXI_SCALE</option>
 				<option value="1">FLEXI_CROP</option>
 			</field>
-			<field name="use_watermark_l" type="radio" default="1" label="FLEXI_FIELD_IMAGE_USE_WM" description="FLEXI_FIELD_IMAGE_USE_WM_DESC" class="btn-group btn-group-yesno">
+			<field name="use_watermark_l" type="radio" default="0" label="FLEXI_FIELD_IMAGE_USE_WM" description="FLEXI_FIELD_IMAGE_USE_WM_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="wm_l" type="text" default="plugins/flexicontent_fields/image/watermarks/wm_l.png" size="60" label="FLEXI_FIELD_IMAGE_WM" description="FLEXI_FIELD_IMAGE_WM_DESC" />
+			<field name="wm_l" type="text" default="plugins/flexicontent_fields/image/image/watermarks/wm_l.png" size="60" label="FLEXI_FIELD_IMAGE_WM" description="FLEXI_FIELD_IMAGE_WM_DESC" />
 			<field name="copy_original_l" type="radio" default="1" label="FLEXI_COPY_ORIGINAL" description="FLEXI_COPY_ORIGINAL_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -303,15 +347,15 @@
 			<field name="" type="separator" default="FLEXI_MEDIUM_IMAGES" description="FLEXI_MEDIUM_IMAGES_DESC" level="level2" />
 			<field name="w_m" type="text" default="400" size="4" label="FLEXI_FIELD_IMAGE_WIDTH" description="FLEXI_FIELD_IMAGE_WIDTH_DESC" />
 			<field name="h_m" type="text" default="300" size="4" label="FLEXI_FIELD_IMAGE_HEIGHT" description="FLEXI_FIELD_IMAGE_HEIGHT_DESC" />
-			<field name="method_m" type="radio" default="0" label="FLEXI_FIELD_IMAGE_METHOD" description="FLEXI_FIELD_IMAGE_METHOD_DESC" class="btn-group btn-group-yesno">
+			<field name="method_m" type="radio" default="0" label="FLEXI_PROCESSING_METHOD" description="FLEXI_PROCESSING_METHOD_DESC" class="btn-group group-fcinfo">
 				<option value="0">FLEXI_SCALE</option>
 				<option value="1">FLEXI_CROP</option>
 			</field>
-			<field name="use_watermark_m" type="radio" default="1" label="FLEXI_FIELD_IMAGE_USE_WM" description="FLEXI_FIELD_IMAGE_USE_WM_DESC" class="btn-group btn-group-yesno">
+			<field name="use_watermark_m" type="radio" default="0" label="FLEXI_FIELD_IMAGE_USE_WM" description="FLEXI_FIELD_IMAGE_USE_WM_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="wm_m" type="text" default="plugins/flexicontent_fields/image/watermarks/wm_m.png" size="60" label="FLEXI_FIELD_IMAGE_WM" description="FLEXI_FIELD_IMAGE_WM_DESC" />
+			<field name="wm_m" type="text" default="plugins/flexicontent_fields/image/image/watermarks/wm_m.png" size="60" label="FLEXI_FIELD_IMAGE_WM" description="FLEXI_FIELD_IMAGE_WM_DESC" />
 			<field name="copy_original_m" type="radio" default="1" label="FLEXI_COPY_ORIGINAL" description="FLEXI_COPY_ORIGINAL_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -321,15 +365,15 @@
 			<field name="" type="separator" default="FLEXI_SMALL_IMAGES" description="FLEXI_SMALL_IMAGES_DESC" level="level2" />
 			<field name="w_s" type="text" default="120" size="4" label="FLEXI_FIELD_IMAGE_WIDTH" description="FLEXI_FIELD_IMAGE_WIDTH_DESC" />
 			<field name="h_s" type="text" default="90" size="4" label="FLEXI_FIELD_IMAGE_HEIGHT" description="FLEXI_FIELD_IMAGE_HEIGHT_DESC" />
-			<field name="method_s" type="radio" default="1" label="FLEXI_FIELD_IMAGE_METHOD" description="FLEXI_FIELD_IMAGE_METHOD_DESC" class="btn-group btn-group-yesno">
+			<field name="method_s" type="radio" default="1" label="FLEXI_PROCESSING_METHOD" description="FLEXI_PROCESSING_METHOD_DESC" class="btn-group group-fcinfo">
 				<option value="0">FLEXI_SCALE</option>
 				<option value="1">FLEXI_CROP</option>
 			</field>
-			<field name="use_watermark_s" type="radio" default="1" label="FLEXI_FIELD_IMAGE_USE_WM" description="FLEXI_FIELD_IMAGE_USE_WM_DESC" class="btn-group btn-group-yesno">
+			<field name="use_watermark_s" type="radio" default="0" label="FLEXI_FIELD_IMAGE_USE_WM" description="FLEXI_FIELD_IMAGE_USE_WM_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="wm_s" type="text" default="plugins/flexicontent_fields/image/watermarks/wm_s.png" size="60" label="FLEXI_FIELD_IMAGE_WM" description="FLEXI_FIELD_IMAGE_WM_DESC" />
+			<field name="wm_s" type="text" default="plugins/flexicontent_fields/image/image/watermarks/wm_s.png" size="60" label="FLEXI_FIELD_IMAGE_WM" description="FLEXI_FIELD_IMAGE_WM_DESC" />
 			<field name="copy_original_s" type="radio" default="1" label="FLEXI_COPY_ORIGINAL" description="FLEXI_COPY_ORIGINAL_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -337,32 +381,42 @@
 			</field>
 
 			<field name="" type="separator" default="FLEXI_BACKEND_IMAGES" description="FLEXI_BACKEND_IMAGES_DESC" level="level2" />
+			<field name="" type="separator" default="FLEXI_IMAGE_FIELD_USAGE_ITEMS_MAN" level="level3" class="alert alert-info fcpadded" />
+			<field name="" type="separator" default="FLEXI_IMAGE_FIELD_USAGE_ITEM_FORM" level="level3" class="alert alert-info fcpadded" />
+
 			<field name="w_b" type="text" default="40" size="4" label="FLEXI_FIELD_IMAGE_WIDTH" description="FLEXI_FIELD_IMAGE_WIDTH_DESC" />
 			<field name="h_b" type="text" default="30" size="4" label="FLEXI_FIELD_IMAGE_HEIGHT" description="FLEXI_FIELD_IMAGE_HEIGHT_DESC" />
-			<field name="method_b" type="radio" default="1" label="FLEXI_FIELD_IMAGE_METHOD" description="FLEXI_FIELD_IMAGE_METHOD_DESC" class="btn-group btn-group-yesno">
+			<field name="method_b" type="radio" default="1" label="FLEXI_PROCESSING_METHOD" description="FLEXI_PROCESSING_METHOD_DESC" class="btn-group group-fcinfo">
 				<option value="0">FLEXI_SCALE</option>
 				<option value="1">FLEXI_CROP</option>
 			</field>
-			<field name="use_watermark_b" type="radio" default="1" label="FLEXI_FIELD_IMAGE_USE_WM" description="FLEXI_FIELD_IMAGE_USE_WM_DESC" class="btn-group btn-group-yesno">
+			<field name="use_watermark_b" type="radio" default="0" label="FLEXI_FIELD_IMAGE_USE_WM" description="FLEXI_FIELD_IMAGE_USE_WM_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="wm_b" type="text" default="plugins/flexicontent_fields/image/watermarks/wm_s.png" size="60" label="FLEXI_FIELD_IMAGE_WM" description="FLEXI_FIELD_IMAGE_WM_DESC" />
+			<field name="wm_b" type="text" default="plugins/flexicontent_fields/image/image/watermarks/wm_s.png" size="60" label="FLEXI_FIELD_IMAGE_WM" description="FLEXI_FIELD_IMAGE_WM_DESC" />
 			<field name="copy_original_b" type="radio" default="1" label="FLEXI_COPY_ORIGINAL" description="FLEXI_COPY_ORIGINAL_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 				<option value="2">FLEXI_YES_REGARDLESS_SETTINGS</option>
 			</field>
 
-
 			<field name="" type="separator" default="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL" description="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL_DESC_FIELD" level="level1" />
+			<field name="prx_sfx_open_close_configs" type="multilist" subtype="list" default="" label="FLEXI_PRESET_CONFIGURATIONS" description="FLEXI_PRESET_CONFIGURATIONS_DESC" toggle_related="1">
+				<option value=""  fcreadonly="{'opentag':0,'closetag':0,'pretext':0,'posttext':0,'separatorf':0,'remove_space':0}" >FLEXI_CUSTOMIZE</option>
+				<option value="1" fcreadonly="{'opentag':1,'closetag':1,'pretext':1,'posttext':1,'separatorf':1,'remove_space':1}" fcconfigs="{'opentag':'&lt;ol&gt;','closetag':'&lt;/ol&gt;','pretext':'&lt;li&gt;','posttext':'&lt;/li&gt;','separatorf':'5','remove_space':'0'}">List: numbered</option>
+				<option value="2" fcreadonly="{'opentag':1,'closetag':1,'pretext':1,'posttext':1,'separatorf':1,'remove_space':1}" fcconfigs="{'opentag':'&lt;ul style=\'list-style-type:disc\'&gt;','closetag':'&lt;/ul&gt;','pretext':'&lt;li&gt;','posttext':'&lt;/li&gt;','separatorf':'5','remove_space':'0'}">List (bullets)</option>
+				<option value="3" fcreadonly="{'opentag':1,'closetag':1,'pretext':1,'posttext':1,'separatorf':1,'remove_space':1}" fcconfigs="{'opentag':'&lt;ul style=\'list-style-type:circle\'&gt;','closetag':'&lt;/ul&gt;','pretext':'&lt;li&gt;','posttext':'&lt;/li&gt;','separatorf':'5','remove_space':'0'}">List (circle)</option>
+				<option value="4" fcreadonly="{'opentag':1,'closetag':1,'pretext':1,'posttext':1,'separatorf':1,'remove_space':1}" fcconfigs="{'opentag':'&lt;ul style=\'list-style-type:square\'&gt;','closetag':'&lt;/ul&gt;','pretext':'&lt;li&gt;','posttext':'&lt;/li&gt;','separatorf':'5','remove_space':'0'}">List (square)</option>
+				<option value="5" fcreadonly="{'opentag':1,'closetag':1,'pretext':1,'posttext':1,'separatorf':1,'remove_space':1}" fcconfigs="{'opentag':'&lt;ul style=\'list-style-type:none\'&gt;','closetag':'&lt;/ul&gt;','pretext':'&lt;li&gt;','posttext':'&lt;/li&gt;','separatorf':'5','remove_space':'0'}">List (no marking)</option>
+			</field>
 			<field name="remove_space" type="radio" default="0" label="FLEXI_REMOVE_SPACE" description="FLEXI_REMOVE_SPACE_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="" type="separator" default="Not applied in inline (non-popup) galleries like:  Elastislide / Galleriffic" level="level4" />
-			<field name="pretext" type="text" default="" label="FLEXI_FIELD_VALUE_PREFIX_TEXT" description="FLEXI_FIELD_VALUE_PREFIX_TEXT_DESC" />
-			<field name="posttext" type="text" default="" label="FLEXI_FIELD_VALUE_SUFFIX_TEXT" description="FLEXI_FIELD_VALUE_SUFFIX_TEXT_DESC" />
+			<field name="" type="separator" default="Not applied in inline (non-popup) galleries like:  Elastislide / Galleriffic" level="level4" class="alert alert-info fcpadded" />
+			<field name="pretext" type="text" default="" filter="raw" label="FLEXI_FIELD_VALUE_PREFIX_TEXT" description="FLEXI_FIELD_VALUE_PREFIX_TEXT_DESC" />
+			<field name="posttext" type="text" default="" filter="raw" label="FLEXI_FIELD_VALUE_SUFFIX_TEXT" description="FLEXI_FIELD_VALUE_SUFFIX_TEXT_DESC" />
 			<field name="separatorf" type="list" default="0" label="FLEXI_VALUE_SEPARATOR_FRONTEND_VIEWS" description="FLEXI_VALUE_SEPARATOR_FRONTEND_VIEWS_DESC">
 				<option value="0">FLEXI_SPACE</option>
 				<option value="1">FLEXI_LINE_BREAK</option>
@@ -371,36 +425,185 @@
 				<option value="4">FLEXI_CLOSE_OPEN_TEXTS_AS_SEP</option>
 				<option value="5">FLEXI_NOCHAR_EMPTY_SEPARATOR</option>
 			</field>
-			<field name="opentag" type="text" default="" label="FLEXI_FIELD_OPENING_TEXT" description="FLEXI_FIELD_OPENING_TEXT_DESC" />
-			<field name="closetag" type="text" default="" label="FLEXI_FIELD_CLOSING_TEXT" description="FLEXI_FIELD_CLOSING_TEXT_DESC" />
-			
-			<field name="" type="separator" default="FLEXI_SOCIAL_SUPPORT" description="FLEXI_SOCIAL_SUPPORT_IMG_DESC" level="level1" />
-			<field name="useogp" type="radio" default="0" label="FLEXI_SOCIAL_SUGGEST_FIELD" description="FLEXI_SOCIAL_SUGGEST_IMG_DESC" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
+			<field name="opentag" type="text" default="" filter="raw" label="FLEXI_FIELD_OPENING_TEXT" description="FLEXI_FIELD_OPENING_TEXT_DESC" />
+			<field name="closetag" type="text" default="" filter="raw" label="FLEXI_FIELD_CLOSING_TEXT" description="FLEXI_FIELD_CLOSING_TEXT_DESC" />
+
+
+			<field name="" type="separator" default="FLEXI_LAYOUT" icon_class="icon-palette" level="tab_open" box_type="1" />
+
+			<field name="" type="separator" default="FLEXI_ITEM_VIEW" level="level2" />
+			<field name="default_method_item" type="multilist" subtype="radio" default="display" label="FLEXI_FIELD_IMAGE_ITEM_VIEW_DISPLAY_METHOD" description="FLEXI_FIELD_IMAGE_ITEM_VIEW_DISPLAY_METHOD_DESC"
+				inline_tip="Single Thumb, will only allow popup galleries" tip_class="" tip_img="comments.png" class="btn-group group-fcinfo">
+				<option value="display">All thumbnails</option>
+				<option value="display_single">Single</option>
+				<option value="display_single_total">Single + total</option>
 			</field>
-			<field name="ogpinview" type="fccheckbox" default=""
-				checkoptions="FLEXI_ITEMS,FLEXI_CATEGORY,FLEXI_MODULE" checkvals="item,category,module" defaultvals="item"
-				label="FLEXI_FIELD_ENABLE_IN_VIEWS" description="FLEXI_FIELD_ENABLE_IN_VIEWS_DESC" />
-			<field name="ogpthumbsize" type="list" default="2" label="FLEXI_SOCIAL_IMG_SIZE_IN_LISTING" description="FLEXI_SOCIAL_IMG_SIZE_IN_LISTING_DESC">
-				<option value="1">FLEXI_SMALL_NOT_RECOMMENDED</option>
+
+			<field name="" type="separator" default="FLEXI_FIELD_IMAGE_CAT_CONTENT_LISTS" level="level2" />
+			<field name="default_method_cat" type="multilist" subtype="radio" default="display_single" label="FLEXI_FIELD_IMAGE_CAT_VIEW_DISPLAY_METHOD" description="FLEXI_FIELD_IMAGE_CAT_VIEW_DISPLAY_METHOD_DESC"
+					inline_tip="Single Thumb, will optionally link to the item details view, and will not add gallery JS" tip_class="" tip_img="comments.png" toggle_related="1" class="btn-group group-fcinfo">
+				<option value="display" show_list="" hide_list="single_mode_cat">All thumbnails</option>
+				<option value="display_single" show_list="single_mode_cat" hide_list="">Single</option>
+				<option value="display_single_total" show_list="single_mode_cat" hide_list="">Single + total</option>
+				<option value="display_link" show_list="" hide_list="single_mode_cat" force_list="cat_view_link_to_item">All thumbnails, link to item</option>
+			</field>
+			<field name="cat_link_single_to" type="multilist" subtype="radio" default="1" label="FLEXI_FIELD_IMAGE_SINGLE_MODE_LINK_TO_ITEM" description="FLEXI_FIELD_IMAGE_SINGLE_MODE_LINK_TO_ITEM_DESC"
+					inline_tip="Single Thumb, will link to the item details view, instead of linking to a gallery" tip_class="" tip_img="comments.png" toggle_related="1" depend_class="single_mode_cat" class="btn-group group-fcinfo">
+				<option value="0" show_list="" hide_list="cat_view_link_to_item">FLEXI_NO</option>
+				<option value="1" show_list="cat_view_link_to_item" hide_list="">FLEXI_YES</option>
+			</field>
+
+			<field name="" type="separator" default="FLEXI_FIELD_IMAGE_GALLERY_NAVIGATION" level="level2" depend_class="use_js_lib" />
+
+			<field name="usepopup_disabled_link_to_url" type="separator" label="" default="Gallery navigation JS has been disabled in ITEM &amp; CATEGORY view, because parameter 'Link to URL' was enabled" description="" class="alert fcpadded" depend_class="img-link-url-mode" />
+			<field name="usepopup_disabled_link_to_item" type="separator" label="" default="Gallery navigation JS has been disabled in CATEGORY view, because parameter 'Link to item' was enabled" description="" class="alert fcpadded" depend_class="cat_view_link_to_item single_mode_cat" />
+
+			<field name="usepopup" type="multilist" subtype="radio" default="1" toggle_related="1" label="Gallery" description="FLEXI_FIELD_IMAGE_THUBMNAILS_ADD_JS_GALLERY_DESC" class="btn-group btn-group-yesno" depend_class="">
+				<option value="0" show_list="" hide_list="use_js_lib">FLEXI_FIELD_IMAGE_THUMBNAIL_ONLY</option>
+				<option value="1" show_list="use_js_lib" hide_list="">FLEXI_YES</option>
+			</field>
+
+			<field name="popupinview" type="fccheckbox" default=""
+				checkoptions="FLEXI_ITEM,FLEXI_ITEM_LISTS,FLEXI_MODULE,FLEXI_BACKEND" checkvals="item,category,module,backend" defaultvals="item,category,module,backend"
+				label="FLEXI_FIELD_ENABLE_IN_VIEWS" description="FLEXI_FIELD_ENABLE_IN_VIEWS_DESC" depend_class="use_js_lib" />
+
+			<field name="grouptype" type="radio" default="1" label="FLEXI_FIELD_GROUP_THUMBS_WITH_OTHER_IMAGE_FIELDS" description="FLEXI_FIELD_GROUP_THUMBS_WITH_OTHER_IMAGE_FIELDS_DESC" class="btn-group btn-group-yesno" depend_class="use_js_lib" >
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_FIELD_GROUP_PER_ITEM</option>
+				<option value="2">FLEXI_FIELD_GROUP_PER_VIEW</option>
+			</field>
+
+			<field name="" type="separator" default="Layout" level="level3" />
+
+			<field name="popuptype" type="fclayout" default="4" label="FLEXI_FIELD_IMAGE_GALLERY_LAYOUT" description="FLEXI_FIELD_IMAGE_GALLERY_LAYOUT_DESC" depend_class="use_js_lib"
+				directory="/plugins/flexicontent_fields/image/tmpl"
+				ext_name="image"
+				hide_default="1" hide_none="1"
+				stripext="1" stripprefix="value_" filter="^value_.*\.php$"
+				tmpl_container="tabset_attrs_1_nav_4" params_source="file" custom_layouts_label="Custom layouts" layout_label="FLEXI_DESKTOP" icon_class="icon-screen"
+			>
+				<group label="Popup layouts">
+					<option filename="value_gallery_multibox" value="1">FLEXI_FIELD_IMAGE_MULTIBOX_BUILTIN</option>
+					<option filename="value_gallery_rokbox" value="2">FLEXI_FIELD_IMAGE_ROKBOX_NEEDS_ROCKETTHEME</option>
+					<option filename="value_gallery_jce_mediabox" value="3">FLEXI_FIELD_IMAGE_JCEMEDIABOX_NEEDS_JCE</option>
+					<option filename="value_gallery_fancybox" value="4">FLEXI_FIELD_IMAGE_FANCYBOX_BUILTIN</option>
+					<option filename="value_gallery_widgetkit" value="6">FLEXI_FIELD_IMAGE_WIDGETKIT</option>
+					<option filename="value_gallery_photoswipe" value="8">FLEXI_FIELD_IMAGE_PHOTOSWIPE</option>
+				</group>
+
+				<group label="Inline layouts">
+					<!--option filename="value_gallery_galleriffic" value="5">FLEXI_FIELD_IMAGE_GALLERIFFIC_BUILTIN</option-->
+					<!--option filename="value_gallery_elastislide" value="7">FLEXI_FIELD_IMAGE_ELASTISLIDE</option-->
+					<option filename="value_gallery_galleriffic" value="5">Galleriffic (Slideshow + carousel) (Built-in)</option>
+					<option filename="value_gallery_elastislide" value="7">Elastislide (Slideshow + carousel) (Built-in)</option>
+				</group>
+
+				<group label="Enable via parameters">
+					<option filename="value_link_to_url" value="value_link_to_url" disable="1">FLEXI_FIELD_LINKTO_URL</option>
+					<option filename="value_link_to_item" value="value_link_to_item" disable="1">FLEXI_FIELD_IMAGE_SINGLE_MODE_LINK_TO_ITEM</option>
+					<option filename="value_thumbnail_basic" value="value_thumbnail_basic" disable="1">FLEXI_FIELD_IMAGE_THUMBNAIL_ONLY</option>
+				</group>
+			</field>
+
+			<field name="popuptype_mobile" type="fclayout" default="" label="FLEXI_FIELD_IMAGE_GALLERY_LAYOUT_MOBILE" description="FLEXI_FIELD_IMAGE_GALLERY_LAYOUT_MOBILE_DESC" depend_class="use_js_lib"
+				directory="/plugins/flexicontent_fields/image/tmpl"
+				ext_name="image"
+				hide_default="0" hide_none="1" use_default_label="FLEXI_USE_DESKTOP"
+				stripext="1" stripprefix="value_" filter="^value_.*\.php$"
+				tmpl_container="tabset_attrs_1_nav_5" params_source="file" custom_layouts_label="Custom layouts" layout_label="FLEXI_MOBILE" icon_class="icon-mobile"
+			>
+				<group label="Popup layouts">
+					<option filename="value_gallery_multibox" value="1">FLEXI_FIELD_IMAGE_MULTIBOX_BUILTIN</option>
+					<option filename="value_gallery_rokbox" value="2">FLEXI_FIELD_IMAGE_ROKBOX_NEEDS_ROCKETTHEME</option>
+					<option filename="value_gallery_jce_mediabox" value="3">FLEXI_FIELD_IMAGE_JCEMEDIABOX_NEEDS_JCE</option>
+					<option filename="value_gallery_fancybox" value="4">FLEXI_FIELD_IMAGE_FANCYBOX_BUILTIN</option>
+					<option filename="value_gallery_widgetkit" value="6">FLEXI_FIELD_IMAGE_WIDGETKIT</option>
+					<option filename="value_gallery_photoswipe" value="8">FLEXI_FIELD_IMAGE_PHOTOSWIPE</option>
+				</group>
+
+				<group label="Inline layouts">
+					<option filename="value_gallery_galleriffic" value="5">FLEXI_FIELD_IMAGE_GALLERIFFIC_BUILTIN</option>
+					<!--option filename="value_gallery_elastislide" value="7">FLEXI_FIELD_IMAGE_ELASTISLIDE</option-->
+					<option filename="value_gallery_elastislide" value="7">Elastislide (Slideshow + carousel) (Built-in)</option>
+				</group>
+
+				<group label="Enable via parameters">
+					<option filename="value_link_to_url" value="value_link_to_url" disable="1">FLEXI_FIELD_LINKTO_URL</option>
+					<option filename="value_link_to_item" value="value_link_to_item" disable="1">FLEXI_FIELD_IMAGE_SINGLE_MODE_LINK_TO_ITEM</option>
+					<option filename="value_thumbnail_basic" value="value_thumbnail_basic" disable="1">FLEXI_FIELD_IMAGE_THUMBNAIL_ONLY</option>
+				</group>
+			</field>
+
+			<field name="" type="separator" default="FLEXI_IMGFIELD_THUMBNAILS" level="level2" />
+			<field name="thumbincatview" type="radio" default="1" label="FLEXI_FIELD_THUMB_IN_CAT" description="FLEXI_FIELD_THUMB_IN_CAT_DESC" class="btn-group group-fcinfo">
+				<option value="1">FLEXI_SMALL</option>
+				<option value="2">FLEXI_MEDIUM</option>
+				<option value="3">FLEXI_LARGE</option>
+				<option value="4">FLEXI_ORIGINAL</option>
+			</field>
+			<field name="thumbinitemview" type="radio" default="2" label="FLEXI_FIELD_THUMB_IN_ITEM" description="FLEXI_FIELD_THUMB_IN_ITEM_DESC" class="btn-group group-fcinfo">
+				<option value="1">FLEXI_SMALL</option>
 				<option value="2">FLEXI_MEDIUM</option>
 				<option value="3">FLEXI_LARGE</option>
 				<option value="4">FLEXI_ORIGINAL</option>
 			</field>
 
+			<field name="" type="separator" default="FLEXI_IMGFIELD_INFORMATION" level="level2" />
+			<field name="showtitle" type="radio" default="0" label="FLEXI_FIELD_SHOW_TITLE" description="FLEXI_FIELD_SHOW_TITLE_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="showdesc" type="radio" default="0" label="FLEXI_FIELD_SHOW_LONGDESC" description="FLEXI_FIELD_SHOW_LONGDESC_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
 
-			<field name="" type="separator" default="FLEXI_FILTERING_CONF" description="FLEXI_FILTERING_CONF_DESC" level="level0" />
-			
-			<field name="" type="separator" default="FLEXI_ADVANCED_SEARCH_VIEW" level="level2" />
-			<field name="display_filter_as_s" type="list" default="0" label="FLEXI_DISPLAY_FILTER_AS" description="FLEXI_DISPLAY_FILTER_AS_DESC">
+			<field name="" type="separator" default="FLEXI_IMGFIELD_HOVERING_LEGEND" level="level2" />
+			<field name="uselegend" type="radio" default="1" label="FLEXI_FIELD_IMAGE_USE_LEGEND" description="FLEXI_FIELD_IMAGE_USE_LEGEND_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="legendinview" type="fccheckbox" default=""
+				checkoptions="FLEXI_ITEM,FLEXI_ITEM_LISTS,FLEXI_MODULE,FLEXI_BACKEND" checkvals="item,category,module,backend" defaultvals="item,category,module,backend"
+				label="FLEXI_FIELD_ENABLE_IN_VIEWS" description="FLEXI_FIELD_ENABLE_IN_VIEWS_DESC" />
+
+
+			<field name="" type="separator" default="FLEXI_PARAMETERS" icon_class="icon-screen" level="tab_open" box_type="1" />
+			<field name="" type="separator" default="FLEXI_PARAMETERS" icon_class="icon-mobile" level="tab_open" box_type="1" />
+
+			<field name="" type="separator" default="FLEXI_FIELD_VIEWING" level="tabset_close" box_type="1" />
+		</fieldset>
+		<fieldset name="group-image-social" hidden="true" icon_class="icon-users" label="FLEXI_SOCIAL" addfieldpath="/administrator/components/com_flexicontent/elements">
+
+			<field name="" type="separator" default="FLEXI_SOCIAL_SUPPORT" description="FLEXI_SOCIAL_SUPPORT_IMG_DESC" level="level1" />
+			<field name="useogp" type="multilist" subtype="radio" default="0" label="FLEXI_SOCIAL_SUGGEST_FIELD" description="FLEXI_SOCIAL_SUGGEST_IMG_DESC" toggle_related="1" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="social-mode">FLEXI_NO</option>
+				<option value="1" show_list="social-mode" hide_list="">FLEXI_YES</option>
+			</field>
+			<field name="ogpthumbsize" type="list" default="2" label="FLEXI_SOCIAL_IMG_SIZE_IN_LISTING" depend_class="social-mode" description="FLEXI_SOCIAL_IMG_SIZE_IN_LISTING_DESC">
+				<option value="1">FLEXI_SMALL_NOT_RECOMMENDED</option>
+				<option value="2">FLEXI_MEDIUM</option>
+				<option value="3">FLEXI_LARGE</option>
+				<option value="4">FLEXI_ORIGINAL</option>
+			</field>
+			<field name="ogplimit" type="radio" default="1" label="FLEXI_SOCIAL_SUGGEST_IMG_LIMIT" depend_class="social-mode" description="FLEXI_SOCIAL_SUGGEST_IMG_LIMIT_DESC" class="btn-group group-fcinfo">
+				<option value="0">FLEXI_ALL</option>
+				<option value="1">FLEXI_SOCIAL_IMG_FIRST_ONLY</option>
+			</field>
+
+		</fieldset>
+		<fieldset name="group-image-filtering" hidden="true" icon_class="icon-filter" label="FLEXI_FILTERING_CONF" description="FLEXI_FILTERING_CONF_DESC" addfieldpath="/administrator/components/com_flexicontent/elements">
+
+			<field name="" type="separator" default="FLEXI_ADVANCED_SEARCH_VIEW" level="level1" />
+			<field name="display_filter_as_s" type="list" default="0" label="FLEXI_DISPLAY_FILTER_AS" description="FLEXI_DISPLAY_FILTER_AS_DESC" class="use_select2_lib">
 				<option value="1">FLEXI_DISPLAY_AS_TEXT_SEARCH</option>
 			</field>
-			
+
 		</fieldset>
+
 	</fields>
 	</config>
-	
+
 	<languages>
 		<language tag="en-GB">en-GB.plg_flexicontent_fields_image.ini</language>
 	</languages>

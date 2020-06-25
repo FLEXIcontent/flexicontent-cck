@@ -18,10 +18,13 @@
 
 // Check to ensure this file is included in Joomla!
 defined('_JEXEC') or die('Restricted access');
-if (FLEXI_J16GE) {
-	jimport('joomla.html.html');
-	jimport('joomla.form.formfield');
-}
+
+jimport('cms.html.html');      // JHtml
+jimport('cms.html.select');    // JHtmlSelect
+jimport('joomla.form.field');  // JFormField
+
+//jimport('joomla.form.helper'); // JFormHelper
+//JFormHelper::loadFieldClass('...');   // JFormField...
 
 /**
  * Renders an alphaindex element
@@ -51,35 +54,32 @@ class JFormFieldAlphaindex extends JFormField
 	function getInput()
 	{
 		$doc  = JFactory::getDocument();
-		$db   = JFactory::getDBO();
-		if (FLEXI_J16GE) {
-			$node = & $this->element;
-			$attributes = get_object_vars($node->attributes());
-			$attributes = $attributes['@attributes'];
-		} else {
-			$attributes = & $node->_attributes;
-		}
-		
+		$db   = JFactory::getDbo();
+
+		$node = & $this->element;
+		$attributes = get_object_vars($node->attributes());
+		$attributes = $attributes['@attributes'];
+
 		$options = array();
 		$i=-1;
-		if (@$attributes['use_global']) {
-			$options[++$i] = new stdClass();
-			$options[$i]->text=JTEXT::_("FLEXI_USE_GLOBAL"); $options[$i]->value='';
+		if (@ $attributes['use_global'])
+		{
+			$options[++$i] = new stdClass(); $options[$i]->text=JTEXT::_("FLEXI_USE_GLOBAL"); $options[$i]->value='';
 		}
 		$options[++$i] = new stdClass(); $options[$i]->text=JTEXT::_("FLEXI_HIDE"); $options[$i]->value=0;
 		$options[++$i] = new stdClass(); $options[$i]->text=JTEXT::_("FLEXI_SHOW_ALPHA_USE_LANG_DEFAULT"); $options[$i]->value=1;
 		$options[++$i] = new stdClass(); $options[$i]->text=JTEXT::_("FLEXI_SHOW_ALPHA_USE_CUSTOM_CHARS"); $options[$i]->value=2;
 		
-		$value  = FLEXI_J16GE ? $this->value : $value;
+		$value = $this->value;
 		
-		$fieldname	= FLEXI_J16GE ? $this->name : $control_name.'['.$name.']';
-		$element_id = FLEXI_J16GE ? $this->id : $control_name.$name;
-		$element_name = FLEXI_J16GE ? $this->fieldname : $name;
+		$fieldname  = $this->name;
+		$element_id = $this->id;
+		$element_name = $this->fieldname;
 		
 		$attribs = ' class="inputbox" onchange="updatealphafields(this.value);" ';
 		
 		$js = "
-		window.addEvent( 'domready', function()
+		document.addEventListener('DOMContentLoaded', function()
 		{
 			updatealphafields(".$value.");
 		});
@@ -101,7 +101,6 @@ class JFormFieldAlphaindex extends JFormField
 
 		$doc->addScriptDeclaration($js);
 		
-		return JHTML::_('select.genericlist', $options, $fieldname, $attribs, 'value', 'text', $value, $element_id);
+		return JHtml::_('select.genericlist', $options, $fieldname, $attribs, 'value', 'text', $value, $element_id);
 	}
 }
-?>

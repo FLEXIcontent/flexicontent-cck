@@ -34,10 +34,6 @@
 			</field>
 			<field name="personalized_limit" type="text" default="50" label="FLEXI_SUBSCRIBER_LIMIT" description="FLEXI_SUBSCRIBER_LIMIT_DESC" />
 			<field name="" type="separator" default="FLEXI_CUSTOMIZATIONS_PER_EMAIL" description="..." level="level3" />
-			<field name="autologin" type="radio" default="1" label="FLEXI_AUTOLOGIN_IN_URL" description="FLEXI_AUTOLOGIN_IN_URL_DESC">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
 			<field name="include_fullname" type="radio" default="1" label="FLEXI_INCLUDE_FULLNAME" description="FLEXI_INCLUDE_FULLNAME_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>

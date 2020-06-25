@@ -1,32 +1,21 @@
 <?php
 /**
- * @version 1.5 stable $Id: stats.php 171 2010-03-20 00:44:02Z emmanuel.danan $
- * @package Joomla
- * @subpackage FLEXIcontent
- * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
- * @license GNU/GPL v2
- * 
- * FLEXIcontent is a derivative work of the excellent QuickFAQ component
- * @copyright (C) 2008 Christoph Lukes
- * see www.schlu.net for more information
+ * @package         FLEXIcontent
+ * @version         3.3
  *
- * FLEXIcontent is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
+ * @link            https://flexicontent.org
+ * @copyright       Copyright © 2018, FLEXIcontent team, All Rights Reserved
+ * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
-// no direct access
 defined('_JEXEC') or die('Restricted access');
 
-jimport('joomla.application.component.model');
+jimport('legacy.model.legacy');
 
 /**
  * FLEXIcontent Component stats Model
  *
- * @package Joomla
- * @subpackage FLEXIcontent
- * @since		1.0
  */
 class FlexicontentModelStats extends JModelLegacy
 {
@@ -36,15 +25,16 @@ class FlexicontentModelStats extends JModelLegacy
 	 * @var object
 	 */
 	var $_rating_resolution = null;
-	
+
 	/**
-	* Constructor
-	*
-	* @since 1.0
-	*/
-	function __construct()
+	 * Constructor
+	 *
+	 * @since 3.3.0
+	 */
+	public function __construct($config = array())
 	{
-		parent::__construct();
+		parent::__construct($config);
+
 		$this->getRatingResolution();
 	}
 
@@ -57,8 +47,7 @@ class FlexicontentModelStats extends JModelLegacy
 	function getGeneralstats()
 	{
 		$_items = array();
-		
-		
+
 		// Get total nr of items
 		$query = 'SELECT count(i.id)'
 			. ' FROM #__content as i'
@@ -67,8 +56,8 @@ class FlexicontentModelStats extends JModelLegacy
 			;
 		$this->_db->SetQuery($query);
 		$_items[] = $this->_db->loadResult();
-		
-		
+
+
 		// Get nr of all categories
 		$query = 'SELECT count(id)'
 			. ' FROM #__categories as c'
@@ -76,14 +65,14 @@ class FlexicontentModelStats extends JModelLegacy
 			;
 		$this->_db->SetQuery($query);
 		$_items[] = $this->_db->loadResult();
-		
-		
+
+
 		// Get nr of all tags
 		$query = 'SELECT count(id) FROM #__flexicontent_tags';
 		$this->_db->SetQuery($query);
 		$_items[] = $this->_db->loadResult();
-		
-		
+
+
 		// Get nr of all files
 		$query = 'SELECT count(id) FROM #__flexicontent_files';
 		$this->_db->SetQuery($query);
@@ -95,14 +84,10 @@ class FlexicontentModelStats extends JModelLegacy
 		$_items[] = $this->_db->loadResult();
 
 		// Get nr of authors
-		$query = 'SELECT a.id AS value, a.title AS text, COUNT(DISTINCT b.id) AS level' .
-					' FROM #__usergroups AS a' .
-					' LEFT JOIN '.$this->_db->quoteName('#__usergroups').' AS b ON a.lft > b.lft AND a.rgt < b.rgt' .
-					' GROUP BY a.id, a.title, a.lft, a.rgt' .
-					' ORDER BY a.lft ASC';
+		$query = 'SELECT COUNT(id) FROM #__users';
 		$this->_db->SetQuery($query);
 		$_items[] = $this->_db->loadResult();
-		
+
 
 		// Get nr of templates
 		$query = 'SELECT count(DISTINCT template) FROM #__flexicontent_templates';
@@ -113,11 +98,11 @@ class FlexicontentModelStats extends JModelLegacy
 		$query = 'SELECT count(id) FROM #__flexicontent_fields';
 		$this->_db->SetQuery($query);
 		$_items[] = $this->_db->loadResult();
-		
+
 		return $_items;
 	}
-	
-	
+
+
 	/**
 	* Method to get items counts per month
 	*
@@ -139,7 +124,7 @@ class FlexicontentModelStats extends JModelLegacy
 				WHERE i.created > DATE_SUB(NOW(), INTERVAL 120 MONTH)
 				GROUP BY DATE_FORMAT(i.created, "%Y-%m")
 
-				';	
+				';
 		$this->_db->SetQuery($query);
 		$_items[] = $this->_db->loadObjectList();
 
@@ -251,12 +236,12 @@ class FlexicontentModelStats extends JModelLegacy
 	 */
 	function getCreators()
 	{
-		$query = 'SELECT COUNT(*) AS counter, i.created_by AS id, u.name, u.username'
+		$query = 'SELECT COUNT(*) AS counter, i.created_by AS id, ua.name, ua.username'
 			. ' FROM #__content AS i'
 			. ' JOIN #__categories as c ON i.catid=c.id'
-			. ' LEFT JOIN #__users AS u ON u.id = i.created_by'
+			. ' LEFT JOIN #__users AS ua ON ua.id = i.created_by'
 			. ' WHERE c.extension="'.FLEXI_CAT_EXTENSION.'" AND c.lft >= ' . $this->_db->Quote(FLEXI_LFT_CATEGORY) . ' AND c.rgt<=' . $this->_db->Quote(FLEXI_RGT_CATEGORY)
-			. ' GROUP BY u.name'
+			. ' GROUP BY ua.name'
 			. ' ORDER BY counter DESC'
 			. ' LIMIT 5'
 			;
@@ -275,13 +260,13 @@ class FlexicontentModelStats extends JModelLegacy
 	 */
 	function getEditors()
 	{
-		$query = 'SELECT COUNT(*) AS counter, i.modified_by AS id, u.name, u.username'
+		$query = 'SELECT COUNT(*) AS counter, i.modified_by AS id, ua.name, ua.username'
 			. ' FROM #__content AS i'
 			. ' JOIN #__categories as c ON i.catid=c.id'
-			. ' LEFT JOIN #__users AS u ON u.id = i.modified_by'
+			. ' LEFT JOIN #__users AS ua ON ua.id = i.modified_by'
 			. ' WHERE c.extension="'.FLEXI_CAT_EXTENSION.'" AND i.modified_by > 0'
 			. ' AND c.lft >= ' . $this->_db->Quote(FLEXI_LFT_CATEGORY) . ' AND c.rgt<=' . $this->_db->Quote(FLEXI_RGT_CATEGORY)
-			. ' GROUP BY u.name'
+			. ' GROUP BY ua.name'
 			. ' ORDER BY counter DESC'
 			. ' LIMIT 5'
 			;
@@ -347,19 +332,28 @@ class FlexicontentModelStats extends JModelLegacy
 		$collect['progress'] = 0;
 
 		//count each states
-		foreach ($states AS $state) {
-			if ($state->state == 1) {
-				$collect['published']++;
-			} elseif($state->state == 0) {
-				$collect['unpublished']++;
-			} elseif($state->state == -1) {
-				$collect['archived']++;
-			} elseif($state->state == -3) {
-				$collect['pending']++;
-			} elseif($state->state == -4) {
-				$collect['open']++;
-			} elseif($state->state == -5) {
-				$collect['progress']++;
+		foreach ($states AS $state)
+		{
+			switch ($state->state)
+			{
+				case 1:
+					$collect['published']++;
+					break;
+				case 0:
+					$collect['unpublished']++;
+					break;
+				case -1:
+					$collect['archived']++;
+					break;
+				case -3:
+					$collect['pending']++;
+					break;
+				case -4:
+					$collect['open']++;
+					break;
+				case -5:
+					$collect['progress']++;
+					break;
 			}
 		}
 
@@ -367,31 +361,41 @@ class FlexicontentModelStats extends JModelLegacy
 		$val = array();
 		$lab = array();
 		$i = 0;
-		foreach ($collect as $key => $proz) {
-
-			if ($proz == 0) {
+		foreach ($collect as $key => $proz)
+		{
+			if ($proz == 0)
+			{
 				unset($collect[$key]);
 				continue;
 			}
+
 			$val[] = round($proz / $total * 100);
 
-			if ( $key == 'published' ) {
-				$lab[] = JText::_( 'FLEXI_PUBLISHED' ).' '.$val[$i].' %';
-			} else if ( $key == 'unpublished' ) {
-				$lab[] = JText::_( 'FLEXI_UNPUBLISHED' ).' '.$val[$i].' %';
-			} else if ( $key == 'archived' ) {
-				$lab[] = JText::_( 'FLEXI_ARCHIVED' ).' '.$val[$i].' %';
-			} else if ( $key == 'pending' ) {
-				$lab[] = JText::_( 'FLEXI_PENDING' ).' '.$val[$i].' %';
-			} else if ( $key == 'open' ) {
-				$lab[] = JText::_( 'FLEXI_TO_WRITE' ).' '.$val[$i].' %';
-			} else if ( $key == 'progress' ) {
-				$lab[] = JText::_( 'FLEXI_IN_PROGRESS' ).' '.$val[$i].' %';
+			switch ($key)
+			{
+				case 'published':
+					$lab[] = JText::_( 'FLEXI_PUBLISHED' ).' '.$val[$i].' %';
+					break;
+				case 'unpublished':
+					$lab[] = JText::_( 'FLEXI_UNPUBLISHED' ).' '.$val[$i].' %';
+					break;
+				case 'archived':
+					$lab[] = JText::_( 'FLEXI_ARCHIVED' ).' '.$val[$i].' %';
+					break;
+				case 'pending':
+					$lab[] = JText::_( 'FLEXI_PENDING' ).' '.$val[$i].' %';
+					break;
+				case 'open':
+					$lab[] = JText::_( 'FLEXI_TO_WRITE' ).' '.$val[$i].' %';
+					break;
+				case 'progress':
+					$lab[] = JText::_( 'FLEXI_IN_PROGRESS' ).' '.$val[$i].' %';
+					break;
 			}
 			$i++;
 		}
 
-		$collect['values'] = implode( ',', $val );
+		$collect['values'] = implode(',', $val);
 		$collect['labels'] = implode('|', $lab);
 
 		return $collect;
@@ -438,7 +442,7 @@ class FlexicontentModelStats extends JModelLegacy
 
 			//$percentage = round(($vote->rating_sum / $vote->rating_count) * 20);
 			$percentage	= round((($vote->rating_sum / $vote->rating_count) * (100 / $this->_rating_resolution)), 2);
-			
+
 			if ($percentage > 0 && $percentage < 20) {
 				$collect['020']++;
 			} elseif($percentage >= 20 && $percentage < 40) {
@@ -465,18 +469,26 @@ class FlexicontentModelStats extends JModelLegacy
 			$val[]	= $value;
 			$proz	= round($value / $total * 100);
 
-			if ( $key == '020' ) {
-				$lab[] = JText::_( 'FLEXI_VOTES_BEETWEEN_020' ).' '.$proz.' % ('.$val[$i].')';
-			} else if ( $key == '040' ) {
-				$lab[] = JText::_( 'FLEXI_VOTES_BEETWEEN_040' ).' '.$proz.' % ('.$val[$i].')';
-			} else if ( $key == '060' ) {
-				$lab[] = JText::_( 'FLEXI_VOTES_BEETWEEN_060' ).' '.$proz.' % ('.$val[$i].')';
-			} else if ( $key == '080' ) {
-				$lab[] = JText::_( 'FLEXI_VOTES_BEETWEEN_080' ).' '.$proz.' % ('.$val[$i].')';
-			} else if ( $key == '100' ) {
-				$lab[] = JText::_( 'FLEXI_VOTES_BEETWEEN_100' ).' '.$proz.' % ('.$val[$i].')';
-			} else if ( $key == 'novotes' ) {
-				$lab[] = JText::_( 'FLEXI_NOVOTES' ).' '.$proz.' % ('.$val[$i].')';
+			switch ($key)
+			{
+				case '020':
+					$lab[] = JText::_( 'FLEXI_VOTES_BEETWEEN_020' ).' '.$proz.' % ('.$val[$i].')';
+					break;
+				case '040':
+					$lab[] = JText::_( 'FLEXI_VOTES_BEETWEEN_040' ).' '.$proz.' % ('.$val[$i].')';
+					break;
+				case '060':
+					$lab[] = JText::_( 'FLEXI_VOTES_BEETWEEN_060' ).' '.$proz.' % ('.$val[$i].')';
+					break;
+				case '080':
+					$lab[] = JText::_( 'FLEXI_VOTES_BEETWEEN_080' ).' '.$proz.' % ('.$val[$i].')';
+					break;
+				case '100':
+					$lab[] = JText::_( 'FLEXI_VOTES_BEETWEEN_100' ).' '.$proz.' % ('.$val[$i].')';
+					break;
+				case 'novotes':
+					$lab[] = JText::_( 'FLEXI_NOVOTES' ).' '.$proz.' % ('.$val[$i].')';
+					break;
 			}
 
 			$i++;
@@ -490,8 +502,11 @@ class FlexicontentModelStats extends JModelLegacy
 
 	function getRatingResolution()
 	{
-		if ($this->_rating_resolution) return $this->_rating_resolution;
-		
+		if ($this->_rating_resolution)
+		{
+			return $this->_rating_resolution;
+		}
+
 		$this->_db->setQuery('SELECT * FROM #__flexicontent_fields WHERE field_type="voting"');
 		$field = $this->_db->loadObject();
 		$item = JTable::getInstance( $type = 'flexicontent_items', $prefix = '', $config = array() );

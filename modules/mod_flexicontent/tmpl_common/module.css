@@ -1,21 +1,28 @@
 
 /* MODULE STYLING EXTERNAL CONTAINER */
 .mod_flexicontent_wrapper {
+	box-sizing: border-box;
 	overflow: hidden;
 	position: relative;
 	top: 0;
 	left: 0;
+	margin:0 0 24px 0;
+}
+
+/* All elements */
+.mod_flexicontent_wrapper * {
+	box-sizing: border-box;
 }
 
 /* ITEM (AND OTHER DATA) SEPARATOR */
 .mod_flexicontent_wrapper .modclear {
 	display:block;  float:none;  clear:both;
-	width:100%;  overflow:hidden;  height:4px;  line-height:0px;
+	width:100%;  overflow:hidden;  height:0px;  line-height:0px;
 	border-width:0px;  margin:0px;
 }
 
 /* ORDERING GROUPs SEPERATOR */
-.mod_flexicontent_wrapper ordering_seperator {
+.mod_flexicontent_wrapper ordering_separator {
 	display:block;  float:none;  clear:both;
 	width:100%;  overflow:hidden;  height:0px;  line-height:0px;
 	border-width:1px 0px 0px 0px;  border:dashed #dddddd;  margin:8px 12px 12px 8px;
@@ -23,33 +30,34 @@
 
 /* ORDERING GROUPs TITLE */
 .mod_flexicontent_wrapper .order_group_title {
-	display:block; float:none; clear:both;
-	width:56%; margin: 4px 20%;
-	border:dashed gray;	border-width:2px;
-	color:darkred; font-weight:bold;
-	text-align:center; text-transform:uppercase;
+ color: #d04764;
+ font-family: 'Lobster', cursive;
+ font-size: 36px;
+ font-weight: normal;
+ line-height: 48px;
+ margin: 0 0 18px;
+ text-shadow: 1px 0 0 #fff;
 }
 
 
 
 /* THE (OPTIONAL) CURRENT CATEGORY INFORMATION */
 .mod_flexicontent_wrapper .catdata {   /* external container */
-	border-bottom: 1px dashed darkgray;
-	margin: 0px 0px 6px 0px;
+	margin: 0px 0px 0px 0px;
 }
 
 .mod_flexicontent_wrapper .catdata .cattitle {  /* the category title */
-	padding:1px 16px 1px 16px;  margin:2px 0px 8px 0px;  border:1px dashed #bbbbbb;
-	background-color:#dddddd; color:black;
-	font-size:12px;  font-weight:bold;  text-align:left;
+	padding: 1px 8px 1px 10px;
+	margin: 2px 0px 8px 0px;
+	font-size: 16px;
+	background: #d0d0d0;
+	border-radius: 3px;
 }
 .mod_flexicontent_wrapper .catdata.fccat_active .cattitle,  /* title of active category */
 .mod_flexicontent_wrapper .catdata.fcitemcat_active .cattitle {  /* title of category of active item */
-	background-color:#aaa; 
 	color:darkred;
 }
 .mod_flexicontent_wrapper .catdata .cattitle:hover {  /* the category title hover */
-	border: 1px dashed #444444;
 }
 .mod_flexicontent_wrapper .catdata .cattitle a.cattitle_link {  /* the link to category title */
 	background-color: transparent; color: black;
@@ -57,7 +65,6 @@
 }
 .mod_flexicontent_wrapper .catdata.fccat_active .cattitle a.cattitle_link,        /* the link of active category */
 .mod_flexicontent_wrapper .catdata.fcitemcat_active .cattitle a.cattitle_link {   /* the link of category of active item */
-	background-color:#aaa; 
 	color: darkred;
 }
 .mod_flexicontent_wrapper .catdata .cattitle:hover a.cattitle_link,
@@ -89,19 +96,19 @@
 	float:left;
 	font-weight:normal;
 	
-	background: url("../tmpl/news/images/readmore.png") transparent no-repeat scroll 0px 2px;
-	border:solid gray;
-	border-width:0px 0px;
+	background: url("../tmpl/news/images/readmore.png") transparent no-repeat scroll 0px 3px;
+	border:solid transparent;
+	border-width:1px 0px;
 	padding: 1px 6px 1px 20px;
 	margin: 0px 0px 3px 4px;
 }
 
 .mod_flexicontent_wrapper .cat_readon:hover,
 .mod_flexicontent_wrapper .module_readon:hover { /* style of external container of link */
-	background: url("../tmpl/news/images/readmore.png") lightgray no-repeat scroll 0px 1px;
+	background: url("../tmpl/news/images/readmore.png") lightgray no-repeat scroll 0px 3px;
 	border: solid gray;
 	border-width:1px 0px;
-	padding: 0px 6px 0px 20px;
+	padding: 1px 6px 1px 20px;
 	margin: 0px 0px 3px 4px;
 }
 
@@ -147,33 +154,22 @@
 	text-align: center;
 }
 
-.mod_flexicontent_wrapper ul#mod_fc_favlist {
-	left: 0;
-	list-style: none outside none !important;
-	position: relative !important;
-	text-align: left !important;
+.mod_flexicontent_wrapper #mod_fc_favlist {
 }
-
-.mod_flexicontent_wrapper ul#mod_fc_favlist > li {
-	padding: 0 !important;
-	margin: 0px 0px 0px 8px !important;
+.mod_flexicontent_wrapper #mod_fc_favlist > div {
+}
+.mod_flexicontent_wrapper #mod_fc_favlist .fav-block .fcitem_readon {
+	font-size: 14px;
+	font-weight: normal;
+}
+div.mod_fc_favlist_favblock_template {
+	display: none;
 }
 
 .mod_flexicontent_wrapper #mod_fc_favlist a {
-	background: none !important;
-	color: blue !important;
-	text-decoration: none !important;
-	text-transform: none !important;
-	padding: 0 !important;
-	margin: 0px 2px !important;
-	font-weight: bold !important;
 }
 
 .mod_flexicontent_wrapper #mod_fc_favlist a:hover {
-	background: none !important;
-	color: darkred !important;
-	text-decoration: none !important;
-	font-weight: bold !important;
 }
 
 .mod_flexicontent_wrapper .fcitem_active .fcitem_title a,  /* news template, etc */

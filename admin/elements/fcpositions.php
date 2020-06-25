@@ -19,14 +19,12 @@
 // Check to ensure this file is included in Joomla!
 defined('_JEXEC') or die('Restricted access');
 
-if (FLEXI_J16GE) {
-	jimport('joomla.html.html');
-	jimport('joomla.form.formfield');
-} else {
-	$fparams = JComponentHelper::getParams('com_flexicontent');
-	if (!defined('FLEXI_SECTION')) define('FLEXI_SECTION', $fparams->get('flexi_section'));
-	if (!defined('FLEXI_ACCESS')) define('FLEXI_ACCESS', (JPluginHelper::isEnabled('system', 'flexiaccess') && version_compare(PHP_VERSION, '5.0.0', '>')) ? 1 : 0);
-}
+jimport('cms.html.html');      // JHtml
+jimport('cms.html.select');    // JHtmlSelect
+jimport('joomla.form.field');  // JFormField
+
+//jimport('joomla.form.helper'); // JFormHelper
+//JFormHelper::loadFieldClass('...');   // JFormField...
 
 /**
  * Renders a module positions list
@@ -47,16 +45,13 @@ class JFormFieldFcpositions extends JFormField
 	protected function getInput()
 	{
 		$doc = JFactory::getDocument();
-		$db  = JFactory::getDBO();
-		if (FLEXI_J16GE) {
-			$node = & $this->element;
-			$attributes = get_object_vars($node->attributes());
-			$attributes = $attributes['@attributes'];
-		} else {
-			$attributes = & $node->_attributes;
-		}
-		
-		$values = FLEXI_J16GE ? $this->value : $value;
+		$db  = JFactory::getDbo();
+
+		$node = & $this->element;
+		$attributes = get_object_vars($node->attributes());
+		$attributes = $attributes['@attributes'];
+
+		$values = $this->value;
 		
 		$fieldname	= FLEXI_J16GE ? $this->name : $control_name.'['.$name.']';
 		$element_id = FLEXI_J16GE ? $this->id : $control_name.$name;
@@ -82,6 +77,6 @@ class JFormFieldFcpositions extends JFormField
 		
 		$attribs = '';
 		
-		return JHTML::_('select.genericlist', $positions, $fieldname, $attribs, 'value', 'text', $values, $element_id);
+		return JHtml::_('select.genericlist', $positions, $fieldname, $attribs, 'value', 'text', $values, $element_id);
 	}
 }

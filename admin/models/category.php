@@ -1,410 +1,386 @@
 <?php
 /**
- * @version 1.5 stable $Id: category.php 1372 2012-07-08 19:08:21Z ggppdk $
- * @package Joomla
- * @subpackage FLEXIcontent
- * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
- * @license GNU/GPL v2
- * 
- * FLEXIcontent is a derivative work of the excellent QuickFAQ component
- * @copyright (C) 2008 Christoph Lukes
- * see www.schlu.net for more information
+ * @package         FLEXIcontent
+ * @version         3.3
  *
- * FLEXIcontent is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
+ * @link            https://flexicontent.org
+ * @copyright       Copyright © 2018, FLEXIcontent team, All Rights Reserved
+ * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
-// no direct access
 defined('_JEXEC') or die('Restricted access');
 
-jimport('joomla.application.component.modeladmin');
+use Joomla\String\StringHelper;
+use Joomla\Utilities\ArrayHelper;
+use Joomla\Component\Categories\Administrator\Helper\CategoriesHelper;
+
+require_once('base/base.php');
+require_once('base/traitnestable.php');
 
 /**
  * FLEXIcontent Component Category Model
  *
- * @package Joomla
- * @subpackage FLEXIcontent
- * @since		1.0
  */
-class FlexicontentModelCategory extends JModelAdmin
+class FlexicontentModelCategory extends FCModelAdmin
 {
+
+	use FCModelTraitNestableRecord;
+
 	/**
-	 * Category data
+	 * Record name, (parent class property), this is used for: naming session data, XML file of class, etc
+	 *
+	 * @var string
+	 */
+	protected $name = 'category';
+
+	/**
+	 * Record database table
+	 *
+	 * @var string
+	 */
+	var $records_dbtbl = 'categories';
+
+	/**
+	 * Record jtable name
+	 *
+	 * @var string
+	 */
+	var $records_jtable = 'flexicontent_categories';
+
+	/**
+	 * Column names
+	 */
+	var $state_col   = 'published';
+	var $name_col    = 'title';
+	var $parent_col  = 'parent_id';
+
+	/**
+	 * Record primary key
+	 *
+	 * @var int
+	 */
+	var $_id = null;
+
+	/**
+	 * Record data
 	 *
 	 * @var object
 	 */
-	var $_category = null;
+	var $_record = null;
+
+	/**
+	 * Events context to use during model FORM events and diplay PREPARE events triggering
+	 *
+	 * @var object
+	 */
+	var $events_context = 'com_content.category';
+
+	/**
+	 * Record's type alias string
+	 *
+	 * @var        string
+	 */
+	var $type_alias = 'com_content.category';
+
+	/**
+	 * Flag to indicate adding new records with next available ordering (at the end),
+	 * this is ignored if this record DB model does not have 'ordering'
+	 *
+	 * @var boolean
+	 */
+	var $useLastOrdering = false;
+
+	/**
+	 * Plugin group used to trigger events
+	 *
+	 * @var boolean
+	 */
+	var $plugins_group = 'content';
+
+	/**
+	 * Records real extension
+	 *
+	 * @var string
+	 */
+	var $extension_proxy = 'com_content';
+
+	/**
+	 * Context to use for registering (language) associations
+	 *
+	 * @var string
+	 */
+	var $associations_context = 'com_categories.item';
+
+
+	/**
+	 * Groups of Fields that can be partially present in the form
+	 */
+	var $mergeableGroups = array('params');
+
+	/**
+	 * Various record specific properties
+	 *
+	 */
+
+	// Inherited parameters
+	var $_inherited_params = null;
+
+	/**
+	 * List filters that are always applied
+	 */
+	var $hard_filters = array('a.extension' => FLEXI_CAT_EXTENSION);
 
 	/**
 	 * Constructor
 	 *
-	 * @since 1.0
+	 * @since 3.3.0
 	 */
-	function __construct()
+	public function __construct($config = array())
 	{
-		parent::__construct();
-
-		$array = JRequest::getVar('cid',  0, '', 'array');
-		if ( !@$array[0] ) {
-			// Try id variable too (needed by J3.0+)
-			$array = JRequest::getVar('id',  0, '', 'array');
-		}
-		// Make sure id variable is set (needed by J3.0+ controller)
-		JRequest::setVar('id', (int)$array[0]);
-		$this->setId((int)$array[0]);
+		parent::__construct($config);
 	}
 
+
 	/**
-	 * Method to set the identifier
+	 * Legacy method to get the record
 	 *
-	 * @access	public
-	 * @param	int category identifier
-	 */
-	function setId($id)
-	{
-		// Set category id and wipe data
-		$this->_id	    	= $id;
-		$this->_category	= null;
-	}
-	
-	/**
-	 * Overridden get method to get properties from the category
+	 * @return	object
 	 *
-	 * @access	public
-	 * @param	string	$property	The name of the property
-	 * @param	mixed	$value		The value of the property to set
-	 * @return 	mixed 				The value of the property
 	 * @since	1.0
 	 */
-	function get($property, $default=null)
+	public function getCategory($pk = null)
 	{
-		if ($this->_loadCategory()) {
-			if(isset($this->_category->$property)) {
-				return $this->_category->$property;
-			}
-		}
-		return $default;
+		return parent::getRecord($pk);
 	}
 
-	/**
-	 * Method to get category data
-	 *
-	 * @access	public
-	 * @return	array
-	 * @since	1.0
-	 */
-	function &getCategory()
-	{
-		if ($this->_loadCategory())
-		{
-
-		}
-		else  $this->_initCategory();
-
-		return $this->_category;
-	}
 
 	/**
-	 * Method to load category data
+	 * Method to initialise the record data
 	 *
-	 * @access	private
+	 * @param   object      $record    The record being initialized
+	 * @param   boolean     $initOnly  If true then only a new record will be initialized without running the _afterLoad() method
+	 *
 	 * @return	boolean	True on success
-	 * @since	1.0
+	 *
+	 * @since	1.5
 	 */
-	function _loadCategory()
+	protected function _initRecord(&$record = null, $initOnly = false)
 	{
-		// Lets load the category if it doesn't already exist
-		if (empty($this->_category))
-		{
-			$query = 'SELECT *'
-					. ' FROM #__categories'
-					. ' WHERE id = '.$this->_id
-					;
-			$this->_db->setQuery($query);
-			$this->_category = $this->_db->loadObject();
+		parent::_initRecord($record, $initOnly);
 
-			return (boolean) $this->_category;
-		}
+		// Set some new record specific properties, note most properties already have proper values
+		// Either the DB default values (set by getTable() method) or the values set by _afterLoad() method
+		$record->id							= 0;
+		$record->parent_id			= 0;
+		$record->title					= null;
+		$record->name						= null;  //$this->getName() . ($this->_getLastId() + 1);
+		$record->alias					= null;
+		$record->description		= null;
+		$record->extension			= FLEXI_CAT_EXTENSION;
+		$record->image_position	= 'left';
+		$record->published			= 1;
+		$record->params					= null;
+		$record->editor					= null;
+		$record->ordering				= 0;
+		$record->access					= 1;
+		$record->count					= 0;
+		$record->checked_out		= 0;
+		$record->checked_out_time	= '';
+
+		$this->_record = $record;
+
 		return true;
 	}
 
+
 	/**
-	 * Method to initialise the category data
+	 * Method to get a table object, load it if necessary.
 	 *
-	 * @access	private
-	 * @return	boolean	True on success
-	 * @since	1.0
+	 * @param   string  $type    The table name. Optional.
+	 * @param   string  $prefix  The class prefix. Optional.
+	 * @param   array   $config  Configuration array for model. Optional.
+	 *
+	 * @return  JTable  A JTable object
+	 *
+	 * @since   3.2.0
 	 */
-	function _initCategory()
+	public function getTable($type = 'Category', $prefix = null, $config = array())
 	{
-		// Lets load the category if it doesn't already exist
-		if (empty($this->_category))
+		$prefix = $prefix !== null
+			? $prefix
+			: (FLEXI_J40GE ? 'Joomla\\CMS\\Table\\' : 'CategoriesTable');
+
+		if (!FLEXI_J40GE)
 		{
-			$category = new stdClass();
-			$category->id					= 0;
-			$category->parent_id			= 0;
-			$category->title				= null;
-			$category->name					= null;
-			$category->alias				= null;
-			//$category->image				= JText::_( 'FLEXI_CHOOSE_IMAGE' );
-			$category->extension				= FLEXI_CAT_EXTENSION;
-			$category->image_position		= 'left';
-			$category->description			= null;
-			$category->published			= 1;
-			$category->editor				= null;
-			$category->ordering				= 0;
-			$category->access				= 0;
-			$category->params				= null;
-			$category->count				= 0;
-			$this->_category				= $category;
-			return (boolean) $this->_category;
+			JTable::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_categories'.DS.'tables');
 		}
-		return true;
+
+		return parent::getTable($type, $prefix, $config);
 	}
 
-	/**
-	 * Method to checkin/unlock the category
-	 *
-	 * @access	public
-	 * @return	boolean	True on success
-	 * @since	1.0
-	 */
-	function checkin($pk = NULL)
-	{
-		if (!$pk) $pk = $this->_id;
-		if ($pk) {
-			$category = $this->getTable();
-			return $category->checkin($pk);
-		}
-		return false;
-	}
-	
-	
-	/**
-	 * Method to checkout/lock the category
-	 *
-	 * @access	public
-	 * @param	int	$uid	User ID of the user checking the item out
-	 * @return	boolean	True on success
-	 * @since	1.0
-	 */
-	function checkout($pk = null)   // UPDATED to match function signature of J1.6+ models
-	{
-		// Make sure we have a record id to checkout the record with
-		if ( !$pk ) $pk = $this->_id;
-		if ( !$pk ) return true;
-		
-		// Get current user
-		$user	= JFactory::getUser();
-		$uid	= $user->get('id');
-		
-		// Lets get table record and checkout the it
-		$tbl = $this->getTable();
-		if ( $tbl->checkout($uid, $this->_id) ) return true;
-		
-		// Reaching this points means checkout failed
-		$this->setError( FLEXI_J16GE ? $tbl->getError() : JText::_("FLEXI_ALERT_CHECKOUT_FAILED") );
-		return false;
-	}
-	
-	
-	/**
-	 * Tests if the category is checked out
-	 *
-	 * @access	public
-	 * @param	int	A user id
-	 * @return	boolean	True if checked out
-	 * @since	1.0
-	 */
-	function isCheckedOut( $uid=0 )
-	{
-		if ($this->_id < 1) {
-			return false;
-		} else if ($this->_loadCategory()) {
-			if ($uid) {
-				return ($this->_category->checked_out && $this->_category->checked_out != $uid);
-			} else {
-				return $this->_category->checked_out;
-			}
-		} else {
-			JError::raiseWarning( 0, 'UNABLE LOAD DATA');
-			return false;
-		}
-	}
 
 	/**
-	 * Method to save the form data.
+	 * Method rebuild the entire nested set tree.
 	 *
-	 * @param   array  $data  The form data.
+	 * @return  boolean  False on failure or error, true otherwise.
 	 *
-	 * @return  boolean  True on success.
-	 *
-	 * @since   1.6
+	 * @since   3.2.0
 	 */
-	public function save($data)
+	public function rebuild()
 	{
-		// Initialise variables;
-		$dispatcher = JDispatcher::getInstance();
+		// Get an instance of the table object.
 		$table = $this->getTable();
-		$pk = (!empty($data['id'])) ? $data['id'] : (int) $this->getState($this->getName() . '.id');
-		$isNew = true;
 
-		// Include the content plugins for the on save events.
-		JPluginHelper::importPlugin('content');
-
-		// Load the row if saving an existing category.
-		if ($pk > 0)
-		{
-			$table->load($pk);
-			$isNew = false;
-		}
-		
-		// Retrieve form data these are subject to basic filtering
-		$jform = JRequest::getVar('jform', array(), 'post', 'array');
-		
-		// Merge template fieldset this should include at least 'clayout' and optionally 'clayout_mobile' parameters
-		if( !empty($jform['templates']) )
-			$data['params'] = array_merge($data['params'], $jform['templates']);
-		
-		// Merge the parameters of the select clayout
-		$clayout = $jform['templates']['clayout'];
-		if( !empty($jform['layouts'][$clayout]) ) {
-			$data['params'] = array_merge($data['params'], $jform['layouts'][$clayout]);
-		}
-		
-		// Merge other special parameters, e.g. 'inheritcid'
-		if( !empty($jform['special']) )
-			$data['params'] = array_merge($data['params'], $jform['special']);
-		
-		// Set the new parent id if parent id not matched OR while New/Save as Copy .
-		if ($table->parent_id != $data['parent_id'] || $data['id'] == 0)
-		{
-			$table->setLocation($data['parent_id'], 'last-child');
-		}
-
-		// Alter the title for save as copy
-		if (JRequest::getVar('task') == 'save2copy')
-		{
-			list($title, $alias) = $this->generateNewTitle($data['parent_id'], $data['alias'], $data['title']);
-			$data['title'] = $title;
-			$data['alias'] = $alias;
-		}
-
-		//$params			= JRequest::getVar( 'params', null, 'post', 'array' );
-		//$params			= $data["params"];
-		$copyparams = $jform['copycid'];
-		if ($copyparams) unset($data['params']);
-		
-		// Bind the data.
-		if (!$table->bind($data))
+		if (!$table->rebuild())
 		{
 			$this->setError($table->getError());
+
 			return false;
-		}
-		
-		if ($copyparams) {
-			$table->params = $this->getParams($copyparams);
-		}
-		
-		// Bind the rules.
-		/*if (isset($data['rules'])) {
-			foreach($data['rules'] as $action_name => $identities) {
-				foreach($identities as $grpid => $val) {
-					if ($val==="") {
-						unset($data['rules'][$action_name][$grpid]);
-					}
-				}
-			}
-			jimport('joomla.access.rules');
-			$rules = new JAccessRules($data['rules']);
-			$table->setRules($rules);
-		}
-		echo "<pre>";
-		print_r($data['rules']);
-		print_r($rules);
-		echo "</pre>";*/
-		//die('die() in model');
-		
-
-		// Check the data.
-		if (!$table->check())
-		{
-			$this->setError($table->getError());
-			return false;
-		}
-
-		// Trigger the onContentBeforeSave event.
-		$result = $dispatcher->trigger($this->event_before_save, array($this->option . '.' . $this->name, &$table, $isNew));
-		if (in_array(false, $result, true))
-		{
-			$this->setError($table->getError());
-			return false;
-		}
-
-		// Store the data.
-		if (!$table->store())
-		{
-			$this->setError($table->getError());
-			return false;
-		}
-		
-		$this->_id = $table->id;
-		$this->_category = & $table;  // variable reference instead of assigning object id, this will work even if $table is reassigned a different object
-
-		// Trigger the onContentAfterSave event.
-		$dispatcher->trigger($this->event_after_save, array($this->option . '.' . $this->name, &$table, $isNew));
-
-		// Rebuild the path for the category:
-		if (!$table->rebuildPath($table->id))
-		{
-			$this->setError($table->getError());
-			return false;
-		}
-
-		// Rebuild the paths of the category's children:
-		if (!$table->rebuild($table->id, $table->lft, $table->level, $table->path))
-		{
-			$this->setError($table->getError());
-			return false;
-		}
-
-		$this->setState($this->getName() . '.id', $table->id);
-
-		if ($table->id)
-		{
-			$query 	= 'UPDATE #__categories'
-				. ' SET extension = "com_content" '
-				. ' WHERE id = ' . (int)$table->id;
-				;
 		}
 
 		// Clear the cache
-		$this->cleanCache();
-		
+		$this->cleanCache(null, 0);
+		$this->cleanCache(null, 1);
+
 		return true;
 	}
-	
-	
+
+
 	/**
-	 * Custom clean the cache of com_content and content modules
+	 * Method to load inherited parameters
 	 *
-	 * @since	1.6
+	 * @access	private
+	 * @return	void
+	 * @since	1.5
 	 */
-	protected function cleanCache($group = NULL, $client_id = -1)
+	public function getInheritedParams($force=false)
 	{
-		if ($client_id == -1) {  // -1 means both
-			parent::cleanCache($group='com_flexicontent', 0);
-			parent::cleanCache($group='com_flexicontent_cats', 0);
-			parent::cleanCache($group='com_flexicontent', 1);
-			parent::cleanCache($group='com_flexicontent_cats', 1);
-		} else {
-			parent::cleanCache($group='com_flexicontent', $client_id);
-			parent::cleanCache($group='com_flexicontent_cats', $client_id);
+		if ($this->_inherited_params !== null && !$force)
+		{
+			return $this->_inherited_params;
 		}
+
+		$id = (int) $this->_id;
+
+		$app = JFactory::getApplication();
+
+		// a. Clone component parameters ... we will use these as parameters base for merging
+		$compParams = clone(JComponentHelper::getComponent('com_flexicontent')->params);
+
+		// b. Retrieve category parameters and create parameter object
+		if ($id)
+		{
+			$query = $this->_db->getQuery(true)
+				->select('params')
+				->from('#__categories')
+				->where('id = ' . (int) $id);
+			$catParams = $this->_db->setQuery($query)->loadResult();
+			$catParams = new JRegistry($catParams);
+		}
+		else
+		{
+			$catParams = new JRegistry();
+		}
+
+
+		// c. Retrieve inherited parameter and create parameter objects
+		global $globalcats;
+		$heritage_stack = array();
+		$inheritcid = $catParams->get('inheritcid', '');
+		$inheritcid_comp = $compParams->get('inheritcid', -1);
+		$inherit_parent = $inheritcid==='-1' || ($inheritcid==='' && $inheritcid_comp);
+
+		// CASE A: inheriting from parent category tree
+		if ($id && $inherit_parent && !empty($globalcats[$id]->ancestorsonly))
+		{
+			$query = $this->_db->getQuery(true)
+				->select('title, id, params')
+				->from('#__categories')
+				->where('id IN ( ' . $globalcats[$id]->ancestorsonly . ')')
+				->order('level DESC');
+				//>order('FIELD(id, ' . $globalcats[$id]->ancestorsonly . ' DESC)';
+			$catdata = $this->_db->setQuery($query)->loadObjectList('id');
+
+			if (!empty($catdata))
+			{
+				foreach ($catdata as $parentcat)
+				{
+					$parentcat->params = new JRegistry($parentcat->params);
+					array_push($heritage_stack, $parentcat);
+					$inheritcid = $parentcat->params->get('inheritcid', '');
+					$inherit_parent = $inheritcid==='-1' || ($inheritcid==='' && $inheritcid_comp);
+
+					// Stop inheriting from further parent categories
+					if (!$inherit_parent)
+					{
+						break;
+					}
+				}
+			}
+		}
+
+		// CASE B: inheriting from specific category
+		elseif ($id && $inheritcid > 0 && !empty($globalcats[$inheritcid]))
+		{
+			$query = $this->_db->getQuery(true)
+				->select('title, params')
+				->from('#__categories')
+				->where('id = ' . (int) $inheritcid);
+			$catdata = $this->_db->setQuery($query)->loadObject();
+
+			if ($catdata)
+			{
+				$catdata->params = new JRegistry($catdata->params);
+				array_push($heritage_stack, $catdata);
+			}
+		}
+
+
+		/**
+		 * Start merging of parameters, OVERRIDE ORDER: layout(template-manager)/component/ancestors-cats/category
+		 */
+
+		// -1. layout parameters will be placed on top at end of this code ...
+
+		// 0. Start from component parameters
+		$params = new JRegistry();
+		$params->merge($compParams);
+
+		// 1. Merge category's inherited parameters (e.g. ancestor categories or specific category)
+		while (!empty($heritage_stack))
+		{
+			$catdata = array_pop($heritage_stack);
+			if ($catdata->params->get('orderbycustomfieldid') === '0')
+			{
+				$catdata->params->set('orderbycustomfieldid', '');
+			}
+			$params->merge($catdata->params);
+		}
+
+		// 2. Merge category parameters
+		/**
+		 * CURRENT CATEGORY PARAMETERS MUST BE SKIPED ! we only want the inherited parameters
+		 */
+		/*
+		if ($catParams->get('orderbycustomfieldid') === '0')
+		{
+			$catParams->set('orderbycustomfieldid', '');
+		}
+		$params->merge($catParams);
+		*/
+
+		// 3. Retrieve and merge Global Layout's parameters (placing these at TOP allows proper heritage)
+		$layoutParams = flexicontent_tmpl::getLayoutparams('category', $params->get('clayout'), '', $force);
+		$layoutParams = new JRegistry($layoutParams);
+
+		$this->_inherited_params = clone($layoutParams);
+		$this->_inherited_params->merge($params);
+
+		return $this->_inherited_params;
 	}
-	
+
+
 	/**
 	 * Method to get the parameters of another category
 	 *
@@ -413,79 +389,88 @@ class FlexicontentModelCategory extends JModelAdmin
 	 * @return	string		ini string of params
 	 * @since	1.5
 	 */
-	function getParams($id)
+	public function getParams($id)
 	{
-		$query 	= 'SELECT params FROM #__categories'
-				. ' WHERE id = ' . (int)$id
-				;
-		$this->_db->setQuery($query);
-		$copyparams = $this->_db->loadResult();
-		
-		return $copyparams;
+		$query = $this->_db->getQuery(true)
+			->select('params')
+			->from('#__categories')
+			->where('id = ' . (int) $id);
+
+		return $this->_db->setQuery($query)->loadResult();
 	}
-	
+
+
 	/**
 	 * Method to copy category parameters
 	 *
 	 * @param 	int 	$id of target
 	 * @param 	string 	$params to copy
 	 * @return 	boolean	true on success
-	 * 
+	 *
 	 * @since 1.5
 	 */
-	function copyParams($id, $params)
+	public function copyParams($id, $params)
 	{
 		$query 	= 'UPDATE #__categories'
-				. ' SET params = ' . $this->_db->Quote($params)
-				. ' WHERE id = ' . (int)$id
-				;
-		$this->_db->setQuery( $query );
-		if (!$this->_db->query()) {
-			return false;
-		}
+			. ' SET params = ' . $this->_db->Quote($params)
+			. ' WHERE id = ' . (int)$id
+			;
+		$this->_db->setQuery($query);
+		$this->_db->execute();
+
 		return true;
 	}
-	
-	
-	/**
-	 * Returns a Table object, always creating it
-	 *
-	 * @param	type	The table type to instantiate
-	 * @param	string	A prefix for the table class name. Optional.
-	 * @param	array	Configuration array for model. Optional.
-	 * @return	JTable	A database object
-	 * @since	1.6
-	*/
-	public function getTable($type = 'flexicontent_categories', $prefix = '', $config = array()) {
-		return JTable::getInstance($type, $prefix, $config);
-	}
-	
-	
+
+
 	/**
 	 * Method to get the row form.
 	 *
-	 * @param	array	$data		Data for the form.
-	 * @param	boolean	$loadData	True if the form is to load its own data (default case), false if not.
-	 * @return	mixed	A JForm object on success, false on failure
-	 * @since	1.6
+	 * @param   array    $data      An optional array of data for the form to interogate.
+	 * @param   boolean  $loadData  True if the form is to load its own data (default case), false if not.
+	 *
+	 * @return  mixed  A JForm object on success, false on failure
+	 *
+	 * @since   1.6
 	 */
 	public function getForm($data = array(), $loadData = true)
 	{
-		// Initialise variables.
-		$extension	= $this->getState('com_flexicontent.category.extension');
+		$this->setState($this->getName().'.extension', 'com_content');
+		$extension = $this->getState($this->getName().'.extension');
+
+		$jinput = JFactory::getApplication()->input;
+
+		// A workaround to get the extension and other data into the model for save requests.
+		if (empty($extension) && isset($data['extension']))
+		{
+			$extension = $data['extension'];
+			$parts = explode('.', $extension);
+
+			$this->setState($this->getName().'.extension', $extension);
+			$this->setState($this->getName().'.component', $parts[0]);
+			$this->setState($this->getName().'.section', @$parts[1]);
+		}
+		$this->setState($this->getName().'.language', isset($data['language']) ? $data['language'] : null);
 
 		// Get the form.
-		$form = $this->loadForm('com_flexicontent.category'.$extension, 'category', array('control' => 'jform', 'load_data' => $loadData));
-		if (empty($form)) {
+		$form = parent::getForm($data, $loadData);
+
+		if (empty($form))
+		{
 			return false;
 		}
 
 		// Modify the form based on Edit State access controls.
-		if (empty($data['extension'])) {
+		if (empty($data['extension']))
+		{
 			$data['extension'] = $extension;
 		}
 
-		if (!$this->canEditState((object) $data)) {
+		// Force asset from request
+		$categoryId = $jinput->get('id');
+		$assetKey   = $categoryId ? $this->extension_proxy . '.category.' . $categoryId : $this->extension_proxy;
+
+		if (!JFactory::getUser()->authorise('core.edit.state', $assetKey))
+		{
 			// Disable fields for display.
 			$form->setFieldAttribute('ordering', 'disabled', 'true');
 			$form->setFieldAttribute('published', 'disabled', 'true');
@@ -498,146 +483,466 @@ class FlexicontentModelCategory extends JModelAdmin
 
 		return $form;
 	}
-	/**
-	 * Method to get the data that should be injected in the form.
-	 *
-	 * @return	mixed	The data for the form.
-	 * @since	1.6
-	 */
-	protected function loadFormData()
-	{
-		// Check the session for previously entered form data.
-		$data = JFactory::getApplication()->getUserState('com_flexicontent.edit.'.$this->getName().'.data', array());
 
-		if (empty($data)) {
-			$data = $this->getItem();
-		}
 
-		return $data;
-	}
-	
 	/**
-	 * Method to get a category.
+	 * Method to get a record.
 	 *
-	 * @param	integer	An optional id of the object to get, otherwise the id from the model state is used.
-	 * @return	mixed	Category data object on success, false on failure.
+	 * @param	integer  $pk An optional id of the object to get, otherwise the id from the model state is used.
+	 *
+	 * @return	mixed 	Record data object on success, false on failure.
+	 *
 	 * @since	1.6
 	 */
 	public function getItem($pk = null)
 	{
-		$pk = $pk ? $pk : $this->_id;
-		
-		if ( $result = parent::getItem($pk) )
+		$pk = $pk ? (int) $pk : $this->_id;
+		$pk = $pk ? $pk : (int) $this->getState($this->getName().'.id');
+
+		static $items = array();
+		if ( $pk && isset($items[$pk]) ) return $items[$pk];
+
+		// Instatiate the JTable
+		$item = parent::getItem($pk);
+
+		if ( $item )
 		{
 			// Prime required properties.
-			if (empty($result->id)) {
-				$result->parent_id	= $this->getState('com_flexicontent.category.parent_id');
-				$result->extension	= $this->getState('com_flexicontent.category.extension');
+			if (empty($item->id))
+			{
+				$item->parent_id	= $this->getState($this->getName().'.parent_id');
+				$item->extension	= $this->getState($this->getName().'.extension');
 			}
 
 			// Convert the metadata field to an array.
-			$registry = new JRegistry($result->metadata);
-			$result->metadata = $registry->toArray();
+			$registry = new JRegistry($item->metadata);
+			$item->metadata = $registry->toArray();
 
 			// Convert the created and modified dates to local user time for display in the form.
 			jimport('joomla.utilities.date');
-			
+
 			$site_zone = JFactory::getApplication()->getCfg('offset');
 			$user_zone = JFactory::getUser()->getParam('timezone', $site_zone);
-			$tz_string = FLEXI_J16GE ? $user_zone : $site_zone ;
+			$tz_string = $user_zone;
 			$tz = new DateTimeZone( $tz_string );
-			
-			if (intval($result->created_time)) {
-				$date = new JDate($result->created_time);
+
+			if (intval($item->created_time))
+			{
+				$date = new JDate($item->created_time);
 				$date->setTimezone($tz);
-				$result->created_time = FLEXI_J16GE ? $date->toSql(true) : $date->toMySQL(true);
-			} else {
-				$result->created_time = null;
+				$item->created_time = $date->toSql(true);
+			}
+			else
+			{
+				$item->created_time = null;
 			}
 
-			if (intval($result->modified_time)) {
-				$date = new JDate($result->modified_time);
+			if (intval($item->modified_time))
+			{
+				$date = new JDate($item->modified_time);
 				$date->setTimezone($tz);
-				$result->modified_time = FLEXI_J16GE ? $date->toSql(true) : $date->toMySQL(true);
-			} else {
-				$result->modified_time = null;
+				$item->modified_time = $date->toSql(true);
 			}
-			$this->_category = $result;
+			else
+			{
+				$item->modified_time = null;
+			}
+
+			$this->_record = $item;
+
+			$useAssocs = $this->useAssociations();
+			if ($useAssocs)
+			{
+				if ($item->id != null)
+				{
+					$item->associations = FLEXI_J40GE
+						? CategoriesHelper::getAssociations($item->id, $item->extension)
+						: \CategoriesHelper::getAssociations($item->id, $item->extension);
+					$item->associations = ArrayHelper::toInteger($item->associations);
+				}
+				else
+				{
+					$item->associations = array();
+				}
+			}
 		}
 
-		return $result;
+		if ($pk) $items[$pk] = $item;
+		return $item;
 	}
-	
-	
+
+
 	/**
-	 * Auto-populate the model state.
+	 * Method to preprocess the form.
 	 *
-	 * Note. Calling getState in this method will result in recursion.
+	 * @param   JForm   $form   A JForm object.
+	 * @param   mixed   $data   The data expected for the form.
+	 * @param   string  $plugins_group  The name of the plugin group to import and trigger
 	 *
-	 * @since	1.6
+	 * @return  void
+	 *
+	 * @see     JFormField
+	 * @since   1.6
+	 * @throws  Exception if there is an error in the form event.
 	 */
-	protected function populateState() {
-		$app = JFactory::getApplication('administrator');
-
-		if (!($parentId = $app->getUserState('com_flexicontent.edit.'.$this->getName().'.parent_id'))) {
-			$parentId = JRequest::getInt('parent_id');
-		}
-		$this->setState('com_flexicontent.category.parent_id', $parentId);
-
-		if (!($extension = $app->getUserState('com_flexicontent.edit.'.$this->getName().'.extension'))) {
-			$extension = JRequest::getCmd('extension', FLEXI_CAT_EXTENSION);
-		}
-		// Load the User state.
-		if (!($pk = (int) $app->getUserState('com_flexicontent.edit.'.$this->getName().'.id'))) {
-			$cid = JRequest::getVar('cid', array(0));
-			$pk = (int)$cid[0];
-		}
-
-		$this->setState('com_flexicontent.category.extension', $extension);
-		$parts = explode('.',$extension);
-		// extract the component name
-		$this->setState('com_flexicontent.category.component', $parts[0]);
-		// extract the optional section name
-		$this->setState('com_flexicontent.category.section', (count($parts)>1)?$parts[1]:null);
-
-		// Load the parameters.
-		$params	= JComponentHelper::getParams('com_flexicontent');
-		$this->setState('params', $params);
-	}
-	
-	
-	public function getAttribs()
+	protected function preprocessForm(JForm $form, $data, $plugins_group = null)
 	{
-		if($this->_category) {
-			return $this->_category->params;
+		jimport('joomla.filesystem.path');
+
+		$lang = JFactory::getLanguage();
+		$component = $this->getState($this->getName().'.component');
+		$section = $this->getState($this->getName().'.section');
+		$extension = JFactory::getApplication()->input->get('extension', null);
+
+		// Get the component form if it exists
+		$name = 'category' . ($section ? ('.' . $section) : '');
+
+		// Try to find the component helper.
+		$eName = str_replace('com_', '', $component);
+		$path = JPath::clean(JPATH_ADMINISTRATOR . "/components/$component/helpers/category.php");
+
+		if (file_exists($path))
+		{
+			$cName = ucfirst($eName) . ucfirst($section) . 'HelperCategory';
+
+			JLoader::register($cName, $path);
+
+			if (class_exists($cName) && is_callable(array($cName, 'onPrepareForm')))
+			{
+				$lang->load($component, JPATH_BASE, null, false, false)
+					|| $lang->load($component, JPATH_BASE . '/components/' . $component, null, false, false)
+					|| $lang->load($component, JPATH_BASE, $lang->getDefault(), false, false)
+					|| $lang->load($component, JPATH_BASE . '/components/' . $component, $lang->getDefault(), false, false);
+				call_user_func_array(array($cName, 'onPrepareForm'), array(&$form));
+
+				// Check for an error.
+				if ($form instanceof Exception)
+				{
+					$this->setError($form->getMessage());
+
+					return false;
+				}
+			}
 		}
-		return array();
+
+		// Set the access control rules field component value.
+		$form->setFieldAttribute('rules', 'component', $component);
+		$form->setFieldAttribute('rules', 'section', $name);
+
+		// Association category items
+		if ($this->useAssociations())
+		{
+			$languages = JLanguageHelper::getContentLanguages(false, true, null, 'ordering', 'asc');
+			$data_language = !empty($data->language) ? $data->language : $this->getState($this->getName().'.language');
+
+			if (count($languages) > 1)
+			{
+				$addform = new SimpleXMLElement('<form />');
+				$fields = $addform->addChild('fields');
+				$fields->addAttribute('name', 'associations');
+				$fieldset = $fields->addChild('fieldset');
+				$fieldset->addAttribute('name', 'item_associations');
+				$fieldset->addAttribute('description', 'COM_CATEGORIES_ITEM_ASSOCIATIONS_FIELDSET_DESC');
+
+				foreach ($languages as $language)
+				{
+					if ($language->lang_code == $data_language) continue;
+					$field = $fieldset->addChild('field');
+					$field->addAttribute('name', $language->lang_code);
+					$field->addAttribute('type', 'fccategory');
+					$field->addAttribute('language', $language->lang_code);
+					$field->addAttribute('label', $language->title);
+					$field->addAttribute('class', 'label');
+					$field->addAttribute('translate_label', 'false');
+					$field->addAttribute('extension', $extension);
+					$field->addAttribute('edit', 'true');
+					$field->addAttribute('clear', 'true');
+					$field->addAttribute('filter', 'INT');  // also enforced later, but better to have it here too
+				}
+
+				$form->load($addform, false);
+			}
+		}
+
+		// Trigger the default form events.
+		$plugins_group = $plugins_group ?: $this->plugins_group;
+		parent::preprocessForm($form, $data, $plugins_group);
 	}
-	
-	
+
+
 	/**
 	 * Method to change the title & alias.
 	 *
-	 * @param   integer  $parent_id  The id of the parent.
-	 * @param   string   $alias      The alias.
-	 * @param   string   $title      The title.
+	 * @param   integer  $parent_id  If applicable, the id of the parent (e.g. assigned category)
+	 * @param   string   $alias      The alias / name.
+	 * @param   string   $title      The title / label.
 	 *
-	 * @return  array  Contains the modified title and alias.
+	 * @return  array    Contains the modified title and alias / name.
 	 *
-	 * @since	1.7
+	 * @since   1.7
 	 */
 	protected function generateNewTitle($parent_id, $alias, $title)
 	{
-		// Alter the title & alias
-		$table = $this->getTable();
-		while ($table->load(array('alias' => $alias, 'parent_id' => $parent_id)))
+		return parent::generateNewTitle($parent_id, $alias, $title);
+	}
+
+
+	/**
+	 * Method to check if the user can edit the record
+	 *
+	 * @return	boolean	True on success
+	 *
+	 * @since	3.2.0
+	 */
+	public function canEdit($record = null)
+	{
+		$record  = $record ?: $this->_record;
+		$user    = JFactory::getUser();
+		$asset   = $record && !$record->id ? $this->type_alias . '.' . $record->id : $this->option;
+		$isOwner = $record && $user->id && $record->created_user_id == $user->id;
+
+		$canDo    = $user->authorise('core.edit', $asset);
+		$canDoOwn	= $user->authorise('core.edit.own', $asset) && $isOwner;
+
+		return $canDo || $canDoOwn;
+	}
+
+
+	/**
+	 * Method to check if the user can edit record 's state
+	 *
+	 * @return	boolean	True on success
+	 *
+	 * @since	3.2.0
+	 */
+	public function canEditState($record = null)
+	{
+		$record  = $record ?: $this->_record;
+		$user    = JFactory::getUser();
+		$asset   = $record && !$record->id ? $this->type_alias . '.' . $record->id : $this->option;
+		$isOwner = $record && $user->id && $record->created_user_id == $user->id;
+
+		$canDo    = $user->authorise('core.edit.state', $asset);
+		$canDoOwn	= $user->authorise('core.edit.state.own', $asset) && $isOwner;
+
+		return $canDo || $canDoOwn;
+	}
+
+
+	/**
+	 * Method to check if the user can delete the record
+	 *
+	 * @return	boolean	True on success
+	 *
+	 * @since	3.2.0
+	 */
+	public function canDelete($record = null)
+	{
+		$record  = $record ?: $this->_record;
+		$user    = JFactory::getUser();
+		$asset   = $record && !$record->id ? $this->type_alias . '.' . $record->id : $this->option;
+		$isOwner = $record && $user->id && $record->created_user_id == $user->id;
+
+		$canDo    = $user->authorise('core.delete', $asset);
+		$canDoOwn	= $user->authorise('core.delete.own', $asset) && $isOwner;
+
+		return $canDo || $canDoOwn;
+	}
+
+
+	/**
+	 * Method to do some record / data preprocessing before call JTable::bind()
+	 *
+	 * Note. Typically called inside this MODEL 's store()
+	 *
+	 * @param   object     $record   The record object
+	 * @param   array      $data     The new data array
+	 *
+	 * @since	3.2.0
+	 */
+	protected function _prepareBind($record, & $data)
+	{
+		// Merge template fieldset this should include at least 'clayout' and optionally 'clayout_mobile' parameters
+		if( !empty($data['templates']) )
 		{
-			$title = JString::increment($title);
-			$alias = JString::increment($alias, 'dash');
+			$data['params'] = array_merge($data['params'], $data['templates']);
+			unset($data['templates']);
 		}
 
-		return array($title, $alias);
+		// Merge other special parameters, e.g. 'inheritcid'
+		if( !empty($data['special']) )
+		{
+			$data['params'] = array_merge($data['params'], $data['special']);
+			unset($data['special']);
+		}
+
+		// Get RAW layout field values, validation will follow ...
+		$raw_data = JFactory::getApplication()->input->post->get('jform', array(), 'array');
+		$data['params']['layouts'] = !empty($raw_data['layouts']) ? $raw_data['layouts'] : null;
+
+
+		// ***
+		// *** Special handling of some FIELDSETs: e.g. 'attribs/params' and optionally for other fieldsets too, like: 'metadata'
+		// *** By doing partial merging of these arrays we support having only a sub-set of them inside the form
+		// *** we will use mergeAttributes() instead of bind(), thus fields that are not set will maintain their current DB values,
+		// ***
+		$mergeProperties = $this->mergeableGroups;
+		$mergeOptions = array(
+			'params_fset'  => 'params',
+			'layout_type'  => 'category',
+			'model_names'  => array($this->option => $this->getName(), 'com_categories' => 'category'),
+			'cssprep_save' => false,
+		);
+		$this->mergeAttributes($record, $data, $mergeProperties, $mergeOptions);
+
+		// Unset the above handled FIELDSETs from $data, since we selectively merged them above into the RECORD,
+		// thus they will not overwrite the respective RECORD's properties during call of JTable::bind()
+		foreach($mergeProperties as $prop)
+		{
+			unset($data[$prop]);
+		}
+
+		// Optionally copy parameters from another category
+		$copycid = (int) $data['copycid'];
+
+		if ($copycid)
+		{
+			unset($data['params']);
+			$record->params = $this->getParams($copycid);
+		}
+
+		// Call parent class bind preparation
+		parent::_prepareBind($record, $data);
 	}
-	
+
+
+	/**
+	 * Method to do some work after record has been stored
+	 *
+	 * Note. Typically called inside this MODEL 's store()
+	 *
+	 * @param   object     $record   The record object
+	 * @param   array      $data     The new data array
+	 *
+	 * @since	3.2.0
+	 */
+	protected function _afterStore($record, & $data)
+	{
+		parent::_afterStore($record, $data);
+
+		// Rebuild the path for the category:
+		if (!$record->rebuildPath($record->id))
+		{
+			$this->setError($record->getError());
+			return false;
+		}
+
+		// Rebuild the paths of the category's children:
+		if (!$record->rebuild($record->id, $record->lft, $record->level, $record->path))
+		{
+			$this->setError($record->getError());
+			return false;
+		}
+
+		// Restore extension property of the category to 'com_content'
+		if ($record->id)
+		{
+			$query 	= 'UPDATE #__categories'
+				. ' SET extension = "com_content" '
+				. ' WHERE id = ' . (int)$record->id
+				;
+		}
+	}
+
+
+	/**
+	 * Method to do some work after record has been loaded via JTable::load()
+	 *
+	 * Note. Typically called inside this MODEL 's store()
+	 *
+	 * @param	object   $record   The record object
+	 *
+	 * @since	3.2.0
+	 */
+	protected function _afterLoad($record)
+	{
+		parent::_afterLoad($record);
+	}
+
+
+	/**
+	 * Custom clean the cache
+	 *
+	 * @param   string   $group      Clean cache only in the given group
+	 * @param   integer  $client_id  Site Cache (0) / Admin Cache (1)
+	 *
+	 * @return  void
+	 *
+	 * @since   3.2.0
+	 */
+	protected function cleanCache($group = NULL, $client_id = 0)
+	{
+		if ($group)
+		{
+			parent::cleanCache($group, $client_id);
+		}
+
+		// An empty '$group' will clean '$this->option' which is the Component VIEW Cache, we will do a little more ...
+		else
+		{
+			/**
+			 * Note: null should be the same as $this->option ...
+			 * Maybe add option not clean Component's VIEW cache it will be too aggressive ...
+			 */
+			if (1)
+			{
+				parent::cleanCache(null, $client_id);
+				parent::cleanCache('com_content', $client_id);
+			}
+
+			parent::cleanCache('mod_articles_archive', $client_id);
+			parent::cleanCache('mod_articles_categories', $client_id);
+			parent::cleanCache('mod_articles_category', $client_id);
+			parent::cleanCache('mod_articles_latest', $client_id);
+			parent::cleanCache('mod_articles_news', $client_id);
+			parent::cleanCache('mod_articles_popular', $client_id);
+
+			parent::cleanCache('com_flexicontent_cats', $client_id);
+
+			// Indicate to our system plugin that its category cache needs to be cleaned
+			JFactory::getSession()->set('clear_cats_cache', 1, 'flexicontent');
+		}
+	}
+
+
+	/**
+	 * START OF MODEL SPECIFIC METHODS
+	 */
+
+
+
+	/**
+	 * Method to get parameters of parent categories
+	 *
+	 * @param   integer  $pk  The category id
+	 * @return	string   An array of JSON strings
+	 *
+	 * @since	3.3.0
+	 */
+	public function getParentParams($pk)
+	{
+		if (empty($pk))
+		{
+			return array();
+		}
+
+		global $globalcats;
+
+		$query = 'SELECT id, params'
+			. ' FROM #__categories'
+			. ' WHERE id IN (' . $globalcats[$pk]->ancestors . ')'
+			. ' ORDER BY level ASC'
+		;
+		return $this->_db->setQuery($query)->loadObjectList('id');
+	}
 }
-?>

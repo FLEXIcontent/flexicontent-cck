@@ -18,7 +18,7 @@
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-jimport( 'joomla.application.component.view');
+jimport('legacy.view.legacy');
 
 /**
  * HTML Item View class for the FLEXIcontent component
@@ -31,8 +31,9 @@ class FlexicontentViewItems extends JViewLegacy
 {
 	function display($tpl = null)
 	{
+		$app        = JFactory::getApplication();
 		$user       = JFactory::getUser();
-		$dispatcher = JDispatcher::getInstance();
+		$dispatcher = JEventDispatcher::getInstance();
 
 		// Initialize some variables
 		$item 		= $this->get('Item');
@@ -46,11 +47,9 @@ class FlexicontentViewItems extends JViewLegacy
 
 		// process the new plugins
 		JPluginHelper::importPlugin('content', 'image');
-		if (!FLEXI_J16GE) {
-			$dispatcher->trigger('onPrepareContent', array (& $item, & $params, 0));
-		} else {
-			$dispatcher->trigger('onContentPrepare', array ('com_content.article', &$item, &$params, 0));
-		}
+		FLEXI_J40GE
+			? $app->triggerEvent('onContentPrepare', array ('com_content.article', &$item, &$params, 0))
+			: $dispatcher->trigger('onContentPrepare', array ('com_content.article', &$item, &$params, 0));
 
 		$document = JFactory::getDocument();
 
@@ -117,7 +116,7 @@ class FlexicontentViewItems extends JViewLegacy
 		if ($params->get('show_create_date')) {
 			// Display Created Date
 			if (intval($item->created)) {
-				$create_date = JHTML::_('date', $item->created, JText::_( 'DATE_FORMAT_LC2' ));
+				$create_date = JHtml::_('date', $item->created, JText::_( 'DATE_FORMAT_LC2' ));
 				$text .= $create_date;
 			}
 		}
@@ -130,7 +129,7 @@ class FlexicontentViewItems extends JViewLegacy
 		if ($params->get('show_modify_date')) {
 			// Display Modified Date
 			if (intval($item->modified)) {
-				$mod_date = JHTML::_('date', $item->modified);
+				$mod_date = JHtml::_('date', $item->modified);
 				$text .= JText::_( 'FLEXI_LAST_REVISED' ).' '.$mod_date;
 			}
 		}

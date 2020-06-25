@@ -18,8 +18,9 @@
 
 defined('_JEXEC') or die('Restricted access');
 ?>
-<script language="javascript" type="text/javascript">
-function submitbutton(pressbutton) {
+<script>
+function submitbutton(pressbutton)
+{
 	var form = document.adminForm;
 	if (pressbutton == 'cancel') {
 		submitform( pressbutton );
@@ -35,54 +36,117 @@ function submitbutton(pressbutton) {
 }
 </script>
 
-<?php $disabled = $this->row->url ? '' : ' disabled="disabled"'; ?>
-<div id="flexicontent" class="flexicontent">
-<form action="index.php" method="post" name="adminForm" id="adminForm">
+<?php
 
-	<table class="fc-form-tbl" cellspacing="0" cellpadding="0" border="0" width="100%">
+$tip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
+$btn_class = FLEXI_J30GE ? 'btn' : 'fc_button fcsimple';
+$disabled = $this->row->url ? '' : ' disabled="disabled"';
+?>
+
+
+<div id="flexicontent" class="flexicontent">
+<form action="index.php" method="post" name="adminForm" id="adminForm" class="form-validate form-horizontal">
+
+	<table class="fc-form-tbl">
+
 		<tr>
-			<td class="key">
-				<label class="label" for="altname">
-					<?php echo JText::_( !$this->row->url ? 'FLEXI_FILENAME' : 'FLEXI_FILE_URL' ); ?>
+			<td class="key hasTooltip" title="<?php echo ((int) $this->row->url === 0)
+				? flexicontent_html::getToolTip('FLEXI_FILE_STORAGE_FILENAME', 'FLEXI_FILE_STORAGE_FILENAME_DESC', 1, 1)
+				: flexicontent_html::getToolTip('FLEXI_URL_LINK', 'FLEXI_URL_LINK_DESC', 1, 1)
+				; ?>">
+				<label class="fc-prop-lbl" for="filename">
+					<?php
+					switch ((int) $this->row->url)
+					{
+						case 0:
+							echo JText::_('FLEXI_FILE_STORAGE_FILENAME');
+							break;
+						case 1:
+							echo JText::_('FLEXI_URL_LINK');
+							break;
+						case 2:
+							echo JText::_('FLEXI_JMEDIA_LINK');
+							break;
+					}
+					?>
 				</label>
 			</td>
 			<td>
-				<input type="text" name="filename_original" value="<?php echo strlen($this->row->filename_original) ? $this->row->filename_original : $this->row->filename; ?>" style="width:96%; max-width:800px;" maxlength="100" />
+				<?php if ((int) $this->row->url === 2) :
+
+					$jMedia_file_displayData = array(
+						'disabled' => false,
+						'preview' => 'tooltip',
+						'readonly' => false,
+						'class' => 'required',
+						'link' => 'index.php?option=com_media&amp;view=images&amp;layout=default_fc&amp;tmpl=component&amp;filetypes=folders,images,docs,videos&amp;asset=',  //com_flexicontent&amp;author=&amp;fieldid=\'+mm_id+\'&amp;folder='
+						'asset' => 'com_flexicontent',
+						'authorId' => '',
+						'previewWidth' => 480,
+						'previewHeight' => 360,
+						'name' => 'filename',
+						'id' => 'filename',
+						'value' => $this->row->filename,
+						'folder' => '',
+					);
+					echo JLayoutHelper::render($media_field_layout = 'joomla.form.field.media', $jMedia_file_displayData, $layouts_path = null);
+
+				else :
+
+					echo '
+					<input type="text" id="filename" name="filename" value="' . $this->row->filename . '" class="input-xxlarge required" maxlength="4000"
+					' . ((int)$this->row->url === 0 ? ' readonly="readonly" ' : '') . '
+					/>
+					';
+
+				endif; ?>
+
+			</td>
+		</tr>
+
+
+		<tr>
+			<td class="key hasTooltip" title="<?php echo flexicontent_html::getToolTip('FLEXI_DOWNLOAD_FILENAME', 'FLEXI_FILE_DOWNLOAD_FILENAME_DESC', 1, 1); ?>">
+				<label class="fc-prop-lbl" for="filename_original">
+					<?php
+						echo JText::_('FLEXI_DOWNLOAD_FILENAME');
+					?>
+				</label>
+			</td>
+			<td>
 				<?php
-				if (!$this->row->url) {
-					?><br/><span class="label" style="margin-top:6px;"><?php echo JText::_( 'FLEXI_REAL_PATH' ); ?></span><?php
-					$path		= $this->row->secure ? COM_FLEXICONTENT_FILEPATH : COM_FLEXICONTENT_MEDIAPATH;  // JPATH_ROOT . DS . <media_path | file_path>
-					$file_path = $this->row->filename;
-					$file_path = $path . DS . $this->row->filename;
-					echo $file_path;
-				}
+					echo '
+					<input type="text" id="filename_original" name="filename_original" value="' . (strlen($this->row->filename_original) ? $this->row->filename_original : $this->row->filename) . '" class="input-xxlarge required" maxlength="4000" />
+					';
 				?>
 			</td>
 		</tr>
 
 		<tr>
-			<td class="key" title="<?php echo JText::_( 'FLEXI_FILE_DISPLAY_TITLE_DESC' ); ?>">
-				<label class="label" for="altname">
+			<td class="key hasTooltip" title="<?php echo flexicontent_html::getToolTip('FLEXI_FILE_DISPLAY_TITLE', 'FLEXI_FILE_DISPLAY_TITLE_DESC', 1, 1); ?>">
+				<label class="fc-prop-lbl" for="altname">
 					<?php echo JText::_( 'FLEXI_FILE_DISPLAY_TITLE' ); ?>
 				</label>
 			</td>
 			<td>
-				<input type="text" name="altname" value="<?php echo $this->row->altname; ?>" maxlength="100" style="width:96%; max-width:800px;" />
+				<input type="text" id="altname" name="altname" value="<?php echo $this->row->altname; ?>" maxlength="4000" class="input-xxlarge" />
 			</td>
 		</tr>
+
 		<tr>
-			<td class="key">
-				<label class="label" for="file-desc">
+			<td class="key hasTooltip" title="<?php echo flexicontent_html::getToolTip('FLEXI_DESCRIPTION', 'FLEXI_FILE_DESCRIPTION_DESC', 1, 1); ?>">
+				<label class="fc-prop-lbl" for="file-desc">
 				<?php echo JText::_( 'FLEXI_DESCRIPTION' ); ?>
 				</label>
 			</td>
 			<td>
-				<textarea name="description" rows="5" style="width:94%; max-width:800px;" id="file-desc"><?php echo $this->row->description; ?></textarea>
+				<textarea name="description" rows="5" class="input-xxlarge" id="file-desc"><?php echo $this->row->description; ?></textarea>
 			</td>
 		</tr>
+
 		<tr>
-			<td class="key">
-				<label class="label" for="access">
+			<td class="key hasTooltip" title="<?php echo flexicontent_html::getToolTip('FLEXI_LANGUAGE', 'FLEXI_FILE_LANGUAGE_DESC', 1, 1); ?>">
+				<label class="fc-prop-lbl" for="language">
 					<?php echo JText::_( 'FLEXI_LANGUAGE' ); ?>
 				</label>
 			</td>
@@ -92,10 +156,11 @@ function submitbutton(pressbutton) {
 				</span>
 			</td>
 		</tr>
+
 		<tr>
-			<td class="key">
-				<label class="label" for="access">
-					<?php echo JText::_( 'FLEXI_ACCESS_LEVEL' ); ?>
+			<td class="key hasTooltip" title="<?php echo flexicontent_html::getToolTip('FLEXI_ACCESS', 'FLEXI_FILE_ACCESS_DESC', 1, 1); ?>">
+				<label class="fc-prop-lbl" for="access">
+					<?php echo JText::_( 'FLEXI_ACCESS' ); ?>
 				</label>
 			</td>
 			<td>
@@ -104,8 +169,30 @@ function submitbutton(pressbutton) {
 		</tr>
 
 		<tr>
-			<td class="key" title="<?php echo JText::_( 'FLEXI_FILEEXT_MIME_DESC' ); ?>">
-				<label class="label" for="ext">
+			<td class="key hasTooltip" title="<?php echo flexicontent_html::getToolTip('FLEXI_DOWNLOAD_STAMPING', 'FLEXI_FILE_DOWNLOAD_STAMPING_CONF_FILE_FIELD_DESC', 1, 1); ?>">
+				<label class="fc-prop-lbl" data-for="stamp">
+					<?php echo JText::_( 'FLEXI_DOWNLOAD_STAMPING' ); ?>
+				</label>
+			</td>
+			<td>
+				<?php echo $this->lists['stamp']; ?>
+			</td>
+		</tr>
+
+		<tr>
+			<td class="key hasTooltip" title="<?php echo flexicontent_html::getToolTip('FLEXI_HITS', 'FLEXI_DOWNLOAD_HITS', 1, 1); ?>">
+				<label class="fc-prop-lbl" for="access">
+					<?php echo JText::_( 'FLEXI_HITS' ); ?>
+				</label>
+			</td>
+			<td>
+				<input type="text" id="hits" name="hits" value="<?php echo $this->row->hits; ?>" maxlength="10" class="input-small" />
+			</td>
+		</tr>
+
+		<tr>
+			<td class="key hasTooltip" title="<?php echo flexicontent_html::getToolTip('FLEXI_FILEEXT_MIME', 'FLEXI_FILEEXT_MIME_DESC' ); ?>">
+				<label class="fc-prop-lbl" for="mime_ext">
 					<?php echo JText::_( 'FLEXI_FILEEXT_MIME' ); ?>
 				</label>
 			</td>
@@ -763,46 +850,59 @@ function submitbutton(pressbutton) {
 			</td>
 		</tr>
 
+		<?php if (!$this->row->url) : ?>
+
+		<tr><td colspan="2"></td></tr>
+
+		<tr>
+			<td class="key">
+				<span class="label label-info"><?php echo JText::_( 'FLEXI_SIZE' ); ?></span> &nbsp;
+			</td>
+			<td>
+				<?php echo file_exists($this->rowdata->path) ? $this->rowdata->size_display : JText::_('FLEXI_FILE_NOT_FOUND'); ?>
+			</td>
+		</tr>
+
+		<tr>
+			<td class="key">
+				<span class="label label-info"><?php echo JText::_( 'FLEXI_REAL_PATH' ); ?></span> &nbsp;
+			</td>
+			<td>
+				<?php echo $this->rowdata->path;?>
+			</td>
+		</tr>
+
+		<?php else: ?>
+
+		<tr>
+			<td class="key hasTooltip" title="<?php echo flexicontent_html::getToolTip('FLEXI_SIZE', 'FLEXI_SIZE_IN_FORM', 1, 1); ?>">
+				<label class="fc-prop-lbl" for="size">
+					<?php echo JText::_( 'FLEXI_SIZE' ); ?>
+				</label>
+			</td>
+			<td>
+				<input type="text" id="size" name="size" value="<?php echo ceil(((int)$this->rowdata->calculated_size)/1024.0); ?>" size="10" style="max-width:200px;" maxlength="100"/>
+				<select id="size_unit" name="size_unit" class="use_select2_lib">
+					<option value="KBs" selected="selected">KBs</option>
+					<option value="MBs">MBs</option>
+					<option value="GBs">GBs</option>
+				</select>
+				<span class="hasTooltip" title="<?php echo flexicontent_html::getToolTip('FLEXI_SIZE', 'FLEXI_SIZE_IN_FORM', 1, 1); ?>"><i class="icon-info"></i></span>
+
+				<?php echo $this->rowdata->size_warning; ?>
+			</td>
+		</tr>
+		
+		<?php endif; ?>
+		
 	</table>
 
 
-<?php
-if (FLEXI_ACCESS) :
-$this->document->addScriptDeclaration("
-	window.addEvent('domready', function() {
-	var slideaccess = new Fx.Slide('tabacces');
-	var slidenoaccess = new Fx.Slide('notabacces');
-	slideaccess.hide();
-		$$('fieldset.flexiaccess legend').addEvent('click', function(ev) {
-			slideaccess.toggle();
-			slidenoaccess.toggle();
-			});
-		});
-	");
-?>
-<fieldset class="flexiaccess">
-	<legend><?php echo JText::_( 'FLEXI_RIGHTS_MANAGEMENT' ); ?></legend>
-	<table id="tabacces" class="admintable" width="100%">
-	<tr>
-		<td>
-		<div id="access"><?php echo $this->lists['access']; ?></div>
-	</td>
-	</tr>
-</table>
-	<div id="notabacces">
-	<?php echo JText::_( 'FLEXI_RIGHTS_MANAGEMENT_DESC' ); ?>
-</div>
-</fieldset>
-<?php endif; ?>
-
-
-<?php echo JHTML::_( 'form.token' ); ?>
+<?php echo JHtml::_( 'form.token' ); ?>
 <input type="hidden" name="option" value="com_flexicontent" />
 <?php if (!$this->row->url) : ?>
-<input type="hidden" name="filename" value="<?php echo $this->row->filename; ?>" />
 <input type="hidden" name="ext" value="<?php echo $this->row->ext; ?>" />
 <?php endif; ?>
-<input type="hidden" name="hits" value="<?php echo $this->row->hits; ?>" />
 <input type="hidden" name="url" value="<?php echo $this->row->url; ?>" />
 <input type="hidden" name="secure" value="<?php echo $this->row->secure; ?>" />
 <input type="hidden" name="uploaded" value="<?php echo $this->row->uploaded; ?>" />
@@ -817,5 +917,5 @@ $this->document->addScriptDeclaration("
 
 <?php
 //keep session alive while editing
-JHTML::_('behavior.keepalive');
+JHtml::_('behavior.keepalive');
 ?>

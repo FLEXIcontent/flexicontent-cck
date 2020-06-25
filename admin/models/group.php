@@ -1,34 +1,34 @@
 <?php
 /**
- * @package Joomla
- * @subpackage FLEXIcontent
- * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
- * @license GNU/GPL v2
- * 
- * FLEXIcontent is a derivative work of the excellent QuickFAQ component
- * @copyright (C) 2008 Christoph Lukes
- * see www.schlu.net for more information
+ * @package         FLEXIcontent
+ * @version         3.3
  *
- * FLEXIcontent is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
+ * @link            https://flexicontent.org
+ * @copyright       Copyright © 2018, FLEXIcontent team, All Rights Reserved
+ * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
-// No direct access.
-defined('_JEXEC') or die;
-
-jimport('joomla.application.component.modeladmin');
+// no direct access
+defined('_JEXEC') or die('Restricted access');
 
 /**
- * User group model.
+ * FLEXIcontent Component User Group Model
  *
- * @package		Joomla.Administrator
- * @subpackage	com_flexicontent
- * @since		1.6
  */
-require_once(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_users'.DS.'models'.DS.'group.php');
-
-class FlexicontentModelGroup extends UsersModelGroup
+if (FLEXI_J40GE)
 {
+	require_once(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_users'.DS.'Model'.DS.'GroupModel.php');
+
+	class FlexicontentModelGroup extends Joomla\Component\Users\Administrator\Model\GroupModel
+	{
+	}
+}
+else
+{
+	require_once(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_users'.DS.'models'.DS.'group.php');
+
+	class FlexicontentModelGroup extends UsersModelGroup
+	{
+	}
 }

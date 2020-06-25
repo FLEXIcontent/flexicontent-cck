@@ -8,93 +8,303 @@
 	<authorEmail>emmanuel@vistamedia.fr</authorEmail>
 	<authorUrl>www.vistamedia.fr</authorUrl>
 	<version>1.0</version>
+	<documentation url="http://www.flexicontent.org/documentation/faq.html" title="FLEXI_ABOUT" modal="1" icon="info" />
 	<description>FLEXI_FIELD_EMAIL</description>
 	<files>
 		<filename plugin="email">email.php</filename>
 		<filename>index.html</filename>
+		<folder>tmpl</folder>
 	</files>
-	
+
 	<config>
 	<fields name="attribs">
-		
-		<!--fieldset name="standard" repeat="1">
+
+		<!--fieldset name="standard" hidden="true">
 		</fieldset-->
-		
-		<fieldset name="group-email-editing" repeat="1" icon_class="icon-pencil" label="FLEXI_FIELD_EDITING" addfieldpath="/administrator/components/com_flexicontent/elements">
-			
-			<field name="" type="separator" default="FLEXI_FIELD_VALUES" level="level1" />
-			
-			<field name="" type="separator" default="FLEXI_FIELD_NUMBER_OF_VALUES" description="" level="level2" />
-			<field name="allow_multiple" type="radio" default="0" label="FLEXI_FIELD_ALLOW_MULTIPLE" description="FLEXI_FIELD_ALLOW_MULTIPLE_DESC">
+
+		<fieldset name="group-email-editing" hidden="true" icon_class="icon-pencil" label="FLEXI_FIELD_EDITING" addfieldpath="/administrator/components/com_flexicontent/elements">
+
+			<field name="" type="separator" default="FLEXI_FIELD_EDITING" level="tabset_start" box_type="1" />
+
+			<field name="" type="separator" default="FLEXI_FIELD_VALUES" icon_class="icon-database" level="tab_open" box_type="1" />
+
+			<field name="use_ingroup" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_USE_IN_FIELD_GROUP" description="FLEXI_USE_IN_FIELD_GROUP_DESC" inline_tip="FLEXI_USE_IN_FIELD_GROUP_INSTRUCTIONS" tip_class="fieldgroupon" tip_img="comments.png" preview_img="insert_merge_field.png" class="btn-group group-fcinfo">
+				<option value="0" show_list="fieldgroupoff" hide_list="fieldgroupon">FLEXI_NO</option>
+				<option value="1" show_list="fieldgroupon" hide_list="fieldgroupoff">FLEXI_YES</option>
+			</field>
+
+			<field name="" type="separator" default="FLEXI_FIELD_NUMBER_OF_VALUES" description="" depend_class="fieldgroupoff" level="level2" />
+			<field name="required" type="radio" default="0" label="FLEXI_FIELD_REQUIRED" description="FLEXI_FIELD_REQUIRED_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="add_position" type="radio" default="3" label="FLEXI_FIELD_ADD_POSITION" description="FLEXI_FIELD_ADD_POSITION_DESC">
+			<field name="allow_multiple" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_FIELD_ALLOW_MULTIPLE" description="FLEXI_FIELD_ALLOW_MULTIPLE_DESC" depend_class="fieldgroupoff" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="multivalue-mode">FLEXI_NO</option>
+				<option value="1" show_list="multivalue-mode" hide_list="">FLEXI_YES</option>
+			</field>
+			<field name="max_values" type="text" default="0" size="2" label="FLEXI_FIELD_MAX_VALUES" description="FLEXI_FIELD_MAX_VALUES_DESC" depend_class="fieldgroupoff multivalue-mode" />
+			<field name="fields_box_placing" type="radio" default="1" label="FLEXI_FIELD_VALUES_PER_ROW" description="FLEXI_FIELD_VALUES_PER_ROW_DESC" depend_class="fieldgroupoff multivalue-mode" class="btn-group group-fcinfo">
+				<option value="0">1</option>
+				<option value="1">FLEXI_MULTIPLE</option>
+			</field>
+			<field name="add_position" type="multilist" subtype="radio" default="3" label="FLEXI_FIELD_ADD_POSITION" description="FLEXI_FIELD_ADD_POSITION_DESC" depend_class="fieldgroupoff multivalue-mode" class="btn-group group-fcinfo">
 				<option value="0">FLEXI_FIELD_APPEND_BTN</option>
 				<option value="1">FLEXI_FIELD_INLINE_APPEND_BTN</option>
 				<option value="2">FLEXI_FIELD_INLINE_PREPEND_BTN</option>
 				<option value="3">FLEXI_FIELD_INLINE_BOTH_BTN</option>
 			</field>
-			<field name="max_values" type="text" default="0" size="2" label="FLEXI_FIELD_MAX_VALUES" description="FLEXI_FIELD_MAX_VALUES_DESC" />
-			<field name="required" type="radio" default="0" label="FLEXI_REQUIRED" description="FLEXI_REQUIRED_DESC">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			
-			<field name="" type="separator" default="FLEXI_VALUE_CREATION_LABEL" level="level1" />
-			<field name="" type="separator" default="Email address" description="FLEXI_FORM_FIELD_CONF_DESC" level="level2" />
-			<field name="default_value" type="text" default="" size="50" label="FLEXI_PROPERTY_DEFAULT" description="FLEXI_PROPERTY_DEFAULT_DESC" />
+
+			<field name="" type="separator" default="FLEXI_VALUE_CREATION_LABEL" level="level2" />
+
+			<field name="" type="separator" default="Email" level="level3" />
+			<field name="default_value" type="text" filter="EMAIL" default="" label="FLEXI_PROPERTY_DEFAULT" description="FLEXI_PROPERTY_DEFAULT_DESC" />
 			<field name="default_value_use" type="list" default="0" label="FLEXI_OPTIONAL_PROPERTIES_DEFAULT_USAGE" description="FLEXI_OPTIONAL_PROPERTIES_DEFAULT_USAGE_DESC">
 				<option value="0">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_NEW</option>
 				<option value="1">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_ALL</option>
 				<option value="2">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_AND_ON_EMPTY</option>
 			</field>
-			<field name="" type="separator" default="FLEXI_FORM_FIELD_CONF" description="FLEXI_FORM_FIELD_CONF_DESC" level="level3" />
-			<field name="maxlength" type="text" default="" size="6" label="FLEXI_MAX_TXT_LEN" description="FLEXI_MAX_TXT_LEN_DESC" />
-			<field name="size" type="text" default="30" size="2" label="FLEXI_FIELD_SIZE" description="FLEXI_FIELD_SIZE_DESC" />
-			<field name="extra_attributes" type="text" default="" size="50" label="FLEXI_FIELD_EXTRA_ATTRIBUTES" description="FLEXI_FIELD_EXTRA_ATTRIBUTES_DESC" />
-			
-			<field name="" type="separator" default="FLEXI_EMAIL_TITLE" level="level2" />
-			<field name="use_title" type="radio" default="0" label="FLEXI_ENABLE_PROPERTY" description="FLEXI_ENABLE_PROPERTY_DESC">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
+
+			<field name="" type="separator" default="FLEXI_EMAIL_TITLE" level="level3" />
 			<field name="default_value_title" type="text" default="" label="FLEXI_PROPERTY_DEFAULT" description="FLEXI_PROPERTY_DEFAULT_DESC" />
 			<field name="title_usage" type="list" default="0" label="FLEXI_OPTIONAL_PROPERTIES_DEFAULT_USAGE" description="FLEXI_OPTIONAL_PROPERTIES_DEFAULT_USAGE_DESC">
 				<option value="0">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_NEW</option>
 				<option value="1">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_ALL</option>
 				<option value="2">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_AND_ON_EMPTY</option>
 			</field>
-			
+
+			<field name="" type="separator" default="FLEXI_FIELD_VALUE_AUTO_VALUE_CREATION" level="level2" />
+			<field name="" type="separator" default="FLEXI_FC_PRO_ONLY_INFO" level="level4" class="alert alert-warning fcpadded" />
+			<field name="auto_value" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_FIELD_VALUE_AUTO_VALUE" description="FLEXI_FIELD_VALUE_AUTO_VALUE_DESC" class="btn-group group-fcmethod">
+				<option value="0" hide_list="auto-value-code">FLEXI_NO</option>
+				<option value="2" show_list="auto-value-code">FLEXI_USE_CUSTOM_CODE</option>
+			</field>
+			<field name="auto_value_code" type="editor" editor="codemirror" syntax="php" rows="4" cols="80" height="100px" class="fc-unset-width" filter="RAW"
+				default="&lt;?php&#13;&#10;$F = &amp; $item-&gt;fields;&#13;&#10;if ( !isset($F['fieldname01']) ) return array('fieldname01 field not found');&#13;&#10;&#13;&#10;$vals = array();&#13;&#10;foreach($F['fieldname01']-&gt;postdata as $i =&gt; $v)&#13;&#10;{&#13;&#10;  $vals[$i] = 'Auto : ' . $v;&#13;&#10;}&#13;&#10;&#13;&#10;return $vals;"
+				label="FLEXI_CREATE_VIA_CUSTOM_CODE" description="FLEXI_CREATE_VIA_CUSTOM_CODE_DESC" depend_class="auto-value-code"/>
+
+			<field name="" type="separator" default="FLEXI_FORM_FIELD_CONF" _description="FLEXI_FORM_FIELD_CONF_DESC" icon_class="icon-checkbox" level="tab_open" box_type="1" />
+
+			<field name="display_label_form" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_FLOATED_LEFT</option>
+				<option value="2">FLEXI_CLEARED</option>
+			</field>
+			<field name="label_form" type="text" default="" label="FLEXI_LABEL" description="Enter a label to use for item form that is different than field label for viewing" depend_class=""/>
+			<field name="no_acc_msg_form" type="text" default="" label="FLEXI_FIELD_NOACCESS_MSG" description="FLEXI_FIELD_NOACCESS_MSG_DESC" depend_class=""/>
+
+			<field name="" type="separator" default="FLEXI_LAYOUT" description="" level="level2" />
+
+			<field name="formlayout" type="fcfilelist" default="" label="FLEXI_FIELD_SELECT_FORM_LAYOUT" description="FLEXI_FIELD_SELECT_FORM_LAYOUT_DESC" directory="plugins/flexicontent_fields/email/tmpl/" filter="field*" exclude="" stripext="1" stripprefix="field_" hide_none="1" hide_default="1" labelclass="label label-warning" />
+
+			<field name="show_values_expand_btn" type="radio" default="0" label="FLEXI_FIELD_EDIT_EXPAND_VALUES" description="FLEXI_FIELD_EDIT_EXPAND_VALUES_DESC" class="btn-group btn-group-yesno" depend_class="fieldgroupoff">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="simple_form_layout" type="radio" default="0" label="FLEXI_FIELD_SIMPLE_FORM_DESIGN" description="FLEXI_FIELD_SIMPLE_FORM_DESIGN_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+
+			<field name="" type="separator" default="Email" level="level2" />
+			<field name="maxlength" type="text" default="4000" size="6" label="FLEXI_MAX_TXT_LEN" description="FLEXI_MAX_TXT_LEN_DESC" />
+			<field name="size" type="text" default="30" size="2" label="FLEXI_FIELD_SIZE" description="FLEXI_FIELD_SIZE_DESC" />
+			<field name="extra_attributes" type="text" default="" label="FLEXI_FIELD_EXTRA_ATTRIBUTES" description="FLEXI_FIELD_EXTRA_ATTRIBUTES_DESC" />
+
+			<field name="inputmask" type="multilist" subtype="radio" default="" label="FLEXI_VALUE_MASK_VALIDATE_CONF" description="FLEXI_VALUE_MASK_VALIDATE_CONF_DESC" class="btn-group btn-group-yesno">
+				<option value="">FLEXI_NO</option>
+				<option value="email">FLEXI_YES</option>
+			</field>
+
+			<field name="" type="separator" default="FLEXI_EMAIL_TITLE" level="level2" />
+			<field name="use_title" type="radio" default="0" label="FLEXI_ENABLE_PROPERTY" description="FLEXI_ENABLE_PROPERTY_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+
+			<field name="" type="separator" default="FLEXI_IMPORT" description="" icon_class="icon-upload" level="tab_open" box_type="1" />
+
+			<field name="" type="separator" default="FLEXI_FIELDS_IMPORT_MANIPULATE_VALUES_DURING_IMPORT" level="level2" />
+			<field name="" type="separator" default="FLEXI_FC_PRO_ONLY_INFO" level="level4" class="alert alert-warning fcpadded" />
+
+			<field name="import_fv_remap_mode" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_FIELDS_IMPORT_REMAP_VALUES" description="FLEXI_FIELDS_IMPORT_REMAP_VALUES_DESC" class="btn-group group-fcmethod">
+				<option value="0" hide_list="import-remap">FLEXI_NO</option>
+				<option value="1" show_list="import-remap">FLEXI_YES</option>
+			</field>
+			<field name="import_fv_remap" type="textarea" label="FLEXI_FIELDS_IMPORT_VALUE_REMAPPINGS" description="FLEXI_FIELDS_IMPORT_VALUE_REMAPPINGS_DESC" depend_class="import-remap" />
+
+			<field name="import_fv_ccode_mode" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_FIELDS_IMPORT_VALUES_MANIPULATION" description="FLEXI_FIELDS_IMPORT_VALUES_MANIPULATION_DESC" class="btn-group group-fcmethod">
+				<option value="0" hide_list="import-ccode">FLEXI_NO</option>
+				<option value="2" show_list="import-ccode">FLEXI_USE_CUSTOM_CODE</option>
+			</field>
+			<field name="import_fv_ccode" type="editor" editor="codemirror" syntax="php" rows="4" cols="80" height="100px" class="fc-unset-width" filter="RAW"
+				default="&lt;?php&#13;&#10;$some_param = $field->parameters->get('some_param');&#13;&#10;&#13;&#10;foreach($values as $i => $v)&#13;&#10;{&#13;&#10;  $values[$i] = 'Example ' .  $i . ' : ' . $v;&#13;&#10;}&#13;&#10;&#13;&#10;return $values;"
+				label="FLEXI_CREATE_VIA_CUSTOM_CODE" description="FLEXI_CREATE_VIA_CUSTOM_CODE_DESC" depend_class="import-ccode" />
+
+			<field name="" type="separator" default="FLEXI_FIELD_EDITING" level="tabset_close" box_type="1" />
 		</fieldset>
-		<fieldset name="group-email-viewing" repeat="1" icon_class="icon-list-view" label="FLEXI_FIELD_VIEWING" addfieldpath="/administrator/components/com_flexicontent/elements">
-			
-			<field name="" type="separator" default="FLEXI_FIELD_LABEL_AND_ACCESS" level="level1" />
-			
-			<field name="display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC">
+		<fieldset name="group-email-viewing" hidden="true" icon_class="icon-screen" label="FLEXI_FIELD_VIEWING" addfieldpath="/administrator/components/com_flexicontent/elements">
+
+			<field name="" type="separator" default="FLEXI_FIELD_VIEWING" level="tabset_start" box_type="1" />
+			<field name="" type="separator" default="FLEXI_BASIC" icon_class="icon-vcard" level="tab_open" box_type="1" />
+
+			<field name="" type="separator" default="FLEXI_DISPLAY" level="level2" />
+			<field name="show_in_clients" type="fccheckbox" default=""
+				checkoptions="FLEXI_DESKTOP,FLEXI_TABLET,FLEXI_MOBILE" checkvals="desktop,tablet,mobile" defaultvals="desktop,tablet,mobile"
+				label="FLEXI_FIELD_SHOW_IN_CLIENTS" description="FLEXI_FIELD_SHOW_IN_CLIENTS_DESC" depend_class="use_js_lib" />
+			<field name="show_in_views" type="fccheckbox" default=""
+				checkoptions="FLEXI_ITEM,FLEXI_ITEM_LISTS,FLEXI_MODULE,FLEXI_BACKEND" checkvals="item,category,module,backend" defaultvals="item,category,module,backend"
+				label="FLEXI_FIELD_SHOW_IN_VIEWS" description="FLEXI_FIELD_SHOW_IN_VIEWS_DESC" />
+
+			<field name="" type="separator" default="FLEXI_FIELD_LABEL_AND_ACCESS" level="level2" />
+			<field name="display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="show_acc_msg" type="radio" default="0" label="FLEXI_FIELD_SHOW_NOACCESS" description="FLEXI_FIELD_SHOW_NOACCESS_DESC">
+			<field name="show_acc_msg" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_FIELD_SHOW_NOACCESS" description="FLEXI_FIELD_SHOW_NOACCESS_DESC" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="field-acc-msg">FLEXI_NO</option>
+				<option value="1" show_list="field-acc-msg" hide_list="">FLEXI_YES</option>
+			</field>
+			<field name="no_acc_msg" type="text" default="" label="FLEXI_FIELD_NOACCESS_MSG" description="FLEXI_FIELD_NOACCESS_MSG_DESC" depend_class="field-acc-msg"/>
+
+			<field name="" type="separator" default="FLEXI_EXPORT" level="level2" />
+			<field name="include_in_csv_export" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_FIELD_INCLUDE_IN_CSV_EXPORT" description="FLEXI_FIELD_INCLUDE_IN_CSV_EXPORT_DESC" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="csv_rendered_display">FLEXI_NO</option>
+				<option value="1" show_list="" hide_list="csv_rendered_display">FLEXI_FIELD_RAW_VALUES</option>
+				<option value="2" show_list="csv_rendered_display" hide_list="">FLEXI_FIELD_RENDERED_VALUES</option>
+			</field>
+			<field name="csv_strip_html" type="radio" default="0" label="FLEXI_STRIP_HTML" description="" class="btn-group btn-group-yesno" depend_class="csv_rendered_display">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="no_acc_msg" type="text" default="" label="FLEXI_FIELD_NOACCESS_MSG" description="FLEXI_FIELD_NOACCESS_MSG_DESC"/>
-			
-			<field name="" type="separator" default="FLEXI_FIELD_CONTENT_PLUGINS" description="FLEXI_FIELD_CONTENT_PLUGINS_DESC" level="level2"  />
-			<field name="trigger_onprepare_content" type="radio" default="0" label="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT" description="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT_DESC">
+			<field name="" type="separator" default="{{text}} {{addr}}" level="level3" class="alert alert-info"  depend_class="csv_rendered_display" />
+			<field name="csv_export_text" type="textarea" default="{{text}} {{addr}}" label="FLEXI_CUSTOMIZE" description="" depend_class="csv_rendered_display" />
+
+			<field name="" type="separator" default="FLEXI_LAYOUT" description="" icon_class="icon-file-2" level="tab_open" box_type="1" />
+			<field name="viewlayout" type="fcfilelist" default="" label="FLEXI_FIELD_SELECT_VIEW_LAYOUT" description="FLEXI_FIELD_SELECT_VIEW_LAYOUT_DESC" directory="plugins/flexicontent_fields/email/tmpl/" filter="value*" exclude="" stripext="1" stripprefix="value_" hide_none="1" hide_default="1" />
+
+			<field name="" type="separator" default="FLEXI_FIELD_VALUE_DISPLAY" level="level2" />
+			<field name="show_no_value" type="multilist" subtype="radio" default="0" label="FLEXI_FIELD_SHOW_NO_VALUE" toggle_related="1" description="FLEXI_FIELD_SHOW_NO_VALUE_DESC" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="multivalue-mode">FLEXI_NO</option>
+				<option value="1" show_list="multivalue-mode" hide_list="">FLEXI_YES</option>
+			</field>
+			<field name="no_value_msg" type="text" default="" size="42" label="FLEXI_FIELD_NO_VALUE_MSG" depend_class="multivalue-mode" description="FLEXI_FIELD_NO_VALUE_MSG_DESC" />
+
+			<field name="email_cloaking" type="radio" default="1" label="FLEXI_FIELD_EMAIL_CLOAKING" description="FLEXI_FIELD_EMAIL_CLOAKING_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="plugins" type="pluginlist" label="FLEXI_FIELD_CHOOSE_SPECIFIC_PLUGINS" description="FLEXI_FIELD_CHOOSE_SPECIFIC_PLUGINS_DESC" />
-			
+			<field name="mailto_link" type="radio" default="1" label="FLEXI_FIELD_EMAIL_MAILTO_LINK" description="FLEXI_FIELD_EMAIL_MAILTO_LINK_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+
+			<field name="" type="separator" default="FLEXI_FIELD_EMAIL_OPTIONS" level="level1" />
+
+			<field name="" type="separator" default="FLEXI_FIELD_EMAIL_FORM_OPTION" level="level2" />
+
+			<field name="display_title_form" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_FIELD_EMAIL_TITLE_FORM_DISPLAY" description="FLEXI_FIELD_EMAIL_TITLE_FORM_DISPLAY_DESC" class="btn-group btn-group-yesno">
+			  <option value="0" show_list="" hide_list="disp_title_form">FLEXI_NO</option>
+			  <option value="1" show_list="disp_title_form" hide_list="">FLEXI_YES</option>
+			</field>
+			<field name="title_form" type="text" label="FLEXI_FIELD_EMAIL_FORM_TITLE"  defaut="FLEXI_FIELD_EMAIL_TITLEFORM_VALUE" description="FLEXI_FIELD_EMAIL_FORM_TITLE_DESC" depend_class="disp_title_form" />
+
+			<field name="email_user_copy" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_FIELD_EMAIL_SEND_COPY_TO_USER" description="FLEXI_FIELD_EMAIL_SEND_COPY_TO_USER_DESC" class="btn-group btn-group-yesno">
+				<option value="0" >FLEXI_NO</option>
+				<option value="1" >FLEXI_YES</option>
+			</field>
+
+			<field name="email_admin_copy" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_FIELD_EMAIL_SEND_COPY_TO_ADMIN" description="FLEXI_FIELD_EMAIL_SEND_COPY_TO_ADMIN_DESC" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="sentoadmin">FLEXI_NO</option>
+				<option value="1" show_list="sentoadmin" hide_list="">FLEXI_YES</option>
+			</field>
+			<field name="email_admin" type="text" label="FLEXI_FIELD_EMAIL_ADMIN"  defaut="" description="FLEXI_FIELD_EMAIL_ADMIN_DESC" depend_class="sentoadmin" />
+
+
+			<field name="label_position" default="" type="multilist" subtype="radio" toggle_related="1" label="FLEXI_FIELD_EMAIL_LABEL_POSITION" description="FLEXI_FIELD_EMAIL_LABEL_POSITION_DESC" class="btn-group btn-group-yesno">
+			<option value="">FLEXI_LABEL_TMP_POSITION</option>
+			<option value="top">FLEXI_LABEL_TOP</option>
+			<option value="placeholder">FLEXI_LABEL_PLACEHOLDER</option>
+			</field>
+
+			<field name="" type="separator" default="FLEXI_FIELD_EMAIL_FORM_FIELDS" level="level2" />
+
+			<field name="form_fields" type="subform" label="Form field" description="" layout="joomla.form.field.subform.repeatable" icon="list" multiple="true" class="fcsubform-compact">
+	<form name="form_fields_list" repeat="true">
+		<field name="field_type" type="list" label="Type" description="">
+			<option value="text">FLEXI_FIELD_TYPE_TEXT</option>
+			<option value="email">FLEXI_FIELD_TYPE_EMAIL</option>
+			<option value="radio">FLEXI_FIELD_TYPE_RADIO</option>
+			<option value="date">FLEXI_FIELD_TYPE_DATE</option>
+			<option value="datetime-local">FLEXI_FIELD_TYPE_DATETIME</option>
+			<option value="checkbox">FLEXI_FIELD_TYPE_CHECKBOX</option>
+			<option value="select">FLEXI_FIELD_TYPE_SELECT</option>
+			<option value="range">FLEXI_FIELD_TYPE_RANGE</option>
+			<option value="textarea">FLEXI_FIELD_TYPE_TEXTAREA</option>
+			<option value="freehtml">FLEXI_FIELD_TYPE_FREEHTML</option>
+			<option value="hidden">FLEXI_FIELD_TYPE_HIDDEN</option>
+			<option value="tel">FLEXI_FIELD_TYPE_TEL</option>
+			<option value="url">FLEXI_FIELD_TYPE_URL</option>
+			<option value="file">FLEXI_FIELD_TYPE_FILE</option>
+		</field>
+		<field name="field_name" type="text" label="FLEXI_FIELD_EMAIL_NAME_FIELD"  default="FIELD_NAME" description="FLEXI_FIELD_EMAIL_NAME_FIELD_DESC" />
+		<field name="field_label" type="text" label="FLEXI_FIELD_EMAIL_LABEL_FIELD"  default="FIELD_LABEL" description="FLEXI_FIELD_EMAIL_LABEL_FIELD_DESC" />
+		<field name="field_value" type="text" label="FLEXI_FIELD_EMAIL_VALUE_FIELD"  default="value1;;value2" description="FLEXI_FIELD_EMAIL_VALUE_FIELD_DESC" />
+		<field name="field_required" type="multilist" subtype="radio" toggle_related="1" default="1" label="FLEXI_FIELD_EMAIL_FIELD_REQUIRED" description="FLEXI_FIELD_EMAIL_FIELD_REQUIRED_DESC" class="btn-group btn-group-yesno" >
+			<option value="0" >FLEXI_NO</option>
+			<option value="1" >FLEXI_YES</option>
+		</field>
+	</form>
+</field>
+<field name="" type="separator" default="FLEXI_FIELD_EMAIL_FORM_USEDESC" level="level3" class="alert alert-info fcpadded" />
+
+			<field name="" type="separator" default="FLEXI_FIELD_EMAIL_SUBMIT_OPTION" level="level2" />
+			<field name="submit_label" type="text" label="FLEXI_FIELD_EMAIL_SUBMIT_LABEL"  default="FLEXI_FIELD_EMAIL_SUBMIT_LABEL_VALUE" description="FLEXI_FIELD_EMAIL_SUBMIT_LABEL_DESC"/>
+			<field name="submit_class" type="text" label="FLEXI_FIELD_EMAIL_SUBMIT_CLASS"  default="btn btn-success" description="FLEXI_FIELD_EMAIL_SUBMIT_CLASS_DESC"/>
+
+			<field name="" type="separator" default="FLEXI_FIELD_EMAIL_CONSENT_OPTION" level="level2" />
+			<field name="display_consent" type="multilist" subtype="radio" toggle_related="1" default="1" label="FLEXI_FIELD_EMAIL_CONSENT_DISPLAY" description="FLEXI_FIELD_EMAIL_CONSENT_DISPLAY_DESC" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="consent_label">FLEXI_NO</option>
+				<option value="1" show_list="consent_label" hide_list="">FLEXI_YES</option>
+			</field>
+			<field name="text_consent" type="text" label="FLEXI_FIELD_EMAIL_CONSENT_LABEL"  default="FLEXI_FIELD_EMAIL_CONSENT_LABEL_VALUE" description="FLEXI_FIELD_EMAIL_LINK_LABEL_DESC" depend_class="consent_label"/>
+			<field name="link_consent" type="text" label="FLEXI_FIELD_EMAIL_CONSENT_LINK_LABEL"  default="" description="FLEXI_FIELD_EMAIL_CONSENT_LINK_DESC" depend_class="consent_label"/>
+
+
+			<field name="" type="separator" default="FLEXI_FIELD_EMAIL_CAPTCHA_OPTION" level="level2" />
+			<field name="display_captcha" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_FIELD_EMAIL_CAPTCHA_DISPLAY" description="FLEXI_FIELD_EMAIL_CAPTCHA_DISPLAY_DESC" class="btn-group btn-group-yesno">
+			  <option value="0" show_list="" hide_list="disp_captcha_label">FLEXI_NO</option>
+			  <option value="1" show_list="disp_captcha_label" hide_list="">FLEXI_YES</option>
+			</field>
+
+			<field name="" type="separator" default="FLEXI_FIELD_EMAIL_CONTENT_MESSAGE" level="level2" />
+			<field name="" type="separator" default="FLEXI_FC_PRO_ONLY_INFO" level="level4" class="alert alert-warning fcpadded" />
+			<field name="override_email" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_FIELD_EMAIL_OVERRIDE" description="FLEXI_FIELD_EMAIL_OVERRIDE_DESC" class="btn-group btn-group-yesno" >
+			<option value="0" show_list="" hide_list="override_email">FLEXI_NO</option>
+			<option value="1" show_list="override_email" hide_list="">FLEXI_YES</option>
+		</field>
+			<field name="" type="separator" default="FLEXI_FIELD_EMAIL_CONTENT_DESC" level="level3" class="alert alert-info fcpadded" depend_class="override_email"/>
+			<field name="title_email" type="text" default="Title email {{field_name##value}}" label="FLEXI_FIELD_TITLE_EMAIL" description="FLEXI_FIELD_TITLE_EMAIL_DESC" depend_class="override_email" />
+			<field name="body_email" type="editor" editor="tinymce" syntax="html" filter="RAW" cols="20" rows="4" height="60px" class="fc-unset-width" default="{{item_title}} {{item_url}} {{field_name##value}}" label="FLEXI_FIELD_BODY_EMAIL" description="FLEXI_FIELD_BODY_EMAIL_DESC" depend_class="override_email" />
+
+			<field name="" type="separator" default="FLEXI_FIELD_VALUE_LIST" description="" icon_class="icon-stack" level="tab_open" box_type="1" />
+
 			<field name="" type="separator" default="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL" description="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL_DESC_FIELD" level="level2" />
-			<field name="remove_space" type="radio" default="0" label="FLEXI_REMOVE_SPACE" description="FLEXI_REMOVE_SPACE_DESC">
+			<field name="prx_sfx_open_close_configs" type="multilist" subtype="list" default="" label="FLEXI_PRESET_CONFIGURATIONS" description="FLEXI_PRESET_CONFIGURATIONS_DESC" toggle_related="1">
+				<option value=""  fcreadonly="{'opentag':0,'closetag':0,'pretext':0,'posttext':0,'separatorf':0,'remove_space':0}" >FLEXI_CUSTOMIZE</option>
+				<option value="1" fcreadonly="{'opentag':1,'closetag':1,'pretext':1,'posttext':1,'separatorf':1,'remove_space':1}" fcconfigs="{'opentag':'&lt;ol&gt;','closetag':'&lt;/ol&gt;','pretext':'&lt;li&gt;','posttext':'&lt;/li&gt;','separatorf':'5','remove_space':'0'}">List: numbered</option>
+				<option value="2" fcreadonly="{'opentag':1,'closetag':1,'pretext':1,'posttext':1,'separatorf':1,'remove_space':1}" fcconfigs="{'opentag':'&lt;ul style=\'list-style-type:disc\'&gt;','closetag':'&lt;/ul&gt;','pretext':'&lt;li&gt;','posttext':'&lt;/li&gt;','separatorf':'5','remove_space':'0'}">List (bullets)</option>
+				<option value="3" fcreadonly="{'opentag':1,'closetag':1,'pretext':1,'posttext':1,'separatorf':1,'remove_space':1}" fcconfigs="{'opentag':'&lt;ul style=\'list-style-type:circle\'&gt;','closetag':'&lt;/ul&gt;','pretext':'&lt;li&gt;','posttext':'&lt;/li&gt;','separatorf':'5','remove_space':'0'}">List (circle)</option>
+				<option value="4" fcreadonly="{'opentag':1,'closetag':1,'pretext':1,'posttext':1,'separatorf':1,'remove_space':1}" fcconfigs="{'opentag':'&lt;ul style=\'list-style-type:square\'&gt;','closetag':'&lt;/ul&gt;','pretext':'&lt;li&gt;','posttext':'&lt;/li&gt;','separatorf':'5','remove_space':'0'}">List (square)</option>
+				<option value="5" fcreadonly="{'opentag':1,'closetag':1,'pretext':1,'posttext':1,'separatorf':1,'remove_space':1}" fcconfigs="{'opentag':'&lt;ul style=\'list-style-type:none\'&gt;','closetag':'&lt;/ul&gt;','pretext':'&lt;li&gt;','posttext':'&lt;/li&gt;','separatorf':'5','remove_space':'0'}">List (no marking)</option>
+			</field>
+			<field name="remove_space" type="radio" default="0" label="FLEXI_REMOVE_SPACE" description="FLEXI_REMOVE_SPACE_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="pretext" type="text" default="" size="50" label="FLEXI_FIELD_VALUE_PREFIX_TEXT" description="FLEXI_FIELD_VALUE_PREFIX_TEXT_DESC" />
-			<field name="posttext" type="text" default="" size="50" label="FLEXI_FIELD_VALUE_SUFFIX_TEXT" description="FLEXI_FIELD_VALUE_SUFFIX_TEXT_DESC" />
+			<field name="pretext" type="text" default="" filter="raw" label="FLEXI_FIELD_VALUE_PREFIX_TEXT" description="FLEXI_FIELD_VALUE_PREFIX_TEXT_DESC" />
+			<field name="posttext" type="text" default="" filter="raw" label="FLEXI_FIELD_VALUE_SUFFIX_TEXT" description="FLEXI_FIELD_VALUE_SUFFIX_TEXT_DESC" />
+
+			<field name="opentag_closetag_separatorf_disabled_ingroup" type="separator" label="" default="FLEXI_OPENTAG_CLOSETAG_SEPARATORF_DISABLED_INGROUP" description="" class="alert fcpadded" depend_class="fieldgroupon" />
 			<field name="separatorf" type="list" default="1" label="FLEXI_VALUE_SEPARATOR_FRONTEND_VIEWS" description="FLEXI_VALUE_SEPARATOR_FRONTEND_VIEWS_DESC">
 				<option value="0">FLEXI_SPACE</option>
 				<option value="1">FLEXI_LINE_BREAK</option>
@@ -103,31 +313,42 @@
 				<option value="4">FLEXI_CLOSE_OPEN_TEXTS_AS_SEP</option>
 				<option value="5">FLEXI_NOCHAR_EMPTY_SEPARATOR</option>
 			</field>
-			<field name="opentag" type="text" default="" size="50" label="FLEXI_FIELD_OPENING_TEXT" description="FLEXI_FIELD_OPENING_TEXT_DESC" />
-			<field name="closetag" type="text" default="" size="50" label="FLEXI_FIELD_CLOSING_TEXT" description="FLEXI_FIELD_CLOSING_TEXT_DESC" />
-			
-		</fieldset>
-		<fieldset name="group-email-filtering" repeat="1" icon_class="icon-filter" label="FLEXI_FILTERING_CONF" description="FLEXI_FILTERING_CONF_DESC" addfieldpath="/administrator/components/com_flexicontent/elements">
-			
-			<field name="" type="separator" default="FLEXI_ADVANCED_SEARCH_VIEW" level="level2" />
-			<field name="display_filter_as_s" type="list" default="0" label="FLEXI_DISPLAY_FILTER_AS" description="FLEXI_DISPLAY_FILTER_AS_DESC">
-				<option value="1">FLEXI_DISPLAY_AS_TEXT_SEARCH</option>
-			</field>
-			
-		</fieldset>
+			<field name="opentag" type="text" default="" filter="raw" label="FLEXI_FIELD_OPENING_TEXT" description="FLEXI_FIELD_OPENING_TEXT_DESC" />
+			<field name="closetag" type="text" default="" filter="raw" label="FLEXI_FIELD_CLOSING_TEXT" description="FLEXI_FIELD_CLOSING_TEXT_DESC" />
 
-		<fieldset name="group-email-fieldgrouping" repeat="1" icon_class="icon-menu-3" label="Field grouping" addfieldpath="/administrator/components/com_flexicontent/elements">
-			<field name="" type="separator" default="The following requires the groupfield and v2.3.0+, do not enable if you do not have this field" level="level2" />
-			<field name="use_ingroup" type="radio" default="0" label="FLEXI_USE_IN_FIELD_GROUP" description="FLEXI_USE_IN_FIELD_GROUP_DESC">
+			<field name="" type="separator" default="FLEXI_CONTENT_PLUGINS" description="" icon_class="icon-power-cord" level="tab_open" box_type="1" />
+
+			<field name="" type="separator" default="FLEXI_FIELD_CONTENT_PLUGINS" description="FLEXI_FIELD_CONTENT_PLUGINS_DESC" class="fc-mssg-inline fc-info fc-nobgimage" level="level3"/>
+			<field name="trigger_onprepare_content" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT" description="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT_DESC" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="plg-trigger-mode">FLEXI_NO</option>
+				<option value="1" show_list="plg-trigger-mode" hide_list="">FLEXI_YES</option>
+			</field>
+			<field name="trigger_plgs_incatview" type="radio" default="0" label="FLEXI_TRIGGER_ONPREPARECONTENT_EVENT_INCATVIEW" description="FLEXI_TRIGGER_ONPREPARECONTENT_EVENT_INCATVIEW_DESC" depend_class="plg-trigger-mode" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
+			<field name="plugins" type="pluginlist" label="FLEXI_FIELD_CHOOSE_SPECIFIC_PLUGINS" description="FLEXI_FIELD_CHOOSE_SPECIFIC_PLUGINS_DESC" depend_class="plg-trigger-mode" />
+
+
+			<field name="" type="separator" default="FLEXI_FIELD_VIEWING" level="tabset_close" box_type="1" />
+
 		</fieldset>
-		
+		<fieldset name="group-email-filtering" hidden="true" icon_class="icon-filter" label="FLEXI_FILTERING_CONF" description="FLEXI_FILTERING_CONF_DESC" addfieldpath="/administrator/components/com_flexicontent/elements">
+
+			<field name="" type="separator" default="FLEXI_FORM_FIELD_CONF" level="level1" />
+
+			<field name="" type="separator" default="FLEXI_ADVANCED_SEARCH_VIEW" level="level2" />
+			<field name="display_filter_as_s" type="list" default="0" label="FLEXI_DISPLAY_FILTER_AS" description="FLEXI_DISPLAY_FILTER_AS_DESC" class="use_select2_lib">
+				<option value="1">FLEXI_DISPLAY_AS_TEXT_SEARCH</option>
+			</field>
+
+		</fieldset>
+
 	</fields>
 	</config>
-	
+
 	<languages>
 		<language tag="en-GB">en-GB.plg_flexicontent_fields_email.ini</language>
 	</languages>
+
 </extension>

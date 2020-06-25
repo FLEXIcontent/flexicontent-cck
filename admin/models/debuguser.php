@@ -1,23 +1,36 @@
 <?php
 /**
- * @copyright	Copyright (C) 2005 - 2014 Open Source Matters, Inc. All rights reserved.
- * @license		GNU General Public License version 2 or later; see LICENSE.txt
+ * @package         FLEXIcontent
+ * @version         3.3
+ *
+ * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
+ * @link            https://flexicontent.org
+ * @copyright       Copyright © 2018, FLEXIcontent team, All Rights Reserved
+ * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
-defined('_JEXEC') or die;
+// no direct access
+defined('_JEXEC') or die('Restricted access');
 
-jimport('joomla.application.component.modellist');
 require_once JPATH_COMPONENT.'/helpers/debug.php';
 
 /**
- * Methods supporting a list of user records.
+ * FLEXIcontent Component Debug User Model
  *
- * @package		Joomla.Administrator
- * @subpackage	com_users
- * @since		1.6
  */
-require_once(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_users'.DS.'models'.DS.'debuguser.php');
-
-class FlexicontentModelDebugUser extends UsersModelDebugUser
+if (FLEXI_J40GE)
 {
+	require_once(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_users'.DS.'Model'.DS.'DebugUserModel.php');
+
+	class FlexicontentModelDebugUser extends Joomla\Component\Users\Administrator\Model\DebugUserModel
+	{
+	}
+}
+else
+{
+	require_once(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_users'.DS.'models'.DS.'debuguser.php');
+
+	class FlexicontentModelDebugUser extends UsersModelDebugUser
+	{
+	}
 }

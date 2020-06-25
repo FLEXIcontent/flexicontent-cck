@@ -16,489 +16,487 @@
  * GNU General Public License for more details.
  */
 
-defined( '_JEXEC' ) or die( 'Restricted access' );
+defined('_JEXEC') or die('Restricted access');
 ?>
-<script type="text/javascript">
-	window.addEvent('domready', function() {
-		var ajaxloader = '<img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center">';
-<?php if(!$this->existfields) : //@TODO must write a class for that!!! I'm a dirty lazy pig :-) ?>
-	$('existfields').addEvent('click', function(e) {
-		var url = "index.php?option=com_flexicontent&task=createdefaultfields&format=raw&<?php echo (FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken());?>=1&tmpl=component";
-		//e = new Event(e).stop();
-		if(MooTools.version>="1.2.4") {
-			$('existfields-log').set('html', ajaxloader);
-			new Request.HTML({
-				url: url,
-				method: 'get',
-				update: $('existfields-log')
-			}).send();
-		}else{
-			$('existfields-log').set('html',ajaxloader);
-			var ajax = new Ajax(url, {
-				method: 'get',
-				update: $('existfields-log')
-			});
-			ajax.request.delay(500, ajax);
-		}
+
+<script>
+
+jQuery(document).ready(function() {
+	var ajaxloader = '<span class="ajax-loader"><\/span>';
+
+
+<?php if(!$this->existfields) : /*@TODO must write a class for all following cases */ ?>
+	jQuery('#existfields').on('click', function(e, data)
+	{
+		var url = "index.php?option=com_flexicontent&task=flexicontent.createdefaultfields&format=raw&<?php echo JSession::getFormToken();?>=1&tmpl=component";
+
+		jQuery('#existfields-log').html(ajaxloader);
+		jQuery.ajax({
+			type: 'GET',
+			url: url,
+			data: {}
+		}).done( function(data) {
+			jQuery('#existfields-log').html(data);
+		});
+
 	});
 <?php endif; ?>
+
+
 <?php if(!$this->existmenuitems) : ?>
-	$('existmenuitems').addEvent('click', function(e) {
-		//e = new Event(e).stop();
-		var url = "index.php?option=com_flexicontent&task=createMenuItems&format=raw&<?php echo (FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken());?>=1&tmpl=component";
-		if(MooTools.version>="1.2.4") {
-			$('existmenuitems-log').set('html', ajaxloader);
-			new Request.HTML({
-				url: url,
-				method: 'get',
-				update: $('existmenuitems-log')
-			}).send();
-		}else{
-			$('existmenuitems-log').set('html',ajaxloader);
-			var ajax = new Ajax(url, {
-				method: 'get',
-				update: $('existmenuitems-log')
-			});
-			ajax.request.delay(500, ajax);
-		}
+	jQuery('#existmenuitems').on('click', function(e, data)
+	{
+		var url = "index.php?option=com_flexicontent&task=flexicontent.createmenuitems&format=raw&<?php echo JSession::getFormToken();?>=1&tmpl=component";
+
+		jQuery('#existmenuitems-log').html(ajaxloader);
+		jQuery.ajax({
+			type: 'GET',
+			url: url,
+			data: {}
+		}).done( function(data) {
+			jQuery('#existmenuitems-log').html(data);
+		});
+
 	});
 <?php endif; ?>
+
+
 <?php if(!$this->existtype) : ?>
-	$('existtype').addEvent('click', function(e) {
-		//e = new Event(e).stop();
-		var url = "index.php?option=com_flexicontent&task=createdefaultype&format=raw&<?php echo (FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken());?>=1&tmpl=component";
-		if(MooTools.version>="1.2.4") {
-			$('existtype-log').set('html', ajaxloader);
-			new Request.HTML({
-				url: url,
-				method: 'get',
-				update: $('existtype-log')
-			}).send();
-		}else{
-			$('existtype-log').set('html',ajaxloader);
-			var ajax = new Ajax(url, {
-				method: 'get',
-				update: $('existtype-log')
-			});
-			ajax.request.delay(500, ajax);
-		}
+	jQuery('#existtype').on('click', function(e, data)
+	{
+		var url = "index.php?option=com_flexicontent&task=flexicontent.createdefaultype&format=raw&<?php echo JSession::getFormToken();?>=1&tmpl=component";
+
+		jQuery('#existtype-log').html(ajaxloader);
+		jQuery.ajax({
+			type: 'GET',
+			url: url,
+			data: {}
+		}).done( function(data) {
+			jQuery('#existtype-log').html(data);
+		});
+
 	});
 <?php endif; ?>
+
+
 <?php if(!$this->allplgpublish) : ?>
-	$('publishplugins').addEvent('click', function(e) {
-		//e = new Event(e).stop();
-		var url = "index.php?option=com_flexicontent&task=publishplugins&format=raw&<?php echo (FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken());?>=1&tmpl=component";
-		if(MooTools.version>="1.2.4") {
-			$('publishplugins-log').set('html', ajaxloader);
-			new Request.HTML({
-				url: url,
-				method: 'get',
-				update: $('publishplugins-log')
-			}).send();
-		}else{
-			$('publishplugins-log').set('html',ajaxloader);
-			var ajax = new Ajax(url, {
-				method: 'get',
-				update: $('publishplugins-log')
-			});
-			ajax.request.delay(500, ajax);
-		}
+	jQuery('#publishplugins').on('click', function(e, data)
+	{
+		var url = "index.php?option=com_flexicontent&task=flexicontent.publishplugins&format=raw&<?php echo JSession::getFormToken();?>=1&tmpl=component";
+
+		jQuery('#publishplugins-log').html(ajaxloader);
+		jQuery.ajax({
+			type: 'GET',
+			url: url,
+			data: {}
+		}).done( function(data) {
+			jQuery('#publishplugins-log').html(data);
+		});
+
 	});
 <?php endif; ?>
+
+
 <?php if(!$this->existcats) : ?>
-	$('existcats').addEvent('click', function(e) {
-		//e = new Event(e).stop();
-		var url = "index.php?option=com_flexicontent&task=addmcatitemrelations&format=raw&<?php echo (FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken());?>=1&tmpl=component";
-		if(MooTools.version>="1.2.4") {
-			$('existcats-log').set('html', ajaxloader);
-			new Request.HTML({
-				url: url,
-				method: 'get',
-				update: $('existcats-log')
-			}).send();
-		}else{
-			$('existcats-log').set('html',ajaxloader);
-			var ajax = new Ajax(url, {
-				method: 'get',
-				update: $('existcats-log')
-			});
-			ajax.request.delay(500, ajax);
-		}
+	jQuery('#existcats').on('click', function(e, data)
+	{
+		var url = "index.php?option=com_flexicontent&task=flexicontent.addmcatitemrelations&format=raw&<?php echo JSession::getFormToken();?>=1&tmpl=component";
+
+		jQuery('#existcats-log').html(ajaxloader);
+		jQuery.ajax({
+			type: 'GET',
+			url: url,
+			data: {}
+		}).done( function(data) {
+			jQuery('#existcats-log').html(data);
+		});
+
 	});
 <?php endif; ?>
-<?php if(!$this->existlang) : ?>
-	$('existlang').addEvent('click', function(e) {
-		//e = new Event(e).stop();
-		var url = "index.php?option=com_flexicontent&task=createlangcolumn&format=raw&<?php echo (FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken());?>=1&tmpl=component";
-		if(MooTools.version>="1.2.4") {
-			$('existlang-log').set('html', ajaxloader);
-			new Request.HTML({
-				url: url,
-				method: 'get',
-				update: $('existlang-log')
-			}).send();
-		}else{
-			$('existlang-log').set('html',ajaxloader);
-			var ajax = new Ajax(url, {
-				method: 'get',
-				update: $('existlang-log')
-			});
-			ajax.request.delay(500, ajax);
-		}
+
+
+<?php if(!$this->langsynced) : ?>
+	jQuery('#langsynced').on('click', function(e, data)
+	{
+		var url = "index.php?option=com_flexicontent&task=flexicontent.updatelanguagedata&format=raw&<?php echo JSession::getFormToken();?>=1&tmpl=component";
+
+		jQuery('#langsynced-log').html(ajaxloader);
+		jQuery.ajax({
+			type: 'GET',
+			url: url,
+			data: {}
+		}).done( function(data) {
+			jQuery('#langsynced-log').html(data);
+		});
+
 	});
 <?php endif; ?>
+
+
+
 <?php if(!$this->existdbindexes) : ?>
-	$('existdbindexes').addEvent('click', function(e) {
-		//e = new Event(e).stop();
-		var url = "index.php?option=com_flexicontent&task=createdbindexes&format=raw&<?php echo (FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken());?>=1&tmpl=component";
-		if(MooTools.version>="1.2.4") {
-			$('existdbindexes-log').set('html', ajaxloader);
-			new Request.HTML({
-				url: url,
-				method: 'get',
-				update: $('existdbindexes-log')
-			}).send();
-		}else{
-			$('existdbindexes-log').set('html',ajaxloader);
-			var ajax = new Ajax(url, {
-				method: 'get',
-				update: $('existdbindexes-log')
-			});
-			ajax.request.delay(500, ajax);
-		}
+	jQuery('#existdbindexes').on('click', function(e, data)
+	{
+		var url = "index.php?option=com_flexicontent&task=flexicontent.createdbindexes&format=raw&<?php echo JSession::getFormToken();?>=1&tmpl=component";
+
+		jQuery('#existdbindexes-log').html(ajaxloader);
+		jQuery.ajax({
+			type: 'GET',
+			url: url,
+			data: {}
+		}).done( function(data) {
+			jQuery('#existdbindexes-log').html(data);
+		});
+
 	});
 <?php endif; ?>
+
+
 <?php if(!$this->existversions) : ?>
-	$('existversions').addEvent('click', function(e) {
-		//e = new Event(e).stop();
-		var url = "index.php?option=com_flexicontent&task=createversionstbl&format=raw&<?php echo (FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken());?>=1&tmpl=component";
-		if(MooTools.version>="1.2.4") {
-			$('existversions-log').set('html', ajaxloader);
-			new Request.HTML({
-				url: url,
-				method: 'get',
-				update: $('existversions-log')
-			}).send();
-		}else{
-			$('existversions-log').set('html',ajaxloader);
-			var ajax = new Ajax(url, {
-				method: 'get',
-				update: $('existversions-log')
-			});
-			ajax.request.delay(500, ajax);
-		}
+	jQuery('#existversions').on('click', function(e, data)
+	{
+		var url = "index.php?option=com_flexicontent&task=flexicontent.createversionstable&format=raw&<?php echo JSession::getFormToken();?>=1&tmpl=component";
+
+		jQuery('#existversions-log').html(ajaxloader);
+		jQuery.ajax({
+			type: 'GET',
+			url: url,
+			data: {}
+		}).done( function(data) {
+			jQuery('#existversions-log').html(data);
+		});
+
 	});
 <?php endif; ?>
+
+
 <?php if(!$this->existversionsdata) : ?>
-	$('existversionsdata').addEvent('click', function(e) {
-		//e = new Event(e).stop();
-		var url = "index.php?option=com_flexicontent&task=populateversionstbl&format=raw&<?php echo (FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken());?>=1&tmpl=component";
-		if(MooTools.version>="1.2.4") {
-			$('existversionsdata-log').set('html', ajaxloader);
-			new Request.HTML({
-				url: url,
-				method: 'get',
-				update: $('existversionsdata-log')
-			}).send();
-		}else{
-			$('existversionsdata-log').set('html',ajaxloader);
-			var ajax = new Ajax(url, {
-				method: 'get',
-				update: $('existversionsdata-log')
-			});
-			ajax.request.delay(500, ajax);
-		}
+	jQuery('#existversionsdata').on('click', function(e, data)
+	{
+		var url = "index.php?option=com_flexicontent&task=flexicontent.populateversionstable&format=raw&<?php echo JSession::getFormToken();?>=1&tmpl=component";
+
+		jQuery('#existversionsdata-log').html(ajaxloader);
+		jQuery.ajax({
+			type: 'GET',
+			url: url,
+			data: {}
+		}).done( function(data) {
+			jQuery('#existversionsdata-log').html(data);
+		});
+
 	});
 <?php endif; ?>
+
+
 <?php if (!$this->existauthors) : ?>
-	$('existauthors').addEvent('click', function(e) {
-		//e = new Event(e).stop();
-		var url = "index.php?option=com_flexicontent&task=createauthorstbl&format=raw&<?php echo (FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken());?>=1&tmpl=component";
-		if(MooTools.version>="1.2.4") {
-			$('existauthors-log').set('html', ajaxloader);
-			new Request.HTML({
-				url: url,
-				method: 'get',
-				update: $('existauthors-log')
-			}).send();
-		}else{
-			$('existauthors-log').set('html',ajaxloader);
-			var ajax = new Ajax(url, {
-				method: 'get',
-				update: $('existauthors-log')
-			});
-			ajax.request.delay(500, ajax);
-		}
+	jQuery('#existauthors').on('click', function(e, data)
+	{
+		var url = "index.php?option=com_flexicontent&task=flexicontent.createauthorstable&format=raw&<?php echo JSession::getFormToken();?>=1&tmpl=component";
+
+		jQuery('#existauthors-log').html(ajaxloader);
+		jQuery.ajax({
+			type: 'GET',
+			url: url,
+			data: {}
+		}).done( function(data) {
+			jQuery('#existauthors-log').html(data);
+		});
+
 	});
 <?php endif; ?>
+
+
 <?php if (!$this->cachethumb) : ?>
-	$('cachethumb').addEvent('click', function(e) {
-		//e = new Event(e).stop();
-		var url = "index.php?option=com_flexicontent&task=cachethumbchmod&format=raw&<?php echo (FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken());?>=1&tmpl=component";
-		if(MooTools.version>="1.2.4") {
-			$('cachethumb-log').set('html', ajaxloader);
-			new Request.HTML({
-				url: url,
-				method: 'get',
-				update: $('cachethumb-log')
-			}).send();
-		}else{
-			$('cachethumb-log').set('html',ajaxloader);
-			var ajax = new Ajax(url, {
-				method: 'get',
-				update: $('cachethumb-log')
-			});
-			ajax.request.delay(500, ajax);
-		}
+	jQuery('#cachethumb').on('click', function(e, data)
+	{
+		var url = "index.php?option=com_flexicontent&task=flexicontent.setcachethumbperms&format=raw&<?php echo JSession::getFormToken();?>=1&tmpl=component";
+
+		jQuery('#cachethumb-log').html(ajaxloader);
+		jQuery.ajax({
+			type: 'GET',
+			url: url,
+			data: {}
+		}).done( function(data) {
+			jQuery('#cachethumb-log').html(data);
+		});
+
 	});
 <?php endif; ?>
+
+
 <?php if (!$this->itemcountingdok) : ?>
-	$('itemcountingdok').addEvent('click', function(e) {
-		//e = new Event(e).stop();
-		var url = "index.php?option=com_flexicontent&task=updateitemcounting&format=raw&<?php echo (FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken());?>=1&tmpl=component";
-		if(MooTools.version>="1.2.4") {
-			$('itemcountingdok-log').set('html', ajaxloader);
-			new Request.HTML({
-				url: url,
-				method: 'get',
-				update: $('itemcountingdok-log')
-			}).send();
-		}else{
-			$('itemcountingdok-log').set('html',ajaxloader);
-			var ajax = new Ajax(url, {
-				method: 'get',
-				update: $('itemcountingdok-log')
-			});
-			ajax.request.delay(500, ajax);
-		}
+	jQuery('#itemcountingdok').on('click', function(e, data)
+	{
+		var url = "index.php?option=com_flexicontent&task=flexicontent.updateitemcountingdata&format=raw&<?php echo JSession::getFormToken();?>=1&tmpl=component";
+
+		jQuery('#itemcountingdok-log').html(ajaxloader);
+		jQuery.ajax({
+			type: 'GET',
+			url: url,
+			data: {}
+		}).done( function(data) {
+			jQuery('#itemcountingdok-log').html(data);
+		});
+
 	});
 <?php endif; ?>
-<?php if (!$this->oldbetafiles) : ?>
-$('oldbetafiles').addEvent('click', function(e) {
-		//e = new Event(e).stop();
-		var url = "index.php?option=com_flexicontent&task=deleteoldfiles&format=raw&<?php echo (FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken());?>=1&tmpl=component";
-		if(MooTools.version>="1.2.4") {
-			$('oldbetafiles-log').set('html', ajaxloader);
-			new Request.HTML({
-				url: url,
-				method: 'get',
-				update: $('oldbetafiles-log')
-			}).send();
-		}else{
-			$('oldbetafiles-log').set('html',ajaxloader);
-			var ajax = new Ajax(url, {
-				method: 'get',
-				update: $('oldbetafiles-log')
-			});
-			ajax.request.delay(500, ajax);
-		}
+
+
+<?php if (!$this->deprecatedfiles) : ?>
+	jQuery('#deprecatedfiles').on('click', function(e, data)
+	{
+		var url = "index.php?option=com_flexicontent&task=flexicontent.deletedeprecatedfiles&format=raw&<?php echo JSession::getFormToken();?>=1&tmpl=component";
+
+		jQuery('#deprecatedfiles-log').html(ajaxloader);
+		jQuery.ajax({
+			type: 'GET',
+			url: url,
+			data: {}
+		}).done( function(data) {
+			jQuery('#deprecatedfiles-log').html(data);
+		});
+
 	});
 <?php endif; ?>
+
+
 <?php if (!$this->nooldfieldsdata) : ?>
-$('oldfieldsdata').addEvent('click', function(e) {
-		//e = new Event(e).stop();
-		var url = "index.php?option=com_flexicontent&task=cleanupoldtables&format=raw&<?php echo (FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken());?>=1&tmpl=component";
-		if(MooTools.version>="1.2.4") {
-			$('oldfieldsdata-log').set('html', ajaxloader);
-			new Request.HTML({
-				url: url,
-				method: 'get',
-				update: $('oldfieldsdata-log')
-			}).send();
-		}else{
-			$('oldfieldsdata-log').set('html',ajaxloader);
-			var ajax = new Ajax(url, {
-				method: 'get',
-				update: $('oldfieldsdata-log')
-			});
-			ajax.request.delay(500, ajax);
-		}
+	jQuery('#oldfieldsdata').on('click', function(e, data)
+	{
+		var url = "index.php?option=com_flexicontent&task=flexicontent.cleanupoldtables&format=raw&<?php echo JSession::getFormToken();?>=1&tmpl=component";
+
+		jQuery('#oldfieldsdata-log').html(ajaxloader);
+		jQuery.ajax({
+			type: 'GET',
+			url: url,
+			data: {}
+		}).done( function(data) {
+			jQuery('#oldfieldsdata-log').html(data);
+		});
+
 	});
 <?php endif; ?>
+
+
 <?php if (!$this->missingversion) : ?>
-$('missingversion').addEvent('click', function(e) {
-		//e = new Event(e).stop();
-		var url = "index.php?option=com_flexicontent&task=addcurrentversiondata&format=raw&<?php echo (FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken());?>=1&tmpl=component";
-		if(MooTools.version>="1.2.4") {
-			$('missingversion-log').set('html', ajaxloader);
-			new Request.HTML({
-				url: url,
-				method: 'get',
-				update: $('missingversion-log')
-			}).send();
-		}else{
-			$('missingversion-log').set('html',ajaxloader);
-			var ajax = new Ajax(url, {
-				method: 'get',
-				update: $('missingversion-log')
-			});
-			ajax.request.delay(500, ajax);
-		}
+	jQuery('#missingversion').on('click', function(e, data)
+	{
+		var url = "index.php?option=com_flexicontent&task=flexicontent.addcurrentversiondata&format=raw&<?php echo JSession::getFormToken();?>=1&tmpl=component";
+
+		jQuery('#missingversion-log').html(ajaxloader);
+		jQuery.ajax({
+			type: 'GET',
+			url: url,
+			data: {}
+		}).done( function(data) {
+			jQuery('#missingversion-log').html(data);
+		});
+
 	});
 <?php endif; ?>
+
+
 <?php if(!$this->initialpermission) : ?>
-	$('initialpermission').addEvent('click', function(e) {
-		//e = new Event(e).stop();
-		var url = "index.php?option=com_flexicontent&task=initialpermission&format=raw&<?php echo (FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken());?>=1&tmpl=component";
-		if(MooTools.version>="1.2.4") {
-			$('initialpermission-log').set('html', ajaxloader);
-			new Request.HTML({
-				url: url,
-				method: 'get',
-				update: $('initialpermission-log')
-			}).send();
-		}else{
-			$('initialpermission-log').set('html',ajaxloader);
-			var ajax = new Ajax(url, {
-				method: 'get',
-				update: $('initialpermission-log')
-			});
-			ajax.request.delay(500, ajax);
-		}
+	jQuery('#initialpermission').on('click', function(e, data)
+	{
+		var url = "index.php?option=com_flexicontent&task=flexicontent.updateinitialpermission&format=raw&<?php echo JSession::getFormToken();?>=1&tmpl=component";
+
+		jQuery('#initialpermission-log').html(ajaxloader);
+		jQuery.ajax({
+			type: 'GET',
+			url: url,
+			data: {}
+		}).done( function(data) {
+			jQuery('#initialpermission-log').html(data);
+		});
+
 	});
 <?php endif; ?>
-	});
+
+});
 </script>
-<table class="adminlist" cellspacing="0" cellpadding="0" border="0">
-	<tr>
-		<td class="key">
-			<?php echo JText::_( 'FLEXI_PUBLISH_ALL_PLUGINS' ); ?>
-		</td>
-		<td id="publishplugins-log">
-			<?php echo $this->allplgpublish ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span class="button-add"><a id="publishplugins" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>' ; ?>
-		</td>
-	</tr>
-	<tr>
-		<td class="key">
-			<?php echo JText::_( 'FLEXI_INSTALL_DEFAULT_TYPE' ); ?>
-		</td>
-		<td id="existtype-log">
-			<?php echo $this->existtype ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span class="button-add"><a id="existtype" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>' ; ?>
-		</td>
-	</tr>
-	<tr>
-		<td class="key">
-			<?php echo JText::_( 'Add/update default Menu Item for URLs' ); ?>
-		</td>
-		<td id="existmenuitems-log">
-			<?php echo $this->existmenuitems ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span class="button-add"><a id="existmenuitems" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>' ; ?>
-		</td>
-	</tr>
-	<tr>
-		<td class="key">
-			<?php echo JText::_( 'FLEXI_INSTALL_DEFAULT_FIELDS' ); ?>
-		</td>
-		<td id="existfields-log">
-			<?php echo $this->existfields ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span class="button-add"><a id="existfields" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>' ; ?>
-		</td>
-	</tr>
-	<tr>
-		<td class="key">
-			<?php echo JText::_( 'FLEXI_INSTALL_MCATS_RELATIONS' ); ?>
-		</td>
-		<td id="existcats-log">
-			<?php echo $this->existcats ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span class="button-add"><a id="existcats" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>' ; ?>
-		</td>
-	</tr>
-	<tr>
-		<td class="key">
-			<?php echo JText::_( 'FLEXI_INSTALL_MULTILINGUAL_SUPPORT' ); ?>
-		</td>
-		<td id="existlang-log">
-			<?php echo $this->existlang ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span class="button-add"><a id="existlang" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>' ; ?>
-		</td>
-	</tr>
-	<tr>
-		<td class="key">
-			<?php echo JText::_( 'FLEXI_CREATE_DB_INDEXES' ); ?>
-			<?php
-				if (!$this->existdbindexes) {
-					echo "<br/><span class='fc-mssg-inline fc-mssg fc-note'>this may take a long time on big web-sites, if it timeouts (or takes >5 min) then please refresh, and click to create remaining indexes</span>";
-					echo "<br># tables: ". count($this->missingindexes) ." : ";
-					foreach($this->missingindexes as $tblname => $indexes) {
-						if ( isset($indexes['__indexing_started__']) ) {
-							echo "<br/><b>" .$tblname. "</b> (<small style='color:green'>Indexing started</small>)";
-						} else {
-							echo "<br/><b>" .$tblname. "</b> (". count($indexes) ." <small>indexes missing</small>)";
+
+
+<table class="adminlist table fcmanlist postinstall-tbl" style="margin: 10px 0 10px 10px; border: 0 none;">
+
+	<thead>
+		<tr>
+			<th><?php echo JText::_( 'FLEXI_ACTIONS' ); ?></th>
+			<th><?php echo JText::_( 'JSTATUS' ); ?></th></th>
+		</tr>
+	</thead>
+
+	<tbody>
+		<tr>
+			<td class="key">
+				<?php echo JText::_( 'FLEXI_PUBLISH_ALL_PLUGINS' ); ?>
+			</td>
+			<td>
+				<div id="publishplugins-log" class="install-task">
+					<?php echo $this->allplgpublish ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span><a class="fc_button fc_simple" id="publishplugins" href="javascript:;">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>' ; ?>
+				</div>
+			</td>
+		</tr>
+		<tr>
+			<td class="key">
+				<?php echo JText::_( 'FLEXI_INSTALL_DEFAULT_TYPE' ); ?>
+			</td>
+			<td>
+				<div id="existtype-log" class="install-task">
+					<?php echo $this->existtype ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span><a class="fc_button fc_simple" id="existtype" href="javascript:;">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>' ; ?>
+				</div>
+			</td>
+		</tr>
+		<tr>
+			<td class="key">
+				<?php echo JText::_( 'Add/update default Menu Item for URLs' ); ?>
+			</td>
+			<td>
+				<div id="existmenuitems-log" class="install-task">
+					<?php echo $this->existmenuitems ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span><a class="fc_button fc_simple" id="existmenuitems" href="javascript:;">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>' ; ?>
+				</div>
+			</td>
+		</tr>
+		<tr>
+			<td class="key">
+				<?php echo JText::_( 'FLEXI_INSTALL_DEFAULT_FIELDS' ); ?>
+			</td>
+			<td>
+				<div id="existfields-log" class="install-task">
+					<?php echo $this->existfields ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span><a class="fc_button fc_simple" id="existfields" href="javascript:;">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>' ; ?>
+				</div>
+			</td>
+		</tr>
+		<tr>
+			<td class="key">
+				<?php echo JText::_( 'FLEXI_INSTALL_MCATS_RELATIONS' ); ?>
+			</td>
+			<td>
+				<div id="existcats-log" class="install-task">
+					<?php echo $this->existcats ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span><a class="fc_button fc_simple" id="existcats" href="javascript:;">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>' ; ?>
+				</div>
+			</td>
+		</tr>
+		<tr>
+			<td class="key">
+				<?php echo JText::_( 'FLEXI_INSTALL_MULTILINGUAL_SUPPORT' ); ?>
+			</td>
+			<td>
+				<div id="langsynced-log" class="install-task">
+					<?php echo $this->langsynced ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span><a class="fc_button fc_simple" id="langsynced" href="javascript:;">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>' ; ?>
+				</div>
+			</td>
+		</tr>
+		<tr>
+			<td class="key">
+				<?php echo JText::_( 'FLEXI_CREATE_DB_INDEXES' ); ?>
+				<?php
+					if (!$this->existdbindexes && !empty($this->missingindexes)) {
+						echo "<br/><span class='fc-mssg-inline fc-mssg fc-info'>this may take a long time on big web-sites, if it timeouts (or takes >2 min) then please refresh, and click to create remaining indexes</span>";
+						echo "<br># tables: ". count($this->missingindexes) ." : ";
+						foreach($this->missingindexes as $tblname => $indexes)
+						{
+							echo isset($indexes['__indexing_started__']) ?
+								"<br/><b>" .$tblname. "</b> (<small style='color:green'>Indexing started</small>)" :
+								"<br/><b>" .$tblname. "</b> (". count($indexes) ." <small>indexes missing</small>)";
 						}
 					}
-				}
-			?>
-		</td>
-		<td id="existdbindexes-log">
-			<?php echo $this->existdbindexes ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span class="button-add"><a id="existdbindexes" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>' ; ?>
-		</td>
-	</tr>
-	<tr>
-		<td class="key">
-			<?php echo JText::_( 'FLEXI_INSTALL_VERSIONS_TABLE' ); ?>
-		</td>
-		<td id="existversions-log">
-			<?php echo $this->existversions ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span class="button-add"><a id="existversions" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>' ; ?>
-		</td>
-	</tr>
-	<tr>
-		<td class="key">
-			<?php echo JText::_( 'FLEXI_UPDATE_VERSIONS_DATA' ); ?>
-		</td>
-		<td id="existversionsdata-log">
-			<?php echo $this->existversionsdata ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span class="button-add"><a id="existversionsdata" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>' ; ?>
-		</td>
-	</tr>
-	<tr>
-		<td class="key">
-			<?php echo JText::_( 'FLEXI_INSTALL_AUTHORS_TABLE' ); ?>
-		</td>
-		<td id="existauthors-log">
-			<?php echo $this->existauthors ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span class="button-add"><a id="existauthors" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>' ; ?>
-		</td>
-	</tr>
-	<tr>
-		<td class="key">
-			<?php echo JText::_( 'FLEXI_UPDATE_TEMPORARY_ITEM_DATA' ); ?>
-		</td>
-		<td id="itemcountingdok-log">
-			<?php echo $this->itemcountingdok ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span class="button-add"><a id="itemcountingdok" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>' ; ?>
-		</td>
-	</tr>
-	<tr>
-		<td class="key">
-			<?php echo JText::_( 'FLEXI_SET_PHPTHUMB_CACHE_PERMISSIONS' ); ?>
-		</td>
-		<td id="cachethumb-log">
-			<?php echo $this->cachethumb ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span class="button-add"><a id="cachethumb" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>'; ?>
-		</td>
-	</tr>
-	<tr>
-		<td class="key">
-			<?php echo JText::_( 'FLEXI_CLEANUP_TEMPLATE_FILES' ); ?>
-		</td>
-		<td id="oldbetafiles-log">
-			<?php echo $this->oldbetafiles ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span class="button-add"><a id="oldbetafiles" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>'; ?>
-		</td>
-	</tr>
-	<tr>
-		<td class="key">
-			<?php echo JText::_( 'FLEXI_CLEANUP_TABLES' ); ?>
-		</td>
-		<td id="oldfieldsdata-log">
-			<?php echo $this->nooldfieldsdata ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span class="button-add"><a id="oldfieldsdata" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>'; ?>
-		</td>
-	</tr>
-	<tr>
-		<td class="key">
-			<?php echo JText::_( 'FLEXI_CURRENT_VERSIONS' ); ?>
-		</td>
-		<td id="missingversion-log">
-			<?php echo $this->missingversion ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span class="button-add"><a id="missingversion" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>'; ?>
-		</td>
-	</tr>
-	<tr>
-		<td class="key">
-			<?php echo JText::_( 'FLEXI_INITIAL_PERMISSION' ); ?>
-		</td>
-		<td id="initialpermission-log">
-			<?php echo $this->initialpermission ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span class="button-add"><a id="initialpermission" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>'; ?>
-		</td>
-	</tr>
+				?>
+			</td>
+			<td>
+				<div id="existdbindexes-log" class="install-task">
+					<?php echo $this->existdbindexes ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span><a class="fc_button fc_simple" id="existdbindexes" href="javascript:;">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>' ; ?>
+				</div>
+			</td>
+		</tr>
+		<tr>
+			<td class="key">
+				<?php echo JText::_( 'FLEXI_INSTALL_VERSIONS_TABLE' ); ?>
+			</td>
+			<td>
+				<div id="existversions-log" class="install-task">
+					<?php echo $this->existversions ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span><a class="fc_button fc_simple" id="existversions" href="javascript:;">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>' ; ?>
+				</div>
+			</td>
+		</tr>
+		<tr>
+			<td class="key">
+				<?php echo JText::_( 'FLEXI_UPDATE_VERSIONS_DATA' ); ?>
+			</td>
+			<td>
+				<div id="existversionsdata-log" class="install-task">
+					<?php echo $this->existversionsdata ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span><a class="fc_button fc_simple" id="existversionsdata" href="javascript:;">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>' ; ?>
+				</div>
+			</td>
+		</tr>
+		<tr>
+			<td class="key">
+				<?php echo JText::_( 'FLEXI_INSTALL_AUTHORS_TABLE' ); ?>
+			</td>
+			<td id="existauthors-log">
+				<div class="install-task"><?php echo $this->existauthors ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span><a class="fc_button fc_simple" id="existauthors" href="javascript:;">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>' ; ?></div>
+			</td>
+		</tr>
+		<tr>
+			<td class="key">
+				<?php echo JText::_( 'FLEXI_UPDATE_TEMPORARY_ITEM_DATA' ); ?>
+			</td>
+			<td>
+				<div id="itemcountingdok-log" class="install-task">
+					<?php echo $this->itemcountingdok ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span><a class="fc_button fc_simple" id="itemcountingdok" href="javascript:;">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>' ; ?>
+				</div>
+			</td>
+		</tr>
+		<tr>
+			<td class="key">
+				<?php echo JText::_( 'FLEXI_SET_PHPTHUMB_CACHE_PERMISSIONS' ); ?>
+			</td>
+			<td>
+				<div id="cachethumb-log" class="install-task">
+					<?php echo $this->cachethumb ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span><a class="fc_button fc_simple" id="cachethumb" href="javascript:;">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>'; ?>
+				</div>
+			</td>
+		</tr>
+		<tr>
+			<td class="key">
+				<?php echo JText::_( 'FLEXI_REMOVE_DEPRECATED_FILES' ); ?>
+			</td>
+			<td>
+				<div id="deprecatedfiles-log" class="install-task">
+					<?php echo $this->deprecatedfiles ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span><a class="fc_button fc_simple" id="deprecatedfiles" href="javascript:;">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>'; ?>
+				</div>
+			</td>
+		</tr>
+		<tr>
+			<td class="key">
+				<?php echo JText::_( 'FLEXI_CLEANUP_TABLES' ); ?>
+			</td>
+			<td>
+				<div id="oldfieldsdata-log" class="install-task">
+					<?php echo $this->nooldfieldsdata ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span><a class="fc_button fc_simple" id="oldfieldsdata" href="javascript:;">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>'; ?>
+				</div>
+			</td>
+		</tr>
+		<tr>
+			<td class="key">
+				<?php echo JText::_( 'FLEXI_CURRENT_VERSIONS' ); ?>
+			</td>
+			<td>
+				<div id="missingversion-log" class="install-task">
+					<?php echo $this->missingversion ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span><a class="fc_button fc_simple" id="missingversion" href="javascript:;">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>'; ?>
+				</div>
+			</td>
+		</tr>
+		<tr>
+			<td class="key">
+				<?php echo JText::_( 'FLEXI_INITIAL_PERMISSION' ); ?>
+			</td>
+			<td>
+				<div id="initialpermission-log" class="install-task">
+					<?php echo $this->initialpermission ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span><a class="fc_button fc_simple" id="initialpermission" href="javascript:;">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>'; ?>
+				</div>
+			</td>
+		</tr>
+	</tbody>
+
 </table>

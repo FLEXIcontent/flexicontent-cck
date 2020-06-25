@@ -18,12 +18,12 @@
 
 // Check to ensure this file is included in Joomla!
 defined('_JEXEC') or die('Restricted access');
-if (FLEXI_J16GE) {
-	jimport('joomla.html.html');
-	jimport('joomla.form.formfield');
-	jimport('joomla.form.helper');
-	JFormHelper::loadFieldClass('list');
-}
+
+jimport('cms.html.html');      // JHtml
+jimport('joomla.form.field');  // JFormField
+
+//jimport('joomla.form.helper'); // JFormHelper
+//JFormHelper::loadFieldClass('calendar');   // JFormField...
 
 /**
  * Renders a date element
@@ -44,47 +44,25 @@ class JFormFieldFcdate extends JFormField
 
 	public function getInput()
 	{
-		$document = JFactory::getDocument();
-		if (FLEXI_J16GE) {
-			$node = & $this->element;
-			$attributes = get_object_vars($node->attributes());
-			$attributes = $attributes['@attributes'];
-		} else {
-			$attributes = & $node->_attributes;
+		$node = & $this->element;
+		$attribs = get_object_vars($node->attributes());
+		$attribs = $attribs['@attributes'];
+
+		$value = $this->value;
+		$fieldname = $this->name;
+		$elementid = $this->id;
+
+		$dateFormat = isset($attribs['format']) ? $attributes['format'] : '%Y-%m-%d';
+		$allowText  = isset($attribs['allowText']) ? (bool) $attributes['allowText'] : true;
+
+		$value_holder = '';
+		if ($allowText)
+		{
+			$attribs['class'] = isset($attribs['class']) ? $attribs['class'] . ' fc_date_allow_text' : 'fc_date_allow_text';
+			$value_holder = '<span id="'.$elementid.'_fc_value" style="display: none;" data-fc-value="'.$value.'"></span>';
 		}
-		
-		$css  = '.calendar { vertical-align:middle; }';
-		$document->addStyleDeclaration($css);
-		
-		$value = FLEXI_J16GE ? $this->value : $value;
-		$fieldname	= FLEXI_J16GE ? $this->name : $control_name.'['.$name.']';
-		$element_id = FLEXI_J16GE ? $this->id : $control_name.$name;
-		$format = '%Y-%m-%d';
-		$attribs = (@$attributes['size']) ? ' size="'.@$attributes['size'].'" ' : ' size="18" ';
-		
- 		//return JHTML::_('calendar', $value, $fieldname, $element_id, $format, $attribs);
- 		return $this->calendar($value, $fieldname, $element_id, $format, $attribs);
+
+		// Create JS calendar
+		return $value_holder . JHtml::_('calendar', $value, $fieldname, $elementid, $dateFormat, $attribs);
 	}
-	
-	
-	function calendar($value, $name, $id, $format = '%Y-%m-%d', $attribs = null)
-	{
-		JHTML::_('behavior.calendar'); //load the calendar behavior
-
-		if (is_array($attribs)) {
-			$attribs = JArrayHelper::toString( $attribs );
-		}
-		$document = JFactory::getDocument();
-		$document->addScriptDeclaration('window.addEvent(\'domready\', function() {Calendar.setup({
-        inputField     :    "'.$id.'",     // id of the input field
-        ifFormat       :    "'.$format.'",      // format of the input field
-        button         :    "'.$id.'_img",  // trigger for the calendar (button ID)
-        align          :    "Tl",           // alignment (defaults to "Bl")
-        singleClick    :    true
-    });});');
-
-		return '<input type="text" name="'.$name.'" id="'.$id.'" value="'.htmlspecialchars($value, ENT_COMPAT, 'UTF-8').'" '.$attribs.' />'.
-				 '<img class="calendar" src="'.JURI::root(true).'/templates/system/images/calendar.png" alt="calendar" id="'.$id.'_img" />';
-	}
-
 }

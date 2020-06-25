@@ -1,44 +1,85 @@
 <?php
 /**
- * @version 1.5 stable $Id: fields.php 1640 2013-02-28 14:45:19Z ggppdk $
- * @package Joomla
- * @subpackage FLEXIcontent
- * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
- * @license GNU/GPL v2
- * 
- * FLEXIcontent is a derivative work of the excellent QuickFAQ component
- * @copyright (C) 2008 Christoph Lukes
- * see www.schlu.net for more information
+ * @package         FLEXIcontent
+ * @version         3.3
  *
- * FLEXIcontent is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
+ * @link            https://flexicontent.org
+ * @copyright       Copyright © 2018, FLEXIcontent team, All Rights Reserved
+ * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
-// no direct access
 defined('_JEXEC') or die('Restricted access');
 
-jimport('joomla.application.component.modellist');
+use Joomla\String\StringHelper;
+use Joomla\Utilities\ArrayHelper;
+use Joomla\CMS\Table\Table;
+
+require_once('base/baselist.php');
 
 /**
- * FLEXIcontent Component fields Model
+ * FLEXIcontent Component Fields Model
  *
- * @package Joomla
- * @subpackage FLEXIcontent
- * @since		1.0
  */
-class FlexicontentModelFields extends JModelList
+class FlexicontentModelFields extends FCModelAdminList
 {
 	/**
-	 * Field data
+	 * Record database table
 	 *
-	 * @var object
+	 * @var string
+	 */
+	var $records_dbtbl  = 'flexicontent_fields';
+
+	/**
+	 * Record jtable name
+	 *
+	 * @var string
+	 */
+	var $records_jtable = 'flexicontent_fields';
+
+	/**
+	 * Column names
+	 */
+	var $state_col      = 'published';
+	var $name_col       = 'name';
+	var $parent_col     = null;
+	var $created_by_col = null;
+
+	/**
+	 * (Default) Behaviour Flags
+	 */
+	protected $listViaAccess = false;
+	protected $copyRelations = false;
+
+	/**
+	 * Supported Features Flags
+	 */
+	const canDelRelated = true;
+
+	/**
+	 * Search and ordering columns
+	 */
+	var $search_cols = array(
+		'FLEXI_NAME' => 'name',
+		'FLEXI_LABEL' => 'label',
+	);
+	var $default_order     = 'a.ordering';
+	var $default_order_dir = 'ASC';
+
+	/**
+	 * List filters that are always applied
+	 */
+	var $hard_filters = array();
+
+	/**
+	 * Record rows
+	 *
+	 * @var array
 	 */
 	var $_data = null;
 
 	/**
-	 * Field total
+	 * Rows total
 	 *
 	 * @var integer
 	 */
@@ -51,891 +92,950 @@ class FlexicontentModelFields extends JModelList
 	 */
 	var $_pagination = null;
 
-	/**
-	 * Field id
-	 *
-	 * @var int
-	 */
-	var $_id = null;
 
 	/**
 	 * Constructor
 	 *
-	 * @since 1.0
+	 * @since 3.3.0
 	 */
-	function __construct()
+	public function __construct($config = array())
 	{
-		parent::__construct();
+		$app    = JFactory::getApplication();
+		$jinput = $app->input;
+		$option = $jinput->getCmd('option', '');
+		$view   = $jinput->getCmd('view', '');
+		$layout = $jinput->getString('layout', 'default');
+		$fcform = $jinput->getInt('fcform', 0);
 
-		$option = JRequest::getVar('option');
-		$app = JFactory::getApplication();
+		// Make session index more specific ... (if needed by this model)
+		//$this->view_id = $view . '_' . $layout;
 
-		$limit		= $app->getUserStateFromRequest( $option.'.fields.limit', 'limit', $app->getCfg('list_limit'), 'int');
-		$limitstart = $app->getUserStateFromRequest( $option.'.fields.limitstart', 'limitstart', 0, 'int' );
+		// Call parent after setting ... $this->view_id
+		parent::__construct($config);
 
-		// In case limit has been changed, adjust limitstart accordingly
-		$limitstart = ( $limit != 0 ? (floor($limitstart / $limit) * $limit) : 0 );
+		$p = $this->ovid;
 
-		$this->setState('limit', $limit);
-		$this->setState('limitstart', $limitstart);
 
-		$array = JRequest::getVar('cid',  0, '', 'array');
-		$this->setId((int)$array[0]);
+		/**
+		 * View's Filters
+		 * Inherited filters : filter_state, filter_access, search
+		 * Inside method _setStateOrder(): filter_type
+		 */
+
+		// Various filters
+		$filter_fieldtype = $fcform ? $jinput->get('filter_fieldtype', '', 'cmd') : $app->getUserStateFromRequest($p . 'filter_fieldtype', 'filter_fieldtype', '', 'cmd');
+		$filter_assigned  = $fcform ? $jinput->get('filter_assigned', '', 'cmd') : $app->getUserStateFromRequest($p . 'filter_assigned', 'filter_assigned', '', 'cmd');
+
+		$this->setState('filter_fieldtype', $filter_fieldtype);
+		$this->setState('filter_assigned', $filter_assigned);
+
+		$app->setUserState($p . 'filter_fieldtype', $filter_fieldtype);
+		$app->setUserState($p . 'filter_assigned', $filter_assigned);
+
+
+		// Manage view permission
+		$this->canManage = FlexicontentHelperPerm::getPerm()->CanFields;
 	}
 
-	/**
-	 * Method to set the Field identifier
-	 *
-	 * @access	public
-	 * @param	int Field identifier
-	 */
-	function setId($id)
-	{
-		// Set id and wipe data
-		$this->_id	 = $id;
-		$this->_data = null;
-	}
 
 	/**
-	 * Method to get a pagination object for the fields
+	 * Method to get records data
 	 *
-	 * @access public
-	 * @return integer
+	 * @return array
+	 *
+	 * @since	3.3.0
 	 */
-	function getPagination()
+	public function getItems()
 	{
-		// Lets load the fields if it doesn't already exist
-		if (empty($this->_pagination))
+		// Lets load the records if it doesn't already exist
+		if (empty($this->_data))
 		{
-			jimport('joomla.html.pagination');
-			$this->_pagination = new JPagination( $this->getTotal(), $this->getState('limitstart'), $this->getState('limit') );
+			parent::getItems();
+
+			/**
+			 * Get type data
+			 */
+
+			$this->_typeids = array();
+
+			foreach ($this->_data as $item)
+			{
+				$item->content_types = $item->typeids ? preg_split("/[\s]*,[\s]*/", $item->typeids) : array();
+
+				foreach ($item->content_types as $type_id)
+				{
+					if ($type_id)
+					{
+						$this->_typeids[$type_id] = 1;
+					}
+				}
+			}
+
+			$this->_typeids = array_keys($this->_typeids);
 		}
 
-		return $this->_pagination;
+		return $this->_data;
 	}
 
+
 	/**
-	 * Method to build the query for the fields
+	 * Method to build the query for the records
 	 *
-	 * @access private
-	 * @return integer
-	 * @since 1.0
+	 * @return  JDatabaseQuery   The DB Query object
+	 *
+	 * @since   3.3.0
 	 */
-	function getListQuery()
+	protected function getListQuery()
 	{
-		static $query;
-		
-		if(!isset($query)) {
-			
-			// Get the WHERE, HAVING and ORDER BY clauses for the query
-			$where		= trim($this->_buildContentWhere());
-			$orderby	= trim($this->_buildContentOrderBy());
-			$having		= trim($this->_buildContentHaving());
-	
-			$db =  JFactory::getDBO();
-			$query = $db->getQuery(true);
-			$query->select(
-				$this->getState( 'list.select',
-					't.*, u.name AS editor, COUNT(rel.type_id) AS nrassigned, level.title AS access_level, rel.ordering as typeordering, t.field_type as type, plg.name as field_friendlyname'
-				)
-			);
-			$query->from('#__flexicontent_fields AS t');
-			$query->join('LEFT', '#__extensions AS plg ON (plg.element = t.field_type AND plg.`type`=\'plugin\' AND plg.folder=\'flexicontent_fields\')');
-			$query->join('LEFT', '#__flexicontent_fields_type_relations AS rel ON rel.field_id = t.id');
-			$query->join('LEFT', '#__viewlevels AS level ON level.id=t.access');
-			$query->join('LEFT', '#__users AS u ON u.id = t.checked_out');
-			if ($where) $query->where($where);
-			$query->group('t.id');
-			if ($having) $query->having($having);
-			if ($orderby) $query->order($orderby);
-			
-		}//end if(!isset($query))
-		
+		// Create a query with all its clauses: WHERE, HAVING and ORDER BY, etc
+		$query = parent::getListQuery()
+			->select(
+				'COUNT(rel.type_id) AS nrassigned, GROUP_CONCAT(rel.type_id SEPARATOR  ",") AS typeids, ' .
+				'rel.ordering as typeordering, a.field_type as type, plg.name as friendly'
+			)
+			->leftJoin('#__extensions AS plg ON (plg.element = a.field_type AND plg.`type`=\'plugin\' AND plg.folder=\'flexicontent_fields\')')
+			->leftJoin('#__flexicontent_fields_type_relations AS rel ON rel.field_id = a.id')
+		;
+
 		return $query;
 	}
 
-	/**
-	 * Method to build the orderby clause of the query for the fields
-	 *
-	 * @access private
-	 * @return string
-	 * @since 1.0
-	 */
-	function _buildContentOrderBy()
-	{
-		$app = JFactory::getApplication();
-		$option = JRequest::getVar('option');
 
-		$filter_type 		= $app->getUserStateFromRequest( $option.'.fields.filter_type', 'filter_type', '', 'int' );
-		$filter_order		= $app->getUserStateFromRequest( $option.'.fields.filter_order', 		'filter_order', 	't.ordering', 'cmd' );
-		if ($filter_type && $filter_order == 't.ordering') {
-			$filter_order	= $app->setUserState( $option.'.fields.filter_order', 'typeordering' );
-		} else if (!$filter_type && $filter_order == 'typeordering') {
-			$filter_order	= $app->setUserState( $option.'.fields.filter_order', 't.ordering' );
+	/**
+	 * Method to build the where clause of the query for the records
+	 *
+	 * @param		JDatabaseQuery|bool   $q   DB Query object or bool to indicate returning an array or rendering the clause
+	 *
+	 * @return  JDatabaseQuery|array
+	 *
+	 * @since   3.3.0
+	 */
+	protected function _buildContentWhere($q = false)
+	{
+		// Inherited filters : filter_state, filter_access, search
+		$where = parent::_buildContentWhere(false);
+
+		// Various filters
+		$filter_fieldtype = $this->getState('filter_fieldtype');
+		$filter_type      = $this->getState('filter_type');
+
+		// Filter by item-type (assigned-to)
+		switch ($filter_fieldtype)
+		{
+			case 'C':
+				$where[] = 'a.iscore = 1';
+				break;
+			case 'NC':
+				$where[] = 'a.iscore = 0';
+				break;
+			case 'BV':
+				$where[] = '(a.iscore = 0 OR a.id = 1)';
+				break;
+			default:
+				if ($filter_fieldtype)
+				{
+					$where[] = 'a.field_type = ' . $this->_db->Quote($filter_fieldtype);
+				}
+				break;
 		}
-		$filter_order_Dir	= $app->getUserStateFromRequest( $option.'.fields.filter_order_Dir',	'filter_order_Dir',	'ASC', 'word' );
 
-		$orderby 	= ' '.$filter_order.' '.$filter_order_Dir;
+		// Filter by field-type
+		if ($filter_type)
+		{
+			$where[] = 'rel.type_id = ' . (int) $filter_type;
+		}
 
-		return $orderby;
+		// Limit to plugin type 'flexicontent_fields'
+		$where[] = '(plg.extension_id IS NULL OR plg.folder = ' . $this->_db->quote('flexicontent_fields') . ')';
+
+		if ($q instanceof \JDatabaseQuery)
+		{
+			return $where ? $q->where($where) : $q;
+		}
+
+		return $q
+			? ' WHERE ' . (count($where) ? implode(' AND ', $where) : ' 1 ')
+			: $where;
 	}
 
-	/**
-	 * Method to build the where clause of the query for the fields
-	 *
-	 * @access private
-	 * @return string
-	 * @since 1.0
-	 */
-	function _buildContentWhere()
-	{
-		static $where;
-		if(!isset($where)) {
-			$option = JRequest::getVar('option');
-			$app = JFactory::getApplication();
-	
-			$filter_fieldtype = $app->getUserStateFromRequest( $option.'.fields.filter_fieldtype', 'filter_fieldtype', '', 'word' );
-			$filter_type      = $app->getUserStateFromRequest( $option.'.fields.filter_type', 'filter_type', '', 'int' );
-			$filter_state     = $app->getUserStateFromRequest( $option.'.fields.filter_state', 'filter_state', '', 'word' );
-			$filter_access    = $app->getUserStateFromRequest( $option.'.fields.filter_access', 'filter_access', '', 'string' );
-			$search = $app->getUserStateFromRequest( $option.'.fields.search', 'search', '', 'string' );
-			$search = trim( JString::strtolower( $search ) );
-	
-			$where = array();
-	
-			// Filter by item-type (assigned-to)
-			if ( $filter_fieldtype ) {
-				if ( $filter_fieldtype == 'C' ) {
-					$where[] = 't.iscore = 1';
-				} else if ($filter_fieldtype == 'NC' ) {
-					$where[] = 't.iscore = 0';
-				} else if ($filter_fieldtype == 'BV' ) {
-					$where[] = '(t.iscore = 0 OR t.id = 1)';
-				} else {
-					$where[] = 't.field_type = "'.$filter_fieldtype.'"';
-				}
-			}
-			
-			// Filter by field-type
-			if ( $filter_type ) {
-				$where[] = 'rel.type_id = ' . $filter_type;
-			}
-			
-			// Filter by state
-			if ( $filter_state ) {
-				if ( $filter_state == 'P' ) {
-					$where[] = 't.published = 1';
-				} else if ($filter_state == 'U' ) {
-					$where[] = 't.published = 0';
-				}
-			}
-			
-			// Filter by access level
-			if ( $filter_access ) {
-				$where[] = 't.access = '.(int) $filter_access;
-			}
-			
-			// Filter by search word
-			if ($search) {
-				$search_escaped = FLEXI_J16GE ? $this->_db->escape( $search, true ) : $this->_db->getEscaped( $search, true );
-				$where[] = ' (LOWER(t.name) LIKE '.$this->_db->Quote( '%'.$search_escaped.'%', false )
-					.' OR LOWER(t.label) LIKE '.$this->_db->Quote( '%'.$search_escaped.'%', false ) .')';
-			}
-			
-			$where[] = ' (plg.extension_id IS NULL OR plg.folder="flexicontent_fields") ';
-			
-			$where 		= ( count( $where ) ? implode( ' AND ', $where ) : '' );
-		}//end if(!isset($where))
-		
-		return $where;
-	}
-	
+
 	/**
 	 * Method to build the having clause of the query for the files
 	 *
-	 * @access private
-	 * @return string
+	 * @param		JDatabaseQuery|bool   $q   DB Query object or bool to indicate returning an array or rendering the clause
+	 *
+	 * @return  JDatabaseQuery|array
+	 *
 	 * @since 1.0
 	 */
-	function _buildContentHaving()
+	protected function _buildContentHaving($q = false)
+	{
+		$having = parent::_buildContentHaving(false);
+
+		$filter_assigned = $this->getState('filter_assigned');
+		$rel_col         = 'rel.type_id';
+
+		switch ($filter_assigned)
+		{
+			case 'O':
+				$having[] = 'COUNT(' . $rel_col . ') = 0';
+				break;
+
+			case 'A':
+				$having[] = 'COUNT(' . $rel_col . ') > 0';
+				break;
+		}
+
+		if ($q instanceof \JDatabaseQuery)
+		{
+			return $having ? $q->having($having) : $q;
+		}
+
+		return $q
+			? ' HAVING ' . (count($having) ? implode(' AND ', $having) : ' 1 ')
+			: $having;
+	}
+
+
+	/**
+	 * Method to get SET-clause to set new values to columns related to the changing state of the records
+	 *
+	 * @param		array			$cid          Array of record ids to set to a new state
+	 * @param		integer   $state        The new state
+	 *
+	 * @return	boolean	True on success
+	 *
+	 * @since	3.3.0
+	 */
+	protected function getExtraStateChangeProps($state)
+	{
+		$set_properties = array();
+
+		// Force dirty properties, NOTE: for this reason only fields changing publication state are updated
+		if ($state)
+		{
+			$set_properties = array(
+				'issearch = CASE issearch WHEN 0 THEN 0   WHEN 1 THEN 2   ELSE issearch   END',
+				'isadvsearch = CASE isadvsearch WHEN 0 THEN 0   WHEN 1 THEN 2   ELSE isadvsearch   END',
+				'isadvfilter = CASE isadvfilter WHEN 0 THEN 0   WHEN 1 THEN 2   ELSE isadvfilter   END',
+			);
+		}
+		else
+		{
+			$set_properties = array(
+				'issearch = CASE issearch WHEN 0 THEN 0   ELSE -1   END',
+				'isadvsearch = CASE isadvsearch WHEN 0 THEN 0   ELSE -1   END',
+				'isadvfilter = CASE isadvfilter WHEN 0 THEN 0   ELSE -1   END',
+			);
+		}
+
+		return $set_properties;
+	}
+
+
+	/**
+	 * Method to move a record upwards or downwards
+	 *
+	 * @param   integer   $direction   A value of 1  or -1 to indicate moving up or down respectively
+	 * @param   integer   $typeid      The ID of the item type whose fields are being reorder, needed as fields are assigned to multiple item types
+	 *
+	 * @return	boolean	  True on success
+	 *
+	 * @since	3.3.0
+	 */
+	public function move($direction, $typeid)
+	{
+		// Load the moved record
+		$table = $this->getTable($this->records_jtable, '');
+
+		if (!$table->load($this->_id))
+		{
+			$this->setError($table->getError());
+			return false;
+		}
+
+		// Use filter value if content type was not given
+		$typeid = $typeid ?: $this->getState('filter_type');
+		$multi_assigns_ordering = (boolean) $typeid;
+
+
+		/**
+		 * CASE 1
+		 *
+		 * Global ordering (no content type), use ordering column inside DB table itself
+		 * do reordering via JTable calls
+		 */
+
+		if (!$multi_assigns_ordering)
+		{
+			// Access check must done at the controller code for component level ACL 'flexicontent.orderfields'
+			return parent::move($direction, 0);
+		}
+
+
+		/**
+		 * CASE 2
+		 *
+		 * Specific item type ordering (multi-type assignments), use ordering column at the fields-types relation DB table
+		 * we will not use JTable calls for changing order,
+		 * instead we will use custom optimized queries to update multiple records at once
+		 */
+
+		else
+		{
+			/**
+			 * Verify currently moved field is assigned to given type and also get its current ordering value
+			 */
+
+			$query = $this->_db->getQuery(true)
+				->select('rel.field_id, rel.ordering')
+				->from('#__flexicontent_fields_type_relations AS rel')
+				->where('rel.type_id = ' . (int) $typeid)
+				->where('rel.field_id = ' . (int) $this->_id)
+			;
+			$origin = $this->_db->setQuery($query, 0, 1)->loadObject();
+
+			if (!$origin)
+			{
+				$this->setError('Field to move is not assigned to given type');
+				return false;
+			}
+
+			/**
+			 * Find the NEXT or PREVIOUS field having same (typeid), to use it for swapping the ordering numbers
+			 */
+
+			$query
+				->clear('where')
+				->where(array(
+					'rel.type_id = ' . (int) $typeid,
+				));
+
+			if ($direction < 0)
+			{
+				$query
+					->where('rel.ordering >= 0 AND rel.ordering < ' . (int) $origin->ordering)
+					->order('ordering DESC');
+			}
+			elseif ($direction > 0)
+			{
+				$query
+					->where('rel.ordering >= 0 AND rel.ordering > ' . (int) $origin->ordering)
+					->order('ordering ASC');
+			}
+
+			$row = $this->_db->setQuery($query, 0, 1)->loadObject();
+
+			/**
+			 * NEXT or PREVIOUS record found, swap its order with currently moved record
+			 */
+			if (isset($row))
+			{
+				$query = $this->_db->getQuery(true)
+					->update('#__flexicontent_fields_type_relations')
+					->set('ordering = ' . (int) $row->ordering)
+					->where('field_id = ' . (int) $origin->field_id)
+					->where('type_id = ' . (int) $typeid)
+				;
+				$this->_db->setQuery($query)->execute();
+
+				$query = $this->_db->getQuery(true)
+					->update('#__flexicontent_fields_type_relations')
+					->set('ordering = ' . (int) $origin->ordering)
+					->where('field_id = ' . (int) $row->field_id)
+					->where('type_id = ' . (int) $typeid)
+				;
+				$this->_db->setQuery($query)->execute();
+			}
+
+			/**
+			 * NEXT or PREVIOUS record NOT found, raise a notice
+			 */
+			else
+			{
+				JFactory::getApplication()->enqueueMessage(
+					JText::_('Previous/Next record was not found or has same ordering, trying saving ordering once to create incrementing unique ordering numbers'),
+					'notice'
+				);
+			}
+
+			return true;
+		}
+	}
+
+
+	/**
+	 * Saves the manually set order of records.
+	 *
+	 * @param   array     $pks        An array of primary key ids
+	 * @param   array     $order      An array of new ordering values
+	 * @param   integer   $typeid     The ID of the item type whose fields are being reorder, needed as fields are assigned to multiple item types
+	 *
+	 * @return  boolean   Boolean true on success, false on failure
+	 *
+	 * @since   3.3.0
+	 */
+	public function saveorder($pks, $order, $typeid = 0)
 	{
 		$app = JFactory::getApplication();
-		$option = JRequest::getVar('option');
-		
-		$filter_assigned	= $app->getUserStateFromRequest( $option.'.fields.filter_assigned', 'filter_assigned', '', 'word' );
-		
-		$having = '';
-		
-		if ( $filter_assigned ) {
-			if ( $filter_assigned == 'O' ) {
-				$having = ' COUNT(rel.type_id) = 0';
-			} else if ($filter_assigned == 'A' ) {
-				$having = ' COUNT(rel.type_id) > 0';
-			}
-		}
-		
-		return $having;
-	}
 
-	/**
-	 * Method to (un)publish a field
-	 *
-	 * @access	public
-	 * @return	boolean	True on success
-	 * @since	1.0
-	 */
-	function publish($cid = array(), $publish = 1)
-	{
-		$user = JFactory::getUser();
+		$typeid = $typeid ?: $this->getState('filter_type');
 
-		if (count( $cid ))
+
+		/**
+		 * CASE 1
+		 *
+		 * Global ordering (no content type), use ordering column inside DB table itself
+		 * do reordering via JTable calls
+		 */
+
+		if (!$typeid)
 		{
-			$cids = implode( ',', $cid );
-			
-			// Force dirty properties, NOTE: for this reason only fields changing publication state are updated
-			if ($publish) {
-				$set_search_properties =
-						', issearch = CASE issearch WHEN 0 THEN 0   WHEN 1 THEN 2   ELSE issearch   END'.
-						', isadvsearch = CASE isadvsearch WHEN 0 THEN 0   WHEN 1 THEN 2   ELSE isadvsearch   END'.
-						', isadvfilter = CASE isadvfilter WHEN 0 THEN 0   WHEN 1 THEN 2   ELSE isadvfilter   END';
-			} else {
-				$set_search_properties =
-						', issearch = CASE issearch WHEN 0 THEN 0   ELSE -1   END'.
-						', isadvsearch = CASE isadvsearch WHEN 0 THEN 0   ELSE -1   END'.
-						', isadvfilter = CASE isadvfilter WHEN 0 THEN 0   ELSE -1   END';
-			}
-			$query = 'UPDATE #__flexicontent_fields'
-				. ' SET published = ' . (int) $publish
-				. $set_search_properties
-				. ' WHERE id IN ('. $cids .') '
-				. '   AND published<>' . (int) $publish   // IMPORTANT only update fields changing publication state
-				. ' AND ( checked_out = 0 OR ( checked_out = ' . (int) $user->get('id'). ' ) )'
-			;
-			$this->_db->setQuery( $query );
-			if (!$this->_db->query()) {
-				$this->setError($this->_db->getErrorMsg());
-				return false;
-			}
-		}
-		return true;
-	}
-	
-	
-	/**
-	 * Method to toggle the given property of given field
-	 *
-	 * @access	public
-	 * @return	boolean	True on success
-	 * @since	1.0
-	 */
-	function toggleprop($cid = array(), $propname=null, &$unsupported=0, &$locked=0)
-	{
-		if (!$propname) return false;
-		$user = JFactory::getUser();
-		
-		$affected = 0;
-		if (count( $cid ))
-		{
-			// Get fields information from DB
-			$query = 'SELECT field_type, iscore, id'
-					. ' FROM #__flexicontent_fields'
-					. ' WHERE id IN ('. implode( ',', $cid ) .') '
-					;
-			$this->_db->setQuery($query);
-			$rows = $this->_db->loadObjectList('id');
-			
-			// Calculate fields not supporting the property
-			$support_ids = array();
-			$supportprop_name = 'support'.str_replace('is','',$propname);
-			foreach ($rows as $id => $row)
+			// Access check must done at the controller code for component level ACL 'flexicontent.orderfields'
+			$table = $this->getTable($this->records_jtable, '');
+
+			// Update ordering values
+			for ($i = 0; $i < count($pks); $i++)
 			{
-				$ft_support = FlexicontentFields::getPropertySupport($row->field_type, $row->iscore);
-				$supportprop = isset($ft_support->{$supportprop_name}) ? $ft_support->{$supportprop_name} : false;
-				if ($supportprop) $support_ids[] = $id;
-			}
-			$unsupported = count($cid) - count($support_ids);
-			
-			// Check that at least one field that supports the property was found
-			if ( !count($support_ids) ) return 0;
-			
-			// Some fields are marked as 'dirty'
-			$dirty_properties = array('issearch', 'isadvsearch', 'isadvfilter');
-			$set_clause = in_array($propname,$dirty_properties) ?
-				' SET '. $propname .' = CASE '. $propname .'  WHEN 2 THEN -1   WHEN -1 THEN 2   WHEN 1 THEN -1   WHEN 0 THEN 2   END' :
-				' SET '. $propname .' = 1-'. $propname;
-			
-			// Toggle the property for fields supporting the property
-			$query = 'UPDATE #__flexicontent_fields'
-				. $set_clause
-				. ' WHERE id IN ('. implode(",",$support_ids) .')'
-				. ' AND ( checked_out = 0 OR ( checked_out = ' . (int) $user->get('id'). ' ) )'
-				;
-			$this->_db->setQuery( $query );
-			if ( !( $result = $this->_db->query() ) ) {
-				$this->setError($this->_db->getErrorMsg());
-				return false;
-			}
-			
-			// Get affected fields, non affected fields must have been locked by another user
-			$affected = $this->_db->getAffectedRows($result);
-			$locked = count($support_ids) - $affected;
-		}
-		return $affected;
-	}
-		
-	
-	/**
-	 * Method to check if we can remove a field
-	 *
-	 * @access	public
-	 * @return	boolean	True on success
-	 * @since	1.5
-	 */
-	function candelete($cid = array())
-	{
-		$n		= count( $cid );
-		if (count( $cid ))
-		{
-			for ($i = 0; $i < $n; $i++)
-			{
-				$query = 'SELECT COUNT( id )'
-				. ' FROM #__flexicontent_fields'
-				. ' WHERE id = '. (int) $cid[$i]
-				. ' AND iscore = 1'
-				;
-				$this->_db->setQuery( $query );
-				$count = $this->_db->loadResult();
-				
-				if ($count > 0) {
-					return false;
-				}
-			}
-			return true;
-		}
-	}
+				$table->load((int) $pks[$i]);
 
-	/**
-	 * Method to check if we can unpublish a field
-	 *
-	 * @access	public
-	 * @return	boolean	True on success
-	 * @since	1.5
-	 */
-	function canunpublish($cid = array())
-	{
-		$n		= count( $cid );
-		if (count( $cid ))
-		{
-			for ($i = 0; $i < $n; $i++)
-			{
-				// the six first fields are needed for versioning, filtering and advanced search
-				if ($cid[$i] < 7) {
-					return false;
-				}
-			}
-			return true;
-		}
-	}
 
-	/**
-	 * Method to remove a field
-	 *
-	 * @access	public
-	 * @return	boolean	True on success
-	 * @since	1.0
-	 */
-	function delete($cid = array())
-	{
-		$result = false;
+				// Save JTable record only if ordering differs
+				if ($table->ordering != $order[$i])
+				{
+					$table->ordering = $order[$i];
 
-		if (count( $cid ))
-		{
-			$cids = implode( ',', $cid );
-			$query = 'DELETE FROM #__flexicontent_fields'
-					. ' WHERE id IN ('. $cids .')'
-					;
+					if (!$table->store())
+					{
+						$this->setError($table->getError());
 
-			$this->_db->setQuery( $query );
-
-			if(!$this->_db->query()) {
-				$this->setError($this->_db->getErrorMsg());
-				return false;
-			}
-
-			// delete also field in fields_type relation
-			$query = 'DELETE FROM #__flexicontent_fields_type_relations'
-					. ' WHERE field_id IN ('. $cids .')'
-					;
-
-			$this->_db->setQuery( $query );
-
-			if(!$this->_db->query()) {
-				$this->setError($this->_db->getErrorMsg());
-				return false;
-			}
-
-			// delete also field in fields_item relation
-			$query = 'DELETE FROM #__flexicontent_fields_item_relations'
-					. ' WHERE field_id IN ('. $cids .')'
-					;
-
-			$this->_db->setQuery( $query );
-
-			if(!$this->_db->query()) {
-				$this->setError($this->_db->getErrorMsg());
-				return false;
-			}
-			
-			// delete also field in fields versions table
-			$query = 'DELETE FROM #__flexicontent_items_versions'
-					. ' WHERE field_id IN ('. $cids .')'
-					;
-
-			$this->_db->setQuery( $query );
-
-			if(!$this->_db->query()) {
-				$this->setError($this->_db->getErrorMsg());
-				return false;
-			}
-			
-		}
-
-		return true;
-	}
-
-	/**
-	 * Method to set the access level of the Types
-	 *
-	 * @access	public
-	 * @param integer id of the category
-	 * @param integer access level
-	 * @return	boolean	True on success
-	 * @since	1.0
-	 */
-	function saveaccess($id, $access)
-	{
-		$option = JRequest::getVar('option');
-		$row = JTable::getInstance('flexicontent_fields', '');
-
-		$row->load( $id );
-		$row->id = $id;
-		$row->access = $access;
-
-		if ( !$row->check() ) {
-			$this->setError($this->_db->getErrorMsg());
-			return false;
-		}
-		if ( !$row->store() ) {
-			$this->setError($this->_db->getErrorMsg());
-			return false;
-		}
-		return true;
-	}
-
-	/**
-	 * Method to get the last id
-	 *
-	 * @access	private
-	 * @return	int
-	 * @since	1.5
-	 */
-	function _getLastId()
-	{
-		$query  = 'SELECT MAX(id)'
-				. ' FROM #__flexicontent_fields'
-				;
-		$this->_db->setQuery($query);
-		$lastid = $this->_db->loadResult();
-		
-		return (int)$lastid;
-	}
-
-	/**
-	 * Method to copy fields
-	 *
-	 * @access	public
-	 * @return	boolean	True on success
-	 * @since	1.0
-	 */
-	function copy($cid = array(), $copyvalues=false)
-	{
-		if ( !count( $cid ) ) return false;
-		
-		$ids_map = array();
-		foreach ($cid as $id) {
-			// only non core fields
-			if ($id > 14) {
-				$field = $this->getTable('flexicontent_fields', '');
-				$field->load($id);
-				if ( $copyvalues && in_array($field->field_type, array('image')) ) {
-					$params = FLEXI_J16GE ? new JRegistry($field->attribs) : new JParameter($field->attribs);
-					if ($params->get('image_source')) {
-						JFactory::getApplication()->enqueueMessage( 'You cannot copy image field -- "'.$field->name.'" -- together with its values, since this field has data in folders too' ,'error');
-						continue;
+						return false;
 					}
 				}
-				$field->id = 0;
-				$field->name = 'field' . ($this->_getLastId() + 1);
-				$field->label = $field->label . ' [copy]';
-				$field->check();
-				$field->store();
-				$ids_map[$id] = $field->id;
-			}				
+			}
+
+			/**
+			 * Compact the ordering numbers
+			 */
+
+			$table->reorder();
+
+			return true;
 		}
-		
-		if ( !count( $ids_map ) ) return false; 
-		if ($copyvalues) $this->copyvalues( $ids_map );  // Also copy values
-		return $ids_map;
+
+
+		/**
+		 * CASE 2
+		 *
+		 * Specific item type ordering (multi-type assignments), use ordering column at the fields-types relation DB table
+		 * we will not use JTable calls for changing order,
+		 * instead we will use custom optimized queries to update multiple records at once
+		 */
+
+		else
+		{
+			$query = $this->_db->getQuery(true)
+				->select('rel.field_id, rel.ordering')
+				->from('#__flexicontent_fields_type_relations AS rel')
+				->where('rel.type_id = ' . (int) $typeid)
+				->order('rel.ordering')
+			;
+			$rows = $this->_db->setQuery($query)->loadObjectList('field_id');
+
+			/**
+			 * Update the record-to-group relations tableusing the given ordering numbers
+			 * TODO: merge this with the re-compacting (reordering) code ...
+			 */
+			$new_order_wheres = array();
+
+			for ($i = 0; $i < count($pks); $i++)
+			{
+				$row = $rows[$pks[$i]];
+
+				if ($row->ordering != $order[$i])
+				{
+					$row->ordering = $order[$i];
+
+					$where_case = 'type_id = ' . (int) $typeid . ' AND field_id = ' . (int) $row->field_id;
+					$new_order_wheres[$where_case] = ' WHEN ' . $where_case . ' THEN ' . (int) $row->ordering;
+				}
+			}
+
+			if (count($new_order_wheres))
+			{
+				$query = $this->_db->getQuery(true)
+					->update('#__flexicontent_fields_type_relations')
+					->set('ordering = CASE ' . implode(' ', $new_order_wheres) . ' END ')
+					->where('(' . implode(') OR (', array_keys($new_order_wheres)) . ')')
+				;
+				$this->_db->setQuery($query)->execute();
+			}
+
+			/**
+			 * Get ordering of all records in current group (we will compact them below)
+			 */
+
+			$query = $this->_db->getQuery(true)
+				->select('rel.field_id, rel.ordering')
+				->from('#__flexicontent_fields_type_relations AS rel')
+				->where('rel.ordering >= 0')
+				->where('rel.type_id = ' . (int) $typeid)
+				->order('rel.ordering')
+			;
+			$rows = $this->_db->setQuery($query)->loadObjectList('field_id');
+
+			/**
+			 * Compact the ordering numbers
+			 */
+
+			$n = 1;
+			$new_order_wheres = array();
+
+			foreach ($rows as $row)
+			{
+				if ($row->ordering >= 0)
+				{
+					if ($row->ordering != $n)
+					{
+						$row->ordering = $n;
+
+						$where_case = 'type_id = ' . (int) $typeid . ' AND field_id = ' . (int) $row->field_id;
+						$new_order_wheres[$where_case] = ' WHEN ' . $where_case . ' THEN ' .  (int) $row->ordering;
+					}
+
+					$n++;
+				}
+			}
+
+			if (count($new_order_wheres))
+			{
+				$query = $this->_db->getQuery(true)
+					->update('#__flexicontent_fields_type_relations')
+					->set('ordering = CASE ' . implode(' ', $new_order_wheres) . ' END ')
+					->where('(' . implode(') OR (', array_keys($new_order_wheres)) . ')')
+				;
+				$this->_db->setQuery($query)->execute();
+			}
+
+			return true;
+		}
 	}
-	
-	
+
+
 	/**
-	 * Method to copy field values of duplicated (copied) fields
+	 * Method to delete records relations like record assignments
 	 *
-	 * @access	public
-	 * @return	boolean	True on success
-	 * @since	1.0
+	 * @param		array			$cid      array of record ids to delete their related data
+	 *
+	 * @return	bool      True on success
+	 *
+	 * @since		3.3.0
 	 */
-	function copyvalues($ids_map = array())
+	public function delete_relations($cid)
 	{
-		if ( !count( $ids_map ) ) return false;
-		
-		$db = JFactory::getDBO();
-		foreach ($ids_map as $source_id => $target_id) {
-			// Copy field - content type assignments
-			$query = 'INSERT INTO #__flexicontent_fields_type_relations (field_id, type_id, ordering)'
-				.' SELECT '.$target_id.', type_id, ordering FROM #__flexicontent_fields_type_relations as rel'
-				.' WHERE rel.field_id='.$source_id;
-			$db->setQuery($query);
-			$db->query();
-			if ( $db->getErrorNum() ) {
-				$this->setError($this->_db->getErrorMsg());
-				return false;
-			}
-			
-			// Copy field values assigned to items
-			$query = 'INSERT INTO #__flexicontent_fields_item_relations (field_id, item_id, valueorder, value)'
-				.' SELECT '.$target_id.',item_id, valueorder, value FROM #__flexicontent_fields_item_relations as rel'
-				.' WHERE rel.field_id='.$source_id;
-			$db->setQuery($query);
-			$db->query();
-			if ( $db->getErrorNum() ) {
-				$this->setError($this->_db->getErrorMsg());
-				return false;
+		if (count($cid))
+		{
+			$cid = ArrayHelper::toInteger($cid);
+			$cid_list = implode(',', $cid);
+
+			// Delete field - type relations
+			$query = $this->_db->getQuery(true)
+				->delete('#__flexicontent_fields_type_relations')
+				->where('field_id IN (' . $cid_list . ')')
+			;
+			$this->_db->setQuery($query)->execute();
+
+			// Delete field values
+			$query = $this->_db->getQuery(true)
+				->delete('#__flexicontent_fields_item_relations')
+				->where('field_id IN (' . $cid_list . ')')
+			;
+			$this->_db->setQuery($query)->execute();
+
+			// Delete versioned field values
+			$query = $this->_db->getQuery(true)
+				->delete('#__flexicontent_items_versions')
+				->where('field_id IN (' . $cid_list . ')')
+			;
+			$this->_db->setQuery($query)->execute();
+
+			// Delete advanced search index data
+			$query = $this->_db->getQuery(true)
+				->delete('#__flexicontent_advsearch_index')
+				->where('field_id IN (' . $cid_list . ')')
+			;
+			$this->_db->setQuery($query)->execute();
+
+			// Delete advanced search index data in individual field tables
+			foreach($cid as $id)
+			{
+				$query = 'DROP TABLE IF EXISTS #__flexicontent_advsearch_index_field_' . (int) $id
+				;
+				$this->_db->setQuery($query)->execute();
 			}
 		}
+
 		return true;
 	}
-	
-	
+
+
 	/**
-	 * Method to get types list when performing an edit action
-	 * 
-	 * @return array
-	 * @since 1.5
+	 * Method to copy records
+	 *
+	 * @param		array			$cid          array of record ids to copy
+	 * @param		array			$copyRelations   flag to indicate copying 'related' data, like 'assignments'
+	 *
+	 * @return	array		Array of old-to new record ids of copied record IDs
+	 *
+	 * @since   3.3.0
 	 */
-	function getTypeslist ()
+	public function copy($cid, $copyRelations = null)
 	{
-		$query = 'SELECT id, name'
-				. ' FROM #__flexicontent_types'
-				. ' WHERE published = 1'
-				. ' ORDER BY name ASC'
-				;
-		$this->_db->setQuery($query);
-		$types = $this->_db->loadObjectList();
-		return $types;	
-	}
-	
-	
-	/**
-	 * Method to get list of field types used
-	 * 
-	 * @return array
-	 * @since 1.5
-	 */
-	function getFieldTypes ($group=false)
-	{
-		$query = 'SELECT plg.element AS field_type, count(f.id) as assigned, plg.name as field_friendlyname'
-				. ' FROM ' . (FLEXI_J16GE ? '#__extensions': '#__plugins') .' AS plg'
-				. ' LEFT JOIN #__flexicontent_fields AS f ON (plg.element = f.field_type AND f.iscore=0)'
-				. ' WHERE plg.folder="flexicontent_fields" AND plg.element<>"core"'. (FLEXI_J16GE ? ' AND plg.type="plugin" ' : '')
-				. ' GROUP BY plg.element'
-				;
-		$this->_db->setQuery($query);
-		$ft_types = $this->_db->loadObjectList('field_type');
-		if (!$group) return $ft_types;
-		
-		$ft_grps = array(
-			'Selection fields'         => array('radio', 'radioimage', 'checkbox', 'checkboximage', 'select', 'selectmultiple'),
-			'Media fields / Mini apps' => array('file', 'image', 'minigallery', 'sharedvideo', 'sharedaudio', 'addressint'),
-			'Single property fields'   => array('date', 'text', 'textarea', 'textselect'),
-			'Multi property fields'     => array('weblink', 'email', 'extendedweblink', 'phonenumbers', 'termlist'),
-			'Item form'                => array('groupmarker', 'coreprops'),
-			'Item relations fields'    => array('relation', 'relation_reverse', 'autorelationfilters'),
-			'Special action fields'    => array('toolbar', 'fcloadmodule', 'fcpagenav', 'linkslist')
-		);
-		foreach($ft_grps as $ft_grpname => $ft_arr) {
-			//$ft_types_grp[$ft_grpname] = array();
-			foreach($ft_arr as $ft) {
-				if ( !empty($ft_types[$ft]) )
-				$ft_types_grp[$ft_grpname][$ft] = $ft_types[$ft];
-				unset($ft_types[$ft]);
+		$copyRelations = $copyRelations === null ? $this->copyValues : $copyRelations;
+		$ids_map       = array();
+		$name          = $this->name_col;
+
+		foreach ($cid as $id)
+		{
+			// Do not copy CORE fields
+			if ($id <= 14)
+			{
+				continue;
 			}
+
+			$table = $this->getTable($this->records_jtable, '');
+			$table->load($id);
+
+			if ($copyRelations && in_array($table->field_type, array('image')))
+			{
+				$params = new JRegistry($table->attribs);
+
+				if ($params->get('image_source'))
+				{
+					JFactory::getApplication()->enqueueMessage('You cannot copy image field -- "' . $table->name . '" -- together with its values, since this field has data in folders too', 'error');
+					continue;
+				}
+			}
+
+			$table->id    = 0;
+			$table->label = $table->label . ' [copy]';
+			$table->$name = 'field' . ($this->_getLastId() + 1);
+
+			$table->check();
+			$table->store();
+
+			// Add new record id to the old-to-new IDs map
+			$ids_map[$id] = $table->id;
 		}
-		// Remaining fields
-		$ft_types_grp['3rd-Party / Other Fields'] = $ft_types;
-		
-		return $ft_types_grp;
+
+		// Also copy related Data, like 'assignments'
+		if ($copyRelations)
+		{
+			$this->_copyRelatedData($ids_map);
+		}
+
+		return $ids_map;
 	}
-	
-	
+
+
+	/**
+	 * Method to copy assignments and other related data of records
+	 *
+	 * @param   array     $ids_map     array of old to new record ids
+	 *
+	 * @since   3.3.0
+	 */
+	protected function _copyRelatedData($ids_map)
+	{
+		foreach ($ids_map as $source_id => $target_id)
+		{
+			// Copy field - content type assignments
+			$query = 'INSERT INTO #__flexicontent_fields_type_relations (field_id, type_id, ordering)'
+				. ' SELECT ' . $target_id . ', type_id, ordering FROM #__flexicontent_fields_type_relations as rel'
+				. ' WHERE rel.field_id=' . $source_id;
+			$this->_db->setQuery($query)->execute();
+
+			// Copy field values assigned to items
+			$query = 'INSERT INTO #__flexicontent_fields_item_relations (field_id, item_id, valueorder, suborder, value, value_integer, value_decimal, value_datetime)'
+				. ' SELECT ' . $target_id . ',item_id, valueorder, suborder, value, CAST(value AS SIGNED), CAST(value AS DECIMAL(65,15)), CAST(value AS DATETIME) FROM #__flexicontent_fields_item_relations as rel'
+				. ' WHERE rel.field_id=' . $source_id;
+			$this->_db->setQuery($query)->execute();
+		}
+	}
+
+
+	/**
+	 * Method to find which records are not authorized
+	 *
+	 * @param   array        $cid      Array of record ids to check
+	 * @param		int|string   $action   Either an ACL rule action, or a new state
+	 *
+	 * @return	array     The records having assignments
+	 *
+	 * @since	3.3.0
+	 */
+	public function filterByPermission($cid, $action)
+	{
+		$this->rules_map = array(
+			'core.delete'     => 'flexicontent.deletefield',
+			'core.edit.state' => 'flexicontent.publishfield',
+		);
+
+		return parent::filterByPermission($cid, $action);
+	}
+
+
+	/**
+	 * Method to find which records having assignments blocking a state change
+	 *
+	 * @param		array        $cid      Array of record ids to check
+	 * @param		int|string   $action   Either an ACL rule action, or a new state
+	 *
+	 * @return	array     The records having assignments
+	 *
+	 * @since   3.3.0
+	 */
+	public function filterByAssignments($cid = array(), $action = -2)
+	{
+		$cid = ArrayHelper::toInteger($cid);
+		$cid_wassocs = array();
+
+		switch ((string)$action)
+		{
+			// Delete
+			case 'core.delete':
+				$cid_wassocs = $this->filterByCoreTypes($cid);
+				break;
+
+			// Trash, Unpublish, Archive, any state change
+			case -2:
+			case 0:
+			case 2:
+			default:
+				// Filter by CORE fields that should be remain published
+				if ($action != 1)
+				{
+					foreach ($cid as $i => $id)
+					{
+						// The fields having ID 1 to 6, are needed for versioning, filtering and search indexing
+						if ($id < 7)
+						{
+							$cid_wassocs[] = $id;
+						}
+					}
+				}
+				break;
+		}
+
+		return $cid_wassocs;
+	}
+
+
+	/**
+	 * Method to set order into state
+	 *
+	 * @return	void
+	 *
+	 * @since 3.3.0
+	 */
+	protected function _setStateOrder()
+	{
+		$app    = JFactory::getApplication();
+		$jinput = $app->input;
+		$fcform = $jinput->get('fcform', 0, 'int');
+		$p      = $this->ovid;
+
+		$default_order     = $this->default_order;
+		$default_order_dir = $this->default_order_dir;
+
+		$filter_type      = $fcform ? $jinput->get('filter_type', 0, 'int') : $app->getUserStateFromRequest($p . 'filter_type', 'filter_type', 0, 'int');
+		$filter_order     = $fcform ? $jinput->get('filter_order', $default_order, 'cmd') : $app->getUserStateFromRequest($p . 'filter_order', 'filter_order', $default_order, 'cmd');
+		$filter_order_Dir = $fcform ? $jinput->get('filter_order_Dir', $default_order_dir, 'word') : $app->getUserStateFromRequest($p . 'filter_order_Dir', 'filter_order_Dir', $default_order_dir, 'word');
+
+		if (!$filter_order)
+		{
+			$filter_order = $default_order;
+		}
+
+		if (!$filter_order_Dir)
+		{
+			$filter_order_Dir = $default_order_dir;
+		}
+
+		if ($filter_type && $filter_order === 'a.ordering')
+		{
+			$filter_order = 'typeordering';
+		}
+		else if (!$filter_type && $filter_order === 'typeordering')
+		{
+			$filter_order = 'a.ordering';
+		}
+
+		$this->setState('filter_type', $filter_type);
+		$this->setState('filter_order', $filter_order);
+		$this->setState('filter_order_Dir', $filter_order_Dir);
+
+		$app->setUserState($p . 'filter_type', $filter_type);
+		$app->setUserState($p . 'filter_order', $filter_order);
+		$app->setUserState($p . 'filter_order_Dir', $filter_order_Dir);
+	}
+
+
+	/**
+	 * START OF MODEL SPECIFIC METHODS
+	 */
+
+
+	/**
+	 * Method (LEGACY) to copy field values of duplicated (copied) fields
+	 *
+	 * @return	void
+	 *
+	 * @since	3.3.0
+	 */
+	protected function copyvalues($ids_map)
+	{
+		$this->_copyRelatedData($ids_map);
+	}
+
+
+	/**
+	 * Method to get types list
+	 *
+	 * @return array
+	 *
+	 * @since 1.5
+	 */
+	function getTypeslist($type_ids = false, $check_perms = false, $published = false)
+	{
+		return flexicontent_html::getTypesList($type_ids, $check_perms, $published);
+	}
+
+
 	/**
 	 * Method to build the list for types filter
-	 * 
+	 *
 	 * @return array
+	 *
 	 * @since 1.5
 	 */
 	function buildtypesselect($list, $name, $selected, $top, $class = 'class="inputbox"')
 	{
-		$typelist 	= array();
-		
-		if($top) {
-			$typelist[] 	= JHTML::_( 'select.option', '0', JText::_( 'FLEXI_SELECT_TYPE' ) );
+		$typelist = array();
+
+		if ($top)
+		{
+			$typelist[] = JHtml::_('select.option', '0', JText::_('FLEXI_SELECT_TYPE'));
 		}
-		
-		foreach ($list as $item) {
-			$typelist[] = JHTML::_( 'select.option', $item->id, $item->name);
+
+		foreach ($list as $item)
+		{
+			$typelist[] = JHtml::_('select.option', $item->id, $item->name);
 		}
-		return JHTML::_('select.genericlist', $typelist, $name, $class, 'value', 'text', $selected );
+
+		return JHtml::_('select.genericlist', $typelist, $name, $class, 'value', 'text', $selected);
 	}
 
+
 	/**
-	 * Method to move a Field
+	 * Method to find which type are core
 	 *
-	 * @access	public
-	 * @return	boolean	True on success
-	 * @since	1.0
+	 * @param   array     $cid     array of field type ids to check
+	 *
+	 * @return	array()  of record ids having assignments
+	 *
+	 * @since	1.5
 	 */
-	function move($direction)
+	function filterByCoreTypes($cid = array())
 	{
-		$app = JFactory::getApplication();
-		$option = JRequest::getVar('option');
-		
-		$filter_type = $app->getUserStateFromRequest( $option.'.fields.filter_type', 'filter_type', '', 'int' );
+		$cid = ArrayHelper::toInteger($cid);
 
-		if ($filter_type == '' || $filter_type == 0)
-		{
-			$row = JTable::getInstance('flexicontent_fields', '');
+		$query = 'SELECT id '
+			. ' FROM #__flexicontent_fields'
+			. ' WHERE id IN (' . implode(',', $cid) . ') '
+			. ' AND iscore = 1'
+		;
 
-			if (!$row->load( $this->_id ) ) {
-				$this->setError($this->_db->getErrorMsg());
-				return false;
-			}
-
-			if (!$row->move( $direction )) {
-				$this->setError($this->_db->getErrorMsg());
-				return false;
-			}
-			return true;
-		}
-		else
-		{
-			$query = 'SELECT field_id, ordering'
-					.' FROM #__flexicontent_fields_type_relations'
-					.' WHERE type_id = ' . $filter_type
-					.' AND field_id = ' . $this->_id
-					;
-			$this->_db->setQuery( $query, 0, 1 );
-			$origin = $this->_db->loadObject();
-
-			$sql = 'SELECT field_id, ordering FROM #__flexicontent_fields_type_relations';
-
-			if ($direction < 0)
-			{
-				$sql .= ' WHERE ordering < '.(int) $origin->ordering;
-				$sql .= ' AND type_id = ' . $filter_type;
-				$sql .= ' ORDER BY ordering DESC';
-			}
-			else if ($direction > 0)
-			{
-				$sql .= ' WHERE ordering > '.(int) $origin->ordering;
-				$sql .= ' AND type_id = ' . $filter_type;
-				$sql .= ' ORDER BY ordering';
-			}
-			else
-			{
-				$sql .= ' WHERE ordering = '.(int) $origin->ordering;
-				$sql .= ' AND type_id = ' . $filter_type;
-				$sql .= ' ORDER BY ordering';
-			}
-
-			$this->_db->setQuery( $sql, 0, 1 );
-
-			$row = null;
-			$row = $this->_db->loadObject();
-			
-			if (isset($row))
-			{
-				$query = 'UPDATE #__flexicontent_fields_type_relations'
-				. ' SET ordering = '. (int) $row->ordering
-				. ' WHERE field_id = '. (int) $origin->field_id
-				. ' AND type_id = ' . $filter_type
-				;
-				$this->_db->setQuery( $query );
-
-				if (!$this->_db->query())
-				{
-					$msg = $this->_db->getErrorMsg();
-					$this->setError( $msg );
-					return false;
-				}
-
-				$query = 'UPDATE #__flexicontent_fields_type_relations'
-				. ' SET ordering = '.(int) $origin->ordering
-				. ' WHERE field_id = '. (int) $row->field_id
-				. ' AND type_id = ' . $filter_type
-				;
-				$this->_db->setQuery( $query );
-	
-				if (!$this->_db->query())
-				{
-					$msg = $this->_db->getErrorMsg();
-					$this->setError( $msg );
-					return false;
-				}
-
-				$origin->ordering = $row->ordering;
-			}
-			else
-			{
-				$query = 'UPDATE #__flexicontent_fields_type_relations'
-				. ' SET ordering = '.(int) $origin->ordering
-				. ' WHERE field_id = '. (int) $origin->field_id
-				. ' AND type_id = ' . $filter_type
-				;
-				$this->_db->setQuery( $query );
-	
-				if (!$this->_db->query())
-				{
-					$msg = $this->_db->getErrorMsg();
-					$this->setError( $msg );
-					return false;
-				}
-			}
-		return true;
-		}
+		return $this->_db->setQuery($query)->loadColumn();
 	}
 
+
 	/**
-	 * Method to order Fields
+	 * Method to toggle the given -SEARCH- property of given field
 	 *
-	 * @access	public
+	 * @param		array			$cid          Array of record ids to set to a new state
+	 * @param		string    $propname     The property name
+	 * @param		array     $propname     Return an array of field ids that do no support this propery
+	 * @param		array     $locked       Return an array of field ids that have this propery locked to specific value
+	 *
 	 * @return	boolean	True on success
-	 * @since	1.0
+	 *
+	 * @since	3.3.0
 	 */
-	function saveorder($cid = array(), $order)
+	public function toggleprop($cid = array(), $propname = null, &$unsupported = 0, &$locked = 0)
 	{
-		$app = JFactory::getApplication();
-		$option = JRequest::getVar('option');
-		
-		$filter_type = $app->getUserStateFromRequest( $option.'.fields.filter_type', 'filter_type', '', 'int' );
+		$user = JFactory::getUser();
 
-		if ($filter_type == '' || $filter_type == 0)
+		$affected = 0;
+
+		if (count($cid))
 		{
-
-			$row = JTable::getInstance('flexicontent_fields', '');
-		
-			// update ordering values
-			for( $i=0; $i < count($cid); $i++ )
-			{
-				$row->load( (int) $cid[$i] );
-	
-				if ($row->ordering != $order[$i])
-				{
-					$row->ordering = $order[$i];
-					if (!$row->store()) {
-						$this->setError($this->_db->getErrorMsg());
-						return false;
-					}
-				}
-			}
-
-			$row->reorder( );
-			return true;
-
-		}
-		else
-		{
-			// Here goes the second method for saving order.
-			// As there is a composite primary key in the relations table we aren't able to use the standard methods from JTable
-		
-			$query = 'SELECT field_id, ordering'
-					.' FROM #__flexicontent_fields_type_relations'
-					.' WHERE type_id = ' . $filter_type
-					.' ORDER BY ordering'
-					;
-			// on utilise la methode _getList pour s'assurer de ne charger que les résultats compris entre les limites
-			//$rows = $this->_getList($query, $this->getState('limitstart'), $this->getState('limit'));
+			// Get fields information from DB
+			$query = 'SELECT field_type, iscore, id'
+				. ' FROM #__flexicontent_fields'
+				. ' WHERE id IN (' . implode(',', $cid) . ') '
+			;
 			$this->_db->setQuery($query);
-			$rows = $this->_db->loadObjectList('field_id');
+			$rows = $this->_db->loadObjectList('id');
 
-			for( $i=0; $i < count($cid); $i++ )
+			// Calculate fields not supporting the property
+			$support_ids      = array();
+			$supportprop_name = 'support' . str_replace('is', '', $propname);
+			foreach ($rows as $id => $row)
 			{
-				if ($rows[$cid[$i]]->ordering != $order[$i])
+				$ft_support  = FlexicontentFields::getPropertySupport($row->field_type, $row->iscore);
+				$supportprop = isset($ft_support->{$supportprop_name}) ? $ft_support->{$supportprop_name} : false;
+
+				if ($supportprop)
 				{
-					$rows[$cid[$i]]->ordering = $order[$i];
-					
-					$query = 'UPDATE #__flexicontent_fields_type_relations'
-							.' SET ordering=' . $order[$i]
-							.' WHERE type_id = ' . $filter_type
-							.' AND field_id = ' . $cid[$i]
-							;
-
-					$this->_db->setQuery($query);
-
-					if (!$this->_db->query()) {
-						$this->setError($this->_db->getErrorMsg());
-						return false;
-					}
+					$support_ids[] = $id;
 				}
 			}
+			$unsupported = count($cid) - count($support_ids);
 
-			// Specific reorder procedure because the relations table has a composite primary key 
-			$query 	= 'SELECT field_id, ordering'
-					. ' FROM #__flexicontent_fields_type_relations'
-					. ' WHERE ordering >= 0'
-					. ' AND type_id = '.(int) $filter_type
-					. ' ORDER BY ordering'
-					;
-			$this->_db->setQuery( $query );
-			if (!($orders = $this->_db->loadObjectList()))
+			// Check that at least one field that supports the property was found
+			if (!count($support_ids))
 			{
-				$this->setError($this->_db->getErrorMsg());
-				return false;
-			}
-			// compact the ordering numbers
-			for ($i=0, $n=count( $orders ); $i < $n; $i++)
-			{
-				if ($orders[$i]->ordering >= 0)
-				{
-					if ($orders[$i]->ordering != $i+1)
-					{
-						$orders[$i]->ordering = $i+1;
-						$query 	= 'UPDATE #__flexicontent_fields_type_relations'
-								. ' SET ordering = '. (int) $orders[$i]->ordering
-								. ' WHERE field_id = '. (int) $orders[$i]->field_id
-								. ' AND type_id = '.(int) $filter_type
-								;
-						$this->_db->setQuery( $query);
-						$this->_db->query();
-					}
-				}
+				return 0;
 			}
 
-			return true;
+			// Some fields are marked as 'dirty'
+			$dirty_properties = array('issearch', 'isadvsearch', 'isadvfilter');
+			$set_clause = in_array($propname, $dirty_properties) ?
+				' SET ' . $propname . ' = CASE ' . $propname . '  WHEN 2 THEN -1   WHEN -1 THEN 2   WHEN 1 THEN -1   WHEN 0 THEN 2   END' :
+				' SET ' . $propname . ' = 1-' . $propname;
+
+			// Toggle the property for fields supporting the property
+			$query = 'UPDATE #__' . $this->records_dbtbl
+				. $set_clause
+				. ' WHERE id IN (' . implode(",", $support_ids) . ')'
+				. ' AND ( checked_out = 0 OR ( checked_out = ' . (int) $user->get('id') . ' ) )'
+			;
+			$this->_db->setQuery($query)->execute();
+
+			// Get affected records, non records may have been locked by another user
+			$affected = $this->_db->getAffectedRows();
+
+			// Get locked records, by subtracting effected from initial count
+			$locked = count($support_ids) - $affected;
 		}
 
+		return $affected;
 	}
-	
+
+
+	/**
+	 * START OF MODEL LEGACY METHODS
+	 */
+
 }
-?>

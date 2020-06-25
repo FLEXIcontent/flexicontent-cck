@@ -1,0 +1,10 @@
+{
+  "id": "mapnik-fr",
+  "url": "https://a.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png",
+  "settings": {
+	  "attribution": "Map data &copy; <a href='https://www.openstreetmap.org/'>OpenStreetMap</a> contributors", 
+	  "minZoom": 1, 
+      "maxZoom": 18,
+	  "doubleClickZoom": 0
+    } 
+}

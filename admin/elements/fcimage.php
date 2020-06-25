@@ -18,12 +18,13 @@
 
 // Check to ensure this file is included in Joomla!
 defined('_JEXEC') or die('Restricted access');
-if (FLEXI_J16GE) {
-	jimport('joomla.html.html');
-	jimport('joomla.form.formfield');
-	jimport('joomla.form.helper');
- 	JFormHelper::loadFieldClass('list');
-}
+
+jimport('cms.html.html');      // JHtml
+jimport('cms.html.select');    // JHtmlSelect
+jimport('joomla.form.field');  // JFormField
+
+jimport('joomla.form.helper'); // JFormHelper
+JFormHelper::loadFieldClass('groupedlist');   // JFormFieldGroupedList
 
 /**
  * Renders an image element
@@ -32,7 +33,7 @@ if (FLEXI_J16GE) {
  * @subpackage	FLEXIcontent
  * @since		1.5
  */
- class JFormFieldFcimage extends JFormFieldList
+ class JFormFieldFcimage extends JFormFieldGroupedList
 {
 	/**
 	 * Element name
@@ -41,41 +42,42 @@ if (FLEXI_J16GE) {
 	 */
 	var $type = 'Fcimage';
 
-	public function getOptions()
+	public function getGroups()
 	{
 
-		$images 	= array();
-		$images[] 	= JHTMLSelect::option('', JText::_( 'FLEXI_SELECT_IMAGE_FIELD' )); 
+		$images = array();
+		$images[] = array(
+			array('value' => '', 'text' => JText::_('FLEXI_SELECT_IMAGE_FIELD'))
+		);
 
-		$db = JFactory::getDBO();
-		if (FLEXI_J16GE) {
-			$node = & $this->element;
-			$attributes = get_object_vars($node->attributes());
-			$attributes = $attributes['@attributes'];
-		} else {
-			$attributes = & $node->_attributes;
-		}
+		$db = JFactory::getDbo();
+		$node = & $this->element;
+		$attributes = get_object_vars($node->attributes());
+		$attributes = $attributes['@attributes'];
 		
 		$valcolumn = 'name';
-		if (@$attributes['valcolumn']) {
+		if (@$attributes['valcolumn'])
+		{
 			$valcolumn = $attributes['valcolumn'];
 		}
 		
 		$query = 'SELECT '.$valcolumn.' AS value, label AS text'
-		. ' FROM #__flexicontent_fields'
-		. ' WHERE published = 1'
-		. ' AND field_type = ' . $db->Quote('image')
-		. ' ORDER BY label ASC, id ASC'
-		;
-		
+			. ' FROM #__flexicontent_fields'
+			. ' WHERE published = 1'
+			. ' AND field_type = ' . $db->Quote('image')
+			. ' ORDER BY label ASC, id ASC';
+
 		$db->setQuery($query);
 		$fields = $db->loadObjectList();
 
-		foreach ($fields as $field) {
-			$images[] = JHTMLSelect::option($field->value, JText::_('FLEXI_FIELD') .': '. $field->text); 
+		$grp = JText::_('FLEXI_FIELD');
+		$images[$grp] = array();
+
+		foreach ($fields as $field)
+		{
+			$images[$grp][] = array('value' => $field->value, 'text' => $field->text); 
 		}
 
 		return $images;
 	}
 }
-?>
