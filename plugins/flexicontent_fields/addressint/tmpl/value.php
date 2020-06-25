@@ -160,7 +160,7 @@ foreach ($this->values as $n => $value)
 	$value['marker_anchor'] = $value['custom_marker'] && !empty($value['marker_anchor'])
 		? $value['marker_anchor']
 		: 'BotC';
-	
+
 	$marker_path = !empty($value['custom_marker'])
 		? $custom_marker_path_abs . $value['custom_marker']
 		: '';
@@ -168,7 +168,7 @@ foreach ($this->values as $n => $value)
 		? $custom_marker_url_base . $value['custom_marker']
 		: $defaut_icon_url;
 
-	
+
 	if ($marker_path || $marker_url)
 	{
 		// Marker Size
@@ -291,11 +291,11 @@ foreach ($this->values as $n => $value)
 						data-maptype="google.maps.MapTypeId.'.strtoupper($map_type_view).'"
 						data-mapcontent="' . htmlspecialchars(json_encode($addr . $map_directions), ENT_COMPAT, 'UTF-8') . '"
             ' . ($value['custom_marker'] ? '
-							data-mapicon="' . htmlspecialchars(json_encode($marker_url), ENT_COMPAT, 'UTF-8') . '" 
-							data-mapicon_ws="' . $wS . '" 
-							data-mapicon_hs="' . $hS . '" 
-							data-mapicon_wa="' . $wA . '" 
-							data-mapicon_ha="' . $hA . '" 
+							data-mapicon="' . htmlspecialchars(json_encode($marker_url), ENT_COMPAT, 'UTF-8') . '"
+							data-mapicon_ws="' . $wS . '"
+							data-mapicon_hs="' . $hS . '"
+							data-mapicon_wa="' . $wA . '"
+							data-mapicon_ha="' . $hA . '"
 						' : '') . '
 						id="' . $map_tagid . '"' .
 						($map_width || $map_height ? 'style="min-width: ' . $map_width . 'px; min-height: ' . $map_height . 'px;"' : '') . '
@@ -444,7 +444,7 @@ if (!isset($addressint_view_js_added[$field->id]) && $map_api === 'googlemap' &&
 		var myInfoWindow = new google.maps.InfoWindow({
 			content: mapContent
 		});
-		
+
 		var theIcon = "";
 
 		if (mapIcon)
