@@ -329,6 +329,10 @@
 			<field name="" type="separator" default="FLEXI_LARGE_IMAGES" description="FLEXI_LARGE_IMAGES_DESC" level="level2" />
 			<field name="w_l" type="text" default="800" size="4" label="FLEXI_FIELD_IMAGE_WIDTH" description="FLEXI_FIELD_IMAGE_WIDTH_DESC" />
 			<field name="h_l" type="text" default="600" size="4" label="FLEXI_FIELD_IMAGE_HEIGHT" description="FLEXI_FIELD_IMAGE_HEIGHT_DESC" />
+			<field name="l_thumb_width_as_min_or_max" type="radio" default="0" label="FLEXI_IMAGE_FIELD_SET_THUMB_WIDTH_AS" description="FLEXI_IMAGE_FIELD_SET_THUMB_WIDTH_AS_DESC" class="btn-group group-fcinfo">
+				<option value="0">FLEXI_IMAGE_FIELD_MIN_WIDTH</option>
+				<option value="1">FLEXI_IMAGE_FIELD_MAX_WIDTH</option>
+			</field>
 			<field name="method_l" type="radio" default="0" label="FLEXI_PROCESSING_METHOD" description="FLEXI_PROCESSING_METHOD_DESC" class="btn-group group-fcinfo">
 				<option value="0">FLEXI_SCALE</option>
 				<option value="1">FLEXI_CROP</option>
@@ -347,6 +351,10 @@
 			<field name="" type="separator" default="FLEXI_MEDIUM_IMAGES" description="FLEXI_MEDIUM_IMAGES_DESC" level="level2" />
 			<field name="w_m" type="text" default="400" size="4" label="FLEXI_FIELD_IMAGE_WIDTH" description="FLEXI_FIELD_IMAGE_WIDTH_DESC" />
 			<field name="h_m" type="text" default="300" size="4" label="FLEXI_FIELD_IMAGE_HEIGHT" description="FLEXI_FIELD_IMAGE_HEIGHT_DESC" />
+			<field name="m_thumb_width_as_min_or_max" type="radio" default="0" label="FLEXI_IMAGE_FIELD_SET_THUMB_WIDTH_AS" description="FLEXI_IMAGE_FIELD_SET_THUMB_WIDTH_AS_DESC" class="btn-group group-fcinfo">
+				<option value="0">FLEXI_IMAGE_FIELD_MIN_WIDTH</option>
+				<option value="1">FLEXI_IMAGE_FIELD_MAX_WIDTH</option>
+			</field>
 			<field name="method_m" type="radio" default="0" label="FLEXI_PROCESSING_METHOD" description="FLEXI_PROCESSING_METHOD_DESC" class="btn-group group-fcinfo">
 				<option value="0">FLEXI_SCALE</option>
 				<option value="1">FLEXI_CROP</option>
@@ -365,6 +373,10 @@
 			<field name="" type="separator" default="FLEXI_SMALL_IMAGES" description="FLEXI_SMALL_IMAGES_DESC" level="level2" />
 			<field name="w_s" type="text" default="120" size="4" label="FLEXI_FIELD_IMAGE_WIDTH" description="FLEXI_FIELD_IMAGE_WIDTH_DESC" />
 			<field name="h_s" type="text" default="90" size="4" label="FLEXI_FIELD_IMAGE_HEIGHT" description="FLEXI_FIELD_IMAGE_HEIGHT_DESC" />
+			<field name="s_thumb_width_as_min_or_max" type="radio" default="0" label="FLEXI_IMAGE_FIELD_SET_THUMB_WIDTH_AS" description="FLEXI_IMAGE_FIELD_SET_THUMB_WIDTH_AS_DESC" class="btn-group group-fcinfo">
+				<option value="0">FLEXI_IMAGE_FIELD_MIN_WIDTH</option>
+				<option value="1">FLEXI_IMAGE_FIELD_MAX_WIDTH</option>
+			</field>
 			<field name="method_s" type="radio" default="1" label="FLEXI_PROCESSING_METHOD" description="FLEXI_PROCESSING_METHOD_DESC" class="btn-group group-fcinfo">
 				<option value="0">FLEXI_SCALE</option>
 				<option value="1">FLEXI_CROP</option>
@@ -546,10 +558,6 @@
 				<option value="2">FLEXI_MEDIUM</option>
 				<option value="3">FLEXI_LARGE</option>
 				<option value="4">FLEXI_ORIGINAL</option>
-			</field>
-			<field name="srcsetitemview" type="radio" default="0" label="FLEXI_FIELD_THUMB_SRCSET" description="FLEXI_FIELD_THUMB_SRCSER_DESC" class="btn-group group-fcinfo">
-				<option value="0">FLEXI_MIN_BASED</option>
-				<option value="1">FLEXI_MAX_BASE</option>
 			</field>
 
 			<field name="" type="separator" default="FLEXI_IMGFIELD_INFORMATION" level="level2" />
