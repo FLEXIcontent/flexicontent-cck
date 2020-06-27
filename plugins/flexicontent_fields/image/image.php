@@ -1073,7 +1073,7 @@ class plgFlexicontent_fieldsImage extends FCField
 					'.$fc_preview_msg.'
 					'.$originalname.'
 					'.$existingname.'
-					<div class="fcclear"></div>
+					<div class="fc-field-value-properties-box">
 					'.($image_source === -2 || $image_source === -1  ?  // Do not add image preview box if using Joomla Media Manager (or intro/full mode)
 						$select_existing.'
 						<div class="fcclear"></div>
@@ -1105,6 +1105,8 @@ class plgFlexicontent_fieldsImage extends FCField
 						</table>
 					</div>'
 					: '') .'
+					
+					</div>
 				</div>';
 
 			if (!$image_subpath)

@@ -1533,9 +1533,9 @@ div.empty_image {
 	flex-direction: column;
 }
 .fc-field-props-box .fc_preview_msg {
-	margin: 0 1.2%;
+	margin: 0.5em 0;
 	padding: 0.5em 1%;
-	min-width: 96.4%;
+	width: 98%;
 	max-width: 400px;
 	box-sizing: border-box;
 	display: inline-block;
@@ -1570,7 +1570,6 @@ div.empty_image {
 	width: 100%;
 	height: auto;
 	border-radius: 4px;
-	position: absolute;
 }
 #flexicontent .fcfield_preview_box .fc_preview_text {
 	display: flex;
@@ -1591,6 +1590,10 @@ div.empty_image {
 }
 div.fcimg_value_props {
 	display: inline-block;
+}
+div.fcimg_value_props select,
+div.fcimg_value_props input {
+	margin: 0;
 }
 #flexicontent .fc_filedata_txt.invalid {
 	color: red;
