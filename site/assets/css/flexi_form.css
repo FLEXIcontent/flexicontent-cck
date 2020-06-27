@@ -449,6 +449,7 @@ div .flexi_buttons button:not(.btn):hover {
 	margin: 4px 0% 3px 0%;
 	width: 100%;
 	box-sizing: border-box;
+	font-weight: normal;
 }
 .fcsep_level3 {
 	background-color: #9fe1ff;
@@ -457,6 +458,7 @@ div .flexi_buttons button:not(.btn):hover {
 	padding: 0.3em 2em;
 	margin: 4px 5% 3px;
 	width: auto;
+	font-weight: normal;
 }
 .fcsep_level4 {
 	background: #f7f7f7;
@@ -552,18 +554,18 @@ body .nowrap_hidden {
 	margin: -1px 0 0 0;
 	white-space: nowrap;
 }
-#flexicontent div.input-group-addon > *:not(:last-child):not(.select2-container),
-#flexicontent div.input-append > *:not(:last-child):not(.select2-container),
-#flexicontent div.input-group-addon > *:not(:last-child) > *,
-#flexicontent div.input-append > *:not(:last-child) > * {
+#flexicontent div.input-group-addon > *:not(:first-child):not(:last-child):not(.select2-container),
+#flexicontent div.input-append > *:not(:first-child):not(:last-child):not(.select2-container),
+#flexicontent div.input-group-addon > *:not(:first-child):not(:last-child) > *,
+#flexicontent div.input-append > *:not(:first-child):not(:last-child) > * {
 	border-top-right-radius: 0px !important;
 	border-bottom-right-radius: 0px !important;
 	margin-right: 0 !important;
 }
-#flexicontent div.input-group-addon > *:not(:first-child),
-#flexicontent div.input-prepend > *:not(:first-child),
-#flexicontent div.input-group-addon > *:not(:first-child) > *,
-#flexicontent div.input-prepend > *:not(:first-child) > * {
+#flexicontent div.input-group-addon > *:not(:first-child):not(:last-child),
+#flexicontent div.input-prepend > *:not(:first-child):not(:last-child),
+#flexicontent div.input-group-addon > *:not(:first-child):not(:last-child) > *,
+#flexicontent div.input-prepend > *:not(:first-child):not(:last-child) > * {
 	border-top-left-radius: 0px !important;
 	border-bottom-left-radius: 0px !important;
 }
@@ -615,6 +617,7 @@ body .nowrap_hidden {
 	padding-top: 18px;
 }
 #flexicontent .fc-floated-labels-box {
+	display: inline-block;
 	position: relative;
 	margin: 0px 4px 20px 0px;
 }
@@ -644,9 +647,9 @@ body .nowrap_hidden {
 #flexicontent .fc-floated-labels-box > input.fc-floated-lbl-input {
 	font-size: 14px;
 	width: 200px;
-	height: 16px;
-	line-height: 16px;
-	padding: 16px 0px 4px 8px;
+	height: auto;
+	line-height: 1em;
+	padding: 0.5em 0.5em 0.25em 0.5em;
 	border: 1px solid gray;
 	border-radius: 4px;
 }
@@ -658,7 +661,7 @@ body .nowrap_hidden {
 	top: 8px;
 	left: 8px;
 	transition: 0.2s ease all;
-	z-index: 1;
+	z-index: 10;
 	color: gray;
 	opacity: 0.7;
 	padding: 0 4px 0 4px;
@@ -667,11 +670,14 @@ body .nowrap_hidden {
 	top: 0px;
 }
 #flexicontent .fc-floated-labels-box > label.fc-floated-lbl.fc-has-value {
-	background: white;
-	top: -9px;
-	left: 8px;
+	background: #f0f0f0;
+	color: black;
+	top: -0.8em;
+	left: 0.5em;
 	font-size: 12px;
+	line-height: 1em;
 	opacity: 1;
+	padding: 0.15em 0.25em 0.15em 0.25em;
 }
 #flexicontent .fc-floated-labels-box > label.fc-floated-lbl.fc-lbl-external {
 	top: -2px;

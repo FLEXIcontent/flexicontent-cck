@@ -233,7 +233,6 @@ h3.themes-title small {
 /* Panes disabled */
 .pane-disabled {
 	opacity: 0.4;
-	filter: alpha(opacity=40);
 	font-style: oblique;
 }
 
@@ -318,7 +317,6 @@ ul.fcrecords {
 .records_container > ul > li.fcrecord > .fcrecord_prop.fcrec_unused {
 	width: 100px;
 	opacity: 0.65;
-	filter: alpha(opacity=65);
 }
 
 
@@ -382,7 +380,6 @@ ul.fcrecords {
 		cursor: move;
 		border: 0;
 		opacity: 0.8;
-		filter: alpha(opacity=80);
 	}
 
 	.addfield_handle.fc_after {
@@ -784,6 +781,7 @@ span.fc_select_button {
 span.fc_select_button:hover {
 	background-color: white;
 }
+
 /* Language associations */
 .fc_assoc_translation img {
 	border: 1px solid lightgray;
@@ -1101,16 +1099,16 @@ form div.container_fcfield > select {
 #flexicontent div fieldset.panelform .input-prepend > button {
 	margin-left: 0px;
 }
-#flexicontent div .btn-group > *:not(:last-child),
-#flexicontent div .input-append > *:not(:last-child) {
+#flexicontent div .btn-group > *:not(:first-child):not(:last-child),
+#flexicontent div .input-append > *:not(:first-child):not(:last-child) {
 	border-top-right-radius: 0px;
 	border-bottom-right-radius: 0px;
 	vertical-align: middle;
 }
-#flexicontent div .btn-group > *:not(:first-of-type),
-#flexicontent div .input-prepend > *:not(:first-child),
-#flexicontent div .btn-group > *:not(:first-child):not(label),
-#flexicontent div .input-prepend > *:not(:first-child):not(label) {
+#flexicontent div .btn-group > *:not(:first-of-type):not(:last-of-type),
+#flexicontent div .input-prepend > *:not(:first-child):not(:last-child),
+#flexicontent div .btn-group > *:not(:first-child):not(:last-child):not(label),
+#flexicontent div .input-prepend > *:not(:first-child):not(:last-child):not(label) {
 	border-top-left-radius: 0px;
 	border-bottom-left-radius: 0px;
 	vertical-align: middle;
@@ -1710,7 +1708,7 @@ ul.thumbnails.image_picker_selector li div.thumbnail p {
 	background-clip: padding-box;
 	color: #444;
 	border: 1px solid #AAAAAA;
-	border-radius: 4px;
+	/*border-radius: 4px;*/
 	display: inline-block;
 	padding: 0 6px 0px 6px;
 	margin: 0px 6px 2px 2px;
@@ -1934,7 +1932,6 @@ select[multiple].use_select2_lib:hover, select[multiple].use_select2_lib:focus {
 		top: 0;
 		left: 0;
 
-		opacity: 0.5;
 		background-color: #000;
 		width: 100%;
 		height: 100%;
@@ -1951,13 +1948,10 @@ select[multiple].use_select2_lib:hover, select[multiple].use_select2_lib:focus {
 		font-size: 18px;
 		font-weight: bold;
 		color: #555;
-
 		background: white 30px 40px no-repeat;
-		opacity: 1;
 		width: auto;
 		padding: 2em 2em 3em 2em;
 		margin: 0px;
-		border: 1px solid lightgray;
 		border-radius: 0.5em;
 		text-align: center;
 		width: 280px;
@@ -1971,7 +1965,6 @@ select[multiple].use_select2_lib:hover, select[multiple].use_select2_lib:focus {
 		position: relative !important;
 		left: 0;
 		top: 1.5em;
-
 		width: 100%;
 		height: 22px;
 		border-radius: 4px;

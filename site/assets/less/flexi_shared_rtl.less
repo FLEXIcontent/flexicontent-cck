@@ -233,7 +233,6 @@ h3.themes-title small {
 /* Panes disabled */
 .pane-disabled {
 	opacity: 0.4;
-	filter: alpha(opacity=40);
 	font-style: oblique;
 }
 
@@ -318,7 +317,6 @@ ul.fcrecords {
 .records_container > ul > li.fcrecord > .fcrecord_prop.fcrec_unused {
 	width: 100px;
 	opacity: 0.65;
-	filter: alpha(opacity=65);
 }
 
 
@@ -382,7 +380,6 @@ ul.fcrecords {
 		cursor: move;
 		border: 0;
 		opacity: 0.8;
-		filter: alpha(opacity=80);
 	}
 
 	.addfield_handle.fc_after {
@@ -1102,16 +1099,16 @@ form div.container_fcfield > select {
 #flexicontent div fieldset.panelform .input-prepend > button {
 	margin-right: 0px;
 }
-#flexicontent div .btn-group > *:not(:last-child),
-#flexicontent div .input-append > *:not(:last-child) {
+#flexicontent div .btn-group > *:not(:first-child):not(:last-child),
+#flexicontent div .input-append > *:not(:first-child):not(:last-child) {
 	border-top-left-radius: 0px;
 	border-bottom-left-radius: 0px;
 	vertical-align: middle;
 }
-#flexicontent div .btn-group > *:not(:first-of-type),
-#flexicontent div .input-prepend > *:not(:first-child),
-#flexicontent div .btn-group > *:not(:first-child):not(label),
-#flexicontent div .input-prepend > *:not(:first-child):not(label) {
+#flexicontent div .btn-group > *:not(:first-of-type):not(:last-of-type),
+#flexicontent div .input-prepend > *:not(:first-child):not(:last-child),
+#flexicontent div .btn-group > *:not(:first-child):not(:last-child):not(label),
+#flexicontent div .input-prepend > *:not(:first-child):not(:last-child):not(label) {
 	border-top-right-radius: 0px;
 	border-bottom-right-radius: 0px;
 	vertical-align: middle;
@@ -1711,7 +1708,7 @@ ul.thumbnails.image_picker_selector li div.thumbnail p {
 	background-clip: padding-box;
 	color: #444;
 	border: 1px solid #AAAAAA;
-	border-radius: 4px;
+	/*border-radius: 4px;*/
 	display: inline-block;
 	padding: 0 6px 0px 6px;
 	margin: 0px 6px 2px 2px;
@@ -2151,7 +2148,6 @@ div.current ul.config-option-list li fieldset {
 .prettycheckbox > a.disabled + label {
 	font-style: italic;
 	opacity: 0.4;
-	filter: alpha(opacity=40);
 }
 
 
@@ -2526,7 +2522,6 @@ div .fc_field_unsused_val .fc_ifield_val_txt {
 }
 div .fc_field_unsused_val .fc_ifield_val_txt {
 	opacity: 0.7;
-	filter: alpha(opacity=70);
 }
 div .fc_field_unsused_val [class^="fc-icon-"], 
 div .fc_field_unsused_val [class*=" fc-icon-"],
