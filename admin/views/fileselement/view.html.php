@@ -502,7 +502,7 @@ class FlexicontentViewFileselement extends FlexicontentViewBaseRecords
 						{
 							// Add after given element or at end if element was not provided
 							fcfiles_targetid = fcfiles_targetid ?
-								window.parent.addField".$fieldid."(null, null, jQuery('#'+fcfiles_targetid, parent.document).closest('li'), {insert_before: 0, scroll_visible: 0, animate_visible: 0}) :
+								window.parent.addField".$fieldid."(null, null, jQuery('#'+fcfiles_targetid, parent.document).closest('li.fcfieldval_container'), {insert_before: 0, scroll_visible: 0, animate_visible: 0}) :
 								window.parent.addField".$fieldid."(null);
 						}
 						if (fcfiles_targetid == 'cancel')  return false;  // Stop .each() loop
