@@ -859,17 +859,29 @@ class plgFlexicontent_fieldsImage extends FCField
 			}
 			elseif ($image_subpath)
 			{
-				$img_link = rawurlencode(
-					JUri::root(true).'/'.$dir_url
-					. ($image_source
-						? '/item_' . $u_item_id . '_field_' . $field->id
-						: ''
-					)
-					. ($item->id && empty($value['existingname'])
-						? '/m_' . $extra_prefix . basename($image_subpath)
-						: '/original/' . $image_subpath
-					)
-				);
+				// Extra thumbnails sub-folder
+				if (!empty($value['existingname']))
+				{
+					list($_file_path, $_src_path, $_dest_path, $_field_index, $_extra_prefix) = $this->getThumbPaths($field, $item, $value);
+					$_src_path = str_replace(JPATH_SITE, '', $_src_path);
+					$_src_path = JUri::root(true) . '/' . str_replace('\\', '/', $_src_path);
+
+					$img_link = rawurlencode($_src_path . $image_subpath);
+				}
+				else
+				{
+					$img_link = rawurlencode(
+						JUri::root(true).'/'.$dir_url
+						. ($image_source
+							? '/item_' . $u_item_id . '_field_' . $field->id
+							: ''
+						)
+						. ($item->id && empty($value['existingname'])
+							? '/m_' . $extra_prefix . basename($image_subpath)
+							: '/original/' . $image_subpath
+						)
+					);
+				}
 
 				if (isset($value['existingname']))
 				{
@@ -891,7 +903,6 @@ class plgFlexicontent_fieldsImage extends FCField
 			{
 				$img_link = '';
 			}
-
 
 			/**
 			 * Create the image preview using the image preview link
