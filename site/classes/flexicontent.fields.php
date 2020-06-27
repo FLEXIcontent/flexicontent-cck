@@ -2524,13 +2524,19 @@ class FlexicontentFields
 		static $support_ft = array();
 		if ( isset( $support_ft[$field_type] ) ) return !$spname ? $support_ft[$field_type] : $support_ft[$field_type]->{$spname};
 
-		// Existing fields with field type
-		if ($field_type)
-		{
-			// Make sure that the Joomla plugin that implements the type of current flexi field, has been imported
-			//JPluginHelper::importPlugin('flexicontent_fields', $field_type);
-			FLEXIUtilities::call_FC_Field_Func($iscore ? 'core' : $field_type, null, null);
+		/**
+		 * Try to load existing fields with field type
+		 * Make sure that the Joomla plugin that implements the type of current flexi field, has been imported
+		 */
 
+		//JPluginHelper::importPlugin('flexicontent_fields', $field_type);
+		$loaded = $field_type
+			? FLEXIUtilities::call_FC_Field_Func($iscore ? 'core' : $field_type, null, null)
+			: false;
+
+		// Field type was found
+		if ($loaded !== false)
+		{
 			// Get Methods implemented by the field
 			$classname	= 'plgFlexicontent_fields'.($iscore ? 'core' : $field_type);
 			$classmethods	= get_class_methods($classname);
@@ -2546,10 +2552,11 @@ class FlexicontentFields
 			$supportvalueseditable = !$iscore || $field_type=='maintext';
 			$supportformhidden     = !$iscore || $field_type=='maintext';
 			$supportedithelp       = !$iscore || $field_type=='maintext';
+		}
 
-		// New fields without field type
-		} else {
-
+		// New fields without field type or field type not found / not installed
+		else
+		{
 			// SEARCH/FILTER related properties
 			$supportsearch    = false;
 			$supportfilter    = false;
