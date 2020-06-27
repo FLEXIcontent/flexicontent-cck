@@ -402,15 +402,18 @@ class FLEXIUtilities
 			$path = JPATH_ROOT.DS.'plugins'.DS.'flexicontent_fields'.$plgfolder.DS.strtolower($fieldtype).'.php';
 			if (!file_exists($path))
 			{
-				JFactory::getApplication()->enqueueMessage(nl2br("While calling field method: $func(): cann't find field type: $fieldtype. This is internal error or wrong field name"), 'error');
-				return;
+				$func
+					? JFactory::getApplication()->enqueueMessage(nl2br("While calling field method: $func(): cann't find field type: $fieldtype. This is internal error or wrong field name"), 'error')
+					: JFactory::getApplication()->enqueueMessage(nl2br("Field of type: <b>'$fieldtype'</b> seems to have been uninstalled"), 'notice');
+
+				return false;
 			}
 			require_once($path);
 
 			if (!class_exists($className))
 			{
 				JFactory::getApplication()->enqueueMessage(nl2br("Could not find class: $className in file: $path\n Please correct field name"), 'error');
-				return;
+				return false;
 			}
 
 			// 2. Create a plugin instance, also pass the parameters so that $this->params are created too
