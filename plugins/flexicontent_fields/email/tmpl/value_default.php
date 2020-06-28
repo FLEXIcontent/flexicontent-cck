@@ -1,7 +1,8 @@
 <?php
-// Create field's HTML
+
 $field->{$prop} = array();
 $n = 0;
+
 foreach ($values as $value)
 {
 	// Basic sanity check for a valid email address

@@ -1,6 +1,4 @@
 <?php
-	$n = 0;
-
 	$box_classes = empty($simple_form_layout)
 		? $input_grp_class . ' fc-xpended-row'
 		: 'fc-floated-labels-box';
@@ -12,10 +10,12 @@
 		: 'fcfield_textval fc-floated-lbl-input';
 	$ff_events = 'onfocus="jQuery(this).prev().addClass(\'fc-has-value\');" onblur="if (this.value===\'\') jQuery(this).prev().removeClass(\'fc-has-value\');"';
 
+	$n = 0;
+
 	foreach ($field->value as $value)
 	{
 		// Compatibility for non-serialized values (e.g. reload user input after form validation error) or for NULL values in a field group
-		if ( !is_array($value) )
+		if (!is_array($value))
 		{
 			$array = $this->unserialize_array($value, $force_array=false, $force_value=false);
 			$value = $array ?: array(
@@ -23,7 +23,8 @@
 			);
 		}
 
-		if ( empty($value['addr']) && !$use_ingroup && $n) continue;  // If at least one added, skip empty if not in field group
+		// If at least one value has been added, then skip empty values if not in field group
+		if ( empty($value['addr']) && !$use_ingroup && $n) continue;
 
 		$fieldname_n = $fieldname.'['.$n.']';
 		$elementid_n = $elementid.'_'.$n;
