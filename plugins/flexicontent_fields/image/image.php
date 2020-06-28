@@ -801,7 +801,7 @@ class plgFlexicontent_fieldsImage extends FCField
 			elseif ($image_source === -2)
 			{
 				$mm_id = $elementid_n.'_existingname';
-				$img_path = $value['originalname'];
+				$img_path = $image_subpath;
 				$img_src  = ($img_path && file_exists(JPATH_ROOT . '/' . $img_path))  ?  JUri::root() . $img_path  :  '';
 				$img_attr = array('id' => $mm_id . '_preview', 'class' => 'media-preview', 'style' => ' style="max-width:480px; max-height:360" ');
 				$img = JHtml::image($img_src ?: 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=', JText::_('JLIB_FORM_MEDIA_PREVIEW_ALT'), $img_attr);
@@ -859,29 +859,10 @@ class plgFlexicontent_fieldsImage extends FCField
 			}
 			elseif ($image_subpath)
 			{
-				// Extra thumbnails sub-folder
-				if (!empty($value['existingname']))
-				{
-					list($_file_path, $_src_path, $_dest_path, $_field_index, $_extra_prefix) = $this->getThumbPaths($field, $item, $value);
-					$_src_path = str_replace(JPATH_SITE, '', $_src_path);
-					$_src_path = JUri::root(true) . '/' . str_replace('\\', '/', $_src_path);
-
-					$img_link = rawurlencode($_src_path . $image_subpath);
-				}
-				else
-				{
-					$img_link = rawurlencode(
-						JUri::root(true).'/'.$dir_url
-						. ($image_source
-							? '/item_' . $u_item_id . '_field_' . $field->id
-							: ''
-						)
-						. ($item->id && empty($value['existingname'])
-							? '/m_' . $extra_prefix . basename($image_subpath)
-							: '/original/' . $image_subpath
-						)
-					);
-				}
+				list($_file_path, $_src_path, $_dest_path, $_field_index, $_extra_prefix) = $this->getThumbPaths($field, $item, $value);
+				$_src_path = str_replace(JPATH_SITE, '', $_src_path);
+				$_src_path = JUri::root(true) . '/' . str_replace('\\', '/', $_src_path);
+				$img_link = rawurlencode($_src_path . $image_subpath);
 
 				if (isset($value['existingname']))
 				{
@@ -903,6 +884,7 @@ class plgFlexicontent_fieldsImage extends FCField
 			{
 				$img_link = '';
 			}
+
 
 			/**
 			 * Create the image preview using the image preview link
@@ -1084,41 +1066,44 @@ class plgFlexicontent_fieldsImage extends FCField
 					'.$fc_preview_msg.'
 					'.$originalname.'
 					'.$existingname.'
+
 					<div class="fc-field-value-properties-box">
-					'.($image_source === -2 || $image_source === -1  ?  // Do not add image preview box if using Joomla Media Manager (or intro/full mode)
-						$select_existing.'
-						<div class="fcclear"></div>
-					' : '
-						'.(empty($uploader_html) ? '' : '
-							<div style="display: inline-block; vertical-align: top;">
-								' . $uploader_html->container . '
+
+						'.($image_source === -2 || $image_source === -1  ?  // Do not add image preview box if using Joomla Media Manager (or intro/full mode)
+							$select_existing.'
+							<div class="fcclear"></div>
+						' : '
+							'.(empty($uploader_html) ? '' : '
+								<div style="display: inline-block; vertical-align: top;">
+									' . $uploader_html->container . '
+								</div>
+							').'
+							<div class="fcfield_preview_box fc-box thumb_'.$thumb_size_default.'">
+								'.$imgpreview.'
+								<div class="fcclear"></div>
+							'.$select_existing.'
 							</div>
 						').'
-						<div class="fcfield_preview_box fc-box thumb_'.$thumb_size_default.'">
-							'.$imgpreview.'
-							<div class="fcclear"></div>
-						'.$select_existing.'
-						</div>
-					').'
-					'
+						'
 
-					.(($linkto_url || $usemediaurl || $usealt || $usetitle || $usedesc || $usecust1 || $usecust2) ?
-					'
-					<div class="fcimg_value_props">
-						<table class="fc-form-tbl fcinner fccompact">
-							' . @ $urllink . '
-							' . @ $mediaurl . '
-							' . @ $alt . '
-							' . @ $title . '
-							' . @ $desc . '
-							' . @ $cust1 . '
-							' . @ $cust2 . '
-						</table>
-					</div>'
-					: '') .'
-					
-					</div>
-				</div>';
+						.(($linkto_url || $usemediaurl || $usealt || $usetitle || $usedesc || $usecust1 || $usecust2) ?
+						'
+						<div class="fcimg_value_props">
+							<table class="fc-form-tbl fcinner fccompact">
+								' . @ $urllink . '
+								' . @ $mediaurl . '
+								' . @ $alt . '
+								' . @ $title . '
+								' . @ $desc . '
+								' . @ $cust1 . '
+								' . @ $cust2 . '
+							</table>
+						</div>'
+						: '') .'
+
+					</div><!-- EOF class="fc-field-value-properties-box" -->
+				</div><!-- EOF class="fc-field-props-box" -->
+				';
 
 			if (!$image_subpath)
 			{
@@ -3224,6 +3209,7 @@ class plgFlexicontent_fieldsImage extends FCField
 
 		// Extract sub-folder pathfrom the (filepath) value (if it exists)
 		$subpath  = dirname($value['originalname']);
+		$subpath  = $subpath !== '.' ? $subpath . DS  : '';
 		$filename = basename($value['originalname']);
 
 
@@ -3268,7 +3254,7 @@ class plgFlexicontent_fieldsImage extends FCField
 		}
 
 		// Add value-extracted subpath to original folder
-		$src_path = JPath::clean( $src_path . ($subpath ?: '') .DS );
+		$src_path = JPath::clean( $src_path . ($subpath ? $subpath . DS : '')  );
 
 		// Full path of original file  - and - Destination folder
 		$file_path = JPath::clean( $src_path . $filename );

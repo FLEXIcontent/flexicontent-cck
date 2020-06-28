@@ -22,7 +22,9 @@
 				'link' => $value, 'title' => '', 'linktext' => '', 'class' => '', 'id' => '', 'hits' => 0
 			);
 		}
-		if ( empty($value['link']) && !$use_ingroup && $n) continue;  // If at least one added, skip empty if not in field group
+
+		// If at least one value has been added, then skip empty values if not in field group
+		if ( empty($value['link']) && !$use_ingroup && $n) continue;
 
 		$fieldname_n = $fieldname.'['.$n.']';
 		$elementid_n = $elementid.'_'.$n;
