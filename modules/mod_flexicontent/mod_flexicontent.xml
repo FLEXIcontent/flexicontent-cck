@@ -41,7 +41,7 @@
 				hide_default="1" hide_none="1" stripext="1" filter="\.php$" exclude="^_"
 				tmpl_container="tabset_attrs_2_nav_1" params_source="file"
 				/> <!-- params_source="inline" -->
-			<field name="" type="separator" default="Please set layout parameters in &lt;b&gt;Layout: ... TAB&lt;/b&gt;. CSS/HTML developers please read: &lt;u&gt;&lt;b&gt; &lt;a href='http://www.flexicontent.org/documentation/faq/69-templating-module-plugin-content/274-how-to-create-a-custom-layout-for-universal-content-module-and-other-flexicontent-modules.html' target='_blank'&gt;Custom templates HOW-TO&lt;/a&gt; &lt;/b&gt; &lt;/u&gt;" level="level3" class="alert alert-info fcpadded" />
+			<field name="" type="separator" default="Please set layout parameters in &lt;b&gt;Layout: ... TAB&lt;/b&gt;. CSS/HTML developers please read: &lt;u&gt;&lt;b&gt; &lt;a href='https://www.flexicontent.org/documentation/tutorials-english/69-templating-module-plugin-content/274-how-to-create-a-custom-layout-for-universal-content-module-and-other-flexicontent-modules.html' target='_blank'&gt;Custom templates HOW-TO&lt;/a&gt; &lt;/b&gt; &lt;/u&gt;" level="level3" class="alert alert-info fcpadded" />
 
 			<field name="" type="separator" default="FLEXI_UMOD_FEATURED_STANDARD_ITEMS" level="level2" />
 			<field name="count" type="text" filter="int" default="5" size="3" label="FLEXI_UMOD_COUNT_TOTAL" description="FLEXI_UMOD_COUNT_TOTAL_DESC" />
