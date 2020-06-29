@@ -1209,7 +1209,6 @@ class plgFlexicontent_fieldsImage extends FCField
 
 		static $initialized = null;
 		static $app, $document, $option, $format, $realview;
-		static $configured_file_path;
 
 		if ($initialized === null)
 		{
@@ -1220,8 +1219,6 @@ class plgFlexicontent_fieldsImage extends FCField
 			$option    = $app->input->getCmd('option', '');
 			$format    = $app->input->getCmd('format', 'html');
 			$realview  = $app->input->getCmd('view', '');
-
-			$configured_file_path = static::$cparams->get('file_path', 'components/com_flexicontent/uploads');
 		}
 
 		// For legacy layouts
@@ -1732,7 +1729,11 @@ class plgFlexicontent_fieldsImage extends FCField
 		// DB-mode
 		else
 		{
-			$orig_urlpath = str_replace('\\', '/', $configured_file_path);
+			$target_dir    = (int) $field->parameters->get('target_dir', 1);
+			$orig_filepath = $target_dir
+				? static::$cparams->get('file_path', 'components/com_flexicontent/uploads')
+				: static::$cparams->get('media_path', 'components/com_flexicontent/medias');
+			$orig_urlpath  = str_replace('\\', '/', $orig_filepath);
 		}
 
 
