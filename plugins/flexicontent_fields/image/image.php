@@ -1207,7 +1207,7 @@ class plgFlexicontent_fieldsImage extends FCField
 		static $app, $document, $option, $format, $realview;
 		static $itemViewId, $isItemsManager, $isHtmlViewFE;
 		static $isMobile, $isTablet, $useMobile;
-		static $configured_file_path;
+		static $cparams;
 
 		if ($initialized === null)
 		{
@@ -1231,8 +1231,6 @@ class plgFlexicontent_fieldsImage extends FCField
 			$isMobile = $mobileDetector->isMobile();
 			$isTablet = $mobileDetector->isTablet();
 			$useMobile = $force_desktop_layout  ?  $isMobile && !$isTablet  :  $isMobile;
-
-			$configured_file_path = $cparams->get('file_path', 'components/com_flexicontent/uploads');
 		}
 
 		// Current view variable
@@ -1766,7 +1764,11 @@ class plgFlexicontent_fieldsImage extends FCField
 		// DB-mode
 		else
 		{
-			$orig_urlpath = str_replace('\\', '/', $configured_file_path);
+			$target_dir    = (int) $field->parameters->get('target_dir', 1);
+			$orig_filepath = $target_dir
+				? $cparams->get('file_path', 'components/com_flexicontent/uploads')
+				: $cparams->get('media_path', 'components/com_flexicontent/medias');
+			$orig_urlpath  = str_replace('\\', '/', $orig_filepath);
 		}
 
 
