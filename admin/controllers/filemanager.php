@@ -731,13 +731,20 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 		$ext = strtolower(flexicontent_upload::getExt($filename));
 
 		// echo "\n". $file['tmp_name'] ." => ". $filepath ."\n";
-		$move_success = $chunks ?
-			rename($file['tmp_name'], $filepath) :
-			JFile::upload($file['tmp_name'], $filepath, false, false,
+
+		if ($chunks)
+		{
+			$move_success = copy($file['tmp_name'], $filepath);
+			$move_success ? unlink($file['tmp_name']) : false;
+		}
+		else
+		{
+			$move_success = JFile::upload($file['tmp_name'], $filepath, false, false,
 				// - Valid extensions are checked by our helper function
 				// - also we allow all extensions and php inside content, FLEXIcontent will never execute "include" files evening when doing "in-browser viewing"
 				array('null_byte' => true, 'forbidden_extensions' => array('_fake_ext_'), 'php_tag_in_content' => true, 'shorttag_in_content' => true, 'shorttag_extensions' => array(), 'fobidden_ext_in_content' => false, 'php_ext_content_extensions' => array() )
 			);
+		}
 
 		// Check of upload failed
 		if (!$move_success)

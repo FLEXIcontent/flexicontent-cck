@@ -540,11 +540,15 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 			// Try to create a UTF8 filename
 			$row->filename_original = iconv(mb_detect_encoding($row->filename, mb_detect_order(), true), "UTF-8", $row->filename);
 			$row->filename_original = $row->filename_original ? $row->filename_original : $row->filename;
-			$row->size = sprintf("%.0f KB", (filesize($filepath) / 1024) );
+
+			$row->size    = sprintf("%.0f KB", (filesize($filepath) / 1024) );
 			$row->altname = $pinfo['filename'];
+
 			$row->uploader = '-';
 			$row->uploaded = date("F d Y H:i:s.", filectime($filepath) );
-			$row->id = $i;
+
+			$row->url = 0;
+			$row->id  = $i;
 
 			if ( in_array(strtolower($row->ext), $imageexts))
 			{
