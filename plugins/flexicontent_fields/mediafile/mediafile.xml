@@ -395,8 +395,30 @@
 			<field name="" type="separator" default="FLEXI_FIELD_FILE_FILE_ACTIONS" level="tabset_close" box_type="1" />
 
 
-			<field name="" type="separator" default="FLEXI_FIELD_FILE_FILE_DISPLAY" description="" icon_class="icon-mediafile-2" level="tab_open" box_type="1" />
+			<field name="" type="separator" default="FLEXI_FIELD_FILE_FILE_DISPLAY" description="" icon_class="icon-file-2" level="tab_open" box_type="1" />
 			<field name="viewlayout" type="fcfilelist" default="" label="FLEXI_FIELD_SELECT_VIEW_LAYOUT" description="FLEXI_FIELD_SELECT_VIEW_LAYOUT_DESC" directory="plugins/flexicontent_fields/mediafile/tmpl/" filter="value*" exclude="" stripext="1" stripprefix="value_" hide_none="1" hide_default="1" labelclass="label label-warning" />
+
+			<field name="" type="separator" default="Item view" description="" level="level3" />
+			<field name="wf_add_waveform" type="radio" default="1" label="Show waveform" description="" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="mm_show_props" type="multilist" subtype="radio" toggle_related="1" default="1" label="Show Properties" description="" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="mm_show_props">FLEXI_NO</option>
+				<option value="1" show_list="mm_show_props" hide_list="">FLEXI_YES</option>
+			</field>
+			<field name="mm_show_props_list" type="fcmediaprops" subtype="sortable" default="media_format, bit_rate, bits_per_sample, sample_rate, duration, channels" label="Media properties" description="Select properties to show" depend_class="mm_show_props" />
+
+			<field name="" type="separator" default="Category-like views" description="" level="level3" />
+			<field name="wf_add_waveform_cat" type="radio" default="1" label="Show waveform" description="" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="mm_show_props_cat" type="multilist" subtype="radio" toggle_related="1" default="1" label="Show Properties" description="" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="mm_show_props_cat">FLEXI_NO</option>
+				<option value="1" show_list="mm_show_props_cat" hide_list="">FLEXI_YES</option>
+			</field>
+			<field name="mm_show_props_list_cat" type="fcmediaprops" subtype="sortable" default="media_format, bit_rate, bits_per_sample, sample_rate, duration, channels" label="Media properties" description="Select properties to show" depend_class="mm_show_props_cat" />
 
 			<field name="" type="separator" default="FLEXI_FIELD_FILE_TOTALS" level="level2" />
 			<field name="display_total_count" type="multilist" subtype="radio" default="0" label="FLEXI_FIELD_FILE_SHOW_TOTAL_COUNT" toggle_related="1" description="FLEXI_FIELD_FILE_SHOW_TOTAL_COUNT_DESC" class="btn-group btn-group-yesno">

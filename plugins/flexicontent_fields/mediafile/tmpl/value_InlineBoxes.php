@@ -11,9 +11,10 @@ $field->file_data = array();
 $field->hits_total = 0;
 
 $compactDisp      = true;
-$create_preview   = $field->parameters->get('mm_create_preview', 1);
-$wf_zoom_slider   = $field->parameters->get('wf_zoom_slider', 1);
-$wf_load_progress = $field->parameters->get('wf_load_progress', 1);
+$create_preview   = (int) $field->parameters->get('mm_create_preview', 1);
+$wf_zoom_slider   = (int) $field->parameters->get('wf_zoom_slider', 1);
+$wf_load_progress = (int) $field->parameters->get('wf_load_progress', 1);
+$wf_add_waveform  = (int) $field->parameters->get('wf_add_waveform' . ($view === 'item' ? '' : '_cat'), 1);
 
 $per_value_js = "";
 $n = 0;
@@ -279,7 +280,7 @@ if ($prop !== 'display_properties_only') :
 	// [0]: filename (if visible)
 	if (($filename_shown && !$filename_shown_as_link) || $not_downloadable)
 	{
-		$html .= '<div class="fcfile_name">' . $icon . ' ' . $name_html . '</div>';
+		$html .= '<div class="fcfile_name" style="display: inline-block;">' . $icon . ' ' . $name_html . '</div>';
 	}
 
 
@@ -492,78 +493,80 @@ if ($prop !== 'display_properties_only') :
 		</div>' .
 		(!$buttonsposition ? $html : '');
 
-	if ($create_preview)
+	if ($wf_add_waveform)
 	{
-		$ext         = strtolower(flexicontent_upload::getExt($file_data->filename));
-		$previewname = preg_replace('/\.' . $ext . '$/i', '', basename($file_data->filename)) . '.mp3';
-		$peaksname   = preg_replace('/\.' . $ext . '$/i', '', basename($file_data->filename)) . '.json';
-		$previewpath = 'audio_preview/' . $previewname;
-		$peakspath   = 'audio_preview/' . $peaksname;
-	}
-	else
-	{
-		$previewpath = $file_data->filename;
-		$peakspath   = null;
-	}
+		if ($create_preview)
+		{
+			$ext         = strtolower(flexicontent_upload::getExt($file_data->filename));
+			$previewname = preg_replace('/\.' . $ext . '$/i', '', basename($file_data->filename)) . '.mp3';
+			$peaksname   = preg_replace('/\.' . $ext . '$/i', '', basename($file_data->filename)) . '.json';
+			$previewpath = 'audio_preview/' . $previewname;
+			$peakspath   = 'audio_preview/' . $peaksname;
+		}
+		else
+		{
+			$previewpath = $file_data->filename;
+			$peakspath   = null;
+		}
 
-	$fnn = $item->id . '_' . $FN_n;
+		$fnn = $item->id . '_' . $FN_n;
 
-	$html .= '<div class="fcclear"></div>'
-	. '
-	<div class="fc_mediafile_player_box' . ($compactDisp ? ' fc_compact' : '') . '">
+		$html .= '<div class="fcclear"></div>'
+		. '
+		<div class="fc_mediafile_player_box' . ($compactDisp ? ' fc_compact' : '') . '">
 
-		<div class="fc_mediafile_controls_outer">
+			<div class="fc_mediafile_controls_outer">
 
-			<!--div id="fc_mediafile_current_time_' . $fnn . '" class="media_time">00:00:00</div-->
-			<div id="fc_mediafile_controls_' . $fnn . '" class="fc_mediafile_controls">
-				<a href="javascript:;" class="btn playBtn">
-					<span class="icon-play-circle controls"></span><span class="btnControlsText">' . JText::_('FLEXI_FIELD_MEDIAFILE_PLAY') . '</span>
-				</a>
-				<a href="javascript:;" class="btn pauseBtn" style="display: none;">
-					<span class="icon-pause-circle controls"></span><span class="btnControlsText">' . JText::_('FLEXI_FIELD_MEDIAFILE_PAUSE') . '</span>
-				</a>
-				<a href="javascript:;" class="btn stopBtn" style="display: none;">
-					<span class="icon-stop-circle controls"></span><span class="btnControlsText">' . JText::_('FLEXI_FIELD_MEDIAFILE_STOP') . '</span>
-				</a>
-				<a href="javascript:;" class="btn loadBtn" style="display: none;">
-					<span class="icon-loop controls"></span><span class="btnControlsText">' . JText::_('FLEXI_FIELD_MEDIAFILE_LOAD') . '</span>
-				</a>
-				' . ($allowdownloads ? $_download_btn_html : '') . '
-				' . (!$wf_zoom_slider ? '' : '
-				<div class="fc_mediafile_wf_zoom_box">
-					- <input id="fc_mediafile_slider_' . $fnn. '" type="range" min="0.5" max="200" value="0.5" class="fc_mediafile_wf_zoom" /> +
+				<!--div id="fc_mediafile_current_time_' . $fnn . '" class="media_time">00:00:00</div-->
+				<div id="fc_mediafile_controls_' . $fnn . '" class="fc_mediafile_controls">
+					<a href="javascript:;" class="btn playBtn">
+						<span class="icon-play-circle controls"></span><span class="btnControlsText">' . JText::_('FLEXI_FIELD_MEDIAFILE_PLAY') . '</span>
+					</a>
+					<a href="javascript:;" class="btn pauseBtn" style="display: none;">
+						<span class="icon-pause-circle controls"></span><span class="btnControlsText">' . JText::_('FLEXI_FIELD_MEDIAFILE_PAUSE') . '</span>
+					</a>
+					<a href="javascript:;" class="btn stopBtn" style="display: none;">
+						<span class="icon-stop-circle controls"></span><span class="btnControlsText">' . JText::_('FLEXI_FIELD_MEDIAFILE_STOP') . '</span>
+					</a>
+					<a href="javascript:;" class="btn loadBtn" style="display: none;">
+						<span class="icon-loop controls"></span><span class="btnControlsText">' . JText::_('FLEXI_FIELD_MEDIAFILE_LOAD') . '</span>
+					</a>
+					' . ($allowdownloads ? $_download_btn_html : '') . '
+					' . (!$wf_zoom_slider ? '' : '
+					<div class="fc_mediafile_wf_zoom_box">
+						- <input id="fc_mediafile_slider_' . $fnn. '" type="range" min="0.5" max="200" value="0.5" class="fc_mediafile_wf_zoom" /> +
+					</div>
+					') . '
 				</div>
-				') . '
+
+			</div>
+
+			<div class="fc_mediafile_audio_spectrum_box_outer" >
+
+				<div id="fc_mediafile_audio_spectrum_box_' . $fnn . '" class="fc_mediafile_audio_spectrum_box"
+					data-fc_tagid="' . $item->id . '_' . $field->name . '_' . $n . '"
+					data-fc_fname="' .$field_name_js . '"
+				>
+					<div id="fcview_' . $item->id . '_' . $field->name . '_' . $n . '_file-data-txt"
+						data-filename="' . htmlspecialchars($previewpath, ENT_COMPAT, 'UTF-8') . '"
+						data-wfpreview="' . htmlspecialchars($previewpath, ENT_COMPAT, 'UTF-8') . '"
+						data-wfpeaks="' . htmlspecialchars($peakspath, ENT_COMPAT, 'UTF-8') . '"
+						class="fc-wf-filedata"
+					></div>
+					' . (!$wf_load_progress ? '' : '
+					<div class="fc_mediafile_audio_spectrum_progressbar">
+						<div class="barText"></div>
+						<div class="bar" style="width: 100%;"></div>
+					</div>
+					') . '
+					<div id="fc_mediafile_audio_spectrum_' . $fnn . '" class="fc_mediafile_audio_spectrum"></div>
+				</div>
+
 			</div>
 
 		</div>
-
-		<div class="fc_mediafile_audio_spectrum_box_outer" >
-
-			<div id="fc_mediafile_audio_spectrum_box_' . $fnn . '" class="fc_mediafile_audio_spectrum_box"
-				data-fc_tagid="' . $item->id . '_' . $field->name . '_' . $n . '"
-				data-fc_fname="' .$field_name_js . '"
-			>
-				<div id="fcview_' . $item->id . '_' . $field->name . '_' . $n . '_file-data-txt"
-					data-filename="' . htmlspecialchars($previewpath, ENT_COMPAT, 'UTF-8') . '"
-					data-wfpreview="' . htmlspecialchars($previewpath, ENT_COMPAT, 'UTF-8') . '"
-					data-wfpeaks="' . htmlspecialchars($peakspath, ENT_COMPAT, 'UTF-8') . '"
-					class="fc-wf-filedata"
-				></div>
-				' . (!$wf_load_progress ? '' : '
-				<div class="fc_mediafile_audio_spectrum_progressbar">
-					<div class="barText"></div>
-					<div class="bar" style="width: 100%;"></div>
-				</div>
-				') . '
-				<div id="fc_mediafile_audio_spectrum_' . $fnn . '" class="fc_mediafile_audio_spectrum"></div>
-			</div>
-
-		</div>
-
-	</div>
 		';
-
+	}
 
 
 endif;   // END OF   $prop !== 'display_properties_only'
@@ -573,7 +576,14 @@ endif;   // END OF   $prop !== 'display_properties_only'
 	/**
 	 * Basic display of audio / video media data
 	 */
-	if (isset($file_data->media_type) && $prop === 'display_properties_only' && $view === 'item')
+	$show_props      = (int) $field->parameters->get('mm_show_props' . ($view === 'item' ? '' : '_cat'), 1);
+	$show_props_list = $field->parameters->get(
+		'mm_show_props_list' . ($view === 'item' ? '' : '_cat'),
+		array('media_format','bit_rate', 'bits_per_sample', 'sample_rate', 'duration', 'channels')
+	);
+	$show_props_list = FLEXIUtilities::paramToArray($show_props_list, "/[\s]*,[\s]*/", false, true);
+
+	if (isset($file_data->media_type) && ( ($prop === 'display_properties_only' && $view === 'item') || $show_props ))
 	{
 		/*
 		$mediadata = array(
@@ -581,7 +591,8 @@ endif;   // END OF   $prop !== 'display_properties_only'
 			'media_format', 'bit_rate', 'bits_per_sample', 'sample_rate', 'duration',
 			'channels', 'channel_layout', 'checked_out', 'checked_out_time');
 		*/
-		$mediadata = array('media_format','bit_rate', 'bits_per_sample', 'sample_rate', 'duration', 'channels');
+		$mediadata = $show_props_list ?:
+			array('media_format', 'bit_rate', 'bits_per_sample', 'sample_rate', 'duration', 'channels');
 
 		$html .= '<table class="table audiotable">';
 		foreach($mediadata as $md_name)
@@ -603,7 +614,7 @@ endif;   // END OF   $prop !== 'display_properties_only'
 
 			if ($md_name == 'media_format')
 			{
-				$PROP_NAME = '<span class="icon-music large-icon"> </span> ' . JText::_('FLEXI_FIELD_MEDIADATA_CHANNELS');
+				$PROP_NAME = '<span class="icon-music large-icon"> </span> ' . JText::_('FLEXI_FIELD_MEDIADATA_MEDIA_TYPE');
 			}
 
 			if ($md_name == 'bit_rate')
@@ -630,20 +641,7 @@ endif;   // END OF   $prop !== 'display_properties_only'
 				$PROP_VALUE = gmdate("H:i:s", $PROP_VALUE);
 			}
 
-			if ($PROP_VALUE == "wav")
-			{
-				$media_format = "wav";
-			}
-
-			if ($PROP_VALUE == "aiff")
-			{
-				$media_format = "aiff";
-			}
-
-			if ($PROP_VALUE == "mp3")
-			{
-				$media_format = "mp3";
-			}
+			$media_format = $PROP_VALUE;
 
 			if ($md_name == 'bit_rate' && ($media_format == 'wav' || $media_format == 'aiff'))  continue;
 			if ($md_name == 'bits_per_sample' && $media_format == 'mp3')  continue;
