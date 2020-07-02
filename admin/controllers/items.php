@@ -1424,8 +1424,8 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 				{
 					if (!$model->moveitem($itemid, $maincat, $seccats, $lang, $state, $type_id, $access))
 					{
-						$msg = JText::_('FLEXI_ERROR_MOVE_ITEMS');
-						JError::raiseWarning(500, $msg . " " . $model->getError());
+						$app->setHeader('status', 500);
+						$app->enqueueMessage(JText::_('FLEXI_ERROR_MOVE_ITEMS') . " " . $model->getError(), 'error');
 						$msg = '';
 					}
 				}
@@ -1442,8 +1442,8 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 				}
 				else
 				{
-					$msg = JText::_('FLEXI_ERROR_COPYMOVE_ITEMS');
-					JError::raiseWarning(500, $msg . " " . $model->getError());
+					$app->setHeader('status', 500);
+					$app->enqueueMessage(JText::_('FLEXI_ERROR_COPYMOVE_ITEMS') . " " . $model->getError(), 'error');
 					$msg = '';
 				}
 				break;
@@ -1603,7 +1603,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 			{
 				// Prune items that you can't change.
 				unset($cid[$i]);
-				JError::raiseNotice(403, JText::_('JLIB_APPLICATION_ERROR_EDITSTATE_NOT_PERMITTED'));
+				$app->enqueueMessage(JText::_('FLEXI_ITEM') . ': ' . $id . ' - ' . JText::_('JLIB_APPLICATION_ERROR_EDITSTATE_NOT_PERMITTED'), 'warning');
 			}
 		}
 
