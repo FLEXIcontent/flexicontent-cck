@@ -1702,7 +1702,9 @@ class FlexicontentModelItems extends FCModelAdminList
 		 * Loop through the items, copying, moving, or translating them
 		 */
 
-		foreach ($cid as $itemid)
+		$cid_reverse = array_reverse($cid);
+
+		foreach ($cid_reverse as $itemid)
 		{
 			for( $nr=0; $nr < $copynr; $nr++ )  // Number of copies to create, meaningful only when copying items
 			{
@@ -1729,8 +1731,8 @@ class FlexicontentModelItems extends FCModelAdminList
 					$row->featured = 0;
 				$row->version 	= 1;
 				$datenow 				= JFactory::getDate();
-				$row->created 		= $datenow->toSql();
-				$row->publish_up	= $datenow->toSql();
+				$row->created 		= $method == 99 ? $item->created : $datenow->toSql();
+				$row->publish_up	= $method == 99 ? $item->publish_up : $datenow->toSql();
 				$row->modified 		= $nullDate = $this->_db->getNullDate();
 				$lang_from			= substr($row->language,0,2);
 				$row->language	= $lang ? $lang : $row->language;
