@@ -1018,8 +1018,7 @@ class _FlexicontentSiteRouter
 		$tbl = '#__categories', $alias_col = 'alias'
 	)
 	{
-		// Do not force language if parent was given !
-		$language = !$language && !$parent_id ? JFactory::getLanguage()->getTag() : $language;
+		$language = !$language /*&& !$parent_id*/ ? JFactory::getLanguage()->getTag() : $language;
 
 		$db = JFactory::getDbo();
 		$query = $db->getQuery(true)
