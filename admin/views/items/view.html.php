@@ -992,6 +992,7 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 			'language',
 			array(
 				'class' => 'use_select2_lib' . ($behaviour !== 'translate' ? '' : ' required'),
+				'onchange' => ($behaviour !== 'translate' ? '' : "document.adminForm.prefix.value = ''; document.adminForm.suffix.value = this.value.substring(0, 2); "),
 				),
 			$selected = '',
 			$type = ($behaviour !== 'translate' ? JText::_('FLEXI_NOCHANGE_LANGUAGE') : 2),

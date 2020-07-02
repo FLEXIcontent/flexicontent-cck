@@ -1723,6 +1723,7 @@ class FlexicontentModelItems extends FCModelAdminList
 
 				// (d) Start altering the properties of the cloned item
 				$row->title 		= ($prefix ? $prefix . ' ' : '') . $item->title . ($suffix ? ' ' . $suffix : '');
+				$row->alias			= !$prefix && !$suffix ? $row->alias : '';
 				$row->hits 			= 0;
 				if (!$translate_method)  // cleared featured flag if not translating
 					$row->featured = 0;
@@ -1843,6 +1844,9 @@ class FlexicontentModelItems extends FCModelAdminList
 					}
 				}
 				//print_r($row->fulltext); exit;
+
+				// Check new item
+				$row->check();
 
 				// Create a new item in the content fc_items_ext table
 				$row->store();
