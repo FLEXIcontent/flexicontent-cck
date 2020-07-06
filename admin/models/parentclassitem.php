@@ -1313,7 +1313,20 @@ class ParentClassItem extends FCModelAdmin
 
 		// Trigger the default form events.
 		$plugins_group = $plugins_group ?: $this->plugins_group;
-		parent::preprocessForm($form, $data, $plugins_group);
+
+		try
+		{
+			parent::preprocessForm($form, $data, $plugins_group);
+		}
+		catch (Exception $e)
+		{
+			$app      = JFactory::getApplication();
+			$isClient = $app->isClient('site');
+			$errMssg  = $isClient
+				? 'Form maybe loaded / saved incomplete'
+				: '3rd-party plugin triggering to prepare form failed. Form will be loaded/saved only with basic data : <b> ' . $e->getMessage() . '</b>';
+			$app->enqueueMessage($errMssg, ($isClient ? 'notice' : 'warning'));
+		}
 	}
 
 
