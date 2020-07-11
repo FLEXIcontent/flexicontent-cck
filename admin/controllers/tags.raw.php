@@ -369,7 +369,7 @@ class FlexicontentControllerTags extends FlexicontentControllerBaseAdmin
 			{
 				foreach ($record_data as $tag_id => $tag)
 				{
-					$jtag_data_arr = $records_model->createTagsFromText(array($tag->alias => '#new#' . $tag->name));
+					$jtag_data_arr = $records_model->createFindJoomlaTags(array($tag->alias => '#new#' . $tag->name));
 					$jtag_data = $jtag_data_arr ? reset($jtag_data_arr) : false;
 					$tag->jtag_id = $jtag_data ? $jtag_data->id : 0;
 					$map_index[] = ' WHEN ' . $tag->id . ' THEN ' . $tag->jtag_id;
