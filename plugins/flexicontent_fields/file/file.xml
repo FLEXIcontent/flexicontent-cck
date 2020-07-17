@@ -319,17 +319,28 @@
 			<field name="" type="separator" default="FLEXI_BROWSER_VIEWING" description="" icon_class="icon-eye" level="tab_open" box_type="1" />
 
 			<field name="allowview" type="multilist" subtype="radio" default="0" label="FLEXI_FIELD_FILE_ALLOW_VIEW" toggle_related="1" description="FLEXI_FIELD_FILE_ALLOW_VIEW_DESC" class="btn-group btn-group-yesno">
-				<option value="0" show_list="" hide_list="allow-viewing, allow-viewing-custom">FLEXI_NO</option>
+				<option value="0" show_list="" hide_list="allow-viewing, allow-viewing-custom, allow-viewing-embed">FLEXI_NO</option>
 				<option value="1" show_list="allow-viewing" hide_list="allow-viewing-custom">FLEXI_YES</option>
 				<option value="2" show_list="allow-viewing, allow-viewing-custom" hide_list="">FLEXI_YES_CUSTOM_TEXT</option>
+				<option value="3" show_list="allow-viewing-embed, allow-viewing-custom" hide_list="allow-viewing">FLEXI_FIELD_FILE_YES_EMBED_PDF</option>
 			</field>
 
 			<field name="viewtext" type="text" size="40" default="" label="FLEXI_FIELD_FILE_CUSTOM_VIEW_TEXT" depend_class="allow-viewing-custom" description="FLEXI_FIELD_FILE_CUSTOM_VIEW_TEXT_DESC"/>
-			<field name="viewinside" type="radio" default="1" label="View inside" description="Select to view file in same / new window" depend_class="allow-viewing" class="btn-group group-fcinfo">
-				<option value="0">Fancybox modal</option>
-				<option value="1">jQuery modal (responsive + fullscreen)</option>
-				<option value="2">New window</option>
-				<option value="3">Same window</option>
+			<field name="viewinside" type="radio" default="1" label="View inside" description="Select to view file in same / new window, or embed the file (HTML5)" depend_class="allow-viewing" class="btn-group group-fcinfo">
+				<option value="0" show_list="" hide_list="allow-viewing-embed">Fancybox modal</option>
+				<option value="1" show_list="" hide_list="allow-viewing-embed">jQuery modal (responsive + fullscreen)</option>
+				<option value="2" show_list="" hide_list="allow-viewing-embed">New tab</option>
+				<option value="3" show_list="" hide_list="allow-viewing-embed">Same tab</option>
+			</field>
+			<field name="viewheight" type="number" size="40" default="100" label="FLEXI_FIELD_FILE_CUSTOM_EMBED_HEIGHT" depend_class="allow-viewing-embed" description="FLEXI_FIELD_FILE_CUSTOM_EMBED_HEIGHT"/>
+			<field name="viewheightunit" type="radio" default="1" label="View height unit" description="Select the unit for height value" depend_class="allow-viewing-embed" class="btn-group group-fcinfo">
+				<option value="0">px</option>
+				<option value="1">%</option>
+			</field>
+			<field name="viewwidht" type="number" size="40" default="100" label="FLEXI_FIELD_FILE_CUSTOM_EMBED_HEIGHT" depend_class="allow-viewing-embed" description="FLEXI_FIELD_FILE_CUSTOM_EMBED_HEIGHT"/>
+			<field name="viewwidthunit" type="radio" default="1" label="View width unit" description="Select the unit for width value" depend_class="allow-viewing-embed" class="btn-group group-fcinfo">
+				<option value="0">px</option>
+				<option value="1">%</option>
 			</field>
 
 			<field name="" type="separator" default="FLEXI_FIELD_FILE_PDF_STAMPING" description="" icon_class="icon-file" level="tab_open" box_type="1" />

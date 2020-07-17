@@ -352,6 +352,17 @@ if ($prop !== 'display_properties_only') :
 
 		if ($authorized && $allowview && !$file_data->url)
 		{
+			 
+			if ($allowview==3 && $file_data->ext == 'pdf')
+			{
+			$actions_arr[] = 
+				'<object data="'.$dl_link.(strpos($dl_link,'?')!==false ? '&amp;' : '?').'method=view" type="application/pdf" width="'.$viewwidth.($viewwidthunit == 0 ? 'px' : '%').'" height="'.$viewheight.($viewheightunit == 0 ? 'px' : '%').'"> 
+				  <p>'.JTEXT::_('FLEXI_FIELD_FILE_NO_BUILT_IN').'
+				  	<a href="'.$dl_link.(strpos($dl_link,'?')!==false ? '&amp;' : '?').'method=view" target="_blank">'.JTEXT::_('FLEXI_FIELD_FILE_DOWNLOAD').'</a></p>  
+				</object>';
+			}
+			else
+			{
 			$actions_arr[] = '
 				<a href="' . $dl_link . (strpos($dl_link, '?') !== false ? '&amp;' : '?') . 'method=view" ' . ($viewinside==2 ? 'target="_blank"' : '')
 					. ' class="' . ($viewinside==0 ? 'fancybox ' : '') . $file_classes . ' btn-info fcfile_viewFile" '.($viewinside==0 ? 'data-type="iframe" ' : '')
@@ -359,6 +370,7 @@ if ($prop !== 'display_properties_only') :
 					. ' title="' . $viewinfo . '" style="line-height:1.3em;" >
 					' . $viewtext . '
 				</a>';
+			}
 			$fancybox_needed = $viewinside == 0;
 		}
 
