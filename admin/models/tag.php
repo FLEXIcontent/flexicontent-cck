@@ -179,6 +179,11 @@ class FlexicontentModelTag extends FCModelAdmin
 	 */
 	public function store($data)
 	{
+		if (is_object($data))
+		{
+			$data = (array) $data;
+		}
+
 		if (empty($data['jtag_id']))
 		{
 			$jtag_id_arr = flexicontent_db::createFindJoomlaTags(array('#new#' . $data['name']));
