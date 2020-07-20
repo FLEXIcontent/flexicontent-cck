@@ -355,6 +355,11 @@ class FlexicontentControllerImport extends FlexicontentControllerBaseAdmin
 
 				$conf['columns'] = flexicontent_html::arrayTrim($contents[0]);
 				unset($contents[0]);
+				foreach ($conf['columns'] as $i => $v)
+				{
+					// Only Printable latin ASCII in fieldname. This will also remove any UTF-8 BOM header at first column name ...
+					$conf['columns'][$i] = preg_replace('/[\x00-\x1F\x7F-\xFF]/', '', $v);
+				}
 
 				$q = $db->getQuery(true)
 					->select('fi.*')
@@ -746,14 +751,6 @@ class FlexicontentControllerImport extends FlexicontentControllerBaseAdmin
 			$data['attribs']  = array();
 			$data['metadata'] = array();
 
-			$data['type_id'] = $conf['type_id'];
-			$data['language'] = $conf['language'];
-			$data['catid']   = $conf['maincat'];   // Default value maybe overriden by column
-			$data['cid']     = $conf['seccats'];   // Default value maybe overriden by column
-			$data['vstate']  = 2;
-			$data['state']   = $conf['state'];
-			$data['access']  = $conf['access'];
-
 			// Prepare request variable used by the item's Model
 			if ($task !== 'testcsv')
 			{
@@ -890,11 +887,24 @@ class FlexicontentControllerImport extends FlexicontentControllerBaseAdmin
 				$data['id'] = 0;
 			}
 
+			$data['vstate']  = 2;
+
+			if (!$data['id'])
+			{
+				$data['type_id'] = isset($data['type_id'])  ? $data['type_id']  : $conf['type_id'];
+				$data['language']= isset($data['language']) ? $data['language'] : $conf['language'];
+				$data['state']   = isset($data['state'])    ? $data['state']    : $conf['state'];
+				$data['access']  = isset($data['access'])   ? $data['access']   : $conf['access'];
+
+				$data['catid']   = isset($data['catid'])    ? $data['catid']    : $conf['maincat'];
+				$data['cid']     = isset($data['cid'])      ? $data['cid']      : $conf['seccats'];
+			}
+
 			// ***
 			// *** CREATE / UPDATE --OR-- UPDATE-only CASEs with item ID given
 			// ***
 
-			else
+			if ($data['id'] && $c_item_id)
 			{
 				// Try to Load existing item into the ITEM model
 				$item = $itemmodel->getItem($c_item_id, $check_view_access = false, $no_cache = true, $force_version = 0);

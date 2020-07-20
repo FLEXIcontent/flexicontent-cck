@@ -81,7 +81,11 @@ class FlexicontentViewItems extends JViewLegacy
 		}
 
 		// Check if current view is filtered by item type
-		$filter_type = $model->getState('filter_type');
+		$filter_type    = $model->getState('filter_type');
+		$csv_header     = $app->isClient('administrator') ? (int) $model->getState('csv_header') : 2;
+		$csv_raw_export = $app->isClient('administrator') ? (int) $model->getState('csv_raw_export') : 2;
+		$csv_all_fields = $app->isClient('administrator') ? (int) $model->getState('csv_all_fields') : 2;
+		$err_count      = 0;
 
 		if (!$filter_type && $app->isClient('administrator'))
 		{
@@ -89,6 +93,29 @@ class FlexicontentViewItems extends JViewLegacy
 			$app->redirect($this->_getSafeReferer());
 		}
 
+		if (!$csv_header && $app->isClient('administrator'))
+		{
+			$app->enqueueMessage(JText::_('Please select Field name or Field label as header row.'), 'warning');
+			$err_count++;
+		}
+
+		if (!$csv_raw_export && $app->isClient('administrator'))
+		{
+			$app->enqueueMessage(JText::_('Please select to export values according to field configuration or to export raw values.'), 'warning');
+			$err_count++;
+		}
+
+		if (!$csv_all_fields && $app->isClient('administrator'))
+		{
+			$app->enqueueMessage(JText::_('Please select to export all fields or only configured fields'), 'warning');
+			$err_count++;
+		}
+
+		if ($err_count)
+		{
+			$app->enqueueMessage(JText::_('(Set this inside filters slider)'), 'warning');
+			$app->redirect($this->_getSafeReferer());
+		}
 
 		// Map of CORE to item properties
 		$core_props = array(
@@ -167,6 +194,8 @@ class FlexicontentViewItems extends JViewLegacy
 			FlexicontentFields::loadFieldConfig($field, $item0);
 
 			$include_in_csv_export = (int) $field->parameters->get('include_in_csv_export', 0);
+			$include_in_csv_export = $include_in_csv_export || $csv_all_fields !== 2 ? $include_in_csv_export : 1;
+			$include_in_csv_export = !$include_in_csv_export || $csv_raw_export !== 2 ? $include_in_csv_export : 1;
 
 			if (!$include_in_csv_export)
 			{
@@ -209,13 +238,15 @@ class FlexicontentViewItems extends JViewLegacy
 		foreach($item0->fields as $field)
 		{
 			$include_in_csv_export = (int) $field->parameters->get('include_in_csv_export', 0);
+			$include_in_csv_export = $include_in_csv_export || $csv_all_fields !== 2 ? $include_in_csv_export : 1;
+			$include_in_csv_export = !$include_in_csv_export || $csv_raw_export !== 2 ? $include_in_csv_export : 1;
 
 			if (!$include_in_csv_export)
 			{
 				continue;
 			}
 
-			echo $delim . $this->_encodeCSVField($field->label);
+			echo $delim . $this->_encodeCSVField($csv_header !== 2 ? $field->label : $field->name);
 			$delim = ",";
 			$total_fields++;
 		}
@@ -245,6 +276,9 @@ class FlexicontentViewItems extends JViewLegacy
 				foreach($item0->fields as $field_name => $field)
 				{
 					$include_in_csv_export = (int) $field->parameters->get('include_in_csv_export', 0);
+					$include_in_csv_export = $include_in_csv_export || $csv_all_fields !== 2 ? $include_in_csv_export : 1;
+					$include_in_csv_export = !$include_in_csv_export || $csv_raw_export !== 2 ? $include_in_csv_export : 1;
+
 					$csv_strip_html = (int) $field->parameters->get('csv_strip_html', 0);
 
 					if (!$include_in_csv_export)
@@ -280,8 +314,15 @@ class FlexicontentViewItems extends JViewLegacy
 					// CASE 2: CORE properties (special case), TODO: Implement this as "RENDERED value display" (and make it default output for them ?)
 					elseif ($field->iscore && isset($core_props[$field_name]))
 					{
-						$prop = $core_props[$field_name];
-						$vals = $item->$prop;
+						if ($csv_raw_export === 2 && isset($item->$field_name))
+						{
+							$vals = $item->$field_name;
+						}
+						else
+						{
+							$prop = $core_props[$field_name];
+							$vals = $item->$prop;
+						}
 					}
 
 					elseif ($field->field_type === 'coreprops' && $include_in_csv_export === 1)
