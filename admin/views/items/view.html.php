@@ -130,6 +130,10 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 		$filter_access    = $model->getState('filter_access');
 		$filter_meta      = $model->getState('filter_meta');
 
+		$csv_header       = $model->getState('csv_header');
+		$csv_raw_export   = $model->getState('csv_raw_export');
+		$csv_all_fields   = $model->getState('csv_all_fields');
+
 		// Support for using 'ALL', 'ORPHAN' fake states, by clearing other values
 		if (is_array($filter_state) && in_array('ALL', $filter_state))     $filter_state = array('ALL');
 		if (is_array($filter_state) && in_array('ORPHAN', $filter_state))  $filter_state = array('ORPHAN');
@@ -872,6 +876,99 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 		{
 			$lists['filter_fileid'] = '';
 		}
+
+
+		// Build CSV header selection
+		$csv_header_ops = array(
+			JHtml::_('select.option', '', JText::_('-')),
+			JHtml::_('select.option', '1', JText::_('FLEXI_DEFAULT') . ' (' . JText::_('FLEXI_FIELD') . ' ' . JText::_('FLEXI_LABEL') . ')'),
+			JHtml::_('select.option', '2', JText::_('FLEXI_FIELD') . ' ' . JText::_('FLEXI_NAME')),
+		);
+
+		$lists['csv_header'] = $this->getFilterDisplay(array(
+			'label' => JText::_('Header Row'),
+			'label_extra_class' => 'fc-lbl-short ' . $this->popover_class,
+			'label_extra_attrs' => array(
+				'data-placement' => 'bottom',
+				'data-content' => flexicontent_html::getToolTip('', 'Select if header row will contain field names or labels. <br>Use field names if you plan to reimport the file', 0, 1),
+			),
+			'html' => JHtml::_('select.genericlist',
+				$csv_header_ops,
+				'csv_header',
+				array(
+					'size' => '1',
+					'class' => $this->select_class,
+					'onchange' => 'document.adminForm.limitstart.value=0; Joomla.submitform();',
+				),
+				'value',
+				'text',
+				$csv_header,
+				'csv_header',
+				$translate = true
+			),
+		));
+
+
+
+		// Build CSV raw value (Default or Raw) selection
+		$csv_raw_export_ops = array(
+			JHtml::_('select.option', '', JText::_('-')),
+			JHtml::_('select.option', '1', JText::_('FLEXI_DEFAULT') . ' (Field configuration)'),
+			JHtml::_('select.option', '2', JText::_('FLEXI_FIELD_RAW_VALUES')),
+		);
+
+		$lists['csv_raw_export'] = $this->getFilterDisplay(array(
+			'label' => JText::_('Field values'),
+			'label_extra_class' => 'fc-lbl-short ' . $this->popover_class,
+			'label_extra_attrs' => array(
+				'data-placement' => 'bottom',
+				'data-content' => flexicontent_html::getToolTip('', 'Select if field values will be raw or according to field configuration. <br>Use raw values if you plan to reimport the file', 0, 1),
+			),
+			'html' => JHtml::_('select.genericlist',
+				$csv_raw_export_ops,
+				'csv_raw_export',
+				array(
+					'size' => '1',
+					'class' => $this->select_class,
+					'onchange' => 'document.adminForm.limitstart.value=0; Joomla.submitform();',
+				),
+				'value',
+				'text',
+				$csv_raw_export,
+				'csv_raw_export',
+				$translate = true
+			),
+		));
+
+
+		// Build CSV export all field (Default / All) selection
+		$csv_all_fields_ops = array(
+			JHtml::_('select.option', '1', JText::_('FLEXI_DEFAULT') . ' (Field configuration)'),
+			JHtml::_('select.option', '2', JText::_('FLEXI_ALL') . ' &nbsp; ( BETA Feature !!! )'),
+		);
+
+		$lists['csv_all_fields'] = $this->getFilterDisplay(array(
+			'label' => JText::_('Include fields'),
+			'label_extra_class' => 'fc-lbl-short ' . $this->popover_class,
+			'label_extra_attrs' => array(
+				'data-placement' => 'bottom',
+				'data-content' => flexicontent_html::getToolTip('', 'If you plan to reimport the file, then before re-import it is best to remove field columns that you have not modified. Also some field types may not support importing !!', 0, 1),
+			),
+			'html' => JHtml::_('select.genericlist',
+				$csv_all_fields_ops,
+				'csv_all_fields',
+				array(
+					'size' => '1',
+					'class' => $this->select_class,
+					'onchange' => 'document.adminForm.limitstart.value=0; Joomla.submitform();',
+				),
+				'value',
+				'text',
+				$csv_all_fields,
+				'csv_all_fields',
+				$translate = true
+			),
+		));
 
 
 		/**

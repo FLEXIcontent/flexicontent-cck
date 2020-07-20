@@ -201,13 +201,17 @@ class FlexicontentModelItems extends FCModelAdminList
 
 
 		// Various filters
-		$filter_tag    = $fcform ? $jinput->get('filter_tag',    false, 'array')  :  $app->getUserStateFromRequest( $p.'filter_tag',    'filter_tag',    false, 'array');
-		$filter_lang	 = $fcform ? $jinput->get('filter_lang',   false, 'array')  :  $app->getUserStateFromRequest( $p.'filter_lang',   'filter_lang',   false, 'array');
-		$filter_type   = $fcform ? $jinput->get('filter_type',   false, 'array')  :  $app->getUserStateFromRequest( $p.'filter_type',   'filter_type',   false, 'array');
-		$filter_author = $fcform ? $jinput->get('filter_author', false, 'array')  :  $app->getUserStateFromRequest( $p.'filter_author', 'filter_author', false, 'array');
-		$filter_state  = $fcform ? $jinput->get('filter_state',  false, 'array')  :  $app->getUserStateFromRequest( $p.'filter_state',  'filter_state',  false, 'array');
-		$filter_access = $fcform ? $jinput->get('filter_access', false, 'array')  :  $app->getUserStateFromRequest( $p.'filter_access', 'filter_access', false, 'array');
-		$filter_meta   = $fcform ? $jinput->get('filter_meta',   '',    'int')    :  $app->getUserStateFromRequest( $p.'filter_meta',   'filter_meta',   '',    'int');
+		$filter_tag     = $fcform ? $jinput->get('filter_tag',     false, 'array')  :  $app->getUserStateFromRequest( $p.'filter_tag',     'filter_tag',     false, 'array');
+		$filter_lang	  = $fcform ? $jinput->get('filter_lang',    false, 'array')  :  $app->getUserStateFromRequest( $p.'filter_lang',    'filter_lang',    false, 'array');
+		$filter_type    = $fcform ? $jinput->get('filter_type',    false, 'array')  :  $app->getUserStateFromRequest( $p.'filter_type',    'filter_type',    false, 'array');
+		$filter_author  = $fcform ? $jinput->get('filter_author',  false, 'array')  :  $app->getUserStateFromRequest( $p.'filter_author',  'filter_author',  false, 'array');
+		$filter_state   = $fcform ? $jinput->get('filter_state',   false, 'array')  :  $app->getUserStateFromRequest( $p.'filter_state',   'filter_state',   false, 'array');
+		$filter_access  = $fcform ? $jinput->get('filter_access',  false, 'array')  :  $app->getUserStateFromRequest( $p.'filter_access',  'filter_access',  false, 'array');
+		$filter_meta    = $fcform ? $jinput->get('filter_meta',    '',    'int')    :  $app->getUserStateFromRequest( $p.'filter_meta',    'filter_meta',    '',    'int');
+		$csv_header     = $fcform ? $jinput->get('csv_header',     '',    'int')    :  $app->getUserStateFromRequest( $p.'csv_header',     'csv_header',     '',    'int');
+		$csv_raw_export = $fcform ? $jinput->get('csv_raw_export', '',    'int')    :  $app->getUserStateFromRequest( $p.'csv_raw_export', 'csv_raw_export', '',    'int');
+		$csv_all_fields = $fcform ? $jinput->get('csv_all_fields', '1',    'int')    :  $app->getUserStateFromRequest( $p.'csv_all_fields', 'csv_all_fields', '1',    'int');
+
 
 		if (!is_array($filter_tag))    $filter_tag    = strlen($filter_tag)    ? array($filter_tag)    : array();
 		if (!is_array($filter_lang))   $filter_lang   = strlen($filter_lang)   ? array($filter_lang)   : array();
@@ -224,6 +228,9 @@ class FlexicontentModelItems extends FCModelAdminList
 		$this->setState('filter_state', $filter_state);
 		$this->setState('filter_access', $filter_access);
 		$this->setState('filter_meta', $filter_meta);
+		$this->setState('csv_header', $csv_header);
+		$this->setState('csv_raw_export', $csv_raw_export);
+		$this->setState('csv_all_fields', $csv_all_fields);
 
 		$app->setUserState($p . 'filter_tag', $filter_tag);
 		$app->setUserState($p . 'filter_lang', $filter_lang);
@@ -232,6 +239,9 @@ class FlexicontentModelItems extends FCModelAdminList
 		$app->setUserState($p . 'filter_state', $filter_state);
 		$app->setUserState($p . 'filter_access', $filter_access);
 		$app->setUserState($p . 'filter_meta', $filter_meta);
+		$app->setUserState($p . 'csv_header', $csv_header);
+		$app->setUserState($p . 'csv_raw_export', $csv_raw_export);
+		$app->setUserState($p . 'csv_all_fields', $csv_all_fields);
 
 
 		// Date filters
