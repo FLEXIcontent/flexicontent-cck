@@ -101,10 +101,21 @@ $tabCnt[$tabSetCnt] = 0;
 			<tr>
 				<td class="key"><label class="label" id="type_id-lbl" for="type_id"><?php echo JText::_("FLEXI_ITEM_TYPE");?></label></td>
 				<td class="data" colspan="2">
-					<?php echo $this->lists['type_id'];?> <span class="fc-mssg-inline fc-info fc-nobgimage"><?php echo JText::_("Used by NEW items only");?></span>
+					<?php echo $this->lists['type_id'];?>
+					<span class="fc-mssg-inline fc-info fc-nobgimage"><?php echo JText::_("Used by NEW items only");?></span>
+					<span class="fc-mssg-inline fc-warning fc-nobgimage"><?php echo JText::_("For existing items. It is only used to identify field names in column header row. Type will not be modified.");?></span>
 				</td>
 			</tr>
-			
+
+			<tr>
+				<td colspan="3">
+					<div class="fcsep_level2"><?php echo JText::_('Defaults'); ?></div>
+					<div class="alert alert-info fc-iblock">
+						<?php echo JText::_("- <b>'Use column'</b> effects both NEW / Existing items. <br> - <b>Specific</b> value effects <b>only NEW</b> items");?>
+					</div>
+				</td>
+			</tr>
+
 			<tr>
 				<td class="key"><label class="label"><?php echo JText::_("FLEXI_LANGUAGE");?></label></td>
 				<td class="data" colspan="2">
@@ -127,14 +138,14 @@ $tabCnt[$tabSetCnt] = 0;
 			</tr>
 			
 		</table>
-		
+
 		<br/><br/>
 		<table style="border-collapse: collapse; border: 0; border-spacing: 0;">
 			<tr>
 				<td style="vertical-align:top; font-family:tahoma; font-size:12px;">
 					
 					<fieldset>
-						<legend style='color: darkgreen;'><?php echo JText::_( 'FLEXI_IMPORT_CSV_FILE_EXAMPLE' ); ?></legend>
+						<legend style="color: darkgreen;"><?php echo JText::_( 'FLEXI_IMPORT_CSV_FILE_EXAMPLE' ); ?></legend>
 						<div class="alert alert-info">BASIC format, 1st row consists of <br/> - either CUSTOM field names &nbsp; (e.g. mygallery) <br/> - or CORE properties names &nbsp; (e.g. catid)</div>
 						<span class="fcimport_sampleline">title ~~ text ~~ catid ~~ textfield3 ~~ emailfield6 ~~ weblinkfld8 </span><br/>
 						<span class="fcimport_sampleline">~~ title 4 ~~ description 4 ~~ 31 ~~ textfield3 value ~~ userd@somedomain.com ~~ www.somedomaina.com</span><br/>
@@ -281,17 +292,19 @@ $tabCnt[$tabSetCnt] = 0;
 	
 	<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" data-icon-class="icon-tree-2">
 		<h3 class="tabberheading hasTooltip" title="<?php echo JText::_( 'FLEXI_IMPORT_CATS_TIP' ); ?>"><?php echo JText::_("FLEXI_CATEGORIES");?></h3>
-		
+
 		<br/>
-		<div class="fc-mssg-inline fc-info"><?php echo JText::_("FLEXI_IMPORT_INTO_CATEGORIES_WITH_OVERRIDE_DESC");?></div>
 		<table class="fc-form-tbl align-top">
 			
 			<tr>
 				<td class="" colspan="2">
+					<div class="alert alert-info fc-iblock">
+						<?php echo JText::_("- <b>'Use column'</b> effects both NEW / Existing items. <br> - <b>Specific</b> value effects <b>only NEW</b> items");?>
+					</div>
 					<div class="fcsep_level2"><?php echo JText::_('Defaults'); ?></div>
 				</td>
 			</tr>
-			
+
 			<tr>
 				<td class="key"><label class="label" for="maincat"><?php echo JText::_( 'FLEXI_MAIN_CATEGORY' ); ?></label></td>
 				<td class="data"><?php echo $this->lists['maincat']; ?></td>
@@ -470,6 +483,11 @@ $tabCnt[$tabSetCnt] = 0;
 			<tr>
 				<td class="" colspan="3">
 					<div class="fcsep_level2"> <?php echo JText::_( 'FLEXI_IMPORT_CSV_FILE_FORMAT' ); ?> </div>
+					<div class="alert alert-info fcpadded"> <b>NOTE:</b> Format compatible to EXCEL CSV <b>and</b> FC CSV export file is<br>
+						<b><?php echo JText::_( 'FLEXI_CSV_FIELD_SEPARATOR' ); ?></b>: <span class="badge">,</span>
+						<b><?php echo JText::_( 'FLEXI_CSV_FIELD_ENCLOSE_CHAR' ); ?></b>: <span class="badge">"</span>
+						<b><?php echo JText::_( 'FLEXI_CSV_ITEM_SEPARATOR' ); ?></b>: <span class="badge">\n</span>
+					</div>
 				</td>
 			</tr>
 			<tr>
