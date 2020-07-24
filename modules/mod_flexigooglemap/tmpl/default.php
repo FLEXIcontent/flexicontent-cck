@@ -60,6 +60,8 @@ if ($map_style)
 $gridsize = $params->get('gridsize', '');
 $maxzoom  = $params->get('maxzoom', '');
 $ratiomap = $params->get('ratiomap','');
+$usescrollmouse = $params->get('usescrollmouse','true');
+
 
 $clustermode = $params->get('clustermode', '' );
 if ($clustermode)
@@ -131,6 +133,7 @@ switch ($mapapi)
 				mapTypeId: google.maps.MapTypeId.<?php echo $maptype;?>,
 				mapTypeControl: false,
 				streetViewControl: false,
+                scrollwheel: <?php echo $usescrollmouse;?>,
 				panControl: false,
 				styles:[<?php echo $mapstyle; ?>],
 				zoomControlOptions: {
@@ -240,7 +243,7 @@ switch ($mapapi)
 			var lat = 48.852969;
 			var lon = 2.349903;
 
-			theMap_<?php echo $module->id;?> = L.map('fc_module_map_<?php echo $module->id;?>').setView([lat, lon], 11);
+			theMap_<?php echo $module->id;?> = L.map('fc_module_map_<?php echo $module->id;?>',{scrollWheelZoom: <?php echo $usescrollmouse;?>}).setView([lat, lon],11);
 			<?php if ($clustermode) {
 				echo "markerClusters = L.markerClusterGroup({ disableClusteringAtZoom: ".$maxzoommarker.",removeOutsideVisibleBounds:true,animate:true, maxClusterRadius :".$gridsize," }); ";// create cluster and add zoom limitation
 			}

@@ -176,7 +176,15 @@
 			/>
 
 			<field name="" type="separator" default="MOD_FLEXIGOOGLEMAP_BEHAVIOUR_N_STYLE" level="level3" />
-			<field name="" type="separator" default="FLEXI_NA" level="level4" class="alert alert-info fcpadded" showon="mapapi:openstreetmap" />
+			      <field
+				name="usescrollmouse" type="radio"
+				default="1" label="MOD_FLEXIGOOGLEMAP_USESCROLLMOUSE"
+				description="MOD_FLEXIGOOGLEMAP_USESCROLLMOUSE_DESC"
+				class="btn-group"
+				>
+				<option value="false">MOD_FLEXIGOOGLEMAP_NO</option>
+				<option value="true">MOD_FLEXIGOOGLEMAP_YES</option>
+			</field>
 			<field
 				name="animationmarker" type="radio"
 				default="1" label="MOD_FLEXIGOOGLEMAP_ANIMATIONMARKER"
@@ -300,6 +308,7 @@
 			/>
 
 		</fieldset>
+      
 
 		<fieldset name="FLEXI_MODULE_DISPLAYING_RULES" label="FLEXI_MODULE_DISPLAYING_RULES" description="FLEXI_MODULE_DISPLAYING_RULES_DESC">
 			<field name="combine_show_rules" type="radio" default="AND" label="FLEXI_COMBINE_SHOW_RULES" description="FLEXI_COMBINE_SHOW_RULES_DESC" class="btn-group group-fcinfo">
