@@ -19,7 +19,7 @@ foreach ($values as $n => $value)
 	if ($result === _FC_CONTINUE_) continue;
 	if ($result === _FC_BREAK_) break;
 
-	$title_attr = $desc_encoded ? $desc_encoded : $title_encoded;
+	$title_attr = $desc_encoded ? '<b>' . $title_encoded . '</b><br>' . $desc_encoded : $title_encoded;
 	$group_str = $group_name ? 'data-spotlight-group="'.$group_name.'"' : '';
 	$field->{$prop}[] = $pretext.
 		'<a style="'.$style.'" href="'.JUri::root(true).'/'.$srcl.'" class="fc_image_thumb" data-lightbox="on" data-spotlight="effect:bottom" '.$group_str.' title="' . $title_attr . '">
