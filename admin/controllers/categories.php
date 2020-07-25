@@ -76,7 +76,10 @@ class FlexicontentControllerCategories extends FlexicontentControllerBaseAdmin
 
 		// Warning messages
 		$this->warn_locked_recs_skipped    = 'FLEXI_SKIPPED_N_ROWS_WITH_ASSOCIATIONS';
-		$this->warn_noauth_recs_skipped    = 'FLEXI_SKIPPED_N_ROWS_UNAUTHORISED';		
+		$this->warn_noauth_recs_skipped    = 'FLEXI_SKIPPED_N_ROWS_UNAUTHORISED';
+
+		// Messages about deleted records
+		$this->msg_records_deleted         = 'FLEXI_CATEGORIES_DELETED';
 
 		// Load Joomla 'com_categories' language files
 		JFactory::getLanguage()->load('com_categories', JPATH_ADMINISTRATOR, 'en-GB', true);

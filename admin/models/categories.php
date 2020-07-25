@@ -244,6 +244,8 @@ class FlexicontentModelCategories extends FCModelAdminList
 	 */
 	public function filterByAssignments($cid = array(), $action = -2)
 	{
+		global $globalcats;
+
 		$cid = ArrayHelper::toInteger($cid);
 		$cid_list = implode( ',', $cid );
 
@@ -259,6 +261,48 @@ class FlexicontentModelCategories extends FCModelAdminList
 				;
 
 				$cid_wassocs = $this->_db->setQuery($query)->loadColumn();
+
+				/**
+				 * Find categories without children
+				 */
+				$remaining_cats = array();
+				$cid_wassocs_flipped = array_flip($cid_wassocs);
+
+				// Create an array of categories to examine, do not include categories that have item associations
+				foreach($cid as $i => $cat_id)
+				{
+					if (!isset($cid_wassocs_flipped[$cat_id]))
+					{
+						$remaining_cats[$cat_id] = new stdClass;
+						$remaining_cats[$cat_id]->descendantsarray = !empty($globalcats[$cat_id]->descendantsarray) ? array_flip($globalcats[$cat_id]->descendantsarray) : array();
+						unset($remaining_cats[$cat_id]->descendantsarray[$cat_id]);
+					}
+				}
+
+				// Repeat finding categories without children until a complete loop is run without removing any category
+				do {
+					$removed = false;
+
+					foreach($remaining_cats as $cat_id => $cat)
+					{
+						if (!count($cat->descendantsarray))
+						{
+							unset($remaining_cats[$cat_id]);
+							$removed = true;
+
+							foreach($remaining_cats as $id => $cat)
+							{
+								unset($remaining_cats[$id]->descendantsarray[$cat_id]);
+							}
+						}
+					}
+				} while ($removed === true);
+
+				foreach($remaining_cats as $cat_id => $cat)
+				{
+					$cid_wassocs[] = $catid;
+				}
+
 				break;
 
 			// Trash, Unpublish
@@ -335,12 +379,12 @@ class FlexicontentModelCategories extends FCModelAdminList
 	 */
 	public function getParentParams($pk)
 	{
-		if (empty($pk))
+		global $globalcats;
+
+		if (empty($pk) || empty($globalcats[$pk]->ancestors))
 		{
 			return array();
 		}
-
-		global $globalcats;
 
 		$query = 'SELECT id, params'
 			. ' FROM #__categories'

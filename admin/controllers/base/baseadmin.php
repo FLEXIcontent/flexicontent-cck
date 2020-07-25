@@ -116,7 +116,7 @@ class FlexicontentControllerBaseAdmin extends FlexicontentController
 		$this->warn_noauth_recs_skipped_del = 'FLEXI_SKIPPED_N_ROWS_DUE_TO_NO_ACL_OR_NOT_IN_TRASH';
 
 		// Messages about related data
-		$this->msg_relations_deleted        ='FLEXI_ASSIGNMENTS_DELETED';
+		$this->msg_relations_deleted        = 'FLEXI_ASSIGNMENTS_DELETED';
 	}
 
 
@@ -795,6 +795,11 @@ class FlexicontentControllerBaseAdmin extends FlexicontentController
 		$cid = array_diff($cid, $cid_noauth, $cid_locked);
 		$is_authorised = count($cid);
 
+/*print_r($cid);
+print_r($cid_noauth);
+print_r($cid_locked);
+return;*/
+
 		// Check access
 		if (!$is_authorised)
 		{
@@ -848,7 +853,7 @@ class FlexicontentControllerBaseAdmin extends FlexicontentController
 		$total = count($cid);
 		$msg = $this->task === 'remove_relations'
 			? JText::sprintf($this->msg_relations_deleted, $total)
-			: $total . ' ' . JText::_('FLEXI_' . $this->_NAME . 'S_DELETED');
+			: $total . ' ' . JText::_(isset($this->msg_records_deleted) ? $this->msg_records_deleted : 'FLEXI_' . $this->_NAME . 'S_DELETED');
 
 		$this->setRedirect($this->returnURL, $msg, 'success');
 	}
