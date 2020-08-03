@@ -628,21 +628,26 @@ class FlexicontentControllerSearch extends FlexicontentControllerBaseAdmin
 				' isadvsearch = CASE isadvsearch WHEN 2 THEN 1   WHEN -1 THEN 0   ELSE isadvsearch   END,' .
 				' isadvfilter = CASE isadvfilter WHEN 2 THEN 1   WHEN -1 THEN 0   ELSE isadvfilter   END');
 			$query = 'UPDATE #__flexicontent_fields' . $set_clause . " WHERE published=1";
-			$db->setQuery($query);
-			$db->execute();
+			$db->setQuery($query)->execute();
 
-			// Force SEARCH properties of non-published fields to be: normal OFF
+			/**
+			 * *Force SEARCH properties of non-published fields to be: normal OFF
+			 */
 			if ($indexer === 'basic')
 			{
 				$query = 'UPDATE #__flexicontent_fields SET issearch = 0 WHERE published <> 1';
-				$db->setQuery($query);
-				$db->execute();
+				$db->setQuery($query)->execute();
+
+				// Do not clear (set to 0) the isfilter of unpublished fields ... since this uses no special index
+				$query = 'UPDATE #__flexicontent_fields '
+					. ' SET isfilter = CASE isfilter WHEN 2 THEN 1   WHEN -1 THEN 0   ELSE isfilter   END '
+					. ' WHERE published <> 1 AND (isfilter = 2 OR isfilter = -1)';
+				$db->setQuery($query)->execute();
 			}
 			else
 			{
 				$query = 'UPDATE #__flexicontent_fields SET isadvsearch = 0, isadvfilter = 0  WHERE published <> 1';
-				$db->setQuery($query);
-				$db->execute();
+				$db->setQuery($query)->execute();
 			}
 		}
 
@@ -666,6 +671,26 @@ class FlexicontentControllerSearch extends FlexicontentControllerBaseAdmin
 		// Terminate if no fields found to be indexable
 		if (!count($field_ids))
 		{
+			/**
+			 * *Force SEARCH properties of non-published fields to be: normal OFF
+			 */
+			if ($indexer === 'basic')
+			{
+				$query = 'UPDATE #__flexicontent_fields SET issearch = 0 WHERE published <> 1';
+				$db->setQuery($query)->execute();
+
+				// Do not clear (set to 0) the isfilter of unpublished fields ... since this uses no special index
+				$query = 'UPDATE #__flexicontent_fields '
+					. ' SET isfilter = CASE isfilter WHEN 2 THEN 1   WHEN -1 THEN 0   ELSE isfilter   END '
+					. ' WHERE published <> 1 AND (isfilter = 2 OR isfilter = -1)';
+				$db->setQuery($query)->execute();
+			}
+			else
+			{
+				$query = 'UPDATE #__flexicontent_fields SET isadvsearch = 0, isadvfilter = 0  WHERE published <> 1';
+				$db->setQuery($query)->execute();
+			}
+
 			jexit(
 				'fail | Index was only cleaned-up, <br/>since no <b>fields</b> were marked as: ' . '<br> -- ' .
 				($indexer == 'basic'
