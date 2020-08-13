@@ -6084,7 +6084,8 @@ class ParentClassItem extends FCModelAdmin
 				{
 					if (!$jtag_ids)
 					{
-						$this->table->tagsHelper->deleteTagData($this->table, $this->table->id);
+						//$this->table->tagsHelper->deleteTagData($this->table, $this->table->id);
+						$this->tagsObserver->onBeforeDelete($this->table->id);
 					}
 					else
 					{
