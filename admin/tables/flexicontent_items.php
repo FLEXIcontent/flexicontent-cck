@@ -747,57 +747,60 @@ class flexicontent_items extends _flexicontent_items
 		$record_ext->$fk_ext = $this->$tk_ext;
 		$record_tmp->$fk_tmp = $this->$tk_tmp;
 
+
+		/**
+		 * NOTE: This is not usuable because an exception will be thrown on DB error, maybe remove or add TRY-CATCH above
+		 */
 		if (!$ret)
 		{
 			$this->setError(get_class($this) . '::store failed - ' . $this->_db->getErrorMsg());
 			return false;
 		}
 
+
+		// Check if record at extended data DB table exists
+		$ext_exists = false;
+
+		if (!empty($record_ext->$fk_ext))
+		{
+			$ext_exists = (boolean) $this->_db->setQuery('SELECT COUNT(*) FROM ' . $this->_tbl_ext . ' WHERE ' . $fk_ext . '=' . (int) $record_ext->$fk_ext)->loadResult();
+		}
+
+		// Check if record at temporary data DB table exists
+		$tmp_exists = false;
+		if (!empty($record_tmp->$fk_tmp))
+		{
+			$tmp_exists = (boolean) $this->_db->setQuery('SELECT COUNT(*) FROM ' . $this->_tbl_tmp . ' WHERE ' . $fk_tmp . '=' . (int) $record_tmp->$fk_tmp)->loadResult();
+		}
+
+		// Update extended data record
+		if ($ext_exists)
+		{
+			$ret = $this->_db->updateObject($this->_tbl_ext, $record_ext, $fk_ext, $updateNulls);
+		}
+
+		// Insert extended data record
 		else
 		{
-			// Check if record at extended data DB table exists
-			$ext_exists = false;
-
-			if (!empty($record_ext->$fk_ext))
-			{
-				$ext_exists = (boolean) $this->_db->setQuery('SELECT COUNT(*) FROM ' . $this->_tbl_ext . ' WHERE ' . $fk_ext . '=' . (int) $record_ext->$fk_ext)->loadResult();
-			}
-
-			// Check if record at temporary data DB table exists
-			$tmp_exists = false;
-			if (!empty($record_tmp->$fk_tmp))
-			{
-				$tmp_exists = (boolean) $this->_db->setQuery('SELECT COUNT(*) FROM ' . $this->_tbl_tmp . ' WHERE ' . $fk_tmp . '=' . (int) $record_tmp->$fk_tmp)->loadResult();
-			}
-
-			// Update extended data record
-			if ($ext_exists)
-			{
-				$ret = $this->_db->updateObject($this->_tbl_ext, $record_ext, $fk_ext, $updateNulls);
-			}
-
-			// Insert extended data record
-			else
-			{
-				// Insert without using autoincrement
-				$record_ext->$fk_ext = $this->$tk_ext;
-				$ret = $this->_db->insertObject($this->_tbl_ext, $record_ext, $fk_ext);
-			}
-
-			// Update #__flexicontent_items_tmp table
-			if ($tmp_exists)
-			{
-				$ret = $this->_db->updateObject($this->_tbl_tmp, $record_tmp, $fk_tmp, $updateNulls);
-			}
-
-			// Insert into #__flexicontent_items_tmp table
-			else
-			{
-				// Insert without using autoincrement
-				$record_tmp->$fk_tmp = $this->$tk_tmp;
-				$ret = $this->_db->insertObject($this->_tbl_tmp, $record_tmp, $fk_tmp);
-			}
+			// Insert without using autoincrement
+			$record_ext->$fk_ext = $this->$tk_ext;
+			$ret = $this->_db->insertObject($this->_tbl_ext, $record_ext, $fk_ext);
 		}
+
+		// Update #__flexicontent_items_tmp table
+		if ($tmp_exists)
+		{
+			$ret = $this->_db->updateObject($this->_tbl_tmp, $record_tmp, $fk_tmp, $updateNulls);
+		}
+
+		// Insert into #__flexicontent_items_tmp table
+		else
+		{
+			// Insert without using autoincrement
+			$record_tmp->$fk_tmp = $this->$tk_tmp;
+			$ret = $this->_db->insertObject($this->_tbl_tmp, $record_tmp, $fk_tmp);
+		}
+
 
 		// If the table is not set to track assets return true.
 		if (!$this->_trackAssets)

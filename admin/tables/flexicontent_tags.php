@@ -325,11 +325,13 @@ class flexicontent_tags extends flexicontent_basetable
 	 */
 	public function store($updateNulls = false)
 	{
+		/**
+		 * Create one JTable record for every DB table
+		 */
 		$k      = $this->_tbl_key;
 		$fk_ext = $this->_frn_key_ext;
 		$tk_ext = $this->_tbl_key_ext;
 
-		// Split the data to their actual DB table
 		$record = JTable::getInstance($this->_jtbls[$this->_tbl][0], $this->_jtbls[$this->_tbl][1]);
 		$record->_tbl = $this->_tbl;
 		$record->_tbl_key = $k;
@@ -338,22 +340,68 @@ class flexicontent_tags extends flexicontent_basetable
 		$record_ext->_tbl = $this->_tbl_ext;
 		$record_ext->_tbl_key = $fk_ext;
 
+
+		/**
+		 * Check and fix Joomla Tags table
+		 */
+		static $tags_table_fix_needed = null;
+
+		if ($tags_table_fix_needed === null)
+		{
+			$query = 'SELECT COUNT(*) FROM #__tags WHERE parent_id = 0 AND id <> 1';
+			$tags_table_fix_needed = (boolean) $this->_db->setQuery($query)->execute();
+
+			// Fix Joomla tags table
+			if ($tags_table_fix_needed)
+			{
+				$query = 'UPDATE #__tags SET parent_id = 1 WHERE parent_id = 0 AND id <> 1';
+				$this->_db->setQuery($query)->execute();
+
+				$record_ext->rebuild();
+			}
+		}
+
+
+		/**
+		 * Check if corresponding entry in Joomla tag exists and load it
+		 */
+		$record_ext->$fk_ext = (int) $this->$tk_ext;
+
+		$ext_exists = !empty($record_ext->$fk_ext)
+			? $record_ext->load($record_ext->$fk_ext)
+			: false;
+
+
+		/**
+		 * Split the data to their actual DB table
+		 */
+
 		foreach ($this->getProperties() as $p => $v)
 		{
-			// If the property is in the join properties array we add it to the items_ext object
-			if (isset($this->_tbl_fields[$this->_tbl_ext][$p]))
+			/**
+			 * Add property value to the Joomla Tags Table record
+			 *
+			 * !!! Because we do not populate $this with correct values values for Joomla Tags Table properties,
+			 * we must not pass them to Joomla Tags Table record even if the exist inside $this !!!
+			 *
+			 * Do this only if the property exists in both FC and Joomla tables (aka property should be same !!!)
+			 * ... but exclude irrelevant properties like 'id' (fk_ext) !!!
+			 *
+			 */
+			if (isset($this->_tbl_fields[$this->_tbl_ext][$p]) && isset($this->_tbl_fields[$this->_tbl][$p]) && $p !== $fk_ext)
 			{
-				if ($p === $tk_ext)
-				{
-					$record_ext->$fk_ext = $v;
-				}
-				elseif ($p !== $k)
-				{
-					$record_ext->$p = $v;
-				}
+				$record_ext->$p = $v;
 			}
 
-			// Add it to the main record properties
+			// Other cases e.g. 'name' column is 'title' column in Joomla Tags Table
+			elseif ($p === 'name')
+			{
+				$record_ext->title = $v;
+			}
+
+			/**
+			 * Add property value to the FC Tags Table record
+			 */
 			if (isset($this->_tbl_fields[$this->_tbl][$p]))
 			{
 				$record->$p = $v;
@@ -372,42 +420,35 @@ class flexicontent_tags extends flexicontent_basetable
 			$this->$k = $record->$k;
 		}
 
-		// Set related tables IDs
-		$record_ext->$fk_ext = $this->$tk_ext;
 
+		/**
+		 * NOTE: This is not usuable because an exception will be thrown on DB error, maybe remove or add TRY-CATCH above
+		 */
 		if (!$ret)
 		{
 			$this->setError(get_class($this) . '::store failed - ' . $this->_db->getErrorMsg());
 			return false;
 		}
 
-		else
+
+		// Update extended data record
+		if ($ext_exists)
 		{
-			// Check if record at extended data DB table exists
-			$ext_exists = false;
-
-			if (!empty($record_ext->$fk_ext))
-			{
-				$ext_exists = (boolean) $this->_db->setQuery('SELECT COUNT(*) FROM ' . $this->_tbl_ext . ' WHERE ' . $fk_ext . '=' . (int) $record_ext->$fk_ext)->loadResult();
-			}
-
-			// Update extended data record
-			if ($ext_exists)
-			{
-				$ret = $this->_db->updateObject($this->_tbl_ext, $record_ext, $fk_ext, $updateNulls);
-			}
-
-			// Insert extended data record, COMMENTED OUT, MAPPING TAGS MUST BE HANDLED BY DB MODEL
-			/*else
-			{
-				// Zero means autoincrement
-				$record_ext->$fk_ext = 0;
-				$ret = $this->_db->insertObject($this->_tbl_ext, $record_ext, $fk_ext);
-
-				// Get record ID, this is the auto-increment ID of last INSERT operation
-				$this->$tk_ext = $record_ext->$fk_ext;
-			}*/
+			$record_ext->check();
+			$record_ext->store();
 		}
+
+		// Insert extended data record, COMMENTED OUT, MAPPING TAGS MUST BE HANDLED BY DB MODEL
+		/*else
+		{
+			// Zero means autoincrement
+			$record_ext->$fk_ext = 0;
+			$ret = $this->_db->insertObject($this->_tbl_ext, $record_ext, $fk_ext);
+
+			// Get record ID, this is the auto-increment ID of last INSERT operation
+			$this->$tk_ext = $record_ext->$fk_ext;
+		}*/
+
 
 		// If the table is not set to track assets return true.
 		if (!$this->_trackAssets)
