@@ -1209,6 +1209,41 @@ class flexicontent_db
 
 
 	/**
+	 * Check and fix Joomla Tags table
+	 *
+	 * @return  void
+	 *
+	 * @since   3.3.8
+	 */
+	static function checkFixJTagsTable()
+	{
+		static $tags_table_fix_needed = null;
+
+		if ($tags_table_fix_needed !== null)
+		{
+			return;
+		}
+
+		$db = JFactory::getDbo();
+
+		$query = 'SELECT COUNT(*) FROM #__tags WHERE parent_id = 0 AND id <> 1';
+		$tags_table_fix_needed = (boolean) $db->setQuery($query)->execute();
+
+		// Fix Joomla tags table
+		if ($tags_table_fix_needed)
+		{
+			$query = 'UPDATE #__tags SET parent_id = 1 WHERE parent_id = 0 AND id <> 1';
+			$db->setQuery($query)->execute();
+
+			JTable::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tags/tables');
+			$tbl = JTable::getInstance('Tag', 'TagsTable');
+
+			$tbl->rebuild();
+		}
+	}
+
+
+	/**
 	 * Find Joomla tags when given respective FC tags, creating them if they do not exist
 	 *
 	 * @param   array   $tags       Tags text array from the field
@@ -1221,6 +1256,8 @@ class flexicontent_db
 	 */
 	static function createFindJoomlaTags($tags, $checkACL = true, $indexCol = 'null')
 	{
+		flexicontent_db::checkFixJTagsTable();
+
 		$newTags = array();
 
 		if (empty($tags) || (count($tags) === 1 && reset($tags) === ''))
