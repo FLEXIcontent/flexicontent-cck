@@ -1091,6 +1091,7 @@ class flexicontent_db
 		return $translations;
 	}
 
+
 	/**
 	 * Method to save language associations
 	 *
@@ -1098,15 +1099,20 @@ class flexicontent_db
 	 */
 	static function saveAssociations(&$item, &$data, $context)
 	{
-		$assoc = flexicontent_db::useAssociations();
-		if (!$assoc) return true;
+		// Check if associations are enabled, but also mantain associations if associations data are no present, 
+		if (!flexicontent_db::useAssociations() || !isset($data['associations']))
+		{
+			return true;
+		}
 
-		// ***
-		// *** Prepare / check associations array
-		// ***
+
+		/**
+		 * Prepare / check associations array
+		 */
 
 		// Unset empty associations from associations array, to avoid save them in the associations table
-		$associations = isset($data['associations']) ? $data['associations'] : array();
+		$associations = !empty($data['associations']) ? $data['associations'] : array();
+
 		foreach ($associations as $tag => $id)
 		{
 			if (empty($id)) unset($associations[$tag]);
