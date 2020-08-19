@@ -1809,7 +1809,8 @@
 				<option value="1">FLEXI_BOTH</option>
 				<option value="2">FLEXI_MANUALLY_IN_FRONTEND</option>
 			</field>
-			<field name="jquery_ui_theme" type="fcradio" default="ui-lightness" label="jQuery UI Theme" description="..." class="btn-group group-fcinfo">
+			<field name="jquery_ui_theme" type="fcradio" default="flat" label="jQuery UI Theme" description="..." class="btn-group group-fcinfo">
+			<option value="flat">flat</option>
 				<option value="ui-lightness">ui-lightness</option>
 				<option value="smoothness">smoothness</option>
 			</field>
