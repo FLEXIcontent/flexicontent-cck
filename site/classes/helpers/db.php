@@ -643,9 +643,17 @@ class flexicontent_db
 				$order_col	= $rel_as.'.catid, '.$rel_as.'.ordering ASC, '.$i_as.'.id DESC';
 				$order_dir	= '';
 				break;
+			case 'rorder':
+				$order_col	= $rel_as.'.catid, '.$rel_as.'.ordering DESC, '.$i_as.'.id DESC';
+				$order_dir	= '';
+				break;
 			case 'jorder':
 				$order_col	= $i_as.'.ordering';
 				$order_dir	= 'ASC';
+				break;
+			case 'rjorder':
+				$order_col	= $i_as.'.ordering';
+				$order_dir	= 'DESC';
 				break;
 
 			// SPECIAL case custom field
