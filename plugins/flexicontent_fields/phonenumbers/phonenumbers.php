@@ -94,7 +94,8 @@ class plgFlexicontent_fieldsPhonenumbers extends FCField
 
 
 		// Initialise property with default value
-		if (!$field->value) {
+		if (!$field->value || (count($field->value) === 1 && reset($field->value) === null))
+		{
 			$field->value = array();
 			$field->value[0] = array('label'=>'', 'cc'=>'', 'phone1'=>'', 'phone2'=>'', 'phone3'=>'');
 			$field->value[0] = serialize($field->value[0]);

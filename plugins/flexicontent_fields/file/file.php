@@ -173,7 +173,7 @@ class plgFlexicontent_fieldsFile extends FCField
 		}
 
 		// Empty field value
-		if (!$field->value)
+		if (!$field->value || (count($field->value) === 1 && reset($field->value) === null))
 		{
 			$files_data = array();
 			$form_data = array();
