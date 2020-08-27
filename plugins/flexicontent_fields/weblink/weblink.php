@@ -997,7 +997,7 @@ class plgFlexicontent_fieldsWeblink extends FCField
 		{
 				$array = $this->unserialize_array($db_value, $force_array=false, $force_value=false);
 				$v = $array ?: array(
-					'link' => $v, 'title' => '', 'linktext' => '', 'class' => '', 'id' => '', 'hits' => 0
+					'link' => $db_value, 'title' => '', 'linktext' => '', 'class' => '', 'id' => '', 'hits' => 0
 				);
 				$db_values[$v['link']] = $v;
 		}
