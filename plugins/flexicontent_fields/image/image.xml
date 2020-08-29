@@ -195,6 +195,8 @@
 			</field>
 
 			<field name="" type="separator" default="FLEXI_FIELD_MEDIA_URL" _description="..." icon_class="icon-video" level="tab_open" box_type="1" />
+			<field name="" type="separator" default="PLEASE NOTE: If media-URL is enabled then &lt;b&gt;fancybox&lt;/b&gt; layout will be forced" level="level3" class="alert alert-warning fcpadded" />
+
 			<field name="use_mediaurl" type="multilist" subtype="radio" default="0" label="FLEXI_ENABLE_PROPERTY" description="FLEXI_ENABLE_PROPERTY_DESC" toggle_related="1" class="btn-group btn-group-yesno">
 				<option value="0" show_list="" hide_list="img-mediaurl-mode">FLEXI_NO</option>
 				<option value="1" show_list="img-mediaurl-mode" hide_list="">Video URLs (Youtube, Vimeo)</option>
@@ -486,6 +488,7 @@
 			</field>
 
 			<field name="" type="separator" default="Layout" level="level3" />
+			<field name="" type="separator" label="" default="Layout is forced to 'fancybox' because parameter 'Media URL' was enabled, &lt;br&gt; please select to 'fancybox' layout to be able to customize its parameters" description="" class="alert fcpadded" depend_class="img-mediaurl-mode" />
 
 			<field name="popuptype" type="fclayout" default="4" label="FLEXI_FIELD_IMAGE_GALLERY_LAYOUT" description="FLEXI_FIELD_IMAGE_GALLERY_LAYOUT_DESC" depend_class="use_js_lib"
 				directory="/plugins/flexicontent_fields/image/tmpl"
@@ -508,6 +511,7 @@
 					<!--option filename="value_gallery_elastislide" value="7">FLEXI_FIELD_IMAGE_ELASTISLIDE</option-->
 					<option filename="value_gallery_galleriffic" value="5">Galleriffic (Slideshow + carousel) (Built-in)</option>
 					<option filename="value_gallery_elastislide" value="7">Elastislide (Slideshow + carousel) (Built-in)</option>
+					<option filename="value_gallery_pannellum" value="9">Pannellum (Panorama)</option>
 				</group>
 
 				<group label="Enable via parameters">

@@ -1469,6 +1469,12 @@ class flexicontent_html
 				$document->addScript($framework_path.'/leaflet.markercluster.js');
 				break;
 
+
+			case 'pannellum' :
+				$document->addStyleSheet('https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.css');
+				$document->addScript('https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.js');
+				break;
+
 			case 'select2':
 				if ($load_jquery) flexicontent_html::loadJQuery();
 
