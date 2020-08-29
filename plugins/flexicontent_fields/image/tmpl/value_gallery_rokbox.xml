@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <form>
 
-	<name>Image field layout -- Fancybox</name>
+	<name>Image field layout -- Rokbox</name>
 	<author>ggppdk</author>
 	<creationDate>September 2017</creationDate>
 	<copyright>Copyright (C) 2017 ggppdk</copyright>
@@ -9,7 +9,7 @@
 	<authorEmail>flexicontentck@gmail.com</authorEmail>
 	<authorUrl>www.flexicontent.org</authorUrl>
 	<version>1.0</version>
-	<description>Flexicontent fields - Image field layout - Fancybox parameters</description>
+	<description>Flexicontent fields - Image field layout - Rokbox parameters</description>
 	
 	<fields name="attribs">
 		
