@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<form>
+
+	<name>Image field layout -- Pannellum</name>
+	<author>ggppdk</author>
+	<creationDate>September 2020</creationDate>
+	<copyright>Copyright (C) 2020 ggppdk</copyright>
+	<license>GNU/GPL v2</license>
+	<authorEmail>flexicontentck@gmail.com</authorEmail>
+	<authorUrl>www.flexicontent.org</authorUrl>
+	<version>1.0</version>
+	<description>Flexicontent fields - Image field layout - Pannellum parameters</description>
+	
+	<fields name="attribs">
+		
+		<fieldset name="layout" addfieldpath="/administrator/components/com_flexicontent/elements">
+			<field name="PPFX_vp_max_height" type="int" default="50" label="Max Height (%)" description="Max Height of inline viewer (as a percentage of window height). Enter a number 20 to 95" />
+		</fieldset>
+
+	</fields>
+	
+</form>
