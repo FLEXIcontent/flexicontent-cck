@@ -10,6 +10,19 @@ $vp_max_height = (int) $field->parameters->get( $PPFX_ . 'vp_max_height', 50 );
 $vp_max_height = $vp_max_height >= 20 ? $vp_max_height : 20;
 $vp_max_height = $vp_max_height <= 95 ? $vp_max_height : 95;
 
+if (static::$isTablet)
+{
+	$param_name  = $view === 'item' ? 'thumbinitemview_tablet' : 'thumbincatview_tablet';
+	$tablet_size = (int) $field->parameters->get( $PPFX_ . $param_name, '');
+	$tablet_size = isset(self::$index_to_thumb_size[$tablet_size]) ? self::$index_to_thumb_size[$tablet_size] : '';
+}
+elseif (static::$isMobile)
+{
+	$param_name  = $view === 'item' ? 'thumbinitemview_mobile' : 'thumbincatview_mobile';
+	$mobile_size = (int) $field->parameters->get( $PPFX_ . $param_name, '');
+	echo $mobile_size = isset(self::$index_to_thumb_size[$mobile_size]) ? self::$index_to_thumb_size[$mobile_size] : '';
+}
+
 // ***
 // *** Values loop
 // ***
@@ -23,8 +36,29 @@ foreach ($values as $n => $value)
 	if ($result === _FC_CONTINUE_) continue;
 	if ($result === _FC_BREAK_) break;
 
-	$w = isset($value['size_w_' . $size]) ? $value['size_w_' . $size] : $field->parameters->get('w_' . $size, self::$default_widths[$size]);
-	$h = isset($value['size_h_' . $size]) ? $value['size_h_' . $size] : $field->parameters->get('h_' . $size, self::$default_heights[$size]);
+	if (static::$isTablet && $tablet_size)
+	{
+		$SIZE    = $tablet_size;
+		$ABS_SRC = ${'abs_src' . $SIZE};
+	}
+	elseif (static::$isMobile && !static::$isTablet && $mobile_size)
+	{
+		$SIZE    = $mobile_size;
+		$ABS_SRC = ${'abs_src' . $SIZE};
+	}
+	elseif ($size === 'o')
+	{
+		$SIZE    = 'l';
+		$ABS_SRC = $abs_srcl;
+	}
+	else
+	{
+		$SIZE    = $size;
+		$ABS_SRC = $abs_src;
+	}
+
+	$w = isset($value['size_w_' . $SIZE]) ? $value['size_w_' . $SIZE] : $field->parameters->get('w_' . $SIZE, self::$default_widths[$size]);
+	$h = isset($value['size_h_' . $SIZE]) ? $value['size_h_' . $SIZE] : $field->parameters->get('h_' . $SIZE, self::$default_heights[$size]);
 
 	$img_legend_custom = '
 	<div id="panorama_' . $uniqueid . '" style="width: ' . $w . 'px; height: ' . $w . 'px; max-width: 100%; max-height: ' . $vp_max_height  . 'vh;"></div>
@@ -32,7 +66,7 @@ foreach ($values as $n => $value)
 		pannellum.viewer(\'panorama_' . $uniqueid . '\', {
 			"type": "equirectangular",
 			"panorama": "' . JUri::root(true).'/'.$src . '",
-			"preview": "' . $abs_src . '",
+			"preview": "' . $ABS_SRC . '",
 			"title": "' . $title_encoded . '",
 		});
 	</script>	

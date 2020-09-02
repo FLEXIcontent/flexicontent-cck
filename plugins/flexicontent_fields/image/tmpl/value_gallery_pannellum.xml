@@ -15,6 +15,40 @@
 		
 		<fieldset name="layout" addfieldpath="/administrator/components/com_flexicontent/elements">
 			<field name="PPFX_vp_max_height" type="int" default="50" label="Max Height (%)" description="Max Height of inline viewer (as a percentage of window height). Enter a number 20 to 95" />
+
+			<field name="PPFX_vp_max_height" type="int" default="50" label="Max Height (%)" description="Max Height of inline viewer (as a percentage of window height). Enter a number 20 to 95" />
+			<field name="PPFX_vp_max_height" type="int" default="50" label="Max Height (%)" description="Max Height of inline viewer (as a percentage of window height). Enter a number 20 to 95" />
+
+			<field name="" type="separator" default="FLEXI_PREVIEW_THUMBNAILS" level="level1" />
+
+			<field name="" type="separator" default="FLEXI_TABLET" level="level2" />
+			<field name="PPFX_thumbincatview_tablet" type="radio" default="" label="FLEXI_FIELD_THUMB_IN_CAT" description="FLEXI_FIELD_THUMB_IN_CAT_DESC" class="btn-group group-fcinfo">
+				<option value="">FLEXI_USE_DESKTOP</option>
+				<option value="1">FLEXI_SMALL</option>
+				<option value="2">FLEXI_MEDIUM</option>
+				<option value="3">FLEXI_LARGE</option>
+			</field>
+			<field name="PPFX_thumbinitemview_tablet" type="radio" default="" label="FLEXI_FIELD_THUMB_IN_ITEM" description="FLEXI_FIELD_THUMB_IN_ITEM_DESC" class="btn-group group-fcinfo">
+				<option value="">FLEXI_USE_DESKTOP</option>
+				<option value="1">FLEXI_SMALL</option>
+				<option value="2">FLEXI_MEDIUM</option>
+				<option value="3">FLEXI_LARGE</option>
+			</field>
+
+			<field name="" type="separator" default="FLEXI_MOBILE" level="level2" />
+			<field name="PPFX_thumbincatview_mobile" type="radio" default="" label="FLEXI_FIELD_THUMB_IN_CAT" description="FLEXI_FIELD_THUMB_IN_CAT_DESC" class="btn-group group-fcinfo">
+				<option value="">FLEXI_USE_DESKTOP</option>
+				<option value="1">FLEXI_SMALL</option>
+				<option value="2">FLEXI_MEDIUM</option>
+				<option value="3">FLEXI_LARGE</option>
+			</field>
+			<field name="PPFX_thumbinitemview_mobile" type="radio" default="" label="FLEXI_FIELD_THUMB_IN_ITEM" description="FLEXI_FIELD_THUMB_IN_ITEM_DESC" class="btn-group group-fcinfo">
+				<option value="">FLEXI_USE_DESKTOP</option>
+				<option value="1">FLEXI_SMALL</option>
+				<option value="2">FLEXI_MEDIUM</option>
+				<option value="3">FLEXI_LARGE</option>
+			</field>
+
 		</fieldset>
 
 	</fields>
