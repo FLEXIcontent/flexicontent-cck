@@ -10,13 +10,13 @@ $vp_max_height = (int) $field->parameters->get( $PPFX_ . 'vp_max_height', 50 );
 $vp_max_height = $vp_max_height >= 20 ? $vp_max_height : 20;
 $vp_max_height = $vp_max_height <= 95 ? $vp_max_height : 95;
 
-if (static::$isTablet)
+if ($isTablet)
 {
 	$param_name  = $view === 'item' ? 'thumbinitemview_tablet' : 'thumbincatview_tablet';
 	$tablet_size = (int) $field->parameters->get( $PPFX_ . $param_name, '');
 	$tablet_size = isset(self::$index_to_thumb_size[$tablet_size]) ? self::$index_to_thumb_size[$tablet_size] : '';
 }
-elseif (static::$isMobile)
+elseif ($isMobile)
 {
 	$param_name  = $view === 'item' ? 'thumbinitemview_mobile' : 'thumbincatview_mobile';
 	$mobile_size = (int) $field->parameters->get( $PPFX_ . $param_name, '');
@@ -36,12 +36,12 @@ foreach ($values as $n => $value)
 	if ($result === _FC_CONTINUE_) continue;
 	if ($result === _FC_BREAK_) break;
 
-	if (static::$isTablet && $tablet_size)
+	if ($isTablet && $tablet_size)
 	{
 		$SIZE    = $tablet_size;
 		$ABS_SRC = ${'abs_src' . $SIZE};
 	}
-	elseif (static::$isMobile && !static::$isTablet && $mobile_size)
+	elseif ($isMobile && !$isTablet && $mobile_size)
 	{
 		$SIZE    = $mobile_size;
 		$ABS_SRC = ${'abs_src' . $SIZE};
