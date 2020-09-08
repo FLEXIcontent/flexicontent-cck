@@ -119,12 +119,16 @@ if ($this->perms['cantags'] || $this->perms['canversion'])
 					}
 
 					//window.console.log( 'Getting tags for \"' + term + '\" ...');
+
+					window.console.log(jQuery('#jform_language').val());
+
 					jQuery.ajax({
 						url: '".JUri::base(true)."/components/com_flexicontent/tasks/core.php?". JSession::getFormToken() ."=1',
 						dataType: 'json',
 						data: {
 							q: term,
 							task: 'viewtags',
+							item_lang: jQuery('#jform_language').val(),
 							format: 'json'
 						},
 						success: function(data)
@@ -138,7 +142,8 @@ if ($this->perms['cantags'] || $this->perms['canversion'])
 									el.data('tagid',   item.id);
 									el.data('tagname', item.name);
 								}
-								return jQuery('#ultagbox').find('input[value=\"'+item.id+'\"]').length > 0 ? null : { label: item.name, value: item.id };
+								let label_text = item.name + (item.translated_text ? ' (' + item.translated_text + ')' : '');
+								return jQuery('#ultagbox').find('input[value=\"'+item.id+'\"]').length > 0 ? null : { label: label_text, value: item.id };
 							});
 
 							fcTagsCache[term] = response_data;
@@ -525,7 +530,7 @@ if (isset($this->item->item_translations)) foreach ($this->item->item_translatio
 								}
 								echo '
 								<li class="tagitem">
-									<span>'.$tag->name.'</span>
+									<span>' . $tag->name . ($tag->translated_text ? ' (' . $tag->translated_text . ')' : '') . '</span>
 									<input type="hidden" name="jform[tag][]" value="'.$tag->id.'" />
 									<a href="javascript:;" class="deletetag" onclick="javascript:deleteTag(this);" title="'.JText::_('FLEXI_DELETE_TAG').'"></a>
 								</li>';
@@ -534,7 +539,7 @@ if (isset($this->item->item_translations)) foreach ($this->item->item_translatio
 							{
 								echo '
 								<li class="tagitem plain">
-									<span>'.$tag->name.'</span>
+									<span>' . $tag->name . ($tag->translated_text ? ' (' . $tag->translated_text . ')' : '') . '</span>
 									<input type="hidden" name="jform[tag][]" value="'.$tag->id.'" />
 								</li>';
 							}

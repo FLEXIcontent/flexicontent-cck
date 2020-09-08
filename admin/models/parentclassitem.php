@@ -3913,9 +3913,12 @@ class ParentClassItem extends FCModelAdmin
 			return array();
 		}
 
-		$query 	= 'SELECT *, t.id as tid FROM #__flexicontent_tags as t '
+		$query 	= 'SELECT *, t.id as tid, fa.value AS translated_text'
+			. ' FROM #__flexicontent_tags as t '
+			. ' LEFT JOIN #__falang_content AS fa ON fa.reference_table = "tags" AND fa.reference_field = "title" AND fa.reference_id = t.jtag_id'
 			. ' WHERE t.id IN (\'' . implode("','", $tagIds).'\')'
-			. ' ORDER BY name ASC';
+			. ' ORDER BY name ASC'
+			;
 		$tagsData = $this->_db->setQuery($query)->loadObjectList('tid');
 
 		if ($indexed) return $tagsData;

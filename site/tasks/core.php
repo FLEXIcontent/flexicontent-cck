@@ -336,7 +336,8 @@ class FlexicontentTasksCore
 				{
 					$array[] = (object) array(
 						'id' => $tag->id,
-						'name' => $tag->name
+						'name' => $tag->name,
+						'translated_text' => $tag->fa_text,
 					);
 				}
 			}
@@ -346,7 +347,8 @@ class FlexicontentTasksCore
 				$this->_loadLanguage();
 				$array[] = (object) array(
 					'id' => '0',
-					'name' => JText::_($perms->CanCreateTags ? 'FLEXI_NEW_TAG_ENTER_TO_CREATE' : 'FLEXI_NO_TAGS_FOUND')
+					'name' => JText::_($perms->CanCreateTags ? 'FLEXI_NEW_TAG_ENTER_TO_CREATE' : 'FLEXI_NO_TAGS_FOUND'),
+					'translated_text' => '',
 				);
 			}
 		}
@@ -427,12 +429,23 @@ class FlexicontentTasksCore
 		if ($jinput->get('task', '', 'cmd') == __FUNCTION__) die(__FUNCTION__ . ' : direct call not allowed');
 
 		$db = JFactory::getDbo();
+		
+		$lang_code = $jinput->getString('item_lang', JFactory::getLanguage()->getTag());
 
 		$query = $db->getQuery(true)
-			->select('*')
-			->from('#__flexicontent_tags')
-			->where('published = 1')
-			->order('name')
+			->select('la.*')
+			->from('#__languages AS la')
+			->where('la.lang_code = ' . $db->quote($lang_code))
+			;
+
+		$lang = $db->setQuery($query)->loadObject();
+
+		$query = $db->getQuery(true)
+			->select('ft.*, fa.value AS fa_text')
+			->from('#__flexicontent_tags AS ft')
+			->leftjoin('#__falang_content AS fa ON fa.reference_table = "tags" AND fa.reference_field = "title" AND fa.reference_id = ft.jtag_id')
+			->where('ft.published = 1')
+			->order('ft.name')
 			;
 
 		if (trim($text))
@@ -440,7 +453,7 @@ class FlexicontentTasksCore
 			$escaped_text = $db->escape($text, true);
 			$quoted_text  = $db->Quote('%' . $escaped_text . '%', false);
 
-			$query->where('name LIKE ' . $quoted_text);
+			$query->where('ft.name LIKE ' . $quoted_text . ' OR (fa.language_id = ' . (int) $lang->lang_id . ' AND fa.value LIKE ' . $quoted_text . ')');
 		}
 
 		$tags = $db->setQuery($query, 0, (int) $limit)->loadObjectlist();

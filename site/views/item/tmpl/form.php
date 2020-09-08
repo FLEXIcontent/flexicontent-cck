@@ -170,6 +170,7 @@ if ($tags_editable)
 						data: {
 							q: term,
 							task: 'viewtags',
+							item_lang: jQuery('#jform_language').val(),
 							format: 'json'
 						},
 						success: function(data)
@@ -183,7 +184,8 @@ if ($tags_editable)
 									el.data('tagid',   item.id);
 									el.data('tagname', item.name);
 								}
-								return jQuery('#ultagbox').find('input[value=\"'+item.id+'\"]').length > 0 ? null : { label: item.name, value: item.id };
+								let label_text = item.name + (item.translated_text ? ' (' + item.translated_text + ')' : '');
+								return jQuery('#ultagbox').find('input[value=\"'+item.id+'\"]').length > 0 ? null : { label: label_text, value: item.id };
 							});
 
 							fcTagsCache[term] = response_data;
@@ -865,14 +867,14 @@ if ($tags_displayed) : ob_start();  // tags ?>
 								}
 								echo '
 								<li class="tagitem">
-									<span>'.$tag->name.'</span>
+									<span>' . $tag->name . ($tag->translated_text ? ' (' . $tag->translated_text . ')' : '') . '</span>
 									<input type="hidden" name="jform[tag][]" value="'.$tag->id.'" />
 									<a href="javascript:;" class="deletetag" onclick="javascript:deleteTag(this);" title="'.JText::_('FLEXI_DELETE_TAG').'"></a>
 								</li>';
 							} else {
 								echo '
 								<li class="tagitem plain">
-									<span>'.$tag->name.'</span>
+									<span>' . $tag->name . ($tag->translated_text ? ' (' . $tag->translated_text . ')' : '') . '</span>
 									<input type="hidden" name="jform[tag][]" value="'.$tag->id.'" />
 								</li>';
 							}
