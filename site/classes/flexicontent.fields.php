@@ -1400,13 +1400,19 @@ class FlexicontentFields
 			if ( !count($item->tags) ) return array();
 			$item->tags = ArrayHelper::toInteger($item->tags);
 
-			$query 	= 'SELECT DISTINCT t.id, t.name, CASE WHEN CHAR_LENGTH(t.alias) THEN CONCAT_WS(\':\', t.id, t.alias) ELSE t.id END as slug'
+			$query 	= 'SELECT DISTINCT t.id AS _id, t.id, t.name, jt.id,jt.title, jt.description'
+				. ' CASE WHEN CHAR_LENGTH(t.alias) THEN CONCAT_WS(\':\', t.id, t.alias) ELSE t.id END as slug'
 				. ' FROM #__flexicontent_tags AS t'
+				. ' LEFT JOIN #__tags AS jt ON jt.id = t.jtag_id'
 				. ' WHERE t.id IN (' . implode(',', $item->tags) . ')'
 				. ' AND t.published = 1';
-
-			$db->setQuery( $query );
-			$tags = $db->loadObjectList();
+			$tags = $db->setQuery($query)->loadObjectList();
+			foreach($tags as $tag)
+			{
+				$tag->id = $tag->_id;
+				$tag->name = $tag->title ?: $tag->name;
+				unset($tag->_id);
+			}
 
 			$taglists[$item->id] = array_reverse( $tags );
 			return $taglists;
@@ -1439,14 +1445,21 @@ class FlexicontentFields
 		// Get single copy of tag data
 		// ***************************
 
-		$query = 'SELECT DISTINCT t.id, t.name, CASE WHEN CHAR_LENGTH(t.alias) THEN CONCAT_WS(\':\', t.id, t.alias) ELSE t.id END as slug'
+		$query = 'SELECT DISTINCT t.id AS _id, t.name, jt.id, jt.title, jt.description, '
+			. ' CASE WHEN CHAR_LENGTH(t.alias) THEN CONCAT_WS(\':\', t.id, t.alias) ELSE t.id END as slug'
 			. ' FROM #__flexicontent_tags AS t'
 			. ' JOIN #__flexicontent_tags_item_relations AS i ON i.tid = t.id'
+			. ' LEFT JOIN #__tags AS jt ON jt.id = t.jtag_id'
 			. ' WHERE i.itemid IN (' . implode(',', $cids) . ')'
 			. ' AND t.published = 1';
 
-		$db->setQuery( $query );
-		$tags = $db->loadObjectList('id');
+			$tags = $db->setQuery($query)->loadObjectList('_id');
+			foreach($tags as $tag)
+			{
+				$tag->id = $tag->_id;
+				$tag->name = $tag->title ?: $tag->name;
+				unset($tag->_id);
+			}
 
 		// Create an array of every item's tag data
 		$taglists = array();
