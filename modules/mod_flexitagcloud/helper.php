@@ -5,7 +5,7 @@
  * @subpackage FLEXIcontent Tag Cloud Module
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
  * @license GNU/GPL v2
- * 
+ *
  * FLEXIcontent is a derivative work of the excellent QuickFAQ component
  * @copyright (C) 2008 Christoph Lukes
  * see www.schlu.net for more information
@@ -28,7 +28,7 @@ class modFlexiTagCloudHelper
 		$db   = JFactory::getDbo();
 		$user = JFactory::getUser();
 		$cparams = JComponentHelper::getParams( 'com_flexicontent' );
-		
+
 		//$now    = FLEXI_J16GE ? JFactory::getDate()->toSql() : JFactory::getDate()->toMySQL();
 		$_nowDate = 'UTC_TIMESTAMP()'; //$db->Quote($now);
 		$nullDate	= $db->getNullDate();
@@ -76,7 +76,7 @@ class modFlexiTagCloudHelper
 			$id   = $app->input->get('id', 0, 'int');   // id of current item
 			$cid  = $app->input->get(($option == 'com_content' ? 'id' : 'cid'), 0, 'int');   // current category ID or category ID of current item
 			$rootcatid = $app->input->get('rootcatid', 0, 'int');   // root category ID for directory view
-	
+
 			$is_content_ext   = $option == 'com_flexicontent' || $option == 'com_content';
 			$isflexi_itemview = $is_content_ext && ($view == 'item' || $view == 'article') && $id;
 			$isflexi_catview  = $is_content_ext && $view == 'category' && $cid;
@@ -124,13 +124,13 @@ class modFlexiTagCloudHelper
 		// EXCLUDE method
 		if ($method == 2)
 		{
-			$where .= ' AND c.id NOT IN (' . implode(',', $cids) . ')';		
+			$where .= ' AND c.id NOT IN (' . implode(',', $cids) . ')';
 		}
 
 		// INCLUDE method (specified categories or current category)
 		elseif ($method == 3 || $method == 1)
 		{
-			$where .= ' AND c.id IN (' . implode(',', $cids) . ')';		
+			$where .= ' AND c.id IN (' . implode(',', $cids) . ')';
 		}
 
 
@@ -157,7 +157,7 @@ class modFlexiTagCloudHelper
 		// ***
 
 		$result = array();
-		
+
 		$query = 'SELECT tag.id, COUNT( rel.tid ) AS no'
 			. ' FROM #__flexicontent_tags_item_relations AS rel'
 			. ' JOIN #__flexicontent_items_tmp AS i ON i.id = rel.itemid'
@@ -167,9 +167,7 @@ class modFlexiTagCloudHelper
 			. ' GROUP BY rel.tid'
 			. ' ORDER BY no DESC'
 			;
-
-		$db->setQuery($query, 0, $limit);
-		$tag_counts = $db->loadObjectList('id');
+		$tag_counts = $db->setQuery($query, 0, $limit)->loadObjectList('id');
 
 		// Did any tags match our criteria ?
 		if (!$tag_counts)
@@ -192,19 +190,22 @@ class modFlexiTagCloudHelper
 		// *** Get tag data
 		// ***
 
-		$query = 'SELECT tag.id, tag.name,'
-			. ' CASE WHEN CHAR_LENGTH(tag.alias) THEN CONCAT_WS(\':\', tag.id, tag.alias) ELSE tag.id END as slug'
-			. ' FROM #__flexicontent_tags AS tag'
-			. ' WHERE tag.id IN (' . implode(', ', array_keys($tag_counts)) . ')'
+		$query = $db->getQuery(true)
+			->select('tag.id AS _id, jt.id, jt.title, jt.description')
+			->select('CASE WHEN CHAR_LENGTH(tag.alias) THEN CONCAT_WS(\':\', tag.id, tag.alias) ELSE tag.id END as slug')
+			->from('#__flexicontent_tags AS tag')
+			->leftjoin('#__tags AS jt ON jt.id = tag.jtag_id')
+			->where('tag.id IN (' . implode(', ', array_keys($tag_counts)) . ')')
 			;
-
-		$db->setQuery($query);
-		$rows = $db->loadObjectList('id');
+		$rows = $db->setQuery($query)->loadObjectList('_id');
 
 		// Add tag counts, calculated above
 		foreach($rows as $row)
 		{
-			$row->no = $tag_counts[$row->id]->no;
+			$row->id   = $row->_id;
+			$row->no   = $tag_counts[$row->id]->no;
+
+			unset($row->_id);
 		}
 
 
@@ -215,12 +216,14 @@ class modFlexiTagCloudHelper
 		$use_catlinks = $cparams->get('tags_using_catview', 0);
 		$i = 0;
 		$lists	= array();
-		foreach ( $rows as $row )
+		foreach ($rows as $row)
 		{
 			$lists[$i] = new stdClass();
 
 			$lists[$i]->size = modFlexiTagCloudHelper::sizer($min, $max, $row->no, $minsize, $maxsize);
-			$lists[$i]->name = $row->name;
+			$lists[$i]->name = $row->title ?: $row->name;
+
+			$lists[$i]->description = $row->description;
 			$lists[$i]->screenreader = JText::sprintf('FLEXI_NR_ITEMS_TAGGED', $row->no);
 
 			$lists[$i]->link = $use_catlinks
@@ -239,7 +242,7 @@ class modFlexiTagCloudHelper
 	 * sort the tags between a range from 1 to 10 according their usage
 	 */
 	static function sizer($min, $max, $no, $minsize, $maxsize)
-	{		
+	{
 		$spread = $max - $min;
 		$spread = $spread === 0 ? 1 : $spread;
 
