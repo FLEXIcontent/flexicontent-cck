@@ -26,7 +26,7 @@ $document->addStyleSheet("./modules/mod_flexigooglemap/assets/css/style.css",'te
 $itemmodel_name = 'FlexicontentModelItem';
 $itemmodel = new $itemmodel_name();
 
-//module config
+// Module config
 $mapapi = $params->get('mapapi', 'googlemap');
 $height = $params->get('height', '300px');
 $width  = $params->get('width', '200px');
@@ -34,6 +34,9 @@ $mapcenter = $params->get('mapcenter', '48.8566667, 2.3509871');
 $apikey    = $params->get('apikey', '');
 $maptype   = $params->get('maptype', '');
 $maxzoommarker = $params->get('maxzoommarker', '');
+
+// Get OS Map TILE server
+$os_tile_server_url = $params->get('os_tile_server_url', 'https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png');
 
 $mapstyle  = $params->get('mapstyle', '');
 $mapstyle  = substr($mapstyle,1,-1); // Remove[] at end and start
@@ -236,7 +239,7 @@ switch ($mapapi)
 			}
 			?>
 			// Title display
-			L.tileLayer('https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png',
+			L.tileLayer('<?php echo $os_tile_server_url; ?>',
 			{
 				// Datas sources
 				attribution: 'données © OpenStreetMap/ODbL - rendu OSM France',
