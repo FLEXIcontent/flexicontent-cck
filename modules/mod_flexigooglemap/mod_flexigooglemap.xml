@@ -80,6 +80,11 @@
 
 			<field name="fieldaddressid" type="fields" field_type="addressint" label="MOD_FLEXIGOOGLEMAP_ADDRESSFIELD" description="MOD_FLEXIGOOGLEMAP_ADDRESSFIELD_DESC" />
 			<field
+				name="os_tile_server_url" type="text" default=""
+				label="Tile (Map) Server URL" description="Enter a custom tile server URL (of Openstreet Maps). If you are going to be having a lot of traffic it is best to setup your own tiles server for hosting your map tiles, e.g. https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png"
+				showon="mapapi:openstreetmap"
+			/>
+			<field
 				name="apikey" type="text" default=""
 				label="MOD_FLEXIGOOGLEMAP_APIKEY" description="MOD_FLEXIGOOGLEMAP_APIKEY_DESC"
 				require="true" showon="mapapi:googlemap"

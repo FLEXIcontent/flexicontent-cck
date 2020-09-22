@@ -422,6 +422,11 @@
 
 			<field name="" type="separator" default="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_GOOGLE_MAPS_VIEWING_API_KEY" level="level4" class="alert alert-info fcpadded" depend_class="googlemap-api" />
 			<field name="google_maps_static_api_key" type="text" default="" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_GOOGLE_MAPS_API_KEY_VIEWING" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_GOOGLE_MAPS_API_KEY_VIEWING_DESC" depend_class="googlemap-api" />
+			<field
+				name="os_tile_server_url" type="text" default=""
+				label="Tile (Map) Server URL" description="Enter a custom tile server URL (of Openstreet Maps). If you are going to be having a lot of traffic it is best to setup your own tiles server for hosting your map tiles, e.g. https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png"
+				depend_class="openstreetmap-api"
+			/>
 
 		</fieldset>
 		<fieldset name="group-addressint-fields" hidden="true" icon_class="icon-link" label="FLEXI_PROPERTIES_AS_FIELDS" addfieldpath="/administrator/components/com_flexicontent/elements">

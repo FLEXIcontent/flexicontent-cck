@@ -87,6 +87,9 @@ switch ($mapapi)
 		break;
 	case 'openstreetmap';
 		flexicontent_html::loadFramework('openstreetmap', '', $params);
+
+		// Get OS Map TILE server
+		$os_tile_server_url = $params->get('os_tile_server_url', 'https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png');
 		break;
 }
 ?>
@@ -246,7 +249,7 @@ switch ($mapapi)
 			}
 			?>
 			// Title display
-			L.tileLayer('https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png',
+			L.tileLayer('<?php echo $os_tile_server_url; ?>',
 			{
 				// Datas sources
 				attribution: '<?php echo JText::_('OPENSTREETMAP_ATTRIBUTION_TXT'); ?>',
