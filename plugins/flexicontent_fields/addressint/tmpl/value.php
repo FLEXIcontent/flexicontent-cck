@@ -31,6 +31,8 @@ if ($map_api === 'googlemap')
 }
 else  //  $map_api === 'openstreetmap'
 {
+	// Get OS Map TILE server
+	$os_tile_server_url = $field->parameters->get('os_tile_server_url', 'https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png');
 }
 
 
@@ -346,7 +348,7 @@ foreach ($this->values as $n => $value)
 
 			$js_perValue[] = '
 				theMap = L.map("' . $map_tagid . '").setView(['.($value['lat'] ? $value['lat'] : '0').','.($value['lon'] ? $value['lon'] : '0').'], '.($value['zoom'] ? $value['zoom'] : $map_zoom).');
-				L.tileLayer(\'https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png\',
+				L.tileLayer(\'' . $os_tile_server_url . '\',
 				{
 					attribution: \'données © <a href="//osm.org/copyright">OpenStreetMap</a>/ODbL - rendu <a href="//openstreetmap.fr">OSM France</a>\',
 					minZoom: 1,
