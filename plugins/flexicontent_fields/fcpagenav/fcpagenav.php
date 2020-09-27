@@ -298,25 +298,6 @@ class plgFlexicontent_fieldsFcpagenav extends FCField
 
 		// $html variable , should be set by the layout file
 		$field->{$prop} = isset($html) ? $html : $field->{$prop};
-
-		// Do not convert the array to string if field is in a group, and do not add: FIELD's opentag, closetag, value separator
-		if (!$is_ingroup)
-		{
-			// Apply values separator
-			$field->{$prop} = implode($separatorf, $field->{$prop});
-
-			if ($field->{$prop} !== '')
-			{
-				// Apply field 's opening / closing texts
-				$field->{$prop} = $opentag . $field->{$prop} . $closetag;
-
-				// Add microdata once for all values, if field -- is NOT -- in a field group
-				if ($itemprop)
-				{
-					$field->{$prop} = '<div style="display:inline" itemprop="'.$itemprop.'" >' .$field->{$prop}. '</div>';
-				}
-			}
-		}
 	}
 
 
