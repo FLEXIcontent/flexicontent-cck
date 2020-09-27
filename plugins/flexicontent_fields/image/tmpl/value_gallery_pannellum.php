@@ -23,6 +23,10 @@ elseif (static::$isMobile)
 	echo $mobile_size = isset(self::$index_to_thumb_size[$mobile_size]) ? self::$index_to_thumb_size[$mobile_size] : '';
 }
 
+$image_source     = $image_source = (int) $field->parameters->get('image_source', 0);
+$protect_original = $image_source < 1 ? 0 : $field->parameters->get('protect_original', 1);
+
+
 // ***
 // *** Values loop
 // ***
@@ -31,6 +35,17 @@ $i = -1;
 
 foreach ($values as $n => $value)
 {
+	if ($protect_original)
+	{
+		$field->{$prop}[] = '<div class="alert alert-warning">'
+			. 'Aborting loading of gallery code.<br>'
+			. 'Original file is protected from direct access.<br>'
+			. 'Inside field\'s configuration <i>(Editing TAB / Image Source TAB)</i> please turn off:<br>'
+			. ' &nbsp; <b>"Prevent access to original images"</b>'
+			. '</div>';
+		continue;
+	}
+
 	// Include common layout code for preparing values, but you may copy here to customize
 	$result = include( JPATH_ROOT . '/plugins/flexicontent_fields/image/tmpl_common/prepare_value_display.php' );
 	if ($result === _FC_CONTINUE_) continue;
@@ -65,7 +80,7 @@ foreach ($values as $n => $value)
 	<script>
 		pannellum.viewer(\'panorama_' . $uniqueid . '\', {
 			"type": "equirectangular",
-			"panorama": "' . JUri::root(true).'/'.$src . '",
+			"panorama": "' . JUri::root(true).'/'.$srco . '",
 			"preview": "' . $ABS_SRC . '",
 			"title": "' . $title_encoded . '",
 		});
