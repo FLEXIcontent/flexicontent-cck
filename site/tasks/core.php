@@ -424,6 +424,8 @@ class FlexicontentTasksCore
 	 */
 	private function _getTags($text = '', $limit = 500)
 	{
+		if (!defined('FLEXI_FISH'))    define('FLEXI_FISH'		, ($params->get('flexi_fish', 0) && (JPluginHelper::isEnabled('system', 'falangdriver' ))) ? 1 : 0);
+
 		$app     = JFactory::getApplication();
 		$jinput  = $app->input;
 		if ($jinput->get('task', '', 'cmd') == __FUNCTION__) die(__FUNCTION__ . ' : direct call not allowed');
@@ -441,19 +443,26 @@ class FlexicontentTasksCore
 		$lang = $db->setQuery($query)->loadObject();
 
 		$query = $db->getQuery(true)
-			->select('ft.*, fa.value AS fa_text')
+			->select('ft.*')
 			->from('#__flexicontent_tags AS ft')
-			->leftjoin('#__falang_content AS fa ON fa.reference_table = "tags" AND fa.reference_field = "title" AND fa.reference_id = ft.jtag_id')
 			->where('ft.published = 1')
 			->order('ft.name')
 			;
+
+		!FLEXI_FALANG
+			? $query->select('"" AS fa_text')
+			:	$query
+					->select('fa.value AS fa_text')
+					->leftjoin('#__falang_content AS fa ON fa.reference_table = "tags" AND fa.reference_field = "title" AND fa.reference_id = ft.jtag_id');
 
 		if (trim($text))
 		{
 			$escaped_text = $db->escape($text, true);
 			$quoted_text  = $db->Quote('%' . $escaped_text . '%', false);
 
-			$query->where('ft.name LIKE ' . $quoted_text . ' OR (fa.language_id = ' . (int) $lang->lang_id . ' AND fa.value LIKE ' . $quoted_text . ')');
+			!FLEXI_FALANG
+				? $query->where('name LIKE ' . $quoted_text)
+				: $query->where('ft.name LIKE ' . $quoted_text . ' OR (fa.language_id = ' . (int) $lang->lang_id . ' AND fa.value LIKE ' . $quoted_text . ')');
 		}
 
 		$tags = $db->setQuery($query, 0, (int) $limit)->loadObjectlist();
