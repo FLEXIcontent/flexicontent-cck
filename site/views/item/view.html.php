@@ -586,7 +586,7 @@ class FlexicontentViewItem extends JViewLegacy
 
 		// Get the item, loading item data and doing parameters merging,
 		// check_view_access: false, will return false if item is not found
-		$item = $model->getItem(null, $check_view_access=false, $no_cache=false, $force_version=($version!=0 ? $version : -1));  // -1 version means latest
+		$item = $model->getItem(null, $check_view_access=false, $no_cache=true, $force_version=($version!=0 ? $version : -1));  // -1 version means latest
 
 		if (!$item)
 		{
