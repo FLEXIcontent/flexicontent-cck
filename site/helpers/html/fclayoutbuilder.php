@@ -355,13 +355,14 @@ abstract class JHtmlFclayoutbuilder
 
 			var editor = grapesjs.init({
 
-				//TODO need to find solution for add current template.css inside canvas for now this code is regular but kill the js
+				//TODO check loading css in canvas and real url
 				canvas: {
-				styles: [\'http://localhost/flexi-dev/templates/shaper_helix3/css/template.css\']
+				styles: [\'http://localhost/flexidev/templates/shaper_helix3/css/template.css\']
 				},
 
 
 				avoidInlineStyle: false,
+				// allow to move 
 				dragMode: \'absolute\',
 
 				// Indicate where to init the editor. You can also pass an HTMLElement
@@ -397,10 +398,8 @@ abstract class JHtmlFclayoutbuilder
 					\'grapesjs-touch\',
 					\'grapesjs-parser-postcss\',
 					\'grapesjs-tooltip\',
-		\\TODO load ck editor ! https://github.com/artf/grapesjs-plugin-ckeditor
-		\\ or check block header https://github.com/olivmonnier/grapesjs-plugin-header
-					\'gjs-plugin-ckeditor',
-					\'grapesjs-plugin-header',
+					\'gjs-plugin-ckeditor\',
+					//\'grapesjs-plugin-header\',
 				],
 
 				pluginsOpts: {
@@ -418,6 +417,9 @@ abstract class JHtmlFclayoutbuilder
 						tabsBlock: {
 							category: \'Extra\'
 						}
+					},
+					\'gjs-plugin-ckeditor\': {
+						//need to specific tool bar
 					},
 					\'gjs-preset-webpage\': {
 						modalImportTitle: \'Import Template\',

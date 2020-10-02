@@ -1346,7 +1346,7 @@ class flexicontent_html
 				$framework_path = JUri::root(true).$lib_path.'/grapesjs';
 
 				$document->addStyleSheet($framework_path.'/stylesheets/toastr.min.css');
-				$document->addStyleSheet('https://unpkg.com/grapesjs@0.16.2/dist/css/grapes.min.css'); //stylesheets/grapes.min.css?v0.14.49
+				$document->addStyleSheet('https://unpkg.com/grapesjs@0.16.22/dist/css/grapes.min.css'); //stylesheets/grapes.min.css?v0.14.49
 				$document->addStyleSheet($framework_path.'/stylesheets/grapesjs-preset-webpage.min.css?0.1.10');
 				$document->addStyleSheet($framework_path.'/stylesheets/tooltip.css');
 				$document->addStyleSheet($framework_path.'/stylesheets/grapesjs-plugin-filestack.css');
@@ -1354,7 +1354,8 @@ class flexicontent_html
 
 				$document->addScript('https://static.filestackapi.com/v3/filestack.js');
 				$document->addScript($framework_path.'/js/toastr.min.js');
-				$document->addScript('https://unpkg.com/grapesjs@0.16.2/dist/grapes.js');  //js/grapes.min.js?v0.14.49
+				$document->addScript('https://unpkg.com/grapesjs@0.16.22/dist/grapes.js');  //js/grapes.min.js?v0.14.49
+
 
 				// GrapesJS Plugins
 				//$document->addScript('https://unpkg.com/grapesjs-blocks-basic');
@@ -1365,6 +1366,9 @@ class flexicontent_html
 				$document->addScript($framework_path.'/js/grapesjs-touch.min.js?0.1.1');
 				$document->addScript($framework_path.'/js/grapesjs-parser-postcss.min.js?0.1.1');
 				$document->addScript($framework_path.'/js/grapesjs-tooltip.min.js?0.1.1');
+				//ckeditor for graps
+				$document->addScript($framework_path.'/js/grapesjs-plugin-ckeditor.min.js?0.0.9');
+				$document->addScript('https://cdn.ckeditor.com/4.14.1/standard-all/ckeditor.js');
 				break;
 
 			case 'grapesjs_view':
