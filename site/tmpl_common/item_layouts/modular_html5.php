@@ -319,10 +319,10 @@ $microdata_itemtype_code = 'itemscope itemtype="http://schema.org/'.$microdata_i
 				$top_span_cols     = (int) $this->params->get('top_span_cols', 8);
 
 				$top_span_cols     = $top_span_cols < 1 || $top_span_cols > 12 ? 8 : $top_span_cols;
-				$img_span_cols     = 12 - $top_span_cols > 0 ? 12 - $top_span_cols : 12;
+				$img_span_cols     = 12 - $top_span_num > 0 ? 12 - $top_span_num : 12;
 
 				$imgPos_widthClass = 'span' . $img_span_cols;
-				$topPos_widthClass = 'span' . $top_span_cols;
+				$topPos_widthClass = 'span' . $top_span_num;
 
 				$box_class_image .= (!$has_output_top ? ' span12' : ' ' . $imgPos_widthClass);
 				$box_class_top   .= (!$has_output_image ? ' span12' : ' '. $topPos_widthClass);
