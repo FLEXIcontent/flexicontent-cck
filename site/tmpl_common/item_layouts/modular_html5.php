@@ -315,18 +315,26 @@ $microdata_itemtype_code = 'itemscope itemtype="http://schema.org/'.$microdata_i
 						$has_output_top = $has_output_top || strlen($field->display);
 					}
 				}
-				
-				$box_class_image .= (!$has_output_top ? ' span12' : ' span4');
-				$box_class_top   .= (!$has_output_image ? ' span12' : ' span8');
+
+				$top_span_cols     = (int) $this->params->get('top_span_cols', 8);
+
+				$top_span_cols     = $top_span_cols < 1 || $top_span_cols > 12 ? 8 : $top_span_cols;
+				$img_span_cols     = 12 - $top_span_num > 0 ? 12 - $top_span_num : 12;
+
+				$imgPos_widthClass = 'span' . $img_span_cols;
+				$topPos_widthClass = 'span' . $top_span_num;
+
+				$box_class_image .= (!$has_output_top ? ' span12' : ' ' . $imgPos_widthClass);
+				$box_class_top   .= (!$has_output_image ? ' span12' : ' '. $topPos_widthClass);
 			?>
 			
 			<?php if (isset($item->positions['image'])) : ?>
 				<!-- BOF image block -->
 				<?php foreach ($item->positions['image'] as $field) : ?>
-				<figure class="<?php echo $box_class_image; ?> field_<?php echo $field->name; ?>">
+				<div class="<?php echo $box_class_image; ?> field_<?php echo $field->name; ?>">
 					<?php echo $field->display; ?>
 					<div class="fcclear"></div>
-				</figure>
+				</div>
 				<?php endforeach; ?>
 				<!-- EOF image block -->
 			<?php endif; ?>
