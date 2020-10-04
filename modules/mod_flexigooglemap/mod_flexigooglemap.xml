@@ -90,6 +90,8 @@
 				require="true" showon="mapapi:googlemap"
 			/>
 			<field name="" type="separator" default="MOD_FLEXIGOOGLEMAP_DISPLAY" level="level1" />
+
+			<field name="" type="separator" default="External container" level="level4" class="alert alert-info fcpadded" />
 			<field
 				name="maptype" type="list" default="ROADMAP"
 				label="MOD_FLEXIGOOGLEMAP_MAPTYPE" description="MOD_FLEXIGOOGLEMAP_MAPTYPE_DESC" showon="mapapi:googlemap"
@@ -132,6 +134,17 @@
 				<option	value="DESC LIMIT 450">450</option>
 				<option	value="DESC LIMIT 500">500</option>
 				<option	value="DESC LIMIT 1000">1000</option>
+			</field>
+
+			<field name="" type="separator" default="Viewport's Marker List" level="level2" />
+			<field
+				name="use_dynamic_marker_list" type="radio"
+				default="0" label="FLEXI_DISPLAY"
+				description="Show and dynamically update a list of markers, that currently visible according to current viewport of the map."
+				class="btn-group"
+				>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
 			</field>
 
 			<field name="" type="separator" default="MOD_FLEXIGOOGLEMAP_MARKERSDISPLAY" level="level2" />
@@ -181,7 +194,15 @@
 			/>
 
 			<field name="" type="separator" default="MOD_FLEXIGOOGLEMAP_BEHAVIOUR_N_STYLE" level="level3" />
-			<field name="" type="separator" default="FLEXI_NA" level="level4" class="alert alert-info fcpadded" showon="mapapi:openstreetmap" />
+			<field
+				name="usescrollmouse" type="radio"
+				default="1" label="MOD_FLEXIGOOGLEMAP_USESCROLLMOUSE"
+				description="MOD_FLEXIGOOGLEMAP_USESCROLLMOUSE_DESC"
+				class="btn-group"
+				>
+				<option value="false">MOD_FLEXIGOOGLEMAP_NO</option>
+				<option value="true">MOD_FLEXIGOOGLEMAP_YES</option>
+			</field>
 			<field
 				name="animationmarker" type="radio"
 				default="1" label="MOD_FLEXIGOOGLEMAP_ANIMATIONMARKER"
