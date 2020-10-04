@@ -62,7 +62,6 @@ $maxzoom  = $params->get('maxzoom', '');
 $ratiomap = $params->get('ratiomap','');
 $usescrollmouse = $params->get('usescrollmouse','true');
 
-
 $clustermode = $params->get('clustermode', '' );
 if ($clustermode)
 {
@@ -94,14 +93,30 @@ switch ($mapapi)
 		$os_tile_server_url = $params->get('os_tile_server_url', 'https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png');
 		break;
 }
+
+$use_mlist = (int) $params->get('use_dynamic_marker_list', 0);
 ?>
 
 
 <?php /* Module container*/ ?>
-<div id="mod_fleximap_default<?php echo $module->id;?>" class="mod_fleximap map<?php echo $moduleclass_sfx ?>" style="width:<?php echo $width; ?>;height:<?php echo $height; ?>;">
 
-	<?php /* Map container*/ ?>
-	<div id="fc_module_map_<?php echo $module->id;?>" style="width:<?php echo $width; ?>;height:<?php echo $height; ?>;">
+<div id="mod_fleximap_default<?php echo $module->id;?>" class="mod_fleximap map<?php echo $moduleclass_sfx ?>" style="display: contents;">
+
+	<div class="row">
+
+    <div class="<?php echo $use_mlist ? 'span8' : 'span12'; ?>">
+			<?php /* Map container*/ ?>
+			<div style="width:<?php echo $width; ?>; height:<?php echo $height; ?>; max-width: 100%;">
+				<div id="fc_module_map_<?php echo $module->id;?>" style="width:<?php echo $width; ?>; height:<?php echo $height; ?>; max-width: 100%;"></div>
+			</div>
+
+    </div>
+
+    <?php if ($use_mlist) : ?>
+    <div class="span4">
+			<ol id="fc_module_marker_list_<?php echo $module->id;?>" class="fc_module_marker_list" style="height:<?php echo $height; ?>; overflow-y: scroll; overflow-x: hidden;" ></ol>
+    </div>
+    <?php endif; ?>
 	</div>
 
 </div>
@@ -112,6 +127,55 @@ switch ($mapapi)
 
 	<script type="text/javascript" src="modules/mod_flexigooglemap/assets/js/markerclusterer.js"></script>
 	<script>
+
+		function fc_MapMod_addToVisibleList_<?php echo $module->id;?>(map, marker)
+		{
+			var ol = document.getElementById("fc_module_marker_list_<?php echo $module->id;?>");
+			if (!!!ol) return;
+
+			var li = document.createElement("li");
+			li.innerHTML = marker._location_info;
+
+			/*var btn = document.createElement("button");
+			btn.innerHTML = 'Center';
+			btn._map_ref = map;
+			btn._marker_ref = marker;
+			btn.setAttribute('onclick', "this._map_ref.setCenter(this._marker_ref.getPosition());");
+			li.appendChild(btn);*/
+
+			var btn2 = document.createElement("button");
+			btn2.innerHTML = 'Highlight';
+			btn2._map_ref = map;
+			btn2._marker_ref = marker;
+			btn2.setAttribute('onclick', "new google.maps.event.trigger(this._marker_ref, 'click');");
+			li.appendChild(btn2);
+
+			//window.console.log(marker);
+			ol.appendChild(li);
+		};
+
+		function fc_MapMod_updateVisibleMarkerList_<?php echo $module->id;?>(map, markers)
+		{
+			//window.console.log('bounds_changed');
+			// Get our current map view bounds.
+			// Create a new bounds object so we don't affect the map.
+
+			var ol = document.getElementById("fc_module_marker_list_<?php echo $module->id;?>");
+			if (!!!ol) return;
+
+			ol.innerHTML = "";
+
+			var mapBounds = new google.maps.LatLngBounds(map.getBounds().getSouthWest(),
+					map.getBounds().getNorthEast());
+			var bounds = mapBounds;
+
+			for (var i = 0, marker; marker = markers[i]; i++) {
+				if (bounds.contains(marker.getPosition()))
+				{
+					fc_MapMod_addToVisibleList_<?php echo $module->id;?>(map, marker);
+				}
+			}
+		};
 
 		function fc_MapMod_autoCenter_<?php echo $module->id;?>(map, markers)
 		{
@@ -125,6 +189,16 @@ switch ($mapapi)
 			map.fitBounds(bounds);
 		}
 
+
+		function fc_MapMod_resizeMap_<?php echo $module->id;?>(map)
+		{
+			//window.console.log('resizing');
+			var center = map.getCenter();
+			google.maps.event.trigger(map, "resize");
+			map.setCenter(center);
+		}
+
+
 		function fc_MapMod_initialize_<?php echo $module->id;?>()
 		{
 			// Define your locations: HTML content for the info window, latitude, longitude
@@ -136,7 +210,7 @@ switch ($mapapi)
 				mapTypeId: google.maps.MapTypeId.<?php echo $maptype;?>,
 				mapTypeControl: false,
 				streetViewControl: false,
-                scrollwheel: <?php echo $usescrollmouse;?>,
+				scrollwheel: <?php echo $usescrollmouse;?>,
 				panControl: false,
 				styles:[<?php echo $mapstyle; ?>],
 				zoomControlOptions: {
@@ -181,6 +255,7 @@ switch ($mapapi)
 						: '');
 					?>
 				});
+				marker._location_info = locations[i][0];
 
 				markers.push(marker);
 
@@ -198,10 +273,17 @@ switch ($mapapi)
 				}
 				?>
 
-				google.maps.event.addDomListener(window, "resize", function() {
-					var center = map.getCenter();
-					google.maps.event.trigger(map, "resize");
-					map.setCenter(center);
+				var fc_MapMod_resizeMap_debounced_<?php echo $module->id;?> = fc_debounce_exec(fc_MapMod_resizeMap_<?php echo $module->id;?>, 200, false, null);
+				var fc_MapMod_updateVisibleMarkerList_debounced_<?php echo $module->id;?> = fc_debounce_exec(fc_MapMod_updateVisibleMarkerList_<?php echo $module->id;?>, 200, false, null);
+
+				google.maps.event.addDomListener(window, "resize", function()
+				{
+					fc_MapMod_resizeMap_debounced_<?php echo $module->id;?>(map);
+				});
+
+				google.maps.event.addDomListener(map, "bounds_changed", function()
+				{
+					fc_MapMod_updateVisibleMarkerList_debounced_<?php echo $module->id;?>(map, markers);
 				});
 			}
 
@@ -236,6 +318,55 @@ switch ($mapapi)
 
 	<script type="text/javascript">
 
+
+		function fc_MapMod_addToVisibleList_<?php echo $module->id;?>(map, marker)
+		{
+			var ol = document.getElementById("fc_module_marker_list_<?php echo $module->id;?>");
+			if (!!!ol) return;
+
+			var li = document.createElement("li");
+			li.innerHTML = marker._location_info;
+
+			/*var btn = document.createElement("button");
+			btn.innerHTML = 'Center';
+			btn._map_ref = map;
+			btn._marker_ref = marker;
+			btn.setAttribute('onclick', "this._map_ref.setView(this._marker_ref.getLatLng(),5);");
+			li.appendChild(btn);*/
+			
+			var btn2 = document.createElement("button");
+			btn2.innerHTML = 'Highlight';
+			btn2._map_ref = map;
+			btn2._marker_ref = marker;
+			btn2.setAttribute('onclick', "this._marker_ref.fire('click');");
+			li.appendChild(btn2);
+
+			//window.console.log(marker);
+			ol.appendChild(li);
+		};
+
+		function fc_MapMod_updateVisibleMarkerList_<?php echo $module->id;?>(map, markers)
+		{
+			//window.console.log('bounds_changed');
+			// Get our current map view bounds.
+			// Create a new bounds object so we don't affect the map.
+			var ol = document.getElementById("fc_module_marker_list_<?php echo $module->id;?>");
+			if (!!!ol) return;
+
+			ol.innerHTML = "";
+
+			var mapBounds = map.getBounds();
+			var bounds = mapBounds;
+
+			for (var i = 0, marker; marker = markers[i]; i++) {
+				if (marker instanceof L.Marker && bounds.contains(marker.getLatLng()))
+				{
+					fc_MapMod_addToVisibleList_<?php echo $module->id;?>(map, marker);
+				}
+			}
+		};
+
+
 		function fc_MapMod_initialize_<?php echo $module->id;?>()
 		{
 			var locations = [ <?php echo implode(",",  $renderedMapLocations); ?>  ];
@@ -246,7 +377,7 @@ switch ($mapapi)
 			var lat = 48.852969;
 			var lon = 2.349903;
 
-			theMap_<?php echo $module->id;?> = L.map('fc_module_map_<?php echo $module->id;?>',{scrollWheelZoom: <?php echo $usescrollmouse;?>}).setView([lat, lon],11);
+			var map = L.map('fc_module_map_<?php echo $module->id;?>',{scrollWheelZoom: <?php echo $usescrollmouse;?>}).setView([lat, lon],11);
 			<?php if ($clustermode) {
 				echo "markerClusters = L.markerClusterGroup({ disableClusteringAtZoom: ".$maxzoommarker.",removeOutsideVisibleBounds:true,animate:true, maxClusterRadius :".$gridsize," }); ";// create cluster and add zoom limitation
 			}
@@ -259,7 +390,7 @@ switch ($mapapi)
 				minZoom: 1,
 				maxZoom: <?php echo $maxzoom; ?>
 			})
-			.addTo(theMap_<?php echo $module->id;?>);
+			.addTo(map);
 
 			var defaultMarkerIcon = <?php echo !$defaultMarkerURL ? 'null' : 'L.icon({
 				iconUrl: \'' . $defaultMarkerURL . '\',
@@ -288,6 +419,8 @@ switch ($mapapi)
 					marker = new L.marker( [locations[i][1], locations[i][2]] );
 				}
 
+				marker._location_info = locations[i][0];
+
 				marker
 					<?php /* Display information window on marker click */
 					echo $info_popup ? '
@@ -296,7 +429,7 @@ switch ($mapapi)
 
 					<?php /* Add single location marker */
 					echo !$clustermode ? '
-					.addTo(theMap_' . $module->id . ');
+					.addTo(map);
 					' : ''; ?>
 				;
 
@@ -308,9 +441,17 @@ switch ($mapapi)
 			var group = new L.featureGroup(markers);
 
 			<?php echo $clustermode ?
-			'theMap_' . $module->id . '.addLayer(markerClusters);' : ''; ?>
+			'map.addLayer(markerClusters);' : ''; ?>
 
-			theMap_<?php echo $module->id;?>.fitBounds(group.getBounds().pad(0.5));
+			map.fitBounds(group.getBounds().pad(0.5));
+
+			fc_MapMod_updateVisibleMarkerList_<?php echo $module->id;?>(map, markers);				
+
+			map.on('moveend', function(e)
+			{
+				//window.console.log('moveend');
+				fc_MapMod_updateVisibleMarkerList_<?php echo $module->id;?>(map, markers);				
+			});
 		}
 
 		// Initialize the Map
