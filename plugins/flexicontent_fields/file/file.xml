@@ -246,6 +246,7 @@
 			<field name="show_acc_msg" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_FIELD_SHOW_NOACCESS" description="FLEXI_FIELD_SHOW_NOACCESS_DESC" class="btn-group btn-group-yesno">
 				<option value="0" show_list="" hide_list="field-acc-msg">FLEXI_NO</option>
 				<option value="1" show_list="field-acc-msg" hide_list="">FLEXI_YES</option>
+				<option value="2" show_list="field-acc-msg" hide_list="">FLEXI_YES_APPEND_LOGIN_LINK</option>
 			</field>
 			<field name="no_acc_msg" type="text" default="" label="FLEXI_FIELD_NOACCESS_MSG" description="FLEXI_FIELD_NOACCESS_MSG_DESC" depend_class="field-acc-msg"/>
 
