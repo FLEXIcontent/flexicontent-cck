@@ -957,8 +957,31 @@ class plgFlexicontent_fieldsFile extends FCField
 		$noaccess_addvars      = $field->parameters->get( 'noaccess_addvars', 0);
 
 		// Select appropriate messages depending if user is logged on
-		$noaccess_url = JFactory::getUser()->guest ? $noaccess_url_unlogged : $noaccess_url_logged;
-		$noaccess_msg = JFactory::getUser()->guest ? $noaccess_msg_unlogged : $noaccess_msg_logged;
+		if (JFactory::getUser()->guest)
+		{
+			if ($noaccess_url_unlogged)
+			{
+				$noaccess_url = $noaccess_url_unlogged;
+			}
+			else
+			{
+				$uri  = JUri::getInstance();
+
+				$return   = strtr(base64_encode($uri->toString()), '+/=', '-_,');          // Current URL as return URL (but we will for id / cid)
+				$fcreturn = serialize( array('id' => $app->input->getInt('id'), 'cid' => $app->input->getInt('cid')) );  // a special url parameter, used by some SEF code
+				$noaccess_url = JComponentHelper::getParams( 'com_flexicontent' )->get('login_page', 'index.php?option=com_users&view=login')
+					. '&return='.$return
+					. '&fcreturn='.base64_encode($fcreturn);
+			}
+
+			$noaccess_msg = $noaccess_msg_unlogged;
+		}
+		else
+		{
+			$noaccess_url = $noaccess_url_logged;
+			$noaccess_msg = $noaccess_msg_logged;
+		}
+
 
 		// VERIFY downloads manager module is installed and enabled
 		static $mod_is_enabled = null;

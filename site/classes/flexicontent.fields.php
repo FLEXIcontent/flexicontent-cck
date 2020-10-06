@@ -801,6 +801,30 @@ class FlexicontentFields
 			$show_acc_msg = $first_item_field->parameters->get('show_acc_msg', 0);
 			$no_acc_msg = $first_item_field->parameters->get('no_acc_msg');
 			$no_acc_msg = JText::_( $no_acc_msg ? $no_acc_msg : 'FLEXI_FIELD_NO_ACCESS');
+			
+			static $login_link = null;
+
+			if ($show_acc_msg == 2 && $login_link === null)
+			{
+				if (JFactory::getUser()->guest)
+				{
+					$uri      = JUri::getInstance();
+					$return   = strtr(base64_encode($uri->toString()), '+/=', '-_,');          // Current URL as return URL (but we will for id / cid)
+					$fcreturn = serialize( array('id' => $app->input->getInt('id'), 'cid' => $app->input->getInt('cid')) );  // a special url parameter, used by some SEF code
+					$login_link = JComponentHelper::getParams( 'com_flexicontent' )->get('login_page', 'index.php?option=com_users&view=login')
+						. '&return='.$return
+						. '&fcreturn='.base64_encode($fcreturn);
+				}
+				else
+				{
+					$login_link = '';
+				}
+			}
+
+			$no_acc_msg .= $show_acc_msg == 2
+				? '<a class="fc_no_field_access_login_link" href="' . $login_link . '">' . JText::_('FLEXI_LOGIN_FIRST') . '</a>'
+				: '';
+
 			foreach($items as $item)
 			{
 				// Only rendering 1 item the field object was given, skip current item if it does not have the desired field
