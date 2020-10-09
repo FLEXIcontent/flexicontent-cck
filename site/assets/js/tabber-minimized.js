@@ -92,8 +92,11 @@ function tabberObj(argsObj)
 	/* Class of each DIV that contains a tab */
 	this.classTab = "tabbertab";
 
-	/* Class to indicate which tab should be active on startup */
+	/* Class to indicate which tab should be active on startup by default */
 	this.classTabDefault = "tabbertabdefault";
+
+	/* Class to indicate which tab should be active on startup ignoring cookie*/
+	this.classTabForced = "tabbertabforced";
 
 	/* Class for the navigation UL */
 	this.classNav = "tabbernav";
@@ -155,6 +158,7 @@ function tabberObj(argsObj)
 	this.REclassMainLive = new RegExp('\\b' + this.classMainLive + '\\b', 'gi');
 	this.REclassTab = new RegExp('\\b' + this.classTab + '\\b', 'gi');
 	this.REclassTabDefault = new RegExp('\\b' + this.classTabDefault + '\\b', 'gi');
+	this.REclassTabForced = new RegExp('\\b' + this.classTabForced + '\\b', 'gi');
 	this.REclassTabHide = new RegExp('\\b' + this.classTabHide + '\\b', 'gi');
 
 	/* Array of objects holding info about each tab */
@@ -193,6 +197,7 @@ tabberObj.prototype.init = function(e)
 	i, i2, /* loop indices */
 	t, /* object to store info about a single tab */
 	defaultTab=0, /* which tab to select by default */
+	forcedTab=-1,  /* activate specific tab ignoring last set cookie */
 	DOM_ul, /* tabbernav list */
 	DOM_li, /* tabbernav list item */
 	DOM_a, /* tabbernav link */
@@ -234,6 +239,14 @@ tabberObj.prototype.init = function(e)
 			if (childNodes[i].className.match(this.REclassTabDefault))
 			{
 				defaultTab = this.tabs.length-1;
+			}
+
+			/* If the class name contains classTabForced,
+				 then select this tab by default.
+			*/
+			if (childNodes[i].className.match(this.REclassTabForced))
+			{
+				forcedTab = this.tabs.length-1;
 			}
 		}
 	}
@@ -285,6 +298,9 @@ tabberObj.prototype.init = function(e)
 					t.headingDataTitle = headingElement.dataset.title;
 					t.headingContent = headingElement.dataset.content;
 					t.headingPlacement = headingElement.dataset.placement;
+					t.headingDataAttrA = headingElement.dataset.data_attr_a;
+					t.headingDataAttrB = headingElement.dataset.data_attr_b;
+					t.headingOnMouseUp = headingElement.onmouseup;
 					if (headingElement.hasAttribute('class'))
 					{
 						tab_classes=headingElement.getAttribute('class');
@@ -352,6 +368,18 @@ tabberObj.prototype.init = function(e)
 		{
 			DOM_a.dataset.placement = t.headingPlacement;
 		}
+		if (t.headingDataAttrA)
+		{
+			DOM_a.dataset.data_attr_a = t.headingDataAttrA;
+		}
+		if (t.headingDataAttrB)
+		{
+			DOM_a.dataset.data_attr_b = t.headingDataAttrB;
+		}
+		if (t.headingOnMouseUp)
+		{
+			DOM_a.onmouseup = t.headingOnMouseUp;
+		}
 
 		DOM_a.onclick = this.navClick;
 		if (tab_classes)
@@ -362,6 +390,7 @@ tabberObj.prototype.init = function(e)
 		/* Add some properties to the link so we can identify which tab
 			 was clicked. Later the navClick method will need this.
 		*/
+		this.forcedTab = forcedTab;
 		DOM_a.tabber = this;
 		DOM_a.tabberIndex = i;
 
@@ -413,8 +442,8 @@ tabberObj.prototype.init = function(e)
 	/* Make the tabber div "live" so different CSS can be applied */
 	e.className = e.className.replace(this.REclassMain, this.classMainLive);
 
-	/* Activate the default tab, and do not call the onclick handler */
-	this.tabShow(defaultTab);
+	/* Activate the default or forced tab, and do not call the onclick handler */
+	this.tabShow(forcedTab >= 0 ? forcedTab : defaultTab);
 
 	/* If the user specified an onLoad function, call it now. */
 	if (typeof this.onLoad == 'function') {
@@ -763,7 +792,9 @@ var tabberOptions =
 		/* If a cookie was previously set, restore the active tab */
 		i = parseInt(tabberGetCookie(t.cookie));
 
-		if (isNaN(i)) { return; }
+window.console.log(t.forcedTab);
+
+		if (isNaN(i) || t.forcedTab >= 0) { return; }
 		t.tabShow(i);
 	},
 
