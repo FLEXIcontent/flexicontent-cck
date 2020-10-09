@@ -378,6 +378,10 @@
 				<option value="2" show_list="" hide_list="allow_jview">FLEXI_REDIRECT_TO_ITEM_VIEW</option>
 				<option value="1" show_list="allow_jview" hide_list="">FLEXI_YES</option>
 			</field>
+			<field name="create_jarticle_form_links" type="multilist" subtype="radio" default="0" toggle_related="1" label="FLEXI_COMPATIBILITY_EDIT_LINKS" description="FLEXI_COMPATIBILITY_EDIT_LINKS_DESC" class="btn-group group-fcinfo" depend_class="allow_jview">
+				<option value="0" >FC Item form</option>
+				<option value="1" >Joomla Article form</option>
+			</field>
 			<field name="search_jlinks" type="radio" default="1" label="FLEXI_SEARCH_VIEW_LINKS_TYPE" description="FLEXI_SEARCH_VIEW_LINKS_TYPE_DESC" depend_class="allow_jview" class="btn-group group-fcinfo">
 				<option value="0">FLEXI_USE_FCITEMS_LINKS</option>
 				<option value="1">FLEXI_USE_JARTICLE_LINKS</option>
