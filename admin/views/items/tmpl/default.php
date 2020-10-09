@@ -388,6 +388,13 @@ jQuery(document).ready(function(){
 
 <?php
 //echo '<pre>'; print_r($this->itemTypes); echo '</pre>'; exit;
+foreach ($this->itemTypes as $itemType)
+{
+	if (empty($itemType->params))
+	{
+		$itemType->params = new JRegistry($itemType->attribs);
+	}
+}
 
 if ($this->max_tab_types && count($this->itemTypes) >= $this->max_tab_types)
 {
@@ -1001,7 +1008,25 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 				 * Display title with edit link ... (row editable and not checked out)
 				 * Display title with no edit link ... if row is not-editable for any reason (no ACL or checked-out by other user)
 				 */
-				echo JHtml::_($hlpname . '.edit_link', $row, $i, $row->canEdit);
+				echo !empty($this->itemTypes[$row->type_id]) && (int) $this->itemTypes[$row->type_id]->params->get('create_jarticle_form_links' , 0)
+					? JHtml::_($hlpname . '.edit_link', $row, $i, $row->canEdit, $config = array(
+							'option'   => 'com_content',
+							'ctrl'     => 'article',
+							//'url_data' => '&amp;tmpl=component',
+							'keyname'  => 'id',
+							'noTitle'  => false,
+							'linkedPrefix' => '', //'<span class="icon-pencil-2"></span>',
+							'attribs' => array(
+								'class'       => '',
+								'title'       => JText::_('FLEXI_EDIT'),
+							),
+							'useModal' => (object) array(
+								'title'       => 'FLEXI_EDIT',
+								'onloadfunc'  => 'fc_edit_jarticle_modal_load',
+								'onclosefunc' => 'fc_edit_jarticle_modal_close',
+							),
+						))
+					: JHtml::_($hlpname . '.edit_link', $row, $i, $row->canEdit);
 				?>
 			</td>
 
@@ -1270,3 +1295,20 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 
 </form>
 </div><!-- #flexicontent end -->
+
+<?php
+JFactory::getDocument()->addScriptDeclaration('
+	function fc_edit_jarticle_modal_load( container )
+	{
+		if ( container.find("iframe").get(0).contentWindow.location.href.indexOf("view=articles") != -1 )
+		{
+			container.dialog("close");
+		}
+	}
+	function fc_edit_jarticle_modal_close()
+	{
+		//window.location.reload(false);
+		window.location.href = \'index.php?option=com_flexicontent&view=items\';
+		document.body.innerHTML = Joomla.JText._("FLEXI_UPDATING_CONTENTS") + \' <img id="page_loading_img" src="components/com_flexicontent/assets/images/ajax-loader.gif">\';
+	}
+');
