@@ -136,7 +136,6 @@ else
 $ord_grp = 1;
 
 
-
 /**
  * ICONS and reusable variables
  */
@@ -154,6 +153,11 @@ foreach($this->extra_fields as $_field)
 	$field = $_field;
 	FlexicontentFields::renderField($this->rows, $field->name, $values, $field->methodname);
 }
+
+// Load JS tabber lib
+$document->addScript(JUri::root(true).'/components/com_flexicontent/assets/js/tabber-minimized.js', array('version' => FLEXI_VHASH));
+$document->addStyleSheet(JUri::root(true).'/components/com_flexicontent/assets/css/tabber.css', array('version' => FLEXI_VHASH));
+$document->addScriptDeclaration(' document.write(\'<style type="text/css">.fctabber{display:none;}<\/style>\'); ');  // temporarily hide the tabbers until javascript runs
 
 ?>
 
@@ -365,7 +369,6 @@ jQuery(document).ready(function(){
 
 <form action="index.php?option=<?php echo $this->option; ?>&amp;view=<?php echo $this->view; ?>" method="post" name="adminForm" id="adminForm">
 
-
 <div class="<?php echo FLEXI_J40GE ? 'row' : 'row-fluid'; ?>">
 
 <?php if (!empty( $this->sidebar)) : ?>
@@ -380,6 +383,76 @@ jQuery(document).ready(function(){
 	<div id="j-main-container" class="span12 col-md-12">
 
 <?php endif;?>
+
+
+
+<?php
+//echo '<pre>'; print_r($this->itemTypes); echo '</pre>'; exit;
+
+if ($this->max_tab_types && count($this->itemTypes) >= $this->max_tab_types)
+{
+	echo '
+	<div style="min-height: 36px; margin-top: -8px; ">
+		' . $this->lists['filter_type'] . '
+	</div>';
+}
+elseif ($this->max_tab_types && count($this->itemTypes) > 1)
+{
+	echo '
+	<div style="height: 54px; overflow: hidden; margin-top: -8px; ">
+		<div class="fctabber s-cblue" id="items_type_tabset">';
+
+	$filter_type = $this->getModel()->getState('filter_type');
+	$type_class = empty($filter_type) ? ' tabbertabforced' : '';
+	$__tip_class = ''; //' hasTooltip';
+	$__tip_props = ''; //' data-placement="top" data-title="' . JText::_('FLEXI_ALL') . '" ';
+
+	echo '
+		<div class="tabbertab ' . $type_class . '" id="type_tab_all" style="padding-left: 0; padding-right: 0; border-left: 0; border-right: 0; border-bottom: 0;">
+			<h3 class="tabberheading ' . $__tip_class . '" ' . $__tip_props . '
+				onmouseup="jQuery(\'#filter_type\').val([]); jQuery(\'#filter_type\').trigger(\'change\')"
+			>' . JText::_('FLEXI_ALL') . '</h3>
+		</div>
+		';
+
+	if (count($filter_type) > 1)
+	{
+		$type_class  = ' tabbertabforced';
+		$_name = count($filter_type) . ' ' . JText::_('FLEXI_TYPES');
+
+		$__tip_props = ''; //' data-placement="top" data-title="' . $_name . '" ';
+		$__tip_class = ''; //' hasTooltip';
+		echo '
+			<div class="tabbertab ' . $type_class . '" id="type_tab_all" style="padding-left: 0; padding-right: 0; border-left: 0; border-right: 0; border-bottom: 0;">
+				<h3 class="tabberheading ' . $__tip_class . '" ' . $__tip_props . '
+				>' . $_name . '</h3>
+			</div>
+			';
+		}
+
+	reset($this->itemTypes);
+
+	while($itemType = next($this->itemTypes))
+	{
+		$type_class = count($filter_type) == 1 && in_array($itemType->id, $filter_type) ? ' tabbertabforced' : '';
+		$__tip_class = ''; //' hasTooltip';
+		$__tip_props = ''; //' data-placement="top" data-title="' . JText::_( $itemType->name ) . '" ';
+
+		echo '
+			<div class="tabbertab ' . $type_class . '" id="type_tab_' . (int) $itemType->id . '" style="padding-left: 0; padding-right: 0; border-left: 0; border-right: 0; border-bottom: 0;">
+				<h3 class="tabberheading ' . $__tip_class . '" ' . $__tip_props . '
+					data-data_attr_a="' . (int) $itemType->id . '"
+					onmouseup="jQuery(\'#filter_type\').val([this.getAttribute(\'data-data_attr_a\')]); jQuery(\'#filter_type\').trigger(\'change\')"
+				>' . JText::_( $itemType->name ) . '</h3>
+		';
+		echo '</div>';
+	}
+
+	echo '
+		</div>
+	</div>';
+}
+?>
 
 
 	<?php if ($this->unassociated && !$this->badcatitems) : ?>
@@ -463,7 +536,7 @@ jQuery(document).ready(function(){
 					echo $this->lists['filter_fileid'];
 					echo $this->lists['filter_author'];
 					echo $this->lists['filter_tag'];
-					echo $this->lists['filter_type'];
+					if (!$this->max_tab_types || count($this->itemTypes) < $this->max_tab_types) echo $this->lists['filter_type'];
 					echo $this->lists['filter_lang'];
 					echo $this->lists['filter_state'];
 					echo $this->lists['filter_access'];
@@ -501,7 +574,6 @@ jQuery(document).ready(function(){
 			</div>
 
 		</div>
-
 
 		<div class="fc-filter-head-box nowrap_box">
 

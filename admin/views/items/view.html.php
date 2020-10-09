@@ -507,10 +507,27 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 
 
 		// Build item type filter
+		$this->isMobile  = flexicontent_html::getMobileDetector()->isMobile();
+		$this->isTablet  = flexicontent_html::getMobileDetector()->isTablet();
+
+		if ($cparams->get('iman_quick_itype_links', 1))
+		{
+			$this->max_tab_types = !$this->isMobile ? 14 : ($this->isTablet ? 5 : 1);
+		}
+		else
+		{
+			$this->max_tab_types = 0;
+		}
+
+		$filt_label          =  JText::_('FLEXI_TYPE'); //(!$this->max_tab_types || count($types) < $this->max_tab_types) ? JText::_('FLEXI_TYPE') : '';
+		$filt_placeholder    = ''; //$filt_label ? '' : JText::_('FLEXI_TYPE');
+		$filt_label_css      = (!$this->max_tab_types || count($types) < $this->max_tab_types) ? '' : ' fc-lbl-short' /*. ' fc-lbl-inverted'*/;
+
 		if (1)
 		{
 			$lists['filter_type'] = $this->getFilterDisplay(array(
-				'label' => JText::_('FLEXI_TYPE'),
+				'label' => $filt_label,
+				'label_extra_class' => $filt_label_css,
 				'html' => flexicontent_html::buildtypesselect(
 					$types,
 					'filter_type[]',
@@ -523,6 +540,7 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 						'onmouseenter' => 'if (typeof this.oVal == \'undefined\') this.oVal = jQuery(this).val(); this.valChanged = false;',
 						'onchange' => 'this.valChanged = JSON.stringify(this.oVal) !== JSON.stringify(jQuery(this).val()); if (this.valChanged && this != document.activeElement) {document.adminForm.limitstart.value=0; Joomla.submitform();}',
 						'onblur' => 'this.oVal = jQuery(this).val(); if (this.valChanged) {document.adminForm.limitstart.value=0; Joomla.submitform();}',
+						'placeholder' => $filt_placeholder,
 					),
 					'filter_type'
 				),
@@ -982,6 +1000,7 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 		$this->rows        = $rows;
 		$this->itemCats    = $itemCats;
 		$this->itemTags    = $itemTags;
+		$this->itemTypes   = $types;
 		$this->extra_fields= $extraCols;
 		$this->custom_filts= $customFilts;
 		$this->lang_assocs = $lang_assocs;

@@ -1575,6 +1575,11 @@
 
 		<field name="" type="separator" default="FLEXI_PARAMETERS_APPEARANCE" label="" level="level1" />
 
+			<field name="iman_quick_itype_links" type="fcradio" default="1" label="FLEXI_IMAN_QUICK_FILTER_TYPE_LINKS" description="FLEXI_IMAN_QUICK_FILTER_TYPE_LINKS_DESC" class="btn-group">
+				<option value="0">FLEXI_HIDE</option>
+				<option value="1">FLEXI_SHOW</option>
+			</field>
+
 			<field name="show_csvbutton_be" type="fcradio" default="0" label="FLEXI_CSV_EXPORT_BUTTON" description="FLEXI_CSV_EXPORT_BUTTON_DESC" class="btn-group">
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
