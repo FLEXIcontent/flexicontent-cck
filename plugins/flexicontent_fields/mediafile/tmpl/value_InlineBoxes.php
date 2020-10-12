@@ -594,6 +594,8 @@ endif;   // END OF   $prop !== 'display_properties_only'
 		$mediadata = $show_props_list ?:
 			array('media_format', 'bit_rate', 'bits_per_sample', 'sample_rate', 'duration', 'channels');
 
+		$media_format = $file_data->media_format;
+
 		$html .= '<table class="table audiotable">';
 		foreach($mediadata as $md_name)
 		{
@@ -640,8 +642,6 @@ endif;   // END OF   $prop !== 'display_properties_only'
 				$PROP_NAME = '<span class="icon-clock large-icon"> </span> ' . JText::_('FLEXI_FIELD_MEDIADATA_DURATION');
 				$PROP_VALUE = gmdate("H:i:s", $PROP_VALUE);
 			}
-
-			$media_format = $PROP_VALUE;
 
 			if ($md_name == 'bit_rate' && ($media_format == 'wav' || $media_format == 'aiff'))  continue;
 			if ($md_name == 'bits_per_sample' && $media_format == 'mp3')  continue;

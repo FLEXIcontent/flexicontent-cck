@@ -611,39 +611,41 @@ class fc_Waveform_LazyLoad
 			//dummyProgress();
 			updateProgressBar(0);
 
-			var r = audio_spectrum.util.ajax({
-				responseType: 'json',
-				url: jsonUrl
-			});
-			
-			r.on('progress', function(t)
-			{
-				var e;
-        if (t.lengthComputable) e = t.loaded / t.total;
-        else e = t.loaded / (t.loaded + 1e6);
-				//window.console.log(t + ' - ' + e);
-        updateProgressBar(Math.round(100 * e), null);
-			});
+			jQuery.ajax({
+				url: jsonUrl,
+				dataType: 'json',
+				data: {
+					format: 'json'
+				},
 
-			r.on('success', function (response)
-			{
-				var data = response.data;
-				data.unshift(data[1]);
+				progress: function(t)
+				{
+					var e;
+					if (t.lengthComputable) e = t.loaded / t.total;
+					else e = t.loaded / (t.loaded + 1e6);
+					//window.console.log(t + ' - ' + e);
+					updateProgressBar(Math.round(100 * e), null);
+				},
 
-				// Scale peaks
-				audio_spectrum.backend.peaks = data; //.map(p => p/128);
+				success: function(response)
+				{
+					var data = response.data;
+					data.unshift(data[1]);
 
-				// Alternative we can load the file now ... using the peaks to avoid full download
-				//audio_spectrum.load(mp3Url, data);
+					// Scale peaks
+					audio_spectrum.backend.peaks = data; //.map(p => p/128);
 
-				// Do a waveform reDraw without any delay !!
-				audio_spectrum.drawBuffer();
+					// Alternative we can load the file now ... using the peaks to avoid full download
+					//audio_spectrum.load(mp3Url, data);
+
+					// Do a waveform reDraw without any delay !!
+					audio_spectrum.drawBuffer();
 				
-				// Stop progressBar but first move it to 100%
-				stopProgressBar(100);
+					// Stop progressBar but first move it to 100%
+					stopProgressBar(100);
+				}
 			});
 		}
-
 	}
 
 	fcfield_mediafile.showUploader = function(field_name_n, config_name)
