@@ -86,7 +86,7 @@ echo '
 				{
 					$link = $app->isAdmin()
 						? "index.php?option=com_flexicontent&amp;controller=items&amp;task=".$ctrl_task."&amp;typeid=".$type->id."&amp;". JSession::getFormToken() ."=1"
-						: "index.php?option=com_flexicontent&amp;task=".$ctrl_task."&amp;typeid=".$type->id.($menu_itemid ? '&amp;menu_id='.$menu_itemid : '')."&amp;". JSession::getFormToken() ."=1";
+						: "index.php?option=com_flexicontent&amp;task=".$ctrl_task."&amp;typeid=".$type->id.($menu_id ? '&amp;Itemid='.$menu_id : '')."&amp;". JSession::getFormToken() ."=1";
 				}
 				?>
 			<li>
