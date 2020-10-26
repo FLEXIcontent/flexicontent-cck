@@ -860,9 +860,12 @@ class plgFlexicontent_fieldsImage extends FCField
 			elseif ($image_subpath)
 			{
 				list($_file_path, $_src_path, $_dest_path, $_field_index, $_extra_prefix) = $this->getThumbPaths($field, $item, $value);
-				$_src_path = str_replace(JPATH_SITE, '', $_src_path);
-				$_src_path = JUri::root(true) . '/' . str_replace('\\', '/', $_src_path);
-				$img_link = rawurlencode($_src_path . $image_subpath);
+
+				$rel_url_base = str_replace(JPATH_SITE, '', $_src_path);
+				$rel_url_base = ltrim(str_replace('\\', '/', $rel_url_base), '/');
+				$abs_url_base = JUri::root(true) . '/' . $rel_url_base;
+
+				$img_link = rawurlencode($abs_url_base . $image_subpath);
 
 				if (isset($value['existingname']))
 				{
