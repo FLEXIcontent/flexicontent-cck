@@ -112,9 +112,15 @@ $use_mlist = (int) $params->get('use_dynamic_marker_list', 0);
 
     </div>
 
-    <?php if ($use_mlist) : ?>
+    <?php if ($use_mlist) :
+		JText::script("MOD_FLEXIGOOGLEMAP_MARKERS_LIST_HEADER_1_ENTRY", true);
+		JText::script("MOD_FLEXIGOOGLEMAP_MARKERS_LIST_HEADER_N_ENTRIES", true);
+		?>
     <div class="span4">
-			<ol id="fc_module_marker_list_<?php echo $module->id;?>" class="fc_module_marker_list" style="height:<?php echo $height; ?>; overflow-y: scroll; overflow-x: hidden;" ></ol>
+			<div id="fc_module_marker_list_box_<?php echo $module->id;?>" class="fc_module_marker_list_box" style="height:<?php echo $height; ?>;" >
+				<div id="fc_module_marker_list_header_<?php echo $module->id;?>" class="fc_module_marker_list_header"></div>
+				<ol id="fc_module_marker_list_<?php echo $module->id;?>" class="fc_module_marker_list"></ol>
+			</div>
     </div>
     <?php endif; ?>
 	</div>
@@ -157,24 +163,32 @@ $use_mlist = (int) $params->get('use_dynamic_marker_list', 0);
 		function fc_MapMod_updateVisibleMarkerList_<?php echo $module->id;?>(map, markers)
 		{
 			//window.console.log('bounds_changed');
+
 			// Get our current map view bounds.
 			// Create a new bounds object so we don't affect the map.
-
 			var ol = document.getElementById("fc_module_marker_list_<?php echo $module->id;?>");
+			var ol_header = document.getElementById("fc_module_marker_list_header_<?php echo $module->id;?>");
 			if (!!!ol) return;
 
 			ol.innerHTML = "";
 
-			var mapBounds = new google.maps.LatLngBounds(map.getBounds().getSouthWest(),
-					map.getBounds().getNorthEast());
+			var mapBounds = new google.maps.LatLngBounds(map.getBounds().getSouthWest(), map.getBounds().getNorthEast());
 			var bounds = mapBounds;
+			var added = 0;
 
-			for (var i = 0, marker; marker = markers[i]; i++) {
+			for (var i = 0, marker; marker = markers[i]; i++)
+			{
 				if (bounds.contains(marker.getPosition()))
 				{
+					added++;
 					fc_MapMod_addToVisibleList_<?php echo $module->id;?>(map, marker);
 				}
 			}
+
+			var header_html = added == 1
+				? Joomla.JText._('MOD_FLEXIGOOGLEMAP_MARKERS_LIST_HEADER_1_ENTRY')
+				: Joomla.JText._('MOD_FLEXIGOOGLEMAP_MARKERS_LIST_HEADER_N_ENTRIES');
+			ol_header.innerHTML = header_html.replace(/%s/, added);
 		};
 
 		function fc_MapMod_autoCenter_<?php echo $module->id;?>(map, markers)
@@ -348,22 +362,32 @@ $use_mlist = (int) $params->get('use_dynamic_marker_list', 0);
 		function fc_MapMod_updateVisibleMarkerList_<?php echo $module->id;?>(map, markers)
 		{
 			//window.console.log('bounds_changed');
+
 			// Get our current map view bounds.
 			// Create a new bounds object so we don't affect the map.
 			var ol = document.getElementById("fc_module_marker_list_<?php echo $module->id;?>");
+			var ol_header = document.getElementById("fc_module_marker_list_header_<?php echo $module->id;?>");
 			if (!!!ol) return;
 
 			ol.innerHTML = "";
 
 			var mapBounds = map.getBounds();
 			var bounds = mapBounds;
+			var added = 0;
 
-			for (var i = 0, marker; marker = markers[i]; i++) {
+			for (var i = 0, marker; marker = markers[i]; i++)
+			{
 				if (marker instanceof L.Marker && bounds.contains(marker.getLatLng()))
 				{
+					added++;
 					fc_MapMod_addToVisibleList_<?php echo $module->id;?>(map, marker);
 				}
 			}
+
+			var header_html = added == 1
+				? Joomla.JText._('MOD_FLEXIGOOGLEMAP_MARKERS_LIST_HEADER_1_ENTRY')
+				: Joomla.JText._('MOD_FLEXIGOOGLEMAP_MARKERS_LIST_HEADER_N_ENTRIES');
+			ol_header.innerHTML = header_html.replace(/%s/, added);
 		};
 
 

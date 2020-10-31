@@ -1,0 +1,27 @@
+.fc_module_marker_list_box {
+	/*display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+	justify-content: start;
+	align-items: start;*/
+}
+.fc_module_marker_list_header {
+	font-size: 160%;
+	font-weight: bold;
+	border-bottom: 4px double gray;
+	text-align: left;
+	padding: 0px 0 8px 0;
+	flex-shrink: 1;
+	max-height: 10%;
+}
+.fc_module_marker_list {
+	flex-shrink: 1;
+	max-height: 90%;
+
+	overflow-y: scroll;
+	overflow-x: hidden;
+	padding: 0;
+	margin: 0;
+	list-style: none;
+}
+}
