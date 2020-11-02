@@ -117,6 +117,7 @@ $use_mlist = (int) $params->get('use_dynamic_marker_list', 0);
     </div>
 
     <?php if ($use_mlist) :
+		JText::script("MOD_FLEXIGOOGLEMAP_MARKERS_LIST_HEADER_0_ENTRIES", true);
 		JText::script("MOD_FLEXIGOOGLEMAP_MARKERS_LIST_HEADER_1_ENTRY", true);
 		JText::script("MOD_FLEXIGOOGLEMAP_MARKERS_LIST_HEADER_N_ENTRIES", true);
 		?>
@@ -191,7 +192,9 @@ $use_mlist = (int) $params->get('use_dynamic_marker_list', 0);
 
 			var header_html = added == 1
 				? Joomla.JText._('MOD_FLEXIGOOGLEMAP_MARKERS_LIST_HEADER_1_ENTRY')
-				: Joomla.JText._('MOD_FLEXIGOOGLEMAP_MARKERS_LIST_HEADER_N_ENTRIES');
+				: (added == 0
+					? Joomla.JText._('MOD_FLEXIGOOGLEMAP_MARKERS_LIST_HEADER_0_ENTRIES')
+					: Joomla.JText._('MOD_FLEXIGOOGLEMAP_MARKERS_LIST_HEADER_N_ENTRIES'));
 			ol_header.innerHTML = header_html.replace(/%s/, added);
 		};
 
@@ -391,7 +394,9 @@ $use_mlist = (int) $params->get('use_dynamic_marker_list', 0);
 
 			var header_html = added == 1
 				? Joomla.JText._('MOD_FLEXIGOOGLEMAP_MARKERS_LIST_HEADER_1_ENTRY')
-				: Joomla.JText._('MOD_FLEXIGOOGLEMAP_MARKERS_LIST_HEADER_N_ENTRIES');
+				: (added == 0
+					? Joomla.JText._('MOD_FLEXIGOOGLEMAP_MARKERS_LIST_HEADER_0_ENTRIES')
+					: Joomla.JText._('MOD_FLEXIGOOGLEMAP_MARKERS_LIST_HEADER_N_ENTRIES'));
 			ol_header.innerHTML = header_html.replace(/%s/, added);
 		};
 
