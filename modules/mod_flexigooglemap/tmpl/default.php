@@ -151,7 +151,7 @@ $use_mlist = (int) $params->get('use_dynamic_marker_list', 0);
 			li.appendChild(btn);*/
 
 			var btn2 = document.createElement("button");
-			btn2.innerHTML = 'Highlight';
+			btn2.innerHTML = '<?php echo JText::_("MOD_FLEXIGOOGLEMAP_MARKER_HIGHLIGHT_ENTRY", true) ?>';
 			btn2._map_ref = map;
 			btn2._marker_ref = marker;
 			btn2.setAttribute('onclick', "new google.maps.event.trigger(this._marker_ref, 'click');");
@@ -352,7 +352,7 @@ $use_mlist = (int) $params->get('use_dynamic_marker_list', 0);
 			li.appendChild(btn);*/
 			
 			var btn2 = document.createElement("button");
-			btn2.innerHTML = 'Highlight';
+			btn2.innerHTML = '<?php echo JText::_("MOD_FLEXIGOOGLEMAP_MARKER_HIGHLIGHT_ENTRY", true) ?>';
 			btn2._map_ref = map;
 			btn2._marker_ref = marker;
 			btn2.setAttribute('onclick', "this._marker_ref.fire('click');");
