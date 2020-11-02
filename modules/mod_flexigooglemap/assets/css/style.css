@@ -24,4 +24,8 @@
 	margin: 0;
 	list-style: none;
 }
+.fc_module_marker_list img.fc_module_marker_list_icon {
+	float: left;
+	margin: 0 8px 0 0;
+	height: 1.5em;
 }

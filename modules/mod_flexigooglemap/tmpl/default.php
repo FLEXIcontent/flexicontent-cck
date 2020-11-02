@@ -37,6 +37,10 @@ $mapcenter = $params->get('mapcenter', '48.8566667, 2.3509871');
 $maptype   = $params->get('maptype', '');
 $apikey    = $params->get('apikey', '');
 
+$defaut_icon_url = $mapapi === 'googlemap'
+	? 'https://maps.gstatic.com/mapfiles/api-3/images/spotlight-poi2.png'
+	: JUri::root(true) . '/components/com_flexicontent/librairies/leaflet/images/marker-icon.png';
+
 $maxzoommarker = $params->get('maxzoommarker', '');
 $info_popup    = (int)$params->get('info_popup', 1);
 
@@ -141,7 +145,7 @@ $use_mlist = (int) $params->get('use_dynamic_marker_list', 0);
 			if (!!!ol) return;
 
 			var li = document.createElement("li");
-			li.innerHTML = marker._location_info;
+			li.innerHTML = '<img class="fc_module_marker_list_icon" src="' + marker._icon_url + '" /> ' + marker._location_info;
 
 			/*var btn = document.createElement("button");
 			btn.innerHTML = 'Center';
@@ -273,6 +277,7 @@ $use_mlist = (int) $params->get('use_dynamic_marker_list', 0);
 					?>
 				});
 				marker._location_info = locations[i][0];
+				marker._icon_url = locations[i][3] == '__default__' ? '<?php echo $defaultMarkerURL ?: $defaut_icon_url;?>' : locations[i][3];
 
 				markers.push(marker);
 
@@ -342,7 +347,7 @@ $use_mlist = (int) $params->get('use_dynamic_marker_list', 0);
 			if (!!!ol) return;
 
 			var li = document.createElement("li");
-			li.innerHTML = marker._location_info;
+			li.innerHTML = '<img class="fc_module_marker_list_icon" src="' + marker._icon_url + '" /> ' + marker._location_info;
 
 			/*var btn = document.createElement("button");
 			btn.innerHTML = 'Center';
@@ -449,6 +454,7 @@ $use_mlist = (int) $params->get('use_dynamic_marker_list', 0);
 				}
 
 				marker._location_info = locations[i][0];
+				marker._icon_url = locations[i][3] == '__default__' ? '<?php echo $defaultMarkerURL ?: $defaut_icon_url;?>' : locations[i][3];
 
 				marker
 					<?php /* Display information window on marker click */
