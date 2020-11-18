@@ -13,7 +13,7 @@
 defined('_JEXEC') or die('Restricted access');
 
 // Check if having at least 1 location, otherwise skip showing the map
-if (empty($renderedMapLocations))
+if (empty($renderedMapLocations) && (int)$params->get('hide_map_when_empty', '1'))
 {
 	return;
 }
@@ -149,14 +149,12 @@ $use_mlist = (int) $params->get('use_dynamic_marker_list', 0);
 
 			/*var btn = document.createElement("button");
 			btn.innerHTML = 'Center';
-			btn._map_ref = map;
 			btn._marker_ref = marker;
-			btn.setAttribute('onclick', "this._map_ref.setCenter(this._marker_ref.getPosition());");
+			btn.setAttribute('onclick', "this._marker_ref._map_ref.setCenter(this._marker_ref.getPosition());");
 			li.appendChild(btn);*/
 
 			var btn2 = document.createElement("button");
 			btn2.innerHTML = '<?php echo JText::_("MOD_FLEXIGOOGLEMAP_MARKER_HIGHLIGHT_ENTRY", true) ?>';
-			btn2._map_ref = map;
 			btn2._marker_ref = marker;
 			btn2.setAttribute('onclick', "new google.maps.event.trigger(this._marker_ref, 'click');");
 			li.appendChild(btn2);
@@ -278,6 +276,7 @@ $use_mlist = (int) $params->get('use_dynamic_marker_list', 0);
 				});
 				marker._location_info = locations[i][0];
 				marker._icon_url = locations[i][3] == '__default__' ? '<?php echo $defaultMarkerURL ?: $defaut_icon_url;?>' : locations[i][3];
+				marker._map_ref = map;
 
 				markers.push(marker);
 
@@ -339,8 +338,6 @@ $use_mlist = (int) $params->get('use_dynamic_marker_list', 0);
 
 
 	<script type="text/javascript">
-
-
 		function fc_MapMod_addToVisibleList_<?php echo $module->id;?>(map, marker)
 		{
 			var ol = document.getElementById("fc_module_marker_list_<?php echo $module->id;?>");
@@ -349,23 +346,47 @@ $use_mlist = (int) $params->get('use_dynamic_marker_list', 0);
 			var li = document.createElement("li");
 			li.innerHTML = '<img class="fc_module_marker_list_icon" src="' + marker._icon_url + '" /> ' + marker._location_info;
 
-			/*var btn = document.createElement("button");
-			btn.innerHTML = 'Center';
-			btn._map_ref = map;
-			btn._marker_ref = marker;
-			btn.setAttribute('onclick', "this._map_ref.setView(this._marker_ref.getLatLng(),5);");
-			li.appendChild(btn);*/
-			
 			var btn2 = document.createElement("button");
 			btn2.innerHTML = '<?php echo JText::_("MOD_FLEXIGOOGLEMAP_MARKER_HIGHLIGHT_ENTRY", true) ?>';
-			btn2._map_ref = map;
 			btn2._marker_ref = marker;
-			btn2.setAttribute('onclick', "this._marker_ref.fire('click');");
+
+			<?php /* Add single location marker */
+				echo $clustermode ? '
+				btn2.onclick = function () {
+					var marker = this._marker_ref;
+					var map    = marker._map_ref;
+					var mLayer = marker.theMarkerClusters_.getLayer(marker._leaflet_id);
+
+					if (!map.hasLayer(marker))
+					{
+						window.console.log(marker); window.console.log(marker.__parent._leaflet_id);
+						marker.theMarkerClusters_.zoomToShowLayer(mLayer, function()
+						{
+							/*if (map.getZoom() > 16) { map.setView([marker._latlng.lat, marker._latlng.lng], map.getZoom() + 1); } */
+							mLayer.__parent.spiderfy();
+							mLayer.openPopup();
+						});
+					}
+					else
+					{
+						mLayer.openPopup(); //marker.fire(\'click\');
+					}
+				};
+				' : '
+				btn2.onclick = function () {
+					var marker = this._marker_ref;
+					var map    = marker._map_ref;
+					var mLayer = map._topLayerGroup_ref.getLayer(marker._leaflet_id);
+					//map.setView([marker._latlng.lat, marker._latlng.lng], 9);
+					mLayer.openPopup(); //marker.fire(\'click\');
+				};
+				'; ?>
 			li.appendChild(btn2);
 
 			//window.console.log(marker);
 			ol.appendChild(li);
 		};
+
 
 		function fc_MapMod_updateVisibleMarkerList_<?php echo $module->id;?>(map, markers)
 		{
@@ -455,6 +476,7 @@ $use_mlist = (int) $params->get('use_dynamic_marker_list', 0);
 
 				marker._location_info = locations[i][0];
 				marker._icon_url = locations[i][3] == '__default__' ? '<?php echo $defaultMarkerURL ?: $defaut_icon_url;?>' : locations[i][3];
+				marker._map_ref = map;
 
 				marker
 					<?php /* Display information window on marker click */
@@ -470,15 +492,19 @@ $use_mlist = (int) $params->get('use_dynamic_marker_list', 0);
 
 				<?php /* Add a cluster of markers */
 				echo $clustermode ?
-				'markerClusters.addLayer(marker);' : ''; ?>
+				'markerClusters.addLayer(marker); marker.theMarkerClusters_ = markerClusters;' : ''; ?>
 				markers.push(marker);
 			}
 			var group = new L.featureGroup(markers);
 
 			<?php echo $clustermode ?
 			'map.addLayer(markerClusters);' : ''; ?>
-
-			map.fitBounds(group.getBounds().pad(0.5));
+			
+			map._topLayerGroup_ref = group;
+			if (markers.length)
+				map.fitBounds(group.getBounds().pad(0.5));
+			else
+				map.setZoom(1);
 
 			fc_MapMod_updateVisibleMarkerList_<?php echo $module->id;?>(map, markers);				
 

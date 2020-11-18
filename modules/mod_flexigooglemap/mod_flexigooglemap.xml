@@ -40,6 +40,11 @@
 				tmpl_container="mod_tmpl_layout" params_source="file"
 				/> <!-- params_source="inline" -->
 
+			<field name="hide_map_when_empty" type="radio" default="1" label="Hide map when empty" description="" class="btn-group">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+
 			<field name="" type="separator" default="MOD_FLEXIMAP_API" level="level1" />
 			<field
 				name="mapapi" type="radio" default="googlemap"
