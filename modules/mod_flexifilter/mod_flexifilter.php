@@ -472,6 +472,31 @@ else if ($catid)
 	$form_target = JRoute::_(FlexicontentHelperRoute::getCategoryRoute($categoryslug), $cat_itemid);
 }
 
+$scroll_to_anchor_tag = (int) $params->get('scroll_to_anchor_tag', '0');
+if ($scroll_to_anchor_tag === 2)
+{
+	$active_filters_count = 0;
+
+	foreach ($filters as $fn => $filter)
+	{
+		$fn = $filter->name;
+		$vals = $jinput->get('filter_' . $filter->id, null, 'raw');
+		if ( (is_array($vals) && count($vals)) || (!is_array($vals) && strlen($vals)) )
+		{
+			foreach($vals as $v)
+			{
+				if ( !(is_array($v) && count($v)) && !(!is_array($v) && strlen($v)) )
+				{
+					continue 2;
+				}
+			}
+			$active_filters_count++;
+		}
+	}
+	if (!$active_filters_count) $scroll_to_anchor_tag = 0;
+}
+
+
 // Render Layout
 require(JModuleHelper::getLayoutPath('mod_flexifilter', $layout));
 
