@@ -36,6 +36,12 @@
 				tmpl_container="mod_tmpl_layout" params_source="file"
 				/> <!-- params_source="inline" -->
 
+			<field name="scroll_to_anchor_tag" type="radio" default="0" label="Scroll To Module" description="Enable this to scroll to module on page load" class="btn-group">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+				<option value="2">When active filters</option>
+			</field>
+
 			<field name="" type="separator" default="FLEXI_FILTER_TARGET_CAT" level="level1" />
 
 			<field name="" type="separator" default="FLEXI_FILTER_CATEGORY_PARAM_EXPLANATION" level="level3" class="alert alert-info fcpadded" />

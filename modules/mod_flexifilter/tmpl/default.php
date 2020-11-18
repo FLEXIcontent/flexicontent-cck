@@ -2,6 +2,10 @@
 defined('_JEXEC') or die('Restricted access');
 
 // use css class fc_nnnnn_clear to override wrapping
+
+if ($scroll_to_anchor_tag) echo '
+	<a name="mod_flexifilter_anchor' . $module->id . '"></a>
+';
 ?>
 
 <div class="mod_flexifilter_wrapper mod_flexifilter_wrap<?php echo $moduleclass_sfx; ?>" id="mod_flexifilter_default<?php echo $module->id ?>">
@@ -115,6 +119,22 @@ if ($ff_placement)
 				// Show the last active slide
 				$('#' + active_slides['" . $ff_slider_tagid ."']).addClass('in');
 			}
+		});
+	})(jQuery);
+	");
+}
+
+if ($scroll_to_anchor_tag)
+{
+	JFactory::getDocument()->addScriptDeclaration("
+	(function($) {
+		$(document).ready(function ()
+		{
+			function scrollToAnchor(aid){
+					var aTag = $(\"a[name='\"+ aid +\"']\");
+					$('html,body').animate({scrollTop: aTag.offset().top},'slow');
+			}
+			scrollToAnchor('mod_flexifilter_anchor" . $module->id . "');
 		});
 	})(jQuery);
 	");
