@@ -44,14 +44,14 @@ if (isset($item->toc))
  * Custom Classes for containers
  */
 
-$box_class_subtitle1 = $this->params->get('box_class_subtitle1', 'flexi group lineinfo subtitle1');
-$box_class_subtitle2 = $this->params->get('box_class_subtitle2', 'flexi group lineinfo subtitle2');
-$box_class_subtitle3 = $this->params->get('box_class_subtitle3', 'flexi group lineinfo subtitle3');
+$box_class_subtitle1 = $this->params->get('box_class_subtitle1', 'flexi lineinfo subtitle1');
+$box_class_subtitle2 = $this->params->get('box_class_subtitle2', 'flexi lineinfo subtitle2');
+$box_class_subtitle3 = $this->params->get('box_class_subtitle3', 'flexi lineinfo subtitle3');
 
-$box_class_image  = $this->params->get('box_class_image', 'flexi group image');
-$box_class_top    = $this->params->get('box_class_top', 'flexi group infoblock');
-$box_class_descr  = $this->params->get('box_class_descr', 'flexi group description');
-$box_class_bottom = $this->params->get('box_class_bottom', 'flexi group infoblock');
+$box_class_image  = $this->params->get('box_class_image', 'flexi image');
+$box_class_top    = $this->params->get('box_class_top', 'flexi infoblock');
+$box_class_descr  = $this->params->get('box_class_descr', 'flexi description');
+$box_class_bottom = $this->params->get('box_class_bottom', 'flexi infoblock');
 
 
 /**
@@ -72,7 +72,7 @@ $itemTitleHeaderLevel = $page_heading_shown ? '2' : '1';
 // SEO, header level of tab title tag
 $tabsHeaderLevel = $itemTitleHeaderLevel == '2'  ?  '3' : '2';
 
-$page_classes  = 'flexicontent group';
+$page_classes  = 'flexicontent  ';
 $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 $page_classes .= ' fcitems fcitem'.$item->id;
 $page_classes .= ' fctype'.$item->type_id;
@@ -90,7 +90,7 @@ $microdata_itemtype_code = 'itemscope itemtype="http://schema.org/'.$microdata_i
 
   <?php if ($item->event->beforeDisplayContent) : ?>
 		<!-- BOF beforeDisplayContent -->
-		<div class="fc_beforeDisplayContent group">
+		<div class="fc_beforeDisplayContent  ">
 			<?php echo $item->event->beforeDisplayContent; ?>
 		</div>
 		<!-- EOF beforeDisplayContent -->
@@ -122,7 +122,7 @@ $microdata_itemtype_code = 'itemscope itemtype="http://schema.org/'.$microdata_i
 			<!-- BOF buttons -->
 			<?php if ($this->params->get('btn_grp_dropdown')) : ?>
 
-			<div class="buttons btn-group">
+			<div class="buttons btn- ">
 			  <button type="button" class="btn dropdown-toggle" data-toggle="dropdown">
 			    <span class="<?php echo $this->params->get('btn_grp_dropdown_class', 'icon-options'); ?>"></span>
 			  </button>
@@ -188,7 +188,7 @@ $microdata_itemtype_code = 'itemscope itemtype="http://schema.org/'.$microdata_i
 
   <?php if ($item->event->afterDisplayTitle) : ?>
 		<!-- BOF afterDisplayTitle -->
-		<div class="fc_afterDisplayTitle group">
+		<div class="fc_afterDisplayTitle  ">
 			<?php echo $item->event->afterDisplayTitle; ?>
 		</div>
 		<!-- EOF afterDisplayTitle -->
@@ -256,7 +256,7 @@ $microdata_itemtype_code = 'itemscope itemtype="http://schema.org/'.$microdata_i
 
 	<?php if ($createtabs) :?>
 		<!-- tabber start -->
-		<div id="fc_subtitle_tabset" class="fctabber group">
+		<div id="fc_subtitle_tabset" class="fctabber  ">
 
 		<?php for ($tc=1; $tc<=$tabcount; $tc++) : ?>
 			<?php
@@ -297,7 +297,7 @@ $microdata_itemtype_code = 'itemscope itemtype="http://schema.org/'.$microdata_i
 
 	<?php if ((isset($item->positions['image'])) || (isset($item->positions['top']))) : ?>
 		<!-- BOF image/top row -->
-		<div class="flexi topblock group">  <!-- NOTE: image block is inside same outer block as position 'top' -->
+		<div class="flexi topblock  ">  <!-- NOTE: image block is inside same outer block as position 'top' -->
 
 			<?php
 				$has_output_image = false;
@@ -400,7 +400,7 @@ $microdata_itemtype_code = 'itemscope itemtype="http://schema.org/'.$microdata_i
 
 	<?php if ($createtabs) :?>
 		<!-- tabber start -->
-		<div id="fc_bottom_tabset" class="fctabber group">
+		<div id="fc_bottom_tabset" class="fctabber  ">
 
 		<?php for ($tc=1; $tc<=$tabcount; $tc++) : ?>
 			<?php
@@ -450,7 +450,7 @@ $microdata_itemtype_code = 'itemscope itemtype="http://schema.org/'.$microdata_i
 			$bottom_cols = $this->params->get('bottom_cols', 'two');
 			$span_class = $bottom_cols == 'one' ? 'span12' : 'span6'; // bootstrap span
 		?>
-		<div class="<?php echo $box_class_bottom; ?> <?php echo $bottom_cols; ?>cols group">
+		<div class="<?php echo $box_class_bottom; ?> <?php echo $bottom_cols; ?>cols  ">
 			<ul class="flexi">
 				<?php foreach ($item->positions['bottom'] as $field) : ?>
 				<li class="flexi lvbox <?php echo 'field_' . $field->name . ' ' . $span_class; ?>">
@@ -472,7 +472,7 @@ $microdata_itemtype_code = 'itemscope itemtype="http://schema.org/'.$microdata_i
 
 	<?php if ($item->event->afterDisplayContent) : ?>
 		<!-- BOF afterDisplayContent -->
-		<div class="fc_afterDisplayContent group">
+		<div class="fc_afterDisplayContent  ">
 			<?php echo $item->event->afterDisplayContent; ?>
 		</div>
 		<!-- EOF afterDisplayContent -->
@@ -484,7 +484,7 @@ $microdata_itemtype_code = 'itemscope itemtype="http://schema.org/'.$microdata_i
 
 	<?php if ($this->params->get('comments') && !JFactory::getApplication()->input->getInt('print', 0)) : ?>
 		<!-- BOF comments -->
-		<div class="comments group">
+		<div class="comments  ">
 		<?php
 			if ($this->params->get('comments') == 1) :
 				if (file_exists(JPATH_SITE.DS.'components'.DS.'com_jcomments'.DS.'jcomments.php')) :
