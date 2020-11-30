@@ -1339,7 +1339,7 @@ class com_flexicontentInstallerScript
 		?>
 
 		<div class="alert alert-success" style="margin: 8px 0 64px 0;">
-			<span class="btn btn-info" onclick="window.open('index.php?option=com_flexicontent');" style="cursor: pointer;">
+			<span class="btn btn-info" onclick="window.open('index.php?option=com_flexicontent','_self');" style="cursor: pointer;">
 				<?php echo JText::_('FLEXI_DASHBOARD'); ?>
   		</span>
 			<?php echo JText::_('COM_FLEXICONTENT_PLEASE_COMPLETE_POST_INSTALL_TASKS_AT_DASHBOARD'); ?>
