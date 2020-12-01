@@ -437,9 +437,9 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 			';
 		}
 
-	reset($this->itemTypes);
+	$itemType = reset($this->itemTypes);
 
-	while($itemType = next($this->itemTypes))
+	do
 	{
 		$type_class = count($filter_type) == 1 && in_array($itemType->id, $filter_type) ? ' tabbertabforced' : '';
 		$__tip_class = ''; //' hasTooltip';
@@ -453,7 +453,7 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 				>' . JText::_( $itemType->name ) . '</h3>
 		';
 		echo '</div>';
-	}
+	} while($itemType = next($this->itemTypes));
 
 	echo '
 		</div>
