@@ -36,8 +36,7 @@
     margin-bottom: 10px;
     margin-right: 6px;
 }
-.link {
-    max-width: 27%;
+.fc_module_marker_list .link, .fc_module_marker_list .directions {
     float: left;
 }
 .fc_module_marker_list .link.btn, .fc_module_marker_list .directions .btn, .fc_module_marker_list .btn-highlight {
