@@ -312,7 +312,7 @@ class modFlexigooglemapHelper
 					if ($uselink)
 					{
 						$link = JRoute::_(FlexicontentHelperRoute::getItemRoute($address->id, $address->catid, $forced_itemid, $address));
-						$link = '<p class="link"><a href="'.$link.'" target="'.$linkmode.'">' . $readmore . '</a></p>';
+						$link = '<div class="link"><a href="'.$link.'" target="'.$linkmode.'" class="btn">' . $readmore . '</a></div>';
 						$link = addslashes($link);
 					}
 
@@ -346,7 +346,7 @@ class modFlexigooglemapHelper
 							}
 						}
 
-						$linkdirection= '<div class="directions"><a href="' . $map_link . '" target="_blank" class="direction">' . $directionname . '</a></div>';
+						$linkdirection= '<div class="directions"><a href="' . $map_link . '" target="_blank" class="btn direction">' . $directionname . '</a></div>';
 					}
 
 					$contentwindows = $infotextmode
