@@ -170,7 +170,7 @@ class modFlexigooglemapHelper
 				if ($uselink)
 				{
 					$link = $itemLoc->link;
-					$link = '<p class="link btn"><a href="'.$link.'" target="'.$linkmode.'">' . $readmore . '</a></p>';
+					$link = '<div class="link"><a href="'.$link.'" target="'.$linkmode.'" class="link btn">' . $readmore . '</a></div>';
 					$link = addslashes($link);
 				}
 
@@ -312,7 +312,7 @@ class modFlexigooglemapHelper
 					if ($uselink)
 					{
 						$link = JRoute::_(FlexicontentHelperRoute::getItemRoute($address->id, $address->catid, $forced_itemid, $address));
-						$link = '<div class="link"><a href="'.$link.'" target="'.$linkmode.'" class="btn">' . $readmore . '</a></div>';
+						$link = '<div class="link"><a href="'.$link.'" target="'.$linkmode.'" class="link btn">' . $readmore . '</a></div>';
 						$link = addslashes($link);
 					}
 
