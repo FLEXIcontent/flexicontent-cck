@@ -8,7 +8,7 @@
 .fc_module_marker_list_header {
 	font-size: 160%;
 	font-weight: bold;
-	border-bottom: 1px double ccc;
+	border-bottom: 1px double #ccc;
 	text-align: left;
 	padding: 0px 0 8px 0;
 	flex-shrink: 1;

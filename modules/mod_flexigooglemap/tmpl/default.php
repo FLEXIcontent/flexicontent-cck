@@ -155,7 +155,7 @@ $use_mlist = (int) $params->get('use_dynamic_marker_list', 0);
 
 			var btn2 = document.createElement("button");
 			btn2.innerHTML = '<?php echo JText::_("MOD_FLEXIGOOGLEMAP_MARKER_HIGHLIGHT_ENTRY", true) ?>';
-			btn2.className ="btn btn-highlight"
+			btn2.className ="btn btn-highlight";
 			btn2._marker_ref = marker;
 			btn2.setAttribute('onclick', "new google.maps.event.trigger(this._marker_ref, 'click');");
 			li.appendChild(btn2);

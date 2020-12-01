@@ -170,7 +170,7 @@ class modFlexigooglemapHelper
 				if ($uselink)
 				{
 					$link = $itemLoc->link;
-					$link = '<p class="link"><a href="'.$link.'" target="'.$linkmode.'">' . $readmore . '</a></p>';
+					$link = '<p class="link btn"><a href="'.$link.'" target="'.$linkmode.'">' . $readmore . '</a></p>';
 					$link = addslashes($link);
 				}
 
@@ -204,7 +204,7 @@ class modFlexigooglemapHelper
 						}
 					}
 
-					$linkdirection= '<div class="directions"><a href="' . $map_link . '" target="_blank" class="direction">' . $directionname . '</a></div>';
+					$linkdirection= '<div class="directions"><a href="' . $map_link . '" target="_blank" class="direction btn">' . $directionname . '</a></div>';
 				}
 
 				$contentwindows = $infotextmode
@@ -346,7 +346,7 @@ class modFlexigooglemapHelper
 							}
 						}
 
-						$linkdirection= '<div class="directions"><a href="' . $map_link . '" target="_blank" class="btn direction">' . $directionname . '</a></div>';
+						$linkdirection= '<div class="directions"><a href="' . $map_link . '" target="_blank" class="direction btn">' . $directionname . '</a></div>';
 					}
 
 					$contentwindows = $infotextmode
