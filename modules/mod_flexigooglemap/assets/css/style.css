@@ -8,7 +8,7 @@
 .fc_module_marker_list_header {
 	font-size: 160%;
 	font-weight: bold;
-	border-bottom: 4px double gray;
+	border-bottom: 1px double ccc;
 	text-align: left;
 	padding: 0px 0 8px 0;
 	flex-shrink: 1;
@@ -27,5 +27,23 @@
 .fc_module_marker_list img.fc_module_marker_list_icon {
 	float: left;
 	margin: 0 8px 0 0;
-	height: 1.5em;
+	height: 2.5em;
+}
+.fc_module_marker_list_box li {
+    background: #f8f8f8;
+    border: 0;
+    padding: 10px;
+    margin-bottom: 10px;
+    margin-right: 6px;
+}
+.link {
+    max-width: 27%;
+    float: left;
+}
+.link.btn, .directions.btn {
+    padding: 4px 0px;
+}
+.directions {
+    max-width: 30%;
+    float: left;
 }
