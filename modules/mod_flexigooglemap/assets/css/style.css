@@ -8,7 +8,7 @@
 .fc_module_marker_list_header {
 	font-size: 160%;
 	font-weight: bold;
-	border-bottom: 1px double #ccc;
+	border-bottom: 1px solid #ccc;
 	text-align: left;
 	padding: 0px 0 8px 0;
 	flex-shrink: 1;
@@ -40,8 +40,8 @@
     max-width: 27%;
     float: left;
 }
-.link.btn, .directions.btn {
-    padding: 4px 0px;
+.link.btn, .directions .btn, .btn-highlight {
+    padding: 5px 5px;
 }
 .directions {
     max-width: 30%;
