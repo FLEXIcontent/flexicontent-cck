@@ -51,7 +51,7 @@ $box_class_subtitle3 = $this->params->get('box_class_subtitle3', 'flexi lineinfo
 $box_class_image  = $this->params->get('box_class_image', 'flexi image');
 $box_class_top    = $this->params->get('box_class_top', 'flexi infoblock');
 $box_class_descr  = $this->params->get('box_class_descr', 'flexi description');
-$box_class_bottom = $this->params->get('box_class_bottom', 'flexi infoblock');
+$box_class_bottom = $this->params->get('box_class_bottom', 'flexi bottomblock infoblock');
 
 
 /**

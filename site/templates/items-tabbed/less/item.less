@@ -44,29 +44,27 @@ body #flexicontent .desc-title.label {
 /* TAB styling */
 
 body #flexicontent ul.tabbernav > li a {
-	border: 1px solid @FCI_tab_bg_color_end;
-	background-color: @FCI_tab_bg_color_start;
-	background-image: -webkit-linear-gradient(top, @FCI_tab_bg_color_start , @FCI_tab_bg_color_end);
+	/*border: 1px solid lighten(@FCI_tab_bg_color_start,50%) + !important;*/
+	background-color: lighten(@FCI_tab_bg_color_start,45%);
+	/*background-image: -webkit-linear-gradient(top, @FCI_tab_bg_color_start , @FCI_tab_bg_color_end);
 	background-image: linear-gradient(to bottom, @FCI_tab_bg_color_start , @FCI_tab_bg_color_end );
-	filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr= @FCI_tab_bg_color_start , endColorstr= @FCI_tab_bg_color_end );
+	filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr= @FCI_tab_bg_color_start , endColorstr= @FCI_tab_bg_color_end );*/
 	color: @FCI_tab_title_color;
 }
 
 body #flexicontent ul.tabbernav > li.tabberactive a::before {
-	border-top: 4px solid @FCI_tab_bg_color_end;
+	border-top: 4px solid @FCI_tab_bg_color_start;
 }
-/*  ... NOT USED !!
-body #flexicontent ul.tabbernav > li.tabberactive a,
-body #flexicontent ul.tabbernav > li.tabberactive a:hover {
-	background-color: @FCI_tab_bg_color_active;
-}*/
+body ul.tabbernav > li.tabberactive a, body ul.tabbernav > li.tabberactive a:hover, #flexicontent ul.tabbernav > li.tabberactive a, #flexicontent ul.tabbernav > li.tabberactive a:hover {
+    border-bottom: 1px solid white !important;
+    border-left: 1px solid #D0D0D0 !important;
+    border-top: 1px solid #D0D0D0 !important;
+    border-right: 1px solid #D0D0D0 !important;
+}
 body #flexicontent ul.tabbernav > li:hover a {
-	border: 1px solid darken(@FCI_tab_bg_color_end, 20%);
+	border: 1px solid darken(@FCI_tab_bg_color_start, 20%);
 	background-color: darken(@FCI_tab_bg_color_start, 20%);
-	background-image: -webkit-linear-gradient(top, darken(@FCI_tab_bg_color_start, 20%) , darken(@FCI_tab_bg_color_end, 20%));
-	background-image: linear-gradient(to bottom, darken(@FCI_tab_bg_color_start, 20%) , darken(@FCI_tab_bg_color_end, 20%) );
-	filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr= darken(@FCI_tab_bg_color_start, 20%) , endColorstr= darken(@FCI_tab_bg_color_end, 20%) );
-	color: @FCI_tab_title_color;
+	color: #fff;
 }
 body .tabbertab, #flexicontent .tabbertab {
 	background-color: @FCI_tab_content_bg_color;
@@ -80,14 +78,10 @@ body ul.tabbernav, #flexicontent ul.tabbernav {
 /* infoblock styling */
 
 body .flexi.infoblock{
-	color: @FCI_column_color;
-	background-color: @FCI_column_bg_color;
 	padding-top: @FCI_column_pad_top + px ;
 	padding-right: @FCI_column_pad_right + px;
 	padding-left: @FCI_column_pad_left + px;
 	padding-bottom: @FCI_column_pad_bottom + px;
-	border-radius: @FCI_column_border_radius + px;
-	border : @FCI_column_border_size + px @FCI_column_border_type @FCI_column_border_color;
 }
 
 // ***
@@ -156,6 +150,18 @@ body .flexi.infoblock{
 }
 .topblock .flexi.infoblock {
 	overflow: hidden;
+  	border-radius: @FCI_column_border_radius_top + px;
+	border : @FCI_column_border_size_top + px @FCI_column_border_type_top @FCI_column_border_color_top;
+  	color: @FCI_column_color_top;
+	background-color: @FCI_column_bg_color_top;
+}
+
+.flexi.bottomblock.infoblock {
+	overflow: hidden;
+  	border-radius: @FCI_column_border_radius_bottom + px;
+	border : @FCI_column_border_size_bottom + px @FCI_column_border_type_bottom @FCI_column_border_color_bottom;
+  	color: @FCI_column_color_bottom;
+	background-color: @FCI_column_bg_color_bottom;
 }
 
 
