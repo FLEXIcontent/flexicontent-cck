@@ -35,8 +35,8 @@ ul.tabbernav > li > a {
 }
 ul.tabbernav > li > a [class^="icon-"],
 ul.tabbernav > li > a [class*=" icon-"] {
-	font-size: 14px;
-	padding-top: 4px;
+	font-size: 18px;
+	padding-top: 8px;
 	vertical-align: top;
 }
 ul.tabbernav > li.tabberactive a {
@@ -52,6 +52,9 @@ ul.tabbernav > li.tabberactive a:hover {
 	background: #fff;
 	padding: 5px;
 	border: 1px solid #aaa;
+	border-left: 1px solid #b2bfcd;
+	border-right: 1px solid #b2bfcd;
+	border-bottom: 1px solid #b2bfcd;
 	border-top: 0;
 	opacity: 1;
 	filter: alpha(opacity=100);
@@ -88,11 +91,11 @@ body ul.tabbernav,
 #flexicontent ul.tabbernav {
 	line-height: 100%;
 	border-bottom: 1px solid #cccccc;
-	border-left: 1px solid transparent;
+	border-left: 0px solid transparent;
 	border-right: 2px solid transparent;
 	font: bold 11px Verdana, sans-serif;
 	margin: 0;
-	padding: 0px 1% 0px 1%;
+	padding: 0px 1% 0px 0%;
 	width: 100%;
 	box-sizing: border-box;
 	display: inline-block;
@@ -102,24 +105,22 @@ body ul.tabbernav > li,
 #flexicontent ul.tabbernav > li {
 	line-height: 100%;
 	padding: 0px;
-	margin: 4px 0px -1px 8px;
+	margin: 0px 0px -1px 0px;
 	overflow: visible;
 	display: inline-block;
 	float: none;
+	background: #83838326;
 }
 body ul.tabbernav > li > a,
 #flexicontent ul.tabbernav > li > a {
 	font-family: arial, helvetica, sans-serif;
 	text-decoration: none;
 	line-height: 220%;
-	font-size: 12px;
+	font-size: 14px;
 	margin: 0px;
-	padding-left: 5px;
-	padding-right: 5px;
-	padding-top: 4px;
-	padding-bottom: 5px;
+	padding: .5rem 1rem !important;
 	display: inline-block;
-	border-radius: 5px 5px 0px 0px;
+	border-radius: 0px;
 	border-left: 1px solid #D0D0D0;
 	border-top: 1px solid #B0B0B0;
 	border-right: 1px solid #808080;
@@ -151,7 +152,7 @@ body ul.tabbernav > li.tabberactive a:hover,
 	background-color: white;
 	filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=white,endColorstr=white);
 	background-image: none;
-	border-bottom: 1px solid white;
+	border-bottom: 0px solid white;
 	border-left: 1px solid #D0D0D0;
 	border-top: 1px solid #B0B0B0;
 	border-right: 1px solid #808080;
@@ -167,7 +168,7 @@ body ul.tabbernav > li.tabberactive a:before,
 	top: 0;
 	left: 0px;
 	width: 100%;
-	border-radius: 4px 3px 0px 0px;
+	border-radius: 0px;
 }
 body .tabber-inline ul.tabbernav > li > a,
 #flexicontent .tabber-inline ul.tabbernav > li > a {
@@ -243,9 +244,9 @@ body .s-cblue ul.tabbernav > li.tabberactive a:hover,
 	filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=white,endColorstr=white);
 	background-image: none;
 	border-bottom: 0px solid white;
-	border-left: 1px solid #5599dd;
-	border-top: 1px solid #3377bb;
-	border-right: 1px solid #225599;
+	border-left: 1px solid #b2bfcd;
+	border-top: 1px solid #b2bfcd;
+	border-right: 1px solid #b2bfcd;
 	text-shadow: none;
 	position: relative;
 }
@@ -258,7 +259,7 @@ body .s-cblue ul.tabbernav > li.tabberactive a:before,
 	top: 0;
 	left: 0px;
 	width: 100%;
-	border-radius: 2px;
+	border-radius: 0px;
 }
 body div.tabberlive:not(.tabber-inline):not(.fcparams_tabset) {
 	margin-top: 10px;
