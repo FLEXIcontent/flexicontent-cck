@@ -46,17 +46,22 @@ body ul.tabbernav > li.tabberactive a:hover,
 }
 body #flexicontent ul.tabbernav > li:hover a {
 	border: 1px solid #1c5675;
-	background-color: #1c5675;
+	background: #1c5675;
 	color: #fff;
 }
 body .tabbertab,
 #flexicontent .tabbertab {
 	background-color: #ffffff;
-	border-radius: 0px;
+	border-radius: 8px;
 }
 body ul.tabbernav,
 #flexicontent ul.tabbernav {
-	border-bottom: 1px solid inherit !important;
+	border-bottom: 1px solid #9e2323 !important;
+}
+div#fc_subtitle_tabset,
+div#fc_bottom_tabset {
+	margin-top: 40px !important;
+	margin-bottom: 40px !important;
 }
 body .flexi.infoblock {
 	padding-top: 10px;
