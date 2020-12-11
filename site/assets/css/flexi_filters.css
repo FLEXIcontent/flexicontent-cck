@@ -159,9 +159,17 @@ form > .fc_filter_line {
 	border-radius: 3px;
 	text-shadow: 2px 4px 3px rgba(0,0,0,0.3);
 }
+.fc_filter.active .fc_filter_label,
+.fc_filter_line.active .fc_filter_label {
+	background-color: darkred;
+}
 .fc_filter .fc_filter_label .label,
 .fc_filter_line .fc_filter_label .label {
 	font-size: 11px;
+}
+.fc_filter.active .fc_filter_label .label,
+.fc_filter_line.active .fc_filter_label .label {
+	background-color: darkred;
 }
 .fc_filter .fc_filter_label {
 	clear: both;

@@ -36,7 +36,11 @@ if ($ff_placement)
 		($model->_id     ? '_cat_' . $model->_id : '').
 		($model->_layout ? '_cat_' . $model->_layout : '')
 		;
-	$ff_toggle_search_title = JText::_($this->params->get('ff_toggle_search_title', 'FLEXI_TOGGLE_SEARCH_FORM'));
+	$ff_toggle_search_title = JText::_($this->params->get('ff_toggle_search_title', 'FLEXI_TOGGLE_SEARCH_FORM'))
+		. (!empty($active_filters)
+			? ' - <span class="ff_filter_active_count badge badge-important">' . $active_filters . '</span>'
+			: ''
+		);
 	$ff_slider_tagid = 'fcfilter_form_slider'.$ff_slider_id;
 
 	$active_slides = $jcookie->get($cookie_name, '{}', 'string');
@@ -112,11 +116,11 @@ if ($ff_placement)
 			var active_slides = fclib_getCookie('" . $cookie_name ."');
 			try { active_slides = JSON.parse(active_slides); } catch(e) { active_slides = {}; }
 
+			// Hide default active slide
+			$('#" . $ff_slider_tagid ." .collapse').removeClass('in');
+
 			if (!!active_slides['" . $ff_slider_tagid ."'])
 			{
-				// Hide default active slide
-				$('#" . $ff_slider_tagid ." .collapse').removeClass('in');
-
 				// Show the last active slide
 				$('#' + active_slides['" . $ff_slider_tagid ."']).addClass('in');
 			}
