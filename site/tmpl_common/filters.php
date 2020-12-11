@@ -178,6 +178,7 @@ if ( $use_search || $use_filters ) : /* BOF search and filters block */
 			$prepend_onchange = ''; //" adminFormPrepare(document.getElementById('".$form_id."'), 1); ";
 
 			$filters_html = array();
+			$active_filters = 0;
 
 			foreach ($filters as $filt)
 			{
@@ -254,7 +255,7 @@ if ( $use_search || $use_filters ) : /* BOF search and filters block */
 						<h3 class="tabberheading ' . $filter_label_class . '">' . $filt_lbl . (!$is_empty ? ' *' : '') . '</h3>' : '')
 
 						/* External filter container */.'
-						<div class="'.$filter_container_class.$even_odd_class.' fc_filter_id_'.$filt->id.'" >'.
+						<div class="'.$filter_container_class.$even_odd_class . (!$is_empty ? ' active' : '' ) . ' fc_filter_id_'.$filt->id.'" >'.
 
 							/* Optional filter label before filter's HTML */
 							($label_outside ? '
@@ -278,6 +279,8 @@ if ( $use_search || $use_filters ) : /* BOF search and filters block */
 					: $_filter_html;
 
 				$filters_html[] = $_filter_html;
+
+				if (!$is_empty) $active_filters++;
 			}
 
 
