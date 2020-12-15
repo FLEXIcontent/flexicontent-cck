@@ -52,9 +52,7 @@ foreach ($values as $value)
 	// Add styles for label position
 	$document = JFactory::getDocument();
 	$styleurl = JUri::root(true) . '/plugins/flexicontent_fields/email/css/style.css';
-	$document->addStyleSheet($styleurl);;
-
-
+	$document->addStyleSheet($styleurl);
 
 	// Use paremeters to decide if email should be cloaked and if we need a mailto: link
 	//title form display
@@ -64,6 +62,26 @@ foreach ($values as $value)
 		$titleformD = '<LEGEND>'.$titleform.'</LEGEND>';
 	} else {
 		$titleformD='';
+	}
+
+	//modal display
+	$use_modal = $field->parameters->get('use_modal', 1);
+	$modal_button_text = $field->parameters->get('modal_button_text', 'FLEXI_FIELD_EMAIL_MODAL_BUTTON_CONTENT');
+	$modal_button_class = $field->parameters->get('modal_button_class', 'btn btn-info');
+	if ($use_modal == 1){
+		$modal_header = "<button data-toggle='modal' data-target='#myModal' class='$modal_button_class'>".Jtext::_($modal_button_text)."</button>
+		<div id='myModal' class='modal fade' role='dialog'>
+	  <div class='modal-dialog'>
+		<div class='modal-content'>
+		  <div class='modal-header' style='border-bottom: 0px solid #eee;'>
+			<button type='button' class='close' data-dismiss='modal'>&times;</button>
+		  </div>
+		  <div class='modal-body'>";
+		  $modal_footer = "</div></div></div>";
+	}else{
+		$modal_header = "";
+		$modal_footer = "";
+
 	}
 
 	// Consent field
@@ -198,6 +216,7 @@ if ( $joomla_captcha != '0' && $captcha_display) {
 						}
 
 	$html = '
+	'.$modal_header.'
 		<form id="contact-form-'.$formid.'" method="POST" class="form-validate" enctype="multipart/form-data">
 		<fieldset>
 			'.$titleformD.'
@@ -230,7 +249,9 @@ if ( $joomla_captcha != '0' && $captcha_display) {
   				}
  				})
 			});
-		</script>';
+		</script>
+		'.$modal_footer.'
+    ';
 
 
 

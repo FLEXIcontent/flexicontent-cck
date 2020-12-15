@@ -226,6 +226,16 @@
 			<option value="placeholder">FLEXI_LABEL_PLACEHOLDER</option>
 			</field>
 
+			<field name="" type="separator" default="FLEXI_FIELD_EMAIL_FORM_MODAL" level="level2" />
+
+			<field name="use_modal" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_FIELD_EMAIL_USE_MODAL" description="FLEXI_FIELD_EMAIL_USE_MODAL_DESC" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="use_modal">FLEXI_NO</option>
+				<option value="1" show_list="use_modal" hide_list="">FLEXI_YES</option>
+			</field>
+			<field name="modal_button_text" type="text" label="FLEXI_FIELD_EMAIL_MODAL_BUTTON_TEXT"  defaut="FLEXI_FIELD_EMAIL_MODAL_BUTTON_CONTENT" description="FLEXI_FIELD_EMAIL_MODAL_BUTTON_TEXT_DESC" depend_class="use_modal" />
+			<field name="modal_button_class" type="text" label="FLEXI_FIELD_EMAIL_MODAL_BUTTON_CLASS"  defaut="btn btn-info" description="FLEXI_FIELD_EMAIL_MODAL_BUTTON_CLASS_DESC" depend_class="use_modal" />
+			
+
 			<field name="" type="separator" default="FLEXI_FIELD_EMAIL_FORM_FIELDS" level="level2" />
 
 			<field name="form_fields" type="subform" label="Form field" description="" layout="joomla.form.field.subform.repeatable" icon="list" multiple="true" class="fcsubform-compact">
