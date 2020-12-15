@@ -1827,7 +1827,7 @@ html[dir="rtl"] .select2-container .select2-choice {
 	min-height: 20px !important;
 	padding: 1px 4px !important;
 	margin-top: 1px !important;
-	border: 1px solid lightgray !important;
+	border: 0px solid lightgray !important;
 	background: #fff url('../images/select2.png') no-repeat 100% -22px !important;
 	background: url('../images/select2.png') no-repeat 100% -22px, -webkit-gradient(linear,left bottom,left top,color-stop(0.85,#fff),color-stop(0.99,#eee)) !important;
 	background: url('../images/select2.png') no-repeat 100% -22px, -webkit-linear-gradient(center bottom,#fff 85%,#eee 99%) !important;
@@ -1993,9 +1993,6 @@ div#permissions .tab-content {
 img.fc_field_image {
 	display: inline-block;
 	margin: 0px 4px 6px 0px;
-	padding: 1px;
-	border: 1px solid lightgray;
-	border-radius: 5px;
 }
 div .fc_image_thumb {
 	display: inline-block;

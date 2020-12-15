@@ -189,7 +189,7 @@ form > .fc_filter_line {  /* filters placed directly inside form aka outside the
 	vertical-align: baseline;
 	white-space: nowrap;
 	border-radius: 5px;
-	margin: 0px 2px 0px 4px;
+	/*margin: 0px 2px 0px 4px;*/
 }
 .fc_filter .fc_filter_label_inline,
 .fc_filter_line .fc_filter_label_inline {
@@ -274,7 +274,7 @@ form > .fc_filter_line {  /* filters placed directly inside form aka outside the
 .fc_filter_html > *,
 .fc_filter_html > * {
 	vertical-align: middle;
-	margin: 2px 0 2px 4px;
+	/*margin: 2px 0 2px 4px;*/
 }
 
 /* Clear filter label from filter html*/
@@ -291,7 +291,7 @@ form > .fc_filter_line {  /* filters placed directly inside form aka outside the
 	margin: 24px 24px 6px 24px;
 }
 .fc_filter_html > .noUi-target.noToolTipSlider {
-	margin: 8px 16px 6px 16px;
+	margin: 6px 16px 6px 16px;
 }
 
 /* Highlight date calendar inside FC filters */
@@ -325,13 +325,13 @@ form > .fc_filter_line {  /* filters placed directly inside form aka outside the
 }
 .fc_filter_html .fc_text_filter.select2-container.select2-container-multi,
 .fc_filter_html .fc_field_filter.select2-container.select2-container-multi {
-	margin: 2px 0px 2px 4px;
+	/*margin: 2px 0px 2px 4px;*/
 }
 .fc_filter_html :not(.input-prepend):not(.input-append) > .fc_text_filter,
 .fc_filter_html :not(.input-prepend):not(.input-append) > .fc_field_filter {
 	border-radius: 5px;
-	padding: 2px 0px 2px 4px;
-	margin: 2px 0px 2px 4px;
+	/*padding: 2px 0px 2px 4px;
+	margin: 2px 0px 2px 4px;*/
 	font-size: 11px;
 }
 .fc_filter_html not(.input-prepend):not(.input-append) > input.fc_text_filter,
@@ -356,7 +356,7 @@ form > .fc_filter_line {  /* filters placed directly inside form aka outside the
 .fc_filter_html :not(.input-append):not(.input-prepend) > input.fc_field_filter,
 .fc_filter_html :not(.input-append):not(.input-prepend) > input.fc_text_filter:focus,
 .fc_filter_html :not(.input-append):not(.input-prepend) > input.fc_field_filter:focus {
-	padding: 5px 26px 6px 4px;
+	/*padding: 5px 26px 6px 4px;*/
 	background: url(../images/magnifier-left.png) 98% 6px no-repeat white;
 }
 
@@ -449,7 +449,7 @@ span.fc_field_filter {
 	text-align: left;
 }
 .fc_filter > .fc_filter_html > .fc_checkradio_group_wrapper > ul.fc_field_filter.fc_checkradio_group label {
-	margin: 6px 6px 4px 0px;
+	margin: 0px 8px 4px 6px;
 	display: inline-block;
 }
 
@@ -473,7 +473,7 @@ span.fc_field_filter {
 	width: unset;
 }
 .fc_filter_html.fc_text_search > * {
-	margin: 2px;
+	/*margin: 4px 0px 4px 0px;*/
 }
 
 
@@ -499,4 +499,23 @@ span.fc_field_filter {
 .fc_has_inner_prompt.fc_has_inner_prompt_select2 {
 	left: 4px;
 	top: 8px;
+}
+
+/** more styling for select2 field in filter **/
+.fc_filter_html .use_select2_lib {
+    width: 100% !important;
+}
+.fc_filter_html .field-calendar .fc_field_filter {
+    color: black;
+    font-weight: normal;
+    display: inline-block;
+    width: 67%;
+}
+.fc_filter_html .select2-container .select2-search-field {
+	padding: 0px !important;
+    margin: 0px !important;
+}
+.fc_filter_html .select2-container-multi .select2-choices {
+    border: 1px solid #aaa;
+	border-radius: 5px;
 }
