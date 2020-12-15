@@ -149,9 +149,6 @@ body .flexi.infoblock{
 .topblock .flexi.image a {
 	outline: none;
 }
-.topblock .flexi.image img {
-	border: 1px solid white;
-}
 .topblock .flexi.infoblock {
 	overflow: hidden;
   	border-radius: @FCI_column_border_radius_top + px;
@@ -166,6 +163,10 @@ body .flexi.infoblock{
 	border : @FCI_column_border_size_bottom + px @FCI_column_border_type_bottom @FCI_column_border_color_bottom;
   	color: @FCI_column_color_bottom;
 	background-color: @FCI_column_bg_color_bottom;
+}
+.flexi.topblock ul { /* remove bottstrap padding */
+    padding: 0;
+    margin: 0;
 }
 
 
