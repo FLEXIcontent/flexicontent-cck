@@ -295,7 +295,8 @@ input.fc_text_filter:not(.fc_iscalendar),
 input.fc_text_filter:not(.fc_iscalendar):focus,
 input.fc_field_filter:not(.fc_iscalendar),
 input.fc_field_filter:not(.fc_iscalendar):focus {
-	min-width: 180px;
+	min-width: 92%;
+	width: 92% !important;
 }
 input.fc_text_filter.fc_iscalendar,
 input.fc_field_filter.fc_iscalendar {
@@ -405,7 +406,7 @@ span.fc_field_filter {
 	color: black;
 	font-weight: normal;
 	display: inline-block;
-	width: 67%;
+	width: 69%;
 }
 .fc_filter_html .select2-container .select2-search-field {
 	padding: 0px !important;
