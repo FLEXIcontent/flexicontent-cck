@@ -1,13 +1,13 @@
 .flexicontent :not(.input-prepend):not(.input-append) > input[type="text"]:not(.minicolors) {
 	display: inline-block;
-	margin: 1px 2px 1px 2px;
+	margin: 0px 2px 1px 2px;
 }
 .flexicontent *:not(.input-append):not(.input-prepend):not(.input-group) > div.use_select2_lib {
-	margin: 1px 2px 1px 2px;
+	margin: 0px 2px 1px 2px;
 }
 .flexicontent *:not(.input-append):not(.input-prepend):not(.input-group) > select:not(.custom-select) {
 	display: inline-block;
-	margin: 1px 2px 1px 2px;
+	margin: 0px 2px 1px 2px;
 	padding: 4px;
 	border-radius: 4px;
 	height: auto;
@@ -3685,7 +3685,7 @@ html[dir="rtl"] .select2-container .select2-choice {
 	top: 0 !important;
 	left: 0 !important;
 	padding: 0px !important;
-	margin: 0 6px 0 0 !important;
+	margin: 0 0 6px 0 !important;
 	white-space: normal !important;
 	width: auto !important;
 	min-width: 24px !important;
@@ -3706,7 +3706,7 @@ html[dir="rtl"] .select2-container .select2-choice {
 	min-height: 20px !important;
 	padding: 1px 4px !important;
 	margin-top: 1px !important;
-	border: 1px solid lightgray !important;
+	border: 0px solid lightgray !important;
 	background: #fff url('../images/select2.png') no-repeat 100% -22px !important;
 	background: url('../images/select2.png') no-repeat 100% -22px, -webkit-gradient(linear,left bottom,left top,color-stop(0.85,#fff),color-stop(0.99,#eee)) !important;
 	background: url('../images/select2.png') no-repeat 100% -22px, -webkit-linear-gradient(center bottom,#fff 85%,#eee 99%) !important;
