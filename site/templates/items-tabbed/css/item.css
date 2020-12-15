@@ -97,16 +97,13 @@ body .flexi.infoblock {
 	float: left;
 	max-width: 99% !important;
 	padding: 0% !important;
-	margin-right: 1%;
+	margin-right: 0%;
 	margin-left: 0%;
 	line-height: 0px;
 	border: 0px solid silver;
 }
 .topblock .flexi.image a {
 	outline: none;
-}
-.topblock .flexi.image img {
-	border: 1px solid white;
 }
 .topblock .flexi.infoblock {
 	overflow: hidden;
@@ -121,6 +118,10 @@ body .flexi.infoblock {
 	border: 0px solid inherit;
 	color: inherit;
 	background-color: inherit;
+}
+.flexi.topblock ul {
+	padding: 0;
+	margin: 0;
 }
 .flexi.infoblock {
 	border: 1px solid silver;
