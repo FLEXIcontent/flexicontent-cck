@@ -1,13 +1,13 @@
 .flexicontent :not(.input-prepend):not(.input-append) > input[type="text"]:not(.minicolors) {
 	display: inline-block;
-	margin: 1px 2px 1px 2px;
+	margin: 0px 2px 1px 2px;
 }
 .flexicontent *:not(.input-append):not(.input-prepend):not(.input-group) > div.use_select2_lib {
-	margin: 1px 2px 1px 2px;
+	margin: 0px 2px 1px 2px;
 }
 .flexicontent *:not(.input-append):not(.input-prepend):not(.input-group) > select:not(.custom-select) {
 	display: inline-block;
-	margin: 1px 2px 1px 2px;
+	margin: 0px 2px 1px 2px;
 	padding: 4px;
 	border-radius: 4px;
 	height: auto;
@@ -3685,7 +3685,7 @@ html[dir="rtl"] .select2-container .select2-choice {
 	top: 0 !important;
 	left: 0 !important;
 	padding: 0px !important;
-	margin: 0 6px 0 0 !important;
+	margin: 0 0 6px 0 !important;
 	white-space: normal !important;
 	width: auto !important;
 	min-width: 24px !important;

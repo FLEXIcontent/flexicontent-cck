@@ -1800,7 +1800,7 @@ html[dir="rtl"] .select2-container .select2-choice {
 	top: 0 !important;
 	left: 0 !important;
 	padding: 0px !important;
-	margin: 0 6px 0 0 !important;
+	margin: 0 0 6px 0 !important;
 	white-space: normal !important;
 	width: auto !important;
 	min-width: 24px !important;
