@@ -1,5 +1,6 @@
 <?php
 JHtml::_('behavior.formvalidator');
+JHtml::_('behavior.modal', 'a.modal');
 // Create field's HTML
 $field->{$prop} = array();
 $n = 0;
@@ -64,20 +65,24 @@ foreach ($values as $value)
 		$titleformD='';
 	}
 
-	//modal display
+	//modal display 
+	//TODO remplace joomla modal for flexicontent modal base on jquery
 	$use_modal = $field->parameters->get('use_modal', 1);
 	$modal_button_text = $field->parameters->get('modal_button_text', 'FLEXI_FIELD_EMAIL_MODAL_BUTTON_CONTENT');
 	$modal_button_class = $field->parameters->get('modal_button_class', 'btn btn-info');
+	$modal_height = $field->parameters->get('modal_height', 400);
+	$modal_widht = $field->parameters->get('modal_width', 400);
 	if ($use_modal == 1){
-		$modal_header = "<button data-toggle='modal' data-target='#myModal' class='$modal_button_class'>".Jtext::_($modal_button_text)."</button>
-		<div id='myModal' class='modal fade' role='dialog'>
-	  <div class='modal-dialog'>
+		$modal_header = "<button id='modal_info' data-toggle='modal' data-target='#myModal' class='$modal_button_class' rel='{handler: 'iframe', size: {x: $modal_height, y: $modal_widht}}'>".Jtext::_($modal_button_text)."</button>
+		<div id='myModal' class='modal fade' role='dialog'  tabindex='-1' role='dialog' aria-labelledby='contact' aria-hidden='true'>
+	  <div class='modal-dialog-centered'>
 		<div class='modal-content'>
 		  <div class='modal-header' style='border-bottom: 0px solid #eee;'>
 			<button type='button' class='close' data-dismiss='modal'>&times;</button>
 		  </div>
 		  <div class='modal-body'>";
-		  $modal_footer = "</div></div></div>";
+		  $modal_footer = "</div></div></div>
+";
 	}else{
 		$modal_header = "";
 		$modal_footer = "";

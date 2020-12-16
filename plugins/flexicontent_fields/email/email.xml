@@ -234,6 +234,8 @@
 			</field>
 			<field name="modal_button_text" type="text" label="FLEXI_FIELD_EMAIL_MODAL_BUTTON_TEXT"  defaut="FLEXI_FIELD_EMAIL_MODAL_BUTTON_CONTENT" description="FLEXI_FIELD_EMAIL_MODAL_BUTTON_TEXT_DESC" depend_class="use_modal" />
 			<field name="modal_button_class" type="text" label="FLEXI_FIELD_EMAIL_MODAL_BUTTON_CLASS"  defaut="btn btn-info" description="FLEXI_FIELD_EMAIL_MODAL_BUTTON_CLASS_DESC" depend_class="use_modal" />
+			<field name="modal_width" type="number" label="FLEXI_WIDTH"  defaut="4000" description="" depend_class="use_modal" />
+			<field name="modal_height" type="number" label="FLEXI_HEIGHT"  defaut="400" description="" depend_class="use_modal" />
 			
 
 			<field name="" type="separator" default="FLEXI_FIELD_EMAIL_FORM_FIELDS" level="level2" />
