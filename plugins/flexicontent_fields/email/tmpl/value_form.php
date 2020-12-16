@@ -67,22 +67,22 @@ foreach ($values as $value)
 
 	//modal display 
 	//TODO remplace joomla modal for flexicontent modal base on jquery
+	$view = $app->input->getCmd('flexi_callview', ($realview ?: 'item'));
 	$use_modal = $field->parameters->get('use_modal', 1);
+	$use_modal_in_view = $field->parameters->get('use_modal_in_view', 'both');
 	$modal_button_text = $field->parameters->get('modal_button_text', 'FLEXI_FIELD_EMAIL_MODAL_BUTTON_CONTENT');
 	$modal_button_class = $field->parameters->get('modal_button_class', 'btn btn-info');
 	$modal_height = $field->parameters->get('modal_height', 400);
 	$modal_widht = $field->parameters->get('modal_width', 400);
-	if ($use_modal == 1){
+	if (($use_modal == 1 && $view=='item' && $use_modal_in_view =='item') || ($use_modal == 1 && $view=='category' && $use_modal_in_view =='category') || ($use_modal == 1 && $use_modal_in_view =='both')){
 		$modal_header = "<button id='modal_info' data-toggle='modal' data-target='#myModal' class='$modal_button_class' rel='{handler: 'iframe', size: {x: $modal_height, y: $modal_widht}}'>".Jtext::_($modal_button_text)."</button>
-		<div id='myModal' class='modal fade' role='dialog'  tabindex='-1' role='dialog' aria-labelledby='contact' aria-hidden='true'>
-	  <div class='modal-dialog-centered'>
+		<div id='myModal' class='modal hide fade' role='dialog'  tabindex='-1' role='dialog' aria-labelledby='contact' aria-hidden='true'>
 		<div class='modal-content'>
 		  <div class='modal-header' style='border-bottom: 0px solid #eee;'>
 			<button type='button' class='close' data-dismiss='modal'>&times;</button>
 		  </div>
 		  <div class='modal-body'>";
-		  $modal_footer = "</div></div></div>
-";
+		  $modal_footer = "</div></div></div>";
 	}else{
 		$modal_header = "";
 		$modal_footer = "";
@@ -93,6 +93,7 @@ foreach ($values as $value)
 	$consent_field_display = $field->parameters->get('display_consent', 1);
 	$consent_field_text = $field->parameters->get('text_consent', 'FLEXI_FIELD_EMAIL_CONSENT_LABEL_VALUE');
 	$consent_field_link = $field->parameters->get('link_consent', '');
+	$consent_field ="";
 	if($consent_field_display){
 		$consent_field = '<div class="field form-group control-group"><input type="checkbox" id="consent" name="consent" value="consent" class="required">
 		<label for="consent">

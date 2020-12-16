@@ -232,6 +232,12 @@
 				<option value="0" show_list="" hide_list="use_modal">FLEXI_NO</option>
 				<option value="1" show_list="use_modal" hide_list="">FLEXI_YES</option>
 			</field>
+			<field name="use_modal_in_view" type="multilist" subtype="radio" toggle_related="1" default="both" label="FLEXI_FIELD_EMAIL_USE_MODAL" description="FLEXI_FIELD_EMAIL_USE_MODAL_DESC" class="btn-group btn-group-yesno" depend_class="use_modal">
+				<option value="item" >FLEXI_ITEM</option>
+				<option value="category" >FLEXI_CATEGORY</option>
+				<option value="both" >FLEXI_BOTH</option>
+			</field>
+			
 			<field name="modal_button_text" type="text" label="FLEXI_FIELD_EMAIL_MODAL_BUTTON_TEXT"  defaut="FLEXI_FIELD_EMAIL_MODAL_BUTTON_CONTENT" description="FLEXI_FIELD_EMAIL_MODAL_BUTTON_TEXT_DESC" depend_class="use_modal" />
 			<field name="modal_button_class" type="text" label="FLEXI_FIELD_EMAIL_MODAL_BUTTON_CLASS"  defaut="btn btn-info" description="FLEXI_FIELD_EMAIL_MODAL_BUTTON_CLASS_DESC" depend_class="use_modal" />
 			<field name="modal_width" type="number" label="FLEXI_WIDTH"  defaut="4000" description="" depend_class="use_modal" />
