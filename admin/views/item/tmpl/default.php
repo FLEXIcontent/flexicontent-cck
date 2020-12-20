@@ -129,6 +129,7 @@ if ($this->perms['cantags'] || $this->perms['canversion'])
 							q: term,
 							task: 'viewtags',
 							item_lang: jQuery('#jform_language').val(),
+							lang: '". JFactory::getLanguage()->getTag() . "',
 							format: 'json'
 						},
 						success: function(data)
