@@ -1359,7 +1359,7 @@ class ParentClassItem extends FCModelAdmin
 
 			foreach($item as $i => $v)
 			{
-				
+
 				if ($i === 'fields' || $i === 'parameters')
 				{
 					continue;
@@ -3913,10 +3913,20 @@ class ParentClassItem extends FCModelAdmin
 			return array();
 		}
 
+		$lang_code = !empty($this->_record->language) ? $this->_record->language : JFactory::getLanguage()->getTag();
+
+		$query = $this->_db->getQuery(true)
+			->select('la.*')
+			->from('#__languages AS la')
+			->where('la.lang_code = ' . $this->_db->quote($lang_code))
+			;
+		$lang = $this->_db->setQuery($query)->loadObject();
+
 		$query 	= 'SELECT *, t.id as tid,'
-			. (!FLEXI_FALANG ? ' "" AS translated_text' : ' fa.value AS translated_text')
+			. (!FLEXI_FALANG || !$lang ? ' "" AS translated_text' : ' fa.value AS translated_text')
 			. ' FROM #__flexicontent_tags as t '
-			. (!FLEXI_FALANG ? '' : ' LEFT JOIN #__falang_content AS fa ON fa.reference_table = "tags" AND fa.reference_field = "title" AND fa.reference_id = t.jtag_id')
+			. (!FLEXI_FALANG || !$lang ? '' : ' LEFT JOIN #__falang_content AS fa ON fa.reference_table = "tags" AND fa.reference_field = "title" AND fa.reference_id = t.jtag_id'
+				. ' AND fa.language_id = ' . (int) $lang->lang_id)
 			. ' WHERE t.id IN (\'' . implode("','", $tagIds).'\')'
 			. ' ORDER BY name ASC'
 			;

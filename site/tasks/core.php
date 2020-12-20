@@ -79,8 +79,8 @@ class FlexicontentTasksCore
 		$lang    = substr($lang, 0,2);
 
 		$pageSize = $jinput->get('pageSize', 20, 'int');
-		$pageNum  = $jinput->get('pageNum', 1, 'int');		
-		$usesubs  = $jinput->get('usesubs', 1, 'int');		
+		$pageNum  = $jinput->get('pageNum', 1, 'int');
+		$usesubs  = $jinput->get('usesubs', 1, 'int');
 
 		$min_word_len = $app->getUserState( $this->option.'.min_word_len', 0 );
 		$filtercat    = $cparams->get('filtercat', 0);      // Filter items using currently selected language
@@ -89,13 +89,13 @@ class FlexicontentTasksCore
 		// Get category ID(s)
 		$cid  = $jinput->get('cid', 0, 'int');
 		$cids = $jinput->get('cids', '', 'string');
-		
+
 		// CASE 1: Single category view, zero or string means ignore and use 'cids'
 		if ($cid)
 		{
 			$_cids = array($cid);
 		}
-		
+
 		// CASE 2: Multi category view
 		elseif (!empty($cids))
 		{
@@ -398,7 +398,7 @@ class FlexicontentTasksCore
 
 		// Load cached category data
 		global $globalcats;
-		if (FLEXI_CACHE) 
+		if (FLEXI_CACHE)
 		{
 			// Add the category tree to categories cache
 			$catscache = JFactory::getCache('com_flexicontent_cats');
@@ -418,7 +418,7 @@ class FlexicontentTasksCore
 
 	/**
 	 * Method to fetch tags according to a given text
-	 * 
+	 *
 	 * @return object
 	 * @since 1.0
 	 */
@@ -431,8 +431,11 @@ class FlexicontentTasksCore
 		if ($jinput->get('task', '', 'cmd') == __FUNCTION__) die(__FUNCTION__ . ' : direct call not allowed');
 
 		$db = JFactory::getDbo();
-		
-		$lang_code = $jinput->getString('item_lang', JFactory::getLanguage()->getTag());
+
+		$lang_code = $jinput->getString('item_lang');
+		$lang_code = $lang_code && $lang_code !== '*'
+          ? $lang_code
+          : $jinput->getString('lang', JFactory::getLanguage()->getTag());
 
 		$query = $db->getQuery(true)
 			->select('la.*')
@@ -453,7 +456,8 @@ class FlexicontentTasksCore
 			? $query->select('"" AS fa_text')
 			:	$query
 					->select('fa.value AS fa_text')
-					->leftjoin('#__falang_content AS fa ON fa.reference_table = "tags" AND fa.reference_field = "title" AND fa.reference_id = ft.jtag_id');
+					->leftjoin('#__falang_content AS fa ON fa.reference_table = "tags" AND fa.reference_field = "title" AND fa.reference_id = ft.jtag_id'
+						. ' AND fa.language_id = ' . (int) $lang->lang_id);
 
 		if (trim($text))
 		{
@@ -462,7 +466,7 @@ class FlexicontentTasksCore
 
 			!FLEXI_FALANG
 				? $query->where('name LIKE ' . $quoted_text)
-				: $query->where('ft.name LIKE ' . $quoted_text . ' OR (fa.language_id = ' . (int) $lang->lang_id . ' AND fa.value LIKE ' . $quoted_text . ')');
+				: $query->where('ft.name LIKE ' . $quoted_text . ' OR fa.value LIKE ' . $quoted_text);
 		}
 
 		$tags = $db->setQuery($query, 0, (int) $limit)->loadObjectlist();
@@ -473,7 +477,7 @@ class FlexicontentTasksCore
 
 	/**
 	 * Method to load language files
-	 * 
+	 *
 	 * @return object
 	 * @since 3.2.1.4
 	 */
