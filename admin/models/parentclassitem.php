@@ -460,6 +460,9 @@ class ParentClassItem extends FCModelAdmin
 
 			// Load item parameters with heritage, (SUBMIT ITEM FORM)
 			$this->_loadItemParams($no_cache);
+
+			// Update item's default language now that all parameters have been loaded
+			$this->_record->language = $this->getDefaultItemLanguage($this->_record);
 		}
 
 		// Verify item's type. This method verify new item type exists or gets item type for existing item
@@ -1685,6 +1688,29 @@ class ParentClassItem extends FCModelAdmin
 
 
 	/**
+	 * Return default language for new items
+	 *
+	 * @since	3.3
+	 */
+	protected function getDefaultItemLanguage($record)
+	{
+		$params = !empty($record->parameters) ? $record->parameters : $this->_cparams;
+
+		$app   = JFactory::getApplication();
+		$user  = JFactory::getUser();
+
+		$default_lang = $app->isClient('site')
+			? $params->get('default_language_fe', '_author_lang_')
+			: '*';   // or Site default:  // flexicontent_html::getSiteDefaultLang()  // JComponentHelper::getParams('com_languages')->get('site', '*')
+		$default_lang = $default_lang === '_author_lang_'
+			? $user->getParam('language', '*')
+			: $default_lang;
+
+		return $default_lang;
+	}
+
+
+	/**
 	 * Set model's default values into the record properties, overriding DB table column default values
 	 *
 	 * Note. Calling getState in this method will result in recursion.
@@ -1715,13 +1741,7 @@ class ParentClassItem extends FCModelAdmin
 
 		// Default -- Language
 		// -- NOTE: There are language limitations per user / usergroup that may override the defaults ...
-		$default_lang = $app->isClient('site')
-			? $this->_cparams->get('default_language_fe', '_author_lang_')
-			: '*';   // or Site default:  // flexicontent_html::getSiteDefaultLang()  // JComponentHelper::getParams('com_languages')->get('site', '*')
-		$default_lang = $default_lang === '_author_lang_'
-			? $user->getParam('language', '*')
-			: $default_lang;
-
+		$default_lang = $this->getDefaultItemLanguage($record);
 
 		// ***
 		// *** DB properties that do not use DB / getTable() defaults
