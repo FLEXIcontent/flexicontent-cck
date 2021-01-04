@@ -792,7 +792,7 @@ var tabberOptions =
 		/* If a cookie was previously set, restore the active tab */
 		i = parseInt(tabberGetCookie(t.cookie));
 
-window.console.log(t.forcedTab);
+		//window.console.log(t.forcedTab);
 
 		if (isNaN(i) || t.forcedTab >= 0) { return; }
 		t.tabShow(i);
