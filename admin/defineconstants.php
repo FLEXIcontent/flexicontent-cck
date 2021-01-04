@@ -87,7 +87,7 @@ $popup_upload = $jinput->get('pop_up', null, 'cmd');
 $path = "fleximedia_path";
 if(substr(strtolower($view),0,6) == "images" || $popup_upload == 1) $path = "image_path";
 if (!defined('COM_FLEXIMEDIA_BASE'))		define('COM_FLEXIMEDIA_BASE',		 JPath::clean(JPATH_ROOT.DS.$params->get($path, 'images'.DS.'stories')));
-if (!defined('COM_FLEXIMEDIA_BASEURL'))	define('COM_FLEXIMEDIA_BASEURL', JUri::root().$params->get($path, 'images/stories'));
+if (!defined('COM_FLEXIMEDIA_BASEURL'))	define('COM_FLEXIMEDIA_BASEURL', (php_sapi_name() !== 'cli' ? JUri::root() : JPATH_ROOT . '/').$params->get($path, 'images/stories'));
 
 if (!defined('FLEXI_SECTION'))				define('FLEXI_SECTION', 0);
 
