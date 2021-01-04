@@ -119,8 +119,7 @@ if ($this->perms['cantags'] || $this->perms['canversion'])
 					}
 
 					//window.console.log( 'Getting tags for \"' + term + '\" ...');
-
-					window.console.log(jQuery('#jform_language').val());
+					//window.console.log(jQuery('#jform_language').val());
 
 					jQuery.ajax({
 						url: '".JUri::base(true)."/components/com_flexicontent/tasks/core.php?". JSession::getFormToken() ."=1',
