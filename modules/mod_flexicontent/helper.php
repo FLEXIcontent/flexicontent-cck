@@ -461,8 +461,6 @@ class modFlexicontentHelper
 								$src = flexicontent_html::extractimagesrc($row);
 							}elseif(!$src && $fallback_field && $mod_image_fallback_img==3) {
 								$image_url2 = FlexicontentFields::getFieldDisplay($row, $fallback_field, null, 'display_large_src', 'module');
-								$src2 = '';
-								$thumb2 = '';
 								if ($image_url2)
 								{
 									$img_field2 = $row->fields[$fallback_field];
@@ -650,8 +648,6 @@ class modFlexicontentHelper
 								$src = flexicontent_html::extractimagesrc($row);
 							}elseif(!$src && $fallback_field && $mod_image_fallback_img==3) {
 								$image_url2 = FlexicontentFields::getFieldDisplay($row, $fallback_field, null, 'display_large_src', 'module');
-								$src2 = '';
-								$thumb2 = '';
 								if ($image_url2)
 								{
 									$img_field2 = $row->fields[$fallback_field];

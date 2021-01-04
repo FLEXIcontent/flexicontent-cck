@@ -572,7 +572,7 @@ $container_id = $module->id . (count($catdata_arr) > 1 && $catdata ? '_' . $catd
 
 					<?php if ($mod_use_image_feat && $item->image_rendered) : ?>
 
-						<div class="image_featured" <?php echo $img_container_class_feat;?>">
+						<div class="image_featured <?php echo $img_container_class_feat;?>">
 							<?php if ($mod_link_image_feat) : ?>
 								<a href="<?php echo $item->link; ?>"><?php echo $item->image_rendered; ?></a>
 							<?php else : ?>
@@ -864,7 +864,7 @@ $container_id = $module->id . (count($catdata_arr) > 1 && $catdata ? '_' . $catd
 
 					<?php if ($mod_use_image && $item->image_rendered) : ?>
 
-						<div class="image_standard" <?php echo $img_container_class;?>">
+						<div class="image_standard <?php echo $img_container_class;?>">
 							<?php if ($mod_link_image) : ?>
 								<a href="<?php echo $item->link; ?>"><?php echo $item->image_rendered; ?></a>
 							<?php else : ?>
