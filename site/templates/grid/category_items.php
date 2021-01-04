@@ -1,15 +1,9 @@
 <?php
 /**
- * @version 1.5 stable $Id$
- * @package Joomla
- * @subpackage FLEXIcontent
- * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
+ * @package FLEXIcontent
+ * @copyright (C) 2009-2021 Emmanuel Danan, Georgios Papadakis, Yannick Berges
+ * @author Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
  * @license GNU/GPL v2
- * 
- * FLEXIcontent is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
  */
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
@@ -318,6 +312,8 @@ if ($leadnum) :
 		
 		$lead_fallback_field = $params->get('lead_fallback_field', 0);
 		$lead_image_fallback_img = $params->get('lead_image_fallback_img');
+		$lead_image_custom_display	= $params->get('lead_image_custom_url');
+		$lead_image_custom_url	= $params->get('lead_image_custom_url');
 
 		$lead_dimgs = $this->params->get('lead_default_images');
 		if ($lead_use_image && $lead_dimgs)
@@ -336,6 +332,7 @@ if ($leadnum) :
 		for ($i=0; $i < $leadnum; $i++) :
 			$item = $items[$i];
 			$src = '';
+			$thumb_rendered = '';
 			$fc_item_classes = 'fc_newslist_item';
 			if ($doing_cat_order)
      		$fc_item_classes .= ($i==0 || ($items[$i-1]->rel_catid != $items[$i]->rel_catid) ? ' fc_cat_item_1st' : '');
@@ -365,16 +362,16 @@ if ($leadnum) :
 					$varname = $varname ? $varname : 'display';
 					$thumb_rendered = FlexicontentFields::getFieldDisplay($item, $fieldname, null, $varname, 'category');
 					$src = '';  // Clear src no rendering needed
-					$_thumb_w = $_thumb_h = 0;
+					$item->image_w = $item->image_h = 0;
 				}
-				if (!$src && $lead_image_custom_url)
+				if (!$src && !$thumb_rendered && $lead_image_custom_url)
 				{
 					@list($fieldname, $varname) = preg_split('/##/',$lead_image_custom_url);
 					$fieldname = trim($fieldname); $varname = trim($varname);
 					$varname = $varname ? $varname : 'display';
 					$src =  FlexicontentFields::getFieldDisplay($item, $fieldname, null, $varname, 'category');
 				}
-				if (!$src && $lead_image_fallback_img)
+				if (!$src && !$thumb_rendered && $lead_image_fallback_img)
 				{
 					// Render method 'display_NNNN_src' to avoid CSS/JS being added to the page
 					$img_field = false;
@@ -401,10 +398,10 @@ if ($leadnum) :
 						$src = flexicontent_html::extractimagesrc($item);
 					}
 
-					if(!$src && $lead_fallback_field) {
+					if (!$src && $lead_fallback_field)
+					{
 						$image_url2 = FlexicontentFields::getFieldDisplay($item, $lead_fallback_field, $values=null, $method='display_'.$img_field_size.'_src', 'category');
-						$src2 = '';
-						$thumb2 = '';
+
 						if ($image_url2)
 						{
 							$img_field2 = $item->fields[$lead_fallback_field];
@@ -415,9 +412,9 @@ if ($leadnum) :
 							}
 							else
 							{
-								$thumb = @ $img_field2->thumbs_src[ $lead_use_image ][0];
-								$_thumb_w = $thumb ? $img_field2->parameters->get('w_'.$lead_use_image[0], 120) : 0;
-								$_thumb_h = $thumb ? $img_field2->parameters->get('h_'.$lead_use_image[0], 90) : 0;
+								$src = @ $img_field2->thumbs_src[ $lead_use_image ][0];
+								$item->image_w = $src ? $img_field2->parameters->get('w_'.$lead_use_image[0], 120) : 0;
+								$item->image_h = $src ? $img_field2->parameters->get('h_'.$lead_use_image[0], 90) : 0;
 							}
 						}
 					}
@@ -447,7 +444,7 @@ if ($leadnum) :
 					$item->image_h = $this->params->get('lead_height', 200);
 				} else {
 					// Do not resize image when (a) image src path not set or (b) using image field's already created thumbnails
-					$item->image = $src;
+					$item->image = $src ?: $thumb_rendered;
 				}
 
 				// Instead of empty image
@@ -573,7 +570,19 @@ if ($leadnum) :
 				<!-- BOF item's image -->	
 				<?php ob_start(); ?>
 
-					<?php if (!empty($item->image)) : ?>
+					<?php if (!empty($item->image_rendered)) : ?>
+
+						<div class="image_featured <?php echo $img_container_class_feat;?>">
+							<?php if ($lead_link_image) : ?>
+								<a href="<?php echo $link_url; ?>">
+									<?php echo $item->image_rendered; ?>
+								</a>
+							<?php else : ?>
+								<?php echo $item->image_rendered; ?>
+							<?php endif; ?>
+						</div>
+
+					<?php else if (!empty($item->image)) : ?>
 
 						<div class="image_featured <?php echo $img_container_class_feat;?>">
 							<?php if ($lead_link_image) : ?>
@@ -798,6 +807,8 @@ if ($count > $leadnum) :
 		
 		$intro_fallback_field = $params->get('intro_fallback_field', 0);
 		$intro_image_fallback_img = $params->get('intro_image_fallback_img');
+		$intro_image_custom_display	= $params->get('intro_image_custom_url');
+		$intro_image_custom_url	= $params->get('intro_image_custom_url');
 		
 		$intro_dimgs = $this->params->get('intro_default_images');
 		if ($intro_use_image && $intro_dimgs) {
@@ -816,6 +827,7 @@ if ($count > $leadnum) :
 		for ($i = $leadnum; $i < $count; $i++) :
 			$item = $items[$i];
 			$src = '';
+			$thumb_rendered = '';
 			$fc_item_classes = 'fc_newslist_item';
 			if ($doing_cat_order)
      		$fc_item_classes .= ($i==0 || ($items[$i-1]->rel_catid != $items[$i]->rel_catid) ? ' fc_cat_item_1st' : '');
@@ -843,16 +855,16 @@ if ($count > $leadnum) :
 					$varname = $varname ? $varname : 'display';
 					$thumb_rendered = FlexicontentFields::getFieldDisplay($item, $fieldname, null, $varname, 'category');
 					$src = '';  // Clear src no rendering needed
-					$_thumb_w = $_thumb_h = 0;
+					$item->image_w = $item->image_h = 0;
 				}
-				if (!$src && $intro_image_custom_url)
+				if (!$src && !$thumb_rendered && $intro_image_custom_url)
 				{
 					@list($fieldname, $varname) = preg_split('/##/',$intro_image_custom_url);
 					$fieldname = trim($fieldname); $varname = trim($varname);
 					$varname = $varname ? $varname : 'display';
 					$src =  FlexicontentFields::getFieldDisplay($item, $fieldname, null, $varname, 'category');
 				}
-				if (!$src && $intro_image_fallback_img)
+				if (!$src && !$thumb_rendered && $intro_image_fallback_img)
 				{
 					// Render method 'display_NNNN_src' to avoid CSS/JS being added to the page
 					$img_field = false;
@@ -879,10 +891,10 @@ if ($count > $leadnum) :
 						$src = flexicontent_html::extractimagesrc($item);
 					}
 
-					if(!$src && $intro_fallback_field) {
+					if (!$src && $intro_fallback_field)
+					{
 						$image_url2 = FlexicontentFields::getFieldDisplay($item, $intro_fallback_field, $values=null, $method='display_'.$img_field_size.'_src', 'category');
-						$src2 = '';
-						$thumb2 = '';
+
 						if ($image_url2)
 						{
 							$img_field2 = $item->fields[$intro_fallback_field];
@@ -893,9 +905,9 @@ if ($count > $leadnum) :
 							}
 							else
 							{
-								$thumb = @ $img_field2->thumbs_src[ $intro_use_image ][0];
-								$_thumb_w = $thumb ? $img_field2->parameters->get('w_'.$intro_use_image[0], 120) : 0;
-								$_thumb_h = $thumb ? $img_field2->parameters->get('h_'.$intro_use_image[0], 90) : 0;
+								$src = @ $img_field2->thumbs_src[ $intro_use_image ][0];
+								$item->image_w = $src ? $img_field2->parameters->get('w_'.$intro_use_image[0], 120) : 0;
+								$item->image_h = $src ? $img_field2->parameters->get('h_'.$intro_use_image[0], 90) : 0;
 							}
 						}
 					}
@@ -924,7 +936,7 @@ if ($count > $leadnum) :
 					$item->image_h = $this->params->get('intro_height', 200);
 				} else {
 					// Do not resize image when (a) image src path not set or (b) using image field's already created thumbnails
-					$item->image = $src;
+					$item->image = $src ?: $thumb_rendered;
 				}
 
 				// Instead of empty image
@@ -1051,7 +1063,20 @@ if ($count > $leadnum) :
 				<!-- BOF item's image -->
 				<?php ob_start(); ?>
 
-					<?php if (!empty($item->image)) : ?>
+					<?php if (!empty($item->image_rendered)) : ?>
+
+						<div class="image_standard <?php echo $img_container_class;?>">
+							<?php if ($intro_link_image) : ?>
+								<a href="<?php echo $link_url; ?>">
+									<?php echo $item->image_rendered; ?>
+								</a>
+							<?php else : ?>
+								<?php echo $item->image_rendered; ?>
+							<?php endif; ?>
+						</div>
+
+
+					<?php else if (!empty($item->image)) : ?>
 
 						<div class="image_standard <?php echo $img_container_class;?>">
 							<?php if ($intro_link_image) : ?>
