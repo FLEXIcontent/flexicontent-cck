@@ -439,7 +439,8 @@ JFactory::getDocument()->addScriptDeclaration('
 	}
 	function fc_edit_jtag_modal_close()
 	{
-		window.location.reload(false);
+		//window.location.reload(false);
+		window.location.href = \'index.php?option=com_flexicontent&view=tags\';
 		document.body.innerHTML = Joomla.JText._("FLEXI_UPDATING_CONTENTS") + \' <img id="page_loading_img" src="components/com_flexicontent/assets/images/ajax-loader.gif">\';
 	}
 ');
