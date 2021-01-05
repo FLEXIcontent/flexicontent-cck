@@ -582,7 +582,7 @@ if ($leadnum) :
 							<?php endif; ?>
 						</div>
 
-					<?php else if (!empty($item->image)) : ?>
+					<?php elseif (!empty($item->image)) : ?>
 
 						<div class="image_featured <?php echo $img_container_class_feat;?>">
 							<?php if ($lead_link_image) : ?>
@@ -1076,7 +1076,7 @@ if ($count > $leadnum) :
 						</div>
 
 
-					<?php else if (!empty($item->image)) : ?>
+					<?php elseif (!empty($item->image)) : ?>
 
 						<div class="image_standard <?php echo $img_container_class;?>">
 							<?php if ($intro_link_image) : ?>
