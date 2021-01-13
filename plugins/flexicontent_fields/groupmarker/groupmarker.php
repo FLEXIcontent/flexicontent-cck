@@ -27,6 +27,13 @@ class plgFlexicontent_fieldsGroupmarker extends FCField
 	}
 
 
+	public function onDisplayFieldValue(&$field, $item, $values = null, $prop = 'display')
+	{
+		if ( !in_array($field->field_type, static::$field_types) ) return;
+
+		// Nothing to display
+	}
+
 
 	// ***
 	// *** DISPLAY methods, item form & frontend views
