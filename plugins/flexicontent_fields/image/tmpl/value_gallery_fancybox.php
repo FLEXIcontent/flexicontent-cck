@@ -75,9 +75,10 @@ if ( !isset(static::$js_added[$field->id][__FILE__]) )
 // *** Add - per (field, item) pair - custom JS
 // ***
 
+$uid = 'fc_'.$field_name_js."_fcitem".$item->id;
+
 if (!isset(static::$js_added[$field->id][__FILE__][$item->id]))
 {
-	$uid = 'fc_'.$field_name_js."_fcitem".$item->id;
 	//$js = file_get_contents(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'fancybox'.DS.'dist'.DS.'jquery.fancybox.js');
 	//$js = str_replace('unique_gal_id', $uid, $js);
 
