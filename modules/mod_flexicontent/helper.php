@@ -59,6 +59,7 @@ class modFlexicontentHelper
 		$mod_do_stripcat	= $params->get('mod_do_stripcat', 1);
 		$mod_use_image 		= $params->get('mod_use_image');
 		$mod_image 				= $params->get('mod_image');
+		$mod_image_ff     = $params->get('mod_image_fallback_field');
 		$mod_link_image		= $params->get('mod_link_image');
 		$mod_default_img_show = $params->get('mod_default_img_show', 1);
 		$mod_default_img_path = $params->get('mod_default_img_path', 'components/com_flexicontent/assets/images/image.png');
@@ -456,24 +457,28 @@ class modFlexicontentHelper
 									$_thumb_h = $thumb ? $img_field->parameters->get('h_'.$mod_use_image_feat[0], 90) : 0;
 								}
 							}
+
 							if ((!$src && $mod_image_fallback_img==1) || ($src && $mod_image_fallback_img==2 && $img_field->using_default_value))
 							{
 								$src = flexicontent_html::extractimagesrc($row);
-							}elseif(!$src && $fallback_field && $mod_image_fallback_img==3) {
-								$image_url2 = FlexicontentFields::getFieldDisplay($row, $fallback_field, null, 'display_large_src', 'module');
+							}
+							elseif(!$src && $mod_image_ff && $mod_image_fallback_img==3)
+							{
+								$image_url2 = FlexicontentFields::getFieldDisplay($row, $mod_image_ff, null, 'display_large_src', 'module');
+
 								if ($image_url2)
 								{
-									$img_field2 = $row->fields[$fallback_field];
+									$img_field2 = $row->fields[$mod_image_ff];
 
-									if ($mod_use_image==1)
+									if ($mod_use_image_feat==1)
 									{
 										$src = str_replace(JUri::root(), '', @ $img_field2->thumbs_src['large'][0] );
 									}
 									else
 									{
-										$thumb = @ $img_field2->thumbs_src[ $mod_use_image ][0];
-										$_thumb_w = $thumb ? $img_field2->parameters->get('w_'.$mod_use_image[0], 120) : 0;
-										$_thumb_h = $thumb ? $img_field2->parameters->get('h_'.$mod_use_image[0], 90) : 0;
+										$thumb = @ $img_field2->thumbs_src[ $mod_use_image_feat ][0];
+										$_thumb_w = $thumb ? $img_field2->parameters->get('w_'.$mod_use_image_feat[0], 120) : 0;
+										$_thumb_h = $thumb ? $img_field2->parameters->get('h_'.$mod_use_image_feat[0], 90) : 0;
 									}
 								}
 							}
@@ -643,14 +648,18 @@ class modFlexicontentHelper
 									$_thumb_h = $thumb ? $img_field->parameters->get('h_'.$mod_use_image[0], 90) : 0;
 								}
 							}
+
 							if ((!$src && $mod_image_fallback_img==1) || ($src && $mod_image_fallback_img==2 && $img_field->using_default_value))
 							{
 								$src = flexicontent_html::extractimagesrc($row);
-							}elseif(!$src && $fallback_field && $mod_image_fallback_img==3) {
-								$image_url2 = FlexicontentFields::getFieldDisplay($row, $fallback_field, null, 'display_large_src', 'module');
+							}
+							elseif(!$src && $mod_image_ff && $mod_image_fallback_img==3)
+							{
+								$image_url2 = FlexicontentFields::getFieldDisplay($row, $mod_image_ff, null, 'display_large_src', 'module');
+
 								if ($image_url2)
 								{
-									$img_field2 = $row->fields[$fallback_field];
+									$img_field2 = $row->fields[$mod_image_ff];
 
 									if ($mod_use_image==1)
 									{
