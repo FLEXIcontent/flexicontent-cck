@@ -300,7 +300,7 @@ class FCField extends JPlugin
 		$viewlayout = $viewlayout && $viewlayout !== 'value' ? 'value_'.$viewlayout : 'value';
 
 		// Create field's display
-		$this->displayFieldValue($prop, $viewlayout, $data);
+		$this->displayFieldValue($prop, $viewlayout);
 	}
 
 
@@ -583,7 +583,19 @@ class FCField extends JPlugin
 
 		// Create field's viewing HTML, using layout file
 		$field->{$prop} = array();
-		include(self::getViewPath($this->fieldtypes[0], $layout));
+
+		$layout_filename = self::getViewPath($this->fieldtypes[0], $layout); 
+		if (file_exists($layout_filename))
+		{
+			include($layout_filename);
+		}
+		else
+		{
+			$field->{$prop} = '<div class="alert alert-info">' . $field->label .
+				' field does not implement the layout file: \'' . $layout . '\' please remove field from displayed fields' .
+				'</div>';
+			return;
+		}
 
 		// Do not convert the array to string if field is in a group, and do not add: FIELD's opentag, closetag, value separator
 		if (!$is_ingroup)
