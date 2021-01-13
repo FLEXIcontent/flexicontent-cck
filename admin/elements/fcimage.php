@@ -44,17 +44,18 @@ JFormHelper::loadFieldClass('groupedlist');   // JFormFieldGroupedList
 
 	public function getGroups()
 	{
-
-		$images = array();
-		$images[] = array(
-			array('value' => '', 'text' => JText::_('FLEXI_SELECT_IMAGE_FIELD'))
-		);
-
 		$db = JFactory::getDbo();
 		$node = & $this->element;
 		$attributes = get_object_vars($node->attributes());
 		$attributes = $attributes['@attributes'];
 		
+		$prompt_text = !empty($attributes['prompt_text']) ? $attributes['prompt_text'] : 'FLEXI_SELECT_IMAGE_FIELD';
+
+		$images = array();
+		$images[] = array(
+			array('value' => '', 'text' => JText::_($prompt_text))
+		);
+
 		$valcolumn = 'name';
 		if (@$attributes['valcolumn'])
 		{
