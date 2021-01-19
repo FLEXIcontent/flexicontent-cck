@@ -1519,12 +1519,12 @@ class plgFlexicontent_fieldsMediafile extends FCField
 			if ($prop_name == 'media_format')
 			{
 				// Change 'channels' to '# Channels' you can also you language   JText::_('SOMENAME');
-				$filtername = 'Media Type';	
+				$filtername = JText::_('FLEXI_FIELD_MEDIADATA_MEDIA_TYPE');	
 			}
 			elseif ($prop_name == 'sample_rate')
 			{
 				// Change 'channels' to '# Channels' you can also you language   JText::_('SOMENAME');
-				$filtername = 'Sample Rate';	
+				$filtername = JText::_('FLEXI_FIELD_MEDIADATA_SAMPLE_RATE');	
 			}
 
 			$filter->html[] = '
