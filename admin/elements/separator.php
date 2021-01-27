@@ -141,21 +141,22 @@ class JFormFieldSeparator extends JFormFieldSpacer
 				var tr45 = jQuery("#permissions-sliders .tab-content .tab-pane tbody tr:nth-child(45)");
 				var tr47 = jQuery("#permissions-sliders .tab-content .tab-pane tbody tr:nth-child(47)");
 				var tr48 = jQuery("#permissions-sliders .tab-content .tab-pane tbody tr:nth-child(48)");
+				
+				tr1.before("<tr><td colspan=\"3\"><span class=\"fcsep_level2\">'.JText::_('FLEXI_PERMISSIONS_COMPONENT_COMPONENT_ACCESS_TITLE').'<\/td><\/tr>");
+				tr4.before("<tr><td colspan=\"3\"><span class=\"fcsep_level2\">'.JText::_('FLEXI_PERMISSIONS_COMPONENT_ITEMS_CATEGORIES_TITLE').'<\/td><\/tr>");
+				tr11.before("<tr><td colspan=\"3\"><span class=\"fcsep_level2\">'.JText::_('FLEXI_PERMISSIONS_COMPONENT_ITEM_FORM_TITLE').'<\/td><\/tr>");
+				tr11.before("<tr><td colspan=\"3\"><span class=\"fcsep_level3\">'.JText::_('FLEXI_PERMISSIONS_COMPONENT_CATEGORY_TAGS_USAGE_TITLE').'<\/td><\/tr>");
+				tr15.before("<tr><td colspan=\"3\"><span class=\"fcsep_level3 alert alert-info fcpadded\" style=\"margin-left: 10% !important;\"><b>'.JText::_('FLEXI_PERMISSIONS_COMPONENT_EXISTING_ITEMS_TITLE').'<\/b>:  ('.JText::_('FLEXI_PERMISSIONS_COMPONENT_OVERRIDABLE_IN_TYPE_TITLE').')<\/td><\/tr>");
+				tr18.before("<tr><td colspan=\"3\"><span class=\"fcsep_level3\">'.JText::_('FLEXI_PERMISSIONS_COMPONENT_VARIOUS_TITLE').'<\/td><\/tr>");
+				tr23.before("<tr><td colspan=\"3\"><span class=\"fcsep_level2\">'.JText::_('FLEXI_PERMISSIONS_COMPONENT_WORKFLOW_TITLE').'<\/td><\/tr>");
+				tr28.before("<tr><td colspan=\"3\"><span class=\"fcsep_level2\">'.JText::_('FLEXI_PERMISSIONS_COMPONENT_ITEMS_MANAGER_TITLE').'<\/td><\/tr>");
+				tr30.before("<tr><td colspan=\"3\"><span class=\"fcsep_level2\">'.JText::_('FLEXI_PERMISSIONS_COMPONENT_BACKEND_MANAGER_ACCESS_TITLE').'<\/td><\/tr>");
+				tr37.before("<tr><td colspan=\"3\"><span class=\"fcsep_level2\">'.JText::_('FLEXI_PERMISSIONS_COMPONENT_FIELDS_MANAGER_TITLE').'<\/td><\/tr>");
+				tr41.before("<tr><td colspan=\"3\"><span class=\"fcsep_level3 alert alert-info fcpadded\">'.JText::_('FLEXI_PERMISSIONS_COMPONENT_OVERRIDABLE_IN_FIELD_TITLE').'<\/td><\/tr>");
+				tr45.before("<tr><td colspan=\"3\"><span class=\"fcsep_level2\">'.JText::_('FLEXI_PERMISSIONS_COMPONENT_REVIEWS_MANAGER_TITLE').'<\/td><\/tr>");
+				tr47.before("<tr><td colspan=\"3\"><span class=\"fcsep_level2\">'.JText::_('FLEXI_PERMISSIONS_COMPONENT_FILES_MANAGER_TITLE').'<\/td><\/tr>");
+				tr48.before("<tr><td colspan=\"3\"><span class=\"fcsep_level3 alert alert-info fcpadded\">'.JText::_('FLEXI_PERMISSIONS_COMPONENT_ALSO_USED_IN_ITEM_FORM_TITLE').'<\/td><\/tr>");
 
-				tr1.before("<tr><td colspan=\"3\"><span class=\"fcsep_level2\">Component access<\/td><\/tr>");
-				tr4.before("<tr><td colspan=\"3\"><span class=\"fcsep_level2\">Items / Categories (inherited via category-tree)<\/td><\/tr>");
-				tr11.before("<tr><td colspan=\"3\"><span class=\"fcsep_level2\">Item form<\/td><\/tr>");
-				tr11.before("<tr><td colspan=\"3\"><span class=\"fcsep_level3\">Category / Tags usage<\/td><\/tr>");
-				tr15.before("<tr><td colspan=\"3\"><span class=\"fcsep_level3 alert alert-info fcpadded\" style=\"margin-left: 10% !important;\"><b>Existing items<\/b>:  (Overridable in type\'s permissions)<\/td><\/tr>");
-				tr18.before("<tr><td colspan=\"3\"><span class=\"fcsep_level3\">Various<\/td><\/tr>");
-				tr23.before("<tr><td colspan=\"3\"><span class=\"fcsep_level2\">Workflow<\/td><\/tr>");
-				tr28.before("<tr><td colspan=\"3\"><span class=\"fcsep_level2\">Items manager<\/td><\/tr>");
-				tr30.before("<tr><td colspan=\"3\"><span class=\"fcsep_level2\">Backend Managers (access)<\/td><\/tr>");
-				tr37.before("<tr><td colspan=\"3\"><span class=\"fcsep_level2\">Fields manager<\/td><\/tr>");
-				tr41.before("<tr><td colspan=\"3\"><span class=\"fcsep_level3 alert alert-info fcpadded\">Overridable in field\'s permissions<\/td><\/tr>");
-				tr45.before("<tr><td colspan=\"3\"><span class=\"fcsep_level2\">Reviews manager<\/td><\/tr>");
-				tr47.before("<tr><td colspan=\"3\"><span class=\"fcsep_level2\">Files manager<\/td><\/tr>");
-				tr48.before("<tr><td colspan=\"3\"><span class=\"fcsep_level3 alert alert-info fcpadded\">Also used in <b>item form<\/b> e.g. <b>file<\/b> field<\/td><\/tr>");
 			});
 		');
 	}
