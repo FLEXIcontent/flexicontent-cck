@@ -1021,7 +1021,8 @@ class plgSearchFlexiadvsearch extends JPlugin
 					break;
 
 				case 'all':
-					$newtext = '+' . implode( '* +', $words ) . '*';
+					//$newtext = '+' . implode( '* +', $words ) . '*';  // This is not worked for Thai language.
+					$newtext = '+' . implode( ' +', $words ) . ''; // This is worked for Thai language.
 					$escaped_text = $db->escape($newtext, true);
 					$quoted_text  = $db->Quote($escaped_text, false);
 
