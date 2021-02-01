@@ -1022,11 +1022,14 @@ class plgSearchFlexiadvsearch extends JPlugin
 
 				case 'all':
 					$newtext = '';
-					if(in_array(JFactory::getLanguage()->getTag(), array('th-TH'))) {
+					$nospace_languages = array('th-TH');
+					$is_nospace_language = in_array(JFactory::getLanguage()->getTag(), $nospace_languages);
+					if($is_nospace_language) {
 						$newtext = '+' . implode( ' +', $words ) . ''; // This is worked for Thai language.
 					}else{
 						$newtext = '+' . implode( '* +', $words ) . '*';  // This is not worked for Thai language.
 					}
+					
 					$escaped_text = $db->escape($newtext, true);
 					$quoted_text  = $db->Quote($escaped_text, false);
 
@@ -1036,7 +1039,12 @@ class plgSearchFlexiadvsearch extends JPlugin
 					$quoted_text_np  = $db->Quote($escaped_text_np, false);
 
 					$_index_match = ' MATCH ('.$ts.'.search_index) AGAINST ('.$quoted_text.' IN BOOLEAN MODE) ';
-					$_title_relev = ' MATCH (i.title) AGAINST ('.$quoted_text_np.' IN BOOLEAN MODE) ';
+					if($is_nospace_language) {
+						$q = trim(JRequest::getVar('q', ''));
+						$_title_relev = " (MATCH (i.title) AGAINST (".$quoted_text_np." IN BOOLEAN MODE) OR i.title LIKE '%".trim($q)."%') ";
+					}else{
+						$_title_relev = ' MATCH (i.title) AGAINST ('.$quoted_text_np.' IN BOOLEAN MODE) ';
+					}
 					$_index_relev = ' MATCH ('.$ts.'.search_index) AGAINST ('.$quoted_text.' IN BOOLEAN MODE) ';
 					break;
 
