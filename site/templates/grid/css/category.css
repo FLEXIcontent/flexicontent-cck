@@ -161,6 +161,8 @@ div.comments {
 	clear: both;
 	margin-top: 0;
 	margin-bottom: 0;
+	position: absolute;
+	right: 0;
 }
 .news.fc-items-block-green .fc-item-block-featured-wrapper-innerbox,
 .news.fc-items-block-green .fc-item-block-standard-wrapper-innerbox {
