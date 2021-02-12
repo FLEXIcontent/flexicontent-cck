@@ -207,7 +207,7 @@ $r = 0;
 			</tr>
 			<?php endif;*/ ?>
 
-			<?php if ($this->params->get('canseltext', 1) && isset($this->lists['txtflds'])) : ?>
+			<?php if ($autodisplayadvoptions && $this->params->get('canseltext', 1) && isset($this->lists['txtflds'])) : ?>
 			
 				<tr id="fcsearch_txtflds_row" class="fc_search_row_<?php echo (($r++)%2);?>">
 					<td class="fc_search_label_cell">
