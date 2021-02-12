@@ -514,7 +514,7 @@ class FLEXIcontentViewSearch extends JViewLegacy
 
 
 		// *** Selector of Fields for text searching
-		if( $txtmode==2 && count($fields_text) )
+		if( in_array($txtmode, array(1,2)) && count($fields_text) )
 		{
 			// Get selected text fields in the Search Form
 			$form_txtflds = $jinput->get('txtflds', array(), 'array');
