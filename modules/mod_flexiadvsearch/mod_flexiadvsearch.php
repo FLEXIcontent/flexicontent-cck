@@ -218,14 +218,14 @@ $itemid = $itemid_force ? (int) $params->get('itemid_force_value', 0)  :  0;
 
 if ($itemid)
 {
-	$menu = $app->getMenu()->getItem($itemid);     // Retrieve active menu
+	//$menu = $app->getMenu()->getItem($itemid);     // Retrieve active menu
 	
 	// Merge into module params (a) COMPONENT parameters, then (b) active menu parameters
 	$params->merge(JComponentHelper::getComponent('com_flexicontent')->params);
-	if ($menu)
+	/*if ($menu)
 	{
 		$params->merge($menu->params);
-	}
+	}*/
 }
 
 // Render Layout
