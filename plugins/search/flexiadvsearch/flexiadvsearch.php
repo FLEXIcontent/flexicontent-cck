@@ -983,6 +983,10 @@ class plgSearchFlexiadvsearch extends JPlugin
 				{
 					$words = flexicontent_db::removeInvalidWords($words, $stopwords, $shortwords, $si_tbl, 'search_index', $isprefix);
 				}
+				if($si_tbl=='flexicontent_advsearch_index') {
+					$words = array_merge($words, $stopwords, $shortwords);
+					$stopwords = $shortwords = array();
+				}
 
 				// Abort if all words are stop-words or too short, we could try to execute a query that only contains a LIKE %...% , but it would be too slow
 				if (empty($words))
@@ -1029,7 +1033,6 @@ class plgSearchFlexiadvsearch extends JPlugin
 					}else{
 						$newtext = '+' . implode( '* +', $words ) . '*';  // This is not worked for Thai language.
 					}
-					
 					$escaped_text = $db->escape($newtext, true);
 					$quoted_text  = $db->Quote($escaped_text, false);
 
@@ -1038,14 +1041,16 @@ class plgSearchFlexiadvsearch extends JPlugin
 					$escaped_text_np = $db->escape($newtext_np, true);
 					$quoted_text_np  = $db->Quote($escaped_text_np, false);
 
-					$_index_match = ' MATCH ('.$ts.'.search_index) AGAINST ('.$quoted_text.' IN BOOLEAN MODE) ';
 					if($is_nospace_language) {
 						$q = trim(JRequest::getVar('q', ''));
+						$_index_match = " (MATCH (".$ts.".search_index) AGAINST (".$quoted_text." IN BOOLEAN MODE) OR i.title LIKE '%".trim($q)."%') ";
 						$_title_relev = " (MATCH (i.title) AGAINST (".$quoted_text_np." IN BOOLEAN MODE) OR i.title LIKE '%".trim($q)."%') ";
+						$_index_relev = " (MATCH (".$ts.".search_index) AGAINST (".$quoted_text." IN BOOLEAN MODE) OR i.title LIKE '%".trim($q)."%') ";
 					}else{
+						$_index_match = ' MATCH ('.$ts.'.search_index) AGAINST ('.$quoted_text.' IN BOOLEAN MODE) ';
 						$_title_relev = ' MATCH (i.title) AGAINST ('.$quoted_text_np.' IN BOOLEAN MODE) ';
+						$_index_relev = ' MATCH ('.$ts.'.search_index) AGAINST ('.$quoted_text.' IN BOOLEAN MODE) ';
 					}
-					$_index_relev = ' MATCH ('.$ts.'.search_index) AGAINST ('.$quoted_text.' IN BOOLEAN MODE) ';
 					break;
 
 				case 'any':
