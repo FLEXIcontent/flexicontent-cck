@@ -207,7 +207,7 @@ if ($canseltypes)
 		'value',
 		'text',
 		(empty($form_contenttypes) ? '' : $form_contenttypes),
-		'contenttypes'
+		'contenttypes_'.$module->id
 	);
 }
 
@@ -259,32 +259,32 @@ if ($autodisplayadvoptions)
 	  };
 	  
     
-	  jQuery("#modfcadvsearch_fcsearch_txtflds_row").css("position","relative").hide(0, function(){}).css("position","static");
+	  jQuery("#modfcadvsearch_fcsearch_txtflds_row_'.$module->id.'").css("position","relative").hide(0, function(){}).css("position","static");
 	  
-	  '. (($autodisplayadvoptions==1 && !$use_advsearch_options) ? '' : 'jQuery("#modfcadvsearch_fcsearch_txtflds_row").css("position","relative").toggle(500, function(){}).css("position","static");') .'
+	  '. (($autodisplayadvoptions==1 && !$use_advsearch_options) ? '' : 'jQuery("#modfcadvsearch_fcsearch_txtflds_row_'.$module->id.'").css("position","relative").toggle(500, function(){}).css("position","static");') .'
 		
-	  jQuery("#modfcadvsearch_use_advsearch_options").click(function() {
+	  jQuery("#modfcadvsearch_use_advsearch_options_'.$module->id.'").click(function() {
 	  
-		  jQuery("#modfcadvsearch_fcsearch_txtflds_row").css("position","relative").toggle(500, function(){}).css("position","static");
+		  jQuery("#modfcadvsearch_fcsearch_txtflds_row_'.$module->id.'").css("position","relative").toggle(500, function(){}).css("position","static");
     });
   '
   .( 1 /*$this->params->get('canseltypes', 1)!=2*//*disable hiding*/ ? '' : '
-	  jQuery("#modfcadvsearch_fcsearch_contenttypes_row").css("position","relative").hide(0, function(){}).css("position","static");
+	  jQuery("#modfcadvsearch_fcsearch_contenttypes_row_'.$module->id.'").css("position","relative").hide(0, function(){}).css("position","static");
 	  
-	  '. (($autodisplayadvoptions==1 && !$use_advsearch_options) ? '' : 'jQuery("#modfcadvsearch_fcsearch_contenttypes_row").css("position","relative").toggle(500, function(){}).css("position","static");') .'
+	  '. (($autodisplayadvoptions==1 && !$use_advsearch_options) ? '' : 'jQuery("#modfcadvsearch_fcsearch_contenttypes_row_'.$module->id.'").css("position","relative").toggle(500, function(){}).css("position","static");') .'
 		
-	  jQuery("#use_advsearch_options").click(function() {
+	  jQuery("#modfcadvsearch_use_advsearch_options_'.$module->id.'").click(function() {
 	  
-		  jQuery("#modfcadvsearch_fcsearch_contenttypes_row").css("position","relative").toggle(500, function(){}).css("position","static");
+		  jQuery("#modfcadvsearch_fcsearch_contenttypes_row_'.$module->id.'").css("position","relative").toggle(500, function(){}).css("position","static");
     }); ').
   '
-	  jQuery("#fc_advsearch_options_set").css("position","relative").hide(0, function(){}).css("position","static");
+	  jQuery("#modfcadvsearch_fc_advsearch_options_set_'.$module->id.'").css("position","relative").hide(0, function(){}).css("position","static");
 	  
-	  '. (($autodisplayadvoptions==1 && !$use_advsearch_options) ? '' : 'jQuery("#fc_advsearch_options_set").css("position","relative").toggle(500, function(){}).css("position","static");') .'
+	  '. (($autodisplayadvoptions==1 && !$use_advsearch_options) ? '' : 'jQuery("#modfcadvsearch_fc_advsearch_options_set_'.$module->id.'").css("position","relative").toggle(500, function(){}).css("position","static");') .'
 		
-	  jQuery("#use_advsearch_options").click(function() {
+	  jQuery("#modfcadvsearch_use_advsearch_options_'.$module->id.'").click(function() {
 	  
-		  jQuery("#fc_advsearch_options_set").css("position","relative").toggle(500, function(){}).css("position","static");
+		  jQuery("#modfcadvsearch_fc_advsearch_options_set_'.$module->id.'").css("position","relative").toggle(500, function(){}).css("position","static");
     });
     
 	});
@@ -299,16 +299,16 @@ $doc->addScriptDeclaration($js);
 <form class="mod_flexiadvsearch<?php echo $params->get('moduleclass_sfx'); ?>" name="<?php echo $form_name; ?>" id="<?php echo $form_id; ?>" action="<?php echo $action; ?>" method="post" role="search">
 
 	<?php if ($params->get('canseltypes', 1) && isset($lists['contenttypes'])) : ?>
-	<fieldset id="fc_contenttypes_set" class="fc_search_set">
+	<fieldset id="modfcadvsearch_fc_advsearch_options_set_<?php echo $module->id;?>" class="fc_search_set">
 		<legend>
 			<span class="fc_legend_text <?php echo $tooltip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_SEARCH_CONTENT_TYPE', 'FLEXI_SEARCH_CONTENT_TYPE_TIP', 1); ?>">
 				<span><?php echo JText::_('FLEXI_SEARCH_CONTENT_TYPE'); ?></span>
 			</span>
 		</legend>
 		
-		<table id="fc_textsearch_tbl" class="fc_search_tbl <?php echo $params->get('pageclass_sfx'); ?>" >
+		<table id="fc_textsearch_tbl_<?php echo $module->id;?>" class="fc_search_tbl <?php echo $params->get('pageclass_sfx'); ?>" >
 		
-			<tr id="fcsearch_contenttypes_row" class="fc_search_row_<?php echo (($r++)%2);?>">
+			<tr id="modfcadvsearch_fcsearch_contenttypes_row_<?php echo $module->id;?>" class="fc_search_row_<?php echo (($r++)%2);?>">
 				<?php if($params->get('show_type_label', 1)): ?>
 				<td class="fc_search_label_cell">
 					<label for="contenttypes" class="label">
@@ -445,8 +445,8 @@ $doc->addScriptDeclaration($js);
 				$checked_attr  = $use_advsearch_options ? 'checked=checked' : '';
 				$checked_class = $use_advsearch_options ? 'btn-primary' : '';
 				echo '
-					<input type="checkbox" id="modfcadvsearch_use_advsearch_options" name="use_advsearch_options" value="1" '.$checked_attr.' onclick="jQuery(this).next().toggleClass(\'btn-primary\');" />
-					<label id="modfcadvsearch_use_advsearch_options_lbl" class="btn '.$checked_class.' hasTooltip" for="modfcadvsearch_use_advsearch_options" title="'.JText::_('FLEXI_SEARCH_ADVANCED_OPTIONS').'">
+					<input type="checkbox" id="modfcadvsearch_use_advsearch_options_'.$module->id.'" name="use_advsearch_options" value="1" '.$checked_attr.' onclick="jQuery(this).next().toggleClass(\'btn-primary\');" />
+					<label id="modfcadvsearch_use_advsearch_options_lbl_'.$module->id.'" class="btn '.$checked_class.' hasTooltip" for="modfcadvsearch_use_advsearch_options_'.$module->id.'" title="'.JText::_('FLEXI_SEARCH_ADVANCED_OPTIONS').'">
 						<span class="icon-list"></span>' . JText::_('FLEXI_SEARCH_ADVANCED') . '
 					</label>
 				';
@@ -457,7 +457,7 @@ $doc->addScriptDeclaration($js);
 
 <?php if ($autodisplayadvoptions && $params->get('canseltext', 1) && isset($lists['txtflds'])) : ?>
 <table>
-	<tr id="modfcadvsearch_fcsearch_txtflds_row" class="fc_search_row_<?php echo (($r++)%2);?>">
+	<tr id="modfcadvsearch_fcsearch_txtflds_row_<?php echo $module->id;?>" class="fc_search_row_<?php echo (($r++)%2);?>">
 		<td class="fc_search_label_cell">
 			<label for="txtflds" class="label <?php echo $tooltip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_SEARCH_SEARCHWORDS_IN_FIELDS', 'FLEXI_SEARCH_SEARCHWORDS_IN_FIELDS_TIP', 1); ?>">
 				<?php echo JText::_('FLEXI_SEARCH_SEARCHWORDS_IN_FIELDS'); ?>:
@@ -469,7 +469,7 @@ $doc->addScriptDeclaration($js);
 			</div>
 		</td>
 	</tr>
-</table>	
+</table>
 <?php endif; ?>
 
 </form>
