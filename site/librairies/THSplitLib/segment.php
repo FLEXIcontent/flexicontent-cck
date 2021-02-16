@@ -86,7 +86,7 @@ class Segment {
 
 
         // กำจัดซ้ำ  // duplicate removal
-        $this->_input_string = $this->clear_duplicated($this->_input_string);
+        // $this->_input_string = $this->clear_duplicated($this->_input_string);
 
 
         // แยกประโยคจากช่องว่าง (~เผื่อไว้สำหรับภาษาอังกฤษ)  // Separate sentences from space (~ Provision for English).
