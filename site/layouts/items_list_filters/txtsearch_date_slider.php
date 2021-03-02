@@ -332,7 +332,7 @@ if ($display_filter_as==1 || $display_filter_as==7)
 			<div class="fc_filter_element">
 				<input id="'.$filter_ffid.'" name="'.$filter_ffname.'" '.$attribs_str.' type="text" size="'.$size.'" value="'.htmlspecialchars(@ $value, ENT_COMPAT, 'UTF-8').'" />
 			</div>
-		'.($isSlider ? '</div><div class="fcfilter_nouislider_txtbox">' . ($label_filter==2 ? '<span class="fc_slider_inner_label">' . $field->label . ': </span>' : '') . '</div>' : '');
+		'.($isSlider ? '</div><div class="fcfilter_nouislider_txtbox">' . ($label_filter==2 ? '<span class="fc_slider_inner_label">' . $filter->label . ': </span>' : '') . '</div>' : '');
 	}
 }
 
@@ -361,6 +361,6 @@ else
 			<div class="fc_filter_element">
 				<input name="'.$filter_ffname.'[2]" '.$attribs_str.' id="'.$filter_ffid.'2" type="text" size="'.$size.'" value="'.htmlspecialchars(@ $value[2], ENT_COMPAT, 'UTF-8').'" />
 			</div>
-		'.($isSlider ? '</div><div class="fcfilter_nouislider_txtbox">' . ($label_filter==2 ? '<span class="fc_slider_inner_label">' . $field->label . ': </span>' : '') . '</div>' : '');
+		'.($isSlider ? '</div><div class="fcfilter_nouislider_txtbox">' . ($label_filter==2 ? '<span class="fc_slider_inner_label">' . $filter->label . ': </span>' : '') . '</div>' : '');
 	}
 }
