@@ -399,6 +399,7 @@ abstract class JHtmlFclayoutbuilder
 					\'grapesjs-parser-postcss\',
 					\'grapesjs-tooltip\',
 					\'gjs-plugin-ckeditor\',
+					\'grapesjs-shape-divider\',
 					//\'grapesjs-plugin-header\',
 				],
 
