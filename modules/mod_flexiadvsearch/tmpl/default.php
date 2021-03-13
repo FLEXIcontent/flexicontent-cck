@@ -212,7 +212,9 @@ if ($canseltypes)
 }
 
 // *** Selector of Fields for text searching
-if( in_array($txtmode, array(1,2)) && count($fields_text) )
+// THIS is wrong value 1 means hide the fields and use the configured fields 
+// if( in_array($txtmode, array(1,2)) && count($fields_text) )
+if( $txtmode==2 && count($fields_text) )
 {
 	// Get selected text fields in the Search Form
 	$form_txtflds = $jinput->get('txtflds', array(), 'array');
