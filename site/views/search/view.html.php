@@ -84,7 +84,7 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		 */
 
 		$canseltypes = (int) $params->get('canseltypes', 1);
-		$txtmode     = (int) $params->get('txtmode', 0);  // 0: BASIC Index, 1: ADVANCED Index without search fields user selection, 2: ADVANCED Index with search fields user selection
+		$txtmode     = (int) $params->get('txtmode', 0);  // 0: BASIC Index, 1: ADVANCED Index with the configured search fields (no selection of fields), 2: ADVANCED Index with text search fields can be altered by user
 
 		// Get if text searching according to specific (single) content type
 		$show_txtfields = (int) $params->get('show_txtfields', 1);  // 0: hide, 1: according to content, 2: use custom configuration
@@ -513,6 +513,8 @@ class FLEXIcontentViewSearch extends JViewLegacy
 
 
 		// *** Selector of Fields for text searching
+		// THIS is wrong value 1 means hide the fields and use the configured fields 
+		// if( in_array($txtmode, array(1,2)) && count($fields_text) )
 		if( $txtmode==2 && count($fields_text) )
 		{
 			// Get selected text fields in the Search Form
