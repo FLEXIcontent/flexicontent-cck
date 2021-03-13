@@ -970,5 +970,3 @@ class plgFlexicontent_fieldsEmail extends FCField
 			}
 	}
 }
-
-?>
