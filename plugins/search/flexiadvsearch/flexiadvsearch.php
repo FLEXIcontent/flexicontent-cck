@@ -26,9 +26,7 @@ jimport('cms.plugin.plugin');
 
 require_once(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'defineconstants.php');
 
-FLEXI_J40GE
-	? require_once (JPATH_SITE.DS.'components'.DS.'com_content'.DS.'src'.DS.'Helper'.DS.'RouteHelper.php')
-	: require_once (JPATH_SITE.DS.'components'.DS.'com_content'.DS.'helpers'.DS.'route.php');
+require_once(JPATH_SITE.DS.'components'.DS.'com_content'.DS.'helpers'.DS.'route.php');
 require_once(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'route.php');
 require_once(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_search'.DS.'helpers'.DS.'search.php');
 
@@ -70,7 +68,7 @@ class plgSearchFlexiadvsearch extends JPlugin
 
 		if ($menu)
 		{
-			$this->_params->merge($menu->getParams());
+			$this->_params->merge($menu->params);
 		}
 	}
 
@@ -910,7 +908,11 @@ class plgSearchFlexiadvsearch extends JPlugin
 			$q = $app->input->getString('q', '');
 			$q = $q !== parse_url(@$_SERVER["REQUEST_URI"], PHP_URL_PATH) ? $q : '';
 
-			$text = $app->input->getString('filter', $q);
+			$original_text = $app->input->getString('filter', $q);
+		}
+		else
+		{
+			$original_text = $text;
 		}
 
 		// Set _relevant _active_* FLAG
@@ -934,9 +936,14 @@ class plgSearchFlexiadvsearch extends JPlugin
 
 		// Try to add space between words for current language using a dictionary
 		$lang_handler = FlexicontentFields::getLangHandler(JFactory::getLanguage()->getTag());
+
 		if ($lang_handler)
 		{
-			$text = implode(' ', $lang_handler->get_segment_array($clear_previous = true, trim($text)));
+			$text = implode(' ', $lang_handler->get_segment_array($clear_previous = true, trim($original_text)));
+		}
+		else
+		{
+			$text = trim($original_text);
 		}
 
 		// Prefix the words for short word / stop words matching
@@ -986,6 +993,13 @@ class plgSearchFlexiadvsearch extends JPlugin
 					$words = flexicontent_db::removeInvalidWords($words, $stopwords, $shortwords, $si_tbl, 'search_index', $isprefix);
 				}
 
+				// TODO: Check this If using advanced search index we do not have stop words or too short words
+				if ($si_tbl=='flexicontent_advsearch_index')
+				{
+					$words = array_merge($words, $stopwords, $shortwords);
+					$stopwords = $shortwords = array();
+				}
+
 				// Abort if all words are stop-words or too short, we could try to execute a query that only contains a LIKE %...% , but it would be too slow
 				if (empty($words))
 				{
@@ -1023,7 +1037,17 @@ class plgSearchFlexiadvsearch extends JPlugin
 					break;
 
 				case 'all':
-					$newtext = '+' . implode( '* +', $words ) . '*';
+					$nospace_languages = array('th-TH');
+					$is_nospace_language = in_array(JFactory::getLanguage()->getTag(), $nospace_languages);
+
+					if ($is_nospace_language)
+					{
+						$newtext = '+' . implode( ' +', $words ) . ''; // This is worked for Thai language.
+					}
+					else
+					{
+						$newtext = '+' . implode( '* +', $words ) . '*';  // This is not worked for Thai language.
+					}
 					$escaped_text = $db->escape($newtext, true);
 					$quoted_text  = $db->Quote($escaped_text, false);
 
@@ -1032,9 +1056,20 @@ class plgSearchFlexiadvsearch extends JPlugin
 					$escaped_text_np = $db->escape($newtext_np, true);
 					$quoted_text_np  = $db->Quote($escaped_text_np, false);
 
-					$_index_match = ' MATCH ('.$ts.'.search_index) AGAINST ('.$quoted_text.' IN BOOLEAN MODE) ';
-					$_title_relev = ' MATCH (i.title) AGAINST ('.$quoted_text_np.' IN BOOLEAN MODE) ';
-					$_index_relev = ' MATCH ('.$ts.'.search_index) AGAINST ('.$quoted_text.' IN BOOLEAN MODE) ';
+					if ($is_nospace_language)
+					{
+						$q = trim($original_text);
+
+						$_index_match = " (MATCH (".$ts.".search_index) AGAINST (".$quoted_text." IN BOOLEAN MODE) OR i.title LIKE '%".trim($q)."%') ";
+						$_title_relev = " (MATCH (i.title) AGAINST (".$quoted_text_np." IN BOOLEAN MODE) OR i.title LIKE '%".trim($q)."%') ";
+						$_index_relev = " (MATCH (".$ts.".search_index) AGAINST (".$quoted_text." IN BOOLEAN MODE) OR i.title LIKE '%".trim($q)."%') ";
+					}
+					else
+					{
+						$_index_match = ' MATCH ('.$ts.'.search_index) AGAINST ('.$quoted_text.' IN BOOLEAN MODE) ';
+						$_title_relev = ' MATCH (i.title) AGAINST ('.$quoted_text_np.' IN BOOLEAN MODE) ';
+						$_index_relev = ' MATCH ('.$ts.'.search_index) AGAINST ('.$quoted_text.' IN BOOLEAN MODE) ';
+					}
 					break;
 
 				case 'any':
