@@ -198,34 +198,34 @@ abstract class JHtmlFclayoutbuilder
 
 			$document->addStyleDeclaration('
 
-			/* We can remove the border weve set at the beginnig */
-#gjs {
-  border: none;
-}
-/* Theming */
+		/* We can remove the border we have set at the beginning */
+		#gjs {
+		  border: none;
+		}
 
-/* Primary color for the background */
-.gjs-one-bg {
-  background-color: #444444;
-}
+		/* Theming */
 
-/* Secondary color for the text color */
-.gjs-two-color {
-  color: rgba(255, 255, 255, 0.7);
-}
+		/* Primary color for the background */
+		.gjs-one-bg {
+		  background-color: #444444;
+		}
 
-/* Tertiary color for the background */
-.gjs-three-bg {
-  background-color: #ec5896;
-  color: white;
-}
+		/* Secondary color for the text color */
+		.gjs-two-color {
+		  color: rgba(255, 255, 255, 0.7);
+		}
 
-/* Quaternary color for the text color */
-.gjs-four-color,
-.gjs-four-color-h:hover {
-  color: #6EA22B;
-}
+		/* Tertiary color for the background */
+		.gjs-three-bg {
+		  background-color: #ec5896;
+		  color: white;
+		}
 
+		/* Quaternary color for the text color */
+		.gjs-four-color,
+		.gjs-four-color-h:hover {
+		  color: #6EA22B;
+		}
 
 		/**
 		 * Top Panels container and top panels
@@ -330,7 +330,7 @@ abstract class JHtmlFclayoutbuilder
 		');
 		
 		//JFactory::getDocument()->addScriptDeclaration(
-			//TODO add template.css file in editor for better display
+		// TODO add template.css file in editor for better display
 		$html .= '
 		<script>
 		function fclayout_init_builder(editor_sfx, element_id)
@@ -357,12 +357,12 @@ abstract class JHtmlFclayoutbuilder
 
 				//TODO check loading css in canvas and real url
 				canvas: {
-				styles: [\'http://localhost/flexidev/templates/shaper_helix3/css/template.css\']
+					styles: [\'http://localhost/flexidev/templates/shaper_helix3/css/template.css\']
 				},
 
-
 				avoidInlineStyle: false,
-				// allow to move 
+
+				// Allow to move 
 				dragMode: \'absolute\',
 
 				// Indicate where to init the editor. You can also pass an HTMLElement
@@ -847,7 +847,9 @@ abstract class JHtmlFclayoutbuilder
 
 
 			// Add info command
-			/*var cmdm = editor.Commands;
+			// To readd this uncomment the respective DIV at ... $html
+			/*
+			var cmdm = editor.Commands;
 			var mdlClass = \'gjs-mdl-dialog-sm\';
 			var infoContainer = document.getElementById(\'info-panel\');
 			cmdm.add(\'open-info\', function() {
@@ -869,7 +871,8 @@ abstract class JHtmlFclayoutbuilder
 					\'title\': \'About\',
 					\'data-tooltip-pos\': \'bottom\',
 				},
-			});*/
+			});
+			*/
 
 
 			// Simple warn notifier
@@ -1449,7 +1452,22 @@ abstract class JHtmlFclayoutbuilder
 
 			<!--div id="blocks"></div-->
 		</div>
-		';
+		'
+		/*. '
+		<div id="info-panel" style="display:none">
+			<br/>
+			<svg class="info-panel-logo" xmlns="//www.w3.org/2000/svg" version="1"><g id="gjs-logo">
+				<path d="M40 5l-12.9 7.4 -12.9 7.4c-1.4 0.8-2.7 2.3-3.7 3.9 -0.9 1.6-1.5 3.5-1.5 5.1v14.9 14.9c0 1.7 0.6 3.5 1.5 5.1 0.9 1.6 2.2 3.1 3.7 3.9l12.9 7.4 12.9 7.4c1.4 0.8 3.3 1.2 5.2 1.2 1.9 0 3.8-0.4 5.2-1.2l12.9-7.4 12.9-7.4c1.4-0.8 2.7-2.2 3.7-3.9 0.9-1.6 1.5-3.5 1.5-5.1v-14.9 -12.7c0-4.6-3.8-6-6.8-4.2l-28 16.2" style="fill:none;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;stroke-width:10;stroke:#fff"/>
+			</g></svg>
+			<br/>
+			<div class="info-panel-label">
+				<b>GrapesJS Webpage Builder</b> is a simple showcase of what is possible to achieve with the
+				<a class="info-panel-link gjs-four-color" target="_blank" href="https://github.com/artf/grapesjs">GrapesJS</a>
+				core library
+			</div>
+		</div>
+		'*/
+		;
 
 		return $html;
 	}
