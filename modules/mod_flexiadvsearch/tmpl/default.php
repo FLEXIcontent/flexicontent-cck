@@ -212,9 +212,7 @@ if ($canseltypes)
 }
 
 // *** Selector of Fields for text searching
-// THIS is wrong value 1 means hide the fields and use the configured fields 
-// if( in_array($txtmode, array(1,2)) && count($fields_text) )
-if( $txtmode==2 && count($fields_text) )
+if( in_array($txtmode, array(1,2)) && count($fields_text) )
 {
 	// Get selected text fields in the Search Form
 	$form_txtflds = $jinput->get('txtflds', array(), 'array');
@@ -370,16 +368,12 @@ $doc->addScriptDeclaration($js);
 		$top_html = $bottom_html = $output = array();
 
 		//$output[] = '<input name="q" id="mod_search_searchword-'.$module->id.'" maxlength="'.$maxlength.'" alt="'.$button_text.'" class="fc_field_filter inputbox" type="text" size="'.$width.'" value="'.$text.'"  onblur="if(this.value==\'\') this.value=\''.$text.'\';" onfocus="if(this.value==\''.$text.'\') this.value=\'\';" />';
-
-		$q = $app->input->getString('q', '');
-		$q = $q !== parse_url(@$_SERVER["REQUEST_URI"], PHP_URL_PATH) ? $q : '';
-		$searchword = $app->input->getString('filter', $q);
-
+		$q = JRequest::getVar('q');
 		$output[] = '
 			<input type="'.($search_autocomplete==2 ? 'hidden' : 'text').'"
 				data-txt_ac_lang="' . JFactory::getLanguage()->getTag() . '"
 				id="mod_search_searchword-'.$module->id.'" class="'.$text_search_class.'"
-				placeholder="'.$search_inner_prompt.'" name="q" '.($search_autocomplete==2 ? '' : ' size="'.$search_inner_width.'" maxlength="'.$maxchars.'"').' value="'.$searchword.'" aria-label="'.$search_inner_prompt.'"  />';
+				placeholder="'.$search_inner_prompt.'" name="q" '.($search_autocomplete==2 ? '' : ' size="'.$search_inner_width.'" maxlength="'.$maxchars.'"').' value="'.$q.'" aria-label="'.$search_inner_prompt.'"  />';
 
 		// Search's GO button
 		if ($button) :
