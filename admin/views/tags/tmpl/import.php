@@ -22,27 +22,35 @@ $ctrl_task = FLEXI_J16GE ? 'task=tags.' : 'controller=tags&task=';
 $close_popup_js = FLEXI_J16GE ? "window.parent.SqueezeBox.close();" : "window.parent.document.getElementById('sbox-window').close();";
 ?>
 <script>
-window.addEvent('domready', function(){
-	$('adminForm').addEvent('submit', function(e) {
-		e = new Event(e).stop();
-		if (MooTools.version>="1.2.4") {
-			$('log-bind').set('html','<p class="centerimg"><img src="components/com_flexicontent/assets/images/ajax-loader.gif" style="vertical-align: middle;"><\/p>');
-			new Request.HTML({
-				 url: this.get('action'),
-			   evalScripts: true,
-			   update: $('log-bind'),
-			   data: $('adminForm')
-			}).send();
-		} else {
-			$('log-bind').setHTML('<p class="centerimg"><img src="components/com_flexicontent/assets/images/ajax-loader.gif" style="vertical-align: middle;"><\/p>');
-			this.send({
-				update: 	$('log-bind')
+(function ($) {
+
+	$(document).ready(function() {
+
+		var ajaxloader = '<span class="ajax-loader"><\/span>';
+		var adminForm = $('#adminForm');
+		var log_bind = $('#log-bind');
+
+		adminForm.on('submit', function(e, data)
+		{
+			e.preventDefault();
+			log_bind.html(ajaxloader);
+
+			$.ajax({
+				type: 'POST',
+				data: adminForm.serialize(),
+				url:  adminForm.prop('action'),
+				success: function(str) {
+					log_bind.html(str);
+				}
 			});
-		}
-		
+
+		});
+
 	});
-}); 
+
+})(jQuery);
 </script>
+
 <style>
 	body.contentpane.component,
 	body.contentpane.modal {

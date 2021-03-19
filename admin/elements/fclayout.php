@@ -519,7 +519,7 @@ function fc_getLayout_".$_name."(el, initial)
 
 ")."
 
-window.addEvent('domready', function(){
+jQuery(document).ready(function(){
 	var el = document.getElementById('jform_".($view=='field' ? "attribs_" : "params_").$_name."');
 	fc_getLayout_".$_name."(el, 1);
 

@@ -1348,7 +1348,7 @@ abstract class JHtmlFclayoutbuilder
 				],
 			});
 
-			/*window.addEvent(\'domready\', function(){
+			/*jQuery(document).ready(function(){
 				editor.store(res => console.log(\'Store callback\'));
 			});*/
 

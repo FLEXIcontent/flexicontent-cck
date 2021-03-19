@@ -25,71 +25,54 @@ defined('_JEXEC') or die('Restricted access');
 </style>
 
 <script>
-	window.addEvent('domready', function(){
-		$('lang').addEvent('change', function(e) {
-			if(MooTools.version>="1.2.4") {
+(function ($) {
 
-				$('log').set('html', '<p class="spinner"><img src="components/com_flexicontent/assets/images/ajax-loader.gif" style="vertical-align: middle;"><span><?php echo JText::_( 'FLEXI_SEND_LANGUAGE_CHECKING',true ); ?><\/span><\/p>');
-				e = e.stop();
+	jQuery(document).ready(function() {
+		var ajaxloader = '<span class="ajax-loader"><\/span>';
 
-				var url = "index.php?option=com_flexicontent&tmpl=component&format=raw&<?php echo JSession::getFormToken();?>=1&task=flexicontent.createlanguagepack&code=" + lang.value;
-				new Request.HTML({
-					url: url,
-					method: 'get',
-					update: $('log'),
-				}).send();
+		$('#lang').on('change', function(e, data)
+		{
+			e.preventDefault();
+			$('#log').html(ajaxloader);
+			var url = "index.php?option=com_flexicontent&tmpl=component&format=raw&<?php echo JSession::getFormToken();?>=1&task=flexicontent.createlanguagepack&code=" + lang.value;
 
-			} else {
+			jQuery.ajax({
+				type: 'GET',
+				url: url,
+				data: {}
+			}).done( function(data) {
+				$('#log').html(data);
+			});
 
-				$('log').setHTML('<p class="spinner"><img src="components/com_flexicontent/assets/images/ajax-loader.gif" style="vertical-align: middle;"><span><?php echo JText::_( 'FLEXI_SEND_LANGUAGE_CHECKING',true ); ?><\/span><\/p>');
-				e = new Event(e).stop();
-
-				var url = "index.php?option=com_flexicontent&format=raw&<?php echo JSession::getFormToken();?>=1&task=flexicontent.createlanguagepack&code=" + lang.value;
-				var ajax = new Ajax(url, {
-					method: 'get',
-					update: $('log')
-				});
-				ajax.request.delay(1000, ajax);
-
- 			}
 		});
 
-		$('missing').addEvent('click', function(e) {
+		$('#missing').on('click', function(e, data)
+		{
+			e.preventDefault();
+			$('#log').html(ajaxloader);
+			var url = "index.php?option=com_flexicontent&tmpl=component&format=raw&<?php echo JSession::getFormToken();?>=1&task=flexicontent.createlanguagepack&method=create&code=" + lang.value;
 
-			if(MooTools.version>="1.2.4") {
-				$('log').set('html', '<p class="spinner"><img src="components/com_flexicontent/assets/images/ajax-loader.gif" style="vertical-align: middle;"><span><?php echo JText::_( 'FLEXI_SEND_LANGUAGE_CREATING_MISSING',true ); ?><\/span><\/p>');
-				e = e.stop();
+			jQuery.ajax({
+				type: 'GET',
+				url: url,
+				data: {}
+			}).done( function(data) {
+				$('#log').html(data);
+			});
 
-				var url = "index.php?option=com_flexicontent&tmpl=component&format=raw&<?php echo JSession::getFormToken();?>=1&task=flexicontent.createlanguagepack&method=create&code=" + lang.value;
-				new Request.HTML({
-					url: url,
-					method: 'get',
-					update: $('log'),
-				}).send();
-
-			} else {
-
-				$('log').setHTML('<p class="spinner"><img src="components/com_flexicontent/assets/images/ajax-loader.gif" style="vertical-align: middle;"><span><?php echo JText::_( 'FLEXI_SEND_LANGUAGE_CREATING_MISSING',true ); ?><\/span><\/p>');
-				e = new Event(e).stop();
-
-				var url = "index.php?option=com_flexicontent&format=raw&<?php echo JSession::getFormToken();?>=1&task=flexicontent.createlanguagepack&method=create&code=" + lang.value;
-				var ajax = new Ajax(url, {
-					method: 'get',
-					update: $('log')
-				});
-				ajax.request.delay(1000, ajax);
-
-			}
 		});
 
-		$('archive').addEvent('click', function(e) {
+		$('#archive').on('click', function(e, data)
+		{
+			e.preventDefault();
+			$('#log').html(ajaxloader);
 
 			// Récupération des valeurs des champs de formulaire
-			var code 	= encodeURIComponent($('lang').value);
-			var name 	= encodeURIComponent($('myname').value);
-			var email 	= encodeURIComponent($('myemail').value);
-			var web 	= encodeURIComponent($('website').value);
-			var message = encodeURIComponent($('message').value);
+			var code 	= encodeURIComponent($('#lang').value);
+			var name 	= encodeURIComponent($('#myname').value);
+			var email 	= encodeURIComponent($('#myemail').value);
+			var web 	= encodeURIComponent($('#website').value);
+			var message = encodeURIComponent($('#message').value);
 
 			// Préparation des paramètres d'URL
 			var params 	 = '&code='+ code;
@@ -98,32 +81,20 @@ defined('_JEXEC') or die('Restricted access');
 			params 		+= '&web=' + web;
 			params 		+= '&message=' + message;
 
-			if(MooTools.version>="1.2.4") {
-				$('log').set('html', '<p class="spinner"><img src="components/com_flexicontent/assets/images/ajax-loader.gif" style="vertical-align: middle;"><span><?php echo JText::_( 'FLEXI_SEND_LANGUAGE_CREATING_ARCHIVE',true ); ?><\/span><\/p>');
-				e = e.stop();
+			var url = "index.php?option=com_flexicontent&tmpl=component&format=raw&<?php echo JSession::getFormToken();?>=1&task=flexicontent.createlanguagepack&method=zip" + params;
+			jQuery.ajax({
+				type: 'GET',
+				url: url,
+				data: {}
+			}).done( function(data) {
+				$('#log').html(data);
+			});
 
-				var url = "index.php?option=com_flexicontent&tmpl=component&format=raw&<?php echo JSession::getFormToken();?>=1&task=flexicontent.createlanguagepack&method=zip" + params;
-				new Request.HTML({
-					url: url,
-					method: 'get',
-					update: $('log'),
-				}).send();
-
-			} else {
-
-				$('log').setHTML('<p class="spinner"><img src="components/com_flexicontent/assets/images/ajax-loader.gif" style="vertical-align: middle;"><span><?php echo JText::_( 'FLEXI_SEND_LANGUAGE_CREATING_ARCHIVE',true ); ?><\/span><\/p>');
-				e = new Event(e).stop();
-
-				var url = "index.php?option=com_flexicontent&format=raw&<?php echo JSession::getFormToken();?>=1&task=flexicontent.createlanguagepack&method=zip" + params;
-				var ajax = new Ajax(url, {
-					method: 'get',
-					update: $('log')
-				});
-				ajax.request.delay(1000, ajax);
-
-			}
 		});
+
 	});
+
+})(jQuery);
 </script>
 
 <div id="flexicontent">
