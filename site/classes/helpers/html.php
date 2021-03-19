@@ -1802,15 +1802,6 @@ class flexicontent_html
 				$document->addScript($framework_path.'/imagesloaded.pkgd.min.js');
 				break;
 
-			case 'noobSlide':
-				// Make sure mootools are loaded
-				JHtml::_('behavior.framework', true);
-
-				$framework_path = JUri::root(true).$lib_path.'/noobSlide';
-				//$document->addScript($framework_path.'/_class.noobSlide.js');
-				$document->addScript($framework_path.'/_class.noobSlide.packed.js');
-				break;
-
 			case 'zTree':
 				if ($load_jquery) flexicontent_html::loadJQuery();
 

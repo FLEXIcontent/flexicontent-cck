@@ -61,22 +61,24 @@ class JFormFieldFcmethod extends JFormFieldRadio
 		if ($disabled_ff) {
 			$dff_idtag = FLEXI_J16GE ? 'jform_params_'.$disabled_ff : 'params'.$disabled_ff;
 			$js 	= "
-function filterCategories_".$disabled_ff."(method) {
-	var cats = $('".$dff_idtag."');
-	var options = cats.getElements('option');
-	if (method == 1) {
-		cats.setProperty('disabled', 'disabled');
-		/*options.each(function(el){
-    		el.setProperty('selected', 'selected');
-		});*/
-	} else {
-		cats.setProperty('disabled', '');
-	}
-}
-window.addEvent('domready', function(){
-	filterCategories_".$disabled_ff."('".$value."');			
-});
-		";
+				function filterCategories_".$disabled_ff."(method)
+				{
+					var cats = jQuery('#".$dff_idtag."');
+					var options = cats.find('option');
+					if (method == 1) {
+						cats.setAttribute('disabled', 'disabled');
+						/*options.each(function(el){
+								el.setAttribute('selected', 'selected');
+						});*/
+					} else {
+						cats.setAttribute('disabled', '');
+					}
+				}
+
+				jQuery(document).ready(function(){
+					filterCategories_".$disabled_ff."('".$value."');			
+				});
+			";
 			$doc->addScriptDeclaration($js);
 			
 			$class = 'class="inputbox" onchange="filterCategories_'.$disabled_ff.'(this.value);"';
