@@ -35,7 +35,6 @@ require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'
 // Load the helper classes
 require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.helper.php');
 		
-JHtml::_('behavior.framework', true);
 flexicontent_html::loadFramework('jQuery');
 flexicontent_html::loadFramework('select2');
 

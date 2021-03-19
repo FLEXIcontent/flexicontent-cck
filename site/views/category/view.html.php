@@ -173,7 +173,6 @@ class FlexicontentViewCategory extends JViewLegacy
 		// *** Load needed JS libs & CSS styles
 		// ***
 
-		JHtml::_('behavior.framework', true);
 		flexicontent_html::loadFramework('jQuery');
 		flexicontent_html::loadFramework('flexi_tmpl_common');
 

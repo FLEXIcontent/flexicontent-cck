@@ -19,20 +19,33 @@
 defined('_JEXEC') or die('Restricted access');
 ?>
 <script>
-window.addEvent('domready', function(){
-	$('adminForm').addEvent('submit', function(e) {
-		$('log-bind').set('html','<p class="centerimg"><img src="components/com_flexicontent/assets/images/ajax-loader.gif" style="vertical-align: middle;"><\/p>');
-		e = new Event(e).stop();
+(function ($) {
 
-		new Request.HTML({
-			 url: this.get('action'),
-		   evalScripts: true,
-		   update: $('log-bind'),
-		   data: $('adminForm')
-		}).send();
-		
+	$(document).ready(function() {
+
+		var ajaxloader = '<span class="ajax-loader"><\/span>';
+		var adminForm = $('#adminForm');
+		var log_bind = $('#log-bind');
+
+		adminForm.on('submit', function(e, data)
+		{
+			e.preventDefault();
+			log_bind.html(ajaxloader);
+
+			$.ajax({
+				type: 'POST',
+				data: adminForm.serialize(),
+				url:  adminForm.prop('action'),
+				success: function(str) {
+					log_bind.html(str);
+				}
+			});
+
+		});
+
 	});
-}); 
+
+})(jQuery);
 </script>
 
 <form action="index.php?option=com_flexicontent&task=categories.params&layout=params&format=raw" method="post" name="adminForm" id="adminForm">

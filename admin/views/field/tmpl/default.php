@@ -330,21 +330,8 @@ $this->document->addScriptDeclaration($js);
 				
 			</div>
 			<?php endif; ?>
-			
-			
-			<?php if ($this->perms->CanConfig) :
-				/*$this->document->addScriptDeclaration("
-					window.addEvent('domready', function() {
-						var slideaccess = new Fx.Slide('tabacces');
-						var slidenoaccess = new Fx.Slide('notabacces');
-						slideaccess.hide();
-						$$('fieldset.flexiaccess legend').addEvent('click', function(ev) {
-							slideaccess.toggle();
-							slidenoaccess.toggle();
-						});
-					});
-				");*/
-			?>
+
+
 			<div class="tabbertab" id="fcform_tabset_common_perms_tab" data-icon-class="icon-power-cord" >
 				<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_PERMISSIONS' ); ?> </h3>
 				

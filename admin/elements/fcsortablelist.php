@@ -59,7 +59,6 @@ class JFormFieldFcSortableList extends JFormField
 	
 	function add_css_js()
 	{
-		JHtml::_('behavior.framework', true);
 		flexicontent_html::loadJQuery();
 
 		$document = JFactory::getDocument();

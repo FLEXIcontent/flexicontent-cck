@@ -84,7 +84,6 @@ class JFormFieldSeparator extends JFormFieldSpacer
 			$this->add_tab_css_js();
 		}
 
-		JHtml::_('behavior.framework', true);
 		flexicontent_html::loadJQuery();
 
 		// Add js function to overload the joomla submitform validation

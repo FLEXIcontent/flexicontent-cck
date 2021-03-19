@@ -39,9 +39,9 @@ if ($params->get('display_favlist', 0))
 	$alt_add = JText::_( 'FLEXI_FAVOURE' );
 	$alt_delete = JText::_( 'FLEXI_REMOVE_FAVOURITE' );
 	$js = '
-		window.addEvent("domready", function()
+		if (typeof jQuery != "undefined")
 		{
-			if (typeof jQuery != "undefined")
+			jQuery(document).ready(function()
 			{
 				var fcfavs_list = new fclib_createCookieList("fcfavs_recent");
 				var fcfavs_box = jQuery("div#mod_fc_favlist");
@@ -52,8 +52,8 @@ if ($params->get('display_favlist', 0))
 					fcfavs_box.sortable();
 				}
 				jQuery("span.fcfav-toggle-btn").bind("click", favicon_clicked);
-			}
-		});
+			});
+		}
   ';
 	$document->addScriptDeclaration($js);
 }
