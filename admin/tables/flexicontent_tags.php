@@ -11,6 +11,7 @@
 
 defined('_JEXEC') or die('Restricted access');
 
+use Joomla\CMS\Event\AbstractEvent;
 use Joomla\String\StringHelper;
 require_once('flexicontent_basetable.php');
 
