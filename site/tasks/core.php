@@ -41,9 +41,34 @@ class FlexicontentTasksCore
 		require_once JPATH_BASE . '/includes/framework.php';
 
 		// Instantiate the application.
-		$is_admin = preg_match('/\/administrator\//', isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : '');
-		$app = JFactory::getApplication($is_admin ? 'administrator' : 'site');
-		$app->initialise();
+		$is_admin    = preg_match('/\/administrator\//', isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : '');
+		$client_name = $is_admin ? 'administrator' : 'site';
+
+		if (!FLEXI_J40GE)
+		{
+			$app = JFactory::getApplication($client_name);
+			$app->initialise();
+		}
+		else
+		{
+			// Boot the DI container
+			$container = \Joomla\CMS\Factory::getContainer();
+
+			$container->alias('session.web', 'session.web.' . $client_name)
+				->alias('session', 'session.web.' . $client_name)
+				->alias('JSession', 'session.web.' . $client_name)
+				->alias(\Joomla\CMS\Session\Session::class, 'session.web.' . $client_name)
+				->alias(\Joomla\Session\Session::class, 'session.web.' . $client_name)
+				->alias(\Joomla\Session\SessionInterface::class, 'session.web.' . $client_name);
+
+			// Instantiate the application.
+			$app = $is_admin
+				? $container->get(\Joomla\CMS\Application\AdministratorApplication::class)
+				: $container->get(\Joomla\CMS\Application\SiteApplication::class);
+
+			// Set the application as global app
+			\Joomla\CMS\Factory::$application = $app;
+		}
 
 		// Call the task
 		$jinput = $app->input;
