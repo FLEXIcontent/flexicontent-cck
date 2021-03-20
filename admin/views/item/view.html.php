@@ -249,7 +249,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		flexicontent_html::loadFramework('flexi-lib-form');
 
 		// Load custom behaviours: form validation, popup tooltips
-		JHtml::_('behavior.formvalidation');  // load default validation JS to make sure it is overriden
+		JHtml::_('behavior.formvalidator');  // load default validation JS to make sure it is overriden
 		JHtml::_('bootstrap.tooltip');
 
 		// Add js function to overload the joomla submitform validation
