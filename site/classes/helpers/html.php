@@ -1186,10 +1186,12 @@ class flexicontent_html
 
 		if ($add_jquery_ui && !$jquery_ui_added)
 		{
-			// Load all components of jQuery-UI
+			// Load all components of jQuery-UI (add and "override" it)
 			if ($add_remote_forced_jquery_ui)
 			{
-				JHtml::_('jquery.ui', array());   // add and "override" it
+				!FLEXI_J40GE
+					? JHtml::_('jquery.ui', array())
+					: false;
 				$document->addScript('//code.jquery.com/ui/'.$JQUERY_UI_VER.'/jquery-ui.min.js');
 			}
 			else
