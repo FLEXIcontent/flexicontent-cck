@@ -87,7 +87,7 @@ class JFormFieldSeparator extends JFormFieldSpacer
 		flexicontent_html::loadJQuery();
 
 		// Add js function to overload the joomla submitform validation
-		JHtml::_('behavior.formvalidation');  // load default validation JS to make sure it is overriden
+		JHtml::_('behavior.formvalidator');  // load default validation JS to make sure it is overriden
 		$document->addScript(JUri::root(true).'/components/com_flexicontent/assets/js/admin.js', array('version' => FLEXI_VHASH));
 		$document->addScript(JUri::root(true).'/components/com_flexicontent/assets/js/validate.js', array('version' => FLEXI_VHASH));
 

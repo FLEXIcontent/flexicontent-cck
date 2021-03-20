@@ -8,7 +8,7 @@ $menu_id = $app->input->getInt('menu_id', '');
 $types = flexicontent_html::getTypesList( $_type_ids=false, $_check_perms = false, $_published=true);
 $types = is_array($types) ? $types : array();
 
-$ctrl_task = $app->isAdmin() ? 'items.add' : 'add';
+$ctrl_task = $app->isClient('administrator') ? 'items.add' : 'add';
 $icon = "components/com_flexicontent/assets/images/layout_add.png";
 $btn_class = 'choose_type';
 
@@ -16,7 +16,7 @@ echo '
 <div id="flexicontent" style="margin:32px;" >
 	<ul class="nav nav-tabs nav-stacked">
 		';
-		$link = $app->isAdmin()
+		$link = $app->isClient('administrator')
 			? "index.php?option=com_flexicontent&amp;controller=items&amp;task=".$ctrl_task."&amp;". JSession::getFormToken() ."=1"
 			: "index.php?option=com_flexicontent&amp;task=".$ctrl_task."&amp;". JSession::getFormToken() ."=1";
 		$_name = '- ' . JText::_("FLEXI_NO_TYPE") . ' -';
@@ -84,7 +84,7 @@ echo '
 				}
 				else
 				{
-					$link = $app->isAdmin()
+					$link = $app->isClient('administrator')
 						? "index.php?option=com_flexicontent&amp;controller=items&amp;task=".$ctrl_task."&amp;typeid=".$type->id."&amp;". JSession::getFormToken() ."=1"
 						: "index.php?option=com_flexicontent&amp;task=".$ctrl_task."&amp;typeid=".$type->id.($menu_id ? '&amp;Itemid='.$menu_id : '')."&amp;". JSession::getFormToken() ."=1";
 				}

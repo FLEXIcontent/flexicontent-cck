@@ -120,7 +120,7 @@ class FlexicontentViewGroups extends FlexicontentViewBaseRecords
 			flexicontent_html::loadFramework('select2');
 
 			// Load custom behaviours: form validation, popup tooltips
-			JHtml::_('behavior.formvalidation');
+			JHtml::_('behavior.formvalidator');
 			JHtml::_('bootstrap.tooltip');
 
 			// Add js function to overload the joomla submitform validation
