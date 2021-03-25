@@ -8,7 +8,7 @@
 }
 fieldset.fc_search_set,
 fieldset.fc_filter_set {
-	border: 1px solid #cccccc;
+	border-bottom: 1px solid #cccccc;
 	margin: 12px 0 0 0;
 	padding: 1%;
 	width: 100%;
