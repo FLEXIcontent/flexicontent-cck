@@ -350,7 +350,7 @@ $this->document->addScriptDeclaration($js);
 				*/ ?>
 				
 			</div>
-			<?php endif; ?>		
+		
 			
 		</div>
 
