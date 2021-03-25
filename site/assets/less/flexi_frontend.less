@@ -422,7 +422,7 @@ div table.adminform td {
 /****************************************************/
 
 #flexicontent .item_total {
-	border: 1px solid lightgray;
+	border: 0px solid lightgray; /*less border to be more clear*/
 	margin: 0px 0px 12px 0px;
 	padding: 4px 8px;
 	width: 100%;
@@ -454,7 +454,10 @@ div table.adminform td {
 	filter: alpha(opacity=100);
 }
 #flexicontent .item_total .fc_clayout_box img {
-	height: 48px;
+	height: 24px;
+}
+#flexicontent .item_total .fc_clayout_box .btn-group.group-fcinfo .btn{ /* more compact design for template swicther*/
+	min-width: 43px;
 }
 
 #flexicontent .item_total .fc_item_total_data {

@@ -4298,7 +4298,7 @@ div table.adminform td {
 	color: darkred;
 }
 #flexicontent .item_total {
-	border: 1px solid lightgray;
+	border: 0px solid lightgray;
 	margin: 0px 0px 12px 0px;
 	padding: 4px 8px;
 	width: 100%;
@@ -4329,7 +4329,10 @@ div table.adminform td {
 	filter: alpha(opacity=100);
 }
 #flexicontent .item_total .fc_clayout_box img {
-	height: 48px;
+	height: 24px;
+}
+#flexicontent .item_total .fc_clayout_box .btn-group.group-fcinfo .btn {
+	min-width: 43px;
 }
 #flexicontent .item_total .fc_item_total_data {
 	display: inline-block;
