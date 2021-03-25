@@ -2155,12 +2155,13 @@ div.current ul.config-option-list li fieldset {
  
 /* select choice container */
 .select2-container .select2-choice {
-	padding: 0 0 0 8px !important;
+	padding: 4px 5px 4px 8px !important;
 	margin: 0 !important;
 	font-weight: normal !important;
 	min-height: 26px;
 	height: auto !important;
 	box-sizing: content-box !important;
+	background:none !important;//remove background gradient
 }
 html[dir="rtl"] .select2-container .select2-choice {
 	padding: 0 8px 0 0 !important;
@@ -2169,6 +2170,14 @@ html[dir="rtl"] .select2-container .select2-choice {
 	color: black;
 	white-space: pre-wrap !important;
 }
+.select2-container .select2-choice .select2-arrow {
+    border-left: 0px solid #aaa !important;
+ 	background: none !important;
+}
+.select2-container .select2-choice .select2-arrow b {
+    background-position: 0 4px !important;
+}
+
 /* Form validation failed, having 'invalid' CLASS */
 .select2-container.invalid .select2-choice > .select2-chosen {
 	color: red !important;
@@ -2213,16 +2222,16 @@ html[dir="rtl"] .select2-container .select2-choice {
 	cursor: pointer;
 	min-width: 32px !important;
 	min-height: 20px !important;
-	padding: 1px 4px !important;
+	padding: 6px 7px !important;
 	margin-top: 1px !important;
 	border: 0px solid lightgray !important;
 	/*background: url(../../assets/images/plus-button.png) no-repeat  50% 50% !important;*/
 
 	background: #fff url('../images/select2.png') no-repeat 100% -22px !important;
-	background: url('../images/select2.png') no-repeat 100% -22px, -webkit-gradient(linear, left bottom, left top, color-stop(0.85, #fff), color-stop(0.99, #eee)) !important;
-	background: url('../images/select2.png') no-repeat 100% -22px, -webkit-linear-gradient(center bottom, #fff 85%, #eee 99%) !important;
-	background: url('../images/select2.png') no-repeat 100% -22px, -moz-linear-gradient(center bottom, #fff 85%, #eee 99%) !important;
-	background: url('../images/select2.png') no-repeat 100% -22px, linear-gradient(to bottom, #fff 85%, #eee 99%) 0 0 !important;
+	background: url('../images/select2.png') no-repeat 100% -22px !important;
+	background: url('../images/select2.png') no-repeat 100% -22px !important;
+	background: url('../images/select2.png') no-repeat 100% -22px !important;
+	background: url('../images/select2.png') no-repeat 100% -22px !important;
 }
 .select2-container-multi.select2-dropdown-open .select2-choices .select2-search-field input.select2-input {
 	min-width: 124px !important;
@@ -2254,6 +2263,17 @@ html[dir="rtl"] .select2-container .select2-choice {
 	font-size: 11px !important;
 }
 
+/* dropdown */
+.select2-drop.select2-drop-multi {
+    padding: 0px 10px 10px 10px !important;
+}
+.select2-drop-active {
+    border: 1px solid #aaa !important;
+}
+.select2-results .select2-highlighted {
+    background: #d8d8d8 !important;
+    color: #fff !important;
+}
 
 
 // ***
