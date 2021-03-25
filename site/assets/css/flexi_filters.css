@@ -129,20 +129,16 @@ form > .fc_filter_line {
 }
 .fc_filter .fc_filter_label_inline,
 .fc_filter_line .fc_filter_label_inline {
-	color: #FFFFFF;
 	display: inline-block;
 	font-size: 10.998px;
-	font-weight: bold;
 	line-height: 14px;
 	padding: 4px 4px;
-	text-shadow: 0 -1px 0 rgba(0,0,0,0.25);
 	vertical-align: baseline;
 	white-space: nowrap;
-	border-radius: 5px;
 }
 .fc_filter .fc_filter_label_inline,
 .fc_filter_line .fc_filter_label_inline {
-	background-color: #555;
+	border-bottom: 1px solid #ccc;
 }
 .fc_filter .fc_filter_label,
 .fc_filter_line .fc_filter_label {
@@ -374,6 +370,7 @@ span.fc_field_filter {
 }
 .fc_filter_html input.fc_text_filter {
 	margin: 3px 0px;
+	padding: 8px 5px 8px 8px !important;
 }
 .fc_filter_html.fc_text_search input {
 	width: unset;
