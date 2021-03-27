@@ -105,6 +105,7 @@ class FlexicontentViewCategory extends JViewLegacy
 
 		/**
 		 * Override with tag's metadata and prepend with tag's metadesc, metakey
+		 * Also use tag title of Joomla tag (it may have been translated via falang)
 		 */
 		if ($tag && $tag->jtag)
 		{
@@ -118,6 +119,9 @@ class FlexicontentViewCategory extends JViewLegacy
 			// Prepend tag metadata to view's meta description and keywords
 			$metadesc = $tag->jtag->metadesc . ($metadesc ? "\n" . $metadesc : '');
 			$metakey = $tag->jtag->metakey . ($metakey ? "\n" . $metakey : '');
+
+			// Use Joomla tag as it may have been translated
+			$tag->name = $tag->jtag->title !== $tag->name ? $tag->jtag->title : $tag->name;
 		}
 
 

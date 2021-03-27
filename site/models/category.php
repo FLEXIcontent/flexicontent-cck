@@ -2152,10 +2152,13 @@ class FlexicontentModelCategory extends JModelLegacy {
 		}
 
 		// Load tag data
-		$query = 'SELECT *,'
-			. ' CASE WHEN CHAR_LENGTH(t.alias) THEN CONCAT_WS(\':\', t.id, t.alias) ELSE t.id END as slug'
-			. ' FROM #__flexicontent_tags AS t'
-			. ' WHERE t.id = ' . (int) $this->_tagid;
+		$query = $this->_db->getQuery(true)
+			->select('ft.*')
+			->select('CASE WHEN CHAR_LENGTH(ft.alias) THEN CONCAT_WS(\':\', ft.id, ft.alias) ELSE ft.id END as slug')
+			->from('#__flexicontent_tags AS ft')
+			->where('ft.id = ' . (int) $this->_tagid)
+			;
+
 		$this->_tag = $this->_db->setQuery($query)->loadObject();
 
 		// Abort further execution if tag not found
@@ -2165,12 +2168,13 @@ class FlexicontentModelCategory extends JModelLegacy {
 		}
 
 		// Get the linked joomla tag
-
 		if (!empty($this->_tag->jtag_id))
 		{
-			$query = 'SELECT *'
-				. ' FROM #__tags AS t'
-				. ' WHERE t.id = ' . (int) $this->_tag->jtag_id;
+			$query = $this->_db->getQuery(true)
+				->select('t.*')
+				->from('#__tags AS t')
+				->where('t.id = ' . (int) $this->_tag->jtag_id)
+				;
 			$this->_tag->jtag = $this->_db->setQuery($query)->loadObject();
 		}
 		else
