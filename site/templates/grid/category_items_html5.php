@@ -827,6 +827,11 @@ if ($count > $leadnum) :
 			$img_field_name = $this->params->get('intro_image');
 		}
 
+		$intro_fallback_field = $params->get('intro_fallback_field', 0);
+		$intro_image_fallback_img = $params->get('intro_image_fallback_img');
+		$intro_image_custom_display	= $params->get('intro_image_custom_url');
+		$intro_image_custom_url	= $params->get('intro_image_custom_url');
+
 		$intro_dimgs = $this->params->get('intro_default_images');
 		if ($intro_use_image && $intro_dimgs) {
 			$intro_dimgs = preg_split("/[\s]*,[\s]*/", $intro_dimgs);
