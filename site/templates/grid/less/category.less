@@ -211,11 +211,16 @@ div.comments {
 	margin-left: 8px;
 	margin-right: 8px;
 	/*min-width: 120px;*/
-	padding: 6px 12px;
+  	padding-right: @FCC_label_pad_right + px!important;
+	padding-left: @FCC_label_pad_left + px!important ;
+	padding-bottom: @FCC_label_pad_bottom + px!important;
+	padding-top: @FCC_label_pad_top + px!important ;
 	box-sizing: border-box;
 }
 #flexicontent .lineinfo .element .value {
 	display: inline-block;
+  	padding-bottom: @FCC_label_pad_bottom + px!important;
+	padding-top: @FCC_label_pad_top + px!important ;
 }
 
 #flexicontent .readmore {
