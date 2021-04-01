@@ -1150,7 +1150,6 @@ class flexicontent_html
 		) : null;
 		$JQUERY_UI_VER = FLEXI_J40GE ? '1.12.1' : $params->get('jquery_ui_ver', $flexiparams->get('jquery_ui_ver', '1.9.2'));
 		$JQUERY_UI_THEME = $params->get('jquery_ui_theme', $flexiparams->get('jquery_ui_theme', 'flat'));   // FLEXI_JQUERY_UI_CSS_STYLE:  'ui-lightness', 'smoothness', 'flat'
-		if ($JQUERY_UI_THEME === 'flat') $JQUERY_UI_THEME = 'base';
 		JText::script("FLEXI_FORM_IS_BEING_SUBMITTED", true);
 
 		/*
