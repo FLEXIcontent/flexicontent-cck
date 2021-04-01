@@ -44,6 +44,12 @@ class FlexicontentTasksCore
 		$is_admin    = preg_match('/\/administrator\//', isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : '');
 		$client_name = $is_admin ? 'administrator' : 'site';
 
+		if (!defined('FLEXI_J40GE'))
+		{
+			$jversion = new JVersion;
+			define('FLEXI_J40GE', version_compare( $jversion->getShortVersion(), '3.9.99', 'g' ) );
+		}
+
 		if (!FLEXI_J40GE)
 		{
 			$app = JFactory::getApplication($client_name);
