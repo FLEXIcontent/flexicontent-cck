@@ -1567,7 +1567,7 @@ class plgFlexicontent_fieldsMediafile extends FCField
 
 		foreach($media_property_filters as $prop_name)
 		{
-			$filter->filter_valuesjoin   = ' JOIN #__flexicontent_fields_item_relations as rel ON rel.item_id = c.id '
+			$filter->filter_valuesjoin   = ' JOIN #__flexicontent_fields_item_relations as rel ON rel.item_id = c.id AND rel.field_id = ' . (int) $filter->id
 				. ' JOIN #__flexicontent_files AS f ON f.id = rel.value '
 				. ' JOIN #__flexicontent_mediadatas AS md ON f.id = md.file_id';
 
