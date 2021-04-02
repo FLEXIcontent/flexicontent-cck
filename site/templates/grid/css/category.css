@@ -125,7 +125,6 @@ div.comments {
 }
 #flexicontent .lineinfo {
 	display: block;
-	clear: both;
 	margin: 0;
 	vertical-align: middle;
 	text-align: left;
@@ -656,4 +655,10 @@ div.comments {
 	filter: alpha(opacity=100);
 	background-color: rgba(0,0,0,0.75);
 	max-height: 100%;
+}
+.fc_overlayed .fcitem_text p {
+    color: #fff;
+}
+#flexicontent .fc_overlayed .element {
+    color: #fff;
 }
