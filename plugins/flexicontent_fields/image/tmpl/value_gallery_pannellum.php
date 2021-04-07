@@ -74,6 +74,35 @@ foreach ($values as $n => $value)
 
 	$w = isset($value['size_w_' . $SIZE]) ? $value['size_w_' . $SIZE] : $field->parameters->get('w_' . $SIZE, self::$default_widths[$size]);
 	$h = isset($value['size_h_' . $SIZE]) ? $value['size_h_' . $SIZE] : $field->parameters->get('h_' . $SIZE, self::$default_heights[$size]);
+	
+	//check hotspot list
+	$hots_spots_list = 1;
+	if ($hots_spots_list =1){
+	$hots_spots_list="
+	\"hotSpots\": [
+	{
+		\"pitch\": 14.1,
+		\"yaw\": 1.5,
+		\"type\": \"info\",
+		\"text\": \"Baltimore Museum of Art\",
+		\"URL\": \"https://artbma.org/\"
+	},
+	{
+		\"pitch\": -9.4,
+		\"yaw\": 222.6,
+		\"type\": \"info\",
+		\"text\": \"Art Museum Drive\"
+	},
+	{
+		\"pitch\": -0.9,
+		\"yaw\": 144.4,
+		\"type\": \"info\",
+		\"text\": \"North Charles Street\"
+	}
+]
+	";}else{
+		$hots_spots_list="";
+	}
 
 	$img_legend_custom = '
 	<div id="panorama_' . $uniqueid . '" style="width: ' . $w . 'px; height: ' . $w . 'px; max-width: 100%; max-height: ' . $vp_max_height  . 'vh;"></div>
@@ -83,6 +112,7 @@ foreach ($values as $n => $value)
 			"panorama": "' . JUri::root(true).'/'.$srco . '",
 			"preview": "' . $ABS_SRC . '",
 			"title": "' . $title_encoded . '",
+			' . $hots_spots_list . '
 		});
 	</script>	
 	';
