@@ -760,16 +760,15 @@ class plgFlexicontent_fieldsRelation extends FCField
 		include(self::getViewPath($field->field_type, $viewlayout));
 
 		// Do not convert the array to string if field is in a group, and do not add: FIELD's opentag, closetag, value separator
+		// NOTE the 'value' list (aka in our case an item list) was created inside the LAYOUT
+		// ... so the opentag, closetag, value separator were used inside the layout ALREADY
 		if (!$is_ingroup)
 		{
-			// Apply values separator
-			$field->{$prop} = implode($separatorf, $field->{$prop});
+			// Implode data without adding any ... separator !!!
+			$field->{$prop} = implode('', $field->{$prop});
 
 			if ($field->{$prop} !== '')
 			{
-				// Apply field 's opening / closing texts
-				$field->{$prop} = $opentag . $field->{$prop} . $closetag;
-
 				// Add microdata once for all values, if field -- is NOT -- in a field group
 				if ($itemprop)
 				{
