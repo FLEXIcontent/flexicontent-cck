@@ -198,6 +198,8 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 
+			<field name="text_sparator" type="text" default="" label="FLEXI_FIELD_EMAIL_TXT_SEPARATOR" description="FLEXI_FIELD_EMAIL_TXT_SEPARATOR_DESC" />
+
 			<field name="" type="separator" default="FLEXI_FIELD_EMAIL_OPTIONS" level="level1" />
 
 			<field name="" type="separator" default="FLEXI_FIELD_EMAIL_FORM_OPTION" level="level2" />
@@ -260,7 +262,7 @@
 			<option value="textarea">FLEXI_FIELD_TYPE_TEXTAREA</option>
 			<option value="freehtml">FLEXI_FIELD_TYPE_FREEHTML</option>
 			<option value="hidden">FLEXI_FIELD_TYPE_HIDDEN</option>
-			<option value="tel">FLEXI_FIELD_TYPE_TEL</option>
+			<option value="phone">FLEXI_FIELD_TYPE_TEL</option>
 			<option value="url">FLEXI_FIELD_TYPE_URL</option>
 			<option value="file">FLEXI_FIELD_TYPE_FILE</option>
 		</field>
@@ -274,6 +276,8 @@
 	</form>
 </field>
 <field name="" type="separator" default="FLEXI_FIELD_EMAIL_FORM_USEDESC" level="level3" class="alert alert-info fcpadded" />
+
+<field name="js_script" type="editor" editor="codemirror" syntax="html" filter="RAW" label="FLEXI_FIELD_EMAIL_JSSCRIPT"  default="" description="FLEXI_FIELD_EMAIL_SUBMIT_JSSCRIPT_DESC"/>
 
 			<field name="" type="separator" default="FLEXI_FIELD_EMAIL_SUBMIT_OPTION" level="level2" />
 			<field name="submit_label" type="text" label="FLEXI_FIELD_EMAIL_SUBMIT_LABEL"  default="FLEXI_FIELD_EMAIL_SUBMIT_LABEL_VALUE" description="FLEXI_FIELD_EMAIL_SUBMIT_LABEL_DESC"/>

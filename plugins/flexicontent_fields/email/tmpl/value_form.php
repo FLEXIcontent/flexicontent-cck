@@ -38,6 +38,21 @@ foreach ($values as $value)
 		$text_is_email = strpos($text,'@') !== false;
 	}
 
+	// Use paremeters to decide if email should be cloaked and if we need a mailto: link
+	if ($format != 'feed' && $email_cloaking)
+	{
+		$emaildisplay = JHtml::_('email.cloak', $addr, $mailto_link, $text, $text_is_email);
+	}
+	else
+	{
+		$emaildisplay = $mailto_link ?
+			'<a href="mailto:' . $addr . '" target="_blank" itemprop="email">' . $text . '</a>' :
+			$text;
+	}
+  
+  	// text to separate email to form
+  	$textseparator = JText::_($field->parameters->get('text_sparator', ''));
+
 	// Create field's display
 	$submit_class = $field->parameters->get('submit_class', 'btn');
 	$label_position = $field->parameters->get('label_position', '');
@@ -88,6 +103,14 @@ foreach ($values as $value)
 		$modal_footer = "";
 
 	}
+
+	 // add js script
+	 $add_js_script = $field->parameters->get('js_script');
+	 if(!empty($add_js_script)){
+	 $js_script = $add_js_script;
+   }else{
+	   $js_script ="";
+	 }
 
 	// Consent field
 	$consent_field_display = $field->parameters->get('display_consent', 1);
@@ -244,6 +267,7 @@ if ( $joomla_captcha != '0' && $captcha_display) {
 		'.JHtml::_("form.token").'
 		</fieldset>
 		</form>
+		'.$js_script.'
 		<script>
 			const qsa=(s,o)=>[...(o||document).querySelectorAll(s)],
       		qs=(s,o)=>qsa(s,o)[0];
