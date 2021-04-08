@@ -455,6 +455,8 @@ body .fc-nowrap-box .nowrap_box .label,
 	margin: 0 0 0 0;
 	padding-left: 4px;
 	padding-right: 4px;
+	padding-top: 8px;
+	padding-bottom: 8px;
 	display: inline-block;
 }
 @media (max-width: 800px) {
