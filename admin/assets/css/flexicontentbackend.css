@@ -873,18 +873,18 @@ td.col_edit_layout {
 	text-align: center;
 }
 .flexicontent #fc-managers-header select.fc_is_selarrow {
-	max-width: 1.4em !important;
+	max-width: 1.9em !important;
 }
 .flexicontent #fc-managers-header select.fc_is_selarrow:hover,
 .flexicontent #fc-managers-header select.fc_is_selarrow:focus {
 	max-width: unset !important;
 }
 .flexicontent #fc-managers-header select.fc_is_selarrow + #search {
-	margin-left: 1.3em !important;
+	margin-left: 1.9em !important;
 }
 .flexicontent #fc-managers-header #search {
 	margin: 0px !important;
-	padding: 4px !important;
+	padding: 8px !important;
 	vertical-align: top !important;
 	min-width: 200px;
 	border: 1px solid #aaa;
@@ -1148,6 +1148,9 @@ td.col_edit_layout {
 	#flexicontent .fc_hidden_580 {
 		display: none;
 	}
+}
+#flexicontent .btn {
+	padding: 8px 12px;
 }
 body .fc-close {
 	color: #000000;
@@ -1606,6 +1609,8 @@ body .fc-nowrap-box .nowrap_box .label,
 	margin: 0 0 0 0;
 	padding-left: 4px;
 	padding-right: 4px;
+	padding-top: 8px;
+	padding-bottom: 8px;
 	display: inline-block;
 }
 @media (max-width: 800px) {
@@ -3342,7 +3347,7 @@ ul.thumbnails.image_picker_selector li div.thumbnail p {
 }
 #flexicontent form select.fcfield_selectval,
 #flexicontent form input.fcfield_textval {
-	height: 26px;
+	height: 34px;
 	line-height: 26px;
 	overflow: auto;
 	vertical-align: top;
@@ -3979,6 +3984,9 @@ div.fc-fieldgrp-value-box {
 [class*="fcfavs-"].fc-mssg-inline {
 	position: relative;
 	margin: 1px 2px;
+}
+.select2-container-multi .select2-choices {
+	min-height: 34px !important;
 }
 #flexicontent {
 	margin-bottom: 24px;

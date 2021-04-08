@@ -1269,7 +1269,7 @@ div.container_fcfield div.toggle_all_values_buttons_box {
 #flexicontent div [class^="fcfield-"].fcfont-icon,
 #flexicontent div [class*=" fcfield-"].fcfont-icon,
 #flexicontent .fcfield-button-add.fcfont-icon a {
-	padding: 4px 12px;
+	padding: 8px 12px;
 	background-image: none;
 }
 #flexicontent div .fcfield-expand-view.fcfont-icon {
@@ -1277,7 +1277,7 @@ div.container_fcfield div.toggle_all_values_buttons_box {
 	margin: 0px;
 }
 #flexicontent .buttons.btn-group .btn {
-	padding: 4px 6px;
+	padding: 8px 6px;
 }
 #flexicontent .buttons.btn-group .btn .caret {
 	margin: 2px 0 4px 0;
@@ -1504,7 +1504,7 @@ div.container_fcfield div.toggle_all_values_buttons_box {
 #flexicontent .fcfield-selectvalue.multi.fcfont-icon,
 #flexicontent .fcfield-uploadvalue.multi.fcfont-icon {
 	background-position: 50% 50%;
-	padding: 4px 12px;
+	padding: 8px 12px;
 }
 #flexicontent .fcfield-drag-handle {
 	cursor: move;
