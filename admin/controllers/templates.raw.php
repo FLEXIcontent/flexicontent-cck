@@ -169,7 +169,7 @@ class FlexicontentControllerTemplates extends FlexicontentControllerBaseAdmin
 		$ext_id     = $this->input->getInt('ext_id', 0);       // ID of item / type / category being edited
 		$layout_pfx = $this->input->getCmd('layout_pfx', '');  // A prefix to distinguish multiple loading of same layout in the same page: (This is typically the name of the layout parameter)
 
-		$layout_name = $app->input->get('layout_name', '', 'CMD'); // IN modules/fields: layout name, IN item/type/category forms (FC templates):  'item' / 'category'
+		$layout_name = $app->input->get('layout_name', '', 'STRING'); // IN modules/fields: layout name, IN item/type/category forms (FC templates):  'item' / 'category'
 		$directory   = $app->input->get('directory', '', 'STRING');   // Explicit path of XML file:  $layout_name.xml
 
 		$db = JFactory::getDbo();
