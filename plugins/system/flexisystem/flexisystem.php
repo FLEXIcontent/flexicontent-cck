@@ -2004,10 +2004,15 @@ class plgSystemFlexisystem extends JPlugin
 			// Check for currently supported cases, !!! TODO add case of MENUS
 			if (empty($table->module)) return;
 
+			$layout_names = explode(':', $layout);
 			// Check if layout XML parameter file exists
 			$client = JApplicationHelper::getClientInfo($table->client_id);
-			$layoutpath = JPath::clean($client->path . '/modules/' . $table->module . '/tmpl/' . $layout .'.xml');
-			if (!file_exists($layoutpath))
+			$layoutpath = '';
+			if(count($layout_names)>1)
+				$layoutpath = JPath::clean($client->path . '/templates/' . $layout_names[0] . '/html/' . $table->module .'/'.$layout_names[1].'.xml');
+			else if(count($layout_names)==1)
+				$layoutpath = JPath::clean($client->path . '/modules/' . $table->module . '/tmpl/' . $layout .'.xml');
+			if (!$layoutpath || !file_exists($layoutpath))
 			{
 				$layoutpath = JPath::clean($client->path . '/modules/' . $table->module . '/tmpl/_fallback/_fallback.xml');
 				if (!file_exists($layoutpath)) return;
