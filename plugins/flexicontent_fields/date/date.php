@@ -239,6 +239,7 @@ class plgFlexicontent_fieldsDate extends FCField
 			// Update the new (date) input field
 			$js .= "
 				var theInput = newField.find('input.fcfield_date').first();
+				theInput.attr('data-alt-value', '0000-00-00 00:00:00');
 				theInput.attr('value', '');
 				theInput.attr('name', '".$fieldname."['+uniqueRowNum".$field->id."+']');
 				theInput.attr('id', '".$elementid."_'+uniqueRowNum".$field->id.");
