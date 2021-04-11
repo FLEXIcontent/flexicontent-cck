@@ -358,7 +358,7 @@ class FlexicontentControllerTemplates extends FlexicontentControllerBaseAdmin
 			// Check if value exists in the extension's parameters and set it into the non-prefixed field name
 			$value = $ext_params->get($prefixed_fieldname);
 
-			if (strlen($value))
+			if ( (is_string($value) && strlen($value)) || (is_array($value) && count($value)>0))
 			{
 				$form_layout->setValue($field->fieldname, $groupname, $value);
 			}
