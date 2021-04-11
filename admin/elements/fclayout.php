@@ -481,6 +481,7 @@ function fc_getLayout_".$_name."(el, initial)
 			fc_bootstrapAttach('#'+panel_id);
 			if (typeof(fcrecord_attach_sortable) == 'function') fcrecord_attach_sortable('#'+panel_id);
 			if (typeof(fcfield_attach_sortable) == 'function')  fcfield_attach_sortable('#'+panel_id);
+			fc_attachSelect2('body');
 		}
 	});
 }
