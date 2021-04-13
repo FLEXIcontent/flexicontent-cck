@@ -718,11 +718,11 @@ class plgSearchFlexiadvsearch extends JPlugin
 				$join_textsearch . $onAdvanced_textsearch .
 				$join_textfields : '');
 
-		$catid = $jinput->getCmd('cid', 0);
+		$catid = $jinput->getInt('cid', 0);
 		$cids = array();
 		if($catid) {
 			$cids[] = $catid;
-			$query = "SELECT id,lft,rgt FROM `#__categories` WHERE id='{$catid}';";
+			$query = "SELECT id,lft,rgt FROM `#__categories` WHERE id='".(int)$catid."';";
 			$db->setQuery($query);
 			if($cat = $db->loadObject()) {
 				$query = "SELECT sub.id FROM `#__categories` as sub WHERE sub.lft>='{$cat->lft}' AND sub.rgt<='{$cat->rgt}' AND published='1';";
