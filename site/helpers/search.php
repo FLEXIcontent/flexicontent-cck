@@ -237,4 +237,69 @@ class FLEXIadvsearchHelper
 			}
 		}
 	}
+
+	static function decideCats(& $params)
+	{
+		global $globalcats;
+		
+		$display_cat_list = (int) $params->get('display_cat_list', 0);
+		$catids = $params->get('catids', array());
+		$usesubcats = (int) $params->get('usesubcats', 0);
+
+		// Get user's allowed categories
+		if ($display_cat_list)
+		{
+			$tree = flexicontent_cats::getCategoriesTree();
+
+			// (only) For include mode, use all categories if no cats were selected via configuration
+			if ($display_cat_list === 1 && empty($catids))
+			{
+				global $globalcats;
+				$catids = array_keys($globalcats);
+			}
+		}
+
+		// Find descendants of the categories
+		if ($usesubcats)
+		{
+			$subcats = array();
+
+			foreach ($catids as $catid)
+			{
+				$subcats = array_merge($subcats, array_map('trim', explode(',', $globalcats[$catid]->descendants)) );
+			}
+
+			$catids = array_unique($subcats);
+		}
+		
+		switch ($display_cat_list)
+		{
+			// Include method
+			case 1:
+				$allowedtree = array();
+
+				foreach ($catids as $catid)
+				{
+					$allowedtree[$catid] = $tree[$catid];
+				}
+				break;
+
+			// Exclude method
+			case 2:
+				foreach ($catids as $catid)
+				{
+					unset($tree[$catid]);
+				}
+				$allowedtree = & $tree;
+				break;
+
+			// Not using category selector
+			case 0:
+			default:
+				$allowedtree = array();
+				break;
+		}
+
+		return $allowedtree;
+	}
 }

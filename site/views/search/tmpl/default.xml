@@ -56,6 +56,20 @@
 			
 		<field name="" type="separator" level="level1" default="Search Form: &lt;small&gt;Advanced Options&lt;/small&gt;" />
 			
+			<field name="" type="separator" default="Category selector" level="level2" />
+			<field name="" type="separator" default="NOTE: single or multiple value allowed, this depends on target view (set below)" level="level3" class="alert alert-info fcpadded" />
+			<field name="display_cat_list" type="multilist" subtype="list" toggle_related="1" default="0" label="Show selector" description="Show selector" >
+				<option value="0" show_list="" hide_list="disp_catselector">No (Use single selected or current category)</option>
+				<option value="1" show_list="disp_catselector" hide_list="">Yes (Include selected categories)</option>
+				<option value="2" show_list="disp_catselector" hide_list="">Yes (Exclude selected categories)</option>
+			</field>
+
+			<field name="catids" type="flexicategories" multiple="true" required="false" size="10" label="Categories" description="Categories" class="disp_catselector" />
+			<field name="usesubcats" type="radio" default="0" label="Include subcategories" description="Include subcategories" class="btn-group disp_catselector">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			
 			<field name="" type="separator" level="level3" default="NOTE: when advanced search options box is hidden, the options configured below will still be used" class="alert alert-warning fcpadded" />
 			<field name="autodisplayadvoptions" type="radio" default="1" label="Advanced search options box" description="If this is disabled. Then a clickable text will appear to allow user to toggle the advanced search box on/off." class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_HIDE</option>
