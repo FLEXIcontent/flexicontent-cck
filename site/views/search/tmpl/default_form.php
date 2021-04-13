@@ -273,6 +273,40 @@ $r = 0;
 				<?php endif; */ ?>
 				
 				<?php
+				$display_cat_list = $this->params->get('display_cat_list', 0);
+				if($display_cat_list) {
+					$label = JText::_('JCATEGORY');
+					$descr = JText::_('JCATEGORY');
+					$cid = $app->input->get('cid', 0);
+				?>
+					<tr class="fc_search_row_<?php echo (($r++)%2);?>">
+						<td class="fc_search_label_cell">
+						<label for="filter_category" class="label <?php echo $tooltip_class; ?>" title="<?php echo flexicontent_html::getToolTip($label, $descr, 0); ?>">
+								<?php echo $label; ?>
+						</label>
+						</td>
+						<td class="fc_search_option_cell">
+							<?php
+							$catid_fieldname = 'cid';
+							$_fld_classes .= ' fc_autosubmit_exclude';  // exclude from autosubmit because we need to get single category SEF url before submitting, and then submit ...
+							$_fld_size = "";
+							$_fld_onchange = '';
+							$_fld_name = $catid_fieldname;
+							$_fld_multiple = '';
+
+							$_fld_attributes = ' class="'.$_fld_classes.'" '.$_fld_size.$_fld_onchange.$_fld_multiple;
+						
+							$allowedtree = FLEXIadvsearchHelper::decideCats($this->params);
+							//$selected_cats = $params->get('catids', array());
+							$selected_cats = $cid?array($cid):array();
+							?>
+							<div class="fc_filter_html">
+								<?php echo flexicontent_cats::buildcatselect($allowedtree, $_fld_name, $selected_cats, '- '.JText::_("JALL").' -', $_fld_attributes, $check_published = true, $check_perms = false, array(), $require_all=false); ?>
+							</div>
+						</td>
+					</tr>
+				<?php
+				}
 				$prepend_onchange = ''; //" adminFormPrepare(document.getElementById('".$form_id."'), 1); ";
 				foreach($this->filters as $filt) {
 					if (empty($filt->html)) continue;

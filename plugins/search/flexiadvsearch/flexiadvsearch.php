@@ -718,8 +718,23 @@ class plgSearchFlexiadvsearch extends JPlugin
 				$join_textsearch . $onAdvanced_textsearch .
 				$join_textfields : '');
 
+		$catid = $jinput->getCmd('cid', 0);
+		$cids = array();
+		if($catid) {
+			$cids[] = $catid;
+			$query = "SELECT id,lft,rgt FROM `#__categories` WHERE id='{$catid}';";
+			$db->setQuery($query);
+			if($cat = $db->loadObject()) {
+				$query = "SELECT sub.id FROM `#__categories` as sub WHERE sub.lft>='{$cat->lft}' AND sub.rgt<='{$cat->rgt}' AND published='1';";
+				$db->setQuery($query);
+				$subs = $db->loadColumn();
+				if(is_array($subs)) $cids=array_merge($cids, $subs);
+			}
+		}
+
 		// AND-WHERE sub-clauses ... (shared with filters)
 		$where_conf = ' WHERE 1 '
+			. (count($cids)>0?" AND i.catid IN ('".implode("','",$cids)."')":'')
 			. ' AND i.state IN (1,-5'. ($search_archived ? ','.(FLEXI_J16GE ? 2:-1) :'' ) .') '
 			. ' AND c.published = 1 '
 			. ' AND ( i.publish_up = '.$db->Quote($nullDate).' OR i.publish_up <= '.$_nowDate.' )'
