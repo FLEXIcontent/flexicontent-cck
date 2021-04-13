@@ -301,7 +301,7 @@ $r = 0;
 							$selected_cats = $cid?array($cid):array();
 							?>
 							<div class="fc_filter_html">
-								<?php echo flexicontent_cats::buildcatselect($allowedtree, $_fld_name, $selected_cats, '- '.JText::_("JALL").' -', $_fld_attributes, $check_published = true, $check_perms = false, array(), $require_all=false); ?>
+								<?php echo flexicontent_cats::buildcatselect($allowedtree, $_fld_name, $selected_cats, '- '.JText::_($this->params->get('search_firstoptiontext_s', 'FLEXI_ALL')).' -', $_fld_attributes, $check_published = true, $check_perms = false, array(), $require_all=false); ?>
 							</div>
 						</td>
 					</tr>

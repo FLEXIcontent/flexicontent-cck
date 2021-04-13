@@ -69,6 +69,7 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
+			<field name="search_firstoptiontext_s" type="text" default="FLEXI_ALL" label="FLEXI_FILTER_FIRST_OPTION_TEXT" depend_class="filt-drop-down-s displaydefauttext-mode-s" description="FLEXI_FILTER_FIRST_OPTION_TEXT_DESC" />
 			
 			<field name="" type="separator" level="level3" default="NOTE: when advanced search options box is hidden, the options configured below will still be used" class="alert alert-warning fcpadded" />
 			<field name="autodisplayadvoptions" type="radio" default="1" label="Advanced search options box" description="If this is disabled. Then a clickable text will appear to allow user to toggle the advanced search box on/off." class="btn-group btn-group-yesno">
