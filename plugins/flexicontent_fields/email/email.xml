@@ -14,6 +14,7 @@
 		<filename plugin="email">email.php</filename>
 		<filename>index.html</filename>
 		<folder>tmpl</folder>
+		<folder>css</folder>
 	</files>
 
 	<config>
