@@ -142,8 +142,7 @@ if ( $joomla_captcha != '0' && $captcha_display) {
   }
 
 	//Fake id form, cutt email on @ and set startemail
-	$formid =  explode("@", $addr);
-	$formid = $formid[0];
+	$formid =  random_int(0, 999);
 	$fields_display='';
 	$list_fields = $field->parameters->get('form_fields');
 								if ($list_fields){
