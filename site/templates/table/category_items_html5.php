@@ -24,7 +24,7 @@ if ($this->params->get('togglable_table_cols', 1))
 	flexicontent_html::jscode_to_showhide_table(
 		'mainChooseColBox',
 		'adminListTableFCcategory',
-		$start_html = '<span class="label">'.JText::_('FLEXI_TMPL_DEFAULT_COLUMNS_FE', true).'<\/span>',
+		$start_html = '',
 		$end_html = '<div class="icon-arrow-up-2" title="'.JText::_('FLEXI_HIDE').'" style="cursor: pointer;" onclick="fc_toggle_box_via_btn(\\\'mainChooseColBox\\\', document.getElementById(\\\'fc_mainChooseColBox_btn\\\'), \\\'btn-primary\\\');"><\/div>'
 	);
 }
