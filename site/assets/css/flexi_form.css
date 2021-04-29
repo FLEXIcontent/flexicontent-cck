@@ -843,7 +843,7 @@ td.col_edit_layout {
 .flexicontent #fc-filters-box.fcman-abs,
 .flexicontent #mainChooseColBox.fcman-abs {
 	position: absolute;
-	box-shadow: 2px 2px 6px black;
+	box-shadow: 0px 5px 16px 0px #939393;
 	background: #fff;
 	z-index: 100;
 	left: 0;
@@ -873,7 +873,7 @@ td.col_edit_layout {
 	text-align: center;
 }
 .flexicontent #fc-managers-header select.fc_is_selarrow {
-	max-width: 1.9em !important;
+	max-width: 1.8em !important;
 }
 .flexicontent #fc-managers-header select.fc_is_selarrow:hover,
 .flexicontent #fc-managers-header select.fc_is_selarrow:focus {
@@ -998,8 +998,8 @@ td.col_edit_layout {
 .flexicontent #fc-filters-box .fc-filter #startdate_btn,
 .flexicontent #fc-filters-box .fc-filter #enddate_btn {
 	font-size: 14px !important;
-	height: 28px !important;
-	padding: 2px 4px !important;
+	height: 36px !important;
+	padding: 10px 4px !important;
 	box-sizing: border-box;
 }
 .flexicontent #fc-filters-box .fc-filter #startdate_btn {
@@ -1011,7 +1011,7 @@ td.col_edit_layout {
 	min-width: 99px;
 	max-width: 99px;
 	height: 16px !important;
-	padding: 13px 8px !important;
+	padding: 17px 8px !important;
 	box-sizing: border-box;
 	border-radius: 0;
 }
@@ -1040,7 +1040,7 @@ td.col_edit_layout {
 .flexicontent #fc-filters-box .fc-filter > * {
 	vertical-align: middle !important;
 	float: left;
-	margin: 0 !important;
+	margin: 4px !important;
 }
 .flexicontent #fc-filters-box .fc-filter > *:not(.fc-xpended):not(.fc-xpended-row) {
 	margin: 0 6px 0 2px !important;
@@ -1151,4 +1151,12 @@ td.col_edit_layout {
 }
 #flexicontent .btn {
 	padding: 8px 12px;
+}
+div#fc-filters-slide-btn {
+	border: 0;
+	background: none;
+	box-shadow: none;
+}
+#fc-filters-box input[type="text"] {
+	padding: 8px 6px !important;
 }
