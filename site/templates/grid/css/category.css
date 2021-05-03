@@ -641,6 +641,12 @@ div.comments {
 	padding-bottom: 0px;
 	overflow-y: hidden;
 }
+.fc_overlayed .fcitem_text p {
+	color: #fff;
+}
+#flexicontent .fc_overlayed .element {
+	color: #fff;
+}
 .news.fc-items-block .fc-item-block-featured-wrapper.mod_fc_activeitem .fc_auto_show.fc_show_active,
 .news.fc-items-block .fc-item-block-standard-wrapper.mod_fc_activeitem .fc_auto_show.fc_show_active {
 	opacity: 1;
@@ -656,9 +662,7 @@ div.comments {
 	background-color: rgba(0,0,0,0.75);
 	max-height: 100%;
 }
-.fc_overlayed .fcitem_text p {
-    color: #fff;
-}
-#flexicontent .fc_overlayed .element {
-    color: #fff;
+.group.tool {
+	position: absolute;
+	right: 0;
 }

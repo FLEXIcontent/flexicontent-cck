@@ -507,14 +507,14 @@ if ($leadnum) :
 				?>
 
 				<?php if ( $header_shown ) : ?>
-				<header class="group">
+				<header class="group tool">
 				<?php endif; ?>
 
 				<?php if ($this->params->get('show_editbutton', 1)) : ?>
 
 					<?php $editbutton = flexicontent_html::editbutton( $item, $this->params ); ?>
 					<?php if ($editbutton) : ?>
-						<div class="fc_edit_link"><?php echo $editbutton;?></div>
+						<div class="fc_edit_link btn"><?php echo $editbutton;?></div>
 					<?php endif; ?>
 
 					<?php $statebutton = flexicontent_html::statebutton( $item, $this->params ); ?>
@@ -526,12 +526,12 @@ if ($leadnum) :
 
 				<?php $deletebutton = flexicontent_html::deletebutton( $item, $this->params ); ?>
 				<?php if ($deletebutton) : ?>
-					<div class="fc_delete_link"><?php echo $deletebutton;?></div>
+					<div class="fc_delete_link btn"><?php echo $deletebutton;?></div>
 				<?php endif; ?>
 
 				<?php $approvalbutton = flexicontent_html::approvalbutton( $item, $this->params ); ?>
 				<?php if ($approvalbutton) : ?>
-					<div class="fc_approval_request_link"><?php echo $approvalbutton;?></div>
+					<div class="fc_approval_request_link btn"><?php echo $approvalbutton;?></div>
 				<?php endif; ?>
 
 				<?php if ($this->params->get('show_comments_count')) : ?>
@@ -1023,7 +1023,7 @@ if ($count > $leadnum) :
 				?>
 
 				<?php if ( $header_shown ) : ?>
-				<header class="group">
+				<header class="group tool">
 				<?php endif; ?>
 
 				<?php if ($this->params->get('show_editbutton', 1)) : ?>
