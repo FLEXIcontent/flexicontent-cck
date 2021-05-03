@@ -113,7 +113,7 @@ if ( $user->id ) :
 		if ( $show_editbutton ) :
 			if ($item->editbutton = flexicontent_html::editbutton( $item, $this->params )) :
 				$buttons_exists = true;
-				$item->editbutton = '<div class="fc_edit_link_nopad">'.$item->editbutton.'</div>';
+				$item->editbutton = '<div class="fc_edit_link_nopad btn">'.$item->editbutton.'</div>';
 			endif;
 			if ($item->statebutton = flexicontent_html::statebutton( $item, $this->params )) :
 				$buttons_exists = true;
@@ -123,12 +123,12 @@ if ( $user->id ) :
 		
 		if ($item->deletebutton = flexicontent_html::deletebutton( $item, $this->params )) :
 			$buttons_exists = true;
-			$item->deletebutton = '<div class="fc_delete_link">'.$item->deletebutton.'</div>';
+			$item->deletebutton = '<div class="fc_delete_link btn">'.$item->deletebutton.'</div>';
 		endif;
 		
 		if ($item->approvalbutton = flexicontent_html::approvalbutton( $item, $this->params )) :
 			$buttons_exists = true;
-			$item->approvalbutton = '<div class="fc_approval_request_link_nopad">'.$item->approvalbutton.'</div>';
+			$item->approvalbutton = '<div class="fc_approval_request_link_nopad btn">'.$item->approvalbutton.'</div>';
 		endif;
 		
 	endforeach;
@@ -163,6 +163,11 @@ endif;
 	<?php if ($this->params->get('show_field_labels_row', 1) || $this->params->get('togglable_table_cols', 1)) : ?>
 	<thead style="<?php echo $this->params->get('show_field_labels_row', 1) ? '' : 'display:none;' ?>">
 		<tr>
+		<?php if ( $buttons_exists) : ?>
+			<th id="flexi_edit">
+
+			</th>
+			<?php endif; ?>
 			<?php if ( $buttons_exists || $comments_non_zero || $show_title || count($item->css_markups) ) : ?>
 				<th id="flexi_title" class="hideOnDemandClass">
 				
@@ -211,13 +216,13 @@ endif;
 		<tr id="tablelist_item_<?php echo $i; ?>" class="<?php echo $fc_item_classes.' row'.($i%2 ? 1 : 0); ?>" <?php echo $microdata_itemtype_code; ?>>
 		
 		<?php if ( $buttons_exists || $comments_non_zero || $show_title || count($item->css_markups) ) : ?>
-			<td class="fc_title_col">
-			
+			<td class="fc_edit_col">
 			<?php echo @ $item->editbutton; ?>
 			<?php echo @ $item->statebutton; ?>
 			<?php echo @ $item->deletebutton; ?>
 			<?php echo @ $item->approvalbutton; ?>
-			
+			</td>
+			<td class="fc_title_col">
 			<?php if ($this->params->get('show_comments_count')) : ?>
 				<?php if ( isset($this->comments[ $item->id ]->total) ) : ?>
 				<div <?php echo $_comments_container_params; ?> >

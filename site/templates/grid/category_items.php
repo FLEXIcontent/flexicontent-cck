@@ -502,30 +502,31 @@ if ($leadnum) :
 						$this->params->get('show_comments_count', 1) ||
 						$this->params->get('show_title', 1) || $item->event->afterDisplayTitle ||
 						0; // ...
+						echo '<div class="group tool">';
 				?>
 
 				<?php if ($this->params->get('show_editbutton', 1)) : ?>
 
 					<?php $editbutton = flexicontent_html::editbutton( $item, $this->params ); ?>
 					<?php if ($editbutton) : ?>
-						<div class="fc_edit_link"><?php echo $editbutton;?></div>
+						<div class="fc_edit_link btn"><?php echo $editbutton;?></div>
 					<?php endif; ?>
 
 					<?php $statebutton = flexicontent_html::statebutton( $item, $this->params ); ?>
 					<?php if ($statebutton) : ?>
-						<div class="fc_state_toggle_link"><?php echo $statebutton;?></div>
+						<div class="fc_state_toggle_link "><?php echo $statebutton;?></div>
 					<?php endif; ?>
 
 				<?php endif; ?>
 
 				<?php $deletebutton = flexicontent_html::deletebutton( $item, $this->params ); ?>
 				<?php if ($deletebutton) : ?>
-					<div class="fc_delete_link"><?php echo $deletebutton;?></div>
+					<div class="fc_delete_link btn"><?php echo $deletebutton;?></div>
 				<?php endif; ?>
 
 				<?php $approvalbutton = flexicontent_html::approvalbutton( $item, $this->params ); ?>
 				<?php if ($approvalbutton) : ?>
-					<div class="fc_approval_request_link"><?php echo $approvalbutton;?></div>
+					<div class="fc_approval_request_link btn"><?php echo $approvalbutton;?></div>
 				<?php endif; ?>
 
 				<?php if ($this->params->get('show_comments_count')) : ?>
@@ -537,6 +538,10 @@ if ($leadnum) :
 				<?php endif; ?>
 
 				<?php echo $markup_tags; ?>
+
+				<?php if ( $header_shown ) : ?>
+				</div>
+				<?php endif; ?>
 
 
 				<!-- BOF item title -->
@@ -995,13 +1000,14 @@ if ($count > $leadnum) :
 						$this->params->get('show_comments_count', 1) ||
 						$this->params->get('show_title', 1) || $item->event->afterDisplayTitle ||
 						0; // ...
+						echo '<div class="group tool">';
 				?>
 
 				<?php if ($this->params->get('show_editbutton', 1)) : ?>
 
 					<?php $editbutton = flexicontent_html::editbutton( $item, $this->params ); ?>
 					<?php if ($editbutton) : ?>
-						<div class="fc_edit_link"><?php echo $editbutton;?></div>
+						<div class="fc_edit_link btn "><?php echo $editbutton;?></div>
 					<?php endif; ?>
 
 					<?php $statebutton = flexicontent_html::statebutton( $item, $this->params ); ?>
@@ -1013,12 +1019,12 @@ if ($count > $leadnum) :
 
 				<?php $deletebutton = flexicontent_html::deletebutton( $item, $this->params ); ?>
 				<?php if ($deletebutton) : ?>
-					<div class="fc_delete_link"><?php echo $deletebutton;?></div>
+					<div class="fc_delete_link btn"><?php echo $deletebutton;?></div>
 				<?php endif; ?>
 
 				<?php $approvalbutton = flexicontent_html::approvalbutton( $item, $this->params ); ?>
 				<?php if ($approvalbutton) : ?>
-					<div class="fc_approval_request_link"><?php echo $approvalbutton;?></div>
+					<div class="fc_approval_request_link btn"><?php echo $approvalbutton;?></div>
 				<?php endif; ?>
 
 				<?php if ($this->params->get('show_comments_count')) : ?>
@@ -1030,6 +1036,9 @@ if ($count > $leadnum) :
 				<?php endif; ?>
 
 				<?php echo $markup_tags; ?>
+				<?php if ( $header_shown ) : ?>
+				</div>
+				<?php endif; ?>
 
 
 				<!-- BOF item title -->
