@@ -512,6 +512,7 @@
 					<option filename="value_gallery_galleriffic" value="5">Galleriffic (Slideshow + carousel) (Built-in)</option>
 					<option filename="value_gallery_elastislide" value="7">Elastislide (Slideshow + carousel) (Built-in)</option>
 					<option filename="value_gallery_pannellum" value="9">Pannellum (Panorama)</option>
+					<option filename="value_gallery_juxtapose" value="10">Juxtapose</option>
 				</group>
 
 				<group label="Enable via parameters">

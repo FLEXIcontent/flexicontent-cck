@@ -17,7 +17,7 @@
 
 		<field name="" type="separator" default="FLEXI_DISPLAY" level="level2" />
 
-			<field name="PPFX_compare_mode" type="radio" default="true" label="Slider direction" description="FLEXI_FIELD_IMAGE_DISP_INFOBAR_DESC" class="btn-group">
+			<field name="PPFX_compare_mode" type="radio" default="horizontal" label="Slider direction" description="FLEXI_FIELD_IMAGE_DISP_INFOBAR_DESC" class="btn-group">
 				<option value="horizontal">Horizontal</option>
 				<option value="vertical">Vertical</option>
 			</field>
