@@ -3073,6 +3073,7 @@ body .container_fcfield input.input-xxlarge,
 body .container_fcfield input,
 #flexicontent .container_fcfield input {
 	max-width: 100%;
+	height: 26px;
 }
 .flexi_params table.admintable,
 .flexi_params table.admintable td {
@@ -3362,6 +3363,7 @@ ul.thumbnails.image_picker_selector li div.thumbnail p {
 	min-width: 220px;
 	width: auto;
 	max-width: 600px;
+	border-radius: 3px;
 }
 #flexicontent form select.fcfield_selectval {
 	padding: 4px 0 2px 4px;
@@ -3995,6 +3997,13 @@ div.fc-fieldgrp-value-box {
 }
 .select2-container-multi .select2-choices {
 	min-height: 34px !important;
+}
+#fcform_language_container .input-append input {
+	height: 26px !important;
+}
+span.add-on.pop-helper.field-media-preview {
+	height: 26px !important;
+	line-height: 28px !important;
 }
 #flexicontent {
 	margin-bottom: 24px;
