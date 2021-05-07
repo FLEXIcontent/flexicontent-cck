@@ -64,7 +64,7 @@ if ($menu) $page_classes .= ' menuitem'.$menu->id;
 
 <!-- BOF page title -->
 <?php if ($this->params->get('show_page_heading', 1)) : ?>
-	<header class="group">
+	<header class="">
 		<h1 class="componentheading">
 			<?php echo $this->params->get( 'page_heading' ) ?>
 		</h1>
@@ -77,7 +77,7 @@ if ($menu) $page_classes .= ' menuitem'.$menu->id;
 
 <?php if ($this->params->get('show_page_heading', 1)) echo '</header>'; ?>
 
-<?php if ($this->category->id || (count($this->categories) && $this->params->get('show_subcategories'))) echo '<section class="group">'; ?>
+<?php if ($this->category->id || (count($this->categories) && $this->params->get('show_subcategories'))) echo '<section class="">'; ?>
 
 <!-- BOF category info -->
 <?php if ( $this->category->id > 0) : /* Category specific data may not be not available, e.g. for -author- layout view */ ?>
