@@ -1817,6 +1817,7 @@ class plgFlexicontent_fieldsImage extends FCField
 				6 => 'widgetkit',
 				8 => 'photoswipe',
 				9 => 'pannellum',
+				10 => 'juxtapose',
 			);
 
 			$viewlayout = isset($built_in_gallery_names[$popuptype])
