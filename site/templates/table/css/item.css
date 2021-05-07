@@ -15,7 +15,7 @@ body #flexicontent .fc_item_title a {
 	padding-left: 0px;
 	padding-bottom: 0px;
 	border-radius: 0px;
-	border: 0px solid inherit;
+	border: 0px solid #ccc;
 	color: inherit;
 }
 body #flexicontent .flexi.label,
@@ -56,7 +56,7 @@ body .tabbertab,
 }
 body ul.tabbernav,
 #flexicontent ul.tabbernav {
-	border-bottom: 1px solid inherit !important;
+	border-bottom: 1px solid #ccc !important;
 }
 body .flexi.infoblock {
 	padding-top: 10px;
@@ -106,16 +106,16 @@ body .flexi.infoblock {
 .topblock .flexi.infoblock {
 	overflow: hidden;
 	border-radius: 0px;
-	border: 1px solid inherit;
+	border: 1px solid #ccc;
 	color: inherit;
-	background-color: inherit;
+	background-color: transparent;
 }
 .flexi.bottomblock.infoblock {
 	overflow: hidden;
 	border-radius: 0px;
-	border: 1px solid inherit;
-	color: inherit;
-	background-color: inherit;
+	border: 1px solid #ccc;
+	color: #ccc;
+	background-color: #fff;
 }
 .flexi.infoblock {
 	border: 1px solid silver;

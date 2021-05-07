@@ -15,7 +15,7 @@ body #flexicontent .fc_item_title a {
 	padding-left: 0px;
 	padding-bottom: 0px;
 	border-radius: 0px;
-	border: 0px solid inherit;
+	border: 0px solid #ccc;
 	color: inherit;
 }
 body #flexicontent .flexi.label,
@@ -29,23 +29,25 @@ body #flexicontent .desc-title.label {
 	padding-bottom: 2px;
 }
 body #flexicontent ul.tabbernav > li a {
-	border: 1px solid #1c5a85;
-	background-color: #3093c7;
-	background-image: -webkit-linear-gradient(top,#3093c7,#1c5a85);
-	background-image: linear-gradient(to bottom,#3093c7,#1c5a85);
-	filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#3093c7,endColorstr=#1c5a85);
+	background-color: #e4f1f8;
 	color: #ffffff;
 }
 body #flexicontent ul.tabbernav > li.tabberactive a::before {
-	border-top: 4px solid #1c5a85;
+	border-top: 4px solid #3093c7;
+}
+body ul.tabbernav > li.tabberactive a,
+body ul.tabbernav > li.tabberactive a:hover,
+#flexicontent ul.tabbernav > li.tabberactive a,
+#flexicontent ul.tabbernav > li.tabberactive a:hover {
+	border-bottom: 1px solid white !important;
+	border-left: 1px solid #D0D0D0 !important;
+	border-top: 1px solid #D0D0D0 !important;
+	border-right: 1px solid #D0D0D0 !important;
 }
 body #flexicontent ul.tabbernav > li:hover a {
-	border: 1px solid #0a2131;
-	background-color: #1c5675;
-	background-image: -webkit-linear-gradient(top,#1c5675,#0a2131);
-	background-image: linear-gradient(to bottom,#1c5675,#0a2131);
-	filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#1c5675,endColorstr=#0a2131);
-	color: #ffffff;
+	border: 1px solid #1c5675;
+	background: #1c5675;
+	color: #fff;
 }
 body .tabbertab,
 #flexicontent .tabbertab {
@@ -54,17 +56,18 @@ body .tabbertab,
 }
 body ul.tabbernav,
 #flexicontent ul.tabbernav {
-	border-bottom: 1px solid inherit !important;
+	border-bottom: 1px solid #ccc !important;
+}
+div#fc_subtitle_tabset,
+div#fc_bottom_tabset {
+	margin-top: 40px !important;
+	margin-bottom: 40px !important;
 }
 body .flexi.infoblock {
-	color: inherit;
-	background-color: inherit;
 	padding-top: 10px;
 	padding-right: 0px;
 	padding-left: 10px;
 	padding-bottom: 10px;
-	border-radius: 0px;
-	border: 1px solid inherit;
 }
 .flexi.lineinfo {
 	display: block;
@@ -94,7 +97,7 @@ body .flexi.infoblock {
 	float: left;
 	max-width: 99% !important;
 	padding: 0% !important;
-	margin-right: 1%;
+	margin-right: 0%;
 	margin-left: 0%;
 	line-height: 0px;
 	border: 0px solid silver;
@@ -102,11 +105,23 @@ body .flexi.infoblock {
 .topblock .flexi.image a {
 	outline: none;
 }
-.topblock .flexi.image img {
-	border: 1px solid white;
-}
 .topblock .flexi.infoblock {
 	overflow: hidden;
+	border-radius: 0px;
+	border: 1px solid #ccc;
+	color: inherit;
+	background-color: transparent;
+}
+.flexi.topblock ul {
+	padding: 0;
+	margin: 0;
+}
+.flexi.bottomblock.infoblock {
+	overflow: hidden;
+	border-radius: 0px;
+	border: 1px solid #ccc;
+	color: #ccc;
+	background-color: #fff;
 }
 .flexi.infoblock {
 	border: 1px solid silver;
@@ -127,17 +142,17 @@ body .flexi.infoblock {
 	margin: 0%;
 	zoom: 1;
 }
+div.flexi.value {
+	padding-bottom: 2px !important;
+	padding-top: 2px !important;
+}
 .onecols ul li.flexi {
 	width: 100%;
 }
 .onecols .flexi.label {
-	min-width: 20%;
+	min-width: 25%;
 	margin-right: 4%;
 	margin-bottom: 6px;
-}
-.onecols .flexi.value {
-	min-width: 74%;
-	margin-right: 1%;
 }
 .twocols ul li.flexi {
 	min-width: 48%;
