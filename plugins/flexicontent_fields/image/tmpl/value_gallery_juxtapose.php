@@ -103,26 +103,55 @@ if ($result !== _FC_RETURN_)
 	// *** Add container HTML (if required by current layout) and add value separator (if supported by current layout), then finally apply open/close tags
 	// ***
 
-	// Add value separator
-	$field->{$prop} = implode($separatorf, $field->{$prop});
+	$i = 0;
+	$html = array();
+	while($i < count($field->{$prop}))
+	{
+		/**
+		 * Check for special case of 9 or 11 images.
+		 * Meanging that we have a single image (at the end of values array)
+		 * and just add it by itself
+		 */
+		if ($i + 1 == count($field->{$prop}))
+		{
+			$html[] = $field->{$prop}[$i];
+			break;
+		}
 
-	$field->{$prop} = '
-		<div
-			id="juxtapose-wrapper_' . $item->id . '_' . $field->id . '"
-			class="juxtapose juxtapose_' . $field->id . '"
-			data-startingposition="'.$slider_position.'%"
-			data-showlabels="' . $display_label . '"
-			data-showcredits="' . $display_credit . '"
-			data-makeresponsive="' . $make_responsive . '"
-			data-mode="' . $compare_mode . '"
-			data-animate="' . $use_animation . '"
-		>	
-				' . $field->{$prop} . '
-		</div>
-		<script src="https://cdn.knightlab.com/libs/juxtapose/latest/js/juxtapose.min.js"></script>
-		<link rel="stylesheet" href="https://cdn.knightlab.com/libs/juxtapose/latest/css/juxtapose.css">
-	';
+		/**
+		 * Create a pair of images, (e.g. a "before" and an "after") this layout create a "comparison" slider for every pair
+		 */
+		$html[] = '
+			<div
+				id="juxtapose-wrapper_' . $item->id . '_' . $field->id . '"
+				class="juxtapose juxtapose_' . $field->id . '"
+				data-startingposition="'.$slider_position.'%"
+				data-showlabels="' . $display_label . '"
+				data-showcredits="' . $display_credit . '"
+				data-makeresponsive="' . $make_responsive . '"
+				data-mode="' . $compare_mode . '"
+				data-animate="' . $use_animation . '"
+			>
+					' . $field->{$prop}[$i] . '
+					' . $field->{$prop}[$i+1] . '
+			</div>
+		';
+
+		$i = $i + 2;
+	}
+
+	// Implode the image pairs ... that were created inside $html using configured value separator
+	$field->{$prop} = implode($separatorf, $html);
 
 	// Apply open/close tags
 	$field->{$prop}  = $opentag . $field->{$prop} . $closetag;
+}
+
+if ( !isset(static::$js_added['juxtapose']) )
+{
+	static::$js_added['juxtapose'] = true;
+	$field->{$prop} .= '
+		<script src="https://cdn.knightlab.com/libs/juxtapose/latest/js/juxtapose.min.js"></script>
+		<link rel="stylesheet" href="https://cdn.knightlab.com/libs/juxtapose/latest/css/juxtapose.css">
+	';
 }
