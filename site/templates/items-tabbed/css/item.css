@@ -52,7 +52,7 @@ body #flexicontent ul.tabbernav > li:hover a {
 body .tabbertab,
 #flexicontent .tabbertab {
 	background-color: #ffffff;
-	border-radius: 8px;
+	border-radius: 0px;
 }
 body ul.tabbernav,
 #flexicontent ul.tabbernav {
