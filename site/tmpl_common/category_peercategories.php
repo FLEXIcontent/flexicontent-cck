@@ -76,6 +76,6 @@ if ($show_label_peercats) {
 }
 ?>
 
-<div class="peercategorieslist group">
+<div class="peercategorieslist ">
 	<?php echo $peercats_html; ?>
 </div>

@@ -5,7 +5,7 @@ $catTitleHeaderLevel = ( $this->params->get( 'show_page_heading', 1 ) && $this->
 // Note:in Some editors like Dreamweaver will automatically set a closing tag > after </h when opening the document. So look for h>  and replaced it with h
 ?>
 
-<div class="floattext group">
+<div class="floattext">
 	<?php if ($this->params->get('show_cat_title', 1)) : ?>
     <header>
 		<?php echo "<h".$catTitleHeaderLevel; ?> class="cattitle">
