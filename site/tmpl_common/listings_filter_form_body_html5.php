@@ -29,7 +29,7 @@ $tooltip_class = 'hasTooltip';
 <?php if (count($this->items) && ($this->params->get('show_item_total', 1) || $limit_selector || $orderby_selector || $orderby_selector_2nd || $clayout_selector)) : ?>
 
 	<!-- BOF items total-->
-	<div id="item_total" class="item_total group">
+	<div id="item_total" class="item_total">
 
 		<?php if ($this->params->get('show_item_total', 1)) : ?>
 			<span class="fc_item_total_data<?php echo $clayout_selector ? ' labelclear' : '';?>">

@@ -76,6 +76,6 @@ if ($show_label_subcats) {
 }
 ?>
 
-<div class="subcategorieslist group">
+<div class="subcategorieslist">
 	<?php echo $subcats_html; ?>
 </div>
