@@ -56,7 +56,7 @@ body .tabbertab,
 }
 body ul.tabbernav,
 #flexicontent ul.tabbernav {
-	border-bottom: 1px solid #9e2323 !important;
+	border-bottom: 1px solid #cccccc !important;
 }
 div#fc_subtitle_tabset,
 div#fc_bottom_tabset {
@@ -108,16 +108,16 @@ body .flexi.infoblock {
 .topblock .flexi.infoblock {
 	overflow: hidden;
 	border-radius: 0px;
-	border: 1px solid inherit;
+	border: 0px solid #cccccc;
 	color: inherit;
-	background-color: inherit;
+	background-color: transparent;
 }
 .flexi.bottomblock.infoblock {
 	overflow: hidden;
 	border-radius: 0px;
-	border: 0px solid inherit;
-	color: inherit;
-	background-color: inherit;
+	border: 0px solid #cccccc;
+	color: #cccccc;
+	background-color: #ffffff;
 }
 .flexi.topblock ul {
 	padding: 0;
