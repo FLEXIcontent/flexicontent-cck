@@ -171,7 +171,7 @@ endif;
 
 			</th>
 			<?php endif; ?>
-			<?php if ( $buttons_exists || $comments_non_zero || $show_title || count($item->css_markups) ) : ?>
+			<?php if ($comments_non_zero || $show_title || count($item->css_markups) ) : ?>
 				<th id="flexi_title" class="hideOnDemandClass">
 				
 					<?php echo JText::_(
@@ -218,13 +218,15 @@ endif;
 
 		<tr id="tablelist_item_<?php echo $i; ?>" class="<?php echo $fc_item_classes.' row'.($i%2 ? 1 : 0); ?>" <?php echo $microdata_itemtype_code; ?>>
 		
-		<?php if ( $buttons_exists || $comments_non_zero || $show_title || count($item->css_markups) ) : ?>
+		<?php if ( $buttons_exists) : ?>
 			<td class="fc_edit_col">
 			<?php echo @ $item->editbutton; ?>
 			<?php echo @ $item->statebutton; ?>
 			<?php echo @ $item->deletebutton; ?>
 			<?php echo @ $item->approvalbutton; ?>
 			</td>
+			<?php endif; ?>
+			<?php if ($comments_non_zero || $show_title || count($item->css_markups) ) : ?>
 			<td class="fc_title_col">
 			<?php if ($this->params->get('show_comments_count')) : ?>
 				<?php if ( isset($this->comments[ $item->id ]->total) ) : ?>
