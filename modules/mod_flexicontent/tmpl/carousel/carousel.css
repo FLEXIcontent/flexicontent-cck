@@ -306,7 +306,7 @@
 
 .carousel.mod_flexicontent_wrapper .fcitem_title,
 .carousel.mod_flexicontent_wrapper .fcitem_title a {
-	/*color: #08c;*/
+	color: #fff;
 	font-size: 120%;
 	/*background-color: transparent;
 	line-height: 1.2em;*/
@@ -527,8 +527,8 @@
 	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=#4C000000, endColorstr=#4C000000);
 	/* For IE 8+ */
 	-ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#4C000000, endColorstr=#4C000000)";
-	/*width: 96%;
-	height: auto;*/
+	width: 100%;
+	/*height: auto;*/
 	padding: 2%;
 	margin: 0%;
 	position: absolute;
