@@ -83,3 +83,10 @@ admin/tables/flexicontent_mediadatas.php
 admin/views/mediadata/
 admin/views/mediadatas/
 plugins/flexicontent_fields/mediafile/
+site/templates/blog/language/fr-FR/fr-FR.blog.ini
+site/templates/default/language/fr-FR/fr-FR.default.ini
+site/templates/faq/language/fr-FR/fr-FR.faq.ini
+site/templates/grid/language/fr-FR/fr-FR.grid.ini
+site/templates/items-tabbed/language/fr-FR/fr-FR.items-tabbed.ini
+site/templates/presentation/language/fr-FR/fr-FR.presentation.ini
+site/templates/table/language/fr-FR/fr-FR.table.ini

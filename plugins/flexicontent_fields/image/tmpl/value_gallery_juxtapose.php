@@ -29,13 +29,6 @@ foreach ($values as $n => $value)
 	if ($result === _FC_BREAK_) break;
 
 	$field->{$prop}[] = $pretext . $img_legend . $inline_info . $posttext;
-	$compositeKey .= $n . ' ';
-	if ($i%2 == 1)
-	{
-		$field->{$prop} .= 'code avant' . $field->{$prop} . 'code apres';
-	}
-
-	$i++;
 }
 
 //var_dump($field->{$prop});
