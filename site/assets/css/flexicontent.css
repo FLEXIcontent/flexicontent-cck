@@ -4209,12 +4209,6 @@ hr.fcclearline {
 	float: left;
 	margin-right: 8px;
 }
-#flexicontent .fceven {
-	background-color: #e7e7e7;
-}
-#flexicontent .fcodd {
-	background-color: #f2f2f2;
-}
 #flexicontent .buttons.fc-iblock {
 	display: inline-block;
 	float: none;
@@ -4965,18 +4959,12 @@ div.current dd {
 	height: auto;
 }
 .flexicontent.fcsearch  fieldset.fc_search_result {
-	padding: 16px 4px 16px 4px;
+	padding: 16px;
 	margin: 0px;
-	border: 1px solid transparent;
-}
-.flexicontent.fcsearch  fieldset.fc_search_result.fcodd {
-	background-color: #f0f0f0;
-}
-.flexicontent.fcsearch  fieldset.fc_search_result.fceven {
-	background-color: #f7f7f7;
+	border-bottom: 1px solid #ccc;
 }
 .flexicontent.fcsearch fieldset.fc_search_result:hover {
-	border: 1px dashed gray;
+	background-color: #f7f7f7;
 }
 .flexicontent.fcsearch .fc_search_result_title {
 	float: left;
@@ -5011,6 +4999,24 @@ fc_search_result_category .fc-mssg-inline {
 .flexicontent.fcsearch  .fc_mublock {
 	display: block;
 	float: right;
+}
+#fc_fieldfilters_tbl ul {
+	padding: 0;
+	margin: 0;
+}
+#fc_fieldfilters_tbl li {
+	list-style: none;
+	padding: 5px 0;
+}
+.col-search.span3 label#use_advsearch_options_lbl {
+	width: 88%;
+	margin-top: 15px;
+	margin-bottom: 15px;
+}
+.view-search fieldset.fc_search_set,
+fieldset.fc_filter_set {
+	margin: 12px 0 25px 0;
+	border-bottom: 0px solid #cccccc !important;
 }
 #flexicontent .fc_inline_block {
 	display: inline-block;
