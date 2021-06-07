@@ -135,8 +135,8 @@
 		<field name="" type="separator" level="level1" default="Results List" />
 
 		<field name="column_display" type="radio" default="1" label="FLEXI_SEARCH_COLUMN_DISPLAY" description="FLEXI_SEARCH_COLUMN_DISPLAY_DESC" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
+				<option value="0">FLEXI_SEARCH_COLUMN_DISPLAY_TOP</option>
+				<option value="1">FLEXI_SEARCH_COLUMN_DISPLAY_LEFT</option>
 			</field>
 			
 			<field name="limit" type="text" size="4" default="10" label="FLEXI_NUM_PER_PAGE" description="FLEXI_NUM_PER_PAGE_DESC" />
