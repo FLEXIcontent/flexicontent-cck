@@ -72,10 +72,15 @@ if ( $use_infoflds && count($infoflds) ) {
 		FlexicontentFields::getFieldDisplay($fcitems, $fieldname, $values=null, $method='display');
 	}
 }
+
+$column_display = $this->params->get('column_display', 0);
+if ($column_display == 1){
+	$column_display = 'span8';
+}
+
 ?>
 
-
-<div class="fc_search_results_list page<?php echo $this->escape($this->params->get('pageclass_sfx')); ?>">
+<div class="fc_search_results_list <?php echo $column_display; ?> page<?php echo $this->escape($this->params->get('pageclass_sfx')); ?>">
 
 <?php $count = -1; ?>
 <?php foreach($this->results as $i => $result) : ?>

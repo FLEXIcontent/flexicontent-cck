@@ -29,12 +29,6 @@ hr.fcclearline {
 	float: right;
 	margin-left: 8px;
 }
-#flexicontent .fceven {
-	background-color: #e7e7e7;
-}
-#flexicontent .fcodd {
-	background-color: #f2f2f2;
-}
 #flexicontent .buttons.fc-iblock {
 	display: inline-block;
 	float: none;
@@ -785,18 +779,12 @@ div.current dd {
 	height: auto;
 }
 .flexicontent.fcsearch  fieldset.fc_search_result {
-	padding: 16px 4px 16px 4px;
+	padding: 16px;
 	margin: 0px;
-	border: 1px solid transparent;
-}
-.flexicontent.fcsearch  fieldset.fc_search_result.fcodd {
-	background-color: #f0f0f0;
-}
-.flexicontent.fcsearch  fieldset.fc_search_result.fceven {
-	background-color: #f7f7f7;
+	border: 1px solid #ccc;
 }
 .flexicontent.fcsearch fieldset.fc_search_result:hover {
-	border: 1px dashed gray;
+	background-color: #f7f7f7;
 }
 .flexicontent.fcsearch .fc_search_result_title {
 	float: right;
