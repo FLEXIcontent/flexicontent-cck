@@ -206,12 +206,12 @@ abstract class JHtmlFclayoutbuilder
 
 /* Primary color for the background */
 .gjs-one-bg {
-  background-color: #444444;
+  background-color: #f3f3f3;
 }
 
 /* Secondary color for the text color */
 .gjs-two-color {
-  color: rgba(255, 255, 255, 0.7);
+  color: color: #000000;
 }
 
 /* Tertiary color for the background */
@@ -220,18 +220,17 @@ abstract class JHtmlFclayoutbuilder
   color: white;
 }
 
-		/* Quaternary color for the text color */
-		.gjs-four-color,
-		.gjs-four-color-h:hover {
-		  color: #6EA22B;
-		}
-
-		.gjs-radio-item input {
-		    display: none !important;
-		}
-		.gjs-radio-item-label {
-		    margin: 0;
-		}
+/* Quaternary color for the text color */
+.gjs-four-color,
+.gjs-four-color-h:hover {
+  color: #6EA22B;
+}
+.gjs-radio-item input {
+    display: none !important;
+}
+.gjs-radio-item-label {
+    margin: 0;
+}
 
 
 		/**
@@ -347,7 +346,7 @@ abstract class JHtmlFclayoutbuilder
 			 * and you\'d like to import it on fly for the user
 			 */
 			var LandingPage = {
-				html: \'<h2>This is the layout area, you may drag and drop to add your blocks here, to load flexicontent field use data panel to insert flexicontent block</h2>\',
+				html: \'<div style="display: inline-block" data-gjs-resizable="true"><h2>This is the layout area, you may drag and drop to add your blocks here, to load flexicontent field use data panel to insert flexicontent block</h2></div>\',
 				css: null,
 				components: null,
 				styles: [\'http://localhost/flexidev/templates/shaper_helix3/css/template.css\'],
@@ -373,7 +372,8 @@ abstract class JHtmlFclayoutbuilder
 				],
 
 				avoidInlineStyle: false,
-				// dragMode: \'absolute\',
+				// allow to move 
+				//dragMode: \'absolute\',
 
 				// Indicate where to init the editor. You can also pass an HTMLElement
 				// Size of the editor
@@ -408,6 +408,9 @@ abstract class JHtmlFclayoutbuilder
 					\'grapesjs-touch\',
 					\'grapesjs-parser-postcss\',
 					\'grapesjs-tooltip\',
+					\'gjs-plugin-ckeditor\',
+					//\'grapesjs-shape-divider\',
+					//\'grapesjs-plugin-header\',
 				],
 
 				pluginsOpts: {
