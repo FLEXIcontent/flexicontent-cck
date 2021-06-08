@@ -211,7 +211,7 @@ abstract class JHtmlFclayoutbuilder
 
 /* Secondary color for the text color */
 .gjs-two-color {
-  color: color: #000000;
+  color: #000000;
 }
 
 /* Tertiary color for the background */
