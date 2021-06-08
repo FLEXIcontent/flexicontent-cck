@@ -1347,8 +1347,12 @@ class flexicontent_html
 
 				$framework_path = JUri::root(true).$lib_path.'/grapesjs';
 
+				$grapjs_vers = '0.16.22';
+				$url_grapjs_css = 'https://unpkg.com/grapesjs@' . $grapjs_vers . '/dist/css/grapes.min.css';
+				$url_grapjs_js = 'https://unpkg.com/grapesjs@' . $grapjs_vers . '/dist/grapes.min.js';
+
 				$document->addStyleSheet($framework_path.'/stylesheets/toastr.min.css');
-				$document->addStyleSheet('https://unpkg.com/grapesjs@0.16.41/dist/css/grapes.min.css'); //stylesheets/grapes.min.css?v0.14.49
+				$document->addStyleSheet($url_grapjs_css);
 				$document->addStyleSheet($framework_path.'/stylesheets/grapesjs-preset-webpage.min.css?0.1.10');
 				$document->addStyleSheet($framework_path.'/stylesheets/tooltip.css');
 				$document->addStyleSheet($framework_path.'/stylesheets/grapesjs-plugin-filestack.css');
@@ -1356,7 +1360,7 @@ class flexicontent_html
 
 				$document->addScript('https://static.filestackapi.com/v3/filestack.js');
 				$document->addScript($framework_path.'/js/toastr.min.js');
-				$document->addScript('https://unpkg.com/grapesjs@0.16.22/dist/grapes.js');  //js/grapes.min.js?v0.14.49
+				$document->addScript($url_grapjs_js);
 
 
 				// GrapesJS Plugins
@@ -1369,7 +1373,7 @@ class flexicontent_html
 				$document->addScript($framework_path.'/js/grapesjs-parser-postcss.min.js?0.1.1');
 				$document->addScript($framework_path.'/js/grapesjs-tooltip.min.js?0.1.1');
 				//shapedivider module
-				$document->addScript('https://unpkg.com/grapesjs-shape-divider');  
+				//$document->addScript('https://unpkg.com/grapesjs-shape-divider');  
 				//ckeditor for graps
 				$document->addScript($framework_path.'/js/grapesjs-plugin-ckeditor.min.js?0.0.9');
 				$document->addScript('https://cdn.ckeditor.com/4.14.1/standard-all/ckeditor.js');
