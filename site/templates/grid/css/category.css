@@ -219,7 +219,7 @@ div.comments {
 .news.fc-items-block .fc-item-block-featured-wrapper-innerbox {
 	padding: 8px 12px;
 	border-width: 0px;
-	margin: 15px 15px;
+	margin: 15px 15px 15px 0px;
 	background-color: none;
 	border-color: none;
 }
