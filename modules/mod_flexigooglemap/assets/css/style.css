@@ -40,10 +40,25 @@
     max-width: 27%;
     float: left;
 }
-.link.btn, .directions .btn, .btn-highlight {
-    padding: 5px 5px;
+.fc_module_marker_list .link.btn, .fc_module_marker_list .directions .btn, .fc_module_marker_list .btn-highlight {
+	padding: 5px 5px;
+	margin-right: 4px;
 }
-.directions {
-    max-width: 30%;
-    float: left;
+.col8 {
+    width: 60%;
+    display: inline-block;
+}
+.col4 {
+    width: 38%;
+    float: right;
+}
+@media screen and (max-width: 750px){
+	.col8 {
+		width: 100%;
+		display: block;
+	}
+	.col4 {
+		margin-top:20px;
+		width: 100%;
+	}
 }
