@@ -144,7 +144,7 @@ $r = 0;
 				</div>
 				<div class="fc_search_option_cell" style="position:relative;">
 					<?php
-					$append_buttons = true;
+					$append_buttons = false;
 					
 					$_ac_index = $txtmode ? 'fc_adv_complete' : 'fc_basic_complete';
 					$text_search_class  = !$append_buttons ? 'fc_text_filter' : '';
@@ -159,10 +159,6 @@ $r = 0;
 								placeholder="<?php echo $text_search_prompt; ?>" name="q" size="30" maxlength="120" 
 								id="search_searchword" value="<?php echo $this->escape($this->searchword);?>" style="max-width: 144px;" />
 							
-							<?php $button_classes = FLEXI_J30GE ? ' btn btn-success' : ' fc_button fcsimple'; ?>
-							<button class="<?php echo $button_classes; ?> button_go" onclick="var form=document.getElementById('<?php echo $form_id; ?>'); adminFormPrepare(form, 1);">
-								<span class="icon-search icon-white"></span><?php echo JText::_( 'FLEXI_GO' ); ?>
-							</button>
 							
 						<?php echo $append_buttons ? '</span>' : ''; ?>
 						
@@ -399,11 +395,18 @@ $r = 0;
 			</fieldset>
 			
 		<?php endif; ?>
+
+
 		
 	<!--/fieldset-->
 	</div>
 	
 <?php endif; /* END OF IF autodisplayadvoptions */ ?>
+
+<?php $button_classes = FLEXI_J30GE ? ' btn btn-success' : ' fc_button fcsimple'; ?>
+							<button class="<?php echo $button_classes; ?> button_go" onclick="var form=document.getElementById('<?php echo $form_id; ?>'); adminFormPrepare(form, 1);">
+								<span class="icon-search icon-white"></span><?php echo JText::_( 'FLEXI_GO' ); ?>
+							</button>
 
 
 	<!-- BOF items total-->
