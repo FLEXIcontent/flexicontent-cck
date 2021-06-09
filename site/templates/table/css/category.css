@@ -46,9 +46,6 @@ table.adminlist {
 .subcategorieslist {
 	margin: 0 0 1em;
 }
-table.adminlist td {
-    padding: 1px;
-}
 #fc_alpha .btn.fc_alpha_index,
 #fc_alpha .btn.fc_alpha_index_sep {
 	margin-top: 0;
