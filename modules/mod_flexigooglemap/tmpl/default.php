@@ -106,9 +106,9 @@ $use_mlist = (int) $params->get('use_dynamic_marker_list', 0);
 
 <div id="mod_fleximap_default<?php echo $module->id;?>" class="mod_fleximap map<?php echo $moduleclass_sfx ?>" style="display: contents;">
 
-	<div class="row">
+	<div class="">
 
-    <div class="<?php echo $use_mlist ? 'span8' : ''; ?>">
+    <div class="<?php echo $use_mlist ? 'col8' : ''; ?>">
 			<?php /* Map container*/ ?>
 			<div style="width:<?php echo $width; ?>; height:<?php echo $height; ?>; max-width: 100%;">
 				<div id="fc_module_map_<?php echo $module->id;?>" style="width:<?php echo $width; ?>; height:<?php echo $height; ?>; max-width: 100%;"></div>
@@ -121,7 +121,7 @@ $use_mlist = (int) $params->get('use_dynamic_marker_list', 0);
 		JText::script("MOD_FLEXIGOOGLEMAP_MARKERS_LIST_HEADER_1_ENTRY", true);
 		JText::script("MOD_FLEXIGOOGLEMAP_MARKERS_LIST_HEADER_N_ENTRIES", true);
 		?>
-    <div class="span4">
+    <div class="col4">
 			<div id="fc_module_marker_list_box_<?php echo $module->id;?>" class="fc_module_marker_list_box" style="height:<?php echo $height; ?>;" >
 				<div id="fc_module_marker_list_header_<?php echo $module->id;?>" class="fc_module_marker_list_header"></div>
 				<ol id="fc_module_marker_list_<?php echo $module->id;?>" class="fc_module_marker_list"></ol>
