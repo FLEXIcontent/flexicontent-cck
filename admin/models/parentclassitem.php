@@ -3942,7 +3942,7 @@ class ParentClassItem extends FCModelAdmin
 			;
 		$lang = $this->_db->setQuery($query)->loadObject();
 
-		$query 	= 'SELECT *, t.id as tid,'
+		$query 	= 'SELECT t.*, t.id as tid,'
 			. (!FLEXI_FALANG || !$lang ? ' "" AS translated_text' : ' fa.value AS translated_text')
 			. ' FROM #__flexicontent_tags as t '
 			. (!FLEXI_FALANG || !$lang ? '' : ' LEFT JOIN #__falang_content AS fa ON fa.reference_table = "tags" AND fa.reference_field = "title" AND fa.reference_id = t.jtag_id'
