@@ -363,13 +363,13 @@ abstract class JHtmlFclayoutbuilder
 
 				// TODO check loading css in canvas and real url
 				canvas: {
-					styles: [\'https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css\']
+				styles: [\'https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css\']
 				},
 				scripts: [
 					\'https://code.jquery.com/jquery-3.3.1.slim.min.js\',
 					\'https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js\',
 					\'https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js\'
-				],
+				  ],
 
 				avoidInlineStyle: false,
 				// allow to move 
@@ -411,6 +411,7 @@ abstract class JHtmlFclayoutbuilder
 					\'gjs-plugin-ckeditor\',
 					//\'grapesjs-shape-divider\',
 					//\'grapesjs-plugin-header\',
+					\'grapesjs-blocks-bootstrap4\',
 				],
 
 				pluginsOpts: {
@@ -429,6 +430,19 @@ abstract class JHtmlFclayoutbuilder
 							category: \'Extra\'
 						}
 					},
+					\'gjs-plugin-ckeditor\': {
+						//need to specific tool bar
+					},
+					\'grapesjs-blocks-bootstrap4\': {
+						blocks: {
+						},
+						blockCategories: {
+						},
+						labels: {
+						},
+						
+					},
+	
 					\'gjs-preset-webpage\': {
 						modalImportTitle: \'Import Template\',
 						modalImportLabel: \'<div style="margin-bottom: 10px; font-size: 13px;">Paste here your HTML/CSS and click Import</div>\',
@@ -1179,7 +1193,7 @@ abstract class JHtmlFclayoutbuilder
 
 			editor.BlockManager.add(\'fcfield\', {
 				label: \'Flexicontent Field\',
-				category: \'Data\',
+				category: \'Flexicontent Data\',
 				content: \'<div style="display: inline-block" data-gjs-resizable="true" data-gjs-dragMode="absolute">{flexi_field:FIELDNAME  item:{{fc-item-id}}  method:display}</div>\',
 				select: true,
 				activate: true,
@@ -1209,7 +1223,7 @@ abstract class JHtmlFclayoutbuilder
 						//label: \'Desktop\',
 						className: \'fa fa-desktop\',
 						command: \'set-device-desktop\',
-						active: false,
+						active: true,
 						togglable: false,
 						attributes: {
 							\'title\': \'Desktop\',
@@ -1242,7 +1256,7 @@ abstract class JHtmlFclayoutbuilder
 						//label: \'Mobile\',
 						className: \'fa fa-mobile\',
 						command: \'set-device-mobile\',
-						active: true,
+						active: false,
 						togglable: false,
 						attributes: {
 							\'title\': \'Mobile\',

@@ -1377,6 +1377,8 @@ class flexicontent_html
 				//ckeditor for graps
 				$document->addScript($framework_path.'/js/grapesjs-plugin-ckeditor.min.js?0.0.9');
 				$document->addScript('https://cdn.ckeditor.com/4.14.1/standard-all/ckeditor.js');
+				//bs4
+				$document->addScript($framework_path.'/js/grapesjs-blocks-bootstrap4.min');
 				break;
 
 			case 'grapesjs_view':
