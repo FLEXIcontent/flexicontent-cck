@@ -123,7 +123,10 @@ class plgFlexicontent_fieldsComments extends FCField
 				    </a>
 				</noscript>
 				');
-		$display = "<div id='disqus_thread'></div>";
+		$display = "<div id='disqus_thread' style='float:none;'></div>";
+          // Add styles fo width
+			$style = '.flexi.value.field_'.$field->name.' {float: none;};';
+			$document->addStyleDeclaration($style);
 			}
 		}
 		elseif ($comment_api == 'facebook')	{
