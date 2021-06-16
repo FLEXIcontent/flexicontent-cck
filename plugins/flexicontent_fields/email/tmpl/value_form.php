@@ -9,7 +9,6 @@ $n = 0;
 foreach ($values as $value)
 {
 
-	//dump($value);
 	// Basic sanity check for a valid email address
 	$value['addr'] = !empty($value['addr']) && strpos($value['addr'], '@') !== false ? $value['addr'] : '';
 
@@ -88,13 +87,15 @@ foreach ($values as $value)
 				<button type='button' class='close' data-dismiss='modal'>&times;</button>
 			  </div>
 			  <div class='modal-body'>";
-			  </div>
+		$modal_footer = "
+				</div>
 			</div>
 		</div>";
 	}
 	else
 	{
 		$modal_header = '';
+		$modal_footer = '';
 	}
 	// Consent field
 	$consent_field_display = (int) $field->parameters->get('display_consent', 1);
@@ -299,6 +300,7 @@ foreach ($values as $value)
 		'.JHtml::_("form.token").'
 		</fieldset>
 		</form>
+		'.$modal_footer.'
 		<script>
 			const qsa=(s,o)=>[...(o||document).querySelectorAll(s)],
 				qs=(s,o)=>qsa(s,o)[0];
