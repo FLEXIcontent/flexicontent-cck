@@ -197,17 +197,14 @@ class plgFlexicontent_fieldsEmail extends FCField
 				var remove_previous = (typeof params!== 'undefined' && typeof params.remove_previous !== 'undefined') ? params.remove_previous : 0;
 				var scroll_visible  = (typeof params!== 'undefined' && typeof params.scroll_visible  !== 'undefined') ? params.scroll_visible  : 1;
 				var animate_visible = (typeof params!== 'undefined' && typeof params.animate_visible !== 'undefined') ? params.animate_visible : 1;
-
 				if(!remove_previous && (rowCount".$field->id." >= maxValues".$field->id.") && (maxValues".$field->id." != 0)) {
 					alert(Joomla.JText._('FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED') + maxValues".$field->id.");
 					return 'cancel';
 				}
-
 				// Find last container of fields and clone it to create a new container of fields
 				var lastField = fieldval_box ? fieldval_box : jQuery(el).prev().children().last();
 				var newField  = lastField.clone();
 				newField.find('.fc-has-value').removeClass('fc-has-value');
-
 				// New element's field name and id
 				var uniqueRowN = uniqueRowNum" . $field->id . ";
 				var element_id = '" . $elementid . "_' + uniqueRowN;
@@ -222,7 +219,6 @@ class plgFlexicontent_fieldsEmail extends FCField
 				theInput.attr('name', fname_pfx + '[addr]');
 				theInput.attr('id', element_id + '_addr');
 				newField.find('.emailaddr-lbl').first().attr('for', element_id + '_addr');
-
 				// Update inputmask
 				var has_inputmask = newField.find('input.has_inputmask').length != 0;
 				if (has_inputmask)  newField.find('input.has_inputmask').inputmask();
@@ -235,7 +231,6 @@ class plgFlexicontent_fieldsEmail extends FCField
 				theInput.attr('name', fname_pfx + '[text]');
 				theInput.attr('id', element_id + '_text');
 				newField.find('.emailtext-lbl').first().attr('for', element_id + '_text');
-
 				// Destroy any select2 elements
 				var sel2_elements = newField.find('div.select2-container');
 				if (sel2_elements.length)
@@ -251,10 +246,8 @@ class plgFlexicontent_fieldsEmail extends FCField
 					(insert_before ? newField.insertBefore( lastField ) : newField.insertAfter( lastField ) ) :
 					newField.appendTo( jQuery('#sortables_".$field->id."') ) ;
 				if (remove_previous) lastField.remove();
-
 				// Attach form validation on new element
 				fc_validationAttach(newField);
-
 				// Re-init any select2 elements
 				fc_attachSelect2(newField);
 				";
@@ -269,32 +262,24 @@ class plgFlexicontent_fieldsEmail extends FCField
 				//newField.fadeOut({ duration: 400, easing: 'swing' }).fadeIn({ duration: 200, easing: 'swing' });
 				if (scroll_visible) fc_scrollIntoView(newField, 1);
 				if (animate_visible) newField.css({opacity: 0.1}).animate({ opacity: 1 }, 800, function() { jQuery(this).css('opacity', ''); });
-
 				// Enable tooltips on new element
 				newField.find('.hasTooltip').tooltip({html: true, container: newField});
 				newField.find('.hasPopover').popover({html: true, container: newField, trigger : 'hover focus'});
-
 				// Attach bootstrap event on new element
 				fc_bootstrapAttach(newField);
-
 				rowCount".$field->id."++;       // incremented / decremented
 				uniqueRowNum".$field->id."++;   // incremented only
 			}
-
-
 			function deleteField".$field->id."(el, groupval_box, fieldval_box)
 			{
 				// Disable clicks on remove button, so that it is not reclicked, while we do the field value hide effect (before DOM removal of field value)
 				var btn = fieldval_box ? false : jQuery(el);
 				if (btn && rowCount".$field->id." > 1) btn.css('pointer-events', 'none').off('click');
-
 				// Find field value container
 				var row = fieldval_box ? fieldval_box : jQuery(el).closest('li');
-
 				// Add empty container if last element, instantly removing the given field value container
 				if(rowCount".$field->id." == 1)
 					addField".$field->id."(null, groupval_box, row, {remove_previous: 1, scroll_visible: 0, animate_visible: 0});
-
 				// Remove if not last one, if it is last one, we issued a replace (copy,empty new,delete old) above
 				if (rowCount".$field->id." > 1)
 				{
@@ -794,21 +779,15 @@ class plgFlexicontent_fieldsEmail extends FCField
 	 * Helper for sendemail
 	 */
 
-	public function sendEmail()
+	public static function sendEmail()
 	{
 		// Load plugin language
 		$lang = JFactory::getLanguage();
 		$lang->load('plg_flexicontent_fields_email', JPATH_ADMINISTRATOR);
 
 		// get the params from the plugin options
-		
-
 		$plugin = JPluginHelper::getPlugin('flexicontent_fields', 'email');
 		$pluginParams = new JRegistry($plugin->params);
-		dump ($plugin);
-		dump ($pluginParams);
-		//$textseparator = $field->parameters->get('text_sparator', '');
-		//dump($textseparator);
 
 		// Check for request forgeries.
 		JSession::checkToken() or jexit(JText::_('JINVALID_TOKEN'));
@@ -865,8 +844,8 @@ class plgFlexicontent_fieldsEmail extends FCField
 		if (empty($fromname)){
 			$app->enqueueMessage(JText::_('FLEXI_FIELD_EMAIL_CONFIG_ERROR'), 'error');
 		}
-		$fromemail = $fromemail = $datas['emailfrom'];
-		$emailauthor = $datas['emailauthor'];
+		$fromemail = $datas['emailauthor'];//$jinput->post->get('emailfrom', '', '');
+		$emailauthor =  $datas['emailauthor'];//$jinput->post->get('emailauthor', '', '');
 		$from = array($fromemail , $fromname);
 
 		//subject
@@ -886,35 +865,32 @@ class plgFlexicontent_fieldsEmail extends FCField
 			$message 	= JText::sprintf('FLEXI_FIELD_EMAIL_MESSAGE_DEFAULT', $title, $body, '<a href="'.$item_url.'">'.$item_url.'</a>', $sitename);
 
 		// Check whether email copy function activated
-		$copy_email_user = $pluginParams->get( 'email_user_copy', 0) ;//$this->parameters->get('email_user_copy', 0);
-		
-		//$copy_email_user2 = $field->parameters->get('email_user_copy');
-		if ($copy_email_user == 1)
-		{
-		  $fromemail = $datas['emailfrom'];
-			$message_copy_user  = JText::sprintf('FLEXI_FIELD_EMAIL_MESSAGE_DEFAULT_COPY', $title, $body, '<a href="'.$item_url.'">'.$item_url.'</a>', $sitename);
-			$subject_copy_user =  JText::sprintf('FLEXI_FIELD_EMAIL_SUBJECT_DEFAULT_COPY', $fromname, $itemauthor, $subject);
-			$mailer_copy_user = JFactory::getMailer();
-			$mailer_copy_user->isHTML(true);
-			$mailer_copy_user->setSender(array($emailauthor, $itemauthor));
-			$mailer_copy_user->addRecipient($fromemail);
-			$mailer_copy_user->setSubject($subject_copy_user);
-			$mailer_copy_user->setBody($message_copy_user);
-			$send_copy_user = $mailer_copy_user->Send();
-		}
+		$copy_email_user = $pluginParams->get( 'email_user_copy','' );
+			if ($copy_email_user == true)
+			{
+				$messagecopy   = JText::sprintf('FLEXI_FIELD_EMAIL_MESSAGE_DEFAULT_COPY', $title, $body, '<a href="'.$item_url.'">'.$item_url.'</a>', $sitename);
+				$subjectcopy =  JText::sprintf('FLEXI_FIELD_EMAIL_SUBJECT_DEFAULT_COPY', $fromname, $itemauthor, $subject);
+				$mailer = JFactory::getMailer();
+				$mailer->isHTML(true);
+				$mailer ->setSender(array($emailauthor, $itemauthor));
+				$mailer ->addRecipient($fromemail);
+				$mailer ->setSubject($subjectcopy);
+				$mailer ->setBody($messagecopy);
+				$send = $mailer->Send();
+			}
 			$copy_email_admin = $pluginParams->get( 'email_admin_copy', 0 );
 			$email_admin = $pluginParams->get( 'email_admin', '' ) ;
-				if ($copy_email_admin == 1)
+				if ($copy_email_admin == true)
 				{
-					$message_copy_admin   = JText::sprintf('FLEXI_FIELD_EMAIL_MESSAGE_ADMIN_COPY', $fromname , $title, $body, '<a href="'.$item_url.'">'.$item_url.'</a>', $sitename);
-					$subject_copy_admin =  JText::sprintf('FLEXI_FIELD_EMAIL_SUBJECT_ADMIN_COPY', $itemauthor, $subject);
-					$mailer_copy_admin = JFactory::getMailer();
-					$mailer_copy_admin->isHTML(true);
-					$mailer_copy_admin->setSender($from, $fromname);
-					$mailer_copy_admin->addRecipient($email_admin);
-					$mailer_copy_admin->setSubject($subject_copy_admin);
-					$mailer_copy_admin->setBody($message_copy_admin);
-					$send_copy_admin = $mailer_copy_admin->Send();
+					$messagecopyadmin   = JText::sprintf('FLEXI_FIELD_EMAIL_MESSAGE_ADMIN_COPY', $fromname , $title, $body, '<a href="'.$item_url.'">'.$item_url.'</a>', $sitename);
+					$subjectcopyadmin =  JText::sprintf('FLEXI_FIELD_EMAIL_SUBJECT_ADMIN_COPY', $itemauthor, $subject);
+					$mailer = JFactory::getMailer();
+					$mailer->isHTML(true);
+					$mailer ->setSender($from, $fromname);
+					$mailer ->addRecipient($email_admin);
+					$mailer ->setSubject($subjectcopyadmin);
+					$mailer ->setBody($messagecopyadmin);
+					$send = $mailer->Send();
 				}
 
 
@@ -979,5 +955,3 @@ class plgFlexicontent_fieldsEmail extends FCField
 			}
 	}
 }
-
-?>
