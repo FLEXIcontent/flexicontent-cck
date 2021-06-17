@@ -80,15 +80,15 @@ foreach ($values as $value)
 	)
 	{
 		$modal_header = "
-		<button id='modal_info' data-toggle='modal' data-target='#myModal' class='$modal_button_class' rel='{handler: 'iframe', size: {x: $modal_height, y: $modal_width}}'>".Jtext::_($modal_button_text)."</button>
-		<div id='myModal' class='modal hide fade' role='dialog'  tabindex='-1' role='dialog' aria-labelledby='contact' aria-hidden='true'>
-			<div class='modal-content'>
+		<button id='modal_info' data-toggle='modal' data-target='#myModal'$formid' class='$modal_button_class' rel=\"{handler: 'popover', size: {x: $modal_height, y: $modal_width}}\" >".Jtext::_($modal_button_text)."</button>
+		<div id='myModal'$formid' class='modal hide fade' role='dialog'  tabindex='-1' role='dialog' aria-labelledby='contact' aria-hidden='true'>
 			  <div class='modal-header' style='border-bottom: 0px solid #eee;'>
 				<button type='button' class='close' data-dismiss='modal'>&times;</button>
 			  </div>
 			  <div class='modal-body'>";
-		$modal_footer = "
+		$modal_footer = "		
 				</div>
+				<div class='modal-footer'>
 			</div>
 		</div>";
 	}

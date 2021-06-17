@@ -1,2 +1,5 @@
 .placeholder{position: absolute;left: -99999px;}.label-top{display:block;}
+.modal-body {
+overflow: auto !important;
+}
 /*** here add style for input ***/

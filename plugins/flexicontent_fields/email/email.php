@@ -844,8 +844,8 @@ class plgFlexicontent_fieldsEmail extends FCField
 		if (empty($fromname)){
 			$app->enqueueMessage(JText::_('FLEXI_FIELD_EMAIL_CONFIG_ERROR'), 'error');
 		}
-		$fromemail = $datas['emailauthor'];//$jinput->post->get('emailfrom', '', '');
-		$emailauthor =  $datas['emailauthor'];//$jinput->post->get('emailauthor', '', '');
+		$fromemail = $datas['emailfrom'];
+		$emailauthor =  $datas['emailauthor'];
 		$from = array($fromemail , $fromname);
 
 		//subject
