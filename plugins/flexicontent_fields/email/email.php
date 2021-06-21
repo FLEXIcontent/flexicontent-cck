@@ -845,7 +845,7 @@ class plgFlexicontent_fieldsEmail extends FCField
 			$app->enqueueMessage(JText::_('FLEXI_FIELD_EMAIL_CONFIG_ERROR'), 'error');
 		}
 		$fromemail = $datas['emailfrom'];
-		$emailauthor =  $datas['emailauthor'];
+		$emailauthor =  htmlspecialchars($_POST['emailauthor']); //using post because i can't get email on hidden field
 		$from = array($fromemail , $fromname);
 
 		//subject

@@ -63,6 +63,10 @@ foreach ($values as $value)
 
 	$titleformD = $display_titleform ? '<LEGEND>'.$titleform.'</LEGEND>' : '';
 
+	//Fake id form, cutt email on @ and set startemail
+	$formid =  explode('@', $addr);
+	$formid = $formid[0] .'_'. random_int(100, 999); //add a random id if we have 2 forms in same page but with same email author
+
 	// Modal display 
 	// TODO replace joomla modal for flexicontent modal base on jquery
 	$view = $app->input->getCmd('flexi_callview', ($realview ?: 'item'));
@@ -132,9 +136,6 @@ foreach ($values as $value)
 			$captcha_html= '<div class="captcha form-group control-group">'.$recaptcha[0].'</div>';
 		}
 	}
-	//Fake id form, cutt email on @ and set startemail
-	$formid =  explode('@', $addr);
-	$formid = $formid[0];
 	$fields_display = '';
 	$list_fields    = $field->parameters->get('form_fields');
 	if ($list_fields)
