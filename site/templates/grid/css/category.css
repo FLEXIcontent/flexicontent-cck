@@ -595,6 +595,7 @@ div.comments {
 	margin: 0%;
 	position: absolute;
 	left: 0px;
+	width: 100%;
 }
 .news.fc-items-block .fc_overlayed .fc_block {
 	line-height: 160%;
