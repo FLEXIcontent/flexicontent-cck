@@ -23,7 +23,10 @@ $microdata_itemtype_cat = $this->params->get( 'microdata_itemtype_cat', 'Article
 // If customizing via CSS rules or JS scripts is not enough, then please copy the following file here to customize the HTML too
 
 ob_start();
-include(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'tmpl_common'.DS.'listings_filter_form_html5.php');
+file_exists(dirname(__FILE__).DS.'listings_filter_form_html5.php')
+    ? include(dirname(__FILE__).DS.'listings_filter_form_html5.php')
+    : include(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'tmpl_common'.DS.'listings_filter_form_html5.php');
+
 $filter_form_html = trim(ob_get_contents());
 ob_end_clean();
 

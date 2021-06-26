@@ -809,9 +809,13 @@ $items_task = 'task=items.';
 					</span><br/><br/>
 					<span id="fc-dash-devs" class="nowrap_box">
 						<span class="fc-mssg-inline fc-nobgimage fc-noborder nowrap_box" style="text-align:center;" >
-							<span class="label label-info <?php echo $tooltip_class;?>" title="Core developer">Emmanuel Danan</span>
 							<span class="label label-info <?php echo $tooltip_class;?>" title="Core developer">Georgios Papadakis</span><br/><br/>
-							<a class="<?php echo $btn_class.' btn-primary '.$tooltip_class;?>" style="" href="http://www.flexicontent.org" title="FLEXIcontent home page" target="_blank">FLEXIcontent.org</a>
+							<a class="<?php echo $btn_class.' btn-small btn-primary '.$tooltip_class;?>" style="" href="http://www.flexicontent.org" title="FLEXIcontent home page" target="_blank">FLEXIcontent.org</a>
+						</span>
+
+						<span class="fc-mssg-inline fc-nobgimage fc-noborder nowrap_box" style="text-align:center;" >
+							<span class="label label-info <?php echo $tooltip_class;?>" title="Core developer">Emmanuel Danan</span><br/><br/>
+							<a class="<?php echo $btn_class.' btn-small btn-primary '.$tooltip_class;?>" style="" href="http://www.agerix.fr" title="Agerix : L'agence digitale gauloise<br>Spécialistes Joomla - conception, refonte, migration et maintenance." target="_blank">agerix.fr</a>
 						</span>
 
 						<span class="fc-mssg-inline fc-nobgimage fc-noborder nowrap_box">

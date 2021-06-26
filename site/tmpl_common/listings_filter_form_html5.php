@@ -11,8 +11,8 @@ ob_start();
  * First try current folder, otherwise load from common folder
  */
 
-file_exists('listings_filter_form_body_html5.php')
-	? include('listings_filter_form_body_html5.php')
+file_exists(dirname(__FILE__).DS.'listings_filter_form_body_html5.php')
+	? include(dirname(__FILE__).DS.'listings_filter_form_body_html5.php')
 	: include(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'tmpl_common'.DS.'listings_filter_form_body_html5.php');
 
 $filter_form_body = trim(ob_get_contents());
