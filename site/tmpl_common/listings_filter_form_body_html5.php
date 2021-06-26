@@ -11,7 +11,10 @@ $params  = & $this->params;
 $form_id = $form_name = 'adminForm';
 $filters = & $this->filters;
 $text_search_val = $this->lists['filter'];
-include "filters.php";
+
+file_exists(dirname(__FILE__).DS.'filters.php')
+    ? include(dirname(__FILE__).DS.'filters.php')
+    : include(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'tmpl_common'.DS.'filters.php');
 
 // Alpha-Index
 if ($this->params->get('show_alpha', 1)) :

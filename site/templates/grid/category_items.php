@@ -235,7 +235,9 @@ if (!empty($this->items) && ($load_masonry_feat || $load_masonry_std))
 
 	// Form for (a) Text search, Field Filters, Alpha-Index, Items Total Statistics, Selectors(e.g. per page, orderby)
 	// If customizing via CSS rules or JS scripts is not enough, then please copy the following file here to customize the HTML too
-	include(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'tmpl_common'.DS.'listings_filter_form.php');
+    file_exists(dirname(__FILE__).DS.'listings_filter_form.php')
+        ? include(dirname(__FILE__).DS.'listings_filter_form.php')
+        : include(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'tmpl_common'.DS.'listings_filter_form.php');
 
 	$filter_form_html = trim(ob_get_contents());
 	ob_end_clean();
