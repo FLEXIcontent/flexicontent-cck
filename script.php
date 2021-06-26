@@ -107,7 +107,7 @@ class com_flexicontentInstallerScript
 				<td valign="top">
 		    	<img src="<?php echo 'components/com_flexicontent/assets/images/logo.png'; ?>" style="width:300px; margin: 0px 48px 0px 0px;" alt="FLEXIcontent Logo" />
 				</td>
-				<td valign="top" width="100%">
+				<td valign="top">
 	     	 	<span><?php echo JText::_('COM_FLEXICONTENT_DESCRIPTION'); ?></></span><br />
 	      	<font class="small">by <a href="http://www.flexicontent.org" target="_blank">Emmanuel Danan</a>,
 	      	<font class="small">by <a href="http://www.flexicontent.org" target="_blank">Georgios Papadakis</a>,
