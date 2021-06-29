@@ -368,12 +368,15 @@ $doc->addScriptDeclaration($js);
 		$top_html = $bottom_html = $output = array();
 
 		//$output[] = '<input name="q" id="mod_search_searchword-'.$module->id.'" maxlength="'.$maxlength.'" alt="'.$button_text.'" class="fc_field_filter inputbox" type="text" size="'.$width.'" value="'.$text.'"  onblur="if(this.value==\'\') this.value=\''.$text.'\';" onfocus="if(this.value==\''.$text.'\') this.value=\'\';" />';
-		$q = JRequest::getVar('q');
+
+		$q = $app->input->getString('q', '');
+		$searchword = $app->input->getString('filter', $q);
+
 		$output[] = '
 			<input type="'.($search_autocomplete==2 ? 'hidden' : 'text').'"
 				data-txt_ac_lang="' . JFactory::getLanguage()->getTag() . '"
 				id="mod_search_searchword-'.$module->id.'" class="'.$text_search_class.'"
-				placeholder="'.$search_inner_prompt.'" name="q" '.($search_autocomplete==2 ? '' : ' size="'.$search_inner_width.'" maxlength="'.$maxchars.'"').' value="'.$q.'" aria-label="'.$search_inner_prompt.'"  />';
+				placeholder="'.$search_inner_prompt.'" name="q" '.($search_autocomplete==2 ? '' : ' size="'.$search_inner_width.'" maxlength="'.$maxchars.'"').' value="'.$searchword.'" aria-label="'.$search_inner_prompt.'"  />';
 
 		// Search's GO button
 		if ($button) :
