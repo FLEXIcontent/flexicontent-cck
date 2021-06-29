@@ -372,7 +372,6 @@ $doc->addScriptDeclaration($js);
 		//$output[] = '<input name="q" id="mod_search_searchword-'.$module->id.'" maxlength="'.$maxlength.'" alt="'.$button_text.'" class="fc_field_filter inputbox" type="text" size="'.$width.'" value="'.$text.'"  onblur="if(this.value==\'\') this.value=\''.$text.'\';" onfocus="if(this.value==\''.$text.'\') this.value=\'\';" />';
 
 		$q = $app->input->getString('q', '');
-		$q = $q !== parse_url(@$_SERVER["REQUEST_URI"], PHP_URL_PATH) ? $q : '';
 		$searchword = $app->input->getString('filter', $q);
 
 		$output[] = '
