@@ -74,7 +74,7 @@ if ($ff_placement)
 	<input type="hidden" name="cid" value="<?php echo $this->category->id; ?>" />
 	<input type="hidden" name="layout" value="<?php echo $this->layout_vars['layout']; ?>" />
 
-	<input type="hidden" name="letter" value="<?php echo JFactory::getApplication()->input->get('letter', '', 'string'); ?>" id="alpha_index" />
+	<input type="hidden" name="letter" value="<?php echo htmlspecialchars(JFactory::getApplication()->input->get('letter', '', 'string'), ENT_QUOTES, 'UTF-8'); ?>" id="alpha_index" />
 
 	<?php if (flexicontent_html::initial_list_limited($this->params)) : ?>
 	<input type="hidden" name="listall" value="<?php echo JFactory::getApplication()->input->get('listall', 0, 'int'); ?>" />
