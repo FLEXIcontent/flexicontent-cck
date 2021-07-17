@@ -110,8 +110,15 @@ class FlexicontentTasksCore
 		$lang    = substr($lang, 0,2);
 
 		$pageSize = $jinput->get('pageSize', 20, 'int');
-		$pageNum  = $jinput->get('pageNum', 1, 'int');		
-		$usesubs  = $jinput->get('usesubs', 1, 'int');		
+		$pageNum  = $jinput->get('pageNum', 1, 'int');
+		
+		// Make sure the pageNum start with 1 to avoid SQL errors
+		if ($pageNum < 1)
+		{
+			$pageNum = 1;
+		}
+		
+		$usesubs  = $jinput->get('usesubs', 1, 'int');
 
 		$min_word_len = $app->getUserState( $this->option.'.min_word_len', 0 );
 		$filtercat    = $cparams->get('filtercat', 0);      // Filter items using currently selected language
