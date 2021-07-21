@@ -90,3 +90,4 @@ site/templates/grid/language/fr-FR/fr-FR.grid.ini
 site/templates/items-tabbed/language/fr-FR/fr-FR.items-tabbed.ini
 site/templates/presentation/language/fr-FR/fr-FR.presentation.ini
 site/templates/table/language/fr-FR/fr-FR.table.ini
+_tools/link_livesite2repo_pro.bat

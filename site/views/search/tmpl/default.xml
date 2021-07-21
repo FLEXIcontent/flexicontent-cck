@@ -193,6 +193,10 @@
 			<field name="info_fieldlist" type="fields" default="" label="Select Field" description="Please select one by one fields to add to textarea below." fieldnameasvalue="true" onchange="f=document.getElementById('{control_name}infoflds'); f.value = f.value ? f.value + ','+this.value : this.value; this.value='';" class="disp_field"/>
 			<field name="infoflds" type="textarea" default="" label="Fields &lt;br/&gt; &lt;small&gt;(Leave EMPTY for -NONE-)&lt;/small&gt;" description="Enter Fields (their fieldnames) to render their values and display them in the search results. You can separate each fieldname by comma(,)." cols="30" rows="3" class="disp_field"/>
 		
+			<field name="disp_slide_filter" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_SEARCH_FLITER_SLIDE_DISPLAY" description="FLEXI_SEARCH_FLITER_SLIDE_DISPLAY_DESC" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="disp_field">FLEXI_NO</option>
+				<option value="1" show_list="disp_field" hide_list="">FLEXI_YES</option>
+			</field>
 		
 			<field name="" type="separator" default="FLEXI_ITEMS_ORDER" description="FLEXI_ITEMS_ORDER_DESC" level="level1" />
 			
