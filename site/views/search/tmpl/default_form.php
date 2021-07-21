@@ -87,6 +87,38 @@ $other_search_areas_title_tip = ' title="'.flexicontent_html::getToolTip('FLEXI_
 $r = 0;
 ?>
 
+
+<?php
+$jcookie = JFactory::getApplication()->input->cookie;
+$cookie_name = 'fc_active_TabSlideFilter';
+
+// filter in slider
+
+if ($disp_slide_filter)
+{
+	//$ff_slider_id =
+	//	($module->id     ? '_module_' . $module->id : '')
+		;
+	//$ff_toggle_search_title = JText::_($params->get('ff_toggle_search_title', 'FLEXI_TOGGLE_SEARCH_FORM'));
+	$ff_slider_tagid = 'menu-sliders-filter';
+
+	$active_slides = $jcookie->get($cookie_name, '{}', 'string');
+
+	try
+	{
+		$active_slides = json_decode($active_slides);
+	}
+	catch (Exception $e)
+	{
+		$jcookie->set($cookie_name, '{}', time()+60*60*24*(365*5), JUri::base(true), '');
+	}
+
+	$last_active_slide = isset($active_slides->$ff_slider_tagid) ? $active_slides->$ff_slider_tagid : null;
+}
+?>
+
+
+
 <?php if ($column_display == 1): ?>
 <div class="col-search span3 "> 
 <?php endif; ?>
@@ -314,7 +346,7 @@ $r = 0;
 				}
 				$prepend_onchange = ''; //" adminFormPrepare(document.getElementById('".$form_id."'), 1); ";
 				if ($disp_slide_filter){
-				echo JHtml::_('bootstrap.startAccordion','menu-sliders-filter', 'accordion');
+				echo JHtml::_('bootstrap.startAccordion','menu-sliders-filter', array('active' => $last_active_slide));
 				}
 				foreach($this->filters as $filt) {
 					if (empty($filt->html)) continue;
@@ -539,4 +571,48 @@ $js .= '
 	';
 $document = JFactory::getDocument();
 $document->addScriptDeclaration($js);
+?>
+<?php
+// FORM in slider
+if ($disp_slide_filter)
+{
+	JFactory::getDocument()->addScriptDeclaration("
+	(function($) {
+		$(document).ready(function ()
+		{
+			$('#" . $ff_slider_tagid ."').on('shown', function ()
+			{
+				var active_slides = fclib_getCookie('" . $cookie_name ."');
+				try { active_slides = JSON.parse(active_slides); } catch(e) { active_slides = {}; }
+
+				active_slides['" . $ff_slider_tagid ."'] = $('#" . $ff_slider_tagid ." .in').attr('id');
+				fclib_setCookie('" . $cookie_name ."', JSON.stringify(active_slides), 7);
+				//window.console.log(JSON.stringify(active_slides));
+			});
+
+			$('#" . $ff_slider_tagid ."').on('hidden', function ()
+			{
+				var active_slides = fclib_getCookie('" . $cookie_name ."');
+				try { active_slides = JSON.parse(active_slides); } catch(e) { active_slides = {}; }
+
+				active_slides['" . $ff_slider_tagid ."'] = null;
+				fclib_setCookie('" . $cookie_name ."', JSON.stringify(active_slides), 7);
+				//window.console.log(JSON.stringify(active_slides));
+			});
+
+			var active_slides = fclib_getCookie('" . $cookie_name ."');
+			try { active_slides = JSON.parse(active_slides); } catch(e) { active_slides = {}; }
+
+			if (!!active_slides['" . $ff_slider_tagid ."'])
+			{
+				// Hide default active slide
+				$('#" . $ff_slider_tagid ." .collapse').removeClass('in');
+
+				// Show the last active slide
+				$('#' + active_slides['" . $ff_slider_tagid ."']).addClass('in');
+			}
+		});
+	})(jQuery);
+	");
+}
 ?>
