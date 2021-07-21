@@ -10,6 +10,8 @@ $search_autocomplete = $this->params->get( 'search_autocomplete', 1 );
 $show_searchphrase = $this->params->get('show_searchphrase', 1);
 $default_searchphrase = $this->params->get('default_searchphrase', 'all');
 
+$disp_slide_filter = $this->params->get('disp_slide_filter', 0);
+
 $show_searchordering = $this->params->get('show_searchordering', 1);
 $default_searchordering = $this->params->get('default_searchordering', 'newest');
 
@@ -311,12 +313,21 @@ $r = 0;
 				<?php
 				}
 				$prepend_onchange = ''; //" adminFormPrepare(document.getElementById('".$form_id."'), 1); ";
+				if ($disp_slide_filter){
+				echo JHtml::_('bootstrap.startAccordion','menu-sliders-filter', 'accordion');
+				}
 				foreach($this->filters as $filt) {
 					if (empty($filt->html)) continue;
 					$label = JText::_($filt->label);
 					$descr = JText::_($filt->description);
 					?>
+					
 					<li class="fc_search_row_<?php echo (($r++)%2);?>">
+					
+					<?php 
+					if ($disp_slide_filter){
+					echo JHtml::_('bootstrap.addSlide','menu-sliders-filter' , $label, $filt->id);
+					}  ?>
 						<div class="fc_search_label_cell">
 						<?php if ($descr) : ?>
 							<label for="filter_<?php echo $filt->id; ?>" class=" <?php echo $tooltip_class; ?>" title="<?php echo flexicontent_html::getToolTip($label, $descr, 0); ?>">
@@ -338,12 +349,17 @@ $r = 0;
 								<?php echo $filt->html; ?>
 							</div>
 						</div>
+						<?php if ($disp_slide_filter){
+							echo JHtml::_('bootstrap.endSlide');
+						 } ?>
+						
 					</li>
 					
+					
 				<?php } ?>
+				<?php //echo JHtml::_('bootstrap.endAccordion'); ?>
 				</ul>
-				</div>
-				
+				</div>	
 			</fieldset>
 			
 		<?php endif; ?>
