@@ -167,6 +167,10 @@
 				<option value="2">FLEXI_INSIDE_FILTER</option>
 			</field>
 			<field name="initial_filters" default="" type="textarea" rows="5" cols="32" label="FLEXI_INITIAL_FILTER_VALUES" description="FLEXI_INITIAL_FILTER_VALUES_DESC" class="usefilters input-xxlarge"/>
+			<field name="fc_filter_in_slide" type="radio" default="0" label="FLEXI_FILTER_IN_SLIDE" description="FLEXI_FILTER_IN_SLIDE_DESC" class="btn-group">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
 
 			<field name="" type="separator" default="FLEXI_FILTER_ENCLOSING" level="level2" class="usefilters" />
 			<field name="filter_placement" type="radio" default="1" label="FLEXI_ONE_RECORD_PER_ROW" description="FLEXI_ONE_RECORD_PER_ROW_DESC" class="usefilters btn-group">

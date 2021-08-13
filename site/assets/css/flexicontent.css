@@ -5327,3 +5327,58 @@ div.fc-field-box {
 	padding-left: 28px;
 	background: url(../images/calendar-select-days-span.png) 6px 50% no-repeat lightskyblue;
 }
+#flexicontent .item_total .fc_clayout_box fieldset {
+	display: block;
+}
+.fc_clayout_box {
+	float: right !important;
+}
+.fc_clayout_selector input {
+	position: absolute !important;
+	opacity: 0;
+}
+.gf_container .controls .ss-controls a {
+	border: none !important;
+}
+.gf_container .controls .ss-controls .play,
+.gf_container .controls .ss-controls .pause {
+	color: white !important;
+	border-radius: 3px !important;
+	padding: 0.5em 0.5em !important;
+}
+.gf_container .controls .ss-controls .play {
+	background-color: 46A 546 !important;
+}
+.gf_container .controls .ss-controls .pause {
+	background-color: #545454 !important;
+}
+.gf_container .icon-play-circle,
+.gf_container .icon-pause-circle {
+	padding-top: 3px !important;
+}
+div.gf_container div.slideshow img {
+	border: 0px solid #ccc !important;
+}
+div.gf_container > div.navigation > ul.thumbs > li {
+	border: 0 !important;
+}
+div.gf_container > div.navigation:not(.no_pagination) {
+	border: 0;
+}
+.top-search #menu-sliders-filter,
+.fc_filter_box {
+	display: flex;
+}
+.top-search #menu-sliders-filter .collapse,
+.fccategory .fc_filter_box .collapse {
+	position: absolute;
+	z-index: 5;
+}
+.top-search #menu-sliders-filter .accordion-inner,
+.fccategory .fc_filter_box .accordion-inner {
+	border: 1px solid #e5e5e5;
+	background: #fff;
+}
+.fcfilter_form_component .accordion-group {
+	display: inline-block;
+}
