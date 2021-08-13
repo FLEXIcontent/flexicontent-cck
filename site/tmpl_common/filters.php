@@ -18,6 +18,7 @@ $flexi_button_class_reset =  ($params->get('flexi_button_class_reset','') != '-1
 
 $filters_in_lines = $filter_placement==1 || $filter_placement==2;
 $filters_in_tabs  = $filter_placement==3;
+$filters_in_slide = $params->get('fc_filter_in_slide', 1);
 $filter_container_class  = $filters_in_lines ? 'fc_filter_line' : 'fc_filter';
 $filter_container_class .= $filter_placement==2 ? ' fc_clear_label' : '';
 
@@ -252,7 +253,17 @@ if ( $use_search || $use_filters ) : /* BOF search and filters block */
 					/* Optional TAB start and filter label as TAB title */
 					($filters_in_tabs ? '
 					<div class="tabbertab" id="fcform_tabset_'.$_filter_TABsetCnt.'_tab_'.($tabSetCnt++).'" >
-						<h3 class="tabberheading ' . $filter_label_class . '">' . $filt_lbl . (!$is_empty ? ' *' : '') . '</h3>' : '')
+						<h3 class="tabberheading ' . $filter_label_class . '">' . $filt_lbl . (!$is_empty ? ' *' : '') . '</h3>' : '').
+
+					($filters_in_slide ? '
+						<div class="accordion-group">
+							<div class="accordion-heading">
+								<strong><a href="#'.$filt->id.'" data-toggle="collapse" class="accordion-toggle collapsed">' . $filt_lbl . '</a></strong></div>
+									<div class="accordion-body collapse" id="'.$filt->id.'">
+										<div class="accordion-inner">
+												' : '')
+
+						
 
 						/* External filter container */.'
 						<div class="'.$filter_container_class.$even_odd_class . (!$is_empty ? ' active' : '' ) . ' fc_filter_id_'.$filt->id.'" >'.
@@ -269,6 +280,12 @@ if ( $use_search || $use_filters ) : /* BOF search and filters block */
 						</div>
 					'.
 
+					($filters_in_slide ? '
+									</div>
+							</div>
+					</div>
+					' : '').
+					
 					/* Optional TAB end */
 					($filters_in_tabs ? '
 					</div>' : '').'

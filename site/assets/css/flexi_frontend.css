@@ -1188,3 +1188,20 @@ div.gf_container > div.navigation > ul.thumbs > li {
 div.gf_container > div.navigation:not(.no_pagination) {
 	border: 0;
 }
+.top-search #menu-sliders-filter,
+.fc_filter_box {
+	display: flex;
+}
+.top-search #menu-sliders-filter .collapse,
+.fccategory .fc_filter_box .collapse {
+	position: absolute;
+	z-index: 5;
+}
+.top-search #menu-sliders-filter .accordion-inner,
+.fccategory .fc_filter_box .accordion-inner {
+	border: 1px solid #e5e5e5;
+	background: #fff;
+}
+.fcfilter_form_component .accordion-group {
+	display: inline-block;
+}
