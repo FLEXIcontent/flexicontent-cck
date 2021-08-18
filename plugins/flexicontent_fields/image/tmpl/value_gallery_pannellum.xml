@@ -19,45 +19,15 @@
 			<field name="PPFX_vp_max_height" type="int" default="50" label="Max Height (%)" description="Max Height of inline viewer (as a percentage of window height). Enter a number 20 to 95" />
 			<field name="PPFX_vp_max_height" type="int" default="50" label="Max Height (%)" description="Max Height of inline viewer (as a percentage of window height). Enter a number 20 to 95" />
 
-<field name="" type="separator" default="FLEXI_HOTS_SPOTS_TITLE" level="level1" />
-			<field
-	name="hotspot"
-	type="subform"
-	label="FLEXI_HOT_SPOTS_LABEL"
-	description="FLEXI_HOT_SPOTS_DESC"
-	multiple="true"
-	min="1"
-	max="100"
-	>
-	<form>
-		<field
-			name="pitch"
-			type="number"
-			label="FLEXI_HOTS_SPOTS_PITCH"
-			description="FLEXI_HOTS_SPOTS_PITCH_DESC"
-			/>
-			<field
-			name="yaw"
-			type="number"
-			label="FLEXI_HOTS_SPOTS_YAW"
-			description="FLEXI_HOTS_SPOTS_YAW_DESC"
-			/>
-		<field
-			name="hot_spot_text"
-			type="textarea"
-			label="FLEXI_HOTS_SPOTS_TEXT"
-			cols="40"
-			rows="8"
-			description="FLEXI_HOTS_SPOTS_TEXT_DESC"
-			/>
-			<field
-			name="hot_spot_url"
-			type="url"
-			label="FLEXI_HOTS_SPOTS_URL"
-			description="FLEXI_HOTS_SPOTS_URL_DESC"
-			/>
-	</form>
-</field>
+			<!--field name="" type="separator" default="FLEXI_HOTS_SPOTS_TITLE" level="level1" />
+			<field name="hotspot" type="subform" label="FLEXI_HOT_SPOTS_LABEL" description="FLEXI_HOT_SPOTS_DESC" multiple="true" min="1" max="100" >
+				<form>
+					<field name="pitch" type="number" label="FLEXI_HOTS_SPOTS_PITCH" description="FLEXI_HOTS_SPOTS_PITCH_DESC" />
+					<field name="yaw" type="number" label="FLEXI_HOTS_SPOTS_YAW" description="FLEXI_HOTS_SPOTS_YAW_DESC" />
+					<field name="hot_spot_text" type="textarea" label="FLEXI_HOTS_SPOTS_TEXT" cols="40" rows="8" description="FLEXI_HOTS_SPOTS_TEXT_DESC" />
+					<field name="hot_spot_url" type="url" label="FLEXI_HOTS_SPOTS_URL" description="FLEXI_HOTS_SPOTS_URL_DESC" />
+				</form>
+			</field-->
 
 			<field name="" type="separator" default="FLEXI_PREVIEW_THUMBNAILS" level="level1" />
 
