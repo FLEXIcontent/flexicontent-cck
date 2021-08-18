@@ -47,7 +47,7 @@ class FlexicontentTasksCore
 		if (!defined('FLEXI_J40GE'))
 		{
 			$jversion = new JVersion;
-			define('FLEXI_J40GE', version_compare( $jversion->getShortVersion(), '3.9.99', 'g' ) );
+			define('FLEXI_J40GE', version_compare( $jversion->getShortVersion(), '3.99.99', 'g' ) );
 		}
 
 		if (!FLEXI_J40GE)
@@ -205,8 +205,8 @@ class FlexicontentTasksCore
 		if ($filtercat)
 		{
 			$lta = 'i';
-			//$lang_where .= ' AND ( '.$lta.'.language LIKE ' . $db->Quote( $lang .'%' ) . ' OR '.$lta.'.language="*" ) ';
-			$lang_where .= ' AND (' . $lta . ' .language = ' . $db->Quote(JFactory::getLanguage()->getTag()) . ' OR ' . $lta . '.language = ' . $db->Quote('*') . ')';
+			$lang_where .= ' AND (' . $lta . '.language LIKE ' . $db->Quote( $lang .'%' ) . ' OR ' . $lta . '.language="*" ) ';
+			//$lang_where .= ' AND (' . $lta . '.language = ' . $db->Quote(JFactory::getLanguage()->getTag()) . ' OR ' . $lta . '.language = ' . $db->Quote('*') . ')';
 		}
 
 		$access_where = '';
