@@ -75,33 +75,38 @@ foreach ($values as $n => $value)
 	$w = isset($value['size_w_' . $SIZE]) ? $value['size_w_' . $SIZE] : $field->parameters->get('w_' . $SIZE, self::$default_widths[$size]);
 	$h = isset($value['size_h_' . $SIZE]) ? $value['size_h_' . $SIZE] : $field->parameters->get('h_' . $SIZE, self::$default_heights[$size]);
 	
-	//check hotspot list
-	$hots_spots_list = 1;
-	if ($hots_spots_list =1){
-	$hots_spots_list="
-	\"hotSpots\": [
+	// TODO: Check if this feature will be implemented (Params commented out in XML file too)
+	$hots_spots_list = 0;
+
+	if ($hots_spots_list === 1)
 	{
-		\"pitch\": 14.1,
-		\"yaw\": 1.5,
-		\"type\": \"info\",
-		\"text\": \"Baltimore Museum of Art\",
-		\"URL\": \"https://artbma.org/\"
-	},
-	{
-		\"pitch\": -9.4,
-		\"yaw\": 222.6,
-		\"type\": \"info\",
-		\"text\": \"Art Museum Drive\"
-	},
-	{
-		\"pitch\": -0.9,
-		\"yaw\": 144.4,
-		\"type\": \"info\",
-		\"text\": \"North Charles Street\"
+		$hots_spots_list = "
+		\"hotSpots\": [
+			{
+				\"pitch\": 14.1,
+				\"yaw\": 1.5,
+				\"type\": \"info\",
+				\"text\": \"Baltimore Museum of Art\",
+				\"URL\": \"https://artbma.org/\"
+			},
+			{
+				\"pitch\": -9.4,
+				\"yaw\": 222.6,
+				\"type\": \"info\",
+				\"text\": \"Art Museum Drive\"
+			},
+			{
+				\"pitch\": -0.9,
+				\"yaw\": 144.4,
+				\"type\": \"info\",
+				\"text\": \"North Charles Street\"
+			}
+		]
+		";
 	}
-]
-	";}else{
-		$hots_spots_list="";
+	else
+	{
+		$hots_spots_list = '';
 	}
 
 	$img_legend_custom = '
