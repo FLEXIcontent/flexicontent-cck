@@ -1570,7 +1570,9 @@ class FlexicontentViewItem extends JViewLegacy
 			}
 			else
 			{
-				$cid_tree = & $categories;
+				$cid_tree = flexicontent_cats::getCategoriesTree($published_only=1, $parent_id=0, $depth_limit=0);
+				// Commented out to get a titles translated and also get the description texts too
+				//$cid_tree = & $categories;
 				$disabled_cats = array();
 			}
 
@@ -1619,8 +1621,12 @@ class FlexicontentViewItem extends JViewLegacy
 		{
 			$catid_tree = flexicontent_cats::getCategoriesTree($published_only=1, $parent_id=$page_params->get('catid_allowed_parent'), $depth_limit=0);
 			$disabled_cats = $page_params->get('catid_allowed_parent_disable', 1) ? array($page_params->get('catid_allowed_parent')) : array();
-		} else {
-			$catid_tree = & $categories;
+		}
+		else
+		{
+			$catid_tree = flexicontent_cats::getCategoriesTree($published_only=1, $parent_id=0, $depth_limit=0);
+			// Commented out to get a titles translated and also get the description texts too
+			//$catid_tree = & $categories;
 			$disabled_cats = array();
 		}
 
