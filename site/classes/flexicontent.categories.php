@@ -261,6 +261,8 @@ class flexicontent_cats
 				$list[$id] = $v;
 				$list[$id]->treename  = "$indent$txt";
 				$list[$id]->title     = $v->title;
+				$list[$id]->description    = $v->description;
+				
 				//$list[$id]->slug      = $v->slug;
 				//$list[$id]->access    = $v->access;
 				$list[$id]->ancestors = $ancestors;
@@ -516,7 +518,14 @@ class flexicontent_cats
 				if ($cat->id)
 				{
 					$arr = $globalcats[$cat->id]->ancestorsarray;
-					$parent_title = count($arr) > 1 ?  $globalcats[$arr[count($arr) - 2]]->title : '';
+					if (!empty($cat->description))
+					{
+						$parent_title = flexicontent_html::striptagsandcut($cat->description, 200);
+					}
+					else
+					{
+						$parent_title = count($arr) > 1 ? $globalcats[$arr[count($arr) - 2]]->title . '/' . $cat->title : '';
+					}
 					$parent_title = htmlspecialchars($parent_title, ENT_COMPAT, 'UTF-8');
 				}
 
@@ -554,6 +563,7 @@ class flexicontent_cats
 			'<div class="alert alert-error">'.$empty_errmsg.'</div>' :
 			JHtml::_('select.genericlist', $catlist, $name, $sg_options )  // $catlist, $name, $attribs, 'value', 'text', $selected, $idtag )
 			;
+		//echo '<pre>'; print_r($catlist); exit;
 
 		// Restore first category element
 		if ($top == 3)

@@ -1534,7 +1534,7 @@
 			function fc_formatSel2Option(item)
 			{
 				var data_title = jQuery(item.element).attr('data-title');
-				return !data_title ? item.text : "<div title='Parent : " + data_title + "'>" + item.text + "</div>";
+				return !data_title ? item.text : "<div title='" + data_title + "'>" + item.text + "</div>";
 			}
 
 			var sel_EL = jQuery(this);
