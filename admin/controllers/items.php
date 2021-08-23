@@ -207,7 +207,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 
 			if ($menu)
 			{
-				$params->merge($menu->params);
+				$params->merge($menu->getParams());
 			}
 
 			// Get some needed parameters

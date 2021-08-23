@@ -339,7 +339,7 @@ class FLEXIcontentModelSearch extends JModelLegacy
 		// Merge the active menu parameters
 		if ($menu)
 		{
-			$params->merge($menu->params);
+			$params->merge($menu->getParams());
 		}
 
 		$this->_params = $params;
