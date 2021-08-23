@@ -2339,7 +2339,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		$app  = JFactory::getApplication();
 		$menu = $app->getMenu()->getActive();     // Retrieve active menu item
 		if ($menu)
-			$menu_params = FLEXI_J16GE ? $menu->params : new JParameter($menu->params);  // Get active menu item parameters
+			$menu_params = $menu->getParams();
 
 		// a. Clone component parameters ... we will use these as parameters base for merging
 		$compParams = clone(JComponentHelper::getComponent('com_flexicontent')->params);     // Get the COMPONENT only parameters

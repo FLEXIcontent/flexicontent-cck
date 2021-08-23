@@ -433,7 +433,7 @@ switch ($view)
 			$tagid_ok    = $layout !== 'tags'   || empty($menu->query['tagid'])    || ((int) $tagid     == (int) (isset($menu->query['tagid']) ? $menu->query['tagid'] : 0));
 
 			// (a) override is enabled in the menu or (b) category Layout is 'myitems' or 'favs' or 'tags' or 'mcats' which has no default parameters
-			$overrideconf = $menu->params->get('override_defaultconf', 0) || in_array($layout, array('myitems', 'favs', 'mcats', 'tags'));
+			$overrideconf = $menu->getParams()->get('override_defaultconf', 0) || in_array($layout, array('myitems', 'favs', 'mcats', 'tags'));
 			$menu_matches = $view_ok && $cid_ok && $layout_ok && $authorid_ok && $tagid_ok;
 
 			if ($menu_matches && $layout === 'mcats')

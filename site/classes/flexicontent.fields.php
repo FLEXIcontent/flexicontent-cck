@@ -961,9 +961,11 @@ class FlexicontentFields
 		if (!$_initialize)
 		{
 			// Include com_content helper files, these are needed by some content plugins
-			require_once (JPATH_SITE.DS.'components'.DS.'com_content'.DS.'helpers'.DS.'route.php');
 			FLEXI_J40GE
-				? require_once (JPATH_SITE.DS.'components'.DS.'com_content'.DS.'Helper'.DS.'QueryHelper.php')
+				? require_once (JPATH_SITE.DS.'components'.DS.'com_content'.DS.'src'.DS.'Helper'.DS.'RouteHelper.php')
+				: require_once (JPATH_SITE.DS.'components'.DS.'com_content'.DS.'helpers'.DS.'route.php');
+			FLEXI_J40GE
+				? require_once (JPATH_SITE.DS.'components'.DS.'com_content'.DS.'src'.DS.'Helper'.DS.'QueryHelper.php')
 				: require_once (JPATH_SITE.DS.'components'.DS.'com_content'.DS.'helpers'.DS.'query.php');
 
 			// some request and other variables

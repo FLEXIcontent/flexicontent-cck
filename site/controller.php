@@ -240,7 +240,7 @@ class FlexicontentController extends JControllerLegacy
 
 			if ($menu)
 			{
-				$params->merge($menu->params);
+				$params->merge($menu->getParams());
 			}
 
 			// Get some needed parameters

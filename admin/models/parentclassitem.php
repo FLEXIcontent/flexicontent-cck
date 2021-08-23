@@ -3828,7 +3828,7 @@ class ParentClassItem extends FCModelAdmin
 		// MENU ITEM matched, merge parameters and use its page heading (but use menu title if the former is not set)
 		if ( $this->menu_matches )
 		{
-			$params->merge($menu->params);
+			$params->merge($menu->getParams());
 			$default_heading = $menu->title;
 
 			// Cross set (show_) page_heading / page_title for compatibility of J2.5+ with J1.5 template (and for J1.5 with J2.5 template)

@@ -164,7 +164,7 @@ if ($mcats_selection)
 		{
 			$menu_params = new JRegistry();   // Empty parameters object
 			$menu_params->merge( JComponentHelper::getComponent('com_flexicontent')->params );   // Merge component parameters
-			$menu_params->merge($mcats_menu->params);   // Merge menu parameters
+			$menu_params->merge($mcats_menu->getParams());   // Merge menu parameters
 		}
 	}
 

@@ -81,7 +81,7 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 		if ( $menu ) {
 			$view_ok     = 'flexicontent' == @$menu->query['view'];
 			$menu_matches = $view_ok;
-			//$menu_params = FLEXI_J16GE ? $menu->params : new JParameter($menu->params);  // Get active menu item parameters
+			//$menu_params = $menu->getParams();
 		} else {
 			$menu_matches = false;
 		}
@@ -155,10 +155,10 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 		
 		// Overwrite with menu META data if menu matched
 		if ($menu_matches) {
-			if (($_mp=$menu->params->get('menu-meta_description')))  $document->setDescription( $_mp );
-			if (($_mp=$menu->params->get('menu-meta_keywords')))     $document->setMetadata('keywords', $_mp);
-			if (($_mp=$menu->params->get('robots')))                 $document->setMetadata('robots', $_mp);
-			if (($_mp=$menu->params->get('secure')))                 $document->setMetadata('secure', $_mp);
+			if (($_mp=$menu->getParams()->get('menu-meta_description')))  $document->setDescription( $_mp );
+			if (($_mp=$menu->getParams()->get('menu-meta_keywords')))     $document->setMetadata('keywords', $_mp);
+			if (($_mp=$menu->getParams()->get('robots')))                 $document->setMetadata('robots', $_mp);
+			if (($_mp=$menu->getParams()->get('secure')))                 $document->setMetadata('secure', $_mp);
 		}
 		
 		// Add feed link

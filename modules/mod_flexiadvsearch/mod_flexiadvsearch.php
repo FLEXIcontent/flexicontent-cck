@@ -224,7 +224,7 @@ if ($itemid)
 	$params->merge(JComponentHelper::getComponent('com_flexicontent')->params);
 	/*if ($menu)
 	{
-		$params->merge($menu->params);
+		$params->merge($menu->getParams());
 	}*/
 }
 
