@@ -25,7 +25,7 @@ require_once('base/traitnestable.php');
  */
 if (FLEXI_J40GE)
 {
-	require_once(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_users'.DS.'Model'.DS.'GroupsModel.php');
+	require_once(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_users'.DS.'src'.DS.'Model'.DS.'GroupsModel.php');
 
 	class _FlexicontentModelGroups extends Joomla\Component\Users\Administrator\Model\GroupsModel
 	{

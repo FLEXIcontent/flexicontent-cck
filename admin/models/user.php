@@ -18,7 +18,7 @@ jimport('legacy.model.admin');
 
 if (FLEXI_J40GE)
 {
-	require_once(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_users'.DS.'Model'.DS.'UserModel.php');
+	require_once(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_users'.DS.'src'.DS.'Model'.DS.'UserModel.php');
 	class _FlexicontentModelUser extends Joomla\Component\Users\Administrator\Model\UserModel {}
 }
 else
