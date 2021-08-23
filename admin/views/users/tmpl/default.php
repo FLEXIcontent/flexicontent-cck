@@ -463,7 +463,7 @@ if ($js)
 			</td>
 
 			<td class="center col_status">
-				<a href="javascript:void(0);" onclick="return listItemTask('cb<?php echo $i;?>','<?php echo $block_task;?>')">
+				<a href="javascript:void(0);" onclick="return Joomla.listItemTask('cb<?php echo $i;?>','<?php echo $block_task;?>')">
 					<img src="images/<?php echo $block_img;?>" class="<?php echo $this->tooltip_class; ?> fc-man-icon-s" width="16" height="16" style="border:0;" title="<?php echo $block_title; ?>" alt="<?php echo $block_title; ?>" />
 				</a>
 			</td>

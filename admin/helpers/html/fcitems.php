@@ -159,7 +159,7 @@ abstract class JHtmlFcitems extends JHtmlFcbase
 
 		return $row->canEditState && $row->canCheckin
 			? '
-			<a href="javascript:;" onclick="return listItemTask(\'cb' . $i . '\',\'' . $state[1] . '\')" class="featured ntxt ' . static::$btn_sm_class . ' ' . static::$btn_mbar_class . ' ' . static::$tooltip_class
+			<a href="javascript:;" onclick="return Joomla.listItemTask(\'cb' . $i . '\',\'' . $state[1] . '\')" class="featured ntxt ' . static::$btn_sm_class . ' ' . static::$btn_mbar_class . ' ' . static::$tooltip_class
 				. ($value == 1 ? ' active' : '') . '" title="' . $state[3] . '">
 				<span class="icon-' . $state[0] . '"></span>
 			</a>
