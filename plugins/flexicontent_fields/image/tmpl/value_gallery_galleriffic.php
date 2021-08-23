@@ -28,10 +28,18 @@ foreach ($values as $n => $value)
 	if ($result === _FC_CONTINUE_) continue;
 	if ($result === _FC_BREAK_) break;
 
+
+	$size_w_s = isset($value['size_w_s']) ? $value['size_w_s'] : 0;
+	$size_h_s = isset($value['size_h_s']) ? $value['size_h_s'] : 0;
+	$size_w_m = isset($value['size_w_m']) ? $value['size_w_m'] : 0;
+	$size_h_m = isset($value['size_h_m']) ? $value['size_h_m'] : 0;
+	$size_w_l = isset($value['size_w_l']) ? $value['size_w_l'] : 0;
+	$size_h_l = isset($value['size_h_l']) ? $value['size_h_l'] : 0;
+
 	$group_str = $group_name ? 'data-fancybox="' . $group_name . '"' : '';
 
 	$field->{$prop}[] =
-		'<a class="thumb" name="drop" href="'.JUri::root(true).'/'.$srcl.'" data-width="' . $value['size_w_l'] . '" data-height="' . $value['size_h_l'] . '" title="' . $title_encoded . '">
+		'<a class="thumb" name="drop" href="'.JUri::root(true).'/'.$srcl.'" data-width="' . $size_w_l . '" data-height="' . $size_h_l . '" title="' . $title_encoded . '">
 			'.$img_legend.'
 		</a>
 		<a class="gf_fancybox" href="'.JUri::root(true).'/'.$srcl.'" data-title="' . $title_encoded . '" data-caption="' . $desc_encoded . '"' . $group_str . '
