@@ -333,7 +333,7 @@ class plgFlexicontent_fieldsAddressint extends FCField
 
 			if (!$ac_types_default)
 			{
-				$conf_ops[] = 'type:[\'' . implode(array_filter($ac_type_allowed_list), "', '") . '\']';
+				$conf_ops[] = 'type:[\'' . implode("', '", array_filter($ac_type_allowed_list)) . '\']';
 			}
 			else
 			{
