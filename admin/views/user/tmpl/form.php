@@ -524,7 +524,9 @@ $this->document->addScriptDeclaration($js);
 
 							<div class="fc-sliders-plain-outer">
 								<?php
-								echo JHtml::_('sliders.start','theme-sliders-'.$this->form->getValue("id"), array('useCookie'=>1,'show'=>1));
+								$slider_set_id = 'theme-sliders-'.$this->form->getValue("id");
+								//echo JHtml::_('sliders.start','theme-sliders-'.$this->form->getValue("id"), array('useCookie'=>1,'show'=>1));
+								echo JHtml::_('bootstrap.startAccordion', $slider_set_id, array(/*'active' => ''*/));
 								$groupname = 'attribs';  // Field Group name this is for name of <fields name="..." >
 								$cat_layout = $this->params_authorcat->get('clayout');
 
@@ -532,7 +534,8 @@ $this->document->addScriptDeclaration($js);
 
 									$form_layout = $tmpl->params;
 									$label = JText::_( 'FLEXI_PARAMETERS_THEMES_SPECIFIC' ) . ' : ' . $tmpl->name;
-									echo JHtml::_('sliders.panel', $label, $tmpl->name.'-'.$groupname.'-options');
+									//echo JHtml::_('sliders.panel', $label, $tmpl->name.'-'.$groupname.'-options');
+									echo JHtml::_('bootstrap.addSlide', $slider_set_id, $label, $slider_id = $tmpl->name.'-'.$groupname.'-options');
 
 									if (!$cat_layout || $tmpl->name != $cat_layout) continue;
 
@@ -603,7 +606,10 @@ $this->document->addScriptDeclaration($js);
 									<?php endforeach; //fieldSets ?>
 								<?php endforeach; //tmpls ?>
 
-								<?php echo JHtml::_('sliders.end'); ?>
+								<?php
+								//echo JHtml::_('sliders.end');
+								echo JHtml::_('bootstrap.endSlide');
+								?>
 
 							</div><!-- class="fc-sliders-plain-outer" -->
 
