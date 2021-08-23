@@ -638,7 +638,7 @@ if ($js)
 
 			<td class="col_access hidden-phone">
 				<?php echo $row->canEdit
-					? flexicontent_html::userlevel('access['.$row->id.']', $row->access, 'onchange="return listItemTask(\'cb'.$i.'\',\''.$ctrl.'access\')"')
+					? flexicontent_html::userlevel('access['.$row->id.']', $row->access, 'onchange="return Joomla.listItemTask(\'cb'.$i.'\',\''.$ctrl.'access\')"')
 					: $this->escape($row->access_level);
 				?>
 			</td>

@@ -292,7 +292,7 @@ abstract class JHtmlFcfields extends JHtmlFcbase
 		if ($supportsearch && $row->canEdit)
 		{
 			$icon	= '
-			<a title="Toggle property" class="btn btn-small" onclick="document.adminForm.propname.value=\'issearch\'; return listItemTask(\'cb' . $i . '\',\'toggleprop\')" href="javascript:void(0);"
+			<a title="Toggle property" class="btn btn-small" onclick="document.adminForm.propname.value=\'issearch\'; return Joomla.listItemTask(\'cb' . $i . '\',\'toggleprop\')" href="javascript:void(0);"
 				>' . $icon . '</a>';
 		}
 
@@ -306,7 +306,7 @@ abstract class JHtmlFcfields extends JHtmlFcbase
 		if ($supportfilter && $row->canEdit)
 		{
 			$icon	= '
-			<a title="Toggle property" class="btn btn-small" onclick="document.adminForm.propname.value=\'isfilter\'; return listItemTask(\'cb' . $i . '\',\'toggleprop\')" href="javascript:void(0);"
+			<a title="Toggle property" class="btn btn-small" onclick="document.adminForm.propname.value=\'isfilter\'; return Joomla.listItemTask(\'cb' . $i . '\',\'toggleprop\')" href="javascript:void(0);"
 				>' . $icon . '</a>';
 		}
 		
@@ -320,7 +320,7 @@ abstract class JHtmlFcfields extends JHtmlFcbase
 		if ($supportadvsearch && $row->canEdit)
 		{
 			$icon	= '
-			<a title="Toggle property" class="btn btn-small" onclick="document.adminForm.propname.value=\'isadvsearch\'; return listItemTask(\'cb' . $i . '\',\'toggleprop\')" href="javascript:void(0);"
+			<a title="Toggle property" class="btn btn-small" onclick="document.adminForm.propname.value=\'isadvsearch\'; return Joomla.listItemTask(\'cb' . $i . '\',\'toggleprop\')" href="javascript:void(0);"
 				>' . $icon . '</a>';
 		}
 
@@ -333,7 +333,7 @@ abstract class JHtmlFcfields extends JHtmlFcbase
 		if ($supportadvfilter && $row->canEdit)
 		{
 			$icon	= '
-			<a title="Toggle property" class="btn btn-small" onclick="document.adminForm.propname.value=\'isadvfilter\'; return listItemTask(\'cb' . $i . '\',\'toggleprop\')" href="javascript:void(0);"
+			<a title="Toggle property" class="btn btn-small" onclick="document.adminForm.propname.value=\'isadvfilter\'; return Joomla.listItemTask(\'cb' . $i . '\',\'toggleprop\')" href="javascript:void(0);"
 				>' . $icon . '</a>';
 		}
 

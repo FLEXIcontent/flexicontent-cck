@@ -1111,7 +1111,7 @@ if ($js)
 					<td class="center hidden-phone">
 					<?php
 					echo $this->CanFiles && ($this->CanViewAllFiles || $user->id == $row->uploaded_by)
-						? flexicontent_html::userlevel('access[' . $row->id . ']', $row->access, 'onchange="return listItemTask(\'cb' . $i . '\',\'' . $ctrl . 'access\')"')
+						? flexicontent_html::userlevel('access[' . $row->id . ']', $row->access, 'onchange="return Joomla.listItemTask(\'cb' . $i . '\',\'' . $ctrl . 'access\')"')
 						: (strlen($row->access_level) ? $this->escape($row->access_level) : '-');
 					?>
 					</td>
@@ -1185,7 +1185,7 @@ if ($js)
 
 					<?php if ($isFilesElement) : /* Direct delete button for fileselement view */ ?>
 					<td>
-						<a class="btn btn-mini ntxt" href="javascript:;" onclick="if (confirm('<?php echo JText::_('FLEXI_SURE_TO_DELETE_FILE', true); ?>')) { return listItemTask('cb<?php echo $i; ?>','filemanager.remove'); }">
+						<a class="btn btn-mini ntxt" href="javascript:;" onclick="if (confirm('<?php echo JText::_('FLEXI_SURE_TO_DELETE_FILE', true); ?>')) { return Joomla.listItemTask('cb<?php echo $i; ?>','filemanager.remove'); }">
 							<span class="icon-remove" title="<?php echo JText::_('FLEXI_REMOVE'); ?>"></span>
 						</a>
 					</td>
@@ -1303,7 +1303,7 @@ if ($js)
 					<span class="btn fc-fileman-preview-btn icon-search" onclick="fman_zoom_thumb(event, this); return false;"></span>
 					'; ?>
 					<span class="btn fc-fileman-selection-mark icon-checkmark" id="_cb<?php echo $i; ?>" ></span>
-					<span class="btn fc-fileman-delete-btn icon-remove" onclick="if (confirm('<?php echo JText::_('FLEXI_SURE_TO_DELETE_FILE', true); ?>')) { document.adminForm.filename.value='<?php echo rawurlencode($row->filename);?>'; return listItemTask('cb<?php echo $i; ?>','filemanager.remove'); }"></span>
+					<span class="btn fc-fileman-delete-btn icon-remove" onclick="if (confirm('<?php echo JText::_('FLEXI_SURE_TO_DELETE_FILE', true); ?>')) { document.adminForm.filename.value='<?php echo rawurlencode($row->filename);?>'; return Joomla.listItemTask('cb<?php echo $i; ?>','filemanager.remove'); }"></span>
 					<span class="fc-fileman-filename-box"><?php echo $row->title_cut; ?></span>
 				</div>
 				<?php
