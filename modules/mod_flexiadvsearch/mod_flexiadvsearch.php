@@ -218,23 +218,14 @@ $itemid = $itemid_force ? (int) $params->get('itemid_force_value', 0)  :  0;
 
 if ($itemid)
 {
-	$new_params = new JRegistry();
-
-	// Merge COMPONENT parameters
-	$new_params->merge(JComponentHelper::getComponent('com_flexicontent')->params);
-
-	// Merge active menu parameters
-	$menu = $app->getMenu()->getItem($itemid);
-	if ($menu)
+	//$menu = $app->getMenu()->getItem($itemid);     // Retrieve active menu
+	
+	// Merge into module params (a) COMPONENT parameters, then (b) active menu parameters
+	$params->merge(JComponentHelper::getComponent('com_flexicontent')->params);
+	/*if ($menu)
 	{
-		$new_params->merge($menu->params);
-	}
-
-	// Finally merge module params
-	$new_params->merge($params);
-
-	// Set new parameters as module's parameters
-	$params = $new_params;
+		$params->merge($menu->getParams());
+	}*/
 }
 
 // Render Layout
