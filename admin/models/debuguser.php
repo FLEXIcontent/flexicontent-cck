@@ -20,7 +20,7 @@ require_once JPATH_COMPONENT.'/helpers/debug.php';
  */
 if (FLEXI_J40GE)
 {
-	require_once(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_users'.DS.'Model'.DS.'DebugUserModel.php');
+	require_once(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_users'.DS.'src'.DS.'Model'.DS.'DebugUserModel.php');
 
 	class FlexicontentModelDebugUser extends Joomla\Component\Users\Administrator\Model\DebugUserModel
 	{
