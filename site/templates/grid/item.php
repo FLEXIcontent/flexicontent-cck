@@ -82,7 +82,7 @@ $microdata_itemtype_code = 'itemscope itemtype="http://schema.org/'.$microdata_i
 		<!-- EOF beforeDisplayContent -->
 	<?php endif; ?>
 	
-	<?php if (JRequest::getCmd('print')) : ?>
+	<?php if (JFactory::getApplication()->input->getInt('print')) : ?>
 		<!-- BOF Print handling -->
 		<?php if ($this->params->get('print_behaviour', 'auto') == 'auto') : ?>
 			<script type="text/javascript">jQuery(document).ready(function(){ window.print(); });</script>
@@ -108,7 +108,7 @@ $microdata_itemtype_code = 'itemscope itemtype="http://schema.org/'.$microdata_i
 			<!-- BOF buttons -->
 			<?php if ($this->params->get('btn_grp_dropdown')) : ?>
 			
-			<div class="buttons btn-">
+			<div class="buttons btn-group">
 			  <button type="button" class="btn dropdown-toggle" data-toggle="dropdown">
 			    <span class="<?php echo $this->params->get('btn_grp_dropdown_class', 'icon-options'); ?>"></span>
 			  </button>
@@ -498,7 +498,7 @@ $microdata_itemtype_code = 'itemscope itemtype="http://schema.org/'.$microdata_i
 	
 	<?php echo $mainAreaTag == 'section' ? '</article>' : ''; ?>
 	
-	<?php if ($this->params->get('comments') && !JRequest::getVar('print')) : ?>
+	<?php if ($this->params->get('comments') && !JFactory::getApplication()->input->getInt('print')) : ?>
 		<!-- BOF comments -->
 		<div class="comments ">
 		<?php

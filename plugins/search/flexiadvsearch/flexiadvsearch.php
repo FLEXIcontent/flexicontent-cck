@@ -722,21 +722,29 @@ class plgSearchFlexiadvsearch extends JPlugin
 
 		$catid = $jinput->getInt('cid', 0);
 		$cids = array();
-		if($catid) {
+
+		if ($catid)
+		{
 			$cids[] = $catid;
-			$query = "SELECT id,lft,rgt FROM `#__categories` WHERE id='".(int)$catid."';";
-			$db->setQuery($query);
-			if($cat = $db->loadObject()) {
-				$query = "SELECT sub.id FROM `#__categories` as sub WHERE sub.lft>='{$cat->lft}' AND sub.rgt<='{$cat->rgt}' AND published='1';";
-				$db->setQuery($query);
-				$subs = $db->loadColumn();
-				if(is_array($subs)) $cids=array_merge($cids, $subs);
+			$query = 'SELECT id,lft,rgt FROM `#__categories` WHERE id = ' . (int) $catid;
+
+			if ($cat = $db->setQuery($query)->loadObject())
+			{
+				$query = 'SELECT sub.id FROM `#__categories` as sub '
+					. ' WHERE sub.lft >= ' . (int) $cat->lft . ' AND sub.rgt <= ' . (int) $cat->rgt . ' AND published = 1 ';
+
+				$subs = $db->setQuery($query)->loadColumn();
+				if (is_array($subs))
+				{
+					$subs = ArrayHelper::toInteger($subs);
+					$cids = array_merge($cids, $subs);
+				}
 			}
 		}
 
 		// AND-WHERE sub-clauses ... (shared with filters)
 		$where_conf = ' WHERE 1 '
-			. (count($cids)>0?" AND i.catid IN ('".implode("','",$cids)."')":'')
+			. (count($cids) > 0 ? ' AND i.catid IN (' . implode(',', $cids) . ')' : '')
 			. ' AND i.state IN (1,-5'. ($search_archived ? ','.(FLEXI_J16GE ? 2:-1) :'' ) .') '
 			. ' AND c.published = 1 '
 			. ' AND ( i.publish_up = '.$db->Quote($nullDate).' OR i.publish_up <= '.$_nowDate.' )'
@@ -854,9 +862,7 @@ class plgSearchFlexiadvsearch extends JPlugin
 		//require_once(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'SqlFormatter'.DS.'SqlFormatter.php');
 		//echo str_replace('PPP_', '#__', SqlFormatter::format(str_replace('#__', 'PPP_', $query)))."<br/>";
 
-		$db->setQuery( $query_data );
-		$list = $db->loadObjectList();
-		if ($db->getErrorNum()) { echo $db->getErrorMsg(); }
+		$list = $db->setQuery($query_data)->loadObjectList();
 
 		if ( $print_logging_info ) @$fc_run_times['search_query_runtime'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 
@@ -920,7 +926,7 @@ class plgSearchFlexiadvsearch extends JPlugin
 		 * Create query CLAUSE for Text Search
 		 */
 
-		if ($text === null)
+		if (!strlen($text))
 		{
 			$q = $app->input->getString('q', '');
 			$q = $q !== parse_url(@$_SERVER["REQUEST_URI"], PHP_URL_PATH) ? $q : '';
@@ -965,7 +971,7 @@ class plgSearchFlexiadvsearch extends JPlugin
 
 		// Prefix the words for short word / stop words matching
 		$search_prefix = $this->_params->get('add_search_prefix') ? 'vvv' : '';
-		$text_np = trim($text);
+		$text_np = $text;
 		$text = preg_replace('/(\b[^\s,\.]+\b)/u', $search_prefix.'$0', $text_np);
 
 		// Split to words
@@ -1010,7 +1016,7 @@ class plgSearchFlexiadvsearch extends JPlugin
 					$words = flexicontent_db::removeInvalidWords($words, $stopwords, $shortwords, $si_tbl, 'search_index', $isprefix);
 				}
 
-				// TODO: Check this If using advanced search index we do not have stop words or too short words
+				// TODO: Check this if using advanced search index we do not have stop words or too short words
 				if ($si_tbl=='flexicontent_advsearch_index')
 				{
 					$words = array_merge($words, $stopwords, $shortwords);
@@ -1055,16 +1061,14 @@ class plgSearchFlexiadvsearch extends JPlugin
 
 				case 'all':
 					$nospace_languages = array('th-TH');
+
 					$is_nospace_language = in_array(JFactory::getLanguage()->getTag(), $nospace_languages);
 
-					if ($is_nospace_language)
-					{
-						$newtext = '+' . implode( ' +', $words ) . ''; // This is worked for Thai language.
-					}
-					else
-					{
-						$newtext = '+' . implode( '* +', $words ) . '*';  // This is not worked for Thai language.
-					}
+					// TODO check if not using the * for THAI is appropriate & needed
+					$newtext = $is_nospace_language
+						? '+' . implode( ' +', $words ) . ''  // This is worked for Thai language.
+						: '+' . implode( '* +', $words ) . '*';  // This is not worked for Thai language.
+
 					$escaped_text = $db->escape($newtext, true);
 					$quoted_text  = $db->Quote($escaped_text, false);
 
@@ -1075,11 +1079,14 @@ class plgSearchFlexiadvsearch extends JPlugin
 
 					if ($is_nospace_language)
 					{
-						$q = trim($original_text);
+						// Text nLH (no-Language-Handler, aka NO SPACES added to guess and seperate words)
+						$text_nLH = trim($original_text);  
+						$escaped_text_nLH = $db->escape($text_nLH, true);
+						$quoted_text_nLH  = $db->Quote($escaped_text_nLH, false);
 
-						$_index_match = " (MATCH (".$ts.".search_index) AGAINST (".$quoted_text." IN BOOLEAN MODE) OR i.title LIKE '%".trim($q)."%') ";
-						$_title_relev = " (MATCH (i.title) AGAINST (".$quoted_text_np." IN BOOLEAN MODE) OR i.title LIKE '%".trim($q)."%') ";
-						$_index_relev = " (MATCH (".$ts.".search_index) AGAINST (".$quoted_text." IN BOOLEAN MODE) OR i.title LIKE '%".trim($q)."%') ";
+						$_index_match = " (MATCH (".$ts.".search_index) AGAINST (".$quoted_text." IN BOOLEAN MODE) OR i.title LIKE '%".$quoted_text_nLH."%') ";
+						$_title_relev = " (MATCH (i.title) AGAINST (".$quoted_text_np." IN BOOLEAN MODE) OR i.title LIKE '%".$quoted_text_nLH."%') ";
+						$_index_relev = " (MATCH (".$ts.".search_index) AGAINST (".$quoted_text." IN BOOLEAN MODE) OR i.title LIKE '%".$quoted_text_nLH."%') ";
 					}
 					else
 					{

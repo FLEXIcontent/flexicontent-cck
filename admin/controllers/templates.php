@@ -85,9 +85,9 @@ class FlexicontentControllerTemplates extends FlexicontentControllerBaseAdmin
 		$ctrl_task = 'task=' . $this->record_name_pl . '.';
 		$original_task = $this->task;
 
-		$type    = $this->input->getWord('type',  'items');
-		$folder  = $this->input->getCmd('folder',  'default');
-		$cfgname = $this->input->getCmd('cfgname');
+		$type    = $this->input->getWord('type', 'items');
+		$folder  = $this->input->getString('folder', 'table');
+		$cfgname = $this->input->getString('cfgname');
 
 		$isnew = 0;
 
