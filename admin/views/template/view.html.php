@@ -23,22 +23,24 @@ class FlexicontentViewTemplate extends JViewLegacy
 	function display($tpl = null)
 	{
 		// Initialise variables
-		$app = JFactory::getApplication();
-		$option   = JRequest::getVar('option');
+		$app      = JFactory::getApplication();
+		$jinput   = $app->input;
+		$option   = $jinput->getCmd('option');
 		$db       = JFactory::getDbo();
 		$document = JFactory::getDocument();
 		$user     = JFactory::getUser();
 
 		$use_jquery_sortable = true;
-		$type    = JRequest::getVar('type',  'items', '', 'word');
-		$folder  = JRequest::getVar('folder',  'default', '', 'cmd');
-		$ismodal = JRequest::getVar('ismodal',  'default', '', 'int');
+
+		$type    = $jinput->getWord('type', 'items');
+		$folder  = $jinput->getString('folder', 'table');
+		$ismodal = $jinput->getInt('ismodal', 0);
 
 		//Get data from the model
 		$layout  = $this->get( 'Data');
 		if (!$layout)
 		{
-			$app->redirect('index.php?option=com_flexicontent', JText::_( 'Template not found: <b>' ).JRequest::getVar('folder',  'default', '', 'cmd').'</b>');
+			$app->redirect('index.php?option=com_flexicontent', JText::_( 'Template not found: <b>' ) . $jinput->getString('folder', 'table') . '</b>');
 		}
 		$conf    = $this->get( 'LayoutConf');
 

@@ -59,7 +59,7 @@ class plgFlexicontentFlexinotify extends JPlugin
 	 * @param 	boolean		Indicates if item is new
 	 */
 	/*function onBeforeSaveItem( &$item, $isnew ) {
-		$post = JRequest::get('post');
+		$post = JFactory::getApplication()->input->get('post');
 		//echo "<pre>"; $post; echo "</pre>"; exit;
 		
 		//...

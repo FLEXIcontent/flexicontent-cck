@@ -79,8 +79,8 @@ class FlexicontentControllerTemplates extends FlexicontentControllerBaseAdmin
 			jexit(JText::_('FLEXI_ALERTNOTAUTH_TASK'));
 		}
 
-		$source 		= JRequest::getCmd('source');
-		$dest 			= JRequest::getCmd('dest');
+		$source = $this->input->getString('source');
+		$dest   = $this->input->getString('dest');
 
 		$model = $this->getModel('templates');
 
@@ -116,8 +116,8 @@ class FlexicontentControllerTemplates extends FlexicontentControllerBaseAdmin
 			jexit(JText::_('FLEXI_ALERTNOTAUTH_TASK'));
 		}
 
-		$dir = JRequest::getCmd('dir');
-		$model = $this->getModel('templates');
+		$dir    = $this->input->getString('dir');
+		$model  = $this->getModel('templates');
 
 		if (!$model->delete($dir))
 		{
@@ -162,15 +162,15 @@ class FlexicontentControllerTemplates extends FlexicontentControllerBaseAdmin
 		$user = JFactory::getUser();
 
 		// Get vars
-		$ext_option = $app->input->get('ext_option', '', 'CMD');  // Current component name
-		$ext_view   = $app->input->get('ext_view', '', 'CMD');    // Current view name
-		$ext_type   = $app->input->get('ext_type', '', 'CMD');    // Type layouts: 'templates' or empty: ('modules'/'fields')
-		$ext_name   = $app->input->get('ext_name', '', 'CMD');    // IN item/type/category (templates): template name
-		$ext_id     = $app->input->get('ext_id', 0, 'INT');       // ID of item / type / category being edited
-		$layout_pfx = $app->input->get('layout_pfx', '', 'CMD');  // A prefix to distinguish multiple loading of same layout in the same page: (This is typically the name of the layout parameter)
+		$ext_option = $this->input->getCmd('ext_option', '');  // Current component name
+		$ext_view   = $this->input->getCmd('ext_view', '');    // Current view name
+		$ext_type   = $this->input->getCmd('ext_type', '');    // Type layouts: 'templates' or empty: ('modules'/'fields')
+		$ext_name   = $this->input->getCmd('ext_name', '');    // IN item/type/category (templates): template name
+		$ext_id     = $this->input->getInt('ext_id', 0);       // ID of item / type / category being edited
+		$layout_pfx = $this->input->getCmd('layout_pfx', '');  // A prefix to distinguish multiple loading of same layout in the same page: (This is typically the name of the layout parameter)
 
-		$layout_name = $app->input->get('layout_name', '', 'STRING'); // IN modules/fields: layout name, IN item/type/category forms (FC templates):  'item' / 'category'
-		$directory   = $app->input->get('directory', '', 'STRING');   // Explicit path of XML file:  $layout_name.xml
+		$layout_name = $this->input->getString('layout_name', ''); // IN modules/fields: layout name, IN item/type/category forms (FC templates):  'item' / 'category'
+		$directory   = $this->input->getString('directory', '');   // Explicit path of XML file:  $layout_name.xml
 
 		$db = JFactory::getDbo();
 
@@ -509,10 +509,10 @@ class FlexicontentControllerTemplates extends FlexicontentControllerBaseAdmin
 		);
 
 		// Get vars
-		$load_mode   = $app->input->get('load_mode', '0', 'INT');
-		$layout_name = $app->input->get('layout_name', 'default', 'CMD');
+		$load_mode   = $this->input->getInt('load_mode', 0);
+		$layout_name = $this->input->getString('layout_name', '');
 
-		$file_subpath = $app->input->get('file_subpath', '', 'STRING');
+		$file_subpath = $this->input->getString('file_subpath', '');
 		$file_subpath = preg_replace("/\.\.\//", "", $file_subpath);
 
 		// $file_subpath = preg_replace("#\\#", DS, $file_subpath);
@@ -619,9 +619,9 @@ class FlexicontentControllerTemplates extends FlexicontentControllerBaseAdmin
 
 		// Get vars
 		$file_contents = $_POST['file_contents'];
-		$layout_name  = $app->input->get('layout_name', 'default', 'CMD');
+		$layout_name  = $this->input->getString('layout_name', '');
 
-		$file_subpath = $app->input->get('file_subpath', '', 'STRING');
+		$file_subpath = $this->input->getString('file_subpath', '');
 		$file_subpath = preg_replace("/\.\.\//", "", $file_subpath);
 
 		if (!$layout_name)

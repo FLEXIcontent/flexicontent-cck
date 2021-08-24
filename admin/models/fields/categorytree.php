@@ -112,9 +112,9 @@ class JFormFieldCategorytree extends JFormFieldList
 	protected function getOptions()
 	{
 		global $globalcats;
-		$jinput = JFactory::getApplication();
-		$user = JFactory::getUser();
-		$cid  = $jinput->get('cid', 0, 'INT');
+		$jinput = JFactory::getApplication()->input;
+		$user   = JFactory::getUser();
+		$cid    = $jinput->getInt('cid', 0);
 
 		$usercats = array();
 		$viewallcats = FlexicontentHelperPerm::getPerm()->ViewAllCats;
@@ -144,8 +144,8 @@ class JFormFieldCategorytree extends JFormFieldList
 		foreach ($globalcats as $item) {
 			if ( !$published || ($published && $item->published) )
 			{
-				//if ((JRequest::getVar('controller') == 'categories') && (JRequest::getVar('task') == 'edit') && ($cid[0] == $item->id)) {
-				if ((JRequest::getVar('controller') == 'categories') && (JRequest::getVar('task') == 'edit') && ($item->lft >= @$globalcats[$cid[0]]->lft && $item->rgt <= @$globalcats[$cid[0]]->rgt)) {
+				//if (($jinput->getCmd('controller') == 'categories') && ($jinput->getCmd('task') == 'edit') && ($cid[0] == $item->id)) {
+				if (($jinput->getCmd('controller') == 'categories') && ($jinput->getCmd('task') == 'edit') && ($item->lft >= @$globalcats[$cid[0]]->lft && $item->rgt <= @$globalcats[$cid[0]]->rgt)) {
 					if ($top == 2)
 					{
 						if ($cid[0] != $item->id)

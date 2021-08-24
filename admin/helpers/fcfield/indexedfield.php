@@ -1148,10 +1148,12 @@ class FCIndexedField extends FCField
 	// Method called via AJAX to get dependent values
 	function getCascadedField()
 	{
-		$field_id = JRequest::getInt('field_id', 0);
-		$item_id  = JRequest::getInt('item_id', 0);
-		$valgrps  = JRequest::getVar('valgrps', '');
-		$valindex = JRequest::getVar('valindex', 0);
+		$jinput = JFactory::getApplication()->input;
+
+		$field_id = $jinput->getInt('field_id', 0);
+		$item_id  = $jinput->getInt('item_id', 0);
+		$valgrps  = $jinput->getVar('valgrps', '');
+		$valindex = $jinput->getInt('valindex', 0);
 
 		// Load field
 		$_fields = FlexicontentFields::getFieldsByIds(array($field_id), array($item_id));

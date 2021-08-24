@@ -147,9 +147,9 @@ class FlexicontentModelTemplate extends FCModelAdmin
 
 		$jinput = JFactory::getApplication()->input;
 
-		$type 	= $jinput->getWord('type',  'items');
-		$folder = $jinput->getCmd('folder',  'default');
-		$cfgname = $jinput->getCmd('cfgname',  '');
+		$type 	= $jinput->getWord('type', 'items');
+		$folder = $jinput->getCmd('folder', 'table');
+		$cfgname = $jinput->getCmd('cfgname', '');
 
 		$this->setId($type, $folder, $cfgname);
 
