@@ -1749,7 +1749,7 @@
 				<option value="1">FLEXI_YES</option>
 			</field-->
 			<field name="" type="separator" default="FLEXI_EXTENSIONS" label="" level="level3" />
-			<field name="image_extensions" type="text" size="50" default="bmp,gif,jpg,png" label="FLEXI_LEGAL_IMAGE_EXTENSIONS_LABEL" description="FLEXI_LEGAL_IMAGE_EXTENSIONS_DESC" class="input-xxlarge" />
+			<field name="image_extensions" type="text" size="50" default="bmp,wbmp,gif,jpg,jpeg,png,webp,ico" label="FLEXI_LEGAL_IMAGE_EXTENSIONS_LABEL" description="FLEXI_LEGAL_IMAGE_EXTENSIONS_DESC" class="input-xxlarge" />
 			<field name="ignore_extensions" type="text" size="50" default="" label="FLEXI_SKIP_MIME_CHECK_EXTS" description="FLEXI_SKIP_MIME_CHECK_EXTS_DESC" class="input-xxlarge" />
 
 			<field name="" type="separator" default="FLEXI_MIME_TYPES" label="" level="level3" />
