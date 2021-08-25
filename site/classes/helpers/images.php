@@ -70,8 +70,11 @@ class flexicontent_images
 				case 'gif':
 				case 'xcf':
 				case 'odg':
+				case 'wbmp':
 				case 'bmp':
+				case 'ico':
 				case 'jpeg':
+				case 'webp':
 					$rows[$i]->icon = 'components/com_flexicontent/assets/images/mime-icon-16/image.png';
 					break;
 
