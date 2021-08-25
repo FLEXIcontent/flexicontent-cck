@@ -209,7 +209,7 @@ class flexicontent_upload
 		// **********************************************
 		
 		$imginfo = null;
-		$images = explode( ',', $params->get( 'image_extensions' ));
+		$images = explode( ',', $params->get( 'image_extensions', 'bmp,wbmp,gif,jpg,jpeg,png,webp,ico' ));
 		
 		if ($params->get('restrict_uploads', 1) )
 		{

@@ -314,7 +314,8 @@
 				<option value="0" show_list="" hide_list="force_url_download">FLEXI_NO</option>
 				<option value="1" show_list="force_url_download" hide_list="">FLEXI_YES</option>
 			</field>
-			<field name="force_url_download_exts" type="text" size="40" default="bmp,gif,jpg,png,wav,mp3,aiff" label="FLEXI_FILE_FORCE_URL_DOWNLOADS_EXTS" depend_class="force_url_download" description="FLEXI_FIELD_FILE_CUSTOM_DOWNLOAD_TEXT_DESC"/>
+			bmp,wbmp,gif,jpg,jpeg,png,webp,ico,bmp
+			<field name="force_url_download_exts" type="text" size="40" default="bmp,wbmp,gif,jpg,jpeg,png,webp,ico,wav,mp3,aiff" label="FLEXI_FILE_FORCE_URL_DOWNLOADS_EXTS" depend_class="force_url_download" description="FLEXI_FIELD_FILE_CUSTOM_DOWNLOAD_TEXT_DESC"/>
 			<field name="force_url_download_max_kbs" type="text" size="40" default="100000" label="FLEXI_FILE_FORCE_URL_DOWNLOADS_MAX_KBS" depend_class="force_url_download" description="FLEXI_FILE_FORCE_URL_DOWNLOADS_MAX_KBS_DESC"/>
 
 			<field name="" type="separator" default="FLEXI_BROWSER_VIEWING" description="" icon_class="icon-eye" level="tab_open" box_type="1" />
