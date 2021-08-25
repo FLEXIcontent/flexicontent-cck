@@ -1919,6 +1919,7 @@ class flexicontent_html
 
 				$document->addScript(JUri::root(true).'/components/com_flexicontent/assets/js/flexi-lib.js', array('version' => FLEXI_VHASH));
 				JText::script("FLEXI_NOT_AN_IMAGE_FILE", true);
+				JText::script("FLEXI_IMAGE", true);
 				JText::script('FLEXI_LOADING_IMAGES',true);
 				JText::script('FLEXI_THUMBNAILS',true);
 				JText::script("FLEXI_NO_ITEMS_SELECTED", true);

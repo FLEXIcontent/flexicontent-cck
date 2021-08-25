@@ -1,6 +1,5 @@
 
 var fc_file_props_handle = null;
-var fc_file_count = 0;
 var fc_plupload_loaded_imgs = {};
 
 var fc_plupload_submit_props_form;
@@ -100,12 +99,12 @@ fc_plupload = function(options)
 			{
 				//max_file_size : this.options.upload_maxsize,
 				mime_types: [
-					{title : 'Image files', extensions : 'jpg,jpeg,gif,png'},
+					{title : 'Image files', extensions : 'jpg,jpeg,gif,png,webp,bmp,wbmp,ico'},
 					{title : 'Zip files', extensions : 'zip,avi'}
 				]
 			} :
 			[
-				{title : 'Image files', extensions : 'jpg,jpeg,gif,png'},
+				{title : 'Image files', extensions : 'jpg,jpeg,gif,png,webp,bmp,wbmp,ico'},
 				{title : 'Zip files', extensions : 'zip,avi'}
 			]
 		);
@@ -288,6 +287,17 @@ fc_plupload = function(options)
 				{
 					var func = up.getOption('handle_FileUploaded');
 					if (typeof func == 'function') func.apply(this, arguments);
+
+					var file_img = fc_plupload_loaded_imgs[file.id];
+
+					// Check if plupload's preloader could not load the file and read it using a native Javascript FileReader
+					if (! file_img.attr( "src" ))
+					{
+						var reader = new FileReader();
+
+						reader.onload = function(){ file_img.prop( "src", reader.result ).removeClass('plupload_loading_img'); }
+						reader.readAsDataURL( file.getNative() );
+					}
 				}
 			}
 		}
@@ -400,15 +410,6 @@ fc_plupload = function(options)
 
 		// Remove useless title 'Using runtime ...'
 		uploader_container.find('.plupload_container').removeAttr('title');
-
-		/*if (uploader_header.find('.fc-uploader-loading').length==0)
-		{
-			uploader_header.prepend('\
-				<div class="fc-mssg-inline fc-success fc-small fc-iblock fc-nobgimage fc-uploader-loading" style="display: none;">\
-					<img src="components/com_flexicontent/assets/images/ajax-loader.gif" /> ' + Joomla.JText._('FLEXI_LOADING_IMAGES') + ' ...\
-				</div>\
-			');
-		}*/
 
 		if (slider_cfg && uploader.getOption('add_size_slider'))
 		{
@@ -528,7 +529,7 @@ fc_plupload = function(options)
 		var file_row_id = file.id;
 		var file_row = $('#'+file_row_id);
 		var file_name_box = file_row.find('.plupload_file_name');
-		var is_img = is_IE8_IE9 && !fc_has_flash_addon() ? 0 : file.name.match(/\.(jpg|jpeg|png|gif)$/i);
+		var is_img = is_IE8_IE9 && !fc_has_flash_addon() ? 0 : file.name.match(/\.(jpg|jpeg|gif|png|webp|bmp|wbmp|ico)$/i);
 
 		// Add extra CSS classes to the delete buttons
 		file_row.find('.plupload_file_action > a').addClass('fc_uploader_row_remove');
@@ -590,8 +591,6 @@ fc_plupload = function(options)
 			var image_already_loaded = !! fc_plupload_loaded_imgs[file_row_id];
 			if (!image_already_loaded)
 			{
-				fc_file_count++;
-				//$('.fc-uploader-loading').show();
 				fc_plupload_loaded_imgs[file_row_id] = $('<img class="plupload_loading_img" src="components/com_flexicontent/assets/images/ajax-loader.gif" />');
 			}
 
@@ -646,7 +645,14 @@ fc_plupload = function(options)
 			// This utility object provides several means of reading in and loading image data from various sources.
 			file.preloader = new window.moxie.image.Image();
 
-			// Define the onload BEFORE you execute the load() command as load() does not execute async.
+			if (file.name.match(/\.(webp|bmp|wbmp|ico)$/i))
+			{
+				fc_plupload_loaded_imgs[file_row_id].prop('src', '').removeClass('plupload_loading_img');
+				return;
+			}
+
+			// Load a downsized image preview by define the onload event of preloader
+			// This needs to be done BEFORE you execute the load() command as load() does not execute asynchronously !
 			file.preloader.onload = function()
 			{
 				// This will scale the image (in memory) before it tries to render it. This just reduces the amount of Base64 data that needs to be rendered.
@@ -657,12 +663,10 @@ fc_plupload = function(options)
 
 				// Now that the image is preloaded, grab the Base64 encoded data URL. This will show the image without making an Network request using the client-side file binary.
 				fc_plupload_loaded_imgs[file_row_id].prop( "src", this.getAsDataURL() ).removeClass('plupload_loading_img');
-				fc_file_count--;
-				//if (fc_file_count==0) $('.fc-uploader-loading').hide();
 			};
 
-			// Calling the .getSource() on the file will return an instance of window.moxie.file (File object), which is a unified file wrapper that can be used across the various runtimes.
-			// Wiki: https://github.com/moxiecode/plupload/wiki/File
+			// Calling the .getSource() on the file will return an instance of window.moxie.file (File object), which is a unified
+			// file wrapper that can be used across the various runtimes. Wiki: https://github.com/moxiecode/plupload/wiki/File
 			file.preloader.load( file.getSource() );
 		}
 	}
