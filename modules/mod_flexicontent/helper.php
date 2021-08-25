@@ -109,7 +109,7 @@ class modFlexicontentHelper
 			$ar 	= '&amp;ar=x';
 			$zc		= $mod_method ? '&amp;zc=' . $mod_method : '';
 			$ext = strtolower(pathinfo($src, PATHINFO_EXTENSION));
-			$f = in_array( $ext, array('png', 'ico', 'gif', 'jpg', 'jpeg') ) ? '&amp;f='.$ext : '';
+			$f = in_array( $ext, array('png', 'gif', 'jpeg', 'jpg', 'webp', 'wbmp', 'bmp', 'ico') ) ? '&amp;f='.$ext : '';
 			$conf	= $w . $h . $aoe . $q . $ar . $zc . $f;
 
 			$base_url = (!preg_match("#^http|^https|^ftp|^/#i", $src)) ?  JUri::base(true).'/' : '';
@@ -123,7 +123,7 @@ class modFlexicontentHelper
 			$ar 	= '&amp;ar=x';
 			$zc		= $mod_method_feat ? '&amp;zc=' . $mod_method_feat : '';
 			$ext = strtolower(pathinfo($src, PATHINFO_EXTENSION));
-			$f = in_array( $ext, array('png', 'ico', 'gif', 'jpg', 'jpeg') ) ? '&amp;f='.$ext : '';
+			$f = in_array( $ext, array('png', 'gif', 'jpeg', 'jpg', 'webp', 'wbmp', 'bmp', 'ico') ) ? '&amp;f='.$ext : '';
 			$conf	= $w . $h . $aoe . $q . $ar . $zc . $f;
 
 			$base_url = (!preg_match("#^http|^https|^ftp|^/#i", $src)) ?  JUri::base(true).'/' : '';
@@ -499,7 +499,7 @@ class modFlexicontentHelper
 							$q		= '&amp;q=95';
 							$zc		= $mod_method_feat ? '&amp;zc=' . $mod_method_feat : '';
 							$ext = strtolower(pathinfo($src, PATHINFO_EXTENSION));
-							$f = in_array( $ext, array('png', 'ico', 'gif', 'jpg', 'jpeg') ) ? '&amp;f='.$ext : '';
+							$f = in_array( $ext, array('png', 'gif', 'jpeg', 'jpg', 'webp', 'wbmp', 'bmp', 'ico') ) ? '&amp;f='.$ext : '';
 							$conf	= $w . $h . $aoe . $q . $zc . $f;
 
     					$base_url = (!preg_match("#^http|^https|^ftp|^/#i", $src)) ?  JUri::base(true).'/' : '';
@@ -690,7 +690,7 @@ class modFlexicontentHelper
 							$q		= '&amp;q=95';
 							$zc		= $mod_method ? '&amp;zc=' . $mod_method : '';
 							$ext = strtolower(pathinfo($src, PATHINFO_EXTENSION));
-							$f = in_array( $ext, array('png', 'ico', 'gif', 'jpg', 'jpeg') ) ? '&amp;f='.$ext : '';
+							$f = in_array( $ext, array('png', 'gif', 'jpeg', 'jpg', 'webp', 'wbmp', 'bmp', 'ico') ) ? '&amp;f='.$ext : '';
 							$conf	= $w . $h . $aoe . $q . $zc . $f;
 
     					$base_url = (!preg_match("#^http|^https|^ftp|^/#i", $src)) ?  JUri::base(true).'/' : '';
@@ -2564,7 +2564,7 @@ class modFlexicontentHelper
 					$q		= '&amp;q=95';
 					$zc		= $catconf->image_method ? '&amp;zc=' . $catconf->image_method : '';
 					$ext = strtolower(pathinfo($src, PATHINFO_EXTENSION));
-					$f = in_array( $ext, array('png', 'ico', 'gif', 'jpg', 'jpeg') ) ? '&amp;f='.$ext : '';
+					$f = in_array( $ext, array('png', 'gif', 'jpeg', 'jpg', 'webp', 'wbmp', 'bmp', 'ico') ) ? '&amp;f='.$ext : '';
 					$conf	= $w . $h . $aoe . $q . $zc . $f;
 
 					$catimage = JUri::root(true) . '/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$src.$conf;
@@ -2577,7 +2577,7 @@ class modFlexicontentHelper
 					$q		= '&amp;q=95';
 					$zc		= $catconf->image_method ? '&amp;zc=' . $catconf->image_method : '';
 					$ext = strtolower(pathinfo($src, PATHINFO_EXTENSION));
-					$f = in_array( $ext, array('png', 'ico', 'gif', 'jpg', 'jpeg') ) ? '&amp;f='.$ext : '';
+					$f = in_array( $ext, array('png', 'gif', 'jpeg', 'jpg', 'webp', 'wbmp', 'bmp', 'ico') ) ? '&amp;f='.$ext : '';
 					$conf	= $w . $h . $aoe . $q . $zc . $f;
 
 					$base_url = (!preg_match("#^http|^https|^ftp|^/#i", $src)) ?  JUri::base(true).'/' : '';
