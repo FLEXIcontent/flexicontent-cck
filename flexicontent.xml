@@ -154,7 +154,7 @@
 			<param name="trigger_onprepare_content_cat" default="1" />
 			<param name="filter_types" default="createdby,modifiedby,type,state,tags,checkbox,checkboximage,radio,radioimage,select,selectmultiple" />
 
-			<param name="upload_extensions" default="bmp,csv,doc,docx,gif,ico,jpg,jpeg,odg,odp,ods,odt,pdf,png,ppt,pptx,txt,xcf,xls,xlsx,zip,ics" />
+			<param name="upload_extensions" default="bmp,wbmp,csv,doc,docx,webp,gif,ico,jpg,jpeg,odg,odp,ods,odt,pdf,png,ppt,pptx,txt,xcf,xls,xlsx,zip,ics" />
 			<param name="upload_maxsize" default="10000000" />
 			<param name="file_path" default="components/com_flexicontent/uploads" />
 			<param name="media_path" default="components/com_flexicontent/medias" />
