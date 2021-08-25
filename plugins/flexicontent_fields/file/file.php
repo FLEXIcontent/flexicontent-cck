@@ -1623,7 +1623,9 @@ class plgFlexicontent_fieldsFile extends FCField
 			case 'gif':
 			case 'xcf':
 			case 'odg':
+			case 'wbmp':
 			case 'bmp':
+			case 'ico':
 			case 'jpeg':
 			case 'webp':
 				$file->icon = 'components/com_flexicontent/assets/images/mime-icon-16/image.png';
