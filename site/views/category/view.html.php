@@ -740,7 +740,7 @@ class FlexicontentViewCategory extends JViewLegacy
 			$src = $this->baseurl ."/". $joomla_image_url . $cat_default_image;
 
 			$ext = strtolower(pathinfo($src, PATHINFO_EXTENSION));
-			$f = in_array( $ext, array('png', 'ico', 'gif', 'jpg', 'jpeg') ) ? '&amp;f='.$ext : '';
+			$f = in_array( $ext, array('png', 'gif', 'jpeg', 'jpg', 'webp', 'wbmp', 'bmp', 'ico') ) ? '&amp;f='.$ext : '';
 			$conf	= $w . $h . $aoe . $q . $ar . $zc . $f;
 
 			$default_image = $phpThumbURL.$src.$conf;
@@ -769,7 +769,7 @@ class FlexicontentViewCategory extends JViewLegacy
 					$src = $this->baseurl ."/". $joomla_image_url . $cat->image;
 
 					$ext = strtolower(pathinfo($src, PATHINFO_EXTENSION));
-					$f = in_array( $ext, array('png', 'ico', 'gif', 'jpg', 'jpeg') ) ? '&amp;f='.$ext : '';
+					$f = in_array( $ext, array('png', 'gif', 'jpeg', 'jpg', 'webp', 'wbmp', 'bmp', 'ico') ) ? '&amp;f='.$ext : '';
 					$conf	= $w . $h . $aoe . $q . $ar . $zc . $f;
 
 					$image = $phpThumbURL.$src.$conf;
@@ -778,7 +778,7 @@ class FlexicontentViewCategory extends JViewLegacy
 				elseif ( $cat_image_source!=1 && $src = flexicontent_html::extractimagesrc($cat) )
 				{
 					$ext = strtolower(pathinfo($src, PATHINFO_EXTENSION));
-					$f = in_array( $ext, array('png', 'ico', 'gif', 'jpg', 'jpeg') ) ? '&amp;f='.$ext : '';
+					$f = in_array( $ext, array('png', 'gif', 'jpeg', 'jpg', 'webp', 'wbmp', 'bmp', 'ico') ) ? '&amp;f='.$ext : '';
 					$conf	= $w . $h . $aoe . $q . $ar . $zc . $f;
 
 					$base_url = (!preg_match("#^http|^https|^ftp|^/#i", $src)) ?  $this->baseurl.'/' : '';
@@ -836,7 +836,7 @@ class FlexicontentViewCategory extends JViewLegacy
 			$src = $this->baseurl ."/". $joomla_image_url . $cat_default_image;
 
 			$ext = strtolower(pathinfo($src, PATHINFO_EXTENSION));
-			$f = in_array( $ext, array('png', 'ico', 'gif', 'jpg', 'jpeg') ) ? '&amp;f='.$ext : '';
+			$f = in_array( $ext, array('png', 'gif', 'jpeg', 'jpg', 'webp', 'wbmp', 'bmp', 'ico') ) ? '&amp;f='.$ext : '';
 			$conf	= $w . $h . $aoe . $q . $ar . $zc . $f;
 
 			$default_image = $phpThumbURL.$src.$conf;
@@ -868,7 +868,7 @@ class FlexicontentViewCategory extends JViewLegacy
 					$src = $this->baseurl ."/". $joomla_image_url . $cat->image;
 
 					$ext = strtolower(pathinfo($src, PATHINFO_EXTENSION));
-					$f = in_array( $ext, array('png', 'ico', 'gif', 'jpg', 'jpeg') ) ? '&amp;f='.$ext : '';
+					$f = in_array( $ext, array('png', 'gif', 'jpeg', 'jpg', 'webp', 'wbmp', 'bmp', 'ico') ) ? '&amp;f='.$ext : '';
 					$conf	= $w . $h . $aoe . $q . $ar . $zc . $f;
 
 					$image = $phpThumbURL.$src.$conf;
@@ -877,7 +877,7 @@ class FlexicontentViewCategory extends JViewLegacy
 				elseif ( $cat_image_source!=1 && $src = flexicontent_html::extractimagesrc($cat) )
 				{
 					$ext = strtolower(pathinfo($src, PATHINFO_EXTENSION));
-					$f = in_array( $ext, array('png', 'ico', 'gif', 'jpg', 'jpeg') ) ? '&amp;f='.$ext : '';
+					$f = in_array( $ext, array('png', 'gif', 'jpeg', 'jpg', 'webp', 'wbmp', 'bmp', 'ico') ) ? '&amp;f='.$ext : '';
 					$conf	= $w . $h . $aoe . $q . $ar . $zc . $f;
 
 					$base_url = (!preg_match("#^http|^https|^ftp|^/#i", $src)) ?  $this->baseurl.'/' : '';
@@ -934,7 +934,7 @@ class FlexicontentViewCategory extends JViewLegacy
 			$src = $this->baseurl ."/". $joomla_image_url . $cat_default_image;
 
 			$ext = strtolower(pathinfo($src, PATHINFO_EXTENSION));
-			$f = in_array( $ext, array('png', 'ico', 'gif', 'jpg', 'jpeg') ) ? '&amp;f='.$ext : '';
+			$f = in_array( $ext, array('png', 'gif', 'jpeg', 'jpg', 'webp', 'wbmp', 'bmp', 'ico') ) ? '&amp;f='.$ext : '';
 			$conf	= $w . $h . $aoe . $q . $ar . $zc . $f;
 
 			$default_image = $phpThumbURL.$src.$conf;
@@ -965,7 +965,7 @@ class FlexicontentViewCategory extends JViewLegacy
 					$src = $this->baseurl ."/". $joomla_image_url . $cat->image;
 
 					$ext = strtolower(pathinfo($src, PATHINFO_EXTENSION));
-					$f = in_array( $ext, array('png', 'ico', 'gif', 'jpg', 'jpeg') ) ? '&amp;f='.$ext : '';
+					$f = in_array( $ext, array('png', 'gif', 'jpeg', 'jpg', 'webp', 'wbmp', 'bmp', 'ico') ) ? '&amp;f='.$ext : '';
 					$conf	= $w . $h . $aoe . $q . $ar . $zc . $f;
 
 					$image = $phpThumbURL.$src.$conf;
@@ -974,7 +974,7 @@ class FlexicontentViewCategory extends JViewLegacy
 				elseif ( $cat_image_source!=1 && $src = flexicontent_html::extractimagesrc($cat) )
 				{
 					$ext = strtolower(pathinfo($src, PATHINFO_EXTENSION));
-					$f = in_array( $ext, array('png', 'ico', 'gif', 'jpg', 'jpeg') ) ? '&amp;f='.$ext : '';
+					$f = in_array( $ext, array('png', 'gif', 'jpeg', 'jpg', 'webp', 'wbmp', 'bmp', 'ico') ) ? '&amp;f='.$ext : '';
 					$conf	= $w . $h . $aoe . $q . $ar . $zc . $f;
 
 					$base_url = (!preg_match("#^http|^https|^ftp|^/#i", $src)) ?  $this->baseurl.'/' : '';
