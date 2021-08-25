@@ -172,7 +172,7 @@ if ($column_display == 1){
 				$ar 	= '&amp;ar=x';
 				$zc		= $this->params->get('fcr_method') ? '&amp;zc=' . $this->params->get('fcr_method') : '';
 				$ext = strtolower(pathinfo($src, PATHINFO_EXTENSION));
-				$f = in_array( $ext, array('png', 'ico', 'gif', 'jpg', 'jpeg') ) ? '&amp;f='.$ext : '';
+				$f = in_array( $ext, array('png', 'gif', 'jpeg', 'jpg', 'webp', 'wbmp', 'bmp', 'ico') ) ? '&amp;f='.$ext : '';
 				$conf	= $w . $h . $aoe . $q . $ar . $zc . $f;
 				
 				$base_url = (!preg_match("#^http|^https|^ftp|^/#i", $src)) ?  JUri::base(true).'/' : '';
