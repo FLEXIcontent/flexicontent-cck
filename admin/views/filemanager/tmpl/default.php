@@ -903,7 +903,7 @@ if ($js)
 
 				$file_is_selected = false;
 
-				$imageexts = array('png', 'ico', 'gif', 'bmp', 'jpg', 'jpeg');
+				$imageexts = array('png', 'gif', 'jpeg', 'jpg', 'webp', 'wbmp', 'bmp', 'ico');
 				$index = $jinput->get('index', 0, 'INT');
 
 				// In the case we skip rows, we need a reliable incrementing counter with no holes, used for e.g. even / odd row class
@@ -967,7 +967,7 @@ if ($js)
 					$file_url = rawurlencode(str_replace('\\', '/', $file_url));
 
 					// Use same format for output if possible
-					$output_formats = array('png', 'ico', 'gif', 'bmp', 'jpg', 'jpeg');
+					$output_formats = array('png', 'gif', 'jpeg', 'jpg', 'webp', 'wbmp', 'bmp', 'ico');
 					$f = in_array($ext, $output_formats)
 						? '&amp;f=' . $ext
 						: '';
@@ -1262,7 +1262,7 @@ if ($js)
 
 			<div id="adminListThumbsFCfiles<?php echo $this->layout.$this->fieldid; ?>" class="adminthumbs fcmanthumbs fman_grid_element" style="display: none;">
 				<?php
-				$imageexts = array('png', 'ico', 'gif', 'bmp', 'jpg', 'jpeg');
+				$imageexts = array('png', 'gif', 'jpeg', 'jpg', 'webp', 'wbmp', 'bmp', 'ico');
 				$index = $jinput->get('index', 0, 'INT');
 
 				// In the case we skip rows, we need a reliable incrementing counter with no holes, used for e.g. even / odd row class
