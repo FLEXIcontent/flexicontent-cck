@@ -101,7 +101,7 @@ class plgFlexicontent_fieldsFile extends FCField
 
 		$mediapath   = $cparams->get('media_path', 'components/com_flexicontent/medias');
 		$docspath    = $cparams->get('file_path', 'components/com_flexicontent/uploads');
-		$imageexts   = array('jpg','gif','png','bmp','jpeg');
+		$imageexts   = array('png', 'ico', 'gif', 'jpg', 'jpeg', 'webp', 'bmp');
 
 		$thumb_size_resizer = (int) $field->parameters->get('thumb_size_resizer', 0);
 		$thumb_size_default = (int) $field->parameters->get('thumb_size_default', 120);
@@ -1594,6 +1594,7 @@ class plgFlexicontent_fieldsFile extends FCField
 			case 'bmp':
 			case 'ico':
 			case 'jpeg':
+			case 'webp':
 				$file->icon = 'components/com_flexicontent/assets/images/mime-icon-16/image.png';
 			break;
 
