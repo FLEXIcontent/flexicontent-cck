@@ -870,7 +870,7 @@ class plgFlexicontent_fieldsImage extends FCField
 				if (isset($value['existingname']))
 				{
 					$ext = strtolower(flexicontent_upload::getExt($image_subpath));
-					$f = in_array( $ext, array('png', 'ico', 'gif', 'jpg', 'jpeg') ) ? '&f='.$ext : '';
+					$f = in_array( $ext, array('png', 'gif', 'jpeg', 'jpg', 'webp', 'wbmp', 'bmp', 'ico') ) ? '&f='.$ext : '';
 					$img_link = str_replace('\\', '/', $img_link);
 
 					/*$img_link = JUri::root().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' .
@@ -2763,7 +2763,12 @@ class plgFlexicontent_fieldsImage extends FCField
 
 		$ext = strtolower(flexicontent_upload::getExt($filename));
 
-		if ( in_array( $ext, array('png', 'ico', 'gif') ) )
+		/**
+		 * Maintain image format for output file for specific file extensions
+		 * this is needed to keep features like transparency support,
+		 * for other formats use default (unless changed this is jpg)
+		 */
+		if ( in_array( $ext, array('png', 'gif', 'ico', 'webp') ) )
 		{
 			$phpThumb->setParameter('f', $ext);
 		}
