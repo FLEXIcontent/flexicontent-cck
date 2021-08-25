@@ -164,7 +164,7 @@ switch ($cols)
 			$ar 	= '&amp;ar=x';
 			$zc		= $cat_image_method ? '&amp;zc=' . $cat_image_method : '';
 			$ext = strtolower(pathinfo($src, PATHINFO_EXTENSION));
-			$f = in_array( $ext, array('png', 'ico', 'gif', 'jpg', 'jpeg') ) ? '&amp;f='.$ext : '';
+			$f = in_array( $ext, array('png', 'gif', 'jpeg', 'jpg', 'webp', 'wbmp', 'bmp', 'ico') ) ? '&amp;f='.$ext : '';
 			$conf	= $w . $h . $aoe . $q . $ar . $zc . $f;
 	
 			$image = JUri::base(true).'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$src.$conf;
@@ -177,7 +177,7 @@ switch ($cols)
 			$ar 	= '&amp;ar=x';
 			$zc		= $cat_image_method ? '&amp;zc=' . $cat_image_method : '';
 			$ext = strtolower(pathinfo($src, PATHINFO_EXTENSION));
-			$f = in_array( $ext, array('png', 'ico', 'gif', 'jpg', 'jpeg') ) ? '&amp;f='.$ext : '';
+			$f = in_array( $ext, array('png', 'gif', 'jpeg', 'jpg', 'webp', 'wbmp', 'bmp', 'ico') ) ? '&amp;f='.$ext : '';
 			$conf	= $w . $h . $aoe . $q . $ar . $zc . $f;
 
 			$base_url = (!preg_match("#^http|^https|^ftp|^/#i", $src)) ?  JUri::base(true).'/' : '';
@@ -257,7 +257,7 @@ switch ($cols)
 					$q		= '&amp;q=95';
 					$zc		= $subcat_image_method ? '&amp;zc=' . $subcat_image_method : '';
 					$ext = strtolower(pathinfo($src, PATHINFO_EXTENSION));
-					$f = in_array( $ext, array('png', 'ico', 'gif', 'jpg', 'jpeg') ) ? '&amp;f='.$ext : '';
+					$f = in_array( $ext, array('png', 'gif', 'jpeg', 'jpg', 'webp', 'wbmp', 'bmp', 'ico') ) ? '&amp;f='.$ext : '';
 					$conf	= $w . $h . $aoe . $q . $zc . $f;
 			
 					$image = JUri::base(true).'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$src.$conf;
@@ -269,7 +269,7 @@ switch ($cols)
 					$q		= '&amp;q=95';
 					$zc		= $subcat_image_method ? '&amp;zc=' . $subcat_image_method : '';
 					$ext = strtolower(pathinfo($src, PATHINFO_EXTENSION));
-					$f = in_array( $ext, array('png', 'ico', 'gif', 'jpg', 'jpeg') ) ? '&amp;f='.$ext : '';
+					$f = in_array( $ext, array('png', 'gif', 'jpeg', 'jpg', 'webp', 'wbmp', 'bmp', 'ico') ) ? '&amp;f='.$ext : '';
 					$conf	= $w . $h . $aoe . $q . $zc . $f;
 		
 					$base_url = (!preg_match("#^http|^https|^ftp|^/#i", $src)) ?  JUri::base(true).'/' : '';
