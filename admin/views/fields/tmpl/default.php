@@ -371,7 +371,7 @@ if ($js)
 			</th>
 
 			<th class="col_status hideOnDemandClass left">
-				<?php echo JHtml::_('grid.sort', 'FLEXI_STATUS', 'i.' . $this->state_propname, $this->lists['order_Dir'], $this->lists['order'] ); ?>
+				<?php echo JHtml::_('grid.sort', 'FLEXI_STATUS', 'a.' . $this->state_propname, $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
 
 			<?php /*<th style="padding:0px;"><?php echo JHtml::_('grid.sort', 'FLEXI_FIELD_DESCRIPTION', 'a.description', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>*/ ?>
