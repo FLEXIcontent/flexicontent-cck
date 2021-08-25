@@ -2555,7 +2555,7 @@ class FlexicontentController extends JControllerLegacy
 				else
 				{
 					$force_url_download         = (int) $fields_conf[$field_id]->get('force_url_download', 0);
-					$force_url_download_exts    = preg_split("/[\s]*,[\s]*/", strtolower($fields_conf[$field_id]->get('force_url_download_exts', 'bmp,gif,jpg,png,wav,mp3,aiff')));
+					$force_url_download_exts    = preg_split("/[\s]*,[\s]*/", strtolower($fields_conf[$field_id]->get('force_url_download_exts', 'bmp,wbmp,gif,jpg,jpeg,png,webp,ico,wav,mp3,aiff')));
 					$force_url_download_exts    = array_flip($force_url_download_exts);
 					$force_url_download_max_kbs = (int) $fields_conf[$field_id]->get('force_url_download_max_kbs', 100000);
 
