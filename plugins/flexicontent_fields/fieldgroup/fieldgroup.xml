@@ -24,15 +24,23 @@
 
 		<fieldset name="group-fieldgroup-editing" hidden="true" icon_class="icon-pencil" label="FLEXI_FIELD_EDITING" addfieldpath="/administrator/components/com_flexicontent/elements">
 
-			<field name="" type="separator" default="FLEXI_FIELD_EDITING" level="level0" />
+			<field name="" type="separator" default="FLEXI_FIELD_EDITING" level="tabset_start" box_type="1" />
 
+			<field name="" type="separator" default="FLEXI_FIELD_VALUES" icon_class="icon-database" level="tab_open" box_type="1" />
+
+			<field name="" type="separator" default="FLEXI_FIELD_GROUPING" description="" depend_class="fieldgroupoff" level="level2" />
 			<field name="fields" type="fields" multiple="false" groupables="1" issortable="1" default="" label="Fields" description="Select fields that will be show shown as a group" />
 
 			<field name="" type="separator" default="FLEXI_FIELD_NUMBER_OF_VALUES" description="" depend_class="fieldgroupoff" level="level2" />
-			<field name="allow_multiple" type="multilist" subtype="radio" default="0" label="FLEXI_FIELD_ALLOW_MULTIPLE" description="FLEXI_FIELD_ALLOW_MULTIPLE_DESC" tip_class="multivalue-mode" tip_img="warning.png" toggle_related="1" depend_class="fieldgroupoff" class="btn-group btn-group-yesno">
+			<field name="required" type="radio" default="0" label="FLEXI_FIELD_REQUIRED" description="FLEXI_FIELD_REQUIRED_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="allow_multiple" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_FIELD_ALLOW_MULTIPLE" description="FLEXI_FIELD_ALLOW_MULTIPLE_DESC" depend_class="fieldgroupoff" class="btn-group btn-group-yesno" tip_class="multivalue-mode" tip_img="warning.png">
 				<option value="0" show_list="" hide_list="multivalue-mode">FLEXI_NO</option>
 				<option value="1" show_list="multivalue-mode" hide_list="">FLEXI_YES</option>
 			</field>
+			<field name="max_values" type="text" default="0" size="2" label="FLEXI_FIELD_MAX_VALUES" description="FLEXI_FIELD_MAX_VALUES_DESC" depend_class="fieldgroupoff multivalue-mode" />
 			<field name="add_position" type="multilist" subtype="radio" default="3" label="FLEXI_FIELD_ADD_POSITION" description="FLEXI_FIELD_ADD_POSITION_DESC" depend_class="fieldgroupoff multivalue-mode" class="btn-group group-fcinfo">
 				<option value="0">FLEXI_FIELD_APPEND_BTN</option>
 				<option value="1">FLEXI_FIELD_INLINE_APPEND_BTN</option>
@@ -40,11 +48,6 @@
 				<option value="3">FLEXI_FIELD_INLINE_BOTH_BTN</option>
 			</field>
 
-			<field name="max_values" type="text" default="0" size="2" label="FLEXI_FIELD_MAX_VALUES" description="FLEXI_FIELD_MAX_VALUES_DESC" depend_class="fieldgroupoff multivalue-mode" />
-			<field name="required" type="radio" default="0" label="FLEXI_FIELD_REQUIRED" description="FLEXI_FIELD_REQUIRED_DESC" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
 
 			<field name="" type="separator" default="FLEXI_FIELD_GROUP_EMPTY_NON_ASSIGNED_FIELDS" description="" depend_class="" level="level2" />
 			<field name="form_empty_fields" type="multilist" subtype="radio" default="1" toggle_related="1" label="FLEXI_FIELD_GROUP_EMPTY_NON_ASSIGNED_FIELDS_DISPLAY" description="FLEXI_FIELD_GROUP_EMPTY_NON_ASSIGNED_FIELDS_DISPLAY_DESC" class="btn-group btn-group-yesno">
@@ -52,6 +55,17 @@
 				<option value="1" show_list="form_empty_fields" hide_list="">FLEXI_YES</option>
 			</field>
 			<field name="form_empty_fields_text" type="text" default="FLEXI_NA" label="FLEXI_FIELD_GROUP_EMPTY_NON_ASSIGNED_FIELDS_CUSTOM_TEXT" description="FLEXI_FIELD_GROUP_EMPTY_NON_ASSIGNED_FIELDS_CUSTOM_TEXT_DESC" depend_class="form_empty_fields"/>
+
+			<field name="" type="separator" default="Form Display" _description="FLEXI_FORM_FIELD_CONF_DESC" icon_class="icon-checkbox-unchecked" level="tab_open" box_type="1" />
+
+			<field name="display_label_form" type="multilist" subtype="radio" toggle_related="1" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC" class="btn-group btn-group-yesno">
+				<option value="0" show_list="custom_placeholder" hide_list="">FLEXI_NO</option>
+				<option value="1" show_list="custom_placeholder" hide_list="">FLEXI_FLOATED_LEFT</option>
+				<option value="2" show_list="custom_placeholder" hide_list="">FLEXI_CLEARED</option>
+				<option value="-1" show_list="" hide_list="custom_placeholder">FLEXI_AS_PLACEHOLDER</option>
+			</field>
+			<field name="label_form" type="text" default="" label="FLEXI_LABEL" description="Enter a label to use for item form that is different than field label for viewing" depend_class=""/>
+			<field name="no_acc_msg_form" type="text" default="" label="FLEXI_FIELD_NOACCESS_MSG" description="FLEXI_FIELD_NOACCESS_MSG_DESC" depend_class=""/>
 
 			<field name="" type="separator" default="Compact editing" description="" depend_class="" level="level2" />
 			<field name="compact_edit_global" type="radio" default="0" label="FLEXI_FIELD_GROUP_ALL_VALS_TOGGLING" description="FLEXI_FIELD_GROUP_ALL_VALS_TOGGLING_DESC" class="btn-group btn-group-yesno">
@@ -63,8 +77,9 @@
 				<option value="1" show_list="compact_edit" hide_list="">Yes, start collapsed</option>
 				<option value="2" show_list="compact_edit" hide_list="">Yes, start expanded</option>
 			</field>
-			<field name="compact_edit_excluded" type="fields" multiple="false" groupables="1" issortable="1" default="" label="FLEXI_FIELD_GROUP_ALWAYS_VISIBLE_FIELDS" description="FLEXI_FIELD_GROUP_ALWAYS_VISIBLE_FIELDS_DESC" depend_class="compact_edit"/>
 
+			<field name="compact_edit_excluded" type="fields" multiple="false" groupables="1" issortable="1" default="" label="FLEXI_FIELD_GROUP_ALWAYS_VISIBLE_FIELDS" description="FLEXI_FIELD_GROUP_ALWAYS_VISIBLE_FIELDS_DESC" depend_class="compact_edit"/>
+			<field name="" type="separator" default="FLEXI_FIELD_EDITING" level="tabset_close" box_type="1" />
 		</fieldset>
 		<fieldset name="group-fieldgroup-viewing" hidden="true" icon_class="icon-screen" label="FLEXI_FIELD_VIEWING" addfieldpath="/administrator/components/com_flexicontent/elements">
 
@@ -83,18 +98,23 @@
 			<field name="no_acc_msg" type="text" default="" label="FLEXI_FIELD_NOACCESS_MSG" description="FLEXI_FIELD_NOACCESS_MSG_DESC" depend_class="field-acc-msg"/>
 
 			<field name="" type="separator" default="FLEXI_EXPORT" level="level2" />
-			<field name="include_in_csv_export" type="radio" default="0" label="FLEXI_FIELD_INCLUDE_IN_CSV_EXPORT" description="FLEXI_FIELD_INCLUDE_IN_CSV_EXPORT_DESC" class="btn-group btn-group-yesno">
+			<field name="include_in_csv_export" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_FIELD_INCLUDE_IN_CSV_EXPORT" description="FLEXI_FIELD_INCLUDE_IN_CSV_EXPORT_DESC" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="csv_rendered_display">FLEXI_NO</option>
+				<option value="1" show_list="" hide_list="csv_rendered_display">FLEXI_FIELD_RAW_VALUES</option>
+				<option value="2" show_list="csv_rendered_display" hide_list="">FLEXI_FIELD_RENDERED_VALUES</option>
+			</field>
+			<field name="csv_strip_html" type="radio" default="0" label="FLEXI_STRIP_HTML" description="" class="btn-group btn-group-yesno" depend_class="csv_rendered_display">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
 
 			<field name="" type="separator" default="FLEXI_LAYOUT" description="" icon_class="icon-file-2" level="tab_open" box_type="1" />
+			<field name="viewlayout" type="fcfilelist" default="" label="FLEXI_FIELD_SELECT_VIEW_LAYOUT" description="FLEXI_FIELD_SELECT_VIEW_LAYOUT_DESC" directory="plugins/flexicontent_fields/fieldgroup/tmpl/" filter="value*" exclude="" stripext="1" stripprefix="value_" hide_none="1" hide_default="1" depend_class="layout-field-disp" />
 
 			<field name="display_mode" type="multilist" subtype="radio" default="0" label="FLEXI_USE_CUSTOMIZED_HTML" description="FLEXI_USE_CUSTOMIZED_HTML_DESC" toggle_related="1" class="btn-group group-fcmethod">
 				<option value="0" show_list="layout-field-disp" hide_list="custom-field-disp">FLEXI_LAYOUT</option>
 				<option value="1" show_list="custom-field-disp" hide_list="layout-field-disp">FLEXI_FIELD_GROUP_CUSTOM_HTML</option>
 			</field>
-			<field name="viewlayout" type="fcfilelist" default="" label="FLEXI_FIELD_SELECT_VIEW_LAYOUT" description="FLEXI_FIELD_SELECT_VIEW_LAYOUT_DESC" directory="plugins/flexicontent_fields/fieldgroup/tmpl/" filter="value*" exclude="" stripext="1" stripprefix="value_" hide_none="1" hide_default="1" depend_class="layout-field-disp" />
 			<field name="custom_html" type="editor" editor="codemirror" syntax="html" filter="RAW" cols="40" rows="4" height="60px" class="fc-unset-width" default="" label="FLEXI_FIELD_GROUP_CUSTOM_HTML" depend_class="custom-field-disp" description="FLEXI_FIELD_GROUP_CUSTOM_HTML_DESC" />
 
 			<field name="" type="separator" default="Fields WITHOUT value" level="level2" />
@@ -143,8 +163,8 @@
 
 
 			<field name="" type="separator" default="FLEXI_FIELD_VIEWING" level="tabset_close" box_type="1" />
-		</fieldset>
 
+		</fieldset>
 		<fieldset name="group-fieldgroup-seo" hidden="true" icon_class="icon-search" label="FLEXI_SEO" addfieldpath="/administrator/components/com_flexicontent/elements">
 
 			<field name="" type="separator" default="FLEXI_MICRODATA_SUPPORT" description="FLEXI_MICRODATA_SUPPORT_DESC" level="level1" />
@@ -158,4 +178,5 @@
 	<languages>
 		<language tag="en-GB">en-GB.plg_flexicontent_fields_fieldgroup.ini</language>
 	</languages>
+
 </extension>
