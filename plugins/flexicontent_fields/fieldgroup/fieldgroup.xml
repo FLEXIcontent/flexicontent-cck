@@ -24,6 +24,10 @@
 
 		<fieldset name="group-fieldgroup-editing" hidden="true" icon_class="icon-pencil" label="FLEXI_FIELD_EDITING" addfieldpath="/administrator/components/com_flexicontent/elements">
 
+			<field name="" type="separator" default="FLEXI_FIELD_EDITING" level="tabset_start" box_type="1" />
+
+			<field name="" type="separator" default="FLEXI_FIELD_VALUES" icon_class="icon-database" level="tab_open" box_type="1" />
+
 			<field name="" type="separator" default="FLEXI_FIELD_GROUPING" description="" depend_class="fieldgroupoff" level="level2" />
 			<field name="fields" type="fields" multiple="false" groupables="1" issortable="1" default="" label="Fields" description="Select fields that will be show shown as a group" />
 
@@ -52,6 +56,17 @@
 			</field>
 			<field name="form_empty_fields_text" type="text" default="FLEXI_NA" label="FLEXI_FIELD_GROUP_EMPTY_NON_ASSIGNED_FIELDS_CUSTOM_TEXT" description="FLEXI_FIELD_GROUP_EMPTY_NON_ASSIGNED_FIELDS_CUSTOM_TEXT_DESC" depend_class="form_empty_fields"/>
 
+			<field name="" type="separator" default="Form Display" _description="FLEXI_FORM_FIELD_CONF_DESC" icon_class="icon-checkbox-unchecked" level="tab_open" box_type="1" />
+
+			<field name="display_label_form" type="multilist" subtype="radio" toggle_related="1" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC" class="btn-group btn-group-yesno">
+				<option value="0" show_list="custom_placeholder" hide_list="">FLEXI_NO</option>
+				<option value="1" show_list="custom_placeholder" hide_list="">FLEXI_FLOATED_LEFT</option>
+				<option value="2" show_list="custom_placeholder" hide_list="">FLEXI_CLEARED</option>
+				<option value="-1" show_list="" hide_list="custom_placeholder">FLEXI_AS_PLACEHOLDER</option>
+			</field>
+			<field name="label_form" type="text" default="" label="FLEXI_LABEL" description="Enter a label to use for item form that is different than field label for viewing" depend_class=""/>
+			<field name="no_acc_msg_form" type="text" default="" label="FLEXI_FIELD_NOACCESS_MSG" description="FLEXI_FIELD_NOACCESS_MSG_DESC" depend_class=""/>
+
 			<field name="" type="separator" default="Compact editing" description="" depend_class="" level="level2" />
 			<field name="compact_edit_global" type="radio" default="0" label="FLEXI_FIELD_GROUP_ALL_VALS_TOGGLING" description="FLEXI_FIELD_GROUP_ALL_VALS_TOGGLING_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
@@ -62,8 +77,9 @@
 				<option value="1" show_list="compact_edit" hide_list="">Yes, start collapsed</option>
 				<option value="2" show_list="compact_edit" hide_list="">Yes, start expanded</option>
 			</field>
-			<field name="compact_edit_excluded" type="fields" multiple="false" groupables="1" issortable="1" default="" label="FLEXI_FIELD_GROUP_ALWAYS_VISIBLE_FIELDS" description="FLEXI_FIELD_GROUP_ALWAYS_VISIBLE_FIELDS_DESC" depend_class="compact_edit"/>
 
+			<field name="compact_edit_excluded" type="fields" multiple="false" groupables="1" issortable="1" default="" label="FLEXI_FIELD_GROUP_ALWAYS_VISIBLE_FIELDS" description="FLEXI_FIELD_GROUP_ALWAYS_VISIBLE_FIELDS_DESC" depend_class="compact_edit"/>
+			<field name="" type="separator" default="FLEXI_FIELD_EDITING" level="tabset_close" box_type="1" />
 		</fieldset>
 		<fieldset name="group-fieldgroup-viewing" hidden="true" icon_class="icon-screen" label="FLEXI_FIELD_VIEWING" addfieldpath="/administrator/components/com_flexicontent/elements">
 
