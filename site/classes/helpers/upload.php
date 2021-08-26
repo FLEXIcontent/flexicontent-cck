@@ -5,11 +5,11 @@ class flexicontent_upload
 {
 	static function makeSafe($file, $language = null)
 	{
-		// Replace [] with () and multiple space with single, but firest remove any leading / trailing spaces
+		// Replace [] with () and multiple space with a single hyphen '-', but firest remove any leading / trailing spaces
 		$file = trim($file);
 		$file = str_replace('[', '(', $file);
 		$file = str_replace(']', ')', $file);
-		$file = preg_replace('![\s]+!', ' ', $file);
+		$file = preg_replace('![\s]+!', '-', $file);
 
 		// Replace $*"[]:;|/ with dash after removing any leading / trailing spaces
 		$file = preg_replace('![\$\*\"\[\]\:\;\|\/]]+!', '_', $file);
@@ -18,7 +18,7 @@ class flexicontent_upload
 		$file = rtrim($file, '.');
 
 		// Regex for replacing non safe characters
-		$regex = array('#(\.){2,}#', '#[^A-Za-z0-9\(\)\.\_\- ]#', '#^\.#');
+		$regex = array('#(\.){2,}#', '#[^A-Za-z0-9\(\)\.\_\-]#', '#^\.#');
 
 		// Language transliteration should include given language, and also site + admin defaults (most useful is site default)
 		$lang_params = JComponentHelper::getParams('com_languages');
