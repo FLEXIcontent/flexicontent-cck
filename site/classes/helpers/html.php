@@ -1885,9 +1885,6 @@ class flexicontent_html
 					var fc_root_uri = '" . JUri::root(true) . "';
 					var fc_base_uri = '" . JUri::base(true) . "';
 					var FC_URL_VARS = " . json_encode($FC_URL_VARS) . ";
-
-					// To be removed ... in v3.3.x
-					var _FC_GET = " . json_encode($_GET) . ";
 				";
 
 				break;
