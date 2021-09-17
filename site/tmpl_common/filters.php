@@ -18,7 +18,7 @@ $flexi_button_class_reset =  ($params->get('flexi_button_class_reset','') != '-1
 
 $filters_in_lines = $filter_placement==1 || $filter_placement==2;
 $filters_in_tabs  = $filter_placement==3;
-$filters_in_slide = $params->get('fc_filter_in_slide', 1);
+$filters_in_slide = $params->get('fc_filter_in_slide', 0);
 $filter_container_class  = $filters_in_lines ? 'fc_filter_line' : 'fc_filter';
 $filter_container_class .= $filter_placement==2 ? ' fc_clear_label' : '';
 
