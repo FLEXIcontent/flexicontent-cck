@@ -26,8 +26,8 @@ $tmpl = $this->tmpl;
 $item = $this->item;
 $menu = JFactory::getApplication()->getMenu()->getActive();
 
-JFactory::getDocument()->addScriptVersion(JUri::base(true).'/components/com_flexicontent/assets/js/tabber-minimized.js', FLEXI_VHASH);
-JFactory::getDocument()->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/tabber.css', FLEXI_VHASH);
+JFactory::getDocument()->addScript(JUri::root(true).'/components/com_flexicontent/assets/js/tabber-minimized.js', array('version' => FLEXI_VHASH));
+JFactory::getDocument()->addStyleSheet(JUri::root(true).'/components/com_flexicontent/assets/css/tabber.css', array('version' => FLEXI_VHASH));
 JFactory::getDocument()->addScriptDeclaration(' document.write(\'<style type="text/css">.fctabber{display:none;}<\/style>\'); ');  // temporarily hide the tabbers until javascript runs
 
 // Prepend toc (Table of contents) before item's description (toc will usually float right)
