@@ -267,7 +267,7 @@ class FlexicontentControllerFlexicontent extends FlexicontentControllerBaseAdmin
 		VALUES
 		(
 			1, 0, "Article", "article", "", 1, 0, "0000-00-00 00:00:00", 1,
-			\'{"ilayout":"default","hide_maintext":"0","hide_html":"0","maintext_label":"","maintext_desc":"","comments":"","top_cols":"two","bottom_cols":"two","allow_jview":"1"}\'
+			\'{"ilayout":"grid","hide_maintext":"0","hide_html":"0","maintext_label":"","maintext_desc":"","comments":"","top_cols":"two","bottom_cols":"two","allow_jview":"1"}\'
 		)
 		';
 
