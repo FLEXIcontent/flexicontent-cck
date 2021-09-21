@@ -334,14 +334,14 @@ class FlexicontentViewCategory extends FlexicontentViewBaseRecord
 
 
 			if (!$inherit_parent || $row->parent_id==='1')
-				$row_clayout = $catparams->get('clayout', $cparams->get('clayout', 'blog'));
+				$row_clayout = $catparams->get('clayout', $cparams->get('clayout', 'grid'));
 			else {
 				$row_clayout = $catparams->get('clayout', '');
 
 				if (!$row_clayout)
 				{
 					$_ancestors = $this->getModel()->getParentParams($row->id);  // This is ordered by level ASC
-					$row_clayout = $cparams->get('clayout', 'blog');
+					$row_clayout = $cparams->get('clayout', 'grid');
 					$cats_params = array();
 					foreach($_ancestors as $_cid => $_cat)
 					{

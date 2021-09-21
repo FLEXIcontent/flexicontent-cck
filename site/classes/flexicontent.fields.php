@@ -1191,7 +1191,7 @@ class FlexicontentFields
 
 		if ( $use_tmpl && ($view == 'category' || $view == FLEXI_ITEMVIEW) )
 		{
-		  $fbypos = flexicontent_tmpl::getFieldsByPositions($params->get($layout, 'default'), $view);
+		  $fbypos = flexicontent_tmpl::getFieldsByPositions($params->get($layout, 'grid'), $view);
 		  //$onDemandOnly = false;
 		}
 

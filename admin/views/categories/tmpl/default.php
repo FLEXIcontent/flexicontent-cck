@@ -425,7 +425,7 @@ if ($js)
 
 			if (!$inherit_parent || $row->parent_id==='1')
 			{
-				$row_clayout = $row->config->get('clayout', $cparams->get('clayout', 'blog'));
+				$row_clayout = $row->config->get('clayout', $cparams->get('clayout', 'grid'));
 			}
 			else
 			{
@@ -440,7 +440,7 @@ if ($js)
 					else
 					{
 						$_ancestors = $this->getModel()->getParentParams($row->id);  // This is ordered by level ASC
-						$row_clayout = $cparams->get('clayout', 'blog');
+						$row_clayout = $cparams->get('clayout', 'grid');
 						foreach($_ancestors as $_cid => $_cat)
 						{
 							if (!isset($cats_params[$_cid]))

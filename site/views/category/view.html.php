@@ -1097,7 +1097,7 @@ class FlexicontentViewCategory extends JViewLegacy
 
 		// Despite layout variable not being empty, there may be missing some sub-layout files,
 		// e.g. category_somefilename.php for this reason we will use a fallback layout that surely has these files
-		$fallback_layout = $params->get('category_fallback_layout', 'blog');  // parameter does not exist yet
+		$fallback_layout = $params->get('category_fallback_layout', 'grid');  // parameter does not exist yet
 		if ($clayout != $fallback_layout)
 		{
 			$this->addTemplatePath(JPATH_COMPONENT.DS.'templates'.DS.$fallback_layout);
