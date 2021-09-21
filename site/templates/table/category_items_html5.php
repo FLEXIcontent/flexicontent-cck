@@ -73,7 +73,7 @@ $show_title  = $this->params->get('show_title', 1);
 $link_titles = $this->params->get('link_titles', 0);
 $table_class = $this->params->get('table_class', 'adminlist table');
 
-$layout = $this->params->get('clayout', 'default');
+$layout = $this->params->get('clayout');
 $fbypos = flexicontent_tmpl::getFieldsByPositions($layout, 'category');
 $columns = array();
 foreach ($items as $item)
