@@ -25,7 +25,7 @@ function FLEXIcontentBuildRoute(&$query)
 }
 
 
-function FLEXIcontentParseRoute($segments)
+function FLEXIcontentParseRoute(& $segments)
 {
 	static $router = null;
 
@@ -571,8 +571,16 @@ class _FlexicontentSiteRouter
 	/**
 	 * Construct a proper URL request from the SEF url, we try to reverse what FLEXIcontentBuildRoute() DID
 	 */
-	public function FLEXIcontentParseRoute($segments)
+	public function FLEXIcontentParseRoute(& $_segments)
 	{
+		/**
+		 * Set segments array to empty array, to indicate to Joomla parser that all segments have been consumed
+		 * otherwise J4 router will assume that routing has failed.
+		 * If we fail to parse a valid URL we will restore the segments array before terminating this method
+		 */
+		$segments = array_merge(array(), $_segments);
+		$_segments = array();
+
 		$vars = array();
 		$_tbl = null;
 
@@ -812,6 +820,9 @@ class _FlexicontentSiteRouter
 
 					return $vars;
 			}
+
+			// Failed to parse, restore segments array ...
+			$_segments = $segments;
 		}
 
 
