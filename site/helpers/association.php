@@ -9,9 +9,15 @@
 
 defined('_JEXEC') or die;
 
-JLoader::register('ContentHelper', JPATH_ADMINISTRATOR . '/components/com_content/helpers/content.php');
+use Joomla\CMS\Factory;
+use Joomla\CMS\Language\Associations;
+use Joomla\CMS\Language\LanguageHelper;
+use Joomla\CMS\Language\Multilanguage;
+use Joomla\Component\Categories\Administrator\Helper\CategoryAssociationHelper;
+
+//JLoader::register('ContentHelper', JPATH_ADMINISTRATOR . '/components/com_content/helpers/content.php');
 JLoader::register('FlexicontentHelperRoute', JPATH_SITE . '/components/com_flexicontent/helpers/route.php');
-JLoader::register('CategoryHelperAssociation', JPATH_ADMINISTRATOR . '/components/com_categories/helpers/association.php');
+//JLoader::register('CategoryHelperAssociation', JPATH_ADMINISTRATOR . '/components/com_categories/helpers/association.php');
 
 JTable::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'tables');
 
@@ -22,7 +28,7 @@ JTable::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'
  * @subpackage  com_content
  * @since       3.0
  */
-abstract class FlexicontentHelperAssociation extends CategoryHelperAssociation
+abstract class FlexicontentHelperAssociation extends CategoryAssociationHelper
 {
 	/**
 	 * Method to get the associations for a given item

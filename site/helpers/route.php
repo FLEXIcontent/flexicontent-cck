@@ -13,6 +13,9 @@
 // no direct access
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
+use Joomla\Registry\Registry;
+use Joomla\CMS\Language\LanguageHelper;
+
 // Component Helper
 jimport('cms.component.helper');
 
@@ -261,7 +264,7 @@ class FlexicontentHelperRoute
 		{
 			if (
 				// Do not display language without frontend UI
-				!JLanguage::exists($language->lang_code) ||
+				!LanguageHelper::exists($language->lang_code) ||
 
 				// Do not display language without specific home menu
 				!$menus->getDefault($language->lang_code) ||
