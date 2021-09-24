@@ -13,13 +13,26 @@ use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Associations;
 use Joomla\CMS\Language\LanguageHelper;
 use Joomla\CMS\Language\Multilanguage;
-use Joomla\Component\Categories\Administrator\Helper\CategoryAssociationHelper;
+use Joomla\Component\Categories\Administrator\Helper\CategoryAssociationHelper as J4_CategoryAssociationHelper;
 
-//JLoader::register('ContentHelper', JPATH_ADMINISTRATOR . '/components/com_content/helpers/content.php');
 JLoader::register('FlexicontentHelperRoute', JPATH_SITE . '/components/com_flexicontent/helpers/route.php');
-//JLoader::register('CategoryHelperAssociation', JPATH_ADMINISTRATOR . '/components/com_categories/helpers/association.php');
-
 JTable::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'tables');
+
+
+/*
+ * Class is different in J3 ...
+ */
+if (!FLEXI_J40GE)
+{
+	JLoader::register('CategoryHelperAssociation', JPATH_ADMINISTRATOR . '/components/com_categories/helpers/association.php');
+
+	class CategoryAssociationHelper extends CategoryHelperAssociation {}
+}
+else
+{
+	class CategoryAssociationHelper extends J4_CategoryAssociationHelper {}
+}
+
 
 /**
  * Content Component Association Helper
