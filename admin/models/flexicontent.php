@@ -874,6 +874,8 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 				continue;
 			else if ( $col_name=='type_id' || $col_name=='lang_parent_id')
 				$query .= " AND ie.`".$col_name."`=ca.`".$col_name."`";
+			else if ( $col_name=='publish_up' || $col_name=='publish_down')
+				$query .= " AND (i.`".$col_name."`=ca.`".$col_name."` OR (i.`".$col_name."` IS NULL AND ca.`".$col_name."` IS NULL))";
 			else
 				$query .= " AND i.`".$col_name."`=ca.`".$col_name."`";
 		}
