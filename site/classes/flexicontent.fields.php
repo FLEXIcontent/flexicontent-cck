@@ -5,7 +5,7 @@
  *
  * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
  * @link            https://flexicontent.org
- * @copyright       Copyright © 2017, FLEXIcontent team, All Rights Reserved
+ * @copyright       Copyright Â© 2017, FLEXIcontent team, All Rights Reserved
  * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
@@ -3121,9 +3121,15 @@ class FlexicontentFields
 			break;
 
 		case 'tags':
-			$query  = 'SELECT t.id AS value_id, t.name AS value, rel.itemid AS itemid'
+			$query  = 'SELECT t.id AS value_id, ' . (FLEXI_FALANG ? 'CASE WHEN (fa.value IS NOT NULL) THEN fa.value ELSE t.name END' : ' t.name') . ' AS value, rel.itemid AS itemid' 
 				.' FROM #__flexicontent_tags AS t'
 				.' JOIN #__flexicontent_tags_item_relations AS rel ON t.id=rel.tid'
+				. (!FLEXI_FALANG ? '' :
+					' LEFT JOIN #__content AS c ON c.id = rel.itemid ' .
+					' LEFT JOIN #__languages AS la ON la.lang_code = c.language ' .
+          ' LEFT JOIN #__falang_content AS fa ON fa.reference_table = "tags" ' .
+						' AND fa.reference_field = "title" AND fa.reference_id = t.jtag_id AND fa.language_id = la.lang_id'
+				)
 				.' WHERE t.id<>0 AND rel.itemid IN ('.(@$field->query_itemids ? implode(',', $field->query_itemids) : $field->item_id) .')';
 			break;
 
