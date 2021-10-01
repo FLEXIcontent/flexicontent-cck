@@ -138,7 +138,7 @@
 			catid: catid
 		};
 
-		if (item_id)
+		if (parseInt(item_id))
 		{
 			ajax_data.item_id = item_id;
 		}
