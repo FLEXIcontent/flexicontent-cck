@@ -1701,7 +1701,8 @@ class ParentClassItem extends FCModelAdmin
 
 		$default_lang = $app->isClient('site')
 			? $params->get('default_language_fe', '_author_lang_')
-			: '*';   // or Site default:  // flexicontent_html::getSiteDefaultLang()  // JComponentHelper::getParams('com_languages')->get('site', '*')
+			// In Backend use Site default. Alternative we can get site default also using: // flexicontent_html::getSiteDefaultLang()  
+			: JComponentHelper::getParams('com_languages')->get('site', '*');
 		$default_lang = $default_lang === '_author_lang_'
 			? $user->getParam('language', '*')
 			: $default_lang;
