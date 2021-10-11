@@ -131,6 +131,7 @@ class plgFlexicontent_fieldsImage extends FCField
 
 		$thumb_size_resizer = $field->parameters->get('thumb_size_resizer', 2);
 		$thumb_size_default = $field->parameters->get('thumb_size_default', 120);
+    $thumb_zc = $field->parameters->get('method_b', 1);
 		$preview_thumb_w = $preview_thumb_h = 600;
 
 		// Optional properies configuration
@@ -877,7 +878,7 @@ class plgFlexicontent_fieldsImage extends FCField
 						htmlspecialchars($img_link . '&w='.$preview_thumb_w . '&h=' . $preview_thumb_h . '&zc=1&q=95&ar=x' . $f);*/
 
 					$img_link = htmlspecialchars(phpThumbURL(
-						'src=' . $img_link . '&w=' . $preview_thumb_w . '&h=' . $preview_thumb_h . '&zc=1&q=95&ar=x' . $f,
+						'src=' . $img_link . '&w=' . $preview_thumb_w . '&h=' . $preview_thumb_h . '&zc='.$thumb_zc.'&q=95&ar=x' . $f,
 						JUri::root(true) . '/components/com_flexicontent/librairies/phpthumb/phpThumb.php'
 					));
 				}
