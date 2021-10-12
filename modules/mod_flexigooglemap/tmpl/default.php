@@ -136,7 +136,7 @@ $use_mlist = (int) $params->get('use_dynamic_marker_list', 0);
 <?php if ($mapapi === 'googlemap') : ?>
 
 
-	<script type="text/javascript" src="modules/mod_flexigooglemap/assets/js/markerclusterer.js"></script>
+	<script src="modules/mod_flexigooglemap/assets/js/markerclusterer.js"></script>
 	<script>
 
 		function fc_MapMod_addToVisibleList_<?php echo $module->id;?>(map, marker)

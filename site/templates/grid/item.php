@@ -85,7 +85,7 @@ $microdata_itemtype_code = 'itemscope itemtype="http://schema.org/'.$microdata_i
 	<?php if (JFactory::getApplication()->input->getInt('print')) : ?>
 		<!-- BOF Print handling -->
 		<?php if ($this->params->get('print_behaviour', 'auto') == 'auto') : ?>
-			<script type="text/javascript">jQuery(document).ready(function(){ window.print(); });</script>
+			<script>jQuery(document).ready(function(){ window.print(); });</script>
 		<?php	elseif ($this->params->get('print_behaviour') == 'button') : ?>
 			<input type='button' id='printBtn' name='printBtn' value='<?php echo JText::_('Print');?>' class='btn btn-info' onclick='this.style.display="none"; window.print(); return false;'>
 		<?php endif; ?>

@@ -61,7 +61,7 @@ $menu = JFactory::getApplication()->getMenu()->getActive();
 if ($menu) $page_classes .= ' menuitem'.$menu->id; 
 ?>
 
-<!--script type="text/javascript">
+<!--script>
 </script-->
 
 <div id="flexicontent" class="flexicontent <?php echo $page_classes; ?>" >
