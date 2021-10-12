@@ -311,7 +311,8 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 			header("Cache-Control: no-cache");
 			header("Pragma: no-cache");
 
-			$fc_css = JUri::base(true) . '/components/com_flexicontent/assets/css/j3x.css';
+			$rtl_sfx = !JFactory::getLanguage()->isRtl() ? '' : '_rtl';
+			$fc_css = JUri::base(true) . '/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x' . $rtl_sfx . '.css' : 'j3x' . $rtl_sfx . '.css');
 			echo '
 			<link rel="stylesheet" href="' . JUri::base(true) . '/components/com_flexicontent/assets/css/flexicontentbackend.css?' . FLEXI_VHASH . '" />
 			<link rel="stylesheet" href="' . $fc_css . '?' . FLEXI_VHASH . '" />
