@@ -5,7 +5,7 @@
  *
  * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
  * @link            https://flexicontent.org
- * @copyright       Copyright © 2020, FLEXIcontent team, All Rights Reserved
+ * @copyright       Copyright ï¿½ 2020, FLEXIcontent team, All Rights Reserved
  * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
@@ -64,7 +64,7 @@ class plgFlexicontent_fieldsTermlist extends FCField
 		// Create the editor object of editor prefered by the user,
 		// this will also add the needed JS to the HTML head
 		$editor_name = $field->parameters->get( 'editor',  $user->getParam('editor', $app->getCfg('editor'))  );
-		$editor  = JFactory::getEditor($editor_name);
+		$editor  = JEditor::getInstance($editor_name);
 		$editor_plg_params = array();  // Override parameters of the editor plugin, ignored by most editors !!
 
 

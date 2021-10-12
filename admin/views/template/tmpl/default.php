@@ -697,7 +697,7 @@ $this->document->addScript(JUri::base(true).'/components/com_flexicontent/assets
 
 				<?php
 				if ($use_editor) {
-					$editor = JFactory::getEditor('codemirror');
+					$editor = JEditor::getInstance('codemirror');
 					$editor_plg_params = array('mode'=>'php');  // Override parameters of the editor plugin, ignored by most editors !!
 				}
 
