@@ -259,7 +259,9 @@ if ( $cparams->get('recompile_core_less', 0) && $format == 'html' )
 		'less/fcvote.less',
 		'less/tabber.less',
 		'less/j3x.less',
-		'less/j3x_rtl.less'
+		'less/j3x_rtl.less',
+		'less/j4x.less',
+		'less/j4x_rtl.less'
 	);
 	flexicontent_html::checkedLessCompile($less_files, $path, $inc_path, $force=false);
 
@@ -287,6 +289,9 @@ if ( $cparams->get('recompile_core_less', 0) && $format == 'html' )
 	flexicontent_html::checkedLessCompile($less_files, $path, $inc_path, $force);
 
 	$less_files = array('less/j3x.less');
+	flexicontent_html::checkedLessCompile($less_files, $path, $inc_path, $force=false);
+
+	$less_files = array('less/j4x.less');
 	flexicontent_html::checkedLessCompile($less_files, $path, $inc_path, $force=false);
 
 
@@ -320,6 +325,9 @@ if ( $cparams->get('recompile_core_less', 0) && $format == 'html' )
 	flexicontent_html::checkedLessCompile($less_files, $path, $inc_path, $force);
 
 	$less_files = array('less/j3x_rtl.less');
+	flexicontent_html::checkedLessCompile($less_files, $path, $inc_path, $force=false);
+
+	$less_files = array('less/j4x_rtl.less');
 	flexicontent_html::checkedLessCompile($less_files, $path, $inc_path, $force=false);
 
 	/* RTL EOF */

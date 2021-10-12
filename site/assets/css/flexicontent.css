@@ -872,6 +872,9 @@ td.col_edit_layout {
 #flexicontent input.fcitem_order_no {
 	text-align: center;
 }
+.flexicontent #fc-managers-header div.fc_is_selarrow .select2-chosen {
+	width: 0 !important;
+}
 .flexicontent #fc-managers-header select.fc_is_selarrow {
 	max-width: 1.8em !important;
 }
