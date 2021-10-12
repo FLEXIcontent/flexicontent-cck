@@ -108,7 +108,7 @@ switch ($mapapi)
 <?php if ($mapapi === 'googlemap') : ?>
 
 
-	<script type="text/javascript" src="modules/mod_flexigooglemap/assets/js/markerclusterer.js"></script>
+	<script src="modules/mod_flexigooglemap/assets/js/markerclusterer.js"></script>
 	<script>
 
 		function fc_MapMod_autoCenter_<?php echo $module->id;?>(map, markers)
