@@ -45,14 +45,14 @@
 	</fields>
 	
 	<fieldgroups>
-		<group readonly="true">subcategory_title</group>
-		<group readonly="true">subcategory_description</group>
-		<group>aftertitle</group>
-		<group>aftertitle_nolabel</group>
-		<group>aftertitle2</group>
-		<group>aftertitle_nolabel2</group>
-		<group>aftertitle3</group>
-		<group>aftertitle_nolabel3</group>
+		<group tcolor="gray" readonly="true">subcategory_title</group>
+		<group tcolor="gray" readonly="true">subcategory_description</group>
+		<group tcolor="darkcyan" title="After title">aftertitle</group>
+		<group tcolor="darkcyan" title="After title, no label" >aftertitle_nolabel</group>
+		<group tcolor="darkcyan" title="After title 2">aftertitle2</group>
+		<group tcolor="darkcyan" title="After title, no lable">aftertitle_nolabel2</group>
+		<group tcolor="darkcyan" title="After title 3">aftertitle3</group>
+		<group tcolor="darkcyan" title="After title, no label">aftertitle_nolabel3</group>
 	</fieldgroups>
 	<csscategory>
 		<file>css/category.css</file>

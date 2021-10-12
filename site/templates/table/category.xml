@@ -115,8 +115,8 @@
 	</fields>
 	
 	<fieldgroups>
-		<group>table</group>
-		<group>renderonly</group>
+		<group tcolor="darkgreen" title="Column, one field = one column">table</group>
+		<group tcolor="darkgray" title="Render only, no display">renderonly</group>
 	</fieldgroups>
 	<csscategory>
 		<file>css/category.css</file>
