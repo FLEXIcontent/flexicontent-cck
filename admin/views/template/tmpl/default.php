@@ -429,7 +429,7 @@ $this->document->addScript(JUri::base(true).'/components/com_flexicontent/assets
 
 							?>
 
-							<div class="positions_title label label-success" style="color: white; margin:10px 0 2px; <?php echo $title_color; ?>"><?php echo $postitle; ?></div>
+							<div class="positions_title label label-success" style="color: white; margin:10px 0 -6px;display: inline-block; padding: 5px; <?php echo $title_color; ?>"><?php echo $postitle; ?></div>
 
 							<?php
 							if ( isset($this->layout->attributes[$count]['readonly']) ) {
