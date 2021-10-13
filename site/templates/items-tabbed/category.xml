@@ -49,9 +49,9 @@
 	</fields>
 	
 	<fieldgroups>
-		<group tcolor="darkcyan" title="Subtitle 1">subtitle1</group>
-		<group tcolor="darkcyan" title="Subtitle 2">subtitle2</group>
-		<group tcolor="darkcyan" title="Subtitle 3">subtitle3</group>
+		<group tcolor="darkcyan" title="After Title row 1">subtitle1</group>
+		<group tcolor="darkcyan" title="After Title row 2">subtitle2</group>
+		<group tcolor="darkcyan" title="After Title row 3">subtitle3</group>
 		<group posrow="img_top" tcolor="#3A2459" title="Image">image</group>
 		<group posrow="img_top" tcolor="#3A2459" title="Top">top</group>
 		<group tcolor="#000000" title="Description">description</group>
