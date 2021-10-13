@@ -406,7 +406,7 @@ if ($this->max_tab_types && count($this->itemTypes) >= $this->max_tab_types)
 elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 {
 	echo '
-	<div style="height: 54px; overflow: hidden; margin-top: -8px; ">
+	<div style="overflow: hidden; margin: -8px 0; ">
 		<div class="fctabber s-cblue" id="items_type_tabset">';
 
 	$filter_type = $this->getModel()->getState('filter_type');
