@@ -131,6 +131,7 @@
 .badge,
 .flexicontent label.label {
 	margin: 0px 2px 2px 4px;
+	background: var(--template-bg-dark-20);
 }
 .label.highlight,
 .badge.highlight {
@@ -150,6 +151,7 @@ div.toolbar-box {
 }
 #flexicontent select {
 	width: auto;
+	border: 1px solid var(--template-bg-dark-20);
 }
 #user-groups legend + .control-group,
 #user-groups .control-group {
@@ -432,9 +434,35 @@ dl#content-pane.tabs {
 }
 #flexicontent .btn,
 .btn {
-	border: 1px solid;
+	border: 1px solid var(--template-bg-dark-20);
+	background: #fff;
 }
 [class^="fcsb-icon-"]:before,
 [class*=" fcsb-icon-"]:before {
 	font-family: inherit;
+}
+table.fcmanlist td {
+	padding: .75rem 1rem;
+}
+#s2id_scope.select2-container.use_select2_lib .select2-choice {
+	width: 15px !important;
+	height: 32px !important;
+}
+.icon-tags:before {
+	content: "";
+}
+#flexicontent .btn-outline-info.active {
+	color: var(--template-text-dark);
+}
+#flexicontent .btn.btn-sm {
+	padding: inherit;
+}
+div.statetoggler {
+	padding: 13px 12px !important;
+	width: auto;
+	line-height: inherit;
+	box-sizing: content-box;
+}
+.flexicontent *:not(.input-append):not(.input-prepend):not(.input-group) > select:not(.custom-select) {
+	padding: 11px;
 }

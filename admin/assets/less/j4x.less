@@ -152,6 +152,7 @@
 .badge,
 .flexicontent label.label {
 	margin: 0px 2px 2px 4px;
+	background:var(--template-bg-dark-20);
 }
 .label.highlight,
 .badge.highlight {
@@ -180,6 +181,7 @@ div.toolbar-box {
 /* TODO examine making this more specific ? */
 #flexicontent select {
 	width: auto;
+	border: 1px solid var(--template-bg-dark-20);
 }
 
 #user-groups legend + .control-group,
@@ -541,11 +543,48 @@ dl#content-pane.tabs {
 	padding: 5px 2%;
 }
 
-/* fix btn border */
+/* fix btn */
 #flexicontent .btn, .btn {
-    border: 1px solid;
+    border: 1px solid var(--template-bg-dark-20);
+    background: #fff;
 }
 /* fix iconmoon display */
 [class^="fcsb-icon-"]:before, [class*=" fcsb-icon-"]:before {
     font-family: inherit;
+}
+/* fix table display */
+    table.fcmanlist td {
+		padding: .75rem 1rem;
+}
+#s2id_scope.select2-container.use_select2_lib .select2-choice {
+    width: 15px !important;
+    height: 32px !important;
+}
+/* fix icon tags */
+.icon-tags:before {
+    content: "";
+}
+/*fix icon state*/
+#flexicontent .btn-outline-info.active {
+    color: var(--template-text-dark);
+}
+/* fix button size*/
+#flexicontent .btn.btn-sm {
+    padding: inherit;
+}
+div.statetoggler {
+    padding: 13px 12px !important;
+    width: auto;
+    line-height: inherit;
+    box-sizing: content-box;
+}
+.flexicontent *:not(.input-append):not(.input-prepend):not(.input-group) > select:not(.custom-select) {
+    padding: 11px;
+}
+#flexicontent .fc-xpended .input-group-text:first-child, #flexicontent .fc-xpended-row .input-group-text:first-child, #flexicontent .fc-xpended .add-on:first-child, #flexicontent .fc-xpended-row .add-on:first-child {
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+.flexicontent #fc-managers-header #fc-columns-slide-btn, .flexicontent #fc-managers-header #fc-filters-slide-btn {
+    height: inherit;
 }
