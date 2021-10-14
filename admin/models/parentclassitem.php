@@ -2271,7 +2271,7 @@ class ParentClassItem extends FCModelAdmin
 
 		if ( !$item->bind($data) )
 		{
-			$this->setError($this->_db->getErrorMsg());
+			$this->setError($item->getError());
 			return false;
 		}
 
@@ -2530,7 +2530,7 @@ class ParentClassItem extends FCModelAdmin
 			// Re-bind (possibly modified data) to the item
 			if (!$item->bind($core_data_via_events))
 			{
-				$this->setError($this->_db->getErrorMsg());
+				$this->setError($item->getError());
 				return false;
 			}
 		}

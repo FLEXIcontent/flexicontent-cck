@@ -345,10 +345,9 @@ class plgSearchFlexisearch extends JPlugin
 			$query->order($order);
 			//echo "<pre style='white-space:normal!important;'>".$query."</pre>";
 			
-			$db->setQuery($query, 0, $limit);
-			$list = $db->loadObjectList();
-			if ($db->getErrorNum()) { echo $db->getErrorMsg(); }
-			if ( $list )
+			$list = $db->setQuery($query, 0, $limit)->loadObjectList();
+
+			if ($list)
 			{
 				$item_cats = FlexicontentFields::_getCategories($list);
 				$typeData = flexicontent_db::getTypeData();

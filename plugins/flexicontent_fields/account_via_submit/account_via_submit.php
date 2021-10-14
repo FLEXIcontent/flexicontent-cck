@@ -404,9 +404,7 @@ class plgFlexicontent_fieldsAccount_via_submit extends FCField
 
 		$db = JFactory::getDbo();
 		$query = "UPDATE #__flexicontent_fields SET attribs=".$db->Quote($attribs) ." WHERE id = ".$field->id;
-		$db->setQuery($query);
-		$result = $db->execute();
-		if ($db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');
+		$result = $db->setQuery($query)->execute();
 	}
 
 

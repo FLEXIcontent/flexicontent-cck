@@ -340,7 +340,7 @@ class FlexicontentControllerFlexicontent extends FlexicontentControllerBaseAdmin
 			}
 			else
 			{
-				$db_err_msg = $db->getErrorNum() ? ' :<br/>' . $e->getMessage() : '';
+				$db_err_msg = $e->getMessage();
 				JFactory::getApplication()->enqueueMessage(JText::_('FLEXI_COULD_NOT_PUBLISH_PLUGINS') . $db_err_msg, 'notice');
 
 				return false;

@@ -1355,7 +1355,7 @@ class plgFlexicontent_fieldsFile extends FCField
 					// Update DB data of the file
 					if ( !$row->check() || !$row->store() )
 					{
-						JFactory::getApplication()->enqueueMessage("FILE FIELD: ".JFactory::getDbo()->getErrorMsg(), 'warning' );
+						JFactory::getApplication()->enqueueMessage("FILE FIELD: " . $row->getError(), 'warning');
 						if ($use_ingroup) $newpost[$new++] = null;
 						continue;
 					}
@@ -1849,13 +1849,7 @@ class plgFlexicontent_fieldsFile extends FCField
 				.' AND f.published= 1'
 				. $access_clauses['and']
 				;
-		$db->setQuery($query);
-		try {
-			$file = $db->loadObject();
-		}
-		catch (Exception $e) {
-			jexit( __FUNCTION__.'() -- SQL ERROR: '. (JDEBUG ? '<br/>'.nl2br($db->getErrorMsg()) : 'Enabled DEBUG to see the error') );
-		}
+		$file = $db->setQuery($query)->loadObject();
 
 		if ( empty($file) )
 		{

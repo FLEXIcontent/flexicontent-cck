@@ -460,18 +460,10 @@ class plgFlexicontent_fieldsFcpagenav extends FCField
 				. ' FROM #__content AS i'
 				. ' JOIN #__flexicontent_items_ext AS ie on ie.item_id = i.id'
 				. ' JOIN #__categories AS cc ON cc.id = '. $cid
-				. ' WHERE i.id IN ('. implode(',', $ids) .')';
-			$db->setQuery($query);
+				. ' WHERE i.id IN ('. implode(',', $ids) .')'
+				;
+			$list = $db->setQuery($query)->loadObjectList('id');
 
-			try {
-				$list = $db->loadObjectList('id');
-			}
-			catch (Exception $e) {
-				if ($db->getErrorNum()) JError::raiseWarning($db->getErrorNum(), $db->getErrorMsg(). "<br />".$query."<br />");
-				return array();
-			}
-
-			$list = is_array($list) ? $list : array();
 			return $list;
 		}
 	}
@@ -560,10 +552,7 @@ class plgFlexicontent_fieldsFcpagenav extends FCField
 			. $anddepth
 			. ' ORDER BY '.$ordering
 			;
-
-		$db->setQuery($query);
-		$this->_data_cats = $db->loadColumn();
-		if ($db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');
+		$this->_data_cats = $db->setQuery($query)->loadColumn();
 
 		return $this->_data_cats;
 	}

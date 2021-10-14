@@ -1679,27 +1679,32 @@ class plgSystemFlexisystem extends JPlugin
 
 			// Try to find matching records for visitor's IP, that is within time limit of unique hit
 			$query = "SELECT COUNT(*) FROM #__flexicontent_hits_log WHERE ip=".$db->quote($visitorip)." AND (timestamp + ".$db->quote($secs_between_unique_hit).") > ".$db->quote($current_secs). " AND item_id=". $item_id;
-			$db->setQuery($query);
-			$result = $db->execute();
-			if ($db->getErrorNum()) {
-				$query_create = "CREATE TABLE #__flexicontent_hits_log (item_id INT PRIMARY KEY, timestamp INT NOT NULL, ip VARCHAR(16) NOT NULL DEFAULT '0.0.0.0')";
-				$db->setQuery($query_create);
-				$result = $db->execute();
-				if ($this->_db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($this->_db->getErrorMsg()),'error');
-				return 1; // on select error e.g. table created, count a new hit
+
+			try
+			{
+				$result = $db->setQuery($query)->execute();
 			}
+			catch (Exception $e)
+			{
+				$query_create = "CREATE TABLE #__flexicontent_hits_log (item_id INT PRIMARY KEY, timestamp INT NOT NULL, ip VARCHAR(16) NOT NULL DEFAULT '0.0.0.0')";
+				$result = $db->setQuery($query_create)->execute();
+
+				// On select error , aka missing table created, count a new hit
+				return 1;
+			}
+
 			$count = $db->loadResult();
 
 			// Log the visit into the hits logging db table
-			if(empty($count))
+			if (empty($count))
 			{
 				$query = "INSERT INTO #__flexicontent_hits_log (item_id, timestamp, ip) "
 						."  VALUES (".$db->quote($item_id).", ".$db->quote($current_secs).", ".$db->quote($visitorip).")"
 						." ON DUPLICATE KEY UPDATE timestamp=".$db->quote($current_secs).", ip=".$db->quote($visitorip);
-				$db->setQuery($query);
-				$result = $db->execute();
-				if ($db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');
-				return 1;  // last visit not found or is beyond time limit, count a new hit
+				$result = $db->setQuery($query)->execute();
+
+				// Last visit not found or is beyond time limit, count a new hit
+				return 1;
 			}
 		}
 

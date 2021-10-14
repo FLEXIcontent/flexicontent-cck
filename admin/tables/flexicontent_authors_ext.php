@@ -37,16 +37,13 @@ class flexicontent_authors_ext extends JTable
 		// we have to check and create the row manually, when the user_id row cannot be found in the table
 		$query = "SELECT user_id FROM #__flexicontent_authors_ext ".
 			" WHERE user_id = ". (int) $this->user_id;
-		$this->_db->setQuery($query);
-		$row = $this->_db->loadResult();
-		if (!$row) {
+		$row = $this->_db->setQuery($query)->loadResult();
+
+		if (!$row)
+		{
 			$query = "INSERT INTO #__flexicontent_authors_ext (`user_id`) VALUES ('". (int) $this->user_id ."')";
-			$this->_db->setQuery($query);
-			if ( ! $this->_db->execute() ) {
-				$this->_error = 'Database error while creating author extended data row for user_id: '. (int) $this->user_id. ' DB ERROR: '.$this->_db->getErrorMsg();
-				JError::raiseWarning('SOME_ERROR_CODE', $this->_error );
-				return false;
-			}
+			
+			$this->_db->setQuery($query)->execute();
 		}
 
 		return true;

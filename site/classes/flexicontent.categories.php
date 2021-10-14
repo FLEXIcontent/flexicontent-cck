@@ -102,12 +102,10 @@ class flexicontent_cats
 		 .' FROM #__categories AS cat '
 		 .' WHERE cat.extension = ' . $db->Quote('com_content') .' AND (SELECT lft FROM #__categories WHERE id='.(int)$cid.' ) BETWEEN cat.lft AND cat.rgt'
 		 .' GROUP BY cat.id '
-		 .' ORDER BY cat.level ASC';
-		
-		$db->setQuery( $query );
-		$this->parentcats_ids = $db->loadColumn();
-		if ($db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');*/
-		
+		 .' ORDER BY cat.level ASC'
+		 ;
+		$this->parentcats_ids = $db->setQuery($query)->loadColumn();*/
+
 		global $globalcats;
 		$this->parentcats_ids = isset($globalcats[$cid]) ? $globalcats[$cid]->ancestorsarray : array();
 		//echo "<pre>" . print_r($this->parentcats_ids, true) ."</pre>";
@@ -648,10 +646,9 @@ class flexicontent_cats
 			.' WHERE c.id IN ('.implode(',', $all_cats).') AND c.published = 1'
 			.$andaccess
 			;
-		$db->setQuery($query);
-		$published_cats = $db->loadColumn();
-		if ($db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');
-		
+
+		$published_cats = $db->setQuery($query)->loadColumn();
+
 		return array_unique($published_cats);
 	}
 

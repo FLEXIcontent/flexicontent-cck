@@ -460,11 +460,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 	function getFeed()
 	{		
 		$feed = $this->_getList( $this->_buildQuery('feed'), $this->getState('limitstart'), $this->getState('limit') );
-		if ($this->_db->getErrorNum()) {
-			echo __FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($this->_db->getErrorMsg()),'error';
-			exit;
-		}
-		
+
 		return $feed;
 	}
 	

@@ -65,7 +65,6 @@ class JFormFieldFcpositions extends JFormField
 		
 		$db->setQuery($query);
 		$positions = $db->loadObjectList();
-		if ($db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');
 		
 		if ( !$positions )  return array();
 		

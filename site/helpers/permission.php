@@ -323,9 +323,7 @@ class FlexicontentHelperPerm
 
 			// Query the assets table to retrieve the asset names for the specified section
 			$query = "SELECT name FROM #__assets WHERE name like '{$asset_partial}.%';";
-			$db->setQuery($query);
-			$names = $db->loadColumn();
-			if ($db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');
+			$names = $db->setQuery($query)->loadColumn();
 
 			// Create an empty array that will contain the sections on which the user can perform the given action
 			$elements[$uid][$section][$action] = array();

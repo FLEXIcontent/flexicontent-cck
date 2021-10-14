@@ -154,13 +154,6 @@ class UsersHelper
 		);
 		$options = $db->loadObjectList();
 
-		// Check for a database error.
-		if ($db->getErrorNum())
-		{
-			JError::raiseNotice(500, $db->getErrorMsg());
-			return null;
-		}
-
 		foreach ($options as &$option)
 		{
 			$option->text = str_repeat('- ', $option->level).$option->text;
