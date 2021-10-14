@@ -45,6 +45,9 @@ $flexi_button_class_advanced =  ($params->get('flexi_button_class_advanced' ,'')
 $show_txtfields = (int) $params->get('show_txtfields', 1);  // 0: hide, 1: according to content, 2: use custom configuration
 $show_txtfields = !$txtmode ? 0 : $show_txtfields;  // disable this flag if using BASIC index for text search
 
+/*TODO check this variable */
+$type_based_search="";
+
 
 /**
  * Get Content Types allowed for user selection in the Search Form
