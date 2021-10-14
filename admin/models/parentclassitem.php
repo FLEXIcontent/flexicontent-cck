@@ -194,11 +194,11 @@ class ParentClassItem extends FCModelAdmin
 		$jinput = JFactory::getApplication()->input;
 
 		// Set current category ID and current type ID via URL variables (only for new items)
-		$currcatid = !$this->_id
-			? 0  // new item, zero means try more below
-			: $jinput->get('cid', 0, 'int');
+		$currcatid = $this->_id
+			? 0  // existing item, keep current main category
+			: ($jinput->get('catid', 0, 'int') ? $jinput->get('catid', 0, 'int') : $jinput->get('cid', 0, 'int'));
 		$typeid = $this->_id
-			? 0  // existing item, zero means set to its current type
+			? 0  // existing item, keep current type
 			: $jinput->get('typeid', 0, 'int');
 
 		// For new item, try to use posted data

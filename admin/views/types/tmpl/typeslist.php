@@ -3,6 +3,7 @@ $user = JFactory::getUser();
 $app  = JFactory::getApplication();
 $action = $app->input->getCmd('action', '');
 $menu_id = $app->input->getInt('menu_id', '');
+$catid = $app->input->getInt('catid', 0);
 
 // Get types
 $types = flexicontent_html::getTypesList( $_type_ids=false, $_check_perms = false, $_published=true);
@@ -17,7 +18,7 @@ echo '
 	<ul class="nav nav-tabs nav-stacked">
 		';
 		$link = $app->isClient('administrator')
-			? "index.php?option=com_flexicontent&amp;controller=items&amp;task=".$ctrl_task."&amp;". JSession::getFormToken() ."=1"
+			? "index.php?option=com_flexicontent&amp;controller=items&amp;task=".$ctrl_task."&amp;". JSession::getFormToken() ."=1" . '&catid=' . $catid
 			: "index.php?option=com_flexicontent&amp;task=".$ctrl_task."&amp;". JSession::getFormToken() ."=1";
 		$_name = '- ' . JText::_("FLEXI_NO_TYPE") . ' -';
 		?>
@@ -85,8 +86,8 @@ echo '
 				else
 				{
 					$link = $app->isClient('administrator')
-						? "index.php?option=com_flexicontent&amp;controller=items&amp;task=".$ctrl_task."&amp;typeid=".$type->id."&amp;". JSession::getFormToken() ."=1"
-						: "index.php?option=com_flexicontent&amp;task=".$ctrl_task."&amp;typeid=".$type->id.($menu_id ? '&amp;Itemid='.$menu_id : '')."&amp;". JSession::getFormToken() ."=1";
+						? "index.php?option=com_flexicontent&amp;controller=items&amp;task=".$ctrl_task."&amp;typeid=".$type->id."&amp;". JSession::getFormToken() ."=1" . '&catid=' . $catid
+						: "index.php?option=com_flexicontent&amp;task=".$ctrl_task."&amp;typeid=".$type->id.($menu_id ? '&amp;Itemid='.$menu_id : '')."&amp;". JSession::getFormToken() ."=1" . '&catid=' . $catid;
 				}
 				?>
 			<li>
