@@ -225,15 +225,15 @@ $list_arr = modFlexicontentHelper::getList($params, $list_totals);
 // Get comments for the items (if enabled), NOTE !! TODO: modify templates and XML file so that this used
 $comments_arr = modFlexicontentHelper::getComments($params, $list_arr);
 
-$mod_fc_run_times['category_data_retrieval'] = $modfc_jprof->getmicrotime();
+$mod_fc_run_times['category_data_retrieval'] = microtime(1);
 
 // Get Category List Data
 $catdata_arr = modFlexicontentHelper::getCategoryData($params);
 $catdata_arr = $catdata_arr ? $catdata_arr : array(0 => false);
 
-$mod_fc_run_times['category_data_retrieval'] = $modfc_jprof->getmicrotime() - $mod_fc_run_times['category_data_retrieval'];
+$mod_fc_run_times['category_data_retrieval'] = microtime(1) - $mod_fc_run_times['category_data_retrieval'];
 
-$mod_fc_run_times['rendering_template'] = $modfc_jprof->getmicrotime();
+$mod_fc_run_times['rendering_template'] = microtime(1);
 
 // Load needed JS libs & CSS styles
 flexicontent_html::loadFramework('jQuery');
@@ -385,7 +385,7 @@ if ($main_html)
 }
 
 
-$mod_fc_run_times['rendering_template'] = $modfc_jprof->getmicrotime() - $mod_fc_run_times['rendering_template'];
+$mod_fc_run_times['rendering_template'] = microtime(1) - $mod_fc_run_times['rendering_template'];
 
 $task_lbls = array(
 'query_items'=>'Main DB Querying of Items ('.count($catdata_arr).' queries): %.2f secs',
