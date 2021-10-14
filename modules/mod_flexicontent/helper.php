@@ -195,7 +195,7 @@ class modFlexicontentHelper
 		$striptags_onempty_fields = $params->get('striptags_onempty_fields');
 		$onempty_fields_combination = $params->get('onempty_fields_combination');
 
-		//$mod_fc_run_times['query_items']= $modfc_jprof->getmicrotime();
+		//$mod_fc_run_times['query_items']= microtime(1);
 
 		$cat_items_arr = array();
 		if ( !is_array($ordering) )
@@ -216,7 +216,7 @@ class modFlexicontentHelper
 				}
 			}
 		}
-		//$mod_fc_run_times['query_items'] = $modfc_jprof->getmicrotime() - $mod_fc_run_times['query_items'];
+		//$mod_fc_run_times['query_items'] = microtime(1) - $mod_fc_run_times['query_items'];
 
 		// Impementation of Empty Field Filter.
 		// The cost of the following code is minimal.
@@ -225,7 +225,7 @@ class modFlexicontentHelper
 		// The hardcoded limit of max items skipped is 100.
 		if ( count($skiponempty_fields) )
 		{
-			$mod_fc_run_times['empty_fields_filter'] = $modfc_jprof->getmicrotime();
+			$mod_fc_run_times['empty_fields_filter'] = microtime(1);
 
 			// 0. Add ONLY skipfields to the list of fields to be rendered
 			$fields_list = implode(',', $skiponempty_fields);
@@ -325,7 +325,7 @@ class modFlexicontentHelper
 				$filtered_rows_arr[$catid] = $filtered_rows;
 			}
 
-			$mod_fc_run_times['empty_fields_filter'] = $modfc_jprof->getmicrotime() - $mod_fc_run_times['empty_fields_filter'];
+			$mod_fc_run_times['empty_fields_filter'] = microtime(1) - $mod_fc_run_times['empty_fields_filter'];
 		}
 
 		else
@@ -333,7 +333,7 @@ class modFlexicontentHelper
 			$filtered_rows_arr = & $cat_items_arr;
 		}
 
-		$mod_fc_run_times['item_list_creation'] = $modfc_jprof->getmicrotime();
+		$mod_fc_run_times['item_list_creation'] = microtime(1);
 
 		// *** OPTIMIZATION: we only render the fields after skipping unwanted items
 		if ( ($use_fields && count($fields)) || ($use_fields_feat && count($fields_feat)) )
@@ -801,7 +801,7 @@ class modFlexicontentHelper
 			$lists_arr[$catid] = $lists;
 		}
 
-		$mod_fc_run_times['item_list_creation'] = $modfc_jprof->getmicrotime() - $mod_fc_run_times['item_list_creation'];
+		$mod_fc_run_times['item_list_creation'] = microtime(1) - $mod_fc_run_times['item_list_creation'];
 		return $lists_arr;
 	}
 
@@ -2361,7 +2361,7 @@ class modFlexicontentHelper
 
 		foreach ($multiquery_cats as $catid => $cat_where)
 		{
-			$_microtime = $modfc_jprof->getmicrotime();
+			$_microtime = microtime(1);
 
 			// Get content list per given category
 			$per_cat_query = str_replace('__CID_WHERE__', $cat_where, $items_query);
@@ -2385,7 +2385,7 @@ class modFlexicontentHelper
 				$totals[$catid] = $db->loadResult();
 			}
 
-			@ $mod_fc_run_times['query_items'] += $modfc_jprof->getmicrotime() - $_microtime;
+			@ $mod_fc_run_times['query_items'] += microtime(1) - $_microtime;
 
 			// Check for no content found for given category
 			if (empty($content))
@@ -2394,12 +2394,12 @@ class modFlexicontentHelper
 				continue;
 			}
 
-			$_microtime = $modfc_jprof->getmicrotime();
+			$_microtime = microtime(1);
 			// Get content list data per given category
 			$per_cat_query = str_replace('__content__', implode(',',$content), $items_query_data);
 			$db->setQuery($per_cat_query, 0, $count);
 			$_rows = $db->loadObjectList('item_id');
-			@ $mod_fc_run_times['query_items_sec'] += $modfc_jprof->getmicrotime() - $_microtime;
+			@ $mod_fc_run_times['query_items_sec'] += microtime(1) - $_microtime;
 
 			// Secondary content list ordering and assign content list per category
 			$rows = array();
