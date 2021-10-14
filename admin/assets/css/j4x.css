@@ -152,6 +152,7 @@ div.toolbar-box {
 #flexicontent select {
 	width: auto;
 	border: 1px solid var(--template-bg-dark-20);
+	min-width: 200px;
 }
 #user-groups legend + .control-group,
 #user-groups .control-group {
@@ -449,7 +450,12 @@ table.fcmanlist td {
 }
 #s2id_scope.select2-container.use_select2_lib .select2-choice {
 	width: 15px !important;
-	height: 32px !important;
+	height: 34px !important;
+}
+#flexicontent div .btn-group > *:not(:first-child):not(:last-child),
+#flexicontent div .input-append > *:not(:first-child):not(:last-child) {
+	margin-left: -1px;
+	margin-right: -1px;
 }
 .icon-tags:before {
 	content: "";
@@ -457,8 +463,11 @@ table.fcmanlist td {
 .icon-items:before {
 	content: "";
 }
-#flexicontent .btn-outline-info.active {
+#flexicontent .btn-outline-info.active,
+a.btn.btn-small,
+.btn-outline-info {
 	color: var(--template-text-dark);
+	background: #fff;
 }
 #flexicontent .btn.btn-sm {
 	padding: inherit;
@@ -482,6 +491,13 @@ div.statetoggler {
 .flexicontent #fc-managers-header #fc-columns-slide-btn,
 .flexicontent #fc-managers-header #fc-filters-slide-btn {
 	height: inherit;
+}
+a.fc_assoc_translation.label.label-association {
+	padding: 5px;
+	border-radius: 5px;
+}
+.flexicontent #fc-managers-header #limit {
+	padding: 8px 7px !important;
 }
 #toolbar .buttons.btn-group > ul.dropdown-menu {
 	background: #fff;
@@ -534,5 +550,29 @@ div#tags #input-tags {
 	height: 43px !important;
 	border: 1px solid #aaa;
 	border-radius: 5px;
-	margin-right: -8px;
+	margin-right: -6px;
+}
+#flexicontent [class^="fc-xpended"] .input-group-text.fc-lbl-inverted,
+#flexicontent [class^="fc-xpended"] .add-on.fc-lbl-inverted,
+#flexicontent [class*="fc-xpended"] .input-group-text.fc-lbl-inverted,
+#flexicontent [class*="fc-xpended"] .add-on.fc-lbl-inverted {
+	font-size: inherit;
+}
+span.fc-preview-btn.ntxt.disabled.btn-outline-info.btn.btn-sm.hasTooltip {
+	padding: 12px !important;
+}
+#flexicontent .btn[class^="btn-outline-"],
+#flexicontent .btn[class*=" btn-outline-"] {
+	border-width: 2px;
+}
+.statetoggler_disabled {
+	padding: 12px !important;
+}
+#adminListTableFCtemplates a.btn.hasTooltip {
+	background: #fff;
+	margin-right: 9px;
+}
+button.accordion-button.collapsed {
+	border: 1px solid;
+	border-color: var(--template-bg-dark-20);
 }

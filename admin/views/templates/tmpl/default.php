@@ -100,7 +100,7 @@ $list_total_cols = 8;
 <div id="outer_templates" style="float: left; min-width: 50%;">
 
 	<div id="howto_box" style="margin:10px 0% 24px 0%; width: 100%;">
-		<table class="fc-table-list" style="margin: 0; min-width: unset; width: 100%;">
+		<table class="table itemList" style="margin: 0; min-width: unset; width: 100%;">
 			<tr>
 				<th>Configure display of your fields <span class="badge">item</span> view and <span class="badge">multi-item</span> views</th>
 			</tr>
