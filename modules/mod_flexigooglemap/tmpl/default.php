@@ -19,7 +19,6 @@ if (empty($renderedMapLocations) && (int)$params->get('hide_map_when_empty', '1'
 }
 
 JHtml::_('bootstrap.tooltip');
-JHtml::_('behavior.modal');
 $document = JFactory::getDocument();
 $document->addStyleSheet("./modules/mod_flexigooglemap/assets/css/style.css",'text/css',"screen");
 
