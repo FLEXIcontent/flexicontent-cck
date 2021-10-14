@@ -20,7 +20,7 @@ if (empty($renderedMapLocations) && (int)$params->get('hide_map_when_empty', '1'
 
 JHtml::_('bootstrap.tooltip');
 $document = JFactory::getDocument();
-$document->addStyleSheet("./modules/mod_flexigooglemap/assets/css/style.css",'text/css',"screen");
+$document->addStyleSheet(JUri::root(true) .'/modules/mod_flexigooglemap/assets/css/style.css');
 
 $itemmodel_name = 'FlexicontentModelItem';
 $itemmodel = new $itemmodel_name();
