@@ -72,10 +72,10 @@ abstract class JHtmlFcitems extends JHtmlFcbase
 			return '';
 		}
 
-		$publish_up = $row->publish_up != $nullDate
+		$publish_up = $row->publish_up && $row->publish_up != $nullDate
 			? JFactory::getDate($row->publish_up, 'UTC')->setTimeZone($tz)
 			: false;
-		$publish_down = $row->publish_down != $nullDate
+		$publish_down = $row->publish_down && $row->publish_down != $nullDate
 			? JFactory::getDate($row->publish_down, 'UTC')->setTimeZone($tz)
 			: false;
 
