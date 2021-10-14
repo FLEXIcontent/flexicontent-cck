@@ -546,7 +546,9 @@ dl#content-pane.tabs {
 /* fix btn */
 #flexicontent .btn, .btn {
     border: 2px solid var(--template-bg-dark-20);
-    background: #fff;
+}
+#fc-managers-header .btn-group, .btn-group.fc-group.fc-items {
+    background: #fff !important;
 }
 /* fix iconmoon display */
 [class^="fcsb-icon-"]:before, [class*=" fcsb-icon-"]:before {
@@ -604,11 +606,12 @@ div.statetoggler {
 .com_flexicontent .dropdown-toggle:after {
     margin-right: 11px;
 }
-.com_flexicontent .btn-outline-info:hover {
-    color: var(--template-link-hover-color);
-}
 .com_flexicontent .btn-outline-info:hover, .com_flexicontent .btn-outline-dark:hover {
     color: var(--template-link-hover-color-15);
+}
+.com_flexicontent .input-group-text {
+    background: var(--template-bg-dark-30);
+	border:0;
 }
 .flexicontent #fc-filters-box .fc-filter .input-group-prepend input#filter_id {
     border: 1px solid #aaa;
@@ -619,4 +622,28 @@ a.featured.ntxt.btn.btn-sm.btn-outline-info.hasTooltip {
 a.fc-preview-btn.ntxt.btn-outline-info.btn.btn-sm.hasTooltip {
     min-width: 56px;
     padding-top: 12px !important;
+}
+/** fix version icon **/
+.fa-stack, .icon-stack {
+    height: initial;
+    line-height: initial;
+}
+/** fixs for item form **/
+body .container_fcfield input, #flexicontent .container_fcfield input {
+    height: inherit;
+}
+div#tags #input-tags {
+    border-radius: 5px;
+    border: 1px solid #aaa;
+    padding: 6px;
+}
+#toolbar .buttons.btn-group > .toolbar {
+    margin: auto !important;
+    margin-left: -2px !important;
+}
+#fcform_language_container .input-append input {
+    height: 43px !important;
+    border: 1px solid #aaa;
+    border-radius: 5px;
+    margin-right: -8px;
 }

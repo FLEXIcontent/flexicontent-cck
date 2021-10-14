@@ -21,7 +21,7 @@ $app = JFactory::getApplication();
 $template	= $app->getTemplate();
 if($this->check['connect'] == 0) {
 ?>
-	<table class="fc-table-list">
+	<table class="fadminlist table fcmanlist">
 		<thead>
 			<tr>
 				<th colspan="2">
@@ -43,7 +43,7 @@ if($this->check['connect'] == 0) {
 } elseif ($this->check['enabled'] == 1) {
 ?>
 
-	<table class="fc-table-list fc-tbl-short" style="margin: 4px 16px 13px 4px;">
+	<table class="adminlist table fcmanlist" style="margin: 4px 16px 13px 4px;">
 		
 	<thead>
 		<tr>
