@@ -80,7 +80,7 @@ abstract class JHtmlFcitems extends JHtmlFcbase
 			: false;
 
 		// Create tip text, only if we have publish up or down settings
-		if ($publish_up > $nullDate && $nowDate < $publish_up->toUnix())
+		if ($publish_up && $publish_up > $nullDate && $nowDate < $publish_up->toUnix())
 		{
 			$tip_text = JText::_('FLEXI_SCHEDULED_FOR_PUBLICATION', true)
 				. ' <br> '
@@ -92,7 +92,7 @@ abstract class JHtmlFcitems extends JHtmlFcbase
 			</span> ';
 		}
 
-		if ($publish_down > $nullDate && $nowDate > $publish_down->toUnix())
+		if ($publish_down && $publish_down > $nullDate && $nowDate > $publish_down->toUnix())
 		{
 			$tip_text = JText::_('FLEXI_PUBLICATION_EXPIRED', true)
 				. ' <br> '
