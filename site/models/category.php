@@ -2707,7 +2707,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 				}
 				catch (Exception $e) {
 					// Ignore table creation error, we will handle it below by creating a subquery
-					//if ($db->getErrorNum())  echo 'SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg());
+					//echo 'SQL QUERY ERROR:<br/>'.nl2br($e->getMessage());
 					//echo "<br/><br/>GET FILTERED Items (cat model) -- [".$filter->name."] using subquery: ".$query." <br/><br/>";
 				}
 			}

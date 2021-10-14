@@ -329,13 +329,13 @@ class flexicontent_db
 		$queries = preg_split("/;+(?=([^'|^\\\']*['|\\\'][^'|^\\\']*['|\\\'])*[^'|^\\\']*[^'|^\\\']$)/", $queries);
 
 		$db = JFactory::getDbo();
-		foreach ($queries as $query) {
+
+		foreach ($queries as $query)
+		{
 			$query = trim($query);
 			if (!$query) continue;
 
-			$db->setQuery($query);
-			$result = $db->execute();
-			if ($db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');
+			$result = $db->setQuery($query)->execute();
 		}
 	}
 

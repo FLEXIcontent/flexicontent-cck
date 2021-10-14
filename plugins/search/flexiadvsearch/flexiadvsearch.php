@@ -862,9 +862,7 @@ class plgSearchFlexiadvsearch extends JPlugin
 		//require_once(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'SqlFormatter'.DS.'SqlFormatter.php');
 		//echo str_replace('PPP_', '#__', SqlFormatter::format(str_replace('#__', 'PPP_', $query)))."<br/>";
 
-		$db->setQuery( $query_data );
-		$list = $db->loadObjectList();
-		if ($db->getErrorNum()) { echo $db->getErrorMsg(); }
+		$list = $db->setQuery($query_data)->loadObjectList();
 
 		if ( $print_logging_info ) @$fc_run_times['search_query_runtime'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 

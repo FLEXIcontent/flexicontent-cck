@@ -421,17 +421,6 @@ class flexicontent_tags extends flexicontent_basetable
 			$this->$k = $record->$k;
 		}
 
-
-		/**
-		 * NOTE: This is not usuable because an exception will be thrown on DB error, maybe remove or add TRY-CATCH above
-		 */
-		if (!$ret)
-		{
-			$this->setError(get_class($this) . '::store failed - ' . $this->_db->getErrorMsg());
-			return false;
-		}
-
-
 		// Update extended data record
 		if ($ext_exists)
 		{

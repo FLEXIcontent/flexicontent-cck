@@ -75,7 +75,6 @@ class JFormFieldFcmodules extends JFormField
 		
 		$db->setQuery($query);
 		$mods = $db->loadObjectList();
-		if ($db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');
 		
 		if ( !$mods )  return array();
 		

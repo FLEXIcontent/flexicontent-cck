@@ -3576,7 +3576,7 @@ class FlexicontentFields
 			}
 			catch (Exception $e) {
 				// Ignore table creation error
-				//if ($db->getErrorNum())  echo 'SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg());
+				//echo 'SQL QUERY ERROR:<br/>'.nl2br($e->getMessage());
 				//echo "<br/><br/>GET FILTERED Items (helper func) -- [".$filter->name."] using subquery: ".$query." <br/><br/>";
 			}
 		}
@@ -3677,7 +3677,7 @@ class FlexicontentFields
 			}
 			catch (Exception $e) {
 				// Ignore table creation error
-				//if ($db->getErrorNum())  echo 'SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg());
+				//echo 'SQL QUERY ERROR:<br/>'.nl2br($e->getMessage());
 				//echo "<br/><br/>GET FILTERED Items (helper func) -- [".$filter->name."] using subquery: ".$query." <br/><br/>";
 			}
 		} else {
@@ -4440,7 +4440,7 @@ class FlexicontentFields
 				}
 				catch (Exception $e) {
 					// Repeat sub-query if creating temporary table failed
-					//if ($db->getErrorNum())  echo 'SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg());
+					//echo 'SQL QUERY ERROR:<br/>'.nl2br($e->getMessage());
 					$iids_subquery[$view_n_text] = $view_n_text;   //echo "<br/><br/> FILTER INITIALIZATION - using subquery: ".$iids_subquery[$view_n_text]." <br/><br/>";
 					/*if ($fc_catview['search']) {
 						$db->setQuery($view_n_text);
@@ -4620,7 +4620,7 @@ class FlexicontentFields
 				}
 				catch (Exception $e) {
 					// Repeat sub-query if creating temporary table failed
-					//if ($db->getErrorNum())  echo 'SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg());
+					//echo 'SQL QUERY ERROR:<br/>'.nl2br($e->getMessage());
 					$iids_subquery[$view_n_text] = $view_n_text;   //echo "<br/><br/> FILTER INITIALIZATION - using subquery: ".$iids_subquery[$view_n_text]." <br/><br/>";
 					/*if ($fc_searchview['search']) {
 						$db->setQuery($view_n_text);

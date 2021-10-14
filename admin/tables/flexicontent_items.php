@@ -747,17 +747,6 @@ class flexicontent_items extends _flexicontent_items
 		$record_ext->$fk_ext = $this->$tk_ext;
 		$record_tmp->$fk_tmp = $this->$tk_tmp;
 
-
-		/**
-		 * NOTE: This is not usuable because an exception will be thrown on DB error, maybe remove or add TRY-CATCH above
-		 */
-		if (!$ret)
-		{
-			$this->setError(get_class($this) . '::store failed - ' . $this->_db->getErrorMsg());
-			return false;
-		}
-
-
 		// Check if record at extended data DB table exists
 		$ext_exists = false;
 
