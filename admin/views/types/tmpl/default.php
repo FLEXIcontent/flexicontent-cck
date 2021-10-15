@@ -86,6 +86,7 @@ $image_editlayout = 0 ?
 	'<span class="'.$ico_class.'"><span class="icon-edit"></span></span>' ;
 $article_viewing_tip  = '<span class="icon-info ' . $this->tooltip_class . '" data-placement="bottom" title="'.flexicontent_html::getToolTip('FLEXI_JOOMLA_ARTICLE_VIEW', 'FLEXI_ALLOW_ARTICLE_VIEW_DESC', 1, 1).'"></span>';
 $default_template_tip = '<span class="icon-info ' . $this->tooltip_class . '" data-placement="bottom" title="'.flexicontent_html::getToolTip('FLEXI_TYPE_DEFAULT_TEMPLATE', 'FLEXI_TYPE_DEFAULT_TEMPLATE_DESC', 1, 1).'"></span>';
+$limit_maincat_tip = '<span class="icon-info ' . $this->tooltip_class . '" data-placement="bottom" title="'.flexicontent_html::getToolTip('Main category limitation', 'Only categories in this subtree are allowed as item\'s main category in item form', 1, 1).'"></span>';
 
 /**
  * Order stuff and table related variables
@@ -279,6 +280,10 @@ if ($js)
 				<?php echo $default_template_tip.JText::_( 'FLEXI_TEMPLATE' )."<br/><small>(".JText::_( 'FLEXI_PROPERTY_DEFAULT' )." ".JText::_( 'FLEXI_TEMPLATE_ITEM' ).")</small>"; ?>
 			</th>
 
+			<th class="col_template left hideOnDemandClass hidden-phone hidden-tablet" >
+				<?php echo $limit_maincat_tip.JText::_( 'Main category<br/><small>(Subtree limitation)</small>' ); ?>
+			</th>
+
 			<th class="col_alias hideOnDemandClass hidden-phone hidden-tablet">
 				<?php echo JHtml::_('grid.sort', 'FLEXI_ALIAS', 'a.alias', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
@@ -330,6 +335,7 @@ if ($js)
 
 			$stateIsChangeable = $row->canCheckin && $row->canEditState;
 			$row_ilayout       = $row->config->get('ilayout');
+			$catid_allowed_parent       = $row->config->get('catid_allowed_parent');
 			?>
 		<tr class="<?php echo 'row' . ($i % 2); ?>">
 
@@ -389,6 +395,10 @@ if ($js)
 
 			<td class="col_template hidden-phone hidden-tablet">
 				<small><?php echo $row_ilayout; ?></small>
+			</td>
+
+			<td class="col_allowed_subtree hidden-phone hidden-tablet">
+				<?php echo isset($globalcats[$catid_allowed_parent]) ? $globalcats[$catid_allowed_parent]->title : '-'; ?>
 			</td>
 
 			<td class="col_alias hidden-phone hidden-tablet">
