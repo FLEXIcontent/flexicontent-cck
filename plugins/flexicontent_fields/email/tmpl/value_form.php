@@ -1,6 +1,6 @@
 <?php
 JHtml::_('behavior.formvalidator');
-JHtml::_('behavior.modal', 'a.modal');
+JHtml::_('bootstrap.modal');
 
 // Create field's HTML
 $field->{$prop} = array();
@@ -73,10 +73,25 @@ foreach ($values as $value)
 	$view = $app->input->getCmd('flexi_callview', ($realview ?: 'item'));
 	$use_modal = $field->parameters->get('use_modal', 1);
 	$use_modal_in_view = $field->parameters->get('use_modal_in_view', 'both');
-	$modal_button_text = $field->parameters->get('modal_button_text', 'FLEXI_FIELD_EMAIL_MODAL_BUTTON_CONTENT');
+	$modal_button_text = Jtext::_($field->parameters->get('modal_button_text', 'FLEXI_FIELD_EMAIL_MODAL_BUTTON_CONTENT'));
 	$modal_button_class = $field->parameters->get('modal_button_class', 'btn btn-info');
 	$modal_height = $field->parameters->get('modal_height', 400);
 	$modal_width = $field->parameters->get('modal_width', 400);
+
+		/** adapt modal trigger to bs2 - b5 */
+		$datatoggle="";
+		$datatarget="";
+		if (FLEXI_J40GE){
+			$datatoggle="data-bs-toggle";
+			$datatarget="data-bs-target";
+			$datadismiss="data-bs-dismiss";
+			$class_close="btn-close";
+		}else{
+			$datatoggle="data-toggle";
+			$datatarget="data-target";
+			$datadismiss="data-dismiss";
+			$class_close="close";
+		}
 
 	if (
 		($use_modal == 1 && $view=='item' && $use_modal_in_view =='item') ||
@@ -85,16 +100,21 @@ foreach ($values as $value)
 	)
 	{
 		$modal_header = "
-		<button id='modal_info' data-toggle='modal' data-target='#myModal'$formid' class='$modal_button_class' rel=\"{handler: 'popover', size: {x: $modal_height, y: $modal_width}}\" >".Jtext::_($modal_button_text)."</button>
+		<button id='modal_info' $datatoggle='modal' $datatarget='#myModal'$formid' class='$modal_button_class' >$modal_button_text</button>
 		<div id='myModal'$formid' class='modal hide fade' role='dialog'  tabindex='-1' role='dialog' aria-labelledby='contact' aria-hidden='true'>
-			  <div class='modal-header' style='border-bottom: 0px solid #eee;'>
-					<button type='button' class='close' data-dismiss='modal'>&times;</button>
+		<div class='modal-dialog modal-dialog-centered modal-fullscreen-sm-down' style='max-width:$modal_width;max-height:$modal_width;'>
+		<div class='modal-content'>
+		<div class='modal-header'>
+		<h5 class='modal-title' id='exampleModalLabel'>$titleform </h5>
+					<button type='button' class='$class_close' $datadismiss='modal' aria-label='Close'>&times;</button>
 			  </div>
 			  <div class='modal-body'>
 		";
 		$modal_footer = "		
 				</div>
 				<div class='modal-footer'></div>
+		</div>
+		</div>
 		</div>
 		";
 	}
