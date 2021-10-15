@@ -684,3 +684,19 @@ button.accordion-button.collapsed {
     border: 1px solid;
     border-color: var(--template-bg-dark-20);
 }
+/** fix button group **/
+body .btn-group.group-fcinfo .btn:not(.btn-primary), body .btn-group.group-fcprimary .btn:not(.btn-primary), body .btn-group.group-fcsuccess .btn:not(.btn-primary), body .btn-group.group-fcwarning .btn:not(.btn-primary), body .btn-group.group-fcmethod .btn:not(.btn-primary) {
+    color: #333;
+    background-color: initial;
+    background-image: initial;
+    background-image: initial;
+    filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#ffffff,endColorstr=#e7e7e7);
+    background-repeat: none;
+    border-color: none;
+    border-image: none;
+}
+.btn-check:active+.btn-outline-secondary, .btn-check:checked+.btn-outline-secondary, .btn-outline-secondary.active, .btn-outline-secondary.dropdown-toggle.show, .btn-outline-secondary:active {
+    color: #fff !important;
+    background-color: #495057 !important;
+    border-color: #495057 !important;
+}
