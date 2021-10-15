@@ -95,7 +95,7 @@ class JFormFieldFctag extends JFormField
 			}
 			";
 			$doc->addScriptDeclaration($js);
-			JHtml::_('behavior.modal', 'a.modal');
+			JHtml::_('bootstrap.modal');
 		}
 
 		$link = 'index.php?option=com_flexicontent&amp;view=tagelement&amp;tmpl=component';
