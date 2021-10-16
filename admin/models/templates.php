@@ -114,7 +114,7 @@ class FlexicontentModelTemplates extends JModelLegacy
 
 		$path 	= JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'templates'.DS;
 
-		if (!$dir || ($dir === 'blog') || ($dir === 'default') || ($dir === 'faq') || ($dir === 'presentation')) return false;
+		if (!$dir || ($dir === 'grid') || ($dir === 'table') || ($dir === 'faq') || ($dir === 'items-tabbed')) return false;
 		if (!JFolder::delete($path.$dir)) return false;
 
 		// delete old record
