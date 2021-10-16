@@ -145,7 +145,7 @@ JText::script('FLEXI_LOADING', true);
 	}
 
 	var jformToken   = '<?php echo JSession::getFormToken();?>';
-	var isCoreLayout = <?php echo in_array($this->layout->name, array('blog','default','faq','items-tabbed','presentation')) ? 1: 0;?>
+	var isCoreLayout = <?php echo in_array($this->layout->name, array('grid','table','faq','items-tabbed')) ? 1: 0;?>
 </script>
 
 <?php
