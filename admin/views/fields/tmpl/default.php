@@ -104,6 +104,14 @@ else
 	$drag_handle_box = '<div class="fc_drag_handle%s" title="' . JText::_('FLEXI_ORDER_COLUMN_FIRST', true) . '" ></div>';
 	$image_saveorder    = '';
 }
+$common_properties_tip = '<span class="icon-info ' . $this->tooltip_class . '" data-placement="bottom" title="'.flexicontent_html::getToolTip(
+	'(Viewing) Display Label <br> (Form) Required, Multiple<br>Translations differ or shared', '', 1, 1).'"></span>';
+
+$showin_clients_tip = '<span class="icon-info ' . $this->tooltip_class . '" data-placement="bottom" title="'.flexicontent_html::getToolTip(
+	'Show in clients: Desktops, Tablets, Phones', '', 1, 1).'"></span>';
+
+$showin_views_tip = '<span class="icon-info ' . $this->tooltip_class . '" data-placement="bottom" title="'.flexicontent_html::getToolTip(
+	'Show in views: Items, Categories, Modules', '', 1, 1).'"></span>';
 
 $drag_handle_html['disabled'] = sprintf($drag_handle_box, ' fc_drag_handle_disabled');
 $drag_handle_html['both']     = sprintf($drag_handle_box, ' fc_drag_handle_both');
@@ -411,6 +419,18 @@ if ($js)
 				<?php echo JHtml::_('grid.sort', 'FLEXI_ASSIGNED_TYPES', 'nrassigned', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
 
+			<th class="col_common_props hideOnDemandClass left hidden-phone">
+				<?php echo $common_properties_tip . JText::_('FLEXI_PROPERTIES'); ?>
+			</th>
+
+			<th class="col_showin_clients hideOnDemandClass left hidden-phone">
+				<?php echo $showin_clients_tip . JText::_('FLEXI_CLIENTS'); ?>
+			</th>
+
+			<th class="col_showin_views hideOnDemandClass left hidden-phone">
+				<?php echo $showin_views_tip . JText::_('FLEXI_VIEWS'); ?>
+			</th>
+
 			<th class="col_access hideOnDemandClass left hidden-phone">
 				<?php echo JHtml::_('grid.sort', 'FLEXI_ACCESS', 'a.access', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
@@ -635,6 +655,55 @@ if ($js)
 				}
 				?>
 			</td>
+
+			<td class="col_common_props hidden-phone">
+				<?php
+				echo $row->parameters->get('display_label')
+					? '<span class="icon-info" title="'.JText::_('FLEXI_FIELD_DISPLAY_LABEL').'" style="color:black; font-size: 16px;"></span>'
+					: '<span class="icon-info" title="'.JText::_('FLEXI_FIELD_DISPLAY_LABEL').'" style="color:lightgray; font-size: 16px;"></span>';
+				echo $row->parameters->get('required')
+					? '<span class="icon-lock" title="'.JText::_('FLEXI_REQUIRED').'" style="color:black; font-size: 16px;"></span>'
+					: '<span class="icon-lock" title="'.JText::_('FLEXI_REQUIRED').'" style="color:lightgray; font-size: 16px;"></span>';
+				echo $row->parameters->get('allow_multiple')
+					? '<span class="icon-items" title="'.JText::_('FLEXI_MULTIPLE').'" style="color:black; font-size: 16px;"></span>'
+					: '<span class="icon-items" title="'.JText::_('FLEXI_MULTIPLE').'" style="color:lightgray; font-size: 16px;"></span>';
+				echo !$row->untranslatable
+					? '<span class="icon-flag" title="'.JText::_('FLEXI_FIELD_TRANSLATION_DIFFERS') .'" style="color:black; font-size: 16px;"></span>'
+					: '<span class="icon-link" title="'.JText::_('FLEXI_FIELD_TRANSLATION_SHARED') .'" style="color:darkred; font-size: 16px;"></span>';
+				?>
+			</td>
+
+			<td class="col_showin_clients hidden-phone">
+				<?php
+				$show_in_clients = FLEXIUtilities::paramToArray($row->parameters->get('show_in_clients', array('desktop', 'tablet', 'mobile')));
+				echo ' ';
+				echo in_array('desktop', $show_in_clients)
+					? '<span class="icon-screen" title="'.JText::_('FLEXI_DESKTOP') .'" style="color:black; font-size: 16px;"></span>'
+					: '<span class="icon-screen" title="'.JText::_('FLEXI_DESKTOP') .'" style="color:lightgray; font-size: 16px;"></span>';
+				echo in_array('tablet', $show_in_clients)
+					? '<span class="icon-tablet" title="'.JText::_('FLEXI_TABLET') .'" style="color:black; font-size: 16px;"></span>'
+					: '<span class="icon-tablet" title="'.JText::_('FLEXI_TABLET') .'" style="color:lightgray; font-size: 16px;"></span>';
+				echo in_array('mobile', $show_in_clients)
+					? '<span class="icon-mobile" title="'.JText::_('FLEXI_PHONE') .'" style="color:black; font-size: 16px;"></span>'
+					: '<span class="icon-mobile" title="'.JText::_('FLEXI_PHONE') .'" style="color:lightgray; font-size: 16px;"></span>';
+				?>
+			</td>
+
+			<td class="col_showin_views hidden-phone">
+				<?php
+				$show_in_views = FLEXIUtilities::paramToArray($row->parameters->get('show_in_views', array('item', 'category', 'module', 'backend')));
+				echo ' ';
+				echo in_array('item', $show_in_views)
+					? '<span class="icon-file" title="'.JText::_('FLEXI_ITEM') .'" style="color:black; font-size: 16px;"></span>'
+					: '<span class="icon-file" title="'.JText::_('FLEXI_ITEM') .'" style="color:lightgray; font-size: 16px;"></span>';
+				echo in_array('category', $show_in_views)
+					? '<span class="icon-menu-3" title="'.JText::_('FLEXI_CATEGORY') .'" style="color:black; font-size: 16px;"></span>'
+					: '<span class="icon-menu-3" title="'.JText::_('FLEXI_CATEGORY') .'" style="color:lightgray; font-size: 16px;"></span>';
+				echo in_array('module', $show_in_views)
+					? '<span class="icon-grid-view" title="'.JText::_('FLEXI_MODULE') .'" style="color:black; font-size: 16px;"></span>'
+					: '<span class="icon-grid-view" title="'.JText::_('FLEXI_MODULE') .'" style="color:lightgray; font-size: 16px;"></span>';
+				?>
+			</td>	
 
 			<td class="col_access hidden-phone">
 				<?php echo $row->canEdit
