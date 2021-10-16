@@ -1701,6 +1701,10 @@ div.current ul.config-option-list li fieldset {
 .subhead #toolbar.btn-toolbar > *:first-child {
 	margin-left: 0;
 }
+#toolbar button#toolbar-new,
+#toolbar div#toolbar-new > * {
+	min-width: unset;
+}
 #toolbar .buttons.btn-group .toolbar {
 	text-align: right;
 }

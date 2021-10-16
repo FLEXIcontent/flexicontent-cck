@@ -1190,38 +1190,17 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 		if ($CanAddAny)
 		{
 			$btn_arr = array();
+			$newBtn_in_dropdown = count($filter_type) === 1;
 
-			if (count($filter_type) !== 1)
+			// Add button of New Item of current (filtered) type
+			if ($newBtn_in_dropdown)
 			{
-				$btn_task = '';
-				$popup_load_url = JUri::base(true) . '/index.php?option=com_flexicontent&view=types&tmpl=component&layout=typeslist&action=new';
-				//$toolbar->appendButton('Popup', 'new',  JText::_('FLEXI_NEW'), str_replace('&', '&amp;', $popup_load_url), 780, 240);   //JToolbarHelper::addNew( $btn_task );
-				$js .= "
-					jQuery('#toolbar-new a.toolbar, #toolbar-new button')
-						.attr('href', '".$popup_load_url."')
-						.attr('onclick', 'var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 1200, 0, false, {\'title\': \'".flexicontent_html::encodeHTML(JText::_('FLEXI_TYPE'), 2)."\'}); return false;');
-				";
-				JToolbarHelper::custom( $btn_task, 'new.png', 'new_f2.png', 'FLEXI_NEW', false );
-			}
-			else
-			{
-				$popup_load_url = JUri::base(true) . '/index.php?option=com_flexicontent&view=types&tmpl=component&layout=typeslist&action=new' . '&catid=' . $filter_cats;
-				$btn_name = 'add_item';
-				$full_js = "var url = jQuery(this).data('taskurl'); fc_showDialog(url, 'fc_modal_popup_container', 0, 1200, 0, false, {'title': '".flexicontent_html::encodeHTML(JText::_('FLEXI_TYPE'), 2)."'}); return false;";
-				$btn_arr[] = flexicontent_html::addToolBarButton(
-					'FLEXI_NEW', $btn_name, $full_js,
-					$msg_alert = '', $msg_confirm = '',
-					$btn_task='', $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false,
-					$this->btn_sm_class . ' btn-success btn-fcaction ' . (FLEXI_J40GE ? $this->btn_iv_class : '') . ' ' . $this->tooltip_class, 'icon-new',
-					'data-placement="right" data-taskurl="' . $popup_load_url .'" data-title="' . flexicontent_html::encodeHTML(JText::_('FLEXI_SELECT_TYPE'), 2) . '"', $auto_add = 0, $tag_type='button'
-				);
-
 				$typeid = $filter_type[0];
 				$types = flexicontent_html::getTypesList( $_type_ids=$filter_type, $_check_perms = false, $_published=true);
 				$types = is_array($types) ? $types : array();
 
 				$btn_title = JText::_('FLEXI_NEW', true) . ' ' . $types[$typeid]->name;
-				$btn_info  = flexicontent_html::encodeHTML(JText::_('Add item of current type'), 2);
+				$btn_info  = flexicontent_html::encodeHTML(JText::_('FLEXI_ADD_ITEM_OF_CURRENT_TYPE'), 2);
 				$task_url  = JUri::base(true) . '/index.php?option=com_flexicontent&controller=items&task=items.add'
 					. '&typeid=' . $filter_type[0] . '&catid=' . $filter_cats . '&' . JSession::getFormToken() . '=1';
 
@@ -1234,12 +1213,40 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 				);
 			}
 
+			/**
+			 * Add NEW ITEM button (with select type POPUP window)
+			 */
+			$popup_load_url = JUri::base(true) . '/index.php?option=com_flexicontent&view=types&tmpl=component&layout=typeslist&action=new' . '&catid=' . $filter_cats;
+			$btn_name = 'add_item';
+			$full_js = "var url = jQuery(this).data('taskurl'); fc_showDialog(url, 'fc_modal_popup_container', 0, 1200, 0, false, {'title': '".flexicontent_html::encodeHTML(JText::_('FLEXI_TYPE'), 2)."'}); return false;";
+			$btn_arr[] = flexicontent_html::addToolBarButton(
+				'FLEXI_NEW', $btn_name, $full_js,
+				$msg_alert = '', $msg_confirm = '',
+				$btn_task='', $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false,
+				$this->btn_sm_class . ' btn-success btn-fcaction ' . (FLEXI_J40GE ? $this->btn_iv_class : '') . ' ' . $this->tooltip_class, 'icon-new',
+				'data-placement="right" data-taskurl="' . $popup_load_url .'" data-title="' . flexicontent_html::encodeHTML(JText::_('FLEXI_SELECT_TYPE'), 2) . '"', $auto_add = !$newBtn_in_dropdown, $tag_type='button'
+			);
+
+			/*
+			// ALTERNATIVE WAYS to add the NEW ITEM button (with select type POPUP window)
+			$btn_task = '';
+			$popup_load_url = JUri::base(true) . '/index.php?option=com_flexicontent&view=types&tmpl=component&layout=typeslist&action=new';
+			//$toolbar->appendButton('Popup', 'new',  JText::_('FLEXI_NEW'), str_replace('&', '&amp;', $popup_load_url), 780, 240);   //JToolbarHelper::addNew( $btn_task );
+			$js .= "
+				jQuery('#toolbar-new a.toolbar, #toolbar-new button')
+					.attr('href', '".$popup_load_url."')
+					.attr('onclick', 'var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 1200, 0, false, {\'title\': \'".flexicontent_html::encodeHTML(JText::_('FLEXI_TYPE'), 2)."\'}); return false;');
+			";
+			JToolbarHelper::custom( $btn_task, 'new.png', 'new_f2.png', 'FLEXI_NEW', false );
+			*/
+
+			if (!$newBtn_in_dropdown) $btn_arr = array();
+
 			if (count($btn_arr))
 			{
-				// icon-new-dropdown ... this class has no icon add a class with an icon if it is desired ...
 				$drop_btn = '
-					<button type="button" class="' . $this->btn_sm_class . ' dropdown-toggle btn-success" data-toggle="dropdown">
-						<span title="'.JText::_('FLEXI_NEW').'" class="icon-new-dropdown"></span>
+					<button id="toolbar-new" type="button" class="' . $this->btn_sm_class . ' dropdown-toggle btn-fcaction" data-toggle="dropdown">
+						<span title="'.JText::_('FLEXI_NEW').'" class="icon-new"></span>
 						'.JText::_('FLEXI_NEW').'
 						<span class="caret"></span>
 					</button>';

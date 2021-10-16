@@ -86,7 +86,7 @@ $image_editlayout = 0 ?
 	'<span class="'.$ico_class.'"><span class="icon-edit"></span></span>' ;
 $article_viewing_tip  = '<span class="icon-info ' . $this->tooltip_class . '" data-placement="bottom" title="'.flexicontent_html::getToolTip('FLEXI_JOOMLA_ARTICLE_VIEW', 'FLEXI_ALLOW_ARTICLE_VIEW_DESC', 1, 1).'"></span>';
 $default_template_tip = '<span class="icon-info ' . $this->tooltip_class . '" data-placement="bottom" title="'.flexicontent_html::getToolTip('FLEXI_TYPE_DEFAULT_TEMPLATE', 'FLEXI_TYPE_DEFAULT_TEMPLATE_DESC', 1, 1).'"></span>';
-$limit_maincat_tip = '<span class="icon-info ' . $this->tooltip_class . '" data-placement="bottom" title="'.flexicontent_html::getToolTip('Main category limitation', 'Only categories in this subtree are allowed as item\'s main category in item form', 1, 1).'"></span>';
+$limit_maincat_tip = '<span class="icon-info ' . $this->tooltip_class . '" data-placement="bottom" title="'.flexicontent_html::getToolTip('FLEXI_MAIN_CATEGORY_LIMITATION', 'FLEXI_MAIN_CATEGORY_LIMITATION_DESC', 1, 1).'"></span>';
 
 /**
  * Order stuff and table related variables
@@ -281,7 +281,7 @@ if ($js)
 			</th>
 
 			<th class="col_template left hideOnDemandClass hidden-phone hidden-tablet" >
-				<?php echo $limit_maincat_tip.JText::_( 'Main category<br/><small>(Subtree limitation)</small>' ); ?>
+				<?php echo $limit_maincat_tip.JText::_( 'FLEXI_MAIN_CATEGORY' ) . '<br/><small>(' . JText::_( 'FLEXI_SUBTREE_LIMITATION' ) . ')</small>'; ?>
 			</th>
 
 			<th class="col_alias hideOnDemandClass hidden-phone hidden-tablet">
@@ -333,9 +333,9 @@ if ($js)
 
 			$canEdit    = 1;
 
-			$stateIsChangeable = $row->canCheckin && $row->canEditState;
-			$row_ilayout       = $row->config->get('ilayout');
-			$catid_allowed_parent       = $row->config->get('catid_allowed_parent');
+			$stateIsChangeable    = $row->canCheckin && $row->canEditState;
+			$row_ilayout          = $row->config->get('ilayout');
+			$catid_allowed_parent = $row->config->get('catid_allowed_parent');
 			?>
 		<tr class="<?php echo 'row' . ($i % 2); ?>">
 
