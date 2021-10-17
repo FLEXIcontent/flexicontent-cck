@@ -410,10 +410,13 @@ class FlexicontentModelItems extends FCModelAdminList
 					continue;
 				}
 				$tconfig[$item->type_name] = new JRegistry($item->tconfig);
-	   		$item->tconfig = $tconfig[$item->type_name];
+				$item->tconfig = $tconfig[$item->type_name];
 			}
 			$k = 1 - $k;
 		}
+
+		// Get Original content ids for creating some untranslatable fields that have share data (like shared folders)
+		flexicontent_db::getOriginalContentItemids($this->_data);
 
 		return $this->_data;
 	}
