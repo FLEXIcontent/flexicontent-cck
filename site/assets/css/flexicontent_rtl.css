@@ -3896,6 +3896,16 @@ div#permissions .tab-content {
 .fcfile_total_hits_label {
 	font-weight: bold;
 }
+.fcfile_name.fcfile_compact,
+.fcfile_actions.fcfile_compact {
+	display: inline-block !important;
+	width: unset !important;
+}
+.fcfile_actions.fcfile_compact > a,
+.fcfile_actions.fcfile_compact > input,
+.fcfile_actions.fcfile_compact > form > input {
+	width: unset !important;
+}
 img.fc_field_image {
 	display: inline-block;
 	margin: 0px 4px 6px 0px;
