@@ -2427,7 +2427,9 @@ div#permissions .tab-content {
 	width: 100% !important;
 	box-sizing: border-box !important;
 }
-.fcfile_actions > a, .fcfile_actions > input, .fcfile_actions > form > input {
+.fcfile_actions > a,
+.fcfile_actions > input,
+.fcfile_actions > form > input {
   margin: 4px 0;
 	width: 100% !important;
 	box-sizing: border-box !important;
@@ -2448,6 +2450,17 @@ div#permissions .tab-content {
 	font-weight: bold;
 }
 
+/* Compact Display */
+.fcfile_name.fcfile_compact,
+.fcfile_actions.fcfile_compact {
+	display: inline-block !important;
+	width: unset !important;
+}
+.fcfile_actions.fcfile_compact > a,
+.fcfile_actions.fcfile_compact > input,
+.fcfile_actions.fcfile_compact > form > input {
+	width: unset !important;
+}
 
 /* Image field viewing: thumbnails */
 img.fc_field_image {

@@ -4033,6 +4033,11 @@ div#permissions .tab-content {
 	width: 100% !important;
 	box-sizing: border-box !important;
 }
+.fcfile_actions.fcfile_compact > a,
+.fcfile_actions.fcfile_compact > input,
+.fcfile_actions.fcfile_compact > form > input {
+	width: unset !important;
+}
 .fcfile_actions > form {
 	width: 100% !important;
 	box-sizing: border-box !important;

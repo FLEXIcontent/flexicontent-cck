@@ -890,19 +890,28 @@ class plgFlexicontent_fieldsFile extends FCField
 
 		$useicon = $field->parameters->get( 'useicon', 0 ) ;
 		$lowercase_filename = $field->parameters->get( 'lowercase_filename', 1 ) ;
-		$link_filename      = $field->parameters->get( 'link_filename', 1 ) ;
+		
 		$display_filename	= $field->parameters->get( 'display_filename', 1 ) ;
 		$display_lang     = $field->parameters->get( 'display_lang', 1 ) ;
 		$display_size			= $field->parameters->get( 'display_size', 0 ) ;
 		$display_hits     = $field->parameters->get( 'display_hits', 0 ) ;
 		$display_descr		= $field->parameters->get( 'display_descr', 1 ) ;
 
+		// Force icons in items manager
+		$display_lang  = $display_lang && static::$isItemsManager ?  0 : $display_lang;
+		$display_size  = $display_size && static::$isItemsManager ?  0 : $display_size;
+		$display_hits  = $display_hits && static::$isItemsManager ?  0 : $display_hits;
+		$display_descr = $display_descr && static::$isItemsManager ?  0 : $display_descr;
+
 		$add_lang_img = $display_lang == 1 || $display_lang == 3;
 		$add_lang_txt = $display_lang == 2 || $display_lang == 3 || static::$isMobile;
 		$add_hits_img = $display_hits == 1 || $display_hits == 3;
 		$add_hits_txt = $display_hits == 2 || $display_hits == 3 || static::$isMobile;
 
-		$usebutton    = $field->parameters->get( 'usebutton', 1 ) ;
+		// NOTE: link_filename parameter is ignore when using buttons !!!
+		$link_filename = $field->parameters->get( 'link_filename', 1 ) ;
+		$usebutton     = $field->parameters->get( 'usebutton', 1 ) ;
+
 		$buttonsposition = $field->parameters->get('buttonsposition', 1);
 		$use_infoseptxt   = $field->parameters->get( 'use_info_separator', 0 ) ;
 		$use_actionseptxt = $field->parameters->get( 'use_action_separator', 0 ) ;
@@ -949,6 +958,14 @@ class plgFlexicontent_fieldsFile extends FCField
 		$addtocarttext  = JText::_($addtocarttext);
 		$addtocartinfo  = JText::_('FLEXI_FIELD_FILE_ADD_TO_DOWNLOADS_CART_INFO', true);
 
+		/** BACKEND **/
+		$link_filename = static::$isItemsManager ? 1 : $link_filename;
+		$usebutton     = static::$isItemsManager ?  0 : $usebutton;
+		$allowdownloads = static::$isItemsManager ?  1 : $allowdownloads;
+		$allowview = static::$isItemsManager ?  0 : $allowview;
+		$allowshare = static::$isItemsManager ?  0 : $allowshare;
+		$allowaddtocart = static::$isItemsManager ?  0 : $allowaddtocart;
+
 		$noaccess_display	     = $field->parameters->get( 'noaccess_display', 1 ) ;
 		$noaccess_url_unlogged = $field->parameters->get( 'noaccess_url_unlogged', false ) ;
 		$noaccess_url_logged   = $field->parameters->get( 'noaccess_url_logged', false ) ;
@@ -994,7 +1011,7 @@ class plgFlexicontent_fieldsFile extends FCField
 		switch($separatorf)
 		{
 			case 0:
-			$separatorf = '&nbsp;';
+			$separatorf = '';
 			break;
 
 			case 1:
@@ -1002,11 +1019,11 @@ class plgFlexicontent_fieldsFile extends FCField
 			break;
 
 			case 2:
-			$separatorf = '&nbsp;|&nbsp;';
+			$separatorf = ' | ';
 			break;
 
 			case 3:
-			$separatorf = ',&nbsp;';
+			$separatorf = ', ';
 			break;
 
 			case 4:
@@ -1018,7 +1035,7 @@ class plgFlexicontent_fieldsFile extends FCField
 			break;
 
 			default:
-			$separatorf = '&nbsp;';
+			$separatorf = '';
 			break;
 		}
 
@@ -1072,6 +1089,17 @@ class plgFlexicontent_fieldsFile extends FCField
 		// Do not convert the array to string if field is in a group, and do not add: FIELD's opentag, closetag, value separator
 		if (!$is_ingroup)
 		{
+			// values_list_placement: 1:In slider, 0:Inline
+			$values_list_placement = (int) $field->parameters->get('values_list_placement', 0);
+			$values_list_placement = static::$isItemsManager ? 1 : $values_list_placement;
+			$values_slider_title   = $field->parameters->get('values_slider_title', 'FLEXI_FILES');
+			$head = $values_list_placement && isset($field->{$prop}[-1]) ? $field->{$prop}[-1] : '';
+
+			if ($values_list_placement)
+			{
+				unset($field->{$prop}[-1]);
+			}
+
 			// Apply values separator
 			$field->{$prop} = implode($separatorf, $field->{$prop});
 
@@ -1085,6 +1113,19 @@ class plgFlexicontent_fieldsFile extends FCField
 				{
 					$field->{$prop} = '<div style="display:inline" itemprop="'.$itemprop.'" >' .$field->{$prop}. '</div>';
 				}
+			}
+
+			if ($values_list_placement)
+			{
+				$ff_slider_tagid = 'fcfile_slider_' . $item->id . '_' . $field->id;
+				$ff_slider_title = JText::_($values_slider_title);
+
+				$field->{$prop} = $head .
+					JHtml::_('bootstrap.startAccordion', $ff_slider_tagid, array('active' => -1)) .
+					JHtml::_('bootstrap.addSlide', $ff_slider_tagid, $ff_slider_title, $ff_slider_tagid . '_filelist_slide') .
+					$field->{$prop} .
+					JHtml::_('bootstrap.endSlide') .
+					JHtml::_('bootstrap.endAccordion');
 			}
 		}
 	}
