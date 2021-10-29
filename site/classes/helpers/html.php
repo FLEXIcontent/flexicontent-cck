@@ -1216,7 +1216,7 @@ class flexicontent_html
 		if ( $add_jquery_ui_css && !$jquery_ui_css_added )
 		{
 			// FLEXI_JQUERY_UI_CSS_STYLE:  'ui-lightness', 'smoothness'
-			$add_remote_forced_jquery_ui
+			$add_remote_forced_jquery_ui && $JQUERY_UI_THEME !== 'flat'
 				? $document->addStyleSheet('//code.jquery.com/ui/'.$JQUERY_UI_VER.'/themes/'.$JQUERY_UI_THEME.'/jquery-ui.css')
 				: $document->addStyleSheet(JUri::root(true).$lib_path.'/jquery/css/'.$JQUERY_UI_THEME.'/jquery-ui-'.$JQUERY_UI_VER.'.css');
 
