@@ -335,7 +335,7 @@ class FlexicontentCronTasks
 					. ' WHERE id = ' . (int) $file->id;
 				$db->setQuery($query)->execute();
 
-				unlink($file->source_path);
+				unlink($source_file);
 			}
 			else
 			{
