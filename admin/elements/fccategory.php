@@ -29,7 +29,7 @@ JTable::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'
 
 
 /**
- * Renders an Item element
+ * Renders an FC Category element
  *
  * @package Joomla
  * @subpackage FLEXIcontent
@@ -69,10 +69,12 @@ class JFormFieldFccategory extends JFormField
 		if ($this->value)
 		{
 			$item->load($this->value);
+			$title = $item->title;
 		}
 		else
 		{
-			$item->title = '';
+			$title = '';
+			$this->value = '';  // Clear possible invalid value
 		}
 
 		// HTML tag parameters for required field
@@ -140,7 +142,7 @@ class JFormFieldFccategory extends JFormField
 		$_select = JText::_('FLEXI_SELECT_CATEGORY', true);
 		return '
 		<span class="input-append">
-			<input type="text" id="'.$element_id.'_name" placeholder="'.JText::_( 'FLEXI_FORM_SELECT',true ).'" value="'.$item->title.'" '.$required_param.' readonly="readonly" />
+			<input type="text" id="'.$element_id.'_name" placeholder="'.JText::_( 'FLEXI_FORM_SELECT',true ).'" value="'.$title.'" '.$required_param.' readonly="readonly" />
 			'. //<a class="modal btn hasTooltip" onclick="fc_select_cat_element_id=\''.$element_id.'\'" href="'.$link.'" rel="'.$rel.'" title="'.$_select.'">
 			'<a class="btn hasTooltip" onclick="fc_select_cat_element_id=\''.$element_id.'\'; var url = jQuery(this).attr(\'href\'); window.fc_field_dialog_handle_record = fc_showDialog(url, \'fc_modal_popup_container\', 0, 0, 0, 0, {title:\''.$_select.'\'}); return false;" href="'.$link.'" title="'.$_select.'" >
 				'.JText::_( 'FLEXI_FORM_SELECT' ).'
@@ -148,12 +150,14 @@ class JFormFieldFccategory extends JFormField
 			'.($allowEdit ? '
 			<a id="' .$element_id. '_edit" class="btn ' . ($this->value ? '' : ' hidden') . ' hasTooltip" href="index.php?option=com_flexicontent&amp;task=category.edit&amp;cid=' . $this->value . '" target="_blank" title="'.JText::_( 'FLEXI_EDIT_CATEGORY' ).'">
 				<span class="icon-edit"></span>' . JText::_('FLEXI_FORM_EDIT') . '
-			</a>' : '').'
+			</a>
+			' : '').'
 			'.($allowClear ? '
 			<button id="' .$element_id. '_clear" class="btn'.($this->value ? '' : ' hidden').'" onclick="return fcClearSelectedCategory(\''.$element_id . '\')">
 				<span class="icon-remove"></span>
 				'.JText::_('FLEXI_CLEAR').'
-			</button>' : '').'
+			</button>
+			' : '').'
 		</span>
 		<input type="text" id="'.$element_id.'" name="'.$fieldname.'" value="'.$this->value.'" class="fc_hidden_value" />
 		';
