@@ -191,7 +191,7 @@ class plgFlexicontent_fieldsImage extends FCField
 			JHtml::_('behavior.framework', true);
 
 			// Load the modal behavior script.
-			JHtml::_('bootstrap.modal');
+			JHtml::_('behavior.modal'/*, '.fc_image_field_mm_modal'*/);
 
 			// Include media field JS, detecting different version of Joomla
 			if (file_exists($path = JPATH_ROOT.'/media/media/js/mediafield-mootools.min.js'))

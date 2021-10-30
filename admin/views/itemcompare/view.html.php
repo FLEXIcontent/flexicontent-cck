@@ -40,8 +40,6 @@ class FlexicontentViewItemcompare extends JViewLegacy {
 		$codemode   = $jinput->getInt('codemode', 0);
 		$cparams    = JComponentHelper::getParams('com_flexicontent');
 		
-		JHtml::_('bootstrap.modal');
-
 		//a trick to avoid loosing general style in modal window
 		$css = 'body, td, th { font-size: 11px; } .novalue { color: gray; font-style: italic; }';
 		$document->addStyleDeclaration($css);
