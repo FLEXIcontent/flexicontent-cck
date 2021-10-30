@@ -625,7 +625,7 @@ if ($js)
 				?>
 			</td>
 
-			<td class="col_id small center hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<td class="col_id center hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo $row->id; ?>
 			</td>
 
