@@ -226,6 +226,7 @@ abstract class JHtmlFclayoutbuilder
 		.gjs-four-color-h:hover {
 		  color: #6EA22B;
 		}
+
 		.gjs-radio-item input {
 		    display: none !important;
 		}
@@ -363,15 +364,15 @@ abstract class JHtmlFclayoutbuilder
 
 			var editor = grapesjs.init({
 
-				//TODO check loading css in canvas and real url
+				// TODO check loading css in canvas and real url
 				canvas: {
-				styles: [\'https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css\']
+					styles: [\'https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css\']
 				},
 				scripts: [
 					\'https://code.jquery.com/jquery-3.3.1.slim.min.js\',
 					\'https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js\',
 					\'https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js\'
-				  ],
+				],
 
 				avoidInlineStyle: false,
 

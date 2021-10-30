@@ -45,8 +45,17 @@ $flexi_button_class_advanced =  ($params->get('flexi_button_class_advanced' ,'')
 $show_txtfields = (int) $params->get('show_txtfields', 1);  // 0: hide, 1: according to content, 2: use custom configuration
 $show_txtfields = !$txtmode ? 0 : $show_txtfields;  // disable this flag if using BASIC index for text search
 
-/*TODO check this variable */
-$type_based_search="";
+/* TODO check this variable */
+$type_based_search = 0;
+
+/*
+// Get if filtering according to specific (single) content type
+$show_filters   = (int) $params->get('show_filters', 1);  // 0: hide, 1: according to content, 2: use custom configuration
+
+// Force single type selection and showing the content type selector
+$type_based_search = $show_filters === 1 || $show_txtfields === 1;
+$canseltypes = $type_based_search ? 1 : $canseltypes;
+*/
 
 
 /**
@@ -120,13 +129,18 @@ if ($canseltypes)
 if ($type_based_search && $canseltypes && !empty($form_contenttypes))
 {
 	$single_contenttype = reset($form_contenttypes);
-	$form_contenttypes = $contenttypes = array($single_contenttype);
+	$contenttypes = $form_contenttypes = array($single_contenttype);
 }
 else
 {
 	$single_contenttype = false;
 }
 
+
+
+/**
+ * Text Search Fields of the search form
+ */
 
 if (!$txtmode)
 {

@@ -73,25 +73,16 @@ foreach ($values as $value)
 	$view = $app->input->getCmd('flexi_callview', ($realview ?: 'item'));
 	$use_modal = $field->parameters->get('use_modal', 1);
 	$use_modal_in_view = $field->parameters->get('use_modal_in_view', 'both');
-	$modal_button_text = Jtext::_($field->parameters->get('modal_button_text', 'FLEXI_FIELD_EMAIL_MODAL_BUTTON_CONTENT'));
+	$modal_button_text = JText::_($field->parameters->get('modal_button_text', 'FLEXI_FIELD_EMAIL_MODAL_BUTTON_CONTENT'));
 	$modal_button_class = $field->parameters->get('modal_button_class', 'btn btn-info');
 	$modal_height = $field->parameters->get('modal_height', 400);
 	$modal_width = $field->parameters->get('modal_width', 400);
 
-		/** adapt modal trigger to bs2 - b5 */
-		$datatoggle="";
-		$datatarget="";
-		if (FLEXI_J40GE){
-			$datatoggle="data-bs-toggle";
-			$datatarget="data-bs-target";
-			$datadismiss="data-bs-dismiss";
-			$class_close="btn-close";
-		}else{
-			$datatoggle="data-toggle";
-			$datatarget="data-target";
-			$datadismiss="data-dismiss";
-			$class_close="close";
-		}
+	/* Adapt modal to J3 BS2 or J4 BS5 */
+	$datatoggle  = FLEXI_J40GE ? "data-bs-toggle" : "data-toggle";
+	$datatarget  = FLEXI_J40GE ? "data-bs-target" : "data-target";
+	$datadismiss = FLEXI_J40GE ? "data-bs-dismiss" : "data-dismiss";
+	$class_close = FLEXI_J40GE ? "btn-close" : "close";
 
 	if (
 		($use_modal == 1 && $view=='item' && $use_modal_in_view =='item') ||
@@ -104,17 +95,17 @@ foreach ($values as $value)
 		<div id='myModal'$formid' class='modal hide fade' role='dialog'  tabindex='-1' role='dialog' aria-labelledby='contact' aria-hidden='true'>
 		<div class='modal-dialog modal-dialog-centered modal-fullscreen-sm-down' style='max-width:$modal_width;max-height:$modal_width;'>
 		<div class='modal-content'>
-		<div class='modal-header'>
-		<h5 class='modal-title' id='exampleModalLabel'>$titleform </h5>
-					<button type='button' class='$class_close' $datadismiss='modal' aria-label='Close'>&times;</button>
-			  </div>
-			  <div class='modal-body'>
+			<div class='modal-header'>
+				<h5 class='modal-title' id='exampleModalLabel'>$titleform </h5>
+				<button type='button' class='$class_close' $datadismiss='modal' aria-label='Close'>&times;</button>
+		  </div>
+		  <div class='modal-body'>
 		";
 		$modal_footer = "		
+					</div>
+					<div class='modal-footer'></div>
 				</div>
-				<div class='modal-footer'></div>
-		</div>
-		</div>
+			</div>
 		</div>
 		";
 	}
