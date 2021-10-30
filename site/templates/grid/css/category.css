@@ -217,9 +217,9 @@ div.comments {
 	transition: all 0.4s;
 }
 .news.fc-items-block .fc-item-block-featured-wrapper-innerbox {
-	padding: 8px 12px;
+	padding: 8px 12px 8px 0px;
 	border-width: 0px;
-	margin: 15px 15px 15px 0px;
+	margin: 15px 15px;
 	background-color: none;
 	border-color: none;
 }
