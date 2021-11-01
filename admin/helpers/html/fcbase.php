@@ -221,6 +221,7 @@ abstract class JHtmlFcbase
 	 * @param   boolean  $canEdit     Is user allowed to edit the item
 	 * @param   array    $config      Configuration array
 	 *
+	 *
 	 * @return  string       HTML code
 	 */
 	public static function edit_link($row, $i, $canEdit, $config = array())
@@ -228,17 +229,28 @@ abstract class JHtmlFcbase
 		$title = in_array(static::$title_propname, static::$translateable_props)
 			? JText::_($row->{static::$title_propname})
 			: $row->{static::$title_propname};
-		$title_original = $title;
+		$title_original = $row->{static::$title_propname};
+		$title_basic = '';
+
+		if (!empty($row->custom_title))
+		{
+			$title_basic = $title;
+			$title = JText::_($row->custom_title);
+			$title_original = $row->custom_title;
+		}
 
 		// Limit title length
 		$row->title_cut = StringHelper::strlen($title) > 100
 			? htmlspecialchars(StringHelper::substr($title, 0, 100), ENT_QUOTES, 'UTF-8') . '...'
 			: htmlspecialchars($title, ENT_QUOTES, 'UTF-8');
 		$title_cut = $row->title_cut;
+		$title_cut_styled = $title_basic
+			? '<i>( ' . $title_cut . ' )</i>'
+			: $title_cut;
 
 		// Escape & translate
 		$title_escaped = htmlspecialchars($row->title_cut, ENT_QUOTES, 'UTF-8');
-		$title_untranslated = $title !== $row->{static::$title_propname}
+		$title_untranslated = $title !== $title_original
 			? '<span class="icon-flag" title="' . htmlspecialchars($row->{static::$title_propname}, ENT_QUOTES, 'UTF-8') . '"></span>'
 			: '';
 
@@ -296,7 +308,7 @@ abstract class JHtmlFcbase
 			return $nolinkPrefix . '
 			<a href="javascript:;" data-href="' . $edit_link . '" ' . $attrs . '>
 				' . $linkedPrefix . '
-				' . (empty($config['noTitle']) ? $title_cut : '') . '
+				' . (empty($config['noTitle']) ? $title_cut_styled : '') . '
 			</a>';
 		}
 		else
@@ -304,7 +316,7 @@ abstract class JHtmlFcbase
 			return $nolinkPrefix . '
 			<a href="' . $edit_link . '" ' . $attrs . '>
 				' . $linkedPrefix . '
-				' . (empty($config['noTitle']) ? $title_cut : '') . '
+				' . (empty($config['noTitle']) ? $title_cut_styled : '') . '
 			</a>
 			' . (empty($config['noTitle']) ? $title_untranslated : '');
 		}
