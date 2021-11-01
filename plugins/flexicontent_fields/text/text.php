@@ -377,6 +377,7 @@ class plgFlexicontent_fieldsText extends FCField
 					$classes .= ' inputmask-regex';
 				}
 				break;
+
 			case '__custom__':
 				if ($custommask)
 				{
@@ -384,10 +385,25 @@ class plgFlexicontent_fieldsText extends FCField
 					$classes .= ' has_inputmask';
 				}
 				break;
+
+			case 'phone10digit':
+				$validate_mask = " data-inputmask=\"'mask':'9{4,4} 9{3,3} 9{3,3}', 'removeMaskOnSubmit': 'true'\" ";
+				$classes .= ' has_inputmask';
+				break;
+
 			default:
-				if ($inputmask)
+				if (strpos($inputmask, '__custom') === 0)
 				{
-					$validate_mask = " data-inputmask=\" 'alias': '" . $inputmask . "' \" ";
+					if ($custommask)
+					{
+						$validate_mask = " data-inputmask=\"" . $custommask . "\" ";
+						$classes .= ' has_inputmask';
+					}
+				}
+				else if ($inputmask)
+				{
+					//$validate_mask = " data-inputmask=\"'alias': '" . $inputmask . "', 'removeMaskOnSubmit': 'true'\" ";
+					$validate_mask = " data-inputmask=\"'alias': '" . $inputmask . "'\" ";
 					$classes .= ' has_inputmask';
 				}
 		}
@@ -747,7 +763,12 @@ class plgFlexicontent_fieldsText extends FCField
 		{
 			$v = trim($v);
 
-			// Unmasking is done via JS code, but try to redo it, to avoid value loss if unmasking was not done
+			/** 
+			 * Unmasking is done via JS code, via using the property: 'removeMaskOnSubmit': 'true'
+			 * So the following is UNNEED IF unmasking was done properly via JS
+			 */
+
+			// Remove thousands separator
 			if ($inputmask === 'decimal')
 			{
 				$v = str_replace(',', '', $v);
@@ -755,14 +776,33 @@ class plgFlexicontent_fieldsText extends FCField
 			elseif ($inputmask === 'decimal_comma')
 			{
 				$v = str_replace('.', '', $v);
-				$v = str_replace(',', '.', $v);
 			}
+
+			// Remove currency sign and thousands separator
 			elseif ($inputmask === 'currency' || $inputmask === 'currency_euro')
 			{
-				$v = str_replace('$', '', $v);
-				$v = str_replace(chr(0xE2).chr(0x82).chr(0xAC), '', $v);
-				$v = str_replace(',', '', $v);
+				$v = str_replace('$', '', $v);  // Remove dollar
+				$v = str_replace(chr(0xE2).chr(0x82).chr(0xAC), '', $v);   // Remove Eur
+				$v = str_replace(',', '', $v);  // Remove thousands separator ','
 			}
+
+			// Remove spaces and hyphens in telephone numbers
+			elseif ($inputmask === 'mobile' || $inputmask === 'phone10digit')
+			{
+				$v = str_replace(' ', '', $v);
+				$v = str_replace('-', '', $v);
+			}
+
+
+			/**
+			 * For some TYPES, we need to do some more things for SERVER-SIDE validation to work properly
+			 * e.g. decimals at server-side must use '.' as a decimal point
+			 */
+			if ($inputmask === 'decimal_comma')
+			{
+				$v = str_replace(',', '.', $v);
+			}
+
 
 			// ***
 			// *** Validate data, skipping values that are empty after validation

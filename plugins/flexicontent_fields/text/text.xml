@@ -66,8 +66,10 @@
 			<field name="" type="separator" default="FLEXI_VALUE_MASK_VALIDATE_CONF" description="FLEXI_VALUE_MASK_VALIDATE_CONF_DESC" level="level3" />
 			<field name="inputmask" type="multilist" subtype="list" default="" label="FLEXI_VALUE_VALIDATION_MASK" toggle_related="1" description="FLEXI_VALUE_VALIDATION_MASK_DESC" class="use_select2_lib fc_skip_highlight" labelclass="label label-warning">
 				<option value="" show_list="" hide_list="regexmask-mode,custommask-mode" fcreadonly="{'validation':0}">FLEXI_NO_MASK</option>
-				<option value="__regex__" show_list="regexmask-mode"  hide_list="custommask-mode" fcreadonly="{'validation':0}">- REGULAR EXPRESSION (regex) -</option>
-				<option value="__custom__" show_list="custommask-mode"  hide_list="regexmask-mode" fcreadonly="{'validation':0}">- CUSTOM MASK (property list)</option>
+				<option value="__regex__" show_list="regexmask-mode"  hide_list="custommask-mode" fcreadonly="{'validation':0, 'filter_compare_type':0}">REGULAR EXPRESSION (regex)</option>
+				<option value="__custom__" show_list="custommask-mode"  hide_list="regexmask-mode" fcreadonly="{'validation':0, 'filter_compare_type':0, 'custommask':0}">CUSTOM MASK (property list)</option>
+				<option value="__custom_eg1" show_list="custommask-mode" hide_list="regexmask-mode" fcreadonly="{'validation':1, 'filter_compare_type':1, 'custommask':1}" fcconfigs="{'validation':'UINT', 'filter_compare_type':1, 'custommask':'\u0027mask\u0027: \u00279{5,5} 9{5,5}\u0027, \u0027removeMaskOnSubmit\u0027: \u0027true\u0027'}">CUSTOM MASK (Example 1, 10 digit with spaces)</option>
+				<option value="__custom_eg2" show_list="custommask-mode" hide_list="regexmask-mode" fcreadonly="{'validation':1, 'filter_compare_type':1, 'custommask':1}" fcconfigs="{'validation':'UINT', 'filter_compare_type':1, 'custommask':'\u0027mask\u0027: \u00279{3,3} - 9{3,3} - 9{4,4}\u0027, \u0027removeMaskOnSubmit\u0027: \u0027true\u0027'}">CUSTOM MASK (Example 1, 10 digit with spaces and hyphens)</option>
 
 				<!-- Various aliases -->
 				<group label="FLEXI_VALIDATION_VARIOUS_UNCHANGED">
@@ -91,6 +93,8 @@
 					<option value="integer" show_list="" hide_list="regexmask-mode,custommask-mode" fcreadonly="{'validation':1, 'filter_compare_type':1}" fcconfigs="{'validation':'INT', 'filter_compare_type':1}">Integer</option>
 					<option value="unsigned" show_list="" hide_list="regexmask-mode,custommask-mode" fcreadonly="{'validation':1, 'filter_compare_type':1}" fcconfigs="{'validation':'UINT', 'filter_compare_type':1}">Integer Unsigned (positive)</option>
 					<option value="mobile" show_list="" hide_list="regexmask-mode,custommask-mode" fcreadonly="{'validation':1, 'filter_compare_type':1}" fcconfigs="{'validation':'UINT', 'filter_compare_type':1}">Mobile (9999 999 999)</option>
+					<option value="phone10digit" show_list="" hide_list="regexmask-mode,custommask-mode" fcreadonly="{'validation':1, 'filter_compare_type':1}" fcconfigs="{'validation':'UINT', 'filter_compare_type':1}">Telephone (9999 999 999)</option>
+					<option value="__custom_phone" show_list="custommask-mode" hide_list="regexmask-mode" fcreadonly="{'validation':1, 'filter_compare_type':1, 'custommask':0}" fcconfigs="{'validation':'UINT', 'filter_compare_type':1, 'custommask':'\u0027mask\u0027: \u00279{4,4} 9{3,3} 9{3,3}\u0027, \u0027removeMaskOnSubmit\u0027: \u0027true\u0027'}">Telephone (Custom)</option>
 				</group>
 
 				<!-- Date aliases -->
