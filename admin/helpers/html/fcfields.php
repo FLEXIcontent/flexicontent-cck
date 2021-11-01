@@ -202,7 +202,6 @@ abstract class JHtmlFcfields extends JHtmlFcbase
 			default:
 				$friendly_name = str_replace('FLEXIcontent - ', '', $row->friendly);
 				return
-					($row->iscore ? '<span class="badge ' . static::$tooltip_class . '" title="Common (Core) field" style="margin:0">C</span> ' : '') .
 					'<strong>' . $row->type . '</strong>' .
 					($row->iscore ? '' : '<br/><small>-&nbsp;' . $friendly_name . '&nbsp;-</small>')
 					;
