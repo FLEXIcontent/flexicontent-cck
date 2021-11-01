@@ -161,6 +161,13 @@ $inputmask_txts = array(
 	'mm/yyyy' => 'Month/Year (mm/yyyy)',
 );
 
+$current_type = $this->filter_type ? $this->types[$this->filter_type] : false;
+if ($current_type)
+{
+	$current_type->config = new JRegistry($current_type->attribs);
+}
+
+
 /**
  * Add inline JS
  */
@@ -614,6 +621,10 @@ if ($js)
 				<?php
 				echo $padspacer;
 
+				$row->custom_title = $row->iscore
+					? $current_type->config->get($row->field_type . '_label', '')
+					: '';
+
 				/**
 				 * Display an edit pencil or a check-in button if: either (a) current user has Global
 				 * Checkin privilege OR (b) record checked out by current user, otherwise display a lock
@@ -628,7 +639,7 @@ if ($js)
 				?>
 			</td>
 
-			<td>
+			<td class="col_title">
 				<?php echo JHtml::_($hlpname . '.info_text', $row, $i, 'description', 'FLEXI_FIELD_DESCRIPTION'); ?>
 			</td>
 
