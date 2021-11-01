@@ -435,7 +435,7 @@ if ($js)
 				<small>(<?php echo JText::_('FLEXI_ALIAS'); ?>)</small>
 			</th>
 
-			<th class="col_fieldtype hideOnDemandClass hidden-phone">
+			<th class="col_fieldtype hideOnDemandClass hidden-phone" colspan="2">
 				<?php echo JHtml::_('grid.sort', 'FLEXI_FIELD_TYPE', 'a.field_type', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
 
@@ -647,21 +647,26 @@ if ($js)
 				<?php echo $row->name; ?>
 			</td>
 
-			<td class="col_fieldtype hidden-phone">
+			<td class="col_fieldtype_info hidden-phone">
 				<?php
+					$im_txt = '';
 					if ($row->field_type === 'text')
 					{
 						$inputmask = $row->parameters->get('inputmask');
 						$im_txt = isset($inputmask_txts[$inputmask]) ? $inputmask_txts[$inputmask] : '';
 						echo $im_txt
-							? '<span class="' . $this->tooltip_class . '" title="Input box with validation (text field)"><span class="badge" style="margin:0">V</span></span> <b>' . $im_txt . '</b>'
-							: '<b>text</b>';
+							? '<span class="' . $this->tooltip_class . '" title="Input box with validation (text field)"><span class="badge" style="margin:0">V</span></span>'
+							: '';
 					}
-					else
+					else if ($row->iscore)
 					{
-						echo JHtml::_($hlpname . '.fieldtype_info', $row, $i);
+						echo '<span class="badge ' . $this->tooltip_class . '" title="Common (Core) field" style="margin:0">C</span>';
 					}
 				?>
+			</td>
+
+			<td class="col_fieldtype hidden-phone">
+				<?php echo $im_txt ? '<b>' . $im_txt . '</b>' : JHtml::_($hlpname . '.fieldtype_info', $row, $i); ?>
 			</td>
 
 			<td class="right hidden-phone">
