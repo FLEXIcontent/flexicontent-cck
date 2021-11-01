@@ -621,7 +621,7 @@ if ($js)
 				<?php
 				echo $padspacer;
 
-				$row->custom_title = $row->iscore
+				$row->custom_title = $row->iscore && $current_type
 					? $current_type->config->get($row->field_type . '_label', '')
 					: '';
 
@@ -654,7 +654,7 @@ if ($js)
 						$inputmask = $row->parameters->get('inputmask');
 						$im_txt = isset($inputmask_txts[$inputmask]) ? $inputmask_txts[$inputmask] : '';
 						echo $im_txt
-							? '<span class="disabled">Validated as:</span><br><b>' . $im_txt . '</b>'
+							? '<span class="' . $this->tooltip_class . '" title="Input box with validation (text field)"><span class="badge" style="margin:0">V</span></span> <b>' . $im_txt . '</b>'
 							: '<b>text</b>';
 					}
 					else
