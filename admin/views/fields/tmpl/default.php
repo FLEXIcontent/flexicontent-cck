@@ -127,8 +127,8 @@ $ord_grp = 1;
 
 $inputmask_txts = array(
 	//'' => 'FLEXI_NO_MASK',
-	'__regex__' => '- REGULAR EXPRESSION (regex) -',
-	'__custom__' => '- CUSTOM MASK (property list)',
+	'__regex__' => 'REGULAR EXPRESSION',
+	'__custom__' => 'CUSTOM MASK',
 	'url' => 'URL',
 	'email' => 'Email',
 	'ip' => 'IP (i.i.i.i)',
@@ -617,6 +617,10 @@ if ($js)
 				</div>
 			</td>
 
+			<td class="col_title_info">
+				<?php echo JHtml::_($hlpname . '.info_text', $row, $i, 'description', 'FLEXI_FIELD_DESCRIPTION'); ?>
+			</td>
+
 			<td class="col_title">
 				<?php
 				echo $padspacer;
@@ -637,10 +641,6 @@ if ($js)
 				 */
 				echo JHtml::_($hlpname . '.edit_link', $row, $i, $row->canEdit);
 				?>
-			</td>
-
-			<td class="col_title">
-				<?php echo JHtml::_($hlpname . '.info_text', $row, $i, 'description', 'FLEXI_FIELD_DESCRIPTION'); ?>
 			</td>
 
 			<td class="col_alias small hidden-phone hidden-tablet">
