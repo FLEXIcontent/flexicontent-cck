@@ -125,6 +125,41 @@ $ord_col = !$this->filter_type
 $ord_grp = 1;
 
 
+$inputmask_txts = array(
+	//'' => 'FLEXI_NO_MASK',
+	'__regex__' => '- REGULAR EXPRESSION (regex) -',
+	'__custom__' => '- CUSTOM MASK (property list)',
+	'url' => 'URL',
+	'email' => 'Email',
+	'ip' => 'IP (i.i.i.i)',
+	'mac' => 'MAC address (#:#:#:#:#:#)',
+	'currency' => 'Currency ($)',
+	'currency_euro' => 'Currency (€)',
+	'decimal' => 'Decimal (radix: .)',
+	'decimal_comma' => 'Decimal (radix: ,)',
+	'percentage' => 'Percentage (0.00% - 100%)',
+	'percentage_zero_nolimit' => 'Percentage (0.00% - no limit)',
+	'percentage_nolimit_nolimit' => 'Percentage (no limits)',
+	'integer' => 'Integer',
+	'unsigned' => 'Integer Unsigned (positive)',
+	'mobile' => 'Mobile (9999 999 999)',
+	'dd/mm/yyyy' => 'Date (dd/mm/yyyy)',
+	'mm/dd/yyyy' => 'Date (mm/dd/yyyy)',
+	'yyyy/mm/dd' => 'Date (yyyy/mm/dd)',
+	'dd.mm.yyyy' => 'Date (dd.mm.yyyy)',
+	'dd-mm-yyyy' => 'Date (dd-mm-yyyy)',
+	'mm.dd.yyyy' => 'Date (mm.dd.yyyy)',
+	'mm-dd-yyyy' => 'Date (mm-dd-yyyy)',
+	'yyyy.mm.dd' => 'Date (yyyy.mm.dd)',
+	'yyyy-mm-dd' => 'Date (yyyy-mm-dd)',
+	'datetime' => 'Date Time 24h (dd/mm/yyyy hh:mm)',
+	'datetime12' => 'Date Time 12h (dd/mm/yyyy hh:mm xm)',
+	'hh:mm t' => 'Time (hh:mm t)',
+	'h:s t' => 'Time (h:s t)',
+	'hh:mm:ss' => 'Time (hh:mm:ss)',
+	'hh:mm' => 'Time (hh:mm)',
+	'mm/yyyy' => 'Month/Year (mm/yyyy)',
+);
 
 /**
  * Add inline JS
@@ -602,7 +637,20 @@ if ($js)
 			</td>
 
 			<td class="col_fieldtype hidden-phone">
-				<?php echo JHtml::_($hlpname . '.fieldtype_info', $row, $i); ?>
+				<?php
+					if ($row->field_type === 'text')
+					{
+						$inputmask = $row->parameters->get('inputmask');
+						$im_txt = isset($inputmask_txts[$inputmask]) ? $inputmask_txts[$inputmask] : '';
+						echo $im_txt
+							? '<span class="disabled">Validated as:</span><br><b>' . $im_txt . '</b>'
+							: '<b>text</b>';
+					}
+					else
+					{
+						echo JHtml::_($hlpname . '.fieldtype_info', $row, $i);
+					}
+				?>
 			</td>
 
 			<td class="right hidden-phone">
