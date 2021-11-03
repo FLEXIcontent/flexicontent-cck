@@ -10,12 +10,11 @@ $search_autocomplete = $this->params->get( 'search_autocomplete', 1 );
 $show_searchphrase = $this->params->get('show_searchphrase', 1);
 $default_searchphrase = $this->params->get('default_searchphrase', 'all');
 
-$disp_slide_filter = $this->params->get('disp_slide_filter', 0);
-
 $show_searchordering = $this->params->get('show_searchordering', 1);
 $default_searchordering = $this->params->get('default_searchordering', 'newest');
 
-$column_display = $this->params->get('column_display', 0);
+$disp_slide_filter = $this->params->get('disp_slide_filter', 0);
+$column_display = (int) $this->params->get('column_display', 0);
 
 // Whether to show advanced options,  (a) the filters, (b) the text search fields, which these depend on content types selected/configured
 $autodisplayadvoptions = $this->params->get('autodisplayadvoptions', 1);
@@ -85,23 +84,17 @@ $field_filters_title_tip = ' title="'.flexicontent_html::getToolTip('FLEXI_FIELD
 $other_search_areas_title_tip = ' title="'.flexicontent_html::getToolTip('FLEXI_SEARCH_ALSO_SEARCH_IN_AREAS', 'FLEXI_SEARCH_ALSO_SEARCH_IN_AREAS_TIP', 1).'" ';
 
 $r = 0;
-?>
 
 
-<?php
+/**
+ * Filters in slider
+ */
 $jcookie = JFactory::getApplication()->input->cookie;
 $cookie_name = 'fc_active_TabSlideFilter';
 
-// filter in slider
-
 if ($disp_slide_filter)
 {
-	//$ff_slider_id =
-	//	($module->id     ? '_module_' . $module->id : '')
-		;
-	//$ff_toggle_search_title = JText::_($params->get('ff_toggle_search_title', 'FLEXI_TOGGLE_SEARCH_FORM'));
 	$ff_slider_tagid = 'menu-sliders-filter';
-
 	$active_slides = $jcookie->get($cookie_name, '{}', 'string');
 
 	try
@@ -118,10 +111,7 @@ if ($disp_slide_filter)
 ?>
 
 
-
-
-
-<form action="<?php echo $this->action; ?>" method="POST" id="<?php echo $form_id; ?>" name="<?php echo $form_name; ?>" onsubmit="" class="<?php echo ($column_display == 1) ? 'col-search span3' : 'top-search';?>">
+<form action="<?php echo $this->action; ?>" method="POST" id="<?php echo $form_id; ?>" name="<?php echo $form_name; ?>" onsubmit="" class="<?php echo $column_display === ) ? 'col-search span3' : 'top-search';?>">
 	
 	<?php if ($this->params->get('canseltypes', 1) && isset($this->lists['contenttypes'])) : ?>
 	<fieldset id="fc_contenttypes_set" class="fc_search_set">
@@ -137,7 +127,7 @@ if ($disp_slide_filter)
 			<div id="fcsearch_contenttypes_row" class="fc_search_row_<?php echo (($r++)%2);?>">
 				<?php if($this->params->get('show_type_label', 1)): ?>
 				<div class="fc_search_label_cell">
-					<label for="contenttypes" class="">
+					<label for="contenttypes" class="label_fcflt">
 						<?php echo JText::_('FLEXI_SEARCH_CONTENT_TYPE'); ?>
 					</label>
 				</div>
@@ -170,7 +160,7 @@ if ($disp_slide_filter)
 			
 			<div class="fc_search_row_<?php echo (($r++)%2);?>">
 				<div class="fc_search_label_cell">
-					<label for="search_searchword" class=" <?php echo $tooltip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_SEARCH_SEARCHWORDS', 'FLEXI_SEARCH_SEARCHWORDS_TIP', 1); ?>">
+					<label for="search_searchword" class="label_fcflt <?php echo $tooltip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_SEARCH_SEARCHWORDS', 'FLEXI_SEARCH_SEARCHWORDS_TIP', 1); ?>">
 						<?php echo JText::_('FLEXI_SEARCH_SEARCHWORDS'); ?>
 					</label>
 				</div>
@@ -191,6 +181,14 @@ if ($disp_slide_filter)
 								placeholder="<?php echo $text_search_prompt; ?>" name="q" size="30" maxlength="120" 
 								id="search_searchword" value="<?php echo $this->escape($this->searchword);?>" style="max-width: 144px;" />
 							
+							<?php 
+							if ($append_buttons) :
+								$button_classes = FLEXI_J30GE ? ' btn btn-success' : ' fc_button fcsimple';
+							?>
+								<button class="<?php echo $button_classes; ?> button_go" onclick="var form=document.getElementById('<?php echo $form_id; ?>'); adminFormPrepare(form, 1);">
+									<span class="icon-search icon-white"></span><?php echo JText::_( 'FLEXI_GO' ); ?>
+								</button>
+							<?php endif; ?>
 							
 						<?php echo $append_buttons ? '</span>' : ''; ?>
 						
@@ -288,7 +286,7 @@ if ($disp_slide_filter)
 			<div class="fcclear"></div>
 			
 				<div id="fc_fieldfilters_tbl" class="fc_search_tbl <?php echo $this->escape($this->params->get('pageclass_sfx')); ?>" >
-				<ul >
+				<ul>
 					
 				<?php if ( !count($this->filters) && $this->type_based_search ) : ?>
 					<div class="alert alert-info"><?php echo JText::_('FLEXI_SELECT_CONTENT_TYPE_BEFORE_USING_FILTERS'); ?></div>
@@ -360,11 +358,11 @@ if ($disp_slide_filter)
 					}  ?>
 						<div class="fc_search_label_cell">
 						<?php if ($descr) : ?>
-							<label for="filter_<?php echo $filt->id; ?>" class=" <?php echo $tooltip_class; ?>" title="<?php echo flexicontent_html::getToolTip($label, $descr, 0); ?>">
+							<label for="filter_<?php echo $filt->id; ?>" class="label_fcflt <?php echo $tooltip_class; ?>" title="<?php echo flexicontent_html::getToolTip($label, $descr, 0); ?>">
 								<?php echo $label; ?>
 							</label>
 						<?php else : ?>
-							<label for="filter_<?php echo $filt->id; ?>" class=" <?php echo $tooltip_class; ?>" title="<?php echo flexicontent_html::getToolTip(JText::_('FLEXI_SEARCH_MISSING_FIELD_DESCR'), JText::sprintf('FLEXI_SEARCH_MISSING_FIELD_DESCR_TIP', $label), 0); ?>">
+							<label for="filter_<?php echo $filt->id; ?>" class="label_fcflt <?php echo $tooltip_class; ?>" title="<?php echo flexicontent_html::getToolTip(JText::_('FLEXI_SEARCH_MISSING_FIELD_DESCR'), JText::sprintf('FLEXI_SEARCH_MISSING_FIELD_DESCR_TIP', $label), 0); ?>">
 								<?php echo $label; ?>
 							</label>
 						<?php endif; ?>
@@ -408,7 +406,7 @@ if ($disp_slide_filter)
 					
 					<tr class="fc_search_row_<?php echo (($r++)%2);?>">
 						<td class="fc_search_label_cell">
-							<label class=" <?php echo $tooltip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_SEARCH_INCLUDE_AREAS', 'FLEXI_SEARCH_INCLUDE_AREAS_TIP', 1); ?>">
+							<label class="label_fcflt <?php echo $tooltip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_SEARCH_INCLUDE_AREAS', 'FLEXI_SEARCH_INCLUDE_AREAS_TIP', 1); ?>">
 								<?php echo JText::_( 'FLEXI_SEARCH_INCLUDE_AREAS' );?> :
 							</label>
 						</td>
@@ -423,7 +421,7 @@ if ($disp_slide_filter)
 					
 					<tr class="fc_search_row_<?php echo (($r++)%2);?>">
 						<td class="fc_search_label_cell">
-							<label for="ordering" class=" <?php echo $tooltip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_SEARCH_ORDERING', 'FLEXI_SEARCH_ORDERING_TIP', 1); ?>">
+							<label for="ordering" class="label_fcflt <?php echo $tooltip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_SEARCH_ORDERING', 'FLEXI_SEARCH_ORDERING_TIP', 1); ?>">
 								<?php echo JText::_( 'FLEXI_SEARCH_ORDERING' );?>:
 							</label>
 						</td>
@@ -441,18 +439,20 @@ if ($disp_slide_filter)
 			</fieldset>
 			
 		<?php endif; ?>
-
-
 		
 	<!--/fieldset-->
 	</div>
 	
 <?php endif; /* END OF IF autodisplayadvoptions */ ?>
 
-<?php $button_classes = FLEXI_J30GE ? ' btn btn-success' : ' fc_button fcsimple'; ?>
-							<button class="<?php echo $button_classes; ?> button_go" onclick="var form=document.getElementById('<?php echo $form_id; ?>'); adminFormPrepare(form, 1);">
-								<span class="icon-search icon-white"></span><?php echo JText::_( 'FLEXI_GO' ); ?>
-							</button>
+<?php
+if (!$append_buttons):
+ 	$button_classes = FLEXI_J30GE ? ' btn btn-success' : ' fc_button fcsimple';
+?>
+	<button class="<?php echo $button_classes; ?> button_go" onclick="var form=document.getElementById('<?php echo $form_id; ?>'); adminFormPrepare(form, 1);">
+		<span class="icon-search icon-white"></span><?php echo JText::_( 'FLEXI_GO' ); ?>
+	</button>
+<?php endif; ?>
 
 
 	<!-- BOF items total-->
@@ -472,19 +472,19 @@ if ($disp_slide_filter)
 		
 		<?php if ( $this->lists['orderby'] ) : ?>
 			<div class="fc_orderby_box <?php echo $tooltip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_ORDERBY', 'FLEXI_ORDERBY_INFO', 1); ?>">
-				<?php if ($this->lists['orderby_2nd']) echo '<div class=" fc_orderby_level_lbl">1</div>'; ?><div class="fc_orderby_selector"><?php echo $this->lists['orderby']; ?></div>
+				<?php if ($this->lists['orderby_2nd']) echo '<div class="label_fcflt fc_orderby_level_lbl">1</div>'; ?><div class="fc_orderby_selector"><?php echo $this->lists['orderby']; ?></div>
 			</div>
 		<?php endif; ?>
 		
 		<?php if ( $this->lists['orderby_2nd'] ) : ?>
 			<div class="fc_orderby_box fc_2nd_level <?php echo $tooltip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_ORDERBY_2ND', 'FLEXI_ORDERBY_INFO_2ND', 1); ?>">
-				<div class=" fc_orderby_level_lbl">2</div><div class="fc_orderby_selector"><?php echo $this->lists['orderby_2nd']; ?></div>
+				<div class="label_fcflt fc_orderby_level_lbl">2</div><div class="fc_orderby_selector"><?php echo $this->lists['orderby_2nd']; ?></div>
 			</div>
 		<?php endif; ?>
 		
 		<?php if (@$this->pageNav) : ?>
 		<span class="fc_pages_counter">
-			<span class=""><?php echo $this->pageNav->getPagesCounter(); ?></span>
+			<span class="label_fcflt"><?php echo $this->pageNav->getPagesCounter(); ?></span>
 		</span>
 		<?php endif; ?>
 	
@@ -523,8 +523,6 @@ if ($disp_slide_filter)
 <input type="hidden" name="task" value="search" />
 <input type="hidden" name="Itemid" value="<?php echo $app->input->get('Itemid', '', 'int');?>" />
 </form>
-
-
 
 <?php
 // Automatic submission
@@ -567,8 +565,8 @@ $js .= '
 	';
 $document = JFactory::getDocument();
 $document->addScriptDeclaration($js);
-?>
-<?php
+
+
 // FORM in slider
 if ($disp_slide_filter)
 {
@@ -611,4 +609,3 @@ if ($disp_slide_filter)
 	})(jQuery);
 	");
 }
-?>

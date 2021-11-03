@@ -690,14 +690,14 @@ body .nowrap_hidden {
 #flexicontent div.input-append > *:not(:first-child):not(:last-child) > * {
 	border-top-left-radius: 0px !important;
 	border-bottom-left-radius: 0px !important;
+	margin-left: 0 !important;
 }
-#flexicontent div.input-group-addon > *:not(:first-child):not(:last-child),
-#flexicontent div.input-prepend > *:not(:first-child):not(:last-child),
-#flexicontent div.input-group-addon > *:not(:first-child):not(:last-child) > *,
-#flexicontent div.input-prepend > *:not(:first-child):not(:last-child) > * {
+#flexicontent div.input-group-addon > *:not(:first-child),
+#flexicontent div.input-prepend > *:not(:first-child),
+#flexicontent div.input-group-addon > *:not(:first-child) > *,
+#flexicontent div.input-prepend > *:not(:first-child) > * {
 	border-top-right-radius: 0px !important;
 	border-bottom-right-radius: 0px !important;
-	margin-left: 0 !important;
 }
 
 .input-prepend.input-append .add-on:not(:last-child),
@@ -1029,13 +1029,15 @@ td.col_edit_layout {
 	margin: 4px 0px;
 	vertical-align: top;
 	min-height: 34px;
+	background: #fff;
+	box-shadow: 0px 5px 16px 0px #939393;
 }
 
 .flexicontent #fc-mini-help,
 .flexicontent #fc-filters-box.fcman-abs,
 .flexicontent #mainChooseColBox.fcman-abs {
 	position: absolute;
-	box-shadow: 2px 2px 6px black;
+	box-shadow: 0px 5px 16px 0px #939393;
 	background: #fff;
 	z-index: 100;
 	right: 0;
@@ -1077,14 +1079,14 @@ td.col_edit_layout {
 		width: 0 !important;
 	}
 	select.fc_is_selarrow {
-		max-width: 1.4em !important;
+		max-width: 1.8em !important;
 	}
 	select.fc_is_selarrow:hover, select.fc_is_selarrow:focus {
 		max-width: unset !important;
 	}
 
 	select.fc_is_selarrow + #search {
-		margin-right: 1.3em !important;
+		margin-right: 1.8em !important;
 	}
 
 	#search {
@@ -1232,8 +1234,8 @@ td.col_edit_layout {
 		#startdate_btn,
 		#enddate_btn {
 			font-size: 14px !important;
-			height: 28px !important;
-			padding: 2px 4px !important;
+			height: 36px !important;
+			padding: 10px 4px !important;
 			box-sizing: border-box;
 		}
 		#startdate_btn {
@@ -1245,7 +1247,7 @@ td.col_edit_layout {
 			min-width: 99px;
 			max-width: 99px;
 			height: 16px !important;
-			padding: 13px 8px !important;
+			padding: 17px 8px !important;
 			box-sizing: border-box;
 			border-radius: 0;
 		}
@@ -1293,7 +1295,7 @@ td.col_edit_layout {
 	> * {
 		vertical-align: middle !important;
 		float: right;
-		margin: 0 !important;
+		margin: 4px !important;
 	}
 	> *:not(.fc-xpended):not(.fc-xpended-row) {
 		margin: 0 6px 0 2px !important;
@@ -1354,7 +1356,7 @@ td.col_edit_layout {
 		    width: 22px !important;
 				cursor: pointer !important;
 				border-width: 0px !important;
-				background: transparent url(../images/select2.png) no-repeat scroll -60% -22px !important;
+				background: #fff url(../images/select2.png) no-repeat scroll -60% -22px !important;
 				font-size: 13px;
 			}
 			.select2-search-choice {
@@ -1368,7 +1370,7 @@ td.col_edit_layout {
 
 			input.select2-input {
 		    padding: 2px 6px 2px 26px !important;
-				background: transparent url(../images/select2.png) no-repeat scroll -32px -22px !important;
+				background: #fff url(../images/select2.png) no-repeat scroll -32px -22px !important;
 				width: 100% !important;
 			}
 		}
@@ -1420,4 +1422,16 @@ td.col_edit_layout {
 	#flexicontent .fc_hidden_580 {
 		display: none;
 	}
+}
+
+#flexicontent .btn {
+  padding: 8px 12px;
+}
+div#fc-filters-slide-btn {
+  border: 0;
+  background: none;
+  box-shadow:none;
+}
+#fc-filters-box input[type="text"] {
+  padding: 8px 6px !important;
 }

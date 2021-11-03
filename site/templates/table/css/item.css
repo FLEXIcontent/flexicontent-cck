@@ -15,7 +15,7 @@ body #flexicontent .fc_item_title a {
 	padding-left: 0px;
 	padding-bottom: 0px;
 	border-radius: 0px;
-	border: 0px solid #cccccc;
+	border: 0px solid #ccc;
 	color: inherit;
 }
 body #flexicontent .flexi.label,
@@ -56,7 +56,7 @@ body .tabbertab,
 }
 body ul.tabbernav,
 #flexicontent ul.tabbernav {
-	border-bottom: 1px solid #cccccc !important;
+	border-bottom: 1px solid #ccc !important;
 }
 div#fc_subtitle_tabset,
 div#fc_bottom_tabset {
@@ -108,7 +108,7 @@ body .flexi.infoblock {
 .topblock .flexi.infoblock {
 	overflow: hidden;
 	border-radius: 0px;
-	border: 1px solid #cccccc;
+	border: 1px solid #ccc;
 	color: inherit;
 	background-color: transparent;
 }
@@ -119,9 +119,9 @@ body .flexi.infoblock {
 .flexi.bottomblock.infoblock {
 	overflow: hidden;
 	border-radius: 0px;
-	border: 1px solid #cccccc;
-	color: #cccccc;
-	background-color: #ffffff;
+	border: 1px solid #ccc;
+	color: #ccc;
+	background-color: #fff;
 }
 .flexi.infoblock {
 	border: 1px solid silver;
