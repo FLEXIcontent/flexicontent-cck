@@ -96,7 +96,7 @@
 							<option value="7">7</option>
 							<option value="8">8</option>
 						</field>
-						<field name="item_placement_feat" type="radio" default="" hint="0" label="FLEXI_ITEMS_PLACEMENT" description="FLEXI_ITEMS_PLACEMENT_DESC" class="btn-group ">
+						<field name="item_placement_feat" type="radio" default="" hint="0" label="FLEXI_ITEMS_PLACEMENT" description="FLEXI_ITEMS_PLACEMENT_DESC" class="btn-group group-fcinfo">
 							<option value="">FLEXI_USE_GLOBAL</option>
 							<option value="0">FLEXI_CLEARED</option>
 							<option value="1">FLEXI_AS_MASONRY_TILES</option>
@@ -123,13 +123,13 @@
 							<option value="5">Overlayed (Bottom)</option>
 							<option value="6">Overlayed (Full)</option>
 						</field>
-						<field name="content_display_feat" type="radio" default="" hint="0" label="Content visible &lt;br/&gt; &lt;small&gt; for overlayed &lt;/small&gt;" description="Select how image is fitted into the container" class="btn-group ">
+						<field name="content_display_feat" type="radio" default="" hint="0" label="Content visible &lt;br/&gt; &lt;small&gt; for overlayed &lt;/small&gt;" description="Select how image is fitted into the container" class="btn-group group-fcinfo">
 							<option value="">FLEXI_USE_GLOBAL</option>
 							<option value="0">Always visible</option>
 							<!--option value="1">On mouse over / item active</option-->
 							<option value="2">On mouse over</option>
 						</field>
-						<field name="img_fit_feat" type="radio" default="" hint="1" label="Image fit &lt;br/&gt; &lt;small&gt; for cleared / overlayed &lt;/small&gt;" description="Select how image is fitted into the container" class="btn-group ">
+						<field name="img_fit_feat" type="radio" default="" hint="1" label="Image fit &lt;br/&gt; &lt;small&gt; for cleared / overlayed &lt;/small&gt;" description="Select how image is fitted into the container" class="btn-group group-fcinfo">
 							<option value="">FLEXI_USE_GLOBAL</option>
 							<option value="0">Auto-Fit</option>
 							<option value="1">Auto-Fit and Stretch</option>
@@ -207,7 +207,7 @@
 							value_field="label"
 							query="SELECT name, label FROM `#__flexicontent_fields` WHERE published='1'"
 						/>
-						<field name="lead_position" type="radio" default="" label="FLEXI_IMAGE_POSITION" description="FLEXI_IMAGE_POSITION_DESC" class="btn-group ">
+						<field name="lead_position" type="radio" default="" label="FLEXI_IMAGE_POSITION" description="FLEXI_IMAGE_POSITION_DESC" class="btn-group group-fcinfo">
 							<option value="">FLEXI_USE_GLOBAL</option>
 							<option value="0">FLEXI_IMAGE_LEFT</option>
 							<option value="1">FLEXI_IMAGE_RIGHT</option>
@@ -217,12 +217,12 @@
 							<option value="0">FLEXI_NO</option>
 							<option value="1">FLEXI_YES</option>
 						</field>
-						<field name="lead_link_image_to" type="radio" default="" label="Link to" description="If you are using an image field then you may use the custom link add to the image" class="btn-group ">
+						<field name="lead_link_image_to" type="radio" default="" label="Link to" description="If you are using an image field then you may use the custom link add to the image" class="btn-group group-fcinfo">
 							<option value="">FLEXI_USE_GLOBAL</option>
 							<option value="0">FLEXI_ITEM</option>
 							<option value="1">Custom link (image field)</option>
 						</field>
-						<field name="lead_image_size" type="radio" default="" label="FLEXI_INTRO_IMAGE_SIZE" description="FLEXI_INTRO_IMAGE_SIZE_DESC" class="btn-group ">
+						<field name="lead_image_size" type="radio" default="" label="FLEXI_INTRO_IMAGE_SIZE" description="FLEXI_INTRO_IMAGE_SIZE_DESC" class="btn-group group-fcinfo">
 							<option value="">FLEXI_USE_PARAMS</option>
 							<option value="s">FLEXI_SMALL</option>
 							<option value="m">FLEXI_MEDIUM</option>
@@ -231,7 +231,7 @@
 						</field>
 						<field name="lead_width" type="text" size="4" default="" label="FLEXI_IMAGE_WIDTH" description="FLEXI_IMAGE_WIDTH" />
 						<field name="lead_height" type="text" size="4" default="" label="FLEXI_IMAGE_HEIGHT" description="FLEXI_IMAGE_HEIGHT" />
-						<field name="lead_method" type="radio" default="" label="FLEXI_PROCESSING_METHOD" description="FLEXI_PROCESSING_METHOD" class="btn-group ">
+						<field name="lead_method" type="radio" default="" label="FLEXI_PROCESSING_METHOD" description="FLEXI_PROCESSING_METHOD" class="btn-group group-fcinfo">
 							<option value="">FLEXI_USE_GLOBAL</option>
 							<option value="0">FLEXI_SCALE</option>
 							<option value="1">FLEXI_CROP</option>
@@ -258,7 +258,7 @@
 							<option value="7">7</option>
 							<option value="8">8</option>
 						</field>
-						<field name="item_placement" type="radio" default="" hint="1" label="FLEXI_ITEMS_PLACEMENT" description="FLEXI_ITEMS_PLACEMENT_DESC" class="btn-group ">
+						<field name="item_placement" type="radio" default="" hint="1" label="FLEXI_ITEMS_PLACEMENT" description="FLEXI_ITEMS_PLACEMENT_DESC" class="btn-group group-fcinfo">
 							<option value="">FLEXI_USE_GLOBAL</option>
 							<option value="0">FLEXI_CLEARED</option>
 							<option value="1">FLEXI_AS_MASONRY_TILES</option>
@@ -285,13 +285,13 @@
 							<option value="5">Overlayed (Bottom)</option>
 							<option value="6">Overlayed (Full)</option>
 						</field>
-						<field name="content_display" type="radio" default="" hint="0" label="Content visible &lt;br/&gt; &lt;small&gt; for overlayed &lt;/small&gt;" description="Select how image is fitted into the container" class="btn-group ">
+						<field name="content_display" type="radio" default="" hint="0" label="Content visible &lt;br/&gt; &lt;small&gt; for overlayed &lt;/small&gt;" description="Select how image is fitted into the container" class="btn-group group-fcinfo">
 							<option value="">FLEXI_USE_GLOBAL</option>
 							<option value="0">Always visible</option>
 							<!--option value="1">On mouse over / item active</option-->
 							<option value="2">On mouse over</option>
 						</field>
-						<field name="img_fit" type="radio" default="" hint="1" label="Image fit &lt;br/&gt; &lt;small&gt; for cleared / overlayed &lt;/small&gt;" description="Select how image is fitted into the container" class="btn-group ">
+						<field name="img_fit" type="radio" default="" hint="1" label="Image fit &lt;br/&gt; &lt;small&gt; for cleared / overlayed &lt;/small&gt;" description="Select how image is fitted into the container" class="btn-group group-fcinfo">
 							<option value="">FLEXI_USE_GLOBAL</option>
 							<option value="0">Auto-Fit</option>
 							<option value="1">Auto-Fit and Stretch</option>
@@ -369,7 +369,7 @@
 						value_field="label"
 						query="SELECT name, label FROM `#__flexicontent_fields` WHERE published='1'"
 					/>
-						<field name="intro_position" type="radio" default="" label="FLEXI_IMAGE_POSITION" description="FLEXI_IMAGE_POSITION_DESC" class="btn-group ">
+						<field name="intro_position" type="radio" default="" label="FLEXI_IMAGE_POSITION" description="FLEXI_IMAGE_POSITION_DESC" class="btn-group group-fcinfo">
 							<option value="">FLEXI_USE_GLOBAL</option>
 							<option value="0">FLEXI_IMAGE_LEFT</option>
 							<option value="1">FLEXI_IMAGE_RIGHT</option>
@@ -379,12 +379,12 @@
 							<option value="0">FLEXI_NO</option>
 							<option value="1">FLEXI_YES</option>
 						</field>
-						<field name="intro_link_image_to" type="radio" default="" label="Link to" description="If you are using an image field then you may use the custom link add to the image" class="btn-group ">
+						<field name="intro_link_image_to" type="radio" default="" label="Link to" description="If you are using an image field then you may use the custom link add to the image" class="btn-group group-fcinfo">
 							<option value="">FLEXI_USE_GLOBAL</option>
 							<option value="0">FLEXI_ITEM</option>
 							<option value="1">Custom link (image field)</option>
 						</field>
-						<field name="intro_image_size" type="radio" default="" label="FLEXI_INTRO_IMAGE_SIZE" description="FLEXI_INTRO_IMAGE_SIZE_DESC" class="btn-group ">
+						<field name="intro_image_size" type="radio" default="" label="FLEXI_INTRO_IMAGE_SIZE" description="FLEXI_INTRO_IMAGE_SIZE_DESC" class="btn-group group-fcinfo">
 							<option value="">FLEXI_USE_PARAMS</option>
 							<option value="s">FLEXI_SMALL</option>
 							<option value="m">FLEXI_MEDIUM</option>
@@ -393,7 +393,7 @@
 						</field>
 						<field name="intro_width" type="text" size="4" default="" label="FLEXI_IMAGE_WIDTH" description="FLEXI_IMAGE_WIDTH" />
 						<field name="intro_height" type="text" size="4" default="" label="FLEXI_IMAGE_HEIGHT" description="FLEXI_IMAGE_HEIGHT" />
-						<field name="intro_method" type="radio" default="" label="FLEXI_PROCESSING_METHOD" description="FLEXI_PROCESSING_METHOD" class="btn-group ">
+						<field name="intro_method" type="radio" default="" label="FLEXI_PROCESSING_METHOD" description="FLEXI_PROCESSING_METHOD" class="btn-group group-fcinfo">
 							<option value="">FLEXI_USE_GLOBAL</option>
 							<option value="0">FLEXI_SCALE</option>
 							<option value="1">FLEXI_CROP</option>
