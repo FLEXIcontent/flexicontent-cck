@@ -1403,6 +1403,7 @@ body .container_fcfield input.input-xxlarge,
 body .container_fcfield input,
 #flexicontent .container_fcfield input {
 	max-width: 100%;
+	height: 26px;
 }
 
 .flexi_params table.admintable,
@@ -1727,13 +1728,14 @@ ul.thumbnails.image_picker_selector li div.thumbnail p {
 }
 #flexicontent form select.fcfield_selectval,
 #flexicontent form input.fcfield_textval {
-	height: 26px;
+	height: 34px;
 	line-height: 26px;
 	overflow: auto;
 	vertical-align: top;
 	min-width: 220px;
 	width: auto;
 	max-width: 600px;
+	border-radius:3px;
 }
 #flexicontent form select.fcfield_selectval {
 	padding: 4px 0 2px 4px;
@@ -1743,7 +1745,7 @@ ul.thumbnails.image_picker_selector li div.thumbnail p {
 	line-height: 1em;
 	overflow: auto;
 	padding: 4px 0 2px 4px;
-	min-width: 248x;
+	min-width: 248px;
 }
 #flexicontent form select.fcfield_selectval.inlineval,
 #flexicontent form select.fcfield_selectmulval.inlineval,
@@ -2155,7 +2157,7 @@ div.current ul.config-option-list li fieldset {
 	min-height: 26px;
 	height: auto !important;
 	box-sizing: content-box !important;
-	background:#fff !important; // remove gradient background
+	background:#fff !important;//remove background gradient
 }
 html[dir="rtl"] .select2-container .select2-choice {
 	padding: 0 8px 0 0 !important;
@@ -2171,6 +2173,7 @@ html[dir="rtl"] .select2-container .select2-choice {
 .select2-container .select2-choice .select2-arrow b {
     background-position: 0 4px !important;
 }
+
 /* Form validation failed, having 'invalid' CLASS */
 .select2-container.invalid .select2-choice > .select2-chosen {
 	color: red !important;
@@ -2217,11 +2220,10 @@ html[dir="rtl"] .select2-container .select2-choice {
 	min-height: 20px !important;
 	padding: 6px 7px !important;
 	margin-top: 1px !important;
-	border: 1px solid lightgray !important;
+	border: 0px solid lightgray !important;
 	/*background: url(../../assets/images/plus-button.png) no-repeat  50% 50% !important;*/
 
 	background: #fff url('../images/select2.png') no-repeat 100% -22px !important;
-
 }
 .select2-container-multi.select2-dropdown-open .select2-choices .select2-search-field input.select2-input {
 	min-width: 124px !important;
@@ -2252,6 +2254,7 @@ html[dir="rtl"] .select2-container .select2-choice {
 .select2-drop .select2-results .select2-result.select2-selected-highlight div {
 	font-size: 11px !important;
 }
+
 /* dropdown */
 .select2-drop.select2-drop-multi {
     padding: 0px 10px 10px 10px !important;
@@ -2263,6 +2266,7 @@ html[dir="rtl"] .select2-container .select2-choice {
     background: #d8d8d8 !important;
     color: #fff !important;
 }
+
 
 // ***
 // *** Various
@@ -2455,6 +2459,8 @@ div#permissions .tab-content {
 .fcfile_actions.fcfile_compact {
 	display: inline-block !important;
 	width: unset !important;
+	margin-top: 2px;
+	margin-bottom: 2px;
 }
 .fcfile_actions.fcfile_compact > a,
 .fcfile_actions.fcfile_compact > input,
@@ -2585,4 +2591,16 @@ div.fc-fieldgrp-value-box {
 [class*="fcfavs-"].fc-mssg-inline {
 	position: relative;
 	margin: 1px 2px;
+}
+.select2-container-multi .select2-choices {
+  min-height: 34px !important;
+}
+/** field language assoc**/
+#fcform_language_container .input-append input {
+  height: 26px !important;
+}
+/*** joomla field image**/
+span.add-on.pop-helper.field-media-preview {
+  height: 26px !important;
+  line-height: 28px !important;
 }

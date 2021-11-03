@@ -524,7 +524,7 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="fc_filter_in_slide" type="radio" default="0" label="FLEXI_SEARCH_FLITER_SLIDE_DISPLAY" description="FLEXI_SEARCH_FLITER_SLIDE_DISPLAY_DESC" class="btn-group">
-			<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>

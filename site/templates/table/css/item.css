@@ -58,6 +58,11 @@ body ul.tabbernav,
 #flexicontent ul.tabbernav {
 	border-bottom: 1px solid #ccc !important;
 }
+div#fc_subtitle_tabset,
+div#fc_bottom_tabset {
+	margin-top: 40px !important;
+	margin-bottom: 40px !important;
+}
 body .flexi.infoblock {
 	padding-top: 10px;
 	padding-right: 0px;

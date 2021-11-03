@@ -214,14 +214,14 @@ div.comments {
 	border-width: 0px;
 	margin: 15px 15px;
 	background-color: none;
-	border-color: none;
+	border-color: transparent;
 }
 .news.fc-items-block .fc-item-block-standard-wrapper-innerbox {
 	padding: 8px 12px;
 	border-width: 0px;
 	margin: 15px 15px;
 	background-color: none;
-	border-color: none;
+	border-color: transparent;
 }
 .news.fc-items-block .fc-item-block-standard-wrapper,
 .news.fc-items-block .fc-item-block-featured-wrapper {

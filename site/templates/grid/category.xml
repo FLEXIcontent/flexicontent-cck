@@ -43,15 +43,13 @@
 					<field name="label_styling_grp" type="separator" cssprep="1" default="FLEXI_TMPL_LABEL_STYLING" description="" level="level2" />
 					<field name="label_bg_color" type="color" cssprep="less" default="none" label="FLEXI_TMPL_LABEL_BG" description="FLEXI_TMPL_LABEL_BG_DESC" format="rgba" keywords="transparent,initial,none,none"/>
 					<field name="label_txt_color" type="color" cssprep="less" default="none" label="FLEXI_TMPL_LABEL_TXT_COLOR" description="FLEXI_TMPL_LABEL_TXT_COLOR_DESC" format="rgba" keywords="transparent,initial,none,none" />
-          
-                    <field name="label_pad_top" type="number" cssprep="less" default="8" label="FLEXI_TMPL_PADDING_TOP" description="FLEXI_TMPL_PADDING_TOP_DESC" min="0" max="80" step="1" />
-           <field name="label_pad_right" type="number" cssprep="less" default="10" label="FLEXI_TMPL_PADDING_RIGHT" description="FLEXI_TMPL_PADDING_RIGHT_DESC" min="0" max="80" step="1" />
-                     <field name="label_pad_left" type="number" cssprep="less" default="10" label="FLEXI_TMPL_PADDING_LEFT" description="FLEXI_TMPL_PADDING_LEFT_DESC" min="0" max="80" step="1" />
-                    <field name="label_pad_bottom" type="number" cssprep="less" default="8" label="FLEXI_TMPL_PADDING_BOTTOM" description="FLEXI_TMPL_PADDING_BOTTOM_DESC" min="0" max="80" step="1" />
-          
+
+					<field name="label_pad_top" type="number" cssprep="less" default="8" label="FLEXI_TMPL_PADDING_TOP" description="FLEXI_TMPL_PADDING_TOP_DESC" min="0" max="80" step="1" />
+					<field name="label_pad_right" type="number" cssprep="less" default="10" label="FLEXI_TMPL_PADDING_RIGHT" description="FLEXI_TMPL_PADDING_RIGHT_DESC" min="0" max="80" step="1" />
+					<field name="label_pad_left" type="number" cssprep="less" default="10" label="FLEXI_TMPL_PADDING_LEFT" description="FLEXI_TMPL_PADDING_LEFT_DESC" min="0" max="80" step="1" />
+					<field name="label_pad_bottom" type="number" cssprep="less" default="8" label="FLEXI_TMPL_PADDING_BOTTOM" description="FLEXI_TMPL_PADDING_BOTTOM_DESC" min="0" max="80" step="1" />
+
 					<field name="label_radius" type="number" cssprep="less" default="3" label="FLEXI_TMPL_LABEL_RADIUS" description="FLEXI_TMPL_LABEL_RADIUS_DESC" min="0" max="80" step="1" />
-          
-          
 					
 					<field name="ibox_grp" type="separator" cssprep="1" default="commun Item box style" description="" level="level2" />
 					<field name="ibox_radius" type="number" cssprep="less" default="0" label="FLEXI_TMPL_LABEL_RADIUS" description="FLEXI_TMPL_LABEL_RADIUS_DESC" min="0" max="80" step="1" />

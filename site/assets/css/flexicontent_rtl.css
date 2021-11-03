@@ -560,14 +560,14 @@ body .nowrap_hidden {
 #flexicontent div.input-append > *:not(:first-child):not(:last-child) > * {
 	border-top-left-radius: 0px !important;
 	border-bottom-left-radius: 0px !important;
+	margin-left: 0 !important;
 }
-#flexicontent div.input-group-addon > *:not(:first-child):not(:last-child),
-#flexicontent div.input-prepend > *:not(:first-child):not(:last-child),
-#flexicontent div.input-group-addon > *:not(:first-child):not(:last-child) > *,
-#flexicontent div.input-prepend > *:not(:first-child):not(:last-child) > * {
+#flexicontent div.input-group-addon > *:not(:first-child),
+#flexicontent div.input-prepend > *:not(:first-child),
+#flexicontent div.input-group-addon > *:not(:first-child) > *,
+#flexicontent div.input-prepend > *:not(:first-child) > * {
 	border-top-right-radius: 0px !important;
 	border-bottom-right-radius: 0px !important;
-	margin-left: 0 !important;
 }
 .input-prepend.input-append .add-on:not(:last-child),
 .input-prepend.input-append .add-on:not(:last-child) > * {
@@ -838,12 +838,14 @@ td.col_edit_layout {
 	margin: 4px 0px;
 	vertical-align: top;
 	min-height: 34px;
+	background: #fff;
+	box-shadow: 0px 5px 16px 0px #939393;
 }
 .flexicontent #fc-mini-help,
 .flexicontent #fc-filters-box.fcman-abs,
 .flexicontent #mainChooseColBox.fcman-abs {
 	position: absolute;
-	box-shadow: 2px 2px 6px black;
+	box-shadow: 0px 5px 16px 0px #939393;
 	background: #fff;
 	z-index: 100;
 	right: 0;
@@ -876,14 +878,14 @@ td.col_edit_layout {
 	width: 0 !important;
 }
 .flexicontent #fc-managers-header select.fc_is_selarrow {
-	max-width: 1.4em !important;
+	max-width: 1.8em !important;
 }
 .flexicontent #fc-managers-header select.fc_is_selarrow:hover,
 .flexicontent #fc-managers-header select.fc_is_selarrow:focus {
 	max-width: unset !important;
 }
 .flexicontent #fc-managers-header select.fc_is_selarrow + #search {
-	margin-right: 1.3em !important;
+	margin-right: 1.8em !important;
 }
 .flexicontent #fc-managers-header #search {
 	margin: 0px !important;
@@ -1001,8 +1003,8 @@ td.col_edit_layout {
 .flexicontent #fc-filters-box .fc-filter #startdate_btn,
 .flexicontent #fc-filters-box .fc-filter #enddate_btn {
 	font-size: 14px !important;
-	height: 28px !important;
-	padding: 2px 4px !important;
+	height: 36px !important;
+	padding: 10px 4px !important;
 	box-sizing: border-box;
 }
 .flexicontent #fc-filters-box .fc-filter #startdate_btn {
@@ -1014,7 +1016,7 @@ td.col_edit_layout {
 	min-width: 99px;
 	max-width: 99px;
 	height: 16px !important;
-	padding: 13px 8px !important;
+	padding: 17px 8px !important;
 	box-sizing: border-box;
 	border-radius: 0;
 }
@@ -1043,7 +1045,7 @@ td.col_edit_layout {
 .flexicontent #fc-filters-box .fc-filter > * {
 	vertical-align: middle !important;
 	float: right;
-	margin: 0 !important;
+	margin: 4px !important;
 }
 .flexicontent #fc-filters-box .fc-filter > *:not(.fc-xpended):not(.fc-xpended-row) {
 	margin: 0 6px 0 2px !important;
@@ -1096,7 +1098,7 @@ td.col_edit_layout {
 	width: 22px !important;
 	cursor: pointer !important;
 	border-width: 0px !important;
-	background: transparent url(../images/select2.png) no-repeat scroll -60% -22px !important;
+	background: #fff url(../images/select2.png) no-repeat scroll -60% -22px !important;
 	font-size: 13px;
 }
 .flexicontent #fc-filters-box .fc-filter .select2-container-multi .select2-choices .select2-search-choice {
@@ -1107,7 +1109,7 @@ td.col_edit_layout {
 }
 .flexicontent #fc-filters-box .fc-filter .select2-container-multi.select2-dropdown-open .select2-choices .select2-search-field input.select2-input {
 	padding: 2px 6px 2px 26px !important;
-	background: transparent url(../images/select2.png) no-repeat scroll -32px -22px !important;
+	background: #fff url(../images/select2.png) no-repeat scroll -32px -22px !important;
 	width: 100% !important;
 }
 @media (max-width: 1580px) {
@@ -1151,6 +1153,17 @@ td.col_edit_layout {
 	#flexicontent .fc_hidden_580 {
 		display: none;
 	}
+}
+#flexicontent .btn {
+	padding: 8px 12px;
+}
+div#fc-filters-slide-btn {
+	border: 0;
+	background: none;
+	box-shadow: none;
+}
+#fc-filters-box input[type="text"] {
+	padding: 8px 6px !important;
 }
 body .fc-close {
 	color: #000000;
@@ -1614,6 +1627,8 @@ body .fc-nowrap-box .nowrap_box .label,
 	margin: 0 0 0 0;
 	padding-right: 4px;
 	padding-left: 4px;
+	padding-top: 8px;
+	padding-bottom: 8px;
 	display: inline-block;
 }
 @media (max-width: 800px) {
@@ -1685,7 +1700,6 @@ body .fc-nowrap-box .nowrap_box .label,
 #flexicontent [class*="fc-xpended"] div.select2-container:nth-last-child(n+3) > a.select2-choice {
 	border-top-left-radius: 0;
 	border-bottom-left-radius: 0;
-	margin-left: 0 !important;
 }
 #flexicontent [class^="fc-xpended"] select:first-child,
 #flexicontent [class^="fc-xpended"] div.select2-container:nth-last-child(2),
@@ -3238,6 +3252,7 @@ body .container_fcfield input.input-xxlarge,
 body .container_fcfield input,
 #flexicontent .container_fcfield input {
 	max-width: 100%;
+	height: 26px;
 }
 .flexi_params table.admintable,
 .flexi_params table.admintable td {
@@ -3520,13 +3535,14 @@ ul.thumbnails.image_picker_selector li div.thumbnail p {
 }
 #flexicontent form select.fcfield_selectval,
 #flexicontent form input.fcfield_textval {
-	height: 26px;
+	height: 34px;
 	line-height: 26px;
 	overflow: auto;
 	vertical-align: top;
 	min-width: 220px;
 	width: auto;
 	max-width: 600px;
+	border-radius: 3px;
 }
 #flexicontent form select.fcfield_selectval {
 	padding: 4px 0 2px 4px;
@@ -3536,7 +3552,7 @@ ul.thumbnails.image_picker_selector li div.thumbnail p {
 	line-height: 1em;
 	overflow: auto;
 	padding: 4px 0 2px 4px;
-	min-width: 248x;
+	min-width: 248px;
 }
 #flexicontent form select.fcfield_selectval.inlineval,
 #flexicontent form select.fcfield_selectmulval.inlineval,
@@ -3910,7 +3926,7 @@ html[dir="rtl"] .select2-container .select2-choice {
 	min-height: 20px !important;
 	padding: 6px 7px !important;
 	margin-top: 1px !important;
-	border: 1px solid lightgray !important;
+	border: 0px solid lightgray !important;
 	background: #fff url('../images/select2.png') no-repeat 100% -22px !important;
 }
 .select2-container-multi.select2-dropdown-open .select2-choices .select2-search-field input.select2-input {
@@ -4083,6 +4099,8 @@ div#permissions .tab-content {
 .fcfile_actions.fcfile_compact {
 	display: inline-block !important;
 	width: unset !important;
+	margin-top: 2px;
+	margin-bottom: 2px;
 }
 .fcfile_actions.fcfile_compact > a,
 .fcfile_actions.fcfile_compact > input,
@@ -4188,6 +4206,16 @@ div.fc-fieldgrp-value-box {
 [class*="fcfavs-"].fc-mssg-inline {
 	position: relative;
 	margin: 1px 2px;
+}
+.select2-container-multi .select2-choices {
+	min-height: 34px !important;
+}
+#fcform_language_container .input-append input {
+	height: 26px !important;
+}
+span.add-on.pop-helper.field-media-preview {
+	height: 26px !important;
+	line-height: 28px !important;
 }
 hr.fcclearline {
 	border: 0;

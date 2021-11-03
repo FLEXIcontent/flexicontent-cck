@@ -460,6 +460,8 @@ body .fc-nowrap-box .nowrap_box .label,
 	margin: 0 0 0 0;
 	padding-right: 4px;
 	padding-left: 4px;
+	padding-top: 8px;
+	padding-bottom: 8px;
 	display: inline-block;
 }
 @media (max-width: 800px) {
@@ -531,7 +533,6 @@ body .fc-nowrap-box .nowrap_box .label,
 #flexicontent [class*="fc-xpended"] div.select2-container:nth-last-child(n+3) > a.select2-choice {
 	border-top-left-radius: 0;
 	border-bottom-left-radius: 0;
-	margin-left: 0 !important;
 }
 #flexicontent [class^="fc-xpended"] select:first-child,
 #flexicontent [class^="fc-xpended"] div.select2-container:nth-last-child(2),
