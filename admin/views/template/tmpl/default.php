@@ -571,8 +571,7 @@ $this->document->addScript(JUri::base(true).'/components/com_flexicontent/assets
 
 		<div class="tabbertab" id="tabset_layout_edit_files_tab" data-icon-class="icon-signup" >
 			<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_EDIT_LAYOUT_FILES' ); ?></h3>
-			<div class="container-fluid row">
-			<div id="layout-filelist-container" class="span4 col-4">
+			<div id="layout-filelist-container" class="span4" style="margin:0.5%;">
 				<span class="fcsep_level0" style="margin:0 0 12px 0; background-color:#333; ">
 					<span class="badge"><?php echo JText::_( 'FLEXI_LAYOUT_FILES' ); ?></span>
 				</span>
@@ -683,7 +682,7 @@ $this->document->addScript(JUri::base(true).'/components/com_flexicontent/assets
 				?>
 			</div>
 
-			<div id="layout-fileeditor-container" class="span8 col-8">
+			<div id="layout-fileeditor-container" class="span8" style="margin:0.5%;">
 				<span class="fcsep_level0" style="margin:0 0 12px 0; background-color:#333; ">
 					<span id="layout_edit_name_container" class="label label-info"><?php echo JText::_( 'FLEXI_NO_FILE_LOADED' ); ?></span>
 				</span>
@@ -751,7 +750,6 @@ $this->document->addScript(JUri::base(true).'/components/com_flexicontent/assets
 				<?php endforeach; ?>
 
 			</div>
-				</div>
 			<div class="fcclear"></div>
 
 		</div>
