@@ -139,7 +139,7 @@
 			<field name="layout_pos_tab_top_bottom_positions" type="separator" default="FLEXI_TMPL_TOP_BOTTOM_POS_TAB" description="" icon_class="" level="tab_open" box_type="1" />
 
 			<field name="column_display_grp" type="separator" cssprep="1" default="FLEXI_TMPL_COLUMNS_DISPLAY" description="" level="level2" />
-			<field name="top_span_cols_params" type="integer" default="8" label="Top width" description="This is span1 to span12 (100% width). &lt;br&gt; Note 'Top' position is next to 'Image' position the sum of them is 12. &lt;br&gt; If one position is empty the other is expaned to 100%" first="1" last="12" step="1" />
+			<field name="top_span_cols" type="integer" default="8" label="Top width" description="This is span1 to span12 (100% width). &lt;br&gt; Note 'Top' position is next to 'Image' position the sum of them is 12. &lt;br&gt; If one position is empty the other is expaned to 100%" first="1" last="12" step="1" />
 			<field name="top_cols" type="radio" default="" label="FLEXI_ITEM_TOP_COLS" description="FLEXI_ITEM_TOP_COLS_DESC" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="one">FLEXI_1_COL</option>

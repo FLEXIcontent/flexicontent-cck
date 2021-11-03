@@ -20,17 +20,17 @@ body #flexicontent .fc_item_title a {
 }
 body #flexicontent .flexi.label,
 body #flexicontent .desc-title.label {
-	background-color: #71a233;
+	background-color: #999999;
 	color: #ffffff;
 	border-radius: 3px;
-	padding-top: 10px;
+	padding-top: 2px;
 	padding-right: 4px;
 	padding-left: 4px;
-	padding-bottom: 10px;
+	padding-bottom: 2px;
 }
 body #flexicontent ul.tabbernav > li a {
 	background-color: #e4f1f8;
-	color: #3093c7;
+	color: #ffffff;
 }
 body #flexicontent ul.tabbernav > li.tabberactive a::before {
 	border-top: 4px solid #3093c7;
@@ -56,7 +56,7 @@ body .tabbertab,
 }
 body ul.tabbernav,
 #flexicontent ul.tabbernav {
-	border-bottom: 1px solid #cccccc !important;
+	border-bottom: 1px solid inherit !important;
 }
 div#fc_subtitle_tabset,
 div#fc_bottom_tabset {
@@ -108,16 +108,16 @@ body .flexi.infoblock {
 .topblock .flexi.infoblock {
 	overflow: hidden;
 	border-radius: 0px;
-	border: 0px solid #cccccc;
+	border: 1px solid #ccc;
 	color: inherit;
 	background-color: transparent;
 }
 .flexi.bottomblock.infoblock {
 	overflow: hidden;
 	border-radius: 0px;
-	border: 0px solid #cccccc;
-	color: #cccccc;
-	background-color: #ffffff;
+	border: 1px solid #ccc;
+	color: #ccc;
+	background-color: #fff;
 }
 .flexi.topblock ul {
 	padding: 0;
@@ -143,8 +143,8 @@ body .flexi.infoblock {
 	zoom: 1;
 }
 div.flexi.value {
-	padding-bottom: 10px !important;
-	padding-top: 10px !important;
+	padding-bottom: 2px !important;
+	padding-top: 2px !important;
 }
 .onecols ul li.flexi {
 	width: 100%;
