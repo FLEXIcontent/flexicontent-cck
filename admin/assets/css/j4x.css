@@ -598,3 +598,63 @@ body .btn-group.group-fcmethod .btn:not(.btn-primary) {
 	background-color: #495057 !important;
 	border-color: #495057 !important;
 }
+table.fc-table-list {
+	font: inherit;
+	text-shadow: inherit;
+	background: inherit;
+	border-collapse: inherit;
+	box-shadow: inherit;
+	font-size: inherit;
+	line-height: inherit;
+	margin: inherit;
+	text-align: inherit;
+	min-width: inherit;
+}
+div table.fc-table-list th {
+	background-color: inherit;
+	background-image: inherit;
+	filter: inherit;
+	border-left: inherit;
+	border-right: inherit;
+	border-top: inherit;
+	border-bottom: inherit;
+	box-shadow: inherit;
+	color: #555;
+	font-weight: bold;
+	padding: 6px 12px;
+	position: relative;
+	text-shadow: inherit;
+}
+div table.fc-table-list th:last-child {
+	box-shadow: inherit;
+}
+div table.fc-table-list tr {
+	background: inherit;
+}
+div table.fc-table-list {
+	font: inherit;
+	text-shadow: inherit;
+	background: #fff;
+	border-collapse: inherit;
+	box-shadow: inherit;
+	font-size: inherit;
+}
+div table.fc-table-list th:first-child {
+	border-left: inherit;
+}
+div table.fc-table-list td:last-child {
+	border-right: inherit;
+	box-shadow: inherit;
+}
+div table.fc-table-list td {
+	border-right: inherit;
+	border-left: inherit;
+	border-top: inherit;
+	border-bottom: inherit;
+	padding: 10px 15px;
+	position: inherit;
+	transition: inherit;
+}
+div table.fc-table-list tr:nth-child(odd) td {
+	background: inherit;
+}
