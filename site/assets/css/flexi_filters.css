@@ -289,13 +289,6 @@ form > .fc_filter_line {
 .fc_filter_html .input-prepend > input.fc_field_filter:focus {
 	margin-left: 0px;
 }
-input.fc_text_filter:not(.fc_iscalendar),
-input.fc_text_filter:not(.fc_iscalendar):focus,
-input.fc_field_filter:not(.fc_iscalendar),
-input.fc_field_filter:not(.fc_iscalendar):focus {
-	min-width: 92%;
-	width: 92% !important;
-}
 input.fc_text_filter.fc_iscalendar,
 input.fc_field_filter.fc_iscalendar {
 	min-width: 60px;
@@ -401,6 +394,9 @@ span.fc_field_filter {
 .fc_filter_html .use_select2_lib {
 	width: 100% !important;
 }
+.fc_filter_html .use_select2_lib.fc_field_searchphrase {
+	width: unset !important;
+}
 .fc_filter_html .field-calendar .fc_field_filter {
 	color: black;
 	font-weight: normal;
@@ -416,6 +412,7 @@ span.fc_field_filter {
 .fc_filter_html .select2-container-multi .select2-choices {
 	border: 1px solid #aaa;
 	border-radius: 5px;
+	display: inline-block;
 }
 .field-calendar .btn {
 	background: #fff !important;
