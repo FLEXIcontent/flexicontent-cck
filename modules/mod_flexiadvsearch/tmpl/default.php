@@ -45,14 +45,20 @@ $flexi_button_class_advanced =  ($params->get('flexi_button_class_advanced' ,'')
 $show_txtfields = (int) $params->get('show_txtfields', 1);  // 0: hide, 1: according to content, 2: use custom configuration
 $show_txtfields = !$txtmode ? 0 : $show_txtfields;  // disable this flag if using BASIC index for text search
 
-/* TODO check this variable */
-$type_based_search = 0;
+/**
+ * ***** TODO check these variables that are normally meant
+ * ***** for advanced search view only and not for module
+ */
 
-/*
 // Get if filtering according to specific (single) content type
-$show_filters   = (int) $params->get('show_filters', 1);  // 0: hide, 1: according to content, 2: use custom configuration
+$show_filters      = 1;
+$type_based_search = 0;
+$canseltypes = $params->get('canseltypes', 1);  // SET "type selection FLAG" back into parameters
+
 
 // Force single type selection and showing the content type selector
+/*
+$show_filters   = (int) $params->get('show_filters', 1);  // 0: hide, 1: according to content, 2: use custom configuration
 $type_based_search = $show_filters === 1 || $show_txtfields === 1;
 $canseltypes = $type_based_search ? 1 : $canseltypes;
 */
@@ -83,7 +89,6 @@ foreach($contenttypes as $i => $v)
 
 // Force hidden content type selection if only 1 content type was initially configured
 //$canseltypes = count($contenttypes) === 1 ? 0 : $canseltypes;
-$canseltypes = $params->get('canseltypes', 1);  // SET "type selection FLAG" back into parameters
 
 // Type data and configuration (parameters), if no content types specified then all will be retrieved
 $typeData = flexicontent_db::getTypeData($contenttypes);
@@ -229,7 +234,9 @@ if ($canseltypes)
 }
 
 // *** Selector of Fields for text searching
-if( in_array($txtmode, array(1,2)) && count($fields_text) )
+// THIS is wrong value 1 means hide the fields and use the configured fields 
+// if( in_array($txtmode, array(1,2)) && count($fields_text) )
+if( $txtmode==2 && count($fields_text) )
 {
 	// Get selected text fields in the Search Form
 	$form_txtflds = $jinput->get('txtflds', array(), 'array');
@@ -363,11 +370,11 @@ $doc->addScriptDeclaration($js);
 		$prependToText =
 			( $button && $button_pos == 'left' ) ||
 			( $direct && $direct_pos == 'left' ) ||
-			( $linkadvsearch && $linkadvsearch_pos == 'left' );
+			( $link_to_advsearch && $link_to_advsearch_pos == 'left' );
 		$appendToText =
 			( $button && $button_pos == 'right' ) ||
 			( $direct && $direct_pos == 'right' ) ||
-			( $linkadvsearch && $linkadvsearch_pos == 'right' );
+			( $link_to_advsearch && $link_to_advsearch_pos == 'right' );
 		$isInputGrp = $prependToText || $appendToText;
 
 		$_ac_index = $txtmode ? 'fc_adv_complete' : 'fc_basic_complete';
@@ -437,17 +444,31 @@ $doc->addScriptDeclaration($js);
 		endif;
 
 		// Search's 'ADVANCED' link button
-		if ($linkadvsearch) :
-			$linkadvsearch_html = '<input type="button" onclick="window.location.href=\''.$action.'\';" class="'.(!$isInputGrp ? 'fc_filter_button' : '').' '.$flexi_button_class_advanced.'" value="'.$linkadvsearch_txt.'" />';
+		if ($link_to_advsearch) :
+			$link_to_advsearch_html = '<input type="button" onclick="window.location.href=\''.$action.'\';" class="'.(!$isInputGrp ? 'fc_filter_button' : '').' '.$flexi_button_class_advanced.'" value="'.$link_to_advsearch_txt.'" />';
 
-			if ($linkadvsearch_html) switch ($linkadvsearch_pos) :
-				case 'top'   : $top_html[]    = $linkadvsearch_html;  break;
-				case 'bottom': $bottom_html[] = $linkadvsearch_html;  break;
-				case 'right' : array_push($output, $linkadvsearch_html);  break;
+			if ($link_to_advsearch_html) switch ($link_to_advsearch_pos) :
+				case 'top'   : $top_html[]    = $link_to_advsearch_html;  break;
+				case 'bottom': $bottom_html[] = $link_to_advsearch_html;  break;
+				case 'right' : array_push($output, $link_to_advsearch_html);  break;
 				case 'left'  :
-				default      : array_unshift($output, $linkadvsearch_html); break;
+				default      : array_unshift($output, $link_to_advsearch_html); break;
 			endswitch;
 		endif;
+
+		// Display the optional buttons and advanced search box
+		if ($autodisplayadvoptions)
+		{
+			$checked_attr  = $use_advsearch_options ? 'checked=checked' : '';
+			$checked_class = $use_advsearch_options ? 'btn-primary' : '';
+			$advbox_button_html = '
+			<input type="checkbox" id="modfcadvsearch_use_advsearch_options_'.$module->id.'" name="use_advsearch_options" value="1" '.$checked_attr.' onclick="jQuery(this).next().toggleClass(\'btn-primary\');" style="display:none" />
+			<label id="modfcadvsearch_use_advsearch_options_lbl_'.$module->id.'" class="btn '.$checked_class.' hasTooltip" for="modfcadvsearch_use_advsearch_options_'.$module->id.'" title="'.JText::_('FLEXI_SEARCH_ADVANCED_OPTIONS').'">
+				<span class="icon-list"></span>' . JText::_('FLEXI_SEARCH_ADVANCED') . '
+			</label>
+			';
+			array_push($output, $advbox_button_html);
+		}
 
 		// If using button in same row try to create bootstrap btn input append
 		$txt_grp_class = $params->get('bootstrap_ver', 2)==2  ?  (($prependToText ? ' input-prepend' : '') . ($appendToText ? ' input-append' : '')) : 'input-group';
@@ -458,19 +479,8 @@ $doc->addScriptDeclaration($js);
 			(count($output) > 1 ? '<span class="btn-wrapper '.$txt_grp_class.'">'.implode("\n", $output).'</span>' : implode("\n", $output)).
 			(count($bottom_html) > 1 ? '<span class="btn-wrapper '.$input_grp_class.'">'.implode("\n", $bottom_html).'</span>' : implode("\n", $bottom_html));
 
-		// Display the optional buttons and advanced search box
 		echo $output . $hidden_html;
-		if ($autodisplayadvoptions)
-			{
-				$checked_attr  = $use_advsearch_options ? 'checked=checked' : '';
-				$checked_class = $use_advsearch_options ? 'btn-primary' : '';
-				echo '
-					<input type="checkbox" id="modfcadvsearch_use_advsearch_options_'.$module->id.'" name="use_advsearch_options" value="1" '.$checked_attr.' onclick="jQuery(this).next().toggleClass(\'btn-primary\');" />
-					<label id="modfcadvsearch_use_advsearch_options_lbl_'.$module->id.'" class="btn '.$checked_class.' hasTooltip" for="modfcadvsearch_use_advsearch_options_'.$module->id.'" title="'.JText::_('FLEXI_SEARCH_ADVANCED_OPTIONS').'">
-						<span class="icon-list"></span>' . JText::_('FLEXI_SEARCH_ADVANCED') . '
-					</label>
-				';
-			} ?>
+		?>
 
 		</span>
 	</div>

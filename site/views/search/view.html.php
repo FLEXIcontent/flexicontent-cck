@@ -622,7 +622,7 @@ class FLEXIcontentViewSearch extends JViewLegacy
 				$phrases[] = $_obj;
 			}
 			$lists['searchphrase'] = JHtml::_('select.genericlist', $phrases, 'p',
-				'class="fc_field_filter use_select2_lib"', 'value', 'text', $searchphrase, 'searchphrase', $_translate=true);
+				'class="fc_field_filter use_select2_lib fc_field_searchphrase"', 'value', 'text', $searchphrase, 'searchphrase', $_translate=true);
 
 			/*$lists['searchphrase']  = '<ul class="fc_field_filter fc_checkradio_group">';
 			foreach ($searchphrase_names as $searchphrase_value => $searchphrase_name) {

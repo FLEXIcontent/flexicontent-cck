@@ -111,7 +111,7 @@ if ($disp_slide_filter)
 ?>
 
 
-<form action="<?php echo $this->action; ?>" method="POST" id="<?php echo $form_id; ?>" name="<?php echo $form_name; ?>" onsubmit="" class="<?php echo $column_display === ) ? 'col-search span3' : 'top-search';?>">
+<form action="<?php echo $this->action; ?>" method="POST" id="<?php echo $form_id; ?>" name="<?php echo $form_name; ?>" onsubmit="" class="<?php echo $column_display === 1 ? 'col-search span3' : 'top-search';?>">
 	
 	<?php if ($this->params->get('canseltypes', 1) && isset($this->lists['contenttypes'])) : ?>
 	<fieldset id="fc_contenttypes_set" class="fc_search_set">

@@ -141,10 +141,10 @@ $direct_text  = JText::_($params->get('direct_text', 'FLEXI_ADV_MOD_DIRECT'));
 $direct_image = $params->get('direct_image', 'components/com_flexicontent/assets/images/question.png');
 
 // Link to search view button ('Advanced')
-$linkadvsearch     = $params->get('linkadvsearch', 1);
-$linkadvsearch_pos = $params->get('linkadvsearch_pos', 'bottom');
-$linkadvsearch_as  = '';
-$linkadvsearch_txt = JText::_($params->get('linkadvsearch_txt', 'FLEXI_ADV_MOD_ADVANCED_SEARCH'));
+$link_to_advsearch     = $params->get('link_to_advsearch', 1);
+$link_to_advsearch_pos = $params->get('link_to_advsearch_pos', 'bottom');
+$link_to_advsearch_as  = '';
+$link_to_advsearch_txt = JText::_($params->get('link_to_advsearch_txt', 'FLEXI_ADV_MOD_OPEN_DETAILED_SEARCH'));
 
 
 // Load needed JS libs & CSS styles
