@@ -658,3 +658,13 @@ div table.fc-table-list td {
 div table.fc-table-list tr:nth-child(odd) td {
 	background: inherit;
 }
+#fc_ajax_system_messages button.close {
+	float: right;
+	border: 0;
+	background: inherit;
+	font-size: 30px;
+	color: var(--alert-accent-color);
+}
+#fc_ajax_system_messages .alert.alert-success {
+	border: 1px solid #457d54;
+}
