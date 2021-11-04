@@ -110,6 +110,10 @@
 				<option value="200">200</option>
 				<option value="250">250</option>
 			</field>
+			<field name="thumb_method" type="radio" default="1" label="FLEXI_PROCESSING_METHOD" description="FLEXI_PROCESSING_METHOD_DESC" class="btn-group group-fcinfo">
+				<option value="0">FLEXI_SCALE</option>
+				<option value="1">FLEXI_CROP</option>
+			</field>
 
 			<field name="" type="separator" default="FLEXI_FIELD_IMAGE_SOURCE_MODE" _description="FLEXI_FIELD_IMAGE_SOURCE_MODE_DESC" icon_class="icon-wrench" level="tab_open" box_type="1" />
 
