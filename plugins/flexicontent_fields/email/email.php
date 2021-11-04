@@ -23,6 +23,10 @@ class plgFlexicontent_fieldsEmail extends FCField
 
 	public function __construct( &$subject, $params )
 	{
+		$app = JFactory::getApplication(); //record action in form
+		if ($app->isClient('site') && $app->input->get('emailtask', '', 'cmd') === 'plg.email.submit') {
+			$this->sendEmail();
+		}
 		parent::__construct( $subject, $params );
 	}
 
@@ -780,4 +784,189 @@ class plgFlexicontent_fieldsEmail extends FCField
 		return true;
 	}
 
+
+
+	// ***
+	// *** VARIOUS HELPER METHODS
+	// ***
+
+	/**
+	 * Helper for sendemail
+	 */
+
+	public static function sendEmail()
+	{
+		// Load plugin language
+		$lang = JFactory::getLanguage();
+		$lang->load('plg_flexicontent_fields_email', JPATH_ADMINISTRATOR);
+
+		// get the params from the plugin options
+		$plugin = JPluginHelper::getPlugin('flexicontent_fields', 'email');
+		$pluginParams = new JRegistry($plugin->params);
+
+		// Check for request forgeries.
+		JSession::checkToken() or jexit(JText::_('JINVALID_TOKEN'));
+
+		// Get a handle to the Joomla! application object
+		$app = JFactory::getApplication();
+
+		//get input form
+		$jinput = JFactory::getApplication()->input;
+		
+		// create variable for email
+		global $globalcats;
+		$config = JFactory::getConfig();
+		$categories = & $globalcats;
+		// Get the route helper
+		require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'route.php');
+		$itemid   = $jinput->post->get('itemid', '', 'int');
+		$title    = $jinput->post->get('itemtitle', '');
+		$alias    = $jinput->post->get('itemalias', '');
+		$maincat  = $jinput->post->get('catid', '', 'int');
+		$itemauthor  = $jinput->post->get('itemauthor', '', '');
+		$formid = $jinput->post->get('formid', '', '');
+
+		// Create the non-SEF URL
+		$item_url = FlexicontentHelperRoute::getItemRoute($itemid.':'.$alias, $maincat);
+		// Create the SEF URL
+		$item_url = $app->isClient('administrator')
+			? flexicontent_html::getSefUrl($item_url)   // ..., $_xhtml= true, $_ssl=-1);
+			: JRoute::_($item_url);  // ..., $_xhtml= true, $_ssl=-1);
+		// Make URL absolute since this URL will be emailed
+		$item_url = JUri::getInstance()->toString(array('scheme', 'host', 'port')) . $item_url;
+		$sitename = $app->getCfg('sitename') . ' - ' . JUri::root();
+
+		// set only form value in input
+		$id = $jinput->post->get('formid', '', '');
+		$datas = $jinput->post->get($id, array(), 'array');
+		if (isset($datas['name'])){
+			$name = $datas['name'];
+		}
+		if (isset($datas['firstname'])){
+			$firstname = $datas['firstname'];
+		}
+		if (isset($datas['lastname'])){
+			$lastname = $datas['lastname'];
+		}
+		// Create header email
+		if (!empty($name)){ // check if user use 1 name field or 2 separeate field
+			$fromname = $datas['name'];
+		} elseif (!empty($firstname) && !empty($lastname)){
+			$firstname = $datas['firstname'];
+			$lastname = $datas['lastname'];
+			$fromname = $firstname.' '.$lastname;
+		}
+		if (empty($fromname)){
+			$app->enqueueMessage(JText::_('FLEXI_FIELD_EMAIL_CONFIG_ERROR'), 'error');
+		}
+		$fromemail   = flexicontent_html::dataFilter($datas['emailfrom'],   4000, 'STRING', '');
+		$emailauthor = flexicontent_html::dataFilter($_POST['emailauthor'],   4000, 'STRING', '');
+		$from = array($fromemail , $fromname);
+
+		//subject
+		if (isset($datas['subject'])){
+			$subject = $datas['subject'];
+		} else{
+			$subject ='';
+		}
+		$subjectemail = JText::sprintf('FLEXI_FIELD_EMAIL_SUBJECT_DEFAULT', $fromname, $subject);
+
+		//body
+		$body = '';
+		foreach ($datas as $field => $value) {
+				$body .= '<li>' . $value . '</li>';
+			}
+			$body = "\n\r\n\r\n" . stripslashes($body);
+			$message 	= JText::sprintf('FLEXI_FIELD_EMAIL_MESSAGE_DEFAULT', $title, $body, '<a href="'.$item_url.'">'.$item_url.'</a>', $sitename);
+
+		// Check whether email copy function activated
+		$copy_email_user = $pluginParams->get( 'email_user_copy','' );
+			if ($copy_email_user == true)
+			{
+				$messagecopy   = JText::sprintf('FLEXI_FIELD_EMAIL_MESSAGE_DEFAULT_COPY', $title, $body, '<a href="'.$item_url.'">'.$item_url.'</a>', $sitename);
+				$subjectcopy =  JText::sprintf('FLEXI_FIELD_EMAIL_SUBJECT_DEFAULT_COPY', $fromname, $itemauthor, $subject);
+				$mailer = JFactory::getMailer();
+				$mailer->isHTML(true);
+				$mailer ->setSender(array($emailauthor, $itemauthor));
+				$mailer ->addRecipient($fromemail);
+				$mailer ->setSubject($subjectcopy);
+				$mailer ->setBody($messagecopy);
+				$send = $mailer->Send();
+			}
+			$copy_email_admin = $pluginParams->get( 'email_admin_copy', 0 );
+			$email_admin = $pluginParams->get( 'email_admin', '' ) ;
+				if ($copy_email_admin == true)
+				{
+					$messagecopyadmin   = JText::sprintf('FLEXI_FIELD_EMAIL_MESSAGE_ADMIN_COPY', $fromname , $title, $body, '<a href="'.$item_url.'">'.$item_url.'</a>', $sitename);
+					$subjectcopyadmin =  JText::sprintf('FLEXI_FIELD_EMAIL_SUBJECT_ADMIN_COPY', $itemauthor, $subject);
+					$mailer = JFactory::getMailer();
+					$mailer->isHTML(true);
+					$mailer ->setSender($from, $fromname);
+					$mailer ->addRecipient($email_admin);
+					$mailer ->setSubject($subjectcopyadmin);
+					$mailer ->setBody($messagecopyadmin);
+					$send = $mailer->Send();
+				}
+
+
+			//Prepare contact email
+			$mailer = JFactory::getMailer();
+			$mailer->isHTML(true);
+			$mailer->setSender($from, $fromname);
+			$mailer->addRecipient($emailauthor);
+			$mailer->setSubject($subjectemail);
+			$mailer->setBody($message);
+
+		//upload attachement
+		$files = $jinput->files->get($formid);
+		if (isset($files))
+		{
+			JFolder::create(JPATH_SITE . DS . "tmp" . DS . "upload_flexi_form". $formid);
+
+			foreach($files as $attachements) {
+				foreach ($attachements as $file){
+				// Import filesystem libraries. Perhaps not necessary, but does not hurt.
+				jimport('joomla.filesystem.file');
+
+				// Clean up filename to get rid of strange characters like spaces etc.
+				$filename = JFile::makeSafe($file['name']);
+
+				// Set up the source and destination of the file
+				$src = $file['tmp_name'];
+				$dest = JPATH_SITE . DS . "tmp" . DS . "upload_flexi_form". $formid . DS . $filename;
+					// TODO: Add security checks. FIle extension and size maybe using flexicontent helper
+
+					if (JFile::upload($src, $dest))
+						{
+        			$mailer->addAttachment($dest);
+						} 
+					else
+						{
+						$app->enqueueMessage(JText::_('FLEXI_FIELD_EMAIL_MESSAGE_SEND_ERROR'), 'error');
+						}
+				}
+			}
+		}
+
+		//Sendemail
+		$send = $mailer->Send();
+
+		//Message in front-end
+		if ( $send !== true )
+			{
+				$app->enqueueMessage(JText::_('FLEXI_FIELD_EMAIL_MESSAGE_SEND_ERROR'), 'error');
+				$destFolder= JPATH_SITE . DS . "tmp" . DS . "upload_flexi_form". $formid;
+				//Deleting file
+				if (is_dir($destFolder)) {
+ 				JFolder::delete($destFolder);
+				} 
+			} else {
+				// Message sending
+				$app->enqueueMessage(JText::_('FLEXI_FIELD_EMAIL_MESSAGE_SEND_SUCCESS'), 'message');
+				//Deleting file
+				if (is_dir($$destFolder)) {
+ 				JFolder::delete($destFolder);
+				} 
+			}
+	}
 }
