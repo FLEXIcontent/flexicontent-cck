@@ -36,7 +36,7 @@
 					<option value="fieldset_close" show_list="" hide_list="tfclass,tfopen,chtml" >FLEXI_FIELDSET_CLOSE</option>
 				</group>
 				<group label="FLEXI_OTHER">
-					<option value="html_separator" show_list="tfclass,chtml" hide_list="tfopen" >FLEXI_HTML</option>
+					<option value="html_separator" show_list="tfclass,chtml" hide_list="tfopen" >FLEXI_CUSTOM_HTML</option>
 				</group>
 			</field>
 
@@ -45,7 +45,7 @@
 			<field name="tabfset_specific" type="separator" default="FLEXI_TABS_FIELDSET_OPENING" level="level2" depend_class="tfopen" />
 			<field name="cont_label"    type="text" size="24" default="" label="FLEXI_TABS_FIELDSET_LABEL"     description="FLEXI_TABS_FIELDSET_LABEL_DESC" depend_class="tfopen" />
 
-			<field name="chtml_specific" type="separator" default="FLEXI_CUSTOM_HTML_SEP" level="level2" depend_class="chtml" />
+			<field name="chtml_specific" type="separator" default="FLEXI_CUSTOM_HTML" level="level2" depend_class="chtml" />
 			<field name="custom_html_sep" type="editor" editor="codemirror" syntax="html" filter="RAW" cols="40" rows="4" height="60px" class="fc-unset-width" default="&lt;hr style='clear:both;' /&gt;" label="FLEXI_CUSTOM_HTML" description="FLEXI_CUSTOM_HTML_DESC" depend_class="chtml" />
 
 		</fieldset>

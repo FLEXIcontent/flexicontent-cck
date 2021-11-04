@@ -124,7 +124,7 @@ $ord_col = !$this->filter_type
 	: 'typeordering';
 $ord_grp = 1;
 
-
+//JFactory::getLanguage()->load('plg_flexicontent_fields_text', JPATH_ADMINISTRATOR);
 $inputmask_txts = array(
 	//'' => 'FLEXI_NO_MASK',
 	'__regex__' => 'REGULAR EXPRESSION',
@@ -163,6 +163,14 @@ $inputmask_txts = array(
 	'hh:mm:ss' => 'Time (hh:mm:ss)',
 	'hh:mm' => 'Time (hh:mm)',
 	'mm/yyyy' => 'Month/Year (mm/yyyy)',
+);
+
+JFactory::getLanguage()->load('plg_flexicontent_fields_image', JPATH_ADMINISTRATOR);
+$image_source_txts = array(
+	'-2' => 'Joomla media manager',
+	'-1' => 'Joomla article images: (intro + full)',
+	'0' => JText::_('FLEXI_FIELD_REUSABLE_DB_MODE'),
+	'1' => JText::_('FLEXI_FIELD_ITEM_SPECIFIC_FOLDER_MODE'),
 );
 
 $current_type = $this->filter_type ? $this->types[$this->filter_type] : false;
@@ -653,24 +661,36 @@ if ($js)
 
 			<td class="col_fieldtype_info hidden-phone">
 				<?php
-					$im_txt = '';
-					if ($row->field_type === 'text')
+					$ctype_title = '';
+					$ctype_desc = '';
+					if ($row->field_type === 'text' || $row->field_type === 'textselect')
 					{
 						$inputmask = $row->parameters->get('inputmask');
-						$im_txt = isset($inputmask_txts[$inputmask]) ? $inputmask_txts[$inputmask] : '';
-						echo $im_txt
-							? '<span class="' . $this->tooltip_class . '" title="Input box with validation (text field)"><span class="badge" style="margin:0">V</span></span>'
+						$ctype_desc = isset($inputmask_txts[$inputmask]) ? $inputmask_txts[$inputmask] : '';
+						echo $ctype_desc
+							? '<span class="' . $this->tooltip_class . '" title="Custom validation"><span class="icon icon-lock" style="font-size: 1.2em;"></span></span>'
+							: '';
+						$row->custom_desc = $ctype_desc;
+					}
+					elseif ($row->field_type === 'image')
+					{
+						//$row->custom_title = 'image <span style="font-weight: bold">(gallery)</span>';
+						$image_source = $row->parameters->get('image_source', 1);
+						$ctype_desc = isset($image_source_txts[$image_source]) ? $image_source_txts[$image_source] : '';
+						$row->custom_desc = $ctype_desc;
+						echo $ctype_desc
+							? '<span class="' . $this->tooltip_class . '" title="Custom image source"><span class="icon icon-images" style="font-size: 1.2em;"></span></span>'
 							: '';
 					}
-					else if ($row->iscore)
+					elseif ($row->iscore)
 					{
-						echo '<span class="badge ' . $this->tooltip_class . '" title="Common (Core) field" style="margin:0">C</span>';
+						echo '<span class="icon icon-home-2 ' . $this->tooltip_class . '" title="Common (Core) field" style="font-size: 1.2em;"></span>';
 					}
 				?>
 			</td>
 
 			<td class="col_fieldtype hidden-phone">
-				<?php echo $im_txt ? '<b>' . $im_txt . '</b>' : JHtml::_($hlpname . '.fieldtype_info', $row, $i); ?>
+				<?php echo JHtml::_($hlpname . '.fieldtype_info', $row, $i); ?>
 			</td>
 
 			<td class="right hidden-phone">

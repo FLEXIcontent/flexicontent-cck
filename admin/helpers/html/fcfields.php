@@ -161,6 +161,8 @@ abstract class JHtmlFcfields extends JHtmlFcbase
 	 */
 	public static function fieldtype_info($row, $i)
 	{
+		$row_type = $row->custom_title ?: $row->type;
+		
 		switch ($row->field_type)
 		{
 			case 'fieldgroup':
@@ -180,7 +182,7 @@ abstract class JHtmlFcfields extends JHtmlFcbase
 
 				return '
 				<span class="btn btn-primary" onclick="jQuery(\'#fieldgroup_fields_list_' . $row->id . '\').slideToggle();">'
-					. ucfirst($row->type) . ' ' . JText::_('FLEXI_FIELDS') . '
+					. ucfirst($row_type) . ' ' . JText::_('FLEXI_FIELDS') . '
 				</span>
 				<div id="fieldgroup_fields_list_' . $row->id . '" style="display: none; position: absolute; width: 200px;">
 					<div class="alert alert-info" style="margin: 0; padding: 4px 12px;">
@@ -190,21 +192,28 @@ abstract class JHtmlFcfields extends JHtmlFcbase
 				break;
 
 			case 'groupmarker':
-				return '<strong>' . $row->type . '</strong><br/>
-					<small>-&nbsp;' . $row->parameters->get('marker_type') . '&nbsp;-</small>';
+				return '<strong>' . $row_type . '</strong><br/>
+					<small>- ' . $row->parameters->get('marker_type') . ' -</small>';
 				break;
 
 			case 'coreprops':
-				return '<strong>' . $row->type . '</strong><br/>
-					<small>-&nbsp;' . $row->parameters->get('props_type') . '&nbsp;-</small>';
+				return '<strong>' . $row_type . '</strong><br/>
+					<small>- ' . $row->parameters->get('props_type') . ' -</small>';
 				break;
 
 			default:
-				$friendly_name = str_replace('FLEXIcontent - ', '', $row->friendly);
-				return
-					'<strong>' . $row->type . '</strong>' .
-					($row->iscore ? '' : '<br/><small>-&nbsp;' . $friendly_name . '&nbsp;-</small>')
-					;
+				if (!empty($row->custom_desc))
+				{
+					return '<b>' . $row_type . '</b><br/>' .
+						($row->custom_desc ? '<span style="color: darkcyan; font-weight: bold;">' . $row->custom_desc . '</span>' : '<small>- ' . $friendly_name .' -' . ' -</small>');
+				}
+				else
+				{
+					$friendly_name = str_replace('FLEXIcontent - ', '', $row->friendly);
+					return
+						'<strong>' . $row_type . '</strong>' .
+						($row->iscore ? '' : '<br/><small>- ' . $friendly_name . ' -</small>');
+				}
 				break;
 		}	
 	}
