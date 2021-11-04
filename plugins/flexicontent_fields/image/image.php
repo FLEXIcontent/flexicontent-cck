@@ -129,10 +129,10 @@ class plgFlexicontent_fieldsImage extends FCField
 
 		$autoassign = (int) $field->parameters->get( 'autoassign', 1 );
 
-		$thumb_size_resizer = $field->parameters->get('thumb_size_resizer', 2);
-		$thumb_size_default = $field->parameters->get('thumb_size_default', 120);
-    $thumb_zc = $field->parameters->get('method_b', 1);
-		$preview_thumb_w = $preview_thumb_h = 600;
+		$thumb_size_resizer = (int) $field->parameters->get('thumb_size_resizer', 2);
+		$thumb_size_default = (int) $field->parameters->get('thumb_size_default', 120);
+		$thumb_method       = (int) $field->parameters->get('thumb_method', 1);
+		$preview_thumb_w    = $preview_thumb_h = 600;
 
 		// Optional properies configuration
 		$linkto_url = (int) $field->parameters->get('linkto_url', 0);
@@ -878,7 +878,7 @@ class plgFlexicontent_fieldsImage extends FCField
 						htmlspecialchars($img_link . '&w='.$preview_thumb_w . '&h=' . $preview_thumb_h . '&zc=1&q=95&ar=x' . $f);*/
 
 					$img_link = htmlspecialchars(phpThumbURL(
-						'src=' . $img_link . '&w=' . $preview_thumb_w . '&h=' . $preview_thumb_h . '&zc='.$thumb_zc.'&q=95&ar=x' . $f,
+						'src=' . $img_link . '&w=' . $preview_thumb_w . '&h=' . $preview_thumb_h . '&zc='.($thumb_method ? 1: 0).'&q=95&ar=x' . $f,
 						JUri::root(true) . '/components/com_flexicontent/librairies/phpthumb/phpThumb.php'
 					));
 				}
