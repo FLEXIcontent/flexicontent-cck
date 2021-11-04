@@ -1,5 +1,10 @@
-.placeholder{position: absolute;left: -99999px;}.label-top{display:block;}
-.modal-body {
-overflow: auto !important;
+.placeholder {
+  position: absolute;
+  left: -99999px;
+  }
+.label-top{
+  display:block;
 }
-/*** here add style for input ***/
+.modal-body {
+  overflow: auto !important;
+}

@@ -201,7 +201,9 @@
 
 			<field name="text_sparator" type="text" default="" label="FLEXI_FIELD_EMAIL_TXT_SEPARATOR" description="FLEXI_FIELD_EMAIL_TXT_SEPARATOR_DESC" />
 
-			<field name="" type="separator" default="Send e-mail form" level="level1" />
+			<field name="" type="separator" default="LAYOUT 'form'" level="level0" />
+			<field name="" type="separator" default="(Displays a form to 'send an email')" level="level3" class="alert alert-info fcpadded " />
+			<field name="" type="separator" default="BETA FEATURE &lt;br&gt; Parameters will be renamed and moved to &lt;br&gt; ... an xml file specific to the layout" level="level3" class="alert alert-warning fcpadded " />
 
 			<field name="" type="separator" default="FLEXI_FIELD_EMAIL_FORM_OPTION" level="level2" />
 
@@ -283,7 +285,8 @@
 
 			<field name="" type="separator" default="FLEXI_FIELD_EMAIL_FORM_USEDESC" level="level3" class="alert alert-info fcpadded" />
 
-			<field name="js_script" type="editor" editor="codemirror" syntax="html" filter="RAW" label="FLEXI_FIELD_EMAIL_JSSCRIPT"  default="" description="FLEXI_FIELD_EMAIL_SUBMIT_JSSCRIPT_DESC"/>
+			<!-- This parameter currently not used -->
+			<!--field name="js_script" type="editor" editor="codemirror" syntax="html" filter="RAW" label="FLEXI_FIELD_EMAIL_JSSCRIPT"  default="" description="FLEXI_FIELD_EMAIL_SUBMIT_JSSCRIPT_DESC"/-->
 
 			<field name="" type="separator" default="FLEXI_FIELD_EMAIL_SUBMIT_OPTION" level="level2" />
 			<field name="submit_label" type="text" label="FLEXI_FIELD_EMAIL_SUBMIT_LABEL"  default="FLEXI_FIELD_EMAIL_SUBMIT_LABEL_VALUE" description="FLEXI_FIELD_EMAIL_SUBMIT_LABEL_DESC"/>

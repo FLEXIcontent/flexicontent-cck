@@ -276,7 +276,9 @@ foreach ($values as $value)
 					break;
 
 				case 'hidden':
-					$fields_display .= '<input type="hidden" name="'.$field_name.'" id="'.$field_id.'" value="'.$field_value.'">';
+					// We use 'text' as type + STYLE display-none instead of 'hidden' as type,
+					// because of troubles getting value via JINPUT on post data
+					$fields_display .= '<input type="text" name="'.$field_name.'" id="'.$field_id.'" value="'.$field_value.'" style="display: none;">';
 					break;
 
 				case 'freehtml':
