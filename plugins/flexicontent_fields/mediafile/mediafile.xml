@@ -345,7 +345,7 @@
 				<option value="0" show_list="" hide_list="force_url_download">FLEXI_NO</option>
 				<option value="1" show_list="force_url_download" hide_list="">FLEXI_YES</option>
 			</field>
-			<field name="force_url_download_exts" type="text" size="40" default="bmp,gif,jpg,png,wav,mp3,aiff" label="FLEXI_FILE_FORCE_URL_DOWNLOADS_EXTS" depend_class="force_url_download" description="FLEXI_FIELD_FILE_CUSTOM_DOWNLOAD_TEXT_DESC"/>
+			<field name="force_url_download_exts" type="text" size="40" default="bmp,wbmp,gif,jpg,jpeg,png,webp,ico,wav,mp3,aiff" label="FLEXI_FILE_FORCE_URL_DOWNLOADS_EXTS" depend_class="force_url_download" description="FLEXI_FIELD_FILE_CUSTOM_DOWNLOAD_TEXT_DESC"/>
 			<field name="force_url_download_max_kbs" type="text" size="40" default="100000" label="FLEXI_FILE_FORCE_URL_DOWNLOADS_MAX_KBS" depend_class="force_url_download" description="FLEXI_FILE_FORCE_URL_DOWNLOADS_MAX_KBS_DESC"/>
 
 			<field name="" type="separator" default="FLEXI_BROWSER_VIEWING" description="" icon_class="icon-eye" level="tab_open" box_type="1" />
@@ -398,6 +398,17 @@
 
 			<field name="" type="separator" default="FLEXI_FIELD_FILE_FILE_DISPLAY" description="" icon_class="icon-file-2" level="tab_open" box_type="1" />
 			<field name="viewlayout" type="fcfilelist" default="" label="FLEXI_FIELD_SELECT_VIEW_LAYOUT" description="FLEXI_FIELD_SELECT_VIEW_LAYOUT_DESC" directory="plugins/flexicontent_fields/mediafile/tmpl/" filter="value*" exclude="" stripext="1" stripprefix="value_" hide_none="1" hide_default="1" labelclass="label label-warning" />
+
+			<field name="compact_display" type="radio" default="0" label="FLEXI_FIELD_FILE_COMPACT_DISPLAY" description="FLEXI_FIELD_FILE_COMPACT_DISPLAY_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+				<option value="2">FLEXI_YES_AS_ICON</option>
+			</field>
+			<field name="values_list_placement" type="multilist" subtype="radio" default="0" label="FLEXI_FIELD_VALUES_LIST_PLACEMENT" toggle_related="1" description="FLEXI_FIELD_VALUES_LIST_PLACEMENT_DESC" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="placement-slider">FLEXI_INLINE</option>
+				<option value="1" show_list="placement-slider" hide_list="">FLEXI_IN_SLIDER</option>
+			</field>
+			<field name="values_slider_title" type="text" size="5" default="FLEXI_FILES" label="FLEXI_FIELD_VALUES_SLIDER_TITLE" depend_class="placement-slider" description="FLEXI_FIELD_VALUES_SLIDER_TITLE_DESC"/>
 
 			<field name="" type="separator" default="Item view" description="" level="level3" />
 			<field name="wf_add_waveform" type="radio" default="1" label="Show waveform" description="" class="btn-group btn-group-yesno">

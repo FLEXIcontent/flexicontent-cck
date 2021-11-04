@@ -4,7 +4,7 @@ $PRV_TYPE='-2';
 $image_placeholder = 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=';
 
 $allowdownloads   = false;
-$compactDisp      = true;
+$compactWaveform  = true;
 $wf_zoom_slider   = $field->parameters->get('wf_zoom_slider', 1);
 $wf_load_progress = $field->parameters->get('wf_load_progress', 1);
 
@@ -240,7 +240,7 @@ foreach ($field->value as $file_id)
 
 		<div class="fcclear"></div>
 
-		<div class="fc_mediafile_player_box' . ($compactDisp ? ' fc_compact' : '') . '">
+		<div class="fc_mediafile_player_box' . ($compactWaveform ? ' fc_compact' : '') . '">
 
 			<div class="fc_mediafile_controls_outer">
 

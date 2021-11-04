@@ -10,11 +10,17 @@ $field->abspath = array();
 $field->file_data = array();
 $field->hits_total = 0;
 
-$compactDisp      = true;
+$compactWaveform  = true;
 $create_preview   = (int) $field->parameters->get('mm_create_preview', 1);
 $wf_zoom_slider   = (int) $field->parameters->get('wf_zoom_slider', 1);
 $wf_load_progress = (int) $field->parameters->get('wf_load_progress', 1);
 $wf_add_waveform  = (int) $field->parameters->get('wf_add_waveform' . ($view === 'item' ? '' : '_cat'), 1);
+
+$compact_display    = (int) $field->parameters->get('compact_display', 0);
+$compact_display    = static::$isItemsManager ? 2 : $compact_display;
+
+$infoseptxt   = $compact_display ? ' ' : $infoseptxt;
+$actionseptxt = $compact_display ? ' ' : $actionseptxt;
 
 $per_value_js = "";
 $n = 0;
@@ -280,7 +286,7 @@ if ($prop !== 'display_properties_only') :
 	// [0]: filename (if visible)
 	if (($filename_shown && !$filename_shown_as_link) || $not_downloadable)
 	{
-		$html .= '<div class="fcfile_name" style="display: inline-block;">' . $icon . ' ' . $name_html . '</div>';
+		$html .= '<div class="fcfile_name' . ($compact_display ? ' fcfile_compact' : '') . '">' . $icon . ' ' . $name_html . '</div>';
 	}
 
 
@@ -296,13 +302,13 @@ if ($prop !== 'display_properties_only') :
 	if ($hits)       $info_arr[] = $hits;
 	if ($descr_icon) $info_arr[] = $descr_icon;
 
-	$html .= '<div class="fcclear"></div>' . implode($infoseptxt, $info_arr);
+	$html .= (!$compact_display ? '<div class="fcclear"></div>' : '') . implode($infoseptxt, $info_arr);
 
 
 	// [3]: Add the file description (if displayed inline)
-	if ($descr_inline)
+	if ($descr_inline && $compact_display != 2)
 	{
-		$html .= '<div class="fcclear"></div>' . $descr_inline;
+		$html .= '<div class="fcclear"></div>' . $descr_inline . '<div class="fcclear"></div>' ;
 	}
 
 
@@ -331,6 +337,7 @@ if ($prop !== 'display_properties_only') :
 	else if ($usebutton)
 	{
 		$file_classes .= ' btn';  // ' fc_button fcsimple';   // Add an extra css class (button display)
+		$file_classes .= (static::$isItemsManager ? ' btn-small' : '');
 
 		// DOWNLOAD: single file instant download
 		if ($allowdownloads)
@@ -364,7 +371,8 @@ if ($prop !== 'display_properties_only') :
 					. ' class="' . ($viewinside==0 ? 'fancybox ' : '') . $file_classes . ' btn-info fcfile_viewFile" '.($viewinside==0 ? 'data-type="iframe" ' : '')
 					. ($viewinside==1 ? ' onclick="var url = jQuery(this).attr(\'href\');  fc_showDialog(url, \'fc_modal_popup_container\', 0, 0, 0, 0, {title:\''. $filetitle_escaped .'\'}); return false;" ' : '')
 					. ' title="' . $viewinfo . '" style="line-height:1.3em;" >
-					' . $viewtext . '
+					' . ($compact_display != 2 ? $viewtext : '') . '
+					' . ($compact_display == 2 ? ' <span class="icon-eye"></span>' : '') . '
 				</a>';
 			$fancybox_needed = $viewinside == 0;
 		}
@@ -375,14 +383,17 @@ if ($prop !== 'display_properties_only') :
 			// CSS class to anchor downloads list adding function
 			$addtocart_classes = $file_classes . ' fcfile_addFile';
 
-			$attribs = ' class="'. $addtocart_classes .'"'
+			$attribs = ' class="'. $addtocart_classes . '"'
 				. ' title="'. $addtocartinfo .'"'
 				. ' data-filename="'. $filetitle_escaped .'"'
 				. ' data-fieldid="'. $field->id .'"'
 				. ' data-contentid="'. $item->id .'"'
 				. ' data-fileid="'. $file_data->id .'"';
 			$actions_arr[] =
-				'<input type="button" '. $attribs .' value="'.htmlspecialchars($addtocarttext, ENT_COMPAT, 'UTF-8').'" />';
+				'<button ' . $attribs . '>
+					' . ($compact_display != 2 ? htmlspecialchars($addtocarttext, ENT_COMPAT, 'UTF-8') : '') . '
+					' . ($compact_display == 2 ? ' <span class="icon-cart"></span>' : '') . '
+				</button>';
 		}
 
 
@@ -399,9 +410,12 @@ if ($prop !== 'display_properties_only') :
 				.'&task=call_extfunc&exttype=plugins&extfolder=flexicontent_fields&extname=file&extfunc=share_file_form'
 				.'&file_id='.$file_id.'&content_id='.$item->id.'&field_id='.$field->id;
 			$actions_arr[] =
-				'<input type="button" class="'.$file_classes.' fcfile_shareFile" title="'.$shareinfo.'" data-href="'.$send_form_url.'" value="'.htmlspecialchars($sharetext, ENT_COMPAT, 'UTF-8').'" '.
-					' onclick="var url = jQuery(this).attr(\'data-href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 800, 800, 0, {title:\''.htmlspecialchars($sharetext, ENT_COMPAT, 'UTF-8').'\'}); return false;" '.
-				'/>';
+				'<button class="' . $file_classes . ' fcfile_shareFile" title="'.$shareinfo.'" data-href="'.$send_form_url.'"
+					onclick="var url = jQuery(this).attr(\'data-href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 800, 800, 0, {title:\''.htmlspecialchars($sharetext, ENT_COMPAT, 'UTF-8').'\'}); return false;" '.
+				'>
+					' . ($compact_display != 2 ? htmlspecialchars($sharetext, ENT_COMPAT, 'UTF-8') : '') . '
+					' . ($compact_display == 2 ? ' <span class="icon-mail"></span>' : '') . '
+				</button>';
 		}
 	}
 
@@ -486,12 +500,14 @@ if ($prop !== 'display_properties_only') :
 	}
 
 	//Display the buttons "DOWNLOAD, SHARE, ADD TO CART" before or after the filename
-	$html =
+	$html = (static::$isItemsManager ? '' : '<fieldset><legend></legend>') . '
+		' .
 		($buttonsposition ? $html : '') . '
-		<div class="fcfile_actions">
+		<div class="fcfile_actions ' . ($compact_display ? ' fcfile_compact' : '') . '">
 			' . implode($actionseptxt, $actions_arr) . '
 		</div>' .
-		(!$buttonsposition ? $html : '');
+		(!$buttonsposition ? $html : '') .
+		(static::$isItemsManager ? '' : '</fieldset>');
 
 	if ($wf_add_waveform)
 	{
@@ -513,7 +529,7 @@ if ($prop !== 'display_properties_only') :
 
 		$html .= '<div class="fcclear"></div>'
 		. '
-		<div class="fc_mediafile_player_box' . ($compactDisp ? ' fc_compact' : '') . '">
+		<div class="fc_mediafile_player_box' . ($compactWaveform ? ' fc_compact' : '') . '">
 
 			<div class="fc_mediafile_controls_outer">
 
@@ -703,14 +719,14 @@ if ($display_total_count && $prop !== 'display_properties_only')
 {
 	$file_totals .= '
 		<div class="fcfile_total_count">
-			<span class="fcfile_total_count_label">'. $total_count_label .' </span>
-			<span class="fcfile_total_count_value badge">'. count($values) .'</span>
+			' . ($compact_display ? '' : '<span class="fcfile_total_count_label">'. $total_count_label .' </span>') . '
+			<span class="fcfile_total_count_value badge">' . ($compact_display ? ' ' . $total_count_label. ': ' : '') . count($values) . '</span>
 		</div>
 	';
 }
 
 // Total download hits (of all files)
-if ($display_total_hits && $field->hits_total && $prop !== 'display_properties_only')
+if ($display_total_hits && $compact_display != 2 && $field->hits_total && $prop !== 'display_properties_only')
 {
 	$file_totals .='
 		<div class="fcfile_total_hits">
@@ -724,7 +740,7 @@ if ($display_total_hits && $field->hits_total && $prop !== 'display_properties_o
 if ($file_totals && $prop !== 'display_properties_only')
 {
 	$field->{$prop}[-1] = '
-		<div class="alert alert-success fcfile_total">
+		<div class="' . ($compact_display == 2 ? '' : 'alert alert-success fcfile_total') . '">
 			' . $file_totals . '
 		</div>
 		';

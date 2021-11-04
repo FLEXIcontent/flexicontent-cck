@@ -104,7 +104,7 @@ class plgFlexicontent_fieldsMediafile extends FCField
 
 		$mediapath   = $cparams->get('media_path', 'components/com_flexicontent/medias');
 		$docspath    = $cparams->get('file_path', 'components/com_flexicontent/uploads');
-		$imageexts   = array('jpg','gif','png','bmp','jpeg');
+		$imageexts   = array('png', 'ico', 'gif', 'jpg', 'jpeg', 'webp', 'bmp');
 
 		$target_dir = $field->parameters->get('target_dir', 0);
 		$base_url   = JUri::root(true) . '/' . (!$target_dir ? $mediapath : $docspath);
@@ -928,19 +928,28 @@ class plgFlexicontent_fieldsMediafile extends FCField
 
 		$useicon = $field->parameters->get( 'useicon', 0 ) ;
 		$lowercase_filename = $field->parameters->get( 'lowercase_filename', 1 ) ;
-		$link_filename      = $field->parameters->get( 'link_filename', 1 ) ;
+		
 		$display_filename	= $field->parameters->get( 'display_filename', 1 ) ;
 		$display_lang     = $field->parameters->get( 'display_lang', 1 ) ;
 		$display_size			= $field->parameters->get( 'display_size', 0 ) ;
 		$display_hits     = $field->parameters->get( 'display_hits', 0 ) ;
 		$display_descr		= $field->parameters->get( 'display_descr', 1 ) ;
 
+		// Force icons in items manager
+		$display_lang  = $display_lang && static::$isItemsManager ?  0 : $display_lang;
+		$display_size  = $display_size && static::$isItemsManager ?  0 : $display_size;
+		$display_hits  = $display_hits && static::$isItemsManager ?  0 : $display_hits;
+		$display_descr = $display_descr && static::$isItemsManager ?  0 : $display_descr;
+
 		$add_lang_img = $display_lang == 1 || $display_lang == 3;
 		$add_lang_txt = $display_lang == 2 || $display_lang == 3 || static::$isMobile;
 		$add_hits_img = $display_hits == 1 || $display_hits == 3;
 		$add_hits_txt = $display_hits == 2 || $display_hits == 3 || static::$isMobile;
 
-		$usebutton    = $field->parameters->get( 'usebutton', 1 ) ;
+		// NOTE: link_filename parameter is ignore when using buttons !!!
+		$link_filename = $field->parameters->get( 'link_filename', 1 ) ;
+		$usebutton     = $field->parameters->get( 'usebutton', 1 ) ;
+
 		$buttonsposition = $field->parameters->get('buttonsposition', 1);
 		$use_infoseptxt   = $field->parameters->get( 'use_info_separator', 0 ) ;
 		$use_actionseptxt = $field->parameters->get( 'use_action_separator', 0 ) ;
@@ -1025,6 +1034,14 @@ class plgFlexicontent_fieldsMediafile extends FCField
 		$addtocarttext  = JText::_($addtocarttext);
 		$addtocartinfo  = JText::_('FLEXI_FIELD_FILE_ADD_TO_DOWNLOADS_CART_INFO', true);
 
+		/** BACKEND **/
+		$link_filename = static::$isItemsManager ? 1 : $link_filename;
+		$usebutton     = static::$isItemsManager ?  0 : $usebutton;
+		$allowdownloads = static::$isItemsManager ?  1 : $allowdownloads;
+		$allowview = static::$isItemsManager ?  0 : $allowview;
+		$allowshare = static::$isItemsManager ?  0 : $allowshare;
+		$allowaddtocart = static::$isItemsManager ?  0 : $allowaddtocart;
+
 		$noaccess_display	     = $field->parameters->get( 'noaccess_display', 1 ) ;
 		$noaccess_url_unlogged = $field->parameters->get( 'noaccess_url_unlogged', false ) ;
 		$noaccess_url_logged   = $field->parameters->get( 'noaccess_url_logged', false ) ;
@@ -1087,6 +1104,40 @@ class plgFlexicontent_fieldsMediafile extends FCField
 			}
 		}
 
+		if($pretext)  { $pretext  = $remove_space ? $pretext : $pretext . ' '; }
+		if($posttext) { $posttext = $remove_space ? $posttext : ' ' . $posttext; }
+
+		switch($separatorf)
+		{
+			case 0:
+			$separatorf = '';
+			break;
+
+			case 1:
+			$separatorf = '<hr class="fcclearline" />'; //'<br class="fcclear" />';
+			break;
+
+			case 2:
+			$separatorf = ' | ';
+			break;
+
+			case 3:
+			$separatorf = ', ';
+			break;
+
+			case 4:
+			$separatorf = $closetag . $opentag;
+			break;
+
+			case 5:
+			$separatorf = '';
+			break;
+
+			default:
+			$separatorf = '';
+			break;
+		}
+
 		// Get user access level (these are multiple for J2.5)
 		$user = JFactory::getUser();
 		$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
@@ -1137,6 +1188,17 @@ class plgFlexicontent_fieldsMediafile extends FCField
 		// Do not convert the array to string if field is in a group, and do not add: FIELD's opentag, closetag, value separator
 		if (!$is_ingroup)
 		{
+			// values_list_placement: 1:In slider, 0:Inline
+			$values_list_placement = (int) $field->parameters->get('values_list_placement', 0);
+			$values_list_placement = static::$isItemsManager ? 1 : $values_list_placement;
+			$values_slider_title   = $field->parameters->get('values_slider_title', 'FLEXI_FILES');
+			$head = $values_list_placement && isset($field->{$prop}[-1]) ? $field->{$prop}[-1] : '';
+
+			if ($values_list_placement)
+			{
+				unset($field->{$prop}[-1]);
+			}
+
 			// Apply values separator
 			$field->{$prop} = implode($separatorf, $field->{$prop});
 
@@ -1150,6 +1212,19 @@ class plgFlexicontent_fieldsMediafile extends FCField
 				{
 					$field->{$prop} = '<div style="display:inline" itemprop="'.$itemprop.'" >' .$field->{$prop}. '</div>';
 				}
+			}
+
+			if ($values_list_placement)
+			{
+				$ff_slider_tagid = 'fcfile_slider_' . $item->id . '_' . $field->id;
+				$ff_slider_title = JText::_($values_slider_title);
+
+				$field->{$prop} = $head .
+					JHtml::_('bootstrap.startAccordion', $ff_slider_tagid, array('active' => -1)) .
+					JHtml::_('bootstrap.addSlide', $ff_slider_tagid, $ff_slider_title, $ff_slider_tagid . '_filelist_slide') .
+					$field->{$prop} .
+					JHtml::_('bootstrap.endSlide') .
+					JHtml::_('bootstrap.endAccordion');
 			}
 		}
 	}
@@ -1379,7 +1454,7 @@ class plgFlexicontent_fieldsMediafile extends FCField
 					// Update DB data of the file
 					if ( !$row->check() || !$row->store() )
 					{
-						JFactory::getApplication()->enqueueMessage("FILE FIELD: ".JFactory::getDbo()->getErrorMsg(), 'warning' );
+						JFactory::getApplication()->enqueueMessage("FILE FIELD: " . $row->getError(), 'warning');
 						if ($use_ingroup) $newpost[$new++] = null;
 						continue;
 					}
@@ -1812,8 +1887,11 @@ class plgFlexicontent_fieldsMediafile extends FCField
 			case 'gif':
 			case 'xcf':
 			case 'odg':
+			case 'wbmp':
 			case 'bmp':
+			case 'ico':
 			case 'jpeg':
+			case 'webp':
 				$file->icon = 'components/com_flexicontent/assets/images/mime-icon-16/image.png';
 			break;
 
@@ -1994,13 +2072,7 @@ class plgFlexicontent_fieldsMediafile extends FCField
 				.' AND f.published= 1'
 				. $access_clauses['and']
 				;
-		$db->setQuery($query);
-		try {
-			$file = $db->loadObject();
-		}
-		catch (Exception $e) {
-			jexit( __FUNCTION__.'() -- SQL ERROR: '. (JDEBUG ? '<br/>'.nl2br($db->getErrorMsg()) : 'Enabled DEBUG to see the error') );
-		}
+		$file = $db->setQuery($query)->loadObject();
 
 		if ( empty($file) )
 		{

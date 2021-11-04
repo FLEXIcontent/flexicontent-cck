@@ -500,7 +500,7 @@ if ($prop !== 'display_properties_only') :
 		</div>' .
 		(!$buttonsposition ? $html : '') .
 		(static::$isItemsManager ? '' : '</fieldset>');
-		
+
 
 
 
