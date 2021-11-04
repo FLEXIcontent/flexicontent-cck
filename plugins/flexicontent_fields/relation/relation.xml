@@ -99,8 +99,7 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 
-			<field name="relitem_html_form" type="editor" editor="codemirror" syntax="html" filter="RAW" cols="40" rows="4" height="60px" class="fc-unset-width" default="__display_text__" label="Item form HTML" description="FLEXI_FIELD_ITEM_HTML_WITH_REPLACEMENTS_DESC" />
-
+			<!--field name="relitem_html_form" type="editor" editor="codemirror" syntax="html" filter="RAW" cols="40" rows="4" height="60px" class="fc-unset-width" default="__display_text__" label="Item form HTML" description="FLEXI_FIELD_ITEM_HTML_WITH_REPLACEMENTS_DESC" /-->
 
 			<field name="" type="separator" default="FLEXI_RIFLD_CATEGORY_SELECTOR" description="FLEXI_RIFLD_CATEGORY_SELECTOR_INFO" icon_class="icon-signup" level="tab_open" box_type="1" />
 			<field name="" type="separator" default="FLEXI_RIFLD_CATEGORY_SELECTOR_INFO" level="level3" class="alert alert-info fcpadded" />
