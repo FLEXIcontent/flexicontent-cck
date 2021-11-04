@@ -465,7 +465,8 @@ table.fcmanlist td {
 }
 #flexicontent .btn-outline-info.active,
 a.btn.btn-small,
-.btn-outline-info {
+.btn-outline-info,
+#flexicontent .btn.btn-sm {
 	color: var(--template-text-dark);
 	background: #fff;
 }
@@ -674,4 +675,11 @@ div table.fc-table-list tr:nth-child(odd) td {
 	font-weight: bold;
 	display: initial;
 	padding: 5px;
+}
+#flexicontent .btn.btn-micro {
+	padding: 4px;
+	background: #fff;
+}
+table.fcmanlist tbody tr.row1 td {
+	background: none repeat scroll 0 0 #FFFFFF;
 }

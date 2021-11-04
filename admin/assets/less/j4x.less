@@ -576,7 +576,7 @@ dl#content-pane.tabs {
     content: "";
 }
 /*fix icon state*/
-#flexicontent .btn-outline-info.active, a.btn.btn-small, .btn-outline-info {
+#flexicontent .btn-outline-info.active, a.btn.btn-small, .btn-outline-info, #flexicontent .btn.btn-sm {
     color: var(--template-text-dark);
 	background: #fff;
 }
@@ -778,4 +778,13 @@ div table.fc-table-list tr:nth-child(odd) td {
     font-weight: bold;
     display: initial;
     padding: 5px;
+}
+/** fix btn micro **/
+#flexicontent .btn.btn-micro {
+    padding: 4px;
+	background:#fff;
+}
+/** fix table item **/
+table.fcmanlist tbody tr.row1 td {
+    background: none repeat scroll 0 0 #FFFFFF;
 }
