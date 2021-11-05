@@ -74,8 +74,6 @@ plugins/flexicontent_fields/grade/
 /nbproject/private/
 *.pdf
 
-plugins/flexicontent_fields/mediafile/
-
 site/templates/blog/language/fr-FR/fr-FR.blog.ini
 site/templates/default/language/fr-FR/fr-FR.default.ini
 site/templates/faq/language/fr-FR/fr-FR.faq.ini

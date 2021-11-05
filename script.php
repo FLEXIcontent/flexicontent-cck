@@ -1170,10 +1170,6 @@ class com_flexicontentInstallerScript
 						) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`;";
 					}
 
-					if ($mediadatas_tbl_exists && !array_key_exists('bitdepth', $tbl_fields['#__flexicontent_mediadatas'])) {
-						$queries[] = "ALTER TABLE `#__flexicontent_mediadatas` ADD `bitdepth` INT(11) NULL AFTER `bitrate`";
-					}
-
 					$upgrade_count = 0;
 
 					if (!empty($queries))
