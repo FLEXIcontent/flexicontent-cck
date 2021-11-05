@@ -534,7 +534,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 			{
 				$default_dir = 1;  // 'secure' folder
 			}
-			elseif (in_array($field->field_type, array('minigallery', 'mediafile')))
+			elseif (in_array($field->field_type, array('mediafile')))
 			{
 				$default_dir = 0;  // 'media' folder
 			}
@@ -963,7 +963,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 			{
 				$default_dir = 1;  // 'secure' folder
 			}
-			elseif (in_array($field->field_type, array('minigallery', 'mediafile')))
+			elseif (in_array($field->field_type, array('mediafile')))
 			{
 				$default_dir = 0;  // 'media' folder
 			}

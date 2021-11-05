@@ -262,7 +262,7 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 		//  -- Single property field types: store file ids
 		//  -- Multi property field types: store file id or filename via some property name
 
-		$s_assigned_fields = array('file', 'minigallery', 'mediafile');
+		$s_assigned_fields = array('file', 'mediafile');
 		$m_assigned_fields = array('image');
 
 		$m_assigned_props = array('image'=>array('originalname', 'existingname'));
@@ -1365,7 +1365,7 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 	 * @access public
 	 * @return object
 	 */
-	function getItemsSingleprop( $field_types=array('file', 'minigallery', 'mediafile'), $file_ids=array(), $count_items=false, $ignored=false )
+	function getItemsSingleprop( $field_types=array('file', 'mediafile'), $file_ids=array(), $count_items=false, $ignored=false )
 	{
 		$app    = JFactory::getApplication();
 		$user   = JFactory::getUser();
@@ -1575,7 +1575,7 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 			return false;
 		}
 
-		$s_field_types = array('file', 'minigallery', 'mediafile');
+		$s_field_types = array('file', 'mediafile');
 		$m_field_props = array('image' => array('originalname', 'existingname'));
 		$m_value_props = array('image' => array('filename', 'filename'));
 
@@ -1636,7 +1636,7 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 	 * @since	2.0
 	 */
 	function getDeletable($cid = array(), $ignored = false,
-		$s_field_types = array('file', 'minigallery', 'mediafile'),
+		$s_field_types = array('file', 'mediafile'),
 		$m_field_props = array('image' => array('originalname', 'existingname')),
 		$m_value_props = array('image' => array('filename', 'filename'))
 	) {
