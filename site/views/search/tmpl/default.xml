@@ -11,20 +11,27 @@
 		
 	<field name="" type="separator" level="level3" default="Please note these reasons for some results not being included: &lt;br/&gt;- you have not enabled short word search in component and word is &lt; 4 characters &lt;br/&gt; - word is too common e.g. appears in about half of the articles&lt;br/&gt;- wrong language or article not publish or article has expired" class="alert alert-info fcpadded" />
 		
-		<field name="" type="separator" level="level1" default="Search Form: &lt;small&gt;Content Types&lt;/small&gt;" description="The content types the search will include, selecting none will include ALL. &lt;br/&gt; NOTE: You can allow user to select Content Types. If you do then the selection list will be LIMITED to display ONLY the types specified here &lt;br/&gt; NOTE: if only 1 content type is selected below, then selector will be hidden"/>
+		<field name="" type="separator" level="level1" default="Search Form" />
+
+			<field name="column_display" type="radio" default="1" label="FLEXI_SEARCH_FORM_PLACEMENT" description="FLEXI_SEARCH_FORM_PLACEMENT_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_TOP</option>
+				<option value="1">FLEXI_LEFT</option>
+			</field>
+
+		<field name="" type="separator" level="level2" default="Content Types" description="The content types the search will include, selecting none will include ALL. &lt;br/&gt; NOTE: You can allow user to select Content Types. If you do then the selection list will be LIMITED to display ONLY the types specified here &lt;br/&gt; NOTE: if only 1 content type is selected below, then selector will be hidden"/>
 			
 			<field name="show_type_label" type="radio" default="" label="FLEXI_TYPE_SEARCH_LABEL" description="FLEXI_TYPE_SEARCH_LABEL_DESC" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
 			</field>
-			<field name="contenttypes" type="types" default="" label="Searchable Types &lt;br/&gt; &lt;small&gt;(Select NONE for -ALL-)&lt;/small&gt;" description="The content types the search will include, selecting none will include ALL. NOTE: You can allow user to select Content Types. If you do then the selection list will be LIMITED to display ONLY the types specified here" multiple="true" />
+			<field name="contenttypes" type="types" default="" label="Searchable Types &lt;br/&gt; &lt;i&gt;(Select NONE for -ALL-)&lt;/i&gt;" description="The content types the search will include, selecting none will include ALL. NOTE: You can allow user to select Content Types. If you do then the selection list will be LIMITED to display ONLY the types specified here" multiple="true" />
 			<field name="canseltypes" type="radio" default="1" label="Allow user selection" description="Allow users to select content types they want to include in their search" class="btn-group btn-group-yesno">
 				<option value="0">No</option>
 				<option value="1">Yes</option>
 			</field>
 			
-			<field name="" type="separator" level="level1" default="Search Form: &lt;small&gt;Text Search&lt;/small&gt;" description="&lt;small&gt; (a) Either use BASIC Search Index (can not select individual fields) &lt;br/&gt; (b) OR use ADVANCED Search Index (the above configured fields will be used) &lt;/small&gt;"/>
+			<field name="" type="separator" level="level2" default="Text Search" description="&lt;i&gt; (a) Either use BASIC Search Index (can not select individual fields) &lt;br/&gt; (b) OR use ADVANCED Search Index (the above configured fields will be used) &lt;/i&gt;"/>
 			
 			<field name="show_search_label" type="radio" default="" label="FLEXI_TEXT_SEARCH_LABEL" description="FLEXI_TEXT_SEARCH_LABEL_DESC" class="btn-group btn-group-yesno" >
 				<option value="">FLEXI_USE_GLOBAL</option>
@@ -54,9 +61,9 @@
 			<field name="minchars" type="text" default="3" label="Word Min Length" description="Minimum character length that search words are allowed to have" />
 			<field name="maxchars" type="text" default="200" label="Word Max Length" description="Maximum characters length that search words are allowed to have" />
 			
-		<field name="" type="separator" level="level1" default="Search Form: &lt;small&gt;Advanced Options&lt;/small&gt;" />
+		<field name="" type="separator" level="level2" default="Advanced Options" />
 			
-			<field name="" type="separator" default="Category selector" level="level2" />
+			<field name="" type="separator" default="Category selector" level="level3" />
 			<field name="" type="separator" default="NOTE: single or multiple value allowed, this depends on target view (set below)" level="level3" class="alert alert-info fcpadded" />
 			<field name="display_cat_list" type="multilist" subtype="list" toggle_related="1" default="0" label="Show selector" description="Show selector" >
 				<option value="0" show_list="" hide_list="disp_catselector">No (Use single selected or current category)</option>
@@ -83,21 +90,21 @@
 				<option value="2" hide_list="" show_list="use_adv_txtsearch">Advanced Index (use configured fields, allow user selection)</option>
 			</field>
 			
-			<field name="" type="separator" level="level2" default="PER content type configuration (ADVANCED Index)" description="1. Fields manager: mark -fields- as ADVANCED text-searchable and filterable &lt;br/&gt; 2. Indexes manager: rebuild advanced index &lt;br/&gt; 3. Type manager: in each content type, select text-search fields and filters &lt;br/&gt;&lt;br/&gt; NOTE: if this is enabled content type selector becomes -visible- and -single- value" class=""/>
+			<field name="" type="separator" level="level3" default="PER content type configuration (ADVANCED Index)" description="1. Fields manager: mark -fields- as ADVANCED text-searchable and filterable &lt;br/&gt; 2. Indexes manager: rebuild advanced index &lt;br/&gt; 3. Type manager: in each content type, select text-search fields and filters &lt;br/&gt;&lt;br/&gt; NOTE: if this is enabled content type selector becomes -visible- and -single- value" class=""/>
 			
 			<field name="show_txtfields" type="multilist" subtype="radio" default="1" label="FLEXI_TEXT_SEARCH_FIELDS" description="FLEXI_TEXT_SEARCH_FIELDS_DESC" toggle_related="1" class="use_adv_txtsearch btn-group group-fcmethod">
 				<option value="0" show_list="" hide_list="disp_txtflds">Use all searchable</option>
 				<option value="1" show_list="" hide_list="disp_txtflds">FLEXI_ACCORDING_TO_TYPE</option>
 				<option value="2" show_list="disp_txtflds" hide_list="">FLEXI_CONFIGURE_BELOW</option>
 			</field>
-			<field name="txtflds" type="filters" isadvsearch="1" isfilter='*' fieldnameasvalue="1" multiple="false" default="" label="Fields &lt;br/&gt; &lt;small&gt;(Leave EMPTY for -ALL-)&lt;/small&gt;" description="NOTE: only fields marked as advanced index text-searchable are listed" class="use_adv_txtsearch disp_txtflds" />
+			<field name="txtflds" type="filters" isadvsearch="1" isfilter='*' fieldnameasvalue="1" multiple="false" default="" label="Fields &lt;br/&gt; &lt;i&gt;(Leave EMPTY for -ALL-)&lt;/i&gt;" description="NOTE: only fields marked as advanced index text-searchable are listed" class="use_adv_txtsearch disp_txtflds" />
 			
 			<field name="show_filters" type="multilist" subtype="radio" default="1" label="FLEXI_FIELDS_AS_FILTERS" description="FLEXI_FIELDS_AS_FILTERS_DESC" toggle_related="1" class="btn-group group-fcmethod">
 				<option value="0" show_list="" hide_list="disp_filtflds">Use all filterable</option>
 				<option value="1" show_list="" hide_list="disp_filtflds">FLEXI_ACCORDING_TO_TYPE</option>
 				<option value="2" show_list="disp_filtflds" hide_list="">FLEXI_CONFIGURE_BELOW</option>
 			</field>
-			<field name="filtflds" type="filters" isadvfilter="1" isfilter='*' fieldnameasvalue="1" multiple="false" default="" label="Fields &lt;br/&gt; &lt;small&gt;(Leave EMPTY for -ALL-)&lt;/small&gt;" description="NOTE: only fields marked as advanced index filters are listed" class="disp_filtflds" />
+			<field name="filtflds" type="filters" isadvfilter="1" isfilter='*' fieldnameasvalue="1" multiple="false" default="" label="Fields &lt;br/&gt; &lt;i&gt;(Leave EMPTY for -ALL-)&lt;/i&gt;" description="NOTE: only fields marked as advanced index filters are listed" class="disp_filtflds" />
 			<!--field name="show_filtersop" type="radio" default="1" label="Filters Combination" description="Allow users to select method of combining the search filters, e.g. any filter, all filters">
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
@@ -112,7 +119,7 @@
 			</field>
 			
 			
-			<field name="" type="separator" level="level2" default="Search Areas (non-FC Content)" description=""/>
+			<field name="" type="separator" level="level3" default="Search Areas (non-FC Content)" description=""/>
 			
 			<field name="show_searchareas" type="multilist" subtype="radio" default="0" label="Use areas" description="Allow the user to select and search other areas of the website content, e.g. like weblinks, user contacts, etc" toggle_related="1" class="btn-group btn-group-yesno">
 				<option value="0" show_list="" hide_list="sareas_conf">FLEXI_DISABLE</option>
@@ -138,11 +145,6 @@
 		
 		<field name="" type="separator" level="level1" default="Results List" />
 
-		<field name="column_display" type="radio" default="1" label="FLEXI_SEARCH_COLUMN_DISPLAY" description="FLEXI_SEARCH_COLUMN_DISPLAY_DESC" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_SEARCH_COLUMN_DISPLAY_TOP</option>
-				<option value="1">FLEXI_SEARCH_COLUMN_DISPLAY_LEFT</option>
-			</field>
-			
 			<field name="limit" type="text" size="4" default="10" label="FLEXI_NUM_PER_PAGE" description="FLEXI_NUM_PER_PAGE_DESC" />
 			<field name="" type="separator" level="level2" default="Basic Information (used by non-FC results too)" description=""/>
 			
@@ -150,11 +152,11 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="show_text" type="radio" default="1" label="Show context &lt;br/&gt; &lt;small&gt;(Always ON for non-FC results)&lt;/small&gt;" description="Display search words found along with content text around them. The search words found are highlighted" class="btn-group btn-group-yesno">
+			<field name="show_text" type="radio" default="1" label="Show context &lt;br/&gt; &lt;i&gt;(Always ON for non-FC results)&lt;/i&gt;" description="Display search words found along with content text around them. The search words found are highlighted" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="text_chars" type="text" default="240" label="Context Limit &lt;br/&gt; &lt;small&gt; (# of characters) &lt;/small&gt;" description="Number of characters of content text shown of around each found search word" />
+			<field name="text_chars" type="text" default="240" label="Context Limit &lt;br/&gt; &lt;i&gt; (# of characters) &lt;/i&gt;" description="Number of characters of content text shown of around each found search word" />
 			<field name="show_date" type="radio" default="1" label="Show creation date" description="Display for each result its creation date" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -195,7 +197,7 @@
 				<option value="1" show_list="disp_field" hide_list="">FLEXI_YES</option>
 			</field>
 			<field name="info_fieldlist" type="fields" default="" label="Select Field" description="Please select one by one fields to add to textarea below." fieldnameasvalue="true" onchange="f=document.getElementById('{control_name}infoflds'); f.value = f.value ? f.value + ','+this.value : this.value; this.value='';" class="disp_field"/>
-			<field name="infoflds" type="textarea" default="" label="Fields &lt;br/&gt; &lt;small&gt;(Leave EMPTY for -NONE-)&lt;/small&gt;" description="Enter Fields (their fieldnames) to render their values and display them in the search results. You can separate each fieldname by comma(,)." cols="30" rows="3" class="disp_field"/>
+			<field name="infoflds" type="textarea" default="" label="Fields &lt;br/&gt; &lt;i&gt;(Leave EMPTY for -NONE-)&lt;/i&gt;" description="Enter Fields (their fieldnames) to render their values and display them in the search results. You can separate each fieldname by comma(,)." cols="30" rows="3" class="disp_field"/>
 		
 			<field name="" type="separator" default="FLEXI_ITEMS_ORDER" description="FLEXI_ITEMS_ORDER_DESC" level="level1" />
 			
@@ -280,7 +282,7 @@
 			<field name="orderby_custom_2nd" type="textarea" rows="3" default="" label="FLEXI_ORDER_OPTIONS_CUSTOM_2ND" description="FLEXI_ORDER_OPTIONS_CUSTOM_DESC" />
 			
 		
-		<field name="" type="separator" level="level1" default="FC Advanced Search plugin: &lt;small&gt;Override Configuration&lt;/small&gt;" />
+		<field name="" type="separator" level="level1" default="FC Advanced Search plugin: &lt;i&gt;Override Configuration&lt;/i&gt;" />
 			
 			<field name="search_limit" type="text" size="5" default="" label="Search Limit" description="Limit maximum number of results the plugin can return,"/>
 			<field name="filter_lang" type="radio" default="" label="Language Filter" description="Return content having current language only" class="btn-group btn-group-yesno">
