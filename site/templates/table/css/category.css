@@ -85,3 +85,38 @@ table.adminlist {
 	min-width: 215px;
 	box-shadow: 0 5px 15px 0 #a1a1a1;
 }
+@media screen and (max-width: 600px) {
+	table#adminListTableFCcategory {
+		border: 0;
+	}
+	table#adminListTableFCcategory thead {
+		border: none;
+		clip: rect(0 0 0 0);
+		height: 1px;
+		margin: -1px;
+		overflow: hidden;
+		padding: 0;
+		position: absolute;
+		width: 1px;
+	}
+	table#adminListTableFCcategory tr {
+		border-bottom: 3px solid #ddd;
+		display: block;
+		margin-bottom: .625em;
+	}
+	table#adminListTableFCcategory td {
+		border-bottom: 1px solid #ddd;
+		display: block;
+		font-size: .8em;
+		text-align: left;
+	}
+	table#adminListTableFCcategory td::before {
+		content: attr(data-label);
+		float: left;
+		font-weight: bold;
+		text-transform: uppercase;
+	}
+	table#adminListTableFCcategory td:last-child {
+		border-bottom: 0;
+	}
+}
