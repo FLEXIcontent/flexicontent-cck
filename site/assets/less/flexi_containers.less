@@ -819,3 +819,198 @@ span.fc-centered-icon-box {
 	opacity: 0.9;
 	display: block;
 }
+
+div.fc_mediafile_player_box.fc_compact {
+	display: flex;
+	flex-flow: row wrap;
+	justify-content: center;
+	align-items: center;
+
+	div.fc_mediafile_controls_outer {
+		flex-basis: 80px;
+		flex-grow: 1;
+		/*border: 1px solid;*/
+	}
+
+	div.fc_mediafile_audio_spectrum_box_outer {
+		flex-grow: 50;
+		/*border: 1px solid;*/
+	}
+	.btnControlsText {
+		display: none;
+	}
+
+
+	div.fc_mediafile_controls {
+		margin: 0;
+		display: flex;
+		flex-flow: column wrap;
+
+		div.fc_mediafile_wf_zoom_box {
+			display: none;
+			margin: 6px 0;
+			input {
+				width: 75%;
+			}
+		}
+		> a, > * {
+			margin: 4px !important;
+		}
+
+		.btn {
+			color: white;
+			border-radius: 2em !important;
+			width: 2em !important;
+			line-height: 1.5em;
+			height: 2em;
+			padding: 0;
+
+			span:before {
+				color: white;
+			}
+		}
+
+		span.controls {
+			font-size: 100%;
+			color: #b7b7b7;
+			margin-top: 0.45em !important;
+			margin-right: 0.2em !important;
+		}
+	}
+}
+
+div.fc_mediafile_player_box {
+	position: relative;
+	/*border: 1px solid;*/
+
+	div.fc_mediafile_wf_zoom_box {
+		position: relative;
+		visibility: hidden;
+		margin: 6px 8px 14px 8px;
+		display: inline-block;
+		white-space: nowrap;
+
+		input {
+			width: 120px;
+			padding: 0;
+			margin: 0;
+			box-sizing: border-box;
+		}
+	}
+
+	div.fc_mediafile_audio_spectrum_box {
+		display: block;
+		position: relative;
+		/*border: 1px dashed;*/
+		box-sizing: border-box;
+		
+		div.fc_mediafile_audio_spectrum {
+			wave {
+				div.fccurrentTimeBox {
+					/* THESE ARE PLACEMENT !!! */
+					position: absolute !important;
+					z-index: 11 !important;
+					/*right: 0 !important;*/
+					top: 38% !important;
+					/* CUSTOMIZE THIS */
+					background: #2db383;
+					color: white;
+					padding: 4px 4px 4px 8px;
+					box-sizing: border-box;
+					opacity: 70%;
+					border-radius: 0;
+					width: 55px;
+				}
+			}
+		}
+	}
+
+	div.fc_mediafile_audio_spectrum_progressbar {
+		visibility: hidden;
+		position: absolute !important;
+		width: 70% !important;
+		top: 0% !important;
+		left: 15% !important;
+		z-index: 10000 !important;
+		text-align: center !important;
+		height: 32px;
+		font-size: 24px;
+		line-height: 100%;
+
+		div.barText {
+			height: 32px;
+			font-size: 24px;
+			line-height: 100%;
+		}
+		div.bar {
+			z-index: -1;
+			position: absolute;
+			top: 0;
+		}
+	}
+
+	div.fc_mediafile_controls {
+		text-align: center;
+		margin: 0 0 10px 0;
+
+		.playBtn, .pauseBtn, .stopBtn, .loadBtn, .downloadBtn {
+			margin: 6px 0;
+			outline: none;
+			display: inline-block;
+			border-radius: 16px;
+			
+			&:hover {
+				box-shadow: 0 0 7px 2px rgba(119,119,119,0.5);
+			}
+		}
+		.playBtn.btn {
+			background: #609fc7;
+			border: #70afd7;
+			color: white;
+
+			span:before {
+				color: white;
+			}
+		}
+		.pauseBtn, .stopBtn, .loadBtn {
+			display: none;
+		}
+		.btn.is_active {
+			background: #2db383;
+			border: #3dc393;
+			color: white;
+
+			span:before {
+				color: white;
+			}
+		}
+
+		span.controls {
+			font-size: 80%;
+			line-height: 1em;
+			color: #b7b7b7;
+			margin: 0em 0.8em 0 0em;
+			vertical-align: baseline;
+			line-height: 100%;
+		}
+
+		.btn {
+			color: #777;
+			font-size: 18px;
+			vertical-align: bottom;
+
+			line-height: 1em;
+			background: #afafaf;
+			font-family: "Roboto Condensed";
+			font-weight: normal;
+			margin-left: 10px;
+			position: relative;
+			bottom: 4px;
+
+			span:before {
+				color: #777;
+			}
+		}
+	}
+}
+//End of fc_audio_field_only contro
