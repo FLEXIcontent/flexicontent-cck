@@ -191,7 +191,6 @@ if ($lead_link_to_popup || $intro_link_to_popup) {
 $microdata_itemtype_cat = $this->params->get( 'microdata_itemtype_cat', 'Article' );
 
 // ITEMS as MASONRY tiles
-dump($load_masonry_feat,'load');
 if (!empty($this->items) && ($load_masonry_feat || $load_masonry_std))
 {
 	flexicontent_html::loadFramework('masonry');
