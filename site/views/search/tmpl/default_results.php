@@ -73,14 +73,25 @@ if ( $use_infoflds && count($infoflds) ) {
 	}
 }
 
-$column_display = $this->params->get('column_display', 0);
-if ($column_display == 1){
-	$column_display = 'span8';
+$form_placement = (int) $this->params->get('form_placement', 0);
+
+if ($form_placement)
+{
+	$results_placement_class = 'span8';
+	$results_placement_style = $form_placement === 1 ? 'float: right; margin: 4px 0 4px 4px;' : 'float: left; margin: 4px 4px 4px 0;';
+}
+else
+{
+	$results_placement_class = '';
+	$results_placement_style = '';
 }
 
 ?>
 
-<div class="fc_search_results_list <?php echo $column_display; ?> page<?php echo $this->escape($this->params->get('pageclass_sfx')); ?>">
+<div
+	class="fc_search_results_list <?php echo $results_placement_class; ?> page<?php echo $this->escape($this->params->get('pageclass_sfx')); ?>"
+	style="<?php echo $results_placement_style; ?>"
+>
 
 <?php $count = -1; ?>
 <?php foreach($this->results as $i => $result) : ?>
