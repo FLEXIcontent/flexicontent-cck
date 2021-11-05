@@ -340,8 +340,8 @@ class FlexicontentViewFilemanager extends FlexicontentViewBaseRecords
 		// Create pagination object
 		$pagination = $this->get('Pagination');
 
-		$assigned_fields_labels = array('image'=>'image/gallery', 'file'=>'file', 'minigallery'=>'minigallery');
-		$assigned_fields_icons = array('image'=>'picture_link', 'file'=>'page_link', 'minigallery'=>'film_link');
+		$assigned_fields_labels = array('image'=>'image/gallery', 'file'=>'file', /*'minigallery'=>'minigallery'*/);
+		$assigned_fields_icons = array('image'=>'picture_link', 'file'=>'page_link', /*'minigallery'=>'film_link'*/);
 
 
 		// *** BOF FOLDER MODE specific ***
