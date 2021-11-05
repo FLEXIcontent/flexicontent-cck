@@ -1403,6 +1403,7 @@ body .container_fcfield input.input-xxlarge,
 body .container_fcfield input,
 #flexicontent .container_fcfield input {
 	max-width: 100%;
+	height: 26px;   /** TODO CHECK THIS **/
 }
 
 .flexi_params table.admintable,
@@ -1734,6 +1735,7 @@ ul.thumbnails.image_picker_selector li div.thumbnail p {
 	min-width: 220px;
 	width: auto;
 	max-width: 600px;
+	border-radius:3px;
 }
 #flexicontent form select.fcfield_selectval {
 	padding: 4px 0 2px 4px;
@@ -1931,9 +1933,7 @@ select[multiple].use_select2_lib:hover, select[multiple].use_select2_lib:focus {
 		position: absolute !important;
 		top: 0;
 		left: 0;
-
-		opacity: 0.5;
-		background-color: #000;
+		background-color: rgba(51, 51, 51, 0.521);
 		width: 100%;
 		height: 100%;
 	}
@@ -1949,13 +1949,10 @@ select[multiple].use_select2_lib:hover, select[multiple].use_select2_lib:focus {
 		font-size: 18px;
 		font-weight: bold;
 		color: #555;
-
 		background: white 30px 40px no-repeat;
-		opacity: 1;
 		width: auto;
 		padding: 2em 2em 3em 2em;
 		margin: 0px;
-		border: 1px solid lightgray;
 		border-radius: 0.5em;
 		text-align: center;
 		width: 280px;
@@ -1969,7 +1966,6 @@ select[multiple].use_select2_lib:hover, select[multiple].use_select2_lib:focus {
 		position: relative !important;
 		left: 0;
 		top: 1.5em;
-
 		width: 100%;
 		height: 22px;
 		border-radius: 4px;
@@ -2202,7 +2198,7 @@ html[dir="rtl"] .select2-container .select2-choice {
 	position: relative !important;
 	top: 0 !important; left: 0 !important;
 	padding: 0px !important;
-	margin: 0 6px 0 0 !important;
+	margin: 0 0 6px 0 !important;
 	white-space: normal !important; /* for chrome! */
 	width: auto !important;
 	min-width: 24px !important;
@@ -2481,8 +2477,9 @@ div#permissions .tab-content {
 img.fc_field_image {
 	display: inline-block;
 	margin: 0px 4px 6px 0px;
-	padding: 1px;
-/*	border: 1px solid lightgray;
+  /** TODO CHECK THIS **/
+	/*padding: 1px;
+	border: 1px solid lightgray;
 	.fc.rounded.corners(5px);*/
 }
 div .fc_image_thumb {

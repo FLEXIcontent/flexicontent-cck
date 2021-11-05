@@ -1,13 +1,13 @@
 .flexicontent :not(.input-prepend):not(.input-append) > input[type="text"]:not(.minicolors) {
 	display: inline-block;
-	margin: 1px 2px 1px 2px;
+	margin: 0px 2px 1px 2px;
 }
 .flexicontent *:not(.input-append):not(.input-prepend):not(.input-group) > div.use_select2_lib {
-	margin: 1px 2px 1px 2px;
+	margin: 0px 2px 1px 2px;
 }
 .flexicontent *:not(.input-append):not(.input-prepend):not(.input-group) > select:not(.custom-select) {
 	display: inline-block;
-	margin: 1px 2px 1px 2px;
+	margin: 0px 2px 1px 2px;
 	padding: 4px;
 	border-radius: 4px;
 	height: auto;
@@ -838,12 +838,14 @@ td.col_edit_layout {
 	margin: 4px 0px;
 	vertical-align: top;
 	min-height: 34px;
+	background: #fff;
+	box-shadow: 0px 5px 16px 0px #939393;
 }
 .flexicontent #fc-mini-help,
 .flexicontent #fc-filters-box.fcman-abs,
 .flexicontent #mainChooseColBox.fcman-abs {
 	position: absolute;
-	box-shadow: 2px 2px 6px black;
+	box-shadow: 0px 5px 16px 0px #939393;
 	background: #fff;
 	z-index: 100;
 	left: 0;
@@ -876,14 +878,14 @@ td.col_edit_layout {
 	width: 0 !important;
 }
 .flexicontent #fc-managers-header select.fc_is_selarrow {
-	max-width: 1.9em !important;
+	max-width: 1.8em !important;
 }
 .flexicontent #fc-managers-header select.fc_is_selarrow:hover,
 .flexicontent #fc-managers-header select.fc_is_selarrow:focus {
 	max-width: unset !important;
 }
 .flexicontent #fc-managers-header select.fc_is_selarrow + #search {
-	margin-left: 1.9em !important;
+	margin-left: 1.8em !important;
 }
 .flexicontent #fc-managers-header #search {
 	margin: 0px !important;
@@ -1001,8 +1003,8 @@ td.col_edit_layout {
 .flexicontent #fc-filters-box .fc-filter #startdate_btn,
 .flexicontent #fc-filters-box .fc-filter #enddate_btn {
 	font-size: 14px !important;
-	height: 28px !important;
-	padding: 2px 4px !important;
+	height: 36px !important;
+	padding: 10px 4px !important;
 	box-sizing: border-box;
 }
 .flexicontent #fc-filters-box .fc-filter #startdate_btn {
@@ -1014,7 +1016,7 @@ td.col_edit_layout {
 	min-width: 99px;
 	max-width: 99px;
 	height: 16px !important;
-	padding: 13px 8px !important;
+	padding: 17px 8px !important;
 	box-sizing: border-box;
 	border-radius: 0;
 }
@@ -1043,7 +1045,7 @@ td.col_edit_layout {
 .flexicontent #fc-filters-box .fc-filter > * {
 	vertical-align: middle !important;
 	float: left;
-	margin: 0 !important;
+	margin: 4px !important;
 }
 .flexicontent #fc-filters-box .fc-filter > *:not(.fc-xpended):not(.fc-xpended-row) {
 	margin: 0 6px 0 2px !important;
@@ -1096,7 +1098,7 @@ td.col_edit_layout {
 	width: 22px !important;
 	cursor: pointer !important;
 	border-width: 0px !important;
-	background: transparent url(../images/select2.png) no-repeat scroll 100% -22px !important;
+	background: #fff url(../images/select2.png) no-repeat scroll 100% -22px !important;
 	font-size: 13px;
 }
 .flexicontent #fc-filters-box .fc-filter .select2-container-multi .select2-choices .select2-search-choice {
@@ -1107,7 +1109,7 @@ td.col_edit_layout {
 }
 .flexicontent #fc-filters-box .fc-filter .select2-container-multi.select2-dropdown-open .select2-choices .select2-search-field input.select2-input {
 	padding: 2px 6px 2px 26px !important;
-	background: transparent url(../images/select2.png) no-repeat scroll -32px -22px !important;
+	background: #fff url(../images/select2.png) no-repeat scroll -32px -22px !important;
 	width: 100% !important;
 }
 @media (max-width: 1580px) {
@@ -1154,6 +1156,14 @@ td.col_edit_layout {
 }
 #flexicontent .btn {
 	padding: 8px 12px;
+}
+div#fc-filters-slide-btn {
+	border: 0;
+	background: none;
+	box-shadow: none;
+}
+#fc-filters-box input[type="text"] {
+	padding: 8px 6px !important;
 }
 body .fc-close {
 	color: #000000;
@@ -3237,6 +3247,7 @@ body .container_fcfield input.input-xxlarge,
 body .container_fcfield input,
 #flexicontent .container_fcfield input {
 	max-width: 100%;
+	height: 26px;
 }
 .flexi_params table.admintable,
 .flexi_params table.admintable td {
@@ -3526,6 +3537,7 @@ ul.thumbnails.image_picker_selector li div.thumbnail p {
 	min-width: 220px;
 	width: auto;
 	max-width: 600px;
+	border-radius: 3px;
 }
 #flexicontent form select.fcfield_selectval {
 	padding: 4px 0 2px 4px;
@@ -3687,8 +3699,7 @@ select[multiple].use_select2_lib:focus {
 	position: absolute !important;
 	top: 0;
 	left: 0;
-	opacity: 0.5;
-	background-color: #000;
+	background-color: rgba(51,51,51,0.521);
 	width: 100%;
 	height: 100%;
 }
@@ -3703,11 +3714,9 @@ select[multiple].use_select2_lib:focus {
 	font-weight: bold;
 	color: #555;
 	background: white 30px 40px no-repeat;
-	opacity: 1;
 	width: auto;
 	padding: 2em 2em 3em 2em;
 	margin: 0px;
-	border: 1px solid lightgray;
 	border-radius: 0.5em;
 	text-align: center;
 	width: 280px;
@@ -3735,9 +3744,6 @@ select[multiple].use_select2_lib:focus {
 	line-height: 22px;
 	width: 0;
 	background-color: #0099ff;
-}
-.fc_logo_loading img {
-	margin: auto;
 }
 .tooltip .tooltip-inner {
 	white-space: normal !important;
@@ -3846,12 +3852,13 @@ div.current ul.config-option-list li fieldset {
 	opacity: 0.4;
 }
 .select2-container .select2-choice {
-	padding: 0 0 0 8px !important;
+	padding: 4px 5px 4px 8px !important;
 	margin: 0 !important;
 	font-weight: normal !important;
 	min-height: 26px;
 	height: auto !important;
 	box-sizing: content-box !important;
+	background: #fff !important;
 }
 html[dir="rtl"] .select2-container .select2-choice {
 	padding: 0 8px 0 0 !important;
@@ -3859,6 +3866,13 @@ html[dir="rtl"] .select2-container .select2-choice {
 .select2-container .select2-choice > .select2-chosen {
 	color: black;
 	white-space: pre-wrap !important;
+}
+.select2-container .select2-choice .select2-arrow {
+	border-left: 0px solid #aaa !important;
+	background: none !important;
+}
+.select2-container .select2-choice .select2-arrow b {
+	background-position: 0 4px !important;
 }
 .select2-container.invalid .select2-choice > .select2-chosen {
 	color: red !important;
@@ -3872,7 +3886,7 @@ html[dir="rtl"] .select2-container .select2-choice {
 	top: 0 !important;
 	left: 0 !important;
 	padding: 0px !important;
-	margin: 0 6px 0 0 !important;
+	margin: 0 0 6px 0 !important;
 	white-space: normal !important;
 	width: auto !important;
 	min-width: 24px !important;
@@ -3891,14 +3905,10 @@ html[dir="rtl"] .select2-container .select2-choice {
 	cursor: pointer;
 	min-width: 32px !important;
 	min-height: 20px !important;
-	padding: 1px 4px !important;
+	padding: 6px 7px !important;
 	margin-top: 1px !important;
 	border: 0px solid lightgray !important;
 	background: #fff url('../images/select2.png') no-repeat 100% -22px !important;
-	background: url('../images/select2.png') no-repeat 100% -22px, -webkit-gradient(linear,left bottom,left top,color-stop(0.85,#fff),color-stop(0.99,#eee)) !important;
-	background: url('../images/select2.png') no-repeat 100% -22px, -webkit-linear-gradient(center bottom,#fff 85%,#eee 99%) !important;
-	background: url('../images/select2.png') no-repeat 100% -22px, -moz-linear-gradient(center bottom,#fff 85%,#eee 99%) !important;
-	background: url('../images/select2.png') no-repeat 100% -22px, linear-gradient(to bottom,#fff 85%,#eee 99%) 0 0 !important;
 }
 .select2-container-multi.select2-dropdown-open .select2-choices .select2-search-field input.select2-input {
 	min-width: 124px !important;
@@ -3921,6 +3931,16 @@ html[dir="rtl"] .select2-container .select2-choice {
 }
 .select2-drop .select2-results .select2-result.select2-selected-highlight div {
 	font-size: 11px !important;
+}
+.select2-drop.select2-drop-multi {
+	padding: 0px 10px 10px 10px !important;
+}
+.select2-drop-active {
+	border: 1px solid #aaa !important;
+}
+.select2-results .select2-highlighted {
+	background: #d8d8d8 !important;
+	color: #fff !important;
 }
 fieldset legend .fc_legend_header_text {
 	background: none repeat scroll 0 0 transparent;
@@ -4043,11 +4063,6 @@ div#permissions .tab-content {
 	width: 100% !important;
 	box-sizing: border-box !important;
 }
-.fcfile_actions.fcfile_compact > a,
-.fcfile_actions.fcfile_compact > input,
-.fcfile_actions.fcfile_compact > form > input {
-	width: unset !important;
-}
 .fcfile_actions > form {
 	width: 100% !important;
 	box-sizing: border-box !important;
@@ -4061,12 +4076,21 @@ div#permissions .tab-content {
 .fcfile_total_hits_label {
 	font-weight: bold;
 }
+.fcfile_name.fcfile_compact,
+.fcfile_actions.fcfile_compact {
+	display: inline-block !important;
+	width: unset !important;
+	margin-top: 2px;
+	margin-bottom: 2px;
+}
+.fcfile_actions.fcfile_compact > a,
+.fcfile_actions.fcfile_compact > input,
+.fcfile_actions.fcfile_compact > form > input {
+	width: unset !important;
+}
 img.fc_field_image {
 	display: inline-block;
 	margin: 0px 4px 6px 0px;
-	padding: 1px;
-	border: 1px solid lightgray;
-	border-radius: 5px;
 }
 div .fc_image_thumb {
 	display: inline-block;
@@ -4163,6 +4187,13 @@ div.fc-fieldgrp-value-box {
 }
 .select2-container-multi .select2-choices {
 	min-height: 34px !important;
+}
+#fcform_language_container .input-append input {
+	height: 26px !important;
+}
+span.add-on.pop-helper.field-media-preview {
+	height: 26px !important;
+	line-height: 28px !important;
 }
 #flexicontent {
 	margin-bottom: 24px;

@@ -1,13 +1,13 @@
 .flexicontent :not(.input-prepend):not(.input-append) > input[type="text"]:not(.minicolors) {
 	display: inline-block;
-	margin: 1px 2px 1px 2px;
+	margin: 0px 2px 1px 2px;
 }
 .flexicontent *:not(.input-append):not(.input-prepend):not(.input-group) > div.use_select2_lib {
-	margin: 1px 2px 1px 2px;
+	margin: 0px 2px 1px 2px;
 }
 .flexicontent *:not(.input-append):not(.input-prepend):not(.input-group) > select:not(.custom-select) {
 	display: inline-block;
-	margin: 1px 2px 1px 2px;
+	margin: 0px 2px 1px 2px;
 	padding: 4px;
 	border-radius: 4px;
 	height: auto;
@@ -838,12 +838,14 @@ td.col_edit_layout {
 	margin: 4px 0px;
 	vertical-align: top;
 	min-height: 34px;
+	background: #fff;
+	box-shadow: 0px 5px 16px 0px #939393;
 }
 .flexicontent #fc-mini-help,
 .flexicontent #fc-filters-box.fcman-abs,
 .flexicontent #mainChooseColBox.fcman-abs {
 	position: absolute;
-	box-shadow: 2px 2px 6px black;
+	box-shadow: 0px 5px 16px 0px #939393;
 	background: #fff;
 	z-index: 100;
 	left: 0;
@@ -876,14 +878,14 @@ td.col_edit_layout {
 	width: 0 !important;
 }
 .flexicontent #fc-managers-header select.fc_is_selarrow {
-	max-width: 1.9em !important;
+	max-width: 1.8em !important;
 }
 .flexicontent #fc-managers-header select.fc_is_selarrow:hover,
 .flexicontent #fc-managers-header select.fc_is_selarrow:focus {
 	max-width: unset !important;
 }
 .flexicontent #fc-managers-header select.fc_is_selarrow + #search {
-	margin-left: 1.9em !important;
+	margin-left: 1.8em !important;
 }
 .flexicontent #fc-managers-header #search {
 	margin: 0px !important;
@@ -1001,8 +1003,8 @@ td.col_edit_layout {
 .flexicontent #fc-filters-box .fc-filter #startdate_btn,
 .flexicontent #fc-filters-box .fc-filter #enddate_btn {
 	font-size: 14px !important;
-	height: 28px !important;
-	padding: 2px 4px !important;
+	height: 36px !important;
+	padding: 10px 4px !important;
 	box-sizing: border-box;
 }
 .flexicontent #fc-filters-box .fc-filter #startdate_btn {
@@ -1014,7 +1016,7 @@ td.col_edit_layout {
 	min-width: 99px;
 	max-width: 99px;
 	height: 16px !important;
-	padding: 13px 8px !important;
+	padding: 17px 8px !important;
 	box-sizing: border-box;
 	border-radius: 0;
 }
@@ -1043,7 +1045,7 @@ td.col_edit_layout {
 .flexicontent #fc-filters-box .fc-filter > * {
 	vertical-align: middle !important;
 	float: left;
-	margin: 0 !important;
+	margin: 4px !important;
 }
 .flexicontent #fc-filters-box .fc-filter > *:not(.fc-xpended):not(.fc-xpended-row) {
 	margin: 0 6px 0 2px !important;

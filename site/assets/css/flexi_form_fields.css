@@ -1790,3 +1790,7 @@ iframe.sharedmedia {
 	color: #333 !important;
 	background: #ededed !important;
 }
+span.btn.btn-small.toolbar.dropdown-toggle.fcfield-addvalue.fcfont-icon {
+	border-top: 1px solid #ccc;
+	border-bottom: 1px solid #ccc;
+}
