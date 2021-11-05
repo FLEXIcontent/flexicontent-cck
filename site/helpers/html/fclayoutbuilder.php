@@ -226,6 +226,7 @@ abstract class JHtmlFclayoutbuilder
 		.gjs-four-color-h:hover {
 		  color: #6EA22B;
 		}
+
 		.gjs-radio-item input {
 		    display: none !important;
 		}
@@ -351,7 +352,7 @@ abstract class JHtmlFclayoutbuilder
 				html: \'<div style="display: inline-block" data-gjs-resizable="true"><h2>This is the layout area, you may drag and drop to add your blocks here, to load flexicontent field use data panel to insert flexicontent block</h2></div>\',
 				css: null,
 				components: null,
-				styles: [\'http://localhost/flexidev/templates/shaper_helix3/css/template.css\'],
+				style: null,
 			};
 
 			var lp = \'./img/\';
@@ -365,13 +366,13 @@ abstract class JHtmlFclayoutbuilder
 
 				// TODO check loading css in canvas and real url
 				canvas: {
-				styles: [\'https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css\']
+					styles: [\'https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css\']
 				},
 				scripts: [
 					\'https://code.jquery.com/jquery-3.3.1.slim.min.js\',
 					\'https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js\',
 					\'https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js\'
-				  ],
+				],
 
 				avoidInlineStyle: false,
 
@@ -838,6 +839,7 @@ abstract class JHtmlFclayoutbuilder
 						widthMedia: \'\',
 					}]
 				},
+
 			});
 
 
