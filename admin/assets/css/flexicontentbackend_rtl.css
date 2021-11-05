@@ -1906,6 +1906,175 @@ span.fc-centered-icon-box {
 	opacity: 0.9;
 	display: block;
 }
+div.fc_mediafile_player_box.fc_compact {
+	display: flex;
+	flex-flow: row wrap;
+	justify-content: center;
+	align-items: center;
+}
+div.fc_mediafile_player_box.fc_compact div.fc_mediafile_controls_outer {
+	flex-basis: 80px;
+	flex-grow: 1;
+}
+div.fc_mediafile_player_box.fc_compact div.fc_mediafile_audio_spectrum_box_outer {
+	flex-grow: 50;
+}
+div.fc_mediafile_player_box.fc_compact .btnControlsText {
+	display: none;
+}
+div.fc_mediafile_player_box.fc_compact div.fc_mediafile_controls {
+	margin: 0;
+	display: flex;
+	flex-flow: column wrap;
+}
+div.fc_mediafile_player_box.fc_compact div.fc_mediafile_controls div.fc_mediafile_wf_zoom_box {
+	display: none;
+	margin: 6px 0;
+}
+div.fc_mediafile_player_box.fc_compact div.fc_mediafile_controls div.fc_mediafile_wf_zoom_box input {
+	width: 75%;
+}
+div.fc_mediafile_player_box.fc_compact div.fc_mediafile_controls > a,
+div.fc_mediafile_player_box.fc_compact div.fc_mediafile_controls > * {
+	margin: 4px !important;
+}
+div.fc_mediafile_player_box.fc_compact div.fc_mediafile_controls .btn {
+	color: white;
+	border-radius: 2em !important;
+	width: 2em !important;
+	line-height: 1.5em;
+	height: 2em;
+	padding: 0;
+}
+div.fc_mediafile_player_box.fc_compact div.fc_mediafile_controls .btn span:before {
+	color: white;
+}
+div.fc_mediafile_player_box.fc_compact div.fc_mediafile_controls span.controls {
+	font-size: 100%;
+	color: #b7b7b7;
+	margin-top: 0.45em !important;
+	margin-left: 0.2em !important;
+}
+div.fc_mediafile_player_box {
+	position: relative;
+}
+div.fc_mediafile_player_box div.fc_mediafile_wf_zoom_box {
+	position: relative;
+	visibility: hidden;
+	margin: 6px 8px 14px 8px;
+	display: inline-block;
+	white-space: nowrap;
+}
+div.fc_mediafile_player_box div.fc_mediafile_wf_zoom_box input {
+	width: 120px;
+	padding: 0;
+	margin: 0;
+	box-sizing: border-box;
+}
+div.fc_mediafile_player_box div.fc_mediafile_audio_spectrum_box {
+	display: block;
+	position: relative;
+	box-sizing: border-box;
+}
+div.fc_mediafile_player_box div.fc_mediafile_audio_spectrum_box div.fc_mediafile_audio_spectrum wave div.fccurrentTimeBox {
+	position: absolute !important;
+	z-index: 11 !important;
+	top: 38% !important;
+	background: #2db383;
+	color: white;
+	padding: 4px 4px 4px 8px;
+	box-sizing: border-box;
+	opacity: 70%;
+	border-radius: 0;
+	width: 55px;
+}
+div.fc_mediafile_player_box div.fc_mediafile_audio_spectrum_progressbar {
+	visibility: hidden;
+	position: absolute !important;
+	width: 70% !important;
+	top: 0% !important;
+	right: 15% !important;
+	z-index: 10000 !important;
+	text-align: center !important;
+	height: 32px;
+	font-size: 24px;
+	line-height: 100%;
+}
+div.fc_mediafile_player_box div.fc_mediafile_audio_spectrum_progressbar div.barText {
+	height: 32px;
+	font-size: 24px;
+	line-height: 100%;
+}
+div.fc_mediafile_player_box div.fc_mediafile_audio_spectrum_progressbar div.bar {
+	z-index: -1;
+	position: absolute;
+	top: 0;
+}
+div.fc_mediafile_player_box div.fc_mediafile_controls {
+	text-align: center;
+	margin: 0 0 10px 0;
+}
+div.fc_mediafile_player_box div.fc_mediafile_controls .playBtn,
+div.fc_mediafile_player_box div.fc_mediafile_controls .pauseBtn,
+div.fc_mediafile_player_box div.fc_mediafile_controls .stopBtn,
+div.fc_mediafile_player_box div.fc_mediafile_controls .loadBtn,
+div.fc_mediafile_player_box div.fc_mediafile_controls .downloadBtn {
+	margin: 6px 0;
+	outline: none;
+	display: inline-block;
+	border-radius: 16px;
+}
+div.fc_mediafile_player_box div.fc_mediafile_controls .playBtn:hover,
+div.fc_mediafile_player_box div.fc_mediafile_controls .pauseBtn:hover,
+div.fc_mediafile_player_box div.fc_mediafile_controls .stopBtn:hover,
+div.fc_mediafile_player_box div.fc_mediafile_controls .loadBtn:hover,
+div.fc_mediafile_player_box div.fc_mediafile_controls .downloadBtn:hover {
+	box-shadow: 0 0 7px 2px rgba(119,119,119,0.5);
+}
+div.fc_mediafile_player_box div.fc_mediafile_controls .playBtn.btn {
+	background: #609fc7;
+	border: #70afd7;
+	color: white;
+}
+div.fc_mediafile_player_box div.fc_mediafile_controls .playBtn.btn span:before {
+	color: white;
+}
+div.fc_mediafile_player_box div.fc_mediafile_controls .pauseBtn,
+div.fc_mediafile_player_box div.fc_mediafile_controls .stopBtn,
+div.fc_mediafile_player_box div.fc_mediafile_controls .loadBtn {
+	display: none;
+}
+div.fc_mediafile_player_box div.fc_mediafile_controls .btn.is_active {
+	background: #2db383;
+	border: #3dc393;
+	color: white;
+}
+div.fc_mediafile_player_box div.fc_mediafile_controls .btn.is_active span:before {
+	color: white;
+}
+div.fc_mediafile_player_box div.fc_mediafile_controls span.controls {
+	font-size: 80%;
+	line-height: 1em;
+	color: #b7b7b7;
+	margin: 0em 0em 0 0.8em;
+	vertical-align: baseline;
+	line-height: 100%;
+}
+div.fc_mediafile_player_box div.fc_mediafile_controls .btn {
+	color: #777;
+	font-size: 18px;
+	vertical-align: bottom;
+	line-height: 1em;
+	background: #afafaf;
+	font-family: "Roboto Condensed";
+	font-weight: normal;
+	margin-left: 10px;
+	position: relative;
+	bottom: 4px;
+}
+div.fc_mediafile_player_box div.fc_mediafile_controls .btn span:before {
+	color: #777;
+}
 input.fc-inherited-value + label {
 	font-weight: bold !important;
 	text-decoration: underline !important;

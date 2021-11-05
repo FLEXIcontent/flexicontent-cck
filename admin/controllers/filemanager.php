@@ -534,7 +534,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 			{
 				$default_dir = 1;  // 'secure' folder
 			}
-			elseif (in_array($field->field_type, array('minigallery')))
+			elseif (in_array($field->field_type, array('mediafile')))
 			{
 				$default_dir = 0;  // 'media' folder
 			}
@@ -764,6 +764,8 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 			return $this->terminate($file_id, $exitMessages);
 		}
 
+
+
 		// *****************
 		// Upload Successful
 		// *****************
@@ -801,12 +803,16 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 
 			// Probe file to find if it is a supported media (audio or video) file
 			$fileObj->full_path = $filepath;
-			$model->createMediaData($field, $fileObj);
 
-			// Create audio preview file, if file is a media file
-			if (!empty($fileObj->mediaData))
+			if ($field)
 			{
-				$model->createAudioPreview($field, $fileObj);
+				$model->createMediaData($field, $fileObj);
+
+				// Create audio preview file, if file is a media file
+				if (!empty($fileObj->mediaData))
+				{
+					$model->createAudioPreview($field, $fileObj);
+				}
 			}
 		}
 
@@ -830,7 +836,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 
 		// Terminate with proper messaging
 		$this->exitHttpHead = array( 0 => array('status' => '201 Created') );
-		$this->exitMessages = array( 0 => array('message' => 'FLEXI_UPLOAD_COMPLETE') );
+		$this->exitMessages[] = array('message' => 'FLEXI_UPLOAD_COMPLETE');
 		$this->exitLogTexts = array();
 		$this->exitSuccess  = true;
 
@@ -957,7 +963,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 			{
 				$default_dir = 1;  // 'secure' folder
 			}
-			elseif (in_array($field->field_type, array('minigallery')))
+			elseif (in_array($field->field_type, array('mediafile')))
 			{
 				$default_dir = 0;  // 'media' folder
 			}

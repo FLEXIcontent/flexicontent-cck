@@ -980,7 +980,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 				)
 			),
 			'flexicontent_mediadatas'=>array(
-				'bitdepth'=>0,
+				'bits_per_sample'=>0,
 			),
 			'flexicontent_items_versions'=>array(
 				'value'=>32,

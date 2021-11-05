@@ -25,14 +25,18 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_mediadatas` (
   `file_id` int(11) NOT NULL,
   `state` tinyint(3) NOT NULL DEFAULT '1',
   `media_type` int(11) NOT NULL default 0, /* 0: audio , 1: video */
+  `media_format` varchar(255) NULL, /* e.g 'video', 'wav', 'audio' */
+  `codec_type` varchar(255) NULL, /* e.g 'audio' */
+  `codec_name` varchar(255) NULL, /* e.g 'mp3', 'pcm_s24le' */
+  `codec_long_name` varchar(255) NULL, /* e.g 'PCM signed 24-bit little-endian' , 'MP3 (MPEG audio layer 3)' */
   `resolution` varchar(255) NULL, /* e.g. 1280x720, 1920x1080 */
-  `fps` int(11) NULL, /* e.g. 50 (frames per second) */
-  `bitrate` int(11) NULL, /* e.g. 256 , 320 (kbps) */
-  `bitdepth` int(11) NULL, /* e.g. 16, 24, 32 (# bits) */
-  `samplerate` int(11) NULL, /* e.g. 44100 (HZ) */
-  `audiotype` varchar(255) NULL, /* e.g. 'stereo', 'mono' */
+  `fps` double NULL, /* e.g. 50 (frames per second) */
+  `bit_rate` int(11) NULL, /* e.g. 256000 , 320000 (bps) */
+  `bits_per_sample` int(11) NULL, /* e.g. 16, 24, 32 (# bits) */
+  `sample_rate` int(11) NULL, /* e.g. 44100 (HZ) */
   `duration` int(11) NOT NULL, /* e.g. 410 (seconds) */
-  `format` varchar(255) NULL, /* e.g 'audio/wav'*/
+  `channels` varchar(255) NULL, /* e.g. 1, 2, 4 (number of channels) */
+  `channel_layout` varchar(255) NULL, /* e.g. 'stereo', 'mono' */
   `checked_out` int(11) unsigned NOT NULL default '0',
   `checked_out_time` datetime NOT NULL default '1000-01-01 00:00:00',
   `attribs` mediumtext NULL,
@@ -40,12 +44,15 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_mediadatas` (
   UNIQUE `file_id` (`file_id`),
   KEY `state` (`state`),
   KEY `media_type` (`media_type`),
+  KEY `media_format` (`media_format`),
   KEY `resolution` (`resolution`),
   KEY `fps` (`fps`),
-  KEY `bitrate` (`bitrate`),
-  KEY `samplerate` (`samplerate`),
-  KEY `audiotype` (`fps`),
-  KEY `duration` (`duration`)
+  KEY `bit_rate` (`bit_rate`),
+  KEY `bits_per_sample` (`bits_per_sample`),
+  KEY `sample_rate` (`sample_rate`),
+  KEY `duration` (`duration`),
+  KEY `channels` (`channels`),
+  KEY `channel_layout` (`channel_layout`)
 ) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`;
 
 

@@ -1,11 +1,11 @@
 <?php
 /**
  * @package         FLEXIcontent
- * @version         3.2
+ * @version         3.4
  *
  * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
  * @link            https://flexicontent.org
- * @copyright       Copyright © 2017, FLEXIcontent team, All Rights Reserved
+ * @copyright       Copyright © 2020, FLEXIcontent team, All Rights Reserved
  * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
@@ -23,7 +23,7 @@ class plgFlexicontent_fieldsMediafile extends FCField
 	// *** CONSTRUCTOR
 	// ***
 
-	function __construct( &$subject, $params )
+	public function __construct( &$subject, $params )
 	{
 		parent::__construct( $subject, $params );
 	}
@@ -39,12 +39,16 @@ class plgFlexicontent_fieldsMediafile extends FCField
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 
-		$field->label = JText::_($field->label);
+		$field->label = $field->parameters->get('label_form') ? JText::_($field->parameters->get('label_form')) : JText::_($field->label);
+
+		// Set field and item objects
+		$this->setField($field);
+		$this->setItem($item);
+
 		$use_ingroup = $field->parameters->get('use_ingroup', 0);
 		if (!isset($field->formhidden_grp)) $field->formhidden_grp = $field->formhidden;
 		if ($use_ingroup) $field->formhidden = 3;
 		if ($use_ingroup && empty($field->ingroup)) return;
-		$is_ingroup  = !empty($field->ingroup);
 
 		// Initialize framework objects and other variables
 		$document = JFactory::getDocument();
@@ -71,6 +75,7 @@ class plgFlexicontent_fieldsMediafile extends FCField
 		$max_values   = $use_ingroup ? 0 : (int) $field->parameters->get('max_values', 0);
 		$required     = (int) $field->parameters->get('required', 0);
 		$add_position = (int) $field->parameters->get('add_position', 3);
+		$use_myfiles  = (int) $field->parameters->get('use_myfiles', '1');
 
 		// Classes for marking field required
 		$required_class = $required ? ' required' : '';
@@ -94,12 +99,19 @@ class plgFlexicontent_fieldsMediafile extends FCField
 		$iform_dir   = $inputmode==1 ? 0 : $field->parameters->get('iform_dir',   0);
 		$iform_stamp = $inputmode==1 ? 0 : $field->parameters->get('iform_stamp', 0);
 
+		$secure_default = 0; //!$iform_dir   ? 0 : (int) $field->parameters->get('iform_dir_default', 1);
+		$stamp_default  = 0; //!$iform_stamp ? 0 : (int) $field->parameters->get('iform_stamp_default', 1);
+
 		$mediapath   = $cparams->get('media_path', 'components/com_flexicontent/medias');
 		$docspath    = $cparams->get('file_path', 'components/com_flexicontent/uploads');
-		$imageexts   = array('jpg','gif','png','bmp','jpeg');
+		$imageexts   = array('png', 'ico', 'gif', 'jpg', 'jpeg', 'webp', 'bmp');
 
-		$thumb_size_resizer = 2; //$field->parameters->get('thumb_size_resizer', 2);
-		$thumb_size_default = 120; //$field->parameters->get('thumb_size_default', 120);
+		$target_dir = $field->parameters->get('target_dir', 0);
+		$base_url   = JUri::root(true) . '/' . (!$target_dir ? $mediapath : $docspath);
+		$base_url   = str_replace(DS, '/', $base_url);
+
+		$thumb_size_resizer = (int) $field->parameters->get('thumb_size_resizer', 0);
+		$thumb_size_default = (int) $field->parameters->get('thumb_size_default', 120);
 		$preview_thumb_w = $preview_thumb_h = 600;
 
 		// Inline uploaders flags
@@ -168,7 +180,7 @@ class plgFlexicontent_fieldsMediafile extends FCField
 		}
 
 		// Empty field value
-		if (!$field->value)
+		if (!$field->value || (count($field->value) === 1 && reset($field->value) === null))
 		{
 			$files_data = array();
 			$form_data = array();
@@ -187,8 +199,8 @@ class plgFlexicontent_fieldsMediafile extends FCField
 			{
 				foreach($field->value as $v)
 				{
-					if (!isset($v['secure'])) $v['secure'] = !$iform_dir   ? 1 : (int) $field->parameters->get('iform_dir_default', 1);
-					if (!isset($v['stamp']))  $v['stamp']  = !$iform_stamp ? 1 : (int) $field->parameters->get('iform_stamp_default', 1);
+					if (!isset($v['secure'])) $v['secure'] = 0; //!$iform_dir   ? 0 : (int) $field->parameters->get('iform_dir_default', 0);
+					if (!isset($v['stamp']))  $v['stamp']  = 0; //!$iform_stamp ? 0 : (int) $field->parameters->get('iform_stamp_default', 0);
 					$file_ids[] = $v['file-id'];
 					$form_data[$v['file-id']] = $v;
 				}
@@ -216,18 +228,22 @@ class plgFlexicontent_fieldsMediafile extends FCField
 			}
 		}
 
-		// Inline mode needs an default value, TODO add for popup too ?
-		$has_values = count($field->value);
+		// Flag that indicates if field has values
+		$has_values = !empty($field->value);
 
+		// Inline mode needs an default value, TODO add for popup too ?
 		if (empty($field->value) || $use_ingroup)
 		{
 			// Create an empty file properties value, used by code that creates empty inline file editing form fields
-			if (empty($field->value)) $field->value = array(0=>0);
+			if (empty($field->value))
+			{
+				$field->value = array(0 => 0);
+			}
 			$files_data[0] = (object)array(
 				'id' => '', 'filename' => '', 'filename_original' => '', 'altname' => '', 'description' => '',
 				'url' => '',
-				'secure' => (!$iform_dir  ? 1 : (int) $field->parameters->get('iform_dir_default', 1)),
-				'stamp' => (!$iform_stamp ? 1 : (int) $field->parameters->get('iform_stamp_default', 1)),
+				'secure' => 0, //(!$iform_dir  ? 0 : (int) $field->parameters->get('iform_dir_default', 0)),
+				'stamp' => 0, //(!$iform_stamp ? 0 : (int) $field->parameters->get('iform_stamp_default', 0)),
 				'ext' => '', 'published' => 1,
 				'language' => $field->parameters->get('iform_lang_default', '*'),
 				'access' => (int) $field->parameters->get('iform_access_default', 1),
@@ -253,8 +269,9 @@ class plgFlexicontent_fieldsMediafile extends FCField
 		$_prompt_txt = JText::_( 'FLEXI_FIELD_FILE_SELECT_FILE' );  //JText::_( 'FLEXI_ADD_FILE' );
 
 		// CSS classes of value container
-		$value_classes  = 'fcfieldval_container valuebox fcfieldval_container_'.$field->id;
-		$value_classes .= $fields_box_placing ? ' floated' : '';
+		$value_classes_base     = 'fcfieldval_container valuebox fcfieldval_container_'.$field->id;
+		$value_classes_single   = $value_classes_base;// . ' fc-expanded' ;
+		$value_classes_multiple = $value_classes_base . ($fields_box_placing ? ' floated' : '');
 
 		// Field name and HTML TAG id
 		$fieldname = 'custom['.$field->name.']';
@@ -289,8 +306,8 @@ class plgFlexicontent_fieldsMediafile extends FCField
 				url = url.replace( '__rowno__',  obj.attr('data-rowno') ? obj.attr('data-rowno') : '' );
 				url = url.replace( '__thisid__', obj.attr('id') ? obj.attr('id') : '' );
 
-				window.console.log(obj.attr('data-rowno'));
-				window.console.log(url);
+				//window.console.log(obj.attr('data-rowno'));
+				//window.console.log(url);
 
 				fcfield_mediafile.dialog_handle['".$field_name_js."'] = fc_field_dialog_handle_".$field->id." = fc_showDialog(url, 'fc_modal_popup_container', 0, 0, 0, 0, {title: '".JText::_('FLEXI_SELECT', true)."', paddingW: 10, paddingH: 16});
 				return false;
@@ -306,9 +323,10 @@ class plgFlexicontent_fieldsMediafile extends FCField
 			jQuery(document).ready(function(){
 				jQuery('#sortables_".$field->id."').sortable({
 					handle: '.fcfield-drag-handle',
+					cancel: false,
 					/*containment: 'parent',*/
 					tolerance: 'pointer'
-					".($field->parameters->get('fields_box_placing', 1) ? "
+					".($fields_box_placing ? "
 					,start: function(e) {
 						//jQuery(e.target).children().css('float', 'left');
 						//fc_setEqualHeights(jQuery(e.target), 0);
@@ -340,62 +358,72 @@ class plgFlexicontent_fieldsMediafile extends FCField
 				var newField  = lastField.clone();
 				newField.find('.fc-has-value').removeClass('fc-has-value');
 
+				// New element's field name and id
+				var uniqueRowN = uniqueRowNum" . $field->id . ";
+				var element_id = '" . $elementid . "_' + uniqueRowN;
+				var fname_pfx  = '" . $fieldname . "[' + uniqueRowN + ']';
+
 				var theInput = newField.find('input.inlinefile-del').first();
 				theInput.removeAttr('checked');
-				theInput.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][file-del]');
-				theInput.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_file-del');
-				newField.find('.inlinefile-del-lbl').first().attr('for','".$elementid."_'+uniqueRowNum".$field->id."+'_file-del').attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_file-del-lbl');
+				theInput.attr('name', fname_pfx + '[file-del]');
+				theInput.attr('id', element_id + '_file-del');
+				newField.find('.inlinefile-del-lbl').first().attr('for', element_id + '_file-del').attr('id', element_id + '_file-del-lbl');
 
 				var theInput = newField.find('input.fc_filedata').first();
 				theInput.val('');
-				theInput.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][file-data]');
-				theInput.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_file-data');
-				theInput.attr('data-rowno',uniqueRowNum".$field->id.");
+				theInput.attr('name', fname_pfx + '[file-data]');
+				theInput.attr('id', element_id + '_file-data');
+				theInput.attr('data-rowno', uniqueRowN);
 
-				newField.find('.inlinefile-data-lbl').first().attr('for','".$elementid."_'+uniqueRowNum".$field->id."+'_file-data-txt').attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_file-data-lbl');
+				newField.find('.inlinefile-data-lbl').first().attr('for', element_id + '_file-data-txt').attr('id', element_id + '_file-data-lbl');
 
 				var theInput = newField.find('input.fc_fileid').first();
 				theInput.val('');
-				theInput.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][file-id]');
-				theInput.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_file-id');
+				theInput.attr('name', fname_pfx + '[file-id]');
+				theInput.attr('id', element_id + '_file-id');
 
 				newField.find('.fc_filedata_txt_nowrap').html('-');
 				newField.find('.fc_filedata_title').html('-');
 
 				var theInput = newField.find('input.fc_filedata_txt').first();
-				theInput.val('');
-				theInput.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][file-data-txt]');
-				theInput.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_file-data-txt');
+				theInput.attr('value', '');
+				theInput.removeAttr('data-filename')
+					.removeAttr('data-wfpreview').removeAttr('data-wfpeaks');
+				theInput.data('filename', null);
+				theInput.attr('name', fname_pfx + '[file-data-txt]');
+				theInput.attr('id', element_id + '_file-data-txt');
 
-				var imgPreview = newField.find('.fcimg_preview_box').first();
-				imgPreview.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_img_preview');
+				var imgPreview = newField.find('.fc_preview_thumb').first();
+				imgPreview.attr('id', element_id + '_image_preview');
 				imgPreview.attr('src', 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=');
+				imgPreview.parent().find('.fc_preview_msg').html('');
+				imgPreview.parent().find('.fc_preview_text').html('');
 				".($form_file_preview != 1 ? '
-				imgPreview.hide();' : '')."
+				imgPreview.parent().hide();' : '')."
 
 				".($iform_title ? "
 				var theInput = newField.find('input.fc_filetitle').first();
 				theInput.val('');
-				theInput.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][file-title]');
-				theInput.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_file-title');
-				newField.find('.inlinefile-title-lbl').first().attr('for','".$elementid."_'+uniqueRowNum".$field->id."+'_file-title').attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_file-title-lbl');
+				theInput.attr('name', fname_pfx + '[file-title]');
+				theInput.attr('id', element_id + '_file-title');
+				newField.find('.inlinefile-title-lbl').first().attr('for', element_id + '_file-title').attr('id', element_id + '_file-title-lbl');
 				" : "")."
 
 				".($iform_lang ? "
 				var theInput = newField.find('select.fc_filelang').first();
 				theInput.get(0).selectedIndex = 0;
-				theInput.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][file-lang]');
-				theInput.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_file-lang');
-				newField.find('.inlinefile-lang-lbl').first().attr('for','".$elementid."_'+uniqueRowNum".$field->id."+'_file-lang').attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_file-lang-lbl');
+				theInput.attr('name', fname_pfx + '[file-lang]');
+				theInput.attr('id', element_id + '_file-lang');
+				newField.find('.inlinefile-lang-lbl').first().attr('for', element_id + '_file-lang').attr('id', element_id + '_file-lang-lbl');
 				" : "")."
 
 				".($iform_access ? "
 				var theInput = newField.find('select.fc_fileaccess').first();
 				//theInput.get(0).selectedIndex = 0;
 				theInput.val('1');
-				theInput.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][file-access]');
-				theInput.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_file-access');
-				newField.find('.inlinefile-access-lbl').first().attr('for','".$elementid."_'+uniqueRowNum".$field->id."+'_file-access').attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_file-access-lbl');
+				theInput.attr('name', fname_pfx + '[file-access]');
+				theInput.attr('id', element_id + '_file-access');
+				newField.find('.inlinefile-access-lbl').first().attr('for', element_id + '_file-access').attr('id', element_id + '_file-access-lbl');
 				" : "")."
 
 				".($iform_dir ? "
@@ -405,11 +433,19 @@ class plgFlexicontent_fieldsMediafile extends FCField
 				newField.find('input.fc_filedir').each(function() {
 					var elem = jQuery(this);
 					elem.removeAttr('disabled');
-					elem.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][secure]');
-					elem.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_secure_'+nr);
-					elem.next().removeClass('active');
-					elem.prop('checked', false);
-					elem.next().attr('for', '".$elementid."_'+uniqueRowNum".$field->id."+'_secure_'+nr).attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_file-secure'+nr+'-lbl');
+					elem.attr('name', fname_pfx + '[secure]');
+					elem.attr('id', element_id + '_secure_'+nr);
+					if (elem.val() == " . (int) $secure_default .")
+					{
+						elem.next().addClass('active');
+						elem.prop('checked', true);
+					}
+					else
+					{
+						elem.next().removeClass('active');
+						elem.prop('checked', false);
+					}
+					elem.next().attr('for', element_id + '_secure_'+nr).attr('id', element_id + '_file-secure'+nr+'-lbl');
 					nr++;
 				});
 				" : "")."
@@ -421,11 +457,19 @@ class plgFlexicontent_fieldsMediafile extends FCField
 				newField.find('input.fc_filestamp').each(function() {
 					var elem = jQuery(this);
 					elem.removeAttr('disabled');
-					elem.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][stamp]');
-					elem.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_stamp_'+nr);
-					elem.next().removeClass('active');
-					elem.prop('checked', false);
-					elem.next().attr('for', '".$elementid."_'+uniqueRowNum".$field->id."+'_stamp_'+nr).attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_file-stamp'+nr+'-lbl');
+					elem.attr('name', fname_pfx + '[stamp]');
+					elem.attr('id', element_id + '_stamp_'+nr);
+					if (elem.val() == " . (int) $stamp_default .")
+					{
+						elem.next().addClass('active');
+						elem.prop('checked', true);
+					}
+					else
+					{
+						elem.next().removeClass('active');
+						elem.prop('checked', false);
+					}
+					elem.next().attr('for', element_id + '_stamp_'+nr).attr('id', element_id + '_file-stamp'+nr+'-lbl');
 					nr++;
 				});
 				" : "")."
@@ -433,9 +477,9 @@ class plgFlexicontent_fieldsMediafile extends FCField
 				".($iform_desc ? "
 				var theInput = newField.find('textarea.fc_filedesc').first();
 				theInput.val('');
-				theInput.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][file-desc]');
-				theInput.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_file-desc');
-				newField.find('.inlinefile-desc-lbl').first().attr('for','".$elementid."_'+uniqueRowNum".$field->id."+'_file-desc').attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_file-desc-lbl');
+				theInput.attr('name', fname_pfx + '[file-desc]');
+				theInput.attr('id', element_id + '_file-desc');
+				newField.find('.inlinefile-desc-lbl').first().attr('for', element_id + '_file-desc').attr('id', element_id + '_file-desc-lbl');
 				" : "")."
 
 				// Destroy any select2 elements
@@ -448,8 +492,8 @@ class plgFlexicontent_fieldsMediafile extends FCField
 
 				// Update button for modal file selection
 				var theBTN = newField.find('span.addfile');
-				theBTN.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_addfile');
-				theBTN.attr('data-rowno',uniqueRowNum".$field->id.");
+				theBTN.attr('id', element_id + '_addfile');
+				theBTN.attr('data-rowno', uniqueRowN);
 
 				// Update uploader related data
 				var fcUploader = newField.find('.fc_file_uploader');
@@ -458,19 +502,19 @@ class plgFlexicontent_fieldsMediafile extends FCField
 				{
 					// Update uploader attributes
 					fcUploader.empty().hide();
-					fcUploader.attr('id', fcUploader.attr('data-tagid-prefix') + uniqueRowNum".$field->id.");
+					fcUploader.attr('id', fcUploader.attr('data-tagid-prefix') + uniqueRowN);
 
 					// Update button for toggling uploader
 					upBTN = newField.find('.fc_files_uploader_toggle_btn');
-					upBTN.attr('data-rowno',uniqueRowNum".$field->id.");
+					upBTN.attr('data-rowno', uniqueRowN);
 
 					mulupBTN = newField.find('.fc-files-modal-link.fc-up');
-					mulupBTN.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_mul_uploadvalue');
-					mulupBTN.attr('data-rowno',uniqueRowNum".$field->id.");
+					mulupBTN.attr('id', element_id + '_mul_uploadvalue');
+					mulupBTN.attr('data-rowno', uniqueRowN);
 
 					mulselBTN = newField.find('.fc-files-modal-link.fc-sel');
-					mulselBTN.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_selectvalue');
-					mulselBTN.attr('data-rowno',uniqueRowNum".$field->id.");
+					mulselBTN.attr('id', element_id + '_selectvalue');
+					mulselBTN.attr('data-rowno', uniqueRowN);
 				}
 				";
 
@@ -489,16 +533,16 @@ class plgFlexicontent_fieldsMediafile extends FCField
 
 				// Init WaveSurfer
 				var el = newField.find('.fc_mediafile_controls').first();
-				el.attr('id', 'fc_mediafile_controls_" . $field_name_js . '_' . "'+uniqueRowNum".$field->id.");
+				el.attr('id', 'fc_mediafile_controls_" . $field_name_js . '_' . "' + uniqueRowN);
 
 				var el = newField.find('.fc_mediafile_audio_spectrum_box').first();
-				el.attr('id', 'fc_mediafile_audio_spectrum_box_" . $field_name_js . '_' . "'+uniqueRowNum".$field->id.");
+				el.attr('id', 'fc_mediafile_audio_spectrum_box_" . $field_name_js . '_' . "' + uniqueRowN);
 
 				var el = newField.find('.fc_mediafile_audio_spectrum').first();
-				el.attr('id', 'fc_mediafile_audio_spectrum_" . $field_name_js . '_' . "'+uniqueRowNum".$field->id.");
+				el.attr('id', 'fc_mediafile_audio_spectrum_" . $field_name_js . '_' . "' + uniqueRowN);
 				el.empty();
 
-				fcfield_mediafile.initValue('".$field->name."_'+uniqueRowNum".$field->id.");
+				fcfield_mediafile.initValue('".$field->name."_' + uniqueRowN, '".$field_name_js."');
 				";
 
 			// Add new element to sortable objects (if field not in group)
@@ -606,7 +650,7 @@ class plgFlexicontent_fieldsMediafile extends FCField
 		";
 
 		/**
-	   * Load form JS
+		 * Load form JS
 		 */
 
 		// Add needed JS/CSS
@@ -615,18 +659,37 @@ class plgFlexicontent_fieldsMediafile extends FCField
 		{
 			$js_added = true;
 
-			JText::script('PLG_FLEXICONTENT_FIELDS_MEDIAFILE_RESPONSE_PARSING_FAILED', false);
-			JText::script('PLG_FLEXICONTENT_FIELDS_MEDIAFILE_FILE_NOT_FOUND', false);
+			JText::script('PLG_FLEXICONTENT_FIELDS_MEDIAFILE_RESPONSE_PARSING_FAILED', true);
+			JText::script('PLG_FLEXICONTENT_FIELDS_MEDIAFILE_FILE_NOT_FOUND', true);
+			JText::script('FLEXI_PLEASE_UPLOAD_A_FILE', true);
 
 			//flexicontent_html::loadFramework('wavesurfer');
 			flexicontent_html::loadFramework('flexi-lib');
 			JHtml::addIncludePath(JPATH_SITE . '/components/com_flexicontent/helpers/html');
-			$document->addScript('https://unpkg.com/wavesurfer.js');
+			$document->addScript('https://unpkg.com/wavesurfer.js/dist/wavesurfer.min.js');
+			//$document->addScript('https://unpkg.com/wavesurfer.js/dist/plugin/wavesurfer.cursor.js');
 			$document->addScript(JUri::root(true) . '/plugins/flexicontent_fields/mediafile/js/form.js', array('version' => FLEXI_VHASH));
+
+			$js .= "
+			jQuery(document).ready(function()
+			{
+				audio_spectrum_conf['" . $field_name_js . "'] = [];
+				audio_spectrum_conf['" . $field_name_js . "']['waveColor'] = '" . $field->parameters->get( 'ws_wave_color', '#619fc7' ) . "';
+				audio_spectrum_conf['" . $field_name_js . "']['progressColor'] = '" .$field->parameters->get( 'ws_progress_color', '#d0d0d0' ) . "';
+				audio_spectrum_conf['" . $field_name_js . "']['cursorColor'] = '" .  $field->parameters->get( 'ws_cursor_color', '#619fc7' ) . "';
+				audio_spectrum_conf['" . $field_name_js . "']['cursorWidth'] = '" . (int) $field->parameters->get( 'ws_cursor_width', 2 ) . "';
+
+				new fc_Waveform_LazyLoad(
+					document.getElementsByTagName('body')[0], {
+						rootMargin: '0px 0px',
+						threshold: 0.25
+					}
+				);
+			});
+			";
 		}
 
-
-		// Added field's custom CSS / JS
+		// Add field's custom CSS / JS
 		if ($multiple) $js .= "
 			var uniqueRowNum".$field->id."	= ".count($field->value).";  // Unique row number incremented only
 			var rowCount".$field->id."	= ".count($field->value).";      // Counts existing rows to be able to limit a max number of values
@@ -670,7 +733,7 @@ class plgFlexicontent_fieldsMediafile extends FCField
 						<ul class="dropdown-menu" role="menu">
 							<li>'.$uploader_html->toggleBtn.'</li>
 							<li>'.$uploader_html->multiUploadBtn.'</li>
-							<li>'.$uploader_html->myFilesBtn.'</li>
+							' . ($use_myfiles > 0 ? '<li>'.$uploader_html->myFilesBtn.'</li>' : '') . '
 							<li>'.$uploader_html->mediaUrlBtn.'</li>
 						</ul>
 					</div>
@@ -679,8 +742,24 @@ class plgFlexicontent_fieldsMediafile extends FCField
 				</div>
 				'.($fields_box_placing ? '<div class="fcclear"></div>' : '').'
 				').'
-				<div class="fc-field-props-box">
+
+				<div class="fc-field-props-box" ' . (!$multiple ? 'style="width: 96%; max-width: 1400px;"' : ''). '>
+
+					'.($use_inline_uploaders && ($file_btns_position || !$add_ctrl_btns) ? '
+					<div class="fcclear"></div>
+					<div class="btn-group" style="margin: 4px 0 16px 0; display: inline-block;">
+						<div class="'.$input_grp_class.' fc-xpended-btns">
+							'.$uploader_html->toggleBtn.'
+							'.$uploader_html->multiUploadBtn.'
+							' . ($use_myfiles > 0 ? $uploader_html->myFilesBtn : '') . '
+							'.$uploader_html->mediaUrlBtn.'
+							'.$uploader_html->clearBtn.'
+						</div>
+					</div>
+					' : '') . '
+
 				'.$_html.'
+
 				</div>
 				';
 		}
@@ -693,8 +772,8 @@ class plgFlexicontent_fieldsMediafile extends FCField
 		elseif ($multiple)
 		{
 			$field->html = !count($field->html) ? '' :
-				'<li class="'.$value_classes.'">'.
-					implode('</li><li class="'.$value_classes.'">', $field->html).
+				'<li class="'.$value_classes_multiple.'">'.
+					implode('</li><li class="'.$value_classes_multiple.'">', $field->html).
 				'</li>';
 			$field->html = '<ul class="fcfield-sortables" id="sortables_'.$field->id.'">' .$field->html. '</ul>';
 			if (!$add_position) $field->html .= '
@@ -708,7 +787,7 @@ class plgFlexicontent_fieldsMediafile extends FCField
 		// Handle single values
 		else
 		{
-			$field->html = '<div class="fcfieldval_container valuebox fcfieldval_container_'.$field->id.'">' . $field->html[0] .'</div>';
+			$field->html = '<div class="'.$value_classes_single.'">' . $field->html[0] .'</div>';
 		}
 
 
@@ -738,9 +817,11 @@ class plgFlexicontent_fieldsMediafile extends FCField
 		if (!$use_ingroup && $show_values_expand_btn)
 		{
 			$field->html = '
-			<span class="fcfield-expand-view-btn btn btn-small" onclick="fc_toggleCompactValuesView(this, jQuery(this).closest(\'.container_fcfield\'));" data-expandedFieldState="0">
-				<span class="fcfield-expand-view ' . $font_icon_class . '" title="'.JText::_( 'FLEXI_EXPAND_VALUES', true ).'"></span> &nbsp;'.JText::_( 'FLEXI_EXPAND_VALUES', true ).'
-			</span>
+			<button type="button" class="fcfield-expand-view-btn btn btn-small" data-expandedFieldState="0" aria-label="' . JText::_('FLEXI_EXPAND_VALUES') . '"
+				onclick="fc_toggleCompactValuesView(this, jQuery(this).closest(\'.container_fcfield\'));"
+			>
+				<span class="fcfield-expand-view ' . $font_icon_class . '" aria-hidden="true"></span>&nbsp; ' . JText::_( 'FLEXI_EXPAND_VALUES', true ) . '
+			</button>
 			' . $field->html;
 		}
 
@@ -752,21 +833,62 @@ class plgFlexicontent_fieldsMediafile extends FCField
 
 
 	// Method to create field's HTML display for frontend views
-	function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')
+	public function onDisplayFieldValue(&$field, $item, $values = null, $prop = 'display')
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
+
+		$field->label = JText::_($field->label);
+
+		// Set field and item objects
+		$this->setField($field);
+		$this->setItem($item);
+
+
+		/**
+		 * One time initialization
+		 */
+
+		static $initialized = null;
+		static $app, $document, $option, $format, $realview;
+
+		if ($initialized === null)
+		{
+			$initialized = 1;
+
+			$app       = JFactory::getApplication();
+			$document  = JFactory::getDocument();
+			$option    = $app->input->getCmd('option', '');
+			$format    = $app->input->getCmd('format', 'html');
+			$realview  = $app->input->getCmd('view', '');
+		}
+
+		// Current view variable
+		$view = $app->input->getCmd('flexi_callview', ($realview ?: 'item'));
+		$sfx = $view === 'item' ? '' : '_cat';
+
+		// Check if field should be rendered according to configuration
+		if (!$this->checkRenderConds($prop, $view))
+		{
+			return;
+		}
+
+		// The current view is a full item view of the item
+		$isMatchedItemView = static::$itemViewId === (int) $item->id;
 
 		// Some variables
 		$is_ingroup  = !empty($field->ingroup);
 		$use_ingroup = $field->parameters->get('use_ingroup', 0);
 		$multiple    = $use_ingroup || (int) $field->parameters->get( 'allow_multiple', 1 ) ;
 
-		$field->label = JText::_($field->label);
+
+		/**
+		 * Get field values
+		 */
 
 		$values = $values ? $values : $field->value;
 
 		// Check for no values and no default value, and return empty display
-		if ( empty($values) )
+		if (empty($values))
 		{
 			$field->{$prop} = $is_ingroup ? array() : '';
 			return;
@@ -774,18 +896,6 @@ class plgFlexicontent_fieldsMediafile extends FCField
 
 		static $langs = null;
 		if ($langs === null) $langs = FLEXIUtilities::getLanguages('code');
-
-		static $isMobile = null;
-		static $isTablet = null;
-		static $useMobile = null;
-		if ($useMobile===null)
-		{
-			$force_desktop_layout = JComponentHelper::getParams( 'com_flexicontent' )->get('force_desktop_layout', 0 );
-
-			$mobileDetector = flexicontent_html::getMobileDetector();
-			$isMobile = $mobileDetector->isMobile();
-			$isTablet = $mobileDetector->isTablet();
-		}
 
 		// Load the tooltip library according to configuration, FLAG is an array to have a different check per field ID
 		// This is needed ONLY for fields that also have a configuration parameter, for this field is redundant
@@ -798,19 +908,13 @@ class plgFlexicontent_fieldsMediafile extends FCField
 		}
 
 
-		// Prefix - Suffix - Separator parameters, replacing other field values if found
-		$remove_space = $field->parameters->get( 'remove_space', 0 ) ;
-		$pretext		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'pretext', '' ), 'pretext' );
-		$posttext		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'posttext', '' ), 'posttext' );
-		$separatorf	= $field->parameters->get( 'separatorf', 1 ) ;
-		$opentag		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'opentag', '' ), 'opentag' );
-		$closetag		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'closetag', '' ), 'closetag' );
+		/**
+		 * Get common parameters like: itemprop, value's prefix (pretext), suffix (posttext), separator, value list open/close text (opentag, closetag)
+		 * This will replace other field values and item properties, if such are found inside the parameter texts
+		 */
+		$common_params_array = $this->getCommonParams();
+		extract($common_params_array);
 
-		// Microdata (classify the field values for search engines)
-		$itemprop    = '';//$field->parameters->get('microdata_itemprop');
-
-		if($pretext)  { $pretext  = $remove_space ? $pretext : $pretext . ' '; }
-		if($posttext) { $posttext = $remove_space ? $posttext : ' ' . $posttext; }
 
 		// some parameter shortcuts
 		$tooltip_class = 'hasTooltip';
@@ -824,19 +928,28 @@ class plgFlexicontent_fieldsMediafile extends FCField
 
 		$useicon = $field->parameters->get( 'useicon', 0 ) ;
 		$lowercase_filename = $field->parameters->get( 'lowercase_filename', 1 ) ;
-		$link_filename      = $field->parameters->get( 'link_filename', 1 ) ;
+		
 		$display_filename	= $field->parameters->get( 'display_filename', 1 ) ;
 		$display_lang     = $field->parameters->get( 'display_lang', 1 ) ;
 		$display_size			= $field->parameters->get( 'display_size', 0 ) ;
 		$display_hits     = $field->parameters->get( 'display_hits', 0 ) ;
 		$display_descr		= $field->parameters->get( 'display_descr', 1 ) ;
 
-		$add_lang_img = $display_lang == 1 || $display_lang == 3;
-		$add_lang_txt = $display_lang == 2 || $display_lang == 3 || $isMobile;
-		$add_hits_img = $display_hits == 1 || $display_hits == 3;
-		$add_hits_txt = $display_hits == 2 || $display_hits == 3 || $isMobile;
+		// Force icons in items manager
+		$display_lang  = $display_lang && static::$isItemsManager ?  0 : $display_lang;
+		$display_size  = $display_size && static::$isItemsManager ?  0 : $display_size;
+		$display_hits  = $display_hits && static::$isItemsManager ?  0 : $display_hits;
+		$display_descr = $display_descr && static::$isItemsManager ?  0 : $display_descr;
 
-		$usebutton    = $field->parameters->get( 'usebutton', 1 ) ;
+		$add_lang_img = $display_lang == 1 || $display_lang == 3;
+		$add_lang_txt = $display_lang == 2 || $display_lang == 3 || static::$isMobile;
+		$add_hits_img = $display_hits == 1 || $display_hits == 3;
+		$add_hits_txt = $display_hits == 2 || $display_hits == 3 || static::$isMobile;
+
+		// NOTE: link_filename parameter is ignore when using buttons !!!
+		$link_filename = $field->parameters->get( 'link_filename', 1 ) ;
+		$usebutton     = $field->parameters->get( 'usebutton', 1 ) ;
+
 		$buttonsposition = $field->parameters->get('buttonsposition', 1);
 		$use_infoseptxt   = $field->parameters->get( 'use_info_separator', 0 ) ;
 		$use_actionseptxt = $field->parameters->get( 'use_action_separator', 0 ) ;
@@ -854,11 +967,61 @@ class plgFlexicontent_fieldsMediafile extends FCField
 		$viewinfo  = JText::_('FLEXI_FIELD_FILE_VIEW_INFO', true);
 		$viewinside= $field->parameters->get( 'viewinside', 1 ) ;
 
+		$mediapath = static::$cparams->get('media_path', 'components/com_flexicontent/medias');
+		$docspath  = static::$cparams->get('file_path', 'components/com_flexicontent/uploads');
+
+		$target_dir = $field->parameters->get('target_dir', 0);
+		$base_url   = JUri::root(true) . '/' . (!$target_dir ? $mediapath : $docspath);
+		$base_url   = str_replace(DS, '/', $base_url);
+
+		// JS safe Field name
+		$field_name_js = str_replace('-', '_', $field->name);
+
 		static $fc_lib_added = false;
 		if ($viewinside==1 && !$fc_lib_added)
 		{
 			$fc_lib_added = true;
+
 			flexicontent_html::loadFramework('flexi-lib');
+			JHtml::addIncludePath(JPATH_SITE . '/components/com_flexicontent/helpers/html');
+		}
+
+		// Add needed JS/CSS
+		static $js_added = null;
+		if ( $js_added === null )
+		{
+			$js_added = true;
+			$document = JFactory::getDocument();
+
+			JText::script('PLG_FLEXICONTENT_FIELDS_MEDIAFILE_RESPONSE_PARSING_FAILED', false);
+			JText::script('PLG_FLEXICONTENT_FIELDS_MEDIAFILE_FILE_NOT_FOUND', false);
+
+			//flexicontent_html::loadFramework('wavesurfer');
+			flexicontent_html::loadFramework('flexi-lib');
+			JHtml::addIncludePath(JPATH_SITE . '/components/com_flexicontent/helpers/html');
+			$document->addScript('https://unpkg.com/wavesurfer.js/dist/wavesurfer.min.js');
+			//$document->addScript('https://unpkg.com/wavesurfer.js/dist/plugin/wavesurfer.cursor.js');
+			$document->addScript(JUri::root(true) . '/plugins/flexicontent_fields/mediafile/js/view.js', array('version' => FLEXI_VHASH));
+			//$document->addScript(JUri::root(true) . '/components/com_flexicontent/assets/js/pako.min.js', array('version' => FLEXI_VHASH));
+			//$document->addScript(JUri::root(true) . '/components/com_flexicontent/assets/js/pako_deflate.min.js', array('version' => FLEXI_VHASH));
+			//$document->addScript(JUri::root(true) . '/components/com_flexicontent/assets/js/pako_inflate.min.js', array('version' => FLEXI_VHASH));
+
+			$document->addScriptDeclaration("
+			jQuery(document).ready(function()
+			{
+				audio_spectrum_conf['" . $field_name_js . "'] = [];
+				audio_spectrum_conf['" . $field_name_js . "']['waveColor'] = '" . $field->parameters->get( 'ws_wave_color', '#619fc7' ) . "';
+				audio_spectrum_conf['" . $field_name_js . "']['progressColor'] = '" .$field->parameters->get( 'ws_progress_color', '#d0d0d0' ) . "';
+				audio_spectrum_conf['" . $field_name_js . "']['cursorColor'] = '" .  $field->parameters->get( 'ws_cursor_color', '#619fc7' ) . "';
+				audio_spectrum_conf['" . $field_name_js . "']['cursorWidth'] = '" . (int) $field->parameters->get( 'ws_cursor_width', 2 ) . "';
+
+				new fc_Waveform_LazyLoad(
+					document.getElementsByTagName('body')[0], {
+						rootMargin: '0px 0px',
+						threshold: 0.25
+					});
+			});
+			");
 		}
 
 		$allowshare = $field->parameters->get( 'allowshare', 0 ) ;
@@ -871,6 +1034,14 @@ class plgFlexicontent_fieldsMediafile extends FCField
 		$addtocarttext  = JText::_($addtocarttext);
 		$addtocartinfo  = JText::_('FLEXI_FIELD_FILE_ADD_TO_DOWNLOADS_CART_INFO', true);
 
+		/** BACKEND **/
+		$link_filename = static::$isItemsManager ? 1 : $link_filename;
+		$usebutton     = static::$isItemsManager ?  0 : $usebutton;
+		$allowdownloads = static::$isItemsManager ?  1 : $allowdownloads;
+		$allowview = static::$isItemsManager ?  0 : $allowview;
+		$allowshare = static::$isItemsManager ?  0 : $allowshare;
+		$allowaddtocart = static::$isItemsManager ?  0 : $allowaddtocart;
+
 		$noaccess_display	     = $field->parameters->get( 'noaccess_display', 1 ) ;
 		$noaccess_url_unlogged = $field->parameters->get( 'noaccess_url_unlogged', false ) ;
 		$noaccess_url_logged   = $field->parameters->get( 'noaccess_url_logged', false ) ;
@@ -879,8 +1050,31 @@ class plgFlexicontent_fieldsMediafile extends FCField
 		$noaccess_addvars      = $field->parameters->get( 'noaccess_addvars', 0);
 
 		// Select appropriate messages depending if user is logged on
-		$noaccess_url = JFactory::getUser()->guest ? $noaccess_url_unlogged : $noaccess_url_logged;
-		$noaccess_msg = JFactory::getUser()->guest ? $noaccess_msg_unlogged : $noaccess_msg_logged;
+		if (JFactory::getUser()->guest)
+		{
+			if ($noaccess_url_unlogged)
+			{
+				$noaccess_url = $noaccess_url_unlogged;
+			}
+			else
+			{
+				$uri  = JUri::getInstance();
+
+				$return   = strtr(base64_encode($uri->toString()), '+/=', '-_,');          // Current URL as return URL (but we will for id / cid)
+				$fcreturn = serialize( array('id' => $app->input->getInt('id'), 'cid' => $app->input->getInt('cid')) );  // a special url parameter, used by some SEF code
+				$noaccess_url = JComponentHelper::getParams( 'com_flexicontent' )->get('login_page', 'index.php?option=com_users&view=login')
+					. '&return='.$return
+					. '&fcreturn='.base64_encode($fcreturn);
+			}
+
+			$noaccess_msg = $noaccess_msg_unlogged;
+		}
+		else
+		{
+			$noaccess_url = $noaccess_url_logged;
+			$noaccess_msg = $noaccess_msg_logged;
+		}
+
 
 		// VERIFY downloads manager module is installed and enabled
 		static $mod_is_enabled = null;
@@ -916,7 +1110,7 @@ class plgFlexicontent_fieldsMediafile extends FCField
 		switch($separatorf)
 		{
 			case 0:
-			$separatorf = '&nbsp;';
+			$separatorf = '';
 			break;
 
 			case 1:
@@ -924,11 +1118,11 @@ class plgFlexicontent_fieldsMediafile extends FCField
 			break;
 
 			case 2:
-			$separatorf = '&nbsp;|&nbsp;';
+			$separatorf = ' | ';
 			break;
 
 			case 3:
-			$separatorf = ',&nbsp;';
+			$separatorf = ', ';
 			break;
 
 			case 4:
@@ -940,7 +1134,7 @@ class plgFlexicontent_fieldsMediafile extends FCField
 			break;
 
 			default:
-			$separatorf = '&nbsp;';
+			$separatorf = '';
 			break;
 		}
 
@@ -985,7 +1179,7 @@ class plgFlexicontent_fieldsMediafile extends FCField
 		$viewlayout = $field->parameters->get('viewlayout', '');
 		$viewlayout = $viewlayout ? 'value_'.$viewlayout : 'value_InlineBoxes';
 
-		// Create field's HTML, using layout file
+		// Create field's viewing HTML, using layout file
 		$field->{$prop} = array();
 		include(self::getViewPath($field->field_type, $viewlayout));
 
@@ -994,18 +1188,43 @@ class plgFlexicontent_fieldsMediafile extends FCField
 		// Do not convert the array to string if field is in a group, and do not add: FIELD's opentag, closetag, value separator
 		if (!$is_ingroup)
 		{
+			// values_list_placement: 1:In slider, 0:Inline
+			$values_list_placement = (int) $field->parameters->get('values_list_placement', 0);
+			$values_list_placement = static::$isItemsManager ? 1 : $values_list_placement;
+			$values_slider_title   = $field->parameters->get('values_slider_title', 'FLEXI_FILES');
+			$head = $values_list_placement && isset($field->{$prop}[-1]) ? $field->{$prop}[-1] : '';
+
+			if ($values_list_placement)
+			{
+				unset($field->{$prop}[-1]);
+			}
+
 			// Apply values separator
 			$field->{$prop} = implode($separatorf, $field->{$prop});
-			if ( $field->{$prop}!=='' )
+
+			if ($field->{$prop} !== '')
 			{
 				// Apply field 's opening / closing texts
 				$field->{$prop} = $opentag . $field->{$prop} . $closetag;
 
 				// Add microdata once for all values, if field -- is NOT -- in a field group
-				if ( $itemprop )
+				if ($itemprop)
 				{
 					$field->{$prop} = '<div style="display:inline" itemprop="'.$itemprop.'" >' .$field->{$prop}. '</div>';
 				}
+			}
+
+			if ($values_list_placement)
+			{
+				$ff_slider_tagid = 'fcfile_slider_' . $item->id . '_' . $field->id;
+				$ff_slider_title = JText::_($values_slider_title);
+
+				$field->{$prop} = $head .
+					JHtml::_('bootstrap.startAccordion', $ff_slider_tagid, array('active' => -1)) .
+					JHtml::_('bootstrap.addSlide', $ff_slider_tagid, $ff_slider_title, $ff_slider_tagid . '_filelist_slide') .
+					$field->{$prop} .
+					JHtml::_('bootstrap.endSlide') .
+					JHtml::_('bootstrap.endAccordion');
 			}
 		}
 	}
@@ -1060,7 +1279,7 @@ class plgFlexicontent_fieldsMediafile extends FCField
 	// ***
 
 	// Method to handle field's values before they are saved into the DB
-	function onBeforeSaveField( &$field, &$post, &$file, &$item )
+	public function onBeforeSaveField( &$field, &$post, &$file, &$item )
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 
@@ -1128,8 +1347,8 @@ class plgFlexicontent_fieldsMediafile extends FCField
 					$Fobj->return_url     = null;
 					$Fobj->file_dir_path  = DS. $import_docs_folder . $sub_folder;
 					$Fobj->file_filter_re = preg_quote($filename);
-					$Fobj->secure = (int) $field->parameters->get('iform_dir_default', 1);
-					$Fobj->stamp  = (int) $field->parameters->get('iform_stamp_default', 1);
+					$Fobj->secure = 0; //(int) $field->parameters->get('iform_dir_default', 0);
+					$Fobj->stamp  = 0; //(int) $field->parameters->get('iform_stamp_default', 0);
 					$Fobj->keep   = 1;
 
 					$upload_err = null;
@@ -1137,7 +1356,7 @@ class plgFlexicontent_fieldsMediafile extends FCField
 
 					// Get fist element
 					$v = !empty($file_ids) ? reset($file_ids) : ($use_ingroup ? null : false);
-		    	$v = $v ?: ($use_ingroup ? null : false);
+					$v = $v ?: ($use_ingroup ? null : false);
 					//$_filetitle = key($file_ids);  // This is the cleaned up filename, currently not needed
 				}
 			}
@@ -1145,14 +1364,14 @@ class plgFlexicontent_fieldsMediafile extends FCField
 			// we were given a file ID
 			elseif (!is_array($v))
 			{
-	    	$file_id = (int) $v;
-	    	$v = $v ?: ($use_ingroup ? null : false);
+				$file_id = (int) $v;
+				$v = $v ?: ($use_ingroup ? null : false);
 			}
 
 			// Using inline property editing
 			else
 			{
-	    	$file_id = (int) $v['file-id'];
+				$file_id = (int) $v['file-id'];
 
 				$err_code = isset($_FILES['custom']['error'][$field->name][$n]['file-data'])
 					? $_FILES['custom']['error'][$field->name][$n]['file-data']
@@ -1181,10 +1400,11 @@ class plgFlexicontent_fieldsMediafile extends FCField
 				$v['file-desc']  = !$iform_desc   ? '' : flexicontent_html::dataFilter($v['file-desc'],   10000, 'STRING', 0);
 				$v['file-lang']  = !$iform_lang   ? '' : flexicontent_html::dataFilter($v['file-lang'],   9,     'STRING', 0);
 				$v['file-access']= !$iform_access ? '' : flexicontent_html::dataFilter($v['file-access'], 9,     'ACCESSLEVEL', 0);
-				$v['stamp']      = !$iform_stamp  ? 1 : ((int) $v['stamp'] ? 1 : 0);
+				$v['stamp']      = 0;  //!$iform_stamp  ? 0 : ((int) $v['stamp'] ? 1 : 0);
+
 				if( $new_file )
 				{
-					$v['secure']   = !$iform_dir    ? 1 : ((int) $v['secure'] ? 1 : 0);
+					$v['secure']   = 0; //!$iform_dir    ? 0 : ((int) $v['secure'] ? 1 : 0);
 				}
 
 				// UPDATE existing file
@@ -1234,7 +1454,7 @@ class plgFlexicontent_fieldsMediafile extends FCField
 					// Update DB data of the file
 					if ( !$row->check() || !$row->store() )
 					{
-						JFactory::getApplication()->enqueueMessage("FILE FIELD: ".JFactory::getDbo()->getErrorMsg(), 'warning' );
+						JFactory::getApplication()->enqueueMessage("FILE FIELD: " . $row->getError(), 'warning');
 						if ($use_ingroup) $newpost[$new++] = null;
 						continue;
 					}
@@ -1326,12 +1546,12 @@ class plgFlexicontent_fieldsMediafile extends FCField
 
 
 	// Method to take any actions/cleanups needed after field's values are saved into the DB
-	function onAfterSaveField( &$field, &$post, &$file, &$item ) {
+	public function onAfterSaveField( &$field, &$post, &$file, &$item ) {
 	}
 
 
 	// Method called just before the item is deleted to remove custom item data related to the field
-	function onBeforeDeleteField(&$field, &$item) {
+	public function onBeforeDeleteField(&$field, &$item) {
 	}
 
 
@@ -1340,8 +1560,85 @@ class plgFlexicontent_fieldsMediafile extends FCField
 	// *** CATEGORY/SEARCH FILTERING METHODS
 	// ***
 
+
+	// Method to display a category filter for the category view
+	public function onDisplayFilter(&$filter, $value = '', $formName = 'adminForm', $isSearchView = 0)
+	{
+		if ( !in_array($filter->field_type, static::$field_types) ) return;
+
+		// Available properties
+		/*
+		$mediadata = array('state', 'media_type', 'media_format', 'codec_type', 'codec_name', 'codec_long_name',
+			'resolution', 'fps', 'bit_rate', 'bits_per_sample', 'sample_rate', 'duration',
+			'channels', 'channel_layout', 'checked_out', 'checked_out_time');
+			*/
+		$mediadata = array('media_format', 'sample_rate');
+		$media_property_filters = $filter->parameters->set('media_property_filters', $mediadata);
+
+		$html = array();
+		$label = $filter->label;
+
+		foreach($media_property_filters as $prop_name)
+		{
+			// WARNING: we can not use column alias in from, join, where, group by, can use in having (some DB e.g. mysql) and in order-by
+			// partial SQL clauses
+			$filter->filter_valuesselect = ' md.' . $prop_name . ' AS value, md.' . $prop_name . ' AS text';
+			$filter->filter_valuesjoin   = ' JOIN #__flexicontent_files AS f ON f.id = fi.value '
+				. ' JOIN #__flexicontent_mediadatas AS md ON f.id = md.file_id';
+			//$filter->filter_valueswhere  = ' AND f.id NOT NULL)';
+			// full SQL clauses
+			$filter->filter_groupby = ' GROUP BY md.' . $prop_name;
+			$filter->filter_having  = null;   // this indicates to use default, space is use empty
+			//$filter->filter_orderby = ' ORDER by text';   // default will order by value and not by label
+
+			$prop_value = isset($value[$prop_name]) ? $value[$prop_name] : null;  // TODO GET FROM URI
+			//echo 'filter_id: ' . $filter->id . '<br>';
+			//echo '<pre>'; print_r($prop_value); echo '</pre>';
+
+
+			unset($filter->html);
+			unset($filter->filt_prop_name);
+			$filter->label = $prop_name;
+			$filter->filt_prop_name = $prop_name;
+
+			FlexicontentFields::createFilter($filter, $prop_value, $formName);
+			$html[$prop_name] = $filter->html;
+		}
+		
+
+		unset($filter->filt_prop_name);
+
+		$filter->label = $label;
+		$filter->html = array();
+		foreach($media_property_filters as $prop_name)
+		{
+			$filtername = $prop_name;
+
+			if ($prop_name == 'media_format')
+			{
+				// Change 'channels' to '# Channels' you can also you language   JText::_('SOMENAME');
+				$filtername = JText::_('FLEXI_FIELD_MEDIADATA_MEDIA_TYPE');	
+			}
+			elseif ($prop_name == 'sample_rate')
+			{
+				// Change 'channels' to '# Channels' you can also you language   JText::_('SOMENAME');
+				$filtername = JText::_('FLEXI_FIELD_MEDIADATA_SAMPLE_RATE');	
+			}
+
+			$filter->html[] = '
+			<div class="fc_filter_media_property_'.$prop_name.'">
+				<div class="fc_filter_label fc_label_field_'.$filter->id.'_'.$prop_name.'">'. $filtername . '</div>
+				<div class="fc_filter_html">' . $html[$prop_name] . '</div>
+			</div>
+			';
+		}
+
+		$filter->html =  '<div class="fc_filter_media_properties_box" style="float:left; width: 100%;">' . implode('', $filter->html) . '</div>';
+	}
+
+
 	// Method to display a search filter for the advanced search view
-	function onAdvSearchDisplayFilter(&$filter, $value='', $formName='searchForm')
+	public function onAdvSearchDisplayFilter(&$filter, $value = '', $formName = 'searchForm')
 	{
 		if ( !in_array($filter->field_type, static::$field_types) ) return;
 
@@ -1350,9 +1647,53 @@ class plgFlexicontent_fieldsMediafile extends FCField
 	}
 
 
- 	// Method to get the active filter result (an array of item ids matching field filter, or subquery returning item ids)
+	// Method to get the active filter result (an array of item ids matching field filter, or subquery returning item ids)
+	// This is for category view
+	public function getFiltered(&$filter, $value, $return_sql = true)
+	{
+		// Available properties
+		/*
+		$mediadata = array('state', 'media_type', 'media_format', 'codec_type', 'codec_name', 'codec_long_name',
+			'resolution', 'fps', 'bit_rate', 'bits_per_sample', 'sample_rate', 'duration',
+			'channels', 'channel_layout', 'checked_out', 'checked_out_time');
+		*/
+		$mediadata = array('media_format', 'sample_rate');
+		$media_property_filters = $filter->parameters->set('media_property_filters', $mediadata);
+
+		$results = array();
+		$label = $filter->label;
+
+		foreach($media_property_filters as $prop_name)
+		{
+			$filter->filter_valuesjoin   = ' JOIN #__flexicontent_fields_item_relations as rel ON rel.item_id = c.id AND rel.field_id = ' . (int) $filter->id
+				. ' JOIN #__flexicontent_files AS f ON f.id = rel.value '
+				. ' JOIN #__flexicontent_mediadatas AS md ON f.id = md.file_id';
+
+			$prop_value = isset($value[$prop_name]) ? $value[$prop_name] : null;  // TODO GET FROM URI
+			//echo 'filter_id: ' . $filter->id . '<br>';
+			//echo '<pre>'; print_r($prop_value); echo '</pre>';
+
+			unset($filter->filt_prop_name);
+			$filter->label = $prop_name;
+			$filter->filt_prop_name = $prop_name;
+			$filter->filter_colname = 'md.' . $prop_name;
+
+			$res = FlexicontentFields::getFiltered($filter, $prop_value, $return_sql);
+			if ($res)
+			{
+				$results[] = $res;
+			}
+		}
+
+		unset($filter->filt_prop_name);
+
+		$filter->label = $label;
+		return implode(' ', $results);
+	}
+
+	// Method to get the active filter result (an array of item ids matching field filter, or subquery returning item ids)
 	// This is for search view
-	function getFilteredSearch(&$filter, $value, $return_sql=true)
+	public function getFilteredSearch(&$filter, $value, $return_sql = true)
 	{
 		if ( !in_array($filter->field_type, static::$field_types) ) return;
 
@@ -1363,11 +1704,11 @@ class plgFlexicontent_fieldsMediafile extends FCField
 
 
 	// ***
-	// *** SEARCH / INDEXING METHODS
+	// *** SEARCH INDEX METHODS
 	// ***
 
 	// Method to create (insert) advanced search index DB records for the field values
-	function onIndexAdvSearch(&$field, &$post, &$item)
+	public function onIndexAdvSearch(&$field, &$post, &$item)
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 		if ( !$field->isadvsearch && !$field->isadvfilter ) return;
@@ -1383,7 +1724,7 @@ class plgFlexicontent_fieldsMediafile extends FCField
 			$field->field_valuesjoin   = ' JOIN #__flexicontent_files AS file ON file.id = fi.value';
 			$field->field_groupby      = null;
 		} else {
-			$_files_data = $this->getFileData( $post, $published=true, $extra_select =', id AS value_id' );
+			$_files_data = $this->getFileData( $post, $published=true, $extra_select =', f.id AS value_id' );
 			$values = array();
 			if ($_files_data) foreach($_files_data as $_file_id => $_file_data) $values[$_file_id] = (array)$_file_data;
 		}
@@ -1394,7 +1735,7 @@ class plgFlexicontent_fieldsMediafile extends FCField
 
 
 	// Method to create basic search index (added as the property field->search)
-	function onIndexSearch(&$field, &$post, &$item)
+	public function onIndexSearch(&$field, &$post, &$item)
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 		if ( !$field->issearch ) return;
@@ -1410,7 +1751,7 @@ class plgFlexicontent_fieldsMediafile extends FCField
 			$field->field_valuesjoin   = ' JOIN #__flexicontent_files AS file ON file.id = fi.value';
 			$field->field_groupby      = null;
 		} else {
-			$_files_data = $this->getFileData( $post, $published=true, $extra_select =', id AS value_id' );
+			$_files_data = $this->getFileData( $post, $published=true, $extra_select =', f.id AS value_id' );
 			$values = array();
 			if ($_files_data) foreach($_files_data as $_file_id => $_file_data) $values[$_file_id] = (array)$_file_data;
 		}
@@ -1449,15 +1790,20 @@ class plgFlexicontent_fieldsMediafile extends FCField
 				$new_ids[] = $f;
 			}
 		}
+		
+		$md_select = 'md.state, md.media_type, md.media_format, md.codec_type, md.codec_name, md.codec_long_name, ' .
+			'md.resolution, md.fps, md.bit_rate, md.bits_per_sample, md.sample_rate, md.duration, ' .
+			'md.channels, md.channel_layout, md.checked_out, md.checked_out_time, ';
 
 		// Get file data not retrieved already
 		if (count($new_ids))
 		{
 			// Only query files that are not already cached
 			$db = JFactory::getDbo();
-			$query = 'SELECT * '. $extra_select //filename, filename_original, altname, description, ext, id'
-				. ' FROM #__flexicontent_files'
-				. ' WHERE id IN ('. implode(',', $new_ids) . ')'
+			$query = 'SELECT ' . $md_select . ' f.* '. $extra_select //filename, filename_original, altname, description, ext, id'
+				. ' FROM #__flexicontent_files AS f'
+				. ' LEFT JOIN #__flexicontent_mediadatas AS md ON f.id = md.file_id'
+				. ' WHERE f.id IN ('. implode(',', $new_ids) . ')'
 				. ($published ? '  AND published = 1' : '')
 			;
 			$new_data = $db->setQuery($query)->loadObjectList('id');
@@ -1541,8 +1887,11 @@ class plgFlexicontent_fieldsMediafile extends FCField
 			case 'gif':
 			case 'xcf':
 			case 'odg':
+			case 'wbmp':
 			case 'bmp':
+			case 'ico':
 			case 'jpeg':
+			case 'webp':
 				$file->icon = 'components/com_flexicontent/assets/images/mime-icon-16/image.png';
 			break;
 
@@ -1723,13 +2072,7 @@ class plgFlexicontent_fieldsMediafile extends FCField
 				.' AND f.published= 1'
 				. $access_clauses['and']
 				;
-		$db->setQuery($query);
-		try {
-			$file = $db->loadObject();
-		}
-		catch (Exception $e) {
-			jexit( __FUNCTION__.'() -- SQL ERROR: '. (JDEBUG ? '<br/>'.nl2br($db->getErrorMsg()) : 'Enabled DEBUG to see the error') );
-		}
+		$file = $db->setQuery($query)->loadObject();
 
 		if ( empty($file) )
 		{

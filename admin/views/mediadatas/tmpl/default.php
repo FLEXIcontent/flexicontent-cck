@@ -264,16 +264,32 @@ if ($js)
 				<?php echo JHtml::_('grid.sort', 'FLEXI_UPLOADER', 'uploader', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
 
+			<th class="hideOnDemandClass center hidden-phone hidden-tablet">
+				<?php echo JHtml::_('grid.sort', 'FLEXI_MEDIADATA_TYPE', 'a.media_type', $this->lists['order_Dir'], $this->lists['order'] ); ?>
+			</th>
+
+			<th class="hideOnDemandClass center hidden-phone hidden-tablet">
+				<?php echo JHtml::_('grid.sort', 'FLEXI_MEDIADATA_FORMAT', 'a.media_format', $this->lists['order_Dir'], $this->lists['order'] ); ?>
+			</th>
+
 			<th class="hideOnDemandClass center">
-				<?php echo JHtml::_('grid.sort', 'FLEXI_MEDIADATA_BITRATE', 'a.bitrate', $this->lists['order_Dir'], $this->lists['order'] ); ?>
+				<?php echo JHtml::_('grid.sort', 'FLEXI_MEDIADATA_RATE', 'a.bit_rate', $this->lists['order_Dir'], $this->lists['order'] ); ?>
+			</th>
+
+			<th class="hideOnDemandClass center">
+				<?php echo JHtml::_('grid.sort', 'FLEXI_MEDIADATA_DEPTH', 'a.bits_per_sample', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
 
 			<th class="hideOnDemandClass center hidden-phone hidden-tablet">
-				<?php echo JHtml::_('grid.sort', 'FLEXI_MEDIADATA_SAMPLERATE', 'a.samplerate', $this->lists['order_Dir'], $this->lists['order'] ); ?>
+				<?php echo JHtml::_('grid.sort', 'FLEXI_MEDIADATA_SAMPLE_RATE', 'a.sample_rate', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
 
 			<th class="hideOnDemandClass center hidden-phone hidden-tablet">
-				<?php echo JHtml::_('grid.sort', 'FLEXI_MEDIADATA_AUDIOTYPE', 'a.audiotype', $this->lists['order_Dir'], $this->lists['order'] ); ?>
+				<?php echo JHtml::_('grid.sort', 'FLEXI_MEDIADATA_CHANNELS', 'a.channels', $this->lists['order_Dir'], $this->lists['order'] ); ?>
+			</th>
+
+			<th class="hideOnDemandClass center hidden-phone hidden-tablet">
+				<?php echo JHtml::_('grid.sort', 'FLEXI_MEDIADATA_CHANNEL_LAYOUT', 'a.channel_layout', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
 
 			<th class="hideOnDemandClass center hidden-phone">
@@ -281,7 +297,7 @@ if ($js)
 			</th>
 
 			<th class="hideOnDemandClass center hidden-phone hidden-tablet">
-				<?php echo JHtml::_('grid.sort', 'FLEXI_MEDIADATA_FORMAT', 'a.update_date', $this->lists['order_Dir'], $this->lists['order'] ); ?>
+				<?php echo JHtml::_('grid.sort', 'FLEXI_MEDIADATA_CODEC_NAME', 'a.codec_name', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
 
 			<th class="hideOnDemandClass col_id center hidden-phone hidden-tablet">
@@ -366,15 +382,31 @@ if ($js)
 			</td>
 
 			<td class="center hidden-phone hidden-tablet">
-				<?php echo $row->bitrate; ?>
+				<?php echo $row->media_type ? 'Video' : 'Audio'; ?>
 			</td>
 
 			<td class="center hidden-phone hidden-tablet">
-				<?php echo $row->samplerate; ?>
+				<?php echo $row->media_format; ?>
+			</td>
+
+			<td class="center hidden-phone hidden-tablet">
+				<?php echo ceil($row->bit_rate / 1000) . ' kbps'; ?>
+			</td>
+
+			<td class="center hidden-phone hidden-tablet">
+				<?php echo $row->bits_per_sample; ?>
+			</td>
+
+			<td class="center hidden-phone hidden-tablet">
+				<?php echo $row->sample_rate . ' Hz'; ?>
 			</td>
 
 			<td class="center hidden-phone">
-				<?php echo $row->audiotype; ?>
+				<?php echo $row->channels; ?>
+			</td>
+
+			<td class="center hidden-phone">
+				<?php echo $row->channel_layout; ?>
 			</td>
 
 			<td class="center hidden-phone hidden-tablet">
@@ -382,7 +414,7 @@ if ($js)
 			</td>
 
 			<td class="center hidden-phone hidden-tablet">
-				<?php echo $row->format; ?>
+				<?php echo $row->codec_name; ?>
 			</td>
 
 			<td class="col_id center hidden-phone hidden-tablet">
