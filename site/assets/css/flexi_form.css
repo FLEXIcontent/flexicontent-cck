@@ -1155,3 +1155,11 @@ td.col_edit_layout {
 #flexicontent .btn {
 	padding: 8px 12px;
 }
+div#fc-filters-slide-btn {
+	border: 0;
+	background: none;
+	box-shadow: none;
+}
+#fc-filters-box input[type="text"] {
+	padding: 8px 6px !important;
+}

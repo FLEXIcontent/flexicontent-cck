@@ -3750,9 +3750,6 @@ select[multiple].use_select2_lib:focus {
 	width: 0;
 	background-color: #0099ff;
 }
-.fc_logo_loading img {
-	margin: auto;
-}
 .tooltip .tooltip-inner {
 	white-space: normal !important;
 	word-wrap: break-word !important;
@@ -4099,9 +4096,6 @@ div#permissions .tab-content {
 img.fc_field_image {
 	display: inline-block;
 	margin: 0px 4px 6px 0px;
-	padding: 1px;
-	border: 1px solid lightgray;
-	border-radius: 5px;
 }
 div .fc_image_thumb {
 	display: inline-block;

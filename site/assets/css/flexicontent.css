@@ -1155,6 +1155,14 @@ td.col_edit_layout {
 #flexicontent .btn {
 	padding: 8px 12px;
 }
+div#fc-filters-slide-btn {
+	border: 0;
+	background: none;
+	box-shadow: none;
+}
+#fc-filters-box input[type="text"] {
+	padding: 8px 6px !important;
+}
 body .fc-close {
 	color: #000000;
 	float: right;
@@ -4083,8 +4091,6 @@ img.fc_field_image {
 	display: inline-block;
 	margin: 0px 4px 6px 0px;
 	padding: 1px;
-	border: 1px solid lightgray;
-	border-radius: 5px;
 }
 div .fc_image_thumb {
 	display: inline-block;
@@ -4181,6 +4187,13 @@ div.fc-fieldgrp-value-box {
 }
 .select2-container-multi .select2-choices {
 	min-height: 34px !important;
+}
+#fcform_language_container .input-append input {
+	height: 26px !important;
+}
+span.add-on.pop-helper.field-media-preview {
+	height: 26px !important;
+	line-height: 28px !important;
 }
 hr.fcclearline {
 	border: 0;
