@@ -14,7 +14,19 @@ $show_searchordering = $this->params->get('show_searchordering', 1);
 $default_searchordering = $this->params->get('default_searchordering', 'newest');
 
 $disp_slide_filter = $this->params->get('disp_slide_filter', 0);
-$column_display = (int) $this->params->get('column_display', 0);
+$form_placement = (int) $this->params->get('form_placement', 0);
+
+if ($form_placement)
+{
+	$form_placement_class = $form_placement ? 'col-search span4' : 'top-search';
+	$form_placement_style = $form_placement === 1 ? 'float: left; margin: 4px 4px 4px 0;' : 'float: right; margin: 4px 0 4px 4px;';
+}
+else
+{
+	$form_placement_class = '';
+	$form_placement_style = '';
+}
+
 
 // Whether to show advanced options,  (a) the filters, (b) the text search fields, which these depend on content types selected/configured
 $autodisplayadvoptions = $this->params->get('autodisplayadvoptions', 1);
@@ -110,8 +122,13 @@ if ($disp_slide_filter)
 }
 ?>
 
+<div class="fcclear"></div>
 
-<form action="<?php echo $this->action; ?>" method="POST" id="<?php echo $form_id; ?>" name="<?php echo $form_name; ?>" onsubmit="" class="<?php echo $column_display === 1 ? 'col-search span3' : 'top-search';?>">
+<form
+	action="<?php echo $this->action; ?>" method="POST"
+	id="<?php echo $form_id; ?>" name="<?php echo $form_name; ?>" onsubmit=""
+	class="<?php echo $form_placement_class;?>" style="<?php echo $form_placement_style;?>"
+>
 	
 	<?php if ($this->params->get('canseltypes', 1) && isset($this->lists['contenttypes'])) : ?>
 	<fieldset id="fc_contenttypes_set" class="fc_search_set">
@@ -166,7 +183,7 @@ if ($disp_slide_filter)
 				</div>
 				<div class="fc_search_option_cell" style="position:relative;">
 					<?php
-					$append_buttons = false;
+					$append_buttons = true;
 					
 					$_ac_index = $txtmode ? 'fc_adv_complete' : 'fc_basic_complete';
 					$text_search_class  = !$append_buttons ? 'fc_text_filter' : '';
