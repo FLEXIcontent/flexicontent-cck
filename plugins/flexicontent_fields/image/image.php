@@ -87,6 +87,7 @@ class plgFlexicontent_fieldsImage extends FCField
 		$input_grp_class = $cparams->get('bootstrap_ver', 2)==2  ?  'input-append input-prepend' : 'input-group';
 		$form_font_icons = $cparams->get('form_font_icons', 1);
 		$font_icon_class = $form_font_icons ? ' fcfont-icon' : '';
+		$font_icon_class .= FLEXI_J40GE ? ' icon icon- ' : '';
 
 		// Get a unique id to use as item id if current item is new
 		$u_item_id = $item->id ? $item->id : substr(JFactory::getApplication()->input->get('unique_tmp_itemid', '', 'string'), 0, 1000);
