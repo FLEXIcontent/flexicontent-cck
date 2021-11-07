@@ -311,14 +311,18 @@
 			</field>
 			<field name="pretext" type="text" default="" filter="raw" label="FLEXI_FIELD_VALUE_PREFIX_TEXT" description="FLEXI_FIELD_VALUE_PREFIX_TEXT_DESC" />
 			<field name="posttext" type="text" default="" filter="raw" label="FLEXI_FIELD_VALUE_SUFFIX_TEXT" description="FLEXI_FIELD_VALUE_SUFFIX_TEXT_DESC" />
-			<field name="separatorf" type="list" default="1" label="FLEXI_VALUE_SEPARATOR_FRONTEND_VIEWS" description="FLEXI_VALUE_SEPARATOR_FRONTEND_VIEWS_DESC">
-				<option value="0">FLEXI_SPACE</option>
-				<option value="1">FLEXI_LINE_BREAK</option>
-				<option value="2">FLEXI_PIPE</option>
-				<option value="3">FLEXI_COMMA</option>
-				<option value="4">FLEXI_CLOSE_OPEN_TEXTS_AS_SEP</option>
-				<option value="5">FLEXI_NOCHAR_EMPTY_SEPARATOR</option>
+			<field name="separatorf" type="multilist" subtype="list" toggle_related="1" default="1" label="FLEXI_VALUE_SEPARATOR_FRONTEND_VIEWS" description="FLEXI_VALUE_SEPARATOR_FRONTEND_VIEWS_DESC">
+				<option value="0" show_list="" hide_list="separatorf_custom">FLEXI_SPACE</option>
+				<option value="1" show_list="" hide_list="separatorf_custom">FLEXI_LINE_BREAK</option>
+				<option value="6" show_list="" hide_list="separatorf_custom">FLEXI_HORIZONTAL_LINE</option>
+				<option value="2" show_list="" hide_list="separatorf_custom">FLEXI_PIPE</option>
+				<option value="3" show_list="" hide_list="separatorf_custom">FLEXI_COMMA</option>
+				<option value="4" show_list="" hide_list="separatorf_custom">FLEXI_CLOSE_OPEN_TEXTS_AS_SEP</option>
+				<option value="5" show_list="" hide_list="separatorf_custom">FLEXI_NOCHAR_EMPTY_SEPARATOR</option>
+				<option value="7" show_list="separatorf_custom" hide_list="">FLEXI_CUSTOM_SEPARATOR</option>
 			</field>
+			<field name="separatorf_custom" type="text" default="" filter="raw" label="FLEXI_CUSTOM_SEPARATOR" description="" class="separatorf_custom" />
+
 			<field name="opentag" type="text" default="" filter="raw" label="FLEXI_FIELD_OPENING_TEXT" description="FLEXI_FIELD_OPENING_TEXT_DESC" />
 			<field name="closetag" type="text" default="" filter="raw" label="FLEXI_FIELD_CLOSING_TEXT" description="FLEXI_FIELD_CLOSING_TEXT_DESC" />
 
