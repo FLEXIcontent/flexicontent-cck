@@ -1511,17 +1511,23 @@ class FlexicontentControllerImport extends FlexicontentControllerBaseAdmin
 		// Create a plugin instance if not already created
 		if ($plg === null)
 		{
-			$extfolder = 'system';
-			$extname   = 'flexisyspro';
-			$className = 'plg' . ucfirst($extfolder) . $extname;
-			$plgPath   = JPATH_SITE . '/plugins/'.$extfolder.'/'.$extname.'/'.$extname.'.php';
+			$plg_enabled = JPluginHelper::isEnabled('system', 'flexisyspro');
+			$extfolder   = 'system';
+			$extname     = 'flexisyspro';
+			$className   = 'plg' . ucfirst($extfolder) . $extname;
+			$plgPath     = JPATH_SITE . '/plugins/' . $extfolder . '/' . $extname . '/' . $extname . '.php';
 
-			if (!file_exists($plgPath))
+			if (!$plg_enabled)
 			{
 				$plg = false;
+
+				if (file_exists($plgPath))
+				{
+					$app->enqueueMessage('Flexisyspro (system) plugin is installed but not enabled', 'notice');
+				}
 			}
 
-			// Create plugin instance
+			// Create plugin instance of PRO system plugin
 			else
 			{
 				$dispatcher   = JEventDispatcher::getInstance();

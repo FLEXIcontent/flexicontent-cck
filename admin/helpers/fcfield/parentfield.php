@@ -113,16 +113,28 @@ class FCField extends JPlugin
 				: static::$isMobile;
 
 			// Check for PRO system plugin presence
-			$extfolder = 'system';
-			$extname   = 'flexisyspro';
-			$className = 'plg' . ucfirst($extfolder) . $extname;
-			$plgPath = JPATH_SITE . '/plugins/' . $extfolder . '/' . $extname . '/' . $extname . '.php';
+			$plg_enabled = JPluginHelper::isEnabled('system', 'flexisyspro');
+			$extfolder   = 'system';
+			$extname     = 'flexisyspro';
+			$className   = 'plg' . ucfirst($extfolder) . $extname;
+			$plgPath     = JPATH_SITE . '/plugins/' . $extfolder . '/' . $extname . '/' . $extname . '.php';
 
-			if (file_exists($plgPath))
+			if (!$plg_enabled)
 			{
-				// Create plugin instance of PRO system plugin
+				$self::$fcProPlg = false;
+
+				if (file_exists($plgPath))
+				{
+					$app->enqueueMessage('Flexisyspro (system) plugin is installed but not enabled', 'notice');
+				}
+			}
+
+			// Create plugin instance of PRO system plugin
+			else
+			{
 				$dispatcher     = JEventDispatcher::getInstance();
 				$plg_db_data    = JPluginHelper::getPlugin($extfolder, $extname);
+
 				self::$fcProPlg = new $className($dispatcher, array(
 					'type'   => $extfolder,
 					'name'   => $extname,
