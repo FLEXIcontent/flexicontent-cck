@@ -187,39 +187,73 @@ class FCField extends JPlugin
 	}
 
 
-	protected function getSeparatorF($opentag, $closetag, $default = 1)
+	/**
+	 * Method to decide and return the field value separator
+	 *
+	 * @param		string      $opentag      Needed only when using $closetag + $opentag as separator
+	 * @param		string      $closetag     Needed only when using $closetag + $opentag as separator
+	 * @param		int|string  $sep_default  Default separator, either a selection index (integer) or custom text
+	 *
+	 * @return	string      The field values separator
+	 *
+	 * @since   3.3.0
+	 */
+	protected function getSeparatorF($opentag, $closetag, $sep_default = 1)
 	{
-		$separatorf = $this->field->parameters->get('separatorf', $default);
+		$separatorf = $this->field->parameters->get('separatorf', $sep_default);
+
+		// Check if using custom separator
+		if ($separatorf == 7)
+		{
+			$sep_custom = $this->field->parameters->get('separatorf_custom', '');
+
+			// Fallback to default separator if custom separator HTML is not,
+			// if default separator is ... ? also 7 (aka custom) then fallback to 1
+			if (!strlen($sep_custom))
+			{
+				$separatorf = $sep_default != 7 ? $sep_default : 1;
+			}
+		}
 
 		switch($separatorf)
 		{
 			case 0:
-			$separatorf = '&nbsp;';
-			break;
+				$separatorf = ' ';
+				break;
 
 			case 1:
-			$separatorf = '<br class="fcclear" />';
-			break;
+				$separatorf = '<br class="fcclear" />';
+				break;
 
 			case 2:
-			$separatorf = '&nbsp;|&nbsp;';
-			break;
+				$separatorf = ' | ';
+				break;
 
 			case 3:
-			$separatorf = ',&nbsp;';
-			break;
+				$separatorf = ', ';
+				break;
 
 			case 4:
-			$separatorf = $closetag . $opentag;
-			break;
+				$separatorf = $closetag . $opentag;
+				break;
 
 			case 5:
-			$separatorf = '';
-			break;
+				$separatorf = '';
+				break;
+
+			case 6:
+				$separatorf = '<hr class="fcclearline" />';
+				break;
+
+			case 7:
+				// Custom separator
+				$separatorf = $sep_custom;
+				break;
 
 			default:
-			$separatorf = '&nbsp;';
-			break;
+				// '$separatorf_default' actually contains the separator HTML, and not a selection index
+				$separatorf = $sep_default;
+				break;
 		}
 
 		return $separatorf;
