@@ -1104,40 +1104,6 @@ class plgFlexicontent_fieldsMediafile extends FCField
 			}
 		}
 
-		if($pretext)  { $pretext  = $remove_space ? $pretext : $pretext . ' '; }
-		if($posttext) { $posttext = $remove_space ? $posttext : ' ' . $posttext; }
-
-		switch($separatorf)
-		{
-			case 0:
-			$separatorf = '';
-			break;
-
-			case 1:
-			$separatorf = '<hr class="fcclearline" />'; //'<br class="fcclear" />';
-			break;
-
-			case 2:
-			$separatorf = ' | ';
-			break;
-
-			case 3:
-			$separatorf = ', ';
-			break;
-
-			case 4:
-			$separatorf = $closetag . $opentag;
-			break;
-
-			case 5:
-			$separatorf = '';
-			break;
-
-			default:
-			$separatorf = '';
-			break;
-		}
-
 		// Get user access level (these are multiple for J2.5)
 		$user = JFactory::getUser();
 		$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
