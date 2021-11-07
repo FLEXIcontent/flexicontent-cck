@@ -30,9 +30,9 @@
 
 		form.filter_order.value 	= order;
 		form.filter_order_Dir.value	= dir;
-		
+
 		var form = document.getElementById("adminForm");
-		
+
 		adminFormPrepare(form, 2, task);
 	}
 
@@ -62,31 +62,31 @@
 			}
 		});
 	}
-	
-	
+
+
 	function adminFormPrepare(form, postprep, task)
 	{
 		var extra_action = '';
 		var fcform = jQuery(form);
-		
+
 		var fcform_action = fcform.attr('data-fcform_action');
 		if ( typeof fcform_action === "undefined" || fcform_action === null )
 		{
 			fcform_action = fcform.attr('action');
 			fcform.attr('data-fcform_action', fcform_action);
 		}
-		
+
 		var var_sep = fcform_action.match(/\?/) ? '&' : '?';
-		
+
 		for (i=0; i<form.elements.length; i++)
 		{
 			var element = form.elements[i];
 			if (typeof element.name === "undefined" || element.name === null || !element.name) continue;
-			
+
 			// No need to add the default values for ordering, to the URL
 			if (element.name=='filter_order' && element.value=='i.title') continue;
 			if (element.name=='filter_order_Dir' && element.value=='ASC') continue;
-			
+
 			var matches = element.name.match(/^(filter.*|cids|letter|clayout|limit|orderby|orderby_2nd|listall|q|searchword|p|searchphrase|areas\[\]|contenttypes\[\]|txtflds|o|ordering)$/);
 			if (!matches || element.value == '') continue;
 
@@ -107,7 +107,7 @@
 					continue;
 				}
 			}
-			
+
 			if ( element.type=='select-multiple' )
 			{
 				for (var p=0; p < element.length; p++)
@@ -133,18 +133,24 @@
 		}
 
 		var fc_uid = fc_getCookie('fc_uid');
-		if (fc_uid != '')
+		if (extra_action)
 		{
-			extra_action += var_sep + 'cc' + '=' +fc_uid;
+      if (fc_uid != '')
+  			extra_action += var_sep + 'cc' + '=' + fc_uid;
+      else
+  			extra_action += var_sep + 'cc' + '=' + 'p';
 		}
 		form.action = fcform_action + extra_action;  //alert(form.action);
-		
+
 		if (typeof postprep !== "undefined" && postprep !== null && postprep!=0)
 		{
 			if (postprep==2)
 			{
 				var fc_filter_form_blocker = jQuery("#fc_filter_form_blocker");
-				form.submit( task );
+				if (extra_action === '' && !!!task)
+					window.location.href = fcform_action;
+				else
+					form.submit( task );
 				if (fc_filter_form_blocker)
 				{
 					fc_filter_form_blocker.css("display", "block");
@@ -158,7 +164,7 @@
 			}
 		}
 	}
-	
+
 	function adminFormClearFilters (form)
 	{
 		for(i=0; i<form.elements.length; i++)
@@ -180,7 +186,7 @@
 			}
 		}
 	}
-	
+
 	function fc_toggleClass(ele, cls, fc_all) {
 		var inputs = ele.parentNode.parentNode.getElementsByTagName('input');
 		var input_0 = jQuery(inputs[0]);
@@ -215,7 +221,7 @@
 		}
 		//alert('done fc_toggleClass()');
 	}
-	
+
 	function fc_toggleClassGrp(ele, cls, fc_all) {
 		var inputs = ele.parentNode.parentNode.getElementsByTagName('input');
 		var input_0 = jQuery(inputs[0]);
@@ -260,7 +266,7 @@ jQuery(document).ready(function() {
 	jQuery.expr[':'].contains_ci_fc = function(el,i,txt){
 		return (el.textContent || el.innerText || "").toUpperCase().indexOf(txt[3].toUpperCase()) >= 0;
 	};
-	
+
 	// Add instant text type filter to lists
 	jQuery('div.fc_list_filter_wrapper').each(function() {
 		var list = jQuery(this).find('ul:first');
@@ -268,7 +274,7 @@ jQuery(document).ready(function() {
 		var form = jQuery("<form>").attr({"class":"fc_instant_filter", "action":"#"}),
 		input = jQuery("<input>").attr({"class":"fc_field_filter fc_label_internal fc_instant_filter fc_autosubmit_exclude", "type":"text", "data-fc_label_text":Joomla.JText._('FLEXI_TYPE_TO_FILTER')});
 		jQuery(form).append(input).insertBefore(this);
-	
+
 		jQuery(input)
 		.change( function () {
 			var filter = jQuery(this).val();
@@ -284,7 +290,7 @@ jQuery(document).ready(function() {
 			jQuery(this).change();
 		});
 	});
-	
+
 
 	// Initialize internal labels
 	jQuery('input.fc_label_internal').each(function() {
@@ -293,15 +299,15 @@ jQuery(document).ready(function() {
 		if (!fc_label_text) fc_label_text = el.attr('fc_label_text');
 		if (!fc_label_text) return;
 		var _label = (fc_label_text.length >= 27) ? fc_label_text.substring(0, 25) + '...' : fc_label_text;
-		
+
 		el.before(jQuery('<span/>', {
 			'class': 'fc_has_inner_label fc_has_inner_label_input',
 			'text': _label
 		}));
 		if (el.val().length > 0) el.prev().hide();
 	});
-	
-	
+
+
 	jQuery('input.fc_label_internal').bind('focus', function() {
 		var el = jQuery(this);
 		var fc_label_text = el.attr('data-fc_label_text');
@@ -314,12 +320,12 @@ jQuery(document).ready(function() {
 		var fc_label_text = el.attr('data-fc_label_text');
 		if (!fc_label_text) fc_label_text = el.attr('fc_label_text');
 		if (!fc_label_text) return;
-		
+
 		if (event.type=='blur') {
 			var previous_value = el.attr('data-previous_value');
 			if ( typeof previous_value !== "undefined" && previous_value != el.val())  el.trigger('change');
 		}
-		
+
 		if ( el.val().length ) {
 			el.prev().hide();
 			el.css("opacity", "1");
@@ -382,9 +388,9 @@ jQuery(document).ready(function() {
 			return oldFuncResult;
 		}
 	}
-	
+
 	var fc_select_pageSize = 10;
-	
+
 	// add Simple text search autocomplete
 	if (typeof jQuery.ui != 'undefined' && typeof jQuery.ui.autocomplete==='function') {
 		var theElements = jQuery("input.fc_index_complete_simple");
@@ -455,7 +461,7 @@ jQuery(document).ready(function() {
 			minimumInputLength: 1,
 			separator: " ",
 			allowClear: true,
-		
+
 			initSelection : function (element, callback) {
 				var data = [];
 				jQuery(element.val().split(" ")).each(function () {
@@ -463,7 +469,7 @@ jQuery(document).ready(function() {
 				});
 				callback(data);
 			},
-		
+
 			ajax: {
 				quietMillis: 200,
 				url: (jroot_url_fc + "components/com_flexicontent/tasks/core.php"),
@@ -502,6 +508,8 @@ jQuery(document).ready(function() {
 		'</div>'
 	);
 
+
+
 	fc_recalculateWindow();
 });
 
@@ -509,21 +517,21 @@ jQuery(document).ready(function() {
 // recalculate window width/height and window scrollbars
 function fc_recalculateWindow()
 {
-	// Set these to hidden to force scrollbar recalculation when we set to auto	
+	// Set these to hidden to force scrollbar recalculation when we set to auto
 	/*document.documentElement.style.overflow = "hidden";
 	document.body.style.overflow = "hidden";
-	
+
 	// make sure widht & height is automatic
 	document.documentElement.style.height = "auto";
 	document.documentElement.style.width  = "auto";
 	document.body.style.height = "auto";
 	document.body.style.width  = "auto";
-	
+
 	setTimeout(function() {
 		document.documentElement.style.overflow = "";  // firefox, chrome, ie11+
 		document.body.style.overflow = "";
 	}, 100);*/
-	
+
 	// reset popup overlay containers ... TODO add more ?
 	jQuery('#OverlayContainer').css("height", jQuery('body').css('height'));
 }
@@ -540,10 +548,10 @@ function fc_replaceUrlParam(url, paramName, paramValue)
 
 
 jQuery(document).ready(function () {
-	
+
 	var cc = (typeof FC_URL_VARS !="undefined" && 'cc' in FC_URL_VARS ? FC_URL_VARS['cc']: '');
 	var fc_uid = fc_getCookie('fc_uid');
-	
+
 	if (cc!='' && fc_uid!=cc)
 	{
 		var staleUrl = window.location.href;
