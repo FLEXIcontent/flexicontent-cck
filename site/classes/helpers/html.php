@@ -177,7 +177,7 @@ class flexicontent_html
 		// Get global include folders
 		if ($check_global) {
 			if ($less_folders===null) {
-				$JTEMPLATE_SITE = JPATH_SITE.'/templates/'.(!$app->isClient('administrator') ? $app->getTemplate() : JFactory::getDbo()->setQuery("SELECT template FROM #__template_styles WHERE client_id = 0 AND home = 1")->loadResult());
+				$JTEMPLATE_SITE = flexicontent_html::getSiteTemplate(true);
 				$less_folders = JComponentHelper::getParams('com_flexicontent')->get('less_folders', 'JPATH_COMPONENT_SITE/assets/less/ :: JTEMPLATE_SITE/less/com_flexicontent/ ::');
 				$_reps = array(
 					'JPATH_COMPONENT_SITE' => JPATH_SITE.DS.'components'.DS.'com_flexicontent', 'JPATH_COMPONENT_ADMINISTRATOR' => JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent',
@@ -6005,42 +6005,66 @@ class flexicontent_html
 			return '';
 		}
 	}
+	
+	
+	// Get site template full, or name only
+	public static function getSiteTemplate($full_path = false)
+	{
+		static $site_template, $site_template_full_path;
 
+		if ($site_template === null)
+		{
+			// This does not work in backend because JPATH_THEMES is set to backend folder and folder exists check fails ...
+			//$site_template = CMSApplication::getInstance('site')->getTemplate();
+
+			$app = JFactory::getApplication();
+			$db  = JFactory::getDbo();
+			$site_template = $app->isClient('site')
+				? $app->getTemplate()
+				: $db->setQuery('SELECT template FROM #__template_styles WHERE client_id = 0 AND home = 1')->loadResult();
+			$site_template_full_path = JPath::clean(JPATH_SITE . '/templates/' . $site_template);
+		}
+
+		return $full_path ? $site_template_full_path : $site_template;
+	}
 
 	// Get SEF url regardless of being in backend / frontend
 	public static function getSefUrl($url, $xhtml = true, $ssl = null)
 	{
-		static $site_router, $isAdmin, $isSH404SEF;
-
-		//$url = JRoute::link('site', $url);
-		//return $url;
+		static $site_router, $site_instance, $isAdmin, $isSH404SEF, $useSiteApp;
+		
+		/**
+		 * J4 case
+		 */
 
 		if (FLEXI_J40GE)
 		{
-			$isAdmin = JFactory::getApplication()->isClient('administrator');
+			// This also works in J4 
+			// return $url = JRoute::link('site', $url);
 
-			$router = Router::getInstance('site');
+			$router = Router::getInstance('site');  // ALTERNATIVE: CMSApplication::getInstance('site')->getRouter('site');
 			$url = $router->build($url);
 			$url = $url->toString();
-
-			if ($isAdmin)
-			{
-				$url = str_replace(JUri::base(true), JUri::root(true), $url);
-			}
 
 			return $url;
 		}
 
+		
+		/**
+		 * J3 case
+		 */
+
 		// Get frontend route instance if we are in the backend and SH404SEF is not installed
 		if ($site_router === null)
 		{
-			$isAdmin = JFactory::getApplication()->isClient('administrator');
-			$isSH404SEF  = defined('SH404SEF_IS_RUNNING') && JFactory::getConfig()->get('sef');
-			// Do not merge the following 2 statements (site_instance, site_router), PHP 5.6 and lower cannot parse 2 consequent operators ::
-			$site_instance = $isAdmin && !$isSH404SEF
-				? (FLEXI_J40GE ? CMSApplication::getInstance('site') : JApplication::getInstance('site'))
+			$isAdmin    = JFactory::getApplication()->isClient('administrator');
+			$isSH404SEF = defined('SH404SEF_IS_RUNNING') && JFactory::getConfig()->get('sef');
+			$useSiteApp = $isAdmin; // && $isSH404SEF;
+
+			$site_instance = $useSiteApp
+				? JApplication::getInstance('site')   // In J4 use CMSApplication::getInstance('site')
 				: JFactory::getApplication();
-			$site_router = $site_instance::getRouter();
+			$site_router = $site_instance->getRouter('site');
 		}
 
 		if (!is_array($url) && (strpos($url, '&') !== 0) && (strpos($url, 'index.php') !== 0))
@@ -6048,14 +6072,8 @@ class flexicontent_html
 			return $url;
 		}
 
-		// Force application to the site app if we are in the backend
-		if ( $isAdmin && !$isSH404SEF )  JFactory::$application = FLEXI_J40GE ? CMSApplication::getInstance('site') : JApplication::getInstance('site');
-
 		// Build route
 		$uri = $site_router->build($url);
-
-		// Restore application to the admin app if we are in the backend
-		if  ( $isAdmin && !$isSH404SEF )  JFactory::$application = FLEXI_J40GE ? CMSApplication::getInstance('administrator') : JApplication::getInstance('administrator');
 
 		$scheme = array('path', 'query', 'fragment');
 
@@ -6093,8 +6111,11 @@ class flexicontent_html
 			$url = htmlspecialchars($url, ENT_COMPAT, 'UTF-8');
 		}
 
-		// Check if we are in the backend again and remove administrator from URL as it is added even though we've set the application to the site app
-		if ($isAdmin)
+		/**
+		 * Needed in older Joomla versions like J3.7 (and maybe for J3.8, J3.9). Check if we are in the backend again
+		 * and remove '/administrator' from URL as it is added even though we've set the application to the site app
+		 */
+		if ($useSiteApp)
 		{
 			$url = str_replace(JUri::base(true), JUri::root(true), $url);
 		}

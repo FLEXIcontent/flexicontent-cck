@@ -1882,7 +1882,6 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 			// Create the archive
 			echo JText::_('FLEXI_SEND_LANGUAGE_CREATING_ARCHIVE')."<br>";
 
-			$app = JFactory::getApplication('administrator');
 			$files = array();
 			foreach ($fileslist as $i => $filename) {
 				$files[$i]=array();

@@ -4072,7 +4072,8 @@ class FlexicontentFields
 
 		if ($template === null)
 		{
-			$template = JFactory::getApplication('site')->getTemplate();
+			// Get frontend ('site') Joomla template name
+			$template = flexicontent_html::getSiteTemplate();
 		}
 
 		$layouts_path_1 = JPATH_ROOT . '/templates/' . $template . '/html/layouts/com_flexicontent/items_list_filters';

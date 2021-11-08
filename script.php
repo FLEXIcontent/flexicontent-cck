@@ -1777,8 +1777,9 @@ class com_flexicontentInstallerScript
 					<td class="key" style="font-size:11px;">Remove template overrides</td>
 					<td>
 						<?php
-						$admin_tmpl = JFactory::getApplication()->getTemplate();
-						$site_tmpl  = JFactory::getApplication('site')->getTemplate();
+						// Get DEFAULT backend ('administrator') and frontend ('site') Joomla template names
+						$admin_tmpl = $app->getTemplate();
+						$site_tmpl  = $db->setQuery('SELECT template FROM #__template_styles WHERE client_id = 0 AND home = 1')->loadResult();
 
 						$tmpl_override_files = array(
 							JPATH_ADMINISTRATOR . '/templates/' . $admin_tmpl . '/html/com_media/images/default_fc.php',

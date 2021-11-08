@@ -825,7 +825,7 @@ abstract class FCModelAdmin extends JModelAdmin
 	 */
 	protected function populateState()
 	{
-		$app = JFactory::getApplication('administrator');
+		$app = JFactory::getApplication();
 
 		// Set parent_id into state (later ignored if not this record type has no such property)
 		$parentId = $app->input->getInt('parent_id');

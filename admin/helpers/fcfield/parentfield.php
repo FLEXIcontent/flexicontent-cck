@@ -121,7 +121,7 @@ class FCField extends JPlugin
 
 			if (!$plg_enabled)
 			{
-				$self::$fcProPlg = false;
+				self::$fcProPlg = false;
 
 				if (file_exists($plgPath))
 				{
@@ -473,7 +473,8 @@ class FCField extends JPlugin
 
 		if ($template === null)
 		{
-			$template = JFactory::getApplication('site')->getTemplate();
+			// Get frontend template in case the field is using a layout override in the frontend template folder
+			$template = flexicontent_html::getSiteTemplate();
 		}
 
 		// Get the template and layout name from the string if string contains ':' (aka folder seperators)
