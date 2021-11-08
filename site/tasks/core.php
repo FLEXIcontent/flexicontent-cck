@@ -1,5 +1,6 @@
 <?php
 use Joomla\String\StringHelper;
+//use Joomla\CMS\Application\CMSApplication;
 
 if (!defined('JPATH_BASE'))
 {
@@ -40,7 +41,6 @@ class FlexicontentTasksCore
 		require_once JPATH_BASE . '/includes/defines.php';
 		require_once JPATH_BASE . '/includes/framework.php';
 
-		// Instantiate the application.
 		$is_admin    = preg_match('/\/administrator\//', isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : '');
 		$client_name = $is_admin ? 'administrator' : 'site';
 
@@ -50,6 +50,9 @@ class FlexicontentTasksCore
 			define('FLEXI_J40GE', version_compare( $jversion->getShortVersion(), '3.99.99', 'g' ) );
 		}
 
+		/**
+		 * Instantiate the application.
+		 */
 		if (!FLEXI_J40GE)
 		{
 			$app = JFactory::getApplication($client_name);
@@ -57,6 +60,10 @@ class FlexicontentTasksCore
 		}
 		else
 		{
+			// Alternative is (untested)
+			//$app = CMSApplication::getInstance($client_name);
+			//$app->initialise();
+
 			// Boot the DI container
 			$container = \Joomla\CMS\Factory::getContainer();
 

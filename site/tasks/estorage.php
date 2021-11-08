@@ -1,6 +1,25 @@
 <?php
 use Joomla\String\StringHelper;
 
+/**
+ * J4 CLI
+ */
+use Joomla\CMS\Application\CMSApplication;      // This is for web request, does not work with CLI (command line interface)
+use Joomla\CMS\Application\CliApplication;      // This is abstract class, we cannot use it
+use Joomla\CMS\Application\ConsoleApplication;  // ... we can use this, it is for CLI and it is non-abstract
+
+
+/**
+ * Check we are running from command line interface (CLI)
+ */
+if (php_sapi_name() !== 'cli')
+{
+	die('Direct call not allowed');
+}
+
+/**
+ * Define JPATH_BASE
+ */
 if (!defined('JPATH_BASE'))
 {
 	define('_JEXEC', 1);
@@ -20,16 +39,24 @@ if (!defined('JPATH_BASE'))
 	}
 }
 
+
+/**
+ * Create the instance of our class
+ * and execute the "work" task(s)
+ */
 $task = new FlexicontentCronTasks();
+$task->transferFiles();
+
 
 class FlexicontentCronTasks
 {
 	var $option = 'com_flexicontent';
+	var $app    = null;
 
 	/**
 	 * Constructor
 	 *
-	 * @since 3.1.2
+	 * @since 4.0
 	 */
 	function __construct()
 	{
@@ -40,22 +67,63 @@ class FlexicontentCronTasks
 		require_once JPATH_BASE . '/includes/defines.php';
 		require_once JPATH_BASE . '/includes/framework.php';
 
-		$is_admin = preg_match('/\/administrator\//', @$_SERVER['HTTP_REFERER']);
+		$is_admin    = preg_match('/\/administrator\//', isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : '');
+		$client_name = $is_admin ? 'administrator' : 'site';
 
-		// Instantiate the application.
-		$app = JFactory::getApplication($is_admin ? 'administrator' : 'site');
-		$app->initialise();
-
-		if (php_sapi_name() !== 'cli')
+		if (!defined('FLEXI_J40GE'))
 		{
-			die('Direct call not allowed');
+			$jversion = new JVersion;
+			define('FLEXI_J40GE', version_compare( $jversion->getShortVersion(), '3.99.99', 'g' ) );
+		}
+
+		/**
+		 * Instantiate the application.
+		 */
+		if (!FLEXI_J40GE)
+		{
+			$app = JFactory::getApplication($client_name);
+			$app->initialise();
+		}
+		else
+		{
+			/**
+			 * None of the following 3 options works
+			 */
+			//$app = CMSApplication::getInstance($client_name);
+			//$app = new CliApplication();
+			//$app = new ConsoleApplication();  // This needs parameters ...
+			//$app->initialise();
+
+			// Boot the DI container
+			$container = \Joomla\CMS\Factory::getContainer();
+
+			$container->alias('session', 'session.cli')
+				->alias('JSession', 'session.cli')
+				->alias(\Joomla\CMS\Session\Session::class, 'session.cli')
+				->alias(\Joomla\Session\Session::class, 'session.cli')
+				->alias(\Joomla\Session\SessionInterface::class, 'session.cli');
+	
+			// Instantiate the application.
+			$app = $container->get(\Joomla\CMS\Application\ConsoleApplication::class);
+
+			// Alternative to use the abstract class CliApplication ...
+			//$_SERVER['SCRIPT_NAME'] = basename($_SERVER['SCRIPT_NAME']);
+			//$_SERVER['HTTP_HOST'] = '';
+			//$app = $container->get(\Joomla\CMS\Application\CliApplication::class);
+
+			// Set the application as global app
+			\Joomla\CMS\Factory::$application = $app;
 		}
 
 		// Get Flexicontent constants
 		require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/defineconstants.php';
 
 		$this->_setExecConfig();
+	}
 
+
+	public function transferFiles()
+	{
 		$log_filename = 'cron_estorage.php';
 		jimport('joomla.log.log');
 		JLog::addLogger(
@@ -68,7 +136,6 @@ class FlexicontentCronTasks
 		);
 
 		$db  = JFactory::getDbo();
-		$app = JFactory::getApplication();
 
 
 		/**
