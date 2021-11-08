@@ -50,36 +50,46 @@ class FlexicontentHelperRoute
 		// Get component
 		$component = JComponentHelper::getComponent('com_flexicontent');
 
+		// Get frontend menu items
+		$menus = JFactory::getApplication()->getMenu('site', array());
 
-		// Get menu items pointing to the Flexicontent component
-		// NOTE:
-		//  -- In J1.5 the static method JSite::getMenu() will give an error (in backend), and also an error in J3.2+
-		//     while JFactory::getApplication('site')->getMenu() will not return the frontend menus
-		$menus = JFactory::getApplication()->getMenu('site', array());   // this will work in J1.5 backend too !!!
-
+		/**
+		 * Limit to flexicontent component
+		 */
 		$attribs = array('component_id');
 		$values  = array($component->id);
 
-		// Limit to given language and ... to language ALL ('*')
+		/**
+		 * Limit to given language and ... to language ALL ('*')
+		 */
 		if ($language != '*')
 		{
 			$attribs[] = 'language';
 			$values[]  = array($language, '*');
 		}
 
-		// Getting menu items regardless language
-		// A. If language filtering is enabled,  then menu items with currently active language - OR - language '*'
-		// B. If language filtering is disabled, then menu items of any language are returned
+		/**
+		 * Getting menu items regardless language
+		 * A. If language filtering is enabled,  then menu items with currently active language - OR - language '*'
+		 * B. If language filtering is disabled, then menu items of any language are returned
+		 */
 		else ;
 
+		/**
+		 * Get frontend menu items pointing to the Flexicontent component and of language selected above
+		 */
 		$_menuitems = $menus->getItems($attribs, $values);
 
-		// Assign menu item objects to per language array, and also index by menu id
+		/**
+		 * Assign menu item objects to per language array, and also index by menu id
+		 */
 		self::$menuitems[$language] = array();
 		if ($_menuitems) foreach ($_menuitems as $menuitem)
 		{
-			// We do not need to check and skip menu items of non-allowed access level, since
-			// filtering by access levels of current user, is already done by JMenuSite::getItems()
+			/**
+			 * We do not need to check and skip menu items of non-allowed access level, since
+			 * filtering by access levels of current user, is already done by JMenuSite::getItems()
+			 */
 
 			// Index by menu id
 			self::$menuitems[$language][$menuitem->id] = $menuitem;
@@ -96,8 +106,7 @@ class FlexicontentHelperRoute
 	{
 		static $active = null;
 
-		$menus = JFactory::getApplication()->getMenu('site', array());   // this will work in J1.5 backend too !!!
-		$active = $menus->getActive();
+		$active = JFactory::getApplication()->getMenu('site', array())->getActive();
 
 		if (!$active || !isset($active->query['option']) || $active->query['option'] !== 'com_flexicontent')
 		{
@@ -125,9 +134,6 @@ class FlexicontentHelperRoute
 			? JComponentHelper::getParams('com_languages')->get('site', 'en-GB')
 			: JFactory::getLanguage()->getTag();
 
-		// NOTE: In J1.5 the static method JSite::getMenu() will give an error, while JFactory::getApplication('site')->getMenu() will not return the frontend menus
-		$menus = JFactory::getApplication()->getMenu('site', array());   // this will work in J1.5 backend too !!!
-
 		// Get preference for default menu item
 		$params = JComponentHelper::getParams('com_flexicontent');
 		$default_menuitem_preference = $params->get('default_menuitem_preference', 0);
@@ -136,10 +142,10 @@ class FlexicontentHelperRoute
 		{
 		case 1:
 			// Try to use ACTIVE (current) menu item if pointing to Flexicontent, (if so configure in global options)
-			$menu = $menus->getActive();
+			$menu = FlexicontentHelperRoute::_getActiveFlexiMenuitem();
 
 			// Check that (a) it exists and is active (b) points to com_flexicontent
-			if ($menu && isset($menu->query['option']) && $menu->query['option'] === 'com_flexicontent' )
+			if ($menu)
 			{
 				// Check language, checking access is not needed as it was done already above, by the JMenu::getItem()
 				$item_matches = $current_language === '*' || in_array($menu->language, array('*', $current_language)) || !JLanguageMultilang::isEnabled();
@@ -179,9 +185,6 @@ class FlexicontentHelperRoute
 		$current_language = JFactory::getApplication()->isClient('administrator')
 			? JComponentHelper::getParams('com_languages')->get('site', 'en-GB')
 			: JFactory::getLanguage()->getTag();
-
-		// NOTE: In J1.5 the static method JSite::getMenu() will give an error, while JFactory::getApplication('site')->getMenu() will not return the frontend menus
-		$menus = JFactory::getApplication()->getMenu('site', array());   // this will work in J1.5 backend too !!!
 
 		// Get preference for default menu item
 		$params = JComponentHelper::getParams('com_flexicontent');
