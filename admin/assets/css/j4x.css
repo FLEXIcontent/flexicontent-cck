@@ -474,10 +474,12 @@ a.btn.btn-small,
 	padding: inherit;
 }
 div.statetoggler {
-	padding: 13px 12px !important;
+	padding: 13px 12px 12px 12px !important;
 	width: auto;
 	line-height: inherit;
 	box-sizing: content-box;
+	border-top-right-radius: 0 !important;
+	border-bottom-right-radius: 0 !important;
 }
 .flexicontent *:not(.input-append):not(.input-prepend):not(.input-group) > select:not(.custom-select) {
 	padding: 11px;
@@ -527,7 +529,8 @@ a.featured.ntxt.btn.btn-sm.btn-outline-info.hasTooltip {
 }
 a.fc-preview-btn.ntxt.btn-outline-info.btn.btn-sm.hasTooltip {
 	min-width: 56px;
-	padding-top: 12px !important;
+	padding-top: 11px !important;
+	padding-bottom: 11px !important;
 }
 .fa-stack,
 .icon-stack {
@@ -684,10 +687,13 @@ table.fcmanlist tbody tr.row1 td {
 	background: none repeat scroll 0 0 #FFFFFF;
 }
 .input-append .add-on,
-.input-prepend .add-on {
+.input-prepend .add-on,
+#flexicontent .fc-xpended-btns > [class^="fcfield-"]:not(.add-on):not(.input-group-addon):not(.btn),
+#flexicontent .fc-xpended-btns > [class*=" fcfield-"]:not(.add-on):not(.input-group-addon):not(.btn),
+#flexicontent .fc-xpended-btns > .fcfield-button-add:not(.add-on):not(.input-group-addon) a {
 	height: 18px;
 	min-width: 16px;
-	border: 2px solid var(--template-bg-dark-20);
+	border: 2px solid var(--template-bg-dark-20) !important;
 	text-align: center;
 }
 .input-prepend.input-append .add-on:first-child,
@@ -709,10 +715,70 @@ table.fcmanlist tbody tr.row1 td {
 #flexicontent div [class*=" fcfield-"].fcfont-icon,
 #flexicontent ul.fcfield-sortables > li [class^="fcfield-"].fcfont-icon,
 #flexicontent ul.fcfield-sortables > li [class*=" fcfield-"].fcfont-icon {
-	margin: 0px -6px 0px 0px;
+	margin: 0px -6px -1px 0px !important;
+	background: none;
 }
 #flexicontent ul.fcfield-sortables > li > * {
 	vertical-align: middle !important;
+}
+#flexicontent .fc-xpended-btns > [class^="fcfield-"]:not(.add-on):not(.input-group-addon):not(.btn),
+#flexicontent .fc-xpended-btns > [class*=" fcfield-"]:not(.add-on):not(.input-group-addon):not(.btn),
+#flexicontent .fc-xpended-btns > .fcfield-button-add:not(.add-on):not(.input-group-addon) a {
+	font-family: 'Roboto' !important;
+}
+#flexicontent div div [class^="fcfield-"].fcfont-icon:before,
+#flexicontent div div [class*=" fcfield-"].fcfont-icon:before,
+#flexicontent div div [class^="fcfield-"].fcfont-icon:after,
+#flexicontent div div [class*=" fcfield-"].fcfont-icon:after,
+#flexicontent div ul.fcfield-sortables > li [class^="fcfield-"].fcfont-icon:before,
+#flexicontent div ul.fcfield-sortables > li [class*=" fcfield-"].fcfont-icon:before,
+#flexicontent div ul.fcfield-sortables > li [class^="fcfield-"].fcfont-icon:after,
+#flexicontent div ul.fcfield-sortables > li [class*=" fcfield-"].fcfont-icon:after {
+	font-family: 'Font Awesome 5 Free' !important;
+	font-size: 1.4em;
+}
+#flexicontent div .fcfield-drag-handle.fcfont-icon:before {
+	content: "\f0b2";
+}
+#flexicontent div .fcfield-delvalue.fcfont-icon:before {
+	content: "\f2ed";
+}
+#flexicontent div .fcfield-disablevalue.fcfont-icon:before {
+	content: "\f146";
+}
+#flexicontent div .fcfield-insertvalue.fc_after.fcfont-icon:before {
+	content: "\f067";
+	font-size: 1em !important;
+	margin-right: 4px !important;
+}
+#flexicontent div .fcfield-enablevalue.fcfont-icon:before {
+	content: "\f044";
+}
+#flexicontent div .fcfield-insertvalue.fc_before.fcfont-icon:before {
+	content: "\f3e5";
+}
+#flexicontent div .fcfield-insertvalue.fc_after.fcfont-icon:after {
+	content: "\f064";
+}
+#flexicontent div .fcfield-insertvalue.fc_before.fcfont-icon:after {
+	content: "\f067";
+	font-size: 1em !important;
+	margin-left: 4px !important;
+}
+#flexicontent div .fcfield-uploadvalue.fcfont-icon:before {
+	content: "\f093";
+}
+#flexicontent div .fc-files-modal-link.fcfont-icon:before {
+	content: "\f002";
+}
+#flexicontent div .fcfield-clearvalue.fcfont-icon:before {
+	content: "\f12d";
+}
+#flexicontent div .fcfield-addvalue.fcfont-icon:before {
+	content: "\f302";
+}
+span.btn.btn-sm.toolbar.dropdown-toggle.dropdown-toggle-split.fcfield-addvalue.fcfont-icon.icon.icon- {
+	padding: 4px 7px !important;
 }
 .field-calendar .btn-primary {
 	border: 0 !important;
@@ -723,6 +789,9 @@ label.add-on {
 	padding-right: 14px !important;
 }
 .addrint_autocomplete.pac-target-input {
-	height: 34px !important;
+	height: 36px !important;
 	border: 2px solid var(--template-bg-dark-20);
+}
+label.add-on.fc-lbl-short.addrint_autocomplete-lbl {
+	height: 36px !important;
 }
