@@ -826,3 +826,6 @@ button.ui-button.ui-corner-all.ui-widget.ui-button-icon-only.ui-dialog-titlebar-
 button.ui-button.ui-corner-all.ui-widget.ui-button-icon-only.ui-dialog-titlebar-close:before {
 	content: "x";
 }
+#flexicontent a.btn.btn-small {
+	padding: 8px 11px !important;
+}
