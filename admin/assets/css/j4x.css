@@ -803,28 +803,8 @@ label.add-on.fc-lbl-short.addrint_autocomplete-lbl {
 .ui-dialog-titlebar.ui-corner-all.ui-widget-header.ui-helper-clearfix.ui-draggable-handle {
 	background: #fff;
 	padding: 15px 10px;
-	border-bottom: 1px solid #ccc;
-}
-.ui-dialog-title {
-	font-weight: 500;
-}
-button.ui-button.ui-corner-all.ui-widget.ui-button-icon-only.ui-dialog-titlebar-close {
 	border: 0;
-	margin-right: -10px;
-	position: absolute;
-	right: 21px;
-}
-button.ui-button.ui-corner-all.ui-widget.ui-button-icon-only.ui-dialog-titlebar-close {
-	margin-right: -10px;
-	position: absolute;
-	right: 21px;
-	border-radius: 4px;
-	padding: 5px 17px;
-	color: var(--danger);
-	border: 2px solid var(--danger-border);
-}
-button.ui-button.ui-corner-all.ui-widget.ui-button-icon-only.ui-dialog-titlebar-close:before {
-	content: "x";
+	border-bottom: 1px solid #ccc;
 }
 #flexicontent a.btn.btn-small {
 	padding: 8px 11px !important;
