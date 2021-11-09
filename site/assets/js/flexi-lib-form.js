@@ -212,11 +212,14 @@
 			list.parent().find('.fcrec_cascaded_msg').html('').hide();
 			list.parent().find('.fcrec_cascaded_col').removeClass('fcrec_unused');
 
+			// Frontend case, use root URL
+			var live_site = !!jroot_url_fc ? jroot_url_fc : '';
+
 			list.after( jQuery('<img src="components/com_flexicontent/assets/images/ajax-loader.gif">') );
 			jQuery.ajax({
 				async: false,
 				type: 'GET',
-				url: 'index.php?option=com_flexicontent&task=fields.getIndexedFieldJSON&format=raw',
+				url: live_site + 'index.php?option=com_flexicontent&task=fields.getIndexedFieldJSON&format=raw',
 				data: {
 					field_id: master_field_id
 				},
