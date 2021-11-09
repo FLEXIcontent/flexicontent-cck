@@ -148,9 +148,12 @@
 			ajax_data.lang_code = item_lang;
 		}
 
+    // Frontend case, use root URL
+		var live_site = !!jroot_url_fc ? jroot_url_fc : '';
+
 		jQuery.ajax({
 			type: 'POST',
-			url: 'index.php?option=com_flexicontent&tmpl=component&format=raw',
+			url: live_site + 'index.php?option=com_flexicontent&tmpl=component&format=raw',
 			dataType: 'json',
 			data: ajax_data
 		}).done( function(data) {
