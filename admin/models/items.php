@@ -484,6 +484,7 @@ class FlexicontentModelItems extends FCModelAdminList
 
 		if ( count($not_found_fields) )
 		{
+			$filter_type = $this->getState('filter_type');
 			JFactory::getApplication()->enqueueMessage('Extra column fieldnames: '. implode(', ',array_keys($not_found_fields)) .(!empty($filter_type) ? ' for current type ' : ''). ' were not found, please remove from '.(!empty($filter_type) ? ' type ' : ' component ').' configuration', 'warning');
 		}
 
