@@ -663,6 +663,11 @@ if ($js)
 				<?php
 					$ctype_title = '';
 					$ctype_desc = '';
+					
+					if ((int)$row->parameters->get('auto_value'))
+					{
+						echo '<span class="' . $this->tooltip_class . '" title="Auto created value (custom PHP code)"><span class="icon icon-cogs" style="font-size: 1.2em;"></span></span>';
+					}
 					if ($row->field_type === 'text' || $row->field_type === 'textselect')
 					{
 						$inputmask = $row->parameters->get('inputmask');
