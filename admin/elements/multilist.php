@@ -237,6 +237,11 @@ class JFormFieldMultiList extends JFormFieldGroupedList
 						if ($k=='class') { $label_class = $v; continue; }
 						$input_attribs .= ' ' .$k. '="' .$v. '"';
 					}
+					if (!$label_class)
+					{
+						$label_class = strlen($option->value) ? ($option->value ? "btn btn-outline-success" : "btn btn-outline-danger") : "btn btn-outline-primary";
+						$input_attribs .= ' class="btn-check" ';
+					}
 					$html .= '
 						<input id="'.$element_id.$i.'" type="radio" value="'.$option->value.'" name="'.$fieldname.'" '. $input_attribs . $selected.'/>
 						<label class="'.$label_class.'" for="'.$element_id.$i.'">

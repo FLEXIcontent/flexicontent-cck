@@ -733,6 +733,11 @@ body .btn-group.group-fcmethod .btn:not(.btn-primary) {
 	border-color: #bbb #bbb #a2a2a2;
 	border-image: none;
 }
+body .btn-group.group-fcinfo .btn-check:checked + .btn:not(.btn-primary),
+body .btn-group.group-fcprimary .btn-check:checked + .btn:not(.btn-primary),
+body .btn-group.group-fcsuccess .btn-check:checked + .btn:not(.btn-primary),
+body .btn-group.group-fcwarning .btn-check:checked + .btn:not(.btn-primary),
+body .btn-group.group-fcmethod .btn-check:checked + .btn:not(.btn-primary),
 body .btn-group.group-fcinfo .btn.active:not(.btn-primary),
 body .btn-group.group-fcprimary .btn.active:not(.btn-primary),
 body .btn-group.group-fcsuccess .btn.active:not(.btn-primary),
@@ -744,54 +749,67 @@ body .btn-group.group-fcmethod .btn.active:not(.btn-primary) {
 	box-shadow: 0 2px 4px rgba(0,0,0,0.15) inset, 0 1px 2px rgba(0,0,0,0.15);
 	outline: 0 none;
 }
+body .btn-group.group-fcinfo .btn-check:checked + .btn:not(.btn-primary),
 body .btn-group.group-fcinfo .btn.active:not(.btn-primary) {
 	background-color: #2f96b4;
 	filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#2f96b4,endColorstr=#1f6377);
 	border-color: #2f96b4 #2f96b4 #1f6377;
 }
+body .btn-group.group-fcprimary .btn-check:checked + .btn:not(.btn-primary),
 body .btn-group.group-fcprimary .btn.active:not(.btn-primary) {
 	background-color: #15497c;
 	filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#15497c,endColorstr=#0a223b);
 	border-color: #15497c #15497c #0a223b;
 }
+body .btn-group.group-fcsuccess .btn-check:checked + .btn:not(.btn-primary),
 body .btn-group.group-fcsuccess .btn.active:not(.btn-primary) {
 	background-color: #378137;
 	filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#378137,endColorstr=#204b20);
 	border-color: #378137 #378137 #204b20;
 }
+body .btn-group.group-fcwarning .btn-check:checked + .btn:not(.btn-primary),
 body .btn-group.group-fcwarning .btn.active:not(.btn-primary) {
 	background-color: #faa732;
 	filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#faa732,endColorstr=#ad6704);
 	border-color: #faa732 #faa732 #ad6704;
 }
+body .btn-group.group-fcmethod.fcnoyes input[value=""] + label + input:checked + .btn,
+body .btn-group.group-fcmethod.fcnoyes .btn-check:checked + .btn:not(.btn-primary):first-of-type,
 body .btn-group.group-fcmethod.fcnoyes input[value=""] + label + input + .btn.active,
 body .btn-group.group-fcmethod.fcnoyes .btn.active:not(.btn-primary):first-of-type {
 	background-color: #942a25;
 	filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#942a25,endColorstr=#802420);
 	border-color: #942a25 #942a25 #802420;
 }
+body .btn-group.group-fcmethod.fcnoyes .btn-check:checked + .btn:not(.btn-primary),
 body .btn-group.group-fcmethod.fcnoyes .btn.active:not(.btn-primary) {
 	background-color: #378137;
 	filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#378137,endColorstr=#204b20);
 	border-color: #378137 #378137 #204b20;
 }
+body .btn-group.group-fcmethod.fcoffactive input[value=""] + label + input:checked + .btn,
+body .btn-group.group-fcmethod.fcoffactive .btn-check:checked + .btn:not(.btn-primary):first-of-type,
 body .btn-group.group-fcmethod.fcoffactive input[value=""] + label + input + .btn.active,
 body .btn-group.group-fcmethod.fcoffactive .btn.active:not(.btn-primary):first-of-type {
 	background-color: #444444;
 	filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#444444,endColorstr=#333333);
 	border-color: #444444 #444444 #333333;
 }
+body .btn-group.group-fcmethod.fcoffactive .btn-check:checked + .btn:not(.btn-primary),
 body .btn-group.group-fcmethod.fcoffactive .btn.active:not(.btn-primary) {
 	background-color: #378137;
 	filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#378137,endColorstr=#204b20);
 	border-color: #378137 #378137 #204b20;
 }
+body .btn-group.group-fcmethod input[value=""] + label + input:checked + .btn,
+body .btn-group.group-fcmethod .btn-check:checked + .btn:not(.btn-primary):first-of-type,
 body .btn-group.group-fcmethod input[value=""] + label + input + .btn.active,
 body .btn-group.group-fcmethod .btn.active:not(.btn-primary):first-of-type {
 	background-color: #444444;
 	filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#444444,endColorstr=#333333);
 	border-color: #444444 #444444 #333333;
 }
+body .btn-group.group-fcmethod .btn-check:checked + .btn:not(.btn-primary),
 body .btn-group.group-fcmethod .btn.active:not(.btn-primary) {
 	background-color: #faa732;
 	filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#faa732,endColorstr=#ad6704);
