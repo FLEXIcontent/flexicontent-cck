@@ -112,9 +112,9 @@ $ctrl_users = "task=users.";
 	<hr />
 	<span class="label"><?php echo JText::_( 'FLEXI_ITEMS' ) ?></span>
 
-	<div class="row-fluid">
+	<div class="row-fluid row">
 
-		<div class="span2">
+		<div class="span2 col-2">
 			<a href="index.php?option=com_flexicontent&amp;view=items&amp;filter_state=P" class="btn btn-block btn-large btn-success">
 				<div>
 					<i class="icon-asterisk "></i>
@@ -126,7 +126,7 @@ $ctrl_users = "task=users.";
 			</a>
 		</div>
 
-		<div class="span2">
+		<div class="span2 col-2">
 			<a href="index.php?option=com_flexicontent&amp;view=items&amp;filter_state=U" class="btn btn-block btn-large btn-warning">
 				<div class="white">
 					<i class="icon-file "></i>
@@ -138,7 +138,7 @@ $ctrl_users = "task=users.";
 			</a>
 		</div>
 
-		<div class="span2">
+		<div class="span2 col-2">
 			<a href="index.php?option=com_flexicontent&amp;view=items&amp;filter_state=PE" class="btn btn-block btn-large btn-danger">
 				<div class="white">
 					<i class="icon-trash "></i>
@@ -150,7 +150,7 @@ $ctrl_users = "task=users.";
 			</a>
 		</div>
 
-		<div class="span2">
+		<div class="span2 col-2">
 			<a href="index.php?option=com_flexicontent&amp;view=items&amp;filter_state=IP" class="btn btn-block btn-large btn-primary">
 				<div class="white">
 					<i class="icon-archive "></i>
@@ -162,7 +162,7 @@ $ctrl_users = "task=users.";
 			</a>
 		</div>
 
-		<div class="span2">
+		<div class="span2 col-2">
 			<a href="index.php?option=com_flexicontent&amp;view=items&amp;filter_state=PE" class="btn btn-block btn-large btn-info">
 				<div class="white">
 					<i class="icon-list"></i>
@@ -174,7 +174,7 @@ $ctrl_users = "task=users.";
 			</a>
 		</div>
 
-		<div class="span2">
+		<div class="span2 col-2">
 			<a href="index.php?option=com_flexicontent&amp;view=items&amp;filter_state=IP" class="btn btn-block btn-large btn-inverse">
 				<div class="white">
 					<i class="icon-tag "></i>

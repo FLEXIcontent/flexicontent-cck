@@ -572,7 +572,7 @@ $this->document->addScript(JUri::base(true).'/components/com_flexicontent/assets
 		<div class="tabbertab" id="tabset_layout_edit_files_tab" data-icon-class="icon-signup" >
 			<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_EDIT_LAYOUT_FILES' ); ?></h3>
 			<div class="container-fluid row">
-			<div id="layout-filelist-container" class="span3 col-3" style="margin:0.5%;">
+			<div id="layout-filelist-container" class="span3 col-3" style="">
 				<span class="fcsep_level0" style="margin:0 0 12px 0; background-color:#333; ">
 					<span class="badge"><?php echo JText::_( 'FLEXI_LAYOUT_FILES' ); ?></span>
 				</span>
