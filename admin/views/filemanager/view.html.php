@@ -558,7 +558,7 @@ class FlexicontentViewFilemanager extends FlexicontentViewBaseRecords
 		{
 			$lists['filter_secure'] = $this->getFilterDisplay(array(
 				'label' => $_secure_info . ' ' . JText::_('FLEXI_URL_SECURE'),
-				'html' => '<span class="badge badge-info">' . JText::_($target_dir == 0 ? 'FLEXI_MEDIA_DIR' : 'FLEXI_SECURE_DIR') . '</span>',
+				'html' => '<span class="badge bg-info badge-info">' . JText::_($target_dir == 0 ? 'FLEXI_MEDIA_DIR' : 'FLEXI_SECURE_DIR') . '</span>',
 			));
 		}
 

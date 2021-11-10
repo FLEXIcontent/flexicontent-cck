@@ -2,7 +2,7 @@
 <form>
 	<field name="id" type="hidden" default="0" label="JGLOBAL_FIELD_ID_LABEL" description="JGLOBAL_FIELD_ID_DESC" class="readonly" readonly="true" />
 	<field name="asset_id" type="hidden" filter="unset" />
-	<field name="field_type" type="fieldtypes" default="text" label="FLEXI_FIELD_TYPE" description="FLEXI_FIELD_FIELDTYPE_DESC" labelclass="label label-warning" />
+	<field name="field_type" type="fieldtypes" default="text" label="FLEXI_FIELD_TYPE" description="FLEXI_FIELD_FIELDTYPE_DESC" labelclass="label text-white bg-warning label-warning" />
 	<field name="name" type="text" default="" label="FLEXI_FIELD_NAME" description="FLEXI_FIELD_FIELDNAME_DESC" labelclass="fc-prop-lbl" />
 	<field name="label" type="text" default="" label="FLEXI_FIELD_LABEL" description="FLEXI_FIELD_FIELDLABEL_DESC" required="required" labelclass="fc-prop-lbl" />
 	<field name="ordering" type="fieldordering" default="999" label="Ordering" description="FLEXI_FIELD_ORDER_DESC" labelclass="fc-prop-lbl" />

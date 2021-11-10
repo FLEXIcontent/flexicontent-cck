@@ -25,7 +25,7 @@ if ($use_category_link)
 }
 
 // Item location and total count
-$html .= $show_prevnext_count ? '<span class="fc-pagenav-items-cnt badge badge-info">'.($location+1).' / '.$item_count.'</span>' : '';
+$html .= $show_prevnext_count ? '<span class="fc-pagenav-items-cnt badge bg-info badge-info">'.($location+1).' / '.$item_count.'</span>' : '';
 
 // Next item linking
 if ($field->prev)

@@ -30,7 +30,7 @@ foreach ($values as $value)
 	}
 
 	$html = '
-		<label class="fc_termtitle label label-success">' . $value['title'] . '</label>
+		<label class="fc_termtitle label text-white bg-success label-success">' . $value['title'] . '</label>
 		<div class="fc_termdesc">' . $value['text'] . '</div>';
 
 	// Add prefix / suffix

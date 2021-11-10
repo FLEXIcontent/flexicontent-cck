@@ -973,9 +973,9 @@ class plgSystemFlexisystem extends JPlugin
 
 			if (JDEBUG) JFactory::getApplication()->enqueueMessage(
 				"Form data were serialized, ".
-				'<b class="label">PHP max_input_vars</b> <span class="badge badge-info">'.ini_get('max_input_vars').'</span> '.
+				'<b class="label">PHP max_input_vars</b> <span class="badge bg-info badge-info">'.ini_get('max_input_vars').'</span> '.
 				'<b class="label">Estimated / Actual FORM variables</b>'.
-				'<span class="badge badge-warning">'.$_POST['fcdata_serialized_count'].'</span> / <span class="badge">'.$total_vars.'</span> ',
+				'<span class="badge bg-warning badge-warning">'.$_POST['fcdata_serialized_count'].'</span> / <span class="badge">'.$total_vars.'</span> ',
 				'message'
 			);
 		}

@@ -25,7 +25,7 @@ if($this->check['connect'] == 0) {
 		<thead>
 			<tr>
 				<th colspan="2">
-					<span class="label label-info"><?php echo JText::_( 'FLEXI_VERSION' ); ?></span>
+					<span class="label text-white bg-info label-info"><?php echo JText::_( 'FLEXI_VERSION' ); ?></span>
 				</th>
 			</tr>
 		</thead>
@@ -83,7 +83,7 @@ if($this->check['connect'] == 0) {
 				<span class="label"><?php echo JText::_( 'FLEXI_LATEST_VERSION' ); ?></span>
 			</td>
 			<td>
-				<span class="badge badge-success"><?php echo $this->check['version']; ?></span>
+				<span class="badge bg-success badge-success"><?php echo $this->check['version']; ?></span>
 				&nbsp; <strong><?php echo JText::_( 'FLEXI_RELEASED_DATE' ); ?></strong>:
 				<?php echo $this->check['released']; ?>
 			</td>

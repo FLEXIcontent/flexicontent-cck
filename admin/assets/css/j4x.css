@@ -137,6 +137,11 @@
 .badge.highlight {
 	color: darkred;
 }
+.label,
+.flexicontent label.label {
+	padding: 4px;
+	border-radius: 4px;
+}
 ul.adminformlist {
 	list-style-position: outside !important;
 	list-style-type: none !important;

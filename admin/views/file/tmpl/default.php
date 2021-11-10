@@ -856,7 +856,7 @@ $disabled = $this->row->url ? '' : ' disabled="disabled"';
 
 		<tr>
 			<td class="key">
-				<span class="label label-info"><?php echo JText::_( 'FLEXI_SIZE' ); ?></span> &nbsp;
+				<span class="label text-white bg-info label-info"><?php echo JText::_( 'FLEXI_SIZE' ); ?></span> &nbsp;
 			</td>
 			<td>
 				<?php echo file_exists($this->rowdata->path) ? $this->rowdata->size_display : JText::_('FLEXI_FILE_NOT_FOUND'); ?>
@@ -865,7 +865,7 @@ $disabled = $this->row->url ? '' : ' disabled="disabled"';
 
 		<tr>
 			<td class="key">
-				<span class="label label-info"><?php echo JText::_( 'FLEXI_REAL_PATH' ); ?></span> &nbsp;
+				<span class="label text-white bg-info label-info"><?php echo JText::_( 'FLEXI_REAL_PATH' ); ?></span> &nbsp;
 			</td>
 			<td>
 				<?php echo $this->rowdata->path;?>

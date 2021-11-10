@@ -175,7 +175,7 @@ $this->document->addScriptDeclaration($js);
 					</tr>
 					<tr>
 						<td>
-							<label class="label label-warning" style="vertical-align:middle;">
+							<label class="label text-white bg-warning label-warning" style="vertical-align:middle;">
 								<?php echo JText::_( 'FLEXI_TYPES' ); ?>
 							</label>
 							<?php echo /*FLEXI_J16GE ? $form->getInput('tid') :*/ $this->lists['tid']; ?>

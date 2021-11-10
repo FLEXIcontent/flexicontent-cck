@@ -267,8 +267,8 @@ class FlexicontentControllerTemplates extends FlexicontentControllerBaseAdmin
 			echo '
 			<div class="fc_layout_box_outer">
 				<div class="alert fcpadded fc-iblock" style="">
-					You are editing module via extension: <span class="label label-warning">' . $ext_option . '</span><br/>
-					- If extension does not call Joomla event <span class="label label-warning">onExtensionBeforeSave</span> then custom layout parameters may not be saved
+					You are editing module via extension: <span class="label text-white bg-warning label-warning">' . $ext_option . '</span><br/>
+					- If extension does not call Joomla event <span class="label text-white bg-warning label-warning">onExtensionBeforeSave</span> then custom layout parameters may not be saved
 				</div>
 			</div>';
 		}

@@ -146,7 +146,7 @@ class flexicontent_html
 
 			$result[ $recommended_ok ? 'message' : ($required_ok ? 'notice' : 'warning') ][] = '
 			<span class="fc-php-limits-box">
-				<span class="label label-info">'.$varname.'</span>
+				<span class="label text-white bg-info label-info">'.$varname.'</span>
 				<span class="badge '.$conf_limit_class.'">'.$sys_value.'</span>
 				&nbsp; &nbsp; &nbsp;
 				<span class="fc-php-limits-box">

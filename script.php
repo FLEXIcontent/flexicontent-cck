@@ -127,8 +127,8 @@ class com_flexicontentInstallerScript
 		<ul>
 			<li>
 				' . JText::_('COM_FLEXICONTENT_REQUIRED_PHPVER') . '
-				' . JText::_('COM_FLEXICONTENT_MIN').': <span class="badge badge-info">' . $PHP_VERSION_NEEDED . '</span>
-				' . JText::_('COM_FLEXICONTENT_CURRENT').': <span class="badge badge-success">' . PHP_VERSION . '</span>
+				' . JText::_('COM_FLEXICONTENT_MIN').': <span class="badge bg-info badge-info">' . $PHP_VERSION_NEEDED . '</span>
+				' . JText::_('COM_FLEXICONTENT_CURRENT').': <span class="badge bg-success badge-success">' . PHP_VERSION . '</span>
 			</li>
 		';
 
@@ -144,8 +144,8 @@ class com_flexicontentInstallerScript
 			echo '
 				<li>
 					' . JText::_('COM_FLEXICONTENT_REQUIRED_JVER') . '
-					' . JText::_('COM_FLEXICONTENT_MIN').': <span class="badge badge-info">' . $this->minimum_joomla_release . '</span>
-					' . JText::_('COM_FLEXICONTENT_CURRENT').': <span class="badge badge-success">' . $jversion->getShortVersion() . '</span>
+					' . JText::_('COM_FLEXICONTENT_MIN').': <span class="badge bg-info badge-info">' . $this->minimum_joomla_release . '</span>
+					' . JText::_('COM_FLEXICONTENT_CURRENT').': <span class="badge bg-success badge-success">' . $jversion->getShortVersion() . '</span>
 				</li>';
 		}
 
@@ -156,8 +156,8 @@ class com_flexicontentInstallerScript
 			if ( !$downgrade_allowed && version_compare( $this->release, $this->release_existing, 'l' ) )
 			{
 				$from_to = ''
-					.JText::_('COM_FLEXICONTENT_FROM'). ' <span class="badge badge-info">' .$this->release_existing. '</span> '
-					.JText::_('COM_FLEXICONTENT_TO'). ' <span class="badge badge-warning">' .$this->release. '</span> ';
+					.JText::_('COM_FLEXICONTENT_FROM'). ' <span class="badge bg-info badge-info">' .$this->release_existing. '</span> '
+					.JText::_('COM_FLEXICONTENT_TO'). ' <span class="badge bg-warning badge-warning">' .$this->release. '</span> ';
 				// ?? Abort if the component being installed is not newer than the currently installed version
 				//echo '</ul>';
 				JFactory::getApplication()->enqueueMessage('Can not perform downgrade of FLEXIcontent ' . $from_to, 'warning');
@@ -191,7 +191,7 @@ class com_flexicontentInstallerScript
 		<div class="alert alert-success" style="margin:8px 0px 8px 0px;">'
 			. JText::_('COM_FLEXICONTENT_INSTALLING') . ' '
 			//. JText::_('COM_FLEXICONTENT_VERSION')
-			. ' <span class="badge badge-success">'.$this->release.'</span>
+			. ' <span class="badge bg-success badge-success">'.$this->release.'</span>
 		</div>';
 
 		if ( ! $this->do_extra( $parent ) ) return false;  // Abort installation
@@ -216,16 +216,16 @@ class com_flexicontentInstallerScript
 
 		if ( version_compare( $this->release, $this->release_existing, 'ge' ) ) {
 			echo '
-				<span class="badge badge-success">' . JText::_('COM_FLEXICONTENT_UPGRADING') . '</span>
-				' . JText::_('COM_FLEXICONTENT_FROM') . ' <span class="badge badge-info">' . $this->release_existing . '</span>
-				' . JText::_('COM_FLEXICONTENT_TO')   . ' <span class="badge badge-success">' . $this->release . '</span>';
+				<span class="badge bg-success badge-success">' . JText::_('COM_FLEXICONTENT_UPGRADING') . '</span>
+				' . JText::_('COM_FLEXICONTENT_FROM') . ' <span class="badge bg-info badge-info">' . $this->release_existing . '</span>
+				' . JText::_('COM_FLEXICONTENT_TO')   . ' <span class="badge bg-success badge-success">' . $this->release . '</span>';
 		}
 		else
 		{
 			echo '
-				<span class="badge badge-warning">' . JText::_('COM_FLEXICONTENT_DOWNGRADING') . '</span>
-				' . JText::_('COM_FLEXICONTENT_FROM') . ' <span class="badge badge-info">' . $this->release_existing . '</span>
-				' . JText::_('COM_FLEXICONTENT_TO')   . ' <span class="badge badge-info">' . $this->release . '</span>';
+				<span class="badge bg-warning badge-warning">' . JText::_('COM_FLEXICONTENT_DOWNGRADING') . '</span>
+				' . JText::_('COM_FLEXICONTENT_FROM') . ' <span class="badge bg-info badge-info">' . $this->release_existing . '</span>
+				' . JText::_('COM_FLEXICONTENT_TO')   . ' <span class="badge bg-info badge-info">' . $this->release . '</span>';
 		}
 		echo '</div>';
 
@@ -371,7 +371,7 @@ class com_flexicontentInstallerScript
 							if ($ext['status']===null)
 								$status_class = 'badge';
 							else if ($ext['status'])
-								$status_class = 'badge badge-success';
+								$status_class = 'badge bg-success badge-success';
 							else
 								$status_class = 'badge badge-error';
 							?>
@@ -408,7 +408,7 @@ class com_flexicontentInstallerScript
 				{
 					$extensions[$i]['installer']->abort('<span style="color:black">'.
 						$extensions[$i]['name'] .' '. JText::_($extensions[$i]['type']) .' '. JText::_('COM_FLEXICONTENT_INSTALLED') .':</span>'.
-						' <span class="badge badge-warning">'. JText::_('rolling back').'</span>',
+						' <span class="badge bg-warning badge-warning">'. JText::_('rolling back').'</span>',
 						$extensions[$i]['type']
 					);
 					//$extensions[$i]['status'] = false;
@@ -615,8 +615,8 @@ class com_flexicontentInstallerScript
 							try {
 								$db->execute();
 								echo ($count_rows = $db->getAffectedRows()) ?
-									'<span class="badge badge-success">'.$count_rows.' effected rows </span>' :
-									'<span class="badge badge-info">no changes</span>' ;
+									'<span class="badge bg-success badge-success">'.$count_rows.' effected rows </span>' :
+									'<span class="badge bg-info badge-info">no changes</span>' ;
 							}
 							catch (Exception $e) {
 								echo '<span class="badge badge-error">SQL Error</span> '. $e->getMessage() . '<br/>';
@@ -624,7 +624,7 @@ class com_flexicontentInstallerScript
 							}
 						}
 					}
-					else echo '<span class="badge badge-info">nothing to do</span>';
+					else echo '<span class="badge bg-info badge-info">nothing to do</span>';
 					?>
 					</td>
 				</tr>
@@ -645,8 +645,8 @@ class com_flexicontentInstallerScript
 							try {
 								$db->execute();
 								echo ($count_rows = $db->getAffectedRows()) ?
-									'<span class="badge badge-success">'.$count_rows.' effected rows </span>' :
-									'<span class="badge badge-info">no changes</span>' ;
+									'<span class="badge bg-success badge-success">'.$count_rows.' effected rows </span>' :
+									'<span class="badge bg-info badge-info">no changes</span>' ;
 							}
 							catch (Exception $e) {
 								echo '<span class="badge badge-error">SQL Error</span> '. $e->getMessage() . '<br/>';
@@ -654,7 +654,7 @@ class com_flexicontentInstallerScript
 							}
 						}
 					}
-					else echo '<span class="badge badge-info">nothing to do</span>';
+					else echo '<span class="badge bg-info badge-info">nothing to do</span>';
 					?>
 					</td>
 				</tr>
@@ -912,9 +912,9 @@ class com_flexicontentInstallerScript
 								continue;
 							}
 						}
-						echo '<span class="badge badge-success">table(s) upgraded: '.$upgrade_count.'</span>';
+						echo '<span class="badge bg-success badge-success">table(s) upgraded: '.$upgrade_count.'</span>';
 					}
-					else echo '<span class="badge badge-info">nothing to do</span>';
+					else echo '<span class="badge bg-info badge-info">nothing to do</span>';
 					?>
 					</td>
 				</tr>
@@ -985,10 +985,10 @@ class com_flexicontentInstallerScript
 								continue;
 							}
 						}
-						echo '<span class="badge badge-success">table(s) created / upgraded: '.$upgrade_count.'</span>';
-						if ($upgrade_count) echo ' Please <span class="badge badge-warning">re-index</span> your content';
+						echo '<span class="badge bg-success badge-success">table(s) created / upgraded: '.$upgrade_count.'</span>';
+						if ($upgrade_count) echo ' Please <span class="badge bg-warning badge-warning">re-index</span> your content';
 					}
-					else echo '<span class="badge badge-info">nothing to do</span>';
+					else echo '<span class="badge bg-info badge-info">nothing to do</span>';
 					?>
 					</td>
 				</tr>
@@ -1025,9 +1025,9 @@ class com_flexicontentInstallerScript
 								continue;
 							}
 						}
-						echo '<span class="badge badge-success">table(s) created / upgraded: '.$upgrade_count.'</span>';
+						echo '<span class="badge bg-success badge-success">table(s) created / upgraded: '.$upgrade_count.'</span>';
 					}
-					else echo '<span class="badge badge-info">nothing to do</span>';
+					else echo '<span class="badge bg-info badge-info">nothing to do</span>';
 					?>
 					</td>
 				</tr>
@@ -1110,12 +1110,12 @@ class com_flexicontentInstallerScript
 								continue;
 							}
 						}
-						echo '<span class="badge badge-success">table(s) created / upgraded: '.$upgrade_count.'</span>';
+						echo '<span class="badge bg-success badge-success">table(s) created / upgraded: '.$upgrade_count.'</span>';
 					}
 
 					else
 					{
-						echo '<span class="badge badge-info">nothing to do</span>';
+						echo '<span class="badge bg-info badge-info">nothing to do</span>';
 					}
 					?>
 					</td>
@@ -1185,12 +1185,12 @@ class com_flexicontentInstallerScript
 								continue;
 							}
 						}
-						echo '<span class="badge badge-success">table(s) created / upgraded: '.$upgrade_count.'</span>';
+						echo '<span class="badge bg-success badge-success">table(s) created / upgraded: '.$upgrade_count.'</span>';
 					}
 
 					else
 					{
-						echo '<span class="badge badge-info">nothing to do</span>';
+						echo '<span class="badge bg-info badge-info">nothing to do</span>';
 					}
 					?>
 					</td>
@@ -1252,9 +1252,9 @@ class com_flexicontentInstallerScript
 								continue;
 							}
 						}
-						echo '<span class="badge badge-success">table(s) created / upgraded: '.$upgrade_count.'</span>';
+						echo '<span class="badge bg-success badge-success">table(s) created / upgraded: '.$upgrade_count.'</span>';
 					}
-					else echo '<span class="badge badge-info">nothing to do</span>';
+					else echo '<span class="badge bg-info badge-info">nothing to do</span>';
 					?>
 					</td>
 				</tr>
@@ -1313,9 +1313,9 @@ class com_flexicontentInstallerScript
 								continue;
 							}
 						}
-						echo '<span class="badge badge-success">table(s) created / upgraded: '.$upgrade_count.'</span>';
+						echo '<span class="badge bg-success badge-success">table(s) created / upgraded: '.$upgrade_count.'</span>';
 					}
-					else echo '<span class="badge badge-info">nothing to do</span>';
+					else echo '<span class="badge bg-info badge-info">nothing to do</span>';
 					?>
 					</td>
 				</tr>
@@ -1353,9 +1353,9 @@ class com_flexicontentInstallerScript
 								continue;
 							}
 						}
-						echo '<span class="badge badge-success">table(s) created / upgraded: '.$upgrade_count.'</span>';
+						echo '<span class="badge bg-success badge-success">table(s) created / upgraded: '.$upgrade_count.'</span>';
 					}
-					else echo '<span class="badge badge-info">nothing to do</span>';
+					else echo '<span class="badge bg-info badge-info">nothing to do</span>';
 					?>
 					</td>
 				</tr>
@@ -1379,8 +1379,8 @@ class com_flexicontentInstallerScript
 							try {
 								$db->execute();
 								echo ($count_rows = $db->getAffectedRows()) ?
-									'<span class="badge badge-success">'.$count_rows.' effected rows </span>' :
-									'<span class="badge badge-info">no changes</span>' ;
+									'<span class="badge bg-success badge-success">'.$count_rows.' effected rows </span>' :
+									'<span class="badge bg-info badge-info">no changes</span>' ;
 							}
 							catch (Exception $e) {
 								echo '<span class="badge badge-error">SQL Error</span> '. $e->getMessage() . '<br/>';
@@ -1388,7 +1388,7 @@ class com_flexicontentInstallerScript
 							}
 						}
 					}
-					else echo '<span class="badge badge-info">nothing to do</span>';
+					else echo '<span class="badge bg-info badge-info">nothing to do</span>';
 					?>
 					</td>
 				</tr>
@@ -1446,8 +1446,8 @@ class com_flexicontentInstallerScript
 							try {
 								$db->execute();
 								echo ($count_rows = $db->getAffectedRows()) ?
-									'<span class="badge badge-success">'.$count_rows.' effected rows </span>' :
-									'<span class="badge badge-info">no changes</span>' ;
+									'<span class="badge bg-success badge-success">'.$count_rows.' effected rows </span>' :
+									'<span class="badge bg-info badge-info">no changes</span>' ;
 							}
 							catch (Exception $e) {
 								echo '<span class="badge badge-error">SQL Error</span> '. $e->getMessage() . '<br/>';
@@ -1455,7 +1455,7 @@ class com_flexicontentInstallerScript
 							}
 						}
 					}
-					else echo '<span class="badge badge-info">nothing to do</span>';
+					else echo '<span class="badge bg-info badge-info">nothing to do</span>';
 					?>
 					</td>
 				</tr>
@@ -1614,7 +1614,7 @@ class com_flexicontentInstallerScript
 					<tr class="row<?php echo ($i+1) % 2; ?>">
 						<td class="key" style="font-size:11px;">[<?php echo JText::_($ext['type']); ?>] <?php echo $ext['name']; ?></td>
 						<td>
-							<?php $status_class = $ext['status'] ? 'badge badge-success' : 'badge badge-error'; ?>
+							<?php $status_class = $ext['status'] ? 'badge bg-success badge-success' : 'badge badge-error'; ?>
 							<span class="<?php echo $status_class; ?>"><?php echo $ext['status'] ? JText::_('COM_FLEXICONTENT_UNINSTALLED') : JText::_('uninstall FAILED'); ?></span>
 						</td>
 					</tr>
@@ -1672,10 +1672,10 @@ class com_flexicontentInstallerScript
 								}
 							}
 							if ( $count_rows ) {
-								echo '<span class="badge badge-success">'.JText::_("Comments restored").' ('.$count_rows.' effected rows)</span>';
-							} else echo '<span class="badge badge-info">restoring not needed</span>';
+								echo '<span class="badge bg-success badge-success">'.JText::_("Comments restored").' ('.$count_rows.' effected rows)</span>';
+							} else echo '<span class="badge bg-info badge-info">restoring not needed</span>';
 						}
-						else echo '<span class="badge badge-info">jComments not installed, nothing to do</span>';
+						else echo '<span class="badge bg-info badge-info">jComments not installed, nothing to do</span>';
 						?>
 					</td>
 				</tr>
@@ -1718,7 +1718,7 @@ class com_flexicontentInstallerScript
 							}
 						}
 
-						$status_class = $result==2 ? 'badge badge-success' : 'badge badge-error';
+						$status_class = $result==2 ? 'badge bg-success badge-success' : 'badge badge-error';
 						?>
 						<span class="<?php echo $status_class; ?>"><?php
 						if ($result==2) {
@@ -1762,9 +1762,9 @@ class com_flexicontentInstallerScript
 									continue;
 								}
 							}
-							echo '<span class="badge badge-success">table(s) removed: '.$count_removed.'</span>';
+							echo '<span class="badge bg-success badge-success">table(s) removed: '.$count_removed.'</span>';
 						}
-						else echo '<span class="badge badge-info">nothing to do</span>';
+						else echo '<span class="badge bg-info badge-info">nothing to do</span>';
 						?>
 					</td>
 				</tr>
@@ -1803,9 +1803,9 @@ class com_flexicontentInstallerScript
 									else $count_removed++;
 								}
 							}
-							echo '<span class="badge badge-success">template override(s) removed: ' . $count_removed . '</span>';
+							echo '<span class="badge bg-success badge-success">template override(s) removed: ' . $count_removed . '</span>';
 						}
-						else echo '<span class="badge badge-info">nothing to do</span>';
+						else echo '<span class="badge bg-info badge-info">nothing to do</span>';
 						?>
 					</td>
 				</tr>
@@ -2002,7 +2002,7 @@ class com_flexicontentInstallerScript
 			$installer = new JInstaller();
 
 			$msg[$n] = $installer->uninstall($ext['type'], $ext['id'], (int)$ext['client_id'])
-				? '<br/>'.$msg[$n].', uninstalling plugin: <span class="badge badge-success">success</span> <br/>'
+				? '<br/>'.$msg[$n].', uninstalling plugin: <span class="badge bg-success badge-success">success</span> <br/>'
 				: '<br/>'.$msg[$n].', uninstalling plugin: <span class="badge badge-error">failed</span> <br/>';
 		}
 	}

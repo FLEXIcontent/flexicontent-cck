@@ -492,7 +492,7 @@ class plgFlexicontent_fieldsTermlist extends FCField
 
 			$title = '
 				<div class="fc_termtitle">
-					<label id="'.$elementid_n.'_title-lbl" class="label label-info labeltitle" for="'.$elementid_n.'_title">'.$title_label.'</label>
+					<label id="'.$elementid_n.'_title-lbl" class="label text-white bg-info label-info labeltitle" for="'.$elementid_n.'_title">'.$title_label.'</label>
 					<input class="fcfield_textval termtitle' . $required_class . '" id="'.$elementid_n.'_title" name="'.$fieldname_n.'[title]" type="text" size="'.$title_size.'" '.($title_maxlength ? 'maxlength="'.$title_maxlength.'"' : '').'
 						value="'.htmlspecialchars( @$value['title'], ENT_COMPAT, 'UTF-8' ).'" data-defvals="'.htmlspecialchars( $default_title, ENT_COMPAT, 'UTF-8' ).'"/>
 				</div>';
@@ -511,7 +511,7 @@ class plgFlexicontent_fieldsTermlist extends FCField
 
 			$text = '
 				<div class="fc_termtext">
-					<label id="'.$elementid_n.'_text-lbl" class="label label-info labeltext" for="'.$elementid_n.'_text">'.$value_label.'</label>
+					<label id="'.$elementid_n.'_text-lbl" class="label text-white bg-info label-info labeltext" for="'.$elementid_n.'_text">'.$value_label.'</label>
 					<div class="fcfield_box' . ($required ? ' required_box' : '') . '" data-label_text="'.$field->label.'">
 						'.$text.'
 					</div>

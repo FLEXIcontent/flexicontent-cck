@@ -715,14 +715,14 @@ if ($js)
 			</td>
 
 			<td class="col_ntypes_count center hidden-phone">
-				<?php echo $row->nrassigned ? '<span class="badge badge-info hasTooltip">'.$row->nrassigned.'</span>' : $orphan_warning; ?>
+				<?php echo $row->nrassigned ? '<span class="badge bg-info badge-info hasTooltip">'.$row->nrassigned.'</span>' : $orphan_warning; ?>
 			</td>
 
 			<td class="col_ntypes_list hidden-phone">
 				<?php
 				if (!count($row->content_types))
 				{
-					echo '<span class="badge badge-warning">'.JText::_('FLEXI_NONE').'</span>';
+					echo '<span class="badge bg-warning badge-warning">'.JText::_('FLEXI_NONE').'</span>';
 				}
 				else
 				{

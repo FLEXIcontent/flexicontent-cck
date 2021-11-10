@@ -415,7 +415,7 @@ $ctrl_users = "task=users.";
 								</span>
 							</td>
 							<td style="width:1%" class="center">
-								<span class="badge badge-info"><?php echo $row->hits; ?></span>
+								<span class="badge bg-info badge-info"><?php echo $row->hits; ?></span>
 							</td>
 							<td style="width:34%">
 								<strong><?php echo flexicontent_html::ratingbar( $row ); ?></strong>
@@ -457,7 +457,7 @@ $ctrl_users = "task=users.";
 								</span>
 							</td>
 							<td style="width:1%" class="center">
-								<span class="badge badge-info"><?php echo $row->hits; ?></span>
+								<span class="badge bg-info badge-info"><?php echo $row->hits; ?></span>
 							</td>
 							<td style="width:34%">
 								<strong><?php echo flexicontent_html::ratingbar( $row ); ?></strong>
@@ -501,7 +501,7 @@ $ctrl_users = "task=users.";
 								</span>
 							</td>
 							<td class="center">
-								<span class="badge badge-success"><?php echo $row->favnr; ?></span>
+								<span class="badge bg-success badge-success"><?php echo $row->favnr; ?></span>
 							</td>
 						</tr>
 						<?php $k = 1 - $k; } ?>
@@ -730,7 +730,7 @@ $ctrl_users = "task=users.";
 									</span>
 								</td>
 								<td class="center">
-									<span class="badge badge-success"><?php echo $row->counter; ?></span>
+									<span class="badge bg-success badge-success"><?php echo $row->counter; ?></span>
 								</td>
 							</tr>
 							<?php $k = 1 - $k; } ?>
@@ -767,7 +767,7 @@ $ctrl_users = "task=users.";
 									</span>
 								</td>
 								<td class="center">
-									<span class="badge badge-success"><?php echo $row->counter; ?></span>
+									<span class="badge bg-success badge-success"><?php echo $row->counter; ?></span>
 								</td>
 							</tr>
 							<?php $k = 1 - $k; } ?>

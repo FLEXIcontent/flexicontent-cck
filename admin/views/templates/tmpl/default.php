@@ -105,10 +105,10 @@ $list_total_cols = 8;
 				<th>Configure display of your fields <span class="badge">item</span> view and <span class="badge">multi-item</span> views</th>
 			</tr>
 			<tr>
-				<td><span class="label label-info">ITEM Layout</span> Select this in configuration of <span class="badge">types</span> and (optionally) in  <span class="badge">items</span></td>
+				<td><span class="label text-white bg-info label-info">ITEM Layout</span> Select this in configuration of <span class="badge">types</span> and (optionally) in  <span class="badge">items</span></td>
 			</tr>
 			<tr>
-				<td><span class="label label-info">CATEGORY Layout</span> Select this in configuration of <span class="badge">categories / content lists</span> except for <b>search view</b></td>
+				<td><span class="label text-white bg-info label-info">CATEGORY Layout</span> Select this in configuration of <span class="badge">categories / content lists</span> except for <b>search view</b></td>
 			</tr>
 		</table>
 	</div>
@@ -133,11 +133,11 @@ $list_total_cols = 8;
 			<th class="title" style="text-align:left;"><?php echo JText::_( 'FLEXI_TEMPLATE_NAME' ); ?></th>
 			<th colspan="2" style="text-align: left">
 				<?php echo JText::_( 'FLEXI_SINGLE_CONTENT' ); ?><br/>
-				<span class="label label-info">ITEM Layout</span>
+				<span class="label text-white bg-info label-info">ITEM Layout</span>
 			</th>
 			<th colspan="2" style="text-align: left">
 				<?php echo JText::_( 'FLEXI_CONTENT_LISTS' ); ?><br/>
-				<span class="label label-info">CATEGORY Layout</span>
+				<span class="label text-white bg-info label-info">CATEGORY Layout</span>
 			</th>
 		</tr>
 	</thead>

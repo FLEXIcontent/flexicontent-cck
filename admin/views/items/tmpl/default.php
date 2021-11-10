@@ -1222,15 +1222,15 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 			</td>
 
 			<td class="col_hits center hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
-				<?php echo '<span class="badge badge-info"> ' . ($row->hits ?: 0) . '</span>'; ?>
+				<?php echo '<span class="badge bg-info badge-info"> ' . ($row->hits ?: 0) . '</span>'; ?>
 			</td>
 
 			<td class="col_votes center hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
-				<?php echo '<span class="badge badge-success"> ' . ($row->rating_count ?: 0) . '</span>'; ?>
+				<?php echo '<span class="badge bg-success badge-success"> ' . ($row->rating_count ?: 0) . '</span>'; ?>
 			</td>
 
 			<td class="col_ratings center hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
-				<?php echo '<span class="badge badge-warning"> ' .sprintf('%.0f', (float) $row->rating) .'%</span>'; ?>
+				<?php echo '<span class="badge bg-warning badge-warning"> ' .sprintf('%.0f', (float) $row->rating) .'%</span>'; ?>
 			</td>
 
 			<td class="col_id center hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >

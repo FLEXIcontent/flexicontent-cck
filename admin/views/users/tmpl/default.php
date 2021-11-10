@@ -429,7 +429,7 @@ if ($js)
 			}
 			$registered	= JHtml::_('date', $row->registerDate, 'Y-m-d H:i:s');
 
-			$itemscount = '<span class="badge badge-info" title="'.$view_entry.'">'.$row->itemscount.'</span>';
+			$itemscount = '<span class="badge bg-info badge-info" title="'.$view_entry.'">'.$row->itemscount.'</span>';
 			if ($row->itemscount) {
 				$itemscount = '
 				<a href="index.php?option=com_flexicontent&amp;view=items&amp;filter_catsinstate=99&amp;filter_subcats=1&amp;filter_state=ALL&amp;filter_author='.$row->id.'&amp;fcform=1">

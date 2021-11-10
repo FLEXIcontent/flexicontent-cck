@@ -1160,11 +1160,11 @@ if ($js)
 				<?php endif; ?>
 
 				<?php if (!empty($this->cols['target'])) : ?>
-					<td class="center hidden-phone"><?php echo $row->secure ? '<span class="badge badge-info">' . JText::_('FLEXI_YES') : '<span class="badge">' . JText::_('FLEXI_NO'); ?></span></td>
+					<td class="center hidden-phone"><?php echo $row->secure ? '<span class="badge bg-info badge-info">' . JText::_('FLEXI_YES') : '<span class="badge">' . JText::_('FLEXI_NO'); ?></span></td>
 				<?php endif; ?>
 
 				<?php if (!empty($this->cols['stamp'])) : ?>
-					<td class="center hidden-phone"><?php echo $row->stamp ? '<span class="badge badge-info">' . JText::_('FLEXI_YES') : '<span class="badge">' . JText::_('FLEXI_NO'); ?></span></td>
+					<td class="center hidden-phone"><?php echo $row->stamp ? '<span class="badge bg-info badge-info">' . JText::_('FLEXI_YES') : '<span class="badge">' . JText::_('FLEXI_NO'); ?></span></td>
 				<?php endif; ?>
 
 				<?php if (!empty($this->cols['usage'])) : ?>

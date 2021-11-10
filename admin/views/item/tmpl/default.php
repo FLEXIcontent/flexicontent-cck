@@ -578,7 +578,7 @@ if (isset($this->item->item_translations)) foreach ($this->item->item_translatio
 				if ($field)
 				{
 					$field_description = $field->description ?: JText::_($this->form->getField('type_id')->description);
-					$label_attrs = 'class="' . $tip_class . $lbl_class . ' pull-left label-fcinner label-toplevel'.(!$this->item->type_id ? ' label label-warning' : '').'" title="'.flexicontent_html::getToolTip(null, $field_description, 0, 1).'"';
+					$label_attrs = 'class="' . $tip_class . $lbl_class . ' pull-left label-fcinner label-toplevel'.(!$this->item->type_id ? ' label text-white bg-warning label-warning' : '').'" title="'.flexicontent_html::getToolTip(null, $field_description, 0, 1).'"';
 				}
 				else
 				{
@@ -663,7 +663,7 @@ if (isset($this->item->item_translations)) foreach ($this->item->item_translatio
 					<div class="fcclear"></div>
 					<?php
 						//echo "<br/>".$this->form->getLabel('vstate') . $this->form->getInput('vstate');
-						$label_attrs = 'class="'.$tip_class.' label label-success pull-left label-fcinner" title="'.flexicontent_html::getToolTip('FLEXI_PUBLIC_DOCUMENT_CHANGES', 'FLEXI_PUBLIC_DOCUMENT_CHANGES_DESC', 1, 1).'"';
+						$label_attrs = 'class="'.$tip_class.' label text-white bg-success label-success pull-left label-fcinner" title="'.flexicontent_html::getToolTip('FLEXI_PUBLIC_DOCUMENT_CHANGES', 'FLEXI_PUBLIC_DOCUMENT_CHANGES_DESC', 1, 1).'"';
 					?>
 					<span class="label-fcouter" id="jform_vstate-lbl-outer">
 					<label id="jform_vstate-lbl" data-for="jform_vstate" <?php echo $label_attrs; ?> >
@@ -690,7 +690,7 @@ if (isset($this->item->item_translations)) foreach ($this->item->item_translatio
 			<?php if ($this->subscribers) : ?>
 				<div class="fcclear"></div>
 				<?php
-					$label_attrs = 'class="'.$tip_class.' label label-info pull-left label-fcinner" title="'.flexicontent_html::getToolTip('FLEXI_NOTIFY_FAVOURING_USERS', 'FLEXI_NOTIFY_NOTES', 1, 1).'"';
+					$label_attrs = 'class="'.$tip_class.' label text-white bg-info label-info pull-left label-fcinner" title="'.flexicontent_html::getToolTip('FLEXI_NOTIFY_FAVOURING_USERS', 'FLEXI_NOTIFY_NOTES', 1, 1).'"';
 				?>
 				<span class="label-fcouter" id="jform_notify-msg-outer">
 				<label id="jform_notify-msg" <?php echo $label_attrs; ?> >
@@ -707,7 +707,7 @@ if (isset($this->item->item_translations)) foreach ($this->item->item_translatio
 			if ($notify_owner) : ?>
 				<div class="fcclear"></div>
 				<?php
-					$label_attrs = 'class="'.$tip_class.' label label-success pull-left label-fcinner" title="'.flexicontent_html::getToolTip('FLEXI_PUBLISH_CHANGE', 'FLEXI_NOTIFY_OWNER_NOTES', 1, 1).'"';
+					$label_attrs = 'class="'.$tip_class.' label text-white bg-success label-success pull-left label-fcinner" title="'.flexicontent_html::getToolTip('FLEXI_PUBLISH_CHANGE', 'FLEXI_NOTIFY_OWNER_NOTES', 1, 1).'"';
 				?>
 				<span class="label-fcouter" id="jform_notify-msg-outer">
 				<label id="jform_notify-msg" <?php echo $label_attrs; ?> >

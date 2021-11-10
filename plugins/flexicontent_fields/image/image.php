@@ -3114,7 +3114,7 @@ class plgFlexicontent_fieldsImage extends FCField
 
 		return '
 		<span class="fc-img-field-upload-limits-box">
-			<span class="label label-info fc-upload-box-lbl">'.JText::_( $server_limit_exceeded ? 'FLEXI_UPLOAD_LIMITS' : 'FLEXI_UPLOAD_LIMIT' ).'</span>
+			<span class="label text-white bg-info label-info fc-upload-box-lbl">'.JText::_( $server_limit_exceeded ? 'FLEXI_UPLOAD_LIMITS' : 'FLEXI_UPLOAD_LIMIT' ).'</span>
 			<span class="fc-php-upload-limit-box">
 				<span class="'.$tooltip_class.'" style="margin-left:24px;" title="'.flexicontent_html::getToolTip('FLEXI_FIELD_CONF_UPLOAD_MAX_LIMIT', 'FLEXI_FIELD_CONF_UPLOAD_MAX_LIMIT_DESC', 1, 1).'">'.$conf_lim_image.'</span>
 				<span class="badge '.$conf_limit_class.'" style="'.$conf_limit_style.'">'.round($upConf['upload_maxsize'] / (1024*1024), 2).' M </span>

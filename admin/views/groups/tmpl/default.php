@@ -288,7 +288,7 @@ if ($js)
 				<?php endif; ?>
 			</td>
 			<td class="col_usergrp left">
-				<?php echo '<span class="badge badge-info">'.$item->user_count.'</span>'; ?>
+				<?php echo '<span class="badge bg-info badge-info">'.$item->user_count.'</span>'; ?>
 				<?php
 				if ($item->user_count) {
 					echo '

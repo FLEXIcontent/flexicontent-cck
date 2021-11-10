@@ -72,7 +72,7 @@ if ( $extra_attribs = $filter->parameters->get( 'filter_extra_attribs'.$_s, '' )
 
 if ($display_filter_as==6 && $filter->parameters->get('filter_values_require_all_tip', 0))
 {
-	$filter->html	.= ' <span class="fc_filter_tip_inline badge badge-info">'.JText::_(!$require_all_values ? 'FLEXI_ANY_OF' : 'FLEXI_ALL_OF').'</span> ';
+	$filter->html	.= ' <span class="fc_filter_tip_inline badge bg-info badge-info">'.JText::_(!$require_all_values ? 'FLEXI_ANY_OF' : 'FLEXI_ALL_OF').'</span> ';
 }
 
 // Calculate if field has value

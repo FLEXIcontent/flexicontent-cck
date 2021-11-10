@@ -29,7 +29,7 @@ foreach ($values as $n => $value)
 		'.$img_nolegend.'
 		</a><br/>'
 		.($_method == 'display_single_total' || $_method == 'display_single_total_link' ? '
-		<span class="fc_img_total_data badge badge-info" style="display: inline-block;" >
+		<span class="fc_img_total_data badge bg-info badge-info" style="display: inline-block;" >
 			'.count($values).' '.JText::_('FLEXI_IMAGES').'
 		</span>' : '').'
 	</span>';

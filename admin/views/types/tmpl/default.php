@@ -415,7 +415,7 @@ if ($js)
 			</td>
 
 			<td class="col_iassigned center">
-				<a class="badge badge-info fc-assignments-btn" href="<?php echo $items_link; ?>">
+				<a class="badge bg-info badge-info fc-assignments-btn" href="<?php echo $items_link; ?>">
 					<?php echo $row->iassigned; ?>
 				</a>
 			</td>

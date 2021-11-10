@@ -236,7 +236,7 @@ foreach ($field->value as $file_id)
 				<td class="inlinefile-secure-data-cell">
 					'.($has_values ? '
 					<span class="inlinefile-secure-info" style="'.(!$has_values ? 'display:none;' : '').'">
-						<span class="badge badge-info">'.JText::_($file_data->secure ?  'FLEXI_YES' : 'FLEXI_NO').'</span>
+						<span class="badge bg-info badge-info">'.JText::_($file_data->secure ?  'FLEXI_YES' : 'FLEXI_NO').'</span>
 					</span>' : '').'
 					<span class="inlinefile-secure-data" style="'.($has_values ? 'display:none;' : '').'">
 						'.flexicontent_html::buildradiochecklist( array(1=> JText::_( 'FLEXI_YES' ), 0=> JText::_( 'FLEXI_NO' )) , $fieldname_n.'[secure]', (!isset($form_data[$file_id]) ? $file_data->secure : (int)$form_data[$file_id]['secure']), 1, ' class="fc_filedir" ', $elementid_n.'_secure').'

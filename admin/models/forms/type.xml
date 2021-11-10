@@ -301,7 +301,7 @@
 			<field name="" type="separator" default="FLEXI_MAIN_CATEGORY" level="level1" />
 			<field name="catid_allowed_parent" type="flexicategories" top="2"
 				published_only="1" parent_id=""	depth_limit="0" multiple="false"
-				default="" label="Allowed subtree &lt;br&gt;&lt;small&gt;--Blank allows all--&lt;/small&gt;" description="Select the category subtree that will be used for selecting main category" labelclass="label label-info" />
+				default="" label="Allowed subtree &lt;br&gt;&lt;small&gt;--Blank allows all--&lt;/small&gt;" description="Select the category subtree that will be used for selecting main category" labelclass="label text-white bg-info label-info" />
 			<field name="catid_allowed_parent_disable" type="radio" default="1" label="Disable subtree parent" description="Usually you would want to disable selecting the root category of the category subtree" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -313,7 +313,7 @@
 			<field name="" type="separator" default="FLEXI_SECONDARY_CATEGORIES" level="level1" />
 			<field name="cid_allowed_parent" type="flexicategories" top="2"
 				published_only="1" parent_id=""	depth_limit="0" multiple="false"
-				default="" label="Allowed subtree &lt;br&gt;&lt;small&gt;--Blank allows all--&lt;/small&gt;" description="Select the category subtree that will be allowed to be used for selecting secondary categories" labelclass="label label-info" />
+				default="" label="Allowed subtree &lt;br&gt;&lt;small&gt;--Blank allows all--&lt;/small&gt;" description="Select the category subtree that will be allowed to be used for selecting secondary categories" labelclass="label text-white bg-info label-info" />
 			<field name="cid_allowed_parent_disable" type="radio" default="1" label="Disable subtree parent" description="Usually you would want to disable selecting the root category of the category subtree" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -323,7 +323,7 @@
 				default="" label="Default categories" description="Select the default secondary categories" />
 
 			<field name="" type="separator" default="FLEXI_TEMPLATE_ITEM" level="level1" />
-			<field name="allowed_ilayouts" type="ilayoutlist" default="" multiple="true" size="12" label="FLEXI_CHOOSE_ALLOWED_TYPEITEMS_LAYOUT" description="FLEXI_CHOOSE_ALLOWED_TYPEITEMS_LAYOUT_DESC" labelclass="label label-info"/>
+			<field name="allowed_ilayouts" type="ilayoutlist" default="" multiple="true" size="12" label="FLEXI_CHOOSE_ALLOWED_TYPEITEMS_LAYOUT" description="FLEXI_CHOOSE_ALLOWED_TYPEITEMS_LAYOUT_DESC" labelclass="label text-white bg-info label-info"/>
 
 			<field name="" type="separator" default="Common tags (seleactable via checkboxes)" level="level1" />
 			<field name="quick_tags" type="tags" default="" multiple="true" label="FLEXI_TAGS" description="Tags selectable as checkboxes in item form (for quicker / easier selection)"/>
@@ -656,7 +656,7 @@
 
 			<field name="item_form_fe_tab_layout" type="separator" default="FLEXI_ITEM_FORM_LAYOUT" icon_class="icon-screen" level="tab_open" box_type="1" />
 
-			<field name="form_layout_configs" type="multilist" subtype="radio" default="" label="FLEXI_PRESET_CONFIGURATIONS" description="FLEXI_PRESET_CONFIGURATIONS_DESC" toggle_related="1" fccustom_revert="1" class="btn-group group-fcmethod" labelclass="label label-success">
+			<field name="form_layout_configs" type="multilist" subtype="radio" default="" label="FLEXI_PRESET_CONFIGURATIONS" description="FLEXI_PRESET_CONFIGURATIONS_DESC" toggle_related="1" fccustom_revert="1" class="btn-group group-fcmethod" labelclass="label text-white bg-success label-success">
 				<option value="">FLEXI_CUSTOMIZE</option>
 				<option value="1" fcconfigs="{
 					'form_tab_titles':'1:FLEXI_DESCRIPTION, 2:__TYPE_NAME__, 3:FLEXI_ASSIGNMENTS, 4:FLEXI_PUBLISHING, 5:FLEXI_META_SEO, 6:FLEXI_DISPLAYING, 7:FLEXI_TEMPLATE',
@@ -810,8 +810,8 @@
 		</fieldset>
 		<fieldset name="themes" label="FLEXI_PARAMETERS_THEMES" addfieldpath="/administrator/components/com_flexicontent/elements">
 
-			<field name="ilayout" type="itemlayout" default="grid" label="FLEXI_CHOOSE_SPECIFIC_TYPEITEMS_LAYOUT" description="FLEXI_CHOOSE_SPECIFIC_TYPEITEMS_LAYOUT_DESC" class="use_select2_lib" labelclass="label label-warning" />
-			<field name="ilayout_mobile" type="itemlayout" skipparams="1" enableparam="use_mobile_layouts" firstoption="FLEXI_USE_DESKTOP" default="" label="FLEXI_CHOOSE_SPECIFIC_MOBILE_LAYOUT" description="FLEXI_CHOOSE_SPECIFIC_MOBILE_LAYOUT_DESC" class="use_select2_lib" labelclass="label label-warning" />
+			<field name="ilayout" type="itemlayout" default="grid" label="FLEXI_CHOOSE_SPECIFIC_TYPEITEMS_LAYOUT" description="FLEXI_CHOOSE_SPECIFIC_TYPEITEMS_LAYOUT_DESC" class="use_select2_lib" labelclass="label text-white bg-warning label-warning" />
+			<field name="ilayout_mobile" type="itemlayout" skipparams="1" enableparam="use_mobile_layouts" firstoption="FLEXI_USE_DESKTOP" default="" label="FLEXI_CHOOSE_SPECIFIC_MOBILE_LAYOUT" description="FLEXI_CHOOSE_SPECIFIC_MOBILE_LAYOUT_DESC" class="use_select2_lib" labelclass="label text-white bg-warning label-warning" />
 
 		</fieldset>
 

@@ -215,7 +215,7 @@ class FlexicontentViewImport extends FlexicontentViewBaseRecords
 		{
 			$app->enqueueMessage('Joomla DB table: <b>\'session\'</b> has a <b>\'data\'</b> column with type: ' .
 					'<span class="badge">' . $_dataColType .	'</span>' .
-					'<br>Expected column type: <span class="badge badge-info">mediumtext</span>.' .
+					'<br>Expected column type: <span class="badge bg-info badge-info">mediumtext</span>.' .
 					'<br>Trying to import large data files may fail',
 				'notice'
 			);

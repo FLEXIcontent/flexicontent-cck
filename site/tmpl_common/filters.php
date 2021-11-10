@@ -193,7 +193,7 @@ if ( $use_search || $use_filters ) : /* BOF search and filters block */
 				if (isset($fgInfo->field_to_grp[$filt->id]))
 				{
 					$fieldgrp_id = $fgInfo->field_to_grp[$filt->id];
-					$filt_lbl = '<div class="label label-info">'.$fgInfo->grps[$fieldgrp_id]->label .'</div><br/>'. $filt_lbl;
+					$filt_lbl = '<div class="label text-white bg-info label-info">'.$fgInfo->grps[$fieldgrp_id]->label .'</div><br/>'. $filt_lbl;
 				}
 
 				/*

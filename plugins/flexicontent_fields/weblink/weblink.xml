@@ -57,7 +57,7 @@
 
 			<field name="" type="separator" default="FLEXI_VALUE_CREATION_LABEL" level="level2" />
 
-			<field name="link_source" type="multilist" subtype="list" default="0" toggle_related="1" label="FLEXI_FIELD_WEBLINK_LINK_SRC_MODE" description="FLEXI_FIELD_WEBLINK_LINK_SRC_MODE_DESC" labelclass="label label-info">
+			<field name="link_source" type="multilist" subtype="list" default="0" toggle_related="1" label="FLEXI_FIELD_WEBLINK_LINK_SRC_MODE" description="FLEXI_FIELD_WEBLINK_LINK_SRC_MODE_DESC" labelclass="label text-white bg-info label-info">
 				<option value="-1" show_list="" hide_list="not_jurls">FLEXI_FIELD_WEBLINK_JOOMLA_ARTICLE_LINKS</option>
 				<option value="0"  show_list="not_jurls" hide_list="">FLEXI_FIELD_WEBLINK</option>
 			</field>
@@ -96,7 +96,7 @@
 
 			<field name="" type="separator" default="FLEXI_LAYOUT" description="" level="level2" />
 
-			<field name="formlayout" type="fcfilelist" default="" label="FLEXI_FIELD_SELECT_FORM_LAYOUT" description="FLEXI_FIELD_SELECT_FORM_LAYOUT_DESC" directory="plugins/flexicontent_fields/weblink/tmpl/" filter="field*" exclude="" stripext="1" stripprefix="field_" hide_none="1" hide_default="1" labelclass="label label-warning" depend_class="not_jurls"/>
+			<field name="formlayout" type="fcfilelist" default="" label="FLEXI_FIELD_SELECT_FORM_LAYOUT" description="FLEXI_FIELD_SELECT_FORM_LAYOUT_DESC" directory="plugins/flexicontent_fields/weblink/tmpl/" filter="field*" exclude="" stripext="1" stripprefix="field_" hide_none="1" hide_default="1" labelclass="label text-white bg-warning label-warning" depend_class="not_jurls"/>
 
 			<field name="show_values_expand_btn" type="radio" default="1" label="FLEXI_FIELD_EDIT_EXPAND_VALUES" description="FLEXI_FIELD_EDIT_EXPAND_VALUES_DESC" class="btn-group btn-group-yesno" depend_class="fieldgroupoff not_jurls">
 				<option value="0">FLEXI_NO</option>

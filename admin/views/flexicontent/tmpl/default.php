@@ -139,9 +139,9 @@ $items_task = 'task=items.';
 		if ( isset($php_lims['warning']) )
 			$_title .= ' - <span class="badge badge-important">Warning</span>';
 		else if ( isset($php_lims['notice']) )
-			$_title .= ' - <span class="badge badge-warning">Notice</span>';
+			$_title .= ' - <span class="badge bg-warning badge-warning">Notice</span>';
 		else
-			$_title .= ' - <span class="badge badge-success">OK</span>';
+			$_title .= ' - <span class="badge bg-success badge-success">OK</span>';
 		?>
 
 		<div id="fc-dash-boardbtns">
@@ -540,7 +540,7 @@ $items_task = 'task=items.';
 
 
 			<?php if (!isset($ssliders['pending'])):
-				$title = JText::_( 'FLEXI_PENDING_SLIDER' ).' - <span class="badge badge-warning">'.$this->totalrows['pending'].'</span>';
+				$title = JText::_( 'FLEXI_PENDING_SLIDER' ).' - <span class="badge bg-warning badge-warning">'.$this->totalrows['pending'].'</span>';
 				echo JHtml::_('bootstrap.addSlide', 'fc-dash-sliders', $title, 'fc-dash-sliders-pending' );
 				$show_all_link = 'index.php?option=com_flexicontent&amp;view=items&amp;filter_state=PE';
 			?>
@@ -595,7 +595,7 @@ $items_task = 'task=items.';
 
 
 			<?php if (!isset($ssliders['revised'])):
-				$title = JText::_( 'FLEXI_REVISED_VER_SLIDER' ).' - <span class="badge badge-warning">'.$this->totalrows['revised'].'</span>';
+				$title = JText::_( 'FLEXI_REVISED_VER_SLIDER' ).' - <span class="badge bg-warning badge-warning">'.$this->totalrows['revised'].'</span>';
 				echo JHtml::_('bootstrap.addSlide', 'fc-dash-sliders', $title, 'fc-dash-sliders-revised' );
 				$show_all_link = 'index.php?option=com_flexicontent&amp;view=items&amp;filter_state=RV';
 			?>
@@ -651,7 +651,7 @@ $items_task = 'task=items.';
 
 			<?php if (!isset($ssliders['inprogress'])): ?>
 			<?php
-				$title = JText::_( 'FLEXI_IN_PROGRESS_SLIDER' ).' - <span class="badge badge-info-2">'.$this->totalrows['inprogress'].'</span>';
+				$title = JText::_( 'FLEXI_IN_PROGRESS_SLIDER' ).' - <span class="badge bg-info badge-info-2">'.$this->totalrows['inprogress'].'</span>';
 				echo JHtml::_('bootstrap.addSlide', 'fc-dash-sliders', $title, 'fc-dash-sliders-inprogress' );
 				$show_all_link = 'index.php?option=com_flexicontent&amp;view=items&amp;filter_state=IP';
 			?>
@@ -708,7 +708,7 @@ $items_task = 'task=items.';
 
 			<?php if (!isset($ssliders['draft'])): ?>
 			<?php
-				$title = JText::_( 'FLEXI_DRAFT_SLIDER' ).' - <span class="badge badge-info-2">'.$this->totalrows['draft'].'</span>';
+				$title = JText::_( 'FLEXI_DRAFT_SLIDER' ).' - <span class="badge bg-info badge-info-2">'.$this->totalrows['draft'].'</span>';
 				echo JHtml::_('bootstrap.addSlide', 'fc-dash-sliders', $title, 'fc-dash-sliders-draft' );
 				$show_all_link = 'index.php?option=com_flexicontent&amp;view=items&amp;filter_state=OQ';
 			?>
@@ -809,17 +809,17 @@ $items_task = 'task=items.';
 					</span><br/><br/>
 					<span id="fc-dash-devs" class="nowrap_box">
 						<span class="fc-mssg-inline fc-nobgimage fc-noborder nowrap_box" style="text-align:center;" >
-							<span class="label label-info <?php echo $tooltip_class;?>" title="Core developer">Georgios Papadakis</span><br/><br/>
+							<span class="label text-white bg-info label-info <?php echo $tooltip_class;?>" title="Core developer">Georgios Papadakis</span><br/><br/>
 							<a class="<?php echo $btn_class.' btn-small btn-primary '.$tooltip_class;?>" style="" href="http://www.flexicontent.org" title="FLEXIcontent home page" target="_blank">FLEXIcontent.org</a>
 						</span>
 
 						<span class="fc-mssg-inline fc-nobgimage fc-noborder nowrap_box" style="text-align:center;" >
-							<span class="label label-info <?php echo $tooltip_class;?>" title="Core developer">Emmanuel Danan</span><br/><br/>
+							<span class="label text-white bg-info label-info <?php echo $tooltip_class;?>" title="Core developer">Emmanuel Danan</span><br/><br/>
 							<a class="<?php echo $btn_class.' btn-small btn-primary '.$tooltip_class;?>" style="" href="http://www.agerix.fr" title="Agerix : L'agence digitale gauloise<br>Spécialistes Joomla - conception, refonte, migration et maintenance." target="_blank">agerix.fr</a>
 						</span>
 
 						<span class="fc-mssg-inline fc-nobgimage fc-noborder nowrap_box">
-							<span class="label label-info <?php echo $tooltip_class;?>" title="Core Developer">Marvelic Engine</span><br/><br/>
+							<span class="label text-white bg-info label-info <?php echo $tooltip_class;?>" title="Core Developer">Marvelic Engine</span><br/><br/>
 							<a class="<?php echo $btn_class.' btn-small '.$tooltip_class;?>" style="" href="http://www.marvelic.co.th" target="_blank" title="<?php echo flexicontent_html::getToolTip("Marvelic Engine", "Marvelic Engine is a Joomla consultancy based in Bangkok, Thailand. Support services include consulting, Joomla implementation, training, and custom extensions development.", 0, 1); ?>">
 								marvelic.co.th
 							</a>

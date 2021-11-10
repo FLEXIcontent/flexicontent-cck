@@ -76,7 +76,7 @@ $filter->html .= '<label class="'.$checked_class.$tooltip_class.'" for="'.$filte
 	.($checked ? ' style="display:none!important;" ' : ' style="background:none!important; padding-left:0px!important;" ').'>'.
 	'<span class="fc_delall_filters"></span>';
 $filter->html .= '</label> '
-	.($filter->parameters->get('filter_values_require_all_tip', 0) ? ' <span class="fc_filter_tip_inline badge badge-info">'.JText::_(!$require_all_values ? 'FLEXI_ANY_OF' : 'FLEXI_ALL_OF').'</span> ' : '')
+	.($filter->parameters->get('filter_values_require_all_tip', 0) ? ' <span class="fc_filter_tip_inline badge bg-info badge-info">'.JText::_(!$require_all_values ? 'FLEXI_ANY_OF' : 'FLEXI_ALL_OF').'</span> ' : '')
 	.' </li>';
 $i++;
 

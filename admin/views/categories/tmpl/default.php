@@ -324,22 +324,22 @@ if ($js)
 			</th-->
 
 			<th class="col_published hideOnDemandClass center hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
-				<span class="column_toggle_lbl" style="display:none;"><small class="badge badge-info"><?php echo $state_names['ALL_P']; ?></small></span>
+				<span class="column_toggle_lbl" style="display:none;"><small class="badge bg-info badge-info"><?php echo $state_names['ALL_P']; ?></small></span>
 				<?php echo '<span class="' . $this->tooltip_class . ' icon-'.$state_icons['ALL_P'].'" title="'.$state_names['ALL_P'].' '.JText::_ ('FLEXI_ITEMS').'" data-placement="top" style="font-size: 16px;"></span>'; ?>
 			</th>
 
 			<th class="col_unpublished hideOnDemandClass center hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
-				<span class="column_toggle_lbl" style="display:none;"><small class="badge badge-info"><?php echo $state_names['ALL_U']; ?></small></span>
+				<span class="column_toggle_lbl" style="display:none;"><small class="badge bg-info badge-info"><?php echo $state_names['ALL_U']; ?></small></span>
 				<?php echo '<span class="' . $this->tooltip_class . ' icon-'.$state_icons['ALL_U'].'" title="'.$state_names['ALL_U'].' '.JText::_ ('FLEXI_ITEMS').'" data-placement="top" style="font-size: 16px;"></span>'; ?>
 			</th>
 
 			<th class="col_archived hideOnDemandClass center hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
-				<span class="column_toggle_lbl" style="display:none;"><small class="badge badge-info"><?php echo $state_names['A']; ?></small></span>
+				<span class="column_toggle_lbl" style="display:none;"><small class="badge bg-info badge-info"><?php echo $state_names['A']; ?></small></span>
 				<?php echo '<span class="' . $this->tooltip_class . ' icon-'.$state_icons['A'].'" title="'.$state_names['A'].' '.JText::_ ('FLEXI_ITEMS').'" data-placement="top" style="font-size: 16px;"></span>'; ?>
 			</th>
 
 			<th class="col_trashed hideOnDemandClass center hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
-				<span class="column_toggle_lbl" style="display:none;"><small class="badge badge-info"><?php echo $state_names['T']; ?></small></span>
+				<span class="column_toggle_lbl" style="display:none;"><small class="badge bg-info badge-info"><?php echo $state_names['T']; ?></small></span>
 				<?php echo '<span class="' . $this->tooltip_class . ' icon-'.$state_icons['T'].'" title="'.$state_names['T'].' '.JText::_ ('FLEXI_ITEMS').'" data-placement="top" style="font-size: 16px;"></span>'; ?>
 			</th>
 
@@ -585,7 +585,7 @@ if ($js)
 
 			<?php /*<td>
 				<a href="<?php echo $items_link; ?>" title="<?php echo JText::_( 'FLEXI_VIEW_ITEMS' );?>" style="color:unset;">
-					<span class="badge badge-info"><?php echo $row->nrassigned; ?></span>
+					<span class="badge bg-info badge-info"><?php echo $row->nrassigned; ?></span>
 				</a>
 			</td>*/ ?>
 

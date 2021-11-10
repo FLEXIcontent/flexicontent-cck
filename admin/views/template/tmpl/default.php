@@ -180,7 +180,7 @@ $this->document->addScript(JUri::base(true).'/components/com_flexicontent/assets
 							</label>
 						</td>
 						<td>
-							<span class="badge badge-warning"><?php echo $this->layout->name; ?></span>
+							<span class="badge bg-warning badge-warning"><?php echo $this->layout->name; ?></span>
 						</td>
 					</tr>
 					<tr>
@@ -190,7 +190,7 @@ $this->document->addScript(JUri::base(true).'/components/com_flexicontent/assets
 							</label>
 						</td>
 						<td>
-							<span class="badge badge-success"><?php echo $this->layout->view; ?></span>
+							<span class="badge bg-success badge-success"><?php echo $this->layout->view; ?></span>
 						</td>
 					</tr>
 
@@ -340,7 +340,7 @@ $this->document->addScript(JUri::base(true).'/components/com_flexicontent/assets
 						</div>
 
 
-						<div class="positions_title label label-info" style="margin-top:10px;"><?php echo JText::_('FLEXI_CORE_FIELDS'); ?></div>
+						<div class="positions_title label text-white bg-info label-info" style="margin-top:10px;"><?php echo JText::_('FLEXI_CORE_FIELDS'); ?></div>
 
 						<div class="positions_container">
 							<ul id="sortablecorefields" class="positions">
@@ -360,7 +360,7 @@ $this->document->addScript(JUri::base(true).'/components/com_flexicontent/assets
 						</div>
 
 
-						<div class="positions_title label label-info" style="margin-top:10px;"><?php echo JText::_('FLEXI_CUSTOM_NON_CORE_FIELDS'); ?></div>
+						<div class="positions_title label text-white bg-info label-info" style="margin-top:10px;"><?php echo JText::_('FLEXI_CUSTOM_NON_CORE_FIELDS'); ?></div>
 
 						<div class="positions_container">
 							<ul id="sortableuserfields" class="positions">
@@ -429,7 +429,7 @@ $this->document->addScript(JUri::base(true).'/components/com_flexicontent/assets
 
 							?>
 
-							<div class="positions_title label label-success" style="color: white; margin:10px 0 -6px;display: inline-block; padding: 5px; <?php echo $title_color; ?>"><?php echo $postitle; ?></div>
+							<div class="positions_title label text-white bg-success label-success" style="color: white; margin:10px 0 -6px;display: inline-block; padding: 5px; <?php echo $title_color; ?>"><?php echo $postitle; ?></div>
 
 							<?php
 							if ( isset($this->layout->attributes[$count]['readonly']) ) {
@@ -685,7 +685,7 @@ $this->document->addScript(JUri::base(true).'/components/com_flexicontent/assets
 
 			<div id="layout-fileeditor-container" class="span9 col-9" style="">
 				<span class="fcsep_level0" style="margin:0 0 12px 0; background-color:#333; ">
-					<span id="layout_edit_name_container" class="label label-info"><?php echo JText::_( 'FLEXI_NO_FILE_LOADED' ); ?></span>
+					<span id="layout_edit_name_container" class="label text-white bg-info label-info"><?php echo JText::_( 'FLEXI_NO_FILE_LOADED' ); ?></span>
 				</span>
 				<div class="fcclear"></div>
 				<div id="ajax-system-message-container"></div>
@@ -731,7 +731,7 @@ $this->document->addScript(JUri::base(true).'/components/com_flexicontent/assets
 
 
 				<span class="fcsep_level0" id="code_box_header" style="display:none; margin:16px 0 12px 0; background-color:#333; ">
-					<span id="layout_edit_" class="label label-info"><?php echo JText::_( 'FLEXI_INSERT_TEMPLATE_CODE' ); ?></span>
+					<span id="layout_edit_" class="label text-white bg-info label-info"><?php echo JText::_( 'FLEXI_INSERT_TEMPLATE_CODE' ); ?></span>
 				</span>
 				<div class="fcclear"></div>
 
