@@ -5554,6 +5554,8 @@ class flexicontent_html
 	static function addToolBarDropMenu($btn_arr, $btn_group_name, $drop_btn = null, $ops = array())
 	{
 		$toolbar = JToolbar::getInstance('toolbar');
+		static $btngroup_id = 0;
+		$btngroup_id++;
 
 		if (count($btn_arr) < 2)
 		{
@@ -5585,15 +5587,22 @@ class flexicontent_html
 					: ''
 				);
 		}
-
+		
+		if ($drop_btn)
+		{
+			$drop_btn = str_replace('>', ' id="btngroup_id_' . $btngroup_id . '" >', $drop_btn);
+		}
 		$buttons_html = '
-			<div class="buttons btn-group">
+			<div class="buttons btn-group' . (FLEXI_J40GE ? ' dropdown' : '') . '">
 				'.array_shift($btn_arr).'
 			  '.($drop_btn ?: '
-			  <button type="button" class="' . $drop_btn_class . '" data-toggle="dropdown">
+			  <button type="button" class="' . $drop_btn_class . '"
+					data-toggle="dropdown" id="btngroup_id_' . $btngroup_id . '"
+					data-bs-toggle="dropdown" aria-expanded="false"
+				>
 			    <span class="caret"></span>
 			  </button>').'
-				<ul class="dropdown-menu dropdown-menu-right" role="menu">
+				<ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="btngroup_id_' . $btngroup_id . '">
 					<li>' . implode("</li>\n<li>", $btn_arr) . '</li>
 				</ul>
 			</div>';

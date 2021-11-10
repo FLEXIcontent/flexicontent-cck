@@ -507,14 +507,6 @@ a.fc_assoc_translation.label.label-association {
 	min-width: inherit;
 	background: #fff;
 }
-#toolbar .buttons.btn-group > ul.dropdown-menu {
-	background: #fff;
-	box-shadow: 2px 2px 8px #00000080;
-	padding: 5px;
-	min-width: 200px !important;
-	width: auto !important;
-	top: 100% !important;
-}
 .com_flexicontent .dropdown-toggle:after {
 	margin-right: 11px;
 }

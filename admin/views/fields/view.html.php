@@ -620,7 +620,7 @@ class FlexicontentViewFields extends FlexicontentViewBaseRecords
 			$btn_arr[] = flexicontent_html::addToolBarButton(
 				'FLEXI_RECORDS', 'delete', '', $msg_alert, $msg_confirm,
 				$btn_task, $extra_js, $btn_list=true, $btn_menu=true, $btn_confirm=true,
-				$this->btn_sm_class . ' btn-fcaction ' . (FLEXI_J40GE ? 'btn-warning' : '') . ' ' . $this->tooltip_class, 'icon-remove',
+				$this->btn_sm_class . ' btn-fcaction ' . (FLEXI_J40GE ? 'dropdown-item ' . 'btn-warning' : '') . ' ' . $this->tooltip_class, 'icon-remove',
 				'data-placement="right" title="' . flexicontent_html::encodeHTML(JText::_('FLEXI_ABOUT_DELETING_RECORDS_WITHOUT_ASSIGNMENTS'), 2) . '"', $auto_add = 0, $tag_type='button'
 			);
 
@@ -633,7 +633,7 @@ class FlexicontentViewFields extends FlexicontentViewBaseRecords
 				$btn_arr[] = flexicontent_html::addToolBarButton(
 					'FLEXI_ASSIGNMENTS', 'delete', '', $msg_alert, $msg_confirm,
 					$btn_task, $extra_js, $btn_list=true, $btn_menu=true, $btn_confirm=true,
-					$this->btn_sm_class . ' btn-fcaction ' . (FLEXI_J40GE ? 'btn-warning' : '') . ' ' . $this->tooltip_class, 'icon-remove',
+					$this->btn_sm_class . ' btn-fcaction ' . (FLEXI_J40GE ? 'dropdown-item ' . 'btn-warning' : '') . ' ' . $this->tooltip_class, 'icon-remove',
 					'data-placement="right" title="' . flexicontent_html::encodeHTML(JText::_('FLEXI_ABOUT_DELETING_ASSIGNMENTS'), 2) . '"', $auto_add = 0, $tag_type='button'
 				);
 
@@ -644,13 +644,13 @@ class FlexicontentViewFields extends FlexicontentViewBaseRecords
 				$btn_arr[] = flexicontent_html::addToolBarButton(
 					'FLEXI_ASSIGNMENTS_N_RECORDS', 'delete', '', $msg_alert, $msg_confirm,
 					$btn_task, $extra_js, $btn_list=true, $btn_menu=true, $btn_confirm=true,
-					$this->btn_sm_class . ' btn-fcaction ' . (FLEXI_J40GE ? 'btn-warning' : '') . ' ' . $this->tooltip_class, 'icon-remove',
+					$this->btn_sm_class . ' btn-fcaction ' . (FLEXI_J40GE ? 'dropdown-item ' . 'btn-warning' : '') . ' ' . $this->tooltip_class, 'icon-remove',
 					'data-placement="right" title="' . flexicontent_html::encodeHTML(JText::_('FLEXI_ABOUT_DELETING_ASSIGNMENTS_N_RECORDS'), 2) . '"', $auto_add = 0, $tag_type='button'
 				);
 			}
 
 			$drop_btn = '
-				<button type="button" class="' . $this->btn_sm_class . ' dropdown-toggle" data-toggle="dropdown">
+				<button id="toolbar-delete" class="' . $this->btn_sm_class . ' dropdown-toggle btn-fcaction" data-toggle="dropdown" data-bs-toggle="dropdown">
 					<span title="'.JText::_('FLEXI_DELETE').'" class="icon-delete"></span>
 					'.JText::_('FLEXI_DELETE').'
 					<span class="caret"></span>
@@ -716,7 +716,7 @@ class FlexicontentViewFields extends FlexicontentViewBaseRecords
 			'JTOOLBAR_CHECKIN', $btn_name = 'checkin', $full_js = '',
 			$msg_alert = '', $msg_confirm = '',
 			$btn_task, $extra_js = '', $btn_list=true, $btn_menu=true, $btn_confirm=false,
-			$this->btn_sm_class . ' btn-fcaction ' . (FLEXI_J40GE ? $this->btn_iv_class : '') . ' ' . $this->popover_class, $btn_icon='icon-checkin',
+			$this->btn_sm_class . ' btn-fcaction ' . (FLEXI_J40GE ? 'dropdown-item ' . $this->btn_iv_class : '') . ' ' . $this->popover_class, $btn_icon='icon-checkin',
 			'data-placement="right" data-content="' . flexicontent_html::encodeHTML(JText::_('FLEXI_MAINTENANCE_CHECKIN_DESC'), 2) . '"', $auto_add = 0, $tag_type='button'
 		);
 
@@ -731,7 +731,7 @@ class FlexicontentViewFields extends FlexicontentViewBaseRecords
 				'Export now',
 				$btn_name, $full_js='', $msg_alert='', $msg_confirm=JText::_('FLEXI_EXPORT_NOW_AS_XML'),
 				$btn_task, $extra_js, $btn_list=false, $btn_menu=true, $btn_confirm=true,
-				$this->btn_sm_class . ' btn-fcaction ' . (FLEXI_J40GE ? $this->btn_iv_class : '') . ' ' . $this->popover_class, $btn_icon,
+				$this->btn_sm_class . ' btn-fcaction ' . (FLEXI_J40GE ? 'dropdown-item ' . $this->btn_iv_class : '') . ' ' . $this->popover_class, $btn_icon,
 				'data-placement="right" data-content="' . flexicontent_html::encodeHTML(JText::_(''), 2) . '"', $auto_add = 0, $tag_type='button'
 			);
 
@@ -743,7 +743,7 @@ class FlexicontentViewFields extends FlexicontentViewBaseRecords
 				'Add to export',
 				$btn_name, $full_js='', $msg_alert='', $msg_confirm=JText::_('FLEXI_ADD_TO_EXPORT_LIST'),
 				$btn_task, $extra_js, $btn_list=false, $btn_menu=true, $btn_confirm=true,
-				$this->btn_sm_class . ' btn-fcaction ' . (FLEXI_J40GE ? $this->btn_iv_class : '') . ' ' . $this->popover_class, $btn_icon,
+				$this->btn_sm_class . ' btn-fcaction ' . (FLEXI_J40GE ? 'dropdown-item ' . $this->btn_iv_class : '') . ' ' . $this->popover_class, $btn_icon,
 				'data-placement="right" data-content="' . flexicontent_html::encodeHTML(JText::_(''), 2) . '"', $auto_add = 0, $tag_type='button'
 			);
 
@@ -754,7 +754,7 @@ class FlexicontentViewFields extends FlexicontentViewBaseRecords
 			$btn_arr[] = flexicontent_html::addToolBarButton(
 				'Export SQL', $btn_name, $full_js='', $msg_alert='', $msg_confirm='Field\'s configuration will be exported as SQL',
 				$btn_task, $extra_js, $btn_list=false, $btn_menu=true, $btn_confirm=true,
-				$this->btn_sm_class . ' btn-fcaction ' . (FLEXI_J40GE ? $this->btn_iv_class : '') . ' ' . $this->popover_class, $btn_icon,
+				$this->btn_sm_class . ' btn-fcaction ' . (FLEXI_J40GE ? 'dropdown-item ' . $this->btn_iv_class : '') . ' ' . $this->popover_class, $btn_icon,
 				'data-placement="right" data-content="' . flexicontent_html::encodeHTML(JText::_(''), 2) . '"', $auto_add = 0, $tag_type='button'
 			);
 
@@ -765,7 +765,7 @@ class FlexicontentViewFields extends FlexicontentViewBaseRecords
 			flexicontent_html::addToolBarButton(
 				'Export CSV', $btn_name, $full_js='', $msg_alert='', $msg_confirm='Field\'s configuration will be exported as CSV',
 				$btn_task, $extra_js, $btn_list=false, $btn_menu=true, $btn_confirm=true,
-				$this->btn_sm_class . ' btn-fcaction ' . (FLEXI_J40GE ? $this->btn_iv_class : '') . ' ' . $this->popover_class, $btn_icon,
+				$this->btn_sm_class . ' btn-fcaction ' . (FLEXI_J40GE ? 'dropdown-item ' . $this->btn_iv_class : '') . ' ' . $this->popover_class, $btn_icon,
 				'data-placement="right" data-content="' . flexicontent_html::encodeHTML(JText::_(''), 2) . '"', $auto_add = 0, $tag_type='button'
 			);
 		}
@@ -773,7 +773,7 @@ class FlexicontentViewFields extends FlexicontentViewBaseRecords
 		if (count($btn_arr))
 		{
 			$drop_btn = '
-				<button type="button" class="' . $this->btn_sm_class . ' dropdown-toggle" data-toggle="dropdown">
+				<button id="toolbar-maintenance" class="' . $this->btn_sm_class . ' dropdown-toggle btn-fcaction" data-toggle="dropdown" data-bs-toggle="dropdown">
 					<span title="'.JText::_('FLEXI_MAINTENANCE').'" class="icon-tools"></span>
 					'.JText::_('FLEXI_MAINTENANCE').'
 					<span class="caret"></span>

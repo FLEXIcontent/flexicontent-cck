@@ -3820,6 +3820,7 @@ div.current ul.config-option-list li fieldset {
 	display: block;
 	width: 100%;
 	box-sizing: border-box;
+	margin: 0;
 }
 #toolbar .buttons.btn-group > .toolbar {
 	margin: 0;

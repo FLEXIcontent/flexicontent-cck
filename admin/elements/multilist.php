@@ -237,9 +237,9 @@ class JFormFieldMultiList extends JFormFieldGroupedList
 						if ($k=='class') { $label_class = $v; continue; }
 						$input_attribs .= ' ' .$k. '="' .$v. '"';
 					}
-					if (!$label_class)
+					if (!$label_class && FLEXI_J40GE)
 					{
-						$label_class = strlen($option->value) ? ($option->value ? "btn btn-outline-success" : "btn btn-outline-danger") : "btn btn-outline-primary";
+						$label_class = "btn";
 						$input_attribs .= ' class="btn-check" ';
 					}
 					$html .= '

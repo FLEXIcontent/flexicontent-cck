@@ -134,7 +134,7 @@ class FlexicontentViewBaseRecords extends JViewLegacy
 		if (count($btn_arr))
 		{
 			$drop_btn = '
-				<button type="button" class="' . $this->btn_sm_class . ' dropdown-toggle" data-toggle="dropdown">
+				<button id="toolbar-changestate" class="' . $this->btn_sm_class . ' dropdown-toggle btn-fcaction" data-toggle="dropdown" data-bs-toggle="dropdown">
 					<span title="'.JText::_('FLEXI_CHANGE_STATE').'" class="icon-checkmark"></span>
 					'.JText::_('FLEXI_CHANGE_STATE').'
 					<span class="caret"></span>
@@ -218,7 +218,7 @@ class FlexicontentViewBaseRecords extends JViewLegacy
 					$btn_list = true,
 					$btn_menu = true,
 					$btn_confirm = false,
-					$s['btn_class'] . ' ' . $this->btn_sm_class . ' btn-fcaction ' . (FLEXI_J40GE ? 'btn-info' : '') . ' ' . $this->tooltip_class,
+					$s['btn_class'] . ' ' . $this->btn_sm_class . ' btn-fcaction dropdown-item ' . (FLEXI_J40GE ? 'btn-info' : '') . ' ' . $this->tooltip_class,
 					$s['btn_icon'],
 					$attribs = 'data-placement="right" title="' . flexicontent_html::encodeHTML(JText::_($s['btn_desc']), 2) . '"',
 					$auto_add = 0,
