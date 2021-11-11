@@ -110,6 +110,7 @@
 			<field name="max_filt_to_index" type="integer" default="4" first="0" last="10" step="1" label="FLEXI_MAX_FILTERS_TO_ALLOW_INDEXING" description="FLEXI_MAX_FILTERS_TO_ALLOW_INDEXING_DESC" />
 
 	</fieldset>
+
 	<fieldset name="buttons_fset" label="FLEXI_BUTTONS" description="" >
 
 		<field name="" type="separator" default="FLEXI_BUTTONS" label="" level="level0" />
@@ -139,10 +140,6 @@
 			<field name="show_feed_link" type="fcradio" default="1" label="FLEXI_FEED_HEAD_LINK" description="FLEXI_FEED_HEAD_LINK_DESC" class="btn-group">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
-			</field>
-			<field name="show_csvbutton" type="fcradio" default="0" label="FLEXI_CSV_EXPORT_BUTTON" description="FLEXI_CSV_EXPORT_BUTTON_DESC" class="btn-group">
-				<option value="0">FLEXI_HIDE</option>
-				<option value="1">FLEXI_SHOW</option>
 			</field>
 
 			<field name="" type="separator" default="FLEXI_ITEM_BUTTONS" label="" level="level2" />
@@ -1506,6 +1503,32 @@
 			<field name="text_notify_existing_reviewal" type="textarea" rows="2" cols="60" default="" label="FLEXI_CUSTOM_NOTIFY_TEXT" description="FLEXI_CUSTOM_NOTIFY_TEXT_DESC" class="disp_notifications input-xxlarge" />
 
 		<field name="" type="separator" default="FLEXI_WORKFLOW_CONF" level="tabset_close" box_type="1" remove_boxes="2" />
+	</fieldset>
+
+	<fieldset name="csv_export_fset" label="FLEXI_CSV_EXPORT" description="" >
+
+		<field name="" type="separator" default="FLEXI_FRONTEND" label="" level="level1" />
+			<field name="show_csvbutton" type="fcradio" default="0" label="FLEXI_CSV_EXPORT" description="FLEXI_CSV_EXPORT_BUTTON_DESC" class="btn-group">
+				<option value="0">FLEXI_DISABLE</option>
+				<option value="1">FLEXI_ENABLE</option>
+			</field>
+
+		<field name="" type="separator" default="FLEXI_BACKEND" label="" level="level1" />
+			<field name="show_csvbutton_be" type="fcradio" default="0" label="FLEXI_CSV_EXPORT" description="FLEXI_CSV_EXPORT_BUTTON_DESC" class="btn-group">
+				<option value="0">FLEXI_DISABLE</option>
+				<option value="1">FLEXI_ENABLE</option>
+			</field>
+
+		<field name="" type="separator" default="Options" label="" level="level1" />
+			<field name="csv_export_header" type="fcradio" default="1" label="Column Headers" description="" class="btn-group group-fcinfo">
+				<option value="1">Field Label</option>
+				<option value="2">Field name</option>
+			</field>
+			<field name="csv_export_field_sep" type="text" default="," label="Field (Column) separator" description="" />
+			<field name="__exported_fields" type="list" default="0" label="Exported fields" description="">
+				<option value="0">Enable this inside every field</option>
+			</field>
+
 	</fieldset>
 
 	<fieldset name="backend_tabs_fset" label="FLEXI_BACKEND_TABS_CONF" description="" >
