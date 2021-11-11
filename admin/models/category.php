@@ -209,7 +209,7 @@ class FlexicontentModelCategory extends FCModelAdmin
 	{
 		$prefix = $prefix !== null
 			? $prefix
-			: (FLEXI_J40GE ? 'Joomla\\CMS\\Table\\' : 'CategoriesTable');
+			: (FLEXI_J40GE ? 'JTable' : 'CategoriesTable');
 
 		if (!FLEXI_J40GE)
 		{
