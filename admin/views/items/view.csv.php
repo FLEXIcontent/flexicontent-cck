@@ -66,8 +66,9 @@ class FlexicontentViewItems extends JViewLegacy
 		 * For backend this is component parameters only
 		 * For frontend this category parameters as VIEW's parameters (category parameters are merged parameters in order: layout(template-manager)/component/ancestors-cats/category/author/menu)
 		 */
-		$params = $app->isClient('administrator')
-			? JComponentHelper::getParams('com_flexicontent')
+		$cparams = JComponentHelper::getParams('com_flexicontent');
+		$params  = $app->isClient('administrator')
+			? $cparams
 			: $model->getCategory()->parameters;
 
 		// Check if CSV export button is enabled for current view
@@ -80,12 +81,15 @@ class FlexicontentViewItems extends JViewLegacy
 			die('CSV export not enabled for this view');
 		}
 
+		$field_sep  = $cparams->get('csv_export_field_sep', 0);
+
 		// Check if current view is filtered by item type
 		$filter_type    = $model->getState('filter_type');
-		$csv_header     = $app->isClient('administrator') ? (int) $model->getState('csv_header') : 2;
+		$csv_header     = $app->isClient('administrator') ? (int) $model->getState('csv_header') : (int) $cparams->get('csv_export_header', 1);
 		$csv_raw_export = $app->isClient('administrator') ? (int) $model->getState('csv_raw_export') : 2;
 		$csv_all_fields = $app->isClient('administrator') ? (int) $model->getState('csv_all_fields') : 2;
 		$err_count      = 0;
+		$csv_header     = $csv_header === -1 ? (int) $cparams->get('csv_export_header', 1) : $csv_header;
 
 		if (!$filter_type && $app->isClient('administrator'))
 		{
@@ -232,7 +236,7 @@ class FlexicontentViewItems extends JViewLegacy
 		/**
 		 * 2. Output HEADERS row
 		 */
-
+		 
 		$delim = '';
 
 		foreach($item0->fields as $field)
@@ -246,8 +250,8 @@ class FlexicontentViewItems extends JViewLegacy
 				continue;
 			}
 
-			echo $delim . $this->_encodeCSVField($csv_header !== 2 ? $field->label : $field->name);
-			$delim = ",";
+			echo $delim . $this->_encodeCSVField($csv_header === 1 ? $field->label : $field->name);
+			$delim = $field_sep;
 			$total_fields++;
 		}
 		echo "\n";
@@ -293,7 +297,7 @@ class FlexicontentViewItems extends JViewLegacy
 					}
 
 					echo $delim;
-					$delim = ',';
+					$delim = $field_sep;
 					$vals = '';
 
 					// CASE 1: RENDERED value display !

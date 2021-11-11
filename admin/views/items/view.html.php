@@ -899,7 +899,8 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 		// Build CSV header selection
 		$csv_header_ops = array(
 			JHtml::_('select.option', '', JText::_('-')),
-			JHtml::_('select.option', '1', JText::_('FLEXI_DEFAULT') . ' (' . JText::_('FLEXI_FIELD') . ' ' . JText::_('FLEXI_LABEL') . ')'),
+			JHtml::_('select.option', '-1', JText::_('FLEXI_DEFAULT') . ' (' . JText::_('Component') . ' ' . JText::_('FLEXI_CONFIG'). ')'),
+			JHtml::_('select.option', '1', JText::_('FLEXI_FIELD') . ' ' . JText::_('FLEXI_LABEL')),
 			JHtml::_('select.option', '2', JText::_('FLEXI_FIELD') . ' ' . JText::_('FLEXI_NAME')),
 		);
 
@@ -931,7 +932,7 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 		// Build CSV raw value (Default or Raw) selection
 		$csv_raw_export_ops = array(
 			JHtml::_('select.option', '', JText::_('-')),
-			JHtml::_('select.option', '1', JText::_('FLEXI_DEFAULT') . ' (Field configuration)'),
+			JHtml::_('select.option', '1', JText::_('FLEXI_DEFAULT') . ' (' . JText::_('FLEXI_FIELD') . ' ' . JText::_('FLEXI_CONFIG'). ')'),
 			JHtml::_('select.option', '2', JText::_('FLEXI_FIELD_RAW_VALUES')),
 		);
 
@@ -961,7 +962,7 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 
 		// Build CSV export all field (Default / All) selection
 		$csv_all_fields_ops = array(
-			JHtml::_('select.option', '1', JText::_('FLEXI_DEFAULT') . ' (Field configuration)'),
+			JHtml::_('select.option', '1', JText::_('FLEXI_DEFAULT') . ' (' . JText::_('FLEXI_FIELD') . ' ' . JText::_('FLEXI_CONFIG'). ')'),
 			JHtml::_('select.option', '2', JText::_('FLEXI_ALL') . ' &nbsp; ( BETA Feature !!! )'),
 		);
 
