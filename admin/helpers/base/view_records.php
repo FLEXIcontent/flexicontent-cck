@@ -218,7 +218,7 @@ class FlexicontentViewBaseRecords extends JViewLegacy
 					$btn_list = true,
 					$btn_menu = true,
 					$btn_confirm = false,
-					$s['btn_class'] . ' ' . $this->btn_sm_class . ' btn-fcaction dropdown-item ' . (FLEXI_J40GE ? 'btn-info' : '') . ' ' . $this->tooltip_class,
+					$s['btn_class'] . ' ' . $this->btn_sm_class . ' btn-fcaction ' . (FLEXI_J40GE ? '_DDI_class_ btn-info' : '') . ' ' . $this->tooltip_class,
 					$s['btn_icon'],
 					$attribs = 'data-placement="right" title="' . flexicontent_html::encodeHTML(JText::_($s['btn_desc']), 2) . '"',
 					$auto_add = 0,
