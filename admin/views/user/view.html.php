@@ -72,7 +72,8 @@ class FlexicontentViewUser extends FlexicontentViewBaseRecord
 		$isnew = ! $row->id;
 
 		// Get JForm
-		$form  = $this->get('Form');
+		$form = $this->get('Form');
+
 		if (!$form)
 		{
 			$app->enqueueMessage($model->getError(), 'warning');

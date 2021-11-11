@@ -5553,6 +5553,7 @@ class flexicontent_html
 	// * Create a drop down button menu inside Joomla Toolbar
 	static function addToolBarDropMenu($btn_arr, $btn_group_name, $drop_btn = null, $ops = array())
 	{
+		JHtml::_('bootstrap.dropdown');
 		$toolbar = JToolbar::getInstance('toolbar');
 		static $btngroup_id = 0;
 		$btngroup_id++;
@@ -5561,11 +5562,11 @@ class flexicontent_html
 		{
 			if (count($btn_arr) === 1)
 			{
-				$toolbar->appendButton(
-					'Custom',
-					$button_html = end($btn_arr),
-					$btn_name = key($btn_arr)
-				);
+				$button_html = end($btn_arr);
+				$btn_name = key($btn_arr);
+				$buttons_html = str_replace('_DDI_class_', '', $buttons_html);
+
+				$toolbar->appendButton('Custom', $button_html, $btn_name);
 			}
 
 			return;
@@ -5596,9 +5597,9 @@ class flexicontent_html
 			<div class="buttons btn-group' . (FLEXI_J40GE ? ' dropdown' : '') . '">
 				'.array_shift($btn_arr).'
 			  '.($drop_btn ?: '
-			  <button type="button" class="' . $drop_btn_class . '"
-					data-toggle="dropdown" id="btngroup_id_' . $btngroup_id . '"
-					data-bs-toggle="dropdown" aria-expanded="false"
+			  <button class="' . $drop_btn_class . '"
+					' . (FLEXI_J40GE ? ' data-bs-toggle="dropdown" ' : ' data-toggle="dropdown" ') .'
+					id="btngroup_id_' . $btngroup_id . '" aria-expanded="false"
 				>
 			    <span class="caret"></span>
 			  </button>').'
@@ -5606,6 +5607,9 @@ class flexicontent_html
 					<li>' . implode("</li>\n<li>", $btn_arr) . '</li>
 				</ul>
 			</div>';
+
+		// Add drop-down class to the items
+		$buttons_html = str_replace('_DDI_class_', 'dropdown-item', $buttons_html);
 
 		$toolbar->appendButton(
 			'Custom',

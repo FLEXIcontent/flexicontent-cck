@@ -73,25 +73,41 @@ class FlexicontentViewFile extends FlexicontentViewBaseRecord
 		$isnew = ! $row->id;
 
 		// Get JForm
-		$form  = $this->get('Form');
+		$form = $this->get('Form');
+
 		if (!$form)
 		{
 			$app->enqueueMessage($model->getError(), 'warning');
-			$app->redirect( 'index.php?option=com_flexicontent&view=' . $manager_view );
+
+			if ($jinput->getCmd('tmpl') !== 'component')
+			{
+				$app->redirect( 'index.php?option=com_flexicontent&view=' . $manager_view );
+			}
+			return;
 		}
 
 		// Fail if an existing record is checked out by someone else
 		if ($row->id && $model->isCheckedOut($user->get('id')))
 		{
 			$app->enqueueMessage(JText::_( 'FLEXI_EDITED_BY_ANOTHER_ADMIN' ), 'warning');
-			$app->redirect( 'index.php?option=com_flexicontent&view=' . $manager_view );
+
+			if ($jinput->getCmd('tmpl') !== 'component')
+			{
+				$app->redirect( 'index.php?option=com_flexicontent&view=' . $manager_view );
+			}
+			return;
 		}
 
 		// Fail if an existing record is file being moved to external storage
 		if ($row->id && $row->estorage_fieldid < 0)
 		{
 			$app->enqueueMessage(JText::_( 'File is being moved to external storage, please edit later' ), 'warning');
-			$app->redirect( 'index.php?option=com_flexicontent&view=' . $manager_view );
+
+			if ($jinput->getCmd('tmpl') !== 'component')
+			{
+				$app->redirect( 'index.php?option=com_flexicontent&view=' . $manager_view );
+			}
+			return;
 		}
 
 
@@ -160,7 +176,8 @@ class FlexicontentViewFile extends FlexicontentViewBaseRecord
 
 			$btn_arr[$btn_name] = flexicontent_html::addToolBarButton(
 				'FLEXI_APPLY', $btn_name, $full_js="Joomla.submitbutton('".$ctrl.".apply_ajax')", $msg_alert='', $msg_confirm='',
-				$btn_task, $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false, $btn_class="".$tip_class, $btn_icon="icon-loop",
+				$btn_task, $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false,
+				$btn_class=(FLEXI_J40GE ? ' _DDI_class_ btn-success ' : '') . ' ' . $this->tooltip_class, $btn_icon="icon-loop",
 				'data-placement="bottom" title="'.JText::_('FLEXI_FAST_SAVE_INFO', true).'"', $auto_add = 0);
 		}
 
@@ -175,11 +192,17 @@ class FlexicontentViewFile extends FlexicontentViewBaseRecord
 
 			$btn_arr[$btn_name] = flexicontent_html::addToolBarButton(
 				$btn_title, $btn_name, $full_js="Joomla.submitbutton('".$btn_task."')", $msg_alert='', $msg_confirm='',
-				$btn_task, $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false, $btn_class="".$tip_class, $btn_icon="icon-save",
+				$btn_task, $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false,
+				$btn_class=(FLEXI_J40GE ? ' _DDI_class_ btn-success ' : '') . ' ' . $this->tooltip_class, $btn_icon="icon-save",
 				'data-placement="right" title=""', $auto_add = 0);
 		}
 
-		flexicontent_html::addToolBarDropMenu($btn_arr, 'apply_btns_group');
+		flexicontent_html::addToolBarDropMenu(
+			$btn_arr,
+			'apply_btns_group',
+			null,
+			array('drop_class_extra' => (FLEXI_J40GE ? 'btn-success' : ''))
+		);
 
 
 		/**
@@ -187,16 +210,19 @@ class FlexicontentViewFile extends FlexicontentViewBaseRecord
 		 */
 
 		$btn_arr = array();
+		if (1)
+		{
+			$btn_name = 'save';
+			$btn_task = $ctrl.'.save';
 
-		$btn_name = 'save';
-		$btn_task = $ctrl.'.save';
+			//JToolbarHelper::save($btn_task);  //JToolbarHelper::custom( $btn_task, 'save.png', 'save.png', 'JSAVE', false );
 
-		//JToolbarHelper::save($btn_task);  //JToolbarHelper::custom( $btn_task, 'save.png', 'save.png', 'JSAVE', false );
-
-		$btn_arr[$btn_name] = flexicontent_html::addToolBarButton(
-			'JSAVE', $btn_name, $full_js="Joomla.submitbutton('".$ctrl.".save')", $msg_alert='', $msg_confirm='',
-			$btn_task, $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false, $btn_class="".$tip_class, $btn_icon="icon-save",
-			'data-placement="bottom" title=""', $auto_add = 0);
+			$btn_arr[$btn_name] = flexicontent_html::addToolBarButton(
+				'JSAVE', $btn_name, $full_js="Joomla.submitbutton('".$ctrl.".save')", $msg_alert='', $msg_confirm='',
+				$btn_task, $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false,
+				$btn_class=(FLEXI_J40GE ? ' _DDI_class_ btn-success ' : '') . ' ' . $this->tooltip_class, $btn_icon="icon-save",
+				'data-placement="bottom" title=""', $auto_add = 0);
+			}
 
 
 		// Add a save and new button, if user can create new records
@@ -209,7 +235,8 @@ class FlexicontentViewFile extends FlexicontentViewBaseRecord
 
 			$btn_arr[$btn_name] = flexicontent_html::addToolBarButton(
 				'FLEXI_SAVE_AND_NEW', $btn_name, $full_js="Joomla.submitbutton('".$ctrl.".save2new')", $msg_alert='', $msg_confirm='',
-				$btn_task, $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false, $btn_class="".$tip_class, $btn_icon="icon-save-new",
+				$btn_task, $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false,
+				$btn_class= (FLEXI_J40GE ? ' _DDI_class_ btn-success ' : '') . ' ' . $this->tooltip_class, $btn_icon="icon-save-new",
 				'data-placement="right" title="'.JText::_('FLEXI_SAVE_AND_NEW_INFO', true).'"', $auto_add = 0);
 
 			// Also if an existing item, can save to a copy
@@ -222,12 +249,18 @@ class FlexicontentViewFile extends FlexicontentViewBaseRecord
 
 				$btn_arr[$btn_name] = flexicontent_html::addToolBarButton(
 					'FLEXI_SAVE_AS_COPY', $btn_name, $full_js="Joomla.submitbutton('".$ctrl.".save2copy')", $msg_alert='', $msg_confirm='',
-					$btn_task, $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false, $btn_class="".$tip_class, $btn_icon="icon-save-copy",
+					$btn_task, $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false,
+					$btn_class= (FLEXI_J40GE ? ' _DDI_class_ btn-success ' : '') . ' ' . $this->tooltip_class, $btn_icon="icon-save-copy",
 					'data-placement="right" title="'.JText::_('FLEXI_SAVE_AS_COPY_INFO', true).'"', $auto_add = 0);
 			}
 		}
 
-		flexicontent_html::addToolBarDropMenu($btn_arr, 'save_btns_group');
+		flexicontent_html::addToolBarDropMenu(
+			$btn_arr,
+			'save_btns_group',
+			null,
+			array('drop_class_extra' => (FLEXI_J40GE ? 'btn-success' : ''))
+		);
 
 
 		// Cancel button, TODO frontend modal close
