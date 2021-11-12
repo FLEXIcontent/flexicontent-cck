@@ -1135,7 +1135,7 @@ class flexicontent_html
 		$lib_path = '/components/com_flexicontent/librairies';
 
 		$add_remote_forced_jquery = $add_remote === 2;
-		$add_remote_forced_jquery_ui = $add_remote === 2 || FLEXI_J40GE;
+		$add_remote_forced_jquery_ui = $add_remote === 2;
 
 		if (!$params)
 		{
@@ -1148,7 +1148,8 @@ class flexicontent_html
 			'integrity' => 'sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=',
 			'crossorigin' => 'anonymous',
 		) : null;
-		$JQUERY_UI_VER = FLEXI_J40GE ? '1.12.1' : $params->get('jquery_ui_ver', $flexiparams->get('jquery_ui_ver', '1.9.2'));
+
+		$JQUERY_UI_VER = FLEXI_J40GE ? '1.13.0' : $params->get('jquery_ui_ver', $flexiparams->get('jquery_ui_ver', '1.9.2'));
 		$JQUERY_UI_THEME = $params->get('jquery_ui_theme', $flexiparams->get('jquery_ui_theme', 'flat'));   // FLEXI_JQUERY_UI_CSS_STYLE:  'ui-lightness', 'smoothness', 'flat'
 		JText::script("FLEXI_FORM_IS_BEING_SUBMITTED", true);
 
@@ -1195,7 +1196,11 @@ class flexicontent_html
 			}
 			else
 			{
-				if (FLEXI_J30GE)
+				if (FLEXI_J40GE)
+				{
+					$document->addScript(JUri::root(true).$lib_path.'/jquery/js/jquery-ui-'.$JQUERY_UI_VER.'/jquery-ui.min.js');
+				}
+				elseif (FLEXI_J30GE)
 				{
 					JHtml::_('jquery.ui', array('core', 'sortable'));   // 'core' in J3+ includes all parts of jQuery-UI CORE component: Core, Widget, Mouse, Position
 					if ( !$params || $params->get('load-ui-dialog', 1) )        $document->addScript(JUri::root(true).$lib_path.'/jquery/js/jquery-ui/jquery.ui.dialog.min.js');
@@ -1215,10 +1220,18 @@ class flexicontent_html
 		// Add jQuery UI theme, this is included in J3+ when executing jQuery-UI framework is called
 		if ( $add_jquery_ui_css && !$jquery_ui_css_added )
 		{
-			// FLEXI_JQUERY_UI_CSS_STYLE:  'ui-lightness', 'smoothness'
-			$add_remote_forced_jquery_ui && $JQUERY_UI_THEME !== 'flat'
-				? $document->addStyleSheet('//code.jquery.com/ui/'.$JQUERY_UI_VER.'/themes/'.$JQUERY_UI_THEME.'/jquery-ui.css')
-				: $document->addStyleSheet(JUri::root(true).$lib_path.'/jquery/css/'.$JQUERY_UI_THEME.'/jquery-ui-'.$JQUERY_UI_VER.'.css');
+			if (!$add_remote_forced_jquery_ui && $JQUERY_UI_THEME === 'flat')
+			{
+				$document->addStyleSheet(JUri::root(true).$lib_path.'/jquery/js/jquery-ui-'.$JQUERY_UI_VER.'/jquery-ui.theme.min.css');
+				$document->addStyleSheet(JUri::root(true).$lib_path.'/jquery/js/jquery-ui-'.$JQUERY_UI_VER.'/jquery-ui.structure.min.css');
+			}
+			else
+			{
+				// FLEXI_JQUERY_UI_CSS_STYLE:  'ui-lightness', 'smoothness'
+				$add_remote_forced_jquery_ui // && $JQUERY_UI_THEME !== 'flat'
+					? $document->addStyleSheet('//code.jquery.com/ui/'.$JQUERY_UI_VER.'/themes/'.$JQUERY_UI_THEME.'/jquery-ui.css')
+					: $document->addStyleSheet(JUri::root(true).$lib_path.'/jquery/css/'.$JQUERY_UI_THEME.'/jquery-ui-'.$JQUERY_UI_VER.'.css');
+			}
 
 			$jquery_ui_css_added = 1;
 		}

@@ -47,6 +47,7 @@ $folders = array(
 	JPATH_SITE . '/components/com_flexicontent/librairies/fancybox/source',
 	JPATH_SITE . '/components/com_flexicontent/librairies/fancybox/lib',
 	JPATH_SITE . '/components/com_flexicontent/librairies/echarts',
+	JPATH_SITE . '/components/com_flexicontent/librairies/jquery/css/ui-smoothness',
 	JPATH_ADMINISTRATOR . '/components/com_flexicontent/views/archive',
 	JPATH_ADMINISTRATOR . '/components/com_flexicontent/views/qfcategoryelement',
 );
