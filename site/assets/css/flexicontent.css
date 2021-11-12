@@ -2763,17 +2763,9 @@ div fieldset.panelform {
 	border-width: 1px;
 	border-style: solid;
 }
-#flexicontent .input-group > input:first-child,
-#flexicontent .input-group > input:last-child {
-	border-radius: 4px;
-}
 #flexicontent .btn[class^="btn-outline-"],
 #flexicontent .btn[class*=" btn-outline-"] {
 	border-width: 1px;
-	border-radius: 4px;
-}
-#flexicontent .btn.btn-sm {
-	padding: 4px 4px 3px 5px;
 }
 @media (min-width: 1020px) {
 	.com_flexicontent .btn.spaced-btn,
@@ -4213,6 +4205,15 @@ div.fc-fieldgrp-value-box {
 span.add-on.pop-helper.field-media-preview {
 	height: 26px !important;
 	line-height: 28px !important;
+}
+.input-group > .input-group-append:last-child > .btn:not(:last-child):not(.dropdown-toggle),
+.input-group > .input-group-append:last-child > .input-group-text:not(:last-child),
+.input-group > .input-group-append:not(:last-child) > .btn,
+.input-group > .input-group-append:not(:last-child) > .input-group-text,
+.input-group > .input-group-prepend > .btn,
+.input-group > .input-group-prepend > .input-group-text {
+	border-top-right-radius: 0;
+	border-bottom-right-radius: 0;
 }
 hr.fcclearline {
 	border: 0;

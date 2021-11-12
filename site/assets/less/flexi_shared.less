@@ -873,15 +873,15 @@ div fieldset.panelform {
 	}
 	.input-group > input:first-child,
 	.input-group > input:last-child {
-		border-radius: 4px;
+		/*border-radius: 4px;*/
 	}
 	.btn[class^="btn-outline-"],
 	.btn[class*=" btn-outline-"] {
 		border-width: 1px;
-		border-radius: 4px;
+		/*border-radius: 4px;*/
 	}
 	.btn.btn-sm {
-		padding: 4px 4px 3px 5px;
+		/*padding: 4px 4px 3px 5px;*/
 	}
 }
 @media (min-width: 1020px) {
@@ -2628,4 +2628,9 @@ div.fc-fieldgrp-value-box {
 span.add-on.pop-helper.field-media-preview {
   height: 26px !important;
   line-height: 28px !important;
+}
+/* Add missing bootstrap CSS */
+.input-group > .input-group-append:last-child > .btn:not(:last-child):not(.dropdown-toggle), .input-group > .input-group-append:last-child > .input-group-text:not(:last-child), .input-group > .input-group-append:not(:last-child) > .btn, .input-group > .input-group-append:not(:last-child) > .input-group-text, .input-group > .input-group-prepend > .btn, .input-group > .input-group-prepend > .input-group-text {
+	border-top-right-radius: 0;
+	border-bottom-right-radius: 0;
 }

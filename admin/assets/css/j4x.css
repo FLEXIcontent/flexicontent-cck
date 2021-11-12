@@ -157,7 +157,6 @@ div.toolbar-box {
 #flexicontent select {
 	width: auto;
 	border: 1px solid var(--template-bg-dark-20);
-	min-width: 200px;
 }
 #user-groups legend + .control-group,
 #user-groups .control-group {
@@ -450,9 +449,6 @@ dl#content-pane.tabs {
 [class*=" fcsb-icon-"]:before {
 	font-family: inherit;
 }
-table.fcmanlist td {
-	padding: .75rem 1rem;
-}
 #s2id_scope.select2-container.use_select2_lib .select2-choice {
 	width: 15px !important;
 	height: 34px !important;
@@ -474,17 +470,6 @@ a.btn.btn-small,
 #flexicontent .btn.btn-sm {
 	color: var(--template-text-dark);
 	background: #fff;
-}
-#flexicontent .btn.btn-sm {
-	padding: inherit;
-}
-div.statetoggler {
-	padding: 13px 12px 12px 12px !important;
-	width: auto;
-	line-height: inherit;
-	box-sizing: content-box;
-	border-top-right-radius: 0 !important;
-	border-bottom-right-radius: 0 !important;
 }
 .flexicontent *:not(.input-append):not(.input-prepend):not(.input-group) > select:not(.custom-select) {
 	padding: 11px;
@@ -526,14 +511,6 @@ a.fc_assoc_translation.label.label-association {
 .flexicontent #fc-filters-box .fc-filter .input-group-prepend input#filter_id {
 	border: 1px solid #aaa;
 }
-a.featured.ntxt.btn.btn-sm.btn-outline-info.hasTooltip {
-	padding: 12px 10px !important;
-}
-a.fc-preview-btn.ntxt.btn-outline-info.btn.btn-sm.hasTooltip {
-	min-width: 56px;
-	padding-top: 11px !important;
-	padding-bottom: 11px !important;
-}
 .fa-stack,
 .icon-stack {
 	height: initial;
@@ -563,16 +540,6 @@ div#tags #input-tags {
 #flexicontent [class*="fc-xpended"] .input-group-text.fc-lbl-inverted,
 #flexicontent [class*="fc-xpended"] .add-on.fc-lbl-inverted {
 	font-size: inherit;
-}
-span.fc-preview-btn.ntxt.disabled.btn-outline-info.btn.btn-sm.hasTooltip {
-	padding: 12px !important;
-}
-#flexicontent .btn[class^="btn-outline-"],
-#flexicontent .btn[class*=" btn-outline-"] {
-	border-width: 2px;
-}
-.statetoggler_disabled {
-	padding: 12px !important;
 }
 #adminListTableFCtemplates a.btn.hasTooltip {
 	background: #fff;
@@ -687,6 +654,36 @@ div table.fc-table-list tr:nth-child(odd) td {
 }
 table.fcmanlist tbody tr.row1 td {
 	background: none repeat scroll 0 0 #FFFFFF;
+}
+table.fcmanlist tbody td.col_status .fc-group {
+	vertical-align: text-top;
+}
+table.fcmanlist tbody td.col_status a[target="_blank"]::before {
+	content: unset;
+}
+table.fcmanlist tbody td.col_status fa,
+table.fcmanlist tbody td.col_status .fas,
+table.fcmanlist tbody td.col_status [class*=" icon-"],
+table.fcmanlist tbody td.col_status [class^="icon-"] {
+	height: 1em;
+	line-height: 1em;
+}
+table.fcmanlist tbody td.col_status div.statetoggler {
+	padding-top: 9px !important;
+}
+.col_common_props .fa:before,
+.col_common_props .fas:before,
+.col_common_props [class*=" icon-"]:before,
+.col_common_props [class^="icon-"]:before,
+.col_showin_clients .fa:before,
+.col_showin_clients .fas:before,
+.col_showin_clients [class*=" icon-"]:before,
+.col_showin_clients [class^="icon-"]:before,
+.col_showin_views .fa:before,
+.col_showin_views .fas:before,
+.col_showin_views [class*=" icon-"]:before,
+.col_showin_views [class^="icon-"]:before {
+	padding: 0px 2px;
 }
 .input-append .add-on,
 .input-prepend .add-on,
@@ -806,9 +803,9 @@ label.add-on.fc-lbl-short.addrint_autocomplete-lbl {
 .ui-widget-overlay {
 	opacity: 0.8 !important;
 }
-#flexicontent a.btn.btn-small {
-	padding: 8px 11px !important;
-}
-#flexicontent a.saveorder.btn.btn-small.btn-primary.hasTooltip {
-	padding: 8px 12px !important;
+#flexicontent a.saveorder.btn.btn-small fa,
+#flexicontent a.saveorder.btn.btn-small .fas,
+#flexicontent a.saveorder.btn.btn-small [class*=" icon-"],
+#flexicontent a.saveorder.btn.btn-small [class^="icon-"] {
+	width: 1.2em !important;
 }
