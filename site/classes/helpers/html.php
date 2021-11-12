@@ -5562,11 +5562,11 @@ class flexicontent_html
 		{
 			if (count($btn_arr) === 1)
 			{
-				$button_html = end($btn_arr);
+				$btn_html = end($btn_arr);
 				$btn_name = key($btn_arr);
-				$buttons_html = str_replace('_DDI_class_', '', $buttons_html);
+				$btn_html = str_replace('_DDI_class_', '', $btn_html);
 
-				$toolbar->appendButton('Custom', $button_html, $btn_name);
+				$toolbar->appendButton('Custom', $btn_html, $btn_name);
 			}
 
 			return;
