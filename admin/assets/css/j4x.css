@@ -789,14 +789,77 @@ label.add-on {
 }
 .addrint_autocomplete.pac-target-input {
 	height: 36px !important;
-	border: 2px solid var(--template-bg-dark-20);
+	border: 1px solid var(--template-bg-dark-20);
 }
 label.add-on.fc-lbl-short.addrint_autocomplete-lbl {
 	height: 36px !important;
+	border: 1px solid var(--template-bg-dark-20) !important;
 }
 #flexicontent a.saveorder.btn.btn-small fa,
 #flexicontent a.saveorder.btn.btn-small .fas,
 #flexicontent a.saveorder.btn.btn-small [class*=" icon-"],
 #flexicontent a.saveorder.btn.btn-small [class^="icon-"] {
 	width: 1.2em !important;
+}
+body .fc-mssg-inline.fc-nobgimage,
+body .fc-mssg.fc-nobgimage {
+	padding: 8px 10px 12px 36px;
+}
+#flexicontent .select2-container .select2-choice,
+#flexicontent div#tags #input-tags,
+#flexicontent .fc-field-props-box .fc_preview_msg,
+#flexicontent input.imgalt,
+#flexicontent textarea.imgdesc,
+#flexicontent form .fcfield_textareaval,
+#flexicontent form .fcfield_selectval,
+#flexicontent form .fcfield_selectmulval,
+#flexicontent form .fcfield_textval {
+	border: 1px solid var(--template-bg-dark-20);
+	border-radius: 4px;
+	padding: 5px;
+}
+.controls *:not(.input-append):not(.input-prepend):not(.input-group) > input[type="text"]:not(.minicolors),
+.controls textarea,
+.controls fieldset.radio,
+.controls fieldset.checkbox,
+.flexicontent textarea,
+.flexicontent fieldset.radio,
+.flexicontent fieldset.checkbox {
+	margin: 0;
+}
+#flexicontent .flexicontent :not(.input-prepend):not(.input-append) > input[type="text"]:not(.minicolors) {
+	margin: 0 !important;
+}
+#flexicontent form div fieldset.panelform > fieldset,
+#flexicontent form div fieldset.panelform > div > div.input-append,
+#flexicontent form div fieldset.panelform > div > div.input-prepend,
+#flexicontent form div fieldset.panelform > div > div.btn-group,
+#flexicontent form div fieldset.panelform > div.input-append,
+#flexicontent form div fieldset.panelform > div.input-prepend,
+#flexicontent form div fieldset.panelform > div.btn-group,
+#flexicontent form div fieldset.panelform > div.select2-container,
+#flexicontent form div fieldset.panelform > input,
+#flexicontent form div fieldset.panelform > button,
+#flexicontent form div fieldset.panelform > textarea,
+#flexicontent form div fieldset.panelform > select,
+#flexicontent form div fieldset.panelform > img,
+#flexicontent form div fieldset.panelform > span,
+form div.container_fcfield > fieldset,
+form div.container_fcfield > div > div.input-append,
+form div.container_fcfield > div > div.input-prepend,
+form div.container_fcfield > div > div.btn-group,
+form div.container_fcfield > div.input-append,
+form div.container_fcfield > div.input-prepend,
+form div.container_fcfield > div.btn-group,
+form div.container_fcfield > div.select2-container,
+form div.container_fcfield > input,
+form div.container_fcfield > button,
+form div.container_fcfield > textarea,
+form div.container_fcfield > select,
+form div.container_fcfield > img,
+form div.container_fcfield > span {
+	margin: 0px !important;
+}
+#flexicontent input#input-tags {
+	margin: 0px !important;
 }
