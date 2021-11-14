@@ -828,7 +828,7 @@ class com_flexicontentInstallerScript
 					{
 						$queries[] = "ALTER TABLE `#__".$tbl_name."` "
 							. ' CHANGE `uploaded` `uploaded` DATETIME NULL DEFAULT NULL, CHANGE `checked_out_time` `checked_out_time` DATETIME NULL DEFAULT NULL, '
-							. implode($changes, ' , ');
+							. implode(' , ', $changes);
 					}
 
 					// Fields TABLE
@@ -859,7 +859,7 @@ class com_flexicontentInstallerScript
 
 					if ($changes)
 					{
-						$queries[] = "ALTER TABLE `#__".$tbl_name."` " . implode($changes, ' , ');
+						$queries[] = "ALTER TABLE `#__".$tbl_name."` " . implode(' , ', $changes);
 					}
 
 					// Types TABLE
@@ -881,7 +881,7 @@ class com_flexicontentInstallerScript
 
 					if ($changes)
 					{
-						$queries[] = "ALTER TABLE `#__".$tbl_name."` " . implode($changes, ' , ');
+						$queries[] = "ALTER TABLE `#__".$tbl_name."` " . implode(' , ', $changes);
 					}
 
 					// Tags TABLE
@@ -1926,7 +1926,7 @@ class com_flexicontentInstallerScript
 
 		$query = 'SELECT ' . $id_col . ', ' . $attr_col .
 			' FROM ' . $tbl .
-			' WHERE ' . implode($where, ' AND ')
+			' WHERE ' . implode(' AND ', $where)
 			;
 		$records = $db->setQuery($query)->loadObjectList();
 
