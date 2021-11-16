@@ -1646,7 +1646,7 @@ class FlexicontentModelItems extends FCModelAdminList
 	 * @return	boolean	True on success
 	 * @since	1.5
 	 */
-	function copyitems($cid, $keeptags = 1, $prefix, $suffix, $copynr = 1, $lang = null, $state = null, $method = 1, $maincat = null, $seccats = null, $type_id = null, $access = null)
+	function copyitems($cid, $keeptags = 1, $prefix = '', $suffix = '', $copynr = 1, $lang = null, $state = null, $method = 1, $maincat = null, $seccats = null, $type_id = null, $access = null)
 	{
 		$app    = JFactory::getApplication();
 		$jinput = $app->input;

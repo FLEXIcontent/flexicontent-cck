@@ -182,7 +182,7 @@ trait flexicontent_basetable_trait
 	 *
 	 * @since   3.2
 	 */
-	public function stringURLSafe($string, $language = '', $force_ascii)
+	public function stringURLSafe($string, $language, $force_ascii)
 	{
 		// Return a cleaned unicode alias
 		if (JFactory::getConfig()->get('unicodeslugs') && !$force_ascii)
