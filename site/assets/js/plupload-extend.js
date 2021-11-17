@@ -289,9 +289,10 @@ fc_plupload = function(options)
 					if (typeof func == 'function') func.apply(this, arguments);
 
 					var file_img = fc_plupload_loaded_imgs[file.id];
+					var is_img = file.name.match(/\.(jpg|jpeg|gif|png|webp|bmp|wbmp|ico)$/i);
 
 					// Check if plupload's preloader could not load the file and read it using a native Javascript FileReader
-					if (! file_img.attr( "src" ))
+					if (is_img && !file_img.attr( "src" ))
 					{
 						var reader = new FileReader();
 
