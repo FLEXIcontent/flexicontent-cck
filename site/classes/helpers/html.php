@@ -1220,15 +1220,25 @@ class flexicontent_html
 		// Add jQuery UI theme, this is included in J3+ when executing jQuery-UI framework is called
 		if ( $add_jquery_ui_css && !$jquery_ui_css_added )
 		{
-			if (!$add_remote_forced_jquery_ui && $JQUERY_UI_THEME === 'flat')
+			// A custom made theme ...
+			if ($JQUERY_UI_THEME === 'flat')
 			{
-				$document->addStyleSheet(JUri::root(true).$lib_path.'/jquery/js/jquery-ui-'.$JQUERY_UI_VER.'/jquery-ui.theme.min.css');
-				$document->addStyleSheet(JUri::root(true).$lib_path.'/jquery/js/jquery-ui-'.$JQUERY_UI_VER.'/jquery-ui.structure.min.css');
+				if (FLEXI_J40GE)
+				{
+					// Just load default CSS
+					$document->addStyleSheet(JUri::root(true).$lib_path.'/jquery/js/jquery-ui-'.$JQUERY_UI_VER.'/jquery-ui.theme.min.css');
+					$document->addStyleSheet(JUri::root(true).$lib_path.'/jquery/js/jquery-ui-'.$JQUERY_UI_VER.'/jquery-ui.structure.min.css');
+				}
+				else
+				{
+					// Load custom theme
+					$document->addStyleSheet(JUri::root(true).$lib_path.'/jquery/css/'.$JQUERY_UI_THEME.'/jquery-ui-'.$JQUERY_UI_VER.'.css');
+				}
 			}
 			else
 			{
-				// FLEXI_JQUERY_UI_CSS_STYLE:  'ui-lightness', 'smoothness'
-				$add_remote_forced_jquery_ui // && $JQUERY_UI_THEME !== 'flat'
+				// FLEXI_JQUERY_UI_CSS_STYLE:  'ui-lightness', 'smoothness', ...
+				$add_remote_forced_jquery_ui
 					? $document->addStyleSheet('//code.jquery.com/ui/'.$JQUERY_UI_VER.'/themes/'.$JQUERY_UI_THEME.'/jquery-ui.css')
 					: $document->addStyleSheet(JUri::root(true).$lib_path.'/jquery/css/'.$JQUERY_UI_THEME.'/jquery-ui-'.$JQUERY_UI_VER.'.css');
 			}
