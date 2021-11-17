@@ -60,6 +60,8 @@ class FlexicontentCronTasks
 	 */
 	function __construct()
 	{
+		$this->_setExecConfig();
+
 		// Saves the start time and memory usage.
 		//$start_time = microtime(true);
 		//$start_mem  = memory_get_usage();
@@ -117,8 +119,6 @@ class FlexicontentCronTasks
 
 		// Get Flexicontent constants
 		require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/defineconstants.php';
-
-		$this->_setExecConfig();
 	}
 
 
@@ -418,6 +418,10 @@ class FlexicontentCronTasks
 
 		foreach ($ftpConnID as $ftp_conn)
 		{
+			if (empty($ftp_conn))
+			{
+				continue;
+			}
 			ftp_close($ftp_conn);
 		}
 

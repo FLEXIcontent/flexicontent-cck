@@ -1535,8 +1535,27 @@ class plgSystemFlexisystem extends JPlugin
 		// Try to allow using longer execution time and more memory
 		//$this->_setExecConfig();
 
-		//echo $output = shell_exec('php ' . JPATH_ROOT . DS . 'components' . DS . 'com_flexicontent' . DS . 'tasks'  . DS .  'estorage.php > /dev/null 2>/dev/null &');
-		echo $output = shell_exec('php ' . JPATH_ROOT . DS . 'components' . DS . 'com_flexicontent' . DS . 'tasks'  . DS .  'estorage.php');
+		$shell_exec_enabled = is_callable('shell_exec') && false === stripos(ini_get('disable_functions'), 'shell_exec');
+		if ($shell_exec_enabled)
+		{
+			//echo $output = shell_exec('php ' . JPATH_ROOT . DS . 'components' . DS . 'com_flexicontent' . DS . 'tasks'  . DS .  'estorage.php > /dev/null 2>/dev/null &');
+			$output = shell_exec('php ' . JPATH_ROOT . DS . 'components' . DS . 'com_flexicontent' . DS . 'tasks'  . DS .  'estorage.php 2>&1');
+
+			if ($output)
+			{
+				$log_filename = 'cron_estorage.php';
+				jimport('joomla.log.log');
+				JLog::addLogger(
+					array(
+						'text_file' => $log_filename,  // Sets the target log file
+						'text_entry_format' => '{DATE} {TIME} {PRIORITY} {MESSAGE}'  // Sets the format of each line
+					),
+					JLog::ALL,  // Sets messages of all log levels to be sent to the file
+					array('com_flexicontent.estorage')  // category of logged messages
+				);
+				JLog::add($output, JLog::INFO, 'com_flexicontent.estorage');
+			}
+		}
 	}
 
 
