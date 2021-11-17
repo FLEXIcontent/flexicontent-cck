@@ -583,7 +583,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 			$chunk = $this->input->get('chunk', 0, 'int');
 
 			// Get / Create target directory
-			$targetDir = (ini_get("upload_tmp_dir") ? ini_get("upload_tmp_dir") : sys_get_temp_dir()) . DIRECTORY_SEPARATOR . "fc_fileselement";
+			$targetDir = $app->getCfg('tmp_path') . DIRECTORY_SEPARATOR . "fc_fileselement";
 
 			if (!file_exists($targetDir))
 			{
@@ -597,10 +597,10 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 			$app->setUserState($fileName, $fileName_tmp);
 			$filePath_tmp = $targetDir . DIRECTORY_SEPARATOR . $fileName_tmp;
 
-			// CREATE tmp file inside SERVER tmp directory, but if this FAILS, then CREATE tmp file inside the Joomla temporary folder
+			// CREATE tmp file inside the Joomla temporary folder, but if this FAILS, then CREATE tmp file inside SERVER tmp directory
 			if (!$out = @fopen("{$filePath_tmp}", "ab"))
 			{
-				$targetDir = $app->getCfg('tmp_path') . DIRECTORY_SEPARATOR . "fc_fileselement";
+				$targetDir = (ini_get("upload_tmp_dir") ? ini_get("upload_tmp_dir") : sys_get_temp_dir()) . DIRECTORY_SEPARATOR . "fc_fileselement";
 
 				if (!file_exists($targetDir))
 				{
