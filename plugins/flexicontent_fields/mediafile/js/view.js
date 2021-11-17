@@ -499,7 +499,7 @@ class fc_Waveform_LazyLoad
 		{
 			if (!!!file.data('wfpreview'))
 			{
-				alert(Joomla.JText._('Reference to File is empty can not loade file'));
+				alert(Joomla.JText._('Preview can not load file. Reference to preview file is empty.'));
 				return;
 			}
 

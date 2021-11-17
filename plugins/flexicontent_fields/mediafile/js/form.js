@@ -476,6 +476,9 @@ class fc_Waveform_LazyLoad
 		// Need to watch for seek in addition to audioprocess as audioprocess doesn't fire (if the audio is paused)
 		audio_spectrum.on('seek', seekHandler);
 
+		audio_spectrum.on('error', function(e) {
+			console.warn(e);
+    });
 
 		box.get(0).addEventListener("keydown", function (event) {
 			return keyPressedDown(event);
@@ -824,10 +827,10 @@ class fc_Waveform_LazyLoad
 		{
 			audio_spectrum._dummyProgress();
 
-			audio_spectrum.util.ajax({
-				responseType: 'json',
+			jQuery.ajax({
+				dataType: 'json',
 				url: jsonPeaks
-			}).on('success', function (response)
+			}).success(function (response)
 			{
 				var data = response.data;
 				data.unshift(data[1]);
