@@ -1024,7 +1024,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 			$file = JPATH_SITE.DS.'tmp'.DS.'tbl_indexes_'.$tblname;
 			if ( JFile::exists($file) )
 			{
-				$indexing_start_secs = (int)JFile::read($file);
+				$indexing_start_secs = (int) file_get_contents($file);
 				$indexing_started = $indexing_start_secs + 3600 > time();
 				if (!$indexing_started) {
 					JFile::delete($file);

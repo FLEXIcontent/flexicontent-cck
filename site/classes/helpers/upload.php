@@ -260,7 +260,7 @@ class flexicontent_upload
 		// Check for XSS safe contents
 		// ***************************
 		
-		$xss_check = JFile::read($file['tmp_name'], false, 256);
+		$xss_check = file_get_contents($file['tmp_name'], false, null, 0, 256);
 		$html_tags = array('abbr','acronym','address','applet','area','audioscope','base','basefont',
 			'bdo','bgsound','big','blackface','blink','blockquote','body','bq','br','button','caption',
 			'center','cite','code','col','colgroup','comment','custom','dd','del','dfn','dir','div','dl','dt',
