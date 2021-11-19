@@ -813,7 +813,7 @@
 		trgEL.removeAttr('data-defvals');  // Remove default values of select2 JS
 
     // Frontend case, use root URL
-		var live_site = !!jroot_url_fc ? jroot_url_fc : '';
+		var live_site = !!jbase_url_fc ? jbase_url_fc : '';;
 
 		jQuery.ajax({
 			type: 'POST',

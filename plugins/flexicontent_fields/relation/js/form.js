@@ -149,11 +149,11 @@
 		}
 
     // Frontend case, use root URL
-		var live_site = !!jroot_url_fc ? jroot_url_fc : '';
+		var live_site = !!jbase_url_fc ? jbase_url_fc : '';
 
 		jQuery.ajax({
 			type: 'POST',
-			url: live_site + 'index.php?option=com_flexicontent&tmpl=component&format=raw',
+			url: live_site + 'index.php?option=com_flexicontent&tmpl=component&format=raw&' + eval('sessionToken' + field_id) + '=1',
 			dataType: 'json',
 			data: ajax_data
 		}).done( function(data) {

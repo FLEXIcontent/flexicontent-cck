@@ -519,6 +519,9 @@ class plgFlexicontent_fieldsRelation extends FCField
 			var rowCount".$field->id."	= ".count($field->value).";      // Counts existing rows to be able to limit a max number of values
 			var maxValues".$field->id." = ".$max_values.";
 		";
+		$js .= "
+			var sessionToken".$field->id." = '". JSession::getFormToken() . "';
+		";
 		if ($js)  $document->addScriptDeclaration($js);
 		if ($css) $document->addStyleDeclaration($css);
 
@@ -1125,6 +1128,8 @@ class plgFlexicontent_fieldsRelation extends FCField
 
 	public function getCategoryItems()
 	{
+		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
+
 		// Get API objects / data
 		$app   = JFactory::getApplication();
 		$user  = JFactory::getUser();
