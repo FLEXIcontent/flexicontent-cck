@@ -213,7 +213,7 @@
 			list.parent().find('.fcrec_cascaded_col').removeClass('fcrec_unused');
 
 			// Frontend case, use root URL
-			var !!jbase_url_fc ? jbase_url_fc : '';
+			var live_site = !!jbase_url_fc ? jbase_url_fc : '';
 
 			list.after( jQuery('<img src="components/com_flexicontent/assets/images/ajax-loader.gif">') );
 			jQuery.ajax({
