@@ -19,11 +19,11 @@ if ( ini_get('date.timezone')=='' ) {
 // ALLOW INCLUDING CONFIG multiple times
 if (!defined('phpThumbConfigFileVersion'))
 {
-	define('phpThumbConfigFileVersion', '1.7.16');
+	define('phpThumbConfigFileVersion', '1.7.18');
 }
 
 ob_start();
-if (!class_exists('phpthumb_functions')) { // normally include_once should take care of this, but see https://github.com/JamesHeinrich/phpThumb/issues/94
+if (!class_exists('phpthumb_functions', false)) { // normally include_once should take care of this, but see https://github.com/JamesHeinrich/phpThumb/issues/94
 	if (!file_exists( __DIR__ .'/phpthumb.functions.php') || !include_once( __DIR__ .'/phpthumb.functions.php')) {
 		ob_end_flush();
 		die('failed to include_once(phpthumb.functions.php) - realpath="'.realpath( __DIR__ .'/phpthumb.functions.php').'"');
@@ -288,6 +288,6 @@ if (!function_exists('phpThumbURL'))
 			}
 		}
 		$ParameterString = implode($PHPTHUMB_CONFIG['high_security_url_separator'], $ParamterStringEncodedArray);
-		return $path_to_phpThumb.'?'.$ParameterString.$PHPTHUMB_CONFIG['high_security_url_separator'].'hash='.md5($ParameterString.$PHPTHUMB_CONFIG['high_security_password']);
+		return $path_to_phpThumb.'?'.$ParameterString.$PHPTHUMB_CONFIG['high_security_url_separator'].'hash='.hash_hmac('sha256', $ParameterString, $PHPTHUMB_CONFIG['high_security_password']);
 	}
 }
