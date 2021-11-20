@@ -665,6 +665,15 @@ class plgFlexicontent_fieldsImage extends FCField
 		";
 		$css .='';
 
+		// Add field's custom CSS / JS
+		if ($multiple) $js .= "
+			var uniqueRowNum".$field->id."	= ".count($field->value).";  // Unique row number incremented only
+			var rowCount".$field->id."	= ".count($field->value).";      // Counts existing rows to be able to limit a max number of values
+			var maxValues".$field->id." = ".$max_values.";
+		";
+		if ($js)  $document->addScriptDeclaration($js);
+		if ($css) $document->addStyleDeclaration($css);
+
 		flexicontent_html::loadFramework('flexi-lib');
 		JHtml::addIncludePath(JPATH_SITE . '/components/com_flexicontent/helpers/html');
 
@@ -1122,16 +1131,7 @@ class plgFlexicontent_fieldsImage extends FCField
 			if (!$multiple) break;  // multiple values disabled, break out of the loop, not adding further values even if the exist
 		}
 
-
-		// Add field's custom CSS / JS
-		if ($multiple) $js .= "
-			var uniqueRowNum".$field->id."	= ".count($field->value).";  // Unique row number incremented only
-			var rowCount".$field->id."	= ".count($field->value).";      // Counts existing rows to be able to limit a max number of values
-			var maxValues".$field->id." = ".$max_values.";
-		";
-		if ($js)  $document->addScriptDeclaration($js);
-		if ($css) $document->addStyleDeclaration($css);
-
+		// Add per value JS
 		$js = !$per_value_js ? "" : "
 			jQuery(document).ready(function()
 			{
