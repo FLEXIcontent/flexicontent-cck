@@ -536,7 +536,7 @@ if ($prop !== 'display_properties_only') :
 				<!--div id="fc_mediafile_current_time_' . $fnn . '" class="media_time">00:00:00</div-->
 				<div id="fc_mediafile_controls_' . $fnn . '" class="fc_mediafile_controls">
 					<a href="javascript:;" class="btn playBtn">
-						<span class="icon-play-circle controls"></span><span class="btnControlsText">' . JText::_('FLEXI_FIELD_MEDIAFILE_PLAY') . '</span>
+						<span class="icon-play controls"></span><span class="btnControlsText">' . JText::_('FLEXI_FIELD_MEDIAFILE_PLAY') . '</span>
 					</a>
 					<a href="javascript:;" class="btn pauseBtn" style="display: none;">
 						<span class="icon-pause-circle controls"></span><span class="btnControlsText">' . JText::_('FLEXI_FIELD_MEDIAFILE_PAUSE') . '</span>
@@ -620,7 +620,7 @@ endif;   // END OF   $prop !== 'display_properties_only'
 
 			if ($md_name == 'channels')
 			{
-				$PROP_NAME = '<span class="icon-play-circle large-icon"> </span> ' . JText::_('FLEXI_FIELD_MEDIADATA_CHANNELS');
+				$PROP_NAME = '<span class="icon-play large-icon"> </span> ' . JText::_('FLEXI_FIELD_MEDIADATA_CHANNELS');
 
 				// Only change value if it is 2 or 1
 				if ($PROP_VALUE == 2 || $PROP_VALUE == 1)
