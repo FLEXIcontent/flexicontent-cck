@@ -325,6 +325,7 @@ if ($js)
 
 		// In the case we skip rows, we need a reliable incrementing counter with no holes, used for e.g. even / odd row class
 		$k = 0;
+		$text_cnt = 0;
 
 		foreach ($this->rows as $i => $row)
 		{
@@ -395,10 +396,22 @@ if ($js)
 			<td class="left col_search_index">
 				<?php
 					$_search_index = !$search_prefix ? $row->search_index : preg_replace('/\b'.$search_prefix.'/u', '', $row->search_index);
-					if(iconv_strlen($row->search_index, "UTF-8")>400)
-						echo iconv_substr($_search_index, 0, 400, "UTF-8").'...';
+					if (iconv_strlen($row->search_index, "UTF-8")> 610)
+					{
+						echo iconv_substr($_search_index, 0, 300, "UTF-8");
+						$text_cnt++;
+						?>
+						<span id="search_index_text_<?php echo $text_cnt; ?>" style="display: none;">
+							<?php echo $_search_index; ?>
+						</span>
+						<span class="badge" onclick="var box = jQuery('#search_index_text_<?php echo $text_cnt; ?>'); fc_itemelement_view_handle = fc_showAsDialog(box, 800, 0, null, { title: '<?php echo JText::_('FLEXI_MORE', true); ?>'}); return false;" style="cursor: pointer">...</span>
+						<?php
+						echo iconv_substr($_search_index, -300, 300, "UTF-8");
+					}
 					else
+					{
 						echo $_search_index;
+					}
 				?>
 			</td>
 
