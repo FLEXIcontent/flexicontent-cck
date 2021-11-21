@@ -3146,9 +3146,15 @@ class FlexicontentFields
 			break;
 
 		case 'categories':
-			$query  = 'SELECT c.id AS value_id, c.title AS value, rel.itemid AS itemid'
+			$query  = 'SELECT c.id AS value_id, ' . (FLEXI_FALANG ? 'CASE WHEN (fa.value IS NOT NULL) THEN fa.value ELSE c.title END' : ' c.title') . ' AS value, fa.value as faval, rel.itemid AS itemid'
 				.' FROM #__categories AS c'
 				.' JOIN #__flexicontent_cats_item_relations AS rel ON c.id=rel.catid'
+				. (!FLEXI_FALANG ? '' :
+					' LEFT JOIN #__content AS im ON im.id = rel.itemid ' .
+					' LEFT JOIN #__languages AS la ON la.lang_code = im.language ' .
+          ' LEFT JOIN #__falang_content AS fa ON fa.reference_table = "categories" ' .
+						' AND fa.reference_field = "title" AND fa.reference_id = c.id AND fa.language_id = la.lang_id'
+				)
 				.' WHERE c.id<>0 AND rel.itemid IN ('.(@$field->query_itemids ? implode(',', $field->query_itemids) : $field->item_id) .')';
 			break;
 
@@ -3157,8 +3163,8 @@ class FlexicontentFields
 				.' FROM #__flexicontent_tags AS t'
 				.' JOIN #__flexicontent_tags_item_relations AS rel ON t.id=rel.tid'
 				. (!FLEXI_FALANG ? '' :
-					' LEFT JOIN #__content AS c ON c.id = rel.itemid ' .
-					' LEFT JOIN #__languages AS la ON la.lang_code = c.language ' .
+					' LEFT JOIN #__content AS im ON im.id = rel.itemid ' .
+					' LEFT JOIN #__languages AS la ON la.lang_code = im.language ' .
           ' LEFT JOIN #__falang_content AS fa ON fa.reference_table = "tags" ' .
 						' AND fa.reference_field = "title" AND fa.reference_id = t.jtag_id AND fa.language_id = la.lang_id'
 				)
