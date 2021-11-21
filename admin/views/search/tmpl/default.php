@@ -129,6 +129,7 @@ function delAllFilters()
 	delFilter('search');
 	delFilter('search_itemtitle');
 	delFilter('search_itemid');
+	delFilter('filter_itemlang');
 	delFilter('filter_type');
 	delFilter('filter_state');
 	delFilter('filter_fieldtype');
@@ -192,6 +193,7 @@ if ($js)
 
 					<?php echo $this->lists['search_itemtitle']; ?>
 					<?php echo $this->lists['search_itemid']; ?>
+					<?php echo $this->lists['filter_itemlang']; ?>
 					<?php echo $this->lists['filter_type']; ?>
 					<?php echo $this->lists['filter_state']; ?>
 
@@ -278,6 +280,10 @@ if ($js)
 				<?php echo JHtml::_('grid.sort', JText::_('FLEXI_ITEM_TITLE'), 'a.title', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
 
+			<th class="hideOnDemandClass left language">
+				<?php echo JHtml::_('grid.sort', JText::_('FLEXI_LANGUAGE'), 'a.language', $this->lists['order_Dir'], $this->lists['order'] ); ?>
+			</th>
+
 		<?php if ($this->isADV) : ?>
 			<th class="hideOnDemandClass left">
 				<?php echo JHtml::_('grid.sort', JText::_('FLEXI_FIELD_INDEX').' '.JText::_('FLEXI_FIELD_LABEL'), 'f.label', $this->lists['order_Dir'], $this->lists['order'] ); ?>
@@ -362,6 +368,10 @@ if ($js)
 					'onclick'  => 'var url = jQuery(this).attr(\'data-href\'); var the_dialog = fc_showDialog(url, \'fc_modal_popup_container\', 0, 0, 0, fc_edit_fcitem_modal_close, {title:\'' . JText::_('FLEXI_EDIT', true) . '\', loadFunc: fc_edit_fcitem_modal_load}); return false;" ',
 				));
 				?>
+			</td>
+
+			<td>
+				<?php echo $row->language; ?>
 			</td>
 
 			<?php if ($this->isADV) : ?>

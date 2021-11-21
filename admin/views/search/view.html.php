@@ -89,10 +89,12 @@ class FLEXIcontentViewSearch extends FlexicontentViewBaseRecords
 		$filter_indextype = $model->getState('filter_indextype');
 		$isADV = $filter_indextype === 'advanced';
 
+		$filter_itemlang  = $model->getState('filter_itemlang');
 		$filter_fieldtype = $model->getState('filter_fieldtype');
 		$filter_type      = $model->getState('filter_type');
 		$filter_state     = $model->getState('filter_state');
 
+		if ($filter_itemlang) $count_filters++;
 		if ($filter_fieldtype) $count_filters++;
 		if ($filter_type) $count_filters++;
 		if (strlen($filter_state)) $count_filters++;
@@ -110,6 +112,7 @@ class FLEXIcontentViewSearch extends FlexicontentViewBaseRecords
 
 		$filter_indextype	= $model->getState( 'filter_indextype' );
 
+		$f_active['filter_itemlang']	= (boolean)$filter_itemlang;
 		$f_active['filter_fieldtype']	= (boolean)$filter_fieldtype;
 		$f_active['filter_type']	= (boolean)$filter_type;
 		$f_active['filter_state']	= (boolean)$filter_state;
@@ -228,6 +231,23 @@ class FLEXIcontentViewSearch extends FlexicontentViewBaseRecords
 				),
 			));
 		}
+
+
+		// Build item language filter
+		$lists['filter_itemlang'] = $this->getFilterDisplay(array(
+			'label' => JText::_('FLEXI_LANGUAGE'),
+			'html' => flexicontent_html::buildlanguageslist(
+				'filter_itemlang',
+				array(
+					'class' => $this->select_class,
+					'size' => '1',
+					'onchange' => 'document.adminForm.limitstart.value=0; Joomla.submitform();',
+				),
+				$filter_itemlang,
+				'-'
+			)
+		));
+
 
 		// Build item type filter
 		$lists['filter_type'] = $this->getFilterDisplay(array(

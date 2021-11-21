@@ -116,16 +116,19 @@ class FLEXIcontentModelSearch extends FCModelAdminList
 
 		// Various filters
 		$filter_type      = $fcform ? $jinput->get('filter_type', 0, 'int') : $app->getUserStateFromRequest($p . 'filter_type',  'filter_type',   0, 'int' );
+		$filter_itemlang  = $fcform ? $jinput->get('filter_itemlang', '', 'cmd') : $app->getUserStateFromRequest($p . 'filter_itemlang', 'filter_itemlang', '', 'cmd');
 		$filter_fieldtype = $fcform ? $jinput->get('filter_fieldtype', '', 'cmd') : $app->getUserStateFromRequest($p . 'filter_fieldtype', 'filter_fieldtype', '', 'cmd');
 		$search_itemtitle = $fcform ? $jinput->get('search_itemtitle', '', 'string') : $app->getUserStateFromRequest($p . 'search_itemtitle', 'search_itemtitle', '', 'string' );
 		$search_itemid    = $fcform ? $jinput->get('search_itemid', 0, 'int') : $app->getUserStateFromRequest( $p.'search_itemid',    'search_itemid',     0, 'int' );
 
 		$this->setState('filter_type', $filter_type);
+		$this->setState('filter_itemlang', $filter_itemlang);
 		$this->setState('filter_fieldtype', $filter_fieldtype);
 		$this->setState('search_itemtitle', $search_itemtitle);
 		$this->setState('search_itemid', $search_itemid);
 
 		$app->setUserState($p.'filter_type', $filter_type);
+		$app->setUserState($p.'filter_itemlang', $filter_itemlang);
 		$app->setUserState($p.'filter_fieldtype', $filter_fieldtype);
 		$app->setUserState($p.'search_itemtitle', $search_itemtitle);
 		$app->setUserState($p.'search_itemid', $search_itemid);
@@ -265,6 +268,7 @@ class FLEXIcontentModelSearch extends FCModelAdminList
 
 			$filter_order     = $this->getState('filter_order');
 
+			$filter_itemlang = $this->getState('filter_itemlang');
 			$filter_fieldtype = $this->getState('filter_fieldtype');
 			$filter_state = $this->getState('filter_state');
 			$filter_type  = $this->getState('filter_type');
@@ -279,8 +283,8 @@ class FLEXIcontentModelSearch extends FCModelAdminList
 		$query = !$query_ids
 			? 'SELECT SQL_CALC_FOUND_ROWS ' . ($isADV ? 'ai.sid' : 'ext.item_id')
 			: ($isADV
-				? 'SELECT f.label, f.name, f.field_type, ai.*, a.title, a.id, 0 AS checked_out '
-				: 'SELECT ext.*, a.title, a.id, 0 AS checked_out '
+				? 'SELECT f.label, f.name, f.field_type, ai.*, a.title, a.id, a.language, 0 AS checked_out '
+				: 'SELECT ext.*, a.title, a.id, a.language, 0 AS checked_out '
 			);
 		$query .= $isADV ? ' FROM #__flexicontent_advsearch_index as ai' : ' FROM #__flexicontent_items_ext as ext';
 
@@ -308,7 +312,7 @@ class FLEXIcontentModelSearch extends FCModelAdminList
 			}
 			else
 			{
-				if ($filter_order == 'a.id' || $filter_order == 'a.title' || $filter_state || $filter_type || $search_itemtitle || $search_itemid)
+				if ($filter_order == 'a.id' || $filter_order == 'a.title' || $filter_state || $filter_type || $filter_itemlang || $search_itemtitle || $search_itemid)
 					$query .= ' JOIN #__flexicontent_items_tmp as a ON ' .($isADV ? 'ai' : 'ext'). '.item_id=a.id';
 				if ($isADV && $filter_type)
 					$query .= ' JOIN #__flexicontent_items_ext as ext ON ext.item_id=a.id';
@@ -363,6 +367,7 @@ class FLEXIcontentModelSearch extends FCModelAdminList
 
 		$filter_state	= $this->getState('filter_state');
 		$filter_type	= $this->getState('filter_type');
+		$filter_itemlang  = $this->getState('filter_itemlang');
 		$filter_fieldtype = $this->getState('filter_fieldtype');
 		$search_itemtitle	= $this->getState('search_itemtitle');
 		$search_itemid		= $this->getState('search_itemid');
@@ -389,6 +394,11 @@ class FLEXIcontentModelSearch extends FCModelAdminList
 			{
 				$where[] = 'f.field_type = ' . $this->_db->quote($filter_fieldtype);
 			}
+		}
+
+		if ($filter_itemlang)
+		{
+			$where[] = 'a.language = ' . $this->_db->quote($filter_itemlang);
 		}
 
 		if ($filter_state)
