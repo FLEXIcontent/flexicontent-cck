@@ -847,7 +847,7 @@ class FlexicontentFields
 			$show_acc_msg = $first_item_field->parameters->get('show_acc_msg', 0);
 			$no_acc_msg = $first_item_field->parameters->get('no_acc_msg');
 			$no_acc_msg = JText::_( $no_acc_msg ? $no_acc_msg : 'FLEXI_FIELD_NO_ACCESS');
-			
+
 			static $login_link = null;
 
 			if ($show_acc_msg == 2 && $login_link === null)
@@ -1440,19 +1440,22 @@ class FlexicontentFields
 		// ***************************************************************
 
 		$versioned_item = count($items)==1 && !empty($items[0]->version_id) && !empty($items[0]->tags);
+
 		if ($versioned_item)
 		{
 			$item = $items[0];
 			if ( !count($item->tags) ) return array();
 			$item->tags = ArrayHelper::toInteger($item->tags);
 
-			$query 	= 'SELECT DISTINCT t.id AS _id, t.id, t.name, jt.id,jt.title, jt.description'
+			$query 	= 'SELECT DISTINCT t.id AS _id, t.id, t.name, jt.id,jt.title, jt.description,'
 				. ' CASE WHEN CHAR_LENGTH(t.alias) THEN CONCAT_WS(\':\', t.id, t.alias) ELSE t.id END as slug'
 				. ' FROM #__flexicontent_tags AS t'
 				. ' LEFT JOIN #__tags AS jt ON jt.id = t.jtag_id'
 				. ' WHERE t.id IN (' . implode(',', $item->tags) . ')'
-				. ' AND t.published = 1';
+				. ' AND t.published = 1'
+				;
 			$tags = $db->setQuery($query)->loadObjectList();
+
 			foreach($tags as $tag)
 			{
 				$tag->id = $tag->_id;
@@ -1481,8 +1484,7 @@ class FlexicontentFields
 		$query = 'SELECT t.tid, t.itemid'
 			. ' FROM #__flexicontent_tags_item_relations AS t'
 			. ' WHERE t.itemid IN (' . implode(',', $cids) .')';
-		$db->setQuery( $query );
-		$item_tagids = $db->loadObjectList();
+		$item_tagids = $db->setQuery($query)->loadObjectList();
 
 		if ( empty($item_tagids) ) return array();
 
@@ -1497,18 +1499,20 @@ class FlexicontentFields
 			. ' JOIN #__flexicontent_tags_item_relations AS i ON i.tid = t.id'
 			. ' LEFT JOIN #__tags AS jt ON jt.id = t.jtag_id'
 			. ' WHERE i.itemid IN (' . implode(',', $cids) . ')'
-			. ' AND t.published = 1';
+			. ' AND t.published = 1'
+			;
+		$tags = $db->setQuery($query)->loadObjectList('_id');
 
-			$tags = $db->setQuery($query)->loadObjectList('_id');
-			foreach($tags as $tag)
-			{
-				$tag->id = $tag->_id;
-				$tag->name = $tag->title ?: $tag->name;
-				unset($tag->_id);
-			}
+		foreach($tags as $tag)
+		{
+			$tag->id = $tag->_id;
+			$tag->name = $tag->title ?: $tag->name;
+			unset($tag->_id);
+		}
 
 		// Create an array of every item's tag data
 		$taglists = array();
+
 		foreach ($item_tagids as $it)
 		{
 			if ( !empty($tags[$it->tid]) )
@@ -1542,18 +1546,20 @@ class FlexicontentFields
 		// ***************************************************************
 
 		$versioned_item = count($items)==1 && !empty($items[0]->version_id) && !empty($items[0]->categories);
+
 		if ($versioned_item)
 		{
 			$item = $items[0];
+			if ( !count($item->categories) ) return array();
 			$item->categories = ArrayHelper::toInteger($item->categories);
 
-			$query = 'SELECT DISTINCT c.id, c.title, CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as slug'
+			$query = 'SELECT DISTINCT c.id, c.title,'
+				. ' CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as slug'
 				. ' FROM #__categories AS c'
 				. ' WHERE c.id IN (' . implode(',', $item->categories) . ')'
 				//. ' AND c.published = 1'   // Get unpublished cats too
 				;
-			$db->setQuery( $query );
-			$cats = $db->loadObjectList();
+			$cats = $db->setQuery($query)->loadObjectList();
 
 			$catlists[$item->id] = array_reverse( $cats );
 			return $catlists;
@@ -1597,6 +1603,7 @@ class FlexicontentFields
 
 		// Create an array of every item's cat data
 		$catlists = array();
+
 		foreach ($item_catids as $ic)
 		{
 			if ( !empty($cats[$ic->catid]) )
@@ -1604,6 +1611,7 @@ class FlexicontentFields
 				$catlists[$ic->itemid][] = $cats[$ic->catid];
 			}
 		}
+
 		return $catlists;
 	}
 
@@ -3145,7 +3153,7 @@ class FlexicontentFields
 			break;
 
 		case 'tags':
-			$query  = 'SELECT t.id AS value_id, ' . (FLEXI_FALANG ? 'CASE WHEN (fa.value IS NOT NULL) THEN fa.value ELSE t.name END' : ' t.name') . ' AS value, rel.itemid AS itemid' 
+			$query  = 'SELECT t.id AS value_id, ' . (FLEXI_FALANG ? 'CASE WHEN (fa.value IS NOT NULL) THEN fa.value ELSE t.name END' : ' t.name') . ' AS value, rel.itemid AS itemid'
 				.' FROM #__flexicontent_tags AS t'
 				.' JOIN #__flexicontent_tags_item_relations AS rel ON t.id=rel.tid'
 				. (!FLEXI_FALANG ? '' :
@@ -5952,7 +5960,7 @@ class FlexicontentFields
 			echo '</pre>';*/
 		}
 	}
-	
+
 	static function cleanArray($value, $validation = 'STRING', $max_depth = 10)
 	{
 		static $depth = 0;
@@ -5991,7 +5999,7 @@ class FlexicontentFields
 				{
 					unset($value[$i]);
 				}
-					
+
 			}
 
 			--$depth;
