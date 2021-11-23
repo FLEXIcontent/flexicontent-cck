@@ -3146,7 +3146,8 @@ class FlexicontentFields
 			break;
 
 		case 'categories':
-			$query  = 'SELECT c.id AS value_id, ' . (FLEXI_FALANG ? 'CASE WHEN (fa.value IS NOT NULL) THEN fa.value ELSE c.title END' : ' c.title') . ' AS value, fa.value as faval, rel.itemid AS itemid'
+			$query  = 'SELECT c.id AS value_id, rel.itemid AS itemid, '
+				. (FLEXI_FALANG ? ' CASE WHEN (fa.value IS NOT NULL) THEN fa.value ELSE c.title END' : ' c.title') . ' AS value'
 				.' FROM #__categories AS c'
 				.' JOIN #__flexicontent_cats_item_relations AS rel ON c.id=rel.catid'
 				. (!FLEXI_FALANG ? '' :
