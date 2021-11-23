@@ -215,17 +215,27 @@ if ($canseltypes)
 		$types[] = JHtml::_('select.option', $type->id, JText::_($type->name));
 	}
 
-	$multiple_param = $show_filters ? ' onchange="adminFormPrepare(this.form); this.form.submit();" ' : ' multiple="multiple" ';
-	$multiple_class = $show_filters ? ' fc_is_selmultiple' : '';
+	$attrs = array();
+	$attrs['class'] = 'fc_field_filter use_select2_lib fc_prompt_internal';
+	//$attrs['class'] .= ' fc_label_internal';  $attrs['data-fc_label_text'] = "...";
 
-	$attribs  = $multiple_param.' size="5" class="fc_field_filter use_select2_lib fc_prompt_internal '.$multiple_class.'"';  // class="... fc_label_internal" data-fc_label_text="..."
-	$attribs .= ' data-placeholder="'.htmlspecialchars(JText::_('FLEXI_CLICK_TO_LIST', ENT_QUOTES, 'UTF-8')).'"';
-	$attribs .= ' data-fc_prompt_text="'.htmlspecialchars(JText::_('FLEXI_TYPE_TO_FILTER', ENT_QUOTES, 'UTF-8')).'"';
+	if ($show_filters)
+	{
+		$attrs['onchange'] = "adminFormPrepare(this.form); this.form.submit();";
+		$attrs['class'] .= ' fc_is_selmultiple';
+	}
+	else
+	{
+		 $attrs['multiple'] = "multiple";
+	}
+	$attrs['size'] = "5";
+	$attrs['data-placeholder']    = htmlspecialchars(JText::_('FLEXI_CLICK_TO_LIST', ENT_QUOTES, 'UTF-8'));
+	$attrs['data-fc_prompt_text'] = htmlspecialchars(JText::_('FLEXI_TYPE_TO_FILTER', ENT_QUOTES, 'UTF-8'));
 
 	$lists['contenttypes'] = JHtml::_('select.genericlist',
 		$types,
 		'contenttypes[]',
-		$attribs,
+		$attrs,
 		'value',
 		'text',
 		(empty($form_contenttypes) ? '' : $form_contenttypes),
@@ -234,7 +244,7 @@ if ($canseltypes)
 }
 
 // *** Selector of Fields for text searching
-// THIS is wrong value 1 means hide the fields and use the configured fields 
+// THIS is wrong value 1 means hide the fields and use the configured fields
 // if( in_array($txtmode, array(1,2)) && count($fields_text) )
 if( $txtmode==2 && count($fields_text) )
 {
@@ -281,36 +291,36 @@ if ($autodisplayadvoptions)
 	    "true": "open",
 	    "false": "close"
 	  };
-	  
-    
+
+
 	  jQuery("#modfcadvsearch_fcsearch_txtflds_row_'.$module->id.'").css("position","relative").hide(0, function(){}).css("position","static");
-	  
+
 	  '. (($autodisplayadvoptions==1 && !$use_advsearch_options) ? '' : 'jQuery("#modfcadvsearch_fcsearch_txtflds_row_'.$module->id.'").css("position","relative").toggle(500, function(){}).css("position","static");') .'
-		
+
 	  jQuery("#modfcadvsearch_use_advsearch_options_'.$module->id.'").click(function() {
-	  
+
 		  jQuery("#modfcadvsearch_fcsearch_txtflds_row_'.$module->id.'").css("position","relative").toggle(500, function(){}).css("position","static");
     });
   '
   .( 1 /*$this->params->get('canseltypes', 1)!=2*//*disable hiding*/ ? '' : '
 	  jQuery("#modfcadvsearch_fcsearch_contenttypes_row_'.$module->id.'").css("position","relative").hide(0, function(){}).css("position","static");
-	  
+
 	  '. (($autodisplayadvoptions==1 && !$use_advsearch_options) ? '' : 'jQuery("#modfcadvsearch_fcsearch_contenttypes_row_'.$module->id.'").css("position","relative").toggle(500, function(){}).css("position","static");') .'
-		
+
 	  jQuery("#modfcadvsearch_use_advsearch_options_'.$module->id.'").click(function() {
-	  
+
 		  jQuery("#modfcadvsearch_fcsearch_contenttypes_row_'.$module->id.'").css("position","relative").toggle(500, function(){}).css("position","static");
     }); ').
   '
 	  jQuery("#modfcadvsearch_fc_advsearch_options_set_'.$module->id.'").css("position","relative").hide(0, function(){}).css("position","static");
-	  
+
 	  '. (($autodisplayadvoptions==1 && !$use_advsearch_options) ? '' : 'jQuery("#modfcadvsearch_fc_advsearch_options_set_'.$module->id.'").css("position","relative").toggle(500, function(){}).css("position","static");') .'
-		
+
 	  jQuery("#modfcadvsearch_use_advsearch_options_'.$module->id.'").click(function() {
-	  
+
 		  jQuery("#modfcadvsearch_fc_advsearch_options_set_'.$module->id.'").css("position","relative").toggle(500, function(){}).css("position","static");
     });
-    
+
 	});
 	';
 }
@@ -329,9 +339,9 @@ $doc->addScriptDeclaration($js);
 				<span><?php echo JText::_('FLEXI_SEARCH_CONTENT_TYPE'); ?></span>
 			</span>
 		</legend>
-		
+
 		<table id="fc_textsearch_tbl_<?php echo $module->id;?>" class="fc_search_tbl <?php echo $params->get('pageclass_sfx'); ?>" >
-		
+
 			<tr id="modfcadvsearch_fcsearch_contenttypes_row_<?php echo $module->id;?>" class="fc_search_row_<?php echo (($r++)%2);?>">
 				<?php if($params->get('show_type_label', 1)): ?>
 				<td class="fc_search_label_cell">
