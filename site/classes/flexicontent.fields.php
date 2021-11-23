@@ -4382,35 +4382,42 @@ class FlexicontentFields
 		$show_matches = $isRange || !$faceted_filter ?  0  :  $show_matching_items;
 
 		$filter->filter_isindexed = (boolean) $indexed_elements;
-		if ($faceted_filter || !$indexed_elements)
+		$indexed_elements_given = is_array($indexed_elements) && $indexed_elements;
+
+		if ($faceted_filter || !$indexed_elements_given)
 		{
 			$_results = FlexicontentFields::getFilterValuesSearch($filter, $view_join, $view_where, $filters_where, $lang_code);
 			//echo "<pre>". $filter->label.": ". print_r($_results, true) ."\n\n</pre>";
 		}
 
 		// Support of value-indexed fields
-		if ( !$faceted_filter && $indexed_elements)
+		if ($indexed_elements_given)
 		{
-			// Clone 'indexed_elements' because they maybe modified
-			$results = array();
-			foreach ($indexed_elements as $i => $result)
+			if (!$faceted_filter)
 			{
-				$results[$i] = clone($result);
+				// Clone 'indexed_elements' because they maybe modified
+				$results = array();
+				foreach ($indexed_elements as $i => $result)
+				{
+					$results[$i] = clone($result);
+				}
+			}
+
+			// Limit indexed element according to DB results found
+			else
+			{
+				$results = array_intersect_key($indexed_elements, $_results);
+				//echo "<pre>". $filter->label.": ". print_r($indexed_elements, true) ."\n\n</pre>";
+				if ($faceted_filter==2 && $show_matches) foreach ($results as $i => $result)
+				{
+					$result->found = $_results[$i]->found;
+					// Clone 'indexed_elements' because they maybe modified
+					$results[$i] = clone($result);
+				}
 			}
 		}
 
-		// Limit indexed element according to DB results found
-		else if ( $indexed_elements && is_array($indexed_elements) )
-		{
-			$results = array_intersect_key($indexed_elements, $_results);
-			//echo "<pre>". $filter->label.": ". print_r($indexed_elements, true) ."\n\n</pre>";
-			if ($faceted_filter==2 && $show_matches) foreach ($results as $i => $result)
-			{
-				$result->found = $_results[$i]->found;
-				// Clone 'indexed_elements' because they maybe modified
-				$results[$i] = clone($result);
-			}
-		}
+		// Indexed elements not given
 		else
 		{
 			$results = & $_results;
@@ -4423,7 +4430,7 @@ class FlexicontentFields
 			{
 				if ($format_output > 0)  // 1: decimal, 2: integer
 				{
-					$results[$i]->text = @ number_format($results[$i]->text, $decimal_digits_displayed, $decimal_digits_sep, $decimal_thousands_sep);
+					$results[$i]->text = number_format((float)$results[$i]->text, $decimal_digits_displayed, $decimal_digits_sep, $decimal_thousands_sep);
 					$results[$i]->text = $results[$i]->text === NULL ? 0 : $results[$i]->text;
 					$results[$i]->text = $output_prefix .$results[$i]->text. $output_suffix;
 				}

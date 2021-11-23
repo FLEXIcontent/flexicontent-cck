@@ -29,7 +29,7 @@ class date_time
 	 *
 	 * @return timestamp
 	 */
-	static function shift_dates($datetime = '', $shift_amount, $shift_unit)
+	static function shift_dates($datetime, $shift_amount, $shift_unit)
 	{
 		// Check that $datetime was given
 		if (!$datetime)

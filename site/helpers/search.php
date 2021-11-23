@@ -132,7 +132,7 @@ class FLEXIadvsearchHelper
 	 * @param string The searchword to select around
 	 * @return string
 	 */
-	static function prepareSearchContent( $text, $length = 200, $searchword_arr )
+	static function prepareSearchContent( $text, $length, $searchword_arr )
 	{
 		// strips tags won't remove the actual jscript
 		$text = preg_replace( "'<script[^>]*>.*?</script>'si", "", $text );
@@ -141,7 +141,10 @@ class FLEXIadvsearchHelper
 		// replace line breaking tags with whitespace
 		$text = preg_replace( "'<(br[^/>]*?/|hr[^/>]*?/|/(div|h[1-6]|li|p|td))>'si", ' ', $text );
 
-		if (($wordpos = @StringHelper::strpos($text, ' ', $length)) !== false) {
+		// Do not try past the text's length
+		$length = min(StringHelper::strlen($text), $length);
+
+		if (($wordpos = StringHelper::strpos($text, ' ', $length)) !== false) {
 			$start_part = StringHelper::substr($text, 0, $wordpos) . '&nbsp;...';
 		} else {
 			$start_part = StringHelper::substr($text, 0, $length);
@@ -149,17 +152,18 @@ class FLEXIadvsearchHelper
 
 		$parts = array();
 		foreach ($searchword_arr as $searchword) {
-			$part = FLEXIadvsearchHelper::_smartSubstr( strip_tags( $text ), $length, $searchword, $pos);
-			if ($pos !== false) {
+			$wordpos = false;
+			$part = FLEXIadvsearchHelper::_smartSubstr( strip_tags( $text ), $length, $searchword, $wordpos);
+			if ($wordpos !== false) {
 				$parts[$searchword] = $part;
-				$positions[$pos] = $searchword;
+				$positions[$wordpos] = $searchword;
 			}
 		}
 
 		if ( count($parts) ) {
 			$oparts = array();
 			ksort($positions);
-			foreach ($positions as $pos => $searchword) {
+			foreach ($positions as $wordpos => $searchword) {
 				$oparts[ $searchword ] = $parts[$searchword];
 			}
 			return $oparts;
@@ -208,26 +212,30 @@ class FLEXIadvsearchHelper
 	 * @param string The searchword to select around
 	 * @return string
 	 */
-	static function _smartSubstr($text, $length = 200, $searchword, &$wordfound)
+	static function _smartSubstr($text, $length, $searchword, &$wordpos)
 	{
 		$textlen = StringHelper::strlen($text);
 		$lsearchword = StringHelper::strtolower($searchword);
-		$wordfound = false;
+		$wordpos = false;
 		$pos = 0;
-		while ($wordfound === false && $pos < $textlen) {
-			if (($wordpos = @StringHelper::strpos($text, ' ', $pos + $length)) !== false) {
+		while ($wordpos === false && $pos < $textlen)
+		{
+			// Do not try past the text's length
+			$offset = min($textlen, $pos + $length);
+
+			if (($wordpos = StringHelper::strpos($text, ' ', $offset)) !== false) {
 				$chunk_size = $wordpos - $pos;
 			} else {
 				$chunk_size = $length;
 			}
 			$chunk = StringHelper::substr($text, $pos, $chunk_size);
-			$wordfound = StringHelper::strpos(StringHelper::strtolower($chunk), $lsearchword);
-			if ($wordfound === false) {
+			$wordpos = StringHelper::strpos(StringHelper::strtolower($chunk), $lsearchword);
+			if ($wordpos === false) {
 				$pos += $chunk_size + 1;
 			}
 		}
 
-		if ($wordfound !== false) {
+		if ($wordpos !== false) {
 			return (($pos > 0) ? '...&nbsp;' : '') . $chunk . '&nbsp;...';
 		} else {
 			if (($wordpos = @StringHelper::strpos($text, ' ', $length)) !== false) {
