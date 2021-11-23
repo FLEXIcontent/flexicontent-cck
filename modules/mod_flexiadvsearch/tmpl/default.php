@@ -400,7 +400,7 @@ $doc->addScriptDeclaration($js);
 			<input type="'.($search_autocomplete==2 ? 'hidden' : 'text').'"
 				data-txt_ac_lang="' . JFactory::getLanguage()->getTag() . '"
 				id="mod_search_searchword-'.$module->id.'" class="'.$text_search_class.'"
-				placeholder="'.$search_inner_prompt.'" name="q" '.($search_autocomplete==2 ? '' : ' size="'.$search_inner_width.'" maxlength="'.$maxchars.'"').' value="'.$searchword.'" aria-label="'.$search_inner_prompt.'"  />';
+				placeholder="'.$search_inner_prompt.'" label="'.$search_inner_prompt.'"  name="q" '.($search_autocomplete==2 ? '' : ' size="'.$search_inner_width.'" maxlength="'.$maxchars.'"').' value="'.$searchword.'" aria-label="'.$search_inner_prompt.'"  />';
 
 		// Search's GO button
 		if ($button) :
