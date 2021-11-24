@@ -874,8 +874,7 @@ form div.container_fcfield > span {
 .statetoggler.fc_statebutton.btn.btn-sm.btn-outline-info.hasTooltip {
 	padding: 9px 12px !important;
 }
-div#type_tab_all,
-.admin.com_flexicontent .tabberlive .tabbertab {
+div#type_tab_all {
 	background: transparent;
 }
 .flexicontent #fc-managers-header #search {
