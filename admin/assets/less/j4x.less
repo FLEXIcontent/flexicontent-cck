@@ -561,7 +561,7 @@ dl#content-pane.tabs {
 }
 #s2id_scope.select2-container.use_select2_lib .select2-choice {
 	width: 15px !important;
-	height: 34px !important;
+	height: 32px !important;
 }
 /* fix toolbar search */
 #flexicontent div .btn-group > *:not(:first-child):not(:last-child), #flexicontent div .input-append > *:not(:first-child):not(:last-child) {
@@ -829,7 +829,11 @@ table.fcmanlist tbody {
 	ul.fcfield-sortables > li [class^="fcfield-"].fcfont-icon:before,
 	ul.fcfield-sortables > li [class*=" fcfield-"].fcfont-icon:before,
 	ul.fcfield-sortables > li [class^="fcfield-"].fcfont-icon:after,
-	ul.fcfield-sortables > li [class*=" fcfield-"].fcfont-icon:after {
+	ul.fcfield-sortables > li [class*=" fcfield-"].fcfont-icon:after,
+	.fc_uploader_row_remove:before,
+	.fc_uploader_row_remove:after,
+	.fc_img_preview_btn.icon-search:after,
+	.fc_img_preview_btn.icon-search:before {
 		font-family: 'Font Awesome 5 Free' !important;
 		font-size: 1.4em;
 	}
@@ -837,7 +841,7 @@ table.fcmanlist tbody {
 	.fcfield-drag-handle.fcfont-icon:before {
 		content: "\f0b2";
 	}
-	.fcfield-delvalue.fcfont-icon:before{
+	.fcfield-delvalue.fcfont-icon:before , .fc_uploader_row_remove:before{
 		content: "\f2ed";
 	}
 	.fcfield-disablevalue.fcfont-icon:before {
@@ -859,10 +863,12 @@ table.fcmanlist tbody {
 	}
 	.fcfield-insertvalue.fc_before.fcfont-icon:after {
 		content: "\f067";
-		font-size: 1em !important;
+		font-size: 1em !imvportant;
 		margin-left: 4px !important;
 	}
-
+	.btn.fc_img_preview_btn.icon-search:after {
+		content: "\f00e";
+	}
 	.fcfield-uploadvalue.fcfont-icon:before{
 		content: "\f093";
 	}
@@ -878,7 +884,7 @@ table.fcmanlist tbody {
 }
 
 span.btn.btn-sm.toolbar.dropdown-toggle.dropdown-toggle-split.fcfield-addvalue.fcfont-icon.icon.icon- {
-	padding: 4px 7px !important;
+	padding: 4px 7px 3px 4px !important;
 }
 /*** fix calendar bouton **/
 .field-calendar .btn-primary {
@@ -935,4 +941,30 @@ body .fc-mssg-inline.fc-nobgimage, body .fc-mssg.fc-nobgimage {
 }
 #flexicontent input#input-tags {
 	margin:0px !important;
+}
+/** fix state button in item list **/
+.statetoggler.fc_statebutton.btn.btn-sm.btn-outline-info.hasTooltip {
+	padding: 9px 12px !important;
+}
+/** fix tab type in backend **/
+div#type_tab_all {
+	background: transparent;
+}
+/** fix input search in item list **/
+.flexicontent #fc-managers-header #search {
+	border: 1px solid #b8c9e0;
+}
+/** fix dropdown button need review**/
+span.btn.btn-sm.toolbar.dropdown-toggle.dropdown-toggle-split.fcfield-addvalue.fcfont-icon.icon.icon- {
+	display: table-cell;
+	left: 1px;
+	top: 0px;
+}
+/** fix selector relation field **/
+label#custom_agent_item_selector-lbl {
+	height: 36px !important;
+}
+/** fix border input **/
+.select2-container-multi .select2-choices {
+    border: 1px solid #b8c9e0 !important;
 }

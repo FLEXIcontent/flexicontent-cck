@@ -451,7 +451,7 @@ dl#content-pane.tabs {
 }
 #s2id_scope.select2-container.use_select2_lib .select2-choice {
 	width: 15px !important;
-	height: 34px !important;
+	height: 32px !important;
 }
 #flexicontent div .btn-group > *:not(:first-child):not(:last-child),
 #flexicontent div .input-append > *:not(:first-child):not(:last-child) {
@@ -732,14 +732,19 @@ table.fcmanlist tbody td.col_status div.statetoggler {
 #flexicontent div ul.fcfield-sortables > li [class^="fcfield-"].fcfont-icon:before,
 #flexicontent div ul.fcfield-sortables > li [class*=" fcfield-"].fcfont-icon:before,
 #flexicontent div ul.fcfield-sortables > li [class^="fcfield-"].fcfont-icon:after,
-#flexicontent div ul.fcfield-sortables > li [class*=" fcfield-"].fcfont-icon:after {
+#flexicontent div ul.fcfield-sortables > li [class*=" fcfield-"].fcfont-icon:after,
+#flexicontent div .fc_uploader_row_remove:before,
+#flexicontent div .fc_uploader_row_remove:after,
+#flexicontent div .fc_img_preview_btn.icon-search:after,
+#flexicontent div .fc_img_preview_btn.icon-search:before {
 	font-family: 'Font Awesome 5 Free' !important;
 	font-size: 1.4em;
 }
 #flexicontent div .fcfield-drag-handle.fcfont-icon:before {
 	content: "\f0b2";
 }
-#flexicontent div .fcfield-delvalue.fcfont-icon:before {
+#flexicontent div .fcfield-delvalue.fcfont-icon:before,
+#flexicontent div .fc_uploader_row_remove:before {
 	content: "\f2ed";
 }
 #flexicontent div .fcfield-disablevalue.fcfont-icon:before {
@@ -761,8 +766,11 @@ table.fcmanlist tbody td.col_status div.statetoggler {
 }
 #flexicontent div .fcfield-insertvalue.fc_before.fcfont-icon:after {
 	content: "\f067";
-	font-size: 1em !important;
+	font-size: 1em !imvportant;
 	margin-left: 4px !important;
+}
+#flexicontent div .btn.fc_img_preview_btn.icon-search:after {
+	content: "\f00e";
 }
 #flexicontent div .fcfield-uploadvalue.fcfont-icon:before {
 	content: "\f093";
@@ -777,7 +785,7 @@ table.fcmanlist tbody td.col_status div.statetoggler {
 	content: "\f302";
 }
 span.btn.btn-sm.toolbar.dropdown-toggle.dropdown-toggle-split.fcfield-addvalue.fcfont-icon.icon.icon- {
-	padding: 4px 7px !important;
+	padding: 4px 7px 3px 4px !important;
 }
 .field-calendar .btn-primary {
 	border: 0 !important;
@@ -862,4 +870,24 @@ form div.container_fcfield > span {
 }
 #flexicontent input#input-tags {
 	margin: 0px !important;
+}
+.statetoggler.fc_statebutton.btn.btn-sm.btn-outline-info.hasTooltip {
+	padding: 9px 12px !important;
+}
+div#type_tab_all {
+	background: transparent;
+}
+.flexicontent #fc-managers-header #search {
+	border: 1px solid #b8c9e0;
+}
+span.btn.btn-sm.toolbar.dropdown-toggle.dropdown-toggle-split.fcfield-addvalue.fcfont-icon.icon.icon- {
+	display: table-cell;
+	left: 1px;
+	top: 0px;
+}
+label#custom_agent_item_selector-lbl {
+	height: 36px !important;
+}
+.select2-container-multi .select2-choices {
+	border: 1px solid #b8c9e0 !important;
 }
