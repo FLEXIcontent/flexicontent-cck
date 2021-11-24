@@ -68,9 +68,8 @@ foreach ($field->value as $file_id)
 	$toggleUploader_onclick = 'var box = jQuery(this).closest(\'.fcfieldval_container\'); ' .
 		'var isVisible = box.find(\'.fc_file_uploader\').is(\':visible\'); ' .
 		'isVisible ? jQuery(this).removeClass(\'active\') : jQuery(this).addClass(\'active\'); ' .
-		'isVisible ? box.find(\'.fcfield_preview_box\').show() :  box.find(\'.fcfield_preview_box\').hide(); ' .
+		'isVisible ? box.find(\'.fcfield_preview_box\').show() : box.find(\'.fcfield_preview_box\').hide(); ' .
 		'isVisible ? box.find(\'.inlinefile-prv-box\').addClass(\'empty\') : box.find(\'.inlinefile-prv-box\').removeClass(\'empty\');';
-		
 
 	if ($use_inline_uploaders)
 	{
@@ -82,9 +81,9 @@ foreach ($field->value as $file_id)
 			'refresh_on_complete' => false,
 			'thumb_size_default' => $thumb_size_default,
 			'toggle_btn' => array(
-				'class' => ($file_btns_position ? $add_on_class : '') . ' fcfield-uploadvalue' . $font_icon_class,
+				'class' => ($file_btns_position ? $add_on_class : '') . ' fcfield-uploadvalue dropdown-item' . $font_icon_class,
 				'text' => (!$file_btns_position ? '&nbsp; ' . JText::_('FLEXI_UPLOAD') : ''),
-				'onclick' => $toggleUploader_onclick ,
+				'onclick' => $toggleUploader_onclick,
 				'action' => null
 			),
 			'thumb_size_slider_cfg' => ($thumb_size_resizer ? $thumb_size_slider_cfg : 0),
@@ -97,15 +96,15 @@ foreach ($field->value as $file_id)
 		$multi_icon = $form_font_icons ? ' <span class="icon-stack"></span>' : '<span class="pages_stack"></span>';
 		$btn_classes = 'fc-files-modal-link ' . ($file_btns_position ? $add_on_class : '') . ' ' . $font_icon_class;
 		$uploader_html->multiUploadBtn = '';  /*'
-			<span data-href="'.$addExistingURL.'" onclick="'.$addExistingURL_onclick.'" class="'.$btn_classes.' fc-up fcfield-uploadvalue multi" id="'.$elementid_n.'_mul_uploadvalue">
+			<span data-href="'.$addExistingURL.'" onclick="'.$addExistingURL_onclick.'" class="'.$btn_classes.' fc-up fcfield-uploadvalue multi dropdown-item" id="'.$elementid_n.'_mul_uploadvalue">
 				&nbsp; ' . $multi_icon . ' ' . (!$file_btns_position || $file_btns_position==2 ? JText::_('FLEXI_UPLOAD') : '') . '
 			</span>';*/
 		$uploader_html->myFilesBtn = '
-			<span data-href="'.$addExistingURL.'" onclick="'.$addExistingURL_onclick.'" class="'.$btn_classes.' fc-sel fcfield-selectvalue multi" data-rowno="'.$n.'" id="'.$elementid_n.'_selectvalue">
+			<span data-href="'.$addExistingURL.'" onclick="'.$addExistingURL_onclick.'" class="'.$btn_classes.' fc-sel fcfield-selectvalue multi dropdown-item" data-rowno="'.$n.'" id="'.$elementid_n.'_selectvalue">
 				' .  ($file_btns_position ? $multi_icon : '') . ' ' . (!$file_btns_position || $file_btns_position==2 ? '&nbsp; ' . JText::_('FLEXI_MY_FILES') : '') . ' ' . (!$file_btns_position ? $multi_icon : '') .'
 			</span>';
 		$uploader_html->mediaUrlBtn = !$usemediaurl ? '' : '
-			<span class="' . ($file_btns_position ? $add_on_class : '') . ' fcfield-medialurlvalue ' . $font_icon_class . '" onclick="fcfield_file.toggleMediaURL(\''.$elementid_n.'\', \''.$field_name_js.'\'); return false;">
+			<span class="' . ($file_btns_position ? $add_on_class : '') . ' fcfield-medialurlvalue ' . $font_icon_class . ' dropdown-item" onclick="fcfield_file.toggleMediaURL(\''.$elementid_n.'\', \''.$field_name_js.'\'); return false;">
 				' . (!$file_btns_position || $file_btns_position==2 ? '&nbsp; ' . JText::_('FLEXI_FIELD_MEDIA_URL') : '') . '
 			</span>';
 		$uploader_html->clearBtn = '
@@ -282,7 +281,7 @@ foreach ($field->value as $file_id)
 	}
 
 	$n++;
-	if (!$multiple) break;
+	if (!$multiple) break;  // multiple values disabled, break out of the loop, not adding further values even if the exist
 }
 
 

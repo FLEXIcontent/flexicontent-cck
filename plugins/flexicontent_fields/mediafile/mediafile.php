@@ -628,6 +628,8 @@ class plgFlexicontent_fieldsMediafile extends FCField
 			$css .= '';
 		}
 
+
+		// Add field's custom CSS / JS
 		$js .= "
 			/**
 			 * Method Wrappers to class methods (used for compatibility)
@@ -649,6 +651,8 @@ class plgFlexicontent_fieldsMediafile extends FCField
 				fcfield_mediafile.fileUploaded(uploader, file, result, '".$field_name_js."');
 			}
 		";
+		$css .='';
+
 
 		/**
 		 * Load form JS
@@ -690,7 +694,7 @@ class plgFlexicontent_fieldsMediafile extends FCField
 			";
 		}
 
-		// Add field's custom CSS / JS
+		// Add field's CSS / JS
 		if ($multiple) $js .= "
 			var uniqueRowNum".$field->id."	= ".count($field->value).";  // Unique row number incremented only
 			var rowCount".$field->id."	= ".count($field->value).";      // Counts existing rows to be able to limit a max number of values
@@ -698,7 +702,6 @@ class plgFlexicontent_fieldsMediafile extends FCField
 		";
 		if ($js)  $document->addScriptDeclaration($js);
 		if ($css) $document->addStyleDeclaration($css);
-
 
 
 		/**
@@ -726,12 +729,12 @@ class plgFlexicontent_fieldsMediafile extends FCField
 					'.$move2.'
 					'.$remove_button.'
 					'.(!$add_position ? '' : $add_here)
-					.($use_inline_uploaders && !$file_btns_position ?'
-					<div class="buttons btn-group fc-iblock">
-						<span role="button" class="' . $drop_btn_class . ' fcfield-addvalue ' . $font_icon_class . '" data-toggle="dropdown">
+					.($use_inline_uploaders && !$file_btns_position ? '
+					<div class="buttons btn-group fc-iblock ' . (FLEXI_J40GE ? ' dropdown ' : '') . '">
+						<span role="button" class="' . $drop_btn_class . ' fcfield-addvalue ' . $font_icon_class . '" data-toggle="dropdown" data-bs-toggle="dropdown">
 							<span class="caret"></span>
 						</span>
-						<ul class="dropdown-menu" role="menu">
+						<ul class="dropdown-menu dropdown-menu-right" role="menu">
 							<li>'.$uploader_html->toggleBtn.'</li>
 							<li>'.$uploader_html->multiUploadBtn.'</li>
 							' . ($use_myfiles > 0 ? '<li>'.$uploader_html->myFilesBtn.'</li>' : '') . '
@@ -773,8 +776,8 @@ class plgFlexicontent_fieldsMediafile extends FCField
 		elseif ($multiple)
 		{
 			$field->html = !count($field->html) ? '' :
-				'<li class="'.$value_classes_multiple.'">'.
-					implode('</li><li class="'.$value_classes_multiple.'">', $field->html).
+				'<li class="' . $value_classes_multiple . '">'.
+					implode('</li><li class="' . $value_classes_multiple . '">', $field->html).
 				'</li>';
 			$field->html = '<ul class="fcfield-sortables" id="sortables_'.$field->id.'">' .$field->html. '</ul>';
 			if (!$add_position) $field->html .= '

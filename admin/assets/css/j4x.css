@@ -740,6 +740,13 @@ table.fcmanlist tbody td.col_status div.statetoggler {
 	font-family: 'Font Awesome 5 Free' !important;
 	font-size: 1.4em;
 }
+#flexicontent div .fa,
+#flexicontent div .fas,
+#flexicontent div [class*=" icon-"],
+#flexicontent div [class^="icon-"] {
+	font-family: Font Awesome 5 Free;
+	font-weight: 900;
+}
 #flexicontent div .fcfield-drag-handle.fcfont-icon:before {
 	content: "\f0b2";
 }

@@ -348,7 +348,7 @@ class plgFlexicontent_fieldsImage extends FCField
 					cancel: false,
 					/*containment: 'parent',*/
 					tolerance: 'pointer'
-					".($field->parameters->get('fields_box_placing', 1) ? "
+					".($fields_box_placing ? "
 					,start: function(e) {
 						//jQuery(e.target).children().css('float', 'left');
 						//fc_setEqualHeights(jQuery(e.target), 0);
@@ -360,8 +360,6 @@ class plgFlexicontent_fieldsImage extends FCField
 				});
 			});
 			";
-
-			// WARNING: bellow we also use $field->name which is different than $fieldname
 
 			if ($max_values) JText::script("FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED", true);
 			$js .= "
@@ -383,7 +381,8 @@ class plgFlexicontent_fieldsImage extends FCField
 				newField.find('.fc-has-value').removeClass('fc-has-value');
 
 				// New element's field name and id
-				var element_id = '" . $elementid . "_' + uniqueRowNum" . $field->id . ";
+				var uniqueRowN = uniqueRowNum" . $field->id . ";
+				var element_id = '" . $elementid . "_' + uniqueRowN;
 
 				// Destroy any select2 elements
 				var sel2_elements = newField.find('div.select2-container');
@@ -398,11 +397,11 @@ class plgFlexicontent_fieldsImage extends FCField
 				newField.find('input.hasvalue').attr('id', element_id);
 
 				newField.find('input.originalname').val('');
-				newField.find('input.originalname').attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][originalname]');
+				newField.find('input.originalname').attr('name','".$fieldname."['+uniqueRowN+'][originalname]');
 				newField.find('input.originalname').attr('id', element_id + '_originalname');
 
 				newField.find('.existingname').val('');
-				newField.find('.existingname').attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][existingname]');
+				newField.find('.existingname').attr('name','".$fieldname."['+uniqueRowN+'][existingname]');
 				newField.find('.existingname').attr('id', element_id + '_existingname');
 
 				newField.find('.fc_preview_msg').html('');
@@ -416,11 +415,11 @@ class plgFlexicontent_fieldsImage extends FCField
 				{
 					// Update uploader attributes
 					fcUploader.empty().hide();
-					fcUploader.attr('id', fcUploader.attr('data-tagid-prefix') + uniqueRowNum".$field->id.");
+					fcUploader.attr('id', fcUploader.attr('data-tagid-prefix') + uniqueRowN);
 
 					// Update button for toggling uploader
 					upBTN = newField.find('.fc_files_uploader_toggle_btn');
-					upBTN.attr('data-rowno',uniqueRowNum".$field->id.");
+					upBTN.attr('data-rowno', uniqueRowN);
 
 					mulupBTN = newField.find('.fc-files-modal-link.fc-up');
 					mulupBTN.attr('data-href', " . "'" . str_replace('&amp;', '&', sprintf($filesElementURL,  $elementid . "_' + uniqueRowNum".$field->id ." + '")) . "');
@@ -444,7 +443,7 @@ class plgFlexicontent_fieldsImage extends FCField
 
 			if ($linkto_url) $js .= "
 				newField.find('input.imgurllink').val('');
-				newField.find('input.imgurllink').attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][urllink]');
+				newField.find('input.imgurllink').attr('name','".$fieldname."['+uniqueRowN+'][urllink]');
 				newField.find('input.imgurllink').attr('id', element_id + '_urllink');
 				";
 
@@ -456,7 +455,7 @@ class plgFlexicontent_fieldsImage extends FCField
 				{
 					theInput = newField.find('.' + elements[i]).first();
 					var el_name = elements[i].replace(/^img_/, '');
-					theInput.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+']['+el_name+']');
+					theInput.attr('name','".$fieldname."['+uniqueRowN+']['+el_name+']');
 					theInput.attr('id', element_id + '_' + el_name);
 				}
 
@@ -474,29 +473,29 @@ class plgFlexicontent_fieldsImage extends FCField
 
 			if ($usealt) $js .= "
 				newField.find('input.imgalt').attr('value', ".json_encode($default_alt).");
-				newField.find('input.imgalt').attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][alt]');
+				newField.find('input.imgalt').attr('name','".$fieldname."['+uniqueRowN+'][alt]');
 				newField.find('input.imgalt').attr('id', element_id + '_alt');
 				";
 
 			if ($usetitle) $js .= "
 				newField.find('input.imgtitle').attr('value', ".json_encode($default_title).");
-				newField.find('input.imgtitle').attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][title]');
+				newField.find('input.imgtitle').attr('name','".$fieldname."['+uniqueRowN+'][title]');
 				newField.find('input.imgtitle').attr('id', element_id + '_title');
 				";
 
 			if ($usedesc) $js .= "
 				newField.find('textarea.imgdesc').attr('value', ".json_encode($default_desc).");
-				newField.find('textarea.imgdesc').attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][desc]');
+				newField.find('textarea.imgdesc').attr('name','".$fieldname."['+uniqueRowN+'][desc]');
 				";
 
 			if ($usecust1) $js .= "
 				newField.find('input.imgcust1').attr('value', ".json_encode($default_cust1).");
-				newField.find('input.imgcust1').attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][cust1]');
+				newField.find('input.imgcust1').attr('name','".$fieldname."['+uniqueRowN+'][cust1]');
 				";
 
 			if ($usecust2) $js .= "
 				newField.find('input.imgcust2').attr('value', ".json_encode($default_cust2).");
-				newField.find('input.imgcust2').attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][cust2]');
+				newField.find('input.imgcust2').attr('name','".$fieldname."['+uniqueRowN+'][cust2]');
 				";
 
 			// Add new field to DOM
@@ -630,7 +629,6 @@ class plgFlexicontent_fieldsImage extends FCField
 
 
 		// Add field's custom CSS / JS
-		$image_folder = JUri::root(true).'/'.$dir_url;
 		$js .= "
 			/**
 			 * Method Wrappers to class methods (used for compatibility)
@@ -675,7 +673,7 @@ class plgFlexicontent_fieldsImage extends FCField
 			$document->addScript(JUri::root(true) . '/plugins/flexicontent_fields/image/js/form.js', array('version' => FLEXI_VHASH));
 		}
 
-		// Add field's custom CSS / JS
+		// Add field's CSS / JS
 		if ($multiple) $js .= "
 			var uniqueRowNum".$field->id."	= ".count($field->value).";  // Unique row number incremented only
 			var rowCount".$field->id."	= ".count($field->value).";      // Counts existing rows to be able to limit a max number of values
@@ -731,6 +729,7 @@ class plgFlexicontent_fieldsImage extends FCField
 				'</li>';
 			$field->html = '<ul class="fcfield-sortables" id="sortables_'.$field->id.'">' .$field->html. '</ul>';
 		}
+
 
 		// This is field HTML that is created regardless of values
 		$non_value_html = '<input id="custom_'.$field_name_js.'" class="fc_hidden_value '.($use_ingroup ? '' : $required_class).'" type="text" name="__fcfld_valcnt__['.$field->name.']" value="'.($count_vals ? $count_vals : '').'" />';
