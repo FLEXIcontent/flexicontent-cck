@@ -766,7 +766,7 @@ table.fcmanlist tbody td.col_status div.statetoggler {
 }
 #flexicontent div .fcfield-insertvalue.fc_before.fcfont-icon:after {
 	content: "\f067";
-	font-size: 1em !imvportant;
+	font-size: 1em !important;
 	margin-left: 4px !important;
 }
 #flexicontent div .btn.fc_img_preview_btn.icon-search:after {
