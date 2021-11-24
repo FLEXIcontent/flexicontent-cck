@@ -947,7 +947,7 @@ body .fc-mssg-inline.fc-nobgimage, body .fc-mssg.fc-nobgimage {
 	padding: 9px 12px !important;
 }
 /** fix tab type in backend **/
-div#type_tab_all {
+div#type_tab_all, .admin.com_flexicontent .tabberlive .tabbertab {
 	background: transparent;
 }
 /** fix input search in item list **/
@@ -967,4 +967,8 @@ label#custom_agent_item_selector-lbl {
 /** fix border input **/
 .select2-container-multi .select2-choices {
     border: 1px solid #b8c9e0 !important;
+}
+/** fix filter button when is in notification mode **/
+div#fc_filters_box_btn {
+	max-height: 42px;
 }

@@ -874,7 +874,8 @@ form div.container_fcfield > span {
 .statetoggler.fc_statebutton.btn.btn-sm.btn-outline-info.hasTooltip {
 	padding: 9px 12px !important;
 }
-div#type_tab_all {
+div#type_tab_all,
+.admin.com_flexicontent .tabberlive .tabbertab {
 	background: transparent;
 }
 .flexicontent #fc-managers-header #search {
@@ -890,4 +891,7 @@ label#custom_agent_item_selector-lbl {
 }
 .select2-container-multi .select2-choices {
 	border: 1px solid #b8c9e0 !important;
+}
+div#fc_filters_box_btn {
+	max-height: 42px;
 }
