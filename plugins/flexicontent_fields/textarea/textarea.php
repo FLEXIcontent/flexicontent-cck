@@ -608,7 +608,7 @@ class plgFlexicontent_fieldsTextarea extends FCField
 			";
 		}
 
-		// Add field's custom CSS / JS
+		// Add field's CSS / JS
 		if ($multiple) $js .= "
 			var uniqueRowNum".$field->id."	= ".count($field->value).";  // Unique row number incremented only
 			var rowCount".$field->id."	= ".count($field->value).";      // Counts existing rows to be able to limit a max number of values
