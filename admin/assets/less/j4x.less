@@ -818,7 +818,11 @@ table.fcmanlist tbody {
 	vertical-align: middle !important;
 }
 /** icon in button **/
-#flexicontent .fc-xpended-btns > [class^="fcfield-"]:not(.add-on):not(.input-group-addon):not(.btn), #flexicontent .fc-xpended-btns > [class*=" fcfield-"]:not(.add-on):not(.input-group-addon):not(.btn), #flexicontent .fc-xpended-btns > .fcfield-button-add:not(.add-on):not(.input-group-addon) a {
+#flexicontent .fc-xpended-btns > [class^="fcfield-"]:not(.add-on):not(.input-group-addon):not(.btn), 
+#flexicontent .fc-xpended-btns > [class*=" fcfield-"]:not(.add-on):not(.input-group-addon):not(.btn), 
+#flexicontent .fc-xpended-btns > .fcfield-button-add:not(.add-on):not(.input-group-addon) a,
+#flexicontent .buttons.btn-group > ul.dropdown-menu > li > span
+ {
 	font-family: 'Roboto' !important;
 }
 #flexicontent div {
@@ -833,7 +837,8 @@ table.fcmanlist tbody {
 	.fc_uploader_row_remove:before,
 	.fc_uploader_row_remove:after,
 	.fc_img_preview_btn.icon-search:after,
-	.fc_img_preview_btn.icon-search:before {
+	.fc_img_preview_btn.icon-search:before,
+	.fcfield-expand-view.fcfont-icon:before {
 		font-family: 'Font Awesome 5 Free' !important;
 		font-size: 1.4em;
 	}
@@ -872,6 +877,7 @@ table.fcmanlist tbody {
 	}
 	.btn.fc_img_preview_btn.icon-search:after {
 		content: "\f00e";
+		font-size:17px;
 	}
 	.fcfield-uploadvalue.fcfont-icon:before{
 		content: "\f093";
@@ -885,6 +891,9 @@ table.fcmanlist tbody {
 	.fcfield-addvalue.fcfont-icon:before{
 		content: "\f302";
 	}
+	.fcfield-expand-view.fcfont-icon:before{
+		content: "\f337";
+	}
 }
 
 span.btn.btn-sm.toolbar.dropdown-toggle.dropdown-toggle-split.fcfield-addvalue.fcfont-icon.icon.icon- {
@@ -892,8 +901,9 @@ span.btn.btn-sm.toolbar.dropdown-toggle.dropdown-toggle-split.fcfield-addvalue.f
 }
 /*** fix calendar bouton **/
 .field-calendar .btn-primary {
-	border: 0 !important;
+	/*border: 0 !important;*/
 	margin-left: -5px !important;
+	margin-top:-2px !important;
 }
 /** fix label in field **/
 label.add-on {
@@ -928,8 +938,9 @@ body .fc-mssg-inline.fc-nobgimage, body .fc-mssg.fc-nobgimage {
 #flexicontent form .fcfield_textareaval, 
 #flexicontent form .fcfield_selectval, 
 #flexicontent form .fcfield_selectmulval,
-#flexicontent form .fcfield_textval{
-	border: 1px solid var(--template-bg-dark-20);
+#flexicontent form .fcfield_textval,
+#flexicontent .fc_filedata_txt {
+	border: 1px solid var(--template-bg-dark-20) !important;
 	border-radius: 4px;
 	padding: 5px;
 }
@@ -975,4 +986,18 @@ label#custom_agent_item_selector-lbl {
 /** fix filter button when is in notification mode **/
 div#fc_filters_box_btn {
 	max-height: 42px;
+}
+/** fix preview image field **/
+span.btn.fc_img_preview_btn.icon-search:before {
+	display: none;
+}
+span.btn.fc_img_preview_btn.icon-search {
+	background: #fff;
+	width: 10px !important;
+	padding: 2px 5px !important;
+}
+/** fix media field **/
+span.add-on.fc_filedata_title {
+	min-height: 34px;
+	margin-left: 4px !important;
 }
