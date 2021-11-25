@@ -133,10 +133,40 @@ class FlexicontentViewUser extends FlexicontentViewBaseRecord
 			? JToolbarHelper::title(JText::_( 'FLEXI_EDIT_USER'), 'authoredit')
 			: JToolbarHelper::title(JText::_( 'FLEXI_ADD_USER'), 'authoradd');
 
-		$ctrl = 'users.';
-		JToolbarHelper::apply( $ctrl.'apply' );
-		JToolbarHelper::save( $ctrl.'save' );
-		JToolbarHelper::custom( $ctrl.'save2new', 'savenew.png', 'savenew.png', 'FLEXI_SAVE_AND_NEW', false );
+		$btn_name = 'apply';
+		$btn_task = $ctrl.'.apply';
+		$btn_title = !$isnew ? 'FLEXI_APPLY_N_RELOAD' : 'FLEXI_ADD';
+
+		//JToolbarHelper::apply($btn_task, $btn_title, false);
+
+		/*$btn_arr[$btn_name] = */ flexicontent_html::addToolBarButton(
+			$btn_title, $btn_name, $full_js="Joomla.submitbutton('".$btn_task."')", $msg_alert='', $msg_confirm='',
+			$btn_task, $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false,
+			$btn_class=(FLEXI_J40GE ? ' _DDI_class_ btn-success ' : '') . ' ' . $this->tooltip_class, $btn_icon="icon-save",
+			'data-placement="right" title=""', $auto_add = 1);
+
+		$btn_name = 'save';
+		$btn_task = $ctrl.'.save';
+
+		//JToolbarHelper::save($btn_task);  //JToolbarHelper::custom( $btn_task, 'save.png', 'save.png', 'JSAVE', false );
+
+		/*$btn_arr[$btn_name] = */ flexicontent_html::addToolBarButton(
+			'JSAVE', $btn_name, $full_js="Joomla.submitbutton('".$ctrl.".save')", $msg_alert='', $msg_confirm='',
+			$btn_task, $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false,
+			$btn_class=(FLEXI_J40GE ? ' _DDI_class_ btn-success ' : '') . ' ' . $this->tooltip_class, $btn_icon="icon-save",
+			'data-placement="bottom" title=""', $auto_add = 1);
+
+		$btn_name = 'save2new';
+		$btn_task = $ctrl.'.save2new';
+
+		//JToolbarHelper::save2new($btn_task);  //JToolbarHelper::custom( $btn_task, 'savenew.png', 'savenew.png', 'FLEXI_SAVE_AND_NEW', false );
+
+		/*$btn_arr[$btn_name] = */ flexicontent_html::addToolBarButton(
+			'FLEXI_SAVE_AND_NEW', $btn_name, $full_js="Joomla.submitbutton('".$ctrl.".save2new')", $msg_alert='', $msg_confirm='',
+			$btn_task, $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false,
+			$btn_class= (FLEXI_J40GE ? ' _DDI_class_ btn-success ' : '') . ' ' . $this->tooltip_class, $btn_icon="icon-save-new",
+			'data-placement="right" title="'.JText::_('FLEXI_SAVE_AND_NEW_INFO', true).'"', $auto_add = 1);
+
 		JToolbarHelper::cancel( $ctrl.'cancel' );
 		JToolbarHelper::help( 'screen.users.edit' );
 

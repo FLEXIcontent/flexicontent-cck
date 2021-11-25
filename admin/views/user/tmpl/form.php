@@ -45,51 +45,15 @@ $this->document->addScriptDeclaration($js);
 ?>
 
 <script>
-	/*jQuery(document).ready(function() {
-		jQuery('input[type=password]').each(function() {
-			jQuery(this).val('');
-		});
-	});*/
-	
-	function submitbutton(pressbutton) {
-		var form = document.adminForm;
-		if (pressbutton == 'cancel') {
-			submitform( pressbutton );
-			return;
-		}
-		var r = new RegExp("[\<|\>|\"|\'|\%|\;|\(|\)|\&]", "i");
-
-		// do field validation
-		if (trim(form.name.value) == "") {
-			alert( "<?php echo JText::_( 'You must provide a name.', true ); ?>" );
-		} else if (form.username.value == "") {
-			alert( "<?php echo JText::_( 'You must provide a user login name.', true ); ?>" );
-		} else if (r.exec(form.username.value) || form.username.value.length < 2) {
-			alert( "<?php echo JText::_( 'WARNLOGININVALID', true ); ?>" );
-		} else if (trim(form.email.value) == "") {
-			alert( "<?php echo JText::_( 'You must provide an email address.', true ); ?>" );
-		} else if (form.gid.value == "") {
-			alert( "<?php echo JText::_( 'You must assign user to a group.', true ); ?>" );
-		} else if (((trim(form.password.value) != "") || (trim(form.password2.value) != "")) && (form.password.value != form.password2.value)){
-			alert( "<?php echo JText::_( 'Password do not match.', true ); ?>" );
-		} else if (form.gid.value == "29") {
-			alert( "<?php echo JText::_( 'WARNSELECTPF', true ); ?>" );
-		} else if (form.gid.value == "30") {
-			alert( "<?php echo JText::_( 'WARNSELECTPB', true ); ?>" );
-		} else {
-			submitform( pressbutton );
-		}
-	}
-
 	function gotocontact( id ) {
 		var form = document.adminForm;
 		form.contact_id.value = id;
-		submitform( 'contact' );
+		Joomla.submitform( 'contact' );
 	}
 </script>
 
 <div id="flexicontent">
-<form action="index.php?controller=users" method="post" name="adminForm" id="adminForm" class="form-validate form-horizontal" autocomplete="off">
+<form action="index.php" method="post" name="adminForm" id="adminForm" class="form-validate form-horizontal" autocomplete="off">
 
 <div class="container-fluid row" style="padding: 0px !important; margin: 0px! important;">
 
@@ -397,24 +361,28 @@ $this->document->addScriptDeclaration($js);
 
 
 		<div style="margin-bottom: 32px;">
-		<?php
-			$fieldSet = $this->jform_authorbasic->getFieldset('author_override_cat_config');
+			<div class="fcclear"></div>
+			<?php
+				$fieldSet = $this->jform_authorbasic->getFieldset('author_override_cat_config');
 			
-				if (isset($fieldSet->description) && trim($fieldSet->description)) :
-					echo '<div class="fc-mssg fc-info">'.JText::_($fieldSet->description).'</div>';
-				endif;
-				?>
+					if (isset($fieldSet->description) && trim($fieldSet->description)) :
+						echo '<div class="fc-mssg fc-info">'.JText::_($fieldSet->description).'</div>';
+					endif;
+					?>
 
-				<?php foreach ($fieldSet as $field) :
-					echo ($field->getAttribute('type')=='separator' || $field->hidden) ? $field->input : '
-					<div class="control-group">
-						<div class="control-label">'.$field->label.'</div>
-						<div class="controls">
-							' . $field->input /* non-inherited */ . '
+					<?php foreach ($fieldSet as $field) :
+					echo ($field->getAttribute('type')=='separator' || $field->hidden)
+						? $field->input
+						: '
+						<div class="control-group">
+							<div class="control-label">'.$field->label.'</div>
+							<div class="controls">
+								' . $field->input /* non-inherited */ . '
+							</div>
 						</div>
-					</div>
-					';
-				endforeach; ?>
+						';
+				endforeach;
+			?>
 		</div>
 
 
@@ -537,7 +505,11 @@ $this->document->addScriptDeclaration($js);
 									//echo JHtml::_('sliders.panel', $label, $tmpl->name.'-'.$groupname.'-options');
 									echo JHtml::_('bootstrap.addSlide', $slider_set_id, $label, $slider_id = $tmpl->name.'-'.$groupname.'-options');
 
-									if (!$cat_layout || $tmpl->name != $cat_layout) continue;
+									if (!$cat_layout || $tmpl->name != $cat_layout)
+									{
+										echo JHtml::_('bootstrap.endSlide');
+										continue;
+									}
 
 									$fieldSets = $form_layout->getFieldsets($groupname);
 									foreach ($fieldSets as $fsname => $fieldSet) : ?>
@@ -604,12 +576,11 @@ $this->document->addScriptDeclaration($js);
 										</fieldset>
 
 									<?php endforeach; //fieldSets ?>
+									<?php echo JHtml::_('bootstrap.endSlide'); ?>
+
 								<?php endforeach; //tmpls ?>
 
-								<?php
-								//echo JHtml::_('sliders.end');
-								echo JHtml::_('bootstrap.endSlide');
-								?>
+								<?php echo JHtml::_('bootstrap.endAccordion'); //echo JHtml::_('sliders.end'); ?>
 
 							</div><!-- class="fc-sliders-plain-outer" -->
 

@@ -89,7 +89,6 @@ class FlexicontentControllerUsers extends FlexicontentControllerBaseAdmin
 		$app = JFactory::getApplication();
 		$db  = JFactory::getDbo();
 		$me  = JFactory::getUser();
-		$acl = JFactory::getACL();
 		$config = JFactory::getConfig();
 		$MailFrom	= $config->get('mailfrom');
 		$FromName	= $config->get('fromname');
@@ -195,7 +194,7 @@ class FlexicontentControllerUsers extends FlexicontentControllerBaseAdmin
 		{
 			case 'apply':
 				$msg = JText::sprintf('Successfully Saved changes to User', $user->get('name'));
-				$this->setRedirect('index.php?option=com_flexicontent&controller=users&view=user&task=' . $ctrl . 'edit&cid[]=' . $user->get('id'), $msg);
+				$this->setRedirect('index.php?option=com_flexicontent&controller=users&view=user&task=' . $ctrl . 'edit&id=' . $user->get('id'), $msg);
 				break;
 
 			case 'save2new':
