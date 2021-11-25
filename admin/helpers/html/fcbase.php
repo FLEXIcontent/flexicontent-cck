@@ -439,9 +439,9 @@ abstract class JHtmlFcbase
 		);
 
 		return '
-		<a href="javascript:;" onclick="saveorder(' . (count($rows) - 1) . ', \'' . $config->task_value . '\')" '
+		<a href="javascript:;" onclick="var checkAllToggle = document.adminForm.elements[\'checkall-toggle\']; checkAllToggle.checked=true; Joomla.checkAll(checkAllToggle); Joomla.submitform(\'' . $config->task_value . '\');" '
 				. ' class="saveorder btn btn-small btn-primary' . ($config->custom_tip ? ' hasTooltip' : '') . '" '
-				. ' title="' . JText::_($config->custom_tip ?: '') . '" style="padding: 6px 4px 4px 6px;">
+				. ' title="' . JText::_($config->custom_tip ?: '') . '" style="padding: 6px 7px 4px 8px;">
 			<span class="' . $config->icon_class . '"></span>
 			<span class="hidden-phone">' . JText::_($config->custom_txt ?: '') . '</span>
 		</a>';
