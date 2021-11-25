@@ -17,26 +17,6 @@
  */
 
 defined('_JEXEC') or die('Restricted access');
-?>
-<script>
-function submitbutton(pressbutton)
-{
-	var form = document.adminForm;
-	if (pressbutton == 'cancel') {
-		submitform( pressbutton );
-		return;
-	}
-
-	// do field validation
-	if (form.altname.value == ""){
-		alert( "<?php echo JText::_( 'FLEXI_ADD_NAME_TAG',true ); ?>" );
-	} else {
-		submitform( pressbutton );
-	}
-}
-</script>
-
-<?php
 
 $tip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
 $btn_class = FLEXI_J30GE ? 'btn' : 'fc_button fcsimple';
@@ -129,7 +109,7 @@ $disabled = $this->row->url ? '' : ' disabled="disabled"';
 				</label>
 			</td>
 			<td>
-				<input type="text" id="altname" name="altname" value="<?php echo $this->row->altname; ?>" maxlength="4000" class="input-xxlarge" />
+				<input type="text" id="altname" name="altname" value="<?php echo $this->row->altname; ?>" maxlength="4000" class="input-xxlarge required" />
 			</td>
 		</tr>
 
