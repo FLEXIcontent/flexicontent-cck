@@ -5537,7 +5537,7 @@ class flexicontent_html
 			$confirm_msg = $confirm_msg ? $confirm_msg : JText::_('FLEXI_ARE_YOU_SURE');
 			$confirm_msg = flexicontent_html::escapeJsText(strip_tags($confirm_msg), "d");
 
-			$full_js = $extra_js ."; submitbutton('$task');";
+			$full_js = $extra_js ."; Joomla.submitbutton('$task');";
 			if ($confirm)
 			{
 				$full_js = "if (confirm('".$confirm_msg."')) { ".$full_js." }";
