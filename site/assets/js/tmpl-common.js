@@ -541,12 +541,13 @@ jQuery(document).ready(function () {
 
 	var cc = (typeof FC_URL_VARS !="undefined" && 'cc' in FC_URL_VARS ? FC_URL_VARS['cc']: '');
 	var fc_uid = fc_getCookie('fc_uid');
+	var base_url = !!jbase_url_fc ? jbase_url_fc : '';
 
 	if (cc!='' && fc_uid!=cc)
 	{
 		var staleUrl = window.location.href;
 		newUrl = fc_replaceUrlParam(staleUrl, 'cc', fc_uid);
 		window.location.replace(newUrl);
-		document.body.innerHTML = Joomla.JText._('FLEXI_UPDATING_CONTENTS') + ' <img id="loading_img" src="components/com_flexicontent/assets/images/ajax-loader.gif">';
+		document.body.innerHTML = Joomla.JText._('FLEXI_UPDATING_CONTENTS') + ' <img id="loading_img" src="'+base_url+'components/com_flexicontent/assets/images/ajax-loader.gif">';
 	}
 });

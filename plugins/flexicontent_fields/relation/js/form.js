@@ -148,12 +148,12 @@
 			ajax_data.lang_code = item_lang;
 		}
 
-    // Frontend case, use root URL
-		var live_site = !!jbase_url_fc ? jbase_url_fc : '';
+    // Joomla Base URL
+		var base_url = !!jbase_url_fc ? jbase_url_fc : '';
 
 		jQuery.ajax({
 			type: 'POST',
-			url: live_site + 'index.php?option=com_flexicontent&tmpl=component&format=raw&' + eval('sessionToken' + field_id) + '=1',
+			url: base_url + 'index.php?option=com_flexicontent&tmpl=component&format=raw&' + eval('sessionToken' + field_id) + '=1',
 			dataType: 'json',
 			data: ajax_data
 		}).done( function(data) {

@@ -805,19 +805,19 @@
 
 	function fcCascadedField_update(elVal, trgID, field_id, item_id, field_type, cascade_prompt, prompt_enabled, valindex)
 	{
+    // Joomla Base URL
+		var base_url = !!jbase_url_fc ? jbase_url_fc : '';;
+
 		var trgEL = jQuery('#'+trgID);
-		trgEL.parent().find('.field_cascade_loading').html('<img src=\"components/com_flexicontent/assets/images/ajax-loader.gif\" align=\"center\" /> ... Loading');
+		trgEL.parent().find('.field_cascade_loading').html('<img src="'+base_url+'components/com_flexicontent/assets/images/ajax-loader.gif" align="center" /> ... Loading');
 
 		var loading_prompt = '';  // Joomla.JText._('FLEXI_PLEASE_WAIT')
 		fcCascadedField_clear(trgEL, loading_prompt, prompt_enabled);
 		trgEL.removeAttr('data-defvals');  // Remove default values of select2 JS
 
-    // Frontend case, use root URL
-		var live_site = !!jbase_url_fc ? jbase_url_fc : '';;
-
 		jQuery.ajax({
 			type: 'POST',
-			url: live_site + 'index.php?option=com_flexicontent&tmpl=component&format=raw',
+			url: base_url + 'index.php?option=com_flexicontent&tmpl=component&format=raw',
 			data: {
 				lang: (typeof fc_sef_lang != 'undefined' ? fc_sef_lang : ''),
 				task: 'call_extfunc',

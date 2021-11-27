@@ -44,6 +44,9 @@
 
 	fcfield_sharemedia.fetchData = function(element_id_n, config_name)
 	{
+    // Joomla Base URL
+		var base_url = !!jbase_url_fc ? jbase_url_fc : '';
+
 		var msg_box = jQuery("#fcfield_message_box_"+element_id_n);
 
 		// Clear any existing message
@@ -56,7 +59,7 @@
 		var url = jQuery("#"+element_id_n+"_url").val();
 		if (url=="") return;
 
-		msg_box.html("<img src=\"components/com_flexicontent/assets/images/ajax-loader.gif\" style=\"vertical-align: middle;\">");
+		msg_box.html('<img src="'+base_url+'components/com_flexicontent/assets/images/ajax-loader.gif" style="vertical-align: middle;">');
 
 		fcfield_sharemedia.debugToConsole[config_name] ? window.console.log("Fetching "+url) : "";
 

@@ -151,7 +151,10 @@ function fc_submit_form(form, task, validate)
 			// CHECKs are done, do the AJAX submit, but first prevent the normal browser submit from continuing further
 			e.preventDefault();
 			
-			$form.after('<span id="fc_doajax_loading"><img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center" /> ... Saving</span>');
+			// Joomla Base URL
+			var base_url = !!jbase_url_fc ? jbase_url_fc : '';
+
+			$form.after('<span id="fc_doajax_loading"><img src="'+base_url+'components/com_flexicontent/assets/images/ajax-loader.gif" align="center" /> ... Saving</span>');
 			$form.hide();
 			$form.append('<input type="hidden" name="fc_doajax_submit" id="fc_doajax_submit" value="1" />');
 			jQuery.ajax({

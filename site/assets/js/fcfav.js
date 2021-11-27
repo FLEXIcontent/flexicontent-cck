@@ -40,8 +40,6 @@ function toggleFCFavCookie(id, type)
 
 function FCFav(id, type, add_counter)
 {
-	//var url = location.href;  // entire url including querystring - also: window.location.href;
-	//var live_site = url.substring(0, url.indexOf('/', 14)) + fc_root_uri + '/';
 	type = (typeof type === "undefined" || type === null ) ? 'item' : type;
 	add_counter = (typeof add_counter === "undefined" || add_counter === null ) ? false : add_counter;
 
@@ -49,10 +47,11 @@ function FCFav(id, type, add_counter)
 	// cookie will be received via the HTTP response of the AJAX server call
 	//toggleFCFavCookie(id, type);
 
-	var currentURL = window.location;
-	var live_site = currentURL.protocol + '//' + currentURL.host + fc_root_uri;
-	
-	var favurl = live_site + '/index.php?option=com_flexicontent&format=raw&task=ajaxfav&id=' + id + '&type=' + type;
+	// Joomla Root and Base URL
+	var root_url = !!jroot_url_fc ? jroot_url_fc : '';
+	var base_url = !!jbase_url_fc ? jbase_url_fc : '';
+
+	var favurl = root_url + 'index.php?option=com_flexicontent&format=raw&task=ajaxfav&id=' + id + '&type=' + type;
 
 	var onote_msg_box_start = '<div class="fc-mssg fc-note fc-iblock fc-nobgimage fcfavs-result-mssg" style="position: relative;">';
 	var osucc_msg_box_start = '<div class="fc-mssg fc-success fc-iblock fc-nobgimage fcfavs-result-mssg" style="z-index:1000; position: relative;">';
@@ -61,8 +60,8 @@ function FCFav(id, type, add_counter)
 	var divs = jQuery('.fcfavs-responce_'+type+'_'+id);
 	if (divs.length)
 	{
-		//divs.html(_box_start + ' fcfavs-loading">' + '<img src="'+live_site+'/components/com_flexicontent/assets/images/ajax-loader.gif" border="0" align="absmiddle" /> ' + Joomla.JText._('FLEXI_LOADING') + '</div>');
-		divs.html('<span class="fcfavs-loading">' + '<img src="'+live_site+'/components/com_flexicontent/assets/images/ajax-loader.gif" border="0" align="absmiddle" /> </span>');
+		//divs.html(_box_start + ' fcfavs-loading">' + '<img src="'+base_url+'components/com_flexicontent/assets/images/ajax-loader.gif" border="0" align="absmiddle" /> ' + Joomla.JText._('FLEXI_LOADING') + '</div>');
+		divs.html('<span class="fcfavs-loading">' + '<img src="'+base_url+'components/com_flexicontent/assets/images/ajax-loader.gif" border="0" align="absmiddle" /> </span>');
 	}
 
 	jQuery.ajax({
@@ -104,7 +103,7 @@ function FCFav(id, type, add_counter)
 				}
 				else if (fcfav_toggle_style == 1)  // Icon Image
 				{
-					link = '<img alt="'+Joomla.JText._('FLEXI_REMOVE_FAVOURITE')+'" src="'+live_site+'/components/com_flexicontent/assets/images/heart_full.png" border="0" class="fcfavs-img_icon" />';
+					link = '<img alt="'+Joomla.JText._('FLEXI_REMOVE_FAVOURITE')+'" src="'+base_url+'components/com_flexicontent/assets/images/heart_full.png" border="0" class="fcfavs-img_icon" />';
 				}
 				else  // Icon CSS
 				{
@@ -121,7 +120,7 @@ function FCFav(id, type, add_counter)
 				}
 				else if (fcfav_toggle_style == 1)  // Icon Image
 				{
-					link='<img alt="'+Joomla.JText._('FLEXI_FAVOURE')+'" src="'+live_site+'/components/com_flexicontent/assets/images/heart_empty.png" border="0" class="fcfavs-img_icon" />';
+					link='<img alt="'+Joomla.JText._('FLEXI_FAVOURE')+'" src="'+base_url+'components/com_flexicontent/assets/images/heart_empty.png" border="0" class="fcfavs-img_icon" />';
 				}
 				else  // Icon CSS
 				{
@@ -141,7 +140,7 @@ function FCFav(id, type, add_counter)
 				}
 				else if (fcfav_toggle_style == 1)  // Icon Image
 				{
-					link = '<img alt="'+Joomla.JText._('FLEXI_REMOVE_FAVOURITE')+'" src="'+live_site+'/components/com_flexicontent/assets/images/heart_full.png" border="0" class="fcfavs-img_icon" />';
+					link = '<img alt="'+Joomla.JText._('FLEXI_REMOVE_FAVOURITE')+'" src="'+base_url+'components/com_flexicontent/assets/images/heart_full.png" border="0" class="fcfavs-img_icon" />';
 				}
 				else  // Icon CSS
 				{
@@ -163,7 +162,7 @@ function FCFav(id, type, add_counter)
 				}
 				else if (fcfav_toggle_style == 1)  // Icon Image
 				{
-					link = '<img alt="'+Joomla.JText._('FLEXI_FAVOURE')+'" src="'+live_site+'/components/com_flexicontent/assets/images/heart_empty.png" border="0" class="fcfavs-img_icon" />';
+					link = '<img alt="'+Joomla.JText._('FLEXI_FAVOURE')+'" src="'+base_url+'components/com_flexicontent/assets/images/heart_empty.png" border="0" class="fcfavs-img_icon" />';
 				}
 				else  // Icon CSS
 				{

@@ -212,14 +212,14 @@
 			list.parent().find('.fcrec_cascaded_msg').html('').hide();
 			list.parent().find('.fcrec_cascaded_col').removeClass('fcrec_unused');
 
-			// Frontend case, use root URL
-			var live_site = !!jbase_url_fc ? jbase_url_fc : '';
+			// Joomla Base URL
+			var base_url = !!jbase_url_fc ? jbase_url_fc : '';
 
-			list.after( jQuery('<img src="components/com_flexicontent/assets/images/ajax-loader.gif">') );
+			list.after( jQuery('<img src="'+base_url+'components/com_flexicontent/assets/images/ajax-loader.gif">') );
 			jQuery.ajax({
 				async: false,
 				type: 'GET',
-				url: live_site + 'index.php?option=com_flexicontent&task=fields.getIndexedFieldJSON&format=raw',
+				url: base_url + 'index.php?option=com_flexicontent&task=fields.getIndexedFieldJSON&format=raw',
 				data: {
 					field_id: master_field_id
 				},
