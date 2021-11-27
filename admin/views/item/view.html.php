@@ -32,6 +32,8 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 	{
 		if (1)
 		{
+			// Important set layout to be form since various category view SEF links may have this variable set
+			$this->setLayout('default');
 			$this->_displayForm($tpl);
 			return;
 		}
@@ -61,6 +63,8 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		$user       = JFactory::getUser();
 		$db         = JFactory::getDbo();
 		$uri        = JUri::getInstance();
+		$task       = $jinput->getCmd('task');
+		$isAdmin    = $app->isClient('administrator');
 		$cparams    = JComponentHelper::getParams('com_flexicontent');
 
 		// Get url vars and some constants
@@ -114,6 +118,11 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 			$app->redirect( $returnURL );
 		}
 
+		if ($task === 'edit' && !$item->id)
+		{
+			throw new Exception(JText::sprintf('FLEXI_REQUESTED_CONTENT_OR_VIEW_NOT_FOUND', 'item'), 404);
+		}
+
 		if ( $print_logging_info ) $fc_run_times['get_item_data'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 
 
@@ -159,14 +168,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		// IS new FLAG
 		$isnew   = ! $item->id;
 		$manager_view = $ctrl = 'items';
-
-
-		/**
-		 * Get Associated Translations
-		 */
-
-		if ($useAssocs)  $langAssocs = $this->get( 'LangAssocs' );
-		$langs = FLEXIUtilities::getLanguages('code');
+		$ctrl_ = $ctrl ? $ctrl . '.' : '';
 
 
 		// Create and set (into HTTP request) a unique item id for plugins that needed it
@@ -183,8 +185,26 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		//print_r($unique_tmp_itemid);
 		$jinput->set('unique_tmp_itemid', $unique_tmp_itemid);
 
-		// Get number of subscribers
-		$subscribers = $model->getSubscribersCount();
+
+		/**
+		 * Get Associated Translations and languages
+		 * also (frontend) load Template-Specific language file to override or add new language
+		 */
+
+		$uselang = $isAdmin
+			? true
+			: $page_params->get('uselang_fe') == 1;
+
+		$langAssocs = $useAssocs && $uselang
+			? $model->getLangAssocs()
+			: false;
+		$langs = FLEXIUtilities::getLanguages('code');
+
+		// In frontend also load language override from template folder
+		if (!$isAdmin)
+		{
+			FLEXIUtilities::loadTemplateLanguageFile($page_params->get('ilayout') ?: 'default');
+		}
 
 
 
@@ -340,8 +360,25 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		$quicktagsdata = !empty($quicktagsIds) ? $model->getTagsByIds($quicktagsIds, $_indexed = true) : array();
 
 
+		// Get number of subscribers
+		$subscribers = $model->getSubscribersCount();
+
 		// Get the edit lists
 		$lists = $this->_buildEditLists($perms, $page_params, $session_data);
+
+		// Frontend specific code
+		if (!$isAdmin)
+		{
+			// Get menu overridden categories/main category fields
+			$menuCats = $this->_getMenuCats($item, $perms, $page_params);
+
+			// Create placement configuration for CORE properties
+			$placementConf = $this->_createPlacementConf($item, $fields, $page_params);
+
+			// Create submit configuration (for new items) into the session
+			$submitConf = $this->_createSubmitConf($item, $perms, $page_params);
+		}
+
 
 		// Label for current item state: published, unpublished, archived etc
 		switch ($item->state) {
@@ -462,26 +499,50 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		if ($useAssocs)  $this->lang_assocs = $langAssocs;
 		$this->langs   = $langs;
 		$this->params  = $page_params;
-		$this->iparams = $model->getComponentTypeParams();
 		$this->lists   = $lists;
-		$this->typesselected = $typesselected;
 
-		$this->published     = $published;
 		$this->subscribers   = $subscribers;
 		$this->usedtagsdata  = $usedtagsdata;
 		$this->quicktagsdata = $quicktagsdata;
 
 		$this->fields     = $fields;
-		$this->versions   = $versions;
-		$this->ratings    = $ratings;
-		$this->pagecount  = $pagecount;
 		$this->tparams    = $tparams;
 		$this->tmpls      = $tmpls;
 		$this->perms      = $perms;
 		$this->document   = $document;
 		$this->nullDate   = $nullDate;
-		$this->current_page = $current_page;
 
+		// Backend only
+		if ($isAdmin)
+		{
+			$this->iparams       = $model->getComponentTypeParams();
+			$this->typesselected = $typesselected;
+			$this->published     = $published;
+
+			// Version related: versio data, current page, total pages
+			$this->versions     = $versions;
+			$this->current_page = $current_page;
+			$this->pagecount    = $pagecount;
+			// Ratings
+			$this->ratings = $ratings;
+		}
+
+		// Frontend only
+		else
+		{
+			$this->action     = $uri->toString();
+			$this->itemlang   = $itemlang;
+
+			$this->menuCats      = $menuCats;
+			$this->submitConf    = $submitConf;
+			$this->placementConf = $placementConf;
+			$this->pageclass_sfx = $pageclass_sfx;
+
+			$this->captcha_errmsg = isset($captcha_errmsg) ? $captcha_errmsg : null;
+			$this->captcha_field  = isset($captcha_field)  ? $captcha_field  : null;
+
+			$this->referer = $this->_getReturnUrl();
+		}
 
 
 		// ***
@@ -515,6 +576,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		$document = JFactory::getDocument();
 		$session  = JFactory::getSession();
 		$option   = $jinput->get('option', '', 'cmd');
+		$isAdmin  = $app->isClient('administrator');
 
 		global $globalcats;
 
@@ -789,11 +851,32 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		// Creating categorories tree for item assignment, we use the 'create' privelege
 		$actions_allowed = array('core.create');
 
-		// Featured categories form field
+
+		/**
+		 * Featured categories form field
+		 */
+
 		$featured_cats_parent = $page_params->get('featured_cats_parent', 0);
 		$featured_cats = array();
-		$enable_featured_cid_selector = $perms['multicat'] && $perms['canchange_featcat'];
-		if ( $featured_cats_parent )
+
+		// ACL Permission for using featured cats
+		$canchange_featcat = $perms['multicat'] && $perms['canchange_featcat'];
+
+		// SHOW/HIDE Configuration -- 0: hide, 1: hide if no ACL, 2: show
+		$show_featcats = $isAdmin
+			? 2
+			: (int) $page_params->get('show_featcats_fe', 2);
+
+		// Do not display selector if featured cats are disabled or if selector is configured to be hidden via ACL
+		$feat_cids_hidden = $show_featcats === 0 || ($show_featcats === 1 && !$canchange_featcat);
+
+		if (!$featured_cats_parent || $feat_cids_hidden)
+		{
+			$lists['featured_cid'] = false;
+		}
+
+		// Display selector (but show as disabled if no ACL to change it)
+		else
 		{
 			$featured_tree = flexicontent_cats::getCategoriesTree($published_only=1, $parent_id=$featured_cats_parent, $depth_limit=0);
 			$disabled_cats = $page_params->get('featured_cats_parent_disable', 1) ? array($featured_cats_parent) : array();
@@ -806,7 +889,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 
 			$class  = "use_select2_lib";
 			$attribs  = 'class="'.$class.'" multiple="multiple" size="8"';
-			$attribs .= $enable_featured_cid_selector ? '' : ' disabled="disabled"';
+			$attribs .= $canchange_featcat ? '' : ' disabled="disabled"';
 			$fieldname = 'jform[featured_cid][]';
 
 			// Skip main category from the selected cats to allow easy change of it
@@ -819,21 +902,35 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 				}
 			}
 
-			$lists['featured_cid'] = ($enable_featured_cid_selector ? '' : '<label class="label" style="float:none; margin:0 6px 0 0 !important;">locked</label>').
+			$lists['featured_cid'] = ($canchange_featcat ? '' : '<label class="label" style="float:none; margin:0 6px 0 0 !important;">locked</label>').
 				flexicontent_cats::buildcatselect($featured_tree, $fieldname, $featured_sel_nomain, 3, $attribs, true, ($item->id ? 'edit' : 'create'),	$actions_allowed,
 					$require_all=true, $skip_subtrees=array(), $disable_subtrees=array(), $custom_options=array(), $disabled_cats
 				);
 		}
-		else{
-			// Do not display, if not configured or not allowed to the user
-			$lists['featured_cid'] = false;
+
+
+		/**
+		 * Multi-category form field, for user allowed to use multiple categories
+		 */
+
+		// ACL Permission for using secondaty cats
+		$canchange_seccat = $perms['multicat'] && $perms['canchange_seccat'];
+
+		// SHOW/HIDE Configuration -- 0: hide, 1: hide if no ACL, 2: show
+		$show_seccats = $isAdmin
+			? 2
+			: (int) $page_params->get('show_seccats_fe', 2);
+
+		// Do not display selector if secondary cats are disabled or if selector is configured to be hidden via ACL
+		$sec_cids_hidden = $show_seccats === 0 || ($show_seccats === 1 && !$canchange_seccat);
+
+		if ($sec_cids_hidden)
+		{
+			$lists['cid'] = false;
 		}
 
-
-		// Multi-category form field, for user allowed to use multiple categories
-		$lists['cid'] = '';
-		$enable_cid_selector = $perms['multicat'] && $perms['canchange_seccat'];
-		if ( 1 )
+		// Display selector (but show as disabled if no ACL to change it)
+		else
 		{
 			if ($page_params->get('cid_allowed_parent'))
 			{
@@ -859,7 +956,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 			$class .= $max_cat_assign ? " validate-fccats" : " validate";
 
 			$attribs  = 'class="'.$class.'" multiple="multiple" size="20"';
-			$attribs .= $enable_cid_selector ? '' : ' disabled="disabled"';
+			$attribs .= $canchange_seccat ? '' : ' disabled="disabled"';
 
 			$fieldname = 'jform[cid][]';
 			$skip_subtrees = $featured_cats_parent ? array($featured_cats_parent) : array();
@@ -871,26 +968,10 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 				if ($cat_id != $form_catid) $form_cid_nomain[] = $cat_id;
 			}
 
-			$lists['cid'] = ($enable_cid_selector ? '' : '<label class="label" style="float:none; margin:0 6px 0 0 !important;">locked</label>').
+			$lists['cid'] = ($canchange_seccat ? '' : '<label class="label" style="float:none; margin:0 6px 0 0 !important;">locked</label>').
 				flexicontent_cats::buildcatselect($cid_tree, $fieldname, $form_cid_nomain, false, $attribs, true, ($item->id ? 'edit' : 'create'), $actions_allowed,
 					$require_all=true, $skip_subtrees, $disable_subtrees=array(), $custom_options=array(), $disabled_cats
 				);
-		}
-
-		else
-		{
-			if ( count($form_cid) > 1 )
-			{
-				foreach ($form_cid as $catid)
-				{
-					$cat_titles[$catid] = $globalcats[$catid]->title;
-				}
-				$lists['cid'] .= implode(', ', $cat_titles);
-			}
-			else
-			{
-				$lists['cid'] = false;
-			}
 		}
 
 
@@ -1084,6 +1165,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		$perms_cache[$model->get('id')] = $perms;
 		return $perms;
 	}
+
 
 
 	/**

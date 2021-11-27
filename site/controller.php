@@ -330,15 +330,15 @@ class FlexicontentController extends JControllerLegacy
 
 		$AutoApproveChanges = $perms->AutoApproveChanges;
 
-		$enable_featured_cid_selector = $perms->MultiCat && $CanChangeFeatCat;
-		$enable_cid_selector   = $perms->MultiCat && $CanChangeSecCat;
+		$canchange_featcat = $perms->MultiCat && $CanChangeFeatCat;
+		$canchange_seccat   = $perms->MultiCat && $CanChangeSecCat;
 		$enable_catid_selector = ($isnew && !$params->get('catid_default')) || (!$isnew && !$model->get('catid')) || $CanChangeCat;
 
 		// Enforce featured categories if user is not allowed to changed
 		$featured_cats_parent = $params->get('featured_cats_parent', 0);
 		$featured_cats = array();
 
-		if ($featured_cats_parent && !$enable_featured_cid_selector)
+		if ($featured_cats_parent && !$canchange_featcat)
 		{
 			$featured_tree = flexicontent_cats::getCategoriesTree($published_only = 1, $parent_id = $featured_cats_parent, $depth_limit = 0);
 			$disabled_cats = $params->get('featured_cats_parent_disable', 1) ? array($featured_cats_parent) : array();
@@ -369,7 +369,7 @@ class FlexicontentController extends JControllerLegacy
 		// (FE) No category override active, and no secondary cats were submitted
 		$cid_not_submitted = $app->isClient('administrator') ? true : !$overridecatperms && empty($data['cid']);
 
-		if (!$enable_cid_selector && $cid_not_submitted)
+		if (!$canchange_seccat && $cid_not_submitted)
 		{
 			// For new item use default secondary categories from type configuration
 			if ($isnew)
