@@ -530,6 +530,7 @@ fc_plupload = function(options)
 		var file_row = $('#'+file_row_id);
 		var file_name_box = file_row.find('.plupload_file_name');
 		var is_img = is_IE8_IE9 && !fc_has_flash_addon() ? 0 : file.name.match(/\.(jpg|jpeg|gif|png|webp|bmp|wbmp|ico)$/i);
+		var base_url = !!jbase_url_fc ? jbase_url_fc : '';
 
 		// Add extra CSS classes to the delete buttons
 		file_row.find('.plupload_file_action > a').addClass('fc_uploader_row_remove');
@@ -591,7 +592,7 @@ fc_plupload = function(options)
 			var image_already_loaded = !! fc_plupload_loaded_imgs[file_row_id];
 			if (!image_already_loaded)
 			{
-				fc_plupload_loaded_imgs[file_row_id] = $('<img class="plupload_loading_img" src="components/com_flexicontent/assets/images/ajax-loader.gif" />');
+				fc_plupload_loaded_imgs[file_row_id] = $('<img class="plupload_loading_img" src="'+base_url+'components/com_flexicontent/assets/images/ajax-loader.gif" />');
 			}
 
 

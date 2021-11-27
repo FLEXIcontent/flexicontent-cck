@@ -14,6 +14,7 @@ var itemscreen = function(name, options)
 	this.fetchscreen = function(name)  
 	{
 		var doname = typeof name != 'undefined' ? name : this.name;
+		var base_url = !!jbase_url_fc ? jbase_url_fc : '';
 
 		if (this.options.id <= 0)
 		{
@@ -21,7 +22,7 @@ var itemscreen = function(name, options)
 			return;
 		}
 
-		jQuery('#'+doname).html('<p><img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center"></p>');
+		jQuery('#'+doname).html('<p><img src="'+base_url+'components/com_flexicontent/assets/images/ajax-loader.gif" align="center"></p>');
 		jQuery.ajax({
 			url: this.options.script_url + "&format=raw&task=" + this.options.task + "&id=" + this.options.id,
 			type: 'get',
@@ -64,8 +65,9 @@ var itemscreen = function(name, options)
 	this.reseter = function(task, id, name, url)
 	{
 		var doname = typeof name != 'undefined' ? name : this.name;
+		var base_url = !!jbase_url_fc ? jbase_url_fc : '';
 
-		jQuery('#'+doname).html('<p><img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center"></p>');
+		jQuery('#'+doname).html('<p><img src="'+base_url+'components/com_flexicontent/assets/images/ajax-loader.gif" align="center"></p>');
 		jQuery.ajax({
 			url: url+'&format=raw&task='+task+'&id='+id,
 			type: 'get',
