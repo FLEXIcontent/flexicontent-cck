@@ -1050,28 +1050,62 @@ class _FlexicontentSiteRouter
 			}
 		}
 
-		if ($language && ($tbl === '#__content' || $tbl === '#__categories'))
+		if ($language)
 		{
-			$query->where('(i.language = ' . $db->Quote($language) . ' OR i.language = ' . $db->Quote('*') . ')');
+			if ($tbl === '#__content')  // || $tbl === '#__categories'
+			{
+				$query->where('(i.language = ' . $db->Quote($language) . ' OR i.language = ' . $db->Quote('*') . ')');
+			}
+
+			if ($tbl === '#__content' || $tbl === '#__categories')
+			{
+				$query->select('i.language');
+			}
 		}
 
 		//echo $alias . ' -- ' . $query . '<br>';
 		$records = $db->setQuery($query)->loadObjectList();
+		
 
+		/**
+		 * Multiple records with same alias were found, try to filter out records with non-matching language
+		 * (if not done by query already, e.g. not done for #__categories) 
+		 */
+		if (count($records) > 1 && $language)
+		{
+			foreach($records as $k => $record)
+			{
+				if ($record->language != $language && $record->language != '*')
+				{
+					if (count($records) > 1) unset($records[$k]);
+				}
+			}
+		}
+
+		/*
+		 * We still have multiple records with same alias, try to filter out records with non-matching parent_id
+		 * (if not done by query already, e.g. not done for #__categories) 
+		 */
+		if (count($records) > 1 && $parent_id)
+		{
+			foreach($records as $record)
+			{
+				if ((int) $record->parent_id !== (int) $parent_id)
+				{
+					if (count($records) > 1) unset($records[$k]);
+				}
+			}
+		}
+
+		/**
+		 * If we now have 1 record, return
+		 * But for multiple content items with same alias just return the first one
+		 * We do this for compatibility as MVC should make sure that this does not happen
+		 */
 		if (count($records) === 1 || (count($records) && $tbl === '#__content'))
 		{
 			$record = reset($records);
 			return (int) $record->id;
-		}
-		elseif (count($records) > 1 && $parent_id)
-		{
-			foreach($records as $record)
-			{
-				if ((int) $record->parent_id === (int) $parent_id)
-				{
-					return (int) $record->id;
-				}
-			}
 		}
 
 		if (count($records) > 1)
