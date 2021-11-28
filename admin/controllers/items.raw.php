@@ -387,7 +387,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 	 */
 	function getOrphansItems()
 	{
-		$model  = $this->getModel('items');
+		$model  = $this->getModel($this->record_name_pl);
 		$status = $model->getUnboundedItems($limit = 1000000, $count_only = true, $checkNoExtData = true, $checkInvalidCat = false);
 		echo $status;
 		exit;
@@ -401,7 +401,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 	 */
 	function getBadCatItems()
 	{
-		$model  = $this->getModel('items');
+		$model  = $this->getModel($this->record_name_pl);
 		$status = $model->getUnboundedItems($limit = 1000000, $count_only = true, $checkNoExtData = false, $checkInvalidCat = true);
 		echo $status;
 		exit;
@@ -429,7 +429,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 			$bind_limit = 25000;
 		}
 
-		$model = $this->getModel('items');
+		$model = $this->getModel($this->record_name_pl);
 		$rows  = $model->getUnboundedItems($bind_limit, $count_only = false, $checkNoExtData = true, $checkInvalidCat = false, $noCache = true);
 		$model->bindExtData($rows);
 		jexit();
@@ -446,7 +446,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 	function fixmaincat()
 	{
 		$default_cat = $this->input->getInt('default_cat', 0);
-		$model = $this->getModel('items');
+		$model = $this->getModel($this->record_name_pl);
 		$model->fixMainCat($default_cat);
 		jexit();
 	}
@@ -488,7 +488,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		$app     = JFactory::getApplication();
 
 		// Get records model to call needed methods
-		$records_model = $this->getModel('items');
+		$records_model = $this->getModel($this->record_name_pl);
 
 		/**
 		 * Check indexer type

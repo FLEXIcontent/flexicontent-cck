@@ -516,7 +516,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 			$file_mode  = $this->input->get('folder_mode', 0, 'int') ? 'folder_mode' : 'db_mode';
 		}
 
-		$model = $this->getModel('filemanager');
+		$model = $this->getModel($this->record_name_pl);
 		$field = false;
 
 		if ($fieldid)
@@ -1269,7 +1269,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 		$files = $db->loadObjectList('id');
 		$cid = array_keys($files);
 
-		$model = $this->getModel('filemanager');
+		$model = $this->getModel($this->record_name_pl);
 
 		$msg = '';
 		$allowed_files = array();

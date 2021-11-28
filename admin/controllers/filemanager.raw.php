@@ -148,7 +148,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 		}
 
 		// Get records model to call needed methods
-		$records_model = $this->getModel('filemanager');
+		$records_model = $this->getModel($this->record_name_pl);
 
 		// Get ids of records to process
 		$records_total = 0;
@@ -241,8 +241,8 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 		// jexit('fail | ' . $max_execution_time);
 
 		// Get models
-		$model        = $this->getModel('filemanager');
-		$record_model = $this->getModel('file');
+		$model        = $this->getModel($this->record_name_pl);
+		$record_model = $this->getModel($this->record_name);
 		
 		// Get mediafile fields
 		$media_fields = FlexicontentFields::getFieldsByType(array('mediafile'));

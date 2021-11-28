@@ -318,7 +318,7 @@ class FlexicontentControllerCategories extends FlexicontentControllerBaseAdmin
 		$this->setRedirect(JRoute::_('index.php?option=com_flexicontent&view=categories', false));
 
 		/** @var CategoriesModelCategory $model */
-		$model = $this->getModel('Category');
+		$model = $this->getModel($this->record_name);
 
 		if ($model->rebuild())
 		{

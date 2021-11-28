@@ -88,7 +88,7 @@ class FlexicontentControllerTags extends FlexicontentControllerBaseAdmin
 
 		$list  = $this->input->get('taglist', null, 'string');
 
-		$model = $this->getModel('tags');
+		$model = $this->getModel($this->record_name_pl);
 		$logs  = $model->importList($list);
 
 		if ($logs)
@@ -223,7 +223,7 @@ class FlexicontentControllerTags extends FlexicontentControllerBaseAdmin
 
 
 		// Get records model to call needed methods
-		$records_model = $this->getModel('tags');
+		$records_model = $this->getModel($this->record_name_pl);
 
 		// Get ids of records to process
 		$records_total = 0;
@@ -322,7 +322,7 @@ class FlexicontentControllerTags extends FlexicontentControllerBaseAdmin
 		// jexit('fail | ' . $max_execution_time);
 
 		// Get records models
-		$records_model = $this->getModel('tags');
+		$records_model = $this->getModel($this->record_name_pl);
 		$record_model  = null;
 
 		$query_count         = 0;

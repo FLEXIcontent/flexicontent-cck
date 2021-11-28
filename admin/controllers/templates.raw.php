@@ -82,7 +82,7 @@ class FlexicontentControllerTemplates extends FlexicontentControllerBaseAdmin
 		$source = $this->input->getString('source');
 		$dest   = $this->input->getString('dest');
 
-		$model = $this->getModel('templates');
+		$model = $this->getModel($this->record_name_pl);
 
 		if (!$model->duplicate($source, $dest))
 		{
@@ -117,7 +117,7 @@ class FlexicontentControllerTemplates extends FlexicontentControllerBaseAdmin
 		}
 
 		$dir    = $this->input->getString('dir');
-		$model  = $this->getModel('templates');
+		$model  = $this->getModel($this->record_name_pl);
 
 		if (!$model->delete($dir))
 		{

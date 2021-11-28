@@ -70,8 +70,12 @@ class FlexicontentControllerFields extends FlexicontentControllerBaseAdmin
 	 */
 	function getfieldspecificproperties()
 	{
-		$this->input->set('view', 'field');    // Set view to be field, if not already done in http request
-		$this->input->set('format', 'raw');    // force raw format, if not already done in http request
+		/**
+		 * 1. Set view to be record name aka to 'field', if not already done in http request
+		 * 2 . Force raw format, if not already done in http request
+		 */
+		$this->input->set('view', $this->record_name);
+		$this->input->set('format', 'raw');    
 
 		// Import field to execute its constructor, e.g. needed for loading language file etc
 		JPluginHelper::importPlugin('flexicontent_fields', $this->input->get('field_type', '', 'cmd'));

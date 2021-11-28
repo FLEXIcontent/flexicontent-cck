@@ -500,7 +500,7 @@ class FlexicontentControllerAppsman extends FlexicontentController
 		$session  = JFactory::getSession();
 		$document = JFactory::getDocument();
 
-		$this->input->set('view', 'appsman');
+		$this->input->set('view', $this->record_name);
 		$this->input->set('hidemainmenu', 1);
 
 		// Get/Create the view
@@ -510,7 +510,7 @@ class FlexicontentControllerAppsman extends FlexicontentController
 		$view = $this->getView($viewName, $viewType, '', array('base_path' => $this->basePath, 'layout' => $viewLayout));
 
 		// Get/Create the model
-		$model = $this->getModel('appsman');
+		$model = $this->getModel($this->record_name);
 
 		// Push the model into the view (as default), later we will call the view display method instead of calling parent's display task, because it will create a 2nd model instance !!
 		$view->setModel($model, true);

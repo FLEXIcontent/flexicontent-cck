@@ -85,7 +85,7 @@ class FlexicontentControllerBaseAdmin extends FlexicontentController
 
 		$this->option = $this->input->get('option', '', 'cmd');
 		$this->task   = $this->input->get('task', '', 'cmd');
-		$this->view   = $this->input->get('view', '', 'cmd');
+		$this->view   = $this->input->get('view', $this->record_name, 'cmd');
 		$this->format = $this->input->get('format', '', 'cmd');
 
 		// Get referer URL from HTTP request and validate it
