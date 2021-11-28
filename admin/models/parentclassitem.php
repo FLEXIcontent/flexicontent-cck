@@ -291,6 +291,7 @@ class ParentClassItem extends FCModelAdmin
 		// Verify item's type. This method verify new item type exists or gets item type for existing item
 		if ($this->_id || $this->_typeid)
 		{
+			// For new items if item type is not found, then an empty type is return that has ZERO id (=item type not set)
 			$this->_typeid = $this->getItemType()->id;
 		}
 

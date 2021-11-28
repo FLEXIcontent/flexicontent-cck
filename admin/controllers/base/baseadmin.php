@@ -725,7 +725,7 @@ class FlexicontentControllerBaseAdmin extends FlexicontentController
 
 		// Set success message and redirect
 		$msg = JText::sprintf('FLEXI_N_RECORDS_CHANGED_TO', $count) . ' ' . JText::_($record_model->supported_conditions[$state]);
-		$this->setRedirect($this->returnURL, $msg, 'success');
+		$this->setRedirect($this->returnURL, $msg, 'message');
 	}
 
 
@@ -768,7 +768,7 @@ class FlexicontentControllerBaseAdmin extends FlexicontentController
 			$app->setHeader('status', 500, true);
 			$this->setRedirect($this->returnURL);
 
-			return;
+			return false;
 		}
 
 		// Get and santize records ids
@@ -782,7 +782,7 @@ class FlexicontentControllerBaseAdmin extends FlexicontentController
 			$app->setHeader('status', 500, true);
 			$this->setRedirect($this->returnURL);
 
-			return;
+			return false;
 		}
 
 		// Calculate access, if cascade removal, then pass via 'cid_locked' all records as ignore-assignments records
@@ -796,11 +796,6 @@ class FlexicontentControllerBaseAdmin extends FlexicontentController
 		$cid = array_diff($cid, $cid_noauth, $cid_locked);
 		$is_authorised = count($cid);
 
-/*print_r($cid);
-print_r($cid_noauth);
-print_r($cid_locked);
-return;*/
-
 		// Check access
 		if (!$is_authorised)
 		{
@@ -810,7 +805,7 @@ return;*/
 			$app->setHeader('status', 403, true);
 			$this->setRedirect($this->returnURL);
 
-			return;
+			return false;
 		}
 
 		count($cid_locked)
@@ -848,7 +843,7 @@ return;*/
 			$app->setHeader('status', '500', true);
 			$this->setRedirect($this->returnURL);
 
-			return;
+			return $result;
 		}
 
 		$total = count($cid);
@@ -856,7 +851,8 @@ return;*/
 			? JText::sprintf($this->msg_relations_deleted, $total)
 			: $total . ' ' . JText::_(isset($this->msg_records_deleted) ? $this->msg_records_deleted : 'FLEXI_' . $this->_NAME . 'S_DELETED');
 
-		$this->setRedirect($this->returnURL, $msg, 'success');
+		$this->setRedirect($this->returnURL, $msg, 'message');
+		return true;
 	}
 
 
@@ -1047,7 +1043,7 @@ return;*/
 
 		$msg = JText::sprintf('FLEXI_RECORDS_MODIFIED', count($cid));
 
-		$this->setRedirect($this->returnURL, $msg, 'success');
+		$this->setRedirect($this->returnURL, $msg, 'message');
 	}
 
 

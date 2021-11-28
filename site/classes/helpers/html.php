@@ -2559,13 +2559,13 @@ class flexicontent_html
 		{
 			$caption = '';
 			$button_classes .= '';
-			$tooltip_placement = 'bottom';
+			$tooltip_placement = 'top';
 		}
 		else
 		{
 			$caption = $text;
 			if ( !$params->get('btn_grp_dropdown', 0) ) $button_classes .= self::$use_bootstrap ? ' btn btn-small' : ' fc_button fcsimple fcsmall';
-			$tooltip_placement = !$params->get('btn_grp_dropdown', 0) ? 'bottom' : 'left';
+			$tooltip_placement = !$params->get('btn_grp_dropdown', 0) ? 'top' : 'left';
 		}
 
 		$button_classes .= ' hasTooltip';
@@ -2622,13 +2622,13 @@ class flexicontent_html
 		{
 			$caption = '';
 			$button_classes .= '';
-			$tooltip_placement = 'bottom';
+			$tooltip_placement = 'top';
 		}
 		else
 		{
 			$caption = $text;
 			if ( !$params->get('btn_grp_dropdown', 0) ) $button_classes .= self::$use_bootstrap ? ' btn btn-small' : ' fc_button fcsimple fcsmall';
-			$tooltip_placement = !$params->get('btn_grp_dropdown', 0) ? 'bottom' : 'left';
+			$tooltip_placement = !$params->get('btn_grp_dropdown', 0) ? 'top' : 'left';
 		}
 
 		$button_classes .= ' hasTooltip';
@@ -2637,7 +2637,11 @@ class flexicontent_html
 		//$Itemid = JFactory::getApplication()->input->get('Itemid', 0, 'int');  // Maintain menu item ? e.g. current category view,
 		$Itemid = 0;
 		$item_url = JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, $Itemid, $item));
-		$link = $item_url . (strpos($item_url, '?') !== false ? '&' : '?') . 'task=remove';
+		$link = $item_url . (strpos($item_url, '?') !== false ? '&' : '?') . 'task=remove' . '&' . JSession::getFormToken() . '=1';
+
+		$view = JFactory::getApplication()->input->getCm('view', '');
+		$link .= '&isitemview=' . ($view == 'item' ? '1' : '0');
+
 		$targetLink = "_self";
 		$confirm_text = JText::_('FLEXI_ARE_YOU_SURE_PERMANENT_DELETE', true);
 
@@ -2701,13 +2705,13 @@ class flexicontent_html
 		{
 			$caption = '';
 			$button_classes .= '';
-			$tooltip_placement = 'bottom';
+			$tooltip_placement = 'top';
 		}
 		else
 		{
 			$caption = $text;
 			if ( !$params->get('btn_grp_dropdown', 0) ) $button_classes .= self::$use_bootstrap ? ' btn btn-small' : ' fc_button fcsimple fcsmall';
-			$tooltip_placement = !$params->get('btn_grp_dropdown', 0) ? 'bottom' : 'left';
+			$tooltip_placement = !$params->get('btn_grp_dropdown', 0) ? 'top' : 'left';
 		}
 
 		$button_classes .= ' hasTooltip';
@@ -2757,13 +2761,13 @@ class flexicontent_html
 		{
 			$caption = '';
 			$button_classes .= '';
-			$tooltip_placement = 'bottom';
+			$tooltip_placement = 'top';
 		}
 		else
 		{
 			$caption = $text;
 			if ( !$params->get('btn_grp_dropdown', 0) ) $button_classes .= self::$use_bootstrap ? ' btn btn-small' : ' fc_button fcsimple fcsmall';
-			$tooltip_placement = !$params->get('btn_grp_dropdown', 0) ? 'bottom' : 'left';
+			$tooltip_placement = !$params->get('btn_grp_dropdown', 0) ? 'top' : 'left';
 		}
 
 		$button_classes .= ' hasTooltip';
@@ -2844,13 +2848,13 @@ class flexicontent_html
 		{
 			$caption = '';
 			$button_classes .= '';
-			$tooltip_placement = 'bottom';
+			$tooltip_placement = 'top';
 		}
 		else
 		{
 			$caption = $text;
 			if ( !$params->get('btn_grp_dropdown', 0) ) $button_classes .= self::$use_bootstrap ? ' btn btn-small' : ' fc_button fcsimple fcsmall';
-			$tooltip_placement = !$params->get('btn_grp_dropdown', 0) ? 'bottom' : 'left';
+			$tooltip_placement = !$params->get('btn_grp_dropdown', 0) ? 'top' : 'left';
 		}
 
 		$button_classes .= ' hasTooltip';
@@ -2896,13 +2900,13 @@ class flexicontent_html
 		{
 			$caption = '';
 			$button_classes .= '';
-			$tooltip_placement = 'bottom';
+			$tooltip_placement = 'top';
 		}
 		else
 		{
 			$caption = $text;
 			if ( !$params->get('btn_grp_dropdown', 0) ) $button_classes .= self::$use_bootstrap ? ' btn btn-small' : ' fc_button fcsimple fcsmall';
-			$tooltip_placement = !$params->get('btn_grp_dropdown', 0) ? 'bottom' : 'left';
+			$tooltip_placement = !$params->get('btn_grp_dropdown', 0) ? 'top' : 'left';
 		}
 
 		$button_classes .= ' hasTooltip';
@@ -3213,11 +3217,11 @@ class flexicontent_html
 			}
 			elseif (!$params || !$params->get('show_icons', 2))
 			{
-				$tooltip_placement = 'bottom';
+				$tooltip_placement = 'top';
 			}
 			else
 			{
-				$tooltip_placement = !$params->get('btn_grp_dropdown', 0) ? 'bottom' : 'left';
+				$tooltip_placement = !$params->get('btn_grp_dropdown', 0) ? 'top' : 'left';
 			}
 
 			$state_js_ids = array();
@@ -3319,6 +3323,7 @@ class flexicontent_html
 			'iconname' => 'approval',
 			'icondefault' => 'icon-key',
 			'iconimage' => 'key_add.png',
+			'iconpath' => 'components/com_flexicontent/assets/images',  // Use icon from flexicontent assets folder
 			'icontitle' => 'FLEXI_APPROVAL_REQUEST',
 		);
 
@@ -3335,20 +3340,26 @@ class flexicontent_html
 		{
 			$caption = '';
 			$button_classes .= '';
-			$tooltip_placement = 'bottom';
+			$tooltip_placement = 'top';
 		}
 		else
 		{
 			$caption = $text;
 			if ( !$params->get('btn_grp_dropdown', 0) ) $button_classes .= self::$use_bootstrap ? ' btn btn-small' : ' fc_button fcsimple fcsmall';
-			$tooltip_placement = !$params->get('btn_grp_dropdown', 0) ? 'bottom' : 'left';
+			$tooltip_placement = !$params->get('btn_grp_dropdown', 0) ? 'top' : 'left';
 		}
 
 		$button_classes .= ' hasTooltip';
 		$tooltip_title = flexicontent_html::getToolTip($text, $overlib, 0);
 
-		$link = 'index.php?option=com_flexicontent&task=approval&cid='.$item->id;
-		$output	= ' <a href="'.$link.'" class="'.$button_classes.'" data-placement="' . $tooltip_placement . '" title="'.$tooltip_title.'">'.$image.$caption.'</a>';
+		$Itemid = 0;
+		$item_url = JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, $Itemid, $item));
+		$link = $item_url . (strpos($item_url, '?') !== false ? '&' : '?') . 'task=approval' . '&' . JSession::getFormToken() . '=1';
+
+		$targetLink = "_self";
+		$confirm_text = JText::_('FLEXI_CONFIRM_SEND_APPROVAL', true) . "\n" . ' (' . $overlib . ')';
+
+		$output	= ' <a href="'.$link.'" class="'.$button_classes.'" data-placement="' . $tooltip_placement . '" onclick="return confirm(\''.$confirm_text.'\')" target="'.$targetLink.'" title="'.$tooltip_title.'">'.$image.$caption.'</a>';
 		$output = JText::_('FLEXI_ICON_SEP') . $output . JText::_('FLEXI_ICON_SEP');
 
 		return $output;
@@ -3399,13 +3410,13 @@ class flexicontent_html
 		{
 			$caption = '';
 			$button_classes .= '';
-			$tooltip_placement = 'bottom';
+			$tooltip_placement = 'top';
 		}
 		else
 		{
 			$caption = $text;
 			if ( !$params->get('btn_grp_dropdown', 0) ) $button_classes .= self::$use_bootstrap ? ' btn btn-small' : ' fc_button fcsimple fcsmall';
-			$tooltip_placement = !$params->get('btn_grp_dropdown', 0) ? 'bottom' : 'left';
+			$tooltip_placement = !$params->get('btn_grp_dropdown', 0) ? 'top' : 'left';
 		}
 
 		$button_classes .= ' hasTooltip';
@@ -3614,7 +3625,7 @@ class flexicontent_html
 		{
 			$caption = '';
 			$button_classes .= '';
-			$tooltip_placement = 'bottom';
+			$tooltip_placement = 'top';
 		}
 		else
 		{
@@ -3622,7 +3633,7 @@ class flexicontent_html
 			if ( !$params->get('btn_grp_dropdown', 0) ) $button_classes .=
 				(self::$use_bootstrap ? ' btn btn-small' : ' fc_button fcsimple fcsmall')
 				.($auto_relations ? ' btn-success' : '');
-			$tooltip_placement = !$params->get('btn_grp_dropdown', 0) ? 'bottom' : 'left';
+			$tooltip_placement = !$params->get('btn_grp_dropdown', 0) ? 'top' : 'left';
 		}
 
 		$button_classes .= ' hasTooltip';

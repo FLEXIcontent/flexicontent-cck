@@ -16,10 +16,6 @@ use Joomla\Utilities\ArrayHelper;
 
 JLoader::register('FlexicontentControllerBaseAdmin', JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'controllers' . DS . 'base' . DS . 'baseadmin.php');
 
-// Manually import models in case used by frontend, then models will not be autoloaded correctly via getModel('name')
-require_once JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'models' . DS . 'item.php';
-require_once JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'models' . DS . 'items.php';
-
 /**
  * FLEXIcontent Items Controller
  *
@@ -45,6 +41,14 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 	var $exitLogTexts = array();
 	var $exitSuccess  = true;
 
+	// Only allow specific tasks in frontend. That have been reviewed for being both VALID and SAFE in frontend
+	var $FE_tasks_proxied = array(
+		'add', 'edit', 'save', 'cancel',
+		'remove', 'approval',
+		'apply_type', 'apply', 'apply_ajax',
+		'save2new', 'save2copy', 'save_a_preview',
+	);
+
 	/**
 	 * Constructor
 	 *
@@ -56,20 +60,53 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 	{
 		parent::__construct($config);
 
+		if (JFactory::getApplication()->isClient('site'))
+		{
+			$task = $this->input->get('task', '', 'cmd');
+
+			if (!in_array($task, $this->FE_tasks_proxied))
+			{
+				throw new Exception('Direct usage of this controller is not allowed in frontend. Task: ' . $task, 403);
+			}
+
+			// Since we are in frontend we need to manually load the backend language files, (english and then  override with current language)
+			JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, 'en-GB', true);
+			JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, true);
+		}
+
 		/**
 		 * Register task aliases
 		 */
-		$this->registerTask('add',          'edit');
 		$this->registerTask('apply_type',   'save');
-		$this->registerTask('apply',        'save');
-		$this->registerTask('apply_ajax',   'save');
-		$this->registerTask('save2new',     'save');
-		$this->registerTask('save2copy',    'save');
+		$this->registerTask('save_a_preview', 'save');
 
-		$this->registerTask('unfeatured',   'featured');
+		if (JFactory::getApplication()->isClient('site'))
+		{
+			$this->registerTask('download_tree',  'download');
 
-		$this->registerTask('copy',         'batch');
-		$this->registerTask('translate',    'batch');
+			$this->input  = empty($this->input) ? JFactory::getApplication()->input : $this->input;
+			$this->option = $this->input->get('option', '', 'cmd');
+			$this->task   = $this->input->get('task', '', 'cmd');
+			$this->view   = $this->input->get('view', '', 'cmd');
+			$this->format = $this->input->get('format', '', 'cmd');
+
+			// Get referer URL from HTTP request and validate it
+			$this->refererURL = !empty($_SERVER['HTTP_REFERER']) && flexicontent_html::is_safe_url($_SERVER['HTTP_REFERER'])
+				? $_SERVER['HTTP_REFERER']
+				: JUri::base();
+
+			// Get return URL from HTTP request and validate it
+			$this->returnURL = $this->_getReturnUrl();
+
+			// For frontend default return is refererURL
+			$this->returnURL = $this->returnURL ?: $this->refererURL;
+		}
+		else
+		{
+			$this->registerTask('unfeatured',   'featured');
+			$this->registerTask('copy',         'batch');
+			$this->registerTask('translate',    'batch');
+		}
 	}
 
 
@@ -275,9 +312,9 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		 */
 
 		// No permission to change tags or tags were not displayed
-		$tags_shown = $app->isClient('administrator')
-			? 1
-			: (int) $params->get('usetags_fe', 1) === 1;
+		$tags_shown = $app->isClient('site')
+			? (int) $params->get('usetags_fe', 1) === 1
+			: true;
 
 		if (!$perms->CanUseTags || ! $tags_shown)
 		{
@@ -297,15 +334,15 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 
 		$AutoApproveChanges = $perms->AutoApproveChanges;
 
-		$enable_featured_cid_selector = $perms->MultiCat && $CanChangeFeatCat;
-		$enable_cid_selector   = $perms->MultiCat && $CanChangeSecCat;
+		$canchange_featcat = $perms->MultiCat && $CanChangeFeatCat;
+		$canchange_seccat   = $perms->MultiCat && $CanChangeSecCat;
 		$enable_catid_selector = ($isnew && !$params->get('catid_default')) || (!$isnew && !$model->get('catid')) || $CanChangeCat;
 
 		// Enforce featured categories if user is not allowed to changed
 		$featured_cats_parent = $params->get('featured_cats_parent', 0);
 		$featured_cats = array();
 
-		if ($featured_cats_parent && !$enable_featured_cid_selector)
+		if ($featured_cats_parent && !$canchange_featcat)
 		{
 			$featured_tree = flexicontent_cats::getCategoriesTree($published_only = 1, $parent_id = $featured_cats_parent, $depth_limit = 0);
 			$disabled_cats = $params->get('featured_cats_parent_disable', 1) ? array($featured_cats_parent) : array();
@@ -334,9 +371,11 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		 */
 
 		// (FE) No category override active, and no secondary cats were submitted
-		$cid_not_submitted = $app->isClient('administrator') ? true : !$overridecatperms && empty($data['cid']);
+		$cid_not_submitted = $app->isClient('site')
+			? !$overridecatperms && empty($data['cid'])
+			: true;
 
-		if (!$enable_cid_selector && $cid_not_submitted)
+		if (!$canchange_seccat && $cid_not_submitted)
 		{
 			// For new item use default secondary categories from type configuration
 			if ($isnew)
@@ -344,10 +383,10 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 				$data['cid'] = $params->get('cid_default');
 			}
 
-			// Use featured cats if these are set
-			elseif (isset($featured_cid))
+			// Filter featured cats out of secondary cats
+			else
 			{
-				$featured_cid_arr = array_flip($featured_cid);
+				$featured_cid_arr = isset($data['featured_cid']) ? array_flip($data['featured_cid']) : array();
 				$sec_cid = array();
 
 				// User cannot change secondary categories, reset them, excluding featured cats and existing (possibly changed) main category
@@ -361,12 +400,6 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 
 				$data['cid'] = $sec_cid;
 			}
-
-			// Use already assigned categories (existing item)
-			else
-			{
-				$data['cid'] = $model->get('cats');
-			}
 		}
 
 
@@ -377,7 +410,9 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		 */
 
 		// (FE) No category override active, and no main category was submitted
-		$catid_not_submitted = $app->isClient('administrator') ? true : !$overridecatperms && empty($data['catid']);
+		$catid_not_submitted = $app->isClient('site')
+			? !$overridecatperms && empty($data['catid'])
+			: true;
 
 		if (!$enable_catid_selector && $catid_not_submitted)
 		{
@@ -530,13 +565,13 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 
 		// Assign template parameters of the select ilayout as an sub-array (the DB model will handle the merging of parameters)
 		// Always be set in backend, but usually not in frontend, if frontend template editing is not shown
-		if ($app->isClient('administrator'))
+		if ($app->isClient('site'))
 		{
-			$ilayout = $data['attribs']['ilayout'];
+			$ilayout = isset($data['attribs']['ilayout']) ? $data['attribs']['ilayout'] : null;
 		}
 		else
 		{
-			$ilayout = @ $data['attribs']['ilayout'];
+			$ilayout = $data['attribs']['ilayout'];
 		}
 
 		// Give UNVALIDATED data for the case of LAYOUTS to the MODEL. Model will load the
@@ -1151,6 +1186,282 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 
 
 	/**
+	 * Logic to create the view for record editing
+	 *
+	 * @return void
+	 *
+	 * @since 3.3
+	 */
+	public function edit()
+	{
+		$app      = JFactory::getApplication();
+		$user     = JFactory::getUser();
+		$session  = JFactory::getSession();
+		$document = JFactory::getDocument();
+		$isAdmin  = $app->isClient('administrator');
+
+		$this->input->set('view', $this->record_name);
+		$this->input->set('hidemainmenu', 1);
+
+		// Get/Create the view
+		$viewType   = $document->getType();
+		$viewName   = $this->input->get('view', $this->default_view, 'cmd');
+		$viewLayout = $this->input->get('layout', $app->isClient('administrator') ? 'default' : 'form', 'string');
+		$view = $this->getView($viewName, $viewType, '', array('base_path' => $this->basePath, 'layout' => $viewLayout));
+
+		// Get/Create the model
+		$model = $this->getModel($this->record_name);
+
+		// Try to load record by attributes in HTTP Request
+		if (0)
+		{
+			$record = $model->getRecord(array(
+				$this->record_alias => '',
+			));
+		}
+
+		// Try to load by unique ID or NAME
+		else
+		{
+			// Force model to load versioned data (URL specified version or latest version (last saved))
+			$version = $isAdmin
+				? $this->input->get('version', 0, 'int')   // Load specific item version (non-zero), 0 version: is unversioned data, -1 version: is latest version (=default for edit form)
+				: 0;
+			$record  = $model->getItem(null, $check_view_access = false, $no_cache = true, $force_version = ($version != 0 ? $version : -1));  // -1 version means latest
+		}
+
+		// Set error message for models that do not throw exception
+		if (!$record)
+		{
+			$app->setHeader('status', '404', true);
+			$app->enqueueMessage(JText::_('FLEXI_OPERATION_FAILED') . ' : ' . $model->getError(), 'error');
+
+			if ($this->input->getCmd('tmpl') !== 'component')
+			{
+				$this->setRedirect($this->returnURL);
+			}
+
+			return;
+		}
+
+		$model->isForm = true;
+		$isnew = !$model->getId();
+
+		// Push the model into the view (as default), later we will call the view display method instead of calling parent's display task, because it will create a 2nd model instance !!
+		$view->setModel($model, true);
+		$view->document = $document;
+
+
+		/**
+		 * ACL checks only for BACKEND,
+		 * since for FRONTEND we allow ACL override via menu
+		 * and this checks for ACL and ACL override via menu
+		 * are currently inside the frontent VIEW code
+		 * Also FRONTEND VIEW will do the record CHECKOUT
+		 */
+		if ($isAdmin)
+		{
+			// Calculate access
+			$canAdd  = $model->getItemAccess()->get('access-create');
+			$canEdit = $model->getItemAccess()->get('access-edit');
+
+			if (!$canEdit)
+			{
+				// No edit privilege, check if item is editable till logoff
+				if ($session->has('rendered_uneditable', 'flexicontent'))
+				{
+					$rendered_uneditable = $session->get('rendered_uneditable', array(), 'flexicontent');
+					$canEdit = isset($rendered_uneditable[$model->get('id')]) && $rendered_uneditable[$model->get('id')];
+				}
+			}
+
+			// New item: check if user can create in at least one category
+			if ($isnew)
+			{
+				// A. Check create privilege
+				if (!$canAdd)
+				{
+					$app->setHeader('status', '403 Forbidden', true);
+					$this->setRedirect($this->returnURL, JText::_('FLEXI_NO_ACCESS_CREATE'), 'error');
+
+					$model->enqueueMessages($_exclude = array('showAfterLoad' => 1));
+
+					return;
+				}
+
+				// Get User Group / Author parameters
+				$db = JFactory::getDbo();
+				$authorparams = flexicontent_db::getUserConfig($user->id);
+				$max_auth_limit = intval($authorparams->get('max_auth_limit', 0));  // Maximum number of content items the user can create
+
+				// B. Check if max authored content limit reached
+				if ($max_auth_limit)
+				{
+					$db->setQuery('SELECT COUNT(id) FROM #__content WHERE created_by = ' . $user->id);
+					$authored_count = $db->loadResult();
+
+					if ($authored_count >= $max_auth_limit)
+					{
+						$app->setHeader('status', '403 Forbidden', true);
+						$this->setRedirect($this->returnURL, JText::sprintf('FLEXI_ALERTNOTAUTH_CREATE_MORE', $max_auth_limit), 'warning');
+
+						$model->enqueueMessages($_exclude = array('showAfterLoad' => 1));
+
+						return;
+					}
+				}
+
+				// C. Check if Content Type can be created by current user
+				$typeid = $this->input->get('typeid', 0, 'int');
+				$canCreateType = $typeid
+					? $model->canCreateType(array($typeid), true, $types)  // Can create given Content Type
+					: $model->canCreateType();  // Can create at least one Content Type
+
+				if (!$canCreateType)
+				{
+					// Check if Content Type exists
+					if ($typeid && !isset($types[$typeid]))
+					{
+						$status = '400 Bad Request';
+						$msg = 'Type ID: '.$typeid.' not found';
+					}
+					else
+					{
+						$status    = '403 Forbidden';
+						$type_name = isset($types[$typeid])
+							? '"' . JText::_($types[$typeid]->name) . '"'
+							: JText::_('FLEXI_ANY');
+						$msg = JText::sprintf('FLEXI_NO_ACCESS_CREATE_CONTENT_OF_TYPE', $type_name);
+					}
+
+					$app->setHeader('status', $status, true);
+					$this->setRedirect($this->returnURL, $msg, 'error');
+
+					$model->enqueueMessages($_exclude = array('showAfterLoad' => 1));
+
+					return;
+				}
+			}
+
+			// Existing item: Check if user can edit current item
+			else
+			{
+				if (!$canEdit)
+				{
+					$app->setHeader('status', '403 Forbidden', true);
+					$this->setRedirect($this->returnURL, JText::_('FLEXI_NO_ACCESS_EDIT'), 'error');
+
+					$model->enqueueMessages($_exclude = array('showAfterLoad' => 1));
+
+					return;
+				}
+
+				// Check if record is checked out by other editor
+				if ($model->isCheckedOut($user->get('id')))
+				{
+					$app->setHeader('status', '400 Bad Request', true);
+					$app->enqueueMessage(JText::_('FLEXI_EDITED_BY_ANOTHER_ADMIN'), 'warning');
+
+					if ($this->input->getCmd('tmpl') !== 'component')
+					{
+						$this->setRedirect($this->returnURL);
+					}
+
+					// Do not add messages meant only if form load succeeds
+					$model->enqueueMessages($_exclude = array('showAfterLoad' => 1));
+
+					return;
+				}
+
+				// Checkout the record and proceed to edit form
+				if (!$model->checkout())
+				{
+					$app->setHeader('status', '400 Bad Request', true);
+					$app->enqueueMessage(JText::_('FLEXI_OPERATION_FAILED') . ' : ' . $model->getError(), 'error');
+
+					if ($this->input->getCmd('tmpl') !== 'component')
+					{
+						$this->setRedirect($this->returnURL);
+					}
+
+					// Do not add messages meant only if form load succeeds
+					$model->enqueueMessages($_exclude = array('showAfterLoad' => 1));
+
+					return;
+				}
+			}
+		}
+
+
+		// We succeeded, enqueue all minor model messages / notices
+		$model->enqueueMessages();
+
+		// Call display method of the view, instead of calling parent's display task, because it will create a 2nd model instance !!
+		$view->display();
+	}
+
+
+	/**
+	 * Method for clearing cache of data depending on records type
+	 *
+	 * @return void
+	 *
+	 * @since 3.2.0
+	 */
+	protected function _cleanCache()
+	{
+		$this->input->get('task', '', 'cmd') !== __FUNCTION__ or die(__FUNCTION__ . ' : direct call not allowed');
+
+		parent::_cleanCache();
+
+		$cache_site = FLEXIUtilities::getCache($group = '', $client = 0);
+		$cache_site->clean('com_flexicontent_items');
+		$cache_site->clean('com_flexicontent_filters');
+
+		$cache_admin = FLEXIUtilities::getCache($group = '', $client = 1);
+		$cache_admin->clean('com_flexicontent_items');
+		$cache_admin->clean('com_flexicontent_filters');
+
+		// Also clean this as it contains Joomla frontend view cache of the component)
+		$cache_site->clean('com_flexicontent');
+	}
+
+
+	/**
+	 * Method for extra form validation after JForm validation is executed
+	 *
+	 * @param   array     $validated_data  The already jform-validated data of the record
+	 * @param   object    $model            The Model object of current controller instance
+	 * @param   array     $data            The original posted data of the record
+	 *
+	 * @return  boolean   true on success, false on failure
+	 *
+	 * @since 3.3
+	 */
+	protected function _afterModelValidation(& $validated_data, & $data, $model)
+	{
+		$this->input->get('task', '', 'cmd') !== __FUNCTION__ or die(__FUNCTION__ . ' : direct call not allowed');
+
+		return true;
+	}
+
+
+	/**
+	 * Method for doing some record type specific work before calling model store
+	 *
+	 * @return  boolean   true on success, false on failure
+	 *
+	 * @since 3.3
+	 */
+	protected function _beforeModelStore(& $validated_data, & $data, $model)
+	{
+		$this->input->get('task', '', 'cmd') !== __FUNCTION__ or die(__FUNCTION__ . ' : direct call not allowed');
+
+		return true;
+	}
+
+
+	/**
 	 * Logic to order up/down a record
 	 *
 	 * @return void
@@ -1583,23 +1894,29 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 	/**
 	 * Logic to submit item to approval
 	 *
+	 * @access public
 	 * @return void
 	 *
 	 * @since 1.5
 	 */
 	function approval()
 	{
-		// Check for request forgeries
-		JSession::checkToken() or jexit(JText::_('JINVALID_TOKEN'));
+		$app    = JFactory::getApplication();
+		$isSite = $app->isClient('site');
+		$tokarr = $app->isClient('site') ? 'request' : 'post';
 
-		$app   = JFactory::getApplication();
+		// Check for request forgeries, use REQUEST in the case of FRONTEND (which may uses GET urls)
+		JSession::checkToken($tokarr) or jexit(JText::_('JINVALID_TOKEN'));
 
-		$cid = $this->input->get('cid', array(), 'array');
+		// FRONTEND: get item ID via 'id' URL variable, instead of 'cid' (BACKEND)
+		$cid_name = $isSite ? 'id' : 'cid';
+		$cid = $this->input->get($cid_name, array(), 'array');
 		$cid = ArrayHelper::toInteger($cid);
 
 		if (!count($cid))
 		{
-			$app->enqueueMessage(JText::_('FLEXI_APPROVAL_SELECT_ITEM_SUBMIT'), 'error');
+			$app->setHeader('status', '500 Internal Server Error', true);
+			$app->enqueueMessage(JText::_('FLEXI_APPROVAL_SELECT_ITEM_SUBMIT'), 'warning');
 			$app->redirect($this->returnURL);
 		}
 
@@ -1607,7 +1924,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		$record_model = $this->getModel($this->record_name);
 		$msg = $record_model->approval($cid);
 
-		$this->setRedirect($this->returnURL, $msg);
+		$this->setRedirect($this->returnURL, $msg, 'message');
 	}
 
 
@@ -1620,7 +1937,41 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 	 */
 	public function remove()
 	{
-		parent::remove();
+		$app    = JFactory::getApplication();
+		$isSite = $app->isClient('site');
+		$tokarr = $app->isClient('site') ? 'request' : 'post';
+
+		// Check for request forgeries, use REQUEST (frontend uses GET urls)
+		JSession::checkToken($tokarr) or jexit(JText::_('JINVALID_TOKEN'));
+
+		// Frontend may use GET request, before calling parent task method, set token to POST too
+		if ($isSite && !JSession::checkToken('post'))
+		{
+			$this->input->post->set(JSession::getFormToken(), '1');
+		}
+
+		// FRONTEND: Get extra variables
+		if ($isSite)
+		{
+			// These are needed in case we are in item view and we need to redirect to a different URL after deletion (to deleted item's category)
+			$catid = $this->input->getInt('cid');
+			$isitemview = $this->input->getInt('isitemview');
+
+			// Get item ID from 'id' URL variable and set it back to 'cid' URL variable
+			$cid = $this->input->get('id', array(), 'array');
+			$cid = ArrayHelper::toInteger($cid);
+			$this->input->set('cid', $cid);
+		}
+
+		$result = parent::remove();
+
+		// FRONTEND: Check if we cannot redirect back to the deleted item 
+		if ($isSite && $result && reset($cid) === $this->input->getInt('id') && $isitemview)
+		{
+			$non_sef_link = FlexicontentHelperRoute::getCategoryRoute($catid, $Itemid = 0, $urlvars = array());
+			$category_link = JRoute::_($non_sef_link);
+			$this->setRedirect($category_link);
+		}
 	}
 
 
@@ -1657,195 +2008,6 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 
 		$ctrlTask = 'task=items.edit';
 		$this->setRedirect('index.php?option=com_flexicontent&' . $ctrlTask . '&cid[]=' . $id, $msg);
-	}
-
-
-	/**
-	 * Logic to create the view for record editing
-	 *
-	 * @return void
-	 *
-	 * @since 3.3
-	 */
-	public function edit()
-	{
-		$app      = JFactory::getApplication();
-		$user     = JFactory::getUser();
-		$session  = JFactory::getSession();
-		$document = JFactory::getDocument();
-
-		$this->input->set('view', $this->record_name);
-		$this->input->set('hidemainmenu', 1);
-
-		// Get/Create the view
-		$viewType   = $document->getType();
-		$viewName   = $this->input->get('view', $this->default_view, 'cmd');
-		$viewLayout = $this->input->get('layout', $app->isClient('administrator') ? 'default' : 'form', 'string');
-		$view = $this->getView($viewName, $viewType, '', array('base_path' => $this->basePath, 'layout' => $viewLayout));
-
-		// Get/Create the model
-		$model = $this->getModel($this->record_name);
-
-		// Try to load review by attributes in HTTP Request
-		if (0)
-		{
-			$record = $model->getRecord(array(
-				$this->record_alias => '',
-			));
-		}
-
-		// Try to load by unique ID or NAME
-		else
-		{
-			$model->isForm = true;
-
-			// Force model to load versioned data (URL specified version or latest version (last saved))
-			$version = $this->input->get('version', 0, 'int');   // Load specific item version (non-zero), 0 version: is unversioned data, -1 version: is latest version (=default for edit form)
-			$item = $model->getItem(null, $check_view_access = false, $no_cache = true, $force_version = ($version != 0 ? $version : -1));  // -1 version means latest
-
-			if (!$item)
-			{
-				$app->setHeader('status', '404', true);
-				$app->enqueueMessage(JText::_('FLEXI_OPERATION_FAILED') . ' : ' . $model->getError(), 'error');
-
-				if ($this->input->getCmd('tmpl') !== 'component')
-				{
-					$this->setRedirect($this->returnURL);
-				}
-
-				return;
-			}
-		}
-
-		// Push the model into the view (as default), later we will call the view display method instead of calling parent's display task, because it will create a 2nd model instance !!
-		$view->setModel($model, true);
-		$view->document = $document;
-
-		$isnew  = !$model->getId();
-
-		// Calculate access
-		$canAdd  = $model->getItemAccess()->get('access-create');
-		$canEdit = $model->getItemAccess()->get('access-edit');
-
-		if (!$canEdit)
-		{
-			// No edit privilege, check if item is editable till logoff
-			if ($session->has('rendered_uneditable', 'flexicontent'))
-			{
-				$rendered_uneditable = $session->get('rendered_uneditable', array(), 'flexicontent');
-				$canEdit = isset($rendered_uneditable[$model->get('id')]) && $rendered_uneditable[$model->get('id')];
-			}
-		}
-
-		// New item: check if user can create in at least one category
-		if ($isnew)
-		{
-			// A. Check create privilege
-			if (!$canAdd)
-			{
-				$app->setHeader('status', '403 Forbidden', true);
-				$this->setRedirect($this->returnURL, JText::_('FLEXI_NO_ACCESS_CREATE'), 'error');
-
-				$model->enqueueMessages($_exclude = array('showAfterLoad' => 1));
-
-				return;
-			}
-
-			// Get User Group / Author parameters
-			$db = JFactory::getDbo();
-			$authorparams = flexicontent_db::getUserConfig($user->id);
-			$max_auth_limit = intval($authorparams->get('max_auth_limit', 0));  // Maximum number of content items the user can create
-
-			// B. Check if max authored content limit reached
-			if ($max_auth_limit)
-			{
-				$db->setQuery('SELECT COUNT(id) FROM #__content WHERE created_by = ' . $user->id);
-				$authored_count = $db->loadResult();
-
-				if ($authored_count >= $max_auth_limit)
-				{
-					$app->setHeader('status', '403 Forbidden', true);
-					$this->setRedirect($this->returnURL, JText::sprintf('FLEXI_ALERTNOTAUTH_CREATE_MORE', $max_auth_limit), 'warning');
-
-					$model->enqueueMessages($_exclude = array('showAfterLoad' => 1));
-
-					return;
-				}
-			}
-
-			// C. Check if Content Type can be created by current user
-			$typeid = $this->input->get('typeid', 0, 'int');
-			$canCreateType = $typeid
-				? $model->canCreateType(array($typeid), true, $types)  // Can create given Content Type
-				: $model->canCreateType();  // Can create at least one Content Type
-
-			if (!$canCreateType)
-			{
-				$type_name = isset($types[$$typeid]) ? '"' . JText::_($types[$$typeid]->name) . '"' : JText::_('FLEXI_ANY');
-				$msg = JText::sprintf('FLEXI_NO_ACCESS_CREATE_CONTENT_OF_TYPE', $type_name);
-
-				$app->setHeader('status', '403 Forbidden', true);
-				$this->setRedirect($this->returnURL, $msg, 'error');
-
-				$model->enqueueMessages($_exclude = array('showAfterLoad' => 1));
-
-				return;
-			}
-		}
-
-		// Existing item: Check if user can edit current item
-		else
-		{
-			if (!$canEdit)
-			{
-				$app->setHeader('status', '403 Forbidden', true);
-				$this->setRedirect($this->returnURL, JText::_('FLEXI_NO_ACCESS_EDIT'), 'error');
-
-				$model->enqueueMessages($_exclude = array('showAfterLoad' => 1));
-
-				return;
-			}
-		}
-
-		// Check if record is checked out by other editor
-		if ($model->isCheckedOut($user->get('id')))
-		{
-			$app->setHeader('status', '400 Bad Request', true);
-			$app->enqueueMessage(JText::_('FLEXI_EDITED_BY_ANOTHER_ADMIN'), 'warning');
-
-			if ($this->input->getCmd('tmpl') !== 'component')
-			{
-				$this->setRedirect($this->returnURL);
-			}
-
-			// Do not add messages meant only if form load succeeds
-			$model->enqueueMessages($_exclude = array('showAfterLoad' => 1));
-
-			return;
-		}
-
-		// Checkout the record and proceed to edit form
-		if (!$model->checkout())
-		{
-			$app->setHeader('status', '400 Bad Request', true);
-			$app->enqueueMessage(JText::_('FLEXI_OPERATION_FAILED') . ' : ' . $model->getError(), 'error');
-
-			if ($this->input->getCmd('tmpl') !== 'component')
-			{
-				$this->setRedirect($this->returnURL);
-			}
-
-			// Do not add messages meant only if form load succeeds
-			$model->enqueueMessages($_exclude = array('showAfterLoad' => 1));
-
-			return;
-		}
-
-		// We succeeded, enqueue all minor model messages / notices
-		$model->enqueueMessages();
-
-		// Call display method of the view, instead of calling parent's display task, because it will create a 2nd model instance !!
-		$view->display();
 	}
 
 
@@ -1939,66 +2101,6 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		}
 
 		echo $html;
-	}
-
-
-	/**
-	 * Method for clearing cache of data depending on records type
-	 *
-	 * @return void
-	 *
-	 * @since 3.2.0
-	 */
-	protected function _cleanCache()
-	{
-		$this->input->get('task', '', 'cmd') !== __FUNCTION__ or die(__FUNCTION__ . ' : direct call not allowed');
-
-		parent::_cleanCache();
-
-		$cache_site = FLEXIUtilities::getCache($group = '', $client = 0);
-		$cache_site->clean('com_flexicontent_items');
-		$cache_site->clean('com_flexicontent_filters');
-
-		$cache_admin = FLEXIUtilities::getCache($group = '', $client = 1);
-		$cache_admin->clean('com_flexicontent_items');
-		$cache_admin->clean('com_flexicontent_filters');
-
-		// Also clean this as it contains Joomla frontend view cache of the component)
-		$cache_site->clean('com_flexicontent');
-	}
-
-
-	/**
-	 * Method for extra form validation after JForm validation is executed
-	 *
-	 * @param   array     $validated_data  The already jform-validated data of the record
-	 * @param   object    $model            The Model object of current controller instance
-	 * @param   array     $data            The original posted data of the record
-	 *
-	 * @return  boolean   true on success, false on failure
-	 *
-	 * @since 3.3
-	 */
-	protected function _afterModelValidation(& $validated_data, & $data, $model)
-	{
-		$this->input->get('task', '', 'cmd') !== __FUNCTION__ or die(__FUNCTION__ . ' : direct call not allowed');
-
-		return true;
-	}
-
-
-	/**
-	 * Method for doing some record type specific work before calling model store
-	 *
-	 * @return  boolean   true on success, false on failure
-	 *
-	 * @since 3.3
-	 */
-	protected function _beforeModelStore(& $validated_data, & $data, $model)
-	{
-		$this->input->get('task', '', 'cmd') !== __FUNCTION__ or die(__FUNCTION__ . ' : direct call not allowed');
-
-		return true;
 	}
 
 

@@ -127,6 +127,19 @@ $_ct = explode('.', $task);
 $task = $_ct[ count($_ct) - 1];
 if (count($_ct) > 1) $controller = $_ct[0];
 
+// Handle legacy URLs that their 'task' variable does not include the controller name
+$FE_item_tasks_proxied = array(
+		'add', 'edit', 'save', 'cancel',
+		'remove', 'approval',
+		'apply_type', 'apply', 'apply_ajax',
+		'save2new', 'save2copy', 'save_a_preview',
+);
+if (!$controller && $view === 'item' && in_array($task, $FE_item_tasks_proxied))
+{
+	$controller = 'items';
+	$jinput->set('controller', $controller);
+	$jinput->set('task', $controller . '.' . $task);
+}
 
 // c. Force variables: controller AND/OR task
 $forced_views = array();  // *** Cases that view variable must be ignored
