@@ -277,6 +277,12 @@ if ( $cparams->get('recompile_core_less', 0) && $format == 'html' )
 	$less_files = array('less/flexicontent.less');
 	flexicontent_html::checkedLessCompile($less_files, $path, $inc_path, $force);
 
+	$less_files = array('less/j3x.less');
+	flexicontent_html::checkedLessCompile($less_files, $path, $inc_path, $force=false);
+
+	$less_files = array('less/j4x.less');
+	flexicontent_html::checkedLessCompile($less_files, $path, $inc_path, $force=false);
+
 	// Files in backend assets folder
 	$path = JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'assets'.DS;
 	$inc_path = $path.'less/include/';
