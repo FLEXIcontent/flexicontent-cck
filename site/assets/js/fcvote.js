@@ -1,8 +1,8 @@
 jQuery(document).ready(function(){
 
 	// Joomla Root and Base URL
-	var window.root_url = !!jroot_url_fc ? jroot_url_fc : '';
-	var window.base_url = !!jbase_url_fc ? jbase_url_fc : '';
+	window.root_url = !!jroot_url_fc ? jroot_url_fc : '';
+	window.base_url = !!jbase_url_fc ? jbase_url_fc : '';
 
 	var under_vote = false;
 	
