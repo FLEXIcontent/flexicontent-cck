@@ -911,10 +911,10 @@ abstract class FCModelAdmin extends JModelAdmin
 	 *
 	 * @since	3.2.0
 	 */
-	public function canEdit($record = null)
+	public function canEdit($record = null, $user = null)
 	{
 		$record = $record ?: $this->_record;
-		$user = JFactory::getUser();
+		$user   = $user ?: JFactory::getUser();
 
 		return false;
 	}

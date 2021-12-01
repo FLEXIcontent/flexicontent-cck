@@ -291,11 +291,10 @@ class FlexicontentModelReview extends FCModelAdmin
 	 *
 	 * @since	3.2.0
 	 */
-	public function canEdit($record = null)
+	public function canEdit($record = null, $user = null)
 	{
 		$record  = $record ?: $this->_record;
-
-		$user    = JFactory::getUser();
+		$user    = $user ?: JFactory::getUser();
 		$app     = JFactory::getApplication();
 
 		$isOwner = $record && $record->user_id == $user->id;
