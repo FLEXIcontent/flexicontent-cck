@@ -3789,9 +3789,21 @@ class ParentClassItem extends FCModelAdmin
 
 		// b. Merge parameters from current category, but prevent some settings from propagating ... to the item, that are meant for
 		//    category view only, these are legacy settings that were removed from category.xml, but may exist in saved configurations
-		$catParams->set('show_title', '');
-		$catParams->set('show_editbutton', '');
-		$params->merge($catParams);
+		
+		// Do not merge ALL category parameters !! into item, as they are 99% irrelevant
+		if (0)
+		{
+			$catParams->set('show_title', '');
+			$catParams->set('show_editbutton', '');
+			$params->merge($catParams);
+		}
+		else
+		{
+			$params->set('automatic_pathways', $catParams->get('automatic_pathways'));
+			$params->set('add_canonical', $catParams->get('add_canonical'));
+			$params->set('microdata_itemtype', $catParams->get('microdata_itemtype_cat'));
+			$params->set('comments', $catParams->get('comments'));
+		}
 
 		// c. Merge TYPE parameters into the page configuration
 		$params->merge($typeParams);
