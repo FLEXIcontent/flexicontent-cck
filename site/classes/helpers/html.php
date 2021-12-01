@@ -2290,10 +2290,10 @@ class flexicontent_html
 			switch ($options['more_toggler'])
 			{
 			case 2:
-				$box_js = $options['more_box_id']
+				$box_js = !empty($options['more_box_id'])
 					? ' var box = document.getElementById(\'' . $options['more_box_id'] . '\'); '
 					: ' var box = this.parentElement.previousElementSibling; ';
-				$text2 = (!$options['more_box_id'] ? '
+				$text2 = (empty($options['more_box_id']) ? '
 					<div style="display:none;">
 						'. $text . '
 					</div>' : '') . '
