@@ -777,18 +777,7 @@ class com_flexicontentInstallerScript
 						$queries[] = "ALTER TABLE `#__".$tbl_name."` ADD `stamp` tinyint(3) unsigned NOT NULL default '1' AFTER `assignments`";
 					}
 					if ( isset($tbl_datatypes[$tbl_name]) && strtolower($tbl_datatypes[$tbl_name]['attribs']['DATA_TYPE']) != 'mediumtext' ) {
-<<<<<<< HEAD
 						$queries[] = "ALTER TABLE `#__".$tbl_name."` CHANGE `attribs` `attribs` MEDIUMTEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL";
-=======
-						$changes[] = "CHANGE `attribs` `attribs` MEDIUMTEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL";
-					}
-
-					if ($changes)
-					{
-						$queries[] = "ALTER TABLE `#__".$tbl_name."` "
-							. ' CHANGE `uploaded` `uploaded` DATETIME NULL DEFAULT NULL, CHANGE `checked_out_time` `checked_out_time` DATETIME NULL DEFAULT NULL, '
-							. implode(' , ', $changes);
->>>>>>> 95b6f4eee (Fix (PHP8) old type usage of implode function in installation script)
 					}
 
 					// Fields TABLE
@@ -812,16 +801,7 @@ class com_flexicontentInstallerScript
 						$queries[] = "ALTER TABLE `#__".$tbl_name."` ADD `asset_id` INT(10) UNSIGNED NOT NULL DEFAULT '0' AFTER `id`";
 					}
 					if ( isset($tbl_datatypes[$tbl_name]) && strtolower($tbl_datatypes[$tbl_name]['attribs']['DATA_TYPE']) != 'mediumtext' ) {
-<<<<<<< HEAD
 						$queries[] = "ALTER TABLE `#__".$tbl_name."` CHANGE `attribs` `attribs` MEDIUMTEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL";
-=======
-						$changes[] = "CHANGE `attribs` `attribs` MEDIUMTEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL";
-					}
-
-					if ($changes)
-					{
-						$queries[] = "ALTER TABLE `#__".$tbl_name."` " . implode(' , ', $changes);
->>>>>>> 95b6f4eee (Fix (PHP8) old type usage of implode function in installation script)
 					}
 
 					// Types TABLE
@@ -836,16 +816,7 @@ class com_flexicontentInstallerScript
 						$queries[] = "ALTER TABLE `#__".$tbl_name."` CHANGE `attribs` `attribs` MEDIUMTEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL";
 					}
 					if ( $types_tbl_exists && !array_key_exists('description', $tbl_fields['#__'.$tbl_name])) {
-<<<<<<< HEAD
 						$queries[] = "ALTER TABLE `#__".$tbl_name."` ADD `description` TEXT NULL AFTER `alias`";
-=======
-						$changes[] = "ADD `description` TEXT NULL AFTER `alias`";
-					}
-
-					if ($changes)
-					{
-						$queries[] = "ALTER TABLE `#__".$tbl_name."` " . implode(' , ', $changes);
->>>>>>> 95b6f4eee (Fix (PHP8) old type usage of implode function in installation script)
 					}
 
 					// Tags TABLE
