@@ -15,3 +15,106 @@
 .badge.highlight {
 	color: darkred;
 }
+/*** theme update ***/
+
+/** markup **/
+#flexicontent .fc_markup.mu_has_text {
+    border-bottom: 0px solid #AAA;
+    border-right: 0px solid #AAA;
+    padding: 10px;
+}
+#flexicontent .fc_markup {
+    max-width: initial;
+    border-radius: 5px;
+    line-height: 100%;
+    border-width: 0px;
+    margin: 0px 6px 6px 0px;
+    padding: 0px;
+    background-color: #F2F2F2;
+    color: #555;
+    box-shadow: none;
+}
+#flexicontent .news.fc-items-block .fc_mublock {
+    position: initial !important;
+}
+/*** end theme update ***/
+
+/** fix btn in front **/
+.fc_filter_html .btn[type="button"],
+.fcitem_readon .btn,
+button.btn.btn-light,
+a.link.btn,
+a.direction.btn,
+button.btn.btn-highlight,
+.fc_filter_line.fc_clear_label.fc_filter_buttons_box .btn {
+    border: 1px solid #ccc;
+    background: #ccc;
+}
+.fc_filter_html .btn[type="button"]:hover,
+.fcitem_readon .btn:hover,
+button.btn.btn-light:hover,
+a.link.btn:hover,
+a.direction.btn:hover,
+button.btn.btn-highlight:hover,
+.fc_filter_line.fc_clear_label.fc_filter_buttons_box .btn:hover {
+    border: 1px solid rgb(121, 121, 121);
+    background: rgb(121, 121, 121);
+}
+
+/** fix form in front **/
+
+/** fix filter **/
+.select2-default {
+    color: #000 !important;
+}
+.select2-container-multi .select2-choices .select2-search-field input.select2-input, .select2-container-multi.select2-dropdown-open .select2-choices .select2-search-field input.select2-input {
+    min-height: 39px !important;
+}
+.select2-container .select2-choice {
+    min-height: 32px !important;
+}
+.fc_filter_html :not(.input-append):not(.input-prepend) > input.fc_field_filter {
+    padding: 8px 3px 13px 9px !important;
+}
+.input-group>:not(:first-child):not(.dropdown-menu):not(.valid-tooltip):not(.valid-feedback):not(.invalid-tooltip):not(.invalid-feedback) {
+    margin-left: -3px;
+}
+.flexicontent :not(.input-prepend):not(.input-append) > input[type="text"]:not(.minicolors) {
+    margin: 0px 2px 0px 2px;
+}
+.fc_filter_html :not(.input-append):not(.input-prepend) > input.fc_text_filter, .fc_filter_html :not(.input-append):not(.input-prepend) > input.fc_field_filter, .fc_filter_html :not(.input-append):not(.input-prepend) > input.fc_text_filter:focus, .fc_filter_html :not(.input-append):not(.input-prepend) > input.fc_field_filter:focus {
+    border: 1px solid #ccc !important;
+}
+/*/ fix filter module **/
+.mod_flexifilter_wrapper .select2-container-multi .select2-choices > li:first-child input.select2-input,.mod_flexifilter_wrapper .select2-container-multi.select2-dropdown-open .select2-choices > li:first-child input.select2-input, .select2-container-multi.select2-dropdown-open .select2-choices .select2-search-field input.select2-input.select2-focused {
+    width: auto !important;
+    min-width: 265px !important;
+}
+.mod_flexifilter_wrapper .fc_filter_html .fc_text_filter, .mod_flexifilter_wrapper .fc_filter_html .fc_field_filter {
+    min-width: 267px;
+}
+.mod_flexifilter_wrapper .fc_filter_html :not(.input-append):not(.input-prepend) > input.fc_field_filter{
+    border: 1px solid #aaa !important;
+}
+.mod_flexifilter_wrapper .fc_filter_html .fc_text_filter.fc_iscalendar, .mod_flexifilter_wrapper .fc_filter_html .fc_field_filter.fc_iscalendar{
+    min-width:232px !important;
+}
+.fc_filter_html :not(.input-prepend):not(.input-append) > .fc_text_filter, .fc_filter_html :not(.input-prepend):not(.input-append) > .fc_field_filter {
+    font-size: 12px !important;
+}
+
+/** fix search module **/
+.fc_filter_html.fc_text_search input {
+    min-height: 45px;
+}
+.fc_filter_html input.btn.btn-success {
+    margin-left: -5px;
+    border-radius: 0px 5px 5px 0;
+}
+.mod_flexiadvsearch_wrapper input {
+    border-radius: 5px 0 0 5px;
+    border: 0;
+}
+.fc_filter_html.fc_text_search input {
+    padding-left: 10px;
+}
