@@ -293,6 +293,11 @@ class FlexicontentModelReview extends FCModelAdmin
 	 */
 	public function canEdit($record = null, $user = null)
 	{
+		if ($user)
+		{
+			throw new Exception(__FUNCTION__ . '(): Error model does not support checking ACL of specific user', 500);
+		}
+
 		$record  = $record ?: $this->_record;
 		$user    = $user ?: JFactory::getUser();
 		$app     = JFactory::getApplication();
@@ -348,8 +353,6 @@ class FlexicontentModelReview extends FCModelAdmin
 			}
 		}
 
-
-
 		return !$record || !$record->id
 			? $this->canCreate
 			: (($this->canCreate && $isOwner) || $this->canManage);
@@ -363,10 +366,15 @@ class FlexicontentModelReview extends FCModelAdmin
 	 *
 	 * @since	3.2.0
 	 */
-	public function canEditState($record = null)
+	public function canEditState($record = null, $user = null)
 	{
+		if ($user)
+		{
+			throw new Exception(__FUNCTION__ . '(): Error model does not support checking ACL of specific user', 500);
+		}
+
 		$record  = $record ?: $this->_record;
-		$user    = JFactory::getUser();
+		$user    = $user ?: JFactory::getUser();
 
 		return $this->canManage;
 	}

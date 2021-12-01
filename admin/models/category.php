@@ -715,10 +715,10 @@ class FlexicontentModelCategory extends FCModelAdmin
 	 *
 	 * @since	3.2.0
 	 */
-	public function canEditState($record = null)
+	public function canEditState($record = null, $user = null)
 	{
 		$record  = $record ?: $this->_record;
-		$user    = JFactory::getUser();
+		$user    = $user ?: JFactory::getUser();
 		$asset   = $record && !$record->id ? $this->type_alias . '.' . $record->id : $this->option;
 		$isOwner = $record && $user->id && $record->created_user_id == $user->id;
 

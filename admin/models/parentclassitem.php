@@ -5720,10 +5720,10 @@ class ParentClassItem extends FCModelAdmin
 	 *
 	 * @since	3.2.0
 	 */
-	public function canEditState($record = null)
+	public function canEditState($record = null, $user = null)
 	{
 		$record  = $record ?: $this->_record;
-		$user    = JFactory::getUser();
+		$user    = $user ?: JFactory::getUser();
 		$session = JFactory::getSession();
 		$isOwner = !empty($record->created_by) && ( $record->created_by == $user->get('id') );
 
