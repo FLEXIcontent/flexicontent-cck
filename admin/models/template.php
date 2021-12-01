@@ -373,7 +373,7 @@ class FlexicontentModelTemplate extends FCModelAdmin
 			. ' FROM #__flexicontent_fields as f '
 			. ' LEFT JOIN #__flexicontent_fields_type_relations as rel ON rel.field_id=f.id '
 			. ' WHERE f.published = 1 '
-			. ' AND f.field_type <> "groupmarker" '
+			. ' AND f.field_type <> "custom_form_html" '
 			. ' GROUP BY f.id '
 			. ' ORDER BY f.label ASC'
 			;

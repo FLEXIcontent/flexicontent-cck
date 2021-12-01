@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <extension type="plugin" version="1.6" group="flexicontent_fields" method="upgrade">
-	<name>FLEXIcontent - Item Form Tab / Fieldset / Custom HTML</name>
+	<name>FLEXIcontent - Custom HTML / Item Form Tab / Fieldset</name>
 	<author>ggppdk</author>
 	<creationDate>July 2012</creationDate>
 	<copyright>Copyright (C) 2012 ggppdk</copyright>
@@ -11,7 +11,7 @@
 	<documentation url="http://www.flexicontent.org/documentation/faq.html" title="FLEXI_ABOUT" modal="1" icon="info" />
 	<description>Form Field Group Marker Field Plugin for FLEXIcontent. This field is used to mark the start/end of FLEXIcontent field groups in ITEM edit FORM. Group will appear inside Tabs/Fieldsets/etc. Take care to match all openings with a closing marker appropriately.</description>
 	<files>
-		<filename plugin="groupmarker">groupmarker.php</filename>
+		<filename plugin="custom_form_html">custom_form_html.php</filename>
 		<filename>index.html</filename>
 	</files>
 
@@ -22,9 +22,9 @@
 		<!--fieldset name="standard" hidden="true">
 		</fieldset-->
 
-		<fieldset name="group-groupmarker-editing" hidden="true" icon_class="icon-pencil" label="FLEXI_FIELD_EDITING" addfieldpath="/administrator/components/com_flexicontent/elements">
+		<fieldset name="group-custom_form_html-editing" hidden="true" icon_class="icon-pencil" label="FLEXI_FIELD_EDITING" addfieldpath="/administrator/components/com_flexicontent/elements">
 
-			<field name="marker_type" type="multilist" default="fieldset_open" label="FLEXI_MARKER" description="FLEXI_MARKER_DESC" toggle_related="1">
+			<field name="marker_type" type="multilist" default="custom_html" label="FLEXI_MARKER" description="FLEXI_MARKER_DESC" toggle_related="1">
 				<group label="FLEXI_TABS">
 					<option value="tabset_start"  show_list="tfclass" hide_list="tfopen,chtml" >FLEXI_TABS_START</option>
 					<option value="tab_open"      show_list="tfclass,tfopen" hide_list="chtml" >FLEXI_TAB_OPEN</option>
@@ -36,7 +36,7 @@
 					<option value="fieldset_close" show_list="" hide_list="tfclass,tfopen,chtml" >FLEXI_FIELDSET_CLOSE</option>
 				</group>
 				<group label="FLEXI_OTHER">
-					<option value="html_separator" show_list="tfclass,chtml" hide_list="tfopen" >FLEXI_CUSTOM_HTML</option>
+					<option value="custom_html" show_list="tfclass,chtml" hide_list="tfopen" >FLEXI_CUSTOM_HTML</option>
 				</group>
 			</field>
 
@@ -53,7 +53,7 @@
 	</config>
 
 	<languages>
-		<language tag="en-GB">en-GB.plg_flexicontent_fields_groupmarker.ini</language>
+		<language tag="en-GB">en-GB.plg_flexicontent_fields_custom_form_html.ini</language>
 	</languages>
 
 </extension>

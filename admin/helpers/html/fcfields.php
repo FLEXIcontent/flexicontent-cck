@@ -191,7 +191,7 @@ abstract class JHtmlFcfields extends JHtmlFcbase
 				</div>';
 				break;
 
-			case 'groupmarker':
+			case 'custom_form_html':
 				return '<strong>' . $row_type . '</strong><br/>
 					<small>- ' . $row->parameters->get('marker_type') . ' -</small>';
 				break;

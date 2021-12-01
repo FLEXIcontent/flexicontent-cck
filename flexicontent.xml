@@ -189,7 +189,7 @@
 		<plugin name="fcpagenav"          folder="plugins/flexicontent_fields/fcpagenav"          instfolder="flexicontent_fields">FLEXIcontent - Navigation (Next/Previous Item)</plugin>
 		<plugin name="fieldgroup"         folder="plugins/flexicontent_fields/fieldgroup"         instfolder="flexicontent_fields">FLEXIcontent - Fieldgroup (Repeatable and cascadable group of fields)</plugin>
 		<plugin name="file"               folder="plugins/flexicontent_fields/file"               instfolder="flexicontent_fields">FLEXIcontent - File (Download/View/Share/Download cart)</plugin>
-		<plugin name="groupmarker"        folder="plugins/flexicontent_fields/groupmarker"        instfolder="flexicontent_fields">FLEXIcontent - Item Form Tab / Fieldset / Custom HTML</plugin>
+		<plugin name="custom_form_html"   folder="plugins/flexicontent_fields/custom_form_html"   instfolder="flexicontent_fields">FLEXIcontent - Custom HTML / Item Form Tab / Fieldset</plugin>
 		<plugin name="image"              folder="plugins/flexicontent_fields/image"              instfolder="flexicontent_fields">FLEXIcontent - Image or Gallery (image + details)</plugin>
 		<plugin name="jprofile"           folder="plugins/flexicontent_fields/jprofile"           instfolder="flexicontent_fields">FLEXIcontent - User (Contact, Community Builder, Jomsocial, etc)</plugin>
 		<plugin name="linkslist"          folder="plugins/flexicontent_fields/linkslist"          instfolder="flexicontent_fields">FLEXIcontent - HTML list of URLs/Anchors/JS links</plugin>

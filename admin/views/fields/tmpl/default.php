@@ -517,8 +517,8 @@ if ($js)
 			$repeat = $padcount;
 			$padspacer = $padspacer_next;
 
-			// Create coloring and padding for groupmarker fields if filtering by specific type is enabled
-			if ($this->filter_type && $row->field_type === 'groupmarker')
+			// Create coloring and padding for custom_form_html fields if filtering by specific type is enabled
+			if ($this->filter_type && $row->field_type === 'custom_form_html')
 			{
 				switch ($row->parameters->get('marker_type'))
 				{

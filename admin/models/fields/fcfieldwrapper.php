@@ -120,7 +120,7 @@ class JFormFieldFCFieldWrapper extends JFormField
 			if ( $item->tparams->get('hide_'.$field->field_type) ) continue;
 
 			$not_in_tabs = "";
-			if ($field->field_type=='groupmarker')
+			if ($field->field_type=='custom_form_html')
 			{
 				echo $field->html;
 				continue;

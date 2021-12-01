@@ -12,7 +12,7 @@
 defined( '_JEXEC' ) or die( 'Restricted access' );
 JLoader::register('FCField', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/fcfield/parentfield.php');
 
-class plgFlexicontent_fieldsGroupmarker extends FCField
+class plgFlexicontent_fieldsCustom_form_html extends FCField
 {
 	static $field_types = null; // Automatic, do not remove since needed for proper late static binding, define explicitely when a field can render other field types
 	var $task_callable = null;  // Field's methods allowed to be called via AJAX
@@ -89,7 +89,7 @@ class plgFlexicontent_fieldsGroupmarker extends FCField
 				$field->html .= " </div>\n";      // Close content's container (used to apply a css class)
 				$field->html .= "</fieldset>\n";  // Close Fieldset
 				break;
-			case 'html_separator':
+			case 'custom_html':
 				$field->html .= $custom_html_sep;
 				break;
 		}

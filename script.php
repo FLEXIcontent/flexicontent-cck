@@ -510,6 +510,7 @@ class com_flexicontentInstallerScript
 			'sharedvideo'=>'sharedmedia',
 			'extendedweblink'=>'weblink',
 			'minigallery'=>'image',
+			'groupmarker'=>'custom_form_html'
 		);
 
 		// Get DB table information
@@ -1913,7 +1914,8 @@ class com_flexicontentInstallerScript
 			$match_cols = array('field_type' => 'minigallery'),
 			$id_col = 'id',
 			$attr_col = 'attribs',
-			$attr_vals = array('allow_multiple' => 1, 'image_source' => 0, 'target_dir' => 0, 'popuptype' => 7)
+			$attr_vals = array(),  // For an example see minigallery case
+			$attr_vals_fix = array()  // For an example see groupmarker case
 	)
 	{
 		$db = JFactory::getDbo();
@@ -1939,6 +1941,14 @@ class com_flexicontentInstallerScript
 				$r->$attr_col->$i = $v;
 			}
 
+			foreach($attr_vals_fix as $i => $m)
+			{
+				if ($r->$attr_col->$i === $m[0])
+				{
+					$r->$attr_col->$i = $m[1];
+				}
+			}
+
 			$r->$attr_col = json_encode($r->$attr_col);
 
 			$query = 'UPDATE ' . $tbl .
@@ -1961,6 +1971,24 @@ class com_flexicontentInstallerScript
 			$id_col = 'id',
 			$attr_col = 'attribs',
 			$attr_vals = array('allow_multiple' => 1, 'image_source' => 0, 'target_dir' => 0, 'popuptype' => 7)
+		);
+
+		$this->_deprecate_field($old_type, $new_type, $msg, $n);
+	}
+
+
+	/*
+	 * Deprecate 'groupmarker' field type as 'image' field type
+	 */
+	private function _deprecate_field_groupmarker($old_type, $new_type, & $msg, & $n)
+	{
+		$msg[$n++] = $this->_setExtensionParameters(
+			$tbl = '#__flexicontent_fields',
+			$match_cols = array('field_type' => 'groupmarker'),
+			$id_col = 'id',
+			$attr_col = 'attribs',
+			$attr_vals = array(),
+			$attr_vals_fix = array('marker_type' => array('html_separator', 'custom_html') /* param2 => array('old value', 'new value')...*/)
 		);
 
 		$this->_deprecate_field($old_type, $new_type, $msg, $n);
