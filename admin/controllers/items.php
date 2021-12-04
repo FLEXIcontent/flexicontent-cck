@@ -129,6 +129,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		$config  = JFactory::getConfig();
 		$session = JFactory::getSession();
 		$perms   = FlexicontentHelperPerm::getPerm();
+		$CFGsfx  = $app->isClient('site') ? '_fe' : '_be';
 
 		$ctrl_task = $app->isClient('site')
 			? 'task='
@@ -335,8 +336,8 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		$AutoApproveChanges = $perms->AutoApproveChanges;
 
 		$canchange_featcat = $perms->MultiCat && $CanChangeFeatCat;
-		$canchange_seccat   = $perms->MultiCat && $CanChangeSecCat;
-		$enable_catid_selector = ($isnew && !$params->get('catid_default')) || (!$isnew && !$model->get('catid')) || $CanChangeCat;
+		$canchange_seccat  = $perms->MultiCat && $CanChangeSecCat;
+		$enable_catid_selector = ($isnew && !$params->get('catid_default')) || (!$isnew && !$model->get('catid')); // || $CanChangeCat;
 
 		// Enforce featured categories if user is not allowed to changed
 		$featured_cats_parent = $params->get('featured_cats_parent', 0);
@@ -370,12 +371,9 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		 * *** NOTE *** this DOES NOT ENFORCE SUBMIT MENU category configuration, this is done later by the model store()
 		 */
 
-		// (FE) No category override active, and no secondary cats were submitted
-		$cid_not_submitted = $app->isClient('site')
-			? !$overridecatperms && empty($data['cid'])
-			: true;
+		$show_seccats = (int) $params->get('show_seccats' . $CFGsfx, 2);
 
-		if (!$canchange_seccat && $cid_not_submitted)
+		if (!$canchange_seccat || (empty($overridecatperms) && !$show_seccats))
 		{
 			// For new item use default secondary categories from type configuration
 			if ($isnew)
@@ -401,6 +399,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 				$data['cid'] = $sec_cid;
 			}
 		}
+		//var_dump($data['cid']); exit;
 
 
 		/**
@@ -409,10 +408,15 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		 * *** NOTE *** this DOES NOT ENFORCE SUBMIT MENU category configuration, this is done later by the model store()
 		 */
 
+
+		$hide_maintext = (int) $params->get('hide_maintext', 0);
+
+		if (!$canchange_seccat || (empty($overridecatperms) && !$show_seccats))
+
+
+
 		// (FE) No category override active, and no main category was submitted
-		$catid_not_submitted = $app->isClient('site')
-			? !$overridecatperms && empty($data['catid'])
-			: true;
+		$catid_not_submitted = empty($data['catid']);
 
 		if (!$enable_catid_selector && $catid_not_submitted)
 		{
@@ -563,16 +567,11 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		$validated_data['custom']  = & $custom;          // Assign array of custom field values, they are in the 'custom' form array instead of jform (validation will follow at each field)
 		$validated_data['jfdata']  = & $validated_jf;    // Assign array of Joomfish field values, they are in the 'jfdata' form array instead of jform (validated above)
 
-		// Assign template parameters of the select ilayout as an sub-array (the DB model will handle the merging of parameters)
-		// Always be set in backend, but usually not in frontend, if frontend template editing is not shown
-		if ($app->isClient('site'))
-		{
-			$ilayout = isset($data['attribs']['ilayout']) ? $data['attribs']['ilayout'] : null;
-		}
-		else
-		{
-			$ilayout = $data['attribs']['ilayout'];
-		}
+		/**
+		 * Assign template parameters of the select ilayout as an sub-array (the DB model will handle the merging of parameters)
+		 * Usually this will be set in backend, but usually not in frontend, if frontend template editing is not shown
+		 */
+		$ilayout = isset($data['attribs']['ilayout']) ? $data['attribs']['ilayout'] : null;
 
 		// Give UNVALIDATED data for the case of LAYOUTS to the MODEL. Model will load the
 		// XML file of the layout into a JForm object and do validation before merging them

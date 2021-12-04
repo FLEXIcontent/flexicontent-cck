@@ -210,7 +210,7 @@
 		<plugin name="weblink"            folder="plugins/flexicontent_fields/weblink"            instfolder="flexicontent_fields">FLEXIcontent - Weblink</plugin>
 		
 		<!-- Plugins: fincontent/content -->
-		<plugin name="flexinotify"        folder="plugins/flexicontent/flexinotify" instfolder="flexicontent">Flexicontent - Notifications for favoured content</plugin>
+		<plugin name="flexinotify"        folder="plugins/flexicontent/flexinotify" instfolder="flexicontent">Flexicontent - Notifications for favoured and owned content</plugin>
 		<plugin name="flexibreak"         folder="plugins/content/flexibreak"       instfolder="content">Content - Flexibreak, pagination for multi-paged articles</plugin>
 
 		<!-- Plugins: fincontent/editors-xtd -->

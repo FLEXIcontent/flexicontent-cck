@@ -28,10 +28,11 @@
 					<option value="id"                show_list="" hide_list="maincat_conf">FLEXI_ID</option>
 					<option value="alias"             show_list="" hide_list="maincat_conf">FLEXI_ALIAS</option>
 					<option value="lang"              show_list="" hide_list="maincat_conf">FLEXI_COREPROPS_LANGUAGE</option>
-					<option value="language"          show_list="" hide_list="maincat_conf">FLEXI_COREPROPS_LANGUAGE_N_ASSOCS</option>
+					<option value="lang_assocs"       show_list="" hide_list="maincat_conf">FLEXI_COREPROPS_LANGUAGE_ASSOCS</option>
 					<option value="category"          show_list="maincat_conf" hide_list="">FLEXI_COREPROPS_CATEGORY_MAIN</option>
 					<option value="disable_comments"  show_list="" hide_list="maincat_conf">FLEXI_COREPROPS_DISABLE_COMMENTS</option>
 					<option value="notify_subscribers" show_list="" hide_list="maincat_conf">FLEXI_COREPROPS_NOTIFY_SUBSCRIBERS</option>
+					<option value="notify_owner"      show_list="" hide_list="maincat_conf">FLEXI_COREPROPS_NOTIFY_OWNER</option>
 					<option value="captcha"           show_list="" hide_list="maincat_conf">FLEXI_COREPROPS_CAPTCHA</option>
 				</group>
 				<group label="FLEXI_COREPROPS_PUBLISHING_PROPS">
@@ -39,6 +40,8 @@
 					<option value="created_by_alias"  show_list="" hide_list="maincat_conf">FLEXI_COREPROPS_CREATE_BY_ALIAS</option>
 					<option value="publish_up"        show_list="" hide_list="maincat_conf">FLEXI_COREPROPS_PUBLISH_UP</option>
 					<option value="publish_down"      show_list="" hide_list="maincat_conf">FLEXI_COREPROPS_PUBLISH_DOWN</option>
+					<option value="modified"          show_list="" hide_list="maincat_conf">FLEXI_COREPROPS_MODIFIED</option>
+					<option value="modified_by"       show_list="" hide_list="maincat_conf">FLEXI_COREPROPS_MODIFIED_BY</option>
 					<option value="access"            show_list="" hide_list="maincat_conf">FLEXI_COREPROPS_VIEW_ACCESS</option>
 				</group>
 				<group label="FLEXI_COREPROPS_PROP_GROUPS">
@@ -48,6 +51,10 @@
 					<option value="display_params"    show_list="" hide_list="maincat_conf">FLEXI_COREPROPS_DISP_PARAMS</option>
 					<option value="layout_selection"  show_list="" hide_list="maincat_conf">FLEXI_COREPROPS_LAYOUT_SELECT</option>
 					<option value="layout_params"     show_list="" hide_list="maincat_conf">FLEXI_COREPROPS_LAYOUT_PARAMS</option>
+					<option value="versions"          show_list="" hide_list="maincat_conf">FLEXI_VERSIONS</option>
+				</group>
+				<group label="FLEXI_COREPROPS_DEPRECATED">
+					<option value="language"          show_list="" hide_list="maincat_conf">FLEXI_COREPROPS_LANGUAGE_N_ASSOCS</option>
 				</group>
 			</field>
 

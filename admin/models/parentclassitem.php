@@ -1237,6 +1237,13 @@ class ParentClassItem extends FCModelAdmin
 			$form->setFieldAttribute('access', 'filter', 'unset');
 		}
 
+		// (item edit form ACL) edit viewing access level
+		if (!$perms->CanRights)
+		{
+			$form->setFieldAttribute('rules', 'disabled', 'true');
+			$form->setFieldAttribute('rules', 'filter', 'unset');
+		}
+
 		// Check if item has languages associations, and disable changing category and language in frontend
 		/*$useAssocs = $this->useAssociations();
 
@@ -1697,15 +1704,20 @@ class ParentClassItem extends FCModelAdmin
 	{
 		$params = !empty($record->parameters) ? $record->parameters : $this->_cparams;
 
-		$app   = JFactory::getApplication();
-		$user  = JFactory::getUser();
+		$app    = JFactory::getApplication();
+		$user   = JFactory::getUser();
+		$CFGsfx = $app->isClient('site') ? '_fe' : '_be';
 
-		$default_lang = $app->isClient('site')
-			? $params->get('default_language_fe', '_author_lang_')
-			// In Backend use Site default. Alternative we can get site default also using: // flexicontent_html::getSiteDefaultLang()  
-			: JComponentHelper::getParams('com_languages')->get('site', '*');
+		$default_lang = $params->get('default_language' . $CFGsfx, '_author_lang_');
+
+		// Check if using author default language
 		$default_lang = $default_lang === '_author_lang_'
 			? $user->getParam('language', '*')
+			: $default_lang;
+
+		// Check if using Site default language
+		$default_lang = $default_lang === '_site_default_'
+			? JComponentHelper::getParams('com_languages')->get('site', '*')
 			: $default_lang;
 
 		return $default_lang;
@@ -1832,9 +1844,11 @@ class ParentClassItem extends FCModelAdmin
 		// *** Initialize various variables
 		// ***
 
-		$db   = $this->_db;
-		$app  = JFactory::getApplication();
-		$user = JFactory::getUser();
+		$db     = $this->_db;
+		$app    = JFactory::getApplication();
+		$user   = JFactory::getUser();
+		$isSite = $app->isClient('site');
+		$CFGsfx = $isSite ? '_fe' : '_be';
 
 		$jinput     = JFactory::getApplication()->input;
 		$dispatcher = JEventDispatcher::getInstance();
@@ -1898,7 +1912,7 @@ class ParentClassItem extends FCModelAdmin
 			else $jm_state = $fc_state;                                      // trashed & archive states
 
 			// Frontend SECURITY concern: ONLY allow to set item type for new items !!! ... or for items without type ?!
-			if (!$app->isClient('administrator') && $item->type_id && ($option === 'com_flexicontent' || $item->version > 1))
+			if ($isSite && $item->type_id && ($option === 'com_flexicontent' || $item->version > 1))
 			{
 				unset($data['type_id']);
 			}
@@ -2014,7 +2028,7 @@ class ParentClassItem extends FCModelAdmin
 			 * Retrieve submit configuration for new items in frontend
 			 */
 
-			if ($app->isClient('site') && $isNew && !empty($data['submit_conf']))
+			if ($isSite && $isNew && !empty($data['submit_conf']))
 			{
 				$h = $data['submit_conf'];
 				$session = JFactory::getSession();
@@ -2150,7 +2164,7 @@ class ParentClassItem extends FCModelAdmin
 			$item->catid      = $old_catid;
 
 			// If cannot edit state or is frontend, then prevent user from changing 'featured' & 'ordering'
-			if (!$canEditState || $app->isClient('site'))
+			if (!$canEditState || $isSite)
 			{
 				unset($data['featured']);
 				unset($data['ordering']);
@@ -2212,7 +2226,7 @@ class ParentClassItem extends FCModelAdmin
 				// The preselected forced state of -NEW- items for users that CANNOT publish, and autopublish via menu item is disabled
 				else
 				{
-					$data['state'] = $app->isClient('administrator')
+					$data['state'] = !$isSite
 						? $cparams->get('non_publishers_item_state', $draft_state)  // Use the configured setting for backend items
 						: $cparams->get('non_publishers_item_state_fe', $pending_approval_state);  // Use the configured setting for frontend items
 				}
@@ -2238,7 +2252,8 @@ class ParentClassItem extends FCModelAdmin
 				if ($isNew) return false;
 			}
 
-			if ($app->isClient('site') && !in_array($cparams->get('uselang_fe', 1), array(1,3)) && isset($data['language']))
+			$uselang = $cparams->get('uselang' . $CFGsfx, 1);
+			if (!in_array($uselang, array(1,3)) && isset($data['language']))
 			{
 				$app->enqueueMessage('Language was set automatically to default value', 'info');
 				unset($data['language']);
@@ -2341,14 +2356,7 @@ class ParentClassItem extends FCModelAdmin
 
 
 		// Auto assign the default language if not set, (security of allowing language usage and of language in user's allowed languages was checked above)
-		$item->language = $item->language ?:
-			($app->isClient('site')
-				? $cparams->get('default_language_fe', '_author_lang_')
-				: '*'   // or Site default:  // flexicontent_html::getSiteDefaultLang()  // JComponentHelper::getParams('com_languages')->get('site', '*')
-			);
-		$item->language = $item->language === '_author_lang_'
-			? $user->getParam('language', '*')
-			: $item->language;
+		$item->language = $item->language ?: $this->getDefaultItemLanguage($item);
 
 
 		// Ignore language parent id, we are now using J3.x associations
@@ -2650,7 +2658,7 @@ class ParentClassItem extends FCModelAdmin
 
 		if ( !$version_approved )
 		{
-			if ( $app->isClient('administrator') || $cparams->get('approval_warning_aftersubmit_fe', 1) )
+			if ( $cparams->get('approval_warning_aftersubmit' . $CFGsfx, 1) )
 			{
 				// Warn editor that his/her changes will need approval to before becoming active / visible
 				$canEditState
@@ -2752,8 +2760,11 @@ class ParentClassItem extends FCModelAdmin
 			$old_item = & $item;
 		}
 
-		$app   = JFactory::getApplication();
-		$user  = JFactory::getUser();
+		$app     = JFactory::getApplication();
+		$user    = JFactory::getUser();
+		$isSite  = $app->isClient('site');
+		$isAdmin = !$isSite;  // Treat non-site (e.g. CLI) as if being admin
+		
 		$dispatcher = JEventDispatcher::getInstance();
 		$cparams    = $this->_cparams;
 		$use_versioning = $cparams->get('use_versioning', 1);
@@ -2849,8 +2860,8 @@ class ParentClassItem extends FCModelAdmin
 
 			// FORM HIDDEN FIELDS (FRONTEND/BACKEND) AND (ACL) UNEDITABLE FIELDS: maintain their DB value ...
 			if (
-				( $app->isClient('site') && ($field->formhidden==1 || $field->formhidden==3 || $field->parameters->get('frontend_hidden')) ) ||
-				( $app->isClient('administrator') && ($field->formhidden==2 || $field->formhidden==3 || $field->parameters->get('backend_hidden')) ) ||
+				( $isSite && ($field->formhidden==1 || $field->formhidden==3 || $field->parameters->get('frontend_hidden')) ) ||
+				( $isAdmin && ($field->formhidden==2 || $field->formhidden==3 || $field->parameters->get('backend_hidden')) ) ||
 				!$is_editable
 			) {
 				$postdata[$field->name] = $field->value;
@@ -6577,10 +6588,9 @@ class ParentClassItem extends FCModelAdmin
 	 */
 	protected function handlePartialForm($form, & $data)
 	{
-		if (JFactory::getApplication()->isClient('administrator'))
-		{
-			return;
-		}
+		$app    = JFactory::getApplication();
+		$isSite = $app->isClient('site');
+		$CFGsfx = $isSite ? '_fe' : '_be';
 
 		$this->_loadItemParams();
 
@@ -6593,14 +6603,14 @@ class ParentClassItem extends FCModelAdmin
 		{
 			if ($grp_name === 'metadata')
 			{
-				if ($this->_record->parameters->get('usemetadata_fe', 1) < 1)
+				if ($this->_record->parameters->get('usemetadata' . $CFGsfx, ($isSite ? 1 : 2)) < 1)
 				{
 					// Unset so that they will not be used during binding
 					unset($data['metakey']);
 					unset($data['metadesc']);
 				}
 
-				if ($this->_record->parameters->get('usemetadata_fe', 1) < 2)
+				if ($this->_record->parameters->get('usemetadata' . $CFGsfx, ($isSite ? 1 : 2)) < 2)
 				{
 					// Set to false to indicate maintaining DB value
 					foreach ($form->getGroup($grp_name) as $field)
@@ -6614,11 +6624,18 @@ class ParentClassItem extends FCModelAdmin
 
 			foreach ($form->getFieldsets($grp_name) as $fsname => $fieldSet)
 			{
-				$skip = ($fsname === 'params-basic' && $this->_record->parameters->get('usedisplaydetails_fe', 0) < 1)
-					|| ($fsname === 'params-advanced' && $this->_record->parameters->get('usedisplaydetails_fe', 0) < 2)
-					|| ($fsname === 'params-seoconf' && $this->_record->parameters->get('useseoconf_fe', 0) < 1)
-					|| ($fsname === 'themes' && $this->_record->parameters->get('selecttheme_fe', 0) < 1)
+				$skip = ($fsname === 'params-basic' && $this->_record->parameters->get('usedisplaydetails' . $CFGsfx, ($isSite ? 0 : 2)) < 1)
+					|| ($fsname === 'params-advanced' && $this->_record->parameters->get('usedisplaydetails' . $CFGsfx, ($isSite ? 0 : 2)) < 2)
+					|| ($fsname === 'params-seoconf' && $this->_record->parameters->get('useseoconf' . $CFGsfx, ($isSite ? 0 : 1)) < 1)
+					|| ($fsname === 'themes' && $this->_record->parameters->get('selecttheme' . $CFGsfx, ($isSite ? 0 : 1)) < 1)
 					;
+
+				// Check for values that were posted individually and do not skipped them, e.g. comments in params-advanced
+				$individual_params = array();
+				if ($fsname === 'params-advanced' && (int) $this->_record->parameters->get('allowdisablingcomments' . $CFGsfx, 1))
+				{
+					$individual_params['comments'] = isset($data[$grp_name]['comments']) ? $data[$grp_name]['comments'] : false;
+				}
 
 				if ($skip)
 				{
@@ -6626,6 +6643,12 @@ class ParentClassItem extends FCModelAdmin
 					foreach ($form->getFieldset($fsname) as $field)
 					{
 						$data[$grp_name][$field->fieldname] = false;
+					}
+
+					// Check for values that were posted individually and do not skipped them
+					foreach ($individual_params as $field_name => $field_value)
+					{
+						$data[$grp_name][$field_name] = $field_value;
 					}
 				}
 			}

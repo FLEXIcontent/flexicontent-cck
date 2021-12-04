@@ -687,30 +687,55 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		// Get the edit lists
 		$lists = $this->_buildEditLists($perms, $page_params, $session_data);
 
+		// Create placement configuration for CORE properties
+		$placementConf = $this->_createPlacementConf($item, $fields, $page_params);
+
+		// Get menu overridden categories/main category fields, (FALSE IN BACKEND, no menu configuration in backend)
+		$menuCats = !$isSite ? false : $this->_getMenuCats($item, $perms, $page_params);
+
+		// Create submit configuration (for new items) into the session, (FALSE IN BACKEND, no menu configuration in backend)
+		$submitConf = !$isSite ? false : $this->_createSubmitConf($item, $perms, $page_params);
+
+
+		/**
+		 * Check for zero allowed categories and terminate
+		 */
+		if (!$lists['catid'] && !$menuCats)
+		{
+			$app->setHeader('status', 403);
+			$app->enqueueMessage(JText::sprintf('FLEXI_LOGIN_TO_ACCESS', $url), 'warning');
+			$app->redirect($url, JText::_("FLEXI_CANNOT_SUBMIT_IN_TYPE_ALLOWED_CATS"), 'warning');
+		}
+
+		// Item language related vars
+		$languages = FLEXIUtilities::getLanguages();
+		$itemlang = new stdClass();
+		$itemlang->shortcode = substr($item->language ,0,2);
+		$itemlang->name = $languages->{$item->language}->name;
+		$itemlang->image = '<img src="'.@$languages->{$item->language}->imgsrc.'" alt="'.$languages->{$item->language}->name.'" />';
+
+		// Label for current item state
+		$state_labels = array(
+			 1 => 'FLEXI_PUBLISHED',
+			 0 => 'FLEXI_UNPUBLISHED',
+			-5 => 'FLEXI_IN_PROGRESS',
+			-3 => 'FLEXI_PENDING',
+			-4 => 'FLEXI_TO_WRITE',
+			 2 => 'FLEXI_ARCHIVED',
+			-2 => 'FLEXI_TRASHED',
+		);
+		$published = isset($state_labels[$item->state])
+			? JText::_($state_labels[$item->state])
+			: JText::_('FLEXI_UNKNOWN');
+
 
 
 		/**
 		 * Frontend specific code
 		 */
+
 		if ($isSite)
 		{
-			// Get menu overridden categories/main category fields
-			$menuCats = $this->_getMenuCats($item, $perms, $page_params);
-
-			// Create placement configuration for CORE properties
-			$placementConf = $this->_createPlacementConf($item, $fields, $page_params);
-
-			// Create submit configuration (for new items) into the session
-			$submitConf = $this->_createSubmitConf($item, $perms, $page_params);
-
-			// Item language related vars
-			$languages = FLEXIUtilities::getLanguages();
-			$itemlang = new stdClass();
-			$itemlang->shortcode = substr($item->language ,0,2);
-			$itemlang->name = $languages->{$item->language}->name;
-			$itemlang->image = '<img src="'.@$languages->{$item->language}->imgsrc.'" alt="'.$languages->{$item->language}->name.'" />';
-
-
 			// ***
 			// *** Calculate a (browser window) page title and a page heading
 			// ***
@@ -751,46 +776,35 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		 */
 		else
 		{
-			/**
-			 * Version Panel data
-			 */
-
-			// Get / calculate some version related variables
-			$versioncount    = $model->getVersionCount();
-			$versionsperpage = $page_params->get('versionsperpage', 10);
-			$pagecount = (int) ceil( $versioncount / $versionsperpage );
-
-			// Data need by version panel: (a) current version page, (b) currently active version
-			$current_page = 1;  $k=1;
-			$allversions  = $model->getVersionList();
-			foreach($allversions as $v)
-			{
-				if ( $k > 1 && (($k-1) % $versionsperpage) == 0 )
-					$current_page++;
-				if ( $v->nr == $item->version ) break;
-				$k++;
-			}
-
-			// Finally fetch the version data for versions in current page
-			$versions = $model->getVersionList( ($current_page-1)*$versionsperpage, $versionsperpage );
-
-			// Create display of average rating
-			$ratings = $model->getRatingDisplay();
-
-			// Label for current item state
-			$state_labels = array(
-				 1 => 'FLEXI_PUBLISHED',
-				 0 => 'FLEXI_UNPUBLISHED',
-				-5 => 'FLEXI_IN_PROGRESS',
-				-3 => 'FLEXI_PENDING',
-				-4 => 'FLEXI_TO_WRITE',
-				 2 => 'FLEXI_ARCHIVED',
-				-2 => 'FLEXI_TRASHED',
-			);
-			$published = isset($state_labels[$item->state])
-				? JText::_($state_labels[$item->state])
-				: JText::_('FLEXI_UNKNOWN');
 		}
+
+
+		/**
+		 * Version Panel data
+		 */
+
+		// Get / calculate some version related variables
+		$versioncount    = $model->getVersionCount();
+		$versionsperpage = $page_params->get('versionsperpage', 10);
+		$pagecount = (int) ceil( $versioncount / $versionsperpage );
+
+		// Data need by version panel: (a) current version page, (b) currently active version
+		$current_page = 1;  $k=1;
+		$allversions  = $model->getVersionList();
+		foreach($allversions as $v)
+		{
+			if ( $k > 1 && (($k-1) % $versionsperpage) == 0 )
+				$current_page++;
+			if ( $v->nr == $item->version ) break;
+			$k++;
+		}
+
+		// Finally fetch the version data for versions in current page
+		$versions = $model->getVersionList( ($current_page-1)*$versionsperpage, $versionsperpage );
+
+		// Create display of average rating
+		$ratings = $model->getRatingDisplay();
+
 
 
 		// ***
@@ -892,6 +906,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		$this->subscribers   = $subscribers;
 		$this->usedtagsdata  = $usedtagsdata;
 		$this->quicktagsdata = $quicktagsdata;
+		$this->typesselected = $typesselected;
 
 		$this->fields     = $fields;
 		$this->tparams    = $tparams;
@@ -900,15 +915,18 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		$this->document   = $document;
 		$this->nullDate   = $nullDate;
 
+		$this->menuCats      = $menuCats;
+		$this->submitConf    = $submitConf;
+		$this->placementConf = $placementConf;
+
+		$this->iparams   = $model->getComponentTypeParams();
+		$this->itemlang  = $itemlang;
+		$this->action    = $isSite ? $uri->toString() : 'index.php';
+		$this->published = $published;
+
 		// Frontend only
 		if ($isSite)
 		{
-			$this->action     = $uri->toString();
-			$this->itemlang   = $itemlang;
-
-			$this->menuCats      = $menuCats;
-			$this->submitConf    = $submitConf;
-			$this->placementConf = $placementConf;
 			$this->pageclass_sfx = $pageclass_sfx;
 
 			$this->captcha_errmsg = isset($captcha_errmsg) ? $captcha_errmsg : null;
@@ -920,17 +938,16 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		// Backend only
 		else
 		{
-			$this->iparams       = $model->getComponentTypeParams();
-			$this->typesselected = $typesselected;
-			$this->published     = $published;
-
-			// Version related: versio data, current page, total pages
-			$this->versions     = $versions;
-			$this->current_page = $current_page;
-			$this->pagecount    = $pagecount;
-			// Ratings
-			$this->ratings = $ratings;
 		}
+
+
+		// Version related: version data, current page, total pages
+		$this->versions     = $versions;
+		$this->current_page = $current_page;
+		$this->pagecount    = $pagecount;
+
+		// Ratings
+		$this->ratings = $ratings;
 
 
 		// ***
@@ -966,6 +983,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		$option   = $jinput->get('option', '', 'cmd');
 		$isAdmin  = $app->isClient('administrator');
 		$isSite   = $app->isClient('site');
+		$CFGsfx   = $isSite ? '_fe' : '_be';
 
 		global $globalcats;
 
@@ -1192,14 +1210,14 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		}
 
 
-		// build field for notifying subscribers
-		if ( !$subscribers )
+		// Build field for notifying subscribers
+		if (!$subscribers)
 		{
 			$lists['notify'] = !$isnew ? '<div class="alert alert-info fc-small fc-iblock">'.JText::_('FLEXI_NO_SUBSCRIBERS_EXIST').'</div>' : '';
 		}
 		else
 		{
-			// b. Check if notification emails to subscribers , were already sent during current session
+			// Check if notification emails to subscribers , were already sent during current session
 			$subscribers_notified = $session->get('subscribers_notified', array(),'flexicontent');
 			if ( !empty($subscribers_notified[$item->id]) )
 			{
@@ -1207,22 +1225,41 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 			}
 			else
 			{
-				// build favs notify field
 				$fieldname = 'jform[notify]';
 				$elementid = 'jform_notify';
-				/*
-				$attribs = '';
-				$lists['notify'] = '<input type="checkbox" name="jform[notify]" id="jform_notify" '.$attribs.' /> '. $lbltxt;
-				*/
-				$classes = !$prettycheckable_added ? '' : ' use_prettycheckable ';
-				$attribs = ' class="'.$classes.'" ';
-				$lbltxt = $subscribers .' '. JText::_( $subscribers>1 ? 'FLEXI_SUBSCRIBERS' : 'FLEXI_SUBSCRIBER' );
-				if (!$prettycheckable_added) $lists['notify'] .= '<label class="fccheckradio_lbl" for="'.$elementid.'">';
-				$extra_params = !$prettycheckable_added ? '' : ' data-labeltext="'.$lbltxt.'" data-labelPosition="right" data-customClass="fcradiocheck"';
-				$lists['notify'] = ' <input type="checkbox" id="'.$elementid.'" data-element-grpid="'.$elementid
-					.'" name="'.$fieldname.'" '.$attribs.' value="1" '.$extra_params.' checked="checked" />';
-				if (!$prettycheckable_added) $lists['notify'] .= '&nbsp;'.$lbltxt.'</label>';
+
+				$lbltxt   = $subscribers . ' ' . JText::_($subscribers > 1 ? 'FLEXI_SUBSCRIBERS' : 'FLEXI_SUBSCRIBER');
+				$classes  = !$prettycheckable_added ? '' : ' use_prettycheckable ';
+				$attribs  = ' class="' . $classes . '" '
+					. (!$prettycheckable_added ? '' : ' data-labeltext="' . $lbltxt . '" data-labelPosition="right" data-customClass="fcradiocheck"');
+
+				$lists['notify'] = ''
+					. ($prettycheckable_added ? '' : '<label class="fccheckradio_lbl" for="'.$elementid.'">')
+					. ' <input type="checkbox" id="' . $elementid . '" data-element-grpid="' . $elementid . '" name="' . $fieldname . '" ' . $attribs . ' value="1" checked="checked" />'
+					. ($prettycheckable_added ? '' : '&nbsp;' . $lbltxt . '</label>');
 			}
+		}
+
+
+		// Build field for notifying owner of changes
+		$isOwner = (int) $item->created_by === (int) $user->id;
+		if (!$isOwner)
+		{
+			$fieldname = 'jform[notify_owner]';
+			$elementid = 'jform_notify_owner';
+
+			$lbltxt   = JText::_('FLEXI_NOTIFY_OWNER');
+			$classes  = !$prettycheckable_added ? '' : ' use_prettycheckable ';
+			$attribs  = ' class="' . $classes . '" '
+				. (!$prettycheckable_added ? '' : ' data-labeltext="' . $lbltxt . '" data-labelPosition="right" data-customClass="fcradiocheck"');
+
+			$lists['notify_owner'] = ''
+				. ($prettycheckable_added ? '' : '<label class="fccheckradio_lbl" for="'.$elementid.'">')
+				. ' <input type="checkbox" id="' . $elementid . '" data-element-grpid="' . $elementid . '" name="' . $fieldname . '" ' . $attribs . ' value="1" checked="checked" />'
+				. ($prettycheckable_added ? '' : '&nbsp;' . $lbltxt . '</label>');
+
+			$this->ownerCanEdit     = $model->canEdit(null, JFactory::getUser($item->created_by));
+			$this->ownerCanEditState = $model->canEditState(null, JFactory::getUser($item->created_by));
 		}
 
 		// Retrieve author configuration
@@ -1252,9 +1289,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		$canchange_featcat = $perms['multicat'] && $perms['canchange_featcat'];
 
 		// SHOW/HIDE Configuration -- 0: hide, 1: hide if no ACL, 2: show
-		$show_featcats = $isAdmin
-			? 2
-			: (int) $page_params->get('show_featcats_fe', 2);
+		$show_featcats = (int) $page_params->get('show_featcats' . $CFGsfx, 2);
 
 		// Do not display selector if featured cats are disabled or if selector is configured to be hidden via ACL
 		$feat_cids_hidden = $show_featcats === 0 || ($show_featcats === 1 && !$canchange_featcat);
@@ -1306,9 +1341,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		$canchange_seccat = $perms['multicat'] && $perms['canchange_seccat'];
 
 		// SHOW/HIDE Configuration -- 0: hide, 1: hide if no ACL, 2: show
-		$show_seccats = $isAdmin
-			? 2
-			: (int) $page_params->get('show_seccats_fe', 2);
+		$show_seccats = (int) $page_params->get('show_seccats' . $CFGsfx, 2);
 
 		// Do not display selector if secondary cats are disabled or if selector is configured to be hidden via ACL
 		$sec_cids_hidden = $show_seccats === 0 || ($show_seccats === 1 && !$canchange_seccat);
@@ -1448,6 +1481,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 				$i++;
 			}
 		}
+
 
 		// ***
 		// *** Build languages list
@@ -2402,6 +2436,8 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 	 */
 	function _createPlacementConf( $item, & $fields, $page_params )
 	{
+		$CFGsfx = JFactory::getApplication()->isClient('site') ? '' : '_be';
+
 		// 1. Find core placer fields (of type 'coreprops')
 		$core_placers = array();
 		foreach($fields as $field)
@@ -2415,43 +2451,49 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 
 		// 2. Field name arrays:  (a) placeable and  (b) placeable via placer  (c) above tabs fields
 		$via_core_field  = array(
-			'title'=>1, 'type_id'=>1, 'state'=>1, 'cats'=>1, 'tags'=>1, 'text'=>1
+			'title'=>1, 'document_type'=>1, 'state'=>1, 'categories'=>1, 'tags'=>1, 'text'=>1,
 		);
-		$via_core_field = array_merge($via_core_field,
-			array('created'=>1, 'created_by'=>1, 'modified'=>1, 'modified_by'=>1)
-		);
+		$via_core_field = array_merge($via_core_field, array(
+			'created'=>1, 'created_by'=>1, 'modified'=>1, 'modified_by'=>1,
+		));
 
 		$via_core_prop = array(
-			'alias'=>1, 'disable_comments'=>1, 'notify_subscribers'=>1, 'language'=>1, 'perms'=>1,
-			'metadata'=>1, 'seoconf'=>1, 'display_params'=>1, 'layout_selection'=>1, 'layout_params'=>1
+			'alias'=>1, 'disable_comments'=>1, 'notify_subscribers'=>1, 'notify_owner'=>1, 'language'=>1, 'perms'=>1,
+			'metadata'=>1, 'seoconf'=>1, 'display_params'=>1, 'layout_selection'=>1, 'layout_params'=>1,
 		);
-		$via_core_prop = array_merge($via_core_prop,
-			array('timezone_info'=>1, 'created_by_alias'=>1, 'publish_up'=>1, 'publish_down'=>1, 'access'=>1)
-		);
+		$via_core_prop = array_merge($via_core_prop, array(
+			'timezone_info'=>1, 'created_by_alias'=>1, 'modified'=>1, 'modified_by'=>1,
+			'publish_up'=>1, 'publish_down'=>1, 'access'=>1,
+		));
 
 		$placeable_fields = array_merge($via_core_field, $via_core_prop);
+		//echo "<pre>"; print_r($placeable_fields); echo "</pre>";
 
 
 		// 3. Decide placement of CORE properties / fields
-		$tab_fields['above'] = $page_params->get('form_tabs_above',    'title, alias, category, lang, type, state, disable_comments, notify_subscribers');
+		$tab_fields['above'] = $page_params->get('form_tabs_above'. $CFGsfx,    'title, alias, category, lang, type, state, access, disable_comments, notify_subscribers, notify_owner');
 
-		$tab_fields['tab01'] = $page_params->get('form_tab01_fields',  'text');
-		$tab_fields['tab02'] = $page_params->get('form_tab02_fields',  'fields_manager');
-		$tab_fields['tab03'] = $page_params->get('form_tab03_fields',  'categories, tags, language, perms');
-		$tab_fields['tab04'] = $page_params->get('form_tab04_fields',  'timezone_info, created, createdby, created_by_alias, publish_up, publish_down, access');
-		$tab_fields['tab05'] = $page_params->get('form_tab05_fields',  'metadata, seoconf');
-		$tab_fields['tab06'] = $page_params->get('form_tab06_fields',  'display_params');
-		$tab_fields['tab07'] = $page_params->get('form_tab07_fields',  'layout_selection, layout_params');
+		$tab_fields['tab01'] = $page_params->get('form_tab01_fields'. $CFGsfx,  'text');
+		$tab_fields['tab02'] = $page_params->get('form_tab02_fields'. $CFGsfx,  'fields_manager');
+		$tab_fields['tab03'] = $page_params->get('form_tab03_fields'. $CFGsfx,  'categories, tags, language, perms');
+		$tab_fields['tab04'] = $page_params->get('form_tab04_fields'. $CFGsfx,  'timezone_info, created, created_by, created_by_alias, publish_up, publish_down, modified, modified_by');
+		$tab_fields['tab05'] = $page_params->get('form_tab05_fields'. $CFGsfx,  'metadata, seoconf');
+		$tab_fields['tab06'] = $page_params->get('form_tab06_fields'. $CFGsfx,  'display_params');
+		$tab_fields['tab07'] = $page_params->get('form_tab07_fields'. $CFGsfx,  'layout_selection, layout_params');
+		$tab_fields['tab08'] = $page_params->get('form_tab08_fields'. $CFGsfx,  'versions');
 
-		$tab_fields['fman']  = $page_params->get('form_tabs_fieldsman','');
-		$tab_fields['below'] = $page_params->get('form_tabs_below',    '');
+		$tab_fields['fman']  = $page_params->get('form_tabs_fieldsman'. $CFGsfx,'');
+		$tab_fields['below'] = $page_params->get('form_tabs_below'. $CFGsfx,    '');
 
 		// Fix aliases, also replacing field types with field names
-		foreach($tab_fields as $tab_name => $field_list) {
+		foreach($tab_fields as $tab_name => $field_list)
+		{
 			$field_list = str_replace('createdby', 'created_by', $field_list);
 			$field_list = str_replace('modifiedby', 'modified_by', $field_list);
 			$field_list = str_replace('createdby_alias', 'created_by_alias', $field_list);
 			$field_list = str_replace('maintext', 'text', $field_list);
+			$field_list = str_replace('type', 'document_type', $field_list);
+			$field_list = str_replace('language', 'lang_associations', $field_list);  // LEGACY value ...
 			$tab_fields[$tab_name] = $field_list;
 		}
 		//echo "<pre>"; print_r($tab_fields); echo "</pre>";
@@ -2471,15 +2513,19 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		// Find fields missing from configuration, and place them below the tabs
 		foreach($placeable_fields as $fn => $i)
 		{
-			if ( !isset($all_tab_fields[$fn]) )   $tab_fields['below'][$fn] = 1;
+			if ( !isset($all_tab_fields[$fn]) )
+			{
+				$tab_fields['below'][$fn] = 1;
+			}
 		}
 
 		// get TAB titles and TAB icon classes
-		$_tmp = $page_params->get('form_tab_titles', '1:FLEXI_DESCRIPTION, 2:__TYPE_NAME__, 3:FLEXI_ASSIGNMENTS, 4:FLEXI_PUBLISHING, 5:FLEXI_META_SEO, 6:FLEXI_DISPLAYING, 7:FLEXI_TEMPLATE');
-		$_ico = $page_params->get('form_tab_icons',  '1:icon-file-2, 2:icon-signup, 3:icon-tree-2, 4:icon-calendar, 5:icon-bookmark, 6:icon-eye-open, 7:icon-palette');
+		$_tmp = $page_params->get('form_tab_titles'. $CFGsfx, '1:FLEXI_DESCRIPTION, 2:__TYPE_NAME__, 3:FLEXI_ASSIGNMENTS, 4:FLEXI_PUBLISHING, 5:FLEXI_META_SEO, 6:FLEXI_DISPLAYING, 7:FLEXI_TEMPLATE');
+		$_ico = $page_params->get('form_tab_icons'. $CFGsfx,  '1:icon-file-2, 2:icon-signup, 3:icon-tree-2, 4:icon-calendar, 5:icon-bookmark, 6:icon-eye-open, 7:icon-palette');
 
 		// Create title of the custom fields default TAB (field manager TAB)
-		if ($item->type_id) {
+		if ($item->type_id)
+		{
 			$_str = JText::_('FLEXI_DETAILS');
 			$_str = StringHelper::strtoupper(StringHelper::substr($_str, 0, 1)) . StringHelper::substr($_str, 1);
 
@@ -2487,7 +2533,9 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 			$type_lbl = isset($types_arr[$item->type_id]) ? $types_arr[$item->type_id]->name : '';
 			$type_lbl = $type_lbl ? JText::_($type_lbl) : JText::_('FLEXI_CONTENT_TYPE');
 			$type_lbl = $type_lbl .' ('. $_str .')';
-		} else {
+		}
+		else
+		{
 			$type_lbl = JText::_('FLEXI_TYPE_NOT_DEFINED');
 		}
 
@@ -2536,86 +2584,6 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		return $placementConf;
 	}
 
-
-
-	/**
-	 * Method to diplay field showing inherited value
-	 *
-	 * @access	private
-	 * @return	void
-	 * @since	1.5
-	 */
-	function getInheritedFieldDisplay($field, $params, $_v = null)
-	{
-		$_v = $params ? $params->get($field->fieldname) : $_v;
-
-		if ($_v==='' || $_v===null)
-		{
-			return $field->input;
-		}
-
-		elseif ($field->getAttribute('type')==='fcordering' || $field->getAttribute('type')==='list' || ($field->getAttribute('type')==='multilist' && $field->getAttribute('subtype')==='list'))
-		{
-			$_v = htmlspecialchars( $_v, ENT_COMPAT, 'UTF-8' );
-			if (preg_match('/<option\s*value="' . preg_quote($_v, '/') . '"\s*>(.*?)<\/option>/', $field->input, $matches))
-			{
-				return str_replace(
-					JText::_('FLEXI_USE_GLOBAL'),
-					JText::_('FLEXI_USE_GLOBAL') . ' (' . $matches[1] . ')',
-					$field->input);
-			}
-		}
-
-		elseif ($field->getAttribute('type')==='radio' || $field->getAttribute('type')==='fcradio' || ($field->getAttribute('type')==='multilist' && $field->getAttribute('subtype')==='radio'))
-		{
-			$_v = htmlspecialchars( $_v, ENT_COMPAT, 'UTF-8' );
-			return str_replace(
-				'value="'.$_v.'"',
-				'value="'.$_v.'" class="fc-inherited-value" ',
-				$field->input);
-		}
-
-		elseif ($field->getAttribute('type')==='fccheckbox' && is_array($_v))
-		{
-			$_input = $field->input;
-			foreach ($_v as $v)
-			{
-				$v = htmlspecialchars( $v, ENT_COMPAT, 'UTF-8' );
-				$_input = str_replace(
-					'value="'.$v.'"',
-					'value="'.$v.'" class="fc-inherited-value" ',
-					$_input);
-			}
-			return $_input;
-		}
-
-		elseif ($field->getAttribute('type')==='text' || $field->getAttribute('type')==='fcmedia' || $field->getAttribute('type')==='media')
-		{
-			$_v = htmlspecialchars( preg_replace('/[\n\r]/', ' ', $_v), ENT_COMPAT, 'UTF-8' );
-			return str_replace(
-				'<input ',
-				'<input placeholder="'.$_v.'" ',
-				preg_replace('/^(\s*<input\s[^>]+)placeholder="[^"]+"/i', '\1 ', $field->input)
-			);
-		}
-		elseif ($field->getAttribute('type')==='textarea')
-		{
-			$_v = htmlspecialchars(preg_replace('/[\n\r]/', ' ', $_v), ENT_COMPAT, 'UTF-8' );
-			return str_replace(
-				'<textarea ',
-				'<textarea placeholder="'.$_v.'" ',
-				preg_replace('/^(\s*<textarea\s[^>]+)placeholder="[^"]+"/i', '\1 ', $field->input)
-			);
-		}
-
-		elseif ( method_exists($field, 'setInherited') )
-		{
-			$field->setInherited($_v);
-			return $field->input;
-		}
-
-		return $field->input;
-	}
 
 
 	/**

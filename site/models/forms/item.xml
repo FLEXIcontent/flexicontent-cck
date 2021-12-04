@@ -19,12 +19,18 @@
 			<option value="1">JNO</option>
 			<option value="2">JYES</option>
 		</field>
-		<field name="notify" type="list" label="FLEXI_NOTIFY_SUBSCRIBERS" description="FLEXI_NOTIFY_FAVOURING_USERS" default="0">
+
+		<field name="notify" type="list" label="FLEXI_NOTIFY_SUBSCRIBERS" description="FLEXI_NOTIFY_FAVOURING_USERS" default="">
 			<option value="">JNO</option> <!-- must be empty we will output a checkbox with value 1 -->
 			<option value="1">JYES</option>
 		</field>
+		<field name="notify_owner" type="list" label="FLEXI_NOTIFY_OWNER" description="FLEXI_NOTIFY_OWNER_DESC" default="">
+			<option value="">JNO</option> <!-- must be empty we will output a checkbox with value 1 -->
+			<option value="1">JYES</option>
+		</field>
+
 		<field name="image_selector" type="fcmedia" label="MEDIA SELECTOR" />
-		<field name="tag" type="hidden" label="FLEXI_TAGS" description="JFIELD_TAGS_DESC" class="" required="false" multiple="true" />
+		<field name="tag" type="hidden" label="FLEXI_TAGS" description="JTAG_DESC" class="" required="false" multiple="true" />
 		<field name="cid" type="categorytree" size="40" label="FLEXI_SECONDARY_CATEGORIES" description="FLEXI_CATEGORIES_NOTES" class="mcat " multiple="true" />
 		<field name="featured_cid" type="categorytree" size="10" label="FLEXI_FEATURED_CATEGORIES" description="FLEXI_FEATURED_CATEGORIES_DESC" class="use_select2_lib" multiple="true" top="3" />
 		<field name="catid" type="categorytree" label="FLEXI_PRIMARY_CATEGORY" description="FLEXI_CATEGORIES_NOTES" class="scat use_select2_lib" required="true" top="2" />
@@ -32,12 +38,12 @@
 		<field name="created" type="calendar" label="COM_CONTENT_FIELD_CREATED_LABEL" description="COM_CONTENT_FIELD_CREATED_DESC" class="" size="22" format="%Y-%m-%d %H:%M:%S" filter="user_utc" />
 		<field name="created_by" type="user" label="FLEXI_FIELD_CREATED_BY_LABEL" description="FLEXI_FIELD_CREATED_BY_DESC" class="" />
 		<field name="created_by_alias" type="text" label="FLEXI_FIELD_CREATED_BY_ALIAS_LABEL" description="FLEXI_FIELD_CREATED_BY_ALIAS_DESC" class="" size="20" />
-		<field name="modified" type="calendar" class="readonly" label="COM_CONTENT_FIELD_MODIFIED_LABEL" description="COM_CONTENT_FIELD_MODIFIED_DESC" size="22" readonly="true" format="%Y-%m-%d %H:%M:%S" filter="user_utc" />
-		<field name="modified_by" type="hidden" filter="unset" />
+		<field name="modified" type="calendar" label="JGLOBAL_FIELD_MODIFIED_LABEL" description="COM_CONTENT_FIELD_MODIFIED_DESC" class="readonly" showtime="true" readonly="true" size="22" format="%Y-%m-%d %H:%M:%S" filter="user_utc" />
+		<field name="modified_by" type="user" label="JGLOBAL_FIELD_MODIFIED_BY_LABEL" description="..." class="readonly" readonly="true" filter="unset" />
 		<field name="checked_out" type="hidden" filter="unset" />
 		<field name="checked_out_time" type="hidden" filter="unset" />
-		<field name="publish_up" type="calendar" label="COM_CONTENT_FIELD_PUBLISH_UP_LABEL" description="COM_CONTENT_FIELD_PUBLISH_UP_DESC" class="" format="%Y-%m-%d %H:%M:%S" size="22" filter="user_utc" />
-		<field name="publish_down" type="calendar" label="COM_CONTENT_FIELD_PUBLISH_DOWN_LABEL" description="COM_CONTENT_FIELD_PUBLISH_DOWN_DESC" class="" format="%Y-%m-%d %H:%M:%S" size="22" filter="user_utc" />
+		<field name="publish_up" type="calendar" label="COM_CONTENT_FIELD_PUBLISH_UP_LABEL" description="COM_CONTENT_FIELD_PUBLISH_UP_DESC" labelclass="label label-inverse" format="%Y-%m-%d %H:%M:%S" size="22" filter="user_utc" />
+		<field name="publish_down" type="calendar" label="COM_CONTENT_FIELD_PUBLISH_DOWN_LABEL" description="COM_CONTENT_FIELD_PUBLISH_DOWN_DESC" labelclass="label label-inverse" format="%Y-%m-%d %H:%M:%S" size="22" filter="user_utc" />
 		<field name="version" type="text" class="readonly" label="COM_CONTENT_FIELD_VERSION_LABEL" size="6" description="COM_CONTENT_FIELD_VERSION_DESC" readonly="true" filter="unset" />
 		<field name="versioncomment" type="textarea" label="FLEXI_VERSION_COMMENT" description="FLEXI_VERSION_COMMENT_DESC" class="inputbox" rows="3" cols="30" />
 		<field name="ordering" type="text" label="JFIELD_ORDERING_LABEL" description="JFIELD_ORDERING_DESC" class="inputbox" size="6" default="0" />
@@ -64,7 +70,7 @@
 <fields name="attribs">
 
 	<fieldset name="params-basic" label="FLEXI_PARAMETERS_ITEM_BASIC" addfieldpath="/administrator/components/com_flexicontent/elements">
-		
+
 		<field name="" type="separator" default="FLEXI_PARAMETERS_ICONS" description="..." level="level1" />
 		<!--field name="show_pdf_icon" type="fcradio" default="" label="FLEXI_PDF_ICON" description="FLEXI_PDF_ICON_DESC" class="btn-group btn-group-yesno">
 			<option value="">FLEXI_USE_GLOBAL</option>
@@ -96,7 +102,7 @@
 			<option value="0">FLEXI_HIDE</option>
 			<option value="1">FLEXI_SHOW</option>
 		</field>
-		
+
 		<field name="" type="separator" default="FLEXI_PARAMETERS_CONTENT" description="..." level="level1" />
 		<field name="show_title" type="fcradio" default="" label="FLEXI_SHOWTITLE" description="FLEXI_SHOWTITLE_DESC" class="btn-group btn-group-yesno">
 			<option value="">FLEXI_USE_GLOBAL</option>
@@ -110,9 +116,9 @@
 		</field>
 		<field name="readmore" type="text" size="30" default="" label="FLEXI_ALTLINK_TEXTE" description="PARAMALTREADMORE" class="" />
 	</fieldset>
-	
+
 	<fieldset name="params-advanced" label="FLEXI_PARAMETERS_ITEM_ADVANCED">
-		
+
 		<field name="" type="separator" default="FLEXI_ADVANCED" description="..." level="level2" />
 		<field name="comments" type="fcradio" default="" label="FLEXI_ENABLE_COMMENTS_INTEGRATION" description="FLEXI_ENABLE_COMMENTS_INTEGRATION_DESC" class="btn-group group-fcmethod fcoffactive">
 			<option value="">FLEXI_USE_GLOBAL</option>
@@ -126,9 +132,9 @@
 		</field>
 		<!--field name="language" type="languages" client="site" label="Content Language (for Browser)" description="Indication to the the browser for the language used to write this content" /-->
 		<!--field name="keyref" type="text" default="" label="Key Reference" description="A Unique Key which can be used to undentify the item in the URL, like &amp;key=keyref, note this is currently unusued" size="30" /-->
-		
+
 	</fieldset>
-	
+
 	<fieldset name="params-seoconf" label="FLEXI_PARAMETERS_ITEM_SEO" addfieldpath="/administrator/components/com_flexicontent/elements">
 
 		<field name="" type="separator" default="FLEXI_MICRODATA_SUPPORT" description="FLEXI_MICRODATA_SUPPORT_DESC" level="level2" />
@@ -156,17 +162,17 @@
 		</field>
 
 	</fieldset>
-	
+
 	<fieldset name="themes" label="FLEXI_TEMPLATE" addfieldpath="/administrator/components/com_flexicontent/elements">
 		<field name="ilayout" type="itemlayout" label="FLEXI_CHOOSE_SPECIFIC_ITEM_LAYOUT" description="FLEXI_CHOOSE_SPECIFIC_ITEM_LAYOUT_DESC" class="use_select2_lib" labelclass="label text-white bg-warning label-warning" />
 		<field name="ilayout_mobile" type="itemlayout" skipparams="1" enableparam="use_mobile_layouts" firstoption="FLEXI_USE_DESKTOP" default="" label="FLEXI_CHOOSE_SPECIFIC_MOBILE_LAYOUT" description="FLEXI_CHOOSE_SPECIFIC_MOBILE_LAYOUT_DESC" class="use_select2_lib" labelclass="label text-white bg-warning label-warning" />
 	</fieldset>
-	
+
 </fields>
 
 
 <fields name="images" label="Images" description="">
-		
+
 		<field name="" type="separator" default="FLEXI_IMAGES_COMP_INTROIMG" description="FLEXI_IMAGES_COMP_INTROIMG_DESC" level="_" class="alert alert-info fcpadded" />
 		<field name="image_intro" type="fcmedia" label="COM_CONTENT_FIELD_INTRO_LABEL" description="COM_CONTENT_FIELD_INTRO_DESC" labelclass="fc-prop-lbl" />
 		<field name="float_intro" type="fcradio" label="COM_CONTENT_FLOAT_LABEL" description="COM_CONTENT_FLOAT_DESC" labelclass="fc-prop-lbl" class="btn-group btn-group-yesno">
@@ -177,7 +183,7 @@
 		</field>
 		<field name="image_intro_alt" type="text" label="COM_CONTENT_FIELD_IMAGE_ALT_LABEL" description="COM_CONTENT_FIELD_IMAGE_ALT_DESC" labelclass="fc-prop-lbl" class="" />
 		<field name="image_intro_caption" type="text" label="COM_CONTENT_FIELD_IMAGE_CAPTION_LABEL" description="COM_CONTENT_FIELD_IMAGE_CAPTION_DESC" labelclass="fc-prop-lbl" class="" />
-		
+
 		<field name="" type="separator" default="FLEXI_IMAGES_COMP_FULLIMG" description="FLEXI_IMAGES_COMP_FULLIMG_DESC" level="_" class="alert alert-info fcpadded" />
 		<field name="image_fulltext" type="fcmedia" label="COM_CONTENT_FIELD_FULL_LABEL" description="COM_CONTENT_FIELD_FULL_DESC" labelclass="fc-prop-lbl" />
 		<field name="float_fulltext" type="fcradio" label="COM_CONTENT_FLOAT_LABEL" description="COM_CONTENT_FLOAT_DESC" labelclass="fc-prop-lbl" class="btn-group btn-group-yesno">
@@ -188,11 +194,11 @@
 		</field>
 		<field name="image_fulltext_alt" type="text" label="COM_CONTENT_FIELD_IMAGE_ALT_LABEL" description="COM_CONTENT_FIELD_IMAGE_ALT_DESC" labelclass="fc-prop-lbl" class="" />
 		<field name="image_fulltext_caption" type="text" label="COM_CONTENT_FIELD_IMAGE_CAPTION_LABEL" description="COM_CONTENT_FIELD_IMAGE_CAPTION_DESC" labelclass="fc-prop-lbl" class="" />
-	
-</fields>	
+
+</fields>
 
 <fields name="urls" label="Links" description="">
-		
+
 		<field name="" type="separator" default="FLEXI_URLS_LINK_A" description="FLEXI_URLS_LINK_A_DESC" level="_" class="alert alert-info fcpadded" />
 		<field name="urla" type="url" validate="url" filter="url" label="COM_CONTENT_FIELD_URLA_LABEL" description="COM_CONTENT_FIELD_URL_DESC" labelclass="fc-prop-lbl" />
 		<field name="urlatext" type="text" label="COM_CONTENT_FIELD_URLA_LINK_TEXT_LABEL" description="COM_CONTENT_FIELD_URL_LINK_TEXT_DESC" labelclass="fc-prop-lbl" class="" />
@@ -203,7 +209,7 @@
 			<option value="2">JBROWSERTARGET_POPUP</option>
 			<option value="3">JBROWSERTARGET_MODAL</option>
 		</field>
-		
+
 		<field name="" type="separator" default="FLEXI_URLS_LINK_B" description="FLEXI_URLS_LINK_B_DESC" level="_" class="alert alert-info fcpadded" />
 		<field name="urlb" type="url" validate="url" filter="url" label="COM_CONTENT_FIELD_URLB_LABEL" description="COM_CONTENT_FIELD_URL_DESC" labelclass="fc-prop-lbl" />
 		<field name="urlbtext" type="text" label="COM_CONTENT_FIELD_URLB_LINK_TEXT_LABEL" description="COM_CONTENT_FIELD_URL_LINK_TEXT_DESC" labelclass="fc-prop-lbl" class="" />
@@ -225,7 +231,7 @@
 			<option value="2">JBROWSERTARGET_POPUP</option>
 			<option value="3">JBROWSERTARGET_MODAL</option>
 		</field>
-		
+
 </fields>
 
 

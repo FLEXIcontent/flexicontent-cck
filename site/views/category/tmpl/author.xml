@@ -910,7 +910,7 @@
 
 		<field name="" type="separator" default="OPTIONS" icon_class="icon-cog" level="tab_open" box_type="1"/>
 			
-			<field name="" type="separator" default="FLEXI_CAT_PARAMS_USED_IF_NO_TYPE_PARAMS" level="level3" class="alert alert-info fcpadded"/>
+			<field name="" type="separator" default="FLEXI_CAT_PARAMS_USED_IF_NO_TYPE_PARAMS_ARE_SET" level="level3" class="alert alert-info fcpadded"/>
 
 			<field name="" type="separator" default="FLEXI_SEO" level="level2" />
 			<field name="automatic_pathways" type="fcradio" default="" label="FLEXI_CREATE_PATHWAYS_AUTOMATICALLY" description="FLEXI_CREATE_PATHWAYS_AUTOMATICALLY_DESC" class="btn-group">

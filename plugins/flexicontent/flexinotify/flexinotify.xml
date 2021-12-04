@@ -16,29 +16,36 @@
 	<config>
 	<fields name="params">
 		<fieldset name="basic" addfieldpath="/administrator/components/com_flexicontent/elements">
-			
+
 			<field name="debug_notifications" type="list" default="0" label="FLEXI_DEBUG_NOTIFICATIONS" description="FLEXI_DEBUG_NOTIFICATIONS_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_SHOW_TO_ALL_EDITORS</option>
 				<option value="2">FLEXI_SHOW_TO_ALL_SUPER_ADMINS</option>
 			</field>
 			<field name="" type="separator" default="FLEXI_BASIC_CONFIGURATION" description="..." level="level2" />
-			<field name="mailsubject" type="text" size="40" default="" label="FLEXI_SUBJECT" description="FLEXI_SUBJECT_DESC" />
 			<field name="sendername" type="text" size="40" default="" label="FLEXI_FROM_NAME" description="FLEXI_FROM_NAME_DESC" />
 			<field name="senderemail" type="text" size="40" default="" label="FLEXI_FROM_EMAIL" description="FLEXI_FROM_EMAIL_DESC" />
-			
-			<field name="" type="separator" default="FLEXI_PERSONALIZED_NOTIFICATIONS" description="FLEXI_PERSONALIZED_NOTIFICATIONS_DESC" level="level2" />
+
+			<field name="" type="separator" default="FLEXI_NOTIFY_PLG_OWNERS_NOTIFICATIONS" description="..." level="level1" class="fcpadded" />
+			<field name="mailsubject_owner" type="text" size="40" default="" hint="FLEXI_SUBJECT_DEFAULT" label="FLEXI_SUBJECT" description="FLEXI_SUBJECT_DESC" />
+			<field name="mailbody_owner" type="textarea" rows="11" cols="120" default="" hint="FLEXI_NOTIFICATION_MESSAGE_OWNER" label="FLEXI_NOTIFY_PLG_BODY" description="FLEXI_NOTIFY_PLG_BODY_DESC" />
+
+			<field name="" type="separator" default="FLEXI_NOTIFY_PLG_SUBSCRIBERS_NOTIFICATIONS" description="..." level="level1" class="fcpadded" />
+			<field name="mailsubject" type="text" size="40" default="" hint="FLEXI_SUBJECT_DEFAULT" label="FLEXI_SUBJECT" description="FLEXI_SUBJECT_DESC" />
+			<field name="mailbody" type="textarea" size="40" rows="11" cols="120" default="" hint="FLEXI_NOTIFICATION_MESSAGE" label="FLEXI_NOTIFY_PLG_BODY" description="FLEXI_NOTIFY_PLG_BODY_DESC" />
+
+			<field name="" type="separator" default="FLEXI_PERSONALIZED_NOTIFICATIONS" description="FLEXI_PERSONALIZED_NOTIFICATIONS_DESC" level="level3" />
 			<field name="send_personalized" type="list" default="1" label="FLEXI_ENABLE_PERSONALIZED_NOTIFICATIONS" description="FLEXI_ENABLE_PERSONALIZED_NOTIFICATIONS_DESC">
 				<option value="0">FLEXI_NO_SEND_SAME_EMAIL</option>
 				<option value="1">FLEXI_YES_SEND_SEPARATE_EMAILS</option>
 			</field>
 			<field name="personalized_limit" type="text" default="50" label="FLEXI_SUBSCRIBER_LIMIT" description="FLEXI_SUBSCRIBER_LIMIT_DESC" />
-			<field name="" type="separator" default="FLEXI_CUSTOMIZATIONS_PER_EMAIL" description="..." level="level3" />
+			<field name="" type="separator" default="FLEXI_CUSTOMIZATIONS_PER_EMAIL" description="..." level="level4" class="alert alert-info fcpadded" />
 			<field name="include_fullname" type="radio" default="1" label="FLEXI_INCLUDE_FULLNAME" description="FLEXI_INCLUDE_FULLNAME_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			
+
 		</fieldset>
 	</fields>
 	</config>
