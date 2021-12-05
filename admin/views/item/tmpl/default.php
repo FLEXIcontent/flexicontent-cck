@@ -60,15 +60,15 @@ $allowdisablingcomments   = (int) $this->params->get('allowdisablingcomments' . 
 $allow_owner_notify       = (int) $this->params->get('allow_owner_notify' . $CFGsfx, ($isSite ? 0 : 1));
 $allow_subscribers_notify = (int) $this->params->get('allow_subscribers_notify' . $CFGsfx, ($isSite ? 0 : 1));
 $disable_langs            = $this->params->get('disable_languages' . $CFGsfx, array());
-$usepublicationdetails    = (int) $this->params->get('usepublicationdetails' . $CFGsfx, ($isSite ? 1 : 2));
-$usemetadata              = (int) $this->params->get('usemetadata' . $CFGsfx, ($isSite ? 1 : 2));
-$useseoconf               = (int) $this->params->get('useseoconf' . $CFGsfx, ($isSite ? 0 : 1));
 
-$usedisplaydetails = (int) $this->params->get('usedisplaydetails' . $CFGsfx, ($isSite ? 1 : 2));
-$selecttheme       = (int) $this->params->get('selecttheme' . $CFGsfx, ($isSite ? 1 : 2));
+$usepublicationdetails = (int) $this->params->get('usepublicationdetails' . $CFGsfx, ($isSite ? 1 : 2));
+$usemetadata           = (int) $this->params->get('usemetadata' . $CFGsfx, ($isSite ? 1 : 2));
+$useseoconf            = (int) $this->params->get('useseoconf' . $CFGsfx, ($isSite ? 0 : 1));
+$usedisplaydetails     = (int) $this->params->get('usedisplaydetails' . $CFGsfx, ($isSite ? 1 : 2));
+$selecttheme           = (int) $this->params->get('selecttheme' . $CFGsfx, ($isSite ? 1 : 2));
+
 $permsplacement    = (int) $this->params->get('permsplacement' . $CFGsfx, 2);
 $versionsplacement = (int) $this->params->get('versionsplacement' . $CFGsfx, 2);
-
 $buttons_placement = (int) $this->params->get('buttons_placement' . $CFGsfx, 0);
 
 $task_items = 'task=items.';
@@ -651,6 +651,17 @@ $page_classes .= $isSite && $this->pageclass_sfx ? ' page'.$this->pageclass_sfx 
 					}
 				}
 			}
+
+			// Check if it is possible to hide the category selector
+			if ($usemaincat === 0 && empty($this->menuCats->cancatid) && !$this->row->id && !$this->params->get('catid_default'))
+			{
+				$usemaincat = 1;
+
+				$this->lists['catid'] = sprintf( $alert_box,
+					' style="margin: 2px 0px 6px 0px; display: inline-block;" ',
+					'error', '', JText::_('FLEXI_CANNOT_HIDE_MAINCAT_MISCONFIG_INFO')
+				) . '<br>' . $this->lists['catid'];
+			}
 			?>
 
 <?php if ($submit_msg || $approval_msg) : ?>
@@ -751,7 +762,7 @@ if ($usealias) : ob_start();  // alias ?>
 	</span>
 
 	<div class="container_fcfield container_fcfield_name_alias input-fcmax">
-	<?php	if ( isset($this->row->item_translations) ) :?>
+	<?php if ( isset($this->row->item_translations) ) :?>
 
 		<?php
 		array_push($tabSetStack, $tabSetCnt);
@@ -1226,6 +1237,8 @@ if ($this->fields && $typeid) :
 		$row_k = 0;
 
 		foreach ($this->fields as $field_name => $field) :
+			
+			$hide_ifempty = $field->formhidden==4 || $field->iscore || in_array($field->field_type, $hide_ifempty_fields);
 
 			if ($field->iscore && isset($tab_fields['fman'][$field->field_type]))
 			{
@@ -1240,13 +1253,14 @@ if ($this->fields && $typeid) :
 			}
 
 			elseif (
-				// SKIP frontend / backend hidden fields from this listing
-				($field->iscore && empty($field->html)) ||
-				$field->parameters->get($isSite ? 'frontend_hidden' : 'backend_hidden') ||
-				in_array($field->formhidden, array(2,3))   ||
 
 				// Skip hide-if-empty fields from this listing
-				( empty($field->html) && ($field->formhidden==4 || in_array($field->field_type, $hide_ifempty_fields)) )
+				( empty($field->html) && $hide_ifempty ) ||
+
+				// SKIP frontend / backend hidden fields from this listing
+				( $isSite && ($field->formhidden==1 || $field->formhidden==3 || $field->parameters->get('frontend_hidden')) ) ||
+				( !$isSite && ($field->formhidden==2 || $field->formhidden==3 || $field->parameters->get('backend_hidden')) )
+
 			) continue;
 
 			/**
@@ -1455,11 +1469,12 @@ if ($this->fields && $typeid) :
 			<?php echo sprintf( $alert_box, '', 'info', '', JText::_( 'FLEXI_CHOOSE_ITEM_TYPE' ) ); ?>
 		<?php else : // existing item that has no custom fields, warn the user ?>
 			<?php echo sprintf( $alert_box, '', 'info', '', JText::_( 'FLEXI_NO_FIELDS_TO_TYPE' ) ); ?>
-		<?php	endif; ?>
+		<?php endif; ?>
 
-<?php	endif;
+<?php endif;
 $captured['fields_manager'] = ob_get_clean();
-
+$captured['fields_manager'] .= implode('<div class="fcclear"></div>', $captured['fman']);
+unset($captured['fman']);
 
 
 
@@ -1836,7 +1851,7 @@ if ( $typeid && $usemetadata ) : ob_start(); // metadata ?>
 				<?php echo $this->form->getLabel('metadesc'); ?>
 			</div>
 			<div class="controls container_fcfield">
-				<?php	if ( isset($this->row->item_translations) ) : ?>
+				<?php if ( isset($this->row->item_translations) ) : ?>
 					<?php
 					array_push($tabSetStack, $tabSetCnt);
 					$tabSetCnt = ++$tabSetMax;
@@ -1877,7 +1892,7 @@ if ( $typeid && $usemetadata ) : ob_start(); // metadata ?>
 			</div>
 
 			<div class="controls container_fcfield">
-				<?php	if ( isset($this->row->item_translations) ) :?>
+				<?php if ( isset($this->row->item_translations) ) :?>
 					<?php
 					array_push($tabSetStack, $tabSetCnt);
 					$tabSetCnt = ++$tabSetMax;
@@ -1934,7 +1949,7 @@ if ( $typeid && $usemetadata ) : ob_start(); // metadata ?>
 				</div>
 			</div>
 
-			<?php	endif; ?>
+			<?php endif; ?>
 
 		<?php endforeach; ?>
 		<?php endif; ?>
@@ -1970,7 +1985,7 @@ if ($typeid && $useseoconf) : ob_start(); // seoconf ?>
 				</div>
 			</div>
 
-			<?php	endif; ?>
+			<?php endif; ?>
 
 		<?php endforeach; ?>
 	</fieldset>
@@ -2182,7 +2197,7 @@ endif; // end of template: layout_selection, layout_params
 
 
 
-	<?php if ($use_versioning && $this->perms['canversion'] && $versionsplacement !== 0) : ob_start() ?>
+	<?php if ($typeid && $use_versioning && $this->perms['canversion'] && $versionsplacement !== 0) : ob_start() ?>
 
 		<table class="" style="margin: 10px; width: auto; float: left;">
 			<tr>
@@ -2357,8 +2372,18 @@ if ( count($tab_fields['above']) ) : ?>
 
 	<?php foreach($tab_fields['above'] as $fn => $i) : ?>
 		<div class="fcclear"></div>
-		<?php echo $captured[$fn]; unset($captured[$fn]); ?>
-	<?php endforeach; ?>
+
+			<?php if (!is_array($captured[$fn])) :
+				echo $captured[$fn]; unset($captured[$fn]);
+			else:
+				foreach($captured[$fn] as $n => $html) : ?>
+					<div class="fcclear"></div>
+					<?php echo $html;
+				endforeach;
+				unset($captured[$fn]);
+			endif;
+		endforeach;
+		?>
 
 </div>
 <?php endif;
@@ -2390,8 +2415,18 @@ if ( count($tab_fields['tab01']) ) :
 
 		<?php foreach($tab_fields['tab01'] as $fn => $i) : ?>
 			<div class="fcclear"></div>
-			<?php echo $captured[$fn]; unset($captured[$fn]); ?>
-		<?php endforeach; ?>
+
+			<?php if (!is_array($captured[$fn])) :
+				echo $captured[$fn]; unset($captured[$fn]);
+			else:
+				foreach($captured[$fn] as $n => $html) : ?>
+					<div class="fcclear"></div>
+					<?php echo $html;
+				endforeach;
+				unset($captured[$fn]);
+			endif;
+		endforeach;
+		?>
 
 	</div>
 <?php endif;
@@ -2410,14 +2445,18 @@ if ( count($tab_fields['tab02']) ) :
 
 		<?php foreach($tab_fields['tab02'] as $fn => $i) : ?>
 			<div class="fcclear"></div>
-			<?php echo $captured[$fn]; unset($captured[$fn]); ?>
-		<?php endforeach; ?>
 
-		<?php foreach($captured['fman'] as $fn => $i) : ?>
-			<div class="fcclear"></div>
-			<?php echo $captured['fman'][$fn]; unset($captured['fman'][$fn]); ?>
-		<?php endforeach; ?>
-		<?php unset($captured['fman']); ?>
+			<?php if (!is_array($captured[$fn])) :
+				echo $captured[$fn]; unset($captured[$fn]);
+			else:
+				foreach($captured[$fn] as $n => $html) : ?>
+					<div class="fcclear"></div>
+					<?php echo $html;
+				endforeach;
+				unset($captured[$fn]);
+			endif;
+		endforeach;
+		?>
 
 	</div>
 <?php endif;
@@ -2487,8 +2526,18 @@ if ( count($tab_fields['tab03']) ) :
 
 		<?php foreach($tab_fields['tab03'] as $fn => $i) : ?>
 			<div class="fcclear"></div>
-			<?php echo $captured[$fn]; unset($captured[$fn]); ?>
-		<?php endforeach; ?>
+
+			<?php if (!is_array($captured[$fn])) :
+				echo $captured[$fn]; unset($captured[$fn]);
+			else:
+				foreach($captured[$fn] as $n => $html) : ?>
+					<div class="fcclear"></div>
+					<?php echo $html;
+				endforeach;
+				unset($captured[$fn]);
+			endif;
+		endforeach;
+		?>
 
 	</div>
 <?php endif;
@@ -2538,168 +2587,212 @@ foreach ($fieldSets as $name => $fieldSet) :
 
 </div> <!-- end tab -->
 
-<?php endforeach;
+<?php endforeach; ?>
 
 
-if ($typeid) : // hide items parameters (standard, extended, template) if content type is not selected ?>
 
+<?php
+
+// ***
+// *** PUBLISHING TAB
+// ***
+// J2.5 requires Edit State privilege while J1.5 requires Edit privilege
+if ( count($tab_fields['tab04']) ) : ?>
 	<?php
+	$tab_lbl = isset($tab_titles['tab04']) ? $tab_titles['tab04'] : JText::_( 'FLEXI_PUBLISHING' );
+	$tab_ico = isset($tab_icocss['tab04']) ? $tab_icocss['tab04'] : 'icon-calendar';
+	?>
+	<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" data-icon-class="<?php echo $tab_ico; ?>">
+		<h3 class="tabberheading"> <?php echo $tab_lbl; ?> </h3>
 
-	// ***
-	// *** PUBLISHING TAB
-	// ***
-	// J2.5 requires Edit State privilege while J1.5 requires Edit privilege
-	if ( count($tab_fields['tab04']) ) : ?>
-		<?php
-		$tab_lbl = isset($tab_titles['tab04']) ? $tab_titles['tab04'] : JText::_( 'FLEXI_PUBLISHING' );
-		$tab_ico = isset($tab_icocss['tab04']) ? $tab_icocss['tab04'] : 'icon-calendar';
-		?>
-		<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" data-icon-class="<?php echo $tab_ico; ?>">
-			<h3 class="tabberheading"> <?php echo $tab_lbl; ?> </h3>
+		<?php foreach($tab_fields['tab04'] as $fn => $i) : ?>
+			<div class="fcclear"></div>
 
-			<fieldset class="flexi_params fc_edit_container_full">
-			<?php foreach($tab_fields['tab04'] as $fn => $i) : ?>
-				<div class="fcclear"></div>
-				<?php echo $captured[$fn]; unset($captured[$fn]); ?>
-			<?php endforeach; ?>
-			</fieldset>
-
-		</div> <!-- end tab -->
-
-	<?php endif;
-
-
-
-	// ***
-	// *** META / SEO TAB
-	// ***
-	if ( count($tab_fields['tab05']) ) : ?>
-		<?php
-		$tab_lbl = isset($tab_titles['tab05']) ? $tab_titles['tab05'] : JText::_( 'FLEXI_META_SEO' );
-		$tab_ico = isset($tab_icocss['tab05']) ? $tab_icocss['tab05'] : 'icon-bookmark';
-		?>
-		<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" data-icon-class="<?php echo $tab_ico; ?>" >
-			<h3 class="tabberheading"> <?php echo $tab_lbl; ?> </h3>
-
-			<?php foreach($tab_fields['tab05'] as $fn => $i) : ?>
-				<div class="fcclear"></div>
-				<?php echo $captured[$fn]; unset($captured[$fn]); ?>
-			<?php endforeach; ?>
-
-		</div> <!-- end tab -->
-	<?php endif;
-
-
-
-
-	// ***
-	// *** DISPLAYING PARAMETERS TAB
-	// ***
-	if ( count($tab_fields['tab06']) ) : ?>
-		<?php
-		$tab_lbl = isset($tab_titles['tab06']) ? $tab_titles['tab06'] : JText::_( 'FLEXI_DISPLAYING' );
-		$tab_ico = isset($tab_icocss['tab06']) ? $tab_icocss['tab06'] : 'icon-eye-open';
-		?>
-		<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" data-icon-class="<?php echo $tab_ico; ?>">
-			<h3 class="tabberheading"> <?php echo $tab_lbl; ?> </h3>
-
-			<?php foreach($tab_fields['tab06'] as $fn => $i) : ?>
-				<div class="fcclear"></div>
-				<?php echo $captured[$fn]; unset($captured[$fn]); ?>
-			<?php endforeach; ?>
-
-		</div>
-	<?php endif;
-
-
-
-	// ***
-	// *** JOOMLA IMAGE/URLS TAB
-	// ***
-	if ( count($FC_jfields_html) ) : ?>
-		<?php
-			if (isset($FC_jfields_html['images']) && isset($FC_jfields_html['urls'])) {
-				$fsetname = 'FLEXI_COM_CONTENT_IMAGES_AND_URLS';
-				$fseticon = 'icon-pencil-2';
-			} else if (isset($FC_jfields_html['images'])) {
-				$fsetname = 'FLEXI_IMAGES';
-				$fseticon = 'icon-images';
-			} else if (isset($FC_jfields_html['urls'])) {
-				$fsetname = 'FLEXI_LINKS';
-				$fseticon = 'icon-link';
-			} else {
-				$fsetname = 'FLEXI_COMPATIBILITY';
-				$fseticon = 'icon-pencil-2';
-			}
-		?>
-		<!-- Joomla images/urls tab -->
-		<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" data-icon-class="<?php echo $fseticon; ?>">
-			<h3 class="tabberheading"> <?php echo JText::_($fsetname); ?> </h3>
-
-			<?php foreach ($FC_jfields_html as $fields_grp_name => $_html) : ?>
-			<fieldset class="flexi_params fc_tabset_inner">
-				<div class="alert alert-info" style="width: 50%;"><?php echo JText::_('FLEXI_'.strtoupper($fields_grp_name).'_COMP'); ?></div>
-				<?php echo $_html; ?>
-			</fieldset>
-			<?php endforeach; ?>
-
-		</div>
-	<?php endif;
-
-
-
-	// ***
-	// *** TEMPLATE TAB
-	// ***
-	if ( count($tab_fields['tab07']) ) : ?>
-		<?php
-		$tab_lbl = isset($tab_titles['tab07']) ? $tab_titles['tab07'] : JText::_( 'FLEXI_TEMPLATE' );
-		$tab_ico = isset($tab_icocss['tab07']) ? $tab_icocss['tab07'] : 'icon-palette';
-		?>
-		<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" data-icon-class="<?php echo $tab_ico; ?>">
-			<h3 class="tabberheading"> <?php echo $tab_lbl; ?> </h3>
-
-			<fieldset class="flexi_params fc_edit_container_full">
-
-				<?php foreach($tab_fields['tab07'] as $fn => $i) : ?>
+			<?php if (!is_array($captured[$fn])) :
+				echo $captured[$fn]; unset($captured[$fn]);
+			else:
+				foreach($captured[$fn] as $n => $html) : ?>
 					<div class="fcclear"></div>
-					<?php echo $captured[$fn]; unset($captured[$fn]); ?>
-				<?php endforeach; ?>
-
-			</fieldset>
-
-		</div> <!-- end tab -->
-
-	<?php endif;
-
-
-
-	// ***
-	// *** Versions TAB
-	// ***
-	if ( count($tab_fields['tab08']) ) : ?>
-		<?php
-		$tab_lbl = isset($tab_titles['tab08']) ? $tab_titles['tab08'] : JText::_( 'FLEXI_VERSIONS' );
-		$tab_ico = isset($tab_icocss['tab08']) ? $tab_icocss['tab08'] : 'icon-stack';
+					<?php echo $html;
+				endforeach;
+				unset($captured[$fn]);
+			endif;
+		endforeach;
 		?>
-		<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" data-icon-class="<?php echo $tab_ico; ?>">
-			<h3 class="tabberheading"> <?php echo $tab_lbl; ?> </h3>
 
-			<fieldset class="flexi_params fc_edit_container_full">
+	</div> <!-- end tab -->
 
-				<?php foreach($tab_fields['tab08'] as $fn => $i) : ?>
+<?php endif;
+
+
+
+// ***
+// *** META / SEO TAB
+// ***
+if ( count($tab_fields['tab05']) ) : ?>
+	<?php
+	$tab_lbl = isset($tab_titles['tab05']) ? $tab_titles['tab05'] : JText::_( 'FLEXI_META_SEO' );
+	$tab_ico = isset($tab_icocss['tab05']) ? $tab_icocss['tab05'] : 'icon-bookmark';
+	?>
+	<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" data-icon-class="<?php echo $tab_ico; ?>" >
+		<h3 class="tabberheading"> <?php echo $tab_lbl; ?> </h3>
+
+		<?php foreach($tab_fields['tab05'] as $fn => $i) : ?>
+			<div class="fcclear"></div>
+
+			<?php if (!is_array($captured[$fn])) :
+				echo $captured[$fn]; unset($captured[$fn]);
+			else:
+				foreach($captured[$fn] as $n => $html) : ?>
 					<div class="fcclear"></div>
-					<?php echo $captured[$fn]; unset($captured[$fn]); ?>
-				<?php endforeach; ?>
+					<?php echo $html;
+				endforeach;
+				unset($captured[$fn]);
+			endif;
+		endforeach;
+		?>
 
-			</fieldset>
+	</div> <!-- end tab -->
+<?php endif;
 
-		</div> <!-- end tab -->
 
-	<?php endif; ?>
 
-<?php	endif; // end of existing item:  if ($typeid) ?>
 
+// ***
+// *** DISPLAYING PARAMETERS TAB
+// ***
+if ( count($tab_fields['tab06']) ) : ?>
+	<?php
+	$tab_lbl = isset($tab_titles['tab06']) ? $tab_titles['tab06'] : JText::_( 'FLEXI_DISPLAYING' );
+	$tab_ico = isset($tab_icocss['tab06']) ? $tab_icocss['tab06'] : 'icon-eye-open';
+	?>
+	<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" data-icon-class="<?php echo $tab_ico; ?>">
+		<h3 class="tabberheading"> <?php echo $tab_lbl; ?> </h3>
+
+		<?php foreach($tab_fields['tab06'] as $fn => $i) : ?>
+			<div class="fcclear"></div>
+
+			<?php if (!is_array($captured[$fn])) :
+				echo $captured[$fn]; unset($captured[$fn]);
+			else:
+				foreach($captured[$fn] as $n => $html) : ?>
+					<div class="fcclear"></div>
+					<?php echo $html;
+				endforeach;
+				unset($captured[$fn]);
+			endif;
+		endforeach;
+		?>
+
+	</div>
+<?php endif;
+
+
+
+// ***
+// *** JOOMLA IMAGE/URLS TAB
+// ***
+if ( count($FC_jfields_html) ) : ?>
+	<?php
+		if (isset($FC_jfields_html['images']) && isset($FC_jfields_html['urls'])) {
+			$fsetname = 'FLEXI_COM_CONTENT_IMAGES_AND_URLS';
+			$fseticon = 'icon-pencil-2';
+		} else if (isset($FC_jfields_html['images'])) {
+			$fsetname = 'FLEXI_IMAGES';
+			$fseticon = 'icon-images';
+		} else if (isset($FC_jfields_html['urls'])) {
+			$fsetname = 'FLEXI_LINKS';
+			$fseticon = 'icon-link';
+		} else {
+			$fsetname = 'FLEXI_COMPATIBILITY';
+			$fseticon = 'icon-pencil-2';
+		}
+	?>
+	<!-- Joomla images/urls tab -->
+	<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" data-icon-class="<?php echo $fseticon; ?>">
+		<h3 class="tabberheading"> <?php echo JText::_($fsetname); ?> </h3>
+
+		<?php foreach ($FC_jfields_html as $fields_grp_name => $_html) : ?>
+		<fieldset class="flexi_params fc_tabset_inner">
+			<div class="alert alert-info" style="width: 50%;"><?php echo JText::_('FLEXI_'.strtoupper($fields_grp_name).'_COMP'); ?></div>
+			<?php echo $_html; ?>
+		</fieldset>
+		<?php endforeach; ?>
+
+	</div>
+<?php endif;
+
+
+
+// ***
+// *** TEMPLATE TAB
+// ***
+if ( count($tab_fields['tab07']) ) : ?>
+	<?php
+	$tab_lbl = isset($tab_titles['tab07']) ? $tab_titles['tab07'] : JText::_( 'FLEXI_TEMPLATE' );
+	$tab_ico = isset($tab_icocss['tab07']) ? $tab_icocss['tab07'] : 'icon-palette';
+	?>
+	<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" data-icon-class="<?php echo $tab_ico; ?>">
+		<h3 class="tabberheading"> <?php echo $tab_lbl; ?> </h3>
+
+		<fieldset class="flexi_params fc_edit_container_full">
+
+		<?php foreach($tab_fields['tab07'] as $fn => $i) : ?>
+			<div class="fcclear"></div>
+
+			<?php if (!is_array($captured[$fn])) :
+				echo $captured[$fn]; unset($captured[$fn]);
+			else:
+				foreach($captured[$fn] as $n => $html) : ?>
+					<div class="fcclear"></div>
+					<?php echo $html;
+				endforeach;
+				unset($captured[$fn]);
+			endif;
+		endforeach;
+		?>
+
+		</fieldset>
+
+	</div> <!-- end tab -->
+
+<?php endif;
+
+
+
+// ***
+// *** Versions TAB
+// ***
+if ( count($tab_fields['tab08']) ) : ?>
+	<?php
+	$tab_lbl = isset($tab_titles['tab08']) ? $tab_titles['tab08'] : JText::_( 'FLEXI_VERSIONS' );
+	$tab_ico = isset($tab_icocss['tab08']) ? $tab_icocss['tab08'] : 'icon-stack';
+	?>
+	<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" data-icon-class="<?php echo $tab_ico; ?>">
+		<h3 class="tabberheading"> <?php echo $tab_lbl; ?> </h3>
+
+		<fieldset class="flexi_params fc_edit_container_full">
+
+		<?php foreach($tab_fields['tab08'] as $fn => $i) : ?>
+			<div class="fcclear"></div>
+
+			<?php if (!is_array($captured[$fn])) :
+				echo $captured[$fn]; unset($captured[$fn]);
+			else:
+				foreach($captured[$fn] as $n => $html) : ?>
+					<div class="fcclear"></div>
+					<?php echo $html;
+				endforeach;
+				unset($captured[$fn]);
+			endif;
+		endforeach;
+		?>
+
+		</fieldset>
+
+	</div> <!-- end tab -->
+
+<?php endif; ?>
 
 
 
@@ -2724,14 +2817,34 @@ if ( count($tab_fields['below']) || count($captured) ) : ?>
 
 	<?php foreach($tab_fields['below'] as $fn => $i) : ?>
 		<div class="fcclear"></div>
-		<?php echo $captured[$fn]; unset($captured[$fn]); ?>
-	<?php endforeach; ?>
+
+		<?php if (!is_array($captured[$fn])) :
+			echo $captured[$fn]; unset($captured[$fn]);
+		else:
+			foreach($captured[$fn] as $n => $html) : ?>
+				<div class="fcclear"></div>
+				<?php echo $html;
+			endforeach;
+			unset($captured[$fn]);
+		endif;
+	endforeach;
+	?>
 
 	<?php /* ALSO print any fields that were not placed above, this list may contain fields zero-length HTML which is OK */ ?>
 	<?php foreach($captured as $fn => $i) : ?>
 		<div class="fcclear"></div>
-		<?php echo $captured[$fn]; unset($captured[$fn]); ?>
-	<?php endforeach; ?>
+
+		<?php if (!is_array($captured[$fn])) :
+			echo $captured[$fn]; unset($captured[$fn]);
+		else:
+			foreach($captured[$fn] as $n => $html) : ?>
+				<div class="fcclear"></div>
+				<?php echo $html;
+			endforeach;
+			unset($captured[$fn]);
+		endif;
+	endforeach;
+	?>
 
 </div>
 <?php endif;
@@ -2757,12 +2870,13 @@ if ( count($tab_fields['below']) || count($captured) ) : ?>
 		<?php echo $this->form->getInput('id');?>
 		<?php echo $this->form->getInput('hits'); ?>
 
-		<?php if ($isSite) : ?>
-			<input type="hidden" name="referer" value="<?php echo htmlspecialchars($this->referer, ENT_COMPAT, 'UTF-8'); ?>" />
-			<?php if ($isnew && $typeid) : ?>
-				<input type="hidden" name="jform[type_id]" value="<?php echo $typeid; ?>" />
-			<?php endif;?>
+		<?php if ( $isnew && $typeid ) : ?>
+			<input type="hidden" name="jform[type_id]" value="<?php echo $typeid; ?>" />
+		<?php endif;?>
 
+		<input type="hidden" name="referer" value="<?php echo htmlspecialchars($this->referer, ENT_COMPAT, 'UTF-8'); ?>" />
+
+		<?php if ($isSite) : ?>
 			<?php if ($isnew) echo $this->submitConf; ?>
 		<?php endif; ?>
 

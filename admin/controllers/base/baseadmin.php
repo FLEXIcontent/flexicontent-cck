@@ -1129,34 +1129,49 @@ class FlexicontentControllerBaseAdmin extends FlexicontentController
 	{
 		$this->input->get('task', '', 'cmd') !== __FUNCTION__ or die(__FUNCTION__ . ' : direct call not allowed');
 
-		// Get HTTP request variable 'return' (base64 encoded)
+		$app = JFactory::getApplication();
+
+		// Try 'return' from the GET / POST data (base64 encoded)
 		$return = $this->input->get('return', null, 'base64');
 
-		// Base64 decode the return URL
 		if ($return)
 		{
 			$return = base64_decode($return);
 		}
 
-		// Also try 'referer' (form posted, encode with htmlspecialchars)
 		else
 		{
+			// Try 'referer' from the GET / POST data (htmlspecialchars encoded)
 			$referer = $this->input->getString('referer', null);
-			$return = $referer ? htmlspecialchars_decode($referer) : null;
+
+			if ($referer)
+			{
+				$referer = htmlspecialchars_decode($referer);
+			}
+
+			// Try WEB SERVER variable 'HTTP_REFERER'
+			else
+			{
+				$referer = null;
+				// Wrong redirection in some cases, since it redirects to the form itself after saving more than once
+				/*$referer = !empty($_SERVER['HTTP_REFERER']) && flexicontent_html::is_safe_url($_SERVER['HTTP_REFERER'])
+					? $_SERVER['HTTP_REFERER']
+					: JUri::base();*/
+			}
+
+			$return = $referer;
 		}
 
 		// Check return URL if empty or not safe and set a default one
 		if (!$return || !flexicontent_html::is_safe_url($return))
 		{
-			$app = JFactory::getApplication();
-
 			if ($app->isClient('administrator') && ($this->view === $this->record_name || $this->view === $this->record_name_pl))
 			{
 				$return = 'index.php?option=com_flexicontent&view=' . $this->record_name_pl;
 			}
 			else
 			{
-				$return = null; //$app->isClient('administrator') ? 'index.php?option=com_flexicontent' : JUri::base();
+				$return = $app->isClient('administrator') ? null : JUri::base();
 			}
 		}
 

@@ -96,9 +96,10 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		$db         = JFactory::getDbo();
 		$uri        = JUri::getInstance();
 		$task       = $jinput->getCmd('task');
+		$cparams    = JComponentHelper::getParams('com_flexicontent');
 		$isAdmin    = $app->isClient('administrator');
 		$isSite     = $app->isClient('site');
-		$cparams    = JComponentHelper::getParams('com_flexicontent');
+		$CFGsfx     = $isSite ? '_fe' : '_be';
 
 		// Get url vars and some constants
 		$option     = $jinput->get('option', '', 'cmd');
@@ -295,9 +296,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		 * also (frontend) load Template-Specific language file to override or add new language
 		 */
 
-		$uselang = $isSite
-			? $page_params->get('uselang_fe') == 1
-			: true;
+		$uselang = (int) $page_params->get('uselang' . $CFGsfx, 1);
 
 		$langAssocs = $useAssocs && $uselang
 			? $model->getLangAssocs()
@@ -1447,8 +1446,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		// ***
 		// *** Build disable comments selector
 		// ***
-
-		if ($isSite && $page_params->get('allowdisablingcomments_fe'))
+		if ( (int) $page_params->get('allowdisablingcomments' . $CFGsfx, ($isSite ? 0 : 1)) )
 		{
 			// Set to zero if disabled or to "" (aka use default) for any other value.  THIS WILL FORCE comment field use default Global/Category/Content Type setting or disable it,
 			// thus a per item commenting system cannot be selected. This is OK because it makes sense to have a different commenting system per CONTENT TYPE by not per Content Item
@@ -1498,12 +1496,12 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		if ($isSite)
 		{
 			// Find globaly or per content type disabled languages
-			$disable_langs = $page_params->get('disable_languages_fe', array());
+			$disable_langs = $page_params->get('disable_languages' . $CFGsfx, array());
 
-			$langdisplay = $page_params->get('langdisplay_fe', 2);
+			$langdisplay = $page_params->get('langdisplay' . $CFGsfx, 2);
 			$langconf = array();
-			$langconf['flags'] = $page_params->get('langdisplay_flags_fe', 1);
-			$langconf['texts'] = $page_params->get('langdisplay_texts_fe', 1);
+			$langconf['flags'] = $page_params->get('langdisplay_flags' . $CFGsfx, 1);
+			$langconf['texts'] = $page_params->get('langdisplay_texts' . $CFGsfx, 1);
 			$field_attribs = $langdisplay==2 ? 'class="use_select2_lib"' : '';
 			$lists['languages'] = flexicontent_html::buildlanguageslist( 'jform[language]', $field_attribs, $item->language, $langdisplay, $allowed_langs, $published_only=1, $disable_langs, $add_all=true, $langconf);
 		}
@@ -1828,7 +1826,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 
 		$has_pro = JPluginHelper::isEnabled($extfolder = 'system', $extname = 'flexisyspro');
 
-		if ($has_pro)
+		if ($has_pro && $item->id)
 		{
 			$status = 'width=700,height=360,menubar=yes,resizable=yes';
 			$btn_title = JText::_('FLEXI_COLLABORATE_EMAIL_ABOUT_THIS_ITEM');
@@ -2598,25 +2596,25 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		$app         = JFactory::getApplication();
 		$this->input = $app->input;
 
-		// Get HTTP request variable 'return' (base64 encoded)
+		// Try 'return' from the GET / POST data (base64 encoded)
 		$return = $this->input->get('return', null, 'base64');
 
-		// Base64 decode the return URL
 		if ($return)
 		{
 			$return = base64_decode($return);
 		}
 
-		// Also try 'referer' (form posted, encode with htmlspecialchars)
 		else
 		{
+			// Try 'referer' from the GET / POST data (htmlspecialchars encoded)
 			$referer = $this->input->getString('referer', null);
 
-			// Get referer URL from HTTP request and validate it
 			if ($referer)
 			{
 				$referer = htmlspecialchars_decode($referer);
 			}
+
+			// Try WEB SERVER variable 'HTTP_REFERER'
 			else
 			{
 				$referer = !empty($_SERVER['HTTP_REFERER']) && flexicontent_html::is_safe_url($_SERVER['HTTP_REFERER'])
@@ -2630,15 +2628,13 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		// Check return URL if empty or not safe and set a default one
 		if (!$return || !flexicontent_html::is_safe_url($return))
 		{
-			$app = JFactory::getApplication();
-
 			if ($app->isClient('administrator') && ($this->view === $this->record_name || $this->view === $this->record_name_pl))
 			{
 				$return = 'index.php?option=com_flexicontent&view=' . $this->record_name_pl;
 			}
 			else
 			{
-				$return = $app->isClient('administrator') ? false : JUri::base();
+				$return = $app->isClient('administrator') ? null : JUri::base();
 			}
 		}
 

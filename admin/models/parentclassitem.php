@@ -2234,6 +2234,7 @@ class ParentClassItem extends FCModelAdmin
 
 			/**
 			 * SECURITY concern: Check form tampering of allowed languages
+			 * NOTE: hiding language is checked by controller
 			 */
 
 			$authorparams = flexicontent_db::getUserConfig($user->get('id'));
@@ -2250,14 +2251,6 @@ class ParentClassItem extends FCModelAdmin
 				$app->enqueueMessage('You are not allowed to assign language: '.$data['language'].' to Content Items', 'warning');
 				unset($data['language']);
 				if ($isNew) return false;
-			}
-
-			$uselang = $cparams->get('uselang' . $CFGsfx, 1);
-			if (!in_array($uselang, array(1,3)) && isset($data['language']))
-			{
-				$app->enqueueMessage('Language was set automatically to default value', 'info');
-				unset($data['language']);
-				//if ($isNew) return false;
 			}
 		}
 

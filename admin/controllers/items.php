@@ -129,9 +129,11 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		$config  = JFactory::getConfig();
 		$session = JFactory::getSession();
 		$perms   = FlexicontentHelperPerm::getPerm();
-		$CFGsfx  = $app->isClient('site') ? '_fe' : '_be';
+		$isSite  = $app->isClient('site');
 
-		$ctrl_task = $app->isClient('site')
+		$CFGsfx  = $isSite ? '_fe' : '_be';
+
+		$ctrl_task = $isSite
 			? 'task='
 			: 'task=' . $this->record_name_pl . '.';
 		$original_task = $this->task;
@@ -153,38 +155,71 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 
 		// Get the model
 		$model = $this->getModel($this->record_name);
-		$model->setId($data['id']);  // Make sure id is correct
-		$model->getState();   // Populate state
-		$record = $model->getItem($data['id'], $check_view_access = false, $no_cache = true, $force_version = 0);
 
-		// Make sure type is set into the given data, using type from model, if one was not given
-		$data['type_id'] = empty($data['type_id'])
-			? $model->get('type_id')
-			: (int) $data['type_id'];
+		// Make sure is is correct and then populate state
+		$model->setId($data['id']);
+		$model->getState();
+
+		// Load the record
+		$record = $model->getItem($data['id'], $check_view_access = false, $no_cache = true, $force_version = 0);
 
 
 		/**
-		 * Always Set frontend record form as default return URL
+		 * Check if user can change item type, and other fields. Get component + type parameters
+		 * ignoring modified type for existing and only using it for new items
+		 * Note: Providing $force_type_id is not really needed, as the model should do it anyway
 		 */
-		/*
-		if ($app->isClient('site'))
-		{
-			$Itemid = $this->input->get('Itemid', 0, 'int');  // Maintain current menu item if this was given
+		$force_type_id = !$isnew ? $model->get('type_id') : (int) $data['type_id'];
+		$params = new JRegistry( $model->getComponentTypeParams($force_type_id) );
 
-			if (!$isnew)
-			{
-				$item_url = JRoute::_(FlexicontentHelperRoute::getItemRoute($record->slug, $record->categoryslug, $Itemid));
-				$this->returnURL = $item_url . ( strstr($item_url, '?') ? '&' : '?' ) . 'task=edit';
-			}
-			elseif ($Itemid)
-			{
-				$this->returnURL = JRoute::_('index.php?Itemid=' . $Itemid);
-			}
-		}
-		*/
+		if (! (int) $params->get('usetitle' . $CFGsfx, 1))
+			unset($data['title']);
+
+		if (! (int) $params->get('usealias' . $CFGsfx, 1))
+			unset($data['alias']);
+
+		if (! in_array((int) $params->get('uselang' . $CFGsfx, 1), array(1,2)))
+			unset($data['language']);
+
+		if (! (int) $params->get('useaccess' . $CFGsfx, 1))
+			unset($data['access']);
+
+		/**
+		 * Note: unsetting 'type_id' for new items is always off because it is meaningless
+		 * Unsetting type_id has an effect for existing items only
+		 * For new items model will use $data['type_id'] as default value if this is posted
+		 * and if default category is not configured for this type then a validation error will occur bellow
+		 */
+		if (!$isnew && ! (int) $params->get('usetype' . $CFGsfx, ($isSite ? 0 : 1)))
+			unset($data['type_id']);
+
+		/**
+		 * Note: unsetting 'catid' for new items will cause a validation error will occur below
+		 * this will happen if a default category is not configured for current item type
+		 */
+		if (! (int) $params->get('usemaincat' . $CFGsfx, 1))
+			unset($data['catid']);
+
+		/**
+		 * Due to legacy configuration, hidding main description text is done via a single parameter instead of 2 like the others above
+		 */
+		$hide = (int) $params->get('hide_maintext', 0);
+		if ($hide === 1 || ($hide === 2 && $isSite) || ($hide === 3 && !$isSite))
+			unset($data['text']);
 
 
-		// The save2copy task needs to be handled slightly differently.
+		/**
+		 * Make sure type is set into the given data,
+		 * And if type was not given, use the type from model
+		 * Then get AGAIN the component + type parameters
+		 */
+		$data['type_id'] = empty($data['type_id']) ? $model->get('type_id') : (int) $data['type_id'];
+		$params = new JRegistry( $model->getComponentTypeParams($data['type_id']) );
+
+
+		/**
+		 * Task save2copy needs to be handled slightly differently.
+		 */
 		if ($this->task === 'save2copy')
 		{
 			// Check-in the original row.
@@ -231,15 +266,9 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 			$this->task = 'apply';
 		}
 
-		// Get merged parameters: component, type, and (FE only) menu
-		// We will force using new type_id only for the purpose of getting type parameters
-		// Below a check will be made if this type is allowed to the user
-		$params = new JRegistry;
-		$model_params = $model->getComponentTypeParams($data['type_id']);
-		$params->merge($model_params);
 
 		// For frontend merge the active menu parameters
-		if ($app->isClient('site'))
+		if ($isSite)
 		{
 			$menu = $app->getMenu()->getActive();
 
@@ -313,7 +342,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		 */
 
 		// No permission to change tags or tags were not displayed
-		$tags_shown = $app->isClient('site')
+		$tags_shown = $isSite
 			? (int) $params->get('usetags_fe', 1) === 1
 			: true;
 
@@ -337,7 +366,6 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 
 		$canchange_featcat = $perms->MultiCat && $CanChangeFeatCat;
 		$canchange_seccat  = $perms->MultiCat && $CanChangeSecCat;
-		$enable_catid_selector = ($isnew && !$params->get('catid_default')) || (!$isnew && !$model->get('catid')); // || $CanChangeCat;
 
 		// Enforce featured categories if user is not allowed to changed
 		$featured_cats_parent = $params->get('featured_cats_parent', 0);
@@ -367,14 +395,15 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 
 		/**
 		 * Enforce maintaining secondary categories if user is not allowed to change / set secondary cats
-		 * or (FE only) if these were not submitted
-		 * *** NOTE *** this DOES NOT ENFORCE SUBMIT MENU category configuration, this is done later by the model store()
+		 * NOTE: This DOES NOT ENFORCE SUBMIT MENU category configuration, this is done later by the model store()
 		 */
 
 		$show_seccats = (int) $params->get('show_seccats' . $CFGsfx, 2);
 
-		if (!$canchange_seccat || (empty($overridecatperms) && !$show_seccats))
+		if ((!$canchange_seccat && $show_seccats > 0) || $show_seccats === 2)
 		{
+			unset($data['cid']);
+
 			// For new item use default secondary categories from type configuration
 			if ($isnew)
 			{
@@ -404,21 +433,11 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 
 		/**
 		 * Enforce maintaining main category if user is not allowed to change / set main category
-		 * or (FE only) if this was not submitted
-		 * *** NOTE *** this DOES NOT ENFORCE SUBMIT MENU category configuration, this is done later by the model store()
+		 * NOTE: This DOES NOT ENFORCE SUBMIT MENU category configuration, this is done later by the model store()
+		 * NOTE: data['catid'] has already been unset above in case that field is set to be hidden
 		 */
 
-
-		$hide_maintext = (int) $params->get('hide_maintext', 0);
-
-		if (!$canchange_seccat || (empty($overridecatperms) && !$show_seccats))
-
-
-
-		// (FE) No category override active, and no main category was submitted
-		$catid_not_submitted = empty($data['catid']);
-
-		if (!$enable_catid_selector && $catid_not_submitted)
+		if (!$CanChangeCat || empty($data['catid']))
 		{
 			// For new item use default main category from type configuration
 			if ($isnew && $params->get('catid_default'))
@@ -452,7 +471,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		/**
 		 * Check custom-injected (non-JForm field) (frontend) captcha field
 		 */
-		if ($app->isClient('site'))
+		if ($isSite)
 		{
 			$use_captcha    = $params->get('use_captcha', 1);     // 1 for guests, 2 for any user
 			$captcha_formop = $params->get('captcha_formop', 0);  // 0 for submit, 1 for submit/edit (aka always)
@@ -630,7 +649,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		}
 
 		// Special CASEs of overriding CREATE ACL in FrontEnd via menu item
-		elseif ($app->isClient('site'))
+		elseif ($isSite)
 		{
 			// Allow creating via submit menu OVERRIDE
 			if ($allowunauthorize)
@@ -833,7 +852,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		/**
 		 * Track category changes and nullify return URL
 		 */
-		if ($app->isClient('site'))
+		if ($isSite)
 		{
 			$cats_changed = $session->get('cats_changed', array(), 'flexicontent');
 
@@ -1070,7 +1089,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		/**
 		 * Check if Content Item is being closed, and clear some flags, like cats_changed
 		 */
-		if ($app->isClient('site'))
+		if ($isSite)
 		{
 			if (!in_array($this->task, array('apply', 'apply_type')))
 			{
@@ -1092,7 +1111,8 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		 * Saving is done, decide where to redirect
 		 */
 
-		$msg = JText::_('FLEXI_' . $this->_NAME . '_SAVED');
+		$msg  = JText::_('FLEXI_' . $this->_NAME . '_SAVED');
+		$tmpl = $this->input->getCmd('tmpl');
 
 		switch ($this->task)
 		{
@@ -1101,7 +1121,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 			case 'apply_type':
 				if ($app->isClient('administrator'))
 				{
-					$link = 'index.php?option=com_flexicontent&' . $ctrl_task . 'edit&view=' . $this->record_name . '&id=' . (int) $model->get('id');
+					$link = 'index.php?option=com_flexicontent&' . $ctrl_task . 'edit&view=' . $this->record_name . '&id=' . (int) $model->get('id') . ($tmpl ? '&tmpl=' . $tmpl : '');
 				}
 				else
 				{
@@ -1112,7 +1132,8 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 					// Set task to 'edit', and pass original referer back to avoid making the form itself the referer, but also check that it is safe enough
 					$link = $item_url
 						. ( strstr($item_url, '?') ? '&' : '?' ) . 'task=edit'
-						. '&return='.base64_encode($this->returnURL ?: $item_url);
+						. '&return='.base64_encode($this->returnURL ?: $item_url)
+						. ($tmpl ? '&tmpl=' . $tmpl : '');
 				}
 				break;
 
@@ -1122,7 +1143,8 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 				{
 					$link = 'index.php?option=com_flexicontent&view=' . $this->record_name
 						. '&typeid=' . $model->get('type_id')
-						. '&filter_cats=' . $model->get('catid');
+						. '&filter_cats=' . $model->get('catid')
+						. ($tmpl ? '&tmpl=' . $tmpl : '');
 				}
 				else
 				{
@@ -1132,7 +1154,8 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 						. '&typeid=' . $model->get('type_id')
 						. '&maincat=' . $model->get('catid')
 						. '&Itemid=' . $Itemid
-						. '&return='.base64_encode($this->returnURL ?: $item_url);
+						. '&return='.base64_encode($this->returnURL ?: $item_url)
+						. ($tmpl ? '&tmpl=' . $tmpl : '');
 
 					// Set task to 'edit', and pass original referer back to avoid making the form itself the referer, but also check that it is safe enough
 					$link = JRoute::_($item_url, false);
@@ -1156,7 +1179,8 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 				elseif ($this->task === 'save_a_preview')
 				{
 					// Do not use SLUG !!! since we maybe previewing a non-current version !!
-					$link = JRoute::_(FlexicontentHelperRoute::getItemRoute($model->get('id') . ':' . $model->get('alias'), $model->get('catid'), 0, $item) . '&amp;preview=1', false);
+					$item_url = FlexicontentHelperRoute::getItemRoute($model->get('id') . ':' . $model->get('alias'), $model->get('catid'), 0, $item);
+					$link = JRoute::_($item_url . ($tmpl ? '&tmpl=' . $tmpl : '') . '&preview=1', false);
 				}
 
 				// REDIRECT CASE: Return to the form 's original referer after item saving
@@ -1166,8 +1190,8 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 						? JText::_('FLEXI_THANKS_SUBMISSION')
 						: JText::_('FLEXI_ITEM_SAVED');
 
-					$link = $this->returnURL ?:
-						JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, 0, $item), false);
+					$item_url = FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, 0, $item);
+					$link = $this->returnURL ?: JRoute::_($item_url . ($tmpl ? '&tmpl=' . $tmpl : ''), false);
 				}
 				break;
 		}
@@ -1964,7 +1988,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 
 		$result = parent::remove();
 
-		// FRONTEND: Check if we cannot redirect back to the deleted item 
+		// FRONTEND: Check if we cannot redirect back to the deleted item
 		if ($isSite && $result && reset($cid) === $this->input->getInt('id') && $isitemview)
 		{
 			$non_sef_link = FlexicontentHelperRoute::getCategoryRoute($catid, $Itemid = 0, $urlvars = array());

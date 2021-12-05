@@ -3377,7 +3377,9 @@ class flexicontent_html
 	{
 		if ( !$params->get('show_editbutton', 1) || JFactory::getApplication()->input->getInt('print', 0) ) return;
 
+		$app  = JFactory::getApplication();
 		$user	= JFactory::getUser();
+		$tmpl = $app->input->getCmd('tmpl');
 
 		// Determine if current user can edit the given item
 		$asset = 'com_content.article.' . $item->id;
@@ -3427,7 +3429,7 @@ class flexicontent_html
 			//$Itemid = JFactory::getApplication()->input->get('Itemid', 0, 'int');  // Maintain menu item ? e.g. current category view,
 			$Itemid = 0;
 			$item_url = JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, $Itemid, $item));
-			$link = $item_url . (strpos($item_url, '?') !== false ? '&' : '?') . 'task=edit';
+			$link = $item_url . (strpos($item_url, '?') !== false ? '&' : '?') . 'task=edit' . ($tmpl ? '&tmpl=' . $tmpl : '');
 			$targetLink = "_self";
 		}
 		elseif ((int) $params->get('show_editbutton', 1) === 2)
