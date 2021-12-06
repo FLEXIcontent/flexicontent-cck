@@ -861,7 +861,7 @@ if ($uselang) : ob_start();  // lang ?>
 	<div class="container_fcfield container_fcfield_name_language">
 		<?php if (
 			(in_array('mod_item_lang', $allowlangmods) || $isnew) &&
-			in_array($this->params->get('uselang_fe', 1), array(1,3))
+			in_array($uselang, array(1,3))
 		) : ?>
 			<?php echo $this->lists['languages']; ?>
 		<?php else: ?>
