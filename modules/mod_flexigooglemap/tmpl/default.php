@@ -110,7 +110,7 @@ $use_mlist = (int) $params->get('use_dynamic_marker_list', 0);
     <div class="<?php echo $use_mlist ? 'col8' : ''; ?>">
 			<?php /* Map container*/ ?>
 			<div style="width:<?php echo $width; ?>; height:<?php echo $height; ?>; max-width: 100%;">
-				<div id="fc_module_map_<?php echo $module->id;?>" style="width:<?php echo $width; ?>; height:<?php echo $height; ?>; max-width: 100%;"></div>
+				<div id="fc_module_map_<?php echo $module->id;?>" style="width:<?php echo $width; ?>; height:<?php echo $height; ?>; max-width: 100%;z-index:1;"></div>
 			</div>
 
     </div>
