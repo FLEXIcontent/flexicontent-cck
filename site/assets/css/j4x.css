@@ -365,9 +365,10 @@ header.group.tool {
 .fc_state_toggle_link {
 	margin: 0;
 	background: #fff;
+	padding: 2px;
 }
 .statetoggler.fc_statebutton.btn.btn-small.hasTooltip {
-	padding: 5px !important;
+	padding: 0px !important;
 }
 #flexicontent ::placeholder,
 .mod_flexifilter_wrapper ::placeholder {

@@ -516,7 +516,7 @@ if ($leadnum) :
 
 					<?php $statebutton = flexicontent_html::statebutton( $item, $this->params ); ?>
 					<?php if ($statebutton) : ?>
-						<div class="fc_state_toggle_link "><?php echo $statebutton;?></div>
+						<div class="fc_state_toggle_link btn"><?php echo $statebutton;?></div>
 					<?php endif; ?>
 
 				<?php endif; ?>
@@ -1009,12 +1009,12 @@ if ($count > $leadnum) :
 
 					<?php $editbutton = flexicontent_html::editbutton( $item, $this->params ); ?>
 					<?php if ($editbutton) : ?>
-						<div class="fc_edit_link btn "><?php echo $editbutton;?></div>
+						<div class="fc_edit_link btn"><?php echo $editbutton;?></div>
 					<?php endif; ?>
 
 					<?php $statebutton = flexicontent_html::statebutton( $item, $this->params ); ?>
 					<?php if ($statebutton) : ?>
-						<div class="fc_state_toggle_link"><?php echo $statebutton;?></div>
+						<div class="fc_state_toggle_link btn"><?php echo $statebutton;?></div>
 					<?php endif; ?>
 
 				<?php endif; ?>
