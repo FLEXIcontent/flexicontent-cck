@@ -219,8 +219,9 @@ body .fc-mssg-inline.fc-nobgimage, body .fc-mssg.fc-nobgimage {
 #flexicontent form .fcfield_selectval, 
 #flexicontent form .fcfield_selectmulval,
 #flexicontent form .fcfield_textval,
-#flexicontent .fc_filedata_txt {
-	border: 1px solid var(--template-bg-dark-20) !important;
+#flexicontent .fc_filedata_txt,
+.select2-container-multi .select2-choices {
+	border: 1px solid #ccc !important;
 	border-radius: 4px;
 	padding: 5px;
 }
@@ -246,7 +247,7 @@ body .fc-mssg-inline.fc-nobgimage, body .fc-mssg.fc-nobgimage {
     min-height: 39px !important;
 }
 .select2-container .select2-choice {
-    min-height: 32px !important;
+    min-height: 31px !important;
 }
 .fc_filter_html :not(.input-append):not(.input-prepend) > input.fc_field_filter {
     padding: 8px 3px 13px 9px !important;
@@ -272,7 +273,8 @@ body .fc-mssg-inline.fc-nobgimage, body .fc-mssg.fc-nobgimage {
 		width:100%;
 }
 .mod_flexifilter_wrapper .fc_filter_html :not(.input-append):not(.input-prepend) > input.fc_field_filter{
-    border: 1px solid #aaa !important;
+    border: 1px solid #ccc !important;
+		background-position-x: 100% !important;
 }
 .mod_flexifilter_wrapper .fc_filter_html .fc_text_filter.fc_iscalendar, .mod_flexifilter_wrapper .fc_filter_html .fc_field_filter.fc_iscalendar{
     min-width:80% !important;
@@ -299,6 +301,12 @@ body .fc-mssg-inline.fc-nobgimage, body .fc-mssg.fc-nobgimage {
 .fc_filter_html.fc_text_search input {
     padding-left: 10px;
 }
+.fc_filter_html input.btn {
+    border-radius: 5px;
+}
+.fc_filter_html .select2-container .select2-search-field {
+	width: 100%;
+}
 /** fix dropdown button need review**/
 span.btn.btn-sm.toolbar.dropdown-toggle.dropdown-toggle-split.fcfield-addvalue.fcfont-icon.icon.icon- {
 	display: table-cell;
@@ -309,10 +317,7 @@ span.btn.btn-sm.toolbar.dropdown-toggle.dropdown-toggle-split.fcfield-addvalue.f
 label#custom_agent_item_selector-lbl {
 	height: 36px !important;
 }
-/** fix border input **/
-.select2-container-multi .select2-choices {
-    border: 1px solid #b8c9e0 !important;
-}
+
 /** fix preview image field **/
 span.btn.fc_img_preview_btn.icon-search:before {
 	display: none;
@@ -345,4 +350,10 @@ header.group.tool {
 }
 .statetoggler.fc_statebutton.btn.btn-small.hasTooltip {
 	padding: 5px !important;
+}
+
+/** placeholder fix **/
+#flexicontent ::placeholder,
+.mod_flexifilter_wrapper ::placeholder {
+	color:#000;font-size:12px;
 }
