@@ -66,6 +66,8 @@ site/tasks/defines.php
 admin/tasks/defines.php
 admin/flexicontent.xml
 
+admin/views/item/tmpl/common/render_buttons.php
+
 plugins/flexicontent_fields/currency/
 plugins/flexicontent_fields/mediaplayer/
 plugins/flexicontent_fields/qrcode/

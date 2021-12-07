@@ -1207,6 +1207,12 @@
 				<option value="1">FLEXI_SHOW</option>
 			</field>
 
+			<field name="version_reviewal_msg_fe" type="textarea" hint="FLEXI_REQUIRES_VERSION_REVIEWAL" rows="3" cols="60" label="FLEXI_REQUIRES_VERSION_REVIEWAL_LBL" description="" class="input-xxlarge" />
+			<field name="document_approval_msg_fe" type="textarea" hint="FLEXI_REQUIRES_DOCUMENT_APPROVAL" rows="3" cols="60" label="FLEXI_REQUIRES_DOCUMENT_APPROVAL_LBL" description="" class="input-xxlarge" />
+			<field name="mr_version_revial_msg_fe" type="textarea" hint="FLEXI_MIGHT_REQUIRE_VERSION_REVIEWAL" rows="3" cols="60" label="FLEXI_MIGHT_REQUIRE_VERSION_REVIEWAL_LBL" description="" class="input-xxlarge" />
+			<field name="mr_document_approval_msg_fe" type="textarea" hint="FLEXI_MIGHT_REQUIRE_DOCUMENT_APPROVAL" rows="3" cols="60" label="FLEXI_MIGHT_REQUIRE_DOCUMENT_APPROVAL_LBL" description="" class="input-xxlarge" />
+			<field name="changes_applied_immediately_msg_fe" type="textarea" hint="FLEXI_CHANGES_APPLIED_IMMEDIATELY" rows="3" cols="60" label="FLEXI_CHANGES_APPLIED_IMMEDIATELY_LBL" description="" class="input-xxlarge" />
+
 			<field name="" label="" type="separator" default="FLEXI_INSTRUCTIONS_REDIRECTIONS_ETC" level="level2" />
 			<field name="submit_message" type="textarea" default="" rows="2" cols="60" label="FLEXI_MENU_SUBMIT_INSTRUCTIONS" description="FLEXI_MENU_SUBMIT_INSTRUCTIONS_DESC" class="input-xxlarge" />
 			<field name="submit_redirect_url_fe" type="text" default="" size="106" label="FLEXI_FORM_SUBMIT_REDIRECT_URL" description="FLEXI_FORM_SUBMIT_REDIRECT_URL_DESC" class="input-xxlarge" />
@@ -1437,9 +1443,10 @@
 				checkoptions="FLEXI_APPLY_N_RELOAD,FLEXI_APPLY,FLEXI_SAVE_AND_NEW,FLEXI_SAVE_AS_COPY,FLEXI_SAVE_A_PREVIEW,FLEXI_PREVIEW_LATEST"
 				checkvals="apply,apply_ajax,save2new,save2copy,save_preview,preview_latest" defaultvals="apply,apply_ajax,save2new,save2copy,save_preview,preview_latest"
 				label="FLEXI_MENU_ALLOW_BUTTONS" description="FLEXI_MENU_ALLOW_BUTTONS_DESC" cols="2" />
-			<field name="buttons_placement_be" type="fcradio" default="0" label="FLEXI_BUTTONS_PLACEMENT" description="FLEXI_BUTTONS_PLACEMENT_DESC" class="btn-group group-fcinfo">
+			<field name="buttons_placement_be" type="fcradio" default="-1" label="FLEXI_BUTTONS_PLACEMENT" description="FLEXI_BUTTONS_PLACEMENT_DESC" class="btn-group group-fcinfo">
+				<option value="-1">JTOOLBAR</option>
 				<option value="0">FLEXI_TOP</option>
-				<!--option value="1">FLEXI_BOTTOM</option-->
+				<option value="1">FLEXI_BOTTOM</option>
 			</field>
 
 			<field name="" label="" type="separator" default="FLEXI_APPROVAL_NEEDED_WARNINGS" level="level2" />
@@ -1451,6 +1458,12 @@
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
 			</field>
+
+			<field name="version_reviewal_msg_be" type="textarea" hint="FLEXI_REQUIRES_VERSION_REVIEWAL" rows="3" cols="60" label="FLEXI_REQUIRES_VERSION_REVIEWAL_LBL" description="" class="input-xxlarge" />
+			<field name="document_approval_msg_be" type="textarea" hint="FLEXI_REQUIRES_DOCUMENT_APPROVAL" rows="3" cols="60" label="FLEXI_REQUIRES_DOCUMENT_APPROVAL_LBL" description="" class="input-xxlarge" />
+			<field name="mr_version_revial_msg_be" type="textarea" hint="FLEXI_MIGHT_REQUIRE_VERSION_REVIEWAL" rows="3" cols="60" label="FLEXI_MIGHT_REQUIRE_VERSION_REVIEWAL_LBL" description="" class="input-xxlarge" />
+			<field name="mr_document_approval_msg_be" type="textarea" hint="FLEXI_MIGHT_REQUIRE_DOCUMENT_APPROVAL" rows="3" cols="60" label="FLEXI_MIGHT_REQUIRE_DOCUMENT_APPROVAL_LBL" description="" class="input-xxlarge" />
+			<field name="changes_applied_immediately_msg_be" type="textarea" hint="FLEXI_CHANGES_APPLIED_IMMEDIATELY" rows="3" cols="60" label="FLEXI_CHANGES_APPLIED_IMMEDIATELY_LBL" description="" class="input-xxlarge" />
 
 			<field name="" label="" type="separator" default="FLEXI_INSTRUCTIONS_REDIRECTIONS_ETC" level="level2" />
 			<field name="submit_message_be" type="textarea" default="" rows="2" cols="60" label="FLEXI_MENU_SUBMIT_INSTRUCTIONS" description="FLEXI_MENU_SUBMIT_INSTRUCTIONS_DESC" class="input-xxlarge" />

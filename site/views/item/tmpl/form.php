@@ -9,4 +9,8 @@ defined('_JEXEC') or die('Restricted access');
  * 2. Copy the contents of the backend file here (replacing the "include" statement below)
  * 3. Select to use it in the ITEM TYPE configuration of the FRONTEND form
  */
-include(JPATH_ROOT.DS."administrator".DS."components".DS."com_flexicontent".DS."views".DS."item".DS."tmpl".DS."default.php");
+
+$form_layout = $this->params->get('form_layout_fe', 'tabs');
+$this->setLayout($form_layout);
+
+include JPATH_ROOT.DS."administrator".DS."components".DS."com_flexicontent".DS."views".DS."item".DS."tmpl".DS. $form_layout . ".php";

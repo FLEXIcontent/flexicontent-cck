@@ -136,21 +136,28 @@ icon-typeadd:before,
 	content: "\35";
 }
 @media (min-width: 1020px) {
+	#fctoolbar-copy,
+	#fctoolbar-maintenance-btns-group,
+	#fctoolbar-download,
 	#toolbar-copy,
 	#toolbar-maintenance-btns-group,
 	#toolbar-download {
 		margin-right: 32px;
 	}
 }
+#fctoolbar .dropdown-menu span.icon-upload,
 #toolbar .dropdown-menu span.icon-upload {
 	color: darkorange;
 }
+#fctoolbar .dropdown-menu span.icon-download,
 #toolbar .dropdown-menu span.icon-download {
 	color: darkcyan;
 }
+#fctoolbar .dropdown-menu span.icon-box-add,
 #toolbar .dropdown-menu span.icon-box-add {
 	color: darkcyan;
 }
+#fctoolbar .dropdown-menu span.icon-upload,
 #toolbar .dropdown-menu span.icon-upload {
 	color: darkorange;
 }

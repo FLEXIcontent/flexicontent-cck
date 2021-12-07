@@ -697,8 +697,9 @@ div fieldset.panelform {
 }
 @media (min-width: 1020px) {
 	.com_flexicontent .btn.spaced-btn,
+	#fctoolbar-preview_btns_group,
 	#toolbar-preview_btns_group {
-		margin-left: 32px;
+		margin-left: 2rem !important;
 	}
 }
 body .controls .btn-group.btn-group-yesno .btn,
@@ -1707,24 +1708,80 @@ div.current ul.config-option-list li fieldset {
 	margin: 0;
 	padding: 0;
 }
-.subhead #toolbar.btn-toolbar > *,
-.subhead #toolbar.btn-toolbar > *:first-of-type {
-	margin-left: .75rem;
+.com_flexicontent .subhead-collapse.in.collapse {
+	overflow: visible;
 }
-.subhead #toolbar.btn-toolbar > *:first-child {
+#fctoolbar.btn-toolbar .btn-wrapper,
+#toolbar.btn-toolbar .btn-wrapper {
+	display: inline-block;
+	margin-bottom: 6px !important;
+}
+#fctoolbar.btn-toolbar > *,
+#toolbar.btn-toolbar > * {
 	margin-left: 0;
+	margin-top: 0;
+	margin-right: .75rem;
+	vertical-align: middle;
 }
+#fctoolbar.btn-toolbar > * .btn.buttons.btn-group,
+#toolbar.btn-toolbar > * .btn.buttons.btn-group {
+	padding: 0 !important;
+	border: 0;
+}
+#fctoolbar.btn-toolbar > * .btn,
+#toolbar.btn-toolbar > * .btn {
+	padding: 0.5rem !important;
+	margin: 0;
+	float: none ! important;
+}
+#fctoolbar_btn {
+	display: none;
+}
+@media (min-width: 480px) {
+	#fctoolbar {
+		display: block !important;
+	}
+}
+@media (max-width: 479px) {
+	#fctoolbar_btn {
+		display: block;
+	}
+	#fctoolbar .btn-wrapper,
+	#toolbar .btn-wrapper,
+	#fctoolbar .btn,
+	#toolbar .btn {
+		margin-left: 0 !important;
+		margin-right: 0 !important;
+		width: 100%;
+	}
+	#fctoolbar .buttons.btn-group > ul.dropdown-menu > li,
+	#fctoolbar .buttons.btn-group > ul.dropdown-menu > li .toolbar,
+	#toolbar .buttons.btn-group > ul.dropdown-menu > li,
+	#toolbar .buttons.btn-group > ul.dropdown-menu > li .toolbar {
+		text-align: center;
+	}
+}
+#fctoolbar button#fctoolbar-new,
+#fctoolbar div#fctoolbar-new > *,
 #toolbar button#toolbar-new,
 #toolbar div#toolbar-new > * {
 	min-width: unset;
 }
-#toolbar .buttons.btn-group .toolbar {
-	text-align: left;
+#fctoolbar .buttons.btn-group,
+#toolbar .buttons.btn-group {
+	display: table !important;
 }
+#fctoolbar .buttons.btn-group .btn,
+#toolbar .buttons.btn-group .btn {
+	display: table-cell !important;
+}
+#fctoolbar .buttons.btn-group .toolbar > [class^="icon-"],
+#fctoolbar .buttons.btn-group .toolbar > [class*=" icon-"],
 #toolbar .buttons.btn-group .toolbar > [class^="icon-"],
 #toolbar .buttons.btn-group .toolbar > [class*=" icon-"] {
 	text-align: center;
 }
+#fctoolbar .buttons.btn-group > ul.dropdown-menu,
 #toolbar .buttons.btn-group > ul.dropdown-menu {
 	background: unset;
 	border: unset;
@@ -1733,26 +1790,34 @@ div.current ul.config-option-list li fieldset {
 	min-width: 100% !important;
 	width: auto !important;
 	top: 100% !important;
-	left: auto !important;
 	transform: unset !important;
 }
+#fctoolbar .buttons.btn-group > ul.dropdown-menu > li,
+#fctoolbar .buttons.btn-group > ul.dropdown-menu > li .toolbar,
 #toolbar .buttons.btn-group > ul.dropdown-menu > li,
 #toolbar .buttons.btn-group > ul.dropdown-menu > li .toolbar {
-	display: block;
+	display: block !important;
 	width: 100%;
 	box-sizing: border-box;
 	margin: 0;
+	float: right;
+	text-align: left;
 }
+#fctoolbar .buttons.btn-group > .toolbar,
 #toolbar .buttons.btn-group > .toolbar {
 	margin: 0;
 }
+#fctoolbar .buttons.btn-group > .toolbar + .dropdown-toggle:not(.dropdown-toggle-split),
 #toolbar .buttons.btn-group > .toolbar + .dropdown-toggle:not(.dropdown-toggle-split) {
 	padding-top: 1px;
 }
+#fctoolbar .buttons.btn-group > .dropdown-toggle:first-child .caret,
 #toolbar .buttons.btn-group > .dropdown-toggle:first-child .caret {
 	margin-top: 10px;
 	margin-left: 4px;
 }
+#fctoolbar .btn.btn-fcaction > [class^="icon-"],
+#fctoolbar .btn.btn-fcaction > [class*=" icon-"],
 #toolbar .btn.btn-fcaction > [class^="icon-"],
 #toolbar .btn.btn-fcaction > [class*=" icon-"] {
 	padding-right: 8px;
@@ -1939,11 +2004,6 @@ div#permissions .tab-content {
 }
 .fcspacer-32 {
 	margin-top: 32px !important;
-}
-.flexicontent .btn-toolbar .btn-wrapper {
-	float: left;
-	display: block;
-	margin: 0 8px 0 0;
 }
 .sr-only {
 	position: absolute;

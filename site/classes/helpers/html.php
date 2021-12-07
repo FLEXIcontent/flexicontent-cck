@@ -5536,9 +5536,11 @@ class flexicontent_html
 	// * Create a custom button inside Joomla Toolbar
 	static function addToolBarButton(
 		$text='Button Text', $btn_name='btnname', $full_js='', $err_msg='', $confirm_msg='', $task='btntask', $extra_js='',
-		$list=true, $menu=true, $confirm=true, $btn_class="", $btn_icon="", $attrs='', $auto_add = true, $tag_type='a')
+		$list=true, $menu=true, $confirm=true, $btn_class="", $btn_icon="", $attrs='', $auto_add = true, $tag_type='a',
+		$tbname = 'toolbar'
+	)
 	{
-		$toolbar = JToolbar::getInstance('toolbar');
+		$toolbar = JToolbar::getInstance($tbname);
 		$text  = JText::_($text);
 		$class = $btn_icon ? $btn_icon : 'icon-32-'.$btn_name;
 		$btn_sm_class = FLEXI_J40GE ? 'btn btn-sm' : 'btn btn-small';
@@ -5587,10 +5589,10 @@ class flexicontent_html
 
 
 	// * Create a drop down button menu inside Joomla Toolbar
-	static function addToolBarDropMenu($btn_arr, $btn_group_name, $drop_btn = null, $ops = array())
+	static function addToolBarDropMenu($btn_arr, $btn_group_name, $drop_btn = null, $ops = array(), $tbname = 'toolbar')
 	{
 		JHtml::_('bootstrap.dropdown');
-		$toolbar = JToolbar::getInstance('toolbar');
+		$toolbar = JToolbar::getInstance($tbname);
 		static $btngroup_id = 0;
 		$btngroup_id++;
 
@@ -5627,10 +5629,11 @@ class flexicontent_html
 		
 		if ($drop_btn)
 		{
-			$drop_btn = str_replace('>', ' id="btngroup_id_' . $btngroup_id . '" >', $drop_btn);
+			$drop_btn = str_replace('<button ', '<button id="btngroup_id_' . $btngroup_id . '" ', $drop_btn);
 		}
+
 		$buttons_html = '
-			<div class="buttons btn-group' . (FLEXI_J40GE ? ' dropdown' : '') . '">
+			<div class="buttons btn btn-group' . (FLEXI_J40GE ? ' dropdown' : '') . '">
 				'.array_shift($btn_arr).'
 			  '.($drop_btn ?: '
 			  <button class="' . $drop_btn_class . '"

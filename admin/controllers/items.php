@@ -1164,7 +1164,16 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 
 			// REDIRECT CASES FOR SAVING
 			default:
-				if ($app->isClient('administrator'))
+
+				// REDIRECT CASE: Save and preview the latest version
+				if ($this->task === 'save_a_preview')
+				{
+					// Do not use SLUG !!! since we maybe previewing a non-current version !!
+					$item_url = FlexicontentHelperRoute::getItemRoute($model->get('id') . ':' . $model->get('alias'), $model->get('catid'), 0, $item);
+					$link = JRoute::_($item_url . ($tmpl ? '&tmpl=' . $tmpl : '') . '&preview=1', false);
+				}
+
+				elseif ($app->isClient('administrator'))
 				{
 					$link = $this->returnURL;
 				}
@@ -1173,14 +1182,6 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 				elseif ($newly_submitted_item && $submit_redirect_url_fe)
 				{
 					$link = $submit_redirect_url_fe;
-				}
-
-				// REDIRECT CASE: Save and preview the latest version
-				elseif ($this->task === 'save_a_preview')
-				{
-					// Do not use SLUG !!! since we maybe previewing a non-current version !!
-					$item_url = FlexicontentHelperRoute::getItemRoute($model->get('id') . ':' . $model->get('alias'), $model->get('catid'), 0, $item);
-					$link = JRoute::_($item_url . ($tmpl ? '&tmpl=' . $tmpl : '') . '&preview=1', false);
 				}
 
 				// REDIRECT CASE: Return to the form 's original referer after item saving
