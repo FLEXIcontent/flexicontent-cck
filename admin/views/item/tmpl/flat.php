@@ -16,10 +16,10 @@ include "common/render_fields.php";
 
 
 /**
- * About customizing files: LAYOUTNAME.php and LAYOUTNAME_main.php.
+ * About customizing files:  LAYOUTNAME.php  ,  layouts/LAYOUTNAME/main.php
  * Please create a duplicate of them first and rename LAYOUTNAME to 'myLAYOUTNAME'
  * Then select the new layout name in the item type configuration
  */
 include "common/form_start.php";
-include $this->getLayout() . "_main.php";
+include "layouts/" . $this->getLayout() . "/main.php";
 include "common/form_end.php";

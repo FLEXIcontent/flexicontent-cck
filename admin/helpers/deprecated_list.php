@@ -41,6 +41,8 @@ $files = array(
 	JPATH_SITE . '/components/com_flexicontent/librairies/elastislide/css/elastislide.css',
 	JPATH_SITE . '/components/com_flexicontent/librairies/elastislide/js/jquery.easing.1.3.js',
 	JPATH_SITE . '/components/com_flexicontent/librairies/elastislide/js/gallery_tmpl.js',
+	JPATH_ADMINISTRATOR . '/components/com_flexicontent/views/item/tmpl/tabs_main.php',
+	JPATH_ADMINISTRATOR . '/components/com_flexicontent/views/item/tmpl/flat_main.php',
 );
 
 $folders = array(

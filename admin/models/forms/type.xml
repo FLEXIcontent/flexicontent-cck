@@ -516,6 +516,8 @@
 
 		</fieldset>
 
+		<!--fieldset name="layout_iform_fe" label="FLEXI_LAYOUT" description="FLEXI_LAYOUT_DESC">
+		</fieldset-->
 
 		<fieldset name="frontend_item_form" label="FLEXI_ITEM_FORM" icon_class="icon-pencil">
 
@@ -528,6 +530,12 @@
 			<field name="item_form_fe_bof" type="separator" default="FLEXI_ITEM_FORM_FE" level="tabset_start" box_type="1" tab_class="s-cblue" />
 
 			<field name="item_form_fe_tab_behaviour" type="separator" default="FLEXI_GENERAL_FORM_BEHAVIOR" icon_class="icon-cog" level="tab_open" box_type="1" />
+
+			<!--field name="layout" type="fclayout" default="tabs" label="FLEXI_CHOOSE_TMPL"
+				description="FLEXI_CHOOSE_TMPL_DESC" directory="/administrator/components/com_flexicontent/views/item/tmpl" ext_name="" ext_view="item_form"
+				hide_default="1" hide_none="1" stripext="1" filter="\.php$" exclude="^_"
+				tmpl_container="layout_iform_fe" params_source="file"
+				/--> <!-- params_source="inline" -->
 
 			<field name="allowbuttons_fe" type="fccheckbox" default="" display_useglobal="1"
 				checkoptions="FLEXI_APPLY_N_RELOAD,FLEXI_APPLY,FLEXI_SAVE_AND_NEW,FLEXI_SAVE_AS_COPY,FLEXI_SAVE_A_PREVIEW,FLEXI_PREVIEW_LATEST"
