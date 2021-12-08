@@ -34,9 +34,6 @@
     color: #555;
     box-shadow: none;
 }
-#flexicontent .news.fc-items-block .fc_mublock {
-    position: initial !important;
-}
 /*** end theme update ***/
 
 /** fix btn in front **/
@@ -352,9 +349,18 @@ header.group.tool {
 .statetoggler.fc_statebutton.btn.btn-small.hasTooltip {
 	padding: 0px !important;
 }
-
 /** placeholder fix **/
 #flexicontent ::placeholder,
 .mod_flexifilter_wrapper ::placeholder {
 	color:#000;font-size:12px;
+}
+/** slider accordeon on category view **/
+#flexicontent #fcfilter_form_slider_category .accordion-item {
+	display: inline-grid !important;
+	border: 1px solid #ccc;
+	border-radius:5px;
+}
+.top-search #menu-sliders-filter .collapse, .fccategory .fc_filter_box .collapse {
+	position: initial;
+	z-index: 5;
 }

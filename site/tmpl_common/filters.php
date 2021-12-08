@@ -85,6 +85,23 @@ if ( $use_search || $use_filters ) : /* BOF search and filters block */
 		$document->addStyleSheet(JUri::root(true).'/components/com_flexicontent/assets/css/flexi_filters.css', array('version' => FLEXI_VHASH));
 	}
 	$searchphrase_selector = flexicontent_html::searchphrase_selector($params, $form_name);
+
+
+// Filter in slide
+if ($filters_in_slide){
+	if (!empty($module->id)){
+			$ff_slider_id = ($module->id     ? '_module_' . $module->id : '');
+	}else{
+		$ff_slider_id = '_category';
+	}
+$ff_toggle_search_title = JText::_($params->get('ff_toggle_search_title', 'FLEXI_TOGGLE_SEARCH_FORM'));
+$ff_slider_tagid = 'fcfilter_form_slider'.$ff_slider_id;
+
+
+// Last active for slider
+$last_active_slide = isset($active_slides->$ff_slider_tagid) ? $active_slides->$ff_slider_tagid : null;
+}
+
 ?>
 
 <div id="<?php echo $form_id; ?>_filter_box" class="fc_filter_box floattext">
@@ -255,13 +272,11 @@ if ( $use_search || $use_filters ) : /* BOF search and filters block */
 					<div class="tabbertab" id="fcform_tabset_'.$_filter_TABsetCnt.'_tab_'.($tabSetCnt++).'" >
 						<h3 class="tabberheading ' . $filter_label_class . '">' . $filt_lbl . (!$is_empty ? ' *' : '') . '</h3>' : '').
 
-					($filters_in_slide ? '
-						<div class="accordion-group">
-							<div class="accordion-heading">
-								<strong><a href="#'.$filt->id.'" data-toggle="collapse" class="accordion-toggle collapsed">' . $filt_lbl . '</a></strong></div>
-									<div class="accordion-body collapse" id="'.$filt->id.'">
-										<div class="accordion-inner">
-												' : '')
+					($filters_in_slide ? 
+					
+					JHtml::_('bootstrap.startAccordion', $ff_slider_tagid, array('active' => $last_active_slide)).
+					JHtml::_('bootstrap.addSlide', $ff_slider_tagid, $filt_lbl, '_filters_slide'.$filt->id)
+	 				: '')
 
 						
 
@@ -280,11 +295,8 @@ if ( $use_search || $use_filters ) : /* BOF search and filters block */
 						</div>
 					'.
 
-					($filters_in_slide ? '
-									</div>
-							</div>
-					</div>
-					' : '').
+					($filters_in_slide ? 
+				JHtml::_('bootstrap.endSlide'): '').
 					
 					/* Optional TAB end */
 					($filters_in_tabs ? '
@@ -311,7 +323,7 @@ if ( $use_search || $use_filters ) : /* BOF search and filters block */
 			}
 
 			// Create HTML of filters
-			echo $opentag . implode($separatorf, $filters_html) . $closetag;
+			echo $opentag . implode($separatorf, $filters_html) . $closetag .($filters_in_slide ? JHtml::_('bootstrap.endAccordion'): '');
 			unset ($filters_html);
 			?>
 
@@ -350,6 +362,8 @@ if ( $use_search || $use_filters ) : /* BOF search and filters block */
 </div>
 
 <?php
+
+	// TODO ADD active slide script
 
 	// Automatic submission
 	if ($filter_autosubmit) {
