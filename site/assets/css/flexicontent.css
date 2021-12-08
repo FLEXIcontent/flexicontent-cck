@@ -3840,8 +3840,8 @@ div.current ul.config-option-list li fieldset {
 	}
 }
 @media (max-width: 479px) {
-	:not(div.fctoolbar_side_placement) > #fctoolbar_btn {
-		display: block;
+	#fctoolbar_btn {
+		display: block !important;
 	}
 	:not(div.fctoolbar_side_placement) > #fctoolbar joomla-toolbar-button,
 	:not(div.fctoolbar_side_placement) > #toolbar joomla-toolbar-button,
@@ -3888,9 +3888,6 @@ div.current ul.config-option-list li fieldset {
 	.fctoolbar_side_placement {
 		margin: 24px 0 12px 0;
 	}
-	.fctoolbar_side_placement #fctoolbar_btn {
-		display: block !important;
-	}
 }
 .fctoolbar_side_placement #fctoolbar joomla-toolbar-button,
 .fctoolbar_side_placement #toolbar joomla-toolbar-button,
@@ -3924,6 +3921,10 @@ div.current ul.config-option-list li fieldset {
 		margin-left: 0.5rem !important;
 		margin-right: 0.5rem !important;
 		width: auto !important;
+	}
+	.fctoolbar_side_placement #fctoolbar {
+		display: block !important;
+		margin-top: 0;
 	}
 }
 div.fctoolbar_top_placement {

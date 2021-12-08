@@ -2129,11 +2129,13 @@ div.current ul.config-option-list li fieldset {
 	}
 }
 @media (max-width: 479px)  {
+
+	#fctoolbar_btn {
+		display: block !important;
+	}
+
 	:not(div.fctoolbar_side_placement) > {  /* Only direct descedants, otherwise :not() will evaluate to true in other cases too */
-		#fctoolbar_btn {
-			display: block;
-		}
-		
+
 		#fctoolbar joomla-toolbar-button,
 		#toolbar joomla-toolbar-button,
 		#fctoolbar .btn-wrapper,
@@ -2198,10 +2200,6 @@ div.current ul.config-option-list li fieldset {
 
 	.fctoolbar_side_placement {
 		margin: 24px 0 12px 0;
-
-		#fctoolbar_btn {
-			display: block !important;
-		}
 	}
 }
 
@@ -2246,6 +2244,10 @@ div.current ul.config-option-list li fieldset {
 			margin-left: 0.5rem !important;
 			margin-right: 0.5rem !important;
 			width: auto !important;
+		}
+		#fctoolbar {
+			display: block !important;
+			margin-top: 0;
 		}
 	}
 }
