@@ -656,7 +656,8 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		$buttons_placement = (int) $page_params->get('buttons_placement' . $CFGsfx, ($isSite ? 0 : -1));
 		if ($buttons_placement >= 0)
 		{
-			$this->document->addStyleDeclaration('#toolbar, #isisJsData{display:none !important;}');
+			// Not important just save space
+			$this->document->addStyleDeclaration('#toolbar, #isisJsData{display:none !important;} div.container-main {margin-top: 16px;}');
 			$this->document->addScriptDeclaration('jQuery(document).ready(function(){ var jtoolbar_box = jQuery(\'#toolbar\').closest(\'.subhead-collapse\').hide();  jtoolbar_box.prev().remove(); });');
 		}
 
@@ -1652,8 +1653,16 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 			$page_params->set('buttons_placement' . $CFGsfx, $buttons_placement);
 		}
 
-		$tbname  = $buttons_placement ? 'toolbar' : 'fctoolbar';
+		$tbname  = $buttons_placement === -1 ? 'toolbar' : 'fctoolbar';  // -1 : Place at page header
 		$toolbar = JToolbar::getInstance($tbname);
+
+		$isSideBtns = in_array($buttons_placement, array(2,3));  // Side placement (left, right)
+		$add_inline = false; // $isSideBtns
+
+		$tip_place_subbtn  = $buttons_placement !== 3 ? 'right' : 'left';
+		$tip_place_mainbtn = $isSideBtns
+			? $tip_place_subbtn
+			: ($buttons_placement === 1 ? 'top' : 'bottom');
 
 
 		/**
@@ -1675,8 +1684,9 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		 * Apply buttons
 		 */
 
+		$btn_arr = $add_inline ? array('fc_actions' => '') : array();
+
 		// Apply button
-		$btn_arr = array();
 		if ( in_array( 'apply_ajax', $allowbuttons) && !$isnew && $typesselected->id  )
 		{
 			$btn_name = 'apply_ajax';
@@ -1686,7 +1696,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 				'FLEXI_APPLY', $btn_name, $full_js="Joomla.submitbutton('".$ctrl.".apply_ajax')", $msg_alert='', $msg_confirm='',
 				$btn_task, $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false,
 				$btn_class=(FLEXI_J40GE ? ' _DDI_class_ btn-success ' : '') . ' ' . $this->tooltip_class, $btn_icon="icon-loop",
-				'data-placement="bottom" title="'.JText::_('FLEXI_FAST_SAVE_INFO', true).'"', $auto_add = 0, $tbname);
+				'data-placement="'.$tip_place_mainbtn.'" title="'.JText::_('FLEXI_FAST_SAVE_INFO', true).'"', $auto_add = 0, $tbname);
 		}
 
 		// Apply & Reload button   ***   (Apply Type, is a special case of new that has not loaded custom fieds yet, due to type not defined on initial form load)
@@ -1706,14 +1716,14 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 				$btn_title, $btn_name, $full_js="Joomla.submitbutton('".$btn_task."')", $msg_alert='', $msg_confirm='',
 				$btn_task, $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false,
 				$btn_class=(FLEXI_J40GE ? ' _DDI_class_ btn-success ' : '') . ' ' . $this->tooltip_class, $btn_icon="icon-save",
-				'data-placement="right" title=""', $auto_add = 0, $tbname);
+				'data-placement="'.$tip_place_subbtn.'" title=""', $auto_add = 0, $tbname);
 		}
 
 		flexicontent_html::addToolBarDropMenu(
 			$btn_arr,
 			'apply_btns_group',
 			null,
-			array('drop_class_extra' => (FLEXI_J40GE ? 'btn-success' : '')),
+			array('drop_class_extra' => (FLEXI_J40GE ? 'btn-success' : ''), 'add_inline' => $add_inline),
 			$tbname
 		);
 
@@ -1722,7 +1732,8 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		 * Save buttons
 		 */
 
-		$btn_arr = array();
+		$btn_arr = $add_inline ? array('fc_actions' => '') : array();
+
 		if ($typesselected->id)
 		{
 			$btn_name = 'save';
@@ -1734,7 +1745,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 				'JSAVE', $btn_name, $full_js="Joomla.submitbutton('".$btn_task."')", $msg_alert='', $msg_confirm='',
 				$btn_task, $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false,
 				$btn_class=(FLEXI_J40GE ? ' _DDI_class_ btn-success ' : '') . ' ' . $this->tooltip_class, $btn_icon="icon-save",
-				'data-placement="bottom" title=""', $auto_add = 0, $tbname);
+				'data-placement="'.$tip_place_mainbtn.'" title=""', $auto_add = 0, $tbname);
 
 			if ( !$isredirected_after_submit )
 			{
@@ -1749,7 +1760,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 						(!$isnew ? 'FLEXI_SAVE_A_PREVIEW' : 'FLEXI_ADD_A_PREVIEW'), $btn_name, $full_js="Joomla.submitbutton('".$btn_task."')", $msg_alert='', $msg_confirm='',
 						$btn_task, $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false,
 						$btn_class=(FLEXI_J40GE ? ' _DDI_class_ btn-success ' : '') . ' ' . $this->tooltip_class, $btn_icon="icon-save",
-						'data-placement="bottom" title=""', $auto_add = 0, $tbname);
+						'data-placement="'.$tip_place_subbtn.'" title=""', $auto_add = 0, $tbname);
 				}
 
 				if (!$isnew)
@@ -1765,7 +1776,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 							'FLEXI_SAVE_AND_NEW', $btn_name, $full_js="Joomla.submitbutton('".$btn_task."')", $msg_alert='', $msg_confirm='',
 							$btn_task, $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false,
 							$btn_class= (FLEXI_J40GE ? ' _DDI_class_ btn-success ' : '') . ' ' . $this->tooltip_class, $btn_icon="icon-save-new",
-							'data-placement="right" title="'.JText::_('FLEXI_SAVE_AND_NEW_INFO', true).'"', $auto_add = 0, $tbname);
+							'data-placement="'.$tip_place_subbtn.'" title="'.JText::_('FLEXI_SAVE_AND_NEW_INFO', true).'"', $auto_add = 0, $tbname);
 					}
 
 					// Also if an existing item, can save to a copy
@@ -1780,17 +1791,20 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 							'FLEXI_SAVE_AS_COPY', $btn_name, $full_js="Joomla.submitbutton('".$btn_task."')", $msg_alert='', $msg_confirm='',
 							$btn_task, $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false,
 							$btn_class= (FLEXI_J40GE ? ' _DDI_class_ btn-success ' : '') . ' ' . $this->tooltip_class, $btn_icon="icon-save-copy",
-							'data-placement="right" title="'.JText::_('FLEXI_SAVE_AS_COPY_INFO', true).'"', $auto_add = 0, $tbname);
+							'data-placement="'.$tip_place_subbtn.'" title="'.JText::_('FLEXI_SAVE_AS_COPY_INFO', true).'"', $auto_add = 0, $tbname);
 					}
 				}
 			}
 		}
 
+		// This will add a vertical spacer before for cancel button
+		$isSideBtns ? $btn_arr['fc_actions_before_cancel'] = '' : false;
+
 		flexicontent_html::addToolBarDropMenu(
 			$btn_arr,
 			'save_btns_group',
 			null,
-			array('drop_class_extra' => (FLEXI_J40GE ? 'btn-success' : '')),
+			array('drop_class_extra' => (FLEXI_J40GE ? 'btn-success' : ''), 'add_inline' => $add_inline),
 			$tbname
 		);
 
@@ -1889,7 +1903,13 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 					<span class="caret"></span>
 				</button>';
 
-			flexicontent_html::addToolBarDropMenu($btn_arr, 'preview_btns_group', $drop_btn, array(), $tbname);
+			flexicontent_html::addToolBarDropMenu(
+				$btn_arr,
+				'preview_btns_group',
+				$drop_btn,
+				array('drop_class_extra' => '', 'add_inline' => $add_inline),
+				$tbname
+			);
 		}
 
 
@@ -1960,7 +1980,13 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 				'.JText::_('FLEXI_MORE').'
 				<span class="caret"></span>
 			</button>';
-		flexicontent_html::addToolBarDropMenu($btn_arr, 'action_btns_group', $drop_btn, array(), $tbname);
+		flexicontent_html::addToolBarDropMenu(
+			$btn_arr,
+			'action_btns_group',
+			$drop_btn,
+			array('drop_class_extra' => '', 'add_inline' => $add_inline),
+			$tbname
+		);
 
 		// Return the new custom toolbar object, we will use it to display toolbar at custom place
 		return $toolbar;
@@ -2640,6 +2666,9 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		{
 			$type_lbl = JText::_('FLEXI_TYPE_NOT_DEFINED');
 		}
+
+		// Also assign it for usage by layout
+		$this->type_lbl = $type_lbl;
 
 
 		// Split titles of default tabs and language filter the titles

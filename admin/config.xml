@@ -1195,6 +1195,8 @@
 			<field name="buttons_placement_fe" type="fcradio" default="0" label="FLEXI_BUTTONS_PLACEMENT" description="FLEXI_BUTTONS_PLACEMENT_DESC" class="btn-group group-fcinfo">
 				<option value="0">FLEXI_TOP</option>
 				<option value="1">FLEXI_BOTTOM</option>
+				<option value="2">FLEXI_LEFT</option>
+				<option value="3">FLEXI_RIGHT</option>
 			</field>
 
 			<field name="" label="" type="separator" default="FLEXI_APPROVAL_NEEDED_WARNINGS" level="level2" />
@@ -1447,6 +1449,8 @@
 				<option value="-1">JTOOLBAR</option>
 				<option value="0">FLEXI_TOP</option>
 				<option value="1">FLEXI_BOTTOM</option>
+				<option value="2">FLEXI_LEFT</option>
+				<option value="3">FLEXI_RIGHT</option>
 			</field>
 
 			<field name="" label="" type="separator" default="FLEXI_APPROVAL_NEEDED_WARNINGS" level="level2" />

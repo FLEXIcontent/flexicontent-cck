@@ -886,8 +886,8 @@ div fieldset.panelform {
 }
 @media (min-width: 1020px) {
 	.com_flexicontent .btn.spaced-btn,
-	#fctoolbar-preview_btns_group,
-	#toolbar-preview_btns_group {
+	div.#fctoolbar-preview_btns_group,
+	div.#toolbar-preview_btns_group {
 		margin-left: 2rem !important;
 	}
 }
@@ -2070,16 +2070,19 @@ div.current ul.config-option-list li fieldset {
 
 #fctoolbar.btn-toolbar,
 #toolbar.btn-toolbar {
-		.btn-wrapper {
-	    display: inline-block;
-			margin-bottom: 6px !important;
-		}
+	.btn-wrapper {
+		display: inline-block;
+		margin-bottom: 6px !important;
+		box-sizing: border-box;
+	}
 
-	 > * {
+	> * {
+		margin-top: 4px;
+		margin-bottom: 4px;
 		margin-left: 0;
-		margin-top: 0;
 		margin-right: .75rem;
 		vertical-align: middle;
+		box-sizing: border-box;
 
 		.btn.buttons.btn-group {
 			padding: 0 !important;
@@ -2087,35 +2090,140 @@ div.current ul.config-option-list li fieldset {
 		}
 
 		.btn {
-			padding: 0.5rem !important;
+			box-sizing: border-box;
 			margin: 0;
 			float: none ! important;
 		}
-	 }
+	}
 }
 
+#fctoolbar.btn-toolbar {
+	> * .btn {
+		/* Do not apply to #toolbar... and specify individually (padding-*) to override other CSS*/
+		padding-top: 0.5rem !important;
+		padding-bottom: 0.5rem!important;
+		padding-left: 0.5rem !important;
+		padding-right: 0.5rem !important;
+	}
+	> *,
+	> * > * {
+		font-size: 14px;
+	}
+}
 
 /* Toolbar toggling in small screens */
 #fctoolbar_btn {
 	display: none;
+	margin: 0 0 12px 0;
 }
+
 @media (min-width: 480px) {
-	#fctoolbar {
-		display: block !important;
+	:not(div.fctoolbar_side_placement) > {  /* Only direct descedants, otherwise :not() will evaluate to true in other cases too */
+		#fctoolbar {
+			display: block !important;
+			margin-top: 0;
+		}
+		#fctoolbar_btn {
+			display: none !important;
+		}
 	}
 }
-@media (max-width: 479px) {
-	#fctoolbar_btn {
-		display: block;
+@media (max-width: 479px)  {
+	:not(div.fctoolbar_side_placement) > {  /* Only direct descedants, otherwise :not() will evaluate to true in other cases too */
+		#fctoolbar_btn {
+			display: block;
+		}
+		
+		#fctoolbar joomla-toolbar-button,
+		#toolbar joomla-toolbar-button,
+		#fctoolbar .btn-wrapper,
+		#toolbar .btn-wrapper,
+		#fctoolbar .btn,
+		#toolbar .btn {
+			margin-left: 0!important;
+			margin-right: 0 !important;
+			width: 100%;
+		}
+
+		#fctoolbar .buttons.btn-group,
+		#toolbar .buttons.btn-group {
+			> ul.dropdown-menu {
+				> li,
+				> li .toolbar {
+					text-align: center;
+				}
+			}
+		}
+	}
+}
+
+@media (min-width: 768px) {
+	.fctoolbar_side_placement {
+		#fctoolbar {
+			display: block !important;
+		}
+		#fctoolbar_btn {
+			display: none !important;
+		}
 	}
 
+	.fctoolbar_side_placement.fcpos_left {
+		#fctoolbar .buttons.btn-group,
+		#toolbar .buttons.btn-group {
+			> ul.dropdown-menu {
+				top: 0 !important;
+				left: 102%;
+			}
+		}
+	}
+
+	.fctoolbar_side_placement.fcpos_right {
+		#fctoolbar .buttons.btn-group,
+		#toolbar .buttons.btn-group {
+			> ul.dropdown-menu {
+				top: 0 !important;
+				right: 102%;
+			}
+		}
+	}
+}
+
+@media (max-width: 767px)  {
+	body .label-fcouter > label,
+	body .label-fcinner,
+	#flexicontent .label-fcouter > label,
+	#flexicontent .label-fcinner {
+		text-align: left;
+	}
+
+	.fctoolbar_side_placement {
+		margin: 24px 0 12px 0;
+
+		#fctoolbar_btn {
+			display: block !important;
+		}
+	}
+}
+
+.fctoolbar_side_placement {
+	#fctoolbar joomla-toolbar-button,
+	#toolbar joomla-toolbar-button,
 	#fctoolbar .btn-wrapper,
 	#toolbar .btn-wrapper,
-	#fctoolbar .btn,
-	#toolbar .btn {
+	#fctoolbar .btn-group,
+	#toolbar .btn-group,
+	#fctoolbar :not(li) > .btn,
+	#toolbar :not(li) > .btn {
 	  margin-left: 0!important;
 	  margin-right: 0 !important;
 		width: 100%;
+		white-space: normal;
+	}
+
+	#fctoolbar li > .btn,
+	#toolbar li > .btn {
+		text-align: left !important;
+		white-space: nowrap;
 	}
 
 	#fctoolbar .buttons.btn-group,
@@ -2129,6 +2237,27 @@ div.current ul.config-option-list li fieldset {
 	}
 }
 
+@media (min-width: 480px) and (max-width: 767px) {
+	.fctoolbar_side_placement {
+		#fctoolbar > .btn-wrapper,
+		#toolbar > .btn-wrapper,
+		#fctoolbar > *,
+		#toolbar > * {
+			margin-left: 0.5rem !important;
+			margin-right: 0.5rem !important;
+			width: auto !important;
+		}
+	}
+}
+
+div.fctoolbar_top_placement {
+	margin: 0;
+}
+div.fctoolbar_bottom_placement {
+	margin: 24px 0 12px 0;
+}
+
+
 #fctoolbar.btn-toolbar > *:first-of-type,
 #toolbar.btn-toolbar > *:first-of-type {
 }
@@ -2140,12 +2269,14 @@ div.current ul.config-option-list li fieldset {
 	min-width: unset;
 }
 
+#fctoolbar joomla-toolbar-button,
+#toolbar joomla-toolbar-button,
 #fctoolbar .buttons.btn-group,
 #toolbar .buttons.btn-group {
-	display: table !important;
+	display: inline-flex !important;
 
 	.btn {
-		display: table-cell !important;
+		/*display: inline-block !important;*/
 	}
 
 	.toolbar {
@@ -2188,6 +2319,9 @@ div.current ul.config-option-list li fieldset {
 
 	> .toolbar + .dropdown-toggle:not(.dropdown-toggle-split) {
 		padding-top: 1px;
+	}
+	> .toolbar + .dropdown-toggle {
+		flex-basis: 0;
 	}
 	> .dropdown-toggle:first-child .caret {
 		margin-top: 10px;

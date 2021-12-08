@@ -485,6 +485,8 @@
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_TOP</option>
 				<option value="1">FLEXI_BOTTOM</option>
+				<option value="2">FLEXI_LEFT</option>
+				<option value="3">FLEXI_RIGHT</option>
 			</field>
 
 			<field name="" label="" type="separator" default="FLEXI_APPROVAL_NEEDED_WARNINGS" level="level2" />
@@ -768,6 +770,8 @@
 				<option value="-1">JTOOLBAR</option>
 				<option value="0">FLEXI_TOP</option>
 				<option value="1">FLEXI_BOTTOM</option>
+				<option value="2">FLEXI_LEFT</option>
+				<option value="3">FLEXI_RIGHT</option>
 			</field>
 
 			<field name="" label="" type="separator" default="FLEXI_APPROVAL_NEEDED_WARNINGS" level="level2" />

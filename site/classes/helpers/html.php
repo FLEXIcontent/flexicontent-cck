@@ -5596,15 +5596,15 @@ class flexicontent_html
 		static $btngroup_id = 0;
 		$btngroup_id++;
 
-		if (count($btn_arr) < 2)
+		if (count($btn_arr) < 2 || !empty($ops['add_inline']))
 		{
-			if (count($btn_arr) === 1)
+			if (count($btn_arr) === 1 || !empty($ops['add_inline']))
 			{
-				$btn_html = end($btn_arr);
-				$btn_name = key($btn_arr);
-				$btn_html = str_replace('_DDI_class_', '', $btn_html);
-
-				$toolbar->appendButton('Custom', $btn_html, $btn_name);
+				foreach ($btn_arr as $btn_name => $btn_html)
+				{
+					$btn_html = str_replace('_DDI_class_', '', $btn_html);
+					$toolbar->appendButton('Custom', $btn_html, $btn_name);
+				}
 			}
 
 			return;
@@ -5633,7 +5633,7 @@ class flexicontent_html
 		}
 
 		$buttons_html = '
-			<div class="buttons btn btn-group' . (FLEXI_J40GE ? ' dropdown' : '') . '">
+			<div class="buttons btn-group' . (FLEXI_J40GE ? ' dropdown' : '') . '">
 				'.array_shift($btn_arr).'
 			  '.($drop_btn ?: '
 			  <button class="' . $drop_btn_class . '"

@@ -12,7 +12,6 @@
 defined('_JEXEC') or die('Restricted access');
 
 include "common/load_config_n_acl.php";
-//include "common/render_buttons.php";
 include "common/render_fields.php";
 
 

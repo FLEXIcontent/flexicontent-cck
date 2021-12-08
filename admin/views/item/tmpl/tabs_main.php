@@ -73,7 +73,7 @@ if ( count($tab_fields['tab01']) ) :
 // *** CUSTOM FIELDS TAB (via TYPE)
 // ***
 if ( count($tab_fields['tab02']) ) :
-	$tab_lbl = isset($tab_titles['tab02']) ? $tab_titles['tab02'] : $type_lbl; // __TYPE_NAME__
+	$tab_lbl = isset($tab_titles['tab02']) ? $tab_titles['tab02'] : $this->type_lbl; // __TYPE_NAME__
 	$tab_ico = isset($tab_icocss['tab02']) ? $tab_icocss['tab02'] : 'icon-tree-2';
 	?>
 	<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" data-icon-class="<?php echo $tab_ico; ?>">

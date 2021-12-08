@@ -15,6 +15,7 @@ use Joomla\String\StringHelper;
 
 $submit_msg = $approval_msg = '';
 
+
 /**
  * A custom message about submitting new Content via configuration parameter per item type
  */
@@ -22,6 +23,7 @@ if ($isnew && $submit_message)
 {
 	$submit_msg = sprintf( $alert_box, 'id="fc_submit_msg"', 'note', 'fc-nobgimage', JText::_($submit_message) );
 }
+
 
 /**
  * Autopublishing new item regardless of publish privilege, use a menu item specific
@@ -86,6 +88,7 @@ elseif ($approval_warning_inform)
 	}
 }
 
+
 // Check if it is possible to hide the category selector
 if ($usemaincat === 0 && empty($this->menuCats->cancatid) && !$this->row->id && !$this->params->get('catid_default'))
 {
@@ -96,7 +99,9 @@ if ($usemaincat === 0 && empty($this->menuCats->cancatid) && !$this->row->id && 
 		'error', '', JText::_('FLEXI_CANNOT_HIDE_MAINCAT_MISCONFIG_INFO')
 	) . '<br>' . $this->lists['catid'];
 }
+
 ?>
+
 
 <?php if ($submit_msg || $approval_msg) : ?>
 	<div class="fcclear" style="height:12px!important;"></div>
@@ -121,11 +126,11 @@ if ($usemaincat === 0 && empty($this->menuCats->cancatid) && !$this->row->id && 
 		<?php $captured['captcha'] = ob_get_clean(); ?>
 
 	<?php endif;
-endif; ?>
+endif;
 
 
 
-<?php
+
 /**
  * Capture JOOMLA INTRO/FULL IMAGES and URLS
  */
@@ -160,6 +165,7 @@ if ( $this->params->get('use_jimages' . $CFGsfx, $show_jui) || $this->params->ge
 
 	endforeach;
 endif;
+
 
 
 
@@ -219,6 +225,7 @@ endif;
 
 
 
+
 if ($usealias) : ob_start();  // alias ?>
 	<?php
 	$field = isset($this->fields['alias']) ? $this->fields['alias'] : false;
@@ -273,6 +280,7 @@ endif;
 
 
 
+
 if ((!$this->menuCats || $this->menuCats->cancatid) && $usemaincat) : ob_start();  // category ?>
 	<?php
 	// Field via coreprops field type
@@ -311,6 +319,7 @@ endif;
 
 
 
+
 if ($uselang) : ob_start();  // lang ?>
 	<?php
 	// Field via coreprops field type
@@ -342,6 +351,7 @@ if ($uselang) : ob_start();  // lang ?>
 	</div>
 <?php $captured['lang'] = ob_get_clean();
 endif;
+
 
 
 
@@ -434,11 +444,10 @@ if ($tags_displayed) : ob_start();  // tags ?>
 	</div>
 <?php $captured['tags'] = ob_get_clean();
 endif;
-?>
 
 
 
-<?php
+
 if (!$typeid || $usetype) : ob_start();  // type
 		$field = isset($this->fields['document_type']) ? $this->fields['document_type'] : false;
 		$field_description = $field && $field->description ? $field->description : JText::_($this->form->getField('type_id')->description);  // Note: form element (XML file) is 'type_id' not 'document_type'
@@ -469,13 +478,12 @@ endif;
 
 
 
-
 if ($isSite && $isnew && $this->params->get('autopublished', 0) ) :  // Auto publish new item via MENU OVERRIDE ?>
 
 	<input type="hidden" id="jform_state" name="jform[state]" value="1" />
 	<input type="hidden" id="jform_vstate" name="jform[vstate]" value="2" />
 
-<?php else : ob_start();  // state (and vstate) ?>
+<?php else : ob_start();  // state and vstate (= approval of new document version) ?>
 
 	<?php
 		$field = isset($this->fields['state']) ? $this->fields['state'] : false;
@@ -494,9 +502,7 @@ if ($isSite && $isnew && $this->params->get('autopublished', 0) ) :  // Auto pub
 	</span>
 
 
-	<?php if ( $this->perms['canpublish'] ) :
-		// Display state selection field to the user that can publish
-	?>
+	<?php if ( $this->perms['canpublish'] ) :  // state ?>
 
 		<div class="container_fcfield container_fcfield_id_10 container_fcfield_name_state" id="container_fcfield_10">
 			<?php echo $this->lists['state']; ?>
@@ -514,7 +520,7 @@ if ($isSite && $isnew && $this->params->get('autopublished', 0) ) :  // Auto pub
 	endif;?>
 
 
-	<?php if ($this->perms['canpublish']) : ?>
+	<?php if ($this->perms['canpublish']) : // vstate (= approval of new document version) ?>
 
 		 <?php if ($use_versioning && !$auto_approve) :
 		   // CASE 1. Display the 'publish changes' field.
@@ -557,7 +563,7 @@ if ($isSite && $isnew && $this->params->get('autopublished', 0) ) :  // Auto pub
 
 	endif; ?>
 
-<?php $captured['state'] = ob_get_clean();
+<?php $captured['state'] = ob_get_clean();   // this includes both fields: state, vstate
 endif;
 
 
@@ -588,7 +594,11 @@ if ($useaccess) : ob_start(); ob_start();  // access ?>
 
 
 
-// This parameter is always present in backend inside the atrribs parameter section
+/**
+ * Note: This parameter is part of attribs parameter group, but we want to display it separately
+ * when attribs are displayed in the form, it will be auto-skipped (from the section)
+ */
+
 if ($typeid && $allowdisablingcomments) : ob_start();  // disable_comments ?>
 	<?php
 	$label_attrs = 'class="' . $tip_class . $lbl_class . $lbl_extra_class . '" title="'.flexicontent_html::getToolTip('FLEXI_ALLOW_COMMENTS', 'FLEXI_ALLOW_COMMENTS_DESC', 1, 1).'"';
@@ -658,30 +668,6 @@ if ($typeid && $allow_owner_notify && $this->row->created_by != $user->id) :  ob
 	</div>
 <?php $captured['notify_owner'] = ob_get_clean();
 endif;
-
-
-
-
-
-if ($typeid)
-{
-	$_str = JText::_('FLEXI_DETAILS');
-	$_str = StringHelper::strtoupper(StringHelper::substr($_str, 0, 1)) . StringHelper::substr($_str, 1);
-
-	$type_lbl = $this->typesselected->name;
-	$type_lbl = $type_lbl ? JText::_($type_lbl) : JText::_('FLEXI_CONTENT_TYPE');
-	$type_lbl = $type_lbl .' ('. $_str .')';
-}
-else
-{
-	$type_lbl = JText::_('FLEXI_TYPE_NOT_DEFINED');
-}
-
-
-
-
-
-
 
 
 
@@ -845,7 +831,7 @@ if ($this->fields && $typeid) :
 				<div style="<?php echo $container_width; ?>" class="controls <?php echo $container_class; ?>" id="container_fcfield_<?php echo $field->id; ?>">
 					<?php echo ($field->description && $edithelp==3)  ?  sprintf( $alert_box, '', 'info', 'fc-nobgimage', $field->description )  :  ''; ?>
 
-				<?php // CASE 1: CORE 'description' FIELD with multi-tabbed editing of joomfish (J1.5) or falang (J2.5+)
+				<?php // CASE 1: CORE 'description' FIELD with multi-tabbed editing falang
 				if ($field->field_type === 'maintext' && isset($this->row->item_translations)) :
 
 					array_push($tabSetStack, $tabSetCnt);
@@ -947,16 +933,6 @@ if ($this->fields && $typeid) :
 $captured['fields_manager'] = ob_get_clean();
 $captured['fields_manager'] .= implode('<div class="fcclear"></div>', $captured['fman']);
 unset($captured['fman']);
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -1305,11 +1281,11 @@ if ($usepublicationdetails) : // timezone_info, publication_details ?>
 			</div>
 		<?php $captured['modified'] = ob_get_clean(); endif; ?>
 
-<?php endif; ?>
+<?php endif;
 
 
 
-<?php
+
 if ( $typeid && $usemetadata ) : ob_start(); // metadata ?>
 	<fieldset class="panelform">
 		<legend>
@@ -1432,6 +1408,7 @@ endif;
 
 
 
+
 if ($typeid && $useseoconf) : ob_start(); // seoconf ?>
 	<fieldset class="panelform">
 		<legend>
@@ -1464,12 +1441,10 @@ if ($typeid && $useseoconf) : ob_start(); // seoconf ?>
 
 <?php $captured['seoconf'] = ob_get_clean();
 endif;
-?>
 
 
 
 
-<?php
 // Parameter configured to be displayed
 $has_custom_params = false;
 $fieldSets = $this->form->getFieldsets('attribs');
@@ -1664,80 +1639,76 @@ if ($typeid && $selecttheme) : ?>
 	$captured['layout_params'] = ob_get_clean(); endif;
 
 endif; // end of template: layout_selection, layout_params
-?>
 
 
 
 
-	<?php if ($typeid && $use_versioning && $this->perms['canversion'] && $versionsplacement !== 0) : ob_start() ?>
+if ($typeid && $use_versioning && $this->perms['canversion'] && $versionsplacement !== 0) : ob_start()  // versions ?>
 
-		<table class="" style="margin: 10px; width: auto; float: left;">
+	<table class="" style="margin: 10px; width: auto; float: left;">
+		<tr>
+			<td>
+				<h3><?php echo JText::_( 'FLEXI_VERSIONS_HISTORY' ); ?></h3>
+			</td>
+		</tr>
+		<tr><td>
+			<table id="version_tbl" class="fc-table-list fc-tbl-short">
+			<?php if ($this->row->id == 0) : ?>
 			<tr>
-				<td>
-					<h3><?php echo JText::_( 'FLEXI_VERSIONS_HISTORY' ); ?></h3>
+				<td class="versions-first" colspan="4"><?php echo JText::_( 'FLEXI_NEW_ARTICLE' ); ?></td>
+			</tr>
+			<?php
+			else :
+			$date_format = (($date_format = JText::_( 'FLEXI_DATE_FORMAT_FLEXI_VERSIONS_J16GE' )) == 'FLEXI_DATE_FORMAT_FLEXI_VERSIONS_J16GE') ? "d/M H:i" : $date_format;
+			foreach ($this->versions as $version) :
+				$class = ($version->nr == $this->row->version) ? ' id="active-version" class="success"' : '';
+				if ((int)$version->nr > 0) :
+			?>
+			<tr<?php echo $class; ?>>
+				<td class="versions"><span style="padding: 0 5px 0 0;"><?php echo '#' . $version->nr; ?></span></td>
+				<td class="versions"><span style="padding: 0 5px 0 0;"><?php echo JHtml::_('date', (($version->nr == 1) ? $this->row->created : $version->date), $date_format ); ?></span></td>
+				<td class="versions"><span style="padding: 0 5px 0 0;"><?php echo ($version->nr == 1) ? flexicontent_html::striptagsandcut($this->row->creator, 25) : flexicontent_html::striptagsandcut($version->modifier, 25); ?></span></td>
+				<td class="versions">
+
+					<a href="javascript:;" class="hasTooltip" title="<?php echo JHtml::tooltipText( JText::_( 'FLEXI_COMMENT' ), ($version->comment ? $version->comment : 'No comment written'), 0, 1); ?>"><?php echo $comment_image;?></a>
+
+					<?php if (!$isSite) :?>
+						<?php if ((int) $version->nr === (int) $this->row->current_version) : ?>
+							<a onclick="javascript:return clickRestore('<?php echo JUri::base(true); ?>/index.php?option=com_flexicontent&amp;view=item&amp;<?php echo $task_items;?>edit&amp;<?php ($isSite ? 'id=' : 'cid=') . $this->row->id;?>&amp;version=<?php echo $version->nr; ?>');" href="javascript:;"><?php echo JText::_( 'FLEXI_CURRENT' ); ?></a>
+
+						<?php else : ?>
+
+							<a class="modal-versions"
+								href="index.php?option=com_flexicontent&amp;view=itemcompare&amp;cid=<?php echo $this->row->id; ?>&amp;version=<?php echo $version->nr; ?>&amp;tmpl=component"
+								title="<?php echo JText::_( 'FLEXI_COMPARE_WITH_CURRENT_VERSION' ); ?>"
+							>
+								<?php echo $compare_image; ?>
+							</a>
+
+							<a onclick="javascript:return clickRestore('<?php echo JUri::base(true); ?>/index.php?option=com_flexicontent&amp;task=items.edit&amp;<?php ($isSite ? 'id=' : 'cid=') . $this->row->id;?>&amp;version=<?php echo $version->nr; ?>&amp;<?php echo JSession::getFormToken();?>=1');"
+								href="javascript:;"
+								title="<?php echo JText::sprintf( 'FLEXI_REVERT_TO_THIS_VERSION', $version->nr ); ?>"
+							>
+								<?php echo $revert_image; ?>
+							</a>
+
+						<?php endif; ?>
+					<?php endif; ?>
+
 				</td>
 			</tr>
-			<tr><td>
-				<table id="version_tbl" class="fc-table-list fc-tbl-short">
-				<?php if ($this->row->id == 0) : ?>
-				<tr>
-					<td class="versions-first" colspan="4"><?php echo JText::_( 'FLEXI_NEW_ARTICLE' ); ?></td>
-				</tr>
-				<?php
-				else :
-				$date_format = (($date_format = JText::_( 'FLEXI_DATE_FORMAT_FLEXI_VERSIONS_J16GE' )) == 'FLEXI_DATE_FORMAT_FLEXI_VERSIONS_J16GE') ? "d/M H:i" : $date_format;
-				foreach ($this->versions as $version) :
-					$class = ($version->nr == $this->row->version) ? ' id="active-version" class="success"' : '';
-					if ((int)$version->nr > 0) :
-				?>
-				<tr<?php echo $class; ?>>
-					<td class="versions"><span style="padding: 0 5px 0 0;"><?php echo '#' . $version->nr; ?></span></td>
-					<td class="versions"><span style="padding: 0 5px 0 0;"><?php echo JHtml::_('date', (($version->nr == 1) ? $this->row->created : $version->date), $date_format ); ?></span></td>
-					<td class="versions"><span style="padding: 0 5px 0 0;"><?php echo ($version->nr == 1) ? flexicontent_html::striptagsandcut($this->row->creator, 25) : flexicontent_html::striptagsandcut($version->modifier, 25); ?></span></td>
-					<td class="versions">
-
-						<a href="javascript:;" class="hasTooltip" title="<?php echo JHtml::tooltipText( JText::_( 'FLEXI_COMMENT' ), ($version->comment ? $version->comment : 'No comment written'), 0, 1); ?>"><?php echo $comment_image;?></a>
-
-						<?php if (!$isSite) :?>
-							<?php if ((int) $version->nr === (int) $this->row->current_version) : ?>
-								<a onclick="javascript:return clickRestore('<?php echo JUri::base(true); ?>/index.php?option=com_flexicontent&amp;view=item&amp;<?php echo $task_items;?>edit&amp;<?php ($isSite ? 'id=' : 'cid=') . $this->row->id;?>&amp;version=<?php echo $version->nr; ?>');" href="javascript:;"><?php echo JText::_( 'FLEXI_CURRENT' ); ?></a>
-
-							<?php else : ?>
-
-								<a class="modal-versions"
-									href="index.php?option=com_flexicontent&amp;view=itemcompare&amp;cid=<?php echo $this->row->id; ?>&amp;version=<?php echo $version->nr; ?>&amp;tmpl=component"
-									title="<?php echo JText::_( 'FLEXI_COMPARE_WITH_CURRENT_VERSION' ); ?>"
-								>
-									<?php echo $compare_image; ?>
-								</a>
-
-								<a onclick="javascript:return clickRestore('<?php echo JUri::base(true); ?>/index.php?option=com_flexicontent&amp;task=items.edit&amp;<?php ($isSite ? 'id=' : 'cid=') . $this->row->id;?>&amp;version=<?php echo $version->nr; ?>&amp;<?php echo JSession::getFormToken();?>=1');"
-									href="javascript:;"
-									title="<?php echo JText::sprintf( 'FLEXI_REVERT_TO_THIS_VERSION', $version->nr ); ?>"
-								>
-									<?php echo $revert_image; ?>
-								</a>
-
-							<?php endif; ?>
-						<?php endif; ?>
-
-					</td>
-				</tr>
-				<?php
-					endif;
-				endforeach;
-				endif; ?>
-				</table>
-			</td></tr>
-			<tr style="background:unset;"><td style="background:unset;">
-				<div id="fc_pager"></div>
-			</td></tr>
-		</table>
+			<?php
+				endif;
+			endforeach;
+			endif; ?>
+			</table>
+		</td></tr>
+		<tr style="background:unset;"><td style="background:unset;">
+			<div id="fc_pager"></div>
+		</td></tr>
+	</table>
 
 <?php $captured['versions'] = ob_get_clean(); endif;
-
-
-
 
 
 
@@ -1775,8 +1746,6 @@ if ($permsplacement && $this->perms['canright'] ) : ob_start(); // perms ?>
 
 
 
-
-
 /**
  * ANY field not found inside the 'captured' ARRAY,
  * must be a field not configured to be displayed
@@ -1785,8 +1754,8 @@ if ($permsplacement && $this->perms['canright'] ) : ob_start(); // perms ?>
 $displayed_at_tab = array();
 foreach($tab_fields as $tabname => $fieldnames)
 {
-	//echo "$tabname <br/>  %% ";
-	//print_r($fieldnames); echo "<br/>";
+	// echo "$tabname <br/>  %% " . print_r($fieldnames, true) . "<br/>";
+
 	foreach($fieldnames as $fn => $i)
 	{
 		//echo " -- $fn <br/>";
@@ -1818,19 +1787,24 @@ foreach($tab_fields as $tabname => $fieldnames)
 
 
 
+
 /**
- * CONFIGURATION WARNINGS
+ * CONFIGURATION WARNINGS, fields that are displayed twice, and core properties that are missing
  */
 $msg = '';
-foreach($displayed_at_tab as $fieldname => $_places) {
+foreach($displayed_at_tab as $fieldname => $_places)
+{
 	if ( count($_places) > 1 ) $msg .= "<br/><b>".$fieldname."</b>" . " at [".implode(', ', $_places)."]";
 }
-if ($msg) {
+
+if ($msg)
+{
 	$msg = JText::sprintf( 'FLEXI_FORM_FIELDS_DISPLAYED_TWICE', $msg."<br/>");
 	echo sprintf( $alert_box, '', 'error', '', $msg );
 }
 
-if ( count($coreprop_missing) ) :
+if ( count($coreprop_missing) )
+{
 	$msg = JText::sprintf( 'FLEXI_FORM_PLACER_FIELDS_MISSING', "<b>".implode(', ', array_keys($coreprop_missing))."</b>");
 	echo sprintf( $alert_box, '', 'error', '', $msg );
-endif;
+}
