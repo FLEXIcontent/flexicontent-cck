@@ -43,6 +43,7 @@ $files = array(
 	JPATH_SITE . '/components/com_flexicontent/librairies/elastislide/js/gallery_tmpl.js',
 	JPATH_ADMINISTRATOR . '/components/com_flexicontent/views/item/tmpl/tabs_main.php',
 	JPATH_ADMINISTRATOR . '/components/com_flexicontent/views/item/tmpl/flat_main.php',
+	JPATH_ADMINISTRATOR . '/components/com_flexicontent/views/item/tmpl/default_associations.php',
 );
 
 $folders = array(

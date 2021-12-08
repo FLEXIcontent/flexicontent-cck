@@ -74,6 +74,7 @@ class JFormFieldFclayout extends JFormFieldGroupedList
 		$jinput = $app->input;
 		$option = $jinput->get('option', '', 'CMD');
 		$view   = $jinput->get('view', '', 'CMD');
+		$task   = $jinput->get('task', '', 'CMD');
 
 		if (
 			$option == 'com_modules' ||
@@ -521,7 +522,7 @@ function fc_getLayout_".$_name."(el, initial)
 ")."
 
 jQuery(document).ready(function(){
-	var el = document.getElementById('jform_".($view=='field' ? "attribs_" : "params_").$_name."');
+	var el = document.getElementById('jform_".($view === 'field' || ($view === 'type' && in_array($task, array('edit', 'add'))) ? "attribs_" : "params_").$_name."');
 	fc_getLayout_".$_name."(el, 1);
 
 	// In case on DOM ready the element is intialized, retry on this custom event

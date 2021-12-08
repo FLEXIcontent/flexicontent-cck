@@ -516,7 +516,10 @@
 
 		</fieldset>
 
-		<!--fieldset name="layout_iform_fe" label="FLEXI_LAYOUT" description="FLEXI_LAYOUT_DESC">
+		<!--fieldset name="form_layout_attribs_fe" label="Item Form Layout FE" description="Item form layout for frontend item form">
+		</fieldset-->
+
+		<!--fieldset name="form_layout_attribs_be" label="Item Form Layout BE" description="Item form layout for backend item form">
 		</fieldset-->
 
 		<fieldset name="frontend_item_form" label="FLEXI_ITEM_FORM" icon_class="icon-pencil">
@@ -531,11 +534,11 @@
 
 			<field name="item_form_fe_tab_behaviour" type="separator" default="FLEXI_GENERAL_FORM_BEHAVIOR" icon_class="icon-cog" level="tab_open" box_type="1" />
 
-			<!--field name="layout" type="fclayout" default="tabs" label="FLEXI_CHOOSE_TMPL"
-				description="FLEXI_CHOOSE_TMPL_DESC" directory="/administrator/components/com_flexicontent/views/item/tmpl" ext_name="" ext_view="item_form"
-				hide_default="1" hide_none="1" stripext="1" filter="\.php$" exclude="^_"
-				tmpl_container="layout_iform_fe" params_source="file"
-				/--> <!-- params_source="inline" -->
+			<field name="form_layout_fe" type="fclayout" default="" label="FLEXI_ITEM_FORM_LAYOUT"
+				description="" directory="/administrator/components/com_flexicontent/views/item/tmpl" ext_name="" ext_view="item_form"
+				hide_default="0" hide_none="1" stripext="1" filter="\.php$" exclude="^_|default\.php"
+				tmpl_container="form_layout_attribs_fe" params_source="inline"
+				/> <!-- params_source="file" -->
 
 			<field name="allowbuttons_fe" type="fccheckbox" default="" display_useglobal="1"
 				checkoptions="FLEXI_APPLY_N_RELOAD,FLEXI_APPLY,FLEXI_SAVE_AND_NEW,FLEXI_SAVE_AS_COPY,FLEXI_SAVE_A_PREVIEW,FLEXI_PREVIEW_LATEST"
@@ -756,7 +759,9 @@
 				<option value="2">FLEXI_INLINE</option>
 			</field>
 
-			<field name="item_form_fe_tab_layout" type="separator" default="FLEXI_ITEM_FORM_LAYOUT" icon_class="icon-screen" level="tab_open" box_type="1" />
+			<field name="item_form_fe_flat_layout" type="separator" default="Layout: flat" icon_class="icon-screen" level="tab_open" box_type="1" />
+
+			<field name="item_form_fe_tab_layout" type="separator" default="Layout: tabs" icon_class="icon-screen" level="tab_open" box_type="1" />
 
 			<field name="form_layout_configs" type="multilist" subtype="radio" default="" label="FLEXI_PRESET_CONFIGURATIONS" description="FLEXI_PRESET_CONFIGURATIONS_DESC" toggle_related="1" fccustom_revert="1" class="btn-group group-fcmethod" labelclass="label text-white bg-success label-success">
 				<option value="">FLEXI_CUSTOMIZE</option>
@@ -820,6 +825,12 @@
 
 
 			<field name="item_form_be_tab_behaviour" type="separator" default="FLEXI_GENERAL_FORM_BEHAVIOR" icon_class="icon-cog" level="tab_open" box_type="1" />
+
+			<field name="form_layout_be" type="fclayout" default="" label="FLEXI_ITEM_FORM_LAYOUT"
+				description="" directory="/administrator/components/com_flexicontent/views/item/tmpl" ext_name="" ext_view="item_form"
+				hide_default="0" hide_none="1" stripext="1" filter="\.php$" exclude="^_|default\.php"
+				tmpl_container="form_layout_attribs_be" params_source="inline"
+				/> <!-- params_source="file" -->
 
 			<field name="allowbuttons_be" type="fccheckbox" default="" display_useglobal="1"
 				checkoptions="FLEXI_APPLY_N_RELOAD,FLEXI_APPLY,FLEXI_SAVE_AND_NEW,FLEXI_SAVE_AS_COPY,FLEXI_SAVE_A_PREVIEW,FLEXI_PREVIEW_LATEST"
@@ -1029,7 +1040,9 @@
 				<option value="2">FLEXI_INLINE</option>
 			</field>
 
-			<field name="item_form_be_tab_layout" type="separator" default="FLEXI_ITEM_FORM_LAYOUT" icon_class="icon-screen" level="tab_open" box_type="1" />
+			<field name="item_form_be_flat_layout" type="separator" default="Layout: flat" icon_class="icon-screen" level="tab_open" box_type="1" />
+
+			<field name="item_form_be_tab_layout" type="separator" default="Layout: tabs" icon_class="icon-screen" level="tab_open" box_type="1" />
 
 			<field name="form_layout_configs_be" type="multilist" subtype="radio" default="" label="FLEXI_PRESET_CONFIGURATIONS" description="FLEXI_PRESET_CONFIGURATIONS_DESC" toggle_related="1" fccustom_revert="1" class="btn-group group-fcmethod" labelclass="label text-white bg-success label-success">
 				<option value="">FLEXI_CUSTOMIZE</option>
