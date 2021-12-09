@@ -117,15 +117,22 @@ else
 // PREPARE Calling the controller task
 // ***********************************
 
-// a. Get view, task, controller REQUEST variables
-$view = $jinput->get('view', '', 'cmd');
-$task = $jinput->get('task', '', 'cmd');
+// a. Get view, task, controller, layout REQUEST variables
+$view       = $jinput->get('view', '', 'cmd');
+$task       = $jinput->get('task', '', 'cmd');
 $controller = $jinput->get('controller', '', 'cmd');
+$layout     = $jinput->get('layout', '', 'cmd');
 
 // b. In J1.6+ controller can be set via task variable ... split task from controller name
 $_ct = explode('.', $task);
 $task = $_ct[ count($_ct) - 1];
 if (count($_ct) > 1) $controller = $_ct[0];
+
+if ($view === 'item' && $layout === 'form' && !$task)
+{
+	$task = 'edit';
+	$jinput->set('task', $task, 'cmd');
+}
 
 // Handle legacy URLs that their 'task' variable does not include the controller name
 $FE_item_tasks_proxied = array(
