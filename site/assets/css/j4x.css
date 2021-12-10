@@ -382,3 +382,45 @@ header.group.tool {
 	position: initial;
 	z-index: 5;
 }
+div#fc_approval_msg {
+	color: #084298;
+	background-color: #cfe2ff;
+}
+a.close {
+	float: right;
+	margin-top: -23px;
+	font-size: 26px !important;
+	text-decoration: none !important;
+	margin-right: -10px;
+}
+.buttons.btn-group.dropdown {
+	background: #448344;
+	border-radius: 5px;
+}
+fctoolbar.toolbar.btn.btn-sm.dropdown-item.btn-success.hasTooltip {
+	color: #fff;
+}
+#fctoolbar joomla-toolbar-button > .toolbar + .dropdown-toggle,
+#toolbar joomla-toolbar-button > .toolbar + .dropdown-toggle,
+#fctoolbar .buttons.btn-group > .toolbar + .dropdown-toggle,
+#toolbar .buttons.btn-group > .toolbar + .dropdown-toggle {
+	margin-left: -5px !important;
+}
+.fctoolbar_side_placement #fctoolbar.btn-toolbar > *,
+#toolbar.btn-toolbar > * {
+	width: 100%;
+}
+ul.dropdown-menu {
+	background: #fff !important;
+	color: #22262a !important;
+	box-shadow: 0 0 9px 0px #00000047 !important;
+}
+li fctoolbar.toolbar.btn.btn-sm.dropdown-item.btn-success.hasTooltip {
+	color: #22262a;
+}
+div#fctoolbar .buttons {
+	margin-right: 5px;
+}
+.fctoolbar_side_placement div#fctoolbar .buttons {
+	margin-bottom: 5px;
+}
