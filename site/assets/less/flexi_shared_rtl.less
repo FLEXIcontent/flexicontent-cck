@@ -825,6 +825,24 @@ span.fc_select_button:hover {
 	/*background-color: cyan;*/ /* for testing */
 }
 
+#flexicontent .fc_form_flex_box {
+	float: none;
+	width: 100;
+	margin: 0;
+	padding: 0;
+	display: flex;
+	flex-wrap: wrap;
+	border: 0 none;
+}
+#flexicontent .fc_form_flex_box_item {
+	float: none;
+	flex-grow: 1;
+	margin: 12px;
+	padding: 0;
+	display: inline-block;
+	border: 0 none;
+}
+
 #flexicontent div.fields_tabset,
 #flexicontent div.params_tabset {
 	width: 100% !important;
@@ -892,6 +910,9 @@ div fieldset.panelform {
 	}
 }
 
+body .controls .btn-group.btn-group-yesno {
+	width: unset;
+}
 body .controls .btn-group.btn-group-yesno .btn,
 body .btn-group.btn-group-yesno .btn,
 body .btn-group.group-fcinfo .btn,
@@ -1138,7 +1159,7 @@ form div.container_fcfield > select {
 #flexicontent div fieldset.panelform :not(.container_fcfield) fieldset.group-fcset,
 #flexicontent div fieldset.panelform :not(.container_fcfield) textarea {
 	min-width: 60%;
-	max-width: 81%;
+	/*max-width: 81%;*/
 	box-sizing: border-box;
 	display: inline-block;
 	margin-right: 0 !important;

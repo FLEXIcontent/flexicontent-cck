@@ -12,6 +12,12 @@
 defined('_JEXEC') or die('Restricted access');
 use Joomla\String\StringHelper;
 
+/**
+ * Arrays containing the captured form fields and other displayed content
+ */
+$captured = array();  // Support legacy forms, contains a single HTML string
+$rendered = array();  // An object with: field (object), label_html, input_html, html (container with label_html + input_html)
+
 
 $submit_msg = $approval_msg = '';
 
@@ -29,7 +35,7 @@ if ($isnew && $submit_message)
  * Autopublishing new item regardless of publish privilege, use a menu item specific
  * message if this is set, or notify user of autopublishing with a default message
  */
-if ($isSite && $isnew && $this->params->get('autopublished', 0))
+if ($is_autopublished)
 {
 	// *** THIS option only exists in the frontend submit conf
 	// *** THIS IS CURRENTLY used for FRONTEND only (is-site check is done in controller and model)
@@ -112,20 +118,24 @@ if ($usemaincat === 0 && empty($this->menuCats->cancatid) && !$this->row->id && 
 
 
 
-<?php if ($isSite): ?>
+
+<?php if ($isSite): ob_start();  // captcha ?>
+
 	<?php if ( $this->captcha_errmsg ) : ?>
 
 		<?php echo sprintf( $alert_box, '', 'error', '', $this->captcha_errmsg );?>
 
 	<?php elseif ( $this->captcha_field ) : ?>
 
-		<?php ob_start();  // captcha ?>
 			<fieldset class="flexi_params fc_edit_container_full">
 			<?php echo $this->captcha_field; ?>
 			</fieldset>
-		<?php $captured['captcha'] = ob_get_clean(); ?>
 
-	<?php endif;
+	<?php endif; ?>
+<?php
+$fn = 'captcha';
+$captured[$fn] = ob_get_clean();
+$rendered[$fn] = (object) array('label_html' => '', 'input_html' => $captured[$fn], 'html' => $captured[$fn], 'field' => $field);
 endif;
 
 
@@ -170,10 +180,12 @@ endif;
 
 
 if ( !$this->params->get('auto_title', 0) || $usetitle ) :  ob_start();  // title ?>
+	<div class="fcclear"></div>
 	<?php
 	$field = isset($this->fields['title']) ? $this->fields['title'] : false;
 	$field_description = $field && $field->description ? $field->description : JText::_($this->form->getField('title')->description);
 	$label_attrs = 'class="' . $tip_class . $lbl_class . $lbl_extra_class . '" title="'.flexicontent_html::getToolTip(null, $field_description, 0, 1).'"';
+	ob_start();
 	?>
 	<span class="label-fcouter" id="jform_title-lbl-outer">
 		<label id="jform_title-lbl" for="jform_title" data-for="jform_title" <?php echo $label_attrs; ?> >
@@ -181,6 +193,7 @@ if ( !$this->params->get('auto_title', 0) || $usetitle ) :  ob_start();  // titl
 			/* $field->label is set per type */ ?>
 		</label>
 	</span>
+	<?php $label_html = ob_get_clean(); echo $label_html; ob_start(); ?>
 
 	<div class="container_fcfield container_fcfield_id_6 container_fcfield_name_title input-fcmax" id="container_fcfield_6">
 
@@ -220,25 +233,33 @@ if ( !$this->params->get('auto_title', 0) || $usetitle ) :  ob_start();  // titl
 	<?php endif; ?>
 
 	</div>
-<?php $captured['title'] = ob_get_clean();
+
+	<?php $input_html = ob_get_clean(); echo $input_html; ?>
+<?php
+$fn = 'title';
+$captured[$fn] = ob_get_clean();
+$rendered[$fn] = (object) array('label_html' => $label_html, 'input_html' => $input_html, 'html' => $captured[$fn], 'field' => $field);
+unset($label_html); unset($input_html);
 endif;
 
 
 
 
 if ($usealias) : ob_start();  // alias ?>
+	<div class="fcclear"></div>
 	<?php
 	$field = isset($this->fields['alias']) ? $this->fields['alias'] : false;
 	$field_description = $field && $field->description ? $field->description : JText::_($this->form->getField('alias')->description);
 	$label_attrs = 'class="' . $tip_class . $lbl_class . $lbl_extra_class . '" title="'.flexicontent_html::getToolTip(null, $field_description, 0, 1).'"';
+	ob_start();
 	?>
-	<div class="fcclear"></div>
 	<span class="label-fcouter" id="jform_alias-lbl-outer">
 		<label id="jform_alias-lbl" for="jform_alias" data-for="jform_alias" <?php echo $label_attrs; ?> >
 			<?php echo $field ? $field->label : JText::_($this->form->getField('alias')->getAttribute('label'));
 			/* $field->label is set per type */ ?>
 		</label>
 	</span>
+	<?php $label_html = ob_get_clean(); echo $label_html; ob_start(); ?>
 
 	<div class="container_fcfield container_fcfield_name_alias input-fcmax">
 	<?php if ( isset($this->row->item_translations) ) :?>
@@ -275,21 +296,28 @@ if ($usealias) : ob_start();  // alias ?>
 	<?php endif; ?>
 
 	</div>
-<?php $captured['alias'] = ob_get_clean();
+
+	<?php $input_html = ob_get_clean(); echo $input_html; ?>
+<?php
+$fn = 'alias';
+$captured[$fn] = ob_get_clean();
+$rendered[$fn] = (object) array('label_html' => $label_html, 'input_html' => $input_html, 'html' => $captured[$fn], 'field' => $field);
+unset($label_html); unset($input_html);
 endif;
 
 
 
 
 if ((!$this->menuCats || $this->menuCats->cancatid) && $usemaincat) : ob_start();  // category ?>
+	<div class="fcclear"></div>
 	<?php
 	// Field via coreprops field type
 	$field = isset($this->fields['core_category']) ? $this->fields['core_category'] : false;
 	$field = isset($this->fields['core_category_' . $typeid]) ? $this->fields['core_category_' . $typeid] : $field;
 	$field_description = $field && $field->description ? $field->description : JText::_($this->form->getField('catid')->description);
 	$label_attrs = 'class="' . $tip_class . $lbl_class . $lbl_extra_class . '" title="'.flexicontent_html::getToolTip(null, $field_description, 0, 1).'"';
+	ob_start();
 	?>
-	<div class="fcclear"></div>
 	<span class="label-fcouter" id="jform_catid-lbl-outer">
 		<label id="jform_catid-lbl" for="jform_catid" data-for="jform_catid" <?php echo $label_attrs; ?> >
 			<?php
@@ -302,6 +330,7 @@ if ((!$this->menuCats || $this->menuCats->cancatid) && $usemaincat) : ob_start()
 			<i class="icon-tree-2"></i>
 		</label>
 	</span>
+	<?php $label_html = ob_get_clean(); echo $label_html; ob_start(); ?>
 
 	<div class="container_fcfield container_fcfield_name_catid">
 		<?php /* MENU SPECIFIED main category (new item) or main category according to perms */ ?>
@@ -314,13 +343,20 @@ if ((!$this->menuCats || $this->menuCats->cancatid) && $usemaincat) : ob_start()
 		</span>
 		<?php endif; ?>
 	</div>
-<?php $captured['category'] = ob_get_clean();
+
+	<?php $input_html = ob_get_clean(); echo $input_html; ?>
+<?php
+$fn = 'category';
+$captured[$fn] = ob_get_clean();
+$rendered[$fn] = (object) array('label_html' => $label_html, 'input_html' => $input_html, 'html' => $captured[$fn], 'field' => $field);
+unset($label_html); unset($input_html);
 endif;
 
 
 
 
 if ($uselang) : ob_start();  // lang ?>
+	<div class="fcclear"></div>
 	<?php
 	// Field via coreprops field type
 	$field = isset($this->fields['core_lang']) ? $this->fields['core_lang'] : false;
@@ -329,8 +365,8 @@ if ($uselang) : ob_start();  // lang ?>
 	$label_attrs = $field
 		? 'class="' . $tip_class . $lbl_class . $lbl_extra_class . '" title="'.flexicontent_html::getToolTip(null, $field_description, 0, 1).'"'
 		: 'class="' . $lbl_class . $lbl_extra_class . '"';
+	ob_start();
 	?>
-	<div class="fcclear"></div>
 	<span class="label-fcouter" id="jform_language-lbl-outer">
 	<label id="jform_language-lbl" for="jform_language" data-for="jform_language" class="<?php echo $lbl_class; ?> pull-left label-fcinner label-toplevel" >
 		<?php echo $field ? $field->label : JText::_($this->form->getField('language')->getAttribute('label'));
@@ -338,6 +374,7 @@ if ($uselang) : ob_start();  // lang ?>
 		<i class="icon-flag"></i>
 	</label>
 	</span>
+	<?php $label_html = ob_get_clean(); echo $label_html; ob_start(); ?>
 
 	<div class="container_fcfield container_fcfield_name_language">
 		<?php if (
@@ -349,21 +386,28 @@ if ($uselang) : ob_start();  // lang ?>
 			<?php echo $this->itemlang->image.' ['.$this->itemlang->name.']'; ?>
 		<?php endif; ?>
 	</div>
-<?php $captured['lang'] = ob_get_clean();
+
+	<?php $input_html = ob_get_clean(); echo $input_html; ?>
+<?php
+$fn = 'lang';
+$captured[$fn] = ob_get_clean();
+$rendered[$fn] = (object) array('label_html' => $label_html, 'input_html' => $input_html, 'html' => $captured[$fn], 'field' => $field);
+unset($label_html); unset($input_html);
 endif;
 
 
 
 
 if ($tags_displayed) : ob_start();  // tags ?>
+	<div class="fcclear"></div>
 	<?php
 	$field = isset($this->fields['tags']) ? $this->fields['tags'] : false;
 	$field_description = $field && $field->description ? $field->description : JText::_($this->form->getField('tag')->description);  // Note: form element (XML file) is 'tag' not 'tags'
 	$label_attrs = $field
 		? 'class="' . $tip_class . $lbl_class . $lbl_extra_class . '" title="'.flexicontent_html::getToolTip(null, $field_description, 0, 1).'"'
 		: 'class="' . $lbl_class . $lbl_extra_class . '"';
+	ob_start();
 	?>
-	<div class="fcclear"></div>
 	<span class="label-fcouter" id="jform_tag-lbl-outer">
 		<label id="jform_tag-lbl" data-for="input-tags" <?php echo $label_attrs; ?> >
 			<?php echo $field ? $field->label : JText::_($this->form->getField('tag')->getAttribute('label'));
@@ -371,6 +415,8 @@ if ($tags_displayed) : ob_start();  // tags ?>
 			<i class="icon-tags-2"></i>
 		</label>
 	</span>
+	<?php $label_html = ob_get_clean(); echo $label_html; ob_start(); ?>
+
 	<div class="container_fcfield container_fcfield_name_tags">
 
 		<?php if ($tags_editable) : ?>
@@ -442,21 +488,29 @@ if ($tags_displayed) : ob_start();  // tags ?>
 			</div>
 
 	</div>
-<?php $captured['tags'] = ob_get_clean();
+
+	<?php $input_html = ob_get_clean(); echo $input_html; ?>
+<?php
+$fn = 'tags';
+$captured[$fn] = ob_get_clean();
+$rendered[$fn] = (object) array('label_html' => $label_html, 'input_html' => $input_html, 'html' => $captured[$fn], 'field' => $field);
+unset($label_html); unset($input_html);
 endif;
 
 
 
 
-if (!$typeid || $usetype) : ob_start();  // type
-		$field = isset($this->fields['document_type']) ? $this->fields['document_type'] : false;
-		$field_description = $field && $field->description ? $field->description : JText::_($this->form->getField('type_id')->description);  // Note: form element (XML file) is 'type_id' not 'document_type'
-		$warning_class = !$typeid && !$isSite ? ' label text-white bg-warning label-warning' : '';
-		$label_attrs = $field
-			? 'class="' . $tip_class . $lbl_class . $lbl_extra_class . $warning_class . '" title="'.flexicontent_html::getToolTip(null, $field_description, 0, 1).'"'
-			: 'class="' . $lbl_class . $lbl_extra_class . '"';
-	?>
+if (!$typeid || $usetype) : ob_start();  // type ?>
 	<div class="fcclear"></div>
+	<?php
+	$field = isset($this->fields['document_type']) ? $this->fields['document_type'] : false;
+	$field_description = $field && $field->description ? $field->description : JText::_($this->form->getField('type_id')->description);  // Note: form element (XML file) is 'type_id' not 'document_type'
+	$warning_class = !$typeid && !$isSite ? ' label text-white bg-warning label-warning' : '';
+	$label_attrs = $field
+		? 'class="' . $tip_class . $lbl_class . $lbl_extra_class . $warning_class . '" title="'.flexicontent_html::getToolTip(null, $field_description, 0, 1).'"'
+		: 'class="' . $lbl_class . $lbl_extra_class . '"';
+	ob_start();
+	?>
 	<span class="label-fcouter" id="jform_type_id-lbl-outer">
 		<label id="jform_type_id-lbl" for="jform_type_id" data-for="jform_type_id" <?php echo $label_attrs; ?> >
 			<?php echo $field ? $field->label : JText::_($this->form->getField('type_id')->getAttribute('label'));
@@ -464,6 +518,7 @@ if (!$typeid || $usetype) : ob_start();  // type
 			<i class="icon-briefcase"></i>
 		</label>
 	</span>
+	<?php $label_html = ob_get_clean(); echo $label_html; ob_start(); ?>
 
 	<div class="container_fcfield container_fcfield_id_8 container_fcfield_name_type" id="container_fcfield_8">
 		<?php echo $this->lists['type']; ?>
@@ -473,26 +528,28 @@ if (!$typeid || $usetype) : ob_start();  // type
 		</span>
 		<?php echo sprintf( $alert_box, 'id="fc-change-warning" style="display:none; float:left;"', 'warning', '', '<h4>'.JText::_( 'FLEXI_WARNING' ).'</h4> '.JText::_( 'FLEXI_TAKE_CARE_CHANGING_FIELD_TYPE' ) ); ?>
 	</div>
-<?php $captured['document_type'] = ob_get_clean();
+
+	<?php $input_html = ob_get_clean(); echo $input_html; ?>
+<?php
+$fn = 'document_type';
+$captured[$fn] = ob_get_clean();
+$rendered[$fn] = (object) array('label_html' => $label_html, 'input_html' => $input_html, 'html' => $captured[$fn], 'field' => $field);
+unset($label_html); unset($input_html);
 endif;
 
 
 
-if ($isSite && $isnew && $this->params->get('autopublished', 0) ) :  // Auto publish new item via MENU OVERRIDE ?>
 
-	<input type="hidden" id="jform_state" name="jform[state]" value="1" />
-	<input type="hidden" id="jform_vstate" name="jform[vstate]" value="2" />
-
-<?php else : ob_start();  // state and vstate (= approval of new document version) ?>
-
-	<?php
-		$field = isset($this->fields['state']) ? $this->fields['state'] : false;
-		$field_description = $field && $field->description ? $field->description : JText::_($this->form->getField('state')->description);
-		$label_attrs = $field
-			? 'class="' . $tip_class . $lbl_class . $lbl_extra_class . '" title="'.flexicontent_html::getToolTip(null, $field_description, 0, 1).'"'
-			: 'class="' . $lbl_class . $lbl_extra_class . '"';
-	?>
+if (!$is_autopublished) : ob_start();  // state and vstate (= approval of new document version) ?>
 	<div class="fcclear"></div>
+	<?php
+	$field = isset($this->fields['state']) ? $this->fields['state'] : false;
+	$field_description = $field && $field->description ? $field->description : JText::_($this->form->getField('state')->description);
+	$label_attrs = $field
+		? 'class="' . $tip_class . $lbl_class . $lbl_extra_class . '" title="'.flexicontent_html::getToolTip(null, $field_description, 0, 1).'"'
+		: 'class="' . $lbl_class . $lbl_extra_class . '"';
+	ob_start();
+	?>
 	<span class="label-fcouter" id="jform_state-lbl-outer">
 		<label id="jform_state-lbl" for="jform_state" data-for="jform_state" <?php echo $label_attrs; ?> >
 			<?php echo $field ? $field->label : JText::_($this->form->getField('state')->getAttribute('label'));
@@ -500,6 +557,7 @@ if ($isSite && $isnew && $this->params->get('autopublished', 0) ) :  // Auto pub
 			<i class="icon-file-check"></i>
 		</label>
 	</span>
+	<?php $label_html = ob_get_clean(); echo $label_html; ob_start(); ?>
 
 
 	<?php if ( $this->perms['canpublish'] ) :  // state ?>
@@ -563,8 +621,14 @@ if ($isSite && $isnew && $this->params->get('autopublished', 0) ) :  // Auto pub
 
 	endif; ?>
 
-<?php $captured['state'] = ob_get_clean();   // this includes both fields: state, vstate
+	<?php $input_html = ob_get_clean(); echo $input_html; ?>
+<?php
+$fn = 'state';  // this includes both fields: state, vstate
+$captured[$fn] = ob_get_clean();
+$rendered[$fn] = (object) array('label_html' => $label_html, 'input_html' => $input_html, 'html' => $captured[$fn], 'field' => $field);
+unset($label_html); unset($input_html);
 endif;
+
 
 
 
@@ -577,8 +641,8 @@ if ($useaccess) : ob_start(); ob_start();  // access ?>
 	$label_attrs = $field
 		? 'class="' . $tip_class . $lbl_class . $lbl_extra_class . '" title="'.flexicontent_html::getToolTip(null, $field_description, 0, 1).'"'
 		: 'class="' . $lbl_class . $lbl_extra_class . '"';
+	ob_start();
 	?>
-	<div class="fcclear"></div>
 	<span class="label-fcouter" id="jform_access-lbl-outer">
 		<label id="jform_access-lbl" for="jform_access" data-for="jform_access" <?php echo $label_attrs; ?> >
 			<?php echo $field ? $field->label : JText::_($this->form->getField('access')->getAttribute('label'));
@@ -586,11 +650,20 @@ if ($useaccess) : ob_start(); ob_start();  // access ?>
 			<i class="icon-lock"></i>
 		</label>
 	</span>
+	<?php $label_html = ob_get_clean(); echo $label_html; ob_start(); ?>
+
 	<div class="container_fcfield container_fcfield_name_access">
 		<?php echo $this->form->getInput('access');?>
 	</div>
 
-<?php $captured['access'] = ob_get_clean(); endif;
+	<?php $input_html = ob_get_clean(); echo $input_html; ?>
+<?php
+$fn = 'access';
+$captured[$fn] = ob_get_clean();
+$rendered[$fn] = (object) array('label_html' => $label_html, 'input_html' => $input_html, 'html' => $captured[$fn], 'field' => $field);
+unset($label_html); unset($input_html);
+endif;
+
 
 
 
@@ -600,50 +673,70 @@ if ($useaccess) : ob_start(); ob_start();  // access ?>
  */
 
 if ($typeid && $allowdisablingcomments) : ob_start();  // disable_comments ?>
+	<div class="fcclear"></div>
 	<?php
 	$label_attrs = 'class="' . $tip_class . $lbl_class . $lbl_extra_class . '" title="'.flexicontent_html::getToolTip('FLEXI_ALLOW_COMMENTS', 'FLEXI_ALLOW_COMMENTS_DESC', 1, 1).'"';
+	ob_start();
 	?>
-	<div class="fcclear"></div>
 	<span class="label-fcouter" id="jform_attribs_comments-title-outer">
 		<label id="jform_attribs_comments-title" <?php echo $label_attrs; ?> >
 			<?php echo JText::_( 'FLEXI_ALLOW_COMMENTS' );?>
 		</label>
 	</span>
+	<?php $label_html = ob_get_clean(); echo $label_html; ob_start(); ?>
 
 	<div class="container_fcfield container_fcfield_name_comments">
 		<?php echo $this->lists['disable_comments']; ?>
 	</div>
-<?php $captured['disable_comments'] = ob_get_clean();
+
+	<?php $input_html = ob_get_clean(); echo $input_html; ?>
+<?php
+$fn = 'disable_comments';
+$captured[$fn] = ob_get_clean();
+$rendered[$fn] = (object) array('label_html' => $label_html, 'input_html' => $input_html, 'html' => $captured[$fn], 'field' => false);
+unset($label_html); unset($input_html);
 endif;
 
 
 
+
 if ($typeid && $allow_subscribers_notify && $this->subscribers) :  ob_start();  // notify ?>
-	<?php
-		$label_attrs = 'class="' . $tip_class . $lbl_class  . $lbl_extra_class . '" title="'.flexicontent_html::getToolTip('FLEXI_NOTIFY_FAVOURING_USERS', 'FLEXI_NOTIFY_NOTES', 1, 1).'"';
-	?>
 	<div class="fcclear"></div>
+	<?php
+	$label_attrs = 'class="' . $tip_class . $lbl_class  . $lbl_extra_class . '" title="'.flexicontent_html::getToolTip('FLEXI_NOTIFY_FAVOURING_USERS', 'FLEXI_NOTIFY_NOTES', 1, 1).'"';
+	ob_start();
+	?>
 	<span class="label-fcouter" id="jform_notify-lbl-outer">
 		<label id="jform_notify-lbl" <?php echo $label_attrs; ?> >
 			<?php echo JText::_( $isSite ? 'FLEXI_NOTIFY_FAVOURING_USERS' : 'FLEXI_NOTIFY_SUBSCRIBERS' ); ?>
 			<i class="icon-mail"></i>
 		</label>
 	</span>
+	<?php $label_html = ob_get_clean(); echo $label_html; ob_start(); ?>
 
 	<div class="container_fcfield container_fcfield_name_notify">
 		<span style="display:inline-block;">
 			<?php echo $this->lists['notify']; ?>
 		</span>
 	</div>
-<?php $captured['notify_subscribers'] = ob_get_clean();
+
+	<?php $input_html = ob_get_clean(); echo $input_html; ?>
+<?php
+$fn = 'notify_subscribers';
+$captured[$fn] = ob_get_clean();
+$rendered[$fn] = (object) array('label_html' => $label_html, 'input_html' => $input_html, 'html' => $captured[$fn], 'field' => false);
+unset($label_html); unset($input_html);
 endif;
+
+
 
 
 
 if ($typeid && $allow_owner_notify && $this->row->created_by != $user->id) :  ob_start();  // notify_owner ?>
 	<div class="fcclear"></div>
 	<?php
-		$label_attrs = 'class="' . $tip_class . $lbl_class . '" title="'.flexicontent_html::getToolTip('FLEXI_NOTIFY_OWNER', 'FLEXI_NOTIFY_OWNER_DESC', 1, 1).'"';
+	$label_attrs = 'class="' . $tip_class . $lbl_class . '" title="'.flexicontent_html::getToolTip('FLEXI_NOTIFY_OWNER', 'FLEXI_NOTIFY_OWNER_DESC', 1, 1).'"';
+	ob_start();
 	?>
 	<span class="label-fcouter" id="jform_notify_owner-lbl-outer">
 		<label id="jform_notify_owner-lbl" <?php echo $label_attrs; ?> >
@@ -651,6 +744,7 @@ if ($typeid && $allow_owner_notify && $this->row->created_by != $user->id) :  ob
 			<i class="icon-mail"></i>
 		</label>
 	</span>
+	<?php $label_html = ob_get_clean(); echo $label_html; ob_start(); ?>
 
 	<div class="container_fcfield container_fcfield_name_notify">
 		<span style="display:inline-block;">
@@ -666,273 +760,14 @@ if ($typeid && $allow_owner_notify && $this->row->created_by != $user->id) :  ob
 			<?php echo $this->ownerCanEditState ? $info_image : $warn_image; ?>
 		</span>
 	</div>
-<?php $captured['notify_owner'] = ob_get_clean();
+
+	<?php $input_html = ob_get_clean(); echo $input_html; ?>
+<?php
+$fn = 'notify_owner';
+$captured[$fn] = ob_get_clean();
+$rendered[$fn] = (object) array('label_html' => $label_html, 'input_html' => $input_html, 'html' => $captured[$fn], 'field' => false);
+unset($label_html); unset($input_html);
 endif;
-
-
-
-// Fields manager tab
-$captured['fman'] = array();
-ob_start();
-if ($this->fields && $typeid) :
-
-	$this->document->addScriptDeclaration("
-		jQuery(document).ready(function(){
-			jQuery('#jform_type_id').change(function() {
-				if (jQuery('#jform_type_id').val() != '".$typeid."')
-					jQuery('#fc-change-warning').css('display', 'block');
-				else
-					jQuery('#fc-change-warning').css('display', 'none');
-			});
-		});
-	");
-	?>
-
-	<div class="fc_edit_container_full">
-
-		<?php
-		$hide_ifempty_fields = array('fcloadmodule', 'fcpagenav', 'toolbar', 'comments');
-		$row_k = 0;
-
-		foreach ($this->fields as $field_name => $field) :
-			
-			$hide_ifempty = $field->formhidden==4 || $field->iscore || in_array($field->field_type, $hide_ifempty_fields);
-
-			if ($field->iscore && isset($tab_fields['fman'][$field->field_type]))
-			{
-				// Print any CORE fields that are placed by field manager
-				if (isset($captured[$field->field_type]))
-				{
-					echo $captured[$field->field_type];
-					unset($captured[$field->field_type]);
-					echo "\n" . '<div class="fcclear"></div>' . "\n";
-				}
-				continue;
-			}
-
-			elseif (
-
-				// Skip hide-if-empty fields from this listing
-				( empty($field->html) && $hide_ifempty ) ||
-
-				// SKIP frontend / backend hidden fields from this listing
-				( $isSite && ($field->formhidden==1 || $field->formhidden==3 || $field->parameters->get('frontend_hidden')) ) ||
-				( !$isSite && ($field->formhidden==2 || $field->formhidden==3 || $field->parameters->get('backend_hidden')) )
-
-			) continue;
-
-			/**
-			 * Check to SKIP (hide) field. This in only used for description field ('maintext' field type)
-			 * since for other core fields we used 2 distinct parameters 1 parameter for frontend item form and 1 for backend item form
-			 */
-			$hide_field = (int) $this->tparams->get('hide_' . $field->field_type, 0);
-			if ($hide_field === 1 || ($hide_field === 2 && $isSite) || ($hide_field === 3 && !$isSite))
-			{
-				continue;
-			}
-
-			$not_in_tabs = "";
-			if ($field->field_type === 'custom_form_html')
-			{
-				echo $field->html;
-				continue;
-			}
-
-
-			elseif ($field->field_type === 'coreprops')
-			{
-				$props_type = $field->parameters->get('props_type');
-				if ( isset($tab_fields['fman'][$props_type]) )
-				{
-					if ( !isset($captured[ $props_type ]) ) continue;
-					echo $captured[ $props_type ]; unset($captured[ $props_type ]);
-					echo "\n".'<div class="fcclear"></div>'."\n";
-				}
-				continue;
-			}
-
-			// Check if 'Description' field will NOT be placed via fields manager placement/ordering,
-			// but instead it will be inside a custom TAB or inside the 'Description' TAB (default)
-			elseif ($field->field_type === 'maintext' && isset($all_tab_fields['text']) )
-			{
-				ob_start();
-			}
-			else
-			{
-				ob_start();
-			}
-
-
-			if ($field->field_type === 'image')
-			{
-				if ($field->parameters->get('image_source')==-1)
-				{
-					$replace_txt = !empty($FC_jfields_html['images'])
-						? $FC_jfields_html['images']
-						: sprintf( $alert_box, '', 'warning', 'fc-nobgimage', JText::_('FLEXI_ENABLE_INTRO_FULL_IMAGES_IN_TYPE_CONFIGURATION') );
-					unset($FC_jfields_html['images']);
-					$field->html = str_replace('_INTRO_FULL_IMAGES_HTML_', $replace_txt, $field->html);
-				}
-			}
-
-
-			if ($field->field_type === 'weblink')
-			{
-				if ($field->parameters->get('link_source')==-1)
-				{
-					$replace_txt = !empty($FC_jfields_html['urls'])
-						? $FC_jfields_html['urls']
-						: sprintf( $alert_box, '', 'warning', 'fc-nobgimage', JText::_('FLEXI_ENABLE_LINKS_IN_TYPE_CONFIGURATION') );
-					unset($FC_jfields_html['urls']);
-					$field->html = str_replace('_JOOMLA_ARTICLE_LINKS_HTML_', $replace_txt, $field->html);
-				}
-			}
-
-
-			// Field has tooltip
-			$edithelp = $field->edithelp ? $field->edithelp : 1;
-			if ( $field->description && ($edithelp==1 || $edithelp==2) )
-			{
-				$label_attrs = 'class="' . $tip_class . ($edithelp==2 ? ' fc_tooltip_icon' : '') . $lbl_class . $lbl_extra_class . '" title="'.flexicontent_html::getToolTip(null, $field->description, 0, 1).'"';
-			}
-			else
-			{
-				$label_attrs = 'class="' . $lbl_class . $lbl_extra_class . '"';
-			}
-
-			$row_k = 1 - $row_k;
-
-			// Some fields may force a container width ?
-			$display_label_form = (int) $field->parameters->get('display_label_form', 1);
-			$full_width = $display_label_form === 0 || $display_label_form === 2 || $display_label_form === -1;
-
-			$width = $field->parameters->get('container_width', ($full_width ? '100% !important;' : false));
-
-			$container_width = empty($width)
-				? ''
-				: 'width:' . $width . ($width != (int) $width ? 'px !important;' : '');
-			$container_class =
-				//'fcfield_row' . $row_k .
-				' container_fcfield container_fcfield_id_' . $field->id . ' container_fcfield_name_' . $field->name;
-			?>
-
-			<div class="control-group">
-
-				<div class="control-label" id="label_outer_fcfield_<?php echo $field->id; ?>" style="<?php echo $display_label_form < 1 ? 'display:none;' : '' ?>">
-					<label id="label_fcfield_<?php echo $field->id; ?>" data-for="<?php echo 'custom_'.$field->name;?>" <?php echo $label_attrs;?> >
-						<?php echo $field->label; ?>
-					</label>
-				</div>
-
-				<?php if ($display_label_form === 2): ?>
-					<div class="fcclear"></div>
-				<?php endif; ?>
-
-				<div style="<?php echo $container_width; ?>" class="controls <?php echo $container_class; ?>" id="container_fcfield_<?php echo $field->id; ?>">
-					<?php echo ($field->description && $edithelp==3)  ?  sprintf( $alert_box, '', 'info', 'fc-nobgimage', $field->description )  :  ''; ?>
-
-				<?php // CASE 1: CORE 'description' FIELD with multi-tabbed editing falang
-				if ($field->field_type === 'maintext' && isset($this->row->item_translations)) :
-
-					array_push($tabSetStack, $tabSetCnt);
-					$tabSetCnt = ++$tabSetMax;
-					$tabCnt[$tabSetCnt] = 0;
-					?>
-					<!-- tabber start -->
-					<div class="fctabber tabber-inline s-gray tabber-lang" id="fcform_tabset_<?php echo $tabSetCnt; ?>">
-						<div class="tabbertab fc-tabbed-field-box" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" >
-							<h3 class="tabberheading"> <?php echo '- '.$this->itemlang->name.' -'; ?> </h3>
-							<?php
-								$field_tab_labels = & $field->tab_labels;
-								$field_html       = & $field->html;
-								echo !is_array($field_html) ? $field_html : flexicontent_html::createFieldTabber( $field_html, $field_tab_labels, "");
-							?>
-						</div>
-						<?php foreach ($this->row->item_translations as $t): ?>
-							<?php if ($this->itemlang->shortcode!=$t->shortcode && $t->shortcode!='*' && !in_array($t->code, $disable_langs)) : ?>
-								<div class="tabbertab fc-tabbed-field-box" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" >
-									<h3 class="tabberheading"> <?php echo $t->name; // $t->shortcode; ?> </h3>
-									<?php
-									$field_tab_labels = & $t->fields->text->tab_labels;
-									$field_html       = & $t->fields->text->html;
-									echo !is_array($field_html) ? $field_html : flexicontent_html::createFieldTabber( $field_html, $field_tab_labels, "");
-									?>
-								</div>
-							<?php endif; ?>
-						<?php endforeach; ?>
-					</div>
-					<!-- tabber end -->
-					<?php $tabSetCnt = array_pop($tabSetStack); ?>
-
-				<?php // CASE 2: NORMAL FIELD non-tabbed
-				elseif ( !isset($field->html) || !is_array($field->html) ) : ?>
-
-					<?php echo isset($field->html) ? $field->html : $noplugin; ?>
-
-				<?php /* MULTI-TABBED FIELD e.g textarea, description */
-				else : 
-
-					array_push($tabSetStack, $tabSetCnt);
-					$tabSetCnt = ++$tabSetMax;
-					$tabCnt[$tabSetCnt] = 0;
-					?>
-					<!-- tabber start -->
-					<div class="fctabber" id="fcform_tabset_<?php echo $tabSetCnt; ?>">
-					<?php foreach ($field->html as $i => $fldhtml): ?>
-						<?php
-							// Hide field when it has no label, and skip creating tab
-							$not_in_tabs .= !isset($field->tab_labels[$i]) ? "<div style='display:none!important'>".$field->html[$i]."</div>" : "";
-							if (!isset($field->tab_labels[$i]))	continue;
-						?>
-
-						<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" style="padding: 0px;">
-							<h3 class="tabberheading"> <?php echo $field->tab_labels[$i]; // Current TAB LABEL ?> </h3>
-							<?php
-								echo $not_in_tabs;      // Output hidden fields (no tab created), by placing them inside the next appearing tab
-								$not_in_tabs = "";      // Clear the hidden fields variable
-								echo $field->html[$i];  // Current TAB CONTENTS
-							?>
-						</div>
-
-					<?php endforeach; ?>
-					</div>
-					<!-- tabber end -->
-					<?php $tabSetCnt = array_pop($tabSetStack); ?>
-
-					<?php echo $not_in_tabs;      // Output ENDING hidden fields, by placing them outside the tabbing area ?>
-
-				<?php endif; /* END MULTI-TABBED FIELD */ ?>
-
-				</div>
-			</div>
-		<?php
-			if ( $field->field_type === 'maintext' && isset($all_tab_fields['text']) )
-			{
-				$captured['text'] = ob_get_clean();
-			}
-			else
-			{
-				$captured['fman'][$field->name] = ob_get_clean();
-			}
-		?>
-
-		<?php endforeach; ?>
-
-	</div>
-
-<?php else : /* NO TYPE SELECTED */ ?>
-
-		<?php if ( $typeid == 0) : // type_id is not set (user allowed to select item type) ?>
-			<input name="jform[type_id_not_set]" value="1" type="hidden" />
-			<?php echo sprintf( $alert_box, '', 'info', '', JText::_( 'FLEXI_CHOOSE_ITEM_TYPE' ) ); ?>
-		<?php else : // existing item that has no custom fields, warn the user ?>
-			<?php echo sprintf( $alert_box, '', 'info', '', JText::_( 'FLEXI_NO_FIELDS_TO_TYPE' ) ); ?>
-		<?php endif; ?>
-
-<?php endif;
-$captured['fields_manager'] = ob_get_clean();
-$captured['fields_manager'] .= implode('<div class="fcclear"></div>', $captured['fman']);
-unset($captured['fman']);
 
 
 
@@ -945,16 +780,19 @@ if ($secondary_displayed || !empty($this->lists['featured_cid']) || !isset($all_
 			<span class="fc_legend_header_text"><?php echo JText::_( $fset_lbl ); ?></span>
 		</legend>
 
-		<?php if (!isset($all_tab_fields['category'])) { echo $captured['category']; unset($captured['category']); } ?>
+		<?php if (!isset($all_tab_fields['category'])) : ?>
+			<?php echo $captured['category']; unset($captured['category']); ?>
+		<?php endif; ?>
 
 		<?php if ($secondary_displayed) : /* optionally via MENU SPECIFIED categories subset (instead of categories with CREATE perm) */ ?>
 
-			<div class="fcclear"></div>
+			<?php ob_start(); ?>
 			<div class="control-group">
 				<?php
 				$field = isset($this->fields['categories']) ? $this->fields['categories'] : false;
 				$field_description = $field && $field->description ? $field->description : ($isSite ? JText::_('FLEXI_CATEGORIES_NOTES') : '');
 				$label_attrs = 'class="' . $tip_class . $lbl_class . $lbl_extra_class . '" title="'.flexicontent_html::getToolTip(null, $field_description, 0, 1).'"';
+				ob_start();
 				?>
 				<div class="control-label" id="jform_cid-lbl-outer">
 					<label id="jform_cid-lbl" for="jform_cid" data-for="jform_cid" <?php echo $label_attrs; ?>>
@@ -962,37 +800,57 @@ if ($secondary_displayed || !empty($this->lists['featured_cid']) || !isset($all_
 						/* $field->label is set per type */ ?>
 					</label>
 				</div>
+				<?php $label_html = ob_get_clean(); echo $label_html; ob_start(); ?>
+
 				<div class="controls container_fcfield container_fcfield_name_cid">
 					<?php /* MENU SPECIFIED secondary categories (new item at frontend) or categories according to perms */ ?>
 					<?php echo $this->menuCats && $this->menuCats->cid ? $this->menuCats->cid : $this->lists['cid']; ?>
 				</div>
+				<?php $input_html = ob_get_clean(); echo $input_html; ?>
 
 			</div>
 
+		<?php $fn = 'cid';
+		echo $html = ob_get_clean();
+		$rendered[$fn] = (object) array('label_html' => $label_html, 'input_html' => $input_html, 'html' => $html, 'field' => $field);
+		unset($label_html); unset($input_html); ?>
 		<?php endif; ?>
 
-		<?php if ( !empty($this->lists['featured_cid']) ) : ?>
-			<div class="fcclear"></div>
 
+		<?php if ( !empty($this->lists['featured_cid']) ) : ?>
+
+			<?php ob_start(); ?>
 			<div class="control-group">
 
+				<?php ob_start(); ?>
 				<div class="control-label" id="jform_featured_cid-lbl-outer">
 					<label id="jform_featured_cid-lbl" for="jform_featured_cid" data-for="jform_featured_cid" class="<?php echo $lbl_class; ?>  pull-left label-fcinner label-toplevel">
 						<?php echo JText::_( 'FLEXI_FEATURED_CATEGORIES' ); ?>
 					</label>
 				</div>
+				<?php $label_html = ob_get_clean(); echo $label_html; ob_start(); ?>
+
 				<div class="controls container_fcfield container_fcfield_name_featured_cid">
 					<?php echo $this->lists['featured_cid']; ?>
 				</div>
 
+				<?php $input_html = ob_get_clean(); echo $input_html; ?>
+
 			</div>
 
+		<?php $fn = 'featured_cid';
+		echo $html = ob_get_clean();
+		$rendered[$fn] = (object) array('label_html' => $label_html, 'input_html' => $input_html, 'html' => $html, 'field' => false);
+		unset($label_html); unset($input_html); ?>
 		<?php endif; ?>
 
+
 		<?php if (!$isSite) : /* We do not (yet) allow modifying featured flag in frontend */ ?>
-		<div class="fcclear"></div>
+
+		<?php ob_start(); ?>
 		<div class="control-group">
 
+			<?php ob_start(); ?>
 			<div class="control-label" id="jform_featured-lbl-outer">
 				<label id="jform_featured-lbl" class="<?php echo $lbl_class; ?>  pull-left label-fcinner label-toplevel">
 					<?php echo JText::_( 'FLEXI_FEATURED' ); ?>
@@ -1000,16 +858,30 @@ if ($secondary_displayed || !empty($this->lists['featured_cid']) || !isset($all_
 					<small><?php echo JText::_( 'FLEXI_JOOMLA_FEATURED_VIEW' ); ?></small>
 				</label>
 			</div>
+			<?php $label_html = ob_get_clean(); echo $label_html; ob_start(); ?>
+
 			<div class="controls container_fcfield container_fcfield_name_featured">
 				<?php echo $this->lists['featured']; ?>
 				<?php //echo $this->form->getInput('featured');?>
 			</div>
 
+			<?php $input_html = ob_get_clean(); echo $input_html; ?>
+
 		</div>
+		<?php $fn = 'featured';
+		echo $html = ob_get_clean();
+		$rendered[$fn] = (object) array('label_html' => $label_html, 'input_html' => $input_html, 'html' => $html, 'field' => false);
+		unset($label_html); unset($input_html); ?>
 		<?php endif; ?>
 
 	</fieldset>
-<?php $captured['categories'] = ob_get_clean(); endif;
+<?php
+$fn = 'categories';
+$captured[$fn] = ob_get_clean();
+$rendered[$fn] = (object) array('label_html' => '', 'input_html' => '', 'html' => $captured[$fn], 'field' => false);
+unset($label_html); unset($input_html);
+endif;
+
 
 
 
@@ -1044,12 +916,17 @@ if ($forceLangInclude || (flexicontent_db::useAssociations() && $modifyLangAssoc
 		<!-- EOF of language / language associations section -->
 
 	</fieldset>
-<?php $captured['lang_associations'] = ob_get_clean(); endif;
-?>
+<?php
+$fn = 'lang_associations';
+$captured[$fn] = ob_get_clean();
+$rendered[$fn] = (object) array('label_html' => '', 'input_html' => '', 'html' => $captured[$fn], 'field' => false);
+unset($label_html); unset($input_html);
+endif;
 
 
 
-<?php if ($typeid && $this->perms['canright'] && $usepublicationdetails === 2) : ob_start(); ?>
+
+if ($typeid && $this->perms['canright'] && $usepublicationdetails === 2) : ob_start(); ?>
 		<?php
 		// used to hide "Reset Hits" when hits = 0
 		$visibility = !$this->row->hits ? 'style="display: none; visibility: hidden;"' : '';
@@ -1207,8 +1084,12 @@ if ($forceLangInclude || (flexicontent_db::useAssociations() && $modifyLangAssoc
 		<?php endif; ?>
 		</table>
 
-<?php $captured['item_screen'] = ob_get_clean(); endif;
-
+<?php
+$fn = 'item_screen';
+$captured[$fn] = ob_get_clean();
+$rendered[$fn] = (object) array('label_html' => '', 'input_html' => '', 'html' => $captured[$fn], 'field' => false);
+unset($label_html); unset($input_html);
+endif;
 
 
 
@@ -1216,70 +1097,70 @@ if ($forceLangInclude || (flexicontent_db::useAssociations() && $modifyLangAssoc
 
 if ($usepublicationdetails) : // timezone_info, publication_details ?>
 
-		<?php ob_start(); ?>
-			<?php
-			// Dates displayed in the item form, are in user timezone for J2.5, and in site's default timezone for J1.5
-			$site_zone = $app->getCfg('offset');
-			$user_zone = $user->getParam('timezone', $site_zone);
+	<?php ob_start(); ?>
+		<?php
+		// Dates displayed in the item form, are in user timezone for J2.5, and in site's default timezone for J1.5
+		$site_zone = $app->getCfg('offset');
+		$user_zone = $user->getParam('timezone', $site_zone);
 
-			$tz = new DateTimeZone( $user_zone );
-			$tz_offset = $tz->getOffset(new JDate()) / 3600;
-			$tz_info =  $tz_offset > 0 ? ' UTC +' . $tz_offset : ' UTC ' . $tz_offset;
+		$tz = new DateTimeZone( $user_zone );
+		$tz_offset = $tz->getOffset(new JDate()) / 3600;
+		$tz_info =  $tz_offset > 0 ? ' UTC +' . $tz_offset : ' UTC ' . $tz_offset;
 
-			$tz_info .= ' ('.$user_zone.')';
-			$msg = JText::sprintf( FLEXI_J16GE ? 'FLEXI_DATES_IN_USER_TIMEZONE_NOTE' : 'FLEXI_DATES_IN_SITE_TIMEZONE_NOTE', ' ', $tz_info );
-			echo sprintf( $alert_box, ' style="display: inline-block;" ', 'info', 'fc-nobgimage', $msg );
-			?>
-		<?php $captured['timezone_info'] = ob_get_clean(); ?>
+		$tz_info .= ' ('.$user_zone.')';
+		$msg = JText::sprintf( FLEXI_J16GE ? 'FLEXI_DATES_IN_USER_TIMEZONE_NOTE' : 'FLEXI_DATES_IN_SITE_TIMEZONE_NOTE', ' ', $tz_info );
+		echo sprintf( $alert_box, ' style="display: inline-block;" ', 'info', 'fc-nobgimage', $msg );
+		?>
+	<?php $captured['timezone_info'] = ob_get_clean(); ?>
 
-		<?php ob_start(); ?>
-			<div class="control-group">
-				<div class="control-label" id="publish_up-lbl-outer"><?php echo str_replace('class="', 'class="' . $lbl_class . ' label-fcinner ', $this->form->getLabel('publish_up')); ?></div>
-				<div class="controls container_fcfield"><?php echo /*$this->perms['canpublish'] || $this->perms['editpublishupdown']*/ $this->form->getInput('publish_up'); ?></div>
-			</div>
-		<?php $captured['publish_up'] = ob_get_clean(); ?>
+	<?php ob_start(); ?>
+		<div class="control-group">
+			<div class="control-label" id="publish_up-lbl-outer"><?php echo str_replace('class="', 'class="' . $lbl_class . ' label-fcinner ', $this->form->getLabel('publish_up')); ?></div>
+			<div class="controls container_fcfield"><?php echo /*$this->perms['canpublish'] || $this->perms['editpublishupdown']*/ $this->form->getInput('publish_up'); ?></div>
+		</div>
+	<?php $captured['publish_up'] = ob_get_clean(); ?>
 
-		<?php ob_start(); ?>
-			<div class="control-group">
-				<div class="control-label" id="publish_down-lbl-outer"><?php echo str_replace('class="', 'class="' . $lbl_class . ' label-fcinner ', $this->form->getLabel('publish_down')); ?></div>
-				<div class="controls container_fcfield"><?php echo /*$this->perms['canpublish'] || $this->perms['editpublishupdown']*/ $this->form->getInput('publish_down'); ?></div>
-			</div>
-		<?php $captured['publish_down'] = ob_get_clean(); ?>
+	<?php ob_start(); ?>
+		<div class="control-group">
+			<div class="control-label" id="publish_down-lbl-outer"><?php echo str_replace('class="', 'class="' . $lbl_class . ' label-fcinner ', $this->form->getLabel('publish_down')); ?></div>
+			<div class="controls container_fcfield"><?php echo /*$this->perms['canpublish'] || $this->perms['editpublishupdown']*/ $this->form->getInput('publish_down'); ?></div>
+		</div>
+	<?php $captured['publish_down'] = ob_get_clean(); ?>
 
-		<?php if ($usepublicationdetails === 2) : ob_start(); ?>
-			<div class="control-group">
-				<div class="control-label" id="created_by-lbl-outer"><?php echo str_replace('class="', 'class="' . $lbl_class . ' label-fcinner ', $this->form->getLabel('created_by')); ?></div>
-				<div class="controls container_fcfield"><?php echo /*$this->perms['editcreator']*/ $this->form->getInput('created_by'); ?></div>
-			</div>
-		<?php $captured['created_by'] = ob_get_clean(); endif; ?>
+	<?php if ($usepublicationdetails === 2) : ob_start(); ?>
+		<div class="control-group">
+			<div class="control-label" id="created_by-lbl-outer"><?php echo str_replace('class="', 'class="' . $lbl_class . ' label-fcinner ', $this->form->getLabel('created_by')); ?></div>
+			<div class="controls container_fcfield"><?php echo /*$this->perms['editcreator']*/ $this->form->getInput('created_by'); ?></div>
+		</div>
+	<?php $captured['created_by'] = ob_get_clean(); endif; ?>
 
-		<?php if ($usepublicationdetails === 2) : ob_start(); ?>
-			<div class="control-group">
-				<div class="control-label" id="created-lbl-outer"><?php echo str_replace('class="', 'class="' . $lbl_class . ' label-fcinner ', $this->form->getLabel('created')); ?></div>
-				<div class="controls container_fcfield"><?php echo /*$this->perms['editcreationdate']*/ $this->form->getInput('created'); ?></div>
-			</div>
-		<?php $captured['created'] = ob_get_clean(); endif; ?>
+	<?php if ($usepublicationdetails === 2) : ob_start(); ?>
+		<div class="control-group">
+			<div class="control-label" id="created-lbl-outer"><?php echo str_replace('class="', 'class="' . $lbl_class . ' label-fcinner ', $this->form->getLabel('created')); ?></div>
+			<div class="controls container_fcfield"><?php echo /*$this->perms['editcreationdate']*/ $this->form->getInput('created'); ?></div>
+		</div>
+	<?php $captured['created'] = ob_get_clean(); endif; ?>
 
-		<?php ob_start(); ?>
-			<div class="control-group">
-				<div class="control-label" id="created_by_alias-lbl-outer"><?php echo str_replace('class="', 'class="' . $lbl_class . ' label-fcinner ', $this->form->getLabel('created_by_alias')); ?></div>
-				<div class="controls container_fcfield"><?php echo /*$this->perms['editcreator']*/ $this->form->getInput('created_by_alias'); ?></div>
-			</div>
-		<?php $captured['created_by_alias'] = ob_get_clean(); ?>
+	<?php ob_start(); ?>
+		<div class="control-group">
+			<div class="control-label" id="created_by_alias-lbl-outer"><?php echo str_replace('class="', 'class="' . $lbl_class . ' label-fcinner ', $this->form->getLabel('created_by_alias')); ?></div>
+			<div class="controls container_fcfield"><?php echo /*$this->perms['editcreator']*/ $this->form->getInput('created_by_alias'); ?></div>
+		</div>
+	<?php $captured['created_by_alias'] = ob_get_clean(); ?>
 
-		<?php if ($usepublicationdetails === 2) : ob_start(); ?>
-			<div class="control-group">
-				<div class="control-label" id="modified_by-lbl-outer"><?php echo str_replace('class="', 'class="' . $lbl_class . ' label-fcinner ', $this->form->getLabel('modified_by')); ?></div>
-				<div class="controls container_fcfield"><?php echo $this->form->getInput('modified_by'); ?></div>
-			</div>
-		<?php $captured['modified_by'] = ob_get_clean(); endif; ?>
+	<?php if ($usepublicationdetails === 2) : ob_start(); ?>
+		<div class="control-group">
+			<div class="control-label" id="modified_by-lbl-outer"><?php echo str_replace('class="', 'class="' . $lbl_class . ' label-fcinner ', $this->form->getLabel('modified_by')); ?></div>
+			<div class="controls container_fcfield"><?php echo $this->form->getInput('modified_by'); ?></div>
+		</div>
+	<?php $captured['modified_by'] = ob_get_clean(); endif; ?>
 
-		<?php if ($usepublicationdetails === 2) : ob_start(); ?>
-			<div class="control-group">
-				<div class="control-label" id="modified-lbl-outer"><?php echo str_replace('class="', 'class="' . $lbl_class . ' label-fcinner ', $this->form->getLabel('modified')); ?></div>
-				<div class="controls container_fcfield"><?php echo $this->form->getInput('modified'); ?></div>
-			</div>
-		<?php $captured['modified'] = ob_get_clean(); endif; ?>
+	<?php if ($usepublicationdetails === 2) : ob_start(); ?>
+		<div class="control-group">
+			<div class="control-label" id="modified-lbl-outer"><?php echo str_replace('class="', 'class="' . $lbl_class . ' label-fcinner ', $this->form->getLabel('modified')); ?></div>
+			<div class="controls container_fcfield"><?php echo $this->form->getInput('modified'); ?></div>
+		</div>
+	<?php $captured['modified'] = ob_get_clean(); endif; ?>
 
 <?php endif;
 
@@ -1403,7 +1284,11 @@ if ( $typeid && $usemetadata ) : ob_start(); // metadata ?>
 		<?php endif; ?>
 
 	</fieldset>
-<?php $captured['metadata'] = ob_get_clean();
+<?php
+$fn = 'metadata';
+$captured[$fn] = ob_get_clean();
+$rendered[$fn] = (object) array('label_html' => '', 'input_html' => '', 'html' => $captured[$fn], 'field' => false);
+unset($label_html); unset($input_html);
 endif;
 
 
@@ -1438,8 +1323,11 @@ if ($typeid && $useseoconf) : ob_start(); // seoconf ?>
 
 		<?php endforeach; ?>
 	</fieldset>
-
-<?php $captured['seoconf'] = ob_get_clean();
+<?php
+$fn = 'seoconf';
+$captured[$fn] = ob_get_clean();
+$rendered[$fn] = (object) array('label_html' => '', 'input_html' => '', 'html' => $captured[$fn], 'field' => false);
+unset($label_html); unset($input_html);
 endif;
 
 
@@ -1487,16 +1375,19 @@ if ($typeid && $usedisplaydetails || $has_custom_params ) : ob_start(); ?>
 	<?php endforeach; ?>
 
 </fieldset>
-<?php $captured['display_params'] = ob_get_clean(); endif;
+<?php
+$fn = 'display_params';
+$captured[$fn] = ob_get_clean();
+$rendered[$fn] = (object) array('label_html' => '', 'input_html' => '', 'html' => $captured[$fn], 'field' => false);
+unset($label_html); unset($input_html);
+endif;
 
 
 
 
 if ($typeid && $selecttheme) : ?>
 
-	<?php if ( $selecttheme >= 1 ) : ob_start(); ?>
-
-		<?php
+	<?php if ( $selecttheme >= 1 ) : ob_start();
 		foreach ($this->form->getFieldset('themes') as $field) :
 
 			if ($field->getAttribute('type') === 'separator' || !$field->label || $field->hidden)
@@ -1526,13 +1417,16 @@ if ($typeid && $selecttheme) : ?>
 			<?php /*echo JText::sprintf( 'FLEXI_USING_CONTENT_TYPE_LAYOUT', $this->tparams->get('ilayout') ) . "<br/><br/>";*/ ?>
 			<?php echo JText::_($isSite ? 'FLEXI_USING_LAYOUT_DEFAULTS' : 'FLEXI_RECOMMEND_CONTENT_TYPE_LAYOUT'); ?>
 		</div>
-
-	<?php $captured['layout_selection'] = ob_get_clean(); endif;
+	<?php
+	$fn = 'layout_selection';
+	$captured[$fn] = ob_get_clean();
+	$rendered[$fn] = (object) array('label_html' => '', 'input_html' => '', 'html' => $captured[$fn], 'field' => false);
+	unset($label_html); unset($input_html);
+	endif;
 
 
 
 	if ( $selecttheme >= 2 ) : ob_start(); ?>
-
 		<?php $item_layout = $this->row->itemparams->get('ilayout'); ?>
 
 		<div class="fc-sliders-plain-outer <?php echo $item_layout ? 'fc_preloaded' : ''; ?>">
@@ -1636,7 +1530,11 @@ if ($typeid && $selecttheme) : ?>
 
 		</div><!-- END class="fc-sliders-plain-outer" -->
 	<?php
-	$captured['layout_params'] = ob_get_clean(); endif;
+	$fn = 'layout_params';
+	$captured[$fn] = ob_get_clean();
+	$rendered[$fn] = (object) array('label_html' => '', 'input_html' => '', 'html' => $captured[$fn], 'field' => false);
+	unset($label_html); unset($input_html);
+	endif;
 
 endif; // end of template: layout_selection, layout_params
 
@@ -1644,7 +1542,6 @@ endif; // end of template: layout_selection, layout_params
 
 
 if ($typeid && $use_versioning && $this->perms['canversion'] && $versionsplacement !== 0) : ob_start()  // versions ?>
-
 	<table class="" style="margin: 10px; width: auto; float: left;">
 		<tr>
 			<td>
@@ -1707,8 +1604,12 @@ if ($typeid && $use_versioning && $this->perms['canversion'] && $versionsplaceme
 			<div id="fc_pager"></div>
 		</td></tr>
 	</table>
-
-<?php $captured['versions'] = ob_get_clean(); endif;
+<?php
+$fn = 'versions';
+$captured[$fn] = ob_get_clean();
+$rendered[$fn] = (object) array('label_html' => '', 'input_html' => '', 'html' => $captured[$fn], 'field' => false);
+unset($label_html); unset($input_html);
+endif;
 
 
 
@@ -1741,7 +1642,307 @@ if ($permsplacement && $this->perms['canright'] ) : ob_start(); // perms ?>
 		</div>
 		<?php endif; ?>
 	</fieldset>
-<?php $captured['perms'] = ob_get_clean(); endif;
+<?php
+$fn = 'perms';
+$captured[$fn] = ob_get_clean();
+$rendered[$fn] = (object) array('label_html' => '', 'input_html' => '', 'html' => $captured[$fn], 'field' => false);
+unset($label_html); unset($input_html);
+endif;
+
+
+
+
+// Fields manager tab
+$captured['fman'] = array();
+
+/**
+ * Capture any fields manager contents that were missed (THIS SHOULD BE EMPTY !!)
+ */
+ob_start();
+
+if ($this->fields && $typeid) :
+
+	$this->document->addScriptDeclaration("
+		jQuery(document).ready(function(){
+			jQuery('#jform_type_id').change(function() {
+				if (jQuery('#jform_type_id').val() != '".$typeid."')
+					jQuery('#fc-change-warning').css('display', 'block');
+				else
+					jQuery('#fc-change-warning').css('display', 'none');
+			});
+		});
+	");
+	?>
+
+	<div class="fc_edit_container_full">
+
+		<?php
+		$hide_ifempty_fields = array('fcloadmodule', 'fcpagenav', 'toolbar', 'comments');
+		$row_k = 0;
+
+		foreach ($this->fields as $field_name => $field) :
+
+			$hide_ifempty = $field->formhidden==4 || $field->iscore || in_array($field->field_type, $hide_ifempty_fields);
+
+			if ($field->iscore && isset($tab_fields['fman'][$field->field_type]))
+			{
+				// Print any CORE fields that are placed by field manager
+				if (isset($captured[$field->field_type]))
+				{
+					echo $captured[$field->field_type];
+					unset($captured[$field->field_type]);
+					echo "\n" . '<div class="fcclear"></div>' . "\n";
+				}
+				continue;
+			}
+
+			elseif (
+
+				// Skip hide-if-empty fields from this listing
+				( empty($field->html) && $hide_ifempty ) ||
+
+				// SKIP frontend / backend hidden fields from this listing
+				( $isSite && ($field->formhidden==1 || $field->formhidden==3 || $field->parameters->get('frontend_hidden')) ) ||
+				( !$isSite && ($field->formhidden==2 || $field->formhidden==3 || $field->parameters->get('backend_hidden')) )
+
+			) continue;
+
+			/**
+			 * Check to SKIP (hide) field. This in only used for description field ('maintext' field type)
+			 * since for other core fields we used 2 distinct parameters 1 parameter for frontend item form and 1 for backend item form
+			 */
+			$hide_field = (int) $this->tparams->get('hide_' . $field->field_type, 0);
+			if ($hide_field === 1 || ($hide_field === 2 && $isSite) || ($hide_field === 3 && !$isSite))
+			{
+				continue;
+			}
+
+			$not_in_tabs = '';
+
+			if ($field->field_type === 'custom_form_html')
+			{
+				ob_start();
+				echo $field->html;
+				$captured['fman'][$field->name] = ob_get_clean();
+				$rendered[$field->name] = (object) array('label_html' => '', 'input_html' => $captured['fman'][$field->name], 'html' => $captured['fman'][$field->name], 'field' => $field);
+				continue;
+			}
+
+
+			elseif ($field->field_type === 'coreprops')
+			{
+				$props_type = $field->parameters->get('props_type');
+				if ( isset($tab_fields['fman'][$props_type]) )
+				{
+					if ( !isset($captured[ $props_type ]) ) continue;
+					echo $captured[ $props_type ]; unset($captured[ $props_type ]);
+					echo "\n".'<div class="fcclear"></div>'."\n";
+				}
+
+				continue;
+			}
+
+
+			/**
+			 * Start capturing field's html ( label + input )
+			 */
+			ob_start();
+
+
+			if ($field->field_type === 'image')
+			{
+				if ($field->parameters->get('image_source')==-1)
+				{
+					$replace_txt = !empty($FC_jfields_html['images'])
+						? $FC_jfields_html['images']
+						: sprintf( $alert_box, '', 'warning', 'fc-nobgimage', JText::_('FLEXI_ENABLE_INTRO_FULL_IMAGES_IN_TYPE_CONFIGURATION') );
+					unset($FC_jfields_html['images']);
+					$field->html = str_replace('_INTRO_FULL_IMAGES_HTML_', $replace_txt, $field->html);
+				}
+			}
+
+
+			if ($field->field_type === 'weblink')
+			{
+				if ($field->parameters->get('link_source')==-1)
+				{
+					$replace_txt = !empty($FC_jfields_html['urls'])
+						? $FC_jfields_html['urls']
+						: sprintf( $alert_box, '', 'warning', 'fc-nobgimage', JText::_('FLEXI_ENABLE_LINKS_IN_TYPE_CONFIGURATION') );
+					unset($FC_jfields_html['urls']);
+					$field->html = str_replace('_JOOMLA_ARTICLE_LINKS_HTML_', $replace_txt, $field->html);
+				}
+			}
+
+
+			// Field has tooltip
+			$edithelp = $field->edithelp ? $field->edithelp : 1;
+			if ( $field->description && ($edithelp==1 || $edithelp==2) )
+			{
+				$label_attrs = 'class="' . $tip_class . ($edithelp==2 ? ' fc_tooltip_icon' : '') . $lbl_class . $lbl_extra_class . '" title="'.flexicontent_html::getToolTip(null, $field->description, 0, 1).'"';
+			}
+			else
+			{
+				$label_attrs = 'class="' . $lbl_class . $lbl_extra_class . '"';
+			}
+
+			$row_k = 1 - $row_k;
+
+			// Some fields may force a container width ?
+			$display_label_form = (int) $field->parameters->get('display_label_form', 1);
+			$full_width = $display_label_form === 0 || $display_label_form === 2 || $display_label_form === -1;
+
+			$width = $field->parameters->get('container_width', ($full_width ? '100% !important;' : false));
+
+			$container_width = empty($width)
+				? ''
+				: 'width:' . $width . ($width != (int) $width ? 'px !important;' : '');
+			$container_class =
+				//'fcfield_row' . $row_k .
+				' container_fcfield container_fcfield_id_' . $field->id . ' container_fcfield_name_' . $field->name;
+			?>
+
+			<div class="control-group">
+
+				<?php ob_start(); /* label_html */ ?>
+				<div class="control-label" id="label_outer_fcfield_<?php echo $field->id; ?>" style="<?php echo $display_label_form < 1 ? 'display:none;' : '' ?>">
+					<label id="label_fcfield_<?php echo $field->id; ?>" data-for="<?php echo 'custom_'.$field->name;?>" <?php echo $label_attrs;?> >
+						<?php echo $field->label; ?>
+					</label>
+				</div>
+				<?php $rendered[$field->name] = (object) array('label_html' => ob_get_clean()); echo $rendered[$field->name]->label_html; ?>
+
+				<?php if ($display_label_form === 2): ?>
+					<div class="fcclear"></div>
+				<?php endif; ?>
+
+				<?php ob_start(); /*input_html */ ?>
+				<div style="<?php echo $container_width; ?>" class="controls <?php echo $container_class; ?>" id="container_fcfield_<?php echo $field->id; ?>">
+					<?php echo ($field->description && $edithelp==3)  ?  sprintf( $alert_box, '', 'info', 'fc-nobgimage', $field->description )  :  ''; ?>
+
+				<?php // CASE 1: CORE 'description' FIELD with multi-tabbed editing falang
+				if ($field->field_type === 'maintext' && isset($this->row->item_translations)) :
+
+					array_push($tabSetStack, $tabSetCnt);
+					$tabSetCnt = ++$tabSetMax;
+					$tabCnt[$tabSetCnt] = 0;
+					?>
+					<!-- tabber start -->
+					<div class="fctabber tabber-inline s-gray tabber-lang" id="fcform_tabset_<?php echo $tabSetCnt; ?>">
+						<div class="tabbertab fc-tabbed-field-box" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" >
+							<h3 class="tabberheading"> <?php echo '- '.$this->itemlang->name.' -'; ?> </h3>
+							<?php
+								$field_tab_labels = & $field->tab_labels;
+								$field_html       = & $field->html;
+								echo !is_array($field_html) ? $field_html : flexicontent_html::createFieldTabber( $field_html, $field_tab_labels, "");
+							?>
+						</div>
+						<?php foreach ($this->row->item_translations as $t): ?>
+							<?php if ($this->itemlang->shortcode!=$t->shortcode && $t->shortcode!='*' && !in_array($t->code, $disable_langs)) : ?>
+								<div class="tabbertab fc-tabbed-field-box" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" >
+									<h3 class="tabberheading"> <?php echo $t->name; // $t->shortcode; ?> </h3>
+									<?php
+									$field_tab_labels = & $t->fields->text->tab_labels;
+									$field_html       = & $t->fields->text->html;
+									echo !is_array($field_html) ? $field_html : flexicontent_html::createFieldTabber( $field_html, $field_tab_labels, "");
+									?>
+								</div>
+							<?php endif; ?>
+						<?php endforeach; ?>
+					</div>
+					<!-- tabber end -->
+					<?php $tabSetCnt = array_pop($tabSetStack); ?>
+
+				<?php // CASE 2: NORMAL FIELD non-tabbed
+				elseif ( !isset($field->html) || !is_array($field->html) ) : ?>
+
+					<?php echo isset($field->html) ? $field->html : $noplugin; ?>
+
+				<?php /* MULTI-TABBED FIELD e.g textarea, description */
+				else :
+
+					array_push($tabSetStack, $tabSetCnt);
+					$tabSetCnt = ++$tabSetMax;
+					$tabCnt[$tabSetCnt] = 0;
+					?>
+					<!-- tabber start -->
+					<div class="fctabber" id="fcform_tabset_<?php echo $tabSetCnt; ?>">
+					<?php foreach ($field->html as $i => $fldhtml): ?>
+						<?php
+							// Hide field when it has no label, and skip creating tab
+							$not_in_tabs .= !isset($field->tab_labels[$i]) ? "<div style='display:none!important'>".$field->html[$i]."</div>" : "";
+							if (!isset($field->tab_labels[$i]))	continue;
+						?>
+
+						<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" style="padding: 0px;">
+							<h3 class="tabberheading"> <?php echo $field->tab_labels[$i]; // Current TAB LABEL ?> </h3>
+							<?php
+								echo $not_in_tabs;      // Output hidden fields (no tab created), by placing them inside the next appearing tab
+								$not_in_tabs = "";      // Clear the hidden fields variable
+								echo $field->html[$i];  // Current TAB CONTENTS
+							?>
+						</div>
+
+					<?php endforeach; ?>
+					</div>
+					<!-- tabber end -->
+					<?php $tabSetCnt = array_pop($tabSetStack); ?>
+
+					<?php echo $not_in_tabs;      // Output ENDING hidden fields, by placing them outside the tabbing area ?>
+
+				<?php endif; /* END MULTI-TABBED FIELD */ ?>
+
+				</div>
+				<?php $rendered[$field->name]->input_html = ob_get_clean(); echo $rendered[$field->name]->input_html; ?>
+
+			</div>
+		<?php
+			/**
+			 * Check if 'Description' field will NOT be placed via fields manager placement/ordering,
+			 * but instead it will be inside a custom TAB or inside the 'Description' TAB (default)
+			 */
+			if ( $field->field_type === 'maintext' && isset($all_tab_fields['text']) )
+			{
+				$captured[$field->name] = ob_get_clean();   // $field->name is 'text'
+				$rendered[$field->name]->html = $captured[$field->name];
+			}
+			else
+			{
+				$captured['fman'][$field->name] = ob_get_clean();
+				$rendered[$field->name]->html = $captured['fman'][$field->name];
+			}
+
+			$rendered[$field->name]->field = $field;
+		?>
+
+		<?php endforeach; ?>
+
+	</div>
+
+<?php else : /* NO TYPE SELECTED */ ?>
+
+		<?php if ( $typeid == 0) : // type_id is not set (user allowed to select item type) ?>
+			<input name="jform[type_id_not_set]" value="1" type="hidden" />
+			<?php echo sprintf( $alert_box, '', 'info', '', JText::_( 'FLEXI_CHOOSE_ITEM_TYPE' ) ); ?>
+		<?php else : // existing item that has no custom fields, warn the user ?>
+			<?php echo sprintf( $alert_box, '', 'info', '', JText::_( 'FLEXI_NO_FIELDS_TO_TYPE' ) ); ?>
+		<?php endif; ?>
+
+<?php endif;
+
+/**
+ * Capture any fields manager contents that were missed (THIS SHOULD BE EMPTY !!)
+ */
+$captured['fields_manager'] = ob_get_clean();
+
+/**
+ * Implode captured fields manager fields
+ */
+$captured['fields_manager'] .= implode('<div class="fcclear"></div>', $captured['fman']);
+unset($captured['fman']);
+
+
+
 
 
 

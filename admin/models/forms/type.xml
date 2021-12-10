@@ -866,7 +866,7 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="usetype_be" type="fcradio" default="1" label="FLEXI_MENU_USE_TYPE" description="FLEXI_MENU_USE_TYPE_DESC" class="btn-group">
+			<field name="usetype_be" type="fcradio" default="" label="FLEXI_MENU_USE_TYPE" description="FLEXI_MENU_USE_TYPE_DESC" class="btn-group">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>

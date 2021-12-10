@@ -42,6 +42,7 @@ $usemaincat  = (int) $this->params->get('usemaincat' . $CFGsfx, 1);
 $use_versioning          = (int) $this->params->get('use_versioning', 1);
 $auto_approve            = (int) $this->params->get('auto_approve', 1);
 $approval_warning_inform = $this->params->get('approval_warning_inform'. $CFGsfx, 1);
+$is_autopublished        = $isSite && $isnew && $this->params->get('autopublished', 0);
 
 $allowdisablingcomments   = (int) $this->params->get('allowdisablingcomments' . $CFGsfx, ($isSite ? 0 : 1));
 $allow_owner_notify       = (int) $this->params->get('allow_owner_notify' . $CFGsfx, ($isSite ? 0 : 1));

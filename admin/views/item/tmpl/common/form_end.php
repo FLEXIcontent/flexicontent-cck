@@ -21,9 +21,16 @@
 				<input type="hidden" name="controller" value="items" />
 				<input type="hidden" name="view" value="item" />
 				<?php echo $this->form->getInput('id');?>
-				<?php echo $this->form->getInput('hits'); ?>
+				<?php echo $this->form->getInput('hits'); /* this is ignored by form validation */ ?>
 
-				<?php if ( $isnew && $typeid ) : ?>
+				<?php if ($is_autopublished) :
+				/* Auto publish new item via MENU OVERRIDE, (these are overwritten by the controller checks) */
+				?>
+					<input type="hidden" id="jform_state" name="jform[state]" value="1" />
+					<input type="hidden" id="jform_vstate" name="jform[vstate]" value="2" />
+				<?php endif; ?>
+	
+				<?php if ( $isnew && $typeid ) : /* this is compared to submit menu item configuration by the controller */ ?>
 					<input type="hidden" name="jform[type_id]" value="<?php echo $typeid; ?>" />
 				<?php endif;?>
 

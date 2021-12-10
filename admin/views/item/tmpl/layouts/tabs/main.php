@@ -273,20 +273,28 @@ if ( count($tab_fields['tab05']) ) : ?>
 	<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" data-icon-class="<?php echo $tab_ico; ?>" >
 		<h3 class="tabberheading"> <?php echo $tab_lbl; ?> </h3>
 
+		<div class="fc_form_flex_box">
 		<?php foreach($tab_fields['tab05'] as $fn => $i) : ?>
-			<div class="fcclear"></div>
 
-			<?php if (!is_array($captured[$fn])) :
-				echo $captured[$fn]; unset($captured[$fn]);
-			else:
-				foreach($captured[$fn] as $n => $html) : ?>
+			<?php if (!is_array($captured[$fn])) : ?>
+
+				<div class="fc_form_flex_box_item">
+				<?php echo $captured[$fn]; unset($captured[$fn]); ?>
+				</div>
+
+			<?php else: ?>
+
+				<div class="fc_form_flex_box_item">
+				<?php foreach($captured[$fn] as $n => $html) : ?>
 					<div class="fcclear"></div>
-					<?php echo $html;
-				endforeach;
-				unset($captured[$fn]);
-			endif;
-		endforeach;
-		?>
+					<?php echo $html; ?>
+				<?php endforeach;
+				unset($captured[$fn]); ?>
+				</div>
+
+			<?php endif; ?>
+		<?php endforeach; ?>
+		</div>
 
 	</div> <!-- end tab -->
 <?php endif;
@@ -407,24 +415,28 @@ if ( count($tab_fields['tab08']) ) : ?>
 	<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" data-icon-class="<?php echo $tab_ico; ?>">
 		<h3 class="tabberheading"> <?php echo $tab_lbl; ?> </h3>
 
-		<fieldset class="flexi_params fc_edit_container_full">
-
+		<div class="fc_form_flex_box">
 		<?php foreach($tab_fields['tab08'] as $fn => $i) : ?>
-			<div class="fcclear"></div>
 
-			<?php if (!is_array($captured[$fn])) :
-				echo $captured[$fn]; unset($captured[$fn]);
-			else:
-				foreach($captured[$fn] as $n => $html) : ?>
+			<?php if (!is_array($captured[$fn])) : ?>
+
+				<div class="fc_form_flex_box_item">
+				<?php echo $captured[$fn]; unset($captured[$fn]); ?>
+				</div>
+
+			<?php else: ?>
+
+				<div class="fc_form_flex_box_item">
+				<?php foreach($captured[$fn] as $n => $html) : ?>
 					<div class="fcclear"></div>
-					<?php echo $html;
-				endforeach;
-				unset($captured[$fn]);
-			endif;
-		endforeach;
-		?>
+					<?php echo $html; ?>
+				<?php endforeach;
+				unset($captured[$fn]); ?>
+				</div>
 
-		</fieldset>
+			<?php endif; ?>
+		<?php endforeach; ?>
+		</div>
 
 	</div> <!-- end tab -->
 
