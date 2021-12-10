@@ -284,6 +284,10 @@ if ($js)
 				<?php echo $limit_maincat_tip.JText::_( 'FLEXI_MAIN_CATEGORY' ) . '<br/><small>(' . JText::_( 'FLEXI_SUBTREE_LIMITATION' ) . ')</small>'; ?>
 			</th>
 
+			<th class="col_iflayout center hideOnDemandClass hidden-phone hidden-tablet" colspan="2" >
+				<?php echo JText::_( 'JForm'). ' ' . JText::_( 'FLEXI_LAYOUT' ) . '<br/><small>(' . JText::_( 'FLEXI_FRONTEND' ) . ' ' . JText::_( 'FLEXI_BACKEND' ) . ')</small>'; ?>
+			</th>
+
 			<th class="col_alias hideOnDemandClass hidden-phone hidden-tablet">
 				<?php echo JHtml::_('grid.sort', 'FLEXI_ALIAS', 'a.alias', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
@@ -335,6 +339,8 @@ if ($js)
 
 			$stateIsChangeable    = $row->canCheckin && $row->canEditState;
 			$row_ilayout          = $row->config->get('ilayout');
+			$row_form_ilayout_fe  = $row->config->get('form_ilayout_fe', 'tabs');
+			$row_form_ilayout_be  = $row->config->get('form_ilayout_be', 'tabs');
 			$catid_allowed_parent = $row->config->get('catid_allowed_parent');
 			?>
 		<tr class="<?php echo 'row' . ($i % 2); ?>">
@@ -399,6 +405,14 @@ if ($js)
 
 			<td class="col_allowed_subtree hidden-phone hidden-tablet">
 				<?php echo isset($globalcats[$catid_allowed_parent]) ? $globalcats[$catid_allowed_parent]->title : '-'; ?>
+			</td>
+
+			<td class="col_iflayout_fe center hidden-phone hidden-tablet">
+				<?php echo $row_form_ilayout_fe; ?>
+			</td>
+
+			<td class="col_iflayout_be center hidden-phone hidden-tablet">
+				<?php echo $row_form_ilayout_be; ?>
 			</td>
 
 			<td class="col_alias hidden-phone hidden-tablet">
