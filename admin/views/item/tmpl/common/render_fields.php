@@ -580,7 +580,7 @@ if (!$is_autopublished) :  // state and vstate (= approval of new document versi
 		<?php else :
 
 			echo $this->published;
-			echo '<input type="hidden" name="jform[state]" id="jform_vstate" value="'.$this->row->state.'" />';
+			echo '<input type="hidden" name="jform[state]" id="jform_state" value="'.$this->row->state.'" />';
 
 		endif;?>
 
@@ -598,6 +598,7 @@ if (!$is_autopublished) :  // state and vstate (= approval of new document versi
 
 		<?php ob_start(); ?>
 		<div class="control-group">
+
 		 <?php if ($use_versioning && !$auto_approve) :
 			// CASE 1. Display the 'publish changes' field.
 			// User can publish and versioning is ON with auto approval  OFF
@@ -631,10 +632,8 @@ if (!$is_autopublished) :  // state and vstate (= approval of new document versi
 		<?php else :
 		// CASE 2. Hide 'publish changes' field.
 		// User can publish AND either versioning is OFF or auto approval is ON (or both), publish changes immediately
+		// vstate = 2 will be added at end of form (see file form_end.php)
 		?>
-
-			<input type="hidden" id="jform_vstate" name="jform[vstate]" value="2" />
-
 		<?php endif; ?>
 
 	<?php else :

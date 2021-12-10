@@ -28,6 +28,8 @@
 				?>
 					<input type="hidden" id="jform_state" name="jform[state]" value="1" />
 					<input type="hidden" id="jform_vstate" name="jform[vstate]" value="2" />
+				<?php elseif ($this->perms['canpublish'] && (!$use_versioning || $auto_approve)) :?>		
+					<input type="hidden" id="jform_vstate" name="jform[vstate]" value="2" />
 				<?php endif; ?>
 	
 				<?php if ( $isnew && $typeid ) : /* this is compared to submit menu item configuration by the controller */ ?>
