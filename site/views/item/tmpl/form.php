@@ -10,7 +10,7 @@ defined('_JEXEC') or die('Restricted access');
  * 3. Select to use it in the ITEM TYPE configuration of the FRONTEND form
  */
 
-$form_layout = $this->params->get('form_layout_fe', 'tabs');
-$this->setLayout($form_layout);
+$form_ilayout = $this->params->get('form_ilayout_fe', 'tabs');
+$this->setLayout($form_ilayout);
 
-include JPATH_ROOT.DS."administrator".DS."components".DS."com_flexicontent".DS."views".DS."item".DS."tmpl".DS. $form_layout . ".php";
+include JPATH_ROOT.DS."administrator".DS."components".DS."com_flexicontent".DS."views".DS."item".DS."tmpl".DS. $form_ilayout . ".php";

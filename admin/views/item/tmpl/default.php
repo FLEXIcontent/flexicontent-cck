@@ -11,7 +11,7 @@
 
 defined('_JEXEC') or die('Restricted access');
 
-$form_layout = $this->params->get('form_layout_be', 'tabs');
-$this->setLayout($form_layout);
+$form_ilayout = $this->params->get('form_ilayout_be', 'tabs');
+$this->setLayout($form_ilayout);
 
-include $form_layout . ".php";
+include $form_ilayout . ".php";
