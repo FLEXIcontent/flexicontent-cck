@@ -180,61 +180,62 @@ endif;
 
 
 if ( !$this->params->get('auto_title', 0) || $usetitle ) :  ob_start();  // title ?>
-	<div class="fcclear"></div>
-	<?php
-	$field = isset($this->fields['title']) ? $this->fields['title'] : false;
-	$field_description = $field && $field->description ? $field->description : JText::_($this->form->getField('title')->description);
-	$label_attrs = 'class="' . $tip_class . $lbl_class . $lbl_extra_class . '" title="'.flexicontent_html::getToolTip(null, $field_description, 0, 1).'"';
-	ob_start();
-	?>
-	<span class="label-fcouter" id="jform_title-lbl-outer">
-		<label id="jform_title-lbl" for="jform_title" data-for="jform_title" <?php echo $label_attrs; ?> >
-			<?php echo $field ? $field->label : JText::_($this->form->getField('title')->getAttribute('label'));
-			/* $field->label is set per type */ ?>
-		</label>
-	</span>
-	<?php $label_html = ob_get_clean(); echo $label_html; ob_start(); ?>
-
-	<div class="container_fcfield container_fcfield_id_6 container_fcfield_name_title input-fcmax" id="container_fcfield_6">
-
-	<?php if ( $this->params->get('auto_title', 0) ): ?>
-		<?php echo $this->row->title . ' <div class="fc-nobgimage fc-info fc-mssg-inline hasTooltip" title="' . JText::_('FLEXI_SET_TO_AUTOMATIC_VALUE_ON_SAVE', true) . '"><span class="icon-info"></span> ' . JText::_('FLEXI_AUTO', true) . '</div>' ; ?>
-	<?php elseif ( isset($this->row->item_translations) ) : ?>
-
+	<div class="control-group">
 		<?php
-		array_push($tabSetStack, $tabSetCnt);
-		$tabSetCnt = ++$tabSetMax;
-		$tabCnt[$tabSetCnt] = 0;
+		$field = isset($this->fields['title']) ? $this->fields['title'] : false;
+		$field_description = $field && $field->description ? $field->description : JText::_($this->form->getField('title')->description);
+		$label_attrs = 'class="' . $tip_class . $lbl_class . $lbl_extra_class . '" title="'.flexicontent_html::getToolTip(null, $field_description, 0, 1).'"';
+		ob_start();
 		?>
-		<!-- tabber start -->
-		<div class="fctabber tabber-inline s-gray tabber-lang" id="fcform_tabset_<?php echo $tabSetCnt; ?>">
-			<div class="tabbertab fc-tabbed-field-box" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" >
-				<h3 class="tabberheading"> <?php echo '-'.$this->itemlang->name.'-'; ?> </h3>
-				<?php echo $this->form->getInput('title');?>
-			</div>
-			<?php foreach ($this->row->item_translations as $t): ?>
-				<?php if ($this->itemlang->shortcode!=$t->shortcode && $t->shortcode!='*' && !in_array($t->code, $disable_langs)) : ?>
-					<div class="tabbertab fc-tabbed-field-box" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" >
-						<h3 class="tabberheading"> <?php echo $t->name; // $t->shortcode; ?> </h3>
-						<?php
-						$ff_id = 'jfdata_'.$t->shortcode.'_title';
-						$ff_name = 'jfdata['.$t->shortcode.'][title]';
-						?>
-						<input class="fc_form_title fcfield_textareaval" type="text" id="<?php echo $ff_id; ?>" name="<?php echo $ff_name; ?>" value="<?php echo @$t->fields->title->value; ?>" size="36" maxlength="254" />
-					</div>
-				<?php endif; ?>
-			<?php endforeach; ?>
+		<div class="control-label" id="jform_title-lbl-outer">
+			<label id="jform_title-lbl" for="jform_title" data-for="jform_title" <?php echo $label_attrs; ?> >
+				<?php echo $field ? $field->label : JText::_($this->form->getField('title')->getAttribute('label'));
+				/* $field->label is set per type */ ?>
+			</label>
 		</div>
-		<!-- tabber end -->
-		<?php $tabSetCnt = array_pop($tabSetStack); ?>
+		<?php $label_html = ob_get_clean(); echo $label_html; ob_start(); ?>
 
-	<?php else : ?>
-		<?php echo $this->form->getInput('title');?>
-	<?php endif; ?>
+		<div class="controls container_fcfield container_fcfield_id_6 container_fcfield_name_title input-fcmax" id="container_fcfield_6">
 
+		<?php if ( $this->params->get('auto_title', 0) ): ?>
+			<?php echo $this->row->title . ' <div class="fc-nobgimage fc-info fc-mssg-inline hasTooltip" title="' . JText::_('FLEXI_SET_TO_AUTOMATIC_VALUE_ON_SAVE', true) . '"><span class="icon-info"></span> ' . JText::_('FLEXI_AUTO', true) . '</div>' ; ?>
+		<?php elseif ( isset($this->row->item_translations) ) : ?>
+
+			<?php
+			array_push($tabSetStack, $tabSetCnt);
+			$tabSetCnt = ++$tabSetMax;
+			$tabCnt[$tabSetCnt] = 0;
+			?>
+			<!-- tabber start -->
+			<div class="fctabber tabber-inline s-gray tabber-lang" id="fcform_tabset_<?php echo $tabSetCnt; ?>">
+				<div class="tabbertab fc-tabbed-field-box" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" >
+					<h3 class="tabberheading"> <?php echo '-'.$this->itemlang->name.'-'; ?> </h3>
+					<?php echo $this->form->getInput('title');?>
+				</div>
+				<?php foreach ($this->row->item_translations as $t): ?>
+					<?php if ($this->itemlang->shortcode!=$t->shortcode && $t->shortcode!='*' && !in_array($t->code, $disable_langs)) : ?>
+						<div class="tabbertab fc-tabbed-field-box" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" >
+							<h3 class="tabberheading"> <?php echo $t->name; // $t->shortcode; ?> </h3>
+							<?php
+							$ff_id = 'jfdata_'.$t->shortcode.'_title';
+							$ff_name = 'jfdata['.$t->shortcode.'][title]';
+							?>
+							<input class="fc_form_title fcfield_textareaval" type="text" id="<?php echo $ff_id; ?>" name="<?php echo $ff_name; ?>" value="<?php echo @$t->fields->title->value; ?>" size="36" maxlength="254" />
+						</div>
+					<?php endif; ?>
+				<?php endforeach; ?>
+			</div>
+			<!-- tabber end -->
+			<?php $tabSetCnt = array_pop($tabSetStack); ?>
+
+		<?php else : ?>
+			<?php echo $this->form->getInput('title');?>
+		<?php endif; ?>
+
+		</div>
+
+		<?php $input_html = ob_get_clean(); echo $input_html; ?>
 	</div>
-
-	<?php $input_html = ob_get_clean(); echo $input_html; ?>
 <?php
 $fn = 'title';
 $captured[$fn] = ob_get_clean();
@@ -246,58 +247,59 @@ endif;
 
 
 if ($usealias) : ob_start();  // alias ?>
-	<div class="fcclear"></div>
-	<?php
-	$field = isset($this->fields['alias']) ? $this->fields['alias'] : false;
-	$field_description = $field && $field->description ? $field->description : JText::_($this->form->getField('alias')->description);
-	$label_attrs = 'class="' . $tip_class . $lbl_class . $lbl_extra_class . '" title="'.flexicontent_html::getToolTip(null, $field_description, 0, 1).'"';
-	ob_start();
-	?>
-	<span class="label-fcouter" id="jform_alias-lbl-outer">
-		<label id="jform_alias-lbl" for="jform_alias" data-for="jform_alias" <?php echo $label_attrs; ?> >
-			<?php echo $field ? $field->label : JText::_($this->form->getField('alias')->getAttribute('label'));
-			/* $field->label is set per type */ ?>
-		</label>
-	</span>
-	<?php $label_html = ob_get_clean(); echo $label_html; ob_start(); ?>
-
-	<div class="container_fcfield container_fcfield_name_alias input-fcmax">
-	<?php if ( isset($this->row->item_translations) ) :?>
-
+	<div class="control-group">
 		<?php
-		array_push($tabSetStack, $tabSetCnt);
-		$tabSetCnt = ++$tabSetMax;
-		$tabCnt[$tabSetCnt] = 0;
+		$field = isset($this->fields['alias']) ? $this->fields['alias'] : false;
+		$field_description = $field && $field->description ? $field->description : JText::_($this->form->getField('alias')->description);
+		$label_attrs = 'class="' . $tip_class . $lbl_class . $lbl_extra_class . '" title="'.flexicontent_html::getToolTip(null, $field_description, 0, 1).'"';
+		ob_start();
 		?>
-		<!-- tabber start -->
-		<div class="fctabber tabber-inline s-gray tabber-lang" id="fcform_tabset_<?php echo $tabSetCnt; ?>">
-			<div class="tabbertab fc-tabbed-field-box" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" >
-				<h3 class="tabberheading"> <?php echo '-'.$this->itemlang->name.'-'; ?> </h3>
-				<?php echo $this->form->getInput('alias');?>
-			</div>
-			<?php foreach ($this->row->item_translations as $t): ?>
-				<?php if ($this->itemlang->shortcode!=$t->shortcode && $t->shortcode!='*' && !in_array($t->code, $disable_langs)) : ?>
-					<div class="tabbertab fc-tabbed-field-box" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" >
-						<h3 class="tabberheading"> <?php echo $t->name; // $t->shortcode; ?> </h3>
-						<?php
-						$ff_id = 'jfdata_'.$t->shortcode.'_alias';
-						$ff_name = 'jfdata['.$t->shortcode.'][alias]';
-						?>
-						<input class="fc_form_alias fcfield_textareaval" type="text" id="<?php echo $ff_id; ?>" name="<?php echo $ff_name; ?>" value="<?php echo @$t->fields->alias->value; ?>" size="36" maxlength="254" />
-					</div>
-				<?php endif; ?>
-			<?php endforeach; ?>
+		<div class="control-label" id="jform_alias-lbl-outer">
+			<label id="jform_alias-lbl" for="jform_alias" data-for="jform_alias" <?php echo $label_attrs; ?> >
+				<?php echo $field ? $field->label : JText::_($this->form->getField('alias')->getAttribute('label'));
+				/* $field->label is set per type */ ?>
+			</label>
 		</div>
-		<!-- tabber end -->
-		<?php $tabSetCnt = array_pop($tabSetStack); ?>
+		<?php $label_html = ob_get_clean(); echo $label_html; ob_start(); ?>
 
-	<?php else : ?>
-		<?php echo $this->form->getInput('alias');?>
-	<?php endif; ?>
+		<div class="controls container_fcfield container_fcfield_name_alias input-fcmax">
+		<?php if ( isset($this->row->item_translations) ) :?>
 
+			<?php
+			array_push($tabSetStack, $tabSetCnt);
+			$tabSetCnt = ++$tabSetMax;
+			$tabCnt[$tabSetCnt] = 0;
+			?>
+			<!-- tabber start -->
+			<div class="fctabber tabber-inline s-gray tabber-lang" id="fcform_tabset_<?php echo $tabSetCnt; ?>">
+				<div class="tabbertab fc-tabbed-field-box" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" >
+					<h3 class="tabberheading"> <?php echo '-'.$this->itemlang->name.'-'; ?> </h3>
+					<?php echo $this->form->getInput('alias');?>
+				</div>
+				<?php foreach ($this->row->item_translations as $t): ?>
+					<?php if ($this->itemlang->shortcode!=$t->shortcode && $t->shortcode!='*' && !in_array($t->code, $disable_langs)) : ?>
+						<div class="tabbertab fc-tabbed-field-box" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" >
+							<h3 class="tabberheading"> <?php echo $t->name; // $t->shortcode; ?> </h3>
+							<?php
+							$ff_id = 'jfdata_'.$t->shortcode.'_alias';
+							$ff_name = 'jfdata['.$t->shortcode.'][alias]';
+							?>
+							<input class="fc_form_alias fcfield_textareaval" type="text" id="<?php echo $ff_id; ?>" name="<?php echo $ff_name; ?>" value="<?php echo @$t->fields->alias->value; ?>" size="36" maxlength="254" />
+						</div>
+					<?php endif; ?>
+				<?php endforeach; ?>
+			</div>
+			<!-- tabber end -->
+			<?php $tabSetCnt = array_pop($tabSetStack); ?>
+
+		<?php else : ?>
+			<?php echo $this->form->getInput('alias');?>
+		<?php endif; ?>
+
+		</div>
+
+		<?php $input_html = ob_get_clean(); echo $input_html; ?>
 	</div>
-
-	<?php $input_html = ob_get_clean(); echo $input_html; ?>
 <?php
 $fn = 'alias';
 $captured[$fn] = ob_get_clean();
@@ -309,42 +311,43 @@ endif;
 
 
 if ((!$this->menuCats || $this->menuCats->cancatid) && $usemaincat) : ob_start();  // category ?>
-	<div class="fcclear"></div>
-	<?php
-	// Field via coreprops field type
-	$field = isset($this->fields['core_category']) ? $this->fields['core_category'] : false;
-	$field = isset($this->fields['core_category_' . $typeid]) ? $this->fields['core_category_' . $typeid] : $field;
-	$field_description = $field && $field->description ? $field->description : JText::_($this->form->getField('catid')->description);
-	$label_attrs = 'class="' . $tip_class . $lbl_class . $lbl_extra_class . '" title="'.flexicontent_html::getToolTip(null, $field_description, 0, 1).'"';
-	ob_start();
-	?>
-	<span class="label-fcouter" id="jform_catid-lbl-outer">
-		<label id="jform_catid-lbl" for="jform_catid" data-for="jform_catid" <?php echo $label_attrs; ?> >
-			<?php
-			$label_maincat = JText::_(!$secondary_displayed || isset($all_tab_fields['category'])
-				? $this->form->getLabel('catid')
-				: 'FLEXI_MAIN_CATEGORY'
-			);
-			echo $field ? $field->label : $label_maincat;
-			/* $field->label is set per type */ ?>
-			<i class="icon-tree-2"></i>
-		</label>
-	</span>
-	<?php $label_html = ob_get_clean(); echo $label_html; ob_start(); ?>
+	<div class="control-group">
+		<?php
+		// Field via coreprops field type
+		$field = isset($this->fields['core_category']) ? $this->fields['core_category'] : false;
+		$field = isset($this->fields['core_category_' . $typeid]) ? $this->fields['core_category_' . $typeid] : $field;
+		$field_description = $field && $field->description ? $field->description : JText::_($this->form->getField('catid')->description);
+		$label_attrs = 'class="' . $tip_class . $lbl_class . $lbl_extra_class . '" title="'.flexicontent_html::getToolTip(null, $field_description, 0, 1).'"';
+		ob_start();
+		?>
+		<div class="control-label" id="jform_catid-lbl-outer">
+			<label id="jform_catid-lbl" for="jform_catid" data-for="jform_catid" <?php echo $label_attrs; ?> >
+				<?php
+				$label_maincat = JText::_(!$secondary_displayed || isset($all_tab_fields['category'])
+					? $this->form->getLabel('catid')
+					: 'FLEXI_MAIN_CATEGORY'
+				);
+				echo $field ? $field->label : $label_maincat;
+				/* $field->label is set per type */ ?>
+				<i class="icon-tree-2"></i>
+			</label>
+		</div>
+		<?php $label_html = ob_get_clean(); echo $label_html; ob_start(); ?>
 
-	<div class="container_fcfield container_fcfield_name_catid">
-		<?php /* MENU SPECIFIED main category (new item) or main category according to perms */ ?>
-		<?php echo $this->menuCats ? $this->menuCats->catid : $this->lists['catid']; ?>
+		<div class="controls container_fcfield container_fcfield_name_catid">
+			<?php /* MENU SPECIFIED main category (new item) or main category according to perms */ ?>
+			<?php echo $this->menuCats ? $this->menuCats->catid : $this->lists['catid']; ?>
 
-		<?php /* Display secondary categories if permitted, show advanced info in backend */ ?>
-		<?php if ($cats_canselect_sec && !$isSite): ?>
-		<span class="inlineFormTip <?php echo $tip_class; ?>" title="<?php echo flexicontent_html::getToolTip( 'FLEXI_NOTES', 'FLEXI_SEC_FEAT_CATEGORIES_NOTES', 1, 1); ?>" >
-			<?php echo $info_image; ?>
-		</span>
-		<?php endif; ?>
+			<?php /* Display secondary categories if permitted, show advanced info in backend */ ?>
+			<?php if ($cats_canselect_sec && !$isSite): ?>
+			<span class="inlineFormTip <?php echo $tip_class; ?>" title="<?php echo flexicontent_html::getToolTip( 'FLEXI_NOTES', 'FLEXI_SEC_FEAT_CATEGORIES_NOTES', 1, 1); ?>" >
+				<?php echo $info_image; ?>
+			</span>
+			<?php endif; ?>
+		</div>
+
+		<?php $input_html = ob_get_clean(); echo $input_html; ?>
 	</div>
-
-	<?php $input_html = ob_get_clean(); echo $input_html; ?>
 <?php
 $fn = 'category';
 $captured[$fn] = ob_get_clean();
@@ -356,38 +359,39 @@ endif;
 
 
 if ($uselang) : ob_start();  // lang ?>
-	<div class="fcclear"></div>
-	<?php
-	// Field via coreprops field type
-	$field = isset($this->fields['core_lang']) ? $this->fields['core_lang'] : false;
-	$field = isset($this->fields['core_lang_' . $typeid]) ? $this->fields['core_lang_' . $typeid] : $field;
-	$field_description = $field && $field->description ? $field->description : JText::_($this->form->getField('tag')->description);  // Note: form element (XML file) is 'tag' not 'tags'
-	$label_attrs = $field
-		? 'class="' . $tip_class . $lbl_class . $lbl_extra_class . '" title="'.flexicontent_html::getToolTip(null, $field_description, 0, 1).'"'
-		: 'class="' . $lbl_class . $lbl_extra_class . '"';
-	ob_start();
-	?>
-	<span class="label-fcouter" id="jform_language-lbl-outer">
-	<label id="jform_language-lbl" for="jform_language" data-for="jform_language" class="<?php echo $lbl_class; ?> pull-left label-fcinner label-toplevel" >
-		<?php echo $field ? $field->label : JText::_($this->form->getField('language')->getAttribute('label'));
-		/* $field->label is set per type */ ?>
-		<i class="icon-flag"></i>
-	</label>
-	</span>
-	<?php $label_html = ob_get_clean(); echo $label_html; ob_start(); ?>
+	<div class="control-group">
+		<?php
+		// Field via coreprops field type
+		$field = isset($this->fields['core_lang']) ? $this->fields['core_lang'] : false;
+		$field = isset($this->fields['core_lang_' . $typeid]) ? $this->fields['core_lang_' . $typeid] : $field;
+		$field_description = $field && $field->description ? $field->description : JText::_($this->form->getField('tag')->description);  // Note: form element (XML file) is 'tag' not 'tags'
+		$label_attrs = $field
+			? 'class="' . $tip_class . $lbl_class . $lbl_extra_class . '" title="'.flexicontent_html::getToolTip(null, $field_description, 0, 1).'"'
+			: 'class="' . $lbl_class . $lbl_extra_class . '"';
+		ob_start();
+		?>
+		<div class="control-label" id="jform_language-lbl-outer">
+			<label id="jform_language-lbl" for="jform_language" data-for="jform_language" class="<?php echo $lbl_class; ?> pull-left label-fcinner label-toplevel" >
+				<?php echo $field ? $field->label : JText::_($this->form->getField('language')->getAttribute('label'));
+				/* $field->label is set per type */ ?>
+				<i class="icon-flag"></i>
+			</label>
+		</div>
+		<?php $label_html = ob_get_clean(); echo $label_html; ob_start(); ?>
 
-	<div class="container_fcfield container_fcfield_name_language">
-		<?php if (
-			(in_array('mod_item_lang', $this->allowlangmods) || $isnew) &&
-			in_array($uselang, array(1,3))
-		) : ?>
-			<?php echo $this->lists['languages']; ?>
-		<?php else: ?>
-			<?php echo $this->itemlang->image.' ['.$this->itemlang->name.']'; ?>
-		<?php endif; ?>
+		<div class="controls ontainer_fcfield container_fcfield_name_language">
+			<?php if (
+				(in_array('mod_item_lang', $this->allowlangmods) || $isnew) &&
+				in_array($uselang, array(1,3))
+			) : ?>
+				<?php echo $this->lists['languages']; ?>
+			<?php else: ?>
+				<?php echo $this->itemlang->image.' ['.$this->itemlang->name.']'; ?>
+			<?php endif; ?>
+		</div>
+
+		<?php $input_html = ob_get_clean(); echo $input_html; ?>
 	</div>
-
-	<?php $input_html = ob_get_clean(); echo $input_html; ?>
 <?php
 $fn = 'lang';
 $captured[$fn] = ob_get_clean();
@@ -399,97 +403,97 @@ endif;
 
 
 if ($tags_displayed) : ob_start();  // tags ?>
-	<div class="fcclear"></div>
-	<?php
-	$field = isset($this->fields['tags']) ? $this->fields['tags'] : false;
-	$field_description = $field && $field->description ? $field->description : JText::_($this->form->getField('tag')->description);  // Note: form element (XML file) is 'tag' not 'tags'
-	$label_attrs = $field
-		? 'class="' . $tip_class . $lbl_class . $lbl_extra_class . '" title="'.flexicontent_html::getToolTip(null, $field_description, 0, 1).'"'
-		: 'class="' . $lbl_class . $lbl_extra_class . '"';
-	ob_start();
-	?>
-	<span class="label-fcouter" id="jform_tag-lbl-outer">
-		<label id="jform_tag-lbl" data-for="input-tags" <?php echo $label_attrs; ?> >
-			<?php echo $field ? $field->label : JText::_($this->form->getField('tag')->getAttribute('label'));
-			/* $field->label is set per type */ ?>
-			<i class="icon-tags-2"></i>
-		</label>
-	</span>
-	<?php $label_html = ob_get_clean(); echo $label_html; ob_start(); ?>
+	<div class="control-group">
+		<?php
+		$field = isset($this->fields['tags']) ? $this->fields['tags'] : false;
+		$field_description = $field && $field->description ? $field->description : JText::_($this->form->getField('tag')->description);  // Note: form element (XML file) is 'tag' not 'tags'
+		$label_attrs = $field
+			? 'class="' . $tip_class . $lbl_class . $lbl_extra_class . '" title="'.flexicontent_html::getToolTip(null, $field_description, 0, 1).'"'
+			: 'class="' . $lbl_class . $lbl_extra_class . '"';
+		ob_start();
+		?>
+		<div class="control-label" id="jform_tag-lbl-outer">
+			<label id="jform_tag-lbl" data-for="input-tags" <?php echo $label_attrs; ?> >
+				<?php echo $field ? $field->label : JText::_($this->form->getField('tag')->getAttribute('label'));
+				/* $field->label is set per type */ ?>
+				<i class="icon-tags-2"></i>
+			</label>
+		</div>
+		<?php $label_html = ob_get_clean(); echo $label_html; ob_start(); ?>
 
-	<div class="container_fcfield container_fcfield_name_tags">
+		<div class="controls container_fcfield container_fcfield_name_tags">
 
-		<?php if ($tags_editable) : ?>
-			<div class="fcclear"></div>
-			<div id="tags">
-				<input type="text" id="input-tags" name="tagname" class="<?php echo $tip_class; ?>"
-					placeholder="<?php echo JText::_($this->perms['cancreatetags'] ? 'FLEXI_TAG_SEARCH_EXISTING_CREATE_NEW' : 'FLEXI_TAG_SEARCH_EXISTING'); ?>"
-					title="<?php echo flexicontent_html::getToolTip( 'FLEXI_NOTES', ($this->perms['cancreatetags'] ? 'FLEXI_TAG_CAN_ASSIGN_CREATE' : 'FLEXI_TAG_CAN_ASSIGN_ONLY'), 1, 1);?>"
-				/>
-				<span id='input_new_tag' ></span>
-			</div>
-		<?php endif; ?>
+			<?php if ($tags_editable) : ?>
+				<div id="tags">
+					<input type="text" id="input-tags" name="tagname" class="<?php echo $tip_class; ?>"
+						placeholder="<?php echo JText::_($this->perms['cancreatetags'] ? 'FLEXI_TAG_SEARCH_EXISTING_CREATE_NEW' : 'FLEXI_TAG_SEARCH_EXISTING'); ?>"
+						title="<?php echo flexicontent_html::getToolTip( 'FLEXI_NOTES', ($this->perms['cancreatetags'] ? 'FLEXI_TAG_CAN_ASSIGN_CREATE' : 'FLEXI_TAG_CAN_ASSIGN_ONLY'), 1, 1);?>"
+					/>
+					<span id='input_new_tag' ></span>
+				</div>
+			<?php endif; ?>
 
-			<div class="fc_tagbox" id="fc_tagbox">
+				<div class="fc_tagbox" id="fc_tagbox">
 
-				<?php
-				// Tags both shown and editable
-				if ($tags_editable) echo '<input type="hidden" name="jform[tag][]" value="" />';
-				?>
+					<?php
+					// Tags both shown and editable
+					if ($tags_editable) echo '<input type="hidden" name="jform[tag][]" value="" />';
+					?>
 
-				<ul id="ultagbox">
-				<?php
-					$common_tags_selected = array();
+					<ul id="ultagbox">
+					<?php
+						$common_tags_selected = array();
 
-					foreach($this->usedtagsdata as $tag)
-					{
-						if ($tags_editable)
+						foreach($this->usedtagsdata as $tag)
 						{
-							if ( isset($this->quicktagsdata[$tag->id]) )
+							if ($tags_editable)
 							{
-								$common_tags_selected[$tag->id] = 1;
-								continue;
+								if ( isset($this->quicktagsdata[$tag->id]) )
+								{
+									$common_tags_selected[$tag->id] = 1;
+									continue;
+								}
+								echo '
+								<li class="tagitem">
+									<span>' . $tag->name . ($tag->translated_text ? ' (' . $tag->translated_text . ')' : '') . '</span>
+									<input type="hidden" name="jform[tag][]" value="'.$tag->id.'" />
+									<a href="javascript:;" class="deletetag" onclick="javascript:deleteTag(this);" title="'.JText::_('FLEXI_DELETE_TAG').'"></a>
+								</li>';
 							}
-							echo '
-							<li class="tagitem">
-								<span>' . $tag->name . ($tag->translated_text ? ' (' . $tag->translated_text . ')' : '') . '</span>
-								<input type="hidden" name="jform[tag][]" value="'.$tag->id.'" />
-								<a href="javascript:;" class="deletetag" onclick="javascript:deleteTag(this);" title="'.JText::_('FLEXI_DELETE_TAG').'"></a>
-							</li>';
+							else
+							{
+								echo '
+								<li class="tagitem plain">
+									<span>' . $tag->name . ($tag->translated_text ? ' (' . $tag->translated_text . ')' : '') . '</span>
+									<input type="hidden" name="jform[tag][]" value="'.$tag->id.'" />
+								</li>';
+							}
 						}
-						else
-						{
-							echo '
-							<li class="tagitem plain">
-								<span>' . $tag->name . ($tag->translated_text ? ' (' . $tag->translated_text . ')' : '') . '</span>
-								<input type="hidden" name="jform[tag][]" value="'.$tag->id.'" />
-							</li>';
-						}
-					}
-				?>
-				</ul>
+					?>
+					</ul>
 
-				<div class="fcclear"></div>
+					<div class="fcclear"></div>
 
-				<?php
-				if ($tags_editable && count($this->quicktagsdata))
-				{
-					echo '<span class="tagicon '.$tip_class.'" title="'.JText::_('FLEXI_COMMON_TAGS').'"></span>';
-					foreach ($this->quicktagsdata as $tag)
+					<?php
+					if ($tags_editable && count($this->quicktagsdata))
 					{
-						$_checked = isset($common_tags_selected[$tag->id]) ? ' checked="checked" ' : '';
-						echo '
-						<input type="checkbox" name="jform[tag][]" value="'.$tag->id.'" data-tagname="'.$tag->name.'" id="quick-tag-'.$tag->id.'" '.$_checked.' />
-						<label for="quick-tag-'.$tag->id.'" class="tagitem">'.$tag->name.'</label>
-						';
+						echo '<span class="tagicon '.$tip_class.'" title="'.JText::_('FLEXI_COMMON_TAGS').'"></span>';
+						foreach ($this->quicktagsdata as $tag)
+						{
+							$_checked = isset($common_tags_selected[$tag->id]) ? ' checked="checked" ' : '';
+							echo '
+							<input type="checkbox" name="jform[tag][]" value="'.$tag->id.'" data-tagname="'.$tag->name.'" id="quick-tag-'.$tag->id.'" '.$_checked.' />
+							<label for="quick-tag-'.$tag->id.'" class="tagitem">'.$tag->name.'</label>
+							';
+						}
 					}
-				}
-				?>
-			</div>
+					?>
+				</div>
 
+		</div>
+
+		<?php $input_html = ob_get_clean(); echo $input_html; ?>
 	</div>
-
-	<?php $input_html = ob_get_clean(); echo $input_html; ?>
 <?php
 $fn = 'tags';
 $captured[$fn] = ob_get_clean();
@@ -501,35 +505,36 @@ endif;
 
 
 if (!$typeid || $usetype) : ob_start();  // type ?>
-	<div class="fcclear"></div>
-	<?php
-	$field = isset($this->fields['document_type']) ? $this->fields['document_type'] : false;
-	$field_description = $field && $field->description ? $field->description : JText::_($this->form->getField('type_id')->description);  // Note: form element (XML file) is 'type_id' not 'document_type'
-	$warning_class = !$typeid && !$isSite ? ' label text-white bg-warning label-warning' : '';
-	$label_attrs = $field
-		? 'class="' . $tip_class . $lbl_class . $lbl_extra_class . $warning_class . '" title="'.flexicontent_html::getToolTip(null, $field_description, 0, 1).'"'
-		: 'class="' . $lbl_class . $lbl_extra_class . '"';
-	ob_start();
-	?>
-	<span class="label-fcouter" id="jform_type_id-lbl-outer">
-		<label id="jform_type_id-lbl" for="jform_type_id" data-for="jform_type_id" <?php echo $label_attrs; ?> >
-			<?php echo $field ? $field->label : JText::_($this->form->getField('type_id')->getAttribute('label'));
-			/* $field->label is set per type */ ?>
-			<i class="icon-briefcase"></i>
-		</label>
-	</span>
-	<?php $label_html = ob_get_clean(); echo $label_html; ob_start(); ?>
+	<div class="control-group">
+		<?php
+		$field = isset($this->fields['document_type']) ? $this->fields['document_type'] : false;
+		$field_description = $field && $field->description ? $field->description : JText::_($this->form->getField('type_id')->description);  // Note: form element (XML file) is 'type_id' not 'document_type'
+		$warning_class = !$typeid && !$isSite ? ' label text-white bg-warning label-warning' : '';
+		$label_attrs = $field
+			? 'class="' . $tip_class . $lbl_class . $lbl_extra_class . $warning_class . '" title="'.flexicontent_html::getToolTip(null, $field_description, 0, 1).'"'
+			: 'class="' . $lbl_class . $lbl_extra_class . '"';
+		ob_start();
+		?>
+		<div class="control-label" id="jform_type_id-lbl-outer">
+			<label id="jform_type_id-lbl" for="jform_type_id" data-for="jform_type_id" <?php echo $label_attrs; ?> >
+				<?php echo $field ? $field->label : JText::_($this->form->getField('type_id')->getAttribute('label'));
+				/* $field->label is set per type */ ?>
+				<i class="icon-briefcase"></i>
+			</label>
+		</div>
+		<?php $label_html = ob_get_clean(); echo $label_html; ob_start(); ?>
 
-	<div class="container_fcfield container_fcfield_id_8 container_fcfield_name_type" id="container_fcfield_8">
-		<?php echo $this->lists['type']; ?>
-		<?php $type_warning = flexicontent_html::getToolTip('FLEXI_NOTES', 'FLEXI_TYPE_CHANGE_WARNING', 1, 1); ?>
-		<span class="<?php echo $tip_class; ?>" style="display:inline-block;" title="<?php echo $type_warning; ?>">
-			<?php echo $info_image; ?>
-		</span>
-		<?php echo sprintf( $alert_box, 'id="fc-change-warning" style="display:none; float:left;"', 'warning', '', '<h4>'.JText::_( 'FLEXI_WARNING' ).'</h4> '.JText::_( 'FLEXI_TAKE_CARE_CHANGING_FIELD_TYPE' ) ); ?>
+		<div class="controls container_fcfield container_fcfield_id_8 container_fcfield_name_type" id="container_fcfield_8">
+			<?php echo $this->lists['type']; ?>
+			<?php $type_warning = flexicontent_html::getToolTip('FLEXI_NOTES', 'FLEXI_TYPE_CHANGE_WARNING', 1, 1); ?>
+			<span class="<?php echo $tip_class; ?>" style="display:inline-block;" title="<?php echo $type_warning; ?>">
+				<?php echo $info_image; ?>
+			</span>
+			<?php echo sprintf( $alert_box, 'id="fc-change-warning" style="display:none; float:left;"', 'warning', '', '<h4>'.JText::_( 'FLEXI_WARNING' ).'</h4> '.JText::_( 'FLEXI_TAKE_CARE_CHANGING_FIELD_TYPE' ) ); ?>
+		</div>
+
+		<?php $input_html = ob_get_clean(); echo $input_html; ?>
 	</div>
-
-	<?php $input_html = ob_get_clean(); echo $input_html; ?>
 <?php
 $fn = 'document_type';
 $captured[$fn] = ob_get_clean();
@@ -540,68 +545,92 @@ endif;
 
 
 
-if (!$is_autopublished) : ob_start();  // state and vstate (= approval of new document version) ?>
-	<div class="fcclear"></div>
-	<?php
-	$field = isset($this->fields['state']) ? $this->fields['state'] : false;
-	$field_description = $field && $field->description ? $field->description : JText::_($this->form->getField('state')->description);
-	$label_attrs = $field
-		? 'class="' . $tip_class . $lbl_class . $lbl_extra_class . '" title="'.flexicontent_html::getToolTip(null, $field_description, 0, 1).'"'
-		: 'class="' . $lbl_class . $lbl_extra_class . '"';
-	ob_start();
-	?>
-	<span class="label-fcouter" id="jform_state-lbl-outer">
-		<label id="jform_state-lbl" for="jform_state" data-for="jform_state" <?php echo $label_attrs; ?> >
-			<?php echo $field ? $field->label : JText::_($this->form->getField('state')->getAttribute('label'));
-			/* $field->label is set per type */ ?>
-			<i class="icon-file-check"></i>
-		</label>
-	</span>
-	<?php $label_html = ob_get_clean(); echo $label_html; ob_start(); ?>
+if (!$is_autopublished) :  // state and vstate (= approval of new document version) ?>
 
-
-	<?php if ( $this->perms['canpublish'] ) :  // state ?>
-
-		<div class="container_fcfield container_fcfield_id_10 container_fcfield_name_state" id="container_fcfield_10">
-			<?php echo $this->lists['state']; ?>
-			<?php //echo $this->form->getInput('state'); ?>
-			<span class="<?php echo $tip_class; ?>" style="display:inline-block;" title="<?php echo flexicontent_html::getToolTip('FLEXI_NOTES', 'FLEXI_STATE_CHANGE_WARNING', 1, 1); ?>">
-				<?php echo $info_image; ?>
-			</span>
+	<?php ob_start(); ?>
+	<div class="control-group">
+		<?php
+		$field = isset($this->fields['state']) ? $this->fields['state'] : false;
+		$field_description = $field && $field->description ? $field->description : JText::_($this->form->getField('state')->description);
+		$label_attrs = $field
+			? 'class="' . $tip_class . $lbl_class . $lbl_extra_class . '" title="'.flexicontent_html::getToolTip(null, $field_description, 0, 1).'"'
+			: 'class="' . $lbl_class . $lbl_extra_class . '"';
+		ob_start();
+		?>
+		<div class="control-label" id="jform_state-lbl-outer">
+			<label id="jform_state-lbl" for="jform_state" data-for="jform_state" <?php echo $label_attrs; ?> >
+				<?php echo $field ? $field->label : JText::_($this->form->getField('state')->getAttribute('label'));
+				/* $field->label is set per type */ ?>
+				<i class="icon-file-check"></i>
+			</label>
 		</div>
+		<?php $label_html = ob_get_clean(); echo $label_html; ob_start(); ?>
 
-	<?php else :
 
-		echo $this->published;
-		echo '<input type="hidden" name="jform[state]" id="jform_vstate" value="'.$this->row->state.'" />';
+		<?php if ( $this->perms['canpublish'] ) :  // state ?>
 
-	endif;?>
+			<div class="controls container_fcfield container_fcfield_id_10 container_fcfield_name_state" id="container_fcfield_10">
+				<?php echo $this->lists['state']; ?>
+				<?php //echo $this->form->getInput('state'); ?>
+				<span class="<?php echo $tip_class; ?>" style="display:inline-block;" title="<?php echo flexicontent_html::getToolTip('FLEXI_NOTES', 'FLEXI_STATE_CHANGE_WARNING', 1, 1); ?>">
+					<?php echo $info_image; ?>
+				</span>
+			</div>
+
+		<?php else :
+
+			echo $this->published;
+			echo '<input type="hidden" name="jform[state]" id="jform_vstate" value="'.$this->row->state.'" />';
+
+		endif;?>
+
+		<?php $input_html = ob_get_clean(); echo $input_html; ?>
+	</div>
+	<?php
+	$fn = 'state';
+	$captured[$fn] = ob_get_clean();
+	$rendered[$fn] = (object) array('label_html' => $label_html, 'input_html' => $input_html, 'html' => $captured[$fn], 'field' => $field);
+	unset($label_html); unset($input_html);
+	?>
 
 
 	<?php if ($this->perms['canpublish']) : // vstate (= approval of new document version) ?>
 
+		<?php ob_start(); ?>
+		<div class="control-group">
 		 <?php if ($use_versioning && !$auto_approve) :
-		   // CASE 1. Display the 'publish changes' field.
-			 // User can publish and versioning is ON with auto approval  OFF
-		 ?>
+			// CASE 1. Display the 'publish changes' field.
+			// User can publish and versioning is ON with auto approval  OFF
+			?>
 
 			<?php
-				//echo "<br/>".$this->form->getLabel('vstate') . $this->form->getInput('vstate');
-				$label_attrs = 'class="' . $tip_class . $lbl_class . $lbl_extra_class . '" title="'.flexicontent_html::getToolTip('FLEXI_PUBLIC_DOCUMENT_CHANGES', 'FLEXI_PUBLIC_DOCUMENT_CHANGES_DESC', 1, 1).'"';
+			$label_attrs = 'class="' . $tip_class . $lbl_class . $lbl_extra_class . '" title="'.flexicontent_html::getToolTip('FLEXI_PUBLIC_DOCUMENT_CHANGES', 'FLEXI_PUBLIC_DOCUMENT_CHANGES_DESC', 1, 1).'"';
+			ob_start();
 			?>
-			<div class="fcclear"></div>
-			<span class="label-fcouter" id="jform_vstate-lbl-outer">
+			
+			<div class="control-label" id="jform_vstate-lbl-outer">
 				<label id="jform_vstate-lbl" data-for="jform_vstate" <?php echo $label_attrs; ?> >
 					<?php echo JText::_( 'FLEXI_PUBLIC_DOCUMENT_CHANGES' ); ?>
 				</label>
-			</span>
-			<div class="container_fcfield container_fcfield_name_vstate">
+			</div>
+			<?php $label_html = ob_get_clean(); echo $label_html; ob_start(); ?>
+
+			<div class="controls container_fcfield container_fcfield_name_vstate">
 				<?php echo $this->lists['vstate']; ?>
 			</div>
 
+			<?php $input_html = ob_get_clean(); echo $input_html; ?>
+		</div>
+		<?php
+		$fn = 'vstate';
+		$captured[$fn] = ob_get_clean();
+		$rendered[$fn] = (object) array('label_html' => $label_html, 'input_html' => $input_html, 'html' => $captured[$fn], 'field' => $field);
+		unset($label_html); unset($input_html);
+		?>
+
 		<?php else :
-		   // CASE 2. Hide 'publish changes' field.
-			 // User can publish AND either versioning or auto approval is OFF (or both OFF), publish changes immediately
+		// CASE 2. Hide 'publish changes' field.
+		// User can publish AND either versioning is OFF or auto approval is ON (or both), publish changes immediately
 		?>
 
 			<input type="hidden" id="jform_vstate" name="jform[vstate]" value="2" />
@@ -612,51 +641,70 @@ if (!$is_autopublished) : ob_start();  // state and vstate (= approval of new do
 		// User can not publish.  Display message that
 		// Versioning ON: that item will need approval
 		// Versioning OFF: that change are applied immediately and that existing item is overwritten immediately
+	?>
+		<div class="control-group">
+			<?php ob_start(); ?>
+				<div class="control-label" id="jform_vstate-lbl-outer">
+				</div>
+			<?php $label_html = ob_get_clean(); echo $label_html; ob_start(); ?>
 
-			echo JText::_(($isnew || $use_versioning ? 'FLEXI_NEEDS_APPROVAL' : 'FLEXI_WITHOUT_APPROVAL') . ($isSite ? '' : '_BE'));
-		// Enable approval if versioning disabled, this make sense,
-		// since if use can edit item THEN item should be updated !!!
-		$item_vstate = $use_versioning ? 1 : 2;
-		echo '<input type="hidden" name="jform[vstate]" id="jform_vstate" value="'.$item_vstate.'" />';
+			<div class="controls container_fcfield container_fcfield_name_vstate">
+			<?php
+			echo '<div class="alert alert-info">' . JText::_(($isnew || $use_versioning ? 'FLEXI_NEEDS_APPROVAL' : 'FLEXI_WITHOUT_APPROVAL') . ($isSite ? '' : '_BE')) . '</div>';
+			// Enable approval if versioning disabled, this make sense,
+			// since if use can edit item THEN item should be updated !!!
+			$item_vstate = $use_versioning ? 1 : 2;
+			echo '<input type="hidden" name="jform[vstate]" id="jform_vstate" value="'.$item_vstate.'" />';
 
-	endif; ?>
+			$input_html = ob_get_clean(); echo $input_html; ?>
+		</div>
+		<?php
+		$fn = 'vstate';
+		$captured[$fn] = ob_get_clean();
+		$rendered[$fn] = (object) array('label_html' => $label_html, 'input_html' => $input_html, 'html' => $captured[$fn], 'field' => $field);
+		unset($label_html); unset($input_html);
+	endif;
 
-	<?php $input_html = ob_get_clean(); echo $input_html; ?>
-<?php
-$fn = 'state';  // this includes both fields: state, vstate
-$captured[$fn] = ob_get_clean();
-$rendered[$fn] = (object) array('label_html' => $label_html, 'input_html' => $input_html, 'html' => $captured[$fn], 'field' => $field);
-unset($label_html); unset($input_html);
 endif;
+
+/**
+ * Compatibility, append vstate to state, is state was not specified
+ */
+if (!isset($all_tab_fields['vstate']) && isset($captured['vstate']))
+{
+	$captured['state'] .= $captured['vstate'];
+	unset($captured['vstate']);
+}
 
 
 
 
 if ($useaccess) : ob_start(); ob_start();  // access ?>
-	<div class="fcclear"></div>
-	<?php
-	$field = isset($this->fields['core_access']) ? $this->fields['core_access'] : false;
-	$field = isset($this->fields['core_access_' . $typeid]) ? $this->fields['core_access_' . $typeid] : $field;
-	$field_description = $field && $field->description ? $field->description : JText::_($this->form->getField('access')->description);
-	$label_attrs = $field
-		? 'class="' . $tip_class . $lbl_class . $lbl_extra_class . '" title="'.flexicontent_html::getToolTip(null, $field_description, 0, 1).'"'
-		: 'class="' . $lbl_class . $lbl_extra_class . '"';
-	ob_start();
-	?>
-	<span class="label-fcouter" id="jform_access-lbl-outer">
-		<label id="jform_access-lbl" for="jform_access" data-for="jform_access" <?php echo $label_attrs; ?> >
-			<?php echo $field ? $field->label : JText::_($this->form->getField('access')->getAttribute('label'));
-			/* $field->label is set per type */ ?>
-			<i class="icon-lock"></i>
-		</label>
-	</span>
-	<?php $label_html = ob_get_clean(); echo $label_html; ob_start(); ?>
+	<div class="control-group">
+		<?php
+		$field = isset($this->fields['core_access']) ? $this->fields['core_access'] : false;
+		$field = isset($this->fields['core_access_' . $typeid]) ? $this->fields['core_access_' . $typeid] : $field;
+		$field_description = $field && $field->description ? $field->description : JText::_($this->form->getField('access')->description);
+		$label_attrs = $field
+			? 'class="' . $tip_class . $lbl_class . $lbl_extra_class . '" title="'.flexicontent_html::getToolTip(null, $field_description, 0, 1).'"'
+			: 'class="' . $lbl_class . $lbl_extra_class . '"';
+		ob_start();
+		?>
+		<div class="control-label" id="jform_access-lbl-outer">
+			<label id="jform_access-lbl" for="jform_access" data-for="jform_access" <?php echo $label_attrs; ?> >
+				<?php echo $field ? $field->label : JText::_($this->form->getField('access')->getAttribute('label'));
+				/* $field->label is set per type */ ?>
+				<i class="icon-lock"></i>
+			</label>
+		</div>
+		<?php $label_html = ob_get_clean(); echo $label_html; ob_start(); ?>
 
-	<div class="container_fcfield container_fcfield_name_access">
-		<?php echo $this->form->getInput('access');?>
+		<div class="controls container_fcfield container_fcfield_name_access">
+			<?php echo $this->form->getInput('access');?>
+		</div>
+
+		<?php $input_html = ob_get_clean(); echo $input_html; ?>
 	</div>
-
-	<?php $input_html = ob_get_clean(); echo $input_html; ?>
 <?php
 $fn = 'access';
 $captured[$fn] = ob_get_clean();
@@ -673,23 +721,24 @@ endif;
  */
 
 if ($typeid && $allowdisablingcomments) : ob_start();  // disable_comments ?>
-	<div class="fcclear"></div>
-	<?php
-	$label_attrs = 'class="' . $tip_class . $lbl_class . $lbl_extra_class . '" title="'.flexicontent_html::getToolTip('FLEXI_ALLOW_COMMENTS', 'FLEXI_ALLOW_COMMENTS_DESC', 1, 1).'"';
-	ob_start();
-	?>
-	<span class="label-fcouter" id="jform_attribs_comments-title-outer">
-		<label id="jform_attribs_comments-title" <?php echo $label_attrs; ?> >
-			<?php echo JText::_( 'FLEXI_ALLOW_COMMENTS' );?>
-		</label>
-	</span>
-	<?php $label_html = ob_get_clean(); echo $label_html; ob_start(); ?>
+	<div class="control-group">
+		<?php
+		$label_attrs = 'class="' . $tip_class . $lbl_class . $lbl_extra_class . '" title="'.flexicontent_html::getToolTip('FLEXI_ALLOW_COMMENTS', 'FLEXI_ALLOW_COMMENTS_DESC', 1, 1).'"';
+		ob_start();
+		?>
+		<div class="control-label" id="jform_attribs_comments-title-outer">
+			<label id="jform_attribs_comments-title" <?php echo $label_attrs; ?> >
+				<?php echo JText::_( 'FLEXI_ALLOW_COMMENTS' );?>
+			</label>
+		</div>
+		<?php $label_html = ob_get_clean(); echo $label_html; ob_start(); ?>
 
-	<div class="container_fcfield container_fcfield_name_comments">
-		<?php echo $this->lists['disable_comments']; ?>
+		<div class="controls container_fcfield container_fcfield_name_comments">
+			<?php echo $this->lists['disable_comments']; ?>
+		</div>
+
+		<?php $input_html = ob_get_clean(); echo $input_html; ?>
 	</div>
-
-	<?php $input_html = ob_get_clean(); echo $input_html; ?>
 <?php
 $fn = 'disable_comments';
 $captured[$fn] = ob_get_clean();
@@ -701,26 +750,27 @@ endif;
 
 
 if ($typeid && $allow_subscribers_notify && $this->subscribers) :  ob_start();  // notify ?>
-	<div class="fcclear"></div>
-	<?php
-	$label_attrs = 'class="' . $tip_class . $lbl_class  . $lbl_extra_class . '" title="'.flexicontent_html::getToolTip('FLEXI_NOTIFY_FAVOURING_USERS', 'FLEXI_NOTIFY_NOTES', 1, 1).'"';
-	ob_start();
-	?>
-	<span class="label-fcouter" id="jform_notify-lbl-outer">
-		<label id="jform_notify-lbl" <?php echo $label_attrs; ?> >
-			<?php echo JText::_( $isSite ? 'FLEXI_NOTIFY_FAVOURING_USERS' : 'FLEXI_NOTIFY_SUBSCRIBERS' ); ?>
-			<i class="icon-mail"></i>
-		</label>
-	</span>
-	<?php $label_html = ob_get_clean(); echo $label_html; ob_start(); ?>
+	<div class="control-group">
+		<?php
+		$label_attrs = 'class="' . $tip_class . $lbl_class  . $lbl_extra_class . '" title="'.flexicontent_html::getToolTip('FLEXI_NOTIFY_FAVOURING_USERS', 'FLEXI_NOTIFY_NOTES', 1, 1).'"';
+		ob_start();
+		?>
+		<div class="control-label" id="jform_notify-lbl-outer">
+			<label id="jform_notify-lbl" <?php echo $label_attrs; ?> >
+				<?php echo JText::_( $isSite ? 'FLEXI_NOTIFY_FAVOURING_USERS' : 'FLEXI_NOTIFY_SUBSCRIBERS' ); ?>
+				<i class="icon-mail"></i>
+			</label>
+		</div>
+		<?php $label_html = ob_get_clean(); echo $label_html; ob_start(); ?>
 
-	<div class="container_fcfield container_fcfield_name_notify">
-		<span style="display:inline-block;">
-			<?php echo $this->lists['notify']; ?>
-		</span>
+		<div class="controls container_fcfield container_fcfield_name_notify">
+			<span style="display:inline-block;">
+				<?php echo $this->lists['notify']; ?>
+			</span>
+		</div>
+
+		<?php $input_html = ob_get_clean(); echo $input_html; ?>
 	</div>
-
-	<?php $input_html = ob_get_clean(); echo $input_html; ?>
 <?php
 $fn = 'notify_subscribers';
 $captured[$fn] = ob_get_clean();
@@ -733,35 +783,36 @@ endif;
 
 
 if ($typeid && $allow_owner_notify && $this->row->created_by != $user->id) :  ob_start();  // notify_owner ?>
-	<div class="fcclear"></div>
-	<?php
-	$label_attrs = 'class="' . $tip_class . $lbl_class . '" title="'.flexicontent_html::getToolTip('FLEXI_NOTIFY_OWNER', 'FLEXI_NOTIFY_OWNER_DESC', 1, 1).'"';
-	ob_start();
-	?>
-	<span class="label-fcouter" id="jform_notify_owner-lbl-outer">
-		<label id="jform_notify_owner-lbl" <?php echo $label_attrs; ?> >
-			<?php echo JText::_('FLEXI_NOTIFY_OWNER'); ?>
-			<i class="icon-mail"></i>
-		</label>
-	</span>
-	<?php $label_html = ob_get_clean(); echo $label_html; ob_start(); ?>
-
-	<div class="container_fcfield container_fcfield_name_notify">
-		<span style="display:inline-block;">
-		<?php echo $this->lists['notify_owner']; ?>
-		</span>
-
+	<div class="control-group">
 		<?php
-			$tipOwnerCanEdit      = JText::_('FLEXI_OWNER_CAN_EDIT_THIS_ITEM') . ': &nbsp; - ' . mb_strtoupper(JText::_($this->ownerCanEdit ? 'JYES' : 'JNO')) . ' -';
-			$tipOwnerCanEditState = JText::_('FLEXI_OWNER_CAN_PUBLISH_CHANGES_OF_THIS_ITEM') . ': &nbsp; - ' . mb_strtoupper(JText::_($this->ownerCanEdit ? 'JYES' : 'JNO')) . ' -';
+		$label_attrs = 'class="' . $tip_class . $lbl_class . $lbl_extra_class . '" title="'.flexicontent_html::getToolTip('FLEXI_NOTIFY_OWNER', 'FLEXI_NOTIFY_OWNER_DESC', 1, 1).'"';
+		ob_start();
 		?>
-		<span class="<?php echo $tip_class; ?>" style="display:inline-block;"
-		      title="<?php echo flexicontent_html::getToolTip('FLEXI_NOTES', $tipOwnerCanEdit . '<br>' . $tipOwnerCanEditState, 1, 1); ?>">
-			<?php echo $this->ownerCanEditState ? $info_image : $warn_image; ?>
-		</span>
-	</div>
+		<div class="control-label" id="jform_notify_owner-lbl-outer">
+			<label id="jform_notify_owner-lbl" <?php echo $label_attrs; ?> >
+				<?php echo JText::_('FLEXI_NOTIFY_OWNER'); ?>
+				<i class="icon-mail"></i>
+			</label>
+		</div>
+		<?php $label_html = ob_get_clean(); echo $label_html; ob_start(); ?>
 
-	<?php $input_html = ob_get_clean(); echo $input_html; ?>
+		<div class="controls container_fcfield container_fcfield_name_notify">
+			<span style="display:inline-block;">
+			<?php echo $this->lists['notify_owner']; ?>
+			</span>
+
+			<?php
+				$tipOwnerCanEdit      = JText::_('FLEXI_OWNER_CAN_EDIT_THIS_ITEM') . ': &nbsp; - ' . mb_strtoupper(JText::_($this->ownerCanEdit ? 'JYES' : 'JNO')) . ' -';
+				$tipOwnerCanEditState = JText::_('FLEXI_OWNER_CAN_PUBLISH_CHANGES_OF_THIS_ITEM') . ': &nbsp; - ' . mb_strtoupper(JText::_($this->ownerCanEdit ? 'JYES' : 'JNO')) . ' -';
+			?>
+			<span class="<?php echo $tip_class; ?>" style="display:inline-block;"
+			      title="<?php echo flexicontent_html::getToolTip('FLEXI_NOTES', $tipOwnerCanEdit . '<br>' . $tipOwnerCanEditState, 1, 1); ?>">
+				<?php echo $this->ownerCanEditState ? $info_image : $warn_image; ?>
+			</span>
+		</div>
+
+		<?php $input_html = ob_get_clean(); echo $input_html; ?>
+	</div>
 <?php
 $fn = 'notify_owner';
 $captured[$fn] = ob_get_clean();

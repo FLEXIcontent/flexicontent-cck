@@ -22,7 +22,7 @@
 				<option value="1" fcconfigs="{
 					'iflayout_form_tab_titles_PSFX':'1:FLEXI_DESCRIPTION, 2:__TYPE_NAME__, 3:FLEXI_ASSIGNMENTS, 4:FLEXI_PUBLISHING, 5:FLEXI_META_SEO, 6:FLEXI_DISPLAYING, 7:FLEXI_TEMPLATE, 8:FLEXI_VERSIONS',
 					'iflayout_form_tab_icons_PSFX':'1:icon-file-2, 2:icon-signup, 3:icon-tree-2, 4:icon-calendar, 5:icon-bookmark, 6:icon-eye-open, 7:icon-palette, 8:icon-stack',
-					'iflayout_form_tabs_above_PSFX':'title, alias, category, lang, type, state, access, disable_comments, notify_subscribers, notify_owner',
+					'iflayout_form_tabs_above_PSFX':'title, alias, category, lang, type, state, vstate, access, disable_comments, notify_subscribers, notify_owner',
 					'iflayout_form_tabs_below_PSFX':'_skip_',
 					'iflayout_form_tab01_fields_PSFX':'text',
 					'iflayout_form_tab02_fields_PSFX':'fields_manager',
@@ -64,7 +64,7 @@
 
 			<field name="form_tabs_above_PSFX"   type="textarea" rows="2" cols="60" label="FLEXI_ABOVE_TABS" description="FLEXI_COMMA_LIST_OF_CORE_FIELDS_PROPS" class="input-xxlarge"
 				default="" 
-				hint="title, alias, category, lang, type, state, access, disable_comments, notify_subscribers, notify_owner" />
+				hint="title, alias, category, lang, type, state, vstate, access, disable_comments, notify_subscribers, notify_owner" />
 			<field name="form_tabs_below_PSFX"   type="textarea" default="" hint="_skip_" rows="2" cols="60" label="FLEXI_BELOW_TABS" description="FLEXI_COMMA_LIST_OF_CORE_FIELDS_PROPS" class="input-xxlarge" />
 
 			<field name="form_tab01_fields_PSFX" type="textarea" default="" hint="text" rows="2" cols="60" label="TAB 1" description="FLEXI_COMMA_LIST_OF_CORE_FIELDS_PROPS" class="input-xxlarge" />
