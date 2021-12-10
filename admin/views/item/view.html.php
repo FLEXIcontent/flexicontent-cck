@@ -134,7 +134,6 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 
 		// Get model and indicate to model that current view IS item form
 		$model = $this->getModel();
-		$model->isForm = true;
 
 
 		/**
@@ -212,9 +211,6 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 				$model->setId(0, null, $new_typeid, null);
 			}
 		}
-
-		// Indicate to model to merge menu parameters if menu matches
-		$model->mergeMenuParams = $isSite === true;
 
 		// FORCE model to load versioned data (URL specified version or latest version (last saved))
 		$version = $jinput->getInt('version', 0);   // Load specific item version (non-zero), 0 version: is unversioned data, -1 version: is latest version (=default for edit form)
@@ -2034,8 +2030,11 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		// Get model
 		$model  = $this->getModel();
 
-		// Indicate to model that current view IS item form
+		// Indicate to model that current view IS NOT item form (anyway default is false)
 		$model->isForm = false;
+
+		// Indicate to model to merge menu parameters if menu matches
+		$model->mergeMenuParams = true;
 
 		// Get current category id
 		$cid = $model->_cid ? $model->_cid : $model->get('catid');
@@ -2060,9 +2059,6 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 
 		// Allow ilayout from HTTP request, this will be checked during loading item parameters
 		$model->setItemLayout('__request__');
-
-		// Indicate to model to merge menu parameters if menu matches
-		$model->mergeMenuParams = true;
 
 
 		/**
@@ -2774,16 +2770,4 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		return $return;
 	}
 
-
-	/**
-	 * Method to get the display of field while showing the inherited value
-	 *
-	 * @return	int
-	 *
-	 * @since	3.3.0
-	 */
-	public function getFieldInheritedDisplay($field, $params)
-	{
-		return flexicontent_html::getInheritedFieldDisplay($field, $params);
-	}
 }

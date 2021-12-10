@@ -55,6 +55,7 @@ class JFormFieldCategorylayout extends JFormFieldList
 
 	protected function getInput()
 	{
+		// Element params
 		$node = & $this->element;
 		$attributes = get_object_vars($node->attributes());
 		$attributes = $attributes['@attributes'];
@@ -64,14 +65,16 @@ class JFormFieldCategorylayout extends JFormFieldList
 		$value = $this->value;
 		//$value = $value ? $value : @$attributes['default'];
 		
-		$app = JFactory::getApplication();
-		$db  = JFactory::getDbo();
+		// Get current extension and id being edited
+		$app    = JFactory::getApplication();
+		$db     = JFactory::getDbo();
+		$jinput = $app->input;
+		$option = $jinput->get('option', '', 'CMD');
+		$view   = $jinput->get('view', '', 'CMD');
+
 		$cparams = JComponentHelper::getParams('com_flexicontent');
-		$jinput  = $app->input;
-		$view	= $jinput->get('view', '', 'cmd');
-		$controller	= $jinput->get('controller', '', 'cmd');
-		
-		// Get RECORED id of current view
+
+		// Get RECORD id of current view
 		$id = $jinput->get('id', array(0), 'array');
 		$id = ArrayHelper::toInteger($id, array(0));
 		$pk = (int) $id[0];
@@ -112,7 +115,7 @@ class JFormFieldCategorylayout extends JFormFieldList
 if (!@$attributes['skipparams'])
 {
 		$ext_option = 'com_flexicontent';
-		$ext_view = $view;
+		$ext_view   = $view;
 		$doc 	= JFactory::getDocument();
 		$js 	= "
 var clayout_names = ['".$lays."'];

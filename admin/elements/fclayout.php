@@ -60,37 +60,39 @@ class JFormFieldFclayout extends JFormFieldGroupedList
 	 */
 	protected function getInput()
 	{
-		// element params
+		// Element params
 		$node = & $this->element;
 		$attributes = get_object_vars($node->attributes());
 		$attributes = $attributes['@attributes'];
-		
-		// value
+
+		// Get value
 		$value = $this->value;
 		$value = $value ? $value : $attributes['default'];
-		
+
 		// Get current extension and id being edited
 		$app    = JFactory::getApplication();
 		$jinput = $app->input;
-		$option = $jinput->get('option', '', 'CMD');
-		$view   = $jinput->get('view', '', 'CMD');
 		$task   = $jinput->get('task', '', 'CMD');
 
-		if (
-			$option == 'com_modules' ||
-			$option == 'com_advancedmodules' ||
-			($option == 'com_falang' && $jinput->get('catid', '', 'CMD')=='modules')
-		) $view = 'module';
+		$ext_option = $jinput->get('option', '', 'CMD');
+		$ext_view   = $jinput->get('view', '', 'CMD');
 
+		if (
+			$ext_option == 'com_modules' ||
+			$ext_option == 'com_advancedmodules' ||
+			($ext_option == 'com_falang' && $jinput->get('catid', '', 'CMD')=='modules')
+		) $ext_view = 'module';
+
+		// Get RECORD id of current view
 		$cid = $jinput->get('cid', array(0), 'array');
 		$cid = ArrayHelper::toInteger($cid);
 		$pk = (int) $cid[0];
 		if (!$pk) $pk = $jinput->get('id', 0, 'int');
-		
-		
+
+
 		// Initialize variables.
 		//$options = array();
-		
+
 		// Initialize some field attributes.
 		$filter   = (string) @ $attributes['filter'];
 		$exclude  = (string) @ $attributes['exclude'];
@@ -103,38 +105,52 @@ class JFormFieldFclayout extends JFormFieldGroupedList
 		$icon_class = $icon_class ?: 'icon-palette';
 
 		$icon_class2 = (string) @ $attributes['icon_class2'];
-		
+
 		$custom_layouts_label  = (string) @ $attributes['custom_layouts_label'];
 		$use_default_label  = (string) @ $attributes['use_default_label'];
 		$use_default_label  = $use_default_label ?: 'JOPTION_USE_DEFAULT';
-		
+
 		$layout_label = (string) @ $attributes['layout_label'];
 		$layout_label = JText::_($layout_label ?: 'FLEXI_LAYOUT');
-		
+
 		// Get the path which contains layouts
-		$directory = (string) @ $attributes['directory'];
-		$ext_name = (string) @ $attributes['ext_name'];
+		$ext_name   = (string) @ $attributes['ext_name'];
+		$ext_type   = (string) @ $attributes['ext_type'];
+		$directory  = (string) @ $attributes['directory'];
 		$path = is_dir($directory)  ?  $directory  :  JPATH_ROOT . $directory;
 
-		// The name of parameter selecting the layout, will be the layout prefix (that is prefix 'PPFX_' exists in the layout's parameter names)
-		// This allows loading the layout multiple times inside same form
+		/**
+		 * A prefix and/or a suffix to distinguish multiple loading of same layout in the same page
+		 * (This is typically the name of the layout parameter)
+		 * Typically the layouts will either use prefix 'PPFX_' or suffix '_PSFX', e.g. to distiguish between
+		 * 'desktop_' and 'mobile_' or '_fe' and '_be' for (frontend and backend)
+		 */
 		$layout_pfx = (string) @ $attributes['name']; //
-		
+		$layout_sfx = (string) @ $attributes['layout_sfx'];
+
 		// For using directory in url
 		$directory = str_replace('\\', '/', $directory);
-		
+
 		// Prepare the grouped list
 		$groups = array();
-		$groups['_'] = array();
-		$groups['_']['id'] = $this->id . '__';
-		$groups['_']['text'] = $view=='module'
-			? JText::sprintf('JOPTION_FROM_MODULE')
-			: '';
-		$groups['_']['items'] = array();
+
+		/**
+		 * An integer index with no 'id' and 'text' will add the 'items' array without creating an Option-Group
+		 */
+		$grp_index = $ext_view === 'module' ? '_' : 0;
+		$groups[$grp_index] = array();
+		$groups[$grp_index]['items'] = array();
+
+		// Adding these will create an option group
+		if ($ext_view === 'module')
+		{
+			$groups[$grp_index]['id'] = $this->id . '__';
+			$groups[$grp_index]['text'] = $ext_view === 'module' ? JText::sprintf('JOPTION_FROM_MODULE') : '';
+		}
 
 		// Prepend some default options based on field attributes.
-		if (!$hideNone)   $groups['_']['items'][] = JHtml::_('select.option', '-1', JText::alt('JOPTION_DO_NOT_USE', preg_replace('/[^a-zA-Z0-9_\-]/', '_', $this->fieldname)));
-		if (!$hideDefault) $groups['_']['items'][] = JHtml::_('select.option', '', JText::alt($use_default_label, preg_replace('/[^a-zA-Z0-9_\-]/', '_', $this->fieldname)));
+		if (!$hideNone)   $groups[$grp_index]['items'][] = JHtml::_('select.option', '-1', JText::alt('JOPTION_DO_NOT_USE', preg_replace('/[^a-zA-Z0-9_\-]/', '_', $this->fieldname)));
+		if (!$hideDefault) $groups[$grp_index]['items'][] = JHtml::_('select.option', '', JText::alt($use_default_label, preg_replace('/[^a-zA-Z0-9_\-]/', '_', $this->fieldname)));
 
 		// ***
 		// *** Get any additional options in the XML definition.
@@ -216,9 +232,9 @@ class JFormFieldFclayout extends JFormFieldGroupedList
 		}
 
 
-		// *** 
-		// *** Get a list of files in the search path with the given filter.
-		// ***
+		/**
+		 * Get a list of files in the search path with the given filter.
+		 */
 
 		$files = JFolder::files($path, $filter);
 		$files = is_array($files) ? $files : array();
@@ -227,7 +243,7 @@ class JFormFieldFclayout extends JFormFieldGroupedList
 		// Build the options list from the list of files.
 		$groups['custom'] = array();
 		$groups['custom']['id'] = $this->id . '_custom';
-		$groups['custom']['text'] = $view=='module'
+		$groups['custom']['text'] = $ext_view === 'module'
 			? JText::sprintf('JOPTION_FROM_MODULE')
 			: JText::_($custom_layouts_label ?: 'FLEXI_LAYOUTS');
 		$groups['custom']['items'] = array();
@@ -265,125 +281,23 @@ class JFormFieldFclayout extends JFormFieldGroupedList
 		{
 			unset($groups['custom']);
 		}
-		
-		
-		// START custom templates
-		if ($view=='module')
+
+
+		/**
+		 * Case of module, also get custom layouts from templates
+		 * Note: layout overrides are excluded from being listed
+		 */
+		if ($ext_view === 'module')
 		{
-			// Get the database object and a new query object.
-			$db = JFactory::getDbo();
-			$query = $db->getQuery(true);
-			
-			// Get the client id.
-			$clientId = $this->element['client_id'];
-	
-			if (is_null($clientId) && $this->form instanceof JForm)
-			{
-				$clientId = $this->form->getValue('client_id');
-			}
-			$clientId = (int) $clientId;
-	
-			$client = JApplicationHelper::getClientInfo($clientId);
-			
-			// Get the module.
-			$module = (string) $this->element['module'];
-	
-			if (empty($module) && ($this->form instanceof JForm))
-			{
-				$module = $this->form->getValue('module');
-			}
-	
-			$module = preg_replace('#\W#', '', $module);
-			
-			// Get the template.
-			$template = (string) $this->element['template'];
-			$template = preg_replace('#\W#', '', $template);
-			
-			// Get the style.
-			if ($this->form instanceof JForm)
-			{
-				$template_style_id = $this->form->getValue('template_style_id');
-			}
-	
-			$template_style_id = preg_replace('#\W#', '', $template_style_id);
-	
-			// Build the query.
-			$query->select('element, name')
-				->from('#__extensions as e')
-				->where('e.client_id = ' . (int) $clientId)
-				->where('e.type = ' . $db->quote('template'))
-				->where('e.enabled = 1');
-	
-			if ($template)
-			{
-				$query->where('e.element = ' . $db->quote($template));
-			}
-	
-			if ($template_style_id)
-			{
-				$query->join('LEFT', '#__template_styles as s on s.template=e.element')
-					->where('s.id=' . (int) $template_style_id);
-			}
-	
-			// Set the query and load the templates.
-			$db->setQuery($query);
-			$templates = $db->loadObjectList('element');
-			
-			// Load language file
-			$lang = JFactory::getLanguage();
-			$lang->load($module . '.sys', $client->path, null, false, true)
-				|| $lang->load($module . '.sys', $client->path . '/modules/' . $module, null, false, true);
-			
-			// Loop on all templates
-			if ($templates) {
-				foreach ($templates as $template) {
-					// Load language file
-					$lang->load('tpl_' . $template->element . '.sys', $client->path, null, false, true)
-						|| $lang->load('tpl_' . $template->element . '.sys', $client->path . '/templates/' . $template->element, null, false, true);
-	
-					$template_path = JPath::clean($client->path . '/templates/' . $template->element . '/html/' . $module);
-	
-					// Add the layout options from the template path.
-					if (is_dir($template_path) && ($files = JFolder::files($template_path, '^[^_]*\.php$')))
-					{
-						foreach ($files as $i => $file)
-						{
-							// Remove layout that already exist in component ones
-							if (in_array(basename($file, '.php'), $layout_files))
-							{
-								unset($files[$i]);
-							}
-						}
-	
-						if (count($files))
-						{
-							// Create the group for the template
-							$groups[$template->element] = array();
-							$groups[$template->element]['id'] = $this->id . '_' . $template->element;
-							$groups[$template->element]['text'] = JText::sprintf('JOPTION_FROM_TEMPLATE', $template->name);
-							$groups[$template->element]['items'] = array();
-	
-							foreach ($files as $file)
-							{
-								// Add an option to the template group
-								$value = basename($file, '.php');
-								$text = $lang->hasKey($key = strtoupper('TPL_' . $template->element . '_' . $module . '_LAYOUT_' . $value))
-									? JText::_($key) : $value;
-								$groups[$template->element]['items'][] = JHtml::_('select.option', $template->element . ':' . $value, $text);
-							}
-						}
-					}
-				}
-			}
-			// END custom templates
+			$this->getModuleLayoutsFromTemplates($groups, $layout_files);
 		}
-		
-		
+
+
 		// Element name and id
 		$_name	= $this->fieldname;
 		$fieldname	= $this->name;
 		$element_id = $this->id;
-		
+
 		// Add tag attributes
 		$attribs = '';
 		if (@$attributes['multiple']=='multiple' || @$attributes['multiple']=='true' )
@@ -393,8 +307,8 @@ class JFormFieldFclayout extends JFormFieldGroupedList
 		}
 		$attribs .= ' class="fc-element-auto-init"';
 		$attribs .= ' onchange="fc_getLayout_'.$_name.'(this);"';
-		
-		
+
+
 		// Container of parameters
 		$tmpl_container = (string) @ $attributes['tmpl_container'];
 
@@ -406,8 +320,22 @@ class JFormFieldFclayout extends JFormFieldGroupedList
 
 		$params_source = (string) @ $attributes['params_source'];
 
+
+		/**
+		 * Find the fieldset group of current form
+		 */
+		switch ($ext_view)
+		{
+			case 'field': $fld_groupname = 'attribs_'; break;
+			case 'type' : $fld_groupname = in_array($task, array('edit', 'add')) ? 'attribs_' : 'params_'; break;
+			case 'component': $fld_groupname = ''; break;
+			default: $fld_groupname = 'params_'; break;
+		}
+
 flexicontent_html::loadJQuery();
-if ( ! @$attributes['skipparams'] ) {
+
+if ( ! @$attributes['skipparams'] )
+{
 		$doc 	= JFactory::getDocument();
 		$js 	= "
 
@@ -422,7 +350,7 @@ function fc_getLayout_".$_name."(el, initial)
 	var panel_header = bs_tab_handle;
 	var panel_id = 'attrib-".$tmpl_container."';
 	var panel = jQuery('#'+panel_id);
-	
+
 	// Second try FC TAB handle
 	if (!panel_header.length && fc_tab_handle.length)
 	{
@@ -434,7 +362,7 @@ function fc_getLayout_".$_name."(el, initial)
 		panel = panel_header.closest('.tabberlive').children().eq( panel_header.parent().index() + 1 );
 		panel_id = panel.attr('id');
 	}
-	
+
 	if (!panel_header.length)
 	{
 		//alert('Layout container: ".$tmpl_container." not found');
@@ -447,7 +375,7 @@ function fc_getLayout_".$_name."(el, initial)
  		return;
  	}
  	jQuery(el).data('fc-layout-first-run', 1);
-	
+
 	var selected_option = jQuery(el).find(':selected');
 	var filename = selected_option.data('filename');
 	var layout_name = filename ? filename : selected_option.val();
@@ -460,7 +388,7 @@ function fc_getLayout_".$_name."(el, initial)
 
 	jQuery.ajax({
 		type: 'GET',
-		url: 'index.php?option=com_flexicontent&task=templates.getlayoutparams&ext_option=".$option."&ext_view=".$view."&ext_name=".$ext_name."&layout_pfx=".$layout_pfx."&ext_id=".$pk."&directory=".$directory."&layout_name='+layout_name+'&format=raw&" . JSession::getFormToken() . "=1',
+		url: 'index.php?option=com_flexicontent&task=templates.getlayoutparams&ext_option=".$ext_option."&ext_view=".$ext_view."&ext_type=".$ext_type."&ext_name=".$ext_name."&layout_pfx=".$layout_pfx."&ext_id=".$pk."&directory=".$directory."&layout_sfx=".$layout_sfx."&layout_name='+layout_name+'&format=raw&" . JSession::getFormToken() . "=1',
 		success: function(str) {
 			if (bs_tab_handle.length)
 			{
@@ -500,7 +428,7 @@ function fc_getLayout_".$_name."(el, initial)
   // *** Hide default container
  	var container = jQuery('a[href=\"#attrib-".$tmpl_container."\"]');
  	if (container) container.parent().css('display', 'none');
-	
+
 	var filename = jQuery(el).find(':selected').data('filename');
 	var layout_name = filename ? filename : el.value;
 
@@ -522,7 +450,7 @@ function fc_getLayout_".$_name."(el, initial)
 ")."
 
 jQuery(document).ready(function(){
-	var el = document.getElementById('jform_".($view === 'field' || ($view === 'type' && in_array($task, array('edit', 'add'))) ? "attribs_" : "params_").$_name."');
+	var el = document.getElementById('jform_".$fld_groupname.$_name."');
 	fc_getLayout_".$_name."(el, 1);
 
 	// In case on DOM ready the element is intialized, retry on this custom event
@@ -548,4 +476,139 @@ jQuery(document).ready(function(){
 			)
 		);
 	}
+
+
+
+	/**
+	 * Get custom layouts from templates for current module
+	 * Update $groups with the custom layouts and list layout overrides as disabled
+	 *
+	 * param   $groups         array
+	 * param   $layout_files   array
+	 *
+	 * @return  array  The updated groups of options
+	 */
+	protected function getModuleLayoutsFromTemplates(& $groups, $layout_files)
+	{
+		$db = JFactory::getDbo();
+
+		// Get the client id.
+		$clientId = $this->element['client_id'];
+
+		if (is_null($clientId) && $this->form instanceof JForm)
+		{
+			$clientId = $this->form->getValue('client_id');
+		}
+		$clientId = (int) $clientId;
+
+		$client = JApplicationHelper::getClientInfo($clientId);
+
+		// Get the module.
+		$module = (string) $this->element['module'];
+
+		if (empty($module) && ($this->form instanceof JForm))
+		{
+			$module = $this->form->getValue('module');
+		}
+
+		$module = preg_replace('#\W#', '', $module);
+
+		// Get the template.
+		$template = (string) $this->element['template'];
+		$template = preg_replace('#\W#', '', $template);
+
+		// Get the style.
+		if ($this->form instanceof JForm)
+		{
+			$template_style_id = $this->form->getValue('template_style_id');
+		}
+
+		$template_style_id = preg_replace('#\W#', '', $template_style_id);
+
+		// Build the query.
+		$query = $db->getQuery(true)
+			->select('element, name')
+			->from('#__extensions as e')
+			->where('e.client_id = ' . (int) $clientId)
+			->where('e.type = ' . $db->quote('template'))
+			->where('e.enabled = 1');
+
+		if ($template)
+		{
+			$query->where('e.element = ' . $db->quote($template));
+		}
+
+		if ($template_style_id)
+		{
+			$query
+				->join('LEFT', '#__template_styles as s on s.template=e.element')
+				->where('s.id=' . (int) $template_style_id);
+		}
+
+		// Set the query and load the templates.
+		$templates = $db->setQuery($query)->loadObjectList('element');
+
+		// Load 'sys' language file of current module
+		$lang = JFactory::getLanguage();
+		$lang->load($module . '.sys', $client->path, null, false, true)
+			|| $lang->load($module . '.sys', $client->path . '/modules/' . $module, null, false, true);
+
+		// Loop on all templates
+		foreach ($templates as $template)
+		{
+			// Load language file
+			$lang->load('tpl_' . $template->element . '.sys', $client->path, null, false, true)
+				|| $lang->load('tpl_' . $template->element . '.sys', $client->path . '/templates/' . $template->element, null, false, true);
+
+			$template_path = JPath::clean($client->path . '/templates/' . $template->element . '/html/' . $module);
+
+			// Add the layout options from the template path.
+			if (is_dir($template_path) && ($files = JFolder::files($template_path, '^[^_]*\.php$')))
+			{
+				$is_override = array();
+				$display_overrides = true;
+
+				foreach ($files as $i => $file)
+				{
+					// Remove layout that already exist in component ones
+					if (in_array(basename($file, '.php'), $layout_files))
+					{
+						if ($display_overrides)
+						{
+							$is_override[$i] = true;
+							continue;
+						}
+					 unset($files[$i]);
+					}
+				}
+
+				if (count($files))
+				{
+					// Create the group for the template
+					$groups[$template->element] = array();
+					$groups[$template->element]['id'] = $this->id . '_' . $template->element;
+					$groups[$template->element]['text'] = JText::sprintf('JOPTION_FROM_TEMPLATE', $template->name);
+					$groups[$template->element]['items'] = array();
+
+					foreach ($files as $i => $file)
+					{
+						// Add an option to the template group
+						$value = basename($file, '.php');
+						$text = $lang->hasKey($key = strtoupper('TPL_' . $template->element . '_' . $module . '_LAYOUT_' . $value))
+							? JText::_($key)
+							: $value;
+
+						//$groups[$template->element]['items'][] = JHtml::_('select.option', $template->element . ':' . $value, $text);
+						$groups[$template->element]['items'][] = (object) array(
+							'value' => $template->element . ':' . $value,
+							'text'  => $text . (!empty($is_override[$i]) ? '  -- overrides builtin automatically' : ''),
+							'disable' => !empty($is_override[$i]),
+							'attr'  => array()
+						);
+					}
+				}
+			}
+		}
+	}
+
 }

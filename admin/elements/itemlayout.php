@@ -55,6 +55,7 @@ class JFormFieldItemlayout extends JFormFieldList
 
 	protected function getInput()
 	{
+		// Element params
 		$node = & $this->element;
 		$attributes = get_object_vars($node->attributes());
 		$attributes = $attributes['@attributes'];
@@ -64,14 +65,16 @@ class JFormFieldItemlayout extends JFormFieldList
 		$value = $this->value;
 		//$value = $value ? $value : @$attributes['default'];
 		
-		$app = JFactory::getApplication();
-		$db  = JFactory::getDbo();
+		// Get current extension and id being edited
+		$app    = JFactory::getApplication();
+		$db     = JFactory::getDbo();
+		$jinput = $app->input;
+		$option = $jinput->get('option', '', 'CMD');
+		$view   = $jinput->get('view', '', 'CMD');
+
 		$cparams = JComponentHelper::getParams('com_flexicontent');
-		$jinput  = $app->input;
-		$view	= $jinput->get('view', '', 'cmd');
-		$controller	= $jinput->get('controller', '', 'cmd');
-		
-		// Get RECORED id of current view
+
+		// Get RECORD id of current view
 		$id = $jinput->get('id', array(0), 'array');
 		$id = ArrayHelper::toInteger($id, array(0));
 		$pk = (int) $id[0];
@@ -161,7 +164,7 @@ class JFormFieldItemlayout extends JFormFieldList
 if (!@$attributes['skipparams'])
 {
 		$ext_option = 'com_flexicontent';
-		$ext_view = $view;
+		$ext_view   = $view;
 		$doc 	= JFactory::getDocument();
 		$js 	= "
 var ilayout_names = ['".$lays."'];
@@ -371,9 +374,33 @@ jQuery(document).ready(function() {
 			$attribs .= ' onchange="ilayout_activatePanel(this.value);"';
 		}
 		
+		if ($inline_tip = @$attributes['inline_tip'])
+		{
+			$tip_img = @$attributes['tip_img'];
+			$tip_img = $tip_img ? $tip_img : 'comments.png';
+			$preview_img = @$attributes['preview_img'];
+			$preview_img = $preview_img ? $preview_img : '';
+			$tip_class = @$attributes['tip_class'];
+			$tip_class .= FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
+			$hintmage = JHtml::image ( 'components/com_flexicontent/assets/images/'.$tip_img, JText::_( 'FLEXI_NOTES' ), ' style="max-height:24px; padding:0px; margin-left:12px; margin-right:0px;" ' );
+			$previewimage = $preview_img ? JHtml::image ( 'components/com_flexicontent/assets/images/'.$preview_img, JText::_( 'FLEXI_NOTES' ), ' style="max-height:24px; padding:0px; margin:0px;" ' ) : '';
+			$tip_text = '<span class="'.$tip_class.'" style="" title="'.flexicontent_html::getToolTip(null, $inline_tip, 1, 1).'">'.$hintmage.$previewimage.'</span>';
+		}
+		if ($inline_tip = @$attributes['inline_tip2'])
+		{
+			$tip_img = @$attributes['tip_img2'];
+			$tip_img = $tip_img ? $tip_img : 'comments.png';
+			$preview_img = @$attributes['preview_img2'];
+			$preview_img = $preview_img ? $preview_img : '';
+			$tip_class = @$attributes['tip_class2'];
+			$tip_class .= FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
+			$hintmage = JHtml::image ( 'administrator/components/com_flexicontent/assets/images/'.$tip_img, JText::_( 'FLEXI_NOTES' ), ' style="max-height:24px; padding:0px; margin-left:12px; margin-right:0px;" ' );
+			$previewimage = $preview_img ? JHtml::image ( 'administrator/components/com_flexicontent/assets/images/'.$preview_img, JText::_( 'FLEXI_NOTES' ), ' style="max-height:24px; padding:0px; margin:0px;" ' ) : '';
+			$tip_text2 = '<span class="'.$tip_class.'" style="" title="'.flexicontent_html::getToolTip(null, $inline_tip, 1, 1).'">'.$hintmage.$previewimage.'</span>';
+		}
 		return
 			JHtml::_('select.genericlist', $layouts, $fieldname, $attribs, 'value', 'text', $value, $element_id)
-			;
+			. @ $tip_text . @ $tip_text2;
 	}
 	
 	

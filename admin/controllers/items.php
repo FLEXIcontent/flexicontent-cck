@@ -1236,6 +1236,12 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		// Get/Create the model
 		$model = $this->getModel($this->record_name);
 
+		// Indicate to model that current view IS item form
+		$model->isForm = true;
+
+		// Indicate to model to merge menu parameters if menu matches
+		$model->mergeMenuParams = true;
+
 		// Try to load record by attributes in HTTP Request
 		if (0)
 		{

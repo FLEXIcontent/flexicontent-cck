@@ -6585,8 +6585,6 @@ class ParentClassItem extends FCModelAdmin
 		$isSite = $app->isClient('site');
 		$CFGsfx = $isSite ? '_fe' : '_be';
 
-		$this->_loadItemParams();
-
 		if (empty($this->_record) || empty($this->_record->parameters))
 		{
 			return;

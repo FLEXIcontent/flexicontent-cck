@@ -18,16 +18,33 @@
 
 		<fieldset name="generalform" label="FLEXI_GENERAL_FORM_BEHAVIOR" description="FLEXI_MENU_ITEM_FORM_OVERRIDES_DESC" addfieldpath="/administrator/components/com_flexicontent/elements">
 
+
+			<field name="form_ilayout_fe" type="fclayout" default="" label="FLEXI_ITEM_FORM_LAYOUT" description="" depend_class="" labelclass="label label-success"
+				directory="/administrator/components/com_flexicontent/views/item/tmpl"
+				ext_name="" ext_type="forms" layout_sfx=""
+				hide_default="0" hide_none="1"
+				stripext="1" stripprefix="" filter="^.*\.php$" exclude="^_|default\.php"
+				tmpl_container="" params_source="inline" custom_layouts_label="Custom layouts" layout_label="FLEXI_LAYOUT" icon_class="icon-screen"
+			>
+				<group label="Built-in layouts">
+					<option filename="tabs" value="tabs">tabs (Default)</option>
+					<option filename="flat" value="flat">flat</option>
+				</group>
+			</field>
+
+
 			<field name="" label="" type="separator" default="FLEXI_GENERAL_FORM_BEHAVIOR" level="level1" />
 
 			<field name="allowbuttons_fe" type="fccheckbox" default="" display_useglobal="1"
 				checkoptions="FLEXI_APPLY_N_RELOAD,FLEXI_APPLY,FLEXI_SAVE_AND_NEW,FLEXI_SAVE_AS_COPY,FLEXI_SAVE_A_PREVIEW,FLEXI_PREVIEW_LATEST"
-				checkvals="apply,apply_ajax,save2new,save2copy,save_preview,preview_latest" defaultvals=""
+				checkvals="apply,apply_ajax,save2new,save2copy,save_preview,preview_latest"
 				label="FLEXI_MENU_ALLOW_BUTTONS" description="FLEXI_MENU_ALLOW_BUTTONS_DESC" cols="2" />
 			<field name="buttons_placement_fe" type="radio" default="" label="FLEXI_BUTTONS_PLACEMENT" description="FLEXI_BUTTONS_PLACEMENT_DESC" class="btn-group group-fcinfo">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_TOP</option>
 				<option value="1">FLEXI_BOTTOM</option>
+				<option value="2">FLEXI_LEFT</option>
+				<option value="3">FLEXI_RIGHT</option>
 			</field>
 
 			<field name="" label="" type="separator" default="FLEXI_APPROVAL_NEEDED_WARNINGS" level="level2" />
@@ -42,16 +59,23 @@
 				<option value="1">FLEXI_SHOW</option>
 			</field>
 
+			<field name="" type="separator" default="If you leave these blank, then please check default values at item configuration type type" label="" level="level4" class="alert alert-info" />
+			<field name="version_reviewal_msg_fe" type="textarea" hint="FLEXI_REQUIRES_VERSION_REVIEWAL" rows="3" cols="60" label="FLEXI_REQUIRES_VERSION_REVIEWAL_LBL" description="" class="input-xxlarge" />
+			<field name="document_approval_msg_fe" type="textarea" hint="FLEXI_REQUIRES_DOCUMENT_APPROVAL" rows="3" cols="60" label="FLEXI_REQUIRES_DOCUMENT_APPROVAL_LBL" description="" class="input-xxlarge" />
+			<field name="mr_version_revial_msg_fe" type="textarea" hint="FLEXI_MIGHT_REQUIRE_VERSION_REVIEWAL" rows="3" cols="60" label="FLEXI_MIGHT_REQUIRE_VERSION_REVIEWAL_LBL" description="" class="input-xxlarge" />
+			<field name="mr_document_approval_msg_fe" type="textarea" hint="FLEXI_MIGHT_REQUIRE_DOCUMENT_APPROVAL" rows="3" cols="60" label="FLEXI_MIGHT_REQUIRE_DOCUMENT_APPROVAL_LBL" description="" class="input-xxlarge" />
+			<field name="changes_applied_immediately_msg_fe" type="textarea" hint="FLEXI_CHANGES_APPLIED_IMMEDIATELY" rows="3" cols="60" label="FLEXI_CHANGES_APPLIED_IMMEDIATELY_LBL" description="" class="input-xxlarge" />
+
 			<field name="" label="" type="separator" default="FLEXI_INSTRUCTIONS_REDIRECTIONS_ETC" level="level2" />
-			<field name="submit_message" type="textarea" default="" rows="3" cols="30" label="FLEXI_MENU_SUBMIT_INSTRUCTIONS" description="FLEXI_MENU_SUBMIT_INSTRUCTIONS_DESC" />
-			<field name="submit_redirect_url_fe" type="text" default="" size="46" label="FLEXI_FORM_SUBMIT_REDIRECT_URL" description="FLEXI_FORM_SUBMIT_REDIRECT_URL_DESC" />
+			<field name="submit_message" type="textarea" default="" rows="3" cols="80" label="FLEXI_MENU_SUBMIT_INSTRUCTIONS" description="FLEXI_MENU_SUBMIT_INSTRUCTIONS_DESC" class="input-xxlarge" />
+			<field name="submit_redirect_url_fe" type="text" default="" size="106" label="FLEXI_FORM_SUBMIT_REDIRECT_URL" description="FLEXI_FORM_SUBMIT_REDIRECT_URL_DESC" class="input-xxlarge" />
 			<field name="notauthurl" type="menuitem" default="" disable="separator" state="1" published="1" label="FLEXI_CANNOTAUTHOR_URL" description="FLEXI_CANNOTAUTHOR_URL_DESC" />
 
 			<field name="" type="separator" default="FLEXI_SHOW_CAPTCHA_CRITERIA" label="" level="level2" />
 			<field name="use_captcha" type="multilist" subtype="radio" default="" label="FLEXI_USE_CAPTCHA" description="FLEXI_USE_CAPTCHA_DESC" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_DISABLE</option>
-				<option value="1">FLEXI_GUESTS</option>
+				<option value="1">FLEXI_GUESTS_RECOMMENEDED</option>
 				<option value="2">FLEXI_ANY_USER</option>
 			</field>
 			<field name="captcha" type="plugins" folder="captcha" default="" label="FLEXI_CAPTCHA_PLG" description="FLEXI_CAPTCHA_PLG_DESC" filter="cmd">
@@ -62,6 +86,17 @@
 		</fieldset>
 
 		<fieldset name="simplifyform" label="FLEXI_OPTIONAL_FORM_DISPLAY" description="FLEXI_MENU_ITEM_FORM_OVERRIDES_DESC" addfieldpath="/administrator/components/com_flexicontent/elements">
+
+			<field name="use_jimages_fe" type="radio" default="" label="Intro / Full Images" description="Show intro/full images" class="btn-group btn-group-yesno">
+				<option value="">FLEXI_JOOMLA_DEFAULT</option>
+				<option value="0">FLEXI_DISABLE</option>
+				<option value="1">FLEXI_ENABLE</option>
+			</field>
+			<field name="use_jurls_fe" type="radio" default="" label="Urls" description="Show urls" class="btn-group btn-group-yesno">
+				<option value="">FLEXI_JOOMLA_DEFAULT</option>
+				<option value="0">FLEXI_DISABLE</option>
+				<option value="1">FLEXI_ENABLE</option>
+			</field>
 
 			<field name="" type="separator" default="FLEXI_BASIC_EDITING" label="" level="level1" />
 
@@ -75,12 +110,23 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
+			<field name="usetype_fe" type="fcradio" default="" label="FLEXI_MENU_USE_TYPE" description="FLEXI_MENU_USE_TYPE_DESC" class="btn-group">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="useaccess_fe" type="fcradio" default="" label="FLEXI_MENU_USE_ACCESS" description="FLEXI_MENU_USE_ACCESS_DESC" class="btn-group">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
 			<field name="usetags_fe" type="radio" default="" label="FLEXI_MENU_USE_TAGS" description="FLEXI_MENU_USE_TAGS_DESC" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 				<option value="2">FLEXI_MENU_ONLY_DISPLAY</option>
 			</field>
+
 			<field name="allowdisablingcomments_fe" type="radio" default="" label="FLEXI_ALLOW_DISABLING_COMMENTS" description="FLEXI_ALLOW_DISABLING_COMMENTS_DESC" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_NO</option>
@@ -89,12 +135,19 @@
 
 			<field name="" type="separator" default="FLEXI_CATEGORIES" label="" level="level3" />
 			<field name="" type="separator" default="FLEXI_MENU_ABOUT_HIDE_SEC_FEAT_CATS_INFO" class="alert alert-warning fcpadded" level="level4" />
+			<field name="usemaincat_fe" type="fcradio" default="" label="FLEXI_MENU_USE_MAINCAT" description="FLEXI_MENU_USE_MAINCAT_DESC" class="btn-group">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
 			<field name="show_seccats_fe" type="fcradio" default="" label="FLEXI_SECONDARY_CATEGORIES" description="" class="btn-group group-fcmethod fcoffactive">
+				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_HIDE_IF_NOEDIT_PERMS</option>
 				<option value="2">FLEXI_SHOW</option>
 			</field>
 			<field name="show_featcats_fe" type="fcradio" default="" label="FLEXI_FEATURED_CATEGORIES" description="" class="btn-group group-fcmethod fcoffactive">
+				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_HIDE_IF_NOEDIT_PERMS</option>
 				<option value="2">FLEXI_SHOW</option>
@@ -110,6 +163,7 @@
 			</field>
 			<field name="default_language_fe" type="fclanguage" default="" use_global="1" label="FLEXI_MENU_DEFAULT_LANGUAGE" description="FLEXI_MENU_DEFAULT_LANGUAGE_DESC">
 				<option value="_author_lang_">FLEXI_USE_AUTHOR_LANGUAGE</option>
+				<option value="_site_default_">FLEXI_SITE_DEFAULT</option>
 			</field>
 			<field name="disable_languages_fe" type="fclanguage" default="" use_global="1" multiple="multiple" class="use_select2_lib" label="FLEXI_MENU_DISABLE_LANGUAGES" description="FLEXI_MENU_DISABLE_LANGUAGES_DESC" />
 
@@ -166,6 +220,26 @@
 				<option value="1">FLEXI_MENU_YES_SELECT_TEMPLATE</option>
 				<option value="2">FLEXI_MENU_YES_SELECT_CONFIGURE_TEMPLATE</option>
 			</field>
+			<field name="permsplacement_fe" type="radio" default="" label="FLEXI_MENU_USE_PERMS" description="FLEXI_MENU_USE_PERMS_DESC" class="btn-group btn-group-yesno">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_HIDE_ALWAYS_EVEN_IF_EDITABLE</option>
+				<option value="1">FLEXI_INLINE</option>
+				<option value="2">FLEXI_SLIDER</option>
+			</field>
+			<field name="versionsplacement_fe" type="radio" default="" label="FLEXI_MENU_USE_VERSIONS" description="FLEXI_MENU_USE_VERSIONS_DESC" class="btn-group btn-group-yesno">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_HIDE_ALWAYS_EVEN_IF_EDITABLE</option>
+				<option value="1">FLEXI_POPUP</option>
+				<option value="2">FLEXI_INLINE</option>
+			</field>
+
+
+			<field name="item_form_fe_tab_styling" type="separator" default="FLEXI_STYLING_N_BEHAVIOUR" icon_class="icon-palette" level="tab_open" box_type="1" />
+
+			<field name="form_lbl_class_fe" type="text" default="" label="FLEXI_LABEL_CLASS" description="FLEXI_LABEL_CLASS_DESC" class="input-xxlarge" />
+			<field name="form_container_css_fe" type="text" default="" size="36" label="FLEXI_FORM_CONTAINER_CSS" description="FLEXI_FORM_CONTAINER_CSS_DESC" />
+			<field name="form_extra_css_fe" type="editor" editor="codemirror" default="" filter="JComponentHelper::filterText" rows="5" cols="80" label="FLEXI_EDIT_FORM_CSS" description="FLEXI_EDIT_FORM_CSS_DESC" />
+			<field name="form_extra_js_fe" type="editor" editor="codemirror" default="" filter="RAW" rows="5" cols="80" label="FLEXI_EDIT_FORM_JS" description="FLEXI_EDIT_FORM_JS_DESC" />
 
 		</fieldset>
 

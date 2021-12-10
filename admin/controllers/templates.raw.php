@@ -160,19 +160,30 @@ class FlexicontentControllerTemplates extends FlexicontentControllerBaseAdmin
 		jimport('joomla.filesystem.file');
 		$app  = JFactory::getApplication();
 		$user = JFactory::getUser();
+		$db   = JFactory::getDbo();
 
 		// Get vars
 		$ext_option = $this->input->getCmd('ext_option', '');  // Current component name
 		$ext_view   = $this->input->getCmd('ext_view', '');    // Current view name
-		$ext_type   = $this->input->getCmd('ext_type', '');    // Type layouts: 'templates' or empty: ('modules'/'fields')
-		$ext_name   = $this->input->getCmd('ext_name', '');    // IN item/type/category (templates): template name
+		$ext_type   = $this->input->getCmd('ext_type', '');    // Type layouts: 'templates' or 'forms' or '' (= 'modules'/'fields')
+		$ext_name   = $this->input->getCmd('ext_name', '');    // IN item/type/category: template folder name or form layout name
 		$ext_id     = $this->input->getInt('ext_id', 0);       // ID of item / type / category being edited
-		$layout_pfx = $this->input->getCmd('layout_pfx', '');  // A prefix to distinguish multiple loading of same layout in the same page: (This is typically the name of the layout parameter)
+
+		/**
+		 * A prefix and/or a suffix to distinguish multiple loading of same layout in the same page
+		 * (This is typically the name of the layout parameter)
+		 * Typically the layouts will either use prefix 'PPFX_' or suffix '_PSFX', e.g. to distiguish between
+		 * 'desktop_' and 'mobile_' or '_fe' and '_be' for (frontend and backend)
+		 */
+		$layout_pfx = $this->input->getCmd('layout_pfx', '');
+		$layout_sfx = $this->input->getCmd('layout_sfx', ''); 
+		
+		//echo "ext_option: $ext_option , ext_view: $ext_view , ext_type: $ext_type , ext_name: $ext_name , ext_id: $ext_id , layout_pfx: $layout_pfx"; exit;
 
 		$layout_name = $this->input->getString('layout_name', ''); // IN modules/fields: layout name, IN item/type/category forms (FC templates):  'item' / 'category'
 		$directory   = $this->input->getString('directory', '');   // Explicit path of XML file:  $layout_name.xml
 
-		$db = JFactory::getDbo();
+		$inh_params = false;
 
 		switch ($ext_view)
 		{
@@ -192,14 +203,40 @@ class FlexicontentControllerTemplates extends FlexicontentControllerBaseAdmin
 				$groupname = 'attribs';  // Name="..." of <fields> container
 				break;
 
+			case 'component':
+				if ($ext_type !== 'forms')
+				{
+					echo 'Can only handle ext_type: \'forms\' for view \'component\'';
+					return;
+				}
+
+				$ext_params = JComponentHelper::getParams('com_flexicontent');
+				$query = '';
+				$path = JPATH::clean(JPATH_ADMINISTRATOR . '/components/com_flexicontent/views/item/tmpl');
+
+				$groupname = 'attribs';  // when empty we use 'attribs'
+				break;
+
 			case 'type':
 				$query = 'SELECT attribs FROM #__flexicontent_types WHERE id = ' . $ext_id;
-				$inh_params = flexicontent_tmpl::getLayoutparams('items', $directory, '', true);
-				$inh_params = new JRegistry($inh_params);
 
-				// Load language file of the template
-				FLEXIUtilities::loadTemplateLanguageFile($ext_name);
-				$path = JPATH::clean(JPATH_SITE . DS . 'components' . DS . 'com_flexicontent' . DS . 'templates' . DS . $directory);
+				// Load item form layout
+				if ($ext_type === 'forms')
+				{
+					$inh_params = JComponentHelper::getParams('com_flexicontent');
+					$path = JPATH::clean(JPATH_ADMINISTRATOR . '/components/com_flexicontent/views/item/tmpl');
+				}
+				// Load item view layout
+				else
+				{
+					$inh_params = flexicontent_tmpl::getLayoutparams('items', $directory, '', true);
+					$inh_params = new JRegistry($inh_params);
+
+					// Also Load language file of the template
+					FLEXIUtilities::loadTemplateLanguageFile($ext_name);
+					$path = JPATH::clean(JPATH_SITE . DS . 'components' . DS . 'com_flexicontent' . DS . 'templates' . DS . $directory);
+				}
+
 				$groupname = 'attribs';  // Name="..." of <fields> container
 				break;
 
@@ -262,6 +299,10 @@ class FlexicontentControllerTemplates extends FlexicontentControllerBaseAdmin
 				return;
 		}
 
+
+		/**
+		 * Check if using a known modules manager
+		 */
 		if ($ext_view == 'module' && $ext_option != 'com_modules' && $ext_option != 'com_advancedmodules')
 		{
 			echo '
@@ -273,28 +314,39 @@ class FlexicontentControllerTemplates extends FlexicontentControllerBaseAdmin
 			</div>';
 		}
 
+		/**
+		 * Load backend language file
+		 */
 		if (!$app->isClient('administrator'))
 		{
 			JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, 'en-GB', true);
 			JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, true);
 		}
 
+
+		/**
+		 * Load and parse parameters from database
+		 */
 		if ($query)
 		{
-			// Load and parse parameters
 			$ext_params_str = $db->setQuery($query)->loadResult();
 			$ext_params = new JRegistry($ext_params_str);
 		}
 
+
+		/**
+		 * Modules case: Check if loading layout file from overrides folder of a Joomla template
+		 */
 		$layout_names = explode(':', $layout_name);
 
 		if (count($layout_names) > 1)
 		{
-			$layout_name = $layout_names[1];
-			$layoutpath = JPATH::clean(JPATH_ROOT . DS . 'templates' . DS . $layout_names[0] . DS . 'html' . DS . $ext_name . DS . $layout_name . '.xml');
+			$template_name = $layout_names[0];
+			$layout_name   = $layout_names[1];
+			$layoutpath    = JPATH::clean(JPATH_ROOT . DS . 'templates' . DS . $template_name . DS . 'html' . DS . $ext_name . DS . $layout_name . '.xml');
 		}
 
-		if (empty($layoutpath) || !file_exists($layoutpath))
+		if ($layout_name && (empty($layoutpath) || !file_exists($layoutpath)))
 		{
 			$layoutpath = JPATH::clean($path . DS . $layout_name . '.xml');
 		}
@@ -318,7 +370,7 @@ class FlexicontentControllerTemplates extends FlexicontentControllerBaseAdmin
 				echo '
 				<div class="fc_layout_box_outer">
 					<div class="alert alert-warning">
-						Currently selected layout: <b>"' . $layout_name . '"</b> does not have a parameters XML file, using general defaults.
+						Currently selected layout: <b>"' . $layout_name . '"</b> ' .($app->isClient('administrator') ? 'with path: ' . $layoutpath : '') . ' does not have a parameters XML file, using general defaults.
 						If this is an old template then these parameters will allow to continue using it, but we recommend that you create parameter file: ' . $layout_name . '.xml
 					</div>
 				</div>';
@@ -328,20 +380,34 @@ class FlexicontentControllerTemplates extends FlexicontentControllerBaseAdmin
 				echo '
 				<div class="fc_layout_box_outer">
 					<div class="alert alert-info">
-						Currently selected layout: <b>"' . $layout_name . '"</b> does not have layout specific parameters
+						Currently selected layout: <b>"' . $layout_name . '"</b> ' .($app->isClient('administrator') ? 'with path: ' . $layoutpath : '') . ' does not have layout specific parameters
 					</div>
 				</div>';
 				exit;
 			}
 		}
+		
+		
+		/**
+		 * Read file and replace parameter suffix if this was providden
+		 * layout_sfx should include underscore unlike layout_pfx which does not
+		 */
+		$file_string = file_get_contents($layoutpath);
+		$file_string = str_replace('_PSFX', $layout_sfx, $file_string);  
+		$file_string = str_replace('PPFX_', $layout_pfx . '_', $file_string);  
 
-		// Attempt to parse the XML file
-		$xml = simplexml_load_file($layoutpath);
+
+		/**
+		 * Attempt to parse the XML file
+		 */
+		$xml = simplexml_load_string($file_string);
 
 		if (!$xml)
 		{
-			die('Error parsing layout XML file : ' . $layoutpath);
+			echo 'Error parsing layout XML file : ' . $layoutpath;
+			return;
 		}
+
 
 		// Create form object, (form name seems not to cause any problem)
 		$form_layout = new JForm('com_flexicontent.layout.' . $layout_name, array('control' => 'jform', 'load_data' => true));
@@ -352,11 +418,8 @@ class FlexicontentControllerTemplates extends FlexicontentControllerBaseAdmin
 
 		foreach ($form_layout->getGroup($groupname) as $field)
 		{
-			// Get prefixed fieldname (that is, if the given layout is using prefix)
-			$prefixed_fieldname = str_replace('PPFX_', $layout_pfx . '_', $field->fieldname);
-
-			// Check if value exists in the extension's parameters and set it into the non-prefixed field name
-			$value = $ext_params->get($prefixed_fieldname);
+			// Check if value exists in the extension's parameters and set it into the field name
+			$value = $ext_params->get($field->fieldname);
 
 			if ( (is_string($value) && strlen($value)) || (is_array($value) && count($value)>0))
 			{
@@ -394,49 +457,80 @@ class FlexicontentControllerTemplates extends FlexicontentControllerBaseAdmin
 					$cssprep    = $field->getAttribute('cssprep');
 					$labelclass = $cssprep == 'less' ? 'fc_less_parameter' : '';
 
-					if ($ext_type === 'templates')
+					/**
+					 * Clear disable fields that are flagged as 'cssprep' when displaying parameters in forms that inherit these values
+					 * the values LESS configuration parameters, can only be compiled once for the template's main configuration
+					 */
+					if ($cssprep && $inh_params && $ext_type === 'templates')
 					{
-						// For J3.7.0+ , we have extra form methods Form::getFieldXml()
-						if ($cssprep && FLEXI_J37GE && $inh_params)
-						{
-							$_value = $form_layout->getValue($fieldname, $groupname, $inh_params->get($fieldname));
-
-							// Not only set the disabled attribute but also clear the required attribute to avoid issues with some fields (like 'color' field)
-							$form_layout->setFieldAttribute($fieldname, 'disabled', 'true', $field->group);
-							$form_layout->setFieldAttribute($fieldname, 'required', 'false', $field->group);
-
-							$field->setup($form_layout->getFieldXml($fieldname, $field->group), $_value, $field->group);
-						}
-
-						$_label = str_replace('jform_attribs_', 'jform_layouts_' . $ext_name . '_', $field->label);
-						$_input = str_replace('jform_attribs_', 'jform_layouts_' . $ext_name . '_',
-							str_replace('[attribs]', '[layouts][' . $ext_name . ']',
-								($inh_params ? flexicontent_html::getInheritedFieldDisplay($field, $inh_params) : $field->input)
-							)
-						);
+						// Not only set the disabled attribute but also clear the required attribute to avoid issues with some fields (like 'color' field)
+						$form_layout->setFieldAttribute($fieldname, 'disabled', 'true', $field->group);
+						$form_layout->setFieldAttribute($fieldname, 'required', 'false', $field->group);
 					}
-					elseif ($ext_view === 'field')
+
+					/**
+					 * Display the inherited value for the cases:
+					 *  item, category view layouts
+					 *  item form layouts
+					 * This is possible since J3.7.0+ we have the extra form method: Form::getFieldXml()
+					 */
+					if ($inh_params)
 					{
-						$_label = str_replace('jform_attribs_', 'jform_layouts_', $field->label);
-						$_input = str_replace('jform_attribs_', 'jform_layouts_',
-							str_replace('[attribs]', '[layouts]', $field->input)
-						);
+						$_value = $form_layout->getValue($fieldname, $groupname, $inh_params->get($fieldname));
+						$field->setup($form_layout->getFieldXml($fieldname, $field->group), $_value, $field->group);
+						
+						$field_input_inherited = $inh_params ? flexicontent_html::getInheritedFieldDisplay($field, $inh_params) : $field->input;
 					}
 					else
 					{
-						$_label = $field->label;
-						$_input = $field->input;
+						$field_input_inherited = $field->input;
 					}
 
+
+					/**
+					 * Rename the fields to match the current form fieldset
+					 */
+					switch ($ext_type)
+					{
+						case 'templates':
+							$_label = str_replace('jform_attribs_', 'jform_layouts_' . $ext_name . '_', $field->label);
+							$_input = str_replace('jform_attribs_', 'jform_layouts_' . $ext_name . '_',
+								str_replace('[attribs]', '[layouts][' . $ext_name . ']', $field_input_inherited)
+							);
+							$_field_id = str_replace('jform_attribs_', 'jform_layouts_' . $ext_name . '_', $field->id);
+							break;
+
+						case 'forms':
+							
+							$_label = str_replace('jform_attribs_', 'jform_iflayout_', $field->label);
+							$_input = str_replace('jform_attribs_', 'jform_iflayout_',
+								str_replace('[attribs]', '[iflayout]', $field_input_inherited)
+							);
+							$_field_id = str_replace('jform_attribs_', 'jform_iflayout_', $field->id);
+							break;
+
+						case 'field':
+							$_label = str_replace('jform_attribs_', 'jform_layouts_', $field->label);
+							$_input = str_replace('jform_attribs_', 'jform_layouts_',
+								str_replace('[attribs]', '[layouts]', $field_input_inherited)
+							);
+							$_field_id = str_replace('jform_attribs_', 'jform_layouts_', $field->id);
+							break;
+
+						default:
+							$_label = $field->label;
+							$_input = $field_input_inherited;
+							$_field_id = $field->id;
+							break;
+					}
+
+					/**
+					 * Style the label if extra classes were provided
+					 */
 					if ($labelclass)
 					{
 						$_label = str_replace('class="', 'class="'.$labelclass.' ', $_label);
 					}
-
-					// Replace prefix in the parameter names (that is, if it exists)
-					$_label = str_replace('PPFX_', $layout_pfx . '_', $_label);
-					$_input = str_replace('PPFX_', $layout_pfx . '_', $_input);
-					$_field_id = str_replace('PPFX_', $layout_pfx . '_', $field->id);
 
 					if (!$field->label || $field->hidden)
 					{

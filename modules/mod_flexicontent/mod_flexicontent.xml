@@ -39,7 +39,7 @@
 			<field name="layout" type="fclayout" default="news" label="FLEXI_CHOOSE_TMPL"
 				description="FLEXI_CHOOSE_TMPL_DESC" directory="/modules/mod_flexicontent/tmpl" ext_name="mod_flexicontent"
 				hide_default="1" hide_none="1" stripext="1" filter="\.php$" exclude="^_"
-				tmpl_container="tabset_attrs_2_nav_1" params_source="file"
+				tmpl_container="tabset_attrs_0_nav_4" params_source="file"
 				/> <!-- params_source="inline" -->
 			<field name="" type="separator" default="Please set layout parameters in &lt;b&gt;Layout: ... TAB&lt;/b&gt;. CSS/HTML developers please read: &lt;u&gt;&lt;b&gt; &lt;a href='https://www.flexicontent.org/documentation/tutorials-english/69-templating-module-plugin-content/274-how-to-create-a-custom-layout-for-universal-content-module-and-other-flexicontent-modules.html' target='_blank'&gt;Custom templates HOW-TO&lt;/a&gt; &lt;/b&gt; &lt;/u&gt;" level="level3" class="alert alert-info fcpadded" />
 
@@ -624,9 +624,6 @@
 		<field name="" type="separator" default="Items List Tabset" level="tabset_close" tab_class="s-fake" box_type="1" />
 
 
-	<field name="" type="separator" default="Layout" description="" icon_class="icon-palette" level="tab_open" box_type="1" />
-
-		<field name="" type="separator" default="Layout Tabset" description="" level="tabset_start" tab_class="s-fake" box_type="1" />
 
 		<field name="" type="separator" default="FLEXI_MOD_TMPL_LAYOUT_OPTIONS" description="FLEXI_MOD_TMPL_LAYOUT_OPTIONS_DESC" icon_class="icon-pencil" level="tab_open" box_type="1" />
 
@@ -973,7 +970,6 @@
 			<field name="builder_layout2_hash" type="hidden" filter="JHtmlFclayoutbuilder::createUrlHash" default="" label="Hash" description="..." class="" />
 			<field name="builder_layout2_less" type="hidden" filter="JHtmlFclayoutbuilder::prepareLess" default="/modules/mod_flexicontent/builder/less/builder_layout2_{{id}}" label="LESS" description="..." class="" />
 
-		<field name="" type="separator" default="Items List Tabset" level="tabset_close" tab_class="s-fake" box_type="1" />
 		<field name="" type="separator" default="Display Tabset" level="tabset_close" tab_class="s-fake" box_type="1" />
 
 		</fieldset>

@@ -354,6 +354,20 @@ class FlexicontentModelType extends FCModelAdmin
 			unset($data[$prop]);
 		}
 
+		/**
+		 * Add the parameter form layout configuration that were cleared by form validation (this should only happen in the backend)
+		 */
+		if (JFactory::getApplication()->isClient('administrator'))
+		{
+			$record->attribs = new JRegistry($record->attribs);
+			$iflayout_params = !empty($raw_data['iflayout']) ? $raw_data['iflayout'] : array();
+			foreach($iflayout_params as $i => $v)
+			{
+				$record->attribs[$i] = $v;
+			}
+			$record->attribs = $record->attribs->toString();
+		}
+
 		// Call parent class bind preparation
 		parent::_prepareBind($record, $data);
 	}

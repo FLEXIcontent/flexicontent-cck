@@ -128,6 +128,7 @@ $_ct = explode('.', $task);
 $task = $_ct[ count($_ct) - 1];
 if (count($_ct) > 1) $controller = $_ct[0];
 
+// Handle legacy URLs not setting the task and only setting layout === 'form' in item view
 if ($view === 'item' && $layout === 'form' && !$task)
 {
 	$task = 'edit';

@@ -1935,10 +1935,30 @@ class plgSystemFlexisystem extends JPlugin
 		$user  = JFactory::getUser();
 		$option = $app->input->get('component', '', 'cmd');
 
+		/**
+		 * Handle saving the parameters of 2 (1 frontend, 1 backend) item form default layouts
+		 */
 
-		// ***
-		// *** Handle syncing permissions between com_content and com_flexicontent assets
-		// ***
+		if ($context === 'com_config.component' && $table->type === 'component' && $table->element === 'com_flexicontent')
+		{
+			if (JFactory::getApplication()->isClient('administrator'))
+			{
+				$raw_data = JFactory::getApplication()->input->post->get('jform', array(), 'array');
+
+				$table->params = new JRegistry($table->params);
+				$iflayout_params = !empty($raw_data['iflayout']) ? $raw_data['iflayout'] : array();
+				foreach($iflayout_params as $i => $v)
+				{
+					$table->params[$i] = $v;
+				}
+				$table->params = $table->params->toString();
+			}
+		}
+
+
+		/**
+		 * Handle syncing permissions between com_content and com_flexicontent assets
+		 */
 
 		if ($context === 'com_config.component' && ($option === 'com_content' || $option === 'com_flexicontent'))
 		{
