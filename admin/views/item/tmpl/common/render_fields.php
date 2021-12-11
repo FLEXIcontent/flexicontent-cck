@@ -864,7 +864,7 @@ if ($typeid && $this->perms['canright'] && $usepublicationdetails === 2) : ob_st
 		// used to hide "Reset Hits" when hits = 0
 		$visibility = !$this->row->hits ? 'style="display: none; visibility: hidden;"' : '';
 		$visibility2 = !$this->row->rating_count ? 'style="display: none; visibility: hidden;"' : '';
-		$default_label_attrs = 'class="fc-prop-lbl"';
+		$default_label_class = ' fc-prop-lbl ';
 		?>
 
 		<table class="fc-form-tbl fcinner" style="margin: 10px; width: auto;">
@@ -894,7 +894,7 @@ if ($typeid && $this->perms['canright'] && $usepublicationdetails === 2) : ob_st
 					$field_description = $field && $field->description ? $field->description : JText::_($this->form->getField('state')->description);
 					$label_attrs = $field
 						? 'class="' . $tip_class . ' fc-prop-lbl" title="'.flexicontent_html::getToolTip(null, $field_description, 0, 1).'"'
-						: 'class="' . $default_label_attrs . '"';
+						: 'class="' . $default_label_class . '"';
 				?>
 				<label <?php echo $label_attrs; ?>><?php echo $field ? $field->label : JText::_( 'FLEXI_STATE' ); ?></label>
 			</td>
@@ -909,7 +909,7 @@ if ($typeid && $this->perms['canright'] && $usepublicationdetails === 2) : ob_st
 					$field_description = $field && $field->description ? $field->description : JText::_($this->form->getField('hits')->description);
 					$label_attrs = $field
 						? 'class="' . $tip_class . ' fc-prop-lbl" title="'.flexicontent_html::getToolTip(null, $field_description, 0, 1).'"'
-						: 'class="' . $default_label_attrs . '"';
+						: 'class="' . $default_label_class . '"';
 				?>
 				<label <?php echo $label_attrs; ?>><?php echo $field ? $field->label : JText::_( 'FLEXI_HITS' ); ?></label>
 			</td>
@@ -927,7 +927,7 @@ if ($typeid && $this->perms['canright'] && $usepublicationdetails === 2) : ob_st
 					$field_description = $field && $field->description ? $field->description : '';
 					$label_attrs = $field
 						? 'class="' . $tip_class . ' fc-prop-lbl" title="'.flexicontent_html::getToolTip(null, $field_description, 0, 1).'"'
-						: 'class="' . $default_label_attrs . '"';
+						: 'class="' . $default_label_class . '"';
 				?>
 				<label <?php echo $label_attrs; ?>><?php echo $field ? $field->label : JText::_( 'FLEXI_SCORE' ); ?></label>
 			</td>
@@ -941,7 +941,7 @@ if ($typeid && $this->perms['canright'] && $usepublicationdetails === 2) : ob_st
 
 		<tr>
 			<td class="key">
-				<label <?php echo $default_label_attrs; ?>><?php echo JText::_( 'FLEXI_REVISED' ); ?></label>
+				<label class="<?php echo $default_label_class; ?>"><?php echo JText::_( 'FLEXI_REVISED' ); ?></label>
 			</td>
 			<td>
 				<span class="badge badge-info">
@@ -951,7 +951,7 @@ if ($typeid && $this->perms['canright'] && $usepublicationdetails === 2) : ob_st
 		</tr>
 		<tr>
 			<td class="key">
-				<label <?php echo $default_label_attrs; ?>><?php echo JText::_( 'FLEXI_FRONTEND_ACTIVE_VERSION' ); ?></label>
+				<label class="<?php echo $default_label_class; ?>"><?php echo JText::_( 'FLEXI_FRONTEND_ACTIVE_VERSION' ); ?></label>
 			</td>
 			<td>
 				<span class="badge badge-info">#<?php echo $this->row->current_version;?></span>
@@ -959,7 +959,7 @@ if ($typeid && $this->perms['canright'] && $usepublicationdetails === 2) : ob_st
 		</tr>
 		<tr>
 			<td class="key">
-				<label <?php echo $default_label_attrs; ?>><?php echo JText::_( 'FLEXI_FORM_LOADED_VERSION' ); ?></label>
+				<label class="<?php echo $default_label_class; ?>"><?php echo JText::_( 'FLEXI_FORM_LOADED_VERSION' ); ?></label>
 			</td>
 			<td>
 				<span class="badge badge-info">#<?php echo $this->row->version;?></span>
@@ -972,7 +972,7 @@ if ($typeid && $this->perms['canright'] && $usepublicationdetails === 2) : ob_st
 					$field_description = $field && $field->description ? $field->description : JText::_($this->form->getField('created')->description);
 					$label_attrs = $field
 						? 'class="' . $tip_class . ' fc-prop-lbl" title="'.flexicontent_html::getToolTip(null, $field_description, 0, 1).'"'
-						: 'class="' . $default_label_attrs . '"';
+						: 'class="' . $default_label_class . '"';
 				?>
 				<label <?php echo $label_attrs; ?>><?php echo $field ? $field->label : JText::_( 'FLEXI_CREATED' ); ?></label>
 			</td>
@@ -989,7 +989,7 @@ if ($typeid && $this->perms['canright'] && $usepublicationdetails === 2) : ob_st
 					$field_description = $field && $field->description ? $field->description : JText::_($this->form->getField('modified')->description);
 					$label_attrs = $field
 						? 'class="' . $tip_class . ' fc-prop-lbl" title="'.flexicontent_html::getToolTip(null, $field_description, 0, 1).'"'
-						: 'class="' . $default_label_attrs . '"';
+						: 'class="' . $default_label_class . '"';
 				?>
 				<label <?php echo $label_attrs; ?>><?php echo $field ? $field->label : JText::_( 'FLEXI_MODIFIED' ); ?></label>
 			</td>
@@ -1006,7 +1006,7 @@ if ($typeid && $this->perms['canright'] && $usepublicationdetails === 2) : ob_st
 	<?php if ($use_versioning) : ?>
 			<tr>
 				<td class="key">
-					<label <?php echo $default_label_attrs; ?>><?php echo JText::_( 'FLEXI_VERSION_COMMENT' ); ?></label>
+					<label class="<?php echo $default_label_class; ?>"><?php echo JText::_( 'FLEXI_VERSION_COMMENT' ); ?></label>
 				</td>
 				<td></td>
 			</tr><tr>
