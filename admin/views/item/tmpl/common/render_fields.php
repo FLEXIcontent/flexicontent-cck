@@ -223,10 +223,7 @@ if ((!$this->menuCats || $this->menuCats->cancatid) && $usemaincat) : ob_start()
 		<div class="control-label" id="jform_catid-lbl-outer">
 			<label id="jform_catid-lbl" for="jform_catid" data-for="jform_catid" <?php echo $label_attrs; ?> >
 				<?php
-				$label_maincat = JText::_(!$secondary_displayed || isset($all_tab_fields['category'])
-					? $this->form->getLabel('catid')
-					: 'FLEXI_MAIN_CATEGORY'
-				);
+				$label_maincat = JText::_(!$secondary_displayed ? $this->form->getLabel('catid') : 'FLEXI_MAIN_CATEGORY');
 				echo $field ? $field->label : $label_maincat;
 				/* $field->label is set per type */ ?>
 				<i class="icon-tree-2"></i>
@@ -566,14 +563,6 @@ if (!$is_autopublished) :  // state and vstate (= approval of new document versi
 
 endif;
 
-/**
- * Compatibility, append vstate to state, is state was not specified
- */
-if (!isset($all_tab_fields['vstate']) && isset($captured['vstate']))
-{
-	$captured['state'] .= $captured['vstate'];
-	unset($captured['vstate']);
-}
 
 
 
@@ -723,7 +712,7 @@ endif;
 
 
 
-if ($secondary_displayed || !empty($this->lists['featured_cid']) || !isset($all_tab_fields['category'])) : ob_start();  // categories ?>
+if ( $secondary_displayed || !empty($this->lists['featured_cid']) ) : ob_start();  // categories ?>
 
 	<fieldset class="basicfields_set" id="fcform_categories_container">
 		<legend>
@@ -731,9 +720,7 @@ if ($secondary_displayed || !empty($this->lists['featured_cid']) || !isset($all_
 			<span class="fc_legend_header_text"><?php echo JText::_( $fset_lbl ); ?></span>
 		</legend>
 
-		<?php if (!isset($all_tab_fields['category'])) : ?>
-			<?php echo $captured['category']; unset($captured['category']); ?>
-		<?php endif; ?>
+		<div style="display: none;">_FC_CATEGORY_BOX_</div>
 
 		<?php if ($secondary_displayed) : /* optionally via MENU SPECIFIED categories subset (instead of categories with CREATE perm) */ ?>
 
@@ -838,21 +825,16 @@ endif;
 
 
 $modifyLangAssocs = in_array('mod_original_content_assoc', $this->allowlangmods) && $uselang === 1;
-$forceLangInclude = !isset($all_tab_fields['lang']) && $captured['lang'];  // TODO examine
-if ($forceLangInclude || (flexicontent_db::useAssociations() && $modifyLangAssocs)) : ob_start(); // lang_associations ?>
+if ( flexicontent_db::useAssociations() && $modifyLangAssocs ) : ob_start(); // lang_associations ?>
 
 	<fieldset class="basicfields_set" id="fcform_language_container">
 		<legend>
 			<span class="fc_legend_header_text">
-				<?php echo !isset($all_tab_fields['lang'])
-					? JText::_( 'FLEXI_LANGUAGE' )
-					: JText::_( 'FLEXI_LANGUAGE' ) . ' '. JText::_( 'FLEXI_ASSOCIATIONS' ) ; ?>
+				<?php echo JText::_( 'FLEXI_LANGUAGE' ) . ' '. JText::_( 'FLEXI_ASSOCIATIONS' ) ; ?>
 			</span>
 		</legend>
 
-		<?php if ($forceLangInclude): ?>
-			<?php echo $captured['lang']; unset($captured['lang']); ?>
-		<?php endif; ?>
+		<div style="display: none;">_FC_LANGUAGE_BOX_</div>
 
 		<!-- BOF of language / language associations section -->
 		<?php if (flexicontent_db::useAssociations() && $modifyLangAssocs): ?>
@@ -885,7 +867,7 @@ if ($typeid && $this->perms['canright'] && $usepublicationdetails === 2) : ob_st
 		$default_label_attrs = 'class="fc-prop-lbl"';
 		?>
 
-		<table class="fc-form-tbl fcinner" style="margin: 10px; width: auto; float: left;">
+		<table class="fc-form-tbl fcinner" style="margin: 10px; width: auto;">
 		<tr>
 			<td colspan="2">
 				<h3><?php echo JText::_( 'FLEXI_VERSION_INFO' ); ?></h3>
@@ -1034,7 +1016,7 @@ if ($typeid && $this->perms['canright'] && $usepublicationdetails === 2) : ob_st
 			</tr>
 		<?php endif; ?>
 		</table>
-
+		<div class="fcclear"></div>
 <?php
 $fn = 'item_screen';
 $captured[$fn] = ob_get_clean();
@@ -1493,7 +1475,7 @@ endif; // end of template: layout_selection, layout_params
 
 
 if ($typeid && $use_versioning && $this->perms['canversion'] && $versionsplacement !== 0) : ob_start()  // versions ?>
-	<table class="" style="margin: 10px; width: auto; float: left;">
+	<table class="" style="margin: 10px; width: auto;">
 		<tr>
 			<td>
 				<h3><?php echo JText::_( 'FLEXI_VERSIONS_HISTORY' ); ?></h3>
@@ -1555,6 +1537,7 @@ if ($typeid && $use_versioning && $this->perms['canversion'] && $versionsplaceme
 			<div id="fc_pager"></div>
 		</td></tr>
 	</table>
+	<div class="fcclear"></div>
 <?php
 $fn = 'versions';
 $captured[$fn] = ob_get_clean();
@@ -1877,70 +1860,3 @@ $captured['fields_manager'] .= implode('<div class="fcclear"></div>', $captured[
 unset($captured['fman']);
 
 
-
-
-
-
-
-/**
- * ANY field not found inside the 'captured' ARRAY,
- * must be a field not configured to be displayed
- */
-
-$displayed_at_tab = array();
-foreach($tab_fields as $tabname => $fieldnames)
-{
-	// echo "$tabname <br/>  %% " . print_r($fieldnames, true) . "<br/>";
-
-	foreach($fieldnames as $fn => $i)
-	{
-		//echo " -- $fn <br/>";
-
-		// Array used to count duplicate placement of fields
-		if (isset($captured[$fn]))
-		{
-			$displayed_at_tab[$fn][] = $tabname;
-		}
-
-		// If a field is assigned to multiple places then unset its excess placements (except the 1st placement)
-		if (isset($shown[$fn]))
-		{
-			unset( $tab_fields[$tabname][$fn] );
-			continue;
-		}
-		$shown[$fn] = 1;
-
-		// If we did not captured the display of field
-		// because field was skipped due to ACL or due to configuration,
-		// then removed the field from its placement positions
-		if (!isset($captured[$fn]))
-		{
-			unset( $tab_fields[$tabname][$fn] );
-			continue;
-		}
-	}
-}
-
-
-
-
-/**
- * CONFIGURATION WARNINGS, fields that are displayed twice, and core properties that are missing
- */
-$msg = '';
-foreach($displayed_at_tab as $fieldname => $_places)
-{
-	if ( count($_places) > 1 ) $msg .= "<br/><b>".$fieldname."</b>" . " at [".implode(', ', $_places)."]";
-}
-
-if ($msg)
-{
-	$msg = JText::sprintf( 'FLEXI_FORM_FIELDS_DISPLAYED_TWICE', $msg."<br/>");
-	echo sprintf( $alert_box, '', 'error', '', $msg );
-}
-
-if ( count($coreprop_missing) )
-{
-	$msg = JText::sprintf( 'FLEXI_FORM_PLACER_FIELDS_MISSING', "<b>".implode(', ', array_keys($coreprop_missing))."</b>");
-	echo sprintf( $alert_box, '', 'error', '', $msg );
-}
