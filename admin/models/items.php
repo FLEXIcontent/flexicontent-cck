@@ -622,7 +622,7 @@ class FlexicontentModelItems extends FCModelAdminList
 			$filter->parameters->set('label_filter_css', '');
 			//$filter->parameters->set('display_label_filter', -1);
 			//$filter->parameters->set('label_filter_css', 'add-on');
-			$filter->parameters->set( 'filter_extra_attribs', ' onchange="document.adminForm.limitstart.value=0; Joomla.submitform()" ' );
+			$filter->parameters->set( 'filter_extra_attribs', ' onchange="if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform()" ' );
 
 			// Check for error during getting indexed field elements
 			if (!$elements)

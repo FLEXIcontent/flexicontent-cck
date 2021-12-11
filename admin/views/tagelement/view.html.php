@@ -215,7 +215,7 @@ class FlexicontentViewTagelement extends FlexicontentViewBaseRecords
 				array(
 					'class' => $this->select_class,
 					'size' => '1',
-					'onchange' => 'document.adminForm.limitstart.value=0; Joomla.submitform();',
+					'onchange' => 'if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();',
 				),
 				'value',
 				'text',
@@ -245,7 +245,7 @@ class FlexicontentViewTagelement extends FlexicontentViewBaseRecords
 				array(
 					'class' => $this->select_class,
 					'size' => '1',
-					'onchange' => 'document.adminForm.limitstart.value=0; Joomla.submitform();',
+					'onchange' => 'if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();',
 				),
 				'value',
 				'text',

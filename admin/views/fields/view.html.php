@@ -361,7 +361,7 @@ class FlexicontentViewFields extends FlexicontentViewBaseRecords
 				array(
 					'class' => $this->select_class,
 					'size' => '1',
-					'onchange' => 'document.adminForm.limitstart.value=0; Joomla.submitform();',
+					'onchange' => 'if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();',
 				),
 				'filter_type'
 			),
@@ -382,7 +382,7 @@ class FlexicontentViewFields extends FlexicontentViewBaseRecords
 				array(
 					'class' => $this->select_class,
 					'size' => '1',
-					'onchange' => 'document.adminForm.limitstart.value=0; Joomla.submitform();',
+					'onchange' => 'if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();',
 				),
 				'value',
 				'text',
@@ -426,7 +426,7 @@ class FlexicontentViewFields extends FlexicontentViewBaseRecords
 				array(
 					'class' => $this->select_class,
 					'size' => '1',
-					'onchange' => 'document.adminForm.limitstart.value=0; Joomla.submitform();',
+					'onchange' => 'if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();',
 				),
 				'filter_fieldtype'
 			),
@@ -454,7 +454,7 @@ class FlexicontentViewFields extends FlexicontentViewBaseRecords
 				array(
 					'class' => $this->select_class,
 					'size' => '1',
-					'onchange' => 'document.adminForm.limitstart.value=0; Joomla.submitform();',
+					'onchange' => 'if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();',
 				),
 				'value',
 				'text',
@@ -479,7 +479,7 @@ class FlexicontentViewFields extends FlexicontentViewBaseRecords
 				$fieldname,
 				array(
 					'class' => $this->select_class,
-					'onchange' => 'document.adminForm.limitstart.value=0; Joomla.submitform();',
+					'onchange' => 'if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();',
 				),
 				'value',
 				'text',

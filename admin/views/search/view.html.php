@@ -223,7 +223,7 @@ class FLEXIcontentViewSearch extends FlexicontentViewBaseRecords
 					array(
 						'class' => $this->select_class,
 						'size' => '1',
-						'onchange' => 'document.adminForm.limitstart.value=0; Joomla.submitform();',
+						'onchange' => 'if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();',
 					),
 					'value',
 					'text',
@@ -241,7 +241,7 @@ class FLEXIcontentViewSearch extends FlexicontentViewBaseRecords
 				array(
 					'class' => $this->select_class,
 					'size' => '1',
-					'onchange' => 'document.adminForm.limitstart.value=0; Joomla.submitform();',
+					'onchange' => 'if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();',
 				),
 				$filter_itemlang,
 				'-'
@@ -260,7 +260,7 @@ class FLEXIcontentViewSearch extends FlexicontentViewBaseRecords
 				array(
 					'class' => $this->select_class,
 					'size' => '1',
-					'onchange' => 'document.adminForm.limitstart.value=0; Joomla.submitform();',
+					'onchange' => 'if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();',
 				),
 				'filter_type'
 			),
@@ -280,7 +280,7 @@ class FLEXIcontentViewSearch extends FlexicontentViewBaseRecords
 				array(
 					'class' => $this->select_class,
 					'size' => '1',
-					'onchange' => 'document.adminForm.limitstart.value=0; Joomla.submitform();',
+					'onchange' => 'if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();',
 				),
 				'value',
 				'text',
@@ -293,14 +293,14 @@ class FLEXIcontentViewSearch extends FlexicontentViewBaseRecords
 		$itn['advanced'] = JText::_( 'FLEXI_INDEX_ADVANCED' );
 		$indextypes = array();
 		//foreach ($itn as $i => $v) $indextypes[] = JHtml::_('select.option', $i, $v);
-		//$lists['filter_indextype'] = JHtml::_('select.radiolist', $indextypes, 'filter_indextype', 'size="1" class="inputbox" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', 'value', 'text', $filter_indextype );
+		//$lists['filter_indextype'] = JHtml::_('select.radiolist', $indextypes, 'filter_indextype', 'size="1" class="inputbox" onchange="if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform()"', 'value', 'text', $filter_indextype );
 
 		$lists['filter_indextype'] = '<div class="fc-iblock group-fcset radio" style="vertical-align: middle">';
 
 		foreach ($itn as $i => $v)
 		{
 			$checked = $filter_indextype == $i ? ' checked="checked" ' : '';
-			$lists['filter_indextype'] .= '<input type="radio" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()" class="inputbox" size="1" '.$checked.' value="'.$i.'" id="filter_indextype'.$i.'" name="filter_indextype" />';
+			$lists['filter_indextype'] .= '<input type="radio" onchange="if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform()" class="inputbox" size="1" '.$checked.' value="'.$i.'" id="filter_indextype'.$i.'" name="filter_indextype" />';
 			$lists['filter_indextype'] .= '<label class="" id="filter_indextype'.$i.'-lbl" for="filter_indextype'.$i.'">'.$v.'</label>';
 		}
 

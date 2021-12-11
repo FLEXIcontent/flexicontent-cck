@@ -616,7 +616,7 @@ class FlexicontentViewFileselement extends FlexicontentViewBaseRecords
 				array(
 					'class' => $this->select_class,
 					'size' => '1',
-					'onchange' => 'document.adminForm.limitstart.value=0; Joomla.submitform();',
+					'onchange' => 'if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();',
 				),
 				'value',
 				'text',
@@ -643,7 +643,7 @@ class FlexicontentViewFileselement extends FlexicontentViewBaseRecords
 				array(
 					'class' => $this->select_class,
 					'size' => '1',
-					'onchange' => 'document.adminForm.limitstart.value=0; Joomla.submitform();',
+					'onchange' => 'if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();',
 				),
 				'value',
 				'text',
@@ -662,7 +662,7 @@ class FlexicontentViewFileselement extends FlexicontentViewBaseRecords
 				array(
 					'class' => $this->select_class,
 					'size' => '1',
-					'onchange' => 'document.adminForm.limitstart.value=0; Joomla.submitform();',
+					'onchange' => 'if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();',
 				),
 				$filter_lang,
 				'-'
@@ -686,7 +686,7 @@ class FlexicontentViewFileselement extends FlexicontentViewBaseRecords
 					array(
 						'class' => $this->select_class,
 						'size' => '1',
-						'onchange' => 'document.adminForm.limitstart.value=0; Joomla.submitform();',
+						'onchange' => 'if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();',
 					),
 					'value',
 					'text',
@@ -709,7 +709,7 @@ class FlexicontentViewFileselement extends FlexicontentViewBaseRecords
 					array(
 						'class' => $this->select_class,
 						'size' => '1',
-						'onchange' => 'document.adminForm.limitstart.value=0; Joomla.submitform();',
+						'onchange' => 'if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();',
 					),
 					'value',
 					'text',
@@ -722,7 +722,7 @@ class FlexicontentViewFileselement extends FlexicontentViewBaseRecords
 		// Build content item id filter
 		$lists['item_id'] = $this->getFilterDisplay(array(
 			'label' => JText::_('Item id'),
-			'html' => '<input type="text" name="item_id" size="1" class="inputbox" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()" value="'.$filter_item.'" />',
+			'html' => '<input type="text" name="item_id" size="1" class="inputbox" onchange="if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform()" value="'.$filter_item.'" />',
 		));
 
 
@@ -744,7 +744,7 @@ class FlexicontentViewFileselement extends FlexicontentViewBaseRecords
 					array(
 						'class' => $this->select_class,
 						'size' => '1',
-						'onchange' => 'document.adminForm.limitstart.value=0; Joomla.submitform();',
+						'onchange' => 'if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();',
 					),
 					'value',
 					'text',
@@ -769,7 +769,7 @@ class FlexicontentViewFileselement extends FlexicontentViewBaseRecords
 				array(
 					'class' => $this->select_class,
 					'size' => '1',
-					'onchange' => 'document.adminForm.limitstart.value=0; Joomla.submitform();',
+					'onchange' => 'if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();',
 				),
 				$filter_ext,
 				'-'
@@ -787,7 +787,7 @@ class FlexicontentViewFileselement extends FlexicontentViewBaseRecords
 					array(
 						'class' => $this->select_class,
 						'size' => '1',
-						'onchange' => 'document.adminForm.limitstart.value=0; Joomla.submitform();',
+						'onchange' => 'if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();',
 					),
 					$filter_uploader,
 					'-'
