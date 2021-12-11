@@ -234,7 +234,7 @@
 			</field>
 
 
-			<field name="item_form_fe_tab_styling" type="separator" default="FLEXI_STYLING_N_BEHAVIOUR" icon_class="icon-palette" level="tab_open" box_type="1" />
+			<field name="item_form_fe_tab_styling" type="separator" default="FLEXI_STYLING_N_BEHAVIOUR" icon_class="icon-palette" level="level2" box_type="1" />
 
 			<field name="form_lbl_class_fe" type="text" default="" label="FLEXI_LABEL_CLASS" description="FLEXI_LABEL_CLASS_DESC" class="input-xxlarge" />
 			<field name="form_container_css_fe" type="text" default="" size="36" label="FLEXI_FORM_CONTAINER_CSS" description="FLEXI_FORM_CONTAINER_CSS_DESC" />
