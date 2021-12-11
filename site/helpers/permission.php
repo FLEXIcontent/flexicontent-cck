@@ -267,6 +267,7 @@ class FlexicontentHelperPerm
 	static function returnAllCats ($check_published, $specific_catids)
 	{
 		global $globalcats;
+		if (!$globalcats) $globalcats = array();
 		$usercats = array();
 
 		if ($specific_catids) {

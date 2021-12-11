@@ -313,6 +313,8 @@ class flexicontent_cats
 		// ***
 
 		global $globalcats;
+		if (!$globalcats) $globalcats = array();
+
 		$cparams = JComponentHelper::getParams('com_flexicontent');
 		$user = JFactory::getUser();
 		$app  = JFactory::getApplication();
@@ -502,7 +504,7 @@ class flexicontent_cats
 			}
 		}
 
-		foreach ($list as $cat)
+		if ($globalcats) foreach ($list as $cat)
 		{
 			if (isset($cats_incestors_ancestors[$cat->id]))
 			{

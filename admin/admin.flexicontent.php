@@ -63,17 +63,17 @@ if ($print_logging_info && $format === 'html')
  */
 
 //include constants file
-require_once (JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'defineconstants.php');
+require_once (JPATH_ADMINISTRATOR.'/components/com_flexicontent/defineconstants.php');
 
 //include the needed classes and helpers
-require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.helper.php');
-require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.categories.php');
-require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.fields.php');
-require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'permission.php');
-require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'route.php');
+require_once (JPATH_SITE.'/components/com_flexicontent/classes/flexicontent.helper.php');
+require_once (JPATH_SITE.'/components/com_flexicontent/classes/flexicontent.categories.php');
+require_once (JPATH_SITE.'/components/com_flexicontent/classes/flexicontent.fields.php');
+require_once (JPATH_SITE.'/components/com_flexicontent/helpers/permission.php');
+require_once (JPATH_SITE.'/components/com_flexicontent/helpers/route.php');
 
 // Add component's table directory to the include path
-JTable::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'tables');
+JTable::addIncludePath(JPATH_ADMINISTRATOR.'/components/com_flexicontent/tables');
 
 // Import the flexicontent_fields plugins and flexicontent plugins
 if (!FLEXI_ONDEMAND)
@@ -106,7 +106,7 @@ else
 // Load language overrides, just before executing the component (DONE manually for J1.5)
 /*if (!FLEXI_J16GE)
 {
-	$overrideDir = JPATH_ADMINISTRATOR .DS. 'languages' .DS. 'overrides' .DS;
+	$overrideDir = JPATH_ADMINISTRATOR . '/languages/overrides/';
 	JFactory::getLanguage()->load('override', $overrideDir, 'en-GB', $force_reload = true, $load_default = true);
 	JFactory::getLanguage()->load('override', $overrideDir, null, $force_reload = true, $load_default = true);
 }*/
@@ -154,7 +154,7 @@ if ( isset($forced_views[$controller]) )
 // ***
 
 // CASE 1: Use (if it exists) controller named as current view name
-if ( file_exists( JPATH_COMPONENT.DS.'controllers'.DS.$view.'.php' ) )
+if ( file_exists( JPATH_COMPONENT.'/controllers/'.$view.'.php' ) )
 {
 	if ($controller != 'group')
 	{
@@ -164,7 +164,7 @@ if ( file_exists( JPATH_COMPONENT.DS.'controllers'.DS.$view.'.php' ) )
 
 
 // CASE 2: Singular views do not (usually) have a controller, use (if it exists) the 'Plural' controller by appending 's' to view name
-else if ( file_exists( JPATH_COMPONENT.DS.'controllers'.DS.$view.'s.php' ) )
+else if ( file_exists( JPATH_COMPONENT.'/controllers/'.$view.'s.php' ) )
 {
 	$controller = $view.'s';
 	$task = $task ?: 'edit';  // Default task for singular views is 'edit', set it if task is empty
@@ -218,11 +218,11 @@ if (
 	JFactory::getLanguage()->load('com_users', JPATH_ADMINISTRATOR, 'en-GB', true);
 	JFactory::getLanguage()->load('com_users', JPATH_ADMINISTRATOR, null, true);
 	// users helper file
-	require_once (JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'users.php');
+	require_once (JPATH_ADMINISTRATOR.'/components/com_flexicontent/helpers/users.php');
 }
 if ( $view=='debuggroup' || $controller_name=='debuggroup' ) {
 	// users helper file
-	require_once (JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'debug.php');
+	require_once (JPATH_ADMINISTRATOR.'/components/com_flexicontent/helpers/debug.php');
 }
 
 
@@ -243,7 +243,7 @@ if ( $cparams->get('recompile_core_less', 0) && $format == 'html' )
 	$start_microtime = microtime(true);
 
 	// Files in frontend assets folder
-	$path = JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'assets'.DS;
+	$path = JPATH_SITE.'/components/com_flexicontent/assets/';
 	$inc_path = $path.'less/include/';
 
 	$less_files = array(
@@ -284,7 +284,7 @@ if ( $cparams->get('recompile_core_less', 0) && $format == 'html' )
 	flexicontent_html::checkedLessCompile($less_files, $path, $inc_path, $force=false);
 
 	// Files in backend assets folder
-	$path = JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'assets'.DS;
+	$path = JPATH_ADMINISTRATOR.'/components/com_flexicontent/assets/';
 	$inc_path = $path.'less/include/';
 
 	$less_files = array('less/flexi_backend.less');
@@ -304,7 +304,7 @@ if ( $cparams->get('recompile_core_less', 0) && $format == 'html' )
 	/* RTL BOF */
 
 	// Files in frontend assets folder
-	$path = JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'assets'.DS;
+	$path = JPATH_SITE.'/components/com_flexicontent/assets/';
 	$inc_path = $path.'less/include/';
 
 	$less_files = array(
@@ -320,7 +320,7 @@ if ( $cparams->get('recompile_core_less', 0) && $format == 'html' )
 	flexicontent_html::checkedLessCompile($less_files, $path, $inc_path, $force);
 
 	// Files in backend assets folder
-	$path = JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'assets'.DS;
+	$path = JPATH_ADMINISTRATOR.'/components/com_flexicontent/assets/';
 	$inc_path = $path.'less/include/';
 
 	$less_files = array('less/flexi_backend_rtl.less');

@@ -19,5 +19,5 @@
 // no direct access
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-require_once (JPATH_COMPONENT.DS.'admin.flexicontent.php');
+require_once (JPATH_COMPONENT.'/admin.flexicontent.php');
 ?>
