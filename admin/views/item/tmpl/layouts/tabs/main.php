@@ -546,12 +546,16 @@ if ( count($FC_jfields_html) ) : ?>
 	<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" data-icon-class="<?php echo $fseticon; ?>">
 		<h3 class="tabberheading"> <?php echo JText::_($fsetname); ?> </h3>
 
+		<div class="fc_form_flex_box">
 		<?php foreach ($FC_jfields_html as $fields_grp_name => $_html) : ?>
-		<fieldset class="flexi_params fc_tabset_inner">
-			<div class="alert alert-info" style="width: 50%;"><?php echo JText::_('FLEXI_'.strtoupper($fields_grp_name).'_COMP'); ?></div>
-			<?php echo $_html; ?>
-		</fieldset>
+			<div class="fc_form_flex_box_item">
+				<fieldset class="panelform">
+					<legend><?php echo JText::_('FLEXI_'.strtoupper($fields_grp_name).'_COMP'); ?></legend>
+					<?php echo $_html; ?>
+				</fieldset>
+			</div>
 		<?php endforeach; ?>
+		</div>
 
 	</div>
 <?php endif;
