@@ -184,6 +184,10 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		if (! (int) $params->get('useaccess' . $CFGsfx, 1))
 			unset($data['access']);
 
+		if (! (int) $params->get('usestate' . $CFGsfx, 1))
+			unset($data['state']);
+
+
 		/**
 		 * Note: unsetting 'type_id' for new items is always off because it is meaningless
 		 * Unsetting type_id has an effect for existing items only

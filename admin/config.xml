@@ -1214,11 +1214,11 @@
 			</field>
 
 			<field name="" label="" type="separator" default="FLEXI_APPROVAL_NEEDED_WARNINGS" level="level2" />
-			<field name="approval_warning_inform_fe" type="fcradio" default="1" label="FLEXI_INFORM_APPROVAL_NEEDED_WARNING" description="FLEXI_INFORM_APPROVAL_NEEDED_WARNING_DESC" class="btn-group">
+			<field name="approval_warning_inform_fe" type="fcradio" default="1" label="FLEXI_INFORM_APPROVAL_NEEDED_WARNING" description="FLEXI_INFORM_APPROVAL_NEEDED_WARNING_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
 			</field>
-			<field name="approval_warning_aftersubmit_fe" type="fcradio" default="1" label="FLEXI_AFTERSUBMIT_APPROVAL_NEEDED_WARNING" description="FLEXI_AFTERSUBMIT_APPROVAL_NEEDED_WARNING_DESC" class="btn-group">
+			<field name="approval_warning_aftersubmit_fe" type="fcradio" default="1" label="FLEXI_AFTERSUBMIT_APPROVAL_NEEDED_WARNING" description="FLEXI_AFTERSUBMIT_APPROVAL_NEEDED_WARNING_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
 			</field>
@@ -1235,7 +1235,7 @@
 			<field name="notauthurl" type="menuitem" default="" disable="separator" state="1" published="1" label="FLEXI_CANNOTAUTHOR_URL" description="FLEXI_CANNOTAUTHOR_URL_DESC" />
 
 			<field name="" type="separator" default="FLEXI_SHOW_CAPTCHA_CRITERIA" label="" level="level2" />
-			<field name="use_captcha" type="multilist" subtype="radio" default="1" toggle_related="0" label="FLEXI_USE_CAPTCHA" description="FLEXI_USE_CAPTCHA_DESC" class="btn-group">
+			<field name="use_captcha" type="multilist" subtype="radio" default="1" toggle_related="0" label="FLEXI_USE_CAPTCHA" description="FLEXI_USE_CAPTCHA_DESC" class="btn-group btn-group-yesno">
 				<option value="0" show_list="" hide_list="disp_captcha">FLEXI_DISABLE</option>
 				<option value="1" show_list="disp_captcha" hide_list="">FLEXI_GUESTS_RECOMMENEDED</option>
 				<option value="2" show_list="disp_captcha" hide_list="">FLEXI_ANY_USER</option>
@@ -1252,23 +1252,27 @@
 			<field name="" type="separator" default="FLEXI_BASIC_EDITING" icon_class="icon-pencil" level="tab_open" box_type="1" remove_boxes="2" />
 
 			<field name="" type="separator" default="FLEXI_NEW_EXISTING_ITEMS" label="" level="level2" />
-			<field name="usetitle_fe" type="fcradio" default="1" label="FLEXI_USE_TITLE_EDIT_FIELD" description="FLEXI_USE_TITLE_EDIT_FIELD_DESC" class="btn-group group-fcmethod fcoffactive">
+			<field name="usetitle_fe" type="fcradio" default="1" label="FLEXI_USE_TITLE_EDIT_FIELD" description="FLEXI_USE_TITLE_EDIT_FIELD_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_HIDE_IF_AUTO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="usealias_fe" type="fcradio" default="1" label="FLEXI_MENU_USE_ALIAS" description="FLEXI_MENU_USE_ALIAS_DESC" class="btn-group">
+			<field name="usealias_fe" type="fcradio" default="1" label="FLEXI_MENU_USE_ALIAS" description="FLEXI_MENU_USE_ALIAS_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="usetype_fe" type="fcradio" default="1" label="FLEXI_MENU_USE_TYPE" description="FLEXI_MENU_USE_TYPE_DESC" class="btn-group">
+			<field name="usetype_fe" type="fcradio" default="1" label="FLEXI_MENU_USE_TYPE" description="FLEXI_MENU_USE_TYPE_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="useaccess_fe" type="fcradio" default="1" label="FLEXI_MENU_USE_ACCESS" description="FLEXI_MENU_USE_ACCESS_DESC" class="btn-group">
+			<field name="usestate_fe" type="fcradio" default="1" label="FLEXI_MENU_USE_STATE" description="FLEXI_MENU_USE_STATE_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="usetags_fe" type="fcradio" default="1" label="FLEXI_MENU_USE_TAGS" description="FLEXI_MENU_USE_TAGS_DESC" class="btn-group">
+			<field name="useaccess_fe" type="fcradio" default="1" label="FLEXI_MENU_USE_ACCESS" description="FLEXI_MENU_USE_ACCESS_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="usetags_fe" type="fcradio" default="1" label="FLEXI_MENU_USE_TAGS" description="FLEXI_MENU_USE_TAGS_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 				<option value="2">FLEXI_MENU_ONLY_DISPLAY</option>
@@ -1283,23 +1287,23 @@
 
 			<field name="" type="separator" default="FLEXI_CATEGORIES" label="" level="level3" />
 			<field name="" type="separator" default="FLEXI_MENU_ABOUT_HIDE_SEC_FEAT_CATS_INFO" class="alert alert-warning fcpadded" level="level4" />
-			<field name="usemaincat_fe" type="fcradio" default="1" label="FLEXI_MENU_USE_MAINCAT" description="FLEXI_MENU_USE_MAINCAT_DESC" class="btn-group">
+			<field name="usemaincat_fe" type="fcradio" default="1" label="FLEXI_MENU_USE_MAINCAT" description="FLEXI_MENU_USE_MAINCAT_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="show_seccats_fe" type="fcradio" default="2" label="FLEXI_SECONDARY_CATEGORIES" description="" class="btn-group group-fcmethod fcoffactive">
+			<field name="show_seccats_fe" type="fcradio" default="2" label="FLEXI_SECONDARY_CATEGORIES" description="" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_HIDE_IF_NOEDIT_PERMS</option>
 				<option value="2">FLEXI_SHOW</option>
 			</field>
-			<field name="show_featcats_fe" type="fcradio" default="2" label="FLEXI_FEATURED_CATEGORIES" description="" class="btn-group group-fcmethod fcoffactive">
+			<field name="show_featcats_fe" type="fcradio" default="2" label="FLEXI_FEATURED_CATEGORIES" description="" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_HIDE_IF_NOEDIT_PERMS</option>
 				<option value="2">FLEXI_SHOW</option>
 			</field>
 
 			<field name="" type="separator" default="FLEXI_LANGUAGE" label="" level="level3" />
-			<field name="uselang_fe" type="fcradio" default="1" label="FLEXI_MENU_USE_LANGUAGE" description="FLEXI_MENU_USE_LANGUAGE_DESC" class="btn-group">
+			<field name="uselang_fe" type="fcradio" default="1" label="FLEXI_MENU_USE_LANGUAGE" description="FLEXI_MENU_USE_LANGUAGE_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 				<option value="3">FLEXI_YES_WITHOUT_ASSOCS</option>
@@ -1316,11 +1320,11 @@
 				<option value="2">FLEXI_LANG_AS_DROP_DOWN</option>
 				<option value="3">FLEXI_LANG_AS_RADIO</option>
 			</field>
-			<field name="langdisplay_flags_fe" type="fcradio" default="1" label="FLEXI_MENU_LANG_SHOW_FLAGS_RADIO" description="FLEXI_MENU_LANG_SHOW_FLAGS_RADIO_DESC" class="btn-group">
+			<field name="langdisplay_flags_fe" type="fcradio" default="1" label="FLEXI_MENU_LANG_SHOW_FLAGS_RADIO" description="FLEXI_MENU_LANG_SHOW_FLAGS_RADIO_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="langdisplay_texts_fe" type="fcradio" default="1" label="FLEXI_MENU_LANG_SHOW_TEXT_RADIO" description="FLEXI_MENU_LANG_SHOW_TEXT_RADIO_DESC" class="btn-group">
+			<field name="langdisplay_texts_fe" type="fcradio" default="1" label="FLEXI_MENU_LANG_SHOW_TEXT_RADIO" description="FLEXI_MENU_LANG_SHOW_TEXT_RADIO_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_LANG_NO_TEXT</option>
 				<option value="1">FLEXI_LANG_CODE</option>
 				<option value="2">FLEXI_LANG_TITLE</option>
@@ -1335,49 +1339,49 @@
 				label="FLEXI_MENU_ALLOW_LANG_MODS" description="FLEXI_MENU_ALLOW_LANG_MODS_DESC"/>
 
 			<field name="" type="separator" default="FLEXI_EDIT_NOTIFICATIONS_PLUGIN_CONF" label="" level="level3" class="alert alert-warning fcppaded" />
-			<field name="allow_owner_notify_fe" type="fcradio" default="0" label="FLEXI_ALLOW_OWNER_NOTIFY" description="FLEXI_ALLOW_OWNER_NOTIFY_DESC" class="btn-group">
+			<field name="allow_owner_notify_fe" type="fcradio" default="0" label="FLEXI_ALLOW_OWNER_NOTIFY" description="FLEXI_ALLOW_OWNER_NOTIFY_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES_ONCE_PER_SESSION</option>
 			</field>
-			<field name="allow_subscribers_notify_fe" type="fcradio" default="0" label="FLEXI_ALLOW_SUBSCIRBERS_NOTIFY" description="FLEXI_ALLOW_SUBSCIRBERS_NOTIFY_DESC" class="btn-group">
+			<field name="allow_subscribers_notify_fe" type="fcradio" default="0" label="FLEXI_ALLOW_SUBSCIRBERS_NOTIFY" description="FLEXI_ALLOW_SUBSCIRBERS_NOTIFY_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES_ONCE_PER_SESSION</option>
 			</field>
 
 			<field name="" type="separator" default="FLEXI_ADVANCED_EDITING" icon_class="icon-pencil" level="tab_open" box_type="1" remove_boxes="2" />
 
-			<field name="usepublicationdetails_fe" type="fcradio" default="1" label="FLEXI_MENU_USE_PUBL_DETAILS" description="FLEXI_MENU_USE_PUBL_DETAILS_DESC" class="btn-group">
+			<field name="usepublicationdetails_fe" type="fcradio" default="1" label="FLEXI_MENU_USE_PUBL_DETAILS" description="FLEXI_MENU_USE_PUBL_DETAILS_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_MENU_YES_BASIC_RECOMMENDED</option>
 				<option value="2">FLEXI_MENU_YES_ALL_STAR</option>
 			</field>
 
-			<field name="usemetadata_fe" type="fcradio" default="1" label="FLEXI_MENU_USE_METADATA" description="FLEXI_MENU_USE_METADATA_DESC" class="btn-group">
+			<field name="usemetadata_fe" type="fcradio" default="1" label="FLEXI_MENU_USE_METADATA" description="FLEXI_MENU_USE_METADATA_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_MENU_YES_BASIC_RECOMMENDED</option>
 				<option value="2">FLEXI_MENU_YES_ALL_STAR</option>
 			</field>
-			<field name="useseoconf_fe" type="fcradio" default="0" label="FLEXI_MENU_USE_SEO_CONF" description="FLEXI_MENU_USE_SEO_CONF_DESC" class="btn-group group-fcmethod">
+			<field name="useseoconf_fe" type="fcradio" default="0" label="FLEXI_MENU_USE_SEO_CONF" description="FLEXI_MENU_USE_SEO_CONF_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO_RECOMMENDED</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
 
-			<field name="usedisplaydetails_fe" type="fcradio" default="0" label="FLEXI_MENU_USE_DISPLAY_DETAILS" description="FLEXI_MENU_USE_DISPLAY_DETAILS_DESC" class="btn-group group-fcmethod">
+			<field name="usedisplaydetails_fe" type="fcradio" default="0" label="FLEXI_MENU_USE_DISPLAY_DETAILS" description="FLEXI_MENU_USE_DISPLAY_DETAILS_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO_RECOMMENDED</option>
 				<option value="1">FLEXI_PARAMETERS_ITEM_BASIC</option>
 				<option value="2">FLEXI_PARAMETERS_ITEM_ADVANCED</option>
 			</field>
-			<field name="selecttheme_fe" type="fcradio" default="0" label="FLEXI_MENU_TEMPLATE_SELECTION" description="FLEXI_MENU_TEMPLATE_SELECTION_DESC" class="btn-group group-fcmethod">
+			<field name="selecttheme_fe" type="fcradio" default="0" label="FLEXI_MENU_TEMPLATE_SELECTION" description="FLEXI_MENU_TEMPLATE_SELECTION_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO_RECOMMENDED</option>
 				<option value="1">FLEXI_MENU_YES_SELECT_TEMPLATE</option>
 				<option value="2">FLEXI_MENU_YES_SELECT_CONFIGURE_TEMPLATE</option>
 			</field>
-			<field name="permsplacement_fe" type="fcradio" default="2" label="FLEXI_MENU_USE_PERMS" description="FLEXI_MENU_USE_PERMS_DESC" class="btn-group group-fcmethod">
+			<field name="permsplacement_fe" type="fcradio" default="2" label="FLEXI_MENU_USE_PERMS" description="FLEXI_MENU_USE_PERMS_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_HIDE_ALWAYS_EVEN_IF_EDITABLE</option>
 				<option value="1">FLEXI_INLINE</option>
 				<option value="2">FLEXI_SLIDER</option>
 			</field>
-			<field name="versionsplacement_fe" type="fcradio" default="1" label="FLEXI_MENU_USE_VERSIONS" description="FLEXI_MENU_USE_VERSIONS_DESC" class="btn-group group-fcmethod">
+			<field name="versionsplacement_fe" type="fcradio" default="1" label="FLEXI_MENU_USE_VERSIONS" description="FLEXI_MENU_USE_VERSIONS_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_HIDE_ALWAYS_EVEN_IF_EDITABLE</option>
 				<option value="1">FLEXI_POPUP</option>
 				<option value="2">FLEXI_INLINE</option>
@@ -1431,11 +1435,11 @@
 			</field>
 
 			<field name="" label="" type="separator" default="FLEXI_APPROVAL_NEEDED_WARNINGS" level="level2" />
-			<field name="approval_warning_inform_be" type="fcradio" default="1" label="FLEXI_INFORM_APPROVAL_NEEDED_WARNING" description="FLEXI_INFORM_APPROVAL_NEEDED_WARNING_DESC" class="btn-group">
+			<field name="approval_warning_inform_be" type="fcradio" default="1" label="FLEXI_INFORM_APPROVAL_NEEDED_WARNING" description="FLEXI_INFORM_APPROVAL_NEEDED_WARNING_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
 			</field>
-			<field name="approval_warning_aftersubmit_be" type="fcradio" default="1" label="FLEXI_AFTERSUBMIT_APPROVAL_NEEDED_WARNING" description="FLEXI_AFTERSUBMIT_APPROVAL_NEEDED_WARNING_DESC" class="btn-group">
+			<field name="approval_warning_aftersubmit_be" type="fcradio" default="1" label="FLEXI_AFTERSUBMIT_APPROVAL_NEEDED_WARNING" description="FLEXI_AFTERSUBMIT_APPROVAL_NEEDED_WARNING_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
 			</field>
@@ -1459,23 +1463,27 @@
 			<field name="" type="separator" default="FLEXI_BASIC_EDITING" icon_class="icon-pencil" level="tab_open" box_type="1" remove_boxes="2" />
 
 			<field name="" type="separator" default="FLEXI_NEW_EXISTING_ITEMS" label="" level="level2" />
-			<field name="usetitle_be" type="fcradio" default="1" label="FLEXI_USE_TITLE_EDIT_FIELD" description="FLEXI_USE_TITLE_EDIT_FIELD_DESC" class="btn-group group-fcmethod fcoffactive">
+			<field name="usetitle_be" type="fcradio" default="1" label="FLEXI_USE_TITLE_EDIT_FIELD" description="FLEXI_USE_TITLE_EDIT_FIELD_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_HIDE_IF_AUTO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="usealias_be" type="fcradio" default="1" label="FLEXI_MENU_USE_ALIAS" description="FLEXI_MENU_USE_ALIAS_DESC" class="btn-group">
+			<field name="usealias_be" type="fcradio" default="1" label="FLEXI_MENU_USE_ALIAS" description="FLEXI_MENU_USE_ALIAS_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="usetype_be" type="fcradio" default="1" label="FLEXI_MENU_USE_TYPE" description="FLEXI_MENU_USE_TYPE_DESC" class="btn-group">
+			<field name="usetype_be" type="fcradio" default="1" label="FLEXI_MENU_USE_TYPE" description="FLEXI_MENU_USE_TYPE_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="useaccess_be" type="fcradio" default="1" label="FLEXI_MENU_USE_ACCESS" description="FLEXI_MENU_USE_ACCESS_DESC" class="btn-group">
+			<field name="usestate_be" type="fcradio" default="1" label="FLEXI_MENU_USE_STATE" description="FLEXI_MENU_USE_STATE_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="usetags_be" type="fcradio" default="1" label="FLEXI_MENU_USE_TAGS" description="FLEXI_MENU_USE_TAGS_DESC" class="btn-group">
+			<field name="useaccess_be" type="fcradio" default="1" label="FLEXI_MENU_USE_ACCESS" description="FLEXI_MENU_USE_ACCESS_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="usetags_be" type="fcradio" default="1" label="FLEXI_MENU_USE_TAGS" description="FLEXI_MENU_USE_TAGS_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 				<option value="2">FLEXI_MENU_ONLY_DISPLAY</option>
@@ -1490,23 +1498,23 @@
 
 			<field name="" type="separator" default="FLEXI_CATEGORIES" label="" level="level3" />
 			<field name="" type="separator" default="FLEXI_MENU_ABOUT_HIDE_SEC_FEAT_CATS_INFO" class="alert alert-warning fcpadded" level="level4" />
-			<field name="usemaincat_be" type="fcradio" default="1" label="FLEXI_MENU_USE_MAINCAT" description="FLEXI_MENU_USE_MAINCAT_DESC" class="btn-group">
+			<field name="usemaincat_be" type="fcradio" default="1" label="FLEXI_MENU_USE_MAINCAT" description="FLEXI_MENU_USE_MAINCAT_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="show_seccats_be" type="fcradio" default="2" label="FLEXI_SECONDARY_CATEGORIES" description="" class="btn-group group-fcmethod fcoffactive">
+			<field name="show_seccats_be" type="fcradio" default="2" label="FLEXI_SECONDARY_CATEGORIES" description="" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_HIDE_IF_NOEDIT_PERMS</option>
 				<option value="2">FLEXI_SHOW</option>
 			</field>
-			<field name="show_featcats_be" type="fcradio" default="2" label="FLEXI_FEATURED_CATEGORIES" description="" class="btn-group group-fcmethod fcoffactive">
+			<field name="show_featcats_be" type="fcradio" default="2" label="FLEXI_FEATURED_CATEGORIES" description="" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_HIDE_IF_NOEDIT_PERMS</option>
 				<option value="2">FLEXI_SHOW</option>
 			</field>
 
 			<field name="" type="separator" default="FLEXI_LANGUAGE" label="" level="level3" />
-			<field name="uselang_be" type="fcradio" default="1" label="FLEXI_MENU_USE_LANGUAGE" description="FLEXI_MENU_USE_LANGUAGE_DESC" class="btn-group">
+			<field name="uselang_be" type="fcradio" default="1" label="FLEXI_MENU_USE_LANGUAGE" description="FLEXI_MENU_USE_LANGUAGE_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 				<option value="3">FLEXI_YES_WITHOUT_ASSOCS</option>
@@ -1523,11 +1531,11 @@
 				<option value="2">FLEXI_LANG_AS_DROP_DOWN</option>
 				<option value="3">FLEXI_LANG_AS_RADIO</option>
 			</field>
-			<field name="langdisplay_flags_be" type="fcradio" default="1" label="FLEXI_MENU_LANG_SHOW_FLAGS_RADIO" description="FLEXI_MENU_LANG_SHOW_FLAGS_RADIO_DESC" class="btn-group">
+			<field name="langdisplay_flags_be" type="fcradio" default="1" label="FLEXI_MENU_LANG_SHOW_FLAGS_RADIO" description="FLEXI_MENU_LANG_SHOW_FLAGS_RADIO_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="langdisplay_texts_be" type="fcradio" default="1" label="FLEXI_MENU_LANG_SHOW_TEXT_RADIO" description="FLEXI_MENU_LANG_SHOW_TEXT_RADIO_DESC" class="btn-group">
+			<field name="langdisplay_texts_be" type="fcradio" default="1" label="FLEXI_MENU_LANG_SHOW_TEXT_RADIO" description="FLEXI_MENU_LANG_SHOW_TEXT_RADIO_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_LANG_NO_TEXT</option>
 				<option value="1">FLEXI_LANG_CODE</option>
 				<option value="2">FLEXI_LANG_TITLE</option>
@@ -1542,49 +1550,49 @@
 				label="FLEXI_MENU_ALLOW_LANG_MODS" description="FLEXI_MENU_ALLOW_LANG_MODS_DESC"/>
 
 			<field name="" type="separator" default="FLEXI_EDIT_NOTIFICATIONS_PLUGIN_CONF" label="" level="level3" class="alert alert-warning fcppaded" />
-			<field name="allow_owner_notify_be" type="fcradio" default="1" label="FLEXI_ALLOW_OWNER_NOTIFY" description="FLEXI_ALLOW_OWNER_NOTIFY_DESC" class="btn-group">
+			<field name="allow_owner_notify_be" type="fcradio" default="1" label="FLEXI_ALLOW_OWNER_NOTIFY" description="FLEXI_ALLOW_OWNER_NOTIFY_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES_ONCE_PER_SESSION</option>
 			</field>
-			<field name="allow_subscribers_notify_be" type="fcradio" default="1" label="FLEXI_ALLOW_SUBSCIRBERS_NOTIFY" description="FLEXI_ALLOW_SUBSCIRBERS_NOTIFY_DESC" class="btn-group">
+			<field name="allow_subscribers_notify_be" type="fcradio" default="1" label="FLEXI_ALLOW_SUBSCIRBERS_NOTIFY" description="FLEXI_ALLOW_SUBSCIRBERS_NOTIFY_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES_ONCE_PER_SESSION</option>
 			</field>
 
 			<field name="" type="separator" default="FLEXI_ADVANCED_EDITING" icon_class="icon-pencil" level="tab_open" box_type="1" remove_boxes="2" />
 
-			<field name="usepublicationdetails_be" type="fcradio" default="2" label="FLEXI_MENU_USE_PUBL_DETAILS" description="FLEXI_MENU_USE_PUBL_DETAILS_DESC" class="btn-group">
+			<field name="usepublicationdetails_be" type="fcradio" default="2" label="FLEXI_MENU_USE_PUBL_DETAILS" description="FLEXI_MENU_USE_PUBL_DETAILS_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_MENU_YES_BASIC_RECOMMENDED</option>
 				<option value="2">FLEXI_MENU_YES_ALL_STAR</option>
 			</field>
 
-			<field name="usemetadata_be" type="fcradio" default="2" label="FLEXI_MENU_USE_METADATA" description="FLEXI_MENU_USE_METADATA_DESC" class="btn-group">
+			<field name="usemetadata_be" type="fcradio" default="2" label="FLEXI_MENU_USE_METADATA" description="FLEXI_MENU_USE_METADATA_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_MENU_YES_BASIC_RECOMMENDED</option>
 				<option value="2">FLEXI_MENU_YES_ALL_STAR</option>
 			</field>
-			<field name="useseoconf_be" type="fcradio" default="1" label="FLEXI_MENU_USE_SEO_CONF" description="FLEXI_MENU_USE_SEO_CONF_DESC" class="btn-group group-fcmethod">
+			<field name="useseoconf_be" type="fcradio" default="1" label="FLEXI_MENU_USE_SEO_CONF" description="FLEXI_MENU_USE_SEO_CONF_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO_RECOMMENDED</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
 
-			<field name="usedisplaydetails_be" type="fcradio" default="2" label="FLEXI_MENU_USE_DISPLAY_DETAILS" description="FLEXI_MENU_USE_DISPLAY_DETAILS_DESC" class="btn-group group-fcmethod">
+			<field name="usedisplaydetails_be" type="fcradio" default="2" label="FLEXI_MENU_USE_DISPLAY_DETAILS" description="FLEXI_MENU_USE_DISPLAY_DETAILS_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO_RECOMMENDED</option>
 				<option value="1">FLEXI_PARAMETERS_ITEM_BASIC</option>
 				<option value="2">FLEXI_PARAMETERS_ITEM_ADVANCED</option>
 			</field>
-			<field name="selecttheme_be" type="fcradio" default="2" label="FLEXI_MENU_TEMPLATE_SELECTION" description="FLEXI_MENU_TEMPLATE_SELECTION_DESC" class="btn-group group-fcmethod">
+			<field name="selecttheme_be" type="fcradio" default="2" label="FLEXI_MENU_TEMPLATE_SELECTION" description="FLEXI_MENU_TEMPLATE_SELECTION_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO_RECOMMENDED</option>
 				<option value="1">FLEXI_MENU_YES_SELECT_TEMPLATE</option>
 				<option value="2">FLEXI_MENU_YES_SELECT_CONFIGURE_TEMPLATE</option>
 			</field>
-			<field name="permsplacement_be" type="fcradio" default="2" label="FLEXI_MENU_USE_PERMS" description="FLEXI_MENU_USE_PERMS_DESC" class="btn-group group-fcmethod">
+			<field name="permsplacement_be" type="fcradio" default="2" label="FLEXI_MENU_USE_PERMS" description="FLEXI_MENU_USE_PERMS_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_HIDE_ALWAYS_EVEN_IF_EDITABLE</option>
 				<option value="1">FLEXI_INLINE</option>
 				<option value="2">FLEXI_SLIDER</option>
 			</field>
-			<field name="versionsplacement_be" type="fcradio" default="1" label="FLEXI_MENU_USE_VERSIONS" description="FLEXI_MENU_USE_VERSIONS_DESC" class="btn-group group-fcmethod">
+			<field name="versionsplacement_be" type="fcradio" default="1" label="FLEXI_MENU_USE_VERSIONS" description="FLEXI_MENU_USE_VERSIONS_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_HIDE_ALWAYS_EVEN_IF_EDITABLE</option>
 				<option value="1">FLEXI_POPUP</option>
 				<option value="2">FLEXI_INLINE</option>

@@ -36,6 +36,7 @@ $usetitle    = (int) $this->params->get('usetitle' . $CFGsfx, 1);
 $usealias    = (int) $this->params->get('usealias' . $CFGsfx, 1);
 $uselang     = (int) $this->params->get('uselang' . $CFGsfx, 1);
 $usetype     = (int) $this->params->get('usetype' . $CFGsfx, ($isSite ? 0 : 1));
+$usestate    = (int) $this->params->get('usestate' . $CFGsfx, 1);
 $useaccess   = (int) $this->params->get('useaccess' . $CFGsfx, 1);
 $usemaincat  = (int) $this->params->get('usemaincat' . $CFGsfx, 1);
 

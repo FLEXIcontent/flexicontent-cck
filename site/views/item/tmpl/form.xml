@@ -110,12 +110,17 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="usetype_fe" type="fcradio" default="" label="FLEXI_MENU_USE_TYPE" description="FLEXI_MENU_USE_TYPE_DESC" class="btn-group">
+			<field name="usetype_fe" type="fcradio" default="" label="FLEXI_MENU_USE_TYPE" description="FLEXI_MENU_USE_TYPE_DESC" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="useaccess_fe" type="fcradio" default="" label="FLEXI_MENU_USE_ACCESS" description="FLEXI_MENU_USE_ACCESS_DESC" class="btn-group">
+			<field name="usestate_fe" type="fcradio" default="" label="FLEXI_MENU_USE_STATE" description="FLEXI_MENU_USE_STATE_DESC" class="btn-group btn-group-yesno">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="useaccess_fe" type="fcradio" default="" label="FLEXI_MENU_USE_ACCESS" description="FLEXI_MENU_USE_ACCESS_DESC" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -135,7 +140,7 @@
 
 			<field name="" type="separator" default="FLEXI_CATEGORIES" label="" level="level3" />
 			<field name="" type="separator" default="FLEXI_MENU_ABOUT_HIDE_SEC_FEAT_CATS_INFO" class="alert alert-warning fcpadded" level="level4" />
-			<field name="usemaincat_fe" type="fcradio" default="" label="FLEXI_MENU_USE_MAINCAT" description="FLEXI_MENU_USE_MAINCAT_DESC" class="btn-group">
+			<field name="usemaincat_fe" type="fcradio" default="" label="FLEXI_MENU_USE_MAINCAT" description="FLEXI_MENU_USE_MAINCAT_DESC" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>

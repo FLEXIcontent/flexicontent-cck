@@ -586,7 +586,7 @@ body .nowrap_hidden {
 }
 .flexicontent .field-media-wrapper .field-media-input {
 	width: unset;
-	min-width: 80%;
+	min-width: 60%;
 	max-width: unset;
 }
 .flexicontent iframe.seamless {
@@ -3038,7 +3038,7 @@ form div.container_fcfield > select {
 #flexicontent div fieldset.panelform textarea,
 div fieldset td :not(.input-prepend):not(.input-append) > input[type="text"]:not(.minicolors):not(.input-small):not(.input-xsmall),
 div fieldset td textarea {
-	min-width: 80%;
+	min-width: 86%;
 }
 fieldset.panelform ul.adminformlist input,
 fieldset.panelform ul.adminformlist button,

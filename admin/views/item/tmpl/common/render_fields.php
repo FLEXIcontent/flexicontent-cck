@@ -55,22 +55,25 @@ if ( $this->params->get('use_jimages' . $CFGsfx, $show_jui) || $this->params->ge
 	foreach ($fields_grps_compatibility as $name => $fields_grp_name) :
 
 		ob_start(); ?>
-		<table class="fc-form-tbl fcinner fcfullwidth">
 		<?php foreach ($this->form->getGroup($fields_grp_name) as $field) : ?>
+
 			<?php if ($field->hidden): ?>
-				<tr style="display: none;"><td><?php echo $field->input; ?></td></tr>
+				<div style="display: none;"><?php echo $field->input; ?></div>
+
 			<?php elseif (!$field->label): ?>
-			<tr>
-				<td colspan="2"><?php echo $field->input;?></td>
-			</tr>
+				<?php echo $field->input;?>
+
 			<?php else: ?>
-			<tr>
-				<td class="key"><?php echo $field->label; ?></td>
-				<td><?php echo $field->input;?></td>
-			</tr>
+			<div class="control-group">
+				<div class="control-label" id="jform_<?php echo $field->name; ?>-lbl-outer">
+					<?php echo $field->label; ?>
+				</div>
+				<div class="controls">
+					<?php echo $field->input;?>
+				</div>
+
 			<?php endif;
 		endforeach; ?>
-		</table>
 		<?php $FC_jfields_html[$fields_grp_name] = ob_get_clean();
 
 	endforeach;
@@ -444,7 +447,7 @@ endif;
 
 if (!$is_autopublished) :  // state and vstate (= approval of new document version) ?>
 
-	<?php ob_start(); ?>
+	<?php if ($usestate) : ob_start();  // state ?>
 	<div class="control-group">
 		<?php
 		$field = isset($this->fields['state']) ? $this->fields['state'] : false;
@@ -488,6 +491,7 @@ if (!$is_autopublished) :  // state and vstate (= approval of new document versi
 	$captured[$fn] = ob_get_clean();
 	$rendered[$fn] = (object) array('label_html' => $label_html, 'input_html' => $input_html, 'html' => $captured[$fn], 'field' => $field);
 	unset($label_html); unset($input_html);
+	endif;
 	?>
 
 
@@ -505,7 +509,7 @@ if (!$is_autopublished) :  // state and vstate (= approval of new document versi
 			$label_attrs = 'class="' . $tip_class . $lbl_class . $lbl_extra_class . '" title="'.flexicontent_html::getToolTip('FLEXI_PUBLIC_DOCUMENT_CHANGES', 'FLEXI_PUBLIC_DOCUMENT_CHANGES_DESC', 1, 1).'"';
 			ob_start();
 			?>
-			
+
 			<div class="control-label" id="jform_vstate-lbl-outer">
 				<label id="jform_vstate-lbl" data-for="jform_vstate" <?php echo $label_attrs; ?> >
 					<?php echo JText::_( 'FLEXI_PUBLIC_DOCUMENT_CHANGES' ); ?>
