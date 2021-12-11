@@ -47,12 +47,6 @@ body  .ui-dialog.fc-fixed-dialog + .ui-widget-overlay {
  * yet unclassified CSS
  **********************/
 
-body > #system-message-container {
-	margin: 6px 0 0 0;
-	.alert {
-		margin: 0;
-	}
-}
 body .fc_loading_box {
 	border: gray;
 	box-shadow: inset 0px 0px 5px #777;
@@ -1514,6 +1508,9 @@ body.contentpane.component,
 body.contentpane.modal {
 	margin: 0px;
 	padding: 0px 8px 0px 8px;
+	> #system-message-container {
+		margin: 8px 0 0 0;
+	}
 }
 body.contentpane.component #mailto-window,
 body.contentpane.component #flexicontent,

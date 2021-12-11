@@ -19,107 +19,7 @@ $captured = array();  // Support legacy forms, contains a single HTML string
 $rendered = array();  // An object with: field (object), label_html, input_html, html (container with label_html + input_html)
 
 
-$submit_msg = $approval_msg = '';
-
-
-/**
- * A custom message about submitting new Content via configuration parameter per item type
- */
-if ($isnew && $submit_message)
-{
-	$submit_msg = sprintf( $alert_box, 'id="fc_submit_msg"', 'note', 'fc-nobgimage', JText::_($submit_message) );
-}
-
-
-/**
- * Autopublishing new item regardless of publish privilege, use a menu item specific
- * message if this is set, or notify user of autopublishing with a default message
- */
-if ($is_autopublished)
-{
-	// *** THIS option only exists in the frontend submit conf
-	// *** THIS IS CURRENTLY used for FRONTEND only (is-site check is done in controller and model)
-	// *** TODO for backend ?
-	$approval_msg = $this->params->get('autopublished_message') ? $this->params->get('autopublished_message') :  JText::_( 'FLEXI_CONTENT_WILL_BE_AUTOPUBLISHED' . ($isSite ? '' : '_BE') ) ;
-	$approval_msg = str_replace('_PUBLISH_UP_DAYS_INTERVAL_', $this->params->get('autopublished_up_interval') / (24*60), $approval_msg);
-	$approval_msg = str_replace('_PUBLISH_DOWN_DAYS_INTERVAL_', $this->params->get('autopublished_up_interval') / (24*60), $approval_msg);
-	$approval_msg = sprintf( $alert_box, 'id="fc_approval_msg"', 'info', 'fc-nobgimage', $approval_msg );
-}
-
-/**
- * Current user does not have general publish privilege, aka new/existing items will surely go through approval/reviewal process
- */
-elseif ($approval_warning_inform)
-{
-	if (!$this->perms['canpublish'])
-	{
-		if ($isnew)
-		{
-			$approval_msg = JText::_( $this->params->get('document_approval_msg' . $CFGsfx, 'FLEXI_REQUIRES_DOCUMENT_APPROVAL') ) ;
-			$approval_msg = sprintf( $alert_box, 'id="fc_approval_msg"', 'note', 'fc-nobgimage', $approval_msg );
-		}
-		elseif ($use_versioning)
-		{
-			$approval_msg = JText::_( $this->params->get('version_reviewal_msg' . $CFGsfx, 'FLEXI_REQUIRES_VERSION_REVIEWAL') ) ;
-			$approval_msg = sprintf( $alert_box, 'id="fc_approval_msg"', 'note', 'fc-nobgimage', $approval_msg );
-		}
-		else
-		{
-			$approval_msg = JText::_( $this->params->get('changes_applied_immediately_msg' . $CFGsfx, 'FLEXI_CHANGES_APPLIED_IMMEDIATELY') ) ;
-			$approval_msg = sprintf( $alert_box, 'id="fc_approval_msg"', 'info', 'fc-nobgimage', $approval_msg );
-		}
-	}
-
-	/**
-	 * Have general publish privilege but may not have privilege if item is assigned to specific category or is of a specific type
-	 * !!! Add this only to FRONTEND (as it maybe nuisance in backend)
-	 */
-	elseif ($isSite)
-	{
-		if ($isnew)
-		{
-			$approval_msg = JText::_( $this->params->get('mr_document_approval_msg' . $CFGsfx, 'FLEXI_MIGHT_REQUIRE_DOCUMENT_APPROVAL') ) ;
-			$approval_msg = sprintf( $alert_box, 'id="fc_approval_msg"', 'note', 'fc-nobgimage', $approval_msg );
-		}
-		elseif ($use_versioning)
-		{
-			$approval_msg = JText::_( $this->params->get('version_reviewal_msg' . $CFGsfx, 'FLEXI_MIGHT_REQUIRE_VERSION_REVIEWAL') ) ;
-			$approval_msg = sprintf( $alert_box, 'id="fc_approval_msg"', 'note', 'fc-nobgimage', $approval_msg );
-		}
-		else
-		{
-			$approval_msg = JText::_( $this->params->get('changes_applied_immediately_msg' . $CFGsfx, 'FLEXI_CHANGES_APPLIED_IMMEDIATELY') ) ;
-			$approval_msg = sprintf( $alert_box, 'id="fc_approval_msg"', 'info', 'fc-nobgimage', $approval_msg );
-		}
-	}
-}
-
-
-// Check if it is possible to hide the category selector
-if ($usemaincat === 0 && empty($this->menuCats->cancatid) && !$this->row->id && !$this->params->get('catid_default'))
-{
-	$usemaincat = 1;
-
-	$this->lists['catid'] = sprintf( $alert_box,
-		' style="margin: 2px 0px 6px 0px; display: inline-block;" ',
-		'error', '', JText::_('FLEXI_CANNOT_HIDE_MAINCAT_MISCONFIG_INFO')
-	) . '<br>' . $this->lists['catid'];
-}
-
-?>
-
-
-<?php if ($submit_msg || $approval_msg) : ?>
-	<div class="fcclear" style="height:12px!important;"></div>
-	<?php echo $submit_msg . $approval_msg; ?>
-<?php else : ?>
-	<div class="fcclear"></div>
-<?php endif; ?>
-
-
-
-
-<?php if ($isSite): ob_start();  // captcha ?>
+if ($isSite): ob_start();  // captcha ?>
 
 	<?php if ( $this->captcha_errmsg ) : ?>
 
@@ -135,7 +35,7 @@ if ($usemaincat === 0 && empty($this->menuCats->cancatid) && !$this->row->id && 
 <?php
 $fn = 'captcha';
 $captured[$fn] = ob_get_clean();
-$rendered[$fn] = (object) array('label_html' => '', 'input_html' => $captured[$fn], 'html' => $captured[$fn], 'field' => $field);
+$rendered[$fn] = (object) array('label_html' => '', 'input_html' => $captured[$fn], 'html' => $captured[$fn], 'field' => false);
 endif;
 
 
@@ -527,7 +427,7 @@ if (!$typeid || $usetype) : ob_start();  // type ?>
 		<div class="controls container_fcfield container_fcfield_id_8 container_fcfield_name_type" id="container_fcfield_8">
 			<?php echo $this->lists['type']; ?>
 			<?php $type_warning = flexicontent_html::getToolTip('FLEXI_NOTES', 'FLEXI_TYPE_CHANGE_WARNING', 1, 1); ?>
-			<span class="<?php echo $tip_class; ?>" style="display:inline-block;" title="<?php echo $type_warning; ?>">
+			<span class="inlineFormTip <?php echo $tip_class; ?>" style="display:inline-block;" title="<?php echo $type_warning; ?>">
 				<?php echo $info_image; ?>
 			</span>
 			<?php echo sprintf( $alert_box, 'id="fc-change-warning" style="display:none; float:left;"', 'warning', '', '<h4>'.JText::_( 'FLEXI_WARNING' ).'</h4> '.JText::_( 'FLEXI_TAKE_CARE_CHANGING_FIELD_TYPE' ) ); ?>
@@ -572,7 +472,7 @@ if (!$is_autopublished) :  // state and vstate (= approval of new document versi
 			<div class="controls container_fcfield container_fcfield_id_10 container_fcfield_name_state" id="container_fcfield_10">
 				<?php echo $this->lists['state']; ?>
 				<?php //echo $this->form->getInput('state'); ?>
-				<span class="<?php echo $tip_class; ?>" style="display:inline-block;" title="<?php echo flexicontent_html::getToolTip('FLEXI_NOTES', 'FLEXI_STATE_CHANGE_WARNING', 1, 1); ?>">
+				<span class="inlineFormTip <?php echo $tip_class; ?>" style="display:inline-block;" title="<?php echo flexicontent_html::getToolTip('FLEXI_NOTES', 'FLEXI_STATE_CHANGE_WARNING', 1, 1); ?>">
 					<?php echo $info_image; ?>
 				</span>
 			</div>
@@ -728,6 +628,7 @@ if ($typeid && $allowdisablingcomments) : ob_start();  // disable_comments ?>
 		<div class="control-label" id="jform_attribs_comments-title-outer">
 			<label id="jform_attribs_comments-title" <?php echo $label_attrs; ?> >
 				<?php echo JText::_( 'FLEXI_ALLOW_COMMENTS' );?>
+				<i class="icon-comment"></i>
 			</label>
 		</div>
 		<?php $label_html = ob_get_clean(); echo $label_html; ob_start(); ?>
@@ -804,7 +705,7 @@ if ($typeid && $allow_owner_notify && $this->row->created_by != $user->id) :  ob
 				$tipOwnerCanEdit      = JText::_('FLEXI_OWNER_CAN_EDIT_THIS_ITEM') . ': &nbsp; - ' . mb_strtoupper(JText::_($this->ownerCanEdit ? 'JYES' : 'JNO')) . ' -';
 				$tipOwnerCanEditState = JText::_('FLEXI_OWNER_CAN_PUBLISH_CHANGES_OF_THIS_ITEM') . ': &nbsp; - ' . mb_strtoupper(JText::_($this->ownerCanEdit ? 'JYES' : 'JNO')) . ' -';
 			?>
-			<span class="<?php echo $tip_class; ?>" style="display:inline-block;"
+			<span class="inlineFormTip <?php echo $tip_class; ?>" style="display:inline-block;"
 			      title="<?php echo flexicontent_html::getToolTip('FLEXI_NOTES', $tipOwnerCanEdit . '<br>' . $tipOwnerCanEditState, 1, 1); ?>">
 				<?php echo $this->ownerCanEditState ? $info_image : $warn_image; ?>
 			</span>
@@ -1665,22 +1566,6 @@ endif;
 
 
 if ($permsplacement && $this->perms['canright'] ) : ob_start(); // perms ?>
-	<?php
-	if ($permsplacement === 2) :
-	$this->document->addScriptDeclaration("
-		jQuery(document).ready(function()
-		{
-			jQuery('fieldset.flexiaccess legend + div#tabacces').hide();
-			jQuery('fieldset.flexiaccess legend').on('click', function(ev)
-			{
-				var panel = jQuery(this).next();
-				panel.is(':visible') ? panel.slideUp(600) : panel.slideDown(600);
-			});
-		});
-	");
-	endif;
-	?>
-
 	<fieldset id="flexiaccess" class="flexiaccess basicfields_set">
 		<legend><?php echo JText::_( 'FLEXI_RIGHTS_MANAGEMENT' ); ?></legend>
 		<div id="tabacces">

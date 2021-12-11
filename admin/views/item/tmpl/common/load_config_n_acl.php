@@ -69,6 +69,10 @@ $tabSetMax = -1;
 $tabCnt = array();
 $tabSetStack = array();
 
+
+/**
+ * Decide if we are showing:  secondary cats, featured cats, featured flag, tags
+ */
 $secondary_displayed =
   ($this->menuCats  && $this->menuCats->cid) ||   // New Content  -with-  Menu Override, check if secondary categories were enabled in menu
   (!$this->menuCats && $this->lists['cid']);      // New Content but  -without-  Menu override ... OR Existing Content, check if secondary are permitted  OR already set
@@ -80,6 +84,20 @@ $usetags        = (int) $this->params->get('usetags' . $CFGsfx, 1);
 $tags_editable  = $this->perms['cantags'] && $usetags === 1;
 $tags_displayed = $typeid &&
 	( ($this->perms['cantags'] && $usetags) || (count($this->usedtagsdata) && $usetags === 2) ) ;
+
+
+/**
+ * Check if it is possible to hide the main category selector
+ */
+if ($usemaincat === 0 && empty($this->menuCats->cancatid) && !$this->row->id && !$this->params->get('catid_default'))
+{
+	$usemaincat = 1;
+
+	$this->lists['catid'] = sprintf( $alert_box,
+		' style="margin: 2px 0px 6px 0px; display: inline-block;" ',
+		'error', '', JText::_('FLEXI_CANNOT_HIDE_MAINCAT_MISCONFIG_INFO')
+	) . '<br>' . $this->lists['catid'];
+}
 
 
 /**
@@ -97,7 +115,7 @@ $noplugin  = '<div class="fc-mssg-inline fc-warning" style="margin:0 2px 6px 2px
  * Create info images
  */
 $info_image = $this->params->get('use_font_icons', 1)
-	? '<i class="icon-info" style="color:darkgray"></i>'
+	? '<i class="icon-info text-info"></i>'
 	: JHtml::image ( 'administrator/components/com_flexicontent/assets/images/information.png', JText::_( 'FLEXI_NOTES' ) );
 $revert_image = $this->params->get('use_font_icons', 1)
 	? '<i class="icon-undo" style="color:darkgray"></i>'
@@ -112,7 +130,7 @@ $hint_image = $this->params->get('use_font_icons', 1)
 	? '<i class="icon-lamp"></i>'
 	: JHtml::image ( 'administrator/components/com_flexicontent/assets/images/lightbulb.png', JText::_( 'FLEXI_NOTES' ), 'style="vertical-align:top;"' );
 $warn_image = $this->params->get('use_font_icons', 1)
-	? '<i class="icon-warning"></i>'
+	? '<i class="icon-warning text-warning"></i>'
 	: JHtml::image ( 'administrator/components/com_flexicontent/assets/images/warning.png', JText::_( 'FLEXI_NOTES' ), 'style="vertical-align:top;"' );
 $conf_image = '<i class="icon-cog"></i>';
 
@@ -423,3 +441,19 @@ $this->document->addScriptDeclaration
 		return false;
 	}
 ");
+
+
+if ($permsplacement && $this->perms['canright'] && $permsplacement === 2)
+{
+	$this->document->addScriptDeclaration("
+		jQuery(document).ready(function()
+		{
+			jQuery('fieldset.flexiaccess legend + div#tabacces').hide();
+			jQuery('fieldset.flexiaccess legend').on('click', function(ev)
+			{
+				var panel = jQuery(this).next();
+				panel.is(':visible') ? panel.slideUp(600) : panel.slideDown(600);
+			});
+		});
+	");
+}

@@ -1809,9 +1809,9 @@ body .fc-nowrap-box .nowrap_box .label,
 .inlineFormTip > [class^="icon-"]:before,
 .inlineFormTip > [class*="icon-"]:before {
 	display: inline-block;
-	line-height: 1.6em;
-	font-size: 1.6em;
-	padding: 0 1em;
+	line-height: 1.2em;
+	font-size: 1.2em;
+	padding: 0 0.5em;
 }
 body .btn-group.fc-group > .btn.btn-small {
 	padding: 4px 4px;
@@ -2110,12 +2110,6 @@ body  .ui-dialog.fc-fixed-dialog + .ui-widget-overlay {
 }
 .ui-dialog.fc-fixed-dialog.fc-no-scroll .ui-resizable-handle {
 	display: none;
-}
-body > #system-message-container {
-	margin: 6px 0 0 0;
-}
-body > #system-message-container .alert {
-	margin: 0;
 }
 body .fc_loading_box {
 	border: gray;
@@ -3350,6 +3344,10 @@ body.contentpane.component,
 body.contentpane.modal {
 	margin: 0px;
 	padding: 0px 8px 0px 8px;
+}
+body.contentpane.component > #system-message-container,
+body.contentpane.modal > #system-message-container {
+	margin: 8px 0 0 0;
 }
 body.contentpane.component #mailto-window,
 body.contentpane.component #flexicontent,
