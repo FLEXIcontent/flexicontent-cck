@@ -567,7 +567,7 @@ endif;
 
 
 
-if ($useaccess) : ob_start(); ob_start();  // access ?>
+if ($useaccess) : ob_start();  // access ?>
 	<div class="control-group">
 		<?php
 		$field = isset($this->fields['core_access']) ? $this->fields['core_access'] : false;
