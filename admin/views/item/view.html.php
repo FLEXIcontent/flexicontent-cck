@@ -926,9 +926,12 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		$this->document   = $document;
 		$this->nullDate   = $nullDate;
 
-		$this->menuCats      = $menuCats;
-		$this->submitConf    = $submitConf;
-		$this->placementConf = $placementConf;
+		$this->menuCats         = $menuCats;
+		$this->submitConf       = $submitConf;
+		$this->placementConf    = $placementConf;
+
+		$this->placeViaFieldMan = $placementConf['tab_fields']['fman'];
+		$this->customPlacements = $placementConf['all_tab_fields'];
 
 		$this->iparams   = $model->getComponentTypeParams();
 		$this->itemlang  = $itemlang;
@@ -2424,7 +2427,6 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		if ( !$isnew || (empty($cid) && empty($maincatid)) || !$override ) return false;
 
 		// Check if overriding multi-category ACL permission for submitting to multiple categories
-		//echo "<pre>"; print_r($perms); echo "</pre>"; exit;
 		if ( !$perms['multicat'] && !$override_mulcatsperms && $postcats==2 ) $postcats = 1;
 
 		// OVERRIDE item categories, using the ones specified specified by the MENU item, instead of categories that user has CREATE (=add) Permission
@@ -2560,56 +2562,73 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 	 */
 	function _createPlacementConf( $item, & $fields, $page_params )
 	{
-		$CFGsfx = JFactory::getApplication()->isClient('site') ? '' : '_be';
+		$app    = JFactory::getApplication();
+		$CFGsfx = $app->isClient('site') ? '' : '_be';
 
-		// 1. Find core placer fields (of type 'coreprops')
+
+		/**
+		 * 1. Find core placer fields (of type 'coreprops')
+		 */
 		$core_placers = array();
 		foreach($fields as $field)
 		{
-			if ($field->field_type=='coreprops')
+			if ($field->field_type=='coreprops' && (int) $field->published === 1)
 			{
 				$core_placers[$field->parameters->get('props_type')] = $field;
 			}
 		}
 
 
-		// 2. Field name arrays:  (a) placeable and  (b) placeable via placer  (c) above tabs fields
-		$via_core_field  = array(
-			'title'=>1, 'document_type'=>1, 'state'=>1, 'categories'=>1, 'tags'=>1, 'text'=>1,
-		);
-		$via_core_field = array_merge($via_core_field, array(
-			'created'=>1, 'created_by'=>1, 'modified'=>1, 'modified_by'=>1,
+		/**
+		 * 2. Field name arrays:  (a) placeable and  (b) placeable via placer  (c) above tabs fields
+		 */
+		$via_core_field  = array_flip(array
+		(
+			'text', 'created', 'created_by', 'modified', 'modified_by',
+			'title', 'hits', 'document_type', 'version', 'state',
+			'voting', 'favourites', 'categories', 'tags',
 		));
 
-		$via_core_prop = array(
-			'alias'=>1, 'disable_comments'=>1, 'notify_subscribers'=>1, 'notify_owner'=>1, 'language'=>1, 'perms'=>1,
-			'metadata'=>1, 'seoconf'=>1, 'display_params'=>1, 'layout_selection'=>1, 'layout_params'=>1,
-		);
-		$via_core_prop = array_merge($via_core_prop, array(
-			'timezone_info'=>1, 'created_by_alias'=>1, 'modified'=>1, 'modified_by'=>1,
-			'publish_up'=>1, 'publish_down'=>1, 'access'=>1,
+		$via_core_prop = array_flip(array
+		(
+			// Single properties
+			'id', 'alias', 'category', 'lang', 'vstate', 'disable_comments',
+			'notify_subscribers', 'notify_owner', 'captcha', 'layout_selection',
+
+			//Publishing
+			'timezone_info', 'created_by_alias', 'publish_up', 'publish_down', 'access',
+
+			// Attibute groups or other composite data
+			'item_screen', 'lang_assocs', 'jimages', 'jurls', 'metadata', 'seoconf', 'display_params', 'layout_params', 'perms', 'versions',
+
+			// Deprecated: 'language',
 		));
 
 		$placeable_fields = array_merge($via_core_field, $via_core_prop);
-		//echo "<pre>"; print_r($placeable_fields); echo "</pre>";
 
 
-		// 3. Decide placement of CORE properties / fields
-		$tab_fields['above'] = $page_params->get('form_tabs_above'. $CFGsfx,    'title, alias, category, lang, type, state, access, disable_comments, notify_subscribers, notify_owner');
-
-		$tab_fields['tab01'] = $page_params->get('form_tab01_fields'. $CFGsfx,  'text');
-		$tab_fields['tab02'] = $page_params->get('form_tab02_fields'. $CFGsfx,  'fields_manager');
-		$tab_fields['tab03'] = $page_params->get('form_tab03_fields'. $CFGsfx,  'categories, tags, language, perms');
-		$tab_fields['tab04'] = $page_params->get('form_tab04_fields'. $CFGsfx,  'timezone_info, created, created_by, created_by_alias, publish_up, publish_down, modified, modified_by');
-		$tab_fields['tab05'] = $page_params->get('form_tab05_fields'. $CFGsfx,  'metadata, seoconf');
-		$tab_fields['tab06'] = $page_params->get('form_tab06_fields'. $CFGsfx,  'display_params');
-		$tab_fields['tab07'] = $page_params->get('form_tab07_fields'. $CFGsfx,  'layout_selection, layout_params');
-		$tab_fields['tab08'] = $page_params->get('form_tab08_fields'. $CFGsfx,  'versions');
-
+		/**
+		 * 3. Decide placement of CORE properties / fields
+		 */
+		// Important: Get fman before other so that foreach will examine it 1st when we will check for duplicate fields
 		$tab_fields['fman']  = $page_params->get('form_tabs_fieldsman'. $CFGsfx,'');
-		$tab_fields['below'] = $page_params->get('form_tabs_below'. $CFGsfx,    '');
 
-		// Fix aliases, also replacing field types with field names
+		$tab_fields['above']  = $page_params->get('form_tabs_above'. $CFGsfx,    'title, alias, category, lang, type, state, access, disable_comments, notify_subscribers, notify_owner');
+		$tab_fields['tab01']  = $page_params->get('form_tab01_fields'. $CFGsfx,  'text');
+		$tab_fields['tab02']  = $page_params->get('form_tab02_fields'. $CFGsfx,  'fields_manager');
+		$tab_fields['tab02a'] = $page_params->get('form_tab02a_fields'. $CFGsfx, 'jimages, jurls');
+		$tab_fields['tab03']  = $page_params->get('form_tab03_fields'. $CFGsfx,  'categories, tags, lang_assocs, perms');
+		$tab_fields['tab04']  = $page_params->get('form_tab04_fields'. $CFGsfx,  'timezone_info, created, created_by, created_by_alias, publish_up, publish_down, modified, modified_by, item_screen');
+		$tab_fields['tab05']  = $page_params->get('form_tab05_fields'. $CFGsfx,  'metadata, seoconf');
+		$tab_fields['tab06']  = $page_params->get('form_tab06_fields'. $CFGsfx,  'display_params');
+		$tab_fields['tab07']  = $page_params->get('form_tab07_fields'. $CFGsfx,  'layout_selection, layout_params');
+		$tab_fields['tab08']  = $page_params->get('form_tab08_fields'. $CFGsfx,  'versions');
+		$tab_fields['below']  = $page_params->get('form_tabs_below'. $CFGsfx,    '');
+
+
+		/**
+		 * Fix aliases, also replacing field types with field names
+		 */
 		foreach($tab_fields as $tab_name => $field_list)
 		{
 			$field_list = str_replace('createdby', 'created_by', $field_list);
@@ -2617,17 +2636,22 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 			$field_list = str_replace('createdby_alias', 'created_by_alias', $field_list);
 			$field_list = str_replace('maintext', 'text', $field_list);
 			$field_list = str_replace('type', 'document_type', $field_list);
-			$field_list = str_replace('language', 'lang_associations', $field_list);  // LEGACY value ...
+			$field_list = str_replace('language', 'lang_assocs', $field_list);  // LEGACY value ...
 			$tab_fields[$tab_name] = $field_list;
 		}
-		//echo "<pre>"; print_r($tab_fields); echo "</pre>";
 
 		// Split field lists
 		$all_tab_fields = array();
 		foreach($tab_fields as $i => $field_list)
 		{
 			// Split field names and flip the created sub-array to make field names be the indexes of the sub-array
-			$tab_fields[$i] = (empty($tab_fields[$i]) || $tab_fields[$i]=='_skip_')  ?  array()  :  array_flip( preg_split("/[\s]*,[\s]*/", $field_list ) );
+			$tab_fields[$i] = is_array($tab_fields[$i])
+				? $tab_fields[$i]
+				: (trim($tab_fields[$i]) === '' || trim($tab_fields[$i]) === '_skip_'
+					? array()
+					: preg_split("/[\s]*,[\s]*/", $field_list )
+				);
+			$tab_fields[$i] = array_flip($tab_fields[$i]);
 
 			// Find all field names of the placed fields, we can use this to find non-placed fields
 			foreach ($tab_fields[$i] as $field_name => $ignore)
@@ -2644,8 +2668,8 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		}
 
 		// get TAB titles and TAB icon classes
-		$_tmp = $page_params->get('form_tab_titles'. $CFGsfx, '1:FLEXI_DESCRIPTION, 2:__TYPE_NAME__, 3:FLEXI_ASSIGNMENTS, 4:FLEXI_PUBLISHING, 5:FLEXI_META_SEO, 6:FLEXI_DISPLAYING, 7:FLEXI_TEMPLATE');
-		$_ico = $page_params->get('form_tab_icons'. $CFGsfx,  '1:icon-file-2, 2:icon-signup, 3:icon-tree-2, 4:icon-calendar, 5:icon-bookmark, 6:icon-eye-open, 7:icon-palette');
+		$_titles = $page_params->get('form_tab_titles'. $CFGsfx, '1:FLEXI_DESCRIPTION, 2:__TYPE_NAME__, 3:FLEXI_ASSIGNMENTS, 4:FLEXI_PUBLISHING, 5:FLEXI_META_SEO, 6:FLEXI_DISPLAYING, 7:FLEXI_TEMPLATE');
+		$_icons  = $page_params->get('form_tab_icons'. $CFGsfx,  '1:icon-file-2, 2:icon-signup, 3:icon-tree-2, 4:icon-calendar, 5:icon-bookmark, 6:icon-eye-open, 7:icon-palette');
 
 		// Create title of the custom fields default TAB (field manager TAB)
 		if ($item->type_id)
@@ -2668,22 +2692,43 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 
 
 		// Split titles of default tabs and language filter the titles
-		$_tmp = preg_split("/[\s]*,[\s]*/", $_tmp);
 		$tab_titles = array();
-		foreach($_tmp as $_data) {
-			list($tab_no, $tab_title) = preg_split("/[\s]*:[\s]*/", $_data);
-			if ($tab_title == '__TYPE_NAME__')
-				$tab_titles['tab0'.$tab_no] = $type_lbl;
-			else
-				$tab_titles['tab0'.$tab_no] = JText::_($tab_title);
+
+		if ($_titles !== '_ignore_')
+		{
+			$_tmp = preg_split("/[\s]*,[\s]*/", $_titles);
+			foreach($_tmp as $_data)
+			{
+				$arr = preg_split("/[\s]*:[\s]*/", $_data);
+				if (count($arr) !== 2)
+				{
+					$app->enqueueMessage('Failed parse TAB titles configuration for: ' . $_titles, 'warning');
+					$tab_titles = array();
+					break;
+				}
+
+				$tab_titles['tab0'.$arr[0]] = $arr[1] === '__TYPE_NAME__' ? $type_lbl : JText::_($arr[1]);
+			}
 		}
 
 		// Split icon classes of default tabs
-		$_ico = preg_split("/[\s]*,[\s]*/", $_ico);
 		$tab_icocss = array();
-		foreach($_ico as $_data) {
-			list($tab_no, $tab_icon_class) = preg_split("/[\s]*:[\s]*/", $_data);
-			$tab_icocss['tab0'.$tab_no] = $tab_icon_class;
+
+		if ($_icons !== '_ignore_')
+		{
+			$_tmp = preg_split("/[\s]*,[\s]*/", $_icons);
+			foreach($_tmp as $_data)
+			{
+				$arr = preg_split("/[\s]*:[\s]*/", $_data);
+				if (count($arr) !== 2)
+				{
+					$app->enqueueMessage('Failed parse TAB icon classes configuration for: ' . $_icons, 'warning');
+					$tab_icocss = array();
+					break;
+				}
+
+				$tab_icocss['tab0'.$arr[0]] = $arr[1];
+			}
 		}
 
 

@@ -1249,6 +1249,19 @@
 				<option value="1">FLEXI_SUBMIT_EDIT</option>
 			</field>
 
+			<field name="item_form_fe_tab_compat" type="separator" default="FLEXI_COMPATIBILITY" icon_class="icon-cog" level="tab_open" box_type="1" remove_boxes="2" />
+
+			<field name="use_jimages_fe" type="radio" default="" label="Intro / Full Images" description="Show intro/full images" class="btn-group btn-group-yesno">
+				<option value="">FLEXI_JOOMLA_DEFAULT</option>
+				<option value="0">FLEXI_DISABLE</option>
+				<option value="1">FLEXI_ENABLE</option>
+			</field>
+			<field name="use_jurls_fe" type="radio" default="" label="Urls" description="Show urls" class="btn-group btn-group-yesno">
+				<option value="">FLEXI_JOOMLA_DEFAULT</option>
+				<option value="0">FLEXI_DISABLE</option>
+				<option value="1">FLEXI_ENABLE</option>
+			</field>
+
 			<field name="" type="separator" default="FLEXI_BASIC_EDITING" icon_class="icon-pencil" level="tab_open" box_type="1" remove_boxes="2" />
 
 			<field name="" type="separator" default="FLEXI_NEW_EXISTING_ITEMS" label="" level="level2" />
@@ -1459,6 +1472,19 @@
 			<field name="use_captcha_be" type="multilist" subtype="radio" default="0" toggle_related="0" label="FLEXI_USE_CAPTCHA" description="FLEXI_USE_CAPTCHA_DESC" class="btn-group">
 				<option value="0" show_list="" hide_list="disp_captcha">FLEXI_DISABLE</option>
 			</field-->
+
+			<field name="item_form_be_tab_compat" type="separator" default="FLEXI_COMPATIBILITY" icon_class="icon-cog" level="tab_open" box_type="1" remove_boxes="2" />
+
+			<field name="use_jimages_be" type="radio" default="" label="Intro / Full Images" description="Show intro/full images" class="btn-group btn-group-yesno">
+				<option value="">FLEXI_JOOMLA_DEFAULT</option>
+				<option value="0">FLEXI_DISABLE</option>
+				<option value="1">FLEXI_ENABLE</option>
+			</field>
+			<field name="use_jurls_be" type="radio" default="" label="Urls" description="Show urls" class="btn-group btn-group-yesno">
+				<option value="">FLEXI_JOOMLA_DEFAULT</option>
+				<option value="0">FLEXI_DISABLE</option>
+				<option value="1">FLEXI_ENABLE</option>
+			</field>
 
 			<field name="" type="separator" default="FLEXI_BASIC_EDITING" icon_class="icon-pencil" level="tab_open" box_type="1" remove_boxes="2" />
 

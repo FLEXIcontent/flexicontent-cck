@@ -210,6 +210,8 @@ class FlexicontentControllerTemplates extends FlexicontentControllerBaseAdmin
 					return;
 				}
 
+				JFactory::getLanguage()->load('plg_flexicontent_fields_coreprops', JPATH_ADMINISTRATOR, 'en-GB', true);
+				JFactory::getLanguage()->load('plg_flexicontent_fields_coreprops', JPATH_ADMINISTRATOR, null, true);
 				$ext_params = JComponentHelper::getParams('com_flexicontent');
 				$query = '';
 				$path = JPATH::clean(JPATH_ADMINISTRATOR . '/components/com_flexicontent/views/item/tmpl');
@@ -223,6 +225,8 @@ class FlexicontentControllerTemplates extends FlexicontentControllerBaseAdmin
 				// Load item form layout
 				if ($ext_type === 'forms')
 				{
+					JFactory::getLanguage()->load('plg_flexicontent_fields_coreprops', JPATH_ADMINISTRATOR, 'en-GB', true);
+					JFactory::getLanguage()->load('plg_flexicontent_fields_coreprops', JPATH_ADMINISTRATOR, null, true);
 					$inh_params = JComponentHelper::getParams('com_flexicontent');
 					$path = JPATH::clean(JPATH_ADMINISTRATOR . '/components/com_flexicontent/views/item/tmpl');
 				}

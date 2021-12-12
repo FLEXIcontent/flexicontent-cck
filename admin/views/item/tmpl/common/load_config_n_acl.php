@@ -137,16 +137,6 @@ $conf_image = '<i class="icon-cog"></i>';
 
 $lbl_extra_class = $isSite ? '' : ' pull-left label-fcinner label-toplevel';
 
-// Placement configuration
-$via_core_field   = $this->placementConf['via_core_field'];
-$via_core_prop    = $this->placementConf['via_core_prop'];
-$placeable_fields = $this->placementConf['placeable_fields'];
-$tab_fields       = $this->placementConf['tab_fields'];
-$tab_titles       = $this->placementConf['tab_titles'];
-$tab_icocss       = $this->placementConf['tab_icocss'];
-$all_tab_fields   = $this->placementConf['all_tab_fields'];
-$coreprop_missing = $this->placementConf['coreprop_missing'];
-
 
 // Add extra css/js for the edit form
 if ($this->params->get('form_extra_css'))    $this->document->addStyleDeclaration($this->params->get('form_extra_css'));

@@ -43,7 +43,7 @@ class plgFlexicontent_fieldsCoreprops extends FCField
 
 		$props_type = $field->parameters->get('props_type');
 
-		$field->html = '';
+		$field->html = '<span class="alert alert-info">' . $props_type . '</span>';
 	}
 
 

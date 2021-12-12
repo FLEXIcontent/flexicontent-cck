@@ -598,12 +598,12 @@
 			<field name="item_form_fe_tab_compat" type="separator" default="FLEXI_COMPATIBILITY" icon_class="icon-cog" level="tab_open" box_type="1" />
 
 			<field name="use_jimages_fe" type="radio" default="" label="Intro / Full Images" description="Show intro/full images" class="btn-group btn-group-yesno">
-				<option value="">FLEXI_JOOMLA_DEFAULT</option>
+				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_DISABLE</option>
 				<option value="1">FLEXI_ENABLE</option>
 			</field>
 			<field name="use_jurls_fe" type="radio" default="" label="Urls" description="Show urls" class="btn-group btn-group-yesno">
-				<option value="">FLEXI_JOOMLA_DEFAULT</option>
+				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_DISABLE</option>
 				<option value="1">FLEXI_ENABLE</option>
 			</field>
@@ -848,12 +848,12 @@
 			<field name="item_form_be_tab_compat" type="separator" default="FLEXI_COMPATIBILITY" icon_class="icon-cog" level="tab_open" box_type="1" />
 
 			<field name="use_jimages_be" type="radio" default="" label="Intro / Full Images" description="Show intro/full images" class="btn-group btn-group-yesno">
-				<option value="">FLEXI_JOOMLA_DEFAULT</option>
+				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_DISABLE</option>
 				<option value="1">FLEXI_ENABLE</option>
 			</field>
 			<field name="use_jurls_be" type="radio" default="" label="Urls" description="Show urls" class="btn-group btn-group-yesno">
-				<option value="">FLEXI_JOOMLA_DEFAULT</option>
+				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_DISABLE</option>
 				<option value="1">FLEXI_ENABLE</option>
 			</field>

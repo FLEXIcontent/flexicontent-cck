@@ -477,6 +477,19 @@
 					jf_field.find('input').removeAttr('disabled').removeAttr('readonly');
 					jf_field.find('label').removeAttr('disabled').css('pointer-events', 'auto').css('opacity', '1');
 					jf_field.find(':input[value="'+fcconfigs[fieldname]+'"]').next().trigger('click').trigger('blur');
+				} else if (jf_field.is('select')) {
+
+					jf_field.removeAttr('disabled').removeAttr('readonly');
+					if (jf_field.prop('multiple')) {
+						jf_field.val('').trigger('change');
+						jQuery.each(fcconfigs[fieldname].split(','), function(i, val){
+							jf_field.find('option[value=\"' + val.trim() + '\"]').attr('selected', 'selected');
+						});
+					} else {
+						jf_field.val(fcconfigs[fieldname]);
+					}
+					jf_field.trigger('change');
+
 				} else {
 					jf_field.removeAttr('disabled').removeAttr('readonly').val(fcconfigs[fieldname]).trigger('click').trigger('blur');
 				}

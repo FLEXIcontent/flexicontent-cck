@@ -55,8 +55,12 @@ class JFormFieldMultiList extends JFormFieldGroupedList
 	{
 		//$attributes = get_object_vars($this->element->attributes());
 		//$attributes = $attributes['@attributes'];
-
-		$values = is_array($this->value) ? $this->value : explode("|", $this->value);
+		
+		$split_via = ($this->element['split_str_value'] ?: '|');
+		$values = is_array($this->value)
+			? $this->value
+			: explode($split_via, $this->value);
+		$values = array_map('trim', $values);
 
 		$fieldname	= $this->name;
 		$element_id = $this->id;

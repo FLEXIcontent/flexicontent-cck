@@ -1,5 +1,14 @@
 <?php
 
+/**
+ * Placement configuration
+ */
+$tab_fields       = $this->placementConf['tab_fields'];
+$tab_titles       = $this->placementConf['tab_titles'];
+$tab_icocss       = $this->placementConf['tab_icocss'];
+$all_tab_fields   = $this->placementConf['all_tab_fields'];
+$coreprop_missing = $this->placementConf['coreprop_missing'];
+
 
 /**
  * Compatibility, if 'vstate' is present but not specified in configuration then append 'vstate' after 'state'
@@ -24,7 +33,7 @@ if (!isset($all_tab_fields['category']) && isset($captured['category']))
 	if (isset($all_tab_fields['categories']))
 	{
 		$captured['categories'] = isset($captured['categories'])
-			? str_replace('<div style="display: none;">_FC_CATEGORY_BOX_</div>', $captured['category'], $captured['categories'])
+			? str_replace('<!--__FC_CATEGORY_BOX__-->', $captured['category'], $captured['categories'])
 			: $captured['category'];
 		unset($captured['category']);
 	}
@@ -33,14 +42,14 @@ if (!isset($all_tab_fields['category']) && isset($captured['category']))
 
 
 /**
- * Compatibility, if 'lang' is present but not specified in configuration then place 'lang' inside 'lang_associations' (*which renamed from legacy name 'language')
+ * Compatibility, if 'lang' is present but not specified in configuration then place 'lang' inside 'lang_assocs' (*which renamed from legacy name 'language')
  */
 if (!isset($all_tab_fields['lang']) && isset($captured['lang']))
 {
-	if (isset($all_tab_fields['lang_associations']))
+	if (isset($all_tab_fields['lang_assocs']))
 	{
-		$captured['lang_associations'] = isset($captured['lang_associations'])
-			? str_replace('<div style="display: none;">_FC_LANGUAGE_BOX_</div>', $captured['lang'], $captured['lang_associations'])
+		$captured['lang_assocs'] = isset($captured['lang_assocs'])
+			? str_replace('<!--__FC_LANGUAGE_BOX__-->', $captured['lang'], $captured['lang_assocs'])
 			: $captured['lang'];
 		unset($captured['lang']);
 	}
@@ -57,14 +66,14 @@ if (!isset($all_tab_fields['lang']) && isset($captured['lang']))
 $displayed_at_tab = array();
 foreach($tab_fields as $tabname => $fieldnames)
 {
-	// echo "$tabname <br/>  %% " . print_r($fieldnames, true) . "<br/>";
+	//echo "$tabname <br/>  %% " . print_r($fieldnames, true) . "<br/>";
 
 	foreach($fieldnames as $fn => $i)
 	{
 		//echo " -- $fn <br/>";
 
 		// Array used to count duplicate placement of fields
-		if (isset($captured[$fn]))
+		if (isset($rendered[$fn]))
 		{
 			$displayed_at_tab[$fn][] = $tabname;
 		}
@@ -87,6 +96,16 @@ foreach($tab_fields as $tabname => $fieldnames)
 		}
 	}
 }
+//echo '<pre>'; print_r($displayed_at_tab); echo '</pre>'; exit;
+
+
+/**
+ * Unset fields placed inside the fields manager
+ */
+foreach ($tab_fields['fman'] as $fn => $i)
+{
+	unset($captured[$fn]);
+}
 
 
 
@@ -94,15 +113,15 @@ foreach($tab_fields as $tabname => $fieldnames)
 /**
  * CONFIGURATION WARNINGS, fields that are displayed twice, and core properties that are missing
  */
-$msg = '';
+$field_n_places = array();
 foreach($displayed_at_tab as $fieldname => $_places)
 {
-	if ( count($_places) > 1 ) $msg .= "<br/><b>".$fieldname."</b>" . " at [".implode(', ', $_places)."]";
+	if ( count($_places) > 1 ) $field_n_places[] = "<b>".$fieldname."</b>" . " at [".implode(', ', $_places)."]";
 }
 
-if ($msg)
+if ($field_n_places)
 {
-	$msg = JText::sprintf( 'FLEXI_FORM_FIELDS_DISPLAYED_TWICE', $msg."<br/>");
+	$msg = JText::sprintf( 'FLEXI_FORM_FIELDS_DISPLAYED_TWICE', implode('<br>', $field_n_places) );
 	echo sprintf( $alert_box, '', 'error', '', $msg );
 }
 
@@ -201,7 +220,7 @@ if ( count($tab_fields['tab01']) ) :
 		endforeach;
 		?>
 
-	</div>
+	</div> <!-- end tab -->
 <?php endif;
 
 
@@ -231,9 +250,74 @@ if ( count($tab_fields['tab02']) ) :
 		endforeach;
 		?>
 
-	</div>
+	</div> <!-- end tab -->
 <?php endif;
 
+
+
+
+// ***
+// *** JOOMLA IMAGE/URLS TAB
+// ***
+if ( count($tab_fields['tab02a']) ) : ?>
+	<?php
+	if (isset($tab_fields['tab02a']['jimages']) && isset($tab_fields['tab02a']['jurls'])) {
+		$fsetname = 'FLEXI_COM_CONTENT_IMAGES_AND_URLS';
+		$fseticon = 'icon-pencil-2';
+	} else if (isset($tab_fields['tab02a']['jimages'])) {
+		$fsetname = 'FLEXI_IMAGES';
+		$fseticon = 'icon-images';
+	} else if (isset($tab_fields['tab02a']['jurls'])) {
+		$fsetname = 'FLEXI_LINKS';
+		$fseticon = 'icon-link';
+	} else {
+		$fsetname = 'FLEXI_COMPATIBILITY';
+		$fseticon = 'icon-pencil-2';
+	}
+
+	$tab_lbl = isset($tab_titles['jimage_jurls']) && $tab_titles['jimage_jurls'] !== '_DEFAULT_' ? $tab_titles['jimage_jurls'] : JText::_($fsetname);
+	$tab_ico = isset($tab_icocss['jimage_jurls']) && $tab_icocss['jimage_jurls'] !== '_default_'? $tab_icocss['jimage_jurls'] : $fseticon;
+
+	$total_fields = count($tab_fields['tab02a']);
+	$use_flexbox  = $total_fields > 1;
+	$n = 0;
+	?>
+	<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" data-icon-class="<?php echo $tab_ico; ?>">
+		<h3 class="tabberheading"> <?php echo $tab_lbl; ?> </h3>
+
+		<?php
+		echo $use_flexbox ? '
+		<div class="fc_form_flex_box">
+			<div class="fc_form_flex_box_item">
+		' : '';
+
+		foreach($tab_fields['tab02a'] as $fn => $i) :
+			$n++;
+
+			echo $use_flexbox && ($n - 1 == ceil($total_fields / 2)) ? '
+				</div><div class="fc_form_flex_box_item">' : '';
+			echo $use_flexbox && in_array($fn, array('perms', 'fields_manager')) ? '
+				</div><div class="fc_form_flex_box_item" style="width: 100%;">
+			' : '';
+			if (!is_array($captured[$fn])) :
+				echo $captured[$fn]; unset($captured[$fn]);
+			else:
+				foreach($captured[$fn] as $n => $html) : ?>
+					<div class="fcclear"></div>
+					<?php echo $html;
+				endforeach;
+				unset($captured[$fn]);
+			endif;
+		endforeach;
+
+		echo $use_flexbox ? '
+			</div>
+		</div>
+		' : '';
+		?>
+
+	</div> <!-- end tab -->
+<?php endif;
 
 
 
@@ -252,36 +336,35 @@ foreach ($fieldSets as $name => $fieldSet) :
 	$icon_class = 'icon-pencil-2';
 	//echo JHtml::_('sliders.panel', JText::_($label), $name.'-options');
 	//echo "<h2>".$label. "</h2> " . "<h3>".$name. "</h3> ";
-?>
-<!-- CUSTOM parameters TABs -->
-<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" data-icon-class="<?php echo $icon_class; ?>">
-	<h3 class="tabberheading"> <?php echo JText::_($label); ?> </h3>
+	?>
+	<!-- CUSTOM parameters TABs -->
+	<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" data-icon-class="<?php echo $icon_class; ?>">
+		<h3 class="tabberheading"> <?php echo JText::_($label); ?> </h3>
 
-	<div class="fc_tabset_inner">
-		<?php foreach ($this->form->getFieldset($name) as $field) : ?>
+		<div class="fc_tabset_inner">
+			<?php foreach ($this->form->getFieldset($name) as $field) : ?>
 
-			<?php if ($field->hidden): ?>
-				<span style="display:none !important;">
-					<?php echo $field->input; ?>
-				</span>
-			<?php else :
-				echo ($field->getAttribute('type') === 'separator' || $field->hidden || !$field->label) ? $field->input : '
-				<div class="control-group">
-					<div class="control-label" id="jform_attribs_'.$field->fieldname.'-lbl-outer">
-						' . str_replace('class="', 'class="' . $lbl_class . ' label-fcinner ', str_replace(' for="', ' data-for="', $field->label)) . '
+				<?php if ($field->hidden): ?>
+					<span style="display:none !important;">
+						<?php echo $field->input; ?>
+					</span>
+				<?php else :
+					echo ($field->getAttribute('type') === 'separator' || $field->hidden || !$field->label) ? $field->input : '
+					<div class="control-group">
+						<div class="control-label" id="jform_attribs_'.$field->fieldname.'-lbl-outer">
+							' . str_replace('class="', 'class="' . $lbl_class . ' label-fcinner ', str_replace(' for="', ' data-for="', $field->label)) . '
+						</div>
+						<div class="controls container_fcfield">
+							' . $field->input . '
+						</div>
 					</div>
-					<div class="controls container_fcfield">
-						' . $field->input . '
-					</div>
-				</div>
-				';
-			endif; ?>
+					';
+				endif; ?>
 
-		<?php endforeach; ?>
-	</div>
+			<?php endforeach; ?>
+		</div>
 
-</div> <!-- end tab -->
-
+	</div> <!-- end tab -->
 <?php endforeach;
 
 
@@ -350,36 +433,35 @@ foreach ($fieldSets as $name => $fieldSet) :
 		$icon_class = 'icon-users';
 	else
 		$icon_class = '';
-?>
-<!-- CUSTOM parameters TABs -->
-<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" data-icon-class="<?php echo $icon_class; ?>">
-	<h3 class="tabberheading"> <?php echo JText::_($label); ?> </h3>
+	?>
+	<!-- CUSTOM parameters TABs -->
+	<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" data-icon-class="<?php echo $icon_class; ?>">
+		<h3 class="tabberheading"> <?php echo JText::_($label); ?> </h3>
 
-	<div class="fc_tabset_inner">
-		<?php foreach ($this->form->getFieldset($name) as $field) : ?>
+		<div class="fc_tabset_inner">
+			<?php foreach ($this->form->getFieldset($name) as $field) : ?>
 
-			<?php if ($field->hidden): ?>
-				<span style="display:none !important;">
-					<?php echo $field->input; ?>
-				</span>
-			<?php else :
-				echo ($field->getAttribute('type')=='separator' || $field->hidden || !$field->label) ? $field->input : '
-				<div class="control-group">
-					<div class="control-label" id="jform_attribs_'.$field->fieldname.'-lbl-outer">
-						' . str_replace('class="', 'class="' . $lbl_class . ' label-fcinner ', str_replace(' for="', ' data-for="', $field->label)) . '
+				<?php if ($field->hidden): ?>
+					<span style="display:none !important;">
+						<?php echo $field->input; ?>
+					</span>
+				<?php else :
+					echo ($field->getAttribute('type')=='separator' || $field->hidden || !$field->label) ? $field->input : '
+					<div class="control-group">
+						<div class="control-label" id="jform_attribs_'.$field->fieldname.'-lbl-outer">
+							' . str_replace('class="', 'class="' . $lbl_class . ' label-fcinner ', str_replace(' for="', ' data-for="', $field->label)) . '
+						</div>
+						<div class="controls container_fcfield">
+							' . $this->getFieldInheritedDisplay($field, $this->iparams) . '
+						</div>
 					</div>
-					<div class="controls container_fcfield">
-						' . $this->getFieldInheritedDisplay($field, $this->iparams) . '
-					</div>
-				</div>
-				';
-			endif; ?>
+					';
+				endif; ?>
 
-		<?php endforeach; ?>
-	</div>
+			<?php endforeach; ?>
+		</div>
 
-</div> <!-- end tab -->
-
+	</div> <!-- end tab -->
 <?php endforeach; ?>
 
 
@@ -435,7 +517,6 @@ if ( count($tab_fields['tab04']) ) : ?>
 		?>
 
 	</div> <!-- end tab -->
-
 <?php endif;
 
 
@@ -518,46 +599,7 @@ if ( count($tab_fields['tab06']) ) : ?>
 		endforeach;
 		?>
 
-	</div>
-<?php endif;
-
-
-
-// ***
-// *** JOOMLA IMAGE/URLS TAB
-// ***
-if ( count($FC_jfields_html) ) : ?>
-	<?php
-		if (isset($FC_jfields_html['images']) && isset($FC_jfields_html['urls'])) {
-			$fsetname = 'FLEXI_COM_CONTENT_IMAGES_AND_URLS';
-			$fseticon = 'icon-pencil-2';
-		} else if (isset($FC_jfields_html['images'])) {
-			$fsetname = 'FLEXI_IMAGES';
-			$fseticon = 'icon-images';
-		} else if (isset($FC_jfields_html['urls'])) {
-			$fsetname = 'FLEXI_LINKS';
-			$fseticon = 'icon-link';
-		} else {
-			$fsetname = 'FLEXI_COMPATIBILITY';
-			$fseticon = 'icon-pencil-2';
-		}
-	?>
-	<!-- Joomla images/urls tab -->
-	<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" data-icon-class="<?php echo $fseticon; ?>">
-		<h3 class="tabberheading"> <?php echo JText::_($fsetname); ?> </h3>
-
-		<div class="fc_form_flex_box">
-		<?php foreach ($FC_jfields_html as $fields_grp_name => $_html) : ?>
-			<div class="fc_form_flex_box_item">
-				<fieldset class="panelform">
-					<legend><?php echo JText::_('FLEXI_'.strtoupper($fields_grp_name).'_COMP'); ?></legend>
-					<?php echo $_html; ?>
-				</fieldset>
-			</div>
-		<?php endforeach; ?>
-		</div>
-
-	</div>
+	</div> <!-- end tab -->
 <?php endif;
 
 
@@ -593,7 +635,6 @@ if ( count($tab_fields['tab07']) ) : ?>
 		</fieldset>
 
 	</div> <!-- end tab -->
-
 <?php endif;
 
 
@@ -645,7 +686,6 @@ if ( count($tab_fields['tab08']) ) : ?>
 		?>
 
 	</div> <!-- end tab -->
-
 <?php endif; ?>
 
 
