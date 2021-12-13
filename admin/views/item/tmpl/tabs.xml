@@ -137,7 +137,7 @@
 				</group>
 				<group label="FLEXI_COREPROPS_PUBLISHING_PROPS">
 					<option value="timezone_info"     >FLEXI_COREPROPS_TIMEZONE</option>
-					<option value="created_by_alias"  >FLEXI_COREPROPS_CREATE_BY_ALIAS</option>
+					<option value="created_by_alias"  >FLEXI_COREPROPS_CREATED_BY_ALIAS</option>
 					<option value="publish_up"        >FLEXI_COREPROPS_PUBLISH_UP</option>
 					<option value="publish_down"      >FLEXI_COREPROPS_PUBLISH_DOWN</option>
 					<option value="access"            >FLEXI_COREPROPS_VIEW_ACCESS</option>

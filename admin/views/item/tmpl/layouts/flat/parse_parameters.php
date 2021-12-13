@@ -27,10 +27,22 @@ class FcFormLayoutParameters
 
 		$placeable_fields = array_merge($via_core_field, $via_core_prop);
 
+		/**
+		 * Find if any core properties are missing
+		 */
+		$coreprop_missing = array();
+		foreach($via_core_prop as $fn => $i)
+		{
+			if (!isset($coreprops_fields[$fn]))
+			{
+				$coreprop_missing[] = $fn;
+			}
+		}
+
 		// An empty 'placeViaLayout' means that by default fields manager will try to place core form fields (and elements)
 		$placementConf['placeViaFman']     = array();
 		$placementConf['placeViaLayout']   = array();
-		$placementConf['coreprop_missing'] = $via_core_prop;
+		$placementConf['coreprop_missing'] = $coreprop_missing;
 
 		return $placementConf;
 	}

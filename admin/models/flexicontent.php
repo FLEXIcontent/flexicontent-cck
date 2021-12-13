@@ -315,6 +315,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		return $return;
 	}
 
+
 	/**
 	 * Method to check if there is at least the default fields in the FLEXIcontent fields TABLE
 	 *
@@ -337,6 +338,72 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 
 		return $return;
 	}
+
+
+	/**
+	 * Method to check if there is at least the default fields in the FLEXIcontent fields TABLE
+	 *
+	 * @access public
+	 * @return	boolean	True on success
+	 */
+	function getExistCpFields()
+	{
+		static $return;
+		if ($return !== NULL) return $return;
+		$return = false;
+
+		//JFactory::getLanguage()->load('plg_flexicontent_fields_coreprops', JPATH_ADMINISTRATOR, 'en-GB', true);
+		//JFactory::getLanguage()->load('plg_flexicontent_fields_coreprops', JPATH_ADMINISTRATOR, null, true);
+
+		$p = 'FLEXI_COREPROPS_';
+		$coreprop_names = array
+		(
+			// Single properties
+			'id' => 'FLEXI_ID', 'alias' => 'FLEXI_ALIAS', 'category' => $p.'CATEGORY_MAIN', 'lang' => $p.'LANGUAGE', 'vstate' => $p.'PUBLISH_CHANGES',
+			'disable_comments' => $p.'DISABLE_COMMENTS', 'notify_subscribers' => $p.'NOTIFY_SUBSCRIBERS', 'notify_owner' => $p.'NOTIFY_OWNER',
+			'captcha' => $p.'CAPTCHA', 'layout_selection' => $p.'LAYOUT_SELECT',
+
+			//Publishing
+			'timezone_info' => $p.'TIMEZONE', 'created_by_alias' => $p.'CREATED_BY_ALIAS',
+			'publish_up' => $p.'PUBLISH_UP', 'publish_down' => $p.'PUBLISH_DOWN',
+			'access' => $p.'VIEW_ACCESS',
+
+			// Attibute groups or other composite data
+			'item_screen' => $p.'VERSION_INFOMATION', 'lang_assocs' => $p.'LANGUAGE_ASSOCS',
+			'jimages' => $p.'JIMAGES', 'jurls' => $p.'JLINKS',
+			'metadata' => $p.'META', 'seoconf' => $p.'SEO',
+			'display_params' => $p.'DISP_PARAMS', 'layout_params' => $p.'LAYOUT_PARAMS',
+			'perms' => 'FLEXI_PERMISSIONS', 'versions' => 'FLEXI_VERSIONS',
+		);
+
+		$types_count = (int) $this->_db->setQuery('SELECT COUNT(id) FROM `#__flexicontent_types`')->loadResult();
+
+		$query = 'SELECT f.name, COUNT(rel.type_id) as types_assigned'
+			. ' FROM #__flexicontent_fields AS f '
+			. ' LEFT JOIN #__flexicontent_fields_type_relations AS rel ON f.id = rel.field_id'
+			. ' WHERE f.field_type = "coreprops" AND f.name LIKE "form_%" AND f.published = 1'
+			. ' GROUP BY f.id'
+			;
+		$fields = $this->_db->setQuery( $query )->loadObjectList();
+
+		/**
+		 * Unset any $coreprop_names that have been found assigned to all types
+		 */
+		foreach ($fields as $i => $field)
+		{
+			$propname = str_replace('form_', '', $field->name);
+			if ((int) $field->types_assigned === $types_count && isset($coreprop_names[$propname]))
+			{
+				unset($coreprop_names[$propname]);
+			}
+		}
+		//echo $query . '<br><pre>'; print_r($fields); echo '</pre><br>' .count($coreprop_names) . '<br>'; exit;
+
+		// All coreprop_names should have been eliminated
+		$return = count($coreprop_names) ? false : true;
+		return $return;
+	}
+
 
 	/**
 	 * Method to check if there is at least the default flexicontent_fields PLUGINs

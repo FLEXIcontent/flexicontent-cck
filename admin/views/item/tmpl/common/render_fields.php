@@ -1693,6 +1693,12 @@ if ($this->fields && $typeid) :
 
 			elseif ($field->field_type === 'coreprops')
 			{
+				// Only specific core properties are used by form
+				if ((int) $field->published !== 1 && substr( $field->name, 0, 5 ) !== 'form_')
+				{
+					continue;
+				}
+
 				$props_type = $field->parameters->get('props_type');
 				if ( isset($this->viaFieldMan[$props_type]) )
 				{

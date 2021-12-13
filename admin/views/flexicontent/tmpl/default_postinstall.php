@@ -43,6 +43,24 @@ jQuery(document).ready(function() {
 <?php endif; ?>
 
 
+<?php if(!$this->existcpfields) : /*@TODO must write a class for all following cases */ ?>
+	jQuery('#existcpfields').on('click', function(e, data)
+	{
+		var url = "index.php?option=com_flexicontent&task=flexicontent.createdefaultcpfields&format=raw&<?php echo JSession::getFormToken();?>=1&tmpl=component";
+
+		jQuery('#existcpfields-log').html(ajaxloader);
+		jQuery.ajax({
+			type: 'GET',
+			url: url,
+			data: {}
+		}).done( function(data) {
+			jQuery('#existcpfields-log').html(data);
+		});
+
+	});
+<?php endif; ?>
+
+
 <?php if(!$this->existmenuitems) : ?>
 	jQuery('#existmenuitems').on('click', function(e, data)
 	{
@@ -364,6 +382,16 @@ jQuery(document).ready(function() {
 			<td>
 				<div id="existfields-log" class="install-task">
 					<?php echo $this->existfields ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span><a class="fc_button fc_simple" id="existfields" href="javascript:;">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>' ; ?>
+				</div>
+			</td>
+		</tr>
+		<tr>
+			<td class="key">
+				<?php echo JText::_( 'FLEXI_INSTALL_CORE_PROPERTY_FIELDS' ); ?>
+			</td>
+			<td>
+				<div id="existcpfields-log" class="install-task">
+					<?php echo $this->existcpfields ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span><a class="fc_button fc_simple" id="existcpfields" href="javascript:;">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>' ; ?>
 				</div>
 			</td>
 		</tr>

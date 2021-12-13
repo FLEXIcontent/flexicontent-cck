@@ -2574,7 +2574,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		$coreprops_fields = array();
 		foreach($fields as $field)
 		{
-			if ($field->field_type=='coreprops' && (int) $field->published === 1)
+			if ($field->field_type === 'coreprops' && (int) $field->published === 1 && substr( $field->name, 0, 5 ) === "form_")
 			{
 				$coreprops_fields[$field->parameters->get('props_type')] = $field;
 			}
@@ -2629,6 +2629,8 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		/**
 		 * Add message about and core properties fields that are missing
 		 */
+		$placementConf['placementMsgs'] = array();
+
 		if ( count($placementConf ['coreprop_missing']) )
 		{
 			$placementConf['placementMsgs']['warning'] = array();

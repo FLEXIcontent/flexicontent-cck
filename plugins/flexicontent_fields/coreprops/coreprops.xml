@@ -38,7 +38,7 @@
 				</group>
 				<group label="FLEXI_COREPROPS_PUBLISHING_PROPS">
 					<option value="timezone_info"     show_list="" hide_list="maincat_conf">FLEXI_COREPROPS_TIMEZONE</option>
-					<option value="created_by_alias"  show_list="" hide_list="maincat_conf">FLEXI_COREPROPS_CREATE_BY_ALIAS</option>
+					<option value="created_by_alias"  show_list="" hide_list="maincat_conf">FLEXI_COREPROPS_CREATED_BY_ALIAS</option>
 					<option value="publish_up"        show_list="" hide_list="maincat_conf">FLEXI_COREPROPS_PUBLISH_UP</option>
 					<option value="publish_down"      show_list="" hide_list="maincat_conf">FLEXI_COREPROPS_PUBLISH_DOWN</option>
 					<option value="access"            show_list="" hide_list="maincat_conf">FLEXI_COREPROPS_VIEW_ACCESS</option>

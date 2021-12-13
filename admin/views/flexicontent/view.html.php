@@ -88,6 +88,7 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 			$existtype 			= $model->getExistType();
 			$existmenuitems	= $model->getExistMenuItems();
 			$existfields 		= $model->getExistCoreFields();
+			$existcpfields 	= $model->getExistCpFields();
 
 			$existfplg 			= $model->getExistFieldsPlugins();
 			$existseplg 		= $model->getExistSearchPlugin();
@@ -111,7 +112,7 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 
 		else if ($optional_tasks)  // IF optional tasks do not recheck instead just set the FLAGS to true
 		{
-			$existtype = $existmenuitems = $existfields = true;
+			$existtype = $existmenuitems = $existfields = $existcpfields = true;
 			$existfplg = $existseplg = $existsyplg = true;
 		  $existcats = $langsynced = $existversions = $existversionsdata = $existauthors = true;
 		  $deprecatedfiles = $nooldfieldsdata = $missingversion = $cachethumb = true;
@@ -264,6 +265,7 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 		$this->existtype = isset($existtype) ? $existtype : null;
 		$this->existmenuitems = isset($existmenuitems) ? $existmenuitems : null;
 		$this->existfields = isset($existfields) ? $existfields : null;
+		$this->existcpfields = isset($existcpfields) ? $existcpfields : null;
 
 		$this->existfplg = isset($existfplg) ? $existfplg : null;
 		$this->existseplg = isset($existseplg) ? $existseplg : null;

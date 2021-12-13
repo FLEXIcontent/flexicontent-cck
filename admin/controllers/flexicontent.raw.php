@@ -41,6 +41,7 @@ class FlexicontentControllerFlexicontent extends FlexicontentControllerBaseAdmin
 
 		// Register task aliases
 		$this->registerTask('createdefaultfields',		'createDefaultFields');
+		$this->registerTask('createdefaultcpfields',  'createDefaultCpFields');
 		$this->registerTask('createmenuitems',				'createMenuItems');
 		$this->registerTask('createdefaultype', 			'createDefaultType');
 		$this->registerTask('publishplugins', 				'publishPlugins');
@@ -172,6 +173,141 @@ class FlexicontentControllerFlexicontent extends FlexicontentControllerBaseAdmin
 
 		echo '<span class="install-ok"></span>';
 	}
+
+
+
+
+	/**
+	 * Method to create default (CORE property) fields
+	 *
+	 * @access	public
+	 * @return	boolean	True on success
+	 * @since 1.5
+	 */
+	function createDefaultCpFields()
+	{
+		// Check for request forgeries
+		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
+
+		$db = JFactory::getDbo();
+
+		JFactory::getLanguage()->load('plg_flexicontent_fields_coreprops', JPATH_ADMINISTRATOR, 'en-GB', true);
+		JFactory::getLanguage()->load('plg_flexicontent_fields_coreprops', JPATH_ADMINISTRATOR, null, true);
+
+		$p = 'FLEXI_COREPROPS_';
+		$coreprop_names = array
+		(
+			// Single properties
+			'id' => 'FLEXI_ID', 'alias' => 'FLEXI_ALIAS', 'category' => $p.'CATEGORY_MAIN', 'lang' => $p.'LANGUAGE', 'vstate' => $p.'PUBLISH_CHANGES',
+			'disable_comments' => $p.'DISABLE_COMMENTS', 'notify_subscribers' => $p.'NOTIFY_SUBSCRIBERS', 'notify_owner' => $p.'NOTIFY_OWNER',
+			'captcha' => $p.'CAPTCHA', 'layout_selection' => $p.'LAYOUT_SELECT',
+
+			//Publishing
+			'timezone_info' => $p.'TIMEZONE', 'created_by_alias' => $p.'CREATED_BY_ALIAS',
+			'publish_up' => $p.'PUBLISH_UP', 'publish_down' => $p.'PUBLISH_DOWN',
+			'access' => $p.'VIEW_ACCESS',
+
+			// Attibute groups or other composite data
+			'item_screen' => $p.'VERSION_INFOMATION', 'lang_assocs' => $p.'LANGUAGE_ASSOCS',
+			'jimages' => $p.'JIMAGES', 'jurls' => $p.'JLINKS',
+			'metadata' => $p.'META', 'seoconf' => $p.'SEO',
+			'display_params' => $p.'DISP_PARAMS', 'layout_params' => $p.'LAYOUT_PARAMS',
+			'perms' => 'FLEXI_PERMISSIONS', 'versions' => 'FLEXI_VERSIONS',
+		);
+
+
+		/**
+		 * First try to publish existing coreprops fields with name 'form_*' that are not published
+		 */
+		$query = 'UPDATE #__flexicontent_fields SET published = 1 '
+			. ' WHERE field_type = "coreprops" AND name LIKE "form_%"'
+			;
+		$db->setQuery($query)->execute();
+
+
+		/**
+		 * Now find coreprops fields that are missing
+		 */
+		$query = 'SELECT name'
+			. ' FROM #__flexicontent_fields'
+			. ' WHERE field_type = "coreprops" AND name LIKE "form_%"'
+			;
+		$existing = $db->setQuery($query)->loadColumn();
+		$existing = array_flip($existing);
+
+		$vals = array();
+		$n = 14;
+
+		foreach($coreprop_names as $prop_name => $prop_label)
+		{
+			$name  = 'form_' . $prop_name;
+			$label = JText::_($prop_label);   // Maybe use language string
+			if (!isset($existing[$name]))
+			{
+				$vals[$name] = ' ("coreprops","' . $name . '", ' . $db->Quote($label). ',"",0,0,0,0,0,0,0,1,"",1,'
+					. '\'{"display_label":"1","props_type":"'.$prop_name.'"}\',0,"0000-00-00 00:00:00",1,'. ($n + 1) . ')';
+			}
+		}
+
+
+		/**
+		 * Create any missing fields
+		 */
+		if (count($vals) > 0)
+		{
+			$query 	= '
+			INSERT INTO `#__flexicontent_fields` (
+				`field_type`,`name`,`label`,`description`,`isfilter`,`iscore`,`issearch`,`isadvsearch`,
+				`untranslatable`,`formhidden`,`valueseditable`,`edithelp`,`positions`,`published`,
+				`attribs`,`checked_out`,`checked_out_time`,`access`,`ordering`
+			) VALUES '	. implode(', ', $vals);
+
+			try
+			{
+				$db->setQuery($query)->execute();
+			}
+			catch (Exception $e)
+			{
+				jexit('<span class="install-notok"></span>' . $e->getMessage());
+			}
+		}
+
+
+		/**
+		 * Make sure all coreprops fields with name 'form_*' are assigned to all types
+		 */
+		$coreprops_field_ids = $db->setQuery('SELECT id FROM #__flexicontent_fields WHERE field_type = "coreprops" AND name LIKE "form_%"')->loadColumn();
+		$coreprops_field_ids = array_flip($coreprops_field_ids);
+
+		$type_ids = $db->setQuery('SELECT id FROM `#__flexicontent_types`')->loadColumn();
+
+		if ($type_ids)
+		{
+			$query = 'REPLACE INTO `#__flexicontent_fields_type_relations` (`field_id`,`type_id`,`ordering`) VALUES';
+			$rels = array();
+
+			foreach ($type_ids as $type_id)
+			{
+				foreach ($coreprops_field_ids as $field_id => $i)
+				{
+					$rels[] = '(' . (int) $field_id . ',' . (int) $type_id . ', 0)';
+				}
+			}
+			$query .= implode(', ', $rels);
+
+			try
+			{
+				$db->setQuery($query)->execute();
+			}
+			catch (Exception $e)
+			{
+				jexit('<span class="install-notok"></span>' . $e->getMessage());
+			}
+		}
+
+		echo '<span class="install-ok"></span>';
+	}
+
 
 
 	/**

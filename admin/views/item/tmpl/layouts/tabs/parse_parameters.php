@@ -88,7 +88,7 @@ class FcFormLayoutParameters
 		// Find fields missing from configuration, and place them below the tabs
 		foreach($placeable_fields as $fn => $i)
 		{
-			if ( !isset($all_tab_fields[$fn]) )
+			if ( !isset($all_tab_fields[$fn]) && !isset($tab_fields['fman'][$fn]) )
 			{
 				$tab_fields['below'][$fn] = 1;
 			}
