@@ -930,7 +930,6 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		$this->submitConf       = $submitConf;
 		$this->placementConf    = $placementConf;
 
-		$this->placeViaFman   = $placementConf['placeViaFman'];
 		$this->placeViaLayout = $placementConf['placeViaLayout'];
 		$this->placementMsgs  = $placementConf['placementMsgs'];
 
@@ -2623,7 +2622,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		else
 		{
 			JFactory::getApplication()->enqueueMessage('A layout file is missing : ' . $params_file, 'warning');
-			$placementConf = array('placeViaFman' => array(), 'placeViaLayout' => array());
+			$placementConf = array('placeViaLayout' => array(), 'coreprop_missing' => array() );
 		}
 
 		/**

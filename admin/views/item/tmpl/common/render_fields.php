@@ -1637,28 +1637,56 @@ if ($this->fields && $typeid) :
 	<div class="fc_edit_container_full">
 
 		<?php
-		$customPlacement = !isset($this->placeViaFman[$field->name]) && isset($this->placeViaLayout[$field->name]);
 		$hide_ifempty_fields = array('fcloadmodule', 'fcpagenav', 'toolbar', 'comments');
 		$row_k = 0;
 
 		foreach ($this->fields as $field_name => $field) :
 
-			$hide_ifempty = $field->formhidden==4 || $field->iscore || in_array($field->field_type, $hide_ifempty_fields);
+			$field_plain_name = $field->field_type === 'coreprops' ? str_replace('form_', '', $field_name) : $field_name;
+			$customPlacement  = isset($this->placeViaLayout[$field_plain_name]);
+			$hide_ifempty     = $field->iscore || $field->field_type === 'coreprops' ||	$field->formhidden == 4 || in_array($field->field_type, $hide_ifempty_fields);
+
 
 			/**
-			 * Check if a core field (currently: title, created, modified, categories, tags) will be placed
-			 * via fields manager placement/ordering. Default is to place these fields in a fixed position
+			 * Skip coreprops fields not meant for item form
 			 */
-			if ($field->iscore && isset($captured[$field->field_type]) && !$customPlacement)
+			if ($field->field_type === 'coreprops' && substr($field->name, 0, 5) !== 'form_')
 			{
-				// Print any CORE fields that are placed by field manager
-				echo $captured[$field->field_type];
-				unset($captured[$field->field_type]);
-				echo "\n" . '<div class="fcclear"></div>' . "\n";
 				continue;
 			}
 
-			elseif (
+
+			/**
+			 * Skip field via type parameter. This in only used for description field ('maintext' field type)
+			 * since for other core fields we used 2 distinct parameters 1 parameter for frontend item form and 1 for backend item form
+			 */
+			$hide_field = (int) $this->tparams->get('hide_' . $field->field_type, 0);
+			if ($hide_field === 1 || ($hide_field === 2 && $isSite) || ($hide_field === 3 && !$isSite))
+			{
+				continue;
+			}
+
+
+			/**
+			 * Before we skip fields with empty HTML (below), we check if this a core field
+			 * or coreprops field that will be placed via fields manager placement/ordering
+			 */
+			if ( !$customPlacement && ($field->iscore || $field->field_type === 'coreprops') )
+			{
+				if ( isset($captured[ $field_plain_name ]) )
+				{
+					$captured['fman'][$field_plain_name] = $captured[ $field_plain_name ];
+					unset($captured[ $field_plain_name ]);
+					continue;
+				}
+			}
+
+
+			/**
+			 * Skip fields with empty HTML, any needed fields with "form-captured" html
+			 * that needed to be displayed via fields manager we already output them above
+			 */
+			if (
 
 				// Skip hide-if-empty fields from this listing
 				( empty($field->html) && $hide_ifempty ) ||
@@ -1669,52 +1697,15 @@ if ($this->fields && $typeid) :
 
 			) continue;
 
+
 			/**
-			 * Check to SKIP (hide) field. This in only used for description field ('maintext' field type)
-			 * since for other core fields we used 2 distinct parameters 1 parameter for frontend item form and 1 for backend item form
+			 * Output custom HTML field which neither displays a label nor any containers HTML
 			 */
-			$hide_field = (int) $this->tparams->get('hide_' . $field->field_type, 0);
-			if ($hide_field === 1 || ($hide_field === 2 && $isSite) || ($hide_field === 3 && !$isSite))
-			{
-				continue;
-			}
-
-			$not_in_tabs = '';
-
 			if ($field->field_type === 'custom_form_html')
 			{
-				ob_start();
-				echo $field->html;
-				$captured['fman'][$field->name] = ob_get_clean();
+				$captured['fman'][$field->name] = $field->html;
 				$rendered[$field->name] = (object) array('label_html' => '', 'input_html' => $captured['fman'][$field->name], 'html' => $captured['fman'][$field->name], 'field' => $field);
 				continue;
-			}
-
-
-			elseif ($field->field_type === 'coreprops')
-			{
-				// Only specific core properties are used by form
-				if ((int) $field->published !== 1 && substr( $field->name, 0, 5 ) !== 'form_')
-				{
-					continue;
-				}
-
-				$props_type = $field->parameters->get('props_type');
-				if ( isset($this->viaFieldMan[$props_type]) )
-				{
-					if ( isset($captured[ $props_type ]) )
-					{
-						ob_start();
-						echo $captured[ $props_type ]; unset($captured[ $props_type ]);
-						echo !empty($field->html) ? '<br>' . $field->html : '';
-
-						$captured['fman'][$field->name] = ob_get_clean();
-						$rendered[$field->name] = (object) array('label_html' => '', 'input_html' => $captured['fman'][$field->name], 'html' => $captured['fman'][$field->name], 'field' => $field);
-						continue;
-					}
-				}
-
-				if (empty($field->html)) continue;
 			}
 
 
@@ -1835,6 +1826,7 @@ if ($this->fields && $typeid) :
 
 				<?php /* MULTI-TABBED FIELD e.g textarea, description */
 				else :
+					$not_in_tabs = '';
 
 					array_push($tabSetStack, $tabSetCnt);
 					$tabSetCnt = ++$tabSetMax;

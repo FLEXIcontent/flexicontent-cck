@@ -15,8 +15,6 @@
 		
 		<fieldset name="layout" addfieldpath="/administrator/components/com_flexicontent/elements">
 
-
-
 			<field name="form_layout_configs_PSFX" type="multilist" subtype="radio" default="" label="FLEXI_PRESET_CONFIGURATIONS" description="FLEXI_PRESET_CONFIGURATIONS_DESC" toggle_related="1" fccustom_revert="1" class="btn-group group-fcmethod" labelclass="label text-white bg-success label-success">
 				<option value="">FLEXI_CUSTOMIZE</option>
 				<option value="1" fcconfigs="{
@@ -32,8 +30,7 @@
 					'iflayout_form_tab05_fields_PSFX':'metadata, seoconf',
 					'iflayout_form_tab06_fields_PSFX':'display_params',
 					'iflayout_form_tab07_fields_PSFX':'layout_selection, layout_params',
-					'iflayout_form_tab08_fields_PSFX':'versions',
-					'iflayout_form_tabs_fieldsman_PSFX':''
+					'iflayout_form_tab08_fields_PSFX':'versions'
 				}">FLEXI_LOAD_DEFAULTS_N_CUSTOMIZE</option>
 				<option value="2" fcconfigs="{
 					'iflayout_form_tab_titles_PSFX':'',
@@ -48,8 +45,7 @@
 					'iflayout_form_tab05_fields_PSFX':'',
 					'iflayout_form_tab06_fields_PSFX':'',
 					'iflayout_form_tab07_fields_PSFX':'',
-					'iflayout_form_tab08_fields_PSFX':'',
-					'iflayout_form_tabs_fieldsman_PSFX':''
+					'iflayout_form_tab08_fields_PSFX':''
 				}">FLEXI_USE_COMPONENT_SETTINGS_CLEAR</option>
 
 				<option value="3" fcconfigs="{
@@ -65,9 +61,8 @@
 					'iflayout_form_tab05_fields_PSFX':'_skip_',
 					'iflayout_form_tab06_fields_PSFX':'_skip_',
 					'iflayout_form_tab07_fields_PSFX':'_skip_',
-					'iflayout_form_tab08_fields_PSFX':'_skip_',
-					'iflayout_form_tabs_fieldsman_PSFX':'jimages, jurls, text, created, created_by, modified, modified_by, title, hits, type, version, state, voting, favourites, categories, tags, id, alias, category, lang, vstate, disable_comments, notify_subscribers, notify_owner, captcha, layout_selection, timezone_info, created_by_alias, publish_up, publish_down, access, item_screen, lang_assocs, metadata, seoconf, display_params, layout_params, perms, versions'
-				}">Place all by fields manager</option>
+					'iflayout_form_tab08_fields_PSFX':'_skip_'
+				}">FLEXI_PLACE_ALL_VIA_FIELDS_MANAGER</option>
 			</field>
 
 			<field name="form_tab_titles_PSFX" type="textarea" rows="3" cols="80" label="FLEXI_FORM_TAB_TITLES" description="FLEXI_FORM_TAB_TITLES_DESC" class="input-xxlarge"
@@ -96,66 +91,6 @@
 			<field name="form_tab06_fields_PSFX"  type="textarea" default="" hint="display_params" rows="2" cols="60" label="TAB 6" description="FLEXI_COMMA_LIST_OF_CORE_FIELDS_PROPS" class="input-xxlarge" />
 			<field name="form_tab07_fields_PSFX"  type="textarea" default="" hint="layout_selection, layout_params" rows="2" cols="60" label="TAB 7" description="FLEXI_COMMA_LIST_OF_CORE_FIELDS_PROPS" class="input-xxlarge" />
 			<field name="form_tab08_fields_PSFX"  type="textarea" default="" hint="versions" rows="2" cols="60" label="TAB 8 (flex-box)" description="FLEXI_COMMA_LIST_OF_CORE_FIELDS_PROPS" class="input-xxlarge" />
-
-			<field name="" type="separator" default="FLEXI_PLACEMENT_FORCE_FIELDS_MANAGER" label="" level="level1" />
-			<field name="" type="separator" default="FLEXI_PLACEMENT_FORCE_FIELDS_MANAGER_INFO" label="" level="level3" class="alert alert-info fcpadded"/>
-
-			<field name="form_tabs_fieldsman_PSFX" type="multilist" subtype="list" multiple="multiple"
-				label="FLEXI_FMAN_PLACING_OF_CORE_ELEMENTS" description="FLEXI_FMAN_PLACING_OF_CORE_ELEMENTS_DESC" toggle_related="0" split_str_value="," class="use_select2_lib"
-				default=""
-			>
-				<group label="Core fields">
-					<option value="text"       >FLEXI_FIELD_DESCRIPTION</option>
-					<option value="created"    >FLEXI_FIELD_CREATED</option>
-					<option value="created_by" >FLEXI_FIELD_CREATED_BY</option>
-					<option value="modified"   >FLEXI_FIELD_MODIFIED</option>
-					<option value="modified_by">FLEXI_FIELD_MODIFIED_BY</option>
-					<option value="title"      >FLEXI_FIELD_TITLE</option>
-					<option value="hits"       >FLEXI_FIELD_HITS</option>
-					<option value="type"       >FLEXI_FIELD_DOCUMENT_TYPE</option>
-					<option value="version"    >FLEXI_FIELD_VERSION</option>
-					<option value="state"      >FLEXI_FIELD_STATE</option>
-					<option value="voting"     >FLEXI_FIELD_VOTING</option>
-					<option value="favourites" >FLEXI_FIELD_FAVOURITES</option>
-					<option value="categories" >FLEXI_CATEGORIES</option>
-					<option value="tags"       >FLEXI_FIELD_TAGS</option>
-				</group>
-
-				<group label="CORE PROPERTY FIELDS">
-				</group>
-
-				<group label="FLEXI_BASIC_SINGLE_PROPS">
-					<option value="id"                >FLEXI_ID</option>
-					<option value="alias"             >FLEXI_ALIAS</option>
-					<option value="lang"              >FLEXI_COREPROPS_LANGUAGE</option>
-					<option value="category"          >FLEXI_COREPROPS_CATEGORY_MAIN</option>
-					<option value="disable_comments"  >FLEXI_COREPROPS_DISABLE_COMMENTS</option>
-					<option value="notify_subscribers">FLEXI_COREPROPS_NOTIFY_SUBSCRIBERS</option>
-					<option value="notify_owner"      >FLEXI_COREPROPS_NOTIFY_OWNER</option>
-					<option value="captcha"           >FLEXI_COREPROPS_CAPTCHA</option>
-					<option value="layout_selection"  >FLEXI_COREPROPS_LAYOUT_SELECT</option>
-				</group>
-				<group label="FLEXI_COREPROPS_PUBLISHING_PROPS">
-					<option value="timezone_info"     >FLEXI_COREPROPS_TIMEZONE</option>
-					<option value="created_by_alias"  >FLEXI_COREPROPS_CREATED_BY_ALIAS</option>
-					<option value="publish_up"        >FLEXI_COREPROPS_PUBLISH_UP</option>
-					<option value="publish_down"      >FLEXI_COREPROPS_PUBLISH_DOWN</option>
-					<option value="access"            >FLEXI_COREPROPS_VIEW_ACCESS</option>
-				</group>
-				<group label="FLEXI_COREPROPS_PROP_GROUPS">
-					<option value="item_screen"       >FLEXI_COREPROPS_VERSION_INFOMATION</option>
-					<option value="lang_assocs"       >FLEXI_COREPROPS_LANGUAGE_ASSOCS</option>
-					<option value="metadata"          >FLEXI_COREPROPS_META</option>
-					<option value="seoconf"           >FLEXI_COREPROPS_SEO</option>
-					<option value="display_params"    >FLEXI_COREPROPS_DISP_PARAMS</option>
-					<option value="layout_params"     >FLEXI_COREPROPS_LAYOUT_PARAMS</option>
-					<option value="perms"             >FLEXI_PERMISSIONS</option>
-					<option value="versions"          >FLEXI_VERSIONS</option>
-				</group>
-				<!--group label="FLEXI_COREPROPS_DEPRECATED">
-					<option value="language"          show_list="" hide_list="maincat_conf">FLEXI_COREPROPS_LANGUAGE_N_ASSOCS</option>
-				</group-->
-			</field>
 
 		</fieldset>
 

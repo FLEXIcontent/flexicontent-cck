@@ -99,16 +99,6 @@ foreach($tab_fields as $tabname => $fieldnames)
 //echo '<pre>'; print_r($displayed_at_tab); echo '</pre>'; exit;
 
 
-/**
- * Unset fields placed inside the fields manager
- */
-foreach ($tab_fields['fman'] as $fn => $i)
-{
-	unset($captured[$fn]);
-}
-
-
-
 
 /**
  * CONFIGURATION WARNING, fields that are displayed twice

@@ -31,8 +31,6 @@ class FcFormLayoutParameters
 		/**
 		 * Get placement of CORE properties / fields
 		 */
-		// Important: Get fman before other so that foreach will examine it 1st when we will check for duplicate fields
-		$tab_fields['fman']  = $params->get('form_tabs_fieldsman'. $CFGsfx,'');
 
 		$tab_fields['above']  = $params->get('form_tabs_above'. $CFGsfx,    'title, alias, category, lang, type, state, access, disable_comments, notify_subscribers, notify_owner');
 		$tab_fields['tab01']  = $params->get('form_tab01_fields'. $CFGsfx,  'text');
@@ -63,7 +61,6 @@ class FcFormLayoutParameters
 
 		// Split field lists
 		$all_tab_fields = array();    // All placements
-		$placeViaLayout = array();    // Not placed not by fields manager
 		foreach($tab_fields as $i => $field_list)
 		{
 			// Split field names and flip the created sub-array to make field names be the indexes of the sub-array
@@ -76,19 +73,16 @@ class FcFormLayoutParameters
 			$tab_fields[$i] = array_flip($tab_fields[$i]);
 
 			// Find all field names of the placed fields, we can use this to find non-placed fields
-			if ($i !== 'fman')
+			foreach ($tab_fields[$i] as $field_name => $ignore)
 			{
-				foreach ($tab_fields[$i] as $field_name => $ignore)
-				{
-					$all_tab_fields[$field_name] = 1;
-				}
+				$all_tab_fields[$field_name] = 1;
 			}
 		}
 
 		// Find fields missing from configuration, and place them below the tabs
 		foreach($placeable_fields as $fn => $i)
 		{
-			if ( !isset($all_tab_fields[$fn]) && !isset($tab_fields['fman'][$fn]) )
+			if ( !isset($all_tab_fields[$fn]) )
 			{
 				$tab_fields['below'][$fn] = 1;
 			}
@@ -159,17 +153,17 @@ class FcFormLayoutParameters
 		}
 
 
-		// 4. find if some fields are missing placement field
+		// 4. Find if any core properties are missing a form placement field (a coreprops field named: form_*)
 		$coreprop_missing = array();
 		foreach($via_core_prop as $fn => $i)
 		{
-			// -EITHER- configured to be shown at default position -OR-
-			if ( isset($tab_fields['fman'][$fn])  &&  !isset($coreprops_fields[$fn]) ) {
+			if (!isset($coreprops_fields[$fn]))
+			{
 				$coreprop_missing[$fn] = true;
-				unset($tab_fields['fman'][$fn]);
 				$tab_fields['below'][$fn] = 1;
 			}
 		}
+
 
 		$placementConf['via_core_field']   = $via_core_field;
 		$placementConf['via_core_prop']    = $via_core_prop;
@@ -180,8 +174,7 @@ class FcFormLayoutParameters
 		$placementConf['all_tab_fields']   = $all_tab_fields;
 		$placementConf['coreprop_missing'] = $coreprop_missing;
 
-		$placementConf['placeViaFman']     = $placementConf['tab_fields']['fman'];
-		$placementConf['placeViaLayout']   = $placeViaLayout;
+		$placementConf['placeViaLayout']   = $all_tab_fields;
 
 		return $placementConf;
 	}
