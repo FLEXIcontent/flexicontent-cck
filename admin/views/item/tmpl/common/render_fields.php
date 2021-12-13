@@ -491,14 +491,12 @@ if (!$is_autopublished) :  // state and vstate (= approval of new document versi
 
 	<?php if ($this->perms['canpublish']) : // vstate (= approval of new document version) ?>
 
-		<?php ob_start(); ?>
+		<?php if ($use_versioning && !$auto_approve) : ob_start();
+		// CASE 1. Display the 'publish changes' field.
+		// User can publish and versioning is ON with auto approval  OFF
+		?>
+
 		<div class="control-group">
-
-		 <?php if ($use_versioning && !$auto_approve) :
-			// CASE 1. Display the 'publish changes' field.
-			// User can publish and versioning is ON with auto approval  OFF
-			?>
-
 			<?php
 			$label_attrs = 'class="' . $tip_class . $lbl_class . $lbl_extra_class . '" title="'.flexicontent_html::getToolTip('FLEXI_PUBLIC_DOCUMENT_CHANGES', 'FLEXI_PUBLIC_DOCUMENT_CHANGES_DESC', 1, 1).'"';
 			ob_start();
@@ -536,6 +534,7 @@ if (!$is_autopublished) :  // state and vstate (= approval of new document versi
 		// Versioning ON: that item will need approval
 		// Versioning OFF: that change are applied immediately and that existing item is overwritten immediately
 	?>
+		<?php ob_start(); ?>
 		<div class="control-group">
 			<?php ob_start(); ?>
 				<div class="control-label" id="jform_vstate-lbl-outer">
@@ -1863,6 +1862,7 @@ if ($this->fields && $typeid) :
 				<?php $rendered[$field->name]->input_html = ob_get_clean(); echo $rendered[$field->name]->input_html; ?>
 
 			</div>
+
 		<?php
 			/**
 			 * Check if a field will NOT be placed via fields manager placement/ordering,
@@ -1870,14 +1870,16 @@ if ($this->fields && $typeid) :
 			 *
 			 * NOTE: if a field is not explicitely placed by layout, fields manager will try to place it by default
 			 */
+			$field_html = ob_get_clean();
+
 			if ( $customPlacement )
 			{
-				$captured[$field->name] = ob_get_clean();
+				$captured[$field->name] = $field_html;
 				$rendered[$field->name]->html = $captured[$field->name];
 			}
 			else
 			{
-				$captured['fman'][$field->name] = ob_get_clean();
+				$captured['fman'][$field->name] = $field_html;
 				$rendered[$field->name]->html = $captured['fman'][$field->name];
 			}
 
@@ -1886,7 +1888,18 @@ if ($this->fields && $typeid) :
 
 		<?php endforeach; ?>
 
-	</div>
+
+		<?php
+		/**
+		 * Implode captured fields manager fields
+		 */
+		echo implode('<div class="fcclear"></div>', $captured['fman']);
+		unset($captured['fman']);
+		?>
+
+
+	</div> <!-- fields manager container class="fc_edit_container_full" -->
+
 
 <?php else : /* NO TYPE SELECTED */ ?>
 
@@ -1899,15 +1912,9 @@ if ($this->fields && $typeid) :
 
 <?php endif;
 
+
 /**
- * Capture any fields manager contents that were missed (THIS SHOULD BE EMPTY !!)
+ * Capture the fields manager contents, including the external container
  */
 $captured['fields_manager'] = ob_get_clean();
-
-/**
- * Implode captured fields manager fields
- */
-$captured['fields_manager'] .= implode('<div class="fcclear"></div>', $captured['fman']);
-unset($captured['fman']);
-
 

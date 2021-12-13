@@ -2733,6 +2733,12 @@ span.fc_select_button:hover {
 	display: inline-block;
 	border: 0 none;
 }
+#flexicontent .fcform_tabs_above {
+	margin-bottom: 1em;
+}
+#flexicontent .fcform_tabs_below {
+	margin-top: 2em;
+}
 #flexicontent .fc_form_flex_box {
 	float: none;
 	width: 100;

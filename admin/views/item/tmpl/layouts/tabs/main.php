@@ -126,7 +126,7 @@ $total_fields = count($tab_fields['above']);
 $use_flexbox  = $total_fields > 1;
 $n = 0;
 ?>
-<div class="fc_edit_container_full">
+<div class="fcform_tabs_above">
 
 	<?php
 	echo $use_flexbox ? '
@@ -690,7 +690,7 @@ if ( count($tab_fields['tab08']) ) : ?>
 // BELOW TABSET
 // ************
 if ( count($tab_fields['below']) || count($captured) ) : ?>
-<div class="fc_edit_container_full">
+<div class="fcform_tabs_below">
 
 	<?php foreach($tab_fields['below'] as $fn => $i) : ?>
 		<div class="fcclear"></div>
