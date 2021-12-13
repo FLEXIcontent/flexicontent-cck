@@ -1,4 +1,13 @@
 <?php
+defined('_JEXEC') or die('Restricted access');
+
+if (!empty($this->placementMsgs))
+{
+	foreach($this->placementMsgs as $msg_type => $msgs)
+	{
+		foreach ($msgs as $msg) echo sprintf( $alert_box, ' style="" ', $msg_type, '', $msg);
+	}
+}
 
 $submit_msg = $approval_msg = '';
 

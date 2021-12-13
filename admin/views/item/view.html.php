@@ -710,7 +710,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		$lists = $this->_buildEditLists($perms, $page_params, $session_data);
 
 		// Create placement configuration for CORE properties
-		$placementConf = $this->_createPlacementConf($item, $fields, $page_params);
+		$placementConf = $this->_createPlacementConf($item, $fields, $page_params, $typesselected);
 
 		// Get menu overridden categories/main category fields, (FALSE IN BACKEND, no menu configuration in backend)
 		$menuCats = !$isSite ? false : $this->_getMenuCats($item, $perms, $page_params);
@@ -930,8 +930,9 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		$this->submitConf       = $submitConf;
 		$this->placementConf    = $placementConf;
 
-		$this->placeViaFieldMan = $placementConf['tab_fields']['fman'];
-		$this->customPlacements = $placementConf['all_tab_fields'];
+		$this->placeViaFman   = $placementConf['placeViaFman'];
+		$this->placeViaLayout = $placementConf['placeViaLayout'];
+		$this->placementMsgs  = $placementConf['placementMsgs'];
 
 		$this->iparams   = $model->getComponentTypeParams();
 		$this->itemlang  = $itemlang;
@@ -990,7 +991,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 	 *
 	 * @since 1.0
 	 */
-	function _buildEditLists(&$perms, &$page_params, &$session_data)
+	private function _buildEditLists(&$perms, &$page_params, &$session_data)
 	{
 		$app      = JFactory::getApplication();
 		$jinput   = $app->input;
@@ -2560,21 +2561,22 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 	 *
 	 * @since 1.0
 	 */
-	function _createPlacementConf( $item, & $fields, $page_params )
+	private function _createPlacementConf( $item, & $fields, $page_params, $typesselected )
 	{
 		$app    = JFactory::getApplication();
 		$CFGsfx = $app->isClient('site') ? '' : '_be';
 
 
 		/**
-		 * 1. Find core placer fields (of type 'coreprops')
+		 * 1. Find fields (of type 'coreprops') that are used to place core form elements
+		 *    like language associations, permissions, versions etc
 		 */
-		$core_placers = array();
+		$coreprops_fields = array();
 		foreach($fields as $field)
 		{
 			if ($field->field_type=='coreprops' && (int) $field->published === 1)
 			{
-				$core_placers[$field->parameters->get('props_type')] = $field;
+				$coreprops_fields[$field->parameters->get('props_type')] = $field;
 			}
 		}
 
@@ -2604,154 +2606,40 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 			// Deprecated: 'language',
 		));
 
-		$placeable_fields = array_merge($via_core_field, $via_core_prop);
-
 
 		/**
-		 * 3. Decide placement of CORE properties / fields
+		 * Parse layout parameters
 		 */
-		// Important: Get fman before other so that foreach will examine it 1st when we will check for duplicate fields
-		$tab_fields['fman']  = $page_params->get('form_tabs_fieldsman'. $CFGsfx,'');
+		$form_ilayout = $page_params->get('form_ilayout_be', 'tabs');
+		$params_file  = JPATH_ADMINISTRATOR . '/components/com_flexicontent/views/item/tmpl/layouts/' . $form_ilayout . '/parse_parameters.php';
 
-		$tab_fields['above']  = $page_params->get('form_tabs_above'. $CFGsfx,    'title, alias, category, lang, type, state, access, disable_comments, notify_subscribers, notify_owner');
-		$tab_fields['tab01']  = $page_params->get('form_tab01_fields'. $CFGsfx,  'text');
-		$tab_fields['tab02']  = $page_params->get('form_tab02_fields'. $CFGsfx,  'fields_manager');
-		$tab_fields['tab02a'] = $page_params->get('form_tab02a_fields'. $CFGsfx, 'jimages, jurls');
-		$tab_fields['tab03']  = $page_params->get('form_tab03_fields'. $CFGsfx,  'categories, tags, lang_assocs, perms');
-		$tab_fields['tab04']  = $page_params->get('form_tab04_fields'. $CFGsfx,  'timezone_info, created, created_by, created_by_alias, publish_up, publish_down, modified, modified_by, item_screen');
-		$tab_fields['tab05']  = $page_params->get('form_tab05_fields'. $CFGsfx,  'metadata, seoconf');
-		$tab_fields['tab06']  = $page_params->get('form_tab06_fields'. $CFGsfx,  'display_params');
-		$tab_fields['tab07']  = $page_params->get('form_tab07_fields'. $CFGsfx,  'layout_selection, layout_params');
-		$tab_fields['tab08']  = $page_params->get('form_tab08_fields'. $CFGsfx,  'versions');
-		$tab_fields['below']  = $page_params->get('form_tabs_below'. $CFGsfx,    '');
-
-
-		/**
-		 * Fix aliases, also replacing field types with field names
-		 */
-		foreach($tab_fields as $tab_name => $field_list)
+		if (file_exists($params_file))
 		{
-			$field_list = str_replace('createdby', 'created_by', $field_list);
-			$field_list = str_replace('modifiedby', 'modified_by', $field_list);
-			$field_list = str_replace('createdby_alias', 'created_by_alias', $field_list);
-			$field_list = str_replace('maintext', 'text', $field_list);
-			$field_list = str_replace('type', 'document_type', $field_list);
-			$field_list = str_replace('language', 'lang_assocs', $field_list);  // LEGACY value ...
-			$tab_fields[$tab_name] = $field_list;
-		}
-
-		// Split field lists
-		$all_tab_fields = array();
-		foreach($tab_fields as $i => $field_list)
-		{
-			// Split field names and flip the created sub-array to make field names be the indexes of the sub-array
-			$tab_fields[$i] = is_array($tab_fields[$i])
-				? $tab_fields[$i]
-				: (trim($tab_fields[$i]) === '' || trim($tab_fields[$i]) === '_skip_'
-					? array()
-					: preg_split("/[\s]*,[\s]*/", $field_list )
-				);
-			$tab_fields[$i] = array_flip($tab_fields[$i]);
-
-			// Find all field names of the placed fields, we can use this to find non-placed fields
-			foreach ($tab_fields[$i] as $field_name => $ignore)
-				$all_tab_fields[$field_name] = 1;
-		}
-
-		// Find fields missing from configuration, and place them below the tabs
-		foreach($placeable_fields as $fn => $i)
-		{
-			if ( !isset($all_tab_fields[$fn]) )
-			{
-				$tab_fields['below'][$fn] = 1;
-			}
-		}
-
-		// get TAB titles and TAB icon classes
-		$_titles = $page_params->get('form_tab_titles'. $CFGsfx, '1:FLEXI_DESCRIPTION, 2:__TYPE_NAME__, 3:FLEXI_ASSIGNMENTS, 4:FLEXI_PUBLISHING, 5:FLEXI_META_SEO, 6:FLEXI_DISPLAYING, 7:FLEXI_TEMPLATE');
-		$_icons  = $page_params->get('form_tab_icons'. $CFGsfx,  '1:icon-file-2, 2:icon-signup, 3:icon-tree-2, 4:icon-calendar, 5:icon-bookmark, 6:icon-eye-open, 7:icon-palette');
-
-		// Create title of the custom fields default TAB (field manager TAB)
-		if ($item->type_id)
-		{
-			$_str = JText::_('FLEXI_DETAILS');
-			$_str = StringHelper::strtoupper(StringHelper::substr($_str, 0, 1)) . StringHelper::substr($_str, 1);
-
-			$types_arr = flexicontent_html::getTypesList();
-			$type_lbl = isset($types_arr[$item->type_id]) ? $types_arr[$item->type_id]->name : '';
-			$type_lbl = $type_lbl ? JText::_($type_lbl) : JText::_('FLEXI_CONTENT_TYPE');
-			$type_lbl = $type_lbl .' ('. $_str .')';
+			// Get custom placement and placement forced to be via fields manager
+			require_once($params_file);
+			$fcForm_layout_params = new FcFormLayoutParameters();
+			$placementConf = $fcForm_layout_params->createPlacementConf( $item, $fields, $page_params, $coreprops_fields, $via_core_field, $via_core_prop);
 		}
 		else
 		{
-			$type_lbl = JText::_('FLEXI_TYPE_NOT_DEFINED');
+			JFactory::getApplication()->enqueueMessage('A layout file is missing : ' . $params_file, 'warning');
+			$placementConf = array('placeViaFman' => array(), 'placeViaLayout' => array());
 		}
 
-		// Also assign it for usage by layout
-		$this->type_lbl = $type_lbl;
-
-
-		// Split titles of default tabs and language filter the titles
-		$tab_titles = array();
-
-		if ($_titles !== '_ignore_')
+		/**
+		 * Add message about and core properties fields that are missing
+		 */
+		if ( count($placementConf ['coreprop_missing']) )
 		{
-			$_tmp = preg_split("/[\s]*,[\s]*/", $_titles);
-			foreach($_tmp as $_data)
-			{
-				$arr = preg_split("/[\s]*:[\s]*/", $_data);
-				if (count($arr) !== 2)
-				{
-					$app->enqueueMessage('Failed parse TAB titles configuration for: ' . $_titles, 'warning');
-					$tab_titles = array();
-					break;
-				}
-
-				$tab_titles['tab0'.$arr[0]] = $arr[1] === '__TYPE_NAME__' ? $type_lbl : JText::_($arr[1]);
-			}
+			$placementConf['placementMsgs']['warning'] = array();
+			$placementConf['placementMsgs']['warning'][] = JText::sprintf( 'FLEXI_FORM_FIELDSMAN_PLACING_FIELDS_MISSING',
+				'<span class="badge">'. JText::_($typesselected->name) . '</span>',
+				'<br><span class="fc_elements_listed_small">' . implode(', ', array_keys($placementConf ['coreprop_missing'])) . '</span><br>',
+				'<a href="javascript:;" class="btn btn-primary"
+					onclick="alert(\'Not implemented yet, please create manually\'); return false;"
+				>Create \'Core Property\' Fields</a>'
+			);
 		}
-
-		// Split icon classes of default tabs
-		$tab_icocss = array();
-
-		if ($_icons !== '_ignore_')
-		{
-			$_tmp = preg_split("/[\s]*,[\s]*/", $_icons);
-			foreach($_tmp as $_data)
-			{
-				$arr = preg_split("/[\s]*:[\s]*/", $_data);
-				if (count($arr) !== 2)
-				{
-					$app->enqueueMessage('Failed parse TAB icon classes configuration for: ' . $_icons, 'warning');
-					$tab_icocss = array();
-					break;
-				}
-
-				$tab_icocss['tab0'.$arr[0]] = $arr[1];
-			}
-		}
-
-
-		// 4. find if some fields are missing placement field
-		$coreprop_missing = array();
-		foreach($via_core_prop as $fn => $i)
-		{
-			// -EITHER- configured to be shown at default position -OR-
-			if ( isset($tab_fields['fman'][$fn])  &&  !isset($core_placers[$fn]) ) {
-				$coreprop_missing[$fn] = true;
-				unset($tab_fields['fman'][$fn]);
-				$tab_fields['below'][$fn] = 1;
-			}
-		}
-
-		$placementConf['via_core_field']   = $via_core_field;
-		$placementConf['via_core_prop']    = $via_core_prop;
-		$placementConf['placeable_fields'] = $placeable_fields;
-		$placementConf['tab_fields']       = $tab_fields;
-		$placementConf['tab_titles']       = $tab_titles;
-		$placementConf['tab_icocss']       = $tab_icocss;
-		$placementConf['all_tab_fields']   = $all_tab_fields;
-		$placementConf['coreprop_missing'] = $coreprop_missing;
 
 		return $placementConf;
 	}

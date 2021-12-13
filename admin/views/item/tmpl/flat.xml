@@ -14,7 +14,12 @@
 	<fields name="attribs">
 		
 		<fieldset name="layout" addfieldpath="/administrator/components/com_flexicontent/elements">
-			<field name="" type="separator" level="level3" default="This layout does not have any layout-specific parameters (yet)" class="alert alert-info fcpadded" />
+			<field name="" type="separator" level="level3" default="&lt;b&gt; This layout places all form elements via fields manager. &lt;/b&gt; 
+				&lt;br&gt;
+				&lt;br&gt; If any core property fields have not been created
+				&lt;br&gt; then you will prompted to create and assign these field to the item's type."
+				class="alert alert-info fcpadded"
+			/>
 		</fieldset>
 
 	</fields>

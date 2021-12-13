@@ -1169,6 +1169,11 @@ div#fc-filters-slide-btn {
 #fc-filters-box input[type="text"] {
 	padding: 8px 6px !important;
 }
+.fc_elements_listed_small {
+	font-weight: bold;
+	display: inline-block;
+	max-width: 420px;
+}
 body .fc-close {
 	color: #000000;
 	float: left;

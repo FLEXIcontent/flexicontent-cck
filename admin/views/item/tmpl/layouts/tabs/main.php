@@ -111,7 +111,7 @@ foreach ($tab_fields['fman'] as $fn => $i)
 
 
 /**
- * CONFIGURATION WARNINGS, fields that are displayed twice, and core properties that are missing
+ * CONFIGURATION WARNING, fields that are displayed twice
  */
 $field_n_places = array();
 foreach($displayed_at_tab as $fieldname => $_places)
@@ -124,13 +124,6 @@ if ($field_n_places)
 	$msg = JText::sprintf( 'FLEXI_FORM_FIELDS_DISPLAYED_TWICE', implode('<br>', $field_n_places) );
 	echo sprintf( $alert_box, '', 'error', '', $msg );
 }
-
-if ( count($coreprop_missing) )
-{
-	$msg = JText::sprintf( 'FLEXI_FORM_PLACER_FIELDS_MISSING', "<b>".implode(', ', array_keys($coreprop_missing))."</b>");
-	echo sprintf( $alert_box, '', 'error', '', $msg );
-}
-
 
 
 

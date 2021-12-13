@@ -1,14 +1,4 @@
 <?php
-/**
- * @package         FLEXIcontent
- * @version         3.3
- *
- * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
- * @link            https://flexicontent.org
- * @copyright       Copyright © 2018, FLEXIcontent team, All Rights Reserved
- * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
- */
-
 defined('_JEXEC') or die('Restricted access');
 use Joomla\String\StringHelper;
 
@@ -1647,7 +1637,7 @@ if ($this->fields && $typeid) :
 	<div class="fc_edit_container_full">
 
 		<?php
-		$customPlacement = isset($this->customPlacements[$field->name]) && !isset($this->placeViaFieldMan[$field->name]);
+		$customPlacement = !isset($this->placeViaFman[$field->name]) && isset($this->placeViaLayout[$field->name]);
 		$hide_ifempty_fields = array('fcloadmodule', 'fcpagenav', 'toolbar', 'comments');
 		$row_k = 0;
 
@@ -1879,8 +1869,9 @@ if ($this->fields && $typeid) :
 			/**
 			 * Check if a field will NOT be placed via fields manager placement/ordering,
 			 * but instead it will be inside a custom TAB (e.g. 'text' (Description field) is placed inside the 'Description' TAB
+			 *
+			 * NOTE: if a field is not explicitely placed by layout, fields manager will try to place it by default
 			 */
-			$customPlacement = isset($this->customPlacements[$field->name]) && !isset($this->placeViaFieldMan[$field->name]);
 			if ( $customPlacement )
 			{
 				$captured[$field->name] = ob_get_clean();

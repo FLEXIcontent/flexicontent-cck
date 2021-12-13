@@ -1,10 +1,12 @@
 <?php
+defined('_JEXEC') or die('Restricted access');
 
 $app     = JFactory::getApplication();
 $user    = JFactory::getUser();
 $session = JFactory::getSession();
 $isSite  = $app->isClient('site');
 $CFGsfx  = $isSite ? '_fe' : '_be';
+
 
 /**
  * Create some variables
@@ -15,6 +17,19 @@ $isnew  = !$this->row->id;
 $typeid = (int) $this->row->type_id;
 
 $this->menuCats = $isnew ? $this->menuCats : false;  // just make sure ...
+
+
+/**
+ * Create reusable html code
+ */
+
+$close_btn = '<a class="close" data-dismiss="alert">&#215;</a>';  // '<a class="fc-close" onclick="this.parentNode.parentNode.removeChild(this.parentNode);">&#215;</a>';
+$alert_box = '<div %s class="alert alert-%s %s">'.$close_btn.'%s</div>';  // '<div %s class="fc-mssg fc-%s %s">'.$close_btn.'%s</div>';
+$btn_class = 'btn';  // 'fc_button';
+$tip_class = ' hasTooltip';
+$lbl_class = ' ' . $this->params->get('form_lbl_class' . $CFGsfx, '');
+$noplugin  = '<div class="fc-mssg-inline fc-warning" style="margin:0 2px 6px 2px; max-width: unset;">'.JText::_( 'FLEXI_PLEASE_PUBLISH_THIS_PLUGIN' ).'</div>';
+
 
 /**
  * These are used in FRONTEND, to create
@@ -100,17 +115,6 @@ if ($usemaincat === 0 && empty($this->menuCats->cancatid) && !$this->row->id && 
 	) . '<br>' . $this->lists['catid'];
 }
 
-
-/**
- * Create reusable html code
- */
-
-$close_btn = '<a class="close" data-dismiss="alert">&#215;</a>';  // '<a class="fc-close" onclick="this.parentNode.parentNode.removeChild(this.parentNode);">&#215;</a>';
-$alert_box = '<div %s class="alert alert-%s %s">'.$close_btn.'%s</div>';  // '<div %s class="fc-mssg fc-%s %s">'.$close_btn.'%s</div>';
-$btn_class = 'btn';  // 'fc_button';
-$tip_class = ' hasTooltip';
-$lbl_class = ' ' . $this->params->get('form_lbl_class' . $CFGsfx, '');
-$noplugin  = '<div class="fc-mssg-inline fc-warning" style="margin:0 2px 6px 2px; max-width: unset;">'.JText::_( 'FLEXI_PLEASE_PUBLISH_THIS_PLUGIN' ).'</div>';
 
 /**
  * Create info images
