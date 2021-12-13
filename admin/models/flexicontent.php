@@ -370,7 +370,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 
 			// Attibute groups or other composite data
 			'item_screen' => $p.'VERSION_INFOMATION', 'lang_assocs' => $p.'LANGUAGE_ASSOCS',
-			'jimages' => $p.'JIMAGES', 'jurls' => $p.'JLINKS',
+			'jimages' => $p.'JIMAGES', 'jurls' => $p.'JURLS',
 			'metadata' => $p.'META', 'seoconf' => $p.'SEO',
 			'display_params' => $p.'DISP_PARAMS', 'layout_params' => $p.'LAYOUT_PARAMS',
 			'perms' => 'FLEXI_PERMISSIONS', 'versions' => 'FLEXI_VERSIONS',
