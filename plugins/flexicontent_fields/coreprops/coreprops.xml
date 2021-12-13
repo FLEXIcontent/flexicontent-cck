@@ -40,12 +40,14 @@
 					<option value="timezone_info"     show_list="" hide_list="maincat_conf">FLEXI_COREPROPS_TIMEZONE</option>
 					<option value="created_by_alias"  show_list="" hide_list="maincat_conf">FLEXI_COREPROPS_CREATE_BY_ALIAS</option>
 					<option value="publish_up"        show_list="" hide_list="maincat_conf">FLEXI_COREPROPS_PUBLISH_UP</option>
-					<option value="publish_down"      show_list="" hide_list="maincat_conf">FLEXI_COREPROPS_PUBLISH__BY</option>
+					<option value="publish_down"      show_list="" hide_list="maincat_conf">FLEXI_COREPROPS_PUBLISH_DOWN</option>
 					<option value="access"            show_list="" hide_list="maincat_conf">FLEXI_COREPROPS_VIEW_ACCESS</option>
 				</group>
 				<group label="FLEXI_COREPROPS_PROP_GROUPS">
 					<option value="item_screen"       show_list="" hide_list="maincat_conf">FLEXI_COREPROPS_VERSION_INFOMATION</option>
 					<option value="lang_assocs"       show_list="" hide_list="maincat_conf">FLEXI_COREPROPS_LANGUAGE_ASSOCS</option>
+					<option value="jimages"           show_list="" hide_list="maincat_conf">FLEXI_COREPROPS_JIMAGES</option>
+					<option value="jurls"             show_list="" hide_list="maincat_conf">FLEXI_COREPROPS_JLINKS</option>
 					<option value="metadata"          show_list="" hide_list="maincat_conf">FLEXI_COREPROPS_META</option>
 					<option value="seoconf"           show_list="" hide_list="maincat_conf">FLEXI_COREPROPS_SEO</option>
 					<option value="display_params"    show_list="" hide_list="maincat_conf">FLEXI_COREPROPS_DISP_PARAMS</option>
