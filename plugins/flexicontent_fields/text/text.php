@@ -112,7 +112,10 @@ class plgFlexicontent_fieldsText extends FCField
 		$maxlength = (int) $field->parameters->get( 'maxlength', 0 ) ;
 
 		$display_label_form = (int) $field->parameters->get( 'display_label_form', 1 ) ;
-		$placeholder        = $display_label_form==-1 ? $field->label : JText::_($field->parameters->get( 'placeholder', '' )) ;
+		$simple_form_layout = $display_label_form === -1;
+		$placeholder        = $display_label_form === -1 && !$simple_form_layout
+			? $field->label
+			: JText::_($field->parameters->get( 'placeholder', '' )) ;
 
 		// Create extra HTML TAG parameters for the form field
 		$classes = '';
@@ -358,7 +361,7 @@ class plgFlexicontent_fieldsText extends FCField
 		}
 
 		// We may comment out some classes so that layout decides these
-		$classes .= ' fcfield_textval' . $required_class;
+		$classes .= $required_class;
 
 		// Set field to 'Automatic' on successful validation'
 		if ($auto_value)
@@ -418,44 +421,15 @@ class plgFlexicontent_fieldsText extends FCField
 		 */
 
 		$field->html = array();
-		$n = 0;
 
 		// These are unused in this field
 		$skipped_vals = array();
 		$per_val_js   = '';
 
-		foreach ($field->value as $value)
-		{
-			if ( !strlen($value) && !$use_ingroup && $n) continue;  // If at least one added, skip empty if not in field group
+		$formlayout = $field->parameters->get('formlayout', '');
+		$formlayout = $formlayout ? 'field_'.$formlayout : 'field_default';
 
-			$fieldname_n = $fieldname.'['.$n.']';
-			$elementid_n = $elementid.'_'.$n;
-
-			// NOTE: HTML tag id of this form element needs to match the -for- attribute of label HTML tag of this FLEXIcontent field, so that label will be marked invalid when needed
-			$text_field =
-				'<input value="'.htmlspecialchars( $value, ENT_COMPAT, 'UTF-8' ).'" '
-					.$validate_mask.' id="'.$elementid_n.'" name="'.$fieldname_n.'" class="'.$classes.'" type="text" '.$attribs.'
-				/>';
-
-			$field->html[] = $pretext . '
-				<div class="' . $input_grp_class . ' fc-xpended">
-					'.($auto_value || $select_field_placement !== 0 ? '' : $select_field).'
-					' . $text_field . '
-					'.($auto_value || $select_field_placement !== 1 ? '' : $select_field).'
-				</div>
-				' . $posttext . '
-				' . ($auto_value ? '<span class="fc-mssg-inline fc-info fc-nobgimage">' . JText::_('FLEXI_AUTO') . '</span>' : '') . '
-				' . (!$add_ctrl_btns || $auto_value ? '' : '
-				<div class="'.$input_grp_class.' fc-xpended-btns">
-					'.$move2.'
-					'.$remove_button.'
-					'.(!$add_position ? '' : $add_here).'
-				</div>
-				');
-
-			$n++;
-			if (!$multiple) break;  // multiple values disabled, break out of the loop, not adding further values even if the exist
-		}
+		include(self::getFormPath($this->fieldtypes[0], $formlayout));
 
 		// Add per value JS
 		if ($per_val_js)
