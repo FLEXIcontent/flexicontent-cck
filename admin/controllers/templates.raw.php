@@ -335,6 +335,7 @@ class FlexicontentControllerTemplates extends FlexicontentControllerBaseAdmin
 		{
 			$ext_params_str = $db->setQuery($query)->loadResult();
 			$ext_params = new JRegistry($ext_params_str);
+			//print_r($ext_params_str); exit;
 		}
 
 
@@ -518,18 +519,21 @@ class FlexicontentControllerTemplates extends FlexicontentControllerBaseAdmin
 							$_field_id = str_replace('jform_attribs_', 'jform_iflayout_', $field->id);
 							break;
 
-						case 'field':
-							$_label = str_replace('jform_attribs_', 'jform_layouts_', $field->label);
-							$_input = str_replace('jform_attribs_', 'jform_layouts_',
-								str_replace('[attribs]', '[layouts]', $field_input_inherited)
-							);
-							$_field_id = str_replace('jform_attribs_', 'jform_layouts_', $field->id);
-							break;
-
 						default:
-							$_label = $field->label;
-							$_input = $field_input_inherited;
-							$_field_id = $field->id;
+							if (in_array($ext_view, array('field', 'module')))
+							{
+								$_label = str_replace('jform_attribs_', 'jform_layouts_', $field->label);
+								$_input = str_replace('jform_attribs_', 'jform_layouts_',
+									str_replace('[attribs]', '[layouts]', $field_input_inherited)
+								);
+								$_field_id = str_replace('jform_attribs_', 'jform_layouts_', $field->id);
+							}
+							else
+							{
+								$_label = $field->label;
+								$_input = $field_input_inherited;
+								$_field_id = $field->id;
+							}
 							break;
 					}
 
