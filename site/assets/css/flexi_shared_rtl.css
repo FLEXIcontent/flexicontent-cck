@@ -1487,22 +1487,23 @@ ul.thumbnails.image_picker_selector li div.thumbnail p {
 }
 #flexicontent form span.fcfield_textval {
 	cursor: text;
-	padding: 4px;
 	white-space: pre-wrap;
 	word-wrap: break-word;
-	min-width: 220px;
 	width: auto;
-	max-width: 600px;
 }
+#flexicontent form span.fcfield_textval,
 #flexicontent form select.fcfield_selectval,
 #flexicontent form input.fcfield_textval {
-	height: 3rem;
-	line-height: 3rem;
+	height: 2.7rem;
+	line-height: 2.7rem;
 	overflow: auto;
 	vertical-align: top;
 	min-width: 220px;
 	max-width: 600px;
 	border-radius: 3px;
+	padding: 0 0.3rem;
+	font-size: 1rem;
+	box-sizing: border-box;
 }
 #flexicontent form select.fcfield_selectval {
 	padding: 4px 0 2px 4px;

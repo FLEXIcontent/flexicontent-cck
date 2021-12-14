@@ -470,12 +470,25 @@ body .fc-nowrap-box .nowrap_box .label,
 	min-width: 140px;
 	float: left;
 	text-align: right;
-	margin: 0 0 0 0;
-	padding-left: 4px;
-	padding-right: 4px;
-	padding-top: 8px;
-	padding-bottom: 8px;
+}
+#flexicontent .btn-group .btn,
+#flexicontent .fc-xpended > div,
+#flexicontent .fc-xpended-row > div,
+#flexicontent .fc-xpended .input-group-text,
+#flexicontent .fc-xpended-row .input-group-text,
+#flexicontent .fc-xpended .add-on,
+#flexicontent .fc-xpended-row .add-on {
 	display: inline-block;
+	margin: 0 0 0 0;
+	height: 2.7rem;
+	line-height: 2.7rem;
+	padding: 0 0.6rem !important;
+	font-size: 1rem;
+	box-sizing: border-box;
+}
+#flexicontent .fc-xpended > div,
+#flexicontent .fc-xpended-row > div {
+	padding: 0 !important;
 }
 @media (max-width: 800px) {
 	#flexicontent .fc-xpended .input-group-text:first-child,
