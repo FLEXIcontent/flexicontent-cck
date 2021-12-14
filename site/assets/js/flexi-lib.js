@@ -719,7 +719,7 @@
 	{
 		btn_class = btn_class || 'btn-info';
 		// Get field value containers
-		var rows = field_values_box.find('.fcfieldval_container.valuebox');
+		var rows = field_values_box.find('.fcfieldval_container');
 		var el = jQuery(el);
 
 		// Set expanding flag and expand or compact properties

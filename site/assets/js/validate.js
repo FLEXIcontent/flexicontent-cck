@@ -807,7 +807,7 @@ var JFormValidator_FC = function()
 			}
 
 			// Performance concern ... only do for first invalid field  --  Check if it is part of a field group and make sure the fied group is expanded
-			fieldval_box.find(".fc-toggle-group-down").filter(":visible").data('fc_noeffect', 1).trigger('click');   // Only if is drop down button is visible = valuebox is hidden
+			fieldval_box.find(".fc-toggle-group-down").filter(":visible").data('fc_noeffect', 1).trigger('click');   // Only if is drop down button is visible = value box is hidden
 		}
 		
  		// Get the label
@@ -871,8 +871,8 @@ var JFormValidator_FC = function()
 					jQuery('<span class="fc-field-invalid alert alert-error" style="' + error_css +'">' + error_mssg + '</span>').prependTo( $el.parent() );
 
 					// Prevent showing required error until the other error is cleared
-					var fcfied_parent_box = $el.closest('.valuebox');
-					if (fcfied_parent_box.length) fcfied_parent_box.find('.invalid').removeClass('invalid');
+					var fcfield_parent_box = $el.closest('.fcfieldval_container');
+					if (fcfield_parent_box.length) fcfield_parent_box.find('.invalid').removeClass('invalid');
 				}
 			}
 
