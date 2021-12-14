@@ -37,10 +37,6 @@
 			<div class="' . $box_classes . '">
 				<label class="' . $lbl_classes . $has_value_class . ' fc-lbl emailaddr-lbl" for="'.$elementid_n.'_addr">'.JText::_( 'FLEXI_FIELD_EMAILADDRESS' ).'</label>
 				<input ' . $ff_events . ' class="emailaddr ' . $input_classes . ' ' . $addr_classes . '" name="'.$fieldname_n.'[addr]" id="'.$elementid_n.'_addr" type="text" value="'.htmlspecialchars(JStringPunycode::emailToUTF8($value['addr']), ENT_COMPAT, 'UTF-8').'" ' . $addr_attribs . '/>
-				'
-				. (!$auto_value ? '' : '
-				<span class="fc-mssg-inline fc-info fc-nobgimage">' . JText::_('FLEXI_AUTO') . '</span>'
-				) . '
 			</div>';
 
 		$text = '';

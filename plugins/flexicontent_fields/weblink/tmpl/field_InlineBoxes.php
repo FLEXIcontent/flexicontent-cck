@@ -43,11 +43,8 @@
 				'
 				. ($useimage && !$auto_value ? '
 				<a href="javascript:;" class="'. $tooltip_class .' btn btn-primary img_fetch_btn" title="'.JText::_('FLEXI_AUTO').'" onclick="fcfield_weblink.fetchData(\''.$elementid_n.'\', \''.$field_name_js.'\'); return false;">
-					<i class="icon-loop"></i> ' /*. JText::_('FLEXI_AUTO')*/ . '
-				</a>' : '')
-				. (!$auto_value ? '' : '
-				<span class="fc-mssg-inline fc-info fc-nobgimage">' . JText::_('FLEXI_AUTO') . '</span>'
-				) . '
+					<i class="icon-loop"></i>
+				</a>' : '') . '
 			</div>';
 
 		$autoprefix = '';

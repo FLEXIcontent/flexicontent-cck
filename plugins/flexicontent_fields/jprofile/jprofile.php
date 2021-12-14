@@ -392,7 +392,6 @@ class plgFlexicontent_fieldsJProfile extends FCField
 
 			$field->html[] = '
 				'.$jfield_html.'
-				' . ($auto_value ? '<span class="fc-mssg-inline fc-info fc-nobgimage">' . JText::_('FLEXI_AUTO') . '</span>' : '') . '
 				' . (!$add_ctrl_btns || $auto_value ? '' : '
 				<div class="'.$input_grp_class.' fc-xpended-btns">
 					'.$move2.'
