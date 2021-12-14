@@ -1087,102 +1087,23 @@ div.container_fcfield div.toggle_all_values_buttons_box {
 	margin: 0 4px 16px 0;
 	padding: 12px 0 12px 12px;
 }
-#flexicontent ul.fcfield-sortables.fcfield-group > li.fcfieldval_container.valuebox .flexi.label.sub_label {
+#flexicontent ul.fcfield-sortables.fcfield-group > li.fcfieldval_container.valuebox .fc_sub_label {
 	box-sizing: border-box;
-	max-width: 150px;
-	width: 20%;
-	padding: 4px 6px 4px 6px;
-	margin: 1px 1% 2px 0;
 	float: none;
 	clear: none;
-	display: inline-block;
+	display: block;
 	vertical-align: top;
-	border-width: 0px !important;
-	color: unset;
-	background: unset;
-	font-weight: unset;
 	text-align: right;
-	font-size: 110%;
 }
-#flexicontent ul.fcfield-sortables.fcfield-group > li.fcfieldval_container.valuebox .flexi.label.sub_label.fc_tooltip_icon {
+#flexicontent ul.fcfield-sortables.fcfield-group > li.fcfieldval_container.valuebox .fc_sub_label.fc_tooltip_icon {
 	padding: 4px 6px 4px 20px !important;
 	background-image: url(../images/information.png);
 	background-position: 2px 2px;
 	background-repeat: no-repeat;
 }
-#flexicontent ul.fcfield-sortables.fcfield-group > li.fcfieldval_container.valuebox .fcfieldval_container.valuebox {
-	box-sizing: border-box;
-	border-width: 0;
-	width: 78% !important;
-	padding: 0px 0% 6px;
-	margin: 0% !important;
-	float: none !important;
-	clear: none;
-	display: inline-block;
-}
-@media only screen and (min-width: 2090px) {
-	#flexicontent ul.fcfield-sortables.fcfield-group > li.fcfieldval_container.valuebox .fcfieldval_container.valuebox {
-		width: 90% !important;
-	}
-}
-@media only screen and (min-width: 1860px) and (max-width: 2090px) {
-	#flexicontent ul.fcfield-sortables.fcfield-group > li.fcfieldval_container.valuebox .fcfieldval_container.valuebox {
-		width: 89% !important;
-	}
-}
-@media only screen and (min-width: 1720px) and (max-width: 1860px) {
-	#flexicontent ul.fcfield-sortables.fcfield-group > li.fcfieldval_container.valuebox .fcfieldval_container.valuebox {
-		width: 88% !important;
-	}
-}
-@media only screen and (min-width: 1590px) and (max-width: 1720px) {
-	#flexicontent ul.fcfield-sortables.fcfield-group > li.fcfieldval_container.valuebox .fcfieldval_container.valuebox {
-		width: 87% !important;
-	}
-}
-@media only screen and (min-width: 1490px) and (max-width: 1590px) {
-	#flexicontent ul.fcfield-sortables.fcfield-group > li.fcfieldval_container.valuebox .fcfieldval_container.valuebox {
-		width: 86% !important;
-	}
-}
-@media only screen and (min-width: 1390px) and (max-width: 1490px) {
-	#flexicontent ul.fcfield-sortables.fcfield-group > li.fcfieldval_container.valuebox .fcfieldval_container.valuebox {
-		width: 85% !important;
-	}
-}
-@media only screen and (min-width: 1310px) and (max-width: 1390px) {
-	#flexicontent ul.fcfield-sortables.fcfield-group > li.fcfieldval_container.valuebox .fcfieldval_container.valuebox {
-		width: 84% !important;
-	}
-}
-@media only screen and (min-width: 1250px) and (max-width: 1310px) {
-	#flexicontent ul.fcfield-sortables.fcfield-group > li.fcfieldval_container.valuebox .fcfieldval_container.valuebox {
-		width: 83% !important;
-	}
-}
-@media only screen and (min-width: 1190px) and (max-width: 1250px) {
-	#flexicontent ul.fcfield-sortables.fcfield-group > li.fcfieldval_container.valuebox .fcfieldval_container.valuebox {
-		width: 82% !important;
-	}
-}
-@media only screen and (min-width: 1130px) and (max-width: 1190px) {
-	#flexicontent ul.fcfield-sortables.fcfield-group > li.fcfieldval_container.valuebox .fcfieldval_container.valuebox {
-		width: 81% !important;
-	}
-}
-@media only screen and (min-width: 1100px) and (max-width: 1130px) {
-	#flexicontent ul.fcfield-sortables.fcfield-group > li.fcfieldval_container.valuebox .fcfieldval_container.valuebox {
-		width: 80% !important;
-	}
-}
-@media only screen and (min-width: 1050px) and (max-width: 1100px) {
-	#flexicontent ul.fcfield-sortables.fcfield-group > li.fcfieldval_container.valuebox .fcfieldval_container.valuebox {
-		width: 79% !important;
-	}
-}
 @media only screen and (max-width: 800px) {
-	#flexicontent ul.fcfield-sortables.fcfield-group > li.fcfieldval_container.valuebox .fcfieldval_container.valuebox {
-		width: 100% !important;
+	#flexicontent ul.fcfield-sortables.fcfield-group .controls {
+		margin-left: 0;
 	}
 }
 #flexicontent div [class^="fcfield-"].fcfont-icon,

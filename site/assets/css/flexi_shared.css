@@ -1195,7 +1195,7 @@ body .span6 .container_fcfield:not(.controls),
 }
 body .input-fcmax.container_fcfield input,
 #flexicontent .input-fcmax.container_fcfield input {
-	width: 90%;
+	width: 80%;
 	padding-left: 1em;
 	padding-right: 1em;
 }
@@ -1468,6 +1468,9 @@ ul.thumbnails.image_picker_selector li div.thumbnail p {
 	visibility: hidden !important;
 	display: block !important;
 }
+#flexicontent form input.fcfield_textval.fc-floated-lbl-input {
+	margin: 0px 0.6rem 0.2rem 0.6rem !important;
+}
 #flexicontent form .fcfield_textareaval,
 #flexicontent form .fcfield_selectval,
 #flexicontent form .fcfield_selectmulval,
@@ -1476,11 +1479,11 @@ ul.thumbnails.image_picker_selector li div.thumbnail p {
 	color: #444;
 	border: 1px solid #AAAAAA;
 	display: inline-block;
-	padding: 0 6px 0px 6px;
-	margin: 0px 6px 2px 2px;
+	padding: 0 0.6rem 0px 0.6rem;
+	margin: 0px 0.6rem 0.2rem 0.6rem;
 	position: relative;
 	text-decoration: none;
-	font-size: 12px;
+	font-size: 1rem;
 }
 #flexicontent form span.fcfield_textval {
 	cursor: text;
@@ -1493,12 +1496,11 @@ ul.thumbnails.image_picker_selector li div.thumbnail p {
 }
 #flexicontent form select.fcfield_selectval,
 #flexicontent form input.fcfield_textval {
-	height: 34px;
-	line-height: 26px;
+	height: 3rem;
+	line-height: 3rem;
 	overflow: auto;
 	vertical-align: top;
 	min-width: 220px;
-	width: auto;
 	max-width: 600px;
 	border-radius: 3px;
 }
@@ -1826,8 +1828,10 @@ div.current ul.config-option-list li fieldset {
 	body .label-fcouter > label,
 	body .label-fcinner,
 	#flexicontent .label-fcouter > label,
-	#flexicontent .label-fcinner {
-		text-align: left;
+	#flexicontent .label-fcinner,
+	#flexicontent .fc_sub_label > label,
+	#flexicontent .fc_sub_label {
+		text-align: left !important;
 	}
 	.fctoolbar_side_placement {
 		margin: 24px 0 12px 0;

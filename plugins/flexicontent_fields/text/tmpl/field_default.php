@@ -1,7 +1,7 @@
 <?php
-	$box_classes = empty($simple_form_layout)
+	$box_classes = (empty($simple_form_layout)
 		? $input_grp_class . ' fc-xpended'
-		: 'fc-floated-labels-box';
+		: 'fc-floated-labels-box');
 	$lbl_classes = empty($simple_form_layout)
 		? $add_on_class
 		: 'fc-floated-lbl';
@@ -42,7 +42,6 @@
 				'.($auto_value || $select_field_placement !== 1 ? '' : $select_field).'
 			</div>
 			' . $posttext . '
-			' . ($auto_value ? '<span class="fc-mssg-inline fc-info fc-nobgimage">' . JText::_('FLEXI_AUTO') . '</span>' : '') . '
 			' . (!$add_ctrl_btns || $auto_value ? '' : '
 			<div class="'.$input_grp_class.' fc-xpended-btns">
 				'.$move2.'

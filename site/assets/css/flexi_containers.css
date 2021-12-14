@@ -82,6 +82,16 @@ body .fc-field-invalid {
 	padding: 4px 8px;
 	display: inline-block;
 	margin: 2px 4px 0 8px;
+	border-radius: 4px;
+	font-weight: bold;
+	font-size: 1rem;
+	height: 2rem;
+	line-height: 2rem;
+}
+#flexicontent div.input-group-addon > .fc-field-invalid,
+#flexicontent div.input-append > .fc-field-invalid {
+	border-top-left-radius: 4px !important;
+	border-bottom-left-radius: 4px !important;
 }
 body .fc-mssg-inline.fc-note,
 body .fc-mssg.fc-note {
@@ -434,9 +444,17 @@ body .fc-nowrap-box .nowrap_box .label,
 	display: inline-block;
 }
 #flexicontent .fc-xpended-btns {
-	margin: 0 0 8px 0 !important;
+	margin: 0 0 0.3rem 0 !important;
 	float: none;
 	display: inline-block;
+}
+#flexicontent .fc-xpended-block500 {
+	box-sizing: border-box;
+	clear: both;
+	float: left;
+	margin: 0 0 1% 0 !important;
+	max-width: 500px;
+	width: 100%;
 }
 #flexicontent .fc-xpended-row {
 	box-sizing: border-box;

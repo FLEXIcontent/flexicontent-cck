@@ -885,7 +885,7 @@ var JFormValidator_FC = function()
 
 				if (!$el.next().hasClass('fc-field-invalid'))
 				{
-					$el.css({'width': 'auto'});
+					//$el.css({'width': 'auto'});   /* cause invalid input tags to change size */
 					jQuery('<span class="fc-field-invalid alert alert-error" style="' + error_css +'">' + error_mssg + '</span>').insertAfter( $el );
 				}
 			}
@@ -949,7 +949,7 @@ var JFormValidator_FC = function()
 			// Do not remove for radio-buttons / checkoxes, have custom code for this
 			else if (!is_radio_check)
 			{
-				$el.css({'width': ''}).next('.fc-field-invalid').remove() ;
+				$el.css({'width': ''}).next('.fc-field-invalid').remove() ;  /* remove any custom width in case it was added */
 			}
 
 			if (is_radio_check)

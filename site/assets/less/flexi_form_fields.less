@@ -173,24 +173,15 @@ div.container_fcfield div.toggle_all_values_buttons_box {
 	padding: 12px 0 12px 12px;
 
 	/* FIELD-GROUP: label of grouped field */
-	.flexi.label.sub_label {
+	.fc_sub_label {
 		box-sizing: border-box;
-		max-width: 150px;
-		width: 20%;
-		padding: 4px 6px 4px 6px;
-		margin: 1px 1% 2px 0;
 		float: none;
 		clear: none;
-		display: inline-block;
+		display: block;
 		vertical-align: top;
-		border-width: 0px !important;
-		color: unset;
-		background: unset;
-		font-weight: unset;
 		text-align: right;
-		font-size: 110%;
 	}
-	.flexi.label.sub_label.fc_tooltip_icon {
+	.fc_sub_label.fc_tooltip_icon {
 		padding: 4px 6px 4px 20px !important;
 		background-image: url(../images/information.png);
 		background-position: 2px 2px;
@@ -198,17 +189,18 @@ div.container_fcfield div.toggle_all_values_buttons_box {
 	}
 	/* FIELD-GROUP: value of grouped field */
 	.fcfieldval_container.valuebox {
-		box-sizing: border-box;
-		border-width: 0;
-		width: 78% !important;
-		padding: 0px 0% 6px;
-		margin: 0% !important;
-		float: none !important;
-		clear: none;
-		display: inline-block;
 	}
 }
 
+@media only screen and (max-width: 800px) {
+	#flexicontent ul.fcfield-sortables.fcfield-group {
+		.controls {
+			margin-left: 0;
+		}
+	}
+}
+
+/*
 @media only screen and (min-width: 2090px) {
 	#flexicontent ul.fcfield-sortables.fcfield-group > li.fcfieldval_container.valuebox .fcfieldval_container.valuebox {
 		width: 90% !important;
@@ -274,6 +266,7 @@ div.container_fcfield div.toggle_all_values_buttons_box {
 		width: 100% !important;
 	}
 }
+*/
 
 
 /*

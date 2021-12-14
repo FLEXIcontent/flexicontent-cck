@@ -763,10 +763,17 @@ body .nowrap_hidden {
 	padding-top: 18px;
 }
 
+#flexicontent .fcfield-group .fc-floated-labels-box {
+	display: inline-block;
+  position: relative;
+	margin: 0px;
+	width: 100%;
+}
+
 #flexicontent .fc-floated-labels-box {
 	display: inline-block;
   position: relative;
-	margin: 0px 0px 20px 4px;
+	margin: 0px 0px 0.2rem 0.4rem;
 
 	> div.use_select2_lib {
 		width: 100% !important;
@@ -794,23 +801,20 @@ body .nowrap_hidden {
 		}
 	}
 
-	> input.fc-floated-lbl-input {
-		font-size: 14px;
-		width: 200px;
-		height: auto;
-		line-height: 1em;
-		padding: 0.5em 0.5em 0.25em 0.5em;
+	> input.fc-floated-lbl-input {  /* this is used together with fcfield_textval */
 		border: 1px solid gray;
 		border-radius: 4px;
+		text-align: left;
+		margin: 0.6rem;  /* this is used together with fcfield_textval */
 	}
 
 	> label.fc-floated-lbl {
 		font-family: "Trebuchet MS", Verdana, Helvetica, Arial;
-		font-size: 14px;
+		font-size: 1em;
 		position: absolute;
 		pointer-events: none;
-		top: 8px;
-		left: 8px;
+		top: 0.6rem;
+		left: 0.6rem;
 		transition: 0.2s ease all;
 		z-index: 10;
 		color: gray;
@@ -823,14 +827,15 @@ body .nowrap_hidden {
 	}
 
 	> label.fc-floated-lbl.fc-has-value {
-		background: #f0f0f0;
+		background: #ffffff;
 		color: black;
-		top: -0.8em;
-		left: 0.5em;
-		font-size: 1.2em;
-		line-height: 1em;
+		top: -0.8rem;
+		left: 0.5rem;
+		font-size: 1.2rem;
+		line-height: 1rem;
 		opacity: 1;
-		padding: 0.15em 0.25em 0.15em 0.25em;
+		padding: 0.2rem 0.3rem 0.3rem 0.3rem;
+		border-radius: 4px;
 	}
 
 	> label.fc-floated-lbl.fc-lbl-external {
@@ -840,15 +845,10 @@ body .nowrap_hidden {
 		opacity: 1;
 	}
 
-	> label.fc-floated-lbl.fc-has-value.invalid {
-		top: -3px;
-		right: 4px;
-	}
-
-	> input.fc-floated-lbl-input.invalid {
+	/*> input.fc-floated-lbl-input.invalid {
 		border-left: 1px solid transparent !important;
 		border-right: 1px solid transparent !important;
-	}
+	}*/
 }
 
 body .fcsubform-compact div.container_fcfield div.row-fluid {
