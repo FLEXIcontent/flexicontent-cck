@@ -402,54 +402,7 @@ if ( count($tab_fields['tab03']) ) :
 <?php endif;
 
 
-//echo "<pre>"; print_r(array_keys($this->form->getFieldsets('attribs'))); echo "</pre>";
-//echo "<pre>"; print_r(array_keys($this->form->getFieldsets())); echo "</pre>";
 
-$fieldSets = $this->form->getFieldsets();
-foreach ($fieldSets as $name => $fieldSet) :
-	if (substr($name, 0, 7) == 'params-' || substr($name, 0, 7) == 'fields-' || $name=='themes' || $name=='item_associations') continue;
-
-	$label = !empty($fieldSet->label) ? $fieldSet->label : 'COM_FLEXICONTENT_'.$name.'_FIELDSET_LABEL';
-	if ( JText::_($label)=='COM_FLEXICONTENT_'.$name.'_FIELDSET_LABEL' ) $label = 'COM_CONTENT_'.$name.'_FIELDSET_LABEL';
-
-	if ($name == 'metafb')
-		$icon_class = 'icon-users';
-	else
-		$icon_class = '';
-	?>
-	<!-- CUSTOM parameters TABs -->
-	<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" data-icon-class="<?php echo $icon_class; ?>">
-		<h3 class="tabberheading"> <?php echo JText::_($label); ?> </h3>
-
-		<div class="fc_tabset_inner">
-			<?php foreach ($this->form->getFieldset($name) as $field) : ?>
-
-				<?php if ($field->hidden): ?>
-					<span style="display:none !important;">
-						<?php echo $field->input; ?>
-					</span>
-				<?php else :
-					echo ($field->getAttribute('type')=='separator' || $field->hidden || !$field->label) ? $field->input : '
-					<div class="control-group">
-						<div class="control-label" id="jform_attribs_'.$field->fieldname.'-lbl-outer">
-							' . str_replace('class="', 'class="' . $lbl_class . ' label-fcinner ', str_replace(' for="', ' data-for="', $field->label)) . '
-						</div>
-						<div class="controls container_fcfield">
-							' . $this->getFieldInheritedDisplay($field, $this->iparams) . '
-						</div>
-					</div>
-					';
-				endif; ?>
-
-			<?php endforeach; ?>
-		</div>
-
-	</div> <!-- end tab -->
-<?php endforeach; ?>
-
-
-
-<?php
 
 // ***
 // *** PUBLISHING TAB

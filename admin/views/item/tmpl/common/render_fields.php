@@ -1307,48 +1307,69 @@ endif;
 
 
 
-// Parameter configured to be displayed
-$has_custom_params = false;
-$fieldSets = $this->form->getFieldsets('attribs');
-foreach ($fieldSets as $name => $fieldSet)
-{
-	if (in_array($name,
-		array('themes', 'params-basic', 'params-advanced','params-seoconf')
-	)) continue;
-	$has_custom_params = true;
-	break;
-}
+if ($displayed_fieldSets) : ob_start();  // display_params ?>
 
-if ($typeid && $usedisplaydetails || $has_custom_params ) : ob_start(); ?>
-<fieldset class="panelform">
-	<legend>
-		<?php echo JText::_( 'FLEXI_DISPLAYING' ); ?>
-	</legend>
+<?php if(count($displayed_fieldSets) > 1) :
+	array_push($tabSetStack, $tabSetCnt);
+	$tabSetCnt = ++$tabSetMax;
+	$tabCnt[$tabSetCnt] = 0;
+?>
+<!-- tabber start -->
+<div class="fctabber s-gray tabber-displayparams" id="fcform_tabset_<?php echo $tabSetCnt; ?>">
+<?php endif; ?>
 
-	<?php foreach ($fieldSets as $name => $fieldSet) : ?>
-		<?php
-		if ($name === 'themes' || $name === 'params-seoconf') continue;
-		if ($name === 'params-basic' && $usedisplaydetails < 1) continue;
-		if ($name === 'params-advanced' && $usedisplaydetails < 2) continue;
+	<?php foreach ($displayed_fieldSets as $name => $fieldSet) :
+		$label = !empty($fieldSet->label)
+			? $fieldSet->label
+			: 'COM_FLEXICONTENT_'.$name.'_FIELDSET_LABEL';
+		$label = JText::_($label) === 'COM_FLEXICONTENT_'.$name.'_FIELDSET_LABEL'
+			? 'COM_CONTENT_'.$name.'_FIELDSET_LABEL'
+			: $label;
+		$icon_class = $name === 'metafb' ? 'icon-users' : '';
 
-		$label = !empty($fieldSet->label) ? $fieldSet->label : 'FLEXI_'.$name.'_FIELDSET_LABEL';
-		?>
-
+		if(count($displayed_fieldSets) > 1) : ?>
+		<div class="tabbertab fc-tabbed-displayparams-box" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" >
+			<h3 class="tabberheading"> <?php echo JText::_($label); ?> </h3>
+		<?php else : ?>
 		<fieldset class="flexi_params panelform">
-			<!--legend><?php echo JText::_($label); ?></legend-->
+			<legend><?php echo JText::_($label); ?></legend>
+		<?php endif ?>
+
 
 			<?php foreach ($this->form->getFieldset($name) as $field) : ?>
-				<?php if ($allowdisablingcomments && $name === 'params-advanced' && $field->fieldname === 'comments')  continue; ?>
-				<?php echo $field->label; ?>
-				<div class="container_fcfield">
-					<?php echo $this->getFieldInheritedDisplay($field, $this->iparams);?>
-				</div>
-				<div class="fcclear"></div>
+
+				<?php if ($field->hidden): ?>
+					<span style="display:none !important;">
+						<?php echo $field->input; ?>
+					</span>
+				<?php else :
+					echo ($field->getAttribute('type')=='separator' || $field->hidden || !$field->label) ? $field->input : '
+					<div class="control-group">
+						<div class="control-label" id="jform_attribs_'.$field->fieldname.'-lbl-outer">
+							' . str_replace('class="', 'class="' . $lbl_class . ' label-fcinner ', str_replace(' for="', ' data-for="', $field->label)) . '
+						</div>
+						<div class="controls container_fcfield">
+							' . $this->getFieldInheritedDisplay($field, $this->iparams) . '
+						</div>
+					</div>
+					';
+				endif; ?>
+
 			<?php endforeach; ?>
+
+		<?php if(count($displayed_fieldSets) > 1) : ?>
+		</div>
+		<?php else : ?>
 		</fieldset>
+		<?php endif ?>
+
+
 	<?php endforeach; ?>
 
-</fieldset>
+<?php if(count($displayed_fieldSets) > 1) : ?>
+</div>
+<?php endif; ?>
+
 <?php
 $fn = 'display_params';
 $captured[$fn] = ob_get_clean();

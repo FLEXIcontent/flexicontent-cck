@@ -1190,7 +1190,7 @@
 				ext_name="" ext_type="forms" layout_sfx=""
 				hide_default="1" hide_none="1"
 				stripext="1" stripprefix="" filter="^.*\.php$" exclude="^_|default\.php"
-				tmpl_container="tabset_attrs_5_nav_4" params_source="file" custom_layouts_label="Custom layouts" layout_label="FLEXI_LAYOUT" icon_class="icon-screen"
+				tmpl_container="tabset_attrs_5_nav_5" params_source="file" custom_layouts_label="Custom layouts" layout_label="FLEXI_LAYOUT" icon_class="icon-screen"
 			>
 				<group label="Built-in layouts">
 					<option filename="tabs" value="tabs">tabs (Default)</option>
@@ -1379,10 +1379,14 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 
-			<field name="usedisplaydetails_fe" type="fcradio" default="0" label="FLEXI_MENU_USE_DISPLAY_DETAILS" description="FLEXI_MENU_USE_DISPLAY_DETAILS_DESC" class="btn-group btn-group-yesno">
+			<field name="usedisplaydetails_fe" type="fcradio" default="0" label="FLEXI_MENU_USE_DISPLAY_OPTIONS" description="FLEXI_MENU_USE_DISPLAY_OPTIONS_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO_RECOMMENDED</option>
 				<option value="1">FLEXI_PARAMETERS_ITEM_BASIC</option>
 				<option value="2">FLEXI_PARAMETERS_ITEM_ADVANCED</option>
+			</field>
+			<field name="use3rdpartyparams_fe" type="fcradio" default="1" label="FLEXI_MENU_USE_3RD_PARTY_DISPLAY_OPTIONS" description="FLEXI_MENU_USE_3RD_PARTY_DISPLAY_OPTIONS_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="selecttheme_fe" type="fcradio" default="0" label="FLEXI_MENU_TEMPLATE_SELECTION" description="FLEXI_MENU_TEMPLATE_SELECTION_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO_RECOMMENDED</option>
@@ -1423,7 +1427,7 @@
 				ext_name="" ext_type="forms" layout_sfx="_be"
 				hide_default="1" hide_none="1"
 				stripext="1" stripprefix="" filter="^.*\.php$" exclude="^_|default\.php"
-				tmpl_container="tabset_attrs_6_nav_4" params_source="file" custom_layouts_label="Custom layouts" layout_label="FLEXI_LAYOUT" icon_class="icon-screen"
+				tmpl_container="tabset_attrs_6_nav_5" params_source="file" custom_layouts_label="Custom layouts" layout_label="FLEXI_LAYOUT" icon_class="icon-screen"
 			>
 				<group label="Built-in layouts">
 					<option filename="tabs" value="tabs">tabs (Default)</option>
@@ -1603,10 +1607,14 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 
-			<field name="usedisplaydetails_be" type="fcradio" default="2" label="FLEXI_MENU_USE_DISPLAY_DETAILS" description="FLEXI_MENU_USE_DISPLAY_DETAILS_DESC" class="btn-group btn-group-yesno">
+			<field name="usedisplaydetails_be" type="fcradio" default="2" label="FLEXI_MENU_USE_DISPLAY_OPTIONS" description="FLEXI_MENU_USE_DISPLAY_OPTIONS_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO_RECOMMENDED</option>
 				<option value="1">FLEXI_PARAMETERS_ITEM_BASIC</option>
 				<option value="2">FLEXI_PARAMETERS_ITEM_ADVANCED</option>
+			</field>
+			<field name="use3rdpartyparams_be" type="fcradio" default="1" label="FLEXI_MENU_USE_3RD_PARTY_DISPLAY_OPTIONS" description="FLEXI_MENU_USE_3RD_PARTY_DISPLAY_OPTIONS_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="selecttheme_be" type="fcradio" default="2" label="FLEXI_MENU_TEMPLATE_SELECTION" description="FLEXI_MENU_TEMPLATE_SELECTION_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO_RECOMMENDED</option>

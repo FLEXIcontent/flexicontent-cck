@@ -69,6 +69,7 @@ $usepublicationdetails = (int) $this->params->get('usepublicationdetails' . $CFG
 $usemetadata           = (int) $this->params->get('usemetadata' . $CFGsfx, ($isSite ? 1 : 2));
 $useseoconf            = (int) $this->params->get('useseoconf' . $CFGsfx, ($isSite ? 0 : 1));
 $usedisplaydetails     = (int) $this->params->get('usedisplaydetails' . $CFGsfx, ($isSite ? 1 : 2));
+$use3rdpartyparams     = (int) $this->params->get('use3rdpartyparams' . $CFGsfx, 1);
 $selecttheme           = (int) $this->params->get('selecttheme' . $CFGsfx, ($isSite ? 1 : 2));
 
 $permsplacement    = (int) $this->params->get('permsplacement' . $CFGsfx, 2);
@@ -84,6 +85,38 @@ $tabSetCnt = -1;
 $tabSetMax = -1;
 $tabCnt = array();
 $tabSetStack = array();
+
+
+/**
+ * Decide which field-sets with display options (parameters) will be shown
+ */
+
+$displayed_fieldSets = array();
+$fieldSets = $this->form->getFieldsets('attribs');
+foreach ($fieldSets as $name => $fieldSet)
+{
+	if ($name === 'themes' || $name === 'params-seoconf')
+	{
+		// These are displayed with seperate elements: 'layout_selection', 'layout_params' and  'metadata'
+		continue;
+	}
+	elseif ($name === 'params-basic')
+	{
+		if ($typeid && $usedisplaydetails < 1) continue;
+	}
+	elseif ($name === 'params-advanced')
+	{
+		if ($typeid && $usedisplaydetails < 2) continue;
+	}
+
+	else
+	{
+		// 3rd-party display attributes
+		if (!$use3rdpartyparams) continue;
+	}
+
+	$displayed_fieldSets[$name] = $fieldSet;
+}
 
 
 /**

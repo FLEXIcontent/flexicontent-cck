@@ -213,11 +213,16 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 
-			<field name="usedisplaydetails_fe" type="radio" default="" label="FLEXI_MENU_USE_DISPLAY_DETAILS" description="FLEXI_MENU_USE_DISPLAY_DETAILS_DESC" class="btn-group btn-group-yesno">
+			<field name="usedisplaydetails_fe" type="radio" default="" label="FLEXI_MENU_USE_DISPLAY_OPTIONS" description="FLEXI_MENU_USE_DISPLAY_OPTIONS_DESC" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_NO_RECOMMENDED</option>
 				<option value="1">FLEXI_PARAMETERS_ITEM_BASIC</option>
 				<option value="2">FLEXI_PARAMETERS_ITEM_ADVANCED</option>
+			</field>
+			<field name="use3rdpartyparams_fe" type="radio" default="" label="FLEXI_MENU_USE_3RD_PARTY_DISPLAY_OPTIONS" description="FLEXI_MENU_USE_3RD_PARTY_DISPLAY_OPTIONS_DESC" class="btn-group btn-group-yesno">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="selecttheme_fe" type="radio" default="" label="FLEXI_MENU_TEMPLATE_SELECTION" description="FLEXI_MENU_TEMPLATE_SELECTION_DESC" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>
