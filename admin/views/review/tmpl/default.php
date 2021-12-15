@@ -14,7 +14,7 @@ defined('_JEXEC') or die('Restricted access');
 $form = $this->form;
 ?>
 
-<div class="flexicontent" id="flexicontent">
+<div id="flexicontent" class="flexicontent">
 <form action="index.php" method="post" name="adminForm" id="adminForm" class="form-validate form-horizontal">
 
 	<?php

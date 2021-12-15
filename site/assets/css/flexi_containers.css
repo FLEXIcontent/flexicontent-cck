@@ -485,6 +485,19 @@ body .fc-nowrap-box .nowrap_box .label,
 	padding: 0 0.6rem !important;
 	font-size: 1rem;
 	box-sizing: border-box;
+	vertical-align: bottom;
+}
+#flexicontent.fcconfig-form .btn-group .btn,
+#flexicontent.fcconfig-form .fc-xpended > div,
+#flexicontent.fcconfig-form .fc-xpended-row > div,
+#flexicontent.fcconfig-form .fc-xpended .input-group-text,
+#flexicontent.fcconfig-form .fc-xpended-row .input-group-text,
+#flexicontent.fcconfig-form .fc-xpended .add-on,
+#flexicontent.fcconfig-form .fc-xpended-row .add-on {
+	height: 2rem;
+	line-height: 2rem;
+	padding: 0 0.6rem !important;
+	font-size: 0.9rem;
 }
 #flexicontent .fc-xpended > div,
 #flexicontent .fc-xpended-row > div {

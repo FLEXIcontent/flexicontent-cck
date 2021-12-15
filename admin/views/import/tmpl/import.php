@@ -34,7 +34,7 @@ $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">
 ?>
 
 
-<div class="flexicontent" id="flexicontent">
+<div id="flexicontent" class="flexicontent fcconfig-form">
 
 <form action="index.php" method="post" name="adminForm" id="adminForm" class="form-validate form-horizontal" enctype="multipart/form-data" >
 

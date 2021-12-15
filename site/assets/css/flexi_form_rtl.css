@@ -889,7 +889,9 @@ td.col_edit_layout {
 }
 .flexicontent #fc-managers-header #search {
 	margin: 0px !important;
-	padding: 4px !important;
+	padding: 0 0.6rem;
+	height: 2.55rem;
+	line-height: 2.55rem;
 	vertical-align: top !important;
 	min-width: 200px;
 	border: 1px solid #aaa;

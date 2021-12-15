@@ -77,7 +77,7 @@ class JFormFieldFCFieldWrapper extends JFormField
 		$html = $this->renderFieldsForm(static::$fcform_item);
 		$html = $html ?: '<span class="alert alert-info">' . JText::_( 'FLEXI_NO_FIELDS_TO_TYPE' ) .' </span>';
 		return '</div></div>
-		<div class="flexicontent" id="flexicontent">'
+		<div id="flexicontent" class="flexicontent">'
 			. $html . '
 			<input type="hidden" name="unique_tmp_itemid" value="' . $unique_tmp_itemid . '" />
 		</div>

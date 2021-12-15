@@ -35,7 +35,7 @@ $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">
 ?>
 
 
-<div class="flexicontent" id="flexicontent">
+<div id="flexicontent" class="flexicontent fcconfig-form">
 
 
 <div class="<?php echo FLEXI_J40GE ? 'row' : 'row-fluid'; ?>">

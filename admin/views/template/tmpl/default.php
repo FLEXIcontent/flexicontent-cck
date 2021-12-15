@@ -152,7 +152,7 @@ JText::script('FLEXI_LOADING', true);
 $this->document->addScript(JUri::base(true).'/components/com_flexicontent/assets/js/layout_editor.js', array('version' => FLEXI_VHASH));
 ?>
 
-<div id="flexicontent" class="flexicontent">
+<div id="flexicontent" class="flexicontent fcconfig-form">
 
 <form action="index.php" method="post" name="adminForm" id="adminForm" class="form-validate form-horizontal">
 

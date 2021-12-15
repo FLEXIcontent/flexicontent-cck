@@ -1788,6 +1788,7 @@ ul.thumbnails.image_picker_selector li div.thumbnail p {
 	padding: 0 0.3rem;
 	font-size: 1rem;
 	box-sizing: border-box;
+	vertical-align: bottom;
 }
 #flexicontent form select.fcfield_selectval {
 	padding: 4px 0 2px 4px;
@@ -2417,16 +2418,35 @@ div.fctoolbar_bottom_placement {
  * select2.js : SINGLE  SELECT customizations and enforced CSS
  */
  
+#flexicontent .select2-container,
+.select2-container {
+	margin: 0;
+	height: 2.55rem;
+	line-height: 2.55rem;
+	padding: 0;
+} 
+#flexicontent.fcconfig-form .select2-container,
+.select2-container {
+	height: 2rem;
+	line-height: 2rem;
+}
+
 /* select choice container */
 .select2-container .select2-choice {
-	padding: 4px 5px 4px 8px !important;
+	padding: 0 7px !important;
 	margin: 0 !important;
 	font-weight: normal !important;
-	min-height: 26px;
+	min-height: 2.55rem !important;
+	line-height: 2.55rem !important;
 	height: auto !important;
 	box-sizing: content-box !important;
 	background:#fff !important;//remove background gradient
 }
+#flexicontent.fcconfig-form .select2-container .select2-choice {
+	min-height: 2rem !important;
+	line-height: 2rem !important;
+}
+
 html[dir="rtl"] .select2-container .select2-choice {
 	padding: 0 8px 0 0 !important;
 }
