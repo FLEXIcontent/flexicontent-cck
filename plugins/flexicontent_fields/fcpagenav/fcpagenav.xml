@@ -44,7 +44,7 @@
 			<field name="no_acc_msg" type="text" default="" label="FLEXI_FIELD_NOACCESS_MSG" description="FLEXI_FIELD_NOACCESS_MSG_DESC" depend_class="field-acc-msg"/>
 
 			<field name="" type="separator" default="FLEXI_FIELD_VALUES" level="level1" />
-			<field name="viewlayout" type="fcfilelist" default="" label="FLEXI_FIELD_SELECT_VIEW_LAYOUT" description="FLEXI_FIELD_SELECT_VIEW_LAYOUT_DESC" directory="plugins/flexicontent_fields/fcpagenav/tmpl/" filter="value*" exclude="" stripext="1" stripprefix="value_" hide_none="1" hide_default="1" labelclass="label text-white bg-warning label-warning" />
+			<field name="viewlayout" type="fcfilelist" default="" label="FLEXI_FIELD_SELECT_VIEW_LAYOUT" description="FLEXI_FIELD_SELECT_VIEW_LAYOUT_DESC" directory="plugins/flexicontent_fields/fcpagenav/tmpl/" filter="^value_.*\.php$" exclude="" stripext="1" stripprefix="value_" hide_none="1" hide_default="1" labelclass="label text-white bg-warning label-warning" />
 
 			<field name="load_css" type="radio" default="1" label="FLEXI_FIELD_PAGENAV_CSS" description="FLEXI_FIELD_PAGENAV_CSS_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>

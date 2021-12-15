@@ -153,10 +153,6 @@
 				<option value="0" hide_list="auto-value-code">FLEXI_NO</option>
 				<option value="2" show_list="auto-value-code">FLEXI_USE_CUSTOM_CODE</option>
 			</field>
-			<field name="auto_value_msg" type="radio" default="0" label="FLEXI_FIELD_VALUE_AUTO_VALUE_MSG" description="FLEXI_FIELD_VALUE_AUTO_VALUE_MSG_DESC" class="btn-group btn-group-yesno" depend_class="auto-value-code" >
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
 			<field name="auto_value_code" type="editor" editor="codemirror" syntax="php" rows="4" cols="80" height="100px" class="fc-unset-width" filter="RAW"
 				default="&lt;?php&#13;&#10;$F = &amp; $item-&gt;fields;&#13;&#10;if ( !isset($F['fieldname01']) ) return array('fieldname01 field not found');&#13;&#10;&#13;&#10;$vals = array();&#13;&#10;foreach($F['fieldname01']-&gt;postdata as $i =&gt; $v)&#13;&#10;{&#13;&#10;  $vals[$i] = 'Auto : ' . $v;&#13;&#10;}&#13;&#10;&#13;&#10;return $vals;"
 				label="FLEXI_CREATE_VIA_CUSTOM_CODE" description="FLEXI_CREATE_VIA_CUSTOM_CODE_DESC" depend_class="auto-value-code"/>
@@ -243,7 +239,7 @@
 			</field>
 
 			<field name="" type="separator" default="FLEXI_LAYOUT" description="" icon_class="icon-file-2" level="tab_open" box_type="1" />
-			<field name="viewlayout" type="fcfilelist" default="" label="FLEXI_FIELD_SELECT_VIEW_LAYOUT" description="FLEXI_FIELD_SELECT_VIEW_LAYOUT_DESC" directory="plugins/flexicontent_fields/text/tmpl/" filter="value*" exclude="" stripext="1" stripprefix="value_" hide_none="1" hide_default="1" />
+			<field name="viewlayout" type="fcfilelist" default="" label="FLEXI_FIELD_SELECT_VIEW_LAYOUT" description="FLEXI_FIELD_SELECT_VIEW_LAYOUT_DESC" directory="plugins/flexicontent_fields/text/tmpl/" filter="^value_.*\.php$" exclude="" stripext="1" stripprefix="value_" hide_none="1" hide_default="1" />
 
 			<field name="" type="separator" default="FLEXI_FIELD_VALUE_DISPLAY" level="level2" />
 			<field name="show_no_value" type="multilist" subtype="radio" default="0" label="FLEXI_FIELD_SHOW_NO_VALUE" toggle_related="1" description="FLEXI_FIELD_SHOW_NO_VALUE_DESC" class="btn-group group-fcmethod fcnoyes">

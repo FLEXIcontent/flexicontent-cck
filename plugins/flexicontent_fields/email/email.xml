@@ -95,7 +95,7 @@
 
 			<field name="" type="separator" default="FLEXI_LAYOUT" description="" level="level2" />
 
-			<field name="formlayout" type="fcfilelist" default="" label="FLEXI_FIELD_SELECT_FORM_LAYOUT" description="FLEXI_FIELD_SELECT_FORM_LAYOUT_DESC" directory="plugins/flexicontent_fields/email/tmpl/" filter="field*" exclude="" stripext="1" stripprefix="field_" hide_none="1" hide_default="1" labelclass="label text-white bg-warning label-warning" />
+			<field name="formlayout" type="fcfilelist" default="" label="FLEXI_FIELD_SELECT_FORM_LAYOUT" description="FLEXI_FIELD_SELECT_FORM_LAYOUT_DESC" directory="plugins/flexicontent_fields/email/tmpl/" filter="^field_.*\.php$" exclude="" stripext="1" stripprefix="field_" hide_none="1" hide_default="1" labelclass="label text-white bg-warning label-warning" />
 
 			<field name="show_values_expand_btn" type="radio" default="0" label="FLEXI_FIELD_EDIT_EXPAND_VALUES" description="FLEXI_FIELD_EDIT_EXPAND_VALUES_DESC" class="btn-group btn-group-yesno" depend_class="fieldgroupoff">
 				<option value="0">FLEXI_NO</option>
@@ -181,7 +181,7 @@
 			<field name="csv_export_text" type="textarea" default="{{text}} {{addr}}" label="FLEXI_CUSTOMIZE" description="" depend_class="csv_rendered_display" />
 
 			<field name="" type="separator" default="FLEXI_LAYOUT" description="" icon_class="icon-file-2" level="tab_open" box_type="1" />
-			<field name="viewlayout" type="fcfilelist" default="" label="FLEXI_FIELD_SELECT_VIEW_LAYOUT" description="FLEXI_FIELD_SELECT_VIEW_LAYOUT_DESC" directory="plugins/flexicontent_fields/email/tmpl/" filter="value*" exclude="" stripext="1" stripprefix="value_" hide_none="1" hide_default="1" />
+			<field name="viewlayout" type="fcfilelist" default="" label="FLEXI_FIELD_SELECT_VIEW_LAYOUT" description="FLEXI_FIELD_SELECT_VIEW_LAYOUT_DESC" directory="plugins/flexicontent_fields/email/tmpl/" filter="^value_.*\.php$" exclude="" stripext="1" stripprefix="value_" hide_none="1" hide_default="1" />
 
 			<field name="" type="separator" default="FLEXI_FIELD_VALUE_DISPLAY" level="level1" />
 			<field name="show_no_value" type="multilist" subtype="radio" default="0" label="FLEXI_FIELD_SHOW_NO_VALUE" toggle_related="1" description="FLEXI_FIELD_SHOW_NO_VALUE_DESC" class="btn-group group-fcmethod fcnoyes">

@@ -108,7 +108,7 @@
 
 
 			<field name="" type="separator" default="FLEXI_LAYOUT" description="" level="level2" />
-			<field name="formlayout" type="fcfilelist" default="" label="FLEXI_FIELD_SELECT_FORM_LAYOUT" description="FLEXI_FIELD_SELECT_FORM_LAYOUT_DESC" directory="plugins/flexicontent_fields/addressint/tmpl/" filter="field*" exclude="field.php" stripext="1" stripprefix="field_" hide_none="1" hide_default="" defaultlabel="Table (Default)" labelclass="" />
+			<field name="formlayout" type="fcfilelist" default="" label="FLEXI_FIELD_SELECT_FORM_LAYOUT" description="FLEXI_FIELD_SELECT_FORM_LAYOUT_DESC" directory="plugins/flexicontent_fields/addressint/tmpl/" filter="^field_.*\.php$" exclude="field.php" stripext="1" stripprefix="field_" hide_none="1" hide_default="" defaultlabel="Table (Default)" labelclass="" />
 
 			<!--field name="simple_form_layout" type="radio" default="0" label="FLEXI_FIELD_SIMPLE_FORM_DESIGN" description="FLEXI_FIELD_SIMPLE_FORM_DESIGN_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
@@ -266,7 +266,7 @@
 			<field name="csv_export_text" type="textarea" default="{{addr1}} {{city}} ZIP: {{zip}}" label="FLEXI_CUSTOMIZE" description="Use &lt;br&gt; {{addr_display}} {{addr_formatted}} &lt;br&gt; {{addr1}} {{city}} {{zip}} {{lat}} {{lon}} {{url}} {{zoom}} {{name}} &lt;br&gt; {{addr2}} {{addr3}} {{state}} {{country}} {{province}} {{zip_suffix}}" depend_class="csv_rendered_display" />
 
 			<field name="" type="separator" default="FLEXI_LAYOUT" description="" icon_class="icon-file-2" level="tab_open" box_type="1" />
-			<field name="viewlayout" type="fcfilelist" default="" label="FLEXI_FIELD_SELECT_VIEW_LAYOUT" description="FLEXI_FIELD_SELECT_VIEW_LAYOUT_DESC" directory="plugins/flexicontent_fields/addressint/tmpl/" filter="value*" exclude="value.php" stripext="1" stripprefix="value_" hide_none="1" hide_default="" defaultlabel="Boxed (Default)" labelclass="label text-white bg-warning label-warning" />
+			<field name="viewlayout" type="fcfilelist" default="" label="FLEXI_FIELD_SELECT_VIEW_LAYOUT" description="FLEXI_FIELD_SELECT_VIEW_LAYOUT_DESC" directory="plugins/flexicontent_fields/addressint/tmpl/" filter="^value_.*\.php$" exclude="value.php" stripext="1" stripprefix="value_" hide_none="1" hide_default="" defaultlabel="Boxed (Default)" labelclass="label text-white bg-warning label-warning" />
 
 			<field name="" type="separator" default="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_ADDRESS_CONFIGURATION" description="" level="level2" />
 			<field name="show_address" type="multilist" subtype="radio" default="both" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_SHOW_ADDRESS" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_SHOW_ADDRESS_DESC" toggle_related="1" class="btn-group btn-group-yesno">

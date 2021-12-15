@@ -120,7 +120,7 @@
 			</field>
 
 			<field name="" type="separator" default="FLEXI_LAYOUT" description="" icon_class="icon-file-2" level="tab_open" box_type="1" />
-			<field name="viewlayout" type="fcfilelist" default="" label="FLEXI_FIELD_SELECT_VIEW_LAYOUT" description="FLEXI_FIELD_SELECT_VIEW_LAYOUT_DESC" directory="plugins/flexicontent_fields/fieldgroup/tmpl/" filter="value*" exclude="" stripext="1" stripprefix="value_" hide_none="1" hide_default="1" depend_class="layout-field-disp" />
+			<field name="viewlayout" type="fcfilelist" default="" label="FLEXI_FIELD_SELECT_VIEW_LAYOUT" description="FLEXI_FIELD_SELECT_VIEW_LAYOUT_DESC" directory="plugins/flexicontent_fields/fieldgroup/tmpl/" filter="^value_.*\.php$" exclude="" stripext="1" stripprefix="value_" hide_none="1" hide_default="1" depend_class="layout-field-disp" />
 
 			<field name="display_mode" type="multilist" subtype="radio" default="0" label="FLEXI_USE_CUSTOMIZED_HTML" description="FLEXI_USE_CUSTOMIZED_HTML_DESC" toggle_related="1" class="btn-group group-fcmethod">
 				<option value="0" show_list="layout-field-disp" hide_list="custom-field-disp">FLEXI_LAYOUT</option>
