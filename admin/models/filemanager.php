@@ -1905,10 +1905,31 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 		$ext = strtolower(flexicontent_upload::getExt($full_path));
 
 		$create_preview     = (int) $field->parameters->get('mm_create_preview', 1);
-		$ffmpeg_path        = $field->parameters->get('mm_ffmpeg_path', '');
-		$audiowaveform_path = $field->parameters->get('mm_audiowaveform_path', '');
 		$preview_bitrate    = (int) $field->parameters->get('mm_preview_bitrate', 96);
 		$wf_zoom            = (int) $field->parameters->get('mm_wf_zoom', 256);
+
+
+		/**
+		 * Get and check file path of ffmpeg and audiowaveform
+		 */
+		$ffmpeg_path        = $field->parameters->get('mm_ffmpeg_path', '/usr/bin/ffmpeg');
+		$audiowaveform_path = $field->parameters->get('mm_audiowaveform_path', '/usr/bin/audiowaveform');
+
+		if ($ffmpeg_path && !file_exists($ffmpeg_path))
+		{
+			$error_mssg = $file->filename . ' : Failed to open ffmpeg path: ' . $ffmpeg_path;
+			$this->exitMessages[] = array('error' => $error_mssg);
+			JLog::add($error_mssg, JLog::ERROR, $logger->namespace);
+			$ffmpeg_path = '';
+		}
+
+		if ($audiowaveform_path && !file_exists($audiowaveform_path))
+		{
+			$error_mssg = $file->filename . ' : Failed to open audiowaveform path: ' . $audiowaveform_path;
+			$this->exitMessages[] = array('error' => $error_mssg);
+			JLog::add($error_mssg, JLog::ERROR, $logger->namespace);
+			$audiowaveform_path = '';
+		}
 
 		if ($file->mediaData->duration > 30)
 		{
@@ -2006,9 +2027,24 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 		// Get the extension to record it in the DB
 		$ext = strtolower(flexicontent_upload::getExt($full_path));
 
+
+		/**
+		 * Get and check file path of ffprobe
+		 */
 		$ffprobe_path = $field->parameters->get('mm_ffprobe_path', '');
 
-		// Create audio preview file
+		if ($ffprobe_path && !file_exists($ffprobe_path))
+		{
+			$error_mssg = $file->filename . ' : Failed to open ffprobe path: ' . $ffprobe_path;
+			$this->exitMessages[] = array('error' => $error_mssg);
+			JLog::add($error_mssg, JLog::ERROR, $logger->namespace);
+			$ffprobe_path = '';
+		}
+
+
+		/**
+		 * Create audio preview file
+		 */
 		if ($ffprobe_path && in_array($ext, array('wav', 'mp3', 'aiff', 'mp4', 'mpg', 'mpeg', 'avi')))
 		{
 			// Default options

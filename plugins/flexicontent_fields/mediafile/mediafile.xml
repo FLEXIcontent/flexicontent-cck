@@ -64,12 +64,17 @@
 			</field-->
 			<field name="file_btns_position" type="hidden" default="0" label="FLEXI_FIELD_FILE_BTNS_POSITION" description="FLEXI_FIELD_FILE_BTNS_POSITION_DESC" depend_class="fieldgroupoff multivalue-mode" />
 
-			<field name="estorage_mode" type="multilist" subtype="radio" default="0" label="Remote Storage" description="FLEXI_FIELD_ALLOW_MULTIPLE_DESC" toggle_related="1" depend_class="" class="btn-group group-fcmethod fcoffactive">
-				<option value="0" show_list="" hide_list="estorage-ftp">FLEXI_NO</option>
-				<option value="FTP" show_list="estorage-ftp" hide_list="">FTP</option>
+			<field name="" type="separator" default="FLEXI_FIELD_MEDIADATA_REMOTE_STORAGE" description="" level="level1" />
+			<field name="estorage_mode" type="multilist" subtype="radio" default="0" label="FLEXI_FIELD_MEDIADATA_REMOTE_STORAGE_TYPE" description="FLEXI_FIELD_MEDIADATA_REMOTE_STORAGE_TYPE_DESC" toggle_related="1" depend_class="" class="btn-group group-fcmethod fcoffactive">
+				<option value="0" show_list="" hide_list="estorage-ftp,estorage-other">FLEXI_NO</option>
+				<option value="FTP" show_list="estorage-ftp" hide_list="estorage-other">FTP</option>
+				<option value="FTP" show_list="estorage-other" hide_list="estorage-ftp">Other</option>
 			</field>
 
-			<field name="" type="separator" default="Remote Storage (FTP)" description="" depend_class="estorage-ftp" level="level2" />
+			<field name="" type="separator" default="FLEXI_OTHER" description="" depend_class="estorage-other" level="level3" />
+			<field name="" type="separator" default="Currently only FTP is supported, TO-DO more external storage options ..." description="" depend_class="estorage-other" level="level3" class="alert alert-info fcpadded" />
+
+			<field name="" type="separator" default="FLEXI_FIELD_MEDIADATA_REMOTE_STORAGE_FTP" description="" depend_class="estorage-ftp" level="level2" />
 			<field name="efs_ftp_host" type="text" default="" size="80" label="Hostname" description="" depend_class="estorage-ftp" />
 			<field name="efs_ftp_port" type="text" default="" size="80" label="Port" description="" depend_class="estorage-ftp" />
 			<field name="efs_ftp_user" type="text" default="" size="80" label="FLEXI_USER" description="" depend_class="estorage-ftp" />
@@ -78,18 +83,20 @@
 
 			<field name="efs_www_url" type="text" default="https://some_external_servername.com/somefolder/" size="80" label="URL" description="" depend_class="estorage-ftp" />
 
-			<field name="" type="separator" default="Create preview files (downsize)" description="" level="level2" class=""/>
-			<field name="mm_create_preview" type="radio" default="1" label="Create a preview file" description="" class="btn-group">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			<field name="mm_preview_bitrate" type="text" default="96" size="5" label="Bit rate (kbps)" description="..." />
-			<field name="mm_ffmpeg_path" type="text" default="" label="Path to ffmpeg binary" description="..." />
-			<field name="mm_ffprobe_path" type="text" default="" label="Path to ffprobe binary" description="..." />
-			<field name="mm_audiowaveform_path" type="text" default="" label="Path to audiowaveform binary" description="..." />
+			<field name="" type="separator" default="FLEXI_FIELD_MEDIADATA_CREATE_PREVIEW_FILES" description="" level="level1" class=""/>
 
-			<field name="" type="separator" default="Samples per peak. &lt;br&gt; &amp;nbsp;&amp;nbsp; E.g. Enter 256, to use 256 input samples to create 1 waveform peak. &lt;br&gt;&lt;br&gt; Note: this is for sounds up to 30 seconds. &lt;br&gt; For longer files we will increase this proportionally. &lt;br&gt; &amp;nbsp;&amp;nbsp; E.g. for 60 seconds we will use 512 samples to create 1 waveform peak." description="" level="level3" class="alert alert-info fcpadded" />
-			<field name="mm_wf_zoom" type="text" default="" label="Samples per peak" description="..." />
+			<field name="mm_ffprobe_path" type="text" default="/usr/bin/ffprobe" label="FLEXI_FIELD_MEDIADATA_PATH_FFMPEG_TO_BINARY" description="FLEXI_FIELD_MEDIADATA_PATH_FFMPEG_TO_BINARY_DESC" />
+			<field name="mm_create_preview" type="multilist" subtype="radio" toggle_related="1" default="1" label="Create a preview file" description="" class="btn-group">
+				<option value="0" show_list="" hide_list="audio-preview">FLEXI_NO</option>
+				<option value="1" show_list="audio-preview" hide_list="">FLEXI_YES</option>
+			</field>
+
+			<field name="mm_preview_bitrate" type="text" default="96" size="5" label="Bit rate (kbps)" description="Bitrate will effect the quality of the audio preview" depend_class="audio-preview" />
+			<field name="mm_ffmpeg_path" type="text" default="/usr/bin/ffmpeg" label="FLEXI_FIELD_MEDIADATA_PATH_FFMPEG_TO_BINARY" description="FLEXI_FIELD_MEDIADATA_PATH_FFMPEG_TO_BINARY_DESC" depend_class="audio-preview" />
+			<field name="mm_audiowaveform_path" type="text" default="/usr/bin/audiowaveform" label="FLEXI_FIELD_MEDIADATA_PATH_AUDIOWAVEFORM_TO_BINARY" description="FLEXI_FIELD_MEDIADATA_PATH_AUDIOWAVEFORM_TO_BINARY_DESC" depend_class="audio-preview" />
+
+			<field name="" type="separator" default="Samples per peak. &lt;br&gt; &amp;nbsp;&amp;nbsp; E.g. Enter 256, to use 256 input samples to create 1 waveform peak. &lt;br&gt;&lt;br&gt; Note: this is for sounds up to 30 seconds. &lt;br&gt; For longer files we will increase this proportionally. &lt;br&gt; &amp;nbsp;&amp;nbsp; E.g. for 60 seconds we will use 512 samples to create 1 waveform peak." description="" level="level3" class="alert alert-info fcpadded" depend_class="audio-preview" />
+			<field name="mm_wf_zoom" type="text" default="" label="Samples per peak" description="..." depend_class="audio-preview" />
 
 			<field name="" type="separator" default="FLEXI_FORM_FIELD_CONF" _description="FLEXI_FORM_FIELD_CONF_DESC" icon_class="icon-checkbox" level="tab_open" box_type="1" />
 
