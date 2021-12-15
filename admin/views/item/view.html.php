@@ -1706,7 +1706,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 
 			// If apply_ajax is disabled then just call the button "Save"
 			$btn_title = !$isnew
-				? (in_array( 'apply_ajax', $allowbuttons) ? 'FLEXI_APPLY_N_RELOAD' : 'JSAVE')
+				? (in_array( 'apply_ajax', $allowbuttons) ? 'FLEXI_APPLY_N_RELOAD' : 'FLEXI_SAVE')
 				: ($typesselected->id ? 'FLEXI_ADD' : 'FLEXI_APPLY_TYPE');
 
 			//JToolbarHelper::apply($btn_task, $btn_title, false);
