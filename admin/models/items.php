@@ -1070,6 +1070,13 @@ class FlexicontentModelItems extends FCModelAdminList
 				. ', CASE WHEN a.publish_down = '.$nullDate.' OR a.publish_down >= '.$nowDate.' THEN 0 ELSE 1 END as publication_expired'
 				. ', t.name AS type_name, (' . $subquery . ') AS author, a.attribs AS config, t.attribs as tconfig'
 				. ($use_versioning ? ', CASE WHEN a.version = MAX(fv.version_id) THEN 0 ELSE MAX(fv.version_id) END as unapproved_version ' : ', 0 as unapproved_version')
+
+				. (FLEXI_J40GE
+					? ', wa.stage_id AS stage_id' .
+						', ws.title AS stage_title' .
+						', ws.workflow_id AS workflow_id' .
+						', w.title AS workflow_title'
+					: '')
 				;
 		}
 
@@ -1138,6 +1145,14 @@ class FlexicontentModelItems extends FCModelAdminList
 					? ' LEFT JOIN #__viewlevels AS level ON level.id = a.access'
 					: '')
 
+				// Workflows
+				. (FLEXI_J40GE
+					? ' LEFT JOIN #__workflow_associations AS wa ON wa.item_id = a.id AND wa.extension = "com_content.article"' .
+						' LEFT JOIN #__workflow_stages AS ws ON ws.id = wa.stage_id' .
+						' LEFT JOIN #__workflows AS w ON w.id = ws.workflow_id'
+					: '')
+
+				// ...
 				. $extra_joins
 				;
 

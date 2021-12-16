@@ -698,6 +698,16 @@ class ParentClassItem extends FCModelAdmin
 				$query->select('CASE WHEN i.publish_up = '.$nullDate.' OR i.publish_up <= '.$nowDate.' THEN 0 ELSE 1 END as publication_scheduled');
 				$query->select('CASE WHEN i.publish_down = '.$nullDate.' OR i.publish_down >= '.$nowDate.' THEN 0 ELSE 1 END as publication_expired' );
 
+				if (FLEXI_J40GE)
+				{
+					$query->select([
+						$db->quoteName('wa.stage_id', 'stage_id'),
+						$db->quoteName('ws.title', 'stage_title'),
+						$db->quoteName('ws.workflow_id', 'workflow_id'),
+						$db->quoteName('w.title', 'workflow_title'),
+					]);
+				}
+
 				// From content table, and extended item table, content type table, user table, rating table, categories relation table
 				$query->from('#__content AS i');
 				$query->join('LEFT', '#__flexicontent_items_ext AS ie ON ie.item_id = i.id');
@@ -709,6 +719,13 @@ class ParentClassItem extends FCModelAdmin
 				// Join twice on category table, once for current category and once for item's main category
 				$query->join('LEFT', '#__categories AS c on c.id = rel.catid');   // All item's categories
 				$query->join('LEFT', '#__categories AS mc on mc.id = i.catid');   // Item's main category
+
+				if (FLEXI_J40GE)
+				{
+					$query->join('LEFT', '#__workflow_associations AS wa ON wa.item_id = i.id AND wa.extension = "com_content.article"');
+					$query->join('LEFT', '#__workflow_stages AS ws ON ws.id = wa.stage_id');
+					$query->join('LEFT', '#__workflows AS w ON w.id = ws.workflow_id');
+				}
 
 				// NOTE: version_id is used by field helper file to load the specified version, the reason for left join here is to verify that the version exists
 				if ($version)
@@ -744,6 +761,14 @@ class ParentClassItem extends FCModelAdmin
 				}
 
 				$item = & $data;
+			}
+
+			/**
+			 * Make sure item has workflow assigned
+			 */
+			if (FLEXI_J40GE && $item->stage_id === null)
+			{
+				flexicontent_db::assign_default_WF($item->id, $item);
 			}
 
 			// Catch case that current category ID has been changed since last checked !!
@@ -3456,9 +3481,11 @@ class ParentClassItem extends FCModelAdmin
 	 */
 	function applyCurrentVersion(&$item, &$data, $createonly=false)
 	{
-		$app  = JFactory::getApplication();
-		$user = JFactory::getUser();
+		$app     = JFactory::getApplication();
+		$user    = JFactory::getUser();
 		$cparams = $this->_cparams;
+		$isNew   = !$item->id;
+
 		$editjf_translations = $cparams->get('editjf_translations', 0);
 
 		// ***
@@ -3483,6 +3510,17 @@ class ParentClassItem extends FCModelAdmin
 		$this->_record = & $item;
 		$this->_typeid = $item->type_id;
 		$this->getComponentTypeParams();
+
+
+		// ***
+		// *** Assign default workflow to new items
+		// ***
+
+		if ($isNew)
+		{
+		  flexicontent_db::assign_default_WF($item->id, $item);
+			$app->enqueueMessage('Assigned item to Default Workflow', 'notice');
+		}
 
 
 		// ***

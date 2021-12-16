@@ -173,6 +173,15 @@ class flexicontent_items extends _flexicontent_items
 	/** @var string */
 	var $search_index		= null;
 
+	/** @var int */
+	var $stage_id		= null;
+	/** @var string */
+	var $stage_title = null;
+	/** @var int */
+	var $workflow_id = null;
+	/** @var string */
+	var $workflow_title = null;
+
 	// Non-table (private) properties
 	var $_record_name = 'item';
 	var $_title = 'title';
@@ -500,8 +509,21 @@ class flexicontent_items extends _flexicontent_items
 		// Initialise the query.
 		$query = $this->_db->getQuery(true)
 			->select('e.*, a.*')
+			->select([
+				$this->_db->quoteName('wa.stage_id', 'stage_id'),
+				$this->_db->quoteName('ws.title', 'stage_title'),
+				$this->_db->quoteName('ws.workflow_id', 'workflow_id'),
+				$this->_db->quoteName('w.title', 'workflow_title'),
+			])
 			->from($this->_tbl . ' AS a')
 			->join('LEFT', $this->_tbl_ext . ' AS e ON a.' . $this->_tbl_key_ext . ' = e.' . $this->_frn_key_ext);
+
+		if (FLEXI_J40GE)
+		{
+			$query->join('LEFT', '#__workflow_associations AS wa ON wa.item_id = a.id AND wa.extension = "com_content.article"');
+			$query->join('LEFT', '#__workflow_stages AS ws ON ws.id = wa.stage_id');
+			$query->join('LEFT', '#__workflows AS w ON w.id = ws.workflow_id');
+		}
 
 		$fields = array_keys($this->getProperties());
 
@@ -514,7 +536,7 @@ class flexicontent_items extends _flexicontent_items
 			}
 
 			// Add the search tuple to the query.
-			$query->where($this->_db->quoteName($field) . ' = ' . $this->_db->quote($value));
+			$query->where($this->_db->quoteName('a.' . $field) . ' = ' . $this->_db->quote($value));
 		}
 
 		$row = $this->_db->setQuery($query)->loadAssoc();

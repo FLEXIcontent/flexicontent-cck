@@ -62,6 +62,54 @@ class flexicontent_db
 
 
 	/**
+	 * Method to verify a workflow association exists for given record, and add it
+	 *
+	 * @return string
+	 * @since 3.1
+	 */
+	static function assign_default_WF($pk, $record = null, $extension = 'com_content.article', $stage_id = 0)
+	{
+		$db = JFactory::getDbo();
+		if (!FLEXI_J40GE || !$pk) return;
+
+		// This extra may seem redudant, but it is to avoid clearing valid data, due to coding or other errors
+		if (!$record)
+		{
+			$query = $db->getQuery(true)
+				->select('i.id AS i, wa.stage_id AS stage_id')
+				->from('#__content AS i')
+				->join('LEFT', '#__workflow_associations AS wa ON wa.item_id = i.id')
+				->where('i.id = ' . (int) $pk);
+			$record = $db->setQuery($query)->loadObject();
+		}
+
+		if ($record->stage_id === null)
+		{
+			if (!$stage_id)
+			{
+				$query = $db->getQuery(true)
+					->select('ws.id AS id')
+					->from('#__workflows AS w')
+					->join('INNER', '#__workflow_stages AS ws ON ws.workflow_id = w.id AND ws.default = 1')
+					->where('w.extension = ' . $db->Quote($extension))
+					->where('w.default = 1');
+				$stage_id = $db->setQuery($query)->loadResult();
+			}
+			if ($stage_id)
+			{
+				$record->stage_id = $stage_id;
+				$obj = (object) array(
+					'item_id' => (int) $record->id,
+					'stage_id' => (int) $record->stage_id,
+					'extension' => $extension,
+				);
+				$db->insertObject('#__workflow_associations', $obj);
+			}
+		}
+	}
+
+
+	/**
 	 * Method to get the (language filtered) name of all access levels
 	 *
 	 * @return string
