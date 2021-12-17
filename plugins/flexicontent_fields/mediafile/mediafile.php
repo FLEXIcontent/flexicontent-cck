@@ -821,10 +821,10 @@ class plgFlexicontent_fieldsMediafile extends FCField
 		if (!$use_ingroup && $show_values_expand_btn)
 		{
 			$field->html = '
-			<button type="button" class="fcfield-expand-view-btn btn btn-small" data-expandedFieldState="0" aria-label="' . JText::_('FLEXI_EXPAND_VALUES') . '"
+			<button type="button" class="fcfield-expand-view-btn btn btn-small" data-expandedFieldState="0" aria-label="' . JText::_('FLEXI_EXPAND') . '"
 				onclick="fc_toggleCompactValuesView(this, jQuery(this).closest(\'.container_fcfield\'));"
 			>
-				<span class="fcfield-expand-view ' . $font_icon_class . '" aria-hidden="true"></span>&nbsp; ' . JText::_( 'FLEXI_EXPAND_VALUES', true ) . '
+				<span class="fcfield-expand-view ' . $font_icon_class . '" aria-hidden="true"></span>&nbsp; ' . JText::_('FLEXI_EXPAND', true) . '
 			</button>
 			' . $field->html;
 		}
