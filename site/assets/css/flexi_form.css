@@ -25,9 +25,17 @@
 	margin: 0px;
 	padding: 0px;
 }
-body .control-label > label {
+body #flexicontent .control-label > label {
 	max-width: 160px;
 	white-space: initial;
+}
+body #flexicontent .control-label.fclabel_cleared {
+	float: none;
+	margin: 0;
+}
+body #flexicontent .control-label.fclabel_cleared > label {
+	display: inline;
+	text-align: left;
 }
 body label.fc-prop-lbl,
 body span.fc-prop-lbl,

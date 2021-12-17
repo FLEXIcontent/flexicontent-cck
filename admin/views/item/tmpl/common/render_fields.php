@@ -1791,7 +1791,11 @@ if ($this->fields && $typeid) :
 			<div class="control-group">
 
 				<?php ob_start(); /* label_html */ ?>
-				<div class="control-label" id="label_outer_fcfield_<?php echo $field->id; ?>" style="<?php echo $display_label_form < 1 ? 'display:none;' : '' ?>">
+				<div
+					class="control-label <?php echo $display_label_form === 2 ? 'fclabel_cleared' : ''; ?>"
+					id="label_outer_fcfield_<?php echo $field->id; ?>"
+					style="<?php echo $display_label_form < 1 ? 'display:none;' : '' ?>"
+				>
 					<label id="label_fcfield_<?php echo $field->id; ?>" data-for="<?php echo 'custom_'.$field->name;?>" <?php echo $label_attrs;?> >
 						<?php echo $field->label; ?>
 					</label>
@@ -1803,7 +1807,7 @@ if ($this->fields && $typeid) :
 				<?php endif; ?>
 
 				<?php ob_start(); /*input_html */ ?>
-				<div style="<?php echo $container_width; ?>" class="controls <?php echo $container_class; ?>" id="container_fcfield_<?php echo $field->id; ?>">
+				<div style="<?php echo $container_width . ($display_label_form !== 1 ? 'margin: 0' : ''); ?>" class="controls <?php echo $container_class; ?>" id="container_fcfield_<?php echo $field->id; ?>">
 					<?php echo ($field->description && $edithelp==3)  ?  sprintf( $alert_box, '', 'info', 'fc-nobgimage', $field->description )  :  ''; ?>
 
 				<?php // CASE 1: CORE 'description' FIELD with multi-tabbed editing falang

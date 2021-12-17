@@ -43,10 +43,22 @@ body .fc_isselect.fc_ismobile {
 // *** Labels
 // ***
 
-body .control-label > label {
-	max-width: 160px;
-	white-space: initial;
+body #flexicontent .control-label {
+	> label {
+		max-width: 160px;
+		white-space: initial;
+	}
+
+	&.fclabel_cleared {
+		float: none;
+		margin: 0;
+		> label {
+			display: inline;
+			text-align: left;
+		}
+	}
 }
+
 
 body label.fc-prop-lbl,
 body span.fc-prop-lbl,

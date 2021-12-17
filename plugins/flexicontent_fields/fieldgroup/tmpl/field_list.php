@@ -10,6 +10,9 @@ for ($n = 0; $n < $max_count; $n++)
 			'.$togglers.'
 			'.(!$add_position ? '' : $add_here).'
 		</div>
+
+		') . (empty($isFlexBox) ? '' : '
+		<div class="fc_form_flex_box">
 		');
 
 	// Append item-form display HTML of the every field in the group
@@ -53,23 +56,30 @@ for ($n = 0; $n < $max_count; $n++)
 		$gf_elementid_n = 'custom_' . $grouped_field->name . '_' . $n;
 		$gf_display_label_form = (int) $grouped_field->parameters->get('display_label_form', 1);
 
-		$field->html[$n] .= '
-		<div class="control-group control-fc_subgroup fcfieldval_container_outer' . $gf_compactedit . '">
-			<div class="control-label">
-				' . ($gf_display_label_form < 1 ? '' : '
-				<label id="' . $gf_elementid_n . '-lbl" class="' . $lbl_class . '" title="' . $lbl_title . '" data-for="' . $gf_elementid_n . '">
-					' . $grouped_field->label . '
-				</label>
-				') . '
-			</div>
-			<div class="controls">
-				<div class="fcfieldval_container valuebox fcfieldval_container_'.$grouped_field->id.'" >
-					' . $gf_inline_desc . '
-					' . $grouped_field->html[$n] . '
+		$field->html[$n] .= (empty($isFlexBox) ? '' : '
+		<div class="fc_form_flex_box_item" style="margin: 0;">') . '
+			<div class="control-group control-fc_subgroup fcfieldval_container_outer' . $gf_compactedit . '">
+				<div
+					class="control-label ' . ($gf_display_label_form === 2 ? 'fclabel_cleared' : '') . '"
+					style="' . ($gf_display_label_form < 1 ? 'display:none;' : '') .'"
+				>
+					' . ($gf_display_label_form < 1 ? '' : '
+					<label id="' . $gf_elementid_n . '-lbl" class="' . $lbl_class . '" title="' . $lbl_title . '" data-for="' . $gf_elementid_n . '">
+						' . $grouped_field->label . '
+					</label>
+					') . '
+				</div>
+
+				<div class="controls" 	style="' . ($gf_display_label_form !== 1 ? 'margin: 0' : '') . '" >
+					<div class="fcfieldval_container valuebox fcfieldval_container_'.$grouped_field->id.'" >
+						' . $gf_inline_desc . '
+						' . $grouped_field->html[$n] . '
+					</div>
 				</div>
 			</div>
+		' . (empty($isFlexBox) ? '' : '
 		</div>
-		';
+		');
 		$i++;
 	}
 

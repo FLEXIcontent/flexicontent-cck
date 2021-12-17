@@ -1101,6 +1101,14 @@ div.container_fcfield div.toggle_all_values_buttons_box {
 	background-position: 2px 2px;
 	background-repeat: no-repeat;
 }
+#flexicontent ul.fcfield-sortables.fcfield-group > li.fcfieldval_container.valuebox .fclabel_cleared {
+	float: none;
+	margin: 0;
+}
+#flexicontent ul.fcfield-sortables.fcfield-group > li.fcfieldval_container.valuebox .fclabel_cleared > label {
+	display: inline;
+	text-align: left;
+}
 @media only screen and (max-width: 800px) {
 	#flexicontent ul.fcfield-sortables.fcfield-group .controls {
 		margin-left: 0;

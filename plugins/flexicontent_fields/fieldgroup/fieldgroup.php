@@ -591,7 +591,10 @@ class plgFlexicontent_fieldsFieldgroup extends FCField
 			include(self::getViewPath($field->field_type, $viewlayout));
 		}
 
-		if (count($field->{$prop})) {
+		if (is_string($field->{$prop})) {
+			$field->{$prop}  = $opentag . $field->{$prop} . $closetag;
+		}
+		elseif (count($field->{$prop})) {
 			$field->{$prop}  = implode($separatorf, $field->{$prop});
 			$field->{$prop}  = $opentag . $field->{$prop} . $closetag;
 		} else {

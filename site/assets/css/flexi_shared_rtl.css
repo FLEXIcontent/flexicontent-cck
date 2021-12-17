@@ -662,7 +662,7 @@ span.fc_select_button:hover {
 }
 #flexicontent .fc_form_flex_box_item {
 	float: none;
-	flex-grow: 1;
+	flex-grow: 0;
 	margin: 12px;
 	padding: 0;
 	display: inline-block;
@@ -1469,7 +1469,7 @@ ul.thumbnails.image_picker_selector li div.thumbnail p {
 	display: block !important;
 }
 #flexicontent form input.fcfield_textval.fc-floated-lbl-input {
-	margin: 0px 0.6rem 0.2rem 0.6rem !important;
+	margin: 0 0 0.2rem 0.6rem !important;
 }
 #flexicontent form .fcfield_textareaval,
 #flexicontent form .fcfield_selectval,
@@ -1479,8 +1479,8 @@ ul.thumbnails.image_picker_selector li div.thumbnail p {
 	color: #444;
 	border: 1px solid #AAAAAA;
 	display: inline-block;
-	padding: 0 0.6rem 0px 0.6rem;
-	margin: 0px 0.6rem 0.2rem 0.6rem;
+	padding: 0 0.6rem 0 0.6rem;
+	margin: 0 0 0.2rem 0.6rem;
 	position: relative;
 	text-decoration: none;
 	font-size: 1rem;
