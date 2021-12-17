@@ -509,14 +509,17 @@ class flexicontent_items extends _flexicontent_items
 		// Initialise the query.
 		$query = $this->_db->getQuery(true)
 			->select('e.*, a.*')
-			->select([
-				$this->_db->quoteName('wa.stage_id', 'stage_id'),
-				$this->_db->quoteName('ws.title', 'stage_title'),
-				$this->_db->quoteName('ws.workflow_id', 'workflow_id'),
-				$this->_db->quoteName('w.title', 'workflow_title'),
-			])
 			->from($this->_tbl . ' AS a')
 			->join('LEFT', $this->_tbl_ext . ' AS e ON a.' . $this->_tbl_key_ext . ' = e.' . $this->_frn_key_ext);
+		if (FLEXI_J40GE)
+		{
+				$query->select([
+					$this->_db->quoteName('wa.stage_id', 'stage_id'),
+					$this->_db->quoteName('ws.title', 'stage_title'),
+					$this->_db->quoteName('ws.workflow_id', 'workflow_id'),
+					$this->_db->quoteName('w.title', 'workflow_title'),
+				]);
+		}
 
 		if (FLEXI_J40GE)
 		{
