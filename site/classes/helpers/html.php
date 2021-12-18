@@ -2005,8 +2005,8 @@ class flexicontent_html
 							<div id="fc_filter_form_blocker">\\
 								<div class="fc_blocker_overlay" style="' . $styles->overlay_box . '"></div>\\
 								<div class="fc_blocker_content" style="' . $styles->content_box . '">\\
-									' . ($logo_imgsrc  ? '<div class="fc_logo_loading" style="' . $styles->logo_box . '" ><img src="' . $logo_imgsrc . '" alt="' . $mssg_text . '"><div>' : '') . '\\
-									' . ($mssg_display ? '<div class="fc_mssg_loading" style="' . $styles->mssg_box . '" >' . JText::_($mssg_text, true) . '</div>' : '') . '\\
+									' . ($logo_imgsrc  ? '<div class="fc_blocker_logo" style="' . $styles->logo_box . '" ><img src="' . $logo_imgsrc . '" alt="' . $mssg_text . '"></div>' : '') . '\\
+									' . ($mssg_display ? '<div class="fc_blocker_mssg" style="' . $styles->mssg_box . '" >' . JText::_($mssg_text, true) . '</div>' : '') . '\\
 									' . ($pbar_display ? '<div class="fc_blocker_bar"><div style="' . $styles->progress_bar . '"></div></div>' : '') . '\\
 								</div>\\
 							</div>\\

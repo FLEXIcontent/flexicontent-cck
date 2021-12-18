@@ -62,8 +62,8 @@
 			<field name="lowres_minwidth" type="text" size="8" default="800" label="FLEXI_MOBILE_RES_MINWIDTH" description="FLEXI_MOBILE_RES_MINWIDTH_DESC"/>
 			<field name="lowres_minheight" type="text" size="8" default="480" label="FLEXI_MOBILE_RES_MINHEIGHT" description="FLEXI_MOBILE_RES_MINHEIGHT_DESC"/-->
 
-		<field name="" type="separator" default="FLEXI_PAGE_RELOADING_FE" label="" level="level0" />
-		<field name="" type="separator" default="FLEXI_PAGE_RELOADING_FE_ABOUT" label="" level="level3" class="alert alert-info fcpadded" />
+		<field name="" type="separator" default="FLEXI_PAGE_RELOADING_FE_BE" label="" level="level0" />
+		<field name="" type="separator" default="FLEXI_PAGE_RELOADING_FE_BE_ABOUT" label="" level="level3" class="alert alert-info fcpadded" />
 
 			<field name="" type="separator" default="FLEXI_PAGE_RELOADING_OVERLAY_BOX" label="" level="level2" />
 			<field name="page_reloading_overlay_bg_color" type="color" label="FLEXI_BACKGROUND" default="rgba(0, 0, 0, 0.3)" format="rgba" keywords="transparent,initial,inherit" />
@@ -74,6 +74,7 @@
 			<field name="page_reloading_content_bg_color" type="color" label="FLEXI_BACKGROUND" default="rgba(255, 255, 255, 1)" format="rgba" keywords="transparent,initial,inherit" />
 
 			<field name="" type="separator" default="FLEXI_PAGE_RELOADING_LOGO_IMAGE" label="" level="level3" />
+			<field name="" type="separator" default="FLEXI_PAGE_RELOADING_LOGO_IMAGE_ABOUT" label="" level="level3" class="alert alert-info fcpadded" />
 			<field name="page_reloading_logo_imgsrc" type="fcmedia" hint="FLEXI_NONE" label="FLEXI_IMAGE" />
 			<field name="page_reloading_logo_opacity" type="range" default="100" label="FLEXI_OPACITY" description="" min="0" max="100" step="1" />
 
