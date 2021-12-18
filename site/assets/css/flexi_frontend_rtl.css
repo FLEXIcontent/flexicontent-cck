@@ -333,11 +333,9 @@ div table.adminform td {
 #flexicontent .item_total .fc_clayout_box label {
 	padding: 1px 2px;
 	opacity: 0.8;
-	filter: alpha(opacity=80);
 }
 #flexicontent .item_total .fc_clayout_box label:hover {
 	opacity: 1;
-	filter: alpha(opacity=100);
 }
 #flexicontent .item_total .fc_clayout_box img {
 	height: 48px;
@@ -509,7 +507,6 @@ div table.adminform td {
 }
 .fav-block .fcfavs-icon_box .fcfavs-icon_login:before {
 	opacity: 0.4;
-	filter: alpha(opacity=40);
 	color: darkgray;
 	font-size: 32px;
 	line-height: 100%;

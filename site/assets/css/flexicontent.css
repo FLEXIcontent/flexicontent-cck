@@ -1184,7 +1184,6 @@ body .fc-close {
 	font-weight: bold;
 	line-height: 18px;
 	opacity: 0.2;
-	filter: alpha(opacity=20);
 	text-shadow: 0 1px 0 #FFFFFF;
 	margin-top: -2px;
 }
@@ -1192,7 +1191,6 @@ body .fc-close:hover {
 	color: #000000;
 	cursor: pointer;
 	opacity: 0.4;
-	filter: alpha(opacity=40);
 	text-decoration: none;
 	background: none;
 }
@@ -4836,11 +4834,9 @@ div table.adminform td {
 #flexicontent .item_total .fc_clayout_box label {
 	padding: 1px 2px;
 	opacity: 0.8;
-	filter: alpha(opacity=80);
 }
 #flexicontent .item_total .fc_clayout_box label:hover {
 	opacity: 1;
-	filter: alpha(opacity=100);
 }
 #flexicontent .item_total .fc_clayout_box img {
 	height: 24px;
@@ -5015,7 +5011,6 @@ div table.adminform td {
 }
 .fav-block .fcfavs-icon_box .fcfavs-icon_login:before {
 	opacity: 0.4;
-	filter: alpha(opacity=40);
 	color: darkgray;
 	font-size: 32px;
 	line-height: 100%;

@@ -57,7 +57,6 @@ ul.tabbernav > li.tabberactive a:hover {
 	border-bottom: 1px solid #b2bfcd;
 	border-top: 0;
 	opacity: 1;
-	filter: alpha(opacity=100);
 	transition: opacity 0.29s;
 	transition-timing-function: ease-in;
 }
@@ -135,7 +134,6 @@ body ul.tabbernav > li > a,
 body ul.tabbernav > li:hover a,
 #flexicontent ul.tabbernav > li:hover a {
 	opacity: 1;
-	filter: alpha(opacity=100);
 	color: #FFFFFF;
 	border: 1px solid #1c5675;
 	background-color: #26759e;

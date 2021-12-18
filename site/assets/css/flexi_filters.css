@@ -261,7 +261,6 @@ form > .fc_filter_line {
 	position: relative;
 	border: 1px solid gray;
 	opacity: 0.5;
-	filter: alpha(opacity=50);
 	min-width: 120px;
 	vertical-align: top;
 }
