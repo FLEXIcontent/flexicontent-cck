@@ -13,7 +13,6 @@
 	padding: 0;
 	background: none;
 	min-height: 10px;
-	display: -moz-inline-stack;
 	display: inline-block;
 	vertical-align: top;
 	zoom: 1;
@@ -88,7 +87,6 @@
 	background: none;
 	width: 100%;
 	min-height: 10px;
-	display: -moz-inline-stack;
 	display: inline-block;
 	vertical-align: top;
 	zoom: 1;
@@ -100,7 +98,6 @@
 	background: none;
 	width: 100%;
 	min-height: 10px;
-	display: -moz-inline-stack;
 	display: inline-block;
 	vertical-align: top;
 	zoom: 1;

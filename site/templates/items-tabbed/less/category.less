@@ -14,9 +14,7 @@ body #flexicontent .fc_item_title a {
 body #flexicontent ul.tabbernav > li a {
 	border: 1px solid @FCC_tab_bg_color_end;
 	background-color: @FCC_tab_bg_color_start;
-	background-image: -webkit-linear-gradient(top, @FCC_tab_bg_color_start , @FCC_tab_bg_color_end);
 	background-image: linear-gradient(to bottom, @FCC_tab_bg_color_start , @FCC_tab_bg_color_end );
-	filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr= @FCC_tab_bg_color_start , endColorstr= @FCC_tab_bg_color_end );
 	color: @FCC_tab_title_color;
 }
 body #flexicontent ul.tabbernav > li.tabberactive a::before {
@@ -30,9 +28,7 @@ body #flexicontent ul.tabbernav > li.tabberactive a:hover {
 body #flexicontent ul.tabbernav > li:hover a {
 	border: 1px solid darken(@FCC_tab_bg_color_end, 20%);
 	background-color: darken(@FCC_tab_bg_color_start, 20%);
-	background-image: -webkit-linear-gradient(top, darken(@FCC_tab_bg_color_start, 20%) , darken(@FCC_tab_bg_color_end, 20%));
 	background-image: linear-gradient(to bottom, darken(@FCC_tab_bg_color_start, 20%) , darken(@FCC_tab_bg_color_end, 20%) );
-	filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr= darken(@FCC_tab_bg_color_start, 20%) , endColorstr= darken(@FCC_tab_bg_color_end, 20%) );
 	color: @FCC_tab_title_color;
 }
 
@@ -102,7 +98,6 @@ body #flexicontent ul.tabbernav > li:hover a {
 	padding: 0;
 	background: none;
 	min-height: 10px;
-	display: -moz-inline-stack;
 	display: inline-block;
 	vertical-align: top;
 	margin: 0%;

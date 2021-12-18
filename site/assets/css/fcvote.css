@@ -63,7 +63,7 @@ div.fcvote > ul.fcvote_list > li.current-rating {
 	background-color: transparent !important;
 	border: medium none !important;
 	cursor: pointer !important;
-	outline-color: -moz-use-text-color !important;
+	outline-color: initial !important;
 	outline-style: none !important;
 	outline-width: medium !important;
 	overflow: hidden !important;

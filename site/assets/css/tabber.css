@@ -137,9 +137,7 @@ body ul.tabbernav > li:hover a,
 	color: #FFFFFF;
 	border: 1px solid #1c5675;
 	background-color: #26759e;
-	background-image: -webkit-linear-gradient(top,#26759e,#133d5b);
 	background-image: linear-gradient(to bottom,#26759e,#133d5b);
-	filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#26759e,endColorstr=#133d5b);
 	border-bottom-width: 0;
 }
 body ul.tabbernav > li.tabberactive a,
@@ -148,7 +146,6 @@ body ul.tabbernav > li.tabberactive a:hover,
 #flexicontent ul.tabbernav > li.tabberactive a:hover {
 	color: black;
 	background-color: white;
-	filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=white,endColorstr=white);
 	background-image: none;
 	border-bottom: 0px solid white;
 	border-left: 1px solid #D0D0D0;
@@ -185,9 +182,7 @@ body .s-gray ul.tabbernav > li:hover a,
 	color: #FFFFFF;
 	border: 1px solid #707070;
 	background-color: #7a7a7a;
-	background-image: -webkit-linear-gradient(top,#7a7a7a,#5a5a5a);
 	background-image: linear-gradient(to bottom,#7a7a7a,#5a5a5a);
-	filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#7a7a7a,endColorstr=#5a5a5a);
 	border-bottom-width: 0;
 }
 body .s-gray ul.tabbernav > li.tabberactive a,
@@ -196,7 +191,6 @@ body .s-gray ul.tabbernav > li.tabberactive a:hover,
 #flexicontent .s-gray ul.tabbernav > li.tabberactive a:hover {
 	color: black;
 	background-color: white;
-	filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=white,endColorstr=white);
 	background-image: none;
 	border-bottom: 0px solid white;
 	border-left: 1px solid #909090;
@@ -228,9 +222,7 @@ body .s-cblue ul.tabbernav > li:hover a,
 	color: #FFFFFF;
 	border: 1px solid #225599;
 	background-color: #3377bb;
-	background-image: -webkit-linear-gradient(top,#3377bb,#225599);
 	background-image: linear-gradient(to bottom,#3377bb,#225599);
-	filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#3377bb,endColorstr=#225599);
 	border-bottom-width: 0;
 }
 body .s-cblue ul.tabbernav > li.tabberactive a,
@@ -239,7 +231,6 @@ body .s-cblue ul.tabbernav > li.tabberactive a:hover,
 #flexicontent .s-cblue ul.tabbernav > li.tabberactive a:hover {
 	color: black;
 	background-color: white;
-	filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=white,endColorstr=white);
 	background-image: none;
 	border-bottom: 0px solid white;
 	border-left: 1px solid #b2bfcd;

@@ -880,9 +880,6 @@ div fieldset.panelform {
 /* Extra buttons style for button groups to override Joomla default YES-NO only styling */
 #flexicontent .btn,
 .btn {
-	-webkit-user-select: none;
-	-moz-user-select: none;
-	-ms-user-select: none;
 	user-select: none;
 	outline-width: 0;
 }
@@ -934,9 +931,7 @@ body .btn-group.group-fcwarning .btn:not(.btn-primary),
 body .btn-group.group-fcmethod .btn:not(.btn-primary) {
 	color: #333;
 	background-color: #e7e7e7;
-	background-image: -webkit-linear-gradient(top,#ffffff,#e7e7e7);
 	background-image: linear-gradient(to bottom,#ffffff,#e7e7e7);
-	filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#ffffff,endColorstr=#e7e7e7);
 	background-repeat: repeat-x;
 	border-color: #bbb #bbb #a2a2a2;
 	border-image: none;
@@ -961,25 +956,21 @@ body .btn-group.group-fcmethod .btn.active:not(.btn-primary) {
 body .btn-group.group-fcinfo .btn-check:checked + .btn:not(.btn-primary),
 body .btn-group.group-fcinfo .btn.active:not(.btn-primary) {
 	background-color: #2f96b4;
-	filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#2f96b4,endColorstr=#1f6377);
 	border-color: #2f96b4 #2f96b4 #1f6377;
 }
 body .btn-group.group-fcprimary .btn-check:checked + .btn:not(.btn-primary),
 body .btn-group.group-fcprimary .btn.active:not(.btn-primary) {
 	background-color: #15497c;
-	filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#15497c,endColorstr=#0a223b);
 	border-color: #15497c #15497c #0a223b;
 }
 body .btn-group.group-fcsuccess .btn-check:checked + .btn:not(.btn-primary),
 body .btn-group.group-fcsuccess .btn.active:not(.btn-primary) {
 	background-color: #378137;
-	filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#378137,endColorstr=#204b20);
 	border-color: #378137 #378137 #204b20;
 }
 body .btn-group.group-fcwarning .btn-check:checked + .btn:not(.btn-primary),
 body .btn-group.group-fcwarning .btn.active:not(.btn-primary) {
 	background-color: #faa732;
-	filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#faa732,endColorstr=#ad6704);
 	border-color: #faa732 #faa732 #ad6704;
 }
 
@@ -988,13 +979,11 @@ body .btn-group.group-fcmethod.fcnoyes .btn-check:checked + .btn:not(.btn-primar
 body .btn-group.group-fcmethod.fcnoyes input[value=""] + label + input + .btn.active,
 body .btn-group.group-fcmethod.fcnoyes .btn.active:not(.btn-primary):first-of-type {
 	background-color: #942a25;
-	filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#942a25,endColorstr=#802420);
 	border-color: #942a25 #942a25 #802420;
 }
 body .btn-group.group-fcmethod.fcnoyes .btn-check:checked + .btn:not(.btn-primary),
 body .btn-group.group-fcmethod.fcnoyes .btn.active:not(.btn-primary) {
 	background-color: #378137;
-	filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#378137,endColorstr=#204b20);
 	border-color: #378137 #378137 #204b20;
 }
 
@@ -1003,13 +992,11 @@ body .btn-group.group-fcmethod.fcoffactive .btn-check:checked + .btn:not(.btn-pr
 body .btn-group.group-fcmethod.fcoffactive input[value=""] + label + input + .btn.active,
 body .btn-group.group-fcmethod.fcoffactive .btn.active:not(.btn-primary):first-of-type {
 	background-color: #444444;
-	filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#444444,endColorstr=#333333);
 	border-color: #444444 #444444 #333333;
 }
 body .btn-group.group-fcmethod.fcoffactive .btn-check:checked + .btn:not(.btn-primary),
 body .btn-group.group-fcmethod.fcoffactive .btn.active:not(.btn-primary) {
 	background-color: #378137;
-	filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#378137,endColorstr=#204b20);
 	border-color: #378137 #378137 #204b20;
 }
 
@@ -1018,13 +1005,11 @@ body .btn-group.group-fcmethod .btn-check:checked + .btn:not(.btn-primary):first
 body .btn-group.group-fcmethod input[value=""] + label + input + .btn.active,
 body .btn-group.group-fcmethod .btn.active:not(.btn-primary):first-of-type {
 	background-color: #444444;
-	filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#444444,endColorstr=#333333);
 	border-color: #444444 #444444 #333333;
 }
 body .btn-group.group-fcmethod .btn-check:checked + .btn:not(.btn-primary),
 body .btn-group.group-fcmethod .btn.active:not(.btn-primary) {
 	background-color: #faa732;
-	filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#faa732,endColorstr=#ad6704);
 	border-color: #faa732 #faa732 #ad6704;
 }
 body .group-fcset {
@@ -2836,7 +2821,6 @@ div .fc_field_unsused_val [class^="fc-icon-"],
 div .fc_field_unsused_val [class*=" fc-icon-"],
 div .fc_field_unsused_val img {
 	opacity:0.4;
-	filter:alpha(opacity=40);
 }
 .fc_ifield_val_box {
 	float: left;

@@ -58,8 +58,6 @@ button.btn.btn-highlight:hover,
 .input-prepend.input-append .add-on:first-child,
 .input-prepend.input-append .btn:first-child {
 	margin-right: -6px !important;
-	-webkit-border-radius: 3px 0 0 3px;
-	-moz-border-radius: 3px 0 0 3px;
 	border-radius: 3px 0 0 3px;
 }
 .input-prepend.input-append .add-on:not(:first-child),

@@ -259,15 +259,12 @@ input[type="radio"].fc_checkradio_bar + label {
 	vertical-align: middle !important;
 	cursor: pointer !important;
 	background-color: #f5f5f5 !important;
-	background-image: -webkit-linear-gradient(top,#fff,#e6e6e6) !important;
 	background-image: linear-gradient(to bottom,#fff,#e6e6e6) !important;
 	background-repeat: repeat-x !important;
 	border: 1px solid #ccc !important;
 	border-color: #e6e6e6 #e6e6e6 #bfbfbf !important;
 	border-color: rgba(0,0,0,0.1) rgba(0,0,0,0.1) rgba(0,0,0,0.25) !important;
 	border-bottom-color: #b3b3b3 !important;
-	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffffff',endColorstr='#ffe6e6e6',GradientType=0) !important;
-	filter: progid:DXImageTransform.Microsoft.gradient(enabled=false) !important;
 	box-shadow: inset 0 1px 0 rgba(255,255,255,0.2), 0 1px 2px rgba(0,0,0,0.05) !important;
 }
 input[type="checkbox"].fc_checkradio_bar:checked + label,
@@ -318,15 +315,9 @@ div .flexi_buttons button:not(.btn) {
 	font-weight: bold;
 	color: black;
 	background-color: #eeeeee;
-	background-image: -webkit-linear-gradient(top,#eeeeee,#dddddd);
 	background-image: linear-gradient(to bottom,#eeeeee,#dddddd);
-	filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#eeeeee,endColorstr=#dddddd);
 }
 div .fc_button.fcsimple:not(.btn) {
-	-moz-border-bottom-colors: none;
-	-moz-border-right-colors: none;
-	-moz-border-left-colors: none;
-	-moz-border-top-colors: none;
 	background-color: #f5f5f5;
 	background-image: linear-gradient(to bottom,#fff,#e6e6e6);
 	background-repeat: repeat-x;
@@ -354,9 +345,6 @@ div .fc_button.fcsimple:not(.btn):focus {
 	background-color: #e6e6e6;
 	text-decoration: none;
 	background-position: 0 -15px;
-	-webkit-transition: background-position 0.1s linear;
-	-moz-transition: background-position 0.1s linear;
-	-o-transition: background-position 0.1s linear;
 	transition: background-position 0.1s linear;
 }
 div .fc_button:not(.btn):hover,
@@ -364,9 +352,7 @@ div .fc_buttons button:not(.btn):hover,
 div .flexi_buttons button:not(.btn):hover {
 	border: 1px solid #bbbbbb;
 	background-color: #dddddd;
-	background-image: -webkit-linear-gradient(top,#dddddd,#cccccc);
 	background-image: linear-gradient(to bottom,#dddddd,#cccccc);
-	filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#dddddd,endColorstr=#cccccc);
 }
 #flexi_form_submit_msg {
 	font-size: 11px;
@@ -725,9 +711,7 @@ div table.fc-table-list {
 }
 div table.fc-table-list th {
 	background-color: #444444;
-	background-image: url(../images/noise1.png), -webkit-linear-gradient(#777777,#444444);
 	background-image: url(../images/noise1.png), linear-gradient(#777777,#444444);
-	filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#777777,endColorstr=#444444);
 	border-right: 1px solid #555;
 	border-left: 1px solid #777;
 	border-top: 1px solid #555;
@@ -1469,7 +1453,6 @@ div.statetoggler > div.statetoggler_inner > .options > div {
 div.statetoggler > div.statetoggler_inner > .options > span:hover {
 	background-color: #e7e7e7;
 	background-image: linear-gradient(to bottom,#f0f0f0,#d0d0d0);
-	filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#f0f0f0,endColorstr=#d0d0d0);
 }
 div.statetoggler > div.statetoggler_inner > .options > span > span,
 div.statetoggler > div.statetoggler_inner > .options > span > img {
@@ -2836,9 +2819,6 @@ div fieldset.panelform {
 }
 #flexicontent .btn,
 .btn {
-	-webkit-user-select: none;
-	-moz-user-select: none;
-	-ms-user-select: none;
 	user-select: none;
 	outline-width: 0;
 }
@@ -2878,9 +2858,7 @@ body .btn-group.group-fcwarning .btn:not(.btn-primary),
 body .btn-group.group-fcmethod .btn:not(.btn-primary) {
 	color: #333;
 	background-color: #e7e7e7;
-	background-image: -webkit-linear-gradient(top,#ffffff,#e7e7e7);
 	background-image: linear-gradient(to bottom,#ffffff,#e7e7e7);
-	filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#ffffff,endColorstr=#e7e7e7);
 	background-repeat: repeat-x;
 	border-color: #bbb #bbb #a2a2a2;
 	border-image: none;
@@ -2904,25 +2882,21 @@ body .btn-group.group-fcmethod .btn.active:not(.btn-primary) {
 body .btn-group.group-fcinfo .btn-check:checked + .btn:not(.btn-primary),
 body .btn-group.group-fcinfo .btn.active:not(.btn-primary) {
 	background-color: #2f96b4;
-	filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#2f96b4,endColorstr=#1f6377);
 	border-color: #2f96b4 #2f96b4 #1f6377;
 }
 body .btn-group.group-fcprimary .btn-check:checked + .btn:not(.btn-primary),
 body .btn-group.group-fcprimary .btn.active:not(.btn-primary) {
 	background-color: #15497c;
-	filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#15497c,endColorstr=#0a223b);
 	border-color: #15497c #15497c #0a223b;
 }
 body .btn-group.group-fcsuccess .btn-check:checked + .btn:not(.btn-primary),
 body .btn-group.group-fcsuccess .btn.active:not(.btn-primary) {
 	background-color: #378137;
-	filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#378137,endColorstr=#204b20);
 	border-color: #378137 #378137 #204b20;
 }
 body .btn-group.group-fcwarning .btn-check:checked + .btn:not(.btn-primary),
 body .btn-group.group-fcwarning .btn.active:not(.btn-primary) {
 	background-color: #faa732;
-	filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#faa732,endColorstr=#ad6704);
 	border-color: #faa732 #faa732 #ad6704;
 }
 body .btn-group.group-fcmethod.fcnoyes input[value=""] + label + input:checked + .btn,
@@ -2930,13 +2904,11 @@ body .btn-group.group-fcmethod.fcnoyes .btn-check:checked + .btn:not(.btn-primar
 body .btn-group.group-fcmethod.fcnoyes input[value=""] + label + input + .btn.active,
 body .btn-group.group-fcmethod.fcnoyes .btn.active:not(.btn-primary):first-of-type {
 	background-color: #942a25;
-	filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#942a25,endColorstr=#802420);
 	border-color: #942a25 #942a25 #802420;
 }
 body .btn-group.group-fcmethod.fcnoyes .btn-check:checked + .btn:not(.btn-primary),
 body .btn-group.group-fcmethod.fcnoyes .btn.active:not(.btn-primary) {
 	background-color: #378137;
-	filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#378137,endColorstr=#204b20);
 	border-color: #378137 #378137 #204b20;
 }
 body .btn-group.group-fcmethod.fcoffactive input[value=""] + label + input:checked + .btn,
@@ -2944,13 +2916,11 @@ body .btn-group.group-fcmethod.fcoffactive .btn-check:checked + .btn:not(.btn-pr
 body .btn-group.group-fcmethod.fcoffactive input[value=""] + label + input + .btn.active,
 body .btn-group.group-fcmethod.fcoffactive .btn.active:not(.btn-primary):first-of-type {
 	background-color: #444444;
-	filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#444444,endColorstr=#333333);
 	border-color: #444444 #444444 #333333;
 }
 body .btn-group.group-fcmethod.fcoffactive .btn-check:checked + .btn:not(.btn-primary),
 body .btn-group.group-fcmethod.fcoffactive .btn.active:not(.btn-primary) {
 	background-color: #378137;
-	filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#378137,endColorstr=#204b20);
 	border-color: #378137 #378137 #204b20;
 }
 body .btn-group.group-fcmethod input[value=""] + label + input:checked + .btn,
@@ -2958,13 +2928,11 @@ body .btn-group.group-fcmethod .btn-check:checked + .btn:not(.btn-primary):first
 body .btn-group.group-fcmethod input[value=""] + label + input + .btn.active,
 body .btn-group.group-fcmethod .btn.active:not(.btn-primary):first-of-type {
 	background-color: #444444;
-	filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#444444,endColorstr=#333333);
 	border-color: #444444 #444444 #333333;
 }
 body .btn-group.group-fcmethod .btn-check:checked + .btn:not(.btn-primary),
 body .btn-group.group-fcmethod .btn.active:not(.btn-primary) {
 	background-color: #faa732;
-	filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#faa732,endColorstr=#ad6704);
 	border-color: #faa732 #faa732 #ad6704;
 }
 body .group-fcset {
@@ -4449,7 +4417,6 @@ div .fc_field_unsused_val [class^="fc-icon-"],
 div .fc_field_unsused_val [class*=" fc-icon-"],
 div .fc_field_unsused_val img {
 	opacity: 0.4;
-	filter: alpha(opacity=40);
 }
 .fc_ifield_val_box {
 	float: right;

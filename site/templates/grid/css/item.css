@@ -253,7 +253,6 @@ body #flexicontent .desc-title.label {
 	padding: 0;
 	background: none;
 	min-height: 10px;
-	display: -moz-inline-stack;
 	display: inline-block;
 	vertical-align: top;
 	margin: 0%;

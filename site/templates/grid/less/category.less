@@ -791,12 +791,7 @@ div.comments {
 	line-height: 160%;
 }
 .news.fc-items-block .fc_overlayed {
-	/* Fallback for web browsers that don't support RGBa */
 	background-color: @FCC_overlay_background !important;
-	/* For IE 5.5 - 7 
-	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=#4C000000, endColorstr=#4C000000);
-	/* For IE 8+
-	-ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#4C000000, endColorstr=#4C000000)";*/
 	height: auto;
 	padding: 2%;
 	margin: 0%;
@@ -850,12 +845,8 @@ div.comments {
 
 .news.fc-items-block .fc-item-block-featured-wrapper .fc_auto_show,
 .news.fc-items-block .fc-item-block-standard-wrapper .fc_auto_show {
-	-webkit-transition: max-height 0.3s linear, opacity 0.3s linear, padding 0.3s linear, background-color 0.3s linear;
 	transition: max-height 0.3s linear, opacity 0.3s linear, padding 0.3s linear, background-color 0.3s linear;
-	
 	opacity: 0.0;
-	filter:alpha(opacity=0);
-	
 	max-height: 0;
 	padding-top: 0px;
 	padding-bottom: 0px;
@@ -877,7 +868,6 @@ div.comments {
 .news.fc-items-block .fc-item-block-featured-wrapper.mod_fc_activeitem .fc_auto_show.fc_show_active,  /* force showing content of active item */
 .news.fc-items-block .fc-item-block-standard-wrapper.mod_fc_activeitem .fc_auto_show.fc_show_active { /* force showing content of active item */
 	opacity:1;
-	filter:alpha(opacity=100);
 	max-height: 100%; /* can be approximate, percentage works well if parent height is specific */
 }
 .news.fc-items-block .fc-item-block-featured-wrapper.mod_fc_activeitem:hover .fc_auto_show.fc_show_active,  /* show & highlight content of active item */
@@ -885,7 +875,6 @@ div.comments {
 .news.fc-items-block .fc-item-block-featured-wrapper:hover .fc_auto_show,  /* show content if item under mouse */
 .news.fc-items-block .fc-item-block-standard-wrapper:hover .fc_auto_show {   /* show content if item under mouse */
 	opacity:1;
-	filter:alpha(opacity=100);
 	background-color: rgba(0, 0, 0, 0.75);
 	max-height: 100%; /* can be approximate, percentage works well if parent height is specific */
 }

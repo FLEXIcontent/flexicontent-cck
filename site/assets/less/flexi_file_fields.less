@@ -171,13 +171,10 @@ body {
 	background: none;
 	border: 0;
 	box-shadow: unset;
-	-webkit-transition: all 0.2s ease-in;
 	transition: all 0.2s ease-in;
 	overflow: hidden;
-	-webkit-transform: scale(0.5);
 	transform: scale(0.5);
 	opacity: 0;
-	filter: alpha(opacity=0);
 }
 .adminthumbs.fcmanthumbs .fc-fileman-delete-btn:before {
 	font-size: 24px;
@@ -870,18 +867,14 @@ body .fc_file_uploader {
 			/* REMOVE ICON */
 			> li .plupload_file_action {
 				> a:before {
-					background-image: -webkit-linear-gradient(top,#f7f7f7,#d7d7d7);
 					background-image: linear-gradient(to bottom,#f7f7f7,#d7d7d7);
-					filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#f7f7f7,endColorstr=#d7d7d7);
 					color: red;
 					content: "\49";
 				}
 				> a:hover:before {
 					border: 1px solid #b7b7b7;
 					background-color: #c7c7c7;
-					background-image: -webkit-linear-gradient(top,#e7e7e7,#c0c0c0);
 					background-image: linear-gradient(to bottom,#e7e7e7,#c0c0c0);
-					filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#e7e7e7,endColorstr=#c0c0c0);
 				}
 			}			
 		}
