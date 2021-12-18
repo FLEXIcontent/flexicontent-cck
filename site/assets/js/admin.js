@@ -212,7 +212,7 @@ function fc_submit_form(form, task, validate)
 
 			jQuery('body').prepend(
 				'<div id="fc_filter_form_blocker">' +
-					'<div class="fc_blocker_opacity"></div>' +
+					'<div class="fc_blocker_overlay"></div>' +
 					'<div class="fc_blocker_content">' +
 						Joomla.JText._('FLEXI_FORM_IS_BEING_SUBMITTED') +
 						'<div class="fc_blocker_bar"><div></div></div>' +
