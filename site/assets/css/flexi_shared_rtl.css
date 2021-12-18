@@ -1660,7 +1660,7 @@ select[multiple].use_select2_lib:focus {
 	width: 100%;
 	height: 100%;
 }
-#fc_filter_form_blocker .fc_blocker_opacity {
+#fc_filter_form_blocker .fc_blocker_overlay {
 	display: block;
 	z-index: 2000;
 	position: absolute !important;
@@ -2362,4 +2362,7 @@ span.add-on.pop-helper.field-media-preview {
 .input-group > .input-group-prepend > .input-group-text {
 	border-top-right-radius: 0;
 	border-bottom-right-radius: 0;
+}
+body #config {
+	margin-bottom: 230px;
 }

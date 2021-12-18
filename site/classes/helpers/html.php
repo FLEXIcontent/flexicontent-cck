@@ -1285,21 +1285,23 @@ class flexicontent_html
 		$_loaded[$framework] = false;
 
 		// Get frameworks that are configured to be loaded manually in frontend (e.g. via the Joomla template)
-		$app = JFactory::getApplication();
+		$app     = JFactory::getApplication();
+		$cparams = JComponentHelper::getParams('com_flexicontent');
 
 		static $load_frameworks = null;
 		static $load_jquery = null;
 
 		if (!isset($load_frameworks[$framework]))
 		{
-			$flexiparams = JComponentHelper::getParams('com_flexicontent');
-			//$load_frameworks = $flexiparams->get('load_frameworks', array('jQuery','image-picker','masonry','select2','inputmask','prettyCheckable','fancybox'));
-			//$load_frameworks = FLEXIUtilities::paramToArray($load_frameworks);
-			//$load_frameworks = array_flip($load_frameworks);
-			//$load_jquery = isset($load_frameworks['jQuery']) || !$app->isClient('site');
-			if ( $load_jquery===null ) $load_jquery = $flexiparams->get('loadfw_jquery', 1)==1  ||  !$app->isClient('site');
-			$load_framework = $flexiparams->get( 'loadfw_'.strtolower(str_replace('-','_',$framework)), 1 );
-			$load_frameworks[$framework] = $load_framework==1  ||  ($load_framework==2 && !$app->isClient('site'));
+			if ($load_jquery === null)
+			{
+				$load_jquery = (int) $cparams->get('loadfw_jquery', 1) === 1 || !$app->isClient('site');
+			}
+
+			$loadfw_param   = 'loadfw_' . strtolower(str_replace('-', '_', $framework));
+			$load_framework = (int) $cparams->get($loadfw_param, 1);
+
+			$load_frameworks[$framework] = $load_framework === 1 || ($load_framework === 2 && !$app->isClient('site'));
 		}
 
 		// Set loaded flag
@@ -1961,59 +1963,54 @@ class flexicontent_html
 				JText::script("FLEXI_ARE_YOU_SURE", true);
 				JText::script("FLEXI_APPLYING_FILTERING");
 
-				// MANAGE FILTERING MESSAGE DISPLAY 
-				$disp_textloading= JComponentHelper::getParams('com_flexicontent')->get('disp_textloading', 1);
-				 if( $disp_textloading ){
-					 $textloading = "'".JText::_('FLEXI_APPLYING_FILTERING')."'+";
-				 }else{
-					$textloading ="";
-				 }
-				$disp_progressbar = JComponentHelper::getParams('com_flexicontent')->get('disp_progressbar', 1);
-				$color_progressbar = JComponentHelper::getParams('com_flexicontent')->get('background_color_bar', '#0099ff');
-				 if( $disp_progressbar ){
-					 $progressbar = "'<div class=\"fc_blocker_bar\"><div style=\"background-color:".$color_progressbar."\">'+";
-				 }else{
-					$progressbar = "";
-				 }
-				 $url_logo = JUri::root(true). '/' .JComponentHelper::getParams('com_flexicontent')->get('url_logo', '');
-				 $logo_alt = JComponentHelper::getParams('com_flexicontent')->get('logo_alt', '');
-				 if( $url_logo ){
-					 $logo = "'<div class=\"fc_logo_loading\"><img src=\"$url_logo\" alt=".$logo_alt."><div>'+";
-				 }else{
-					$logo = "";
-				 }
-				$background_color_loading = JComponentHelper::getParams('com_flexicontent')->get('background_color_loading', '#000');
-				$background_color_opacity = JComponentHelper::getParams('com_flexicontent')->get('background_color_opacity', 30);
-				if(!empty($background_color_loading)){
-					 $background_color_loading = "background-color:".$background_color_loading." !important;";
-				 }else{
-					$background_color_loading = "";
-				 }
-				 
-				 // NOTE: this was commented out in the XML file, because of causing problems
-				 $background_color_opacity = "";
-				 if (!empty($background_color_opacity))
-				 {
-						$background_color_opacity_b = $background_color_opacity / 100;
-					 	$background_color_opacity = "opacity:".$background_color_opacity_b." !important;filter: alpha(opacity=".$background_color_opacity.") !important;";
-				 }
-				 $background_color_content = JComponentHelper::getParams('com_flexicontent')->get('background_color_content', '#fff');
-				 $background_color_content = "background:".$background_color_content." !important;";
+				/**
+				 * MANAGE FILTERING MESSAGE DISPLAY 
+				 */
 
-				 
+				// Content Box
+				$content_color    = $cparams->get('page_reloading_content_color', 'rgba(0, 0, 0, 1)');
+				$content_bg_color = $cparams->get('page_reloading_content_bg_color', 'rgba(255, 255, 255, 1)');
+
+				// Logo ... in Content Box
+				$logo_imgsrc   = $cparams->get('page_reloading_logo_imgsrc', '');
+				$logo_imgsrc   = $logo_imgsrc ? JUri::root() . $logo_imgsrc : '';
+				$logo_opacity  = $cparams->get('page_reloading_logo_opacity', 100);
+				$logo_opacity  = number_format(($logo_opacity / 100.0), 2, '.', '');
+
+				// Text Message ... in Content Box
+				$mssg_display  = $cparams->get('page_reloading_mssg_display', 1);
+				$mssg_text     = $cparams->get('page_reloading_mssg_text', 'FLEXI_APPLYING_FILTERING');
+
+				// Progress Bar ... in Content Box
+				$pbar_display  = $cparams->get('page_reloading_pbar_display', 1);
+				$pbar_color    = $cparams->get('page_reloading_pbar_color', 'rgba(0, 153, 255, 1)');
+
+				// Overlay Box
+				$overlay_bg_color = $cparams->get('page_reloading_overlay_bg_color', 'rgba(0, 0, 0, 0.3)');
+
+				// Get other CSS
+
+				// Create CSS style as an array, we will implode it using '; '
+				$styles = (object) array(
+					'content_box'  => 'background-color: ' . $content_bg_color . '; color: ' . $content_color . ';' ,
+					'logo_box'     => 'opacity: ' . $logo_opacity . ';',
+					'mssg_box'     => '',
+					'progress_bar' => 'background-color: ' . $pbar_color . ';' ,
+					'overlay_box'  => 'background-color: ' . $overlay_bg_color . ';',
+				);
+
 				$js .= '
 					jQuery( document ).ready(function() {
-    					jQuery(\'body\').prepend(
-						\'<div id="fc_filter_form_blocker">\' +
-						\'<div class="fc_blocker_opacity" style="'.$background_color_loading.''.$background_color_opacity.'"></div>\' +
-						\'<div class="fc_blocker_content" style="'.$background_color_content.'">\' +
-						'.$logo.'
-						'.$textloading.'
-						'.$progressbar.'
-						\'</div></div>\' +
-						\'</div>\' +
-						\'</div>\'
-						);
+						jQuery("body").prepend(\'\\
+							<div id="fc_filter_form_blocker">\\
+								<div class="fc_blocker_overlay" style="' . $styles->overlay_box . '"></div>\\
+								<div class="fc_blocker_content" style="' . $styles->content_box . '">\\
+									' . ($logo_imgsrc  ? '<div class="fc_logo_loading" style="' . $styles->logo_box . '" ><img src="' . $logo_imgsrc . '" alt="' . $mssg_text . '"><div>' : '') . '\\
+									' . ($mssg_display ? '<div class="fc_mssg_loading" style="' . $styles->mssg_box . '" >' . JText::_($mssg_text, true) . '</div>' : '') . '\\
+									' . ($pbar_display ? '<div class="fc_blocker_bar"><div style="' . $styles->progress_bar . '"></div></div>' : '') . '\\
+								</div>\\
+							</div>\\
+						\');
 					});
 				';
 				break;

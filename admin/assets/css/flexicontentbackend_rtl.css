@@ -1164,9 +1164,6 @@ td.col_edit_layout {
 		display: none;
 	}
 }
-#flexicontent .btn {
-	padding: 8px 12px;
-}
 div#fc-filters-slide-btn {
 	border: 0;
 	background: none;
@@ -4505,6 +4502,9 @@ span.add-on.pop-helper.field-media-preview {
 .input-group > .input-group-prepend > .input-group-text {
 	border-top-right-radius: 0;
 	border-bottom-right-radius: 0;
+}
+body #config {
+	margin-bottom: 230px;
 }
 #flexicontent {
 	margin-bottom: 24px;
