@@ -35,6 +35,10 @@
 			</field>
 
 			<field name="" type="separator" default="FLEXI_FIELD_NUMBER_OF_VALUES" description="" depend_class="fieldgroupoff" level="level2" />
+			<field name="required" type="radio" default="0" label="FLEXI_FIELD_REQUIRED" description="FLEXI_FIELD_REQUIRED_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
 			<field name="allow_multiple" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_FIELD_ALLOW_MULTIPLE" description="FLEXI_FIELD_ALLOW_MULTIPLE_DESC" inline_tip="FLEXI_FIELD_ALREADY_MUL_SEL" tip_class="multivalue-mode" tip_img="warning.png" depend_class="fieldgroupoff" class="btn-group group-fcmethod fcnoyes">
 				<option value="0" show_list="" hide_list="multivalue-mode">FLEXI_NO</option>
 				<option value="1" show_list="multivalue-mode" hide_list="">FLEXI_YES</option>
@@ -45,9 +49,13 @@
 				<option value="2">FLEXI_FIELD_INLINE_PREPEND_BTN</option>
 				<option value="3">FLEXI_FIELD_INLINE_BOTH_BTN</option>
 			</field>
-			<field name="required" type="radio" default="0" label="FLEXI_FIELD_REQUIRED" description="FLEXI_FIELD_REQUIRED_DESC" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
+
+			<field name="" type="separator" default="FLEXI_VALUE_CREATION_LABEL" level="level2" />
+			<field name="default_values" type="text" filter="raw" default="" label="FLEXI_FIELD_DEFAULT_VALUES" description="" hint="itemid1:catid1 , itemid2:catid2 , itemid3:catid3" />
+			<field name="default_value_use" type="list" default="0" label="FLEXI_OPTIONAL_PROPERTIES_DEFAULT_USAGE" description="FLEXI_OPTIONAL_PROPERTIES_DEFAULT_USAGE_DESC">
+				<option value="0">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_NEW</option>
+				<option value="1">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_ALL</option>
+				<option value="2">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_AND_ON_EMPTY</option>
 			</field>
 
 			<field name="" type="separator" default="FLEXI_FIELD_OPTIONS_PER_VALUE" description="" level="level3" />
@@ -64,7 +72,7 @@
 			</field>
 			<field name="label_form" type="text" default="" label="FLEXI_LABEL" description="Enter a label to use for item form that is different than field label for viewing" depend_class=""/>
 			<field name="no_acc_msg_form" type="text" default="" label="FLEXI_FIELD_NOACCESS_MSG" description="FLEXI_FIELD_NOACCESS_MSG_DESC" depend_class=""/>
-			<field name="size" type="text" default="12" size="2" label="FLEXI_RIFLD_SELECTBOX_LINES" description="FLEXI_RIFLD_SELECTBOX_LINES_DESC" />
+			<!--field name="size" type="text" default="12" size="2" label="FLEXI_RIFLD_SELECTBOX_LINES" description="FLEXI_RIFLD_SELECTBOX_LINES_DESC" /-->
 
 
 			<field name="" type="separator" default="FLEXI_RIFLD_RELATED_ITEMS_SELECTOR" level="level2" />

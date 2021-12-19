@@ -681,24 +681,43 @@ class FCField extends JPlugin
 	protected function afterDisplayField() {}
 
 	// Create and returns a default value
-	protected function getDefaultValues($isform = true)
+	protected function getDefaultValues($isform = true, $translate = true, $split = '')
 	{
 		$value_usage = (int) $this->field->parameters->get('default_value_use', 0);
 
-		$default_value = $isform
-			? (($this->item->version == 0 || $value_usage > 0) ? $this->field->parameters->get( 'default_value', '' ) : '')
-			: (($value_usage === 2) ? $this->field->parameters->get( 'default_value', '' ) : '');
+		if ($split)
+		{
+			$default_values = $isform
+				? (($this->item->version == 0 || $value_usage > 0) ? trim($this->field->parameters->get( 'default_values', '' )) : '')
+				: ($value_usage === 2 ? trim($this->field->parameters->get( 'default_values', '' )) : '');
 
-		$default_value  = strlen($default_value) ? JText::_($default_value) : '';
+			$default_values = preg_split("/\s*" . $split . "\s*/u", $default_values);
+		}
+		else
+		{
+			$default_value = $isform
+				? (($this->item->version == 0 || $value_usage > 0) ? trim($this->field->parameters->get( 'default_value', '' )) : '')
+				: ($value_usage === 2 ? trim($this->field->parameters->get( 'default_value', '' )) : '');
 
-		/**
-		 * Return default value. Note: If no default value then return:
-		 *  array('') for item form
-		 *  array() for item viewing
-		 */
-		return strlen($default_value) || $isform
-			? array($default_value)
-			: array();
+			/**
+			 * Return default value. Note: If no default value then return:
+			 *  array('') for item form
+			 *  array() for item viewing
+			 */
+			$default_values = strlen($default_value) || $isform
+				? array($default_value)
+				: array();
+		}
+
+		if ($translate)
+		{
+			foreach ($default_values as $i => $v)
+			{
+				$default_values[$i] = strlen($v) ? JText::_($v) : '';
+			}
+		}
+
+		return $default_values;
 	}
 
 	// Parses and returns fields values, unserializing them if serialized

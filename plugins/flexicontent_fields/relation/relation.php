@@ -5,7 +5,7 @@
  *
  * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
  * @link            https://flexicontent.org
- * @copyright       Copyright � 2020, FLEXIcontent team, All Rights Reserved
+ * @copyright       Copyright © 2020, FLEXIcontent team, All Rights Reserved
  * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
@@ -40,19 +40,19 @@ class plgFlexicontent_fieldsRelation extends FCField
 
 		$field->label = $field->parameters->get('label_form') ? JText::_($field->parameters->get('label_form')) : JText::_($field->label);
 
+		// Set field and item objects
+		$this->setField($field);
+		$this->setItem($item);
+
 		$use_ingroup = $field->parameters->get('use_ingroup', 0);
 		if (!isset($field->formhidden_grp)) $field->formhidden_grp = $field->formhidden;
 		if ($use_ingroup) $field->formhidden = 3;
 		if ($use_ingroup && empty($field->ingroup)) return;
 
-		// Set field and item objects
-		$this->setField($field);
-		$this->setItem($item);
 
-
-		// ***
-		// *** Case of autorelated item
-		// ***
+		/**
+		 * Case of autorelated item
+		 */
 
 		if (JFactory::getApplication()->input->get('autorelation_'.$field->id, 0, 'int'))
 		{
@@ -79,28 +79,58 @@ class plgFlexicontent_fieldsRelation extends FCField
 		 * Number of values
 		 */
 
-		$multiple   = $use_ingroup || (int) $field->parameters->get('allow_multiple', 0);
-		$max_values = $use_ingroup ? 0 : (int) $field->parameters->get('max_values', 0);
-		$required   = (int) $field->parameters->get('required', 0);
+		$multiple     = $use_ingroup || (int) $field->parameters->get('allow_multiple', 0);
+		$max_values   = $use_ingroup ? 0 : (int) $field->parameters->get('max_values', 0);
+		$required     = (int) $field->parameters->get('required', 0);
 		$add_position = (int) $field->parameters->get('add_position', 3);
+
+		// Classes for marking field required
+		$required_class = $required ? ' required' : '';
 
 		// If we are multi-value and not inside fieldgroup then add the control buttons (move, delete, add before/after)
 		$add_ctrl_btns = !$use_ingroup && $multiple;
 		$fields_box_placing = (int) $field->parameters->get('fields_box_placing', 0);
 
 
-		// ***
-		// *** EDITING PARAMETERS
-		// ***
+		/**
+		 * Value handling
+		 */
 
-		// Input field display size & max characters
-		$size = $field->parameters->get( 'size', 12 ) ;
-		$attribs = $size ? ' size="'.$size.'"' : '';
+		// Default value(s)
+		$default_values = $this->getDefaultValues($isform = true, $_translate = false, $_split = ',');
+		//$default_value  = reset($default_values);
+
+
+		/**
+		 * Form field display parameters
+		 */
+
+		$size = (int) $field->parameters->get( 'size', 12 ) ;
 		$prepend_item_state = $field->parameters->get( 'prepend_item_state', 1 ) ;
 		$maxtitlechars 	= $field->parameters->get( 'maxtitlechars', 40 ) ;
 		$selected_items_label = $field->parameters->get( 'selected_items_label', 'FLEXI_RIFLD_SELECTED_ITEMS_LABEL' ) ;
 		$selected_items_sortable = $field->parameters->get( 'selected_items_sortable', 0 ) ;
 
+		// Create extra HTML TAG parameters for the form field
+		$classes = 'use_select2_lib fc_select2_no_check fc_select2_noselect'
+			. $required_class
+			. ($selected_items_sortable ? ' fc_select2_sortable' : '');
+		$attribs = ''
+			. ($size ? ' size="' . $size . '" ' : '')
+			;
+
+		// Attribute for default value(s)
+		if (!empty($default_values))
+		{
+			$attribs .= ' data-defvals="'.htmlspecialchars( implode('|||', $default_values), ENT_COMPAT, 'UTF-8' ).'" ';
+		}
+
+
+		// Initialise property with default value
+		if (!$field->value || (count($field->value) === 1 && reset($field->value) === null))
+		{
+			$field->value = $default_values;
+		}
 
 		// CSS classes of value container
 		$value_classes  = 'fcfieldval_container valuebox fcfieldval_container_'.$field->id;
@@ -116,9 +146,9 @@ class plgFlexicontent_fieldsRelation extends FCField
 		$field_name_js = str_replace('-', '_', $field->name);
 
 
-		// ***
-		// *** Create category tree to use for creating the category selector
-		// ***
+		/**
+		 * Create category tree to use for creating the category selector
+		 */
 
 		// Get categories without filtering
 		require_once(JPATH_ROOT.DS."components".DS."com_flexicontent".DS."classes".DS."flexicontent.categories.php");
@@ -140,6 +170,7 @@ class plgFlexicontent_fieldsRelation extends FCField
 		}
 
 
+		// JS & CSS of current field
 		$js = '';
 		$css = '';
 
@@ -352,9 +383,9 @@ class plgFlexicontent_fieldsRelation extends FCField
 		$related_items_sets = $this->parseRelatedItems($field->value, $item_limit, $itemids_sets);
 
 
-		// ***
-		// *** Item retrieving query ... put together and execute it
-		// ***
+		/**
+		 * Item retrieving query ... put together and execute it
+		 */
 
 		foreach($itemids_sets as $n => $_itemids_v)
 		{
@@ -375,9 +406,9 @@ class plgFlexicontent_fieldsRelation extends FCField
 		}
 
 
-		// ***
-		// *** Create category selector to use for selecting related items
-		// ***
+		/**
+		 * Create category selector to use for selecting related items
+		 */
 
 		$cat_selected = count($allowedtree)==1 ? reset($allowedtree) : '';
 		$cat_selecor_box_style = count($allowedtree) === 1 ? 'style="display:none;" ' : '';
@@ -399,9 +430,9 @@ class plgFlexicontent_fieldsRelation extends FCField
 		);
 
 
-		// ***
-		// *** Create the selected items field (items selected as 'related')
-		// ***
+		/**
+		 * Create the selected items field (items selected as 'related')
+		 */
 
 		$state_shortname = array(1=>'P', 0=>'U', -1=>'A', -3=>'PE', -4=>'OQ', -5=>'IP');
 		$items_options_select = array();
@@ -439,7 +470,6 @@ class plgFlexicontent_fieldsRelation extends FCField
 			$document->addScript(JUri::root(true) . '/plugins/flexicontent_fields/relation/js/form.js', array('version' => FLEXI_VHASH));
 		}
 
-		$_classes = 'use_select2_lib fc_select2_no_check fc_select2_noselect' . ($required ? ' required' : '') . ($selected_items_sortable ? ' fc_select2_sortable' : '');
 		$per_val_js = '';
 
 
@@ -449,7 +479,6 @@ class plgFlexicontent_fieldsRelation extends FCField
 
 		$field->html = array();
 		$n = 0;
-		//if ($use_ingroup) {print_r($field->value);}
 
 		foreach ($related_items_sets as $n => $related_items)
 		{
@@ -486,7 +515,7 @@ class plgFlexicontent_fieldsRelation extends FCField
 
 					<div class="' . $input_grp_class . ' fc-xpended-row fcfield-relation-selected_items_box">
 						<label class="' . $add_on_class . ' fc-lbl selected_items-lbl" id="' . $elementid_n . '-lbl" for="' . $elementid_n . '">' . JText::_($selected_items_label) . '</label>
-						<select id="' . $elementid_n . '" name="' . $fieldname_n . '" multiple="multiple" class="' . $_classes . ' fcfield-relation-selected_items" ' . $attribs . ' onchange="return fcfield_relation.selected_items_modified(this);">
+						<select id="' . $elementid_n . '" name="' . $fieldname_n . '" multiple="multiple" class="' . $classes . ' fcfield-relation-selected_items" ' . $attribs . ' onchange="return fcfield_relation.selected_items_modified(this);">
 							' . $items_options_select[$n] . '
 						</select>
 						' . ($selected_items_sortable ? '
@@ -609,6 +638,12 @@ class plgFlexicontent_fieldsRelation extends FCField
 		 */
 
 		$values = $values ? $values : $field->value;
+
+		// Check for no values and no default value, and return empty display
+		if (empty($values))
+		{
+			$values = $this->getDefaultValues($isform = false, $_translate = false, $_split = ',');
+		}
 
 
 		/**

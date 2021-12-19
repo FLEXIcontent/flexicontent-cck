@@ -1658,7 +1658,7 @@ class FCIndexedField extends FCField
 	// ***
 
 	// Method to get default values of an indexed field
-	public function getDefaultValues($isform = true)
+	protected function getDefaultValues($isform = true, $translate = false, $split = ',')
 	{
 		$class_name = 'plgflexicontent_fields' . ucfirst($this->field->field_type);
 
@@ -1667,27 +1667,10 @@ class FCIndexedField extends FCField
 			JPluginHelper::getPlugin('flexicontent_fields', $this->field->field_type);
 		}
 
-		$value_usage = (int) $this->field->parameters->get( 'default_value_use', 0 ) ;
-
-		if ($class_name::$valueIsArr)
-		{
-			$default_values = $isform
-				? (($this->item->version == 0 || $value_usage > 0) ? trim($this->field->parameters->get( 'default_values', '' )) : '')
-				: ($value_usage === 2 ? trim($this->field->parameters->get( 'default_values', '' )) : '');
-
-			$default_values = preg_split("/\s*,\s*/u", $default_values);
-		}
-		else
-		{
-			$default_value = $isform
-				? (($this->item->version == 0 || $value_usage > 0) ? trim($this->field->parameters->get( 'default_value', '' )) : '')
-				: ($value_usage === 2 ? trim($this->field->parameters->get( 'default_value', '' )) : '');
-
-			$default_values = strlen($default_value) || $isform
-				? array($default_value)
-				: array();
-		}
-
-		return $default_values;
+		$value_usage = (int) $this->field->parameters->get('default_value_use', 0);
+		$split       = $class_name::$valueIsArr ? ',' : $split;
+		$translate   = false;
+		
+		return parent::getDefaultValues($isform, $translate, $split);
 	}
 }
