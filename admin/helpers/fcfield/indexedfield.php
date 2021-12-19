@@ -1668,7 +1668,7 @@ class FCIndexedField extends FCField
 		}
 
 		$value_usage = (int) $this->field->parameters->get('default_value_use', 0);
-		$split       = $class_name::$valueIsArr ? ',' : $split;
+		$split       = $class_name::$valueIsArr ? $split : '';
 		$translate   = false;
 		
 		return parent::getDefaultValues($isform, $translate, $split);
