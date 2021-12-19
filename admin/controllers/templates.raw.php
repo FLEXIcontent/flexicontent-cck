@@ -176,8 +176,8 @@ class FlexicontentControllerTemplates extends FlexicontentControllerBaseAdmin
 		 * 'desktop_' and 'mobile_' or '_fe' and '_be' for (frontend and backend)
 		 */
 		$layout_pfx = $this->input->getCmd('layout_pfx', '');
-		$layout_sfx = $this->input->getCmd('layout_sfx', ''); 
-		
+		$layout_sfx = $this->input->getCmd('layout_sfx', '');
+
 		//echo "ext_option: $ext_option , ext_view: $ext_view , ext_type: $ext_type , ext_name: $ext_name , ext_id: $ext_id , layout_pfx: $layout_pfx"; exit;
 
 		$layout_name = $this->input->getString('layout_name', ''); // IN modules/fields: layout name, IN item/type/category forms (FC templates):  'item' / 'category'
@@ -358,48 +358,52 @@ class FlexicontentControllerTemplates extends FlexicontentControllerBaseAdmin
 
 		if (!$layout_name)
 		{
-			echo '
-			<div class="fc_layout_box_outer">
-				<div class="alert alert-info">
-					Using defaults
-				</div>
-			</div>';
-			exit;
+			$layoutpath = '';
+			$layout_msg = JText::_('FLEXI_USING_DEFAULTS');
 		}
 
 		elseif (!file_exists($layoutpath))
 		{
+			$layoutpath_shown = $app->isClient('administrator') ? ' <br><i>' . $layoutpath . '</i>' : '';
+
 			if (file_exists($path . DS . '_fallback' . DS . '_fallback.xml'))
 			{
+				// Desired layout file does not exist but fallback layout parameter file exists, set layout to fallback layout
 				$layoutpath = $path . DS . '_fallback' . DS . '_fallback.xml';
-				echo '
-				<div class="fc_layout_box_outer">
-					<div class="alert alert-warning">
-						Currently selected layout: <b>"' . $layout_name . '"</b> ' .($app->isClient('administrator') ? 'with path: ' . $layoutpath : '') . ' does not have a parameters XML file, using general defaults.
-						If this is an old template then these parameters will allow to continue using it, but we recommend that you create parameter file: ' . $layout_name . '.xml
-					</div>
-				</div>';
+				$layout_msg = JText::sprintf('FLEXI_FIELD_ABOUT_LEGACY_LAYOUT_WITH_NO_PARAMS', $layout_name, $layoutpath_shown, $layout_name );
 			}
 			else
 			{
-				echo '
-				<div class="fc_layout_box_outer">
-					<div class="alert alert-info">
-						Currently selected layout: <b>"' . $layout_name . '"</b> ' .($app->isClient('administrator') ? 'with path: ' . $layoutpath : '') . ' does not have layout specific parameters
-					</div>
-				</div>';
-				exit;
+				$layoutpath = '';
+				$layout_msg = JText::sprintf('FLEXI_FIELD_ABOUT_NAMED_LAYOUT_WITH_NO_PARAMS', $layout_name, $layoutpath_shown);
 			}
 		}
-		
-		
+
+		// Displayed message regarded non-found layout
+		if (!empty($layout_msg))
+		{
+			echo '
+			<div class="fc_layout_box_outer">
+				<div class="alert alert-info">
+					' . $layout_msg . '
+				</div>
+			</div>';
+		}
+
+		// Terminate further execution if we failed to find an existing layout path
+		if (!$layoutpath)
+		{
+			exit;
+		}
+
+
 		/**
 		 * Read file and replace parameter suffix if this was providden
 		 * layout_sfx should include underscore unlike layout_pfx which does not
 		 */
 		$file_string = file_get_contents($layoutpath);
-		$file_string = str_replace('_PSFX', $layout_sfx, $file_string);  
-		$file_string = str_replace('PPFX_', $layout_pfx . '_', $file_string);  
+		$file_string = str_replace('_PSFX', $layout_sfx, $file_string);
+		$file_string = str_replace('PPFX_', $layout_pfx . '_', $file_string);
 
 
 		/**
@@ -511,7 +515,7 @@ class FlexicontentControllerTemplates extends FlexicontentControllerBaseAdmin
 							break;
 
 						case 'forms':
-							
+
 							$_label = str_replace('jform_attribs_', 'jform_iflayout_', $field->label);
 							$_input = str_replace('jform_attribs_', 'jform_iflayout_',
 								str_replace('[attribs]', '[iflayout]', $field_input_inherited)

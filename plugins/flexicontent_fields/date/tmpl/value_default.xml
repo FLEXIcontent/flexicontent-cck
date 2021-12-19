@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <form>
 
-	<name>Date field layout -- Default (Date)</name>
+	<name>Form layout -- Default (Date)</name>
 	<author>ggppdk</author>
 	<creationDate>January 2019</creationDate>
 	<copyright>Copyright (C) 2018 ggppdk</copyright>
@@ -9,7 +9,7 @@
 	<authorEmail>flexicontentck@gmail.com</authorEmail>
 	<authorUrl>www.flexicontent.org</authorUrl>
 	<version>1.0</version>
-	<description>Flexicontent fields - Date field layout - Default parameters</description>
+	<description>Default (Date)</description>
 	
 	<fields name="attribs">
 		

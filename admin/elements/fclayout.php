@@ -460,7 +460,8 @@ jQuery(document).ready(function(){
 });
 
 ";
-		$doc->addScriptDeclaration($js);
+		echo '<script>' . $js . '</script>';  // Add JS inline so that it works when changing flexicontent field type too
+		//$doc->addScriptDeclaration($js);
 }
 		// Compute the current selected values
 		$selected = array($this->value);
