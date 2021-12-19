@@ -2769,20 +2769,30 @@ span.fc_select_button:hover {
 }
 #flexicontent .fc_form_flex_box {
 	float: none;
-	width: 100;
+	width: 100%;
 	margin: 0;
 	padding: 0;
 	display: flex;
 	flex-wrap: wrap;
 	border: 0 none;
 }
-#flexicontent .fc_form_flex_box_item {
+#flexicontent .fc_form_flex_box .fc_form_flex_box_item {
 	float: none;
 	flex-grow: 0;
 	margin: 12px;
 	padding: 0;
 	display: inline-block;
 	border: 0 none;
+}
+#flexicontent .fc_form_flex_box .fc_form_flex_box_item.use_flex_grow {
+	flex-grow: 1;
+}
+#flexicontent .fc_form_flex_box .fc_form_flex_box_item.use_flex_grow .fcfield_textareaval,
+#flexicontent .fc_form_flex_box .fc_form_flex_box_item.use_flex_grow .fcfield_selectval,
+#flexicontent .fc_form_flex_box .fc_form_flex_box_item.use_flex_grow .fcfield_selectmulval,
+#flexicontent .fc_form_flex_box .fc_form_flex_box_item.use_flex_grow .fcfield_textval {
+	width: 100%;
+	max-width: unset;
 }
 #flexicontent div.fields_tabset,
 #flexicontent div.params_tabset {

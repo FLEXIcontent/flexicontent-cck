@@ -54,10 +54,12 @@ for ($n = 0; $n < $max_count; $n++)
 			? ' fcAlwaysVisibleField'
 			: '';
 		$gf_elementid_n = 'custom_' . $grouped_field->name . '_' . $n;
+		$use_flex_grow  = (int) $field->parameters->get('use_flex_grow', 1);
+
 		$gf_display_label_form = (int) $grouped_field->parameters->get('display_label_form', 1);
 
 		$field->html[$n] .= (empty($isFlexBox) ? '' : '
-		<div class="fc_form_flex_box_item" style="margin: 0;">') . '
+		<div class="fc_form_flex_box_item' . ($use_flex_grow ? ' use_flex_grow' : '') . '" style="margin: 0;">') . '
 			<div class="control-group control-fc_subgroup fcfieldval_container_outer' . $gf_compactedit . '">
 				<div
 					class="control-label ' . ($gf_display_label_form === 2 ? 'fclabel_cleared' : '') . '"

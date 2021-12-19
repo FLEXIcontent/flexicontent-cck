@@ -67,8 +67,19 @@
 			<field name="label_form" type="text" default="" label="FLEXI_LABEL" description="Enter a label to use for item form that is different than field label for viewing" depend_class=""/>
 			<field name="no_acc_msg_form" type="text" default="" label="FLEXI_FIELD_NOACCESS_MSG" description="FLEXI_FIELD_NOACCESS_MSG_DESC" depend_class=""/>
 
-			<field name="" type="separator" default="FLEXI_LAYOUT" description="" level="level2" />
-			<field name="formlayout" type="fcfilelist" default="list" label="FLEXI_FIELD_SELECT_FORM_LAYOUT" description="FLEXI_FIELD_SELECT_FORM_LAYOUT_DESC" directory="plugins/flexicontent_fields/fieldgroup/tmpl/" filter="^field_.*\.php$" exclude="" stripext="1" stripprefix="field_" hide_none="1" hide_default="1" labelclass="label text-white bg-warning label-warning" />
+			<field name="" type="separator" default="FLEXI_LAYOUT" level="level2" />
+			<field name="formlayout" type="fclayout" default="list" label="FLEXI_FIELD_SELECT_FORM_LAYOUT" description="FLEXI_FIELD_SELECT_FORM_LAYOUT_DESC"
+				directory="/plugins/flexicontent_fields/fieldgroup/tmpl"
+				ext_name="fieldgroup"
+				hide_default="1" hide_none="1" exclude="list|flexbox"
+				stripext="1" stripprefix="field_" filter="^field_.*\.php$"
+				tmpl_container="tabset_attrs_0_nav_3" params_source="file" custom_layouts_label="Custom layouts" layout_label="FLEXI_LAYOUT" icon_class="icon-screen"
+				labelclass="label text-white bg-warning label-warning"
+			>
+				<option filename="field_list" value="list">Default (Vertical placement)</option>
+				<option filename="field_flexbox" value="flexbox">Flexbox (Horizontal placement with auto-wrap)</option>
+			</field>
+			<field name="" type="separator" default="" level="level_br" />
 
 			<field name="" type="separator" default="Compact editing" description="" depend_class="" level="level2" />
 			<field name="compact_edit_global" type="radio" default="0" label="FLEXI_FIELD_GROUP_ALL_VALS_TOGGLING" description="FLEXI_FIELD_GROUP_ALL_VALS_TOGGLING_DESC" class="btn-group btn-group-yesno">
@@ -82,6 +93,9 @@
 			</field>
 
 			<field name="compact_edit_excluded" type="fields" multiple="false" groupables="1" issortable="1" default="" label="FLEXI_FIELD_GROUP_ALWAYS_VISIBLE_FIELDS" description="FLEXI_FIELD_GROUP_ALWAYS_VISIBLE_FIELDS_DESC" depend_class="compact_edit"/>
+
+			<field name="" type="separator" default="FLEXI_LAYOUT_PARAMETERS" icon_class="icon-screen" level="tab_open" box_type="1" />
+
 			<field name="" type="separator" default="FLEXI_FIELD_EDITING" level="tabset_close" box_type="1" />
 		</fieldset>
 		<fieldset name="group-fieldgroup-viewing" hidden="true" icon_class="icon-screen" label="FLEXI_FIELD_VIEWING" addfieldpath="/administrator/components/com_flexicontent/elements">

@@ -828,20 +828,33 @@ span.fc_select_button:hover {
 
 	.fc_form_flex_box {
 		float: none;
-		width: 100;
+		width: 100%;
 		margin: 0;
 		padding: 0;
 		display: flex;
 		flex-wrap: wrap;
 		border: 0 none;
-	}
-	.fc_form_flex_box_item {
-		float: none;
-		flex-grow: 0;
-		margin: 12px;
-		padding: 0;
-		display: inline-block;
-		border: 0 none;
+
+		.fc_form_flex_box_item {
+			float: none;
+			flex-grow: 0;
+			margin: 12px;
+			padding: 0;
+			display: inline-block;
+			border: 0 none;
+
+			&.use_flex_grow {
+				flex-grow: 1;
+
+				.fcfield_textareaval,
+				.fcfield_selectval,
+				.fcfield_selectmulval,
+				.fcfield_textval {
+					width: 100%;
+					max-width: unset;
+				}
+			}
+		}
 	}
 
 	div.fields_tabset,
