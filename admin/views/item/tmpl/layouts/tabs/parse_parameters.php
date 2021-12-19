@@ -32,7 +32,7 @@ class FcFormLayoutParameters
 		 * Get placement of CORE properties / fields
 		 */
 
-		$tab_fields['above']  = $params->get('form_tabs_above'. $CFGsfx,    'title, alias, category, lang, type, state, access, disable_comments, notify_subscribers, notify_owner');
+		$tab_fields['above']  = $params->get('form_tabs_above'. $CFGsfx,    'title, alias, category, lang, type, state, vstate, access, disable_comments, notify_subscribers, notify_owner');
 		$tab_fields['tab01']  = $params->get('form_tab01_fields'. $CFGsfx,  'text');
 		$tab_fields['tab02']  = $params->get('form_tab02_fields'. $CFGsfx,  'fields_manager');
 		$tab_fields['tab02a'] = $params->get('form_tab02a_fields'. $CFGsfx, 'jimages, jurls');
