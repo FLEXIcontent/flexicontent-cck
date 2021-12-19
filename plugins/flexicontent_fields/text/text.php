@@ -606,7 +606,8 @@ class plgFlexicontent_fieldsText extends FCField
 				}
 				else if ($format_output === -1)
 				{
-					$value = eval( "\$value= \"{$value}\";" . $output_custom_func);
+					$item_link = JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, 0, $item));
+					$value = eval( "\$item_link= \"{$item_link}\";" . "\$value= \"{$value}\";" . $output_custom_func);
 				}
 
 				if ($lang_filter_values)
