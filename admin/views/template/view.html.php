@@ -52,6 +52,11 @@ class FlexicontentViewTemplate extends JViewLegacy
 		//$fieldTypes = $this->get( 'FieldTypesList' );
 		$fieldTypes = flexicontent_db::getFieldTypes($_grouped = true, $_usage=false, $_published=false);  // Field types with content type ASSIGNMENT COUNTING
 
+		// Skip fields meant for form
+		foreach ($fields as $i => $field)
+		{
+			if (substr($field->name, 0, 5) === 'form_') unset($fields[$i]);
+		}
 
 		// Create CONTENT TYPE SELECTOR
 		foreach ($fields as $field) {
