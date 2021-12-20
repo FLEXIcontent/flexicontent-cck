@@ -550,7 +550,7 @@ dl#content-pane.tabs {
 
 /* fix btn */
 #flexicontent .btn, .btn {
-	border: 2px solid var(--template-bg-dark-20);
+	border: 1px solid var(--template-bg-dark-20);
 }
 #fc-managers-header .btn-group, .btn-group.fc-group.fc-items {
 	background: #fff !important;
@@ -578,7 +578,7 @@ dl#content-pane.tabs {
 /*fix icon state*/
 #flexicontent .btn-outline-info.active, a.btn.btn-small, .btn-outline-info, #flexicontent .btn.btn-sm {
 	color: var(--template-text-dark);
-	background: #fff;
+	background: #fff !important;
 }
 .flexicontent *:not(.input-append):not(.input-prepend):not(.input-group) > select:not(.custom-select) {
 	padding: 11px;
@@ -586,6 +586,7 @@ dl#content-pane.tabs {
 #flexicontent .fc-xpended .input-group-text:first-child, #flexicontent .fc-xpended-row .input-group-text:first-child, #flexicontent .fc-xpended .add-on:first-child, #flexicontent .fc-xpended-row .add-on:first-child {
 	padding-top: 5px;
 	padding-bottom: 5px;
+	background:#fff;
 }
 .flexicontent #fc-managers-header #fc-columns-slide-btn, .flexicontent #fc-managers-header #fc-filters-slide-btn {
 	height: inherit;
@@ -626,7 +627,7 @@ a.fc_assoc_translation.label.label-association {
 }
 /** fixs for item form **/
 body .container_fcfield input, #flexicontent .container_fcfield input {
-	height: inherit;
+	height: 2.67rem !important;
 }
 div#tags #input-tags {
 	border-radius: 5px;
@@ -789,7 +790,7 @@ table.fcmanlist tbody {
 
 /** fix fields button **/
 .input-append .add-on, .input-prepend .add-on, #flexicontent .fc-xpended-btns > [class^="fcfield-"]:not(.add-on):not(.input-group-addon):not(.btn), #flexicontent .fc-xpended-btns > [class*=" fcfield-"]:not(.add-on):not(.input-group-addon):not(.btn), #flexicontent .fc-xpended-btns > .fcfield-button-add:not(.add-on):not(.input-group-addon) a {
-	border: 2px solid var(--template-bg-dark-20) !important;
+	border: 1px solid var(--template-bg-dark-20) !important;
 	text-align: center;
 }
 #flexicontent ul.fcfield-sortables > li > * {
@@ -893,7 +894,7 @@ span.btn.btn-sm.toolbar.dropdown-toggle.dropdown-toggle-split.fcfield-addvalue.f
 	border: 1px solid var(--template-bg-dark-20);
 }
 label.add-on.fc-lbl-short.addrint_autocomplete-lbl {
-	height: 36px !important;
+	height: 2.67rem !important;
 	border: 1px solid var(--template-bg-dark-20) !important;
 }
 #flexicontent a.saveorder.btn.btn-small {
@@ -957,6 +958,8 @@ div#type_tab_all {
 /** fix input search in item list **/
 .flexicontent #fc-managers-header #search {
 	border: 1px solid #b8c9e0;
+	height: 2.7rem;
+	line-height: 2.7rem;
 }
 /** fix dropdown button need review**/
 span.btn.btn-sm.toolbar.dropdown-toggle.dropdown-toggle-split.fcfield-addvalue.fcfont-icon.icon.icon- {
@@ -974,7 +977,7 @@ label#custom_agent_item_selector-lbl {
 }
 /** fix filter button when is in notification mode **/
 div#fc_filters_box_btn {
-	max-height: 42px;
+	max-height: 2.7rem;
 }
 /** fix preview image field **/
 span.btn.fc_img_preview_btn.icon-search:before {
@@ -1106,4 +1109,10 @@ body .form-grid {
 			}
 		}
 	}
+}
+#flexicontent .fc-xpended-btns > [class^="fcfield-"], #flexicontent .fc-xpended-btns > [class*=" fcfield-"], #flexicontent .fc-xpended-btns > .fcfield-button-add a {
+	background: #fff !important;
+}
+#flexicontent .fc-xpended-btns {
+	height: 2.74rem;
 }
