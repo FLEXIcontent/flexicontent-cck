@@ -26,13 +26,10 @@
 
 		<field name="" type="separator" default="FLEXI_MULTI_LANGUAGE" label="" level="level0" />
 
-			<field name="flexi_fish" type="fcradio" default="0" label="FLEXI_CONTENT_TRANSLATION" description="FLEXI_CONTENT_TRANSLATION_DESC" class="btn-group group-fcinfo">
+			<field name="flexi_fish" type="fcradio" default="0" label="FLEXI_CONTENT_TRANSLATION_METHOD" description="FLEXI_CONTENT_TRANSLATION_METHOD_DESC" class="btn-group group-fcinfo">
 				<option value="0">FLEXI_NATIVE</option>
 				<option value="1">FLEXI_NATIVE_N_FALANG</option>
 			</field>
-
-			<field name="" type="separator" default="FLEXI_NATIVE_TRANSLATIONS_INFO" label="" level="level3" class="alert alert-info fcpadded" />
-			<field name="" type="separator" default="FLEXI_NON_NATIVE_TRANSLATIONS_INFO" label="" level="level3" class="alert alert-info fcpadded" />
 
 			<field name="" type="separator" default="FLEXI_3RD_PARTY_FALANG_SUPPORT" label="" level="level3" class="" />
 			<field name="editjf_translations" type="fcradio" default="0" label="FLEXI_3RD_PARTY_FALANG_EDIT_INLINE" description="FLEXI_3RD_PARTY_FALANG_EDIT_INLINE_DESC" class="btn-group group-fcmethod fcnoyes">
