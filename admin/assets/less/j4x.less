@@ -1070,6 +1070,8 @@ body .form-grid {
 		}
 		.controls {
 			display: flex;
+			align-items: flex-start;
+
 			> :nth-child(1) {
 				flex-grow: 0;
 				flex-shrink: 1;
@@ -1077,8 +1079,6 @@ body .form-grid {
 				display: flex;
 				flex-wrap: wrap;
 				margin: 0 0 0 2rem !important;
-				height: 2.7rem;  /* force elements to position at top */
-				overflow: visible;
 				min-width: 20%;
 				
 				.btn-group {

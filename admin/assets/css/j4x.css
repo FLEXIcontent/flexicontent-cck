@@ -920,6 +920,7 @@ body .form-grid .control-group .control-label label {
 }
 body .form-grid .control-group .controls {
 	display: flex;
+	align-items: flex-start;
 }
 body .form-grid .control-group .controls > :nth-child(1) {
 	flex-grow: 0;
@@ -928,8 +929,6 @@ body .form-grid .control-group .controls > :nth-child(1) {
 	display: flex;
 	flex-wrap: wrap;
 	margin: 0 0 0 2rem !important;
-	height: 2.7rem;
-	overflow: visible;
 	min-width: 20%;
 }
 body .form-grid .control-group .controls > :nth-child(1) .btn-group {
