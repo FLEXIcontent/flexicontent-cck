@@ -45,7 +45,6 @@
 
 	.fc-field-props-box,
 	.fc-xpended-btns {
-		display: block;
 		position: relative;
 		float: left;
 		clear: both;
@@ -346,7 +345,10 @@ div.container_fcfield div.toggle_all_values_buttons_box {
 		margin: 8px 0 0 0;
 	}
 	.fc-xpended-btns {
-
+		> * {
+			flex-grow: 0;
+			margin: 0 3px;
+		}
 		> [class^="fcfield-"],
 		> [class*=" fcfield-"],
 		> .fcfield-button-add a {

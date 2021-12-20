@@ -156,6 +156,7 @@ div.toolbar-box {
 }
 #flexicontent select {
 	width: auto;
+	border: 1px solid var(--template-bg-dark-20);
 }
 #user-groups legend + .control-group,
 #user-groups .control-group {
@@ -687,37 +688,16 @@ table.fcmanlist tbody td.col_status div.statetoggler {
 #flexicontent .fc-xpended-btns > [class^="fcfield-"]:not(.add-on):not(.input-group-addon):not(.btn),
 #flexicontent .fc-xpended-btns > [class*=" fcfield-"]:not(.add-on):not(.input-group-addon):not(.btn),
 #flexicontent .fc-xpended-btns > .fcfield-button-add:not(.add-on):not(.input-group-addon) a {
-	height: 18px;
-	min-width: 16px;
 	border: 2px solid var(--template-bg-dark-20) !important;
 	text-align: center;
-}
-.input-prepend.input-append .add-on:first-child,
-.input-prepend.input-append .btn:first-child {
-	margin-right: -6px !important;
-	border-radius: 3px 0 0 3px;
-}
-.input-prepend.input-append .add-on:not(:first-child),
-.input-prepend.input-append .add-on:not(:first-child) > * {
-	border-top-right-radius: 3px !important;
-	border-bottom-right-radius: 3px !important;
-}
-#flexicontent div.input-append > *:not(:first-child):not(:last-child):not(.select2-container) {
-	margin-right: -6px !important;
-}
-#flexicontent div [class^="fcfield-"].fcfont-icon,
-#flexicontent div [class*=" fcfield-"].fcfont-icon,
-#flexicontent ul.fcfield-sortables > li [class^="fcfield-"].fcfont-icon,
-#flexicontent ul.fcfield-sortables > li [class*=" fcfield-"].fcfont-icon {
-	margin: 0px -6px -1px 0px !important;
-	background: none;
 }
 #flexicontent ul.fcfield-sortables > li > * {
 	vertical-align: middle !important;
 }
 #flexicontent .fc-xpended-btns > [class^="fcfield-"]:not(.add-on):not(.input-group-addon):not(.btn),
 #flexicontent .fc-xpended-btns > [class*=" fcfield-"]:not(.add-on):not(.input-group-addon):not(.btn),
-#flexicontent .fc-xpended-btns > .fcfield-button-add:not(.add-on):not(.input-group-addon) a {
+#flexicontent .fc-xpended-btns > .fcfield-button-add:not(.add-on):not(.input-group-addon) a,
+#flexicontent .buttons.btn-group > ul.dropdown-menu > li > span {
 	font-family: 'Roboto' !important;
 }
 #flexicontent div div [class^="fcfield-"].fcfont-icon:before,
@@ -727,14 +707,27 @@ table.fcmanlist tbody td.col_status div.statetoggler {
 #flexicontent div ul.fcfield-sortables > li [class^="fcfield-"].fcfont-icon:before,
 #flexicontent div ul.fcfield-sortables > li [class*=" fcfield-"].fcfont-icon:before,
 #flexicontent div ul.fcfield-sortables > li [class^="fcfield-"].fcfont-icon:after,
-#flexicontent div ul.fcfield-sortables > li [class*=" fcfield-"].fcfont-icon:after {
+#flexicontent div ul.fcfield-sortables > li [class*=" fcfield-"].fcfont-icon:after,
+#flexicontent div .fc_uploader_row_remove:before,
+#flexicontent div .fc_uploader_row_remove:after,
+#flexicontent div .fc_img_preview_btn.icon-search:after,
+#flexicontent div .fc_img_preview_btn.icon-search:before,
+#flexicontent div .fcfield-expand-view.fcfont-icon:before {
 	font-family: 'Font Awesome 5 Free' !important;
 	font-size: 1.4em;
+}
+#flexicontent div .fa,
+#flexicontent div .fas,
+#flexicontent div [class*=" icon-"],
+#flexicontent div [class^="icon-"] {
+	font-family: Font Awesome 5 Free;
+	font-weight: 900;
 }
 #flexicontent div .fcfield-drag-handle.fcfont-icon:before {
 	content: "\f0b2";
 }
-#flexicontent div .fcfield-delvalue.fcfont-icon:before {
+#flexicontent div .fcfield-delvalue.fcfont-icon:before,
+#flexicontent div .fc_uploader_row_remove:before {
 	content: "\f2ed";
 }
 #flexicontent div .fcfield-disablevalue.fcfont-icon:before {
@@ -759,6 +752,10 @@ table.fcmanlist tbody td.col_status div.statetoggler {
 	font-size: 1em !important;
 	margin-left: 4px !important;
 }
+#flexicontent div .btn.fc_img_preview_btn.icon-search:after {
+	content: "\f00e";
+	font-size: 17px;
+}
 #flexicontent div .fcfield-uploadvalue.fcfont-icon:before {
 	content: "\f093";
 }
@@ -771,27 +768,187 @@ table.fcmanlist tbody td.col_status div.statetoggler {
 #flexicontent div .fcfield-addvalue.fcfont-icon:before {
 	content: "\f302";
 }
+#flexicontent div .fcfield-expand-view.fcfont-icon:before {
+	content: "\f337";
+}
 span.btn.btn-sm.toolbar.dropdown-toggle.dropdown-toggle-split.fcfield-addvalue.fcfont-icon.icon.icon- {
-	padding: 4px 7px !important;
+	padding: 4px 7px 3px 4px !important;
 }
 .field-calendar .btn-primary {
-	border: 0 !important;
 	margin-left: -5px !important;
-}
-label.add-on {
-	height: 34px !important;
-	padding-right: 14px !important;
+	margin-top: -2px !important;
 }
 .addrint_autocomplete.pac-target-input {
 	height: 36px !important;
-	border: 2px solid var(--template-bg-dark-20);
+	border: 1px solid var(--template-bg-dark-20);
 }
 label.add-on.fc-lbl-short.addrint_autocomplete-lbl {
 	height: 36px !important;
+	border: 1px solid var(--template-bg-dark-20) !important;
 }
 #flexicontent a.saveorder.btn.btn-small fa,
 #flexicontent a.saveorder.btn.btn-small .fas,
 #flexicontent a.saveorder.btn.btn-small [class*=" icon-"],
 #flexicontent a.saveorder.btn.btn-small [class^="icon-"] {
 	width: 1.2em !important;
+}
+body .fc-mssg-inline.fc-nobgimage,
+body .fc-mssg.fc-nobgimage {
+	padding: 8px 10px 12px 36px;
+}
+#flexicontent .select2-container .select2-choice,
+#flexicontent div#tags #input-tags,
+#flexicontent .fc-field-props-box .fc_preview_msg,
+#flexicontent input.imgalt,
+#flexicontent textarea.imgdesc,
+#flexicontent form .fcfield_textareaval,
+#flexicontent form .fcfield_selectval,
+#flexicontent form .fcfield_selectmulval,
+#flexicontent form .fcfield_textval,
+#flexicontent .fc_filedata_txt {
+	border: 1px solid var(--template-bg-dark-20) !important;
+}
+.controls *:not(.input-append):not(.input-prepend):not(.input-group) > input[type="text"]:not(.minicolors),
+.controls textarea,
+.controls fieldset.radio,
+.controls fieldset.checkbox,
+.flexicontent textarea,
+.flexicontent fieldset.radio,
+.flexicontent fieldset.checkbox {
+	margin: 0;
+}
+#flexicontent .flexicontent :not(.input-prepend):not(.input-append) > input[type="text"]:not(.minicolors) {
+	margin: 0 !important;
+}
+#flexicontent input#input-tags {
+	margin: 0px !important;
+}
+.statetoggler.fc_statebutton.btn.btn-sm.btn-outline-info.hasTooltip {
+	padding: 9px 12px !important;
+}
+div#type_tab_all {
+	background: transparent;
+}
+.flexicontent #fc-managers-header #search {
+	border: 1px solid #b8c9e0;
+}
+span.btn.btn-sm.toolbar.dropdown-toggle.dropdown-toggle-split.fcfield-addvalue.fcfont-icon.icon.icon- {
+	display: table-cell;
+	left: 1px;
+	top: 0px;
+}
+label#custom_agent_item_selector-lbl {
+	height: 36px !important;
+}
+.select2-container-multi .select2-choices {
+	border: 1px solid #b8c9e0 !important;
+}
+div#fc_filters_box_btn {
+	max-height: 42px;
+}
+span.btn.fc_img_preview_btn.icon-search:before {
+	display: none;
+}
+span.btn.fc_img_preview_btn.icon-search {
+	background: #fff;
+	width: 10px !important;
+	padding: 2px 5px !important;
+}
+span.add-on.fc_filedata_title {
+	min-height: 34px;
+	margin-left: 4px !important;
+}
+#flexicontent ul.fcfield-sortables > li.fcfieldval_container.valuebox.fc-expanded .fc-xpended-btns {
+	display: flex !important;
+}
+#flexicontent form div fieldset.panelform > fieldset,
+#flexicontent form div fieldset.panelform > div > div.input-append,
+#flexicontent form div fieldset.panelform > div > div.input-prepend,
+#flexicontent form div fieldset.panelform > div > div.btn-group,
+#flexicontent form div fieldset.panelform > div.input-append,
+#flexicontent form div fieldset.panelform > div.input-prepend,
+#flexicontent form div fieldset.panelform > div.btn-group,
+#flexicontent form div fieldset.panelform > div.select2-container,
+#flexicontent form div fieldset.panelform > input,
+#flexicontent form div fieldset.panelform > button,
+#flexicontent form div fieldset.panelform > textarea,
+#flexicontent form div fieldset.panelform > select,
+#flexicontent form div fieldset.panelform > img,
+#flexicontent form div fieldset.panelform > span {
+	margin: 1px 2px 1px 2px;
+	float: left;
+}
+form div.container_fcfield > fieldset,
+form div.container_fcfield > div > div.input-append,
+form div.container_fcfield > div > div.input-prepend,
+form div.container_fcfield > div > div.btn-group,
+form div.container_fcfield > div.input-append,
+form div.container_fcfield > div.input-prepend,
+form div.container_fcfield > div.btn-group,
+form div.container_fcfield > div.select2-container,
+form div.container_fcfield > input,
+form div.container_fcfield > button,
+form div.container_fcfield > textarea,
+form div.container_fcfield > select,
+form div.container_fcfield > img,
+form div.container_fcfield > span {
+	margin: 0px !important;
+}
+form div.container_fcfield > input,
+form div.container_fcfield > button,
+form div.container_fcfield > textarea,
+form div.container_fcfield > select {
+	max-width: 96%;
+}
+body .form-grid {
+	grid-gap: 0.2rem;
+}
+body .form-grid > .fcsep_level0:nth-of-type(1),
+body .form-grid > .fcsep_level1:nth-of-type(1),
+body .form-grid > .fcsep_level1:nth-of-type(1) {
+	margin-top: 4px !important;
+}
+body .form-grid .control-group {
+	margin: 0 0 0 0;
+}
+body .form-grid .control-group .control-label {
+	width: 180px;
+	padding: 0;
+}
+body .form-grid .control-group .control-label label {
+	padding: 0;
+}
+body .form-grid .control-group .controls {
+	display: flex;
+}
+body .form-grid .control-group .controls > :nth-child(1) {
+	flex-grow: 0;
+	flex-shrink: 1;
+	flex-basis: auto;
+	display: flex;
+	flex-wrap: wrap;
+	margin: 0 0 0 2rem !important;
+	height: 2.7rem;
+	overflow: visible;
+	min-width: 20%;
+}
+body .form-grid .control-group .controls > :nth-child(1) .btn-group {
+	flex-wrap: wrap;
+}
+body .form-grid .control-group .controls > :nth-child(1) .btn {
+	font-size: 0.9rem;
+}
+body .form-grid .control-group .controls > textarea {
+	height: auto !important;
+	max-width: 600px;
+}
+body .form-grid .control-group .controls > input.form-control {
+	max-width: 600px;
+}
+body .form-grid .control-group .controls > div {
+	flex-grow: 1;
+	flex-shrink: 1;
+	display: flex;
+	flex-basis: 40%;
+	margin: 0 0 0 2rem !important;
 }

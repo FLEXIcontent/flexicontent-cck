@@ -1606,7 +1606,7 @@ body .fc-nowrap-box .nowrap_box .label,
 #flexicontent .fc-xpended-btns {
 	margin: 0 0 0.3rem 0 !important;
 	float: none;
-	display: inline-block;
+	display: inline-flex;
 }
 #flexicontent .fc-xpended-block500 {
 	box-sizing: border-box;
@@ -3011,7 +3011,10 @@ form div.container_fcfield > div:not(.alert):not(.fc-mssg):not(.fc-mssg-inline):
 #flexicontent form div fieldset.panelform > textarea,
 #flexicontent form div fieldset.panelform > select,
 #flexicontent form div fieldset.panelform > img,
-#flexicontent form div fieldset.panelform > span,
+#flexicontent form div fieldset.panelform > span {
+	margin: 1px 2px 1px 2px;
+	float: left;
+}
 form div.container_fcfield > fieldset,
 form div.container_fcfield > div > div.input-append,
 form div.container_fcfield > div > div.input-prepend,
@@ -3026,8 +3029,7 @@ form div.container_fcfield > textarea,
 form div.container_fcfield > select,
 form div.container_fcfield > img,
 form div.container_fcfield > span {
-	margin: 1px 2px 1px 2px;
-	float: left;
+	margin: 0px !important;
 }
 form div.container_fcfield > input,
 form div.container_fcfield > button,

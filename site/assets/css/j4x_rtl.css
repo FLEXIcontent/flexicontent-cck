@@ -9,3 +9,416 @@
 .badge.highlight {
 	color: darkred;
 }
+#flexicontent .fc_markup.mu_has_text {
+	border-bottom: 0px solid #AAA;
+	border-right: 0px solid #AAA;
+	padding: 10px;
+}
+#flexicontent .fc_markup {
+	max-width: initial;
+	border-radius: 5px;
+	line-height: 100%;
+	border-width: 0px;
+	margin: 0px 6px 6px 0px;
+	padding: 0px;
+	background-color: #F2F2F2;
+	color: #555;
+	box-shadow: none;
+}
+.fc_filter_html .btn[type="button"],
+.fcitem_readon .btn,
+button.btn.btn-light,
+a.link.btn,
+a.direction.btn,
+button.btn.btn-highlight,
+.fc_filter_line.fc_clear_label.fc_filter_buttons_box .btn {
+	border: 1px solid #ccc;
+	background: #ccc;
+}
+.fc_filter_html .btn[type="button"]:hover,
+.fcitem_readon .btn:hover,
+button.btn.btn-light:hover,
+a.link.btn:hover,
+a.direction.btn:hover,
+button.btn.btn-highlight:hover,
+.fc_filter_line.fc_clear_label.fc_filter_buttons_box .btn:hover {
+	border: 1px solid #797979;
+	background: #797979;
+}
+.input-append .add-on,
+.input-prepend .add-on,
+#flexicontent .fc-xpended-btns > [class^="fcfield-"]:not(.add-on):not(.input-group-addon):not(.btn),
+#flexicontent .fc-xpended-btns > [class*=" fcfield-"]:not(.add-on):not(.input-group-addon):not(.btn),
+#flexicontent .fc-xpended-btns > .fcfield-button-add:not(.add-on):not(.input-group-addon) a {
+	height: 18px;
+	min-width: 16px;
+	border: 2px solid var(--template-bg-dark-20) !important;
+	text-align: center;
+}
+.input-prepend.input-append .add-on:first-child,
+.input-prepend.input-append .btn:first-child {
+	margin-right: -6px !important;
+	border-radius: 3px 0 0 3px;
+}
+.input-prepend.input-append .add-on:not(:first-child),
+.input-prepend.input-append .add-on:not(:first-child) > * {
+	border-top-right-radius: 3px !important;
+	border-bottom-right-radius: 3px !important;
+}
+#flexicontent #adminForm  div.input-append > *:not(:first-child):not(:last-child):not(.select2-container) {
+	margin-right: -6px !important;
+}
+#flexicontent div [class^="fcfield-"].fcfont-icon,
+#flexicontent div [class*=" fcfield-"].fcfont-icon,
+#flexicontent ul.fcfield-sortables > li [class^="fcfield-"].fcfont-icon,
+#flexicontent ul.fcfield-sortables > li [class*=" fcfield-"].fcfont-icon {
+	margin: 0px -6px -1px 0px !important;
+	background: none;
+}
+#flexicontent ul.fcfield-sortables > li > * {
+	vertical-align: middle !important;
+}
+#adminForm label.add-on.fc-lbl-short.addrint_autocomplete-lbl,
+#adminForm label.add-on.fc-lbl-short.addrint_marker_tolerance-lbl,
+#adminForm label.add-on.fc-lbl-short.addrint_zoom-lbl {
+	height: 42px !important;
+}
+#flexicontent  .fc-xpended-btns > [class^="fcfield-"]:not(.add-on):not(.input-group-addon):not(.btn),
+#flexicontent .fc-xpended-btns > [class*=" fcfield-"]:not(.add-on):not(.input-group-addon):not(.btn),
+#flexicontent .fc-xpended-btns > .fcfield-button-add:not(.add-on):not(.input-group-addon) a,
+#flexicontent .buttons.btn-group > ul.dropdown-menu > li > span {
+	font-family: 'Roboto' !important;
+}
+#flexicontent div div [class^="fcfield-"].fcfont-icon:before,
+#flexicontent div div [class*=" fcfield-"].fcfont-icon:before,
+#flexicontent div div [class^="fcfield-"].fcfont-icon:after,
+#flexicontent div div [class*=" fcfield-"].fcfont-icon:after,
+#flexicontent div ul.fcfield-sortables > li [class^="fcfield-"].fcfont-icon:before,
+#flexicontent div ul.fcfield-sortables > li [class*=" fcfield-"].fcfont-icon:before,
+#flexicontent div ul.fcfield-sortables > li [class^="fcfield-"].fcfont-icon:after,
+#flexicontent div ul.fcfield-sortables > li [class*=" fcfield-"].fcfont-icon:after,
+#flexicontent div .fc_uploader_row_remove:before,
+#flexicontent div .fc_uploader_row_remove:after,
+#flexicontent div .fc_img_preview_btn.icon-search:after,
+#flexicontent div .fc_img_preview_btn.icon-search:before,
+#flexicontent div .fcfield-expand-view.fcfont-icon:before {
+	font-family: 'Font Awesome 5 Free' !important;
+	font-size: 1.4em;
+}
+#flexicontent div .fa,
+#flexicontent div .fas,
+#flexicontent div [class*=" icon-"],
+#flexicontent div [class^="icon-"] {
+	font-family: Font Awesome 5 Free;
+	font-weight: 900;
+}
+#flexicontent div .fcfield-drag-handle.fcfont-icon:before {
+	content: "\f0b2";
+}
+#flexicontent div .fcfield-delvalue.fcfont-icon:before,
+#flexicontent div .fc_uploader_row_remove:before {
+	content: "\f2ed";
+}
+#flexicontent div .fcfield-disablevalue.fcfont-icon:before {
+	content: "\f146";
+}
+#flexicontent div .fcfield-insertvalue.fc_after.fcfont-icon:before {
+	content: "\f067";
+	font-size: 1em !important;
+	margin-right: 4px !important;
+}
+#flexicontent div .fcfield-enablevalue.fcfont-icon:before {
+	content: "\f044";
+}
+#flexicontent div .fcfield-insertvalue.fc_before.fcfont-icon:before {
+	content: "\f3e5";
+}
+#flexicontent div .fcfield-insertvalue.fc_after.fcfont-icon:after {
+	content: "\f064";
+}
+#flexicontent div .fcfield-insertvalue.fc_before.fcfont-icon:after {
+	content: "\f067";
+	font-size: 1em !important;
+	margin-left: 4px !important;
+}
+#flexicontent div .btn.fc_img_preview_btn.icon-search:after {
+	content: "\f00e";
+	font-size: 17px;
+}
+#flexicontent div .fcfield-uploadvalue.fcfont-icon:before {
+	content: "\f093";
+}
+#flexicontent div .fc-files-modal-link.fcfont-icon:before {
+	content: "\f002";
+}
+#flexicontent div .fcfield-clearvalue.fcfont-icon:before {
+	content: "\f12d";
+}
+#flexicontent div .fcfield-addvalue.fcfont-icon:before {
+	content: "\f302";
+}
+#flexicontent div .fcfield-expand-view.fcfont-icon:before {
+	content: "\f337";
+}
+span.btn.btn-sm.toolbar.dropdown-toggle.dropdown-toggle-split.fcfield-addvalue.fcfont-icon.icon.icon- {
+	padding: 4px 7px 3px 4px !important;
+}
+.field-calendar .btn-primary {
+	margin-left: -5px !important;
+	margin-top: 0px !important;
+}
+body .container_fcfield input,
+#flexicontent .container_fcfield input {
+	height: 42px !important;
+}
+label.add-on {
+	height: 34px !important;
+	padding-right: 14px !important;
+}
+.addrint_autocomplete.pac-target-input {
+	height: 36px !important;
+	border: 1px solid var(--template-bg-dark-20);
+}
+label.add-on.fc-lbl-short.addrint_autocomplete-lbl {
+	height: 36px !important;
+	border: 1px solid var(--template-bg-dark-20) !important;
+}
+#flexicontent a.saveorder.btn.btn-small fa,
+#flexicontent a.saveorder.btn.btn-small .fas,
+#flexicontent a.saveorder.btn.btn-small [class*=" icon-"],
+#flexicontent a.saveorder.btn.btn-small [class^="icon-"] {
+	width: 1.2em !important;
+}
+body .fc-mssg-inline.fc-nobgimage,
+body .fc-mssg.fc-nobgimage {
+	padding: 8px 10px 12px 36px;
+}
+#flexicontent .select2-container .select2-choice,
+#flexicontent div#tags #input-tags,
+#flexicontent .fc-field-props-box .fc_preview_msg,
+#flexicontent input.imgalt,
+#flexicontent textarea.imgdesc,
+#flexicontent form .fcfield_textareaval,
+#flexicontent form .fcfield_selectval,
+#flexicontent form .fcfield_selectmulval,
+#flexicontent form .fcfield_textval,
+#flexicontent .fc_filedata_txt,
+.select2-container-multi .select2-choices {
+	border: 1px solid #ccc !important;
+	border-radius: 4px;
+	padding: 5px;
+}
+.controls *:not(.input-append):not(.input-prepend):not(.input-group) > input[type="text"]:not(.minicolors),
+.controls textarea,
+.controls fieldset.radio,
+.controls fieldset.checkbox,
+.flexicontent textarea,
+.flexicontent fieldset.radio,
+.flexicontent fieldset.checkbox {
+	margin: 0;
+}
+#flexicontent .flexicontent :not(.input-prepend):not(.input-append) > input[type="text"]:not(.minicolors) {
+	margin: 0 !important;
+}
+#flexicontent form div fieldset.panelform > fieldset,
+#flexicontent form div fieldset.panelform > div > div.input-append,
+#flexicontent form div fieldset.panelform > div > div.input-prepend,
+#flexicontent form div fieldset.panelform > div > div.btn-group,
+#flexicontent form div fieldset.panelform > div.input-append,
+#flexicontent form div fieldset.panelform > div.input-prepend,
+#flexicontent form div fieldset.panelform > div.btn-group,
+#flexicontent form div fieldset.panelform > div.select2-container,
+#flexicontent form div fieldset.panelform > input,
+#flexicontent form div fieldset.panelform > button,
+#flexicontent form div fieldset.panelform > textarea,
+#flexicontent form div fieldset.panelform > select,
+#flexicontent form div fieldset.panelform > img,
+#flexicontent form div fieldset.panelform > span,
+form div.container_fcfield > fieldset,
+form div.container_fcfield > div > div.input-append,
+form div.container_fcfield > div > div.input-prepend,
+form div.container_fcfield > div > div.btn-group,
+form div.container_fcfield > div.input-append,
+form div.container_fcfield > div.input-prepend,
+form div.container_fcfield > div.btn-group,
+form div.container_fcfield > div.select2-container,
+form div.container_fcfield > input,
+form div.container_fcfield > button,
+form div.container_fcfield > textarea,
+form div.container_fcfield > select,
+form div.container_fcfield > img,
+form div.container_fcfield > span {
+	margin: 0px !important;
+}
+#flexicontent input#input-tags {
+	margin: 0px !important;
+}
+.select2-default {
+	color: #000 !important;
+}
+.select2-container-multi .select2-choices .select2-search-field input.select2-input,
+.select2-container-multi.select2-dropdown-open .select2-choices .select2-search-field input.select2-input {
+	min-height: 39px !important;
+}
+.select2-container .select2-choice {
+	min-height: 31px !important;
+}
+.fc_filter_html :not(.input-append):not(.input-prepend) > input.fc_field_filter {
+	padding: 8px 3px 13px 9px !important;
+}
+.input-group>:not(:first-child):not(.dropdown-menu):not(.valid-tooltip):not(.valid-feedback):not(.invalid-tooltip):not(.invalid-feedback) {
+	margin-left: -3px;
+}
+.flexicontent :not(.input-prepend):not(.input-append) > input[type="text"]:not(.minicolors) {
+	margin: 0px 2px 0px 2px;
+}
+.fc_filter_html :not(.input-append):not(.input-prepend) > input.fc_text_filter,
+.fc_filter_html :not(.input-append):not(.input-prepend) > input.fc_field_filter,
+.fc_filter_html :not(.input-append):not(.input-prepend) > input.fc_text_filter:focus,
+.fc_filter_html :not(.input-append):not(.input-prepend) > input.fc_field_filter:focus {
+	border: 1px solid #ccc !important;
+}
+.mod_flexifilter_wrapper .fc_filter_html .select2-container-multi .select2-choices {
+	width: 100% !important;
+}
+.mod_flexifilter_wrapper .select2-container-multi .select2-choices > li:first-child input.select2-input,
+.mod_flexifilter_wrapper .select2-container-multi.select2-dropdown-open .select2-choices > li:first-child input.select2-input,
+.select2-container-multi.select2-dropdown-open .select2-choices .select2-search-field input.select2-input.select2-focused {
+	min-width: 100% !important;
+}
+.mod_flexifilter_wrapper .fc_filter_html .fc_text_filter,
+.mod_flexifilter_wrapper .fc_filter_html .fc_field_filter {
+	min-width: 100%;
+	width: 100%;
+}
+.mod_flexifilter_wrapper .fc_filter_html :not(.input-append):not(.input-prepend) > input.fc_field_filter {
+	border: 1px solid #ccc !important;
+	background-position-x: 100% !important;
+}
+.mod_flexifilter_wrapper .fc_filter_html .fc_text_filter.fc_iscalendar,
+.mod_flexifilter_wrapper .fc_filter_html .fc_field_filter.fc_iscalendar {
+	min-width: 80% !important;
+}
+.mod_flexifilter_wrapper .fc_filter_html .fc_filter_element {
+	width: 100%;
+}
+.fc_filter_html :not(.input-prepend):not(.input-append) > .fc_text_filter,
+.fc_filter_html :not(.input-prepend):not(.input-append) > .fc_field_filter {
+	font-size: 12px !important;
+}
+.fc_filter_html.fc_text_search input {
+	min-height: 45px;
+}
+.fc_filter_html input.btn.btn-success {
+	margin-left: -5px;
+	border-radius: 0px 5px 5px 0;
+}
+.mod_flexiadvsearch_wrapper input {
+	border-radius: 5px 0 0 5px;
+	border: 0;
+}
+.fc_filter_html.fc_text_search input {
+	padding-left: 10px;
+}
+.fc_filter_html input.btn {
+	border-radius: 5px;
+}
+.fc_filter_html .select2-container .select2-search-field {
+	width: 100%;
+}
+span.btn.btn-sm.toolbar.dropdown-toggle.dropdown-toggle-split.fcfield-addvalue.fcfont-icon.icon.icon- {
+	display: table-cell;
+	left: 1px;
+	top: 0px;
+}
+label#custom_agent_item_selector-lbl {
+	height: 36px !important;
+}
+span.btn.fc_img_preview_btn.icon-search:before {
+	display: none;
+}
+span.btn.fc_img_preview_btn.icon-search {
+	background: #fff;
+	width: 10px !important;
+	padding: 2px 5px !important;
+}
+span.add-on.fc_filedata_title {
+	min-height: 34px;
+	margin-left: 4px !important;
+}
+#flexicontent ul.fcfield-sortables > li.fcfieldval_container.valuebox.fc-expanded .fc-xpended-btns {
+	display: flex !important;
+}
+header.group.tool {
+	width: 100%;
+}
+.fc_edit_link {
+	margin: 0px 0px;
+	background: #fff;
+	padding: 5px;
+}
+.fc_state_toggle_link {
+	margin: 0;
+	background: #fff;
+	padding: 2px;
+}
+.statetoggler.fc_statebutton.btn.btn-small.hasTooltip {
+	padding: 0px !important;
+}
+#flexicontent ::placeholder,
+.mod_flexifilter_wrapper ::placeholder {
+	color: #000;
+	font-size: 12px;
+}
+#flexicontent #fcfilter_form_slider_category .accordion-item {
+	display: inline-grid !important;
+	border: 1px solid #ccc;
+	border-radius: 5px;
+}
+.top-search #menu-sliders-filter .collapse,
+.fccategory .fc_filter_box .collapse {
+	position: initial;
+	z-index: 5;
+}
+div#fc_approval_msg {
+	color: #084298;
+	background-color: #cfe2ff;
+}
+a.close {
+	float: right;
+	margin-top: -23px;
+	font-size: 26px !important;
+	text-decoration: none !important;
+	margin-right: -10px;
+}
+.buttons.btn-group.dropdown {
+	background: #448344;
+	border-radius: 5px;
+}
+fctoolbar.toolbar.btn.btn-sm.dropdown-item.btn-success.hasTooltip {
+	color: #fff;
+}
+#fctoolbar joomla-toolbar-button > .toolbar + .dropdown-toggle,
+#toolbar joomla-toolbar-button > .toolbar + .dropdown-toggle,
+#fctoolbar .buttons.btn-group > .toolbar + .dropdown-toggle,
+#toolbar .buttons.btn-group > .toolbar + .dropdown-toggle {
+	margin-left: -5px !important;
+}
+.fctoolbar_side_placement #fctoolbar.btn-toolbar > *,
+#toolbar.btn-toolbar > * {
+	width: 100%;
+}
+ul.dropdown-menu {
+	background: #fff !important;
+	color: #22262a !important;
+	box-shadow: 0 0 9px 0px #00000047 !important;
+}
+li fctoolbar.toolbar.btn.btn-sm.dropdown-item.btn-success.hasTooltip {
+	color: #22262a;
+}
+div#fctoolbar .buttons {
+	margin-right: 5px;
+}
+.fctoolbar_side_placement div#fctoolbar .buttons {
+	margin-bottom: 5px;
+}

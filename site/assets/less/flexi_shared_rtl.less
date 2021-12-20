@@ -1087,43 +1087,49 @@ form div.container_fcfield > div:not(.alert):not(.fc-mssg):not(.fc-mssg-inline):
 	margin: 0;
 }
 
-#flexicontent form div fieldset.panelform > fieldset,
-#flexicontent form div fieldset.panelform > div > div.input-append,
-#flexicontent form div fieldset.panelform > div > div.input-prepend,
-#flexicontent form div fieldset.panelform > div > div.btn-group,
-#flexicontent form div fieldset.panelform > div.input-append,
-#flexicontent form div fieldset.panelform > div.input-prepend,
-#flexicontent form div fieldset.panelform > div.btn-group,
-#flexicontent form div fieldset.panelform > div.select2-container,
-#flexicontent form div fieldset.panelform > input,
-#flexicontent form div fieldset.panelform > button,
-#flexicontent form div fieldset.panelform > textarea,
-#flexicontent form div fieldset.panelform > select,
-#flexicontent form div fieldset.panelform > img,
-#flexicontent form div fieldset.panelform > span,
-
-form div.container_fcfield > fieldset,
-form div.container_fcfield > div > div.input-append,
-form div.container_fcfield > div > div.input-prepend,
-form div.container_fcfield > div > div.btn-group,
-form div.container_fcfield > div.input-append,
-form div.container_fcfield > div.input-prepend,
-form div.container_fcfield > div.btn-group,
-form div.container_fcfield > div.select2-container,
-form div.container_fcfield > input,
-form div.container_fcfield > button,
-form div.container_fcfield > textarea,
-form div.container_fcfield > select,
-form div.container_fcfield > img,
-form div.container_fcfield > span {
-	margin: 1px 2px 1px 2px;
-	float: right;
+#flexicontent form div fieldset.panelform {
+	> fieldset,
+	> div > div.input-append,
+	> div > div.input-prepend,
+	> div > div.btn-group,
+	> div.input-append,
+	> div.input-prepend,
+	> div.btn-group,
+	> div.select2-container,
+	> input,
+	> button,
+	> textarea,
+	> select,
+	> img,
+	> span {
+		margin: 1px 2px 1px 2px;
+		float: right;
+	}
 }
-form div.container_fcfield > input,
-form div.container_fcfield > button,
-form div.container_fcfield > textarea,
-form div.container_fcfield > select {
-	max-width: 96%;
+form div.container_fcfield {
+	> fieldset,
+	> div > div.input-append,
+	> div > div.input-prepend,
+	> div > div.btn-group,
+	> div.input-append,
+	> div.input-prepend,
+	> div.btn-group,
+	> div.select2-container,
+	> input,
+	> button,
+	> textarea,
+	> select,
+	> img,
+	> span {
+		margin:0px !important;
+	}
+
+	> input,
+	> button,
+	> textarea,
+	> select {
+		max-width: 96%;
+	}
 }
 
 #flexicontent div fieldset .input-append,

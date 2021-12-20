@@ -443,7 +443,7 @@ body .fc-nowrap-box .nowrap_box .label,
 #flexicontent .fc-xpended-btns {
 	margin: 0 0 0.3rem 0 !important;
 	float: none;
-	display: inline-block;
+	display: inline-flex;
 }
 #flexicontent .fc-xpended-block500 {
 	box-sizing: border-box;

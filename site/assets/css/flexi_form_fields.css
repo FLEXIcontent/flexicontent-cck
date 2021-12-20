@@ -988,7 +988,6 @@ table.fc_uploader_header_tbl td:last-child {
 #flexicontent div.fcfieldval_container.valuebox.fc-expanded .fc-xpended-btns,
 #flexicontent ul.fcfield-sortables > li.fcfieldval_container.valuebox.fc-expanded .fc-field-props-box,
 #flexicontent ul.fcfield-sortables > li.fcfieldval_container.valuebox.fc-expanded .fc-xpended-btns {
-	display: block;
 	position: relative;
 	float: left;
 	clear: both;
@@ -1146,6 +1145,10 @@ div.container_fcfield div.toggle_all_values_buttons_box {
 }
 #flexicontent .fc-xpended-btns.fc-bottom-btns {
 	margin: 8px 0 0 0;
+}
+#flexicontent .fc-xpended-btns > * {
+	flex-grow: 0;
+	margin: 0 3px;
 }
 #flexicontent .fc-xpended-btns > [class^="fcfield-"],
 #flexicontent .fc-xpended-btns > [class*=" fcfield-"],
