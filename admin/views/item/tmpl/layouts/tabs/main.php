@@ -131,16 +131,16 @@ $n = 0;
 	<?php
 	echo $use_flexbox ? '
 	<div class="fc_form_flex_box">
-		<div class="fc_form_flex_box_item">
+		<div class="fc_form_flex_box_item use_flex_grow">
 	' : '';
 
 	foreach($tab_fields['above'] as $fn => $i) :
 		$n++;
 
 		echo $use_flexbox && ($n - 1 == ceil($total_fields / 2)) ? '
-			</div><div class="fc_form_flex_box_item">' : '';
+			</div><div class="fc_form_flex_box_item use_flex_grow">' : '';
 		echo $use_flexbox && in_array($fn, array('perms', 'fields_manager')) ? '
-			</div><div class="fc_form_flex_box_item" style="width: 100%;">
+			</div><div class="fc_form_flex_box_item use_flex_grow" style="width: 100%;">
 		' : '';
 		if (!is_array($captured[$fn])) :
 			echo $captured[$fn]; unset($captured[$fn]);
@@ -271,16 +271,16 @@ if ( count($tab_fields['tab02a']) ) : ?>
 		<?php
 		echo $use_flexbox ? '
 		<div class="fc_form_flex_box">
-			<div class="fc_form_flex_box_item">
+			<div class="fc_form_flex_box_item use_flex_grow">
 		' : '';
 
 		foreach($tab_fields['tab02a'] as $fn => $i) :
 			$n++;
 
 			echo $use_flexbox && ($n - 1 == ceil($total_fields / 2)) ? '
-				</div><div class="fc_form_flex_box_item">' : '';
+				</div><div class="fc_form_flex_box_item use_flex_grow">' : '';
 			echo $use_flexbox && in_array($fn, array('perms', 'fields_manager')) ? '
-				</div><div class="fc_form_flex_box_item" style="width: 100%;">
+				</div><div class="fc_form_flex_box_item use_flex_grow" style="width: 100%;">
 			' : '';
 			if (!is_array($captured[$fn])) :
 				echo $captured[$fn]; unset($captured[$fn]);
@@ -370,16 +370,16 @@ if ( count($tab_fields['tab03']) ) :
 		<?php
 		echo $use_flexbox ? '
 		<div class="fc_form_flex_box">
-			<div class="fc_form_flex_box_item">
+			<div class="fc_form_flex_box_item use_flex_grow">
 		' : '';
 
 		foreach($tab_fields['tab03'] as $fn => $i) :
 			$n++;
 
 			echo $use_flexbox && ($n - 1 == ceil($total_fields / 2)) ? '
-				</div><div class="fc_form_flex_box_item">' : '';
+				</div><div class="fc_form_flex_box_item use_flex_grow">' : '';
 			echo $use_flexbox && in_array($fn, array('perms', 'fields_manager')) ? '
-				</div><div class="fc_form_flex_box_item" style="width: 100%;">
+				</div><div class="fc_form_flex_box_item use_flex_grow" style="width: 100%;">
 			' : '';
 			if (!is_array($captured[$fn])) :
 				echo $captured[$fn]; unset($captured[$fn]);
@@ -424,16 +424,16 @@ if ( count($tab_fields['tab04']) ) : ?>
 		<?php
 		echo $use_flexbox ? '
 		<div class="fc_form_flex_box">
-			<div class="fc_form_flex_box_item">
+			<div class="fc_form_flex_box_item use_flex_grow">
 		' : '';
 
 		foreach($tab_fields['tab04'] as $fn => $i) :
 			$n++;
 
 			echo $fn === 'item_screen' || (!$has_i_screen && $use_flexbox && ($n - 1 == ceil($total_fields / 2))) ? '
-				</div><div class="fc_form_flex_box_item">' : '';
+				</div><div class="fc_form_flex_box_item use_flex_grow">' : '';
 			echo $use_flexbox && in_array($fn, array('perms', 'fields_manager')) ? '
-				</div><div class="fc_form_flex_box_item" style="width: 100%;">
+				</div><div class="fc_form_flex_box_item use_flex_grow" style="width: 100%;">
 			' : '';
 			if (!is_array($captured[$fn])) :
 				echo $captured[$fn]; unset($captured[$fn]);
@@ -475,16 +475,16 @@ if ( count($tab_fields['tab05']) ) : ?>
 		<?php
 		echo $use_flexbox ? '
 		<div class="fc_form_flex_box">
-			<div class="fc_form_flex_box_item">
+			<div class="fc_form_flex_box_item use_flex_grow">
 		' : '';
 
 		foreach($tab_fields['tab05'] as $fn => $i) :
 			$n++;
 
 			echo $use_flexbox && ($n - 1 == ceil($total_fields / 2)) ? '
-				</div><div class="fc_form_flex_box_item">' : '';
+				</div><div class="fc_form_flex_box_item use_flex_grow">' : '';
 			echo $use_flexbox && in_array($fn, array('perms', 'fields_manager')) ? '
-				</div><div class="fc_form_flex_box_item" style="width: 100%;">
+				</div><div class="fc_form_flex_box_item use_flex_grow" style="width: 100%;">
 			' : '';
 			if (!is_array($captured[$fn])) :
 				echo $captured[$fn]; unset($captured[$fn]);
@@ -593,16 +593,16 @@ if ( count($tab_fields['tab08']) ) : ?>
 		<?php
 		echo $use_flexbox ? '
 		<div class="fc_form_flex_box">
-			<div class="fc_form_flex_box_item">
+			<div class="fc_form_flex_box_item use_flex_grow">
 		' : '';
 
 		foreach($tab_fields['tab08'] as $fn => $i) :
 			$n++;
 
 			echo $use_flexbox && ($n - 1 == ceil($total_fields / 2)) ? '
-				</div><div class="fc_form_flex_box_item">' : '';
+				</div><div class="fc_form_flex_box_item use_flex_grow">' : '';
 			echo $use_flexbox && in_array($fn, array('perms', 'fields_manager')) ? '
-				</div><div class="fc_form_flex_box_item" style="width: 100%;">
+				</div><div class="fc_form_flex_box_item use_flex_grow" style="width: 100%;">
 			' : '';
 			if (!is_array($captured[$fn])) :
 				echo $captured[$fn]; unset($captured[$fn]);
