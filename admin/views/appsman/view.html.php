@@ -95,7 +95,7 @@ class FlexicontentViewAppsman extends JViewLegacy
 		$document->setTitle($doc_title .' - '. $site_title);
 
 		// Create the toolbar
-		$this->setToolbar();
+		$this->setToolbar($conf, $task);
 
 
 		// Get types
@@ -120,7 +120,8 @@ class FlexicontentViewAppsman extends JViewLegacy
 		// Execute the import task, load the log-like AJAX-based layout (import_process.php), to display results including any warnings
 		if ( !empty($conf) && $task=='processxml' )
 		{
-			$this->assignRef('conf', $conf);
+			$this->conf    = $conf;
+			$this->cparams = $cparams;
 			parent::display('process');
 			return;
 		}
@@ -128,11 +129,11 @@ class FlexicontentViewAppsman extends JViewLegacy
 		// Configuration has been parsed, display a 'preview' layout:  (import_list.php)
 		else if ( $task=='importxml' || !empty($conf) )
 		{
-			$this->assignRef('conf', $conf);
-			$this->assignRef('cparams', $cparams);
-			$this->assignRef('types', $types);
-			$this->assignRef('languages', $languages);
-			$this->assignRef('categories', $globalcats);
+			$this->conf       = $conf;
+			$this->cparams    = $cparams;
+			$this->types      = $types;
+			$this->languages  = $languages;
+			$this->categories = $globalcats;
 			parent::display('list');
 			return;
 		}
@@ -232,13 +233,6 @@ class FlexicontentViewAppsman extends JViewLegacy
 				'.JText::_('FLEXI_USE_STATE_COLUMN_TIP').'
 			</span>';
 		
-		// Ignore warnings because component may not be installed
-		$warnHandlers = JERROR::getErrorHandling( E_WARNING );
-		JERROR::setErrorHandling( E_WARNING, 'ignore' );
-		
-		// Reset the warning handler(s)
-		foreach( $warnHandlers as $mode )  JERROR::setErrorHandling( E_WARNING, $mode );
-		
 		
 		// ********************************************************************************
 		// Get field names (from the header line (row 0), and remove it form the data array
@@ -251,13 +245,12 @@ class FlexicontentViewAppsman extends JViewLegacy
 		$file_fields = $db->loadObjectList('name');
 		
 		//assign data to template
-		$this->assignRef('model'   	, $model);
-		$this->assignRef('lists'   	, $lists);
-		$this->assignRef('user'			, $user);
-		$this->assignRef('cparams', $cparams);
-		$this->assignRef('file_fields', $file_fields);
-		
-		$this->assignRef('formvals', $formvals);
+		$this->model       = $model;
+		$this->lists       = $lists;
+		$this->user        = $user;
+		$this->cparams     = $cparams;
+		$this->file_fields = $file_fields;
+		$this->formvals    = $formvals;
 
 		parent::display($tpl);
 	}
@@ -270,7 +263,7 @@ class FlexicontentViewAppsman extends JViewLegacy
 	 * @access	public
 	 * @return	void
 	 */
-	function setToolbar()
+	function setToolbar($conf, $task)
 	{
 		$user     = JFactory::getUser();
 		$document = JFactory::getDocument();
@@ -287,22 +280,21 @@ class FlexicontentViewAppsman extends JViewLegacy
 		$toolbar = JToolbar::getInstance('toolbar');
 		$loading_msg = flexicontent_html::encodeHTML(JText::_('FLEXI_LOADING') .' ... '. JText::_('FLEXI_PLEASE_WAIT'), 2);
 
-		/*$btn_icon = 'icon-import';
-		$btn_name = 'import';
-		$btn_task    = 'appsman.initxml';
-		$extra_js    = "";
-		flexicontent_html::addToolBarButton(
-			'Import', $btn_name, $full_js='', $msg_alert='', $msg_confirm='Current version only has export function, for testing purposes',
-			$btn_task, $extra_js, $btn_list=false, $btn_menu=true, $btn_confirm=false, $btn_class="btn", $btn_icon);
-		*/
-		
+	
 		if (!empty($conf))
 		{
 			if ($task !== 'processxml')
 			{
-				$ctrl_task = 'appsman.processxml';
-				$import_btn_title = empty($lineno) ? 'FLEXI_IMPORT_START_TASK' : 'FLEXI_IMPORT_CONTINUE_TASK';
-				JToolbarHelper::custom( $ctrl_task, 'save.png', 'save.png', $import_btn_title, $list_check = false );
+				$import_btn_title = JText::_(empty($lineno) ? 'FLEXI_IMPORT_START_TASK' : 'FLEXI_IMPORT_CONTINUE_TASK');
+
+				$btn_icon = 'icon-import';
+				$btn_name = 'import';
+				$btn_task    = ''; //'appsman.processxml';
+				$extra_js    = "";
+				flexicontent_html::addToolBarButton(
+					$import_btn_title, $btn_name, $full_js='', $msg_alert='', $msg_confirm='Current version does not allow import',
+					$btn_task, $extra_js, $btn_list=false, $btn_menu=true, $btn_confirm=true, $btn_class="btn", $btn_icon);
+
 			}
 
 			$ctrl_task = 'appsman.clearxml';

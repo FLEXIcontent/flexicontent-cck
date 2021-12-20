@@ -330,17 +330,6 @@ class FlexicontentViewImport extends FlexicontentViewBaseRecords
 		$lists['access'] = JHtml::_('select.genericlist', $access_levels, $fieldname, $attribs, 'value', 'text', $formvals['access'], $elementid, $translate=true );
 
 
-		// Ignore warnings because component may not be installed
-		$warnHandlers = JERROR::getErrorHandling(E_WARNING);
-		JERROR::setErrorHandling(E_WARNING, 'ignore');
-
-		// Reset the warning handler(s)
-		foreach($warnHandlers as $mode)
-		{
-			JERROR::setErrorHandling(E_WARNING, $mode);
-		}
-
-
 		/**
 		 * Get field names (from the header line (row 0), and remove it form the data array
 		 */

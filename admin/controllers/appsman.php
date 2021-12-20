@@ -14,28 +14,23 @@ defined('_JEXEC') or die;
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 
-/**
- * Register autoloader for parent controller, in case controller is executed by another component
- * We use JPATH_BASE since parent controller with same name ... exists in frontend too (thus custom code can use it)
- * NOTE: -Only- if this controller is needed by frontend URLs ... then create a derived controller in frontend 'controllers' folder
- */
-JLoader::register('FlexicontentController', JPATH_BASE . DS . 'components' . DS . 'com_flexicontent' . DS . 'controller.php');
+JLoader::register('FlexicontentControllerBaseAdmin', JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'controllers' . DS . 'base' . DS . 'baseadmin.php');
 
-// Manually import in case used by frontend, then model will not be autoloaded correctly via getModel('name')
-require_once JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'models' . DS . 'tag.php';
+// Manually import models in case used by frontend, then models will not be autoloaded correctly via getModel('name')
+require_once JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'models' . DS . 'appsman.php';
 
 /**
  * FLEXIcontent Apps manager Controller
  *
  * @since 3.3
  */
-class FlexicontentControllerAppsman extends FlexicontentController
+class FlexicontentControllerAppsman extends FlexicontentControllerBaseAdmin
 {
 	var $records_dbtbl = null;
 	var $records_jtable = null;
 
 	var $record_name = 'appsman';
-	var $record_name_pl = null;
+	var $record_name_pl = 'appsman';
 
 	var $_NAME = 'APPSMAN';
 	var $record_alias = 'not_applicable';
@@ -79,7 +74,7 @@ class FlexicontentControllerAppsman extends FlexicontentController
 	{
 		parent::__construct($config);
 
-		// Register Extra task
+		// Register task aliases
 		$this->registerTask('initxml',  'import');
 		$this->registerTask('clearxml',  'import');
 		$this->registerTask('processxml', 'import');
@@ -89,32 +84,34 @@ class FlexicontentControllerAppsman extends FlexicontentController
 		$this->registerTask('exportcsv', 'export');
 
 		// Can manage ACL
-		$this->canManage = JFactory::getUser()->authorise('core.admin', 'com_flexicontent');
+		$this->canManage = FlexicontentHelperPerm::getPerm()->CanConfig;
 	}
 
 
-
+	/**
+	 * Logic to add to export
+	 *
+	 * @return void
+	 *
+	 * @since 3.3
+	 */
 	function addtoexport()
 	{
-		$app      = JFactory::getApplication();
-		$user     = JFactory::getUser();
+		$app   = JFactory::getApplication();
+		$model = $this->getModel($this->record_name);
+		$user  = JFactory::getUser();
+
 		$session  = JFactory::getSession();
 
-		// Get the model
-		$model = $this->getModel($this->record_name);
-
-		// Calculate access
+		// Calculate ACL access
 		$is_authorised = $this->canManage;
 
 		// Check access
 		if (!$is_authorised)
 		{
+			$app->setHeader('status', '403 Forbidden', true);
 			$app->enqueueMessage(JText::_('FLEXI_ALERTNOTAUTH_TASK'), 'error');
-			$app->setHeader('status', 403, true);
-
-			$this->setRedirect($this->refererURL);
-
-			return;
+			$app->redirect($this->returnURL);
 		}
 
 
@@ -126,12 +123,9 @@ class FlexicontentControllerAppsman extends FlexicontentController
 
 		if (!in_array($table, self::$allowed_tables))
 		{
-			$app->enqueueMessage(JText::_('FLEXI_NO_ACCESS' . ' Table: ' . $table . ' not in allowed tables'), 'error');
-			$app->setHeader('status', 403, true);
-
-			$this->setRedirect($this->refererURL);
-
-			return;
+			$app->setHeader('status', '403 Forbidden', true);
+			$app->enqueueMessage(JText::_('FLEXI_NO_ACCESS') . ' Table: ' . $table . ' not in allowed tables', 'error');
+			$app->redirect($this->returnURL);
 		}
 
 		$ids_are_integers = $table != 'flexicontent_templates';
@@ -198,9 +192,7 @@ class FlexicontentControllerAppsman extends FlexicontentController
 		$session->set('appsman_export', $conf, 'flexicontent');
 
 		$app->enqueueMessage('TABLE: <strong>' . $table . '</strong><br/>' . $count_new . ' new records added, ' . $count_old . ' existing records updated' . $customHandler_msg, 'notice');
-		$this->setRedirect($this->refererURL);
-
-		return;
+		$this->setRedirect($this->returnURL);
 	}
 
 
@@ -223,18 +215,15 @@ class FlexicontentControllerAppsman extends FlexicontentController
 		// Check access
 		if (!$is_authorised)
 		{
+			$app->setHeader('status', '403 Forbidden', true);
 			$app->enqueueMessage(JText::_('FLEXI_ALERTNOTAUTH_TASK'), 'error');
-			$app->setHeader('status', 403, true);
-
-			$this->setRedirect($this->refererURL);
-
-			return;
+			$app->redirect($this->returnURL);
 		}
 
 		$session->set('appsman_export', "", 'flexicontent');
 
 		$app->enqueueMessage('Export list cleared', 'notice');
-		$this->setRedirect($this->refererURL);
+		$this->setRedirect($this->returnURL);
 	}
 
 
@@ -277,13 +266,9 @@ class FlexicontentControllerAppsman extends FlexicontentController
 		{
 			$app->setHeader('status', '403 Forbidden', true);
 			$app->enqueueMessage(JText::_('FLEXI_ALERTNOTAUTH_TASK'), 'error');
-
-			$this->setRedirect($this->refererURL);
-
-			return false;
+			$app->redirect($this->returnURL);
 		}
 
-		$link = $_SERVER['HTTP_REFERER'];  // 'index.php?option=com_flexicontent&view=appsman';
 		$task = strtolower($this->input->get('task', '', 'cmd'));
 
 		/**
@@ -305,10 +290,8 @@ class FlexicontentControllerAppsman extends FlexicontentController
 
 				// Set a message that import task was cleared and redirect
 				$app->enqueueMessage('Import task cleared', 'notice');
-				$this->setRedirect($link);
-
-				return;
-			break;
+				$app->redirect($this->returnURL);
+				break;
 
 			/**
 			 * EXECUTE an already initialized (prepared) import task
@@ -321,13 +304,26 @@ class FlexicontentControllerAppsman extends FlexicontentController
 
 				if (empty($conf))
 				{
+					$app->setHeader('status', '200 OK', true);
 					$app->enqueueMessage('Can not continue import, import task not initialized or already finished', 'error');
-					$this->setRedirect($link);
-
-					return;
+					$app->redirect($this->returnURL);
 				}
 
+				libxml_use_internal_errors(true);
 				$xml = simplexml_load_string($conf['xml']);
+
+				if (!$xml)
+				{
+					foreach(libxml_get_errors() as $error)
+					{
+						$err_msg[] = $error->message;
+					}
+
+					$app->setHeader('status', '500', true);
+					$app->enqueueMessage('Can not parse XML file: ' . implode('<br>', $err_msg), 'error');
+					$app->redirect($this->returnURL);
+				}
+
 				$db = JFactory::getDbo();
 				$nullDate = $db->getNullDate();
 
@@ -420,10 +416,8 @@ class FlexicontentControllerAppsman extends FlexicontentController
 				}
 
 				// echo "<pre>"; print_r($xml); echo "</pre>";
-			exit;
-
-			// CONTINUE to do the import task ...
-			break;
+				// CONTINUE to do the import task ...
+				break;
 
 			/**
 			 * INITIALIZE (prepare) import by getting configuration and reading XML file
@@ -441,15 +435,20 @@ class FlexicontentControllerAppsman extends FlexicontentController
 				}
 
 				$zip = new ZipArchive;
+				$zip_result = $zip->open($xmlfile);
 
-				if ($zip->open($xmlfile) !== false)
+				if ($zip_result === true)
 				{
-					$zip->open($xmlfile);
 					$conf['xml'] = $zip->getFromName('dbdata.xml');
+				}
+				elseif ($zip_result === ZipArchive::ER_NOZIP)
+				{
+					$conf['xml'] = file_get_contents($xmlfile);
 				}
 				else
 				{
-					$conf['xml'] = file_get_contents($xmlfile);
+					$app->enqueueMessage('Error reading file', 'error');
+					$app->redirect($link);
 				}
 
 				// Set import configuration into session
@@ -458,13 +457,11 @@ class FlexicontentControllerAppsman extends FlexicontentController
 					'flexicontent'
 				);
 
-					// Set a message that import task was prepared and redirect
-					$app->enqueueMessage('Import task prepared', 'message');
-					$this->setRedirect($link);
-
-				return;
-
-			break;
+				// Set a message that import task was prepared and redirect
+				$app->setHeader('status', '200 OK', true);
+				$app->enqueueMessage('Import task prepared', 'message');
+				$app->redirect($this->returnURL);
+				break;
 
 			/**
 			 * UNKNWOWN task, terminate
@@ -473,12 +470,10 @@ class FlexicontentControllerAppsman extends FlexicontentController
 			default:
 
 				// Set an error message about unknown task and redirect
+				$app->setHeader('status', '200 OK', true);
 				$app->enqueueMessage('Unknown task: ' . $task, 'error');
-				$this->setRedirect($link);
-
-				return;
-
-			break;
+				$app->redirect($this->returnURL);
+				break;
 		}
 
 		// Call display method of the view, instead of calling parent's display task, because it will create a 2nd model instance !!
@@ -521,10 +516,9 @@ class FlexicontentControllerAppsman extends FlexicontentController
 
 		if (!$is_authorised)
 		{
-			JError::raiseWarning(403, JText::_('FLEXI_NO_ACCESS'));
-			$this->setRedirect($this->refererURL);
-
-			return;
+			$app->setHeader('status', '403 Forbidden', true);
+			$app->enqueueMessage(JText::_('FLEXI_NO_ACCESS'), 'error');
+			$app->redirect($this->returnURL);
 		}
 
 		// Get export task
@@ -562,14 +556,9 @@ class FlexicontentControllerAppsman extends FlexicontentController
 
 			if (!empty($error))
 			{
-				foreach ($error as $error_code => $error_text)
-				{
-					JError::raiseWarning($error_code, $error_text);
-				}
-
-				$this->setRedirect($this->refererURL);
-
-				return;
+				$app->setHeader('status', reset(array_keys($error)), true);
+				$app->enqueueMessage(reset($error), 'error');
+				$app->redirect($this->returnURL);
 			}
 		}
 
@@ -582,10 +571,9 @@ class FlexicontentControllerAppsman extends FlexicontentController
 
 			if (empty($rows))
 			{
+				$app->setHeader('status', '200 OK', true);
 				$app->enqueueMessage("No rows to export", 'notice');
-				$this->setRedirect($this->refererURL);
-
-				return;
+				$app->redirect($this->returnURL);
 			}
 
 			switch ($export_type)
@@ -648,12 +636,12 @@ class FlexicontentControllerAppsman extends FlexicontentController
 			}
 		}
 
-		// Check for error
+		// Check if no content to export
 		if (!$content)
 		{
-			$this->setRedirect($this->refererURL);
-
-			return;
+			$app->setHeader('status', '200 OK', true);
+			$app->enqueueMessage("No rows to export", 'notice');
+			$app->redirect($this->returnURL);
 		}
 
 		$filename = $filename ? $filename : 'dbdata';// Str_replace('#__', '', $table);

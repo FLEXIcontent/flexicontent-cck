@@ -63,10 +63,22 @@ $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">
 	?>
 	
 	<?php
+
+	libxml_use_internal_errors(true);
 	$xml = simplexml_load_string($this->conf['xml']);
-	
+
 	if (!$xml)
-		echo 'Could not parse XML file';
+	{
+		foreach(libxml_get_errors() as $error)
+		{
+			$err_msg[] = $error->message;
+		}
+	}
+
+	if (!$xml)
+	{
+		JFactory::getApplication()->enqueueMessage('Can not parse XML file: ' . implode('<br>', $err_msg), 'warning');
+	}
 	
 	else foreach ($xml->rows as $table)
 	{
