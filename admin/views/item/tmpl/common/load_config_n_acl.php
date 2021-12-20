@@ -74,7 +74,6 @@ $selecttheme           = (int) $this->params->get('selecttheme' . $CFGsfx, ($isS
 
 $permsplacement    = (int) $this->params->get('permsplacement' . $CFGsfx, 2);
 $versionsplacement = (int) $this->params->get('versionsplacement' . $CFGsfx, 2);
-$buttons_placement = (int) $this->params->get('buttons_placement' . $CFGsfx, 0);
 
 $task_items = 'task=items.';
 $ctrl_items = 'items.';
