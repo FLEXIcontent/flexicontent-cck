@@ -695,8 +695,8 @@ class ParentClassItem extends FCModelAdmin
 				$query->select('CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug');
 
 				// Publication Scheduled / Expired Flags
-				$query->select('CASE WHEN i.publish_up = '.$nullDate.' OR i.publish_up <= '.$nowDate.' THEN 0 ELSE 1 END as publication_scheduled');
-				$query->select('CASE WHEN i.publish_down = '.$nullDate.' OR i.publish_down >= '.$nowDate.' THEN 0 ELSE 1 END as publication_expired' );
+				$query->select('CASE WHEN i.publish_up is NULL OR i.publish_up = '.$nullDate.' OR i.publish_up <= '.$nowDate.' THEN 0 ELSE 1 END as publication_scheduled');
+				$query->select('CASE WHEN i.publish_down is NULL OR i.publish_down = '.$nullDate.' OR i.publish_down >= '.$nowDate.' THEN 0 ELSE 1 END as publication_expired' );
 
 				if (FLEXI_J40GE)
 				{

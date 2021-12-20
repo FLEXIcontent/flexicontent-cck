@@ -3170,18 +3170,24 @@ class flexicontent_html
 
 		if (isset($record->publish_up))
 		{
-			$publish_up = JFactory::getDate($record->publish_up);
-			$publish_up->setTimezone($tz);
-			$publish_info[] = $record->publish_up == $nullDate
+			if ($record->publish_up)
+			{
+				$publish_up = JFactory::getDate($record->publish_up);
+				$publish_up->setTimezone($tz);
+			}
+			$publish_info[] = !$record->publish_up || $record->publish_up == $nullDate
 				? $jtext['start_always']
 				: $jtext['start'] .": ". JHtml::_('date', $publish_up->toSql(), 'Y-m-d H:i:s');
 		}
 
 		if (isset($record->publish_down))
 		{
-			$publish_down = JFactory::getDate($record->publish_down);
-			$publish_down->setTimezone($tz);
-			$publish_info[] = $record->publish_down == $nullDate
+			if ($record->publish_down)
+			{
+				$publish_down = JFactory::getDate($record->publish_down);
+				$publish_down->setTimezone($tz);
+			}
+			$publish_info[] = !$record->publish_down || $record->publish_down == $nullDate
 				? $jtext['finish_no_expiry']
 				: $jtext['finish'] .": ". JHtml::_('date', $publish_down->toSql(), 'Y-m-d H:i:s');
 		}

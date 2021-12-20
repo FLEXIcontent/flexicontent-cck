@@ -429,8 +429,8 @@ class FlexicontentModelFavourites extends JModelLegacy
 			$where .= ' AND ( i.state IN (1, -5) ' . $OR_isOwner . ')';   // . $OR_isModifier
 
 			// Limit by publish up/down dates. Exception: when displaying personal user items or items modified by the user
-			$where .= ' AND ( ( i.publish_up = '.$db->Quote($nullDate).' OR i.publish_up <= '.$_nowDate.' ) ' . $OR_isOwner . ')';   // . $OR_isModifier
-			$where .= ' AND ( ( i.publish_down = '.$db->Quote($nullDate).' OR i.publish_down >= '.$_nowDate.' ) ' . $OR_isOwner . ')';   // . $OR_isModifier
+			$where .= ' AND ( ( i.publish_up is NULL OR i.publish_up = '.$db->Quote($nullDate).' OR i.publish_up <= '.$_nowDate.' ) ' . $OR_isOwner . ')';   // . $OR_isModifier
+			$where .= ' AND ( ( i.publish_down is NULL OR i.publish_down = '.$db->Quote($nullDate).' OR i.publish_down >= '.$_nowDate.' ) ' . $OR_isOwner . ')';   // . $OR_isModifier
 		}
 		else
 		{

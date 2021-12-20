@@ -253,8 +253,8 @@ class FlexicontentTasksCore
 			.$joinaccess
 			.' WHERE '. $_text_match
 			.'   AND i.state IN (1,-5) '   //(FLEXI_J16GE ? 2:-1) // TODO search archived
-			.'   AND ( i.publish_up = '.$db->Quote($nullDate).' OR i.publish_up <= '.$_nowDate.' ) '
-			.'   AND ( i.publish_down = '.$db->Quote($nullDate).' OR i.publish_down >= '.$_nowDate.' ) '
+			.'   AND ( i.publish_up is NULL OR i.publish_up = '.$db->Quote($nullDate).' OR i.publish_up <= '.$_nowDate.' ) '
+			.'   AND ( i.publish_down is NULL OR i.publish_down = '.$db->Quote($nullDate).' OR i.publish_down >= '.$_nowDate.' ) '
 			. $lang_where
 			. $access_where
 			//.' ORDER BY score DESC'  // THIS MAYBE SLOW

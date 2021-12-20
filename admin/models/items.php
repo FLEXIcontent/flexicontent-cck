@@ -1066,8 +1066,8 @@ class FlexicontentModelItems extends FCModelAdminList
 				. ($filter_cats && !$filter_subcats ?
 					', rel.ordering as catsordering' : ', \'\' as catsordering'
 					)
-				. ', CASE WHEN a.publish_up = '.$nullDate.' OR a.publish_up <= '.$nowDate.' THEN 0 ELSE 1 END as publication_scheduled'
-				. ', CASE WHEN a.publish_down = '.$nullDate.' OR a.publish_down >= '.$nowDate.' THEN 0 ELSE 1 END as publication_expired'
+				. ', CASE WHEN a.publish_up IS NULL OR a.publish_up = '.$nullDate.' OR a.publish_up <= '.$nowDate.' THEN 0 ELSE 1 END as publication_scheduled'
+				. ', CASE WHEN a.publish_down IS NULL OR a.publish_down = '.$nullDate.' OR a.publish_down >= '.$nowDate.' THEN 0 ELSE 1 END as publication_expired'
 				. ', t.name AS type_name, (' . $subquery . ') AS author, a.attribs AS config, t.attribs as tconfig'
 				. ($use_versioning ? ', CASE WHEN a.version = MAX(fv.version_id) THEN 0 ELSE MAX(fv.version_id) END as unapproved_version ' : ', 0 as unapproved_version')
 

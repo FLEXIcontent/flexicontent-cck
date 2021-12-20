@@ -5227,8 +5227,8 @@ class FlexicontentFields
 				$nowDate = 'UTC_TIMESTAMP()';  //$db->Quote($now);
 				$nullDate = $db->getNullDate();
 
-				$scopes_where[] = ' ( i.publish_up = '.$db->Quote($nullDate).' OR i.publish_up <= '.$nowDate.' )';
-				$scopes_where[] = ' ( i.publish_down = '.$db->Quote($nullDate).' OR i.publish_down >= '.$nowDate.' )';
+				$scopes_where[] = ' ( i.publish_up is NULL OR i.publish_up = '.$db->Quote($nullDate).' OR i.publish_up <= '.$nowDate.' )';
+				$scopes_where[] = ' ( i.publish_down is NULL OR i.publish_down = '.$db->Quote($nullDate).' OR i.publish_down >= '.$nowDate.' )';
 			}
 
 			$onlypublished = !$reverse_field_id || $params->get('onlypublished_view', 1) != -1
