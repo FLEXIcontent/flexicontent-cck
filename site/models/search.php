@@ -215,14 +215,18 @@ class FLEXIcontentModelSearch extends JModelLegacy
 
 			JPluginHelper::importPlugin( 'search');
 			$dispatcher = JEventDispatcher::getInstance();
-			$results = $dispatcher->trigger( 'onContentSearch',
-				array(
-					$this->getState('keyword'),
-					$this->getState('match'),
-					$this->getState('ordering'),
-					(!empty($areas['active']) ? $areas['active'] : array_keys($areas['search']))
-				)
+			$app        = JFactory::getApplication();
+
+			$search_data = array(
+				$this->getState('keyword'),
+				$this->getState('match'),
+				$this->getState('ordering'),
+				(!empty($areas['active']) ? $areas['active'] : array_keys($areas['search']))
 			);
+
+			$results = FLEXI_J40GE
+				? $app->triggerEvent('onContentSearch', $search_data)
+				: $dispatcher->trigger('onContentSearch', $search_data);
 
 			$rows = array();
 			foreach($results AS $result) {

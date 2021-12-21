@@ -16,6 +16,7 @@
 defined('_JEXEC') or die( 'Restricted access' );
 
 use Joomla\String\StringHelper;
+use Joomla\CMS\Language\LanguageHelper;
 
 if (!defined('DS'))  define('DS',DIRECTORY_SEPARATOR);
 require_once (JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'defineconstants.php');
@@ -34,7 +35,7 @@ class FLEXIadvsearchHelper
 		$search_prefix = JComponentHelper::getParams( 'com_flexicontent' )->get('add_search_prefix') ? 'vvv' : '';   // SEARCH WORD Prefix
 
 		$search_ignore = array();
-		$ignoreFile = $lang->getLanguagePath().DS.$lang_tag.DS.$lang_tag.'.ignore.php';
+		$ignoreFile = LanguageHelper::getLanguagePath().DS.$lang_tag.DS.$lang_tag.'.ignore.php';
 
 		if (file_exists($ignoreFile))
 		{

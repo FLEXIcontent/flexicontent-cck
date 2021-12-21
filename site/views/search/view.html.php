@@ -994,17 +994,17 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		$this->pageclass_sfx = $pageclass_sfx;
 		$this->typeData = $typeData;
 
-		$this->assign('ordering',     $state->get('ordering'));
-		$this->assign('filter_values', $filter_values);
-		$this->assign('searchword',   $searchword);
-		$this->assign('searchphrase', $state->get('match'));
-		$this->assign('searchareas',  $areas);
+		$this->ordering      = $state->get('ordering');
+		$this->filter_values = $filter_values;
+		$this->searchword    = $searchword;
+		$this->searchphrase  = $state->get('match');
+		$this->searchareas   = $areas;
 
-		$this->assign('total',  $total);
-		$this->assign('error',  $error);
-		$this->assign('document', $document);
-		$this->assign('form_id', $form_id);
-		$this->assign('form_name', $form_name);
+		$this->total     = $total;
+		$this->error     = $error;
+		$this->document  = $document;
+		$this->form_id   = $form_id;
+		$this->form_name = $form_name;
 
 		$print_logging_info = $params->get('print_logging_info');
 		if ( $print_logging_info ) { global $fc_run_times; $start_microtime = microtime(true); }
