@@ -77,7 +77,7 @@ $form_placement = (int) $this->params->get('form_placement', 0);
 
 if ($form_placement)
 {
-	$results_placement_class = 'span8';
+	$results_placement_class = 'span8 col-md-8';
 	$results_placement_style = $form_placement === 1 ? 'float: right; margin: 4px 0 4px 4px;' : 'float: left; margin: 4px 4px 4px 0;';
 }
 else
