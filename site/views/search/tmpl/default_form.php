@@ -18,8 +18,8 @@ $form_placement = (int) $this->params->get('form_placement', 0);
 
 if ($form_placement)
 {
-	$form_placement_class = $form_placement ? 'col-search span4 col-md-3' : 'top-search';
-	$form_placement_style = $form_placement === 1 ? 'float: left; margin: 4px 4px 4px 0;' : 'float: right; margin: 4px 0 4px 4px;';
+	$form_placement_class = $form_placement ? 'col-search span4 col-md-4' : 'top-search';
+	$form_placement_style = $form_placement === 1 ? 'float: left; margin: 0 0 1rem 0;' : 'float: right; margin: 0 0 1rem 0;';
 }
 else
 {
