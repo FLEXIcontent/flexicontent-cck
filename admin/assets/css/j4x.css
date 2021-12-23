@@ -962,3 +962,14 @@ body .form-grid .control-group .controls > div {
 #flexicontent .fc-xpended-btns {
 	height: 2.74rem;
 }
+#fc-filters-box .fc-xpended-row .input-group-text {
+	background: #94aed1 !important;
+}
+#fc-filters-box  .select2-container-multi .select2-choices {
+	min-height: 2.7rem !important;
+}
+#fc-filters-box .fc-filter .select2-container-multi,
+#fc-filters-box .select2-container,
+.select2-container {
+	margin-top: -5px;
+}
