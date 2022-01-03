@@ -628,6 +628,7 @@ a.fc_assoc_translation.label.label-association {
 /** fixs for item form **/
 body .container_fcfield input, #flexicontent .container_fcfield input {
 	height: 2.67rem !important;
+	border-radius: 3px;
 }
 div#tags #input-tags {
 	border-radius: 5px;
@@ -884,7 +885,8 @@ span.btn.btn-sm.toolbar.dropdown-toggle.dropdown-toggle-split.fcfield-addvalue.f
 .field-calendar .btn-primary {
 	/*border: 0 !important;*/
 	margin-left: -5px !important;
-	margin-top:-2px !important;
+	margin-top:-1px !important;
+	height: 2.70rem;
 }
 /**
  * Fix input address field
@@ -969,7 +971,7 @@ span.btn.btn-sm.toolbar.dropdown-toggle.dropdown-toggle-split.fcfield-addvalue.f
 }
 /** fix selector relation field **/
 label#custom_agent_item_selector-lbl {
-	height: 36px !important;
+	height: 2.64rem !important;
 }
 /** fix border input **/
 .select2-container-multi .select2-choices {
@@ -1112,6 +1114,7 @@ body .form-grid {
 }
 #flexicontent .fc-xpended-btns > [class^="fcfield-"], #flexicontent .fc-xpended-btns > [class*=" fcfield-"], #flexicontent .fc-xpended-btns > .fcfield-button-add a {
 	background: #fff !important;
+	line-height: 1.6rem !important;
 }
 #flexicontent .fc-xpended-btns {
 	height: 2.74rem;
@@ -1145,4 +1148,37 @@ div#s2id_filter_type {
 }
 span.icon-menu-2.btn.btn-micro {
 	border: 0 !important;
+}
+/** fix group button border **/
+.input-prepend.input-append .add-on:not(:last-child), .input-prepend.input-append .add-on:not(:last-child) > * {
+	border-top-left-radius: .25rem;
+	border-bottom-left-radius: .25rem;
+}
+#flexicontent div.input-group-addon > *:not(:first-child), #flexicontent div.input-prepend > *:not(:first-child), #flexicontent div.input-group-addon > *:not(:first-child) > *, #flexicontent div.input-prepend > *:not(:first-child) > * {
+	border-top-right-radius: .25rem !important;
+	border-bottom-right-radius: .25rem !important;
+}
+/** dropdown button in group **/
+span.btn.btn-sm.toolbar.dropdown-toggle.dropdown-toggle-split.fcfield-addvalue.fcfont-icon.icon.icon- {
+	height: 2.62rem !important;
+}
+span.btn.btn-sm.toolbar.dropdown-toggle.dropdown-toggle-split.fcfield-addvalue.fcfont-icon.icon.icon-.dropdown-toggle:after{
+margin-top: 18px !important;
+}
+/** fix select2choice height in relation field **/
+.fc_select2_noselect.select2-container-multi .select2-choices {
+	height: 2.7rem !important;
+}
+#flexicontent .select2-container-multi .select2-choices .select2-search-choice {
+	font-size: 11px !important;
+	height: 14px !important;
+	line-height: 14px !important;
+	color: #fff !important;
+	border: 1px solid var(--template-bg-dark-50)!important;
+	background: var(--template-bg-dark-50)!important;
+	filter: none !important;
+	background-image: none !important;
+}
+span.fcfield-disablevalue.fcfont-icon.icon.icon- {
+	height: 1.5rem !important;
 }
