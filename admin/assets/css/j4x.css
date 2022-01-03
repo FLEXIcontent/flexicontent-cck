@@ -459,10 +459,10 @@ dl#content-pane.tabs {
 	margin-right: -1px;
 }
 .icon-tags:before {
-	content: "?";
+	content: "\f02c";
 }
 .icon-items:before {
-	content: "?";
+	content: "\f0c5";
 }
 #flexicontent .btn-outline-info.active,
 a.btn.btn-small,
