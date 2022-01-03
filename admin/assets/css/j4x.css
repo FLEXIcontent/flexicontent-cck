@@ -1030,3 +1030,13 @@ span.btn.btn-sm.toolbar.dropdown-toggle.dropdown-toggle-split.fcfield-addvalue.f
 span.fcfield-disablevalue.fcfont-icon.icon.icon- {
 	height: 1.5rem !important;
 }
+body .ui-widget-header {
+	border: 1px solid #fff !important;
+	background: #fff !important;
+	color: var(--template-bg-dark-50) !important33;
+	border-bottom: 1px solid #ccc !important;
+}
+body .ui-widget-overlay {
+	background: #aaa;
+	opacity: .5;
+}
