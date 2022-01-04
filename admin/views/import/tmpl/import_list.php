@@ -68,7 +68,7 @@ foreach($_levels as $_level) {
 					<span class="fc-prop-lbl">Language</span>
 				</td>
 				<td class="data">
-					<?php if (!$this->conf['language']): ?>
+					<?php if ($this->conf['language'] == -99): ?>
 						<span class="icon-stack"><?php echo 'Using column'; ?></b>
 					<?php else: ?>
 						<span class="icon-lock"></span><b><?php echo $this->languages->{$this->conf['language']}->name; ?></b>
@@ -95,7 +95,7 @@ foreach($_levels as $_level) {
 						$tmpparams = new JRegistry();
 						$tmpparams->set('show_icons', '0');
 					?>
-					<?php if (!$this->conf['state']): ?>
+					<?php if ($this->conf['state'] == -99): ?>
 						<span class="icon-stack"></span><b><?php echo 'Using column'; ?></b>
 					<?php else: ?>
 						<span class="icon-lock"></span><b><?php echo flexicontent_html::stateicon( $this->conf['state'], $tmpparams); ?></b>
