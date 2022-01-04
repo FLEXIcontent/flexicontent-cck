@@ -69,6 +69,21 @@ class plgFinderFLEXIcontent extends FinderIndexerAdapter
 	protected $autoloadLanguage = true;
 
 	/**
+	 * Method to setup the indexer to be run.
+	 *
+	 * @return  boolean  True on success.
+	 *
+	 * @since   2.5
+	 */
+	protected function setup()
+	{
+		// Load dependent classes.
+		include_once JPATH_SITE . '/components/com_flexicontent/helpers/route.php';
+
+		return true;
+	}
+
+	/**
 	 * Method to update the item link information when the item category is
 	 * changed. This is fired when the item category is published or unpublished
 	 * from the list view.
@@ -264,10 +279,15 @@ class plgFinderFLEXIcontent extends FinderIndexerAdapter
 		$item->summary = FinderIndexerHelper::prepareContent($item->summary, $item->params, $item);
 		$item->body    = FinderIndexerHelper::prepareContent($item->body, $item->params, $item);
 
-		// Build the necessary route and path information.
+		// Create a URL as identifier to recognise items again.
 		$item->url = $this->getUrl($item->id, $this->extension, $this->layout, $item->catid);
+
+		// Build the necessary route and path information.
 		$item->route = FlexicontentHelperRoute::getItemRoute($item->slug, $item->catslug, 0, $item);
-		$item->path = FinderIndexerHelper::getContentPath($item->route);
+		if (!FLEXI_J40GE)
+		{
+			$item->path = FinderIndexerHelper::getContentPath($item->route);
+		}
 
 		// Get the menu title if it exists.
 		$title = $this->getItemMenuTitle($item->url);
@@ -301,6 +321,17 @@ class plgFinderFLEXIcontent extends FinderIndexerAdapter
 		}
 
 		// Add the category taxonomy data.
+		if (FLEXI_J40GE)
+		{
+			global $globalcats;
+			if ($globalcats)
+			{
+				if (!isset($globalcats[$item->catid]))
+				{
+					return;
+				}
+			}
+		}
 		$item->addTaxonomy('Category', $item->category, $item->cat_state, $item->cat_access);
 
 		// Add the language taxonomy data.
@@ -311,21 +342,6 @@ class plgFinderFLEXIcontent extends FinderIndexerAdapter
 
 		// Index the item.
 		$this->indexer->index($item);
-	}
-
-	/**
-	 * Method to setup the indexer to be run.
-	 *
-	 * @return  boolean  True on success.
-	 *
-	 * @since   2.5
-	 */
-	protected function setup()
-	{
-		// Load dependent classes.
-		include_once JPATH_SITE . '/components/com_flexicontent/helpers/route.php';
-
-		return true;
 	}
 
 	/**
