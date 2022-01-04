@@ -440,3 +440,11 @@ label#use_advsearch_options_lbl {
 #flexicontent .col-search button.btn.btn-success.button_go {
 	width: 50%;
 }
+#flexicontent .select2-container,
+.select2-container {
+	height: 2.7rem !important;
+	line-height: 2.7rem !important;
+}
+.fcfilter_form_module .fc_filter_line.fc_clear_label.fc_filter_buttons_box {
+	margin-top: 1rem;
+}
