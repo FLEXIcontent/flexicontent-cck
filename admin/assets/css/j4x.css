@@ -1033,7 +1033,7 @@ span.fcfield-disablevalue.fcfont-icon.icon.icon- {
 body .ui-widget-header {
 	border: 1px solid #fff !important;
 	background: #fff !important;
-	color: var(--template-bg-dark-50) !important33;
+	color: var(--template-bg-dark-50) !important;
 	border-bottom: 1px solid #ccc !important;
 }
 body .ui-widget-overlay {
@@ -1045,4 +1045,18 @@ body .ui-widget-overlay {
 .subform-repeatable-wrapper.subform-layout .btn-outline-info,
 #flexicontent .subform-repeatable-wrapper.subform-layout .btn.btn-sm {
 	background: #000 !important;
+}
+#flexicontent .nav.nav-tabs.nav-stacked li {
+	width: 24%;
+	border: 1px solid #ccc;
+	margin: 5px;
+	padding: 1.5rem;
+	border-radius: 5px;
+	background: var(--template-bg-dark-10) !important;
+	box-shadow: 0 2px 10px -8px var(--template-bg-dark-50);
+	font-weight: bold;
+}
+#flexicontent .nav.nav-tabs.nav-stacked small.muted {
+	clear: both;
+	display: block;
 }
