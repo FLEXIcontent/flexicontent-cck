@@ -1225,9 +1225,14 @@ body ul.tabbernav > li.tabberactive a:before, #flexicontent ul.tabbernav > li.ta
 body ul.tabbernav > li > a, #flexicontent ul.tabbernav > li > a{
 	color: var(--template-bg-dark-50) !important;
 }
-body ul.tabbernav > li.tabberactive a, body ul.tabbernav > li.tabberactive a:hover, #flexicontent ul.tabbernav > li.tabberactive a, #flexicontent ul.tabbernav > li.tabberactive a:hover, body ul.tabbernav > li:hover a, #flexicontent ul.tabbernav > li:hover a{
+#flexicontent ul.tabbernav > li.tabberactive a{
+	border-right: 1px solid var(--template-bg-dark-50) !important;
+}
+body ul.tabbernav > li.tabberactive a:hover, #flexicontent ul.tabbernav > li.tabberactive a:hover , body ul.tabbernav > li:hover a, #flexicontent ul.tabbernav > li:hover a{
 	background-color: var(--template-bg-dark-50) !important;
 	background: var(--template-bg-dark-50) !important;
 	color:#fff !important;
-	border: 1px solid var(--template-bg-dark-50) !important;
+	border-top: 1px solid var(--template-bg-dark-50) !important;
+	border-right: 1px solid var(--template-bg-dark-50) !important;
+	border-left:1px solid var(--template-bg-dark-50) !important;
 }
