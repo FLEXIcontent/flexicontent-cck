@@ -1092,3 +1092,9 @@ body ul.tabbernav > li:hover a,
 	border-right: 1px solid var(--template-bg-dark-50) !important;
 	border-left: 1px solid var(--template-bg-dark-50) !important;
 }
+body .tabbertab,
+#flexicontent .tabbertab {
+	padding: 30px 2vw;
+	border-radius: 0.25rem;
+	box-shadow: 0 2px 10px -8px var(--template-bg-dark-50);
+}
