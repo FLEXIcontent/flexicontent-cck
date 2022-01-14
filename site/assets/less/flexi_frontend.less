@@ -1554,4 +1554,13 @@ div.gf_container > div.navigation:not(.no_pagination) {
 .fcfilter_form_component .accordion-group {
     display: inline-block;
 }
+/********************************
+ * correction on leafflet map to kill gray display
+ ********************************/
+.leaflet-container {
+	z-index: 1;
+}
+.leaflet-container img {
+	max-height: initial !important;
+}
     
