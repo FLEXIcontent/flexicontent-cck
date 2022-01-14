@@ -448,3 +448,16 @@ label#use_advsearch_options_lbl {
 .fcfilter_form_module .fc_filter_line.fc_clear_label.fc_filter_buttons_box {
 	margin-top: 1rem;
 }
+.fcpagenav.btn-group {
+	border: 1px solid #ccc;
+	border-radius: 3px;
+	width: 100% !important;
+	margin: initial !important;
+	padding-top: 10px !important;
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+}
+#flexicontent .fcpagenav.btn-group .btn {
+	line-height: inherit;
+}
