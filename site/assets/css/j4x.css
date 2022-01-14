@@ -2,12 +2,15 @@
 .flexicontent .badge,
 .flexicontent span.label,
 .flexicontent label.label {
-	margin: 0px 2px 2px 4px;
+	margin: 0px 2px 2px 0px;
 	display: inline-block;
 }
 .label.highlight,
 .badge.highlight {
 	color: darkred;
+}
+#flexicontent .flexi .flexi.element {
+	margin: 0 !important;
 }
 #flexicontent .fc_markup.mu_has_text {
 	border-bottom: 0px solid #AAA;
