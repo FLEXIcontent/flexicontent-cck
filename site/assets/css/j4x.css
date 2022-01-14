@@ -10,7 +10,7 @@
 	color: darkred;
 }
 #flexicontent .flexi .flexi.element {
-	margin: 0 !important;
+	margin: 0.2em 2% 0.2em 0% !important;
 }
 #flexicontent .fc_markup.mu_has_text {
 	border-bottom: 0px solid #AAA;
