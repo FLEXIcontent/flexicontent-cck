@@ -12,6 +12,10 @@
 #flexicontent .flexi .flexi.element {
 	margin: 0.2em 2% 0.2em 0% !important;
 }
+.contentheading {
+	display: inherit;
+	margin: 0 0 0.5em 0px;
+}
 #flexicontent .fc_markup.mu_has_text {
 	border-bottom: 0px solid #AAA;
 	border-right: 0px solid #AAA;
