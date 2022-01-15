@@ -404,7 +404,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 
 		$show_seccats = (int) $params->get('show_seccats' . $CFGsfx, 2);
 
-		if ((!$canchange_seccat && $show_seccats > 0) || $show_seccats === 2)
+		if (!$canchange_seccat || $show_seccats === 0)
 		{
 			unset($data['cid']);
 
