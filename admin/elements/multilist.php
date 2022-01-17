@@ -226,7 +226,12 @@ class JFormFieldMultiList extends JFormFieldGroupedList
 
 		if ($subtype=='radio')
 		{
-			$_class = ' class ="'.$attribs['list.attr']['class'].'"';
+			$group_classes = $attribs['list.attr']['class'];
+
+			$isBtnGroup  = strpos(trim($group_classes), 'btn-group') !== false;
+			$isBtnYesNo  = strpos(trim($group_classes), 'btn-group-yesno') !== false;
+			
+			$_class = ' class="'.$group_classes.'"';
 			$_id = ' id="'.$element_id.'"';
 			$html = '';
 			foreach($this->_options as $i => $ops)
@@ -241,10 +246,31 @@ class JFormFieldMultiList extends JFormFieldGroupedList
 						if ($k=='class') { $label_class = $v; continue; }
 						$input_attribs .= ' ' .$k. '="' .$v. '"';
 					}
-					if (!$label_class && FLEXI_J40GE)
+					if (FLEXI_J40GE)
 					{
-						$label_class = "btn";
+						if (!$label_class)
+						{
+							$label_class = "btn";
+						}
 						$input_attribs .= ' class="btn-check" ';
+
+						// Initialize some option attributes.
+						if ($isBtnYesNo)
+						{
+							// Set the button classes for the yes/no group
+							switch ($option->value)
+							{
+								case '0':
+									$label_class .= ' btn-outline-danger';
+									break;
+								case '1':
+									$label_class .= ' btn-outline-success';
+									break;
+								default:
+									$label_class .= ' btn-outline-secondary';
+									break;
+							}
+						}
 					}
 					$html .= '
 						<input id="'.$element_id.$i.'" type="radio" value="'.$option->value.'" name="'.$fieldname.'" '. $input_attribs . $selected.'/>
@@ -253,7 +279,14 @@ class JFormFieldMultiList extends JFormFieldGroupedList
 						</label>';
 				}
 			}
-			$html = '
+			$html = FLEXI_J40GE ? '
+				<fieldset '.$_id.'>
+					<legend class="visually-hidden">Enable</legend>
+					<div '.$_class.'>
+					'.$html.'
+					</div>
+				</fieldset>
+				' : '
 				<fieldset '.$_class.$_id.'>
 				'.$html.'
 				</fieldset>

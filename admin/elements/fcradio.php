@@ -51,6 +51,16 @@ class JFormFieldFcradio extends JFormFieldRadio
 		return str_replace(' for="', ' data-for="', parent::getLabel());
 	}
 	
+	function getInput()
+	{
+		$class = $this->element['class'];
+		$isBtnGroup  = strpos(trim($class), 'btn-group') !== false;
+		$isBtnYesNo  = strpos(trim($class), 'btn-group-yesno') !== false;
+		return $isBtnGroup && !$isBtnYesNo
+			? str_replace('btn-outline-secondary', '', parent::getInput())
+			: parent::getInput();
+	}
+
 	/*function getInput()
 	{
 		// Valid HTML ... you can not have for LABEL attribute for fieldset
