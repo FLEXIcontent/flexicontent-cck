@@ -17,7 +17,7 @@
 
 			<field name="" type="separator" default="FLEXI_FIELD_IMAGE_SLIDESHOW_OPTIONS" level="level1" />
 
-			<field name="PPFX_slideshow_auto_play" type="multilist" subtype="radio" default="0" toggle_related="1" label="FLEXI_FIELD_IMAGE_AUTOPLAY" description="FLEXI_FIELD_IMAGE_AUTOPLAY_DESC" depend_class="" class="btn-group">
+			<field name="PPFX_slideshow_auto_play" type="multilist" subtype="radio" default="0" toggle_related="1" label="FLEXI_FIELD_IMAGE_AUTOPLAY" description="FLEXI_FIELD_IMAGE_AUTOPLAY_DESC" depend_class="" class="btn-group btn-group-yesno">
 				<option value="0" show_list="" hide_list="auto_play">FLEXI_NO</option>
 				<option value="1" show_list="auto_play" hide_list="">FLEXI_YES</option>
 			</field>
@@ -92,7 +92,7 @@
 
 			<field name="" type="separator" default="FLEXI_FIELD_IMAGE_CAROUSEL_OPTIONS" level="level1" />
 
-			<field name="PPFX_carousel_position" type="multilist" subtype="radio" default="2" toggle_related="1" label="FLEXI_FIELD_IMAGE_ADD_CAROUSEL" description="FLEXI_FIELD_IMAGE_ADD_CAROUSEL_DESC" class="btn-group" >
+			<field name="PPFX_carousel_position" type="multilist" subtype="radio" default="2" toggle_related="1" label="FLEXI_FIELD_IMAGE_ADD_CAROUSEL" description="FLEXI_FIELD_IMAGE_ADD_CAROUSEL_DESC" class="btn-group btn-group-yesno" >
 				<option value="0" show_list="" hide_list="carousel_ops">FLEXI_NO</option>
 				<option value="1" show_list="carousel_ops" hide_list="">FLEXI_FIELD_IMAGE_BELLOW_SLIDESHOW</option>
 				<option value="2" show_list="carousel_ops" hide_list="">FLEXI_FIELD_IMAGE_ABOVE_SLIDESHOW</option>

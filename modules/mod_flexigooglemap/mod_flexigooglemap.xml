@@ -40,7 +40,7 @@
 				tmpl_container="mod_tmpl_layout" params_source="file"
 				/> <!-- params_source="inline" -->
 
-			<field name="hide_map_when_empty" type="radio" default="1" label="Hide map when empty" description="" class="btn-group">
+			<field name="hide_map_when_empty" type="radio" default="1" label="Hide map when empty" description="" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
@@ -146,7 +146,7 @@
 				name="use_dynamic_marker_list" type="radio"
 				default="0" label="FLEXI_DISPLAY"
 				description="Show and dynamically update a list of markers, that currently visible according to current viewport of the map."
-				class="btn-group"
+				class="btn-group btn-group-yesno"
 				>
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -203,7 +203,7 @@
 				name="usescrollmouse" type="radio"
 				default="1" label="MOD_FLEXIGOOGLEMAP_USESCROLLMOUSE"
 				description="MOD_FLEXIGOOGLEMAP_USESCROLLMOUSE_DESC"
-				class="btn-group"
+				class="btn-group btn-group-yesno"
 				>
 				<option value="false">MOD_FLEXIGOOGLEMAP_NO</option>
 				<option value="true">MOD_FLEXIGOOGLEMAP_YES</option>
@@ -212,7 +212,7 @@
 				name="animationmarker" type="radio"
 				default="1" label="MOD_FLEXIGOOGLEMAP_ANIMATIONMARKER"
 				description="MOD_FLEXIGOOGLEMAP_ANIMATIONMARKER_DESC"
-				class="btn-group" showon="mapapi:googlemap"
+				class="btn-group btn-group-yesno" showon="mapapi:googlemap"
 				>
 				<option value="0">MOD_FLEXIGOOGLEMAP_NO</option>
 				<option value="1">MOD_FLEXIGOOGLEMAP_YES</option>
@@ -227,7 +227,7 @@
 				name="clustermode" type="radio"
 				default="1" label="MOD_FLEXIGOOGLEMAP_CLUSTERMODE"
 				description="MOD_FLEXIGOOGLEMAP_CLUSTERMODE_DESC"
-				class="btn-group"
+				class="btn-group btn-group-yesno"
 				>
 				<option value="0">MOD_FLEXIGOOGLEMAP_NO</option>
 				<option value="1">MOD_FLEXIGOOGLEMAP_YES</option>
@@ -253,7 +253,7 @@
 				name="info_popup" type="radio"
 				default="1" label="MOD_FLEXIGOOGLEMAP_DISPLAY_INFOWINDOW"
 				description="MOD_FLEXIGOOGLEMAP_DISPLAY_INFOWINDOW_DESC"
-				class="btn-group"
+				class="btn-group btn-group-yesno"
 				>
 				<option value="0">MOD_FLEXIGOOGLEMAP_NO</option>
 				<option value="1">MOD_FLEXIGOOGLEMAP_YES</option>
@@ -262,7 +262,7 @@
 				name="uselink" type="radio"
 				default="1" label="MOD_FLEXIGOOGLEMAP_USELINK"
 				description="MOD_FLEXIGOOGLEMAP_USELINK_DESC"
-				class="btn-group"
+				class="btn-group btn-group-yesno"
 				>
 				<option value="0">MOD_FLEXIGOOGLEMAP_NO</option>
 				<option value="1">MOD_FLEXIGOOGLEMAP_YES</option>
@@ -272,7 +272,7 @@
 				name="linkmode" type="radio"
 				default="" label="MOD_FLEXIGOOGLEMAP_LINKMODE"
 				description="MOD_FLEXIGOOGLEMAP_LINKMODE_DESC"
-				class="btn-group" showon="uselink:1"
+				class="btn-group btn-group-yesno" showon="uselink:1"
 				>
 				<option value="_blank">MOD_FLEXIGOOGLEMAP_BLANK</option>
 				<option value="">MOD_FLEXIGOOGLEMAP_SAME</option>
@@ -289,7 +289,7 @@
 				name="infotextmode" type="radio"
 				default="0" label="MOD_FLEXIGOOGLEMAP_INFOTEXTMODE"
 				description="MOD_FLEXIGOOGLEMAP_INFOTEXTMODE_DESC"
-				class="btn-group"
+				class="btn-group btn-group-yesno"
 				>
 				<option value="0">MOD_FLEXIGOOGLEMAP_INFOTEXTMODE_SIMPLE</option>
 				<option value="1">MOD_FLEXIGOOGLEMAP_INFOTEXTMODE_FULL</option>
@@ -299,7 +299,7 @@
 				name="useadress" type="radio"
 				default="1" label="MOD_FLEXIGOOGLEMAP_USEADDRESS"
 				description="MOD_FLEXIGOOGLEMAP_USEADDRESS_DESC"
-				class="btn-group" showon="infotextmode:0"
+				class="btn-group btn-group-yesno" showon="infotextmode:0"
 				>
 				<option value="0">MOD_FLEXIGOOGLEMAP_NO</option>
 				<option value="1">MOD_FLEXIGOOGLEMAP_YES</option>
@@ -311,7 +311,7 @@
 				name="usedirection" type="radio"
 				default="1" label="MOD_FLEXIGOOGLEMAP_USEDIRECTION"
 				description="MOD_FLEXIGOOGLEMAP_USEDIRECTION_DESC"
-				class="btn-group"
+				class="btn-group btn-group-yesno"
 				>
 				<option value="0">MOD_FLEXIGOOGLEMAP_NO</option>
 				<option value="1">MOD_FLEXIGOOGLEMAP_YES</option>

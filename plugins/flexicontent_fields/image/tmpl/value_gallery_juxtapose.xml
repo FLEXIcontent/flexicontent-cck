@@ -17,30 +17,30 @@
 
 		<field name="" type="separator" default="FLEXI_DISPLAY" level="level2" />
 
-			<field name="PPFX_compare_mode" type="radio" default="horizontal" label="Slider direction" description="FLEXI_FIELD_IMAGE_DISP_INFOBAR_DESC" class="btn-group">
+			<field name="PPFX_compare_mode" type="radio" default="horizontal" label="Slider direction" description="FLEXI_FIELD_IMAGE_DISP_INFOBAR_DESC" class="btn-group btn-group-yesno">
 				<option value="horizontal">Horizontal</option>
 				<option value="vertical">Vertical</option>
 			</field>
 
 			<field name="PPFX_slider_position" type="number" default="50" label="Starting Slider position " description="FLEXI_FIELD_IMAGE_OPENCLOSE_DURATION_DESC" />
 
-			<field name="PPFX_display_label" type="radio" default="true" label="Display_label" description="FLEXI_FIELD_IMAGE_FIELD_IMAGE_DISP_TOOLBAR_DESC" class="btn-group">
+			<field name="PPFX_display_label" type="radio" default="true" label="Display_label" description="FLEXI_FIELD_IMAGE_FIELD_IMAGE_DISP_TOOLBAR_DESC" class="btn-group btn-group-yesno">
 				<option value="false">FLEXI_NO</option>
 				<option value="true">FLEXI_YES</option>
 			</field>
 
 
-			<field name="PPFX_diplay_credit" type="radio" default="true" label="display crédit" description="FLEXI_FIELD_IMAGE_DISP_THUMBS_DESC" class="btn-group">
+			<field name="PPFX_diplay_credit" type="radio" default="true" label="display crédit" description="FLEXI_FIELD_IMAGE_DISP_THUMBS_DESC" class="btn-group btn-group-yesno">
 				<option value="false">FLEXI_NO</option>
 				<option value="true">FLEXI_YES</option>
 			</field>
 
-			<field name="PPFX_use_animation" type="radio" default="true" label="Use animation" description="FLEXI_FIELD_IMAGE_DISP_THUMBS_DESC" class="btn-group">
+			<field name="PPFX_use_animation" type="radio" default="true" label="Use animation" description="FLEXI_FIELD_IMAGE_DISP_THUMBS_DESC" class="btn-group btn-group-yesno">
 				<option value="false">FLEXI_NO</option>
 				<option value="true">FLEXI_YES</option>
 			</field>
 
-			<field name="PPFX_make_responsive" type="radio" default="true" label="Make responsive" description="FLEXI_FIELD_IMAGE_DISP_THUMBS_DESC" class="btn-group">
+			<field name="PPFX_make_responsive" type="radio" default="true" label="Make responsive" description="FLEXI_FIELD_IMAGE_DISP_THUMBS_DESC" class="btn-group btn-group-yesno">
 				<option value="false">FLEXI_NO</option>
 				<option value="true">FLEXI_YES</option>
 			</field>

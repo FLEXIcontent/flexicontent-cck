@@ -86,7 +86,7 @@
 			<field name="" type="separator" default="FLEXI_FIELD_MEDIADATA_CREATE_PREVIEW_FILES" description="" level="level1" class=""/>
 
 			<field name="mm_ffprobe_path" type="text" default="/usr/bin/ffprobe" label="FLEXI_FIELD_MEDIADATA_PATH_FFMPEG_TO_BINARY" description="FLEXI_FIELD_MEDIADATA_PATH_FFMPEG_TO_BINARY_DESC" />
-			<field name="mm_create_preview" type="multilist" subtype="radio" toggle_related="1" default="1" label="Create a preview file" description="" class="btn-group">
+			<field name="mm_create_preview" type="multilist" subtype="radio" toggle_related="1" default="1" label="Create a preview file" description="" class="btn-group btn-group-yesno">
 				<option value="0" show_list="" hide_list="audio-preview">FLEXI_NO</option>
 				<option value="1" show_list="audio-preview" hide_list="">FLEXI_YES</option>
 			</field>

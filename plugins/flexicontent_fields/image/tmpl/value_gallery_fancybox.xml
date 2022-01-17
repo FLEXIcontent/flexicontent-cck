@@ -17,17 +17,17 @@
 
 		<field name="" type="separator" default="FLEXI_DISPLAY" level="level2" />
 
-			<field name="PPFX_diplay_infobar" type="radio" default="true" label="FLEXI_FIELD_IMAGE_DISP_INFOBAR" description="FLEXI_FIELD_IMAGE_DISP_INFOBAR_DESC" class="btn-group">
+			<field name="PPFX_diplay_infobar" type="radio" default="true" label="FLEXI_FIELD_IMAGE_DISP_INFOBAR" description="FLEXI_FIELD_IMAGE_DISP_INFOBAR_DESC" class="btn-group btn-group-yesno">
 				<option value="false">FLEXI_NO</option>
 				<option value="true">FLEXI_YES</option>
 			</field>
-			<field name="PPFX_diplay_toolbar" type="radio" default="auto" label="FLEXI_FIELD_IMAGE_DISP_TOOLBAR" description="FLEXI_FIELD_IMAGE_FIELD_IMAGE_DISP_TOOLBAR_DESC" class="btn-group">
+			<field name="PPFX_diplay_toolbar" type="radio" default="auto" label="FLEXI_FIELD_IMAGE_DISP_TOOLBAR" description="FLEXI_FIELD_IMAGE_FIELD_IMAGE_DISP_TOOLBAR_DESC" class="btn-group btn-group-yesno">
 				<option value="false">FLEXI_NO</option>
 				<option value="true">FLEXI_YES</option>
 				<option value="auto">Auto</option>
 			</field>
 
-			<field name="PPFX_buttons_shown" type="checkboxes" default="" label="FLEXI_FIELD_IMAGE_DISP_BUTTONS" description="FLEXI_FIELD_IMAGE_DISP_BUTTONS" class="btn-group">
+			<field name="PPFX_buttons_shown" type="checkboxes" default="" label="FLEXI_FIELD_IMAGE_DISP_BUTTONS" description="FLEXI_FIELD_IMAGE_DISP_BUTTONS" class="btn-group btn-group-yesno">
 				<option value="zoom">FLEXI_FIELD_IMAGE_BTN_ZOOM</option>
 				<option value="share">FLEXI_FIELD_IMAGE_BTN_SHARE</option>
 				<option value="slideShow">FLEXI_FIELD_IMAGE_BTN_SLIDESHOW</option>
@@ -37,7 +37,7 @@
 				<option value="close">FLEXI_FIELD_IMAGE_BTN_CLOSE</option>
 			</field>
 
-			<field name="PPFX_diplay_thumbs_autostart" type="radio" default="false" label="FLEXI_FIELD_IMAGE_DISP_THUMBS" description="FLEXI_FIELD_IMAGE_DISP_THUMBS_DESC" class="btn-group">
+			<field name="PPFX_diplay_thumbs_autostart" type="radio" default="false" label="FLEXI_FIELD_IMAGE_DISP_THUMBS" description="FLEXI_FIELD_IMAGE_DISP_THUMBS_DESC" class="btn-group btn-group-yesno">
 				<option value="false">FLEXI_NO</option>
 				<option value="true">FLEXI_YES</option>
 			</field>
@@ -65,23 +65,23 @@
 		
 		<field name="" type="separator" default="FLEXI_FIELD_IMAGE_BEHAVIORS" level="level2" />
 
-			<field name="PPFX_loop_mode" type="radio" default="false" label="FLEXI_FIELD_IMAGE_LOOP" description="FLEXI_FIELD_IMAGE_LOOP_DESC" class="btn-group">
+			<field name="PPFX_loop_mode" type="radio" default="false" label="FLEXI_FIELD_IMAGE_LOOP" description="FLEXI_FIELD_IMAGE_LOOP_DESC" class="btn-group btn-group-yesno">
 				<option value="false">FLEXI_NO</option>
 				<option value="true">FLEXI_YES</option>
 			</field>
-			<field name="PPFX_keyboard_mode" type="radio" default="true" label="FLEXI_FIELD_IMAGE_KEYBOARD_NAV" description="FLEXI_FIELD_IMAGE_KEYBOARD_NAV_DESC" class="btn-group">
+			<field name="PPFX_keyboard_mode" type="radio" default="true" label="FLEXI_FIELD_IMAGE_KEYBOARD_NAV" description="FLEXI_FIELD_IMAGE_KEYBOARD_NAV_DESC" class="btn-group btn-group-yesno">
 				<option value="false">FLEXI_NO</option>
 				<option value="true">FLEXI_YES</option>
 			</field>
 
-			<field name="PPFX_protect_image" type="radio" default="true" label="FLEXI_FIELD_IMAGE_PROTECT_IMG" description="FLEXI_FIELD_IMAGE_PROTECT_IMG_DESC" class="btn-group">
+			<field name="PPFX_protect_image" type="radio" default="true" label="FLEXI_FIELD_IMAGE_PROTECT_IMG" description="FLEXI_FIELD_IMAGE_PROTECT_IMG_DESC" class="btn-group btn-group-yesno">
 				<option value="false">FLEXI_NO</option>
 				<option value="true">FLEXI_YES</option>
 			</field>
 
 		<field name="" type="separator" default="FLEXI_FIELD_IMAGE_SLIDESHOW_OPTIONS" level="level2" />
 
-			<field name="PPFX_slideshow_autostart" type="radio" default="false" label="FLEXI_FIELD_IMAGE_AUTOPLAY" description="_FIELD_IMAGEFLEXI_AUTOSTART_SLIDESHOW_DESC" class="btn-group">
+			<field name="PPFX_slideshow_autostart" type="radio" default="false" label="FLEXI_FIELD_IMAGE_AUTOPLAY" description="_FIELD_IMAGEFLEXI_AUTOSTART_SLIDESHOW_DESC" class="btn-group btn-group-yesno">
 				<option value="false">FLEXI_NO</option>
 				<option value="true">FLEXI_YES</option>
 			</field>

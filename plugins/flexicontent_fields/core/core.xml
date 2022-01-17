@@ -1198,7 +1198,7 @@
 			</field>
 
 			<field name="" type="separator" default="New reviews" level="level2" />
-			<field name="allow_submit_review_by" type="radio" default="0" label="Allow submissions" description="Allow reviews to be submitted by guests" class="btn-group">
+			<field name="allow_submit_review_by" type="radio" default="0" label="Allow submissions" description="Allow reviews to be submitted by guests" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_DISABLED</option>
 				<option value="1">Anyone</option>
 				<option value="1">Logged Only</option>
@@ -1207,13 +1207,13 @@
 			<field name="review_submit_access" type="accesslevel" default="1" label="Submit Access Level" description="..." />
 
 			<field name="" type="separator" default="Publishing" description="" level="level2" />
-			<field name="do_approval" type="radio" default="1" label="Publish after approval" description="Require an administrator to read and approve new reviews" class="btn-group">
+			<field name="do_approval" type="radio" default="1" label="Publish after approval" description="Require an administrator to read and approve new reviews" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
 
 			<field name="" type="separator" default="Guests" description="" level="level3" />
-			<field name="verify_email_ownership" type="radio" default="1" label="Verify email ownerships" disabled="disabled" description="For every new review by a guest, an email will be sent to the guest user email to verify email ownership" class="btn-group">
+			<field name="verify_email_ownership" type="radio" default="1" label="Verify email ownerships" disabled="disabled" description="For every new review by a guest, an email will be sent to the guest user email to verify email ownership" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">Yes ... TODO</option>
 			</field>

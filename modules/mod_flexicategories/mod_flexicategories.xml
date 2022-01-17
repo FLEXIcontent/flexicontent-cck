@@ -84,7 +84,7 @@
 			<field
 				name="show_description"
 				type="radio"
-				class="btn-group"
+				class="btn-group btn-group-yesno"
 				default="0"
 				label="MOD_FLEXICATEGORIES_FIELD_SHOW_DESCRIPTION_LABEL"
 				description="MOD_FLEXICATEGORIES_FIELD_SHOW_DESCRIPTION_DESC">
@@ -95,7 +95,7 @@
 			<field
 				name="numitems"
 				type="radio"
-				class="btn-group"
+				class="btn-group btn-group-yesno"
 				default="0"
 				label="MOD_FLEXICATEGORIES_FIELD_NUMITEMS_LABEL"
 				description="MOD_FLEXICATEGORIES_FIELD_NUMITEMS_DESC">
@@ -108,7 +108,7 @@
 			<field
 				name="show_children"
 				type="radio"
-				class="btn-group"
+				class="btn-group btn-group-yesno"
 				default="0"
 				label="MOD_FLEXICATEGORIES_FIELD_SHOW_CHILDREN_LABEL"
 				description="MOD_FLEXICATEGORIES_FIELD_SHOW_CHILDREN_DESC">
@@ -137,7 +137,7 @@
 			</field>
 
 			<field name="" type="separator" default="FLEXI_IMAGE" description="..." level="level3" />
-			<field name="show_description_image" type="multilist" subtype="radio" default="0" label="MOD_FLEXICATEGORIES_SHOW_IMAGE" description="MOD_FLEXICATEGORIES_SHOW_IMAGE_DESC" toggle_related="1" class="btn-group">
+			<field name="show_description_image" type="multilist" subtype="radio" default="0" label="MOD_FLEXICATEGORIES_SHOW_IMAGE" description="MOD_FLEXICATEGORIES_SHOW_IMAGE_DESC" toggle_related="1" class="btn-group btn-group-yesno">
 				<option value="0" show_list="" hide_list="disp_cat_img">JNO</option>
 				<option value="1" show_list="disp_cat_img" hide_list="">JYES</option>
 			</field>
