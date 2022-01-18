@@ -13,6 +13,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
+use Joomla\CMS\Plugin\PluginHelper;
 
 // Include constants file
 require_once (JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'defineconstants.php');
@@ -1170,7 +1171,10 @@ class FlexicontentFields
 		/**
 		 * Trigger content plugins on field's HTML display, as if they were a "joomla article"
 		 */
-		$results = $fcdispatcher->trigger('onContentPrepare', array ($context, &$record, &$item->parameters, $limitstart), $plg_arr);
+		if (FLEXI_J40GE) PluginHelper::importPlugin('content');
+		$results = FLEXI_J40GE
+			? JFactory::getApplication()->triggerEvent('onContentPrepare', array($context, &$record, &$item->parameters, $limitstart))
+			: $fcdispatcher->trigger('onContentPrepare', array ($context, &$record, &$item->parameters, $limitstart), $plg_arr);
 
 		// Get pluing triggering result
 		$field->{$method} = $record->text;
