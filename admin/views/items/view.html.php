@@ -440,7 +440,7 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 		// Build id filter
 		$lists['filter_id'] = $this->getFilterDisplay(array(
 			'label' => JText::_('FLEXI_ID'),
-			'html' => '<input type="text" name="filter_id" id="filter_id" size="6" value="' . $filter_id . '" class="inputbox" style="width:auto;" />',
+			'html' => '<input type="text" name="filter_id" id="filter_id" size="6" value="' . $filter_id . '" class="fcfield_textval" style="width:auto;" />',
 		));
 
 
@@ -606,7 +606,7 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 
 		$lists['filter_date'] = $this->getFilterDisplay(array(
 			'label' => null, //JText::_('FLEXI_DATE'),
-			'html' => JHtml::_('select.genericlist',
+			'html' => trim(JHtml::_('select.genericlist',
 				$options,
 				$fieldname,
 				array(
@@ -621,9 +621,9 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 				$value,
 				$elementid,
 				$translate = true
-			)
-			. JHtml::_('calendar', $startdate, 'startdate', 'startdate', '%Y-%m-%d', array('class'=>'', 'size'=>'8',  'maxlength'=>'19', 'style'=>'width:auto', 'placeholder'=>JText::_('FLEXI_FROM')))
-			. JHtml::_('calendar', $enddate, 'enddate', 'enddate', '%Y-%m-%d', array('class'=>'', 'size'=>'8',  'maxlength'=>'19', 'style'=>'width:auto', 'placeholder'=>JText::_('FLEXI_TO')))
+			))
+			. trim(JHtml::_('calendar', $startdate, 'startdate', 'startdate', '%Y-%m-%d', array('class'=>'', 'size'=>'8',  'maxlength'=>'19', 'style'=>'width:auto', 'placeholder'=>JText::_('FLEXI_FROM'))))
+			. trim(JHtml::_('calendar', $enddate, 'enddate', 'enddate', '%Y-%m-%d', array('class'=>'', 'size'=>'8',  'maxlength'=>'19', 'style'=>'width:auto', 'placeholder'=>JText::_('FLEXI_TO'))))
 		));
 
 

@@ -2363,10 +2363,13 @@ span.add-on.pop-helper.field-media-preview {
 .input-group > .input-group-append:last-child > .input-group-text:not(:last-child),
 .input-group > .input-group-append:not(:last-child) > .btn,
 .input-group > .input-group-append:not(:last-child) > .input-group-text,
-.input-group > .input-group-prepend > .btn,
-.input-group > .input-group-prepend > .input-group-text {
+.input-group > .input-group-prepend > .btn {
 	border-top-right-radius: 0;
 	border-bottom-right-radius: 0;
+}
+.input-group > .input-group-prepend > .input-group-text {
+	border-top-left-radius: 0;
+	border-bottom-left-radius: 0;
 }
 body #config {
 	margin-bottom: 230px;

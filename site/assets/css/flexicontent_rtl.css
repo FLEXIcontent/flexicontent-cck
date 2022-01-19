@@ -996,10 +996,9 @@ td.col_edit_layout {
 }
 .flexicontent #fc-filters-box .fc-filter #startdate_btn,
 .flexicontent #fc-filters-box .fc-filter #enddate_btn {
-	font-size: 14px !important;
-	height: 36px !important;
-	padding: 10px 4px !important;
+	padding: 0px 4px !important;
 	box-sizing: border-box;
+	vertical-align: top;
 }
 .flexicontent #fc-filters-box .fc-filter #startdate_btn {
 	border-radius: 0;
@@ -1009,7 +1008,9 @@ td.col_edit_layout {
 	font-size: 11px !important;
 	min-width: 99px;
 	max-width: 99px;
-	height: 16px !important;
+	line-height: 2.7rem !important;
+	height: 2.7rem !important;
+	vertical-align: baseline;
 	padding: 17px 8px !important;
 	box-sizing: border-box;
 	border-radius: 0;
@@ -1039,7 +1040,7 @@ td.col_edit_layout {
 .flexicontent #fc-filters-box .fc-filter > * {
 	vertical-align: middle !important;
 	float: right;
-	margin: 4px !important;
+	margin: 2px 4px !important;
 }
 .flexicontent #fc-filters-box .fc-filter > *:not(.fc-xpended):not(.fc-xpended-row) {
 	margin: 0 6px 0 2px !important;
@@ -1064,8 +1065,11 @@ td.col_edit_layout {
 }
 .flexicontent #fc-filters-box .fc-filter .input-group-prepend > .input-group-text + input,
 .flexicontent #fc-filters-box .fc-filter .input-prepend > .add-on + input {
-	width: 192px !important;
-	border-radius: 4px;
+	width: 212px !important;
+	padding: 0 8px;
+	border-radius: 0 4px 4px 0;
+	box-sizing: border-box;
+	min-width: unset;
 }
 .flexicontent #fc-filters-box .fc-filter .input-prepend > input,
 .flexicontent #fc-filters-box .fc-filter .input-append > input {
@@ -1078,6 +1082,8 @@ td.col_edit_layout {
 	width: 206px !important;
 }
 .flexicontent #fc-filters-box .fc-filter .select2-container-multi .select2-choices {
+	min-height: 2.7rem !important;
+	box-sizing: border-box;
 	margin: 0 !important;
 }
 .flexicontent #fc-filters-box .fc-filter .select2-container-multi .select2-choices .select2-search-field {
@@ -1155,6 +1161,7 @@ div#fc-filters-slide-btn {
 }
 #fc-filters-box input[type="text"] {
 	padding: 8px 6px !important;
+	min-width: unset;
 }
 .fc_elements_listed_small {
 	font-weight: bold;
@@ -4484,10 +4491,13 @@ span.add-on.pop-helper.field-media-preview {
 .input-group > .input-group-append:last-child > .input-group-text:not(:last-child),
 .input-group > .input-group-append:not(:last-child) > .btn,
 .input-group > .input-group-append:not(:last-child) > .input-group-text,
-.input-group > .input-group-prepend > .btn,
-.input-group > .input-group-prepend > .input-group-text {
+.input-group > .input-group-prepend > .btn {
 	border-top-right-radius: 0;
 	border-bottom-right-radius: 0;
+}
+.input-group > .input-group-prepend > .input-group-text {
+	border-top-left-radius: 0;
+	border-bottom-left-radius: 0;
 }
 body #config {
 	margin-bottom: 230px;
