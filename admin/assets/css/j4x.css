@@ -833,7 +833,7 @@ div#type_tab_all {
 	background: transparent;
 }
 .flexicontent #fc-managers-header #search {
-	border: 1px solid #b8c9e0;
+	border: 1px solid var(--template-bg-dark-20);
 	height: 2.7rem;
 	line-height: 2.7rem;
 }
@@ -846,7 +846,7 @@ label#custom_agent_item_selector-lbl {
 	height: 2.64rem !important;
 }
 .select2-container-multi .select2-choices {
-	border: 1px solid #b8c9e0 !important;
+	border: 1px solid var(--template-bg-dark-20) !important;
 }
 div#fc_filters_box_btn {
 	max-height: 2.7rem;
@@ -966,18 +966,29 @@ body .form-grid .control-group .controls > div {
 	height: 2.74rem;
 }
 #fc-filters-box .fc-xpended-row .input-group-text {
-	background: #94aed1 !important;
+	background: var(--template-bg-dark-60) !important;
 }
 #flexicontent #fc-filters-box .fc-filter .select2-container-multi,
 #flexicontent #fc-filters-box .select2-container,
 .select2-container {
 	margin-top: -5px;
 }
-.input-group-text.fc-lbl-inverted.fc-lbl-short.icon-info-2.hasPopover {
+.input-group-text.fc-lbl-inverted.fc-lbl-short.icon-info-2.hasPopover,
+.fc-filter.nowrap_box .input-group-text.fc-lbl-inverted.fc-lbl-short {
 	background: var(--template-bg-dark-60) !important;
+	font-family: inherit !important;
+}
+div#s2id_filter_fieldtype {
+	margin-top: -2px !important;
+	height: 2.72em !important;
 }
 div#s2id_filter_type {
-	margin-top: -5px !important;
+	margin-top: -4px !important;
+	height: 2.72em !important;
+}
+div#s2id_filter_type a.select2-choice.fc_highlight,
+div#s2id_filter_fieldtype a.select2-choice.fc_highlight {
+	line-height: 2.65rem !important;
 }
 .adminlist thead {
 	background-color: var(--table-bg);
