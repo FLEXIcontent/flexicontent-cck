@@ -223,10 +223,10 @@ class FlexicontentModelFields extends FCModelAdminList
 		switch ($filter_fieldtype)
 		{
 			case 'C':
-				$where[] = 'a.iscore = 1';
+				$where[] = '(a.iscore = 1 OR a.field_type = \'coreprops\')';
 				break;
 			case 'NC':
-				$where[] = 'a.iscore = 0';
+				$where[] = '(a.iscore = 0 AND a.field_type <> \'coreprops\')';
 				break;
 			case 'BV':
 				$where[] = '(a.iscore = 0 OR a.id = 1)';

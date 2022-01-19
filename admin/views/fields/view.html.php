@@ -93,7 +93,7 @@ class FlexicontentViewFields extends FlexicontentViewBaseRecords
 			? ($filter_order === 'a.ordering')
 			: ($filter_order === 'typeordering');
 
-		if ($filter_fieldtype) $count_filters++;
+		//if ($filter_fieldtype) $count_filters++;
 		if ($filter_assigned) $count_filters++;
 		if ($filter_type && !$reOrderingActive) $count_filters++;
 		if (strlen($filter_state)) $count_filters++;
@@ -397,7 +397,7 @@ class FlexicontentViewFields extends FlexicontentViewBaseRecords
 		$options = array();
 		$options[] = array('value' => '', 'text' => '-'/*JText::_( 'FLEXI_ALL_FIELDS_TYPE' )*/ );
 		$options[] = array('value' => 'BV', 'text' => $ALL . JText::_( 'FLEXI_BACKEND_FIELDS' ) );
-		$options[] = array('value' => 'C',  'text' => $ALL . JText::_( 'FLEXI_CORE_FIELDS' ) );
+		$options[] = array('value' => 'C',  'text' => $ALL . JText::_( 'FLEXI_CORE_COREPROPS_FIELDS' ) );
 		$options[] = array('value' => 'NC', 'text' => $ALL . JText::_( 'FLEXI_CUSTOM_NON_CORE_FIELDS' ));
 		$n = 0;
 
@@ -418,6 +418,7 @@ class FlexicontentViewFields extends FlexicontentViewBaseRecords
 		// Build item type filter
 		$lists['filter_fieldtype'] = $this->getFilterDisplay(array(
 			'label' => JText::_('FLEXI_FIELD_TYPE'),
+			'label_extra_class' => ($reOrderingActive ? 'fc-lbl-inverted fc-lbl-short ' : ''),
 			'html' => flexicontent_html::buildfieldtypeslist(
 				$options,
 				'filter_fieldtype',

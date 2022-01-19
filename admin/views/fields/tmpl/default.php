@@ -284,9 +284,9 @@ if ($js)
 					if (!$this->reOrderingActive)
 					{
 						echo $this->lists['filter_type'];
+						echo $this->lists['filter_fieldtype'];
 					}
 					echo $this->lists['filter_assigned'];
-					echo $this->lists['filter_fieldtype'];
 					echo $this->lists['filter_state'];
 					echo $this->lists['filter_access'];
 					?>
@@ -373,11 +373,15 @@ if ($js)
 
 		<div class="clear"></div>
 
-		<div id="fcorder_notes_box" class="hidden-phone <?php echo $msg_class; ?>" style="<?php echo $msg_style; ?> line-height: 28px; max-width: unset;">
+		<div id="fcorder_notes_box" class="hidden-phone <?php echo $msg_class; ?>" style="<?php echo $msg_style; ?> line-height: 28px; max-width: unset; display: inline-block; margin: 0 32px 0 0;">
 			<?php echo $order_msg;?>
 			<div id="order_type_selector" class="fc-iblock">
 				<?php echo $this->lists['filter_type']; ?>
 			</div>
+		</div>
+
+		<div id="fc_fieldtype_filter_box" class="<?php echo $msg_class; ?>" style="<?php echo $msg_style; ?> line-height: 28px; max-width: unset; display: inline-block;">
+			<?php echo $this->lists['filter_fieldtype']; ?>
 		</div>
 
 		<div class="fcclear"></div>
