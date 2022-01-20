@@ -140,12 +140,13 @@
 			</field>
 
 			<field name="" type="separator" default="Responsive or Fixed" level="level2" />
-			<field name="carousel_responsive" type="radio" default="1" label="Sizing method" description="Select to set number of items or fixed size, width (horizontal mode) OR height (vertical mode)" class="btn-group group-fcinfo">
-				<option value="0">fixed size (px)</option>
-				<option value="1"># items (responsive)</option>
+			<field name="carousel_responsive" type="multilist" subtype="radio" default="1" toggle_related="1" label="Sizing method" description="Select to set number of items or fixed size, width (horizontal mode) OR height (vertical mode)" class="btn-group group-fcinfo">
+				<option value="1" show_list="carousel_responsive">Responsive (Minimum size)</option>
+				<option value="0" hide_list="carousel_responsive">Fixed (Exact size)</option>
 			</field>
-			<field name="carousel_item_size_px" type="text" default="250" label="Fixed size (px)" description="Item width (horizontal) or height (vertical) size in pixels" />
-			<field name="carousel_items_per_page" type="text" default="2" label="# items" description="Number of items that will be displayed, use 1 for 'slideshow' effect" />
+			<field name="carousel_item_size_px" type="text" default="250" label="Minimum / Exact size (px)" description="Item width (horizontal) or height (vertical) size in pixels" />
+			<field name="carousel_items_per_page" type="text" default="2" label="Max # items" description="Maximum number of items that will be displayed, use 1 for 'slideshow' effect"
+			depend_class="carousel_responsive" />
 
 			<field name="" type="separator" default="Navigation" level="level1" />
 			<field name="carousel_hl_items_onnav" type="radio" default="0" label="Highlight items" description="Highlight currently 'active' and 'hovered' items by adding CSS classes" class="btn-group btn-group-yesno">
