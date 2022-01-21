@@ -1176,7 +1176,10 @@ class FlexicontentController extends JControllerLegacy
 				'coupon_id' => $coupon_id,  // int or null
 				'coupon_token' => $coupon_token // string or null
 			);
-			$result = JEventDispatcher::getInstance()->trigger('onFieldValueAction_FC', array(&$field, &$item, $value_order, &$config));
+
+			$result = FLEXI_J40GE
+				? $app->triggerEvent('onFieldValueAction_FC', array(&$field, &$item, $value_order, &$config))
+				: JEventDispatcher::getInstance()->trigger('onFieldValueAction_FC', array(&$field, &$item, $value_order, &$config));
 
 			// Abort on pluging event code returning value -- false --
 			if ($result === false)
@@ -1845,7 +1848,10 @@ class FlexicontentController extends JControllerLegacy
 		$config = array(
 			'task' => 'default'
 		);
-		$result = JEventDispatcher::getInstance()->trigger('onFieldValueAction_FC', array(&$field, &$item, $value_order, &$config));
+
+		$result = FLEXI_J40GE
+			? $app->triggerEvent('onFieldValueAction_FC', array(&$field, &$item, $value_order, &$config))
+			: JEventDispatcher::getInstance()->trigger('onFieldValueAction_FC', array(&$field, &$item, $value_order, &$config));
 
 		// Abort on pluging event code returning value -- false --
 		if ($result === false)
