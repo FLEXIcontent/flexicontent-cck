@@ -3516,10 +3516,9 @@ class ParentClassItem extends FCModelAdmin
 		// *** Assign default workflow to new items
 		// ***
 
-		if ($isNew)
+		if (FLEXI_J40GE && $isNew)
 		{
 		  flexicontent_db::assign_default_WF($item->id, $item);
-			$app->enqueueMessage('Assigned item to Default Workflow', 'notice');
 		}
 
 

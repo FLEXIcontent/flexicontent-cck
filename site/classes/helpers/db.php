@@ -106,6 +106,8 @@ class flexicontent_db
 				$db->insertObject('#__workflow_associations', $obj);
 			}
 		}
+
+		if (JDEBUG) JFactory::getApplication()->enqueueMessage('Assigned item to Default Workflow', 'notice');
 	}
 
 
