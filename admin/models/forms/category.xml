@@ -755,7 +755,7 @@
 			
 			<field name="" type="separator" default="FLEXI_LIMIT_SUPPRESS_ITEMS_LIST_TILL_SUBMIT" description="" level="level2" />
 			<field name="" type="separator" default="FLEXI_LIMIT_SUPPRESS_ITEMS_LIST_TILL_SUBMIT_BEFORE" level="level3" class="alert alert-info fcpadded" />
-			<field name="use_limit_before_search_filt" type="fcradio" subtype="radio" default="" toggle_related="0" label="FLEXI_ENABLE" description="..." class="btn-group btn-group-yesno">
+			<field name="use_limit_before_search_filt" type="fcradio" default="" toggle_related="0" label="FLEXI_ENABLE" description="..." class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0" show_list="" hide_list="limit_before_search_filt">FLEXI_NO</option>
 				<option value="1" show_list="limit_before_search_filt" hide_list="">FLEXI_YES</option>
@@ -1013,7 +1013,7 @@
 		<fieldset name="notifications_conf" label="FLEXI_EMAIL_NOTIFICATIONS_CONF"  addfieldpath="/administrator/components/com_flexicontent/elements" >
 			
 
-			<field name="enable_notifications" type="multilist" subtype="radio" default="" label="FLEXI_ENABLE_SUBMIT_UPDATE_NOTIFICATIONS" toggle_related="0" description="FLEXI_ENABLE_SUBMIT_UPDATE_NOTIFICATIONS_DESC" class="btn-group btn-group-yesno">
+			<field name="enable_notifications" type="fcradio" default="" label="FLEXI_ENABLE_SUBMIT_UPDATE_NOTIFICATIONS" toggle_related="0" description="FLEXI_ENABLE_SUBMIT_UPDATE_NOTIFICATIONS_DESC" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0" show_list="" hide_list="disp_notifications">FLEXI_NO</option>
 				<option value="1" show_list="disp_notifications" hide_list="">FLEXI_YES</option>
