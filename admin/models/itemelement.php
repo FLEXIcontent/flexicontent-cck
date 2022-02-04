@@ -317,6 +317,7 @@ class FlexicontentModelItemelement extends FCModelAdminList
 				->join('LEFT', '#__flexicontent_types AS t ON t.id = ie.type_id')
 				->join('LEFT', '#__flexicontent_cats_item_relations AS rel ON rel.itemid = a.id')
 				->join('LEFT', '#__categories AS c ON a.catid = c.id')
+				->group('a.id');
 			;
 
 			// Get the WHERE, HAVING and ORDER BY clauses for the query
