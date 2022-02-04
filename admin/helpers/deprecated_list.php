@@ -15,7 +15,6 @@ $files = array(
 	JPATH_SITE . '/components/com_flexicontent/classes/flexicontent.iptc.php',
 	JPATH_SITE . '/plugins/flexicontent_fields/minigallery/css/minigallery.php',
 	JPATH_SITE . '/plugins/flexicontent_fields/image/media/tmpl/default_fc.php',
-	JPATH_SITE . '/librairies/fancybox/CHANGELOG.md',
 	JPATH_SITE . '/components/com_flexicontent/librairies/fancybox/CHANGELOG.md',
 	JPATH_ADMINISTRATOR . '/components/com_flexicontent/elements/qfcategory.php',
 	JPATH_ADMINISTRATOR . '/components/com_flexicontent/models/qfcategoryelement.php',
@@ -47,6 +46,7 @@ $files = array(
 );
 
 $folders = array(
+	JPATH_SITE . '/components/com_flexicontent/librairies/jquery/js/jquery-ui-1.13.0',
 	JPATH_SITE . '/plugins/flexicontent_fields/image/media',
 	JPATH_SITE . '/components/com_flexicontent/librairies/fancybox/source',
 	JPATH_SITE . '/components/com_flexicontent/librairies/fancybox/lib',
