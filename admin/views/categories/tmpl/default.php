@@ -459,7 +459,15 @@ if ($js)
 			$items_link = 'index.php?option=com_flexicontent&amp;view=items&amp;filter_catsinstate=99&amp;filter_subcats=0&amp;filter_cats='. $row->id.'&amp;fcform=1&amp;filter_state=';
 			?>
 
-		<tr class="<?php echo 'row' . ($k % 2); ?>" sortable-group-id="<?php echo $row->parent_id; ?>" item-id="<?php echo $row->id ?>" parents="<?php echo $parentsStr ?>" level="<?php echo $row->level ?>">
+		<?php if (FLEXI_J40GE) : ?>
+		<tr class="row<?php echo $i % 2; ?>" data-draggable-group="<?php echo $row->parent_id; ?>"
+			data-item-id="<?php echo $row->id; ?>" data-parents="<?php echo $parentsStr; ?>"
+			data-level="<?php echo $row->level; ?>">
+		<?php else : ?>
+		<tr class="row<?php echo $k % 2; ?>" sortable-group-id="<?php echo $row->parent_id; ?>"
+			item-id="<?php echo $row->id ?>" parents="<?php echo $parentsStr ?>"
+			level="<?php echo $row->level ?>">
+		<?php endif; ?>
 
 			<!--td class="left col_rowcount hidden-phone"><?php //$colposition++; ?>
 				<?php echo $this->pagination->getRowOffset($i); ?>
