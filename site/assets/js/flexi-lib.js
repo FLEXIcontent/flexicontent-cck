@@ -121,7 +121,7 @@
 			autoOpen: false,
 			width: params.winwidth,
 			height: params.winheight,
-			position: [params.winleft, params.wintop],
+			//position: { at: 'center' },
 			modal: (typeof params.modal !== 'undefined'  ?  params.modal  :  true),
 			dialogClass: params.dialogClass,
 			icons: {
@@ -173,6 +173,9 @@
 
 		// Manually move the dialog content back into its proper position, (the extra dialog container will be destroyed on dialog close)
 		if (keepPlace) obj.parent().appendTo(parent);
+
+		// Force manual position of dialog
+		container.parent().css({ 'left': params.winleft+'px', 'width': params.winwidth+'px', 'top': params.wintop+'px'});
 
 		// Open the dialog manually
 		theDialog = obj.dialog('open');
@@ -250,7 +253,7 @@
 			width: params.winwidth,
 			height: params.winheight,
 			modal: (typeof params.modal !== 'undefined'  ?  params.modal  :  true),
-			position: [params.winleft, params.wintop],
+			//position: { at: 'center' },
 			dialogClass: params.dialogClass,
 			// Load contents (url) when dialog opens
 			open: function(ev, ui){
@@ -293,6 +296,9 @@
 				else alert('Unknown action'+closeFunc);
 			}
 		});
+
+		// Force manual position of dialog
+		container.parent().css({ 'left': params.winleft+'px', 'width': params.winwidth+'px', 'top': params.wintop+'px'});
 
 		// Open the dialog manually
 		var theDialog = container.dialog('open');
@@ -1489,24 +1495,30 @@
 			}
 		});
 
-		// Handle sbox
-		params = fc_getAutoSizePos(0, 0, {});
+		// Parameters for modal that should take full window
+		var dialog_box_sbox = jQuery('#sbox-window');
+		var dialog_box_jmedia = jQuery('div.field-media-wrapper > div.modal');
 
-		var dialog_box = jQuery('#sbox-window');
-		if (dialog_box)
+		if (dialog_box_sbox.length || dialog_box_jmedia.length)
 		{
-			dialog_box
-				.css({ 'position': 'fixed' })
-				.css({ 'left': params.winleft+'px', 'width': (params.winwidth-40)+'px' })
-				.css({ 'top': params.wintop+'px', 'height': (params.winheight-20)+'px' })
-				.find('#sbox-content').children('iframe')
-					.removeAttr('width').removeAttr('height').css({ 'width': '100%', 'height': '100%' });
-		}
+			params = fc_getAutoSizePos(0, 0, {});
 
-		var dialog_box = jQuery('div.field-media-wrapper > div.modal');
-		if (dialog_box)
-		{
-			dialog_box.css({ 'top': (params.wintop-30)+'px', 'height': (params.winheight-60)+'px' });
+			// Maximize sbox modal
+			if (dialog_box_sbox.length)
+			{
+				dialog_box_sbox
+					.css({ 'position': 'fixed' })
+					.css({ 'left': params.winleft+'px', 'width': (params.winwidth-40)+'px' })
+					.css({ 'top': params.wintop+'px', 'height': (params.winheight-20)+'px' })
+					.find('#sbox-content').children('iframe')
+						.removeAttr('width').removeAttr('height').css({ 'width': '100%', 'height': '100%' });
+			}
+
+			// Maximize joomla media modal
+			if (dialog_box_jmedia.length)
+			{
+				dialog_box_jmedia.css({ 'top': (params.wintop-30)+'px', 'height': (params.winheight-60)+'px' });
+			}
 		}
 
 		// Fix modal's inner container adding unneeded scrollbar
