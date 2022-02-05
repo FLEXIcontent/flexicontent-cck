@@ -297,7 +297,11 @@ class FLEXIcontentModelSearch extends JModelLegacy
 		// Using other search areas, get all search
 		JPluginHelper::importPlugin( 'search');
 		$dispatcher = JEventDispatcher::getInstance();
-		$searchareas = $dispatcher->trigger( 'onContentSearchAreas' );
+		$app        = JFactory::getApplication();
+
+		$searchareas = FLEXI_J40GE
+			? $app->triggerEvent('onContentSearchAreas')
+			: $dispatcher->trigger('onContentSearchAreas');
 		$areas = array();
 		foreach ($searchareas as $area) {
 			$areas = array_merge( $areas, $area );
