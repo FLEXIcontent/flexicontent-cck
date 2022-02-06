@@ -1039,7 +1039,7 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 					/**
 					 * Display language
 					 */
-					echo JHtml::_($hlpname . '.lang_display', $row, $i, $this->langs, $use_icon = false); ?>
+					echo JHtml::_($hlpname . '.lang_display', $row, $i, $this->langs, $use_icon = 2); ?>
 			</td>
 
 

@@ -375,7 +375,7 @@ if ($js)
 
 		foreach ($this->rows as $i => $row)
 		{
-			$lang = JHtml::_($hlpname . '.lang_display', $row, $i, $this->langs, $use_icon = false);
+			$lang = JHtml::_($hlpname . '.lang_display', $row, $i, $this->langs, $use_icon = 2);
 			?>
 
 		<tr class="<?php echo 'row' . ($k % 2); ?>">
