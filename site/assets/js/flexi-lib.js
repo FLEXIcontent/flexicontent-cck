@@ -175,7 +175,7 @@
 		if (keepPlace) obj.parent().appendTo(parent);
 
 		// Force manual position of dialog
-		container.parent().css({ 'left': params.winleft+'px', 'width': params.winwidth+'px', 'top': params.wintop+'px'});
+		obj.parent().css({ 'left': params.winleft+'px', 'width': params.winwidth+'px', 'top': params.wintop+'px'});
 
 		// Open the dialog manually
 		theDialog = obj.dialog('open');
