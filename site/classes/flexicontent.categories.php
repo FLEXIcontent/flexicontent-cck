@@ -5,7 +5,7 @@
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
  * @license GNU/GPL v2
- * 
+ *
  * FLEXIcontent is a derivative work of the excellent QuickFAQ component
  * @copyright (C) 2008 Christoph Lukes
  * see www.schlu.net for more information
@@ -17,6 +17,8 @@
  */
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
+
+use Joomla\Utilities\ArrayHelper;
 
 //include constants file
 require_once (JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'defineconstants.php');
@@ -30,16 +32,16 @@ class flexicontent_cats
 	 * @var array
 	 */
 	var $id = null;
-	
+
 	/**
 	 * Parent Categories
 	 *
 	 * @var array
 	 */
 	var $parentcats_ids  = null;  // ids of ancestors categories, populated by buildParentCats(), used by getParentCats()
-	
+
 	var $parentcats_data = null;  // data (id,title,categoryslug) of ancestors categories, populated by getParentCats() and accessed via getParentlist()
-	
+
 	/**
 	 * Constructor
 	 *
@@ -55,7 +57,7 @@ class flexicontent_cats
 	{
 		$this->id = (int) $cid;
 	}
-    
+
 	/**
 	 * Retrieves parent categories (anscestors) of category until the category
 	 * and sets this parent in the member variable 'parentcats_ids'
@@ -64,10 +66,10 @@ class flexicontent_cats
 	protected function getParentCats($all_cols=false)
 	{
 		$db = JFactory::getDbo();
-		
+
 		$this->parentcats_data = array();
 		if (empty($this->parentcats_ids)) return;
-		
+
 		$query = 'SELECT ' .($all_cols ? '*,' : 'id, title, published, access,')
 				.' CASE WHEN CHAR_LENGTH(alias) THEN CONCAT_WS(\':\', id, alias) ELSE id END as slug'
 				.' FROM #__categories'
@@ -80,7 +82,7 @@ class flexicontent_cats
 			if ( isset($cats[$cid]) )	$this->parentcats_data[] = $cats[$cid];
 		}
 	}
-	
+
 	/**
 	 * Retrieves parent categories (anscestors) of category until the category
 	 * and sets this parent in the member variable 'parentcats_ids'
@@ -89,14 +91,14 @@ class flexicontent_cats
 	protected function buildParentCats($cid)
 	{
 		$db = JFactory::getDbo();
-		
+
 		// ALTERNATIVE 1
 		/*$currcat = JCategories::getInstance('Content')->get($cid);
 		while ($currcat->id != 'root') {
 			$this->parentcats_ids[] = $currcat->id;
 			$currcat = $currcat->getParent();
 		}*/
-		
+
 		// ALTERNATIVE 2
 		/*$query = ' SELECT cat.id as id '
 		 .' FROM #__categories AS cat '
@@ -110,7 +112,7 @@ class flexicontent_cats
 		$this->parentcats_ids = isset($globalcats[$cid]) ? $globalcats[$cid]->ancestorsarray : array();
 		//echo "<pre>" . print_r($this->parentcats_ids, true) ."</pre>";
 	}
-	
+
 	/*
 	 * Returns the parent category array that is build by functions buildParentCats() and getParentCats()
 	 *
@@ -123,19 +125,19 @@ class flexicontent_cats
 		}
 		return $this->parentcats_data;
 	}
-	
-	
-	
+
+
+
 	/*************************/
 	/* STATIC FUNCTION CALLS */
 	/*************************/
-	
+
 	/**
-    * Get the category tree (a sorted and padded array) but without any filtering or disabling data 
+    * Get the category tree (a sorted and padded array) but without any filtering or disabling data
     *
     * a. A children array is constructed for every category
     * b. Then treerecurse() is called to sort the category array according to each category parent and also to pad the category titles
-    * 
+    *
     * NOTE: the final category array has no filtering or disabling data ( this is done by buildcatselect() )
     * NOTE: the output of this function can be given to buildcatselect() for the purpose of building a select form field (aka category tree)
     *       that has filtering (via FLEXIaccess or via J1.6+ permission) and disabling of specific categories !!!
@@ -146,8 +148,14 @@ class flexicontent_cats
 	{
 		global $globalcats;
 		$db = JFactory::getDbo();
+		
+		$allowed_catstates = is_array($published_only) ? $published_only : array();
 
-		if ($published_only)
+		if ($allowed_catstates)
+		{
+			$where[] = 'published IN (' . implode(',', ArrayHelper::toInteger($allowed_catstates)) . ')';
+		}
+		elseif ($published_only)
 		{
 			$where[] = 'published = 1';
 		}
@@ -177,7 +185,7 @@ class flexicontent_cats
 
 		//set depth limit, no detect loop ?
 		$level_limit = $depth_limit ? $depth_limit : 99;
-		
+
 		//get children
 		$children = array();
 		foreach ($rows as $child)
@@ -189,14 +197,14 @@ class flexicontent_cats
 			array_push($list, $child);
 			$children[$parent] = $list;
 		}
-		
+
 		//get list of the items
 		$root_catid = $parent_id ? $globalcats[$parent_id]->parent_id : 1;
 		$list = flexicontent_cats::treerecurse($root_catid, '', array(), $children, true, max(0, $level_limit-1));
 
 		return $list;
 	}
-	
+
 	/**
 	 * Utility Function:
     * Sorts and pads (indents) given categories according to their parent, thus creating a category tree by using recursion.
@@ -204,7 +212,7 @@ class flexicontent_cats
     * a. looping through all categories  v  in given children array padding all of category v with same padding
     * b. but for every category v that has a children array, it calling itself (recursion) in order to inject the children categories just bellow category v
     *
-    * This function is based on the joomla 1.0 treerecurse 
+    * This function is based on the joomla 1.0 treerecurse
     *
     * @access public
     * @return array
@@ -213,7 +221,7 @@ class flexicontent_cats
 	{
 		$ROOT_CATEGORY_ID = 1;
 		if (!$ancestors) $ancestors = array();
-		
+
 		if (!empty($children[$parent_id]) && $level <= $maxlevel)
 		{
 			foreach ($children[$parent_id] as $v)
@@ -223,7 +231,7 @@ class flexicontent_cats
 				if ((!in_array($v->parent_id, $ancestors)) && $v->parent_id != $ROOT_CATEGORY_ID)
 				{
 					$ancestors[] = $v->parent_id;
-				} 
+				}
 
 				// Top level category (a child of ROOT)
 				if (0)  // NOT needed ?
@@ -260,7 +268,7 @@ class flexicontent_cats
 				$list[$id]->treename  = "$indent$txt";
 				$list[$id]->title     = $v->title;
 				$list[$id]->description    = $v->description;
-				
+
 				//$list[$id]->slug      = $v->slug;
 				//$list[$id]->access    = $v->access;
 				$list[$id]->ancestors = $ancestors;
@@ -297,6 +305,10 @@ class flexicontent_cats
 	 * @param array $skip_subtrees
 	 * @param array $disable_subtrees
 	 * @param array $custom_options
+	 * @param array $disable_specific_cats
+	 * @param string $empty_errmsg
+	 * @param boolean $show_viewable
+	 * @param array $allowed_langs
 	 *
 	 * @return a category form field element
 	 */
@@ -305,7 +317,8 @@ class flexicontent_cats
 		$actions_allowed=array('core.create', 'core.edit', 'core.edit.own'),   // For item edit this should be array('core.create')
 		$require_all=true,   // Require (or not) all privileges present to accept a category
 		$skip_subtrees=array(), $disable_subtrees=array(), $custom_options=array(),
-		$disable_specific_cats = array(), $empty_errmsg = false, $show_viewable = false
+		$disable_specific_cats = array(), $empty_errmsg = false, $show_viewable = false,
+		$allowed_langs = array()  // Filter by languages
 	) {
 
 		// ***
@@ -329,17 +342,32 @@ class flexicontent_cats
 		// Privilege of viewing all categories (even if not allowed to be used)
 		$viewallcats	= FlexicontentHelperPerm::getPerm()->ViewAllCats;
 
-		// Privelege of Super Admin 
+		// Privelege of Super Admin
 		$isSuperAdmin = $user->authorise('core.admin', 'root.1');
 
 		// Access levels granted to current user
 		$user_levels = array_flip(JAccess::getAuthorisedViewLevels($user->id));
 
+		// Allowed category languages and allowed category states
+		$langs_allowed     = array_flip($allowed_langs);
+		$allowed_catstates = is_array($check_published) ? array_flip($check_published) : array();
+
+		// Re-calculate check published flag (TODO remove ??)
+		if (count($allowed_catstates) === 1 && isset($allowed_catstates[1]))
+		{
+			$allowed_catstates = array();
+			$check_published   = true;
+		}
+		else
+		{
+			$check_published = !is_array($check_published) ? $check_published : false;
+		}
+
 
 		// ***
 		// *** Find user allowed categories to be used during Filtering below
 		// ***
-		
+
 		if ($check_perms)
 		{
 			// Get user allowed categories, NOTE: if user (a) (J2.5) has 'core.admin' or (b) (J1.5) user is super admin (gid==25) then all cats are allowed
@@ -348,6 +376,7 @@ class flexicontent_cats
 			// NOTE: already selected categories will be allowed to the user, add them to the category list
 			$selectedcats = !is_array($selected) ? array($selected) : $selected;
 			$usercats_indexed = array_flip($usercats);
+
 			if ($check_perms === 'edit')
 			{
 				foreach ($selectedcats as $selectedcat)
@@ -403,7 +432,7 @@ class flexicontent_cats
 		// ***
 		// *** TOP parameter: defines the APPROPRIATE PROMPT option at top of select list
 		// ***
-		
+
 		$cats_count = 0;
 		$catlist 	= array();
 
@@ -412,18 +441,18 @@ class flexicontent_cats
 		{
 			$catlist[] 	= JHtml::_( 'select.option', '', $top );
 		}
-		
+
 		else if ($top == 1)
 		{
 			$catlist[] 	= JHtml::_( 'select.option', 1, JText::_( 'FLEXI_TOPLEVEL' ));
 		}
-		
+
 		// A tree to select a category
 		else if($top == 2 || $top == -1)
 		{
 			$catlist[] 	= JHtml::_( 'select.option', '', JText::_( $top==-1 ? '' : 'FLEXI_SELECT_CATEGORY' ));
 		}
-		
+
 		// A sub-tree where root category of the sub-tree should be excluded, in place of it a disabled prompt is added ... NOTE that:
 		// a subtree should be given or else the first category out of top level category will be removed, which is of little sense
 		else if($top == 3)
@@ -434,18 +463,18 @@ class flexicontent_cats
 			$first_item->treename = $first_item->title = JText::_( 'FLEXI_SELECT_CATEGORY' );
 			$first_item->id = "";
 		}
-		
+
 		// Extra custom options ... applies to all top parameters
 		foreach ($custom_options as $custom_value => $custom_option)
 		{
 			$catlist[] 	= JHtml::_( 'select.option', $custom_value, '-- '.JText::_( $custom_option ).' --');
 		}
-		
-		
+
+
 		/*
 		 * Loop through categories to create the select option using user allowed categories (if filtering enabled)
 		 */
-		
+
 		$cats_allowed = array();
 		$cats_incestors_ancestors = array();
 
@@ -481,7 +510,19 @@ class flexicontent_cats
 				if ( isset($disable_cats_arr[$cat->id]) )
 				{
 					// NOTE: we did NOT add this CHECK to the ALLOWED check above !! If had added above then VIEW LEVEL checking may have skipped this category !!
-					$allowed = false; 
+					$allowed = false;
+				}
+
+				// Check for skipping categories not in allowed languages
+				if ($langs_allowed && !isset($langs_allowed[$cat->language]) && !isset( $usercats_indexed[$cat->id] ))
+				{
+					$skipped = true;
+				}
+
+				// Check for skipping categories not in allowed states
+				if ($allowed_catstates && !isset($allowed_catstates[$cat->published]) && !isset( $usercats_indexed[$cat->id] ))
+				{
+					$skipped = true;
 				}
 
 				$cats_allowed[$cat->id] = $allowed;
@@ -504,12 +545,25 @@ class flexicontent_cats
 			}
 		}
 
+		// Category state suffixes
+		$state_sfxs = array(1 => ' -P-', 0 => ' -U-', 2 => ' -A-', -2 => ' -T-', );
+
 		if ($globalcats) foreach ($list as $cat)
 		{
 			if (isset($cats_incestors_ancestors[$cat->id]))
 			{
 				$cat_treename = str_replace("&nbsp;", " ", strip_tags($cat->treename));
-				$cat_title = $cat_treename . (!$check_published && $cat->published!=1 ? ' -U-' : '');
+				$cat_title = $cat_treename;
+
+				// Add state suffix
+				$cat_title .= (!$check_published && $cat->published != 1)
+					? $state_sfxs[$cat->published]
+					: '';
+
+				// Add language suffix
+				$cat_title .= (empty($langs_allowed) && $cat->language !== '*') || (!empty($langs_allowed) && isset( $usercats_indexed[$cat->id] ))
+					? ' [' . $cat->language . ']'
+					: '';
 
 				$allowed = $cats_allowed[$cat->id];
 
@@ -559,7 +613,7 @@ class flexicontent_cats
 			'list.select' => $selected
 		);
 
-		$html = $empty_errmsg && $cats_count==0 ? 
+		$html = $empty_errmsg && $cats_count==0 ?
 			'<div class="alert alert-error">'.$empty_errmsg.'</div>' :
 			JHtml::_('select.genericlist', $catlist, $name, $sg_options )  // $catlist, $name, $attribs, 'value', 'text', $selected, $idtag )
 			;
@@ -568,17 +622,17 @@ class flexicontent_cats
 		// Restore first category element
 		if ($top == 3)
 		{
-			$first_item = reset($list); 
+			$first_item = reset($list);
 			$first_item->treename = $_first_item_treename;
 			$first_item->title = $_first_item_title;
 			$first_item->id = $_first_item_id ;
 		}
-		
+
 		if ( $print_logging_info ) @$fc_run_times['render_categories_select'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 		return $html;
 	}
-	
-	
+
+
 	/**
 	 * Find and return extra parent/children/etc categories based on given criteria
 	 *
@@ -594,20 +648,20 @@ class flexicontent_cats
 		$user    = JFactory::getUser();
 		$fparams = $app->getParams('com_flexicontent');
 		$show_noauth = $fparams->get('show_noauth', 0);
-		
+
 		$all_cats = array();
 		if ($treeinclude!=5) foreach ($cids as $cid)
 		{
 			if ($cid) $all_cats[] = $cid;
 		}
-		
+
 		foreach ($cids as $cid)
 		{
 			if (!$cid) continue;
 			$cats = array();
 			switch ($treeinclude) {
 				// current category only
-				case 0: default: 
+				case 0: default:
 					$cats = array($cid);
 				break;
 				case 5: // children only
@@ -621,7 +675,7 @@ class flexicontent_cats
 					$cats = $globalcats[$cid]->ancestorsarray;
 				break;
 				case 3: // current category + children + parents
-					$cats = array_unique(array_merge($globalcats[$cid]->descendantsarray, $globalcats[$cid]->ancestorsarray));						
+					$cats = array_unique(array_merge($globalcats[$cid]->descendantsarray, $globalcats[$cid]->ancestorsarray));
 				break;
 				case 4: // all item's categories
 					$cats = $curritemcats;
@@ -639,7 +693,7 @@ class flexicontent_cats
 			$aid_list = implode(",", $aid_arr);
 			$andaccess .= ' AND c.access IN ('.$aid_list.')';
 		}
-		
+
 		// Filter categories (check that are published and that have ACCESS Level that is assinged to current user)
 		$db = JFactory::getDbo();
 		$query = 'SELECT DISTINCT c.id'

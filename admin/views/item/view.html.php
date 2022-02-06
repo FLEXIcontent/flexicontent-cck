@@ -1298,6 +1298,18 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		$actions_allowed = array('core.create');
 
 
+		// Allowed category language and category states
+		$allowed_catlangs = $page_params->get('iform_cats_not_in_itemlang' . $CFGsfx, 1)
+			? array()
+			: array('*', $item->language);
+
+		$allowed_catstates = $page_params->get('iform_catstates_allowed' . $CFGsfx, ($isSite
+			? array(1)
+			: array(1, 0)
+		));
+		$allowed_catstates = FLEXIUtilities::paramToArray($allowed_catstates, false, false, true);
+
+
 		/**
 		 * Featured categories form field
 		 */
@@ -1322,7 +1334,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		// Display selector (but show as disabled if no ACL to change it)
 		else
 		{
-			$featured_tree = flexicontent_cats::getCategoriesTree($published_only=1, $parent_id=$featured_cats_parent, $depth_limit=0);
+			$featured_tree = flexicontent_cats::getCategoriesTree($allowed_catstates, $parent_id=$featured_cats_parent, $depth_limit=0);
 			$disabled_cats = $page_params->get('featured_cats_parent_disable', 1) ? array($featured_cats_parent) : array();
 
 			$featured_sel = array();
@@ -1347,8 +1359,10 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 			}
 
 			$lists['featured_cid'] = ($canchange_featcat ? '' : '<label class="label" style="float:none; margin:0 6px 0 0 !important;">locked</label>').
-				flexicontent_cats::buildcatselect($featured_tree, $fieldname, $featured_sel_nomain, 3, $attribs, true, ($item->id ? 'edit' : 'create'),	$actions_allowed,
-					$require_all=true, $skip_subtrees=array(), $disable_subtrees=array(), $custom_options=array(), $disabled_cats
+				flexicontent_cats::buildcatselect($featured_tree, $fieldname, $featured_sel_nomain, 3, $attribs,
+					$allowed_catstates, ($item->id ? 'edit' : 'create'),	$actions_allowed,
+					$require_all=true, $skip_subtrees=array(), $disable_subtrees=array(), $custom_options=array(), $disabled_cats,
+					$empty_errmsg=false, $show_viewable=false, $allowed_catlangs
 				);
 		}
 
@@ -1376,12 +1390,12 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		{
 			if ($page_params->get('cid_allowed_parent'))
 			{
-				$cid_tree = flexicontent_cats::getCategoriesTree($published_only=1, $parent_id=$page_params->get('cid_allowed_parent'), $depth_limit=0);
+				$cid_tree = flexicontent_cats::getCategoriesTree($allowed_catstates, $parent_id=$page_params->get('cid_allowed_parent'), $depth_limit=0);
 				$disabled_cats = $page_params->get('cid_allowed_parent_disable', 1) ? array($page_params->get('cid_allowed_parent')) : array();
 			}
 			else
 			{
-				$cid_tree = flexicontent_cats::getCategoriesTree($published_only=1, $parent_id=0, $depth_limit=0);
+				$cid_tree = flexicontent_cats::getCategoriesTree($allowed_catstates, $parent_id=0, $depth_limit=0);
 				// Commented out to get a titles translated and also get the description texts too
 				//$cid_tree = & $categories;
 				$disabled_cats = array();
@@ -1411,8 +1425,10 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 			}
 
 			$lists['cid'] = ($canchange_seccat ? '' : '<label class="label" style="float:none; margin:0 6px 0 0 !important;">locked</label>').
-				flexicontent_cats::buildcatselect($cid_tree, $fieldname, $form_cid_nomain, false, $attribs, true, ($item->id ? 'edit' : 'create'), $actions_allowed,
-					$require_all=true, $skip_subtrees, $disable_subtrees=array(), $custom_options=array(), $disabled_cats
+				flexicontent_cats::buildcatselect($cid_tree, $fieldname, $form_cid_nomain, false, $attribs,
+					$allowed_catstates, ($item->id ? 'edit' : 'create'), $actions_allowed,
+					$require_all=true, $skip_subtrees, $disable_subtrees=array(), $custom_options=array(), $disabled_cats,
+					$empty_errmsg=false, $show_viewable=false, $allowed_catlangs
 				);
 		}
 
@@ -1430,12 +1446,12 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 
 		if ($page_params->get('catid_allowed_parent'))
 		{
-			$catid_tree = flexicontent_cats::getCategoriesTree($published_only=1, $parent_id=$page_params->get('catid_allowed_parent'), $depth_limit=0);
+			$catid_tree = flexicontent_cats::getCategoriesTree($allowed_catstates, $parent_id=$page_params->get('catid_allowed_parent'), $depth_limit=0);
 			$disabled_cats = $page_params->get('catid_allowed_parent_disable', 1) ? array($page_params->get('catid_allowed_parent')) : array();
 		}
 		else
 		{
-			$catid_tree = flexicontent_cats::getCategoriesTree($published_only=1, $parent_id=0, $depth_limit=0);
+			$catid_tree = flexicontent_cats::getCategoriesTree($allowed_catstates, $parent_id=0, $depth_limit=0);
 			// Commented out to get a titles translated and also get the description texts too
 			//$catid_tree = & $categories;
 			$disabled_cats = array();
@@ -1447,9 +1463,11 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 			$disabled = $enable_catid_selector ? '' : ' disabled="disabled"';
 			$attribs .= $disabled;
 			$lists['catid'] = ($enable_catid_selector ? '' : '<label class="label" style="float:none; margin:0 6px 0 0 !important;">locked</label>').
-				flexicontent_cats::buildcatselect($catid_tree, $fieldname, $item->catid, 2, $attribs, true, ($item->id ? 'edit' : 'create'), $actions_allowed,
+				flexicontent_cats::buildcatselect($catid_tree, $fieldname, $item->catid, 2, $attribs,
+					$allowed_catstates, ($item->id ? 'edit' : 'create'), $actions_allowed,
 					$require_all=true, $skip_subtrees=array(), $disable_subtrees=array(), $custom_options=array(), $disabled_cats,
-					$empty_errmsg=JText::_('FLEXI_FORM_NO_MAIN_CAT_ALLOWED')
+					$empty_errmsg=JText::_('FLEXI_FORM_NO_MAIN_CAT_ALLOWED'),
+					$show_viewable=false, $allowed_catlangs
 				);
 		} else if ( !$isnew && $item->catid ) {
 			$lists['catid'] = $globalcats[$item->catid]->title;
@@ -1840,7 +1858,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 				. ' onclick="window.open(\'_PREVIEW_LINK_\', \'preview2\', \''.$link_params.'\'); return false;">'
 				. '<span class="icon-screen"></span>_LBL_TEXT_</a>';
 			$inline_txt = '(' . JText::_('FLEXI_INLINE') . ') - ';
-				
+
 			// PREVIEW for latest version
 			$use_versioning = $page_params->get('use_versioning', 1);
 			if ( !$use_versioning || ($item->version == $item->current_version && $item->version == $item->last_version) )

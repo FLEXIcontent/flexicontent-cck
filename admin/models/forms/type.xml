@@ -668,6 +668,16 @@
 				<option value="1">FLEXI_HIDE_IF_NOEDIT_PERMS</option>
 				<option value="2">FLEXI_SHOW</option>
 			</field>
+			<field name="" type="separator" default="FLEXI_FILTERING" label="" level="level4" />
+			<field name="iform_cats_not_in_itemlang_fe" type="fcradio" default="" label="FLEXI_IFORM_CATS_NOT_ITEMLANG" description="FLEXI_IFORM_CATS_NOT_ITEMLANG_DESC" class="btn-group btn-group-yesno">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_HIDE</option>
+				<option value="1">FLEXI_APPEND_LANG_NAME</option>
+			</field>
+			<field name="iform_catstates_allowed_fe" type="fccheckbox" default="" display_useglobal="1"
+				checkoptions="FLEXI_PUBLISHED,FLEXI_UNPUBLISHED,FLEXI_ARCHIVED,FLEXI_TRASHED"
+				checkvals="1,0,2,-2"
+				label="FLEXI_IFORM_CATSTATES_ALLOWED" description="FLEXI_IFORM_CATSTATES_ALLOWED_DESC" cols="2" />
 
 			<field name="" type="separator" default="FLEXI_LANGUAGE" label="" level="level3" />
 			<field name="uselang_fe" type="radio" default="" label="FLEXI_MENU_USE_LANGUAGE" description="FLEXI_MENU_USE_LANGUAGE_DESC" class="btn-group btn-group-yesno">
@@ -923,6 +933,16 @@
 				<option value="1">FLEXI_HIDE_IF_NOEDIT_PERMS</option>
 				<option value="2">FLEXI_SHOW</option>
 			</field>
+			<field name="" type="separator" default="FLEXI_FILTERING" label="" level="level4" />
+			<field name="iform_cats_not_in_itemlang_be" type="fcradio" default="" label="FLEXI_IFORM_CATS_NOT_ITEMLANG" description="FLEXI_IFORM_CATS_NOT_ITEMLANG_DESC" class="btn-group btn-group-yesno">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_HIDE</option>
+				<option value="1">FLEXI_APPEND_LANG_NAME</option>
+			</field>
+			<field name="iform_catstates_allowed_be" type="fccheckbox" default="" display_useglobal="1"
+				checkoptions="FLEXI_PUBLISHED,FLEXI_UNPUBLISHED,FLEXI_ARCHIVED,FLEXI_TRASHED"
+				checkvals="1,0,2,-2"
+				label="FLEXI_IFORM_CATSTATES_ALLOWED" description="FLEXI_IFORM_CATSTATES_ALLOWED_DESC" cols="2" />
 
 			<field name="" type="separator" default="FLEXI_LANGUAGE" label="" level="level3" />
 			<field name="uselang_be" type="radio" default="" label="FLEXI_MENU_USE_LANGUAGE" description="FLEXI_MENU_USE_LANGUAGE_DESC" class="btn-group btn-group-yesno">
