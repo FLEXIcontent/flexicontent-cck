@@ -389,6 +389,12 @@ class flexicontent_cats
 			}
 		}
 
+		/**
+		 * A reverse index of already used categories, so that we do not skip them
+		 * when skipping categories based on their language and / or their state
+		 */
+		$selectedcats_indexed = array_flip(!is_array($selected) ? array($selected) : $selected);
+
 
 		// ***
 		// *** Excluded subtrees e.g. featured categories subtree in item form
@@ -514,13 +520,13 @@ class flexicontent_cats
 				}
 
 				// Check for skipping categories not in allowed languages
-				if ($langs_allowed && !isset($langs_allowed[$cat->language]) && !isset( $usercats_indexed[$cat->id] ))
+				if ($langs_allowed && !isset($langs_allowed[$cat->language]) && !isset( $selectedcats_indexed[$cat->id] ))
 				{
 					$skipped = true;
 				}
 
 				// Check for skipping categories not in allowed states
-				if ($allowed_catstates && !isset($allowed_catstates[$cat->published]) && !isset( $usercats_indexed[$cat->id] ))
+				if ($allowed_catstates && !isset($allowed_catstates[$cat->published]) && !isset( $selectedcats_indexed[$cat->id] ))
 				{
 					$skipped = true;
 				}
@@ -561,7 +567,7 @@ class flexicontent_cats
 					: '';
 
 				// Add language suffix
-				$cat_title .= (empty($langs_allowed) && $cat->language !== '*') || (!empty($langs_allowed) && isset( $usercats_indexed[$cat->id] ))
+				$cat_title .= (empty($langs_allowed) && $cat->language !== '*') || (!empty($langs_allowed) && isset( $selectedcats_indexed[$cat->id] ))
 					? ' [' . $cat->language . ']'
 					: '';
 
