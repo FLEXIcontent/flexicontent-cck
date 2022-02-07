@@ -27,6 +27,7 @@ if (!defined('FLEXI_J16GE') || !defined('FLEXI_J30GE'))
 }
 if (!defined('FLEXI_J16GE'))   define('FLEXI_J16GE', version_compare( $jversion->getShortVersion(), '1.6.0', 'ge' ) );
 if (!defined('FLEXI_J30GE'))   define('FLEXI_J30GE', version_compare( $jversion->getShortVersion(), '3.0.0', 'ge' ) );
+if (!defined('FLEXI_J40GE'))   define('FLEXI_J40GE', version_compare( $jversion->getShortVersion(), '4.0.0', 'ge' ) );
 
 class com_flexicontentInstallerScript
 {
@@ -467,7 +468,9 @@ class com_flexicontentInstallerScript
 			'warning'
 		);*/
 
-		echo '<link type="text/css" href="components/com_flexicontent/assets/css/j3x.css?'.FLEXI_VHASH.'" rel="stylesheet">';
+		echo FLEXI_J40GE
+			? '<link type="text/css" href="components/com_flexicontent/assets/css/j3x.css" rel="stylesheet">'
+			: '<link type="text/css" href="components/com_flexicontent/assets/css/j4x.css" rel="stylesheet">';
 		echo '<link type="text/css" href="components/com_flexicontent/assets/css/flexicontentbackend.css" rel="stylesheet">';
 
 		//echo JHtml::_('bootstrap.startAccordion', 'upgrade-tasks', array());
@@ -1506,7 +1509,9 @@ class com_flexicontentInstallerScript
 		$app = JFactory::getApplication();
 
 		// Extra CSS needed for J3.x+
-		echo '<link type="text/css" href="components/com_flexicontent/assets/css/j3x.css?'.FLEXI_VHASH.'" rel="stylesheet">';
+		echo FLEXI_J40GE
+			? '<link type="text/css" href="components/com_flexicontent/assets/css/j3x.css" rel="stylesheet">'
+			: '<link type="text/css" href="components/com_flexicontent/assets/css/j4x.css" rel="stylesheet">';
 
 		// Installed component manifest file version
 		$this->release = $parent->getManifest()->version;
