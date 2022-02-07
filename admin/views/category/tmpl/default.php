@@ -162,6 +162,8 @@ $this->document->addScriptDeclaration($js);
 
 				<div class="span6 col-6 full_width_980" style="max-width: 980px;">
 					<div class="fcsep_level1"><?php echo JText::_('FLEXI_PUBLISHING'); ?></div>
+					<div class="fcclear"></div>
+					
 
 					<?php /* No inheritage needed for these */ ?>
 					<?php echo JLayoutHelper::render('joomla.edit.publishingdata', $this); ?>
@@ -171,6 +173,7 @@ $this->document->addScriptDeclaration($js);
 				<!--RIGHT COLUMN-->
 				<div class="span6 col-6 full_width_980" style="max-width: 980px;">
 					<div class="fcsep_level1"><?php echo JText::_('FLEXI_META_SEO'); ?></div>
+					<div class="fcclear"></div>
 
 					<?php /*echo JLayoutHelper::render('joomla.edit.metadata', $this);*/ ?>
 					<?php
