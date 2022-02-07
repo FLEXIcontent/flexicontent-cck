@@ -188,29 +188,38 @@ class plgFlexicontent_fieldsImage extends FCField
 			// Check and if needed install Joomla template overrides into current Joomla template
 			flexicontent_html::install_template_overrides();
 
-			// We will use the mootools based media manager
-			JHtml::_('behavior.framework', true);
-
-			// Load the modal behavior script.
-			JHtml::_('behavior.modal'/*, '.fc_image_field_mm_modal'*/);
-
-			// Include media field JS, detecting different version of Joomla
-			if (file_exists($path = JPATH_ROOT.'/media/media/js/mediafield-mootools.min.js'))
+			if (!FLEXI_J40GE)
 			{
-				$media_js = 'media/mediafield-mootools.min.js';
+				// We will use the mootools based media manager
+				JHtml::_('behavior.framework', true);
+
+				// Load the modal behavior script.
+				JHtml::_('behavior.modal'/*, '.fc_image_field_mm_modal'*/);
+
+				// Include media field JS, detecting different version of Joomla
+				if (file_exists($path = JPATH_ROOT.'/media/media/js/mediafield-mootools.min.js'))
+				{
+					$media_js = 'media/mediafield-mootools.min.js';
+				}
+				else
+				{
+					$media_js = file_exists($path = JPATH_ROOT.'/media/media/js/mediafield.min.js')
+						? 'media/mediafield.min.js'
+						: 'media/mediafield.js';
+				}
+
+				JHtml::_('script', $media_js, $mootools_framework = true, $media_folder_relative_path = true, false, false, true);
+
+				// Tooltips for image path and image popup preview
+				JHtml::_('behavior.tooltip', '.hasTipImgpath', array('onShow' => 'jMediaRefreshImgpathTip'));
+				JHtml::_('behavior.tooltip', '.hasTipPreview', array('onShow' => 'jMediaRefreshPreviewTip'));
 			}
 			else
 			{
-				$media_js = file_exists($path = JPATH_ROOT.'/media/media/js/mediafield.min.js')
-					? 'media/mediafield.min.js'
-					: 'media/mediafield.js';
+				jimport('joomla.form.helper'); // JFormHelper
+				JFormHelper::loadFieldClass('media');   // JFormFieldColor
 			}
 
-			JHtml::_('script', $media_js, $mootools_framework = true, $media_folder_relative_path = true, false, false, true);
-
-			// Tooltips for image path and image popup preview
-			JHtml::_('behavior.tooltip', '.hasTipImgpath', array('onShow' => 'jMediaRefreshImgpathTip'));
-			JHtml::_('behavior.tooltip', '.hasTipPreview', array('onShow' => 'jMediaRefreshPreviewTip'));
 			$mm_mode_common_js_added = true;
 		}
 
@@ -303,30 +312,6 @@ class plgFlexicontent_fieldsImage extends FCField
 			JUri::base(true).'/index.php?option=com_flexicontent&amp;view=fileselement&amp;tmpl=component&amp;layout=image'
 				.'&amp;field='.$field->id.'&amp;u_item_id='.$u_item_id.'&amp;targetid=%s_existingname&amp;thumb_w='.$preview_thumb_w.'&amp;thumb_h='.$preview_thumb_h.'&amp;autoassign='.$autoassign
 				.'&amp;'.JSession::getFormToken().'=1';
-
-		// Media manager mode
-		if ($image_source === -2)
-		{
-			//$start_microtime = microtime(true);
-
-			/*$xml_field = '<field name="'.$field->name.'" type="media" width="500" />';
-			$xml_form = '<form><fields name="attribs"><fieldset name="attribs">'.$xml_field.'</fieldset></fields></form>';
-
-			$jform = new JForm('flexicontent_field.image', array('control' => 'custom', 'load_data' => true));
-			$jform->load($xml_form);
-			$media = new JFormFieldMedia($jform);
-
-			$value = str_replace('\\', '/', !empty($field->value[0])  ?  $field->value[0]  :  '');
-			$media->setup(new SimpleXMLElement($xml_field), $value, '');
-			$field->html = str_replace($elementid.'"', $elementid.'_0"',
-				str_replace('name="'.$fieldname.'"', 'name="'.$fieldname.'[0]"', $media->input)
-			);
-
-			//$diff = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
-			//echo sprintf('<br/>-- [Media manager field creation : %.3f s] ', $diff/1000000);
-			return;*/
-		}
-
 
 		$js = '
 		var fc_field_dialog_handle_'.$field->id.';
@@ -510,7 +495,11 @@ class plgFlexicontent_fieldsImage extends FCField
 
 				// Re-init any select2 elements
 				fc_attachSelect2(newField);
-				";
+
+				" .
+				// Re-init joomla media form field element
+				(FLEXI_J40GE ? "newField.find('.field-media-wrapper').fieldMedia();" : '')
+				;
 
 			// Add new element to sortable objects (if field not in group)
 			if ($add_ctrl_btns) $js .= "
@@ -1686,6 +1675,12 @@ class plgFlexicontent_fieldsImage extends FCField
 				// Handle replacing image with a new existing image
 				if ( $v['existingname'] )
 				{
+					// Handle value containing more than just the filepath
+					if ($image_source == -2)
+					{
+						$_tmp = explode('#', $v['existingname']);
+						$v['existingname'] = $_tmp[0];
+					}
 					$v['originalname'] = $v['existingname'];
 					$v['existingname'] = '';
 				}

@@ -175,22 +175,22 @@
 
 		<field name="" type="separator" default="FLEXI_IMAGES_COMP_INTROIMG" description="FLEXI_IMAGES_COMP_INTROIMG_DESC" level="_" class="alert alert-info fcpadded" />
 		<field name="image_intro" type="fcmedia" label="COM_CONTENT_FIELD_INTRO_LABEL" description="COM_CONTENT_FIELD_INTRO_DESC" labelclass="fc-prop-lbl" />
-		<field name="float_intro" type="fcradio" label="COM_CONTENT_FLOAT_LABEL" description="COM_CONTENT_FLOAT_DESC" labelclass="fc-prop-lbl" class="btn-group btn-group-yesno">
-			<option value="">JGLOBAL_USE_GLOBAL</option>
-			<option value="right">COM_CONTENT_RIGHT</option>
-			<option value="left">COM_CONTENT_LEFT</option>
-			<option value="none">COM_CONTENT_NONE</option>
+		<field name="float_intro" type="fcradio" label="FLEXI_FLOAT" description="" labelclass="fc-prop-lbl" class="btn-group btn-group-yesno">
+			<option value="">FLEXI_USE_GLOBAL</option>
+			<option value="right">FLEXI_RIGHT</option>
+			<option value="left">FLEXI_LEFT</option>
+			<option value="none">FLEXI_NONE</option>
 		</field>
 		<field name="image_intro_alt" type="text" label="COM_CONTENT_FIELD_IMAGE_ALT_LABEL" description="COM_CONTENT_FIELD_IMAGE_ALT_DESC" labelclass="fc-prop-lbl" class="" />
 		<field name="image_intro_caption" type="text" label="COM_CONTENT_FIELD_IMAGE_CAPTION_LABEL" description="COM_CONTENT_FIELD_IMAGE_CAPTION_DESC" labelclass="fc-prop-lbl" class="" />
 
 		<field name="" type="separator" default="FLEXI_IMAGES_COMP_FULLIMG" description="FLEXI_IMAGES_COMP_FULLIMG_DESC" level="_" class="alert alert-info fcpadded" />
 		<field name="image_fulltext" type="fcmedia" label="COM_CONTENT_FIELD_FULL_LABEL" description="COM_CONTENT_FIELD_FULL_DESC" labelclass="fc-prop-lbl" />
-		<field name="float_fulltext" type="fcradio" label="COM_CONTENT_FLOAT_LABEL" description="COM_CONTENT_FLOAT_DESC" labelclass="fc-prop-lbl" class="btn-group btn-group-yesno">
-			<option value="">JGLOBAL_USE_GLOBAL</option>
-			<option value="right">COM_CONTENT_RIGHT</option>
-			<option value="left">COM_CONTENT_LEFT</option>
-			<option value="none">COM_CONTENT_NONE</option>
+		<field name="float_fulltext" type="fcradio" label="FLEXI_FLOAT" description="" labelclass="fc-prop-lbl" class="btn-group btn-group-yesno">
+			<option value="">FLEXI_USE_GLOBAL</option>
+			<option value="right">FLEXI_RIGHT</option>
+			<option value="left">FLEXI_LEFT</option>
+			<option value="none">FLEXI_NONE</option>
 		</field>
 		<field name="image_fulltext_alt" type="text" label="COM_CONTENT_FIELD_IMAGE_ALT_LABEL" description="COM_CONTENT_FIELD_IMAGE_ALT_DESC" labelclass="fc-prop-lbl" class="" />
 		<field name="image_fulltext_caption" type="text" label="COM_CONTENT_FIELD_IMAGE_CAPTION_LABEL" description="COM_CONTENT_FIELD_IMAGE_CAPTION_DESC" labelclass="fc-prop-lbl" class="" />
