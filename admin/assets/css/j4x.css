@@ -158,6 +158,9 @@ div.toolbar-box {
 	width: auto;
 	border: 1px solid var(--template-bg-dark-20);
 }
+#flexicontent select.form-select {
+	width: 100%;
+}
 #user-groups legend + .control-group,
 #user-groups .control-group {
 	margin: 0px;
@@ -235,7 +238,7 @@ fieldset.adminform fieldset.group-fcset.fc_input_set,
 fieldset.panelform fieldset.group-fcset.fc_input_set,
 fieldset.adminform-legacy fieldset.group-fcset.fc_input_set {
 	border: 0 none !important;
-	float: right !important;
+	float: left !important;
 	padding: 0px 0px !important;
 }
 div fieldset label.radiobtn {
@@ -320,7 +323,7 @@ div table.admintable {
 div table.admintable td {
 	border: 0px solid #F0F0F0;
 	font-weight: normal;
-	text-align: right;
+	text-align: left;
 	padding: 2px 4px 2px 8px;
 }
 div table.admintable td.key,

@@ -6270,9 +6270,10 @@ class flexicontent_html
 		elseif ($field->getAttribute('type')==='radio' || $field->getAttribute('type')==='fcradio' || ($field->getAttribute('type')==='multilist' && $field->getAttribute('subtype')==='radio'))
 		{
 			$_v = htmlspecialchars( $_v, ENT_COMPAT, 'UTF-8' );
+			$has_btn_check = strpos($field->input, 'btn-check') !== 0;
 			return str_replace(
 				'value="'.$_v.'"',
-				'value="'.$_v.'" class="fc-inherited-value" ',
+				'value="'.$_v.'" class="fc-inherited-value' . ($has_btn_check ? ' btn-check' : '') . '" ',
 				$field->input);
 		}
 

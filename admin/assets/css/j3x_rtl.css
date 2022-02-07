@@ -151,6 +151,9 @@ div.toolbar-box {
 #flexicontent select {
 	width: auto;
 }
+#flexicontent select.form-select {
+	width: 100%;
+}
 #user-groups legend + .control-group,
 #user-groups .control-group {
 	margin: 0px;
