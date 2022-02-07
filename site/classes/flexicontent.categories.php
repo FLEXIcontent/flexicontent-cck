@@ -523,12 +523,14 @@ class flexicontent_cats
 				if ($langs_allowed && !isset($langs_allowed[$cat->language]) && !isset( $selectedcats_indexed[$cat->id] ))
 				{
 					$skipped = true;
+					$allowed = false;
 				}
 
 				// Check for skipping categories not in allowed states
 				if ($allowed_catstates && !isset($allowed_catstates[$cat->published]) && !isset( $selectedcats_indexed[$cat->id] ))
 				{
 					$skipped = true;
+					$allowed = false;
 				}
 
 				$cats_allowed[$cat->id] = $allowed;
@@ -567,7 +569,11 @@ class flexicontent_cats
 					: '';
 
 				// Add language suffix
-				$cat_title .= (empty($langs_allowed) && $cat->language !== '*') || (!empty($langs_allowed) && isset( $selectedcats_indexed[$cat->id] ))
+				$cat_title .= $cat->language !== '*' && (
+					count($langs_allowed) > 2 ||
+					empty($langs_allowed) ||
+					(count($langs_allowed) === 1 && !isset($allowed_catstates['*']))
+				)
 					? ' [' . $cat->language . ']'
 					: '';
 
