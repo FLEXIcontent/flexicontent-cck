@@ -43,6 +43,10 @@ $files = array(
 	JPATH_ADMINISTRATOR . '/components/com_flexicontent/views/item/tmpl/tabs_main.php',
 	JPATH_ADMINISTRATOR . '/components/com_flexicontent/views/item/tmpl/flat_main.php',
 	JPATH_ADMINISTRATOR . '/components/com_flexicontent/views/item/tmpl/default_associations.php',
+	JPATH_SITE . '/components/com_flexicontent/librairies/jquery/css/smoothness/jquery-ui-1.13.0.css',
+	JPATH_SITE . '/components/com_flexicontent/librairies/jquery/css/smoothness/jquery-ui-1.13.0.min.css',
+	JPATH_SITE . '/components/com_flexicontent/librairies/jquery/css/ui-lightness/jquery-ui-1.13.0.css',
+	JPATH_SITE . '/components/com_flexicontent/librairies/jquery/css/ui-lightness/jquery-ui-1.13.0.min.css',
 );
 
 $folders = array(
