@@ -158,6 +158,9 @@ div.toolbar-box {
 	width: auto;
 	border: 1px solid var(--template-bg-dark-20);
 }
+#flexicontent select.form-select {
+	width: 100%;
+}
 #user-groups legend + .control-group,
 #user-groups .control-group {
 	margin: 0px;
