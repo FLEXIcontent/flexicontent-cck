@@ -851,6 +851,14 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		$cparams = JComponentHelper::getParams( 'com_flexicontent' );
 		//$useAssocs = flexicontent_db::useAssociations();
 
+		// Clean orphan assosiations
+		$query = 'DELETE FROM #__associations WHERE context = "com_content.item" AND id IN (' .
+			'SELECT a.id FROM #__associations AS a ' .
+			'LEFT JOIN #__content AS c ON a.id = c.id ' .
+			'WHERE a.context = "com_content.item" AND c.id IS NULL' .
+		')';
+		$this->_db->setQuery($query)->execute();
+
 		// Check for emtpy language in flexicontent EXT table
 		$query = "SELECT COUNT(*)"
 			." FROM #__flexicontent_items_ext as ie"

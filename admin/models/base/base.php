@@ -884,12 +884,12 @@ abstract class FCModelAdmin extends JModelAdmin
 	 *
 	 * @return  boolean True if successful
 	 */
-	function saveAssociations(&$record, &$data)
+	function saveAssociations(&$record, &$data, $add_current = true)
 	{
 		if( !$this->associations_context ) return true;
 
 		$record = $record ? $record: $this->_record;
-		return flexicontent_db::saveAssociations($record, $data, $this->associations_context);
+		return flexicontent_db::saveAssociations($record, $data, $this->associations_context, $add_current);
 	}
 
 

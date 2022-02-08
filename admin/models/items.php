@@ -52,6 +52,15 @@ class FlexicontentModelItems extends FCModelAdminList
 	protected $copyRelations = false;
 
 	/**
+	 * Events
+	 *
+	 * @var string
+	 */
+	var $event_context = 'com_content.article';
+	var $event_before_delete = 'onContentBeforeDelete';
+	var $event_after_delete = 'onContentAfterDelete';
+
+	/**
 	 * Search and ordering columns
 	 */
 	var $search_cols = array(
@@ -1997,17 +2006,18 @@ class FlexicontentModelItems extends FCModelAdminList
 				// that was copied, and save the associations, adding the new item to them
 				if ($method == 99 && $item->language!='*' && $row->language!='*' && flexicontent_db::useAssociations())
 				{
-					$associations = JLanguageAssociations::getAssociations('com_content', '#__content', 'com_content.item', $item->id);  // associations of item that was copied
+					// Get associations of item that was duplicated
+					$associations = JLanguageAssociations::getAssociations('com_content', '#__content', 'com_content.item', $item->id);
 					$_data = array();
 					foreach ($associations as $tag => $association)
 					{
 						$_data['associations'][$tag] = (int)$association->id;
 					}
 					$_data['associations'][$row->language]  = $row->id;  // Add new item itself
-					$_data['associations'][$item->language] = $item->id; // unneeded, done by saving ...
-					$context = 'com_content.item';
-					flexicontent_db::saveAssociations($item, $_data, $context);  // Save associations, adding the new item
-					//$app->enqueueMessage( print_r($_data, true), 'message' );
+					$_data['associations'][$item->language] = $item->id; // Add current item (needed if association group is empty)
+
+					// Save associations, adding the new item
+					flexicontent_db::saveAssociations($item, $_data, $_context = 'com_content.item');
 				}
 			}
 		}
@@ -2708,58 +2718,66 @@ class FlexicontentModelItems extends FCModelAdminList
 	 *
 	 * @since	1.0
 	 */
-	public function delete($cid, &$itemmodel=null)
+	public function delete($cid, $model = null)
 	{
-		$app        = JFactory::getApplication();
-		$dispatcher = JEventDispatcher::getInstance();  // Get event dispatcher and load all content plugins for triggering their delete events
-
-		JPluginHelper::importPlugin('content');    // Load all content plugins for triggering their delete events
-
-		$item_arr = array();                       // We need an array of items to use for calling the 'onContentAfterDelete' Event
-
 		if ( !count( $cid ) ) return false;
 
 		$cid = ArrayHelper::toInteger($cid);
 		$cid_list = implode( ',', $cid );
 
-		if ($itemmodel)
+		/**
+		 * Get records using the model, we need an array of records to use for calling the events
+		 */
+		$record_arr = array();
+
+		if ($model && $this->event_context && ($this->event_before_delete || $this->event_after_delete))
 		{
-			foreach ($cid as $item_id)
+			$app = JFactory::getApplication();
+			$dispatcher = JEventDispatcher::getInstance();
+
+			// Load all content and flexicontent plugins for triggering their delete events
+			if ($this->event_context === 'com_content.article')
 			{
-				$item = $itemmodel->getItem($item_id);
+				JPluginHelper::importPlugin('content');
+			}
+			JPluginHelper::importPlugin('flexicontent');
 
-				// ***
-				// *** Trigger Event 'onContentBeforeDelete' of Joomla's Content plugins
-				// ***
-				$event_before_delete = 'onContentBeforeDelete';  // NOTE: $itemmodel->event_before_delete is protected property
-				FLEXI_J40GE
-					? $app->triggerEvent($event_before_delete, array('com_content.article', $item))
-					: $dispatcher->trigger($event_before_delete, array('com_content.article', $item));
-				$item_arr[] = $item;  // store object so that we can call after delete event
-
-				// ***
-				// *** Trigger onBeforeDeleteField field event to allow fields to cleanup any custom data
-				// ***
-				$fields = $itemmodel->getExtrafields($force=true);
-				foreach ($fields as $field)
-				{
-					$field_type = $field->iscore ? 'core' : $field->field_type;
-					FLEXIUtilities::call_FC_Field_Func($field_type, 'onBeforeDeleteField', array( &$field, &$item ));
-				}
+			foreach ($cid as $record_id)
+			{
+				$record = $model->getItem($record_id);
+				$record_arr[] = $record;
 			}
 		}
 
-
-		// ***
-		// *** Delete language association, before deleting the items
-		// ***
-		foreach($item_arr as $item)
+		/**
+		 * Trigger onBeforeDelete event(s)
+		 */
+		if ($this->event_before_delete) foreach($record_arr as $record)
 		{
-			if (!empty($item->associations) && $item->language && $item->language !== '*')
+			// Trigger Event 'event_before_delete' e.g. 'onContentBeforeDelete' of flexicontent or content plugins
+			FLEXI_J40GE
+				? $app->triggerEvent($this->event_before_delete, array($this->event_context, $record))
+				: $dispatcher->trigger($this->event_before_delete, array($this->event_context, $record));
+
+			// Trigger Event 'onBeforeDeleteField' to allow fields to cleanup any custom data
+			$fields = $model->getExtrafields($force=true);
+			foreach ($fields as $field)
 			{
-				unset($item->associations[$item->language]);
-				flexicontent_db::saveAssociations($item, $_data, $context = 'com_content.item');
+				$field_type = $field->iscore ? 'core' : $field->field_type;
+				FLEXIUtilities::call_FC_Field_Func($field_type, 'onBeforeDeleteField', array( &$field, &$record ));
 			}
+		}
+
+		/**
+		 * Delete language association, before deleting the items
+		 */
+		foreach($record_arr as $record)
+		{
+			$query = $this->_db->getQuery(true)
+				->delete('#__associations')
+				->where($this->_db->quoteName('context') . ' = ' . $this->_db->quote('com_content.item'))
+				->where($this->_db->quoteName('id') . ' = ' . $this->_db->quote($record->id));
+			$this->_db->setQuery($query)->execute();
 		}
 
 
@@ -2875,21 +2893,19 @@ class FlexicontentModelItems extends FCModelAdminList
 		//$this->_db->setQuery($query)->execute();
 
 
-
-		// ***
-		// *** Trigger Event 'onContentAfterDelete' of Joomla's Content plugins
-		// ***
-		$event_after_delete = 'onContentAfterDelete';  // NOTE: $itemmodel->event_after_delete is protected property
-		foreach($item_arr as $item)
+		/**
+		 * Trigger onAfterDelete event
+		 */
+		if ($this->event_after_delete) foreach($record_arr as $record)
 		{
+			// Trigger Event 'event_before_delete' e.g. 'onContentAfterDelete' of flexicontent or content plugins
 			FLEXI_J40GE
-				? $app->triggerEvent($event_after_delete, array('com_content.article', $item))
-				: $dispatcher->trigger($event_after_delete, array('com_content.article', $item));
+				? $app->triggerEvent($this->event_after_delete, array($this->event_context, $record))
+				: $dispatcher->trigger($this->event_after_delete, array($this->event_context, $record));
 		}
 
 		return true;
 	}
-
 
 
 	/**

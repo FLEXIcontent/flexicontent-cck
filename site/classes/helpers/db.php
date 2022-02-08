@@ -1155,7 +1155,7 @@ class flexicontent_db
 	 *
 	 * @return  boolean True if successful
 	 */
-	static function saveAssociations(&$item, &$data, $context)
+	static function saveAssociations(&$item, &$data, $context, $add_current = false)
 	{
 		// Check if associations are enabled, but also mantain associations if associations data are no present, 
 		if (!flexicontent_db::useAssociations() || !isset($data['associations']))
@@ -1183,8 +1183,11 @@ class flexicontent_db
 			JError::raiseNotice(403, JText::_('FLEXI_ERROR_ALL_LANGUAGE_ASSOCIATED'));
 		}
 
-		// Make sure that current item id, is the association id of the language of the current item
-		$associations[$item->language] = $item->id;
+		// Add current item to associations if this is desired
+		if ($add_current)
+		{
+			$associations[$item->language] = $item->id;
+		}
 
 		// Make sure associations ids are integers
 		$associations = ArrayHelper::toInteger($associations);

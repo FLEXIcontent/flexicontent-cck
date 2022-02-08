@@ -63,6 +63,15 @@ abstract class FCModelAdminList extends JModelList
 	const canDelRelated = false;
 
 	/**
+	 * Events
+	 *
+	 * @var string
+	 */
+	var $event_context = null;
+	var $event_before_delete = null;
+	var $event_after_delete = null;
+
+	/**
 	 * Search and ordering columns
 	 */
 	var $search_cols = array(
@@ -812,8 +821,10 @@ abstract class FCModelAdminList extends JModelList
 	 *
 	 * @since	1.0
 	 */
-	public function delete($cid)
+	public function delete($cid, $model = null)
 	{
+		if ( !count( $cid ) ) return false;
+
 		$cid = ArrayHelper::toInteger($cid);
 
 		// Verify that records ACL has been checked
@@ -826,6 +837,43 @@ abstract class FCModelAdminList extends JModelList
 				$ids[] = $id;
 			}
 		}
+
+
+		/**
+		 * Get records using the model, we need an array of records to use for calling the events
+		 */
+		$record_arr = array();
+
+		if ($model && $this->event_context && ($this->event_before_delete || $this->event_after_delete))
+		{
+			$app = JFactory::getApplication();
+			$dispatcher = JEventDispatcher::getInstance();
+
+			// Load all content and flexicontent plugins for triggering their delete events
+			if ($this->event_context === 'com_content.article')
+			{
+				JPluginHelper::importPlugin('content');
+			}
+			JPluginHelper::importPlugin('flexicontent');
+
+			foreach ($cid as $record_id)
+			{
+				$record = $model->getRecord($record_id);
+				$record_arr[] = $record;
+			}
+		}
+
+		/**
+		 * Trigger onBeforeDelete event(s)
+		 */
+		if ($this->event_before_delete) foreach($record_arr as $record)
+		{
+			// Trigger Event 'event_before_delete' e.g. 'onContentBeforeDelete' of flexicontent or content plugins
+			FLEXI_J40GE
+				? $app->triggerEvent($this->event_before_delete, array($this->event_context, $record))
+				: $dispatcher->trigger($this->event_before_delete, array($this->event_context, $record));
+		}
+
 
 		if (count($ids))
 		{
@@ -841,6 +889,17 @@ abstract class FCModelAdminList extends JModelList
 
 			// Also delete related Data, like 'assignments'
 			$this->delete_relations($cid);
+		}
+
+		/**
+		 * Trigger onAfterDelete event
+		 */
+		if ($this->event_after_delete) foreach($record_arr as $record)
+		{
+			// Trigger Event 'event_before_delete' e.g. 'onContentAfterDelete' of flexicontent or content plugins
+			FLEXI_J40GE
+				? $app->triggerEvent($this->event_after_delete, array($this->event_context, $record))
+				: $dispatcher->trigger($this->event_after_delete, array($this->event_context, $record));
 		}
 
 		return true;

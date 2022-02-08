@@ -759,7 +759,8 @@ class FlexicontentControllerBaseAdmin extends FlexicontentController
 		$user  = JFactory::getUser();
 
 		// Get model
-		$model = $this->getModel($this->record_name_pl);
+		$model   = $this->getModel($this->record_name_pl);
+		$model_s = $this->getModel($this->record_name);
 
 		// Check that request action is supported by the model
 		if (in_array($this->task, array('remove_cascade', 'remove_relations')) && !$model::canDelRelated)
@@ -829,7 +830,7 @@ class FlexicontentControllerBaseAdmin extends FlexicontentController
 			// Delete the record or records and their assignments
 			case 'remove':
 			case 'remove_cascade':
-				$result = $model->delete($cid);
+				$result = $model->delete($cid, $model_s);
 				break;
 		}
 
