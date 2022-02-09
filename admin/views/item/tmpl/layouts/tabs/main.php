@@ -258,8 +258,8 @@ if ( count($tab_fields['tab02a']) ) : ?>
 		$fseticon = 'icon-pencil-2';
 	}
 
-	$tab_lbl = isset($tab_titles['jimage_jurls']) && $tab_titles['jimage_jurls'] !== '_DEFAULT_' ? $tab_titles['jimage_jurls'] : JText::_($fsetname);
-	$tab_ico = isset($tab_icocss['jimage_jurls']) && $tab_icocss['jimage_jurls'] !== '_default_'? $tab_icocss['jimage_jurls'] : $fseticon;
+	$tab_lbl = isset($tab_titles['tab02a']) && $tab_titles['tab02a'] !== '_DEFAULT_' ? $tab_titles['tab02a'] : JText::_($fsetname);
+	$tab_ico = isset($tab_icocss['tab02a']) && $tab_icocss['tab02a'] !== '_default_'? $tab_icocss['tab02a'] : $fseticon;
 
 	$total_fields = count($tab_fields['tab02a']);
 	$use_flexbox  = $total_fields > 1;
