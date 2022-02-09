@@ -852,12 +852,15 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		//$useAssocs = flexicontent_db::useAssociations();
 
 		// Clean orphan assosiations
-		$query = 'DELETE FROM #__associations WHERE context = "com_content.item" AND id IN (' .
-			'SELECT a.id FROM #__associations AS a ' .
+		$query = 'DELETE e.* FROM #__associations AS e WHERE e.context = "com_content.item" AND e.id IN (SELECT tmp.id FROM (' .
+			'SELECT a.id AS id FROM #__associations AS a ' .
 			'LEFT JOIN #__content AS c ON a.id = c.id ' .
 			'WHERE a.context = "com_content.item" AND c.id IS NULL' .
-		')';
-		$this->_db->setQuery($query)->execute();
+		') AS tmp )';
+		try { $this->_db->setQuery($query)->execute(); }
+		catch (Exception $e) {
+			echo '<div class="fcclear"></div><div class="alert alert-warning">' . $e->getMessage() . '<br>' . $query . '</div>';
+		}
 
 		// Check for emtpy language in flexicontent EXT table
 		$query = "SELECT COUNT(*)"
