@@ -1723,8 +1723,21 @@ if ($this->fields && $typeid) :
 			 */
 			if ($field->field_type === 'custom_form_html')
 			{
-				$captured['fman'][$field->name] = $field->html;
-				$rendered[$field->name] = (object) array('label_html' => '', 'input_html' => $captured['fman'][$field->name], 'html' => $captured['fman'][$field->name], 'field' => $field);
+				$rendered[$field->name] = (object) array('label_html' => '', 'input_html' => $field->html);
+
+				if ( $customPlacement )
+				{
+					$captured[$field->name] = $field->html;
+					$rendered[$field->name]->html = $captured[$field->name];
+				}
+				else
+				{
+					$captured['fman'][$field->name] = $field->html;
+					$rendered[$field->name]->html = $captured['fman'][$field->name];
+				}
+
+				$rendered[$field->name]->field = $field;
+
 				continue;
 			}
 
