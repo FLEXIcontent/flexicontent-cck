@@ -3553,6 +3553,7 @@ class FlexicontentModelItems extends FCModelAdminList
 			'context'  => 'com_content.item',
 			'created'  => 'created',
 			'modified' => 'modified',
+			'state'    => 'state',
 		);
 
 		return parent::getLangAssocs($ids, $config);

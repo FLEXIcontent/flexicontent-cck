@@ -92,6 +92,18 @@ $state_icons = array(
 
 
 /**
+ * Calculate maximum column size of associations
+ */
+$max_assocs = 0;
+foreach($this->rows as $row)
+{
+	$max_assocs = !empty($this->lang_assocs[$row->id]) && count($this->lang_assocs[$row->id]) > $max_assocs
+		? count($this->lang_assocs[$row->id])
+		: $max_assocs;
+}
+
+
+/**
  * Order stuff and table related variables
  */
 
@@ -173,7 +185,6 @@ if ($js)
 
 
 <form action="index.php?option=<?php echo $this->option; ?>&amp;view=<?php echo $this->view; ?>" method="post" name="adminForm" id="adminForm">
-
 
 <div class="<?php echo FLEXI_J40GE ? 'row' : 'row-fluid'; ?>">
 
@@ -279,8 +290,8 @@ if ($js)
 		<tr>
 			<?php $colposition = 0; ?>
 
-			<!--th class="left hidden-phone">
-				<?php echo JText::_( 'FLEXI_NUM' ); ?><?php //$colposition++; ?>
+			<!--th class="left hidden-phone"><?php //$colposition++; ?>
+				<?php echo JText::_( 'FLEXI_NUM' ); ?>
 			</th-->
 
 			<th class="col_order center hidden-phone"><?php $colposition++; ?>
@@ -310,12 +321,19 @@ if ($js)
 			</th>
 
 		<?php if ($useAssocs) : ?>
-			<th class="hideOnDemandClass hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
+
+			<?php if ($max_assocs >= 4): ?><?php $colposition++; ?>
+				<th class="col_assocs_count">
+					<div id="fc-toggle-assocs_btn" style="padding: 4px 0 2px 6px;" class="<?php echo $out_class . ' ' . $this->tooltip_class; ?>" title="<?php echo JText::_('FLEXI_ASSOCIATIONS'); ?>" onclick="jQuery('#columnchoose_adminListTableFCcategories_<?php echo $colposition; ?>_label').click();" ><span class="icon-flag"></span></div>
+				</th>
+			<?php endif; ?>
+
+			<th class="col_assocs hideOnDemandClass hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo JText::_('FLEXI_ASSOCIATIONS'); ?>
 			</th>
 		<?php endif; ?>
 
-			<th class="col_template left hideOnDemandClass hidden-phone hidden-tablet" colspan="2" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<th class="col_template hideOnDemandClass left hidden-phone hidden-tablet" colspan="2" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo JText::_('FLEXI_TEMPLATE'); ?>
 			</th>
 
@@ -352,7 +370,7 @@ if ($js)
 				<?php echo $this->orderingx ? str_replace('rel="tooltip"', '', JHtml::_('grid.order', $this->rows, 'filesave.png', $ctrl.'saveorder' )) : ''; ?>
 			</th-->
 
-			<th class="hideOnDemandClass col_id center hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<th class="col_id hideOnDemandClass center hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo JHtml::_('grid.sort', 'FLEXI_ID', 'a.id', $this->lists['order_Dir'], $this->lists['order']); ?>
 			</th>
 
@@ -552,28 +570,46 @@ if ($js)
 
 
 			<?php if ($useAssocs) : ?>
+
+				<?php if ($max_assocs >= 4): ?><?php $colposition++; ?>
+					<td>
+						<?php echo !empty($this->lang_assocs[$row->id]) ? '<span class="fc_assocs_count">' . count($this->lang_assocs[$row->id]) . '</span>' : ''; ?>
+					</td>
+				<?php endif; ?>
+
 			<td class="hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php
 				if (!empty($this->lang_assocs[$row->id]))
 				{
-					$row_modified = strtotime($row->modified_time) ?: strtotime($row->created_time);
+					$row_modified_date = $row->modified_time && $row->modified_time !== '0000-00-00 00:00:00' ? $row->modified_time : $row->created_time;
+					$row_modified = strtotime($row_modified_date);
 
 					foreach($this->lang_assocs[$row->id] as $assoc_item)
 					{
 						// Joomla article manager show also current item, so we will not skip it
 						$is_current = $assoc_item->id == $row->id;
-						$assoc_modified = strtotime($assoc_item->modified) ?: strtotime($assoc_item->created);
+						$assoc_modified_date = $assoc_item->modified && $assoc_item->modified !== '0000-00-00 00:00:00' ? $assoc_item->modified : $assoc_item->created;
+						$assoc_modified = strtotime($assoc_modified_date);
 
 						$_link  = 'index.php?option=com_flexicontent&amp;task='.$ctrl.'edit&amp;cid='. $assoc_item->id;
 						$_title = flexicontent_html::getToolTip(
-							($is_current ? '' : JText::_( $assoc_modified < $row_modified ? 'FLEXI_EARLIER_THAN_THIS' : 'FLEXI_LATER_THAN_THIS')),
+							$assoc_item->title,
+							(isset($state_icons[$assoc_item->state]) ? '<span class="' . $state_icons[$assoc_item->state] . '"></span>' : '') .
+							(isset($state_names[$assoc_item->state]) ? $state_names[$assoc_item->state] . '<br>': '') .
+							($is_current ? '' : '<span class="icon-pencil"></span>' . JText::_( $assoc_modified < $row_modified ? 'FLEXI_EARLIER_THAN_THIS' : 'FLEXI_LATER_THAN_THIS')) .
+							': ' . $assoc_modified_date . '<br>'.
 							( !empty($this->langs->{$assoc_item->lang}) ? ' <img src="'.$this->langs->{$assoc_item->lang}->imgsrc.'" alt="'.$assoc_item->lang.'" /> ' : '').
-							($assoc_item->lang === '*' ? JText::_('FLEXI_ALL') : (!empty($this->langs->{$assoc_item->lang}) ? $this->langs->{$assoc_item->lang}->name: '?')).' <br/> '.
-							$assoc_item->title, 0, 1
+							($assoc_item->lang === '*' ? JText::_('FLEXI_ALL') : (!empty($this->langs->{$assoc_item->lang}) ? $this->langs->{$assoc_item->lang}->name: '?')).' <br/> '
+							, 0, 1
 						);
+						
+						$state_colors = array(1 => 'darkgreen', -5 => 'darkcyan');
+						$bg_color = isset($state_colors[$assoc_item->state]) ? $state_colors[$assoc_item->state] : 'gray';
 
 						echo '
-						<a class="fc_assoc_translation label label-association ' . $this->tooltip_class . ($assoc_modified < $row_modified ? ' fc_assoc_later_mod' : '').'" target="_blank" href="'.$_link.'" title="'.$_title.'" >
+						<a class="fc_assoc_translation label label-association ' . $this->popover_class . ($assoc_modified < $row_modified ? ' fc_assoc_later_mod' : '').'"
+							target="_blank" href="'.$_link.'" data-placement="top" data-content="'.$_title.'" style="background-color: ' . $bg_color . '"
+						>
 							'.($assoc_item->lang=='*' ? JText::_('FLEXI_ALL') : strtoupper($assoc_item->shortcode ?: '?')).'
 						</a>';
 					}

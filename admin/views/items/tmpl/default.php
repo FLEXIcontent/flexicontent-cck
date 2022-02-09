@@ -166,6 +166,18 @@ $state_icons = array(
 
 
 /**
+ * Calculate maximum column size of associations
+ */
+$max_assocs = 0;
+foreach($this->rows as $row)
+{
+	$max_assocs = !empty($this->lang_assocs[$row->id]) && count($this->lang_assocs[$row->id]) > $max_assocs
+		? count($this->lang_assocs[$row->id])
+		: $max_assocs;
+}
+
+
+/**
  * Create custom field columns
  */
 foreach($this->extra_fields as $_field)
@@ -565,6 +577,7 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 					echo $this->lists['filter_author'];
 					echo $this->lists['filter_tag'];
 					if (!$this->max_tab_types || count($this->itemTypes) < $this->max_tab_types) echo $this->lists['filter_type'];
+					echo $this->lists['filter_lang'];
 					echo $this->lists['filter_state'];
 					echo $this->lists['filter_access'];
 					echo $this->lists['filter_meta'];
@@ -601,6 +614,7 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 			</div>
 
 		</div>
+
 
 		<div class="fc-filter-head-box nowrap_box">
 
@@ -676,9 +690,7 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 		}
 
 		$order_msg .= '<div class="fc-iblock" style="margin: 0 32px 0 0;">' . $this->lists['filter_cats'] . $msg_icon . '</div>';
-		
 		?>
-		
 
 		<div class="clear"></div>
 
@@ -710,10 +722,7 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 			<?php echo '<span class="icon-cancel ' . $this->tooltip_class . '" title="'.flexicontent_html::getToolTip('', 'FLEXI_FCORDER_ONLY_VIEW', 1, 1) . '"></span>'; ?>
 		<?php endif; ?>
 
-	<?php endif; 
-						echo $this->lists['filter_lang'];
-
-	?>
+	<?php endif; ?>
 
 	<div class="fcclear"></div>
 
@@ -785,7 +794,14 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 			</th>
 
 		<?php if ($useAssocs) : ?>
-			<th class="hideOnDemandClass left hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
+
+			<?php if ($max_assocs >= 4): ?><?php $colposition++; ?>
+				<th class="col_assocs_count">
+					<div id="fc-toggle-assocs_btn" style="padding: 4px 0 2px 6px;" class="<?php echo $out_class . ' ' . $this->tooltip_class; ?>" title="<?php echo JText::_('FLEXI_ASSOCIATIONS'); ?>" onclick="jQuery('#columnchoose_adminListTableFCitems_<?php echo $colposition; ?>_label').click();" ><span class="icon-flag"></span></div>
+				</th>
+			<?php endif; ?>
+
+			<th class="col_assocs hideOnDemandClass hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo JText::_('FLEXI_ASSOCIATIONS'); ?>
 			</th>
 		<?php endif; ?>
@@ -880,7 +896,7 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 			</th>
 
 			<th class="col_id hideOnDemandClass center hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
-				<?php echo JHtml::_('grid.sort', 'JGRID_HEADING_ID', 'a.id', $this->lists['order_Dir'], $this->lists['order'] ); ?>
+				<?php echo JHtml::_('grid.sort', 'FLEXI_ID', 'a.id', $this->lists['order_Dir'], $this->lists['order']); ?>
 				<?php if ($this->getModel()->getState('filter_id')) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
 					<span class="icon-cancel-circle btn btn-micro" onclick="delFilter('filter_id'); document.adminForm.submit();"></span>
@@ -893,7 +909,6 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 
 	<tbody <?php echo $ordering_draggable && $canOrder && $this->reOrderingActive ? 'id="sortable_fcitems"' : ''; ?> >
 		<?php
-		$k = 0;
 		$canCheckinRecords = $user->authorise('core.admin', 'com_checkin');
 
 		$needsApproval = false;
@@ -904,6 +919,9 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 		{
 			echo '<tr class="collapsed_row"><td colspan="'.$list_total_cols.'"></td></tr>';
 		}
+
+		// In the case we skip rows, we need a reliable incrementing counter with no holes, used for e.g. even / odd row class
+		$k = 0;
 
 		foreach ($this->rows as $i => $row)
 		{
@@ -934,7 +952,7 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 
 		<tr class="<?php echo 'row' . ($k % 2); ?>">
 
-			<!--td class="left col_rowcount hidden-phone">
+			<!--td class="left col_rowcount hidden-phone"><?php //$colposition++; ?>
 				<?php echo $this->pagination->getRowOffset($i); ?>
 			</td-->
 
@@ -1069,11 +1087,19 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 
 
 			<?php if ($useAssocs) : ?>
+
+				<?php if ($max_assocs >= 4): ?><?php $colposition++; ?>
+					<td>
+						<?php echo !empty($this->lang_assocs[$row->id]) ? '<span class="fc_assocs_count">' . count($this->lang_assocs[$row->id]) . '</span>' : ''; ?>
+					</td>
+				<?php endif; ?>
+
 			<td class="hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php
 				if (!empty($this->lang_assocs[$row->id]))
 				{
-					$row_modified = strtotime($row->modified) ?: strtotime($row->created);
+					$row_modified_date = $row->modified && $row->modified !== '0000-00-00 00:00:00' ? $row->modified : $row->created;
+					$row_modified = strtotime($row_modified_date);
 
 					foreach($this->lang_assocs[$row->id] as $assoc_item)
 					{
@@ -1098,8 +1124,8 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 						$bg_color = isset($state_colors[$assoc_item->state]) ? $state_colors[$assoc_item->state] : 'gray';
 
 						echo '
-						<a class="fc_assoc_translation label label-association ' . $this->popover_class . ($assoc_modified < $row_modified ? ' fc_assoc_later_mod' : '').'" ;
-							. target="_blank" href="'.$_link.'" data-placement="top" data-content="'.$_title.'" style="background-color: ' . $bg_color . '"
+						<a class="fc_assoc_translation label label-association ' . $this->popover_class . ($assoc_modified < $row_modified ? ' fc_assoc_later_mod' : '').'"
+							target="_blank" href="'.$_link.'" data-placement="top" data-content="'.$_title.'" style="background-color: ' . $bg_color . '"
 						>
 							'.($assoc_item->lang=='*' ? JText::_('FLEXI_ALL') : strtoupper($assoc_item->shortcode ?: '?')).'
 						</a>';

@@ -332,6 +332,7 @@ class FlexicontentModelCategories extends FCModelAdminList
 			'context'  => 'com_categories.item',
 			'created'  => 'created_time',
 			'modified' => 'modified_time',
+			'state'    => 'published',
 		);
 
 		return parent::getLangAssocs($ids, $config);
