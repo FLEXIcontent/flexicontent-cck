@@ -143,6 +143,27 @@ $ord_grp = 1;
 $stategrps = array(1 => 'published', 0 => 'unpublished', -2 => 'trashed', -3 => 'unpublished', -4 => 'unpublished', -5 => 'published');
 
 
+$state_names = array(
+	 1  => JText::_('FLEXI_PUBLISHED'),
+	-5  => JText::_('FLEXI_IN_PROGRESS'),
+	 0  => JText::_('FLEXI_UNPUBLISHED'),
+	-3  => JText::_('FLEXI_PENDING'),
+	-4  => JText::_('FLEXI_TO_WRITE'),
+	 2  => JText::_('FLEXI_ARCHIVED'),
+	-2  => JText::_('FLEXI_TRASHED'),
+	'u' => JText::_('FLEXI_UNKNOWN'),
+);
+$state_icons = array(
+	 1  => 'icon-publish',
+	-5  => 'icon-checkmark-2',
+	 0  => 'icon-unpublish',
+	-3  => 'icon-question',
+	-4  => 'icon-pencil-2',
+	 2  => 'icon-archive',
+	-2  => 'icon-trash',
+	'u' => 'icon-question-2',
+);
+
 
 /**
  * Create custom field columns
@@ -544,7 +565,6 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 					echo $this->lists['filter_author'];
 					echo $this->lists['filter_tag'];
 					if (!$this->max_tab_types || count($this->itemTypes) < $this->max_tab_types) echo $this->lists['filter_type'];
-					echo $this->lists['filter_lang'];
 					echo $this->lists['filter_state'];
 					echo $this->lists['filter_access'];
 					echo $this->lists['filter_meta'];
@@ -656,7 +676,9 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 		}
 
 		$order_msg .= '<div class="fc-iblock" style="margin: 0 32px 0 0;">' . $this->lists['filter_cats'] . $msg_icon . '</div>';
+		
 		?>
+		
 
 		<div class="clear"></div>
 
@@ -688,7 +710,10 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 			<?php echo '<span class="icon-cancel ' . $this->tooltip_class . '" title="'.flexicontent_html::getToolTip('', 'FLEXI_FCORDER_ONLY_VIEW', 1, 1) . '"></span>'; ?>
 		<?php endif; ?>
 
-	<?php endif; ?>
+	<?php endif; 
+						echo $this->lists['filter_lang'];
+
+	?>
 
 	<div class="fcclear"></div>
 
@@ -1054,18 +1079,28 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 					{
 						// Joomla article manager show also current item, so we will not skip it
 						$is_current = $assoc_item->id == $row->id;
-						$assoc_modified = strtotime($assoc_item->modified) ?: strtotime($assoc_item->created);
+						$assoc_modified_date = $assoc_item->modified && $assoc_item->modified !== '0000-00-00 00:00:00' ? $assoc_item->modified : $assoc_item->created;
+						$assoc_modified = strtotime($assoc_modified_date);
 
 						$_link  = 'index.php?option=com_flexicontent&amp;task='.$ctrl.'edit&amp;id='. $assoc_item->id;
 						$_title = flexicontent_html::getToolTip(
-							($is_current ? '' : JText::_( $assoc_modified < $row_modified ? 'FLEXI_EARLIER_THAN_THIS' : 'FLEXI_LATER_THAN_THIS')),
+							$assoc_item->title,
+							(isset($state_icons[$assoc_item->state]) ? '<span class="' . $state_icons[$assoc_item->state] . '"></span>' : '') .
+							(isset($state_names[$assoc_item->state]) ? $state_names[$assoc_item->state] . '<br>': '') .
+							($is_current ? '' : '<span class="icon-pencil"></span>' . JText::_( $assoc_modified < $row_modified ? 'FLEXI_EARLIER_THAN_THIS' : 'FLEXI_LATER_THAN_THIS')) .
+							': ' . $assoc_modified_date . '<br>'.
 							( !empty($this->langs->{$assoc_item->lang}) ? ' <img src="'.$this->langs->{$assoc_item->lang}->imgsrc.'" alt="'.$assoc_item->lang.'" /> ' : '').
-							($assoc_item->lang === '*' ? JText::_('FLEXI_ALL') : (!empty($this->langs->{$assoc_item->lang}) ? $this->langs->{$assoc_item->lang}->name: '?')).' <br/> '.
-							$assoc_item->title, 0, 1
+							($assoc_item->lang === '*' ? JText::_('FLEXI_ALL') : (!empty($this->langs->{$assoc_item->lang}) ? $this->langs->{$assoc_item->lang}->name: '?')).' <br/> '
+							, 0, 1
 						);
+						
+						$state_colors = array(1 => 'darkgreen', -5 => 'darkcyan');
+						$bg_color = isset($state_colors[$assoc_item->state]) ? $state_colors[$assoc_item->state] : 'gray';
 
 						echo '
-						<a class="fc_assoc_translation label label-association ' . $this->tooltip_class . ($assoc_modified < $row_modified ? ' fc_assoc_later_mod' : '').'" target="_blank" href="'.$_link.'" title="'.$_title.'" >
+						<a class="fc_assoc_translation label label-association ' . $this->popover_class . ($assoc_modified < $row_modified ? ' fc_assoc_later_mod' : '').'" ;
+							. target="_blank" href="'.$_link.'" data-placement="top" data-content="'.$_title.'" style="background-color: ' . $bg_color . '"
+						>
 							'.($assoc_item->lang=='*' ? JText::_('FLEXI_ALL') : strtoupper($assoc_item->shortcode ?: '?')).'
 						</a>';
 					}

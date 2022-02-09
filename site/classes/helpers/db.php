@@ -1130,7 +1130,8 @@ class flexicontent_db
 		);
 
 		$db = JFactory::getDbo();
-		$query = 'SELECT a.id as item_id, i.id as id, i.title, i.' . $config->created . ' as created, i.' . $config->modified . ' as modified, i.language as language, i.language as lang'
+		$query = 'SELECT a.id as item_id, i.id as id, i.title, i.' . $config->created . ' as created, i.' . $config->modified . ' as modified, '
+			. ' i.language as language, i.language as lang, i.state'
 			. ' FROM #__associations AS a'
 			. ' JOIN #__associations AS k ON a.`key`=k.`key`'
 			. ' JOIN ' . $db->quoteName('#__' . $config->table) . ' AS i ON i.id = k.id'
