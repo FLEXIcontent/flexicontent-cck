@@ -1103,8 +1103,8 @@
 								jQuery(tcells[cell]).attr('colspan', colspan - colspan_remaining);
 							} else {
 								firstrun ?
-								eval('jQuery(tcells[cell]).'+action_func+'()') :
-								eval('jQuery(tcells[cell]).'+action_func+'("slow")');
+								eval('jQuery(tcells[cell]).'+action_func+'(0)') :
+								eval('jQuery(tcells[cell]).'+action_func+'(0)');
 								jQuery(tcells[cell]).addClass('isHidden');
 							}
 						}
@@ -1113,7 +1113,7 @@
 							if ( !jQuery(tcells[cell]).hasClass('isHidden') ) {
 								jQuery(tcells[cell]).attr('colspan', colspan + colspan_remaining);
 							} else {
-								eval('jQuery(tcells[cell]).'+action_func+'("slow")');
+								eval('jQuery(tcells[cell]).'+action_func+'(0)');
 								jQuery(tcells[cell]).removeClass('isHidden');
 							}
 						}
@@ -1122,8 +1122,8 @@
 					else if (action_func == 'hide' || !firstrun)
 					{
 						firstrun ?
-						eval('jQuery(tcells[cell]).'+action_func+'()') :
-						eval('jQuery(tcells[cell]).'+action_func+'("slow")');
+						eval('jQuery(tcells[cell]).'+action_func+'(0)') :
+						eval('jQuery(tcells[cell]).'+action_func+'(0)');
 						colspan_remaining--;
 					}
 				}

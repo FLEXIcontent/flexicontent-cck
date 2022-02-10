@@ -806,3 +806,29 @@ body .popover {
  max-width: 500px !important;
  min-width: 400px !important;
 }
+
+
+/* Associations state and staleness , etc*/
+body div .fc_assoc_ispublished {
+	background-color: darkgreen;
+}
+body div .fc_assoc_isinprogress {
+	background-color: darkcyan;
+}
+body div .fc_assoc_isunpublished {
+	background-color: #555555;
+}
+
+body div .fc_assoc_isstale {
+	opacity: 0.5;
+	span {
+		color: white;
+	}
+}
+
+body div .fc_assoc_isuptodate {
+	opacity: 1;
+	span {
+		color: white;
+	}
+}

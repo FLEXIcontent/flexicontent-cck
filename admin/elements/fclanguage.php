@@ -77,6 +77,9 @@ class JFormFieldFclanguage extends JFormField
 		if (@$attributes['please_select']) {
 			$langs[] = JHtml::_('select.option', '', JText::_('FLEXI_PLEASE_SELECT') );
 		}
+
+		// Whether to add language 'ALL' (*)
+		$add_all = @$attributes['skip_all'] ? false : true;
 		
 		foreach ($node->children() as $option)
 		{
@@ -85,7 +88,7 @@ class JFormFieldFclanguage extends JFormField
 			$langs[] = JHtml::_('select.option', $val, $text );
 		}
 		
-		$languages = FLEXIUtilities::getlanguageslist();
+		$languages = FLEXIUtilities::getlanguageslist($_published_only=false, $add_all);
 		foreach($languages as $lang) {
 			$langs[] = JHtml::_('select.option', $lang->code, $lang->name );
 		}

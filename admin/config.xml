@@ -1341,7 +1341,7 @@
 				<option value="3">FLEXI_YES_WITHOUT_ASSOCS</option>
 				<option value="2">FLEXI_MENU_ONLY_DISPLAY</option>
 			</field>
-			<field name="default_language_fe" type="fclanguage" default="_author_lang_" use_global="0" label="FLEXI_MENU_DEFAULT_LANGUAGE" description="FLEXI_MENU_DEFAULT_LANGUAGE_DESC">
+			<field name="default_language_fe" type="fclanguage" default="_author_lang_" label="FLEXI_MENU_DEFAULT_LANGUAGE" description="FLEXI_MENU_DEFAULT_LANGUAGE_DESC">
 				<option value="_author_lang_">FLEXI_USE_AUTHOR_LANGUAGE</option>
 				<option value="_site_default_">FLEXI_SITE_DEFAULT</option>
 			</field>
@@ -1912,6 +1912,11 @@
 			</field>
 
 		<field name="" type="separator" default="FLEXI_ITEMS_MANAGER" icon_class="icon-list" level="tab_open" box_type="1" remove_boxes="2" />
+
+			<field name="original_content_language" type="fclanguage" default="_site_default_" skip_all="true" label="FLEXI_ORIGINAL_CONTENT_LANGUAGE" description="FLEXI_ORIGINAL_CONTENT_LANGUAGE_DESC">
+				<option value="_site_default_">FLEXI_SITE_DEFAULT</option>
+				<option value="_disable_">FLEXI_DISABLE</option>
+			</field>
 
 			<field name="" type="separator" default="FLEXI_PARAMETERS_BEHAVIOR" label="" level="level1" />
 

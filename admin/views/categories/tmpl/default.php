@@ -101,6 +101,9 @@ foreach($this->rows as $row)
 		? count($this->lang_assocs[$row->id])
 		: $max_assocs;
 }
+$ocLang = $cparams->get('original_content_language', '_site_default_');
+$ocLang = $ocLang === '_site_default_' ? JComponentHelper::getParams('com_languages')->get('site', '*') : $ocLang;
+$ocLang = $ocLang !== '_disable_' && $ocLang !== '*' ? $ocLang : false;
 
 
 /**
@@ -581,13 +584,27 @@ if ($js)
 				<?php
 				if (!empty($this->lang_assocs[$row->id]))
 				{
-					$row_modified_date = $row->modified_time && $row->modified_time !== '0000-00-00 00:00:00' ? $row->modified_time : $row->created_time;
-					$row_modified = strtotime($row_modified_date);
+					// Find record of original content
+					$oc_item = null;
+					foreach($this->lang_assocs[$row->id] as $assoc_item)
+					{
+						if ($ocLang && $assoc_item->language === $ocLang)
+						{
+							$oc_item = $assoc_item;
+							break;
+						}
+					}
+
+					if ($oc_item)
+					{
+						$oc_item_modified_date = $oc_item->modified && $oc_item->modified !== '0000-00-00 00:00:00' ? $oc_item->modified : $oc_item->created;
+						$oc_item_modified = strtotime($oc_item_modified_date);
+					}
 
 					foreach($this->lang_assocs[$row->id] as $assoc_item)
 					{
 						// Joomla article manager show also current item, so we will not skip it
-						$is_current = $assoc_item->id == $row->id;
+						$is_oc_item = !$oc_item || $assoc_item->id == $oc_item->id;
 						$assoc_modified_date = $assoc_item->modified && $assoc_item->modified !== '0000-00-00 00:00:00' ? $assoc_item->modified : $assoc_item->created;
 						$assoc_modified = strtotime($assoc_modified_date);
 
@@ -596,21 +613,22 @@ if ($js)
 							$assoc_item->title,
 							(isset($state_icons[$assoc_item->state]) ? '<span class="' . $state_icons[$assoc_item->state] . '"></span>' : '') .
 							(isset($state_names[$assoc_item->state]) ? $state_names[$assoc_item->state] . '<br>': '') .
-							($is_current ? '' : '<span class="icon-pencil"></span>' . JText::_( $assoc_modified < $row_modified ? 'FLEXI_EARLIER_THAN_THIS' : 'FLEXI_LATER_THAN_THIS')) .
+							($is_oc_item ? '' : '<span class="icon-pencil"></span>' . JText::_( $assoc_modified < $oc_item_modified ? 'FLEXI_TRANSLATINON_IS_STALE' : 'FLEXI_TRANSLATINON_IS_UPTODATE')) .
 							': ' . $assoc_modified_date . '<br>'.
 							( !empty($this->langs->{$assoc_item->lang}) ? ' <img src="'.$this->langs->{$assoc_item->lang}->imgsrc.'" alt="'.$assoc_item->lang.'" /> ' : '').
 							($assoc_item->lang === '*' ? JText::_('FLEXI_ALL') : (!empty($this->langs->{$assoc_item->lang}) ? $this->langs->{$assoc_item->lang}->name: '?')).' <br/> '
 							, 0, 1
 						);
 						
-						$state_colors = array(1 => 'darkgreen', -5 => 'darkcyan');
-						$bg_color = isset($state_colors[$assoc_item->state]) ? $state_colors[$assoc_item->state] : 'gray';
+						$state_colors = array(1 => ' fc_assoc_ispublished', -5 => ' fc_assoc_isinprogress');
+						$assoc_state_class   = isset($state_colors[$assoc_item->state]) ? $state_colors[$assoc_item->state] : ' fc_assoc_isunpublished';
+						$assoc_isstale_class = $oc_item && ($assoc_modified < $oc_item_modified) ? ' fc_assoc_isstale' : ' fc_assoc_isuptodate';
 
 						echo '
-						<a class="fc_assoc_translation label label-association ' . $this->popover_class . ($assoc_modified < $row_modified ? ' fc_assoc_later_mod' : '').'"
-							target="_blank" href="'.$_link.'" data-placement="top" data-content="'.$_title.'" style="background-color: ' . $bg_color . '"
+						<a class="fc_assoc_translation label label-association ' . $this->popover_class . $assoc_isstale_class . $assoc_state_class . '"
+							target="_blank" href="'.$_link.'" data-placement="top" data-content="'.$_title.'"
 						>
-							'.($assoc_item->lang=='*' ? JText::_('FLEXI_ALL') : strtoupper($assoc_item->shortcode ?: '?')).'
+							<span>' . ($assoc_item->lang=='*' ? JText::_('FLEXI_ALL') : strtoupper($assoc_item->shortcode ?: '?')) . '</span>
 						</a>';
 					}
 				}
