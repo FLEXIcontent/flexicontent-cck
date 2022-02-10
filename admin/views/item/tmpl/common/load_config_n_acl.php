@@ -45,7 +45,8 @@ $submit_redirect_url       = $isSite ? $this->params->get('submit_redirect_url')
 $isredirected_after_submit = $newly_submitted_item && $submit_redirect_url;
 
 $buttons_placement  = (int) $this->params->get('buttons_placement' . $CFGsfx, ($isSite ? 0 : -1));
-$form_container_css = $this->params->get('form_container_css' . $CFGsfx, '');
+$form_container_css   = $this->params->get('form_container_css' . $CFGsfx, '');
+$form_container_class = $this->params->get('form_container_class' . $CFGsfx, '');
 
 $usetitle    = (int) $this->params->get('usetitle' . $CFGsfx, 1);
 $usealias    = (int) $this->params->get('usealias' . $CFGsfx, 1);

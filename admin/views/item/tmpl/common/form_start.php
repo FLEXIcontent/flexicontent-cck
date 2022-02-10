@@ -1,7 +1,7 @@
 <?php
 defined('_JEXEC') or die('Restricted access');
 
-$page_classes  = 'flexi_edit flexicontent' . (!$isSite ? ' full_body_box' : '');
+$page_classes  = 'flexi_edit flexicontent fc_item_form_box_' . $typeid. ' ' . $form_container_class . (!$isSite ? ' full_body_box' : '');
 $page_classes .= $isSite && $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 ?>
 
