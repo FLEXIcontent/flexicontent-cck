@@ -1920,6 +1920,8 @@
 
 			<field name="" type="separator" default="FLEXI_PARAMETERS_BEHAVIOR" label="" level="level1" />
 
+			<field name="" type="separator" default="FLEXI_ITEMS_LIST" label="" level="level3" />
+
 			<field name="iman_viewable_items" type="fcradio" default="1" label="FLEXI_IMAN_LIST_VIEWABLE" description="FLEXI_IMAN_LIST_VIEWABLE_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -1928,7 +1930,12 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
+			<field name="iman_authorlang_items" type="fcradio" default="0" label="FLEXI_IMAN_LIST_AUTHOR_LANG" description="FLEXI_IMAN_LIST_AUTHOR_LANG_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
 
+			<field name="" type="separator" default="FLEXI_BEHAVIOUR" label="" level="level3" />
 			<field name="copytask_allow_uneditable" type="fcradio" default="1" label="FLEXI_COPYTASK_ALLOW_UNEDITABLE" description="FLEXI_COPYTASK_ALLOW_UNEDITABLE_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>

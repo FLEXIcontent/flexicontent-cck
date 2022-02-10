@@ -459,6 +459,15 @@ class flexicontent_cats
 			$catlist[] 	= JHtml::_( 'select.option', '', JText::_( $top==-1 ? '' : 'FLEXI_SELECT_CATEGORY' ));
 		}
 
+		else if($top == 4 || $top == 5)
+		{
+			$catlist[] 	= JHtml::_( 'select.option', '', '- ' . JText::_( 'FLEXI_DO_NOT_CHANGE' ) . ' -');
+			if ($top == 5)
+			{
+				$catlist[] 	= JHtml::_( 'select.option', '__associated__', '- ' . JText::_( 'FLEXI_TRY_ASSOCIATED_CATEGORY' ) . ' -');
+			}
+		}
+
 		// A sub-tree where root category of the sub-tree should be excluded, in place of it a disabled prompt is added ... NOTE that:
 		// a subtree should be given or else the first category out of top level category will be removed, which is of little sense
 		else if($top == 3)

@@ -1648,6 +1648,24 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 			return;
 		}
 
+		/**
+		 * Get target languages for translation task
+		 */
+		$lang_arr = $this->input->get('languages', array(), 'array');
+		$lang_arr = array_flip($lang_arr);
+		$lang_tmp = array();
+
+		$site_languages = FLEXIUtilities::getlanguageslist();
+		foreach($site_languages as $site_lang)
+		{
+			if (isset($lang_arr[$site_lang->code]))
+			{
+				$lang_tmp[] = $site_lang->code;
+			}
+		}
+
+		$lang_arr = $lang_tmp;
+
 		// Calculate access of copyitems task
 		$canCopy = $user->authorise('flexicontent.copyitems', 'com_flexicontent');
 
@@ -1670,7 +1688,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		$maincat  = $this->input->get('maincat', '', 'int');
 		$seccats  = $this->input->get('seccats', array(), 'array');
 		$keepseccats = $this->input->get('keepseccats', 0, 'int');
-		$lang    = $this->input->get('language', '', 'string');
+		$lang    = $this->input->get('language', '_not_posted_', 'string');
 
 		$state   = $this->input->get('state', '', 'string');
 		$state   = strlen($state) ? (int) $state : null;
@@ -1778,11 +1796,20 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 				$clean_cache_flag = true;
 				break;
 
-			// Copy and update CASE (optionally moving)
-			default:
-				if ($model->copyitems($auth_cid, $keeptags, $prefix, $suffix, $copynr, $lang, $state, $method, $maincat, $seccats, $type_id, $access))
+			// Translate
+			case 99:
+				if (!$lang_arr && $lang === '_not_posted_')
 				{
-					$msg = JText::sprintf('FLEXI_ITEMS_COPYMOVE_SUCCESS', count($auth_cid));
+					echo '<div class="alert alert-warning">Nothing to do, please select target languages</div>';
+					exit;
+				}
+
+			// Copy and update CASE (optionally moving) 
+			case 3:
+				$total_cnt = $model->copyitems($auth_cid, $keeptags, $prefix, $suffix, $copynr, $lang_arr, $state, $method, $maincat, $seccats, $type_id, $access);
+				if ($total_cnt)
+				{
+					$msg = JText::sprintf('FLEXI_ITEMS_COPYMOVE_SUCCESS', $total_cnt);   //count($auth_cid)
 					$clean_cache_flag = true;
 				}
 				else
@@ -1792,6 +1819,17 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 					$msg = '';
 				}
 				break;
+
+			default:
+				die('Unknown batch mode: ' . $method);
+				break;
+		}
+
+		if ($lang_arr)
+		{
+			$msg = JText::sprintf('FLEXI_N_ITEMS_CREATED', $total_cnt);
+			echo '<div class="alert alert-info">' . $msg . '</div>';
+			return;
 		}
 
 		$link = 'index.php?option=com_flexicontent&view=items';

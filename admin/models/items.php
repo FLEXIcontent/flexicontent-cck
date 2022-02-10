@@ -1670,7 +1670,7 @@ class FlexicontentModelItems extends FCModelAdminList
 	 * @return	boolean	True on success
 	 * @since	1.5
 	 */
-	function copyitems($cid, $keeptags = 1, $prefix = '', $suffix = '', $copynr = 1, $lang = null, $state = null, $method = 1, $maincat = null, $seccats = null, $type_id = null, $access = null)
+	function copyitems($cid, $keeptags = 1, $prefix = '', $suffix = '', $copynr = 1, $lang_arr = null, $state = null, $method = 1, $maincat = null, $seccats = null, $type_id = null, $access = null)
 	{
 		$app    = JFactory::getApplication();
 		$jinput = $app->input;
@@ -1739,289 +1739,309 @@ class FlexicontentModelItems extends FCModelAdminList
 		/**
 		 * Loop through the items, copying, moving, or translating them
 		 */
-
 		$cid_reverse = array_reverse($cid);
+		$total_cnt = 0;
 
 		foreach ($cid_reverse as $itemid)
 		{
-			for( $nr=0; $nr < $copynr; $nr++ )  // Number of copies to create, meaningful only when copying items
+			// Associations added to current item
+			$assoc_data = null;
+
+			// (a) Get existing item
+			$item = JTable::getInstance('flexicontent_items', '');
+			$item->load($itemid);
+
+			foreach($lang_arr as $lang)
 			{
-				// (a) Get existing item
-				$item = JTable::getInstance('flexicontent_items', '');
-				$item->load($itemid);
-				// Some shortcuts
-				$sourceid 	= (int)$item->id;
-				$curversion = (int)$item->version;
-
-				// (b) We create copy so that the original data are always available
-				$row = clone($item);
-
-				// (c) Force creation & assigning of new records by cleaning the primary keys
-				$row->id 				= null;    // force creation of new record in _content DB table
-				$row->item_id 	= null;    // force creation of new record in _flexicontent_ext DB table
-				$row->asset_id 	= null;  // force creation of new record in _assets DB table
-
-				// (d) Start altering the properties of the cloned item
-				$row->title 		= ($prefix ? $prefix . ' ' : '') . $item->title . ($suffix ? ' ' . $suffix : '');
-				$row->alias			= !$prefix && !$suffix ? $row->alias : '';
-				$row->hits 			= 0;
-				if (!$translate_method)  // cleared featured flag if not translating
-					$row->featured = 0;
-				$row->version 	= 1;
-				$datenow 				= JFactory::getDate();
-				$row->created 		= $method == 99 ? $item->created : $datenow->toSql();
-				$row->publish_up	= $method == 99 ? $item->publish_up : $datenow->toSql();
-				$row->modified 		= $nullDate = $this->_db->getNullDate();
-				$lang_from			= substr($row->language,0,2);
-				$row->language	= $lang ? $lang : $row->language;
-				$lang_to				= substr($row->language,0,2);
-				$row->state			= strlen($state) ? $state : $row->state;  // keep original if: null, ''
-				$row->type_id		= $type_id ? $type_id : $row->type_id;    // keep original if: null, zero, ''
-				$row->access		= $access ? $access : $row->access;       // keep original if: null, zero, ''
-
-				$doauto['title'] = $doauto['introtext'] = $doauto['fulltext'] = $doauto['metakey'] = $doauto['metadesc'] = true;    // In case JF data is missing
-				if ($translate_method == 2 || $translate_method == 4)
+				for( $nr=0; $nr < $copynr; $nr++ )  // Number of copies to create, meaningful only when copying without TRANSLATING items
 				{
-					// a. Try to get joomfish/falang translation from the item
-					$jfitemfields = false;
+					// Some shortcuts
+					$sourceid 	= (int)$item->id;
+					$curversion = (int)$item->version;
 
-					if ($_FALANG) {
-						$query = "SELECT c.* FROM `#__falang_content` AS c "
-							." LEFT JOIN #__languages AS lg ON c.language_id=lg.lang_id"
-							." WHERE c.reference_table = 'content' AND lg.lang_code='".$row->language."' AND c.reference_id = ". $sourceid;
-						$this->_db->setQuery($query);
-						$jfitemfields = $this->_db->loadObjectList();
-					}
+					// (b) We create copy so that the original data are always available
+					$row = clone($item);
 
-					if ( !$jfitemfields && $_FISH) {
-						$query = "SELECT c.* FROM `".$dbprefix."jf_content` AS c "
-							." LEFT JOIN #__languages AS lg ON c.language_id=".($_NEW_LANG_TBL ? "lg.lang_id" : "lg.id")
-							." WHERE c.reference_table = 'content' AND ".($_NEW_LANG_TBL ? "lg.lang_code" : "lg.code")."='".$row->language."' AND c.reference_id = ". $sourceid;
-						$this->_db->setQuery($query);
-						$jfitemfields = $this->_db->loadObjectList();
-					}
+					// (c) Force creation & assigning of new records by cleaning the primary keys
+					$row->id 				= null;    // force creation of new record in _content DB table
+					$row->item_id 	= null;    // force creation of new record in _flexicontent_ext DB table
+					$row->asset_id 	= null;  // force creation of new record in _assets DB table
 
-					// b. if joomfish translation found set for the new item
-					if($jfitemfields) {
-						$jfitemdata = new stdClass();
-						foreach($jfitemfields as $jfitemfield) {
-							$jfitemdata->{$jfitemfield->reference_field} = $jfitemfield->value;
-						}
+					// (d) Start altering the properties of the cloned item
+					$row->title 		=
+						($prefix ? str_replace('_lang_code_', $lang, $prefix) . ' ' : '') .
+						$item->title .
+						($suffix ? ' ' . str_replace('_lang_code_', $lang, $suffix) : '');
+					$row->alias			= !$prefix && !$suffix ? $row->alias : '';
+					$row->hits 			= 0;
+					if (!$translate_method)  // cleared featured flag if not translating
+						$row->featured = 0;
+					$row->version 	= 1;
+					$datenow 				= JFactory::getDate();
+					$row->created 		= $method == 99 ? $item->created : $datenow->toSql();
+					$row->publish_up	= $method == 99 ? $item->publish_up : $datenow->toSql();
+					$row->modified 		= $nullDate = $this->_db->getNullDate();
+					$lang_from			= substr($row->language,0,2);
+					$row->language	= $lang ? $lang : $row->language;
+					$lang_to				= substr($row->language,0,2);
+					$row->state			= strlen($state) ? $state : $row->state;  // keep original if: null, ''
+					$row->type_id		= $type_id ? $type_id : $row->type_id;    // keep original if: null, zero, ''
+					$row->access		= $access ? $access : $row->access;       // keep original if: null, zero, ''
 
-						if (isset($jfitemdata->title) && StringHelper::strlen($jfitemdata->title)>0){
-							$row->title = $jfitemdata->title;
-							$doauto['title'] = false;
-						}
-
-						if (isset($jfitemdata->alias) && StringHelper::strlen($jfitemdata->alias)>0) {
-							$row->alias = $jfitemdata->alias;
-						}
-
-						if (isset($jfitemdata->introtext) && StringHelper::strlen(strip_tags($jfitemdata->introtext))>0) {
-							$row->introtext = $jfitemdata->introtext;
-							$doauto['introtext'] = false;
-						}
-
-						if (isset($jfitemdata->fulltext) && StringHelper::strlen(strip_tags($jfitemdata->fulltext))>0) {
-							$row->fulltext = $jfitemdata->fulltext;
-							$doauto['fulltext'] = false;
-						}
-
-						if (isset($jfitemdata->metakey) && StringHelper::strlen($jfitemdata->metakey)>0) {
-							$row->metakey = $jfitemdata->metakey;
-							$doauto['metakey'] = false;
-						}
-
-						if (isset($jfitemdata->metadesc) && StringHelper::strlen($jfitemdata->metadesc)>0) {
-							$row->metadesc = $jfitemdata->metadesc;
-							$doauto['metadesc'] = false;
-						}
-					}
-				}
-
-
-				// Try to do automatic translation from the item, if autotranslate is SET and --NOT found-- or --NOT using-- JoomFish Data
-				if ($translate_method == 3 || $translate_method == 4)
-				{
-					// Translate fulltext item property, using the function for which handles custom fields TYPES: text, textarea, ETC
-					if ($doauto['fulltext'])
+					$doauto['title'] = $doauto['introtext'] = $doauto['fulltext'] = $doauto['metakey'] = $doauto['metadesc'] = true;    // In case JF data is missing
+					if ($translate_method == 2 || $translate_method == 4)
 					{
-						$desc_field->value = $row->fulltext;
-						$fields = array( &$desc_field );
-						$this->translateFieldValues( $fields, $row, $lang_from, $lang_to);
-						$row->fulltext = $desc_field->value;
-					}
+						// a. Try to get joomfish/falang translation from the item
+						$jfitemfields = false;
 
-					// TRANSLATE basic item properties (if not already imported via Joomfish)
-					$translatables = array('title', 'introtext', 'metakey', 'metadesc');
+						if ($_FALANG) {
+							$query = "SELECT c.* FROM `#__falang_content` AS c "
+								." LEFT JOIN #__languages AS lg ON c.language_id=lg.lang_id"
+								." WHERE c.reference_table = 'content' AND lg.lang_code='".$row->language."' AND c.reference_id = ". $sourceid;
+							$this->_db->setQuery($query);
+							$jfitemfields = $this->_db->loadObjectList();
+						}
 
-					$fieldnames_arr = array();
-					$fieldvalues_arr = array();
-					foreach($translatables as $translatable)
-					{
-						if ( !$doauto[$translatable] ) continue;
+						if ( !$jfitemfields && $_FISH) {
+							$query = "SELECT c.* FROM `".$dbprefix."jf_content` AS c "
+								." LEFT JOIN #__languages AS lg ON c.language_id=".($_NEW_LANG_TBL ? "lg.lang_id" : "lg.id")
+								." WHERE c.reference_table = 'content' AND ".($_NEW_LANG_TBL ? "lg.lang_code" : "lg.code")."='".$row->language."' AND c.reference_id = ". $sourceid;
+							$this->_db->setQuery($query);
+							$jfitemfields = $this->_db->loadObjectList();
+						}
 
-						$fieldnames_arr[] = $translatable;
-						$translatable_obj = new stdClass();
-						$translatable_obj->originalValue = $row->{$translatable};
-						$translatable_obj->noTranslate = false;
-						$fieldvalues_arr[] = $translatable_obj;
-					}
+						// b. if joomfish translation found set for the new item
+						if($jfitemfields) {
+							$jfitemdata = new stdClass();
+							foreach($jfitemfields as $jfitemfield) {
+								$jfitemdata->{$jfitemfield->reference_field} = $jfitemfield->value;
+							}
 
-					if (count($fieldvalues_arr))
-					{
-						$result = autoTranslator::translateItem($fieldnames_arr, $fieldvalues_arr, $lang_from, $lang_to);
+							if (isset($jfitemdata->title) && StringHelper::strlen($jfitemdata->title)>0){
+								$row->title = $jfitemdata->title;
+								$doauto['title'] = false;
+							}
 
-						if (intval($result))
-						{
-							$n = 0;
-							foreach($fieldnames_arr as $fieldname)
-							{
-								$row->{$fieldname} = $fieldvalues_arr[$n]->translationValue;
-								$n++;
+							if (isset($jfitemdata->alias) && StringHelper::strlen($jfitemdata->alias)>0) {
+								$row->alias = $jfitemdata->alias;
+							}
+
+							if (isset($jfitemdata->introtext) && StringHelper::strlen(strip_tags($jfitemdata->introtext))>0) {
+								$row->introtext = $jfitemdata->introtext;
+								$doauto['introtext'] = false;
+							}
+
+							if (isset($jfitemdata->fulltext) && StringHelper::strlen(strip_tags($jfitemdata->fulltext))>0) {
+								$row->fulltext = $jfitemdata->fulltext;
+								$doauto['fulltext'] = false;
+							}
+
+							if (isset($jfitemdata->metakey) && StringHelper::strlen($jfitemdata->metakey)>0) {
+								$row->metakey = $jfitemdata->metakey;
+								$doauto['metakey'] = false;
+							}
+
+							if (isset($jfitemdata->metadesc) && StringHelper::strlen($jfitemdata->metadesc)>0) {
+								$row->metadesc = $jfitemdata->metadesc;
+								$doauto['metadesc'] = false;
 							}
 						}
 					}
-				}
-				//print_r($row->fulltext); exit;
-
-				// Check new item
-				$row->check();
-
-				// Create a new item in the content fc_items_ext table
-				$row->store();
-
-				// Not doing a translation, we start a new language group for the new item
-				if ($translate_method == 0)
-				{
-					$row->lang_parent_id = 0; //$row->id;
-					$row->store();
-				}
 
 
-				/**
-				 * Copy custom fields, translating the fields if so configured
-				 */
-
-				$doTranslation = $translate_method == 3 || $translate_method == 4;
-				$query 	= 'SELECT fir.*, f.* '
-						. ' FROM #__flexicontent_fields_item_relations as fir'
-						. ' LEFT JOIN #__flexicontent_fields as f ON f.id=fir.field_id'
-						. ' WHERE item_id = '. $sourceid
-						;
-				$this->_db->setQuery($query);
-				$fields = $this->_db->loadObjectList();
-				//echo "<pre>"; print_r($fields); exit;
-
-				if ($doTranslation)  $this->translateFieldValues( $fields, $row, $lang_from, $lang_to);
-				//foreach ($fields as $field)  if ($field->field_type!='text' && $field->field_type!='textarea') { print_r($field->value); echo "<br><br>"; }
-
-				foreach($fields as $field)
-				{
-					if (strlen($field->value))
+					// Try to do automatic translation from the item, if autotranslate is SET and --NOT found-- or --NOT using-- JoomFish Data
+					if ($translate_method == 3 || $translate_method == 4)
 					{
-						$field->item_id = $row->id;
-						$query 	= 'INSERT INTO #__flexicontent_fields_item_relations (`field_id`, `item_id`, `valueorder`, `suborder`, `value`)'
-							. ' VALUES(' . $field->field_id . ', ' . $field->item_id . ', ' . $field->valueorder . ', ' . $field->suborder . ', ' . $this->_db->Quote($field->value)
+						// Translate fulltext item property, using the function for which handles custom fields TYPES: text, textarea, ETC
+						if ($doauto['fulltext'])
+						{
+							$desc_field->value = $row->fulltext;
+							$fields = array( &$desc_field );
+							$this->translateFieldValues( $fields, $row, $lang_from, $lang_to);
+							$row->fulltext = $desc_field->value;
+						}
+
+						// TRANSLATE basic item properties (if not already imported via Joomfish)
+						$translatables = array('title', 'introtext', 'metakey', 'metadesc');
+
+						$fieldnames_arr = array();
+						$fieldvalues_arr = array();
+						foreach($translatables as $translatable)
+						{
+							if ( !$doauto[$translatable] ) continue;
+
+							$fieldnames_arr[] = $translatable;
+							$translatable_obj = new stdClass();
+							$translatable_obj->originalValue = $row->{$translatable};
+							$translatable_obj->noTranslate = false;
+							$fieldvalues_arr[] = $translatable_obj;
+						}
+
+						if (count($fieldvalues_arr))
+						{
+							$result = autoTranslator::translateItem($fieldnames_arr, $fieldvalues_arr, $lang_from, $lang_to);
+
+							if (intval($result))
+							{
+								$n = 0;
+								foreach($fieldnames_arr as $fieldname)
+								{
+									$row->{$fieldname} = $fieldvalues_arr[$n]->translationValue;
+									$n++;
+								}
+							}
+						}
+					}
+					//print_r($row->fulltext); exit;
+
+					// Check new item
+					$row->check();
+
+					// Create a new item in the content fc_items_ext table
+					$row->store();
+
+					// Not doing a translation, we start a new language group for the new item
+					if ($translate_method == 0)
+					{
+						$row->lang_parent_id = 0; //$row->id;
+						$row->store();
+					}
+
+
+					/**
+					 * Copy custom fields, translating the fields if so configured
+					 */
+
+					$doTranslation = $translate_method == 3 || $translate_method == 4;
+					$query 	= 'SELECT fir.*, f.* '
+							. ' FROM #__flexicontent_fields_item_relations as fir'
+							. ' LEFT JOIN #__flexicontent_fields as f ON f.id=fir.field_id'
+							. ' WHERE item_id = '. $sourceid
+							;
+					$this->_db->setQuery($query);
+					$fields = $this->_db->loadObjectList();
+					//echo "<pre>"; print_r($fields); exit;
+
+					if ($doTranslation)  $this->translateFieldValues( $fields, $row, $lang_from, $lang_to);
+					//foreach ($fields as $field)  if ($field->field_type!='text' && $field->field_type!='textarea') { print_r($field->value); echo "<br><br>"; }
+
+					foreach($fields as $field)
+					{
+						if (strlen($field->value))
+						{
+							$field->item_id = $row->id;
+							$query 	= 'INSERT INTO #__flexicontent_fields_item_relations (`field_id`, `item_id`, `valueorder`, `suborder`, `value`)'
+								. ' VALUES(' . $field->field_id . ', ' . $field->item_id . ', ' . $field->valueorder . ', ' . $field->suborder . ', ' . $this->_db->Quote($field->value)
+								. ')'
+								;
+							$this->_db->setQuery($query)->execute();
+							flexicontent_db::setValues_commonDataTypes($field);
+						}
+					}
+
+					if ($use_versioning)
+					{
+						$v = new stdClass();
+						$v->item_id    = (int)$item->id;
+						$v->version_id = 1;
+						$v->created    = $item->created;
+						$v->created_by = $item->created_by;
+						$v->comment    = ''; //'copy version.';
+						$this->_db->insertObject('#__flexicontent_versions', $v);
+					}
+
+					// Get the items versions
+					$query 	= 'SELECT *'
+							. ' FROM #__flexicontent_items_versions'
+							. ' WHERE item_id = '. $sourceid
+							. ' AND version = ' . $curversion
+							;
+					$curversions = $this->_db->setQuery($query)->loadObjectList();
+
+					foreach ($curversions as $cv)
+					{
+						$query 	= 'INSERT INTO #__flexicontent_items_versions (`version`, `field_id`, `item_id`, `valueorder`, `suborder`, `value`)'
+							. ' VALUES(1 ,'  . $cv->field_id . ', ' . $row->id . ', ' . $cv->valueorder . ', ' . $cv->suborder . ', ' . $this->_db->Quote($cv->value)
 							. ')'
 							;
 						$this->_db->setQuery($query)->execute();
-						flexicontent_db::setValues_commonDataTypes($field);
 					}
-				}
 
-				if ($use_versioning)
-				{
-					$v = new stdClass();
-					$v->item_id 		= (int)$item->id;
-					$v->version_id		= 1;
-					$v->created 	= $item->created;
-					$v->created_by 	= $item->created_by;
-					//$v->comment		= 'copy version.';
-					$this->_db->insertObject('#__flexicontent_versions', $v);
-				}
-
-				// get the items versions
-				$query 	= 'SELECT *'
-						. ' FROM #__flexicontent_items_versions'
-						. ' WHERE item_id = '. $sourceid
-						. ' AND version = ' . $curversion
-						;
-				$curversions = $this->_db->setQuery($query)->loadObjectList();
-
-				foreach ($curversions as $cv)
-				{
-					$query 	= 'INSERT INTO #__flexicontent_items_versions (`version`, `field_id`, `item_id`, `valueorder`, `suborder`, `value`)'
-						. ' VALUES(1 ,'  . $cv->field_id . ', ' . $row->id . ', ' . $cv->valueorder . ', ' . $cv->suborder . ', ' . $this->_db->Quote($cv->value)
-						. ')'
-						;
-					$this->_db->setQuery($query)->execute();
-				}
-
-				// get the item categories
-				$query 	= 'SELECT catid'
-						. ' FROM #__flexicontent_cats_item_relations'
-						. ' WHERE itemid = '. $sourceid
-						;
-				$this->_db->setQuery($query);
-				$cats = $this->_db->loadColumn();
-
-				foreach($cats as $cat)
-				{
-					$query 	= 'INSERT INTO #__flexicontent_cats_item_relations (`catid`, `itemid`)'
-							.' VALUES(' . $cat . ',' . $row->id . ')'
-							;
-					$this->_db->setQuery($query)->execute();
-				}
-
-				if ($keeptags)
-				{
-					// get the item tags
-					$query 	= 'SELECT tid'
-							. ' FROM #__flexicontent_tags_item_relations'
+					// Get the item categories
+					$query 	= 'SELECT catid'
+							. ' FROM #__flexicontent_cats_item_relations'
 							. ' WHERE itemid = '. $sourceid
 							;
-					$tags = $this->_db->setQuery($query)->loadColumn();
+					$cats = $this->_db->setQuery($query)->loadColumn();
 
-					foreach($tags as $tag)
+					foreach($cats as $cat)
 					{
-						$query 	= 'INSERT INTO #__flexicontent_tags_item_relations (`tid`, `itemid`)'
-								.' VALUES(' . $tag . ',' . $row->id . ')'
+						$query 	= 'INSERT INTO #__flexicontent_cats_item_relations (`catid`, `itemid`)'
+								.' VALUES(' . $cat . ',' . $row->id . ')'
 								;
 						$this->_db->setQuery($query)->execute();
 					}
-				}
 
-				if ($method == 3)
-				{
-					$this->moveitem($row->id, $maincat, $seccats);
-				}
-				elseif ($method == 99 && ($maincat || $seccats))
-				{
-					$row->catid = $maincat ? $maincat : $row->catid;
-					$this->moveitem($row->id, $row->catid, $seccats);
-				}
-
-				// If new item is a tranlation, load the language associations of item
-				// that was copied, and save the associations, adding the new item to them
-				if ($method == 99 && $item->language!='*' && $row->language!='*' && flexicontent_db::useAssociations())
-				{
-					// Get associations of item that was duplicated
-					$associations = JLanguageAssociations::getAssociations('com_content', '#__content', 'com_content.item', $item->id);
-					$_data = array();
-					foreach ($associations as $tag => $association)
+					if ($keeptags)
 					{
-						$_data['associations'][$tag] = (int)$association->id;
-					}
-					$_data['associations'][$row->language]  = $row->id;  // Add new item itself
-					$_data['associations'][$item->language] = $item->id; // Add current item (needed if association group is empty)
+						// get the item tags
+						$query 	= 'SELECT tid'
+								. ' FROM #__flexicontent_tags_item_relations'
+								. ' WHERE itemid = '. $sourceid
+								;
+						$tags = $this->_db->setQuery($query)->loadColumn();
 
-					// Save associations, adding the new item
-					flexicontent_db::saveAssociations($item, $_data, $_context = 'com_content.item');
+						foreach($tags as $tag)
+						{
+							$query 	= 'INSERT INTO #__flexicontent_tags_item_relations (`tid`, `itemid`)'
+									.' VALUES(' . $tag . ',' . $row->id . ')'
+									;
+							$this->_db->setQuery($query)->execute();
+						}
+					}
+
+					if ($method == 3)
+					{
+						$this->moveitem($row->id, $maincat, $seccats);
+					}
+					elseif ($method == 99 && ($maincat || $seccats))
+					{
+						$row->catid = $maincat ? $maincat : $row->catid;
+						$this->moveitem($row->id, $row->catid, $seccats);
+					}
+
+					/**
+					 * If new item is a tranlation, load the language associations of item
+					 * that was copied, and save the associations, adding the new item to them
+					 */
+					if ($method == 99 && $item->language!='*' && $row->language!='*' && flexicontent_db::useAssociations())
+					{
+						// Get associations of item that was duplicated
+						if ($assoc_data === null)
+						{
+							// Note: JLanguageAssociations::getAssociations returns cached data
+							$associations = JLanguageAssociations::getAssociations('com_content', '#__content', 'com_content.item', $item->id);
+							$assoc_data = array();
+							foreach ($associations as $tag => $association)
+							{
+								$assoc_data['associations'][$tag] = (int)$association->id;
+							}
+						}
+						$assoc_data['associations'][$row->language]  = $row->id;  // Add new item itself
+						$assoc_data['associations'][$item->language] = $item->id; // Add current item (needed if association group is empty)
+					}
+					$total_cnt++;
 				}
 			}
+
+			// Save new associations for current item
+			if ($assoc_data)
+			{
+				flexicontent_db::saveAssociations($item, $assoc_data, $_context = 'com_content.item');
+			}
 		}
-		return true;
+
+		return $total_cnt;
 	}
 
 
@@ -3554,6 +3574,7 @@ class FlexicontentModelItems extends FCModelAdminList
 			'created'  => 'created',
 			'modified' => 'modified',
 			'state'    => 'state',
+			'catid'    => 'catid',
 		);
 
 		return parent::getLangAssocs($ids, $config);

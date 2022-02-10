@@ -74,9 +74,13 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 		 * Batch task variable
 		 */
 
-		if ($task === 'batch' || $task === 'copy' || $task === 'translate')
+		if ($task === 'batch' || $task === 'copy' || $task === 'translate' || $task === 'quicktranslate')
 		{
-			$behaviour = $task === 'translate'
+			//$model_s = $this->getModel('item');
+			//$this->model_s = $model_s;
+			$this->task    = $task;
+
+			$behaviour = $task === 'translate' || $task === 'quicktranslate'
 				? 'translate'
 				: ($task === 'copy' ? 'copyonly' : 'copymove');
 			$this->setLayout('batch');
@@ -1099,7 +1103,9 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 		$categories = $globalcats;
 
 		// build the main category select list
-		$lists['maincat'] = flexicontent_cats::buildcatselect($categories, 'maincat', '', JText::_('FLEXI_DO_NOT_CHANGE'), 'class="use_select2_lib" size="10"', false, false);
+		$lists['maincat'] = flexicontent_cats::buildcatselect($categories, 'maincat',
+			($behaviour === 'translate' ? '__associated__' : ''), $behaviour === 'translate' ? 5 : 4,
+			'class="use_select2_lib" size="10"', false, false);
 
 		// build the secondary categories select list
 		$lists['seccats'] = flexicontent_cats::buildcatselect($categories, 'seccats[]', '', 0, 'class="use_select2_lib" multiple="multiple" size="10"', false, false);
@@ -1162,6 +1168,7 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 		$perms    = FlexicontentHelperPerm::getPerm();
 		$session  = JFactory::getSession();
 		$useAssocs= flexicontent_db::useAssociations();
+		$cparams  = JComponentHelper::getParams('com_flexicontent');
 
 		$js = '';
 
@@ -1324,26 +1331,45 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 		{
 			$btn_task = $contrl . 'batch';
 			//JToolbarHelper::custom($btn_task, 'copy.png', 'copy_f2.png', 'FLEXI_BATCH');
-			//$btn_arr[] =
-			flexicontent_html::addToolBarButton(
-				'FLEXI_BATCH', $btn_name = 'batch', $full_js = '',
+			$btn_arr[] = flexicontent_html::addToolBarButton(
+				'FLEXI_UPDATE_COPY_MOVE', $btn_name = 'batch', $full_js = '',
 				$msg_alert = '', $msg_confirm = '',
 				$btn_task, $extra_js = '', $btn_list=true, $btn_menu=true, $btn_confirm=false,
 				$this->btn_sm_class . ' btn-fcaction ' . (FLEXI_J40GE ? $this->btn_iv_class : '') . ' ' . $this->popover_class, $btn_icon='icon-checkbox-partial',
-				'data-placement="right" data-content="' . flexicontent_html::encodeHTML(JText::_(''), 2) . '"', $auto_add = 1, $tag_type='button'
+				'data-placement="right" data-content="' . flexicontent_html::encodeHTML(JText::_(''), 2) . '"', $auto_add = 0, $tag_type='button'
 			);
 
 			if ($useAssocs)
 			{
+				/**
+				 * Add multiple translations
+				 */
+				$popup_load_url = JUri::base(true) . '/index.php?option=com_flexicontent&view=items&tmpl=component&task=quicktranslate';
+				$btn_name = 'quicktranslate';
+				$full_js = "" .
+					"var url = jQuery(this).data('taskurl'); " .
+					"var cid = []; jQuery.each(jQuery(\"input[name='cid[]']:checked\"), function(){ cid.push(jQuery(this).val()); }); " .
+					"url += '&' + cid.map(function(el, idx) { return 'cid[' + ']=' + el; }).join('&'); " .
+					"fc_showDialog(url, 'fc_modal_popup_container', 0, 1200, 0, fc_edit_batch_modal_close, {'title': '".flexicontent_html::encodeHTML(JText::_('Add translations'), 2)."'}); return false;";
+				$btn_arr[] = flexicontent_html::addToolBarButton(
+					'FLEXI_VERIFY_N_TRANSLATE', $btn_name, $full_js,
+					$msg_alert = JText::_("FLEXI_NO_ITEMS_SELECTED", true), $msg_confirm = '',
+					$btn_task='quicktranslate', $extra_js='', $btn_list=true, $btn_menu=true, $btn_confirm=false,
+					$this->btn_sm_class . ' btn-fcaction ' . ($newBtn_in_dropdown && FLEXI_J40GE ? '_DDI_class_ ' : '') .(FLEXI_J40GE ? $this->btn_iv_class : '') . ' ' . $this->tooltip_class, $btn_icon='icon-flag',
+					'data-placement="right" data-taskurl="' . $popup_load_url .'" data-title="' . flexicontent_html::encodeHTML(JText::_('FLEXI_ADD_TRANSLATIONS'), 2) . '"', $auto_add = 0, $tag_type='button'
+				);
+
+				/**
+				 * Add single translation
+				 */
 				$btn_task = $contrl . 'translate';
 				//JToolbarHelper::custom($btn_task, 'flag', 'translate', 'FLEXI_TRANSLATE');
-				//$btn_arr[] =
-				flexicontent_html::addToolBarButton(
-					'FLEXI_TRANSLATE', $btn_name = 'translate', $full_js = '',
+				$btn_arr[] = flexicontent_html::addToolBarButton(
+					'FLEXI_TRANSLATE_MULTIPLE_ITEMS', $btn_name = 'translate', $full_js = '',
 					$msg_alert = '', $msg_confirm = '',
 					$btn_task, $extra_js = '', $btn_list=true, $btn_menu=true, $btn_confirm=false,
-					$this->btn_sm_class . ' btn-fcaction ' . (FLEXI_J40GE ? $this->btn_iv_class : '') . ' ' . $this->popover_class, $btn_icon='icon-flag',
-					'data-placement="right" data-content="' . flexicontent_html::encodeHTML(JText::_(''), 2) . '"', $auto_add = 1, $tag_type='button'
+					$this->btn_sm_class . ' btn-fcaction ' . (FLEXI_J40GE ? $this->btn_iv_class : '') . ' ' . $this->tooltip_class, $btn_icon='icon-flag',
+					'data-placement="right" data-title="' . flexicontent_html::encodeHTML(JText::_('FLEXI_ADD_TRANSLATIONS'), 2) . '"', $auto_add = 0, $tag_type='button'
 				);
 			}
 		}
@@ -1353,7 +1379,7 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 			$drop_btn = '
 				<button id="toolbar-advanced" class="' . $this->btn_sm_class . ' dropdown-toggle" data-toggle="dropdown" data-bs-toggle="dropdown">
 					<span title="'.JText::_('FLEXI_ADVANCED').'" class="icon-menu"></span>
-					'.JText::_('FLEXI_ADVANCED').'
+					'.JText::_('FLEXI_BATCH').'
 					<span class="caret"></span>
 				</button>';
 			array_unshift($btn_arr, $drop_btn);

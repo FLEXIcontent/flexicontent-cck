@@ -1737,7 +1737,7 @@ class ParentClassItem extends FCModelAdmin
 
 		// Check if using author default language
 		$default_lang = $default_lang === '_author_lang_'
-			? $user->getParam('language', '*')
+			? $user->getParam(($app->isClient('site') ? 'language' : 'admin_language'), '*')
 			: $default_lang;
 
 		// Check if using Site default language
