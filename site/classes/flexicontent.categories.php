@@ -393,7 +393,7 @@ class flexicontent_cats
 		 * A reverse index of already used categories, so that we do not skip them
 		 * when skipping categories based on their language and / or their state
 		 */
-		$selectedcats_indexed = array_flip(!is_array($selected) ? array($selected) : $selected);
+		$selectedcats_indexed = array_flip(!is_array($selected) ? array($selected === NULL ? '' : $selected) : $selected);
 
 
 		// ***
