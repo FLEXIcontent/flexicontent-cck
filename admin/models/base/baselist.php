@@ -655,6 +655,7 @@ abstract class FCModelAdminList extends JModelList
 		{
 			$user = JFactory::getUser();
 
+			// This is already done by controller task / caller but redo
 			$ids = ArrayHelper::toInteger($ids);
 			$cid_list = implode(',', $ids);
 
@@ -877,6 +878,7 @@ abstract class FCModelAdminList extends JModelList
 
 		if (count($ids))
 		{
+			// This is already done by controller task / caller but redo
 			$ids = ArrayHelper::toInteger($ids);
 			$cid_list = implode(',', $ids);
 

@@ -1673,21 +1673,22 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 	 * @return	string $msg
 	 * @since	1.
 	 */
-	function delete($cid)
+	public function delete($cid, $model = null)
 	{
-		if ( !count($cid) ) return false;
+		if ( !count( $cid ) ) return false;
 
 		jimport('joomla.filesystem.path');
 		jimport('joomla.filesystem.file');
 
-		$cids = implode( ',', $cid );
+		// This is already done by controller task / caller but redo
+		$cid = ArrayHelper::toInteger($cid);
+		$cid_list = implode(',', $cid);
 
 		$query = 'SELECT a.filename, a.url, a.secure'
 				. ' FROM #__flexicontent_files AS a'
-				. ' WHERE a.id IN ('. $cids .')';
+				. ' WHERE a.id IN ('. $cid_list .')';
 
-		$this->_db->setQuery( $query );
-		$files = $this->_db->loadObjectList();
+		$files = $this->_db->setQuery($query)->loadObjectList();
 
 		foreach($files as $file)
 		{
@@ -1701,10 +1702,58 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 			}
 		}
 
+
+		/**
+		 * Get records using the model, we need an array of records to use for calling the events
+		 */
+		$record_arr = array();
+
+		if ($model && $this->event_context && ($this->event_before_delete || $this->event_after_delete))
+		{
+			$app = JFactory::getApplication();
+			$dispatcher = JEventDispatcher::getInstance();
+
+			// Load all content and flexicontent plugins for triggering their delete events
+			if ($this->event_context === 'com_content.article')
+			{
+				JPluginHelper::importPlugin('content');
+			}
+			JPluginHelper::importPlugin('flexicontent');
+
+			foreach ($cid as $record_id)
+			{
+				$record = $model->getRecord($record_id);
+				$record_arr[] = $record;
+			}
+		}
+
+		/**
+		 * Trigger onBeforeDelete event(s)
+		 */
+		if ($this->event_before_delete) foreach($record_arr as $record)
+		{
+			// Trigger Event 'event_before_delete' e.g. 'onContentBeforeDelete' of flexicontent or content plugins
+			FLEXI_J40GE
+				? $app->triggerEvent($this->event_before_delete, array($this->event_context, $record))
+				: $dispatcher->trigger($this->event_before_delete, array($this->event_context, $record));
+		}
+
+
 		$query = 'DELETE FROM #__flexicontent_files'
-		. ' WHERE id IN ('. $cids .')';
+		. ' WHERE id IN ('. $cid_list .')';
 
 		$this->_db->setQuery($query)->execute();
+
+		/**
+		 * Trigger onAfterDelete event
+		 */
+		if ($this->event_after_delete) foreach($record_arr as $record)
+		{
+			// Trigger Event 'event_before_delete' e.g. 'onContentAfterDelete' of flexicontent or content plugins
+			FLEXI_J40GE
+				? $app->triggerEvent($this->event_after_delete, array($this->event_context, $record))
+				: $dispatcher->trigger($this->event_after_delete, array($this->event_context, $record));
+		}
 
 		return true;
 	}
@@ -1826,11 +1875,13 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 
 		if (count( $cid ))
 		{
-			$cids = implode( ',', $cid );
+			// This is already done by controller task / caller but redo
+			$cid = ArrayHelper::toInteger($cid);
+			$cid_list = implode(',', $cid);
 
 			$query = 'UPDATE #__' . $this->records_dbtbl
 				. ' SET published = ' . (int) $publish
-				. ' WHERE id IN ('. $cids .')'
+				. ' WHERE id IN ('. $cid_list .')'
 				. ' AND ( checked_out = 0 OR ( checked_out = ' . (int) $user->get('id'). ' ) )'
 			;
 			$this->_db->setQuery( $query );
