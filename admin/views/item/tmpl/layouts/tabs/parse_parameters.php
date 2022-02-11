@@ -46,18 +46,16 @@ class FcFormLayoutParameters
 
 
 		/**
-		 * Fix aliases, also replacing field types with field names
+		 * Legacy aliases, also mapping field types to field names
 		 */
-		foreach($tab_fields as $tab_name => $field_list)
-		{
-			$field_list = str_replace('createdby', 'created_by', $field_list);
-			$field_list = str_replace('modifiedby', 'modified_by', $field_list);
-			$field_list = str_replace('createdby_alias', 'created_by_alias', $field_list);
-			$field_list = str_replace('maintext', 'text', $field_list);
-			$field_list = str_replace('type', 'document_type', $field_list);
-			$field_list = str_replace('language', 'lang_assocs', $field_list);  // LEGACY value ...
-			$tab_fields[$tab_name] = $field_list;
-		}
+		$legacy_alias_map = array(
+			'createdby' => 'created_by',
+			'modifiedby' => 'modified_by',
+			'createdby_alias' => 'created_by_alias',
+			'maintext' => 'text',
+			'type' => 'document_type',
+			'language' => 'lang_assocs',
+		);
 
 		// Split field lists
 		$all_tab_fields = array();    // All placements
@@ -72,10 +70,19 @@ class FcFormLayoutParameters
 				);
 			$tab_fields[$i] = array_flip($tab_fields[$i]);
 
-			// Find all field names of the placed fields, we can use this to find non-placed fields
-			foreach ($tab_fields[$i] as $field_name => $ignore)
+			/*
+			 * 1. Find all field names of the placed fields, we can use this to find non-placed fields
+			 * 2. Fix legacy aliases, also replacing field types with field names
+			 */
+			$tab_fields_tmp = array();
+			foreach ($tab_fields[$i] as $field_name => $position)
 			{
-				$all_tab_fields[$field_name] = 1;
+				$field_name_fixed = isset($legacy_alias_map[$field_name])
+					? $legacy_alias_map[$field_name]
+					: $field_name;
+
+				$tab_fields_tmp[$field_name_fixed] = $position;
+				$all_tab_fields[$field_name_fixed] = 1;
 			}
 		}
 
@@ -99,13 +106,14 @@ class FcFormLayoutParameters
 			$_str = StringHelper::strtoupper(StringHelper::substr($_str, 0, 1)) . StringHelper::substr($_str, 1);
 
 			$types_arr = flexicontent_html::getTypesList();
-			$type_lbl = isset($types_arr[$item->type_id]) ? $types_arr[$item->type_id]->name : '';
-			$type_lbl = $type_lbl ? JText::_($type_lbl) : JText::_('FLEXI_CONTENT_TYPE');
-			$type_lbl = $type_lbl .' ('. $_str .')';
+			$type_name = isset($types_arr[$item->type_id]) ? $types_arr[$item->type_id]->name : 'FLEXI_CONTENT_TYPE';
+			$type_lbl  = JText::_($type_name);
+			$type_lbl  = $type_lbl .' ('. $_str .')';
 		}
 		else
 		{
-			$type_lbl = JText::_('FLEXI_TYPE_NOT_DEFINED');
+			$type_name = 'FLEXI_TYPE_NOT_DEFINED';
+			$type_lbl  = JText::_($type_name);
 		}
 
 		// Also assign it for usage by layout
@@ -113,7 +121,8 @@ class FcFormLayoutParameters
 
 
 		// Split titles of default tabs and language filter the titles
-		$tab_titles = array();
+		$tab_titles  = array();
+		$tab_classes = array();
 
 		if ($_titles !== '_ignore_')
 		{
@@ -129,6 +138,12 @@ class FcFormLayoutParameters
 				}
 
 				$tab_titles['tab0'.$arr[0]] = $arr[1] === '__TYPE_NAME__' ? $type_lbl : JText::_($arr[1]);
+				$tab_classes['tab0'.$arr[0]] = JFilterOutput::stringURLSafe(
+					StringHelper::strtolower($arr[1] === '__TYPE_NAME__'
+						? (($item->type_id ? 'flexi-type-' : '') . $type_name)
+						: $arr[1]
+					)
+				) . '-tab-box';
 			}
 		}
 
@@ -171,6 +186,7 @@ class FcFormLayoutParameters
 		$placementConf['tab_fields']       = $tab_fields;
 		$placementConf['tab_titles']       = $tab_titles;
 		$placementConf['tab_icocss']       = $tab_icocss;
+		$placementConf['tab_classes']      = $tab_classes;
 		$placementConf['all_tab_fields']   = $all_tab_fields;
 		$placementConf['coreprop_missing'] = $coreprop_missing;
 

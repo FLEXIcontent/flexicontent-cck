@@ -6,6 +6,7 @@
 $tab_fields       = $this->placementConf['tab_fields'];
 $tab_titles       = $this->placementConf['tab_titles'];
 $tab_icocss       = $this->placementConf['tab_icocss'];
+$tab_classes      = $this->placementConf['tab_classes'];
 $all_tab_fields   = $this->placementConf['all_tab_fields'];
 $coreprop_missing = $this->placementConf['coreprop_missing'];
 
@@ -181,14 +182,17 @@ $tabCnt[$tabSetCnt] = 0;
 // ***
 // *** DESCRIPTION TAB
 // ***
-if ( count($tab_fields['tab01']) ) :
-	$tab_lbl = isset($tab_titles['tab01']) ? $tab_titles['tab01'] : JText::_( 'FLEXI_DESCRIPTION' );
-	$tab_ico = isset($tab_icocss['tab01']) ? $tab_icocss['tab01'] : 'icon-file-2';
+$TAB_NAME = 'tab01'; 
+
+if ( count($tab_fields[$TAB_NAME]) ) :
+	$tab_lbl = isset($tab_titles[$TAB_NAME]) ? $tab_titles[$TAB_NAME] : JText::_( 'FLEXI_DESCRIPTION' );
+	$tab_ico = isset($tab_icocss[$TAB_NAME]) ? $tab_icocss[$TAB_NAME] : 'icon-file-2';
+	$tab_cls = isset($tab_classes[$TAB_NAME]) ? $tab_classes[$TAB_NAME] : '';
 	?>
-	<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" data-icon-class="<?php echo $tab_ico; ?>">
+	<div class="tabbertab <?php echo $tab_cls; ?>" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" data-icon-class="<?php echo $tab_ico; ?>">
 		<h3 class="tabberheading"> <?php echo $tab_lbl; ?> </h3>
 
-		<?php foreach($tab_fields['tab01'] as $fn => $i) : ?>
+		<?php foreach($tab_fields[$TAB_NAME] as $fn => $i) : ?>
 			<div class="fcclear"></div>
 
 			<?php if (!is_array($captured[$fn])) :
@@ -211,14 +215,18 @@ if ( count($tab_fields['tab01']) ) :
 // ***
 // *** CUSTOM FIELDS TAB (via TYPE)
 // ***
-if ( count($tab_fields['tab02']) ) :
-	$tab_lbl = isset($tab_titles['tab02']) ? $tab_titles['tab02'] : $this->type_lbl; // __TYPE_NAME__
-	$tab_ico = isset($tab_icocss['tab02']) ? $tab_icocss['tab02'] : 'icon-tree-2';
+$TAB_NAME = 'tab02';
+
+if ( count($tab_fields[$TAB_NAME]) ) :
+	$tab_lbl = isset($tab_titles[$TAB_NAME]) ? $tab_titles[$TAB_NAME] : $this->type_lbl; // __TYPE_NAME__
+	$tab_ico = isset($tab_icocss[$TAB_NAME]) ? $tab_icocss[$TAB_NAME] : 'icon-tree-2';
+		$tab_cls = isset($tab_classes[$TAB_NAME]) ? $tab_classes[$TAB_NAME] : '';
+
 	?>
-	<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" data-icon-class="<?php echo $tab_ico; ?>">
+	<div class="tabbertab <?php echo $tab_cls; ?>" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" data-icon-class="<?php echo $tab_ico; ?>">
 		<h3 class="tabberheading"> <?php echo $tab_lbl; ?> </h3>
 
-		<?php foreach($tab_fields['tab02'] as $fn => $i) : ?>
+		<?php foreach($tab_fields[$TAB_NAME] as $fn => $i) : ?>
 			<div class="fcclear"></div>
 
 			<?php if (!is_array($captured[$fn])) :
@@ -242,15 +250,17 @@ if ( count($tab_fields['tab02']) ) :
 // ***
 // *** JOOMLA IMAGE/URLS TAB
 // ***
-if ( count($tab_fields['tab02a']) ) : ?>
+$TAB_NAME = 'tab02a';
+
+if ( count($tab_fields[$TAB_NAME]) ) : ?>
 	<?php
-	if (isset($tab_fields['tab02a']['jimages']) && isset($tab_fields['tab02a']['jurls'])) {
+	if (isset($tab_fields[$TAB_NAME]['jimages']) && isset($tab_fields[$TAB_NAME]['jurls'])) {
 		$fsetname = 'FLEXI_COM_CONTENT_IMAGES_AND_URLS';
 		$fseticon = 'icon-pencil-2';
-	} else if (isset($tab_fields['tab02a']['jimages'])) {
+	} else if (isset($tab_fields[$TAB_NAME]['jimages'])) {
 		$fsetname = 'FLEXI_IMAGES';
 		$fseticon = 'icon-images';
-	} else if (isset($tab_fields['tab02a']['jurls'])) {
+	} else if (isset($tab_fields[$TAB_NAME]['jurls'])) {
 		$fsetname = 'FLEXI_LINKS';
 		$fseticon = 'icon-link';
 	} else {
@@ -258,14 +268,16 @@ if ( count($tab_fields['tab02a']) ) : ?>
 		$fseticon = 'icon-pencil-2';
 	}
 
-	$tab_lbl = isset($tab_titles['tab02a']) && $tab_titles['tab02a'] !== '_DEFAULT_' ? $tab_titles['tab02a'] : JText::_($fsetname);
-	$tab_ico = isset($tab_icocss['tab02a']) && $tab_icocss['tab02a'] !== '_default_'? $tab_icocss['tab02a'] : $fseticon;
+	$tab_lbl = isset($tab_titles[$TAB_NAME]) && $tab_titles[$TAB_NAME] !== '_DEFAULT_' ? $tab_titles[$TAB_NAME] : JText::_($fsetname);
+	$tab_ico = isset($tab_icocss[$TAB_NAME]) && $tab_icocss[$TAB_NAME] !== '_default_'? $tab_icocss[$TAB_NAME] : $fseticon;
+	$tab_cls = isset($tab_classes[$TAB_NAME]) ? $tab_classes[$TAB_NAME] : '';
+	$tab_cls = $tab_cls !== 'default-tab-box' ? $tab_cls : 'flexi-compatibility-tab-box';
 
-	$total_fields = count($tab_fields['tab02a']);
+	$total_fields = count($tab_fields[$TAB_NAME]);
 	$use_flexbox  = $total_fields > 1;
 	$n = 0;
 	?>
-	<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" data-icon-class="<?php echo $tab_ico; ?>">
+	<div class="tabbertab <?php echo $tab_cls; ?>" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" data-icon-class="<?php echo $tab_ico; ?>">
 		<h3 class="tabberheading"> <?php echo $tab_lbl; ?> </h3>
 
 		<?php
@@ -274,7 +286,7 @@ if ( count($tab_fields['tab02a']) ) : ?>
 			<div class="fc_form_flex_box_item use_flex_grow">
 		' : '';
 
-		foreach($tab_fields['tab02a'] as $fn => $i) :
+		foreach($tab_fields[$TAB_NAME] as $fn => $i) :
 			$n++;
 
 			echo $use_flexbox && ($n - 1 == ceil($total_fields / 2)) ? '
@@ -317,11 +329,12 @@ foreach ($fieldSets as $name => $fieldSet) :
 	if ( JText::_($label)=='COM_FLEXICONTENT_'.$name.'_FIELDSET_LABEL' ) $label = 'COM_CONTENT_'.$name.'_FIELDSET_LABEL';
 
 	$icon_class = 'icon-pencil-2';
+	$tab_cls = 'jcustom-' . $name . '-tab-box';
 	//echo JHtml::_('sliders.panel', JText::_($label), $name.'-options');
 	//echo "<h2>".$label. "</h2> " . "<h3>".$name. "</h3> ";
 	?>
 	<!-- CUSTOM parameters TABs -->
-	<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" data-icon-class="<?php echo $icon_class; ?>">
+	<div class="tabbertab <?php echo $tab_cls; ?>" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" data-icon-class="<?php echo $icon_class; ?>">
 		<h3 class="tabberheading"> <?php echo JText::_($label); ?> </h3>
 
 		<div class="fc_tabset_inner">
@@ -356,15 +369,18 @@ foreach ($fieldSets as $name => $fieldSet) :
 // ***
 // *** ASSIGNMENTS TAB (Multi-category assignments  -- and --  Item language associations)
 // ***
-if ( count($tab_fields['tab03']) ) :
-	$tab_lbl = isset($tab_titles['tab03']) ? $tab_titles['tab03'] : JText::_( 'FLEXI_ASSIGNMENTS' );
-	$tab_ico = isset($tab_icocss['tab03']) ? $tab_icocss['tab03'] : 'icon-signup';
+$TAB_NAME = 'tab03';
 
-	$total_fields = count($tab_fields['tab03']);
+if ( count($tab_fields[$TAB_NAME]) ) :
+	$tab_lbl = isset($tab_titles[$TAB_NAME]) ? $tab_titles[$TAB_NAME] : JText::_( 'FLEXI_ASSIGNMENTS' );
+	$tab_ico = isset($tab_icocss[$TAB_NAME]) ? $tab_icocss[$TAB_NAME] : 'icon-signup';
+	$tab_cls = isset($tab_classes[$TAB_NAME]) ? $tab_classes[$TAB_NAME] : '';
+
+	$total_fields = count($tab_fields[$TAB_NAME]);
 	$use_flexbox  = $total_fields > 1;
 	$n = 0;
 	?>
-	<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" data-icon-class="<?php echo $tab_ico; ?>" >
+	<div class="tabbertab <?php echo $tab_cls; ?>" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" data-icon-class="<?php echo $tab_ico; ?>" >
 		<h3 class="tabberheading"> <?php echo $tab_lbl; ?> </h3>
 
 		<?php
@@ -373,7 +389,7 @@ if ( count($tab_fields['tab03']) ) :
 			<div class="fc_form_flex_box_item use_flex_grow">
 		' : '';
 
-		foreach($tab_fields['tab03'] as $fn => $i) :
+		foreach($tab_fields[$TAB_NAME] as $fn => $i) :
 			$n++;
 
 			echo $use_flexbox && ($n - 1 == ceil($total_fields / 2)) ? '
@@ -408,17 +424,20 @@ if ( count($tab_fields['tab03']) ) :
 // *** PUBLISHING TAB
 // ***
 // J2.5 requires Edit State privilege while J1.5 requires Edit privilege
-if ( count($tab_fields['tab04']) ) : ?>
-	<?php
-	$tab_lbl = isset($tab_titles['tab04']) ? $tab_titles['tab04'] : JText::_( 'FLEXI_PUBLISHING' );
-	$tab_ico = isset($tab_icocss['tab04']) ? $tab_icocss['tab04'] : 'icon-calendar';
+$TAB_NAME = 'tab04';
 
-	$has_i_screen = !isset($tab_icocss['tab04']['item_screen']);
-	$total_fields = count($tab_fields['tab04']);
+if ( count($tab_fields[$TAB_NAME]) ) : ?>
+	<?php
+	$tab_lbl = isset($tab_titles[$TAB_NAME]) ? $tab_titles[$TAB_NAME] : JText::_( 'FLEXI_PUBLISHING' );
+	$tab_ico = isset($tab_icocss[$TAB_NAME]) ? $tab_icocss[$TAB_NAME] : 'icon-calendar';
+	$tab_cls = isset($tab_classes[$TAB_NAME]) ? $tab_classes[$TAB_NAME] : '';
+
+	$has_i_screen = !isset($tab_icocss[$TAB_NAME]['item_screen']);
+	$total_fields = count($tab_fields[$TAB_NAME]);
 	$use_flexbox  = $total_fields > 1;
 	$n = 0;
 	?>
-	<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" data-icon-class="<?php echo $tab_ico; ?>" >
+	<div class="tabbertab <?php echo $tab_cls; ?>" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" data-icon-class="<?php echo $tab_ico; ?>" >
 		<h3 class="tabberheading"> <?php echo $tab_lbl; ?> </h3>
 
 		<?php
@@ -427,7 +446,7 @@ if ( count($tab_fields['tab04']) ) : ?>
 			<div class="fc_form_flex_box_item use_flex_grow">
 		' : '';
 
-		foreach($tab_fields['tab04'] as $fn => $i) :
+		foreach($tab_fields[$TAB_NAME] as $fn => $i) :
 			$n++;
 
 			echo $fn === 'item_screen' || (!$has_i_screen && $use_flexbox && ($n - 1 == ceil($total_fields / 2))) ? '
@@ -460,16 +479,19 @@ if ( count($tab_fields['tab04']) ) : ?>
 // ***
 // *** META / SEO TAB
 // ***
-if ( count($tab_fields['tab05']) ) : ?>
-	<?php
-	$tab_lbl = isset($tab_titles['tab05']) ? $tab_titles['tab05'] : JText::_( 'FLEXI_META_SEO' );
-	$tab_ico = isset($tab_icocss['tab05']) ? $tab_icocss['tab05'] : 'icon-bookmark';
+$TAB_NAME = 'tab05';
 
-	$total_fields = count($tab_fields['tab05']);
+if ( count($tab_fields[$TAB_NAME]) ) : ?>
+	<?php
+	$tab_lbl = isset($tab_titles[$TAB_NAME]) ? $tab_titles[$TAB_NAME] : JText::_( 'FLEXI_META_SEO' );
+	$tab_ico = isset($tab_icocss[$TAB_NAME]) ? $tab_icocss[$TAB_NAME] : 'icon-bookmark';
+	$tab_cls = isset($tab_classes[$TAB_NAME]) ? $tab_classes[$TAB_NAME] : '';
+
+	$total_fields = count($tab_fields[$TAB_NAME]);
 	$use_flexbox  = $total_fields > 1;
 	$n = 0;
 	?>
-	<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" data-icon-class="<?php echo $tab_ico; ?>" >
+	<div class="tabbertab <?php echo $tab_cls; ?>" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" data-icon-class="<?php echo $tab_ico; ?>" >
 		<h3 class="tabberheading"> <?php echo $tab_lbl; ?> </h3>
 
 		<?php
@@ -478,7 +500,7 @@ if ( count($tab_fields['tab05']) ) : ?>
 			<div class="fc_form_flex_box_item use_flex_grow">
 		' : '';
 
-		foreach($tab_fields['tab05'] as $fn => $i) :
+		foreach($tab_fields[$TAB_NAME] as $fn => $i) :
 			$n++;
 
 			echo $use_flexbox && ($n - 1 == ceil($total_fields / 2)) ? '
@@ -512,15 +534,18 @@ if ( count($tab_fields['tab05']) ) : ?>
 // ***
 // *** DISPLAYING PARAMETERS TAB
 // ***
-if ( count($tab_fields['tab06']) ) : ?>
+$TAB_NAME = 'tab06';
+
+if ( count($tab_fields[$TAB_NAME]) ) : ?>
 	<?php
-	$tab_lbl = isset($tab_titles['tab06']) ? $tab_titles['tab06'] : JText::_( 'FLEXI_DISPLAYING' );
-	$tab_ico = isset($tab_icocss['tab06']) ? $tab_icocss['tab06'] : 'icon-eye-open';
+	$tab_lbl = isset($tab_titles[$TAB_NAME]) ? $tab_titles[$TAB_NAME] : JText::_( 'FLEXI_DISPLAYING' );
+	$tab_ico = isset($tab_icocss[$TAB_NAME]) ? $tab_icocss[$TAB_NAME] : 'icon-eye-open';
+	$tab_cls = isset($tab_classes[$TAB_NAME]) ? $tab_classes[$TAB_NAME] : '';
 	?>
-	<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" data-icon-class="<?php echo $tab_ico; ?>">
+	<div class="tabbertab <?php echo $tab_cls; ?>" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" data-icon-class="<?php echo $tab_ico; ?>">
 		<h3 class="tabberheading"> <?php echo $tab_lbl; ?> </h3>
 
-		<?php foreach($tab_fields['tab06'] as $fn => $i) : ?>
+		<?php foreach($tab_fields[$TAB_NAME] as $fn => $i) : ?>
 			<div class="fcclear"></div>
 
 			<?php if (!is_array($captured[$fn])) :
@@ -543,17 +568,20 @@ if ( count($tab_fields['tab06']) ) : ?>
 // ***
 // *** TEMPLATE TAB
 // ***
-if ( count($tab_fields['tab07']) ) : ?>
+$TAB_NAME = 'tab07';
+
+if ( count($tab_fields[$TAB_NAME]) ) : ?>
 	<?php
-	$tab_lbl = isset($tab_titles['tab07']) ? $tab_titles['tab07'] : JText::_( 'FLEXI_TEMPLATE' );
-	$tab_ico = isset($tab_icocss['tab07']) ? $tab_icocss['tab07'] : 'icon-palette';
+	$tab_lbl = isset($tab_titles[$TAB_NAME]) ? $tab_titles[$TAB_NAME] : JText::_( 'FLEXI_TEMPLATE' );
+	$tab_ico = isset($tab_icocss[$TAB_NAME]) ? $tab_icocss[$TAB_NAME] : 'icon-palette';
+	$tab_cls = isset($tab_classes[$TAB_NAME]) ? $tab_classes[$TAB_NAME] : '';
 	?>
-	<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" data-icon-class="<?php echo $tab_ico; ?>">
+	<div class="tabbertab <?php echo $tab_cls; ?>" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" data-icon-class="<?php echo $tab_ico; ?>">
 		<h3 class="tabberheading"> <?php echo $tab_lbl; ?> </h3>
 
 		<fieldset class="flexi_params fc_edit_container_full">
 
-		<?php foreach($tab_fields['tab07'] as $fn => $i) : ?>
+		<?php foreach($tab_fields[$TAB_NAME] as $fn => $i) : ?>
 			<div class="fcclear"></div>
 
 			<?php if (!is_array($captured[$fn])) :
@@ -578,16 +606,19 @@ if ( count($tab_fields['tab07']) ) : ?>
 // ***
 // *** Versions TAB
 // ***
-if ( count($tab_fields['tab08']) ) : ?>
-	<?php
-	$tab_lbl = isset($tab_titles['tab08']) ? $tab_titles['tab08'] : JText::_( 'FLEXI_VERSIONS' );
-	$tab_ico = isset($tab_icocss['tab08']) ? $tab_icocss['tab08'] : 'icon-stack';
+$TAB_NAME = 'tab08';
 
-	$total_fields = count($tab_fields['tab08']);
+if ( count($tab_fields[$TAB_NAME]) ) : ?>
+	<?php
+	$tab_lbl = isset($tab_titles[$TAB_NAME]) ? $tab_titles[$TAB_NAME] : JText::_( 'FLEXI_VERSIONS' );
+	$tab_ico = isset($tab_icocss[$TAB_NAME]) ? $tab_icocss[$TAB_NAME] : 'icon-stack';
+	$tab_cls = isset($tab_classes[$TAB_NAME]) ? $tab_classes[$TAB_NAME] : '';
+
+	$total_fields = count($tab_fields[$TAB_NAME]);
 	$use_flexbox  = $total_fields > 1;
 	$n = 0;
 	?>
-	<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" data-icon-class="<?php echo $tab_ico; ?>">
+	<div class="tabbertab <?php echo $tab_cls; ?>" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" data-icon-class="<?php echo $tab_ico; ?>">
 		<h3 class="tabberheading"> <?php echo $tab_lbl; ?> </h3>
 
 		<?php
@@ -596,7 +627,7 @@ if ( count($tab_fields['tab08']) ) : ?>
 			<div class="fc_form_flex_box_item use_flex_grow">
 		' : '';
 
-		foreach($tab_fields['tab08'] as $fn => $i) :
+		foreach($tab_fields[$TAB_NAME] as $fn => $i) :
 			$n++;
 
 			echo $use_flexbox && ($n - 1 == ceil($total_fields / 2)) ? '
