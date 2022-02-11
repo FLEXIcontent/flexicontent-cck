@@ -2162,6 +2162,49 @@
 			return;
 		}
 
+		// ***
+		// *** Submit progress bar
+		// ***
+
+		if (typeof form.progressbar_submit_handler_success === 'undefined' || !form.progressbar_submit_handler_success)
+		{
+			form.progressbar_submit_handler_success = true;
+			// Default to doing animation
+			form.doanimated_submit = typeof form.doanimated_submit === 'undefined' ? 1 : 0;
+
+			form.addEventListener('submit', function(e)
+			{
+				if ( !form.doanimated_submit )
+				{
+					return true;
+				}
+				//form.doanimated_submit = 0;  // Clear FLAG until next time Joomla.submitform() is called
+				
+				var fc_filter_form_blocker = jQuery('#fc_filter_form_blocker');
+
+				if (!fc_filter_form_blocker.length)
+				{
+					fc_filter_form_blocker = jQuery(
+						'<div id="fc_filter_form_blocker">' +
+							'<div class="fc_blocker_overlay"></div>' +
+							'<div class="fc_blocker_content">' +
+								'<div class="fc_blocker_logo></div>' +
+								'<div class="fc_blocker_mssg>' + Joomla.JText._('FLEXI_LOADING') + '</div>' +
+								'<div class="fc_blocker_bar"><div></div></div>' +
+							'</div>' +
+						'</div>'
+					).prependTo(jQuery('body'));
+				}
+
+				if (fc_filter_form_blocker)
+				{
+					fc_filter_form_blocker.css("display", "block");
+					fc_filter_form_blocker.find('.fc_blocker_mssg').html(Joomla.JText._('FLEXI_LOADING'));
+					fc_admin_progress(95, jQuery('#fc_filter_form_blocker .fc_blocker_bar'));
+				}
+			});
+		}
+
 		// Close modal to allow click events to work on the parent window 's form
 		jQuery('#'+container_id).dialog('close');
 

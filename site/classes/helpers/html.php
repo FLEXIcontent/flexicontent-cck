@@ -1156,6 +1156,7 @@ class flexicontent_html
 			$JQUERY_UI_THEME = 'ui-lightness';
 		}
 		JText::script("FLEXI_FORM_IS_BEING_SUBMITTED", true);
+		JText::script("FLEXI_LOADING", true);
 
 		/*
 		 * jQuery library
