@@ -13,6 +13,11 @@
 		<filename plugin="flexinotify">flexinotify.php</filename>
 		<filename>index.html</filename>
 	</files>
+		<languages>
+		<language tag="en-GB">en-GB.plg_flexicontent_flexinotify.ini</language>
+		<language tag="en-GB">en-GB.plg_flexicontent_flexinotify.sys.ini</language>
+	</languages>
+
 	<config>
 	<fields name="params">
 		<fieldset name="basic" addfieldpath="/administrator/components/com_flexicontent/elements">
