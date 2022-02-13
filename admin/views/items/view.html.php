@@ -126,6 +126,7 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 
 
 		// Various filters
+		$filter_assockey  = $model->getState('filter_assockey');
 		$filter_tag       = $model->getState('filter_tag');
 		$filter_lang      = $model->getState('filter_lang');
 		$filter_type      = $model->getState('filter_type');
@@ -143,6 +144,7 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 		if (is_array($filter_state) && in_array('ORPHAN', $filter_state))  $filter_state = array('ORPHAN');
 
 		// Count active filters
+		if ($filter_assockey) $count_filters++;
 		if ($filter_tag) $count_filters++;
 		if ($filter_lang) $count_filters++;
 		if ($filter_type) $count_filters++;
@@ -357,9 +359,9 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 			'label_extra_class' => ($reOrderingActive ? ' fc-lbl-short' : ''),
 			'html' =>
 				($subcats_na ? '<div style="display:none">' : '') . '
-					<div class="group-fcset" style="display: inline-block;">
+					<div class="group-fcset" style="display: inline-block; ' . (!$filter_subcats ? ' border: 1px solid darkorange; ' : '') . '">
 						<input type="checkbox" id="filter_subcats" name="filter_subcats" onchange="if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform()" value="1" '.($filter_subcats ? ' checked="checked" ' : '').' />
-						<label id="filter_subcats-lbl" for="filter_subcats" style="margin: 0 12px; vertical-align: middle;"></label>
+						<label id="filter_subcats-lbl" for="filter_subcats" style="margin: 0 12px; vertical-align: middle; border: 0;"></label>
 					</div>'
 				. ($subcats_na ? '</div>' : '')
 				. ($subcats_na ? '<span class="icon-question ' . $this->popover_class . '" style="margin: 0 8px; font-size: 12px;" data-content="'
@@ -385,7 +387,7 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 				$fieldname,
 				array(
 					'size' => '1',
-					'class' => $this->select_class,
+					'class' => $this->select_class . ' fc_add_highlight',
 					'onchange' => 'if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();',
 				),
 				'value',
@@ -421,7 +423,7 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 				$fieldname,
 				array(
 					'size' => '1',
-					'class' => $this->select_class,
+					'class' => $this->select_class . ($filter_catsinstate != 1 ? ' fc_add_highlight' : ''),
 					'onchange' => 'if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();',
 				),
 				'value',
@@ -478,7 +480,7 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 				'filter_order_type',
 				array(
 					'size' => '1',
-					'class' => $this->select_class,
+					'class' => $this->select_class . ' fc_add_highlight',
 					'onchange' => 'if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();',
 				),
 				'value',
@@ -500,7 +502,7 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 				$filter_cats,
 				($filter_order !== 'a.ordering' && $filter_order !== 'catsordering' ? '-' : 0),
 				array(
-					'class' => $this->select_class,
+					'class' => $this->select_class . ' fc_add_highlight',
 					'size' => '1',
 					'onchange' => 'if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();',
 				),
@@ -538,7 +540,7 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 					$filter_type,
 					$displaytype = 0,
 					array(
-						'class' => $this->select_class,
+						'class' => $this->select_class . ' fc_add_highlight',
 						'multiple' => 'multiple',
 						'size' => '3',
 						'onmouseenter' => 'if (typeof this.oVal == \'undefined\') this.oVal = jQuery(this).val(); this.valChanged = false;',
@@ -563,7 +565,7 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 					$selected = $filter_author,
 					$displaytype = 0,
 					array(
-						'class' => $this->select_class,
+						'class' => $this->select_class . ' fc_add_highlight',
 						'multiple' => 'multiple',
 						'size' => '3',
 						'onmouseenter' => 'if (typeof this.oVal == \'undefined\') this.oVal = jQuery(this).val(); this.valChanged = false;',
@@ -616,7 +618,7 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 				array(
 					'size' => '1',
 					'style' => 'margin: 0',
-					'class' => $this->select_class . ' ' . $this->tooltip_class,
+					'class' => $this->select_class  . ($startdate || $enddate ? ' fc_add_highlight' : '') . ' ' . $this->tooltip_class,
 					'data-placement' => 'bottom',
 					'title' => flexicontent_html::getToolTip(null, $date_note_msg, 0, 1),
 				),
@@ -637,7 +639,7 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 			'html' => flexicontent_html::buildlanguageslist(
 				$name = 'filter_lang[]',
 				array(
-					'class' => $this->select_class,
+					'class' => $this->select_class . ' fc_add_highlight',
 					'multiple' => 'multiple',
 					'size' => '3',
 					'onmouseenter' => 'if (typeof this.oVal == \'undefined\') this.oVal = jQuery(this).val(); this.valChanged = false;',
@@ -663,7 +665,7 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 			$bind_limits,
 			'bind_limit',
 			array(
-				'class' => $this->select_class,
+				'class' => $this->select_class . ' fc_add_highlight',
 			),
 			'value',
 			'text',
@@ -702,7 +704,7 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 			'html' => flexicontent_html::buildtagsselect(
 				$name = 'filter_tag[]',
 				array(
-					'class' => $this->select_class,
+					'class' => $this->select_class . ' fc_add_highlight',
 					'multiple' => 'multiple',
 					'size' => '3',
 					'onmouseenter' => 'if (typeof this.oVal == \'undefined\') this.oVal = jQuery(this).val(); this.valChanged = false;',
@@ -757,7 +759,7 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 					'id' => 'filter_state',
 					'group.id' => 'id',
 					'list.attr' => array(
-						'class' => $this->select_class,
+						'class' => $this->select_class . ' fc_add_highlight',
 						'multiple' => 'multiple',
 						'size' => '3',
 						'onmouseenter' => 'if (typeof this.oVal == \'undefined\') this.oVal = jQuery(this).val(); this.valChanged = false;',
@@ -814,7 +816,7 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 				$options,
 				$fieldname,
 				array(
-					'class' => $this->select_class,
+					'class' => $this->select_class . ' fc_add_highlight',
 					'size' => '3',
 					'multiple' => 'multiple',
 					'onmouseenter' => 'if (typeof this.oVal == \'undefined\') this.oVal = jQuery(this).val(); this.valChanged = false;',
@@ -849,7 +851,7 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 				$fieldname,
 				array(
 					'size' => '1',
-					'class' => $this->select_class . ' ' . $this->tooltip_class,
+					'class' => $this->select_class . ' fc_add_highlight' . ' ' . $this->tooltip_class,
 					'onchange' => 'if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();',
 					'data-placement' => 'bottom',
 					'title' => flexicontent_html::getToolTip(JText::_('FLEXI_META', true), JText::_('FLEXI_EMPTY', true), 0, 1),
@@ -885,7 +887,7 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 					'filter_fileid',
 					array(
 						'size' => '1',
-						'class' => $this->select_class,
+						'class' => $this->select_class . ' fc_add_highlight',
 						'onchange' => 'if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();',
 					),
 					'value',
@@ -897,6 +899,29 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 		else
 		{
 			$lists['filter_fileid'] = '';
+		}
+
+
+		/**
+		 * Filter by item usage a specific file
+		 */
+
+		if ($filter_assockey)
+		{
+			$lists['filter_assockey'] = '<div class="fc-filter nowrap_box">' . JText::_('FLEXI_ASSOCIATIONS') . '</div>';
+			$lists['filter_assockey'] = $this->getFilterDisplay(array(
+				'label' => JText::_('FLEXI_ASSOCIATIONS'),
+				'label_extra_class' => ' fc-lbl-short',
+				'html' => '
+					<div class="group-fcset" style="display: inline-block; ' . ($filter_assockey ? ' border: 1px solid darkorange; ' : '') . '">
+							<input type="checkbox" id="filter_assockey" name="filter_assockey" onchange="if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform()" value="'.$filter_assockey.'" '.($filter_assockey ? ' checked="checked" ' : '').' />
+							<label id="filter_assockey-lbl" for="filter_assockey" style="margin: 0 12px; vertical-align: middle; border: 0;"></label>
+					</div>',
+			));
+		}
+		else
+		{
+			$lists['filter_assockey'] = '';
 		}
 
 
@@ -920,7 +945,7 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 				'csv_header',
 				array(
 					'size' => '1',
-					'class' => $this->select_class,
+					'class' => $this->select_class . ' fc_add_highlight',
 					'onchange' => 'if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();',
 				),
 				'value',
@@ -952,7 +977,7 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 				'csv_raw_export',
 				array(
 					'size' => '1',
-					'class' => $this->select_class,
+					'class' => $this->select_class . ' fc_add_highlight',
 					'onchange' => 'if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();',
 				),
 				'value',

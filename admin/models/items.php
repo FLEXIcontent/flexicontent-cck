@@ -275,11 +275,15 @@ class FlexicontentModelItems extends FCModelAdminList
 		$app->setUserState($p . 'filter_id', $filter_id);
 
 
-		// File ID filter
+		// File ID filter , association KEY filter
 		$filter_fileid  = $fcform ? $jinput->get('filter_fileid', 0, 'int')  :  $app->getUserStateFromRequest( $p.'filter_fileid',  'filter_fileid',  0,  'int' );
+		$filter_assockey = $fcform ? $jinput->get('filter_assockey', 0, 'cmd')  :  $app->getUserStateFromRequest( $p.'filter_assockey',  'filter_assockey',  0,  'cmd' );
 
 		$this->setState('filter_fileid', $filter_fileid);
+		$this->setState('filter_assockey', $filter_assockey);
+
 		$app->setUserState($p.'filter_fileid', $filter_fileid);
+		$app->setUserState($p.'filter_assockey', $filter_assockey);
 
 		// Manage view permission
 		$this->canManage = FlexicontentHelperPerm::getPerm()->CanManage;
@@ -1579,7 +1583,19 @@ class FlexicontentModelItems extends FCModelAdminList
 
 
 		/**
-		 * CUSTON filters
+		 * Listing associated items
+		 */
+		$filter_assockey = $this->getState('filter_assockey');
+
+		if ($filter_assockey)
+		{
+			$extra_joins .= ' JOIN #__associations AS assoc ON a.id = assoc.id';
+			$where[] = 'assoc.key = ' . $this->_db->quote($filter_assockey);
+		}
+
+
+		/**
+		 * CUSTOM filters
 		 */
 
 		$customFilts = $this->getCustomFilts();

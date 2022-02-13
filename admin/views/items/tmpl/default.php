@@ -95,8 +95,8 @@ $featimg = JHtml::image ( 'administrator/components/com_flexicontent/assets/imag
  * Order stuff and table related variables
  */
 
-$list_total_cols = 19
-	+ ($useAssocs ? 1 : 0);
+$list_total_cols = 18
+	+ ($useAssocs ? 2 : 0);
 
 $list_total_cols += count($this->extra_fields);
 
@@ -169,6 +169,7 @@ $state_icons = array(
 /**
  * Calculate maximum column size of associations
  */
+
 $max_assocs = 0;
 foreach($this->rows as $row)
 {
@@ -578,6 +579,7 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 
 				<div id="fc-filters-box" <?php if (!$this->count_filters || !$tools_state->filters_box) echo 'style="display:none;"'; ?> class="fcman-abs" onclick="var event = arguments[0] || window.event; event.stopPropagation();">
 					<?php
+					echo $this->lists['filter_assockey'];
 					echo $this->lists['filter_fileid'];
 					echo $this->lists['filter_author'];
 					echo $this->lists['filter_tag'];
@@ -801,7 +803,9 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 		<?php if ($useAssocs) : ?>
 
 			<th class="col_assocs_count"><?php $colposition++; ?>
-				<div id="fc-toggle-assocs_btn" style="padding: 4px 0 2px 6px;" class="<?php echo $out_class . ' ' . $this->tooltip_class; ?>" title="<?php echo JText::_('FLEXI_ASSOCIATIONS'); ?>" onclick="jQuery('#columnchoose_adminListTableFCitems_<?php echo $colposition; ?>_label').click();" ><span class="icon-flag"></span></div>
+				<div id="fc-toggle-assocs_btn" style="padding: 4px 0 2px 6px;" class="<?php echo $out_class . ' ' . $this->tooltip_class; ?>" title="<?php echo JText::_('FLEXI_ASSOCIATIONS'); ?>" onclick="jQuery('#columnchoose_adminListTableFCitems_<?php echo $colposition; ?>_label').click();" >
+					<span class="icon-flag"></span>
+				</div>
 			</th>
 
 			<th class="col_assocs hideOnDemandClass hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
@@ -1091,66 +1095,72 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 
 			<?php if ($useAssocs) : ?>
 
-				<?php if ($max_assocs >= 4): ?><?php $colposition++; ?>
-					<td>
-						<?php echo !empty($this->lang_assocs[$row->id]) ? '<span class="fc_assocs_count">' . count($this->lang_assocs[$row->id]) . '</span>' : ''; ?>
-					</td>
-				<?php endif; ?>
+				<td><?php $colposition++; ?>
+					<?php if (!empty($this->lang_assocs[$row->id])): ?>
+						<?php $row_assocs = $this->lang_assocs[$row->id]; ?>
+						<a href="index.php?option=com_flexicontent&amp;view=items&amp;filter_catsinstate=99&amp;filter_assockey=<?php echo reset($row_assocs)->key; ?>&amp;fcform=1&amp;filter_state=ALL"
+							class="<?php echo $this->btn_sm_class; ?> fc_assocs_count"
+						>
+							<?php echo count($row_assocs); ?>
+						</a>
+					<?php endif; ?>
+				</td>
 
-			<td class="hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
-				<?php
-				if (!empty($this->lang_assocs[$row->id]))
-				{
-					// Find record of original content
-					$oc_item = null;
-					foreach($this->lang_assocs[$row->id] as $assoc_item)
+				<td class="hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
+					<?php
+					if (!empty($this->lang_assocs[$row->id]))
 					{
-						if ($ocLang && $assoc_item->language === $ocLang)
+						// Find record of original content
+						$oc_item = null;
+						foreach($this->lang_assocs[$row->id] as $assoc_item)
 						{
-							$oc_item = $assoc_item;
-							break;
+							if ($ocLang && $assoc_item->language === $ocLang)
+							{
+								$oc_item = $assoc_item;
+								break;
+							}
+						}
+
+						if ($oc_item)
+						{
+							$oc_item_modified_date = $oc_item->modified && $oc_item->modified !== '0000-00-00 00:00:00' ? $oc_item->modified : $oc_item->created;
+							$oc_item_modified = strtotime($oc_item_modified_date);
+						}
+
+						foreach($this->lang_assocs[$row->id] as $assoc_item)
+						{
+							// Joomla article manager show also current item, so we will not skip it
+							$is_oc_item = !$oc_item || $assoc_item->id == $oc_item->id;
+							$assoc_modified_date = $assoc_item->modified && $assoc_item->modified !== '0000-00-00 00:00:00' ? $assoc_item->modified : $assoc_item->created;
+							$assoc_modified = strtotime($assoc_modified_date);
+
+							$_link  = 'index.php?option=com_flexicontent&amp;task='.$ctrl.'edit&amp;id='. $assoc_item->id;
+							$_title = flexicontent_html::getToolTip(
+								$assoc_item->title,
+								(isset($state_icons[$assoc_item->state]) ? '<span class="' . $state_icons[$assoc_item->state] . '"></span>' : '') .
+								(isset($state_names[$assoc_item->state]) ? $state_names[$assoc_item->state] . '<br>': '') .
+								($is_oc_item ? '' : '<span class="icon-pencil"></span>' . JText::_( $assoc_modified < $oc_item_modified ? 'FLEXI_TRANSLATION_IS_OUTDATED' : 'FLEXI_TRANSLATION_IS_UPTODATE')) .
+								': ' . $assoc_modified_date . '<br>'.
+								( !empty($this->langs->{$assoc_item->lang}) ? ' <img src="'.$this->langs->{$assoc_item->lang}->imgsrc.'" alt="'.$assoc_item->lang.'" /> ' : '').
+								($assoc_item->lang === '*' ? JText::_('FLEXI_ALL') : (!empty($this->langs->{$assoc_item->lang}) ? $this->langs->{$assoc_item->lang}->name: '?')).' <br/> '
+								, 0, 1
+							);
+
+							$state_colors = array(1 => ' fc_assoc_ispublished', -5 => ' fc_assoc_isinprogress');
+							$assoc_state_class   = isset($state_colors[$assoc_item->state]) ? $state_colors[$assoc_item->state] : ' fc_assoc_isunpublished';
+							$assoc_isstale_class = $oc_item && ($assoc_modified < $oc_item_modified) ? ' fc_assoc_isstale' : ' fc_assoc_isuptodate';
+
+							echo '
+							<a class="fc_assoc_translation label label-association ' . $this->popover_class . $assoc_isstale_class . $assoc_state_class . '"
+								target="_blank" href="'.$_link.'" data-placement="top" data-content="'.$_title.'"
+							>
+								<span>' . ($assoc_item->lang=='*' ? JText::_('FLEXI_ALL') : strtoupper($assoc_item->shortcode ?: '?')) . '</span>
+							</a>';
 						}
 					}
+					?>
+				</td>
 
-					if ($oc_item)
-					{
-						$oc_item_modified_date = $oc_item->modified && $oc_item->modified !== '0000-00-00 00:00:00' ? $oc_item->modified : $oc_item->created;
-						$oc_item_modified = strtotime($oc_item_modified_date);
-					}
-
-					foreach($this->lang_assocs[$row->id] as $assoc_item)
-					{
-						// Joomla article manager show also current item, so we will not skip it
-						$is_oc_item = !$oc_item || $assoc_item->id == $oc_item->id;
-						$assoc_modified_date = $assoc_item->modified && $assoc_item->modified !== '0000-00-00 00:00:00' ? $assoc_item->modified : $assoc_item->created;
-						$assoc_modified = strtotime($assoc_modified_date);
-
-						$_link  = 'index.php?option=com_flexicontent&amp;task='.$ctrl.'edit&amp;id='. $assoc_item->id;
-						$_title = flexicontent_html::getToolTip(
-							$assoc_item->title,
-							(isset($state_icons[$assoc_item->state]) ? '<span class="' . $state_icons[$assoc_item->state] . '"></span>' : '') .
-							(isset($state_names[$assoc_item->state]) ? $state_names[$assoc_item->state] . '<br>': '') .
-							($is_oc_item ? '' : '<span class="icon-pencil"></span>' . JText::_( $assoc_modified < $oc_item_modified ? 'FLEXI_TRANSLATION_IS_OUTDATED' : 'FLEXI_TRANSLATION_IS_UPTODATE')) .
-							': ' . $assoc_modified_date . '<br>'.
-							( !empty($this->langs->{$assoc_item->lang}) ? ' <img src="'.$this->langs->{$assoc_item->lang}->imgsrc.'" alt="'.$assoc_item->lang.'" /> ' : '').
-							($assoc_item->lang === '*' ? JText::_('FLEXI_ALL') : (!empty($this->langs->{$assoc_item->lang}) ? $this->langs->{$assoc_item->lang}->name: '?')).' <br/> '
-							, 0, 1
-						);
-
-						$state_colors = array(1 => ' fc_assoc_ispublished', -5 => ' fc_assoc_isinprogress');
-						$assoc_state_class   = isset($state_colors[$assoc_item->state]) ? $state_colors[$assoc_item->state] : ' fc_assoc_isunpublished';
-						$assoc_isstale_class = $oc_item && ($assoc_modified < $oc_item_modified) ? ' fc_assoc_isstale' : ' fc_assoc_isuptodate';
-
-						echo '
-						<a class="fc_assoc_translation label label-association ' . $this->popover_class . $assoc_isstale_class . $assoc_state_class . '"
-							target="_blank" href="'.$_link.'" data-placement="top" data-content="'.$_title.'"
-						>
-							<span>' . ($assoc_item->lang=='*' ? JText::_('FLEXI_ALL') : strtoupper($assoc_item->shortcode ?: '?')) . '</span>
-						</a>';
-					}
-				}
-				?>
-			</td>
 			<?php endif ; ?>
 
 

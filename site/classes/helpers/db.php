@@ -1131,7 +1131,7 @@ class flexicontent_db
 
 		$db = JFactory::getDbo();
 		$query = 'SELECT a.id as item_id, i.id as id, i.title, i.' . $config->created . ' as created, i.' . $config->modified . ' as modified, '
-			. ' i.language as language, i.language as lang'
+			. ' i.language as language, i.language as lang, ' . $db->quoteName('a.key') . ' as ' . $db->quoteName('key') 
 			. (!empty($config->state) ?', i.' . $config->state . ' AS state ' : '')
 			. (!empty($config->catid) ?', i.' . $config->catid . ' AS catid ' : '')
 			. ' FROM #__associations AS a'

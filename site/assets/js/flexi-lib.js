@@ -1659,7 +1659,7 @@
 
 
 			// SINGLE-SELECT2: Highlight selects with an active value
-			if ( ! sel_EL.attr('multiple') && !sel_EL.hasClass('fc_skip_highlight') )
+			if ( ! sel_EL.attr('multiple') && sel_EL.hasClass('fc_add_highlight') )
 			{
 				var el = el_container.find('.select2-choice');
 				var val = sel_EL.val();
@@ -1798,7 +1798,7 @@
 
 
 			// SINGLE-SELECT2:
-			if ( ! sel_EL.attr('multiple') && !sel_EL.hasClass('fc_skip_highlight') )
+			if ( ! sel_EL.attr('multiple') && sel_EL.hasClass('fc_add_highlight') )
 			{
 				// Handle highlighting selected value
 				var el = jQuery(this).prev('div').find('.select2-choice');
