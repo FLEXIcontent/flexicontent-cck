@@ -608,10 +608,17 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 						));
 					}
 
-					echo '<h4>' . JText::_('FLEXI_CSV_EXPORT') . '</h4>';
-					echo $this->lists['csv_header'];
-					echo $this->lists['csv_raw_export'];
-					echo $this->lists['csv_all_fields'];
+					if (JComponentHelper::getParams('com_flexicontent')->get('show_csvbutton_be', 0))
+					{
+						echo '
+							<div class="clear"></div>
+							<h4>' . JText::_('FLEXI_CSV_EXPORT') . '</h4>
+							<div class="clear"></div>
+						';
+						echo $this->lists['csv_header'];
+						echo $this->lists['csv_raw_export'];
+						echo $this->lists['csv_all_fields'];
+					}
 					?>
 
 					<div id="fc-filters-slide-btn" class="icon-arrow-up-2 btn btn-outline-secondary" title="<?php echo JText::_('FLEXI_HIDE'); ?>" style="cursor: pointer;" onclick="fc_toggle_box_via_btn('fc-filters-box', document.getElementById('fc_filters_box_btn'), 'btn-primary');"></div>
