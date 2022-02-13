@@ -259,7 +259,7 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 
 
 		/**
-		 * Get data from the model, note data retrieval must be before 
+		 * Get data from the model, note data retrieval must be before
 		 * getTotal() and getPagination() because it also calculates total rows
 		 */
 
@@ -778,7 +778,7 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 		$allitems       = FlexicontentHelperPerm::getPerm()->DisplayAllItems;
 		$viewable_items = $cparams->get('iman_viewable_items', 1);
 		$editable_items = $cparams->get('iman_editable_items', 0);
-		
+
 		// If can list only viewable items, then skip the non available levels to avoid user confusion
 		if (!$allitems && $viewable_items)
 		{
@@ -1465,7 +1465,7 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 		{
 			$popup_load_url = JUri::base(true) . '/index.php?option=com_flexicontent&amp;view=items&amp;layout=indexer&amp;tmpl=component&amp;indexer=resave';
 			$btn_name = 'recalculate_alias';
-			$full_js="if (!confirm('" . str_replace('<br>', '\n', flexicontent_html::encodeHTML(JText::_('Recalculate item aliases'), 2)) . "')) return false; var url = jQuery(this).data('taskurl'); fc_showDialog(url, 'fc_modal_popup_container', 0, 550, 350, function(){document.body.innerHTML='<span class=\"fc_loading_msg\">"
+			$full_js="if (!confirm('" . str_replace('<br>', '\n', flexicontent_html::encodeHTML(JText::_('Recalculate item aliases. <br>Only for new websites <br>as this can destroy your existing SEO ranks'), 2)) . "')) return false; var url = jQuery(this).data('taskurl'); fc_showDialog(url, 'fc_modal_popup_container', 0, 550, 350, function(){document.body.innerHTML='<span class=\"fc_loading_msg\">"
 						.$loading_msg."<\/span>'; window.location.reload(false)}, {'title': '".flexicontent_html::encodeHTML(JText::_('Recalculate item aliases'), 2)."'}); return false;";
 			$btn_arr[] = flexicontent_html::addToolBarButton(
 				'Recalculate item aliases', $btn_name, $full_js,

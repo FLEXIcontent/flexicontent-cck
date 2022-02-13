@@ -53,7 +53,8 @@ $_NULL_DATE_     = JFactory::getDbo()->getNullDate();
  * JS for Columns chooser box and Filters box
  */
 
-$this->data_tbl_id = 'adminListTableFC' . $this->view;
+$filter_type = $this->getModel()->getState('filter_type');
+$this->data_tbl_id = 'adminListTableFC' . $this->view . '_type_' . (count($filter_type) === 1 ? reset($filter_type) : 0);
 flexicontent_html::jscode_to_showhide_table(
 	'mainChooseColBox',
 	$this->data_tbl_id,
@@ -539,18 +540,18 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 			<span id="log-fixcat"></span>
 			<span id="badcat_items_count" class="badge" style="border-radius: 3px;"><?php echo $this->badcatitems; ?></span>
 			<?php echo JText::_( 'FLEXI_ITEMS' ); ?>
-			
+
 			<div id="fixCatBox" style="display: inline-block;" data-action="index.php?option=com_flexicontent&amp;<?php echo $items_task; ?>fixmaincat&amp;tmpl=component&amp;format=raw">
 				<input id="button-fixcat" type="button"
 					class="<?php echo $btn_class; ?> btn-primary"
 					value="<?php echo JText::_( 'FLEXI_FIX' ); ?>" onclick="return false;"
 				/>
-				
+
 				<span class="label"><?php echo JText::_('FLEXI_CATEGORY'); ?></span> <?php echo $this->lists['default_cat']; ?>
 			</div>
 		</div>
 	<?php endif; ?>
-	
+
 	<?php if ($this->unassociated && !count($this->rows)) echo '<div style="display: none;">'; ?>
 
 
@@ -799,11 +800,9 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 
 		<?php if ($useAssocs) : ?>
 
-			<?php if ($max_assocs >= 4): ?><?php $colposition++; ?>
-				<th class="col_assocs_count">
-					<div id="fc-toggle-assocs_btn" style="padding: 4px 0 2px 6px;" class="<?php echo $out_class . ' ' . $this->tooltip_class; ?>" title="<?php echo JText::_('FLEXI_ASSOCIATIONS'); ?>" onclick="jQuery('#columnchoose_adminListTableFCitems_<?php echo $colposition; ?>_label').click();" ><span class="icon-flag"></span></div>
-				</th>
-			<?php endif; ?>
+			<th class="col_assocs_count"><?php $colposition++; ?>
+				<div id="fc-toggle-assocs_btn" style="padding: 4px 0 2px 6px;" class="<?php echo $out_class . ' ' . $this->tooltip_class; ?>" title="<?php echo JText::_('FLEXI_ASSOCIATIONS'); ?>" onclick="jQuery('#columnchoose_adminListTableFCitems_<?php echo $colposition; ?>_label').click();" ><span class="icon-flag"></span></div>
+			</th>
 
 			<th class="col_assocs hideOnDemandClass hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo JText::_('FLEXI_ASSOCIATIONS'); ?>
@@ -1131,13 +1130,13 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 							$assoc_item->title,
 							(isset($state_icons[$assoc_item->state]) ? '<span class="' . $state_icons[$assoc_item->state] . '"></span>' : '') .
 							(isset($state_names[$assoc_item->state]) ? $state_names[$assoc_item->state] . '<br>': '') .
-							($is_oc_item ? '' : '<span class="icon-pencil"></span>' . JText::_( $assoc_modified < $oc_item_modified ? 'FLEXI_TRANSLATINON_IS_STALE' : 'FLEXI_TRANSLATINON_IS_UPTODATE')) .
+							($is_oc_item ? '' : '<span class="icon-pencil"></span>' . JText::_( $assoc_modified < $oc_item_modified ? 'FLEXI_TRANSLATION_IS_OUTDATED' : 'FLEXI_TRANSLATION_IS_UPTODATE')) .
 							': ' . $assoc_modified_date . '<br>'.
 							( !empty($this->langs->{$assoc_item->lang}) ? ' <img src="'.$this->langs->{$assoc_item->lang}->imgsrc.'" alt="'.$assoc_item->lang.'" /> ' : '').
 							($assoc_item->lang === '*' ? JText::_('FLEXI_ALL') : (!empty($this->langs->{$assoc_item->lang}) ? $this->langs->{$assoc_item->lang}->name: '?')).' <br/> '
 							, 0, 1
 						);
-						
+
 						$state_colors = array(1 => ' fc_assoc_ispublished', -5 => ' fc_assoc_isinprogress');
 						$assoc_state_class   = isset($state_colors[$assoc_item->state]) ? $state_colors[$assoc_item->state] : ' fc_assoc_isunpublished';
 						$assoc_isstale_class = $oc_item && ($assoc_modified < $oc_item_modified) ? ' fc_assoc_isstale' : ' fc_assoc_isuptodate';
@@ -1257,7 +1256,7 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 					$ix++;
 				}
 				echo $_maincat;
-				echo count($row_cats) ? ' 
+				echo count($row_cats) ? '
 					<span class="btn btn-mini ' . $this->popover_class . ' nowrap_box" onclick="jQuery(this).next().toggle(400);" data-content="'.flexicontent_html::getToolTip(JText::_('FLEXI_CATEGORIES'), '<ul class="fc_plain"><li>'.implode('</li><li>', $cat_names).'</li></ul>', 0, 1).'">
 						'.count($row_cats).' <i class="icon-tree-2"></i>
 					</span>
