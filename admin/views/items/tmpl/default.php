@@ -803,7 +803,7 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 		<?php if ($useAssocs) : ?>
 
 			<th class="col_assocs_count"><?php $colposition++; ?>
-				<div id="fc-toggle-assocs_btn" style="padding: 4px 0 2px 6px;" class="<?php echo $out_class . ' ' . $this->tooltip_class; ?>" title="<?php echo JText::_('FLEXI_ASSOCIATIONS'); ?>" onclick="jQuery('#columnchoose_adminListTableFCitems_<?php echo $colposition; ?>_label').click();" >
+				<div id="fc-toggle-assocs_btn" style="padding: 4px 0 2px 6px;" class="<?php echo $out_class . ' ' . $this->tooltip_class; ?>" title="<?php echo JText::_('FLEXI_ASSOCIATIONS'); ?>" onclick="jQuery('#columnchoose_adminListTableFCitems_type_<?php echo (count($filter_type) === 1 ? reset($filter_type) : 0) . '_'. $colposition; ?>_label').click();" >
 					<span class="icon-flag"></span>
 				</div>
 			</th>
