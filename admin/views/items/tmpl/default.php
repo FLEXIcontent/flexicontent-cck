@@ -302,6 +302,7 @@ function delAllFilters()
 	delFilter('filter_access');
 	delFilter('filter_meta');
 	delFilter('filter_fileid');
+	jQuery('#filter_assockey').removeAttr('checked');
 	delFilter('filter_order');
 	delFilter('filter_order_Dir');
 	jQuery('#filter_subcats').attr('checked', 'checked');  // default: include subcats
@@ -456,7 +457,7 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 	echo '
 		<div class="tabbertab ' . $type_class . '" id="type_tab_all" style="padding-left: 0; padding-right: 0; border-left: 0; border-right: 0; border-bottom: 0;">
 			<h3 class="tabberheading ' . $__tip_class . '" ' . $__tip_props . '
-				onmouseup="jQuery(\'#filter_type\').val([]); jQuery(\'#filter_type\').trigger(\'change\')"
+				onmouseup="jQuery(\'#filter_assockey\').removeAttr(\'checked\'); jQuery(\'#filter_type\').val([]); jQuery(\'#filter_type\').trigger(\'change\')"
 			>' . JText::_('FLEXI_ALL') . '</h3>
 		</div>
 		';
@@ -488,7 +489,7 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 			<div class="tabbertab ' . $type_class . '" id="type_tab_' . (int) $itemType->id . '" style="padding-left: 0; padding-right: 0; border-left: 0; border-right: 0; border-bottom: 0;">
 				<h3 class="tabberheading ' . $__tip_class . '" ' . $__tip_props . '
 					data-data_attr_a="' . (int) $itemType->id . '"
-					onmouseup="jQuery(\'#filter_type\').val([this.getAttribute(\'data-data_attr_a\')]); jQuery(\'#filter_type\').trigger(\'change\')"
+					onmouseup="jQuery(\'#filter_assockey\').removeAttr(\'checked\'); jQuery(\'#filter_type\').val([this.getAttribute(\'data-data_attr_a\')]); jQuery(\'#filter_type\').trigger(\'change\')"
 				>' . JText::_( $itemType->name ) . '</h3>
 		';
 		echo '</div>';
