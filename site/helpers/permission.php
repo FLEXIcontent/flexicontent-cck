@@ -128,10 +128,6 @@ class FlexicontentHelperPerm
 		$permission->MultiCat     = $user->authorise('flexicontent.multicat',    'com_flexicontent'); // (item edit form) allow user to assign items to multiple categories
 
 		// REVIEWs: management tab and usage
-		$permission->CanMediadatas       = $user->authorise('flexicontent.managemediafiles',  'com_flexicontent') && version_compare(FLEXI_VERSION, '3.2.99', '>');
-		$permission->CanCreateMediadatas = $user->authorise('flexicontent.createmediafiles',  'com_flexicontent') && version_compare(FLEXI_VERSION, '3.2.99', '>');
-
-		// REVIEWs: management tab and usage
 		$permission->CanReviews       = $user->authorise('flexicontent.managereviews',  'com_flexicontent') && version_compare(FLEXI_VERSION, '3.2.99', '>');
 		$permission->CanCreateReviews = $user->authorise('flexicontent.createreviews',  'com_flexicontent') && version_compare(FLEXI_VERSION, '3.2.99', '>');
 
@@ -161,9 +157,13 @@ class FlexicontentHelperPerm
 		$permission->CanUpload       = $user->authorise('flexicontent.uploadfiles',   'com_flexicontent'); // allow user to upload Files
 		$permission->CanViewAllFiles = $user->authorise('flexicontent.viewallfiles',  'com_flexicontent'); // allow user to view all Files
 
+		// MEDIA DATA: management tab and usage
+		$permission->CanMediadatas       = $permission->CanFiles;
+		$permission->CanCreateMediadatas = $permission->CanUpload;
+
 		// AUTHORS: management tab
 		$permission->CanAuthors   = $user->authorise('core.manage', 'com_users');
-		$permission->CanGroups    = $permission->CanAuthors;
+		$permission->CanGroups    = $user->authorise('core.admin', 'com_users');;
 
 		// SEARCH INDEX: management tab
 		$permission->CanIndex     = $permission->CanFields && ($permission->CanAddField || $permission->CanEditField);

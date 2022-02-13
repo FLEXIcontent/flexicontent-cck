@@ -793,15 +793,23 @@ class FLEXIUtilities
 			}
 
 			$mediadatas_path = JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'views'.DS.'mediadatas';
-
-			if (file_exists($mediadatas_path) && version_compare(FLEXI_VERSION, '3.2.99', '>'))
+			
+			if (file_exists($mediadatas_path) && $perms->CanMediadatas)
+			//&& version_compare(FLEXI_VERSION, '3.2.99', '>'
 			{
-				call_user_func($addEntry, '<span class="fcsb-icon-mediadata icon-equalizer"></span>'.JText::_( 'FLEXI_MEDIADATAS' ), 'index.php?option=com_flexicontent&view=mediadatas', $view=='mediadatas');
+				$query = 'SELECT COUNT(*) FROM #__flexicontent_fields WHERE field_type="mediafile" AND published=1';
+				$fields_exist = (int) $db->setQuery($query)->loadResult();
+
+				if ($fields_exist)
+				{
+					call_user_func($addEntry, '<span class="fcsb-icon-mediadata icon-equalizer"></span>'.JText::_( 'FLEXI_MEDIADATAS' ), 'index.php?option=com_flexicontent&view=mediadatas', $view=='mediadatas');
+				}
 			}
 
 			$reviews_path = JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'views'.DS.'reviews';
 
-			if (file_exists($reviews_path) && version_compare(FLEXI_VERSION, '3.2.99', '>'))
+			if (file_exists($reviews_path) && $perms->CanReviews)
+			//&& version_compare(FLEXI_VERSION, '3.2.99', '>'
 			{
 				$query = 'SELECT * FROM #__flexicontent_fields WHERE field_type="voting"';
 				$field = $db->setQuery($query)->loadObject();
@@ -838,7 +846,7 @@ class FLEXIUtilities
 			$perms->CanIndex
 				? call_user_func($addEntry, '<span class="fcsb-icon-search icon-search"></span>'.JText::_( 'FLEXI_SEARCH_INDEXES' ), 'index.php?option=com_flexicontent&view=search', $view=='search') : null;
 
-			$CanSeeSearchLogs = JFactory::getUser()->authorise('core.manage', 'com_search');
+			$CanSeeSearchLogs = !FLEXI_J40GE && JFactory::getUser()->authorise('core.admin', 'com_search');
 
 			if ($CanSeeSearchLogs)
 			{

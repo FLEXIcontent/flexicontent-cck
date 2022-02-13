@@ -183,8 +183,11 @@ $items_task = 'task=items.';
 			<h3 class="fc-board-header"><?php echo JText::_( 'FLEXI_NAV_SD_CONTENT_EDITING' );?></h3>
 
 			<div class="fc-board-set-inner"><?php
-			$link = 'index.php?option='.$option.'&amp;view=items';
-			if (!isset($sbtns['items'])) FlexicontentViewFlexicontent::quickiconButton( $link, '', 'icon-items', JText::_( 'FLEXI_ITEMS' ) );
+			if (!isset($sbtns['items']))
+			{
+				$link = 'index.php?option='.$option.'&amp;view=items';
+				FlexicontentViewFlexicontent::quickiconButton( $link, '', 'icon-items', JText::_( 'FLEXI_ITEMS' ) );
+			}
 			if (!isset($sbtns['additem']))
 			{
 				// Check if user can create in at least one published category
@@ -204,15 +207,21 @@ $items_task = 'task=items.';
 				$link = 'index.php?option='.$option.'&amp;view=archive';
 				FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-archive.png', JText::_( 'FLEXI_ARCHIVE' ) );
 			}*/
-			if ($this->perms->CanCats && !isset($sbtns['addcat']))
+			if ($this->perms->CanCats)
 			{
-				$link = 'index.php?option='.$option.'&amp;view=categories';
-				if (!isset($sbtns['cats'])) FlexicontentViewFlexicontent::quickiconButton( $link, '' ,'icon-folder', JText::_( 'FLEXI_CATEGORIES' ) );
-				$canCreateAny = FlexicontentHelperPerm::getPermAny('core.create');
-				if ($canCreateAny)
+				if (!isset($sbtns['cats']))
 				{
-					$link = 'index.php?option='.$option.'&amp;view=category';
-					FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-folder-plus', JText::_( 'FLEXI_NEW_CATEGORY' ) );
+					$link = 'index.php?option='.$option.'&amp;view=categories';
+					FlexicontentViewFlexicontent::quickiconButton( $link, '' ,'icon-folder', JText::_( 'FLEXI_CATEGORIES' ) );
+				}
+				if (!isset($sbtns['addcat']))
+				{
+					$canCreateAny = FlexicontentHelperPerm::getPermAny('core.create');
+					if ($canCreateAny)
+					{
+						$link = 'index.php?option='.$option.'&amp;view=category';
+						FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-folder-plus', JText::_( 'FLEXI_NEW_CATEGORY' ) );
+					}
 				}
 			}
 			if (isset($sbtns['comments']))
