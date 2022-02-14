@@ -37,6 +37,12 @@ $btn_class = 'btn';
 $ico_class = 'fc-man-icon-s';
 $out_class = FLEXI_J40GE ? 'btn btn-outline-dark' : 'btn';
 
+$edit_cat_title  = JText::_('FLEXI_EDIT_CATEGORY', true);
+$rem_filt_txt    = JText::_('FLEXI_REMOVE_FILTER', true);
+$rem_filt_tip    = ' class="' . $this->tooltip_class . ' filterdel" title="'.flexicontent_html::getToolTip('FLEXI_ACTIVE_FILTER', 'FLEXI_CLICK_TO_REMOVE_THIS_FILTER', 1, 1).'" ';
+$_NEVER_         = JText::_('FLEXI_NEVER');
+$_NULL_DATE_     = JFactory::getDbo()->getNullDate();
+
 
 
 /**
@@ -94,6 +100,7 @@ $state_icons = array(
 /**
  * Calculate maximum column size of associations
  */
+
 $max_assocs = 0;
 foreach($this->rows as $row)
 {
@@ -104,6 +111,7 @@ foreach($this->rows as $row)
 $ocLang = $cparams->get('original_content_language', '_site_default_');
 $ocLang = $ocLang === '_site_default_' ? JComponentHelper::getParams('com_languages')->get('site', '*') : $ocLang;
 $ocLang = $ocLang !== '_disable_' && $ocLang !== '*' ? $ocLang : false;
+
 
 
 /**
@@ -146,7 +154,7 @@ function delFilter(name)
 	}
 	else if (filter.attr('type') == 'checkbox')
 	{
-		filter.checked = '';
+		filter.removeAttr('checked');
 	}
 	else
 	{
@@ -162,7 +170,7 @@ function delFilter(name)
 
 function delAllFilters()
 {
-	jQuery('.fc_field_filter').val('');
+	jQuery('.fc_field_filter').val('');  // clear custom filters
 	delFilter('search');
 	delFilter('filter_level');
 	delFilter('filter_state');
@@ -171,6 +179,7 @@ function delAllFilters()
 	delFilter('filter_id');
 	delFilter('filter_lang');
 	delFilter('filter_access');
+	delFilter('filter_assockey');
 	delFilter('filter_order');
 	delFilter('filter_order_Dir');
 }
@@ -228,9 +237,10 @@ if ($js)
 
 				<div id="fc-filters-box" <?php if (!$this->count_filters || !$tools_state->filters_box) echo 'style="display:none;"'; ?> class="fcman-abs" onclick="var event = arguments[0] || window.event; event.stopPropagation();">
 					<?php
+					echo $this->lists['filter_assockey'];
 					echo $this->lists['filter_cats'];
 					echo $this->lists['filter_level'];
-					echo $this->lists['filter_author'];				
+					echo $this->lists['filter_author'];
 					echo $this->lists['filter_state'];
 					echo $this->lists['filter_access'];
 					echo $this->lists['filter_lang'];
@@ -310,6 +320,11 @@ if ($js)
 
 			<th class="col_status hideOnDemandClass left" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo JHtml::_('grid.sort', 'FLEXI_STATUS', 'a.' . $this->state_propname, $this->lists['order_Dir'], $this->lists['order'] ); ?>
+				<?php if ($this->getModel()->getState('filter_state')) : ?>
+				<span <?php echo $rem_filt_tip; ?>>
+					<span class="icon-purge btn btn-danger btn-small" onclick="delFilter('filter_state'); document.adminForm.submit();"></span>
+				</span>
+				<?php endif; ?>
 			</th>
 
 			<th class="col_title hideOnDemandClass" style="<?php echo $this->hideCol($colposition++); ?>" >
@@ -317,20 +332,44 @@ if ($js)
 				&nbsp; <small>[
 				<?php echo JHtml::_('grid.sort', 'FLEXI_ALIAS', 'a.alias', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				]<small>
+				<?php if (strlen($this->getModel()->getState('search'))) : ?>
+				<span <?php echo $rem_filt_tip; ?>>
+					<span class="icon-purge btn btn-danger btn-small" onclick="delFilter('search'); document.adminForm.submit();"></span>
+				</span>
+				<?php endif; ?>
+
+				<?php if (($filter_cats = $this->getModel()->getState('filter_cats'))): ?>
+						<?php echo '<br><span class="alert alert-info fcpadded">'.JText::_('FLEXI_PARENT') . ': ' . $globalcats[$filter_cats]->title .'</span>'; ?>
+						<span <?php echo $rem_filt_tip; ?>>
+							<span class="icon-purge btn btn-danger btn-small" onclick="delFilter('filter_cats'); document.adminForm.submit();"></span>
+						</span>
+				<?php endif; ?>
 			</th>
 
 			<th class="col_lang hideOnDemandClass hidden-phone" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo JHtml::_('grid.sort', 'FLEXI_LANGUAGE', 'a.language', $this->lists['order_Dir'], $this->lists['order'] ); ?>
+				<?php if ($this->getModel()->getState('filter_lang')) : ?>
+				<span <?php echo $rem_filt_tip; ?>>
+					<span class="icon-purge btn btn-danger btn-small" onclick="delFilter('filter_lang'); document.adminForm.submit();"></span>
+				</span>
+				<?php endif; ?>
 			</th>
 
 		<?php if ($useAssocs) : ?>
 
 			<th class="col_assocs_count"><?php $colposition++; ?>
-				<div id="fc-toggle-assocs_btn" style="padding: 4px 0 2px 6px;" class="<?php echo $out_class . ' ' . $this->tooltip_class; ?>" title="<?php echo JText::_('FLEXI_ASSOCIATIONS'); ?>" onclick="jQuery('#columnchoose_adminListTableFCcategories_<?php echo $colposition; ?>_label').click();" ><span class="icon-flag"></span></div>
+				<div id="fc-toggle-assocs_btn" style="padding: 4px 0 2px 6px;" class="<?php echo $out_class . ' ' . $this->tooltip_class; ?>" title="<?php echo JText::_('FLEXI_ASSOCIATIONS'); ?>" onclick="jQuery('#columnchoose_adminListTableFCcategories_<?php echo $colposition; ?>_label').click();" >
+					<span class="icon-flag"></span>
+				</div>
 			</th>
 
 			<th class="col_assocs hideOnDemandClass hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo JText::_('FLEXI_ASSOCIATIONS'); ?>
+				<?php if ($this->getModel()->getState('filter_assockey')) : ?>
+				<span <?php echo $rem_filt_tip; ?>>
+					<span class="icon-purge btn btn-danger btn-small" onclick="delFilter('filter_assockey'); document.adminForm.submit();"></span>
+				</span>
+				<?php endif; ?>
 			</th>
 		<?php endif; ?>
 
@@ -364,6 +403,11 @@ if ($js)
 
 			<th class="col_access hideOnDemandClass hidden-phone" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo JHtml::_('grid.sort', 'FLEXI_ACCESS', 'a.access', $this->lists['order_Dir'], $this->lists['order'] ); ?>
+				<?php if ($this->getModel()->getState('filter_access')) : ?>
+				<span <?php echo $rem_filt_tip; ?>>
+					<span class="icon-purge btn btn-danger btn-small" onclick="delFilter('filter_access'); document.adminForm.submit();"></span>
+				</span>
+				<?php endif; ?>
 			</th>
 
 			<!--th class="hideOnDemandClass" style="<?php //echo $this->hideCol($colposition++); ?>" >
@@ -373,7 +417,24 @@ if ($js)
 
 			<th class="col_id hideOnDemandClass center hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo JHtml::_('grid.sort', 'FLEXI_ID', 'a.id', $this->lists['order_Dir'], $this->lists['order']); ?>
+				<?php if ($this->getModel()->getState('filter_id')) : ?>
+				<span <?php echo $rem_filt_tip; ?>>
+					<span class="icon-purge btn btn-danger btn-small" onclick="delFilter('filter_id'); document.adminForm.submit();"></span>
+				</span>
+				<?php endif; ?>
 			</th>
+
+			<?php if ($this->getModel()->getState('filter_level')) : ?>
+			<th class="col_level hidden-phone">
+				<?php if ($this->getModel()->getState('filter_level')) : ?>
+				<span <?php echo $rem_filt_tip; ?>>
+					<span class="icon-purge btn btn-danger btn-small" onclick="delFilter('filter_level'); document.adminForm.submit();"></span>
+				</span>
+				<?php endif; ?>
+				<br>
+				<span class="icon-tree"></span>
+			</th>
+			<?php endif; ?>
 
 		</tr>
 	</thead>
@@ -573,7 +634,14 @@ if ($js)
 			<?php if ($useAssocs) : ?>
 
 				<td><?php $colposition++; ?>
-					<?php echo !empty($this->lang_assocs[$row->id]) ? '<span class="fc_assocs_count">' . count($this->lang_assocs[$row->id]) . '</span>' : ''; ?>
+					<?php if (!empty($this->lang_assocs[$row->id])): ?>
+						<?php $row_assocs = $this->lang_assocs[$row->id]; ?>
+						<a href="index.php?option=com_flexicontent&amp;view=categories&amp;filter_assockey=<?php echo reset($row_assocs)->key; ?>&amp;fcform=1&amp;filter_state=ALL"
+							class="<?php echo $this->btn_sm_class; ?> fc_assocs_count"
+						>
+							<?php echo count($row_assocs); ?>
+						</a>
+					<?php endif; ?>
 				</td>
 
 				<td class="hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
@@ -609,13 +677,13 @@ if ($js)
 								$assoc_item->title,
 								(isset($state_icons[$assoc_item->state]) ? '<span class="' . $state_icons[$assoc_item->state] . '"></span>' : '') .
 								(isset($state_names[$assoc_item->state]) ? $state_names[$assoc_item->state] . '<br>': '') .
-								($is_oc_item ? '' : '<span class="icon-pencil"></span>' . JText::_( $assoc_modified < $oc_item_modified ? 'FLEXI_TRANSLATINON_IS_STALE' : 'FLEXI_TRANSLATINON_IS_UPTODATE')) .
+								($is_oc_item ? '' : '<span class="icon-pencil"></span>' . JText::_( $assoc_modified < $oc_item_modified ? 'FLEXI_TRANSLATION_IS_OUTDATED' : 'FLEXI_TRANSLATION_IS_UPTODATE')) .
 								': ' . $assoc_modified_date . '<br>'.
 								( !empty($this->langs->{$assoc_item->lang}) ? ' <img src="'.$this->langs->{$assoc_item->lang}->imgsrc.'" alt="'.$assoc_item->lang.'" /> ' : '').
 								($assoc_item->lang === '*' ? JText::_('FLEXI_ALL') : (!empty($this->langs->{$assoc_item->lang}) ? $this->langs->{$assoc_item->lang}->name: '?')).' <br/> '
 								, 0, 1
 							);
-							
+
 							$state_colors = array(1 => ' fc_assoc_ispublished', -5 => ' fc_assoc_isinprogress');
 							$assoc_state_class   = isset($state_colors[$assoc_item->state]) ? $state_colors[$assoc_item->state] : ' fc_assoc_isunpublished';
 							$assoc_isstale_class = $oc_item && ($assoc_modified < $oc_item_modified) ? ' fc_assoc_isstale' : ' fc_assoc_isuptodate';
@@ -687,6 +755,12 @@ if ($js)
 			<td class="col_id center hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo $row->id; ?>
 			</td>
+
+			<?php if ($this->getModel()->getState('filter_level')) : ?>
+			<td class="col_level hidden-phone">
+				<?php echo $this->escape($row->level); ?>
+			</td>
+			<?php endif; ?>
 
 		</tr>
 		<?php

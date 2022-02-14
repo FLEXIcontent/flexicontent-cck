@@ -83,6 +83,7 @@ class FlexicontentViewCategories extends FlexicontentViewBaseRecords
 		$filter_order_Dir  = $model->getState('filter_order_Dir');
 
 		// Various filters
+		$filter_assockey  = $model->getState('filter_assockey');
 		$filter_state     = $model->getState('filter_state');
 		$filter_cats      = $model->getState('filter_cats');
 		$filter_level     = $model->getState('filter_level');
@@ -90,6 +91,7 @@ class FlexicontentViewCategories extends FlexicontentViewBaseRecords
 		$filter_lang      = $model->getState('filter_lang');
 		$filter_author    = $model->getState('filter_author');
 
+		if ($filter_assockey) $count_filters++;
 		if (strlen($filter_state)) $count_filters++;
 		if ($filter_cats) $count_filters++;
 		if ($filter_level) $count_filters++;
@@ -248,6 +250,7 @@ class FlexicontentViewCategories extends FlexicontentViewBaseRecords
 
 		$lists[$elementid] = $this->getFilterDisplay(array(
 			'label' => JText::_('FLEXI_CATEGORY'),
+			'label_extra_class' => ($value ? ' fc-lbl-inverted' : ''),
 			'html' => flexicontent_cats::buildcatselect(
 				$categories,
 				$fieldname,
@@ -282,6 +285,7 @@ class FlexicontentViewCategories extends FlexicontentViewBaseRecords
 		{
 			$lists[$elementid] = $this->getFilterDisplay(array(
 				'label' => JText::_('FLEXI_MAX_DEPTH'),
+				'label_extra_class' => ($value ? ' fc-lbl-inverted' : ''),
 				'html' => JHtml::_('select.genericlist',
 					$options,
 					$fieldname,
@@ -308,6 +312,7 @@ class FlexicontentViewCategories extends FlexicontentViewBaseRecords
 		{
 			$lists[$elementid] = $this->getFilterDisplay(array(
 				'label' => JText::_('FLEXI_AUTHOR'),
+				'label_extra_class' => (strlen($value) ? ' fc-lbl-inverted' : ''),
 				'html' => flexicontent_html::buildauthorsselect(
 					$authors,
 					$fieldname,
@@ -326,6 +331,7 @@ class FlexicontentViewCategories extends FlexicontentViewBaseRecords
 		// Build publication state filter
 		//$options = JHtml::_('jgrid.publishedOptions');
 		$options = array();
+		$options[] = JHtml::_('select.option', 'ALL', JText::_('FLEXI_GRP_ALL') . ' ' . JText::_('FLEXI_STATE_S'));
 
 		foreach ($model_s->supported_conditions as $condition_value => $condition_name)
 		{
@@ -339,6 +345,7 @@ class FlexicontentViewCategories extends FlexicontentViewBaseRecords
 
 		$lists[$elementid] = $this->getFilterDisplay(array(
 			'label' => JText::_('FLEXI_STATE'),
+			'label_extra_class' => (strlen($value) ? ' fc-lbl-inverted' : ''),
 			'html' => JHtml::_('select.genericlist',
 				$options,
 				$fieldname,
@@ -366,6 +373,7 @@ class FlexicontentViewCategories extends FlexicontentViewBaseRecords
 
 		$lists[$elementid] = $this->getFilterDisplay(array(
 			'label' => JText::_('FLEXI_ACCESS'),
+			'label_extra_class' => (strlen($value) ? ' fc-lbl-inverted' : ''),
 			'html' => JHtml::_('select.genericlist',
 				$options,
 				$fieldname,
@@ -384,26 +392,62 @@ class FlexicontentViewCategories extends FlexicontentViewBaseRecords
 
 
 		// Build language filter
-		$lists['filter_lang'] = $this->getFilterDisplay(array(
+		$fieldname = 'filter_lang';
+		$elementid = 'filter_lang';
+		$value     = $filter_lang;
+
+		$lists[$elementid] = $this->getFilterDisplay(array(
 			'label' => JText::_('FLEXI_LANGUAGE'),
+			'label_extra_class' => (strlen($value) ? ' fc-lbl-inverted' : ''),
 			'html' => flexicontent_html::buildlanguageslist(
-				'filter_lang',
+				$fieldname,
 				array(
 					'class' => $this->select_class,
 					'size' => '1',
 					'onchange' => 'if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();',
 				),
-				$filter_lang,
+				$value,
 				'-'
 			)
 		));
 
 
 		// Build record id filter
-		$lists['filter_id'] = $this->getFilterDisplay(array(
+		$fieldname = 'filter_id';
+		$elementid = 'filter_id';
+		$value     = $filter_id;
+
+		$lists[$elementid] = $this->getFilterDisplay(array(
 			'label' => JText::_('FLEXI_ID'),
-			'html' => '<input type="text" name="filter_id" id="filter_id" size="6" value="' . $filter_id . '" class="inputbox" style="width:auto;" />',
+			'label_extra_class' => (strlen($value) ? ' fc-lbl-inverted' : ''),
+			'html' => '<input type="text" name="'.$fieldname.'" id="'.$elementid.'" size="6" value="' . $value . '" class="fcfield_textval" style="width:auto;" />',
 		));
+
+
+		/**
+		 * Filter by item usage a specific file
+		 */
+
+		$fieldname = 'filter_assockey';
+		$elementid = 'filter_assockey';
+		$value     = $filter_assockey;
+
+		if ($filter_assockey)
+		{
+			$lists[$elementid] = $this->getFilterDisplay(array(
+				'label' => JText::_('FLEXI_ASSOCIATIONS'),
+				'label_extra_class' => ' fc-lbl-short' . ($value ? ' fc-lbl-inverted' : ''),
+				'html' => '
+					<div class="group-fcset" style="display: inline-block;">
+							<input type="checkbox" id="'.$elementid.'" name="'.$fieldname.'" onchange="if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform()" value="'.$value.'" '.($value ? ' checked="checked" ' : '').' />
+							<label id="'.$elementid.'-lbl" for="'.$elementid.'" style="margin: 0 12px; vertical-align: middle; border: 0;"></label>
+					</div>',
+			));
+		}
+		else
+		{
+			$lists[$elementid] = '';
+		}
 
 
 		// Build text search scope

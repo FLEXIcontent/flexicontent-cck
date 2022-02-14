@@ -598,7 +598,6 @@ body .fc-nowrap-box .nowrap_box .label,
 #flexicontent [class*="fc-xpended"] .add-on.fc-lbl-inverted {
 	background: #555 none repeat scroll 0 0;
 	color: white;
-	font-family: monospace;
 	text-shadow: unset;
 	border: 1px solid gray;
 	font-size: 12px;

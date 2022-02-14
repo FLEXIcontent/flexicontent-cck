@@ -271,7 +271,7 @@ function delFilter(name)
 	}
 	else if (filter.attr('type') == 'checkbox')
 	{
-		filter.checked = '';
+		filter.removeAttr('checked');
 	}
 	else
 	{
@@ -287,7 +287,7 @@ function delFilter(name)
 
 function delAllFilters()
 {
-	jQuery('.fc_field_filter').val('');
+	jQuery('.fc_field_filter').val('');  // clear custom filters
 	delFilter('search');
 	delFilter('filter_type');
 	delFilter('filter_state');
@@ -302,7 +302,7 @@ function delAllFilters()
 	delFilter('filter_access');
 	delFilter('filter_meta');
 	delFilter('filter_fileid');
-	jQuery('#filter_assockey').removeAttr('checked');
+	delFilter('filter_assockey');
 	delFilter('filter_order');
 	delFilter('filter_order_Dir');
 	jQuery('#filter_subcats').attr('checked', 'checked');  // default: include subcats
@@ -605,6 +605,7 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 					{
 						echo $this->getFilterDisplay(array(
 							'label' => $filt->label,
+							'label_extra_class' => ($filt->value ? ' fc-lbl-inverted' : ''),
 							'html' => $filt->html,
 						));
 					}
@@ -774,9 +775,9 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 
 			<th class="col_status hideOnDemandClass left" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo JHtml::_('grid.sort', 'FLEXI_STATUS', 'a.' . $this->state_propname, $this->lists['order_Dir'], $this->lists['order'] ); ?>
-				<?php if ($this->getModel()->getState('filter_state')) : ?>
+				<?php if ($this->getModel()->getState('filter_state') || $this->getModel()->getState('filter_catsinstate') != 1) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
-					<span class="icon-cancel-circle btn btn-micro" onclick="delFilter('filter_state'); document.adminForm.submit();"></span>
+					<span class="icon-purge btn btn-danger btn-small" onclick="delFilter('filter_state'); jQuery('#filter_catsinstate').val('1'); document.adminForm.submit();"></span>
 				</span>
 				<?php endif; ?>
 			</th>
@@ -785,7 +786,7 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 				<?php echo JHtml::_('grid.sort', 'FLEXI_TITLE', 'a.' . $this->title_propname, $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php if (strlen($this->getModel()->getState('search'))) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
-					<span class="icon-cancel-circle btn btn-micro" onclick="delFilter('search'); document.adminForm.submit();"></span>
+					<span class="icon-purge btn btn-danger btn-small" onclick="delFilter('search'); document.adminForm.submit();"></span>
 				</span>
 				<?php endif; ?>
 			</th>
@@ -794,7 +795,7 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 				<?php echo JHtml::_('grid.sort', 'FLEXI_AUTHOR', 'a.created_by', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php if ($this->getModel()->getState('filter_author')) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
-					<span class="icon-cancel-circle btn btn-micro" onclick="delFilter('filter_author'); document.adminForm.submit();"></span>
+					<span class="icon-purge btn btn-danger btn-small" onclick="delFilter('filter_author'); document.adminForm.submit();"></span>
 				</span>
 				<?php endif; ?>
 			</th>
@@ -803,7 +804,7 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 				<?php echo JHtml::_('grid.sort', 'FLEXI_LANGUAGE', 'a.language', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php if ($this->getModel()->getState('filter_lang')) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
-					<span class="icon-cancel-circle btn btn-micro" onclick="delFilter('filter_lang'); document.adminForm.submit();"></span>
+					<span class="icon-purge btn btn-danger btn-small" onclick="delFilter('filter_lang'); document.adminForm.submit();"></span>
 				</span>
 				<?php endif; ?>
 			</th>
@@ -818,6 +819,11 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 
 			<th class="col_assocs hideOnDemandClass hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo JText::_('FLEXI_ASSOCIATIONS'); ?>
+				<?php if ($this->getModel()->getState('filter_assockey')) : ?>
+				<span <?php echo $rem_filt_tip; ?>>
+					<span class="icon-purge btn btn-danger btn-small" onclick="delFilter('filter_assockey'); document.adminForm.submit();"></span>
+				</span>
+				<?php endif; ?>
 			</th>
 		<?php endif; ?>
 
@@ -825,7 +831,7 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 				<?php echo JHtml::_('grid.sort', 'FLEXI_TYPE_NAME', 'type_name', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php if ($this->getModel()->getState('filter_type')) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
-					<span class="icon-cancel-circle btn btn-micro" onclick="delFilter('filter_type'); document.adminForm.submit();"></span>
+					<span class="icon-purge btn btn-danger btn-small" onclick="delFilter('filter_type'); document.adminForm.submit();"></span>
 				</span>
 				<?php endif; ?>
 			</th>
@@ -844,7 +850,7 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 				<?php echo JHtml::_('grid.sort', 'FLEXI_ACCESS', 'a.access', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php if ($this->getModel()->getState('filter_access')) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
-					<span class="icon-cancel-circle btn btn-micro" onclick="delFilter('filter_access'); document.adminForm.submit();"></span>
+					<span class="icon-purge btn btn-danger btn-small" onclick="delFilter('filter_access'); document.adminForm.submit();"></span>
 				</span>
 				<?php endif; ?>
 			</th>
@@ -852,9 +858,9 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 			<th class="col_cats hideOnDemandClass left hidden-phone" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo $categories_tip; ?>
 				<?php echo JText::_( 'FLEXI_CATEGORIES' ); ?>
-				<?php if ($this->getModel()->getState('filter_cats')) : ?>
+				<?php if ($this->getModel()->getState('filter_cats') || $this->getModel()->getState('filter_subcats') == 0) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
-					<span class="icon-cancel-circle btn btn-micro" onclick="delFilter('filter_cats'); document.adminForm.submit();"></span>
+					<span class="icon-purge btn btn-danger btn-small" onclick="delFilter('filter_cats'); jQuery('#filter_subcats').attr('checked', 'checked'); document.adminForm.submit();"></span>
 				</span>
 				<?php endif; ?>
 			</th>
@@ -863,7 +869,7 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 				<?php echo JText::_( 'FLEXI_TAGS' ); ?>
 				<?php if ($this->getModel()->getState('filter_tag')) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
-					<span class="icon-cancel-circle btn btn-micro" onclick="delFilter('filter_tag'); document.adminForm.submit();"></span>
+					<span class="icon-purge btn btn-danger btn-small" onclick="delFilter('filter_tag'); document.adminForm.submit();"></span>
 				</span>
 				<?php endif; ?>
 			</th>
@@ -875,7 +881,7 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 					if (($this->startdate && ($this->startdate != JText::_('FLEXI_FROM'))) || ($this->enddate && ($this->startdate != JText::_('FLEXI_TO')))) :
 				?>
 				<span <?php echo $rem_filt_tip; ?>>
-					<span class="icon-cancel-circle btn btn-micro" onclick="delFilter('startdate');delFilter('enddate'); document.adminForm.submit();"></span>
+					<span class="icon-purge btn btn-danger btn-small" onclick="delFilter('startdate');delFilter('enddate'); document.adminForm.submit();"></span>
 				</span>
 				<?php
 					endif;
@@ -890,7 +896,7 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 					if (($this->startdate && ($this->startdate != JText::_('FLEXI_FROM'))) || ($this->enddate && ($this->startdate != JText::_('FLEXI_TO')))) :
 				?>
 				<span <?php echo $rem_filt_tip; ?>>
-					<span class="icon-cancel-circle btn btn-micro" onclick="delFilter('startdate');delFilter('enddate'); document.adminForm.submit();"></span>
+					<span class="icon-purge btn btn-danger btn-small" onclick="delFilter('startdate');delFilter('enddate'); document.adminForm.submit();"></span>
 				</span>
 				<?php
 					endif;
@@ -914,7 +920,7 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 				<?php echo JHtml::_('grid.sort', 'FLEXI_ID', 'a.id', $this->lists['order_Dir'], $this->lists['order']); ?>
 				<?php if ($this->getModel()->getState('filter_id')) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
-					<span class="icon-cancel-circle btn btn-micro" onclick="delFilter('filter_id'); document.adminForm.submit();"></span>
+					<span class="icon-purge btn btn-danger btn-small" onclick="delFilter('filter_id'); document.adminForm.submit();"></span>
 				</span>
 				<?php endif; ?>
 			</th>

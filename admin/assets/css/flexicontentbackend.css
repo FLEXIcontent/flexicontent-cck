@@ -978,9 +978,13 @@ td.col_edit_layout {
 	text-align: left;
 	display: inline-block;
 }
-.flexicontent #fc-filters-box .fc-filter .fc-xpended-row .add-on,
-.flexicontent #fc-filters-box .fc-filter .fc-xpended .add-on {
+.flexicontent #fc-filters-box .fc-filter .fc-xpended-row .add-on:not(.fc-lbl-inverted),
+.flexicontent #fc-filters-box .fc-filter .fc-xpended .add-on:not(.fc-lbl-inverted) {
 	color: black;
+}
+.flexicontent #fc-filters-box .fc-filter .has-inverted-date-lbl + button {
+	background: #555 none repeat scroll 0 0;
+	color: white;
 }
 .flexicontent #fc-filters-box .fc-filter #s2id_date.select2-container.use_select2_lib .select2-choice {
 	width: 90px !important;
@@ -1006,8 +1010,8 @@ td.col_edit_layout {
 .flexicontent #fc-filters-box .fc-filter #startdate,
 .flexicontent #fc-filters-box .fc-filter #enddate {
 	font-size: 11px !important;
-	min-width: 99px;
-	max-width: 99px;
+	min-width: 93px;
+	max-width: 93px;
 	line-height: 2.7rem !important;
 	height: 2.7rem !important;
 	vertical-align: baseline;
@@ -1100,9 +1104,6 @@ td.col_edit_layout {
 	border-width: 0px !important;
 	background: #fff url(../images/select2.png) no-repeat scroll 100% -22px !important;
 	font-size: 13px;
-}
-.flexicontent #fc-filters-box .fc-filter .select2-container-multi .select2-choices .select2-search-choice {
-	color: darkorange !important;
 }
 .flexicontent #fc-filters-box .fc-filter .select2-container-multi.select2-dropdown-open .select2-choices .select2-search-field {
 	width: 100% !important;
@@ -1768,7 +1769,6 @@ body .fc-nowrap-box .nowrap_box .label,
 #flexicontent [class*="fc-xpended"] .add-on.fc-lbl-inverted {
 	background: #555 none repeat scroll 0 0;
 	color: white;
-	font-family: monospace;
 	text-shadow: unset;
 	border: 1px solid gray;
 	font-size: 12px;
@@ -5103,7 +5103,7 @@ img.btn.btn-small.fc-man-icon-s {
 	font-family: verdana;
 }
 .flexicontent .fcmanlist :not(.btn-group) > .btn.btn-small {
-	padding: 3px 3px 1px 4px !important;
+	padding: 3px 4px 1px 4px !important;
 	font-size: 14px;
 }
 .flexicontent .fcmanlist :not(.btn-group) > .btn.btn-micro {

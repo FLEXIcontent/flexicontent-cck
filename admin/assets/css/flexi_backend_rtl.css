@@ -604,7 +604,7 @@ img.btn.btn-small.fc-man-icon-s {
 	font-family: verdana;
 }
 .flexicontent .fcmanlist :not(.btn-group) > .btn.btn-small {
-	padding: 3px 3px 1px 4px !important;
+	padding: 3px 4px 1px 4px !important;
 	font-size: 14px;
 }
 .flexicontent .fcmanlist :not(.btn-group) > .btn.btn-micro {

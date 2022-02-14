@@ -139,6 +139,11 @@ class FlexicontentModelCategories extends FCModelAdminList
 		$app->setUserState($p . 'filter_cats', $filter_cats);
 		$app->setUserState($p . 'filter_level', $filter_level);
 
+		// Association KEY filter
+		$filter_assockey = $fcform ? $jinput->get('filter_assockey', 0, 'cmd')  :  $app->getUserStateFromRequest( $p.'filter_assockey',  'filter_assockey',  0,  'cmd' );
+
+		$this->setState('filter_assockey', $filter_assockey);
+		$app->setUserState($p.'filter_assockey', $filter_assockey);
 
 		// Manage view permission
 		$this->canManage = FlexicontentHelperPerm::getPerm()->CanCats;
@@ -157,6 +162,14 @@ class FlexicontentModelCategories extends FCModelAdminList
 		// Create a query with all its clauses: WHERE, HAVING and ORDER BY, etc
 		$query = parent::getListQuery()
 		;
+
+		// Listing associated items
+		$filter_assockey = $this->getState('filter_assockey');
+
+		if ($filter_assockey)
+		{
+			$query->innerJoin('#__associations AS assoc ON a.id = assoc.id AND assoc.context = ' . $this->_db->quote('com_categories.item'));
+		}
 
 		/**
 		 * Because of multi-multi category-item relation it is faster to calculate ITEM COUNT with a seperate query
@@ -197,6 +210,14 @@ class FlexicontentModelCategories extends FCModelAdminList
 		else
 		{
 			$where[] = '(a.lft >= ' . $this->_db->Quote(FLEXI_LFT_CATEGORY) . ' AND a.rgt <= ' . $this->_db->Quote(FLEXI_RGT_CATEGORY) . ')';
+		}
+
+		// Listing associated items
+		$filter_assockey = $this->getState('filter_assockey');
+
+		if ($filter_assockey)
+		{
+			$where[] = 'assoc.key = ' . $this->_db->quote($filter_assockey);
 		}
 
 		// Filter by depth level

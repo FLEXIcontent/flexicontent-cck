@@ -1211,9 +1211,13 @@ td.col_edit_layout {
 			text-align: left;
 			display: inline-block;
 		}
-		.fc-xpended-row .add-on,
-		.fc-xpended .add-on {
+		.fc-xpended-row .add-on:not(.fc-lbl-inverted),
+		.fc-xpended .add-on:not(.fc-lbl-inverted) {
 			color: black;  /* because we place inside a ... btn ... */
+		}
+		.has-inverted-date-lbl + button {
+			background: #555 none repeat scroll 0 0;
+			color: white;
 		}
 
 
@@ -1247,8 +1251,8 @@ td.col_edit_layout {
 		#startdate,
 		#enddate {
 			font-size: 11px !important;
-			min-width: 99px;
-			max-width: 99px;
+			min-width: 93px;
+			max-width: 93px;
 			line-height: 2.7rem !important;
 			height: 2.7rem !important;
 			vertical-align: baseline;
@@ -1371,7 +1375,7 @@ td.col_edit_layout {
 				font-size: 13px;
 			}
 			.select2-search-choice {
-				color: darkorange !important;
+				/*color: darkorange !important;*/
 			}
 		}
 	}
