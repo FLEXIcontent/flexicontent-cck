@@ -289,7 +289,7 @@ function delAllFilters()
 {
 	jQuery('.fc_field_filter').val('');  // clear custom filters
 	delFilter('search');
-	delFilter('filter_type');
+	<?php count($filter_type) === 1 ? '' : "delFilter('filter_type'); "; ?>
 	delFilter('filter_state');
 	delFilter('filter_cats');
 	delFilter('filter_featured');
