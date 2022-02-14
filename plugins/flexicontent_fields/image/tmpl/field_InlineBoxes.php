@@ -135,7 +135,8 @@ foreach ($field->value as $index => & $value)
 
 	elseif ($image_source === -2)
 	{
-		if (!FLEXI_J40GE)
+		//if (!FLEXI_J40GE)
+		if (0)
 		{
 			$mm_id = $elementid_n.'_existingname';
 			$img_path = $image_subpath;
@@ -181,13 +182,36 @@ foreach ($field->value as $index => & $value)
 		{
 			$jfvalue = str_replace('\\', '/', !empty($value['originalname'])  ?  $value['originalname']  :  '');
 
-			$xml_field = '<field name="'.$fieldname_n.'[existingname]" id="'.$elementid_n.'_existingname" type="media" width="500" class="existingname" />';
-			$xml_form = '<form><fields name="attribs"><fieldset name="attribs">'.$xml_field.'</fieldset></fields></form>';
+			$quantum_fieldupload_path = JPATH_ROOT . '\libraries\lib_fields\fields\quantumuploadimage\quantumuploadimage.php';
+			$use_quantum = file_exists($quantum_fieldupload_path) && JComponentHelper::isEnabled('com_quantummanager');
 
+			if ($use_quantum)
+			{
+				JLoader::register('JFormFieldQuantumuploadImage', $quantum_fieldupload_path);
+				$xml_field = '<field name="'.$fieldname_n.'[existingname]" id="'.$elementid_n.'_existingname" type="QuantumUploadImage" dropAreaHidden="false" '
+					// . 'preview_width="'.(int)$thumb_size_default.'" preview_height="'.(int)$thumb_size_default.'" '
+					. ' class="existingname" />';
+			}
+			else
+			{
+				$xml_field = '<field name="'.$fieldname_n.'[existingname]" id="'.$elementid_n.'_existingname" type="media" preview="true" '
+					. ' preview_width="'.(int)$thumb_size_default.'" preview_height="'.(int)$thumb_size_default.'" '
+					. ' class="existingname" />';
+			}
+
+			$xml_form = '<form><fields name="attribs"><fieldset name="attribs">'.$xml_field.'</fieldset></fields></form>';
 			$jform = new JForm('flexicontent_field.image', array('control' => '' /*'custom'*/, 'load_data' => true));
 			$jform->load($xml_form);
-			$jfield = new JFormFieldMedia($jform);
 
+			if ($use_quantum)
+			{
+				$jfield = new JFormFieldQuantumUploadImage($jform);
+			}
+			else
+			{
+				$jfield = new JFormFieldMedia($jform);
+			}
+			
 			$jfield->setup(new SimpleXMLElement($xml_field), $jfvalue, '');
 			$select_existing = $jfield->input;
 		}
