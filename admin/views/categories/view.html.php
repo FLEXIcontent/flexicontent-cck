@@ -173,6 +173,16 @@ class FlexicontentViewCategories extends FlexicontentViewBaseRecords
 		$rows        = $model->getItems();
 		$authors     = $model->getAuthorslist();
 
+		$author_names = array();
+		foreach($authors as $author)
+		{
+			$author_names[$author->id] = $author->name;
+		}
+		foreach($rows as $row)
+		{
+			$row->author = $author_names[$row->created_user_id];
+		}
+
 		$lang_assocs = $useAssocs ? $model->getLangAssocs() : array();
 		$langs       = FLEXIUtilities::getLanguages('code');
 		$categories  = $globalcats ?: array();

@@ -1591,7 +1591,7 @@ class FlexicontentModelItems extends FCModelAdminList
 
 		if ($filter_assockey)
 		{
-			$extra_joins .= ' JOIN #__associations AS assoc ON a.id = assoc.id AND assoc.context = ' . $db->quote('com_content.item');
+			$extra_joins .= ' JOIN #__associations AS assoc ON a.id = assoc.id AND assoc.context = ' . $this->_db->quote('com_content.item');
 			$where[] = 'assoc.key = ' . $this->_db->quote($filter_assockey);
 		}
 

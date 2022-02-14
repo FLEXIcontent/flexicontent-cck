@@ -415,6 +415,15 @@ if ($js)
 				<?php echo $this->orderingx ? str_replace('rel="tooltip"', '', JHtml::_('grid.order', $this->rows, 'filesave.png', $ctrl.'saveorder' )) : ''; ?>
 			</th-->
 
+			<th class="col_authors hideOnDemandClass left hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
+				<?php echo JHtml::_('grid.sort', 'FLEXI_AUTHOR', 'a.created_by', $this->lists['order_Dir'], $this->lists['order'] ); ?>
+				<?php if ($this->getModel()->getState('filter_author')) : ?>
+				<span <?php echo $rem_filt_tip; ?>>
+					<span class="icon-purge btn btn-danger btn-small" onclick="delFilter('filter_author'); document.adminForm.submit();"></span>
+				</span>
+				<?php endif; ?>
+			</th>
+
 			<th class="col_id hideOnDemandClass center hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo JHtml::_('grid.sort', 'FLEXI_ID', 'a.id', $this->lists['order_Dir'], $this->lists['order']); ?>
 				<?php if ($this->getModel()->getState('filter_id')) : ?>
@@ -750,6 +759,10 @@ if ($js)
 					? flexicontent_html::userlevel('access['.$row->id.']', $row->access, 'onchange="return Joomla.listItemTask(\'cb'.$i.'\',\''.$ctrl.'access\')"')
 					: $this->escape($row->access_level);
 				?>
+			</td>
+
+			<td class="col_authors small hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
+				<?php echo $row->author; ?>
 			</td>
 
 			<td class="col_id center hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
