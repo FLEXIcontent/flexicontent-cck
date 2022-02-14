@@ -182,7 +182,7 @@ foreach ($field->value as $index => & $value)
 		{
 			$jfvalue = str_replace('\\', '/', !empty($value['originalname'])  ?  $value['originalname']  :  '');
 
-			$quantum_fieldupload_path = JPATH_ROOT . '\libraries\lib_fields\fields\quantumuploadimage\quantumuploadimage.php';
+			$quantum_fieldupload_path = JPATH_ROOT . '/libraries/lib_fields/fields/quantumuploadimage/quantumuploadimage.php';
 			$use_quantum = file_exists($quantum_fieldupload_path) && JComponentHelper::isEnabled('com_quantummanager');
 
 			if ($use_quantum)
