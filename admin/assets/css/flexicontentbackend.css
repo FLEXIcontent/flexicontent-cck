@@ -1652,6 +1652,7 @@ body .fc-nowrap-box .nowrap_box .label,
 	font-size: 1rem;
 	box-sizing: border-box;
 	vertical-align: bottom;
+	text-align: center;
 }
 #flexicontent.fcconfig-form .btn-group .btn,
 #flexicontent.fcconfig-form .fc-xpended > div,
@@ -3061,16 +3062,16 @@ form div.container_fcfield > select {
 }
 #flexicontent div .btn-group > *:not(:first-child):not(:last-child),
 #flexicontent div .input-append > *:not(:first-child):not(:last-child) {
-	border-top-right-radius: 0px;
-	border-bottom-right-radius: 0px;
+	border-top-right-radius: 5px;
+	border-bottom-right-radius: 5px;
 	vertical-align: middle;
 }
 #flexicontent div .btn-group > *:not(:first-of-type),
 #flexicontent div .input-prepend > *:not(:first-child),
 #flexicontent div .btn-group > *:not(:first-child):not(label),
 #flexicontent div .input-prepend > *:not(:first-child):not(label) {
-	border-top-left-radius: 0px;
-	border-bottom-left-radius: 0px;
+	border-top-left-radius: 5px;
+	border-bottom-left-radius: 5px;
 	vertical-align: middle;
 }
 #flexicontent div fieldset.panelform :not(.container_fcfield) fieldset.radio,
@@ -3621,7 +3622,6 @@ ul.thumbnails.image_picker_selector li div.thumbnail p {
 	line-height: 2.7rem;
 	overflow: auto;
 	vertical-align: top;
-	min-width: 220px;
 	max-width: 600px;
 	border-radius: 3px;
 	padding: 0 0.3rem;
