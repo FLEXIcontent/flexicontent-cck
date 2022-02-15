@@ -1961,6 +1961,11 @@
 				<option value="1">FLEXI_SHOW</option>
 			</field>
 
+			<field name="iman_skip_cols" type="fccheckbox" default=""
+				checkoptions="FLEXI_SINGLE_TYPE,FLEXI_LANGUAGE,FLEXI_ASSOCIATIONS,FLEXI_CATEGORIES,FLEXI_TAGS,FLEXI_TEMPLATE,FLEXI_ACCESS,FLEXI_AUTHOR,FLEXI_CREATED,FLEXI_REVISED,JGLOBAL_HITS,JGLOBAL_VOTES,JGLOBAL_RATINGS,FLEXI_ID"
+				checkvals="single_type,lang,assocs,cats,tags,template,access,author,created,modified,hits,votes,ratings,id" defaultvals="single_type"
+				label="FLEXI_IMAN_DISABLE_COLUMNS" description="FLEXI_IMAN_DISABLE_COLUMNS_DESC" cols="3" />
+
 			<field name="items_manager_extra_fields" type="textarea" default="" rows="2" cols="60" label="FLEXI_ITEMS_MANAGER_EXTRA_FIELDS" description="FLEXI_ITEMS_MANAGER_EXTRA_FIELDS_DESC" class="input-xxlarge" />
 			<field name="items_manager_custom_filters" type="filters" default="" isfilter="*" field_type="select,selectmutiple,radio,radioimage,checkbox,checkboximage" label="FLEXI_ITEMS_MANAGER_CUSTOM_FILTERS_LIST" description="FLEXI_ITEMS_MANAGER_CUSTOM_FILTERS_LIST_DESC" />
 			<field name="items_manager_order" type="list" default="a.id" label="FLEXI_ITEMS_MANAGER_ORDER" description="FLEXI_ITEMS_MANAGER_ORDER_DESC" class="use_select2_lib">

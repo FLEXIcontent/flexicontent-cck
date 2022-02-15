@@ -1146,6 +1146,16 @@
 		</fieldset>
 		<fieldset name="items_manager" label="FLEXI_ITEMS_MANAGER" icon_class="icon-list">
 
+			<field name="is_subtype" type="radio" default="0" label="FLEXI_IS_SUBTYPE" description="FLEXI_IS_SUBTYPE_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+
+			<field name="iman_skip_cols" type="fccheckbox" default="" display_useglobal="1"
+				checkoptions="FLEXI_SINGLE_TYPE,FLEXI_LANGUAGE,FLEXI_ASSOCIATIONS,FLEXI_CATEGORIES,FLEXI_TAGS,FLEXI_TEMPLATE,FLEXI_ACCESS,FLEXI_AUTHOR,FLEXI_CREATED,FLEXI_REVISED,JGLOBAL_HITS,JGLOBAL_VOTES,JGLOBAL_RATINGS,FLEXI_ID"
+				checkvals="single_type,lang,assocs,cats,tags,template,access,author,created,modified,hits,votes,ratings,id" defaultvals=""
+				label="FLEXI_IMAN_DISABLE_COLUMNS" description="FLEXI_IMAN_DISABLE_COLUMNS_DESC" cols="3" />
+
 			<field name="items_manager_extra_fields" type="textarea" default="" rows="3" cols="60" label="FLEXI_ITEMS_MANAGER_EXTRA_FIELDS" description="FLEXI_ITEMS_MANAGER_EXTRA_FIELDS_DESC" />
 			<field name="items_manager_custom_filters" type="filters" default="" field_type="select,selectmutiple,radio,radioimage,checkbox,checkboximage" label="FLEXI_ITEMS_MANAGER_CUSTOM_FILTERS_LIST" description="FLEXI_ITEMS_MANAGER_CUSTOM_FILTERS_LIST_DESC" />
 

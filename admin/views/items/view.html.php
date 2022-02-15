@@ -173,6 +173,27 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 		$search = $model->getState('search');
 		$search = StringHelper::trim(StringHelper::strtolower($search));
 
+		/**
+		 * Get single type configuration
+		 */
+		$model_s = $this->getModel('item');
+
+		if (count($filter_type) === 1)
+		{
+			$this->single_type = reset($filter_type);
+			$this->tparams  = new JRegistry();
+			$this->tparams->merge($cparams);
+
+			$tmp_params = $model_s->getTypeparams($this->single_type);
+			$tmp_params = new JRegistry($tmp_params);
+			$this->tparams->merge($tmp_params);
+		}
+		else
+		{
+			$this->single_type = 0;
+			$this->tparams = $cparams;
+		}
+
 
 		/**
 		 * Add css and js to document

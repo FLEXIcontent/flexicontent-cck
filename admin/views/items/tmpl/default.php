@@ -55,6 +55,8 @@ $_NULL_DATE_     = JFactory::getDbo()->getNullDate();
 
 $filter_type = $this->getModel()->getState('filter_type');
 $single_type = count($filter_type) === 1;
+$disable_columns = $this->tparams->get('iman_skip_cols', array('single_type'));
+$disable_columns = array_flip($disable_columns);
 
 // ID of specific type if one type is selected otherwise ZERO
 $single_type_id = $single_type ? reset($filter_type) : 0;
@@ -795,6 +797,8 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 				<?php endif; ?>
 			</th>
 
+
+			<?php if (!isset($disable_columns['author'])) : ?>
 			<th class="col_authors hideOnDemandClass nowrap left hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo JHtml::_('grid.sort', 'FLEXI_AUTHOR', 'a.created_by', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php if ($this->getModel()->getState('filter_author')) : ?>
@@ -803,7 +807,10 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 				</span>
 				<?php endif; ?>
 			</th>
+			<?php endif; ?>
 
+
+			<?php if (!isset($disable_columns['lang'])) : ?>
 			<th class="col_lang hideOnDemandClass nowrap hidden-phone" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo JHtml::_('grid.sort', 'FLEXI_LANGUAGE', 'a.language', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php if ($this->getModel()->getState('filter_lang')) : ?>
@@ -812,9 +819,10 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 				</span>
 				<?php endif; ?>
 			</th>
+			<?php endif; ?>
 
-		<?php if ($useAssocs) : ?>
 
+			<?php if ($useAssocs && !isset($disable_columns['assocs'])) : ?>
 			<th class="col_assocs_count"><?php $colposition++; ?>
 				<div id="fc-toggle-assocs_btn" style="padding: 4px 0 2px 6px;" class="<?php echo $out_class . ' ' . $this->tooltip_class; ?>" title="<?php echo JText::_('FLEXI_ASSOCIATIONS'); ?>" onclick="jQuery('#columnchoose_adminListTableFCitems_type_<?php echo $single_type_id . '_'. $colposition; ?>_label').click();" >
 					<span class="icon-flag"></span>
@@ -829,9 +837,10 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 				</span>
 				<?php endif; ?>
 			</th>
-		<?php endif; ?>
+			<?php endif; ?>
 
-			<?php if (!$single_type): ?>
+
+			<?php if (!$single_type || !isset($disable_columns['single_type'])): ?>
 			<th class="col_type hideOnDemandClass nowrap hidden-phone" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo JHtml::_('grid.sort', 'FLEXI_TYPE_NAME', 'type_name', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php if ($this->getModel()->getState('filter_type')) : ?>
@@ -839,19 +848,25 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 					<span class="icon-purge fc-del-filter-icon" onclick="delFilter('filter_type'); document.adminForm.submit();"></span>
 				</span>
 				<?php endif; ?>
-			<?php endif; ?>
 			</th>
+			<?php endif; ?>
 
+
+			<?php if (!isset($disable_columns['template'])): ?>
 			<th class="col_template hideOnDemandClass nowrap left hidden-phone hidden-tablet" colspan="2" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo JText::_('FLEXI_TEMPLATE'); ?>
 			</th>
+			<?php endif; ?>
 
-		<?php foreach($this->extra_fields as $field) :?>
-			<th class="hideOnDemandClass nowrap left hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
-				<?php echo $field->label; ?>
-			</th>
-		<?php endforeach; ?>
 
+			<?php foreach($this->extra_fields as $field) :?>
+				<th class="hideOnDemandClass nowrap left hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
+					<?php echo $field->label; ?>
+				</th>
+			<?php endforeach; ?>
+
+
+			<?php if (!isset($disable_columns['access'])): ?>
 			<th class="col_access hideOnDemandClass nowrap left hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo JHtml::_('grid.sort', 'FLEXI_ACCESS', 'a.access', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php if ($this->getModel()->getState('filter_access')) : ?>
@@ -860,7 +875,10 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 				</span>
 				<?php endif; ?>
 			</th>
+			<?php endif; ?>
 
+
+			<?php if (!isset($disable_columns['cats'])): ?>
 			<th class="col_cats hideOnDemandClass nowrap left hidden-phone" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo $categories_tip; ?>
 				<?php echo JText::_( 'FLEXI_CATEGORIES' ); ?>
@@ -870,7 +888,10 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 				</span>
 				<?php endif; ?>
 			</th>
+			<?php endif; ?>
 
+
+			<?php if (!isset($disable_columns['tags'])): ?>
 			<th class="col_tag hideOnDemandClass nowrap left hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo JText::_( 'FLEXI_TAGS' ); ?>
 				<?php if ($this->getModel()->getState('filter_tag')) : ?>
@@ -879,7 +900,10 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 				</span>
 				<?php endif; ?>
 			</th>
+			<?php endif; ?>
 
+
+			<?php if (!isset($disable_columns['created'])): ?>
 			<th class="col_created hideOnDemandClass nowrap hidden-phone" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo JHtml::_('grid.sort',   'FLEXI_CREATED', 'a.created', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php
@@ -894,7 +918,10 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 				endif;
 				?>
 			</th>
+			<?php endif; ?>
 
+
+			<?php if (!isset($disable_columns['modified'])) : ?>
 			<th class="col_revised hideOnDemandClass nowrap hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo JHtml::_('grid.sort',   'FLEXI_REVISED', 'a.modified', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php
@@ -909,19 +936,31 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 				endif;
 				?>
 			</th>
+			<?php endif; ?>
 
+
+			<?php if (!isset($disable_columns['hits'])) : ?>
 			<th class="col_hits hideOnDemandClass center hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo JHtml::_('grid.sort', 'JGLOBAL_HITS', 'a.hits', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
+			<?php endif; ?>
 
+
+			<?php if (!isset($disable_columns['votes'])) : ?>
 			<th class="col_votes hideOnDemandClass center hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo JHtml::_('grid.sort', 'JGLOBAL_VOTES', 'rating_count', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
+			<?php endif; ?>
 
+
+			<?php if (!isset($disable_columns['ratings'])) : ?>
 			<th class="col_ratings hideOnDemandClass center hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo JHtml::_('grid.sort', 'JGLOBAL_RATINGS', 'rating', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
+			<?php endif; ?>
 
+
+			<?php if (!isset($disable_columns['id'])) : ?>
 			<th class="col_id hideOnDemandClass nowrap center hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo JHtml::_('grid.sort', 'FLEXI_ID', 'a.id', $this->lists['order_Dir'], $this->lists['order']); ?>
 				<?php if ($this->getModel()->getState('filter_id')) : ?>
@@ -930,6 +969,8 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 				</span>
 				<?php endif; ?>
 			</th>
+			<?php endif; ?>
+
 
 		</tr>
 	</thead>
@@ -1060,8 +1101,11 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 					//echo JHtml::_($hlpname . '.published', $row->state, $i, $stateIsChangeable, 'cb', $row->publish_up, $row->publish_down);
 
 					echo JHtml::_($hlpname . '.statebutton', $row, $i);
-					echo JHtml::_($hlpname . '.featured', $row, $i);
-					echo JHtml::_($hlpname . '.preview', $row, '_blank', $i);
+					if (!$this->tparams->get('is_subtype', 0))
+					{
+						echo JHtml::_($hlpname . '.featured', $row, $i);
+						echo JHtml::_($hlpname . '.preview', $row, '_blank', $i);
+					}
 					?>
 				</div>
 			</td>
@@ -1100,10 +1144,15 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 				?>
 			</td>
 
+
+			<?php if (!isset($disable_columns['author'])) : ?>
 			<td class="col_authors small hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo $row->author; ?>
 			</td>
+			<?php endif; ?>
 
+
+			<?php if (!isset($disable_columns['lang'])) : ?>
 			<td class="col_lang small hidden-phone" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php
 					/**
@@ -1111,9 +1160,10 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 					 */
 					echo JHtml::_($hlpname . '.lang_display', $row, $i, $this->langs, $use_icon = 2); ?>
 			</td>
+			<?php endif; ?>
 
 
-			<?php if ($useAssocs) : ?>
+			<?php if ($useAssocs && !isset($disable_columns['assocs'])) : ?>
 
 				<td><?php $colposition++; ?>
 					<?php if (!empty($this->lang_assocs[$row->id])): ?>
@@ -1184,19 +1234,22 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 			<?php endif ; ?>
 
 
-			<?php if (!$single_type): ?>
+			<?php if (!$single_type || !isset($disable_columns['single_type'])): ?>
 			<td class="col_type small hidden-phone" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo JText::_($row->type_name); ?>
 			</td>
 			<?php endif ; ?>
 
+
+			<?php if (!isset($disable_columns['template'])): ?>
 			<td class="col_edit_layout hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition); ?>" >
 				<?php echo JHtml::_($hlpname . '.edit_layout', $row, '__modal__', $i, $this->perms->CanTemplates, $row_ilayout); ?>
 			</td>
-
 			<td class="col_template small hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo $row_ilayout.($row->config->get('ilayout') ? '' : '<sup>[1]</sup>') ?>
 			</td>
+			<?php endif; ?>
+
 
     <?php foreach($this->extra_fields as $field) :?>
 
@@ -1208,12 +1261,17 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 			</td>
 		<?php endforeach; ?>
 
+
+			<?php if (!isset($disable_columns['access'])): ?>
 			<td class="col_access hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo $row->canEdit && $this->perms->CanAccLvl
 					? flexicontent_html::userlevel('access['.$row->id.']', $row->access, 'onchange="return Joomla.listItemTask(\'cb'.$i.'\',\''.$ctrl.'access\')"')
 					: $row->access_level; ?>
 			</td>
+			<?php endif; ?>
 
+
+			<?php if (!isset($disable_columns['cats'])): ?>
 			<td class="col_cats small hidden-phone" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php
 				// Reorder categories place item's MAIN category first or ...
@@ -1299,7 +1357,10 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 				echo count($row_cats) ? '</div>' : '';
 				?>
 			</td>
+			<?php endif; ?>
 
+
+			<?php if (!isset($disable_columns['tags'])): ?>
 			<td class="col_tag small hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php
 					$row_tags  = array();
@@ -1323,30 +1384,49 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 					echo count($row_tags) ? '</div>' : '';
 				?>
 			</td>
+			<?php endif; ?>
 
+
+			<?php if (!isset($disable_columns['created'])) : ?>
 			<td class="col_created small hidden-phone" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo JHtml::_('date',  $row->created, $date_format); ?>
 			</td>
+			<?php endif; ?>
 
+
+			<?php if (!isset($disable_columns['modified'])) : ?>
 			<td class="col_revised small hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo ($row->modified != $_NULL_DATE_ && $row->modified != $row->created) ? JHtml::_('date', $row->modified, $date_format) : $_NEVER_; ?>
 			</td>
+			<?php endif; ?>
 
+
+			<?php if (!isset($disable_columns['hits'])) : ?>
 			<td class="col_hits center hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo '<span class="badge bg-info badge-info"> ' . ($row->hits ?: 0) . '</span>'; ?>
 			</td>
+			<?php endif; ?>
 
+
+			<?php if (!isset($disable_columns['votes'])) : ?>
 			<td class="col_votes center hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo '<span class="badge bg-success badge-success"> ' . ($row->rating_count ?: 0) . '</span>'; ?>
 			</td>
+			<?php endif; ?>
 
+
+			<?php if (!isset($disable_columns['ratings'])) : ?>
 			<td class="col_ratings center hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo '<span class="badge bg-warning badge-warning"> ' .sprintf('%.0f', (float) $row->rating) .'%</span>'; ?>
 			</td>
+			<?php endif; ?>
 
+
+			<?php if (!isset($disable_columns['id'])) : ?>
 			<td class="col_id center hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo $row->id; ?>
 			</td>
+			<?php endif; ?>
 
 		</tr>
 		<?php
