@@ -286,7 +286,7 @@ abstract class JHtmlFcbase
 		}
 		else
 		{
-			$attrs = ' class="fc-iblock text-dark" title="' . JText::_('FLEXI_EDIT', true) . '" ';
+			$attrs = ' class="fc-iblock" title="' . JText::_('FLEXI_EDIT', true) . '" ';
 		}
 
 		if (!empty($config['onclick']))
