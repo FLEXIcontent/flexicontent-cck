@@ -940,16 +940,16 @@ form div.container_fcfield > select {
 }
 #flexicontent div .btn-group > *:not(:first-child):not(:last-child),
 #flexicontent div .input-append > *:not(:first-child):not(:last-child) {
-	border-top-right-radius: 0px;
-	border-bottom-right-radius: 0px;
+	border-top-right-radius: 5px;
+	border-bottom-right-radius: 5px;
 	vertical-align: middle;
 }
 #flexicontent div .btn-group > *:not(:first-of-type),
 #flexicontent div .input-prepend > *:not(:first-child),
 #flexicontent div .btn-group > *:not(:first-child):not(label),
 #flexicontent div .input-prepend > *:not(:first-child):not(label) {
-	border-top-left-radius: 0px;
-	border-bottom-left-radius: 0px;
+	border-top-left-radius: 5px;
+	border-bottom-left-radius: 5px;
 	vertical-align: middle;
 }
 #flexicontent div fieldset.panelform :not(.container_fcfield) fieldset.radio,
@@ -1780,10 +1780,6 @@ div.current ul.config-option-list li fieldset {
 	padding-bottom: 0.5rem !important;
 	padding-left: 0.5rem !important;
 	padding-right: 0.5rem !important;
-}
-#fctoolbar.btn-toolbar > *,
-#fctoolbar.btn-toolbar > * > * {
-	font-size: 14px;
 }
 #fctoolbar_btn {
 	display: none;

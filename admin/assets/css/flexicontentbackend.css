@@ -1648,8 +1648,6 @@ body .fc-nowrap-box .nowrap_box .label,
 #flexicontent .fc-xpended-row .add-on {
 	display: inline-block;
 	margin: 0 0 0 0;
-	height: 2.7rem;
-	line-height: 2.7rem;
 	padding: 0 0.6rem !important;
 	font-size: 1rem;
 	box-sizing: border-box;
@@ -3904,10 +3902,6 @@ div.current ul.config-option-list li fieldset {
 	padding-left: 0.5rem !important;
 	padding-right: 0.5rem !important;
 }
-#fctoolbar.btn-toolbar > *,
-#fctoolbar.btn-toolbar > * > * {
-	font-size: 14px;
-}
 #fctoolbar_btn {
 	display: none;
 	margin: 0 0 12px 0;
@@ -5150,13 +5144,4 @@ body div .fc_assoc_isuptodate {
 }
 body div .fc_assoc_isuptodate span {
 	color: white;
-}
-.text-primary {
-	color: #007bff !important;
-}
-.text-secondary {
-	color: #6c757d !important;
-}
-.text-success {
-	color: #28a745 !important;
 }

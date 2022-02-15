@@ -1057,7 +1057,6 @@ div.container_fcfield div.toggle_all_values_buttons_box {
 	cursor: default !important;
 }
 #flexicontent ul.fcfield-sortables > li:only-child .fcfield-drag-handle.fcfont-icon {
-	background: none;
 	color: #aaa;
 	cursor: default;
 }
@@ -1107,7 +1106,6 @@ div.container_fcfield div.toggle_all_values_buttons_box {
 #flexicontent ul.fcfield-sortables > li [class^="fcfield-"].fcfont-icon,
 #flexicontent ul.fcfield-sortables > li [class*=" fcfield-"].fcfont-icon {
 	vertical-align: top;
-	background: none;
 	margin: 0px 0px 2px 0px;
 	color: #555;
 	transition: all 0.3s ease-in;
@@ -1134,7 +1132,6 @@ div.container_fcfield div.toggle_all_values_buttons_box {
 #flexicontent ul.fcfield-sortables > li [class^="fcfield-"].fcfont-icon:after,
 #flexicontent ul.fcfield-sortables > li [class*=" fcfield-"].fcfont-icon:after {
 	margin: 0px 0px 2px 0px;
-	background: none;
 	font-family: "IcoMoon";
 	font-style: normal;
 	font-size: 14px;
@@ -1159,7 +1156,7 @@ div.container_fcfield div.toggle_all_values_buttons_box {
 	line-height: 18px;
 	min-height: 18px;
 	cursor: pointer;
-	background-color: white;
+	background-color: white !important;
 	box-sizing: content-box;
 }
 #flexicontent .fc-xpended-btns > [class^="fcfield-"]:not(.add-on):not(.input-group-addon):not(.btn),
