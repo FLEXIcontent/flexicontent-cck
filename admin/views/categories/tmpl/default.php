@@ -318,39 +318,39 @@ if ($js)
 				</div>
 			</th>
 
-			<th class="col_status hideOnDemandClass left" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<th class="col_status hideOnDemandClass nowrap left" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo JHtml::_('grid.sort', 'FLEXI_STATUS', 'a.' . $this->state_propname, $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php if ($this->getModel()->getState('filter_state')) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
-					<span class="icon-purge btn btn-danger btn-small" onclick="delFilter('filter_state'); document.adminForm.submit();"></span>
+					<span class="icon-purge fc-del-filter-icon" onclick="delFilter('filter_state'); document.adminForm.submit();"></span>
 				</span>
 				<?php endif; ?>
 			</th>
 
-			<th class="col_title hideOnDemandClass" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<th class="col_title hideOnDemandClass nowrap" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo JHtml::_('grid.sort', 'FLEXI_TITLE', 'a.' . $this->title_propname, $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				&nbsp; <small>[
 				<?php echo JHtml::_('grid.sort', 'FLEXI_ALIAS', 'a.alias', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				]<small>
 				<?php if (strlen($this->getModel()->getState('search'))) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
-					<span class="icon-purge btn btn-danger btn-small" onclick="delFilter('search'); document.adminForm.submit();"></span>
+					<span class="icon-purge fc-del-filter-icon" onclick="delFilter('search'); document.adminForm.submit();"></span>
 				</span>
 				<?php endif; ?>
 
 				<?php if (($filter_cats = $this->getModel()->getState('filter_cats'))): ?>
 						<?php echo '<br><span class="alert alert-info fcpadded">'.JText::_('FLEXI_PARENT') . ': ' . $globalcats[$filter_cats]->title .'</span>'; ?>
 						<span <?php echo $rem_filt_tip; ?>>
-							<span class="icon-purge btn btn-danger btn-small" onclick="delFilter('filter_cats'); document.adminForm.submit();"></span>
+							<span class="icon-purge fc-del-filter-icon" onclick="delFilter('filter_cats'); document.adminForm.submit();"></span>
 						</span>
 				<?php endif; ?>
 			</th>
 
-			<th class="col_lang hideOnDemandClass hidden-phone" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<th class="col_lang hideOnDemandClass nowrap hidden-phone" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo JHtml::_('grid.sort', 'FLEXI_LANGUAGE', 'a.language', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php if ($this->getModel()->getState('filter_lang')) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
-					<span class="icon-purge btn btn-danger btn-small" onclick="delFilter('filter_lang'); document.adminForm.submit();"></span>
+					<span class="icon-purge fc-del-filter-icon" onclick="delFilter('filter_lang'); document.adminForm.submit();"></span>
 				</span>
 				<?php endif; ?>
 			</th>
@@ -363,11 +363,11 @@ if ($js)
 				</div>
 			</th>
 
-			<th class="col_assocs hideOnDemandClass hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<th class="col_assocs hideOnDemandClass nowrap hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo JText::_('FLEXI_ASSOCIATIONS'); ?>
 				<?php if ($this->getModel()->getState('filter_assockey')) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
-					<span class="icon-purge btn btn-danger btn-small" onclick="delFilter('filter_assockey'); document.adminForm.submit();"></span>
+					<span class="icon-purge fc-del-filter-icon" onclick="delFilter('filter_assockey'); document.adminForm.submit();"></span>
 				</span>
 				<?php endif; ?>
 			</th>
@@ -401,11 +401,11 @@ if ($js)
 				<?php echo '<span class="' . $this->tooltip_class . ' icon-'.$state_icons['T'].'" title="'.$state_names['T'].' '.JText::_ ('FLEXI_ITEMS').'" data-placement="top" style="font-size: 16px;"></span>'; ?>
 			</th>
 
-			<th class="col_access hideOnDemandClass hidden-phone" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<th class="col_access hideOnDemandClass nowrap hidden-phone" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo JHtml::_('grid.sort', 'FLEXI_ACCESS', 'a.access', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php if ($this->getModel()->getState('filter_access')) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
-					<span class="icon-purge btn btn-danger btn-small" onclick="delFilter('filter_access'); document.adminForm.submit();"></span>
+					<span class="icon-purge fc-del-filter-icon" onclick="delFilter('filter_access'); document.adminForm.submit();"></span>
 				</span>
 				<?php endif; ?>
 			</th>
@@ -415,29 +415,29 @@ if ($js)
 				<?php echo $this->orderingx ? str_replace('rel="tooltip"', '', JHtml::_('grid.order', $this->rows, 'filesave.png', $ctrl.'saveorder' )) : ''; ?>
 			</th-->
 
-			<th class="col_authors hideOnDemandClass left hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<th class="col_authors hideOnDemandClass nowrap left hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo JHtml::_('grid.sort', 'FLEXI_AUTHOR', 'a.created_by', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php if ($this->getModel()->getState('filter_author')) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
-					<span class="icon-purge btn btn-danger btn-small" onclick="delFilter('filter_author'); document.adminForm.submit();"></span>
+					<span class="icon-purge fc-del-filter-icon" onclick="delFilter('filter_author'); document.adminForm.submit();"></span>
 				</span>
 				<?php endif; ?>
 			</th>
 
-			<th class="col_id hideOnDemandClass center hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<th class="col_id hideOnDemandClass nowrap center hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo JHtml::_('grid.sort', 'FLEXI_ID', 'a.id', $this->lists['order_Dir'], $this->lists['order']); ?>
 				<?php if ($this->getModel()->getState('filter_id')) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
-					<span class="icon-purge btn btn-danger btn-small" onclick="delFilter('filter_id'); document.adminForm.submit();"></span>
+					<span class="icon-purge fc-del-filter-icon" onclick="delFilter('filter_id'); document.adminForm.submit();"></span>
 				</span>
 				<?php endif; ?>
 			</th>
 
 			<?php if ($this->getModel()->getState('filter_level')) : ?>
-			<th class="col_level hidden-phone">
+			<th class="col_level nowrap hidden-phone">
 				<?php if ($this->getModel()->getState('filter_level')) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
-					<span class="icon-purge btn btn-danger btn-small" onclick="delFilter('filter_level'); document.adminForm.submit();"></span>
+					<span class="icon-purge fc-del-filter-icon" onclick="delFilter('filter_level'); document.adminForm.submit();"></span>
 				</span>
 				<?php endif; ?>
 				<br>
@@ -645,7 +645,7 @@ if ($js)
 				<td><?php $colposition++; ?>
 					<?php if (!empty($this->lang_assocs[$row->id])): ?>
 						<?php $row_assocs = $this->lang_assocs[$row->id]; ?>
-						<a href="index.php?option=com_flexicontent&amp;view=categories&amp;filter_assockey=<?php echo reset($row_assocs)->key; ?>&amp;fcform=1&amp;filter_state=ALL"
+						<a href="index.php?option=com_flexicontent&amp;view=categories&amp;filter_assockey=<?php echo reset($row_assocs)->key; ?>&amp;fcform=1&amp;filter_state=ALL&amp;limit=50"
 							class="<?php echo $this->btn_sm_class; ?> fc_assocs_count"
 						>
 							<?php echo count($row_assocs); ?>

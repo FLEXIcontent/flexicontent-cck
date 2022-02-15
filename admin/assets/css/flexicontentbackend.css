@@ -2752,6 +2752,11 @@ span.fc_select_button:hover {
 	border: 0px solid green;
 	font-weight: bold !important;
 }
+body div .fc-del-filter-icon {
+	color: #bd362f;
+	font-size: 12px !important;
+	cursor: pointer;
+}
 #flexicontent .fc_tabset_inner {
 	float: none;
 	width: 100%;

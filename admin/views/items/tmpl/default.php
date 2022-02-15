@@ -54,7 +54,12 @@ $_NULL_DATE_     = JFactory::getDbo()->getNullDate();
  */
 
 $filter_type = $this->getModel()->getState('filter_type');
-$this->data_tbl_id = 'adminListTableFC' . $this->view . '_type_' . (count($filter_type) === 1 ? reset($filter_type) : 0);
+$single_type = count($filter_type) === 1;
+
+// ID of specific type if one type is selected otherwise ZERO
+$single_type_id = $single_type ? reset($filter_type) : 0;
+
+$this->data_tbl_id = 'adminListTableFC' . $this->view . '_type_' . $single_type_id;
 flexicontent_html::jscode_to_showhide_table(
 	'mainChooseColBox',
 	$this->data_tbl_id,
@@ -289,7 +294,7 @@ function delAllFilters()
 {
 	jQuery('.fc_field_filter').val('');  // clear custom filters
 	delFilter('search');
-	<?php count($filter_type) === 1 ? '' : "delFilter('filter_type'); "; ?>
+	<?php $single_type ? '' : "delFilter('filter_type'); "; ?>
 	delFilter('filter_state');
 	delFilter('filter_cats');
 	delFilter('filter_featured');
@@ -449,7 +454,6 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 	<div style="overflow: hidden; margin: -8px 0; ">
 		<div class="fctabber s-cblue" id="items_type_tabset">';
 
-	$filter_type = $this->getModel()->getState('filter_type');
 	$type_class = empty($filter_type) ? ' tabbertabforced' : '';
 	$__tip_class = ''; //' hasTooltip';
 	$__tip_props = ''; //' data-placement="top" data-title="' . JText::_('FLEXI_ALL') . '" ';
@@ -481,7 +485,7 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 
 	do
 	{
-		$type_class = count($filter_type) == 1 && in_array($itemType->id, $filter_type) ? ' tabbertabforced' : '';
+		$type_class = $single_type && in_array($itemType->id, $filter_type) ? ' tabbertabforced' : '';
 		$__tip_class = ''; //' hasTooltip';
 		$__tip_props = ''; //' data-placement="top" data-title="' . JText::_( $itemType->name ) . '" ';
 
@@ -773,38 +777,38 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 			<th class="left"><?php $colposition++; ?>
 			</th>
 
-			<th class="col_status hideOnDemandClass left" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<th class="col_status hideOnDemandClass nowrap left" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo JHtml::_('grid.sort', 'FLEXI_STATUS', 'a.' . $this->state_propname, $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php if ($this->getModel()->getState('filter_state') || $this->getModel()->getState('filter_catsinstate') != 1) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
-					<span class="icon-purge btn btn-danger btn-small" onclick="delFilter('filter_state'); jQuery('#filter_catsinstate').val('1'); document.adminForm.submit();"></span>
+					<span class="icon-purge fc-del-filter-icon" onclick="delFilter('filter_state'); jQuery('#filter_catsinstate').val('1'); document.adminForm.submit();"></span>
 				</span>
 				<?php endif; ?>
 			</th>
 
-			<th class="col_title hideOnDemandClass left" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<th class="col_title hideOnDemandClass nowrap left" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo JHtml::_('grid.sort', 'FLEXI_TITLE', 'a.' . $this->title_propname, $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php if (strlen($this->getModel()->getState('search'))) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
-					<span class="icon-purge btn btn-danger btn-small" onclick="delFilter('search'); document.adminForm.submit();"></span>
+					<span class="icon-purge fc-del-filter-icon" onclick="delFilter('search'); document.adminForm.submit();"></span>
 				</span>
 				<?php endif; ?>
 			</th>
 
-			<th class="col_authors hideOnDemandClass left hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<th class="col_authors hideOnDemandClass nowrap left hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo JHtml::_('grid.sort', 'FLEXI_AUTHOR', 'a.created_by', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php if ($this->getModel()->getState('filter_author')) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
-					<span class="icon-purge btn btn-danger btn-small" onclick="delFilter('filter_author'); document.adminForm.submit();"></span>
+					<span class="icon-purge fc-del-filter-icon" onclick="delFilter('filter_author'); document.adminForm.submit();"></span>
 				</span>
 				<?php endif; ?>
 			</th>
 
-			<th class="col_lang hideOnDemandClass hidden-phone" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<th class="col_lang hideOnDemandClass nowrap hidden-phone" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo JHtml::_('grid.sort', 'FLEXI_LANGUAGE', 'a.language', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php if ($this->getModel()->getState('filter_lang')) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
-					<span class="icon-purge btn btn-danger btn-small" onclick="delFilter('filter_lang'); document.adminForm.submit();"></span>
+					<span class="icon-purge fc-del-filter-icon" onclick="delFilter('filter_lang'); document.adminForm.submit();"></span>
 				</span>
 				<?php endif; ?>
 			</th>
@@ -812,76 +816,78 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 		<?php if ($useAssocs) : ?>
 
 			<th class="col_assocs_count"><?php $colposition++; ?>
-				<div id="fc-toggle-assocs_btn" style="padding: 4px 0 2px 6px;" class="<?php echo $out_class . ' ' . $this->tooltip_class; ?>" title="<?php echo JText::_('FLEXI_ASSOCIATIONS'); ?>" onclick="jQuery('#columnchoose_adminListTableFCitems_type_<?php echo (count($filter_type) === 1 ? reset($filter_type) : 0) . '_'. $colposition; ?>_label').click();" >
+				<div id="fc-toggle-assocs_btn" style="padding: 4px 0 2px 6px;" class="<?php echo $out_class . ' ' . $this->tooltip_class; ?>" title="<?php echo JText::_('FLEXI_ASSOCIATIONS'); ?>" onclick="jQuery('#columnchoose_adminListTableFCitems_type_<?php echo $single_type_id . '_'. $colposition; ?>_label').click();" >
 					<span class="icon-flag"></span>
 				</div>
 			</th>
 
-			<th class="col_assocs hideOnDemandClass hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<th class="col_assocs hideOnDemandClass nowrap hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo JText::_('FLEXI_ASSOCIATIONS'); ?>
 				<?php if ($this->getModel()->getState('filter_assockey')) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
-					<span class="icon-purge btn btn-danger btn-small" onclick="delFilter('filter_assockey'); document.adminForm.submit();"></span>
+					<span class="icon-purge fc-del-filter-icon" onclick="delFilter('filter_assockey'); document.adminForm.submit();"></span>
 				</span>
 				<?php endif; ?>
 			</th>
 		<?php endif; ?>
 
-			<th class="col_type hideOnDemandClass hidden-phone" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<?php if (!$single_type): ?>
+			<th class="col_type hideOnDemandClass nowrap hidden-phone" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo JHtml::_('grid.sort', 'FLEXI_TYPE_NAME', 'type_name', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php if ($this->getModel()->getState('filter_type')) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
-					<span class="icon-purge btn btn-danger btn-small" onclick="delFilter('filter_type'); document.adminForm.submit();"></span>
+					<span class="icon-purge fc-del-filter-icon" onclick="delFilter('filter_type'); document.adminForm.submit();"></span>
 				</span>
 				<?php endif; ?>
+			<?php endif; ?>
 			</th>
 
-			<th class="col_template hideOnDemandClass left hidden-phone hidden-tablet" colspan="2" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<th class="col_template hideOnDemandClass nowrap left hidden-phone hidden-tablet" colspan="2" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo JText::_('FLEXI_TEMPLATE'); ?>
 			</th>
 
 		<?php foreach($this->extra_fields as $field) :?>
-			<th class="hideOnDemandClass left hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<th class="hideOnDemandClass nowrap left hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo $field->label; ?>
 			</th>
 		<?php endforeach; ?>
 
-			<th class="col_access hideOnDemandClass left hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<th class="col_access hideOnDemandClass nowrap left hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo JHtml::_('grid.sort', 'FLEXI_ACCESS', 'a.access', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php if ($this->getModel()->getState('filter_access')) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
-					<span class="icon-purge btn btn-danger btn-small" onclick="delFilter('filter_access'); document.adminForm.submit();"></span>
+					<span class="icon-purge fc-del-filter-icon" onclick="delFilter('filter_access'); document.adminForm.submit();"></span>
 				</span>
 				<?php endif; ?>
 			</th>
 
-			<th class="col_cats hideOnDemandClass left hidden-phone" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<th class="col_cats hideOnDemandClass nowrap left hidden-phone" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo $categories_tip; ?>
 				<?php echo JText::_( 'FLEXI_CATEGORIES' ); ?>
 				<?php if ($this->getModel()->getState('filter_cats') || $this->getModel()->getState('filter_subcats') == 0) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
-					<span class="icon-purge btn btn-danger btn-small" onclick="delFilter('filter_cats'); jQuery('#filter_subcats').attr('checked', 'checked'); document.adminForm.submit();"></span>
+					<span class="icon-purge fc-del-filter-icon" onclick="delFilter('filter_cats'); jQuery('#filter_subcats').attr('checked', 'checked'); document.adminForm.submit();"></span>
 				</span>
 				<?php endif; ?>
 			</th>
 
-			<th class="col_tag hideOnDemandClass left hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<th class="col_tag hideOnDemandClass nowrap left hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo JText::_( 'FLEXI_TAGS' ); ?>
 				<?php if ($this->getModel()->getState('filter_tag')) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
-					<span class="icon-purge btn btn-danger btn-small" onclick="delFilter('filter_tag'); document.adminForm.submit();"></span>
+					<span class="icon-purge fc-del-filter-icon" onclick="delFilter('filter_tag'); document.adminForm.submit();"></span>
 				</span>
 				<?php endif; ?>
 			</th>
 
-			<th class="col_created hideOnDemandClass hidden-phone" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<th class="col_created hideOnDemandClass nowrap hidden-phone" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo JHtml::_('grid.sort',   'FLEXI_CREATED', 'a.created', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php
 				if ($this->date == '1') :
 					if (($this->startdate && ($this->startdate != JText::_('FLEXI_FROM'))) || ($this->enddate && ($this->startdate != JText::_('FLEXI_TO')))) :
 				?>
 				<span <?php echo $rem_filt_tip; ?>>
-					<span class="icon-purge btn btn-danger btn-small" onclick="delFilter('startdate');delFilter('enddate'); document.adminForm.submit();"></span>
+					<span class="icon-purge fc-del-filter-icon" onclick="delFilter('startdate');delFilter('enddate'); document.adminForm.submit();"></span>
 				</span>
 				<?php
 					endif;
@@ -889,14 +895,14 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 				?>
 			</th>
 
-			<th class="col_revised hideOnDemandClass hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<th class="col_revised hideOnDemandClass nowrap hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo JHtml::_('grid.sort',   'FLEXI_REVISED', 'a.modified', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php
 				if ($this->date == '2') :
 					if (($this->startdate && ($this->startdate != JText::_('FLEXI_FROM'))) || ($this->enddate && ($this->startdate != JText::_('FLEXI_TO')))) :
 				?>
 				<span <?php echo $rem_filt_tip; ?>>
-					<span class="icon-purge btn btn-danger btn-small" onclick="delFilter('startdate');delFilter('enddate'); document.adminForm.submit();"></span>
+					<span class="icon-purge fc-del-filter-icon" onclick="delFilter('startdate');delFilter('enddate'); document.adminForm.submit();"></span>
 				</span>
 				<?php
 					endif;
@@ -916,11 +922,11 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 				<?php echo JHtml::_('grid.sort', 'JGLOBAL_RATINGS', 'rating', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
 
-			<th class="col_id hideOnDemandClass center hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<th class="col_id hideOnDemandClass nowrap center hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo JHtml::_('grid.sort', 'FLEXI_ID', 'a.id', $this->lists['order_Dir'], $this->lists['order']); ?>
 				<?php if ($this->getModel()->getState('filter_id')) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
-					<span class="icon-purge btn btn-danger btn-small" onclick="delFilter('filter_id'); document.adminForm.submit();"></span>
+					<span class="icon-purge fc-del-filter-icon" onclick="delFilter('filter_id'); document.adminForm.submit();"></span>
 				</span>
 				<?php endif; ?>
 			</th>
@@ -1112,7 +1118,7 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 				<td><?php $colposition++; ?>
 					<?php if (!empty($this->lang_assocs[$row->id])): ?>
 						<?php $row_assocs = $this->lang_assocs[$row->id]; ?>
-						<a href="index.php?option=com_flexicontent&amp;view=items&amp;filter_catsinstate=99&amp;filter_assockey=<?php echo reset($row_assocs)->key; ?>&amp;fcform=1&amp;filter_state=ALL"
+						<a href="index.php?option=com_flexicontent&amp;view=items&amp;filter_catsinstate=99&amp;filter_assockey=<?php echo reset($row_assocs)->key; ?>&amp;fcform=1&amp;filter_state=ALL&amp;limit=50"
 							class="<?php echo $this->btn_sm_class; ?> fc_assocs_count"
 						>
 							<?php echo count($row_assocs); ?>
@@ -1178,9 +1184,11 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 			<?php endif ; ?>
 
 
+			<?php if (!$single_type): ?>
 			<td class="col_type small hidden-phone" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo JText::_($row->type_name); ?>
 			</td>
+			<?php endif ; ?>
 
 			<td class="col_edit_layout hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition); ?>" >
 				<?php echo JHtml::_($hlpname . '.edit_layout', $row, '__modal__', $i, $this->perms->CanTemplates, $row_ilayout); ?>
