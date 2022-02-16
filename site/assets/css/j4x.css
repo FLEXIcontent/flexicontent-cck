@@ -79,7 +79,8 @@ button.btn.btn-highlight:hover,
 #flexicontent div [class*=" fcfield-"].fcfont-icon,
 #flexicontent ul.fcfield-sortables > li [class^="fcfield-"].fcfont-icon,
 #flexicontent ul.fcfield-sortables > li [class*=" fcfield-"].fcfont-icon {
-	margin: 0px -6px -2px 4px !important;
+	margin: 0px -6px -1px 0px !important;
+	background: none;
 }
 #flexicontent ul.fcfield-sortables > li > * {
 	vertical-align: middle !important;

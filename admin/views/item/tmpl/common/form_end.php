@@ -65,8 +65,8 @@ defined('_JEXEC') or die('Restricted access');
 		</div>
 	<?php endif; ?>
 
-		</div>  <!-- class="row" -->
-	</div>  <!-- class="container-fluid" -->
+	</div>  <!-- class="container-fluid row" -->
+</div>  <!-- id="flexicontent" -->
 
 <?php
 //keep session alive while editing

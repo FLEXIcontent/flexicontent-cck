@@ -647,12 +647,3 @@ body div .fc_assoc_isuptodate {
 body div .fc_assoc_isuptodate span {
 	color: white;
 }
-.text-primary {
-	color: #007bff !important;
-}
-.text-secondary {
-	color: #6c757d !important;
-}
-.text-success {
-	color: #28a745 !important;
-}
