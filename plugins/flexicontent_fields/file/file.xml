@@ -64,12 +64,17 @@
 			</field-->
 			<field name="file_btns_position" type="hidden" default="0" label="FLEXI_FIELD_FILE_BTNS_POSITION" description="FLEXI_FIELD_FILE_BTNS_POSITION_DESC" depend_class="fieldgroupoff multivalue-mode" />
 
-			<field name="estorage_mode" type="multilist" subtype="radio" default="0" label="Remote Storage" description="FLEXI_FIELD_ALLOW_MULTIPLE_DESC" toggle_related="1" depend_class="" class="btn-group group-fcmethod fcoffactive">
-				<option value="0" show_list="" hide_list="estorage-ftp">FLEXI_NO</option>
-				<option value="FTP" show_list="estorage-ftp" hide_list="">FTP</option>
+			<field name="" type="separator" default="FLEXI_FIELD_REMOTE_STORAGE" description="" level="level1" />
+			<field name="estorage_mode" type="multilist" subtype="radio" default="0" label="FLEXI_FIELD_REMOTE_STORAGE_TYPE" description="FLEXI_FIELD_REMOTE_STORAGE_TYPE_DESC" toggle_related="1" depend_class="" class="btn-group group-fcmethod fcoffactive">
+				<option value="0" show_list="" hide_list="estorage-ftp,estorage-other">FLEXI_NO</option>
+				<option value="FTP" show_list="estorage-ftp" hide_list="estorage-other">FTP</option>
+				<option value="FTP" show_list="estorage-other" hide_list="estorage-ftp">Other</option>
 			</field>
 
-			<field name="" type="separator" default="Remote Storage (FTP)" description="" depend_class="estorage-ftp" level="level2" />
+			<field name="" type="separator" default="FLEXI_OTHER" description="" depend_class="estorage-other" level="level3" />
+			<field name="" type="separator" default="Currently only FTP is supported, TO-DO more external storage options ..." description="" depend_class="estorage-other" level="level3" class="alert alert-info fcpadded" />
+
+			<field name="" type="separator" default="FLEXI_FIELD_REMOTE_STORAGE_FTP" description="" depend_class="estorage-ftp" level="level2" />
 			<field name="efs_ftp_host" type="text" default="" size="80" label="Hostname" description="" depend_class="estorage-ftp" />
 			<field name="efs_ftp_port" type="text" default="" size="80" label="Port" description="" depend_class="estorage-ftp" />
 			<field name="efs_ftp_user" type="text" default="" size="80" label="FLEXI_USER" description="" depend_class="estorage-ftp" />

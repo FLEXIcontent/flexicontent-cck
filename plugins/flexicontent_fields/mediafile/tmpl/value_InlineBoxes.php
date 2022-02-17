@@ -356,24 +356,30 @@ if ($prop !== 'display_properties_only') :
 
 			// The Download Button
 			$_download_btn_html = '
-				<a href="' . $dl_link . '" class="btn downloadBtn fcfile_downloadFile" title="'.htmlspecialchars($downloadsinfo, ENT_COMPAT, 'UTF-8').'" ' . ($non_file_url ? 'target="_blank"' : '') . '>
-					<span class="icon-download controls"></span><span class="btnControlsText">' . $downloadstext . '</span>
-				</a>
-			';
+				<button type="button" onclick="window.open(\''.$dl_link.'\', ' . ($non_file_url ? "''": "'_self'") . ')"
+					class="' . $file_classes . ' btn-success fcfile_downloadFile" title="'.htmlspecialchars($downloadsinfo, ENT_COMPAT, 'UTF-8').'"
+				>
+					' . ($compact_display != 2 ? $downloadstext : '') . '
+					' . ($compact_display == 2 ? ' <span class="icon-download"></span>' : '') . '
+				</button>';
 			// Do not add it here ... we will add it inline with player
 			//$actions_arr[] = $_download_btn_html;
 		}
 
 		if ($authorized && $allowview && !$file_data->url)
 		{
+			$view_link = $dl_link . (strpos($dl_link, '?') !== false ? '&amp;' : '?') . 'method=view';
+			$view_file_classes = $file_classes . ' btn-info fcfile_viewFile';
 			$actions_arr[] = '
-				<a href="' . $dl_link . (strpos($dl_link, '?') !== false ? '&amp;' : '?') . 'method=view" ' . ($viewinside==2 ? 'target="_blank"' : '')
-					. ' class="' . ($viewinside==0 ? 'fancybox ' : '') . $file_classes . ' btn-info fcfile_viewFile" '.($viewinside==0 ? 'data-type="iframe" ' : '')
-					. ($viewinside==1 ? ' onclick="var url = jQuery(this).attr(\'href\');  fc_showDialog(url, \'fc_modal_popup_container\', 0, 0, 0, 0, {title:\''. $filetitle_escaped .'\'}); return false;" ' : '')
-					. ' title="' . $viewinfo . '" style="line-height:1.3em;" >
+				<button type="button" data-href="' . $view_link . '" class="' . $view_file_classes .'" title="' . $viewinfo . '" style="line-height:1.3em;" '
+					. ($viewinside>=2 ? ' onclick="var url = jQuery(this).attr(\'data-href\'); window.open(url, ' . ($viewinside==3 ? "'_self'" : "") . ');" ' : '')
+					. ($viewinside==1 ? ' onclick="var url = jQuery(this).attr(\'data-href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 0, 0, 0, {title:\''. $filetitle_escaped .'\'}); return false;" ' : '')
+					. ($viewinside==0 ? ' onclick="var url = jQuery(this).attr(\'data-href\'); jQuery.fancybox.open([{ src: url , type: \'iframe\'}]); "' : '')
+					. '
+				>
 					' . ($compact_display != 2 ? $viewtext : '') . '
 					' . ($compact_display == 2 ? ' <span class="icon-eye"></span>' : '') . '
-				</a>';
+				</button>';
 			$fancybox_needed = $viewinside == 0;
 		}
 
