@@ -1759,11 +1759,13 @@ class FlexicontentModelItems extends FCModelAdminList
 		 */
 		$cid_reverse = array_reverse($cid);
 		$total_cnt = 0;
+		global $globalcats;
 
 		foreach ($cid_reverse as $itemid)
 		{
 			// Associations added to current item
 			$assoc_data = null;
+			$cat_assoc_ids = null;
 
 			// (a) Get existing item
 			$item = JTable::getInstance('flexicontent_items', '');
@@ -2024,7 +2026,43 @@ class FlexicontentModelItems extends FCModelAdminList
 					}
 					elseif ($method == 99 && ($maincat || $seccats))
 					{
-						$row->catid = $maincat ? $maincat : $row->catid;
+						/**
+						 * Auto-selected associated category or use same category (of language ALL) as the original item
+						 * NOTE: the quicktranslate task should prevent selecting a language that has no associated category
+						 * No check is done here if a language has indeed ab associated category. If not the item will be created
+						 * in the same category as the original item
+						 */
+						if ($maincat == -99)
+						{
+							// Get associations of item that was duplicated
+							if ($cat_assoc_ids === null)
+							{
+								$cat_assoc_ids = array();
+
+								// Existing associations of the item's category
+								if (isset($globalcats[$item->catid]) && $globalcats[$item->catid]->language !== '*')
+								{
+									$cat_associations = JLanguageAssociations::getAssociations('com_content', '#__categories', 'com_categories.item', $item->catid, 'id', 'alias', '');
+									foreach ($cat_associations as $tag => $cat_association)
+									{
+										if (isset($globalcats[(int)$cat_association->id]))
+										{
+											$cat_assoc_ids[$tag] = (int)$cat_association->id;
+										}
+									}
+								}
+							}
+
+							if (isset($cat_assoc_ids[$row->language]))
+							{
+								$row->catid = $cat_assoc_ids[$row->language];
+							}
+						}
+						else
+						{
+							$row->catid = $maincat ? $maincat : $row->catid;
+						}
+
 						$this->moveitem($row->id, $row->catid, $seccats);
 					}
 

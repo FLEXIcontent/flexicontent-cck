@@ -62,10 +62,12 @@ if ($this->task === 'quicktranslate')
 	// JTable
 	JTable::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'tables');
 	$record = JTable::getInstance($type = 'flexicontent_items', $prefix = '', $config = array());
+	$catRec = JTable::getInstance($type = 'flexicontent_categories', $prefix = '', $config = array());
 
-	// If we only have 1 row then report and disable languages not applicable
 	$assoc_items_arr = array();
+	$assoc_cats_arr  = array();
 
+	// Currently 'quicktranslate' is implemented for 1 row only
 	if (count($this->rows) > 1)
 	{
 		echo '<div class="alert alert-info">Please select only 1 row</div>';
@@ -73,17 +75,53 @@ if ($this->task === 'quicktranslate')
 	}
 	else
 	{
+		$row = reset($this->rows);
+
+		$rowcat_isALL = $row->catid === '*';
+
+		/**
+		 * Actually we have only 1 row inside $this->rows, but we do a loop
+		 * in case we allow this layout to support multiple row in the future
+		 */
+		$total = 0;
 		foreach($this->rows as $row)
 		{
+			if ($row->language === '*')
+			{
+				echo '<div class="alert alert-info">Item: "' . $row->title. '"  has language \'ALL\'. It cannot be associated to other languages</div>';
+			}
+			$total++;
+
+			// Existing associations of the item
 			$associations = JLanguageAssociations::getAssociations('com_content', '#__content', 'com_content.item', $row->id);
 			foreach ($associations as $tag => $association)
 			{
-				if ($record->load($association->id))
+				if ($record->load((int) $association->id))
 				{
 					$assoc_items_arr[$row->id][$tag] = clone($record);
 				}
 			}
+
+			// Existing associations of the item's category
+			if ($catRec->load((int) $row->catid) && $catRec->language !== '*')
+			{
+				$cat_associations = JLanguageAssociations::getAssociations('com_content', '#__categories', 'com_categories.item', $row->catid, 'id', 'alias', '');
+				foreach ($cat_associations as $tag => $cat_association)
+				{
+					if ($catRec->load((int) $cat_association->id))
+					{
+						$assoc_cats_arr[$row->catid][$tag] = clone($catRec);
+					}
+				}
+			}
+			else
+			{
+				$row->hasCatAll = 1;
+			}
 		}
+
+		// Nothing to do
+		if (!$total) return;
 	}
 }
 
@@ -109,7 +147,9 @@ body .form-horizontal .control-group {
 </style>
 
 
-<?php ob_start(); ?>
+<?php
+$submit_cids = array();
+ob_start(); ?>
 <?php if ($this->task === 'quicktranslate'): ?>
 
 			<table class="adminlist table fcmanlist" style="margin-top: 0px; color: black; font-weight: bold">
@@ -128,12 +168,13 @@ body .form-horizontal .control-group {
 					if (in_array($row->id, $this->cid)) :
 						foreach ($row->catids as $catid) :
 							if ($catid == $row->catid) :
+								$submit_cids[] = '<input type="hidden" name="cid[]" value="' . $row->id . '" />';
 								$maincat = $this->itemCats[$catid]->title; ?>
 								<tr>
 									<td><?php echo '<span title="' . $state_names[$row->state] . '" class="' . $state_icons[$row->state] . '"></span>'; ?></td>
 									<td><?php echo $langs_indexed[$row->language]->name; ?></td>
-									<td><?php echo $row->title; ?></td>
-									<td><?php echo $maincat; ?><input type="hidden" name="cid[]" value="<?php echo $row->id; ?>" /></td>
+									<td><?php echo $row->title; ?> <!-- cid[] <?php echo $row->id; ?> --></td>
+									<td><?php echo $maincat; ?></td>
 								</tr>
 								<?php
 							endif;
@@ -162,10 +203,11 @@ body .form-horizontal .control-group {
 					if (in_array($row->id, $this->cid)) :
 						foreach ($row->catids as $catid) :
 							if ($catid == $row->catid) :
+								$submit_cids[] = '<input type="hidden" name="cid[]" value="' . $row->id . '" />';
 								$maincat = $this->itemCats[$catid]->title; ?>
 								<tr>
-									<td><?php echo $row->title; ?></td>
-									<td><?php echo $maincat; ?><input type="hidden" name="cid[]" value="<?php echo $row->id; ?>" /></td>
+									<td><?php echo $row->title; ?> <!-- cid[] <?php echo $row->id; ?> --></td>
+									<td><?php echo $maincat; ?></td>
 									<td><?php echo $langs_indexed[$row->language]->name; ?></td>
 								</tr>
 								<?php
@@ -189,7 +231,7 @@ body .form-horizontal .control-group {
 
 
 <?php if ($this->task === 'quicktranslate'): ?>
-	<input type="submit" value="Submit" class="btn btn-success" onclick="this.form.task.value='batchprocess';" />
+	<input type="submit" value="<?php echo JText::_('FLEXI_ADD_TRANSLATIONS') ?>" class="btn btn-success" onclick="this.form.task.value='batchprocess';" />
 	<div class="fcclear"></div>
 
 	<div class="toggle_all_values_buttons_box" style="display: inline-block; float: right;">
@@ -219,47 +261,63 @@ body .form-horizontal .control-group {
 		<fieldset>
 
 			<?php
-				echo count($this->rows) === 1
-					? $items_info_html
-					: '';
-				$assoc_items = count($assoc_items_arr) === 1
-					? reset($assoc_items_arr)
-					: array();
-				$i = 1;
 				global $globalcats;
+
+				foreach($this->rows as $row):
+					$assoc_items = isset($assoc_items_arr[$row->id]) ? $assoc_items_arr[$row->id] : array();
+					$assoc_cats  = isset($assoc_cats_arr[$row->catid]) ? $assoc_cats_arr[$row->catid] : array();
+					$catLangAll  = $globalcats[$row->catid]->language === '*';
+					$i = 1;
 			?>
-				<table class="adminlist table fcmanlist">
-					<thead>
-						<tr>
-							<th class="col_cb left">
-								<div class="group-fcset">
-									<input type="checkbox" name="checkall-toggle" id="checkall-toggle" value="" title="<?php echo JText::_('JGLOBAL_CHECK_ALL'); ?>" onclick="Joomla.checkAll(this)" />
-									<label for="checkall-toggle" class="green single"></label>
-								</div>
-							</th>
-							<th><?php echo JText::_('FLEXI_LANGUAGE'); ?></th>
-							<th><?php echo JText::_('FLEXI_ITEM'); ?></th>
-							<th><?php echo JText::_( 'FLEXI_CATEGORY' ); ?></th>
-						</tr>
-					</thead>
-					<tbody>
-						<?php foreach ($all_langs as $lang): ?>
-						<?php
-							if ($lang->code === '*') continue;
-							$item = isset($assoc_items[$lang->code]) ? $assoc_items[$lang->code] : false;
-						?>
-						<tr>
-							<td><?php echo $item
-								? '<span title="' . $state_names[$item->state] . '" class="' . $state_icons[$item->state] . '"></span>'
-								: JHtml::_($hlpname . '.grid_id', $i++, $lang->code, $_checkedOut = false, $_name = 'languages'); ?>
-							</td>
-							<td><?php echo $lang->name; ?></td>
-							<td><?php echo $item ? $item->title : '-'; ?></td>
-							<td><?php echo $item ? $globalcats[$item->catid]->title : '-'; ?></td>
-						</tr>
-						<?php endforeach; ?>
-					</tbody>
-				</table>
+					<table class="adminlist table fcmanlist">
+						<thead>
+							<tr>
+								<th class="col_cb left">
+									<div class="group-fcset">
+										<input type="checkbox" name="checkall-toggle" id="checkall-toggle" value="" title="<?php echo JText::_('JGLOBAL_CHECK_ALL'); ?>" onclick="Joomla.checkAll(this)" />
+										<label for="checkall-toggle" class="green single"></label>
+									</div>
+								</th>
+								<th><?php echo JText::_('FLEXI_LANGUAGE'); ?></th>
+								<th><?php echo JText::_('FLEXI_ITEM'); ?></th>
+								<th class="center">&nbsp;&nbsp; <?php echo '<span class="icon-flag"></span>'; ?></th>
+								<th><?php echo JText::_( 'FLEXI_CATEGORY' ); ?></th>
+							</tr>
+						</thead>
+						<tbody>
+							<?php foreach ($all_langs as $lang): ?>
+							<?php
+								if ($lang->code === '*') continue;
+								$is_current = $row->language === $lang->code;
+								$item = $is_current
+									? $row
+									: (isset($assoc_items[$lang->code]) ? $assoc_items[$lang->code] : false);
+								$cat  = $item ? $globalcats[$item->catid]
+									:	(isset($assoc_cats[$lang->code])
+										? $assoc_cats[$lang->code]
+										: ($catLangAll ? $globalcats[$row->catid] : false)
+										);
+							$td_css = $is_current ? ' class="text-white bg-dark _ALIGN_" ' : ' class="text-dark _ALIGN_" ';
+							?>
+							<tr>
+								<td <?php echo $td_css; ?>>
+								<?php if ($cat)
+								{
+									echo $item
+										? '<span title="' . $state_names[$item->state] . '" class="' . $state_icons[$item->state] . '"></span>'
+										: JHtml::_($hlpname . '.grid_id', $i++, $lang->code, $_checkedOut = false, $_name = 'languages');
+								} ?>
+								</td>
+								<td <?php echo str_replace('_ALIGN_', '', $td_css); ?>><?php echo $lang->name; ?></td>
+								<td <?php echo str_replace('_ALIGN_', '', $td_css); ?>><?php echo $item ? $item->title : '-'; ?></td>
+								<td <?php echo str_replace('_ALIGN_', 'center', $td_css); ?>><?php echo $cat ? ($cat->language !== '*' ? $cat->language : JText::_('FLEXI_ALL')) : '-'; ?></td>
+								<td <?php echo str_replace('_ALIGN_', '', $td_css); ?>><?php echo $cat ? $cat->title : '<small class="text-muted">'. JText::_('FLEXI_NO_ASSOCIATED_CATEGORY') . '</small>'; ?></td>
+							</tr>
+							<?php endforeach; ?>
+						</tbody>
+					</table>
+
+				<?php endforeach; ?>
 
 		</fieldset>
 	</div>
@@ -554,7 +612,7 @@ body .form-horizontal .control-group {
 
 </div>
 
-
+<?php echo implode("\n", $submit_cids); ?>
 <input type="hidden" name="option" value="com_flexicontent" />
 <input type="hidden" name="controller" value="items" />
 <input type="hidden" name="view" value="items" />

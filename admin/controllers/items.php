@@ -1829,7 +1829,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		{
 			$msg = JText::sprintf('FLEXI_N_ITEMS_CREATED', $total_cnt);
 			echo '<div class="alert alert-info">' . $msg . '</div>';
-			return;
+			exit;
 		}
 
 		$link = 'index.php?option=com_flexicontent&view=items';

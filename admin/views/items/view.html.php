@@ -1214,7 +1214,7 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 
 		// build the main category select list
 		$lists['maincat'] = flexicontent_cats::buildcatselect($categories, 'maincat',
-			($behaviour === 'translate' ? '__associated__' : ''), $behaviour === 'translate' ? 5 : 4,
+			($behaviour === 'translate' ? '-99' : ''), $behaviour === 'translate' ? 5 : 4,
 			'class="use_select2_lib" size="10"', false, false);
 
 		// build the secondary categories select list
