@@ -84,6 +84,7 @@ class FcFormLayoutParameters
 				$tab_fields_tmp[$field_name_fixed] = $position;
 				$all_tab_fields[$field_name_fixed] = 1;
 			}
+			$tab_fields[$i] = $tab_fields_tmp;
 		}
 
 		// Find fields missing from configuration, and place them below the tabs
