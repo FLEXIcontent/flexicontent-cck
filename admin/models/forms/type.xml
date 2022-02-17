@@ -425,10 +425,6 @@
 				<option value="2" show_list="" hide_list="allow_jview">FLEXI_REDIRECT_TO_ITEM_VIEW</option>
 				<option value="1" show_list="allow_jview" hide_list="">FLEXI_YES</option>
 			</field>
-			<field name="create_jarticle_form_links" type="multilist" subtype="radio" default="0" toggle_related="1" label="FLEXI_COMPATIBILITY_EDIT_LINKS" description="FLEXI_COMPATIBILITY_EDIT_LINKS_DESC" class="btn-group group-fcinfo" depend_class="allow_jview">
-				<option value="0" >FC Item form</option>
-				<option value="1" >Joomla Article form</option>
-			</field>
 			<field name="search_jlinks" type="radio" default="1" label="FLEXI_SEARCH_VIEW_LINKS_TYPE" description="FLEXI_SEARCH_VIEW_LINKS_TYPE_DESC" depend_class="allow_jview" class="btn-group group-fcinfo">
 				<option value="0">FLEXI_USE_FCITEMS_LINKS</option>
 				<option value="1">FLEXI_USE_JARTICLE_LINKS</option>
@@ -596,6 +592,11 @@
 			</field>
 
 			<field name="item_form_fe_tab_compat" type="separator" default="FLEXI_COMPATIBILITY" icon_class="icon-cog" level="tab_open" box_type="1" />
+
+			<field name="create_jarticle_form_links_fe" type="multilist" subtype="radio" default="0" label="FLEXI_COMPATIBILITY_EDIT_LINKS" description="FLEXI_COMPATIBILITY_EDIT_LINKS_DESC" class="btn-group group-fcinfo">
+				<option value="0" >FC Item form</option>
+				<!--option value="1" >Joomla Article form</option--> <!-- not implemented yet, need to change flexisystem plugin and frontend edit link helper / templates -->
+			</field>
 
 			<field name="use_jimages_fe" type="radio" default="" label="Intro / Full Images" description="Show intro/full images" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>
@@ -862,6 +863,11 @@
 			</field-->
 
 			<field name="item_form_be_tab_compat" type="separator" default="FLEXI_COMPATIBILITY" icon_class="icon-cog" level="tab_open" box_type="1" />
+
+			<field name="create_jarticle_form_links" type="multilist" subtype="radio" default="0" label="FLEXI_COMPATIBILITY_EDIT_LINKS" description="FLEXI_COMPATIBILITY_EDIT_LINKS_DESC" class="btn-group group-fcinfo">
+				<option value="0" >FC Item form</option>
+				<option value="1" >Joomla Article form</option>
+			</field>
 
 			<field name="use_jimages_be" type="radio" default="" label="Intro / Full Images" description="Show intro/full images" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>

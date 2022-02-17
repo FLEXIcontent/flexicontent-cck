@@ -1122,7 +1122,10 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 				 * Display title with edit link ... (row editable and not checked out)
 				 * Display title with no edit link ... if row is not-editable for any reason (no ACL or checked-out by other user)
 				 */
-				echo !empty($this->itemTypes[$row->type_id]) && (int) $this->itemTypes[$row->type_id]->params->get('create_jarticle_form_links' , 0)
+				$create_jarticle_form_links = !empty($this->itemTypes[$row->type_id])
+					? (int) $this->itemTypes[$row->type_id]->params->get('create_jarticle_form_links' , 0)
+					: 0;
+				echo $create_jarticle_form_links === 1
 					? JHtml::_($hlpname . '.edit_link', $row, $i, $row->canEdit, $config = array(
 							'option'   => 'com_content',
 							'ctrl'     => 'article',
