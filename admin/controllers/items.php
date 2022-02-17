@@ -172,7 +172,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		$force_type_id = !$isnew ? $model->get('type_id') : (int) $data['type_id'];
 		$params = new JRegistry( $model->getComponentTypeParams($force_type_id) );
 
-		if (! (int) $params->get('usetitle' . $CFGsfx, 1))
+		if (! (int) $params->get('usetitle' . $CFGsfx, 1) && (int) $params->get('auto_title', 0))
 			unset($data['title']);
 
 		if (! (int) $params->get('usealias' . $CFGsfx, 1))
