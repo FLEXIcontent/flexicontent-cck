@@ -190,7 +190,7 @@ if ($js)
 					<?php echo ($this->count_filters  ? ' <sup>' . $this->count_filters . '</sup>' : ''); ?>
 				</div>
 
-				<div id="fc-filters-box" <?php if (!$this->count_filters || !$tools_state->filters_box) echo 'style="display:none;"'; ?> class="fcman-abs" onclick="var event = arguments[0] || window.event; event.stopPropagation();">
+				<div id="fc-filters-box" <?php if (!$this->count_filters || empty($tools_state->filters_box)) echo 'style="display:none;"'; ?> class="fcman-abs" onclick="var event = arguments[0] || window.event; event.stopPropagation();">
 
 					<?php echo $this->lists['filter_itemscount']; ?>
 					<?php echo $this->lists['filter_logged']; ?>
