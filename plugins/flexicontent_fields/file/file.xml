@@ -290,11 +290,12 @@
 				<option value="1">FLEXI_FIELD_AFTER</option>
 			</field>
 
-			<field name="use_action_separator" type="multilist" subtype="radio" default="0" label="FLEXI_FIELD_FILE_USE_SEP_CHARS" toggle_related="1" description="FLEXI_FIELD_FILE_USE_SEP_CHARS_DESC" class="btn-group btn-group-yesno">
-				<option value="0" show_list="" hide_list="use_action_sep">FLEXI_NO</option>
-				<option value="1" show_list="use_action_sep" hide_list="">FLEXI_YES</option>
+			<field name="" type="separator" default="FLEXI_FIELD_FILE_ACTION_SEP_CHARS" level="level3" />
+			<field name="use_action_separator" type="multilist" subtype="radio" default="0" label="FLEXI_FIELD_FILE_USE_SEP_CHARS" toggle_related="0" description="FLEXI_FIELD_FILE_USE_SEP_CHARS_DESC" class="btn-group group-fcinfo">
+				<option value="0">FLEXI_LINE_BREAK</option>
+				<option value="1">FLEXI_CUSTOM</option>
 			</field>
-			<field name="action_separator" type="text" default="" label="FLEXI_FIELD_FILE_ACTION_SEP_CHARS" depend_class="use_action_sep" description="FLEXI_FIELD_FILE_ACTION_SEP_CHARS_DESC" />
+			<field name="action_separator" type="text" default="" label="FLEXI_CUSTOM" depend_class="use_action_sep" description="FLEXI_FIELD_FILE_ACTION_SEP_CHARS_DESC" />
 
 			<field name="" type="separator" default="" level="level_br" />
 
@@ -518,11 +519,12 @@
 				<option value="1">FLEXI_YES_AS_TIP</option>
 				<option value="2">FLEXI_YES_AS_INLINE</option>
 			</field>
-			<field name="use_info_separator" type="multilist" subtype="radio" default="0" label="FLEXI_FIELD_FILE_USE_SEP_CHARS" toggle_related="1" description="FLEXI_FIELD_FILE_USE_SEP_CHARS_DESC" class="btn-group btn-group-yesno">
-				<option value="0" show_list="" hide_list="use_info_sep">FLEXI_NO</option>
-				<option value="1" show_list="use_info_sep" hide_list="use_action_sep">FLEXI_YES</option>
+			<field name="" type="separator" default="FLEXI_FIELD_FILE_INFO_SEP_CHARS" level="level3" />
+			<field name="use_info_separator" type="multilist" subtype="radio" default="0" label="FLEXI_FIELD_FILE_USE_SEP_CHARS" toggle_related="0" description="FLEXI_FIELD_FILE_USE_SEP_CHARS_DESC" class="btn-group group-fcinfo">
+				<option value="0">FLEXI_LINE_BREAK</option>
+				<option value="1">FLEXI_CUSTOM</option>
 			</field>
-			<field name="info_separator" type="text" default="" label="FLEXI_FIELD_FILE_INFO_SEP_CHARS" depend_class="use_info_sep" description="FLEXI_FIELD_FILE_INFO_SEP_CHARS_DESC" />
+			<field name="info_separator" type="text" default="" hint="" label="FLEXI_CUSTOM" depend_class="use_info_sep" description="FLEXI_FIELD_FILE_INFO_SEP_CHARS_DESC" />
 
 
 			<field name="" type="separator" default="FLEXI_FIELD_FILE_FILE_LIST" description="" icon_class="icon-stack" level="tab_open" box_type="1" />
