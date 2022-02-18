@@ -19,12 +19,15 @@
 // no direct access
 defined('_JEXEC') or die('Restricted access');
 
-jimport('legacy.view.legacy');
+use Joomla\String\StringHelper;
+use Joomla\Utilities\ArrayHelper;
+
+JLoader::register('FlexicontentViewBaseRecords', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/base/view_records.php');
 
 /**
  * HTML View class for the Stats View
  */
-class FlexicontentViewStats extends JViewLegacy
+class FlexicontentViewStats extends FlexicontentViewBaseRecords
 {
 	/**
 	 * Creates the Entrypage

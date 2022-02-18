@@ -175,7 +175,7 @@ $ctrl_users = "task=users.";
 		</div>
 
 		<div class="span2 col-2">
-			<a href="index.php?option=com_flexicontent&amp;view=items&amp;filter_state=IP" class="btn btn-block btn-large btn-inverse">
+			<a href="index.php?option=com_flexicontent&amp;view=items&amp;filter_state=IP" class="btn btn-block btn-large <?php echo $this->btn_iv_class; ?>">
 				<div class="white">
 					<i class="icon-tag "></i>
 					<span class="">

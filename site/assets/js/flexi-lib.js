@@ -1027,7 +1027,7 @@
 		{
 			if (action_func === 'hide' && !document.getElementById('fc_' + container_div_id + '_btn').classList.contains('btn-inverse'))
 			{
-				document.getElementById('fc_' + container_div_id + '_btn').classList += ' btn-dark btn-inverse';
+				document.getElementById('fc_' + container_div_id + '_btn').classList += ' btn-dark btn-inverse text-white';
 			}
 		}
 

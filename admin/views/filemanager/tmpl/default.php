@@ -333,7 +333,7 @@ function fman_sync_cid(id, is_cb)
 function fman_set_cids(el)
 {
 	var val = el.prop('checked');
-	val ? el.closest('.btn').addClass('btn-inverse') : el.closest('.btn').removeClass('btn-inverse');
+	val ? el.closest('.btn').addClass('".$this->btn_iv_class."') : el.closest('.btn').removeClass('".$this->btn_iv_class."');
 
 	jQuery('div.adminthumbs.fcmanthumbs').children('.fc-fileman-grid-thumb-box').each(function(index, value)
 	{

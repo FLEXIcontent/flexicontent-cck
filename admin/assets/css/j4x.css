@@ -483,7 +483,6 @@ a.btn.btn-small,
 #flexicontent .fc-xpended-row .add-on:first-child {
 	padding-top: 5px;
 	padding-bottom: 5px;
-	background: #fff;
 }
 .flexicontent #fc-managers-header #fc-columns-slide-btn,
 .flexicontent #fc-managers-header #fc-filters-slide-btn {
@@ -509,7 +508,6 @@ a.fc_assoc_translation.label.label-association {
 	color: var(--template-link-hover-color-15);
 }
 .com_flexicontent .input-group-text {
-	background: var(--template-bg-dark-30);
 	border: 0;
 }
 .flexicontent #fc-filters-box .fc-filter .input-group-prepend input#filter_id {
@@ -968,9 +966,6 @@ body .form-grid .control-group .controls > div {
 #flexicontent .fc-xpended-btns {
 	height: 2.74rem;
 }
-#fc-filters-box .fc-xpended-row .input-group-text {
-	background: var(--template-bg-dark-60) !important;
-}
 #flexicontent #fc-filters-box .fc-filter .select2-container-multi,
 #flexicontent #fc-filters-box .select2-container,
 .select2-container {
@@ -978,7 +973,6 @@ body .form-grid .control-group .controls > div {
 }
 .input-group-text.fc-lbl-inverted.fc-lbl-short.icon-info-2.hasPopover,
 .fc-filter.nowrap_box .input-group-text.fc-lbl-inverted.fc-lbl-short {
-	background: var(--template-bg-dark-60) !important;
 	font-family: inherit !important;
 }
 div#s2id_filter_fieldtype {
