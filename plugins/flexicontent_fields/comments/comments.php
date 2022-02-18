@@ -50,7 +50,6 @@ class plgFlexicontent_fieldsComments extends FCField
 		$comment_api 	= $field->parameters->get('comment_api');
 
 		//Current url
-		$uri = JFactory::getURI();
 		$page_url = JUri::getInstance();
 
 		//language
