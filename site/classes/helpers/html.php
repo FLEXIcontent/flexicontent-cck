@@ -3122,7 +3122,7 @@ class flexicontent_html
 			}
 
 			$jtext['icon_sep']         = JText::_('FLEXI_ICON_SEP');
-			$jtext['start_always']     = JText::_('FLEXI_START_ALWAYS');
+			$jtext['start_immediately']= JText::_('FLEXI_START_IMMEDIATELY');
 			$jtext['start']            = JText::_('FLEXI_START');
 			$jtext['finish_no_expiry'] = JText::_('FLEXI_FINISH_NO_EXPIRY');
 			$jtext['finish']           = JText::_('FLEXI_FINISH');
@@ -3162,7 +3162,7 @@ class flexicontent_html
 				$publish_up->setTimezone($tz);
 			}
 			$publish_info[] = !$record->publish_up || $record->publish_up == $nullDate
-				? $jtext['start_always']
+				? $jtext['start_immediately']
 				: $jtext['start'] .": ". JHtml::_('date', $publish_up->toSql(), 'Y-m-d H:i:s');
 		}
 
