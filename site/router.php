@@ -266,7 +266,7 @@ class _FlexicontentSiteRouter
 
 						// EXPLICIT view ('item' be contained in the url), because according to configuration,
 						// the 1-segment implies --category-- view so we need to add /item/ segment (1st segment is view)
-						elseif ($add_item_sef_segment)
+						elseif ($add_item_sef_segment === 1)
 						{
 							$segments[] = 'item';
 						}
@@ -467,7 +467,7 @@ class _FlexicontentSiteRouter
 						 * or the given menu item is not of category view, then ... we need to explicitly declare
 						 * that this URL is a category URL, otherwise it will be wrongly interpreted as 'item' URL
 						 */
-						if (!$add_item_sef_segment && $mview === 'category')
+						if ($add_item_sef_segment === 0 && $mview === 'category')
 						{
 							$segments[] = 'category';
 						}
@@ -847,10 +847,18 @@ class _FlexicontentSiteRouter
 			 *  so that they are not 1 segment of length ... BUT detect bad 1-segments URL (Segments must be integer prefixed)
 			 */
 			case 1:
-				$is_item_view = !$add_item_sef_segment && in_array($mview, array('category'));
-				$segments[0] = $is_item_view
-						? $this->_fc_route_addRecordIdPrefix($segments, 0, '#__content', $_tbl, $parent_id)
-						: $this->_fc_route_addRecordIdPrefix($segments, 0, '#__categories', $_tbl, $parent_id);
+				if ($add_item_sef_segment === 2 && in_array($mview, array('category')))
+				{
+					$segments[0] = $this->_fc_route_addRecordIdPrefix($segments, 0, array('#__content', '#__categories'), $_tbl, $parent_id);
+					$is_item_view = $_tbl === '#__content';
+				}
+				else
+				{
+					$is_item_view = $add_item_sef_segment === 0 && in_array($mview, array('category'));
+					$segments[0] = $is_item_view
+							? $this->_fc_route_addRecordIdPrefix($segments, 0, '#__content', $_tbl, $parent_id)
+							: $this->_fc_route_addRecordIdPrefix($segments, 0, '#__categories', $_tbl, $parent_id);
+				}
 
 				/**
 				 * First check for bad URLs, this is needed for bad URLs with invalid MENU ALIAS segments,
@@ -1141,19 +1149,37 @@ class _FlexicontentSiteRouter
 	)
 	{
 		// None DB table tried
-		$tbl = null;
+		$tbl  = null;
+		$tbls = is_array($tbls) ? $tbls : array($tbls);
 
 		if (!isset($segments[$i]))
 		{
 			return null;
 		}
 
-		if (!JComponentHelper::getParams('com_flexicontent')->get('sef_ids', 0))
-		{
-			return $segments[$i];
-		}
+		$params = JComponentHelper::getParams('com_flexicontent');
 
-		$tbls = is_array($tbls) ? $tbls : array($tbls);
+		$add_item_sef_segment = (int) $params->get('add_item_sef_segment', 1);
+		$remove_ids = (int) $params->get('sef_ids', 0);
+
+		if (!$remove_ids)
+		{
+			if ($add_item_sef_segment !== 2)
+			{
+				return $segments[$i];
+			}
+			else
+			{
+				$slug = str_replace(':', '-', $segments[$i]);
+				$record_alias_from_url = substr($slug, stripos($slug, '-') + 1);
+				$record_id_from_url    = (int) substr($slug, 0, stripos($slug, '-'));
+			}
+		}
+		else
+		{
+			$record_alias_from_url = str_replace(':', '-', $segments[$i]);
+			$record_id_from_url    = 0;
+		}
 
 		/**
 		 * Try finding the alias in the DB tables in the order they were given
@@ -1162,7 +1188,7 @@ class _FlexicontentSiteRouter
 		{
 			// Get record ID from record's alias
 			$record_id_from_alias = $this->_fc_route_getRecordIdByAlias(
-				str_replace(':', '-', $segments[$i]),
+				$record_alias_from_url,
 				$parent_id,
 				$language,
 				$_tbl,
@@ -1170,11 +1196,46 @@ class _FlexicontentSiteRouter
 			);
 
 			// Only prepend record ID if it was found, otherwise prepend nothing allowing legacy SEF URLs that contain IDs to work
-			if ($record_id_from_alias)
+			if ($record_id_from_alias && (!$record_id_from_url || $record_id_from_url === $record_id_from_alias))
 			{
 				$tbl          = $_tbl;
-				$segments[$i] = $record_id_from_alias . '-' . $segments[$i];
+				$segments[$i] = $record_id_from_alias . '-' . $record_alias_from_url;
 				break;
+			}
+		}
+
+		/**
+		 * Compatibility: If we fail to find the alias, then check if segment is in format id-alias
+		 *  (Removing IDs from URLs was enabled in websites that used to have legacy URLs with ids)
+		 *  (These legacy URLs have been indexed by search engines and bookmarked by visitors)
+		 */
+		if (!$tbl && $remove_ids)
+		{
+			$slug = str_replace(':', '-', $segments[$i]);
+			$record_alias_from_url = substr($slug, stripos($slug, '-') + 1);
+			$record_id_from_url    = (int) substr($slug, 0, stripos($slug, '-'));
+
+			if ($record_id_from_url)
+			{
+				foreach ($tbls as $_tbl)
+				{
+					// Get record ID from record's alias
+					$record_id_from_alias = $this->_fc_route_getRecordIdByAlias(
+						$record_alias_from_url,
+						$parent_id,
+						$language,
+						$_tbl,
+						$alias_col
+					);
+
+					// Only prepend record ID if it was found, otherwise prepend nothing allowing legacy SEF URLs that contain IDs to work
+					if ($record_id_from_alias && (!$record_id_from_url || $record_id_from_url === $record_id_from_alias))
+					{
+						$tbl          = $_tbl;
+						$segments[$i] = $record_id_from_alias . '-' . $record_alias_from_url;
+						break;
+					}
+				}
 			}
 		}
 
@@ -1247,11 +1308,11 @@ class _FlexicontentSiteRouter
 		 */
 		if (count($segments) === 0)
 		{
-			if (count($catpath) === 1 && !$add_item_sef_segment && $view === 'category')
+			if (count($catpath) === 1 && $add_item_sef_segment === 0 && $view === 'category')
 			{
 				$segments[] = 'category';
 			}
-			elseif (count($catpath) === 0 && $add_item_sef_segment && $view === 'item')
+			elseif (count($catpath) === 0 && $add_item_sef_segment === 1 && $view === 'item')
 			{
 				$segments[] = 'item';
 			}

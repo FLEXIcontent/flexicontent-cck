@@ -110,6 +110,7 @@
 			<field name="add_item_sef_segment" type="fcradio" default="1" label="FLEXI_SHORTER_ITEM_OR_CATEGORY_SEF_URLS" description="FLEXI_SHORTER_ITEM_OR_CATEGORY_SEF_URLS_DESC" class="group-fcset fc-cleared">
 				<option value="0">FLEXI_SKIP_ITEM_SEGMENT_IN_ITEM_URLS</option>
 				<option value="1">FLEXI_SKIP_CAT_SEGMENT_IN_CAT_URLS</option>
+				<option value="2">Skip &lt;b&gt;both&lt;/b&gt; (experimental)</option>
 			</field>
 			<field name="default_menu_itemid" type="fcmenuitem" component="com_flexicontent" default="" disable="separator" state="1" published="1" label="FLEXI_DEFAULT_MENU_ITEM_FOR_URLS" description="FLEXI_DEFAULT_MENU_ITEM_FOR_URLS_DESC" />
 			<field name="default_menuitem_preference" type="fcradio" default="2" label="FLEXI_ADD_DEFAULT_MENU_ITEM_TO_URLS" description="FLEXI_ADD_DEFAULT_MENU_ITEM_TO_URLS_DESC" class="group-fcset fc-cleared">
