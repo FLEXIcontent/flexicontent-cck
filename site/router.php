@@ -64,7 +64,7 @@ class _FlexicontentSiteRouter
 		$remove_ids = (int) $params->get('sef_ids', 0);
 
 		// 1. Get a menu item based on Itemid or currently active
-		$menus = $app->getMenu();
+		$menus = $app->getMenu('site', array());
 
 		if (empty($query['Itemid']))
 		{
@@ -590,7 +590,7 @@ class _FlexicontentSiteRouter
 		$remove_ids = (int) $params->get('sef_ids', 0);
 
 		// Get the active menu item
-		$menu = JFactory::getApplication()->getMenu()->getActive();
+		$menu = JFactory::getApplication()->getMenu('site', array())->getActive();
 
 		// Count route segments
 		$count = count($segments);
