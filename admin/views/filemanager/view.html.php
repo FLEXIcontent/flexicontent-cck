@@ -108,7 +108,7 @@ class FlexicontentViewFilemanager extends FlexicontentViewBaseRecords
 			}
 		}
 
-		if (!$fieldid && $view === 'fileselement')
+		if (!$fieldid && $view === 'fileselement' && !$jinput->getCmd('isxtdbtn', ''))
 		{
 			jexit('<div class="alert alert-info">no valid field ID</div>');
 		}

@@ -35,7 +35,20 @@ $action_url = JUri::base(true) . '/index.php?option=com_flexicontent&amp;' . JSe
 //$this->CanViewAllFiles = 0; // test
 $isFilesElement = $this->view == 'fileselement';
 
+$uri      = JUri::getInstance();
+$base     = $uri->toString( array('scheme', 'host', 'port'));
 
+$editor   = $jinput->getCmd('editor', '');
+$isXtdBtn = $jinput->getCmd('isxtdbtn', '');
+$function = $jinput->getCmd('function', 'jSelectFcfile');
+$onclick  = $this->escape($function);
+
+if (!empty($editor))
+{
+	// This view is used also in com_menus. Load the xtd script only if the editor is set!
+	JFactory::getDocument()->addScriptOptions('xtd-fcfiles', array('editor' => $editor));
+	$onclick = "jSelectFcfile";
+}
 
 /**
  * COMMON CSS classes and COMMON repeated texts
@@ -70,7 +83,7 @@ $document->addStyleSheet(JUri::root(true).'/components/com_flexicontent/assets/c
 $document->addScriptDeclaration(' document.write(\'<style type="text/css">.fctabber{display:none;}<\/style>\'); ');  // temporarily hide the tabbers until javascript runs
 
 
-$use_jmedia_man = !$isFilesElement || (int) $this->field->parameters->get('use_myfiles', 0) === 2;
+$use_jmedia_man = !$isFilesElement || ($this->fieldid && (int) $this->field->parameters->get('use_myfiles', 0) === 2);
 
 if ($use_jmedia_man)
 {
@@ -175,6 +188,78 @@ if (empty($this->cols['usage']))  // This is 2 columns so remove 1 more
  */
 
 $js = '';
+
+$js .= (!$isXtdBtn ? "" : "
+(function() {
+	\"use strict\";
+	/**
+	 * Javascript to insert the link
+	 * View element calls jSelectFcfile when a fcfile is clicked
+	 * jSelectFcfile creates the link tag, sends it to the editor,
+	 * and closes the select frame.
+	 **/
+	window.jSelectFcfile = function(id, title, contentid, object, link, lang)
+	{
+		var hreflang = '', editor, tag;
+
+
+		if (!Joomla.getOptions('xtd-fcfiles')) {
+			// Something went wrong!
+			window.parent.jModalClose();
+			return false;
+		}
+
+		editor = Joomla.getOptions('xtd-fcfiles').editor;
+
+		if (lang !== '')
+		{
+			hreflang = ' hreflang=\"' + lang + '\"';
+		}
+
+		tag = '<a' + hreflang + ' href=\"' + link + '\">' + title + '</a>';
+
+		/** Use the API, if editor supports it **/
+		if (!!window.parent.Joomla.editors.instances[editor]) {
+			window.parent.Joomla.editors.instances[editor].replaceSelection(tag)
+		} else {
+			window.parent.jInsertEditorText(tag, editor);
+		}
+
+		window.parent.jModalClose();
+		return false;
+	};
+
+	document.addEventListener('DOMContentLoaded', function(){
+		// Get the elements
+		var elements = document.querySelectorAll('.select-link');
+
+		for(var i = 0, l = elements.length; l>i; i++) {
+			// Listen for click event
+			elements[i].addEventListener('click', function (event) {
+				event.preventDefault();
+				var functionName = event.target.getAttribute('data-function');
+
+				if (functionName === 'jSelectFcfile') {
+					// Used in xtd_fcfiles
+					window[functionName](event.target.getAttribute('data-id'), event.target.getAttribute('data-title'), event.target.getAttribute('data-content-id'), null, event.target.getAttribute('data-uri'), event.target.getAttribute('data-language'));
+				} else {
+					// Used in com_menus
+					window.parent[functionName](
+						event.target.getAttribute('data-id'),
+						event.target.getAttribute('data-title'),
+						event.target.getAttribute('data-content-id'),
+						null,
+						event.target.getAttribute('data-uri'),
+						event.target.getAttribute('data-language')
+					);
+				}
+			})
+		}
+	});
+})();
+
+");
+
 
 if ($use_jmedia_man)
 {
@@ -1096,18 +1181,38 @@ if ($js)
 						}
 						else
 						{
-							// Note we will pass true to canEdit parameter because we want to create an assign link
-							echo JHtml::_($hlpname . '.edit_link', $row, $i, true, array(
-								'linkedPrefix' => '<span class="icon-checkbox"></span><span class="icon-new"></span>',
-								'onclick' => 'if (jQuery(this).hasClass(\'striketext\')) return; ' . $row->file_assign_link,
-								'attribs' => array(
-									'id' => 'file' . $row->id,
-									'class' => 'fc_set_file_assignment fc-iblock text-dark ' . $this->btn_sm_class . ' ' . $this->tooltip_class,
-									'title' => $insert_entry,
-									'data-fileid' => $fileid,
-									'data-filename' => $filename,
-								)
-							));
+							if ($isXtdBtn)
+							{
+								$vars = '&id='.$row->id.'&cid='. 0 .'&fid='.$this->fieldid;
+								$link = $base. JRoute::_('index.php?option=com_flexicontent&task=quick_download'.$vars, false);
+
+								$attribs = 'data-function="' . $this->escape($onclick) . '"'
+									. ' data-id="' . $this->escape($row->id) . '"'
+									. ' data-title="' . $this->escape($row->filename) . '"'
+									. ' data-content-id="' . 0 . '"'
+									. ' data-uri="' . $this->escape($link) . '"'
+									. ' data-language="' . $this->escape($row->language) . '"';
+								?>
+								<a class="select-link" href="javascript:void(0)" <?php echo $attribs; ?>>
+									<?php echo $row->filename; ?>
+								</a>
+								<?php
+							}
+							else
+							{
+								// Note we will pass true to canEdit parameter because we want to create an assign link
+								echo JHtml::_($hlpname . '.edit_link', $row, $i, true, array(
+									'linkedPrefix' => '<span class="icon-checkbox"></span><span class="icon-new"></span>',
+									'onclick' => 'if (jQuery(this).hasClass(\'striketext\')) return; ' . $row->file_assign_link,
+									'attribs' => array(
+										'id' => 'file' . $row->id,
+										'class' => 'fc_set_file_assignment fc-iblock text-dark ' . $this->btn_sm_class . ' ' . $this->tooltip_class,
+										'title' => $insert_entry,
+										'data-fileid' => $fileid,
+										'data-filename' => $filename,
+									)
+								));
+							}
 						}
 
 						if (!$this->folder_mode && $row->altname != $row->filename_displayed)

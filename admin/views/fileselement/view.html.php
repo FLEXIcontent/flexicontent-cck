@@ -113,7 +113,7 @@ class FlexicontentViewFileselement extends FlexicontentViewBaseRecords
 			}
 		}
 
-		if (!$fieldid && $view === 'fileselement')
+		if (!$fieldid && $view === 'fileselement' && !$jinput->getCmd('isxtdbtn', ''))
 		{
 			jexit('<div class="alert alert-info">no valid field ID</div>');
 		}
@@ -509,7 +509,7 @@ class FlexicontentViewFileselement extends FlexicontentViewBaseRecords
 						row_count++;
 						assign_file_btn.trigger('click');
 					});
-					window.parent.fc_field_dialog_handle_".$field->id.".dialog('close');
+					window.parent.fc_field_dialog_handle_".$fieldid.".dialog('close');
 				}, 50);
 			}
 
