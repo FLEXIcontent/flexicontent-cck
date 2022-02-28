@@ -156,6 +156,7 @@ $js .= (!$isXtdBtn ? "" : "
 		}
 
 		window.parent.jModalClose();
+		return false;
 	};
 
 	document.addEventListener('DOMContentLoaded', function(){
@@ -173,7 +174,14 @@ $js .= (!$isXtdBtn ? "" : "
 					window[functionName](event.target.getAttribute('data-id'), event.target.getAttribute('data-title'), event.target.getAttribute('data-cat-id'), null, event.target.getAttribute('data-uri'), event.target.getAttribute('data-language'));
 				} else {
 					// Used in com_menus
-					window.parent[functionName](event.target.getAttribute('data-id'), event.target.getAttribute('data-title'), event.target.getAttribute('data-cat-id'), null, event.target.getAttribute('data-uri'), event.target.getAttribute('data-language'));
+					window.parent[functionName](
+						event.target.getAttribute('data-id'),
+						event.target.getAttribute('data-title'),
+						event.target.getAttribute('data-cat-id'),
+						null,
+						event.target.getAttribute('data-uri'),
+						event.target.getAttribute('data-language')
+					);
 				}
 			})
 		}
@@ -407,11 +415,11 @@ if ($js)
 					<?php if ($isXtdBtn): ?>
 
 						<?php $attribs = 'data-function="' . $this->escape($onclick) . '"'
-							. ' data-id="' . $row->id . '"'
+							. ' data-id="' . $this->escape($row->id) . '"'
 							. ' data-title="' . $this->escape($row->title) . '"'
 							. ' data-cat-id="' . $this->escape($row->parent_id) . '"'
 							. ' data-uri="' . $this->escape(FlexicontentHelperRoute::getCategoryRoute($row->id, $_Itemid = 0, $_urlvars = array(), $row)) . '"'
-							. ' data-language="' . $this->escape($lang) . '"';
+							. ' data-language="' . $this->escape($row->language) . '"';
 						?>
 						<a class="select-link" href="javascript:void(0)" <?php echo $attribs; ?>>
 
