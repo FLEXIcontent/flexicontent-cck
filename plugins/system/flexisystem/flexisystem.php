@@ -2130,29 +2130,12 @@ class plgSystemFlexisystem extends CMSPlugin
 	 */
 	public function onExtensionAfterSave($context, $table, $isNew)
 	{
-		$app   = Factory::getApplication();
-		$user  = Factory::getUser();
-		$option = $app->input->get('component', '', 'cmd');
+		//Factory::getApplication()->enqueueMessage("onExtensionAfterSave -- context: $context -- table: <pre>" . print_r($table, true) . '</pre>');
 
 		/**
-		 * Handle saving the parameters of 2 (1 frontend, 1 backend) item form default layouts
+		 * Various tables. Update usage of Files in download links created via the XTD-editor file button
 		 */
-		$app->enqueueMessage("context: $context  - table->type: {$table->type} table->element {$table->element}");
-		/*if ($context === 'com_config.component' && $table->type === 'component' && $table->element === 'com_flexicontent')
-		{
-			if (Factory::getApplication()->isClient('administrator'))
-			{
-				$raw_data = Factory::getApplication()->input->post->get('jform', array(), 'array');
-
-				$table->params = new Registry($table->params);
-				$iflayout_params = !empty($raw_data['iflayout']) ? $raw_data['iflayout'] : array();
-				foreach($iflayout_params as $i => $v)
-				{
-					$table->params[$i] = $v;
-				}
-				$table->params = $table->params->toString();
-			}
-		}*/
+		$this->_updateFileUsage_FcFileBtn_DownloadLinks($context, $table, $isNew, $table);
 	}
 
 
