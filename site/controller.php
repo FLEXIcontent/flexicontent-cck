@@ -988,11 +988,15 @@ class FlexicontentController extends JControllerLegacy
 		$access_clauses['select'] = '';
 		$access_clauses['join']   = '';
 		$access_clauses['and']    = '';
-		$using_access = empty($cart_token_matches) && empty($slink_valid_coupon) && ! $task === 'quick_download';
+		$using_access = empty($cart_token_matches) && empty($slink_valid_coupon);
+
 		if ( $using_access )
 		{
 			// note CURRENTLY multi-download feature does not use coupons
-			$access_clauses = $this->_createFieldItemAccessClause( $get_select_access = true, $include_file = true );
+			$access_clauses = $this->_createFieldItemAccessClause(
+				$get_select_access = true,
+				$include_file = ($task === 'quick_download' ? 'fileaccess_only' : true)
+			);
 		}
 
 
@@ -1058,13 +1062,6 @@ class FlexicontentController extends JControllerLegacy
 			/**
 			 * Check if file was found AND IF user has required Access Levels
 			 */
-
-			/*if ($file && $task === 'quick_download' && !$file_node->secure)
-			{
-				$app->enqueueMessage('Cannot use quick download link to download a secure (non-media) file', 'notice');
-				$this->setRedirect('index.php', '');
-				return;
-			}*/
 
 			if ( empty($file) || ($using_access && (!$file->has_content_access || !$file->has_field_access || !$file->has_file_access)) )
 			{
@@ -1331,6 +1328,9 @@ class FlexicontentController extends JControllerLegacy
 			}
 			$file->footer_text = str_replace('{{current_date}}', $current_date, $file->footer_text);
 
+			/**
+			 * Send notifications email about file download if file was download via a field that has these notifications enabled
+			 */
 			if ($task !== 'quick_download' && $fields_conf[$field_id]->get('send_notifications') && ($file->hits % $per_downloads == 0) )
 			{
 				// Calculate (once per file) some text used for notifications
@@ -2038,13 +2038,20 @@ class FlexicontentController extends JControllerLegacy
 				$select_access .= ', CASE WHEN'.
 				'   f.access IN (0,'.$aid_list.')  THEN 1 ELSE 0 END AS has_file_access';
 			}
-			$select_access .= ', CASE WHEN'.
-				'  fi.access IN (0,'.$aid_list.')  THEN 1 ELSE 0 END AS has_field_access';
-			$select_access .= ', CASE WHEN'.
-				'  ty.access IN (0,'.$aid_list.') AND '.
-				'   c.access IN (0,'.$aid_list.') AND '.
-				'   i.access IN (0,'.$aid_list.')'.
-				' THEN 1 ELSE 0 END AS has_content_access';
+			if ($include_file === 'fileaccess_only')
+			{
+				$select_access .= ', 1 AS has_field_access, 1 AS has_content_access';
+			}
+			else
+			{
+				$select_access .= ', CASE WHEN'.
+					'  fi.access IN (0,'.$aid_list.')  THEN 1 ELSE 0 END AS has_field_access';
+				$select_access .= ', CASE WHEN'.
+					'  ty.access IN (0,'.$aid_list.') AND '.
+					'   c.access IN (0,'.$aid_list.') AND '.
+					'   i.access IN (0,'.$aid_list.')'.
+					' THEN 1 ELSE 0 END AS has_content_access';
+			}
 		}
 
 		else
@@ -2053,8 +2060,11 @@ class FlexicontentController extends JControllerLegacy
 			{
 				$andacc .= ' AND  f.access IN (0,'.$aid_list.')';  // AND file access
 			}
-			$andacc   .= ' AND fi.access IN (0,'.$aid_list.')';  // AND field access
-			$andacc   .= ' AND ty.access IN (0,'.$aid_list.')  AND  c.access IN (0,'.$aid_list.')  AND  i.access IN (0,'.$aid_list.')';  // AND content access
+			if ($include_file !== 'fileaccess_only')
+			{
+				$andacc   .= ' AND fi.access IN (0,'.$aid_list.')';  // AND field access
+				$andacc   .= ' AND ty.access IN (0,'.$aid_list.')  AND  c.access IN (0,'.$aid_list.')  AND  i.access IN (0,'.$aid_list.')';  // AND content access
+			}
 		}
 
 		$clauses['select'] = $select_access;

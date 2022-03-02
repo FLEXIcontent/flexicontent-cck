@@ -358,7 +358,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 				$size_index[] = ' WHEN ' . $file->id . ' THEN ' . $file->size;
 
 				// Recalculate JSON peaks files
-				if (0 && $file->url != 1 || file_exists($full_path_prw))
+				if ($file->url != 1 || file_exists($full_path_prw))
 				{
 					foreach($media_fields as $media_field)
 					{
