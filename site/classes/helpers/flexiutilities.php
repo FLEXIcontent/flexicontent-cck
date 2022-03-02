@@ -722,19 +722,22 @@ class FLEXIUtilities
 		$session = JFactory::getSession();
 		$cparams = JComponentHelper::getParams( 'com_flexicontent' );
 
-		// Redirect to Joomla backend
-		if (!$perms->CanManage)
+		if ($cando !== null)
 		{
-			$app->redirect('index.php', JText::_('FLEXI_NO_ACCESS'), 'warning');
-		}
+			// Redirect to Joomla backend
+			if (!$perms->CanManage)
+			{
+				$app->redirect('index.php', JText::_('FLEXI_NO_ACCESS'), 'warning');
+			}
 
-		// Check access to current management tab
-		$is_authorized = $cando === null || $perms->$cando;
+			// Check access to current management tab
+			$is_authorized = $perms->$cando;
 
-		// Redirect to Flexicontent backend Dashboard
-		if (!$is_authorized)
-		{
-			$app->redirect('index.php?option=com_flexicontent', JText::_('FLEXI_NO_ACCESS'), 'warning');
+			// Redirect to Flexicontent backend Dashboard
+			if (!$is_authorized)
+			{
+				$app->redirect('index.php?option=com_flexicontent', JText::_('FLEXI_NO_ACCESS'), 'warning');
+			}
 		}
 
 		// Get post-installation FLAG (session variable), and current view (HTTP request variable)
