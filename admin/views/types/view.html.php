@@ -135,7 +135,7 @@ class FlexicontentViewTypes extends FlexicontentViewBaseRecords
 		 */
 
 		// Create Submenu (and also check access to current view)
-		if (! $app->isClient('site') && $layout !== 'typeslist')
+		if ($layout !== 'typeslist')
 		{
 			FLEXIUtilities::ManagerSideMenu('CanTypes');
 		}
@@ -147,7 +147,7 @@ class FlexicontentViewTypes extends FlexicontentViewBaseRecords
 		$document->setTitle($doc_title .' - '. $site_title);
 
 		// Create the toolbar
-		if (! $app->isClient('site') && $layout !== 'typeslist')
+		if (! $app->isClient('site'))
 		{
 			$this->setToolbar();
 		}
