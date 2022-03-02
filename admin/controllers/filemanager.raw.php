@@ -358,7 +358,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 				$size_index[] = ' WHEN ' . $file->id . ' THEN ' . $file->size;
 
 				// Recalculate JSON peaks files
-				if ($file->url != 1 || file_exists($full_path_prw))
+				if (0 && $file->url != 1 || file_exists($full_path_prw))
 				{
 					foreach($media_fields as $media_field)
 					{
@@ -412,7 +412,10 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 				$session->set('mediadata_stats_log_filename', 'mediadata_stats_indexer_' . \JFactory::getUser()->id . '.php', 'flexicontent');
 			}
 
-			// Single property fields, get file usage (# assignments)
+
+			/**
+			 * Single property fields, get file usage (# assignments)
+			 */
 			if ($s_assigned_fields)
 			{
 				foreach ($s_assigned_fields as $field_type)
@@ -421,7 +424,10 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 				}
 			}
 
-			// Multi property fields, get file usage (# assignments)
+
+			/**
+			 * Multi property fields, get file usage (# assignments)
+			 */
 			if ($m_assigned_fields)
 			{
 				foreach ($m_assigned_fields as $field_type)
@@ -431,6 +437,13 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 					$model->countFieldRelationsMultiProp($record_data, $value_prop, $field_prop, $field_type);
 				}
 			}
+
+
+			/**
+			 * Files in download links created via the XTD-editor file button, get file usage (# of download links)
+			 */
+			$model->countUsage_FcFileBtn_DownloadLinks($record_data);
+
 
 			// Also create assignments counter
 			foreach ($record_data as $file_id => $file)

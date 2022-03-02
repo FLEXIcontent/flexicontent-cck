@@ -1059,12 +1059,12 @@ class FlexicontentController extends JControllerLegacy
 			 * Check if file was found AND IF user has required Access Levels
 			 */
 
-			if ($file && $task === 'quick_download' && !$file_node->secure)
+			/*if ($file && $task === 'quick_download' && !$file_node->secure)
 			{
 				$app->enqueueMessage('Cannot use quick download link to download a secure (non-media) file', 'notice');
 				$this->setRedirect('index.php', '');
 				return;
-			}
+			}*/
 
 			if ( empty($file) || ($using_access && (!$file->has_content_access || !$file->has_field_access || !$file->has_file_access)) )
 			{

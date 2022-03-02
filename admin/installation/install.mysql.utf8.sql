@@ -367,3 +367,13 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_download_coupons` (
   KEY `expire_on` (`expire_on`)
 ) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`;
 
+CREATE TABLE IF NOT EXISTS `jos_flexicontent_file_usage` (
+	`id` int(11) NOT NULL,
+	`context` varchar(255) NOT NULL,
+	`file_id` int(11) NOT NULL default '0',
+	`prop` varchar(255) NOT NULL,
+	KEY  `id` (`id`),
+	KEY  `file_id` (`file_id`),
+	KEY  `context` (`context`),
+	KEY  `prop` (`prop`)
+) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`

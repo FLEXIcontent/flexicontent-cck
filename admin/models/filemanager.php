@@ -294,7 +294,10 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 				</span>';
 			$this->_data = flexicontent_images::BuildIcons($this->_data, $default_size_message);
 
-			// Single property fields, get file usage (# assignments), if not already done by main query
+
+			/**
+			 * Single property fields, get file usage (# assignments), if not already done by main query
+			 */			
 			if ( !$s_assigned_via_main && $s_assigned_fields)
 			{
 				foreach ($s_assigned_fields as $field_type)
@@ -302,7 +305,11 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 					$this->countFieldRelationsSingleProp($this->_data, $field_type);
 				}
 			}
-			// Multi property fields, get file usage (# assignments)
+
+			
+			/**
+			 * Multi property fields, get file usage (# assignments)
+			 */
 			if ($m_assigned_fields)
 			{
 				foreach ($m_assigned_fields as $field_type)
@@ -312,6 +319,13 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 					$this->countFieldRelationsMultiProp($this->_data, $value_prop_arr, $field_prop_arr, $field_type);
 				}
 			}
+
+
+			/**
+			 * Files in download links created via the XTD-editor file button, get file usage (# of download links)
+			 */
+			$this->countUsage_FcFileBtn_DownloadLinks($this->_data);
+
 
 			// These can be used by the items manager without need to recalculate
 			if ($this->sess_assignments)
@@ -1360,6 +1374,90 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 
 
 	/**
+	 * Method to get usage for download links added to DB tables via Fcfile XTD button
+	 *
+	 * @access public
+	 * @return object
+	 */
+	function getCustomLinksFileUsage($file_ids=array(), $count_items=false, $ignored=false)
+	{
+		$app    = JFactory::getApplication();
+		$user   = JFactory::getUser();
+		$jinput = $app->input;
+		$option = $jinput->get('option', '', 'cmd');
+
+		$filter_uploader = $this->getState('filter_uploader');
+
+		$where = array();
+
+		if ( count($file_ids) )
+		{
+			$file_ids_list = ' AND a.id IN (' . "'". implode("','", $file_ids)  ."')";
+		}
+		else
+		{
+			$file_ids_list = '';
+
+			$permission = FlexicontentHelperPerm::getPerm();
+			$CanViewAllFiles = $permission->CanViewAllFiles;
+
+			if (!$CanViewAllFiles)
+			{
+				$where[] = ' a.uploaded_by = ' . (int) $user->id;
+			}
+			elseif ($filter_uploader)
+			{
+				$where[] = ' a.uploaded_by = ' . (int) $filter_uploader;
+			}
+		}
+
+		if (!empty($ignored))
+		{
+			$where[] = ' (i.id NOT IN (' . implode(',', ArrayHelper::toInteger($ignored)) . ') AND i.context = \'com_content.article\')';
+		}
+
+		$where = count($where)
+			? ' WHERE ' . implode(' AND ', $where)
+			: '';
+
+		// Group by since file maybe used in more than one fields or ? in more than one values for same field
+		$groupby = !$count_items ? ' GROUP BY i.id'  :  ' GROUP BY a.id';
+		$orderby = ''; //!$count_items ? ' ORDER BY i.title ASC'  :  '';
+
+		// File field relation sub query
+		$query = 'SELECT '. ($count_items  ?  'a.id as file_id, COUNT(i.id) as item_count'  :  'i.id as id, i.id as title')
+			. ' FROM #__flexicontent_file_usage AS i'
+			. ' JOIN #__flexicontent_files AS a ON a.id=id.file_id '. $file_ids_list
+			//. ' JOIN #__users AS ua ON ua.id = a.uploaded_by'
+			. $where
+			. $groupby
+			. $orderby
+			;
+		//echo nl2br( "\n".$query."\n");
+		$this->_db->setQuery( $query );
+		$_item_data = $this->_db->loadObjectList($count_items ? 'file_id' : 'id');
+
+		$items = array();
+		if ($_item_data) foreach ($_item_data as $item)
+		{
+			if ($count_items)
+			{
+				$items[$item->file_id] = isset($items[$item->file_id])
+					? (int) $items[$item->file_id] + (int) $item->item_count
+					: (int) $item->item_count;
+			}
+			else
+			{
+				$items[$item->title] = $item;
+			}
+		}
+
+		//echo "<pre>"; print_r($items); exit;
+		return $items;
+	}
+
+
+	/**
 	 * Method to get items using files VIA (single property) field types that store file ids !
 	 *
 	 * @access public
@@ -1378,12 +1476,14 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 
 		$where = array();
 
-		$file_ids_list = '';
-		if ( count($file_ids) ) {
+		if ( count($file_ids) )
+		{
 			$file_ids_list = ' AND a.id IN (' . "'". implode("','", $file_ids)  ."')";
 		}
 		else
 		{
+			$file_ids_list = '';
+
 			$permission = FlexicontentHelperPerm::getPerm();
 			$CanViewAllFiles = $permission->CanViewAllFiles;
 
@@ -1428,9 +1528,14 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 		$items = array();
 		if ($_item_data) foreach ($_item_data as $item)
 		{
-			if ($count_items) {
-				$items[$item->file_id] = ((int) @ $items[$item->file_id]) + $item->item_count;
-			} else {
+			if ($count_items)
+			{
+				$items[$item->file_id] = isset($items[$item->file_id])
+					? (int) $items[$item->file_id] + (int) $item->item_count
+					: (int) $item->item_count;
+			}
+			else
+			{
 				$items[$item->title] = $item;
 			}
 		}
@@ -1648,13 +1753,14 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 
 		$items_counts_s = $this->getItemsSingleprop($s_field_types,  $cid, $count_items = true, $ignored);
 		$items_counts_m = $this->getItemsMultiprop($m_field_props, $m_value_props, $cid, $count_items = true, $ignored);
-		//echo "<pre>";  print_r($items_counts_s);  print_r($items_counts_m);  exit;
+		$items_counts_u = $this->getCustomLinksFileUsage($cid, $count_items = true, $ignored);
+		//echo "<pre>";  print_r($items_counts_s);  print_r($items_counts_m);  print_r($items_counts_u);  exit;
 
 		$allowed_cid = array();
 
 		foreach ($cid as $file_id)
 		{
-			if (!empty($items_counts_s[$file_id]) || !empty($items_counts_m[$file_id]))
+			if (!empty($items_counts_s[$file_id]) || !empty($items_counts_m[$file_id]) || !empty($items_counts_u[$file_id]))
 			{
 				continue;
 			}
@@ -1810,13 +1916,45 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 				if (isset($assigned_data[$row->id]) && $assigned_data[$row->id]->item_list)
 				{
 					$row->item_list[$field_type] = $assigned_data[$row->id]->item_list;
-					if (isset($row->total_usage))
-					{
-						$item_ids = explode(',', $assigned_data[$row->id]->item_list);
-						$row->total_usage += count($item_ids);
-					}
+					$row->total_usage = isset($row->total_usage) ? $row->total_usage : 0;
+
+					$item_ids = explode(',', $assigned_data[$row->id]->item_list);
+					$row->total_usage += count($item_ids);
 				}
 			}
+		}
+	}
+
+
+
+	/**
+	 * Method to count the usage of files in download links created via the XTD-editor file button
+	 *
+	 * @access	public
+	 * @return	int
+	 * @since	  4.1
+	 */
+	function countUsage_FcFileBtn_DownloadLinks(&$rows)
+	{
+		if ( !count($rows) ) return;
+
+		foreach ($rows as $row)
+		{
+			$file_id_arr[] = $row->id;
+		}
+		$query	= 'SELECT a.id as file_id, COUNT(a.id) as count'
+				. ' FROM #__flexicontent_files AS a'
+				. ' JOIN #__flexicontent_file_usage AS u ON u.file_id = a.id'
+				. ' WHERE a.id IN (' . implode(',', $file_id_arr) . ')'
+				. ' GROUP BY a.id'
+				;
+		$assigned_data = $this->_db->setQuery($query)->loadObjectList('file_id');
+
+		foreach ($rows as $row)
+		{
+			$row->total_usage = isset($row->total_usage) ? $row->total_usage : 0;
+			$download_links_count = isset($assigned_data[$row->id]) ? (int) $assigned_data[$row->id]->count : 0;
+			$row->total_usage += $download_links_count;
 		}
 	}
 
@@ -1852,11 +1990,10 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 			if (isset($assigned_data[$row->id]) && $assigned_data[$row->id]->item_list)
 			{
 				$row->item_list[$field_type] = $assigned_data[$row->id]->item_list;
-				if (isset($row->total_usage))
-				{
-					$item_ids = explode(',', $assigned_data[$row->id]->item_list);
-					$row->total_usage += count($item_ids);
-				}
+				$row->total_usage = isset($row->total_usage) ? $row->total_usage : 0;
+
+				$item_ids = explode(',', $assigned_data[$row->id]->item_list);
+				$row->total_usage += count($item_ids);
 			}
 		}
 	}

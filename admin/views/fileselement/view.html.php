@@ -362,14 +362,6 @@ class FlexicontentViewFileselement extends FlexicontentViewBaseRecords
 		// Create pagination object
 		$pagination = $this->get('Pagination');
 
-		// Get item using at least one file (-of- the currently listed files)
-		/*$items_single	= $model->getItemsSingleprop( array('file','minigallery') );
-		$items_multi	= $model->getItemsMultiprop ( $field_props=array('image'=>array('originalname', 'existingname')), $value_props=array('image'=>array('filename', 'filename')) );
-		$items = array();
-		foreach ($items_single as $item_id => $_item) $items[$item_id] = $_item;
-		foreach ($items_multi  as $item_id => $_item) $items[$item_id] = $_item;
-		ksort($items);*/
-
 		$assigned_fields_labels = array('image'=>'image/gallery', 'file'=>'file', /*'minigallery'=>'minigallery'*/);
 		$assigned_fields_icons = array('image'=>'picture_link', 'file'=>'page_link', /*'minigallery'=>'film_link'*/);
 

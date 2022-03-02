@@ -591,6 +591,10 @@ class com_flexicontentInstallerScript
 		$db->setQuery($query);
 		$dl_coupons_tbl_exists = (boolean) count($db->loadObjectList());
 
+		$query = 'SHOW TABLES LIKE "' . $dbprefix . 'flexicontent_file_usage"';
+		$db->setQuery($query);
+		$file_usage_tbl_exists = (boolean) count($db->loadObjectList());
+
 		// Data Types of columns
 		$tbl_names_arr = array('flexicontent_files', 'flexicontent_fields', 'flexicontent_types');
 		foreach ($tbl_names_arr as $tbl_name)
@@ -1301,6 +1305,21 @@ class com_flexicontentInstallerScript
 							KEY `user_id` (`user_id`),
 							KEY `file_id` (`file_id`),
 							KEY `token` (`token`)
+						) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`";
+					}
+
+
+					if ( !$file_usage_tbl_exists ) {
+						$queries[] = "
+						CREATE TABLE IF NOT EXISTS `#__flexicontent_file_usage` (
+							`id` int(11) NOT NULL,
+							`context` varchar(255) NOT NULL,
+							`file_id` int(11) NOT NULL default '0',
+							`prop` varchar(255) NOT NULL,
+							KEY  `id` (`id`),
+							KEY  `file_id` (`file_id`),
+							KEY  `context` (`context`),
+							KEY  `prop` (`prop`)
 						) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`";
 					}
 

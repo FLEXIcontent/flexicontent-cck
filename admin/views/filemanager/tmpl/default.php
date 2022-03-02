@@ -1183,8 +1183,8 @@ if ($js)
 						{
 							if ($isXtdBtn)
 							{
-								$vars = '&id='.$row->id.'&cid='. 0 .'&fid='.$this->fieldid;
-								$link = $base. JRoute::_('index.php?option=com_flexicontent&task=quick_download'.$vars, false);
+								$vars = '&id='.$row->id;
+								$link = JUri::root(true) . '/index.php?option=com_flexicontent&task=quick_download' . $vars;
 
 								$attribs = 'data-function="' . $this->escape($onclick) . '"'
 									. ' data-id="' . $this->escape($row->id) . '"'

@@ -38,7 +38,6 @@ class PlgButtonFcfile extends JPlugin
 		/**
 		 * Our elements view already filters records according to user's view access levels
 		 */
-		JFactory::getDocument()->addScriptOptions('xtd-fcfile', array('editor' => $name));
 		$link = 'index.php?option=com_flexicontent&amp;view=fileselement&amp;layout=default&amp;isxtdbtn=1&amp;tmpl=component&amp;'
 			. JSession::getFormToken() . '=1&amp;editor=' . $name;
 
