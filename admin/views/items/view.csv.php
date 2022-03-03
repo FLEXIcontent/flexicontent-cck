@@ -198,8 +198,7 @@ class FlexicontentViewItems extends JViewLegacy
 			FlexicontentFields::loadFieldConfig($field, $item0);
 
 			$include_in_csv_export = (int) $field->parameters->get('include_in_csv_export', 0);
-			$include_in_csv_export = $include_in_csv_export || $csv_all_fields !== 2 ? $include_in_csv_export : 1;
-			$include_in_csv_export = !$include_in_csv_export || $csv_raw_export !== 2 ? $include_in_csv_export : 1;
+			$include_in_csv_export = $csv_all_fields !== 2 ? $include_in_csv_export : 1;
 
 			if (!$include_in_csv_export)
 			{
@@ -228,7 +227,7 @@ class FlexicontentViewItems extends JViewLegacy
 		header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
 		header('Content-Encoding: UTF-8');
 		header('Content-type: text/csv; charset=UTF-8');
-		header('Content-Disposition: attachment; filename=EXPORT.csv');
+		header('Content-Disposition: attachment; filename=EXPORT-'.rand().'.csv');
 		//header("Content-Transfer-Encoding: binary");
 		echo "\xEF\xBB\xBF"; // UTF-8 BOM
 
@@ -242,8 +241,7 @@ class FlexicontentViewItems extends JViewLegacy
 		foreach($item0->fields as $field)
 		{
 			$include_in_csv_export = (int) $field->parameters->get('include_in_csv_export', 0);
-			$include_in_csv_export = $include_in_csv_export || $csv_all_fields !== 2 ? $include_in_csv_export : 1;
-			$include_in_csv_export = !$include_in_csv_export || $csv_raw_export !== 2 ? $include_in_csv_export : 1;
+			$include_in_csv_export = $csv_all_fields !== 2 ? $include_in_csv_export : 1;
 
 			if (!$include_in_csv_export)
 			{
@@ -280,8 +278,7 @@ class FlexicontentViewItems extends JViewLegacy
 				foreach($item0->fields as $field_name => $field)
 				{
 					$include_in_csv_export = (int) $field->parameters->get('include_in_csv_export', 0);
-					$include_in_csv_export = $include_in_csv_export || $csv_all_fields !== 2 ? $include_in_csv_export : 1;
-					$include_in_csv_export = !$include_in_csv_export || $csv_raw_export !== 2 ? $include_in_csv_export : 1;
+					$include_in_csv_export = $csv_all_fields !== 2 ? $include_in_csv_export : 1;
 
 					$csv_strip_html = (int) $field->parameters->get('csv_strip_html', 0);
 
