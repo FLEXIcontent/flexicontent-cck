@@ -1184,7 +1184,7 @@ if ($js)
 							if ($isXtdBtn)
 							{
 								$vars = '&id='.$row->id;
-								$link = JUri::root(true) . '/index.php?option=com_flexicontent&task=quick_download' . $vars;
+								$link = JUri::root(true) . '/index.php?option=com_flexicontent&task=download_file' . $vars;
 
 								$attribs = 'data-function="' . $this->escape($onclick) . '"'
 									. ' data-id="' . $this->escape($row->id) . '"'

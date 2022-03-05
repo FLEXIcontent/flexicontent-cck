@@ -2672,7 +2672,7 @@ class plgSystemFlexisystem extends CMSPlugin
 				for ($i=0; $i<$cnt; $i++)
 				{
 					parse_str(html_entity_decode($matches[4][$i]), $vars);
-					if ($vars['option'] === 'com_flexicontent' && $vars['task'] === 'quick_download' && !empty($vars['id']))
+					if ($vars['option'] === 'com_flexicontent' && $vars['task'] === 'download_file' && !empty($vars['id']))
 					{
 						//Factory::getApplication()->enqueueMessage('FOUND');
 						$query = $db->getQuery(true)

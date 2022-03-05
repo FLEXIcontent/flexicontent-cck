@@ -55,7 +55,7 @@ class FlexicontentController extends JControllerLegacy
 		if (JFactory::getApplication()->isClient('site'))
 		{
 			$this->registerTask('download_tree',  'download');
-			$this->registerTask('quick_download',  'download');
+			$this->registerTask('download_file',  'download');
 
 			$this->input  = empty($this->input) ? JFactory::getApplication()->input : $this->input;
 			$this->option = $this->input->get('option', '', 'cmd');
@@ -936,7 +936,7 @@ class FlexicontentController extends JControllerLegacy
 			}
 		}
 
-		else//if ($task === 'download' || $task === 'quick_download')
+		else//if ($task === 'download' || $task === 'download_file')
 		{
 			$file_node = new stdClass();
 			$file_node->fieldid   = $this->input->get('fid', 0, 'int');
@@ -995,7 +995,7 @@ class FlexicontentController extends JControllerLegacy
 			// note CURRENTLY multi-download feature does not use coupons
 			$access_clauses = $this->_createFieldItemAccessClause(
 				$get_select_access = true,
-				$include_file = ($task === 'quick_download' ? 'fileaccess_only' : true)
+				$include_file = ($task === 'download_file' ? 'fileaccess_only' : true)
 			);
 		}
 
@@ -1027,7 +1027,7 @@ class FlexicontentController extends JControllerLegacy
 			$field_type = $fields_props[$field_id]->field_type;
 
 			$query  = 'SELECT f.id, f.filename, f.filename_original, f.altname, f.secure, f.url, f.hits, f.stamp, f.size'
-					.($task !== 'quick_download'
+					.($task !== 'download_file'
 						? ', u.email as item_owner_email' .
 							', i.title as item_title, i.introtext as item_introtext, i.fulltext as item_fulltext' .
 							', i.language as item_language, ie.type_id as item_type_id, i.access as item_access' .
@@ -1040,17 +1040,17 @@ class FlexicontentController extends JControllerLegacy
 
 					.' FROM #__flexicontent_files AS f '
 					.($field_type=='file' ? ' LEFT JOIN #__flexicontent_fields_item_relations AS rel ON rel.field_id = '. $field_id : '')  // Only check value usage for 'file' field
-					.($task !== 'quick_download' ? ' LEFT JOIN #__flexicontent_fields AS fi ON fi.id = '. $field_id : '')
-					.($task !== 'quick_download' ? ' LEFT JOIN #__content AS i ON i.id = '. $content_id : '')
-					.($task !== 'quick_download' ? ' LEFT JOIN #__categories AS c ON c.id = i.catid' : '')
-					.($task !== 'quick_download' ? ' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id' : '')
-					.($task !== 'quick_download' ? ' LEFT JOIN #__flexicontent_types AS ty ON ie.type_id = ty.id' : '')
-					.($task !== 'quick_download' ? ' LEFT JOIN #__users AS u ON u.id = i.created_by' : '')
+					.($task !== 'download_file' ? ' LEFT JOIN #__flexicontent_fields AS fi ON fi.id = '. $field_id : '')
+					.($task !== 'download_file' ? ' LEFT JOIN #__content AS i ON i.id = '. $content_id : '')
+					.($task !== 'download_file' ? ' LEFT JOIN #__categories AS c ON c.id = i.catid' : '')
+					.($task !== 'download_file' ? ' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id' : '')
+					.($task !== 'download_file' ? ' LEFT JOIN #__flexicontent_types AS ty ON ie.type_id = ty.id' : '')
+					.($task !== 'download_file' ? ' LEFT JOIN #__users AS u ON u.id = i.created_by' : '')
 					.' LEFT JOIN #__flexicontent_download_history AS dh ON dh.file_id = f.id AND dh.user_id = '. (int)$user->id
 					. $access_clauses['join']
 					.' WHERE 1'
-					.($task !== 'quick_download' ? ' AND i.id = ' . $content_id : '')
-					.($task !== 'quick_download' ? ' AND fi.id = ' . $field_id : '')
+					.($task !== 'download_file' ? ' AND i.id = ' . $content_id : '')
+					.($task !== 'download_file' ? ' AND fi.id = ' . $field_id : '')
 					.' AND f.id = ' . $file_id
 					.' AND f.published= 1'
 					. $access_clauses['and']
@@ -1331,7 +1331,7 @@ class FlexicontentController extends JControllerLegacy
 			/**
 			 * Send notifications email about file download if file was download via a field that has these notifications enabled
 			 */
-			if ($task !== 'quick_download' && $fields_conf[$field_id]->get('send_notifications') && ($file->hits % $per_downloads == 0) )
+			if ($task !== 'download_file' && $fields_conf[$field_id]->get('send_notifications') && ($file->hits % $per_downloads == 0) )
 			{
 				// Calculate (once per file) some text used for notifications
 				$file->__file_title__ = $file->altname && $file->altname != $file->filename

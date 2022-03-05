@@ -140,7 +140,7 @@ class _FlexicontentSiteRouter
 		// 3. Handle known 'task'(s) formulating segments of SEF URL appropriately
 		if (isset($query['task']))
 		{
-			if ($query['task'] === 'download')
+			if ($query['task'] === 'download' || $query['task'] === 'download_file')
 			{
 				$segments[] = $query['task'];
 				$segments[] = $query['id'];
@@ -151,6 +151,15 @@ class _FlexicontentSiteRouter
 				unset($query['id']);	// file
 				unset($query['cid']);	// content
 				unset($query['fid']);	// field
+			}
+
+			elseif ($query['task'] === 'download_file')
+			{
+				$segments[] = $query['task'];
+				$segments[] = $query['id'];
+
+				unset($query['task']);	// task
+				unset($query['id']);	// file
 			}
 
 			elseif ($query['task'] === 'weblink')
@@ -607,6 +616,15 @@ class _FlexicontentSiteRouter
 			$vars['id']   = isset($segments[1]) ? $segments[1] : null;
 			$vars['cid']  = isset($segments[2]) ? $segments[2] : null;
 			$vars['fid']  = isset($segments[3]) ? $segments[3] : null;
+
+			return $vars;
+		}
+
+		// 'download_file' task
+		if ($segments[0] === 'download_file')
+		{
+			$vars['task'] = 'download_file';
+			$vars['id']   = isset($segments[1]) ? $segments[1] : null;
 
 			return $vars;
 		}
