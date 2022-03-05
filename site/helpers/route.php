@@ -377,6 +377,11 @@ class FlexicontentHelperRoute
 		}
 
 		global $globalcats;
+		if ($globalcats === null)
+		{
+			JLoader::register('plgSystemFlexisystem', JPATH_ROOT . '/plugins/system/flexisystem/flexisystem.php');
+			plgSystemFlexisystem::getCategoriesTree();
+		}
 		$_catid = (int) $catid;
 		$_id = (int) $id;
 
@@ -558,6 +563,11 @@ class FlexicontentHelperRoute
 		}
 
 		global $globalcats;
+		if ($globalcats === null)
+		{
+			JLoader::register('plgSystemFlexisystem', JPATH_ROOT . '/plugins/system/flexisystem/flexisystem.php');
+			plgSystemFlexisystem::getCategoriesTree();
+		}
 		$_catid = (int) $catid;
 
 
