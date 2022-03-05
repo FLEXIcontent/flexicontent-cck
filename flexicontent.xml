@@ -214,6 +214,7 @@
 		<plugin name="flexibreak"         folder="plugins/content/flexibreak"       instfolder="content">Content - Flexibreak, pagination for multi-paged articles</plugin>
 
 		<!-- Plugins: fincontent/editors-xtd -->
+		<plugin name="fcfile"            folder="plugins/editors-xtd/fcfile"        instfolder="editors-xtd" enabled="1">Button - Flexicontent file</plugin>
 		<plugin name="fcitem"            folder="plugins/editors-xtd/fcitem"        instfolder="editors-xtd" enabled="1">Button - Flexicontent item</plugin>
 		<plugin name="fccat"             folder="plugins/editors-xtd/fccat"         instfolder="editors-xtd" enabled="1">Button - Flexicontent category</plugin>
 		
