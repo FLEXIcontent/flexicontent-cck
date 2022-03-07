@@ -2445,6 +2445,15 @@ class plgFlexicontent_fieldsImage extends FCField
 			jimport('joomla.filesystem.path');
 		}
 
+		// Unseriaze value if not already done
+		if ( !is_array($value) )
+		{
+			$array = $this->unserialize_array($value, $force_array=false, $force_value=false);
+			$value = $array ?: array(
+				'originalname' => $value
+			);
+		}
+
 		// Check for empty filename
 		$value['originalname'] = isset($value['originalname']) ? trim($value['originalname']) : '';
 
