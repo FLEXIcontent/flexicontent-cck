@@ -1206,14 +1206,19 @@ class flexicontent_db
 
 
 		// ***
-		// *** Delete old associations
+		// *** Delete old associations for item, and remove given associations for other association groups
 		// ***
-		if ($key)
+		if ($key || $associations)
 		{
+			$record_ids = ArrayHelper::toInteger($associations);
+			$where = array();
+			if ($key) $where[] = $db->quoteName('key') . ' = ' . $db->quote($key);
+			if ($associations) $where[] = ' id IN (' . implode(',', $record_ids) . ')';
+
 			$query = $db->getQuery(true)
 				->delete('#__associations')
 				->where($db->quoteName('context') . ' = ' . $db->quote($context))
-				->where($db->quoteName('key') . ' = ' . $db->quote($key));
+				->where('(' . implode(' OR ', $where) . ')');
 			$db->setQuery($query)->execute();
 		}
 

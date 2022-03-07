@@ -169,14 +169,20 @@ class FlexicontentModelItemelement extends FCModelAdminList
 			$filter_lang   = $this->assocs_id && $item_lang  ? $item_lang  : $this->getState('filter_lang');
 			$filter_author = $this->assocs_id && $created_by ? $created_by : $this->getState('filter_author');
 
-			$this->setState('filter_type', $filter_type);
 			$this->setState('filter_lang', $filter_lang);
+			$this->setState('filter_type', $filter_type);
 			$this->setState('filter_author', $filter_author);
 
-			$app->setUserState($p . 'filter_type', $filter_type);
 			$app->setUserState($p . 'filter_lang', $filter_lang);
+			$app->setUserState($p . 'filter_type', $filter_type);
 			$app->setUserState($p . 'filter_author', $filter_author);
 		}
+
+		// Association KEY filter
+		$filter_assockey = $fcform ? $jinput->get('filter_assockey', 0, 'cmd')  :  $app->getUserStateFromRequest( $p.'filter_assockey',  'filter_assockey',  0,  'cmd' );
+
+		$this->setState('filter_assockey', $filter_assockey);
+		$app->setUserState($p.'filter_assockey', $filter_assockey);
 	}
 
 
@@ -299,6 +305,8 @@ class FlexicontentModelItemelement extends FCModelAdminList
 	 */
 	protected function _buildQuery($query_ids = false)
 	{
+		$filter_assockey = $this->getState('filter_assockey');
+
 		$filter_meta = $this->getState('filter_meta');
 		$scope       = $this->getState('scope');
 		$search      = $this->getState('search');
@@ -319,6 +327,15 @@ class FlexicontentModelItemelement extends FCModelAdminList
 				->join('LEFT', '#__categories AS c ON a.catid = c.id')
 				->group('a.id');
 			;
+
+			/**
+			 * Listing associated items
+			 */
+			if ($filter_assockey)
+			{
+				$query->join('inner', ' #__associations AS assoc ON a.id = assoc.id AND assoc.context = ' . $this->_db->quote('com_content.item'));
+				$query->where('assoc.key = ' . $this->_db->quote($filter_assockey));
+			}
 
 			// Get the WHERE, HAVING and ORDER BY clauses for the query
 			$this->_buildContentWhere($query);
@@ -464,6 +481,8 @@ class FlexicontentModelItemelement extends FCModelAdminList
 			'context'  => 'com_content.item',
 			'created'  => 'created',
 			'modified' => 'modified',
+			'state'    => 'state',
+			'catid'    => 'catid',
 		);
 
 		return parent::getLangAssocs($ids, $config);

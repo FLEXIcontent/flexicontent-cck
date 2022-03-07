@@ -81,7 +81,9 @@ class JFormFieldFctag extends JFormField
 		$required_param = $required ? ' required="required" class="required" aria-required="true" ' : '';
 
 		static $js_added = false;
-		if (!$js_added) {
+		if (!$js_added)
+		{
+			$js_added = true;
 			$js = "
 			function qfClearSelectedTag(element_id)
 			{

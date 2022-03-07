@@ -122,7 +122,7 @@ class FlexicontentHelperPerm
 		$permission->AutoApproveChanges = $user->authorise('flexicontent.autoapprovechanges', 'com_flexicontent'); // (Workflow) Can publish document changes regardless of edit state
 
 		// CATEGORIES: management tab and usage
-		$permission->CanCats      = $user->authorise('flexicontent.managecats',  'com_flexicontent'); // (item edit form) view the categories which user cannot assign to items
+		$permission->CanCats      = $user->authorise('flexicontent.managecats',  'com_flexicontent'); // (backend) Allow management of Categories
 		$permission->ViewAllCats  = $user->authorise('flexicontent.usercats',    'com_flexicontent'); // (item edit form) view the categories which user cannot assign to items
 		$permission->ViewTree     = 1;  // Old (non-used) ACL, we will always displaying of categories as tree
 		$permission->MultiCat     = $user->authorise('flexicontent.multicat',    'com_flexicontent'); // (item edit form) allow user to assign items to multiple categories

@@ -40,6 +40,7 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 		$cparams  = JComponentHelper::getParams('com_flexicontent');
 		$session  = JFactory::getSession();
 		$db       = JFactory::getDbo();
+		$perms    = FlexicontentHelperPerm::getPerm();
 
 		$option   = $jinput->getCmd('option', '');
 		$view     = $jinput->getCmd('view', '');
@@ -61,7 +62,7 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 		}
 
 		// Get model
-		$model = $this->getModel();
+		$model   = $this->getModel();
 
 		// Performance statistics
 		if ($print_logging_info = $cparams->get('print_logging_info'))
@@ -689,23 +690,26 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 		$elementid = 'filter_lang';
 		$value     = $filter_lang;
 
-		$lists[$elementid] = $this->getFilterDisplay(array(
-			'label' => JText::_('FLEXI_LANGUAGE'),
-			'label_extra_class' => ($value ? ' fc-lbl-inverted' : ''),
-			'html' => flexicontent_html::buildlanguageslist(
-				$fieldname,
-				array(
-					'class' => $this->select_class,
-					'multiple' => 'multiple',
-					'size' => '3',
-					'onmouseenter' => 'if (typeof this.oVal == \'undefined\') this.oVal = jQuery(this).val(); this.valChanged = false;',
-					'onchange' => 'this.valChanged = JSON.stringify(this.oVal) !== JSON.stringify(jQuery(this).val()); if (this.valChanged && this != document.activeElement) {if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();}',
-					'onblur' => 'this.oVal = jQuery(this).val(); if (this.valChanged) {if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();}',
+		if (1)
+		{
+			$lists[$elementid] = $this->getFilterDisplay(array(
+				'label' => JText::_('FLEXI_LANGUAGE'),
+				'label_extra_class' => ($value ? ' fc-lbl-inverted' : ''),
+				'html' => flexicontent_html::buildlanguageslist(
+					$fieldname,
+					array(
+						'class' => $this->select_class,
+						'multiple' => 'multiple',
+						'size' => '3',
+						'onmouseenter' => 'if (typeof this.oVal == \'undefined\') this.oVal = jQuery(this).val(); this.valChanged = false;',
+						'onchange' => 'this.valChanged = JSON.stringify(this.oVal) !== JSON.stringify(jQuery(this).val()); if (this.valChanged && this != document.activeElement) {if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();}',
+						'onblur' => 'this.oVal = jQuery(this).val(); if (this.valChanged) {if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();}',
+					),
+					$value,
+					$displaytype = 1
 				),
-				$value,
-				$displaytype = 1
-			),
-		));
+			));
+		}
 
 
 		// Build bind-to-type limit
@@ -832,15 +836,15 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 					'list.select' => $value,
 				)
 			),
-			//JHtml::_('grid.state', $filter_state),
 		));
+		//JHtml::_('grid.state', $filter_state),
 
 
 		// Build access level filter
 		$access_levels = JHtml::_('access.assetgroups');
 
 		// Note 'all items' is already granted to super admins, so no need to check the is-super-admin ('core.admin') separately
-		$allitems       = FlexicontentHelperPerm::getPerm()->DisplayAllItems;
+		$allitems       = $perms->DisplayAllItems;
 		$viewable_items = $cparams->get('iman_viewable_items', 1);
 		$editable_items = $cparams->get('iman_editable_items', 0);
 
@@ -882,8 +886,8 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 				$fieldname,
 				array(
 					'class' => $this->select_class,
-					'size' => '3',
 					'multiple' => 'multiple',
+					'size' => '3',
 					'onmouseenter' => 'if (typeof this.oVal == \'undefined\') this.oVal = jQuery(this).val(); this.valChanged = false;',
 					'onchange' => 'this.valChanged = JSON.stringify(this.oVal) !== JSON.stringify(jQuery(this).val()); if (this.valChanged && this != document.activeElement) {if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();}',
 					'onblur' => 'this.oVal = jQuery(this).val(); if (this.valChanged) {if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();}',
@@ -1136,7 +1140,7 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 		$this->startdate = $startdate;
 		$this->enddate = $enddate;
 
-		$this->perms  = FlexicontentHelperPerm::getPerm();
+		$this->perms  = $perms;
 		$this->option = $option;
 		$this->view   = $view;
 		$this->state  = $this->get('State');
