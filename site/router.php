@@ -140,7 +140,7 @@ class _FlexicontentSiteRouter
 		// 3. Handle known 'task'(s) formulating segments of SEF URL appropriately
 		if (isset($query['task']))
 		{
-			if ($query['task'] === 'download' || $query['task'] === 'download_file')
+			if ($query['task'] === 'download')
 			{
 				$segments[] = $query['task'];
 				$segments[] = $query['id'];
