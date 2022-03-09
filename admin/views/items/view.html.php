@@ -1485,6 +1485,19 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 					$this->btn_sm_class . ' btn-fcaction ' . (FLEXI_J40GE ? $this->btn_iv_class : '') . ' ' . $this->tooltip_class, $btn_icon='icon-flag',
 					'data-placement="right" data-title="' . flexicontent_html::encodeHTML(JText::_('FLEXI_ADD_TRANSLATIONS'), 2) . '"', $auto_add = 0, $tag_type='button'
 				);
+
+				/**
+				 * Mark translations as up to date
+				 */
+				$btn_task = $contrl . 'set_uptodate';
+				//JToolbarHelper::custom($btn_task, 'flag', 'translate', 'Translations are up-to-date');
+				$btn_arr[] = flexicontent_html::addToolBarButton(
+					'FLEXI_TRANSLATIONS_SET_AS_UPTODATE', $btn_name = 'set_uptodate', $full_js = '',
+					$msg_alert = '', $msg_confirm = '',
+					$btn_task, $extra_js = '', $btn_list=true, $btn_menu=true, $btn_confirm=false,
+					$this->btn_sm_class . ' btn-fcaction ' . (FLEXI_J40GE ? $this->btn_iv_class : '') . ' ' . $this->tooltip_class, $btn_icon='icon-flag',
+					'data-placement="right" data-title="' . flexicontent_html::encodeHTML(JText::_('FLEXI_TRANSLATIONS_SET_AS_UPTODATE_DESC'), 2) . '"', $auto_add = 0, $tag_type='button'
+				);
 			}
 		}
 

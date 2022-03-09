@@ -1236,7 +1236,7 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 								$assoc_item->title,
 								(isset($state_icons[$assoc_item->state]) ? '<span class="' . $state_icons[$assoc_item->state] . '"></span>' : '') .
 								(isset($state_names[$assoc_item->state]) ? $state_names[$assoc_item->state] . '<br>': '') .
-								($is_oc_item ? '' : '<span class="icon-pencil"></span>' . Text::_( $assoc_modified < $oc_item_modified ? 'FLEXI_TRANSLATION_IS_OUTDATED' : 'FLEXI_TRANSLATION_IS_UPTODATE')) .
+								($is_oc_item ? '' : '<span class="icon-pencil"></span>' . Text::_( !$assoc_item->is_uptodate && $assoc_modified < $oc_item_modified ? 'FLEXI_TRANSLATION_IS_OUTDATED' : 'FLEXI_TRANSLATION_IS_UPTODATE')) .
 								': ' . $assoc_modified_date . '<br>'.
 								( !empty($this->langs->{$assoc_item->lang}) ? ' <img src="'.$this->langs->{$assoc_item->lang}->imgsrc.'" alt="'.$assoc_item->lang.'" /> ' : '').
 								($assoc_item->lang === '*' ? Text::_('FLEXI_ALL') : (!empty($this->langs->{$assoc_item->lang}) ? $this->langs->{$assoc_item->lang}->name: '?')).' <br/> '
@@ -1245,7 +1245,7 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 
 							$state_colors = array(1 => ' fc_assoc_ispublished', -5 => ' fc_assoc_isinprogress');
 							$assoc_state_class   = isset($state_colors[$assoc_item->state]) ? $state_colors[$assoc_item->state] : ' fc_assoc_isunpublished';
-							$assoc_isstale_class = $oc_item && ($assoc_modified < $oc_item_modified) ? ' fc_assoc_isstale' : ' fc_assoc_isuptodate';
+							$assoc_isstale_class = $oc_item && (!$assoc_item->is_uptodate && $assoc_modified < $oc_item_modified) ? ' fc_assoc_isstale' : ' fc_assoc_isuptodate';
 
 							echo '
 							<a class="fc_assoc_translation label label-association ' . $this->popover_class . $assoc_isstale_class . $assoc_state_class . '"

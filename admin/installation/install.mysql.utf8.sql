@@ -176,6 +176,7 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_files` (
 CREATE TABLE IF NOT EXISTS `#__flexicontent_items_ext` (
   `item_id` int(11) unsigned NOT NULL,
   `type_id` int(11) unsigned NOT NULL,
+  `is_uptodate` tinyint(3) unsigned NOT NULL default '0',
   `language` varchar(7) NOT NULL default '*',
   `lang_parent_id` int(11) unsigned NOT NULL default 0,
   `sub_items` text NOT NULL,
@@ -185,7 +186,8 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_items_ext` (
   PRIMARY KEY  (`item_id`),
   FULLTEXT KEY `search_index` (`search_index`),
   KEY `lang_parent_id` (`lang_parent_id`),
-  KEY `type_id` (`type_id`)
+  KEY `type_id` (`type_id`),
+  KEY `is_uptodate` (`is_uptodate`)
 ) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`;
 
 CREATE TABLE IF NOT EXISTS `#__flexicontent_items_tmp` (

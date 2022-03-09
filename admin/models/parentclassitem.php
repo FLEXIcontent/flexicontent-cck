@@ -2327,6 +2327,9 @@ class ParentClassItem extends FCModelAdmin
 			$item->modified_by = $user->get('id');
 		}
 
+		// Clear up-to date marking of this item so that its modification time will be used ...
+		$item->is_uptodate = 0;
+
 		// -- Creation Date
 		if ($item->created && StringHelper::strlen(StringHelper::trim( $item->created )) <= 10)
 		{

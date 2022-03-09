@@ -1124,6 +1124,8 @@ class flexicontent_db
 	{
 		$config = $config ?: (object) array(
 			'table'    => 'content',
+			'table_ext'=> null,
+			'ext_id'   => null,
 			'context'  => 'com_content.item',
 			'created'  => 'created',
 			'modified' => 'modified',
@@ -1131,12 +1133,14 @@ class flexicontent_db
 
 		$db = JFactory::getDbo();
 		$query = 'SELECT a.id as item_id, i.id as id, i.title, i.' . $config->created . ' as created, i.' . $config->modified . ' as modified, '
-			. ' i.language as language, i.language as lang, ' . $db->quoteName('a.key') . ' as ' . $db->quoteName('key') 
+			. ' i.language as language, i.language as lang, ' . $db->qn('a.key') . ' as ' . $db->qn('key') 
 			. (!empty($config->state) ?', i.' . $config->state . ' AS state ' : '')
 			. (!empty($config->catid) ?', i.' . $config->catid . ' AS catid ' : '')
+			. (!empty($config->is_uptodate) ?', ext.' . $config->is_uptodate . ' AS is_uptodate ' : '')
 			. ' FROM #__associations AS a'
 			. ' JOIN #__associations AS k ON a.`key`=k.`key`'
-			. ' JOIN ' . $db->quoteName('#__' . $config->table) . ' AS i ON i.id = k.id'
+			. ' JOIN ' . $db->qn('#__' . $config->table) . ' AS i ON i.id = k.id'
+			. (!empty($config->table_ext) ? ' JOIN ' . $db->qn('#__' . $config->table_ext) . ' AS ext ON i.id = ext.' . $config->ext_id : '')
 			. ' WHERE a.id IN ('. implode(',', $ids) .') AND a.context = ' . $db->quote($config->context)
 		;
 		$associations = $db->setQuery($query)->loadObjectList();
@@ -1197,10 +1201,10 @@ class flexicontent_db
 
 		$db = JFactory::getDbo();
 		$query = $db->getQuery(true)
-			->select($db->quoteName('key'))
+			->select($db->qn('key'))
 			->from('#__associations')
-			->where($db->quoteName('context') . ' = ' . $db->quote($context))
-			->where($db->quoteName('id') . ' = ' . (int) $item->id)
+			->where($db->qn('context') . ' = ' . $db->quote($context))
+			->where($db->qn('id') . ' = ' . (int) $item->id)
 		;
 		$key = $db->setQuery($query)->loadResult();
 
@@ -1212,14 +1216,29 @@ class flexicontent_db
 		{
 			$record_ids = ArrayHelper::toInteger($associations);
 			$where = array();
-			if ($key) $where[] = $db->quoteName('key') . ' = ' . $db->quote($key);
+			if ($key) $where[] = $db->qn('key') . ' = ' . $db->quote($key);
 			if ($associations) $where[] = ' id IN (' . implode(',', $record_ids) . ')';
 
 			$query = $db->getQuery(true)
 				->delete('#__associations')
-				->where($db->quoteName('context') . ' = ' . $db->quote($context))
+				->where($db->qn('context') . ' = ' . $db->quote($context))
 				->where('(' . implode(' OR ', $where) . ')');
 			$db->setQuery($query)->execute();
+
+			if ($context === 'com_content.item')
+			{
+				$ocLang = JComponentHelper::getParams('com_flexicontent')->get('original_content_language', '_site_default_');
+				$ocLang = $ocLang === '_site_default_' ? JComponentHelper::getParams('com_languages')->get('site', '*') : $ocLang;
+				$ocLang = $ocLang !== '_disable_' && $ocLang !== '*' ? $ocLang : false;
+				if ($item->language === $ocLang)
+				{
+					$query = $db->getQuery(true)
+						->update('#__flexicontent_items_ext')
+						->set($db->qn('is_uptodate') . ' = 0')
+						->where($db->qn('item_id') . ' IN (' . implode(',', $record_ids) . ')');
+					$db->setQuery($query)->execute();
+				}
+			}
 		}
 
 

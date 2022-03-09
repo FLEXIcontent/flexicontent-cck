@@ -111,6 +111,40 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 
 
 	/**
+	 * Logic to set a record as up-to-date
+	 *
+	 * @return void
+	 *
+	 * @since 4.1
+	 */
+	public function set_uptodate()
+	{
+		// Check for request forgeries
+		JSession::checkToken('request') or die(JText::_('JINVALID_TOKEN'));
+
+		// Initialize variables
+		$app     = JFactory::getApplication();
+		$db      = JFactory::getDbo();
+
+		$cid = $this->input->get('cid', array(), 'array');
+		$cid = ArrayHelper::toInteger($cid);
+
+		$values = array('set_uptodate' => 1, 'clear_uptodate' => 0);
+		$value  = ArrayHelper::getValue($values, $this->task, 0, 'int');
+
+		$query = $db->getQuery(true)
+			->update('#__flexicontent_items_ext')
+			->set($db->qn('is_uptodate') . ' = ' . (int) $value)
+			->where($db->qn('item_id') . ' IN (' . implode(',', $cid) . ')');
+		$db->setQuery($query)->execute();
+
+		$message = $value == 1
+			? JText::_('FLEXI_N_ITEMS_SET_UPTODATE', count($cid))
+			: JText::_('FLEXI_N_ITEMS_CLEAR_UPTODATE', count($cid));
+		$this->setRedirect($this->returnURL, $message);
+	}
+
+	/**
 	 * Logic to save a record
 	 *
 	 * @return void

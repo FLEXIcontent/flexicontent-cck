@@ -3625,12 +3625,15 @@ class FlexicontentModelItems extends FCModelAdminList
 	public function getLangAssocs($ids = null, $config = null)
 	{
 		$config = $config ?: (object) array(
-			'table'    => $this->records_dbtbl,
-			'context'  => 'com_content.item',
-			'created'  => 'created',
-			'modified' => 'modified',
-			'state'    => 'state',
-			'catid'    => 'catid',
+			'table'       => $this->records_dbtbl,
+			'table_ext'   => 'flexicontent_items_ext',
+			'ext_id'      => 'item_id',
+			'context'     => 'com_content.item',
+			'created'     => 'created',
+			'modified'    => 'modified',
+			'state'       => 'state',
+			'catid'       => 'catid',
+			'is_uptodate' =>'is_uptodate',
 		);
 
 		return parent::getLangAssocs($ids, $config);

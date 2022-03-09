@@ -29,6 +29,8 @@ class flexicontent_items_ext extends JTable{
 	var $related_items			= null;
 	/** @var string */
 	var $search_index				= null;
+	/** @var int */
+	var $is_uptodate				= null;
 
 	/**
 	* @param database A database connector object
