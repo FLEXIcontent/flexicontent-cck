@@ -560,7 +560,7 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 
 		if ($cparams->get('iman_quick_itype_links', 1))
 		{
-			$this->max_tab_types = !$this->isMobile ? 14 : ($this->isTablet ? 5 : 1);
+			$this->max_tab_types = !$this->isMobile ? 20 : ($this->isTablet ? 8 : 1);
 		}
 		else
 		{
