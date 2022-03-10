@@ -289,6 +289,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 			// Reset the ID, the multilingual associations and then treat the request as for Apply.
 			$isnew = 1;
 			$data['id'] = 0;
+			$data['language'] = isset($data['language']) ? $data['language'] : $model->get('language');
 			$data['associations'] = array();
 			$this->task = 'apply';
 

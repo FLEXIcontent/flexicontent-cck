@@ -1771,7 +1771,10 @@ class FlexicontentModelItems extends FCModelAdminList
 			$item = JTable::getInstance('flexicontent_items', '');
 			$item->load($itemid);
 
-			foreach($lang_arr as $lang)
+			// Note: an empty $lang_arr means maintain item language
+			$langs = $lang_arr ?: array($item->language);
+
+			foreach($langs as $lang)
 			{
 				for( $nr=0; $nr < $copynr; $nr++ )  // Number of copies to create, meaningful only when copying without TRANSLATING items
 				{
@@ -2096,7 +2099,6 @@ class FlexicontentModelItems extends FCModelAdminList
 				flexicontent_db::saveAssociations($item, $assoc_data, $_context = 'com_content.item');
 			}
 		}
-
 		return $total_cnt;
 	}
 
