@@ -22,7 +22,7 @@ $field->html = array();  // Make sure this is an array
 /**
  * Iterate passing A REFERENCE of THE VALUE to rebuildThumbs() and other methods so that value can be modifled, and data like real image width, height can be added
  */
-foreach ($field->value as $index => & $value)
+foreach ($field->value as $index => $value)
 {
 	// Compatibility for non-serialized values, e.g. Reload user input after form validation error
 	// or for NULL values in a field group or file ids as values (minigallery legacy field)
@@ -235,21 +235,6 @@ foreach ($field->value as $index => & $value)
 	elseif ($image_subpath)
 	{
 		list($_file_path, $_src_path, $_dest_path, $_field_index, $_extra_prefix) = $this->getThumbPaths($field, $item, $value);
-
-		// Legacy bug ?? Account for Uppercase characters letters stored inside filename that is lowercase in disk
-		if (!file_exists($_file_path))
-		{
-			$image_subpath_tmp = strtolower($image_subpath);
-			if ($image_subpath_tmp !== $image_subpath)
-			{
-				$_file_path_tmp = preg_replace('/\/' . preg_quote($image_subpath) . '$/', '/' . $image_subpath_tmp, $_file_path);
-				if (file_exists($_file_path_tmp) && is_file($_file_path_tmp))
-				{
-					$image_subpath = $image_subpath_tmp;
-					$_file_path = $_file_path_tmp;
-				}
-			}
-		}
 
 		$rel_url_base = str_replace(JPATH_SITE, '', $_src_path);
 		$rel_url_base = ltrim(str_replace('\\', '/', $rel_url_base), '/');

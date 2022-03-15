@@ -938,7 +938,7 @@ class plgFlexicontent_fieldsImage extends FCField
 			/**
 			 * Iterate passing A REFERENCE of THE VALUE to rebuildThumbs() and other methods so that value can be modifled, and data like real image width, height can be added
 			 */
-			foreach ($values as $index => & $value)
+			foreach ($values as $index => $value)
 			{
 				// Non-serialized values, e.g file ids as values (minigallery legacy field)
 				if ((string)(int)$value == $value)
@@ -2468,21 +2468,6 @@ class plgFlexicontent_fieldsImage extends FCField
 
 		// Extra thumbnails sub-folder
 		list($file_path, $src_path, $dest_path, $field_index, $extra_prefix) = $this->getThumbPaths($field, $item, $value);
-
-		// Legacy bug ?? Account for Uppercase characters letters stored inside filename that is lowercase in disk
-		if (!file_exists($file_path))
-		{
-			$filename_tmp = strtolower($filename);
-			if ($filename_tmp !== $filename)
-			{
-				$file_path_tmp = preg_replace('/\/' . preg_quote($filename) . '$/', '/' . $filename_tmp, $file_path);
-				if (file_exists($file_path_tmp) && is_file($file_path_tmp))
-				{
-					$filename = $filename_tmp;
-					$file_path = $file_path_tmp;
-				}
-			}
-		}
 
 		// Return cached data, avoiding rechecking/recreating image thumbnails multiple times
 		if (isset($images_processed[$field_index][$file_path]))
