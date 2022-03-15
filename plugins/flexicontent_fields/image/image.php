@@ -860,6 +860,21 @@ class plgFlexicontent_fieldsImage extends FCField
 			{
 				list($_file_path, $_src_path, $_dest_path, $_field_index, $_extra_prefix) = $this->getThumbPaths($field, $item, $value);
 
+				// Legacy bug ?? Account for Uppercase characters letters stored inside filename that is lowercase in disk
+				if (!file_exists($_file_path))
+				{
+					$image_subpath_tmp = strtolower($image_subpath);
+					if ($image_subpath_tmp !== $image_subpath)
+					{
+						$_file_path_tmp = preg_replace('/\/' . preg_quote($image_subpath) . '$/', '/' . $image_subpath_tmp, $_file_path);
+						if (file_exists($_file_path_tmp) && is_file($_file_path_tmp))
+						{
+							$image_subpath = $image_subpath_tmp;
+							$_file_path = $_file_path_tmp;
+						}
+					}
+				}
+
 				$rel_url_base = str_replace(JPATH_SITE, '', $_src_path);
 				$rel_url_base = ltrim(str_replace('\\', '/', $rel_url_base), '/');
 				$abs_url_base = JUri::root(true) . '/' . $rel_url_base;
@@ -2937,10 +2952,23 @@ class plgFlexicontent_fieldsImage extends FCField
 
 		$filename = basename($value['originalname']);
 
-
 		// Extra thumbnails sub-folder
 		list($file_path, $src_path, $dest_path, $field_index, $extra_prefix) = $this->getThumbPaths($field, $item, $value);
 
+		// Legacy bug ?? Account for Uppercase characters letters stored inside filename that is lowercase in disk
+		if (!file_exists($file_path))
+		{
+			$filename_tmp = strtolower($filename);
+			if ($filename_tmp !== $filename)
+			{
+				$file_path_tmp = preg_replace('/\/' . preg_quote($filename) . '$/', '/' . $filename_tmp, $file_path);
+				if (file_exists($file_path_tmp) && is_file($file_path_tmp))
+				{
+					$filename = $filename_tmp;
+					$file_path = $file_path_tmp;
+				}
+			}
+		}
 
 		// Return cached data, avoiding rechecking/recreating image thumbnails multiple times
 		if (isset($images_processed[$field_index][$file_path]))
@@ -2953,7 +2981,6 @@ class plgFlexicontent_fieldsImage extends FCField
 		{
 			return ($images_processed[$field_index][$file_path] = false);
 		}
-
 
 		/**
 		 * Enforce protection of original image files for any type of Folder-mode
