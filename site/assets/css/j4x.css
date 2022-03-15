@@ -39,7 +39,7 @@ a.link.btn,
 a.direction.btn,
 button.btn.btn-highlight,
 .fc_filter_line.fc_clear_label.fc_filter_buttons_box .btn {
-	border: 1px solid #ccc;
+	border: 1px solid #aaa;
 	background: #ccc;
 }
 .fc_filter_html .btn[type="button"]:hover,
@@ -211,7 +211,7 @@ body .fc-mssg.fc-nobgimage {
 #flexicontent form .fcfield_textval,
 #flexicontent .fc_filedata_txt,
 .select2-container-multi .select2-choices {
-	border: 1px solid #ccc !important;
+	border: 1px solid #aaa !important;
 	border-radius: 4px;
 	padding: 5px;
 }
@@ -283,7 +283,7 @@ form div.container_fcfield > span {
 .fc_filter_html :not(.input-append):not(.input-prepend) > input.fc_field_filter,
 .fc_filter_html :not(.input-append):not(.input-prepend) > input.fc_text_filter:focus,
 .fc_filter_html :not(.input-append):not(.input-prepend) > input.fc_field_filter:focus {
-	border: 1px solid #ccc !important;
+	border: 1px solid #aaa !important;
 }
 .mod_flexifilter_wrapper .fc_filter_html .select2-container-multi .select2-choices {
 	width: 100% !important;
@@ -299,7 +299,7 @@ form div.container_fcfield > span {
 	width: 100%;
 }
 .mod_flexifilter_wrapper .fc_filter_html :not(.input-append):not(.input-prepend) > input.fc_field_filter {
-	border: 1px solid #ccc !important;
+	border: 1px solid #aaa !important;
 	background-position-x: 100% !important;
 }
 .mod_flexifilter_wrapper .fc_filter_html .fc_text_filter.fc_iscalendar,
@@ -471,4 +471,15 @@ label#use_advsearch_options_lbl {
 .buttons.btn-group.fc-iblock.dropdown {
 	background: #fff;
 	border: 2px solid var(--template-bg-dark-20) !important;
+}
+.fc_filter_line {
+	padding: 0px !important;
+	width: 100% !important;
+}
+.mod_flexifilter_wrapper .field-calendar .input-group {
+	align-items: stretch;
+	display: block;
+	flex-wrap: wrap;
+	position: relative;
+	width: 83%;
 }
