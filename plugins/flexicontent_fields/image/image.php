@@ -945,10 +945,7 @@ class plgFlexicontent_fieldsImage extends FCField
 				{
 					if (isset($files_data[$value]))
 					{
-						$_filename = $files_data[$value]->filename_original
-							? $files_data[$value]->filename_original
-							: $files_data[$value]->filename;
-						$value = array('originalname' => $_filename);
+						$value = array('originalname' => $files_data[$value]->filename);
 					}
 					else
 					{
@@ -1947,8 +1944,7 @@ class plgFlexicontent_fieldsImage extends FCField
 				{
 					if (isset($files_data[$value]))
 					{
-						$_filename = $files_data[$value]->filename_original ? $files_data[$value]->filename_original : $files_data[$value]->filename;
-						$value = array('originalname' => $_filename);
+						$value = array('originalname' => $files_data[$value]->filename);
 					}
 					else $value = array('originalname' => null);
 					$post[$index] = serialize($value);
@@ -1994,8 +1990,7 @@ class plgFlexicontent_fieldsImage extends FCField
 				{
 					if (isset($files_data[$value]))
 					{
-						$_filename = $files_data[$value]->filename_original ? $files_data[$value]->filename_original : $files_data[$value]->filename;
-						$value = array('originalname' => $_filename);
+						$value = array('originalname' => $files_data[$value]->filename);
 					}
 					else $value = array('originalname' => null);
 					$post[$index] = serialize($value);
