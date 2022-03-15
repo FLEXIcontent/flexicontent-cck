@@ -756,10 +756,11 @@ class fc_Waveform_LazyLoad
 
 	fcfield_mediafile.assignFile = function(value_container_id, file, keep_modal, config_name)
 	{
-		//window.console.log(file);
-		//window.console.log(config_name);
-		//window.console.log(fcfield_mediafile_base_url[config_name] + '/' + file.filename);
-
+		// Decode php utf8_encode
+		for (const key in file) {
+			file[key] = decodeURIComponent(escape(file[key]));
+		}
+		
 		// We use altname (aka title) that is by default (unless modified) same as 'filename_original'
 		var originalname = file.filename_original ? file.filename_original : file.filename;
 		var displaytitle = file.altname && (file.altname!=file.filename) ? file.altname : '-';

@@ -105,6 +105,11 @@
 
 	fcfield_file.assignFile = function(value_container_id, file, keep_modal, config_name)
 	{
+		// Decode php utf8_encode
+		for (const key in file) {
+			file[key] = decodeURIComponent(escape(file[key]));
+		}
+
 		// We use altname (aka title) that is by default (unless modified) same as 'filename_original'
 		var originalname = file.filename_original ? file.filename_original : file.filename;
 		var displaytitle = file.altname && (file.altname!=file.filename) ? file.altname : '-';
