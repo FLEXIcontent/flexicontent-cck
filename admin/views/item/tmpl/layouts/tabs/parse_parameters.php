@@ -15,12 +15,13 @@ class FcFormLayoutParameters
 	 * @param   array of objects   $coreprops_fields   The coreprops fields (objects) ... that could be used to place core form elements via fields manager
 	 * @param   array of strings   $via_core_field     The field names of core form elements ...  that can use core field in fields manager
 	 * @param   array of strings   $via_core_prop      The field names of core form elements ...  that can use "core property" field type in fields manager
+	 * @param   object             $typeselected       The item type of current form. If $typeselected->id === 0 then no type has been selected yet
 	 *
 	 * @return  array    The configuration
 	 *
 	 * @since   4.0
 	 */
-	function createPlacementConf( $item, & $fields, $params, $coreprops_fields, $via_core_field, $via_core_prop)
+	function createPlacementConf( $item, & $fields, $params, $coreprops_fields, $via_core_field, $via_core_prop, $typeselected)
 	{
 		$app    = JFactory::getApplication();
 		$CFGsfx = $app->isClient('site') ? '' : '_be';
@@ -169,14 +170,17 @@ class FcFormLayoutParameters
 		}
 
 
-		// 4. Find if any core properties are missing a form placement field (a coreprops field named: form_*)
+		// 4. Find if any core properties are missing a form placement field (a coreprops field named: form_*) (applicable only if item type has been selected)
 		$coreprop_missing = array();
-		foreach($via_core_prop as $fn => $i)
+		if ($typeselected->id)
 		{
-			if (!isset($coreprops_fields[$fn]))
+			foreach($via_core_prop as $fn => $i)
 			{
-				$coreprop_missing[$fn] = true;
-				$tab_fields['below'][$fn] = 1;
+				if (!isset($coreprops_fields[$fn]))
+				{
+					$coreprop_missing[$fn] = true;
+					$tab_fields['below'][$fn] = 1;
+				}
 			}
 		}
 

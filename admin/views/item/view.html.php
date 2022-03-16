@@ -322,8 +322,8 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		 */
 
 		// Get available types and the currently selected/requested type
-		$types         = $model->getTypeslist();
-		$typesselected = $model->getItemType();
+		$types        = $model->getTypeslist();
+		$typeselected = $model->getItemType();
 
 		// Get type parameters, these are needed besides the 'merged' item parameters, e.g. to get Type's default layout
 		$tparams = $model->getTypeparams();
@@ -714,7 +714,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		$lists = $this->_buildEditLists($perms, $page_params, $session_data);
 
 		// Create placement configuration for CORE properties
-		$placementConf = $this->_createPlacementConf($item, $fields, $page_params, $typesselected);
+		$placementConf = $this->_createPlacementConf($item, $fields, $page_params, $typeselected);
 
 		// Get menu overridden categories/main category fields, (FALSE IN BACKEND, no menu configuration in backend)
 		$menuCats = !$isSite ? false : $this->_getMenuCats($item, $perms, $page_params);
@@ -921,7 +921,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		$this->subscribers   = $subscribers;
 		$this->usedtagsdata  = $usedtagsdata;
 		$this->quicktagsdata = $quicktagsdata;
-		$this->typesselected = $typesselected;
+		$this->typeselected  = $typeselected;
 
 		$this->fields     = $fields;
 		$this->tparams    = $tparams;
@@ -1013,7 +1013,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 
 		$categories    = $globalcats;
 		$types         = $model->getTypeslist();
-		$typesselected = $model->getItemType();
+		$typeselected = $model->getItemType();
 		$subscribers   = $model->getSubscribersCount();
 
 		$isnew = !$item->id;
@@ -1483,7 +1483,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		$attribs = 'class="'.$class.'"';
 		$fieldname = 'jform[type_id]';
 		$elementid = 'jform_type_id';
-		$lists['type'] = flexicontent_html::buildtypesselect($types, $fieldname, $typesselected->id, 1, $attribs, $elementid, $check_perms=true );
+		$lists['type'] = flexicontent_html::buildtypesselect($types, $fieldname, $typeselected->id, 1, $attribs, $elementid, $check_perms=true );
 
 
 		// ***
@@ -1656,7 +1656,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		$tparams = $model->getTypeparams();
 		$tparams = new JRegistry($tparams);
 
-		$typesselected = $model->getItemType();
+		$typeselected = $model->getItemType();
 
 		$cid    = $model->getId();
 		$isnew  = ! $cid;
@@ -1708,7 +1708,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		$btn_arr = $add_inline ? array('fc_actions' => '') : array();
 
 		// Apply button
-		if ( in_array( 'apply_ajax', $allowbuttons) && !$isnew && $typesselected->id  )
+		if ( in_array( 'apply_ajax', $allowbuttons) && !$isnew && $typeselected->id  )
 		{
 			$btn_name = 'apply_ajax';
 			$btn_task = $ctrl.'.apply_ajax';
@@ -1721,7 +1721,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		}
 
 		// Apply & Reload button   ***   (Apply Type, is a special case of new that has not loaded custom fieds yet, due to type not defined on initial form load)
-		if ( in_array( 'apply', $allowbuttons) || !$typesselected->id  )
+		if ( in_array( 'apply', $allowbuttons) || !$typeselected->id  )
 		{
 			$btn_name = $item->type_id ? 'apply' : 'apply_type';
 			$btn_task = $item->type_id ? $ctrl.'.apply' : $ctrl.'.apply_type';
@@ -1729,7 +1729,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 			// If apply_ajax is disabled then just call the button "Save"
 			$btn_title = !$isnew
 				? (in_array( 'apply_ajax', $allowbuttons) ? 'FLEXI_APPLY_N_RELOAD' : 'FLEXI_SAVE')
-				: ($typesselected->id ? 'FLEXI_ADD' : 'FLEXI_APPLY_TYPE');
+				: ($typeselected->id ? 'FLEXI_ADD' : 'FLEXI_APPLY_TYPE');
 
 			//JToolbarHelper::apply($btn_task, $btn_title, false);
 
@@ -1755,7 +1755,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 
 		$btn_arr = $add_inline ? array('fc_actions' => '') : array();
 
-		if ($typesselected->id)
+		if ($typeselected->id)
 		{
 			$btn_name = 'save';
 			$btn_task = $ctrl.'.save';
@@ -2586,7 +2586,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 	 *
 	 * @since 1.0
 	 */
-	private function _createPlacementConf( $item, & $fields, $page_params, $typesselected )
+	private function _createPlacementConf( $item, & $fields, $page_params, $typeselected )
 	{
 		$app    = JFactory::getApplication();
 		$CFGsfx = $app->isClient('site') ? '' : '_be';
@@ -2643,7 +2643,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 			// Get custom placement and placement forced to be via fields manager
 			require_once($params_file);
 			$fcForm_layout_params = new FcFormLayoutParameters();
-			$placementConf = $fcForm_layout_params->createPlacementConf( $item, $fields, $page_params, $coreprops_fields, $via_core_field, $via_core_prop);
+			$placementConf = $fcForm_layout_params->createPlacementConf( $item, $fields, $page_params, $coreprops_fields, $via_core_field, $via_core_prop, $typeselected);
 		}
 		else
 		{
@@ -2656,11 +2656,11 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		 */
 		$placementConf['placementMsgs'] = array();
 
-		if ( count($placementConf ['coreprop_missing']) )
+		if ( count($placementConf ['coreprop_missing']) && $typeselected->id )
 		{
 			$placementConf['placementMsgs']['warning'] = array();
 			$placementConf['placementMsgs']['warning'][] = JText::sprintf( 'FLEXI_FORM_FIELDSMAN_PLACING_FIELDS_MISSING',
-				'<span class="badge">'. JText::_($typesselected->name) . '</span>',
+				'<span class="badge">'. JText::_($typeselected->name) . '</span>',
 				'<br><span class="fc_elements_listed_small">' . implode(', ', array_keys($placementConf ['coreprop_missing'])) . '</span><br>',
 				'<a href="javascript:;" class="btn btn-primary"
 					onclick="alert(\'Not implemented yet, please create manually\'); return false;"
