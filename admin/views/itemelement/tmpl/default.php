@@ -175,7 +175,8 @@ $js .= (!$isXtdBtn ? "" : "
 
 		if (!Joomla.getOptions('xtd-fcitems')) {
 			// Something went wrong!
-			window.parent.jModalClose();
+			if (window.parent.Joomla.Modal) window.parent.Joomla.Modal.getCurrent().close();
+			else if (window.parent.jModalClose) window.parent.jModalClose();
 			return false;
 		}
 
@@ -195,7 +196,8 @@ $js .= (!$isXtdBtn ? "" : "
 			window.parent.jInsertEditorText(tag, editor);
 		}
 
-		window.parent.jModalClose();
+		if (window.parent.Joomla.Modal) window.parent.Joomla.Modal.getCurrent().close();
+		else if (window.parent.jModalClose) window.parent.jModalClose();
 		return false;
 	};
 
