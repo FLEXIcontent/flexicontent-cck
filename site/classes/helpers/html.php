@@ -3560,14 +3560,14 @@ class flexicontent_html
 		{
 			$link  = 'index.php?option=com_flexicontent' . ($menu_itemid
 				? '&amp;Itemid='.$menu_itemid
-				: '&amp;view='.FLEXI_ITEMVIEW.'&amp;task=add'
+				: '&amp;view='.FLEXI_ITEMVIEW.'&amp;task=items.add'
 			);			
 			$link  = JRoute::_( $link);
 		}
 		else
 		{
 			$link  = 'index.php?option=com_flexicontent' . ($menu_itemid ? '&amp;menu_id='.$menu_itemid : '')
-				. '&view=types&tmpl=component&layout=typeslist&action=new';
+				. '&amp;view=types&amp;tmpl=component&amp;layout=typeslist&amp;action=new';
 			$link  = JUri::base() . $link;
 		}
 

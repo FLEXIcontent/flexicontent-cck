@@ -142,7 +142,7 @@ $FE_item_tasks_proxied = array(
 		'apply_type', 'apply', 'apply_ajax',
 		'save2new', 'save2copy', 'save_a_preview',
 );
-if (!$controller && $view === 'item' && in_array($task, $FE_item_tasks_proxied))
+if (!$controller && ($view === 'item' || !$view) && in_array($task, $FE_item_tasks_proxied))
 {
 	$controller = 'items';
 	$jinput->set('controller', $controller);

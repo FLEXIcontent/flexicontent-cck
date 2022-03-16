@@ -1,15 +1,23 @@
 <?php
 $user = JFactory::getUser();
 $app  = JFactory::getApplication();
+$isAdmin = $app->isClient('administrator');
+
 $action = $app->input->getCmd('action', '');
 $menu_id = $app->input->getInt('menu_id', '');
-$catid = $app->input->getInt('catid', 0);
+$catid = $isAdmin
+	? $app->input->getInt('catid', 0)
+	: $app->input->getInt('maincat', 0);
+$refererURL = !empty($_SERVER['HTTP_REFERER']) && flexicontent_html::is_safe_url($_SERVER['HTTP_REFERER'])
+	? $_SERVER['HTTP_REFERER']
+	: JUri::base();
+$returnURL = $isAdmin ? '' : $refererURL;
 
 // Get types
 $types = flexicontent_html::getTypesList( $_type_ids=false, $_check_perms = false, $_published=true);
 $types = is_array($types) ? $types : array();
 
-$ctrl_task = $app->isClient('administrator') ? 'items.add' : 'add';
+$ctrl_task = 'items.add';
 $icon = "components/com_flexicontent/assets/images/layout_add.png";
 $btn_class = 'choose_type';
 
@@ -17,9 +25,12 @@ echo '
 <div id="flexicontent" style="margin:32px;" >
 	<ul class="nav nav-tabs nav-stacked">
 		';
-		$link = $app->isClient('administrator')
-			? "index.php?option=com_flexicontent&amp;controller=items&amp;task=".$ctrl_task."&amp;". JSession::getFormToken() ."=1" . '&catid=' . $catid
-			: "index.php?option=com_flexicontent&amp;task=".$ctrl_task."&amp;". JSession::getFormToken() ."=1";
+		$link = 'index.php?option=com_flexicontent&amp;view=item'
+			. '&amp;task=' . $ctrl_task
+			. '&amp;catid=' . $catid
+			. ($menu_id ? '&amp;Itemid=' . $menu_id : '')
+			. '&amp;return='.base64_encode($returnURL)
+			. '&amp;' . JSession::getFormToken() . '=1';
 		$_name = '- ' . JText::_("FLEXI_NO_TYPE") . ' -';
 		?>
 			<li>
@@ -85,9 +96,13 @@ echo '
 				}
 				else
 				{
-					$link = $app->isClient('administrator')
-						? "index.php?option=com_flexicontent&amp;controller=items&amp;task=".$ctrl_task."&amp;typeid=".$type->id."&amp;". JSession::getFormToken() ."=1" . '&catid=' . $catid
-						: "index.php?option=com_flexicontent&amp;task=".$ctrl_task."&amp;typeid=".$type->id.($menu_id ? '&amp;Itemid='.$menu_id : '')."&amp;". JSession::getFormToken() ."=1" . '&catid=' . $catid;
+					$link = 'index.php?option=com_flexicontent&amp;view=item'
+						. '&amp;task=' . $ctrl_task
+						. '&amp;typeid=' . $type->id
+						. '&amp;catid=' . $catid
+						. ($menu_id ? '&amp;Itemid=' . $menu_id : '')
+						. '&amp;return='.base64_encode($returnURL)
+						. '&amp;' . JSession::getFormToken() . '=1';
 				}
 				?>
 			<li>
