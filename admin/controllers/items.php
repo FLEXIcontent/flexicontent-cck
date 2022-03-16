@@ -70,6 +70,9 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 
 		$this->registerTask('copy',         'batch');
 		$this->registerTask('translate',    'batch');
+
+		// Note: canManage, is not applicable for items manager, more specific ACL should be used
+		$this->canManage = false;
 	}
 
 

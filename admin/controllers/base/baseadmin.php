@@ -112,7 +112,7 @@ class FlexicontentControllerBaseAdmin extends FlexicontentController
 		// Warning messages
 		$this->warn_locked_recs_skipped     = 'FLEXI_SKIPPED_N_ROWS_WITH_ASSOCIATIONS';
 		$this->warn_locked_recs_skipped_del = 'FLEXI_SKIPPED_N_ROWS_WITH_ASSOCIATIONS';
-		$this->warn_noauth_recs_skipped     = 'FLEXI_SKIPPED_N_ROWS_UNAUTHORISED';		
+		$this->warn_noauth_recs_skipped     = 'FLEXI_SKIPPED_N_ROWS_UNAUTHORISED';
 		$this->warn_noauth_recs_skipped_del = 'FLEXI_SKIPPED_N_ROWS_DUE_TO_NO_ACL_OR_NOT_IN_TRASH';
 
 		// Messages about related data
@@ -988,29 +988,44 @@ return;*/
 
 		// Calculate access
 		$cid_noauth = array();
-		$is_authorised = $this->canManage;
+		$is_authorised = $this->record_name === 'item'
+			? FlexicontentHelperPerm::getPerm()->CanAccLvl
+			: $this->canManage;
 
-		// Find and excluded records that we can not change their state
-		if ($is_authorised)
+		// Check access
+		if (!$is_authorised)
 		{
-			$record_model = $this->getModel($this->record_name);
+			$app->setHeader('status', '403 Forbidden', true);
+			$app->enqueueMessage(JText::_('FLEXI_ALERTNOTAUTH_TASK'), 'error');
 
-			foreach ($cid as $i => $_id)
+			if ($this->input->getCmd('tmpl') !== 'component')
 			{
-				$record = $record_model->getRecord($_id);
-
-				if (!$record_model->canEditState($record))
-				{
-					$cid_noauth[] = $_id;
-					unset($cid[$i]);
-				}
+				$this->setRedirect($this->returnURL);
 			}
 
-			$is_authorised = count($cid);
+			return;
 		}
 
+		/**
+		 * Find and excluded records that we can not change their state
+		 */
+		$record_model = $this->getModel($this->record_name);
+
+		foreach ($cid as $i => $_id)
+		{
+			$record = $record_model->getRecord($_id);
+
+			if (!$record_model->canEditState($record))
+			{
+				$cid_noauth[] = $_id;
+				unset($cid[$i]);
+			}
+		}
+
+		$is_authorised = count($cid);
+
 		$msg_noauth = JText::_('FLEXI_CANNOT_CHANGE_ACCLEVEL_ASSETS')
-			. ': ' . implode(',', $non_auth_cid)
+			. ': ' . implode(',', $cid_noauth)
 			. ',' . JText::_('FLEXI_REASON_NO_PUBLISH_PERMISSION');
 
 		// Check access
@@ -1018,7 +1033,11 @@ return;*/
 		{
 			$app->enqueueMessage($msg_noauth, 'error');
 			$app->setHeader('status', '403 Forbidden', true);
-			$this->setRedirect($this->returnURL);
+
+			if ($this->input->getCmd('tmpl') !== 'component')
+			{
+				$this->setRedirect($this->returnURL);
+			}
 
 			return;
 		}
@@ -1044,7 +1063,7 @@ return;*/
 			throw new Exception($msg, 500);
 		}
 
-		$msg = JText::sprintf('FLEXI_RECORDS_MODIFIED', count($cid));
+		$msg = count($cid) . ' ' . JText::_('FLEXI_RECORDS_MODIFIED');
 
 		$this->setRedirect($this->returnURL, $msg, 'success');
 	}

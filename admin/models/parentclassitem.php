@@ -1230,7 +1230,7 @@ class ParentClassItem extends FCModelAdmin
 		}
 
 		// (item edit form ACL) edit viewing access level
-		if (!$perms->CanAccLvl)
+		if (!$perms->CanAccLvl || !$canEditState)
 		{
 			$form->setFieldAttribute('access', 'disabled', 'true');
 			$form->setFieldAttribute('access', 'filter', 'unset');
