@@ -44,10 +44,11 @@ class PlgButtonFccat extends JPlugin
 
 		$button = new JObject;
 		$button->modal   = true;
+		$button->icon    = 'add-category';
 		$button->class   = 'btn';
 		$button->link    = $link;
 		$button->text    = JText::_('PLG_EDITORS-XTD_FCCAT_BUTTON_FCCAT');
-		$button->name    = 'flexicontent';
+		$button->name    = FLEXI_J40GE ? 'fccat' : 'list';
 		$button->options = "{handler: 'iframe', size: {x: 800, y: 500}}";
 
 		return $button;

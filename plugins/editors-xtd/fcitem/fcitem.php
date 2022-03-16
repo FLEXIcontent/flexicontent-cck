@@ -44,10 +44,11 @@ class PlgButtonFcitem extends JPlugin
 
 		$button = new JObject;
 		$button->modal   = true;
+		$button->icon    = 'add-fcitem';
 		$button->class   = 'btn';
 		$button->link    = $link;
 		$button->text    = JText::_('PLG_EDITORS-XTD_FCITEM_BUTTON_FCITEM');
-		$button->name    = 'flexicontent';
+		$button->name    = FLEXI_J40GE ? 'fcitem' : 'file-2';
 		$button->options = "{handler: 'iframe', size: {x: 800, y: 500}}";
 
 		return $button;
