@@ -188,7 +188,8 @@ class plgFlexicontent_fieldsImage extends FCField
 			// Check and if needed install Joomla template overrides into current Joomla template
 			flexicontent_html::install_template_overrides();
 
-			if (!FLEXI_J40GE)
+			//if (!FLEXI_J40GE)
+			if (0)
 			{
 				// We will use the mootools based media manager
 				JHtml::_('behavior.framework', true);
@@ -498,7 +499,7 @@ class plgFlexicontent_fieldsImage extends FCField
 
 				" .
 				// Re-init joomla media form field element
-				(FLEXI_J40GE ? "newField.find('.field-media-wrapper').fieldMedia();" : '')
+				(/*FLEXI_J40GE*/1 && $image_source === -2 ? "newField.find('.field-media-wrapper').fieldMedia();" : '')
 				;
 
 			// Add new element to sortable objects (if field not in group)
