@@ -1752,9 +1752,9 @@
 				<option value="0" show_list="" hide_list="dispversioning">FLEXI_NO</option>
 				<option value="1" show_list="dispversioning" hide_list="">FLEXI_YES</option>
 			</field>
-			<field name="disable_diff" type="fcradio" default="0" label="FLEXI_VERSION_COMPARING" description="FLEXI_VERSION_COMPARING_DESC" class="dispversioning btn-group group-fcmethod fcnoyes">
-				<option value="1">FLEXI_NO</option>
-				<option value="0">FLEXI_YES</option>
+			<field name="allow_versioncomparing" type="fcradio" default="1" label="FLEXI_VERSION_COMPARING" description="FLEXI_VERSION_COMPARING_DESC" class="dispversioning btn-group group-fcmethod fcnoyes">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="nr_versions" type="fcradio" default="10" label="FLEXI_NR_OF_VERSIONS" description="FLEXI_NR_OF_VERSIONS_DESC" class="dispversioning btn-group btn-group-yesno">
 				<option value="5">FLEXI_5</option>

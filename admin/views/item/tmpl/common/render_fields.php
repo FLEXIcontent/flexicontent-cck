@@ -1553,7 +1553,8 @@ if ($typeid && $use_versioning && $this->perms['canversion'] && $versionsplaceme
 			else :
 			$date_format = (($date_format = JText::_( 'FLEXI_DATE_FORMAT_FLEXI_VERSIONS_J16GE' )) == 'FLEXI_DATE_FORMAT_FLEXI_VERSIONS_J16GE') ? "d/M H:i" : $date_format;
 			foreach ($this->versions as $version) :
-				$class = ($version->nr == $this->row->version) ? ' id="active-version" class="success"' : '';
+				$isCurrent = (int) $version->nr === (int) $this->row->current_version;
+				$class = $isCurrent ? ' id="active-version" class="success"' : '';
 				if ((int)$version->nr > 0) :
 			?>
 			<tr<?php echo $class; ?>>
@@ -1565,26 +1566,27 @@ if ($typeid && $use_versioning && $this->perms['canversion'] && $versionsplaceme
 					<a href="javascript:;" class="hasTooltip" title="<?php echo JHtml::tooltipText( JText::_( 'FLEXI_COMMENT' ), ($version->comment ? $version->comment : 'No comment written'), 0, 1); ?>"><?php echo $comment_image;?></a>
 
 					<?php if (!$isSite) :?>
-						<?php if ((int) $version->nr === (int) $this->row->current_version) : ?>
-							<a onclick="javascript:return clickRestore('<?php echo JUri::base(true); ?>/index.php?option=com_flexicontent&amp;view=item&amp;<?php echo $task_items;?>edit&amp;<?php ($isSite ? 'id=' : 'cid=') . $this->row->id;?>&amp;version=<?php echo $version->nr; ?>');" href="javascript:;"><?php echo JText::_( 'FLEXI_CURRENT' ); ?></a>
 
-						<?php else : ?>
-
+						<?php if (!$isCurrent && $allow_versioncomparing) : ?>
 							<a class="modal-versions"
 								href="index.php?option=com_flexicontent&amp;view=itemcompare&amp;cid=<?php echo $this->row->id; ?>&amp;version=<?php echo $version->nr; ?>&amp;tmpl=component"
 								title="<?php echo JText::_( 'FLEXI_COMPARE_WITH_CURRENT_VERSION' ); ?>"
 							>
 								<?php echo $compare_image; ?>
 							</a>
+						<?php endif; ?>
 
+						<?php if ($isCurrent) : ?>
+							<a onclick="javascript:return clickRestore('<?php echo JUri::base(true); ?>/index.php?option=com_flexicontent&amp;view=item&amp;<?php echo $task_items;?>edit&amp;<?php ($isSite ? 'id=' : 'cid=') . $this->row->id;?>&amp;version=<?php echo $version->nr; ?>');" href="javascript:;"><?php echo JText::_( 'FLEXI_CURRENT' ); ?></a>
+						<?php else : ?>
 							<a onclick="javascript:return clickRestore('<?php echo JUri::base(true); ?>/index.php?option=com_flexicontent&amp;task=items.edit&amp;<?php ($isSite ? 'id=' : 'cid=') . $this->row->id;?>&amp;version=<?php echo $version->nr; ?>&amp;<?php echo JSession::getFormToken();?>=1');"
 								href="javascript:;"
 								title="<?php echo JText::sprintf( 'FLEXI_REVERT_TO_THIS_VERSION', $version->nr ); ?>"
 							>
 								<?php echo $revert_image; ?>
 							</a>
-
 						<?php endif; ?>
+
 					<?php endif; ?>
 
 				</td>

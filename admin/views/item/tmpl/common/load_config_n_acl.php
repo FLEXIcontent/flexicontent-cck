@@ -57,6 +57,7 @@ $useaccess   = (int) $this->params->get('useaccess' . $CFGsfx, 1);
 $usemaincat  = (int) $this->params->get('usemaincat' . $CFGsfx, 1);
 
 $use_versioning          = (int) $this->params->get('use_versioning', 1);
+$allow_versioncomparing  = (int) $this->params->get('allow_versioncomparing', 1);
 $auto_approve            = (int) $this->params->get('auto_approve', 1);
 $approval_warning_inform = $this->params->get('approval_warning_inform'. $CFGsfx, 1);
 $is_autopublished        = $isSite && $isnew && $this->params->get('autopublished', 0);
