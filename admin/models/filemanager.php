@@ -1427,7 +1427,7 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 		// File field relation sub query
 		$query = 'SELECT '. ($count_items  ?  'a.id as file_id, COUNT(i.id) as item_count'  :  'i.id as id, i.id as title')
 			. ' FROM #__flexicontent_file_usage AS i'
-			. ' JOIN #__flexicontent_files AS a ON a.id=id.file_id '. $file_ids_list
+			. ' JOIN #__flexicontent_files AS a ON a.id=i.file_id '. $file_ids_list
 			//. ' JOIN #__users AS ua ON ua.id = a.uploaded_by'
 			. $where
 			. $groupby
