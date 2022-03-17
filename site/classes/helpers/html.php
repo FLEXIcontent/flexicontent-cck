@@ -5247,7 +5247,7 @@ class flexicontent_html
 		return array($out1, $out2);
 	}
 
-	static function flexiHtmlDiff($old, $new, $mode=0)
+	/*static function flexiHtmlDiff($old, $new, $mode=0)
 	{
 		$t1 = explode(" ",$old);
 		$t2 = explode(" ",$new);
@@ -5265,6 +5265,31 @@ class flexicontent_html
 		$html1 = implode(" ", $html1);
 		$html2 = implode(" ", $html2);
 		return array($html1, $html2);
+	}*/
+
+	static function flexiHtmlDiff($before, $after, $mode=0)
+	{
+		require_once (JPATH_SITE.'/components/com_flexicontent/librairies/phpdiff/diff.php');
+		$diff = new fc_diff_class;
+		$difference = new stdClass;
+		$difference->mode = 'w';
+		$difference->patch = true;
+		$after_patch = new stdClass;
+		if ($diff->FormatDiffAsHtml($before, $after, $difference) && $diff->Patch($before, $difference->difference, $after_patch))
+		{
+			//echo '<div>Difference</div><div class="frameResults">', $difference->html, '</div>';
+			//echo '<div>Patch</div><div class="frameResults">', ($after === $after_patch->after ? 'OK: The patched text matches the text after.' : 'There is a BUG: The patched text (<b>'.HtmlSpecialChars($after_patch->after).'</b>) does not match the text after (<b>'.HtmlSpecialChars($after).'</b>).'), '</div>';
+			return array(
+				0 => ($mode ? htmlspecialchars($before, ENT_QUOTES, 'UTF-8') : $before),
+				1 => ($mode ? htmlspecialchars($after, ENT_QUOTES, 'UTF-8') : $after),
+				2 => ($mode ? $difference->html : htmlspecialchars_decode($difference->html)),
+			);
+		}
+		else
+		{
+			echo '<div>Error: ', htmlspecialchars($diff->error), '</div>';
+			return array(0 => $before . '<br>' . $diff->error, $after);
+		}
 	}
 
 

@@ -1193,6 +1193,7 @@ class FCIndexedField extends FCField
 		// Set field and item objects
 		$this->setField($field);
 		$this->setItem($item);
+		$field->isIndexedfield = true;
 
 
 		/**
@@ -1233,7 +1234,7 @@ class FCIndexedField extends FCField
 
 		// Check for no values and not displaying ALL elements
     $display_all = $field->parameters->get( 'display_all', 0 ) && !$is_ingroup;  // NOT supported inside fielgroup yet
-    $display_all = $prop === 'csv_export' ? 0 : $display_all;
+    $display_all = $prop === 'csv_export' || $realview === 'itemcompare' ? 0 : $display_all;
 
 
 		/**
@@ -1260,6 +1261,7 @@ class FCIndexedField extends FCField
 		$sql_mode = $field->parameters->get( 'sql_mode', 0 ) ;
 		$field_elements = $field->parameters->get( 'field_elements', '' ) ;
 		$text_or_value  = (int) $field->parameters->get( 'text_or_value', (static::$usesImages ? 2 : 1) ) ;
+		$text_or_value  = $realview === 'itemcompare' ? 1 : $text_or_value;
 		$tooltip_class = 'hasTooltip';
 
 		// image specific or image related variables

@@ -39,10 +39,35 @@ class FlexicontentViewItemcompare extends JViewLegacy {
 		$version    = $jinput->get('version', 0, 'int');
 		$codemode   = $jinput->getInt('codemode', 0);
 		$cparams    = JComponentHelper::getParams('com_flexicontent');
+		$isAdmin    = $app->isClient('administrator');
+
+		// Add css to document
+		if ($isAdmin)
+		{
+			!JFactory::getLanguage()->isRtl()
+				? $document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', array('version' => FLEXI_VHASH))
+				: $document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', array('version' => FLEXI_VHASH));
+		}
+		!JFactory::getLanguage()->isRtl()
+			? $document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x.css' : 'j3x.css'), array('version' => FLEXI_VHASH))
+			: $document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x_rtl.css' : 'j3x_rtl.css'), array('version' => FLEXI_VHASH));
+
+		// Fields common CSS
+		$document->addStyleSheet(JUri::root(true).'/components/com_flexicontent/assets/css/flexi_form_fields.css', array('version' => FLEXI_VHASH));
 		
 		//a trick to avoid loosing general style in modal window
-		$css = 'body, td, th { font-size: 11px; } .novalue { color: gray; font-style: italic; }';
-		$document->addStyleDeclaration($css);
+		$document->addStyleDeclaration('
+			body, td, th {
+				font-size: 14px;
+			}
+			td {
+				border: 1px solid #e0e0e0;
+			}
+			.novalue {
+				color: gray;
+				font-style: italic;
+			}
+		');
 
 
 		$allow_versioncomparing = (int) $cparams->get('allow_versioncomparing', 1);
@@ -64,9 +89,15 @@ class FlexicontentViewItemcompare extends JViewLegacy {
 		$fsets[0]	= $model->getExtrafields(true);
 		$rows[$version]  = clone($model->getItem(null, false, true, $version));
 		$fsets[$version] = $model->getExtrafields(true);
+		$rows[$version]->version_id = $version;
 
-		$vars = null;
-		FlexicontentFields::getItemFields($rows, $vars);
+		$vars  = null;
+		$items = array($rows[0]);
+		FlexicontentFields::getItemFields($items, $vars);
+
+		$vars  = null;
+		$items = array($rows[$version]);
+		FlexicontentFields::getItemFields($items, $vars);
 
 		$versions		= $model->getVersionList();
 
@@ -94,7 +125,7 @@ class FlexicontentViewItemcompare extends JViewLegacy {
 
 				if (!isset($field->display) && $field->field_type !== 'coreprops')
 				{
-					$field->display = '<span class="novalue">' . JText::_('FLEXI_NO_VALUE') . '</span>';
+					$field->display = '';
 				}
 			}
 		}
