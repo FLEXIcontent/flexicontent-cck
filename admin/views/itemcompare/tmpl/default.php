@@ -21,60 +21,78 @@ defined('_JEXEC') or die('Restricted access');
 $tooltip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
 ?>
 <style type="text/css">
+table#itemcompare ins,
 table#itemcompare u{
 	color:green;
 }
+table#itemcompare del,
 table#itemcompare s{
 	color:red;
 }
 </style>
-<div class="flexicontent" style="width: 90%;">
-
-	<div align="left" id="itemcompare">
+<div class="flexicontent" style="width: 100%;">
+	<div align="right">
 		<?php echo '
-		<a href="index.php?option=com_flexicontent&view=itemcompare' .
+		<a class="btn btn-primary" href="index.php?option=com_flexicontent&view=itemcompare' .
 			'&cid[]=' . $this->rows[0]->id .
 			'&version=' . $this->version .
 			'&tmpl=component&codemode=' . ($this->codemode ? 0 : 1) .
 		'">
-			' . JText::_($this->codemode ? 'FLEXI_VERSION_VIEW_MODE' : 'FLEXI_VERSION_CODE_MODE') . '
+			' . JText::_('FLEXI_CHANGE_TO') . ' ' . JText::_($this->codemode ? 'FLEXI_VERSION_VIEW_MODE' : 'FLEXI_VERSION_CODE_MODE') . '
 		</a>';
 		?>
 	</div>
 
-	<table class="admintable" style="width: 100%; border: 1px solid black;">
+	<table id="itemcompare" class="table table-striped table-condensed" style="width: 100%;">
 		<tr>
-			<th style="align: right; width: 6%; font-size:16px;">
+			<th style="align: right; width: 6%;">
+				<?php echo JText::_( 'FLEXI_FIELD' ); ?>
 			</th>
-			<th style="align: left; width: 47%; font-size:16px;">
+			<th style="align: left;">
 				<?php echo JText::_( 'FLEXI_VERSION_NR' ) . $this->version; ?>
 			</th>
-			<th style="align: left; width: 47%; font-size:16px;">
+			<th style="align: left;">
 				<?php echo JText::_( 'FLEXI_CURRENT_VERSION' ); ?>
+			</th>
+			<th style="align: left;">
 			</th>
 		</tr>
 		<?php
-		$noplugin = '<div class="fc-mssg-inline fc-warning" style="margin:0 2px 6px 2px; max-width: unset;">'.JText::_( 'FLEXI_PLEASE_PUBLISH_THIS_PLUGIN' ).'</div>';
+		$novalue = '<span class="novalue">' . JText::_('FLEXI_NO_VALUE') . '</span>';
 		$cnt = 0;
+		//echo count($this->fsets[$this->version]); exit;
 		foreach ($this->fsets[$this->version] as $fn => $field)
 		{
+			if ($field->field_type === 'coreprops' || $field->parameters->get('use_ingroup', 0))
+			{
+				continue;
+			}
+
 			// Field of current version
 			$html = null;
 			$field0 = $this->fsets[0][$fn];
-			$isTextarea = $field->field_type == 'textarea' || ($field->field_type === 'maintext' && !$this->tparams->get('hide_maintext') != 1);
+			$isIndexedfield = !empty($field->isIndexedfield);
+			$isText = $field->iscore || $field->field_type == 'text' || $field->field_type == 'textarea'
+				|| ($field->field_type === 'maintext' && $this->tparams->get('hide_maintext') != 1)
+				|| $isIndexedfield;
 
-			if ($isTextarea)
+			if ($isText || $isIndexedfield || 1)
 			{
-				//echo "Calculating DIFF for: " $field->label."<br/>";
-				$html = flexicontent_html::flexiHtmlDiff(
-					!is_array($field->display) ? $field->display : implode('', $field->display),
-					!is_array($field0->display) ? $field0->display : implode('', $field0->display),
-					$this->codemode
-				);
-			}
-			if ($field->field_type === 'coreprops')
-			{
-				continue;
+				//echo 'Calculating DIFF for: ' . $field->label . '<br/>';
+				$before = !is_array($field->display) ? $field->display : implode('', $field->display);
+				$after  = !is_array($field0->display) ? $field0->display : implode('', $field0->display);
+				if ($this->codemode)
+				{
+					$before = htmlspecialchars($before, ENT_QUOTES, 'UTF-8');
+					$after  = htmlspecialchars($after, ENT_QUOTES, 'UTF-8');
+				}
+				else
+				{
+					$uncut_length = 0;
+					$before = flexicontent_html::striptagsandcut($before, 100000, $uncut_length);
+					$after  = flexicontent_html::striptagsandcut($after, 100000, $uncut_length);
+				}
+				$html = flexicontent_html::flexiHtmlDiff($before, $after, 0);
 			}
 		?>
 		<tr>
@@ -85,27 +103,30 @@ table#itemcompare s{
 			</td>
 			<td valign="top">
 				<?php
-				if ($html)
+				if ($html && 0)
 				{
 					echo $html[0];
 				}
 				else
 				{
-					echo isset($field->display) ? $field->display : $noplugin;
+					echo strlen($field->display) ? $field->display : $novalue;
 				}
 				?>
 			</td>
 			<td valign="top">
 				<?php
-				if ($html)
+				if ($html && 0)
 				{
 					echo $html[1];
 				}
 				else
 				{
-					echo isset($field0->display) ? $field0->display : $noplugin;
+					echo strlen($field0->display) ? $field0->display : $novalue;
 				}
 				?>
+			</td>
+			<td valign="top">
+				<?php echo $html && isset($html[2]) ? $html[2] : ''; ?>
 			</td>
 		</tr>
 		<?php
