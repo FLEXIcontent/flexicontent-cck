@@ -4329,7 +4329,9 @@ class FlexicontentFields
 			{
 				if ($format_output > 0)  // 1: decimal, 2: integer
 				{
-					$results[$i]->text = @ number_format($results[$i]->text, $decimal_digits_displayed, $decimal_digits_sep, $decimal_thousands_sep);
+					$results[$i]->text = is_numeric($results[$i]->text)
+						? number_format($results[$i]->text, $decimal_digits_displayed, $decimal_digits_sep, $decimal_thousands_sep)
+						: NULL;
 					$results[$i]->text = $results[$i]->text === NULL ? 0 : $results[$i]->text;
 					$results[$i]->text = $output_prefix .$results[$i]->text. $output_suffix;
 				}
