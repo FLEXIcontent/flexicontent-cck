@@ -636,7 +636,7 @@ class ParentClassItem extends FCModelAdmin
 			// ***
 			// *** Item Retrieval BACKEND
 			// ***
-			if ( $app->isClient('administrator') )
+			if ( $app->isClient('administrator') && $view !== 'itemcompare')
 			{
 				$item   = $this->getTable();
 				$result = $item->load($pk);  // try loading existing item data

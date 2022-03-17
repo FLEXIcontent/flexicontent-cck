@@ -179,7 +179,7 @@ class FCField extends JPlugin
 		$show_in_clients = FLEXIUtilities::paramToArray($this->field->parameters->get('show_in_clients', array('desktop', 'tablet', 'mobile')));
 
 		// Calculate if field should be shown , if field is in 'sublist' then ignore 'view', since 'view' should be checked only for the relation field itself
-		return (in_array($view, $show_in_views) || $view === 'sublist') && (
+		return (in_array($view, $show_in_views) || $view === 'sublist' || $view === 'itemcompare') && (
 			(static::$isTablet && in_array('tablet', $show_in_clients)) ||
 			(!static::$isTablet && static::$isMobile && in_array('mobile', $show_in_clients)) ||
 			(!static::$isTablet && !static::$isMobile && in_array('desktop', $show_in_clients))
