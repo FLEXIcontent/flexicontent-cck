@@ -548,7 +548,9 @@ class plgFlexicontent_fieldsText extends FCField
 
 				if ($format_output > 0)  // 1: decimal, 2: integer
 				{
-					$value = @ number_format($value, $decimal_digits_displayed, $decimal_digits_sep, $decimal_thousands_sep);
+					$value = is_numeric($value)
+						? number_format($value, $decimal_digits_displayed, $decimal_digits_sep, $decimal_thousands_sep)
+						: NULL;
 					$value = $value === NULL ? 0 : $value;
 					$value = $output_prefix .$value. $output_suffix;
 				}
