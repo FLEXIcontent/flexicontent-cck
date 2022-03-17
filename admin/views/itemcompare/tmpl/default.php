@@ -28,80 +28,88 @@ table#itemcompare s{
 	color:red;
 }
 </style>
-<div class="flexicontent">
-	<table cellspacing="0" cellpadding="0" border="0" width="100%" id="itemcompare" style="background-color:white;">
+<div class="flexicontent" style="width: 90%;">
+
+	<div align="left" id="itemcompare">
+		<?php echo '
+		<a href="index.php?option=com_flexicontent&view=itemcompare' .
+			'&cid[]=' . $this->rows[0]->id .
+			'&version=' . $this->version .
+			'&tmpl=component&codemode=' . ($this->codemode ? 0 : 1) .
+		'">
+			' . JText::_($this->codemode ? 'FLEXI_VERSION_VIEW_MODE' : 'FLEXI_VERSION_CODE_MODE') . '
+		</a>';
+		?>
+	</div>
+
+	<table class="admintable" style="width: 100%; border: 1px solid black;">
 		<tr>
+			<th style="align: right; width: 6%; font-size:16px;">
+			</th>
+			<th style="align: left; width: 47%; font-size:16px;">
+				<?php echo JText::_( 'FLEXI_VERSION_NR' ) . $this->version; ?>
+			</th>
+			<th style="align: left; width: 47%; font-size:16px;">
+				<?php echo JText::_( 'FLEXI_CURRENT_VERSION' ); ?>
+			</th>
+		</tr>
+		<?php
+		$noplugin = '<div class="fc-mssg-inline fc-warning" style="margin:0 2px 6px 2px; max-width: unset;">'.JText::_( 'FLEXI_PLEASE_PUBLISH_THIS_PLUGIN' ).'</div>';
+		$cnt = 0;
+		foreach ($this->fsets[$this->version] as $fn => $field)
+		{
+			// Field of current version
+			$html = null;
+			$field0 = $this->fsets[0][$fn];
+			$isTextarea = $field->field_type == 'textarea' || ($field->field_type === 'maintext' && !$this->tparams->get('hide_maintext') != 1);
+
+			if ($isTextarea)
+			{
+				//echo "Calculating DIFF for: " $field->label."<br/>";
+				$html = flexicontent_html::flexiHtmlDiff(
+					!is_array($field->display) ? $field->display : implode('', $field->display),
+					!is_array($field0->display) ? $field0->display : implode('', $field0->display),
+					$this->codemode
+				);
+			}
+			if ($field->field_type === 'coreprops')
+			{
+				continue;
+			}
+		?>
+		<tr>
+			<td class="key" style="text-align:right; vertical-align:top;">
+				<label for="<?php echo $field->name; ?>" class="label <?php echo $tooltip_class; ?>" title="<?php echo flexicontent_html::getToolTip($field->label, $field->description, 0); ?>">
+					<?php echo JText::_($field->label); ?>
+				</label>
+			</td>
 			<td valign="top">
-					<?php if (!$this->cparams->get('disable_diff')) : ?>
-					<div align="left"><a href="index.php?option=com_flexicontent&view=itemcompare&cid[]=<?php echo $this->row->id;?>&version=<?php echo $this->rev;?>&tmpl=component&codemode=<?php echo $this->codemode?0:1;?>"><?php echo JText::_(($this->codemode?'FLEXI_VERSION_VIEW_MODE':'FLEXI_VERSION_CODE_MODE'));?></a></div>
-					<?php endif; ?>
-					<table class="admintable">
-						<tr>
-							<th align="right" width="" style="font-size:16px;">
-							</th>
-							<th align="left" width="" style="font-size:16px;">
-								<?php echo JText::_( 'FLEXI_VERSION_NR' ) . $this->rev; ?>
-							</th>
-							<th align="left" width="" style="font-size:16px;">
-								<?php echo JText::_( 'FLEXI_CURRENT_VERSION' ); ?>
-							</th>
-						</tr>
-						<?php
-						foreach ($this->fields as $field)
-						{
-							if ( $field->iscore == 0 || ($field->field_type == 'maintext' && (!$this->tparams->get('hide_maintext'))) /*|| in_array($field->field_type, array('tags', 'categories'))*/ )
-							{
-								//$field->display = $field->value ? flexicontent_html::nl2space($field->value[0]) : JText::_( 'FLEXI_NO_VALUE' );
-								//$field->displayversion = $field->version ? flexicontent_html::nl2space($field->version[0]) : JText::_( 'FLEXI_NO_VALUE' );
-								
-								$noplugin = '<div class="fc-mssg-inline fc-warning" style="margin:0 2px 6px 2px; max-width: unset;">'.JText::_( 'FLEXI_PLEASE_PUBLISH_THIS_PLUGIN' ).'</div>';
-								
-								//echo "Calculating DIFF for: " $field->label."<br/>";
-								$html = flexicontent_html::flexiHtmlDiff(
-									!is_array($field->displayversion) ? $field->displayversion : implode('', $field->displayversion),
-									!is_array($field->display) ? $field->display : implode('', $field->display),
-									$this->codemode
-								);
-						?>
-						<tr>
-							<td class="key" style="text-align:right;'">
-								<label for="<?php echo $field->name; ?>" class="label <?php echo $tooltip_class; ?>" title="<?php echo flexicontent_html::getToolTip($field->label, $field->description, 0); ?>">
-									<?php echo JText::_($field->label); ?>
-								</label>
-							</td>
-							<td valign="top">
-								<?php
-								if (isset($field->displayversion)) {
-									if ((!$this->cparams->get('disable_diff')) && (($field->field_type == 'maintext') || ($field->field_type == 'textarea'))) {
-										echo $html[0];
-									} else {
-										echo $field->displayversion;
-									}
-								} else {
-									echo $noplugin;
-								}
-								?>
-							</td>
-							<td valign="top">
-								<?php
-								if (isset($field->display)) {
-									if ((!$this->cparams->get('disable_diff')) && (($field->field_type == 'maintext') || ($field->field_type == 'textarea'))) {
-										echo $html[1];
-									} else {
-										echo $field->display;
-									}
-								} else {
-									echo $noplugin;
-								}
-								?>
-							</td>
-						</tr>
-						<?php
-							}
-						}
-						?>
-					</table>
+				<?php
+				if ($html)
+				{
+					echo $html[0];
+				}
+				else
+				{
+					echo isset($field->display) ? $field->display : $noplugin;
+				}
+				?>
+			</td>
+			<td valign="top">
+				<?php
+				if ($html)
+				{
+					echo $html[1];
+				}
+				else
+				{
+					echo isset($field0->display) ? $field0->display : $noplugin;
+				}
+				?>
 			</td>
 		</tr>
+		<?php
+		}
+		?>
 	</table>
 </div>

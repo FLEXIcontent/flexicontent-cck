@@ -27,89 +27,85 @@ class FlexicontentViewItemcompare extends JViewLegacy {
 
 	function display($tpl = null)
 	{
-		$mainframe = JFactory::getApplication();
-		$option = JRequest::getVar('option');
-
-		//initialise variables
+		$app      = JFactory::getApplication();
+		$jinput   = $app->input;
+		$option   = $jinput->getCmd('option');
 		$db       = JFactory::getDbo();
 		$document = JFactory::getDocument();
-		$template   = $mainframe->getTemplate();
-		$dispatcher = JEventDispatcher::getInstance();
-		$rev      = JRequest::getInt('version','','request');
-		$codemode = JRequest::getInt('codemode',0);
-		$cparams  = JComponentHelper::getParams('com_flexicontent');
-		
-		JHtml::_('behavior.modal');
 
+		// Initialise variables
+		$template   = $app->getTemplate();
+		$dispatcher = JEventDispatcher::getInstance();
+		$version    = $jinput->get('version', 0, 'int');
+		$codemode   = $jinput->getInt('codemode', 0);
+		$cparams    = JComponentHelper::getParams('com_flexicontent');
+		
 		//a trick to avoid loosing general style in modal window
 		$css = 'body, td, th { font-size: 11px; } .novalue { color: gray; font-style: italic; }';
 		$document->addStyleDeclaration($css);
+
+
+		$allow_versioncomparing = (int) $cparams->get('allow_versioncomparing', 1);
+		if (!$allow_versioncomparing)
+		{
+			echo '<div class="alert alert-warning">Version comparing has been disabled in component configuration</div>';
+			return;
+		}
 
 		/**
 		 * Get data from the model
 		 */
 
 		$model			= $this->getModel();
-		$row     		= $model->getItem();
-		$fields			= $model->getExtrafields();
-		$versions		= $model->getVersionList();
-		$tparams		= $model->getTypeparams();
+		$rows       = array();
+		$fsets      = array();
 
-		// Calculate inheritied item parameters
-		$iparams_only    = new JRegistry($row->attribs);
-		$row->parameters = new JRegistry;
-		$row->parameters->merge($tparams);
-		$row->parameters->merge($iparams_only);
-				
-		// Create the type parameters
+		$rows[0]  = clone($model->getItem(null, false, true, 0));
+		$fsets[0]	= $model->getExtrafields(true);
+		$rows[$version]  = clone($model->getItem(null, false, true, $version));
+		$fsets[$version] = $model->getExtrafields(true);
+
+		$vars = null;
+		FlexicontentFields::getItemFields($rows, $vars);
+
+		$versions		= $model->getVersionList();
+
+		// Get type parameters, these are needed besides the 'merged' item parameters, e.g. to get Type's default layout
+		$tparams = $model->getTypeparams();
 		$tparams = new JRegistry($tparams);
 		
 		// Add html to field object trought plugins
-		foreach ($fields as $field)
+		foreach($fsets as $iver => $fields)
 		{
-			// Render current field value
-			if ($field->iscore)
+			foreach ($fields as $field)
 			{
-				FLEXIUtilities::call_FC_Field_Func('core', 'onDisplayCoreFieldValue', array(&$field, &$row, &$row->parameters, false, false, false, false, false, null, 'display'));
-			}
-			elseif ($field->value)
-			{
-				//$results = $dispatcher->trigger('onDisplayFieldValue', array( &$field, $row ));
-				$field_type = $field->field_type;
-				FLEXIUtilities::call_FC_Field_Func($field_type, 'onDisplayFieldValue', array(&$field, $row));
-			}
-			else
-			{
-				$field->display = '<span class="novalue">' . JText::_('FLEXI_NO_VALUE') . '</span>';
-			}
-			
-			// Render versioned field value
-			if ($field->version)
-			{
-				if ( in_array($field->field_type, array(/*'tags', 'categories', */'maintext')) )
+				// Render current field value
+				if ($field->iscore)
 				{
-					// TODO render more core fields for versioned value, $field->version is raw we need to convert it to $categories, $tags, etc
-					FLEXIUtilities::call_FC_Field_Func('core', 'onDisplayCoreFieldValue', array(&$field, &$row, &$row->parameters, false, false, false, false, false, $field->version, 'displayversion'));
+					FLEXIUtilities::call_FC_Field_Func('core', 'onDisplayCoreFieldValue', array(&$field, &$rows[$iver], &$rows[$iver]->parameters, false, false, false, false, false, null, 'display'));
 				}
-				else if ($field->iscore) {
-					$field->displayversion = $field->version;
-				}
-				else {
-					//$results = $dispatcher->trigger('onDisplayFieldValue', array( &$field, $row, $field->version, 'displayversion' ));
+				elseif ($field->field_type === 'coreprops');
+				else
+				{
+					//$results = $dispatcher->trigger('onDisplayFieldValue', array( &$field, $rows[$iver] ));
 					$field_type = $field->field_type;
-					FLEXIUtilities::call_FC_Field_Func($field_type, 'onDisplayFieldValue', array( &$field, $row, $field->version, 'displayversion' ));
+					FLEXIUtilities::call_FC_Field_Func($field_type, 'onDisplayFieldValue', array(&$field, $rows[$iver]));
 				}
-			} else {
-				$field->displayversion = '<span class="novalue">' . JText::_('FLEXI_NO_VALUE') . '</span>';
+
+				if (!isset($field->display) && $field->field_type !== 'coreprops')
+				{
+					$field->display = '<span class="novalue">' . JText::_('FLEXI_NO_VALUE') . '</span>';
+				}
 			}
 		}
-		
-		//assign data to template
+
 		$this->document = $document;
-		$this->row = $row;
-		$this->fields = $fields;
+
+		$this->rows  = $rows;
+		$this->fsets = $fsets;
+
+		$this->version  = $version;
 		$this->versions = $versions;
-		$this->rev = $rev;
 		$this->tparams = $tparams;
 		$this->cparams = $cparams;
 		$this->codemode = $codemode;

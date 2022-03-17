@@ -1567,7 +1567,8 @@ class plgFlexicontent_fieldsImage extends FCField
 			$linkto_item ||
 			$prop=='display_large' ||
 			$prop=='display_original' ||
-			$format !== 'html'
+			$format !== 'html' ||
+			$realview=='itemcompare'
 		)
 		{
 			$usepopup = 0;
@@ -1654,7 +1655,7 @@ class plgFlexicontent_fieldsImage extends FCField
 
 		$linkto_url	= (int) $field->parameters->get('linkto_url', 0);
 
-		if ($linkto_url)
+		if ($linkto_url && $realview !== 'itemcompare')
 		{
 			$url_target = $field->parameters->get('url_target','_self');
 			$isLinkToPopup = $format === 'html' && ($url_target=='multibox' || $url_target=='fancybox');
