@@ -907,6 +907,10 @@ class plgFlexicontent_fieldsRelation extends FCField
 	{
 		if ( !in_array($filter->field_type, static::$field_types) ) return;
 
+		$db = Factory::getDbo();
+		$_nowDate = 'UTC_TIMESTAMP()';
+		$nullDate	= $db->getNullDate();
+
 		// Create order clause dynamically based on the field settings
 		$order = $filter->parameters->get( 'orderby', 'alpha' );
 		$orderby = flexicontent_db::buildItemOrderBy(
@@ -920,7 +924,9 @@ class plgFlexicontent_fieldsRelation extends FCField
 		// partial SQL clauses
 		$filter->filter_valuesselect = ' ct.id AS value, ct.title AS text';
 		$filter->filter_valuesfrom   = null;  // use default
-		$filter->filter_valuesjoin   = ' JOIN #__content AS ct ON ct.id = fi.value_integer AND ct.state = 1 AND ct.publish_up < UTC_TIMESTAMP() AND (ct.publish_down = "0000-00-00 00:00:00" OR ct.publish_down > UTC_TIMESTAMP())';
+		$filter->filter_valuesjoin   = ' JOIN #__content AS ct ON ct.id = fi.value_integer AND ct.state = 1 ' .
+			' AND (ct.publish_up IS NULL OR ct.publish_up = ' . $db->Quote($nullDate) . ' OR ct.publish_up <= ' .$_nowDate . ')' .
+			' AND (ct.publish_down IS NULL OR ct.publish_down = ' . $db->Quote($nullDate) . ' OR ct.publish_down >= ' .$_nowDate . ')';
 		$filter->filter_valueswhere  = null;  // use default
 		// full SQL clauses
 		$filter->filter_groupby = ' GROUP BY fi.value_integer '; // * will be be appended with , fi.item_id

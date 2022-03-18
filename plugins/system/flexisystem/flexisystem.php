@@ -731,8 +731,8 @@ class plgSystemFlexisystem extends CMSPlugin
 			. ' JOIN #__flexicontent_cats_item_relations AS rel ON c.id=rel.catid'
 			. ' JOIN #__content AS i ON rel.itemid=i.id '
 			. '  AND i.state IN (1,-5) '
-			. '  AND ( i.publish_up = ' . $db->Quote($nullDate) . ' OR i.publish_up <= ' . $_nowDate . ' )'
-			. '  AND ( i.publish_down = ' . $db->Quote($nullDate) . ' OR i.publish_down >= ' . $_nowDate . ' )'
+			. '  AND ( i.publish_up IS NULL OR i.publish_up = ' . $db->Quote($nullDate) . ' OR i.publish_up <= ' . $_nowDate . ' )'
+			. '  AND ( i.publish_down IS NULL OR i.publish_down = ' . $db->Quote($nullDate) . ' OR i.publish_down >= ' . $_nowDate . ' )'
 			. ' WHERE c.extension=' . $db->Quote(FLEXI_CAT_EXTENSION) . ' AND c.lft > ' . $db->Quote(FLEXI_LFT_CATEGORY) . ' AND c.rgt < ' . $db->Quote(FLEXI_RGT_CATEGORY)
 			. ' GROUP BY c.id'
 			;
@@ -1504,14 +1504,14 @@ class plgSystemFlexisystem extends CMSPlugin
 
 		$query = 'UPDATE #__content SET state = '.$new_state.
 			($clear_publish_down_date ? ', publish_down = '.$db->Quote($nullDate) : '').
-			' WHERE publish_down != '.$db->Quote($nullDate).' AND publish_down <= '.$_nowDate;
+			' WHERE publish_down IS NOT NULL AND publish_down != '.$db->Quote($nullDate).' AND publish_down <= '.$_nowDate;
 		//echo $query;
 		$db->setQuery($query);
 		$db->execute();
 
 		$query = 'UPDATE #__flexicontent_items_tmp SET state = '.$new_state.
 			($clear_publish_down_date ? ', publish_down = '.$db->Quote($nullDate) : '').
-			' WHERE publish_down != '.$db->Quote($nullDate).' AND publish_down <= '.$_nowDate;
+			' WHERE publish_down IS NOT NULL AND publish_down != '.$db->Quote($nullDate).' AND publish_down <= '.$_nowDate;
 		//echo $query;
 		$db->setQuery($query);
 		$db->execute();

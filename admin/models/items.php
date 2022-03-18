@@ -1655,12 +1655,13 @@ class FlexicontentModelItems extends FCModelAdminList
 					break;
 
 				case 3:
-					if ($startdate) $_where[] = '( a.publish_up >= ' . $this->_db->Quote($startdate) . ' OR ( a.publish_up = ' . $this->_db->Quote($nullDate) . ' AND a.created >= ' . $this->_db->Quote($startdate) . '))';
-					if ($enddate)   $_where[] = '( a.publish_up <= ' . $this->_db->Quote($enddate) . ' OR ( a.publish_up = ' . $this->_db->Quote($nullDate) . ' AND a.created >= ' . $this->_db->Quote($startdate) . '))';
+					if ($startdate) $_where[] = '( a.publish_up >= ' . $this->_db->Quote($startdate) . ' OR ( (a.publish_up IS NULL OR a.publish_up = ' . $this->_db->Quote($nullDate) . ') AND a.created >= ' . $this->_db->Quote($startdate) . '))';
+					if ($enddate)   $_where[] = '( a.publish_up <= ' . $this->_db->Quote($enddate) . ' OR ( (a.publish_up IS NULL OR a.publish_up = ' . $this->_db->Quote($nullDate) . ') AND a.created >= ' . $this->_db->Quote($startdate) . '))';
 					$where[] = '( ' . implode(' AND ', $_where) . ' )';
 					break;
 
 				case 4:
+					// DO NOT include NULL dates !! we are 'filtering', aka looking for publish down in specific date range
 					if ($startdate) $_where[] = ' a.publish_down >= ' . $this->_db->Quote($startdate);
 					if ($enddate)   $_where[] = ' a.publish_down <= ' . $this->_db->Quote($enddate);
 					$where[] = '( ' . implode(' AND ', $_where) . ' )';

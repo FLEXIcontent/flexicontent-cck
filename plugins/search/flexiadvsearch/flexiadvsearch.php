@@ -747,8 +747,8 @@ class plgSearchFlexiadvsearch extends JPlugin
 			. (count($cids) > 0 ? ' AND i.catid IN (' . implode(',', $cids) . ')' : '')
 			. ' AND i.state IN (1,-5'. ($search_archived ? ','.(FLEXI_J16GE ? 2:-1) :'' ) .') '
 			. ' AND c.published = 1 '
-			. ' AND ( i.publish_up = '.$db->Quote($nullDate).' OR i.publish_up <= '.$_nowDate.' )'
-			. ' AND ( i.publish_down = '.$db->Quote($nullDate).' OR i.publish_down >= '.$_nowDate.' )'
+			. ' AND ( i.publish_up IS NULL OR i.publish_up = '.$db->Quote($nullDate).' OR i.publish_up <= '.$_nowDate.' )'
+			. ' AND ( i.publish_down IS NULL OR i.publish_down = '.$db->Quote($nullDate).' OR i.publish_down >= '.$_nowDate.' )'
 			. $andaccess
 			. $andlang
 			. $andcontenttypes

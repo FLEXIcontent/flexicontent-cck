@@ -50,8 +50,8 @@ class modFlexiTagCloudHelper
 
 		$where = ' WHERE 1 '
 			. ' AND i.state IN ( 1, -5 )'
-			. ' AND ( i.publish_up = '.$db->Quote($nullDate).' OR i.publish_up <= '.$_nowDate.' )'
-			. ' AND ( i.publish_down = '.$db->Quote($nullDate).' OR i.publish_down >= '.$_nowDate.' )'
+			. ' AND ( i.publish_up IS NULL OR i.publish_up = '.$db->Quote($nullDate).' OR i.publish_up <= '.$_nowDate.' )'
+			. ' AND ( i.publish_down IS NULL OR i.publish_down = '.$db->Quote($nullDate).' OR i.publish_down >= '.$_nowDate.' )'
 			. ' AND c.published = 1'
 			. ' AND tag.published = 1';
 

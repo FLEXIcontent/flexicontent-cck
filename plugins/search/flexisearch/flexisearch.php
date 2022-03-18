@@ -190,9 +190,10 @@ class plgSearchFlexisearch extends JPlugin
 		$filter_lang	= $this->params->def('filter_lang',	1);
 		$limit				= $this->params->def('search_limit', 50);
 
-		// Dates for publish up & down items
-		$date = JFactory::getDate();
-		$nowDate  = $date->toSql();
+		// NULL and CURRENT dates,
+		// NOTE: the current date needs to use built-in MYSQL function, otherwise filter caching can not work because the CURRENT DATETIME is continuously different !!!
+		//$now = JFactory::getDate()->toSql();
+		$_nowDate = 'UTC_TIMESTAMP()'; //$db->Quote($now);
 		$nullDate = $db->getNullDate();
 		
 		$text = trim($text);
@@ -336,8 +337,8 @@ class plgSearchFlexisearch extends JPlugin
 			$query->where(' ('. $where .') ' 
 				.' AND ie.type_id IN('.$types.') '
 				.' AND i.state IN (1, -5) AND c.published = 1 '
-				.' AND (i.publish_up = '.$db->Quote($nullDate).' OR i.publish_up <= '.$db->Quote($nowDate).') '
-				.' AND (i.publish_down = '.$db->Quote($nullDate).' OR i.publish_down >= '.$db->Quote($nowDate).') '
+				.' AND (i.publish_up IS NULL OR i.publish_up = '.$db->Quote($nullDate).' OR i.publish_up <= ' . $_nowDate . ') '
+				.' AND (i.publish_down IS NULL OR i.publish_down = '.$db->Quote($nullDate).' OR i.publish_down >= ' . $_nowDate . ') '
 				. $andaccess // Filter by user access
 				. $andlang   // Filter by current language
 				); 

@@ -505,8 +505,8 @@ class osmap_com_flexicontent
 			$db    = JFactory::getDBO();
 			$user  = JFactory::getUser();
 			$date  = JFactory::getDate();
+			$_nowDate = 'UTC_TIMESTAMP()'; //$this->_db->Quote( $date->toMySQL() );
 			$nullDate = $db->getNullDate();
-			$now = 'UTC_TIMESTAMP()'; //$this->_db->Quote( $date->toMySQL() );
 			$ordering = FLEXI_J16GE ? 'c.lft ASC' : 'c.ordering ASC';
 			$access_clauses = self::getAccessClauses($params);
 		}
@@ -517,8 +517,8 @@ class osmap_com_flexicontent
 		// Second is to only select items the user has access to
 		$states = '1, -5';  //if ($user->gid > 2) $states .= ', 0 , -3, -4';
 		$where .= ' AND i.state IN ('.$states.')';
-		$where .= ' AND ( i.publish_up = '.$db->Quote($nullDate).' OR i.publish_up <= '.$now.' )';
-		$where .= ' AND ( i.publish_down = '.$db->Quote($nullDate).' OR i.publish_down >= '.$now.' )';
+		$where .= ' AND ( i.publish_up IS NULL OR i.publish_up = '.$db->Quote($nullDate).' OR i.publish_up <= ' . $_nowDate . ' )';
+		$where .= ' AND ( i.publish_down IS NULL OR i.publish_down = '.$db->Quote($nullDate).' OR i.publish_down >= ' . $_nowDate . ' )';
 		$where .= ' AND c.published = 1';
 
 		// Third other limitations
