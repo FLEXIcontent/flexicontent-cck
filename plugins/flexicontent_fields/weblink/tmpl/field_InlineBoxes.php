@@ -67,41 +67,13 @@
 			</div>
 			';
 		}
-		
+
 		$image = '';
 		$image_preview = '';
 
 		if ($useimage)
 		{
 			$value['image'] = !empty($value['image']) ? $value['image'] : '';
-
-			$mm_id    = $elementid_n.'_image';
-			$img_path = $value['image'];
-			$img_src  = ($img_path && file_exists(JPATH_ROOT . '/' . $img_path))  ?  JUri::root() . $img_path  :  $img_path;
-			$img_attr = array('id' => $mm_id . '_preview', 'class' => 'media-preview');
-			$img      = JHtml::image($img_src ?: 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=', JText::_('JLIB_FORM_MEDIA_PREVIEW_ALT'), $img_attr);
-
-			$previewImg = '
-			<div id="' . $mm_id . '_preview_img"' . ($img_src ? '' : ' style="display:none"') . '>
-				' . $img . '
-			</div>';
-			$previewImgEmpty = '
-			<div id="' . $mm_id . '_preview_empty"' . ($img_src ? ' style="display:none"' : '') . '>
-				' . JText::_('JLIB_FORM_MEDIA_PREVIEW_EMPTY') . '
-			</div>';
-
-			$tooltip = $previewImgEmpty . $previewImg;
-			$tooltip_options = array(
-				'title' => JText::_('JLIB_FORM_MEDIA_PREVIEW_SELECTED_IMAGE'),
-				'text' => '<span class="display: block;"><span class="icon-eye" aria-hidden="true"></span><span class="icon-image" aria-hidden="true"></span>' . JText::_('FLEXI_FIELD_WEBLINK_URLIMAGE') . '</span>',
-				'class' => 'hasTipPreview',
-			);
-
-			$mm_link = 'index.php?option=com_media&amp;view=images&amp;layout=default_fc&amp;tmpl=component&amp;asset=com_flexicontent&amp;author=&amp;fieldid=\'+mm_id+\'&amp;folder=';
-			$image_preview = '
-				<div style="float: '. (!JFactory::getLanguage()->isRtl() ? 'left' : 'right') . '; max-width: 150px;">
-					' . $previewImgEmpty . $previewImg .'
-				</div>';
 
 			$imagelist = '';
 
@@ -127,29 +99,87 @@
 				. '</div>';
 			}
 
-			$image = '
-			<div class="' . $box_classes . ' input-append">
-				<label class="media-preview ' . $lbl_classes . $has_value_class . ' fc-lbl urlimage-lbl" for="'.$elementid_n.'_image">'
-					.'<span class="icon-image" aria-hidden="true"></span>' . JText::_('FLEXI_FIELD_WEBLINK_URLIMAGE') . '</span>'
-					//.JHtml::tooltip($tooltip, $tooltip_options)
-				.'</label>
-				<input ' . $ff_events . ' type="text" name="'.$fieldname_n.'[image]" id="'.$elementid_n.'_image" value="'.htmlspecialchars($img_path, ENT_COMPAT, 'UTF-8').'" readonly="readonly"
-					style=""
-					class="urlimage field-media-input hasTipImgpath ' . $input_classes . '" onchange="fcfield_weblink.update_path_tip(this);"
-					title="'.htmlspecialchars('<span id="TipImgpath"></span>', ENT_COMPAT, 'UTF-8').'" data-basepath="" data-basepath_local="' . JUri::root() . '"
-				/>
-				<a class="fc_weblink_field_mm_modal btn '.$tooltip_class.'" title="'.JText::_('FLEXI_SELECT') . ' ' . JText::_('FLEXI_IMAGE').'"
-					style="' . ($useimage == 2 ? 'display: none;' : '') . '"
-					onclick="var mm_id=jQuery(this).parent().find(\'.urlimage\').attr(\'id\'); fcfield_weblink.currElement[\''.$field_name_js.'\']=mm_id; SqueezeBox.open(\''.$mm_link.'\', {size:{x: ((window.innerWidth-120) > 1360 ? 1360 : (window.innerWidth-120)), y: ((window.innerHeight-220) > 800 ? 800 : (window.innerHeight-220))}, handler: \'iframe\', onClose: function() {jQuery(\'#\' + mm_id).data(\'basepath\', \'' . JUri::root() .'\');} });  return false;">
-					<span class="icon-upload"></span> ' /*. JText::_('FLEXI_SELECT')*/ . '
-				</a>
-				' . $imagelist . '
-				<a class="btn '.$tooltip_class.'" href="javascript:;" title="'.JText::_('FLEXI_CLEAR').'" onclick="fcfield_weblink.clearImageThumb(this, {}, \''.$field_name_js.'\'); return false;" >
-					<i class="icon-remove"></i>
-				</a>
-			</div>
-			<div class="fcfield_message_box" id="fcfield_message_box_'.$elementid_n.'"></div>
-			';
+
+			if (!$use_jformfields)
+			{
+				$mm_id    = $elementid_n.'_image';
+				$img_path = $value['image'];
+				$img_src  = ($img_path && file_exists(JPATH_ROOT . '/' . $img_path))  ?  JUri::root() . $img_path  :  $img_path;
+				$img_attr = array('id' => $mm_id . '_preview', 'class' => 'media-preview');
+				$img      = JHtml::image($img_src ?: 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=', JText::_('JLIB_FORM_MEDIA_PREVIEW_ALT'), $img_attr);
+
+				$previewImg = '
+				<div id="' . $mm_id . '_preview_img"' . ($img_src ? '' : ' style="display:none"') . '>
+					' . $img . '
+				</div>';
+				$previewImgEmpty = '
+				<div id="' . $mm_id . '_preview_empty"' . ($img_src ? ' style="display:none"' : '') . '>
+					' . JText::_('JLIB_FORM_MEDIA_PREVIEW_EMPTY') . '
+				</div>';
+
+				$tooltip = $previewImgEmpty . $previewImg;
+				$tooltip_options = array(
+					'title' => JText::_('JLIB_FORM_MEDIA_PREVIEW_SELECTED_IMAGE'),
+					'text' => '<span class="display: block;"><span class="icon-eye" aria-hidden="true"></span><span class="icon-image" aria-hidden="true"></span>' . JText::_('FLEXI_FIELD_WEBLINK_URLIMAGE') . '</span>',
+					'class' => 'hasTipPreview',
+				);
+
+				$mm_link = 'index.php?option=com_media&amp;view=images&amp;layout=default_fc&amp;tmpl=component&amp;asset=com_flexicontent&amp;author=&amp;fieldid=\'+mm_id+\'&amp;folder=';
+				$image_preview = '
+					<div style="float: '. (!JFactory::getLanguage()->isRtl() ? 'left' : 'right') . '; max-width: 150px;">
+						' . $previewImgEmpty . $previewImg .'
+					</div>';
+
+				$image = '
+				<div class="' . $box_classes . ' input-append">
+					<label class="media-preview ' . $lbl_classes . $has_value_class . ' fc-lbl urlimage-lbl" for="'.$elementid_n.'_image">'
+						.'<span class="icon-image" aria-hidden="true"></span>' . JText::_('FLEXI_FIELD_WEBLINK_URLIMAGE') . '</span>'
+						//.JHtml::tooltip($tooltip, $tooltip_options)
+					.'</label>
+					<input ' . $ff_events . ' type="text" name="'.$fieldname_n.'[image]" id="'.$elementid_n.'_image" value="'.htmlspecialchars($img_path, ENT_COMPAT, 'UTF-8').'" readonly="readonly"
+						style=""
+						class="urlimage field-media-input hasTipImgpath ' . $input_classes . '" onchange="fcfield_weblink.update_path_tip(this);"
+						title="'.htmlspecialchars('<span id="TipImgpath"></span>', ENT_COMPAT, 'UTF-8').'" data-basepath="" data-basepath_local="' . JUri::root() . '"
+					/>
+					<a class="fc_weblink_field_mm_modal btn '.$tooltip_class.'" title="'.JText::_('FLEXI_SELECT') . ' ' . JText::_('FLEXI_IMAGE').'"
+						style="' . ($useimage == 2 ? 'display: none;' : '') . '"
+						onclick="var mm_id=jQuery(this).parent().find(\'.urlimage\').attr(\'id\'); fcfield_weblink.currElement[\''.$field_name_js.'\']=mm_id; SqueezeBox.open(\''.$mm_link.'\', {size:{x: ((window.innerWidth-120) > 1360 ? 1360 : (window.innerWidth-120)), y: ((window.innerHeight-220) > 800 ? 800 : (window.innerHeight-220))}, handler: \'iframe\', onClose: function() {jQuery(\'#\' + mm_id).data(\'basepath\', \'' . JUri::root() .'\');} });  return false;">
+						<span class="icon-upload"></span> ' /*. JText::_('FLEXI_SELECT')*/ . '
+					</a>
+					' . $imagelist . '
+					<a class="btn '.$tooltip_class.'" href="javascript:;" title="'.JText::_('FLEXI_CLEAR').'" onclick="fcfield_weblink.clearImageThumb(this, {}, \''.$field_name_js.'\'); return false;" >
+						<i class="icon-remove"></i>
+					</a>
+				</div>
+				<div class="fcfield_message_box" id="fcfield_message_box_'.$elementid_n.'"></div>
+				';
+			}
+			else
+			{
+				$jfvalue = $value['image'];
+
+				$xml_field = '<field name="'.$fieldname_n.'[image]" id="'.$elementid_n.'_image" type="media" preview="true" '
+					. ' preview_width="'.(int)$thumb_size_default.'" preview_height="'.(int)$thumb_size_default.'" '
+					. ' class="urlimage" />';
+
+				$xml_form = '<form><fields name="attribs"><fieldset name="attribs">'.$xml_field.'</fieldset></fields></form>';
+				$jform = new JForm('flexicontent_field.image', array('control' => '' /*'custom'*/, 'load_data' => true));
+				$jform->load($xml_form);
+
+				$jfield = new JFormFieldMedia($jform);
+				$jfield->setup(new SimpleXMLElement($xml_field), $jfvalue, '');
+
+				$image = '
+				<div class="' . $box_classes . ' input-append">
+					<label class="media-preview ' . $lbl_classes . $has_value_class . ' fc-lbl urlimage-lbl" for="'.$elementid_n.'_image">
+						<span class="icon-image" aria-hidden="true"></span>' . JText::_('FLEXI_FIELD_WEBLINK_URLIMAGE') . '</span>
+					</label>
+					' . $jfield->input . '
+					' . $imagelist . '
+				</div>
+				<div class="fcfield_message_box" id="fcfield_message_box_'.$elementid_n.'"></div>
+				';
+			}
 		}
 
 		$title = '';

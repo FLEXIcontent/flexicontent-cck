@@ -134,8 +134,7 @@ foreach ($field->value as $index => $value)
 
 	elseif ($image_source === -2)
 	{
-		//if (!FLEXI_J40GE)
-		if (0)
+		if (!$use_jformfields)
 		{
 			$mm_id = $elementid_n.'_existingname';
 			$img_path = $image_subpath;

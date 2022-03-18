@@ -153,6 +153,7 @@ class plgFlexicontent_fieldsWeblink extends FCField
 				$image_options[$image->sub_path] = $image->sub_path;
 			}
 		}
+		$use_jformfields = true; //FLEXI_J40GE
 
 		// URL title (optional)
 		$usetitle      = $field->parameters->get( 'use_title', 0 ) ;
@@ -245,39 +246,49 @@ class plgFlexicontent_fieldsWeblink extends FCField
 
 		if ($useimage && !$mm_mode_common_js_added)
 		{
-			// Check and if needed install Joomla template overrides into current Joomla template
-			flexicontent_html::install_template_overrides();
-
-			// We will use the mootools based media manager
-			JHtml::_('behavior.framework', true);
-
-			// Load the modal behavior script.
-			JHtml::_('behavior.modal'/*, '.fc_image_field_mm_modal'*/);
-
-			// Include media field JS, detecting different version of Joomla
-			if (file_exists($path = JPATH_ROOT.'/media/media/js/mediafield-mootools.min.js'))
+			if (!$use_jformfields)
 			{
-				$media_js = 'media/mediafield-mootools.min.js';
+				// Check and if needed install Joomla template overrides into current Joomla template
+				flexicontent_html::install_template_overrides();
+
+				// We will use the mootools based media manager
+				JHtml::_('behavior.framework', true);
+
+				// Load the modal behavior script.
+				JHtml::_('behavior.modal'/*, '.fc_image_field_mm_modal'*/);
+
+				// Include media field JS, detecting different version of Joomla
+				if (file_exists($path = JPATH_ROOT.'/media/media/js/mediafield-mootools.min.js'))
+				{
+					$media_js = 'media/mediafield-mootools.min.js';
+				}
+				else
+				{
+					$media_js = file_exists($path = JPATH_ROOT.'/media/media/js/mediafield.min.js')
+						? 'media/mediafield.min.js'
+						: 'media/mediafield.js';
+				}
+
+				JHtml::_('script', $media_js, $mootools_framework = true, $media_folder_relative_path = true, false, false, true);
+
+				// Tooltips for image path and image popup preview
+				JHtml::_('behavior.tooltip', '.hasTipImgpath', array('onShow' => 'jMediaRefreshImgpathTip'));
+				JHtml::_('behavior.tooltip', '.hasTipPreview', array('onShow' => 'jMediaRefreshPreviewTip'));
 			}
 			else
 			{
-				$media_js = file_exists($path = JPATH_ROOT.'/media/media/js/mediafield.min.js')
-					? 'media/mediafield.min.js'
-					: 'media/mediafield.js';
+				jimport('joomla.form.helper'); // JFormHelper
+				JFormHelper::loadFieldClass('media');   // JFormFieldMedia
+				$thumb_size_default = 150;
 			}
-
-			JHtml::_('script', $media_js, $mootools_framework = true, $media_folder_relative_path = true, false, false, true);
-
-			// Tooltips for image path and image popup preview
-			JHtml::_('behavior.tooltip', '.hasTipImgpath', array('onShow' => 'jMediaRefreshImgpathTip'));
-			JHtml::_('behavior.tooltip', '.hasTipPreview', array('onShow' => 'jMediaRefreshPreviewTip'));
-			$mm_mode_common_js_added = true;
 
 			JText::script("FLEXI_FIELD_WEBLINK_ENTER_MEDIA_URL", true);
 			JText::script("FLEXI_FIELD_WEBLINK_ENTER_MEDIA_URL_WARNING", true);
 			JText::script("FLEXI_FIELD_MEDIA_URL", true);
 			JText::script("FLEXI_ERROR", true);
 			$document->addScript(JUri::root(true) . '/plugins/flexicontent_fields/weblink/js/form.js', array('version' => FLEXI_VHASH));
+
+			$mm_mode_common_js_added = true;
 		}
 
 		// JS & CSS of current field
@@ -480,7 +491,13 @@ class plgFlexicontent_fieldsWeblink extends FCField
 
 				// Re-init any select2 elements
 				fc_attachSelect2(newField);
-				";
+
+				" .
+				// Re-init joomla media form field element (J3 only)
+				($useimage && $use_jformfields && !FLEXI_J40GE ? "newField.find('.field-media-wrapper').fieldMedia();" : '') .
+				// Clear image preview
+				($useimage && $use_jformfields ? "newField.find('.field-media-wrapper').find('.button-clear').click();" : '')
+				;
 
 			// Add new element to sortable objects (if field not in group)
 			if ($add_ctrl_btns) $js .= "
@@ -1067,6 +1084,8 @@ class plgFlexicontent_fieldsWeblink extends FCField
 		$usetarget   = $field->parameters->get( 'use_target', 0 ) ;
 		$usehits     = $field->parameters->get( 'use_hits', 1 ) ;
 
+		$use_jformfields = true; //FLEXI_J40GE
+
 		// Server side validation
 		$maxlength  = (int) $field->parameters->get( 'maxlength', 4000 ) ;
 
@@ -1187,6 +1206,13 @@ class plgFlexicontent_fieldsWeblink extends FCField
 
 			$newpost[$new] = array();
 			$newpost[$new]['link'] = $prefixed_link;
+
+			// Handle image value containing more than just the filepath
+			if ($useimage && $use_jformfields)
+			{
+				$_tmp = explode('#', $v['image']);
+				$v['image'] = $_tmp[0];
+			}
 
 			// Validate other value properties
 			$newpost[$new]['image']    = !$useimage    ? '' : flexicontent_html::dataFilter(@$v['image'], 200, 'STRING', 0);

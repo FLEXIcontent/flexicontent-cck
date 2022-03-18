@@ -159,6 +159,7 @@ class plgFlexicontent_fieldsImage extends FCField
 		$default_cust1    = ($item->version == 0 || $cust1_usage > 0) ? $field->parameters->get( 'default_cust1', '' ) : '';
 		$default_cust2    = ($item->version == 0 || $cust2_usage > 0) ? $field->parameters->get( 'default_cust2', '' ) : '';
 
+		$use_jformfields = true; //FLEXI40GE
 
 		// *** Calculate some configuration flags
 
@@ -188,8 +189,7 @@ class plgFlexicontent_fieldsImage extends FCField
 			// Check and if needed install Joomla template overrides into current Joomla template
 			flexicontent_html::install_template_overrides();
 
-			//if (!FLEXI_J40GE)
-			if (0)
+			if (!$use_jformfields)
 			{
 				// We will use the mootools based media manager
 				JHtml::_('behavior.framework', true);
@@ -218,7 +218,7 @@ class plgFlexicontent_fieldsImage extends FCField
 			else
 			{
 				jimport('joomla.form.helper'); // JFormHelper
-				JFormHelper::loadFieldClass('media');   // JFormFieldColor
+				JFormHelper::loadFieldClass('media');   // JFormFieldMedia
 			}
 
 			$mm_mode_common_js_added = true;
@@ -498,8 +498,10 @@ class plgFlexicontent_fieldsImage extends FCField
 				fc_attachSelect2(newField);
 
 				" .
-				// Re-init joomla media form field element
-				(/*FLEXI_J40GE*/1 && $image_source === -2 ? "newField.find('.field-media-wrapper').fieldMedia();" : '')
+				// Re-init joomla media form field element (J3 only)
+				($image_source === -2 && $use_jformfields && !FLEXI_J40GE ? "newField.find('.field-media-wrapper').fieldMedia();" : '') .
+				// Clear image preview
+				($image_source === -2 && $use_jformfields ? "newField.find('.field-media-wrapper').find('.button-clear').click();" : '')
 				;
 
 			// Add new element to sortable objects (if field not in group)
