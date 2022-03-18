@@ -673,6 +673,7 @@ body .fc-nowrap-box .nowrap_box .label,
 .ntxt [class^="icon-"],
 .ntxt [class*="icon-"] {
 	margin: 0;
+	width: auto;
 }
 .inlineFormTip > [class^="icon-"]:before,
 .inlineFormTip > [class*="icon-"]:before {
@@ -949,4 +950,9 @@ div.fc_mediafile_player_box div.fc_mediafile_controls .btn {
 }
 div.fc_mediafile_player_box div.fc_mediafile_controls .btn span:before {
 	color: #777;
+}
+.fc-field-props-box .input-append + .field-media-preview {
+	clear: both;
+	margin: 16px 0 !important;
+	width: auto !important;
 }

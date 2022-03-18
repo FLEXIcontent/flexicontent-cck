@@ -764,6 +764,7 @@ body .fc-nowrap-box,
 .ntxt [class^="icon-"],
 .ntxt [class*="icon-"] {
 	margin: 0;
+	width: auto;
 }
 .inlineFormTip > [class^="icon-"]:before,
 .inlineFormTip > [class*="icon-"]:before {
@@ -1064,3 +1065,10 @@ div.fc_mediafile_player_box {
 	}
 }
 //End of fc_audio_field_only contro
+
+// Image preview in weblink field, maybe make more specific
+.fc-field-props-box .input-append + .field-media-preview {
+	clear: both;
+	margin: 16px 0 !important;
+	width: auto !important;
+}
