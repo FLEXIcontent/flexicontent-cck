@@ -113,7 +113,9 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		$df_date_format = FLEXI_J16GE ? "d/M H:i" : "%d/%m %H:%M";
 		$date_format = JText::_($jt_date_format);
 		$date_format = ( $date_format == $jt_date_format ) ? $df_date_format : $date_format;
-		$ctrl_task = FLEXI_J16GE ? 'task=items.edit' : 'controller=items&task=edit';
+		$ctrl_task = 'task=items.edit';
+		$app     = JFactory::getApplication();
+		$isSite  = $app->isClient('site');
 
 		foreach ($versions as $v)
 		{
@@ -127,9 +129,9 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 					<a href="javascript:;" class="hasTooltip" title="' . JHtml::tooltipText(JText::_('FLEXI_COMMENT'), ($v->comment ? $v->comment : 'No comment written'), 0, 1) . '">' . $comment . '</a>
 				' . (
 				((int) $v->nr === (int) $currentversion) ? // Is current version ?
-					'<a onclick="javascript:return clickRestore(\'index.php?option=com_flexicontent&' . $ctrl_task . '&cid=' . $item->id . '&version=' . $v->nr . '\');" href="javascript:;">' . JText::_('FLEXI_CURRENT') . '</a>' :
+					'<a onclick="javascript:return clickRestore(\'index.php?option=com_flexicontent&' . $ctrl_task . '&' . ($isSite ? 'id=' : 'cid=') . $item->id . '&version=' . $v->nr . '\');" href="javascript:;">' . JText::_('FLEXI_CURRENT') . '</a>' :
 					'<a class="modal-versions" href="index.php?option=com_flexicontent&view=itemcompare&cid[]=' . $item->id . '&version=' . $v->nr . '&tmpl=component" title="' . JText::_('FLEXI_COMPARE_WITH_CURRENT_VERSION') . '" rel="{handler: \'iframe\', size: {x:window.getSize().scrollSize.x-100, y: window.getSize().size.y-100}}">' . $view . '</a>
-					<a onclick="javascript:return clickRestore(\'index.php?option=com_flexicontent&' . $ctrl_task . '&cid=' . $item->id . '&version=' . $v->nr . '&' . JSession::getFormToken() . '=1\');" href="javascript:;" title="' . JText::sprintf('FLEXI_REVERT_TO_THIS_VERSION', $v->nr) . '">' . $revert . '</a>
+					<a onclick="javascript:return clickRestore(\'index.php?option=com_flexicontent&' . $ctrl_task . '&' . ($isSite ? 'id=' : 'cid=') . $item->id . '&version=' . $v->nr . '&' . JSession::getFormToken() . '=1\');" href="javascript:;" title="' . JText::sprintf('FLEXI_REVERT_TO_THIS_VERSION', $v->nr) . '">' . $revert . '</a>
 				') . '
 				</td>
 			</tr>';
