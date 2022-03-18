@@ -13,6 +13,9 @@ defined('_JEXEC') or die('Restricted access');
 
 use Joomla\String\StringHelper;
 
+$allow_versioncomparing  = (int) $this->params->get('allow_versioncomparing', 1);
+$isSite  = JFactory::getApplication()->isClient('site');
+
 $task_items = 'task=items.';
 $ctrl_items = 'items.';
 $tags_task  = 'task=tags.';
@@ -32,8 +35,24 @@ $tip_class = ' hasTooltip';
 $lbl_class = ' ' . $this->params->get('form_lbl_class_be', '');
 $noplugin = '<div class="fc-mssg-inline fc-warning" style="margin:0 2px 6px 2px; max-width: unset;">'.JText::_( 'FLEXI_PLEASE_PUBLISH_THIS_PLUGIN' ).'</div>';
 
-$hint_image = '<i class="icon-info"></i>';//JHtml::image ( 'administrator/components/com_flexicontent/assets/images/comments.png', JText::_( 'FLEXI_NOTES' ), 'style="vertical-align:top;"' );
-$warn_image = '<i class="icon-warning"></i>';//JHtml::image ( 'administrator/components/com_flexicontent/assets/images/note.gif', JText::_( 'FLEXI_NOTES' ), 'style="vertical-align:top;"' );
+$info_image = $this->params->get('use_font_icons', 1)
+	? '<i class="icon-info text-info"></i>'
+	: JHtml::image ( 'administrator/components/com_flexicontent/assets/images/information.png', JText::_( 'FLEXI_NOTES' ) );
+$revert_image = $this->params->get('use_font_icons', 1)
+	? '<i class="icon-undo" style="color:darkgray"></i>'
+	: JHtml::image ( 'administrator/components/com_flexicontent/assets/images/arrow_rotate_anticlockwise.png', JText::_( 'FLEXI_REVERT' ) );
+$compare_image = $this->params->get('use_font_icons', 1)
+	? '<i class="icon-contract-2" style="color:darkgray"></i>'
+	: JHtml::image ( 'administrator/components/com_flexicontent/assets/images/arrow-in-out.png', JText::_( 'FLEXI_VIEW' ) );
+$comment_image = $this->params->get('use_font_icons', 1)
+	? '<i class="icon-comment" style="color:darkgray"></i>'
+	: JHtml::image ( 'administrator/components/com_flexicontent/assets/images/comments.png', JText::_( 'FLEXI_COMMENT' ) );
+$hint_image = $this->params->get('use_font_icons', 1)
+	? '<i class="icon-lamp"></i>'
+	: JHtml::image ( 'administrator/components/com_flexicontent/assets/images/lightbulb.png', JText::_( 'FLEXI_NOTES' ), 'style="vertical-align:top;"' );
+$warn_image = $this->params->get('use_font_icons', 1)
+	? '<i class="icon-warning text-warning"></i>'
+	: JHtml::image ( 'administrator/components/com_flexicontent/assets/images/warning.png', JText::_( 'FLEXI_NOTES' ), 'style="vertical-align:top;"' );
 $conf_image = '<i class="icon-cog"></i>';
 
 $add_on_class    = $this->params->get('bootstrap_ver', 2)==2  ?  'add-on' : 'input-group-addon';
@@ -1889,33 +1908,44 @@ if ( count($FC_jfields_html) ) : ?>
 				else :
 				$date_format = (($date_format = JText::_( 'FLEXI_DATE_FORMAT_FLEXI_VERSIONS_J16GE' )) == 'FLEXI_DATE_FORMAT_FLEXI_VERSIONS_J16GE') ? "d/M H:i" : $date_format;
 				foreach ($this->versions as $version) :
-					$class = ($version->nr == $this->item->version) ? ' id="active-version" class="success"' : '';
+					$isCurrent = (int) $version->nr === (int) $this->item->current_version;
+					$class = $isCurrent ? ' id="active-version" class="success"' : '';
 					if ((int)$version->nr > 0) :
 				?>
-				<tr<?php echo $class; ?>>
-					<td class="versions"><span style="padding: 0 5px 0 0;"><?php echo '#' . $version->nr; ?></span></td>
-					<td class="versions"><span style="padding: 0 5px 0 0;"><?php echo JHtml::_('date', (($version->nr == 1) ? $this->item->created : $version->date), $date_format ); ?></span></td>
-					<td class="versions"><span style="padding: 0 5px 0 0;"><?php echo ($version->nr == 1) ? flexicontent_html::striptagsandcut($this->item->creator, 25) : flexicontent_html::striptagsandcut($version->modifier, 25); ?></span></td>
-					<td class="versions"><a href="javascript:;" class="hasTooltip" title="<?php echo JHtml::tooltipText( JText::_( 'FLEXI_COMMENT' ), ($version->comment ? $version->comment : 'No comment written'), 0, 1); ?>"><?php echo $commentimage;?></a>
-					<?php
-					if((int)$version->nr==(int)$this->item->current_version) { ?>
-						<a onclick="javascript:return clickRestore('<?php echo JUri::base(true); ?>/index.php?option=com_flexicontent&amp;view=item&amp;<?php echo $task_items;?>edit&amp;cid=<?php echo $this->item->id;?>&amp;version=<?php echo $version->nr; ?>');" href="javascript:;"><?php echo JText::_( 'FLEXI_CURRENT' ); ?></a>
-					<?php }else{
-					?>
-						<a class="modal-versions"
-							href="index.php?option=com_flexicontent&amp;view=itemcompare&amp;cid=<?php echo $this->item->id; ?>&amp;version=<?php echo $version->nr; ?>&amp;tmpl=component"
-							title="<?php echo JText::_( 'FLEXI_COMPARE_WITH_CURRENT_VERSION' ); ?>"
-						>
-							<?php echo $viewimage; ?>
-						</a>
-						<a onclick="javascript:return clickRestore('<?php echo JUri::base(true); ?>/index.php?option=com_flexicontent&amp;task=items.edit&amp;cid=<?php echo $this->item->id; ?>&amp;version=<?php echo $version->nr; ?>&amp;<?php echo JSession::getFormToken();?>=1');"
-							href="javascript:;"
-							title="<?php echo JText::sprintf( 'FLEXI_REVERT_TO_THIS_VERSION', $version->nr ); ?>"
-						>
-							<?php echo $revertimage; ?>
-						</a>
-					<?php }?></td>
-				</tr>
+			<tr<?php echo $class; ?>>
+				<td class="versions"><span style="padding: 0 5px 0 0;"><?php echo '#' . $version->nr; ?></span></td>
+				<td class="versions"><span style="padding: 0 5px 0 0;"><?php echo JHtml::_('date', (($version->nr == 1) ? $this->item->created : $version->date), $date_format ); ?></span></td>
+				<td class="versions"><span style="padding: 0 5px 0 0;"><?php echo ($version->nr == 1) ? flexicontent_html::striptagsandcut($this->item->creator, 25) : flexicontent_html::striptagsandcut($version->modifier, 25); ?></span></td>
+				<td class="versions">
+
+					<a href="javascript:;" class="hasTooltip" title="<?php echo JHtml::tooltipText( JText::_( 'FLEXI_COMMENT' ), ($version->comment ? $version->comment : 'No comment written'), 0, 1); ?>"><?php echo $comment_image;?></a>
+
+					<?php if (!$isSite) :?>
+
+						<?php if (!$isCurrent && $allow_versioncomparing) : ?>
+							<a class="modal-versions"
+								href="index.php?option=com_flexicontent&amp;view=itemcompare&amp;cid=<?php echo $this->item->id; ?>&amp;version=<?php echo $version->nr; ?>&amp;tmpl=component"
+								title="<?php echo JText::_( 'FLEXI_COMPARE_WITH_CURRENT_VERSION' ); ?>"
+							>
+								<?php echo $compare_image; ?>
+							</a>
+						<?php endif; ?>
+
+						<?php if ($isCurrent) : ?>
+							<a onclick="javascript:return clickRestore('<?php echo JUri::base(true); ?>/index.php?option=com_flexicontent&amp;view=item&amp;<?php echo $task_items;?>edit&amp;<?php echo ($isSite ? 'id=' : 'cid=') . $this->item->id;?>&amp;version=<?php echo $version->nr; ?>');" href="javascript:;"><?php echo JText::_( 'FLEXI_CURRENT' ); ?></a>
+						<?php else : ?>
+							<a onclick="javascript:return clickRestore('<?php echo JUri::base(true); ?>/index.php?option=com_flexicontent&amp;task=items.edit&amp;<?php echo ($isSite ? 'id=' : 'cid=') . $this->item->id;?>&amp;version=<?php echo $version->nr; ?>&amp;<?php echo JSession::getFormToken();?>=1');"
+								href="javascript:;"
+								title="<?php echo JText::sprintf( 'FLEXI_REVERT_TO_THIS_VERSION', $version->nr ); ?>"
+							>
+								<?php echo $revert_image; ?>
+							</a>
+						<?php endif; ?>
+
+					<?php endif; ?>
+
+				</td>
+			</tr>
 				<?php
 					endif;
 				endforeach;
