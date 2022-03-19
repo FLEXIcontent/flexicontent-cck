@@ -153,7 +153,8 @@ class plgFlexicontent_fieldsWeblink extends FCField
 				$image_options[$image->sub_path] = $image->sub_path;
 			}
 		}
-		$use_jformfields = true; //FLEXI_J40GE
+		$use_jformfields    = true; //FLEXI_J40GE
+		$thumb_size_default = 150;
 
 		// URL title (optional)
 		$usetitle      = $field->parameters->get( 'use_title', 0 ) ;
@@ -279,7 +280,6 @@ class plgFlexicontent_fieldsWeblink extends FCField
 			{
 				jimport('joomla.form.helper'); // JFormHelper
 				JFormHelper::loadFieldClass('media');   // JFormFieldMedia
-				$thumb_size_default = 150;
 			}
 
 			JText::script("FLEXI_FIELD_WEBLINK_ENTER_MEDIA_URL", true);
