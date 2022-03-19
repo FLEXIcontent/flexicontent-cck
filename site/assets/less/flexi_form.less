@@ -474,6 +474,7 @@ div .flexi_buttons button:not(.btn):hover {
 	display: inline-block;
 	min-height: 1em;
 	line-height: 1.1em;
+	min-width: 2em;
 	box-sizing: unset;
 	margin: 0;
 	vertical-align: top;
@@ -684,6 +685,94 @@ body .nowrap_hidden {
 	margin: -1px 0 0 0;
 	white-space: nowrap;
 }
+
+
+#flexicontent {
+	.fc-xpended > *,
+	.fc-xpended-row > * {
+		line-height: 2.2rem !important;
+		min-height: 2.45rem !important;
+		box-sizing: border-box !important;
+		padding: 0 8px;
+	}
+
+	.fc-xpended,
+	.fc-xpended-row {
+		button {
+			height: 2.45rem !important;
+		}
+		ul.select2-choices,
+		.select2-container {
+			line-height: 2.45rem !important;
+			min-height: 2.45rem !important;
+			box-sizing: border-box !important;
+			padding-top: 0;
+			padding-bottom: 0;
+			a.select2-choice {
+				.select2-chosen {
+					line-height: 2.33rem !important;
+					height: 2.33rem !important;
+				}
+			}
+		}
+		.input-group > *,
+		.input-group-append > *,
+		.input-group-prepend > *,
+		.input-group-addon > *,
+		.input-append > *,
+		.input-prepend > * {
+			line-height: 2.2rem !important;
+			min-height: 2.45rem !important;
+			box-sizing: border-box !important;
+			padding-top: 0;
+			padding-bottom: 0;
+		}
+	}
+
+	#fc-managers-header {
+		.fc-xpended > *,
+		.fc-xpended-row > * {
+			line-height: 1.7rem !important;
+			min-height: 1.95rem !important;
+			box-sizing: border-box !important;
+			padding: 0 8px;
+		}
+
+		.fc-xpended,
+		.fc-xpended-row {
+			button {
+				height: 1.95rem !important;
+			}
+			ul.select2-choices,
+			.select2-container {
+				line-height: 1.95rem !important;
+				min-height: 1.95rem !important;
+				box-sizing: border-box !important;
+				padding-top: 0;
+				padding-bottom: 0;
+				a.select2-choice {
+					.select2-chosen {
+						line-height: 1.75rem !important;
+						height: 1.75rem !important;
+					}
+				}
+			}
+			.input-group > *,
+			.input-group-append > *,
+			.input-group-prepend > *,
+			.input-group-addon > *,
+			.input-append > *,
+			.input-prepend > * {
+				line-height: 1.7rem !important;
+				min-height: 1.95rem !important;
+				box-sizing: border-box !important;
+				padding-top: 0;
+				padding-bottom: 0;
+			}
+		}
+	}
+}
+
 
 /* bootstrap INPUT groups */
 #flexicontent div.input-group-addon > *:not(:first-child):not(:last-child):not(.select2-container),
@@ -1079,22 +1168,19 @@ td.col_edit_layout {
 		width: 0 !important;
 	}
 	select.fc_is_selarrow {
-		max-width: 1.8em !important;
+		max-width: 25px !important;
 	}
 	select.fc_is_selarrow:hover, select.fc_is_selarrow:focus {
 		max-width: unset !important;
 	}
 
 	select.fc_is_selarrow + #search {
-		margin-left: 1.8em !important;
+		margin-left: 25px !important;
 	}
 
 	#search {
 		margin: 0px !important;
 		padding: 0 0.6rem;
-		height: 2.55rem;
-		line-height: 2.55rem;	
-		vertical-align: top !important;
 		min-width: 200px;
 		border: 1px solid #aaa;
 
@@ -1253,10 +1339,10 @@ td.col_edit_layout {
 			font-size: 11px !important;
 			min-width: 93px;
 			max-width: 93px;
-			line-height: 2.7rem !important;
-			height: 2.7rem !important;
+			line-height: 1.9rem !important;
+			height: 1.9rem !important;
 			vertical-align: baseline;
-			padding: 17px 8px !important;
+			padding: 0px 8px !important;
 			box-sizing: border-box;
 			border-radius: 0;
 		}
@@ -1296,8 +1382,6 @@ td.col_edit_layout {
 .admin.com_flexicontent .select2-drop .select2-results {
 	max-height: 400px !important;
 }
-
-
 
 .flexicontent #fc-filters-box .fc-filter {
 	/* First level childs */
@@ -1355,7 +1439,6 @@ td.col_edit_layout {
 		width: 206px !important;
 
 	 .select2-choices {
-			min-height: 2.7rem !important;
 			box-sizing: border-box;
 
 			margin: 0 !important;

@@ -1457,7 +1457,6 @@ body .container_fcfield input.input-xxlarge,
 body .container_fcfield input,
 #flexicontent .container_fcfield input {
 	max-width: 100%;
-	height: 26px;
 }
 
 .flexi_params table.admintable,
@@ -1788,8 +1787,8 @@ ul.thumbnails.image_picker_selector li div.thumbnail p {
 #flexicontent form span.fcfield_textval,
 #flexicontent form select.fcfield_selectval,
 #flexicontent form input.fcfield_textval {
-	height: 2.7rem;
-	line-height: 2.7rem;
+	height: 1.9rem;
+	line-height: 1.9rem;
 	overflow: auto;
 	vertical-align: top;
 	min-width: 220px;
@@ -2446,14 +2445,10 @@ div.fctoolbar_bottom_placement {
 #flexicontent .select2-container,
 .select2-container {
 	margin: 0;
-	height: 2.55rem;
-	line-height: 2.55rem;
+	min-height: 1.75rem;
+	line-height: 1.7rem;
+	vertical-align: baseline;
 	padding: 0;
-}
-#flexicontent.fcconfig-form .select2-container,
-.select2-container {
-	height: 2rem;
-	line-height: 2rem;
 }
 
 /* select choice container */
@@ -2461,15 +2456,15 @@ div.fctoolbar_bottom_placement {
 	padding: 0 7px !important;
 	margin: 0 !important;
 	font-weight: normal !important;
-	min-height: 2.55rem !important;
-	line-height: 2.55rem !important;
+	min-height: 1.75rem !important;
+	line-height: 1.7rem !important;
 	height: auto !important;
 	box-sizing: content-box !important;
 	background:#fff !important;//remove background gradient
 }
 #flexicontent.fcconfig-form .select2-container .select2-choice {
-	min-height: 2rem !important;
-	line-height: 2rem !important;
+	min-height: 1.75rem !important;
+	line-height: 1.7rem !important;
 }
 
 html[dir="rtl"] .select2-container .select2-choice {
@@ -2478,13 +2473,15 @@ html[dir="rtl"] .select2-container .select2-choice {
 .select2-container .select2-choice > .select2-chosen {
 	color: black;
 	white-space: pre-wrap !important;
+	min-height: 1.75rem !important;
+	line-height: 1.7rem !important;
 }
 .select2-container .select2-choice .select2-arrow {
     border-left: 0px solid #aaa !important;
  	background: none !important;
 }
 .select2-container .select2-choice .select2-arrow b {
-    background-position: 0 4px !important;
+    background-position: 0 0.2rem !important;
 }
 
 /* Form validation failed, having 'invalid' CLASS */
@@ -2509,7 +2506,9 @@ html[dir="rtl"] .select2-container .select2-choice {
 	margin: 0 6px 0 0 !important;
 	white-space: normal !important; /* for chrome! */
 	width: auto !important;
-	min-width: 24px !important;
+	min-width: 2rem !important;
+  min-height: 1.9rem !important;
+  line-height: 1.9rem !important;
 }
 
 /* height fix for template CSS */
@@ -2524,6 +2523,20 @@ html[dir="rtl"] .select2-container .select2-choice {
 	line-height: 1em !important;
 	position: relative !important;
 }
+
+.select2-drop .select2-results {
+	li {
+		line-height: 1.9rem !important;
+		height: auto !important; /* may contain inner sub-list */
+		.select2-result-label {
+			padding: 0 2px !important;
+			font-size: 0.9rem !important;
+			line-height: 1.9rem !important;
+			height: 1.9rem !important;
+		}
+	}
+}
+
 
 /* Make search (filtering) field always visible, forcing the search icon too  */
 .select2-container-multi .select2-choices .select2-search-field input.select2-input,
@@ -2779,9 +2792,6 @@ div#permissions .tab-content {
 img.fc_field_image {
 	display: inline-block;
 	margin: 0px 4px 6px 0px;
-	/*padding: 1px;
-	border: 1px solid lightgray;
-	.fc.rounded.corners(5px);*/
 }
 div .fc_image_thumb {
 	display: inline-block;
@@ -2897,9 +2907,6 @@ div.fc-fieldgrp-value-box {
 [class*="fcfavs-"].fc-mssg-inline {
 	position: relative;
 	margin: 1px 2px;
-}
-.select2-container-multi .select2-choices {
-  min-height: 34px !important;
 }
 /** field language assoc**/
 #fcform_language_container .input-append input {

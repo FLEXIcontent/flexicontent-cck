@@ -174,20 +174,13 @@ span.btn.btn-sm.toolbar.dropdown-toggle.dropdown-toggle-split.fcfield-addvalue.f
 	margin-left: -5px !important;
 	margin-top: 0px !important;
 }
-body .container_fcfield input,
-#flexicontent .container_fcfield input {
-	height: 42px !important;
-}
 label.add-on {
-	height: 34px !important;
 	padding-right: 14px !important;
 }
 .addrint_autocomplete.pac-target-input {
-	height: 36px !important;
 	border: 1px solid var(--template-bg-dark-20);
 }
 label.add-on.fc-lbl-short.addrint_autocomplete-lbl {
-	height: 36px !important;
 	border: 1px solid var(--template-bg-dark-20) !important;
 }
 #flexicontent a.saveorder.btn.btn-small fa,
@@ -262,13 +255,6 @@ form div.container_fcfield > span {
 }
 .select2-default {
 	color: #000 !important;
-}
-.select2-container-multi .select2-choices .select2-search-field input.select2-input,
-.select2-container-multi.select2-dropdown-open .select2-choices .select2-search-field input.select2-input {
-	min-height: 39px !important;
-}
-.select2-container .select2-choice {
-	min-height: 31px !important;
 }
 .fc_filter_html :not(.input-append):not(.input-prepend) > input.fc_field_filter {
 	padding: 8px 3px 13px 9px !important;
@@ -447,11 +433,6 @@ label#use_advsearch_options_lbl {
 #flexicontent .col-search button.btn.btn-success.button_go {
 	width: 50%;
 }
-#flexicontent .select2-container,
-.select2-container {
-	height: 2.7rem !important;
-	line-height: 2.7rem !important;
-}
 .fcfilter_form_module .fc_filter_line.fc_clear_label.fc_filter_buttons_box {
 	margin-top: 1rem;
 }
@@ -482,4 +463,8 @@ label#use_advsearch_options_lbl {
 	flex-wrap: wrap;
 	position: relative;
 	width: 83%;
+}
+body div .form-horizontal .control-group,
+body div .control-group {
+	margin: 0 0 0 0;
 }

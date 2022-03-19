@@ -562,10 +562,6 @@ dl#content-pane.tabs {
 [class^="fcsb-icon-"]:before, [class*=" fcsb-icon-"]:before {
 	font-family: inherit;
 }
-#s2id_scope.select2-container.use_select2_lib .select2-choice {
-	width: 15px !important;
-	height: 34px !important;
-}
 /* fix toolbar search */
 #flexicontent div .btn-group > *:not(:first-child):not(:last-child), #flexicontent div .input-append > *:not(:first-child):not(:last-child) {
 	margin-left: -1px;
@@ -585,10 +581,6 @@ dl#content-pane.tabs {
 }
 .flexicontent *:not(.input-append):not(.input-prepend):not(.input-group) > select:not(.custom-select) {
 	padding: 11px;
-}
-#flexicontent .fc-xpended .input-group-text:first-child, #flexicontent .fc-xpended-row .input-group-text:first-child, #flexicontent .fc-xpended .add-on:first-child, #flexicontent .fc-xpended-row .add-on:first-child {
-	padding-top: 5px;
-	padding-bottom: 5px;
 }
 .flexicontent #fc-managers-header #fc-columns-slide-btn, .flexicontent #fc-managers-header #fc-filters-slide-btn {
 	height: inherit;
@@ -627,10 +619,6 @@ a.fc_assoc_translation.label.label-association {
 	line-height: initial;
 }
 /** fixs for item form **/
-body .container_fcfield input, #flexicontent .container_fcfield input {
-	height: 2.67rem !important;
-	border-radius: 3px;
-}
 div#tags #input-tags {
 	border-radius: 5px;
 	border: 1px solid #aaa;
@@ -881,23 +869,18 @@ span.btn.btn-sm.toolbar.dropdown-toggle.dropdown-toggle-split.fcfield-addvalue.f
 	padding: 4px 7px 3px 4px !important;
 }
 /**
- * Fix calendar bouton
- */
-.field-calendar .btn-primary {
-	/*border: 0 !important;*/
-	margin-left: -5px !important;
-	margin-top:-1px !important;
-	height: 2.70rem;
-}
-/**
  * Fix input address field
  */
 .addrint_autocomplete.pac-target-input{
-	height: 36px!important;
+	line-height: 1.9rem !important;
+	height: 1.9rem !important;
+	padding: 0 8px;
 	border: 1px solid var(--template-bg-dark-20);
 }
 label.add-on.fc-lbl-short.addrint_autocomplete-lbl {
-	height: 2.67rem !important;
+	line-height: 1.9rem !important;
+	height: 1.9rem !important;
+	padding: 0 8px;
 	border: 1px solid var(--template-bg-dark-20) !important;
 }
 #flexicontent a.saveorder.btn.btn-small {
@@ -927,8 +910,6 @@ body .fc-mssg-inline.fc-nobgimage, body .fc-mssg.fc-nobgimage {
 #flexicontent form .fcfield_textval,
 #flexicontent .fc_filedata_txt {
 	border: 1px solid var(--template-bg-dark-20) !important;
-	/*border-radius: 4px;
-	padding: 5px;*/
 }
 
 /**
@@ -961,8 +942,6 @@ div#type_tab_all {
 /** fix input search in item list **/
 .flexicontent #fc-managers-header #search {
 	border: 1px solid var(--template-bg-dark-20);
-	height: 2.7rem;
-	line-height: 2.7rem;
 }
 /** fix dropdown button need review**/
 span.btn.btn-sm.toolbar.dropdown-toggle.dropdown-toggle-split.fcfield-addvalue.fcfont-icon.icon.icon- {
@@ -970,17 +949,9 @@ span.btn.btn-sm.toolbar.dropdown-toggle.dropdown-toggle-split.fcfield-addvalue.f
 	left: 1px;
 	top: 0px;
 }
-/** fix selector relation field **/
-label#custom_agent_item_selector-lbl {
-	height: 2.64rem !important;
-}
 /** fix border input **/
 .select2-container-multi .select2-choices {
-    border: 1px solid var(--template-bg-dark-20) !important;
-}
-/** fix filter button when is in notification mode **/
-div#fc_filters_box_btn {
-	max-height: 2.7rem;
+	border: 1px solid var(--template-bg-dark-20) !important;
 }
 /** fix preview image field **/
 span.btn.fc_img_preview_btn.icon-search:before {
@@ -992,15 +963,9 @@ span.btn.fc_img_preview_btn.icon-search {
 	padding: 2px 5px !important;
 }
 /** fix media field **/
-span.add-on.fc_filedata_title {
-	min-height: 34px;
-	margin-left: 4px !important;
-}
 #flexicontent ul.fcfield-sortables > li.fcfieldval_container.valuebox.fc-expanded .fc-xpended-btns {
 	display: flex !important;
 }
-
-
 
 #flexicontent form div fieldset.panelform {
 	> fieldset,
@@ -1114,31 +1079,15 @@ body .form-grid {
 	}
 }
 #flexicontent .fc-xpended-btns > [class^="fcfield-"], #flexicontent .fc-xpended-btns > [class*=" fcfield-"], #flexicontent .fc-xpended-btns > .fcfield-button-add a {
-	background: #fff !important;
 	line-height: 1.6rem !important;
 }
 #flexicontent .fc-xpended-btns {
 	height: 2.74rem;
 }
-#flexicontent #fc-filters-box .fc-filter .select2-container-multi, #flexicontent #fc-filters-box .select2-container, .select2-container {
-	margin-top: -5px;
-}
 /*** correct order filter type **/
 .input-group-text.fc-lbl-inverted.fc-lbl-short.icon-info-2.hasPopover,
 .fc-filter.nowrap_box .input-group-text.fc-lbl-inverted.fc-lbl-short {
 	font-family: inherit !important;
-}
-div#s2id_filter_fieldtype {
-	margin-top: -2px !important;
-	height: 2.72em !important;
-}
-div#s2id_filter_type {
-	margin-top: -4px !important;
-	height: 2.72em !important;
-}
-div#s2id_filter_type a.select2-choice.fc_highlight, 
-div#s2id_filter_fieldtype a.select2-choice.fc_highlight {
-	line-height: 2.65rem !important;
 }
 /** fix table list **/
 .adminlist thead {
@@ -1169,20 +1118,6 @@ span.btn.btn-sm.toolbar.dropdown-toggle.dropdown-toggle-split.fcfield-addvalue.f
 }
 span.btn.btn-sm.toolbar.dropdown-toggle.dropdown-toggle-split.fcfield-addvalue.fcfont-icon.icon.icon-.dropdown-toggle:after{
 margin-top: 18px !important;
-}
-/** fix select2choice height in relation field **/
-.fc_select2_noselect.select2-container-multi .select2-choices {
-	height: 2.7rem !important;
-}
-#flexicontent .select2-container-multi .select2-choices .select2-search-choice {
-	font-size: 11px !important;
-	height: 14px !important;
-	line-height: 14px !important;
-	color: #fff !important;
-	border: 1px solid var(--template-bg-dark-50)!important;
-	background: var(--template-bg-dark-50)!important;
-	filter: none !important;
-	background-image: none !important;
 }
 span.fcfield-disablevalue.fcfont-icon.icon.icon- {
 	height: 1.5rem !important;
@@ -1245,4 +1180,10 @@ body .tabbertab, #flexicontent .tabbertab {
 	padding: 30px 2vw;
 	border-radius: 0.25rem;
 	box-shadow: 0 2px 10px -8px var(--template-bg-dark-50);
+}
+
+/* More compact display */
+body div .form-horizontal .control-group,
+body div .control-group {
+	margin: 0 0 0 0;
 }

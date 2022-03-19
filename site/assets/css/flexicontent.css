@@ -368,6 +368,7 @@ div .flexi_buttons button:not(.btn):hover {
 	display: inline-block;
 	min-height: 1em;
 	line-height: 1.1em;
+	min-width: 2em;
 	box-sizing: unset;
 	margin: 0;
 	vertical-align: top;
@@ -551,6 +552,98 @@ body .nowrap_hidden {
 	padding: 0;
 	margin: -1px 0 0 0;
 	white-space: nowrap;
+}
+#flexicontent .fc-xpended > *,
+#flexicontent .fc-xpended-row > * {
+	line-height: 2.2rem !important;
+	min-height: 2.45rem !important;
+	box-sizing: border-box !important;
+	padding: 0 8px;
+}
+#flexicontent .fc-xpended button,
+#flexicontent .fc-xpended-row button {
+	height: 2.45rem !important;
+}
+#flexicontent .fc-xpended ul.select2-choices,
+#flexicontent .fc-xpended .select2-container,
+#flexicontent .fc-xpended-row ul.select2-choices,
+#flexicontent .fc-xpended-row .select2-container {
+	line-height: 2.45rem !important;
+	min-height: 2.45rem !important;
+	box-sizing: border-box !important;
+	padding-top: 0;
+	padding-bottom: 0;
+}
+#flexicontent .fc-xpended ul.select2-choices a.select2-choice .select2-chosen,
+#flexicontent .fc-xpended .select2-container a.select2-choice .select2-chosen,
+#flexicontent .fc-xpended-row ul.select2-choices a.select2-choice .select2-chosen,
+#flexicontent .fc-xpended-row .select2-container a.select2-choice .select2-chosen {
+	line-height: 2.33rem !important;
+	height: 2.33rem !important;
+}
+#flexicontent .fc-xpended .input-group > *,
+#flexicontent .fc-xpended .input-group-append > *,
+#flexicontent .fc-xpended .input-group-prepend > *,
+#flexicontent .fc-xpended .input-group-addon > *,
+#flexicontent .fc-xpended .input-append > *,
+#flexicontent .fc-xpended .input-prepend > *,
+#flexicontent .fc-xpended-row .input-group > *,
+#flexicontent .fc-xpended-row .input-group-append > *,
+#flexicontent .fc-xpended-row .input-group-prepend > *,
+#flexicontent .fc-xpended-row .input-group-addon > *,
+#flexicontent .fc-xpended-row .input-append > *,
+#flexicontent .fc-xpended-row .input-prepend > * {
+	line-height: 2.2rem !important;
+	min-height: 2.45rem !important;
+	box-sizing: border-box !important;
+	padding-top: 0;
+	padding-bottom: 0;
+}
+#flexicontent #fc-managers-header .fc-xpended > *,
+#flexicontent #fc-managers-header .fc-xpended-row > * {
+	line-height: 1.7rem !important;
+	min-height: 1.95rem !important;
+	box-sizing: border-box !important;
+	padding: 0 8px;
+}
+#flexicontent #fc-managers-header .fc-xpended button,
+#flexicontent #fc-managers-header .fc-xpended-row button {
+	height: 1.95rem !important;
+}
+#flexicontent #fc-managers-header .fc-xpended ul.select2-choices,
+#flexicontent #fc-managers-header .fc-xpended .select2-container,
+#flexicontent #fc-managers-header .fc-xpended-row ul.select2-choices,
+#flexicontent #fc-managers-header .fc-xpended-row .select2-container {
+	line-height: 1.95rem !important;
+	min-height: 1.95rem !important;
+	box-sizing: border-box !important;
+	padding-top: 0;
+	padding-bottom: 0;
+}
+#flexicontent #fc-managers-header .fc-xpended ul.select2-choices a.select2-choice .select2-chosen,
+#flexicontent #fc-managers-header .fc-xpended .select2-container a.select2-choice .select2-chosen,
+#flexicontent #fc-managers-header .fc-xpended-row ul.select2-choices a.select2-choice .select2-chosen,
+#flexicontent #fc-managers-header .fc-xpended-row .select2-container a.select2-choice .select2-chosen {
+	line-height: 1.75rem !important;
+	height: 1.75rem !important;
+}
+#flexicontent #fc-managers-header .fc-xpended .input-group > *,
+#flexicontent #fc-managers-header .fc-xpended .input-group-append > *,
+#flexicontent #fc-managers-header .fc-xpended .input-group-prepend > *,
+#flexicontent #fc-managers-header .fc-xpended .input-group-addon > *,
+#flexicontent #fc-managers-header .fc-xpended .input-append > *,
+#flexicontent #fc-managers-header .fc-xpended .input-prepend > *,
+#flexicontent #fc-managers-header .fc-xpended-row .input-group > *,
+#flexicontent #fc-managers-header .fc-xpended-row .input-group-append > *,
+#flexicontent #fc-managers-header .fc-xpended-row .input-group-prepend > *,
+#flexicontent #fc-managers-header .fc-xpended-row .input-group-addon > *,
+#flexicontent #fc-managers-header .fc-xpended-row .input-append > *,
+#flexicontent #fc-managers-header .fc-xpended-row .input-prepend > * {
+	line-height: 1.7rem !important;
+	min-height: 1.95rem !important;
+	box-sizing: border-box !important;
+	padding-top: 0;
+	padding-bottom: 0;
 }
 #flexicontent div.input-group-addon > *:not(:first-child):not(:last-child):not(.select2-container),
 #flexicontent div.input-append > *:not(:first-child):not(:last-child):not(.select2-container),
@@ -870,21 +963,18 @@ td.col_edit_layout {
 	width: 0 !important;
 }
 .flexicontent #fc-managers-header select.fc_is_selarrow {
-	max-width: 1.8em !important;
+	max-width: 25px !important;
 }
 .flexicontent #fc-managers-header select.fc_is_selarrow:hover,
 .flexicontent #fc-managers-header select.fc_is_selarrow:focus {
 	max-width: unset !important;
 }
 .flexicontent #fc-managers-header select.fc_is_selarrow + #search {
-	margin-left: 1.8em !important;
+	margin-left: 25px !important;
 }
 .flexicontent #fc-managers-header #search {
 	margin: 0px !important;
 	padding: 0 0.6rem;
-	height: 2.55rem;
-	line-height: 2.55rem;
-	vertical-align: top !important;
 	min-width: 200px;
 	border: 1px solid #aaa;
 }
@@ -1012,10 +1102,10 @@ td.col_edit_layout {
 	font-size: 11px !important;
 	min-width: 93px;
 	max-width: 93px;
-	line-height: 2.7rem !important;
-	height: 2.7rem !important;
+	line-height: 1.9rem !important;
+	height: 1.9rem !important;
 	vertical-align: baseline;
-	padding: 17px 8px !important;
+	padding: 0px 8px !important;
 	box-sizing: border-box;
 	border-radius: 0;
 }
@@ -1086,7 +1176,6 @@ td.col_edit_layout {
 	width: 206px !important;
 }
 .flexicontent #fc-filters-box .fc-filter .select2-container-multi .select2-choices {
-	min-height: 2.7rem !important;
 	box-sizing: border-box;
 	margin: 0 !important;
 }
@@ -1648,12 +1737,12 @@ body .fc-nowrap-box .nowrap_box .label,
 #flexicontent .fc-xpended-row .add-on {
 	display: inline-block;
 	margin: 0 0 0 0;
-	height: 2.7rem;
-	line-height: 2.7rem;
+	height: 1.9rem;
+	line-height: 1.9rem;
 	padding: 0 0.6rem !important;
 	font-size: 1rem;
 	box-sizing: border-box;
-	vertical-align: bottom;
+	vertical-align: top;
 }
 #flexicontent.fcconfig-form .btn-group .btn,
 #flexicontent.fcconfig-form .fc-xpended > div,
@@ -1691,7 +1780,7 @@ body .fc-nowrap-box .nowrap_box .label,
 }
 #flexicontent [class^="fc-xpended"] div.select2-container,
 #flexicontent [class*="fc-xpended"] div.select2-container {
-	vertical-align: middle;
+	vertical-align: top;
 	margin: 0;
 }
 #flexicontent [class^="fc-xpended"] div.select2-container:first-child .select2-choice .select2-arrow,
@@ -1717,7 +1806,7 @@ body .fc-nowrap-box .nowrap_box .label,
 	border-bottom-right-radius: 0px;
 	margin-top: 0;
 	vertical-align: top;
-	font-size: 13px;
+	font-size: 1rem;
 }
 #flexicontent [class^="fc-xpended"] fieldset > label.btn:first-of-type,
 #flexicontent [class^="fc-xpended"] select:not(:first-child),
@@ -3337,7 +3426,6 @@ body .container_fcfield input.input-xxlarge,
 body .container_fcfield input,
 #flexicontent .container_fcfield input {
 	max-width: 100%;
-	height: 26px;
 }
 .flexi_params table.admintable,
 .flexi_params table.admintable td {
@@ -3625,8 +3713,8 @@ ul.thumbnails.image_picker_selector li div.thumbnail p {
 #flexicontent form span.fcfield_textval,
 #flexicontent form select.fcfield_selectval,
 #flexicontent form input.fcfield_textval {
-	height: 2.7rem;
-	line-height: 2.7rem;
+	height: 1.9rem;
+	line-height: 1.9rem;
 	overflow: auto;
 	vertical-align: top;
 	min-width: 220px;
@@ -4141,28 +4229,24 @@ div.fctoolbar_bottom_placement {
 #flexicontent .select2-container,
 .select2-container {
 	margin: 0;
-	height: 2.55rem;
-	line-height: 2.55rem;
+	min-height: 1.75rem;
+	line-height: 1.7rem;
+	vertical-align: baseline;
 	padding: 0;
-}
-#flexicontent.fcconfig-form .select2-container,
-.select2-container {
-	height: 2rem;
-	line-height: 2rem;
 }
 .select2-container .select2-choice {
 	padding: 0 7px !important;
 	margin: 0 !important;
 	font-weight: normal !important;
-	min-height: 2.55rem !important;
-	line-height: 2.55rem !important;
+	min-height: 1.75rem !important;
+	line-height: 1.7rem !important;
 	height: auto !important;
 	box-sizing: content-box !important;
 	background: #fff !important;
 }
 #flexicontent.fcconfig-form .select2-container .select2-choice {
-	min-height: 2rem !important;
-	line-height: 2rem !important;
+	min-height: 1.75rem !important;
+	line-height: 1.7rem !important;
 }
 html[dir="rtl"] .select2-container .select2-choice {
 	padding: 0 8px 0 0 !important;
@@ -4170,13 +4254,15 @@ html[dir="rtl"] .select2-container .select2-choice {
 .select2-container .select2-choice > .select2-chosen {
 	color: black;
 	white-space: pre-wrap !important;
+	min-height: 1.75rem !important;
+	line-height: 1.7rem !important;
 }
 .select2-container .select2-choice .select2-arrow {
 	border-left: 0px solid #aaa !important;
 	background: none !important;
 }
 .select2-container .select2-choice .select2-arrow b {
-	background-position: 0 4px !important;
+	background-position: 0 0.2rem !important;
 }
 .select2-container.invalid .select2-choice > .select2-chosen {
 	color: red !important;
@@ -4193,7 +4279,9 @@ html[dir="rtl"] .select2-container .select2-choice {
 	margin: 0 0 6px 0 !important;
 	white-space: normal !important;
 	width: auto !important;
-	min-width: 24px !important;
+	min-width: 2rem !important;
+	min-height: 1.9rem !important;
+	line-height: 1.9rem !important;
 }
 .select2-container-multi .select2-choices > li {
 	box-sizing: content-box;
@@ -4203,6 +4291,16 @@ html[dir="rtl"] .select2-container .select2-choice {
 	margin: 0px 2px !important;
 	line-height: 1em !important;
 	position: relative !important;
+}
+.select2-drop .select2-results li {
+	line-height: 1.9rem !important;
+	height: auto !important;
+}
+.select2-drop .select2-results li .select2-result-label {
+	padding: 0 2px !important;
+	font-size: 0.9rem !important;
+	line-height: 1.9rem !important;
+	height: 1.9rem !important;
 }
 .select2-container-multi .select2-choices .select2-search-field input.select2-input,
 .select2-container-multi.select2-dropdown-open .select2-choices .select2-search-field input.select2-input {
@@ -4482,9 +4580,6 @@ div.fc-fieldgrp-value-box {
 [class*="fcfavs-"].fc-mssg-inline {
 	position: relative;
 	margin: 1px 2px;
-}
-.select2-container-multi .select2-choices {
-	min-height: 34px !important;
 }
 #fcform_language_container .input-append input {
 	height: 26px !important;

@@ -477,12 +477,12 @@ body .fc-nowrap-box .nowrap_box .label,
 #flexicontent .fc-xpended-row .add-on {
 	display: inline-block;
 	margin: 0 0 0 0;
-	height: 2.7rem;
-	line-height: 2.7rem;
+	height: 1.9rem;
+	line-height: 1.9rem;
 	padding: 0 0.6rem !important;
 	font-size: 1rem;
 	box-sizing: border-box;
-	vertical-align: bottom;
+	vertical-align: top;
 }
 #flexicontent.fcconfig-form .btn-group .btn,
 #flexicontent.fcconfig-form .fc-xpended > div,
@@ -520,7 +520,7 @@ body .fc-nowrap-box .nowrap_box .label,
 }
 #flexicontent [class^="fc-xpended"] div.select2-container,
 #flexicontent [class*="fc-xpended"] div.select2-container {
-	vertical-align: middle;
+	vertical-align: top;
 	margin: 0;
 }
 #flexicontent [class^="fc-xpended"] div.select2-container:first-child .select2-choice .select2-arrow,
@@ -546,7 +546,7 @@ body .fc-nowrap-box .nowrap_box .label,
 	border-bottom-right-radius: 0px;
 	margin-top: 0;
 	vertical-align: top;
-	font-size: 13px;
+	font-size: 1rem;
 }
 #flexicontent [class^="fc-xpended"] fieldset > label.btn:first-of-type,
 #flexicontent [class^="fc-xpended"] select:not(:first-child),

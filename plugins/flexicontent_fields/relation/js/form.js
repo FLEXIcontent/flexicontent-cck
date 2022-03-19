@@ -124,7 +124,7 @@
 		var sel2_item_selector = jQuery('#s2id_' + elementid + '_item_selector');
 		sel2_item_selector.hide();
 
-		var loading = jQuery('<div class="fc_loading_msg" style="position:absolute; background-color:transparent;"></div>');
+		var loading = jQuery('<div class="fc_loading_msg" style="position:relative; background-color:transparent;"></div>');
 		loading.insertAfter(sel2_item_selector);
 
 		var ajax_data = {

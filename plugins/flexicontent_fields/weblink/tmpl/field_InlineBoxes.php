@@ -86,7 +86,7 @@
 					'onchange' => 'jQuery(this).closest(\'.fc-field-props-box\').find(\'.fcfield_message_box\').html(\'\'); if (this.selectedIndex > 0) { var mm_id=jQuery(this).parent().parent().find(\'.urlimage\').attr(\'id\'); jQuery(\'#\' + mm_id).data(\'basepath\', \'' . JUri::root() .'\'); jInsertFieldValue(this.value, mm_id); this.selectedIndex = 0; }',
 					'style' => 'width: auto; margin: 0;',
 				);
-				$imagelist = '<div style="width: 36px; overflow: hidden; display: flex; border: 0; border-radius: 0; margin-bottom: 1px; margin-' . (!JFactory::getLanguage()->isRtl() ? 'left' : 'right') .': -36px">'.
+				$imagelist = '<div style="width: 36px; overflow: hidden; display: flex; border: 0; border-radius: 0; margin-bottom: 1px; margin-' . (!JFactory::getLanguage()->isRtl() ? 'left' : 'right') .': 0px">'.
 					JHtml::_('select.genericlist',
 						$image_options,
 						$fieldname_n.'[imagelist]',
@@ -136,6 +136,7 @@
 						.'<span class="icon-image" aria-hidden="true"></span>' . JText::_('FLEXI_FIELD_WEBLINK_URLIMAGE') . '</span>'
 						//.JHtml::tooltip($tooltip, $tooltip_options)
 					.'</label>
+					' . $imagelist . '
 					<input ' . $ff_events . ' type="text" name="'.$fieldname_n.'[image]" id="'.$elementid_n.'_image" value="'.htmlspecialchars($img_path, ENT_COMPAT, 'UTF-8').'" readonly="readonly"
 						style=""
 						class="urlimage field-media-input hasTipImgpath ' . $input_classes . '" onchange="fcfield_weblink.update_path_tip(this);"
@@ -146,7 +147,6 @@
 						onclick="var mm_id=jQuery(this).parent().find(\'.urlimage\').attr(\'id\'); fcfield_weblink.currElement[\''.$field_name_js.'\']=mm_id; SqueezeBox.open(\''.$mm_link.'\', {size:{x: ((window.innerWidth-120) > 1360 ? 1360 : (window.innerWidth-120)), y: ((window.innerHeight-220) > 800 ? 800 : (window.innerHeight-220))}, handler: \'iframe\', onClose: function() {jQuery(\'#\' + mm_id).data(\'basepath\', \'' . JUri::root() .'\');} });  return false;">
 						<span class="icon-upload"></span> ' /*. JText::_('FLEXI_SELECT')*/ . '
 					</a>
-					' . $imagelist . '
 					<a class="btn '.$tooltip_class.'" href="javascript:;" title="'.JText::_('FLEXI_CLEAR').'" onclick="fcfield_weblink.clearImageThumb(this, {}, \''.$field_name_js.'\'); return false;" >
 						<i class="icon-remove"></i>
 					</a>
@@ -174,8 +174,8 @@
 					<label class="media-preview ' . $lbl_classes . $has_value_class . ' fc-lbl urlimage-lbl" for="'.$elementid_n.'_image">
 						<span class="icon-image" aria-hidden="true"></span>' . JText::_('FLEXI_FIELD_WEBLINK_URLIMAGE') . '</span>
 					</label>
-					' . $jfield->input . '
 					' . $imagelist . '
+					' . $jfield->input . '
 				</div>
 				<div class="fcfield_message_box" id="fcfield_message_box_'.$elementid_n.'"></div>
 				';
