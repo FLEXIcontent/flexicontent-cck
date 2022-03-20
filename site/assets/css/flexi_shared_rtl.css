@@ -2134,6 +2134,25 @@ html[dir="rtl"] .select2-container .select2-choice {
 	background: #d8d8d8 !important;
 	color: #fff !important;
 }
+#flexicontent .fc_filter_box ul.select2-choices,
+#flexicontent .fc_filter_box .select2-container {
+	padding: 0;
+	line-height: 2.45rem !important;
+	min-height: 2.45rem !important;
+	box-sizing: border-box !important;
+	padding-top: 0;
+	padding-bottom: 0;
+}
+#flexicontent .fc_filter_box ul.select2-choices a.select2-choice,
+#flexicontent .fc_filter_box .select2-container a.select2-choice {
+	line-height: 2.33rem !important;
+	height: 2.33rem !important;
+}
+#flexicontent .fc_filter_box ul.select2-choices a.select2-choice .select2-chosen,
+#flexicontent .fc_filter_box .select2-container a.select2-choice .select2-chosen {
+	line-height: 2.33rem !important;
+	height: 2.33rem !important;
+}
 fieldset legend .fc_legend_header_text {
 	background: none repeat scroll 0 0 transparent;
 	border: 1px solid lightgray;

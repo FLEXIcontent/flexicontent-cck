@@ -2591,14 +2591,34 @@ html[dir="rtl"] .select2-container .select2-choice {
 
 /* dropdown */
 .select2-drop.select2-drop-multi {
-    padding: 0px 10px 10px 10px !important;
+	padding: 0px 10px 10px 10px !important;
 }
 .select2-drop-active {
-    border: 1px solid #aaa !important;
+	border: 1px solid #aaa !important;
 }
 .select2-results .select2-highlighted {
-    background: #d8d8d8 !important;
-    color: #fff !important;
+	background: #d8d8d8 !important;
+	color: #fff !important;
+}
+
+#flexicontent .fc_filter_box {
+	ul.select2-choices,
+	.select2-container {
+		padding: 0 ;
+		line-height: 2.45rem !important;
+		min-height: 2.45rem !important;
+		box-sizing: border-box !important;
+		padding-top: 0;
+		padding-bottom: 0;
+		a.select2-choice {
+			line-height: 2.33rem !important;
+			height: 2.33rem !important;
+			.select2-chosen {
+				line-height: 2.33rem !important;
+				height: 2.33rem !important;
+			}
+		}
+	}
 }
 
 

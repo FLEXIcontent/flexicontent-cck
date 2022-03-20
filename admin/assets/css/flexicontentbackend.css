@@ -1169,28 +1169,6 @@ td.col_edit_layout {
 	box-sizing: border-box;
 	border-radius: 0;
 }
-#s2id_scope.select2-container.use_select2_lib {
-	margin: 0;
-	display: inherit;
-}
-#s2id_scope.select2-container.use_select2_lib .select2-choice {
-	width: 10px !important;
-	margin: 0 !important;
-	border-top-right-radius: 0;
-	border-bottom-right-radius: 0;
-}
-#s2id_scope.select2-container.use_select2_lib .select2-choice .select2-chosen {
-	white-space: nowrap !important;
-}
-#s2id_scope.select2-container.use_select2_lib .select2-choice .select2-arrow {
-	border-radius: 0px;
-}
-#s2id_scope.select2-container.use_select2_lib .select2-choice .select2-arrow > * {
-	background-position-y: 0.5em;
-}
-.admin.com_flexicontent .select2-drop .select2-results {
-	max-height: 400px !important;
-}
 .flexicontent #fc-filters-box .fc-filter > * {
 	vertical-align: middle !important;
 	float: left;
@@ -1261,6 +1239,28 @@ td.col_edit_layout {
 	padding: 2px 6px 2px 26px !important;
 	background: #fff url(../images/select2.png) no-repeat scroll -32px -22px !important;
 	width: 100% !important;
+}
+#s2id_scope.select2-container.use_select2_lib {
+	margin: 0;
+	display: inherit;
+}
+#s2id_scope.select2-container.use_select2_lib .select2-choice {
+	width: 10px !important;
+	margin: 0 !important;
+	border-top-right-radius: 0;
+	border-bottom-right-radius: 0;
+}
+#s2id_scope.select2-container.use_select2_lib .select2-choice .select2-chosen {
+	white-space: nowrap !important;
+}
+#s2id_scope.select2-container.use_select2_lib .select2-choice .select2-arrow {
+	border-radius: 0px;
+}
+#s2id_scope.select2-container.use_select2_lib .select2-choice .select2-arrow > * {
+	background-position-y: 0.5em;
+}
+.admin.com_flexicontent .select2-drop .select2-results {
+	max-height: 400px !important;
 }
 @media (max-width: 1580px) {
 	body .fc_hidden_1580,
@@ -4411,6 +4411,25 @@ html[dir="rtl"] .select2-container .select2-choice {
 .select2-results .select2-highlighted {
 	background: #d8d8d8 !important;
 	color: #fff !important;
+}
+#flexicontent .fc_filter_box ul.select2-choices,
+#flexicontent .fc_filter_box .select2-container {
+	padding: 0;
+	line-height: 2.45rem !important;
+	min-height: 2.45rem !important;
+	box-sizing: border-box !important;
+	padding-top: 0;
+	padding-bottom: 0;
+}
+#flexicontent .fc_filter_box ul.select2-choices a.select2-choice,
+#flexicontent .fc_filter_box .select2-container a.select2-choice {
+	line-height: 2.33rem !important;
+	height: 2.33rem !important;
+}
+#flexicontent .fc_filter_box ul.select2-choices a.select2-choice .select2-chosen,
+#flexicontent .fc_filter_box .select2-container a.select2-choice .select2-chosen {
+	line-height: 2.33rem !important;
+	height: 2.33rem !important;
 }
 fieldset legend .fc_legend_header_text {
 	background: none repeat scroll 0 0 transparent;
