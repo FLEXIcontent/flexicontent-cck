@@ -99,11 +99,10 @@ button.btn.btn-highlight:hover,
 	height: 42px !important;
 }
 /** icon in button **/
-#flexicontent  .fc-xpended-btns > [class^="fcfield-"]:not(.add-on):not(.input-group-addon):not(.btn), 
-#flexicontent .fc-xpended-btns > [class*=" fcfield-"]:not(.add-on):not(.input-group-addon):not(.btn), 
+#flexicontent .fc-xpended-btns > [class^="fcfield-"]:not(.add-on):not(.input-group-addon):not(.btn),
+#flexicontent .fc-xpended-btns > [class*=" fcfield-"]:not(.add-on):not(.input-group-addon):not(.btn),
 #flexicontent .fc-xpended-btns > .fcfield-button-add:not(.add-on):not(.input-group-addon) a,
-#flexicontent .buttons.btn-group > ul.dropdown-menu > li > span
- {
+#flexicontent .buttons.btn-group > ul.dropdown-menu > li > span {
 	font-family: 'Roboto' !important;
 }
 #flexicontent div {
@@ -131,7 +130,8 @@ button.btn.btn-highlight:hover,
 	.fcfield-drag-handle.fcfont-icon:before {
 		content: "\f0b2";
 	}
-	.fcfield-delvalue.fcfont-icon:before , .fc_uploader_row_remove:before{
+	.fcfield-delvalue.fcfont-icon:before,
+	.fc_uploader_row_remove:before{
 		content: "\f2ed";
 	}
 	.fcfield-disablevalue.fcfont-icon:before {
@@ -202,11 +202,10 @@ label.add-on.fc-lbl-short.addrint_autocomplete-lbl {
 		width: 1.2em !important;
 	}
 }
-/*** fix message inline ***/
-body .fc-mssg-inline.fc-nobgimage, body .fc-mssg.fc-nobgimage {
-	padding: 8px 10px 12px 36px;
-}
-/*** fix color input ***/
+
+/**
+ * Fix color of inputs
+ */
 #flexicontent .select2-container .select2-choice,
 #flexicontent div#tags #input-tags,
 #flexicontent .fc-field-props-box .fc_preview_msg,
@@ -222,8 +221,17 @@ body .fc-mssg-inline.fc-nobgimage, body .fc-mssg.fc-nobgimage {
 	border-radius: 4px;
 	padding: 5px;
 }
-/*** fix input margin **/
-.controls *:not(.input-append):not(.input-prepend):not(.input-group) > input[type="text"]:not(.minicolors), .controls textarea, .controls fieldset.radio, .controls fieldset.checkbox, .flexicontent textarea, .flexicontent fieldset.radio, .flexicontent fieldset.checkbox {
+
+/**
+ * Fix input margins
+ */
+.controls *:not(.input-append):not(.input-prepend):not(.input-group) > input[type="text"]:not(.minicolors),
+.controls textarea,
+.controls fieldset.radio,
+.controls fieldset.checkbox,
+.flexicontent textarea,
+.flexicontent fieldset.radio,
+.flexicontent fieldset.checkbox {
 	margin: 0;
 }
 #flexicontent .flexicontent :not(.input-prepend):not(.input-append) > input[type="text"]:not(.minicolors) {
@@ -308,7 +316,6 @@ span.btn.btn-sm.toolbar.dropdown-toggle.dropdown-toggle-split.fcfield-addvalue.f
 label#custom_agent_item_selector-lbl {
 	height: 36px !important;
 }
-
 /** fix preview image field **/
 span.btn.fc_img_preview_btn.icon-search:before {
 	display: none;
@@ -319,10 +326,6 @@ span.btn.fc_img_preview_btn.icon-search {
 	padding: 2px 5px !important;
 }
 /** fix media field **/
-span.add-on.fc_filedata_title {
-	min-height: 34px;
-	margin-left: 4px !important;
-}
 #flexicontent ul.fcfield-sortables > li.fcfieldval_container.valuebox.fc-expanded .fc-xpended-btns {
 	display: flex !important;
 }

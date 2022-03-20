@@ -90,7 +90,7 @@ button.btn.btn-highlight:hover,
 #adminForm label.add-on.fc-lbl-short.addrint_zoom-lbl {
 	height: 42px !important;
 }
-#flexicontent  .fc-xpended-btns > [class^="fcfield-"]:not(.add-on):not(.input-group-addon):not(.btn),
+#flexicontent .fc-xpended-btns > [class^="fcfield-"]:not(.add-on):not(.input-group-addon):not(.btn),
 #flexicontent .fc-xpended-btns > [class*=" fcfield-"]:not(.add-on):not(.input-group-addon):not(.btn),
 #flexicontent .fc-xpended-btns > .fcfield-button-add:not(.add-on):not(.input-group-addon) a,
 #flexicontent .buttons.btn-group > ul.dropdown-menu > li > span {
@@ -188,10 +188,6 @@ label.add-on.fc-lbl-short.addrint_autocomplete-lbl {
 #flexicontent a.saveorder.btn.btn-small [class*=" icon-"],
 #flexicontent a.saveorder.btn.btn-small [class^="icon-"] {
 	width: 1.2em !important;
-}
-body .fc-mssg-inline.fc-nobgimage,
-body .fc-mssg.fc-nobgimage {
-	padding: 8px 10px 12px 36px;
 }
 #flexicontent .select2-container .select2-choice,
 #flexicontent div#tags #input-tags,
@@ -335,10 +331,6 @@ span.btn.fc_img_preview_btn.icon-search {
 	width: 10px !important;
 	padding: 2px 5px !important;
 }
-span.add-on.fc_filedata_title {
-	min-height: 34px;
-	margin-left: 4px !important;
-}
 #flexicontent ul.fcfield-sortables > li.fcfieldval_container.valuebox.fc-expanded .fc-xpended-btns {
 	display: flex !important;
 }
@@ -463,4 +455,8 @@ label#use_advsearch_options_lbl {
 	flex-wrap: wrap;
 	position: relative;
 	width: 83%;
+}
+body div .form-horizontal .control-group,
+body div .control-group {
+	margin: 0 0 0 0;
 }

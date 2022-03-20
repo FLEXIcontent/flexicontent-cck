@@ -25,8 +25,11 @@
 	margin: 0px;
 	padding: 0px;
 }
-body #flexicontent .control-label > label {
+body #flexicontent .control-label {
+	padding-top: 0 !important;
 	max-width: 160px;
+}
+body #flexicontent .control-label > label {
 	white-space: initial;
 }
 body #flexicontent .control-label.fclabel_cleared {
@@ -553,6 +556,7 @@ body .nowrap_hidden {
 	margin: -1px 0 0 0;
 	white-space: nowrap;
 }
+#flexicontent .btn-group > *,
 #flexicontent .fc-xpended > *,
 #flexicontent .fc-xpended-row > * {
 	line-height: 2.2rem !important;
@@ -560,20 +564,35 @@ body .nowrap_hidden {
 	box-sizing: border-box !important;
 	padding: 0 8px;
 }
+#flexicontent .btn-group button,
 #flexicontent .fc-xpended button,
 #flexicontent .fc-xpended-row button {
 	height: 2.45rem !important;
 }
+#flexicontent .btn-group ul.select2-choices,
+#flexicontent .btn-group .select2-container,
 #flexicontent .fc-xpended ul.select2-choices,
 #flexicontent .fc-xpended .select2-container,
 #flexicontent .fc-xpended-row ul.select2-choices,
 #flexicontent .fc-xpended-row .select2-container {
+	padding: 0;
 	line-height: 2.45rem !important;
 	min-height: 2.45rem !important;
 	box-sizing: border-box !important;
 	padding-top: 0;
 	padding-bottom: 0;
 }
+#flexicontent .btn-group ul.select2-choices a.select2-choice,
+#flexicontent .btn-group .select2-container a.select2-choice,
+#flexicontent .fc-xpended ul.select2-choices a.select2-choice,
+#flexicontent .fc-xpended .select2-container a.select2-choice,
+#flexicontent .fc-xpended-row ul.select2-choices a.select2-choice,
+#flexicontent .fc-xpended-row .select2-container a.select2-choice {
+	line-height: 2.33rem !important;
+	height: 2.33rem !important;
+}
+#flexicontent .btn-group ul.select2-choices a.select2-choice .select2-chosen,
+#flexicontent .btn-group .select2-container a.select2-choice .select2-chosen,
 #flexicontent .fc-xpended ul.select2-choices a.select2-choice .select2-chosen,
 #flexicontent .fc-xpended .select2-container a.select2-choice .select2-chosen,
 #flexicontent .fc-xpended-row ul.select2-choices a.select2-choice .select2-chosen,
@@ -581,6 +600,12 @@ body .nowrap_hidden {
 	line-height: 2.33rem !important;
 	height: 2.33rem !important;
 }
+#flexicontent .btn-group .input-group > *,
+#flexicontent .btn-group .input-group-append > *,
+#flexicontent .btn-group .input-group-prepend > *,
+#flexicontent .btn-group .input-group-addon > *,
+#flexicontent .btn-group .input-append > *,
+#flexicontent .btn-group .input-prepend > *,
 #flexicontent .fc-xpended .input-group > *,
 #flexicontent .fc-xpended .input-group-append > *,
 #flexicontent .fc-xpended .input-group-prepend > *,
@@ -599,46 +624,68 @@ body .nowrap_hidden {
 	padding-top: 0;
 	padding-bottom: 0;
 }
-#flexicontent #fc-managers-header .fc-xpended > *,
-#flexicontent #fc-managers-header .fc-xpended-row > * {
+#flexicontent #j-main-container .btn-group > *,
+#flexicontent #j-main-container .fc-xpended > *,
+#flexicontent #j-main-container .fc-xpended-row > * {
 	line-height: 1.7rem !important;
 	min-height: 1.95rem !important;
 	box-sizing: border-box !important;
 	padding: 0 8px;
 }
-#flexicontent #fc-managers-header .fc-xpended button,
-#flexicontent #fc-managers-header .fc-xpended-row button {
+#flexicontent #j-main-container .btn-group button,
+#flexicontent #j-main-container .fc-xpended button,
+#flexicontent #j-main-container .fc-xpended-row button {
 	height: 1.95rem !important;
 }
-#flexicontent #fc-managers-header .fc-xpended ul.select2-choices,
-#flexicontent #fc-managers-header .fc-xpended .select2-container,
-#flexicontent #fc-managers-header .fc-xpended-row ul.select2-choices,
-#flexicontent #fc-managers-header .fc-xpended-row .select2-container {
+#flexicontent #j-main-container .btn-group ul.select2-choices,
+#flexicontent #j-main-container .btn-group .select2-container,
+#flexicontent #j-main-container .fc-xpended ul.select2-choices,
+#flexicontent #j-main-container .fc-xpended .select2-container,
+#flexicontent #j-main-container .fc-xpended-row ul.select2-choices,
+#flexicontent #j-main-container .fc-xpended-row .select2-container {
+	padding: 0;
 	line-height: 1.95rem !important;
 	min-height: 1.95rem !important;
 	box-sizing: border-box !important;
 	padding-top: 0;
 	padding-bottom: 0;
 }
-#flexicontent #fc-managers-header .fc-xpended ul.select2-choices a.select2-choice .select2-chosen,
-#flexicontent #fc-managers-header .fc-xpended .select2-container a.select2-choice .select2-chosen,
-#flexicontent #fc-managers-header .fc-xpended-row ul.select2-choices a.select2-choice .select2-chosen,
-#flexicontent #fc-managers-header .fc-xpended-row .select2-container a.select2-choice .select2-chosen {
-	line-height: 1.75rem !important;
-	height: 1.75rem !important;
+#flexicontent #j-main-container .btn-group ul.select2-choices a.select2-choice,
+#flexicontent #j-main-container .btn-group .select2-container a.select2-choice,
+#flexicontent #j-main-container .fc-xpended ul.select2-choices a.select2-choice,
+#flexicontent #j-main-container .fc-xpended .select2-container a.select2-choice,
+#flexicontent #j-main-container .fc-xpended-row ul.select2-choices a.select2-choice,
+#flexicontent #j-main-container .fc-xpended-row .select2-container a.select2-choice {
+	line-height: 1.83rem !important;
+	height: 1.83rem !important;
 }
-#flexicontent #fc-managers-header .fc-xpended .input-group > *,
-#flexicontent #fc-managers-header .fc-xpended .input-group-append > *,
-#flexicontent #fc-managers-header .fc-xpended .input-group-prepend > *,
-#flexicontent #fc-managers-header .fc-xpended .input-group-addon > *,
-#flexicontent #fc-managers-header .fc-xpended .input-append > *,
-#flexicontent #fc-managers-header .fc-xpended .input-prepend > *,
-#flexicontent #fc-managers-header .fc-xpended-row .input-group > *,
-#flexicontent #fc-managers-header .fc-xpended-row .input-group-append > *,
-#flexicontent #fc-managers-header .fc-xpended-row .input-group-prepend > *,
-#flexicontent #fc-managers-header .fc-xpended-row .input-group-addon > *,
-#flexicontent #fc-managers-header .fc-xpended-row .input-append > *,
-#flexicontent #fc-managers-header .fc-xpended-row .input-prepend > * {
+#flexicontent #j-main-container .btn-group ul.select2-choices a.select2-choice .select2-chosen,
+#flexicontent #j-main-container .btn-group .select2-container a.select2-choice .select2-chosen,
+#flexicontent #j-main-container .fc-xpended ul.select2-choices a.select2-choice .select2-chosen,
+#flexicontent #j-main-container .fc-xpended .select2-container a.select2-choice .select2-chosen,
+#flexicontent #j-main-container .fc-xpended-row ul.select2-choices a.select2-choice .select2-chosen,
+#flexicontent #j-main-container .fc-xpended-row .select2-container a.select2-choice .select2-chosen {
+	line-height: 1.83rem !important;
+	height: 1.83rem !important;
+}
+#flexicontent #j-main-container .btn-group .input-group > *,
+#flexicontent #j-main-container .btn-group .input-group-append > *,
+#flexicontent #j-main-container .btn-group .input-group-prepend > *,
+#flexicontent #j-main-container .btn-group .input-group-addon > *,
+#flexicontent #j-main-container .btn-group .input-append > *,
+#flexicontent #j-main-container .btn-group .input-prepend > *,
+#flexicontent #j-main-container .fc-xpended .input-group > *,
+#flexicontent #j-main-container .fc-xpended .input-group-append > *,
+#flexicontent #j-main-container .fc-xpended .input-group-prepend > *,
+#flexicontent #j-main-container .fc-xpended .input-group-addon > *,
+#flexicontent #j-main-container .fc-xpended .input-append > *,
+#flexicontent #j-main-container .fc-xpended .input-prepend > *,
+#flexicontent #j-main-container .fc-xpended-row .input-group > *,
+#flexicontent #j-main-container .fc-xpended-row .input-group-append > *,
+#flexicontent #j-main-container .fc-xpended-row .input-group-prepend > *,
+#flexicontent #j-main-container .fc-xpended-row .input-group-addon > *,
+#flexicontent #j-main-container .fc-xpended-row .input-append > *,
+#flexicontent #j-main-container .fc-xpended-row .input-prepend > * {
 	line-height: 1.7rem !important;
 	min-height: 1.95rem !important;
 	box-sizing: border-box !important;
@@ -887,6 +934,10 @@ div table.fc-table-list tbody tr:hover td {
 }
 div table.fc-table-list tbody tr:hover td a:not(.btn) {
 	color: #0088cc;
+}
+#j-main-container select.fcfield_selectval {
+	min-width: unset !important;
+	background: #fff;
 }
 table.adminlist.fcmanlist {
 	margin-top: 12px;

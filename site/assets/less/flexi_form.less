@@ -44,8 +44,9 @@ body .fc_isselect.fc_ismobile {
 // ***
 
 body #flexicontent .control-label {
+	padding-top: 0 !important;
+	max-width: 160px;
 	> label {
-		max-width: 160px;
 		white-space: initial;
 	}
 
@@ -688,6 +689,7 @@ body .nowrap_hidden {
 
 
 #flexicontent {
+	.btn-group > *,
 	.fc-xpended > *,
 	.fc-xpended-row > * {
 		line-height: 2.2rem !important;
@@ -696,6 +698,7 @@ body .nowrap_hidden {
 		padding: 0 8px;
 	}
 
+	.btn-group,
 	.fc-xpended,
 	.fc-xpended-row {
 		button {
@@ -703,12 +706,15 @@ body .nowrap_hidden {
 		}
 		ul.select2-choices,
 		.select2-container {
+			padding: 0;
 			line-height: 2.45rem !important;
 			min-height: 2.45rem !important;
 			box-sizing: border-box !important;
 			padding-top: 0;
 			padding-bottom: 0;
 			a.select2-choice {
+				line-height: 2.33rem !important;
+				height: 2.33rem !important;
 				.select2-chosen {
 					line-height: 2.33rem !important;
 					height: 2.33rem !important;
@@ -729,7 +735,8 @@ body .nowrap_hidden {
 		}
 	}
 
-	#fc-managers-header {
+	#j-main-container {
+		.btn-group > *,
 		.fc-xpended > *,
 		.fc-xpended-row > * {
 			line-height: 1.7rem !important;
@@ -738,6 +745,7 @@ body .nowrap_hidden {
 			padding: 0 8px;
 		}
 
+		.btn-group,
 		.fc-xpended,
 		.fc-xpended-row {
 			button {
@@ -745,15 +753,18 @@ body .nowrap_hidden {
 			}
 			ul.select2-choices,
 			.select2-container {
+				padding: 0;
 				line-height: 1.95rem !important;
 				min-height: 1.95rem !important;
 				box-sizing: border-box !important;
 				padding-top: 0;
 				padding-bottom: 0;
 				a.select2-choice {
+					line-height: 1.83rem !important;
+					height: 1.83rem !important;
 					.select2-chosen {
-						line-height: 1.75rem !important;
-						height: 1.75rem !important;
+						line-height: 1.83rem !important;
+						height: 1.83rem !important;
 					}
 				}
 			}
@@ -1078,6 +1089,13 @@ div table.fc-table-list tbody tr:hover td a:not(.btn) {
 // *** FLEXIcontent backend manager views
 // ***
 
+#j-main-container {
+	select.fcfield_selectval {
+		min-width: unset !important;
+		background: #fff;
+	}
+}
+
 /* rows table */
 table.adminlist.fcmanlist {
 	margin-top: 12px;
@@ -1163,7 +1181,6 @@ td.col_edit_layout {
 // ***
 
 .flexicontent #fc-managers-header {
-
 	div.fc_is_selarrow .select2-chosen {
 		width: 0 !important;
 	}

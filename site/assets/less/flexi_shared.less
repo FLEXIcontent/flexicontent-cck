@@ -792,6 +792,11 @@ span.fc_select_button:hover {
 	border: 0px solid green;
 	font-weight: bold !important;
 }
+a.fc_assoc_translation:before {
+	content: '' !important;
+	-webkit-padding-end: 0px !important;
+	padding-inline-end: 0px !important;
+}
 .fc_assoc_translation.fc_assoc_later_mod {
 }
 
@@ -1789,6 +1794,8 @@ ul.thumbnails.image_picker_selector li div.thumbnail p {
 #flexicontent form input.fcfield_textval {
 	height: 1.9rem;
 	line-height: 1.9rem;
+	padding-top: 0;
+	padding-bottom: 0;
 	overflow: auto;
 	vertical-align: top;
 	min-width: 220px;
@@ -2503,7 +2510,7 @@ html[dir="rtl"] .select2-container .select2-choice {
 	position: relative !important;
 	top: 0 !important; left: 0 !important;
 	padding: 0px !important;
-	margin: 0 0 6px 0 !important;
+	margin: 0 !important;
 	white-space: normal !important; /* for chrome! */
 	width: auto !important;
 	min-width: 2rem !important;
@@ -2611,11 +2618,10 @@ fieldset legend .fc_legend_header_text {
 	top: 0;
 }
 
-#flexicontent .form-horizontal .control-label {
-	/*text-align: right;
-	padding-right: 10px;*/
+#flexicontent .control-label {
+	/*padding-top: 0 !important;*/
 }
-#flexicontent .form-horizontal .controls {
+#flexicontent .controls {
 	/*margin-right: 10px;*/
 }
 

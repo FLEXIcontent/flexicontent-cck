@@ -209,7 +209,7 @@ class FCPagination extends JPagination
 			'select.genericlist',
 			$limits,
 			$this->prefix . 'limit',
-			'class="' . (FLEXI_J40GE ? 'form-control' : '') . ' fc_skip_highlight" size="1" onchange="Joomla.submitform();"',
+			'class="fcfield_selectval" size="1" onchange="Joomla.submitform();"',
 			'value',
 			'text',
 			$selected

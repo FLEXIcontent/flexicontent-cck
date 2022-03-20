@@ -1292,7 +1292,7 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 			<?php if (!isset($disable_columns['access'])): ?>
 			<td class="col_access hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo $row->canEditState && $this->perms->CanAccLvl
-					? flexicontent_html::userlevel('access['.$row->id.']', $row->access, 'onchange="return Joomla.listItemTask(\'cb'.$i.'\',\''.$ctrl.'access\')"')
+					? flexicontent_html::userlevel('access['.$row->id.']', $row->access, 'class="fcfield_selectval" onchange="return Joomla.listItemTask(\'cb'.$i.'\',\''.$ctrl.'access\')"')
 					: $row->access_level; ?>
 			</td>
 			<?php endif; ?>

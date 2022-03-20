@@ -482,10 +482,6 @@ a.fc_assoc_translation.label.label-association {
 	border-radius: 5px;
 }
 .flexicontent #fc-managers-header #limit {
-	padding: 8px 7px !important;
-}
-.flexicontent #fc-managers-header #limit {
-	padding: 8px 7px !important;
 	min-width: inherit;
 	background: #fff;
 }
@@ -779,10 +775,6 @@ label.add-on.fc-lbl-short.addrint_autocomplete-lbl {
 #flexicontent a.saveorder.btn.btn-small [class^="icon-"] {
 	width: 1.2em !important;
 }
-body .fc-mssg-inline.fc-nobgimage,
-body .fc-mssg.fc-nobgimage {
-	padding: 8px 10px 12px 36px;
-}
 #flexicontent .select2-container .select2-choice,
 #flexicontent div#tags #input-tags,
 #flexicontent .fc-field-props-box .fc_preview_msg,
@@ -1045,5 +1037,5 @@ body .tabbertab,
 }
 body div .form-horizontal .control-group,
 body div .control-group {
-	margin: 0 0 0 0;
+	margin: 0.2rem 0;
 }
