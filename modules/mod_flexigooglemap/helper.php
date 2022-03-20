@@ -82,8 +82,11 @@ class modFlexigooglemapHelper
 
 		$db = JFactory::getDbo();
 		$queryLoc = 'SELECT a.id, a.title, b.field_id, b.value , a.catid '
+			.', CASE WHEN CHAR_LENGTH(a.alias) THEN CONCAT_WS(\':\', a.id, a.alias) ELSE a.id END as itemslug'
+			.', CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as catslug'
 			.' FROM #__content  AS a'
 			.' JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = a.id '
+			.' JOIN #__categories AS c ON c.id = a.catid'
 			.' LEFT JOIN #__flexicontent_fields_item_relations AS b ON a.id = b.item_id '
 			.' WHERE b.field_id = ' . $fieldaddressid.' AND ' . $catWheres . '  AND state = 1'
 			.' ORDER BY title '.$count
@@ -99,7 +102,7 @@ class modFlexigooglemapHelper
 
 		foreach ($itemsLoc as &$itemLoc)
 		{
-			$itemLoc->link = JRoute::_(FlexicontentHelperRoute::getItemRoute($itemLoc->id, $itemLoc->catid, $forced_itemid, $itemLoc));
+			$itemLoc->link = JRoute::_(FlexicontentHelperRoute::getItemRoute($itemLoc->itemslug, $itemLoc->catslug, $forced_itemid, $itemLoc));
 		}
 
 		return $itemsLoc;
@@ -311,7 +314,7 @@ class modFlexigooglemapHelper
 
 					if ($uselink)
 					{
-						$link = JRoute::_(FlexicontentHelperRoute::getItemRoute($address->id, $address->catid, $forced_itemid, $address));
+						$link = JRoute::_(FlexicontentHelperRoute::getItemRoute($address->slug, $address->categoryslug, $forced_itemid, $address));
 						$link = '<div class="link"><a href="'.$link.'" target="'.$linkmode.'" class="link btn">' . $readmore . '</a></div>';
 						$link = addslashes($link);
 					}
