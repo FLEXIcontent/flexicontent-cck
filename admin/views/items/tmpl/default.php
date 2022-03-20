@@ -1134,7 +1134,7 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 				</div>
 			</td>
 
-			<td class="col_title" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<td class="col_title smaller" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php
 				/**
 				 * Display an edit pencil or a check-in button if: either (a) current user has Global

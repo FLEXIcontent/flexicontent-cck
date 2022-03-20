@@ -627,7 +627,7 @@ body .nowrap_hidden {
 #flexicontent #j-main-container .btn-group > *,
 #flexicontent #j-main-container .fc-xpended > *,
 #flexicontent #j-main-container .fc-xpended-row > * {
-	line-height: 1.7rem !important;
+	line-height: 1.83rem !important;
 	min-height: 1.95rem !important;
 	box-sizing: border-box !important;
 	padding: 0 8px;
@@ -686,7 +686,7 @@ body .nowrap_hidden {
 #flexicontent #j-main-container .fc-xpended-row .input-group-addon > *,
 #flexicontent #j-main-container .fc-xpended-row .input-append > *,
 #flexicontent #j-main-container .fc-xpended-row .input-prepend > * {
-	line-height: 1.7rem !important;
+	line-height: 1.83rem !important;
 	min-height: 1.95rem !important;
 	box-sizing: border-box !important;
 	padding-top: 0;
@@ -935,9 +935,17 @@ div table.fc-table-list tbody tr:hover td {
 div table.fc-table-list tbody tr:hover td a:not(.btn) {
 	color: #0088cc;
 }
+#j-main-container .smaller {
+	font-size: 0.95em !important;
+}
+#j-main-container div .btn-group > *:not(:first-child),
+#j-main-container div .input-append > *:not(:first-child) {
+	margin-left: -1px;
+}
 #j-main-container select.fcfield_selectval {
 	min-width: unset !important;
-	background: #fff;
+	background: #fff !important;
+	font-size: 0.8rem !important;
 }
 table.adminlist.fcmanlist {
 	margin-top: 12px;
@@ -966,6 +974,7 @@ td.col_template {
 }
 td.col_edit_layout {
 	text-align: right;
+	width: 2em;
 }
 .flexicontent #fc-filters-box,
 .flexicontent #mainChooseColBox,
@@ -2675,7 +2684,7 @@ table.fcmanlist thead th .filterdel img {
 	vertical-align: bottom;
 }
 table.fcmanlist td {
-	padding: 4px;
+	padding: 5px 4px 3px 4px;
 }
 table.fcmanlist input[type="text"] {
 	width: auto !important;
@@ -2897,6 +2906,7 @@ span.fc_select_button:hover {
 	padding: 1px;
 	border: 0px solid green;
 	font-weight: bold !important;
+	font-size: 11px !important;
 }
 a.fc_assoc_translation:before {
 	content: '' !important;

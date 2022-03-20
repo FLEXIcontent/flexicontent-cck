@@ -600,7 +600,7 @@ if ($js)
 				</div>
 			</td>
 
-			<td class="col_title" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<td class="col_title smaller" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php
 				echo $row->level > 1
 					? str_repeat('.&nbsp;&nbsp;', $row->level - 1) . '<sup>|_</sup>&nbsp;'

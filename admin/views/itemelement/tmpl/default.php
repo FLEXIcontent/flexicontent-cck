@@ -524,7 +524,7 @@ if ($js)
 				<span class="<?php echo $state_icons[$state]; ?>" title="<?php echo $state_names[$state]; ?>"></span>
 			</td>
 
-			<td class="col_title" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<td class="col_title smaller" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php
 					// Do not activate row selection link if doing associations and the record is in use
 					$row_assoc_cnt = empty($this->lang_assocs[$row->id]) ? 0 : count($this->lang_assocs[$row->id]);

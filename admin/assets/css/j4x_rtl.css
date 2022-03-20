@@ -452,11 +452,6 @@ dl#content-pane.tabs {
 [class*=" fcsb-icon-"]:before {
 	font-family: inherit;
 }
-#flexicontent div .btn-group > *:not(:first-child):not(:last-child),
-#flexicontent div .input-append > *:not(:first-child):not(:last-child) {
-	margin-left: -1px;
-	margin-right: -1px;
-}
 .icon-tags:before {
 	content: "\f02c";
 }
@@ -478,8 +473,7 @@ a.btn.btn-small,
 	height: inherit;
 }
 a.fc_assoc_translation.label.label-association {
-	padding: 5px;
-	border-radius: 5px;
+	padding: 0px 4px 2px 4px;
 }
 .flexicontent #fc-managers-header #limit {
 	min-width: inherit;
@@ -633,8 +627,8 @@ div table.fc-table-list tr:nth-child(odd) td {
 	padding: 4px;
 	background: #fff;
 }
-table.fcmanlist tbody tr.row1 td {
-	background: none repeat scroll 0 0 #FFFFFF;
+table.fcmanlist tbody td {
+	padding: 4px 4px 6px 4px;
 }
 table.fcmanlist tbody td.col_status .fc-group {
 	vertical-align: text-top;
@@ -808,6 +802,9 @@ label.add-on.fc-lbl-short.addrint_autocomplete-lbl {
 div#type_tab_all {
 	background: transparent;
 }
+#fc-toggle-assocs_btn span {
+	padding: 0 6px 0 0;
+}
 .flexicontent #fc-managers-header #search {
 	border: 1px solid var(--template-bg-dark-20);
 }
@@ -937,11 +934,6 @@ body .form-grid .control-group .controls > div {
 	border-bottom-width: 1px;
 	box-shadow: inset 0 0 0 9999px var(--table-accent-bg);
 	padding: 0.75rem 1rem;
-}
-.flexicontent .fcmanlist .col_template,
-.flexicontent .fcmanlist .col_alias {
-	font-family: inherit;
-	text-align: center !important;
 }
 span.icon-menu-2.btn.btn-micro {
 	border: 0 !important;

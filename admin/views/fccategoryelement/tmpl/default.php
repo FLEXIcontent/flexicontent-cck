@@ -394,7 +394,7 @@ if ($js)
 				<?php echo $this->pagination->getRowOffset($i); ?>
 			</td-->
 
-			<td class="col_title">
+			<td class="col_title smaller">
 				<!--div class="adminlist-table-row"></div-->
 				<?php
 					// Do not activate row selection link if doing associations and the record is in use

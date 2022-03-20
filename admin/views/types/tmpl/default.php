@@ -365,7 +365,7 @@ if ($js)
 				</div>
 			</td>
 
-			<td class="col_title">
+			<td class="col_title smaller">
 				<?php
 				/**
 				 * Display an edit pencil or a check-in button if: either (a) current user has Global
@@ -391,7 +391,7 @@ if ($js)
 					$jview_ops[] = JHtml::_('select.option', '0', 'FLEXI_ROUTE_TO_ITEM_VIEW');
 					$jview_ops[] = JHtml::_('select.option', '2', 'FLEXI_REDIRECT_TO_ITEM_VIEW');
 
-					echo JHtml::_('select.genericlist', $jview_ops, 'allow_jview['.$row->id.']', 'size="1" onchange="Joomla.listItemTask(\'cb'.$i.'\',\'types.toggle_jview\'); Joomla.submitform()"', 'value', 'text', $allow_jview, 'allow_jview'.$row->id, $translate=true);
+					echo JHtml::_('select.genericlist', $jview_ops, 'allow_jview['.$row->id.']', 'class="fcfield_selectval" size="1" onchange="Joomla.listItemTask(\'cb'.$i.'\',\'types.toggle_jview\'); Joomla.submitform()"', 'value', 'text', $allow_jview, 'allow_jview'.$row->id, $translate=true);
 				?>
 			</td>
 
@@ -399,23 +399,23 @@ if ($js)
 				<?php echo JHtml::_($hlpname . '.edit_layout', $row, '__modal__', $i, $this->perms->CanTemplates, $row_ilayout); ?>
 			</td>
 
-			<td class="col_template hidden-phone hidden-tablet">
-				<small><?php echo $row_ilayout; ?></small>
+			<td class="col_template smaller hidden-phone hidden-tablet">
+				<?php echo $row_ilayout; ?>
 			</td>
 
-			<td class="col_allowed_subtree hidden-phone hidden-tablet">
+			<td class="col_allowed_subtree smaller hidden-phone hidden-tablet">
 				<?php echo isset($globalcats[$catid_allowed_parent]) ? $globalcats[$catid_allowed_parent]->title : '-'; ?>
 			</td>
 
-			<td class="col_iflayout_fe center hidden-phone hidden-tablet">
+			<td class="col_iflayout_fe smaller center hidden-phone hidden-tablet">
 				<?php echo $row_form_ilayout_fe; ?>
 			</td>
 
-			<td class="col_iflayout_be center hidden-phone hidden-tablet">
+			<td class="col_iflayout_be smaller center hidden-phone hidden-tablet">
 				<?php echo $row_form_ilayout_be; ?>
 			</td>
 
-			<td class="col_alias hidden-phone hidden-tablet">
+			<td class="col_alias smaller hidden-phone hidden-tablet">
 				<?php echo StringHelper::strlen($row->alias) > 25
 					? StringHelper::substr( htmlspecialchars($row->alias, ENT_QUOTES, 'UTF-8'), 0 , 25) . '...'
 					: htmlspecialchars($row->alias, ENT_QUOTES, 'UTF-8');

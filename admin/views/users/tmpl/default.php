@@ -449,7 +449,7 @@ if ($js)
 				<?php echo JHtml::_($hlpname . '.grid_id', $i, $row->id); ?>
 			</td>
 
-			<td class="col_title">
+			<td class="col_title smaller">
 				<a href="<?php echo $edit_link; ?>">
 					<?php echo $row->name; ?></a>
 			</td>

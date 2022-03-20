@@ -406,7 +406,7 @@ table.fcmanlist thead th .filterdel img {
 	vertical-align: bottom;
 }
 table.fcmanlist td {
-	padding: 4px;
+	padding: 5px 4px 3px 4px;
 }
 table.fcmanlist input[type="text"] {
 	width: auto !important;
@@ -628,6 +628,7 @@ span.fc_select_button:hover {
 	padding: 1px;
 	border: 0px solid green;
 	font-weight: bold !important;
+	font-size: 11px !important;
 }
 a.fc_assoc_translation:before {
 	content: '' !important;

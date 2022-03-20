@@ -739,7 +739,7 @@ body .nowrap_hidden {
 		.btn-group > *,
 		.fc-xpended > *,
 		.fc-xpended-row > * {
-			line-height: 1.7rem !important;
+			line-height: 1.83rem !important;
 			min-height: 1.95rem !important;
 			box-sizing: border-box !important;
 			padding: 0 8px;
@@ -774,7 +774,7 @@ body .nowrap_hidden {
 			.input-group-addon > *,
 			.input-append > *,
 			.input-prepend > * {
-				line-height: 1.7rem !important;
+				line-height: 1.83rem !important;
 				min-height: 1.95rem !important;
 				box-sizing: border-box !important;
 				padding-top: 0;
@@ -1086,13 +1086,27 @@ div table.fc-table-list tbody tr:hover td a:not(.btn) {
 
 
 // ***
-// *** FLEXIcontent backend manager views
+// *** Manager views frontend / backend
 // ***
 
 #j-main-container {
+	.smaller {
+		font-size: 0.95em !important;
+	}
+
+	/* Make border between buttons in toolbar be single line */
+	div {
+		.btn-group > *:not(:first-child),
+		.input-append > *:not(:first-child) {
+			margin-left: -1px;
+		}
+	}
+
+	/* More compact select elements */
 	select.fcfield_selectval {
 		min-width: unset !important;
-		background: #fff;
+		background: #fff !important;
+		font-size: 0.8rem !important;
 	}
 }
 
@@ -1125,6 +1139,7 @@ td.col_template {
 }
 td.col_edit_layout {
 	text-align: right;
+	width: 2em;
 }
 
 

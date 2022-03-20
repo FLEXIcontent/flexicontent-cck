@@ -1145,7 +1145,7 @@ if ($js)
 						</div>
 					</td>
 
-					<td class="col_title">
+					<td class="col_title smaller">
 						<?php
 						if (!$isFilesElement)
 						{

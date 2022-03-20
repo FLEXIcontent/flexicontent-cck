@@ -274,7 +274,7 @@ if ($js)
 				<!--div class="adminlist-table-row"></div-->
 				<?php echo JHtml::_($hlpname . '.grid_id', $i, $item->id); ?>
 			</td>
-			<td class="col_title">
+			<td class="col_title smaller">
 				<?php echo str_repeat('<span class="gi">|&mdash;</span>', $item->level) ?>
 				<?php if ($canEdit) : ?>
 				<a href="<?php echo JRoute::_('index.php?option=com_flexicontent&task=group.edit&id='.$item->id);?>">
