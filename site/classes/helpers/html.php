@@ -236,7 +236,9 @@ class flexicontent_html
 	}
 
 
-	/* Checks and if needed compiles LESS files to CSS files*/
+	/**
+	 * Checks and if needed compiles LESS files to CSS files
+	 */
 	static function checkedLessCompile($files, $path, $inc_paths=null, $force=false, $check_global_inc = true)
 	{
 		static $print_logging_info = null;
@@ -275,13 +277,13 @@ class flexicontent_html
 			$outFile    = 'css' .DS. $nameOnly . '.css';
 
 			if (!JFile::exists($path.$inFile)) {
-				//if ($debug) JFactory::getApplication()->enqueueMessage('Path not found: '.$path.$inFile, 'warning');
+				if ($debug) JFactory::getApplication()->enqueueMessage('Path not found: '.$path.$inFile, 'warning');
 			} else if ( $_dirty || $force || !is_file($path.$outFile) || filemtime($path.$inFile) > filemtime($path.$outFile) || (filesize($path.$outFile)===0 && is_writable($path.$outFile)) ) {
 				$stale[$inFile] = $outFile;
 			}
 		}
 		unset($inFile);
-		//print_r($stale);
+		//echo '<pre>'; print_r($stale); echo '</pre>';
 
 		// We are done if no CSS files need to be updated
 		if (empty($stale)) return array();

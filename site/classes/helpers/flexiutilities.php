@@ -921,4 +921,102 @@ class FLEXIUtilities
 		}
 	}
 
+
+	/**
+	 * Check and compile all Core LESS files
+	 */
+	static function checkedLessCompile_coreFiles()
+	{
+		// Files in frontend assets folder
+		$path = JPATH_SITE.'/components/com_flexicontent/assets/';
+		$inc_path = $path.'less/include/';
+
+		$less_files = array(
+			'less/flexi_file_fields.less',
+		);
+		$force = $stale_fields = flexicontent_html::checkedLessCompile($less_files, $path, $inc_path, $force=false);
+
+		$less_files = array('less/flexi_form_fields.less');
+		flexicontent_html::checkedLessCompile($less_files, $path, $inc_path, $force);
+
+		$less_files = array(
+			'less/flexi_filters.less',
+			'less/fcvote.less',
+			'less/tabber.less',
+			'less/j3x.less',
+			'less/j3x_rtl.less',
+			'less/j4x.less',
+			'less/j4x_rtl.less',
+		);
+		flexicontent_html::checkedLessCompile($less_files, $path, $inc_path, $force=false);
+
+		$less_files = array(
+			'less/flexi_form.less',
+			'less/flexi_containers.less',
+			'less/flexi_shared.less',
+			'less/flexi_frontend.less',
+		);
+
+		$stale_frontend = flexicontent_html::checkedLessCompile($less_files, $path, $inc_path, $force=false);
+		$force = $stale_frontend && count($stale_frontend);
+		$less_files = array('less/flexicontent.less');
+		flexicontent_html::checkedLessCompile($less_files, $path, $inc_path, $force);
+
+		// Files in backend assets folder
+		$path = JPATH_ADMINISTRATOR.'/components/com_flexicontent/assets/';
+		$inc_path = $path.'less/include/';
+
+		$less_files = array('less/flexi_backend.less');
+		$stale_backend = flexicontent_html::checkedLessCompile($less_files, $path, $inc_path, $force=false);
+
+		$force = ($stale_frontend && count($stale_frontend)) || ($stale_backend && count($stale_backend)) ;
+		$less_files = array('less/flexicontentbackend.less');
+		flexicontent_html::checkedLessCompile($less_files, $path, $inc_path, $force);
+
+		// Other backend less files
+		$less_files = array(
+			'less/j3x.less',
+			'less/j4x.less',
+		);
+		flexicontent_html::checkedLessCompile($less_files, $path, $inc_path, $force=false);
+
+
+		/* RTL BOF */
+
+		// Files in frontend assets folder
+		$path = JPATH_SITE.'/components/com_flexicontent/assets/';
+		$inc_path = $path.'less/include/';
+
+		$less_files = array(
+			'less/flexi_form_rtl.less',
+			'less/flexi_containers_rtl.less',
+			'less/flexi_shared_rtl.less',
+			'less/flexi_frontend_rtl.less'
+		);
+
+		$stale_frontend = flexicontent_html::checkedLessCompile($less_files, $path, $inc_path, $force=false);
+		$force = $stale_frontend && count($stale_frontend);
+		$less_files = array('less/flexicontent_rtl.less');
+		flexicontent_html::checkedLessCompile($less_files, $path, $inc_path, $force);
+
+		// Files in backend assets folder
+		$path = JPATH_ADMINISTRATOR.'/components/com_flexicontent/assets/';
+		$inc_path = $path.'less/include/';
+
+		$less_files = array('less/flexi_backend_rtl.less');
+		$stale_backend = flexicontent_html::checkedLessCompile($less_files, $path, $inc_path, $force=false);
+
+		$force = ($stale_frontend && count($stale_frontend)) || ($stale_backend && count($stale_backend)) ;
+		$less_files = array('less/flexicontentbackend_rtl.less');
+		flexicontent_html::checkedLessCompile($less_files, $path, $inc_path, $force);
+
+		// Other backend less files
+		$less_files = array(
+			'less/j3x_rtl.less',
+			'less/j4x_rtl.less',
+		);
+		flexicontent_html::checkedLessCompile($less_files, $path, $inc_path, $force=false);
+
+		/* RTL EOF */
+	}
 }

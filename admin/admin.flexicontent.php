@@ -117,11 +117,11 @@ else
  * Prepare calling the controller task
  */
 
-// Get view, task, controller REQUEST variables
+// Get view, task, controller, layout REQUEST variables
 $view = $jinput->get('view', '', 'cmd');
 $task = $jinput->get('task', '', 'cmd');
 $controller = $jinput->get('controller', '', 'cmd');
-
+//$layout   = $jinput->get('layout', '', 'cmd');  // UNUSED in backend
 
 // Controller can be set via task variable, split task from controller name
 $_ct = explode('.', $task);
@@ -133,9 +133,8 @@ if (count($_ct) > 1)
 
 
 // Cases that view variable must be ignored, and instead use the controller name as view
-$forced_views = array
-(
-	'category' => 1
+$forced_views = array(
+	'category' => 1,
 );
 if ( isset($forced_views[$controller]) )
 {
@@ -154,9 +153,9 @@ if ( isset($forced_views[$controller]) )
 // ***
 
 // CASE 1: Use (if it exists) controller named as current view name
-if ( file_exists( JPATH_COMPONENT.'/controllers/'.$view.'.php' ) )
+if ( file_exists(JPATH_COMPONENT.'/controllers/'.$view.'.php') )
 {
-	if ($controller != 'group')
+	if ($controller !== 'group')
 	{
 		$controller = $view;
 	}
@@ -174,9 +173,9 @@ else if ( file_exists( JPATH_COMPONENT.'/controllers/'.$view.'s.php' ) )
 else
 {
 	// CASE 3: Some 'Plural' controllers have special naming
-	$view_to_ctrl = array
-	(
-		'category' => 'categories', 'file' => 'filemanager'
+	$view_to_ctrl = array(
+		'category' => 'categories',
+		'file' => 'filemanager',
 	);
 
 	if ( isset($view_to_ctrl[$view]) )
@@ -242,102 +241,7 @@ if ( $cparams->get('recompile_core_less', 0) && $format == 'html' )
 {
 	$start_microtime = microtime(true);
 
-	// Files in frontend assets folder
-	$path = JPATH_SITE.'/components/com_flexicontent/assets/';
-	$inc_path = $path.'less/include/';
-
-	$less_files = array(
-		'less/flexi_file_fields.less'
-	);
-	$force = $stale_fields = flexicontent_html::checkedLessCompile($less_files, $path, $inc_path, $force=false);
-
-	$less_files = array('less/flexi_form_fields.less');
-	flexicontent_html::checkedLessCompile($less_files, $path, $inc_path, $force);
-
-	$less_files = array(
-		'less/flexi_filters.less',
-		'less/fcvote.less',
-		'less/tabber.less',
-		'less/j3x.less',
-		'less/j3x_rtl.less',
-		'less/j4x.less',
-		'less/j4x_rtl.less'
-	);
-	flexicontent_html::checkedLessCompile($less_files, $path, $inc_path, $force=false);
-
-	$less_files = array(
-		'less/flexi_form.less',
-		'less/flexi_containers.less',
-		'less/flexi_shared.less',
-		'less/flexi_frontend.less'
-	);
-
-	$stale_frontend = flexicontent_html::checkedLessCompile($less_files, $path, $inc_path, $force=false);
-	$force = $stale_frontend && count($stale_frontend);
-	$less_files = array('less/flexicontent.less');
-	flexicontent_html::checkedLessCompile($less_files, $path, $inc_path, $force);
-
-	$less_files = array('less/j3x.less');
-	flexicontent_html::checkedLessCompile($less_files, $path, $inc_path, $force=false);
-
-	$less_files = array('less/j4x.less');
-	flexicontent_html::checkedLessCompile($less_files, $path, $inc_path, $force=false);
-
-	// Files in backend assets folder
-	$path = JPATH_ADMINISTRATOR.'/components/com_flexicontent/assets/';
-	$inc_path = $path.'less/include/';
-
-	$less_files = array('less/flexi_backend.less');
-	$stale_backend = flexicontent_html::checkedLessCompile($less_files, $path, $inc_path, $force=false);
-
-	$force = ($stale_frontend && count($stale_frontend)) || ($stale_backend && count($stale_backend)) ;
-	$less_files = array('less/flexicontentbackend.less');
-	flexicontent_html::checkedLessCompile($less_files, $path, $inc_path, $force);
-
-	$less_files = array('less/j3x.less');
-	flexicontent_html::checkedLessCompile($less_files, $path, $inc_path, $force=false);
-
-	$less_files = array('less/j4x.less');
-	flexicontent_html::checkedLessCompile($less_files, $path, $inc_path, $force=false);
-
-
-	/* RTL BOF */
-
-	// Files in frontend assets folder
-	$path = JPATH_SITE.'/components/com_flexicontent/assets/';
-	$inc_path = $path.'less/include/';
-
-	$less_files = array(
-		'less/flexi_form_rtl.less',
-		'less/flexi_containers_rtl.less',
-		'less/flexi_shared_rtl.less',
-		'less/flexi_frontend_rtl.less'
-	);
-
-	$stale_frontend = flexicontent_html::checkedLessCompile($less_files, $path, $inc_path, $force=false);
-	$force = $stale_frontend && count($stale_frontend);
-	$less_files = array('less/flexicontent_rtl.less');
-	flexicontent_html::checkedLessCompile($less_files, $path, $inc_path, $force);
-
-	// Files in backend assets folder
-	$path = JPATH_ADMINISTRATOR.'/components/com_flexicontent/assets/';
-	$inc_path = $path.'less/include/';
-
-	$less_files = array('less/flexi_backend_rtl.less');
-	$stale_backend = flexicontent_html::checkedLessCompile($less_files, $path, $inc_path, $force=false);
-
-	$force = ($stale_frontend && count($stale_frontend)) || ($stale_backend && count($stale_backend)) ;
-	$less_files = array('less/flexicontentbackend_rtl.less');
-	flexicontent_html::checkedLessCompile($less_files, $path, $inc_path, $force);
-
-	$less_files = array('less/j3x_rtl.less');
-	flexicontent_html::checkedLessCompile($less_files, $path, $inc_path, $force=false);
-
-	$less_files = array('less/j4x_rtl.less');
-	flexicontent_html::checkedLessCompile($less_files, $path, $inc_path, $force=false);
-
-	/* RTL EOF */
-
+	FLEXIUtilities::checkedLessCompile_coreFiles();
 
 	if ( $print_logging_info)
 		@$fc_run_times['core_less_recompile'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
@@ -544,7 +448,9 @@ if ( $print_logging_info && $jinput->get('tmpl', '', 'cmd')!='component' && $for
 		$msg .= sprintf('<br/>-- [Workflow sliders (Pending/Revised/etc): %.2f s] ', $fc_run_times['quick_sliders']/1000000);
 	// **** EOF: BACKEND SPECIFIC
 
-	// *** Fields rendering times
+	// **********************
+	// Fields rendering times
+	// **********************
 
 	if (count($fields_render_times))
 	{
