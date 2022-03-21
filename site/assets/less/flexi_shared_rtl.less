@@ -2480,7 +2480,7 @@ html[dir="rtl"] .select2-container .select2-choice {
 	padding: 0 8px 0 0 !important;
 }
 .select2-container .select2-choice > .select2-chosen {
-	color: black;
+	color: inherit;
 	white-space: pre-wrap !important;
 	min-height: 1.75rem !important;
 	line-height: 1.7rem !important;
@@ -2553,9 +2553,10 @@ html[dir="rtl"] .select2-container .select2-choice {
 	cursor: pointer;
 	min-width: 32px !important;
 	min-height: 20px !important;
-	padding: 6px 7px !important;
+	padding: 0 7px !important;
 	margin-top: 1px !important;
 	border: 0px solid lightgray !important;
+	box-sizing: content-box !important;
 	/*background: url(../../assets/images/plus-button.png) no-repeat  50% 50% !important;*/
 
 	background: #fff url('../images/select2.png') no-repeat 100% -22px !important;
@@ -2611,6 +2612,10 @@ html[dir="rtl"] .select2-container .select2-choice {
 		box-sizing: border-box !important;
 		padding-top: 0;
 		padding-bottom: 0;
+		input.select2-input {
+			line-height: 2.3rem !important;
+			height: 2.3rem !important;
+		}
 		a.select2-choice {
 			line-height: 2.33rem !important;
 			height: 2.33rem !important;

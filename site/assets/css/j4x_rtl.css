@@ -249,12 +249,6 @@ form div.container_fcfield > span {
 #flexicontent input#input-tags {
 	margin: 0px !important;
 }
-.select2-default {
-	color: #000 !important;
-}
-.fc_filter_html :not(.input-append):not(.input-prepend) > input.fc_field_filter {
-	padding: 8px 3px 13px 9px !important;
-}
 .input-group>:not(:first-child):not(.dropdown-menu):not(.valid-tooltip):not(.valid-feedback):not(.invalid-tooltip):not(.invalid-feedback) {
 	margin-left: -3px;
 }
@@ -294,9 +288,6 @@ form div.container_fcfield > span {
 .fc_filter_html :not(.input-prepend):not(.input-append) > .fc_text_filter,
 .fc_filter_html :not(.input-prepend):not(.input-append) > .fc_field_filter {
 	font-size: 12px !important;
-}
-.fc_filter_html.fc_text_search input {
-	min-height: 45px;
 }
 .fc_filter_html input.btn.btn-success {
 	margin-left: -5px;

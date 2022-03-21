@@ -582,6 +582,15 @@ body .nowrap_hidden {
 	padding-top: 0;
 	padding-bottom: 0;
 }
+#flexicontent .btn-group ul.select2-choices input.select2-input,
+#flexicontent .btn-group .select2-container input.select2-input,
+#flexicontent .fc-xpended ul.select2-choices input.select2-input,
+#flexicontent .fc-xpended .select2-container input.select2-input,
+#flexicontent .fc-xpended-row ul.select2-choices input.select2-input,
+#flexicontent .fc-xpended-row .select2-container input.select2-input {
+	line-height: 2.23rem !important;
+	height: 2.23rem !important;
+}
 #flexicontent .btn-group ul.select2-choices a.select2-choice,
 #flexicontent .btn-group .select2-container a.select2-choice,
 #flexicontent .fc-xpended ul.select2-choices a.select2-choice,
@@ -649,6 +658,15 @@ body .nowrap_hidden {
 	box-sizing: border-box !important;
 	padding-top: 0;
 	padding-bottom: 0;
+}
+#flexicontent #j-main-container .btn-group ul.select2-choices input.select2-input,
+#flexicontent #j-main-container .btn-group .select2-container input.select2-input,
+#flexicontent #j-main-container .fc-xpended ul.select2-choices input.select2-input,
+#flexicontent #j-main-container .fc-xpended .select2-container input.select2-input,
+#flexicontent #j-main-container .fc-xpended-row ul.select2-choices input.select2-input,
+#flexicontent #j-main-container .fc-xpended-row .select2-container input.select2-input {
+	line-height: 1.73rem !important;
+	height: 1.73rem !important;
 }
 #flexicontent #j-main-container .btn-group ul.select2-choices a.select2-choice,
 #flexicontent #j-main-container .btn-group .select2-container a.select2-choice,
@@ -4323,7 +4341,7 @@ html[dir="rtl"] .select2-container .select2-choice {
 	padding: 0 8px 0 0 !important;
 }
 .select2-container .select2-choice > .select2-chosen {
-	color: black;
+	color: inherit;
 	white-space: pre-wrap !important;
 	min-height: 1.75rem !important;
 	line-height: 1.7rem !important;
@@ -4378,9 +4396,10 @@ html[dir="rtl"] .select2-container .select2-choice {
 	cursor: pointer;
 	min-width: 32px !important;
 	min-height: 20px !important;
-	padding: 6px 7px !important;
+	padding: 0 7px !important;
 	margin-top: 1px !important;
 	border: 0px solid lightgray !important;
+	box-sizing: content-box !important;
 	background: #fff url('../images/select2.png') no-repeat 100% -22px !important;
 }
 .select2-container-multi.select2-dropdown-open .select2-choices .select2-search-field input.select2-input {
@@ -4423,6 +4442,11 @@ html[dir="rtl"] .select2-container .select2-choice {
 	box-sizing: border-box !important;
 	padding-top: 0;
 	padding-bottom: 0;
+}
+#flexicontent .fc_filter_box ul.select2-choices input.select2-input,
+#flexicontent .fc_filter_box .select2-container input.select2-input {
+	line-height: 2.3rem !important;
+	height: 2.3rem !important;
 }
 #flexicontent .fc_filter_box ul.select2-choices a.select2-choice,
 #flexicontent .fc_filter_box .select2-container a.select2-choice {

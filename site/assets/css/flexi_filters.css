@@ -238,9 +238,17 @@ form > .fc_filter_line {
 .flexicontent .fc_field_filter {
 	font-size: 11px;
 }
+.fc_filter_html .select2-container .select2-choices input.select2-input::placeholder,
+.fc_filter_html .fc_text_filter::placeholder,
+.fc_filter_html .fc_field_filter::placeholder {
+	color: #aaa;
+	opacity: 0.5;
+}
+.fc_filter_html .select2-container .select2-choices input.select2-input,
+.fc_filter_html .select2-container .select2-choice > .select2-chosen,
 .fc_filter_html .fc_text_filter,
 .fc_filter_html .fc_field_filter {
-	color: black;
+	color: #aaa;
 	font-weight: normal;
 	display: inline-block;
 	width: auto;
@@ -250,25 +258,19 @@ form > .fc_filter_line {
 	border-radius: 5px;
 	font-size: 11px;
 }
-.fc_filter_html not(.input-prepend):not(.input-append) > input.fc_text_filter,
-.fc_filter_html not(.input-prepend):not(.input-append) > input.fc_field_filter,
-.fc_filter_html not(.input-prepend):not(.input-append) > input.fc_text_filter:focus,
-.fc_filter_html not(.input-prepend):not(.input-append) > input.fc_field_filter:focus {
+.fc_filter_html :not(.input-prepend):not(.input-append) > input.fc_text_filter,
+.fc_filter_html :not(.input-prepend):not(.input-append) > input.fc_field_filter,
+.fc_filter_html :not(.input-prepend):not(.input-append) > input.fc_text_filter:focus,
+.fc_filter_html :not(.input-prepend):not(.input-append) > input.fc_field_filter:focus {
 	height: auto;
-	line-height: 150%;
-	padding: 5px 4px 6px 4px;
+	line-height: 2.33rem !important;
+	min-height: 2.33rem !important;
+	padding: 0px 4px 0px 4px !important;
 	margin: 3px 4px 3px 8px;
 	position: relative;
 	border: 1px solid gray;
-	opacity: 0.5;
 	min-width: 120px;
 	vertical-align: top;
-}
-.fc_filter_html :not(.input-append):not(.input-prepend) > input.fc_text_filter,
-.fc_filter_html :not(.input-append):not(.input-prepend) > input.fc_field_filter,
-.fc_filter_html :not(.input-append):not(.input-prepend) > input.fc_text_filter:focus,
-.fc_filter_html :not(.input-append):not(.input-prepend) > input.fc_field_filter:focus {
-	padding: 8px 2px 8px 9px;
 	border: 1px solid #aaa;
 	background: #fff url('../images/select2.png') no-repeat 92% -22px !important;
 }
@@ -381,7 +383,7 @@ span.fc_field_filter {
 .fc_has_inner_prompt.fc_has_inner_prompt_input {
 	left: 14px;
 	top: 6px;
-	color: black;
+	color: red;
 	line-height: 150%;
 	padding: 0px 0px 0px 4px;
 }
@@ -397,7 +399,7 @@ span.fc_field_filter {
 	width: unset !important;
 }
 .fc_filter_html .field-calendar .fc_field_filter {
-	color: black;
+	color: red;
 	font-weight: normal;
 	display: inline-block;
 	padding: 8px 8px 8px 5px;
@@ -415,7 +417,7 @@ span.fc_field_filter {
 .field-calendar .btn {
 	background: #fff !important;
 	box-shadow: none !important;
-	padding: 8px 10px 8px 12px;
+	padding: 0 10px 0 12px;
 	border: 1px solid #aaa;
 	color: #000;
 }
