@@ -972,7 +972,7 @@ class FlexicontentModelFields extends FCModelAdminList
 	 *
 	 * @since	3.3.0
 	 */
-	public function toggleprop($cid = array(), $propname = null, &$unsupported = 0, &$locked = 0)
+	public function toggleprop($cid = array(), $propname = null, &$unsupported = 0, &$locked = 0, $toggle_value = null)
 	{
 		$user = JFactory::getUser();
 
@@ -1011,9 +1011,24 @@ class FlexicontentModelFields extends FCModelAdminList
 
 			// Some fields are marked as 'dirty'
 			$dirty_properties = array('issearch', 'isadvsearch', 'isadvfilter');
-			$set_clause = in_array($propname, $dirty_properties) ?
-				' SET ' . $propname . ' = CASE ' . $propname . '  WHEN 2 THEN -1   WHEN -1 THEN 2   WHEN 1 THEN -1   WHEN 0 THEN 2   END' :
-				' SET ' . $propname . ' = 1-' . $propname;
+			if ($toggle_value === null)
+			{
+				$set_clause = in_array($propname, $dirty_properties)
+					? ' SET ' . $propname . ' = CASE ' . $propname . '  WHEN 2 THEN -1   WHEN -1 THEN 2   WHEN 1 THEN -1   WHEN 0 THEN 2   END'
+					: ' SET ' . $propname . ' = 1-' . $propname;
+			}
+			elseif((int) $toggle_value)
+			{
+				$set_clause = in_array($propname, $dirty_properties)
+					? ' SET ' . $propname . ' = CASE ' . $propname . '  WHEN 1 THEN 1   ELSE 2   END'
+					: ' SET ' . $propname . ' = ' . (int) $toggle_value;
+			}
+			else
+			{
+				$set_clause = in_array($propname, $dirty_properties)
+					? ' SET ' . $propname . ' = CASE ' . $propname . '  WHEN 0 THEN 0   ELSE -1   END'
+					: ' SET ' . $propname . ' = ' . (int) $toggle_value;
+			}
 
 			// Toggle the property for fields supporting the property
 			$query = 'UPDATE #__' . $this->records_dbtbl
@@ -1026,8 +1041,12 @@ class FlexicontentModelFields extends FCModelAdminList
 			// Get affected records, non records may have been locked by another user
 			$affected = $this->_db->getAffectedRows();
 
-			// Get locked records, by subtracting effected from initial count
-			$locked = count($support_ids) - $affected;
+			// Get locked records that have been locked by another user
+			$query = 'SELECT COUNT(*) FROM #__' . $this->records_dbtbl
+				. ' WHERE id IN (' . implode(",", $support_ids) . ')'
+				. ' AND ( checked_out <> 0 AND ( checked_out <> ' . (int) $user->get('id') . ' ) )'
+			;
+			$locked = $this->_db->setQuery($query)->loadResult();
 		}
 
 		return $affected;

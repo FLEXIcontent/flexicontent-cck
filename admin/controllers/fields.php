@@ -538,13 +538,39 @@ class FlexicontentControllerFields extends FlexicontentControllerBaseAdmin
 
 
 	/**
+	 * Logic to turn ON a boolean property of fields
+	 *
+	 * @return void
+	 *
+	 * @since 3.3
+	 */
+	function toggleprop_on()
+	{
+		$this->toggleprop($toggle_value = 1);
+	}
+
+
+	/**
+	 * Logic to turn OFF a boolean property of fields
+	 *
+	 * @return void
+	 *
+	 * @since 3.3
+	 */
+	function toggleprop_off()
+	{
+		$this->toggleprop($toggle_value = 0);
+	}
+
+
+	/**
 	 * Logic to toggle boolean property of fields
 	 *
 	 * @return void
 	 *
 	 * @since 3.3
 	 */
-	function toggleprop()
+	function toggleprop($toggle_value = null)
 	{
 		// Check for request forgeries
 		JSession::checkToken('request') or die(JText::_('JINVALID_TOKEN'));
@@ -601,7 +627,7 @@ class FlexicontentControllerFields extends FlexicontentControllerBaseAdmin
 
 		$unsupported = 0;
 		$locked = 0;
-		$affected = $model->toggleprop($cid, $propname, $unsupported, $locked);
+		$affected = $model->toggleprop($cid, $propname, $unsupported, $locked, $toggle_value);
 
 		if ($affected === false)
 		{
@@ -620,7 +646,7 @@ class FlexicontentControllerFields extends FlexicontentControllerBaseAdmin
 
 		$msg = JText::sprintf('FLEXI_FIELDS_TOGGLED_PROPERTY', $property_fullname, $affected);
 
-		if ($affected < count($cid))
+		if ($unsupported || $locked)
 		{
 			$msg .= '<br/>' . JText::sprintf('FLEXI_FIELDS_TOGGLED_PROPERTY_FIELDS_SKIPPED', $unsupported + $locked, $unsupported, $locked);
 		}
@@ -641,38 +667,61 @@ class FlexicontentControllerFields extends FlexicontentControllerBaseAdmin
 	 */
 	function selectsearchflag()
 	{
-		$btn_class = 'hasTooltip btn btn-small';
+		$btn_class = 'btn';
 
-		$state['issearch'] = array( 'name' => 'FLEXI_TOGGLE_TEXT_SEARCHABLE', 'desc' => 'FLEXI_FIELD_CONTENT_LIST_TEXT_SEARCHABLE_DESC', 'icon' => 'search', 'btn_class' => 'btn-success', 'clear' => true );
-		$state['isfilter'] = array( 'name' => 'FLEXI_TOGGLE_FILTERABLE', 'desc' => 'FLEXI_FIELD_CONTENT_LIST_FILTERABLE_DESC', 'icon' => 'filter', 'btn_class' => 'btn-success', 'clear' => true );
-		$state['isadvsearch'] = array( 'name' => 'FLEXI_TOGGLE_ADV_TEXT_SEARCHABLE', 'desc' => 'FLEXI_FIELD_ADVANCED_TEXT_SEARCHABLE_DESC', 'icon' => 'search', 'btn_class' => 'btn-info', 'clear' => true );
-		$state['isadvfilter'] = array( 'name' => 'FLEXI_TOGGLE_ADV_FILTERABLE', 'desc' => 'FLEXI_FIELD_ADVANCED_FILTERABLE_DESC', 'icon' => 'filter', 'btn_class' => 'btn-info', 'clear' => true );
+		$state['issearch'] = array( 'name' => 'FLEXI_TOGGLE_TEXT_SEARCHABLE', 'desc' => 'FLEXI_FIELD_CONTENT_LIST_TEXT_SEARCHABLE_DESC', 'icon' => 'search', 'btn_class' => '', 'clear' => true );
+		$state['isfilter'] = array( 'name' => 'FLEXI_TOGGLE_FILTERABLE', 'desc' => 'FLEXI_FIELD_CONTENT_LIST_FILTERABLE_DESC', 'icon' => 'filter', 'btn_class' => '', 'clear' => true );
+		$state['isadvsearch'] = array( 'name' => 'FLEXI_TOGGLE_ADV_TEXT_SEARCHABLE', 'desc' => 'FLEXI_FIELD_ADVANCED_TEXT_SEARCHABLE_DESC', 'icon' => 'search', 'btn_class' => '', 'clear' => true );
+		$state['isadvfilter'] = array( 'name' => 'FLEXI_TOGGLE_ADV_FILTERABLE', 'desc' => 'FLEXI_FIELD_ADVANCED_FILTERABLE_DESC', 'icon' => 'filter', 'btn_class' => '', 'clear' => true );
 
 		echo '
 		<div id="flexicontent" class="flexicontent" style="padding-top:5%;">
-		';
+		
+		<script>
+			function field_toggleprop(shortname, onoff)
+			{
+				if (window.parent.document.adminForm.boxchecked.value==0) {
+					alert("' . JText::_('FLEXI_NO_ITEMS_SELECTED', true) . '");
+					return false;
+				}
+				window.parent.document.adminForm.propname.value=shortname;
+				window.parent.document.adminForm.task.value="fields.toggleprop_" + onoff;
+				window.parent.document.adminForm.submit();
+				return false;
+			}
+		</script>
 
+		';
 		foreach ($state as $shortname => $statedata)
 		{
-			$css = "width:216px; margin:0px 24px 12px 0px; text-align: left;";
+			$css = "width: auto; margin:0px 24px 12px 0px; text-align: left;";
 			$link = JUri::base(true) . "/index.php?option=com_flexicontent&task=fields.toggleprop&propname=" . $shortname . "&" . JSession::getFormToken() . "=1";
 			$icon = $statedata['icon'];
 
 			if ($shortname == 'issearch')
 			{
-				echo '<br/><label class="label">' . JText::_('FLEXI_TOGGLE') . '</label> ' . JText::_('Content Lists') . '<br/>';
+				echo '<h2>' . JText::_('FLEXI_CONTENT_LISTS') . '</h2>';
 			}
 			elseif ($shortname == 'isadvsearch')
 			{
-				echo '<br/><label class="label">' . JText::_('FLEXI_TOGGLE') . '</label> ' . JText::_('Search View') . '<br/>';
+				echo '<h2>' . JText::_('FLEXI_SEARCH_VIEW_CONF') . '</h2>';
 			}
 			?>
-			<button style="<?php echo $css; ?>" class="<?php echo $btn_class . ' ' . $statedata['btn_class']; ?>" title="<?php echo JText::_($statedata['desc']); ?>" data-placement="right"
-				onclick="window.parent.document.adminForm.propname.value='<?php echo $shortname; ?>'; window.parent.document.adminForm.task.value='fields.toggleprop'; window.parent.document.adminForm.boxchecked.value==0  ?  alert('<?php echo JText::_('FLEXI_NO_ITEMS_SELECTED', true); ?>') : window.parent.document.adminForm.submit(); return false;"
-			>
+			
+			<div style="display: inline-block; min-width: 216px;" class="hasTooltip" data-placement="right" title="<?php echo JText::_($statedata['desc']); ?>" style="font-size: 1rem;">
+				<span class="icon-info"></span>
 				<span class="icon-<?php echo $icon; ?>"></span>
 				<?php echo JText::_($statedata['name']); ?>
+			</div>
+
+			<button style="<?php echo $css; ?>" class="<?php echo $btn_class . ' ' . $statedata['btn_class'] . ' btn-success'; ?>" onclick="field_toggleprop('<?php echo $shortname; ?>','on');">
+				<?php echo JText::_('JON'); ?> 
 			</button>
+
+			<button style="<?php echo $css; ?>" class="<?php echo $btn_class . ' ' . $statedata['btn_class'] . ' btn-danger'; ?>" onclick="field_toggleprop('<?php echo $shortname; ?>', 'off');">
+				<?php echo JText::_('JOFF'); ?> 
+			</button>
+
 			<?php
 			if (isset($statedata['clear']))
 			{
