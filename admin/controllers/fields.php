@@ -660,19 +660,19 @@ class FlexicontentControllerFields extends FlexicontentControllerBaseAdmin
 
 			if ($shortname == 'issearch')
 			{
-				echo '<br/><span class="label">' . JText::_('FLEXI_TOGGLE') . '</span> ' . JText::_('Content Lists') . '<br/>';
+				echo '<br/><label class="label">' . JText::_('FLEXI_TOGGLE') . '</label> ' . JText::_('Content Lists') . '<br/>';
 			}
 			elseif ($shortname == 'isadvsearch')
 			{
-				echo '<br/><span class="label">' . JText::_('FLEXI_TOGGLE') . '</span> ' . JText::_('Search View') . '<br/>';
+				echo '<br/><label class="label">' . JText::_('FLEXI_TOGGLE') . '</label> ' . JText::_('Search View') . '<br/>';
 			}
 			?>
-			<span style="<?php echo $css; ?>" class="<?php echo $btn_class . ' ' . $statedata['btn_class']; ?>" title="<?php echo JText::_($statedata['desc']); ?>" data-placement="right"
-				onclick="window.parent.document.adminForm.propname.value='<?php echo $shortname; ?>'; window.parent.document.adminForm.boxchecked.value==0  ?  alert('<?php echo JText::_('FLEXI_NO_ITEMS_SELECTED'); ?>')  :  window.parent.Joomla.submitbutton('fields.toggleprop')"
+			<button style="<?php echo $css; ?>" class="<?php echo $btn_class . ' ' . $statedata['btn_class']; ?>" title="<?php echo JText::_($statedata['desc']); ?>" data-placement="right"
+				onclick="window.parent.document.adminForm.propname.value='<?php echo $shortname; ?>'; window.parent.document.adminForm.task.value='fields.toggleprop'; window.parent.document.adminForm.boxchecked.value==0  ?  alert('<?php echo JText::_('FLEXI_NO_ITEMS_SELECTED', true); ?>') : window.parent.document.adminForm.submit(); return false;"
 			>
 				<span class="icon-<?php echo $icon; ?>"></span>
 				<?php echo JText::_($statedata['name']); ?>
-			</span>
+			</button>
 			<?php
 			if (isset($statedata['clear']))
 			{
