@@ -667,6 +667,15 @@ class FlexicontentControllerFields extends FlexicontentControllerBaseAdmin
 	 */
 	function selectsearchflag()
 	{
+		$document = JFactory::getDocument();
+		flexicontent_html::loadFramework('flexi-lib');
+		!JFactory::getLanguage()->isRtl()
+			? $document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', array('version' => FLEXI_VHASH))
+			: $document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', array('version' => FLEXI_VHASH));
+		!JFactory::getLanguage()->isRtl()
+			? $document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x.css' : 'j3x.css'), array('version' => FLEXI_VHASH))
+			: $document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x_rtl.css' : 'j3x_rtl.css'), array('version' => FLEXI_VHASH));
+
 		$btn_class = 'btn';
 
 		$state['issearch'] = array( 'name' => 'FLEXI_TOGGLE_TEXT_SEARCHABLE', 'desc' => 'FLEXI_FIELD_CONTENT_LIST_TEXT_SEARCHABLE_DESC', 'icon' => 'search', 'btn_class' => '', 'clear' => true );
@@ -678,12 +687,39 @@ class FlexicontentControllerFields extends FlexicontentControllerBaseAdmin
 		<div id="flexicontent" class="flexicontent" style="padding-top:5%;">
 		
 		<script>
+			var i = 0;
+			function submit_progressbar(bar_elem) {
+				var elem = bar_elem.firstChild;
+				if (i == 0) {
+					i = 1;
+					var width = 1;
+					var id = setInterval(frame, 25);
+					function frame() {
+						if (width >= 100) {
+							clearInterval(id);
+							i = 0;
+						} else {
+							width++;
+							elem.style.width = width + "%";
+						}
+					}
+				}
+			}
+
 			function field_toggleprop(shortname, onoff)
 			{
 				if (window.parent.document.adminForm.boxchecked.value==0) {
 					alert("' . JText::_('FLEXI_NO_ITEMS_SELECTED', true) . '");
 					return false;
 				}
+				var fc_blocker_mssg = document.getElementsByClassName("fc_blocker_mssg")[0];
+				var fc_filter_form_blocker = document.getElementById("fc_filter_form_blocker");
+				var fc_blocker_bar = document.getElementsByClassName("fc_blocker_bar")[0];
+
+				fc_blocker_mssg.innerHTML = "' . JText::_('FLEXI_LOADING') . '";
+				fc_filter_form_blocker.style.display = "block";
+				submit_progressbar(fc_blocker_bar);
+
 				window.parent.document.adminForm.propname.value=shortname;
 				window.parent.document.adminForm.task.value="fields.toggleprop_" + onoff;
 				window.parent.document.adminForm.submit();
