@@ -285,8 +285,9 @@ class plgFlexicontent_fieldsLinkslist extends FCField
 
 		$options = array();
 		$options[] = JHtml::_('select.option', '', '-'.JText::_('FLEXI_ALL').'-');
-		foreach ($elements as $val => $title) {
-			$options[] = JHtml::_('select.option', $val, $title);
+		foreach ($elements as $title => $val)
+		{
+			$options[] = JHtml::_('select.option', $title, $title);
 		}
 
 		$filter->html	= JHtml::_('select.genericlist', $options, 'filter_'.$filter->id, ' class="fc_field_filter" onchange="document.getElementById(\''.$formName.'\').submit();"', 'value', 'text', $value);
