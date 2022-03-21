@@ -682,7 +682,7 @@ class FlexicontentViewFields extends FlexicontentViewBaseRecords
 
 			$btn_name = 'basicindex';
 				$full_js="var url = jQuery(this).data('taskurl'); fc_showDialog(url, 'fc_modal_popup_container', 0, 550, 0, function(){document.body.innerHTML='<span class=\"fc_loading_msg\">"
-							.$loading_msg."<\/span>'; window.location.reload(false)}, {'title': '".flexicontent_html::encodeHTML(JText::_('FLEXI_MASS_TAGS_IMPORT'), 2)."'}); return false;";
+							.$loading_msg."<\/span>'; window.location.reload(false)}, {'title': '".flexicontent_html::encodeHTML(JText::_('FLEXI_TOGGLE_SEARCH_FLAG'), 2)."'}); return false;";
 
 				flexicontent_html::addToolBarButton(
 					'FLEXI_TOGGLE_SEARCH_FLAG', $btn_name, $full_js,
