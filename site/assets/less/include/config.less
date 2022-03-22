@@ -1,1 +1,15 @@
 @import 'mixins.less';
+
+/* CSS Variables */
+:root {
+	--form-inp-height: @form-inp-height+px;
+	--ctrls-inp-height: @ctrls-inp-height+px;
+	--fcman-inp-height: @fcman-inp-height+px;
+	--filts-inp-height: @filts-inp-height+px;
+}
+
+/* LESS functions */
+.fc.rounded.corners (@radius: 5px) {
+	border-radius: @radius;
+}
+

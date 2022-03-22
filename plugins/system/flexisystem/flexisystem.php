@@ -1937,6 +1937,60 @@ class plgSystemFlexisystem extends CMSPlugin
 	}
 
 
+	private function _storeLessConf($table)
+	{
+		$xml_path  = JPath::clean(JPATH_ADMINISTRATOR.'/components/com_flexicontent/config.xml');
+		$less_path = JPath::clean(JPATH_ROOT.'/components/com_flexicontent/assets/less/include/mixins.less');
+
+
+		/**
+		 * Load the XML file into a JForm object
+		 */
+		$_options = array('control' => 'jform', 'load_data' => false);
+		$jform = \JForm::getInstance(
+			'com_config.component', // Exception name, if an error occurs.
+			'config',               // The name of an XML file or string to load as the form definition.
+			$_options,              // An array of form options.
+			$_replace = false,      // Flag to toggle whether form fields should be replaced if a field already exists with the same group/name.
+			$_xpath = '/config'     // An optional xpath to search for the fields.
+		);
+		$jform->load(file_get_contents($xml_path));
+
+
+		/**
+		 * Iterate though the form elements and only use parameters with cssprep="less"
+		 *
+		 * Only look into some fieldsets, for all use:  $fieldSetNames = array_keys( $jform->getFieldsets());
+		 */
+		$fieldSetNames = array('component');  
+		$less_data = "/* This is created automatically, do NOT edit this manually! \nModify these in component configuration. */\n\n";
+
+		foreach($fieldSetNames as $fsname)
+		{
+			foreach($jform->getFieldset($fsname) as $field)
+			{
+				if ($field->getAttribute('cssprep')!='less') continue;  // Only add parameters meant to be less variables
+				$v = $table->params->get($field->fieldname);
+				if (is_array($v)) continue;  // array parameters not supported
+				$v = trim($v);
+				if ( !strlen($v) ) {
+					$v = $field->getAttribute('default');
+					if ( !strlen($v) ) continue;  // do not add empty parameters
+				}
+				$less_data .= '@' . $field->fieldname . ': ' . $v . ";\n";
+			}
+		}
+
+
+		/**
+		 * Write the less file with the CSS variable using the found cssprep parameters ...
+		 */
+		file_put_contents($less_path, $less_data);
+
+		return true;
+	}
+
+
 	/**
 	 * Event method onExtensionBeforeSave
 	 *
@@ -1968,6 +2022,8 @@ class plgSystemFlexisystem extends CMSPlugin
 				{
 					$table->params[$i] = $v;
 				}
+
+				$this->_storeLessConf($table);
 				$table->params = $table->params->toString();
 			}
 		}
@@ -2623,6 +2679,9 @@ class plgSystemFlexisystem extends CMSPlugin
 	private function _updateFileUsage_FcFileBtn_DownloadLinks($context, $item, $isNew, $propValues, $path = '', $depth = 0)
 	{
 		$db   = Factory::getDbo();
+
+		// Do not know how to handle this case
+		if (!isset($item->id)) return;
 
 		//Factory::getApplication()->enqueueMessage("context: $context");
 		if ($depth === 0)

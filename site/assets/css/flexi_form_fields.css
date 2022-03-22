@@ -1,3 +1,9 @@
+:root {
+	--form-inp-height: 36px;
+	--ctrls-inp-height: 36px;
+	--fcman-inp-height: 32px;
+	--filts-inp-height: 36px;
+}
 body .fc-fileman-tab {
 	margin: 0px;
 	padding: 4px 0 0 0;
@@ -1146,6 +1152,13 @@ div.container_fcfield div.toggle_all_values_buttons_box {
 #flexicontent .fc-xpended-btns.fc-bottom-btns {
 	margin: 8px 0 0 0;
 }
+#flexicontent .fc-xpended-btns.input-append.input-prepend > *,
+#flexicontent .fc-xpended-btns.btn-group > * {
+	min-height: var(--ctrls-inp-height) !important;
+	line-height: calc(var(--ctrls-inp-height) - 4px) !important;
+	box-sizing: border-box !important;
+	padding: 0 calc(var(--ctrls-inp-height) / 2) !important;
+}
 #flexicontent .fc-xpended-btns > * {
 	flex-grow: 0;
 	margin: 0 3px;
@@ -1156,8 +1169,6 @@ div.container_fcfield div.toggle_all_values_buttons_box {
 	font-size: 12px;
 	text-shadow: unset;
 	padding: 4px 16px;
-	line-height: 18px;
-	min-height: 18px;
 	cursor: pointer;
 	background-color: white;
 	box-sizing: content-box;

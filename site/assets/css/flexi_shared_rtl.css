@@ -1,3 +1,9 @@
+:root {
+	--form-inp-height: 36px;
+	--ctrls-inp-height: 36px;
+	--fcman-inp-height: 32px;
+	--filts-inp-height: 36px;
+}
 input.fc-inherited-value + label {
 	font-weight: bold !important;
 	text-decoration: underline !important;
@@ -1501,8 +1507,9 @@ ul.thumbnails.image_picker_selector li div.thumbnail p {
 #flexicontent form span.fcfield_textval,
 #flexicontent form select.fcfield_selectval,
 #flexicontent form input.fcfield_textval {
-	height: 1.9rem;
-	line-height: 1.9rem;
+	min-height: var(--form-inp-height);
+	line-height: var(--form-inp-height);
+	height: unset;
 	padding-top: 0;
 	padding-bottom: 0;
 	overflow: auto;
@@ -1516,7 +1523,7 @@ ul.thumbnails.image_picker_selector li div.thumbnail p {
 	vertical-align: bottom;
 }
 #flexicontent form select.fcfield_selectval {
-	padding: 4px 0 2px 4px;
+	height: var(--form-inp-height);
 }
 #flexicontent form select.fcfield_selectmulval,
 #flexicontent form textarea.fcfield_textareaval {
@@ -2019,8 +2026,8 @@ div.fctoolbar_bottom_placement {
 #flexicontent .select2-container,
 .select2-container {
 	margin: 0;
-	min-height: 1.75rem;
-	line-height: 1.7rem;
+	min-height: calc(var(--form-inp-height) - 2px);
+	line-height: calc(var(--form-inp-height) - 4px);
 	vertical-align: baseline;
 	padding: 0;
 }
@@ -2028,15 +2035,15 @@ div.fctoolbar_bottom_placement {
 	padding: 0 7px !important;
 	margin: 0 !important;
 	font-weight: normal !important;
-	min-height: 1.75rem !important;
-	line-height: 1.7rem !important;
+	min-height: calc(var(--form-inp-height) - 2px) !important;
+	line-height: calc(var(--form-inp-height) - 4px) !important;
 	height: auto !important;
 	box-sizing: content-box !important;
 	background: #fff !important;
 }
 #flexicontent.fcconfig-form .select2-container .select2-choice {
-	min-height: 1.75rem !important;
-	line-height: 1.7rem !important;
+	min-height: calc(var(--form-inp-height) - 2px) !important;
+	line-height: calc(var(--form-inp-height) - 4px) !important;
 }
 html[dir="rtl"] .select2-container .select2-choice {
 	padding: 0 8px 0 0 !important;
@@ -2044,8 +2051,9 @@ html[dir="rtl"] .select2-container .select2-choice {
 .select2-container .select2-choice > .select2-chosen {
 	color: inherit;
 	white-space: pre-wrap !important;
-	min-height: 1.75rem !important;
-	line-height: 1.7rem !important;
+	border: 0 !important;
+	min-height: calc(var(--form-inp-height) - 4px) !important;
+	line-height: calc(var(--form-inp-height) - 4px) !important;
 }
 .select2-container .select2-choice .select2-arrow {
 	border-left: 0px solid #aaa !important;
@@ -2096,6 +2104,7 @@ html[dir="rtl"] .select2-container .select2-choice {
 .select2-container-multi.select2-dropdown-open .select2-choices .select2-search-field input.select2-input {
 	cursor: pointer;
 	min-width: 32px !important;
+	line-height: 20px !important;
 	min-height: 20px !important;
 	padding: 0 7px !important;
 	margin-top: 1px !important;
@@ -2135,29 +2144,49 @@ html[dir="rtl"] .select2-container .select2-choice {
 	background: #d8d8d8 !important;
 	color: #fff !important;
 }
-#flexicontent .fc_filter_box ul.select2-choices,
 #flexicontent .fc_filter_box .select2-container {
-	padding: 0;
-	line-height: 2.45rem !important;
-	min-height: 2.45rem !important;
+	height: unset !important;
+	min-height: var(--filts-inp-height) !important;
+	line-height: var(--filts-inp-height) !important;
 	box-sizing: border-box !important;
-	padding-top: 0;
-	padding-bottom: 0;
+	padding: 0 !important;
+	margin-top: 0 !important;
+	margin-bottom: 0 !important;
 }
-#flexicontent .fc_filter_box ul.select2-choices input.select2-input,
 #flexicontent .fc_filter_box .select2-container input.select2-input {
-	line-height: 2.3rem !important;
-	height: 2.3rem !important;
+	height: unset !important;
+	min-height: calc(var(--filts-inp-height) - 2px) !important;
+	line-height: calc(var(--filts-inp-height) - 2px) !important;
+	padding: 0 4px !important;
+	margin-top: 0 !important;
+	margin-bottom: 0 !important;
 }
-#flexicontent .fc_filter_box ul.select2-choices a.select2-choice,
 #flexicontent .fc_filter_box .select2-container a.select2-choice {
-	line-height: 2.33rem !important;
-	height: 2.33rem !important;
+	height: unset !important;
+	min-height: calc(var(--filts-inp-height) - 2px) !important;
+	line-height: calc(var(--filts-inp-height) - 2px) !important;
+	padding-top: 0 !important;
+	padding-bottom: 0 !important;
+	margin-top: 0 !important;
+	margin-bottom: 0 !important;
 }
-#flexicontent .fc_filter_box ul.select2-choices a.select2-choice .select2-chosen,
 #flexicontent .fc_filter_box .select2-container a.select2-choice .select2-chosen {
-	line-height: 2.33rem !important;
-	height: 2.33rem !important;
+	height: unset !important;
+	min-height: calc(var(--filts-inp-height) - 4px) !important;
+	line-height: calc(var(--filts-inp-height) - 4px) !important;
+	padding-top: 0 !important;
+	padding-bottom: 0 !important;
+	margin-top: 0 !important;
+	margin-bottom: 0 !important;
+}
+#flexicontent .fc_filter_box .select2-container ul.select2-choices {
+	height: unset !important;
+	min-height: calc(var(--filts-inp-height)) !important;
+	line-height: calc(var(--filts-inp-height)) !important;
+	padding-top: 0 !important;
+	padding-bottom: 0 !important;
+	margin-top: 0 !important;
+	margin-bottom: 0 !important;
 }
 fieldset legend .fc_legend_header_text {
 	background: none repeat scroll 0 0 transparent;
@@ -2398,10 +2427,6 @@ div.fc-fieldgrp-value-box {
 }
 #fcform_language_container .input-append input {
 	height: 26px !important;
-}
-span.add-on.pop-helper.field-media-preview {
-	height: 26px !important;
-	line-height: 28px !important;
 }
 .input-group > .input-group-append:last-child > .btn:not(:last-child):not(.dropdown-toggle),
 .input-group > .input-group-append:last-child > .input-group-text:not(:last-child),

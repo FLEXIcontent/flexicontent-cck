@@ -344,6 +344,16 @@ div.container_fcfield div.toggle_all_values_buttons_box {
 	{
 		margin: 8px 0 0 0;
 	}
+
+	/* Height and width for form controls (typically buttons) */
+	.fc-xpended-btns.input-append.input-prepend > *,
+	.fc-xpended-btns.btn-group > * {
+		min-height: var(--ctrls-inp-height) !important;
+		line-height: calc(var(--ctrls-inp-height) - 4px) !important;
+		box-sizing: border-box !important;
+		padding: 0 calc(var(--ctrls-inp-height) / 2) !important;
+	}
+
 	.fc-xpended-btns {
 		> * {
 			flex-grow: 0;
@@ -355,8 +365,6 @@ div.container_fcfield div.toggle_all_values_buttons_box {
 			font-size: 12px;
 			text-shadow: unset;
 			padding: 4px 16px;
-			line-height: 18px;
-			min-height: 18px;
 			cursor: pointer;
 			background-color: white;
 			box-sizing: content-box;

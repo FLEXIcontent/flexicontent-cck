@@ -689,11 +689,13 @@ body .nowrap_hidden {
 
 
 #flexicontent {
+	input.form-control,
+	select.form-select,
 	.btn-group > *,
 	.fc-xpended > *,
 	.fc-xpended-row > * {
-		line-height: 2.2rem !important;
-		min-height: 2.45rem !important;
+		min-height: var(--form-inp-height) !important;
+		line-height: calc(var(--form-inp-height) - 4px) !important;
 		box-sizing: border-box !important;
 		padding: 0 8px;
 	}
@@ -701,50 +703,91 @@ body .nowrap_hidden {
 	.btn-group,
 	.fc-xpended,
 	.fc-xpended-row {
-		button {
-			height: 2.45rem !important;
-		}
-		ul.select2-choices,
-		.select2-container {
-			padding: 0;
-			line-height: 2.45rem !important;
-			min-height: 2.45rem !important;
-			box-sizing: border-box !important;
-			padding-top: 0;
-			padding-bottom: 0;
-			input.select2-input {
-				line-height: 2.23rem !important;
-				height: 2.23rem !important;
-			}
-			a.select2-choice {
-				line-height: 2.33rem !important;
-				height: 2.33rem !important;
-				.select2-chosen {
-					line-height: 2.33rem !important;
-					height: 2.33rem !important;
-				}
-			}
-		}
 		.input-group > *,
 		.input-group-append > *,
 		.input-group-prepend > *,
 		.input-group-addon > *,
 		.input-append > *,
 		.input-prepend > * {
-			line-height: 2.2rem !important;
-			min-height: 2.45rem !important;
+			min-height: var(--form-inp-height) !important;
+			line-height: calc(var(--form-inp-height) - 4px) !important;
 			box-sizing: border-box !important;
-			padding-top: 0;
-			padding-bottom: 0;
+			padding-top: 0 !important;
+			padding-bottom: 0 !important;
+		}
+
+		select.fcfield_selectval, 
+		select,
+		button {
+			height: var(--form-inp-height) !important;
+			min-height: var(--form-inp-height) !important;
+		}
+
+		.select2-container {
+			height: unset !important;
+			min-height: var(--form-inp-height) !important;
+			line-height: var(--form-inp-height) !important;
+			box-sizing: border-box !important;
+			padding: 0 !important;
+			margin-top: 0 !important;
+			margin-bottom: 0 !important;
+
+			input.select2-input {
+				height: unset !important;
+				min-height: calc(var(--form-inp-height) - 2px) !important;
+				line-height: calc(var(--form-inp-height) - 2px) !important;
+				padding: 0 4px !important;
+				margin-top: 0 !important;
+				margin-bottom: 0 !important;
+			}
+			a.select2-choice {
+				height: unset !important;
+				min-height: calc(var(--form-inp-height) - 2px) !important;
+				line-height: calc(var(--form-inp-height) - 2px) !important;
+				padding-top: 0 !important;
+				padding-bottom: 0 !important;
+				margin-top: 0 !important;
+				margin-bottom: 0 !important;
+
+				.select2-chosen {
+					height: unset !important;
+					min-height: calc(var(--form-inp-height) - 4px) !important;
+					line-height: calc(var(--form-inp-height) - 4px) !important;
+					padding-top: 0 !important;
+					padding-bottom: 0 !important;
+					margin-top: 0 !important;
+					margin-bottom: 0 !important;
+				}
+			}
+			ul.select2-choices {
+				height: unset !important;
+				min-height: calc(var(--form-inp-height)) !important;
+				line-height: calc(var(--form-inp-height)) !important;
+				padding-top: 0 !important;
+				padding-bottom: 0 !important;
+				margin-top: 0 !important;
+				margin-bottom: 0 !important;
+			}
 		}
 	}
+
+	/* EXTRA START */
+	#j-main-container {
+		select.fcfield_selectval, 
+		select {
+			height: var(--fcman-inp-height) !important;
+			min-height: var(--fcman-inp-height) !important;
+			margin: 0 6px 0 0 !important;
+		}
+	}
+	/* EXTRA END */
 
 	#j-main-container {
 		.btn-group > *,
 		.fc-xpended > *,
 		.fc-xpended-row > * {
-			line-height: 1.83rem !important;
-			min-height: 1.95rem !important;
+			min-height: var(--fcman-inp-height) !important;
+			line-height: calc(var(--fcman-inp-height) - 4px) !important;
 			box-sizing: border-box !important;
 			padding: 0 8px;
 		}
@@ -752,41 +795,44 @@ body .nowrap_hidden {
 		.btn-group,
 		.fc-xpended,
 		.fc-xpended-row {
-			button {
-				height: 1.95rem !important;
-			}
-			ul.select2-choices,
-			.select2-container {
-				padding: 0;
-				line-height: 1.95rem !important;
-				min-height: 1.95rem !important;
-				box-sizing: border-box !important;
-				padding-top: 0;
-				padding-bottom: 0;
-				input.select2-input {
-					line-height: 1.73rem !important;
-					height: 1.73rem !important;
-				}
-				a.select2-choice {
-					line-height: 1.83rem !important;
-					height: 1.83rem !important;
-					.select2-chosen {
-						line-height: 1.83rem !important;
-						height: 1.83rem !important;
-					}
-				}
-			}
 			.input-group > *,
 			.input-group-append > *,
 			.input-group-prepend > *,
 			.input-group-addon > *,
 			.input-append > *,
 			.input-prepend > * {
-				line-height: 1.83rem !important;
-				min-height: 1.95rem !important;
-				box-sizing: border-box !important;
-				padding-top: 0;
-				padding-bottom: 0;
+				min-height: var(--fcman-inp-height) !important;
+				line-height: calc(var(--fcman-inp-height) - 4px) !important;
+			}
+
+			select.fcfield_selectval, 
+			select,
+			button {
+				height: var(--fcman-inp-height) !important;
+				min-height: var(--fcman-inp-height) !important;
+			}
+
+			.select2-container {
+				min-height: var(--fcman-inp-height) !important;
+				line-height: var(--fcman-inp-height) !important;
+
+				input.select2-input {
+					min-height: calc(var(--fcman-inp-height) - 2px) !important;
+					line-height: calc(var(--fcman-inp-height) - 2px) !important;
+				}
+				a.select2-choice {
+					min-height: calc(var(--fcman-inp-height) - 2px) !important;
+					line-height: calc(var(--fcman-inp-height) - 2px) !important;
+
+					.select2-chosen {
+						min-height: calc(var(--fcman-inp-height) - 4px) !important;
+						line-height: calc(var(--fcman-inp-height) - 4px) !important;
+					}
+				}
+				ul.select2-choices {
+					min-height: calc(var(--fcman-inp-height)) !important;
+					line-height: calc(var(--fcman-inp-height)) !important;
+				}
 			}
 		}
 	}

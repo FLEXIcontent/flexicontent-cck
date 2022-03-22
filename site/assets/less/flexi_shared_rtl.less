@@ -798,7 +798,6 @@ a.fc_assoc_translation:before {
 	-webkit-padding-end: 0px !important;
 	padding-inline-end: 0px !important;
 }
-
 .fc_assoc_translation.fc_assoc_later_mod {
 }
 
@@ -1794,8 +1793,9 @@ ul.thumbnails.image_picker_selector li div.thumbnail p {
 #flexicontent form span.fcfield_textval,
 #flexicontent form select.fcfield_selectval,
 #flexicontent form input.fcfield_textval {
-	height: 1.9rem;
-	line-height: 1.9rem;
+	min-height: var(--form-inp-height);
+	line-height: var(--form-inp-height);
+	height: unset;
 	padding-top: 0;
 	padding-bottom: 0;
 	overflow: auto;
@@ -1809,8 +1809,9 @@ ul.thumbnails.image_picker_selector li div.thumbnail p {
 	box-sizing: border-box;
 	vertical-align: bottom;
 }
+/* select specific */
 #flexicontent form select.fcfield_selectval {
-	padding: 4px 0 2px 4px;
+	height: var(--form-inp-height);
 }
 
 #flexicontent form select.fcfield_selectmulval,
@@ -2454,8 +2455,8 @@ div.fctoolbar_bottom_placement {
 #flexicontent .select2-container,
 .select2-container {
 	margin: 0;
-	min-height: 1.75rem;
-	line-height: 1.7rem;
+	min-height: calc(var(--form-inp-height) - 2px);
+	line-height: calc(var(--form-inp-height) - 4px);
 	vertical-align: baseline;
 	padding: 0;
 }
@@ -2465,15 +2466,15 @@ div.fctoolbar_bottom_placement {
 	padding: 0 7px !important;
 	margin: 0 !important;
 	font-weight: normal !important;
-	min-height: 1.75rem !important;
-	line-height: 1.7rem !important;
+	min-height: calc(var(--form-inp-height) - 2px) !important;
+	line-height: calc(var(--form-inp-height) - 4px) !important;
 	height: auto !important;
 	box-sizing: content-box !important;
 	background:#fff !important;//remove background gradient
 }
 #flexicontent.fcconfig-form .select2-container .select2-choice {
-	min-height: 1.75rem !important;
-	line-height: 1.7rem !important;
+	min-height: calc(var(--form-inp-height) - 2px) !important;
+	line-height: calc(var(--form-inp-height) - 4px) !important;
 }
 
 html[dir="rtl"] .select2-container .select2-choice {
@@ -2482,8 +2483,9 @@ html[dir="rtl"] .select2-container .select2-choice {
 .select2-container .select2-choice > .select2-chosen {
 	color: inherit;
 	white-space: pre-wrap !important;
-	min-height: 1.75rem !important;
-	line-height: 1.7rem !important;
+	border: 0 !important;
+	min-height: calc(var(--form-inp-height) - 4px) !important;
+	line-height: calc(var(--form-inp-height) - 4px) !important;
 }
 .select2-container .select2-choice .select2-arrow {
     border-left: 0px solid #aaa !important;
@@ -2552,6 +2554,7 @@ html[dir="rtl"] .select2-container .select2-choice {
 .select2-container-multi.select2-dropdown-open .select2-choices .select2-search-field input.select2-input {
 	cursor: pointer;
 	min-width: 32px !important;
+	line-height: 20px !important;
 	min-height: 20px !important;
 	padding: 0 7px !important;
 	margin-top: 1px !important;
@@ -2593,36 +2596,62 @@ html[dir="rtl"] .select2-container .select2-choice {
 
 /* dropdown */
 .select2-drop.select2-drop-multi {
-    padding: 0px 10px 10px 10px !important;
+	padding: 0px 10px 10px 10px !important;
 }
 .select2-drop-active {
-    border: 1px solid #aaa !important;
+	border: 1px solid #aaa !important;
 }
 .select2-results .select2-highlighted {
-    background: #d8d8d8 !important;
-    color: #fff !important;
+	background: #d8d8d8 !important;
+	color: #fff !important;
 }
 
 #flexicontent .fc_filter_box {
-	ul.select2-choices,
+
 	.select2-container {
-		padding: 0;
-		line-height: 2.45rem !important;
-		min-height: 2.45rem !important;
+		height: unset !important;
+		min-height: var(--filts-inp-height) !important;
+		line-height: var(--filts-inp-height) !important;
 		box-sizing: border-box !important;
-		padding-top: 0;
-		padding-bottom: 0;
+		padding: 0 !important;
+		margin-top: 0 !important;
+		margin-bottom: 0 !important;
+
 		input.select2-input {
-			line-height: 2.3rem !important;
-			height: 2.3rem !important;
+			height: unset !important;
+			min-height: calc(var(--filts-inp-height) - 2px) !important;
+			line-height: calc(var(--filts-inp-height) - 2px) !important;
+			padding: 0 4px !important;
+			margin-top: 0 !important;
+			margin-bottom: 0 !important;
 		}
 		a.select2-choice {
-			line-height: 2.33rem !important;
-			height: 2.33rem !important;
+			height: unset !important;
+			min-height: calc(var(--filts-inp-height) - 2px) !important;
+			line-height: calc(var(--filts-inp-height) - 2px) !important;
+			padding-top: 0 !important;
+			padding-bottom: 0 !important;
+			margin-top: 0 !important;
+			margin-bottom: 0 !important;
+
 			.select2-chosen {
-				line-height: 2.33rem !important;
-				height: 2.33rem !important;
+				height: unset !important;
+				min-height: calc(var(--filts-inp-height) - 4px) !important;
+				line-height: calc(var(--filts-inp-height) - 4px) !important;
+				padding-top: 0 !important;
+				padding-bottom: 0 !important;
+				margin-top: 0 !important;
+				margin-bottom: 0 !important;
 			}
+		}
+		ul.select2-choices {
+			height: unset !important;
+			min-height: calc(var(--filts-inp-height)) !important;
+			line-height: calc(var(--filts-inp-height)) !important;
+			padding-top: 0 !important;
+			padding-bottom: 0 !important;
+			margin-top: 0 !important;
+			margin-bottom: 0 !important;
 		}
 	}
 }
@@ -2944,11 +2973,6 @@ div.fc-fieldgrp-value-box {
 /** field language assoc**/
 #fcform_language_container .input-append input {
   height: 26px !important;
-}
-/*** joomla field image**/
-span.add-on.pop-helper.field-media-preview {
-  height: 26px !important;
-  line-height: 28px !important;
 }
 /* Add missing bootstrap CSS */
 .input-group > .input-group-append:last-child > .btn:not(:last-child):not(.dropdown-toggle), .input-group > .input-group-append:last-child > .input-group-text:not(:last-child), .input-group > .input-group-append:not(:last-child) > .btn, .input-group > .input-group-append:not(:last-child) > .input-group-text, .input-group > .input-group-prepend > .btn {

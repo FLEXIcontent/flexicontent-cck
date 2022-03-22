@@ -1,3 +1,9 @@
+:root {
+	--form-inp-height: 36px;
+	--ctrls-inp-height: 36px;
+	--fcman-inp-height: 32px;
+	--filts-inp-height: 36px;
+}
 .tabberlive .tabbertab {
 	transition: opacity 0.2s ease-in-out;
 	opacity: 1;

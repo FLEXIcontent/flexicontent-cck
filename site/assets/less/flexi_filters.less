@@ -348,9 +348,9 @@ form > .fc_filter_line {  /* filters placed directly inside form aka outside the
 .fc_filter_html :not(.input-prepend):not(.input-append) > input.fc_field_filter,
 .fc_filter_html :not(.input-prepend):not(.input-append) > input.fc_text_filter:focus,
 .fc_filter_html :not(.input-prepend):not(.input-append) > input.fc_field_filter:focus {
-	height: auto;
-	line-height: 2.33rem !important;
-	min-height: 2.33rem !important;
+	height: unset !important;
+	min-height: calc(var(--filts-inp-height) - 2px) !important;
+	line-height: calc(var(--filts-inp-height) - 2px) !important;
 	padding: 0px 4px 0px 4px !important;
 	margin: 3px 4px 3px 8px;
 	position: relative;

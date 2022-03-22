@@ -59,6 +59,14 @@
 			<field name="lowres_minwidth" type="text" size="8" default="800" label="FLEXI_MOBILE_RES_MINWIDTH" description="FLEXI_MOBILE_RES_MINWIDTH_DESC"/>
 			<field name="lowres_minheight" type="text" size="8" default="480" label="FLEXI_MOBILE_RES_MINHEIGHT" description="FLEXI_MOBILE_RES_MINHEIGHT_DESC"/-->
 
+		<field name="" type="separator" default="CSS" label="" level="level0" />
+		<field name="" type="separator" default="min-height (px)" label="" level="level3" class="alert alert-info fcpadded" />
+			<field name="form-inp-height" type="number" cssprep="less" hint="" default="36" label="Form elements" description="" min="20" max="80" step="1" />
+			<field name="ctrls-inp-height" type="number" cssprep="less" hint="" default="36" label="Form controls" description="" min="20" max="80" step="1" />
+			<field name="filts-inp-height" type="number" cssprep="less" hint="" default="36" label="Filters elements (Frontend)" description="" min="20" max="80" step="1" />
+			<field name="fcman-inp-height" type="number" cssprep="less" hint="" default="32" label="Managers elements" description="" min="20" max="80" step="1" />
+
+
 		<field name="" type="separator" default="FLEXI_PAGE_RELOADING_FE_BE" label="" level="level0" />
 		<field name="" type="separator" default="FLEXI_PAGE_RELOADING_FE_BE_ABOUT" label="" level="level3" class="alert alert-info fcpadded" />
 
