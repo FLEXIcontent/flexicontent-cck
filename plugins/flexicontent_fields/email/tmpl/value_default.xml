@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<form>
+
+	<name>Email field layout -- defaut</name>
+	<author>micker</author>
+	<creationDate>feb 2022</creationDate>
+	<copyright>Copyright (C) 2022 micker</copyright>
+	<license>GNU/GPL v2</license>
+	<authorEmail>flexicontentck@gmail.com</authorEmail>
+	<authorUrl>www.flexicontent.org</authorUrl>
+	<version>1.0</version>
+	<description>Flexicontent fields - email field layout - defaut parameters</description>
+	<fields name="attribs">
+
+		<!--fieldset name="standard" hidden="true">
+		</fieldset-->
+
+		<fieldset name="layout" addfieldpath="/administrator/components/com_flexicontent/elements">
+
+		<field name="" type="separator" default="FLEXI_FIELD_VALUE_DISPLAY" level="level2" />
+			<field name="PPFX_show_no_value" type="multilist" subtype="radio" default="0" label="FLEXI_FIELD_SHOW_NO_VALUE" toggle_related="1" description="FLEXI_FIELD_SHOW_NO_VALUE_DESC" class="btn-group group-fcmethod fcnoyes">
+				<option value="0" show_list="" hide_list="multivalue-mode">FLEXI_NO</option>
+				<option value="1" show_list="multivalue-mode" hide_list="">FLEXI_YES</option>
+			</field>
+			<field name="PPFX_no_value_msg" type="text" default="" size="42" label="FLEXI_FIELD_NO_VALUE_MSG" depend_class="multivalue-mode" description="FLEXI_FIELD_NO_VALUE_MSG_DESC" />
+
+			<field name="PPFX_email_cloaking" type="radio" default="1" label="FLEXI_FIELD_EMAIL_CLOAKING" description="FLEXI_FIELD_EMAIL_CLOAKING_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="PPFX_mailto_link" type="radio" default="1" label="FLEXI_FIELD_EMAIL_MAILTO_LINK" description="FLEXI_FIELD_EMAIL_MAILTO_LINK_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+
+			<field name="PPFX_text_sparator" type="text" default="" label="FLEXI_FIELD_EMAIL_TXT_SEPARATOR" description="FLEXI_FIELD_EMAIL_TXT_SEPARATOR_DESC" />
+		</fieldset>
+
+	</fields>
+	
+</form>
