@@ -930,7 +930,10 @@ class FLEXIUtilities
 		// Files in frontend assets folder
 		$path = JPATH_SITE.'/components/com_flexicontent/assets/';
 		$inc_path = $path.'less/include/';
-
+		
+		/**
+		 * LESS files for fields CSS
+		 */
 		$less_files = array(
 			'less/flexi_file_fields.less',
 		);
@@ -938,8 +941,13 @@ class FLEXIUtilities
 
 		$less_files = array('less/flexi_form_fields.less');
 		flexicontent_html::checkedLessCompile($less_files, $path, $inc_path, $force);
-
+		
+		
+		/**
+		 * Individual LESS to CSS files in frontend folder (used by frontend only ??)
+		 */
 		$less_files = array(
+			'less/include/config.less',   /* created file is: css/config.css */
 			'less/flexi_filters.less',
 			'less/fcvote.less',
 			'less/tabber.less',
@@ -950,6 +958,9 @@ class FLEXIUtilities
 		);
 		flexicontent_html::checkedLessCompile($less_files, $path, $inc_path, $force=false);
 
+		/**
+		 * LESS files for flexicontent.css and flexicontentbackend.css
+		 */
 		$less_files = array(
 			'less/flexi_form.less',
 			'less/flexi_containers.less',
