@@ -907,7 +907,7 @@ class plgFlexicontent_fieldsRelation extends FCField
 	{
 		if ( !in_array($filter->field_type, static::$field_types) ) return;
 
-		$db = Factory::getDbo();
+		$db = JFactory::getDbo();
 		$_nowDate = 'UTC_TIMESTAMP()';
 		$nullDate	= $db->getNullDate();
 
