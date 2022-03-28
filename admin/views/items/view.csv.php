@@ -176,7 +176,9 @@ class FlexicontentViewItems extends JViewLegacy
 		}
 		else
 		{
-			$limit = $model->getState('limit') > 100 ? 100 : $model->getState('limit');
+			$limit = $jinput->get('limit', $model->getState('limit'));
+			$limit = $limit > 5000 ? 5000 : $limit;
+			$jinput->set('limit', $limit);
 			$model->setState('limit', $limit);
 			$items = $model->getData();
 		}
@@ -197,8 +199,9 @@ class FlexicontentViewItems extends JViewLegacy
 		{
 			FlexicontentFields::loadFieldConfig($field, $item0);
 
+			$is_coreprops_form_field = $field->field_type === 'coreprops' && substr($field->name, 0 , 5) === 'form_';
 			$include_in_csv_export = (int) $field->parameters->get('include_in_csv_export', 0);
-			$include_in_csv_export = $csv_all_fields !== 2 ? $include_in_csv_export : 1;
+			$include_in_csv_export = $csv_all_fields !== 2 ? $include_in_csv_export : ($is_coreprops_form_field ? 0 : 1);
 
 			if (!$include_in_csv_export)
 			{
@@ -240,8 +243,9 @@ class FlexicontentViewItems extends JViewLegacy
 
 		foreach($item0->fields as $field)
 		{
+			$is_coreprops_form_field = $field->field_type === 'coreprops' && substr($field->name, 0 , 5) === 'form_';
 			$include_in_csv_export = (int) $field->parameters->get('include_in_csv_export', 0);
-			$include_in_csv_export = $csv_all_fields !== 2 ? $include_in_csv_export : 1;
+			$include_in_csv_export = $csv_all_fields !== 2 ? $include_in_csv_export : ($is_coreprops_form_field ? 0 : 1);
 
 			if (!$include_in_csv_export)
 			{
@@ -277,8 +281,9 @@ class FlexicontentViewItems extends JViewLegacy
 
 				foreach($item0->fields as $field_name => $field)
 				{
+					$is_coreprops_form_field = $field->field_type === 'coreprops' && substr($field->name, 0 , 5) === 'form_';
 					$include_in_csv_export = (int) $field->parameters->get('include_in_csv_export', 0);
-					$include_in_csv_export = $csv_all_fields !== 2 ? $include_in_csv_export : 1;
+					$include_in_csv_export = $csv_all_fields !== 2 ? $include_in_csv_export : ($is_coreprops_form_field ? 0 : 1);
 
 					$csv_strip_html = (int) $field->parameters->get('csv_strip_html', 0);
 

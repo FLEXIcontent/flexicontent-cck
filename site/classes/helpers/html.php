@@ -2650,17 +2650,55 @@ class flexicontent_html
 		$uri    = JUri::getInstance();
 		$base  	= $uri->toString( array('scheme', 'host', 'port'));
 
-		//TODO: clean this static stuff (Probs when determining the url directly with subdomains)
-		if($view == 'category')
+		$has_export_all_btn = false;
+
+		$memory_limit = ini_get('memory_limit');
+		if (preg_match('/^(\d+)(.)$/', $memory_limit, $matches))
 		{
+			switch($matches[2])
+			{
+				case 'G': $memory_limit = $matches[1] * 1024 * 1024 *1024; break;
+				case 'M': $memory_limit = $matches[1] * 1024 * 1024; break;
+				case 'K': $memory_limit = $matches[1] * 1024; break;
+				default:  $memory_limit = $memory_limit; break;
+			}
+		}
+		$export_limit = ($memory_limit - (15 * 1024 * 1024)) / (1024 * 50);
+		$export_limit = $export_limit > 20000 ? 20000 : $export_limit;
+
+
+		//TODO: clean this static stuff (Probs when determining the url directly with subdomains)
+		if ($view == 'category')
+		{
+			$has_export_all_btn = true;
+
+			$filters = flexicontent_html::getCatViewFilterVars();
+			$start = JFactory::getApplication()->input->get('start', '', 'int');
+
 			$non_sef_link = null;
 			flexicontent_html::createCatLink($slug, $non_sef_link);
-			$link = $base . JRoute::_($non_sef_link.'&format=csv');
+
+			// Current page
+			$link = $base . JRoute::_(
+				$non_sef_link
+				. '&format=csv'
+				. $filters
+				. ($start ? "&start=".$start : '')
+			);
+
+			// All pages
+			$link_all_pages = $base . JRoute::_(
+				$non_sef_link
+				. '&format=csv'
+				. $filters
+				. '&start=0&limit=' . $export_limit
+			);
+
 			//$link = $base.JRoute::_( 'index.php?view='.$view.'&cid='.$slug.'&format=csv', false );
-		} elseif($view == FLEXI_ITEMVIEW) {
+		} elseif ($view == FLEXI_ITEMVIEW) {
 			$link = $base . JRoute::_(FlexicontentHelperRoute::getItemRoute($itemslug, $slug, 0, $item).'&format=csv');
 			//$link = $base.JRoute::_( 'index.php?view='.$view.'&cid='.$slug.'&id='.$itemslug.'&format=csv', false );
-		} elseif($view == 'tags') {
+		} elseif ($view == 'tags') {
 			$link = $base . JRoute::_(FlexicontentHelperRoute::getTagRoute($itemslug).'&format=csv');
 			//$link = $base.JRoute::_( 'index.php?view='.$view.'&id='.$slug.'&format=csv', false );
 		} else {
@@ -2682,7 +2720,7 @@ class flexicontent_html
 		$image = '';
 		self::createFcBtnIcon($params, $config, $image);
 
-		$overlib = JText::_( 'FLEXI_CSV_TIP' );
+		$overlib = JText::_( 'FLEXI_CSV_TIP_THIS_PAGE' );
 		$text = JText::_( 'FLEXI_CSV' );
 
 		$button_classes = 'fc_csvbutton';
@@ -2702,9 +2740,27 @@ class flexicontent_html
 		$button_classes .= ' hasTooltip';
 		$tooltip_title = flexicontent_html::getToolTip($text, $overlib, 0);
 
-		// $link as set above
-		$output	= ' <a href="'.$link.'" class="'.$button_classes.'" data-placement="' . $tooltip_placement . '" title="'.$tooltip_title.'" onclick="'.$onclick.'" >'.$image.$caption.'</a>';
-		$output = JText::_('FLEXI_ICON_SEP') . $output . JText::_('FLEXI_ICON_SEP');
+		// Export All
+		$output .= JText::_('FLEXI_ICON_SEP')
+			. ' <a href="'.$link.'" class="'.$button_classes.'" data-placement="' . $tooltip_placement . '" title="'.$tooltip_title.'" onclick="'.$onclick.'" >'
+				. $image . ($has_export_all_btn? '<span class="icon-file"></span> ' : '')
+				. $caption // . ($has_export_all_btn? ' (Current page)' : '')
+				. '</a>'
+			. JText::_('FLEXI_ICON_SEP');
+
+		// Export current page
+		if (!empty($link_all_pages))
+		{
+			$overlib = JText::_( 'FLEXI_CSV_TIP' ) . ($has_export_all_btn ? '<br>' . JText::sprintf( 'FLEXI_CSV_TIP_EXPORT_LIMIT',  $export_limit) : '');
+			$tooltip_title = flexicontent_html::getToolTip($text, $overlib, 0);
+
+			$output .= JText::_('FLEXI_ICON_SEP')
+				. ' <a href="'.$link_all_pages.'" class="'.$button_classes.'" data-placement="' . $tooltip_placement . '" title="'.$tooltip_title.'" onclick="'.$onclick.'" >'
+					. $image . ($has_export_all_btn? '<span class="icon-book"></span> ' : '')
+					. $caption // . ($has_export_all_btn? ' (All pages)' : '')
+					. '</a>'
+				. JText::_('FLEXI_ICON_SEP');
+		}
 
 		return $output;
 	}
@@ -6010,6 +6066,48 @@ class flexicontent_html
 
 		$_layout_vars[$use_slug] = $layout_vars;
 		return $layout_vars;
+	}
+
+	static function getCatViewFilterVars($obj=null)
+	{
+		$app = JFactory::getApplication();
+		$jinput = $app->input;
+
+		$filters_count = 0;
+		$filters_string = '';
+
+		foreach($jinput->get->get->getArray() as $i => $v)
+		{
+			if (substr($i, 0, 6) !== "filter")
+			{
+				continue;
+			}
+
+			if (is_array($v))
+			{
+				foreach($v as $ii => &$vv)
+				{
+					if (is_array($vv))
+					{
+						foreach($vv as $iii => &$vvv)
+						{
+							$filters_string .= '&' . $i . '[' . $ii . '][' . $iii . ']=' . $vvv;
+						}
+					}
+					else
+					{
+						$filters_string .= '&' . $i . '[' . $ii . ']=' . $vv;
+					}
+				}
+			}
+			else
+			{
+				$filters_string .= '&' . $i . '=' . $v;
+			}
+
+			$filters_count++;
+		}
+		return $filters_string;
 	}
 
 	// Get Prefix - Suffix - Separator parameters and other common parameters
