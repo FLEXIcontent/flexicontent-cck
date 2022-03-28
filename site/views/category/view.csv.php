@@ -79,8 +79,8 @@ class FlexicontentViewCategory extends JViewLegacy
 		// Check if current view is filtered by item type
 		$filter_type    = $model->getState('filter_type');
 		$csv_header     = $app->isClient('administrator') ? (int) $model->getState('csv_header') : (int) $cparams->get('csv_export_header', 1);
-		$csv_raw_export = $app->isClient('administrator') ? (int) $model->getState('csv_raw_export') : 2;
-		$csv_all_fields = $app->isClient('administrator') ? (int) $model->getState('csv_all_fields') : 2;
+		$csv_raw_export = $app->isClient('administrator') ? (int) $model->getState('csv_raw_export') : 0;
+		$csv_all_fields = $app->isClient('administrator') ? (int) $model->getState('csv_all_fields') : 0;
 		$err_count      = 0;
 		$csv_header     = $csv_header === -1 ? (int) $cparams->get('csv_export_header', 1) : $csv_header;
 
