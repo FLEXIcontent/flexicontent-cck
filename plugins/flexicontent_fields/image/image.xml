@@ -559,6 +559,11 @@
 			</field>
 
 			<field name="" type="separator" default="FLEXI_IMGFIELD_THUMBNAILS" level="level2" />
+		<field name="use_lazy_loading" type="radio" default="0" label="FLEXI_FIELD_USE_LAZY_LOADING" description="FLEXI_FIELD_USE_LAZY_LOADING_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+
 			<field name="thumbincatview" type="radio" default="1" label="FLEXI_FIELD_THUMB_IN_CAT" description="FLEXI_FIELD_THUMB_IN_CAT_DESC" class="btn-group group-fcinfo">
 				<option value="1">FLEXI_SMALL</option>
 				<option value="2">FLEXI_MEDIUM</option>
