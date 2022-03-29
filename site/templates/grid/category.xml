@@ -76,7 +76,13 @@
 					</field>
 					<field name="readon_image" type="media" default="" label="Read more image" description="Select image to use instead of read more, this is maybe useful if your website is not multilingual" />
 					<field name="readon_class" type="text" default="btn btn-default" label="Read more class" description="Select class css to use instead of read more, this is maybe useful if your website is not multilingual" />
-				
+					
+					<field name="use_lazy_loading_title" type="separator" default="Lazy loading image" description="" level="level2" />
+					<field name="use_lazy_loading" type="radio" default="0" label="FLEXI_FIELD_USE_LAZY_LOADING" description="FLEXI_FIELD_USE_LAZY_LOADING_DESC" class="btn-group btn-group-yesno">
+						<option value="0">FLEXI_NO</option>
+						<option value="1">FLEXI_YES</option>
+					</field>
+
 				<field name="items_tab_featured" type="separator" default="Featured items" icon_class="icon-list" level="tab_open" box_type="1" />
 				<field name="items_tabset_featured_start" type="separator" default="ITEMS_FEATURED_TABSET" level="tabset_start" />
 

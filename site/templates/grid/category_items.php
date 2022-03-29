@@ -14,6 +14,8 @@ $user = JFactory::getUser();
 $readon_type  = (int) $this->params->get('readon_type', 0);
 $readon_image = $this->params->get('readon_image', '');
 $readon_class = $this->params->get('readon_class', 'btn btn-default');
+$use_lazy_loading = (int) $this->params->get('use_lazy_loading', 1);
+$lazy_loading = $use_lazy_loading ? ' loading="lazy" decoding="async" ' : '';
 
 if ($readon_type && $readon_image && file_exists(JPath::clean(JPATH_SITE . DS . $readon_image)))
 {
@@ -594,10 +596,10 @@ if ($leadnum) :
 						<div class="image_featured <?php echo $img_container_class_feat;?>">
 							<?php if ($lead_link_image) : ?>
 								<a href="<?php echo $link_url; ?>">
-									<img style="<?php echo $img_force_dims_css_feat; ?>" src="<?php echo $item->image; ?>" alt="<?php echo flexicontent_html::striptagsandcut($title_encoded, 60); ?>" />
+									<img style="<?php echo $img_force_dims_css_feat; ?>" src="<?php echo $item->image; ?>" alt="<?php echo flexicontent_html::striptagsandcut($title_encoded, 60); ?>" <?php echo $lazy_loading; ?> />
 								</a>
 							<?php else : ?>
-								<img style="<?php echo $img_force_dims_css_feat; ?>" src="<?php echo $item->image; ?>" alt="<?php echo flexicontent_html::striptagsandcut($title_encoded, 60); ?>" />
+								<img style="<?php echo $img_force_dims_css_feat; ?>" src="<?php echo $item->image; ?>" alt="<?php echo flexicontent_html::striptagsandcut($title_encoded, 60); ?>" <?php echo $lazy_loading; ?> />
 							<?php endif; ?>
 						</div>
 
@@ -1092,10 +1094,10 @@ if ($count > $leadnum) :
 						<div class="image_standard <?php echo $img_container_class;?>">
 							<?php if ($intro_link_image) : ?>
 								<a href="<?php echo $link_url; ?>">
-									<img style="<?php echo $img_force_dims_css; ?>" src="<?php echo $item->image; ?>" alt="<?php echo flexicontent_html::striptagsandcut($title_encoded, 60); ?>" />
+									<img style="<?php echo $img_force_dims_css; ?>" src="<?php echo $item->image; ?>" alt="<?php echo flexicontent_html::striptagsandcut($title_encoded, 60); ?>" <?php echo $lazy_loading; ?> />
 								</a>
 							<?php else : ?>
-								<img style="<?php echo $img_force_dims_css; ?>" src="<?php echo $item->image; ?>" alt="<?php echo flexicontent_html::striptagsandcut($title_encoded, 60); ?>" />
+								<img style="<?php echo $img_force_dims_css; ?>" src="<?php echo $item->image; ?>" alt="<?php echo flexicontent_html::striptagsandcut($title_encoded, 60); ?>" <?php echo $lazy_loading; ?> />
 							<?php endif; ?>
 						</div>
 
