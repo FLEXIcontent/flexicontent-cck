@@ -282,45 +282,45 @@
 		/*$img_size_attrs .= $crop ? ' style="width: ' . $w . 'px; height: ' . $h . 'px;' : ' style="max-width: ' . $w . 'px; max-height: ' . $h . 'px;" ';*/
 	}
 
-	$lazy_loading = $field->parameters->get('use_lazy_loading', 1);
-	if ($lazy_loading == 1){ $lazy_loading ='loading="lazy" decoding="async"'; }
+	$use_lazy_loading = (int) $field->parameters->get('use_lazy_loading', 1);
+	$lazy_loading = $use_lazy_loading ? ' loading="lazy" decoding="async" ' : '';
 
 	switch ($prop)
 	{
 		case 'display_backend':
 		case 'display_backend_thumb':
-			$img_legend   = '<img src="'.$abs_srcb.'" alt="'.$alt_encoded.'"'.$legend.' class="'.$class.'" itemprop="image" ' . $img_size_attrs . ' '. $lazy_loading .'/>';
-			$img_nolegend = '<img src="'.$abs_srcb.'" alt="'.$alt_encoded.'" class="'.$class.'" itemprop="image" ' . $img_size_attrs . ' />';
+			$img_legend   = '<img src="'.$abs_srcb.'" alt="'.$alt_encoded.'"'.$legend.' class="'.$class.'" itemprop="image" ' . $img_size_attrs . $lazy_loading . '/>';
+			$img_nolegend = '<img src="'.$abs_srcb.'" alt="'.$alt_encoded.'" class="'.$class.'" itemprop="image" ' . $img_size_attrs . $lazy_loading . '/>';
 			break;
 
 		case 'display_small':
 		case 'display_small_thumb':
-			$img_legend   = '<img src="'.$abs_srcs.'" alt="'.$alt_encoded.'"'.$legend.' class="'.$class.'" itemprop="image" ' . $img_size_attrs . ' '. $lazy_loading .' />';
-			$img_nolegend = '<img src="'.$abs_srcs.'" alt="'.$alt_encoded.'" class="'.$class.'" itemprop="image" ' . $img_size_attrs . ' '. $lazy_loading .'/>';
+			$img_legend   = '<img src="'.$abs_srcs.'" alt="'.$alt_encoded.'"'.$legend.' class="'.$class.'" itemprop="image" ' . $img_size_attrs . $lazy_loading . '/>';
+			$img_nolegend = '<img src="'.$abs_srcs.'" alt="'.$alt_encoded.'" class="'.$class.'" itemprop="image" ' . $img_size_attrs . $lazy_loading . '/>';
 			break;
 
 		case 'display_medium':
 		case 'display_medium_thumb':
-			$img_legend   = '<img src="'.$abs_srcm.'" alt="'.$alt_encoded.'"'.$legend.' class="'.$class.'" itemprop="image" ' . $img_size_attrs . ' '. $lazy_loading .'/>';
-			$img_nolegend = '<img src="'.$abs_srcm.'" alt="'.$alt_encoded.'" class="'.$class.'" itemprop="image" ' . $img_size_attrs . '  '. $lazy_loading .'/>';
+			$img_legend   = '<img src="'.$abs_srcm.'" alt="'.$alt_encoded.'"'.$legend.' class="'.$class.'" itemprop="image" ' . $img_size_attrs . $lazy_loading . '/>';
+			$img_nolegend = '<img src="'.$abs_srcm.'" alt="'.$alt_encoded.'" class="'.$class.'" itemprop="image" ' . $img_size_attrs . $lazy_loading . '/>';
 			break;
 
 		case 'display_large':
 		case 'display_large_thumb':
-			$img_legend   = '<img src="'.$abs_srcl.'" alt="'.$alt_encoded.'"'.$legend.' class="'.$class.'" itemprop="image" ' . $img_size_attrs . ' '. $lazy_loading .'/>';
-			$img_nolegend = '<img src="'.$abs_srcl.'" alt="'.$alt_encoded.'" class="'.$class.'" itemprop="image" ' . $img_size_attrs . '  '. $lazy_loading .'/>';
+			$img_legend   = '<img src="'.$abs_srcl.'" alt="'.$alt_encoded.'"'.$legend.' class="'.$class.'" itemprop="image" ' . $img_size_attrs . $lazy_loading . '/>';
+			$img_nolegend = '<img src="'.$abs_srcl.'" alt="'.$alt_encoded.'" class="'.$class.'" itemprop="image" ' . $img_size_attrs . $lazy_loading . '/>';
 			break;
 
 		case 'display_original':
 		case 'display_original_thumb':
-			$img_legend   = '<img src="'.$abs_srco.'" alt="'.$alt_encoded.'"'.$legend.' class="'.$class.'" itemprop="image" ' . $img_size_attrs . ' '. $lazy_loading .'/>';
-			$img_nolegend = '<img src="'.$abs_srco.'" alt="'.$alt_encoded.'" class="'.$class.'" itemprop="image" ' . $img_size_attrs . ' '. $lazy_loading .'/>';
+			$img_legend   = '<img src="'.$abs_srco.'" alt="'.$alt_encoded.'"'.$legend.' class="'.$class.'" itemprop="image" ' . $img_size_attrs . $lazy_loading . '/>';
+			$img_nolegend = '<img src="'.$abs_srco.'" alt="'.$alt_encoded.'" class="'.$class.'" itemprop="image" ' . $img_size_attrs . $lazy_loading . '/>';
 			break;
 
 		case 'display':
 		default:
-			$img_legend   = '<img src="'.$abs_src.'" alt="'.$alt_encoded.'"'.$legend.' class="'.$class.'" itemprop="image" ' . $img_size_attrs . ' '. $lazy_loading .'/>';
-			$img_nolegend = '<img src="'.$abs_src.'" alt="'.$alt_encoded.'" class="'.$class.'" itemprop="image" ' . $img_size_attrs . ' '. $lazy_loading .'/>';
+			$img_legend   = '<img src="'.$abs_src.'" alt="'.$alt_encoded.'"'.$legend.' class="'.$class.'" itemprop="image" ' . $img_size_attrs . $lazy_loading . '/>';
+			$img_nolegend = '<img src="'.$abs_src.'" alt="'.$alt_encoded.'" class="'.$class.'" itemprop="image" ' . $img_size_attrs . $lazy_loading . '/>';
 			break;
 	}
 
