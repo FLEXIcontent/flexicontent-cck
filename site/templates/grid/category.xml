@@ -78,7 +78,7 @@
 					<field name="readon_class" type="text" default="btn btn-default" label="Read more class" description="Select class css to use instead of read more, this is maybe useful if your website is not multilingual" />
 					
 					<field name="use_lazy_loading_title" type="separator" default="Lazy loading image" description="" level="level2" />
-					<field name="use_lazy_loading" type="radio" default="0" label="FLEXI_FIELD_USE_LAZY_LOADING" description="FLEXI_FIELD_USE_LAZY_LOADING_DESC" class="btn-group btn-group-yesno">
+					<field name="use_lazy_loading" type="radio" default="1" label="FLEXI_FIELD_USE_LAZY_LOADING" description="FLEXI_FIELD_USE_LAZY_LOADING_DESC" class="btn-group btn-group-yesno">
 						<option value="0">FLEXI_NO</option>
 						<option value="1">FLEXI_YES</option>
 					</field>
