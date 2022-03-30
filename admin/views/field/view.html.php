@@ -131,6 +131,13 @@ class FlexicontentViewField extends FlexicontentViewBaseRecord
 		JHtml::_('behavior.formvalidator');
 		JHtml::_('bootstrap.tooltip');
 
+		// Load subform JS, // JHtml::_('jquery.ui', array('core', 'sortable'));  // This is already loaded
+		JHtml::_('script', 'system/subform-repeatable.js', array('version' => 'auto', 'relative' => true));
+
+		// Load minicolors JS
+		JHtml::_('script', 'jui/jquery.minicolors.min.js', array('version' => 'auto', 'relative' => true));
+		JHtml::_('stylesheet', 'jui/jquery.minicolors.css', array('version' => 'auto', 'relative' => true));
+
 		// Add js function to overload the joomla submitform validation
 		$document->addScript(JUri::root(true).'/components/com_flexicontent/assets/js/admin.js', array('version' => FLEXI_VHASH));
 		$document->addScript(JUri::root(true).'/components/com_flexicontent/assets/js/validate.js', array('version' => FLEXI_VHASH));
@@ -362,14 +369,25 @@ class FlexicontentViewField extends FlexicontentViewBaseRecord
 					jQuery.ajax({
 						type: \"GET\",
 						url: 'index.php?option=com_flexicontent&".$_ctrl_task."&cid=".$_row_id."&field_type='+this.value+'&format=raw',
-						success: function(str) {
-							jQuery('#fieldspecificproperties').html(str);
-							jQuery('#fieldspecificproperties').find('.hasTooltip').tooltip({html: true, container: jQuery('#fieldspecificproperties')});
-							jQuery('#fieldspecificproperties').find('.hasPopover').popover({html: true, container: jQuery('#fieldspecificproperties'), trigger : 'hover focus'});
+						success: function(str)
+						{
+							const container_id  = 'fieldspecificproperties';
+							const container_sel = '#' + container_id;
+							const container_el  = jQuery(container_sel);
+							const reAddOnEvents = ['subform-row-add'];
 
-							tabberAutomatic(tabberOptions, 'fieldspecificproperties');
-							fc_bindFormDependencies('#fieldspecificproperties', 0, '');
-							fc_bootstrapAttach('#fieldspecificproperties');
+							container_el.html(str);
+							container_el.find('.hasTooltip').tooltip({html: true, container: container_el});
+							container_el.find('.hasPopover').popover({html: true, container: container_el, trigger : 'hover focus'});
+
+							tabberAutomatic(tabberOptions, container_id);
+							fc_bindFormDependencies(container_sel, 0, '');
+
+							fc_initBootstrap(null, container_sel, reAddOnEvents);
+							fc_initCodeMirror(null, container_sel, reAddOnEvents);  // This does nothing if (!Joomla.editors || !CodeMirror)
+							fc_initMinicolors(null, container_sel, reAddOnEvents);
+							fc_initSubform(null, container_sel);
+
 							if (typeof(fcrecord_attach_sortable) == 'function') fcrecord_attach_sortable('#fieldspecificproperties');
 							if (typeof(fcfield_attach_sortable) == 'function')  fcfield_attach_sortable('#fieldspecificproperties');
 							jQuery('#field_typename').html(jQuery('#".$_field_id."').val());

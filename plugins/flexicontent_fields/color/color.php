@@ -259,7 +259,7 @@ class plgFlexicontent_fieldsColor extends FCField
 				if (inp)
 				{
 					inp.minicolors('destroy');
-					fcfield_color_initMinicolors(null, newField.get(0));
+					fc_initMinicolors(null, newField.get(0), []);
 				}
 				";
 
@@ -308,25 +308,6 @@ class plgFlexicontent_fieldsColor extends FCField
 					row.slideUp(400, function(){ jQuery(this).remove(); });
 					rowCount".$field->id."--;
 				}
-			}
-
-			function fcfield_color_initMinicolors(event, container)
-			{
-				container = container || document;
-
-				jQuery(container).find('.minicolors').each(function() {
-					var $this = jQuery(this);
-					var format = $this.data('validate') === 'color' ? 'hex' : $this.data('format') || 'hex';
-
-					$this.minicolors({
-						control: $this.data('control') || 'hue',
-						format: format === 'rgba' ? 'rgb' : format,
-						keywords: $this.data('keywords') || '',
-						opacity: format === 'rgba',
-						position: $this.data('position') || 'default',
-						theme: $this.data('theme') || 'bootstrap',
-					});
-				});
 			}
 			";
 

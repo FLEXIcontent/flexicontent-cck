@@ -743,6 +743,20 @@
 	}
 
 
+	/*
+	 * Initialize any color fields
+	 */
+	function fc_initBootstrap(event, container, reAddOnEvents)
+	{
+		const container_el = jQuery(container);
+
+		// Also run method on given "Add" events, e.g. 'subform-row-add'
+		(reAddOnEvents || []).forEach(element => container_el.on(element, fc_initBootstrap));
+		
+		fc_bootstrapAttach(container);
+	}
+
+
 	/* Attach boostrap styling / behaviour to the inner contents of the given selector */
 	function fc_bootstrapAttach(sel)
 	{
@@ -1381,7 +1395,25 @@
 	}
 
 
-	/* Attach CodeMirror with default settings */
+	function fc_initCodeMirror(event, container, reAddOnEvents)
+	{
+		if (!Joomla.editors || !CodeMirror) return;
+
+		const container_el = jQuery(container);
+
+		// Also run method on given "Add" events, e.g. 'subform-row-add'
+		(reAddOnEvents || []).forEach(element => container_el.on(element, fc_initCodeMirror));
+		
+		container_el.find('textarea.codemirror-source').each(function () {
+			var input = jQuery(this).removeClass('codemirror-source');
+			var id = input.prop('id');
+
+			Joomla.editors.instances[id] = CodeMirror.fromTextArea(this, input.data('options'));
+		});
+	}
+
+
+	/* Attach CodeMirror with optional settings */
 	function fc_attachCodeMirror(txtareas, CMoptions)
 	{
 		CMoptions = typeof CMoptions!=='undefined' ? CMoptions : {
@@ -2221,6 +2253,41 @@
 		button.type = 'submit';
 		form.appendChild(button).click();
 		form.removeChild(button);
+	}
+
+
+	/*
+	 * Initialize subform fields
+	 */
+	function fc_initSubform (event, container)
+	{
+		jQuery(container).find('div.subform-repeatable').subformRepeatable();
+	}
+	
+
+	/*
+	 * Initialize any color fields
+	 */
+	function fc_initMinicolors(event, container, reAddOnEvents)
+	{
+		const container_el = jQuery(container);
+
+		// Also run method on given "Add" events, e.g. 'subform-row-add'
+		(reAddOnEvents || []).forEach(element => container_el.on(element, fc_initMinicolors));
+
+		container_el.find('.minicolors').each(function() {
+			var $this = jQuery(this);
+			var format = $this.data('validate') === 'color' ? 'hex' : $this.data('format') || 'hex';
+
+			$this.minicolors({
+				control: $this.data('control') || 'hue',
+				format: format === 'rgba' ? 'rgb' : format,
+				keywords: $this.data('keywords') || '',
+				opacity: format === 'rgba',
+				position: $this.data('position') || 'default',
+				theme: $this.data('theme') || 'bootstrap',
+			});
+		});
 	}
 
 

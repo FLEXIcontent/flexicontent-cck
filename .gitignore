@@ -50,11 +50,12 @@ cache
 
 # other
 flexicontent-cck.zip
-site/templates/blog-1/
-site/templates/default-1/
-site/templates/faq-1/
-site/templates/items-tabbed-1/
-site/templates/presentation-1/
+
+site/templates/*
+!site/templates/faq
+!site/templates/grid
+!site/templates/items-tabbed
+!site/templates/table
 
 site/librairies/pdfparser/
 site/librairies/php-stemmer/
@@ -70,7 +71,6 @@ admin/flexicontent.xml
 admin/views/item/tmpl/common/render_buttons.php
 
 plugins/flexicontent_fields/currency/
-plugins/flexicontent_fields/mediaplayer/
 plugins/flexicontent_fields/qrcode/
 plugins/flexicontent_fields/grade/
 
@@ -85,65 +85,8 @@ site/templates/items-tabbed/language/fr-FR/fr-FR.items-tabbed.ini
 site/templates/presentation/language/fr-FR/fr-FR.presentation.ini
 site/templates/table/language/fr-FR/fr-FR.table.ini
 _tools/link_livesite2repo_pro.bat
-site/uploads/1137_00-2019-08-02-1848.jpg
-site/uploads/12532465465d73cde0966fe6.64518703_0a9b891f3e_1024.jpg
-site/uploads/1322_00-2020-05-06-0337.jpeg
-site/uploads/16386_00-2019-08-02-2124.jpg
-site/uploads/16485_00-2019-08-02-2125.jpg
-site/uploads/2019-04-25_14.27.37.jpg
-site/uploads/2020-12-16_22h38_18.png
-site/uploads/2020-12-16_22h39_59.png
-site/uploads/2020-12-16_22h40_54.png
-site/uploads/2020-12-16_22h41_36-1.png
-site/uploads/2020-12-16_22h41_36.png
-site/uploads/2021-01-12_09h27_36.png
-site/uploads/2021-01-13_14h59_45.png
-site/uploads/2021-01-13_15h00_39.png
-site/uploads/2021-01-13_15h01_30.png
-site/uploads/2021-01-13_15h02_10.png
-site/uploads/2021-01-15_14h12_18.png
-site/uploads/2021-01-15_14h27_25.png
-site/uploads/2021-01-20_13h42_52.png
-site/uploads/2021-01-20_15h29_43.png
-site/uploads/2021-02-09_16h06_56.png
-site/uploads/2021-02-10_15h29_33.png
-site/uploads/2021-03-02_21h37_12.png
-site/uploads/2021-04-01_21h16_09.png
-site/uploads/2021-04-01_21h18_22.gif
-site/uploads/211169617.jpg
-site/uploads/484_00-2020-03-04-0137.jpg
-site/uploads/55882a1f-0cc5-4f9a-aa60-466a92ee4fdc.jpg
-site/uploads/847_00-2020-06-03-0233.jpg
-site/uploads/ec223486-dfd5-319e-ab26-e8ce8098851c_mexico-residence-modern-luxury-home-project-ealuxe-1-min_808_440_2_.jpg
-site/uploads/ec223486-dfd5-319e-ab26-e8ce8098851c_modern_luxury_house_in_johannesburg_on_world_of_architecture_02-min_808_440_2_.jpg
-site/uploads/ec223486-dfd5-319e-ab26-e8ce8098851c_modern_luxury_house_in_johannesburg_on_world_of_architecture_16-min_808_440_2_.jpg
-site/uploads/photo1-25.jpg
-site/uploads/photo2resid-blagnac-liv-04trim03.jpg
-site/uploads/photos-cuisine-vente-blagnac-001.jpg
-site/uploads/photos-sdb-vente-blagnac-004.jpg
-site/uploads/photos-sejour-vente-blagnac-007.jpg
-site/uploads/plan-t2.jpg
-site/uploads/t1bis-blagnac.jpg
-site/uploads/t2-port-frejus-c.jpg
-site/uploads/t2-rue-jolimont-1.jpg
-site/uploads/t2-rue-jolimont-2.jpg
-site/uploads/t2-rue-jolimont-3.jpg
-site/uploads/t2-rue-jolimont.jpg
-site/uploads/telechargement -1-.jpg
-site/uploads/telechargement -2--1.jpg
-site/uploads/telechargement -2-.jpg
-site/uploads/telechargement.jpg
-site/uploads/travis-scott-paye-cash-une-enorme-villa-avec-vue-panoramique.jpg
-site/uploads/villa-cameleon-6.jpg
-site/uploads/villa-marrakech-belya-01.jpg
-site/uploads/06q9vc2mbsen0ha64gwgq5jcjixix7snrw1fov94w.jpg
-site/uploads/06yvj18ygs828x8j63n2k09ye3e7d5e1u3fsao0sg-1.jpg
-site/uploads/06yvj18ygs828x8j63n2k09ye3e7d5e1u3fsao0sg.jpg
-site/uploads/0af0m6ihqq6bcqfyl2zwc5h2o6mgptae78ggovugw.jpg
-site/uploads/0eqwngf1dx2sz5o68k2iouath27doghu8feprsnb4.jpg
-site/uploads/0p4vi8ex6vpoolvm3ehs78aitoyh7xyy93hp8bgg0.jpg
-site/uploads/1axqa2b48ujkr3sqj2ea1733kr270s2k3y8dq8we8.jpg
-site/assets/less/j4x.less
-site/assets/css/j4x_rtl.css
-site/assets/css/tabber.css
-site/assets/css/j4x.css
+
+site/uploads/*
+site/medias/*
+!site/uploads/.htaccess
+!site/medias/.htaccess
