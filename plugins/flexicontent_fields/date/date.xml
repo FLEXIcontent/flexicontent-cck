@@ -182,7 +182,7 @@
 
 			<field name="" type="separator" default="FLEXI_LAYOUT" description="" icon_class="icon-file-2" level="tab_open" box_type="1" />
 
-			<field name="viewlayout" type="fclayout" default="value_default" label="FLEXI_FIELD_SELECT_VIEW_LAYOUT" description="FLEXI_FIELD_SELECT_VIEW_LAYOUT_DESC"
+			<field name="viewlayout" type="fclayout" default="default" label="FLEXI_FIELD_SELECT_VIEW_LAYOUT" description="FLEXI_FIELD_SELECT_VIEW_LAYOUT_DESC"
 				directory="/plugins/flexicontent_fields/date/tmpl"
 				ext_name="date"
 				hide_default="1" hide_none="1" exclude="default|age"
