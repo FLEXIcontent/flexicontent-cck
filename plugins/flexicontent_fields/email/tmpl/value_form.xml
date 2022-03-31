@@ -64,7 +64,7 @@
 
 			<field name="PPFX_form_fields" type="subform" label="Form field" description="" layout="joomla.form.field.subform.repeatable" icon="list" multiple="true" class="fcsubform-compact">
 
-				<form name="PPFX_form_fields_list" repeat="true">
+				<form name="viewlayout_form_fields_list" repeat="true">
 
 					<field name="field_type" type="list" label="Type" description="">
 						<option value="text">FLEXI_FIELD_TYPE_TEXT</option>
@@ -82,10 +82,10 @@
 						<option value="url">FLEXI_FIELD_TYPE_URL</option>
 						<option value="file">FLEXI_FIELD_TYPE_FILE</option>
 					</field>
-					<field name="PPFX_field_name" type="text" label="FLEXI_FIELD_EMAIL_NAME_FIELD"  default="FIELD_NAME" description="FLEXI_FIELD_EMAIL_NAME_FIELD_DESC" />
-					<field name="PPFX_field_label" type="text" label="FLEXI_FIELD_EMAIL_LABEL_FIELD"  default="FIELD_LABEL" description="FLEXI_FIELD_EMAIL_LABEL_FIELD_DESC" />
-					<field name="PPFX_field_value" type="text" label="FLEXI_FIELD_EMAIL_VALUE_FIELD"  default="value1;;value2" description="FLEXI_FIELD_EMAIL_VALUE_FIELD_DESC" />
-					<field name="PPFX_field_required" type="multilist" subtype="radio" toggle_related="1" default="1" label="FLEXI_FIELD_EMAIL_FIELD_REQUIRED" description="FLEXI_FIELD_EMAIL_FIELD_REQUIRED_DESC" class="btn-group btn-group-yesno" >
+					<field name="field_name" type="text" label="FLEXI_FIELD_EMAIL_NAME_FIELD"  default="FIELD_NAME" description="FLEXI_FIELD_EMAIL_NAME_FIELD_DESC" />
+					<field name="field_label" type="text" label="FLEXI_FIELD_EMAIL_LABEL_FIELD"  default="FIELD_LABEL" description="FLEXI_FIELD_EMAIL_LABEL_FIELD_DESC" />
+					<field name="field_value" type="text" label="FLEXI_FIELD_EMAIL_VALUE_FIELD"  default="value1;;value2" description="FLEXI_FIELD_EMAIL_VALUE_FIELD_DESC" />
+					<field name="field_required" type="multilist" subtype="radio" toggle_related="1" default="1" label="FLEXI_FIELD_EMAIL_FIELD_REQUIRED" description="FLEXI_FIELD_EMAIL_FIELD_REQUIRED_DESC" class="btn-group btn-group-yesno" >
 						<option value="0" >FLEXI_NO</option>
 						<option value="1" >FLEXI_YES</option>
 					</field>

@@ -335,7 +335,7 @@ class FlexicontentControllerTemplates extends FlexicontentControllerBaseAdmin
 		{
 			$ext_params_str = $db->setQuery($query)->loadResult();
 			$ext_params = new JRegistry($ext_params_str);
-			//print_r($ext_params_str); exit;
+			//echo '<pre>'; print_r($ext_params); echo '</pre>'; exit;
 		}
 
 
@@ -430,7 +430,8 @@ class FlexicontentControllerTemplates extends FlexicontentControllerBaseAdmin
 			// Check if value exists in the extension's parameters and set it into the field name
 			$value = $ext_params->get($field->fieldname);
 
-			if ( (is_string($value) && strlen($value)) || (is_array($value) && count($value)>0))
+			// NOTE: $value is an object for 'subform' field
+			if ( (is_string($value) && strlen($value)) || (is_array($value) && count($value)>0) || is_object($value) )
 			{
 				$form_layout->setValue($field->fieldname, $groupname, $value);
 			}

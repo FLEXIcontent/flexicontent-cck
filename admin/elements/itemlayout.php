@@ -286,15 +286,10 @@ function ilayout_loadPanel(element)
 			url: 'index.php?option=com_flexicontent&task=templates.getlayoutparams&ext_view=".$ext_view."&ext_option=".$ext_option."&ext_name='+element+'&ext_id=".$pk."&layout_name=item&ext_type=templates&directory='+element+'&format=raw&" . JSession::getFormToken() . "=1',
 			success: function(str)
 			{
-				panel.addClass('fc_layout_loaded').html(str);
-				panel.find('.hasTooltip').tooltip({html: true, container: panel});
-				panel.find('.hasPopover').popover({html: true, container: panel, trigger : 'hover focus'});
+				panel.addClass('fc_layout_loaded');
 
-				tabberAutomatic(tabberOptions, panel_id);
-				fc_bindFormDependencies('#'+panel_id, 0, '');
-				fc_bootstrapAttach('#'+panel_id);
-				if (typeof(fcrecord_attach_sortable) == 'function') fcrecord_attach_sortable('#'+panel_id);
-				if (typeof(fcfield_attach_sortable) == 'function')  fcfield_attach_sortable('#'+panel_id);
+				// Initialize JS and CSS of the layout
+				fc_initDynamicLayoutJsCss(panel_id, ['subform-row-add'], str);
 
 				panel_header_link.html('<span><span class=\"btn\"><i class=\"icon-edit\"><\/i>".JText::_( 'FLEXI_PARAMETERS_THEMES_SPECIFIC' ).": '+element+'<\/span><\/span>');
 

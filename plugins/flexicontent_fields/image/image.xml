@@ -501,7 +501,7 @@
 				directory="/plugins/flexicontent_fields/image/tmpl"
 				ext_name="image"
 				hide_default="1" hide_none="1"
-				stripext="1" stripprefix="value_" filter="^value_.*\.php$"
+				stripext="1" stripprefix="value_" filter="^value_.*\.php$" trim_displayname="gallery_"
 				tmpl_container="tabset_attrs_1_nav_4" params_source="file" custom_layouts_label="Custom layouts" layout_label="FLEXI_DESKTOP" icon_class="icon-screen"
 			>
 				<group label="Popup layouts">
@@ -514,10 +514,8 @@
 				</group>
 
 				<group label="Inline layouts">
-					<!--option filename="value_gallery_galleriffic" value="5">FLEXI_FIELD_IMAGE_GALLERIFFIC_BUILTIN</option-->
-					<!--option filename="value_gallery_elastislide" value="7">FLEXI_FIELD_IMAGE_ELASTISLIDE</option-->
-					<option filename="value_gallery_galleriffic" value="5">Galleriffic (Slideshow + carousel) (Built-in)</option>
-					<option filename="value_gallery_elastislide" value="7">Elastislide (Slideshow + carousel) (Built-in)</option>
+					<option filename="value_gallery_galleriffic" value="5">FLEXI_FIELD_IMAGE_GALLERIFFIC_SLIDESHOW_BUILTIN</option>
+					<option filename="value_gallery_elastislide" value="7">FLEXI_FIELD_IMAGE_ELASTISLIDE_SLIDESHOW_BUILTIN</option>
 					<option filename="value_gallery_pannellum" value="9">Pannellum (Panorama)</option>
 					<option filename="value_gallery_juxtapose" value="10">Juxtapose</option>
 				</group>
@@ -533,7 +531,7 @@
 				directory="/plugins/flexicontent_fields/image/tmpl"
 				ext_name="image"
 				hide_default="0" hide_none="1" use_default_label="FLEXI_USE_DESKTOP"
-				stripext="1" stripprefix="value_" filter="^value_.*\.php$"
+				stripext="1" stripprefix="value_" filter="^value_.*\.php$" trim_displayname="gallery_"
 				tmpl_container="tabset_attrs_1_nav_5" params_source="file" custom_layouts_label="Custom layouts" layout_label="FLEXI_MOBILE" icon_class="icon-mobile"
 			>
 				<group label="Popup layouts">
@@ -546,9 +544,10 @@
 				</group>
 
 				<group label="Inline layouts">
-					<option filename="value_gallery_galleriffic" value="5">FLEXI_FIELD_IMAGE_GALLERIFFIC_BUILTIN</option>
-					<!--option filename="value_gallery_elastislide" value="7">FLEXI_FIELD_IMAGE_ELASTISLIDE</option-->
-					<option filename="value_gallery_elastislide" value="7">Elastislide (Slideshow + carousel) (Built-in)</option>
+					<option filename="value_gallery_galleriffic" value="5">FLEXI_FIELD_IMAGE_GALLERIFFIC_SLIDESHOW_BUILTIN</option>
+					<option filename="value_gallery_elastislide" value="7">FLEXI_FIELD_IMAGE_ELASTISLIDE_SLIDESHOW_BUILTIN</option>
+					<option filename="value_gallery_pannellum" value="9">Pannellum (Panorama)</option>
+					<option filename="value_gallery_juxtapose" value="10">Juxtapose</option>
 				</group>
 
 				<group label="Enable via parameters">

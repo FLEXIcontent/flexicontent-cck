@@ -27,16 +27,11 @@
 				<option value="auto">Auto</option>
 			</field>
 
-			<field name="PPFX_buttons_shown" type="checkboxes" default="" label="FLEXI_FIELD_IMAGE_DISP_BUTTONS" description="FLEXI_FIELD_IMAGE_DISP_BUTTONS" class="btn-group btn-group-yesno">
-				<option value="zoom">FLEXI_FIELD_IMAGE_BTN_ZOOM</option>
-				<option value="share">FLEXI_FIELD_IMAGE_BTN_SHARE</option>
-				<option value="slideShow">FLEXI_FIELD_IMAGE_BTN_SLIDESHOW</option>
-				<option value="fullScreen">FLEXI_FIELD_IMAGE_BTN_FULLSCREEN</option>
-				<option value="download">FLEXI_FIELD_IMAGE_BTN_DOWNLOAD</option>
-				<option value="thumbs">FLEXI_FIELD_IMAGE_BTN_THUMBS</option>
-				<option value="close">FLEXI_FIELD_IMAGE_BTN_CLOSE</option>
-			</field>
-
+			<field name="PPFX_buttons_shown" type="fccheckbox" cols="2" default=""
+				checkoptions="FLEXI_FIELD_IMAGE_BTN_ZOOM,FLEXI_FIELD_IMAGE_BTN_SHARE,FLEXI_FIELD_IMAGE_BTN_SLIDESHOW,FLEXI_FIELD_IMAGE_BTN_FULLSCREEN,FLEXI_FIELD_IMAGE_BTN_DOWNLOAD,FLEXI_FIELD_IMAGE_BTN_THUMBS,FLEXI_FIELD_IMAGE_BTN_CLOSE"
+				checkvals="zoom,share,slideShow,fullScreen,download,thumbs,close"
+				defaultvals=""
+				label="FLEXI_FIELD_IMAGE_DISP_BUTTONS" description="FLEXI_FIELD_IMAGE_DISP_BUTTONS" />
 			<field name="PPFX_diplay_thumbs_autostart" type="radio" default="false" label="FLEXI_FIELD_IMAGE_DISP_THUMBS" description="FLEXI_FIELD_IMAGE_DISP_THUMBS_DESC" class="btn-group btn-group-yesno">
 				<option value="false">FLEXI_NO</option>
 				<option value="true">FLEXI_YES</option>

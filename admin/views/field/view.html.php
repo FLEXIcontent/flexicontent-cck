@@ -371,25 +371,9 @@ class FlexicontentViewField extends FlexicontentViewBaseRecord
 						url: 'index.php?option=com_flexicontent&".$_ctrl_task."&cid=".$_row_id."&field_type='+this.value+'&format=raw',
 						success: function(str)
 						{
+							// Initialize JS and CSS of the layout
 							const container_id  = 'fieldspecificproperties';
-							const container_sel = '#' + container_id;
-							const container_el  = jQuery(container_sel);
-							const reAddOnEvents = ['subform-row-add'];
-
-							container_el.html(str);
-							container_el.find('.hasTooltip').tooltip({html: true, container: container_el});
-							container_el.find('.hasPopover').popover({html: true, container: container_el, trigger : 'hover focus'});
-
-							tabberAutomatic(tabberOptions, container_id);
-							fc_bindFormDependencies(container_sel, 0, '');
-
-							fc_initBootstrap(null, container_sel, reAddOnEvents);
-							fc_initCodeMirror(null, container_sel, reAddOnEvents);  // This does nothing if (!Joomla.editors || !CodeMirror)
-							fc_initMinicolors(null, container_sel, reAddOnEvents);
-							fc_initSubform(null, container_sel);
-
-							if (typeof(fcrecord_attach_sortable) == 'function') fcrecord_attach_sortable('#fieldspecificproperties');
-							if (typeof(fcfield_attach_sortable) == 'function')  fcfield_attach_sortable('#fieldspecificproperties');
+							fc_initDynamicLayoutJsCss(container_id, ['subform-row-add'], str);
 							jQuery('#field_typename').html(jQuery('#".$_field_id."').val());
 						}
 					});

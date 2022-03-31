@@ -136,6 +136,8 @@ class plgFlexicontent_fieldsDate extends FCField
 		$minyear = strlen($minyear) ? (int) $minyear : '';
 		$maxyear = strlen($maxyear) ? (int) $maxyear : '';
 
+		// Create extra HTML TAG parameters for the form field
+		$classes = '';
 		$disable_keyboardinput = (int) $field->parameters->get('disable_keyboardinput', 0);
 		$onChange = $field->parameters->get('onchange', '');
 
@@ -399,8 +401,8 @@ class plgFlexicontent_fieldsDate extends FCField
 			$css .= '';
 		}
 
-
-		$classes  = /*'fcfield_textval' .*/ $required_class;
+		// We may comment out some classes so that layout decides these
+		$classes .= /*' fcfield_textval' .*/ $required_class;
 
 		// Set field to 'Automatic' on successful validation'
 		if ($auto_value)
@@ -619,6 +621,9 @@ class plgFlexicontent_fieldsDate extends FCField
 		{
 			return;
 		}
+
+		// The current view is a full item view of the item
+		$isMatchedItemView = static::$itemViewId === (int) $item->id;
 
 		// Some variables
 		$is_ingroup  = !empty($field->ingroup);

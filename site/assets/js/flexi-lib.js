@@ -743,20 +743,6 @@
 	}
 
 
-	/*
-	 * Initialize any color fields
-	 */
-	function fc_initBootstrap(event, container, reAddOnEvents)
-	{
-		const container_el = jQuery(container);
-
-		// Also run method on given "Add" events, e.g. 'subform-row-add'
-		(reAddOnEvents || []).forEach(element => container_el.on(element, fc_initBootstrap));
-		
-		fc_bootstrapAttach(container);
-	}
-
-
 	/* Attach boostrap styling / behaviour to the inner contents of the given selector */
 	function fc_bootstrapAttach(sel)
 	{
@@ -1035,8 +1021,8 @@
 				hidecol_box.innerHTML = parseInt(hidecol_box.innerHTML) - 1;
 			}
 		}
-		
-		
+
+
 		if (firstrun)
 		{
 			if (action_func === 'hide' && !document.getElementById('fc_' + container_div_id + '_btn').classList.contains('btn-inverse'))
@@ -1395,24 +1381,6 @@
 	}
 
 
-	function fc_initCodeMirror(event, container, reAddOnEvents)
-	{
-		if (!Joomla.editors || !CodeMirror) return;
-
-		const container_el = jQuery(container);
-
-		// Also run method on given "Add" events, e.g. 'subform-row-add'
-		(reAddOnEvents || []).forEach(element => container_el.on(element, fc_initCodeMirror));
-		
-		container_el.find('textarea.codemirror-source').each(function () {
-			var input = jQuery(this).removeClass('codemirror-source');
-			var id = input.prop('id');
-
-			Joomla.editors.instances[id] = CodeMirror.fromTextArea(this, input.data('options'));
-		});
-	}
-
-
 	/* Attach CodeMirror with optional settings */
 	function fc_attachCodeMirror(txtareas, CMoptions)
 	{
@@ -1594,11 +1562,12 @@
 
 
 	/* Apply select2 JS to targeted elements */
-	function fc_attachSelect2(sel)
+	function fc_attachSelect2(sel, s2_elems)
 	{
-		sel = typeof sel !== 'undefined' && sel ? sel : 'body';
+		sel      = typeof sel !== 'undefined' && sel ? sel : 'body';
 		var sbox = jQuery(sel);
-		var s2_elems = sbox.find('select.use_select2_lib');
+
+		s2_elems = s2_elems || sbox.find('select.use_select2_lib');
 
 		if (window.skip_select2_js)
 		{
@@ -2211,7 +2180,7 @@
 					return true;
 				}
 				//form.doanimated_submit = 0;  // Clear FLAG until next time Joomla.submitform() is called
-				
+
 				var fc_filter_form_blocker = jQuery('#fc_filter_form_blocker');
 
 				if (!fc_filter_form_blocker.length)
@@ -2256,26 +2225,163 @@
 	}
 
 
+
+	//*******************************
+	//*** START OF fc_init*() methods
+	//*******************************
+
+
+	/*
+	 * Initialize CSS styles and effects
+	 */
+	function fc_initDynamicLayoutJsCss(container_id, reAddOnEvents, html)
+	{
+		const container_sel = '#' + container_id;
+		jQuery(container_sel).html(html);
+
+		tabberAutomatic(tabberOptions, container_id);
+		fc_bindFormDependencies(container_sel, 0, '');
+
+		fc_initBootstrap(null, container_sel, reAddOnEvents);
+		fc_initTooltips(null, container_sel, reAddOnEvents);
+		fc_initCodeMirror(null, container_sel, reAddOnEvents);
+		fc_initMinicolors(null, container_sel, reAddOnEvents);
+		fc_initSubform(null, container_sel);
+
+		if (typeof(fcrecord_attach_sortable) == 'function') fcrecord_attach_sortable(container_sel);
+		if (typeof(fcfield_attach_sortable) == 'function')  fcfield_attach_sortable(container_sel);
+
+		fc_initSelect2(null, container_sel, reAddOnEvents);
+	}
+
+
+	/*
+	 * Initialize bootstrap styles and effects
+	 */
+	function fc_initBootstrap(event, container_sel, reAddOnEvents)
+	{
+		const container_el = jQuery(container_sel);
+
+		// Also run method on given "Add" events, e.g. 'subform-row-add'
+		(reAddOnEvents || []).forEach(element => container_el.on(element, fc_initBootstrap));
+
+		// Add bootstap styless and effects
+		fc_bootstrapAttach(container_el);
+	}
+
+
+	/*
+	 * Initialize tooltips and popovers
+	 */
+	function fc_initTooltips(event, container_sel, reAddOnEvents)
+	{
+		const container_el = jQuery(container_sel);
+		const elements_set_tooltip = container_el.find('.hasTooltip');
+		const elements_set_popover = container_el.find('.hasPopover');
+
+		if (typeof jQuery === undefined || typeof jQuery.tooltip === undefined)
+		{
+			elements_set_tooltip.length && !!Joomla.fc_debug ? window.console.log('tooltip() not loaded. Skipping it') : false;
+		}
+		if (typeof jQuery === undefined || typeof jQuery.popover === undefined)
+		{
+			elements_set_popover.length && !!Joomla.fc_debug ? window.console.log('popover() not loaded. Skipping it') : false;
+		}
+		if (typeof jQuery === undefined || (typeof jQuery.tooltip === undefined && typeof jQuery.popover === undefined))
+		{
+			return;
+		}
+
+		// Also run method on given "Add" events, e.g. 'subform-row-add'
+		(reAddOnEvents || []).forEach(element => container_el.on(element, fc_initTooltips));
+
+		// Add tooltips and popovers
+		typeof jQuery.tooltip !== undefined ? elements_set_tooltip.tooltip({html: true, container: container_el}) : false;
+		typeof jQuery.popover !== undefined ? elements_set_popover.popover({html: true, container: container_el, trigger : 'hover focus'}) : false;
+	}
+
+
+	/*
+	 * Initialize select2 behaviour
+	 */
+	function fc_initSelect2(event, container_sel, reAddOnEvents)
+	{
+		const container_el = jQuery(container_sel);
+		const elements_set = container_el.find('select.use_select2_lib');
+
+		if (typeof jQuery === undefined || typeof jQuery.select2 === undefined)
+		{
+			elements_set.length && !!Joomla.fc_debug ? window.console.log('subformRepeatable() not loaded. Skipping it') : false;
+			return;
+		}
+
+		// Also run method on given "Add" events, e.g. 'subform-row-add'
+		(reAddOnEvents || []).forEach(element => container_el.on(element, fc_initSelect2));
+
+		// Attach select2
+		fc_attachSelect2(container_el, elements_set);
+	}
+
+
+	function fc_initCodeMirror(event, container_sel, reAddOnEvents)
+	{
+		const container_el = jQuery(container_sel);
+		const elements_set = container_el.find('textarea.codemirror-source');
+
+		if (typeof Joomla.editors === undefined || typeof CodeMirror === undefined)
+		{
+			elements_set.length && !!Joomla.fc_debug ? window.console.log('CodeMirror not loaded. Skipping it') : false;
+			return;
+		}
+
+		// Also run method on given "Add" events, e.g. 'subform-row-add'
+		(reAddOnEvents || []).forEach(element => container_el.on(element, fc_initCodeMirror));
+
+		elements_set.each(function () {
+			var input = jQuery(this).removeClass('codemirror-source');
+			var id = input.prop('id');
+
+			Joomla.editors.instances[id] = CodeMirror.fromTextArea(this, input.data('options'));
+		});
+	}
+
+
+
 	/*
 	 * Initialize subform fields
 	 */
-	function fc_initSubform (event, container)
+	function fc_initSubform (event, container_sel)
 	{
-		jQuery(container).find('div.subform-repeatable').subformRepeatable();
+		const container_el = jQuery(container_sel);
+		const elements_set = container_el.find('div.subform-repeatable');
+
+		if (typeof jQuery === undefined || typeof jQuery.subformRepeatable)
+		{
+			elements_set.length && !!Joomla.fc_debug ? window.console.log('subformRepeatable() not loaded. Skipping it') : false;
+			return;
+		}
+		elements_set.subformRepeatable();
 	}
-	
+
 
 	/*
-	 * Initialize any color fields
+	 * Initialize any minicolor fields
 	 */
-	function fc_initMinicolors(event, container, reAddOnEvents)
+	function fc_initMinicolors(event, container_sel, reAddOnEvents)
 	{
-		const container_el = jQuery(container);
+		const container_el = jQuery(container_sel);
+		const elements_set = container_el.find('.minicolors');
+
+		if (typeof jQuery === undefined || typeof jQuery.minicolors === undefined)
+		{
+			elements_set.length && !!Joomla.fc_debug ? window.console.log('minicolors() not loaded. Skipping it') : false;
+			return;
+		}
 
 		// Also run method on given "Add" events, e.g. 'subform-row-add'
 		(reAddOnEvents || []).forEach(element => container_el.on(element, fc_initMinicolors));
 
-		container_el.find('.minicolors').each(function() {
+		elements_set.each(function() {
 			var $this = jQuery(this);
 			var format = $this.data('validate') === 'color' ? 'hex' : $this.data('format') || 'hex';
 
@@ -2289,6 +2395,12 @@
 			});
 		});
 	}
+
+
+	//*****************************
+	//*** END OF fc_init*() methods
+	//*****************************
+
 
 
 	/*

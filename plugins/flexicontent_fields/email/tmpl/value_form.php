@@ -39,8 +39,9 @@ foreach ($values as $value)
 	}
 
 	// Create field's display
-	$submit_class = $field->parameters->get('submit_class', 'btn');
-	$label_position = $field->parameters->get('label_position', '');
+	$LPN = 'viewlayout_';  // Layout Parameter Name
+	$submit_class   = $field->parameters->get($LPN . 'submit_class', 'btn');
+	$label_position = $field->parameters->get($LPN . 'label_position', '');
 
 	// Label position
 	switch ($label_position)
@@ -58,8 +59,8 @@ foreach ($values as $value)
 	// Use paremeters to decide if email should be cloaked and if we need a mailto: link
 
 	// Title form display
-	$titleform         = JText::_($field->parameters->get('title_form', ''));
-	$display_titleform = $field->parameters->get('display_title_form', 0);
+	$titleform         = JText::_($field->parameters->get($LPN . 'title_form', ''));
+	$display_titleform = $field->parameters->get($LPN . 'display_title_form', 0);
 
 	$titleformD = $display_titleform ? '<LEGEND>'.$titleform.'</LEGEND>' : '';
 
@@ -71,12 +72,12 @@ foreach ($values as $value)
 	// Modal display 
 	// TODO replace joomla modal for flexicontent modal base on jquery
 	$view = $app->input->getCmd('flexi_callview', ($realview ?: 'item'));
-	$use_modal = $field->parameters->get('use_modal', 1);
-	$use_modal_in_view = $field->parameters->get('use_modal_in_view', 'both');
-	$modal_button_text = JText::_($field->parameters->get('modal_button_text', 'FLEXI_FIELD_EMAIL_MODAL_BUTTON_CONTENT'));
-	$modal_button_class = $field->parameters->get('modal_button_class', 'btn btn-info');
-	$modal_height = $field->parameters->get('modal_height', 400);
-	$modal_width = $field->parameters->get('modal_width', 400);
+	$use_modal = $field->parameters->get($LPN . 'use_modal', 1);
+	$use_modal_in_view = $field->parameters->get($LPN . 'use_modal_in_view', 'both');
+	$modal_button_text = JText::_($field->parameters->get($LPN . 'modal_button_text', 'FLEXI_FIELD_EMAIL_MODAL_BUTTON_CONTENT'));
+	$modal_button_class = $field->parameters->get($LPN . 'modal_button_class', 'btn btn-info');
+	$modal_height = $field->parameters->get($LPN . 'modal_height', 400);
+	$modal_width = $field->parameters->get($LPN . 'modal_width', 400);
 
 	/* Adapt modal to J3 BS2 or J4 BS5 */
 	$datatoggle  = FLEXI_J40GE ? "data-bs-toggle" : "data-toggle";
@@ -116,9 +117,9 @@ foreach ($values as $value)
 	}
 
 	// Consent field
-	$consent_field_display = (int) $field->parameters->get('display_consent', 1);
-	$consent_field_text    = $field->parameters->get('text_consent', 'FLEXI_FIELD_EMAIL_CONSENT_LABEL_VALUE');
-	$consent_field_link    = $field->parameters->get('link_consent', '');
+	$consent_field_display = (int) $field->parameters->get($LPN . 'display_consent', 1);
+	$consent_field_text    = $field->parameters->get($LPN . 'text_consent', 'FLEXI_FIELD_EMAIL_CONSENT_LABEL_VALUE');
+	$consent_field_link    = $field->parameters->get($LPN . 'link_consent', '');
 	$consent_field = '';
 
 	if ($consent_field_display)
@@ -134,7 +135,7 @@ foreach ($values as $value)
 	}
 
 	//Captcha
-	$display_captcha = (int) $field->parameters->get('display_captcha', 0);
+	$display_captcha = (int) $field->parameters->get($LPN . 'display_captcha', 0);
 	$captcha_plgname = $display_captcha ? $app->getCfg('captcha') : '0';
 	$captcha_html    = '';
 
@@ -159,7 +160,7 @@ foreach ($values as $value)
 
 
 	$fields_display = '';
-	$list_fields    = $field->parameters->get('form_fields');
+	$list_fields    = $field->parameters->get($LPN . 'form_fields');
 
 	if ($list_fields)
 	{

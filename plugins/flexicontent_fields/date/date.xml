@@ -186,11 +186,11 @@
 				directory="/plugins/flexicontent_fields/date/tmpl"
 				ext_name="date"
 				hide_default="1" hide_none="1" exclude="default|age"
-				stripext="1" stripprefix="value_" filter="^value_.*\.php$"
+				stripext="1" stripprefix="value_" filter="^value_.*\.php$" trim_displayname=""
 				tmpl_container="tabset_attrs_1_nav_3" params_source="file" custom_layouts_label="Custom layouts" layout_label="FLEXI_LAYOUT" icon_class="icon-screen"
 			>
-				<option filename="value_default" value="default">Default (Date)</option>
-				<option filename="value_age" value="age">Age (Years / months since a date)</option>
+				<option filename="value_default" value="default" displayname="FLEXI_DATE">FLEXI_FIELD_DATE_LAYOUT_TITLE_DATE</option>
+				<option filename="value_age" value="age">FLEXI_FIELD_DATE_LAYOUT_TITLE_AGE</option>
 			</field>
 
 			<!--field name="viewlayout" type="fcfilelist" default="" label="FLEXI_FIELD_SELECT_VIEW_LAYOUT" description="FLEXI_FIELD_SELECT_VIEW_LAYOUT_DESC" directory="plugins/flexicontent_fields/date/tmpl/" filter="^value_.*\.php$" exclude="" stripext="1" stripprefix="value_" hide_none="1" hide_default="1" /-->
