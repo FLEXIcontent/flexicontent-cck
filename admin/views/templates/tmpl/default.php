@@ -102,13 +102,13 @@ $list_total_cols = 8;
 	<div id="howto_box" style="margin:10px 0% 24px 0%; width: 100%;">
 		<table class="fc-table-list" style="margin: 0; min-width: unset; width: 100%;">
 			<tr>
-				<th>Configure display of your fields <span class="badge">item</span> view and <span class="badge">multi-item</span> views</th>
+				<th>Configure display of your fields <span class="badge text-white bg-dark">item</span> view and <span class="badge text-white bg-dark">multi-item</span> views</th>
 			</tr>
 			<tr>
-				<td><span class="label text-white bg-info label-info">ITEM Layout</span> Select this in configuration of <span class="badge">types</span> and (optionally) in  <span class="badge">items</span></td>
+				<td><span class="badge text-white bg-info">ITEM Layout</span> Select this in configuration of <span class="badge text-white bg-dark">types</span> and (optionally) in  <span class="badge text-white bg-dark">items</span></td>
 			</tr>
 			<tr>
-				<td><span class="label text-white bg-info label-info">CATEGORY Layout</span> Select this in configuration of <span class="badge">categories / content lists</span> except for <b>search view</b></td>
+				<td><span class="badge text-white bg-info">CATEGORY Layout</span> Select this in configuration of <span class="badge text-white bg-dark">categories / content lists</span> except for <b>search view</b></td>
 			</tr>
 		</table>
 	</div>
@@ -133,11 +133,11 @@ $list_total_cols = 8;
 			<th class="title" style="text-align:left;"><?php echo JText::_( 'FLEXI_TEMPLATE_NAME' ); ?></th>
 			<th colspan="2" style="text-align: left">
 				<?php echo JText::_( 'FLEXI_SINGLE_CONTENT' ); ?><br/>
-				<span class="label text-white bg-info label-info">ITEM Layout</span>
+				<span class="badge text-white bg-info">ITEM Layout</span>
 			</th>
 			<th colspan="2" style="text-align: left">
 				<?php echo JText::_( 'FLEXI_CONTENT_LISTS' ); ?><br/>
-				<span class="label text-white bg-info label-info">CATEGORY Layout</span>
+				<span class="badge text-white bg-info">CATEGORY Layout</span>
 			</th>
 		</tr>
 	</thead>
@@ -174,12 +174,12 @@ $list_total_cols = 8;
 			</td>
 			<td class="right">
 				<?php if (!in_array($row->name, $basetemplates)) :?>
-					<span class="btn hasTooltip deletable-template" title="<?php echo JText::_('FLEXI_REMOVE_TEMPLATE', true); ?>" id="<?php echo 'del-' . $row->name ?>">
+					<span class="<?php echo $this->btn_sm_class; ?> hasTooltip deletable-template" title="<?php echo JText::_('FLEXI_REMOVE_TEMPLATE', true); ?>" id="<?php echo 'del-' . $row->name ?>">
 						<?php echo $delTmpl_icon; ?>
 					</span>
 			 	<?php endif; ?>
 				<?php /*<a class="modal" onclick="javascript:;" rel="{handler: 'iframe', size: {x: 390, y: 210}}" href="<?php echo $copylink; ?>"><?php echo $copyTmpl_icon; ?></a>*/ ?>
-				<span class="btn hasTooltip" title="<?php echo JText::_('FLEXI_DUPLICATE_TEMPLATE', true); ?>" onclick="var url = jQuery(this).attr('data-href'); fc_tmpls_modal = fc_showDialog(url, 'fc_modal_popup_container', 0, 440, 300, fc_template_modal_close); return false;" data-href="<?php echo $copylink; ?>">
+				<span class="<?php echo $this->btn_sm_class; ?> hasTooltip" title="<?php echo JText::_('FLEXI_DUPLICATE_TEMPLATE', true); ?>" onclick="var url = jQuery(this).attr('data-href'); fc_tmpls_modal = fc_showDialog(url, 'fc_modal_popup_container', 0, 440, 300, fc_template_modal_close); return false;" data-href="<?php echo $copylink; ?>">
 					<?php echo $copyTmpl_icon; ?>
 				</span>
 			</td>
@@ -188,32 +188,32 @@ $list_total_cols = 8;
 				<?php if (in_array($row->name, $basetemplates)) :?>
 					<!--<span class="icon-lock"></span>-->
 				<?php else: ?>
-					<span class="icon-user"></span><span class="badge"><?php echo JText::_('FLEXI_USER').' - '.JText::_('FLEXI_CREATED'); ?></span>
+					<span class="icon-user"></span><span class="badge bg-dark text-white"><?php echo JText::_('FLEXI_USER').' - '.JText::_('FLEXI_CREATED'); ?></span>
 				<?php endif; ?>
 			</td>
-			<td style="padding-right: 0;">
+			<td>
 				<?php echo !empty($row->items)
-					? '<a class="btn hasTooltip" href="'.$itemlink.'" title="'.$edit_layout.'">'.$editSingle_icon.'</a>'
-					: '<span class="btn disabled">'.$noEditLayout_icon.'</span>'; ?>
+					? '<a class="' . $this->btn_sm_class . ' hasTooltip" href="'.$itemlink.'" title="'.$edit_layout.'">'.$editSingle_icon.'</a>'
+					: '<span class="' . $this->btn_sm_class . ' disabled">'.$noEditLayout_icon.'</span>'; ?>
 			</td>
-			<td style="text-align: left; padding-left: 0;">
+			<td style="text-align: left;">
 				<?php if ($defaulttitle_item): ?>
 					<span data-placement="top" class="<?php echo $tip_class; ?>" title="<?php echo flexicontent_html::getToolTip('', $description_item, 0, 1); ?>" >
 						<i class="icon-info"></i>
-					</span>
+					</span>&nbsp;
 					<?php echo $defaulttitle_item; ?>
 				<?php endif; ?>
 			</td>
-			<td style="padding-right: 0;">
+			<td>
 				<?php echo !empty($row->category)
-					? '<a class="btn hasTooltip" href="'.$catlink.'" title="'.$edit_layout.'">'.$editMultiple_icon.'</a>'
-					: '<span class="btn disabled">'.$noEditLayout_icon.'</span>'; ?>
+					? '<a class="' . $this->btn_sm_class . ' hasTooltip" href="'.$catlink.'" title="'.$edit_layout.'">'.$editMultiple_icon.'</a>'
+					: '<span class="' . $this->btn_sm_class . ' disabled">'.$noEditLayout_icon.'</span>'; ?>
 			</td>
-			<td style="text-align: left; padding-left: 0;">
+			<td style="text-align: left;">
 				<?php if ($defaulttitle_cat): ?>
 					<span data-placement="top" class="<?php echo $tip_class; ?>" title="<?php echo flexicontent_html::getToolTip('', $description_cat, 0, 1); ?>" >
 						<i class="icon-info"></i>
-					</span>
+					</span>&nbsp;
 					<?php echo $defaulttitle_cat; ?>
 				<?php endif; ?>
 			</td>

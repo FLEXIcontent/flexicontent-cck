@@ -775,7 +775,11 @@ body .nowrap_hidden {
 		select {
 			height: var(--fcman-inp-height) !important;
 			min-height: var(--fcman-inp-height) !important;
-			margin: 0 6px 0 0 !important;
+			line-height: calc(var(--fcman-inp-height) - 4px) !important;
+			padding-top: 0 !important;
+			padding-bottom: 0 !important;
+			background: white;
+			margin: 0 6px 0 0;
 		}
 	}
 	/* EXTRA END */
@@ -785,7 +789,7 @@ body .nowrap_hidden {
 		.fc-xpended > *,
 		.fc-xpended-row > * {
 			min-height: var(--fcman-inp-height) !important;
-			line-height: calc(var(--fcman-inp-height) - 4px) !important;
+			line-height: calc(var(--fcman-inp-height) - 2px) !important;
 			box-sizing: border-box !important;
 			padding: 0 8px;
 		}
@@ -1158,7 +1162,7 @@ div table.fc-table-list tbody tr:hover td a:not(.btn) {
 	select.fcfield_selectval {
 		min-width: unset !important;
 		background: #fff !important;
-		font-size: 0.8rem !important;
+		font-size: 0.9rem !important;
 	}
 }
 

@@ -542,6 +542,93 @@ dl#content-pane.tabs {
 	padding: 5px 2%;
 }
 
+:root {
+  --card-bg: rgba(255, 255, 255, 0.7);
+  --bluegray: #b2bfcd;
+  --lightbluegray: #f6f9fc;
+  --toolbar-bg: #fff;
+  --success-border: var(--success);
+  --info-border: var(--info);
+  --warning-border: var(--warning);
+  --danger-border: var(--danger);
+  --login-main-bg: #0b1c32;
+  --border: #cdcdcd;
+  --white: #fff;
+  --white-offset: #fefefe;
+  --focus: #39f;
+  --focus-shadow: 0 0 0 0.2rem #eaeaea;
+  --toggle-color: #fff;
+  --gray-100: #f8f9fa;
+  --gray-200: #e8e8e8;
+  --gray-300: #dee2e6;
+  --gray-400: #cdcdcd;
+  --gray-500: #adb5bd;
+  --gray-600: #666e76;
+  --gray-700: #495057;
+  --gray-800: #343a40;
+  --gray-900: #212529;
+  --primary: #132f53;
+  --secondary: #495057;
+  --success: #457d54;
+  --info: #2a69b8;
+  --warning: #ffb514;
+  --danger: #c52827;
+  --light: #f8f9fa;
+  --dark: #212529;
+  --action: #132f53;
+  --error: #3b0d0c;
+  --alert-success: #0f2f21;
+  --primary-rgb: 19, 47, 83;
+  --secondary-rgb: 73, 80, 87;
+  --success-rgb: 69, 125, 84;
+  --info-rgb: 42, 105, 184;
+  --warning-rgb: 255, 181, 20;
+  --danger-rgb: 197, 40, 39;
+  --light-rgb: 248, 249, 250;
+  --dark-rgb: 33, 37, 41;
+  --action-rgb: 19, 47, 83;
+  --error-rgb: 59, 13, 12;
+  --alert-success-rgb: 15, 47, 33;
+  --template-sidebar-bg: var(--template-bg-dark-80);
+  --template-sidebar-font-color: #fff;
+  --template-sidebar-link-color: #fff;
+  --template-bg-light: #f0f4fb;
+  --template-text-light: #fff;
+  --template-special-color: #001b4c;
+  --template-link-color: #2a69b8;
+  --template-link-hover-color: #173a65;
+  --template-contrast: #2a69b8;
+  --template-bg-dark: hsl(var(--hue), 40%, 20%);
+  --template-bg-dark-3: hsl(var(--hue), 40%, 97%);
+  --template-bg-dark-5: hsl(var(--hue), 40%, 95%);
+  --template-bg-dark-7: hsl(var(--hue), 40%, 93%);
+  --template-bg-dark-10: hsl(var(--hue), 40%, 90%);
+  --template-bg-dark-15: hsl(var(--hue), 40%, 85%);
+  --template-bg-dark-20: hsl(var(--hue), 40%, 80%);
+  --template-bg-dark-30: hsl(var(--hue), 40%, 70%);
+  --template-bg-dark-40: hsl(var(--hue), 40%, 60%);
+  --template-bg-dark-50: hsl(var(--hue), 40%, 50%);
+  --template-bg-dark-60: hsl(var(--hue), 40%, 40%);
+  --template-bg-dark-65: hsl(var(--hue), 40%, 35%);
+  --template-bg-dark-70: hsl(var(--hue), 40%, 30%);
+  --template-bg-dark-75: hsl(var(--hue), 40%, 25%);
+  --template-bg-dark-80: hsl(var(--hue), 40%, 20%);
+  --template-bg-dark-90: hsl(var(--hue), 40%, 10%);
+  --white-rgb: 255, 255, 255;
+  --black-rgb: 0, 0, 0;
+  --body-color-rgb: 33, 37, 41;
+  --body-bg-rgb: 255, 255, 255;
+  --font-sans-serif: "Roboto", -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --font-monospace: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  --gradient: linear-gradient(180deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0));
+  --body-font-family: var(--font-sans-serif);
+  --body-font-size: 1rem;
+  --body-font-weight: 400;
+  --body-line-height: 1.5;
+  --body-color: var(--template-text-dark);
+  --body-bg: #fff;
+}
+
 /* Missing styles in J3 BS2 */
 .text-primary {
   color: #007bff !important;
@@ -573,6 +660,81 @@ dl#content-pane.tabs {
 .text-white {
   color: #fff !important;
 }
+.bg-primary {
+ --bg-opacity:1;
+ background-color: ~"rgba(var(--primary-rgb),var(--bg-opacity))!important";
+}
+.bg-secondary {
+ --bg-opacity:1;
+ background-color: ~"rgba(var(--secondary-rgb),var(--bg-opacity))!important";
+}
+.bg-success {
+ --bg-opacity:1;
+ background-color: ~"rgba(var(--success-rgb),var(--bg-opacity))!important";
+}
+.bg-info {
+ --bg-opacity:1;
+ background-color: ~"rgba(var(--info-rgb),var(--bg-opacity))!important";
+}
+.bg-warning {
+ --bg-opacity:1;
+ background-color: ~"rgba(var(--warning-rgb),var(--bg-opacity))!important";
+}
+.bg-danger {
+ --bg-opacity:1;
+ background-color: ~"rgba(var(--danger-rgb),var(--bg-opacity))!important";
+}
+.bg-light {
+ --bg-opacity:1;
+ background-color: ~"rgba(var(--light-rgb),var(--bg-opacity))!important";
+}
 .bg-dark {
-  background-color: #343a40 !important;
+ --bg-opacity:1;
+ background-color: ~"rgba(var(--dark-rgb),var(--bg-opacity))!important";
+}
+.bg-action {
+ --bg-opacity:1;
+ background-color: ~"rgba(var(--action-rgb),var(--bg-opacity))!important";
+}
+.bg-error {
+ --bg-opacity:1;
+ background-color: ~"rgba(var(--error-rgb),var(--bg-opacity))!important";
+}
+.bg-alert-success {
+ --bg-opacity:1;
+ background-color: ~"rgba(var(--alert-success-rgb),var(--bg-opacity))!important";
+}
+.bg-black {
+ --bg-opacity:1;
+ background-color: ~"rgba(var(--black-rgb),var(--bg-opacity))!important";
+}
+.bg-white {
+ --bg-opacity:1;
+ background-color: ~"rgba(var(--white-rgb),var(--bg-opacity))!important";
+}
+.bg-body {
+ --bg-opacity:1;
+ background-color: ~"rgba(var(--body-bg-rgb),var(--bg-opacity))!important";
+}
+.bg-transparent {
+ --bg-opacity:1;
+ background-color: ~"transparent!important";
+}
+.bg-opacity-10 {
+ --bg-opacity:0.1
+}
+.bg-opacity-25 {
+ --bg-opacity:0.25
+}
+.bg-opacity-50 {
+ --bg-opacity:0.5
+}
+.bg-opacity-75 {
+ --bg-opacity:0.75
+}
+.bg-opacity-100 {
+ --bg-opacity:1
+}
+.bg-gradient {
+ background-image:var(--gradient)!important";
 }

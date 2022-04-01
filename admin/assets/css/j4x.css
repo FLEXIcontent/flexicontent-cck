@@ -458,13 +458,6 @@ dl#content-pane.tabs {
 .icon-items:before {
 	content: "\f0c5";
 }
-#flexicontent .btn-outline-info.active,
-a.btn.btn-small,
-.btn-outline-info,
-#flexicontent .btn.btn-sm {
-	color: var(--template-text-dark);
-	background: #fff !important;
-}
 .flexicontent *:not(.input-append):not(.input-prepend):not(.input-group) > select:not(.custom-select) {
 	padding: 11px;
 }
@@ -492,10 +485,11 @@ a.fc_assoc_translation.label.label-association {
 .flexicontent #fc-filters-box .fc-filter .input-group-prepend input#filter_id {
 	border: 1px solid #aaa;
 }
-.fa-stack,
-.icon-stack {
+.flexicontent .fa-stack,
+.flexicontent .icon-stack {
 	height: initial;
 	line-height: initial;
+	width: unset;
 }
 div#tags #input-tags {
 	border-radius: 5px;
@@ -517,10 +511,6 @@ div#tags #input-tags {
 #flexicontent [class*="fc-xpended"] .input-group-text.fc-lbl-inverted,
 #flexicontent [class*="fc-xpended"] .add-on.fc-lbl-inverted {
 	font-size: inherit;
-}
-#adminListTableFCtemplates a.btn.hasTooltip {
-	background: #fff;
-	margin-right: 9px;
 }
 button.accordion-button.collapsed {
 	border: 1px solid;
@@ -546,65 +536,6 @@ body .btn-group.group-fcmethod .btn:not(.btn-primary) {
 	color: #fff !important;
 	background-color: #495057 !important;
 	border-color: #495057 !important;
-}
-table.fc-table-list {
-	font: inherit;
-	text-shadow: inherit;
-	background: inherit;
-	border-collapse: inherit;
-	box-shadow: inherit;
-	font-size: inherit;
-	line-height: inherit;
-	margin: inherit;
-	text-align: inherit;
-	min-width: inherit;
-}
-div table.fc-table-list th {
-	background-color: inherit;
-	background-image: inherit;
-	border-left: inherit;
-	border-right: inherit;
-	border-top: inherit;
-	border-bottom: inherit;
-	box-shadow: inherit;
-	color: #555;
-	font-weight: bold;
-	padding: 6px 12px;
-	position: relative;
-	text-shadow: inherit;
-}
-div table.fc-table-list th:last-child {
-	box-shadow: inherit;
-}
-div table.fc-table-list tr {
-	background: inherit;
-}
-div table.fc-table-list {
-	font: inherit;
-	text-shadow: inherit;
-	background: #fff;
-	border-collapse: inherit;
-	box-shadow: inherit;
-	font-size: inherit;
-}
-div table.fc-table-list th:first-child {
-	border-left: inherit;
-}
-div table.fc-table-list td:last-child {
-	border-right: inherit;
-	box-shadow: inherit;
-}
-div table.fc-table-list td {
-	border-right: inherit;
-	border-left: inherit;
-	border-top: inherit;
-	border-bottom: inherit;
-	padding: 10px 15px;
-	position: inherit;
-	transition: inherit;
-}
-div table.fc-table-list tr:nth-child(odd) td {
-	background: inherit;
 }
 #fc_ajax_system_messages button.close {
 	float: right;
@@ -1030,4 +961,7 @@ body .tabbertab,
 body div .form-horizontal .control-group,
 body div .control-group {
 	margin: 0.2rem 0;
+}
+div.flexicontent .sidebar-nav li a:before {
+	content: '';
 }

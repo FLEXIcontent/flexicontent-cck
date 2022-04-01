@@ -661,13 +661,17 @@ body .nowrap_hidden {
 #flexicontent #j-main-container select {
 	height: var(--fcman-inp-height) !important;
 	min-height: var(--fcman-inp-height) !important;
-	margin: 0 6px 0 0 !important;
+	line-height: calc(var(--fcman-inp-height) - 4px) !important;
+	padding-top: 0 !important;
+	padding-bottom: 0 !important;
+	background: white;
+	margin: 0 6px 0 0;
 }
 #flexicontent #j-main-container .btn-group > *,
 #flexicontent #j-main-container .fc-xpended > *,
 #flexicontent #j-main-container .fc-xpended-row > * {
 	min-height: var(--fcman-inp-height) !important;
-	line-height: calc(var(--fcman-inp-height) - 4px) !important;
+	line-height: calc(var(--fcman-inp-height) - 2px) !important;
 	box-sizing: border-box !important;
 	padding: 0 8px;
 }
@@ -987,7 +991,7 @@ div table.fc-table-list tbody tr:hover td a:not(.btn) {
 #j-main-container select.fcfield_selectval {
 	min-width: unset !important;
 	background: #fff !important;
-	font-size: 0.8rem !important;
+	font-size: 0.9rem !important;
 }
 table.adminlist.fcmanlist {
 	margin-top: 12px;
@@ -3857,6 +3861,9 @@ ul.thumbnails.image_picker_selector li div.thumbnail p {
 	line-height: 100%;
 	margin-top: 0px;
 	margin-bottom: 0px;
+}
+#flexicontent a.btn {
+	text-decoration: none;
 }
 table.fc-form-tbl.align-top td.key > *,
 table.fc-form-tbl.align-top td.data > * {

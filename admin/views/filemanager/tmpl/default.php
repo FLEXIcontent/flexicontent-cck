@@ -1242,7 +1242,7 @@ if ($js)
 					<td class="center hidden-phone">
 					<?php
 					echo $this->CanFiles && ($this->CanViewAllFiles || $user->id == $row->uploaded_by)
-						? flexicontent_html::userlevel('access[' . $row->id . ']', $row->access, 'onchange="return Joomla.listItemTask(\'cb' . $i . '\',\'' . $ctrl . 'access\')"')
+						? flexicontent_html::userlevel('access['.$row->id.']', $row->access, 'class="fcfield_selectval" onchange="return Joomla.listItemTask(\'cb'.$i.'\',\''.$ctrl.'access\')"')
 						: (strlen($row->access_level) ? $this->escape($row->access_level) : '-');
 					?>
 					</td>

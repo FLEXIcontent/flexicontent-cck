@@ -660,7 +660,11 @@ body .nowrap_hidden {
 #flexicontent #j-main-container select {
 	height: var(--fcman-inp-height) !important;
 	min-height: var(--fcman-inp-height) !important;
-	margin: 0 6px 0 0 !important;
+	line-height: calc(var(--fcman-inp-height) - 2px) !important;
+	padding-top: 0 !important;
+	padding-bottom: 0 !important;
+	background: white;
+	margin: 0 6px 0 0;
 }
 #flexicontent #j-main-container .btn-group > *,
 #flexicontent #j-main-container .fc-xpended > *,
@@ -986,7 +990,7 @@ div table.fc-table-list tbody tr:hover td a:not(.btn) {
 #j-main-container select.fcfield_selectval {
 	min-width: unset !important;
 	background: #fff !important;
-	font-size: 0.8rem !important;
+	font-size: 0.9rem !important;
 }
 table.adminlist.fcmanlist {
 	margin-top: 12px;
