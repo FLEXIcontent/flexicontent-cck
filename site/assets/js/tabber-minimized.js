@@ -715,7 +715,8 @@ function tabberSetCookie(name, value, expires, path, domain, secure)
 		((expires) ? "; expires=" + expires.toGMTString() : "") +
 		((path) ? "; path=" + path : "") +
 		((domain) ? "; domain=" + domain : "") +
-		((secure) ? "; secure" : "");
+		((secure) ? "; secure" : "") +
+		((secure) ? "; samesite=secure" : "; samesite=lax");
 }
 
 function tabberGetCookie(name)

@@ -1232,7 +1232,7 @@
 
 
 	/* Set a cookie */
-	function fclib_setCookie(cookieName, cookieValue, nDays)
+	function fclib_setCookie(cookieName, cookieValue, nDays, samesite="lax")
 	{
 		var today = new Date();
 		var expires = new Date();
@@ -1242,9 +1242,9 @@
 		if (nDays)
 		{
 			expires.setTime(today.getTime() + 3600000*24*nDays);
-			document.cookie = cookieName+"="+encodeURIComponent(cookieValue) + ";path=" + path + ";expires="+expires.toGMTString();
+			document.cookie = cookieName+"="+encodeURIComponent(cookieValue) + ";samesite=" + samesite + ";path=" + path + ";expires=" + expires.toGMTString();
 		} else {
-			document.cookie = cookieName+"="+encodeURIComponent(cookieValue) + ";path=" + path;
+			document.cookie = cookieName+"="+encodeURIComponent(cookieValue) + ";samesite=" + samesite + ";path=" + path;
 		}
 		//alert(cookieName+"="+encodeURIComponent(cookieValue) + ";path=" + path);
 	}
