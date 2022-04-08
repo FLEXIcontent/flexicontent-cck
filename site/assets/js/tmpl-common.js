@@ -1,5 +1,5 @@
 	/* Set a cookie */
-	function fc_setCookie(cookieName, cookieValue, nDays)
+	function fc_setCookie(cookieName, cookieValue, nDays, samesite="lax")
 	{
 		var today = new Date();
 		var expire = new Date();
@@ -9,9 +9,9 @@
 		if (nDays)
 		{
 			expire.setTime(today.getTime() + 3600000*24*nDays);
-			document.cookie = cookieName+"="+encodeURIComponent(cookieValue) + ";path=" + path + ";expires="+expire.toGMTString();
+			document.cookie = cookieName+"="+encodeURIComponent(cookieValue) + ";samesite=" + samesite + ";path=" + path + ";expires=" + expire.toGMTString();
 		} else {
-			document.cookie = cookieName+"="+encodeURIComponent(cookieValue) + ";path=" + path;
+			document.cookie = cookieName+"="+encodeURIComponent(cookieValue) + ";samesite=" + samesite + ";path=" + path;
 		}
 		//alert(cookieName+"="+encodeURIComponent(cookieValue) + ";path=" + path);
 	}

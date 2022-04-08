@@ -1308,16 +1308,16 @@ class plgSystemFlexisystem extends JPlugin
 				return xHeight;
 			}
 
-			function fc_setCookie(cookieName, cookieValue, nDays) {
+			function fc_setCookie(cookieName, cookieValue, nDays, samesite="lax") {
 				var today = new Date();
 				var expire = new Date();
 				var path = "'.JUri::base(true).'";
 				if (nDays==null || nDays<0) nDays=0;
 				if (nDays) {
 					expire.setTime(today.getTime() + 3600000*24*nDays);
-					document.cookie = cookieName+"="+escape(cookieValue) + ";path=" + path + ";expires="+expire.toGMTString();
+					document.cookie = cookieName+"="+escape(cookieValue) + ";samesite=" + samesite + ";path=" + path + ";expires=" + expire.toGMTString();
 				} else {
-					document.cookie = cookieName+"="+escape(cookieValue) + ";path=" + path;
+					document.cookie = cookieName+"="+escape(cookieValue) + ";samesite=" + samesite + ";path=" + path;
 				}
 				//alert(cookieName+"="+escape(cookieValue) + ";path=" + path);
 			}
