@@ -325,7 +325,14 @@ Joomla.submitform = function(task, form, validate)
 		form.setAttribute('novalidate', 'novalidate') :
 		form.removeAttribute('novalidate') ;
 
-	fc_submit_form(form, form_task); // Submit the form
+	// Submit the form
+	fc_submit_form(form, form_task);
+
+	// Clear form 's task field in case page does not reload, e.g. task was a file download
+	if (form_task && task_field_exists)
+	{
+		form.task.value = '';
+	}
 }
 
 
