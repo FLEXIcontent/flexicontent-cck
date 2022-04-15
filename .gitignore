@@ -50,16 +50,18 @@ cache
 
 # other
 flexicontent-cck.zip
-site/templates/blog-1/
-site/templates/default-1/
-site/templates/faq-1/
-site/templates/items-tabbed-1/
-site/templates/presentation-1/
+
+site/templates/*
+!site/templates/faq
+!site/templates/grid
+!site/templates/items-tabbed
+!site/templates/table
 
 site/librairies/pdfparser/
 site/librairies/php-stemmer/
 site/librairies/TCPDF/
 site/librairies/cropper/
+site/helpers/translator.php
 
 site/librairies/phpthumb/phpThumb.config_OVERRIDE.php
 site/tasks/defines.php
@@ -67,7 +69,6 @@ admin/tasks/defines.php
 admin/flexicontent.xml
 
 plugins/flexicontent_fields/currency/
-plugins/flexicontent_fields/mediaplayer/
 plugins/flexicontent_fields/qrcode/
 plugins/flexicontent_fields/grade/
 
@@ -83,4 +84,9 @@ admin/tables/flexicontent_mediadatas.php
 admin/views/mediadata/
 admin/views/mediadatas/
 plugins/flexicontent_fields/mediafile/
-site/helpers/translator.php
+_tools/link_livesite2repo_pro.bat
+
+site/uploads/*
+site/medias/*
+!site/uploads/.htaccess
+!site/medias/.htaccess

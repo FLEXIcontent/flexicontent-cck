@@ -465,7 +465,7 @@ class com_flexicontentInstallerScript
 			'warning'
 		);*/
 
-		echo '<link type="text/css" href="components/com_flexicontent/assets/css/j3x.css?'.FLEXI_VHASH.'" rel="stylesheet">';
+		echo '<link type="text/css" href="components/com_flexicontent/assets/css/j3x.css" rel="stylesheet">';
 		echo '<link type="text/css" href="components/com_flexicontent/assets/css/flexicontentbackend.css" rel="stylesheet">';
 
 		//echo JHtml::_('bootstrap.startAccordion', 'upgrade-tasks', array());
@@ -1345,7 +1345,7 @@ class com_flexicontentInstallerScript
 		$app = JFactory::getApplication();
 
 		// Extra CSS needed for J3.x+
-		echo '<link type="text/css" href="components/com_flexicontent/assets/css/j3x.css?'.FLEXI_VHASH.'" rel="stylesheet">';
+		echo '<link type="text/css" href="components/com_flexicontent/assets/css/j3x.css" rel="stylesheet">';
 
 		// Installed component manifest file version
 		$this->release = $parent->getManifest()->version;
