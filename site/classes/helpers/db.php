@@ -329,13 +329,13 @@ class flexicontent_db
 		$queries = preg_split("/;+(?=([^'|^\\\']*['|\\\'][^'|^\\\']*['|\\\'])*[^'|^\\\']*[^'|^\\\']$)/", $queries);
 
 		$db = JFactory::getDbo();
-		foreach ($queries as $query) {
+
+		foreach ($queries as $query)
+		{
 			$query = trim($query);
 			if (!$query) continue;
 
-			$db->setQuery($query);
-			$result = $db->execute();
-			if ($db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');
+			$result = $db->setQuery($query)->execute();
 		}
 	}
 
@@ -1074,16 +1074,23 @@ class flexicontent_db
 	{
 		$config = $config ?: (object) array(
 			'table'    => 'content',
+			'table_ext'=> null,
+			'ext_id'   => null,
 			'context'  => 'com_content.item',
 			'created'  => 'created',
 			'modified' => 'modified',
 		);
 
 		$db = JFactory::getDbo();
-		$query = 'SELECT a.id as item_id, i.id as id, i.title, i.' . $config->created . ' as created, i.' . $config->modified . ' as modified, i.language as language, i.language as lang'
+		$query = 'SELECT a.id as item_id, i.id as id, i.title, i.' . $config->created . ' as created, i.' . $config->modified . ' as modified, '
+			. ' i.language as language, i.language as lang, ' . $db->qn('a.key') . ' as ' . $db->qn('key') 
+			. (!empty($config->state) ?', i.' . $config->state . ' AS state ' : '')
+			. (!empty($config->catid) ?', i.' . $config->catid . ' AS catid ' : '')
+			. (!empty($config->is_uptodate) ?', 1 AS is_uptodate ' : '')
 			. ' FROM #__associations AS a'
 			. ' JOIN #__associations AS k ON a.`key`=k.`key`'
-			. ' JOIN ' . $db->quoteName('#__' . $config->table) . ' AS i ON i.id = k.id'
+			. ' JOIN ' . $db->qn('#__' . $config->table) . ' AS i ON i.id = k.id'
+			. (!empty($config->table_ext) ? ' JOIN ' . $db->qn('#__' . $config->table_ext) . ' AS ext ON i.id = ext.' . $config->ext_id : '')
 			. ' WHERE a.id IN ('. implode(',', $ids) .') AND a.context = ' . $db->quote($config->context)
 		;
 		$associations = $db->setQuery($query)->loadObjectList();
@@ -1141,10 +1148,10 @@ class flexicontent_db
 
 		$db = JFactory::getDbo();
 		$query = $db->getQuery(true)
-			->select($db->quoteName('key'))
+			->select($db->qn('key'))
 			->from('#__associations')
-			->where($db->quoteName('context') . ' = ' . $db->quote($context))
-			->where($db->quoteName('id') . ' = ' . (int) $item->id)
+			->where($db->qn('context') . ' = ' . $db->quote($context))
+			->where($db->qn('id') . ' = ' . (int) $item->id)
 		;
 		$key = $db->setQuery($query)->loadResult();
 
