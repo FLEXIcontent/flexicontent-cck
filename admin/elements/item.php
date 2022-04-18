@@ -50,6 +50,7 @@ class JFormFieldItem extends FormField
 		$paramset = $this->element['paramset'];   // optional custom group for the form element instead of e.g. 'params'
 		$required = $this->element['required'] && $this->element['required']!='false' ? true : false;
 		$class    = (string) $this->element['class'];
+		$hint     = (string) $this->element['hint'] ?: 'FLEXI_FORM_SELECT';
 
 		if ($paramset)
 		{
@@ -84,26 +85,30 @@ class JFormFieldItem extends FormField
 			$js = "
 			function fcClearSelectedItem(element_id)
 			{
-				jQuery('#'+element_id+'_name').val('');
-				jQuery('#'+element_id+'_name').attr('placeholder', '".Text::_( 'FLEXI_FORM_SELECT',true )."');
-				jQuery('#'+element_id).val('');
-				jQuery('#'+element_id + '_clear').addClass('hidden');
-				jQuery('#'+element_id + '_edit').addClass('hidden');
+				let el = jQuery('#'+element_id);
+				let box = el.prev('.fcselectitem_box');
+				el.val('');
+				box.find('.fcselectitem_name').val('');
+				box.find('.fcselectitem_name').attr('placeholder', '".Text::_( 'FLEXI_FORM_SELECT',true )."');
+				box.find('.fcselectitem_clear').addClass('hidden');
+				box.find('.fcselectitem_edit').addClass('hidden');
 				return false;
 			};
 
 			var fc_select_element_id;
 			function fcSelectItem(id, cid, title, selected_item, assign_all_assocs)
 			{
-				document.getElementById(fc_select_element_id).value = id;
-				document.getElementById(fc_select_element_id+'_name').value = title;
+				let el = jQuery('#'+fc_select_element_id);
+				let box = el.prev('.fcselectitem_box');
+
+				el.val(id);
+				box.find('.fcselectitem_name').val(title);
 				" .
 				($allowEdit  ? "
-					jQuery('#'+fc_select_element_id+'_edit').removeClass('hidden');" : '') .
+					box.find('.fcselectitem_edit').removeClass('hidden');" : '') .
 				($allowClear ? "
-					jQuery('#'+fc_select_element_id+'_clear').removeClass('hidden');" :'') .
+					box.find('.fcselectitem_clear').removeClass('hidden');" :'') .
 				"
-				var element_id = fc_select_element_id.substring(0, fc_select_element_id.length - 6);
 
 				if (!!assign_all_assocs)
 				{
@@ -115,10 +120,12 @@ class JFormFieldItem extends FormField
 						var assocs = [];
 					}
 
+					let assoc_element_id = fc_select_element_id.substring(0, fc_select_element_id.length - 6);
+
 					for (const lang in assocs)
 					{
 						var assoc = assocs[lang];
-						var element_id_lang = element_id + '_' + lang;
+						var element_id_lang = assoc_element_id + '_' + lang;
 						var assoc_input = document.getElementById(element_id_lang);
 						if (!!assoc_input)
 						{
@@ -174,24 +181,24 @@ class JFormFieldItem extends FormField
 		//$rel = '{handler: \'iframe\', size: {x:((window.getSize().x<1100)?window.getSize().x-100:1000), y: window.getSize().y-100}}';
 		$_select = Text::_( 'FLEXI_SELECT_ITEM', true);
 		return '
-		<span class="input-append '.$class.'">
-			<input type="text" id="'.$element_id.'_name" placeholder="'.Text::_( 'FLEXI_FORM_SELECT',true ).'" value="'.$title.'" '.$required_param.' readonly="readonly" />
+		<span class="input-append fcselectitem_box '.$class.'">
+			<input type="text" class="fcselectitem_name" placeholder="'.Text::_( $hint, true ).'" value="'.$title.'" '.$required_param.' readonly="readonly" />
 			'. //<a class="modal btn hasTooltip" onclick="fc_select_element_id=\''.$element_id.'\'" href="'.$link.'" rel="'.$rel.'" title="'.$_select.'">
-			'<a class="btn hasTooltip" onclick="fc_select_element_id=\''.$element_id.'\'; var url = jQuery(this).attr(\'href\'); window.fc_field_dialog_handle_record = fc_showDialog(url, \'fc_modal_popup_container\', 0, 0, 0, 0, {title:\''.$_select.'\'}); return false;" href="'.$link.'" title="'.$_select.'" >
+			'<a class="btn hasTooltip" onclick="fc_select_element_id = jQuery(this).closest(\'.fcselectitem_box\').next(\'.fcselectitem_value\').attr(\'id\'); alert(fc_select_element_id); var url = jQuery(this).attr(\'href\'); window.fc_field_dialog_handle_record = fc_showDialog(url, \'fc_modal_popup_container\', 0, 0, 0, 0, {title:\''.$_select.'\'}); return false;" href="'.$link.'" title="'.$_select.'" >
 				'.Text::_( 'FLEXI_FORM_SELECT' ).'
 			</a>
 			'.($allowEdit ? '
-			<a id="' .$element_id. '_edit" class="btn ' . ($this->value ? '' : ' hidden') . ' hasTooltip" href="index.php?option=com_flexicontent&amp;task=items.edit&amp;cid=' . $this->value . '" target="_blank" title="'.Text::_( 'FLEXI_EDIT_ITEM' ).'">
+			<a class="fcselectitem_edit btn ' . ($this->value ? '' : ' hidden') . ' hasTooltip" href="index.php?option=com_flexicontent&amp;task=items.edit&amp;cid=' . $this->value . '" target="_blank" title="'.Text::_( 'FLEXI_EDIT_ITEM' ).'">
 				<span class="icon-edit"></span>
 			</a>
 			' : '').'
 			'.($allowClear ? '
-			<button id="' .$element_id. '_clear" class="btn'.($this->value ? '' : ' hidden').' hasTooltip" onclick="return fcClearSelectedItem(\''.$element_id . '\')" title="'.Text::_('FLEXI_CLEAR', true).'">
+			<button class="fcselectitem_clear btn'.($this->value ? '' : ' hidden').' hasTooltip" onclick="return fcClearSelectedItem(\''.$element_id . '\')" title="'.Text::_('FLEXI_CLEAR', true).'">
 				<span class="icon-remove"></span>
 			</button>
 			' : '').'
 		</span>
-		<input type="text" id="'.$element_id.'" name="'.$fieldname.'" value="'.$this->value.'" class="fc_hidden_value" style="display:none;" />
+		<input type="text" id="'.$element_id.'" name="'.$fieldname.'" value="'.$this->value.'" class="fcselectitem_value fc_hidden_value" style="display:none;" />
 		';
 	}
 }
