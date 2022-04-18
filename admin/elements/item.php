@@ -49,6 +49,7 @@ class JFormFieldItem extends FormField
 
 		$paramset = $this->element['paramset'];   // optional custom group for the form element instead of e.g. 'params'
 		$required = $this->element['required'] && $this->element['required']!='false' ? true : false;
+		$class    = (string) $this->element['class'];
 
 		if ($paramset)
 		{
@@ -173,7 +174,7 @@ class JFormFieldItem extends FormField
 		//$rel = '{handler: \'iframe\', size: {x:((window.getSize().x<1100)?window.getSize().x-100:1000), y: window.getSize().y-100}}';
 		$_select = Text::_( 'FLEXI_SELECT_ITEM', true);
 		return '
-		<span class="input-append">
+		<span class="input-append '.$class.'">
 			<input type="text" id="'.$element_id.'_name" placeholder="'.Text::_( 'FLEXI_FORM_SELECT',true ).'" value="'.$title.'" '.$required_param.' readonly="readonly" />
 			'. //<a class="modal btn hasTooltip" onclick="fc_select_element_id=\''.$element_id.'\'" href="'.$link.'" rel="'.$rel.'" title="'.$_select.'">
 			'<a class="btn hasTooltip" onclick="fc_select_element_id=\''.$element_id.'\'; var url = jQuery(this).attr(\'href\'); window.fc_field_dialog_handle_record = fc_showDialog(url, \'fc_modal_popup_container\', 0, 0, 0, 0, {title:\''.$_select.'\'}); return false;" href="'.$link.'" title="'.$_select.'" >
@@ -181,17 +182,16 @@ class JFormFieldItem extends FormField
 			</a>
 			'.($allowEdit ? '
 			<a id="' .$element_id. '_edit" class="btn ' . ($this->value ? '' : ' hidden') . ' hasTooltip" href="index.php?option=com_flexicontent&amp;task=items.edit&amp;cid=' . $this->value . '" target="_blank" title="'.Text::_( 'FLEXI_EDIT_ITEM' ).'">
-				<span class="icon-edit"></span>' . Text::_('FLEXI_FORM_EDIT') . '
+				<span class="icon-edit"></span>
 			</a>
 			' : '').'
 			'.($allowClear ? '
-			<button id="' .$element_id. '_clear" class="btn'.($this->value ? '' : ' hidden').'" onclick="return fcClearSelectedItem(\''.$element_id . '\')">
+			<button id="' .$element_id. '_clear" class="btn'.($this->value ? '' : ' hidden').' hasTooltip" onclick="return fcClearSelectedItem(\''.$element_id . '\')" title="'.Text::_('FLEXI_CLEAR', true).'">
 				<span class="icon-remove"></span>
-				'.Text::_('FLEXI_CLEAR').'
 			</button>
 			' : '').'
 		</span>
-		<input type="text" id="'.$element_id.'" name="'.$fieldname.'" value="'.$this->value.'" class="fc_hidden_value" />
+		<input type="text" id="'.$element_id.'" name="'.$fieldname.'" value="'.$this->value.'" class="fc_hidden_value" style="display:none;" />
 		';
 	}
 }
