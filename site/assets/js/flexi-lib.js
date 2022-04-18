@@ -1322,6 +1322,9 @@
 			if (hasCodeMirror) {
 				jQuery(txtarea).first().next().get(0).CodeMirror.toTextArea();
 				if (addRestoreClass) jQuery(txtarea).addClass('fc_hadCodeMirror');
+
+				// Remove codemirror container in case that removing it failed
+				if (jQuery(txtarea).first().next('.CodeMirror').length) jQuery(txtarea).first().next('.CodeMirror').remove();
 			}
 		});
 	}
