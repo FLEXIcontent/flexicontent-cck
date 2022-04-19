@@ -2263,7 +2263,7 @@ class flexicontent_html
 		if ($chars && $uncut_length > $chars)
 		{
 			// If not cutting at middle of word, then find closest whitespace, that is previous to the word
-			if ($options['cut_at_word'])
+			if (!$options['cut_at_word'])
 			{
 				$chars = StringHelper::strrpos(StringHelper::substr($cleantext, 0, $chars), ' ');
 	    }
