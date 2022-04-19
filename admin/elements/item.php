@@ -184,7 +184,7 @@ class JFormFieldItem extends FormField
 		<span class="input-append fcselectitem_box '.$class.'">
 			<input type="text" class="fcselectitem_name" placeholder="'.Text::_( $hint, true ).'" value="'.$title.'" '.$required_param.' readonly="readonly" />
 			'. //<a class="modal btn hasTooltip" onclick="fc_select_element_id=\''.$element_id.'\'" href="'.$link.'" rel="'.$rel.'" title="'.$_select.'">
-			'<a class="btn hasTooltip" onclick="fc_select_element_id = jQuery(this).closest(\'.fcselectitem_box\').next(\'.fcselectitem_value\').attr(\'id\'); alert(fc_select_element_id); var url = jQuery(this).attr(\'href\'); window.fc_field_dialog_handle_record = fc_showDialog(url, \'fc_modal_popup_container\', 0, 0, 0, 0, {title:\''.$_select.'\'}); return false;" href="'.$link.'" title="'.$_select.'" >
+			'<a class="btn hasTooltip" onclick="fc_select_element_id = jQuery(this).closest(\'.fcselectitem_box\').next(\'.fcselectitem_value\').attr(\'id\'); var url = jQuery(this).attr(\'href\'); window.fc_field_dialog_handle_record = fc_showDialog(url, \'fc_modal_popup_container\', 0, 0, 0, 0, {title:\''.$_select.'\'}); return false;" href="'.$link.'" title="'.$_select.'" >
 				'.Text::_( 'FLEXI_FORM_SELECT' ).'
 			</a>
 			'.($allowEdit ? '
