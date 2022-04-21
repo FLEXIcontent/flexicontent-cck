@@ -27,6 +27,13 @@ body  .ui-dialog.fc-fixed-dialog + .ui-widget-overlay {
 .ui-dialog.fc-fixed-dialog.fc-no-scroll .ui-resizable-handle {
 	display: none;
 }
+body .ui-widget button {
+	font-size: small;
+}
+body .ui-widget a.btn.btn-success,
+body .ui-widget a.btn.btn-info {
+	color: white;
+}
 body .fc_loading_box {
 	border: gray;
 	box-shadow: inset 0px 0px 5px #777;
