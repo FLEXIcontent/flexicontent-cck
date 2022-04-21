@@ -93,7 +93,7 @@
 		obj = jQuery(obj);
 
 		// Get close function
-		var closeFunc = typeof closeFunc !== 'undefined' && closeFunc ? closeFunc : 0;
+		closeFunc = typeof closeFunc !== 'undefined' && closeFunc ? closeFunc : 0;
 		var keepPlace = !!params.keepPlace;
 		var visibleOnClose = !!params.visibleOnClose;
 
@@ -139,9 +139,11 @@
 				jQuery('.ui-widgetck-overlay').removeClass('ui-widgetck-overlay').addClass('ui-widget-overlay').css('z-index', '2049').css('position', 'fixed');
 
 				// Close on click outside of modal popup
-				jQuery('.ui-widget-overlay, .pac-container').bind('click', function(){
-					obj.dialog('close');
-				});
+				if (typeof params.closeOnOutClick !== 'undefined'  ?  params.closeOnOutClick  :  true) {
+					jQuery('.ui-widget-overlay, .pac-container').bind('click', function () {
+						obj.dialog('close');
+					});
+				}
 			},
 			// Clear contents after dialog closes
 			close: function(ev, ui)
