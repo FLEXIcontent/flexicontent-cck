@@ -1912,6 +1912,13 @@ body  .ui-dialog.fc-fixed-dialog + .ui-widget-overlay {
 .ui-dialog.fc-fixed-dialog.fc-no-scroll .ui-resizable-handle {
 	display: none;
 }
+body .ui-widget button {
+	font-size: small;
+}
+body .ui-widget a.btn.btn-success,
+body .ui-widget a.btn.btn-info {
+	color: white;
+}
 body > #system-message-container {
 	margin: 6px 0 0 0;
 }
