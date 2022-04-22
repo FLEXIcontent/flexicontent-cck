@@ -19,16 +19,4 @@
 // no direct access
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, 'en-GB', true);
-JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, true);
-
-$app = JFactory::getApplication();
-$document = JFactory::getDocument();
-$this->baseurl = isset($this->baseurl) ? $this->baseurl : JUri::base(true);
-
-// Allow css override
-if (file_exists(JPATH_SITE.DS.'templates'.DS.$app->getTemplate().DS.'css'.DS.'flexicontent.css')) {
-	$document->addStyleSheet($this->baseurl.'/templates/'.$app->getTemplate().'/css/flexicontent.css', array('version' => FLEXI_VHASH));
-}
-
 require_once(JPATH_BASE.DS."administrator".DS."components".DS."com_flexicontent".DS."views".DS."fileselement".DS."view.html.php");
