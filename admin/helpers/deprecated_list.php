@@ -47,6 +47,7 @@ $files = array(
 	JPATH_SITE . '/components/com_flexicontent/librairies/jquery/css/smoothness/jquery-ui-1.13.0.min.css',
 	JPATH_SITE . '/components/com_flexicontent/librairies/jquery/css/ui-lightness/jquery-ui-1.13.0.css',
 	JPATH_SITE . '/components/com_flexicontent/librairies/jquery/css/ui-lightness/jquery-ui-1.13.0.min.css',
+	JPATH_SITE . '/components/com_flexicontent/librairies/jquery/js/jquery-ui-1.13.1/package.json',
 );
 
 $folders = array(
