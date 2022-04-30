@@ -83,9 +83,9 @@ class JFormFieldItem extends FormField
 		{
 			$js_added = true;
 			$js = "
-			function fcClearSelectedItem(element_id)
+			function fcClearSelectedItem(element)
 			{
-				let el = jQuery('#'+element_id);
+				let el = typeof element === 'string' ? jQuery('#'+element) : jQuery(element).closest('.fcselectitem_box').next('.fcselectitem_value');
 				let box = el.prev('.fcselectitem_box');
 				el.val('');
 				box.find('.fcselectitem_name').val('');
@@ -193,7 +193,7 @@ class JFormFieldItem extends FormField
 			</a>
 			' : '').'
 			'.($allowClear ? '
-			<button class="fcselectitem_clear btn'.($this->value ? '' : ' hidden').' hasTooltip" onclick="return fcClearSelectedItem(\''.$element_id . '\')" title="'.Text::_('FLEXI_CLEAR', true).'">
+			<button class="fcselectitem_clear btn'.($this->value ? '' : ' hidden').' hasTooltip" onclick="return fcClearSelectedItem(this)" title="'.Text::_('FLEXI_CLEAR', true).'">
 				<span class="icon-remove"></span>
 			</button>
 			' : '').'
