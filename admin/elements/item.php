@@ -102,6 +102,7 @@ class JFormFieldItem extends FormField
 				let box = el.prev('.fcselectitem_box');
 
 				el.val(id);
+				el.trigger('change');
 				box.find('.fcselectitem_name').val(title);
 				" .
 				($allowEdit  ? "
