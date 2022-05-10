@@ -3151,27 +3151,45 @@ class FlexicontentFields
 
 		case 'categories':
 			$query  = 'SELECT c.id AS value_id, rel.itemid AS itemid, '
-				. (FLEXI_FALANG ? ' CASE WHEN (fa.value IS NOT NULL) THEN fa.value ELSE c.title END' : ' c.title') . ' AS value'
+				. (FLEXI_FALANG
+					? 'CONCAT_WS(\' \',
+						CASE WHEN (fat.value IS NOT NULL) THEN fat.value ELSE c.title END, 
+						CASE WHEN (fak.value IS NOT NULL) THEN fak.value ELSE c.metakey END
+					)'
+					: 'CONCAT_WS(\' \', c.title, c.metakey)'
+				) . ' AS value '
 				.' FROM #__categories AS c'
 				.' JOIN #__flexicontent_cats_item_relations AS rel ON c.id=rel.catid'
 				. (!FLEXI_FALANG ? '' :
 					' LEFT JOIN #__content AS im ON im.id = rel.itemid ' .
 					' LEFT JOIN #__languages AS la ON la.lang_code = im.language ' .
-          ' LEFT JOIN #__falang_content AS fa ON fa.reference_table = "categories" ' .
-						' AND fa.reference_field = "title" AND fa.reference_id = c.id AND fa.language_id = la.lang_id'
+					' LEFT JOIN #__falang_content AS fat ON fat.reference_table = "categories" ' .
+						' AND fat.reference_field = "title" AND fat.reference_id = c.id AND fat.language_id = la.lang_id' .
+					' LEFT JOIN #__falang_content AS fak ON fak.reference_table = "categories" ' .
+						' AND fak.reference_field = "title" AND fak.reference_id = c.id AND fak.language_id = la.lang_id'
 				)
 				.' WHERE c.id<>0 AND rel.itemid IN ('.(@$field->query_itemids ? implode(',', $field->query_itemids) : $field->item_id) .')';
 			break;
 
 		case 'tags':
-			$query  = 'SELECT t.id AS value_id, ' . (FLEXI_FALANG ? 'CASE WHEN (fa.value IS NOT NULL) THEN fa.value ELSE t.name END' : ' t.name') . ' AS value, rel.itemid AS itemid'
+			$query  = 'SELECT t.id AS value_id, rel.itemid AS itemid, '
+				. (FLEXI_FALANG
+					? 'CONCAT_WS(\' \',
+						CASE WHEN (fat.value IS NOT NULL) THEN fat.value ELSE t.name END, 
+						CASE WHEN (fak.value IS NOT NULL) THEN fak.value ELSE jt.metakey END
+					)'
+					: 'CONCAT_WS(\' \', t.name, jt.metakey)'
+				) . ' AS value '
 				.' FROM #__flexicontent_tags AS t'
 				.' JOIN #__flexicontent_tags_item_relations AS rel ON t.id=rel.tid'
+				.' LEFT JOIN #__tags AS jt ON t.jtag_id = jt.id'
 				. (!FLEXI_FALANG ? '' :
 					' LEFT JOIN #__content AS im ON im.id = rel.itemid ' .
 					' LEFT JOIN #__languages AS la ON la.lang_code = im.language ' .
-          ' LEFT JOIN #__falang_content AS fa ON fa.reference_table = "tags" ' .
-						' AND fa.reference_field = "title" AND fa.reference_id = t.jtag_id AND fa.language_id = la.lang_id'
+					' LEFT JOIN #__falang_content AS fat ON fat.reference_table = "tags" ' .
+						' AND fat.reference_field = "title" AND fat.reference_id = t.jtag_id AND fat.language_id = la.lang_id' .
+					' LEFT JOIN #__falang_content AS fak ON fak.reference_table = "tags" ' .
+						' AND fak.reference_field = "title" AND fak.reference_id = t.jtag_id AND fak.language_id = la.lang_id'
 				)
 				.' WHERE t.id<>0 AND rel.itemid IN ('.(@$field->query_itemids ? implode(',', $field->query_itemids) : $field->item_id) .')';
 			break;
