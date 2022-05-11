@@ -70,75 +70,84 @@ class FlexicontentControllerFlexicontent extends FlexicontentControllerBaseAdmin
 	 * @return	boolean	True on success
 	 * @since 1.5
 	 */
-	function createDefaultFields()
+	function createDefaultFields($skip_success_msg = false)
 	{
 		// Check for request forgeries
 		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 
 		$db = JFactory::getDbo();
 
-		$query = 'SELECT id'
-			. ' FROM #__flexicontent_fields'
-			. ' WHERE id < 15'
-			;
-		$existing = $db->setQuery($query)->loadColumn();
+		$existing = $db->setQuery($db->getQuery(true)
+            ->select('id')
+            ->from('#__flexicontent_fields')
+            ->where('id < 15')
+        )->loadColumn();
 		$existing = array_flip($existing);
 
-		$query 	= '
-		INSERT INTO `#__flexicontent_fields`
-			(`id`,`field_type`,`name`,`label`,`description`,`isfilter`,`iscore`,`issearch`,`isadvsearch`,`untranslatable`,`formhidden`,`valueseditable`,`edithelp`,`positions`,`published`,`attribs`,`checked_out`,`checked_out_time`,`access`,`ordering`)
-		VALUES';
+		$query = $db->getQuery(true)
+            ->insert('#__flexicontent_fields')
+            ->columns('
+                `id`, `field_type`, `name`, `label`, `description`, `isfilter`, `iscore`, `issearch`, `isadvsearch`,
+                `untranslatable`, `formhidden`, `valueseditable`, `edithelp`, `positions`, `published`, `attribs`,
+                `checked_out`, `checked_out_time`, `access`, `ordering`
+            ');
 
-		$vals = array();
+		$values = array();
 
 		!isset($existing[1])
-			? $vals[1] = '(1,"maintext","text","Description","Main description text (introtext/fulltext)",0,1,1,0,0,0,0,1,"description.items.default",1,\'{"display_label":"0","trigger_onprepare_content":"1"}\',0,"0000-00-00 00:00:00",1,2)'
+			? $values[1] = '1,"maintext","text","Description","Main description text (introtext/fulltext)",0,1,1,0,0,0,0,1,"description.items.default",1,\'{"display_label":"0","trigger_onprepare_content":"1"}\',0,"0000-00-00 00:00:00",1,2'
 			: null;
 		!isset($existing[2])
-			? $vals[2] = '(2,"created","created","Created","Date this item was created",0,1,1,0,0,0,0,1,"top.items.default\nabove-description-line1-nolabel.category.blog",1,\'{"display_label":"1","date_format":"DATE_FORMAT_LC1","custom_date":"","pretext":"","posttext":""}\',0,"0000-00-00 00:00:00",1,3)'
+			? $values[2] = '2,"created","created","Created","Date this item was created",0,1,1,0,0,0,0,1,"top.items.default\nabove-description-line1-nolabel.category.blog",1,\'{"display_label":"1","date_format":"DATE_FORMAT_LC1","custom_date":"","pretext":"","posttext":""}\',0,"0000-00-00 00:00:00",1,3'
 			: null;
 		!isset($existing[3])
-			? $vals[3] = '(3,"createdby","created_by","Created by","User (owner) who created this item",0,1,1,0,0,0,0,1,"top.items.default\nabove-description-line1-nolabel.category.blog",1,\'{"display_label":"1","pretext":"","posttext":""}\',0,"0000-00-00 00:00:00",1,4)'
+			? $values[3] = '3,"createdby","created_by","Created by","User (owner) who created this item",0,1,1,0,0,0,0,1,"top.items.default\nabove-description-line1-nolabel.category.blog",1,\'{"display_label":"1","pretext":"","posttext":""}\',0,"0000-00-00 00:00:00",1,4'
 			: null;
 		!isset($existing[4])
-			? $vals[4] = '(4,"modified","modified","Last modified","Date this item was last modified",0,1,1,0,0,0,0,1,"top.items.default",1,\'{"display_label":"1","date_format":"DATE_FORMAT_LC1","custom_date":"","pretext":"","posttext":""}\',0,"0000-00-00 00:00:00",1,5)'
+			? $values[4] = '4,"modified","modified","Last modified","Date this item was last modified",0,1,1,0,0,0,0,1,"top.items.default",1,\'{"display_label":"1","date_format":"DATE_FORMAT_LC1","custom_date":"","pretext":"","posttext":""}\',0,"0000-00-00 00:00:00",1,5'
 			: null;
 		!isset($existing[5])
-			? $vals[5] = '(5,"modifiedby","modified_by","Revised by","User who last modified this item",0,1,1,0,0,0,0,1,"top.items.default",1,\'{"display_label":"1","pretext":"","posttext":""}\',0,"0000-00-00 00:00:00",1,6)'
+			? $values[5] = '5,"modifiedby","modified_by","Revised by","User who last modified this item",0,1,1,0,0,0,0,1,"top.items.default",1,\'{"display_label":"1","pretext":"","posttext":""}\',0,"0000-00-00 00:00:00",1,6'
 			: null;
 		!isset($existing[6])
-			? $vals[6] = '(6,"title","title","Title","Item title",0,1,1,0,0,0,0,1,"",1,\'{"display_label":"1"}\',0,"0000-00-00 00:00:00",1,1)'
+			? $values[6] = '6,"title","title","Title","Item title",0,1,1,0,0,0,0,1,"",1,\'{"display_label":"1"}\',0,"0000-00-00 00:00:00",1,1'
 			: null;
 		!isset($existing[7])
-			? $vals[7] = '(7,"hits","hits","Hits","Number of hits",0,1,1,0,0,0,0,1,"",1,\'{"display_label":"1","pretext":"","posttext":"views"}\',0,"0000-00-00 00:00:00",1,7)'
+			? $values[7] = '7,"hits","hits","Hits","Number of hits",0,1,1,0,0,0,0,1,"",1,\'{"display_label":"1","pretext":"","posttext":"views"}\',0,"0000-00-00 00:00:00",1,7'
 			: null;
 		!isset($existing[8])
-			? $vals[8] = '(8,"type","document_type","Document type","Document type",0,1,1,0,0,0,0,1,"",1,\'{"display_label":"1","pretext":"","posttext":""}\',0,"0000-00-00 00:00:00",1,8)'
+			? $values[8] = '8,"type","document_type","Document type","Document type",0,1,1,0,0,0,0,1,"",1,\'{"display_label":"1","pretext":"","posttext":""}\',0,"0000-00-00 00:00:00",1,8'
 			: null;
 		!isset($existing[9])
-			? $vals[9] = '(9,"version","version","Version","Latest version number",0,1,1,0,0,0,0,1,"",1,\'{"display_label":"1","pretext":"","posttext":""}\',0,"0000-00-00 00:00:00",1,9)'
+			? $values[9] = '9,"version","version","Version","Latest version number",0,1,1,0,0,0,0,1,"",1,\'{"display_label":"1","pretext":"","posttext":""}\',0,"0000-00-00 00:00:00",1,9'
 			: null;
 		!isset($existing[10])
-			? $vals[10] = '(10,"state","state","State","Publication status",0,1,1,0,0,0,0,1,"",1,\'{"display_label":"1"}\',0,"0000-00-00 00:00:00",1,10)'
+			? $values[10] = '10,"state","state","State","Publication status",0,1,1,0,0,0,0,1,"",1,\'{"display_label":"1"}\',0,"0000-00-00 00:00:00",1,10'
 			: null;
 		!isset($existing[11])
-			? $vals[11] = '(11,"voting","voting","Voting","Voting buttons",0,1,1,0,0,0,0,1,"top.items.default\nabove-description-line2-nolabel.category.blog",1,\'{"display_label":"1","dimension":"16","image":"components/com_flexicontent/assets/images/star-small.png"}\',0,"0000-00-00 00:00:00",1,11)'
+			? $values[11] = '11,"voting","voting","Voting","Voting buttons",0,1,1,0,0,0,0,1,"top.items.default\nabove-description-line2-nolabel.category.blog",1,\'{"display_label":"1","dimension":"16","image":"components/com_flexicontent/assets/images/star-small.png"}\',0,"0000-00-00 00:00:00",1,11'
 			: null;
 		!isset($existing[12])
-			? $vals[12] = '(12,"favourites","favourites","Favourites","Add to favourites button",0,1,1,0,0,0,0,1,"top.items.default\nabove-description-line2-nolabel.category.blog",1,\'{"display_label":"1"}\',0,"0000-00-00 00:00:00",1,12)'
+			? $values[12] = '12,"favourites","favourites","Favourites","Add to favourites button",0,1,1,0,0,0,0,1,"top.items.default\nabove-description-line2-nolabel.category.blog",1,\'{"display_label":"1"}\',0,"0000-00-00 00:00:00",1,12'
 			: null;
 		!isset($existing[13])
-			? $vals[13] = '(13,"categories","categories","Categories","Categories this item is assigned to",0,1,1,0,0,0,0,1,"top.items.default\nunder-description-line1.category.blog",1,\'{"display_label":"1","separatorf":"2"}\',0,"0000-00-00 00:00:00",1,13)'
+			? $values[13] = '13,"categories","categories","Categories","Categories this item is assigned to",0,1,1,0,0,0,0,1,"top.items.default\nunder-description-line1.category.blog",1,\'{"display_label":"1","separatorf":"2"}\',0,"0000-00-00 00:00:00",1,13'
 			: null;
 		!isset($existing[14])
-			? $vals[14] = '(14,"tags","tags","Tags","Tags assigned to this item",0,1,1,0,0,0,0,1,"top.items.default\nunder-description-line2.category.blog",1,\'{"display_label":"1","separatorf":"2"}\',0,"0000-00-00 00:00:00",1,14)'
+			? $values[14] = '14,"tags","tags","Tags","Tags assigned to this item",0,1,1,0,0,0,0,1,"top.items.default\nunder-description-line2.category.blog",1,\'{"display_label":"1","separatorf":"2"}\',0,"0000-00-00 00:00:00",1,14'
 			: null;
 
-		$query .= implode(', ', $vals);
+        // Check if nothing to add
+        if (!$values)
+        {
+            if (!$skip_success_msg) echo '<span class="install-ok"></span>';
+            return;
+        }
 
 		try
 		{
-			$db->setQuery($query)->execute();
+            foreach($values as $value) $query->values($value);
+            $db->setQuery($query)->execute();
 		}
 		catch (Exception $e)
 		{
@@ -154,7 +163,7 @@ class FlexicontentControllerFlexicontent extends FlexicontentControllerBaseAdmin
 
 			foreach ($type_ids as $type_id)
 			{
-				foreach ($vals as $field_id => $i)
+				foreach ($values as $field_id => $i)
 				{
 					$rels[] = '(' . (int) $field_id . ',' . (int) $type_id . ', 0)';
 				}
@@ -171,7 +180,7 @@ class FlexicontentControllerFlexicontent extends FlexicontentControllerBaseAdmin
 			}
 		}
 
-		echo '<span class="install-ok"></span>';
+		if (!$skip_success_msg) echo '<span class="install-ok"></span>';
 	}
 
 
@@ -193,6 +202,10 @@ class FlexicontentControllerFlexicontent extends FlexicontentControllerBaseAdmin
 
 		JFactory::getLanguage()->load('plg_flexicontent_fields_coreprops', JPATH_ADMINISTRATOR, 'en-GB', true);
 		JFactory::getLanguage()->load('plg_flexicontent_fields_coreprops', JPATH_ADMINISTRATOR, null, true);
+		
+		// !! IMPORTANT core fields have specific fields ID, ranging from 1 - 14
+		// !! Make sure these have been creating before trying to add any other fields into the flexicontent_fields DB table
+		$this->createDefaultFields($_skip_success_msg = true);
 
 		$p = 'FLEXI_COREPROPS_';
 		$coreprop_names = array
