@@ -1453,6 +1453,10 @@ if ($js)
 				<?php echo $pagination_footer; ?>
 			<?php endif; ?>
 
+			<input type="hidden" name="editor" value="<?php echo $editor; ?>" />
+			<input type="hidden" name="isxtdbtn" value="<?php echo $isXtdBtn; ?>" />
+			<input type="hidden" name="function" value="<?php echo $function; ?>" />
+
 			<input type="hidden" name="boxchecked" value="0" />
 			<input type="hidden" name="view" value="<?php echo $this->view; ?>" />
 			<input type="hidden" name="controller" value="filemanager" />
