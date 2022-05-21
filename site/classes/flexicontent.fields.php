@@ -3166,7 +3166,7 @@ class FlexicontentFields
 					' LEFT JOIN #__falang_content AS fat ON fat.reference_table = "categories" ' .
 						' AND fat.reference_field = "title" AND fat.reference_id = c.id AND fat.language_id = la.lang_id' .
 					' LEFT JOIN #__falang_content AS fak ON fak.reference_table = "categories" ' .
-						' AND fak.reference_field = "title" AND fak.reference_id = c.id AND fak.language_id = la.lang_id'
+						' AND fak.reference_field = "metakey" AND fak.reference_id = c.id AND fak.language_id = la.lang_id'
 				)
 				.' WHERE c.id<>0 AND rel.itemid IN ('.(@$field->query_itemids ? implode(',', $field->query_itemids) : $field->item_id) .')';
 			break;
@@ -3189,7 +3189,7 @@ class FlexicontentFields
 					' LEFT JOIN #__falang_content AS fat ON fat.reference_table = "tags" ' .
 						' AND fat.reference_field = "title" AND fat.reference_id = t.jtag_id AND fat.language_id = la.lang_id' .
 					' LEFT JOIN #__falang_content AS fak ON fak.reference_table = "tags" ' .
-						' AND fak.reference_field = "title" AND fak.reference_id = t.jtag_id AND fak.language_id = la.lang_id'
+						' AND fak.reference_field = "metakey" AND fak.reference_id = t.jtag_id AND fak.language_id = la.lang_id'
 				)
 				.' WHERE t.id<>0 AND rel.itemid IN ('.(@$field->query_itemids ? implode(',', $field->query_itemids) : $field->item_id) .')';
 			break;
