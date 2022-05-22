@@ -2087,8 +2087,8 @@ class FlexicontentFields
 			 * we do this because ... anyway search index is backend only
 			 */
 			$lang_overrides[$iLang] = array();
-			if ($lang_overrides_site)  foreach($lang_overrides_site[$iLang]  as $i => $v) $lang_overrides[$iLang][$i] = $v;
-			if ($lang_overrides_admin) foreach($lang_overrides_admin[$iLang] as $i => $v) $lang_overrides[$iLang][$i] = $v;
+			if ($lang_overrides_site)  foreach($lang_overrides_site[$iLang]  as $i => $v) $lang_overrides[$iLang][strtoupper($i)] = $v;
+			if ($lang_overrides_admin) foreach($lang_overrides_admin[$iLang] as $i => $v) $lang_overrides[$iLang][strtoupper($i)] = $v;
 		}
 
 		// Get overrides of item's language
@@ -2164,9 +2164,10 @@ class FlexicontentFields
 			if ($results && $lang_filter_values)
 			{
 				// Language filter these prefering the overrides in item's language
-				foreach ($results as $val=>$result)
+				foreach ($results as $val => $result)
 				{
-					$results[$val]->text  = isset($overrides[$result->text]) ? $overrides[$result->text] : JText::_($result->text);
+					$lang_string         = strtoupper($results[$val]->text);
+					$results[$val]->text = JText::_(isset($overrides[$lang_string]) ? $overrides[$lang_string] : $results[$val]->text);
 				}
 			}
 
@@ -2222,7 +2223,8 @@ class FlexicontentFields
 				// Language filter these prefering the overrides in item's language
 				if ($lang_filter_values)
 				{
-					$results[$val]->text = isset($overrides[$results[$val]->text]) ? $overrides[$results[$val]->text] : JText::_($results[$val]->text);
+					$lang_string         = strtoupper($results[$val]->text);
+					$results[$val]->text = JText::_(isset($overrides[$lang_string]) ? $overrides[$lang_string] : $results[$val]->text);
 				}
 				
 				$el_prop_count = 2;
