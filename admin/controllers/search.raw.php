@@ -437,7 +437,7 @@ class FlexicontentControllerSearch extends FlexicontentControllerBaseAdmin
 				// Indicate multiple items per query
 				$field->item_id = 0;
 				$field->query_itemids = $query_itemids;
-				$field->items_data = $items_data;   // Includes item langyage, which may be used for special per language handling
+				$field->items_data = $items_data;   // Includes item language, which may be used for special per language handling
 
 				// Indicate that the indexing fuction should retrieve the values
 				$values = null;

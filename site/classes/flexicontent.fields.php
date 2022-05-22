@@ -2067,17 +2067,44 @@ class FlexicontentFields
 	{
 		static $_elements_cache = array();
 
+		// static variable (array) so that we load overrides only once per language
+		static $lang_overrides;
+		$lang_filter_values = $field->parameters->get('lang_filter_values', 1);
+
+		// Get language of current item
+		$iLang = $item ? $item->language : $field->items_data[$field->item_id]->language;
+		$iLang = $iLang === '*' ? flexicontent_html::getSiteDefaultLang() : $iLang;
+
+		// Check if we have loaded the override file already, (aka we load it only once)
+		if ( !isset($lang_overrides[$iLang]) && $lang_filter_values )
+		{
+			$lang_overrides_site[$iLang]  = JLanguageHelper::parseIniFile(JPATH_SITE . '/language/overrides/' . $iLang . '.override.ini');
+			$lang_overrides_admin[$iLang] = JLanguageHelper::parseIniFile(JPATH_ADMINISTRATOR . '/language/overrides/' . $iLang . '.override.ini');
+
+			/**
+			 * Load frontend language overrides of item's language
+			 * then overwrite with backend language overrides 
+			 * we do this because ... anyway search index is backend only
+			 */
+			$lang_overrides[$iLang] = array();
+			if ($lang_overrides_site)  foreach($lang_overrides_site[$iLang]  as $i => $v) $lang_overrides[$iLang][$i] = $v;
+			if ($lang_overrides_admin) foreach($lang_overrides_admin[$iLang] as $i => $v) $lang_overrides[$iLang][$i] = $v;
+		}
+
+		// Get overrides of item's language
+		$overrides = $lang_filter_values && isset($lang_overrides[$iLang]) ? $lang_overrides[$iLang] : array();
+
+
 		// For fields that use this parameter
 		$sql_mode = (int) $field->parameters->get('sql_mode', 0);
 		$canCache = ! $field->parameters->get('nocache');
 
-		if ($canCache && isset($_elements_cache[$field->id][$is_filter]))
+		if ($canCache && isset($_elements_cache[$field->id][$iLang][$is_filter]))
 		{
-			return $_elements_cache[$field->id][$is_filter];
+			return $_elements_cache[$field->id][$iLang][$is_filter];
 		}
 
 		$field_elements = $field->parameters->get('field_elements', '') ;
-		$lang_filter_values = $field->parameters->get('lang_filter_values', 1);
 
 		$default_extra_props = array('image', 'valgrp', 'state');
 
@@ -2136,9 +2163,10 @@ class FlexicontentFields
 
 			if ($results && $lang_filter_values)
 			{
+				// Language filter these prefering the overrides in item's language
 				foreach ($results as $val=>$result)
 				{
-					$results[$val]->text  = JText::_($result->text);
+					$results[$val]->text  = isset($overrides[$result->text]) ? $overrides[$result->text] : JText::_($result->text);
 				}
 			}
 
@@ -2147,7 +2175,7 @@ class FlexicontentFields
 			{
 				if ($canCache && !$and_clause)
 				{
-					$_elements_cache[$field->id][$is_filter] = false;
+					$_elements_cache[$field->id][$iLang][$is_filter] = false;
 				}
 
 				return false;
@@ -2183,13 +2211,20 @@ class FlexicontentFields
 				if (count($listelement_props) < $props_needed)
 				{
 					echo "Error in field: ".$field->label." while splitting element: ".$listelement." properties needed: ".$props_needed." properties found: ".count($listelement_props);
-					return ($_elements_cache[$field->id][$is_filter] = false);
+					return ($_elements_cache[$field->id][$iLang][$is_filter] = false);
 				}
 
 				$val = $listelement_props[0];
 				$results[$val] = new stdClass();
 				$results[$val]->value = $listelement_props[0];
-				$results[$val]->text  = $lang_filter_values ? JText::_($listelement_props[1]) : $listelement_props[1];
+				$results[$val]->text  = $listelement_props[1];
+
+				// Language filter these prefering the overrides in item's language
+				if ($lang_filter_values)
+				{
+					$results[$val]->text = isset($overrides[$results[$val]->text]) ? $overrides[$results[$val]->text] : JText::_($results[$val]->text);
+				}
+				
 				$el_prop_count = 2;
 				$_props = !empty($extra_props) ? $extra_props : $default_extra_props;
 
@@ -2205,7 +2240,7 @@ class FlexicontentFields
 		// Return found elements, caching them if possible (if no item specific elements are used)
 		if ($canCache && !$and_clause)
 		{
-			$_elements_cache[$field->id][$is_filter] = & $results;
+			$_elements_cache[$field->id][$iLang][$is_filter] = & $results;
 		}
 
 		return $results;
