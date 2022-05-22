@@ -2896,9 +2896,15 @@ class FlexicontentFields
 			}
 		}
 
-		// A null indicates that we do not have posted data,
-		// instead indexer is running and we should retrieve values from the DB executing an SQL query
-		if ($values === null)
+		/**
+		 * A null indicates that we do not have posted data, instead indexer is running
+		 * and we should retrieve values from the DB executing an SQL query
+		 * BUT because we have customizations (for CORE fields),
+		 * - like adding metakey to description field
+		 * - like adding metakey to cats and tags field (also using falang values)
+		 * we must always call method searchIndex_getFieldValues()
+		 */
+		if ($values === null || $field->iscore)
 		{
 			$items_values = FlexicontentFields::searchIndex_getFieldValues($field, $item, $for_advsearch);
 		}
