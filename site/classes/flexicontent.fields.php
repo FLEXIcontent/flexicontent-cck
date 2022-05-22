@@ -3144,7 +3144,7 @@ class FlexicontentFields
 			break;
 
 		case 'maintext':
-			$query  = 'SELECT CONCAT_WS(\' \', i.introtext, i.fulltext) AS value, i.id AS itemid'
+			$query  = 'SELECT CONCAT_WS(\' \', i.introtext, i.fulltext, i.metakey) AS value, i.id AS itemid'
 				.' FROM #__content AS i'
 				.' WHERE i.id IN ('.(@$field->query_itemids ? implode(',', $field->query_itemids) : $field->item_id) .')';
 			break;
