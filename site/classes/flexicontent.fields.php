@@ -2063,7 +2063,7 @@ class FlexicontentFields
 
 
 	// Common method to get the allowed element values (field values with index,label,... properties) for fields that use indexed values
-	static function indexedField_getElements($field, $item, $extra_props=array(), &$item_pros=true, $is_filter=false, $and_clause=false)
+	static function indexedField_getElements($field, $item, $extra_props=array(), &$item_pros=true, $is_filter=false, $and_clause=false, $iLang = false)
 	{
 		static $_elements_cache = array();
 
@@ -2071,12 +2071,8 @@ class FlexicontentFields
 		static $lang_overrides;
 		$lang_filter_values = $field->parameters->get('lang_filter_values', 1);
 
-		// Get language of current item
-		$iLang = $item ? $item->language : $field->items_data[$field->item_id]->language;
-		$iLang = $iLang === '*' ? flexicontent_html::getSiteDefaultLang() : $iLang;
-
 		// Check if we have loaded the override file already, (aka we load it only once)
-		if ( !isset($lang_overrides[$iLang]) && $lang_filter_values )
+		if ( $iLang && !isset($lang_overrides[$iLang]) && $lang_filter_values )
 		{
 			$lang_overrides_site[$iLang]  = JLanguageHelper::parseIniFile(JPATH_SITE . '/language/overrides/' . $iLang . '.override.ini');
 			$lang_overrides_admin[$iLang] = JLanguageHelper::parseIniFile(JPATH_ADMINISTRATOR . '/language/overrides/' . $iLang . '.override.ini');
@@ -2092,7 +2088,7 @@ class FlexicontentFields
 		}
 
 		// Get overrides of item's language
-		$overrides = $lang_filter_values && isset($lang_overrides[$iLang]) ? $lang_overrides[$iLang] : array();
+		$overrides = $iLang && $lang_filter_values && isset($lang_overrides[$iLang]) ? $lang_overrides[$iLang] : array();
 
 
 		// For fields that use this parameter
@@ -2972,7 +2968,12 @@ class FlexicontentFields
 				// Get Elements of the field these will be cached if they do not depend on the item ...
 				$field->item_id = $itemid;   // in case it needs to be loaded to replace item properties in a SQL query
 				$item_pros = false;
-				$elements = FlexicontentFields::indexedField_getElements($field, $item, $field->extra_props, $item_pros);
+
+				// We are creating search index, we need to force language to language of current item
+				$iLang = $item ? $item->language : $field->items_data[$field->item_id]->language;
+				$iLang = $iLang === '*' ? flexicontent_html::getSiteDefaultLang() : $iLang;
+
+				$elements = FlexicontentFields::indexedField_getElements($field, $item, $field->extra_props, $item_pros, false, false, $iLang);
 				// Map index field vlaues to their real properties
 				$item_values = FlexicontentFields::indexedField_getValues($field, $elements, $item_values, $prepost_prop='');
 			}
