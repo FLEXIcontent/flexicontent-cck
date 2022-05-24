@@ -460,6 +460,7 @@
 			</field>
 
 			<field name="display_filename" type="radio" default="1" label="FLEXI_FIELD_FILE_SHOW_FILENAME" description="FLEXI_FIELD_FILE_SHOW_FILENAME_DESC" class="btn-group btn-group-yesno">
+				<option value="-1">No (force)</option>
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES_PREFER_FILE_TITLE</option>
 				<option value="2">FLEXI_YES</option>

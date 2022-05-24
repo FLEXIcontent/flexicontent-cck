@@ -895,11 +895,11 @@ class plgFlexicontent_fieldsFile extends FCField
 		$useicon = $field->parameters->get( 'useicon', 0 ) ;
 		$lowercase_filename = $field->parameters->get( 'lowercase_filename', 1 ) ;
 		
-		$display_filename	= $field->parameters->get( 'display_filename', 1 ) ;
-		$display_lang     = $field->parameters->get( 'display_lang', 1 ) ;
-		$display_size			= $field->parameters->get( 'display_size', 0 ) ;
-		$display_hits     = $field->parameters->get( 'display_hits', 0 ) ;
-		$display_descr		= $field->parameters->get( 'display_descr', 1 ) ;
+		$display_filename	= (int) $field->parameters->get( 'display_filename', 1 ) ;
+		$display_lang     = (int) $field->parameters->get( 'display_lang', 1 ) ;
+		$display_size			= (int) $field->parameters->get( 'display_size', 0 ) ;
+		$display_hits     = (int) $field->parameters->get( 'display_hits', 0 ) ;
+		$display_descr		= (int) $field->parameters->get( 'display_descr', 1 ) ;
 
 		// Force icons in items manager
 		$display_lang  = $display_lang && static::$isItemsManager ?  0 : $display_lang;
@@ -1065,7 +1065,7 @@ class plgFlexicontent_fieldsFile extends FCField
 			$hits_icon = '<span class="icon-eye" ' . $_attribs . '></span>';
 		}
 
-		$show_filename = $display_filename || $prop=='namelist';
+		$show_filename = $display_filename > 0 || $prop=='namelist';
 		$public_acclevel = 1;
 		$empty_file_data = array('filename'=>false, 'filename_original'=>false, 'altname'=>false, 'description'=>false, 'ext'=>false, 'id'=>0);
 

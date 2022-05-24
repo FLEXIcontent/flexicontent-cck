@@ -498,12 +498,13 @@ if ($prop !== 'display_properties_only') :
 	}
 
 	//Display the buttons "DOWNLOAD, SHARE, ADD TO CART" before or after the filename
-	$html = (static::$isItemsManager ? '' : '<fieldset><legend></legend>') . '
+	$html = (static::$isItemsManager || (!$html && !actions_arr) ? '' : '<fieldset><legend></legend>') . '
 		' .
-		($buttonsposition ? $html : '') . '
-		<div class="fcfile_actions ' . ($compact_display ? ' fcfile_compact' : '') . '">
-			' . implode($actionseptxt, $actions_arr) . '
-		</div>' .
+		($buttonsposition ? $html : '') .
+		($actions_arr ? '
+			<div class="fcfile_actions ' . ($compact_display ? ' fcfile_compact' : '') . '">
+				' . implode($actionseptxt, $actions_arr) . '
+			</div>' : '') .
 		(!$buttonsposition ? $html : '') .
 		(static::$isItemsManager ? '' : '</fieldset>');
 
