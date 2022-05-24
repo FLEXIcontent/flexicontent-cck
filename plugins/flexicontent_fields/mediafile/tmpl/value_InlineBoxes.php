@@ -284,7 +284,7 @@ if ($prop !== 'display_properties_only') :
 
 
 	// [0]: filename (if visible)
-	if (($filename_shown && !$filename_shown_as_link) || $not_downloadable)
+	if ((($filename_shown && !$filename_shown_as_link) || $not_downloadable) && $display_filename != -1)
 	{
 		$html .= '<div class="fcfile_name' . ($compact_display ? ' fcfile_compact' : '') . '">' . $icon . ' ' . $name_html . '</div>';
 	}
