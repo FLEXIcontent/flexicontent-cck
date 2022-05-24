@@ -429,7 +429,7 @@
 				<option value="0">FLEXI_USE_FCITEMS_LINKS</option>
 				<option value="1">FLEXI_USE_JARTICLE_LINKS</option>
 			</field>
-			<field name="jview_fields_placement" type="radio" default="1" label="FLEXI_ADD_CUSTOM_FIELD_TO_ARTICLE_VIEW" description="FLEXI_ADD_CUSTOM_FIELD_TO_ARTICLE_VIEW_DESC" depend_class="allow_jview" class="btn-group btn-group-yesno">
+			<field name="jview_fields_placement" type="radio" default="0" label="FLEXI_ADD_CUSTOM_FIELD_TO_ARTICLE_VIEW" description="FLEXI_ADD_CUSTOM_FIELD_TO_ARTICLE_VIEW_DESC" depend_class="allow_jview" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_DISABLE</option>
 				<option value="1">FLEXI_BEFORE_CONTENT</option>
 				<option value="2">FLEXI_AFTER_CONTENT</option>
