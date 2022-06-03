@@ -796,6 +796,10 @@ span.fc-centered-icon-box {
 	border-radius: 50%;
 	background: rgba(0,0,0,0.7);
 }
+.field_media ul {
+	margin: 0;
+	padding: 0;
+}
 div.fc_mediafile_player_box.fc_compact {
 	display: flex;
 	flex-flow: row wrap;
