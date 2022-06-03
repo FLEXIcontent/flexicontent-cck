@@ -9,7 +9,7 @@ div.voting-row {
 	display: inline-block;
 	float: left;
 	padding: 0;
-	margin: 12px 0;
+	margin: 0;
 	padding: 0 24px 0 0;
 }
 div.voting-row.voting-row_main {
