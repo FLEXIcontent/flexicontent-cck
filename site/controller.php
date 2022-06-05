@@ -2375,23 +2375,56 @@ class FlexicontentController extends JControllerLegacy
 						{
 							$msg .= "<br/> <small>".JText::_('FLEXI_FDC_COUPON_NO_LONGER_USABLE')."</small>";
 						}
+
+						// Redirect unlogged user to login
+						if ($user->guest)
+						{
+							$uri    = JUri::getInstance();
+							$return	= $uri->toString();
+							$url    = $cparams->get('login_page', 'index.php?option=com_users&view=login');
+							$return = strtr(base64_encode($return), '+/=', '-_,');
+							$url   .= '&return='.$return; // '&return='.base64_encode($return);
+							$url   .= '&isfcurl=1';
+
+							$app->setHeader('status', 403, true);
+							$app->enqueueMessage(JText::sprintf('FLEXI_LOGIN_TO_ACCESS', $url), 'error');
+							$app->redirect($url);
+						}
+
+						// Use custom unauthorized page for already logged user
+						elseif ($cparams->get('unauthorized_page', ''))
+						{
+							$app->setHeader('status', 403, true);
+							$app->redirect($cparams->get('unauthorized_page'));
+						}
+
+						// JDEBUG is OFF, output a simple not authorized message
+						elseif(!JDEBUG)
+						{
+							$app->setHeader('status', 403, true);
+							$app->enqueueMessage(JText::_('FLEXI_ALERTNOTAUTH_VIEW'), 'error');
+							$app->redirect('index.php');
+						}
+
+						// JDEBUG is ON, output a detailed message
 						$msg .= ''
 							.(!$file->has_content_access ? "<br/><br/> ".JText::_('FLEXI_FDC_NO_ACCESS_TO')
-									." -- ".JText::_('FLEXI_FDC_CONTENT_CONTAINS')." ".JText::_('FLEXI_FDC_WEBLINK')
-									."<br/><small>(".JText::_('FLEXI_FDC_CONTENT_EXPLANATION').")</small>"
+								." -- ".JText::_('FLEXI_FDC_CONTENT_CONTAINS')." ".JText::_('FLEXI_FDC_WEBLINK')
+								."<br/><small>(".JText::_('FLEXI_FDC_CONTENT_EXPLANATION').")</small>"
 								: '')
 							.(!$file->has_field_access ? "<br/><br/> ".JText::_('FLEXI_FDC_NO_ACCESS_TO')
-									." -- ".JText::_('FLEXI_FDC_FIELD_CONTAINS')." ".JText::_('FLEXI_FDC_WEBLINK')
+								." -- ".JText::_('FLEXI_FDC_FIELD_CONTAINS')." ".JText::_('FLEXI_FDC_WEBLINK')
 								: '')
 							.(!$file->has_file_access ? "<br/><br/> ".JText::_('FLEXI_FDC_NO_ACCESS_TO') ." -- ".JText::_('FLEXI_FDC_FILE')." " : '')
 						;
+						$msg .= "<br/><br/> ". JText::sprintf('FLEXI_FDC_FILE_DATA', $file_id, $content_id, $field_id);
 					}
 
-					$msg .= "<br/><br/> ". JText::sprintf('FLEXI_FDC_FILE_DATA', $file_id, $content_id, $field_id);
-					$app->enqueueMessage($msg, 'notice');
+					// Enqueue the final created message
+					$app->enqueueMessage($msg, 'warning');
 				}
 
-				// Only abort for single file download
+				// Only abort further execution for single file download
 				if ($task !== 'download_tree')
 				{
 					$this->setRedirect('index.php', '');
@@ -3089,6 +3122,37 @@ class FlexicontentController extends JControllerLegacy
 
 			else
 			{
+				// Redirect unlogged user to login
+				if ($user->guest)
+				{
+					$uri    = JUri::getInstance();
+					$return	= $uri->toString();
+					$url    = $cparams->get('login_page', 'index.php?option=com_users&view=login');
+					$return = strtr(base64_encode($return), '+/=', '-_,');
+					$url   .= '&return='.$return; // '&return='.base64_encode($return);
+					$url   .= '&isfcurl=1';
+
+					$app->setHeader('status', 403, true);
+					$app->enqueueMessage(JText::sprintf('FLEXI_LOGIN_TO_ACCESS', $url), 'error');
+					$app->redirect($url);
+				}
+
+				// Use custom unauthorized page for already logged user
+				elseif ($cparams->get('unauthorized_page', ''))
+				{
+					$app->setHeader('status', 403, true);
+					$app->redirect($cparams->get('unauthorized_page'));
+				}
+
+				// JDEBUG is OFF, output a simple not authorized message
+				elseif(!JDEBUG)
+				{
+					$app->setHeader('status', 403, true);
+					$app->enqueueMessage(JText::_('FLEXI_ALERTNOTAUTH_VIEW'), 'error');
+					$app->redirect('index.php');
+				}
+
+				// JDEBUG is ON, output a detailed message
 				$msg  = JText::_('FLEXI_ALERTNOTAUTH');
 				$msg .= ""
 					.(!$link_data->has_content_access ? "<br/><br/> ".JText::_('FLEXI_FDC_NO_ACCESS_TO')
@@ -3100,10 +3164,12 @@ class FlexicontentController extends JControllerLegacy
 						: '')
 				;
 				$msg .= "<br/><br/> ". JText::sprintf('FLEXI_FDC_WEBLINK_DATA', $value_order, $content_id, $field_id);
-				$app->enqueueMessage($msg, 'notice');
 			}
 
-			// Abort redirecting to home
+			// Enqueue the final created message
+			$app->enqueueMessage($msg, 'warning');
+
+			// Abort further execution, and redirect to home
 			$this->setRedirect('index.php', '');
 			return;
 		}
