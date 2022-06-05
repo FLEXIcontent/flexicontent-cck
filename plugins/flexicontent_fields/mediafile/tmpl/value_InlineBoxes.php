@@ -38,7 +38,9 @@ foreach($values as $file_id)
 		continue;
 	}
 	$file_data = $files_data[$file_id];
-	$FN_n      = $field_name_js.'_'.$n;
+
+	// Use a random integer so that the player can be displayed multiple times inside same page
+	$FN_n      = $field_name_js.'_'.$n . '_' . mt_rand();
 
 
 	// ***
