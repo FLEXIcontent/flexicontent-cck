@@ -103,6 +103,7 @@ class FlexicontentModelAppsman extends JModelList
 	/*** NEEDS PHP 5.5.4+ ***/
 	function create_CSV_file($rows, $table, $id_colname=null, $clear_id=false)
 	{
+		$app         = JFactory::getApplication();
 		$temp_stream = fopen('php://temp', 'r+');
 		if (!$temp_stream)
 		{

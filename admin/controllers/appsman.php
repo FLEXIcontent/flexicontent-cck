@@ -556,7 +556,8 @@ class FlexicontentControllerAppsman extends FlexicontentControllerBaseAdmin
 
 			if (!empty($error))
 			{
-				$app->setHeader('status', reset(array_keys($error)), true);
+				$err_statuses = array_keys($error);
+				$app->setHeader('status', reset($err_statuses), true);
 				$app->enqueueMessage(reset($error), 'error');
 				$app->redirect($this->returnURL);
 			}
@@ -590,7 +591,7 @@ class FlexicontentControllerAppsman extends FlexicontentControllerBaseAdmin
 					$content = $model->create_SQL_file($rows, $table_name, $id_colname, $clear_id = false);
 					break;
 				case "csv":
-					$content = $model->create_CSV_file($rows, $tatable_nameble, $id_colname, $clear_id = false);
+					$content = $model->create_CSV_file($rows, $table_name, $id_colname, $clear_id = false);
 					break;
 				default:
 					$content = false;
@@ -737,10 +738,11 @@ class FlexicontentControllerAppsman extends FlexicontentControllerBaseAdmin
 			 * When more than 1MB, (highest possible for fread should be 8MB)
 			 * read archive file from the server disk in chunks
 			 */
-			$MB_limit = 1;
+			$MB_limit  = 1;
 			$chunksize = $MB_limit * (1024 * 1024);
+			$filesize  = filesize($archivepath);
 
-			if (1 || $filesize > $chunksize)
+			if ($filesize > $chunksize)
 			{
 				$handle = @fopen($archivepath, "rb");
 
