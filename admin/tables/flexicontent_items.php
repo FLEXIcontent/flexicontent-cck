@@ -839,10 +839,11 @@ class flexicontent_items extends _flexicontent_items
 		$asset->loadByName($name);
 
 		// Check for an error.
-		if ($error = $asset->getError())
+		if ($asset->getError())
 		{
-			$this->setError($error);
-			return false;
+			JFactory::getApplication()->enqueueMessage('Error saving permissions asset. ' . $error, 'Notice');
+			//$this->setError('Error saving permissions asset. ' .$asset->getError());
+			return true;
 		}
 
 		// Specify how a new or moved node asset is inserted into the tree.
@@ -863,8 +864,9 @@ class flexicontent_items extends _flexicontent_items
 
 		if (!$asset->check() || !$asset->store($updateNulls))
 		{
-			$this->setError($asset->getError());
-			return false;
+			JFactory::getApplication()->enqueueMessage('Error saving permissions asset. ' . $error, 'Notice');
+			//$this->setError('Error saving permissions asset. ' .$asset->getError());
+			return true;
 		}
 
 		// Update the asset_id field in this table.

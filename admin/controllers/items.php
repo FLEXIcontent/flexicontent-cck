@@ -267,8 +267,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 			if ($model->checkin($data['id']) === false)
 			{
 				// Check-in failed
-				$this->setError(JText::sprintf('JLIB_APPLICATION_ERROR_CHECKIN_FAILED', $model->getError()));
-				$this->setMessage($this->getError(), 'error');
+				$app->enqueueMessage(JText::sprintf('JLIB_APPLICATION_ERROR_CHECKIN_FAILED', $model->getError()), 'error');
 
 				// Set the POSTed form data into the session, so that they get reloaded
 				$app->setUserState('com_flexicontent.edit.' . $this->record_name . '.data', $data);      // Save the jform data in the session
@@ -792,8 +791,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 
 			// Set error message and the redirect URL (back to the record form)
 			$app->setHeader('status', '500 Internal Server Error', true);
-			$this->setError($model->getError() ?: JText::_('FLEXI_ERROR_SAVING_' . $this->_NAME));
-			$this->setMessage($this->getError(), 'error');
+			$app->enqueueMessage($model->getError() ?: JText::_('FLEXI_ERROR_SAVING_' . $this->_NAME), 'error');
 
 			// Skip redirection back to return url if inside a component-area-only view, showing error using current page, since usually we are inside a iframe modal
 			if ($this->input->getCmd('tmpl') !== 'component')

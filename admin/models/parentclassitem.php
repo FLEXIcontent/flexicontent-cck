@@ -2305,6 +2305,7 @@ class ParentClassItem extends FCModelAdmin
 
 		if ( !$item->bind($data) )
 		{
+			$app->enqueueMessage('Failed to bind() item data', 'warning');
 			$this->setError($item->getError());
 			return false;
 		}
@@ -2441,6 +2442,8 @@ class ParentClassItem extends FCModelAdmin
 		// Abort item save if any plugin returns a result === false
 		if (is_array($results) && in_array(false, $results, true))
 		{
+			$this->setError('At least 1 content plugin has failed to save its data (Event onBeforeSaveItem). Aborting');
+			if ($item->getError()) $app->enqueueMessage($item->getError(), 'notice');
 			return false;
 		}
 
@@ -2486,7 +2489,8 @@ class ParentClassItem extends FCModelAdmin
 			// Abort item save if any plugin returns a result === false
 			if (is_array($results) && in_array(false, $results, true))
 			{
-				$this->setError($item->getError());
+				$this->setError('At least 1 content plugin has failed to save its data (Event onBeforeSaveItem). Aborting');
+				if ($item->getError()) $app->enqueueMessage($item->getError(), 'notice');
 				return false;
 			}
 		}
@@ -2560,6 +2564,7 @@ class ParentClassItem extends FCModelAdmin
 			// Re-bind (possibly modified data) to the item
 			if (!$item->bind($core_data_via_events))
 			{
+				$app->enqueueMessage('Failed to (re) bind() item data. Aborting', 'error');
 				$this->setError($item->getError());
 				return false;
 			}
@@ -2642,6 +2647,8 @@ class ParentClassItem extends FCModelAdmin
 				// Abort further actions if any plugin returns a result === false
 				/*if (is_array($results) && in_array(false, $results, true))
 				{
+					$this->setError('At least 1 content plugin has failed to save its data (Event onContentAfterSave). Aborting');
+					if ($item->getError()) $app->enqueueMessage($item->getError(), 'notice');
 					return false;
 				}*/
 
@@ -2667,6 +2674,8 @@ class ParentClassItem extends FCModelAdmin
 		// Abort further actions if any plugin returns a result === false
 		/*if (is_array($results) && in_array(false, $results, true))
 		{
+			$this->setError('At least 1 content plugin has failed to save its data (Event onAfterSaveItem). Aborting');
+			if ($item->getError()) $app->enqueueMessage($item->getError(), 'notice');
 			return false;
 		}*/
 
@@ -2758,6 +2767,8 @@ class ParentClassItem extends FCModelAdmin
 		// Abort further actions if any plugin returns a result === false
 		/*if (is_array($results) && in_array(false, $results, true))
 		{
+			$this->setError('At least 1 content plugin has failed to save its data (Event onCompleteSaveItem). Aborting');
+			if ($item->getError()) $app->enqueueMessage($item->getError(), 'notice');
 			return false;
 		}*/
 
