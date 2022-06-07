@@ -2,10 +2,10 @@ body #flexicontent .fc_item_title,
 body #flexicontent .fc_item_title a {
 	color: inherit;
 	background-color: inherit;
-	padding-top: 0px;
+	padding-top: 50px;
 	padding-right: 0px;
 	padding-left: 0px;
-	padding-bottom: 0px;
+	padding-bottom: 50px;
 	border-radius: 0px;
 }
 .fcitems {
@@ -15,22 +15,23 @@ body #flexicontent .fc_item_title a {
 	padding-left: 0px;
 	padding-bottom: 0px;
 	border-radius: 0px;
-	border: 0px solid #cccccc;
+	border: 0px solid inherit;
 	color: inherit;
 }
 body #flexicontent .flexi.label,
 body #flexicontent .desc-title.label {
-	background-color: #999999;
-	color: #ffffff;
-	border-radius: 3px;
-	padding-top: 2px;
-	padding-right: 4px;
-	padding-left: 4px;
-	padding-bottom: 2px;
+	background-color: rgba(255,255,255,0);
+	color: #000000;
+	border-radius: 0px;
+	padding-top: 0px;
+	padding-right: 0px;
+	padding-left: 0px;
+	padding-bottom: 0px;
+	font-weight: bold;
 }
 body #flexicontent ul.tabbernav > li a {
 	background-color: #e4f1f8;
-	color: #ffffff;
+	color: #073954;
 }
 body #flexicontent ul.tabbernav > li.tabberactive a::before {
 	border-top: 4px solid #3093c7;
@@ -56,7 +57,7 @@ body .tabbertab,
 }
 body ul.tabbernav,
 #flexicontent ul.tabbernav {
-	border-bottom: 1px solid #cccccc !important;
+	border-bottom: 1px solid inherit !important;
 }
 div#fc_subtitle_tabset,
 div#fc_bottom_tabset {
@@ -93,21 +94,14 @@ body .flexi.infoblock {
 	margin-bottom: 10px;
 }
 .topblock .flexi.image {
-	display: block;
-	float: left;
-	max-width: 99% !important;
-	padding: 0% !important;
-	margin-right: 0%;
-	margin-left: 0%;
-	line-height: 0px;
-	border: 0px solid silver;
+	display: grid;
 }
 .topblock .flexi.image a {
 	outline: none;
 }
 .topblock .flexi.infoblock {
 	overflow: hidden;
-	border-radius: 0px;
+	border-radius: 5px;
 	border: 1px solid #cccccc;
 	color: inherit;
 	background-color: transparent;
@@ -120,8 +114,8 @@ body .flexi.infoblock {
 	overflow: hidden;
 	border-radius: 0px;
 	border: 1px solid #cccccc;
-	color: #cccccc;
-	background-color: #ffffff;
+	color: inherit;
+	background-color: inherit;
 }
 .flexi.infoblock {
 	border: 1px solid silver;
@@ -142,16 +136,11 @@ body .flexi.infoblock {
 	zoom: 1;
 }
 div.flexi.value {
-	padding-bottom: 2px !important;
-	padding-top: 2px !important;
+	padding-bottom: 0px !important;
+	padding-top: 0px !important;
 }
 .onecols ul li.flexi {
 	width: 100%;
-}
-.onecols .flexi.label {
-	min-width: 25%;
-	margin-right: 4%;
-	margin-bottom: 6px;
 }
 .twocols ul li.flexi {
 	min-width: 48%;

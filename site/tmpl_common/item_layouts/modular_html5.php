@@ -294,7 +294,7 @@ $microdata_itemtype_code = 'itemscope itemtype="http://schema.org/'.$microdata_i
 
 	<?php if ((isset($item->positions['image'])) || (isset($item->positions['top']))) : ?>
 		<!-- BOF image/top row -->
-		<aside class="flexi topblock  ">  <!-- NOTE: image block is inside top block ... -->
+		<aside class="flexi topblock row ">  <!-- NOTE: image block is inside top block ... -->
 
 			<?php
 				$has_output_image = false;
@@ -316,30 +316,32 @@ $microdata_itemtype_code = 'itemscope itemtype="http://schema.org/'.$microdata_i
 					}
 				}
 
-				$top_span_cols     = (int) $this->params->get('top_span_cols', 8);
+				$top_span_cols = (int) $this->params->get('top_span_cols', 8);
+				$top_span_cols = $top_span_cols < 1 || $top_span_cols > 12 ? 8 : $top_span_cols;
+				$img_span_cols = 12 - $top_span_cols > 0 ? 12 - $top_span_cols : 12;
 
-				$top_span_cols     = $top_span_cols < 1 || $top_span_cols > 12 ? 8 : $top_span_cols;
-				$img_span_cols     = 12 - $top_span_cols > 0 ? 12 - $top_span_cols : 12;
-
-				$imgPos_widthClass = 'span' . $img_span_cols;
-				$topPos_widthClass = 'span' . $top_span_cols;
+				$imgPos_widthClass = 'span' . $img_span_cols . ' col-lg-' . $img_span_cols . ' col-md-' .$img_span_cols;
+				$topPos_widthClass = 'span' . $top_span_cols . ' col-lg-' . $top_span_cols . ' col-md-' .$top_span_cols;
 
 				$box_class_image .= (!$has_output_top ? ' span12' : ' ' . $imgPos_widthClass);
 				$box_class_top   .= (!$has_output_image ? ' span12' : ' '. $topPos_widthClass);
 			?>
 
-			<?php if (isset($item->positions['image'])) : ?>
-				<div class="<?php echo $box_class_image; ?>">
-					<!-- BOF image block -->
-					<?php foreach ($item->positions['image'] as $field) : ?>
-					<div class=" field_<?php echo $field->name; ?>">
-						<?php echo $field->display; ?>
-						<div class="fcclear"></div>
-					</div>
-				</div>
-				<?php endforeach; ?>
-				<!-- EOF image block -->
-			<?php endif; ?>
+          
+          <?php if (isset($item->positions['image'])) : ?>
+		<!-- BOF image block -->
+		<div class="<?php echo $box_class_image; ?>">
+			<?php foreach ($item->positions['image'] as $field) : ?>
+			<div class="flexi element field_<?php echo $field->name; ?>">
+				<?php if ($field->label) : ?>
+				<span class="flexi label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></span>
+				<?php endif; ?>
+				<div class="flexi value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></div>
+			</div>
+			<?php endforeach; ?>
+		</div>
+		<!-- EOF image block -->
+	<?php endif; ?>
 
 			<?php if (isset($item->positions['top'])) : ?>
 				<!-- BOF top block -->

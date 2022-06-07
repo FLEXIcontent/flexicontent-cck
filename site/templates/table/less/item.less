@@ -39,6 +39,7 @@ body #flexicontent .desc-title.label {
 	padding-right: @FCI_label_pad_right + px;
 	padding-left: @FCI_label_pad_left + px;
 	padding-bottom: @FCI_label_pad_bottom + px;
+  font-weight:bold;
 }
 
 /* TAB styling */
@@ -135,14 +136,14 @@ body .flexi.infoblock{
 	margin-bottom: 10px;
 }
 .topblock .flexi.image {
-	display: block;
-	float: left;
-	max-width: 99% !important;  /* Allow responsive width while floating */
-	padding: 0% !important;  /* Allow responsive width while floating */
+	display: grid;
+	/*float: left;
+	max-width: 99% !important;
+	padding: 0% !important;
 	margin-right: 0%;
 	margin-left: 0%;
 	line-height: 0px;
-	border: 0px solid silver;
+	border: 0px solid silver;*/
 }
 .topblock .flexi.image a {
 	outline: none;
@@ -198,7 +199,7 @@ div.flexi.value{
 .onecols ul li.flexi {
 	width: 100%;
 }
-.onecols .flexi.label {
+/*.onecols .flexi.label {
 	min-width: 25%;
 	margin-right: 4%;
 	margin-bottom: 6px;

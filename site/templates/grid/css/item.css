@@ -1,7 +1,7 @@
 body #flexicontent .flexi.label,
 body #flexicontent .desc-title.label {
-	background-color: #999999;
-	color: #ffffff;
+	background-color: rgba(255,255,255,0);
+	color: #000000;
 	border-radius: 3px;
 }
 .news.fc-item-block .fcitem_title_box {
