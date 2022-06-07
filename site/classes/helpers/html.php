@@ -4437,7 +4437,7 @@ class flexicontent_html
 				<div class="fcvote_message" ></div>
 
 				'.($add_review_form ? '
-				<input type="button" class="btn fcvote_toggle_review_form"
+				<input type="button" class="btn btn-primary fcvote_toggle_review_form"
 					onclick="fcvote_open_review_form(jQuery(\'#fcvote_review_form_box_'.$id.'\').attr(\'id\'), '.$id.', \''.$review_type.'\', this)"
 					value="'.JText::_('FLEXI_VOTE_REVIEW_THIS_ITEM').'"/>
 				<div id="fcvote_review_form_box_'.$id.'_loading" class="fcvote_review_form_box_loading"></div>
