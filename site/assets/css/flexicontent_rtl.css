@@ -1364,6 +1364,9 @@ div#fc-filters-slide-btn {
 	display: inline-block;
 	max-width: 420px;
 }
+input.minicolors-input {
+	padding: 0px 44px 8px !important;
+}
 body .fc-close {
 	color: #000000;
 	float: left;
@@ -5809,8 +5812,6 @@ div.flexi.label,
 	display: block;
 	float: right;
 	margin: 2px 8px 2px 0px;
-	min-width: 60px;
-	max-width: 120px;
 	white-space: unset;
 	word-wrap: break-word;
 }

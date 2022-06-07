@@ -1015,8 +1015,6 @@ div.flexi.label,
 	display: block;
 	float: right;
 	margin: 2px 8px 2px 0px;
-	min-width: 60px;
-	max-width: 120px;
 	white-space: unset;
 	word-wrap: break-word;
 }
