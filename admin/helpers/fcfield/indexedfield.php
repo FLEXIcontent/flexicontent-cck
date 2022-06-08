@@ -79,6 +79,7 @@ class FCIndexedField extends FCField
 		$input_grp_class = $cparams->get('bootstrap_ver', 2)==2  ?  'input-append input-prepend' : 'input-group';
 		$form_font_icons = $cparams->get('form_font_icons', 1);
 		$font_icon_class = $form_font_icons ? ' fcfont-icon' : '';
+		$font_icon_class .= FLEXI_J40GE ? ' icon icon- ' : '';
 
 		// some parameter shortcuts
 		$sql_mode				= $field->parameters->get( 'sql_mode', 0 ) ;
