@@ -5,7 +5,7 @@
  *
  * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
  * @link            https://flexicontent.org
- * @copyright       Copyright © 2020, FLEXIcontent team, All Rights Reserved
+ * @copyright       Copyright ï¿½ 2020, FLEXIcontent team, All Rights Reserved
  * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
@@ -731,7 +731,7 @@ class FCIndexedField extends FCField
 						.(!$placeInsideLabel ? $input_fld : '')
 						.'<label for="'.$elementid_no.'" class="'.$label_class.'" style="'.$label_style.'" '.($form_vals_display==1 ? 'title="'.@ $element->label_tip.'"' : '').'>'
 							. ($placeInsideLabel ? $input_fld : '') . ' '
-							.($form_vals_display!=1 ? $element->text : '')
+							.($form_vals_display!=1 ? JText::_($element->text) : '')
 							.($form_vals_display==2 ? ' <br/>' : '')
 							.($form_vals_display >0 ? $element->image_html : '')
 						.'</label>'
