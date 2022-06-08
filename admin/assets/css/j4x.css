@@ -887,9 +887,6 @@ span.btn.btn-sm.toolbar.dropdown-toggle.dropdown-toggle-split.fcfield-addvalue.f
 span.btn.btn-sm.toolbar.dropdown-toggle.dropdown-toggle-split.fcfield-addvalue.fcfont-icon.icon.icon-.dropdown-toggle:after {
 	margin-top: 18px !important;
 }
-span.fcfield-disablevalue.fcfont-icon.icon.icon- {
-	height: 1.5rem !important;
-}
 body .ui-widget-header {
 	border: 1px solid #fff !important;
 	background: #fff !important;

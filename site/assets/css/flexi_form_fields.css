@@ -1147,9 +1147,10 @@ div.container_fcfield div.toggle_all_values_buttons_box {
 	margin: 8px 0 0 0;
 }
 #flexicontent .fc-xpended-btns.input-append.input-prepend > *,
-#flexicontent .fc-xpended-btns.btn-group > * {
+#flexicontent .fc-xpended-btns.btn-group > *,
+#flexicontent span.fcfield-disablevalue.fcfont-icon.icon.icon- {
 	min-height: var(--ctrls-inp-height) !important;
-	line-height: calc(var(--ctrls-inp-height) - 4px) !important;
+	line-height: calc(var(--ctrls-inp-height) - 1px) !important;
 	box-sizing: border-box !important;
 	padding: 0 calc(var(--ctrls-inp-height) / 2) !important;
 }
@@ -1717,4 +1718,13 @@ iframe.sharedmedia {
 span.btn.btn-small.toolbar.dropdown-toggle.fcfield-addvalue.fcfont-icon {
 	border-top: 1px solid #ccc;
 	border-bottom: 1px solid #ccc;
+}
+span.add-on.fcfield-clearvalue.fcfont-icon.icon.icon-,
+span.fcfield-disablevalue.fcfont-icon.icon.icon- {
+	margin: initial !important;
+	height: 2.62rem !important;
+}
+.buttons.btn-group.fc-iblock.dropdown {
+	margin-left: -20px !important;
+	width: 88px;
 }
