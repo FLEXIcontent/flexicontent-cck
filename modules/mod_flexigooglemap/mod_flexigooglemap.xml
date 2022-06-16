@@ -117,11 +117,17 @@
 				description="MOD_FLEXIGOOGLEMAP_HEIGHT_DESC"
 			/>
 			<field
-				name="maxzoommarker" type="text"
+				name="maxzoommarker" type="number"
 				default="18" label="MOD_FLEXIGOOGLEMAP_MAXZOOMMARKER"
 				description="MOD_FLEXIGOOGLEMAP_MAXZOOMMARKER_DESC"
 			/>
-
+			<field
+				name="minzoommarkerr" type="number"
+				default="0.5" label="MOD_FLEXIGOOGLEMAP_MINZOOMMARKER"
+				description="MOD_FLEXIGOOGLEMAP_INZOOMMARKER_DESC"
+				min="0"
+				max="1"
+			/>
 			<field
 				name="count" type="list"
 				default="" label="MOD_FLEXIGOOGLEMAP_NBITEM"
