@@ -474,7 +474,7 @@ class plgFlexicontent_fieldsToolbar extends FCField
 							if (jQuery(el).get(0).hasAttribute("data-fb-like-layout")) jQuery(el).attr("fb:like:layout", jQuery(el).attr("data-fb-like-layout"));
 						});
 						var scriptTag = document.createElement("script");
-						scriptTag.src = "//s7.addthis.com/js/300/addthis_widget.js'.($addthis_pubid ? '#pubid='.$addthis_pubid : '').'";
+						scriptTag.src = "//s7.addthis.com/js/300/addthis_widget.js#domready=1'.($addthis_pubid ? '#pubid='.$addthis_pubid : '').'";
 						document.getElementsByTagName("head")[0].appendChild(scriptTag);
 					});
 
