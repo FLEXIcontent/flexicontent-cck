@@ -2201,11 +2201,16 @@ class modFlexicontentHelper
 			}
 
 			// 1. Get ids of dynamic filters
-			$dynamic_filter_ids = FLEXIUtilities::paramToArray($dynamic_filters, "/[\s]*,[\s]*/", "intval");
+			$_dynamic_filter_ids = FLEXIUtilities::paramToArray($dynamic_filters, "/[\s]*,[\s]*/", "intval");
+			$dynamic_filter_ids = array();
+			foreach($_dynamic_filter_ids as $dynamic_filter_id)
+			{
+				if ($dynamic_filter_id) $dynamic_filter_ids[] = $dynamic_filter_id;
+			}
 
 			if (empty($dynamic_filter_ids))
 			{
-				echo "Please enter at least 1 field in Custom field filtering SCOPE, or set behaviour to static";
+				echo "Please enter at least 1 field ID (integer) in Custom field filtering SCOPE, or set behaviour to static";
 			}
 
 			else

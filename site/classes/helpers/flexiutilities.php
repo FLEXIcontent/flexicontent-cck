@@ -673,7 +673,7 @@ class FLEXIUtilities
 			$value = !$value  ?  array()  :  preg_split($regex, $value);
 		}
 		if ($filterfunc) {
-			array_map($filterfunc, $value);
+			$value = array_map($filterfunc, $value);
 		}
 
 		if (!is_array($value)) {
