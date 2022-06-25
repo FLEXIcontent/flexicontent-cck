@@ -806,12 +806,34 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 
 			if ($field)
 			{
-				$model->createMediaData($field, $fileObj);
+				$res = $model->createMediaData($field, $fileObj);
+				if (!$res)
+				{
+					$error_msg = JText::_("File uploaded successfully.\nBut got error reading media (audio/video) properties")
+						. ":\n  " . $model->getError();
+					$this->exitHttpHead = array( 0 => array('status' => '500 Error') );
+					$this->exitMessages = array( 0 => array('warning' => $error_msg) );
+					$this->exitLogTexts = array( 0 => array(JLog::WARNING => $error_msg) );
+					$this->exitSuccess  = false;
+
+					return $this->terminate($file_id, $exitMessages);
+				}
 
 				// Create audio preview file, if file is a media file
 				if (!empty($fileObj->mediaData))
 				{
-					$model->createAudioPreview($field, $fileObj);
+					$res = $model->createAudioPreview($field, $fileObj);
+					if (!$res)
+					{
+						$error_msg = JText::_("File uploaded successfully.\nBut got error during creating preview files")
+							. ":\n  " . $model->getError();
+						$this->exitHttpHead = array( 0 => array('status' => '500 Error') );
+						$this->exitMessages = array( 0 => array('warning' => $error_msg) );
+						$this->exitLogTexts = array( 0 => array(JLog::WARNING => $error_msg) );
+						$this->exitSuccess  = false;
+
+						return $this->terminate($file_id, $exitMessages);
+					}
 				}
 			}
 		}

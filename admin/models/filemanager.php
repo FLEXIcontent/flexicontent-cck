@@ -2082,6 +2082,17 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 			$this->_setUpLogger($logger);
 		}
 
+		$disabled_funcs = [];
+		if (FLEXIUtilities::funcIsDisabled('exec')) $disabled_funcs[] = "exec";
+
+		if ($disabled_funcs)
+		{
+			$error_mssg = "Cannot create audio preview file. Function(s): " . implode(', ', $disabled_funcs) . " are disabled. \n";
+			$this->setError($error_mssg);
+			JLog::add($error_mssg, JLog::ERROR, $logger->namespace);
+			return false;
+		}
+
 		// Absolute file paths (or URLs ?)
 		$full_path     = $file->full_path;
 		$full_path_prw = isset($file->full_path_prw) ? $file->full_path_prw : '';
@@ -2106,7 +2117,7 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 		if ($ffmpeg_path && !file_exists($ffmpeg_path))
 		{
 			$error_mssg = $file->filename . ' : Failed to open ffmpeg path: ' . $ffmpeg_path;
-			$this->exitMessages[] = array('error' => $error_mssg);
+			$this->setError($error_mssg);
 			JLog::add($error_mssg, JLog::ERROR, $logger->namespace);
 			$ffmpeg_path = '';
 		}
@@ -2114,7 +2125,7 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 		if ($audiowaveform_path && !file_exists($audiowaveform_path))
 		{
 			$error_mssg = $file->filename . ' : Failed to open audiowaveform path: ' . $audiowaveform_path;
-			$this->exitMessages[] = array('error' => $error_mssg);
+			$this->setError($error_mssg);
 			JLog::add($error_mssg, JLog::ERROR, $logger->namespace);
 			$audiowaveform_path = '';
 		}
@@ -2133,8 +2144,7 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 			if (!JFolder::exists($prv_path) && !JFolder::create($prv_path))
 			{
 				$error_mssg = $file->filename . ' : Failed to create preview folder: ' . $prv_path;
-
-				$this->exitMessages[] = array('error' => $error_mssg);
+				$this->setError($error_mssg);
 				JLog::add($error_mssg, JLog::ERROR, $logger->namespace);
 				return false;
 			}
@@ -2224,7 +2234,7 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 		if ($ffprobe_path && !file_exists($ffprobe_path))
 		{
 			$error_mssg = $file->filename . ' : Failed to open ffprobe path: ' . $ffprobe_path;
-			$this->exitMessages[] = array('error' => $error_mssg);
+			$this->setError($error_mssg);
 			JLog::add($error_mssg, JLog::ERROR, $logger->namespace);
 			$ffprobe_path = '';
 		}
@@ -2235,6 +2245,18 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 		 */
 		if ($ffprobe_path && in_array($ext, array('wav', 'mp3', 'aiff', 'mp4', 'mpg', 'mpeg', 'avi')))
 		{
+			$disabled_funcs = [];
+			if (FLEXIUtilities::funcIsDisabled('escapeshellarg')) $disabled_funcs[] = "escapeshellarg";
+			if (FLEXIUtilities::funcIsDisabled('shell_exec')) $disabled_funcs[] = "shell_exec";
+
+			if ($disabled_funcs)
+			{
+				$error_mssg = "Cannot detect audio properties. Function(s): " . implode(', ', $disabled_funcs) . " are disabled. \n";
+				$this->setError($error_mssg);
+				JLog::add($error_mssg, JLog::ERROR, $logger->namespace);
+				return false;
+			}
+
 			// Default options
 			$options = '-loglevel quiet -show_format -show_streams -print_format json';
 			//$options .= ' -pretty';
@@ -2244,12 +2266,15 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 
 			// Run the ffprobe, save the JSON output then decode
 			//ffprobe -v error -show_format -show_streams input.mp4
-			$json = json_decode(shell_exec(sprintf($ffprobe_path.' %s %s', $options, escapeshellarg($full_path))));
+			$json_cmd  = sprintf($ffprobe_path.' %s %s', $options, escapeshellarg($full_path));
+			$json_data = shell_exec($json_cmd);
+			$json = json_decode($json_data);
 
 			if (!isset($json->format))
 			{
-				$this->exitMessages[] = array('warning' => 'Unsupported file type. Cannot detect audio properties.');
-				JLog::add('Unsupported file type. Cannot detect audio properties.', JLog::ERROR, $logger->namespace);
+				$error_mssg = "Unsupported file type. Cannot detect audio properties.\nOR bad output";
+				$this->setError($error_mssg);
+				JLog::add($error_mssg	. "\nCommand: " . $json_cmd . "\nCommand output is:\n". $json_data, JLog::ERROR, $logger->namespace);
 				return false;
 			}
 			else
@@ -2301,7 +2326,7 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 				// Reference the media data object, maybe useful during preview file creation
 				$file->mediaData = $md_obj;
 
-				//$this->exitMessages[] = array('message' => print_r($json, true));
+				//print_r($json, true);
 				$logger->detailed_log
 					? JLog::add($full_path . "\n" . print_r($json->streams[0], true), JLog::INFO, $logger->namespace)
 					: JLog::add($full_path . "\n" .
