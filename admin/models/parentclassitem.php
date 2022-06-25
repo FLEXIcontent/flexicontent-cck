@@ -3854,10 +3854,10 @@ class ParentClassItem extends FCModelAdmin
 		}
 		else
 		{
-			$params->set('automatic_pathways', $catParams->get('automatic_pathways'));
-			$params->set('add_canonical', $catParams->get('add_canonical'));
-			$params->set('microdata_itemtype', $catParams->get('microdata_itemtype_cat'));
-			$params->set('comments', $catParams->get('comments'));
+			if (strlen($catParams->get('automatic_pathways'))) $params->set('automatic_pathways', $catParams->get('automatic_pathways'));
+			if (strlen($catParams->get('add_canonical'))) $params->set('add_canonical', $catParams->get('add_canonical'));
+			if (strlen($catParams->get('microdata_itemtype_cat'))) $params->set('microdata_itemtype', $catParams->get('microdata_itemtype_cat'));
+			if (strlen($catParams->get('comments'))) $params->set('comments', $catParams->get('comments'));
 		}
 
 		// c. Merge TYPE parameters into the page configuration
