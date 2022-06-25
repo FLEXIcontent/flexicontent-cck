@@ -1968,7 +1968,7 @@ class plgSystemFlexisystem extends JPlugin
 			$xml = simplexml_load_file($layoutpath);
 			if (!$xml)
 			{
-				JFactory::getApplication()->enqueueMessage('Error parsing layout file of "'.$new_ilayout.'". Layout parameters were not saved', 'warning');
+				JFactory::getApplication()->enqueueMessage('Error parsing layout file of "'.$layoutpath.'". Layout parameters were not saved', 'warning');
 				return;
 			}
 
