@@ -5,6 +5,10 @@ defined('_JEXEC') or die('Restricted access');
  * Place rendered field using the ordering of fields manager, (and unset them)
  */
 foreach ($this->fields as $fn => $field) :
+	// Remove 'form_' prefix from field name
+	$fn = preg_replace('/^' . preg_quote('form_', '/') . '/', '', $fn);
+
+	// Check field was populated into the 'rendered' array
 	if (!isset($rendered[$fn])) continue;
 	?>
 	<div class="fcclear"></div>
