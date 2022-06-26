@@ -30,11 +30,7 @@ class osmap_com_flexicontent
 	static function getTree($osmap, $parent, $params)
 	{
 		// A quick filter to find if given links has tree to be expanded
-		if (strpos($parent->link, 'view=category') || strpos($parent->link, 'view=tags') || strpos($parent->link, 'view=item'))
-		{
-			// Has Tree
-		}
-		else
+		if (!strpos($parent->link, 'view=category') && !strpos($parent->link, 'view=tags') && !strpos($parent->link, 'view=item'))
 		{
 			// DO NOT have tree, or we do not want to expand further,
 			// e.g. we do not want to expand 'favourites' view or 'search' view
@@ -273,9 +269,9 @@ class osmap_com_flexicontent
 		}
 
 		// OTHER unhandled, this should be unreachable
-		else
+		/*else
 		{
-		}
+		}*/
 	}
 
 
@@ -496,7 +492,7 @@ class osmap_com_flexicontent
 	 */
 	static function &getItems( $where_basic, &$params, $extra_join, $extra_endwhere )
 	{
-		static $db, $user, $nullDate, $now, $ordering, $access_clauses;
+		static $db, $user, $nullDate, $_nowDate, $ordering, $access_clauses;
 		static $initialized = null;
 
 		if ($initialized === null)
