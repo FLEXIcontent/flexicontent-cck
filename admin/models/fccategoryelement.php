@@ -224,6 +224,8 @@ class FlexicontentModelFccategoryelement extends FCModelAdminList
 				// 2, get current items total for pagination
 				$this->_db->setQuery("SELECT FOUND_ROWS()");
 				$this->_total = $this->_db->loadResult();
+				// Check if something intefered with the query, and SQL_CALC_FOUND_ROWS did not work, do extra query
+				if (count($rows) && !$this->_total) $this->_total = null;
 
 				// 3, get item ids
 				$query_ids = array();

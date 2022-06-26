@@ -62,6 +62,16 @@ class FlexicontentViewItemelement extends FlexicontentViewBaseRecords
 			JFactory::getLanguage()->load($this->proxy_option, JPATH_ADMINISTRATOR, null, true);
 		}
 
+		if (JFactory::getApplication()->isClient('site'))
+		{
+			// Note : we use some strings from administrator part, so we will also load administrator language file
+			// TODO: remove this need by moving common language string to different file ?
+
+			// Load english language file for 'com_flexicontent' component then override with current language file
+			JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, 'en-GB', true);
+			JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, true);
+		}
+
 		// Get model
 		$model   = $this->getModel();
 		$model_s = $this->getModel($this->name_singular);

@@ -153,6 +153,17 @@ class FlexicontentModelCategory extends JModelLegacy {
 	var $_active_search = null;
 	var $_active_ai     = null;
 
+
+	/**
+	 * Array of supported state conditions of the record
+	 */
+	var $supported_conditions = array(
+		 1 => 'FLEXI_PUBLISHED',
+		 0 => 'FLEXI_UNPUBLISHED',
+		 2 => 'FLEXI_ARCHIVED',
+		-2 => 'FLEXI_TRASHED'
+	);
+
 	/**
 	 * Constructor
 	 *

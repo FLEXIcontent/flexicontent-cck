@@ -41,6 +41,7 @@ class FlexicontentViewFccategoryelement extends FlexicontentViewBaseRecords
 		$cparams  = JComponentHelper::getParams('com_flexicontent');
 		$session  = JFactory::getSession();
 		$db       = JFactory::getDbo();
+		$perms    = FlexicontentHelperPerm::getPerm();
 
 		$option   = $jinput->getCmd('option', '');
 		$view     = $jinput->getCmd('view', '');
@@ -59,6 +60,16 @@ class FlexicontentViewFccategoryelement extends FlexicontentViewBaseRecords
 		{
 			JFactory::getLanguage()->load($this->proxy_option, JPATH_ADMINISTRATOR, 'en-GB', true);
 			JFactory::getLanguage()->load($this->proxy_option, JPATH_ADMINISTRATOR, null, true);
+		}
+
+		if (JFactory::getApplication()->isClient('site'))
+		{
+			// Note : we use some strings from administrator part, so we will also load administrator language file
+			// TODO: remove this need by moving common language string to different file ?
+
+			// Load english language file for 'com_flexicontent' component then override with current language file
+			JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, 'en-GB', true);
+			JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, true);
 		}
 
 		// Get model
@@ -168,13 +179,14 @@ class FlexicontentViewFccategoryelement extends FlexicontentViewBaseRecords
 
 
 		/**
-		 * Get data from the model, note data retrieval must be before 
+		 * Get data from the model, note data retrieval must be before
 		 * getTotal() and getPagination() because it also calculates total rows
 		 */
 
 		if ( $print_logging_info )  $start_microtime = microtime(true);
 
 		$rows        = $model->getData();
+		$pagination  = $model->getPagination();
 		$authors     = $model->getAuthorslist();
 
 		$lang_assocs = $useAssocs ? $model->getLangAssocs() : array();
@@ -183,8 +195,6 @@ class FlexicontentViewFccategoryelement extends FlexicontentViewBaseRecords
 
 		if ( $print_logging_info ) @$fc_run_times['execute_main_query'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 
-		// Create pagination object
-		$pagination = $this->get('Pagination');
 
 		// Ordering active FLAG
 		$ordering = $filter_order === 'a.lft';
@@ -211,6 +221,7 @@ class FlexicontentViewFccategoryelement extends FlexicontentViewBaseRecords
 
 		$lists[$elementid] = $this->getFilterDisplay(array(
 			'label' => JText::_('FLEXI_CATEGORY'),
+			'label_extra_class' => ($value ? ' fc-lbl-inverted' : ''),
 			'html' => flexicontent_cats::buildcatselect(
 				$categories,
 				$fieldname,
@@ -221,7 +232,7 @@ class FlexicontentViewFccategoryelement extends FlexicontentViewBaseRecords
 					'size' => '1',
 					'onchange' => 'if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();',
 				),
-				$check_published = true,
+				$check_published = ! ($perms->ViewAllCats || $perms->CanCats),
 				$check_perms = false
 			),
 		));
@@ -245,6 +256,7 @@ class FlexicontentViewFccategoryelement extends FlexicontentViewBaseRecords
 		{
 			$lists[$elementid] = $this->getFilterDisplay(array(
 				'label' => JText::_('FLEXI_MAX_DEPTH'),
+				'label_extra_class' => ($value ? ' fc-lbl-inverted' : ''),
 				'html' => JHtml::_('select.genericlist',
 					$options,
 					$fieldname,
@@ -271,6 +283,7 @@ class FlexicontentViewFccategoryelement extends FlexicontentViewBaseRecords
 		{
 			$lists[$elementid] = $this->getFilterDisplay(array(
 				'label' => JText::_('FLEXI_AUTHOR'),
+				'label_extra_class' => ($value ? ' fc-lbl-inverted' : ''),
 				'html' => flexicontent_html::buildauthorsselect(
 					$authors,
 					$fieldname,
@@ -296,18 +309,20 @@ class FlexicontentViewFccategoryelement extends FlexicontentViewBaseRecords
 		// Build language filter
 		$fieldname = 'filter_lang';
 		$elementid = 'filter_lang';
+		$value     = $filter_lang;
 
 		if (!$assocs_id || !$item_lang)
 		{
 			$lists[$elementid] = $this->getFilterDisplay(array(
 				'label' => JText::_('FLEXI_LANGUAGE'),
+				'label_extra_class' => ($value ? ' fc-lbl-inverted' : ''),
 				'html' => flexicontent_html::buildlanguageslist(
 					$fieldname,
 					array(
 						'class' => $this->select_class,
 						'onchange' => 'if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();',
 					),
-					$filter_lang,
+					$value,
 					$displaytype = '-'
 				),
 			));
@@ -337,6 +352,7 @@ class FlexicontentViewFccategoryelement extends FlexicontentViewBaseRecords
 
 		$lists[$elementid] = $this->getFilterDisplay(array(
 			'label' => JText::_('FLEXI_STATE'),
+			'label_extra_class' => ($value ? ' fc-lbl-inverted' : ''),
 			'html' => JHtml::_('select.genericlist',
 				$options,
 				$fieldname,
@@ -364,6 +380,7 @@ class FlexicontentViewFccategoryelement extends FlexicontentViewBaseRecords
 
 		$lists[$elementid] = $this->getFilterDisplay(array(
 			'label' => JText::_('FLEXI_ACCESS'),
+			'label_extra_class' => ($value ? ' fc-lbl-inverted' : ''),
 			'html' => JHtml::_('select.genericlist',
 				$options,
 				$fieldname,
@@ -412,7 +429,7 @@ class FlexicontentViewFccategoryelement extends FlexicontentViewBaseRecords
 		$this->pagination  = $pagination;
 		$this->ordering    = $ordering;
 
-		$this->perms  = FlexicontentHelperPerm::getPerm();
+		$this->perms  = $perms;
 		$this->option = $option;
 		$this->view   = $view;
 		$this->state  = $this->get('State');
