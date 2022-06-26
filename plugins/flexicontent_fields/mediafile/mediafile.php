@@ -718,6 +718,11 @@ class plgFlexicontent_fieldsMediafile extends FCField
 		//$this->setItem($item);
 		//$this->displayField( $formlayout );
 
+		$drop_btn_class =
+			(FLEXI_J40GE
+				? 'btn btn-sm toolbar dropdown-toggle dropdown-toggle-split'
+				: 'btn btn-small toolbar dropdown-toggle'
+			);
 		include(self::getFormPath($this->fieldtypes[0], $formlayout));
 
 		foreach($field->html as $n => &$_html)
@@ -1321,8 +1326,8 @@ class plgFlexicontent_fieldsMediafile extends FCField
 					$Fobj->stamp  = 0; //(int) $field->parameters->get('iform_stamp_default', 0);
 					$Fobj->keep   = 1;
 
-					$upload_err = null;
-					$file_ids = $fman->addlocal($Fobj, $upload_err);
+					$upload_errs = null;
+					$file_ids = $fman->addlocal($Fobj, $upload_errs);
 
 					// Get fist element
 					$v = !empty($file_ids) ? reset($file_ids) : ($use_ingroup ? null : false);
@@ -1482,8 +1487,8 @@ class plgFlexicontent_fieldsMediafile extends FCField
 					$app->input->set('fname_level2', $n);
 					$app->input->set('fname_level3', 'file-data');
 
-					$upload_err = null;
-					$file_id = $fman->upload(null, $upload_err);
+					$upload_errs = null;
+					$file_id = $fman->upload(null, $upload_errs);
 					$v = !empty($file_id) ? $file_id : ($use_ingroup ? null : false);
 
 					if (empty($file_id)) foreach ($upload_errs as $err_type => $upload_err)
@@ -1594,7 +1599,7 @@ class plgFlexicontent_fieldsMediafile extends FCField
 			{
 				case 'media_format':  $filtername = JText::_('FLEXI_FIELD_MEDIADATA_MEDIA_TYPE'); break;
 				case 'sample_rate':  $filtername = JText::_('FLEXI_FIELD_MEDIADATA_SAMPLE_RATE'); break;
-				case 'duration':  $filtername = 'Duration (seconds)'; break;
+				case 'duration':  $filtername = JText::_('FLEXI_FIELD_MEDIADATA_DURATION_SECONDS'); break;
 			}
 
 			$filter->html[] = '

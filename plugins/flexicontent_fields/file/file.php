@@ -680,6 +680,11 @@ class plgFlexicontent_fieldsFile extends FCField
 		//$this->setItem($item);
 		//$this->displayField( $formlayout );
 
+		$drop_btn_class =
+			(FLEXI_J40GE
+				? 'btn btn-sm toolbar dropdown-toggle dropdown-toggle-split'
+				: 'btn btn-small toolbar dropdown-toggle'
+			);
 		include(self::getFormPath($this->fieldtypes[0], $formlayout));
 
 		foreach($field->html as $n => &$_html)
@@ -1245,8 +1250,8 @@ class plgFlexicontent_fieldsFile extends FCField
 					$Fobj->stamp  = (int) $field->parameters->get('iform_stamp_default', 1);
 					$Fobj->keep   = 1;
 
-					$upload_err = null;
-					$file_ids = $fman->addlocal($Fobj, $upload_err);
+					$upload_errs = null;
+					$file_ids = $fman->addlocal($Fobj, $upload_errs);
 
 					// Get fist element
 					$v = !empty($file_ids) ? reset($file_ids) : ($use_ingroup ? null : false);
@@ -1406,8 +1411,8 @@ class plgFlexicontent_fieldsFile extends FCField
 					$app->input->set('fname_level2', $n);
 					$app->input->set('fname_level3', 'file-data');
 
-					$upload_err = null;
-					$file_id = $fman->upload(null, $upload_err);
+					$upload_errs = null;
+					$file_id = $fman->upload(null, $upload_errs);
 					$v = !empty($file_id) ? $file_id : ($use_ingroup ? null : false);
 
 					if (empty($file_id)) foreach ($upload_errs as $err_type => $upload_err)
