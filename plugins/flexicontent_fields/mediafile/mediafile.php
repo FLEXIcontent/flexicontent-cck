@@ -1542,7 +1542,7 @@ class plgFlexicontent_fieldsMediafile extends FCField
 			'resolution', 'fps', 'bit_rate', 'bits_per_sample', 'sample_rate', 'duration',
 			'channels', 'channel_layout', 'checked_out', 'checked_out_time');
 			*/
-		$mediadata = array('media_format', 'sample_rate');
+		$mediadata = array('media_format', 'sample_rate', 'duration');
 		$media_property_filters = $filter->parameters->set('media_property_filters', $mediadata);
 
 		$html = array();
@@ -1571,6 +1571,12 @@ class plgFlexicontent_fieldsMediafile extends FCField
 			$filter->label = $prop_name;
 			$filter->filt_prop_name = $prop_name;
 
+			// For duration use text range
+			if ($prop_name === 'duration')
+			{
+				$filter->parameters->set('display_filter_as', 3);
+			}
+
 			FlexicontentFields::createFilter($filter, $prop_value, $formName);
 			$html[$prop_name] = $filter->html;
 		}
@@ -1584,15 +1590,11 @@ class plgFlexicontent_fieldsMediafile extends FCField
 		{
 			$filtername = $prop_name;
 
-			if ($prop_name == 'media_format')
+			switch($prop_name)
 			{
-				// Change 'channels' to '# Channels' you can also you language   JText::_('SOMENAME');
-				$filtername = JText::_('FLEXI_FIELD_MEDIADATA_MEDIA_TYPE');	
-			}
-			elseif ($prop_name == 'sample_rate')
-			{
-				// Change 'channels' to '# Channels' you can also you language   JText::_('SOMENAME');
-				$filtername = JText::_('FLEXI_FIELD_MEDIADATA_SAMPLE_RATE');	
+				case 'media_format':  $filtername = JText::_('FLEXI_FIELD_MEDIADATA_MEDIA_TYPE'); break;
+				case 'sample_rate':  $filtername = JText::_('FLEXI_FIELD_MEDIADATA_SAMPLE_RATE'); break;
+				case 'duration':  $filtername = 'Duration (seconds)'; break;
 			}
 
 			$filter->html[] = '
@@ -1627,7 +1629,7 @@ class plgFlexicontent_fieldsMediafile extends FCField
 			'resolution', 'fps', 'bit_rate', 'bits_per_sample', 'sample_rate', 'duration',
 			'channels', 'channel_layout', 'checked_out', 'checked_out_time');
 		*/
-		$mediadata = array('media_format', 'sample_rate');
+		$mediadata = array('media_format', 'sample_rate', 'duration');
 		$media_property_filters = $filter->parameters->set('media_property_filters', $mediadata);
 
 		$results = array();
@@ -1647,6 +1649,12 @@ class plgFlexicontent_fieldsMediafile extends FCField
 			$filter->label = $prop_name;
 			$filter->filt_prop_name = $prop_name;
 			$filter->filter_colname = 'md.' . $prop_name;
+
+			// For duration use text range
+			if ($prop_name === 'duration')
+			{
+				$filter->parameters->set('display_filter_as', 3);
+			}
 
 			$res = FlexicontentFields::getFiltered($filter, $prop_value, $return_sql);
 			if ($res)
