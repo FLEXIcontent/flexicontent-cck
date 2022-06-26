@@ -4792,6 +4792,12 @@ div.fc-fieldgrp-value-box {
 body #config {
 	margin-bottom: 230px;
 }
+.fc_val_plg_not_fould_or_upublished_mssg {
+	opacity: 0.6;
+}
+.fc_val_translation_shared_mssg {
+	opacity: 0.7;
+}
 hr.fcclearline {
 	border: 0;
 	height: 1px;
