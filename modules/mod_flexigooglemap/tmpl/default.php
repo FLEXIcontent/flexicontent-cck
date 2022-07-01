@@ -504,7 +504,7 @@ $use_mlist = (int) $params->get('use_dynamic_marker_list', 0);
 			
 			map._topLayerGroup_ref = group;
 			if (markers.length)
-				map.fitBounds(group.getBounds().pad(<?php echo $minzoommarker;?>)));
+				map.fitBounds(group.getBounds().pad(<?php echo $minzoommarker;?>));
 			else
 				map.setZoom(1);
 
