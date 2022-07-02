@@ -1990,7 +1990,7 @@ class flexicontent_html
 				$js .= '
 					jQuery( document ).ready(function() {
 						jQuery("body").prepend(\'\\
-							<div id="fc_filter_form_blocker">\\
+							<div id="fc_filter_form_blocker" style="display: none;">\\
 								<div class="fc_blocker_overlay" style="' . $styles->overlay_box . '"></div>\\
 								<div class="fc_blocker_content" style="' . $styles->content_box . '">\\
 									' . ($logo_imgsrc  ? '<div class="fc_blocker_logo" style="' . $styles->logo_box . '" ><img src="' . $logo_imgsrc . '" alt="' . $mssg_text . '"></div>' : '') . '\\
