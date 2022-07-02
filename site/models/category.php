@@ -1408,17 +1408,20 @@ class FlexicontentModelCategory extends JModelLegacy {
 			// Skip filters without value
 			if (is_array($filt_vals))
 			{
-				if (!count($filt_vals))
+				$is_empty = true;
+				if (count($filt_vals))
 				{
-					$is_empty = true;
-				}
-				else
-				{
-					$v = reset($filt_vals);
+					foreach ($filt_vals as $v)
+					{
+						if (is_array($v)) {
+							$v2 = reset($v);
 
-					$is_empty = is_array($v)
-						? false
-						: !strlen(trim(implode('', $filt_vals)));
+							$is_empty = $is_empty && (is_array($v2)
+								? false
+								: !strlen(trim(implode('', $v))));
+						}
+						else $is_empty = $is_empty && !strlen(trim($v));
+					}
 				}
 			}
 			else

@@ -937,7 +937,7 @@ class plgFlexicontent_fieldsMediafile extends FCField
 
 		$useicon = $field->parameters->get( 'useicon', 0 ) ;
 		$lowercase_filename = $field->parameters->get( 'lowercase_filename', 1 ) ;
-		
+
 		$display_filename	= (int) $field->parameters->get( 'display_filename', 1 ) ;
 		$display_lang     = (int) $field->parameters->get( 'display_lang', 1 ) ;
 		$display_size			= (int) $field->parameters->get( 'display_size', 0 ) ;
@@ -1577,6 +1577,7 @@ class plgFlexicontent_fieldsMediafile extends FCField
 			$filter->filt_prop_name = $prop_name;
 
 			// For duration use text range
+			$display_filter_as = $filter->parameters->set('display_filter_as', 0);
 			if ($prop_name === 'duration')
 			{
 				$filter->parameters->set('display_filter_as', 3);
@@ -1584,8 +1585,11 @@ class plgFlexicontent_fieldsMediafile extends FCField
 
 			FlexicontentFields::createFilter($filter, $prop_value, $formName);
 			$html[$prop_name] = $filter->html;
+
+			// Restore previous value of filter
+			$filter->parameters->set('display_filter_as', $display_filter_as);
 		}
-		
+
 
 		unset($filter->filt_prop_name);
 
@@ -1647,6 +1651,10 @@ class plgFlexicontent_fieldsMediafile extends FCField
 				. ' JOIN #__flexicontent_mediadatas AS md ON f.id = md.file_id';
 
 			$prop_value = isset($value[$prop_name]) ? $value[$prop_name] : null;  // TODO GET FROM URI
+			$is_empty  = ($prop_value && is_array($prop_value)) ? !strlen(trim(implode('', $prop_value))) : !strlen(trim($prop_value));
+
+			//  No posted value, nothing to do
+			if ($is_empty) continue;
 			//echo 'filter_id: ' . $filter->id . '<br>';
 			//echo '<pre>'; print_r($prop_value); echo '</pre>';
 
@@ -1656,6 +1664,7 @@ class plgFlexicontent_fieldsMediafile extends FCField
 			$filter->filter_colname = 'md.' . $prop_name;
 
 			// For duration use text range
+			$display_filter_as = $filter->parameters->set('display_filter_as', 0);
 			if ($prop_name === 'duration')
 			{
 				$filter->parameters->set('display_filter_as', 3);
@@ -1666,12 +1675,17 @@ class plgFlexicontent_fieldsMediafile extends FCField
 			{
 				$results[] = $res;
 			}
+
+			// Restore previous value of filter
+			$filter->parameters->set('display_filter_as', $display_filter_as);
 		}
 
 		unset($filter->filt_prop_name);
-
 		$filter->label = $label;
-		return implode(' ', $results);
+
+		// This method should not have been called for empty values ... but in case this is called for empty values ...
+		// return a non-empty string (prepend a space) to indicate no filtering should be done for this field
+		return ' ' . implode(' ', $results);
 	}
 
 	// Method to get the active filter result (an array of item ids matching field filter, or subquery returning item ids)
@@ -1773,7 +1787,7 @@ class plgFlexicontent_fieldsMediafile extends FCField
 				$new_ids[] = $f;
 			}
 		}
-		
+
 		$md_select = 'md.state, md.media_type, md.media_format, md.codec_type, md.codec_name, md.codec_long_name, ' .
 			'md.resolution, md.fps, md.bit_rate, md.bits_per_sample, md.sample_rate, md.duration, ' .
 			'md.channels, md.channel_layout, md.checked_out, md.checked_out_time, ';
