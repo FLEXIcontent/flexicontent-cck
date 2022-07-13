@@ -62,6 +62,35 @@ if ($map_style)
 	}
 }
 
+$marker_clicktarget = $params->get('marker_clicktarget', '_popup');
+if ($info_popup <= 1)
+{
+	$onclick_js  = '';
+}
+elseif ($info_popup >= 2)
+{
+  if ($marker_clicktarget === '_popup')
+  {
+    $onclick_js  = 'fc_field_dialog_handle_'.$module->id.' = fc_showDialog(jQuery(this).data(\'content_link\'), \'fc_modal_popup_container\', 0, 0, 0, 0, {title: \'\'}); return false;';
+  }
+  else
+  {
+    $_target_win = $marker_clicktarget === '_modal'
+      ? 'module_' . $module->id . '_window'   // For "_modal" case we use same (named) window for all links
+      : $marker_clicktarget;
+    $onclick_js  = 'window.open(jQuery(this).data(\'content_link\'), \'' . $_target_win . '\', \'toolbar=no,location=no,status=no,menubar=no,scrollbars=yes,resizable=yes,width=600,height=600\'); return false;';
+  }
+
+  // For case of link to item views we will add tmpl=component to the URL
+	foreach($mapItemData as $mapItem)
+	{
+		$mapItem->content_link = $mapItem->link . ($info_popup === 2
+        ? (strpos($mapItem->link,'?', 0) === false ? '?' : '&') . 'tmpl=component'
+        : '');
+	}
+}
+
+
 $gridsize = $params->get('gridsize', '');
 $maxzoom  = $params->get('maxzoom', '');
 $ratiomap = $params->get('ratiomap','');
@@ -220,10 +249,17 @@ $use_mlist = (int) $params->get('use_dynamic_marker_list', 0);
 		}
 
 
+    function fc_MapMod_on_marker_click_<?php echo $module->id;?>(e)
+    {
+        <?php echo $onclick_js; ?>
+    }
+
+
 		function fc_MapMod_initialize_<?php echo $module->id;?>()
 		{
 			// Define your locations: HTML content for the info window, latitude, longitude
 			var locations = [ <?php echo implode(",",  $renderedMapLocations); ?>  ];
+			var mapItems  = <?php echo json_encode($mapItemData); ?>;
 
 			var map = new google.maps.Map(document.getElementById('fc_module_map_<?php echo $module->id;?>'), {
 				maxZoom: [<?php echo $maxzoommarker; ?>],
@@ -279,6 +315,10 @@ $use_mlist = (int) $params->get('use_dynamic_marker_list', 0);
 				marker._location_info = locations[i][0];
 				marker._icon_url = locations[i][3] == '__default__' ? '<?php echo $defaultMarkerURL ?: $defaut_icon_url;?>' : locations[i][3];
 				marker._map_ref = map;
+
+        jQuery(marker).data('content_link', mapItems[i].content_link);
+        if (<?php echo strlen($onclick_js) ? 1 : 0 ?>)
+		      google.maps.event.addListener(marker, 'click', fc_MapMod_on_marker_click_<?php echo $module->id; ?>);
 
 				markers.push(marker);
 
@@ -425,9 +465,16 @@ $use_mlist = (int) $params->get('use_dynamic_marker_list', 0);
 		};
 
 
+		function fc_MapMod_on_marker_click_<?php echo $module->id;?>(e)
+		{
+				<?php echo $onclick_js; ?>
+		}
+
+
 		function fc_MapMod_initialize_<?php echo $module->id;?>()
 		{
 			var locations = [ <?php echo implode(",",  $renderedMapLocations); ?>  ];
+  		var mapItems  = <?php echo json_encode($mapItemData); ?>;
 
 			var markerClusters;
 			var markers = [];
@@ -480,6 +527,10 @@ $use_mlist = (int) $params->get('use_dynamic_marker_list', 0);
 				marker._location_info = locations[i][0];
 				marker._icon_url = locations[i][3] == '__default__' ? '<?php echo $defaultMarkerURL ?: $defaut_icon_url;?>' : locations[i][3];
 				marker._map_ref = map;
+
+  		  jQuery(marker).data('content_link', mapItems[i].content_link);
+				if (<?php echo strlen($onclick_js) ? 1 : 0 ?>)
+				  marker.on('click', fc_MapMod_on_marker_click_<?php echo $module->id; ?>);
 
 				marker
 					<?php /* Display information window on marker click */

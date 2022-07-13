@@ -122,9 +122,21 @@ $add_ccs      = is_numeric($add_ccs) ? (int) $add_ccs : ($disable_css ? 0 : 1);
 $add_tooltips = 0; //(int) $params->get('add_tooltips', 1);
 
 /**
- * Render the map locations
+ * Render the map locations and get items having these markers
+ * These are 2 arrays indexed with same number e.g. 25 locations, 25 items (of these items e.g. 8 are unique items)
  */
-$renderedMapLocations = modFlexigooglemapHelper::renderMapLocations($params);
+$mapItems = null;
+$renderedMapLocations = modFlexigooglemapHelper::renderMapLocations($params, $mapItems);
+
+$mapItemData = [];
+foreach($mapItems as $mapItem)
+{
+	$mapItemData[] = (object) array(
+		'title' => $mapItem->title,
+		'link' => $mapItem->link,
+	);
+}
+
 
 /**
  * Default marker URL is used in map locations that do not include a custom marker (via item form)

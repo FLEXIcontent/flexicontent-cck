@@ -281,8 +281,8 @@
 				<option value="_parent">FLEXI_FIELD_LINK_PARENT_FRM</option>
 				<option value="_self">FLEXI_FIELD_LINK_SAME_FRM_WIN_TAB</option>
 				<option value="_top">FLEXI_FIELD_LINK_TOP_FRM</option>
-				<option value="_popup">FLEXI_FIELD_LINK_SINGLE_POPUP_WIN</option>
-				<option value="_modal">FLEXI_FIELD_LINK_MODAL_POPUP_WIN</option>
+				<option value="_popup">FLEXI_FIELD_LINK_JS_POPUP_BOX</option>
+				<option value="_modal">FLEXI_FIELD_LINK_SINGLE_WIN</option>
 			</field>
 			<field name="use_direct_link" type="radio" default="0" label="FLEXI_FIELD_USE_DIRECT_LINKS" description="FLEXI_FIELD_USE_DIRECT_LINKS_DESC" class="btn-group group-fcmethod">
 				<option value="0">FLEXI_NO</option>

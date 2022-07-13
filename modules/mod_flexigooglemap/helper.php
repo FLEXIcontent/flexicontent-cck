@@ -109,7 +109,7 @@ class modFlexigooglemapHelper
 	}
 
 
-	public static function renderMapLocations($params)
+	public static function renderMapLocations($params, & $mapItems = null)
 	{
 		$uselink = $params->get('uselink', '');
 		$useadress = $params->get('useadress', '');
@@ -146,6 +146,9 @@ class modFlexigooglemapHelper
 		{
 			$itemsLocations = modFlexigooglemapHelper::getItemsLocations($params);
 			$itemsLocations = $itemsLocations ?: array();
+
+			// Items having these markers, to be used by the module layout
+			$mapItems = $itemsLocations;
 
 			foreach ($itemsLocations as $itemLoc)
 			{
@@ -289,6 +292,10 @@ class modFlexigooglemapHelper
 					: array();
 			}
 
+			// Items having these markers, to be used by the module layout,
+			// We will create one to one array below for locations and items (items are repeated if having multiple locations)
+			$mapItems = array();
+
 			foreach ($fc_list_items as $address)
 			{
 				// Skip item if it has no address value
@@ -311,6 +318,7 @@ class modFlexigooglemapHelper
 					$link = '';
 					$addr = '';
 					$linkdirection = '';
+					$mapItems[] = $address;  // item
 
 					if ($uselink)
 					{
