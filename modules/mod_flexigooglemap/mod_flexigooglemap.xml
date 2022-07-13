@@ -122,11 +122,11 @@
 				description="MOD_FLEXIGOOGLEMAP_MAXZOOMMARKER_DESC"
 			/>
 			<field
-				name="minzoommarkerr" type="number"
-				default="0.5" label="MOD_FLEXIGOOGLEMAP_MINZOOMMARKER"
-				description="MOD_FLEXIGOOGLEMAP_INZOOMMARKER_DESC"
-				min="0"
-				max="1"
+					name="mappadding" type="number"
+					default="0.5" label="MOD_FLEXIGOOGLEMAP_MAP_PADDING"
+					description="MOD_FLEXIGOOGLEMAP_MAP_PADDING_DESC"
+					min="0"
+					max="1"
 			/>
 			<field
 				name="count" type="list"
@@ -207,7 +207,7 @@
 			<field name="" type="separator" default="MOD_FLEXIGOOGLEMAP_BEHAVIOUR_N_STYLE" level="level3" />
 			<field
 				name="usescrollmouse" type="radio"
-				default="1" label="MOD_FLEXIGOOGLEMAP_USESCROLLMOUSE"
+				default="true" label="MOD_FLEXIGOOGLEMAP_USESCROLLMOUSE"
 				description="MOD_FLEXIGOOGLEMAP_USESCROLLMOUSE_DESC"
 				class="btn-group btn-group-yesno"
 				>
@@ -285,7 +285,7 @@
 			</field>
 
 			<field
-				name="$forced_itemid" type="text"
+				name="forced_itemid" type="text"
 				default="" label="MOD_FLEXIGOOGLEMAP_FORCEITEMID"
 				description="MOD_FLEXIGOOGLEMAP_FORCEITEMID_DESC"
 				showon="uselink:1"
@@ -295,7 +295,7 @@
 				name="infotextmode" type="radio"
 				default="0" label="MOD_FLEXIGOOGLEMAP_INFOTEXTMODE"
 				description="MOD_FLEXIGOOGLEMAP_INFOTEXTMODE_DESC"
-				class="btn-group btn-group-yesno"
+				class="btn-group group-fcinfo"
 				>
 				<option value="0">MOD_FLEXIGOOGLEMAP_INFOTEXTMODE_SIMPLE</option>
 				<option value="1">MOD_FLEXIGOOGLEMAP_INFOTEXTMODE_FULL</option>
@@ -325,14 +325,14 @@
 
 			<field
 				name="directionname" type="text"
-				default="MOD_FLEXIGOOGLEMAP_DIRECTIONNAME_TXT" label="MOD_FLEXIGOOGLEMAP_DIRECTIONNAME"
+				hint="MOD_FLEXIGOOGLEMAP_DIRECTIONNAME_TXT" label="MOD_FLEXIGOOGLEMAP_DIRECTIONNAME"
 				description="MOD_FLEXIGOOGLEMAP_DIRECTIONNAME_DESC" class="input-xxlarge"
 				showon="usedirection:1"
 			/>
 
 			<field
 				name="readmore" type="text"
-				default="MOD_FLEXIGOOGLEMAP_READMORE_TXT" label="MOD_FLEXIGOOGLEMAP_READMORE"
+				hint="MOD_FLEXIGOOGLEMAP_READMORE_TXT" label="MOD_FLEXIGOOGLEMAP_READMORE"
 				description="MOD_FLEXIGOOGLEMAP_READMORE_DESC" class="input-xxlarge"
 			/>
 

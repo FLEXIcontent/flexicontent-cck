@@ -41,7 +41,7 @@ $defaut_icon_url = $mapapi === 'googlemap'
 	: JUri::root(true) . '/components/com_flexicontent/librairies/leaflet/images/marker-icon.png';
 
 $maxzoommarker = $params->get('maxzoommarker', '');
-$minzoommarker = $params->get('minzoommarker', '0.5');
+$mappadding    = $params->get('mappadding', '0.5');
 $info_popup    = (int)$params->get('info_popup', 1);
 
 $mapstyle  = $params->get('mapstyle', '');
@@ -504,7 +504,7 @@ $use_mlist = (int) $params->get('use_dynamic_marker_list', 0);
 			
 			map._topLayerGroup_ref = group;
 			if (markers.length)
-				map.fitBounds(group.getBounds().pad(<?php echo $minzoommarker;?>));
+				map.fitBounds(group.getBounds().pad(<?php echo $mappadding;?>));
 			else
 				map.setZoom(1);
 
