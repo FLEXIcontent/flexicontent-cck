@@ -45,6 +45,11 @@ $mappadding    = (int) $params->get('mappadding', '50');
 $mappadding    = $mappadding >= 0 && $mappadding <= 100 ? $mappadding / 100.0 : 0.5;
 $info_popup    = (int) $params->get('info_popup', 1);
 
+$geo_locate          = (int) $params->get('geo_locate', 0);
+$geo_locate_btn      = (int) $params->get('geo_locate_btn', 0);
+$geo_locate_zoom_sel = (int) $params->get('geo_locate_zoom_sel', 0);
+$geo_locate_zoom_def = (int) $params->get('geo_locate_zoom_def', 10);
+
 $mapstyle  = $params->get('mapstyle', '');
 $mapstyle  = substr($mapstyle,1,-1); // Remove[] at end and start
 $map_style = trim($params->get('mapstyle', ''));
@@ -136,6 +141,44 @@ $use_mlist = (int) $params->get('use_dynamic_marker_list', 0);
 
 <div id="mod_fleximap_default<?php echo $module->id;?>" class="mod_fleximap map<?php echo $moduleclass_sfx ?>" style="display: contents;">
 
+  <div id="map_actions_box_<?php echo $module->id; ?>" class="map_actions_box"
+       style="display: flex; flex-direction: row; flex-wrap: wrap; gap: 16px; margin-bottom: 12px;"
+  >
+    <?php echo $geo_locate_btn ? '<span class="btn btn-primary geo-locate-me-btn">
+      ' . JText::_('Find near-by locations') . '
+      </span>
+      ' : ''; ?>
+    <?php if ($geo_locate_zoom_sel): ?>
+      <div>
+        <label class="label geo-locate-zoom-level-lbl"><?php echo JText::_('Zoom'); ?></label>&nbsp;
+        <select class="form-select geo-locate-zoom-level geo-locate-zoom-level-<?php echo $module->id; ?>" style="display: inline-block; width: auto;">
+        <?php
+        $distance_lbls = array(
+          15 => ' (Closest)',
+          10 => ' (Distant)',
+          7 => ' (Very distant)',
+          2 => ' (Most distant)',
+        );
+        for($i = 15; $i >=2; $i--)
+        {
+          echo '
+            <option value="' . $i . '"' . ($i == $geo_locate_zoom_def ? ' selected="selected"': '')
+            . '> ' . $i . (isset($distance_lbls[$i]) ? $distance_lbls[$i] : '')
+            . '</option>';
+        }
+        ?>
+        </select>
+      </div>
+      <?php endif; ?>
+    <div id="map_mssg_box_<?php echo $module->id; ?>" class=""map_mssg_box" style="display:flex; color: darkred; font-weight: bold; "></div>
+  </div>
+
+    <?php /*
+    metersPerPx = 156543.03392 * Math.cos(latLng.lat() * Math.PI / 180) / Math.pow(2, zoom);
+    'latLng.lat()' = map.getCenter().lat()
+    'zoom' = map.getZoom()
+    */?>
+
 	<div class="">
 
     <div class="<?php echo $use_mlist ? 'col8' : ''; ?>">
@@ -168,6 +211,39 @@ $use_mlist = (int) $params->get('use_dynamic_marker_list', 0);
 
 	<script src="modules/mod_flexigooglemap/assets/js/markerclusterer.js"></script>
 	<script>
+	  // Global reference to map
+    var module_map_<?php echo $module->id;?>;
+
+	  function fc_MapMad_geolocateMe_<?php echo $module->id; ?>(map)
+	  {
+      let output     = document.getElementById('map_mssg_box_<?php echo $module->id; ?>');
+      let zoom_level = jQuery('select.geo-locate-zoom-level-<?php echo $module->id; ?>').val();
+  		zoom_level = parseInt(zoom_level) ? parseInt(zoom_level) : <?php echo $geo_locate_zoom_def; ?>;
+
+  		if (!navigator.geolocation)
+		  {
+			  output.innerHTML = '<span class="geo-location-no-support" style="color: darkred;">Geolocation is not supported by your browser</span>';
+			  return;
+		  }
+
+		  function success(position)
+		  {
+			  var latitude  = position.coords.latitude;
+			  var longitude = position.coords.longitude;
+			  output.innerHTML = '<span class="geo-location-results" style="display:none;">Lat: ' + latitude + '° <br>Lng: ' + longitude + '°</span>';
+		    map.panTo(new google.maps.LatLng(latitude, longitude));
+		    map.setZoom(zoom_level);
+		  }
+
+		  function error()
+		  {
+			  output.innerHTML = '<span class="geo-location-blocked">Unable to retrieve your location</span>';
+		  }
+
+		  output.innerHTML =  '<span class="geo-location-trying" style="align-self: center;">Searching ...</span>';
+
+		  navigator.geolocation.getCurrentPosition(success, error);
+	  }
 
 		function fc_MapMod_addToVisibleList_<?php echo $module->id;?>(map, marker)
 		{
@@ -188,9 +264,9 @@ $use_mlist = (int) $params->get('use_dynamic_marker_list', 0);
 			btn2.className ='btn btn-highlight';
 			btn2._marker_ref = marker;
 			btn2.setAttribute('onclick', "new google.maps.event.trigger(this._marker_ref, 'click');");
-			li.appendChild(btn2);
 
 			//window.console.log(marker);
+			li.appendChild(btn2);
 			ol.appendChild(li);
 		};
 
@@ -367,12 +443,26 @@ $use_mlist = (int) $params->get('use_dynamic_marker_list', 0);
 				";
 			}
 			?>
+
+			// Center to markers
 			fc_MapMod_autoCenter_<?php echo $module->id;?>(map, markers);
+
+			// Try to geo-locate visitor
+			if (<?php echo $geo_locate ? 1 : 0; ?>) setTimeout(function () { fc_MapMad_geolocateMe_<?php echo $module->id; ?>(map); }, 50);
+
+			// Assign global map reference
+  		module_map_<?php echo $module->id;?> = map;
 		}
 
 		// Initialize the Map
 		fc_MapMod_initialize_<?php echo $module->id;?>();
 
+    // Geo locate visitor on-demand via button click
+    document.addEventListener("click", function(e){
+      if(e.target && e.target.classList.contains("geo-locate-me-btn")){
+        fc_MapMad_geolocateMe_<?php echo $module->id; ?>(module_map_<?php echo $module->id;?>);
+      }
+    });
 	</script>
 
 
@@ -380,6 +470,40 @@ $use_mlist = (int) $params->get('use_dynamic_marker_list', 0);
 
 
 	<script type="text/javascript">
+	  // Global reference to map
+	  var module_map_<?php echo $module->id;?>;
+
+    function fc_MapMad_geolocateMe_<?php echo $module->id; ?>(map)
+    {
+      let output     = document.getElementById('map_mssg_box_<?php echo $module->id; ?>');
+  		let zoom_level = jQuery('select.geo-locate-zoom-level-<?php echo $module->id; ?>').val();
+  		zoom_level = parseInt(zoom_level) ? parseInt(zoom_level) : <?php echo $geo_locate_zoom_def; ?>;
+
+      if (!navigator.geolocation)
+      {
+        output.innerHTML = '<span class="geo-location-no-support" style="color: darkred;">Geolocation is not supported by your browser</span>';
+        return;
+      }
+
+      function success(position)
+      {
+        var latitude  = position.coords.latitude;
+        var longitude = position.coords.longitude;
+  		  output.innerHTML = '<span class="geo-location-results" style="display:none;">Lat: ' + latitude + '° <br>Lng: ' + longitude + '°</span>';
+        map.flyTo([latitude, longitude], zoom_level);
+      }
+
+      function error()
+      {
+        output.innerHTML = '<span class="geo-location-blocked">Unable to retrieve your location</span>';
+      }
+
+      output.innerHTML =  '<span class="geo-location-trying" style="align-self: center;">Searching ...</span>';
+
+      navigator.geolocation.getCurrentPosition(success, error);
+    }
+
+
 		function fc_MapMod_addToVisibleList_<?php echo $module->id;?>(map, marker)
 		{
 			var ol = document.getElementById("fc_module_marker_list_<?php echo $module->id;?>");
@@ -424,9 +548,9 @@ $use_mlist = (int) $params->get('use_dynamic_marker_list', 0);
 					mLayer.openPopup(); //marker.fire(\'click\');
 				};
 				'; ?>
-			li.appendChild(btn2);
 
 			//window.console.log(marker);
+			li.appendChild(btn2);
 			ol.appendChild(li);
 		};
 
@@ -555,22 +679,43 @@ $use_mlist = (int) $params->get('use_dynamic_marker_list', 0);
 			'map.addLayer(markerClusters);' : ''; ?>
 			
 			map._topLayerGroup_ref = group;
-			if (markers.length)
-				map.fitBounds(group.getBounds().pad(<?php echo $mappadding;?>));
-			else
-				map.setZoom(1);
 
-			fc_MapMod_updateVisibleMarkerList_<?php echo $module->id;?>(map, markers);				
+		  // Center to markers
+			markers.length
+        ? map.fitBounds(group.getBounds().pad(<?php echo $mappadding;?>))
+        : map.setZoom(1);
+
+			// Try to geo-locate visitor
+			if (<?php echo $geo_locate ? 1 : 0; ?>) setTimeout(function () { fc_MapMad_geolocateMe_<?php echo $module->id; ?>(map); }, 50);
+
+			fc_MapMod_updateVisibleMarkerList_<?php echo $module->id;?>(map, markers);
 
 			map.on('moveend', function(e)
 			{
 				//window.console.log('moveend');
-				fc_MapMod_updateVisibleMarkerList_<?php echo $module->id;?>(map, markers);				
+				fc_MapMod_updateVisibleMarkerList_<?php echo $module->id;?>(map, markers);
 			});
+
+  		// Assign global map reference
+      module_map_<?php echo $module->id;?> = map;
 		}
 
 		// Initialize the Map
 		fc_MapMod_initialize_<?php echo $module->id;?>();
+
+		// Geo locate visitor on-demand via button click
+    document.addEventListener("click", function(e){
+      if(e.target && e.target.classList.contains("geo-locate-me-btn")){
+		    fc_MapMad_geolocateMe_<?php echo $module->id; ?>(module_map_<?php echo $module->id;?>);
+      }
+    });
+
+    // Geo locate visitor on-demand via button click
+    document.addEventListener("change", function(e){
+      if(e.target && e.target.classList.contains("geo-locate-zoom-level")){
+        fc_MapMad_geolocateMe_<?php echo $module->id; ?>(module_map_<?php echo $module->id;?>);
+      }
+    });
 	</script>
 
 

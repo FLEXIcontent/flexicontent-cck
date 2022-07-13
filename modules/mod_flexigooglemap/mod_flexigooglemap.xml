@@ -255,6 +255,44 @@
 				showon="clustermode:1"
 			/>
 
+
+			<field name="" type="separator" default="Geo Location options" level="level1" />
+			<field
+					name="geo_locate" type="radio"
+					default="0" label="Zoom map to visitor"
+					description="On load map will be zoom to visitor's location"
+					class="btn-group btn-group-yesno"
+			>
+				<option value="0">MOD_FLEXIGOOGLEMAP_NO</option>
+				<option value="1">MOD_FLEXIGOOGLEMAP_YES</option>
+			</field>
+			<field
+					name="geo_locate_btn" type="radio"
+					default="0" label="Near Me button"
+					description="Add button to re-center map to visitor's location"
+					class="btn-group btn-group-yesno"
+			>
+				<option value="0">MOD_FLEXIGOOGLEMAP_NO</option>
+				<option value="1">MOD_FLEXIGOOGLEMAP_YES</option>
+			</field>
+			<field
+					name="geo_locate_zoom_sel" type="radio"
+					default="0" label="Near Me zoom selection"
+					description="Add selector to select map zoom level to visitor's location"
+					class="btn-group btn-group-yesno"
+			>
+				<option value="0">MOD_FLEXIGOOGLEMAP_NO</option>
+				<option value="1">MOD_FLEXIGOOGLEMAP_YES</option>
+			</field>
+			<field
+					name="geo_locate_zoom_def" type="number"
+					default="10" label="Near Me zoom default"
+					description="Default zoom level for near-me locations"
+					min="2"
+					max="15"
+					step="1"
+			/>
+
 			<field name="" type="separator" default="Marker actions" level="level1" />
 
 			<field
