@@ -288,6 +288,7 @@ class JFormFieldFields extends JFormField
 		}
 
 		$classes = (string) @ $attributes['class'];
+		$classes = $classes ?: (FLEXI_J40GE ? 'form-select' : '');
 
 		$attribs = ' style="float:left;" ';
 

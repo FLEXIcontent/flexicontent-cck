@@ -100,6 +100,8 @@ class JFormFieldFclayout extends JFormFieldGroupedList
 		$stripPrefix = (string) @ $attributes['stripprefix'];
 		$hideNone    = (string) @ $attributes['hide_none'];
 		$hideDefault = (string) @ $attributes['hide_default'];
+		$class       = (string) @ $attributes['class'];
+		$class       = $class ?: (FLEXI_J40GE ? 'form-select' : '');
 
 		// e.g. 'gallery_' in image-gallery field (e.g. layout filename: value_gallery_multibox.php)
 		$trimDisplayname = (string) @ $attributes['trim_displayname'];
@@ -315,7 +317,7 @@ class JFormFieldFclayout extends JFormFieldGroupedList
 			$attribs .= ' multiple="multiple" ';
 			$attribs .= (@$attributes['size']) ? ' size="'.@$attributes['size'].'" ' : ' size="6" ';
 		}
-		$attribs .= ' class="fc-element-auto-init"';
+		$attribs .= ' class="fc-element-auto-init '.$class.'"';
 		$attribs .= ' onchange="fc_getLayout_'.$_name.'(this);"';
 
 
