@@ -40,9 +40,10 @@ $defaut_icon_url = $mapapi === 'googlemap'
 	? 'https://maps.gstatic.com/mapfiles/api-3/images/spotlight-poi2.png'
 	: JUri::root(true) . '/components/com_flexicontent/librairies/leaflet/images/marker-icon.png';
 
-$maxzoommarker = $params->get('maxzoommarker', '');
-$mappadding    = $params->get('mappadding', '0.5');
-$info_popup    = (int)$params->get('info_popup', 1);
+$maxzoommarker = (int) $params->get('maxzoommarker', 18);
+$mappadding    = (int) $params->get('mappadding', '50');
+$mappadding    = $mappadding >= 0 && $mappadding <= 100 ? $mappadding / 100.0 : 0.5;
+$info_popup    = (int) $params->get('info_popup', 1);
 
 $mapstyle  = $params->get('mapstyle', '');
 $mapstyle  = substr($mapstyle,1,-1); // Remove[] at end and start
