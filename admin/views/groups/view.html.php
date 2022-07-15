@@ -279,7 +279,7 @@ class FlexicontentViewGroups extends FlexicontentViewBaseRecords
 			{
 				//window.location.reload(false);
 				window.location.href = \'index.php?option=com_flexicontent&view=groups\';
-				document.body.innerHTML = Joomla.JText._("FLEXI_UPDATING_CONTENTS") + \' <img id="page_loading_img" src="components/com_flexicontent/assets/images/ajax-loader.gif">\';
+				document.body.innerHTML = "<div>" + Joomla.JText._("FLEXI_UPDATING_CONTENTS") + \' <img id="page_loading_img" src="components/com_flexicontent/assets/images/ajax-loader.gif"></div>\';
 			}
 		');
 

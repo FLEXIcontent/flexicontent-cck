@@ -307,7 +307,7 @@ class FlexicontentViewTag extends FlexicontentViewBaseRecord
 				function fc_edit_jtag_modal_close()
 				{
 					window.location.reload(false);
-					document.body.innerHTML = Joomla.JText._("FLEXI_UPDATING_CONTENTS") + \' <img id="page_loading_img" src="components/com_flexicontent/assets/images/ajax-loader.gif">\';
+					document.body.innerHTML = "<div>" + Joomla.JText._("FLEXI_UPDATING_CONTENTS") + \' <img id="page_loading_img" src="components/com_flexicontent/assets/images/ajax-loader.gif"></div>\';
 				}
 			');
 
