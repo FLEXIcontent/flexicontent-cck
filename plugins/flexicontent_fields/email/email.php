@@ -838,8 +838,7 @@ class plgFlexicontent_fieldsEmail extends FCField
 		$sitename = $app->getCfg('sitename') . ' - ' . JUri::root();
 
 		// set only form value in input
-		$id = $jinput->post->get('formid', '', '');
-		$datas = $jinput->post->get($id, array(), 'array');
+		$datas = $jinput->post->get($formid, array(), 'array');
 		if (isset($datas['name'])){
 			$name = $datas['name'];
 		}
