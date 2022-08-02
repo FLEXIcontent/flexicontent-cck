@@ -79,7 +79,25 @@ abstract class FlexicontentHelperAssociation extends CategoryAssociationHelper
 
 		elseif ($view === 'category')
 		{
-			$cid = $jinput->getInt('cid');
+            $cid    = $jinput->getInt('cid');
+            $layout = $jinput->getCmd('layout');
+            if ($layout === 'tags')
+            {
+                $tagid = $jinput->getInt('tagid', 0);
+                $associations = $tagid ? self::getTagAssociations($tagid) : array();
+
+                if ($associations)
+                {
+					$urlvars = flexicontent_html::getCatViewLayoutVars($catmodel = null, $use_slug = true);
+
+					foreach ($associations as $tag => $assoc)
+					{
+						$return[$tag] = FlexicontentHelperRoute::getCategoryRoute($cid, 0, $urlvars, $assoc);
+					}
+
+					return $return;
+				}
+            }
 
 			$associations = $cid ? self::getCatAssociations($cid) : array();
 
@@ -130,25 +148,67 @@ abstract class FlexicontentHelperAssociation extends CategoryAssociationHelper
 	}
 
 
-	public static function getCatAssociations($cat_id)
+	public static function getTagAssociations($tag_id)
 	{
-		if (!$cat_id)
+
+		if (!$tag_id)
 		{
 			return array();
 		}
 
 		$db = JFactory::getDbo();
-		$query = 'SELECT c.language, c.id, '
-			. '  CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(":", c.id, c.alias) ELSE c.id END as title_slug '
-			. ' FROM #__associations AS a'
-			. ' JOIN #__associations AS k ON a.`key`=k.`key`'
-			. ' JOIN #__categories AS c ON c.id = k.id '
-			. ' WHERE a.id = '. $cat_id .' AND a.context = ' . $db->Quote('com_categories.item');
+        if (!FLEXI_FALANG) return array();
 
+        $query  =
+			//'SELECT la.lang_code AS language, t.id AS id, '
+			'SELECT la.lang_code AS language, t.id AS id, '
+			. '  CASE WHEN CHAR_LENGTH(fat.value) THEN fat.value ELSE t.name END as title, '
+            . '  CONCAT_WS(":", t.id, t.alias) AS title_slug '
+            //. '  CASE WHEN CHAR_LENGTH(faa.value) THEN CONCAT_WS(":", t.id, faa.value) ELSE CONCAT_WS(":", t.id, t.alias) END as title_slug '
+            .' FROM #__flexicontent_tags AS t'
+            .' JOIN #__tags AS jt ON t.jtag_id = jt.id'
+            . ' JOIN #__falang_content AS fat ON fat.reference_table = "tags" '
+            . '   AND fat.reference_field = "title" AND fat.reference_id = t.jtag_id'
+            . ' LEFT JOIN #__falang_content AS faa ON faa.reference_table = "tags" '
+            . '   AND faa.reference_field = "alias" AND faa.reference_id = t.jtag_id'
+            . ' JOIN #__languages AS la ON la.lang_id = fat.language_id '
+            . ' WHERE t.id = '. $tag_id;
+            ;
 		$translations = $db->setQuery($query)->loadObjectList('language');
+		$lang = flexicontent_html::getSiteDefaultLang();
+		if ($translations && !isset($translations[$lang]))
+		{
+			$tag = $db->setQuery('SELECT t.name AS title, CONCAT_WS(":", t.id, t.alias) AS title_slug '
+				. ' FROM #__flexicontent_tags AS t'
+	            . ' WHERE t.id = '. $tag_id
+			)->loadObject();
+			$translations[$lang] = (object) array('language' => $lang, 'id' => ($tag_id), 'title' => $tag->title, 'title_slug' => $tag->title_slug);
+		}
+		//echo '<pre>'; print_r($translations); echo '</pre>'; exit;
 
 		return $translations;
 	}
+
+
+    public static function getCatAssociations($cat_id)
+    {
+        if (!$cat_id)
+        {
+            return array();
+        }
+
+        $db = JFactory::getDbo();
+        $query = 'SELECT c.language, c.id, '
+            . '  CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(":", c.id, c.alias) ELSE c.id END as title_slug '
+            . ' FROM #__associations AS a'
+            . ' JOIN #__associations AS k ON a.`key`=k.`key`'
+            . ' JOIN #__categories AS c ON c.id = k.id '
+            . ' WHERE a.id = '. $cat_id .' AND a.context = ' . $db->Quote('com_categories.item');
+
+        $translations = $db->setQuery($query)->loadObjectList('language');
+
+        return $translations;
+    }
 
 
 	private static function _getMenuAssociations($view, $id)
