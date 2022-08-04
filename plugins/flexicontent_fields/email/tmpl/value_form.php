@@ -62,14 +62,7 @@ foreach ($values as $value)
 	$titleform         = JText::_($field->parameters->get($LPN . 'title_form', ''));
 	$display_titleform = $field->parameters->get($LPN . 'display_title_form', 0);
 
-	$titleformD = $display_titleform ? '<LEGEND>'.$titleform.'</LEGEND>' : '';
-
-	// Fake id form, cut email on @ use start of email plus add a random id
-	// so that if we have 2 forms in same page but with same email author
-	$eparts =  explode('@', $addr);
-	$formid = $eparts[0] . '_' . random_int(100, 1000000);
-
-	// Modal display 
+  // Modal display 
 	// TODO replace joomla modal for flexicontent modal base on jquery
 	$view = $app->input->getCmd('flexi_callview', ($realview ?: 'item'));
 	$use_modal = $field->parameters->get($LPN . 'use_modal', 1);
@@ -85,6 +78,19 @@ foreach ($values as $value)
 	$datadismiss = FLEXI_J40GE ? "data-bs-dismiss" : "data-dismiss";
 	$class_close = FLEXI_J40GE ? "btn-close" : "close";
 
+	// display title in header modal (not double display)
+	if ($use_modal == 1 && $display_titleform ){
+		$titleformD='';
+	}else {
+			$titleformD = '<LEGEND>'.$titleform.'</LEGEND>';
+	}
+
+	// Fake id form, cut email on @ use start of email plus add a random id
+	// so that if we have 2 forms in same page but with same email author
+	$eparts =  explode('@', $addr);
+	$formid = $eparts[0] . '_' . random_int(100, 1000000);
+
+
 	if (
 		($use_modal == 1 && $view=='item' && $use_modal_in_view =='item') ||
 		($use_modal == 1 && $view=='category' && $use_modal_in_view =='category') ||
@@ -98,7 +104,7 @@ foreach ($values as $value)
 		<div class='modal-content'>
 			<div class='modal-header'>
 				<h5 class='modal-title' id='exampleModalLabel'>$titleform </h5>
-				<button type='button' class='$class_close' $datadismiss='modal' aria-label='Close'>&times;</button>
+				<button type='button' class='$class_close' $datadismiss='modal' aria-label='Close'></button>
 		  </div>
 		  <div class='modal-body'>
 		";
