@@ -30,16 +30,19 @@ $ctrl_users = "task=users.";
 
 <div class="<?php echo FLEXI_J40GE ? 'row' : 'row-fluid'; ?>">
 
-<?php if (!empty( $this->sidebar)) : ?>
+<?php if (!empty( $this->sidebar) && FLEXI_J40GE == false) : ?>
 
 	<div id="j-sidebar-container" class="span2 col-md-2">
+
 		<?php echo str_replace('type="button"', '', $this->sidebar); ?>
+
 	</div>
+	
 	<div id="j-main-container" class="span10 col-md-10">
 
-<?php else : ?>
+	<?php else : ?>
 
-	<div id="j-main-container" class="span12 col-md-12">
+		<div id="j-main-container" class="span12 col-md-12">
 
 <?php endif;?>
 
