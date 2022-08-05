@@ -279,7 +279,9 @@ abstract class JHtmlFclayoutbuilder
 			overflow-y: auto;
 		}*/
 
-
+		button#gjs-sm-add {
+			color: #000 !important;
+	}
 
 		/**
 		 * Editor outer container (.editor-row > .editor-canvas > #gjs_*)
@@ -1200,7 +1202,43 @@ abstract class JHtmlFclayoutbuilder
 			editor.BlockManager.add(\'fcfield\', {
 				label: \'Flexicontent Field\',
 				category: \'Flexicontent Data\',
-				content: \'<div style="display: inline-block" data-gjs-resizable="true" data-gjs-dragMode="absolute">{flexi_field:FIELDNAME  item:{{fc-item-id}}  method:display}</div>\',
+				content: \'<div style="display: inline-block" data-gjs-resizable="true" data-gjs-dragMode="absolute">{flexi_field:FIELDNAME  item:122|current|{{fc-item-id}}  method:display}</div>\',
+				select: true,
+				activate: true,
+				attributes: { class:\'fc-iblock fa fa-database\' },
+			});
+
+			editor.BlockManager.add(\'fcitemlink\', {
+				label: \'Flexicontent item title with link\',
+				category: \'Flexicontent Data\',
+				content: \'<div style="display: inline-block" data-gjs-resizable="true" data-gjs-dragMode="absolute">{flexi_link:item  item:566|current|{{fc-item-id}}  linktext:_title_}</div>\',
+				select: true,
+				activate: true,
+				attributes: { class:\'fc-iblock fa fa-database\' },
+			});
+
+			editor.BlockManager.add(\'fcitemlink2\', {
+				label: \'Flexicontent item link with custom text\',
+				category: \'Flexicontent Data\',
+				content: \'<div style="display: inline-block" data-gjs-resizable="true" data-gjs-dragMode="absolute">{flexi_link:item  id:577|current|{{fc-item-id}}  linktext:_noclose_} Some HTML {/flexi_link}</div>\',
+				select: true,
+				activate: true,
+				attributes: { class:\'fc-iblock fa fa-database\' },
+			});
+
+			editor.BlockManager.add(\'fcitemprofil\', {
+				label: \'User profil\',
+				category: \'Flexicontent Data\',
+				content: \'<div style="display: inline-block" data-gjs-resizable="true" data-gjs-dragMode="absolute">{flexi_item:profile  user:%user_id%  ilayout:%template_name%}</div>\',
+				select: true,
+				activate: true,
+				attributes: { class:\'fc-iblock fa fa-database\' },
+			});
+
+			editor.BlockManager.add(\'fcauthor\', {
+				label: \'Author profil\',
+				category: \'Flexicontent Data\',
+				content: \'<div style="display: inline-block" data-gjs-resizable="true" data-gjs-dragMode="absolute"> {flexi_item:profile  author_of:[%item_id% | current]  ilayout:%template_name%}</div>\',
 				select: true,
 				activate: true,
 				attributes: { class:\'fc-iblock fa fa-database\' },

@@ -1360,7 +1360,7 @@ class flexicontent_html
 
 				$framework_path = JUri::root(true).$lib_path.'/grapesjs';
 
-				$grapjs_vers = '0.16.22';
+				$grapjs_vers = '0.16.22'; // need to update
 				$url_grapjs_css = 'https://unpkg.com/grapesjs@' . $grapjs_vers . '/dist/css/grapes.min.css';
 				$url_grapjs_js = 'https://unpkg.com/grapesjs@' . $grapjs_vers . '/dist/grapes.min.js';
 
