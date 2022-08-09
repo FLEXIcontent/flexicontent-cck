@@ -646,6 +646,12 @@ body .nowrap_hidden {
 	margin-top: 0 !important;
 	margin-bottom: 0 !important;
 }
+#flexicontent .btn-group .select2-container a.select2-choice .select2-search-field,
+#flexicontent .fc-xpended .select2-container a.select2-choice .select2-search-field,
+#flexicontent .fc-xpended-row .select2-container a.select2-choice .select2-search-field {
+	min-height: calc(var(--form-inp-height) - 4px) !important;
+	line-height: calc(var(--form-inp-height) - 4px) !important;
+}
 #flexicontent .btn-group .select2-container ul.select2-choices,
 #flexicontent .fc-xpended .select2-container ul.select2-choices,
 #flexicontent .fc-xpended-row .select2-container ul.select2-choices {
@@ -1269,7 +1275,8 @@ td.col_edit_layout {
 	border-left-width: 0;
 }
 .flexicontent #fc-filters-box .fc-filter .select2-container-multi .select2-choices .select2-search-field input.select2-input {
-	min-height: 26px !important;
+	line-height: calc(var(--form-inp-height) -2px) !important;
+	min-height: calc(var(--form-inp-height) - 2px) !important;
 	box-sizing: border-box;
 	margin: 0 !important;
 	width: 22px !important;
@@ -1282,6 +1289,8 @@ td.col_edit_layout {
 	width: 100% !important;
 }
 .flexicontent #fc-filters-box .fc-filter .select2-container-multi.select2-dropdown-open .select2-choices .select2-search-field input.select2-input {
+	line-height: calc(var(--form-inp-height) -2px) !important;
+	min-height: calc(var(--form-inp-height) - 2px) !important;
 	padding: 2px 6px 2px 26px !important;
 	background: #fff url(../images/select2.png) no-repeat scroll -32px -22px !important;
 	width: 100% !important;
@@ -4457,13 +4466,14 @@ html[dir="rtl"] .select2-container .select2-choice {
 .select2-container-multi.select2-dropdown-open .select2-choices .select2-search-field input.select2-input {
 	cursor: pointer;
 	min-width: 32px !important;
-	line-height: 20px !important;
-	min-height: 20px !important;
+	line-height: calc(var(--form-inp-height) -2px) !important;
+	min-height: calc(var(--form-inp-height) - 2px) !important;
 	padding: 0 7px !important;
 	margin-top: 1px !important;
 	border: 0px solid lightgray !important;
 	box-sizing: content-box !important;
 	background: #fff url('../images/select2.png') no-repeat 100% -22px !important;
+	background-position: 93% -22px !important;
 }
 .select2-container-multi.select2-dropdown-open .select2-choices .select2-search-field input.select2-input {
 	min-width: 124px !important;

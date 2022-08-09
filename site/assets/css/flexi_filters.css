@@ -332,6 +332,8 @@ select.fc_field_filter {
 }
 input.fc_text_filter {
 	vertical-align: top;
+	border: 1px solid #aaa;
+	border-radius: 5px;
 }
 input.fc_field_filter {
 	vertical-align: top;
@@ -370,6 +372,8 @@ span.fc_field_filter {
 }
 .fc_filter_html.fc_text_search input {
 	width: unset;
+	min-height: calc(var(--form-inp-height) - 2px) !important;
+	line-height: calc(var(--form-inp-height) -2px) !important;
 }
 .fc_has_inner_label,
 .fc_has_inner_prompt {
@@ -420,4 +424,8 @@ span.fc_field_filter {
 	padding: 0 10px 0 12px;
 	border: 1px solid #aaa;
 	color: #000;
+}
+li.select2-search-field {
+	min-height: calc(var(--form-inp-height)) !important;
+	line-height: calc(var(--form-inp-height)) !important;
 }
