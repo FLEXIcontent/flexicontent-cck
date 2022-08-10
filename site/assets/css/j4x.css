@@ -59,7 +59,7 @@ button.btn.btn-highlight:hover,
 #flexicontent .fc-xpended-btns > .fcfield-button-add:not(.add-on):not(.input-group-addon) a {
 	height: 18px;
 	min-width: 16px;
-	border: 2px solid var(--template-bg-dark-20) !important;
+	border: 1px solid var(--template-bg-dark-20,#aaa) !important;
 	text-align: center;
 }
 .input-prepend.input-append .add-on:first-child,
@@ -72,14 +72,10 @@ button.btn.btn-highlight:hover,
 	border-top-right-radius: 3px !important;
 	border-bottom-right-radius: 3px !important;
 }
-#flexicontent #adminForm  div.input-append > *:not(:first-child):not(:last-child):not(.select2-container) {
-	margin-right: -6px !important;
-}
 #flexicontent div [class^="fcfield-"].fcfont-icon,
 #flexicontent div [class*=" fcfield-"].fcfont-icon,
 #flexicontent ul.fcfield-sortables > li [class^="fcfield-"].fcfont-icon,
 #flexicontent ul.fcfield-sortables > li [class*=" fcfield-"].fcfont-icon {
-	margin: 0px -6px -1px 0px !important;
 	background: none;
 }
 #flexicontent ul.fcfield-sortables > li > * {
@@ -88,7 +84,11 @@ button.btn.btn-highlight:hover,
 #adminForm label.add-on.fc-lbl-short.addrint_autocomplete-lbl,
 #adminForm label.add-on.fc-lbl-short.addrint_marker_tolerance-lbl,
 #adminForm label.add-on.fc-lbl-short.addrint_zoom-lbl {
-	height: 42px !important;
+	box-sizing: border-box !important;
+	height: var(--ctrls-inp-height) !important;
+	min-height: var(--ctrls-inp-height) !important;
+	line-height: calc(var(--ctrls-inp-height) - 1px) !important;
+	padding: 0 calc(var(--ctrls-inp-height) / 2) !important;
 }
 #flexicontent .fc-xpended-btns > [class^="fcfield-"]:not(.add-on):not(.input-group-addon):not(.btn),
 #flexicontent .fc-xpended-btns > [class*=" fcfield-"]:not(.add-on):not(.input-group-addon):not(.btn),
@@ -173,15 +173,18 @@ span.btn.btn-sm.toolbar.dropdown-toggle.dropdown-toggle-split.fcfield-addvalue.f
 .field-calendar .btn-primary {
 	margin-left: -5px !important;
 	margin-top: 0px !important;
+	height: var(--ctrls-inp-height) !important;
+	min-height: var(--ctrls-inp-height) !important;
+	line-height: calc(var(--ctrls-inp-height) - 1px) !important;
 }
 label.add-on {
 	padding-right: 14px !important;
 }
 .addrint_autocomplete.pac-target-input {
-	border: 1px solid var(--template-bg-dark-20);
+	border: 1px solid var(--template-bg-dark-20,#aaa);
 }
 label.add-on.fc-lbl-short.addrint_autocomplete-lbl {
-	border: 1px solid var(--template-bg-dark-20) !important;
+	border: 1px solid var(--template-bg-dark-20,#aaa) !important;
 }
 #flexicontent a.saveorder.btn.btn-small fa,
 #flexicontent a.saveorder.btn.btn-small .fas,
@@ -434,7 +437,7 @@ label#use_advsearch_options_lbl {
 }
 .buttons.btn-group.fc-iblock.dropdown {
 	background: #fff;
-	border: 2px solid var(--template-bg-dark-20) !important;
+	border: 1px solid var(--template-bg-dark-20,#aaa) !important;
 }
 .fc_filter_line {
 	padding: 0px !important;
@@ -450,4 +453,45 @@ label#use_advsearch_options_lbl {
 body div .form-horizontal .control-group,
 body div .control-group {
 	margin: 0 0 0 0;
+}
+body span.add-on.fcfield-delvalue.fcfont-icon.icon.icon- {
+	margin-left: 5px !important;
+}
+body .buttons.btn-group.fc-iblock.dropdown {
+	margin-left: -1px !important;
+	width: 88px;
+	height: var(--ctrls-inp-height) !important;
+	min-height: var(--ctrls-inp-height) !important;
+	line-height: calc(var(--ctrls-inp-height) - 1px) !important;
+	box-sizing: border-box !important;
+	padding: 0 calc(var(--ctrls-inp-height) / 2) !important;
+}
+body span.fcfield-disablevalue.fcfont-icon.icon.icon-,
+body span.add-on.fcfield-clearvalue.fcfont-icon.icon.icon-,
+body span.add-on.fcfield-delvalue.fcfont-icon.icon.icon- {
+	box-sizing: border-box !important;
+	height: var(--ctrls-inp-height) !important;
+	min-height: var(--ctrls-inp-height) !important;
+	line-height: calc(var(--ctrls-inp-height) - 1px) !important;
+	padding: 0 calc(var(--ctrls-inp-height) / 2) !important;
+}
+span.btn.btn-sm.toolbar.dropdown-toggle.dropdown-toggle-split.fcfield-addvalue.fcfont-icon.icon.icon- {
+	border: 0;
+}
+span.fcfield-uploadvalue.dropdown-item.fcfont-icon.icon.icon-.fc_files_uploader_toggle_btn.active {
+	min-width: 128px !important;
+}
+span.btn.btn-sm.toolbar.dropdown-toggle.dropdown-toggle-split.fcfield-addvalue.fcfont-icon.icon.icon-:after {
+	margin-top: 12px !important;
+}
+button.fcfield-expand-view-btn.btn.btn-small {
+	box-sizing: border-box !important;
+	height: var(--ctrls-inp-height) !important;
+	min-height: var(--ctrls-inp-height) !important;
+	line-height: calc(var(--ctrls-inp-height) - 1px) !important;
+	padding: 0 calc(var(--ctrls-inp-height) / 2) !important;
+	border: 1px solid var(--template-bg-dark-20,#aaa) !important;
+}
+span.add-on.fc_filedata_title {
+	margin-left: 5px !important;
 }
