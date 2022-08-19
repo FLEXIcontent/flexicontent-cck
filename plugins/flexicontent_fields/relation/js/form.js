@@ -124,7 +124,7 @@
 		var sel2_item_selector = jQuery('#s2id_' + elementid + '_item_selector');
 		sel2_item_selector.hide();
 
-		var loading = jQuery('<div class="fc_loading_msg" style="position:absolute; background-color:transparent;"></div>');
+		var loading = jQuery('<div class="fc_loading_msg" style="position:relative; background-color:transparent;"></div>');
 		loading.insertAfter(sel2_item_selector);
 
 		var ajax_data = {
@@ -148,12 +148,12 @@
 			ajax_data.lang_code = item_lang;
 		}
 
-    // Frontend case, use root URL
-		var live_site = !!jroot_url_fc ? jroot_url_fc : '';
+    // Joomla Base URL
+		var base_url = !!jbase_url_fc ? jbase_url_fc : '';
 
 		jQuery.ajax({
 			type: 'POST',
-			url: live_site + 'index.php?option=com_flexicontent&tmpl=component&format=raw',
+			url: base_url + 'index.php?option=com_flexicontent&tmpl=component&format=raw',
 			dataType: 'json',
 			data: ajax_data
 		}).done( function(data) {
