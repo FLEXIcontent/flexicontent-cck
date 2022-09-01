@@ -984,35 +984,50 @@ class plgFlexicontent_fieldsImage extends FCField
 
 		// Allow for thumbnailing of the default image
 		$field->using_default_value = false;
-		if ( !count($values) )
+
+		/**
+		 * Create default image to be used if  (a) no image assigned  OR  (b) images assigned have been deleted
+		 */
+		if ( !count($values))
 		{
-			// Create default image to be used if  (a) no image assigned  OR  (b) images assigned have been deleted
-			$default_image = $field->parameters->get('default_image', '');
+			$image_DF = array();
+
+			// Holds complete relative path and indicates that it is default image for field
+			$default_image = '';
+			$default_image_custom = $field->parameters->get('default_image_custom', 0);
+			if ($default_image_custom)
+			{
+				$default_image = $this->_get_custom_text($field, $item, 'default_image_custom');
+			}
+
+			if (!$default_image)
+			{
+				$default_image = $field->parameters->get('default_image', '');
+
+			}
 
 			if ($default_image)
 			{
-				$image_DF = array();
-				// field attributes (default value specific)
-				$image_DF['default_image'] = $default_image;  // holds complete relative path and indicates that it is default image for field
+				$image_DF['default_image'] = $default_image;
+				$image_DF['originalname']  = basename($default_image);
+
+				// Also default image can (possibly) be used across multiple fields, so set flag to add field id to filenames of thumbnails
+				$multiple_image_usages      = true;
+				$extra_prefix               = 'fld' . $field->id . '_';
+				$field->using_default_value = true;
 				// field attributes (value)
-				$image_DF['originalname'] = basename($default_image);
-				$image_DF['alt'] = $default_alt;
-				$image_DF['title'] = $default_title;
-				$image_DF['desc'] = $default_desc;
-				$image_DF['cust1'] = $default_cust1;
-				$image_DF['cust2'] = $default_cust2;
-				$image_DF['urllink'] = '';
+				$image_DF['alt']          = $default_alt;
+				$image_DF['title']        = $default_title;
+				$image_DF['desc']         = $default_desc;
+				$image_DF['cust1']        = $default_cust1;
+				$image_DF['cust2']        = $default_cust2;
+				$image_DF['urllink']      = '';
 
 				// Create thumbnails for default image
 				if (plgFlexicontent_fieldsImage::rebuildThumbs($field, $image_DF, $item))
 				{
 					$values = array(serialize($image_DF));
 				}
-
-				// Also default image can (possibly) be used across multiple fields, so set flag to add field id to filenames of thumbnails
-				$multiple_image_usages = true;
-				$extra_prefix = 'fld' . $field->id . '_';
-				$field->using_default_value = true;
 			}
 		}
 
@@ -2914,6 +2929,87 @@ class plgFlexicontent_fieldsImage extends FCField
 		{
 			fwrite($fh, $file_contents);
 			fclose($fh);
+		}
+	}
+
+	/**
+	 * TODO move this method to parent field class or to helper class
+	 */
+	private function _get_custom_text($field, $item, $paramName, $paramNameCode = null)
+	{
+		// Check if using 'auto_value_code', clear 'auto_value', if function not set
+		$custom_text = (int) $field->parameters->get($paramName, 0);
+		if ($custom_text === 2)
+		{
+			$paramNameCode = $paramNameCode ?: $paramName . '_code';
+			$custom_text_code = $field->parameters->get($paramNameCode, '');
+			$custom_text_code = preg_replace('/^<\?php(.*)(\?>)?$/s', '$1', $custom_text_code);
+		}
+		$custom_text = $custom_text === 2 && !$custom_text_code ? 0 : $custom_text;
+
+		if (!$custom_text)
+		{
+			return;
+		}
+
+		$return = array();
+
+		switch($custom_text)
+		{
+			case 2:     // AUTOMATIC value, via function
+				try {
+					ob_start();
+
+					$old_error_reporting = error_reporting(E_ALL & ~E_DEPRECATED & ~E_STRICT);
+					$old_error_handler = set_error_handler(array($this, '_custom_error_handler'));
+
+					$return = eval($custom_text_code);
+
+					error_reporting($old_error_reporting);
+					set_error_handler($old_error_handler);
+
+					$errors = trim(ob_get_contents());
+					ob_clean();
+
+					if ($errors) JFactory::getApplication()->enqueueMessage( 'Field \'<b>' . $field->label . '</b>\' : <br/> <pre>' . $errors . '</pre>', 'notice');
+				}
+				catch (ParseError $e) {
+					JFactory::getApplication()->enqueueMessage( "Automatic value custom code, failed with: <pre>" . $e->getMessage() . '</pre>', 'warning');
+				}
+				break;
+		}
+		return $return;
+	}
+
+	private function _custom_error_handler($errno, $errstr, $errfile, $errline)
+	{
+		if (!(error_reporting() & $errno))
+		{
+			// This error code is not included in error_reporting, so let it fall through to the standard PHP error handler
+			return false;
+		}
+
+		switch ($errno) {
+			case E_NOTICE:
+			case E_USER_NOTICE:
+			case E_DEPRECATED:
+			case E_USER_DEPRECATED:
+			case E_STRICT:
+				echo("NOTICE: $errstr at line: $errline \n");
+				break;
+
+			case E_WARNING:
+			case E_USER_WARNING:
+				echo("WARNING: $errstr at line: $errline \n");
+				break;
+
+			case E_ERROR:
+			case E_USER_ERROR:
+			case E_RECOVERABLE_ERROR:
+				echo("ERROR: $errstr at line: $errline \n");
+
+			default:
+				echo("UNKNOWN ERROR at line: $errline \n");
 		}
 	}
 }
