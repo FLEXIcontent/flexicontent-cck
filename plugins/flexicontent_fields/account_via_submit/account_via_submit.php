@@ -276,7 +276,7 @@ class plgFlexicontent_fieldsAccount_via_submit extends FCField
 		$post = !is_array($post) ? array($post) : $post;
 		if ( !isset($post[0]) )
 		{
-			JError::raiseWarning(0, 'empty FORM data for field: Account via submit');
+			JFactory::getApplication()->enqueueMessage('empty FORM data for field: Account via submit', 'error');
 			return false;
 		}
 
@@ -293,7 +293,7 @@ class plgFlexicontent_fieldsAccount_via_submit extends FCField
 			$error	=
 				JText::sprintf('FLEXI_ACCOUNT_V_SUBMIT_INVALID_EMAIL', $post[0]['addr']).' '.
 				JText::_('FLEXI_ACCOUNT_V_SUBMIT_PROVIDE_VALID_EMAIL');
-			JError::raiseWarning(0, $error);
+			JFactory::getApplication()->enqueueMessage($error, 'error');
 			return false;
 		}
 
@@ -322,8 +322,8 @@ class plgFlexicontent_fieldsAccount_via_submit extends FCField
 			// Fail if auto-using existing email not enabled
 			if ( $field->parameters->get('handle_existing_email', 0)==0 )
 			{
-				$notice = JText::sprintf('FLEXI_ACCOUNT_V_SUBMIT_EMAIL_EXISTS', $email);
-				JError::raiseWarning(0, $notice);
+				$error = JText::sprintf('FLEXI_ACCOUNT_V_SUBMIT_EMAIL_EXISTS', $email);
+				JFactory::getApplication()->enqueueMessage($error, 'error');
 				return false;
 			}
 			// Account with given email exists, set as item's author
@@ -336,10 +336,11 @@ class plgFlexicontent_fieldsAccount_via_submit extends FCField
 			$username = $email; // EMAIL used as username
 			$newUserID = $this->registerUser($name, $username, $email, $password, $gender, $field);
 
-			if ($newUserID === false) {
-				// Cancel item creation, if email creation returns false
-				$notice = JText::_('FLEXI_ACCOUNT_V_SUBMIT_ACCOUNT_CREATION_FAILED');
-				JError::raiseWarning(0, $notice);
+			// Cancel item creation, if email creation returns false
+			if ($newUserID === false)
+			{
+				$error = JText::_('FLEXI_ACCOUNT_V_SUBMIT_ACCOUNT_CREATION_FAILED');
+				JFactory::getApplication()->enqueueMessage($error, 'error');
 				return false;
 			}
 			// Account with given email created, set as item's author
@@ -519,13 +520,18 @@ class plgFlexicontent_fieldsAccount_via_submit extends FCField
 		$attachment=null; $replyto=null; $replytoname=null;
 
 		// Send the email
-		$send_result = JFactory::getMailer()->sendMail(
-			$data['mailfrom'], $data['fromname'], $recipient, $emailSubject, $emailBody,
-			$html_mode, $cc, $bcc, $attachment, $replyto, $replytoname
-		);
-		if ( $send_result !== true )
+		try {
+			$send_result = JFactory::getMailer()->sendMail(
+				$data['mailfrom'], $data['fromname'], $recipient, $emailSubject, $emailBody,
+				$html_mode, $cc, $bcc, $attachment, $replyto, $replytoname
+			);
+		} catch(\Exception $e) {
+			$send_result = false;
+		}
+
+		if ( !$send_result )
 		{
-			JError::raiseWarning(500, JText:: _ ('COM_USERS_REGISTRATION_SEND_MAIL_FAILED'));
+			JFactory::getApplication()->enqueueMessage(JText:: _ ('COM_USERS_REGISTRATION_SEND_MAIL_FAILED'), 'warning');
 			return false;
 		}
 
@@ -539,29 +545,22 @@ class plgFlexicontent_fieldsAccount_via_submit extends FCField
 			);
 
 			// Get all admin users
-			$query->clear()
-				->select($db->quoteName(array('name', 'email', 'sendEmail')))
-				->from($db->quoteName('#__users'))
-				->where($db->quoteName('sendEmail') . ' = ' . 1);
-
-			$db->setQuery($query);
-
-			try {
-				$rows = $db->loadObjectList();
-			}
-			catch (RuntimeException $e) {
-				JError::raiseError(500, JText::sprintf('COM_USERS_DATABASE_ERROR', $e->getMessage()));
-				return false;
-			}
+			$rows = $db->setQuery(
+				$db->getQuery(true)
+					->select($db->quoteName(array('name', 'email', 'sendEmail')))
+					->from($db->quoteName('#__users'))
+					->where($db->quoteName('sendEmail') . ' = ' . 1)
+			)->loadObjectList();
 
 			// Send single mail to all superadministrators id
 			$adm_emails = array();
-			foreach ($rows as $row) {
+			foreach ($rows as $row)
+			{
 				if ($adm_email_bcc && $row->email == $data['mailfrom']) continue;
 				$adm_emails[] = $row->email;
 			}
 			$recipient = $adm_email_bcc ? array($data['mailfrom']) : $adm_emails;
-			$bcc = $adm_email_bcc ? $adm_emails : null;
+			$bcc       = $adm_email_bcc ? $adm_emails : null;
 
 			// Remove main recepient from BCC, to avoid email failing
 			if ($bcc)
@@ -570,12 +569,19 @@ class plgFlexicontent_fieldsAccount_via_submit extends FCField
 				if ( isset($_bcc_[$data['mailfrom']]) ) unset($bcc[$_bcc_[$data['mailfrom']]]);
 			}
 
-			$send_result = JFactory::getMailer()->sendMail(
-				$data['mailfrom'], $data['fromname'], $recipient, $emailSubject, $emailBody,
-				$html_mode, $cc, $bcc, $attachment, $replyto, $replytoname
-			);
-			if ($send_result !== true) {
-				JError::raiseWarning(500, JText:: _('COM_USERS_REGISTRATION_ACTIVATION_NOTIFY_SEND_MAIL_FAILED'));
+			// Send the email
+			try {
+				$send_result = JFactory::getMailer()->sendMail(
+					$data['mailfrom'], $data['fromname'], $recipient, $emailSubject, $emailBody,
+					$html_mode, $cc, $bcc, $attachment, $replyto, $replytoname
+				);
+			} catch(\Exception $e) {
+				$send_result = false;
+			}
+
+			if ( !$send_result )
+			{
+				JFactory::getApplication()->enqueueMessage(JText:: _('COM_USERS_REGISTRATION_ACTIVATION_NOTIFY_SEND_MAIL_FAILED'), 'warning');
 				return false;
 			}
 		}
@@ -596,8 +602,8 @@ class plgFlexicontent_fieldsAccount_via_submit extends FCField
 		// Check for a valid from address
 		if (! $mailfrom || ! JMailHelper::isEmailAddress($mailfrom))
 		{
-			$notice = JText::sprintf('FLEXI_ACCOUNT_V_SUBMIT_INVALID_EMAIL', $mailfrom);
-			JError::raiseWarning(0, $notice);
+			$warning = JText::sprintf('FLEXI_ACCOUNT_V_SUBMIT_INVALID_EMAIL', $mailfrom);
+			JFactory::getApplication()->enqueueMessage($warning, 'warning');
 		}
 
 		$subject = JText::sprintf('FLEXI_ACCOUNT_V_SUBMIT_YOUR_NEW_ITEM_AT', $SiteName);
@@ -623,14 +629,18 @@ class plgFlexicontent_fieldsAccount_via_submit extends FCField
 		$attachment=null; $replyto=null; $replytoname=null;
 
 		// Send the email
-		$send_result = JFactory::getMailer()->sendMail(
-			$mailfrom, $fromname, $recipient, $emailSubject, $emailBody,
-			$html_mode, $cc, $bcc, $attachment, $replyto, $replytoname
-		);
+		try {
+			$send_result = JFactory::getMailer()->sendMail(
+				$mailfrom, $fromname, $recipient, $emailSubject, $emailBody,
+				$html_mode, $cc, $bcc, $attachment, $replyto, $replytoname
+			);
+		} catch(\Exception $e) {
+			$send_result = false;
+		}
 
-		if ( $send_result !== true )
+		if ( !$send_result )
 		{
-			JError::raiseWarning(500, JText:: _ ('FLEXI_ACCOUNT_V_SUBMIT_EDIT_LINK_NOT_SENT'));
+			JFactory::getApplication()->enqueueMessage(JText:: _ ('FLEXI_ACCOUNT_V_SUBMIT_EDIT_LINK_NOT_SENT'), 'warning');
 			return false;
 		}
 		return true;
