@@ -173,6 +173,7 @@ class modFlexigooglemapHelper
 				$addr = '';
 				$linkdirection = '';
 
+				// Popup window: show (button) link to the item view
 				if ($uselink)
 				{
 					$link = $itemLoc->link;
@@ -180,6 +181,7 @@ class modFlexigooglemapHelper
 					$link = addslashes($link);
 				}
 
+				// Popup window: show address details
 				if ($useadress && !empty($coord['addr_display']))
 				{
 					$addr = '<p>'.$coord['addr_display'].'</p>';
@@ -187,6 +189,7 @@ class modFlexigooglemapHelper
 					$addr = preg_replace("/(\r\n|\n|\r)/", " ", $addr);
 				}
 
+				// Popup window: show (button) link to Google-map directions page
 				if ($usedirection)
 				{
 					// generate link to google maps directions
@@ -213,6 +216,7 @@ class modFlexigooglemapHelper
 					$linkdirection= '<div class="directions"><a href="' . $map_link . '" target="_blank" class="direction btn">' . $directionname . '</a></div>';
 				}
 
+				// Popup window: custom text or default (Address + button link to item)
 				$contentwindows = $infotextmode
 					? $relitem_html
 					: $addr . ' ' . $link;
@@ -296,37 +300,46 @@ class modFlexigooglemapHelper
 			// We will create one to one array below for locations and items (items are repeated if having multiple locations)
 			$mapItems = array();
 
-			foreach ($fc_list_items as $address)
+			foreach ($fc_list_items as $address_item)
 			{
 				// Skip item if it has no address value
-				if ( empty($address->fieldvalues[$fieldaddressid]) )
+				if ( empty($address_item->fieldvalues[$fieldaddressid]) )
 				{
 					continue;
 				}
 
 				// Get first value, typically this is value [0], and unserialize it
-				foreach($address->fieldvalues[$fieldaddressid] as $coord)
+				foreach($address_item->fieldvalues[$fieldaddressid] as $coord)
 				{
+					// Skip item if address field value is empty
 					$coord = flexicontent_db::unserialize_array($coord, false, false);
 					if (!$coord) continue;
 
-					// Skip value that has no cordinates
+					// Skip item if address field value has empty either of the coordinates
 					if ( !isset($coord['lat']) || !isset($coord['lon']) ) continue;
 					if ( !strlen($coord['lat']) || !strlen($coord['lon']) ) continue;
 
-					$title = addslashes($address->title);
+					/**
+					 * Add item to array of know items
+					 */
+					$item = clone($address_item);
+					$item->link = JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, $forced_itemid, $item));
+					$mapItems[] = $item;
+
+					$title = addslashes($item->title);
 					$link = '';
 					$addr = '';
 					$linkdirection = '';
-					$mapItems[] = $address;  // item
 
+					// Popup window: show (button) link to the item view
 					if ($uselink)
 					{
-						$link = JRoute::_(FlexicontentHelperRoute::getItemRoute($address->slug, $address->categoryslug, $forced_itemid, $address));
+						$link = $item->link;
 						$link = '<div class="link"><a href="'.$link.'" target="'.$linkmode.'" class="link btn">' . $readmore . '</a></div>';
 						$link = addslashes($link);
 					}
 
+					// Popup window: show address details
 					if ($useadress && !empty($coord['addr_display']))
 					{
 						$addr = '<p>'.$coord['addr_display'].'</p>';
@@ -334,9 +347,10 @@ class modFlexigooglemapHelper
 						$addr = preg_replace("/(\r\n|\n|\r)/", " ", $addr);
 					}
 
+					// Popup window: show (button) link to Google-map directions page
 					if ($usedirection)
 					{
-						// generate link to google maps directions
+						// Generate link to google maps directions
 						$map_link = empty($coord['url'])  ?  false  :  $coord['url'];
 
 						// if no url, compatibility with old values
@@ -360,6 +374,7 @@ class modFlexigooglemapHelper
 						$linkdirection= '<div class="directions"><a href="' . $map_link . '" target="_blank" class="direction btn">' . $directionname . '</a></div>';
 					}
 
+					// Popup window: custom text or default (Address + button link to item)
 					$contentwindows = $infotextmode
 						? $relitem_html
 						: $addr . ' ' . $link;
