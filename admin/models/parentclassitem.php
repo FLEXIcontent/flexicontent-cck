@@ -1878,7 +1878,7 @@ class ParentClassItem extends FCModelAdmin
 		$jinput     = JFactory::getApplication()->input;
 		$dispatcher = JEventDispatcher::getInstance();
 		$cparams    = $this->_cparams;
-		$nullDate   = $this->_db->getNullDate();
+		$nullDate   = FLEXI_J40GE ? NULL : $this->_db->getNullDate();
 
 		$option = $jinput->get('option', '', 'cmd');
 		$view   = $jinput->get('view', '', 'cmd');
@@ -2362,7 +2362,7 @@ class ParentClassItem extends FCModelAdmin
 		{
 			$item->publish_down = $nullDate;
 		}
-		else if ($item->publish_down != $nullDate)
+		elseif ($item->publish_down && $item->publish_down != $nullDate)
 		{
 			if ( StringHelper::strlen(StringHelper::trim( $item->publish_down )) <= 10 )
 			{
@@ -2714,7 +2714,7 @@ class ParentClassItem extends FCModelAdmin
 			$v->version_id	= ($isNew && !empty($data['type_id_not_set']) ) ? 0 : (int)$last_version+1;
 			$v->created			= $item->created;
 			$v->created_by	= $item->created_by;
-			if ($item->modified != $nullDate) {
+			if ($item->modified && $item->modified != $nullDate) {
 				// NOTE: We set modifier as creator of the version, and modication date as creation date of the version
 				$v->created		 = $item->modified;
 				$v->created_by = $item->modified_by;
