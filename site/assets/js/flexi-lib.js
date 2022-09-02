@@ -1157,11 +1157,11 @@
 
 		var cookieName = 'fc_columnchooser';
 		var cookieValue  = fclib_getCookie(cookieName);
-		//window.console.log(cookieName + 'old value: ' +cookieValue);
+		//window.console.log(cookieName + ' - old value: ' +cookieValue);
 
 		cookieValue = jQuery.parseJSON(cookieValue ? cookieValue : '{}');
 		cookieValue[data_tbl_id] = col_selected.join(',');
-		//window.console.log(cookieName + 'new value: ' + JSON.stringify(cookieValue));
+		//window.console.log(cookieName + ' - new value: ' + JSON.stringify(cookieValue));
 
 		var nDays = 30;
 		fclib_setCookie(cookieName, JSON.stringify(cookieValue), nDays);
@@ -1246,6 +1246,7 @@
 			expires.setTime(today.getTime() + 3600000*24*nDays);
 			document.cookie = cookieName+"="+encodeURIComponent(cookieValue) + ";samesite=" + samesite + ";path=" + path + ";expires=" + expires.toGMTString();
 		} else {
+			// nDays 0 , aka no expiration date, keep cookie till browser closes
 			document.cookie = cookieName+"="+encodeURIComponent(cookieValue) + ";samesite=" + samesite + ";path=" + path;
 		}
 		//alert(cookieName+"="+encodeURIComponent(cookieValue) + ";path=" + path);
@@ -1263,17 +1264,18 @@
 	/* Get a new list of 2-typles (key, element) living inside a cookie
 	 * List is an object with 'key' being the property name and 'element' being the value of the property
 	 */
-	function fclib_createCookieList(cookieName)
+	function fclib_createCookieList(cookieName, nDays)
 	{
 		var cookieValue = fclib_getCookie(cookieName);
 		var items = jQuery.parseJSON(cookieValue ? cookieValue : '{}');
+		nDays = nDays || 90;
 
 		return {
 			// Add to the items
 			"add": function(key, element)
 			{
 				items[key] = element;
-				fclib_setCookie(cookieName, JSON.stringify(items), null);
+				fclib_setCookie(cookieName, JSON.stringify(items), nDays);
 			},
 
 			// Remove from items
@@ -1282,7 +1284,7 @@
 				if (typeof items[key] != 'undefined')
 				{
 					delete items[key];
-					fclib_setCookie(cookieName, JSON.stringify(items), null);
+					fclib_setCookie(cookieName, JSON.stringify(items), nDays);
 				}
 			},
 
@@ -1290,7 +1292,7 @@
 			"clear": function()
 			{
 				items = {};
-				fclib_setCookie(cookieName, JSON.stringify(items), null);
+				fclib_setCookie(cookieName, JSON.stringify(items), nDays);
 			},
 
 			// Get all the items
@@ -1433,7 +1435,7 @@
 			(typeof mode!=='undefined' && parseInt(mode)) ||  // use the mode provided
 			(typeof mode==='undefined' && box.is(':hidden'))  // if any of the elements collection 'box' is hidden then open them all
 		) {
-			if (cookieName) fclib_setCookie(cookieName, 1, 0);
+			if (cookieName) fclib_setCookie(cookieName, 1, 0);  // nDays 0 , aka no expiration date, keep cookie till browser closes
 			jQuery(btn).data('fc_noeffect') || jQuery(btn).hasClass('fc_noeffect') ?
 				box.show() :
 				box.slideDown(400) ;
@@ -1442,7 +1444,7 @@
 		}
 		else
 		{
-			if (cookieName) fclib_setCookie(cookieName, 0, 0);
+			if (cookieName) fclib_setCookie(cookieName, 0, 0);  // nDays 0 , aka no expiration date, keep cookie till browser closes
 			jQuery(btn).data('fc_noeffect') || jQuery(btn).hasClass('fc_noeffect') ?
 				box.hide() :
 				box.slideUp(400) ;
@@ -2021,7 +2023,7 @@
 							jQuery(cfg.elem_container_selector).removeClass(cfg.elem_container_class).addClass(cfg.elem_container_prefix + selectSL.val());
 						}
 
-						fclib_setCookie(slider_input.name, selectSL.val(), 0);
+						fclib_setCookie(slider_input.name, selectSL.val(), 0);  // nDays 0 , aka no expiration date, keep cookie till browser closes
 					})
 					.css('display', '');  // avoid show() it adds display: block
 			}
@@ -2096,7 +2098,7 @@
 				jQuery(cfg.elem_container_selector).removeClass(cfg.elem_container_class).addClass(cfg.elem_container_prefix + slider_input.value);
 			}
 
-			fclib_setCookie(slider_input.name, slider_input.value, 0);
+			fclib_setCookie(slider_input.name, slider_input.value, 0);  // nDays 0 , aka no expiration date, keep cookie till browser closes
 		});
 
 		inputSL.addEventListener('change', function(){

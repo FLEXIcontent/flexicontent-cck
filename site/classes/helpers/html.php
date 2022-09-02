@@ -494,7 +494,8 @@ class flexicontent_html
 		$jinput = $app->input;
 
 		// Clear legacy cookie
-		$jinput->cookie->set('columnchoose_'.$data_tbl_id, null, 1, '', '');
+		$legacy_cookie = $jinput->cookie->get('columnchoose_'.$data_tbl_id, null);
+    if ($legacy_cookie) $jinput->cookie->set('columnchoose_'.$data_tbl_id, null, 1, '', '');
 
 		$js = "
 		var show_col_${data_tbl_id} = Array();
