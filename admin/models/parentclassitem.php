@@ -1763,7 +1763,7 @@ class ParentClassItem extends FCModelAdmin
 
 		// Default -- Dates: current and null.
 		$currentdate = JFactory::getDate();
-		$nullDate    = $this->_db->getNullDate();
+		$nullDate    = FLEXI_J40GE ? NULL : $this->_db->getNullDate();
 
 		// Default -- Created By (Owner).
 		$default_created_by = $user->get('id') ?: flexicontent_db::getSuperUserID();
