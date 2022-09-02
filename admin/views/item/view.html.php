@@ -2170,7 +2170,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 			$p++;
 		}
 		if ($params->get('add_item_pathway', 1)) {
-			$pathway->addItem( $this->escape($item->title), JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, 0, $item)) );
+			$pathway->addItem( $item->title, JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, 0, $item)) );
 		}
 
 

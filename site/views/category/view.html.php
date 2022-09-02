@@ -235,7 +235,7 @@ class FlexicontentViewCategory extends JViewLegacy
 			if ( in_array($parents[$p]->id, $globalnoroute) )  { $p++; continue; }
 
 			// Add current parent category
-			$pathway->addItem( $this->escape($parents[$p]->title), JRoute::_( FlexicontentHelperRoute::getCategoryRoute($parents[$p]->slug) ) );
+			$pathway->addItem( $parents[$p]->title, JRoute::_(FlexicontentHelperRoute::getCategoryRoute($parents[$p]->slug)) );
 			$p++;
 		}
 		//echo "<pre>"; print_r($pathway); echo "</pre>";
