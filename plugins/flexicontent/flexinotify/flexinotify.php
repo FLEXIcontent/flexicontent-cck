@@ -233,7 +233,7 @@ class plgFlexicontentFlexinotify extends JPlugin
 		{
 			if ($debug_notifications)
 			{
-				$app->enqueueMessage("** Notification Plugin: &nbsp; Item owner %d could not be loaded. Notification to owner for item changes could not be sent", 'message');
+				JFactory::getApplication()->enqueueMessage("** Notification Plugin: &nbsp; Item owner %d could not be loaded. Notification to owner for item changes could not be sent", 'message');
 			}
 			return;
 		}
@@ -355,7 +355,11 @@ class plgFlexicontentFlexinotify extends JPlugin
 		$html_mode=true; $cc=null; $bcc=null;
 		$attachment=null; $replyto=null; $replytoname=null;
 
-		$send_result = $mailer->sendMail( $from, $fromname, $recipient, $subject, $_message, $html_mode, $cc, $bcc, $attachment, $replyto, $replytoname );
+		try {
+			$send_result = $mailer->sendMail( $from, $fromname, $recipient, $subject, $_message, $html_mode, $cc, $bcc, $attachment, $replyto, $replytoname );
+		} catch(\Exception $e) {
+			$send_result = false;
+		}
 
 		/**
 		 * Finally give some feedback to current editor
@@ -493,7 +497,11 @@ class plgFlexicontentFlexinotify extends JPlugin
 				$html_mode=true; $cc=null; $bcc=null;
 				$attachment=null; $replyto=null; $replytoname=null;
 
-				$send_result = $mailer->sendMail( $from, $fromname, $recipient, $subject, $_message, $html_mode, $cc, $bcc, $attachment, $replyto, $replytoname );
+				try {
+					$send_result = $mailer->sendMail( $from, $fromname, $recipient, $subject, $_message, $html_mode, $cc, $bcc, $attachment, $replyto, $replytoname );
+				} catch(\Exception $e) {
+					$send_result = false;
+				}
 				if ($send_result) $count_sent++;
 			}
 
@@ -527,7 +535,11 @@ class plgFlexicontentFlexinotify extends JPlugin
 				$html_mode=true; $cc=null; $bcc = $to_100;
 				$attachment=null; $replyto=null; $replytoname=null;
 
-				$send_result = $mailer->sendMail( $from, $fromname, $recipient, $subject, $message, $html_mode, $cc, $bcc, $attachment, $replyto, $replytoname );
+				try {
+					$send_result = $mailer->sendMail( $from, $fromname, $recipient, $subject, $message, $html_mode, $cc, $bcc, $attachment, $replyto, $replytoname );
+				} catch(\Exception $e) {
+					$send_result = false;
+				}
 				if ($send_result) $count_sent += count($to_100);
 			}
 
