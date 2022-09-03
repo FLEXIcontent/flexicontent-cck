@@ -900,7 +900,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 			foreach ($tmpl->params->getGroup('attribs') as $field)
 			{
 				$fieldname = $field->fieldname;
-				$value = $item->itemparams->get($fieldname);
+				$value = $item->itemparams->get($fieldname, '');
 				if (strlen($value)) $tmpl->params->setValue($fieldname, 'attribs', $value);
 			}
 		}

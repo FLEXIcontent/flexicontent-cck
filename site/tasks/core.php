@@ -47,7 +47,7 @@ class FlexicontentTasksCore
 		if (!defined('FLEXI_J40GE'))
 		{
 			$jversion = new JVersion;
-			define('FLEXI_J40GE', version_compare( $jversion->getShortVersion(), '3.99.99', 'g' ) );
+			define('FLEXI_J40GE', version_compare( $jversion->getShortVersion(), '3.99.99', '>' ) );
 		}
 
 		/**

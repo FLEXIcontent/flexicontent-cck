@@ -452,7 +452,7 @@ class FlexicontentModelItems extends FCModelAdminList
 		$this->_extra_cols = array();
 
 		// Get the extra fields from COMPONENT then override by type setting if TYPE FILTER is active
-		$im_extra_fields = $this->cparams->get('items_manager_extra_fields');
+		$im_extra_fields = $this->cparams->get('items_manager_extra_fields', '');
 		$item_instance = null;
 
 		$types = $this->getTypesFromFilter();
@@ -534,14 +534,14 @@ class FlexicontentModelItems extends FCModelAdminList
 		if (count($types) === 1)
 		{
 			$type = reset($types);
-			$im_custom_filters = $type->params->get("items_manager_custom_filters");
+			$im_custom_filters = $type->params->get("items_manager_custom_filters", '');
 
 			$item_instance = new stdClass();
 			$item_instance->type_id = $type->id;
 		}
 		else
 		{
-			$im_custom_filters = $this->cparams->get("items_manager_custom_filters");
+			$im_custom_filters = $this->cparams->get("items_manager_custom_filters", '');
 			$item_instance = null;
 		}
 

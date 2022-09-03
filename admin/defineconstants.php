@@ -58,9 +58,9 @@ if (!defined('FLEXI_J16GE') || !defined('FLEXI_J30GE'))
 }
 if (!defined('FLEXI_J16GE'))   define('FLEXI_J16GE', true );
 if (!defined('FLEXI_J30GE'))   define('FLEXI_J30GE', true );
-if (!defined('FLEXI_J37GE'))   define('FLEXI_J37GE', version_compare( $jversion->getShortVersion(), '3.6.99', 'g' ) );
-if (!defined('FLEXI_J38GE'))   define('FLEXI_J38GE', version_compare( $jversion->getShortVersion(), '3.7.99', 'g' ) );
-if (!defined('FLEXI_J40GE'))   define('FLEXI_J40GE', version_compare( $jversion->getShortVersion(), '3.99.99', 'g' ) );
+if (!defined('FLEXI_J37GE'))   define('FLEXI_J37GE', version_compare( $jversion->getShortVersion(), '3.6.99', '>' ) );
+if (!defined('FLEXI_J38GE'))   define('FLEXI_J38GE', version_compare( $jversion->getShortVersion(), '3.7.99', '>' ) );
+if (!defined('FLEXI_J40GE'))   define('FLEXI_J40GE', version_compare( $jversion->getShortVersion(), '3.99.99', '>' ) );
 
 if (!defined('DS'))  define('DS',DIRECTORY_SEPARATOR);
 
@@ -82,7 +82,7 @@ if (!defined('COM_FLEXICONTENT_MEDIAPATH'))	define('COM_FLEXICONTENT_MEDIAPATH',
 
 // Set the media manager paths definitions
 $jinput = JFactory::getApplication()->input;
-$view = $jinput->get('view', null, 'cmd');
+$view = $jinput->get('view', '', 'cmd');
 $popup_upload = $jinput->get('pop_up', null, 'cmd');
 $path = "fleximedia_path";
 if(substr(strtolower($view),0,6) == "images" || $popup_upload == 1) $path = "image_path";

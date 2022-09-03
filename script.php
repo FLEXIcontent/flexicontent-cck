@@ -154,7 +154,7 @@ class com_flexicontentInstallerScript
 		$downgrade_allowed = true;
 		if ($type=='update')
 		{
-			if ( !$downgrade_allowed && version_compare( $this->release, $this->release_existing, 'l' ) )
+			if ( !$downgrade_allowed && version_compare( $this->release, $this->release_existing, '<' ) )
 			{
 				$from_to = ''
 					.JText::_('COM_FLEXICONTENT_FROM'). ' <span class="badge bg-info badge-info">' .$this->release_existing. '</span> '

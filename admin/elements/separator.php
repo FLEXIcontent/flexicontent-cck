@@ -243,7 +243,7 @@ class JFormFieldSeparator extends JFormFieldSpacer
 
 		$icon_class = @$attributes['icon_class'];
 
-		$box_count = @ $attributes['remove_boxes'];
+		$box_count = $this->element['remove_boxes'] ?? '';
 		$box_count = strlen($box_count) ? (int) $box_count : ($is_fc ? 0 : 2);
 		$_bof = $box_count ? ($box_count == 2 ? '</div></div>' : str_repeat("</div>", $box_count)) : '';
 		$_eof = $box_count ? ($box_count == 2

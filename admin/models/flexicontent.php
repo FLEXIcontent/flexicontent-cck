@@ -790,7 +790,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		$collation_version = $session->get('flexicontent.collation_version');
 		if ($collation_version == $jversion->getShortVersion())  return;
 
-		$docheck = version_compare( $jversion->getShortVersion(), '3.4.99', 'g' );
+		$docheck = version_compare( $jversion->getShortVersion(), '3.4.99', '>' );
 		if ($docheck)
 		{
 			$full_tbl_name = $dbprefix . 'content';
