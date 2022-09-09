@@ -5,7 +5,7 @@
  *
  * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
  * @link            https://flexicontent.org
- * @copyright       Copyright © 2020, FLEXIcontent team, All Rights Reserved
+ * @copyright       Copyright � 2020, FLEXIcontent team, All Rights Reserved
  * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
@@ -821,7 +821,7 @@ class plgFlexicontent_fieldsEmail extends FCField
 		// Get the route helper
 		require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'route.php');
 		$itemid   = $jinput->post->get('itemid', '', 'int');
-		$title    = $jinput->post->get('itemtitle', '');
+		$title    = $jinput->post->get('itemtitle', '', 'STRING');
 		$alias    = $jinput->post->get('itemalias', '');
 		$maincat  = $jinput->post->get('catid', '', 'int');
 		$itemauthor  = $jinput->post->get('itemauthor', '', '');
@@ -839,6 +839,7 @@ class plgFlexicontent_fieldsEmail extends FCField
 
 		// set only form value in input
 		$datas = $jinput->post->get($formid, array(), 'array');
+		
 		if (isset($datas['name'])){
 			$name = $datas['name'];
 		}
@@ -867,14 +868,14 @@ class plgFlexicontent_fieldsEmail extends FCField
 		if (isset($datas['subject'])){
 			$subject = $datas['subject'];
 		} else{
-			$subject ='';
+			$subject = $title;
 		}
 		$subjectemail = JText::sprintf('FLEXI_FIELD_EMAIL_SUBJECT_DEFAULT', $fromname, $subject);
 
 		//body
 		$body = '';
 		foreach ($datas as $field => $value) {
-				$body .= '<li>' . $value . '</li>';
+				$body .= '<li>'.$field.' : ' . $value . '</li>';
 			}
 			$body = "\n\r\n\r\n" . stripslashes($body);
 			$message 	= JText::sprintf('FLEXI_FIELD_EMAIL_MESSAGE_DEFAULT', $title, $body, '<a href="'.$item_url.'">'.$item_url.'</a>', $sitename);
