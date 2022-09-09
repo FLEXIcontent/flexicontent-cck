@@ -316,8 +316,8 @@ $microdata_itemtype_code = 'itemscope itemtype="http://schema.org/'.$microdata_i
 					}
 				}
 
-				$top_span_cols = (int) $this->params->get('top_span_cols', 8);
-				$top_span_cols = $top_span_cols < 1 || $top_span_cols > 12 ? 8 : $top_span_cols;
+				$top_span_cols_params = (int) $this->params->get('top_span_cols_params', '8');
+				$top_span_cols = $top_span_cols_params < 1 || $top_span_cols_params > 12 ? 8 : $top_span_cols_params;
 				$img_span_cols = 12 - $top_span_cols > 0 ? 12 - $top_span_cols : 12;
 
 				$imgPos_widthClass = 'span' . $img_span_cols . ' col-lg-' . $img_span_cols . ' col-md-' .$img_span_cols;
