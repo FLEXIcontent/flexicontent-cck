@@ -763,7 +763,7 @@ class FLEXIUtilities
 
 			$comments = (int) $cparams->get('comments', 0);
 
-			if ($comments === 1 && !$perms->JComments_Installed || $comments === 3 && !$perms->Kommento_Installed)
+			if ($comments === 1 && !$perms->JComments_Installed || $comments === 3 && !$perms->Komento_Installed)
 			{
 				call_user_func($addEntry,
 					'<span class="fcsb-icon-comments icon-comments disabled"></span>'.
