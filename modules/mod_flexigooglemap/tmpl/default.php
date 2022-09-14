@@ -145,7 +145,7 @@ $use_mlist = (int) $params->get('use_dynamic_marker_list', 0);
        style="display: flex; flex-direction: row; flex-wrap: wrap; gap: 16px; margin-bottom: 12px;"
   >
     <?php echo $geo_locate_btn ? '<span class="btn btn-primary geo-locate-me-btn">
-      ' . JText::_('MOD_FLEXIGOOGLEMAP_FINE_NEARBY_TXT') . '
+      ' . JText::_('MOD_FLEXIGOOGLEMAP_FIND_NEARBY_TXT') . '
       </span>
       ' : ''; ?>
     <?php if ($geo_locate_zoom_sel): ?>
