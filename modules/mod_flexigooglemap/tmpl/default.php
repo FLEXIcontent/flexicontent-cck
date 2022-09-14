@@ -145,12 +145,12 @@ $use_mlist = (int) $params->get('use_dynamic_marker_list', 0);
        style="display: flex; flex-direction: row; flex-wrap: wrap; gap: 16px; margin-bottom: 12px;"
   >
     <?php echo $geo_locate_btn ? '<span class="btn btn-primary geo-locate-me-btn">
-      ' . JText::_('Find near-by locations') . '
+      ' . JText::_('MOD_FLEXIGOOGLEMAP_FINE_NEARBY_TXT') . '
       </span>
       ' : ''; ?>
     <?php if ($geo_locate_zoom_sel): ?>
       <div>
-        <label class="label geo-locate-zoom-level-lbl"><?php echo JText::_('Zoom'); ?></label>&nbsp;
+        <label class="label geo-locate-zoom-level-lbl"><?php echo JText::_('MOD_FLEXIGOOGLEMAP_ZOOM'); ?></label>&nbsp;
         <select class="form-select geo-locate-zoom-level geo-locate-zoom-level-<?php echo $module->id; ?>" style="display: inline-block; width: auto;">
         <?php
         $distance_lbls = array(
