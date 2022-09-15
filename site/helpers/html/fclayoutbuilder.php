@@ -207,18 +207,22 @@ abstract class JHtmlFclayoutbuilder
 
 		/* Primary color for the background */
 		.gjs-one-bg {
-		  background-color: #f3f3f3;
+		  background-color: #404040;
 		}
 
 		/* Secondary color for the text color */
 		.gjs-two-color {
-		  color: #000000;
+		  color: #ffffff;
 		}
 
 		/* Tertiary color for the background */
 		.gjs-three-bg {
-		  background-color: #ec5896;
+		  background-color: #6EA22B;
 		  color: white;
+		}
+		.gjs-color-warn {
+			color: #6EA22B;
+			fill: #6EA22B;
 		}
 
 		/* Quaternary color for the text color */
@@ -336,6 +340,13 @@ abstract class JHtmlFclayoutbuilder
 		}
 		body {
 			overflow: scroll;
+		}
+		.fa, .fas, [class^=icon-], [class*=" icon-"] {
+			font-family: \'FontAwesome\';
+			font-weight: normal;
+		}
+		label.gjs-sm-icon {
+			color: #fff;
 		}
 		');
 		
