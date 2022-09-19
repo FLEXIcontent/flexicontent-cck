@@ -240,7 +240,7 @@ $use_mlist = (int) $params->get('use_dynamic_marker_list', 0);
 			  output.innerHTML = '<span class="geo-location-blocked">Unable to retrieve your location</span>';
 		  }
 
-		  output.innerHTML =  '<span class="geo-location-trying" style="align-self: center;">Searching ...</span>';
+		  output.innerHTML =  '<span class="geo-location-trying" style="align-self: center;">'. JText::_("MOD_FLEXIGOOGLEMAP_SECHING_TXT") .'</span>';
 
 		  navigator.geolocation.getCurrentPosition(success, error);
 	  }
