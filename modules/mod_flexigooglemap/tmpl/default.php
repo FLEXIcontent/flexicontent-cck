@@ -154,10 +154,10 @@ $use_mlist = (int) $params->get('use_dynamic_marker_list', 0);
         <select class="form-select geo-locate-zoom-level geo-locate-zoom-level-<?php echo $module->id; ?>" style="display: inline-block; width: auto;">
         <?php
         $distance_lbls = array(
-          15 => ' (Closest)',
-          10 => ' (Distant)',
-          7 => ' (Very distant)',
-          2 => ' (Most distant)',
+          15 => JText::_('MOD_FLEXIGOOGLEMAP_DIST_CLOSED') ,
+          10 => JText::_('MOD_FLEXIGOOGLEMAP_DIST_DISTANT') ,
+          7 => JText::_('MOD_FLEXIGOOGLEMAP_DIST_VERYDISTANT'),
+          2 => JText::_('MOD_FLEXIGOOGLEMAP_DIST_MOSTDIST') ,
         );
         for($i = 15; $i >=2; $i--)
         {
