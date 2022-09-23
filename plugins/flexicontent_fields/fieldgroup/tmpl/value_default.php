@@ -20,12 +20,18 @@ for ($n = 0; $n < $max_count; $n++)
 		}
 
 		// Add field's HTML (optionally including label)
-		$default_html[] = '
-		<div class="fc-field-box field_' . $grouped_field->name . '">
-			'.($grouped_field->parameters->get('display_label') ? '
-			<span class="flexi label">'.$grouped_field->label.'</span>' : '').
-			(isset($grouped_field->{$method.'_arr'}[$n]) ? '<div class="flexi value">'.$grouped_field->{$method.'_arr'}[$n].'</div>' : '').'
-		</div>';
+		if ($grouped_field->field_type == 'fieldgroup') {
+			$default_html[] = '<div class="fc-field-box field_' . $grouped_field->name . '">'.
+			$item->fields[$_grouped_field->name]->display_arr.'
+			</div>';
+		} else {
+			$default_html[] = '
+			<div class="fc-field-box field_' . $grouped_field->name . '">
+				'.($grouped_field->parameters->get('display_label') ? '
+				<span class="flexi label">'.$grouped_field->label.'</span>' : '').
+				(isset($grouped_field->{$method.'_arr'}[$n]) ? '<div class="flexi value">'.$grouped_field->{$method.'_arr'}[$n].'</div>' : '').'
+			</div>';
+		}
 	}
 
 	if (count($default_html))

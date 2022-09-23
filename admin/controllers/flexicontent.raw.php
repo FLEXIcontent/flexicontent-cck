@@ -87,9 +87,7 @@ class FlexicontentControllerFlexicontent extends FlexicontentControllerBaseAdmin
 		$query = $db->getQuery(true)
             ->insert('#__flexicontent_fields')
             ->columns('
-                `id`, `field_type`, `name`, `label`, `description`, `isfilter`, `iscore`, `issearch`, `isadvsearch`,
-                `untranslatable`, `formhidden`, `valueseditable`, `edithelp`, `positions`, `published`, `attribs`,
-                `checked_out`, `checked_out_time`, `access`, `ordering`
+						(`id`,`field_type`,`name`,`label`,`description`,`isfilter`,`iscore`,`issearch`,`isadvsearch`,`untranslatable`,`formhidden`,`defaultviewbehavior`,`fieldviewbehavior`,`valueseditable`,`edithelp`,`positions`,`published`,`attribs`,`checked_out`,`checked_out_time`,`access`,`ordering`)
             ');
 
 		$values = array();
@@ -202,7 +200,7 @@ class FlexicontentControllerFlexicontent extends FlexicontentControllerBaseAdmin
 
 		JFactory::getLanguage()->load('plg_flexicontent_fields_coreprops', JPATH_ADMINISTRATOR, 'en-GB', true);
 		JFactory::getLanguage()->load('plg_flexicontent_fields_coreprops', JPATH_ADMINISTRATOR, null, true);
-		
+
 		// !! IMPORTANT core fields have specific fields ID, ranging from 1 - 14
 		// !! Make sure these have been creating before trying to add any other fields into the flexicontent_fields DB table
 		$this->createDefaultFields($_skip_success_msg = true);

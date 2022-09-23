@@ -172,6 +172,10 @@ class FlexicontentModelField extends FCModelAdmin
 		$record->isadvsearch		= 0;
 		$record->untranslatable	= 0;
 		$record->formhidden			= 0;
+		$record->defaultviewbehavior			= 1;
+		$record->fieldviewbehavior		= 1;
+		$record->checkfieldname			= null;
+		$record->checkfieldvalue		= null;
 		$record->valueseditable	= 0;
 		$record->edithelp				= 2;
 		$record->positions			= array();

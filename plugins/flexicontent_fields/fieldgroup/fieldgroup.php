@@ -90,7 +90,7 @@ class plgFlexicontent_fieldsFieldgroup extends FCField
 		 */
 
 		// Get fields belonging to this field group
-		$grouped_fields = $this->getGroupFields($field);
+		$grouped_fields = $this->getGroupFields($field, $item);
 
 		// Get values of fields making sure that also empty values are created too
 		$max_count = 1;
@@ -233,7 +233,7 @@ class plgFlexicontent_fieldsFieldgroup extends FCField
 			$js .= "
 				lastField ?
 					(insert_before ? newField.insertBefore( lastField ) : newField.insertAfter( lastField ) ) :
-					newField.appendTo( jQuery('#sortables_".$field->id."') ) ;
+					newField.appendTo( el.closest(jQuery('#sortables_".$field->id."')) ) ;
 				";
 
 			// Add new element to sortable objects (if field not in group) -- NOTE: remove_previous: 2 means remove element without do any cleanup actions
@@ -344,17 +344,51 @@ class plgFlexicontent_fieldsFieldgroup extends FCField
 		{
 			$compact_edit_excluded = $field->parameters->get('compact_edit_excluded', array());
 
-			if (empty($compact_edit_excluded))
-			{
-				$compact_edit_excluded = array();
-			}
-			if (!is_array($compact_edit_excluded))
-			{
-				$compact_edit_excluded = preg_split("/[\|,]/", $compact_edit_excluded);
-			}
 
-			$compact_edit_excluded = array_flip($compact_edit_excluded);
-		}
+		$field->html = array();
+		for ($n = 0; $n < $max_count; $n++)
+		{
+			$field->html[$n] = '
+				'.(!$add_ctrl_btns ? '' : '
+				<div class="'.$input_grp_class.' fc-xpended-btns">
+					'.$move2.'
+					'.$remove_button.'
+					'.$togglers.'
+					'.(!$add_position ? '' : $add_here).'
+				</div>
+				');
+
+			// Append item-form display HTML of the every field in the group
+			$i = 0;
+			foreach($grouped_fields as $field_id => $grouped_field)
+			{
+				$hide_field = '';
+				if ($grouped_field->defaultviewbehavior == 0) {
+					if ($grouped_field->defaultviewbehavior !== $grouped_field->fieldviewbehavior) {
+						$target_field = $grouped_field->checkfieldname;
+						$target_field_id = $item->fields[$target_field]->id;
+						$target_field_value = $grouped_field->checkfieldvalue;
+						if ($grouped_fields[$target_field_id]->value[$n] !== $target_field_value) {
+							$hide_field = ' style="display:none;"';
+						}
+					}
+				}
+				if ($grouped_field->formhidden == 4) continue;
+				if ($isAdmin) {
+					if ( $grouped_field->parameters->get('backend_hidden')  ||  (isset($grouped_field->formhidden_grp) && in_array($grouped_field->formhidden_grp, array(2,3))) ) continue;
+				} else {
+					if ( $grouped_field->parameters->get('frontend_hidden') ||  (isset($grouped_field->formhidden_grp) && in_array($grouped_field->formhidden_grp, array(1,3))) ) continue;
+				}
+
+				// Check for not-assigned to type fields,
+				if (!isset($grouped_field->html[$n]))
+				{
+					if ($form_empty_fields)
+					{
+						$grouped_field->html[$n] = '<i>' . $form_empty_fields_text . '</i>';
+					}
+					else continue;
+				}
 
 
 		/**
@@ -366,8 +400,21 @@ class plgFlexicontent_fieldsFieldgroup extends FCField
 		$formlayout = $field->parameters->get('formlayout', '');
 		$formlayout = $formlayout ? 'field_'.$formlayout : 'field_list';
 
-		include(self::getFormPath($this->fieldtypes[0], $formlayout));
+				$field->html[$n] .= '<div class="fcclear"></div>
+				<div class="fcfieldval_container_outer'.($compact_edit && isset($compact_edit_excluded[$field_id]) ? ' fcAlwaysVisibleField' : '').'"'.($hide_field !== '' ? $hide_field : '').'>
+					<label id="custom_'.$grouped_field->name.'_'.$n.'-lbl" class="'.$lbl_class.'" title="'.$lbl_title.'" data-for="custom_'.$grouped_field->name.'_'.$n.'">'.$grouped_field->label.'</label>
+					<div class="fcfieldval_container valuebox fcfieldval_container_'.$grouped_field->id.'" >
+						' . ($grouped_field->description && $edithelp==3 ? sprintf( $alert_box, '', 'info', 'fc-nobgimage', $grouped_field->description ) : '') . '
+						' . ($grouped_field->field_type == 'fieldgroup' ? $grouped_field->html : $grouped_field->html[$n]) . '
+					</div>
+				</div>
+					';
+				$i++;
+			}
+		}
 
+		if (!$multiple) break;  // multiple values disabled, break out of the loop, not adding further values even if the exist
+	}
 
 		/**
 		 * Non value HTML
@@ -435,7 +482,6 @@ class plgFlexicontent_fieldsFieldgroup extends FCField
 				' : '').'
 			' . $field->html;
 	}
-
 
 	// Method to create field's HTML display for frontend views
 	public function onDisplayFieldValue(&$field, $item, $values = null, $prop = 'display')
@@ -512,7 +558,7 @@ class plgFlexicontent_fieldsFieldgroup extends FCField
 
 
 		// Get fields belonging to this field group
-		$grouped_fields = $this->getGroupFields($field);
+		$grouped_fields = $this->getGroupFields($field, $item);
 
 		// Get values of fields making sure that also empty values are created too
 		$max_count = 0;
@@ -754,9 +800,12 @@ class plgFlexicontent_fieldsFieldgroup extends FCField
 				//echo 'Replacing: '. $_rendered_field->name . ', method: ' . $method . ', index: ' .$n. '<br/>';
 				if ($method !== 'label' && $method !== 'id' && $method !== 'name')
 				{
-					$_html = isset($_rendered_field->{$method.'_arr'}[$n]) ? $_rendered_field->{$method.'_arr'}[$n] : '';
+					if ($_rendered_field->field_type == 'fieldgroup') {
+						$_html = isset($_rendered_field->{$method.'_arr'}[$n]) ? $_rendered_field->{$method.'_arr'} : '';
+					} else {
+						$_html = isset($_rendered_field->{$method.'_arr'}[$n]) ? $_rendered_field->{$method.'_arr'}[$n] : '';
+					}
 				}
-
 				// Skip (hide) label for field having none display HTML (is such behaviour was configured)
 				elseif ($method === 'label')
 				{
@@ -795,6 +844,34 @@ class plgFlexicontent_fieldsFieldgroup extends FCField
 	// Method to handle field's values before they are saved into the DB
 	public function onBeforeSaveField( &$field, &$post, &$file, &$item )
 	{
+		//before we save this, due to the presence of nested fields, we need to change the valueorder and suborder of nested fields within a nested groupfield
+		//first things first, we parse whether or not this is used in a group, if not, skip all else.
+		$attribs = str_replace('"', '', explode(',', $field->attribs));
+		$group = explode(':', $attribs[0])[1];
+		//if the field is within another group, we need to check the fields, get the index of the parent item they're under, and go from there
+		if ($group == 1) {
+			//this is a heavy-handed way to get this, if it can be simplified later that would be ideal
+			$grouped_fields = $this->getGroupFields($field, $item);
+			//we can't use "field" here as that is used for the main parent field
+			foreach($grouped_fields as $raw_field) {
+				$raw_field->nested = true;
+				$raw_field->parent_field_id = $field->id;
+				$raw_field->parent_field_name = $field->name;
+				$raw_field->dependent_field = $field-> checkfieldname;
+				$dependent_field_id = $item->fields[$raw_field->dependent_field]->id;
+				$dependent_field_check = $field-> checkfieldvalue;
+				$dependent_field_values = $item->fieldvalues[$dependent_field_id];
+				if (!isset($raw_field->parentindeces)) $raw_field->parentindeces = [];
+				$i = 1;
+				foreach($dependent_field_values as $value) {
+					if ($value == $dependent_field_check) {
+						array_push($raw_field->parentindeces, $i);
+					}
+					$i++;
+				}
+				$item->fields[$raw_field->name] = $raw_field;
+			}
+		}
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 	}
 
@@ -819,7 +896,7 @@ class plgFlexicontent_fieldsFieldgroup extends FCField
 	// ***
 
 	// Retrieves the fields that are part of the given 'fieldgroup' field
-	function getGroupFields(&$field)
+	function getGroupFields(&$field, &$item)
 	{
 		static $grouped_fields = array();
 		if (isset($grouped_fields[$field->id])) return $grouped_fields[$field->id];
@@ -845,19 +922,59 @@ class plgFlexicontent_fieldsFieldgroup extends FCField
 			;
 		$db->setQuery($query);
 		$grouped_fields[$field->id] = $db->loadObjectList('id');
-
 		$_grouped_fields = array();
-		foreach($grouped_fields[$field->id] as $field_id => $grouped_field)
-		{
-			// Create field parameters, if not already created, NOTE: for 'custom' fields loadFieldConfig() is optional
-			if (empty($grouped_field->parameters)) {
-				$grouped_field->parameters = new JRegistry($grouped_field->attribs);
-			}
 
-			// Check if field is not set to participate in a field group and skip it
-			if ( !$grouped_field->parameters->get('use_ingroup') ) continue;
-			$_grouped_fields[$field_id] = $grouped_field;
+		foreach($grouped_fields[$field->id] as $field_id => $grouped_field) {
+			if ($grouped_field->field_type == 'fieldgroup') {
+				$grouped_field->nested_fields = [];
+				// Create field parameters, if not already created, NOTE: for 'custom' fields loadFieldConfig() is optional
+				if (empty($grouped_field->parameters)) {
+					$grouped_field->parameters = new JRegistry($grouped_field->attribs);
+				}
+
+				$_fieldgroup_fields = $grouped_field->parameters->get('fields', array());
+
+				// break $_fieldgroup_fields into array at ,
+				if ( !is_array($_fieldgroup_fields) ) {
+					$_fieldgroup_fields = preg_split("/[\|,]/", $_fieldgroup_fields);
+				}
+				// loop through the fields of the fieldgroup and add them to the list of fields to be returned
+				foreach($_fieldgroup_fields as $fieldgroup_field) {
+					$db = JFactory::getDbo();
+					$query = 'SELECT f.*'
+						. ' FROM #__flexicontent_fields AS f'
+						. ' WHERE f.published = 1'
+						. ' AND f.id = '.$fieldgroup_field
+						;
+					$db->setQuery($query);
+					$field_data = $db->loadObject();
+					$field_data->values = [];
+					$query = 'SELECT ffir.* '
+						. ' FROM #__flexicontent_fields_item_relations AS ffir'
+						. ' WHERE ffir.item_id = '. $item->id .' AND ffir.field_id =' .$fieldgroup_field
+						. ' ORDER BY ffir.valueorder';
+						;
+					$db->setQuery($query);
+					$field_values = $db->loadObjectList();
+					$field_data->values = $field_values;
+					array_push($grouped_field->nested_fields, $field_data);
+				}
+				$_grouped_fields[$field_id] = $grouped_field;
+			} else {
+				// Create field parameters, if not already created, NOTE: for 'custom' fields loadFieldConfig() is optional
+				if (empty($grouped_field->parameters)) {
+					$grouped_field->parameters = new JRegistry($grouped_field->attribs);
+				}
+
+				// Check if field is not set to participate in a field group and skip it
+				// if ( !$grouped_field->parameters->get('use_ingroup') ) continue;
+				$_grouped_fields[$field_id] = $grouped_field;
+
+			}
 		}
+
+		// print_r($grouped_fields[$field->id]);
+
 		$grouped_fields[$field->id] = $_grouped_fields;
 
 		return $grouped_fields[$field->id];
@@ -867,6 +984,7 @@ class plgFlexicontent_fieldsFieldgroup extends FCField
 	// Retrieves and add values to the given field objects
 	function getGroupFieldsValues(&$field, &$item, &$grouped_fields, &$max_count)
 	{
+
 		$do_compact = true;
 
 		// ****************
@@ -876,6 +994,22 @@ class plgFlexicontent_fieldsFieldgroup extends FCField
 		foreach($grouped_fields as $field_id => $grouped_field)
 		{
 			// Item viewing
+			if (isset($grouped_field->nested_fields)) {
+				foreach($grouped_field->nested_fields as $nested_field) {
+					$nested_field_id = $nested_field->id;
+					if ( isset($item->fieldvalues[$nested_field_id]) ) {
+						$nested_field->value = is_array($item->fieldvalues[$nested_field_id])  ?  $item->fieldvalues[$nested_field_id]  :  array($item->fieldvalues[$nested_field_id]);
+					}
+					// Item form
+					else if ( isset($item->fields[$nested_field->name]->value) ) {
+						$nested_field->value = $item->fields[$nested_field->name]->value;
+					}
+					// Value not set
+					else {
+						$nested_field->value = null;
+					}
+				}
+			}
 			if ( isset($item->fieldvalues[$field_id]) ) {
 				$grouped_field->value = is_array($item->fieldvalues[$field_id])  ?  $item->fieldvalues[$field_id]  :  array($item->fieldvalues[$field_id]);
 			}
@@ -939,31 +1073,74 @@ class plgFlexicontent_fieldsFieldgroup extends FCField
 
 		if ($do_compact) foreach($grouped_fields as $field_id => $grouped_field)
 		{
-			$i = $start_at;
-			for ($n = $start_at; $n <= $max_index; $n++)
-			{
-				//echo $n." - ".$i."<br/>";
-				// Move down to fill empty gaps, if current index is not in sync, meaning 1 empty group was encountered -before-, and also if current (value) group is non-empty
-				if ( $n > $i && !isset($grp_isempty[$n]) )
-				{
-					$grouped_field->value[$i] = $grouped_field->value[$n];
-					if ( isset($grouped_field->value[$n]) )
+			if (isset($grouped_field->nested_fields)) {
+				foreach($grouped_field->nested_fields as $nested_field) {
+					$i = $start_at;
+					for ($n = $start_at; $n <= $max_index; $n++)
 					{
-						if ( isset($item->fieldvalues[$field_id]) )               $item->fieldvalues[$field_id][$i] = $grouped_field->value[$n];
-						if ( isset($item->fields[$grouped_field->name]->value) )  $item->fields[$grouped_field->name]->value[$i] = $grouped_field->value[$n];
+						//echo $n." - ".$i."<br/>";
+						// Move down to fill empty gaps, if current index is not in sync, meaning 1 empty group was encountered -before-, and also if current (value) group is non-empty
+						$nested_field->sorted_values = [];
+						foreach($nested_field->values as $value) {
+							$index = $value->valueorder;
+							$order = $value->suborder;
+
+							if (!isset($nested_field->sorted_values[$index])) $nested_field->sorted_values[$index] = [];
+							array_push($nested_field->sorted_values[$index], $value);
+
+						}
+						foreach($nested_field->sorted_values as $value_array) {
+							array_multisort($value_array);
+						}
+						if ( $n > $i && !isset($grp_isempty[$n]) )
+						{
+							$nested_field->value[$i] = $nested_field->value[$n];
+							if ( isset($nested_field->value[$n]) )
+							{
+								if ( isset($item->fieldvalues[$nested_field->id]) )               $item->fieldvalues[$nested_field->id][$i] = $nested_field->value[$n];
+								if ( isset($item->fields[$nested_field->name]->value) )  $item->fields[$nested_field->name]->value[$i] = $nested_field->value[$n];
+							}
+						}
+
+						// Unset moved groups or group with ALL-empty values
+						if ( $n > $i || isset($grp_isempty[$n]) )
+						{
+							unset($nested_field->value[$n]);
+							if ( isset($item->fieldvalues[$nested_field->id]) ) unset($item->fieldvalues[$nested_field->id][$n]);
+							if ( isset($item->fields[$nested_field->name]->value) ) unset($item->fields[$nested_field->name]->value[$n]);
+						}
+
+						// Increment adding position if group was not empty
+						if ( !isset($grp_isempty[$n]) ) $i++;
 					}
 				}
-
-				// Unset moved groups or group with ALL-empty values
-				if ( $n > $i || isset($grp_isempty[$n]) )
+			} else {
+				$i = $start_at;
+				for ($n = $start_at; $n <= $max_index; $n++)
 				{
-					unset($grouped_field->value[$n]);
-					if ( isset($item->fieldvalues[$field_id]) ) unset($item->fieldvalues[$field_id][$n]);
-					if ( isset($item->fields[$grouped_field->name]->value) ) unset($item->fields[$grouped_field->name]->value[$n]);
-				}
+					//echo $n." - ".$i."<br/>";
+					// Move down to fill empty gaps, if current index is not in sync, meaning 1 empty group was encountered -before-, and also if current (value) group is non-empty
+					if ( $n > $i && !isset($grp_isempty[$n]) )
+					{
+						$grouped_field->value[$i] = $grouped_field->value[$n];
+						if ( isset($grouped_field->value[$n]) )
+						{
+							if ( isset($item->fieldvalues[$field_id]) )               $item->fieldvalues[$field_id][$i] = $grouped_field->value[$n];
+							if ( isset($item->fields[$grouped_field->name]->value) )  $item->fields[$grouped_field->name]->value[$i] = $grouped_field->value[$n];
+						}
+					}
 
-				// Increment adding position if group was not empty
-				if ( !isset($grp_isempty[$n]) ) $i++;
+					// Unset moved groups or group with ALL-empty values
+					if ( $n > $i || isset($grp_isempty[$n]) )
+					{
+						unset($grouped_field->value[$n]);
+						if ( isset($item->fieldvalues[$field_id]) ) unset($item->fieldvalues[$field_id][$n]);
+						if ( isset($item->fields[$grouped_field->name]->value) ) unset($item->fields[$grouped_field->name]->value[$n]);
+					}
+
+					// Increment adding position if group was not empty
+					if ( !isset($grp_isempty[$n]) ) $i++;
+				}
 			}
 		}
 		//echo "<br/><br/><br/>COMPACTED<br/><pre>"; foreach($grouped_fields as $field_id => $grouped_field) { echo "\n[".$grouped_field->id."] - ".$grouped_field->name; print_r($grouped_field->value); } echo "</pre>";

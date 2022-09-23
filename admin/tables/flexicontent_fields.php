@@ -99,6 +99,18 @@ class flexicontent_fields extends _flexicontent_fields
 	var $formhidden			= 0;
 
 	/** @var int */
+	var $defaultviewbehavior			= 1;
+
+	/** @var int */
+	var $fieldviewbehavior			= 1;
+
+	/** @var string */
+	var $checkfieldname				= null;
+
+	/** @var string */
+	var $checkfieldvalue	= '';
+
+	/** @var int */
 	var $valueseditable	= 0;
 
 	/** @var int */
@@ -175,7 +187,7 @@ class flexicontent_fields extends _flexicontent_fields
 		// Do not change alias of core fields that, keep the one provided by the model / caller
 		$config = (object) array('automatic_alias' => !$this->iscore);
 
-		// Check common properties, like title and alias 
+		// Check common properties, like title and alias
 		if (parent::_check_record($config) === false)
 		{
 			return false;

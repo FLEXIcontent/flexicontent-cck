@@ -24,7 +24,7 @@
 		<option value="0">FLEXI_NO</option>
 		<option value="1">FLEXI_YES</option>
 	</field>
-	
+
 	<field name="untranslatable" type="fcradio" default="0" label="FLEXI_FIELD_NON_TRANSLATABLE" description="FLEXI_FIELD_NON_TRANSLATABLE_DESC" class="btn-group btn-group-yesno" labelclass="fc-prop-lbl">
 		<option value="0">FLEXI_NO</option>
 		<option value="1">FLEXI_YES</option>
@@ -36,6 +36,16 @@
 		<option value="3">FLEXI_BOTH</option>
 		<option value="4">FLEXI_IF_EMPTY</option>
 	</field>
+	<field name="defaultviewbehavior" type="fcradio" default="1" label="Default Show/Hide Behavior" description="" class="btn-group btn-group-yesno" labelclass="fc-prop-lbl">
+		<option value="0">FLEXI_HIDE</option>
+		<option value="1">FLEXI_SHOW</option>
+	</field>
+	<field name="fieldviewbehavior" type="fcradio" default="1" label="Field Show/Hide Behavior" description="" class="btn-group btn-group-yesno" labelclass="fc-prop-lbl">
+		<option value="0">FLEXI_HIDE</option>
+		<option value="1">FLEXI_SHOW</option>
+	</field>
+	<field name="checkfieldname" type="text" default="" label="Show field if " description="Please enter the name of the field whose value you want checked to determine if this field is hidden or if it shows" labelclass="fc-prop-lbl" />
+	<field name="checkfieldvalue" type="text" default="" label=" has a value of " description="Please enter the value that will be checked for" labelclass="fc-prop-lbl" />
 	<field name="valueseditable" type="list" default="0" label="FLEXI_VALUES_EDITABLE_BY_ACL" description="FLEXI_VALUES_EDITABLE_BY_ACL_DESC" class="" labelclass="fc-prop-lbl">
 		<option value="0">FLEXI_ANY_EDITOR</option>
 		<option value="1">FLEXI_USE_ACL_AND_NO_EDIT_MSG</option>

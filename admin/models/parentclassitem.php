@@ -2796,7 +2796,7 @@ class ParentClassItem extends FCModelAdmin
 		$user    = JFactory::getUser();
 		$isSite  = $app->isClient('site');
 		$isAdmin = !$isSite;  // Treat non-site (e.g. CLI) as if being admin
-		
+
 		$dispatcher = JEventDispatcher::getInstance();
 		$cparams    = $this->_cparams;
 		$use_versioning = $cparams->get('use_versioning', 1);
@@ -3260,6 +3260,11 @@ class ParentClassItem extends FCModelAdmin
 					$obj->version			= (int)$last_version+1;
 					$use_ingroup = $field->parameters->get('use_ingroup', 0);
 
+					if ($field->nested == true) {
+						$indeces = $item->fields[$field->name]->parentindeces;
+						$obj->valueorder = $indeces[0];
+						$obj->suborder = $i;
+					}
 					// Serialize the properties of the value, normally this is redudant, since the field must have had serialized the parameters of each value already
 					if ( !empty($field->use_suborder) && is_array($posted_value) )
 						$obj->value = null;
@@ -3844,7 +3849,7 @@ class ParentClassItem extends FCModelAdmin
 
 		// b. Merge parameters from current category, but prevent some settings from propagating ... to the item, that are meant for
 		//    category view only, these are legacy settings that were removed from category.xml, but may exist in saved configurations
-		
+
 		// Do not merge ALL category parameters !! into item, as they are 99% irrelevant
 		if (0)
 		{
