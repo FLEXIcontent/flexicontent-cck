@@ -355,11 +355,11 @@ else
 		$filter->html	.=
 		($isSlider ? '<div id="'.$filter_ffid.'_nouislider" class="fcfilter_with_nouislider ' . ($showAsTooltips ? '' : 'noToolTipSlider') . '"></div><div class="fc_slider_input_box">' : '').'
 			<div class="fc_filter_element">
-				<input name="'.$filter_ffname.'[1]" '.$attribs_str.' id="'.$filter_ffid.'1" type="text" size="'.$size.'" value="'.htmlspecialchars(@ $value[1], ENT_COMPAT, 'UTF-8').'" />
+				<input name="'.$filter_ffname.'[1]" '.$attribs_str.' id="'.$filter_ffid.'1" type="text" size="'.$size.'" value="'.htmlspecialchars($value[1] ?? '', ENT_COMPAT, 'UTF-8').'" />
 			</div>
 			' . ($use_font_icons ? ' <span class="fc_icon_range icon-arrow-left-4"></span><span class="fc_icon_range icon-arrow-right-4"></span> ' : ' <span class="fc_range"></span> ') . '
 			<div class="fc_filter_element">
-				<input name="'.$filter_ffname.'[2]" '.$attribs_str.' id="'.$filter_ffid.'2" type="text" size="'.$size.'" value="'.htmlspecialchars(@ $value[2], ENT_COMPAT, 'UTF-8').'" />
+				<input name="'.$filter_ffname.'[2]" '.$attribs_str.' id="'.$filter_ffid.'2" type="text" size="'.$size.'" value="'.htmlspecialchars($value[2] ?? '', ENT_COMPAT, 'UTF-8').'" />
 			</div>
 		'.($isSlider ? '</div><div class="fcfilter_nouislider_txtbox">' . ($label_filter==2 ? '<span class="fc_slider_inner_label">' . $filter->label . ': </span>' : '') . '</div>' : '');
 	}

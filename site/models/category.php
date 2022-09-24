@@ -1468,7 +1468,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 	function _buildAlphaIndexWhere()
 	{
 		// Get alpha index request variable and do some security checks, by removing any quotes and other non-valid characters
-		$alpha = JFactory::getApplication()->input->get('letter', NULL, 'string');
+		$alpha = JFactory::getApplication()->input->get('letter', '', 'string');
 		$alpha = preg_replace ("/(\(|\)\'|\"|\\\)/u", "", $alpha);
 
 		if (StringHelper::strlen($alpha)==0) {

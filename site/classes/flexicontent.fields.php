@@ -5987,7 +5987,7 @@ class FlexicontentFields
 
 			if (!is_array($vals))
 			{
-				if (strlen($vals))
+				if (strlen($vals ?? ''))
 				{
 					$vals = array($vals);
 				}

@@ -1072,7 +1072,7 @@ class FlexicontentViewCategory extends JViewLegacy
 
 		$curr_url   = str_replace('&', '&amp;', $_SERVER['REQUEST_URI']);
 		$print_link = $curr_url .(strstr($curr_url, '?') ? '&amp;'  : '?').'pop=1&amp;tmpl=component&amp;print=1';
-		$pageclass_sfx = htmlspecialchars($params->get('pageclass_sfx'));
+		$pageclass_sfx = htmlspecialchars($params->get('pageclass_sfx', ''));
 
 		$this->layout_vars = $layout_vars;
 		$this->action = $category_link;
