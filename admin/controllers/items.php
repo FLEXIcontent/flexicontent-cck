@@ -1685,7 +1685,12 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		}
 
 		/**
-		 * Get target languages for translation task
+		 * Language CASE 1: Either Copy/moving/translating multiple items to a single language, use 'language' REQUEST variable
+		 */
+		$lang    = $this->input->get('language', '_not_posted_', 'string');
+
+		/**
+		 * Language CASE 2: Translation task that translates single item to multiple languages. Get target languages
 		 */
 		$lang_arr = $this->input->get('languages', array(), 'array');
 		$lang_arr = array_flip($lang_arr);
@@ -1724,7 +1729,6 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		$maincat  = $this->input->get('maincat', '', 'int');
 		$seccats  = $this->input->get('seccats', array(), 'array');
 		$keepseccats = $this->input->get('keepseccats', 0, 'int');
-		$lang    = $this->input->get('language', '_not_posted_', 'string');
 
 		$state   = $this->input->get('state', '', 'string');
 		$state   = strlen($state) ? (int) $state : null;
@@ -1834,15 +1838,16 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 
 			// Translate
 			case 99:
+				// CHECK CASE OF TRANSLATING SINGLE ITEM TO MULTIPLE LANGUAGES but zero languages have been given and terminate with error (we are in modal window)
 				if (!$lang_arr && $lang === '_not_posted_')
 				{
-					echo '<div class="alert alert-warning">Nothing to do, please select target languages</div>';
-					exit;
+					jexit('<div class="alert alert-warning">Nothing to do, please select target languages</div>');
 				}
 
 			// Copy and update CASE (optionally moving) 
 			case 3:
-				$total_cnt = $model->copyitems($auth_cid, $keeptags, $prefix, $suffix, $copynr, $lang_arr, $state, $method, $maincat, $seccats, $type_id, $access);
+				$languages = $lang_arr ?: array($lang);
+				$total_cnt = $model->copyitems($auth_cid, $keeptags, $prefix, $suffix, $copynr, $languages, $state, $method, $maincat, $seccats, $type_id, $access);
 				if ($total_cnt)
 				{
 					$msg = JText::sprintf('FLEXI_ITEMS_COPYMOVE_SUCCESS', $total_cnt);   //count($auth_cid)
@@ -1861,11 +1866,11 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 				break;
 		}
 
+		// CHECK CASE OF TRANSLATING SINGLE ITEM TO MULTIPLE LANGUAGES and terminate with success message, because this is inside a modal window
 		if ($lang_arr)
 		{
 			$msg = JText::sprintf('FLEXI_N_ITEMS_CREATED', $total_cnt);
-			echo '<div class="alert alert-info">' . $msg . '</div>';
-			exit;
+			jexit('<div class="alert alert-info">' . $msg . '</div>');
 		}
 
 		$link = 'index.php?option=com_flexicontent&view=items';
