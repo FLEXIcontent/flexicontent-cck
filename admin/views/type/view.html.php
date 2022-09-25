@@ -289,7 +289,7 @@ class FlexicontentViewType extends FlexicontentViewBaseRecord
 				$fieldname = $field->fieldname;
 				$value = $row->attribs->get($fieldname);
 
-				if (strlen($value))
+				if (strlen($value ?? ''))
 				{
 					$tmpl->params->setValue($fieldname, 'attribs', $value);
 				}

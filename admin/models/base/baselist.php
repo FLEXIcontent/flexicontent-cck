@@ -362,7 +362,7 @@ abstract class FCModelAdminList extends JModelList
 
 		$has_checked_out_col = property_exists($table, 'checked_out');
 		$has_access_col      = property_exists($table, 'access');
-		$has_created_by_col  = property_exists($table, $this->created_by_col);
+		$has_created_by_col  = property_exists($table, $this->created_by_col ?? '');
 
 		$editor_col_quoted   = $has_checked_out_col ? $this->_db->quoteName('u.name') : $this->_db->Quote('');
 
@@ -461,7 +461,7 @@ abstract class FCModelAdminList extends JModelList
 		$where = array();
 
 		// Filter by state
-		if (property_exists($table, $this->state_col))
+		if (property_exists($table, $this->state_col ??''))
 		{
 			switch ($filter_state)
 			{
@@ -1044,7 +1044,7 @@ abstract class FCModelAdminList extends JModelList
 		}
 
 		$has_assets_tracking = property_exists($table, 'asset_id');
-		$has_created_by_col  = property_exists($table, $this->created_by_col);
+		$has_created_by_col  = property_exists($table, $this->created_by_col ?? '');
 
 		// Get record owners, needed for *.own ACL
 		$query = $this->_db->getQuery(true)

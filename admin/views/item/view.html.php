@@ -836,7 +836,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		// *** SET INTO THE FORM, parameter values for various parameter groups
 		// ***
 
-		if ( JHtml::_('date', $item->publish_down , 'Y') <= 1969 || $item->publish_down == $nullDate || empty($item->publish_down) )
+		if ( JHtml::_('date', $item->publish_down ?? '' , 'Y') <= 1969 || $item->publish_down == $nullDate || empty($item->publish_down) )
 		{
 			$item->publish_down = '';//JText::_( 'FLEXI_NEVER' );
 			$form->setValue('publish_down', null, ''/*JText::_( 'FLEXI_NEVER' )*/);  // Setting to text will break form date element
@@ -2390,7 +2390,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 
     $curr_url   = str_replace('&', '&amp;', $_SERVER['REQUEST_URI']);
     $print_link = $curr_url .(strstr($curr_url, '?') ? '&amp;'  : '?').'pop=1&amp;tmpl=component&amp;print=1';
-		$pageclass_sfx = htmlspecialchars($params->get('pageclass_sfx'));
+		$pageclass_sfx = htmlspecialchars($params->get('pageclass_sfx', ''));
 
 		$this->item    = $item;
 		$this->user    = $user;

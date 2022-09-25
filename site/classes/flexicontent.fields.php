@@ -3004,7 +3004,7 @@ class FlexicontentFields
 				$required_exists = true;
 				foreach ($required_props as $cp)
 				{
-					if ( !strlen(@$v[$cp]) ) $required_exists = false;
+					if ( !strlen($v[$cp] ?? '') ) $required_exists = false;
 				}
 				if (!$required_exists) continue;
 

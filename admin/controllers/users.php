@@ -97,6 +97,7 @@ class FlexicontentControllerUsers extends FlexicontentControllerBaseAdmin
 		// Create a new JUser object for the given user id, and calculate / retrieve some information about the user
 		$id   = $this->input->getInt('id', 0);
 		$user = new JUser($id);
+		$isNew = !$id;
 
 		$curIsSuperAdmin = $me->authorise('core.admin', 'root.1');
 		$isSuperAdmin = $user->authorise('core.admin', 'root.1');
@@ -130,15 +131,18 @@ class FlexicontentControllerUsers extends FlexicontentControllerBaseAdmin
 		}
 
 		// Check if we allowed to block/unblock the user
-		$check_blocking = !$saving_myself || ($saving_myself && $data['block']);
-
-		if ($user->id && $check_blocking)
+		if (isset($data['block']))
 		{
-			$can_block_unblock = $this->block($check_uids = $user->id, $data['block'] ? 'block' : 'unblock');
+			$check_blocking = !$saving_myself || ($saving_myself && $data['block']);
 
-			if (!$can_block_unblock)
+			if ($user->id && $check_blocking)
 			{
-				return $this->execute('edit');
+				$can_block_unblock = $this->block($check_uids = $user->id, $data['block'] ? 'block' : 'unblock');
+
+				if (!$can_block_unblock)
+				{
+					return $this->execute('edit');
+				}
 			}
 		}
 
@@ -171,7 +175,7 @@ class FlexicontentControllerUsers extends FlexicontentControllerBaseAdmin
 		// *** EOF AUTHOR EXTENDED DATA ***
 
 		// Send email for new user
-		if ($isNew)
+		if (false /*$isNew*/)
 		{
 			$adminEmail = $me->get('email');
 			$adminName	= $me->get('name');

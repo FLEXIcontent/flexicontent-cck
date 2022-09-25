@@ -528,7 +528,7 @@ class flexicontent_html
 	 */
 	static function getToolTip($title = '', $content = '', $translate = 1, $escape = 1)
 	{
-		return JHtml::tooltipText($title, $content, $translate, $escape);
+		return JHtml::tooltipText($title ?? '', $content ?? '', $translate, $escape);
 	}
 
 
@@ -4754,7 +4754,7 @@ class flexicontent_html
 			$options[] = JHtml::_( 'select.option', '', JText::_( 'FLEXI_ALL_UPLOADERS' ));
 
 		foreach ($data as $val)
-			$options[] = JHtml::_( 'select.option', $val->uid, $val->name);
+			$options[] = JHtml::_( 'select.option', $val->uid, $val->name ?? '' );
 
 		$tagid = $tagid ? $tagid : str_replace( '[', '_', preg_replace('#\]|\[\]#', '',($name)) );
 		return JHtml::_('select.genericlist', $options, $name, $attribs, 'value', 'text', $selected, $tagid );

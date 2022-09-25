@@ -996,7 +996,7 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 		$CanViewAllFiles = $permission->CanViewAllFiles;
 
 		// Filter by state
-		if (property_exists($table, $this->state_col))
+		if (property_exists($table, $this->state_col ?? ''))
 		{
 			switch ($filter_state)
 			{

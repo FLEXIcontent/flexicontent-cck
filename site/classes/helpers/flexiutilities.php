@@ -669,7 +669,7 @@ class FLEXIUtilities
 	static function paramToArray($value, $regex = false, $filterfunc = false, $remove_save_flag=false)
 	{
 		if ($regex && !is_array($value)) {
-			$value = trim($value);
+			$value = trim($value ?? '');
 			$value = !$value  ?  array()  :  preg_split($regex, $value);
 		}
 		if ($filterfunc) {

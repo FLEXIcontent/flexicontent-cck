@@ -590,8 +590,8 @@ class FlexicontentModelCategory extends FCModelAdmin
 		jimport('joomla.filesystem.path');
 
 		$lang = JFactory::getLanguage();
-		$component = $this->getState($this->getName().'.component');
-		$section = $this->getState($this->getName().'.section');
+		$component = $this->getState($this->getName().'.component', '');
+		$section   = $this->getState($this->getName().'.section', '');
 		$extension = JFactory::getApplication()->input->get('extension', null);
 
 		// Get the component form if it exists

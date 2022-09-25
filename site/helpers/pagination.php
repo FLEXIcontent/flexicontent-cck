@@ -146,7 +146,7 @@ class FCPagination extends JPagination
 		{
 			foreach($data->pages as $i => $page)
 			{
-				$page->link = str_replace('__amp__', '%26', $page->link);
+				$page->link = str_replace('__amp__', '%26', $page->link ?? '');
 			}
 		}
 

@@ -2931,7 +2931,7 @@ class ParentClassItem extends FCModelAdmin
 			// Force array for field values
 			if ( !is_array($postdata[$field->name]) )
 			{
-				$postdata[$field->name] = strlen($postdata[$field->name]) ? array($postdata[$field->name]) : array();
+				$postdata[$field->name] = strlen($postdata[$field->name] ?? '') ? array($postdata[$field->name]) : array();
 			}
 
 			// Unserialize values already serialized values
