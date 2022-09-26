@@ -533,6 +533,21 @@ class FlexicontentFields
 			$field->formhidden = 3;
 			return;
 		}
+			//check for new method of hiding and showing fields
+			if ($field->parameters->get('defaultviewbehavior')== 0) {
+				//if the field is inside a group, logic within the fieldgroup.php and the associated field_list.php file handles this, so skip it
+				if ($field->parameters->get('use_ingroup') !== "1") {
+					if ($field->defaultviewbehavior !== $field->fieldviewbehavior) {
+						$target_field = $field->checkfieldname;
+						$target_field_value = $field->checkfieldvalue;
+						if ($item->fields[$target_field]->value[0] !== $target_field_value) {
+							$field->formhidden = 3;
+							return;
+						}
+					}
+				}
+
+			}
 
 		$is_editable = !$field->valueseditable || $user->authorise('flexicontent.editfieldvalues', 'com_flexicontent.field.' . $field->id);
 		if ($is_editable)
@@ -2079,7 +2094,7 @@ class FlexicontentFields
 
 			/**
 			 * Load frontend language overrides of item's language
-			 * then overwrite with backend language overrides 
+			 * then overwrite with backend language overrides
 			 * we do this because ... anyway search index is backend only
 			 */
 			$lang_overrides[$iLang] = array();
@@ -2222,7 +2237,7 @@ class FlexicontentFields
 					$lang_string         = strtoupper($results[$val]->text);
 					$results[$val]->text = JText::_(isset($overrides[$lang_string]) ? $overrides[$lang_string] : $results[$val]->text);
 				}
-				
+
 				$el_prop_count = 2;
 				$_props = !empty($extra_props) ? $extra_props : $default_extra_props;
 
@@ -3197,7 +3212,7 @@ class FlexicontentFields
 			$query  = 'SELECT c.id AS value_id, rel.itemid AS itemid, '
 				. (FLEXI_FALANG
 					? 'CONCAT_WS(\' \',
-						CASE WHEN (fat.value IS NOT NULL) THEN fat.value ELSE c.title END, 
+						CASE WHEN (fat.value IS NOT NULL) THEN fat.value ELSE c.title END,
 						CASE WHEN (fak.value IS NOT NULL) THEN fak.value ELSE c.metakey END
 					)'
 					: 'CONCAT_WS(\' \', c.title, c.metakey)'
@@ -3219,7 +3234,7 @@ class FlexicontentFields
 			$query  = 'SELECT t.id AS value_id, rel.itemid AS itemid, '
 				. (FLEXI_FALANG
 					? 'CONCAT_WS(\' \',
-						CASE WHEN (fat.value IS NOT NULL) THEN fat.value ELSE t.name END, 
+						CASE WHEN (fat.value IS NOT NULL) THEN fat.value ELSE t.name END,
 						CASE WHEN (fak.value IS NOT NULL) THEN fak.value ELSE jt.metakey END
 					)'
 					: 'CONCAT_WS(\' \', t.name, jt.metakey)'

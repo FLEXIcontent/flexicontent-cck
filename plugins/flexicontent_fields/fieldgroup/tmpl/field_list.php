@@ -19,6 +19,17 @@ for ($n = 0; $n < $max_count; $n++)
 	$i = 0;
 	foreach($grouped_fields as $field_id => $grouped_field)
 	{
+		$hide_field = '';
+		if ($grouped_field->defaultviewbehavior == 0) {
+			if ($grouped_field->defaultviewbehavior !== $grouped_field->fieldviewbehavior) {
+				$target_field = $grouped_field->checkfieldname;
+				$target_field_id = $item->fields[$target_field]->id;
+				$target_field_value = $grouped_field->checkfieldvalue;
+				if ($grouped_fields[$target_field_id]->value[$n] !== $target_field_value) {
+					$hide_field = ' style="display:none;"';
+				}
+			}
+		}
 		if ($grouped_field->formhidden == 4) continue;
 		if ($isAdmin) {
 			if ( $grouped_field->parameters->get('backend_hidden')  ||  (isset($grouped_field->formhidden_grp) && in_array($grouped_field->formhidden_grp, array(2,3))) ) continue;
@@ -60,7 +71,7 @@ for ($n = 0; $n < $max_count; $n++)
 
 		$field->html[$n] .= (empty($isFlexBox) ? '' : '
 		<div class="fc_form_flex_box_item' . ($use_flex_grow ? ' use_flex_grow' : '') . '" style="margin: 0;">') . '
-			<div class="control-group control-fc_subgroup fcfieldval_container_outer' . $gf_compactedit . '">
+			<div class="control-group control-fc_subgroup fcfieldval_container_outer' . $gf_compactedit . '"'.($hide_field !== '' ? $hide_field : '').'>
 				<div
 					class="control-label ' . ($gf_display_label_form === 2 ? 'fclabel_cleared' : '') . '"
 					style="' . ($gf_display_label_form < 1 ? 'display:none;' : '') .'"
