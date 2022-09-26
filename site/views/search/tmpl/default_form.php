@@ -1,5 +1,6 @@
 <?php defined('_JEXEC') or die('Restricted access');
 
+
 $app = JFactory::getApplication();
 $form_id = $this->form_id;
 $form_name = $this->form_name;
@@ -371,7 +372,8 @@ if ($disp_slide_filter)
 					
 					<?php 
 					if ($disp_slide_filter){
-					echo JHtml::_('bootstrap.addSlide','menu-sliders-filter' , $label, $filt->id);
+					echo JHtml::_('bootstrap.addSlide','menu-sliders-filter' , $label, 'x-' . $filt->id); 
+					//JHtml::_('bootstrap.addSlide','menu-sliders-filter' , $label, $filt->id);
 					}  ?>
 						<div class="fc_search_label_cell">
 						<?php if ($descr) : ?>
@@ -402,7 +404,9 @@ if ($disp_slide_filter)
 					
 					
 				<?php } ?>
-				<?php //echo JHtml::_('bootstrap.endAccordion'); ?>
+				<?php if ($disp_slide_filter) : ?>
+				<?php echo JHtml::_('bootstrap.endAccordion'); ?>
+				<?php endif; ?>
 				</ul>
 				</div>	
 			</fieldset>
