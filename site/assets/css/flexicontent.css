@@ -226,7 +226,7 @@ div.fc_checkradio_group_wrapper {
 	clear: both;
 	margin: 0px;
 	padding: 0px;
-	overflow-y: auto;
+	overflow-y: initial;
 	overflow-x: visible;
 	height: auto;
 	max-height: 220px;
