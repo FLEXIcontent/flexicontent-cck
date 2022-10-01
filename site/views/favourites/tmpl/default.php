@@ -49,7 +49,7 @@ if ($use_image && $image_source)
 
 // Extra fields configuration
 $use_fields = (int)$params->get('use_fields', 1);
-$fields = $params->get('fields');
+$fields = $params->get('fields', '');
 $fields = preg_replace("/[\"'\\\]/u", "", $fields);
 $fields = array_unique(preg_split("/\s*,\s*/u", $fields));
 if ( !strlen($fields[0]) ) unset($fields[0]);

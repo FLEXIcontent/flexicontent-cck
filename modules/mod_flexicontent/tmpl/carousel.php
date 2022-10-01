@@ -302,7 +302,7 @@ $std_builder_layout_num  = (int) $params->get($layout.'_builder_layout', 1);
 if ($feat_builder_layout_num)
 {
 	$builder_layout_name = 'builder_layout' . $feat_builder_layout_num;
-	$feat_builder_layout = trim($params->get($builder_layout_name . '_html'));
+	$feat_builder_layout = trim($params->get($builder_layout_name . '_html', ''));
 	
 	$sub_prefix = $feat_builder_layout_num !== $std_builder_layout_num
 		? ' .mod_flexicontent_featured '
@@ -334,7 +334,7 @@ if ($feat_builder_layout_num)
 if ($std_builder_layout_num)
 {
 	$builder_layout_name = 'builder_layout' . $std_builder_layout_num;
-	$std_builder_layout  = trim($params->get('builder_layout' . $std_builder_layout_num . '_html'));
+	$std_builder_layout  = trim($params->get('builder_layout' . $std_builder_layout_num . '_html', ''));
 
 	$sub_prefix = $feat_builder_layout_num !== $std_builder_layout_num
 		? ' .mod_flexicontent_standard '

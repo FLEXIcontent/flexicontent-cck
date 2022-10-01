@@ -180,7 +180,7 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 		
 		// Create the pagination object
 		$pageNav = $this->get('pagination');
-		$pageclass_sfx = htmlspecialchars($params->get('pageclass_sfx'));
+		$pageclass_sfx = htmlspecialchars($params->get('pageclass_sfx', ''));
 		
 		$this->categories = $categories;
 		$this->params = $params;

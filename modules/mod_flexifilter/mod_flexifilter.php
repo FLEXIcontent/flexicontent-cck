@@ -489,7 +489,7 @@ if ($scroll_to_anchor_tag === 2)
 	{
 		$fn = $filter->name;
 		$vals = $jinput->get('filter_' . $filter->id, null, 'raw');
-		if ( (is_array($vals) && count($vals)) || (!is_array($vals) && strlen($vals)) )
+		if ( (is_array($vals) && count($vals)) || (!is_array($vals) && strlen($vals ?? '')) )
 		{
 			if ( (is_array($vals) && count($vals)) )
 			{

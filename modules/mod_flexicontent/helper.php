@@ -902,12 +902,12 @@ class modFlexicontentHelper
 
 		// authors scope parameters
 		$method_auth 		= (int) $params->get('method_auth', 1);
-		$authors 				= trim($params->get('authors'));
+		$authors 				= trim($params->get('authors', ''));
 		$behaviour_auth	= (int) $params->get('behaviour_auth');
 
 		// items scope parameters
 		$method_items 		= (int) $params->get('method_items', 1);
-		$items	 					= trim($params->get('items'));
+		$items	 					= trim($params->get('items', ''));
 		$items_use_order  = (int) $params->get('items_use_order', 0);
 		$behaviour_items 	= (int) $params->get('behaviour_items', 0);
 		$excluded_tags		= $params->get('excluded_tags', array());

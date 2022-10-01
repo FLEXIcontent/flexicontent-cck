@@ -1227,8 +1227,8 @@ class FlexicontentFields
 		else {
 			// Create a fake template position, for fields defined via parameters
 		  $fbypos[0] = new stdClass();
-		  $fbypos[0]->fields = explode(',', $params->get('fields'));
-		  $fbypos[0]->methods = explode(',', $params->get('methods'));
+		  $fbypos[0]->fields = explode(',', $params->get('fields', ''));
+		  $fbypos[0]->methods = explode(',', $params->get('methods', ''));
 		  $fbypos[0]->position = $view;
 		  //$onDemandOnly = true;
 		}

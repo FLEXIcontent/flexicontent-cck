@@ -140,7 +140,6 @@ class flexicontent_state
 		$jcookie = $app->input->cookie;
 
 		// Clear any cookie set to current path, and set cookie at top-level folder of current joomla installation
-		$jcookie->set($this->ckname, null, 1, '', '');
 		$jcookie->set($this->ckname, json_encode($this->records), time()+60*60*24*(365*5), JUri::base(true), '');
 	}
 }

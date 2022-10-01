@@ -340,7 +340,7 @@ $doc->addScriptDeclaration($js);
 			</span>
 		</legend>
 
-		<table id="fc_textsearch_tbl_<?php echo $module->id;?>" class="fc_search_tbl <?php echo $params->get('pageclass_sfx'); ?>" >
+		<table id="fc_textsearch_tbl_<?php echo $module->id;?>" class="fc_search_tbl <?php echo $params->get('pageclass_sfx', ''); ?>" >
 
 			<tr id="modfcadvsearch_fcsearch_contenttypes_row_<?php echo $module->id;?>" class="fc_search_row_<?php echo (($r++)%2);?>">
 				<?php if($params->get('show_type_label', 1)): ?>
