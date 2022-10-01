@@ -1317,7 +1317,7 @@
 				ext_name="" ext_type="forms" layout_sfx=""
 				hide_default="1" hide_none="1"
 				stripext="1" stripprefix="" filter="^.*\.php$" exclude="^_|default\.php"
-				tmpl_container="tabset_attrs_5_nav_5" params_source="file" custom_layouts_label="Custom layouts" layout_label="FLEXI_LAYOUT" icon_class="icon-screen"
+				tmpl_container="tabset_attrs_6_nav_5" params_source="file" custom_layouts_label="Custom layouts" layout_label="FLEXI_LAYOUT" icon_class="icon-screen"
 			>
 				<group label="Built-in layouts">
 					<option filename="tabs" value="tabs">tabs (Default)</option>
@@ -1564,7 +1564,7 @@
 				ext_name="" ext_type="forms" layout_sfx="_be"
 				hide_default="1" hide_none="1"
 				stripext="1" stripprefix="" filter="^.*\.php$" exclude="^_|default\.php"
-				tmpl_container="tabset_attrs_6_nav_5" params_source="file" custom_layouts_label="Custom layouts" layout_label="FLEXI_LAYOUT" icon_class="icon-screen"
+				tmpl_container="tabset_attrs_7_nav_5" params_source="file" custom_layouts_label="Custom layouts" layout_label="FLEXI_LAYOUT" icon_class="icon-screen"
 			>
 				<group label="Built-in layouts">
 					<option filename="tabs" value="tabs">tabs (Default)</option>
