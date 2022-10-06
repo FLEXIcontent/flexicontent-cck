@@ -663,8 +663,8 @@ class ParentClassItem extends FCModelAdmin
 				$select_access .= ', CASE WHEN  i.access IN (0,'.$aid_list.') THEN 1 ELSE 0 END AS has_item_access';
 
 				// SQL date strings, current date and null date
-				$nowDate = $db->Quote( JFactory::getDate()->toSql() );
-				$nullDate	= $db->Quote($db->getNullDate());
+				$sqlNowDateQuoted  = $db->Quote(JFactory::getDate()->toSql());
+				$sqlNullDateQuoted = $db->Quote($db->getNullDate());
 
 				// Decide to limit to CURRENT CATEGORY
 				$limit_to_cid = $this->_cid ? ' AND rel.catid = '. (int) $this->_cid : ' AND rel.catid = i.catid';
@@ -695,8 +695,8 @@ class ParentClassItem extends FCModelAdmin
 				$query->select('CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug');
 
 				// Publication Scheduled / Expired Flags
-				$query->select('CASE WHEN i.publish_up is NULL OR i.publish_up = '.$nullDate.' OR i.publish_up <= '.$nowDate.' THEN 0 ELSE 1 END as publication_scheduled');
-				$query->select('CASE WHEN i.publish_down is NULL OR i.publish_down = '.$nullDate.' OR i.publish_down >= '.$nowDate.' THEN 0 ELSE 1 END as publication_expired' );
+				$query->select('CASE WHEN i.publish_up is NULL OR i.publish_up = '.$sqlNullDateQuoted.' OR i.publish_up <= '.$sqlNowDateQuoted.' THEN 0 ELSE 1 END as publication_scheduled');
+				$query->select('CASE WHEN i.publish_down is NULL OR i.publish_down = '.$sqlNullDateQuoted.' OR i.publish_down >= '.$sqlNowDateQuoted.' THEN 0 ELSE 1 END as publication_expired' );
 
 				if (FLEXI_J40GE)
 				{
@@ -1763,7 +1763,6 @@ class ParentClassItem extends FCModelAdmin
 
 		// Default -- Dates: current and null.
 		$currentdate = JFactory::getDate();
-		$nullDate    = FLEXI_J40GE ? NULL : $this->_db->getNullDate();
 
 		// Default -- Created By (Owner).
 		$default_created_by = $user->get('id') ?: flexicontent_db::getSuperUserID();
@@ -1791,7 +1790,7 @@ class ParentClassItem extends FCModelAdmin
 		$record->created        = $currentdate->toSql();
 		$record->created_by     = $default_created_by;
 		$record->publish_up     = $currentdate->toSql();
-		$record->publish_down   = $nullDate;
+		$record->publish_down   = FLEXI_J40GE ? NULL : $this->_db->getNullDate();
 		$record->access         = $default_accesslevel;
 		$record->state          = $default_state;
 		$record->language       = $default_lang;
@@ -1815,7 +1814,7 @@ class ParentClassItem extends FCModelAdmin
 		//$record->attribs      = null;
 		//$record->metadata     = null;
 
-		//$record->modified     = $nullDate;
+		//$record->modified     = FLEXI_J40GE ? NULL : $this->_db->getNullDate();
 		//$record->modified_by  = 0;
 		//$record->created_by_alias = null;
 
@@ -1878,7 +1877,6 @@ class ParentClassItem extends FCModelAdmin
 		$jinput     = JFactory::getApplication()->input;
 		$dispatcher = JEventDispatcher::getInstance();
 		$cparams    = $this->_cparams;
-		$nullDate   = FLEXI_J40GE ? NULL : $this->_db->getNullDate();
 
 		$option = $jinput->get('option', '', 'cmd');
 		$view   = $jinput->get('view', '', 'cmd');
@@ -2318,7 +2316,7 @@ class ParentClassItem extends FCModelAdmin
 		// -- Modification Date and Modifier, (a) new item gets null modification date and (b) existing item get the current date
 		if ($isNew)
 		{
-			$item->modified    = $nullDate;
+			$item->modified    = FLEXI_J40GE ? NULL : $this->_db->getNullDate();
 			$item->modified_by = 0;
 		}
 		else
@@ -2358,11 +2356,11 @@ class ParentClassItem extends FCModelAdmin
 
 
 		// -- Publish Down Date
-		if (trim($item->publish_down) == JText::_('FLEXI_NEVER') || trim( $item->publish_down ) == '')
+		if (!$item->publish_down || trim($item->publish_down) == JText::_('FLEXI_NEVER') || trim($item->publish_down) == '' || $item->publish_down == $db->getNullDate())
 		{
-			$item->publish_down = $nullDate;
+			$item->publish_down = FLEXI_J40GE ? NULL : $this->_db->getNullDate();
 		}
-		elseif ($item->publish_down && $item->publish_down != $nullDate)
+		else
 		{
 			if ( StringHelper::strlen(StringHelper::trim( $item->publish_down )) <= 10 )
 			{
@@ -2714,7 +2712,7 @@ class ParentClassItem extends FCModelAdmin
 			$v->version_id	= ($isNew && !empty($data['type_id_not_set']) ) ? 0 : (int)$last_version+1;
 			$v->created			= $item->created;
 			$v->created_by	= $item->created_by;
-			if ($item->modified && $item->modified != $nullDate) {
+			if ($item->modified && $item->modified != $this->_db->getNullDate()) {
 				// NOTE: We set modifier as creator of the version, and modication date as creation date of the version
 				$v->created		 = $item->modified;
 				$v->created_by = $item->modified_by;
