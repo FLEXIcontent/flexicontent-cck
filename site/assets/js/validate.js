@@ -65,7 +65,7 @@ var JFormValidator_FC = function()
 
 		setHandler('email', function (value) {
 			value = punycode.toASCII(value);
-			var regex = /^[a-zA-Z0-9.!#$%&’*+\/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
+			var regex = /^[a-zA-Z0-9.!#$%&â€™*+\/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
 			return regex.test(value);
 		});
 
@@ -651,7 +651,7 @@ var JFormValidator_FC = function()
 	{
 		var $form = jQuery(form);
 		var isFCvalidation = typeof window.fc_validateOnSubmitForm !== undefined ? window.fc_validateOnSubmitForm : 0;
-		var use_all_mssg_box = $form.data('use_all_mssg_box');
+		var use_all_mssg_box = 1; //$form.data('use_all_mssg_box');
 
 		if ($form.length && $form.data('skip_validation'))
 		{
