@@ -168,7 +168,7 @@ else
 			if (!empty($img_field_name)) :
 				FlexicontentFields::getFieldDisplay($fcitems[$i], $img_field_name, $values=null, $method='display');
 				$img_field = & $fcitems[$i]->fields[$img_field_name];
-				$src = str_replace(JUri::root(), '', @ $img_field->thumbs_src[$img_field_size][0] );
+				$src = str_replace(JUri::root(), '', ($img_field->thumbs_src[$img_field_size][0] ?? '') );
 			else :
 				$src = flexicontent_html::extractimagesrc($fcitems[$i]);
 			endif;

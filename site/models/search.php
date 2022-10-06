@@ -83,7 +83,7 @@ class FLEXIcontentModelSearch extends JModelLegacy
 		$app = JFactory::getApplication();
 
 		// Get limits & set the pagination variables into state (We get them from http request OR use default search view parameters)
-		$limit = strlen($app->input->getString('limit')) ? $app->input->getInt('limit') : $this->_params->get('limit');
+		$limit = strlen($app->input->getString('limit', '')) ? $app->input->getInt('limit') : $this->_params->get('limit');
 		$limitstart	= $app->input->getInt('limitstart', $app->input->getInt('start', 0));
 
 		// Make sure limitstart is set

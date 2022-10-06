@@ -138,7 +138,7 @@ class FlexicontentViewCategory extends JViewLegacy
 					// render method 'display_NNNN_src' to avoid CSS/JS being added to the page
 					/* $src = */FlexicontentFields::getFieldDisplay($item, $img_field_name, $values=null, $method='display_'.$img_field_size.'_src');
 					$img_field = $item->fields[$img_field_name];
-					$src = str_replace(JUri::root(), '', @ $img_field->thumbs_src[$img_field_size][0] );
+					$src = str_replace(JUri::root(), '', ($img_field->thumbs_src[$img_field_size][0] ?? '') );
 				} else {
 					$src = flexicontent_html::extractimagesrc($item);
 				}

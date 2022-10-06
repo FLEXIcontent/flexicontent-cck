@@ -388,10 +388,10 @@ if ($leadnum) :
 
 					if ($img_field)
 					{
-						$src = str_replace(JUri::root(), '', @ $img_field->thumbs_src[$img_field_size][0] );
+						$src = str_replace(JUri::root(), '', ($img_field->thumbs_src[$img_field_size][0] ?? '') );
 						if ( $lead_link_image_to && isset($img_field->value[0]) )
 						{
-							$custom_link = ($v = unserialize($img_field->value[0])) !== false ? @ $v['link'] : @ $img_field->value[0]['link'];
+							$custom_link = ($v = unserialize($img_field->value[0])) !== false ? @ $v['link'] : ($img_field->value[0]['link'] ?? '');
 						}
 
 						$item->image_w = $src ? $img_field->parameters->get('w_'.$img_field_size[0], 120) : 0;
@@ -412,11 +412,11 @@ if ($leadnum) :
 
 							if ($lead_use_image==1)
 							{
-								$src = str_replace(JUri::root(), '', @ $img_field2->thumbs_src[$img_field_size][0] );
+								$src = str_replace(JUri::root(), '', ($img_field2->thumbs_src[$img_field_size][0] ?? '') );
 							}
 							else
 							{
-								$src = @ $img_field2->thumbs_src[ $lead_use_image ][0];
+								$src = $img_field2->thumbs_src[ $lead_use_image ][0] ?? '';
 								$item->image_w = $src ? $img_field2->parameters->get('w_'.$lead_use_image[0], 120) : 0;
 								$item->image_h = $src ? $img_field2->parameters->get('h_'.$lead_use_image[0], 90) : 0;
 							}
@@ -886,10 +886,10 @@ if ($count > $leadnum) :
 
 					if ($img_field)
 					{
-						$src = str_replace(JUri::root(), '', @ $img_field->thumbs_src[$img_field_size][0] );
+						$src = str_replace(JUri::root(), '', ($img_field->thumbs_src[$img_field_size][0] ?? '') );
 						if ( $intro_link_image_to && isset($img_field->value[0]) )
 						{
-							$custom_link = ($v = unserialize($img_field->value[0])) !== false ? @ $v['link'] : @ $img_field->value[0]['link'];
+							$custom_link = ($v = unserialize($img_field->value[0])) !== false ? @ $v['link'] : ($img_field->value[0]['link'] ?? '');
 						}
 
 						$item->image_w = $src ? $img_field->parameters->get('w_'.$img_field_size[0], 120) : 0;
@@ -910,11 +910,11 @@ if ($count > $leadnum) :
 
 							if ($intro_use_image==1)
 							{
-								$src = str_replace(JUri::root(), '', @ $img_field2->thumbs_src[$img_field_size][0] );
+								$src = str_replace(JUri::root(), '', ($img_field2->thumbs_src[$img_field_size][0] ?? '') );
 							}
 							else
 							{
-								$src = @ $img_field2->thumbs_src[ $intro_use_image ][0];
+								$src = $img_field2->thumbs_src[ $intro_use_image ][0] ?? '';
 								$item->image_w = $src ? $img_field2->parameters->get('w_'.$intro_use_image[0], 120) : 0;
 								$item->image_h = $src ? $img_field2->parameters->get('h_'.$intro_use_image[0], 90) : 0;
 							}

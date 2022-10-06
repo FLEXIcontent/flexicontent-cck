@@ -4550,7 +4550,7 @@ class ParentClassItem extends FCModelAdmin
 			break;
 
 			case 'maintext': // main text
-			$value = StringHelper::strlen( StringHelper::trim($item->fulltext) ) ? $item->introtext . "<hr id=\"system-readmore\" />" . $item->fulltext : $item->introtext;
+			$value = StringHelper::strlen( StringHelper::trim($item->fulltext ?? '') ) ? $item->introtext . "<hr id=\"system-readmore\" />" . $item->fulltext : $item->introtext;
 			$field_value = array($value);
 			break;
 		}
