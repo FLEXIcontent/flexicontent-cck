@@ -309,7 +309,7 @@ class plgFlexicontent_fieldsAddressint extends FCField
 
 				fcfield_addrint.configure["' . $field_name_js . '"] = function(placesAutocomplete)
 				{
-					placesAutocomplete.setComponentRestrictions({' . implode(', ', $conf_ops) . '});
+					if (' . ($conf_ops ? 1 : 0)  . ') placesAutocomplete.setComponentRestrictions({' . implode(', ', $conf_ops) . '});
 				}
 			';
 			$css = '';
