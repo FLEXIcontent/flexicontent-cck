@@ -448,11 +448,11 @@ class modFlexicontentHelper
 
 								if ($mod_use_image_feat==1)
 								{
-									$src = str_replace(JUri::root(), '', @ $img_field->thumbs_src['large'][0]);
+									$src = str_replace(JUri::root(), '', ($img_field->thumbs_src['large'][0] ?? ''));
 								}
 								else
 								{
-									$thumb = @ $img_field->thumbs_src[ $mod_use_image_feat ][0];
+									$thumb = $img_field->thumbs_src[ $mod_use_image_feat ][0] ?? '';
 									$_thumb_w = $thumb ? $img_field->parameters->get('w_'.$mod_use_image_feat[0], 120) : 0;
 									$_thumb_h = $thumb ? $img_field->parameters->get('h_'.$mod_use_image_feat[0], 90) : 0;
 								}
@@ -472,11 +472,11 @@ class modFlexicontentHelper
 
 									if ($mod_use_image_feat==1)
 									{
-										$src = str_replace(JUri::root(), '', @ $img_field2->thumbs_src['large'][0] );
+										$src = str_replace(JUri::root(), '', ($img_field2->thumbs_src['large'][0] ?? '') );
 									}
 									else
 									{
-										$thumb = @ $img_field2->thumbs_src[ $mod_use_image_feat ][0];
+										$thumb = $img_field2->thumbs_src[ $mod_use_image_feat ][0] ?? '';
 										$_thumb_w = $thumb ? $img_field2->parameters->get('w_'.$mod_use_image_feat[0], 120) : 0;
 										$_thumb_h = $thumb ? $img_field2->parameters->get('h_'.$mod_use_image_feat[0], 90) : 0;
 									}
@@ -639,11 +639,11 @@ class modFlexicontentHelper
 
 								if ($mod_use_image==1)
 								{
-									$src = str_replace(JUri::root(), '', @ $img_field->thumbs_src['large'][0] );
+									$src = str_replace(JUri::root(), '', ($img_field->thumbs_src['large'][0] ?? '') );
 								}
 								else
 								{
-									$thumb = @ $img_field->thumbs_src[ $mod_use_image ][0];
+									$thumb = $img_field->thumbs_src[ $mod_use_image ][0] ?? '';
 									$_thumb_w = $thumb ? $img_field->parameters->get('w_'.$mod_use_image[0], 120) : 0;
 									$_thumb_h = $thumb ? $img_field->parameters->get('h_'.$mod_use_image[0], 90) : 0;
 								}
@@ -663,11 +663,11 @@ class modFlexicontentHelper
 
 									if ($mod_use_image==1)
 									{
-										$src = str_replace(JUri::root(), '', @ $img_field2->thumbs_src['large'][0] );
+										$src = str_replace(JUri::root(), '', ($img_field2->thumbs_src['large'][0] ?? '') );
 									}
 									else
 									{
-										$thumb = @ $img_field2->thumbs_src[ $mod_use_image ][0];
+										$thumb = $img_field2->thumbs_src[ $mod_use_image ][0] ?? '';
 										$_thumb_w = $thumb ? $img_field2->parameters->get('w_'.$mod_use_image[0], 120) : 0;
 										$_thumb_h = $thumb ? $img_field2->parameters->get('h_'.$mod_use_image[0], 90) : 0;
 									}

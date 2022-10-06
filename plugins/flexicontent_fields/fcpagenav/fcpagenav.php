@@ -326,7 +326,7 @@ class plgFlexicontent_fieldsFcpagenav extends FCField
 				if ( !empty($item->fields[$img_field_name]) )
 				{
 					$img_field = $item->fields[$img_field_name];
-					$src = str_replace(JUri::root(), '', @ $img_field->{'display_'.$img_field_size.'_src'});
+					$src = str_replace(JUri::root(), '', ($img_field->{'display_'.$img_field_size.'_src'} ?? ''));
 				}
 			}
 			else {
