@@ -1449,7 +1449,7 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 				'FLEXI_UPDATE_COPY_MOVE', $btn_name = 'batch', $full_js = '',
 				$msg_alert = '', $msg_confirm = '',
 				$btn_task, $extra_js = '', $btn_list=true, $btn_menu=true, $btn_confirm=false,
-				$this->btn_sm_class . ' btn-fcaction ' . (FLEXI_J40GE ? $this->btn_iv_class : '') . ' ' . $this->popover_class, $btn_icon='icon-checkbox-partial',
+				$this->btn_sm_class . ' btn-fcaction ' . (FLEXI_J40GE ? '_DDI_class_ ' . $this->btn_iv_class : '') . ' ' . $this->popover_class, $btn_icon='icon-checkbox-partial',
 				'data-placement="right" data-content="' . flexicontent_html::encodeHTML(JText::_(''), 2) . '"', $auto_add = 0, $tag_type='button'
 			);
 
