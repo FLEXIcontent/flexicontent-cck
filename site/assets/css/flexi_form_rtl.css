@@ -599,7 +599,6 @@ body .nowrap_hidden {
 #flexicontent .fc-xpended-row select.fcfield_selectval,
 #flexicontent .fc-xpended-row select,
 #flexicontent .fc-xpended-row button {
-	height: var(--form-inp-height) !important;
 	min-height: var(--form-inp-height) !important;
 }
 #flexicontent .btn-group .select2-container,
@@ -1369,4 +1368,8 @@ div#fc-filters-slide-btn {
 }
 input.minicolors-input {
 	padding: 0px 44px 8px !important;
+}
+.field-calendar .btn-primary,
+.field-calendar .btn.btn-secondary {
+	height: var(--ctrls-inp-height) !important;
 }

@@ -2172,8 +2172,8 @@ html[dir="rtl"] .select2-container .select2-choice {
 }
 #flexicontent .fc_filter_box .select2-container a.select2-choice {
 	height: unset !important;
-	min-height: calc(var(--filts-inp-height) - 2px) !important;
-	line-height: calc(var(--filts-inp-height) - 2px) !important;
+	min-height: var(--filts-inp-height) !important;
+	line-height: var(--filts-inp-height) !important;
 	padding-top: 0 !important;
 	padding-bottom: 0 !important;
 	margin-top: 0 !important;

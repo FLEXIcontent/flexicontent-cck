@@ -600,7 +600,6 @@ body .nowrap_hidden {
 #flexicontent .fc-xpended-row select.fcfield_selectval,
 #flexicontent .fc-xpended-row select,
 #flexicontent .fc-xpended-row button {
-	height: var(--form-inp-height) !important;
 	min-height: var(--form-inp-height) !important;
 }
 #flexicontent .btn-group .select2-container,
@@ -1370,6 +1369,10 @@ div#fc-filters-slide-btn {
 }
 input.minicolors-input {
 	padding: 0px 44px 8px !important;
+}
+.field-calendar .btn-primary,
+.field-calendar .btn.btn-secondary {
+	height: var(--ctrls-inp-height) !important;
 }
 body .fc-close {
 	color: #000000;
@@ -4524,8 +4527,8 @@ html[dir="rtl"] .select2-container .select2-choice {
 }
 #flexicontent .fc_filter_box .select2-container a.select2-choice {
 	height: unset !important;
-	min-height: calc(var(--filts-inp-height) - 2px) !important;
-	line-height: calc(var(--filts-inp-height) - 2px) !important;
+	min-height: var(--filts-inp-height) !important;
+	line-height: var(--filts-inp-height) !important;
 	padding-top: 0 !important;
 	padding-bottom: 0 !important;
 	margin-top: 0 !important;
