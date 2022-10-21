@@ -347,10 +347,10 @@ form > .fc_filter_line {  /* filters placed directly inside form aka outside the
 .fc_filter_html :not(.input-prepend):not(.input-append) > input.fc_text_filter:focus,
 .fc_filter_html :not(.input-prepend):not(.input-append) > input.fc_field_filter:focus {
 	height: unset !important;
-	min-height: calc(var(--filts-inp-height) - 2px) !important;
-	line-height: calc(var(--filts-inp-height) - 2px) !important;
-	padding: 0px 4px 0px 4px !important;
-	margin: 3px 4px 3px 8px;
+	margin:inherit;
+	min-height: var(--filts-inp-height) !important;
+	line-height: var(--filts-inp-height) !important;
+	padding: 0px 4px !important;
 	position: relative;
 	/* background: transparent; ... does not work properly with ie8/9, it causes: */
 	/* any element with less z-index to be placed above this element, */
@@ -477,8 +477,9 @@ span.fc_field_filter {
 }
 .fc_filter_html.fc_text_search input {
 	width: unset;
-	min-height: calc(var(--form-inp-height) - 2px) !important;
-	line-height: calc(var(--form-inp-height) -2px) !important;
+	min-height: calc(var(--form-inp-height)) !important;
+	line-height: calc(var(--form-inp-height) ) !important;
+	padding: 0px 14px;
 }
 .fc_filter_html.fc_text_search > * {
 	/*margin: 4px 0px 4px 0px;*/
