@@ -19,8 +19,8 @@
 	/* Get a cookie */
 	function fc_getCookie(cookieName)
 	{
-		var matched = document.cookie.match(new RegExp(cookieName + '=([^;]+)'));
-	  return matched ? decodeURIComponent(matched[1]) : '';
+		let matched = document.cookie.match(new RegExp('(^|;\\s*)' + cookieName + '=([^;]+)'));
+		return matched ? decodeURIComponent(matched[2]) : '';
 	}
 
 

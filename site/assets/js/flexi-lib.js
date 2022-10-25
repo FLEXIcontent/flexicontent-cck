@@ -1256,8 +1256,8 @@
 	/* Get a cookie */
 	function fclib_getCookie(cookieName)
 	{
-	  var matched = document.cookie.match(new RegExp(cookieName + '=([^;]+)'));   //window.console.log(matched);
-	  return matched ? decodeURIComponent(matched[1]) : '';
+		let matched = document.cookie.match(new RegExp('(^|;\\s*)' + cookieName + '=([^;]+)'));
+		return matched ? decodeURIComponent(matched[2]) : '';
 	}
 
 
