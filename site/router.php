@@ -1080,6 +1080,10 @@ class _FlexicontentSiteRouter
 			{
 				$query->join('INNER', '#__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id')->where('rel.catid = ' . (int) $parent_id);
 			}
+			elseif ($tbl === '#__categories')
+			{
+				$query->where('i.' . $db->QuoteName('parent_id') . ' = ' . (int) $parent_id);
+			}
 			else
 			{
 				$query->select('i.parent_id');
