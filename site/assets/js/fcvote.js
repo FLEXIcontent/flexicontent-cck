@@ -1,8 +1,8 @@
 jQuery(document).ready(function(){
 
 	// Joomla Root and Base URL
-	window.root_url = !!jroot_url_fc ? jroot_url_fc : '';
-	window.base_url = !!jbase_url_fc ? jbase_url_fc : '';
+	var root_url = !!jroot_url_fc ? jroot_url_fc : '';
+	var base_url = !!jbase_url_fc ? jbase_url_fc : '';
 
 	var under_vote = false;
 	
@@ -42,7 +42,7 @@ jQuery(document).ready(function(){
 
 			var rating = jQuery(this).text();
 
-			var voteurl = window.base_url
+			var voteurl = base_url
 				+ 'index.php?option=com_flexicontent&task=reviews.ajaxvote&user_rating=' + rating + '&cid=' + itemID + '&xid=' + xid;
 
 			jQuery.ajax({
@@ -148,7 +148,7 @@ jQuery(document).ready(function(){
 
 		if (1)
 		{
-			var url = window.base_url
+			var url = base_url
 				+ 'index.php?option=com_flexicontent&task=reviews.edit&view=reviews&id=0&tmpl=component&tagid=' + tagid
 				+ '&content_id=' + content_id + '&review_type=' + review_type
 				+ '&lang=' + (typeof fc_sef_lang != 'undefined' ? fc_sef_lang : '');
@@ -157,7 +157,7 @@ jQuery(document).ready(function(){
 		}
 		else
 		{
-			var url = window.root_url
+			var url = root_url
 				+ 'index.php?option=com_flexicontent&format=raw&task=getreviewform&tagid=' + tagid
 				+ '&content_id=' + content_id + '&review_type=' + review_type;
 
@@ -203,7 +203,7 @@ jQuery(document).ready(function(){
 
 		if (1)
 		{
-			var url = window.base_url
+			var url = base_url
 				+ 'index.php?option=com_flexicontent&task=reviews.edit&view=reviews&id=0&tmpl=component&tagid='
 				+ tagid + '&content_id=' + content_id + '&review_type=' + review_type
 				+ '&lang=' + (typeof fc_sef_lang != 'undefined' ? fc_sef_lang : '');
@@ -212,7 +212,7 @@ jQuery(document).ready(function(){
 		}
 		else
 		{
-			var url = window.root_url
+			var url = root_url
 				+ 'index.php?option=com_flexicontent&format=raw&task=storereviewform';
 
 			box_loading.empty().addClass('ajax-loader').css('display', 'inline-block');
