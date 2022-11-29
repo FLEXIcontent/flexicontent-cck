@@ -48,8 +48,8 @@ function FCFav(id, type, add_counter)
 	//toggleFCFavCookie(id, type);
 
 	// Joomla Root and Base URL
-	var root_url = !!jroot_url_fc ? jroot_url_fc : '';
-	var base_url = !!jbase_url_fc ? jbase_url_fc : '';
+	window.root_url = !!jroot_url_fc ? jroot_url_fc : '';
+	window.base_url = !!jbase_url_fc ? jbase_url_fc : '';
 
 	var favurl = root_url + 'index.php?option=com_flexicontent&format=raw&task=ajaxfav&id=' + id + '&type=' + type;
 

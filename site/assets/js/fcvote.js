@@ -1,11 +1,11 @@
 jQuery(document).ready(function(){
 
 	// Joomla Root and Base URL
-	var root_url = !!jroot_url_fc ? jroot_url_fc : '';
-	var base_url = !!jbase_url_fc ? jbase_url_fc : '';
+	window.root_url = !!jroot_url_fc ? jroot_url_fc : '';
+	window.base_url = !!jbase_url_fc ? jbase_url_fc : '';
 
 	var under_vote = false;
-	
+
 	if (jQuery('.fcvote').length)
 	{
 		jQuery('.fcvote a.fc_dovote').on('click', function(e)
@@ -15,16 +15,16 @@ jQuery(document).ready(function(){
 
 			var voting_group = jQuery(this).closest('.voting-group');
 			voting_group.css('opacity', '0.5');
-			
+
 			var vote_list = jQuery(this).closest('.fcvote_list');
 			var data_arr = jQuery(this).attr('data-rel').split("_");
-			
+
 			// ID for item being voted
 			var itemID = data_arr[0];
 
 			// Voting characteristic, (defaults to the 'main' voting characteristic if not set)
 			var xid = typeof(data_arr[1])!='undefined' && data_arr[1] ? data_arr[1] : 'main';
-			
+
 			var xid_msg  = jQuery(this).closest('.fcvote').find('.fcvote_message');
 			var main_msg = voting_group.find('.voting-row_main').find('.fcvote_message');
 
@@ -32,11 +32,11 @@ jQuery(document).ready(function(){
 			var main_cnt = voting_group.find('.voting-row_main').find('.fcvote-count');
 
 			var xid_rating  = jQuery(this).closest('.fcvote_list').find('.current-rating');
-			var main_rating = voting_group.find('.voting-row_main').find('.fcvote_list').find('.current-rating');			
+			var main_rating = voting_group.find('.voting-row_main').find('.fcvote_list').find('.current-rating');
 
 			var _htmlrating_main = main_cnt.length ? main_cnt.html() : '';
 			var _htmlrating = xid_cnt.html();
-			
+
 			xid_cnt.empty().hide();//.addClass('ajax-loader');
 			xid_msg.empty().show().addClass('ajax-loader');
 
@@ -61,7 +61,7 @@ jQuery(document).ready(function(){
 					{
 						main_rating.css('width', data.percentage_main + "%");
 					}
-					
+
 					if (typeof(data.htmlrating)!="undefined" && data.htmlrating)
 					{
 						_htmlrating = data.htmlrating;
@@ -70,7 +70,7 @@ jQuery(document).ready(function(){
 					{
 						_htmlrating_main = data.htmlrating_main;
 					}
-					
+
 					if (typeof(data.html) && data.html)
 					{
 						xid_cnt.html(data.html).show();
@@ -94,7 +94,7 @@ jQuery(document).ready(function(){
 					{
 						xid_cnt.html(_htmlrating).removeClass('ajax-loader');
 					}
-					
+
 					if (main_cnt.length) {
 						if (typeof(data.html_main) && data.html_main) {
 							main_cnt.html(data.html_main).removeClass('ajax-loader');
@@ -110,16 +110,16 @@ jQuery(document).ready(function(){
 							main_cnt.html(_htmlrating_main).removeClass('ajax-loader');
 						}
 					}
-					
+
 					xid_msg.removeClass('ajax-loader');
-					
+
 					if (typeof(data.message)!="undefined" && data.message) {
 						xid_msg.css('display', '').html(data.message);
 					}
 					if (typeof(data.message_main)!="undefined" && data.message_main) {
 						main_msg.css('display', '').html(data.message_main);
 					}
-					
+
 					under_vote = false;
 					voting_group.css('opacity', '');
 				},
@@ -129,7 +129,7 @@ jQuery(document).ready(function(){
 					voting_group.css('opacity', '');
 				}
 			});
-			
+
 		});
 	}
 });
@@ -190,7 +190,7 @@ jQuery(document).ready(function(){
 	{
 		var box = jQuery('#'+tagid);
 		var box_loading = jQuery('#'+tagid+'_loading');
-		
+
 		if (( typeof(form.checkValidity) == "function" ) )
 		{
 			if (!form.checkValidity())
@@ -255,11 +255,11 @@ jQuery(document).ready(function(){
 		{
 			//Find the field's corresponding label
 			var label = jQuery('label[for=' + node.id + ']');
-	
+
 			//Opera incorrectly does not fill the validationMessage property.
 			var message = node.validationMessage || 'Invalid value.';
 			errorList.append('<div class="fc-mssg fc-warning fc-nobgimage"><button type="button" class="close" data-dismiss="alert">&times;</button><b>' + label.html() + '</b>: ' + message + '</div>');
-			
+
 			var $node = jQuery(node);
 			if (!$node.hasClass('needs-validation'))
 			{
