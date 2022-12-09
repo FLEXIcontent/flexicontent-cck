@@ -1199,7 +1199,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		$filter_word_like_any = (int) $this->_params->get('filter_word_like_any', 0);
 
 		// Text search relevance [title] or [title, search index]
-		$filter_word_relevance_order = (int) $this->_params->get('filter_word_relevance_order', 1);
+		$filter_word_relevance_order = (int) $this->_params->get('filter_word_relevance_order', 0);
 
 		if ($phrase === null)
 		{

@@ -23,7 +23,8 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="filter_word_relevance_order" type="multilist" subtype="radio" default="1" label="FLEXI_FILTER_WORD_MOST_RELEVANT_FIRST" description="FLEXI_FILTER_WORD_MOST_RELEVANT_FIRST_DESC" class="txtsearch_display btn-group group-fcmethod fcoffactive" inline_tip="FLEXI_FILTER_WORD_MOST_RELEVANT_FIRST_INFO" tip_class="" tip_img="information.png" >
+			<field name="filter_word_relevance_order" type="multilist" subtype="radio" default="0" label="FLEXI_FILTER_WORD_MOST_RELEVANT_FIRST" description="FLEXI_FILTER_WORD_MOST_RELEVANT_FIRST_DESC" class="txtsearch_display btn-group group-fcmethod fcoffactive" inline_tip="FLEXI_FILTER_WORD_MOST_RELEVANT_FIRST_INFO" tip_class="" tip_img="information.png" >
+				<option value="0">Only use configured order</option>
 				<option value="1">FLEXI_FILTER_WORD_RELEVANT_TITLE</option>
 				<option value="2">FLEXI_YES</option>
 			</field>
