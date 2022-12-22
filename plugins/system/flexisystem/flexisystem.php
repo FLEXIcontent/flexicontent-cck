@@ -2456,7 +2456,10 @@ class plgSystemFlexisystem extends CMSPlugin
 		$displayed_fields = array();
 		foreach ($item->fields as $field)
 		{
+			// Prevent rendering of core fields
 			if ($field->iscore) continue;
+			// Prevent rendering of fields meant for form placement
+			if (substr($field->name, 0, 5) === 'form_') continue;
 
 			$displayed_fields[$field->name] = $field;
 			$values = isset($item->fieldvalues[$field->id]) ? $item->fieldvalues[$field->id] : array();
