@@ -126,8 +126,8 @@ if (!defined('FLEXI_ICONPATH'))		define('FLEXI_ICONPATH'	, FLEXI_J16GE ? 'media/
 
 // Version constants
 define('FLEXI_PHP_NEEDED',	'7.0.0');
-define('FLEXI_PHP_RECOMMENDED',	'8.0.23');
-define('FLEXI_VERSION', '4.1.3');
+define('FLEXI_PHP_RECOMMENDED',	'8.0.25');
+define('FLEXI_VERSION', '4.1.4');
 define('FLEXI_RELEASE',	'');
 define('FLEXI_VHASH',	md5(filemtime(__FILE__) . filectime(__FILE__) . FLEXI_VERSION));
 define('FLEXI_PHP_54GE', version_compare(PHP_VERSION, '5.4.0', '>='));
