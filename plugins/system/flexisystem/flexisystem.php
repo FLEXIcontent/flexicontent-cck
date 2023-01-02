@@ -282,9 +282,9 @@ class plgSystemFlexisystem extends CMSPlugin
 		$fcdebug = $this->cparams->get('print_logging_info')==2  ?  2  :  $session->get('fcdebug', 0, 'flexicontent');
 		$isAdmin = Factory::getApplication()->isClient('administrator');
 
-		$isFC_Config = $isAdmin ? ($option=='com_config' && ($view == 'component' || $controller='component') && $component == 'com_flexicontent')  :  false;
-		$isBE_Module_Edit = $isAdmin ? (($option=='com_modules' || $option=='com_advancedmodules') && $view == 'module')  :  false;
-		$isBE_Menu_Edit   = $isAdmin ? ($option=='com_menus' && $view == 'item' && $layout=='edit')  :  false;
+		$isFC_Config = $isAdmin ? ($option=='com_config' && ($view == 'component' || $controller =='component') && $component == 'com_flexicontent')  :  false;
+		$isBE_Module_Edit = $isAdmin ? (($option =='com_modules' || $option =='com_advancedmodules') && $view == 'module')  :  false;
+		$isBE_Menu_Edit   = $isAdmin ? ($option =='com_menus' && $view == 'item' && $layout =='edit')  :  false;
 
 		$js = '';
 
