@@ -113,7 +113,7 @@ $items_task = 'task=items.';
 		if (version_compare(PHP_VERSION, FLEXI_PHP_RECOMMENDED, '<'))
 		{
 			echo '<div class="fc-mssg fc-note">';
-			echo JText::sprintf( 'PHP version > %s is recommended', FLEXI_PHP_RECOMMENDED) . '<br/>';
+			echo JText::sprintf( 'PHP version >= %s is recommended', FLEXI_PHP_RECOMMENDED) . '<br/>';
 			echo '</div>';
 		}
 		$_title = "PHP/DB Requirements";

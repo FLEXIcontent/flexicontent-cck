@@ -19,7 +19,7 @@ if ( ini_get('date.timezone')=='' ) {
 // ALLOW INCLUDING CONFIG multiple times
 if (!defined('phpThumbConfigFileVersion'))
 {
-	define('phpThumbConfigFileVersion', '1.7.18');
+	define('phpThumbConfigFileVersion', '1.7.19');
 }
 
 ob_start();
