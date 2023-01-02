@@ -1765,7 +1765,7 @@ class ParentClassItem extends FCModelAdmin
 		$currentdate = JFactory::getDate();
 
 		// Default -- Created By (Owner).
-		$default_created_by = $user->get('id') ?: reset(flexicontent_db::getSuperUserID())
+		$default_created_by = $user->get('id') ?: flexicontent_db::getSuperUserID();
 
 		// Default -- Access level.
 		// -- NOTE: This default will be forced if user has not access level edit privelege
