@@ -54,7 +54,4 @@
 		</fieldset>
 	</fields>
 	</config>
-	<languages>
-		<language tag="en-GB">en-GB.plg_flexicontent_flexinotify.ini</language>
-	</languages>
 </extension>
