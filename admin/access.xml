@@ -14,6 +14,7 @@
 		<action name="core.edit.own" title="FLEXI_PERMISSIONS_COMPONENT_INHERITED_CATEGORY_EDIT_OWN" description="FLEXI_PERMISSIONS_COMPONENT_INHERITED_CATEGORY_EDIT_OWN_DESC" />
 		<action name="core.edit.state" title="FLEXI_PERMISSIONS_COMPONENT_INHERITED_CATEGORY_EDIT_STATE" description="FLEXI_PERMISSIONS_COMPONENT_INHERITED_CATEGORY_EDIT_STATE_DESC" />
 		<action name="core.edit.state.own" title="FLEXI_PERMISSIONS_COMPONENT_INHERITED_CATEGORY_EDIT_STATE_OWN" description="FLEXI_PERMISSIONS_COMPONENT_INHERITED_CATEGORY_EDIT_STATE_OWN_DESC" />
+		<action name="core.export" title="FLEXI_PERMISSIONS_EXPORT_CSV_FRONT" description="FLEXI_PERMISSIONS_EXPORT_CSV_FRONT_DESC" />
 
 		<!-- ITEM EDIT FORM (Global only) -->
 		<!-- Category / Tag usage -->
@@ -91,6 +92,7 @@
 		<action name="core.edit.own" title="FLEXI_PERMISSIONS_CATEGORY_EDIT_OWN" description="FLEXI_PERMISSIONS_CATEGORY_EDIT_OWN_DESC" />
 		<action name="core.edit.state" title="FLEXI_PERMISSIONS_CATEGORY_EDIT_STATE" description="FLEXI_PERMISSIONS_CATEGORY_EDIT_STATE_DESC" />
 		<action name="core.edit.state.own" title="FLEXI_PERMISSIONS_CATEGORY_EDIT_STATE_OWN" description="FLEXI_PERMISSIONS_CATEGORY_EDIT_STATE_OWN_DESC" />
+		<action name="core.export" title="FLEXI_PERMISSIONS_EXPORT_CSV_FRONT" description="FLEXI_PERMISSIONS_EXPORT_CSV_FRONT_DESC" />
 	</section>
 
 	<section name="article">

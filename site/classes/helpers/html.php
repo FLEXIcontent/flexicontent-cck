@@ -2647,6 +2647,17 @@ class flexicontent_html
 	static function csvbutton($view, &$params, $slug = null, $itemslug = null, $reserved=null, $item = null)
 	{
 		if ( !$params->get('show_csvbutton', 0) || JFactory::getApplication()->input->getInt('print', 0) ) return;
+      
+      	$user	= JFactory::getUser();
+
+		// Determine if current user can export csv
+		$has_export_csv = $user->authorise('core.export', $asset);
+
+		// Create the delete button only if user can delete the give item
+		if (!$has_export_csv)
+		{
+			return;
+		}
 
 		$uri    = JUri::getInstance();
 		$base  	= $uri->toString( array('scheme', 'host', 'port'));
