@@ -548,6 +548,6 @@ jQuery(document).ready(function () {
 		var staleUrl = window.location.href;
 		newUrl = fc_replaceUrlParam(staleUrl, 'cc', fc_uid);
 		window.location.replace(newUrl);
-		document.body.innerHTML = Joomla.JText._('FLEXI_UPDATING_CONTENTS') + ' <img id="loading_img" src="'+base_url+'components/com_flexicontent/assets/images/ajax-loader.gif">';
+		document.body.innerHTML = '<div style="display:none;">' + Joomla.JText._('FLEXI_UPDATING_CONTENTS') + ' <img id="loading_img" src="'+base_url+'components/com_flexicontent/assets/images/ajax-loader.gif"></div>';
 	}
 });
