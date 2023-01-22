@@ -72,32 +72,34 @@ abstract class FlexicontentHelperAssociation extends CategoryAssociationHelper
 
 			foreach ($associations as $tag => $assoc)
 			{
-				$return[$tag] = FlexicontentHelperRoute::getItemRoute($assoc->title_slug, $assoc->cat_slug, 0, $assoc);
+				$lang_code    = substr($tag, 0, 2);
+				$return[$tag] = FlexicontentHelperRoute::getItemRoute($assoc->title_slug, $assoc->cat_slug, 0, $assoc) . '&lang=' . $lang_code;
 			}
 			return $return;
 		}
 
 		elseif ($view === 'category')
 		{
-            $cid    = $jinput->getInt('cid');
-            $layout = $jinput->getCmd('layout');
-            if ($layout === 'tags')
-            {
-                $tagid = $jinput->getInt('tagid', 0);
-                $associations = $tagid ? self::getTagAssociations($tagid) : array();
+			$cid    = $jinput->getInt('cid');
+			$layout = $jinput->getCmd('layout');
+			if ($layout === 'tags')
+			{
+				$tagid = $jinput->getInt('tagid', 0);
+				$associations = $tagid ? self::getTagAssociations($tagid) : array();
 
-                if ($associations)
-                {
+				if ($associations)
+				{
 					$urlvars = flexicontent_html::getCatViewLayoutVars($catmodel = null, $use_slug = true);
 
 					foreach ($associations as $tag => $assoc)
 					{
-						$return[$tag] = FlexicontentHelperRoute::getCategoryRoute($cid, 0, $urlvars, $assoc);
+						$lang_code    = substr($tag, 0, 2);
+						$return[$tag] = FlexicontentHelperRoute::getCategoryRoute($cid, 0, $urlvars, $assoc) . '&lang=' . $lang_code;
 					}
 
 					return $return;
 				}
-            }
+			}
 
 			$associations = $cid ? self::getCatAssociations($cid) : array();
 
@@ -110,7 +112,8 @@ abstract class FlexicontentHelperAssociation extends CategoryAssociationHelper
 
 			foreach ($associations as $tag => $assoc)
 			{
-				$return[$tag] = FlexicontentHelperRoute::getCategoryRoute($assoc->title_slug, 0, $urlvars, $assoc);
+				$lang_code    = substr($tag, 0, 2);
+				$return[$tag] = FlexicontentHelperRoute::getCategoryRoute($assoc->title_slug, 0, $urlvars, $assoc) . '&lang=' . $lang_code;
 			}
 
 			return $return;
@@ -157,30 +160,30 @@ abstract class FlexicontentHelperAssociation extends CategoryAssociationHelper
 		}
 
 		$db = JFactory::getDbo();
-        if (!FLEXI_FALANG) return array();
+		if (!FLEXI_FALANG) return array();
 
-        $query  =
+		$query  =
 			//'SELECT la.lang_code AS language, t.id AS id, '
 			'SELECT la.lang_code AS language, t.id AS id, '
 			. '  CASE WHEN CHAR_LENGTH(fat.value) THEN fat.value ELSE t.name END as title, '
-            . '  CONCAT_WS(":", t.id, t.alias) AS title_slug '
-            //. '  CASE WHEN CHAR_LENGTH(faa.value) THEN CONCAT_WS(":", t.id, faa.value) ELSE CONCAT_WS(":", t.id, t.alias) END as title_slug '
-            .' FROM #__flexicontent_tags AS t'
-            .' JOIN #__tags AS jt ON t.jtag_id = jt.id'
-            . ' JOIN #__falang_content AS fat ON fat.reference_table = "tags" '
-            . '   AND fat.reference_field = "title" AND fat.reference_id = t.jtag_id'
-            . ' LEFT JOIN #__falang_content AS faa ON faa.reference_table = "tags" '
-            . '   AND faa.reference_field = "alias" AND faa.reference_id = t.jtag_id'
-            . ' JOIN #__languages AS la ON la.lang_id = fat.language_id '
-            . ' WHERE t.id = '. $tag_id;
-            ;
+			. '  CONCAT_WS(":", t.id, t.alias) AS title_slug '
+			//. '  CASE WHEN CHAR_LENGTH(faa.value) THEN CONCAT_WS(":", t.id, faa.value) ELSE CONCAT_WS(":", t.id, t.alias) END as title_slug '
+			.' FROM #__flexicontent_tags AS t'
+			.' JOIN #__tags AS jt ON t.jtag_id = jt.id'
+			. ' JOIN #__falang_content AS fat ON fat.reference_table = "tags" '
+			. '   AND fat.reference_field = "title" AND fat.reference_id = t.jtag_id'
+			. ' LEFT JOIN #__falang_content AS faa ON faa.reference_table = "tags" '
+			. '   AND faa.reference_field = "alias" AND faa.reference_id = t.jtag_id'
+			. ' JOIN #__languages AS la ON la.lang_id = fat.language_id '
+			. ' WHERE t.id = '. $tag_id;
+		;
 		$translations = $db->setQuery($query)->loadObjectList('language');
 		$lang = flexicontent_html::getSiteDefaultLang();
 		if ($translations && !isset($translations[$lang]))
 		{
 			$tag = $db->setQuery('SELECT t.name AS title, CONCAT_WS(":", t.id, t.alias) AS title_slug '
 				. ' FROM #__flexicontent_tags AS t'
-	            . ' WHERE t.id = '. $tag_id
+				. ' WHERE t.id = '. $tag_id
 			)->loadObject();
 			$translations[$lang] = (object) array('language' => $lang, 'id' => ($tag_id), 'title' => $tag->title, 'title_slug' => $tag->title_slug);
 		}
@@ -190,25 +193,25 @@ abstract class FlexicontentHelperAssociation extends CategoryAssociationHelper
 	}
 
 
-    public static function getCatAssociations($cat_id)
-    {
-        if (!$cat_id)
-        {
-            return array();
-        }
+	public static function getCatAssociations($cat_id)
+	{
+		if (!$cat_id)
+		{
+			return array();
+		}
 
-        $db = JFactory::getDbo();
-        $query = 'SELECT c.language, c.id, '
-            . '  CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(":", c.id, c.alias) ELSE c.id END as title_slug '
-            . ' FROM #__associations AS a'
-            . ' JOIN #__associations AS k ON a.`key`=k.`key`'
-            . ' JOIN #__categories AS c ON c.id = k.id '
-            . ' WHERE a.id = '. $cat_id .' AND a.context = ' . $db->Quote('com_categories.item');
+		$db = JFactory::getDbo();
+		$query = 'SELECT c.language, c.id, '
+			. '  CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(":", c.id, c.alias) ELSE c.id END as title_slug '
+			. ' FROM #__associations AS a'
+			. ' JOIN #__associations AS k ON a.`key`=k.`key`'
+			. ' JOIN #__categories AS c ON c.id = k.id '
+			. ' WHERE a.id = '. $cat_id .' AND a.context = ' . $db->Quote('com_categories.item');
 
-        $translations = $db->setQuery($query)->loadObjectList('language');
+		$translations = $db->setQuery($query)->loadObjectList('language');
 
-        return $translations;
-    }
+		return $translations;
+	}
 
 
 	private static function _getMenuAssociations($view, $id)
@@ -241,7 +244,7 @@ abstract class FlexicontentHelperAssociation extends CategoryAssociationHelper
 		{
 			$menu    = $menus->getItem($menu_item->id);
 			$moption = isset($menu->query['option']) ? $menu->query['option'] : '';
-			
+
 			$matched = false;
 
 			if (0 && $moption !== 'com_flexicontent')
@@ -255,15 +258,17 @@ abstract class FlexicontentHelperAssociation extends CategoryAssociationHelper
 			{
 				$title_slug = $record->id . ':' . $record->alias;
 				$cat_slug   = self::_getItemCatSlug($record, $menu);
+				$lang_code  = substr($tag, 0, 2);
 
-				$associations[$tag] = FlexicontentHelperRoute::getItemRoute($title_slug, $cat_slug, $menu_item->id, $record);
+				$associations[$tag] = FlexicontentHelperRoute::getItemRoute($title_slug, $cat_slug, $menu_item->id, $record) . '&lang=' . $lang_code;
 			}
 			elseif ($view === 'category')
 			{
 				$title_slug = $record->id . ':' . $record->alias;
 				$urlvars    = flexicontent_html::getCatViewLayoutVars($catmodel = null, $use_slug = true);
+				$lang_code  = substr($tag, 0, 2);
 
-				$associations[$tag] = FlexicontentHelperRoute::getCategoryRoute($title_slug, $menu_item->id, $urlvars, $record);
+				$associations[$tag] = FlexicontentHelperRoute::getCategoryRoute($title_slug, $menu_item->id, $urlvars, $record) . '&lang=' . $lang_code;
 			}
 			else
 			{
