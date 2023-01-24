@@ -153,7 +153,7 @@ if ( isset($forced_views[$controller]) )
 // ***
 
 // CASE 1: Use (if it exists) controller named as current view name
-if ( file_exists(JPATH_COMPONENT.'/controllers/'.$view.'.php') )
+if ( file_exists(JPATH_COMPONENT.'/controllers/'.$view . ($format !== 'html' ? '.' . $format : '') . '.php') )
 {
 	if ($controller !== 'group')
 	{
@@ -163,7 +163,7 @@ if ( file_exists(JPATH_COMPONENT.'/controllers/'.$view.'.php') )
 
 
 // CASE 2: Singular views do not (usually) have a controller, use (if it exists) the 'Plural' controller by appending 's' to view name
-else if ( file_exists( JPATH_COMPONENT.'/controllers/'.$view.'s.php' ) )
+else if ( file_exists( JPATH_COMPONENT.'/controllers/'.$view.'s' . ($format !== 'html' ? '.' . $format : '') . '.php' ) )
 {
 	$controller = $view.'s';
 	$task = $task ?: 'edit';  // Default task for singular views is 'edit', set it if task is empty

@@ -137,10 +137,10 @@ if ($view === 'item' && $layout === 'form' && !$task)
 
 // Handle legacy URLs that their 'task' variable does not include the controller name
 $FE_item_tasks_proxied = array(
-		'add', 'edit', 'save', 'cancel',
-		'remove', 'approval',
-		'apply_type', 'apply', 'apply_ajax',
-		'save2new', 'save2copy', 'save_a_preview',
+	'add', 'edit', 'save', 'cancel',
+	'remove', 'approval',
+	'apply_type', 'apply', 'apply_ajax',
+	'save2new', 'save2copy', 'save_a_preview',
 );
 if (!$controller && ($view === 'item' || !$view) && in_array($task, $FE_item_tasks_proxied))
 {
@@ -169,14 +169,14 @@ if ( isset($forced_views[$controller]) )
 // ***
 
 // CASE 1: Use (if it exists) controller named as current view name
-if ( file_exists(JPATH_COMPONENT.'/controllers/'.$view.'.php') )
+if ( file_exists(JPATH_COMPONENT.'/controllers/'.$view . ($format !== 'html' ? '.' . $format : '') . '.php') )
 {
 	$controller = $view;
 }
 
 
 // CASE 2: Singular views do not (usually) have a controller, use (if it exists) the 'Plural' controller by appending 's' to view name
-else if ( file_exists( JPATH_COMPONENT.'/controllers/'.$view.'s.php' ) )
+else if ( file_exists( JPATH_COMPONENT.'/controllers/'.$view.'s' . ($format !== 'html' ? '.' . $format : '') . '.php' ) )
 {
 	$controller = $view.'s';
 }
