@@ -1222,12 +1222,17 @@ class com_flexicontentInstallerScript
 							 `alias` VARCHAR(400) NOT NULL,
 							 `state` tinyint(3) NOT NULL DEFAULT '0',
 							 `catid` int(10) unsigned NOT NULL DEFAULT '0',
-							 `created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+							 `created` datetime NOT NULL DEFAULT '1000-01-01 00:00:00',
 							 `created_by` int(10) unsigned NOT NULL DEFAULT '0',
-							 `modified` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+							 `modified` datetime NOT NULL DEFAULT '1000-01-01 00:00:00',
 							 `modified_by` int(10) unsigned NOT NULL DEFAULT '0',
-							 `publish_up` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
-							 `publish_down` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+							 " . (FLEXI_J40GE ? "
+							    `publish_up` datetime NULL DEFAULT NULL,
+							    `publish_down` datetime NULL DEFAULT NULL,
+							 " : "
+							    `publish_up` datetime NULL DEFAULT '1000-01-01 00:00:00',
+							    `publish_down` datetime NULL DEFAULT '1000-01-01 00:00:00',
+							 ") . "
 							 `version` int(10) unsigned NOT NULL DEFAULT '1',
 							 `ordering` int(11) NOT NULL DEFAULT '0',
 							 `access` int(10) unsigned NOT NULL DEFAULT '0',
@@ -1246,6 +1251,8 @@ class com_flexicontentInstallerScript
 						if (!array_key_exists('alias', $tbl_fields['#__flexicontent_items_tmp'])) $_querycols[] = " ADD `alias` VARCHAR(400) NOT NULL AFTER `title`";
 						if (!array_key_exists('type_id', $tbl_fields['#__flexicontent_items_tmp'])) $_querycols[] = " ADD `type_id` INT(11) NOT NULL DEFAULT '0' AFTER `language`";
 						if (!array_key_exists('lang_parent_id', $tbl_fields['#__flexicontent_items_tmp'])) $_querycols[] = " ADD `lang_parent_id` INT(11) UNSIGNED NOT NULL DEFAULT '0' AFTER `type_id`";
+			      if (FLEXI_J40GE) $_querycols[] = " CHANGE `publish_up` `publish_up` DATETIME NULL DEFAULT NULL";
+			      if (FLEXI_J40GE) $_querycols[] = " CHANGE `publish_down` `publish_down` DATETIME NULL DEFAULT NULL";
 						if (!empty($_querycols)) $queries[] = "ALTER TABLE `#__flexicontent_items_tmp` " . implode(",", $_querycols);
 					}
 
@@ -1302,7 +1309,7 @@ class com_flexicontentInstallerScript
 							`token` varchar(255) NOT NULL,
 							`hits` int(11) NOT NULL,
 							`hits_limit` int(11) NOT NULL,
-							`expire_on` datetime NOT NULL default '0000-00-00 00:00:00',
+							`expire_on` datetime NOT NULL default '1000-01-01 00:00:00',
 							PRIMARY KEY (`id`),
 							KEY `user_id` (`user_id`),
 							KEY `file_id` (`file_id`),
