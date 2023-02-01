@@ -1392,7 +1392,7 @@ class flexicontent_html
 				$document->addScript($framework_path.'/js/grapesjs-plugin-ckeditor.min.js?0.0.9');
 				$document->addScript('https://cdn.ckeditor.com/4.14.1/standard-all/ckeditor.js');
 				//bs4
-				$document->addScript($framework_path.'/js/grapesjs-blocks-bootstrap4.min');
+				//$document->addScript($framework_path.'/js/grapesjs-blocks-bootstrap4.min');
 				break;
 
 			case 'grapesjs_view':
@@ -2119,7 +2119,7 @@ class flexicontent_html
 		// Create a safe-HTML or a no-HTML filter
 		if ($validation=='safehtml_decode_first' || $validation=='safehtml_allow_encoded')
 		{
-			$safeHtmlFilter = JFilterInput::getInstance(null, null, 1, 1);
+			$safeHtmlFilter = JFilterInput::getInstance([], [], 1, 1);
 		}
 		else if ($validation!='joomla_ug_text_filters')
 		{

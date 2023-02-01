@@ -589,7 +589,7 @@ class plgFlexicontent_fieldsText extends FCField
 
 		if ($clean_output)
 		{
-			$ifilter = $clean_output == 1 ? JFilterInput::getInstance(null, null, 1, 1) : JFilterInput::getInstance();
+			$ifilter = $clean_output == 1 ? JFilterInput::getInstance([], [], 1, 1) : JFilterInput::getInstance();
 		}
 		if ($lang_filter_values || $clean_output || $encode_output || $format_output)
 		{
