@@ -702,7 +702,7 @@ class plgFlexicontent_fieldsTermlist extends FCField
 
 		if ($clean_output)
 		{
-			$ifilter = $clean_output == 1 ? JFilterInput::getInstance(null, null, 1, 1) : JFilterInput::getInstance();
+			$ifilter = $clean_output == 1 ? JFilterInput::getInstance([], [], 1, 1) : JFilterInput::getInstance();
 		}
 		if (1)  // 1 because we will unserialize
 		{
