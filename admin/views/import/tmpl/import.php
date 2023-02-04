@@ -21,6 +21,8 @@ defined('_JEXEC') or die('Restricted access');
 $params = $this->cparams;
 $document	= JFactory::getDocument();
 
+JToolbarHelper::inlinehelp();
+
 // For tabsets/tabs ids (focusing, etc)
 $tabSetCnt = -1;
 $tabSetMax = -1;
