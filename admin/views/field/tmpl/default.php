@@ -24,6 +24,9 @@ $hint_image = '<i class="icon-info"></i>';//JHtml::image ( 'administrator/compon
 $warn_image = '<i class="icon-warning"></i>';//JHtml::image ( 'administrator/components/com_flexicontent/assets/images/note.gif', JText::_( 'FLEXI_NOTES' ), 'style="vertical-align:top;"' );
 $conf_image = '<i class="icon-cog"></i>';
 
+//adding inline help
+JToolbarHelper::inlinehelp();
+
 $form = $this->form;
 
 // Load JS tabber lib

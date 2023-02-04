@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <config>
+<inlinehelp button="show"/>
 	<fields addfieldpath="/administrator/components/com_flexicontent/elements">
 
 		<fieldset name="component" label="FLEXI_CONFIG_OPTIONS" description="">

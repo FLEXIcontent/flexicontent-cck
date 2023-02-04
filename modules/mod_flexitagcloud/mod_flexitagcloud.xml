@@ -24,6 +24,7 @@
 	</languages>
 
 	<config>
+	<inlinehelp button="show"/>
 	<fields name="params" addfieldpath="/modules/mod_flexitagcloud/elements">
 		<fieldset name="basic">
 

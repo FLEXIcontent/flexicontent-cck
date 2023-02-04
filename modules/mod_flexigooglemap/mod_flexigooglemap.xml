@@ -28,6 +28,7 @@
 	</languages>
 
 	<config>
+	<inlinehelp button="show"/>
 	<fields name="params" addfieldpath="modules/mod_flexigooglemap/elements/">
 
 		<fieldset name="basic">

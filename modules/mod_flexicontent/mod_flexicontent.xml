@@ -27,6 +27,7 @@
 	</languages>
 
 	<config>
+	<inlinehelp button="show"/>
 	<fields name="params" addfieldpath="/modules/mod_flexicontent/elements">
 
 		<fieldset name="basic">

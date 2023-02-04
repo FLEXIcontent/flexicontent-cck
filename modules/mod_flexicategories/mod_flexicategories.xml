@@ -25,7 +25,7 @@
 	<help key="JHELP_EXTENSIONS_MODULE_MANAGER_ARTICLES_CATEGORIES" />
 
 	<config>
-
+<inlinehelp button="show"/>
 	<fields name="params">
 		<fieldset name="basic" addfieldpath="/modules/mod_flexicategories/elements">
 
