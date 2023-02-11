@@ -5427,7 +5427,7 @@ class ParentClassItem extends FCModelAdmin
 		$pattern = '#<hr\s+id=("|\')system-readmore("|\')\s*\/*>#i';
 		if (is_array($data))
 		{
-			$tagPos = preg_match($pattern, @ $data['text']);
+			$tagPos = preg_match($pattern, $data['text'] ?? '');
 			if ($tagPos == 0)
 			{
 				$data['introtext'] = @ $data['text'];
