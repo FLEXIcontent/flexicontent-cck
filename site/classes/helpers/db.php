@@ -1575,6 +1575,6 @@ class flexicontent_db
 			. ' JOIN #__user_usergroup_map ugm ON u.id = ugm.user_id AND ugm.group_id IN (' . implode(',', $suGroupIDs) . ')'
 			. ' LIMIT 1';
 
-		return $db->setQuery($query)->loadColumn();
+		return $db->setQuery($query)->loadResult();
 	}
 }
