@@ -101,7 +101,7 @@ class flexicontent_fields_item_relations extends JTable
 	{
 		$result = parent::store($updateNulls); // use inherited method to store data
 
-		$query = 'UPDATE ' . $this->_db->quoteName($this->_tbl)
+		$query = 'UPDATE IGNORE ' . $this->_db->quoteName($this->_tbl)
 			. ' SET value_integer = CAST(value AS SIGNED), value_decimal = CAST(value AS DECIMAL(65,15)), value_datetime = CAST(value AS DATETIME) '
 			. ' WHERE item_id = ' . (int) $obj->item_id . ' AND field_id = ' . (int) $obj->field_id . ' AND valueorder = ' . (int) $obj->valueorder. ' AND suborder = ' . (int) $obj->suborder;
 		$this->_db->setQuery($query);

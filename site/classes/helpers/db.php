@@ -19,7 +19,7 @@ class flexicontent_db
 	static function setValues_commonDataTypes($obj, $all=false)
 	{
 		$db = JFactory::getDbo();
-		$query = 'UPDATE #__flexicontent_fields_item_relations'
+		$query = 'UPDATE IGNORE #__flexicontent_fields_item_relations'
 			. ' SET value_integer = CAST(value AS SIGNED), value_decimal = CAST(value AS DECIMAL(65,15)), value_datetime = CAST(value AS DATETIME) '
 			. (!$all ? ' WHERE item_id = ' . (int) $obj->item_id . ' AND field_id = ' . (int) $obj->field_id . ' AND valueorder = ' . (int) $obj->valueorder. ' AND suborder = ' . (int) $obj->suborder : '');
 		$db->setQuery($query);

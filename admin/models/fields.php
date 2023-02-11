@@ -756,7 +756,7 @@ class FlexicontentModelFields extends FCModelAdminList
 			$this->_db->setQuery($query)->execute();
 
 			// Copy field values assigned to items
-			$query = 'INSERT INTO #__flexicontent_fields_item_relations (field_id, item_id, valueorder, suborder, value, value_integer, value_decimal, value_datetime)'
+			$query = 'INSERT IGNORE INTO #__flexicontent_fields_item_relations (field_id, item_id, valueorder, suborder, value, value_integer, value_decimal, value_datetime)'
 				. ' SELECT ' . $target_id . ',item_id, valueorder, suborder, value, CAST(value AS SIGNED), CAST(value AS DECIMAL(65,15)), CAST(value AS DATETIME) FROM #__flexicontent_fields_item_relations as rel'
 				. ' WHERE rel.field_id=' . $source_id;
 			$this->_db->setQuery($query)->execute();
