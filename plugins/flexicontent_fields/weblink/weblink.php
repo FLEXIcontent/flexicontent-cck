@@ -1124,14 +1124,14 @@ class plgFlexicontent_fieldsWeblink extends FCField
 
 			// Sanitize the URL as absolute or relative
 			$force_absolute = $allow_relative_addrs === 0 || ($allow_relative_addrs === 2 && (int) @ $v['autoprefix']);
-			$double_slash_without_proto = strpos($v['link'], '//') === 0;
+			$double_slash_without_proto = strpos($v['link'] ?? '', '//') === 0;
 
 
 			// ***
 			// *** Validate data, skipping values that are empty after validation
 			// ***
 
-			$link = flexicontent_html::dataFilter($v['link'], $maxlength, 'URL', 0);  // Clean bad text/html
+			$link = flexicontent_html::dataFilter($v['link'] ?? '', $maxlength, 'URL', 0);  // Clean bad text/html
 
 			// Restore double slash without protocol, if this was removed
 			$link = $link && $double_slash_without_proto && strpos($link, '//') !== 0

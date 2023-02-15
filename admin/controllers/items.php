@@ -665,7 +665,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		// New item or existing item with Type is being ALTERED, check privilege to create items of this type
 		else
 		{
-			$canCreateType = $model->canCreateType(array($type_id), true, $types);
+			$canCreateType = $model->canCreateType(array($type_id), true, $types = null);
 		}
 
 
@@ -1194,7 +1194,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 						. '&typeid=' . $model->get('type_id')
 						. '&maincat=' . $model->get('catid')
 						. '&Itemid=' . $Itemid
-						. '&return='.base64_encode($this->returnURL ?: $item_url)
+						. '&return='.base64_encode($this->returnURL ?: '')
 						. ($tmpl ? '&tmpl=' . $tmpl : '');
 
 					// Set task to 'edit', and pass original referer back to avoid making the form itself the referer, but also check that it is safe enough
@@ -1384,7 +1384,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 				// C. Check if Content Type can be created by current user
 				$typeid = $this->input->get('typeid', 0, 'int');
 				$canCreateType = $typeid
-					? $model->canCreateType(array($typeid), true, $types)  // Can create given Content Type
+					? $model->canCreateType(array($typeid), true, $types = null)  // Can create given Content Type
 					: $model->canCreateType();  // Can create at least one Content Type
 
 				if (!$canCreateType)
@@ -2134,6 +2134,173 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 	public function access()
 	{
 		parent::access();
+	}
+
+
+	/**
+	 * Logic to set the value of custom field(s) via a task call
+	 *
+	 * @param   array|null  $cid       the ids of the content items to update
+	 * @param   array|null  $custom    the values of multiple custom fields indexed by their field name
+	 * @param   bool        $checkACL  indicate to check ACL (yes by default)
+	 *                                 this should be turned off only when doing direct calls ... e.g. via a CLI script
+	 * @return void
+	 *
+	 * @throws Exception
+	 * @since 3.3
+	 */
+	public function field_set_value(array $cid = null, array $custom = null, bool $checkACL = true)
+	{
+		// Check for request forgeries
+		JSession::checkToken('request') or die(JText::_('JINVALID_TOKEN'));
+
+		// Initialize variables
+		$app   = JFactory::getApplication();
+		$user  = JFactory::getUser();
+		$isAdmin  = $app->isClient('administrator');
+
+		// Get model
+		//$records_model = $this->getModel($this->record_name_pl);
+
+		if (!$custom)
+		{
+			// Get field name
+			$fieldname = $this->input->get('fieldname', '', 'string');
+			// Get new field value
+			$values = $this->input->get('values', array(), 'array');
+
+			// Check if field name was provided
+			if (!$fieldname)
+			{
+				$app->setHeader('status', '400 Bad request', true);
+				$app->enqueueMessage(JText::_('No fieldname was provided'), 'error');
+				$this->setRedirect($this->returnURL);
+
+				return;
+			}
+			// Check if values were provided
+			if ($values === null)
+			{
+				$app->setHeader('status', '400 Bad request', true);
+				$app->enqueueMessage(JText::_('No values were provided'), 'error');
+				$this->setRedirect($this->returnURL);
+
+				return;
+			}
+
+			// Update this single field
+			$custom = [$fieldname => $values];
+		}
+
+		// Get and sanitize records ids
+		$cid = $cid ?: $this->input->get('cid', array(), 'array');
+		$cid = ArrayHelper::toInteger($cid);
+
+		// Check at least one item was selected
+		if (!count($cid))
+		{
+			$app->setHeader('status', '400 Bad request', true);
+			$app->enqueueMessage(JText::_('FLEXI_NO_ITEMS_SELECTED'), 'error');
+			$this->setRedirect($this->returnURL);
+
+			return;
+		}
+
+		/**
+		 * Find and excluded records that user cannot edit
+		 */
+		$record_model = $this->getModel($this->record_name);
+
+		if ($checkACL)
+		{
+			$cid_noauth = [];
+			foreach ($cid as $i => $_id)
+			{
+				$record = $record_model->getRecord($_id);
+
+				if (!$record_model->canEdit($record))
+				{
+					$cid_noauth[] = $_id;
+					unset($cid[$i]);
+				}
+			}
+
+			$is_authorised = count($cid);
+
+			$msg_noauth = JText::_('These items cannot be changed')
+				. ': ' . implode(',', $cid_noauth)
+				. ',' . JText::_('FLEXI_REASON_NO_EDIT_PERMISSION');
+
+			// Check access
+			if (!$is_authorised)
+			{
+				$app->enqueueMessage($msg_noauth, 'error');
+				$app->setHeader('status', '403 Forbidden', true);
+
+				if ($this->input->getCmd('tmpl') !== 'component')
+				{
+					$this->setRedirect($this->returnURL);
+				}
+
+				return;
+			}
+			elseif (count($cid_noauth))
+			{
+				$app->enqueueMessage($msg_noauth, 'warning');
+			}
+		}
+
+
+		foreach ($cid as $item_ID)
+		{
+			// EITHER Load existing item into the ITEM model
+			$item = $record_model->getItem($item_ID, $check_view_access = false, $no_cache = true, $force_version = 0);
+			// You can use $item to get existing values
+			if (!$item) die('item ' . $item_ID . ' not found');
+
+			// IMPORTANT: Get existing field values for the item
+			$items               = array($item);
+			$items_custom_values = FlexicontentFields::getCustomFieldValues($items, 'item');
+			$data['custom']      = reset($items_custom_values); // Get data of first item
+
+			// Indicate which item to update
+			$data['id'] = $item_ID;
+			$data['vstate']  = 2;  // item version is approved
+
+			// Custom fields
+			foreach($custom as $fieldname => $values)
+			{
+				$data['custom'][$fieldname] = $values;  // Values is an array
+			}
+
+			// Custom field values are filtered by field so we do not need to validate anything else
+			$validated_data = $data; // $record_model->validate($record_model->getForm(), $data);
+
+			// Store the new / existing item and log the result in file and on screen
+			$app->input->set('unique_tmp_itemid', $validated_data['id']);
+			$result = $record_model->store($validated_data, $checkACL);
+			$app->input->set('unique_tmp_itemid', null);
+			if (!$result)
+			{
+				$msg = 'Failed to store item: ' . $record_model->getError();
+				JLog::add($msg);
+				echo $msg . "<br/>";
+			}
+		}
+
+		// Clear dependent cache data
+		$this->_cleanCache();
+
+		$msg = count($cid) . ' ' . JText::_('FLEXI_RECORDS_MODIFIED');
+
+		/*echo '<pre>';
+		print_r($cid); echo "\n";
+		print_r($fieldname); echo "\n";
+		print_r($values); echo "\n";
+		print_r($data);
+		exit;*/
+
+		$this->setRedirect($this->returnURL, $msg, 'message');
 	}
 
 
