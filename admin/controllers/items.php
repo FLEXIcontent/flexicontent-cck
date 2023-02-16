@@ -47,6 +47,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		'remove', 'approval',
 		'apply_type', 'apply', 'apply_ajax',
 		'save2new', 'save2copy', 'save_a_preview', 'download', 'download_file', 'weblink' ,
+		'field_set_value',
 	);
 
 	/**
@@ -2300,6 +2301,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		print_r($data);
 		exit;*/
 
+		if ($this->input->get('is_ajax')) die('OK');
 		$this->setRedirect($this->returnURL, $msg, 'message');
 	}
 
