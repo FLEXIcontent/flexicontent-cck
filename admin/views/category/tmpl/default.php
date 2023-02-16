@@ -33,7 +33,7 @@ $js = "
 ";
 $this->document->addScriptDeclaration($js);
 //adding inline help
-JToolbarHelper::inlinehelp();
+if (FLEXI_J40GE) JToolbarHelper::inlinehelp();
 ?>
 
 <div id="flexicontent" class="flexicontent fcconfig-form">

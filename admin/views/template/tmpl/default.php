@@ -19,7 +19,7 @@
 defined('_JEXEC') or die('Restricted access');
 
 //adding inline help
-JToolbarHelper::inlinehelp();
+if (FLEXI_J40GE) JToolbarHelper::inlinehelp();
 
 jimport('joomla.filesystem.folder');
 jimport('joomla.filesystem.file');

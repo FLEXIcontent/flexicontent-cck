@@ -12,7 +12,7 @@
 defined('_JEXEC') or die('Restricted access');
 
 //adding inline help
-JToolbarHelper::inlinehelp();
+if (FLEXI_J40GE) JToolbarHelper::inlinehelp();
 
 // Load JS tabber lib
 $this->document->addScript(JUri::root(true).'/components/com_flexicontent/assets/js/tabber-minimized.js', array('version' => FLEXI_VHASH));

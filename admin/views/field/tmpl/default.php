@@ -25,7 +25,7 @@ $warn_image = '<i class="icon-warning"></i>';//JHtml::image ( 'administrator/com
 $conf_image = '<i class="icon-cog"></i>';
 
 //adding inline help
-JToolbarHelper::inlinehelp();
+if (FLEXI_J40GE) JToolbarHelper::inlinehelp();
 
 $form = $this->form;
 
