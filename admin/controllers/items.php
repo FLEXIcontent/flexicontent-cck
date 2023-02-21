@@ -656,6 +656,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		$canEdit = $itemAccess->get('access-edit');    // includes privileges edit and edit-own
 
 		$type_id = (int) $validated_data['type_id'];
+		$types   = null;
 
 		// Existing item with Type not being ALTERED, content type can be maintained regardless of privilege
 		if (!$isnew && $model->get('type_id') == $type_id)
@@ -666,7 +667,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		// New item or existing item with Type is being ALTERED, check privilege to create items of this type
 		else
 		{
-			$canCreateType = $model->canCreateType(array($type_id), true, $types = null);
+			$canCreateType = $model->canCreateType(array($type_id), true, $types);
 		}
 
 
@@ -1384,8 +1385,9 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 
 				// C. Check if Content Type can be created by current user
 				$typeid = $this->input->get('typeid', 0, 'int');
+				$types = null;
 				$canCreateType = $typeid
-					? $model->canCreateType(array($typeid), true, $types = null)  // Can create given Content Type
+					? $model->canCreateType(array($typeid), true, $types)  // Can create given Content Type
 					: $model->canCreateType();  // Can create at least one Content Type
 
 				if (!$canCreateType)
