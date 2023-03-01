@@ -221,7 +221,11 @@ class modFlexiTagCloudHelper
 			$lists[$i] = new stdClass();
 
 			$lists[$i]->size = modFlexiTagCloudHelper::sizer($min, $max, $row->no, $minsize, $maxsize);
-			$lists[$i]->name = $row->title ?: $row->name;
+			$lists[$i]->name = ($row->title ?: $row->name); // . ' ['. $row->no.']';
+			$lists[$i]->assignments_count   = $row->no;
+
+			// To sort inside the layout use:
+			//usort($list, fn($a, $b) => ((int)$b->assignments_count > (int)$a->assignments_count));
 
 			$lists[$i]->description = $row->description;
 			$lists[$i]->screenreader = JText::sprintf('FLEXI_NR_ITEMS_TAGGED', $row->no);
