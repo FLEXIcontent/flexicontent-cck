@@ -238,17 +238,10 @@ form > .fc_filter_line {
 .flexicontent .fc_field_filter {
 	font-size: 11px;
 }
-.fc_filter_html .select2-container .select2-choices input.select2-input::placeholder,
-.fc_filter_html .fc_text_filter::placeholder,
-.fc_filter_html .fc_field_filter::placeholder {
-	color: #aaa;
-	opacity: 0.5;
-}
 .fc_filter_html .select2-container .select2-choices input.select2-input,
 .fc_filter_html .select2-container .select2-choice > .select2-chosen,
 .fc_filter_html .fc_text_filter,
 .fc_filter_html .fc_field_filter {
-	color: #aaa;
 	font-weight: normal;
 	display: inline-block;
 	width: auto;
@@ -425,4 +418,7 @@ span.fc_field_filter {
 li.select2-search-field {
 	min-height: calc(var(--form-inp-height)) !important;
 	line-height: calc(var(--form-inp-height)) !important;
+}
+.select2-default {
+	color: inherit !important;
 }

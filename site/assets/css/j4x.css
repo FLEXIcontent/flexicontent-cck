@@ -495,3 +495,48 @@ button.fcfield-expand-view-btn.btn.btn-small {
 span.add-on.fc_filedata_title {
 	margin-left: 5px !important;
 }
+.fc_buttons.btn-group {
+	display: inline-flex;
+}
+.fc_filter .fc_filter_label,
+.fc_filter_line .fc_filter_label {
+	float: left !important;
+	display: initial !important;
+	color: initial !important;
+	background-color: initial !important;
+	border-width: 0px !important;
+	font-weight: normal !important;
+	font-size: initial !important;
+	text-align: initial !important;
+	border-radius: initial !important;
+	text-shadow: initial !important;
+	font-family: unset !important;
+	height: var(--ctrls-inp-height) !important;
+	min-height: var(--ctrls-inp-height) !important;
+	line-height: calc(var(--ctrls-inp-height) - 1px) !important;
+	padding: 0px 0px 0px 8px !important;
+}
+fieldset.fc_search_set legend .fc_legend_text.hasTooltip,
+fieldset.fc_filter_set legend .fc_legend_text.hasTooltip {
+	min-height: calc(var(--ctrls-inp-height) + 2px) !important;
+	top: 1px;
+}
+#flexicontent .item_total .fc_item_total_data {
+	padding: 0 8px 0px 0px !important;
+	line-height: var(--ctrls-inp-height) !important;
+}
+.label.fc_orderby_level_lbl {
+	line-height: var(--ctrls-inp-height) !important;
+	padding-left: 10px !important;
+}
+#flexicontent .item_total .fc_limit_box,
+#flexicontent .item_total .fc_orderby_box,
+#flexicontent .item_total .fc_clayout_box {
+	margin-top: 0px !important;
+	margin-bottom: 0px !important;
+	margin-left: 0px !important;
+}
+#flexicontent .item_total .fc_orderby_level_lbl,
+#flexicontent .item_total .fc_orderby_selector {
+	margin: 0 !important;
+}
