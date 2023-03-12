@@ -346,7 +346,7 @@ class FlexicontentViewField extends FlexicontentViewBaseRecord
 
 
 		// Check access level exists
-		$level_name = flexicontent_html::userlevel(null, $row->access, null, null, null, $_createlist = false);
+		$level_name = flexicontent_html::userlevel(null, $row->access, null, null, '', $_createlist = false);
 		if (empty($level_name))
 		{
 			JFactory::getApplication()->enqueueMessage(JText::sprintf('FLEXI_ABOUT_INVALID_ACCESS_LEVEL_PLEASE_SAVE_NEW', $row->access, 'Public'), 'warning');

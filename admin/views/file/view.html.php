@@ -368,7 +368,7 @@ class FlexicontentViewFile extends FlexicontentViewBaseRecord
 		$lists['language'] = flexicontent_html::buildlanguageslist('language', ' class="use_select2_lib" ', $row->language, 2, $allowed_langs, $published_only=false);
 
 		// check access level exists
-		$level_name = flexicontent_html::userlevel(null, $row->access, null, null, null, $_createlist = false);
+		$level_name = flexicontent_html::userlevel(null, $row->access, null, null, '', $_createlist = false);
 		if (empty($level_name))
 		{
 			JFactory::getApplication()->enqueueMessage(JText::sprintf('FLEXI_ABOUT_INVALID_ACCESS_LEVEL_PLEASE_SAVE_NEW', $row->access, 'Public'), 'warning');

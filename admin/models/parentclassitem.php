@@ -1947,7 +1947,7 @@ class ParentClassItem extends FCModelAdmin
 			}
 
 			// Also make sure we have a valid access level
-			if ( !$item->access || !flexicontent_html::userlevel(null, $item->access, null, null, null, $_createlist = false) )
+			if ( !$item->access || !flexicontent_html::userlevel(null, $item->access, null, null, '', $_createlist = false) )
 			{
 				$item->access = $app->getCfg( 'access', $public_acclevel = 1 );
 			}
