@@ -1485,7 +1485,7 @@ class flexicontent_db
 		}
 
 		// Zero length value, return empty array or false (error)
-		if (!strlen($v))
+		if ($v === null || !strlen($v))
 		{
 			return $force_array ? array() : false;
 		}
