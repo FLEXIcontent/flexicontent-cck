@@ -871,7 +871,7 @@ class plgFlexicontent_fieldsSharedmedia extends FCField
 		foreach ($post as $n => $v)
 		{
 			// Support for serialized user data, e.g. basic CSV import / export. (Safety concern: objects code will abort unserialization!)
-			if ( $is_importcsv && !is_array($v) )
+			if ( /*$is_importcsv &&*/ !is_array($v) && $v )
 			{
 				$array = $this->unserialize_array($v, $force_array=false, $force_value=false);
 				$v = $array ?: array(
