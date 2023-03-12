@@ -845,7 +845,7 @@ class plgFlexicontent_fieldsTermlist extends FCField
 			// *** Validate data, skipping values that are empty after validation
 			// ***
 
-			$title = flexicontent_html::dataFilter($v['title'], $title_maxlength, 'HTML', 0);
+			$title = flexicontent_html::dataFilter($v['title'] ?? '', $title_maxlength, 'HTML', 0);
 
 			// Skip empty value, but if in group increment the value position
 			if (!strlen($title))
@@ -856,7 +856,7 @@ class plgFlexicontent_fieldsTermlist extends FCField
 
 			$newpost[$new] = array();
 			$newpost[$new]['title'] = $title;
-			$newpost[$new]['text']  = flexicontent_html::dataFilter($v['text'], $maxlength, $validation, 0);
+			$newpost[$new]['text']  = flexicontent_html::dataFilter($v['text'] ?? '', $maxlength, $validation, 0);
 
 			$new++;
 		}
