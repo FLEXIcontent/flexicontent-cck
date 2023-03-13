@@ -2452,7 +2452,7 @@ class ParentClassItem extends FCModelAdmin
 		// *** Trigger Event 'OnBeforeContentSave' (J1.5) or 'onContentBeforeSave' (J2.5) of Joomla's Content plugins
 		// ***
 
-		if ($option === 'com_flexicontent')
+		if ($option === 'com_flexicontent' || !$option)
 		{
 			// Some compatibility steps
 			if (!$isNew)
@@ -2503,7 +2503,10 @@ class ParentClassItem extends FCModelAdmin
 		// Only create the item not save the CUSTOM fields yet, no need to rebind this is already done above
 		if( $isNew )
 		{
-			$this->applyCurrentVersion($item, $data, $createonly=true);
+			if (!$this->applyCurrentVersion($item, $data, $createonly=true))
+			{
+				return false;
+			}
 		}
 
 		// ??? Make sure the data of the model are correct  ??? ... maybe this no longer needed
@@ -2630,7 +2633,7 @@ class ParentClassItem extends FCModelAdmin
 			// ***
 			// *** Trigger Event 'onAfterContentSave' (J1.5) OR 'onContentAfterSave' (J2.5 ) of Joomla's Content plugins
 			// ***
-			if ($option === 'com_flexicontent')
+			if ($option === 'com_flexicontent' || !$option)
 			{
 				if ( $print_logging_info ) $start_microtime = microtime(true);
 
