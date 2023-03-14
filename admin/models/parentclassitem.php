@@ -2888,15 +2888,15 @@ class ParentClassItem extends FCModelAdmin
 			// Set vstate property into the field object to allow this to be changed be the before saving  field event handler
 			$field->item_vstate = $data['vstate'];
 
-			$is_editable = !$checkACL || !$field->valueseditable || $user->authorise('flexicontent.editfieldvalues', 'com_flexicontent.field.' . $field->id);
+			$is_editable   = !$checkACL || !$field->valueseditable || $user->authorise('flexicontent.editfieldvalues', 'com_flexicontent.field.' . $field->id);
+			$is_hidden_fe  = $checkACL && $isSite && ($field->formhidden==1 || $field->formhidden==3 || $field->parameters->get('frontend_hidden'));
+			$is_hidden_be  = $checkACL && $isAdmin && ($field->formhidden==2 || $field->formhidden==3 || $field->parameters->get('backend_hidden'));
 			$maintain_dbval = false;
 
 			// FORM HIDDEN FIELDS (FRONTEND/BACKEND) AND (ACL) UNEDITABLE FIELDS: maintain their DB value ...
-			if (
-				( $isSite && ($field->formhidden==1 || $field->formhidden==3 || $field->parameters->get('frontend_hidden')) ) ||
-				( $isAdmin && ($field->formhidden==2 || $field->formhidden==3 || $field->parameters->get('backend_hidden')) ) ||
-				!$is_editable
-			) {
+			// NOTE: this will not / should not execute if $checkACL is OFF !!!
+			if ($is_hidden_fe || $is_hidden_be || !$is_editable)
+			{
 				$postdata[$field->name] = $field->value;
 				$maintain_dbval = true;
 			}
