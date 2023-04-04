@@ -3047,7 +3047,7 @@ class FlexicontentModelItems extends FCModelAdminList
 	 * @return	boolean	integer array on success
 	 * @since	1.0
 	 */
-	function getItemsWithTags(&$total=null, $start=0, $limit=20000)
+	function getItemsWithTags(&$total=null, $start=0, $limit=100000)
 	{
 		$query = 'SELECT SQL_CALC_FOUND_ROWS DISTINCT a.id '
 			. ' FROM #__content AS a'
@@ -3071,7 +3071,7 @@ class FlexicontentModelItems extends FCModelAdminList
 	 * @return	boolean	integer array on success
 	 * @since	1.0
 	 */
-	function getAllItems(&$total=null, $start=0, $limit=20000)
+	function getAllItems(&$total=null, $start=0, $limit=100000)
 	{
 		$query = 'SELECT SQL_CALC_FOUND_ROWS DISTINCT a.id '
 			. ' FROM #__content AS a'
@@ -3328,7 +3328,7 @@ class FlexicontentModelItems extends FCModelAdminList
 	 *
 	 * @since 1.5
 	 */
-	function getFieldsItems($fields=null, &$total=null, $start=0, $limit=20000)
+	function getFieldsItems($fields=null, &$total=null, $start=0, $limit=100000)
 	{
 		if ($fields === null)
 		{

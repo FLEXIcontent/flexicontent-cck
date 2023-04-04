@@ -281,7 +281,7 @@ trait flexicontent_basetable_trait
 		{
 			$msg = JText::_('FLEXI_ADD_' . strtoupper($title));
 			JFactory::getApplication()->enqueueMessage($msg, 'error');
-			//$this->setError($msg);
+			$this->setError($msg);
 			return false;
 		}
 

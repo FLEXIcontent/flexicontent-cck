@@ -1947,7 +1947,7 @@ class ParentClassItem extends FCModelAdmin
 			}
 
 			// Also make sure we have a valid access level
-			if ( !$item->access || !flexicontent_html::userlevel(null, $item->access, null, null, null, $_createlist = false) )
+			if ( !$item->access || !flexicontent_html::userlevel(null, $item->access, null, null, '', $_createlist = false) )
 			{
 				$item->access = $app->getCfg( 'access', $public_acclevel = 1 );
 			}
@@ -2452,7 +2452,7 @@ class ParentClassItem extends FCModelAdmin
 		// *** Trigger Event 'OnBeforeContentSave' (J1.5) or 'onContentBeforeSave' (J2.5) of Joomla's Content plugins
 		// ***
 
-		if ($option === 'com_flexicontent')
+		if ($option === 'com_flexicontent' || !$option)
 		{
 			// Some compatibility steps
 			if (!$isNew)
@@ -2503,7 +2503,10 @@ class ParentClassItem extends FCModelAdmin
 		// Only create the item not save the CUSTOM fields yet, no need to rebind this is already done above
 		if( $isNew )
 		{
-			$this->applyCurrentVersion($item, $data, $createonly=true);
+			if (!$this->applyCurrentVersion($item, $data, $createonly=true))
+			{
+				return false;
+			}
 		}
 
 		// ??? Make sure the data of the model are correct  ??? ... maybe this no longer needed
@@ -2630,7 +2633,7 @@ class ParentClassItem extends FCModelAdmin
 			// ***
 			// *** Trigger Event 'onAfterContentSave' (J1.5) OR 'onContentAfterSave' (J2.5 ) of Joomla's Content plugins
 			// ***
-			if ($option === 'com_flexicontent')
+			if ($option === 'com_flexicontent' || !$option)
 			{
 				if ( $print_logging_info ) $start_microtime = microtime(true);
 
@@ -2885,15 +2888,15 @@ class ParentClassItem extends FCModelAdmin
 			// Set vstate property into the field object to allow this to be changed be the before saving  field event handler
 			$field->item_vstate = $data['vstate'];
 
-			$is_editable = !$checkACL || !$field->valueseditable || $user->authorise('flexicontent.editfieldvalues', 'com_flexicontent.field.' . $field->id);
+			$is_editable   = !$checkACL || !$field->valueseditable || $user->authorise('flexicontent.editfieldvalues', 'com_flexicontent.field.' . $field->id);
+			$is_hidden_fe  = $checkACL && $isSite && ($field->formhidden==1 || $field->formhidden==3 || $field->parameters->get('frontend_hidden'));
+			$is_hidden_be  = $checkACL && $isAdmin && ($field->formhidden==2 || $field->formhidden==3 || $field->parameters->get('backend_hidden'));
 			$maintain_dbval = false;
 
 			// FORM HIDDEN FIELDS (FRONTEND/BACKEND) AND (ACL) UNEDITABLE FIELDS: maintain their DB value ...
-			if (
-				( $isSite && ($field->formhidden==1 || $field->formhidden==3 || $field->parameters->get('frontend_hidden')) ) ||
-				( $isAdmin && ($field->formhidden==2 || $field->formhidden==3 || $field->parameters->get('backend_hidden')) ) ||
-				!$is_editable
-			) {
+			// NOTE: this will not / should not execute if $checkACL is OFF !!!
+			if ($is_hidden_fe || $is_hidden_be || !$is_editable)
+			{
 				$postdata[$field->name] = $field->value;
 				$maintain_dbval = true;
 			}
