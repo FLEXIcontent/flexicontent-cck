@@ -1172,6 +1172,9 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 						))
 					: HTMLHelper::_($hlpname . '.edit_link', $row, $i, $row->canEdit);
 				?>
+				<div class="small break-word">
+				<?php echo Text::sprintf('JGLOBAL_LIST_ALIAS', $this->escape($row->alias)); ?>
+                </div>
 			</td>
 
 
