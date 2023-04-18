@@ -2314,7 +2314,8 @@ class plgFlexicontent_fieldsImage extends FCField
 		unset ($phpThumb);
 		$phpThumb = new phpThumb();
 
-		$filepath = $src_path . $filename;
+		// Needed for file paths in windows
+		$filepath = str_replace('\\', '/', $src_path . $filename);
 
 		$phpThumb->setSourceFilename($filepath);
 		$phpThumb->setParameter('config_output_format', "$ext");
