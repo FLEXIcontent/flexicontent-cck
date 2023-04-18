@@ -647,7 +647,7 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 		}
 		else if ($image_source===0 || $image_source===null)
 		{
-			$gallery_path = !empty($options['secure']) ? COM_FLEXICONTENT_FILEPATH.DS : COM_FLEXICONTENT_MEDIAPATH.DS;
+			$gallery_path = (!empty($options['secure']) ? COM_FLEXICONTENT_FILEPATH : COM_FLEXICONTENT_MEDIAPATH) . DS;
 		}
 		else
 		{

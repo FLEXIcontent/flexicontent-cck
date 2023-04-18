@@ -225,7 +225,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 		{
 			// CASE local file
 			case 0:
-				$path = $data['secure'] ? COM_FLEXICONTENT_FILEPATH . DS : COM_FLEXICONTENT_MEDIAPATH . DS;  // JPATH_ROOT . DS . <media_path | file_path> . DS
+				$path = ($data['secure'] ? COM_FLEXICONTENT_FILEPATH : COM_FLEXICONTENT_MEDIAPATH) . DS;  // JPATH_ROOT . DS . <media_path | file_path> . DS
 				$file_path = JPath::clean($path . $data['filename']);
 
 				// Get file size from filesystem (local file)
@@ -702,7 +702,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 		}
 		else
 		{
-			$path = $secure ? COM_FLEXICONTENT_FILEPATH . DS : COM_FLEXICONTENT_MEDIAPATH . DS;
+			$path = ($secure ? COM_FLEXICONTENT_FILEPATH : COM_FLEXICONTENT_MEDIAPATH) . DS;
 		}
 
 		jimport('joomla.utilities.date');
@@ -1407,7 +1407,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 		$filenames = JFolder::files($filesdir, $regexp);
 
 		// Create the folder if it does not exists
-		$destpath = $secure ? COM_FLEXICONTENT_FILEPATH . DS : COM_FLEXICONTENT_MEDIAPATH . DS;
+		$destpath = ($secure ? COM_FLEXICONTENT_FILEPATH : COM_FLEXICONTENT_MEDIAPATH) . DS;
 
 		if (!JFolder::exists($destpath))
 		{
