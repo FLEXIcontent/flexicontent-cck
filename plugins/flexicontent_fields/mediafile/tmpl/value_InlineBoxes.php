@@ -508,7 +508,7 @@ if ($prop !== 'display_properties_only') :
 	}
 
 	//Display the buttons "DOWNLOAD, SHARE, ADD TO CART" before or after the filename
-	$html = (static::$isItemsManager || (!$html && !actions_arr) ? '' : '<fieldset><legend></legend>') . '
+	$html = (static::$isItemsManager || (!$html && !$actions_arr) ? '' : '<fieldset><legend></legend>') . '
 		' .
 		($buttonsposition ? $html : '') .
 		($actions_arr ? '
