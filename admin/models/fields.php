@@ -190,9 +190,10 @@ class FlexicontentModelFields extends FCModelAdminList
 		// Create a query with all its clauses: WHERE, HAVING and ORDER BY, etc
 		$query = parent::getListQuery()
 			->select(
-				'COUNT(rel.type_id) AS nrassigned, GROUP_CONCAT(rel.type_id SEPARATOR  ",") AS typeids, ' .
+				'COUNT(DISTINCT tcnt.type_id) AS nrassigned, GROUP_CONCAT(DISTINCT tcnt.type_id SEPARATOR  ",") AS typeids, ' .
 				'rel.ordering as typeordering, a.field_type as type, plg.name as friendly'
 			)
+			->innerJoin('#__flexicontent_fields_type_relations AS tcnt ON tcnt.field_id = a.id')
 			->leftJoin('#__extensions AS plg ON (plg.element = a.field_type AND plg.`type`=\'plugin\' AND plg.folder=\'flexicontent_fields\')')
 			->leftJoin('#__flexicontent_fields_type_relations AS rel ON rel.field_id = a.id')
 		;
