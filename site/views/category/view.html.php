@@ -22,6 +22,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 jimport('legacy.view.legacy');
 jimport('joomla.filesystem.file');
 use Joomla\String\StringHelper;
+use Joomla\CMS\Component\ComponentHelper;
 
 /**
  * HTML View class for the Category View
@@ -663,7 +664,7 @@ class FlexicontentViewCategory extends JViewLegacy
 		// *** Get some variables needed for images
 		// ***
 
-		$joomla_image_path = $app->getCfg('image_path', '');
+		$joomla_image_path = ComponentHelper::getParams('com_media')->get('image_path', 'images');
 		$joomla_image_url  = str_replace (DS, '/', $joomla_image_path);
 		$joomla_image_path = $joomla_image_path ? $joomla_image_path.DS : '';
 		$joomla_image_url  = $joomla_image_url  ? $joomla_image_url.'/' : '';
@@ -719,10 +720,13 @@ class FlexicontentViewCategory extends JViewLegacy
 			if ($cat->id && $show_cat_image)
 			{
 				$cat->image = $params->get('image');
+				$catimageurl = explode('#', $cat->image);
+				$cat->image =$catimageurl[0];
 				$cat->introtext = & $cat->description;
 				$cat->fulltext = "";
+				$catimageurl = JPATH_SITE .DS . $cat->image;
 
-				if ( $cat_image_source && $cat->image && JFile::exists( JPATH_SITE .DS. $joomla_image_path . $cat->image ) )
+				if ( $cat_image_source && $cat->image && file_get_contents(( $catimageurl ) ))
 				{
 					$src = $this->baseurl ."/". $joomla_image_url . $cat->image;
 
@@ -733,7 +737,7 @@ class FlexicontentViewCategory extends JViewLegacy
 					$image = $phpThumbURL.$src.$conf;
 				}
 
-				elseif ( $cat_image_source!=1 && $src = flexicontent_html::extractimagesrc($cat) )
+				elseif ( $cat_image_source !=1 && $src = flexicontent_html::extractimagesrc($cat) )
 				{
 					$ext = strtolower(pathinfo($src, PATHINFO_EXTENSION));
 					$f = in_array( $ext, array('png', 'gif', 'jpeg', 'jpg', 'webp', 'wbmp', 'bmp', 'ico') ) ? '&amp;f='.$ext : '';
@@ -761,7 +765,6 @@ class FlexicontentViewCategory extends JViewLegacy
 					$image = '<a href="'.JRoute::_( FlexicontentHelperRoute::getCategoryRoute($cat->slug) ).'">'.$image.'</a>';
 				}
 			}
-
 			$cat->image = $image;
 		}
 

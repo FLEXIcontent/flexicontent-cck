@@ -899,6 +899,8 @@ class plgFlexicontent_fieldsImage extends FCField
 				}
 
 				$_image_path = $item->images->get('image_' . $_image_name, '');
+				$_image_path = explode('#', $_image_path);
+				$_image_path = $_image_path[0];
 
 				// Use 'fulltext' image if 'intro' image is empty
 				if (!$_image_path && $_image_name === 'intro')
@@ -914,7 +916,7 @@ class plgFlexicontent_fieldsImage extends FCField
 				// field attributes (value)
 				$image_IF['originalname'] = basename($_image_path);
 				$image_IF['alt']   = $item->images->get('image_' . $_image_name.'_alt', '');
-				$image_IF['title'] = $item->images->get('image_' . $_image_name.'_alt', '');
+				$image_IF['title'] = $item->images->get('image_' . $_image_name.'_title', '');
 				$image_IF['desc']  = $item->images->get('image_' . $_image_name.'_caption', '');
 				$image_IF['cust1'] = '';
 				$image_IF['cust2'] = '';
