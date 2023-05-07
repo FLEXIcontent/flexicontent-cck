@@ -1090,7 +1090,8 @@ class ParentClassItem extends FCModelAdmin
 		}
 
 		// Add to record to cache if it is non-versioned data
-		if (!$version)
+		$is_cli = php_sapi_name() === 'cli';
+		if (!$version && !$is_cli)
 		{
 			$items[$pk] = $this->_record;
 			$fc_list_items[$pk] = $this->_record;
