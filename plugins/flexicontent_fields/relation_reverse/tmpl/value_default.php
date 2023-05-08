@@ -1,18 +1,19 @@
 <?php
 foreach ($related_items_sets as $n => $related_items)
 {
-	// Skip empty if not in field group
-	if (empty($related_items) && !$is_ingroup)
-	{
-		continue;
-	}
+	// Do not skip loop, if empty($related_items)
+	// because we display other info, like submit related button
+	$HTML = new stdClass();
+
+
 
 	// ***
 	// *** --01-- Create the items list
 	// ***
 
 	$HTML->items_list = '';
-	if ($disp->item_list && !empty($related_items))
+
+	if ($disp->total_info && (!empty($options->total) || !empty($related_items)))
 	{
 		// Implode using the configured separator
 		$HTML->items_list = array();
@@ -37,6 +38,7 @@ foreach ($related_items_sets as $n => $related_items)
 	// ***
 
 	$HTML->submit_related_btn = '';
+
 	if ($disp->submit_related_btn)
 	{
 		// Force single button display, if no items list HTML
@@ -65,7 +67,8 @@ foreach ($related_items_sets as $n => $related_items)
 	// ***
 
 	$HTML->total_info = '';
-	if ($disp->total_info)
+
+	if ($disp->total_info && !empty($related_items))
 	{
 		$total_count = isset($options->total) ? $options->total : count($related_items);
 		$total_append_text = JText::_($field->parameters->get('total_append_text', ''));
