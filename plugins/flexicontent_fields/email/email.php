@@ -964,8 +964,9 @@ class plgFlexicontent_fieldsEmail extends FCField
 			} else {
 				// Message sending
 				$app->enqueueMessage(JText::_('FLEXI_FIELD_EMAIL_MESSAGE_SEND_SUCCESS'), 'message');
+				$destFolder= JPATH_SITE . DS . "tmp" . DS . "upload_flexi_form". $formid;
 				//Deleting file
-				if (is_dir($$destFolder)) {
+				if (is_dir($destFolder)) {
  				JFolder::delete($destFolder);
 				} 
 			}

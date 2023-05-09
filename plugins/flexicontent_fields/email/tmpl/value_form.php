@@ -110,7 +110,6 @@ foreach ($values as $value)
 		";
 		$modal_footer = "		
 					</div>
-					<div class='modal-footer'></div>
 				</div>
 			</div>
 		</div>
