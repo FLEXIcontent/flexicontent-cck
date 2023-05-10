@@ -68,7 +68,7 @@ foreach ($related_items_sets as $n => $related_items)
 
 	$HTML->total_info = '';
 
-	if ($disp->total_info && !empty($related_items))
+	if ($disp->total_info && (!empty($options->total) || !empty($related_items)))
 	{
 		$total_count = isset($options->total) ? $options->total : count($related_items);
 		$total_append_text = JText::_($field->parameters->get('total_append_text', ''));
@@ -91,7 +91,7 @@ foreach ($related_items_sets as $n => $related_items)
 		. ($submit_related_position == 0 || $submit_related_position == 2 ? $HTML->submit_related_btn : '')
 		. $HTML->items_list
 		. ($submit_related_position == 1 || $submit_related_position == 2 ? $HTML->submit_related_btn : '')
-		;
+	;
 
 	if (!$multiple) break;  // multiple values disabled, break out of the loop, not adding further values even if the exist
 }
