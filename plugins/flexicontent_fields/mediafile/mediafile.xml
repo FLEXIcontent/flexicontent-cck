@@ -578,11 +578,15 @@
 		</fieldset>
 		<fieldset name="group-mediafile-filtering" hidden="true" icon_class="icon-filter" label="FLEXI_FILTERING_CONF" description="FLEXI_FILTERING_CONF_DESC" addfieldpath="/administrator/components/com_flexicontent/elements">
 
-			<field name="" type="separator" default="Media properties Filters. Currently these effect all Media properties in the same way" level="level3" class="alert alert-info" />
+			<field name="media_property_filters" type="fcmediaprops" subtype="sortable"
+				   default="media_format, sample_rate, duration"
+				   label="Media properties" description="Select properties to show" depend_class="" />
 
 			<field name="" type="separator" default="FLEXI_FILTERING" level="tabset_start" box_type="1" />
 
 			<field name="" type="separator" default="FLEXI_CATEGORY_BASED_VIEWS" icon_class="icon-list" level="tab_open" box_type="1" />
+
+			<field name="" type="separator" default="Media properties Filters. Currently these effect all Media properties in the same way" level="level3" class="alert alert-info" />
 
 			<field name="" type="separator" default="FLEXI_FORM_FIELD_CONF" level="level2" />
 			<field name="display_label_filter" type="radio" default="2" label="FLEXI_LABEL_FILTER_WITH_OVERRIDE" description="FLEXI_LABEL_FILTER_WITH_OVERRIDE_DESC" class="btn-group btn-group-yesno">

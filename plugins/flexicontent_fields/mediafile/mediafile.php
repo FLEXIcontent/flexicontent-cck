@@ -1548,7 +1548,8 @@ class plgFlexicontent_fieldsMediafile extends FCField
 			'channels', 'channel_layout', 'checked_out', 'checked_out_time');
 			*/
 		$mediadata = array('media_format', 'sample_rate', 'duration');
-		$media_property_filters = $filter->parameters->set('media_property_filters', $mediadata);
+		$media_property_filters = $filter->parameters->get('media_property_filters', $mediadata);
+    $media_property_filters = FLEXIUtilities::paramToArray($media_property_filters, "/[\s]*,[\s]*/", false, true);
 
 		$html = array();
 		$label = $filter->label;
@@ -1639,7 +1640,8 @@ class plgFlexicontent_fieldsMediafile extends FCField
 			'channels', 'channel_layout', 'checked_out', 'checked_out_time');
 		*/
 		$mediadata = array('media_format', 'sample_rate', 'duration');
-		$media_property_filters = $filter->parameters->set('media_property_filters', $mediadata);
+		$media_property_filters = $filter->parameters->get('media_property_filters', $mediadata);
+    $media_property_filters = FLEXIUtilities::paramToArray($media_property_filters, "/[\s]*,[\s]*/", false, true);
 
 		$results = array();
 		$label = $filter->label;
