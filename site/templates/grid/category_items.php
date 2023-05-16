@@ -375,7 +375,7 @@ if ($leadnum) :
 					$varname = $varname ? $varname : 'display';
 					$src =  FlexicontentFields::getFieldDisplay($item, $fieldname, null, $varname, 'category');
 				}
-				if (!$src && !$thumb_rendered && $lead_image_fallback_img)
+				if (!$src && !$thumb_rendered)
 				{
 					// Render method 'display_NNNN_src' to avoid CSS/JS being added to the page
 					$img_field = false;
@@ -402,7 +402,7 @@ if ($leadnum) :
 						$src = flexicontent_html::extractimagesrc($item);
 					}
 
-					if (!$src && $lead_fallback_field)
+					if (!$src && $lead_image_fallback_img && $lead_fallback_field)
 					{
 						$image_url2 = FlexicontentFields::getFieldDisplay($item, $lead_fallback_field, $values=null, $method='display_'.$img_field_size.'_src', 'category');
 
@@ -873,7 +873,7 @@ if ($count > $leadnum) :
 					$varname = $varname ? $varname : 'display';
 					$src =  FlexicontentFields::getFieldDisplay($item, $fieldname, null, $varname, 'category');
 				}
-				if (!$src && !$thumb_rendered && $intro_image_fallback_img)
+				if (!$src && !$thumb_rendered)
 				{
 					// Render method 'display_NNNN_src' to avoid CSS/JS being added to the page
 					$img_field = false;
@@ -900,7 +900,7 @@ if ($count > $leadnum) :
 						$src = flexicontent_html::extractimagesrc($item);
 					}
 
-					if (!$src && $intro_fallback_field)
+					if (!$src && $intro_image_fallback_img && $intro_fallback_field)
 					{
 						$image_url2 = FlexicontentFields::getFieldDisplay($item, $intro_fallback_field, $values=null, $method='display_'.$img_field_size.'_src', 'category');
 
