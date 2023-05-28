@@ -299,8 +299,9 @@ class flexicontent_categories extends _flexicontent_categories
 	 *
 	 * @since   3.3
 	 */
-	public function store($updateNulls = false)
+	public function store($updateNulls = true)
 	{
+		$updateNulls = FLEXI_J40GE ? $updateNulls : false;
 		$date	= JFactory::getDate();
 		$user	= JFactory::getUser();
 

@@ -701,8 +701,9 @@ class flexicontent_items extends _flexicontent_items
 	 *
 	 * @since   3.3
 	 */
-	public function store($updateNulls = false)
+	public function store($updateNulls = true)
 	{
+		$updateNulls = FLEXI_J40GE ? $updateNulls : false;
 		$k      = $this->_tbl_key;
 		$fk_ext = $this->_frn_key_ext;
 		$tk_ext = $this->_tbl_key_ext;

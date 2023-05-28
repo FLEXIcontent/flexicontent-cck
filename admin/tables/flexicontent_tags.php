@@ -324,8 +324,10 @@ class flexicontent_tags extends flexicontent_basetable
 	 *
 	 * @since 1.5
 	 */
-	public function store($updateNulls = false)
+	public function store($updateNulls = true)
 	{
+		$updateNulls = FLEXI_J40GE ? $updateNulls : false;
+
 		/**
 		 * Create one JTable record for every DB table
 		 */

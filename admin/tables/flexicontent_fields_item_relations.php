@@ -97,8 +97,9 @@ class flexicontent_fields_item_relations extends JTable
 	 *
 	 * @since   11.1
 	 */
-	public function store($updateNulls = false)
+	public function store($updateNulls = true)
 	{
+		$updateNulls = FLEXI_J40GE ? $updateNulls : false;
 		$result = parent::store($updateNulls); // use inherited method to store data
 
 		$query = 'UPDATE IGNORE ' . $this->_db->quoteName($this->_tbl)
