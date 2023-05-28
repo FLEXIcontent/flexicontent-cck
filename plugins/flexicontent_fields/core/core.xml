@@ -350,6 +350,7 @@
 			</field>
 
 			<field name="" type="separator" default="FLEXI_FIELD_VALUE" level="level1" />
+			<field name="viewlayout" type="fcfilelist" default="" label="FLEXI_FIELD_SELECT_VIEW_LAYOUT_CORE" description="FLEXI_FIELD_SELECT_VIEW_LAYOUT_CORE_DESC" directory="plugins/flexicontent_fields/core/tmpl/createdby/" filter="^value_.*\.php$" exclude="" stripext="1" stripprefix="value_" hide_none="1" hide_default="1" />
 
 			<field name="name_username" type="radio" default="1" label="FLEXI_DISPLAY_NAME_USERNAME" description="FLEXI_DISPLAY_NAME_USERNAME_DESC" class="btn-group group-fcinfo">
 				<option value="1">FLEXI_NAME</option>
@@ -682,6 +683,7 @@
 			</field>
 
 			<field name="" type="separator" default="FLEXI_FIELD_VALUE" level="level1" />
+			<field name="viewlayout" type="fcfilelist" default="" label="FLEXI_FIELD_SELECT_VIEW_LAYOUT_CORE" description="FLEXI_FIELD_SELECT_VIEW_LAYOUT_CORE_DESC" directory="plugins/flexicontent_fields/core/tmpl/modifiedby/" filter="^value_.*\.php$" exclude="" stripext="1" stripprefix="value_" hide_none="1" hide_default="1" />
 
 			<field name="name_username" type="radio" default="1" label="FLEXI_DISPLAY_NAME_USERNAME" description="FLEXI_DISPLAY_NAME_USERNAME_DESC">
 				<option value="1">FLEXI_NAME</option>

@@ -216,8 +216,11 @@ class plgFlexicontent_fieldsCore extends FCField
 					break;
 
 				case 'createdby': // created by
-					$field->value[] = $item->created_by;
-					$field->{$prop} = $pretext.(($field->parameters->get('name_username', 1) == 2) ? $item->cuname : $item->creator).$posttext;
+					$field->value = array($item->created_by);
+
+					// Create field's HTML
+					$field->{$prop} = array();
+					include(self::getViewPath('core', $viewlayout, 'createdby'));
 					break;
 
 				case 'modified': // modified
@@ -234,8 +237,11 @@ class plgFlexicontent_fieldsCore extends FCField
 					break;
 
 				case 'modifiedby': // modified by
-					$field->value[] = $item->modified_by;
-					$field->{$prop} = $pretext.(($field->parameters->get('name_username', 1) == 2) ? $item->muname : $item->modifier).$posttext;
+					$field->value = array($item->modified_by);
+
+					// Create field's HTML
+					$field->{$prop} = array();
+					include(self::getViewPath('core', $viewlayout, 'modifiedby'));
 					break;
 
 				case 'title': // title
