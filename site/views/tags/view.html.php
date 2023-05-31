@@ -222,7 +222,7 @@ class FlexicontentViewTags extends JViewLegacy
 		{
 			// Create desired REL canonical URL
 			$start = $jinput->getInt('start', '');
-			$ucanonical = JRoute::_(FlexicontentHelperRoute::getTagRoute($tag->id) . ($start ? "&start=" . $start : ''));
+			$ucanonical = JRoute::_(FlexicontentHelperRoute::getTagRoute($tag->slug , $tag->id) . ($start ? "&start=" . $start : ''));
 			flexicontent_html::setRelCanonical($ucanonical);
 		}
 
