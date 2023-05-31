@@ -130,6 +130,7 @@ class FlexicontentViewItems extends JViewLegacy
 			'modified_by'  => 'modifier',
 			'created'      => 'created',
 			'modified'     => 'modified',
+			'state'        => 'state',
 			
 			// Core-property fields (Having field type: 'coreprops')
 			'id'           => 'id',
