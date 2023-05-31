@@ -130,7 +130,14 @@ class FlexicontentViewItems extends JViewLegacy
 			'modified_by'  => 'modifier',
 			'created'      => 'created',
 			'modified'     => 'modified',
+			'modifiedby'   => 'modifiedby',
+			'maintext'     => 'maintext',
 			'state'        => 'state',
+			'hits'         => 'hits',
+			'type'         => 'type',
+			'categories'   => 'categories',
+			'tags'         => 'tags',
+
 			
 			// Core-property fields (Having field type: 'coreprops')
 			'id'           => 'id',
@@ -142,6 +149,7 @@ class FlexicontentViewItems extends JViewLegacy
 			'created_by_alias' => 'created_by_alias',
 			'publish_up'   =>'publish_up',
 			'publish_down' =>'publish_down',
+			
 		);
 
 		$has_pro    = JPluginHelper::isEnabled($extfolder = 'system', $extname = 'flexisyspro');
