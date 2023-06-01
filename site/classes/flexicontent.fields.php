@@ -698,19 +698,19 @@ class FlexicontentFields
 			if ( $single_item_vals===null )
 			{
 				$item->onDemandFields[$fieldname]->{$method} = $field->{$method};
-				$_method_html[$item->id] = $field->{$method};
 			}
+
+			$_method_html[$item->id] = $field->{$method};
 		}
 
 		// Return field(s) HTML (in case of multiple items this will be an array indexable by item ids
 		if ( !is_array($item_arr) )
 		{
-	   // Not isset should occur only when fieldname was not found
+			// Not isset should occur only when fieldname was not found
 			$_method_html = isset($_method_html[$item_arr->id]) ? $_method_html[$item_arr->id] : '';
 		}
 		return $_method_html;
 	}
-
 
 
 	/**
@@ -746,7 +746,7 @@ class FlexicontentFields
 		else if (is_object($_item) && is_object($_field)) ; // ok
 		else
 		{
-			$field->$method = '<div class="alert alert-warning">renderField() must be called with: renderField(array of items, field_name, ...) or renderField(item object, field object, ...)</div>';
+			$_field->$method = '<div class="alert alert-warning">renderField() must be called with: renderField(array of items, field_name, ...) or renderField(item object, field object, ...)</div>';
 			return null;
 		}
 
@@ -2888,6 +2888,7 @@ class FlexicontentFields
 		static $search_prefix = null;
 		static $indexed_pdfs = array();
 		static $pdf_count = 0;
+		static $csv_count = 0;
 
 		// Get search prefix
 		if ($search_prefix === null)
