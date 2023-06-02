@@ -263,6 +263,13 @@ class plgSystemFlexisystem extends CMSPlugin
 		// We place this above format check, because maybe, saving will be AJAX based (? format=raw ?)
 		$this->trackSaveConf();
 
+		$hasTemplates = Factory::getUser()->authorise('core.admin', 'com_templates');
+		if (!$hasTemplates)
+		{
+			unset($_POST['jform']['params']['php_rule']);
+			unset($_REQUEST['jform']['params']['php_rule']);
+		}
+
 		$format = Factory::getApplication()->input->get('format', 'html', 'cmd');
 		if ($format != 'html') return;
 
