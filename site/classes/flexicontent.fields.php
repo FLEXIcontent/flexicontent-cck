@@ -621,7 +621,7 @@ class FlexicontentFields
 	 * @return object
 	 * @since 1.5.5
 	 */
-	static function getFieldDisplay(&$item_arr, $fieldname, $single_item_vals=null, $method='display', $view = FLEXI_ITEMVIEW)
+	static function getFieldDisplay(&$item_arr, $fieldname, $single_item_vals=null, $method='display', $view = FLEXI_ITEMVIEW, $reload_field_params = true)
 	{
 		// 1. Convert to array of items if not an array already
 		if ( empty($item_arr) ) {
@@ -687,7 +687,7 @@ class FlexicontentFields
 			// Render the (display) method of the field
 			if (!isset($field->{$method}))
 			{
-				$field = FlexicontentFields::renderField($item, $field, $values, $method, $view);
+				$field = FlexicontentFields::renderField($item, $field, $values, $method, $view, false, false, $reload_field_params);
 			}
 			if (!isset($field->{$method}))
 			{
@@ -720,7 +720,9 @@ class FlexicontentFields
 	 * @return object
 	 * @since 1.5
 	 */
-	static function renderField(&$_item, &$_field, &$values, $method='display', $view=FLEXI_ITEMVIEW, $skip_trigger_plgs = false, $event_row = false)
+	static function renderField(
+		&$_item, &$_field, &$values, $method='display', $view=FLEXI_ITEMVIEW,
+		$skip_trigger_plgs = false, $event_row = false, $reload_field_params = true)
 	{
 		static $_trigger_plgs_ft = array();
 		static $_created = array();
@@ -829,7 +831,7 @@ class FlexicontentFields
 				$field->value = isset($item->fieldvalues[$field->id]) ? $item->fieldvalues[$field->id] : array();
 			}
 
-			FlexicontentFields::loadFieldConfig($field, $item);
+			$reload_field_params || empty($field->parameters) ? FlexicontentFields::loadFieldConfig($field, $item) : false;
 		}
 
 
