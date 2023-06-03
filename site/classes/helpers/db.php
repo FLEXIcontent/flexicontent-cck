@@ -11,6 +11,55 @@ use Joomla\CMS\Table\Table;
 class flexicontent_db
 {
 	/**
+	 * Method to get the overridden language string (frontend in backend and backend in frontend)
+	 *
+	 * @return string
+	 * @since 4.2
+	 */
+	static function fe_be_lang_override($str, $oLang = null, $use_fe = true, $use_be = true)
+	{
+		// static variable (array) so that we load overrides only once per language
+		static $lang_overrides_site;
+		static $lang_overrides_admin;
+		$oLang = $oLang ?: JFactory::getLanguage()->getTag();
+
+		// Check if we have loaded the override file already, (aka we load it only once)
+		if ($oLang && (!isset($lang_overrides_site[$oLang]) || !isset($lang_overrides_site[$oLang])))
+		{
+			$fe_file = JPATH_SITE . '/language/overrides/' . $oLang . '.override.ini';
+			$be_file = JPATH_ADMINISTRATOR . '/language/overrides/' . $oLang . '.override.ini';
+			$lang_overrides_site[$oLang]  = file_exists($fe_file) ? JLanguageHelper::parseIniFile($fe_file) : [];
+			$lang_overrides_admin[$oLang] = file_exists($be_file) ? JLanguageHelper::parseIniFile($be_file) : [];
+		}
+
+		// Get overridden string, otherwise do not change
+		$isSite   = JFactory::getApplication()->isClient('site');
+		$isAdmin  = JFactory::getApplication()->isClient('administrator');
+		$strUpper = strtoupper($str);
+		$str_fe = $use_be || (!$isSite && !$isAdmin)
+			? ($lang_overrides_admin[$oLang][$strUpper] ?? $str)
+			: $str;
+		$str_be = $use_fe || (!$isSite && !$isAdmin)
+			? ($lang_overrides_site[$oLang][$strUpper] ?? $str)
+			: $str;
+
+		if ($isSite)
+		{
+			return $str_fe !== $str ? $str_fe : $str_be;
+		}
+		elseif ($isAdmin)
+		{
+			return $str_be !== $str ? $str_be : $str_fe;
+		}
+		else
+		{
+			// Prefer site
+			return $str_fe !== $str ? $str_fe : $str_be;
+		}
+	}
+
+
+	/**
 	 * Method to set value for custom field 's common data types (INTEGER, DECIMAL(65,15), DATETIME)
 	 *
 	 * @return string
