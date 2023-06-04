@@ -232,9 +232,9 @@ class FlexicontentController extends JControllerAdmin
 		if ( $print_logging_info ) @$fc_run_times['getExistDBindexes'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 		//printf('<br/>-- [getExistDBindexes: %.2f s] ', $fc_run_times['getExistDBindexes']/1000000);
 
-		//if ( $print_logging_info ) $start_microtime = microtime(true);
-		//$itemcountingdok  = $model->getItemCountingDataOK();
-		//if ( $print_logging_info ) @$fc_run_times['getItemCountingDataOK'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+		if ( $print_logging_info ) $start_microtime = microtime(true);
+		$itemcountingdok  = $model->getItemCountingDataOK();
+		if ( $print_logging_info ) @$fc_run_times['getItemCountingDataOK'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 		//printf('<br/>-- [getItemCountingDataOK: %.2f s] ', $fc_run_times['getItemCountingDataOK']/1000000);
 
 		if ( $print_logging_info ) $start_microtime = microtime(true);
@@ -258,7 +258,7 @@ class FlexicontentController extends JControllerAdmin
 			//!$existfplg || !$existseplg || existsyplg ||
 			!$existcats || !$langsynced || !$existversions || !$existversionsdata || !$existauthors ||
 			!$deprecatedfiles || !$nooldfieldsdata || !$missingversion || !$cachethumb ||
-			!$existdbindexes || !$initialpermission
+			!$existdbindexes || !$itemcountingdok || !$initialpermission
 		) {
 			$postinst_integrity_ok = false;
 		}
