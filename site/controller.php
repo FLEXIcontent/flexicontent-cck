@@ -1026,7 +1026,7 @@ class FlexicontentController extends JControllerLegacy
 			}
 			$field_type = $fields_props[$field_id]->field_type;
 
-			$query  = 'SELECT f.id, f.filename, f.filename_original, f.altname, f.secure, f.url, f.hits, f.stamp, f.size'
+			$query  = 'SELECT DISTINCT f.id, f.filename, f.filename_original, f.altname, f.secure, f.url, f.hits, f.stamp, f.size'
 					.($task !== 'download_file'
 						? ', u.email as item_owner_email' .
 							', i.title as item_title, i.introtext as item_introtext, i.fulltext as item_fulltext' .
@@ -1039,7 +1039,9 @@ class FlexicontentController extends JControllerLegacy
 					. $access_clauses['select']  // has access
 
 					.' FROM #__flexicontent_files AS f '
-					.($field_type=='file' ? ' LEFT JOIN #__flexicontent_fields_item_relations AS rel ON rel.field_id = '. $field_id : '')  // Only check value usage for 'file' field
+					.($field_type=='file' ? ' LEFT JOIN #__flexicontent_fields_item_relations AS rel ON '
+						. ' rel.field_id = '. $field_id . ' AND rel.value = ' . (int) $file_id . ' AND rel.item_id = ' . (int) $content_id
+						: '')  // Only check value usage for 'file' field
 					.($task !== 'download_file' ? ' LEFT JOIN #__flexicontent_fields AS fi ON fi.id = '. $field_id : '')
 					.($task !== 'download_file' ? ' LEFT JOIN #__content AS i ON i.id = '. $content_id : '')
 					.($task !== 'download_file' ? ' LEFT JOIN #__categories AS c ON c.id = i.catid' : '')
