@@ -77,10 +77,14 @@
 
 			<field name="" type="separator" default="FLEXI_RIFLD_RELATED_ITEMS_SELECTOR" level="level2" />
 
-			<field name="prepend_item_state" type="radio" default="1" label="FLEXI_RIFLD_PREPEND_ITEM_STATE" description="FLEXI_RIFLD_PREPEND_ITEM_STATE_DESC" class="btn-group btn-group-yesno">
+			<field name="itemselector_prepend_item_state" type="radio" default="0" label="FLEXI_RIFLD_PREPEND_ITEM_STATE" description="FLEXI_RIFLD_PREPEND_ITEM_STATE_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
+			<field name="itemselector_append_fields" type="fields" field_type="text,select,selectmultiple,radio,checkbox,radioimage,checkboximage,date" label="Append fields" description=""
+				   inline_tip="Append these fields to item to make easier to select" tip_class="" tip_img="comments.png"
+				   multiple="multiple" class="use_select2_lib"/>
+
 			<field name="maxtitlechars" type="text" default="40" label="FLEXI_RIFLD_TITLE_MAXLEN" description="FLEXI_RIFLD_TITLE_MAXLEN_DESC" />
 
 			<field name="orderby_form" type="list" default="alpha" label="FLEXI_ITEMS_ORDER" description="FLEXI_ITEMS_ORDER_DESC">
@@ -126,6 +130,11 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">Creatable / Editable</option>
 			</field>
+
+			<field name="" type="separator" default="Field filters" description="Filter items list using other fields" icon_class="icon-signup" level="tab_open" box_type="1" />
+			<field name="itemselector_custom_filters" type="filters" field_type="relation,text,select,selectmultiple,radio,checkbox,radioimage,checkboximage" label="Custom filters"
+				   description="Filter items list using other fields"
+				   inline_tip="Custom filters" tip_class="" tip_img="comments.png" />
 
 
 			<field name="" type="separator" default="FLEXI_RIFLD_SELECTABLE_ITEMS" description="FLEXI_RIFLD_SELECTABLE_ITEMS_DESC" icon_class="icon-signup" level="tab_open" box_type="1" />

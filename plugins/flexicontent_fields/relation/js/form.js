@@ -91,23 +91,42 @@
 		return true;
 	}
 
-
+	fcfield_relation.filters_change = function(el)
+	{
+		let value_fields = jQuery(el).closest('.container_fcfield').find('select.fcfield-relation-selected_items');
+		value_fields.each(function (){
+			let cat_selector = jQuery(this).closest('.fcfield-relation-value_box').find('select.fcfield-relation-cat_selector');
+			if (jQuery(cat_selector).val())
+			{
+				fcfield_relation.cat_selector_change(cat_selector.get(0));
+			}
+		});
+	}
 	fcfield_relation.cat_selector_change = function(el)
 	{
-		var val_box = el;
+		let val_box = el;
 		while ((val_box = val_box.parentNode) && val_box.className.indexOf('fcfield-relation-value_box') < 0);
-		
-		var elementid = val_box.getAttribute('data-elementid'),
+
+		let elementid = val_box.getAttribute('data-elementid'),
+			elementbase = val_box.getAttribute('data-elementbase'),
 			item_id = val_box.getAttribute('data-item_id'),
 			field_id = val_box.getAttribute('data-field_id'),
 			item_type = val_box.getAttribute('data-item_type'),
 			item_lang = val_box.getAttribute('data-item_lang');
 
-		var cat_selector = document.getElementById(elementid + '_cat_selector');
-		var catid = parseInt(cat_selector.value);
+		let cat_selector = document.getElementById(elementid + '_cat_selector');
+		let catid = parseInt(cat_selector.value);
 
-		var item_selector = jQuery('#' + elementid + '_item_selector');
+		let custom_filters = jQuery(val_box).closest('.container_fcfield').find('select.fc_field_filter, input.fc_field_filter');
+		/*let customfilts = {};
+		let i = 0;
+		custom_filters.each(function(){
+			let filt = jQuery(this);
+			customfilts[filt.attr('name').replace('filter_', '')] = filt.val();
+		});*/
+		let customfilts = custom_filters.serialize();
 
+		let item_selector = jQuery('#' + elementid + '_item_selector');
 		// Remove any previous error message
 		item_selector.parent().find('.fc-relation-field-error').remove();
 
@@ -121,22 +140,24 @@
 			return;
 		}
 
-		var sel2_item_selector = jQuery('#s2id_' + elementid + '_item_selector');
+		let sel2_item_selector = jQuery('#s2id_' + elementid + '_item_selector');
 		sel2_item_selector.hide();
 
-		var loading = jQuery('<div class="fc_loading_msg" style="position:relative; background-color:transparent;"></div>');
+		let loading = jQuery('<div class="fc_loading_msg" style="position:relative; background-color:transparent;"></div>');
 		loading.insertAfter(sel2_item_selector);
 
-		var ajax_data = {
+		let ajax_data = {
 			task: 'call_extfunc',
 			omethod: 'html', /* unused */
 			exttype: 'plugins',
 			extfolder: 'flexicontent_fields',
 			extname: 'relation',
 			extfunc: 'getCategoryItems',
+			customfilts: customfilts,
 			field_id: field_id,
 			catid: catid
 		};
+		//console.log(ajax_data);  //console.trace();
 
 		if (parseInt(item_id))
 		{
@@ -148,8 +169,8 @@
 			ajax_data.lang_code = item_lang;
 		}
 
-    // Joomla Base URL
-		var base_url = !!jbase_url_fc ? jbase_url_fc : '';
+		// Joomla Base URL
+		let base_url = !!jbase_url_fc ? jbase_url_fc : '';
 
 		jQuery.ajax({
 			type: 'POST',
@@ -165,8 +186,8 @@
 			else if (!data.options.length)  item_selector.append('<option value="">' + Joomla.JText._('FLEXI_RIFLD_NO_ITEMS') + '</option>');
 			else {
 				item_selector.append('<option value="">- ' + Joomla.JText._('FLEXI_RIFLD_ADD_ITEM', true) + '-</option>');
-				var item;
-				for(var i=0; i<data.options.length; i++)
+				let item;
+				for(let i=0; i<data.options.length; i++)
 				{
 					item = data.options[i];
 					item_selector.append(

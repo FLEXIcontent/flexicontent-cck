@@ -1745,10 +1745,11 @@
 			{
 				sel_EL.data('field_being_edited', null);
 				sel_EL.trigger('change');
-				if ( sel_EL.attr('onchange') )
+				// LEGACY browsers ??
+				/*if ( sel_EL.attr('onchange') )
 				{
 					eval(sel_EL.attr('onchange'));
-				}
+				}*/
 			}
 
 
