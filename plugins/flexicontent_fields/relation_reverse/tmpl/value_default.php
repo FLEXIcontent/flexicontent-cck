@@ -13,7 +13,7 @@ foreach ($related_items_sets as $n => $related_items)
 
 	$HTML->items_list = '';
 
-	if ($disp->total_info && (!empty($options->total) || !empty($related_items)))
+	if ($disp->item_list && !empty($related_items))
 	{
 		// Implode using the configured separator
 		$HTML->items_list = array();
