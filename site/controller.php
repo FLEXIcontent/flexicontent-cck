@@ -686,7 +686,7 @@ class FlexicontentController extends JControllerLegacy
 
 		if (!$item->load($content_id))
 		{
-			$errors[] = 'ID: ' . $pk . ': ' . $item->getError();
+			$errors[] = 'ID: ' . $content_id . ': ' . $item->getError();
 			return;
 		}
 
@@ -1792,9 +1792,10 @@ class FlexicontentController extends JControllerLegacy
 	function weblink()
 	{
 		// Import and Initialize some joomla API variables
-		$app   = JFactory::getApplication();
-		$db    = JFactory::getDbo();
-		$user  = JFactory::getUser();
+		$app     = JFactory::getApplication();
+		$db      = JFactory::getDbo();
+		$user    = JFactory::getUser();
+		$cparams = JComponentHelper::getParams( 'com_flexicontent' );
 
 		// Get HTTP REQUEST variables
 		$field_id    = $this->input->get('fid', 0, 'int');
@@ -2188,26 +2189,6 @@ class FlexicontentController extends JControllerLegacy
 		}
 
 		return $all_files;
-	}
-
-
-	/**
-	 * Method to clean cache of a specific record (if implemented by the model)
-	 *
-	 * @since 3.2.1.9
-	 */
-	private function _cleanRecordsCache($cid)
-	{
-		$this->input->get('task', '', 'cmd') !== __FUNCTION__ or die(__FUNCTION__ . ' : direct call not allowed');
-
-		// Clean this as it contains Joomla frontend view cache of the component)
-		$cache_site = FLEXIUtilities::getCache($group = '', $client = 0);
-		$cache_site->clean('com_flexicontent');
-
-		// Also pass item IDs array in case of doing special cache cleaning per item
-		$itemmodel = $this->getModel($this->record_name);
-		$itemmodel->cleanCache(null, 0, $cid);
-		$itemmodel->cleanCache(null, 1, $cid);
 	}
 
 
