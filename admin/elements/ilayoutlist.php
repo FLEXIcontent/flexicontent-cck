@@ -79,7 +79,6 @@ class JFormFieldIlayoutlist extends JFormFieldList
 			$attribs .= ' multiple="multiple" ';
 			$attribs .= (@$attributes['size']) ? ' size="'.$attributes['size'].'" ' : ' size="6" ';
 		} else {
-			array_unshift($types, JHtml::_('select.option', '', JText::_('FLEXI_PLEASE_SELECT')));
 			$attribs .= 'class="inputbox"';
 		}
 		
