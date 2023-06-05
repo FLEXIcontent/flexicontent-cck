@@ -388,7 +388,11 @@ class FlexicontentModelCategory extends JModelLegacy {
 
 		// Get limitstart, and in case limit has been changed, adjust it accordingly
 		$limitstart	= $app->input->get('limitstart', $app->input->get('start', 0, 'int'), 'int');
-		$limitstart = ( $limit != 0 ? (floor($limitstart / $limit) * $limit) : 0 );
+		$limitstart = ( $limit != 0 ? (int)(floor($limitstart / $limit) * $limit) : 0 );
+		// Avoid integer overflow
+		if ($limitstart < 0){
+			$limitstart = 0;
+		}
 		$this->setState('limitstart', $limitstart);
 
 		// Make sure limitstart is set
