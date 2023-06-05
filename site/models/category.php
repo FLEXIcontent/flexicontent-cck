@@ -1194,6 +1194,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 			$q = $q !== parse_url(@$_SERVER["REQUEST_URI"], PHP_URL_PATH) ? $q : '';
 
 			$text = $app->input->get('filter', $q, 'string');
+			$text = preg_replace('/^[-]/', '', $text);
 		}
 
 		// Set _relevant _active_* FLAG
