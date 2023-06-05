@@ -54,8 +54,8 @@ class JFormFieldContenttypes extends JFormFieldList
 		$options = (array) $this->getOptions();
 
 		$value = $this->value;
-		$fieldname	= FLEXI_J16GE ? $this->name : $control_name.'['.$name.']';
-		$element_id = FLEXI_J16GE ? $this->id : $control_name.$name;
+		$fieldname	= $this->name;
+		$element_id = $this->id;
 
 		return JHtml::_('select.genericlist', $options, $fieldname, trim($attr), 'value', 'text', $value, $element_id);
 		//return JHtmlSelect::genericList($options, $fieldname, $attr, 'value', 'text', $value, $element_id);

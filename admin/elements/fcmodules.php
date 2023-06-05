@@ -53,8 +53,8 @@ class JFormFieldFcmodules extends JFormField
 
 		$values = $this->value;
 		
-		$fieldname	= FLEXI_J16GE ? $this->name : $control_name.'['.$name.']';
-		$element_id = FLEXI_J16GE ? $this->id : $control_name.$name;
+		$fieldname	= $this->name;
+		$element_id = $this->id;
 		
 		$and='';
 		

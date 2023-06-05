@@ -585,7 +585,7 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 
 		if ($content_id && !$item->load($content_id))
 		{
-			$errors[] = 'ID: ' . $pk . ': ' . $item->getError();
+			$errors[] = 'ID: ' . $content_id . ': ' . $item->getError();
 			return;
 		}
 	}

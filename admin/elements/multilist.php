@@ -111,17 +111,6 @@ class JFormFieldMultiList extends JFormFieldGroupedList
 			$attribs['list.attr']['class'][] = $class;
 		}
 
-		if ($this->element['sortable'] == 'true')
-		{
-			$d = array();
-			foreach($values as $v)
-			{
-				$d[] = (object) array('id' => $options[$v]->value, 'text' => $options[$v]->text);
-			}
-			$attribs['list.attr']['data-select2-initdata'][] = htmlentities(json_encode($d), ENT_QUOTES, 'UTF-8');
-			$attribs['list.attr']['class'][] = 'fc_select2_sortable';
-		}
-
 		if ( (int) $this->element['fccustom_revert'] )
 		{
 			$attribs['list.attr']['class'][] = 'fccustom_revert';

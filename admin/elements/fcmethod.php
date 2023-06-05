@@ -50,10 +50,10 @@ class JFormFieldFcmethod extends JFormFieldRadio
 		$attributes = get_object_vars($node->attributes());
 		$attributes = $attributes['@attributes'];
 
-		$value = FLEXI_J16GE ? $this->value : $value;
+		$value = $this->value;
 		
-		$fieldname	= FLEXI_J16GE ? $this->name : $control_name.'['.$name.']';
-		$element_id = FLEXI_J16GE ? $this->id : $control_name.$name;
+		$fieldname	= $this->name;
+		$element_id = $this->id;
 		
 		//$disabled_ff = explode(',', @$attributes['disabled_ff']);
 		$disabled_ff = @$attributes['disabled_ff'];

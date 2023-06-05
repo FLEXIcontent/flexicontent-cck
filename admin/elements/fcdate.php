@@ -52,8 +52,8 @@ class JFormFieldFcdate extends JFormField
 		$fieldname = $this->name;
 		$elementid = $this->id;
 
-		$dateFormat = isset($attribs['format']) ? $attributes['format'] : '%Y-%m-%d';
-		$allowText  = isset($attribs['allowText']) ? (bool) $attributes['allowText'] : true;
+		$dateFormat = isset($attribs['format']) ? $attribs['format'] : '%Y-%m-%d';
+		$allowText  = isset($attribs['allowText']) ? (bool) $attribs['allowText'] : true;
 
 		$value_holder = '';
 		if ($allowText)

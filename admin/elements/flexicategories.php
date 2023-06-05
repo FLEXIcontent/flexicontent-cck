@@ -73,8 +73,8 @@ class JFormFieldFlexicategories extends JFormField
 		if ( empty($values) )							$values = array();
 		else if ( ! is_array($values) )		$values = !FLEXI_J16GE ? array($values) : explode("|", $values);
 		
-		$fieldname	= FLEXI_J16GE ? $this->name : $control_name.'['.$name.']';
-		$element_id = FLEXI_J16GE ? $this->id : $control_name.$name;
+		$fieldname	= $this->name;
+		$element_id = $this->id;
 		$ffname = (string) $this->element['name'];
 		
 		$published_only = (boolean) @$attributes['published_only'];
