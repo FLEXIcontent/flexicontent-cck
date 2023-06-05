@@ -497,7 +497,7 @@ class FlexicontentModelReview extends FCModelAdmin
 
 		if (!$user->id)
 		{
-			$query = 'SELECT id FROM #__users WHERE email = ' . $db->Quote($email);
+			$query = 'SELECT id FROM #__users WHERE email = ' . $db->Quote($data['email']);
 			$reviewer = $db->setQuery($query)->loadObject();
 
 			if ($reviewer)
@@ -507,7 +507,7 @@ class FlexicontentModelReview extends FCModelAdmin
 			}
 		}
 
-		if (!$text)
+		if (!$data['text'])
 		{
 			$this->setError('Text is invalid or empty');
 			return false;
@@ -549,7 +549,7 @@ class FlexicontentModelReview extends FCModelAdmin
 				->update('#__' . $this->records_dbtbl)
 				->set('approved = ' . (int) $value)
 				->where('id IN (' . $cid_list . ')')
-				->where('(checked_out = 0 OR checked_out = ' . (int) $user->get('id') . ')');
+				->where('(checked_out = 0 OR checked_out IS NULL OR checked_out = ' . (int) $user->get('id') . ')');
 
 			$this->_db->setQuery($query)->execute();
 

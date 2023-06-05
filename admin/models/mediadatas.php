@@ -189,7 +189,7 @@ class FlexicontentModelMediadatas extends FCModelAdminList
 	/**
 	 * Method to copy records
 	 *
-	 * @param		array			$cid          array of record ids to copy
+	 * @param		array			$cid             array of record ids to copy
 	 * @param		array			$copyRelations   flag to indicate copying 'related' data, like 'assignments'
 	 *
 	 * @return	array		Array of old-to new record ids of copied record IDs
@@ -198,7 +198,7 @@ class FlexicontentModelMediadatas extends FCModelAdminList
 	 */
 	public function copy($cid, $copyRelations = null)
 	{
-		$copyRelations = $copyValues === null ? $this->copyValues : $copyRelations;
+		$copyRelations = $copyRelations === null ? $this->copyValues : $copyRelations;
 		$ids_map       = array();
 		$name          = $this->name_col;
 

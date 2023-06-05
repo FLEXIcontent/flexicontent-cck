@@ -449,7 +449,7 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 		}
 
 		/**
-		 * If user can not manage reviews then do "Review validation on the posted data"
+		 * If user can not manage reviews then do "Review validation on the posted data", like enforcing email and stripping HTML tags
 		 */
 
 		if (!$this->canManage)

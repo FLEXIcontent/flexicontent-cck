@@ -5177,7 +5177,7 @@ class ParentClassItem extends FCModelAdmin
 					//. ' AND c.created_by = ' . (int) $user->get('id')
 					. (FLEXI_J16GE ? ' AND cat.extension="'.FLEXI_CAT_EXTENSION.'"' : '')
 					. ' AND c.id IN ( '. implode(',', $cid).' )'
-					//. ' AND ( c.checked_out = 0 OR ( c.checked_out = ' . (int) $user->get('id'). ' ) )'
+					//. ' AND ( c.checked_out = 0 OR checked_out IS NULL OR ( c.checked_out = ' . (int) $user->get('id'). ' ) )'
 					;
 			$this->_db->setQuery( $query );
 			$cids = $this->_db->loadObjectList();

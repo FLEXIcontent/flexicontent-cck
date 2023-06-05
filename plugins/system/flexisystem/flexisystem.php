@@ -1459,6 +1459,7 @@ class plgSystemFlexisystem extends CMSPlugin
 			// Check-in the records
 			if ( count($checkin_records) )
 			{
+				// NOTE in J4 the default is NULL ...
 				$query = 'UPDATE #__'.$tablename.' SET checked_out = 0 WHERE id IN ('.  implode(",", $checkin_records)  .')';
 				$db->setQuery($query);
 				$db->execute();

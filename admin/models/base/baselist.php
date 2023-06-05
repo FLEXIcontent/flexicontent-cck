@@ -663,7 +663,7 @@ abstract class FCModelAdminList extends JModelList
 				->update('#__' . $this->records_dbtbl)
 				->set($this->_db->qn($this->state_col) . ' = ' . (int) $state)
 				->where('id IN (' . $cid_list . ')')
-				->where('(checked_out = 0 OR checked_out = ' . (int) $user->get('id') . ')');
+				->where('(checked_out = 0 OR checked_out IS NULL OR checked_out = ' . (int) $user->get('id') . ')');
 
 			/**
 			 * Only update records changing publication state,

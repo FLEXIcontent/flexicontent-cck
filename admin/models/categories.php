@@ -321,7 +321,7 @@ class FlexicontentModelCategories extends FCModelAdminList
 
 				foreach($remaining_cats as $cat_id => $cat)
 				{
-					$cid_wassocs[] = $catid;
+					$cid_wassocs[] = $cat_id;
 				}
 
 				break;

@@ -2019,7 +2019,7 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 			$query = 'UPDATE #__' . $this->records_dbtbl
 				. ' SET published = ' . (int) $publish
 				. ' WHERE id IN ('. $cid_list .')'
-				. ' AND ( checked_out = 0 OR ( checked_out = ' . (int) $user->get('id'). ' ) )'
+				. ' AND ( checked_out = 0 OR checked_out IS NULL OR ( checked_out = ' . (int) $user->get('id'). ' ) )'
 			;
 			$this->_db->setQuery( $query );
 			$this->_db->execute();

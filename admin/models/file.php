@@ -234,7 +234,7 @@ class FlexicontentModelFile extends FCModelAdmin
 
 		if ($record->id && $record->estorage_fieldid < 0)
 		{
-			$app->enqueueMessage(JText::_( 'File is being moved to external storage, please edit later' ), 'warning');
+			JFactory::getApplication()->enqueueMessage(JText::_( 'File is being moved to external storage, please edit later' ), 'warning');
 			return false;
 		}
 

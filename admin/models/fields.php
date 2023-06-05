@@ -1035,7 +1035,7 @@ class FlexicontentModelFields extends FCModelAdminList
 			$query = 'UPDATE #__' . $this->records_dbtbl
 				. $set_clause
 				. ' WHERE id IN (' . implode(",", $support_ids) . ')'
-				. ' AND ( checked_out = 0 OR ( checked_out = ' . (int) $user->get('id') . ' ) )'
+				. ' AND ( checked_out = 0 OR checked_out IS NULL OR ( checked_out = ' . (int) $user->get('id') . ' ) )'
 			;
 			$this->_db->setQuery($query)->execute();
 
