@@ -325,7 +325,7 @@ class plgFlexicontent_fieldsToolbar extends FCField
 		// Create field's viewing HTML, using layout file
 		$field->{$prop} = array();
 		include(self::getViewPath($field->field_type, $viewlayout));
-
+		$field->{$prop} = $opentag . $field->{$prop} . $closetag;
 		$display =
 			'<div class="flexitoolbar">
 				'.implode('<div class="toolbar-spacer"'.$spacer.'></div>', $ops).'
