@@ -113,6 +113,9 @@ class plgFlexicontent_fieldsToolbar extends FCField
 		$target 			= $field->parameters->get('target', 'flexicontent');
 		$voicetarget 		= $field->parameters->get('voicetarget', 'flexicontent');
 
+		$opentag 		= $field->parameters->get('opentag');
+		$closetag 		= $field->parameters->get('closetag');
+
 		$spacer				= ' style="width:'.$spacer_size.'px;"';
 
 		static $css_loaded = false;
