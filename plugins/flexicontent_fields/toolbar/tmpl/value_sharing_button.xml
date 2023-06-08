@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<form>
+
+	<name>Toolbar field layout -- Sharing buttons</name>
+	<author>micker</author>
+	<creationDate>june 2023</creationDate>
+	<copyright>Copyright (C) 2023 micker</copyright>
+	<license>GNU/GPL v2</license>
+	<authorEmail>flexicontentck@gmail.com</authorEmail>
+	<authorUrl>www.flexicontent.org</authorUrl>
+	<version>1.0</version>
+	<description>Flexicontent fields - toolbar field layout - Sharing buttons</description>
+	<fields name="attribs">
+
+		<!--fieldset name="standard" hidden="true">
+		</fieldset-->
+
+		<fieldset name="layout" addfieldpath="/administrator/components/com_flexicontent/elements">
+		<field name="" type="separator" default="FLEXI_FIELD_VALUE_DISPLAY" level="level2" />
+
+			<field name="PPFX_display_sharing_button_item" type="checkboxes" default="0" label="FLEXI_FIELD_DISPLAY_SHARE_BUTTON_ITEM" description="FLEXI_FIELD_DISPLAY_SHARE_BUTTON_DESC">
+			  <option value="fb" >Facebook</option>
+			  <option value="tw" >Twitter</option>
+              <option value="tb" >Tumblr</option>
+              <option value="email" >Email</option>
+              <option value="pin" >Pinterest</option>
+              <option value="lin" >Linkedin</option>
+              <option value="red" >Reddit</option>
+              <option value="xin" >Xing</option>
+              <option value="what" >Whatsapp</option>
+              <option value="ycom" >Ycombinator</option>
+              <option value="vk" >VK</option>
+              <option value="tel" >Telegram</option>
+			</field>
+			<field name="PPFX_display_list_item" type="radio" default="0" label="FLEXI_FIELD_DISPLAY_LIST_ITEM" description="FLEXI_FIELD_DISPLAY_SHARE_BUTTON_DESC" class="btn-group btn-group-yesno">
+			  <option value="0" >Inline</option>
+			  <option value="1" >Dropdown</option>
+			</field>
+			
+			
+			
+
+			<field name="PPFX_display_sharing_button_category" type="checkboxes" default="0" label="FLEXI_FIELD_DISPLAY_SHARE_BUTTON_CATEGORY" description="FLEXI_FIELD_DISPLAY_SHARE_BUTTON_DESC">
+			  <option value="fb" >Facebook</option>
+			  <option value="tw" >Twitter</option>
+              <option value="tb" >Tumblr</option>
+              <option value="email" >Email</option>
+              <option value="pin" >Pinterest</option>
+              <option value="lin" >Linkedin</option>
+              <option value="red" >Reddit</option>
+              <option value="xin" >Xing</option>
+              <option value="what" >Whatsapp</option>
+              <option value="ycom" >Ycombinator</option>
+              <option value="vk" >VK</option>
+              <option value="tel" >Telegram</option>
+			</field>
+			<field name="PPFX_display_list_category" type="radio" default="0" label="FLEXI_FIELD_DISPLAY_LIST_CATEGORY" description="FLEXI_FIELD_DISPLAY_SHARE_BUTTON_DESC" class="btn-group btn-group-yesno">
+			  <option value="0" >Inline</option>
+			  <option value="1" >Dropdown</option>
+			</field>
+			
+		</fieldset>
+
+	</fields>
+	
+</form>

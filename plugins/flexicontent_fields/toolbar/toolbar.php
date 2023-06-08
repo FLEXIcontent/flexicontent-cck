@@ -103,8 +103,8 @@ class plgFlexicontent_fieldsToolbar extends FCField
 		$_sfx = ($view != FLEXI_ITEMVIEW) ? '_cat' : '';
 		$display_social 	= $field->parameters->get('display_social'.$_sfx, ($view != FLEXI_ITEMVIEW ? 0 : 1));
 
-		$addthis_user		= $field->parameters->get('addthis_user', '');
-		$addthis_pubid	= $field->parameters->get('addthis_pubid', $addthis_user);
+		//$addthis_user		= $field->parameters->get('addthis_user', '');
+		//$addthis_pubid	= $field->parameters->get('addthis_pubid', $addthis_user);
 
 		$spacer_size		= $field->parameters->get('spacer_size', 21);
 		$module_position	= $field->parameters->get('module_position', '');
@@ -240,8 +240,7 @@ class plgFlexicontent_fieldsToolbar extends FCField
 			';
 		}
 
-		// AddThis social SHARE buttons, also optionally add OPEN GRAPH TAGs
-		$addthis_html = '';
+
 		if ($display_social)
 		{
 			// ***************
@@ -317,192 +316,22 @@ class plgFlexicontent_fieldsToolbar extends FCField
 			}
 
 
-
-			// ****************************
-			// AddThis social SHARE buttons
-			// ****************************
-
-			$addthis_custom_code     = $field->parameters->get('addthis_custom_code' . $_sfx, '');
-			$addthis_code_predefined = $field->parameters->get('addthis_code_predefined' . $_sfx, 3);
-
-			$addthis_size    = (int) $field->parameters->get('addthis_size' . $_sfx, 20);
-			$addthis_style   = (int) $field->parameters->get('addthis_style' . $_sfx, 1);
-
-			$addthis_fb_like = (int) $field->parameters->get('addthis_fb_like' . $_sfx, 1);
-			$fb_like_resize  = $addthis_style == 2
-				? ''
-				: ($field->parameters->get('addthis_fb_like_resize' . $_sfx, 1) ? ' fc_resize' : '');
-
-			$addthis_box_style = $field->parameters->get('addthis_box_style'.$_sfx, 0);
-			$addthis_box_pos   = $field->parameters->get('addthis_box_pos'.$_sfx, 0);
-
-			// Allow floating in ITEM view only (because in category we have multiple !)
-			$addthis_style_class  = $addthis_style==2 && $view=='item' ? 'addthis_floating_style' : 'addthis_default_style';
-
-			// Size class (note this is ignored by boxed style)
-			$addthis_size_class   = 'addthis_'.$addthis_size.'x'.$addthis_size.'_style';
-
-			$outer_box_class  = 'fc_size_'.$addthis_size . ($addthis_box_style==1 ? ' fccleared' : '');
-
-			$fb_like_layouts = array(   // data-fb-like-layout will be replaced with fb:like:layout on document ready
-				1 => 'data-fb-like-layout="button_count"',
-				2 => 'data-fb-like-layout="box_count"',
-				3 => 'data-fb-like-layout="standard"',
-				4 => 'data-fb-like-layout="button_count" fb:like:action="recommend"',
-				5 => 'data-fb-like-layout="box_count" fb:like:action="recommend"',
-			);
-			if ($addthis_fb_like == 6)
-				$fb_like = '<a class="addthis_button_facebook"></a>';
-			else
-				$fb_like = !$addthis_fb_like ? '' : '<a class="addthis_button_facebook_like' . $fb_like_resize . '" '.$fb_like_layouts[$addthis_fb_like].' ></a>';
-
-			if (!$addthis_custom_code)
-			{
-				switch ($addthis_code_predefined)
-				{
-					case 1:
-						$addthis_custom_code = '
-						<!-- AddThis Button BEGIN -->
-						<div class="addthis_toolbox _addthis_STYLE_ _addthis_SIZE_" addthis:url="_item_url_" addthis:title="_item_title_">
-							_fb_like_
-							<a class="addthis_counter_facebook"></a>
-							<a class="addthis_counter_twitter"></a>
-							<a class="addthis_counter_google_plusone"></a>
-							<a class="addthis_counter_pinterest_share"></a>
-							<a class="addthis_counter_reddit"></a>
-							<a class="addthis_counter_linkedin"></a>
-							<div class="fc_addthis_btn_cnt nowrap_box">
-								<a class="addthis_button_compact"></a>
-								<a class="addthis_counter addthis_bubble_style"></a>
-							</div>
-						</div>
-						<!-- AddThis Button END -->
-						';
-						break;
-
-					case 2:
-						$addthis_custom_code = '
-						<!-- AddThis Button BEGIN -->
-						<div class="addthis_toolbox _addthis_STYLE_" addthis:url="_item_url_" addthis:title="_item_title_">
-							_fb_like_
-							<a class="addthis_button_tweet" tw:count="vertical">
-							<a class="addthis_button_google_plusone" g:plusone:size="tall"></a>
-							<a class="addthis_button_pinterest_pinit" pi:pinit:url="_item_url_" pi:pinit:media="_item_image_" pi:pinit:layout="vertical"></a>
-							<a class="addthis_button_linkedin_counter" li:counter="top"></a>
-							<a class="addthis_counter"></a>
-						</div>
-						<!-- AddThis Button END -->
-						';
-						break;
-
-					case 3:
-						$addthis_custom_code = '
-						<!-- AddThis Button BEGIN -->
-						<div class="addthis_toolbox _addthis_STYLE_ _addthis_SIZE_" addthis:url="_item_url_" addthis:title="_item_title_">
-							_fb_like_
-							<a class="addthis_button_preferred_1"></a>
-							<a class="addthis_button_preferred_2"></a>
-							<a class="addthis_button_preferred_3"></a>
-							<a class="addthis_button_preferred_4"></a>
-							<a class="addthis_button_compact"></a>
-						</div>
-						<!-- AddThis Button END -->
-						';
-						break;
-
-					default:
-					case 4:
-						$addthis_custom_code = '
-						<!-- AddThis Button BEGIN -->
-						<div class="addthis_toolbox _addthis_STYLE_ _addthis_SIZE_" addthis:url="_item_url_" addthis:title="_item_title_">
-							_fb_like_
-							<div class="fc_addthis_btn_cnt nowrap_box">
-								<a class="addthis_button_compact"></a>
-								<a class="addthis_counter addthis_bubble_style"></a>
-							</div>
-						</div>
-						<!-- AddThis Button END -->
-						';
-						break;
-				}
-			}
-
-			// Replacements (pass HTML validation)
-			$addthis_custom_code = str_replace('addthis:url', 'data-url', $addthis_custom_code);
-			$addthis_custom_code = str_replace('addthis:title', 'data-title', $addthis_custom_code);
-			$addthis_custom_code = str_replace('fb:like:layout', 'data-fb-like-layout', $addthis_custom_code);
-
-			// Replacements
-			$addthis_custom_code = str_replace('_item_url_', $item_url_abs, $addthis_custom_code);
-			$addthis_custom_code = str_replace('_item_title_', $item_title_escaped, $addthis_custom_code);
-			$addthis_custom_code = str_replace('_item_image_', $imageurl, $addthis_custom_code);
-			$addthis_custom_code = str_replace('_fb_like_', $fb_like, $addthis_custom_code);
-			$addthis_custom_code = str_replace('_addthis_pubid_', $addthis_pubid, $addthis_custom_code);
-			$addthis_custom_code = str_replace('_jtext_SHARE_', JText::_('FLEXI_FIELD_TOOLBAR_SHARE'), $addthis_custom_code);
-
-			$addthis_custom_code = str_replace('_addthis_STYLE_' , $addthis_style_class , $addthis_custom_code);
-			$addthis_custom_code = str_replace('_addthis_SIZE_'  , $addthis_size_class, $addthis_custom_code);
-
-			$addthis_html = $addthis_box_pos ?
-				'<div class="flexi-socials fc-outside '.$outer_box_class.'">'.$addthis_custom_code.'</div>' :
-				'<div class="toolbar-spacer"'.$spacer.'></div> <div class="flexi-socials '.$outer_box_class.'">' .$addthis_custom_code. '</div>' ;
-
-			// Add AddThis JS if not already added
-			static $addthis_added = null;
-			if (!$addthis_added && JFactory::getApplication()->input->get('format', 'html') === 'html')
-			{
-				$document->addCustomTag('
-					<script>
-					var addthis_config = {
-						services_exclude: "print,email"
-					}
-					var fc_shape_fb_addthis = function() {
-						jQuery(".addthis_button_facebook_like.fc_resize").each(function(i, el) {
-							var scale = -1 + jQuery(el).get(0).getBoundingClientRect().width / jQuery(el).get(0).offsetWidth;
-							jQuery(el).css({"margin-bottom": scale*jQuery(this).height()});
-							if ( !jQuery(el).closest(".addthis_floating_style").length )
-								jQuery(el).css({"margin-right": scale*jQuery(this).width()});
-							else jQuery(el).css({"margin-right": 0});
-						});
-					};
-					jQuery(document).ready(function() {
-						setTimeout(fc_shape_fb_addthis, 2500); setTimeout(fc_shape_fb_addthis, 3500); setTimeout(fc_shape_fb_addthis, 4500);
-
-						jQuery(".addthis_toolbox").each(function(i, el) {
-							if (jQuery(el).get(0).hasAttribute("data-url")) jQuery(el).attr("addthis:url", jQuery(el).attr("data-url"));
-							if (jQuery(el).get(0).hasAttribute("data-title")) jQuery(el).attr("addthis:title", jQuery(el).attr("data-title"));
-							if (jQuery(el).get(0).hasAttribute("data-fb-like-layout")) jQuery(el).attr("fb:like:layout", jQuery(el).attr("data-fb-like-layout"));
-						});
-						var scriptTag = document.createElement("script");
-						scriptTag.src = "//s7.addthis.com/js/300/addthis_widget.js'.($addthis_pubid ? '#pubid='.$addthis_pubid : '').'";
-						document.getElementsByTagName("head")[0].appendChild(scriptTag);
-					});
-
-					</script>
-				');
-				$addthis_added = 1;
-
-				if ($fb_like) {
-					$css = '
-						.flexi-socials .addthis_toolbox.addthis_floating_style,
-						.flexi-socials .addthis_toolbox.addthis_floating_style .addthis_internal_container { min-width: 90px; }
-					';
-					$document->addStyleDeclaration($css);
-				}
-			}
 		}
 
-		$display = $addthis_html && $addthis_box_pos ? '
-			<div class="flexitoolbar">
-				'.implode('<div class="toolbar-spacer"'.$spacer.'></div>', $ops).'
-			</div>'
-			.$addthis_html :
+
+		// Get layout name
+		$viewlayout = $field->parameters->get('viewlayout', '');
+		$viewlayout = $viewlayout ? 'value_'.$viewlayout : 'value_default';
+		// Create field's viewing HTML, using layout file
+		$field->{$prop} = array();
+		include(self::getViewPath($field->field_type, $viewlayout));
+
+		$display =
 			'<div class="flexitoolbar">
 				'.implode('<div class="toolbar-spacer"'.$spacer.'></div>', $ops).'
-				'.$addthis_html.'
+				'.$field->{$prop}.'
 			</div>'
 			;
-
 		$field->{$prop} = $display;
 	}
 
