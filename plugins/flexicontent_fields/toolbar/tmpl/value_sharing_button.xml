@@ -17,7 +17,60 @@
 
 		<fieldset name="layout" addfieldpath="/administrator/components/com_flexicontent/elements">
 		<field name="" type="separator" default="FLEXI_FIELD_VALUE_DISPLAY" level="level2" />
+		<field name="" type="separator" default="FLEXI_FIELD_TOOLBAR_CONTROLS" icon_class="icon-file-2" level="tab_open" box_type="1" />
 
+			<field name="load_css" type="radio" default="1" label="FLEXI_FIELD_TOOLBAR_CSS" description="FLEXI_FIELD_TOOLBAR_CSS_DESC" class="btn-group btn-group-yesno">
+				<option value="1">FLEXI_YES</option>
+				<option value="0">FLEXI_NO</option>
+			</field>
+
+			<field name="PPFX_display_list_item" type="radio" default="0" label="FLEXI_FIELD_DISPLAY_LIST_ITEM" description="FLEXI_FIELD_DISPLAY_SHARE_BUTTON_DESC" class="btn-group btn-group-yesno">
+			  <option value="0" >FLEXI_DISP_INLINE</option>
+			  <option value="1" >FLEXI_DISP_DROPDOWN</option>
+			  <option value="2" >FLEXI_DISP_FIXED</option>
+			</field>
+			<field name="PPFX_display_list_category" type="radio" default="0" label="FLEXI_FIELD_DISPLAY_LIST_CATEGORY" description="FLEXI_FIELD_DISPLAY_SHARE_BUTTON_DESC" class="btn-group btn-group-yesno">
+			  <option value="0" >FLEXI_DISP_INLINE</option>
+			  <option value="1" >FLEXI_DISP_DROPDOWN</option>
+			</field>
+
+			<field name="" type="separator" default="FLEXI_FIELD_TOOLBAR_VARIOUS_CONTROLS" level="level2" />
+
+			<field name="display_comments" type="radio" default="1" label="FLEXI_FIELD_TOOLBAR_COMMENTS" description="FLEXI_FIELD_TOOLBAR_COMMENTS_DESC" class="btn-group btn-group-yesno">
+				<option value="1">FLEXI_YES</option>
+				<option value="0">FLEXI_NO</option>
+			</field>
+			<field name="display_print" type="radio" default="1" label="FLEXI_FIELD_TOOLBAR_PRINT" description="FLEXI_FIELD_TOOLBAR_PRINT_DESC" class="btn-group btn-group-yesno">
+				<option value="1">FLEXI_YES</option>
+				<option value="0">FLEXI_NO</option>
+			</field>
+			<!--<field name="display_email" type="radio" default="1" label="FLEXI_FIELD_TOOLBAR_EMAIL" description="FLEXI_FIELD_TOOLBAR_EMAIL_DESC" class="btn-group btn-group-yesno">
+				<option value="1">FLEXI_YES</option>
+				<option value="0">FLEXI_NO</option>
+			</field-->
+			<!--field name="display_pdf" type="radio" default="0" label="FLEXI_FIELD_TOOLBAR_PDF" description="FLEXI_FIELD_TOOLBAR_PDF_DESC">
+				<option value="1">FLEXI_YES</option>
+				<option value="0">FLEXI_NO</option>
+			</field-->
+
+			<field name="" type="separator" default="Voice Controls" level="level2" />
+			<field name="display_voice" type="multilist" subtype="radio" default="0" label="FLEXI_FIELD_TOOLBAR_VOICE" toggle_related="1" description="FLEXI_FIELD_TOOLBAR_VOICE_DESC" class="btn-group btn-group-yesno">
+				<option value="1" show_list="hiddefield-mode" hide_list="">FLEXI_YES</option>
+				<option value="0" show_list="" hide_list="hiddefield-mode">FLEXI_NO</option>
+			</field>
+			<field name="voicetarget" type="text" default="flexicontent" label="FLEXI_FIELD_TOOLBAR_VOICE_TARGET" depend_class="hiddefield-mode" description="FLEXI_FIELD_TOOLBAR_VOICE_TARGET_DESC" />
+
+			<field name="" type="separator" default="FLEXI_FIELD_TOOLBAR_REZIZE_CONTROLS" level="level2" />
+			<field name="" type="separator" default="NOTE: These controls will only display in single item view" level="level3" class="alert alert-warning fcpadded" />
+			<field name="display_resizer" type="multilist" subtype="radio" default="1" label="FLEXI_FIELD_TOOLBAR_RESIZER" toggle_related="1" description="FLEXI_FIELD_TOOLBAR_RESIZER_DESC" class="btn-group btn-group-yesno">
+				<option value="1" show_list="hiddefield-mode2" hide_list="">FLEXI_YES</option>
+				<option value="0" show_list="" hide_list="hiddefield-mode2">FLEXI_NO</option>
+			</field>
+			<field name="default_size" type="text" size="4" default="12" label="FLEXI_FIELD_TOOLBAR_DEFAULT_SIZE" depend_class="hiddefield-mode2" description="FLEXI_FIELD_TOOLBAR_DEFAULT_SIZE_DESC" />
+			<field name="default_line" type="text" size="4" default="16" label="FLEXI_FIELD_TOOLBAR_DEFAULT_LINE" depend_class="hiddefield-mode2" description="FLEXI_FIELD_TOOLBAR_DEFAULT_LINE_DESC" />
+			<field name="target" type="text" default="flexicontent" label="FLEXI_FIELD_TOOLBAR_TARGET" depend_class="hiddefield-mode2" description="FLEXI_FIELD_TOOLBAR_TARGET_DESC" />
+		<field name="" type="separator" default="FLEXI_FIELD_DISPLAY_SOCIAL_SHARING_BUTTON" level="level2" />
+		<field name="" type="separator" default="FLEXI_FIELD_DISPLAY_ITEM" level="level3" />
 			<field name="PPFX_display_sharing_button_item" type="checkboxes" default="0" label="FLEXI_FIELD_DISPLAY_SHARE_BUTTON_ITEM" description="FLEXI_FIELD_DISPLAY_SHARE_BUTTON_DESC">
 			  <option value="fb" >Facebook</option>
 			  <option value="tw" >Twitter</option>
@@ -32,14 +85,10 @@
               <option value="vk" >VK</option>
               <option value="tel" >Telegram</option>
 			</field>
-			<field name="PPFX_display_list_item" type="radio" default="0" label="FLEXI_FIELD_DISPLAY_LIST_ITEM" description="FLEXI_FIELD_DISPLAY_SHARE_BUTTON_DESC" class="btn-group btn-group-yesno">
-			  <option value="0" >Inline</option>
-			  <option value="1" >Dropdown</option>
-			</field>
 			
 			
 			
-
+		<field name="" type="separator" default="FLEXI_FIELD_DISPLAY_CATEGORY" level="level3" />
 			<field name="PPFX_display_sharing_button_category" type="checkboxes" default="0" label="FLEXI_FIELD_DISPLAY_SHARE_BUTTON_CATEGORY" description="FLEXI_FIELD_DISPLAY_SHARE_BUTTON_DESC">
 			  <option value="fb" >Facebook</option>
 			  <option value="tw" >Twitter</option>
@@ -53,10 +102,6 @@
               <option value="ycom" >Ycombinator</option>
               <option value="vk" >VK</option>
               <option value="tel" >Telegram</option>
-			</field>
-			<field name="PPFX_display_list_category" type="radio" default="0" label="FLEXI_FIELD_DISPLAY_LIST_CATEGORY" description="FLEXI_FIELD_DISPLAY_SHARE_BUTTON_DESC" class="btn-group btn-group-yesno">
-			  <option value="0" >Inline</option>
-			  <option value="1" >Dropdown</option>
 			</field>
 			
 		</fieldset>

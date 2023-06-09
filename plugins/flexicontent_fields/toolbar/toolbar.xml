@@ -51,48 +51,7 @@
 			</field>
 			<field name="no_acc_msg" type="text" default="" label="FLEXI_FIELD_NOACCESS_MSG" description="FLEXI_FIELD_NOACCESS_MSG_DESC" depend_class="field-acc-msg"/>
 
-			<field name="" type="separator" default="FLEXI_FIELD_TOOLBAR_CONTROLS" icon_class="icon-file-2" level="tab_open" box_type="1" />
-
-			<field name="load_css" type="radio" default="1" label="FLEXI_FIELD_TOOLBAR_CSS" description="FLEXI_FIELD_TOOLBAR_CSS_DESC" class="btn-group btn-group-yesno">
-				<option value="1">FLEXI_YES</option>
-				<option value="0">FLEXI_NO</option>
-			</field>
-
-			<field name="" type="separator" default="FLEXI_FIELD_TOOLBAR_VARIOUS_CONTROLS" level="level2" />
-
-			<field name="display_comments" type="radio" default="1" label="FLEXI_FIELD_TOOLBAR_COMMENTS" description="FLEXI_FIELD_TOOLBAR_COMMENTS_DESC" class="btn-group btn-group-yesno">
-				<option value="1">FLEXI_YES</option>
-				<option value="0">FLEXI_NO</option>
-			</field>
-			<field name="display_print" type="radio" default="1" label="FLEXI_FIELD_TOOLBAR_PRINT" description="FLEXI_FIELD_TOOLBAR_PRINT_DESC" class="btn-group btn-group-yesno">
-				<option value="1">FLEXI_YES</option>
-				<option value="0">FLEXI_NO</option>
-			</field>
-			<field name="display_email" type="radio" default="1" label="FLEXI_FIELD_TOOLBAR_EMAIL" description="FLEXI_FIELD_TOOLBAR_EMAIL_DESC" class="btn-group btn-group-yesno">
-				<option value="1">FLEXI_YES</option>
-				<option value="0">FLEXI_NO</option>
-			</field>
-			<!--field name="display_pdf" type="radio" default="0" label="FLEXI_FIELD_TOOLBAR_PDF" description="FLEXI_FIELD_TOOLBAR_PDF_DESC">
-				<option value="1">FLEXI_YES</option>
-				<option value="0">FLEXI_NO</option>
-			</field-->
-
-			<field name="" type="separator" default="Voice Controls" level="level2" />
-			<field name="display_voice" type="multilist" subtype="radio" default="0" label="FLEXI_FIELD_TOOLBAR_VOICE" toggle_related="1" description="FLEXI_FIELD_TOOLBAR_VOICE_DESC" class="btn-group btn-group-yesno">
-				<option value="1" show_list="hiddefield-mode" hide_list="">FLEXI_YES</option>
-				<option value="0" show_list="" hide_list="hiddefield-mode">FLEXI_NO</option>
-			</field>
-			<field name="voicetarget" type="text" default="flexicontent" label="FLEXI_FIELD_TOOLBAR_VOICE_TARGET" depend_class="hiddefield-mode" description="FLEXI_FIELD_TOOLBAR_VOICE_TARGET_DESC" />
-
-			<field name="" type="separator" default="FLEXI_FIELD_TOOLBAR_REZIZE_CONTROLS" level="level2" />
-			<field name="" type="separator" default="NOTE: These controls will only display in single item view" level="level3" class="alert alert-warning fcpadded" />
-			<field name="display_resizer" type="multilist" subtype="radio" default="1" label="FLEXI_FIELD_TOOLBAR_RESIZER" toggle_related="1" description="FLEXI_FIELD_TOOLBAR_RESIZER_DESC" class="btn-group btn-group-yesno">
-				<option value="1" show_list="hiddefield-mode2" hide_list="">FLEXI_YES</option>
-				<option value="0" show_list="" hide_list="hiddefield-mode2">FLEXI_NO</option>
-			</field>
-			<field name="default_size" type="text" size="4" default="12" label="FLEXI_FIELD_TOOLBAR_DEFAULT_SIZE" depend_class="hiddefield-mode2" description="FLEXI_FIELD_TOOLBAR_DEFAULT_SIZE_DESC" />
-			<field name="default_line" type="text" size="4" default="16" label="FLEXI_FIELD_TOOLBAR_DEFAULT_LINE" depend_class="hiddefield-mode2" description="FLEXI_FIELD_TOOLBAR_DEFAULT_LINE_DESC" />
-			<field name="target" type="text" default="flexicontent" label="FLEXI_FIELD_TOOLBAR_TARGET" depend_class="hiddefield-mode2" description="FLEXI_FIELD_TOOLBAR_TARGET_DESC" />
+			
 
 			<field name="" type="separator" default="FLEXI_LAYOUT" icon_class="icon-file-2" level="tab_open" box_type="1" />
 						<field name="viewlayout" type="fclayout" default="default" label="FLEXI_FIELD_SELECT_VIEW_LAYOUT" description="FLEXI_FIELD_SELECT_VIEW_LAYOUT_DESC"
@@ -100,7 +59,7 @@
 				ext_name="toolbar"
 				hide_default="1" hide_none="1"
 				stripext="1" stripprefix="value_" filter="^value_.*\.php$" trim_displayname=""
-				tmpl_container="tabset_attrs_0_nav_4" params_source="file" custom_layouts_label="Custom layouts" layout_label="FLEXI_LAYOUT" icon_class="icon-screen"
+				tmpl_container="tabset_attrs_0_nav_3" params_source="file" custom_layouts_label="Custom layouts" layout_label="FLEXI_LAYOUT" icon_class="icon-screen"
 			/>
 
 			<field name="" type="separator" default="FLEXI_FIELD_VALUE_LIST" description="" icon_class="icon-stack" level="level3" box_type="1" />

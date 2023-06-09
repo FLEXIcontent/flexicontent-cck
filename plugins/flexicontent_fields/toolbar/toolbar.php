@@ -139,111 +139,6 @@ class plgFlexicontent_fieldsToolbar extends FCField
 		}
 
 
-		// Created an array of Toolbar's actions (buttons) according to configuration
-		$ops = array();
-
-		// comments button
-		if ($display_comments)
-		{
-			$comment_link = $item_url_abs . '#addcomments';
-
-			$ops[] = '
-			<div class="flexi-react toolbar-element">
-				<span class="comments-bubble">'.($module_position ? '<!-- jot '.$module_position.' s -->' : '').$this->_getCommentsCount($item->id).($module_position ? '<!-- jot '.$module_position.' e -->' : '').'</span>
-				<span class="comments-legend flexi-legend"><a href="'.$comment_link.'" title="'.JText::_('FLEXI_FIELD_TOOLBAR_COMMENT').'">'.JText::_('FLEXI_FIELD_TOOLBAR_COMMENT').'</a></span>
-			</div>
-			';
-		}
-
-		// text resizer
-		if ($display_resizer && $view == 'item')  // *** Item view only
-		{
-			$document->addScriptDeclaration('var textsize = '.$default_size.';
-			var lineheight = '.$default_line.';
-			function fsize(size,line,unit,id){
-				var vfontsize = document.getElementById(id);
-				if(vfontsize){
-					vfontsize.style.fontSize = size + unit;
-					vfontsize.style.lineHeight = line + unit;
-				}
-			}
-			function changetextsize(up){
-				if(up){
-					textsize 	= parseFloat(textsize)+2;
-					lineheight 	= parseFloat(lineheight)+2;
-				}else{
-					textsize 	= parseFloat(textsize)-2;
-					lineheight 	= parseFloat(lineheight)-2;
-				}
-			}');
-			$ops[] = '
-			<div class="flexi-resizer toolbar-element">
-				<a class="decrease" href="javascript:fsize(textsize,lineheight,\'px\',\''.$target.'\');" onclick="changetextsize(0);">'.JText::_("FLEXI_FIELD_TOOLBAR_DECREASE").'</a>
-				<a class="increase" href="javascript:fsize(textsize,lineheight,\'px\',\''.$target.'\');" onclick="changetextsize(1);">'.JText::_("FLEXI_FIELD_TOOLBAR_INCREASE").'</a>
-				<span class="flexi-legend">'.JText::_("FLEXI_FIELD_TOOLBAR_SIZE").'</span>
-			</div>
-			';
-		}
-
-		// email button
-		if ($display_email && !FLEXI_J40GE)
-		{
-			require_once(JPATH_SITE.DS.'components'.DS.'com_mailto'.DS.'helpers'.DS.'mailto.php');
-
-			$url = 'index.php?option=com_mailto&tmpl=component&link='.MailToHelper::addLink( $item_url_abs );
-			$estatus = 'width=400,height=400,menubar=yes,resizable=yes';
-			$ops[] = '
-			<div class="flexi-email toolbar-element">
-				<span class="email-legend flexi-legend"><a rel="nofollow" href="'. JRoute::_($url) .'" onclick="window.open(this.href,\'win2\',\''.$estatus.'\'); return false;" title="'.JText::_('FLEXI_FIELD_TOOLBAR_SEND').'">'.JText::_('FLEXI_FIELD_TOOLBAR_SEND').'</a></span>
-			</div>
-			';
-		}
-
-		// print button
-		if ($display_print)
-		{
-			$print = $app->input->get('pop', 0, 'int') || $app->input->get('print', 0, 'int');
-			$pstatus = 'status=no,toolbar=no,scrollbars=yes,titlebar=no,menubar=no,resizable=yes,width=640,height=480,directories=no,location=no';
-			$print_link = $print ? '#' : ( $item_url_abs .(strstr($item_url_abs, '?') ? '&amp;'  : '?') . 'pop=1&amp;tmpl=component&amp;print=1' );
-			$js_link = $print ? 'onclick="window.print();return false;"' : 'onclick="window.open(this.href,\'win2\',\''.$pstatus.'\'); return false;"';
-			$ops[] = '
-			<div class="flexi-print toolbar-element">
-				<span class="print-legend flexi-legend"><a rel="nofollow" href="'. $print_link .'" '.$js_link.' title="'.JText::_('FLEXI_FIELD_TOOLBAR_PRINT').'">'.JText::_('FLEXI_FIELD_TOOLBAR_PRINT').'</a></span>
-			</div>
-			';
-		}
-
-		// voice button
-		if ($display_voice)  // *** Item view only
-		{
-			if ($lang=='th') {
-				// Special case language case, maybe la=laos, and Bhutan languages in the future (NECTEC support these languages)
-				$document->addScript(JUri::root(true).'/plugins/flexicontent_fields/toolbar/toolbar/th.js');
-			} else {
-				$document->addScript('//vozme.com/get_text.js');
-			}
-
-			$ops[] = '
-			<div class="flexi-voice toolbar-element">
-			'.( $lang=='th' ? '
-				<span class="voice-legend flexi-legend"><a href="javascript:void(0);" onclick="openwindow(\''.$voicetarget.'\',\''.$lang.'\');"        class="mainlevel-toolbar-article-horizontal" rel="nofollow">' . JTEXT::_('FLEXI_FIELD_TOOLBAR_VOICE') . '</a></span>' : '
-				<span class="voice-legend flexi-legend"><a href="javascript:void(0);"     onclick="get_id(\''.$voicetarget.'\',\''.$lang.'\',\'fm\');" class="mainlevel-toolbar-article-horizontal" rel="nofollow">' . JTEXT::_('FLEXI_FIELD_TOOLBAR_VOICE') . '</a></span>' ).'
-			</div>
-			';
-		}
-
-		// pdf button
-		if ($display_pdf)
-		{
-			$pdflink 	= 'index.php?view=items&cid='.$item->categoryslug.'&id='.$item->slug.'&format=pdf';
-			$ops[] = '
-			<div class="flexi-pdf toolbar-element">
-				<span class="pdf-legend flexi-legend"><a href="'.JRoute::_($pdflink).'" title="'.JText::_('FLEXI_FIELD_TOOLBAR_PDF').'">'.JText::_('FLEXI_FIELD_TOOLBAR_PDF').'</a></span>
-			</div>
-			';
-		}
-
-
 		if ($display_social)
 		{
 			// ***************
@@ -328,13 +223,7 @@ class plgFlexicontent_fieldsToolbar extends FCField
 		// Create field's viewing HTML, using layout file
 		$field->{$prop} = array();
 		include(self::getViewPath($field->field_type, $viewlayout));
-		$field->{$prop} = $opentag . $field->{$prop} . $closetag;
-		$display =
-			'<div class="flexitoolbar">
-				'.implode('<div class="toolbar-spacer"'.$spacer.'></div>', $ops).'
-				'.$field->{$prop}.'
-			</div>'
-			;
+		$display = $field->{$prop};
 		$field->{$prop} = $display;
 	}
 
