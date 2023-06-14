@@ -405,7 +405,7 @@ label#use_advsearch_options_lbl {
 	background: #ccc;
 }
 #flexicontent .col-search .select2-container,
-.select2-container {
+.col-search .fc_search_tbl .select2-container {
 	width: 100%;
 	min-width: 100%;
 }
