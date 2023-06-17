@@ -1137,6 +1137,7 @@ class FlexicontentFields
 
 		// Needed by some plugins that do not use or clear ->text property
 		$record->introtext = $record->text;
+		$record->fulltext  = '';
 
 		// Some plugins expect this
 		if (isset($item->readmore_link))
