@@ -76,7 +76,7 @@ if ($display_filter_as==6 && $filter->parameters->get('filter_values_require_all
 }
 
 // Calculate if field has value
-$has_value = (!is_array($value) && strlen($value)) || (is_array($value) && count($value));
+$has_value = (!is_array($value) && $value !== null && strlen($value)) || (is_array($value) && count($value));
 $filter->html	.= $label_filter==2 && $has_value
 	? ' <span class="badge fc_mobile_label" style="display:none;">'.JText::_($filter->label).'</span> '
 	: '';

@@ -5,7 +5,7 @@
  *
  * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
  * @link            https://flexicontent.org
- * @copyright       Copyright © 2020, FLEXIcontent team, All Rights Reserved
+ * @copyright       Copyright ï¿½ 2020, FLEXIcontent team, All Rights Reserved
  * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
@@ -315,7 +315,7 @@ class plgFlexicontent_fieldsCoreprops extends FCField
 			if ( count($value==1) && !strlen( reset($value) ) )  $value = array();
 
 			// Calculate if field has value
-			$has_value = (!is_array($value) && strlen($value)) || (is_array($value) && count($value));
+			$has_value = (!is_array($value) && $value !== null && strlen($value)) || (is_array($value) && count($value));
 			$filter->html	.= $label_filter==2 && $has_value
 				? ' <span class="badge fc_mobile_label" style="display:none;">'.JText::_($filter->label).'</span> '
 				: '';
