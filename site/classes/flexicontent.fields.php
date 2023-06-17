@@ -1315,6 +1315,10 @@ class FlexicontentFields
 					if ( !isset($item->fields[$f]) )  continue;
 					$field = $item->fields[$f];
 
+					// WARN of array field display being invalid
+					if ( isset($field->display) && is_array($field->display) )
+						$field->display = 'ARRAY';
+
 					// Skip field if empty display was produced
 					if ( !isset($field->display) || !strlen($field->display) ) continue;
 

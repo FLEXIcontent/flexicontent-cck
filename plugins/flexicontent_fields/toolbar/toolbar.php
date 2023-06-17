@@ -219,7 +219,7 @@ class plgFlexicontent_fieldsToolbar extends FCField
 
 		// Get layout name
 		$viewlayout = $field->parameters->get('viewlayout', '');
-		$viewlayout = $viewlayout ? 'value_'.$viewlayout : 'value_default';
+		$viewlayout = $viewlayout ? 'value_'.$viewlayout : 'value_sharing_button';
 		// Create field's viewing HTML, using layout file
 		$field->{$prop} = array();
 		include(self::getViewPath($field->field_type, $viewlayout));

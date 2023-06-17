@@ -123,11 +123,17 @@
 
 	
   //display button in item view
-  $display_sharing_buttons_item   = $field->parameters->get($LPN . 'display_sharing_button_item');//fb,tw,tb,email,pin,lin,red,xin,what,ycom,vk,tel
+  $display_sharing_buttons_item   = $field->parameters->get($LPN . 'display_sharing_button_item',
+		['fb','tw','email','lin']
+	  //['fb','tw','tb','email','pin','lin','red','xin','pin','what','ycom','vk','tel']
+  );
   $display_list_item   = $field->parameters->get($LPN . 'display_list_item', 0);
   
   //display button in category view
-  $display_sharing_buttons_category   = $field->parameters->get($LPN . 'display_sharing_button_category');//fb,tw,tb,email,pin,lin,red,xin,what,ycom,vk,tel
+  $display_sharing_buttons_category   = $field->parameters->get($LPN . 'display_sharing_button_category',
+	  ['fb','tw','email','lin']
+	  //['fb','tw','tb','email','pin','lin','red','xin','pin','what','ycom','vk','tel']
+  );
   $display_list_category  = $field->parameters->get($LPN . 'display_list_category', 0);
 
   //check if fiexed
@@ -153,10 +159,13 @@
     $after_value ='';
   }
 
-if ($view === 'item'){
-    foreach ($display_sharing_buttons_item as $display_sharing_button_item){
+$value = '';
+if ($view === 'item')
+{
+    foreach ($display_sharing_buttons_item as $display_sharing_button_item)
+		{
         if ($display_sharing_button_item === 'fb'){
-            $value =$before_value.'<!-- Sharingbutton Facebook -->
+            $value .=$before_value.'<!-- Sharingbutton Facebook -->
                 <a class="resp-sharing-button__link" href="https://facebook.com/sharer/sharer.php?u='.$item_url_abs.'" target="_blank" rel="noopener" aria-label="">
                 <div class="resp-sharing-button resp-sharing-button--facebook resp-sharing-button--small"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18.77 7.46H14.5v-1.9c0-.9.6-1.1 1-1.1h3V.5h-4.33C10.24.5 9.5 3.44 9.5 5.32v2.15h-3v4h3v12h5v-12h3.85l.42-4z"/></svg>
@@ -275,7 +284,8 @@ if ($view === 'item'){
         }
     }
   }//end of item view
-  elseif ($view === 'category'){
+  elseif ($view === 'category')
+  {
       foreach ($display_sharing_buttons_category as $display_sharing_button_category){
       if ($display_sharing_button_category === 'fb'){
           $value =$before_value.'<!-- Sharingbutton Facebook -->

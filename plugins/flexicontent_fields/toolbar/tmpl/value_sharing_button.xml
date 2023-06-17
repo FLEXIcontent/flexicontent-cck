@@ -71,7 +71,7 @@
 			<field name="target" type="text" default="flexicontent" label="FLEXI_FIELD_TOOLBAR_TARGET" depend_class="hiddefield-mode2" description="FLEXI_FIELD_TOOLBAR_TARGET_DESC" />
 		<field name="" type="separator" default="FLEXI_FIELD_DISPLAY_SOCIAL_SHARING_BUTTON" level="level2" />
 		<field name="" type="separator" default="FLEXI_FIELD_DISPLAY_ITEM" level="level3" />
-			<field name="PPFX_display_sharing_button_item" type="checkboxes" default="0" label="FLEXI_FIELD_DISPLAY_SHARE_BUTTON_ITEM" description="FLEXI_FIELD_DISPLAY_SHARE_BUTTON_DESC">
+			<field name="PPFX_display_sharing_button_item" type="checkboxes" default="fb,tw,email,lin" label="FLEXI_FIELD_DISPLAY_SHARE_BUTTON_ITEM" description="FLEXI_FIELD_DISPLAY_SHARE_BUTTON_DESC">
 			  <option value="fb" >Facebook</option>
 			  <option value="tw" >Twitter</option>
               <option value="tb" >Tumblr</option>
@@ -89,7 +89,7 @@
 			
 			
 		<field name="" type="separator" default="FLEXI_FIELD_DISPLAY_CATEGORY" level="level3" />
-			<field name="PPFX_display_sharing_button_category" type="checkboxes" default="0" label="FLEXI_FIELD_DISPLAY_SHARE_BUTTON_CATEGORY" description="FLEXI_FIELD_DISPLAY_SHARE_BUTTON_DESC">
+			<field name="PPFX_display_sharing_button_category" type="checkboxes" default="fb,tw,email,lin" label="FLEXI_FIELD_DISPLAY_SHARE_BUTTON_CATEGORY" description="FLEXI_FIELD_DISPLAY_SHARE_BUTTON_DESC">
 			  <option value="fb" >Facebook</option>
 			  <option value="tw" >Twitter</option>
               <option value="tb" >Tumblr</option>
