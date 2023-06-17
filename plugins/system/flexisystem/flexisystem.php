@@ -412,7 +412,7 @@ class plgSystemFlexisystem extends CMSPlugin
 		$exclude_arts = $this->params->get('exclude_redirect_articles', array());
 
 		// Get URLs excluded from redirection
-		$excluded_urls = $this->params->get('excluded_redirect_urls');
+		$excluded_urls = $this->params->get('excluded_redirect_urls', '');
 		$excluded_urls = preg_split("/[\s]*%%[\s]*/", $excluded_urls);
 
 		if (empty($excluded_urls[count($excluded_urls)-1]))
