@@ -5142,6 +5142,9 @@ class FlexicontentFields
 	 */
 	static function renderFilters( &$params, &$filters, $form_name )
 	{
+		// This is typically loaded in frontend and some filters maybe use it without loading it
+		flexicontent_html::loadFramework('flexi_tmpl_common');
+
 		// Make the filter compatible with Joomla standard cache
 		$jinput = JFactory::getApplication()->input;
 

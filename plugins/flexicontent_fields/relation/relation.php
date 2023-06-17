@@ -2346,6 +2346,7 @@ class plgFlexicontent_fieldsRelation extends FCField
 		FlexicontentFields::setFilterValues($field->parameters, 'initial_filters', $is_persistent = 0);
 		if (!empty($this->_custom_filters))
 		{
+			flexicontent_html::loadFramework('flexi_tmpl_common');
 			foreach ($this->_custom_filters as $filter) $filter->parameters->set('filter_extra_attribs', ' onchange="fcfield_relation.filters_change(this);"');
 			FlexicontentFields::renderFilters($field->parameters, $this->_custom_filters, $form_name);
 		}
