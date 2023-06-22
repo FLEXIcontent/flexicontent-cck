@@ -495,10 +495,10 @@ class flexicontent_html
 
 		// Clear legacy cookie
 		$legacy_cookie = $jinput->cookie->get('columnchoose_'.$data_tbl_id, null);
-    if ($legacy_cookie) $jinput->cookie->set('columnchoose_'.$data_tbl_id, null, 1, '', '');
+		if ($legacy_cookie) $jinput->cookie->set('columnchoose_'.$data_tbl_id, null, 1, '', '');
 
 		$js = "
-		var show_col_${data_tbl_id} = Array();
+		var show_col_{$data_tbl_id} = Array();
 		jQuery(document).ready(function() {
 		";
 
@@ -508,7 +508,7 @@ class flexicontent_html
 		if ($columnchoose) foreach ($columnchoose as $colnum)
 		{
 			$colnum = (int) $colnum;
-			$js .= "show_col_${data_tbl_id}[".$colnum."]=1; \n";
+			$js .= "show_col_{$data_tbl_id}[".$colnum."]=1; \n";
 		}
 
 		$firstload = $columnchoose !== null ? "false" : "true";
