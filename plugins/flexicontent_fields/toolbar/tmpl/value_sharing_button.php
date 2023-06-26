@@ -52,8 +52,8 @@ if ($display_resizer && $view == 'item')  // *** Item view only
 			}');
 	$ops[] = '
 			<div class="flexi-resizer toolbar-element">
-				<a class="decrease" href="javascript:fsize(textsize,lineheight,\'px\',\''.$target.'\');" onclick="changetextsize(0);"><svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 448 512"><!--! Font Awesome Free 6.4.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. --><path d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32V224H48c-17.7 0-32 14.3-32 32s14.3 32 32 32H192V432c0 17.7 14.3 32 32 32s32-14.3 32-32V288H400c17.7 0 32-14.3 32-32s-14.3-32-32-32H256V80z"/></svg><span class="sublegend">'.JText::_("FLEXI_FIELD_TOOLBAR_DECREASE").'</span></a>
-				<a class="increase" href="javascript:fsize(textsize,lineheight,\'px\',\''.$target.'\');" onclick="changetextsize(1);"><svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 448 512"><!--! Font Awesome Free 6.4.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. --><path d="M432 256c0 17.7-14.3 32-32 32L48 288c-17.7 0-32-14.3-32-32s14.3-32 32-32l352 0c17.7 0 32 14.3 32 32z"/></svg><span class="sublegend">'.JText::_("FLEXI_FIELD_TOOLBAR_INCREASE").'</span></a>
+				<a class="decrease" href="javascript:fsize(textsize,lineheight,\'px\',\''.$target.'\');" onclick="changetextsize(0);"><svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 448 512"><!--! Font Awesome Free 6.4.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. --><path d="M432 256c0 17.7-14.3 32-32 32L48 288c-17.7 0-32-14.3-32-32s14.3-32 32-32l352 0c17.7 0 32 14.3 32 32z"/></svg><span class="sublegend">'.JText::_("FLEXI_FIELD_TOOLBAR_DECREASE").'</span></a>
+				<a class="increase" href="javascript:fsize(textsize,lineheight,\'px\',\''.$target.'\');" onclick="changetextsize(1);"><svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 448 512"><!--! Font Awesome Free 6.4.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. --><path d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32V224H48c-17.7 0-32 14.3-32 32s14.3 32 32 32H192V432c0 17.7 14.3 32 32 32s32-14.3 32-32V288H400c17.7 0 32-14.3 32-32s-14.3-32-32-32H256V80z"/></svg><span class="sublegend">'.JText::_("FLEXI_FIELD_TOOLBAR_INCREASE").'</span></a>
 				<span class="flexi-legend">'.JText::_("FLEXI_FIELD_TOOLBAR_SIZE").'</span>
 			</div>
 			';
@@ -240,7 +240,7 @@ if ($view === 'item')
             </a>
             '.$after_value;
 		}
-		if ($display_sharing_button_item === 'xin'){
+		if ($display_sharing_button_item === 'what'){
 			$value.=$before_value.'<!-- Sharingbutton WhatsApp -->
             <a class="resp-sharing-button__link" href="whatsapp://send?text='.$item_title_escaped.''.$item_url_abs.'" target="_blank" rel="noopener" aria-label="">
               <div class="resp-sharing-button resp-sharing-button--whatsapp resp-sharing-button--small"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
@@ -270,7 +270,7 @@ if ($view === 'item')
             </a>
             '.$after_value;
 		}
-		if ($display_sharing_button_item === 'vk'){
+		if ($display_sharing_button_item === 'tel'){
 			$value.=$before_value.'<!-- Sharingbutton Telegram -->
             <a class="resp-sharing-button__link" href="https://telegram.me/share/url?text='.$item_title_escaped.'&amp;url='.$item_url_abs.'" target="_blank" rel="noopener" aria-label="">
               <div class="resp-sharing-button resp-sharing-button--telegram resp-sharing-button--small"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
@@ -363,7 +363,7 @@ elseif ($view === 'category')
           </a>
           '.$after_value;
 		}
-		if ($display_sharing_button_category === 'xin'){
+		if ($display_sharing_button_category === 'what'){
 			$value.='<!-- Sharingbutton WhatsApp -->
           <a class="resp-sharing-button__link" href="whatsapp://send?text='.$item_title_escaped.''.$item_url_abs.'" target="_blank" rel="noopener" aria-label="">
             <div class="resp-sharing-button resp-sharing-button--whatsapp resp-sharing-button--small"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
@@ -393,7 +393,7 @@ elseif ($view === 'category')
           </a>
           '.$after_value;
 		}
-		if ($display_sharing_button_category === 'vk'){
+		if ($display_sharing_button_category === 'tel'){
 			$value.= $before_value.'<!-- Sharingbutton Telegram -->
           <a class="resp-sharing-button__link" href="https://telegram.me/share/url?text='.$item_title_escaped.'&amp;url='.$item_url_abs.'" target="_blank" rel="noopener" aria-label="">
             <div class="resp-sharing-button resp-sharing-button--telegram resp-sharing-button--small"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
