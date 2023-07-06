@@ -1,19 +1,20 @@
 <?php
+
 /**
-* @version 0.6 stable $Id: helper.php yannick berges
-* @package Joomla
-* @subpackage FLEXIcontent
-* @copyright (C) 2015 Berges Yannick - www.com3elles.com
-* @license GNU/GPL v2
+ * @version 0.6 stable $Id: helper.php yannick berges
+ * @package Joomla
+ * @subpackage FLEXIcontent
+ * @copyright (C) 2015 Berges Yannick - www.com3elles.com
+ * @license GNU/GPL v2
 
-* special thanks to ggppdk and emmanuel dannan for flexicontent
-* special thanks to my master Marc Studer
+ * special thanks to ggppdk and emmanuel dannan for flexicontent
+ * special thanks to my master Marc Studer
 
-* FLEXIadmin module is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-* GNU General Public License for more details.
-**/
+ * FLEXIadmin module is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ **/
 
 defined('_JEXEC') or die('Restricted access');
 
@@ -26,9 +27,8 @@ class modFlexigooglemapHelper
 		 */
 		$fieldaddressid = $params->get('fieldaddressid');
 
-		if (empty($fieldaddressid))
-		{
-			echo '<div class="alert alert-warning">' . JText::_('MOD_FLEXIGOOGLEMAP_ADDRESSFORGOT') .'</div>';
+		if (empty($fieldaddressid)) {
+			echo '<div class="alert alert-warning">' . JText::_('MOD_FLEXIGOOGLEMAP_ADDRESSFORGOT') . '</div>';
 			return array();
 		}
 
@@ -38,8 +38,7 @@ class modFlexigooglemapHelper
 		 */
 		$field = modFlexigooglemapHelper::_getField($fieldaddressid);
 
-		if (empty($field))
-		{
+		if (empty($field)) {
 			// Rare error. Do not add language string
 			echo '<div class="alert alert-warning">Address (Maps) Field with id ' . $fieldaddressid . ' or it is not an address field. Please select an appropriate field in module configuration</div>';
 			return array();
@@ -61,8 +60,7 @@ class modFlexigooglemapHelper
 		$catids_arr = flexicontent_cats::getExtraCats($catids, $treeinclude, array());
 
 		// Check if zero allowed categories
-		if (empty($catids_arr))
-		{
+		if (empty($catids_arr)) {
 			return array();
 		}
 
@@ -82,16 +80,15 @@ class modFlexigooglemapHelper
 
 		$db = JFactory::getDbo();
 		$queryLoc = 'SELECT a.id, a.title, b.field_id, b.value , a.catid '
-			.', CASE WHEN CHAR_LENGTH(a.alias) THEN CONCAT_WS(\':\', a.id, a.alias) ELSE a.id END as itemslug'
-			.', CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as catslug'
-			.' FROM #__content  AS a'
-			.' JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = a.id '
-			.' JOIN #__categories AS c ON c.id = a.catid'
-			.' LEFT JOIN #__flexicontent_fields_item_relations AS b ON a.id = b.item_id '
-			.' WHERE b.field_id = ' . $fieldaddressid.' AND ' . $catWheres . '  AND state = 1'
-			.' ORDER BY title '.$count
-			;
-		$db->setQuery( $queryLoc );
+			. ', CASE WHEN CHAR_LENGTH(a.alias) THEN CONCAT_WS(\':\', a.id, a.alias) ELSE a.id END as itemslug'
+			. ', CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as catslug'
+			. ' FROM #__content  AS a'
+			. ' JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = a.id '
+			. ' JOIN #__categories AS c ON c.id = a.catid'
+			. ' LEFT JOIN #__flexicontent_fields_item_relations AS b ON a.id = b.item_id '
+			. ' WHERE b.field_id = ' . $fieldaddressid . ' AND ' . $catWheres . '  AND state = 1'
+			. ' ORDER BY title ' . $count;
+		$db->setQuery($queryLoc);
 		$itemsLoc = $db->loadObjectList();
 
 
@@ -100,8 +97,7 @@ class modFlexigooglemapHelper
 		 */
 		$forced_itemid = $params->get('forced_itemid', 0);
 
-		foreach ($itemsLoc as &$itemLoc)
-		{
+		foreach ($itemsLoc as &$itemLoc) {
 			$itemLoc->link = JRoute::_(FlexicontentHelperRoute::getItemRoute($itemLoc->itemslug, $itemLoc->catslug, $forced_itemid, $itemLoc));
 		}
 
@@ -109,7 +105,8 @@ class modFlexigooglemapHelper
 	}
 
 
-	public static function renderMapLocations($params, & $mapItems = null)
+
+	public static function renderMapLocations($params, &$mapItems = null)
 	{
 		$uselink = $params->get('uselink', '');
 		$useadress = $params->get('useadress', '');
@@ -121,7 +118,7 @@ class modFlexigooglemapHelper
 		$directionname = JText::_($params->get('directionname', 'MOD_FLEXIGOOGLEMAP_DIRECTIONNAME_TXT'));
 
 		$infotextmode = $params->get('infotextmode', '');
-		$relitem_html = $params->get('relitem_html','');
+		$relitem_html = $params->get('relitem_html', '');
 
 		$fieldaddressid = $params->get('fieldaddressid');
 		$forced_itemid = $params->get('forced_itemid', 0);
@@ -132,29 +129,25 @@ class modFlexigooglemapHelper
 		// Get marker image configuratuon
 		$use_custom_marker = (int) $params->get('use_custom_marker', 1) && (int) $field->parameters->get('use_custom_marker', 1);
 
-		if ($use_custom_marker)
-		{
+		if ($use_custom_marker) {
 			$custom_marker_path     = $field->parameters->get('custom_marker_path', 'modules/mod_flexigooglemap/assets/marker');
-			$custom_marker_path_abs = JPATH::clean(JPATH_SITE . DS . $custom_marker_path. DS);
+			$custom_marker_path_abs = JPATH::clean(JPATH_SITE . DS . $custom_marker_path . DS);
 			$custom_marker_url_base = str_replace('\\', '/', JURI::root() . $custom_marker_path . '/');
 		}
 
 		$mapLocations = array();
 
 		// Fixed category mode
-		if ($params->get('catidmode') == 0)
-		{
+		if ($params->get('catidmode') == 0) {
 			$itemsLocations = modFlexigooglemapHelper::getItemsLocations($params);
 			$itemsLocations = $itemsLocations ?: array();
 
 			// Items having these markers, to be used by the module layout
 			$mapItems = $itemsLocations;
 
-			foreach ($itemsLocations as $itemLoc)
-			{
+			foreach ($itemsLocations as $itemLoc) {
 				// Skip empty value
-				if (empty($itemLoc->value))
-				{
+				if (empty($itemLoc->value)) {
 					continue;
 				}
 
@@ -163,57 +156,49 @@ class modFlexigooglemapHelper
 				$coord['lon'] = isset($coord['lon']) ? $coord['lon'] : '';
 
 				// Skip address if it has empty coordinates, note latitude '0' and / or longitude '0' are not "empty", these are Equator's coordinates
-				if (!strlen($coord['lat']) || !strlen($coord['lon']))
-				{
+				if (!strlen($coord['lat']) || !strlen($coord['lon'])) {
 					continue;
 				}
 
-				$title = rtrim( addslashes($itemLoc->title) );
+				$title = rtrim(addslashes($itemLoc->title));
 				$link = '';
 				$addr = '';
 				$linkdirection = '';
 
 				// Popup window: show (button) link to the item view
-				if ($uselink)
-				{
+				if ($uselink) {
 					$link = $itemLoc->link;
-					$link = '<div class="link"><a href="'.$link.'" target="'.$linkmode.'" class="link btn">' . $readmore . '</a></div>';
+					$link = '<div class="link"><a href="' . $link . '" target="' . $linkmode . '" class="link btn">' . $readmore . '</a></div>';
 					$link = addslashes($link);
 				}
 
 				// Popup window: show address details
-				if ($useadress && !empty($coord['addr_display']))
-				{
-					$addr = '<p>'.$coord['addr_display'].'</p>';
+				if ($useadress && !empty($coord['addr_display'])) {
+					$addr = '<p>' . $coord['addr_display'] . '</p>';
 					$addr = addslashes($addr);
 					$addr = preg_replace("/(\r\n|\n|\r)/", " ", $addr);
 				}
 
 				// Popup window: show (button) link to Google-map directions page
-				if ($usedirection)
-				{
+				if ($usedirection) {
 					// generate link to google maps directions
 					$map_link = empty($coord['url'])  ?  false  :  $coord['url'];
 
 					// if no url, compatibility with old values
-					if (empty($map_link))
-					{
+					if (empty($map_link)) {
 						$map_link = "http://maps.google.com/maps?q=";
-						if (!empty($coord['addr1']) && !empty($coord['city']) && (!empty($coord['province']) || !empty($coord['state']))  && !empty($coord['zip']))
-						{
-							$map_link .= urlencode(($coord['addr1'] ? $coord['addr1'].',' : '')
-								.($coord['city'] ? $coord['city'].',' : '')
-								.($coord['state'] ? $coord['state'].',' : ($coord['province'] ? $coord['province'].',' : ''))
-								.($coord['zip'] ? $coord['zip'].',' : '')
-								.($coord['country'] ? JText::_('PLG_FC_ADDRESSINT_CC_'.$coord['country']) : ''));
-						}
-						else
-						{
+						if (!empty($coord['addr1']) && !empty($coord['city']) && (!empty($coord['province']) || !empty($coord['state']))  && !empty($coord['zip'])) {
+							$map_link .= urlencode(($coord['addr1'] ? $coord['addr1'] . ',' : '')
+								. ($coord['city'] ? $coord['city'] . ',' : '')
+								. ($coord['state'] ? $coord['state'] . ',' : ($coord['province'] ? $coord['province'] . ',' : ''))
+								. ($coord['zip'] ? $coord['zip'] . ',' : '')
+								. ($coord['country'] ? JText::_('PLG_FC_ADDRESSINT_CC_' . $coord['country']) : ''));
+						} else {
 							$map_link .= urlencode($coord['lat'] . "," . $coord['lon']);
 						}
 					}
 
-					$linkdirection= '<div class="directions"><a href="' . $map_link . '" target="_blank" class="direction btn">' . $directionname . '</a></div>';
+					$linkdirection = '<div class="directions"><a href="' . $map_link . '" target="_blank" class="direction btn">' . $directionname . '</a></div>';
 				}
 
 				// Popup window: custom text or default (Address + button link to item)
@@ -235,25 +220,50 @@ class modFlexigooglemapHelper
 					? $custom_marker_url_base . $coord['custom_marker']
 					: '';
 
-				if ($marker_path)
-				{
+				if ($marker_path) {
 					// Marker Size
 					list($wS, $hS) = getimagesize($marker_path);
 
 					// Marker Anchor
-					switch($marker_anchor)
-					{
-						case 'TopL' : $wA = 0;     $hA = 0; break;
-						case 'TopC' : $wA = $wS/2; $hA = 0; break;
-						case 'TopR' : $wA = $wS;   $hA = 0; break;
+					switch ($marker_anchor) {
+						case 'TopL':
+							$wA = 0;
+							$hA = 0;
+							break;
+						case 'TopC':
+							$wA = $wS / 2;
+							$hA = 0;
+							break;
+						case 'TopR':
+							$wA = $wS;
+							$hA = 0;
+							break;
 
-						case 'MidL' : $wA = 0;     $hA = $hS/2; break;
-						case 'MidC' : $wA = $wS/2; $hA = $hS/2; break;
-						case 'MidR' : $wA = $wS;   $hA = $hS/2; break;
+						case 'MidL':
+							$wA = 0;
+							$hA = $hS / 2;
+							break;
+						case 'MidC':
+							$wA = $wS / 2;
+							$hA = $hS / 2;
+							break;
+						case 'MidR':
+							$wA = $wS;
+							$hA = $hS / 2;
+							break;
 
-						case 'BotL' : $wA = 0;     $hA = $hS; break;
-						case 'BotC' : $wA = $wS/2; $hA = $hS; break;
-						case 'BotR' : $wA = $wS;   $hA = $hS; break;
+						case 'BotL':
+							$wA = 0;
+							$hA = $hS;
+							break;
+						case 'BotC':
+							$wA = $wS / 2;
+							$hA = $hS;
+							break;
+						case 'BotR':
+							$wA = $wS;
+							$hA = $hS;
+							break;
 					}
 				}
 
@@ -274,22 +284,18 @@ class modFlexigooglemapHelper
 		}
 
 		// Current category mode or current item mode, these are pre-created (global variables)
-		else
-		{
+		else {
 			// Current category mode
-			if ($params->get('catidmode') == 1)
-			{
+			if ($params->get('catidmode') == 1) {
 				// Get items of current view
 				global $fc_list_items;
-				if ( empty($fc_list_items) )
-				{
+				if (empty($fc_list_items)) {
 					$fc_list_items = array();
 				}
 			}
 
 			// Get current item
-			else
-			{
+			else {
 				global $fc_view_item;
 				$fc_list_items = !empty($fc_view_item)
 					? array($fc_view_item)
@@ -300,29 +306,26 @@ class modFlexigooglemapHelper
 			// We will create one to one array below for locations and items (items are repeated if having multiple locations)
 			$mapItems = array();
 
-			foreach ($fc_list_items as $address_item)
-			{
+			foreach ($fc_list_items as $address_item) {
 				// Skip item if it has no address value
-				if ( empty($address_item->fieldvalues[$fieldaddressid]) )
-				{
+				if (empty($address_item->fieldvalues[$fieldaddressid])) {
 					continue;
 				}
 
 				// Get first value, typically this is value [0], and unserialize it
-				foreach($address_item->fieldvalues[$fieldaddressid] as $coord)
-				{
+				foreach ($address_item->fieldvalues[$fieldaddressid] as $coord) {
 					// Skip item if address field value is empty
 					$coord = flexicontent_db::unserialize_array($coord, false, false);
 					if (!$coord) continue;
 
 					// Skip item if address field value has empty either of the coordinates
-					if ( !isset($coord['lat']) || !isset($coord['lon']) ) continue;
-					if ( !strlen($coord['lat']) || !strlen($coord['lon']) ) continue;
+					if (!isset($coord['lat']) || !isset($coord['lon'])) continue;
+					if (!strlen($coord['lat']) || !strlen($coord['lon'])) continue;
 
 					/**
 					 * Add item to array of know items
 					 */
-					$item = clone($address_item);
+					$item = clone ($address_item);
 					$item->link = JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, $forced_itemid, $item));
 					$mapItems[] = $item;
 
@@ -332,46 +335,39 @@ class modFlexigooglemapHelper
 					$linkdirection = '';
 
 					// Popup window: show (button) link to the item view
-					if ($uselink)
-					{
+					if ($uselink) {
 						$link = $item->link;
-						$link = '<div class="link"><a href="'.$link.'" target="'.$linkmode.'" class="link btn">' . $readmore . '</a></div>';
+						$link = '<div class="link"><a href="' . $link . '" target="' . $linkmode . '" class="link btn">' . $readmore . '</a></div>';
 						$link = addslashes($link);
 					}
 
 					// Popup window: show address details
-					if ($useadress && !empty($coord['addr_display']))
-					{
-						$addr = '<p>'.$coord['addr_display'].'</p>';
+					if ($useadress && !empty($coord['addr_display'])) {
+						$addr = '<p>' . $coord['addr_display'] . '</p>';
 						$addr = addslashes($addr);
 						$addr = preg_replace("/(\r\n|\n|\r)/", " ", $addr);
 					}
 
 					// Popup window: show (button) link to Google-map directions page
-					if ($usedirection)
-					{
+					if ($usedirection) {
 						// Generate link to google maps directions
 						$map_link = empty($coord['url'])  ?  false  :  $coord['url'];
 
 						// if no url, compatibility with old values
-						if (empty($map_link))
-						{
+						if (empty($map_link)) {
 							$map_link = "http://maps.google.com/maps?q=";
-							if (!empty($coord['addr1']) && !empty($coord['city']) && (!empty($coord['province']) || !empty($coord['state']))  && !empty($coord['zip']))
-							{
-								$map_link .= urlencode(($coord['addr1'] ? $coord['addr1'].',' : '')
-									.($coord['city'] ? $coord['city'].',' : '')
-									.($coord['state'] ? $coord['state'].',' : ($coord['province'] ? $coord['province'].',' : ''))
-									.($coord['zip'] ? $coord['zip'].',' : '')
-									.($coord['country'] ? JText::_('PLG_FC_ADDRESSINT_CC_'.$coord['country']) : ''));
-							}
-							else
-							{
+							if (!empty($coord['addr1']) && !empty($coord['city']) && (!empty($coord['province']) || !empty($coord['state']))  && !empty($coord['zip'])) {
+								$map_link .= urlencode(($coord['addr1'] ? $coord['addr1'] . ',' : '')
+									. ($coord['city'] ? $coord['city'] . ',' : '')
+									. ($coord['state'] ? $coord['state'] . ',' : ($coord['province'] ? $coord['province'] . ',' : ''))
+									. ($coord['zip'] ? $coord['zip'] . ',' : '')
+									. ($coord['country'] ? JText::_('PLG_FC_ADDRESSINT_CC_' . $coord['country']) : ''));
+							} else {
 								$map_link .= urlencode($coord['lat'] . "," . $coord['lon']);
 							}
 						}
 
-						$linkdirection= '<div class="directions"><a href="' . $map_link . '" target="_blank" class="direction btn">' . $directionname . '</a></div>';
+						$linkdirection = '<div class="directions"><a href="' . $map_link . '" target="_blank" class="direction btn">' . $directionname . '</a></div>';
 					}
 
 					// Popup window: custom text or default (Address + button link to item)
@@ -393,25 +389,50 @@ class modFlexigooglemapHelper
 						? $custom_marker_url_base . $coord['custom_marker']
 						: '';
 
-					if ($marker_path)
-					{
+					if ($marker_path) {
 						// Marker Size
 						list($wS, $hS) = getimagesize($marker_path);
 
 						// Marker Anchor
-						switch($marker_anchor)
-						{
-							case 'TopL' : $wA = 0;     $hA = 0; break;
-							case 'TopC' : $wA = $wS/2; $hA = 0; break;
-							case 'TopR' : $wA = $wS;   $hA = 0; break;
+						switch ($marker_anchor) {
+							case 'TopL':
+								$wA = 0;
+								$hA = 0;
+								break;
+							case 'TopC':
+								$wA = $wS / 2;
+								$hA = 0;
+								break;
+							case 'TopR':
+								$wA = $wS;
+								$hA = 0;
+								break;
 
-							case 'MidL' : $wA = 0;     $hA = $hS/2; break;
-							case 'MidC' : $wA = $wS/2; $hA = $hS/2; break;
-							case 'MidR' : $wA = $wS;   $hA = $hS/2; break;
+							case 'MidL':
+								$wA = 0;
+								$hA = $hS / 2;
+								break;
+							case 'MidC':
+								$wA = $wS / 2;
+								$hA = $hS / 2;
+								break;
+							case 'MidR':
+								$wA = $wS;
+								$hA = $hS / 2;
+								break;
 
-							case 'BotL' : $wA = 0;     $hA = $hS; break;
-							case 'BotC' : $wA = $wS/2; $hA = $hS; break;
-							case 'BotR' : $wA = $wS;   $hA = $hS; break;
+							case 'BotL':
+								$wA = 0;
+								$hA = $hS;
+								break;
+							case 'BotC':
+								$wA = $wS / 2;
+								$hA = $hS;
+								break;
+							case 'BotR':
+								$wA = $wS;
+								$hA = $hS;
+								break;
 						}
 					}
 
@@ -439,23 +460,21 @@ class modFlexigooglemapHelper
 	/**
 	 * Get a default Marker icon URL for map locations that do not specify a specific marker icon
 	 */
-	public static function getDefaultMarkerURL($params, & $wS = 0, & $hS = 0, & $wA = 0, & $hA = 0)
+	public static function getDefaultMarkerURL($params, &$wS = 0, &$hS = 0, &$wA = 0, &$hA = 0)
 	{
 		// Get marker mode, 'lettermarkermode' was old parameter name, (in future wew may more more modes, so the old parameter name was renamed)
 		$markermode  = (int) $params->get('markermode', $params->get('lettermarkermode', 0));
 		$markerimage = $params->get('markerimage', '');
 
 		// Fall back to default marker icon if custom image not set
-		if ($markermode === 1 && !$markerimage)
-		{
+		if ($markermode === 1 && !$markerimage) {
 			$markermode = -1;
 		}
 
 		$defautmarker_path = '';
 
-		switch ($markermode)
-		{
-			// 'Letter' mode
+		switch ($markermode) {
+				// 'Letter' mode
 			case 1:
 				$color_to_file = array(
 					'red'   => 'spotlight-waypoint-b.png',
@@ -469,13 +488,13 @@ class modFlexigooglemapHelper
 					. "&psize=16&font=fonts/arialuni_t.ttf&color=ff330000&scale=1&ax=44&ay=48";
 				break;
 
-			// 'Local image file' mode
+				// 'Local image file' mode
 			case 0:
 				$defautmarker_path = JPATH_SITE . '/' . $markerimage;
 				$defautmarker_url  = JUri::root(true) . '/' . $markerimage;
 				break;
 
-			// Default marker icon
+				// Default marker icon
 			case -1:
 			default:
 				// AVOID changing default, getimagesize on the URL may slow down page execution, giving false sense of slower PHP execution
@@ -490,24 +509,20 @@ class modFlexigooglemapHelper
 		 * Calculate Default Marker Size and placement ! Because this is maybe a URL we will use caching !
 		 * in order to avoid delay during PHP execution, which may falsely be considered slow ...
 		 */
-		
-		if ($defautmarker_url && $params->get('mapapi', 'googlemap') !== 'googlemap')
-		{
+
+		if ($defautmarker_url && $params->get('mapapi', 'googlemap') !== 'googlemap') {
 			$start_microtime = microtime(true);
-			if (FLEXI_CACHE)
-			{
+			if (FLEXI_CACHE) {
 				$cache = JFactory::getCache('com_flexicontent');
 				$cache->setCaching(1);                  // Force cache ON
 				$cache->setLifeTime(FLEXI_CACHE_TIME);  // Set expire time (default is 1 hour)
 				list($wS, $hS) = $cache->get('getimagesize', array($defautmarker_path ?: $defautmarker_url));
-			}
-			else
-			{
+			} else {
 				list($wS, $hS) = getimagesize($defautmarker_path ?: $defautmarker_url);
 			}
 
 			// Marker Anchor
-			$wA = $wS/2;
+			$wA = $wS / 2;
 			$hA = $hS;
 
 			//$time_passed = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
@@ -526,8 +541,7 @@ class modFlexigooglemapHelper
 		static $fields = array();
 
 		// Return already loaded field
-		if (isset($fields[$fieldid]))
-		{
+		if (isset($fields[$fieldid])) {
 			return $fields[$fieldid];
 		}
 
@@ -536,8 +550,7 @@ class modFlexigooglemapHelper
 		$field   = !empty($_fields[$fieldid]) ? $_fields[$fieldid] : false;
 
 		// Parse field parameters
-		if ($field)
-		{
+		if ($field) {
 			$field->parameters = new JRegistry($field->attribs);
 		}
 
