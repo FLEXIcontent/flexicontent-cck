@@ -378,7 +378,7 @@
 					labelclass="label text-white bg-warning label-warning"
 				/>
 				<field
-					name="width_modal"
+					name="modal_width"
 					type="number"
 					defaut="800"
 					class="mode_modal"
@@ -387,7 +387,7 @@
 				/>
 
 				<field
-					name="height_modal"
+					name="modal_height"
 					type="number"
 					defaut="600"
 					class="mode_modal"

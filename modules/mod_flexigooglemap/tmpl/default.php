@@ -63,8 +63,8 @@ if ($map_style) {
 	}
 }
 //modal size
-$windows_width = $params->get('width_modal', '0');
-$windows_height = $params->get('height_modal', '0');
+$windows_width = (int) $params->get('modal_width', 0);
+$windows_height = (int) $params->get('modal_height', 0);
 $custom_layout = $params->get('ilayout', '');
 $marker_clicktarget = $params->get('marker_clicktarget', '_popup');
 
