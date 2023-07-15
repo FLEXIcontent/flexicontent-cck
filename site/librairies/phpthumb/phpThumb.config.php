@@ -19,7 +19,7 @@ if ( ini_get('date.timezone')=='' ) {
 // ALLOW INCLUDING CONFIG multiple times
 if (!defined('phpThumbConfigFileVersion'))
 {
-	define('phpThumbConfigFileVersion', '1.7.19');
+	define('phpThumbConfigFileVersion', '1.7.16');
 }
 
 ob_start();
@@ -252,6 +252,10 @@ $PHPTHUMB_DEFAULTS_DISABLEGETPARAMS  = false; // if true, GETstring parameters w
 //$PHPTHUMB_DEFAULTS['fltr'] = array('blur|10');
 //$PHPTHUMB_DEFAULTS['q']    =  90;
 
+// benchmark by https://www.industrialempathy.com/posts/avif-webp-quality-settings/ suggests:
+// JPEG quality	50	60	70	80
+// AVIF quality	48	51	56	64
+// WebP quality	55	64	72	82
 
 /* END DEFAULT PARAMETERS SECTION */
 
