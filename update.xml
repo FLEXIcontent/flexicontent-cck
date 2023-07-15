@@ -1,6 +1,6 @@
 <updates>
-	<update>
 
+	<update>
 		<name>FLEXIcontent</name>
 		<description>FLEXIContent CCK</description>
 		<element>com_flexicontent</element>
@@ -23,6 +23,31 @@
 		<maintainer>FLEXIcontent team</maintainer>
 		<maintainerurl>http://www.flexicontent.org</maintainerurl>
 		<targetplatform name="joomla" version="3" />
-
 	</update>
+
+	<update>
+		<name>FLEXIcontent</name>
+		<description>FLEXIContent CCK</description>
+		<element>com_flexicontent</element>
+		<type>component</type>
+		<client>administrator</client>
+		<version>4.2.1</version>
+
+		<infourl title="FAQ">
+			https://flexicontent.org/_documentation_notes/
+		</infourl>
+
+		<downloads>
+			<downloadurl type="full" format="zip">https://github.com/FLEXIcontent/flexicontent-cck/archive/v4.2.1.zip</downloadurl>
+		</downloads>
+
+		<tags>
+			<tag>stable</tag>
+		</tags>
+
+		<maintainer>FLEXIcontent team</maintainer>
+		<maintainerurl>http://www.flexicontent.org</maintainerurl>
+		<targetplatform name="joomla" version="4" />
+	</update>
+
 </updates>
