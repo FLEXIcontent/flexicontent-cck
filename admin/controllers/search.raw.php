@@ -235,6 +235,9 @@ class FlexicontentControllerSearch extends FlexicontentControllerBaseAdmin
 		// Test indexing with limited memory
 		// ini_set("memory_limit", "20M");
 
+		// Try to increment the memory limit
+		$this->_increase_memory_limit();
+
 		$start_microtime = microtime(true);
 
 		$session = JFactory::getSession();
@@ -657,6 +660,7 @@ class FlexicontentControllerSearch extends FlexicontentControllerBaseAdmin
 			$records_start = $records_start + self::$record_limit;
 
 			// Get next set of records
+			$total = null;
 			$record_ids = $records_model->getFieldsItems(/*$field_ids*/ null,
 				$total, $records_start, self::$record_limit
 			);
@@ -742,7 +746,6 @@ class FlexicontentControllerSearch extends FlexicontentControllerBaseAdmin
 	}
 
 
-
 	/**
 	 * Method to purge the Advanced search index
 	 *
@@ -756,5 +759,36 @@ class FlexicontentControllerSearch extends FlexicontentControllerBaseAdmin
 		$model->purge();
 		$msg = JText::_('FLEXI_ITEMS_PURGED');
 		$this->setRedirect('index.php?option=com_flexicontent&view=search', $msg);
+	}
+
+
+	private function _increase_memory_limit()
+	{
+		// Try to increment memory limits
+		$memory_limit	= trim( @ ini_get( 'memory_limit' ) );
+		if ( $memory_limit )
+		{
+			switch (strtolower(substr($memory_limit, -1)))
+			{
+				case 'm': $memory_limit = (int)substr($memory_limit, 0, -1) * 1048576; break;
+				case 'k': $memory_limit = (int)substr($memory_limit, 0, -1) * 1024; break;
+				case 'g': $memory_limit = (int)substr($memory_limit, 0, -1) * 1073741824; break;
+				case 'b':
+					switch (strtolower(substr($memory_limit, -2, 1)))
+					{
+						case 'm': $memory_limit = (int)substr($memory_limit, 0, -2) * 1048576; break;
+						case 'k': $memory_limit = (int)substr($memory_limit, 0, -2) * 1024; break;
+						case 'g': $memory_limit = (int)substr($memory_limit, 0, -2) * 1073741824; break;
+						default : break;
+					} break;
+				default: break;
+			}
+			if ( $memory_limit < 16 * 1024 * 1024 ) @ ini_set( 'memory_limit', '16M' );
+			if ( $memory_limit < 32 * 1024 * 1024 ) @ ini_set( 'memory_limit', '32M' );
+			if ( $memory_limit < 64 * 1024 * 1024 ) @ ini_set( 'memory_limit', '64M' );
+			if ( $memory_limit < 128 * 1024 * 1024 ) @ ini_set( 'memory_limit', '128M' );
+			if ( $memory_limit < 256 * 1024 * 1024 ) @ ini_set( 'memory_limit', '256M' );
+			if ( $memory_limit < 512 * 1024 * 1024 ) @ ini_set( 'memory_limit', '512M' );
+		}
 	}
 }
