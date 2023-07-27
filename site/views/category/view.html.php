@@ -664,8 +664,9 @@ class FlexicontentViewCategory extends JViewLegacy
 		// *** Get some variables needed for images
 		// ***
 
-		$joomla_image_path = ComponentHelper::getParams('com_media')->get('image_path', 'images');
-		//$joomla_image_url  = str_replace (DS, '/', $joomla_image_path);
+		$joomla_image_path = FLEXI_J40GE 
+            ?	ComponentHelper::getParams('com_media')->get('image_path', 'images') 
+            : $app->getCfg('image_path', '');
 		$joomla_image_path = $joomla_image_path ? $joomla_image_path.DS : '';
 		$joomla_image_url  = '';//$joomla_image_url  ? $joomla_image_url.'/' : ''; // NEED REVIEW
 		$phpThumbURL = $this->baseurl.'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=';
