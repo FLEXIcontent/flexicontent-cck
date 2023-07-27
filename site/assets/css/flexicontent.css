@@ -6047,6 +6047,7 @@ button.ui-dialog-titlebar-close:after {
 	flex-direction: row;
 	column-gap: 10px;
 	margin-bottom: 10px;
+	margin-top: 10px;
 }
 .col-search .inline-button .btn {
 	width: 100%;
