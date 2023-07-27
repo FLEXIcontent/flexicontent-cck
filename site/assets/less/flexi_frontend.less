@@ -1590,3 +1590,18 @@ button.ui-dialog-titlebar-close:after {
 	content: '\f410';
 	font-family: 'Font Awesome 5 Free';
 }
+/* better display in search view **/
+.col-search .inline-button{
+display: flex;
+    justify-content: space-between;
+    flex-wrap: nowrap;
+    flex-direction: row;
+    column-gap: 10px;
+	margin-bottom: 10px;
+}
+.col-search .inline-button .btn{
+	width:100%;
+}
+.view-search .select2-container.select2-container-multi.fc_index_complete_tlike.fc_adv_complete {
+    height: 0px;
+}
