@@ -151,7 +151,7 @@ class FlexicontentViewFields extends FlexicontentViewBaseRecords
 		// Create document/toolbar titles
 		$doc_title = JText::_( 'FLEXI_FIELDS' );
 		$site_title = $document->getTitle();
-		JToolbarHelper::title( $doc_title, 'fields' );
+		JToolbarHelper::title( $doc_title, 'puzzle' );
 		$document->setTitle($doc_title .' - '. $site_title);
 
 		// Create the toolbar
