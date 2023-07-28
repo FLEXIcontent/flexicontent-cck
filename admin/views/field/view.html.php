@@ -154,8 +154,8 @@ class FlexicontentViewField extends FlexicontentViewBaseRecord
 
 		// SET toolbar title
 		!$isnew
-			? JToolbarHelper::title( JText::_( 'FLEXI_EDIT_FIELD' ), 'fieldedit' )
-			: JToolbarHelper::title( JText::_( 'FLEXI_ADD_FIELD' ), 'fieldadd' );
+			? JToolbarHelper::title( JText::_( 'FLEXI_EDIT_FIELD' ), 'puzzle' )
+			: JToolbarHelper::title( JText::_( 'FLEXI_ADD_FIELD' ), 'puzzle' );
 
 
 		/**
