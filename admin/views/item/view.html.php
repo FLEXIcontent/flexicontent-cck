@@ -649,7 +649,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 
 		// Set toolbar title
 		$item->id
-			? JToolbarHelper::title( JText::_( 'FLEXI_EDIT_ITEM' ), 'icon-itemedit' )   // Editing existing item
+			? JToolbarHelper::title( JText::_( 'FLEXI_EDIT_ITEM' ), 'icon-pencil-alt' )   // Editing existing item
 			: JToolbarHelper::title( JText::_( 'FLEXI_NEW_ITEM' ), 'icon-file-alt' );    // Creating new item
 
 		// Hide default toolbar
