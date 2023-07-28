@@ -649,8 +649,8 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 
 		// Set toolbar title
 		$item->id
-			? JToolbarHelper::title( JText::_( 'FLEXI_EDIT_ITEM' ), 'itemedit' )   // Editing existing item
-			: JToolbarHelper::title( JText::_( 'FLEXI_NEW_ITEM' ), 'itemadd' );    // Creating new item
+			? JToolbarHelper::title( JText::_( 'FLEXI_EDIT_ITEM' ), 'icon-itemedit' )   // Editing existing item
+			: JToolbarHelper::title( JText::_( 'FLEXI_NEW_ITEM' ), 'icon-file-alt' );    // Creating new item
 
 		// Hide default toolbar
 		$buttons_placement = (int) $page_params->get('buttons_placement' . $CFGsfx, ($isSite ? 0 : -1));
