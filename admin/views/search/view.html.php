@@ -168,7 +168,7 @@ class FLEXIcontentViewSearch extends FlexicontentViewBaseRecords
 		// Create document/toolbar titles
 		$doc_title = JText::_( 'FLEXI_SEARCH_INDEX' );
 		$site_title = $document->getTitle();
-		JToolbarHelper::title( $doc_title, FLEXI_J16GE ? 'searchtext.png' : 'searchindex' );
+		JToolbarHelper::title( $doc_title, 'search' );
 		$document->setTitle($doc_title .' - '. $site_title);
 
 		// Create the toolbar

@@ -103,7 +103,7 @@ class FlexicontentViewStats extends FlexicontentViewBaseRecords
 		// Create document/toolbar titles
 		$doc_title = JText::_( 'FLEXI_STATISTICS' );
 		$site_title = $document->getTitle();
-		JToolbarHelper::title( $doc_title, 'stats' );
+		JToolbarHelper::title( $doc_title, 'icon-signal' );
 		$document->setTitle($doc_title .' - '. $site_title);
 		
 		// Create the toolbar

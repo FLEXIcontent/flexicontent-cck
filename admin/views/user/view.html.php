@@ -130,8 +130,8 @@ class FlexicontentViewUser extends FlexicontentViewBaseRecord
 
 		// SET toolbar title
 		!$isnew
-			? JToolbarHelper::title(JText::_( 'FLEXI_EDIT_USER'), 'authoredit')
-			: JToolbarHelper::title(JText::_( 'FLEXI_ADD_USER'), 'authoradd');
+			? JToolbarHelper::title(JText::_( 'FLEXI_EDIT_USER'), 'user')
+			: JToolbarHelper::title(JText::_( 'FLEXI_ADD_USER'), 'user');
 
 		$btn_name = 'apply';
 		$btn_task = $ctrl.'.apply';

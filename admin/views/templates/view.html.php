@@ -116,7 +116,7 @@ class FlexicontentViewTemplates extends FlexicontentViewBaseRecords
 		// Create document/toolbar titles
 		$doc_title = JText::_('FLEXI_TEMPLATES');
 		$site_title = $document->getTitle();
-		JToolbarHelper::title( $doc_title, 'templates' );
+		JToolbarHelper::title( $doc_title, 'eye' );
 		$document->setTitle($doc_title .' - '. $site_title);
 
 		// Create the toolbar
