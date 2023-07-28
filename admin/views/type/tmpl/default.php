@@ -11,349 +11,333 @@
 
 defined('_JEXEC') or die('Restricted access');
 
-//adding inline help
-if (FLEXI_J40GE) JToolbarHelper::inlinehelp();
+use Joomla\String\StringHelper;
+use Joomla\Utilities\ArrayHelper;
 
-// Load JS tabber lib
-$this->document->addScript(JUri::root(true).'/components/com_flexicontent/assets/js/tabber-minimized.js', array('version' => FLEXI_VHASH));
-$this->document->addStyleSheet(JUri::root(true).'/components/com_flexicontent/assets/css/tabber.css', array('version' => FLEXI_VHASH));
-$this->document->addScriptDeclaration(' document.write(\'<style type="text/css">.fctabber{display:none;}<\/style>\'); ');  // temporarily hide the tabbers until javascript runs
-$js = "
-	jQuery(document).ready(function(){
-		fc_bindFormDependencies('#flexicontent', 0, '');
-	});
-";
-$this->document->addScriptDeclaration($js);
-?>
+JLoader::register('FlexicontentViewBaseRecord', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/base/view_record.php');
 
-<div id="flexicontent" class="flexicontent fcconfig-form">
-<form action="index.php" method="post" name="adminForm" id="adminForm" class="form-validate form-horizontal">
+/**
+ * HTML View class for the Type screen
+ */
+class FlexicontentViewType extends FlexicontentViewBaseRecord
+{
+	var $proxy_option = null;
 
-	<div class="container-fluid row" style="padding: 0px !important; margin: 0px! important;">
+	/**
+	 * Display the view
+	 */
+	public function display($tpl = null)
+	{
+		/**
+		 * Initialize variables, flags, etc
+		 */
 
-		<div class="span6 col-6 full_width_980">
+		$app        = JFactory::getApplication();
+		$jinput     = $app->input;
+		$document   = JFactory::getDocument();
+		$user       = JFactory::getUser();
+		$db         = JFactory::getDbo();
+		$cparams    = JComponentHelper::getParams('com_flexicontent');
+		$perms      = FlexicontentHelperPerm::getPerm();
 
-			<table class="fc-form-tbl" style="margin-bottom:12px;">
+		// Get url vars and some constants
+		$option     = $jinput->get('option', '', 'cmd');
+		$view       = $jinput->get('view', '', 'cmd');
+		$task       = $jinput->get('task', '', 'cmd');
+		$controller = $jinput->get('controller', '', 'cmd');
 
-				<tr>
-					<td class="key">
-							<?php echo $this->form->getLabel('name'); ?>
-					</td>
-					<td>
-						<?php echo $this->form->getInput('name'); ?>
-						<input type="hidden" id="jform_title" name="jform[title]" value="<?php echo $this->form->getValue('name'); ?>" />
-					</td>
-				</tr>
+		$isAdmin  = $app->isClient('administrator');
+		$isCtmpl  = $jinput->getCmd('tmpl') === 'component';
 
-				<tr>
-					<td class="key">
-						<?php echo $this->form->getLabel('published'); ?>
-					</td>
-					<td>
-						<?php echo $this->form->getInput('published'); ?>
-					</td>
-				</tr>
-
-				<tr>
-					<td class="key">
-						<?php echo $this->form->getLabel('access'); ?>
-					</td>
-					<td>
-						<?php echo $this->form->getInput('access'); ?>
-					</td>
-				</tr>
-
-				<tr>
-					<td class="key">
-						<?php echo $this->form->getLabel('alias'); ?>
-					</td>
-					<td>
-						<?php echo $this->form->getInput('alias'); ?>
-					</td>
-				</tr>
-
-				<tr>
-					<td class="key">
-						<?php echo $this->form->getLabel('itemscreatable'); ?>
-					</td>
-					<td>
-						<?php echo $this->form->getInput('itemscreatable'); ?>
-					</td>
-				</tr>
-
-			</table>
-
-		</div>
-
-		<div class="span6 col-6 full_width_980">
-
-			<div class="fc-info fc-nobgimage fc-mssg" style="display:block; float:left; clear:both; margin: 32px 0px 32px 0px !important; font-size:12px;">
-				<?php echo str_replace('<br/>', ' ', JText::_('FLEXI_ITEM_PARAM_OVERRIDE_ORDER_DETAILS')); ?>
-			</div>
-
-		</div>
-
-	</div>
+		$tip_class = ' hasTooltip';
+		$manager_view = 'types';
+		$ctrl = 'types';
+		$js = '';
 
 
-	<div class="fctabber fields_tabset" id="field_specific_props_tabset">
+		/**
+		 * Common view
+		 */
 
-		<div class="tabbertab" id="core_fields-options" data-icon-class="icon-paragraph-justify" >
-			<h3 class="tabberheading"> <?php echo JText::_('FLEXI_DESCRIPTION'); ?> </h3>
-			<div class="alert alert-success" style="display: inline-block;">
-				<?php echo JText::_('FLEXI_REGARDING_ITEM_TYPE_DESCRIPTION_TEXT_USAGE'); ?>
-			</div>
-			<?php echo $this->form->getInput('description'); ?>
-
-			</div>
-
-		<div class="tabbertab" id="core_fields-options" data-icon-class="icon-cogs" >
-			<h3 class="tabberheading"> <?php echo JText::_('FLEXI_CORE_FIELDS'); ?> </h3>
-
-			<?php
-			//echo JHtml::_('sliders.start','basic-sliders-'.$this->form->getValue("id"), array('useCookie'=>1));
-			$fieldSets = $this->form->getFieldsets('attribs');
-			$prefix_len = strlen('customize_field-');
-			foreach ($fieldSets as $fsname => $fieldSet) :
-				if ( substr($fsname, 0, $prefix_len)!='customize_field-' ) continue;
-
-				$label = !empty($fieldSet->label) ? $fieldSet->label : 'FLEXI_'.strtoupper($fsname).'_FIELDSET_LABEL';
-				//echo JHtml::_('sliders.panel', JText::_($label), $fsname.'-options');
-				if (isset($fieldSet->description) && trim($fieldSet->description)) :
-					echo '<div class="fc-mssg fc-info">'.JText::_($fieldSet->description).'</div>';
-				endif;
-
-				foreach ($this->form->getFieldset($fsname) as $field) :
-					$_depends = $field->getAttribute('depend_class');
-					echo ($field->getAttribute('type')=='separator' || $field->hidden) ? $field->input : '
-					<div class="control-group'.($_depends ? ' '.$_depends : '').'" id="'.$field->id.'-container">
-						<div class="control-label">'.$field->label.'</div>
-						<div class="controls">
-							' . $this->getFieldInheritedDisplay($field, $this->cparams) . '
-						</div>
-					</div>
-					';
-				endforeach;
-			endforeach;
-			//echo JHtml::_('sliders.end');
-			?>
-		</div>
-
-		<?php
-		//echo JHtml::_('sliders.start','basic-sliders-'.$this->form->getValue("id"), array('useCookie'=>1));
-		$fieldSets = $this->form->getFieldsets('attribs');
-		$prefix_len = strlen('customize_field-');
-		foreach ($fieldSets as $fsname => $fieldSet) :
-			if ( $fsname=='themes' || substr($fsname, 0, $prefix_len)=='customize_field-' ) continue;
-
-			$label = !empty($fieldSet->label) ? $fieldSet->label : 'FLEXI_'.strtoupper($fsname).'_FIELDSET_LABEL';
-?>
-		<div class="tabbertab" id="<?php echo $fsname; ?>-options" data-icon-class="<?php echo isset($fieldSet->icon_class) ? $fieldSet->icon_class : 'icon-pencil';?>" >
-			<h3 class="tabberheading"> <?php echo JText::_($label); ?> </h3>
-<?php
-			//echo JHtml::_('sliders.panel', JText::_($label), $fsname.'-options');
-			if (isset($fieldSet->description) && trim($fieldSet->description)) :
-				echo '<div class="fc-mssg fc-info">'.JText::_($fieldSet->description).'</div>';
-			endif;
-
-			foreach ($this->form->getFieldset($fsname) as $field) :
-				$_depends = $field->getAttribute('depend_class');
-				if ( $field->getAttribute('box_type') )
-					echo $field->input;
-				else
-					echo ($field->getAttribute('type')=='separator' || $field->hidden) ? $field->input : '
-					<div class="control-group'.($_depends ? ' '.$_depends : '').'" id="'.$field->id.'-container">
-						<div class="control-label">'.$field->label.'</div>
-						<div class="controls">
-							' . $this->getFieldInheritedDisplay($field, $this->cparams) . '
-						</div>
-					</div>
-					';
-
-			endforeach;
-		?>
-		</div>
-
-		<?php endforeach;
-		//echo JHtml::_('sliders.end');
-		?>
+		$this->prepare_common_fcview();
 
 
-	<!-- Template tab -->
-	<div class="tabbertab" id="themes-options" data-icon-class="icon-palette">
-		<h3 class="tabberheading"> <?php echo JText::_('FLEXI_LAYOUT'); ?> </h3>
+		/**
+		 * Get record data, and check if record is already checked out
+		 */
 
-		<div class="fc_tabset_inner">
+		// Get model and load the record data
+		$model = $this->getModel();
+		$row   = $this->get('Item');
+		$isnew = ! $row->id;
 
-			<span class="btn-group input-append" style="margin: 2px 0px 6px;">
-				<span id="fc-layouts-help_btn" class="btn" onclick="fc_toggle_box_via_btn('fc-layouts-help', this, 'btn-primary');" ><span class="icon-help"></span><?php echo JText::_('JHELP'); ?></span>
-			</span>
-			<div class="fcclear"></div>
+		// Get JForm
+		$form = $this->get('Form');
 
-			<div class="fc-info fc-nobgimage fc-mssg-inline" id="fc-layouts-help" style="margin: 2px 0px!important; font-size: 12px; display: none;">
-				<h3 class="themes-title">
-					<?php echo JText::_( 'FLEXI_PARAMETERS_LAYOUT_EXPLANATION' ); ?>
-				</h3>
-				<b>NOTE:</b> Common method for -displaying- fields is by <b>editing the template layout</b> in template manager and placing the fields into <b>template positions</b>
-			</div>
-			<div class="fcclear"></div>
+		if (!$form)
+		{
+			$app->enqueueMessage($model->getError(), 'warning');
 
-			<?php
-			foreach ($this->form->getFieldset('themes') as $field):
-				if (!$field->label || $field->hidden)
+			if ($jinput->getCmd('tmpl') !== 'component')
+			{
+				$app->redirect( 'index.php?option=com_flexicontent&view=' . $manager_view );
+			}
+			return;
+		}
+
+		// Fail if an existing record is checked out by someone else
+		if ($row->id && $model->isCheckedOut($user->get('id')))
+		{
+			$app->enqueueMessage(JText::_( 'FLEXI_EDITED_BY_ANOTHER_ADMIN' ), 'warning');
+
+			if ($jinput->getCmd('tmpl') !== 'component')
+			{
+				$app->redirect( 'index.php?option=com_flexicontent&view=' . $manager_view );
+			}
+			return;
+		}
+
+
+		/**
+		 * Include needed files and add needed js / css files
+		 */
+
+		// Add css to document
+		if ($isAdmin)
+		{
+			!JFactory::getLanguage()->isRtl()
+				? $document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', array('version' => FLEXI_VHASH))
+				: $document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', array('version' => FLEXI_VHASH));
+			!JFactory::getLanguage()->isRtl()
+				? $document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x.css' : 'j3x.css'), array('version' => FLEXI_VHASH))
+				: $document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x_rtl.css' : 'j3x_rtl.css'), array('version' => FLEXI_VHASH));
+		}
+		else
+		{
+			!JFactory::getLanguage()->isRtl()
+				? $document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontent.css', array('version' => FLEXI_VHASH))
+				: $document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontent_rtl.css', array('version' => FLEXI_VHASH));
+		}
+
+		// Add JS frameworks
+		flexicontent_html::loadFramework('select2');
+		flexicontent_html::loadFramework('touch-punch');
+		flexicontent_html::loadFramework('prettyCheckable');
+		flexicontent_html::loadFramework('flexi-lib');
+		flexicontent_html::loadFramework('flexi-lib-form');
+
+		// Load custom behaviours: form validation, popup tooltips
+		JHtml::_('behavior.formvalidator');
+		JHtml::_('bootstrap.tooltip');
+
+		// Add js function to overload the joomla submitform validation
+		$document->addScript(JUri::root(true).'/components/com_flexicontent/assets/js/admin.js', array('version' => FLEXI_VHASH));
+		$document->addScript(JUri::root(true).'/components/com_flexicontent/assets/js/validate.js', array('version' => FLEXI_VHASH));
+
+
+		/**
+		 * Create the toolbar
+		 */
+
+		$toolbar = JToolbar::getInstance('toolbar');
+
+		// Creation flag used to decide if adding save and new / save as copy buttons are allowed
+		$cancreate = true;
+
+		// SET toolbar title
+		!$isnew
+			? JToolbarHelper::title( JText::_( 'FLEXI_EDIT_TYPE' ), 'database' )
+			: JToolbarHelper::title( JText::_( 'FLEXI_ADD_TYPE' ), 'database' );
+
+
+		/**
+		 * Apply buttons
+		 */
+
+		// Apply button
+		$btn_arr = array();
+
+		// Add ajax apply only for existing records
+		if (!$isnew)
+		{
+			$btn_name = 'apply_ajax';
+			$btn_task = $ctrl.'.apply_ajax';
+
+			$btn_arr[$btn_name] = flexicontent_html::addToolBarButton(
+				'FLEXI_APPLY', $btn_name, $full_js="Joomla.submitbutton('".$ctrl.".apply_ajax')", $msg_alert='', $msg_confirm='',
+				$btn_task, $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false,
+				$btn_class=(FLEXI_J40GE ? ' _DDI_class_ btn-success ' : '') . ' ' . $this->tooltip_class, $btn_icon="icon-loop",
+				'data-placement="bottom" title="'.JText::_('FLEXI_FAST_SAVE_INFO', true).'"', $auto_add = 0);
+		}
+
+		// Apply & Reload button   ***   (Apply Type, is a special case of new that has not loaded custom fieds yet, due to type not defined on initial form load)
+		if ($isAdmin && !$isCtmpl)
+		{
+			$btn_name = 'apply';
+			$btn_task = $ctrl.'.apply';
+			$btn_title = !$isnew ? 'FLEXI_APPLY_N_RELOAD' : 'FLEXI_ADD';
+
+			//JToolbarHelper::apply($btn_task, $btn_title, false);
+
+			$btn_arr[$btn_name] = flexicontent_html::addToolBarButton(
+				$btn_title, $btn_name, $full_js="Joomla.submitbutton('".$btn_task."')", $msg_alert='', $msg_confirm='',
+				$btn_task, $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false,
+				$btn_class=(FLEXI_J40GE ? ' _DDI_class_ btn-success ' : '') . ' ' . $this->tooltip_class, $btn_icon="icon-save",
+				'data-placement="right" title=""', $auto_add = 0);
+		}
+
+		flexicontent_html::addToolBarDropMenu(
+			$btn_arr,
+			'apply_btns_group',
+			null,
+			array('drop_class_extra' => (FLEXI_J40GE ? 'btn-success' : ''))
+		);
+
+
+		/**
+		 * Save buttons
+		 */
+
+		$btn_arr = array();
+		if (1)
+		{
+			$btn_name = 'save';
+			$btn_task = $ctrl.'.save';
+
+			//JToolbarHelper::save($btn_task);  //JToolbarHelper::custom( $btn_task, 'save.png', 'save.png', 'JSAVE', false );
+
+			$btn_arr[$btn_name] = flexicontent_html::addToolBarButton(
+				'JSAVE', $btn_name, $full_js="Joomla.submitbutton('".$ctrl.".save')", $msg_alert='', $msg_confirm='',
+				$btn_task, $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false,
+				$btn_class=(FLEXI_J40GE ? ' _DDI_class_ btn-success ' : '') . ' ' . $this->tooltip_class, $btn_icon="icon-save",
+				'data-placement="bottom" title=""', $auto_add = 0);
+			}
+
+
+		// Add a save and new button, if user can create new records
+		if (!$isCtmpl && $cancreate)
+		{
+			$btn_name = 'save2new';
+			$btn_task = $ctrl.'.save2new';
+
+			//JToolbarHelper::save2new($btn_task);  //JToolbarHelper::custom( $btn_task, 'savenew.png', 'savenew.png', 'FLEXI_SAVE_AND_NEW', false );
+
+			$btn_arr[$btn_name] = flexicontent_html::addToolBarButton(
+				'FLEXI_SAVE_AND_NEW', $btn_name, $full_js="Joomla.submitbutton('".$ctrl.".save2new')", $msg_alert='', $msg_confirm='',
+				$btn_task, $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false,
+				$btn_class= (FLEXI_J40GE ? ' _DDI_class_ btn-success ' : '') . ' ' . $this->tooltip_class, $btn_icon="icon-save-new",
+				'data-placement="right" title="'.JText::_('FLEXI_SAVE_AND_NEW_INFO', true).'"', $auto_add = 0);
+
+			// Also if an existing item, can save to a copy
+			if (!$isnew)
+			{
+				$btn_name = 'save2copy';
+				$btn_task = $ctrl.'.save2copy';
+
+				//JToolbarHelper::save2copy($btn_task);  //JToolbarHelper::custom( $btn_task, 'save2copy.png', 'save2copy.png', 'FLEXI_SAVE_AS_COPY', false );
+
+				$btn_arr[$btn_name] = flexicontent_html::addToolBarButton(
+					'FLEXI_SAVE_AS_COPY', $btn_name, $full_js="Joomla.submitbutton('".$ctrl.".save2copy')", $msg_alert='', $msg_confirm='',
+					$btn_task, $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false,
+					$btn_class= (FLEXI_J40GE ? ' _DDI_class_ btn-success ' : '') . ' ' . $this->tooltip_class, $btn_icon="icon-save-copy",
+					'data-placement="right" title="'.JText::_('FLEXI_SAVE_AS_COPY_INFO', true).'"', $auto_add = 0);
+			}
+		}
+
+		flexicontent_html::addToolBarDropMenu(
+			$btn_arr,
+			'save_btns_group',
+			null,
+			array('drop_class_extra' => (FLEXI_J40GE ? 'btn-success' : ''))
+		);
+
+
+		// Cancel button, TODO frontend modal close
+		if ($isAdmin && !$isCtmpl)
+		{
+			$isnew
+				? JToolbarHelper::cancel($ctrl.'.cancel', $isAdmin ? 'JTOOLBAR_CANCEL' : 'FLEXI_CANCEL')
+				: JToolbarHelper::cancel($ctrl.'.cancel', $isAdmin ? 'JTOOLBAR_CLOSE' : 'FLEXI_CLOSE_FORM');
+		}
+
+
+		/**
+		 * Get Layouts, load language of current selected template and apply Layout parameters values into the fields
+		 */
+
+		// Load language file of currently selected template
+		$_ilayout = $row->attribs->get('ilayout');
+		if ($_ilayout)
+		{
+			FLEXIUtilities::loadTemplateLanguageFile($_ilayout);
+		}
+
+		// Get the item layouts, checking template of current layout for modifications
+		$themes = flexicontent_tmpl::getTemplates($_ilayout);
+		$tmpls  = $themes->items;
+
+		// Create JForm for the layout and apply Layout parameters values into the fields
+		foreach ($tmpls as $tmpl)
+		{
+			if ($tmpl->name != $_ilayout) continue;
+
+			$jform = new JForm('com_flexicontent.template.item', array('control' => 'jform', 'load_data' => false));
+			$jform->load($tmpl->params);
+			$tmpl->params = $jform;
+			foreach ($tmpl->params->getGroup('attribs') as $field)
+			{
+				$fieldname = $field->fieldname;
+				$value = $row->attribs->get($fieldname);
+
+				if (strlen($value ?? ''))
 				{
-					echo $field->input;
-					continue;
+					$tmpl->params->setValue($fieldname, 'attribs', $value);
 				}
-				elseif ($field->input)
-				{
-					$_depends = $field->getAttribute('depend_class');
-					echo '
-					<div class="control-group'.($_depends ? ' '.$_depends : '').'" id="'.$field->id.'-container">
-						<div class="control-label">'.$field->label.'</div>
-						<div class="controls">
-							' . $this->getFieldInheritedDisplay($field, $this->cparams) . '
-						</div>
-					</div>
-					';
-				}
-			endforeach; ?>
+			}
+		}
 
-			<?php $item_layout = $this->row->attribs->get('ilayout'); ?>
-
-			<div class="fc-sliders-plain-outer <?php echo $item_layout ? 'fc_preloaded' : ''; ?>">
-				<?php
-				$slider_set_id = 'theme-sliders-' . $this->form->getValue('id');
-				//echo JHtml::_('sliders.start', $slider_set_id, array('useCookie'=>1));
-				echo JHtml::_('bootstrap.startAccordion', $slider_set_id, array(/*'active' => ''*/));
-
-				$groupname = 'attribs';  // Field Group name this is for name of <fields name="..." >
-
-				foreach ($this->tmpls as $tmpl) :
-
-					$form_layout = $tmpl->params;
-					$slider_title = '
-						<span class="btn"><i class="icon-edit"></i>
-							' . JText::_('FLEXI_PARAMETERS_THEMES_SPECIFIC') . ' : ' . $tmpl->name . '
-						</span>';
-					$slider_id = $tmpl->name . '-' . $groupname . '-options';
-
-					//echo JHtml::_('sliders.panel', $slider_title, $slider_id);
-					echo JHtml::_('bootstrap.addSlide', $slider_set_id, $slider_title, $slider_id);
-
-					if ($tmpl->name !== $item_layout)
-					{
-						echo JHtml::_('bootstrap.endSlide');
-						continue;
-					}
-
-					// Display only current layout and only get global layout parameters for it
-					$layoutParams = flexicontent_tmpl::getLayoutparams('items', $tmpl->name, '');
-					$layoutParams = new JRegistry($layoutParams);
-
-					$fieldSets = $form_layout->getFieldsets($groupname);
-					foreach ($fieldSets as $fsname => $fieldSet) : ?>
-						<fieldset class="panelform params_set">
-
-						<?php
-						if (isset($fieldSet->label) && trim($fieldSet->label)) :
-							echo '<div style="margin:0 0 12px 0; font-size: 16px; background-color: #333; float:none;" class="fcsep_level0">'.JText::_($fieldSet->label).'</div>';
-						endif;
-						if (isset($fieldSet->description) && trim($fieldSet->description)) :
-							echo '<div class="fc-mssg fc-info">'.JText::_($fieldSet->description).'</div>';
-						endif;
-
-						foreach ($form_layout->getFieldset($fsname) as $field) :
-
-							if ($field->getAttribute('not_inherited')) continue;
-							//if ($field->getAttribute('cssprep')) continue;
-
-							$fieldname  = $field->fieldname;
-							$cssprep    = $field->getAttribute('cssprep');
-							$labelclass = $cssprep == 'less' ? 'fc_less_parameter' : '';
-
-							// For J3.7.0+ , we have extra form methods Form::getFieldXml()
-							if ($cssprep && FLEXI_J37GE)
-							{
-								$_value = $form_layout->getValue($fieldname, $groupname, $layoutParams->get($fieldname));
-
-								// Not only set the disabled attribute but also clear the required attribute to avoid issues with some fields (like 'color' field)
-								$form_layout->setFieldAttribute($fieldname, 'disabled', 'true', $field->group);
-								$form_layout->setFieldAttribute($fieldname, 'required', 'false', $field->group);
-
-								$field->setup($form_layout->getFieldXml($fieldname, $field->group), $_value, $field->group);
-							}
-
-							echo ($field->getAttribute('type')=='separator' || $field->hidden || !$field->label)
-							 ? $field->input
-							 : '
-								<div class="control-group" id="'.$field->id.'-container">
-									<div class="control-label">'.
-										str_replace('class="', 'class="'.$labelclass.' ',
-											str_replace(' for="', ' data-for="',
-												str_replace('jform_attribs_', 'jform_layouts_'.$tmpl->name.'_',
-													$form_layout->getLabel($fieldname, $groupname)
-												)
-											)
-										) . '
-									</div>
-									<div class="controls">
-										' . ($cssprep && !FLEXI_J37GE
-											? (isset($this->iparams[$fieldname]) ? '<i>' . $this->iparams[$fieldname] . '</i>' : '<i>default</i>')
-											:
-											str_replace('jform_attribs_', 'jform_layouts_'.$tmpl->name.'_',
-												str_replace('[attribs]', '[layouts]['.$tmpl->name.']',
-													$this->getFieldInheritedDisplay($field, $layoutParams)
-													//$form_layout->getInput($fieldname, $groupname/*, $value*/)   // Value already set, no need to pass it
-												)
-											)
-										) .
-										($cssprep ? ' <span class="icon-info hasTooltip" title="' . JText::_('Used to auto-create a CSS styles file. To modify this, you can edit layout in template manager', true) . '"></span>' : '') . '
-									</div>
-								</div>
-							';
-
-						endforeach; ?>
-
-						</fieldset>
-
-					<?php endforeach; //fieldSets ?>
-					<?php echo JHtml::_('bootstrap.endSlide'); ?>
-
-				<?php endforeach; //tmpls ?>
-
-				<?php echo JHtml::_('bootstrap.endAccordion'); //echo JHtml::_('sliders.end'); ?>
-
-			</div><!-- END class="fc-sliders-plain-outer" -->
-		</div> <!-- END class="fc_tabset_inner" -->
-
-	</div><!-- END tabbertab FLEXI_LAYOUT -->
+		// Check access level exists
+		$level_name = flexicontent_html::userlevel(null, $row->access, null, null, '', $_createlist = false);
+		if (empty($level_name))
+		{
+			JFactory::getApplication()->enqueueMessage(JText::sprintf('FLEXI_ABOUT_INVALID_ACCESS_LEVEL_PLEASE_SAVE_NEW', $row->access, 'Public'), 'warning');
+			$document->addScriptDeclaration("jQuery(document).ready(function() { jQuery('#jform_access').val(1).trigger('change'); });");
+		}
 
 
+		/**
+		 * Add inline js to head
+		 */
 
-	<!-- Permissions tab -->
-	<div class="tabbertab" id="permissions-options" data-icon-class="icon-power-cord">
-		<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_PERMISSIONS' ); ?> </h3>
-
-		<div class="fc_tabset_inner">
-			<div id="access"><?php echo $this->form->getInput('rules'); ?></div>
-		</div>
-
-	</div> <!-- end tab -->
-
-</div> <!-- end of tab set -->
-
-<?php echo JHtml::_( 'form.token' ); ?>
-<input type="hidden" name="option" value="com_flexicontent" />
-<?php echo $this->form->getInput('id'); ?>
-<input type="hidden" name="controller" value="types" />
-<input type="hidden" name="view" value="type" />
-<input type="hidden" name="task" value="" />
-</form>
-</div>
+		if ($js)
+		{
+			$document->addScriptDeclaration('jQuery(document).ready(function(){'
+				.$js.
+			'});');
+		}
 
 
-<?php
-//keep session alive while editing
-JHtml::_('behavior.keepalive');
-?>
+		/**
+		 * Encode (UTF-8 charset) HTML entities form data so that they can be set as form field values
+		 * NOTE: we will use JForm to output fields so this is redundant
+		 */
+
+		//JFilterOutput::objectHTMLSafe( $row, ENT_QUOTES, $exclude_keys = '' );
+
+
+		/**
+		 * Assign variables to view
+		 */
+
+		$this->document = $document;
+		$this->row      = $row;
+		$this->form     = $form;
+		$this->perms    = $perms;
+		$this->tmpls    = $tmpls;
+		$this->cparams  = $cparams;
+		$this->view     = $view;
+		$this->controller = $controller;
+
+		parent::display($tpl);
+	}
+}
