@@ -1,5 +1,9 @@
 <?php
 
+// ADD TOOLTIPS
+use Joomla\CMS\HTML\HTMLHelper;
+HTMLHelper::_('bootstrap.tooltip', '.hasTooltip');
+
 /**
  * Placement configuration
  */
@@ -24,6 +28,8 @@ if (!isset($all_tab_fields['vstate']) && isset($captured['vstate']))
 		unset($captured['vstate']);
 	}
 }
+
+
 
 
 /**
