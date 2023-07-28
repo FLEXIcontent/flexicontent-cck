@@ -146,8 +146,8 @@ class FlexicontentViewType extends FlexicontentViewBaseRecord
 
 		// SET toolbar title
 		!$isnew
-			? JToolbarHelper::title( JText::_( 'FLEXI_EDIT_TYPE' ), 'typeedit' )
-			: JToolbarHelper::title( JText::_( 'FLEXI_ADD_TYPE' ), 'typeadd' );
+			? JToolbarHelper::title( JText::_( 'FLEXI_EDIT_TYPE' ), 'briefcase' )
+			: JToolbarHelper::title( JText::_( 'FLEXI_ADD_TYPE' ), 'briefcase' );
 
 
 		/**

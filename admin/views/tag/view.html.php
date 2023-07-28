@@ -144,8 +144,8 @@ class FlexicontentViewTag extends FlexicontentViewBaseRecord
 
 		// SET toolbar title
 		!$isnew
-			? JToolbarHelper::title( JText::_( 'FLEXI_EDIT_TAG' ), 'tagedit' )
-			: JToolbarHelper::title( JText::_( 'FLEXI_NEW_TAG' ), 'tagadd' );
+			? JToolbarHelper::title( JText::_( 'FLEXI_EDIT_TAG' ), 'tags' )
+			: JToolbarHelper::title( JText::_( 'FLEXI_NEW_TAG' ), 'tags' );
 
 
 		/**

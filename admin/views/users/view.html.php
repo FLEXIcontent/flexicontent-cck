@@ -195,7 +195,7 @@ class FlexicontentViewUsers extends FlexicontentViewBaseRecords
 		// Create document/toolbar titles
 		$doc_title = JText::_('FLEXI_AUTHORS');
 		$site_title = $document->getTitle();
-		JToolbarHelper::title( $doc_title, 'authors' );
+		JToolbarHelper::title( $doc_title, 'users' );
 		$document->setTitle($doc_title .' - '. $site_title);
 
 		// Create the toolbar

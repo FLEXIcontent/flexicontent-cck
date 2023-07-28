@@ -110,11 +110,12 @@ $items_task = 'task=items.';
 		<?php
 		$config_saved = $this->params->get('flexi_cat_extension');
 
+
+		
+
 		if (version_compare(PHP_VERSION, FLEXI_PHP_RECOMMENDED, '<'))
 		{
-			echo '<div class="fc-mssg fc-note">';
-			echo JText::sprintf( 'PHP version >= %s is recommended', FLEXI_PHP_RECOMMENDED) . '<br/>';
-			echo '</div>';
+			$app->enqueueMessage(JText::sprintf( 'PHP version >= %s is recommended', FLEXI_PHP_RECOMMENDED), 'warning');
 		}
 		$_title = "PHP/DB Requirements";
 
