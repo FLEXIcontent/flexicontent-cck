@@ -143,7 +143,7 @@ class FlexicontentViewTypes extends FlexicontentViewBaseRecords
 		// Create document/toolbar titles
 		$doc_title = JText::_('FLEXI_TYPES');
 		$site_title = $document->getTitle();
-		JToolbarHelper::title($doc_title, 'database');
+		JToolbarHelper::title($doc_title, 'briefcase');
 		$document->setTitle($doc_title .' - '. $site_title);
 
 		// Create the toolbar
