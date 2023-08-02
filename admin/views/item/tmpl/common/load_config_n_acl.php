@@ -21,10 +21,11 @@ $this->menuCats = $isnew ? $this->menuCats : false;  // just make sure ...
 
 /**
  * Create reusable html code
+ * 
  */
 
-$close_btn = '<a class="close" data-dismiss="alert">&#215;</a>';  // '<a class="fc-close" onclick="this.parentNode.parentNode.removeChild(this.parentNode);">&#215;</a>';
-$alert_box = '<div %s class="alert alert-%s %s">'.$close_btn.'%s</div>';  // '<div %s class="fc-mssg fc-%s %s">'.$close_btn.'%s</div>';
+$close_btn = '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="'.JText::_('CLOSE').'"></button>';  // '<a class="fc-close" onclick="this.parentNode.parentNode.removeChild(this.parentNode);">&#215;</a>';
+$alert_box = '<div %s class="alert alert-%s %s alert-dismissible fade show" role="alert">'.$close_btn.'%s</div>';  // '<div %s class="fc-mssg fc-%s %s">'.$close_btn.'%s</div>';
 $btn_class = 'btn';  // 'fc_button';
 $tip_class = ' hasTooltip';
 $lbl_class = ' ' . $this->params->get('form_lbl_class' . $CFGsfx, '');
