@@ -1807,7 +1807,7 @@ if ($this->fields && $typeid) :
 
 				<?php ob_start(); /* label_html */ ?>
 				<div
-					class="control-label"
+					class="control-label<?php echo $display_label_form === 2 ? ' fclabel_cleared' : ''; ?>"
 					id="label_outer_fcfield_<?php echo $field->id; ?>"
 					style="<?php echo $display_label_form < 1 ? 'display:none;' : '' ?>"
 				>
