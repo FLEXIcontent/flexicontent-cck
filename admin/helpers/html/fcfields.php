@@ -209,7 +209,7 @@ abstract class JHtmlFcfields extends JHtmlFcbase
 				}
 				else
 				{
-					$friendly_name = str_replace('FLEXIcontent - ', '', $row->friendly);
+					$friendly_name = str_replace('FLEXIcontent - ', '', $row->friendly ?? '');
 					return
 						'<strong>' . $row_type . '</strong>' .
 						($row->iscore ? '' : '<br/><small>- ' . $friendly_name . ' -</small>');

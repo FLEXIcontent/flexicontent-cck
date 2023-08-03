@@ -57,9 +57,9 @@ class JFormFieldFccheckbox extends JFormField
 		$split_char = ",";
 		
 		// Get options and values
-		$checkoptions = preg_split("/[\s]*".$split_char."[\s]*/", $attributes['checkoptions']);
-		$checkvals = preg_split("/[\s]*".$split_char."[\s]*/", $attributes['checkvals']);
-		$defaultvals = preg_split("/[\s]*".$split_char."[\s]*/", @$attributes['defaultvals']);
+		$checkoptions = preg_split("/[\s]*".$split_char."[\s]*/", $attributes['checkoptions'] ?? '');
+		$checkvals = preg_split("/[\s]*".$split_char."[\s]*/", $attributes['checkvals'] ?? '');
+		$defaultvals = preg_split("/[\s]*".$split_char."[\s]*/", @$attributes['defaultvals'] ?? '');
 		
 		// Verify defaultvals option
 		if ( count($defaultvals)==1 && empty($defaultvals[0]) ) $defaultvals = array();

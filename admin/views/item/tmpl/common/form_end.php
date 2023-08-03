@@ -42,7 +42,7 @@ defined('_JEXEC') or die('Restricted access');
 					<input type="hidden" name="jform[type_id]" value="<?php echo $typeid; ?>" />
 				<?php endif;?>
 
-				<input type="hidden" name="referer" value="<?php echo htmlspecialchars($this->referer, ENT_COMPAT, 'UTF-8'); ?>" />
+				<input type="hidden" name="referer" value="<?php echo htmlspecialchars($this->referer ?? '', ENT_COMPAT, 'UTF-8'); ?>" />
 
 				<?php if ($isSite) : ?>
 					<?php if ($isnew) echo $this->submitConf; ?>

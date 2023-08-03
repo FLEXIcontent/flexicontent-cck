@@ -125,7 +125,7 @@ class JFormFieldFields extends JFormField
 		}
 
 		// For 'Filters' type not set means true otherwise false
-		$issortable = strlen(@$attributes['issortable']) ?
+		$issortable = strlen(@$attributes['issortable'] ?? '') ?
 			(boolean) $attributes['issortable'] :
 			($this->type=='Filters' ? true : false);
 

@@ -537,7 +537,7 @@ jQuery(document).ready(function(){
 			$template_style_id = $this->form->getValue('template_style_id');
 		}
 
-		$template_style_id = preg_replace('#\W#', '', $template_style_id);
+		$template_style_id = preg_replace('#\W#', '', $template_style_id ?? '');
 
 		// Build the query.
 		$query = $db->getQuery(true)
