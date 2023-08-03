@@ -3,6 +3,7 @@
 // ADD TOOLTIPS
 use Joomla\CMS\HTML\HTMLHelper;
 HTMLHelper::_('bootstrap.tooltip', '.hasTooltip');
+HTMLHelper::_('bootstrap.alert', '.alert-dismissable');
 
 /**
  * Placement configuration
