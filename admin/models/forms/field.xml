@@ -48,6 +48,7 @@
 		<option value="1">FLEXI_EDIT_HELP_LABEL_TOOLTIP</option>
 		<option value="2">FLEXI_EDIT_HELP_LABEL_TOOLTIP_WICON</option>
 		<option value="3">FLEXI_EDIT_HELP_INLINE</option>
+		<option value="4">FLEXI_EDIT_HELP_PLACEHOLDER</option>
 	</field>
 
 	<field name="published" type="fcradio" default="1" label="FLEXI_PUBLISHED" description="FLEXI_FIELD_PUBLISHED_DESC" class="btn-group btn-group-yesno" labelclass="fc-prop-lbl">
