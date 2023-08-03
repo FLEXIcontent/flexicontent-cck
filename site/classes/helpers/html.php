@@ -142,18 +142,18 @@ class flexicontent_html
 			$sys_value = flexicontent_upload::parseByteLimit(ini_get($varname));
 			$required_ok    = $sys_value >=  $required[$varname];
 			$recommended_ok = $sys_value >=  $recommended[$varname];
-			$conf_limit_class  = $recommended_ok ? 'badge-success' : ($required_ok ? 'badge-warning' : 'badge-important');
+			$conf_limit_class  = $recommended_ok ? 'bg-success badge-success' : ($required_ok ? 'bg-warning badge-warning' : 'bg-info badge-important');
 
 			$result[ $recommended_ok ? 'message' : ($required_ok ? 'notice' : 'warning') ][] = '
 			<span class="fc-php-limits-box">
-				<span class="label text-white bg-info label-info">'.$varname.'</span>
+				<span class="badge bg-secondary">'.$varname.'</span> =
 				<span class="badge '.$conf_limit_class.'">'.$sys_value.'</span>
-				&nbsp; &nbsp; &nbsp;
+				&nbsp;&nbsp;|&nbsp;
 				<span class="fc-php-limits-box">
 					<span class="label">'.JText::_('FLEXI_REQUIRED').'</span>
-					<b class="">'.$required[$varname].'</b>
+					<strong class="badge bg-secondary">'.$required[$varname].'</strong>
 					<span class="label">'.JText::_('FLEXI_RECOMMENDED').'</span>
-					<b class="">'.$recommended[$varname].'</b>
+					<strong class="badge bg-success">'.$recommended[$varname].'</strong>
 				</span>
 			</span>';
 		}
@@ -220,7 +220,7 @@ class flexicontent_html
 				$inc_files = glob($inc_path.'*.{less}', GLOB_BRACE);  //print_r($inc_files);
 				if (!is_array($inc_files) && $debug) JFactory::getApplication()->enqueueMessage('Reading LESS folder failed: '.$inc_path, 'notice');
 				if (is_array($inc_files)) foreach ($inc_files as $confFile) {
-					//echo $confFile . " time: ".filemtime($confFile) ."<br/>";
+					//echo $confFile . " time: ".filemtime($confFile) ."<br>";
 					if (!JFile::exists($inc_path.'_config_fc_ts') || filemtime($confFile) > filemtime($inc_path.'_config_fc_ts')) {
 						touch($inc_path.'_config_fc_ts');
 						$_dirty = true;
@@ -316,7 +316,7 @@ class flexicontent_html
 			{
 				$error = true;
 				if ($debug || JFactory::getApplication()->isClient('administrator')) JFactory::getApplication()->enqueueMessage(
-					'- LESS to CSS halted ... CSS file was not changed ... please edit LESS file(s) find offending <b>lines</b> and fix or remove<br/>'. str_replace($path.$in, '<br/><b>'.$path.$in.'</b>', $e->getMessage()), 'notice'
+					'- LESS to CSS halted ... CSS file was not changed ... please edit LESS file(s) find offending <strong>lines</strong> and fix or remove<br>'. str_replace($path.$in, '<br><strong>'.$path.$in.'</strong>', $e->getMessage()), 'notice'
 				);
 				continue;
 			}
@@ -3301,7 +3301,7 @@ class flexicontent_html
 
 			$tooltip_title = flexicontent_html::getToolTip(
 				$state_text ?: JText::_('FLEXI_PUBLISH_INFORMATION'),
-				' &nbsp; ' . implode("\n<br/> &nbsp; \n", $publish_info) . '<br/>' . $jtext['change_state'],
+				' &nbsp; ' . implode("\n<br> &nbsp; \n", $publish_info) . '<br>' . $jtext['change_state'],
 				0, 1
 			);
 
@@ -3321,10 +3321,10 @@ class flexicontent_html
 		{
 			if ($canChangeState)
 			{
-				$publish_info[] = '<br/>' . JText::_('FLEXI_STATE_CHANGER_DISABLED');
+				$publish_info[] = '<br>' . JText::_('FLEXI_STATE_CHANGER_DISABLED');
 			}
 
-			$tooltip_title = flexicontent_html::getToolTip(JText::_( 'FLEXI_PUBLISH_INFORMATION' ), implode("\n<br/>\n", $publish_info), 0);
+			$tooltip_title = flexicontent_html::getToolTip(JText::_( 'FLEXI_PUBLISH_INFORMATION' ), implode("\n<br>\n", $publish_info), 0);
 			$output = '
 				<div id="row' . $record->id . '" class="statetoggler_disabled ' . $config->class . '">
 					<span class="disabled ' . $tooltip_class . '" title="' . $tooltip_title . '">
@@ -5101,7 +5101,7 @@ class flexicontent_html
 
 			foreach ($state_ids as $i => $state_id)
 			{
-				//if ($state_id==0 || $state_id==2) $list .= "<br/>";
+				//if ($state_id==0 || $state_id==2) $list .= "<br>";
 				$checked = $state_id==$selected ? ' checked="checked"' : '';
 				$list .= '<input id="state'.$state_id.'" type="radio" name="state" class="state" value="'.$state_id.'" '.$checked.'/>';
 				$list .= '<label class="state_box" for="state'.$state_id.'" title="'.$state_names[$state_id].'" style="color:'.$state_colors[$state_id].';">';
@@ -5326,11 +5326,11 @@ class flexicontent_html
 		$html2 = array();
 		foreach($t1 as $k=>$o) {
 			if(in_array($k, $out[0])) $html1[] = "<s>".($mode?htmlspecialchars($o, ENT_QUOTES):$o)."</s>";
-			else $html1[] = ($mode?htmlspecialchars($o, ENT_QUOTES)."<br/>":$o);
+			else $html1[] = ($mode?htmlspecialchars($o, ENT_QUOTES)."<br>":$o);
 		}
 		foreach($t2 as $k=>$n) {
 			if(in_array($k, $out[1])) $html2[] = "<u>".($mode?htmlspecialchars($n, ENT_QUOTES):$n)."</u>";
-			else $html2[] = ($mode?htmlspecialchars($n, ENT_QUOTES)."<br/>":$n);
+			else $html2[] = ($mode?htmlspecialchars($n, ENT_QUOTES)."<br>":$n);
 		}
 		$html1 = implode(" ", $html1);
 		$html2 = implode(" ", $html2);
@@ -5348,7 +5348,7 @@ class flexicontent_html
 		if ($diff->FormatDiffAsHtml($before, $after, $difference) && $diff->Patch($before, $difference->difference, $after_patch))
 		{
 			//echo '<div>Difference</div><div class="frameResults">', $difference->html, '</div>';
-			//echo '<div>Patch</div><div class="frameResults">', ($after === $after_patch->after ? 'OK: The patched text matches the text after.' : 'There is a BUG: The patched text (<b>'.HtmlSpecialChars($after_patch->after).'</b>) does not match the text after (<b>'.HtmlSpecialChars($after).'</b>).'), '</div>';
+			//echo '<div>Patch</div><div class="frameResults">', ($after === $after_patch->after ? 'OK: The patched text matches the text after.' : 'There is a BUG: The patched text (<strong>'.HtmlSpecialChars($after_patch->after).'</strong>) does not match the text after (<strong>'.HtmlSpecialChars($after).'</strong>).'), '</div>';
 			return array(
 				0 => ($mode ? htmlspecialchars($before, ENT_QUOTES, 'UTF-8') : $before),
 				1 => ($mode ? htmlspecialchars($after, ENT_QUOTES, 'UTF-8') : $after),

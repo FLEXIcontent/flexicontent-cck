@@ -230,7 +230,7 @@ class FlexicontentViewTemplate extends JViewLegacy
 
 		//create the toolbar
 		$bar = JToolbar::getInstance('toolbar');
-		JToolbarHelper::title( JText::_( 'FLEXI_EDIT_TEMPLATE' ), 'templates' );
+		JToolbarHelper::title( JText::_( 'FLEXI_EDIT_TEMPLATE' ), 'eye' );
 		if (!$ismodal) {
 			JToolbarHelper::apply('templates.apply');
 			JToolbarHelper::save('templates.save');

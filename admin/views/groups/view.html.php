@@ -152,7 +152,7 @@ class FlexicontentViewGroups extends FlexicontentViewBaseRecords
 		// Create document/toolbar titles
 		$doc_title = JText::_( 'FLEXI_GROUPS' );
 		$site_title = $document->getTitle();
-		JToolbarHelper::title( $doc_title, 'groups' );
+		JToolbarHelper::title( $doc_title, 'users-cog' );
 		$document->setTitle($doc_title .' - '. $site_title);
 
 		// Create the toolbar

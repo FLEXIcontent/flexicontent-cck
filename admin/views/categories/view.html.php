@@ -156,7 +156,7 @@ class FlexicontentViewCategories extends FlexicontentViewBaseRecords
 		// Create document/toolbar titles
 		$doc_title = JText::_('FLEXI_CATEGORIES');
 		$site_title = $document->getTitle();
-		JToolbarHelper::title($doc_title, 'fc_categories');
+		JToolbarHelper::title($doc_title, 'icon-folder');
 		$document->setTitle($doc_title .' - '. $site_title);
 
 		// Create the toolbar

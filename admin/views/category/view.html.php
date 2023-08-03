@@ -222,8 +222,8 @@ class FlexicontentViewCategory extends FlexicontentViewBaseRecord
 
 		// SET toolbar title
 		!$isnew
-			? JToolbarHelper::title( JText::_( 'FLEXI_EDIT_CATEGORY' ), 'fc_categoryedit' )   // Editing existing review
-			: JToolbarHelper::title( JText::_( 'FLEXI_NEW_CATEGORY' ), 'fc_categoryadd' );    // Creating new review
+			? JToolbarHelper::title( JText::_( 'FLEXI_EDIT_CATEGORY' ), 'icon-folder' )   // Editing existing review
+			: JToolbarHelper::title( JText::_( 'FLEXI_NEW_CATEGORY' ), 'icon-folder' );    // Creating new review
 
 
 		/**
