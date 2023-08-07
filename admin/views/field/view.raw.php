@@ -104,14 +104,20 @@ class FlexicontentViewField extends JViewLegacy
 						if ( $field->getAttribute('box_type') )
 							echo $field->input;
 						else
+						{
+							$_title = htmlspecialchars(JText::_($field->description), ENT_QUOTES , 'UTF-8' );
+							$_label = strpos($field->label,'class=')
+								? str_replace('class="', 'class="label-fcinner ', $field->label)
+								: str_replace('<label ', '<label class="label-fcinner hasPopover" data-placement="top" data-bs-content="'.$_title.'" ', $field->label);
 							echo '
-						<fieldset class="panelform'.($i ? '' : ' fc-nomargin').' '.($_depends ? ' '.$_depends : '').'" id="'.$field->id.'-container">
-							'.($field->label ? '
-								<span class="label-fcouter">'.str_replace('class="', 'class="label-fcinner ', $field->label).'</span>
-								<div class="container_fcfield">'.$field->input.'</div>
-							' : $field->input).'
-						</fieldset>
-						';
+							<fieldset class="panelform'.($i ? '' : ' fc-nomargin').' '.($_depends ? ' '.$_depends : '').'" id="'.$field->id.'-container">
+								'.($field->label ? '
+									<span class="label-fcouter">'.$_label.'</span>
+									<div class="container_fcfield">'.$field->input.'</div>
+								' : $field->input).'
+							</fieldset>
+							';
+						}
 						$i++;
 					} ?>
 				</div>

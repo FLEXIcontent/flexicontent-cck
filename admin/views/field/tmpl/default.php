@@ -16,6 +16,7 @@
  * GNU General Public License for more details.
  */
 
+use Joomla\CMS\HTML\HTMLHelper;
 defined('_JEXEC') or die('Restricted access');
 
 $tip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
@@ -70,7 +71,12 @@ $this->document->addScriptDeclaration($js);
 		<table class="fc-form-tbl fcinner" style="margin-bottom:12px;">
 			<tr>
 				<td class="key">
-					<?php echo $form->getLabel('label'); ?>
+					<?php
+					$_title = htmlspecialchars(JText::_($form->getFieldAttribute('label', 'description', '')), ENT_QUOTES , 'UTF-8' );
+					$_label = strpos($form->getLabel('label'),'class=')
+						? str_replace('class="', ' data-bs-content="'.$_title.'" class="label-fcinner hasPopover ', $form->getLabel('label'))
+						: str_replace('<label ', '<label data-bs-content="'.$_title.'" data-placement="top" class="label-fcinner hasPopover" ', $form->getLabel('label'));
+					echo $_label; ?>
 				</td>
 				<td>
 					<?php echo $form->getInput('label'); ?>
@@ -396,14 +402,20 @@ $this->document->addScriptDeclaration($js);
 						if ( $field->getAttribute('box_type') )
 							echo $field->input;
 						else
+						{
+							$_title = htmlspecialchars(JText::_($field->description), ENT_QUOTES , 'UTF-8' );
+							$_label = strpos($field->label,'class=')
+								? str_replace('class="', 'class="label-fcinner ', $field->label)
+								: str_replace('<label ', '<label class="label-fcinner hasPopover" data-placement="top" data-bs-content="'.$_title.'" ', $field->label);
 							echo '
-						<fieldset class="panelform'.($i ? '' : ' fc-nomargin').' '.($_depends ? ' '.$_depends : '').'" id="'.$field->id.'-container">
-							'.($field->label ? '
-								<span class="label-fcouter">'.str_replace('class="', 'class="label-fcinner ', $field->label).'</span>
-								<div class="container_fcfield">'.$field->input.'</div>
-							' : $field->input).'
-						</fieldset>
-						';
+							<fieldset class="panelform'.($i ? '' : ' fc-nomargin').' '.($_depends ? ' '.$_depends : '').'" id="'.$field->id.'-container">
+								'.($field->label ? '
+									<span class="label-fcouter">'.$_label.'</span>
+									<div class="container_fcfield">'.$field->input.'</div>
+								' : $field->input).'
+							</fieldset>
+							';
+						}
 						$i++;
 					} ?>
 				</div>
@@ -435,4 +447,4 @@ $this->document->addScriptDeclaration($js);
 <?php
 //keep session alive while editing
 JHtml::_('behavior.keepalive');
-?>
+HTMLHelper::_('bootstrap.popover', '.hasPopover', array('trigger' => 'click hover'));
