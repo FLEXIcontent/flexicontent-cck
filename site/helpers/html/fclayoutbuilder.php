@@ -341,10 +341,10 @@ abstract class JHtmlFclayoutbuilder
 		body {
 			overflow: scroll;
 		}
-		.fa, .fas, [class^=icon-], [class*=" icon-"] {
-			font-family: \'FontAwesome\';
-			font-weight: normal;
-		}
+		// .fa, .fas, [class^=icon-], [class*=" icon-"] {
+		// 	font-family: \'FontAwesome\';
+		// 	font-weight: normal;
+		// }
 		label.gjs-sm-icon {
 			color: #fff;
 		}
