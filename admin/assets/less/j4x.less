@@ -146,21 +146,21 @@
  * Small labels
  **************/
 
-.label,
-.badge,
-.flexicontent label.label {
-	margin: 0px 2px 2px 4px;
-	background:var(--template-bg-dark-40);
-}
-.label.highlight,
-.badge.highlight {
-	color: darkred;
-}
-.label,
-.flexicontent label.label {
-	padding: 4px;
-	border-radius: 4px;
-}
+// .label,
+// .badge,
+// .flexicontent label.label {
+// 	margin: 0px 2px 2px 4px;
+// 	background:var(--template-bg-dark-40);
+// }
+// .label.highlight,
+// .badge.highlight {
+// 	color: darkred;
+// }
+// .label,
+// .flexicontent label.label {
+// 	padding: 4px;
+// 	border-radius: 4px;
+// }
 
 /**************
  * Other layout
@@ -234,7 +234,7 @@ div.toolbar-box {
 	padding: 2px 2px 2px 5px;
 }
 .pane-sliders .content {
-	box-shadow: 0 0 4px #cccccc;
+	box-shadow: 0 0 4px var(--border-color);
 	border-radius: 2px;
 	padding: 12px 0px 0px 12px;
 	background: none repeat scroll 0 0 white;
@@ -442,7 +442,7 @@ dl.tabs {
 }
 dl.tabs dt {
 	background: none repeat scroll 0 0 #E9E9E9;
-	border: 1px solid #CCCCCC;
+	border: 1px solid var(--border-color);
 	color: #666666;
 	float: right;
 	margin-right: 3px;
@@ -460,7 +460,7 @@ dl.tabs dt.open {
 	z-index: 100;
 }
 div.current {
-	border: 1px solid #CCCCCC;
+	border: 1px solid var(--border-color);
 	clear: both;
 	padding: 10px;
 }
@@ -1044,7 +1044,7 @@ body .ui-widget-header {
 	border: 1px solid #fff !important;
 	background: #fff !important;
 	color: var(--template-bg-dark-50)!important;
-	border-bottom: 1px solid #ccc!important;
+	border-bottom: 1px solid var(--border-color) !important;
 }
 body .ui-widget-overlay {
 	background: #aaa;
@@ -1055,7 +1055,7 @@ body .ui-widget-overlay {
 }
 #flexicontent .nav.nav-tabs.nav-stacked li {
 	width: 24%;
-	border: 1px solid #ccc;
+	border: 1px solid var(--border-color);
 	margin: 5px;
 	padding: 1.5rem;
 	border-radius: 5px;
