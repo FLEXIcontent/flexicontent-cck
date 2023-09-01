@@ -312,6 +312,8 @@ tabberObj.prototype.init = function(e)
 						t.headingText.replace(/<br \/>/gi,"[br]");
 						t.headingText = t.headingText.replace(/<[^>]+>/g,"");
 						t.headingText = t.headingText.replace(/\[br\]/g,"<br/>");
+
+
 					}
 					break;
 				}
@@ -349,7 +351,13 @@ tabberObj.prototype.init = function(e)
 				DOM_a.appendChild(document.createTextNode(' '));
 			}
 		}
-		DOM_a.appendChild(document.createTextNode(t.headingText));
+		//DOM_a.appendChild(document.createTextNode(t.headingText));
+		
+		//WRAP IN SPAN
+		var span = document.createElement("span");
+		span.textContent = t.headingText;
+		DOM_a.appendChild(span);
+		
 		DOM_a.href = "javascript:void(null);";
 
 		if (t.headingTitle)
