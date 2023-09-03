@@ -1854,6 +1854,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 			// Build a frontend SEF url
 			$item_url    = flexicontent_html::getSefUrl($item_url);
 			$previewlink = $item_url . (strstr($item_url, '?') ? '&amp;' : '?') .'preview=1';
+			$this->previewlink = $previewlink;
 			$link_params = 'status=no,toolbar=no,scrollbars=yes,titlebar=no,menubar=no,resizable=yes,left=50,width=\'+((screen.width-100) > 1360 ? 1360 : (screen.width-100))+\',top=20,height=\'+((screen.width-160) > 100 ? 1000 : (screen.width-160))+\',directories=no,location=no';
 
 			// Buttom HTML with replacements for the preview buttons
