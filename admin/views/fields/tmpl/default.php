@@ -458,7 +458,7 @@ if ($js)
 				<?php echo JHtml::_('grid.sort', 'FLEXI_FIELD_TYPE', 'a.field_type', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
 
-			<th class="hideOnDemandClass center nowrap hidden-phone" colspan="2">
+			<th class="hideOnDemandClass center nowrap hidden-phone hidden-tablet" colspan="2">
 				<?php echo '<small class="label" style="padding: 2px 4px; border-radius: 4px;">'.JText::_( 'Content Lists' ).'</small>'; ?><br/>
 				<small>
 					<?php echo JHtml::_('grid.sort', 'FLEXI_SEARCH', 'a.issearch', $this->lists['order_Dir'], $this->lists['order'] ); ?> /
@@ -467,7 +467,7 @@ if ($js)
 				<span class="column_toggle_lbl" style="display:none;"><?php echo '<small class="badge">'.JText::_( 'Content Lists' ).'</small>'; ?></span>
 			</th>
 
-			<th class="hideOnDemandClass center nowrap hidden-phone" colspan="2">
+			<th class="hideOnDemandClass center nowrap hidden-phone hidden-tablet" colspan="2">
 				<?php echo '<small class="label" style="padding: 2px 4px; border-radius: 4px;">'.JText::_( 'Search view' ).'</small>'; ?><br/>
 				<small>
 					<?php echo JHtml::_('grid.sort', 'FLEXI_SEARCH', 'a.isadvsearch', $this->lists['order_Dir'], $this->lists['order'] ); ?> /
@@ -480,19 +480,19 @@ if ($js)
 				<?php echo JHtml::_('grid.sort', 'FLEXI_ASSIGNED_TYPES', 'nrassigned', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
 
-			<th class="col_common_props hideOnDemandClass left hidden-phone">
+			<th class="col_common_props hideOnDemandClass left hidden-phone hidden-tablet">
 				<?php echo $common_properties_tip . JText::_('FLEXI_PROPERTIES'); ?>
 			</th>
 
-			<th class="col_showin_clients hideOnDemandClass left hidden-phone">
+			<th class="col_showin_clients hideOnDemandClass left hidden-phone hidden-tablet">
 				<?php echo $showin_clients_tip . JText::_('FLEXI_CLIENTS'); ?>
 			</th>
 
-			<th class="col_showin_views hideOnDemandClass left hidden-phone">
+			<th class="col_showin_views hideOnDemandClass left hidden-phone hidden-tablet">
 				<?php echo $showin_views_tip . JText::_('FLEXI_VIEWS'); ?>
 			</th>
 
-			<th class="col_access hideOnDemandClass left hidden-phone">
+			<th class="col_access hideOnDemandClass left hidden-phone hidden-tablet">
 				<?php echo JHtml::_('grid.sort', 'FLEXI_ACCESS', 'a.access', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
 
@@ -705,19 +705,19 @@ if ($js)
 				<?php echo JHtml::_($hlpname . '.fieldtype_info', $row, $i); ?>
 			</td>
 
-			<td class="right hidden-phone">
+			<td class="right hidden-phone hidden-tablet">
 				<?php echo $search_filter_icons['search']; ?>
 			</td>
 
-			<td class="left hidden-phone">
+			<td class="left hidden-phone hidden-tablet">
 				<?php echo $search_filter_icons['filter']; ?>
 			</td>
 
-			<td class="right hidden-phone">
+			<td class="right hidden-phone hidden-tablet">
 				<?php echo $search_filter_icons['advsearch']; ?>
 			</td>
 
-			<td class="left hidden-phone">
+			<td class="left hidden-phone hidden-tablet">
 				<?php echo $search_filter_icons['advfilter']; ?>
 			</td>
 
@@ -756,7 +756,7 @@ if ($js)
 				?>
 			</td>
 
-			<td class="col_common_props hidden-phone">
+			<td class="col_common_props hidden-phone hidden-tablet">
 				<?php
 				echo $row->parameters->get('display_label')
 					? '<span class="icon-info" title="'.JText::_('FLEXI_FIELD_DISPLAY_LABEL').'" style="color:black; font-size: 16px;"></span>'
@@ -773,7 +773,7 @@ if ($js)
 				?>
 			</td>
 
-			<td class="col_showin_clients hidden-phone">
+			<td class="col_showin_clients hidden-phone hidden-tablet">
 				<?php
 				$show_in_clients = FLEXIUtilities::paramToArray($row->parameters->get('show_in_clients', array('desktop', 'tablet', 'mobile')));
 				echo ' ';
@@ -789,7 +789,7 @@ if ($js)
 				?>
 			</td>
 
-			<td class="col_showin_views hidden-phone">
+			<td class="col_showin_views hidden-phone hidden-tablet">
 				<?php
 				$show_in_views = FLEXIUtilities::paramToArray($row->parameters->get('show_in_views', array('item', 'category', 'module', 'backend')));
 				echo ' ';
@@ -805,7 +805,7 @@ if ($js)
 				?>
 			</td>	
 
-			<td class="col_access hidden-phone">
+			<td class="col_access hidden-phone hidden-tablet">
 				<?php echo $row->canEdit
 					? flexicontent_html::userlevel('access['.$row->id.']', $row->access, 'class="fcfield_selectval" onchange="return Joomla.listItemTask(\'cb'.$i.'\',\''.$ctrl.'access\')"')
 					: $this->escape($row->access_level);
