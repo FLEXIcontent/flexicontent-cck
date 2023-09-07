@@ -1,3 +1,22 @@
+#flexicontent .hidden-desktop {
+	display: none !important;
+}
+@media (min-width: 768px) and (max-width: 991.98px) {
+	#flexicontent .hidden-desktop {
+		display: inherit !important;
+	}
+	#flexicontent .hidden-tablet {
+		display: none !important;
+	}
+}
+@media (max-width: 767.98px) {
+	#flexicontent .hidden-desktop {
+		display: inherit !important;
+	}
+	#flexicontent .hidden-phone {
+		display: none !important;
+	}
+}
 .icon-48-flexicontent {
 	background-image: url(../images/icon-48-dashboard.png);
 }
