@@ -578,7 +578,7 @@ if ($js)
 				}
 				?>
 				<span class="sortable-handler<?php echo $iconClass ?>">
-					<span class="icon-menu"></span>
+					<span class="icon-move"></span>
 				</span>
 				<?php if ($row->canEdit && $saveOrder) : ?>
 					<input type="text" style="display:none" name="order[]" size="5" value="<?php echo $orderkey + 1; ?>" />
