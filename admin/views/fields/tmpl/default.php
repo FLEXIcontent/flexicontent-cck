@@ -858,7 +858,60 @@ if ($js)
 
 </form>
 </div><!-- #flexicontent end -->
+<?php 
+$sidebar_state = $cparams->get('sidebar_state', 'closed');
+if(($sidebar_state) == 'closed') : ?>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  var sidebar = document.querySelector('#sidebar-wrapper');
+  var wrapper = document.querySelector('#wrapper');
+  var menuCollapse = document.querySelector('#menu-collapse');
+  var menuIcon = document.querySelector('#menu-collapse-icon');
+  var navLogo = document.querySelector('#header .logo');
+  // Retrieve sidebar state from localStorage
+  var sidebarState = localStorage.getItem('sidebar');
+  console.log(sidebarState);
 
+
+// Apply initial sidebar state
+if (sidebarState === 'closed') {
+  wrapper.classList.add('closed');
+  menuIcon.classList.remove('icon-toggle-on');
+  menuIcon.classList.add('icon-toggle-off');
+  navLogo.classList.add('small');
+} else if (sidebarState === 'open') {
+  wrapper.classList.remove('closed');
+  menuIcon.classList.remove('icon-toggle-off');
+  menuIcon.classList.add('icon-toggle-on');
+  navLogo.classList.remove('small');
+} else {
+  wrapper.classList.add('closed');
+  menuIcon.classList.remove('icon-toggle-on');
+  menuIcon.classList.add('icon-toggle-off');
+  navLogo.classList.add('small');
+}
+
+
+  // Handle menu click
+  menuCollapse.addEventListener('click', function() {
+    // Toggle wrapper class
+   
+    // Update icon
+    if (wrapper.classList.contains('closed')) {
+      menuIcon.classList.remove('icon-toggle-on');
+      menuIcon.classList.add('icon-toggle-off');
+	  navLogo.classList.add('small');
+      localStorage.setItem('sidebar', 'closed');
+    } else {
+      menuIcon.classList.remove('icon-toggle-off');
+      menuIcon.classList.add('icon-toggle-on');
+      localStorage.setItem('sidebar', 'open');
+	  navLogo.classList.remove('small');
+    }
+  });
+});
+</script>
+<?php endif; ?>
 
 <?php
 JFactory::getDocument()->addScriptDeclaration('
