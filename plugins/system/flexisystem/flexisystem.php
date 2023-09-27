@@ -2228,7 +2228,7 @@ class plgSystemFlexisystem extends CMSPlugin
 		$user       = Factory::getUser();
 
 		// Check we are loading the com_content article form
-		if ($form->getName() !== 'com_content.article' || Factory::getApplication()->input->get('option', '', 'CMD')==='com_flexicontent')
+		if ($form->getName() !== 'com_content.article' || Factory::getApplication()->input->get('option', '', 'CMD')!=='com_content')
 		{
 			return true;
 		}
@@ -2742,7 +2742,11 @@ class plgSystemFlexisystem extends CMSPlugin
 				for ($i=0; $i<$cnt; $i++)
 				{
 					parse_str(html_entity_decode($matches[4][$i]), $vars);
-					if ($vars['option'] === 'com_flexicontent' && $vars['task'] === 'download_file' && !empty($vars['id']))
+
+					if (
+						!empty($vars['option']) && !empty($vars['task']) && !empty($vars['id']) &&
+						$vars['option'] === 'com_flexicontent' && $vars['task'] === 'download_file'
+					)
 					{
 						//Factory::getApplication()->enqueueMessage('FOUND');
 						$query = $db->getQuery(true)
