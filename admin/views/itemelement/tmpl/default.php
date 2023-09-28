@@ -69,7 +69,7 @@ $disable_columns = $this->tparams->get('iman_skip_cols', array('single_type'));
 $disable_columns = array_flip($disable_columns);
 
 // ID of specific type if one type is selected otherwise ZERO
-$single_type_id = $single_type ? reset($filter_type) : 0;
+$single_type_id = $single_type && is_array($filter_type) ? reset($filter_type) : $single_type;
 
 $this->data_tbl_id = 'adminListTableFC' . $this->view . '_type_' . $single_type_id;
 flexicontent_html::jscode_to_showhide_table(
