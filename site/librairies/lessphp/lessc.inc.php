@@ -79,7 +79,7 @@ class lessc {
 	}
 
 	protected function fileExists($name) {
-		return is_file($name);
+		return @is_file($name);
 	}
 
 	static public function compressList($items, $delim) {

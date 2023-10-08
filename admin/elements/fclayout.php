@@ -122,7 +122,7 @@ class JFormFieldFclayout extends JFormFieldGroupedList
 		$ext_name   = (string) @ $attributes['ext_name'];
 		$ext_type   = (string) @ $attributes['ext_type'];
 		$directory  = (string) @ $attributes['directory'];
-		$path = is_dir($directory)  ?  $directory  :  JPATH_ROOT . $directory;
+		$path = @is_dir($directory)  ?  $directory  :  JPATH_ROOT . $directory;
 
 		/**
 		 * A prefix and/or a suffix to distinguish multiple loading of same layout in the same page
