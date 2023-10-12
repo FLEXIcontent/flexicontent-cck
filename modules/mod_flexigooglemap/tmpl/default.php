@@ -25,6 +25,8 @@ $document->addStyleSheet(JUri::root(true) . '/modules/mod_flexigooglemap/assets/
 $itemmodel_name = 'FlexicontentModelItem';
 $itemmodel = new $itemmodel_name();
 
+JText::script('MOD_FLEXIGOOGLEMAP_SECHING_TXT');
+
 // Module config
 $height = $params->get('height', '300px');
 $width  = $params->get('width', '200px');
@@ -230,7 +232,7 @@ $use_mlist = (int) $params->get('use_dynamic_marker_list', 0);
 				output.innerHTML = '<span class="geo-location-blocked">Unable to retrieve your location</span>';
 			}
 
-			output.innerHTML = '<span class="geo-location-trying" style="align-self: center;">'.JText::_("MOD_FLEXIGOOGLEMAP_SECHING_TXT").
+			output.innerHTML = '<span class="geo-location-trying" style="align-self: center;">'+ Joomla.JText._('MOD_FLEXIGOOGLEMAP_SECHING_TXT') +
 			'</span>';
 
 			navigator.geolocation.getCurrentPosition(success, error);
