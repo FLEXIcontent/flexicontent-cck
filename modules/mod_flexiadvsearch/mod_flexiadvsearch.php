@@ -5,7 +5,7 @@
  * 
  * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
  * @link            https://flexicontent.org
- * @copyright       Copyright © 2017, FLEXIcontent team, All Rights Reserved
+ * @copyright       Copyright ï¿½ 2017, FLEXIcontent team, All Rights Reserved
  * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
@@ -111,7 +111,7 @@ $flexiparams = JComponentHelper::getParams('com_flexicontent');
 require_once (dirname(__FILE__).DS.'helper.php');
 
 // Get module's basic display parameters
-$moduleclass_sfx= $params->get('moduleclass_sfx', '');
+$moduleclass_sfx = htmlspecialchars($params->get('moduleclass_sfx') ?? '');
 $layout 				= $params->get('layout', 'default');
 
 // Workaround for legacy serialized form submit bug, posting empty radio as value 'on'
