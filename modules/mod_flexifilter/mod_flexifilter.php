@@ -111,7 +111,7 @@ $flexiparams = JComponentHelper::getParams('com_flexicontent');
 require_once (dirname(__FILE__).DS.'helper.php');
 
 // Get module's basic display parameters
-$moduleclass_sfx = htmlspecialchars($params->get('moduleclass_sfx') ?? '');/
+$moduleclass_sfx = htmlspecialchars($params->get('moduleclass_sfx') ?? '');
 $layout 				= $params->get('layout', 'default');
 
 // Workaround for legacy serialized form submit bug, posting empty radio as value 'on'
