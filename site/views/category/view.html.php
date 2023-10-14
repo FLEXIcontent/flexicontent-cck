@@ -825,7 +825,7 @@ class FlexicontentViewCategory extends JViewLegacy
 				$cat->introtext = & $cat->description;
 				$cat->fulltext = "";
 
-				if ( $cat_image_source && $cat->image && JFile::exists( JPATH_SITE .DS. $joomla_image_path . $cat->image ) )
+				if ( $cat_image_source && $cat->image && file_get_contents(( $catimageurl ) ))
 				{
 					$src = $this->baseurl ."/". $joomla_image_url . $cat->image;
 
@@ -922,7 +922,7 @@ class FlexicontentViewCategory extends JViewLegacy
 				$cat->introtext = & $cat->description;
 				$cat->fulltext = "";
 
-				if ( $cat_image_source && $cat->image && JFile::exists( JPATH_SITE .DS. $joomla_image_path . $cat->image ) )
+				if ( $cat_image_source && $cat->image && file_get_contents(( $catimageurl ) ))
 				{
 					$src = $this->baseurl ."/". $joomla_image_url . $cat->image;
 
