@@ -47,7 +47,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		'remove', 'approval',
 		'apply_type', 'apply', 'apply_ajax',
 		'save2new', 'save2copy', 'save_a_preview', 'download', 'download_file', 'weblink' ,
-		'field_set_value',
+		'field_set_value', 'ajaxvote',
 	);
 
 	/**
