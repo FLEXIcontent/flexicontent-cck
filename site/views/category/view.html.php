@@ -720,14 +720,14 @@ class FlexicontentViewCategory extends JViewLegacy
 		{
 			if ($cat->id && $show_cat_image)
 			{
-				$cat->image = $params->get('image');
-				$catimageurl = explode('#', $cat->image);
-				$cat->image =$catimageurl[0];
 				$cat->introtext = & $cat->description;
 				$cat->fulltext = "";
-				$catimageurl = JPATH_SITE .DS . $cat->image;
 
-				if ( $cat_image_source && $cat->image && file_get_contents(( $catimageurl ) ))
+				$_parts             = explode('#', $params->get('image') ?? '');
+				$cat->image         = $_parts[0];
+				$cat->image_abspath = JPATH_SITE .DS . $cat->image;
+
+				if ( $cat_image_source && $cat->image && file_exists($cat->image_abspath) )
 				{
 					$src = $this->baseurl ."/". $joomla_image_url . $cat->image;
 
@@ -821,11 +821,14 @@ class FlexicontentViewCategory extends JViewLegacy
 					$cat->params = new JRegistry($cat->params);
 				}
 
-				$cat->image = $cat->params->get('image');
 				$cat->introtext = & $cat->description;
 				$cat->fulltext = "";
 
-				if ( $cat_image_source && $cat->image && file_get_contents(( $catimageurl ) ))
+				$_parts             = explode('#', $cat->params->get('image') ?? '');
+				$cat->image         = $_parts[0];
+				$cat->image_abspath = JPATH_SITE .DS . $cat->image;
+
+				if ( $cat_image_source && $cat->image && file_exists($cat->image_abspath) )
 				{
 					$src = $this->baseurl ."/". $joomla_image_url . $cat->image;
 
@@ -918,11 +921,14 @@ class FlexicontentViewCategory extends JViewLegacy
 					$cat->params = new JRegistry($cat->params);
 				}
 
-				$cat->image = $cat->params->get('image');
 				$cat->introtext = & $cat->description;
 				$cat->fulltext = "";
 
-				if ( $cat_image_source && $cat->image && file_get_contents(( $catimageurl ) ))
+				$_parts             = explode('#', $cat->params->get('image') ?? '');
+				$cat->image         = $_parts[0];
+				$cat->image_abspath = JPATH_SITE .DS . $cat->image;
+
+				if ( $cat_image_source && $cat->image && file($cat->image_abspath) )
 				{
 					$src = $this->baseurl ."/". $joomla_image_url . $cat->image;
 
