@@ -142,9 +142,7 @@ if ($result !== _FC_RETURN_)
 
 	$field->{$prop} = '
 		<div id="fb_gallery_' . $uid . '">
-			<ul>
-				' . $field->{$prop} . '
-			</ul>
+			' . $field->{$prop} . '
 		</div>
 	';
 
