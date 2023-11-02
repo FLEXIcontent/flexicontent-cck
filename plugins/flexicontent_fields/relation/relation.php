@@ -552,7 +552,9 @@ class plgFlexicontent_fieldsRelation extends FCField
 
 					<div class="' . $input_grp_class . ' fc-xpended-row fcfield-relation-selected_items_box">
 						<label class="' . $add_on_class . ' fc-lbl selected_items-lbl" id="' . $elementid_n . '-lbl" for="' . $elementid_n . '">' . JText::_($selected_items_label) . '</label>
-						<select id="' . $elementid_n . '" name="' . $fieldname_n . '" multiple="multiple" class="' . $classes . ' fcfield-relation-selected_items" ' . $attribs . ' onchange="return fcfield_relation.selected_items_modified(this);">
+						<select id="' . $elementid_n . '" name="' . $fieldname_n . '" ' . ($multiple ? 'multiple="multiple" ' : '')
+							. ' class="' . $classes . ' fcfield-relation-selected_items" ' . $attribs
+							. ' onchange="return fcfield_relation.selected_items_modified(this);">
 							' . $items_options_select[$n] . '
 						</select>
 						' . ($selected_items_sortable ? '
