@@ -14,6 +14,7 @@ defined('_JEXEC') or die('Restricted access');
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 use Joomla\Component\Categories\Administrator\Helper\CategoriesHelper;
+use \Joomla\CMS\Table\Table;
 
 require_once('base/base.php');
 require_once('base/traitnestable.php');
@@ -209,11 +210,11 @@ class FlexicontentModelCategory extends FCModelAdmin
 	{
 		$prefix = $prefix !== null
 			? $prefix
-			: (FLEXI_J40GE ? '\Joomla\CMS\Table\Table' : 'CategoriesTable');
+			: (FLEXI_J40GE ? 'Table' : 'CategoriesTable');
 
 		if (!FLEXI_J40GE)
 		{
-			\Joomla\CMS\Table\Table::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_categories'.DS.'tables');
+			JTable::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_categories'.DS.'tables');
 		}
 
 		return parent::getTable($type, $prefix, $config);

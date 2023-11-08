@@ -1,6 +1,7 @@
 <?php
 \Joomla\CMS\HTML\HTMLHelper::_('behavior.formvalidator');
 \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.modal');
+use \Joomla\CMS\Language\Text;
 
 // Create field's HTML
 $field->{$prop} = array();
@@ -133,7 +134,7 @@ foreach ($values as $value)
 			<div class="field form-group control-group">
 				<input type="checkbox" id="consent" name="consent" value="consent" class="required">
 				<label for="consent">
-				<a href="'.$consent_field_link.'" target="_blank">'.Jtext::_($consent_field_text).'</a>
+				<a href="'.$consent_field_link.'" target="_blank">'.Text::_($consent_field_text).'</a>
 				</label>
 			</div>
 		';

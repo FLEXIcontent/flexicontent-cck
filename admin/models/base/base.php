@@ -1162,8 +1162,7 @@ abstract class FCModelAdmin extends \Joomla\CMS\MVC\Model\AdminModel
 			$this->user = \Joomla\CMS\Factory::getUser();
 
 			// Get table
-			$this->table = $this->getTable($this->records_dbtbl, '\Joomla\CMS\Table\Table');
-
+			$this->table = $this->getTable($this->records_dbtbl, 'JTable');
 			// Get table class name
 			$tc = explode('\\', get_class($this->table));
 			$this->tableClassName = end($tc);

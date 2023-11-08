@@ -19,6 +19,8 @@ if (empty($renderedMapLocations) && (int)$params->get('hide_map_when_empty', '1'
 }
 
 \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.tooltip');
+use \Joomla\CMS\Filesystem\Path;
+
 $document = \Joomla\CMS\Factory::getDocument();
 $document->addStyleSheet(\Joomla\CMS\Uri\Uri::root(true) . '/modules/mod_flexigooglemap/assets/css/style.css');
 
@@ -108,7 +110,7 @@ $usescrollmouse = $params->get('usescrollmouse', 'true');
 $clustermode = $params->get('clustermode', '');
 if ($clustermode) {
 	$imgcluster = $params->get('imgcluster', '');
-	if ($imgcluster && $img_info = getimagesize(JPATH::clean(JPATH_ROOT . DS . $imgcluster))) {
+	if ($imgcluster && $img_info = getimagesize(PATH::clean(JPATH_ROOT . DS . $imgcluster))) {
 		$imgcluster_w = $img_info[0];
 		$imgcluster_h = $img_info[1];
 		$imgcluster_url  = \Joomla\CMS\Uri\Uri::root(true) . '/' . $imgcluster;

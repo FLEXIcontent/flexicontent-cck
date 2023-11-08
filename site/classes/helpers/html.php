@@ -349,18 +349,19 @@ class flexicontent_html
 		$plugin = \Joomla\CMS\Plugin\PluginHelper::getPlugin('system', 'sef');
 		$pluginParams = new \Joomla\Registry\Registry($plugin ? $plugin->params : null);
 
-		$domain = $pluginParams->get('domain');
-
+		$domain = $pluginParams->get('domain' , '');
 		$jversion = new \Joomla\CMS\Version;
 		$is_j35ge = version_compare( $jversion->getShortVersion(), '3.4.9999', 'ge' );  // includes 3.5.0-beta* too
 
 		if ( ($is_j35ge && $domain === false) || (!$is_j35ge && $domain === null) || $domain === '')
 		{
 			$domain = \Joomla\CMS\Uri\Uri::getInstance()->toString(array('scheme', 'host', 'port'));
+			
 		}
 		$_domain = $domain;  // pass it back by reference
-		$link = $domain . \Joomla\CMS\Router\Route::_('index.php?' . http_build_query($app->getRouter()->getVars()), false);
-
+		//$link = $domain . \Joomla\CMS\Router\Route::_('index.php?' . http_build_query($app->getRouter()->getVars()), false);
+		//TODO check if code is ok ?
+		$link = \Joomla\CMS\Router\Route::link('site', $url);
 		return $link;
 	}
 

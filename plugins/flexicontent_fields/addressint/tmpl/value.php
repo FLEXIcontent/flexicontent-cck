@@ -2,6 +2,9 @@
 //No direct access
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
+use \Joomla\CMS\Filesystem\Path;
+use \Joomla\CMS\Uri\Uri;
+
 
 // Get Map Engine
 $map_api = $field->parameters->get('mapapi', 'googlemap');
@@ -68,8 +71,8 @@ $map_height = (int) $field->parameters->get('map_height', 150);
 $use_custom_marker      = (int) $field->parameters->get('use_custom_marker', 1);
 $custom_marker_path     = $field->parameters->get('custom_marker_path', 'modules/mod_flexigooglemap/assets/marker');
 
-$custom_marker_path_abs = JPATH::clean(JPATH_SITE . DS . $custom_marker_path. DS);
-$custom_marker_url_base = str_replace('\\', '/', JURI::root() . $custom_marker_path . '/');
+$custom_marker_path_abs = PATH::clean(JPATH_SITE . DS . $custom_marker_path. DS);
+$custom_marker_url_base = str_replace('\\', '/', URI::root() . $custom_marker_path . '/');
 
 $defaut_icon_url = $map_api === 'googlemap'
 	? '' //'https://maps.gstatic.com/mapfiles/api-3/images/spotlight-poi2.png'
