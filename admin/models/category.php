@@ -210,7 +210,7 @@ class FlexicontentModelCategory extends FCModelAdmin
 	{
 		$prefix = $prefix !== null
 			? $prefix
-			: (FLEXI_J40GE ? 'Table' : 'CategoriesTable');
+			: (FLEXI_J40GE ? 'JTable' : 'CategoriesTable');
 
 		if (!FLEXI_J40GE)
 		{
