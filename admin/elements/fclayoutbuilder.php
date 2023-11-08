@@ -17,16 +17,16 @@ if (!defined('DS'))  define('DS',DIRECTORY_SEPARATOR);
 require_once(JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.helper.php');
 
 jimport('cms.html.html');      // JHtml
-jimport('cms.html.select');    // JHtmlSelect
-jimport('joomla.form.field');  // JFormField
+jimport('cms.html.select');    // \Joomla\CMS\HTML\Helpers\Select
+jimport('joomla.form.field');  // \Joomla\CMS\Form\FormField
 
-jimport('joomla.form.helper'); // JFormHelper
-//JFormHelper::loadFieldClass('radio');   // JFormFieldRadio
+jimport('joomla.form.helper'); // \Joomla\CMS\Form\FormHelper
+//\Joomla\CMS\Form\FormHelper::loadFieldClass('radio');   // \Joomla\CMS\Form\Field\RadioField
 
 /**
  * Renders an FC Layout Builder element
  */
-class JFormFieldFclayoutbuilder extends JFormField
+class JFormFieldFclayoutbuilder extends \Joomla\CMS\Form\FormField
 {
 
  /**
@@ -53,7 +53,7 @@ class JFormFieldFclayoutbuilder extends JFormField
 			'editor_sfx' => ($this->element['editor_sfx'] ?: $this->element['name']),
 		);
 
-		JHtml::addIncludePath(JPATH_SITE . '/components/com_flexicontent/helpers/html');
-		return JHtml::_('fclayoutbuilder.getBuilderHtml', $builder_options);
+		\Joomla\CMS\HTML\HTMLHelper::addIncludePath(JPATH_SITE . '/components/com_flexicontent/helpers/html');
+		return \Joomla\CMS\HTML\HTMLHelper::_('fclayoutbuilder.getBuilderHtml', $builder_options);
 	}
 }

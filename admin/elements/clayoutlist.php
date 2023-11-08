@@ -24,10 +24,10 @@ if (!defined('DS'))  define('DS',DIRECTORY_SEPARATOR);
 require_once(JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.helper.php');
 
 jimport('cms.html.html');      // JHtml
-jimport('cms.html.select');    // JHtmlSelect
+jimport('cms.html.select');    // \Joomla\CMS\HTML\Helpers\Select
 
-jimport('joomla.form.helper'); // JFormHelper
-JFormHelper::loadFieldClass('list');   // JFormFieldList
+jimport('joomla.form.helper'); // \Joomla\CMS\Form\FormHelper
+\Joomla\CMS\Form\FormHelper::loadFieldClass('list');   // \Joomla\CMS\Form\Field\ListField
 
 /**
  * Renders an clayoutlist element
@@ -36,7 +36,7 @@ JFormHelper::loadFieldClass('list');   // JFormFieldList
  * @subpackage	FLEXIcontent
  * @since		1.0
  */
-class JFormFieldClayoutlist extends JFormFieldList
+class JFormFieldClayoutlist extends \Joomla\CMS\Form\Field\ListField
 {
 	/**
 	 * The form field type.
@@ -95,11 +95,11 @@ class JFormFieldClayoutlist extends JFormFieldList
 		
 		if ($tmpls !== false) {
 			foreach ($tmpls as $tmpl) {
-				$layouts[] = JHtmlSelect::option($tmpl->name, $tmpl->name); 
+				$layouts[] = \Joomla\CMS\HTML\Helpers\Select::option($tmpl->name, $tmpl->name); 
 			}
 		}
 		
-		return JHtml::_('select.genericlist', $layouts, $fieldname, $attribs, 'value', 'text', $values, $element_id);
+		return \Joomla\CMS\HTML\HTMLHelper::_('select.genericlist', $layouts, $fieldname, $attribs, 'value', 'text', $values, $element_id);
 	}
 	
 }

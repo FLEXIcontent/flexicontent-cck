@@ -22,14 +22,14 @@ if ($display_method === 0)
 	{
 		echo '
 		<a href="' . $this->prev_link . '" class="tocPrev" rel="prev" onclick="' . ($display_method === 1 ? 'return flexibreak.previous();' : '') . '">'
-			. JText::_( 'FLEXIBREAK_PREVIOUS_PAGE' ) .
+			. \Joomla\CMS\Language\Text::_( 'FLEXIBREAK_PREVIOUS_PAGE' ) .
 		'</a>';
 	}
 	elseif ($display_method === 2)
 	{
 		echo '
 		<span class="tocNoPrevNext tocPrev" >
-			' . JText::_( 'FLEXIBREAK_PREVIOUS_PAGE' ) . '
+			' . \Joomla\CMS\Language\Text::_( 'FLEXIBREAK_PREVIOUS_PAGE' ) . '
 		</span>';
 	}
 
@@ -55,14 +55,14 @@ if ($display_method === 0)
 	{
 		echo '
 		<a href="' . $this->next_link . '" class="tocNext" rel="next" onclick="' . ($display_method === 1 ? 'return flexibreak.next();' : '') . '">'
-			. JText::_( 'FLEXIBREAK_NEXT_PAGE' ) .
+			. \Joomla\CMS\Language\Text::_( 'FLEXIBREAK_NEXT_PAGE' ) .
 		'</a>';
 	}
 	elseif ($display_method === 2)
 	{
 		echo '
 		<span class="tocNoPrevNext tocNext">
-			' . JText::_('FLEXIBREAK_NEXT_PAGE') . '
+			' . \Joomla\CMS\Language\Text::_('FLEXIBREAK_NEXT_PAGE') . '
 		</span>';
 	}
 	?>

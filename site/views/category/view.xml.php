@@ -29,7 +29,7 @@ jimport('joomla.filesystem.file');
  * @subpackage FLEXIcontent
  * @since 1.0
  */
-class FlexicontentViewCategory extends JViewLegacy
+class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 {
 	/**
 	 * Creates the page's display
@@ -38,7 +38,7 @@ class FlexicontentViewCategory extends JViewLegacy
 	 */
 	function display( $tpl = null )
 	{
-		$doc = JFactory::getDocument();
+		$doc = \Joomla\CMS\Factory::getDocument();
 		$doc->setMimeEncoding('application/xml'); 
 		$domain = $_SERVER['HTTP_HOST'];
 		$dm = new DOMDocument('1.0', 'UTF-8');

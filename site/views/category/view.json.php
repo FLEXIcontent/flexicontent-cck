@@ -29,7 +29,7 @@ jimport('joomla.filesystem.file');
  * @subpackage FLEXIcontent
  * @since 1.0
  */
-class FlexicontentViewCategory extends JViewLegacy
+class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 {
 	/**
 	 * Creates the page's display
@@ -39,10 +39,10 @@ class FlexicontentViewCategory extends JViewLegacy
 	function display( $tpl = null )
 	{
 		// Initialize framework variables
-		$app      = JFactory::getApplication();
+		$app      = \Joomla\CMS\Factory::getApplication();
 		$jinput   = $app->input;
-		$user     = JFactory::getUser();
-		$aid      = JAccess::getAuthorisedViewLevels($user->id);
+		$user     = \Joomla\CMS\Factory::getUser();
+		$aid      = \Joomla\CMS\Access\Access::getAuthorisedViewLevels($user->id);
 
 		// Get model
 		$model  = $this->getModel();

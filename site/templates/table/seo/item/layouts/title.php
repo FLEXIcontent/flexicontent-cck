@@ -14,7 +14,7 @@
  *   {{fieldname:label}}
  *
  * for language string use
- *   JText::_('LANG_STRING_NAME')
+ *   \Joomla\CMS\Language\Text::_('LANG_STRING_NAME')
  */
 
 

@@ -28,7 +28,7 @@ require_once (JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'defi
 /**
  * System plugin for advanced FLEXIcontent routing
  */
-class plgSystemFlexiadvroute extends JPlugin
+class plgSystemFlexiadvroute extends \Joomla\CMS\Plugin\CMSPlugin
 {
 	var $extension;  // Component name
 	var $autoloadLanguage = false;
@@ -41,7 +41,7 @@ class plgSystemFlexiadvroute extends JPlugin
 		parent::__construct( $subject, $config );
 
 		static $language_loaded = null;
-		if (!$this->autoloadLanguage && $language_loaded === null) $language_loaded = JPlugin::loadLanguage('plg_system_flexiadvroute', JPATH_ADMINISTRATOR);
+		if (!$this->autoloadLanguage && $language_loaded === null) $language_loaded = \Joomla\CMS\Plugin\CMSPlugin::loadLanguage('plg_system_flexiadvroute', JPATH_ADMINISTRATOR);
 
 		$this->extension = 'com_flexicontent';
 	}
@@ -54,7 +54,7 @@ class plgSystemFlexiadvroute extends JPlugin
 	function onAfterInitialise()
 	{
 		global $globalnopath, $globalnoroute;
-		$app = JFactory::getApplication();
+		$app = \Joomla\CMS\Factory::getApplication();
 
 		// Dont run in admin
 		if ($app->isClient('administrator'))
@@ -94,10 +94,10 @@ class plgSystemFlexiadvroute extends JPlugin
 
 	/*function detectHomepage()
 	{
-		$menu = JFactory::getApplication()->getMenu();
+		$menu = \Joomla\CMS\Factory::getApplication()->getMenu();
 		if ($menu)
 		{
-			$lang = JFactory::getLanguage();
+			$lang = \Joomla\CMS\Factory::getLanguage();
 			$isHomePage = $menu->getActive() == $menu->getDefault($lang->getTag());
 		}
 		else

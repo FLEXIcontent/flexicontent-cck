@@ -14,7 +14,7 @@ defined('_JEXEC') or die;
  *
  * @since  1.5
  */
-class PlgButtonFccat extends JPlugin
+class PlgButtonFccat extends \Joomla\CMS\Plugin\CMSPlugin
 {
 	/**
 	 * Load the language file on instantiation.
@@ -29,7 +29,7 @@ class PlgButtonFccat extends JPlugin
 	 *
 	 * @param   string  $name  The name of the button to add
 	 *
-	 * @return  JObject  The button options as JObject
+	 * @return  \Joomla\CMS\Object\CMSObject  The button options as \Joomla\CMS\Object\CMSObject
 	 *
 	 * @since   1.5
 	 */
@@ -40,9 +40,9 @@ class PlgButtonFccat extends JPlugin
 		 */
 
 		$link = 'index.php?option=com_flexicontent&amp;view=fccategoryelement&amp;layout=default&amp;isxtdbtn=1&amp;tmpl=component&amp;'
-			. JSession::getFormToken() . '=1&amp;editor=' . $name;
+			. \Joomla\CMS\Session\Session::getFormToken() . '=1&amp;editor=' . $name;
 
-		$button = new JObject;
+		$button = new \Joomla\CMS\Object\CMSObject;
 		$button->modal   = true;
 		$button->icon    = 'add-category';
 		/*$button->iconSVG = '<svg version="1.1" id="Capa_1" x="0px" y="0px" viewBox="0 0 490 490" style="enable-background:new 0 0 490 490;" xml:space="preserve">
@@ -106,7 +106,7 @@ class PlgButtonFccat extends JPlugin
 
 		$button->class   = 'btn';
 		$button->link    = $link;
-		$button->text    = JText::_('PLG_EDITORS-XTD_FCCAT_BUTTON_FCCAT');
+		$button->text    = \Joomla\CMS\Language\Text::_('PLG_EDITORS-XTD_FCCAT_BUTTON_FCCAT');
 		$button->name    = FLEXI_J40GE ? 'fccat' : 'list';
 		$button->options = "{handler: 'iframe', size: {x: 800, y: 500}}";
 

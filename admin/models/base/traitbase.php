@@ -14,6 +14,7 @@ defined('_JEXEC') or die('Restricted access');
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 use Joomla\CMS\Table\Table;
+use \Joomla\CMS\Language\Text;
 
 /**
  * FLEXIcontent List of Records Trait (Legacy model methods)
@@ -47,7 +48,7 @@ trait FCModelTraitBase
 	 * @param   string  $prefix   The class prefix. Optional.
 	 * @param   array   $options  Configuration array for model. Optional.
 	 *
-	 * @return  \JTable  A \JTable object
+	 * @return  \Joomla\CMS\Table\Table  A \Joomla\CMS\Table\Table object
 	 *
 	 * @since   3.0
 	 * @throws  \Exception
@@ -66,16 +67,16 @@ trait FCModelTraitBase
 			return $table;
 		}
 
-		throw new \Exception(\JText::sprintf('JLIB_APPLICATION_ERROR_TABLE_NAME_NOT_SUPPORTED', $name), 0);
+		throw new \Exception(Text::sprintf('JLIB_APPLICATION_ERROR_TABLE_NAME_NOT_SUPPORTED', $name), 0);
 	}
 
 
 	/**
 	 * Returns where conditions that must always be applied
 	 *
-	 * @param		JDatabaseQuery|bool   $q   DB Query object or bool to indicate returning an array or rendering the clause
+	 * @param		\Joomla\Data\DataObjectbaseQuery|bool   $q   DB Query object or bool to indicate returning an array or rendering the clause
 	 *
-	 * @return  JDatabaseQuery|array
+	 * @return  \Joomla\Data\DataObjectbaseQuery|array
 	 *
 	 * @since   3.3.0
 	 */
@@ -88,7 +89,7 @@ trait FCModelTraitBase
 			$where[] = $this->_db->quoteName($n) . ' = ' .  $this->_db->Quote($v);
 		}
 
-		if ($q instanceof \JDatabaseQuery)
+		if ($q instanceof \Joomla\Data\DataObjectbaseQuery)
 		{
 			return $where ? $q->where($where) : $q;
 		}

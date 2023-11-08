@@ -201,17 +201,17 @@ class FlexicontentModelTag extends FCModelAdmin
 	/**
 	 * Method to preprocess the form.
 	 *
-	 * @param   JForm   $form   A JForm object.
+	 * @param   \Joomla\CMS\Form\Form   $form   A \Joomla\CMS\Form\Form object.
 	 * @param   mixed   $data   The data expected for the form.
 	 * @param   string  $plugins_group  The name of the plugin group to import and trigger
 	 *
 	 * @return  void
 	 *
-	 * @see     JFormField
+	 * @see     \Joomla\CMS\Form\FormField
 	 * @since   1.6
 	 * @throws  Exception if there is an error in the form event.
 	 */
-	protected function preprocessForm(JForm $form, $data, $plugins_group = null)
+	protected function preprocessForm(\Joomla\CMS\Form\Form $form, $data, $plugins_group = null)
 	{
 		parent::preprocessForm($form, $data, $plugins_group);
 	}
@@ -258,7 +258,7 @@ class FlexicontentModelTag extends FCModelAdmin
 		}
 
 		$record  = $record ?: $this->_record;
-		$user    = $user ?: JFactory::getUser();
+		$user    = $user ?: \Joomla\CMS\Factory::getUser();
 
 		return !$record || !$record->id
 			? $this->canCreate
@@ -281,7 +281,7 @@ class FlexicontentModelTag extends FCModelAdmin
 		}
 
 		$record  = $record ?: $this->_record;
-		$user    = $user ?: JFactory::getUser();
+		$user    = $user ?: \Joomla\CMS\Factory::getUser();
 
 		return $this->canManage;
 	}
@@ -297,14 +297,14 @@ class FlexicontentModelTag extends FCModelAdmin
 	public function canDelete($record = null)
 	{
 		$record  = $record ?: $this->_record;
-		$user    = JFactory::getUser();
+		$user    = \Joomla\CMS\Factory::getUser();
 
 		return $this->canManage;
 	}
 
 
 	/**
-	 * Method to do some record / data preprocessing before call JTable::bind()
+	 * Method to do some record / data preprocessing before call \Joomla\CMS\Table\Table::bind()
 	 *
 	 * Note. Typically called inside this MODEL 's store()
 	 *
@@ -337,7 +337,7 @@ class FlexicontentModelTag extends FCModelAdmin
 
 
 	/**
-	 * Method to do some work after record has been loaded via JTable::load()
+	 * Method to do some work after record has been loaded via \Joomla\CMS\Table\Table::load()
 	 *
 	 * Note. Typically called inside this MODEL 's store()
 	 *

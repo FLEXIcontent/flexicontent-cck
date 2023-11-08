@@ -25,8 +25,8 @@ require_once(JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'f
 
 jimport('cms.html.html');      // JHtml
 
-jimport('joomla.form.helper'); // JFormHelper
-JFormHelper::loadFieldClass('spacer');   // JFormFieldSpacer
+jimport('joomla.form.helper'); // \Joomla\CMS\Form\FormHelper
+\Joomla\CMS\Form\FormHelper::loadFieldClass('spacer');   // \Joomla\CMS\Form\Field\SpacerField
 
 /**
  * Renders the flexicontent 'separator' (header) element
@@ -35,7 +35,7 @@ JFormHelper::loadFieldClass('spacer');   // JFormFieldSpacer
  * @subpackage	FLEXIcontent
  * @since		1.5
  */
-class JFormFieldSeparator extends JFormFieldSpacer
+class JFormFieldSeparator extends \Joomla\CMS\Form\Field\SpacerField
 {
 	/**
 	 * Element name
@@ -51,8 +51,8 @@ class JFormFieldSeparator extends JFormFieldSpacer
 	{
 		self::$css_js_added = true;
 
-		$app = JFactory::getApplication();
-		$document = JFactory::getDocument();
+		$app = \Joomla\CMS\Factory::getApplication();
+		$document = \Joomla\CMS\Factory::getDocument();
 		$jinput = $app->input;
 		$option = $jinput->get('option', '', 'cmd');
 		$view = $jinput->get('view', '', 'cmd');
@@ -63,22 +63,22 @@ class JFormFieldSeparator extends JFormFieldSpacer
 		{
 			$isAdmin = $app->isClient('administrator');
 
-			if (!JFactory::getLanguage()->isRtl())
+			if (!\Joomla\CMS\Factory::getLanguage()->isRtl())
 			{
 				!$isAdmin ?
-					$document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontent.css', array('version' => FLEXI_VHASH)) :
-					$document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', array('version' => FLEXI_VHASH));
+					$document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontent.css', array('version' => FLEXI_VHASH)) :
+					$document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', array('version' => FLEXI_VHASH));
 			}
 			else
 			{
 				!$isAdmin
-					? $document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontent_rtl.css', array('version' => FLEXI_VHASH))
-					: $document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', array('version' => FLEXI_VHASH));
+					? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontent_rtl.css', array('version' => FLEXI_VHASH))
+					: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', array('version' => FLEXI_VHASH));
 			}
 
-			!JFactory::getLanguage()->isRtl()
-				? $document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x.css' : 'j3x.css'), array('version' => FLEXI_VHASH))
-				: $document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x_rtl.css' : 'j3x_rtl.css'), array('version' => FLEXI_VHASH));
+			!\Joomla\CMS\Factory::getLanguage()->isRtl()
+				? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x.css' : 'j3x.css'), array('version' => FLEXI_VHASH))
+				: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x_rtl.css' : 'j3x_rtl.css'), array('version' => FLEXI_VHASH));
 
 			// Add flexicontent specific TABBing to non-flexicontent views
 			$this->add_tab_css_js();
@@ -87,9 +87,9 @@ class JFormFieldSeparator extends JFormFieldSpacer
 		flexicontent_html::loadJQuery();
 
 		// Add js function to overload the joomla submitform validation
-		JHtml::_('behavior.formvalidator');  // load default validation JS to make sure it is overriden
-		$document->addScript(JUri::root(true).'/components/com_flexicontent/assets/js/admin.js', array('version' => FLEXI_VHASH));
-		$document->addScript(JUri::root(true).'/components/com_flexicontent/assets/js/validate.js', array('version' => FLEXI_VHASH));
+		\Joomla\CMS\HTML\HTMLHelper::_('behavior.formvalidator');  // load default validation JS to make sure it is overriden
+		$document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/admin.js', array('version' => FLEXI_VHASH));
+		$document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/validate.js', array('version' => FLEXI_VHASH));
 
 		if ($option=='com_config' && $view=='component' && $component=='com_flexicontent')
 		{
@@ -101,18 +101,18 @@ class JFormFieldSeparator extends JFormFieldSpacer
 	function add_tab_css_js()
 	{
 		self::$tab_css_js_added = true;
-		$document = JFactory::getDocument();
+		$document = \Joomla\CMS\Factory::getDocument();
 		
 		// Load JS tabber lib
-		$document->addScript(JUri::root(true).'/components/com_flexicontent/assets/js/tabber-minimized.js', array('version' => FLEXI_VHASH));
-		$document->addStyleSheet(JUri::root(true).'/components/com_flexicontent/assets/css/tabber.css', array('version' => FLEXI_VHASH));
+		$document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/tabber-minimized.js', array('version' => FLEXI_VHASH));
+		$document->addStyleSheet(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/css/tabber.css', array('version' => FLEXI_VHASH));
 		$document->addScriptDeclaration(' document.write(\'<style type="text/css">.fctabber{display:none;}<\/style>\'); ');  // temporarily hide the tabbers until javascript runs
 	}
 
 
 	function add_comp_acl_headers()
 	{
-		JFactory::getDocument()->addScriptDeclaration('
+		\Joomla\CMS\Factory::getDocument()->addScriptDeclaration('
 			jQuery(document).ready(function()
 			{
 				jQuery("div.control-group > div").each(function(i, el) {
@@ -142,20 +142,20 @@ class JFormFieldSeparator extends JFormFieldSpacer
 				var tr47 = jQuery("#permissions-sliders .tab-content .tab-pane tbody tr:nth-child(47)");
 				var tr48 = jQuery("#permissions-sliders .tab-content .tab-pane tbody tr:nth-child(48)");
 				
-				tr1.before("<tr><td colspan=\"3\"><span class=\"fcsep_level2\">'.JText::_('FLEXI_PERMISSIONS_COMPONENT_COMPONENT_ACCESS_TITLE').'<\/td><\/tr>");
-				tr4.before("<tr><td colspan=\"3\"><span class=\"fcsep_level2\">'.JText::_('FLEXI_PERMISSIONS_COMPONENT_ITEMS_CATEGORIES_TITLE').'<\/td><\/tr>");
-				tr11.before("<tr><td colspan=\"3\"><span class=\"fcsep_level2\">'.JText::_('FLEXI_PERMISSIONS_COMPONENT_ITEM_FORM_TITLE').'<\/td><\/tr>");
-				tr11.before("<tr><td colspan=\"3\"><span class=\"fcsep_level3\">'.JText::_('FLEXI_PERMISSIONS_COMPONENT_CATEGORY_TAGS_USAGE_TITLE').'<\/td><\/tr>");
-				tr15.before("<tr><td colspan=\"3\"><span class=\"fcsep_level3 alert alert-info fcpadded\" style=\"margin-left: 10% !important;\"><b>'.JText::_('FLEXI_PERMISSIONS_COMPONENT_EXISTING_ITEMS_TITLE').'<\/b>:  ('.JText::_('FLEXI_PERMISSIONS_COMPONENT_OVERRIDABLE_IN_TYPE_TITLE').')<\/td><\/tr>");
-				tr18.before("<tr><td colspan=\"3\"><span class=\"fcsep_level3\">'.JText::_('FLEXI_PERMISSIONS_COMPONENT_VARIOUS_TITLE').'<\/td><\/tr>");
-				tr23.before("<tr><td colspan=\"3\"><span class=\"fcsep_level2\">'.JText::_('FLEXI_PERMISSIONS_COMPONENT_WORKFLOW_TITLE').'<\/td><\/tr>");
-				tr28.before("<tr><td colspan=\"3\"><span class=\"fcsep_level2\">'.JText::_('FLEXI_PERMISSIONS_COMPONENT_ITEMS_MANAGER_TITLE').'<\/td><\/tr>");
-				tr30.before("<tr><td colspan=\"3\"><span class=\"fcsep_level2\">'.JText::_('FLEXI_PERMISSIONS_COMPONENT_BACKEND_MANAGER_ACCESS_TITLE').'<\/td><\/tr>");
-				tr37.before("<tr><td colspan=\"3\"><span class=\"fcsep_level2\">'.JText::_('FLEXI_PERMISSIONS_COMPONENT_FIELDS_MANAGER_TITLE').'<\/td><\/tr>");
-				tr41.before("<tr><td colspan=\"3\"><span class=\"fcsep_level3 alert alert-info fcpadded\">'.JText::_('FLEXI_PERMISSIONS_COMPONENT_OVERRIDABLE_IN_FIELD_TITLE').'<\/td><\/tr>");
-				tr45.before("<tr><td colspan=\"3\"><span class=\"fcsep_level2\">'.JText::_('FLEXI_PERMISSIONS_COMPONENT_REVIEWS_MANAGER_TITLE').'<\/td><\/tr>");
-				tr47.before("<tr><td colspan=\"3\"><span class=\"fcsep_level2\">'.JText::_('FLEXI_PERMISSIONS_COMPONENT_FILES_MANAGER_TITLE').'<\/td><\/tr>");
-				tr48.before("<tr><td colspan=\"3\"><span class=\"fcsep_level3 alert alert-info fcpadded\">'.JText::_('FLEXI_PERMISSIONS_COMPONENT_ALSO_USED_IN_ITEM_FORM_TITLE').'<\/td><\/tr>");
+				tr1.before("<tr><td colspan=\"3\"><span class=\"fcsep_level2\">'.\Joomla\CMS\Language\Text::_('FLEXI_PERMISSIONS_COMPONENT_COMPONENT_ACCESS_TITLE').'<\/td><\/tr>");
+				tr4.before("<tr><td colspan=\"3\"><span class=\"fcsep_level2\">'.\Joomla\CMS\Language\Text::_('FLEXI_PERMISSIONS_COMPONENT_ITEMS_CATEGORIES_TITLE').'<\/td><\/tr>");
+				tr11.before("<tr><td colspan=\"3\"><span class=\"fcsep_level2\">'.\Joomla\CMS\Language\Text::_('FLEXI_PERMISSIONS_COMPONENT_ITEM_FORM_TITLE').'<\/td><\/tr>");
+				tr11.before("<tr><td colspan=\"3\"><span class=\"fcsep_level3\">'.\Joomla\CMS\Language\Text::_('FLEXI_PERMISSIONS_COMPONENT_CATEGORY_TAGS_USAGE_TITLE').'<\/td><\/tr>");
+				tr15.before("<tr><td colspan=\"3\"><span class=\"fcsep_level3 alert alert-info fcpadded\" style=\"margin-left: 10% !important;\"><b>'.\Joomla\CMS\Language\Text::_('FLEXI_PERMISSIONS_COMPONENT_EXISTING_ITEMS_TITLE').'<\/b>:  ('.\Joomla\CMS\Language\Text::_('FLEXI_PERMISSIONS_COMPONENT_OVERRIDABLE_IN_TYPE_TITLE').')<\/td><\/tr>");
+				tr18.before("<tr><td colspan=\"3\"><span class=\"fcsep_level3\">'.\Joomla\CMS\Language\Text::_('FLEXI_PERMISSIONS_COMPONENT_VARIOUS_TITLE').'<\/td><\/tr>");
+				tr23.before("<tr><td colspan=\"3\"><span class=\"fcsep_level2\">'.\Joomla\CMS\Language\Text::_('FLEXI_PERMISSIONS_COMPONENT_WORKFLOW_TITLE').'<\/td><\/tr>");
+				tr28.before("<tr><td colspan=\"3\"><span class=\"fcsep_level2\">'.\Joomla\CMS\Language\Text::_('FLEXI_PERMISSIONS_COMPONENT_ITEMS_MANAGER_TITLE').'<\/td><\/tr>");
+				tr30.before("<tr><td colspan=\"3\"><span class=\"fcsep_level2\">'.\Joomla\CMS\Language\Text::_('FLEXI_PERMISSIONS_COMPONENT_BACKEND_MANAGER_ACCESS_TITLE').'<\/td><\/tr>");
+				tr37.before("<tr><td colspan=\"3\"><span class=\"fcsep_level2\">'.\Joomla\CMS\Language\Text::_('FLEXI_PERMISSIONS_COMPONENT_FIELDS_MANAGER_TITLE').'<\/td><\/tr>");
+				tr41.before("<tr><td colspan=\"3\"><span class=\"fcsep_level3 alert alert-info fcpadded\">'.\Joomla\CMS\Language\Text::_('FLEXI_PERMISSIONS_COMPONENT_OVERRIDABLE_IN_FIELD_TITLE').'<\/td><\/tr>");
+				tr45.before("<tr><td colspan=\"3\"><span class=\"fcsep_level2\">'.\Joomla\CMS\Language\Text::_('FLEXI_PERMISSIONS_COMPONENT_REVIEWS_MANAGER_TITLE').'<\/td><\/tr>");
+				tr47.before("<tr><td colspan=\"3\"><span class=\"fcsep_level2\">'.\Joomla\CMS\Language\Text::_('FLEXI_PERMISSIONS_COMPONENT_FILES_MANAGER_TITLE').'<\/td><\/tr>");
+				tr48.before("<tr><td colspan=\"3\"><span class=\"fcsep_level3 alert alert-info fcpadded\">'.\Joomla\CMS\Language\Text::_('FLEXI_PERMISSIONS_COMPONENT_ALSO_USED_IN_ITEM_FORM_TITLE').'<\/td><\/tr>");
 
 			});
 		');
@@ -183,7 +183,7 @@ class JFormFieldSeparator extends JFormFieldSpacer
 		{
 			$this->add_css_js();
 			
-			$jinput = JFactory::getApplication()->input;
+			$jinput = \Joomla\CMS\Factory::getApplication()->input;
 			$is_fc = $jinput->get('option', '', 'cmd') == 'com_flexicontent';
 		}
 		
@@ -219,21 +219,21 @@ class JFormFieldSeparator extends JFormFieldSpacer
 
 		if (!$value_printf)
 		{
-			$title = JText::_($value);
+			$title = \Joomla\CMS\Language\Text::_($value);
 		}
 		else
 		{
 			$vparts = preg_split("/\s*,\s*/", $value_printf);
 			foreach($vparts as & $vpart)
 			{
-				$vpart = JText::_($vpart);
+				$vpart = \Joomla\CMS\Language\Text::_($vpart);
 			}
 			unset($vpart);
 			array_unshift($vparts, $value);
-			$title = call_user_func_array(array('JText', 'sprintf'), $vparts);
+			$title = call_user_func_array(array('\Joomla\CMS\Language\Text', 'sprintf'), $vparts);
 		}
 
-		$desc = JText::_($description);
+		$desc = \Joomla\CMS\Language\Text::_($description);
 
 		if ($desc)
 		{
@@ -265,7 +265,7 @@ class JFormFieldSeparator extends JFormFieldSpacer
 
 			$tab_id = 0;
 			return $box_type==2
-				? $_bof . JHtml::_('tabs.start','core-tabs-cat-props-' . $tabset_id, array('useCookie'=>1)) . $_eof
+				? $_bof . \Joomla\CMS\HTML\HTMLHelper::_('tabs.start','core-tabs-cat-props-' . $tabset_id, array('useCookie'=>1)) . $_eof
 				: $_bof . "\n". '<div class="fctabber '.$tab_class.' '.$classes.'" id="tabset_attrs_' . $tabset_id . '">' . $_eof;
 			break;
 
@@ -274,7 +274,7 @@ class JFormFieldSeparator extends JFormFieldSpacer
 			$tab_id    = array_pop($tab_stack);
 
 			return $box_type==2
-				? $_bof . JHtml::_('tabs.end') . $_eof
+				? $_bof . \Joomla\CMS\HTML\HTMLHelper::_('tabs.end') . $_eof
 				: $_bof . '
 					</div>
 				</div>
@@ -284,7 +284,7 @@ class JFormFieldSeparator extends JFormFieldSpacer
 		case 'tab_open':
 			if ($box_type==2)
 			{
-				return $_bof . JHtml::_('tabs.panel', $title, 'tab_attrs_'.$tabset_id.'_'.($tab_id++)) . $_eof;
+				return $_bof . \Joomla\CMS\HTML\HTMLHelper::_('tabs.panel', $title, 'tab_attrs_'.$tabset_id.'_'.($tab_id++)) . $_eof;
 			}
 			else
 			{

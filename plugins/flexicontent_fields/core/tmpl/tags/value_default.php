@@ -18,8 +18,8 @@ foreach ($tags as $tag)
 		if ( !isset($tag_links[$tag_id]) )
 		{
 			$tag_links[$tag_id] = $use_catlinks ?
-				JRoute::_( FlexicontentHelperRoute::getCategoryRoute(0, 0, array('layout'=>'tags','tagid'=>$tag->slug)) ) :
-				JRoute::_( FlexicontentHelperRoute::getTagRoute($tag->slug) ) ;
+				\Joomla\CMS\Router\Route::_( FlexicontentHelperRoute::getCategoryRoute(0, 0, array('layout'=>'tags','tagid'=>$tag->slug)) ) :
+				\Joomla\CMS\Router\Route::_( FlexicontentHelperRoute::getTagRoute($tag->slug) ) ;
 		}
 
 		// With / without link

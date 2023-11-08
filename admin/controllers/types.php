@@ -212,7 +212,7 @@ class FlexicontentControllerTypes extends FlexicontentControllerBaseAdmin
 
 
 	/**
-	 * Method for extra form validation after JForm validation is executed
+	 * Method for extra form validation after \Joomla\CMS\Form\Form validation is executed
 	 *
 	 * @param   array     $validated_data  The already jform-validated data of the record
 	 * @param   object    $model            The Model object of current controller instance
@@ -260,11 +260,11 @@ class FlexicontentControllerTypes extends FlexicontentControllerBaseAdmin
 	public function copy()
 	{
 		// Check for request forgeries
-		JSession::checkToken('request') or die(JText::_('JINVALID_TOKEN'));
+		\Joomla\CMS\Session\Session::checkToken('request') or die(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
 
 		// Initialize variables
-		$app   = JFactory::getApplication();
-		$user  = JFactory::getUser();
+		$app   = \Joomla\CMS\Factory::getApplication();
+		$user  = \Joomla\CMS\Factory::getUser();
 		$task   = $this->input->get('task', 'copy', 'cmd');
 		$option = $this->input->get('option', '', 'cmd');
 
@@ -278,7 +278,7 @@ class FlexicontentControllerTypes extends FlexicontentControllerBaseAdmin
 		// Check at least one item was selected
 		if (!count($cid))
 		{
-			$app->enqueueMessage(JText::_('FLEXI_SELECT_ITEMS'), 'error');
+			$app->enqueueMessage(\Joomla\CMS\Language\Text::_('FLEXI_SELECT_ITEMS'), 'error');
 			$app->setHeader('status', 500, true);
 			$this->setRedirect($this->returnURL);
 
@@ -291,7 +291,7 @@ class FlexicontentControllerTypes extends FlexicontentControllerBaseAdmin
 		// Check access
 		if (!$is_authorised)
 		{
-			$app->enqueueMessage(JText::_('FLEXI_ALERTNOTAUTH_TASK'), 'error');
+			$app->enqueueMessage(\Joomla\CMS\Language\Text::_('FLEXI_ALERTNOTAUTH_TASK'), 'error');
 			$app->setHeader('status', 403, true);
 			$this->setRedirect($this->returnURL);
 
@@ -300,11 +300,11 @@ class FlexicontentControllerTypes extends FlexicontentControllerBaseAdmin
 
 		if ($model->copy($cid, $copyRelations = true) === false)
 		{
-			$msg = JText::_('FLEXI_TYPES_COPY_FAILED') . ' : ' . $model->getError();
+			$msg = \Joomla\CMS\Language\Text::_('FLEXI_TYPES_COPY_FAILED') . ' : ' . $model->getError();
 			throw new Exception($msg, 500);
 		}
 
-		$msg = JText::_('FLEXI_TYPES_COPY_SUCCESS');
+		$msg = \Joomla\CMS\Language\Text::_('FLEXI_TYPES_COPY_SUCCESS');
 
 		// Clear dependent cache data
 		$this->_cleanCache();
@@ -328,10 +328,10 @@ class FlexicontentControllerTypes extends FlexicontentControllerBaseAdmin
 	function toggle_jview()
 	{
 		// Check for request forgeries
-		JSession::checkToken('request') or die(JText::_('JINVALID_TOKEN'));
+		\Joomla\CMS\Session\Session::checkToken('request') or die(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
 
-		$app   = JFactory::getApplication();
-		$user  = JFactory::getUser();
+		$app   = \Joomla\CMS\Factory::getApplication();
+		$user  = \Joomla\CMS\Factory::getUser();
 
 		// Get model (NOTE: For this task we will use singular model)
 		$model = $this->getModel($this->record_name);
@@ -343,7 +343,7 @@ class FlexicontentControllerTypes extends FlexicontentControllerBaseAdmin
 		// Check at least one item was selected
 		if (!count($cid))
 		{
-			$app->enqueueMessage(JText::_('FLEXI_SELECT_ITEMS'), 'error');
+			$app->enqueueMessage(\Joomla\CMS\Language\Text::_('FLEXI_SELECT_ITEMS'), 'error');
 			$app->setHeader('status', 500, true);
 			$this->setRedirect($this->returnURL);
 
@@ -356,7 +356,7 @@ class FlexicontentControllerTypes extends FlexicontentControllerBaseAdmin
 		// Check access
 		if (!$is_authorised)
 		{
-			$app->enqueueMessage(JText::_('FLEXI_ALERTNOTAUTH_TASK'), 'error');
+			$app->enqueueMessage(\Joomla\CMS\Language\Text::_('FLEXI_ALERTNOTAUTH_TASK'), 'error');
 			$app->setHeader('status', 403, true);
 			$this->setRedirect($this->returnURL);
 

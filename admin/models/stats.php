@@ -17,7 +17,7 @@ jimport('legacy.model.legacy');
  * FLEXIcontent Component stats Model
  *
  */
-class FlexicontentModelStats extends JModelLegacy
+class FlexicontentModelStats extends \Joomla\CMS\MVC\Model\BaseDatabaseModel
 {
 	/**
 	 * Rating resolution
@@ -374,22 +374,22 @@ class FlexicontentModelStats extends JModelLegacy
 			switch ($key)
 			{
 				case 'published':
-					$lab[] = JText::_( 'FLEXI_PUBLISHED' ).' '.$val[$i].' %';
+					$lab[] = \Joomla\CMS\Language\Text::_( 'FLEXI_PUBLISHED' ).' '.$val[$i].' %';
 					break;
 				case 'unpublished':
-					$lab[] = JText::_( 'FLEXI_UNPUBLISHED' ).' '.$val[$i].' %';
+					$lab[] = \Joomla\CMS\Language\Text::_( 'FLEXI_UNPUBLISHED' ).' '.$val[$i].' %';
 					break;
 				case 'archived':
-					$lab[] = JText::_( 'FLEXI_ARCHIVED' ).' '.$val[$i].' %';
+					$lab[] = \Joomla\CMS\Language\Text::_( 'FLEXI_ARCHIVED' ).' '.$val[$i].' %';
 					break;
 				case 'pending':
-					$lab[] = JText::_( 'FLEXI_PENDING' ).' '.$val[$i].' %';
+					$lab[] = \Joomla\CMS\Language\Text::_( 'FLEXI_PENDING' ).' '.$val[$i].' %';
 					break;
 				case 'open':
-					$lab[] = JText::_( 'FLEXI_TO_WRITE' ).' '.$val[$i].' %';
+					$lab[] = \Joomla\CMS\Language\Text::_( 'FLEXI_TO_WRITE' ).' '.$val[$i].' %';
 					break;
 				case 'progress':
-					$lab[] = JText::_( 'FLEXI_IN_PROGRESS' ).' '.$val[$i].' %';
+					$lab[] = \Joomla\CMS\Language\Text::_( 'FLEXI_IN_PROGRESS' ).' '.$val[$i].' %';
 					break;
 			}
 			$i++;
@@ -472,22 +472,22 @@ class FlexicontentModelStats extends JModelLegacy
 			switch ($key)
 			{
 				case '020':
-					$lab[] = JText::_( 'FLEXI_VOTES_BEETWEEN_020' ).' '.$proz.' % ('.$val[$i].')';
+					$lab[] = \Joomla\CMS\Language\Text::_( 'FLEXI_VOTES_BEETWEEN_020' ).' '.$proz.' % ('.$val[$i].')';
 					break;
 				case '040':
-					$lab[] = JText::_( 'FLEXI_VOTES_BEETWEEN_040' ).' '.$proz.' % ('.$val[$i].')';
+					$lab[] = \Joomla\CMS\Language\Text::_( 'FLEXI_VOTES_BEETWEEN_040' ).' '.$proz.' % ('.$val[$i].')';
 					break;
 				case '060':
-					$lab[] = JText::_( 'FLEXI_VOTES_BEETWEEN_060' ).' '.$proz.' % ('.$val[$i].')';
+					$lab[] = \Joomla\CMS\Language\Text::_( 'FLEXI_VOTES_BEETWEEN_060' ).' '.$proz.' % ('.$val[$i].')';
 					break;
 				case '080':
-					$lab[] = JText::_( 'FLEXI_VOTES_BEETWEEN_080' ).' '.$proz.' % ('.$val[$i].')';
+					$lab[] = \Joomla\CMS\Language\Text::_( 'FLEXI_VOTES_BEETWEEN_080' ).' '.$proz.' % ('.$val[$i].')';
 					break;
 				case '100':
-					$lab[] = JText::_( 'FLEXI_VOTES_BEETWEEN_100' ).' '.$proz.' % ('.$val[$i].')';
+					$lab[] = \Joomla\CMS\Language\Text::_( 'FLEXI_VOTES_BEETWEEN_100' ).' '.$proz.' % ('.$val[$i].')';
 					break;
 				case 'novotes':
-					$lab[] = JText::_( 'FLEXI_NOVOTES' ).' '.$proz.' % ('.$val[$i].')';
+					$lab[] = \Joomla\CMS\Language\Text::_( 'FLEXI_NOVOTES' ).' '.$proz.' % ('.$val[$i].')';
 					break;
 			}
 
@@ -509,7 +509,7 @@ class FlexicontentModelStats extends JModelLegacy
 
 		$this->_db->setQuery('SELECT * FROM #__flexicontent_fields WHERE field_type="voting"');
 		$field = $this->_db->loadObject();
-		$item = JTable::getInstance( $type = 'flexicontent_items', $prefix = '', $config = array() );
+		$item = \Joomla\CMS\Table\Table::getInstance( $type = 'flexicontent_items', $prefix = '', $config = array() );
 		//$item->load( $id );
 		FlexicontentFields::loadFieldConfig($field, $item);
 
