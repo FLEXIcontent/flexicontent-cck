@@ -1,5 +1,7 @@
 <?php
 
+use \Joomla\CMS\Form\Form;
+
 $use_myfiles = 1;
 $per_value_js = "";
 $i = -1;  // Count DB values (may contain invalid entries)
@@ -198,7 +200,7 @@ foreach ($field->value as $index => $value)
 			}
 
 			$xml_form = '<form><fields name="attribs"><fieldset name="attribs">'.$xml_field.'</fieldset></fields></form>';
-			$jform = new JForm('flexicontent_field.image', array('control' => '' /*'custom'*/, 'load_data' => true));
+			$jform = new Form('flexicontent_field.image', array('control' => '' /*'custom'*/, 'load_data' => true));
 			$jform->load($xml_form);
 
 			if ($use_quantum)

@@ -163,7 +163,7 @@
 					. ' class="urlimage" />';
 
 				$xml_form = '<form><fields name="attribs"><fieldset name="attribs">'.$xml_field.'</fieldset></fields></form>';
-				$jform = new JForm('flexicontent_field.image', array('control' => '' /*'custom'*/, 'load_data' => true));
+				$jform = new \Joomla\CMS\Form\Form('flexicontent_field.image', array('control' => '' /*'custom'*/, 'load_data' => true));
 				$jform->load($xml_form);
 
 				$jfield = new \Joomla\CMS\Form\Field\MediaField($jform);

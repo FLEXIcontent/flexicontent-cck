@@ -1378,8 +1378,8 @@ class flexicontent_db
 			$query = 'UPDATE #__tags SET parent_id = 1 WHERE parent_id = 0 AND id <> 1';
 			$db->setQuery($query)->execute();
 
-			\Joomla\CMS\Table\Table::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tags/tables');
-			$tbl = \Joomla\CMS\Table\Table::getInstance('Tag', 'TagsTable');
+			//Table::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tags/tables');
+			$tbl = Table::getInstance('Tag', 'TagsTable');
 
 			$tbl->rebuild();
 		}
@@ -1409,7 +1409,7 @@ class flexicontent_db
 		}
 
 		// We will use the tags table to store them
-		Table::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tags/tables');
+		//Table::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tags/tables');
 		$tagTable  = Table::getInstance('Tag', 'TagsTable');
 		$canCreate = \Joomla\CMS\Factory::getUser()->authorise('core.create', 'com_tags');
 

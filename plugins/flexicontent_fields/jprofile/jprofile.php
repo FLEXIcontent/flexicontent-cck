@@ -381,7 +381,7 @@ class plgFlexicontent_fieldsJProfile extends FCField
 			$xml_field = '<field name="'.$fieldname_n.'" type="user" ' . ($isSite ? ' readonly="true" ' : '') . '/>';
 			$xml_form = '<form><fields name="attribs"><fieldset name="attribs">'.$xml_field.'</fieldset></fields></form>';
 
-			$jform = new JForm('flexicontent_field.jprofile', array('control' => '', 'load_data' => true));
+			$jform = new \Joomla\CMS\Form\Form('flexicontent_field.jprofile', array('control' => '', 'load_data' => true));
 			$jform->load($xml_form);
 			$jfield = new \Joomla\CMS\Form\Field\UserField($jform);
 
