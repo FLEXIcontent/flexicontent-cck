@@ -304,7 +304,6 @@ abstract class FCModelAdminList extends \Joomla\CMS\MVC\Model\ListModel
 			$this->_data  = $this->_getList($this->_getListQuery(), $this->getState('limitstart'), $this->getState('limit'));
 			$this->_total = $this->_db->setQuery('SELECT FOUND_ROWS()')->loadResult();
 		}
-
 		return $this->_data;
 	}
 

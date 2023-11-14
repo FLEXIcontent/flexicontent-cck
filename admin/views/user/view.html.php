@@ -13,6 +13,7 @@ defined('_JEXEC') or die('Restricted access');
 
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
+use \Joomla\CMS\Form\Form;
 
 JLoader::register('FlexicontentViewBaseRecord', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/base/view_record.php');
 
@@ -250,7 +251,7 @@ class FlexicontentViewUser extends FlexicontentViewBaseRecord
 		$xml_string = file_get_contents($auth_xml);
 
 		// Load the form description from the XML string
-		$jform_authorbasic = new JForm('com_flexicontent.author', array('control' => 'jform', 'load_data' => true));
+		$jform_authorbasic = new Form('com_flexicontent.author', array('control' => 'jform', 'load_data' => true));
 		$jform_authorbasic->load($xml_string, $isFile=false);
 
 		// Set DB parameter values into the \Joomla\CMS\Form\Form object
@@ -276,7 +277,7 @@ class FlexicontentViewUser extends FlexicontentViewBaseRecord
 		$xml_string = str_replace('name="params"', 'name="authorcatparams"', file_get_contents($cat_xml));
 
 		// Load the form description from the XML string
-		$jform_authorcat = new JForm('com_flexicontent.category', array('control' => 'jform', 'load_data' => true));
+		$jform_authorcat = new Form('com_flexicontent.category', array('control' => 'jform', 'load_data' => true));
 		$jform_authorcat->load($xml_string, $isFile=false);
 
 		// Set DB parameter values into the \Joomla\CMS\Form\Form object
@@ -306,7 +307,7 @@ class FlexicontentViewUser extends FlexicontentViewBaseRecord
 		{
 			if ($tmpl->name != $_clayout) continue;
 
-			$jform = new JForm('com_flexicontent.template.category', array('control' => 'jform', 'load_data' => false));
+			$jform = new Form('com_flexicontent.template.category', array('control' => 'jform', 'load_data' => false));
 			$jform->load($tmpl->params);
 			$tmpl->params = $jform;
 			foreach ($tmpl->params->getGroup('attribs') as $field)

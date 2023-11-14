@@ -15,25 +15,25 @@ body #flexicontent .fc_item_title a {
 	padding-left: 0px;
 	padding-bottom: 0px;
 	border-radius: 0px;
-	border: 0px solid inherit;
+	border: 0px solid #cccccc;
 	color: inherit;
 }
 body #flexicontent .flexi.label,
 body #flexicontent .desc-title.label {
-	background-color: rgba(255,255,255,0);
-	color: #000000;
-	border-radius: 0px;
-	padding-top: 0px;
-	padding-right: 0px;
-	padding-left: 0px;
-	padding-bottom: 0px;
+	background-color: #2a4959;
+	color: #ffffff;
+	border-radius: 3px;
+	padding-top: 8px;
+	padding-right: 10px;
+	padding-left: 10px;
+	padding-bottom: 8px;
 }
 body #flexicontent ul.tabbernav > li a {
-	background-color: #e4f1f8;
+	background-color: #99bdcf;
 	color: #ffffff;
 }
 body #flexicontent ul.tabbernav > li.tabberactive a::before {
-	border-top: 4px solid #3093c7;
+	border-top: 4px solid #2a4959;
 }
 body ul.tabbernav > li.tabberactive a,
 body ul.tabbernav > li.tabberactive a:hover,
@@ -45,8 +45,8 @@ body ul.tabbernav > li.tabberactive a:hover,
 	border-right: 1px solid #D0D0D0 !important;
 }
 body #flexicontent ul.tabbernav > li:hover a {
-	border: 1px solid #1c5675;
-	background: #1c5675;
+	border: 1px solid #091014;
+	background: #091014;
 	color: #fff;
 }
 body .tabbertab,
@@ -56,7 +56,7 @@ body .tabbertab,
 }
 body ul.tabbernav,
 #flexicontent ul.tabbernav {
-	border-bottom: 1px solid inherit !important;
+	border-bottom: 1px solid #cccccc !important;
 }
 div#fc_subtitle_tabset,
 div#fc_bottom_tabset {
@@ -108,16 +108,16 @@ body .flexi.infoblock {
 .topblock .flexi.infoblock {
 	overflow: hidden;
 	border-radius: 0px;
-	border: 1px solid inherit;
+	border: 0px solid #cccccc;
 	color: inherit;
-	background-color: inherit;
+	background-color: transparent;
 }
 .flexi.bottomblock.infoblock {
 	overflow: hidden;
 	border-radius: 0px;
-	border: 1px solid inherit;
-	color: inherit;
-	background-color: inherit;
+	border: 0px solid #cccccc;
+	color: #cccccc;
+	background-color: #ffffff;
 }
 .flexi.topblock ul {
 	padding: 0;
@@ -142,8 +142,8 @@ body .flexi.infoblock {
 	zoom: 1;
 }
 div.flexi.value {
-	padding-bottom: 0px !important;
-	padding-top: 0px !important;
+	padding-bottom: 8px !important;
+	padding-top: 8px !important;
 }
 .onecols ul li.flexi {
 	width: 100%;
