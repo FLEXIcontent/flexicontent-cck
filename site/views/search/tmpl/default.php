@@ -193,7 +193,7 @@ if ($disp_slide_filter)
 				</div>
 				<div class="fc_search_option_cell" style="position:relative;">
 					<?php
-					//$append_buttons = true;
+					$append_buttons = true;
 					
 					$_ac_index = $txtmode ? 'fc_adv_complete' : 'fc_basic_complete';
 					$text_search_class  = !$append_buttons ? 'fc_text_filter' : '';
@@ -213,7 +213,7 @@ if ($disp_slide_filter)
 							<?php 
 							if ($buttons_position) : ?>
                       <?php if ($form_placement != 0) : ?>
-						<div class="inline-button"> 
+						<div class="btn-group"> 
                         <?php endif; ?>
 								<button class="<?php echo $flexi_button_class_go; ?>" onclick="var form=document.getElementById('<?php echo $form_id; ?>'); adminFormPrepare(form, 1);">
 									<span class="icon-search icon-white"></span><?php echo JText::_( 'FLEXI_GO' ); ?>
@@ -489,7 +489,7 @@ if ($disp_slide_filter)
 
 <?php
 if (!$buttons_position): ?>
- <div class="inline-button">      
+ <div class="btn-group">      
 	<button class="<?php echo $flexi_button_class_go; ?> button_go" onclick="var form=document.getElementById('<?php echo $form_id; ?>'); adminFormPrepare(form, 1);">
 		<span class="icon-search icon-white"></span><?php echo JText::_( 'FLEXI_GO' ); ?>
 	</button>
@@ -500,7 +500,6 @@ if (!$buttons_position): ?>
   <?php endif; ?>
 	</div>
 <?php endif; ?>
-                      
 
 
 	<!-- BOF items total-->
