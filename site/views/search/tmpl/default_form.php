@@ -1,7 +1,8 @@
 <?php defined('_JEXEC') or die('Restricted access');
 
+use \Joomla\CMS\Factory;
 
-$app = JFactory::getApplication();
+$app = Factory::getApplication();
 $form_id = $this->form_id;
 $form_name = $this->form_name;
 
@@ -16,6 +17,15 @@ $default_searchordering = $this->params->get('default_searchordering', 'newest')
 
 $disp_slide_filter = $this->params->get('disp_slide_filter', 0);
 $form_placement = (int) $this->params->get('form_placement', 0);
+$buttons_position = (int) $this->params->get('buttons_position', 0);//1 after search 0 before advanced search
+$append_buttons =  (int) $this->params->get('append_buttons', 0);
+$show_search_reset = $this->params->get('show_search_reset', 1);
+$flexi_button_class_reset =  ($this->params->get('flexi_button_class_reset','') != '-1')  ?
+	$this->params->get('flexi_button_class_reset', 'btn')   :
+	$this->params->get('flexi_button_class_reset_custom', 'btn')  ;
+$flexi_button_class_go =  ($this->params->get('flexi_button_class_go' ,'') != '-1')  ?
+	$this->params->get('flexi_button_class_go', 'btn btn-success')   :
+	$this->params->get('flexi_button_class_go_custom', 'btn btn-success')  ;
 
 if ($form_placement)
 {
@@ -102,7 +112,7 @@ $r = 0;
 /**
  * Filters in slider
  */
-$jcookie = JFactory::getApplication()->input->cookie;
+$jcookie = Factory::getApplication()->input->cookie;
 $cookie_name = 'fc_active_TabSlideFilter';
 
 if ($disp_slide_filter)
@@ -193,19 +203,31 @@ if ($disp_slide_filter)
 					$text_search_prompt = htmlspecialchars(JText::_($show_search_label==2 ? 'FLEXI_TEXT_SEARCH' : 'FLEXI_TYPE_TO_LIST'), ENT_QUOTES, 'UTF-8');
 					?>
 					<div class="fc_filter_html">
-						<?php echo $append_buttons ? '<span class="btn-wrapper input-append">' : ''; ?>
+						<?php 
+                      $append_button_classes = FLEXI_J30GE ? 'input-group' : ' input-append';
+                      echo $append_buttons ? '<span class="btn-wrapper '.$append_button_classes.'">' : ''; ?>
 							<input type="<?php echo $search_autocomplete==2 ? 'hidden' : 'text'; ?>" class="<?php echo $text_search_class; ?>"
-								data-txt_ac_lang="<?php echo JFactory::getLanguage()->getTag(); ?>"
+								data-txt_ac_lang="<?php echo Factory::getLanguage()->getTag(); ?>"
 								placeholder="<?php echo $text_search_prompt; ?>" name="q" size="30" maxlength="120" 
-								id="search_searchword" value="<?php echo $this->escape($this->searchword);?>" style="max-width: 144px;" />
+								id="search_searchword" value="<?php echo $this->escape($this->searchword);?>" style="" />
 							
 							<?php 
-							if ($append_buttons) :
-								$button_classes = FLEXI_J30GE ? ' btn btn-success' : ' fc_button fcsimple';
-							?>
-								<button class="<?php echo $button_classes; ?> button_go" onclick="var form=document.getElementById('<?php echo $form_id; ?>'); adminFormPrepare(form, 1);">
+							if ($buttons_position) : ?>
+                      <?php if ($form_placement != 0) : ?>
+						<div class="btn-group"> 
+                        <?php endif; ?>
+								<button class="<?php echo $flexi_button_class_go; ?>" onclick="var form=document.getElementById('<?php echo $form_id; ?>'); adminFormPrepare(form, 1);">
 									<span class="icon-search icon-white"></span><?php echo JText::_( 'FLEXI_GO' ); ?>
 								</button>
+                      <?php if ($show_search_reset) : ?>
+							<button class="<?php echo $flexi_button_class_reset; ?>" onclick="var form=document.getElementById('<?php echo $form_id; ?>'); adminFormClearFilters(form); adminFormPrepare(form, 2); return false;" title="<?php echo JText::_( 'FLEXI_REMOVE_FILTERING' ); ?>">
+								<i class="icon-remove"></i><?php echo JText::_( 'FLEXI_RESET' ); ?>
+							</button>
+						<?php endif; ?>
+                        <?php if ($form_placement != 0) : ?>
+                        </div>
+                      <?php endif; ?>
+                      
 							<?php endif; ?>
 							
 						<?php echo $append_buttons ? '</span>' : ''; ?>
@@ -467,12 +489,17 @@ if ($disp_slide_filter)
 <?php endif; /* END OF IF autodisplayadvoptions */ ?>
 
 <?php
-if (!$append_buttons):
- 	$button_classes = FLEXI_J30GE ? ' btn btn-success' : ' fc_button fcsimple';
-?>
-	<button class="<?php echo $button_classes; ?> button_go" onclick="var form=document.getElementById('<?php echo $form_id; ?>'); adminFormPrepare(form, 1);">
+if (!$buttons_position): ?>
+ <div class="btn-group">      
+	<button class="<?php echo $flexi_button_class_go; ?> button_go" onclick="var form=document.getElementById('<?php echo $form_id; ?>'); adminFormPrepare(form, 1);">
 		<span class="icon-search icon-white"></span><?php echo JText::_( 'FLEXI_GO' ); ?>
 	</button>
+    <?php if ($show_search_reset) : ?>
+							<button class="<?php echo $flexi_button_class_reset; ?>" onclick="var form=document.getElementById('<?php echo $form_id; ?>'); adminFormClearFilters(form); adminFormPrepare(form, 2); return false;" title="<?php echo JText::_( 'FLEXI_REMOVE_FILTERING' ); ?>">
+								<i class="icon-remove"></i><?php echo JText::_( 'FLEXI_RESET' ); ?>
+							</button>
+  <?php endif; ?>
+	</div>
 <?php endif; ?>
 
 
@@ -584,14 +611,14 @@ $js .= '
 			});
 		});
 	';
-$document = JFactory::getDocument();
+$document = Factory::getDocument();
 $document->addScriptDeclaration($js);
 
 
 // FORM in slider
 if ($disp_slide_filter)
 {
-	JFactory::getDocument()->addScriptDeclaration("
+	Factory::getDocument()->addScriptDeclaration("
 	(function($) {
 		$(document).ready(function ()
 		{
