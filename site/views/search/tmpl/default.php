@@ -1,6 +1,7 @@
 <?php defined('_JEXEC') or die('Restricted access');
 
 use \Joomla\CMS\Factory;
+use \Joomla\CMS\Language\Text;
 
 $page_classes  = '';
 $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
@@ -18,7 +19,7 @@ if ($menu) $page_classes .= ' menuitem'.$menu->id;
 	</h1>
 <?php else : ?>
 	<h2 class="contentheading">
-		<?php echo JText::_( 'FLEXI_SEARCH' ) ;?>
+		<?php echo Text::_( 'FLEXI_SEARCH' ) ;?>
 	</h2>
 <?php endif; ?>
 
@@ -28,7 +29,7 @@ if (Factory::getApplication()->input->getInt('print', 0)) {
 	if ($this->params->get('print_behaviour', 'auto') == 'auto') : ?>
 		<script>jQuery(document).ready(function(){ window.print(); });</script>
 	<?php	elseif ($this->params->get('print_behaviour') == 'button') : ?>
-		<input type='button' id='printBtn' name='printBtn' value='<?php echo JText::_('Print');?>' class='btn btn-info' onclick='this.style.display="none"; window.print(); return false;'>
+		<input type='button' id='printBtn' name='printBtn' value='<?php echo Text::_('Print');?>' class='btn btn-info' onclick='this.style.display="none"; window.print(); return false;'>
 	<?php endif;
 } else {
 	$pdfbutton = '';
