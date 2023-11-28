@@ -278,7 +278,7 @@ if ( $cparams->get('default_menuitem_nopathway',1) )
 	$pathway =  $app->getPathWay();
 	$default_menu_itemid = $cparams->get('default_menu_itemid', 0);
 	$pathway_arr = $pathway->getPathway();
-	if ( count($pathway_arr) && preg_match("/Itemid=([0-9]+)/",$pathway_arr[0]->link, $matches) )
+	if ( count($pathway_arr) && preg_match("/Itemid=([0-9]+)/", (string) $pathway_arr[0]->link, $matches) )
 	{
 		if ($matches[1] == $default_menu_itemid)
 		{
