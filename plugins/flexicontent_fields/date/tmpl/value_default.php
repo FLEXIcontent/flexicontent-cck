@@ -17,7 +17,7 @@ foreach ($values as $value)
 	if (!empty($date))
 	{
 		try {
-			$date = JHtml::_('date', $date, $dateformat, $timezone ).$tz_info;
+			$date = \Joomla\CMS\HTML\HTMLHelper::_('date', $date, $dateformat, $timezone ).$tz_info;
 		} catch ( Exception $e ) {
 			$date = '';
 		}

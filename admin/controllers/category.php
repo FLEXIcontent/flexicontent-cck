@@ -22,7 +22,7 @@ jimport('legacy.controller.form');
  *
  * @since 3.3
  */
-class FlexicontentControllerCategory extends JControllerForm
+class FlexicontentControllerCategory extends \Joomla\CMS\MVC\Controller\FormController
 {
 	/**
 	 * @var		string	The extension for which the categories apply.
@@ -101,7 +101,7 @@ class FlexicontentControllerCategory extends JControllerForm
 
 		if ($this->input->get('fc_doajax_submit'))
 		{
-			JFactory::getApplication()->enqueueMessage(JText::_('FLEXI_CATEGORY_SAVED'), 'message');
+			\Joomla\CMS\Factory::getApplication()->enqueueMessage(\Joomla\CMS\Language\Text::_('FLEXI_CATEGORY_SAVED'), 'message');
 
 			// Ajax submit, do not rerender the view
 			jexit(flexicontent_html::get_system_messages_html());
@@ -138,7 +138,7 @@ class FlexicontentControllerCategory extends JControllerForm
 	 */
 	protected function allowAdd($data = array())
 	{
-		$user = JFactory::getUser();
+		$user = \Joomla\CMS\Factory::getUser();
 
 		if ($user->authorise('core.create', $this->extension))
 		{
@@ -172,7 +172,7 @@ class FlexicontentControllerCategory extends JControllerForm
 	{
 		// Initialise variables.
 		$recordId = (int) isset($data[$key]) ? $data[$key] : 0;
-		$user = JFactory::getUser();
+		$user = \Joomla\CMS\Factory::getUser();
 		$_extension = 'com_content';
 
 		// Zero record (id:0), return component edit permission by calling parent controller method
@@ -212,7 +212,7 @@ class FlexicontentControllerCategory extends JControllerForm
 	 */
 	public function batch($model)
 	{
-		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
+		\Joomla\CMS\Session\Session::checkToken('request') or jexit(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
 
 		// Set the model
 		$model	= $this->getModel('Category');

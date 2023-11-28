@@ -41,7 +41,9 @@ abstract class JHtmlFccats extends JHtmlFcbase
 	protected static function _getPreviewUrl($row)
 	{
 		global $globalcats;
+		if (!empty($globalcats[$row->id]->slug)){
 
 		return FlexicontentHelperRoute::getCategoryRoute($globalcats[$row->id]->slug, 0, array(), $row);
+	}
 	}
 }

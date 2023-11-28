@@ -114,7 +114,7 @@ foreach ($values as $n => $value)
 	<script>
 		pannellum.viewer(\'panorama_' . $uniqueid . '\', {
 			"type": "equirectangular",
-			"panorama": "' . JUri::root(true).'/'.$srco . '",
+			"panorama": "' . \Joomla\CMS\Uri\Uri::root(true).'/'.$srco . '",
 			"preview": "' . $ABS_SRC . '",
 			"title": "' . $title_encoded . '",
 			' . $hots_spots_list . '
@@ -139,7 +139,7 @@ if (!isset(static::$js_added[$field->id][__FILE__]) )
 
 	$js = "";
 
-	if ($js) JFactory::getDocument()->addScriptDeclaration($js);
+	if ($js) \Joomla\CMS\Factory::getDocument()->addScriptDeclaration($js);
 
 	static::$js_added[$field->id][__FILE__] = true;
 }

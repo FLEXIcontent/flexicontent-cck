@@ -22,7 +22,7 @@ class FcFormLayoutParameters
 	 */
 	function createPlacementConf( $item, & $fields, $params, $coreprops_fields, $via_core_field, $via_core_prop)
 	{
-		$app    = JFactory::getApplication();
+		$app    = \Joomla\CMS\Factory::getApplication();
 		$CFGsfx = $app->isClient('site') ? '' : '_be';
 
 		$placeable_fields = array_merge($via_core_field, $via_core_prop);

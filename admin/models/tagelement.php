@@ -94,7 +94,7 @@ class FlexicontentModelTagelement extends FCModelAdminList
 	 */
 	public function __construct($config = array())
 	{
-		$app    = JFactory::getApplication();
+		$app    = \Joomla\CMS\Factory::getApplication();
 		$jinput = $app->input;
 		$option = $jinput->getCmd('option', '');
 		$view   = $jinput->getCmd('view', '');
@@ -129,7 +129,7 @@ class FlexicontentModelTagelement extends FCModelAdminList
 	/**
 	 * Method to build the query for the records
 	 *
-	 * @return  JDatabaseQuery   The DB Query object
+	 * @return  \Joomla\Data\DataObjectbaseQuery   The DB Query object
 	 *
 	 * @since   3.3.0
 	 */
@@ -175,9 +175,9 @@ class FlexicontentModelTagelement extends FCModelAdminList
 	/**
 	 * Method to build the where clause of the query for the records
 	 *
-	 * @param		JDatabaseQuery|bool   $q   DB Query object or bool to indicate returning an array or rendering the clause
+	 * @param		\Joomla\Data\DataObjectbaseQuery|bool   $q   DB Query object or bool to indicate returning an array or rendering the clause
 	 *
-	 * @return  JDatabaseQuery|array
+	 * @return  \Joomla\Data\DataObjectbaseQuery|array
 	 *
 	 * @since   3.3.0
 	 */
@@ -186,7 +186,7 @@ class FlexicontentModelTagelement extends FCModelAdminList
 		// Inherited filters : filter_state, search
 		$where = parent::_buildContentWhere(false);
 
-		if ($q instanceof \JDatabaseQuery)
+		if ($q instanceof \Joomla\Data\DataObjectbaseQuery)
 		{
 			return $where ? $q->where($where) : $q;
 		}
@@ -200,9 +200,9 @@ class FlexicontentModelTagelement extends FCModelAdminList
 	/**
 	 * Method to build the having clause of the query for the files
 	 *
-	 * @param		JDatabaseQuery|bool   $q   DB Query object or bool to indicate returning an array or rendering the clause
+	 * @param		\Joomla\Data\DataObjectbaseQuery|bool   $q   DB Query object or bool to indicate returning an array or rendering the clause
 	 *
-	 * @return  JDatabaseQuery|array
+	 * @return  \Joomla\Data\DataObjectbaseQuery|array
 	 *
 	 * @since 1.0
 	 */
@@ -224,7 +224,7 @@ class FlexicontentModelTagelement extends FCModelAdminList
 				break;
 		}
 
-		if ($q instanceof \JDatabaseQuery)
+		if ($q instanceof \Joomla\Data\DataObjectbaseQuery)
 		{
 			return $having ? $q->having($having) : $q;
 		}

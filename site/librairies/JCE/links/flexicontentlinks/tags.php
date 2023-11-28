@@ -15,7 +15,7 @@
  */
 defined('_WF_EXT') or die('RESTRICTED');
 
-class FlexicontentlinksTags extends JObject {
+class FlexicontentlinksTags extends \Joomla\CMS\Object\CMSObject {
 
 	var $_option = 'com_flexicontent_tags';
 
@@ -61,7 +61,7 @@ class FlexicontentlinksTags extends JObject {
 				<div class="uk-tree-row">
 					<a href="javascript:;">
 						<span class="uk-tree-icon"></span>
-						<span class="uk-tree-text">' . JText::_('FLEXI_EDITOR_LINKS_ITEMS_BY_TAG').' ('.JText::_('FLEXI_EDITOR_LINKS_LEGACY').')' . '</span>
+						<span class="uk-tree-text">' . \Joomla\CMS\Language\Text::_('FLEXI_EDITOR_LINKS_ITEMS_BY_TAG').' ('.\Joomla\CMS\Language\Text::_('FLEXI_EDITOR_LINKS_LEGACY').')' . '</span>
 					</a>
 				</div>
 			</li>';
@@ -79,7 +79,7 @@ class FlexicontentlinksTags extends JObject {
 		$view = isset($args->view) ? $args->view : '';
 		if ($view && $view!='tags') return array();
 
-		$db = JFactory::getDbo();
+		$db = \Joomla\CMS\Factory::getDbo();
 
 		// Add tags
 		$query	= $db->getQuery(true);

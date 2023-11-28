@@ -90,7 +90,7 @@ class osmap_com_flexicontent
 		// Get show unauthorized items from component
 		if ($show_noauth === '')
 		{
-			$fparams = JComponentHelper::getParams('com_flexicontent');
+			$fparams = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
 			$show_noauth = (int) $fparams->get('show_noauth', 0);
 		}
 
@@ -297,9 +297,9 @@ class osmap_com_flexicontent
 		if ($initialized === null)
 		{
 			$initialized = true;
-			$db    = JFactory::getDBO();
-			$user  = JFactory::getUser();
-			$date  = JFactory::getDate();
+			$db    = \Joomla\CMS\Factory::getDBO();
+			$user  = \Joomla\CMS\Factory::getUser();
+			$date  = \Joomla\CMS\Factory::getDate();
 			$nullDate = $db->getNullDate();
 			$now = 'UTC_TIMESTAMP()'; //$this->_db->Quote( $date->toMySQL() );
 			$ordering = FLEXI_J16GE ? 'c.lft ASC' : 'c.ordering ASC';
@@ -462,9 +462,9 @@ class osmap_com_flexicontent
 		if ($initialized === null)
 		{
 			$initialized = true;
-			$db    = JFactory::getDBO();
-			$user  = JFactory::getUser();
-			$date  = JFactory::getDate();
+			$db    = \Joomla\CMS\Factory::getDBO();
+			$user  = \Joomla\CMS\Factory::getUser();
+			$date  = \Joomla\CMS\Factory::getDate();
 			$nullDate = $db->getNullDate();
 			$now = 'UTC_TIMESTAMP()'; //$this->_db->Quote( $date->toMySQL() );
 			$ordering = FLEXI_J16GE ? 'c.lft ASC' : 'c.ordering ASC';
@@ -498,9 +498,9 @@ class osmap_com_flexicontent
 		if ($initialized === null)
 		{
 			$initialized = true;
-			$db    = JFactory::getDBO();
-			$user  = JFactory::getUser();
-			$date  = JFactory::getDate();
+			$db    = \Joomla\CMS\Factory::getDBO();
+			$user  = \Joomla\CMS\Factory::getUser();
+			$date  = \Joomla\CMS\Factory::getDate();
 			$_nowDate = 'UTC_TIMESTAMP()'; //$this->_db->Quote( $date->toMySQL() );
 			$nullDate = $db->getNullDate();
 			$ordering = FLEXI_J16GE ? 'c.lft ASC' : 'c.ordering ASC';
@@ -569,7 +569,7 @@ class osmap_com_flexicontent
 		// CASE A: Select content according to CURRENT USER ACCESS Level
 		if (!$params['show_noauth'])
 		{
-			$user = JFactory::getUser();
+			$user = \Joomla\CMS\Factory::getUser();
 
 			$aid_arr = $user->getAuthorisedViewLevels();
 			$aid_list = implode(",", $aid_arr);
